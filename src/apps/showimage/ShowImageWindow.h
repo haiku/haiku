@@ -27,7 +27,7 @@ class ShowImageStatusView;
 
 class ShowImageWindow : public BWindow {
 public:
-								ShowImageWindow(const entry_ref* ref,
+								ShowImageWindow(const entry_ref& ref,
 									const BMessenger& trackerMessenger);
 	virtual						~ShowImageWindow();
 

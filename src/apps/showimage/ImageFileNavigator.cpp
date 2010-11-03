@@ -12,47 +12,85 @@
  *		yellowTAB GmbH
  *		Bernd Korz
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 
 
 #include "ImageFileNavigator.h"
 
-#include <math.h>
 #include <new>
 #include <stdio.h>
 
-#include <Alert.h>
-#include <Application.h>
 #include <Bitmap.h>
 #include <BitmapStream.h>
-#include <Catalog.h>
-#include <Clipboard.h>
-#include <Debug.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
-#include <Locale.h>
-#include <MenuBar.h>
-#include <MenuItem.h>
-#include <Message.h>
-#include <NodeInfo.h>
+#include <ObjectList.h>
 #include <Path.h>
-#include <PopUpMenu.h>
-#include <Rect.h>
-#include <Region.h>
-#include <Roster.h>
-#include <Screen.h>
-#include <ScrollBar.h>
-#include <StopWatch.h>
-#include <SupportDefs.h>
 #include <TranslatorRoster.h>
 
 #include <tracker_private.h>
 
 #include "ProgressWindow.h"
-#include "ShowImageApp.h"
 #include "ShowImageConstants.h"
-#include "ShowImageWindow.h"
+
+
+class Navigator {
+public:
+								Navigator();
+	virtual						~Navigator();
+
+	virtual	bool				FindNextImage(const entry_ref& currentRef,
+									entry_ref& ref, bool next, bool rewind) = 0;
+	virtual void				UpdateSelection(const entry_ref& ref) = 0;
+
+protected:
+			bool				IsImage(const entry_ref& ref);
+};
+
+
+// Navigation to the next/previous image file is based on
+// communication with Tracker, the folder containing the current
+// image needs to be open for this to work. The routine first tries
+// to find the next candidate file, then tries to load it as image.
+// As long as loading fails, the operation is repeated for the next
+// candidate file.
+
+class TrackerNavigator : public Navigator {
+public:
+								TrackerNavigator(
+									const BMessenger& trackerMessenger);
+	virtual						~TrackerNavigator();
+
+	virtual	bool				FindNextImage(const entry_ref& currentRef,
+									entry_ref& ref, bool next, bool rewind);
+	virtual void				UpdateSelection(const entry_ref& ref);
+
+private:
+			BMessenger			fTrackerMessenger;
+				// of the window that this was launched from
+};
+
+
+class FolderNavigator : public Navigator {
+public:
+								FolderNavigator(const entry_ref& ref);
+	virtual						~FolderNavigator();
+
+	virtual	bool				FindNextImage(const entry_ref& currentRef,
+									entry_ref& ref, bool next, bool rewind);
+	virtual void				UpdateSelection(const entry_ref& ref);
+
+private:
+			void				_BuildEntryList();
+	static	int					_CompareRefs(const entry_ref* refA,
+									const entry_ref* refB);
+
+private:
+			BDirectory			fFolder;
+			BObjectList<entry_ref> fEntries;
+};
 
 
 // TODO: Remove this and use Tracker's Command.h once it is moved into the
@@ -76,25 +114,223 @@ entry_ref_is_file(const entry_ref& ref)
 // #pragma mark -
 
 
-ImageFileNavigator::ImageFileNavigator(const BMessenger& target)
+Navigator::Navigator()
+{
+}
+
+
+Navigator::~Navigator()
+{
+}
+
+
+bool
+Navigator::IsImage(const entry_ref& ref)
+{
+	if (!entry_ref_is_file(ref))
+		return false;
+
+	BFile file(&ref, B_READ_ONLY);
+	if (file.InitCheck() != B_OK)
+		return false;
+
+	BTranslatorRoster* roster = BTranslatorRoster::Default();
+	if (roster == NULL)
+		return false;
+
+	translator_info info;
+	memset(&info, 0, sizeof(translator_info));
+	return roster->Identify(&file, NULL, &info, 0, NULL,
+		B_TRANSLATOR_BITMAP) == B_OK;
+}
+
+
+// #pragma mark -
+
+
+TrackerNavigator::TrackerNavigator(const BMessenger& trackerMessenger)
+	:
+	fTrackerMessenger(trackerMessenger)
+{
+}
+
+
+TrackerNavigator::~TrackerNavigator()
+{
+}
+
+
+bool
+TrackerNavigator::FindNextImage(const entry_ref& currentRef, entry_ref& ref,
+	bool next, bool rewind)
+{
+	// Based on GetTrackerWindowFile function from BeMail
+	if (!fTrackerMessenger.IsValid())
+		return false;
+
+	// Ask the Tracker what the next/prev file in the window is.
+	// Continue asking for the next reference until a valid
+	// image is found.
+	entry_ref nextRef = currentRef;
+	bool foundRef = false;
+	while (!foundRef) {
+		BMessage request(B_GET_PROPERTY);
+		BMessage specifier;
+		if (rewind)
+			specifier.what = B_DIRECT_SPECIFIER;
+		else if (next)
+			specifier.what = 'snxt';
+		else
+			specifier.what = 'sprv';
+		specifier.AddString("property", "Entry");
+		if (rewind)
+			// if rewinding, ask for the ref to the
+			// first item in the directory
+			specifier.AddInt32("data", 0);
+		else
+			specifier.AddRef("data", &nextRef);
+		request.AddSpecifier(&specifier);
+
+		BMessage reply;
+		if (fTrackerMessenger.SendMessage(&request, &reply) != B_OK)
+			return false;
+		if (reply.FindRef("result", &nextRef) != B_OK)
+			return false;
+
+		if (IsImage(nextRef))
+			foundRef = true;
+
+		rewind = false;
+			// stop asking for the first ref in the directory
+	}
+
+	ref = nextRef;
+	return foundRef;
+}
+
+
+void
+TrackerNavigator::UpdateSelection(const entry_ref& ref)
+{
+	BMessage setSelection(B_SET_PROPERTY);
+	setSelection.AddSpecifier("Selection");
+	setSelection.AddRef("data", &ref);
+	fTrackerMessenger.SendMessage(&setSelection);
+}
+
+
+// #pragma mark -
+
+
+FolderNavigator::FolderNavigator(const entry_ref& ref)
+	:
+	fEntries(true)
+{
+	node_ref nodeRef;
+	nodeRef.device = ref.device;
+	nodeRef.node = ref.directory;
+
+	fFolder.SetTo(&nodeRef);
+	_BuildEntryList();
+
+	// TODO: monitor the directory for changes, sort it naturally
+}
+
+
+FolderNavigator::~FolderNavigator()
+{
+}
+
+
+bool
+FolderNavigator::FindNextImage(const entry_ref& currentRef, entry_ref& nextRef,
+	bool next, bool rewind)
+{
+	int32 index;
+	if (rewind) {
+		index = next ? fEntries.CountItems() : 0;
+		next = !next;
+	} else {
+		index = fEntries.BinarySearchIndex(currentRef,
+			&FolderNavigator::_CompareRefs);
+		if (next)
+			index++;
+		else
+			index--;
+	}
+
+	while (index < fEntries.CountItems() && index >= 0) {
+		const entry_ref& ref = *fEntries.ItemAt(index);
+		if (IsImage(ref)) {
+			nextRef = ref;
+			return true;
+		} else {
+			// remove non-image entries
+			delete fEntries.RemoveItemAt(index);
+			if (!next)
+				index--;
+		}
+	}
+
+	return false;
+}
+
+
+void
+FolderNavigator::UpdateSelection(const entry_ref& ref)
+{
+	// nothing to do for us here
+}
+
+
+void
+FolderNavigator::_BuildEntryList()
+{
+	fEntries.MakeEmpty();
+	fFolder.Rewind();
+
+	while (true) {
+		entry_ref* ref = new entry_ref();
+		status_t status = fFolder.GetNextRef(ref);
+		if (status != B_OK)
+			break;
+
+		fEntries.AddItem(ref);
+	}
+
+	fEntries.SortItems(&FolderNavigator::_CompareRefs);
+}
+
+
+/*static*/ int
+FolderNavigator::_CompareRefs(const entry_ref* refA, const entry_ref* refB)
+{
+	// TODO: natural sorting? Collating via current locale?
+	return strcasecmp(refA->name, refB->name);
+}
+
+
+// #pragma mark -
+
+
+ImageFileNavigator::ImageFileNavigator(const BMessenger& target,
+	const entry_ref& ref, const BMessenger& trackerMessenger)
 	:
 	fTarget(target),
 	fProgressWindow(NULL),
 	fDocumentIndex(1),
 	fDocumentCount(1)
 {
+	if (trackerMessenger.IsValid())
+		fNavigator = new TrackerNavigator(trackerMessenger);
+	else
+		fNavigator = new FolderNavigator(ref);
 }
 
 
 ImageFileNavigator::~ImageFileNavigator()
 {
-}
-
-
-void
-ImageFileNavigator::SetTrackerMessenger(const BMessenger& trackerMessenger)
-{
-	fTrackerMessenger = trackerMessenger;
+	delete fNavigator;
 }
 
 
@@ -175,20 +411,7 @@ ImageFileNavigator::LoadImage(const entry_ref& ref, int32 page)
 		return status;
 	}
 
-	be_roster->AddToRecentDocuments(&fCurrentRef, kApplicationSignature);
 	return B_OK;
-}
-
-
-void
-ImageFileNavigator::GetName(BString* outName)
-{
-	BEntry entry(&fCurrentRef);
-	char name[B_FILE_NAME_LENGTH];
-	if (entry.InitCheck() < B_OK || entry.GetName(name) < B_OK)
-		outName->SetTo("");
-	else
-		outName->SetTo(name);
 }
 
 
@@ -299,7 +522,7 @@ bool
 ImageFileNavigator::HasNextFile()
 {
 	entry_ref ref;
-	return _FindNextImage(fCurrentRef, ref, true, false);
+	return fNavigator->FindNextImage(fCurrentRef, ref, true, false);
 }
 
 
@@ -307,7 +530,7 @@ bool
 ImageFileNavigator::HasPreviousFile()
 {
 	entry_ref ref;
-	return _FindNextImage(fCurrentRef, ref, false, false);
+	return fNavigator->FindNextImage(fCurrentRef, ref, false, false);
 }
 
 
@@ -335,90 +558,12 @@ ImageFileNavigator::DeleteFile()
 // #pragma mark -
 
 
-bool
-ImageFileNavigator::_IsImage(const entry_ref& ref)
-{
-	if (!entry_ref_is_file(ref))
-		return false;
-
-	BFile file(&ref, B_READ_ONLY);
-	if (file.InitCheck() != B_OK)
-		return false;
-
-	BTranslatorRoster *roster = BTranslatorRoster::Default();
-	if (!roster)
-		return false;
-
-	BMessage ioExtension;
-	if (ioExtension.AddInt32("/documentIndex", fDocumentIndex) != B_OK)
-		return false;
-
-	translator_info info;
-	memset(&info, 0, sizeof(translator_info));
-	if (roster->Identify(&file, &ioExtension, &info, 0, NULL,
-		B_TRANSLATOR_BITMAP) != B_OK)
-		return false;
-
-	return true;
-}
-
-
-bool
-ImageFileNavigator::_FindNextImage(const entry_ref& currentRef, entry_ref& ref,
-	bool next, bool rewind)
-{
-	// Based on GetTrackerWindowFile function from BeMail
-	if (!fTrackerMessenger.IsValid())
-		return false;
-
-	// Ask the Tracker what the next/prev file in the window is.
-	// Continue asking for the next reference until a valid
-	// image is found.
-	entry_ref nextRef = currentRef;
-	bool foundRef = false;
-	while (!foundRef) {
-		BMessage request(B_GET_PROPERTY);
-		BMessage spc;
-		if (rewind)
-			spc.what = B_DIRECT_SPECIFIER;
-		else if (next)
-			spc.what = 'snxt';
-		else
-			spc.what = 'sprv';
-		spc.AddString("property", "Entry");
-		if (rewind)
-			// if rewinding, ask for the ref to the
-			// first item in the directory
-			spc.AddInt32("data", 0);
-		else
-			spc.AddRef("data", &nextRef);
-		request.AddSpecifier(&spc);
-
-		BMessage reply;
-		if (fTrackerMessenger.SendMessage(&request, &reply) != B_OK)
-			return false;
-		if (reply.FindRef("result", &nextRef) != B_OK)
-			return false;
-
-		if (_IsImage(nextRef))
-			foundRef = true;
-
-		rewind = false;
-			// stop asking for the first ref in the directory
-	}
-
-	ref = nextRef;
-	return foundRef;
-}
-
-
 status_t
 ImageFileNavigator::_LoadNextImage(bool next, bool rewind)
 {
 	entry_ref currentRef = fCurrentRef;
 	entry_ref ref;
-	bool found = _FindNextImage(currentRef, ref, next, rewind);
-	if (found) {
+	if (fNavigator->FindNextImage(currentRef, ref, next, rewind)) {
 		// Keep trying to load images until:
 		// 1. The image loads successfully
 		// 2. The last file in the directory is found (for find next or find
@@ -427,24 +572,13 @@ ImageFileNavigator::_LoadNextImage(bool next, bool rewind)
 		// 4. The call to _FindNextImage fails for any other reason
 		while (LoadImage(ref) != B_OK) {
 			currentRef = ref;
-			found = _FindNextImage(currentRef, ref, next, false);
-			if (!found)
+			if (!fNavigator->FindNextImage(currentRef, ref, next, false))
 				return B_ENTRY_NOT_FOUND;
 		}
-		_SetTrackerSelectionToCurrent();
+		fNavigator->UpdateSelection(fCurrentRef);
 		return B_OK;
 	}
 	return B_ENTRY_NOT_FOUND;
-}
-
-
-void
-ImageFileNavigator::_SetTrackerSelectionToCurrent()
-{
-	BMessage setSelection(B_SET_PROPERTY);
-	setSelection.AddSpecifier("Selection");
-	setSelection.AddRef("data", &fCurrentRef);
-	fTrackerMessenger.SendMessage(&setSelection);
 }
 
 

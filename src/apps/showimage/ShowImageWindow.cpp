@@ -75,11 +75,11 @@ bs_printf(BString* string, const char* format, ...)
 //	#pragma mark -- ShowImageWindow
 
 
-ShowImageWindow::ShowImageWindow(const entry_ref* ref,
+ShowImageWindow::ShowImageWindow(const entry_ref& ref,
 	const BMessenger& trackerMessenger)
 	:
 	BWindow(BRect(5, 24, 250, 100), "", B_DOCUMENT_WINDOW, 0),
-	fNavigator(this),
+	fNavigator(this, ref, trackerMessenger),
 	fSavePanel(NULL),
 	fBar(NULL),
 	fBrowseMenu(NULL),
@@ -142,9 +142,8 @@ ShowImageWindow::ShowImageWindow(const entry_ref* ref,
 	SetSizeLimits(250, 100000, 100, 100000);
 
 	// finish creating the window
-	fNavigator.SetTrackerMessenger(trackerMessenger);
-	if (fNavigator.LoadImage(*ref) != B_OK) {
-		_LoadError(*ref);
+	if (fNavigator.LoadImage(ref) != B_OK) {
+		_LoadError(ref);
 		Quit();
 		return;
 	}

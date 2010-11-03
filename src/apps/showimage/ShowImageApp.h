@@ -35,7 +35,7 @@ public:
 
 private:
 			void				_StartPulse();
-			void				_Open(const entry_ref* ref,
+			void				_Open(const entry_ref& ref,
 									BMessenger& trackerMessenger);
 			void				_BroadcastToWindows(BMessage* message);
 			void				_CheckClipboard();

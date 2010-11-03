@@ -21,6 +21,7 @@
 #include <String.h>
 
 
+class Navigator;
 class ProgressWindow;
 
 enum {
@@ -30,18 +31,17 @@ enum {
 
 class ImageFileNavigator {
 public:
-								ImageFileNavigator(const BMessenger& target);
+								ImageFileNavigator(const BMessenger& target,
+									const entry_ref& ref,
+									const BMessenger& trackerMessenger);
 	virtual						~ImageFileNavigator();
 
-			void				SetTrackerMessenger(
-									const BMessenger& trackerMessenger);
 			void				SetProgressWindow(
 									ProgressWindow* progressWindow);
 
 			status_t			LoadImage(const entry_ref& ref, int32 page = 1);
 			const entry_ref&	ImageRef() const { return fCurrentRef; }
 
-			void				GetName(BString* name);
 			void				GetPath(BString* name);
 
 			// The same image file may have multiple pages, TIFF images for
@@ -55,12 +55,6 @@ public:
 			bool				PreviousPage();
 			bool				GoToPage(int32 page);
 
-			// Navigation to the next/previous image file is based on
-			// communication with Tracker, the folder containing the current
-			// image needs to be open for this to work. The routine first tries
-			// to find the next candidate file, then tries to load it as image.
-			// As long as loading fails, the operation is repeated for the next
-			// candidate file.
 			void				FirstFile();
 			void				NextFile();
 			void				PreviousFile();
@@ -70,18 +64,12 @@ public:
 			void				DeleteFile();
 
 private:
-			bool				_IsImage(const entry_ref& ref);
-			bool				_FindNextImage(const entry_ref& current,
-									entry_ref& ref, bool next,
-									bool rewind);
 			status_t			_LoadNextImage(bool next, bool rewind);
-			void				_SetTrackerSelectionToCurrent();
 
 private:
 			BMessenger			fTarget;
-			BMessenger			fTrackerMessenger;
-				// of the window that this was launched from
 			ProgressWindow*		fProgressWindow;
+			Navigator*			fNavigator;
 
 			entry_ref			fCurrentRef;
 			int32				fDocumentIndex;

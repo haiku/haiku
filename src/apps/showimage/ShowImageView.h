@@ -191,8 +191,6 @@ private:
 
 private:
 			ShowImageUndo		fUndo;
-			BMessenger			fTrackerMessenger;
-				// of the window that this was launched from
 			entry_ref			fCurrentRef;
 
 			BBitmap*			fBitmap;

@@ -257,13 +257,6 @@ ShowImageView::Pulse()
 
 
 void
-ShowImageView::SetTrackerMessenger(const BMessenger& trackerMessenger)
-{
-	fTrackerMessenger = trackerMessenger;
-}
-
-
-void
 ShowImageView::_SendMessageToWindow(BMessage *message)
 {
 	BMessenger target(Window());
@@ -421,6 +414,8 @@ ShowImageView::SetImage(const entry_ref* ref, BBitmap* bitmap)
 	fCaption = path.Path();
 	fFormatDescription = "Bitmap";
 	fMimeType = "image/x-be-bitmap";
+
+	be_roster->AddToRecentDocuments(ref, kApplicationSignature);
 
 	fFitToBoundsZoom = _FitToBoundsZoom();
 	ResetZoom();

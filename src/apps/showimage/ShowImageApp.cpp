@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -168,7 +168,7 @@ ShowImageApp::RefsReceived(BMessage* message)
 
 	entry_ref ref;
 	for (int32 i = 0; message->FindRef("refs", i, &ref) == B_OK; i++) {
-		_Open(&ref, trackerMessenger);
+		_Open(ref, trackerMessenger);
 	}
 }
 
@@ -200,7 +200,7 @@ ShowImageApp::_StartPulse()
 
 
 void
-ShowImageApp::_Open(const entry_ref* ref, BMessenger& trackerMessenger)
+ShowImageApp::_Open(const entry_ref& ref, BMessenger& trackerMessenger)
 {
 	new ShowImageWindow(ref, trackerMessenger);
 }
