@@ -1,9 +1,10 @@
 /*
- * Copyright 2008, Haiku Inc. All Rights Reserved.
+ * Copyright 2008-2010 Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _SHADOW_H_
 #define _SHADOW_H_
+
 
 #include <stddef.h>
 #include <stdio.h>

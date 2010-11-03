@@ -1,9 +1,10 @@
 /*
- * Copyright 2009, Haiku Inc. All Rights Reserved.
+ * Copyright 2009-2010 Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _LIBGEN_H
 #define _LIBGEN_H
+
 
 #include <sys/cdefs.h>
 

@@ -1,4 +1,9 @@
 /*
+ * Copyright 2005-2010 Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
+/*
    Make life easier for those porting old Berkeley style
    code...
 */

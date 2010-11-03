@@ -1,9 +1,10 @@
 /*
- * errno.h
+ * Copyright 2002-2010 Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
  */
-
 #ifndef _POSIX_ERRNO_H
 #define _POSIX_ERRNO_H
+
 
 #ifdef __cplusplus
 extern "C"

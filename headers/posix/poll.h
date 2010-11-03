@@ -1,8 +1,10 @@
+/*
+ * Copyright 2002-2010 Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _POLL_H
 #define _POLL_H
-/* 
-** Distributed under the terms of the OpenBeOS License.
-*/
+
 
 typedef unsigned long nfds_t;
 

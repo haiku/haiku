@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006, Haiku Inc. All Rights Reserved.
+ * Copyright 2005-2010 Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _TIME_H_

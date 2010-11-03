@@ -1,9 +1,10 @@
 /*
- * Copyright 2008, Haiku, Inc.
+ * Copyright 2008-2010 Haiku Inc.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _SEMAPHORE_H_
 #define _SEMAPHORE_H_
+
 
 #include <fcntl.h>
 #include <stdint.h>

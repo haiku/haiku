@@ -1,8 +1,10 @@
-/* 
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2003-2010 Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _STDIO_PRE_H_
 #define _STDIO_PRE_H_
+
 
 #ifndef _STDIO_H_
 #	error "This file must be included from stdio.h!"

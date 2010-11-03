@@ -1,8 +1,10 @@
+/*
+ * Copyright 2002-2010 Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _PWD_H_
 #define _PWD_H_
-/* 
-** Distributed under the terms of the OpenBeOS License.
-*/
+
 
 #include <sys/types.h>
 

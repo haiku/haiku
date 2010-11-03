@@ -1,8 +1,9 @@
+/*
+ * Copyright 2002-2010 Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _UTIME_H_
 #define _UTIME_H_
-/* 
-** Distributed under the terms of the OpenBeOS License.
-*/
 
 
 #include <sys/types.h>

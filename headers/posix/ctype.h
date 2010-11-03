@@ -1,8 +1,10 @@
+/*
+ * Copyright 2003-2010 Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _CTYPE_H
 #define _CTYPE_H
-/*
-** Distributed under the terms of the OpenBeOS License.
-*/
+
 
 #ifdef __cplusplus
 extern "C" {

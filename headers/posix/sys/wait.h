@@ -1,8 +1,9 @@
+/*
+ * Copyright 2004-2010 Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _SYS_WAIT_H
 #define _SYS_WAIT_H
-/* 
-** Distributed under the terms of the OpenBeOS License.
-*/
 
 
 #include <sys/types.h>

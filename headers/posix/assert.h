@@ -1,8 +1,10 @@
-/* 
-** Distributed under the terms of the Haiku License.
-*/
+/*
+ * Copyright 2004-2010 Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _ASSERT_H_
 #define _ASSERT_H_
+
 
 #undef assert
 

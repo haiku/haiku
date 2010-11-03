@@ -1,9 +1,10 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010 Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _NET_IF_TYPES_H
 #define _NET_IF_TYPES_H
+
 
 #define IFT_OTHER		0x01
 #define IFT_ETHER		0x06

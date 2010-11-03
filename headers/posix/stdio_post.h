@@ -1,8 +1,10 @@
-/* 
-** Distributed under the terms of the Haiku License.
-*/
+/*
+ * Copyright 2003-2010 Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _STDIO_POST_H_
 #define _STDIO_POST_H_
+
 
 /* "Private"/inline functions of our BeOS compatible stdio implementation */
 
