@@ -136,13 +136,13 @@ read_write(scsi_periph_device_info *device, scsi_ccb *request,
 				numBlocks = 0x100;
 
 			// no way to break the 21 bit address limit
-			if (pos > 0x200000)
+			if (offset > 0x200000)
 				return B_BAD_VALUE;
 
 			// don't allow transfer cross the 24 bit address limit
 			// (I'm not sure whether this is allowed, but this way we
 			// are sure to not ask for trouble)
-			if (pos < 0x100000)
+			if (offset < 0x100000)
 				numBlocks = min_c(numBlocks, 0x100000 - pos);
 		}
 
@@ -164,7 +164,7 @@ read_write(scsi_periph_device_info *device, scsi_ccb *request,
 			(request->flags & SCSI_ORDERED_QTAG) != 0 ? "yes" : "no");
 
 		// use shortest commands whenever possible
-		if (pos + numBlocks < 0x200000 && numBlocks <= 0x100) {
+		if (offset + numBlocks < 0x200000LL && numBlocks <= 0x100) {
 			scsi_cmd_rw_6 *cmd = (scsi_cmd_rw_6 *)request->cdb;
 
 			isReadWrite10 = false;
