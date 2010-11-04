@@ -1235,7 +1235,7 @@ if [ IsOptionalHaikuImagePackageAdded OpenSSH ] {
 		}
 		InstallOptionalHaikuImagePackage
 			openssh-5.6p1-x86-gcc2-2010-08-31.zip
-			: $(baseURL)/openssh-5.6p1-x86-gcc2-2010-08-31.zip
+			: $(baseURL)/openssh-5.6p1-x86-gcc2-2010-11-03.zip
 			:
 		;
 
