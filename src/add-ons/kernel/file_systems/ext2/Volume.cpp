@@ -214,7 +214,7 @@ ext2_super_block::IsValid()
 Volume::Volume(fs_volume* volume)
 	:
 	fFSVolume(volume),
-	fBlockAllocator(this),
+	fBlockAllocator(NULL),
 	fInodeAllocator(this),
 	fJournalInode(NULL),
 	fFlags(0),
@@ -228,6 +228,7 @@ Volume::Volume(fs_volume* volume)
 Volume::~Volume()
 {
 	TRACE("Volume destructor.\n");
+	delete fBlockAllocator;
 	if (fGroupBlocks != NULL) {
 		uint32 blockCount = (fNumGroups + fGroupsPerBlock - 1)
 			/ fGroupsPerBlock;
@@ -396,16 +397,24 @@ Volume::Mount(const char* deviceName, uint32 flags)
 		return status;
 	}
 
-	// Initialize allocators
-	TRACE("Volume::Mount(): Initialize block allocator\n");
-	status = fBlockAllocator.Initialize();
-	if (status != B_OK) {
-		FATAL("could not initialize block allocator, going read-only!\n");
-		fFlags |= VOLUME_READ_ONLY;
-		fJournal->Uninit();
-		delete fJournal;
-		delete fJournalInode;
-		fJournal = new(std::nothrow) NoJournal(this);
+	if (!IsReadOnly()) {
+		// Initialize allocators
+		fBlockAllocator = new(std::nothrow) BlockAllocator(this);
+		if (fBlockAllocator != NULL) {
+			TRACE("Volume::Mount(): Initialize block allocator\n");
+			status = fBlockAllocator->Initialize();
+		}
+		if (fBlockAllocator == NULL || status != B_OK) {
+			delete fBlockAllocator;
+			fBlockAllocator = NULL;
+			FATAL("could not initialize block allocator, going read-only!\n");
+			fFlags |= VOLUME_READ_ONLY;
+			fJournal->Uninit();
+			delete fJournal;
+			delete fJournalInode;
+			fJournalInode = NULL;
+			fJournal = new(std::nothrow) NoJournal(this);
+		}
 	}
 
 	// ready
@@ -562,12 +571,14 @@ Volume::GetBlockGroup(int32 index, ext2_block_group** _group)
 			return B_NO_MEMORY;
 
 		memcpy(fGroupBlocks[blockIndex], block, fBlockSize);
+
+		TRACE("group [%ld]: inode table %lld\n", index, ((ext2_block_group*)
+			(fGroupBlocks[blockIndex] + (index % fGroupsPerBlock) 
+			* fGroupDescriptorSize))->InodeTable(Has64bitFeature()));
 	}
 
 	*_group = (ext2_block_group*)(fGroupBlocks[blockIndex]
 		+ (index % fGroupsPerBlock) * fGroupDescriptorSize);
-	TRACE("group [%ld]: inode table %lld\n", index, 
-		(*_group)->InodeTable(Has64bitFeature()));
 	return B_OK;
 }
 
@@ -739,7 +750,7 @@ Volume::AllocateBlocks(Transaction& transaction, uint32 minimum, uint32 maximum,
 
 	TRACE("Volume::AllocateBlocks(): Calling the block allocator\n");
 
-	status_t status = fBlockAllocator.AllocateBlocks(transaction, minimum,
+	status_t status = fBlockAllocator->AllocateBlocks(transaction, minimum,
 		maximum, blockGroup, start, length);
 	if (status != B_OK)
 		return status;
@@ -759,7 +770,7 @@ Volume::FreeBlocks(Transaction& transaction, off_t start, uint32 length)
 	if (IsReadOnly())
 		return B_READ_ONLY_DEVICE;
 
-	status_t status = fBlockAllocator.Free(transaction, start, length);
+	status_t status = fBlockAllocator->Free(transaction, start, length);
 	if (status != B_OK)
 		return status;
 

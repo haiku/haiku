@@ -16,9 +16,9 @@ public:
 							BitmapBlock(Volume* volume, uint32 numBits);
 							~BitmapBlock();
 
-			bool			SetTo(uint32 block);
+			bool			SetTo(off_t block);
 			bool			SetToWritable(Transaction& transaction,
-								uint32 block, bool empty = false);
+								off_t block, bool empty = false);
 
 			bool			CheckMarked(uint32 start, uint32 length);
 			bool			CheckUnmarked(uint32 start, uint32 length);

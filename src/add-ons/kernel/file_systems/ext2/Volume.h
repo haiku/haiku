@@ -136,7 +136,7 @@ private:
 			ext2_super_block	fSuperBlock;
 			char				fName[32];
 
-			BlockAllocator		fBlockAllocator;
+			BlockAllocator*		fBlockAllocator;
 			InodeAllocator		fInodeAllocator;
 			Journal*			fJournal;
 			Inode*				fJournalInode;

@@ -4,6 +4,7 @@
  *
  * Authors:
  *		Janito V. Ferreira Filho
+ *		Jérôme Duval
  */
 
 
@@ -130,11 +131,13 @@ AllocationBlockGroup::Initialize(Volume* volume, uint32 blockGroup,
 
 	status = ScanFreeRanges();
 
-	if (fGroupDescriptor->FreeBlocks(fVolume->Has64bitFeature()) != fFreeBits) {
-		ERROR("AllocationBlockGroup::Initialize(): Mismatch between counted "
-			"free blocks (%lu) and what is set on the group descriptor "
-			"(%lu)\n", fFreeBits, 
-			fGroupDescriptor->FreeBlocks(fVolume->Has64bitFeature()));
+	if (fGroupDescriptor->FreeBlocks(fVolume->Has64bitFeature())
+		!= fFreeBits) {
+		ERROR("AllocationBlockGroup(%lu,%lld)::Initialize(): Mismatch between "
+			"counted free blocks (%lu/%lu) and what is set on the group "
+			"descriptor (%lu)\n", fBlockGroup, fBitmapBlock, fFreeBits,
+			fNumBits, fGroupDescriptor->FreeBlocks(
+				fVolume->Has64bitFeature()));
 		return B_BAD_DATA;
 	}
 
@@ -161,6 +164,7 @@ AllocationBlockGroup::ScanFreeRanges()
 
 	while (end < fNumBits) {
 		block.FindNextUnmarked(start);
+		ASSERT(block.CheckMarked(end, start - end));
 		end = start;
 
 		if (start != block.NumBits()) {

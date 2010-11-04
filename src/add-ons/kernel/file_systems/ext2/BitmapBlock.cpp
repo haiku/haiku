@@ -4,6 +4,7 @@
  *
  * Authors:
  *		Janito V. Ferreira Filho
+ *		Jérôme Duval
  */
 
 
@@ -16,6 +17,7 @@
 #else
 #	define TRACE(x...) ;
 #endif
+#define ERROR(x...) dprintf("\33[34mext2:\33[0m " x)
 
 
 BitmapBlock::BitmapBlock(Volume* volume, uint32 numBits)
@@ -35,7 +37,7 @@ BitmapBlock::~BitmapBlock()
 
 
 /*virtual*/ bool
-BitmapBlock::SetTo(uint32 block)
+BitmapBlock::SetTo(off_t block)
 {
 	fData = NULL;
 	fReadOnlyData = (uint32*)CachedBlock::SetTo(block);
@@ -45,7 +47,7 @@ BitmapBlock::SetTo(uint32 block)
 
 
 /*virtual*/ bool
-BitmapBlock::SetToWritable(Transaction& transaction, uint32 block, bool empty)
+BitmapBlock::SetToWritable(Transaction& transaction, off_t block, bool empty)
 {
 	fReadOnlyData = NULL;
 	fData = (uint32*)CachedBlock::SetToWritable(transaction, block, empty);
@@ -74,7 +76,7 @@ BitmapBlock::CheckUnmarked(uint32 start, uint32 length)
 	
 	if (length < 32) {
 		if (startBit + length < 32) {
-			uint32 bits = B_LENDIAN_TO_HOST_INT32(fData[startIndex]);
+			uint32 bits = B_LENDIAN_TO_HOST_INT32(data[startIndex]);
 
 			uint32 mask = (1 << (startBit + length)) - 1;
 			mask &= ~((1 << startBit) - 1);
@@ -147,7 +149,7 @@ BitmapBlock::CheckMarked(uint32 start, uint32 length)
 	
 	if (length < 32) {
 		if (startBit + length < 32) {
-			uint32 bits = B_LENDIAN_TO_HOST_INT32(fData[startIndex]);
+			uint32 bits = B_LENDIAN_TO_HOST_INT32(data[startIndex]);
 
 			uint32 mask = (1 << (startBit + length)) - 1;
 			mask &= ~((1 << startBit) - 1);
@@ -165,8 +167,10 @@ BitmapBlock::CheckMarked(uint32 start, uint32 length)
 		mask = ~((1 << startBit) - 1);
 		uint32 bits = B_LENDIAN_TO_HOST_INT32(data[index]);
 
-		if ((bits & mask) != mask)
+		if ((bits & mask) != mask) {
+			TRACE("BitmapBlock::CheckMarked(): failed\n");
 			return false;
+		}
 
 		index += 1;
 	} else
@@ -174,16 +178,20 @@ BitmapBlock::CheckMarked(uint32 start, uint32 length)
 
 	mask = 0xFFFFFFFF;
 	for (; iterations > 0; --iterations) {
-		if (data[index++] != mask)
+		if (data[index++] != mask) {
+			TRACE("BitmapBlock::CheckMarked(): failed at index %ld\n", index);
 			return false;
+		}
 	}
 
 	if (remainingBits != 0) {
 		mask = (1 << remainingBits) - 1;
 		uint32 bits = B_HOST_TO_LENDIAN_INT32(data[index]);
 
-		if ((bits & mask) != mask)
+		if ((bits & mask) != mask) {
+			TRACE("BitmapBlock::CheckMarked(): failed remaining\n");
 			return false;
+		}
 	}
 
 	return true;
@@ -210,7 +218,7 @@ BitmapBlock::Mark(uint32 start, uint32 length, bool force)
 			mask &= ~((1 << startBit) - 1);
 			
 			if ((bits & mask) != 0) {
-				TRACE("BitmapBlock::Mark() Marking failed bits %lx "
+				ERROR("BitmapBlock::Mark() Marking failed bits %lx "
 					"startBit %ld\n", bits, startBit);
 				return false;
 			}
@@ -240,7 +248,7 @@ BitmapBlock::Mark(uint32 start, uint32 length, bool force)
 			mask, bits);
 
 		if (!force && (bits & mask) != 0) {
-			TRACE("BitmapBlock::Mark() Marking failed bits %lx "
+			ERROR("BitmapBlock::Mark() Marking failed bits %lx "
 					"startBit %ld\n", bits, startBit);
 			return false;
 		}
@@ -255,7 +263,7 @@ BitmapBlock::Mark(uint32 start, uint32 length, bool force)
 	mask = 0xFFFFFFFF;
 	for (; iterations > 0; --iterations) {
 		if (!force && fData[index] != 0) {
-			TRACE("BitmapBlock::Mark() Marking failed "
+			ERROR("BitmapBlock::Mark() Marking failed "
 				"index %ld, iterations %ld\n", index, iterations);
 			return false;
 		}
@@ -269,7 +277,7 @@ BitmapBlock::Mark(uint32 start, uint32 length, bool force)
 			" mask: %lX\n", index, remainingBits, bits, mask);
 
 		if (!force && (bits & mask) != 0) {
-			TRACE("BitmapBlock::Mark() Marking failed remaining\n");
+			ERROR("BitmapBlock::Mark() Marking failed remaining\n");
 			return false;
 		}
 
@@ -309,7 +317,7 @@ BitmapBlock::Unmark(uint32 start, uint32 length, bool force)
 			TRACE("BitmapBlock::Unmark(): mask: %lx\n", mask);
 
 			if ((bits & mask) != mask) {
-				TRACE("BitmapBlock::Unmark() Marking failed bits %lx "
+				ERROR("BitmapBlock::Unmark() Marking failed bits %lx "
 					"startBit %ld\n", bits, startBit);
 				return false;
 			}
@@ -349,7 +357,7 @@ BitmapBlock::Unmark(uint32 start, uint32 length, bool force)
 	mask = 0xFFFFFFFF;
 	for (; iterations > 0; --iterations) {
 		if (!force && fData[index] != mask) {
-			TRACE("BitmapBlock::Unmark() Marking failed "
+			ERROR("BitmapBlock::Unmark() Marking failed "
 				"index %ld, iterations %ld\n", index, iterations);
 			return false;
 		}
@@ -365,7 +373,7 @@ BitmapBlock::Unmark(uint32 start, uint32 length, bool force)
 		TRACE("BitmapBlock::Unmark(): mask: %lx, bits: %lx\n", mask, bits);
 
 		if (!force && (bits & mask) != mask) {
-			TRACE("BitmapBlock::Unmark() Marking failed remaining\n");
+			ERROR("BitmapBlock::Unmark() Marking failed remaining\n");
 			return false;
 		}
 
