@@ -1622,7 +1622,12 @@ if [ IsOptionalHaikuImagePackageAdded Vision ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Vision available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
-		Echo "No optional package Vision for gcc4" ;
+		InstallOptionalHaikuImagePackage vision-908-x86-gcc2-2010-10-30.zip
+			: $(baseURL)/vision-908-x86-gcc4-2010-11-04.zip
+			:
+		;
+		AddSymlinkToHaikuImage home config be Applications
+			: /boot/apps/Vision/Vision ;
 	} else {
 		InstallOptionalHaikuImagePackage vision-908-x86-gcc2-2010-10-30.zip
 			: $(baseURL)/vision-908-x86-gcc2-2010-10-30.zip
