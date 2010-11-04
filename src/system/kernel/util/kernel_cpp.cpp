@@ -56,6 +56,20 @@ __cxa_pure_virtual()
 	panic("pure virtual function call\n");
 }
 
+
+extern "C" int
+__cxa_atexit(void (*hook)(void*), void* data, void* dsoHandle)
+{
+	return 0;
+}
+
+
+extern "C" void
+__cxa_finalize(void* dsoHandle)
+{
+}
+
+
 #endif
 
 // full C++ support in the kernel
