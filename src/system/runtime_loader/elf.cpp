@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -910,7 +910,7 @@ terminate_program(void)
 	image_t **termList;
 	ssize_t count, i;
 
-	count = get_sorted_image_list(gProgramImage, &termList, RFLAG_TERMINATED);
+	count = get_sorted_image_list(NULL, &termList, RFLAG_TERMINATED);
 	if (count < B_OK)
 		return;
 
