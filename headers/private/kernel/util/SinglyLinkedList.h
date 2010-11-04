@@ -1,6 +1,6 @@
 /*
  * Copyright 2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
- * Copyright 2005-2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2005-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  *
  * Distributed under the terms of the MIT License.
  */
@@ -143,6 +143,7 @@ class SinglyLinkedList {
 
 		inline void Add(Element* element);
 		inline void Remove(Element* element);
+		inline void Remove(Element* previous, Element* element);
 
 		inline void MoveFrom(SINGLY_LINKED_LIST_CLASS_NAME* fromList);
 			// O(1) if either list is empty, otherwise O(n).
@@ -182,7 +183,7 @@ SINGLY_LINKED_LIST_CLASS_NAME::Add(Element* element)
 	}
 }
 
-// Remove
+
 SINGLY_LINKED_LIST_TEMPLATE_LIST
 void
 SINGLY_LINKED_LIST_CLASS_NAME::Remove(Element* element)
@@ -202,6 +203,23 @@ SINGLY_LINKED_LIST_CLASS_NAME::Remove(Element* element)
 		fFirst = elementLink->next;
 	else
 		sGetLink(last)->next = elementLink->next;
+
+	elementLink->next = NULL;
+}
+
+
+SINGLY_LINKED_LIST_TEMPLATE_LIST
+void
+SINGLY_LINKED_LIST_CLASS_NAME::Remove(Element* previous, Element* element)
+{
+//	ASSERT(previous == NULL
+//		? fFirst == element : sGetLink(previous)->next == element);
+
+	Link* elementLink = sGetLink(element);
+	if (previous == NULL)
+		fFirst = elementLink->next;
+	else
+		sGetLink(previous)->next = elementLink->next;
 
 	elementLink->next = NULL;
 }
