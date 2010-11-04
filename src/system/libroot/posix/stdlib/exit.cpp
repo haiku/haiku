@@ -21,8 +21,8 @@
 #include <syscalls.h>
 
 
-extern void _IO_cleanup(void);
-extern void _thread_do_exit_work(void);
+extern "C" void _IO_cleanup(void);
+extern "C" void _thread_do_exit_work(void);
 
 struct exit_stack_info {
 	void			(*exit_stack[ATEXIT_MAX])(void);

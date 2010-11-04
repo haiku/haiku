@@ -11,7 +11,7 @@ MergeObject posix_stdlib.o :
 	bsearch.c
 	div.c
 	env.cpp
-	exit.c
+	exit.cpp
 	getsubopt.cpp
 	heapsort.c
 	merge.c
