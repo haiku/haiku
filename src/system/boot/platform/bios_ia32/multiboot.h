@@ -6,10 +6,15 @@
 #define _MULTIBOOT_H
 
 
+#ifndef __ASSEMBLER__
+
 #include <SupportDefs.h>
+
+#endif /* __ASSEMBLER__ */
 
 
 /* minimal part of the MultiBoot API */
+/* we use the official names */
 
 /* magics */
 #define MULTIBOOT_MAGIC 0x1badb002
@@ -28,6 +33,7 @@
 #define MULTIBOOT_INFO_MODS 0x00000008
 #define MULTIBOOT_INFO_MEM_MAP 0x00000040
 
+#ifndef __ASSEMBLER__
 
 /* info struct passed to the loader */
 struct multiboot_info {
@@ -65,5 +71,6 @@ extern status_t parse_multiboot_commandline(struct stage2_args *args);
 }
 #endif
 
+#endif /* __ASSEMBLER__ */
 
 #endif /* _MULTIBOOT_H */

@@ -14,19 +14,9 @@
  *	the entry function of the embedded ELF part of the loader.
  */
 
-#define GLOBAL(x) .globl x ; x
+#include "multiboot.h"
 
-// GRUB-compatible MultiBoot info
-// we use the official names
-#define MULTIBOOT_MAGIC 0x1badb002
-#define MULTIBOOT_MAGIC2 0x2badb002
-// header flags
-#define MULTIBOOT_PAGE_ALIGN 0x00000001
-#define MULTIBOOT_MEMORY_INFO 0x00000002
-#define MULTIBOOT_VIDEO_MODE 0x00000004
-#define MULTIBOOT_AOUT_KLUDGE 0x00010000
-// info flags
-#define MULTIBOOT_INFO_BOOTDEV 0x00000002
+#define GLOBAL(x) .globl x ; x
 
 #define OUR_MB_FLAGS (MULTIBOOT_PAGE_ALIGN \
 	| MULTIBOOT_MEMORY_INFO \
