@@ -142,13 +142,11 @@ static uint32
 topological_sort(image_t* image, uint32 slot, image_t** initList,
 	uint32 sortFlag)
 {
-	uint32 i;
-
 	if (image->flags & sortFlag)
 		return slot;
 
 	image->flags |= sortFlag; /* make sure we don't visit this one */
-	for (i = 0; i < image->num_needed; i++)
+	for (uint32 i = 0; i < image->num_needed; i++)
 		slot = topological_sort(image->needed[i], slot, initList, sortFlag);
 
 	initList[slot] = image;
@@ -612,6 +610,24 @@ clear_image_flags_recursively(image_t* image, uint32 flags)
 }
 
 
+/*!	Returns a topologically sorted image list.
+
+	If \a image is non-NULL, an array containing the image and all its
+	transitive dependencies is returned. If \a image is NULL, all loaded images
+	are returned. In either case dependencies are listed before images
+	depending on them.
+
+	\param image The image specifying the tree of images that shall be sorted.
+		If NULL, all loaded images are sorted.
+	\param _list On success it will be set to an array of the sorted images.
+		The caller is responsible for free()ing it.
+	\param sortFlags The image flag that shall be used for sorting. Images that
+		already have this flag set are ignored (and their dependencies, unless
+		they are also reachable via another path). The flag will be set on all
+		returned images.
+	\return The number of images in the returned array or an error code on
+		failure.
+*/
 ssize_t
 get_sorted_image_list(image_t* image, image_t*** _list, uint32 sortFlag)
 {
@@ -627,5 +643,17 @@ get_sorted_image_list(image_t* image, image_t*** _list, uint32 sortFlag)
 	memset(list, 0, sLoadedImageCount * sizeof(image_t*));
 
 	*_list = list;
-	return topological_sort(image, 0, list, sortFlag);
+
+	if (image != NULL)
+		return topological_sort(image, 0, list, sortFlag);
+
+	// no image given -- sort all loaded images
+	uint32 count = 0;
+	image = sLoadedImages.head;
+	while (image != NULL) {
+		count = topological_sort(image, count, list, sortFlag);
+		image = image->next;
+	}
+
+	return count;
 }
