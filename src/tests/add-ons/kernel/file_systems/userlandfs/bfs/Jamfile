@@ -17,8 +17,8 @@ SEARCH_SOURCE += $(bfsTop) ;
 	}
 
 	defines = [ FDefines $(defines) ] ;
-	SubDirCcFlags $(defines) -Wall -Wno-multichar ;
-	SubDirC++Flags $(defines) -Wall -Wno-multichar -fno-rtti ;
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) -fno-rtti ;
 }
 
 UsePrivateKernelHeaders ;

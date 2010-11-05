@@ -8,8 +8,8 @@ SEARCH_SOURCE
 # set some additional defines
 {
 	local defines = [ FDefines FS_SHELL USER DEBUG ] ;
-	SubDirCcFlags $(defines) -Wall -Wno-multichar ;
-	SubDirC++Flags $(defines) -Wall -Wno-multichar -fno-exceptions ;
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) -fno-exceptions ;
 }
 
 local libHaikuCompat ;

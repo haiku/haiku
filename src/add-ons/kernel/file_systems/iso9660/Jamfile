@@ -3,8 +3,7 @@ SubDir HAIKU_TOP src add-ons kernel file_systems iso9660 ;
 UsePrivateHeaders kernel ;
 
 # set some additional defines
-SubDirCcFlags -Wall -Wno-multichar ;
-SubDirC++Flags -Wall -Wno-multichar -fno-rtti ;
+SubDirC++Flags -fno-rtti ;
 
 KernelAddon iso9660 :
 	iso9660.cpp

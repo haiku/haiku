@@ -14,7 +14,7 @@ SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ]
 	-Wno-format 
 	-Wno-unused 
 	-Wno-uninitialized 
-	-Wall ;
+	;
 
 UseHeaders [ FDirName $(SUBDIR) ] : true ;
 

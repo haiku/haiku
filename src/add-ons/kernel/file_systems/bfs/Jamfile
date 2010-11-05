@@ -20,8 +20,8 @@ SubDir HAIKU_TOP src add-ons kernel file_systems bfs ;
 	}
 
 	defines = [ FDefines $(defines) ] ;
-	SubDirCcFlags $(defines) -Wall -Wno-multichar ;
-	SubDirC++Flags $(defines) -Wall -Wno-multichar ;
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) ;
 }
 
 UsePrivateKernelHeaders ;

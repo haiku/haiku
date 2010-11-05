@@ -17,8 +17,8 @@ UsePrivateHeaders [ FDirName kernel arch arm board $(TARGET_BOOT_BOARD) ] ;
 	local defines = _BOOT_MODE ;
 
 	defines = [ FDefines $(defines) ] ;
-	SubDirCcFlags $(defines) -Wall -Wno-multichar -g3 ;
-	SubDirC++Flags $(defines) -Wall -Wno-multichar -fno-rtti -g3 ;
+	SubDirCcFlags $(defines) -g3 ;
+	SubDirC++Flags $(defines) -fno-rtti -g3 ;
 }
 
 # we fake NetBSD since we don't have an OS ID yet for uimage,

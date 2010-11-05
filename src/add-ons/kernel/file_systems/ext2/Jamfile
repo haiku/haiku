@@ -1,11 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel file_systems ext2 ;
 
-# set some additional defines
-{
-	SubDirCcFlags -Wall -Wno-multichar ;
-	SubDirC++Flags -Wall -Wno-multichar ;
-}
-
 #UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName kernel util ] ;
 UsePrivateHeaders shared storage ;

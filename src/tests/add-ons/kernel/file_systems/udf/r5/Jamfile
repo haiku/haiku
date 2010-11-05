@@ -20,8 +20,8 @@ oldOPTIM = $(OPTIM) ;
 	}
 
 	defines = [ FDefines $(defines) ] ;
-	SubDirCcFlags $(defines) -Wall -Wno-multichar ;
-	SubDirC++Flags $(defines) -Wall -Wno-multichar ;
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) ;
 }
 
 UsePrivateHeaders kernel ;			# For kernel_cpp.cpp
@@ -47,7 +47,7 @@ KernelAddon <r5>udf :
 ;
 
 SEARCH on [ FGristFiles
-		kernel_cpp.cpp 
+		kernel_cpp.cpp
 	] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
 
 

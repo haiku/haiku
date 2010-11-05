@@ -23,8 +23,8 @@ oldOPTIM = $(OPTIM) ;
 	}
 
 	defines = [ FDefines $(defines) ] ;
-	SubDirCcFlags $(defines) -Wall -Wno-multichar ;
-	SubDirC++Flags $(defines) -Wall -Wno-multichar ;
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) ;
 }
 
 UsePrivateHeaders [ FDirName kernel util ] ;

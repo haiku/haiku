@@ -2,9 +2,6 @@ SubDir HAIKU_TOP src add-ons kernel drivers network etherpci ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-# set some additional flags
-SubDirCcFlags -Wall ;
-
 # For ether_driver.h
 UsePrivateHeaders net ;
 

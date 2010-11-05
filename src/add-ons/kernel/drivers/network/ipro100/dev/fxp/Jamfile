@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network ipro100 dev fxp ;
 
-SubDirCcFlags -Wall ;
-
 UseHeaders [ FDirName $(SUBDIR) .. .. ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ] : true ;
 

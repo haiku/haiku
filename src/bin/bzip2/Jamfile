@@ -2,7 +2,8 @@ SubDir HAIKU_TOP src bin bzip2 ;
 
 # set some additional defines
 {
-	SubDirCcFlags -Wall -Winline -O2 -fomit-frame-pointer -fno-strength-reduce -D_FILE_OFFSET_BITS=64 -w ;
+	SubDirCcFlags -Winline -O2 -fomit-frame-pointer -fno-strength-reduce
+		-D_FILE_OFFSET_BITS=64 -w ;
 }
 
 local bzip2_rsrc = [ FGristFiles bzip2.rsrc ] ;

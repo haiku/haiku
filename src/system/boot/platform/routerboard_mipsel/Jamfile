@@ -11,13 +11,13 @@ UsePrivateHeaders [ FDirName storage ] ;
 	local defines = _BOOT_MODE ;
 
 	defines = [ FDefines $(defines) ] ;
-	SubDirCcFlags $(defines) -Wall -Wno-multichar ;
-	SubDirC++Flags $(defines) -Wall -Wno-multichar -fno-rtti ;
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) -fno-rtti ;
 }
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;
 
-local genericPlatformSources = 
+local genericPlatformSources =
 	text_menu.cpp
 #	video_blit.cpp
 #	video_splash.cpp
