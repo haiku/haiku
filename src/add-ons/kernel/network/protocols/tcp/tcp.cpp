@@ -170,9 +170,9 @@ add_options(tcp_segment_header &segment, uint8 *buffer, size_t bufferSize)
 
 
 static void
-process_options(tcp_segment_header &segment, net_buffer *buffer, size_t size)
+process_options(tcp_segment_header &segment, net_buffer *buffer, ssize_t size)
 {
-	if (size == 0)
+	if (size <= 0)
 		return;
 
 	tcp_option *option;
@@ -180,7 +180,7 @@ process_options(tcp_segment_header &segment, net_buffer *buffer, size_t size)
 	uint8 optionsBuffer[kMaxOptionSize];
 	if (gBufferModule->direct_access(buffer, sizeof(tcp_header), size,
 			(void **)&option) != B_OK) {
-		if (size > sizeof(optionsBuffer)) {
+		if ((size_t)size > sizeof(optionsBuffer)) {
 			dprintf("Ignoring TCP options larger than expected.\n");
 			return;
 		}
