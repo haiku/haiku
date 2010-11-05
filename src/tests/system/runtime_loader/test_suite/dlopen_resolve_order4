@@ -12,7 +12,7 @@
 # not to symbol in libb_dependency.so.
 
 
-. test_setup
+. ./test_setup
 
 
 # create libb_dependency.so
@@ -21,7 +21,7 @@ int c() { return 1; }
 EOI
 
 # build
-gcc -shared -o libb_dependency.so libb_dependency.c
+compile_lib -o libb_dependency.so libb_dependency.c
 
 
 # create libb.so
@@ -30,7 +30,7 @@ int b() { return 1; }
 EOI
 
 # build
-gcc -shared -o libb.so libb.c ./libb_dependency.so
+compile_lib -o libb.so libb.c ./libb_dependency.so
 
 
 # create liba.so
@@ -40,7 +40,7 @@ int a() { return c(); }
 EOI
 
 # build
-gcc -shared -o liba.so liba.c ./libb.so
+compile_lib -o liba.so liba.c ./libb.so
 
 
 # create libd.so
@@ -49,7 +49,7 @@ int c() { return 2; }
 EOI
 
 # build
-gcc -shared -o libd.so libd.c
+compile_lib -o libd.so libd.c
 
 
 # create program
@@ -87,7 +87,7 @@ main()
 EOI
 
 # build
-gcc -o program program.c $libdl -Wl,-rpath,.,--export-dynamic
+compile_lib_dl -o program program.c
 
 # run
 test_run_ok ./program 2

@@ -8,7 +8,7 @@
 # Expected: dlsym(RTLD_NEXT) finds symbol in order liba.so, libb.so, libd.so
 
 
-. test_setup
+. ./test_setup
 
 
 # create libd.so
@@ -17,7 +17,7 @@ int a() { return 1; }
 EOI
 
 # build
-gcc -shared -o libd.so libd.c
+compile_lib -o libd.so libd.c
 
 
 # create libb.so
@@ -34,7 +34,7 @@ a()
 EOI
 
 # build
-gcc -shared -o libb.so libb.c -D_GNU_SOURCE ./libd.so $libdl
+compile_lib_dl -o libb.so libb.c ./libd.so
 
 
 # create liba.so
@@ -50,7 +50,7 @@ a()
 EOI
 
 # build
-gcc -shared -o liba.so liba.c -D_GNU_SOURCE ./libb.so $libdl
+compile_lib_dl -o liba.so liba.c ./libb.so
 
 
 # create program
@@ -73,8 +73,7 @@ main()
 EOI
 
 # build
-gcc -o program program.c -D_GNU_SOURCE ./liba.so $libdl \
-	-Wl,-rpath,.,--export-dynamic
+compile_program_dl -o program program.c ./liba.so
 
 # run
 test_run_ok ./program 15

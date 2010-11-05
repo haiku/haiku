@@ -9,7 +9,7 @@
 # Expected: Undefined symbol in liba.so resolves to symbol in libb.so.
 
 
-. test_setup
+. ./test_setup
 
 
 # create liba.so
@@ -19,7 +19,7 @@ int a() { return b(); }
 EOI
 
 # build
-gcc -shared -o liba.so liba.c
+compile_lib -o liba.so liba.c
 
 
 # create libb.so
@@ -28,7 +28,7 @@ int b() { return 1; }
 EOI
 
 # build
-gcc -shared -o libb.so libb.c
+compile_lib -o libb.so libb.c
 
 
 # create program
@@ -60,7 +60,7 @@ main()
 EOI
 
 # build
-gcc -o program program.c ./libb.so $libdl -Wl,-rpath,.,--export-dynamic
+compile_program_dl -o program program.c ./libb.so
 
 # run
 test_run_ok ./program 1

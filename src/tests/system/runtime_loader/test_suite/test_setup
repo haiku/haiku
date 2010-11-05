@@ -30,3 +30,23 @@ test_run_ok()
 		exit 1
 	fi
 }
+
+compile_lib()
+{
+	gcc -shared $@ -D_GNU_SOURCE -fPIC
+}
+
+compile_lib_dl()
+{
+	compile_lib $@ $libdl
+}
+
+compile_program()
+{
+	gcc $@ -D_GNU_SOURCE -Wl,-rpath,.,--export-dynamic
+}
+
+compile_program_dl()
+{
+	compile_program $@ $libdl
+}

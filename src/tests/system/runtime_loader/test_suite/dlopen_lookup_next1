@@ -12,7 +12,7 @@
 # libd.so
 
 
-. test_setup
+. ./test_setup
 
 
 # create libd.so
@@ -21,7 +21,7 @@ int a() { return 1; }
 EOI
 
 # build
-gcc -shared -o libd.so libd.c
+compile_lib -o libd.so libd.c
 
 
 # create libb.so
@@ -38,7 +38,7 @@ a()
 EOI
 
 # build
-gcc -shared -o libb.so libb.c -D_GNU_SOURCE ./libd.so $libdl
+compile_lib_dl -o libb.so libb.c ./libd.so
 
 
 # create liba.so
@@ -54,7 +54,7 @@ a()
 EOI
 
 # build
-gcc -shared -o liba.so liba.c -D_GNU_SOURCE ./libb.so $libdl
+compile_lib_dl -o liba.so liba.c ./libb.so
 
 
 # create libe.so
@@ -70,7 +70,7 @@ a()
 EOI
 
 # build
-gcc -shared -o libe.so libe.c -D_GNU_SOURCE $libdl
+compile_lib_dl -o libe.so libe.c
 
 
 # create program
@@ -111,7 +111,7 @@ main()
 EOI
 
 # build
-gcc -o program program.c -D_GNU_SOURCE $libdl -Wl,-rpath,.,--export-dynamic
+compile_program_dl -o program program.c
 
 # run
 test_run_ok ./program 31
