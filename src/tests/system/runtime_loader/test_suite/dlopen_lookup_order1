@@ -7,7 +7,7 @@
 # libb.so
 # <- libb_dependency.so
 #
-# Expected: Global lookup: symbol in liba.so superseeds symbol in
+# Expected: Global lookup: symbol in liba.so supersedes symbol in
 # libb_dependency.so.
 
 

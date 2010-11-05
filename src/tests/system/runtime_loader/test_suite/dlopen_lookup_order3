@@ -8,7 +8,7 @@
 #    <- libb_dependency.so
 # <- libd.so
 #
-# Expected: liba.so lookup: Symbol in libd.so superseeds symbol in
+# Expected: liba.so lookup: Symbol in libd.so supersedes symbol in
 # libb_dependency.so.
 
 

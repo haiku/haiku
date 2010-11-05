@@ -7,7 +7,7 @@
 # <- libb_dependency.so
 # liba.so
 #
-# Expected: Global lookup: Symbol in libb_dependency.so does not superseeds
+# Expected: Global lookup: Symbol in libb_dependency.so does not supersede
 # symbol in liba.so, since libb.so is loaded RTLD_LOCAL.
 
 
