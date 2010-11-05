@@ -179,8 +179,11 @@ ATADevice::ReadCapacity(ATARequest *request)
 	scsi_res_read_capacity data;
 	data.block_size = B_HOST_TO_BENDIAN_INT32(fBlockSize);
 
-	uint32 lastBlock = fTotalSectors - 1;
-	data.lba = B_HOST_TO_BENDIAN_INT32(lastBlock);
+	if (fTotalSectors <= UINT_MAX) {
+		uint32 lastBlock = fTotalSectors - 1;
+		data.lba = B_HOST_TO_BENDIAN_INT32(lastBlock);
+	} else
+		data.lba = UINT_MAX;
 	TRACE("returning last block: %lu\n", B_BENDIAN_TO_HOST_INT32(data.lba));
 	
 	copy_sg_data(ccb, 0, ccb->data_length, &data, sizeof(data), false);
