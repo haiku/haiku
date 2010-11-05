@@ -107,7 +107,7 @@ add_options(tcp_segment_header &segment, uint8 *buffer, size_t bufferSize)
 		bump_option(option, length);
 	}
 
-	if ((segment.options & TCP_HAS_TIMESTAMPS)
+	if ((segment.options & TCP_HAS_TIMESTAMPS) != 0
 		&& length + 12 <= bufferSize) {
 		// two NOPs so the timestamps get aligned to a 4 byte boundary
 		option->kind = TCP_OPTION_NOP;
@@ -122,7 +122,7 @@ add_options(tcp_segment_header &segment, uint8 *buffer, size_t bufferSize)
 		bump_option(option, length);
 	}
 
-	if ((segment.options & TCP_HAS_WINDOW_SCALE)
+	if ((segment.options & TCP_HAS_WINDOW_SCALE) != 0
 		&& length + 4 <= bufferSize) {
 		// insert one NOP so that the subsequent data is aligned on a 4 byte boundary
 		option->kind = TCP_OPTION_NOP;
@@ -134,7 +134,7 @@ add_options(tcp_segment_header &segment, uint8 *buffer, size_t bufferSize)
 		bump_option(option, length);
 	}
 
-	if ((segment.options & TCP_SACK_PERMITTED)
+	if ((segment.options & TCP_SACK_PERMITTED) != 0
 		&& length + 2 <= bufferSize) {
 		option->kind = TCP_OPTION_SACK_PERMITTED;
 		option->length = 2;
@@ -170,9 +170,9 @@ add_options(tcp_segment_header &segment, uint8 *buffer, size_t bufferSize)
 
 
 static void
-process_options(tcp_segment_header &segment, net_buffer *buffer, ssize_t size)
+process_options(tcp_segment_header &segment, net_buffer *buffer, size_t size)
 {
-	if (size <= 0)
+	if (size == 0)
 		return;
 
 	tcp_option *option;
@@ -198,17 +198,17 @@ process_options(tcp_segment_header &segment, net_buffer *buffer, ssize_t size)
 				length = 1;
 				break;
 			case TCP_OPTION_MAX_SEGMENT_SIZE:
-				if (option->length == 4 && (size - 4) >= 0)
+				if (option->length == 4 && size >= 4)
 					segment.max_segment_size = ntohs(option->max_segment_size);
 				break;
 			case TCP_OPTION_WINDOW_SHIFT:
-				if (option->length == 3 && (size - 3) >= 0) {
+				if (option->length == 3 && size >= 3) {
 					segment.options |= TCP_HAS_WINDOW_SCALE;
 					segment.window_shift = option->window_shift;
 				}
 				break;
 			case TCP_OPTION_TIMESTAMP:
-				if (option->length == 10 && (size - 10) >= 0) {
+				if (option->length == 10 && size >= 10) {
 					segment.options |= TCP_HAS_TIMESTAMPS;
 					segment.timestamp_value = option->timestamp.value;
 					segment.timestamp_reply =
@@ -216,18 +216,19 @@ process_options(tcp_segment_header &segment, net_buffer *buffer, ssize_t size)
 				}
 				break;
 			case TCP_OPTION_SACK_PERMITTED:
-				if (option->length == 2 && (size - 2) >= 0)
+				if (option->length == 2 && size >= 2)
 					segment.options |= TCP_SACK_PERMITTED;
+				break;
 		}
 
 		if (length < 0) {
 			length = option->length;
-			if (length == 0)
+			if (length == 0 || length > (ssize_t)size)
 				break;
 		}
 
-		size -= length;
 		option = (tcp_option *)((uint8 *)option + length);
+		size -= length;
 	}
 }
 
