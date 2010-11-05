@@ -21,22 +21,34 @@
 #define M_SQRT1_2		0.70710678118654752440	/* 1/sqrt(2) */
 
 /* platform independent IEEE floating point special values */
-#define	__HUGE_VAL_v	0x7ff0000000000000LL
-#define __huge_val_t	union { unsigned char __c[8]; long long __ll; double __d; }
-#ifndef HUGE_VAL
-#	define HUGE_VAL		(((__huge_val_t) { __ll: __HUGE_VAL_v }).__d)
+#if __GNUC__ >= 4
+	/* gcc4 and clang definitions */
+#	ifndef HUGE_VAL
+#		define HUGE_VAL     __builtin_huge_val()
+#	endif
+
+#	define HUGE_VALF        __builtin_huge_valf()
+#	define HUGE_VALL		__builtin_huge_vall()
+#	define NAN              __builtin_nanf("")
+#	define INFINITY			__builtin_inff()
+#else
+	/* gcc2 definitions */
+#	define	__HUGE_VAL_v	0x7ff0000000000000LL
+#	define __huge_val_t	union { unsigned char __c[8]; long long __ll; double __d; }
+#	ifndef HUGE_VAL
+#		define HUGE_VAL		(((__huge_val_t) { __ll: __HUGE_VAL_v }).__d)
+#	endif
+
+#	define __HUGE_VALF_v	0x7f800000L
+#	define __huge_valf_t	union { unsigned char __c[4]; long __l; float __f; }
+#	define HUGE_VALF		(((__huge_valf_t) { __l: __HUGE_VALF_v }).__f)
+
+	/* TODO: define HUGE_VALL for long doubles */
+
+#	define __NAN_VALF_v	0x7fc00000L
+#	define NAN				(((__huge_valf_t) { __l: __NAN_VALF_v }).__f)
+#	define INFINITY			HUGE_VALF
 #endif
-
-#define __HUGE_VALF_v	0x7f800000L
-#define __huge_valf_t	union { unsigned char __c[4]; long __l; float __f; }
-#define HUGE_VALF		(((__huge_valf_t) { __l: __HUGE_VALF_v }).__f)
-
-/* TODO: define HUGE_VALL for long doubles */
-
-#define __NAN_VALF_v	0x7fc00000L
-#define NAN				(((__huge_valf_t) { __l: __NAN_VALF_v }).__f)
-
-#define INFINITY		HUGE_VALF
 
 /* floating-point categories */
 #define FP_NAN			0
