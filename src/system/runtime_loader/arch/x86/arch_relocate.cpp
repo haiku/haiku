@@ -17,14 +17,6 @@
 #include <stdlib.h>
 
 
-//#define TRACE_RLD
-#ifdef TRACE_RLD
-#	define TRACE(x) dprintf x
-#else
-#	define TRACE(x) ;
-#endif
-
-
 static int
 relocate_rel(image_t *rootImage, image_t *image, struct Elf32_Rel *rel,
 	int rel_len)
