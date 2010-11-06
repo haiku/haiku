@@ -44,6 +44,12 @@ typedef SinglyLinkedList<AtExitInfo> AtExitInfoList;
 
 
 struct AtExitInfoBlock : DoublyLinkedListLinkImpl<AtExitInfoBlock> {
+	AtExitInfoBlock()
+		:
+		fFirstUnused(0)
+	{
+	}
+
 	bool IsEmpty() const
 	{
 		return fFirstUnused == ATEXIT_MAX && fFreeList.IsEmpty();
