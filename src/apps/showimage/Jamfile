@@ -18,7 +18,8 @@ Application ShowImage :
 	ShowImageView.cpp
 	ShowImageWindow.cpp
 	: libshared.a
-	be tracker translation $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
+	be tracker translation $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSTDC++) 
+	$(TARGET_LIBSUPC++)
 	: ShowImage.rdef
 	;
 
