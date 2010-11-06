@@ -84,7 +84,7 @@ ali_stream_unprepare(ali_stream *stream)
 
 	stream->channels = 0;
 	stream->format.format = 0;
-	stream->format.rate = 0;	
+	stream->format.rate = 0;
 
 	if (-1 < stream->used_voice) {
 		LOCK(stream->card->lock_voices);
@@ -102,7 +102,7 @@ ali_stream_delete(ali_stream *stream)
 	LOCK(stream->card->lock_sts);
 	LIST_REMOVE(stream, next);
 	UNLOCK(stream->card->lock_sts);
-	
+
 	free(stream);
 }
 
@@ -134,7 +134,7 @@ ali_stream_prepare(ali_stream *stream, uint8 channels, uint32 format,
 		if ((stream->card->used_voices & (uint32) 1 << ALI_RECORD_VOICE) == 0) {
 			stream->used_voice = ALI_RECORD_VOICE;
 			stream->card->used_voices |= (uint32) 1 << ALI_RECORD_VOICE;
-		}		
+		}
 	} else {
 		for (ch = 0; ch < ALI_VOICES; ch++) {
 			if ((stream->card->used_voices & (uint32) 1 << ch) == 0) {
@@ -162,7 +162,7 @@ ali_stream_prepare(ali_stream *stream, uint8 channels, uint32 format,
 		return false;
 	}
 
-	return true;	
+	return true;
 }
 
 
@@ -182,7 +182,7 @@ ali_stream_start(ali_stream *stream)
 	TRACE("stream_start: %s using voice: %d\n",
 		stream->rec?"recording":"playing", stream->used_voice);
 
-	return true;	
+	return true;
 }
 
 
@@ -519,7 +519,7 @@ ali_audio_free(void *cookie)
 	ali_dev *card = (ali_dev *) cookie;
 
 	while (!LIST_EMPTY(&card->streams))
-		ali_stream_delete(LIST_FIRST(&card->streams));	
+		ali_stream_delete(LIST_FIRST(&card->streams));
 
 	card->playback_stream = NULL;
 	card->record_stream = NULL;
