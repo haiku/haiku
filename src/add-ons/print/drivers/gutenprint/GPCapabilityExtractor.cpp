@@ -155,6 +155,7 @@ GPCapabilityExtractor::ResolutionParameter(const char* name, const char* key,
 {
 	bool isDefault = fDefaultKey == key;
 	BaseCap* capability;
+	int resolution;
 
 	switch (fState) {
 		case kExtractResolutionParameter:
@@ -167,8 +168,12 @@ GPCapabilityExtractor::ResolutionParameter(const char* name, const char* key,
 				break;
 			}
 
+			// TODO remove this workaround when libprint supports x != y too
+			// for now use the maximum resolution to render the page bands
+			resolution = max_c(x, y);
+
 			capability = new ResolutionCap(displayName,	isDefault, fIndex,
-				x, y);
+				resolution, resolution);
 			AddCapability(fCapabilities->fResolutions, capability, key);
 			break;
 
