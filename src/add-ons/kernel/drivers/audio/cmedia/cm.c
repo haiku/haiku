@@ -514,6 +514,7 @@ init_driver(void)
 {
 	pci_info info;
 	int ix = 0;
+	status_t err;
 
 	num_cards = 0;
 
@@ -547,8 +548,21 @@ init_driver(void)
 			}
 			memset(&cards[num_cards], 0, sizeof(cmedia_pci_dev));
 			cards[num_cards].info = info;
+#ifdef __HAIKU__
+			if ((err = (*pci->reserve_device)(info.bus, info.device, info.function,
+				DRIVER_NAME, &cards[num_cards])) < B_OK) {
+				dprintf("%s: failed to reserve_device(%d, %d, %d,): %s\n",
+					DRIVER_NAME, info.bus, info.device, info.function,
+					strerror(err));
+				continue;
+			}
+#endif
 			if (setup_cmedia_pci(&cards[num_cards])) {
 				dprintf("Setup of C-Media %ld failed\n", num_cards+1);
+#ifdef __HAIKU__
+				(*pci->unreserve_device)(info.bus, info.device, info.function,
+					DRIVER_NAME, &cards[num_cards]);
+#endif
 			}
 			else {
 				num_cards++;

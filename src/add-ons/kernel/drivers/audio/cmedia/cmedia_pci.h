@@ -25,6 +25,8 @@
 #define CMEDIA_PCI_JOYSTICK_MIN_LATENCY 5000		/* 200 times a second! */
 #define CMEDIA_PCI_JOYSTICK_MAX_LATENCY 100000		/* 10 times a second */
 
+#define DRIVER_NAME "cmedia"
+
 typedef struct joystick cmedia_pci_joystick;
 
 
