@@ -19,7 +19,7 @@
 system_info sysinfo;
 
 // dump one entry
-void log_printentry( FILE *logfile, log_entry *entry )
+static void log_printentry( FILE *logfile, log_entry *entry )
 {
 	uint64 time;
 	uint32 min, sec, mill, mic;

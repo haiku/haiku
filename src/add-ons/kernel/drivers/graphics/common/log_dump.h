@@ -13,6 +13,5 @@
 #include <SupportDefs.h>
 
 void log_printall( FILE *logfile, char *buffer, uint32 buffer_len );
-void log_printentry( FILE *logfile, log_entry *entry );
 
 #endif
