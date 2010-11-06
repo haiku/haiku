@@ -43,6 +43,7 @@
 #include "TermScrollView.h"
 #include "TermView.h"
 
+
 const static int32 kMaxTabs = 6;
 const static int32 kTermViewOffset = 3;
 
@@ -53,8 +54,10 @@ const static uint32 kIncreaseFontSize = 'InFs';
 const static uint32 kDecreaseFontSize = 'DcFs';
 const static uint32 kSetActiveTab = 'STab';
 
+
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "Terminal TermWindow"
+
 
 class CustomTermView : public TermView {
 public:
