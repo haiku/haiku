@@ -25,6 +25,8 @@
 #define ALI_VOICES 32
 #define ALI_RECORD_VOICE 31
 
+#define DRIVER_NAME "ali5451"
+
 typedef struct _ali_mem
 {
 	LIST_ENTRY(_ali_mem) next;

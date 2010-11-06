@@ -6,9 +6,9 @@
  */
 
 
-#include <drivers/Drivers.h>
-#include <drivers/KernelExport.h>
-#include <drivers/PCI.h>
+#include <Drivers.h>
+#include <KernelExport.h>
+#include <PCI.h>
 #include <hmulti_audio.h>
 #include <string.h>
 #include <unistd.h>
@@ -365,6 +365,7 @@ init_driver(void)
 {
 	pci_info info;
 	int32 i;
+	status_t err;
 
 	if (get_module(B_PCI_MODULE_NAME, (module_info**) &gPCI) != B_OK)
 		return ENODEV;
@@ -382,8 +383,22 @@ init_driver(void)
 
 			memset(&gCards[gCardsCount], 0, sizeof(ali_dev));
 			gCards[gCardsCount].info = info;
-			if (ali_setup(&gCards[gCardsCount]))
+#ifdef __HAIKU__
+			if ((err = (*gPCI->reserve_device)(info.bus, info.device, info.function,
+				DRIVER_NAME, &gCards[gCardsCount])) < B_OK) {
+				dprintf("%s: failed to reserve_device(%d, %d, %d,): %s\n",
+					DRIVER_NAME, info.bus, info.device, info.function,
+					strerror(err));
+				continue;
+			}
+#endif
+			if (ali_setup(&gCards[gCardsCount])) {
 				TRACE("init_driver: setup of ali %ld failed\n", gCardsCount + 1);
+#ifdef __HAIKU__
+				(*gPCI->unreserve_device)(info.bus, info.device, info.function,
+					DRIVER_NAME, &gCards[gCardsCount]);
+#endif
+			}
 			else
 				gCardsCount++;
 		}
