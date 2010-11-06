@@ -38,6 +38,7 @@ enum {
 	MSG_GOTO_PAGE				= 'mGTP',
 	MSG_FILE_NEXT				= 'mFLN',
 	MSG_FILE_PREV				= 'mFLP',
+	kMsgDeleteCurrentFile		= 'mDcF',
 	MSG_SHRINK_TO_WINDOW		= 'mSTW',
 	MSG_STRETCH_TO_WINDOW		= 'mZTW',
 	MSG_ROTATE_90				= 'mR90',

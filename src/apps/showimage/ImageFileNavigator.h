@@ -61,7 +61,7 @@ public:
 			bool				HasNextFile();
 			bool				HasPreviousFile();
 
-			void				DeleteFile();
+			bool				MoveFileToTrash();
 
 private:
 			status_t			_LoadNextImage(bool next, bool rewind);

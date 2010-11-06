@@ -18,7 +18,11 @@
 
 #include "ImageFileNavigator.h"
 
+#include <deque>
+#include <map>
 #include <new>
+#include <set>
+
 #include <stdio.h>
 
 #include <Bitmap.h>
@@ -26,11 +30,14 @@
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
+#include <Locker.h>
 #include <ObjectList.h>
 #include <Path.h>
 #include <TranslatorRoster.h>
 
+#include <AutoDeleter.h>
 #include <tracker_private.h>
+#include <kernel/util/DoublyLinkedList.h>
 
 #include "ProgressWindow.h"
 #include "ShowImageConstants.h"
@@ -183,11 +190,11 @@ TrackerNavigator::FindNextImage(const entry_ref& currentRef, entry_ref& ref,
 		else
 			specifier.what = 'sprv';
 		specifier.AddString("property", "Entry");
-		if (rewind)
+		if (rewind) {
 			// if rewinding, ask for the ref to the
 			// first item in the directory
 			specifier.AddInt32("data", 0);
-		else
+		} else
 			specifier.AddRef("data", &nextRef);
 		request.AddSpecifier(&specifier);
 
@@ -307,6 +314,249 @@ FolderNavigator::_CompareRefs(const entry_ref* refA, const entry_ref* refB)
 {
 	// TODO: natural sorting? Collating via current locale?
 	return strcasecmp(refA->name, refB->name);
+}
+
+
+// #pragma mark -
+
+
+struct CacheEntry : DoublyLinkedListLinkImpl<CacheEntry> {
+	entry_ref				ref;
+	int32					page;
+	int32					pageCount;
+	BBitmap*				bitmap;
+	BString					type;
+	BString					mimeType;
+};
+
+
+struct QueueEntry {
+	entry_ref				ref;
+	int32					page;
+	std::set<BMessenger>	listeners;
+};
+
+
+class ImageCache {
+public:
+								ImageCache();
+	virtual						~ImageCache();
+
+			void				RetrieveImage(const entry_ref& ref,
+									const BMessenger* target);
+
+private:
+	static	status_t			_QueueWorkerThread(void* self);
+
+			status_t			_RetrieveImage(QueueEntry* entry,
+									BMessage& message);
+			void				_NotifyListeners(QueueEntry* entry,
+									BMessage& message);
+
+private:
+			typedef std::pair<entry_ref, int32> ImageSelector;
+			typedef std::map<ImageSelector, CacheEntry*> CacheMap;
+			typedef std::map<ImageSelector, QueueEntry*> QueueMap;
+			typedef std::deque<QueueEntry*> QueueDeque;
+			typedef DoublyLinkedList<CacheEntry> CacheList;
+
+			BLocker				fCacheLocker;
+			CacheMap			fCacheMap;
+			CacheList			fCacheEntriesByAge;
+			BLocker				fQueueLocker;
+			QueueMap			fQueueMap;
+			QueueDeque			fQueue;
+			vint32				fThreadCount;
+			int32				fMaxThreadCount;
+			uint64				fBytes;
+			uint64				fMaxBytes;
+			size_t				fMaxEntries;
+};
+
+
+ImageCache::ImageCache()
+	:
+	fCacheLocker("image cache"),
+	fQueueLocker("image queue"),
+	fThreadCount(0),
+	fBytes(0)
+{
+	system_info info;
+	get_system_info(&info);
+
+	fMaxThreadCount = (info.cpu_count + 1) / 2;
+	fMaxBytes = info.max_pages * B_PAGE_SIZE / 8;
+	fMaxEntries = 10;
+}
+
+
+ImageCache::~ImageCache()
+{
+	// TODO: delete CacheEntries, and QueueEntries
+}
+
+
+void
+ImageCache::RetrieveImage(const entry_ref& ref, const BMessenger* target)
+{
+	// TODO!
+}
+
+
+/*static*/ status_t
+ImageCache::_QueueWorkerThread(void* _self)
+{
+	ImageCache* self = (ImageCache*)_self;
+
+	// get next queue entry
+	while (true) {
+		self->fQueueLocker.Lock();
+		if (self->fQueue.empty()) {
+			self->fQueueLocker.Unlock();
+			break;
+		}
+
+		QueueEntry* entry = *self->fQueue.begin();
+		self->fQueue.pop_front();
+		self->fQueueLocker.Unlock();
+
+		if (entry == NULL)
+			break;
+
+		BMessage notification(kMsgImageLoaded);
+		status_t status = self->_RetrieveImage(entry, notification);
+		if (status != B_OK)
+			notification.AddInt32("error", status);
+
+		self->fQueueLocker.Lock();
+		self->fQueueMap.erase(std::make_pair(entry->ref, entry->page));
+		self->fQueueLocker.Unlock();
+
+		self->_NotifyListeners(entry, notification);
+		delete entry;
+	}
+
+	atomic_add(&self->fThreadCount, -1);
+	return B_OK;
+}
+
+
+status_t
+ImageCache::_RetrieveImage(QueueEntry* queueEntry, BMessage& message)
+{
+	CacheEntry* entry = new(std::nothrow) CacheEntry();
+	if (entry == NULL)
+		return B_NO_MEMORY;
+
+	ObjectDeleter<CacheEntry> deleter(entry);
+
+	BTranslatorRoster* roster = BTranslatorRoster::Default();
+	if (roster == NULL)
+		return B_ERROR;
+
+	if (!entry_ref_is_file(queueEntry->ref))
+		return B_IS_A_DIRECTORY;
+
+	BFile file;
+	status_t status = file.SetTo(&queueEntry->ref, B_READ_ONLY);
+	if (status != B_OK)
+		return status;
+
+	translator_info info;
+	memset(&info, 0, sizeof(translator_info));
+	BMessage ioExtension;
+
+	if (queueEntry->page != 0
+		&& ioExtension.AddInt32("/documentIndex", queueEntry->page) != B_OK)
+		return B_NO_MEMORY;
+
+// TODO: rethink this!
+#if 0
+	if (fProgressWindow != NULL) {
+		BMessage progress(kMsgProgressStatusUpdate);
+		if (ioExtension.AddMessenger("/progressMonitor",
+				fProgressWindow) == B_OK
+			&& ioExtension.AddMessage("/progressMessage", &progress) == B_OK)
+			fProgressWindow->Start();
+	}
+#endif
+
+	// Translate image data and create a new ShowImage window
+
+	BBitmapStream outstream;
+
+	status = roster->Identify(&file, &ioExtension, &info, 0, NULL,
+		B_TRANSLATOR_BITMAP);
+	if (status == B_OK) {
+		status = roster->Translate(&file, &info, &ioExtension, &outstream,
+			B_TRANSLATOR_BITMAP);
+	}
+
+#if 0
+	if (fProgressWindow != NULL)
+		fProgressWindow->Stop();
+#endif
+
+	if (status != B_OK)
+		return status;
+
+	BBitmap* bitmap;
+	if (outstream.DetachBitmap(&bitmap) != B_OK)
+		return B_ERROR;
+
+	entry->ref = queueEntry->ref;
+	entry->page = queueEntry->page;
+	entry->bitmap = bitmap;
+	entry->type = info.name;
+	entry->mimeType = info.MIME;
+
+	// get the number of documents (pages) if it has been supplied
+	int32 documentCount = 0;
+	if (ioExtension.FindInt32("/documentCount", &documentCount) == B_OK
+		&& documentCount > 0)
+		entry->pageCount = documentCount;
+	else
+		entry->pageCount = 1;
+
+	message.AddString("type", info.name);
+	message.AddString("mime", info.MIME);
+	message.AddRef("ref", &entry->ref);
+	message.AddInt32("page", entry->page);
+	message.AddPointer("bitmap", (void*)bitmap);
+
+	deleter.Detach();
+
+	fCacheLocker.Lock();
+
+	fCacheMap.insert(std::make_pair(
+		std::make_pair(entry->ref, entry->page), entry));
+	fCacheEntriesByAge.Add(entry);
+
+	fBytes += bitmap->BitsLength();
+
+	while (fBytes > fMaxBytes || fCacheMap.size() > fMaxEntries) {
+		if (fCacheMap.size() <= 2)
+			break;
+
+		// Remove the oldest entry
+		entry = fCacheEntriesByAge.RemoveHead();
+		fBytes -= entry->bitmap->BitsLength();
+		fCacheMap.erase(std::make_pair(entry->ref, entry->page));
+		delete entry;
+	}
+
+	fCacheLocker.Unlock();
+	return B_OK;
+}
+
+
+void
+ImageCache::_NotifyListeners(QueueEntry* entry, BMessage& message)
+{
+	std::set<BMessenger>::iterator iterator = entry->listeners.begin();
+	for (; iterator != entry->listeners.end(); iterator++) {
+		iterator->SendMessage(&message);
+	}
 }
 
 
@@ -534,24 +784,33 @@ ImageFileNavigator::HasPreviousFile()
 }
 
 
-void
-ImageFileNavigator::DeleteFile()
+/*!	Moves the current file into the trash.
+	Returns true if a new file is being loaded, false if not.
+*/
+bool
+ImageFileNavigator::MoveFileToTrash()
 {
+	entry_ref nextRef;
+	if (!fNavigator->FindNextImage(fCurrentRef, nextRef, true, false)
+		&& !fNavigator->FindNextImage(fCurrentRef, nextRef, false, false))
+		nextRef.device = -1;
+
 	// Move image to Trash
 	BMessage trash(BPrivate::kMoveToTrash);
 	trash.AddRef("refs", &fCurrentRef);
 
-// TODO!
-#if 0
 	// We create our own messenger because the member fTrackerMessenger
 	// could be invalid
 	BMessenger tracker(kTrackerSignature);
-	if (tracker.SendMessage(&trash) == B_OK && !NextFile()) {
-		// This is the last (or only file) in this directory,
-		// close the window
-		_SendMessageToWindow(B_QUIT_REQUESTED);
+	if (tracker.SendMessage(&trash) != B_OK)
+		return true;
+
+	if (nextRef.device != -1 && LoadImage(nextRef) == B_OK) {
+		fNavigator->UpdateSelection(nextRef);
+		return true;
 	}
-#endif
+
+	return false;
 }
 
 

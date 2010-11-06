@@ -1331,11 +1331,8 @@ ShowImageView::KeyDown(const char* bytes, int32 numBytes)
 			ClearSelection();
 			break;
 		case B_DELETE:
-		{
-			// TODO!
-			//fNavigator.DeleteFile();
+			_SendMessageToWindow(kMsgDeleteCurrentFile);
 			break;
-		}
 		case '+':
 		case '=':
 			ZoomIn();

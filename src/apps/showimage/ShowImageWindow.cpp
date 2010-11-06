@@ -709,6 +709,11 @@ ShowImageWindow::MessageReceived(BMessage* message)
 				fNavigator.NextFile();
 			break;
 
+		case kMsgDeleteCurrentFile:
+			if (!fNavigator.MoveFileToTrash())
+				PostMessage(B_QUIT_REQUESTED);
+			break;
+
 		case MSG_ROTATE_90:
 			fImageView->Rotate(90);
 			break;
