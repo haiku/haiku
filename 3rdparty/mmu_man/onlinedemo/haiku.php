@@ -287,6 +287,8 @@ function probe_keymap()
 	//print_r($keymaps);
 	foreach($langs as $lang)
 	{
+		if (!in_keymaps($lang))
+			$lang = ereg_replace("-.*", "", $lang);
 		if (in_keymaps($lang))
 		{
 			$vnckeymap = $lang;
