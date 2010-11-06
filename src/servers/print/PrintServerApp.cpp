@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku. All rights reserved.
+ * Copyright 2001-2010, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -45,10 +45,6 @@ typedef struct _printer_data {
 	char defaultPrinterName[256];
 } printer_data_t;
 
-
-typedef BMessage* (*config_func_t)(BNode*, const BMessage*);
-typedef BMessage* (*take_job_func_t)(BFile*, BNode*, const BMessage*);
-typedef char* (*add_printer_func_t)(const char* printer_name);
 
 
 static const char* kSettingsName = "print_server_settings";
@@ -423,8 +419,8 @@ PrintServerApp::CreatePrinter(const char* printerName, const char* driverName,
 		char type[B_MIME_TYPE_LENGTH];
 		BNodeInfo(&printer).GetType(type);
 		if (strcmp(PSRV_PRINTER_FILETYPE, type) == 0) {
-			BPath tmp;
-			if (FindPrinterDriver(printerName, tmp) == B_OK) {
+			BPath path;
+			if (Printer::FindPathToDriver(printerName, &path) == B_OK) {
 				if (fDefaultPrinter) {
 					// the printer exists, but is not the default printer
 					if (strcmp(fDefaultPrinter->Name(), printerName) != 0)
@@ -471,41 +467,19 @@ PrintServerApp::CreatePrinter(const char* printerName, const char* driverName,
 	printer.WriteAttr(PSRV_PRINTER_ATTR_CNX, B_STRING_TYPE, 0, connection,
 		::strlen(connection) + 1);
 
-	// Notify printer driver that a new printer definition node
-	// has been created.
-	image_id id = -1;
-	add_printer_func_t func;
-
-	rc = FindPrinterDriver(driverName, path);
-	if (rc != B_OK)
-		goto error;
-
-	id = ::load_add_on(path.Path());
-	if (id <= 0) {
-		rc = B_ERROR;
-		goto error;
-	}
-
-	rc = get_image_symbol(id, "add_printer", B_SYMBOL_TYPE_TEXT, (void**)&func);
-	if (rc != B_OK)
-		goto error;
-
-	// call the function and check its result
-	if ((*func)(printerName) == NULL)
-		rc = B_ERROR;
-	else
+	rc = Printer::ConfigurePrinter(driverName, printerName);
+	if (rc == B_OK) {
+		// Notify printer driver that a new printer definition node
+		// has been created.
 		printer.WriteAttr(PSRV_PRINTER_ATTR_STATE, B_STRING_TYPE, 0, "free",
 			::strlen("free")+1);
+	}
 
-error:
 	if (rc != B_OK) {
 		BEntry entry;
 		if (printer.GetEntry(&entry) == B_OK)
 			entry.Remove();
 	}
-
-	if (id > 0)
-		::unload_add_on(id);
 
 	return rc;
 }
@@ -647,35 +621,6 @@ PrintServerApp::FindPrinterNode(const char* name, BNode& node)
 
 	path.Append(name);
 	return node.SetTo(path.Path());
-}
-
-
-// ---------------------------------------------------------------
-// FindPrinterDriver(const char* name, BPath& outPath)
-//
-// Finds the path to a specific printer driver. It searches all 3
-// places add-ons can be stored: the user's private directory, the
-// directory common to all users, and the system directory, in that
-// order.
-//
-// Parameters:
-//     name - Name of the printer driver to look for.
-//     outPath - BPath to store the path to the driver in.
-//
-// Returns:
-//      B_OK if the driver was found, otherwise an error code.
-// ---------------------------------------------------------------
-status_t
-PrintServerApp::FindPrinterDriver(const char* name, BPath& outPath)
-{
-	if (::TestForAddonExistence(name, B_USER_ADDONS_DIRECTORY, "Print", outPath)
-		!= B_OK
-		&& TestForAddonExistence(name, B_COMMON_ADDONS_DIRECTORY, "Print",
-			outPath) != B_OK)
-		return ::TestForAddonExistence(name, B_BEOS_ADDONS_DIRECTORY, "Print",
-			outPath);
-
-	return B_OK;
 }
 
 

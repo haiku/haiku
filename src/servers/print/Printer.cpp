@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku. All rights reserved.
+ * Copyright 2001-2010, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,8 +8,9 @@
  */
 #include "Printer.h"
 
-#include "pr_server.h"
 #include "BeUtils.h"
+#include "pr_server.h"
+#include "PrinterDriverAddOn.h"
 #include "PrintServerApp.h"
 
 	// posix
@@ -43,12 +44,6 @@ void SpoolFolder::Notify(Job* job, int kind)
 	}
 }
 
-
-// ---------------------------------------------------------------
-typedef BMessage* (*config_func_t)(BNode*, const BMessage*);
-typedef BMessage* (*take_job_func_t)(BFile*, BNode*, const BMessage*);
-typedef char* (*add_printer_func_t)(const char* printer_name);
-typedef BMessage* (*default_settings_t)(BNode*);
 
 // ---------------------------------------------------------------
 BObjectList<Printer> Printer::sPrinters;
@@ -182,34 +177,30 @@ status_t Printer::Remove()
 }
 
 
+status_t
+Printer::FindPathToDriver(const char* driverName, BPath* path)
+{
+	return PrinterDriverAddOn::FindPathToDriver(driverName, path);
+}
+
+
 // ---------------------------------------------------------------
 // ConfigurePrinter
 //
 // Handles calling the printer addon's add_printer function.
 //
 // Parameters:
-//    none.
+//    driverName - the name of the printer driver add-on
+//    printerName - the name of the printer spool folder
 //
 // Returns:
 //    B_OK if successful or errorcode otherwise.
 // ---------------------------------------------------------------
-status_t Printer::ConfigurePrinter()
+status_t Printer::ConfigurePrinter(const char* driverName,
+	const char* printerName)
 {
-	status_t rc;
-	image_id id;
-	if ((rc = LoadPrinterAddon(id)) == B_OK) {
-			// Addon was loaded, so try and get the add_printer symbol
-		add_printer_func_t func;
-		if (get_image_symbol(id, "add_printer", B_SYMBOL_TYPE_TEXT,
-			(void**)&func) == B_OK) {
-			// call the function and check its result
-			rc = ((*func)(Name()) == NULL) ? B_ERROR : B_OK;
-		}
-
-		::unload_add_on(id);
-	}
-
-	return rc;
+	PrinterDriverAddOn addOn(driverName);
+	return addOn.AddPrinter(printerName);
 }
 
 
@@ -229,29 +220,17 @@ status_t Printer::ConfigurePrinter()
 status_t 
 Printer::ConfigurePage(BMessage& settings)
 {
-	status_t rc;
-	image_id id;
-	if ((rc = LoadPrinterAddon(id)) == B_OK) {
-			// Addon was loaded, so try and get the config_page symbol
-		config_func_t func;
-		if ((rc=get_image_symbol(id, "config_page", B_SYMBOL_TYPE_TEXT,
-			(void**)&func)) == B_OK) {
-			// call the function and check its result
-			BMessage* new_settings = (*func)(SpoolDir(), &settings);
-			if (new_settings != NULL && new_settings->what != 'baad') {
-				settings = *new_settings;
-				settings.what = 'okok';
-				AddCurrentPrinter(settings);
-			} else {
-				rc = B_ERROR;
-			}
-			delete new_settings;
-		}
+	BString driver;
+	status_t result = GetDriverName(&driver);
+	if (result != B_OK)
+		return result;
 
-		::unload_add_on(id);
+	PrinterDriverAddOn addOn(driver.String());
+	result = addOn.ConfigPage(SpoolDir(), &settings);
+	if (result == B_OK) {
+		AddCurrentPrinter(settings);
 	}
-
-	return rc;
+	return result;
 }
 
 
@@ -271,29 +250,17 @@ Printer::ConfigurePage(BMessage& settings)
 status_t 
 Printer::ConfigureJob(BMessage& settings)
 {
-	status_t rc;
-	image_id id;
-	if ((rc = LoadPrinterAddon(id)) == B_OK) {
-			// Addon was loaded, so try and get the config_job symbol
-		config_func_t func;
-		if ((rc = get_image_symbol(id, "config_job", B_SYMBOL_TYPE_TEXT,
-			(void**)&func)) == B_OK) {
-			// call the function and check its result
-			BMessage* new_settings = (*func)(SpoolDir(), &settings);
-			if ((new_settings != NULL) && (new_settings->what != 'baad')) {
-				settings = *new_settings;
-				settings.what = 'okok';
-				AddCurrentPrinter(settings);
-			} else {
-				rc = B_ERROR;
-			}
-			delete new_settings;
-		}
+	BString driver;
+	status_t result = GetDriverName(&driver);
+	if (result != B_OK)
+		return result;
 
-		::unload_add_on(id);
+	PrinterDriverAddOn addOn(driver.String());
+	result = addOn.ConfigJob(SpoolDir(), &settings);
+	if (result == B_OK) {
+		AddCurrentPrinter(settings);
 	}
-
-	return rc;
+	return result;
 }
 
 
@@ -327,28 +294,17 @@ Printer::HandleSpooledJob()
 status_t 
 Printer::GetDefaultSettings(BMessage& settings)
 {
-	status_t rc;
-	image_id id;
-	if ((rc = LoadPrinterAddon(id)) == B_OK) {
-			// Addon was loaded, so try and get the default_settings symbol
-		default_settings_t func;
-		if ((rc = get_image_symbol(id, "default_settings", B_SYMBOL_TYPE_TEXT,
-			(void**)&func)) == B_OK) {
-				// call the function and check its result
-			BMessage* new_settings = (*func)(SpoolDir());
-			if (new_settings) {
-				settings = *new_settings;
-				settings.what = 'okok';
-				AddCurrentPrinter(settings);
-			} else {
-				rc = B_ERROR;
-			}
-			delete new_settings;
-		}
+	BString driver;
+	status_t result = GetDriverName(&driver);
+	if (result != B_OK)
+		return result;
 
-		::unload_add_on(id);
+	PrinterDriverAddOn addOn(driver.String());
+	result = addOn.DefaultSettings(SpoolDir(), &settings);
+	if (result == B_OK) {
+		AddCurrentPrinter(settings);
 	}
-	return rc;
+	return result;
 }
 
 
@@ -359,42 +315,10 @@ Printer::AbortPrintThread()
 }
 
 
-// ---------------------------------------------------------------
-// LoadPrinterAddon
-//
-// Try to load the printer addon into memory.
-//
-// Parameters:
-//    id - image_id set to the image id of the loaded addon.
-//
-// Returns:
-//    B_OK if successful or errorcode otherwise.
-// ---------------------------------------------------------------
-status_t 
-Printer::LoadPrinterAddon(image_id& id)
+status_t
+Printer::GetDriverName(BString* name)
 {
-	status_t rc;
-	BString drName;
-	if ((rc = SpoolDir()->ReadAttrString(PSRV_PRINTER_ATTR_DRV_NAME, &drName)) == B_OK) {
-		// try to locate the driver
-		BPath path;
-		if ((rc= ::TestForAddonExistence(drName.String(), B_USER_ADDONS_DIRECTORY,
-			"Print", path)) != B_OK) {
-			if ((rc = ::TestForAddonExistence(drName.String(), B_COMMON_ADDONS_DIRECTORY,
-				"Print", path)) != B_OK) {
-				rc = ::TestForAddonExistence(drName.String(), B_BEOS_ADDONS_DIRECTORY,
-					"Print", path);
-			}
-		}
-
-		// If the driver was found
-		if (rc == B_OK) {
-			// If we cannot load the addon
-			if ((id=::load_add_on(path.Path())) < 0)
-				rc = id;
-		}
-	}
-	return rc;
+	return SpoolDir()->ReadAttrString(PSRV_PRINTER_ATTR_DRV_NAME, name);
 }
 
 
@@ -556,29 +480,13 @@ Printer::FindSpooledJob()
 status_t 
 Printer::PrintSpooledJob(BFile* spoolFile)
 {
-	status_t rc;
-	image_id id;
-	if ((rc = LoadPrinterAddon(id)) == B_OK) {
-		take_job_func_t func;
-		// Addon was loaded, so try and get the take_job symbol
-		if ((rc = get_image_symbol(id, "take_job", B_SYMBOL_TYPE_TEXT,
-			(void**)&func)) == B_OK) {
-			// This seems to be required for legacy?
-			// HP PCL3 add-on crashes without it!
-			BMessage params(B_REFS_RECEIVED);
-			params.AddInt32("file", (int32)spoolFile);
-			params.AddInt32("printer", (int32)SpoolDir());
-				// call the function and check its result
-			BMessage* result = (*func)(spoolFile, SpoolDir(), &params);
+	BString driver;
+	status_t result = GetDriverName(&driver);
+	if (result != B_OK)
+		return result;
 
-			if (result == NULL || result->what != 'okok')
-				rc = B_ERROR;
-			delete result;
-		}
-
-		::unload_add_on(id);
-	}
-	return rc;
+	PrinterDriverAddOn addOn(driver.String());
+	return addOn.TakeJob(spoolFile, SpoolDir());
 }
 
 

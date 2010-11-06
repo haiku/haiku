@@ -8,6 +8,7 @@ AddResources print_server :
 ;
 
 Server print_server :
+	PrinterDriverAddOn.cpp
 	PrintServerApp.cpp
 	PrintServerApp.R5.cpp
 	PrintServerApp.Scripting.cpp

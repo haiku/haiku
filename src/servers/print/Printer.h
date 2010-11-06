@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku. All rights reserved.
+ * Copyright 2001-2010, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -62,7 +62,10 @@ public:
 	static	int32				CountPrinters();
 
 			status_t			Remove();
-			status_t			ConfigurePrinter();
+	static	status_t			FindPathToDriver(const char* driver,
+									BPath* path);
+	static	status_t			ConfigurePrinter(const char* driverName,
+									const char* printerName);
 			status_t			ConfigureJob(BMessage& ioSettings);
 			status_t			ConfigurePage(BMessage& ioSettings);
 			status_t			GetDefaultSettings(BMessage& configuration);
@@ -80,10 +83,9 @@ public:
 			Resource*			GetResource() { return fResource; }
 
 private:
-			status_t			LoadPrinterAddon(image_id& id);
+			status_t			GetDriverName(BString* name);
 			void				AddCurrentPrinter(BMessage& message);
 
-			// Accessor
 			BDirectory*			SpoolDir() { return fPrinter.GetSpoolDir(); }
 
 			void				ResetJobStatus();

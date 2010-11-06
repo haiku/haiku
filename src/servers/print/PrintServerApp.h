@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Haiku. All rights reserved.
+ * Copyright 2001-2010, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -74,7 +74,6 @@ class PrintServerApp : public BApplication, public FolderListener {
 		status_t RetrieveDefaultPrinter();
 
 		status_t FindPrinterNode(const char *name, BNode &node);
-		status_t FindPrinterDriver(const char *name, BPath &outPath);
 
 		// "Classic" BeOS R5 support, see PrintServerApp.R5.cpp
 		static status_t async_thread(void *data);
