@@ -481,29 +481,49 @@ BSlider::KeyDown(const char *bytes, int32 numBytes)
 
 	switch (bytes[0]) {
 		case B_LEFT_ARROW:
-		case B_DOWN_ARROW: {
+		case B_DOWN_ARROW:
 			newValue -= KeyIncrementValue();
 			break;
-		}
+
 		case B_RIGHT_ARROW:
-		case B_UP_ARROW: {
+		case B_UP_ARROW:
 			newValue += KeyIncrementValue();
 			break;
-		}
+
 		case B_HOME:
 			newValue = fMinValue;
 			break;
 		case B_END:
 			newValue = fMaxValue;
 			break;
+
 		default:
 			BControl::KeyDown(bytes, numBytes);
 			return;
 	}
 
+	if (newValue < fMinValue)
+		newValue = fMinValue;
+	if (newValue > fMaxValue)
+		newValue = fMaxValue;
+
 	if (newValue != Value()) {
+		fInitialLocation = _Location();
 		SetValue(newValue);
 		InvokeNotify(ModificationMessage(), B_CONTROL_MODIFIED);
+	}
+}
+
+void
+BSlider::KeyUp(const char *bytes, int32 numBytes)
+{
+	if (fInitialLocation != _Location()) {
+		// The last KeyDown event triggered the modification message or no
+		// notification at all, we may also have sent the modification message
+		// continually while the user kept pressing the key. In either case,
+		// finish with the final message to make the behavior consistent with
+		// changing the value by mouse.
+		Invoke();
 	}
 }
 
@@ -673,7 +693,7 @@ BSlider::SetValue(int32 value)
 
 	if (value == Value())
 		return;
-	
+
 	_SetLocationForValue(value);
 
 	BRect oldThumbFrame = ThumbFrame();

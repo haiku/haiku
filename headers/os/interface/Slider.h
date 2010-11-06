@@ -70,6 +70,7 @@ public:
 	virtual void				FrameMoved(BPoint newPosition);
 	virtual void				FrameResized(float width, float height);
 	virtual void				KeyDown(const char* bytes, int32 numBytes);
+	virtual void				KeyUp(const char* bytes, int32 numBytes);
 	virtual void				MouseDown(BPoint point);
 	virtual void				MouseUp(BPoint point);
 	virtual void				MouseMoved(BPoint point, uint32 transit,
@@ -80,7 +81,7 @@ public:
 	virtual	void				SetLimitLabels(const char* minLabel,
 									const char* maxLabel);
 			const char*			MinLimitLabel() const;
-			const char*			MaxLimitLabel() const;							
+			const char*			MaxLimitLabel() const;
 	virtual	void				SetValue(int32);
 	virtual int32				ValueForPoint(BPoint) const;
 	virtual void				SetPosition(float);
