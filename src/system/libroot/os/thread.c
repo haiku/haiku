@@ -28,6 +28,7 @@ typedef struct callback_node {
 
 
 void _thread_do_exit_work(void);
+void _thread_do_exit_notification(void);
 
 
 static status_t
