@@ -216,6 +216,7 @@ protected:
 			uint32				fLogSize;
 			uint32				fVersion;
 			
+			bool				fIsStarted;
 			uint32				fLogStart;
 			uint32				fLogEnd;
 			uint32				fFreeBlocks;

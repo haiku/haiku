@@ -176,6 +176,14 @@ ext2_read_fs_info(fs_volume* _volume, struct fs_info* info)
 }
 
 
+static status_t
+ext2_sync(fs_volume* _volume)
+{
+	Volume* volume = (Volume*)_volume->private_volume;
+	return volume->Sync();
+}
+
+
 //	#pragma mark -
 
 
@@ -1598,7 +1606,7 @@ fs_volume_ops gExt2VolumeOps = {
 	&ext2_unmount,
 	&ext2_read_fs_info,
 	NULL,	// write_fs_info()
-	NULL,	// sync()
+	&ext2_sync,
 	&ext2_get_vnode,
 };
 

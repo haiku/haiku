@@ -137,6 +137,7 @@ Journal::Journal()
 	fFirstLogBlock(1),
 	fLogSize(0),
 	fVersion(0),
+	fIsStarted(false),
 	fLogStart(0),
 	fLogEnd(0),
 	fFreeBlocks(0),
@@ -175,6 +176,9 @@ Journal::InitCheck()
 status_t
 Journal::Uninit()
 {
+	if (!fIsStarted)
+		return B_OK;
+
 	status_t status = FlushLogAndBlocks();
 
 	if (status == B_OK) {
@@ -182,6 +186,8 @@ Journal::Uninit()
 		fLogStart = 0;
 		status = _SaveSuperBlock();
 	}
+
+	fIsStarted = false;
 
 	return status;
 }
@@ -193,6 +199,7 @@ Journal::StartLog()
 	fLogStart = fFirstLogBlock;
 	fLogEnd = fFirstLogBlock;
 	fFreeBlocks = 0;
+	fIsStarted = true;
 
 	fCurrentCommitID = fFirstCommitID;
 
@@ -497,6 +504,8 @@ Journal::_WriteTransactionToLog()
 		"the transaction\n");
 
 	fHasSubTransaction = false;
+	if (!fIsStarted)
+		StartLog();
 
 	// Prepare Descriptor block
 	TRACE("Journal::_WriteTransactionToLog(): attempting to allocate space for "

@@ -848,7 +848,7 @@ status_t
 Volume::Sync()
 {
 	TRACE("Volume::Sync()\n");
-	return fJournal->FlushLogAndBlocks();
+	return fJournal->Uninit();
 }
 
 
