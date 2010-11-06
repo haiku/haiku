@@ -11,6 +11,7 @@
 
 #include <SupportDefs.h>
 #include <fs_info.h>
+#include <fs_volume.h>
 
 #include <syscalls.h>
 
@@ -22,6 +23,9 @@ int _kunlock_node_(int fd);
 int _kget_cpu_state_(int cpuNum);
 int _kset_cpu_state_(int cpuNum, int state);
 int _kstatfs_(dev_t device, void *whatever, int fd, const char *path, fs_info *info);
+int mount(const char *filesystem, const char *where, const char *device, ulong flags,
+	void *parms, int len);
+int unmount(const char *path);
 
 
 int
@@ -98,3 +102,43 @@ _kstatfs_(dev_t device, void *whatever, int fd, const char *path, fs_info *info)
 
 	return fs_stat_dev(device, info);
 }
+
+
+int
+mount(const char *filesystem, const char *where, const char *device, ulong flags,
+	void *parms, int len)
+{
+	status_t err;
+	uint32 mountFlags = 0;
+
+	if (flags & 1)
+		mountFlags |= B_MOUNT_READ_ONLY;
+
+	// we don't support passing (binary) parameters
+	if (parms != NULL || len != 0 || flags & ~1) {
+		errno = B_BAD_VALUE;
+		return -1;
+	}
+
+	err = fs_mount_volume(where, device, filesystem, mountFlags, NULL);
+	if (err < B_OK) {
+		errno = err;
+		return -1;
+	}
+	return err;
+}
+
+
+int
+unmount(const char *path)
+{
+	status_t err;
+
+	err = fs_unmount_volume(path, 0);
+	if (err < B_OK) {
+		errno = err;
+		return -1;
+	}
+	return err;
+}
+
