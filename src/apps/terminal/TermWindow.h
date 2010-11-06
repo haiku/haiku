@@ -80,6 +80,7 @@ private:
 	void			_DoPrint();
 	void			_AddTab(Arguments *args);
 	void			_RemoveTab(int32 index);
+	bool			_CanClose(int32 index);
 	TermViewContainerView* _ActiveTermViewContainerView() const;
 	TermViewContainerView* _TermViewContainerViewAt(int32 index) const;
 	TermView*		_ActiveTermView() const;
