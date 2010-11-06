@@ -145,7 +145,7 @@ struct R128_RAMSpec {		// All values in XCLKS
 	int  readToWriteDelay;	// Read to Write Delay
 	int  loopLatency;		// Loop Latency
 	int  loopFudgeFactor;	// Add to memReadLatency to get loopLatency
-	char *name;
+	const char *name;
 };
 
 

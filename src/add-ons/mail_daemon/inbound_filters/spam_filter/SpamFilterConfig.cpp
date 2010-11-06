@@ -167,7 +167,7 @@ void AGMSBayesianSpamFilterConfig::AttachedToWindow ()
 {
 	char		 numberString [30];
 	BRect		 tempRect;
-	char		*tempStringPntr;
+	const char		*tempStringPntr;
 
 	SetViewColor (ui_color (B_PANEL_BACKGROUND_COLOR));
 
@@ -209,7 +209,7 @@ void AGMSBayesianSpamFilterConfig::AttachedToWindow ()
 
 	tempRect.right = fNoWordsMeansSpamCheckBoxPntr->Frame().left -
 		be_plain_font->StringWidth ("a");
-	tempStringPntr = (char *)"Spam above:";
+	tempStringPntr = "Spam above:";
 	sprintf (numberString, "%06.4f", (double) fSpamCutoffRatio);
 	fSpamCutoffRatioTextBoxPntr	= new BTextControl (
 		tempRect,
@@ -228,7 +228,7 @@ void AGMSBayesianSpamFilterConfig::AttachedToWindow ()
 
 	// Add the box displaying the genuine cutoff ratio, on a line by itself.
 
-	tempStringPntr = (char *)"Genuine below and uncertain above:";
+	tempStringPntr = "Genuine below and uncertain above:";
 	sprintf (numberString, "%08.6f", (double) fGenuineCutoffRatio);
 	fGenuineCutoffRatioTextBoxPntr = new BTextControl (
 		tempRect,

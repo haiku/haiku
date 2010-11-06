@@ -14,7 +14,7 @@
 class SliderOffscreenView : public BView {
 
 public:
-	SliderOffscreenView(BRect frame, char *name); 
+	SliderOffscreenView(BRect frame, const char *name); 
 	virtual		~SliderOffscreenView();
 	virtual	void	DrawX();
 	

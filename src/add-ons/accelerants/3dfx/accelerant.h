@@ -185,7 +185,7 @@ void	 TDFX_WaitForIdle();
 // Write a value to an 32-bit reg using a mask.  The mask selects the
 // bits to be modified.
 #define OUTREGM(addr, value, mask)	\
-	(OUTREG(addr, (INREG(addr) & ~mask) | (value & mask)))
+	(OUTREG(addr, (INREG(addr) & ~(mask)) | ((value) & (mask))))
 
 
 #endif	// _ACCELERANT_H

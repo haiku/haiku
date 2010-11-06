@@ -53,7 +53,7 @@ class OpenSoundAddOn :
 		/************************/
 
 	private:
-		status_t RecursiveScan(char* path, BEntry *rootEntry = NULL);
+		status_t RecursiveScan(const char* path, BEntry *rootEntry = NULL);
 		void SaveSettings(void);
 		void LoadSettings(void);
 		

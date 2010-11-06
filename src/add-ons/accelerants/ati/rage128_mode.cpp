@@ -304,7 +304,7 @@ SetRegisters(DisplayParams& params)
 
 	OUTREG(R128_CRTC_GEN_CNTL, params.crtc_gen_cntl);
 
-	OUTREGM(R128_DAC_CNTL, (R128_DAC_MASK_ALL | R128_DAC_8BIT_EN),
+	OUTREGM(R128_DAC_CNTL, R128_DAC_MASK_ALL | R128_DAC_8BIT_EN,
 			~(R128_DAC_RANGE_CNTL | R128_DAC_BLANKING));
 
 	OUTREG(R128_CRTC_H_TOTAL_DISP, params.crtc_h_total_disp);
@@ -393,7 +393,7 @@ Rage128_SetDisplayMode(const DisplayModeEx& mode)
 
 	// Select primary monitor and enable 8-bit color.
 	OUTREGM(R128_DAC_CNTL, R128_DAC_8BIT_EN,
-		(R128_DAC_PALETTE_ACC_CTL | R128_DAC_8BIT_EN));
+		R128_DAC_PALETTE_ACC_CTL | R128_DAC_8BIT_EN);
 	OUTREG8(R128_PALETTE_INDEX, 0);		// set first color index
 
 	for (int i = 0; i < 256; i++)
@@ -436,7 +436,7 @@ Rage128_SetIndexedColors(uint count, uint8 first, uint8* colorData, uint32 flags
 
 	// Select primary monitor and enable 8-bit color.
 	OUTREGM(R128_DAC_CNTL, R128_DAC_8BIT_EN,
-		(R128_DAC_PALETTE_ACC_CTL | R128_DAC_8BIT_EN));
+		R128_DAC_PALETTE_ACC_CTL | R128_DAC_8BIT_EN);
 	OUTREG8(R128_PALETTE_INDEX, first);		// set first color index
 
 	while (count--) {

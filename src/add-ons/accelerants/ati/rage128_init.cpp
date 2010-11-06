@@ -21,10 +21,10 @@
 // Memory Specifications from RAGE 128 Software Development Manual
 // (Technical Reference Manual P/N SDK-G04000 Rev 0.01), page 3-21.
 static R128_RAMSpec sRAMSpecs[] = {
-	{ 4, 4, 3, 3, 1, 3, 1, 16, 12, (char *)"128-bit SDR SGRAM 1:1" },
-	{ 4, 8, 3, 3, 1, 3, 1, 17, 13, (char *)"64-bit SDR SGRAM 1:1" },
-	{ 4, 4, 1, 2, 1, 2, 1, 16, 12, (char *)"64-bit SDR SGRAM 2:1" },
-	{ 4, 4, 3, 3, 2, 3, 1, 16, 12, (char *)"64-bit DDR SGRAM" },
+	{ 4, 4, 3, 3, 1, 3, 1, 16, 12, "128-bit SDR SGRAM 1:1" },
+	{ 4, 8, 3, 3, 1, 3, 1, 17, 13, "64-bit SDR SGRAM 1:1" },
+	{ 4, 4, 1, 2, 1, 2, 1, 16, 12, "64-bit SDR SGRAM 2:1" },
+	{ 4, 4, 3, 3, 2, 3, 1, 16, 12, "64-bit DDR SGRAM" },
 };
 
 

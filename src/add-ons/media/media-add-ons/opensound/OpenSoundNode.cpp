@@ -485,9 +485,9 @@ OpenSoundNode::NodeRegistered()
 			mediaInput.destination.port = ControlPort();
 			mediaInput.destination.id = fInputs.CountItems();
 			mediaInput.node = Node();
-			char *prefix = (char *)"";
+			const char *prefix = "";
 			if (strstr(engine->Info()->name, "SPDIF"))
-				prefix = (char *)"S/PDIF ";
+				prefix = "S/PDIF ";
 			sprintf(mediaInput.name, "%sOutput %ld (%s)", prefix,
 				mediaInput.destination.id, gSupportedFormatsNames[f]);
 
@@ -533,9 +533,9 @@ OpenSoundNode::NodeRegistered()
 			mediaOutput.source.port = ControlPort();
 			mediaOutput.source.id = fOutputs.CountItems();
 			mediaOutput.node = Node();
-			char *prefix = (char *)"";
+			const char *prefix = "";
 			if (strstr(engine->Info()->name, "SPDIF"))
-				prefix = (char *)"S/PDIF ";
+				prefix = "S/PDIF ";
 			sprintf(mediaOutput.name, "%sInput %ld (%s)", prefix,
 				mediaOutput.source.id, gSupportedFormatsNames[f]);
 

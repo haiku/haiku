@@ -72,13 +72,13 @@ Rage128_SetDPMSMode(uint32 dpmsMode)
 		case B_DPMS_STAND_BY:
 			// Screen: Off; HSync: Off, VSync: On.
 			OUTREGM(R128_CRTC_EXT_CNTL,
-				(R128_CRTC_DISPLAY_DIS | R128_CRTC_HSYNC_DIS), mask);
+				R128_CRTC_DISPLAY_DIS | R128_CRTC_HSYNC_DIS, mask);
 			break;
 
 		case B_DPMS_SUSPEND:
 			// Screen: Off; HSync: On, VSync: Off.
 			OUTREGM(R128_CRTC_EXT_CNTL,
-				(R128_CRTC_DISPLAY_DIS | R128_CRTC_VSYNC_DIS), mask);
+				R128_CRTC_DISPLAY_DIS | R128_CRTC_VSYNC_DIS, mask);
 			break;
 
 		case B_DPMS_OFF:

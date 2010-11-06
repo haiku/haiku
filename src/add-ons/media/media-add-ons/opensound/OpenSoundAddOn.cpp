@@ -64,7 +64,7 @@ OpenSoundAddOn::OpenSoundAddOn(image_id image) :
 	fInitCheckStatus = B_NO_INIT;
 
 	/* unix paths */
-	if (RecursiveScan((char *)"/dev/oss/") != B_OK)
+	if (RecursiveScan("/dev/oss/") != B_OK)
 		return;
 	/*
 	if (RecursiveScan("/dev/audio/oss/") != B_OK)
@@ -193,7 +193,7 @@ status_t OpenSoundAddOn::AutoStart(
 }
 
 status_t
-OpenSoundAddOn::RecursiveScan(char* rootPath, BEntry *rootEntry)
+OpenSoundAddOn::RecursiveScan(const char* rootPath, BEntry *rootEntry)
 {
 	status_t err;
 	int mixer;

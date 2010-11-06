@@ -75,7 +75,7 @@ struct frac pad_rate[2]  = {
 	{203, 2997},	/* = (8000 - 29.97 * 250)/(29.97 * 250) */
 	{1, 15},	/* = (8000 - 25 * 300)/(25 * 300) */
 };
-char *system_name[] = {(char *)"NTSC", (char *)"PAL"};
+const char *system_name[] = {"NTSC", "PAL"};
 int frame_rate[] = {30, 25};
 
 #define DV_PSIZE 512
