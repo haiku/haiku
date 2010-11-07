@@ -80,12 +80,12 @@ emuxki_dev cards[NUM_CARDS];
 int32 num_names;
 char * names[NUM_CARDS*20+1];
 
-emuxki_settings current_settings = {	
-		2,      // channels	
-		16,     // bits per sample	
-		48000,  // sample rate	
-		512,    // buffer frames	
-		2       // buffer count	
+emuxki_settings current_settings = {
+		2,      // channels
+		16,     // bits per sample
+		48000,  // sample rate
+		512,    // buffer frames
+		2       // buffer count
 };
 
 status_t emuxki_init(emuxki_dev *card);
@@ -97,19 +97,19 @@ extern device_hooks midi_hooks;
 
 /* Hardware Dump */
 
-static void 
+static void
 dump_hardware_regs(device_config *config)
 {
 	LOG(("EMU_IPR = %#08x\n",emuxki_reg_read_32(config, EMU_IPR)));
 	LOG(("EMU_INTE = %#08x\n",emuxki_reg_read_32(config, EMU_INTE)));
 	LOG(("EMU_HCFG = %#08x\n",emuxki_reg_read_32(config, EMU_HCFG)));
-	snooze(1000);	
+	snooze(1000);
 	/*emuxki_reg_write_8(config, EMU_AC97ADDRESS, EMU_AC97ADDRESS_READY);
 	LOG(("EMU_AC97ADDRESS_READY = %#08x\n", emuxki_reg_read_16(config, EMU_AC97DATA)));*/
-	
+
 	/*emuxki_reg_write_8(config, EMU_AC97ADDRESS, EMU_AC97ADDRESS_ADDRESS);
 	LOG(("EMU_AC97ADDRESS_ADDRESS = %#08x\n", emuxki_reg_read_16(config, EMU_AC97DATA)));*/
-	
+
 	/*LOG(("EMU_CHAN_CPF_STEREO = %#08x\n",emuxki_chan_read(config, 0, EMU_CHAN_CPF_STEREO)));
 	LOG(("EMU_CHAN_FXRT = %#08x\n",emuxki_chan_read(config, 0, EMU_CHAN_FXRT)));
 	LOG(("EMU_CHAN_PTRX = %#08x\n",emuxki_chan_read(config, 0, EMU_CHAN_PTRX)));
@@ -133,11 +133,11 @@ dump_hardware_regs(device_config *config)
 	LOG(("EMU_CHAN_ATKHLDV = %#08x\n",emuxki_chan_read(config, 0, EMU_CHAN_ATKHLDV)));
 	LOG(("EMU_CHAN_ENVVOL = %#08x\n",emuxki_chan_read(config, 0, EMU_CHAN_ENVVOL)));
 	LOG(("EMU_CHAN_PEFE = %#08x\n",emuxki_chan_read(config, 0, EMU_CHAN_PEFE)));*/
-	
+
 }
 
 
-/*static void 
+/*static void
 trace_hardware_regs(device_config *config)
 {
 	TRACE(("EMU_IPR = %#08x\n",emuxki_reg_read_32(config, EMU_IPR)));
@@ -256,7 +256,7 @@ emuxki_pmem_alloc(emuxki_dev *card, size_t size)
 	numblocks = size / EMU_PTESIZE;
 	if (size % EMU_PTESIZE)
 		numblocks++;
-		
+
 	PRINT(("emuxki_pmem_alloc : numblocks : %ld\n", numblocks));
 
 	for (i = 0; i < EMU_MAXPTE; i++) {
@@ -282,7 +282,7 @@ emuxki_pmem_alloc(emuxki_dev *card, size_t size)
 						| (i + j)));
 				LIST_INSERT_HEAD(&(card->mem), mem, next);
 				PRINT(("emuxki_pmem_alloc : j == numblocks returning\n"));
-				
+
 				//splx(s);
 				return mem->log_base;
 			} else {
@@ -356,10 +356,10 @@ emuxki_chanparms_set_defaults(emuxki_channel *chan)
 	chan->fxsend.a.level = chan->fxsend.b.level =
 	chan->fxsend.c.level = chan->fxsend.d.level =
 	/* for audigy */
-	chan->fxsend.e.level = chan->fxsend.f.level =	
-	chan->fxsend.g.level = chan->fxsend.h.level = 
+	chan->fxsend.e.level = chan->fxsend.f.level =
+	chan->fxsend.g.level = chan->fxsend.h.level =
 		IS_AUDIGY(&chan->voice->stream->card->config) ? 0xc0 : 0xff;	/* not max */
-		
+
 	chan->fxsend.a.dest = 0x0;
 	chan->fxsend.b.dest = 0x1;
 	chan->fxsend.c.dest = 0x2;
@@ -449,7 +449,7 @@ emuxki_channel_set_fxsend(emuxki_channel *chan,
 	chan->fxsend.b.dest = fxsend->b.dest;
 	chan->fxsend.c.dest = fxsend->c.dest;
 	chan->fxsend.d.dest = fxsend->d.dest;
-	
+
 	/* for audigy */
 	chan->fxsend.e.level = fxsend->e.level;
 	chan->fxsend.f.level = fxsend->f.level;
@@ -490,13 +490,13 @@ emuxki_channel_commit_fx(emuxki_channel *chan)
 {
 	emuxki_dev   	*card = chan->voice->stream->card;
 	uint8			chano = chan->num;
-	
+
 	if (IS_AUDIGY(&card->config)) {
 		emuxki_chan_write(&card->config, chano, 0x4c, 0);
 		emuxki_chan_write(&card->config, chano, 0x4d, 0);
 		emuxki_chan_write(&card->config, chano, 0x4e, 0);
 		emuxki_chan_write(&card->config, chano, 0x4f, 0);
-		
+
 		emuxki_chan_write(&card->config, chano, EMU_A_CHAN_FXRT1,
 			      (chan->fxsend.d.dest << 24) |
 			      (chan->fxsend.c.dest << 16) |
@@ -519,7 +519,7 @@ emuxki_channel_commit_fx(emuxki_channel *chan)
 			      (chan->fxsend.b.dest << 20) |
 			      (chan->fxsend.a.dest << 16));
 	}
-	
+
 	emuxki_chan_write(&card->config, chano, 0x10000000 | EMU_CHAN_PTRX,
 		      (chan->fxsend.a.level << 8) | chan->fxsend.b.level);
 	emuxki_chan_write(&card->config, chano, EMU_CHAN_DSL,
@@ -544,9 +544,9 @@ emuxki_channel_commit_parms(emuxki_channel *chan)
 
 	//s = splaudio();
 	emuxki_chan_write(&card->config, chano, EMU_CHAN_CPF_STEREO, voice->stereo);
-	
+
 	emuxki_channel_commit_fx(chan);
-		      
+
 	emuxki_chan_write(&card->config, chano, EMU_CHAN_CCCA,
 		      (chan->filter.lowpass_resonance_height << 28) |
 		      (chan->filter.interpolation_ROM << 25) |
@@ -659,7 +659,7 @@ emuxki_channel_stop(emuxki_channel *chan)
 
 
 /*	Emuxki voice functions */
-/*static void 
+/*static void
 emuxki_dump_voice(emuxki_voice *voice)
 {
 	LOG(("voice->use = %#u\n", voice->use));
@@ -740,7 +740,7 @@ emuxki_voice_dataloc_create(emuxki_voice *voice)
 		if ((error = emuxki_voice_channel_create(voice)))
 			return (error);
 	} else {
-		
+
 	}
 	return B_OK;
 }
@@ -771,7 +771,7 @@ emuxki_voice_dataloc_destroy(emuxki_voice *voice)
 				return;
 		}
 		emuxki_chan_write(&voice->stream->card->config, 0, buffaddr_reg, 0);
-		emuxki_chan_write(&voice->stream->card->config, 0, buffsize_reg, 
+		emuxki_chan_write(&voice->stream->card->config, 0, buffsize_reg,
 			EMU_RECBS_BUFSIZE_NONE);
 	}
 }
@@ -781,8 +781,8 @@ static void
 emuxki_voice_fxupdate(emuxki_voice *voice)
 {
 	emuxki_chanparms_fxsend fxsend;
-	
-	uint8 maxlevel = 
+
+	uint8 maxlevel =
 		IS_AUDIGY(&voice->stream->card->config) ? 0xc0 : 0xff;	/* not max */
 
 	if (voice->use & EMU_USE_PLAY) {
@@ -795,17 +795,17 @@ emuxki_voice_fxupdate(emuxki_voice *voice)
 		fxsend.f.dest = 0x3f;
 		fxsend.g.dest = 0x3f;
 		fxsend.h.dest = 0x3f;
-		
-		fxsend.a.level = fxsend.b.level = fxsend.c.level = fxsend.d.level = 
+
+		fxsend.a.level = fxsend.b.level = fxsend.c.level = fxsend.d.level =
 		fxsend.e.level = fxsend.g.level = fxsend.f.level = fxsend.h.level = 0x00;
-						
+
 		if (voice->stereo) {
 			switch(voice->stream->card->play_mode) {
 				case 2:
 					if (voice->stream->nstereo == 1) {
 						fxsend.a.dest = voice->voicenum * 2;
 						fxsend.a.level = maxlevel;
-					} else if ((voice->stream->nstereo == 2) || 
+					} else if ((voice->stream->nstereo == 2) ||
 						((voice->stream->nstereo == 3)&&(voice->voicenum < 2))) {
 						fxsend.a.dest = voice->voicenum * 2;
 						fxsend.a.level = maxlevel;
@@ -826,7 +826,7 @@ emuxki_voice_fxupdate(emuxki_voice *voice)
 						fxsend.a.level = maxlevel;
 						fxsend.b.dest = voice->voicenum * 2 + 2;
 						fxsend.b.level = maxlevel;
-					} else if ((voice->stream->nstereo == 2) || 
+					} else if ((voice->stream->nstereo == 2) ||
 						((voice->stream->nstereo == 3)&&(voice->voicenum < 2))) {
 						fxsend.a.dest = voice->voicenum * 2;
 						fxsend.a.level = maxlevel;
@@ -866,16 +866,16 @@ emuxki_voice_fxupdate(emuxki_voice *voice)
 					}
 					break;
 			}
-		
+
 			emuxki_channel_set_fxsend(voice->dataloc.chan[0],
 						   &fxsend);
-			
+
 			switch(voice->stream->card->play_mode) {
 				case 2:
 					if (voice->stream->nstereo == 1) {
 						fxsend.a.dest = voice->voicenum * 2 + 1;
 						fxsend.a.level = maxlevel;
-					} else if ((voice->stream->nstereo == 2) || 
+					} else if ((voice->stream->nstereo == 2) ||
 						((voice->stream->nstereo == 3)&&(voice->voicenum < 2))) {
 						fxsend.a.dest = voice->voicenum * 2 + 1;
 						fxsend.a.level = maxlevel;
@@ -896,7 +896,7 @@ emuxki_voice_fxupdate(emuxki_voice *voice)
 						fxsend.a.level = maxlevel;
 						fxsend.b.dest = voice->voicenum * 2 + 3;
 						fxsend.b.level = maxlevel;
-					} else if ((voice->stream->nstereo == 2) || 
+					} else if ((voice->stream->nstereo == 2) ||
 						((voice->stream->nstereo == 3)&&(voice->voicenum < 2))) {
 						fxsend.a.dest = voice->voicenum * 2 + 1;
 						fxsend.a.level = maxlevel;
@@ -936,7 +936,7 @@ emuxki_voice_fxupdate(emuxki_voice *voice)
 					}
 					break;
 			}
-						   
+
 			emuxki_channel_set_fxsend(voice->dataloc.chan[1],
 						   &fxsend);
 		} else {
@@ -950,7 +950,7 @@ emuxki_voice_fxupdate(emuxki_voice *voice)
 					} else if (voice->stream->nmono == 2) {
 						fxsend.a.dest = voice->voicenum;
 						fxsend.a.level = maxlevel;
-					} else if ((voice->stream->nmono == 4) || 
+					} else if ((voice->stream->nmono == 4) ||
 						((voice->stream->nmono == 6)&&(voice->voicenum < 4))) {
 						fxsend.a.dest = voice->voicenum;
 						fxsend.a.level = maxlevel;
@@ -980,7 +980,7 @@ emuxki_voice_fxupdate(emuxki_voice *voice)
 						fxsend.a.level = maxlevel;
 						fxsend.b.dest = voice->voicenum + 2;
 						fxsend.b.level = maxlevel;
-					} else if ((voice->stream->nmono == 4) || 
+					} else if ((voice->stream->nmono == 4) ||
 						((voice->stream->nmono == 6)&&(voice->voicenum < 4))) {
 						fxsend.a.dest = voice->voicenum;
 						fxsend.a.level = maxlevel;
@@ -1033,7 +1033,7 @@ emuxki_voice_fxupdate(emuxki_voice *voice)
 					}
 					break;
 			}
-			
+
 			emuxki_channel_set_fxsend(voice->dataloc.chan[0],
 						   &fxsend);
 		}
@@ -1045,7 +1045,7 @@ static status_t
 emuxki_voice_set_stereo(emuxki_voice *voice, uint8 stereo)
 {
 	status_t	error;
-	
+
 	emuxki_voice_dataloc_destroy(voice);
 	voice->stereo = stereo;
 	if ((error = emuxki_voice_dataloc_create(voice)))
@@ -1080,7 +1080,7 @@ emuxki_voice_set_audioparms(emuxki_voice *voice, uint8 stereo,
 	if (voice->stereo == stereo && voice->b16 == b16 &&
 	    voice->sample_rate == srate)
 		return B_OK;
-	
+
 	if (voice->stereo != stereo) {
 		if ((error = emuxki_voice_set_stereo(voice, stereo)))
 			return error;
@@ -1197,9 +1197,9 @@ emuxki_voice_commit_parms(emuxki_voice *voice)
 		emuxki_chan_write(&voice->stream->card->config, 0, buffaddr_reg, (uint32)voice->buffer->phy_base);
 		emuxki_chan_write(&voice->stream->card->config, 0, buffsize_reg, EMU_RECBS_BUFSIZE_NONE);
 		emuxki_chan_write(&voice->stream->card->config, 0, buffsize_reg, EMU_RECBS_BUFSIZE_4096);
-		
+
 		LOG(("emuxki_voice_commit_parms idx_reg : %u\n", idx_reg));
-		
+
 		idx_reg = EMU_RECIDX(idx_reg);
 		while (emuxki_chan_read(&voice->stream->card->config, 0, idx_reg))
 			snooze(5);
@@ -1253,7 +1253,7 @@ emuxki_resched_timer(emuxki_dev *card)
 
 	LIST_FOREACH(stream, &card->streams, next) {
 		LIST_FOREACH(voice, &stream->voices, next) {
-			if ((voice->use & EMU_USE_PLAY) == 0 || 
+			if ((voice->use & EMU_USE_PLAY) == 0 ||
 				(voice->state & EMU_STATE_STARTED) == 0)
 				continue;
 			active = 1;
@@ -1263,7 +1263,7 @@ emuxki_resched_timer(emuxki_dev *card)
 	}
 	if (timerate & ~EMU_TIMER_RATE_MASK)
 		timerate = 0;
-	
+
 	if (card->timerate > timerate) {
 		LOG(("emuxki_resched_timer written (old %u, new %u)\n", card->timerate, timerate));
 		card->timerate = timerate;
@@ -1284,7 +1284,7 @@ emuxki_resched_timer(emuxki_dev *card)
 }
 
 
-static uint32 
+static uint32
 emuxki_voice_adc_rate(emuxki_voice *voice)
 {
 	switch(voice->sample_rate) {
@@ -1335,14 +1335,14 @@ void
 emuxki_voice_start(emuxki_voice *voice)
 {
 	LOG(("emuxki_voice_start\n"));
-	
+
 	if (voice->use & EMU_USE_PLAY) {
 		voice->trigblk = 1;
 		emuxki_channel_start(voice->dataloc.chan[0]);
 		if (voice->stereo)
 			emuxki_channel_start(voice->dataloc.chan[1]);
 	} else {
-						
+
 		switch (voice->dataloc.source) {
 			case EMU_RECSRC_MIC:
 				emuxki_inte_enable(&voice->stream->card->config, EMU_INTE_MICBUFENABLE);
@@ -1356,21 +1356,21 @@ emuxki_voice_start(emuxki_voice *voice)
 						| ( IS_AUDIGY(&voice->stream->card->config) ? EMU_A_ADCCR_RCHANENABLE : EMU_ADCCR_RCHANENABLE ));
 				else
 					adccr_value |= IS_AUDIGY(&voice->stream->card->config) ? EMU_A_ADCCR_LCHANENABLE : EMU_ADCCR_LCHANENABLE;
-				
+
 				LOG(("emuxki_voice_start adccr_value : %u, %u\n", adccr_value, EMU_ADCCR_LCHANENABLE | EMU_ADCCR_RCHANENABLE));
 				emuxki_chan_write(&voice->stream->card->config, 0, EMU_ADCCR, adccr_value);
-				
+
 				emuxki_inte_enable(&voice->stream->card->config, EMU_INTE_ADCBUFENABLE);
 				}
 				break;
 			case EMU_RECSRC_FX:
 				if (IS_AUDIGY(&voice->stream->card->config)) {
-					emuxki_chan_write(&voice->stream->card->config, 0, EMU_A_FXWC1, 
+					emuxki_chan_write(&voice->stream->card->config, 0, EMU_A_FXWC1,
 						voice->recparams.efx_voices[0]);
-					emuxki_chan_write(&voice->stream->card->config, 0, EMU_A_FXWC2, 
-						voice->recparams.efx_voices[1]);				
+					emuxki_chan_write(&voice->stream->card->config, 0, EMU_A_FXWC2,
+						voice->recparams.efx_voices[1]);
 				} else {
-					emuxki_chan_write(&voice->stream->card->config, 0, EMU_FXWC, 
+					emuxki_chan_write(&voice->stream->card->config, 0, EMU_FXWC,
 						voice->recparams.efx_voices[0]);
 				}
 				emuxki_inte_enable(&voice->stream->card->config, EMU_INTE_EFXBUFENABLE);
@@ -1390,18 +1390,18 @@ void
 emuxki_voice_halt(emuxki_voice *voice)
 {
 	LOG(("emuxki_voice_halt\n"));
-	
+
 	if (voice->use & EMU_USE_PLAY) {
 		emuxki_channel_stop(voice->dataloc.chan[0]);
 		if (voice->stereo)
 			emuxki_channel_stop(voice->dataloc.chan[1]);
 	} else {
-			
+
 		switch (voice->dataloc.source) {
 			case EMU_RECSRC_MIC:
 				emuxki_inte_disable(&voice->stream->card->config, EMU_INTE_MICBUFENABLE);
 				break;
-			case EMU_RECSRC_ADC: 
+			case EMU_RECSRC_ADC:
 				emuxki_chan_write(&voice->stream->card->config, 0, EMU_ADCCR, 0);
 				emuxki_inte_disable(&voice->stream->card->config, EMU_INTE_ADCBUFENABLE);
 				break;
@@ -1429,7 +1429,7 @@ emuxki_voice_new(emuxki_stream *stream, uint8 use, uint8 voicenum)
 {
 	emuxki_voice *voice;
 	//int             s;
-	
+
 	LOG(("emuxki_voice_new\n"));
 
 	voice = malloc(sizeof(emuxki_voice));
@@ -1477,12 +1477,12 @@ emuxki_stream_set_audioparms(emuxki_stream *stream, bool stereo, uint8 channels,
 	uint8 			sample_size, frame_size;
 	LOG(("emuxki_stream_set_audioparms\n"));
 
-	if (stream->stereo == stereo && 
+	if (stream->stereo == stereo &&
 		((stream->nmono + 2*stream->nstereo) == channels) &&
-		(stream->b16 == b16) && 
+		(stream->b16 == b16) &&
 		(stream->sample_rate == sample_rate))
 		return B_OK;
-	
+
 	LIST_FOREACH(voice, &stream->voices, next) {
 		if (voice->buffer)
 			emuxki_mem_free(stream->card, voice->buffer->log_base);
@@ -1490,10 +1490,10 @@ emuxki_stream_set_audioparms(emuxki_stream *stream, bool stereo, uint8 channels,
 	}
 	stream->first_voice = NULL;
 	LIST_INIT(&(stream->voices));
-	
+
 	stream->b16 = b16;
 	stream->sample_rate = sample_rate;
-	
+
 	if (stereo && (channels % 2 == 0)) {
 		stream->stereo = true;
 		stream->nstereo = channels / 2;
@@ -1505,44 +1505,44 @@ emuxki_stream_set_audioparms(emuxki_stream *stream, bool stereo, uint8 channels,
 		stream->nmono = channels;
 		nvoices = stream->nmono;
 	}
-	
+
 	sample_size = stream->b16 + 1;
 	frame_size = sample_size * (stream->stereo ? 2 : 1);
-	
+
 	for (i = 0; i < nvoices; i++) {
 		voice = emuxki_voice_new(stream, stream->use, i);
 		if (voice) {
 			if (!stream->first_voice)
 				stream->first_voice = voice;
 			LIST_INSERT_HEAD((&stream->voices), voice, next);
-			if ((error = emuxki_voice_set_audioparms(voice, stream->stereo, 
+			if ((error = emuxki_voice_set_audioparms(voice, stream->stereo,
 				stream->b16, stream->sample_rate)))
 				return error;
-						
+
 			if (stream->use & EMU_USE_PLAY)
-				buffer = emuxki_pmem_alloc(stream->card, stream->bufframes 
+				buffer = emuxki_pmem_alloc(stream->card, stream->bufframes
 					* frame_size * stream->bufcount);
 			else
-				buffer = emuxki_rmem_alloc(stream->card, stream->bufframes 
+				buffer = emuxki_rmem_alloc(stream->card, stream->bufframes
 					* frame_size * stream->bufcount);
-			
-			emuxki_voice_set_bufparms(voice, buffer, 
-				stream->bufframes * frame_size * stream->bufcount, 
+
+			emuxki_voice_set_bufparms(voice, buffer,
+				stream->bufframes * frame_size * stream->bufcount,
 				stream->bufframes * frame_size);
 		}
 	}
-		
+
 	return B_OK;
 }
 
 
-status_t 
+status_t
 emuxki_stream_set_recparms(emuxki_stream *stream, emuxki_recsrc_t recsrc,
 			     	emuxki_recparams *recparams)
 {
 	emuxki_voice *voice;
 	LOG(("emuxki_stream_set_recparms\n"));
-	
+
 	if (stream->use & EMU_USE_RECORD) {
 		switch(recsrc) {
 			case EMU_RECSRC_MIC:
@@ -1574,27 +1574,27 @@ emuxki_stream_commit_parms(emuxki_stream *stream)
 	emuxki_voice 	*voice;
 	status_t 		error;
 	LOG(("emuxki_stream_commit_parms\n"));
-	
+
 	LIST_FOREACH(voice, &stream->voices, next)
 		if ((error = emuxki_voice_commit_parms(voice)))
 			return error;
-	
+
 	return B_OK;
 }
 
 
 status_t
-emuxki_stream_get_nth_buffer(emuxki_stream *stream, uint8 chan, uint8 buf, 
+emuxki_stream_get_nth_buffer(emuxki_stream *stream, uint8 chan, uint8 buf,
 					char** buffer, size_t *stride)
 {
 	emuxki_voice *voice = NULL;
 	uint8 i, sample_size;
 	LOG(("emuxki_stream_get_nth_buffer\n"));
-	
+
 	sample_size = stream->b16 + 1;
 	if (buf >= stream->bufcount)
 		return B_BAD_INDEX;
-	
+
 	if (stream->stereo) {
 		i = stream->nstereo - 1;
 		if (chan/2 > i)
@@ -1602,7 +1602,7 @@ emuxki_stream_get_nth_buffer(emuxki_stream *stream, uint8 chan, uint8 buf,
 		LIST_FOREACH(voice, &stream->voices, next)
 			if (i != chan/2)
 				i--;
-			else 
+			else
 				break;
 		if (voice) {
 			*buffer = (char*)voice->buffer->log_base
@@ -1619,16 +1619,16 @@ emuxki_stream_get_nth_buffer(emuxki_stream *stream, uint8 chan, uint8 buf,
 		LIST_FOREACH(voice, &stream->voices, next)
 			if (i != chan)
 				i--;
-			else 
+			else
 				break;
 		if (voice) {
-			*buffer = (char*)voice->buffer->log_base 
+			*buffer = (char*)voice->buffer->log_base
 				+ (buf * stream->bufframes * sample_size);
 			*stride = sample_size;
 		} else
 			return B_ERROR;
 	}
-	
+
 	return B_OK;
 }
 
@@ -1638,10 +1638,10 @@ emuxki_stream_start(emuxki_stream *stream, void (*inth) (void *), void *inthpara
 {
 	emuxki_voice *voice;
 	LOG(("emuxki_stream_start\n"));
-	
+
 	stream->inth = inth;
 	stream->inthparam = inthparam;
-		
+
 	LIST_FOREACH(voice, &stream->voices, next) {
 		emuxki_voice_start(voice);
 	}
@@ -1654,7 +1654,7 @@ emuxki_stream_halt(emuxki_stream *stream)
 {
 	emuxki_voice *voice;
 	LOG(("emuxki_stream_halt\n"));
-			
+
 	LIST_FOREACH(voice, &stream->voices, next) {
 		emuxki_voice_halt(voice);
 	}
@@ -1685,7 +1685,7 @@ emuxki_stream_new(emuxki_dev *card, uint8 use, uint32 bufframes, uint8 bufcount)
 	stream->first_voice = NULL;
 	stream->inth = NULL;
 	stream->inthparam = NULL;
-		
+
 	stream->frames_count = 0;
 	stream->real_time = 0;
 	stream->buffer_cycle = 0;
@@ -1693,11 +1693,11 @@ emuxki_stream_new(emuxki_dev *card, uint8 use, uint32 bufframes, uint8 bufcount)
 
 	/* Init voices list */
 	LIST_INIT(&(stream->voices));
-	
+
 	status = lock();
 	LIST_INSERT_HEAD((&card->streams), stream, next);
 	unlock(status);
-	
+
 	return stream;
 }
 
@@ -1708,13 +1708,13 @@ emuxki_stream_delete(emuxki_stream *stream)
 	emuxki_voice *voice;
 	cpu_status status;
 	LOG(("emuxki_stream_delete\n"));
-	
-	emuxki_stream_halt(stream);	
-	
+
+	emuxki_stream_halt(stream);
+
 	status = lock();
 	LIST_REMOVE(stream, next);
 	unlock(status);
-	
+
 	while (!LIST_EMPTY(&stream->voices)) {
 		voice = LIST_FIRST(&stream->voices);
 		LIST_REMOVE(voice, next);
@@ -1722,7 +1722,7 @@ emuxki_stream_delete(emuxki_stream *stream)
 			emuxki_mem_free(stream->card, voice->buffer->log_base);
 		emuxki_voice_delete(voice);
 	}
-	
+
 	free(stream);
 }
 
@@ -1752,9 +1752,9 @@ emuxki_gpr_set(emuxki_dev *card, emuxki_gpr *gpr, int32 type, float *values)
 	uint8 count = gpr->type & EMU_MIX_STEREO ? 2 : 1;
 	uint8 i;
 	uint32 index;
-	
+
 	LOG(("emuxki_set_gpr\n"));
-	
+
 	switch(type) {
 		case EMU_MIX_MUTE:
 			gpr->mute = (values[0] == 1.0);
@@ -1765,7 +1765,7 @@ emuxki_gpr_set(emuxki_dev *card, emuxki_gpr *gpr, int32 type, float *values)
 			}
 			for (i = 0; i < count; i++) {
 				values[i] = gpr->current[i];
-			}	
+			}
 		case EMU_MIX_GAIN:
 			for (i = 0; i < count; i++) {
 				if (values[i]>gpr->max_gain || values[i]<gpr->min_gain)
@@ -1792,9 +1792,9 @@ emuxki_gpr_get(emuxki_dev *card, emuxki_gpr *gpr, int32 type, float *values)
 {
 	uint8 count = gpr->type & EMU_MIX_STEREO ? 2 : 1;
 	uint16 i;
-		
+
 	LOG(("emuxki_get_gpr\n"));
-	
+
 	switch(type) {
 		case EMU_MIX_GAIN:
 			for (i = 0; i < count; i++) {
@@ -1808,12 +1808,12 @@ emuxki_gpr_get(emuxki_dev *card, emuxki_gpr *gpr, int32 type, float *values)
 }
 
 
-void 
+void
 emuxki_gpr_dump(emuxki_dev * card, uint16 count)
 {
 	uint16      pc;
 	uint32		value;
-	
+
 	LOG(("emuxki_dump_gprs\n"));
 
 	for (pc = 0; pc < count; pc++) {
@@ -1824,14 +1824,14 @@ emuxki_gpr_dump(emuxki_dev * card, uint16 count)
 
 
 static emuxki_gpr *
-emuxki_gpr_new(emuxki_dev *card, const char *name, emuxki_gpr_type type, uint16 *gpr_num, 
+emuxki_gpr_new(emuxki_dev *card, const char *name, emuxki_gpr_type type, uint16 *gpr_num,
 			float default_value, float default_mute, float min_gain, float max_gain, float granularity)
 {
 	emuxki_gpr *gpr;
 	float	values[2];
-	
+
 	LOG(("emuxki_gpr_new\n"));
-	
+
 	gpr = &card->gpr[*gpr_num];
 	strncpy(gpr->name, name, 32);
 	gpr->type = type;
@@ -1844,54 +1844,54 @@ emuxki_gpr_new(emuxki_dev *card, const char *name, emuxki_gpr_type type, uint16 
 	(*gpr_num)++;
 	if (gpr->type & EMU_MIX_STEREO)
 		(*gpr_num)++;
-	
+
 	if (default_mute == 1.0) {
 		values[0] = default_mute;
 		emuxki_gpr_set(card, gpr, EMU_MIX_MUTE, values);
 	}
-	
+
 	values[0] = gpr->default_value;
 	if (gpr->type & EMU_MIX_STEREO)
 		values[1] = gpr->default_value;
 	emuxki_gpr_set(card, gpr, EMU_MIX_GAIN, values);
-	
-	
+
+
 	return gpr;
 }
 
 /* Emuxki parameter */
 
-void 
+void
 emuxki_parameter_set(emuxki_dev *card, const void* cookie, int32 type, int32 *value)
 {
 	emuxki_stream *stream;
 	emuxki_voice *voice;
 	LOG(("emuxki_parameter_set\n"));
-	
+
 	switch(type) {
 		case EMU_DIGITAL_MODE:
 			card->digital_enabled = *value == 1;
 			if (IS_AUDIGY(&card->config))
 				if (IS_AUDIGY2(&card->config)) {
 					// this disables analog, not enough
-					emuxki_reg_write_32(&card->config, EMU_A_IOCFG, 
-						(card->digital_enabled ? 0 : EMU_A_IOCFG_GPOUT0) | 
-							(emuxki_reg_read_32(&card->config, EMU_A_IOCFG) 
+					emuxki_reg_write_32(&card->config, EMU_A_IOCFG,
+						(card->digital_enabled ? 0 : EMU_A_IOCFG_GPOUT0) |
+							(emuxki_reg_read_32(&card->config, EMU_A_IOCFG)
 							& ~(EMU_A_IOCFG_GPOUT0 | EMU_A_IOCFG_GPOUT1) ) );
 				} else {
 					// this disables analog, and enables digital
-					emuxki_reg_write_32(&card->config, EMU_A_IOCFG, 
-						(card->digital_enabled ? EMU_A_IOCFG_GPOUT0 | EMU_A_IOCFG_GPOUT1 : 0) | 
-							(emuxki_reg_read_32(&card->config, EMU_A_IOCFG) 
+					emuxki_reg_write_32(&card->config, EMU_A_IOCFG,
+						(card->digital_enabled ? EMU_A_IOCFG_GPOUT0 | EMU_A_IOCFG_GPOUT1 : 0) |
+							(emuxki_reg_read_32(&card->config, EMU_A_IOCFG)
 							& ~(EMU_A_IOCFG_GPOUT0 | EMU_A_IOCFG_GPOUT1) ) );
 				}
 			else {
 				// this enables digital, not enough
-				emuxki_reg_write_32(&card->config, EMU_HCFG, 
-					(card->digital_enabled ? EMU_HCFG_GPOUTPUT0 : 0) | 
+				emuxki_reg_write_32(&card->config, EMU_HCFG,
+					(card->digital_enabled ? EMU_HCFG_GPOUTPUT0 : 0) |
 					(emuxki_reg_read_32(&card->config, EMU_HCFG) & ~EMU_HCFG_GPOUTPUT0));
 			}
-			
+
 			break;
 		case EMU_AUDIO_MODE:
 			if (*value!=0 && *value!=1 && *value!=2) {
@@ -1915,11 +1915,11 @@ emuxki_parameter_set(emuxki_dev *card, const void* cookie, int32 type, int32 *va
 }
 
 
-void 
+void
 emuxki_parameter_get(emuxki_dev *card, const void* cookie, int32 type, int32 *value)
 {
 	LOG(("emuxki_parameter_get\n"));
-	
+
 	switch(type) {
 		case EMU_DIGITAL_MODE:
 			*value = card->digital_enabled ? 1 : 0;
@@ -1932,7 +1932,7 @@ emuxki_parameter_get(emuxki_dev *card, const void* cookie, int32 type, int32 *va
 
 
 /* Emuxki interrupt */
-static int32 
+static int32
 emuxki_int(void *arg)
 {
 	emuxki_dev	 *card = arg;
@@ -1940,7 +1940,7 @@ emuxki_int(void *arg)
 	bool gotone = false;
 	emuxki_voice *voice;
 	emuxki_stream *stream;
-	
+
 	while ((ipr = emuxki_reg_read_32(&card->config, EMU_IPR))) {
 		gotone = true;
 		if (ipr & EMU_IPR_INTERVALTIMER) {
@@ -1950,7 +1950,7 @@ emuxki_int(void *arg)
 					(stream->state & EMU_STATE_STARTED) == 0 ||
 					(stream->inth == NULL))
 						continue;
-				
+
 				voice = stream->first_voice;
 				//TRACE(("voice %p\n", voice));
 				curblk = emuxki_voice_curaddr(voice) /
@@ -1962,7 +1962,7 @@ emuxki_int(void *arg)
 					//dump_voice(voice);
 					//trace_hardware_regs(&card->config);
 					//TRACE(("voice pointer %p\n", voice));
-														
+
 					if (stream->inth)
 						stream->inth(stream->inthparam);
 
@@ -1975,7 +1975,7 @@ emuxki_int(void *arg)
 		if (ipr & (EMU_IPR_MIDIRECVBUFE)) {
 			midi_interrupt(card);          /* Gameport */
 		}
-        
+
 		if (ipr & (EMU_IPR_MIDITRANSBUFE)) {
 			if (!midi_interrupt(card)) {
 				emuxki_inte_disable(&card->config, EMU_INTE_MIDITXENABLE);
@@ -2002,7 +2002,7 @@ emuxki_int(void *arg)
 					//TRACE(("EMU_IPR_ADCBUF at trigblk %lu\n", curblk));
 					//dump_voice(voice);
 					//trace_hardware_regs(&card->config);
-														
+
 					if (stream->inth)
 						stream->inth(stream->inthparam);
 
@@ -2011,7 +2011,7 @@ emuxki_int(void *arg)
 				}
 			}
 		}
-		
+
 		/*if (ipr & (EMU_IPR_CHANNELLOOP)) {
 			TRACE(("EMU_IPR_CHANNELLOOP pending channel : %u\n", ipr & EMU_IPR_CHNOMASK));
 			LIST_FOREACH(stream, &card->streams, next)
@@ -2024,8 +2024,8 @@ emuxki_int(void *arg)
 				emuxki_chan_write(&voice->card->config, 0, EMU_CLIPL, emuxki_chan_read(&voice->card->config, 0, EMU_CLIPL));
 			}
 		}*/
-		
-		if (ipr & ~(EMU_IPR_RATETRCHANGE | EMU_IPR_INTERVALTIMER 
+
+		if (ipr & ~(EMU_IPR_RATETRCHANGE | EMU_IPR_INTERVALTIMER
 				| EMU_IPR_MIDITRANSBUFE | EMU_IPR_MIDIRECVBUFE
 				| EMU_IPR_ADCBUFHALFFULL | EMU_IPR_ADCBUFFULL
 				| EMU_IPR_MICBUFHALFFULL | EMU_IPR_MICBUFFULL
@@ -2064,14 +2064,14 @@ emuxki_int(void *arg)
 
 
 /* detect presence of our hardware */
-status_t 
+status_t
 init_hardware(void)
 {
 	int ix = 0;
 	pci_info info;
 //	uint32 buffer;
 	status_t err = ENODEV;
-	
+
 	LOG_CREATE();
 
 	PRINT(("init_hardware()\n"));
@@ -2088,11 +2088,11 @@ init_hardware(void)
 #endif
 			)) {
 			err = B_OK;
-			
-/*			
+
+/*
 			Joystick suport
-			if (!(info.u.h0.subsystem_id == 0x20 || 
-					info.u.h0.subsystem_id == 0xc400 || 
+			if (!(info.u.h0.subsystem_id == 0x20 ||
+					info.u.h0.subsystem_id == 0xc400 ||
  					(info.u.h0.subsystem_id == 0x21 && info.revision < 6))) {
 	    		buffer = (*pci->read_io_32)(info.u.h0.base_registers[0] + HCFG);
 	    		buffer |= HCFG_JOYENABLE;
@@ -2101,7 +2101,7 @@ init_hardware(void)
 		}
 		ix++;
 	}
-		
+
 	put_module(B_PCI_MODULE_NAME);
 
 	return err;
@@ -2112,14 +2112,14 @@ static void
 make_device_names(
 	emuxki_dev * card)
 {
-#if MIDI	
+#if MIDI
 	sprintf(card->midi.name, "midi/emuxki/%ld", card-cards+1);
 	names[num_names++] = card->midi.name;
 #endif
 
 //	sprintf(card->joy.name1, "joystick/"DRIVER_NAME "/%x", card-cards+1);
 //	names[num_names++] = card->joy.name1;
-	
+
 	sprintf(card->name, "audio/hmulti/emuxki/%ld", card-cards+1);
 	names[num_names++] = card->name;
 
@@ -2146,10 +2146,10 @@ emuxki_setup(emuxki_dev * card)
 			card->config.type |= TYPE_AUDIGY2;
 	} else if (card->info.device_id == CREATIVELABS_AUDIGY2_VALUE_DEVICE_ID)
 		card->config.type |= TYPE_AUDIGY | TYPE_AUDIGY2 | TYPE_AUDIGY2_VALUE;
-	
+
 	PRINT(("%s deviceid = %#04x chiprev = %x model = %x enhanced at %lx\n", card->name, card->info.device_id,
 		card->info.revision, card->info.u.h0.subsystem_id, card->config.nabmbar));
-		
+
 	cmd = (*pci->read_pci_config)(card->info.bus, card->info.device, card->info.function, PCI_command, 2);
 	PRINT(("PCI command before: %x\n", cmd));
 	(*pci->write_pci_config)(card->info.bus, card->info.device, card->info.function, PCI_command, 2, cmd | PCI_command_io);
@@ -2158,32 +2158,32 @@ emuxki_setup(emuxki_dev * card)
 
 	dump_hardware_regs(&card->config);
 
-	emuxki_reg_write_32(&card->config, EMU_HCFG, EMU_HCFG_LOCKSOUNDCACHE | EMU_HCFG_LOCKTANKCACHE_MASK| 
+	emuxki_reg_write_32(&card->config, EMU_HCFG, EMU_HCFG_LOCKSOUNDCACHE | EMU_HCFG_LOCKTANKCACHE_MASK|
 		EMU_HCFG_MUTEBUTTONENABLE);
-	
+
 	dump_hardware_regs(&card->config);
-	
+
 #if MIDI
 	//SBLIVE : EMU_MUDATA, workaround 0, AUDIGY, AUDIGY2: 0, workaround 0x11020004
-	if ((err = (*mpu401->create_device)((card->config.nabmbar + !IS_AUDIGY(&card->config) ? EMU_MUDATA : 0), 
+	if ((err = (*mpu401->create_device)((card->config.nabmbar + !IS_AUDIGY(&card->config) ? EMU_MUDATA : 0),
 		&card->midi.driver, !IS_AUDIGY(&card->config) ? 0 : 0x11020004, midi_interrupt_op, &card->midi)) < B_OK)
-		return (err);		
+		return (err);
 
 	card->midi.card = card;
 #endif
-	
+
 	// begin Joystick part
 /*	base = card->info.u.h0.base_registers[0];
-	(*pci->write_pci_config) (card->info.bus,card->info.device, 
+	(*pci->write_pci_config) (card->info.bus,card->info.device,
 			card->info.function, 0x10, 2, base);
-	
+
 	if ((*gameport->create_device)(base, &card->joy.driver) < B_OK) {
 		dprintf("Audigy joystick - Error creating device\n");
 		(*gameport->delete_device)(card->joy.driver);
 	}*/
 	// end Joystick part
-	
-	/* reset the codec */	
+
+	/* reset the codec */
 	PRINT(("codec reset\n"));
 	emuxki_codec_write(&card->config, 0x00, 0x0000);
 	snooze(50000); // 50 ms
@@ -2194,14 +2194,14 @@ emuxki_setup(emuxki_dev * card)
 	PRINT(("codec vendor id      = %#08lx\n",ac97_get_vendor_id(&card->config)));
 	PRINT(("codec description     = %s\n",ac97_get_vendor_id_description(&card->config)));
 	PRINT(("codec 3d enhancement = %s\n",ac97_get_3d_stereo_enhancement(&card->config)));
-	
+
 	if (IS_AUDIGY2(&card->config)) {
-		emuxki_reg_write_32(&card->config, EMU_A_IOCFG, 
+		emuxki_reg_write_32(&card->config, EMU_A_IOCFG,
 			EMU_A_IOCFG_GPOUT0 | emuxki_reg_read_32(&card->config, EMU_A_IOCFG));
 	}
-	
+
 	dump_hardware_regs(&card->config);
-	
+
 	/*PRINT(("codec master output = %#04x\n",emuxki_codec_read(&card->config, 0x02)));
 	PRINT(("codec aux output    = %#04x\n",emuxki_codec_read(&card->config, 0x04)));
 	PRINT(("codec mono output   = %#04x\n",emuxki_codec_read(&card->config, 0x06)));
@@ -2209,7 +2209,7 @@ emuxki_setup(emuxki_dev * card)
 	PRINT(("codec line in	    = %#04x\n",emuxki_codec_read(&card->config, 0x10)));
 	PRINT(("codec record line in= %#04x\n",emuxki_codec_read(&card->config, 0x1a)));
 	PRINT(("codec record gain   = %#04x\n",emuxki_codec_read(&card->config, 0x1c)));*/
-	
+
 	/*PRINT(("adc index	    = %#08x\n",emuxki_chan_read(&card->config, EMU_ADCIDX, 0)));
 	PRINT(("micro index 	= %#08x\n",emuxki_chan_read(&card->config, EMU_MICIDX, 0)));
 	PRINT(("fx index   		= %#08x\n",emuxki_chan_read(&card->config, EMU_FXIDX, 0)));
@@ -2248,22 +2248,22 @@ emuxki_setup(emuxki_dev * card)
 	PRINT(("codec line in	    = %#04x\n",emuxki_codec_read(&card->config, AC97_LINE_IN_VOLUME)));
 	PRINT(("codec record line in= %#04x\n",emuxki_codec_read(&card->config, AC97_RECORD_SELECT)));
 	PRINT(("codec record gain   = %#04x\n",emuxki_codec_read(&card->config, AC97_RECORD_GAIN)));
-	
+
 	if (emuxki_codec_read(&card->config, AC97_EXTENDED_AUDIO_ID) & 0x0080) {
 		card->config.type |= TYPE_LIVE_5_1;
 		emuxki_chan_write(&card->config, 0, EMU_AC97SLOT, EMU_AC97SLOT_CENTER | EMU_AC97SLOT_LFE);
 		emuxki_codec_write(&card->config, AC97_SURROUND_VOLUME, 0x0000);
 	}
-	
+
 	if ((err = emuxki_init(card)))
 		return (err);
-	
+
 	if (IS_AUDIGY(&card->config) || IS_LIVE_5_1(&card->config)) {
 		card->play_mode = 6;	// mode 5.1
 	} else {
 		card->play_mode = 4;	// mode 4.0
 	}
-	
+
 	emuxki_reg_write_32(&card->config, EMU_INTE, EMU_INTE_SAMPLERATER | EMU_INTE_PCIERRENABLE);
 	if (IS_AUDIGY2(&card->config)) {
 		emuxki_reg_write_32(&card->config, EMU_A2_INTE2, 0);
@@ -2271,13 +2271,13 @@ emuxki_setup(emuxki_dev * card)
 			emuxki_reg_write_32(&card->config, EMU_A2_INTE3, 0);
 		}
 	}
-	
+
 	PRINT(("installing interrupt : %lx\n", card->config.irq));
 	err = install_io_interrupt_handler(card->config.irq, emuxki_int, card, 0);
 	if (err != B_OK) {
 		PRINT(("failed to install interrupt\n"));
 		emuxki_shutdown(card);
-		return err;	
+		return err;
 	}
 
 	emuxki_inte_enable(&card->config, EMU_INTE_VOLINCRENABLE | EMU_INTE_VOLDECRENABLE
@@ -2293,24 +2293,24 @@ emuxki_setup(emuxki_dev * card)
 		emuxki_reg_write_32(&card->config, EMU_HCFG, EMU_HCFG_AUDIOENABLE |
 			EMU_HCFG_LOCKTANKCACHE_MASK | EMU_HCFG_JOYENABLE | EMU_HCFG_AUTOMUTE);
 	}
-	
+
 	PRINT(("setup_emuxki done\n"));
 
 	return err;
 }
 
 
-void 
+void
 emuxki_dump_fx(emuxki_dev * card)
 {
 	uint16      pc = 0;
 	uint8		op;
 	uint16		r,a,x,y,zero;
-	
+
 	LOG(("emuxki_dump_fx\n"));
 
 	zero = IS_AUDIGY(&card->config) ? EMU_A_DSP_CST(0) : EMU_DSP_CST(0);
-	
+
 	while (pc < 512) {
 		emuxki_dsp_getop(&card->config, &pc, &op, &r, &a, &x, &y);
 		if (op!=EMU_DSP_OP_ACC3 || r!=zero || a!=zero || x!=zero || y!=zero) {
@@ -2334,13 +2334,13 @@ emuxki_initfx(emuxki_dev * card)
 		emuxki_write_gpr(&card->config, pc, 0);
 		card->gpr[pc].gpr = -1;
 	}
-	
+
 	for (pc = 0; pc < 160; pc++) {
 		emuxki_chan_write(&card->config, 0, EMU_TANKMEMDATAREGBASE + pc, 0);
 		emuxki_chan_write(&card->config, 0, EMU_TANKMEMADDRREGBASE + pc, 0);
 	}
 	pc = 0;
-	gpr = EMU_GPR_FIRST_MIX;	// we reserve 16 gprs for processing 
+	gpr = EMU_GPR_FIRST_MIX;	// we reserve 16 gprs for processing
 #define EMU_DSP_TMPGPR_FRONT_LEFT 0
 #define EMU_DSP_TMPGPR_FRONT_RIGHT 1
 #define EMU_DSP_TMPGPR_REAR_LEFT 2
@@ -2349,38 +2349,38 @@ emuxki_initfx(emuxki_dev * card)
 #define EMU_DSP_TMPGPR_SUB 5
 #define EMU_DSP_TMPGPR_DSP_IN_L	6
 #define EMU_DSP_TMPGPR_DSP_IN_R	7
-	
-	a_front_gpr = emuxki_gpr_new(card, "Analog Front", 
+
+	a_front_gpr = emuxki_gpr_new(card, "Analog Front",
 			EMU_MIX_GAIN|EMU_MIX_STEREO|EMU_MIX_MUTE|EMU_MIX_PLAYBACK, &gpr, 0.0, 0.0, -46.5, 0.0, -0.75);
-	a_rear_gpr = emuxki_gpr_new(card, "Analog Rear", 
+	a_rear_gpr = emuxki_gpr_new(card, "Analog Rear",
 			EMU_MIX_GAIN|EMU_MIX_STEREO|EMU_MIX_MUTE|EMU_MIX_PLAYBACK, &gpr, 0.0, 0.0, -46.5, 0.0, -0.75);
 	if (IS_AUDIGY(&card->config) || IS_LIVE_5_1(&card->config))
-		a_center_sub_gpr = emuxki_gpr_new(card, "Analog Center/Sub", 
+		a_center_sub_gpr = emuxki_gpr_new(card, "Analog Center/Sub",
 			EMU_MIX_GAIN|EMU_MIX_STEREO|EMU_MIX_MUTE|EMU_MIX_PLAYBACK, &gpr, 0.0, 0.0, -46.5, 0.0, -0.75);
-	
-	d_front_gpr = emuxki_gpr_new(card, "Digital Front", 
+
+	d_front_gpr = emuxki_gpr_new(card, "Digital Front",
 			EMU_MIX_GAIN|EMU_MIX_STEREO|EMU_MIX_MUTE|EMU_MIX_PLAYBACK, &gpr, 0.0, 0.0, -46.5, 0.0, -0.75);
-	d_rear_gpr = emuxki_gpr_new(card, "Digital Rear", 
+	d_rear_gpr = emuxki_gpr_new(card, "Digital Rear",
 			EMU_MIX_GAIN|EMU_MIX_STEREO|EMU_MIX_MUTE|EMU_MIX_PLAYBACK, &gpr, 0.0, 0.0, -46.5, 0.0, -0.75);
-	d_center_sub_gpr = emuxki_gpr_new(card, "Digital Center/Sub", 
+	d_center_sub_gpr = emuxki_gpr_new(card, "Digital Center/Sub",
 			EMU_MIX_GAIN|EMU_MIX_STEREO|EMU_MIX_MUTE|EMU_MIX_PLAYBACK, &gpr, 0.0, 0.0, -46.5, 0.0, -0.75);
-	
+
 	/* playback in gprs */
-	p_ac97_in_gpr = emuxki_gpr_new(card, "AC97 Record In", 
+	p_ac97_in_gpr = emuxki_gpr_new(card, "AC97 Record In",
 			EMU_MIX_GAIN|EMU_MIX_STEREO|EMU_MIX_MUTE|EMU_MIX_PLAYBACK, &gpr, 0.0, 1.0, -46.5, 0.0, -0.75);
-	p_cd_in_gpr = emuxki_gpr_new(card, "CD Spdif In", 
+	p_cd_in_gpr = emuxki_gpr_new(card, "CD Spdif In",
 			EMU_MIX_GAIN|EMU_MIX_STEREO|EMU_MIX_MUTE|EMU_MIX_PLAYBACK, &gpr, 0.0, 1.0, -46.5, 0.0, -0.75);
-	
+
 	/* record in gprs */
-	r_ac97_in_gpr = emuxki_gpr_new(card, "AC97 Record In", 
+	r_ac97_in_gpr = emuxki_gpr_new(card, "AC97 Record In",
 			EMU_MIX_GAIN|EMU_MIX_STEREO|EMU_MIX_MUTE|EMU_MIX_RECORD, &gpr, 0.0, 0.0, -46.5, 0.0, -0.75);
-	r_cd_in_gpr = emuxki_gpr_new(card, "CD Spdif In", 
+	r_cd_in_gpr = emuxki_gpr_new(card, "CD Spdif In",
 			EMU_MIX_GAIN|EMU_MIX_STEREO|EMU_MIX_MUTE|EMU_MIX_RECORD, &gpr, 0.0, 0.0, -46.5, 0.0, -0.75);
-	r_fx_out_gpr = emuxki_gpr_new(card, "FX 0/1", 
+	r_fx_out_gpr = emuxki_gpr_new(card, "FX 0/1",
 			EMU_MIX_GAIN|EMU_MIX_STEREO|EMU_MIX_MUTE|EMU_MIX_RECORD, &gpr, 0.0, 0.0, -46.5, 0.0, -0.75);
-		
+
 	card->gpr_count = gpr;
-			
+
 	if (IS_AUDIGY(&card->config)) {
 		/* DSP_IN_GPR(l/r) = 0 + AC97In(l/r) * P_AC97_IN_GPR(l/r) */
 		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACS,
@@ -2391,7 +2391,7 @@ emuxki_initfx(emuxki_dev * card)
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_R),
 				  EMU_A_DSP_CST(0),
 				  EMU_A_DSP_INR(EMU_DSP_IN_AC97), EMU_A_DSP_GPR(p_ac97_in_gpr->gpr + 1));
-		
+
 		/* DSP_IN_GPR(l/r) = DSP_IN_GPR(l/r) + CDIn(l/r) * P_CD_IN_GPR(l/r) */
 		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACS,
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_L),
@@ -2401,7 +2401,7 @@ emuxki_initfx(emuxki_dev * card)
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_R),
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_R),
 				  EMU_A_DSP_INR(EMU_DSP_IN_CDSPDIF), EMU_A_DSP_GPR(p_cd_in_gpr->gpr + 1));
-		
+
 		/* Front GPR(l/r) = DSP_IN_GPR(l/r) + FX(0/1) * 4 */
 		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACINTS,
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_FRONT_LEFT),
@@ -2411,7 +2411,7 @@ emuxki_initfx(emuxki_dev * card)
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_FRONT_RIGHT),
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_R),
 				  EMU_DSP_FX(1), EMU_A_DSP_CST(4));
-		
+
 		/* Rear GPR(l/r) = DSP_IN_GPR(l/r) + FX(2/3) * 4 */
 		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACINTS,
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_REAR_LEFT),
@@ -2421,7 +2421,7 @@ emuxki_initfx(emuxki_dev * card)
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_REAR_RIGHT),
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_R),
 				  EMU_DSP_FX(3), EMU_A_DSP_CST(4));
-				  
+
 		/* Center/Sub GPR = 0 + FX(4/5) * 4 */
 		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACINTS,
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_CENTER),
@@ -2431,8 +2431,8 @@ emuxki_initfx(emuxki_dev * card)
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_SUB),
 				  EMU_A_DSP_CST(0),
 				  EMU_DSP_FX(5), EMU_A_DSP_CST(4));
-		
-		/* Analog Front Output l/r = 0 + Front GPR(l/r) * A_FRONT_GPR(l/r) */  
+
+		/* Analog Front Output l/r = 0 + Front GPR(l/r) * A_FRONT_GPR(l/r) */
 		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACS,
 				  EMU_A_DSP_OUTL(EMU_A_DSP_OUT_A_FRONT),
 				  EMU_A_DSP_CST(0),
@@ -2441,7 +2441,7 @@ emuxki_initfx(emuxki_dev * card)
 				  EMU_A_DSP_OUTR(EMU_A_DSP_OUT_A_FRONT),
 				  EMU_A_DSP_CST(0),
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_FRONT_RIGHT), EMU_A_DSP_GPR(a_front_gpr->gpr+1));
-		
+
 		/* Analog Rear Output l/r = 0 + Rear GPR(l/r) * A_REAR_GPR(l/r) */
 		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACS,
 				  EMU_A_DSP_OUTL(EMU_A_DSP_OUT_A_REAR),
@@ -2451,7 +2451,7 @@ emuxki_initfx(emuxki_dev * card)
 				  EMU_A_DSP_OUTR(EMU_A_DSP_OUT_A_REAR),
 				  EMU_A_DSP_CST(0),
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_REAR_RIGHT), EMU_A_DSP_GPR(a_rear_gpr->gpr+1));
-		
+
 		/* Analog Center/Sub = 0 + Center/Sub GPR(l/r) * A_CENTER_GPR(l/r) */
 		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACS,
 				  EMU_A_DSP_OUTL(EMU_A_DSP_OUT_A_CENTER),
@@ -2461,8 +2461,8 @@ emuxki_initfx(emuxki_dev * card)
 				  EMU_A_DSP_OUTR(EMU_A_DSP_OUT_A_CENTER),
 				  EMU_A_DSP_CST(0),
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_SUB), EMU_A_DSP_GPR(a_center_sub_gpr->gpr+1));
-				  
-		/* Digital Front Output l/r = 0 + Front GPR(l/r) * D_FRONT_GPR(l/r) */  
+
+		/* Digital Front Output l/r = 0 + Front GPR(l/r) * D_FRONT_GPR(l/r) */
 		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACS,
 				  EMU_A_DSP_OUTL(EMU_A_DSP_OUT_D_FRONT),
 				  EMU_A_DSP_CST(0),
@@ -2471,7 +2471,7 @@ emuxki_initfx(emuxki_dev * card)
 				  EMU_A_DSP_OUTR(EMU_A_DSP_OUT_D_FRONT),
 				  EMU_A_DSP_CST(0),
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_FRONT_RIGHT), EMU_A_DSP_GPR(d_front_gpr->gpr+1));
-		
+
 		/* Digital Rear Output l/r = 0 + Rear GPR(l/r) * D_REAR_GPR(l/r) */
 		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACS,
 				  EMU_A_DSP_OUTL(EMU_A_DSP_OUT_D_REAR),
@@ -2481,7 +2481,7 @@ emuxki_initfx(emuxki_dev * card)
 				  EMU_A_DSP_OUTR(EMU_A_DSP_OUT_D_REAR),
 				  EMU_A_DSP_CST(0),
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_REAR_RIGHT), EMU_A_DSP_GPR(d_rear_gpr->gpr+1));
-		
+
 		/* Digital Center/Sub = 0 + Center/Sub GPR(l/r) * D_CENTER_GPR(l/r) */
 		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACS,
 				  EMU_A_DSP_OUTL(EMU_A_DSP_OUT_D_CENTER),
@@ -2491,7 +2491,7 @@ emuxki_initfx(emuxki_dev * card)
 				  EMU_A_DSP_OUTR(EMU_A_DSP_OUT_D_CENTER),
 				  EMU_A_DSP_CST(0),
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_SUB), EMU_A_DSP_GPR(d_center_sub_gpr->gpr+1));
-				  
+
 		/* DSP_IN_GPR(l/r) = 0 + AC97In(l/r) * R_AC97_IN_GPR(l/r) */
 		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACS,
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_L),
@@ -2501,7 +2501,7 @@ emuxki_initfx(emuxki_dev * card)
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_R),
 				  EMU_A_DSP_CST(0),
 				  EMU_A_DSP_INR(EMU_DSP_IN_AC97), EMU_A_DSP_GPR(r_ac97_in_gpr->gpr + 1));
-				  
+
 		/* DSP_IN_GPR (l/r) = DSP_IN_GPR(l/r) + FX(0/1) * R_FX_OUT_GPR(l/r) */
 		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACS,
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_L),
@@ -2511,7 +2511,7 @@ emuxki_initfx(emuxki_dev * card)
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_R),
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_R),
 				  EMU_DSP_FX(1), EMU_A_DSP_GPR(r_fx_out_gpr->gpr + 1));
-				  
+
 		/* DSP_IN_GPR(l/r) = 0 + DSP_IN_GPR(l/r) * 4 */
 		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACINTS,
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_L),
@@ -2521,7 +2521,7 @@ emuxki_initfx(emuxki_dev * card)
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_R),
 				  EMU_A_DSP_CST(0),
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_R), EMU_A_DSP_CST(4));
-				  
+
 		/* ADC recording buffer (l/r) = DSP_IN_GPR(l/r) + CDIn(l/r) * R_CD_IN_GPR(l/r) */
 		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACS,
 				  EMU_A_DSP_OUTL(EMU_A_DSP_OUT_ADC),
@@ -2531,17 +2531,17 @@ emuxki_initfx(emuxki_dev * card)
 				  EMU_A_DSP_OUTR(EMU_A_DSP_OUT_ADC),
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_R),
 				  EMU_A_DSP_INR(EMU_DSP_IN_CDSPDIF), EMU_A_DSP_GPR(r_cd_in_gpr->gpr + 1));
-		
-		
-				
+
+
+
 		/* zero out the rest of the microcode */
 		while (pc < 512)
 			emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_ACC3,
 				  EMU_A_DSP_CST(0), EMU_A_DSP_CST(0),
 				  EMU_A_DSP_CST(0), EMU_A_DSP_CST(0));
-		
-		emuxki_chan_write(&card->config, 0, EMU_A_DBG, 0);	/* Is it really necessary ? */	
-	
+
+		emuxki_chan_write(&card->config, 0, EMU_A_DBG, 0);	/* Is it really necessary ? */
+
 	} else {
 		/* DSP_IN_GPR(l/r) = 0 + AC97In(l/r) * P_AC97_IN_GPR(l/r) */
 		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACS,
@@ -2552,7 +2552,7 @@ emuxki_initfx(emuxki_dev * card)
 				  EMU_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_R),
 				  EMU_DSP_CST(0),
 				  EMU_DSP_INR(EMU_DSP_IN_AC97), EMU_DSP_GPR(p_ac97_in_gpr->gpr + 1));
-		
+
 		/* DSP_IN_GPR(l/r) = DSP_IN_GPR(l/r) + CDIn(l/r) * P_CD_IN_GPR(l/r) */
 		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACS,
 				  EMU_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_L),
@@ -2562,7 +2562,7 @@ emuxki_initfx(emuxki_dev * card)
 				  EMU_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_R),
 				  EMU_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_R),
 				  EMU_DSP_INR(EMU_DSP_IN_CDSPDIF), EMU_DSP_GPR(p_cd_in_gpr->gpr + 1));
-	
+
 		/* Front GPR(l/r) = DSP_IN_GPR(l/r) + FX(0/1) * 4 */
 		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACINTS,
 				  EMU_DSP_GPR(EMU_DSP_TMPGPR_FRONT_LEFT),
@@ -2572,7 +2572,7 @@ emuxki_initfx(emuxki_dev * card)
 				  EMU_DSP_GPR(EMU_DSP_TMPGPR_FRONT_RIGHT),
 				  EMU_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_R),
 				  EMU_DSP_FX(1), EMU_DSP_CST(4));
-		
+
 		/* Rear GPR(l/r) = DSP_IN_GPR(l/r) + FX(2/3) * 4 */
 		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACINTS,
 				  EMU_DSP_GPR(EMU_DSP_TMPGPR_REAR_LEFT),
@@ -2582,7 +2582,7 @@ emuxki_initfx(emuxki_dev * card)
 				  EMU_DSP_GPR(EMU_DSP_TMPGPR_REAR_RIGHT),
 				  EMU_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_R),
 				  EMU_DSP_FX(3), EMU_DSP_CST(4));
-				  
+
 		/* Center/Sub GPR = 0 + FX(4/5) * 4 */
 		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACINTS,
 				  EMU_DSP_GPR(EMU_DSP_TMPGPR_CENTER),
@@ -2592,8 +2592,8 @@ emuxki_initfx(emuxki_dev * card)
 				  EMU_DSP_GPR(EMU_DSP_TMPGPR_SUB),
 				  EMU_DSP_CST(0),
 				  EMU_DSP_FX(5), EMU_DSP_CST(4));
-		
-		/* Analog Front Output l/r = 0 + Front GPR(l/r) * A_FRONT_GPR(l/r) */  
+
+		/* Analog Front Output l/r = 0 + Front GPR(l/r) * A_FRONT_GPR(l/r) */
 		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACS,
 				  EMU_DSP_OUTL(EMU_DSP_OUT_A_FRONT),
 				  EMU_DSP_CST(0),
@@ -2602,7 +2602,7 @@ emuxki_initfx(emuxki_dev * card)
 				  EMU_DSP_OUTR(EMU_DSP_OUT_A_FRONT),
 				  EMU_DSP_CST(0),
 				  EMU_DSP_GPR(EMU_DSP_TMPGPR_FRONT_RIGHT), EMU_DSP_GPR(a_front_gpr->gpr+1));
-		
+
 		/* Analog Rear Output l/r = 0 + Rear GPR(l/r) * A_REAR_GPR(l/r) */
 		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACS,
 				  EMU_DSP_OUTL(EMU_DSP_OUT_AD_REAR),
@@ -2612,7 +2612,7 @@ emuxki_initfx(emuxki_dev * card)
 				  EMU_DSP_OUTR(EMU_DSP_OUT_AD_REAR),
 				  EMU_DSP_CST(0),
 				  EMU_DSP_GPR(EMU_DSP_TMPGPR_REAR_RIGHT), EMU_DSP_GPR(a_rear_gpr->gpr+1));
-		
+
 		/* Analog Center/Sub = 0 + Center/Sub GPR(l/r) * A_CENTER_GPR(l/r) */
 		if (IS_LIVE_5_1(&card->config)) {
 			emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACS,
@@ -2624,8 +2624,8 @@ emuxki_initfx(emuxki_dev * card)
 					  EMU_DSP_CST(0),
 					  EMU_DSP_GPR(EMU_DSP_TMPGPR_SUB), EMU_DSP_GPR(a_center_sub_gpr->gpr+1));
 		}
-			  
-		/* Digital Front Output l/r = 0 + Front GPR(l/r) * D_FRONT_GPR(l/r) */  
+
+		/* Digital Front Output l/r = 0 + Front GPR(l/r) * D_FRONT_GPR(l/r) */
 		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACS,
 				  EMU_DSP_OUTL(EMU_DSP_OUT_D_FRONT),
 				  EMU_DSP_CST(0),
@@ -2634,7 +2634,7 @@ emuxki_initfx(emuxki_dev * card)
 				  EMU_DSP_OUTR(EMU_DSP_OUT_D_FRONT),
 				  EMU_DSP_CST(0),
 				  EMU_DSP_GPR(EMU_DSP_TMPGPR_FRONT_RIGHT), EMU_DSP_GPR(d_front_gpr->gpr+1));
-		
+
 		/* Digital Rear Output l/r = 0 + Rear GPR(l/r) * D_REAR_GPR(l/r) */
 		/*emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACS,
 				  EMU_DSP_OUTL(EMU_DSP_OUT_D_REAR),
@@ -2644,7 +2644,7 @@ emuxki_initfx(emuxki_dev * card)
 				  EMU_DSP_OUTR(EMU_DSP_OUT_D_REAR),
 				  EMU_DSP_CST(0),
 				  EMU_DSP_GPR(EMU_DSP_TMPGPR_REAR_RIGHT), EMU_DSP_GPR(d_rear_gpr->gpr+1));*/
-		
+
 		/* Digital Center/Sub = 0 + Center/Sub GPR(l/r) * D_CENTER_GPR(l/r) */
 		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACS,
 				  EMU_DSP_OUTL(EMU_DSP_OUT_D_CENTER),
@@ -2654,7 +2654,7 @@ emuxki_initfx(emuxki_dev * card)
 				  EMU_DSP_OUTR(EMU_DSP_OUT_D_CENTER),
 				  EMU_DSP_CST(0),
 				  EMU_DSP_GPR(EMU_DSP_TMPGPR_SUB), EMU_DSP_GPR(d_center_sub_gpr->gpr+1));
-		
+
 		/* DSP_IN_GPR(l/r) = 0 + AC97In(l/r) * R_AC97_IN_GPR(l/r) */
 		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACS,
 				  EMU_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_L),
@@ -2664,7 +2664,7 @@ emuxki_initfx(emuxki_dev * card)
 				  EMU_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_R),
 				  EMU_DSP_CST(0),
 				  EMU_DSP_INR(EMU_DSP_IN_AC97), EMU_DSP_GPR(r_ac97_in_gpr->gpr + 1));
-				  
+
 		/* DSP_IN_GPR (l/r) = DSP_IN_GPR(l/r) + FX(0/1) * R_FX_OUT_GPR(l/r) */
 		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACS,
 				  EMU_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_L),
@@ -2674,7 +2674,7 @@ emuxki_initfx(emuxki_dev * card)
 				  EMU_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_R),
 				  EMU_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_R),
 				  EMU_DSP_FX(1), EMU_DSP_GPR(r_fx_out_gpr->gpr + 1));
-				  
+
 		/* DSP_IN_GPR(l/r) = 0 + DSP_IN_GPR(l/r) * 4 */
 		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACINTS,
 				  EMU_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_L),
@@ -2684,7 +2684,7 @@ emuxki_initfx(emuxki_dev * card)
 				  EMU_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_R),
 				  EMU_DSP_CST(0),
 				  EMU_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_R), EMU_DSP_CST(4));
-				  
+
 		/* ADC recording buffer (l/r) = DSP_IN_GPR(l/r) + CDIn(l/r) * R_CD_IN_GPR(l/r) */
 		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACS,
 				  EMU_DSP_OUTL(EMU_DSP_OUT_ADC),
@@ -2694,13 +2694,13 @@ emuxki_initfx(emuxki_dev * card)
 				  EMU_DSP_OUTR(EMU_DSP_OUT_ADC),
 				  EMU_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_R),
 				  EMU_DSP_INR(EMU_DSP_IN_CDSPDIF), EMU_DSP_GPR(r_cd_in_gpr->gpr + 1));
-		
+
 		/* zero out the rest of the microcode */
 		while (pc < 512)
 			emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_ACC3,
 				  EMU_DSP_CST(0), EMU_DSP_CST(0),
 				  EMU_DSP_CST(0), EMU_DSP_CST(0));
-				  
+
 		emuxki_chan_write(&card->config, 0, EMU_DBG, 0);	/* Is it really necessary ? */
 	}
 
@@ -2714,7 +2714,7 @@ emuxki_init(emuxki_dev * card)
 	uint16       i;
 	uint32       spcs, *ptb;
 	uint32	 	 silentpage;
-	
+
 	/* disable any channel interrupt */
 	emuxki_chan_write(&card->config, 0, EMU_CLIEL, 0);
 	emuxki_chan_write(&card->config, 0, EMU_CLIEH, 0);
@@ -2728,7 +2728,7 @@ emuxki_init(emuxki_dev * card)
 	emuxki_chan_write(&card->config, 0, EMU_FXBA, 0);
 	emuxki_chan_write(&card->config, 0, EMU_ADCBS, EMU_RECBS_BUFSIZE_NONE);
 	emuxki_chan_write(&card->config, 0, EMU_ADCBA, 0);
-	
+
 	if (IS_AUDIGY(&card->config)) {
 		emuxki_chan_write(&card->config, 0, EMU_SPBYPASS, EMU_SPBYPASS_24_BITS);
 		emuxki_chan_write(&card->config, 0, EMU_AC97SLOT, EMU_AC97SLOT_CENTER | EMU_AC97SLOT_LFE);
@@ -2774,48 +2774,48 @@ emuxki_init(emuxki_dev * card)
 	emuxki_chan_write(&card->config, 0, EMU_SPCS0, spcs);
 	emuxki_chan_write(&card->config, 0, EMU_SPCS1, spcs);
 	emuxki_chan_write(&card->config, 0, EMU_SPCS2, spcs);
-	
+
 	if (IS_AUDIGY2(&card->config)) {
 		emuxki_chan_write(&card->config, 0, EMU_A2_SPDIF_SAMPLERATE, EMU_A2_SPDIF_UNKNOWN);
-		
-		emuxki_p16v_write(&card->config, 0, EMU_A2_SRCSEL, 
+
+		emuxki_p16v_write(&card->config, 0, EMU_A2_SRCSEL,
 			EMU_A2_SRCSEL_ENABLE_SPDIF | EMU_A2_SRCSEL_ENABLE_SRCMULTI);
-		
+
 		if (IS_AUDIGY2_VALUE(&card->config)) {
 			emuxki_p16v_write(&card->config, 0, EMU_A2_P17V_I2S, EMU_A2_P17V_I2S_ENABLE);
 			emuxki_p16v_write(&card->config, 0, EMU_A2_P17V_SPDIF, EMU_A2_P17V_SPDIF_ENABLE);
 
-			emuxki_reg_write_32(&card->config, EMU_A_IOCFG, 
+			emuxki_reg_write_32(&card->config, EMU_A_IOCFG,
 				emuxki_reg_read_32(&card->config, EMU_A_IOCFG) & ~0x8);
 		} else {
 			emuxki_p16v_write(&card->config, 0, EMU_A2_SRCMULTI, EMU_A2_SRCMULTI_ENABLE_INPUT);
-		}		
+		}
 	}
-	
+
 	/* Let's play with sound processor */
 	emuxki_initfx(card);
-	
+
 	/* allocate memory for our Page Table */
-	card->ptb_area = alloc_mem(&card->ptb_phy_base, &card->ptb_log_base, 
+	card->ptb_area = alloc_mem(&card->ptb_phy_base, &card->ptb_log_base,
 		EMU_MAXPTE * sizeof(uint32), "emuxki ptb");
-		
+
 	/* This is necessary unless you like Metallic noise... */
-	card->silentpage_area = alloc_mem(&card->silentpage_phy_base, &card->silentpage_log_base, 
+	card->silentpage_area = alloc_mem(&card->silentpage_phy_base, &card->silentpage_log_base,
 		EMU_PTESIZE, "emuxki sp");
-		
+
 	if (card->ptb_area < B_OK || card->silentpage_area < B_OK) {
 		PRINT(("couldn't allocate memory\n"));
 		if (card->ptb_area > B_OK)
 			delete_area(card->ptb_area);
 		if (card->silentpage_area > B_OK)
 			delete_area(card->silentpage_area);
-		return B_ERROR;	
+		return B_ERROR;
 	}
-	
+
 	/* Zero out the silent page */
 	/* This might not be always true, it might be 128 for 8bit channels */
 	memset(card->ptb_log_base, 0, EMU_PTESIZE);
-	
+
 	/*
 	 * Set all the PTB Entries to the silent page We shift the physical
 	 * address by one and OR it with the page number. I don't know what
@@ -2844,7 +2844,7 @@ emuxki_init(emuxki_dev * card)
 
 	/* Init streams list */
 	LIST_INIT(&(card->streams));
-	
+
 	/* Init mems list */
 	LIST_INIT(&(card->mem));
 
@@ -2864,9 +2864,9 @@ init_driver(void)
 	status_t err;
 	int ix = 0;
 	num_cards = 0;
-	
+
 	PRINT(("init_driver()\n"));
-	
+
 	// get driver settings
 	settings_handle = load_driver_settings("emuxki.settings");
 	if (settings_handle != NULL) {
@@ -2909,12 +2909,12 @@ init_driver(void)
 
 	if (get_module(B_PCI_MODULE_NAME, (module_info **) &pci))
 		return ENOSYS;
-		
-//	if (get_module (gameport_name, (module_info **)&gameport)) {		
+
+//	if (get_module (gameport_name, (module_info **)&gameport)) {
 //		put_module (B_PCI_MODULE_NAME);
 //		return ENOSYS;
 //	}
-	
+
 	if (get_module(B_MPU_401_MODULE_NAME, (module_info **) &mpu401)) {
 		//put_module(gameport_name);
 		put_module(B_PCI_MODULE_NAME);
@@ -2923,7 +2923,7 @@ init_driver(void)
 
 	while ((*pci->get_nth_pci_info)(ix++, &info) == B_OK) {
 		if (info.vendor_id == CREATIVELABS_VENDOR_ID &&
-			(info.device_id == CREATIVELABS_SBLIVE_DEVICE_ID 
+			(info.device_id == CREATIVELABS_SBLIVE_DEVICE_ID
 #if AUDIGY
 			|| info.device_id == CREATIVELABS_AUDIGY_DEVICE_ID
 			|| info.device_id == CREATIVELABS_AUDIGY2_VALUE_DEVICE_ID
@@ -2973,19 +2973,19 @@ emuxki_shutdown(emuxki_dev *card)
 	uint32       i;
 
 	PRINT(("shutdown(%p)\n", card));
-	
+
 	emuxki_reg_write_32(&card->config, EMU_HCFG, EMU_HCFG_LOCKSOUNDCACHE |
 		  EMU_HCFG_LOCKTANKCACHE_MASK | EMU_HCFG_MUTEBUTTONENABLE);
 	emuxki_reg_write_32(&card->config, EMU_INTE, 0);
-	
+
 	dump_hardware_regs(&card->config);
-	
+
 	/* Disable any Channels interrupts */
 	emuxki_chan_write(&card->config, 0, EMU_CLIEL, 0);
 	emuxki_chan_write(&card->config, 0, EMU_CLIEH, 0);
 	emuxki_chan_write(&card->config, 0, EMU_SOLEL, 0);
 	emuxki_chan_write(&card->config, 0, EMU_SOLEH, 0);
-	
+
 	/* Stop all channels */
 	/* This shouldn't be necessary, i'll remove once everything works */
 	for (i = 0; i < EMU_NUMCHAN; i++)
@@ -2998,7 +2998,7 @@ emuxki_shutdown(emuxki_dev *card)
 	}
 
 	remove_io_interrupt_handler(card->config.irq, emuxki_int, card);
-	
+
 	/*
 	 * deallocate Emu10k1 caches and recording buffers Again it will be
 	 * removed because it will be done in voice shutdown.
@@ -3024,14 +3024,14 @@ emuxki_shutdown(emuxki_dev *card)
 	emuxki_chan_write(&card->config, 0, EMU_TCBS, 0);
 
 	emuxki_chan_write(&card->config, 0, EMU_DBG, 0x8000);	/* necessary ? */
-	
+
 	PRINT(("freeing ptb_area\n"));
 	if (card->ptb_area > B_OK)
 		delete_area(card->ptb_area);
 	PRINT(("freeing silentpage_area\n"));
 	if (card->silentpage_area > B_OK)
 		delete_area(card->silentpage_area);
-	
+
 //	(*gameport->delete_device)(card->joy.driver);
 }
 
@@ -3042,7 +3042,7 @@ uninit_driver(void)
 	int ix, cnt = num_cards;
 
 	PRINT(("uninit_driver()\n"));
-	
+
 	for (ix=0; ix<cnt; ix++) {
 		emuxki_shutdown(&cards[ix]);
 	}
@@ -3083,7 +3083,7 @@ find_device(const char * name)
 //		if (!strcmp(cards[ix].joy.name1, name)) {
 //			return &joy_hooks;
 //		}
-		
+
 		if (!strcmp(cards[ix].name, name)) {
 			return &multi_hooks;
 		}
