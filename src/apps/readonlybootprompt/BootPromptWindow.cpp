@@ -150,7 +150,8 @@ class TextBitmapView : public BView
 				// text (right after the last space we saw).
 
 			while (*currentChar != '\0') {
-				if (*currentChar == ' ') {
+				if (BUnicodeChar::IsWhitespace(BUnicodeChar::FromUTF8(
+						currentChar))) {
 					// TODO : we should also handle other kinds of whitespace.
 					// Chinese seems to use a different one. ICU has proper
 					// support for it.
