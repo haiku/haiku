@@ -77,7 +77,7 @@ status_t init_hardware(void)
 	pci_info info;
 
 	memset(cards, 0, sizeof(ice1712) * NUM_CARDS);
-	TRACE("===init_hardware()===\n");
+	TRACE("ice1712: init_hardware()\n");
 
 	if (get_module(B_PCI_MODULE_NAME, (module_info **)&pci))
 		return ENOSYS;
@@ -356,9 +356,10 @@ status_t
 init_driver(void)
 {
 	int i = 0;
+	status_t err;
 	num_cards = 0;
 
-	TRACE("===init_driver()===\n");
+	TRACE("ice1712: init_driver()\n");
 
 	if (get_module(B_PCI_MODULE_NAME, (module_info **)&pci))
 		return ENOSYS;
@@ -377,9 +378,26 @@ init_driver(void)
 				break;
 			}
 
+#ifdef __HAIKU__
+			if ((err = (*pci->reserve_device)(cards[num_cards].info.bus,
+				cards[num_cards].info.device, cards[num_cards].info.function,
+				DRIVER_NAME, &cards[num_cards])) < B_OK) {
+				dprintf("%s: failed to reserve_device(%d, %d, %d,): %s\n",
+					DRIVER_NAME, cards[num_cards].info.bus,
+					cards[num_cards].info.device,
+					cards[num_cards].info.function, strerror(err));
+				continue;
+			}
+#endif
 			if (ice1712_setup(&cards[num_cards]) != B_OK) {
 			//Vendor_ID and Device_ID has been modified
 				TRACE("Setup of ice1712 %d failed\n", (int)(num_cards + 1));
+#ifdef __HAIKU__
+				(*pci->unreserve_device)(cards[num_cards].info.bus,
+					cards[num_cards].info.device,
+					cards[num_cards].info.function,
+					DRIVER_NAME, &cards[num_cards]);
+#endif
 			} else {
 				num_cards++;
 			}
@@ -420,6 +438,11 @@ ice_1712_shutdown(ice1712 *ice)
 	codec_write(ice, AK45xx_RESET_REGISTER, 0x00);
 
 	save_settings(ice);
+
+#ifdef __HAIKU__
+	(*pci->unreserve_device)(ice->info.bus, ice->info.device,
+		ice->info.function, DRIVER_NAME, ice);
+#endif
 }
 
 
