@@ -94,7 +94,7 @@ private:
 
 			// Get next spooled job if any
 			bool				FindSpooledJob();
-			status_t			PrintSpooledJob(BFile* spoolFile);
+			status_t			PrintSpooledJob(const char* spoolFile);
 			void				PrintThread(Job* job);
 
 	static	status_t			print_thread(void* data);

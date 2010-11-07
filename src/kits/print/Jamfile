@@ -9,7 +9,10 @@ StaticLibrary libprintutils.a :
 	BeUtilsTranslation.cpp
 	FolderWatcher.cpp
 	Jobs.cpp
-	PicturePrinter.cpp
-	PrintTransport.cpp
 	PictureIterator.cpp
+	PicturePrinter.cpp
+	PrinterDriverAddOn.cpp
+	PrintTransport.cpp
+	PrintServerAddOn.cpp
+	PrintServerAddOnProtocol.cpp
 ;

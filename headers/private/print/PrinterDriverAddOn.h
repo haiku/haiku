@@ -11,7 +11,6 @@
 
 
 #include <Directory.h>
-#include <File.h>
 #include <image.h>
 #include <Message.h>
 #include <Path.h>
@@ -31,7 +30,7 @@ public:
 							BMessage* settings);
 			status_t	DefaultSettings(BDirectory* spoolFolder,
 							BMessage* settings);
-			status_t	TakeJob(BFile* spoolFile,
+			status_t	TakeJob(const char* spoolFile,
 							BDirectory* spoolFolder);
 
 	static	status_t	FindPathToDriver(const char* driver, BPath* path);

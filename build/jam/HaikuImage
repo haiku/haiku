@@ -47,7 +47,7 @@ SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bootman bzip2
 	netcat netstat nl nohup notify nproc
 	od open
 	passwd paste patch pathchk pc ping ping6 play playfile playsound playwav
-	pr prio printenv printf profile ps ptx pwd
+	pr prio printenv printf print_server_add_on profile ps ptx pwd
 	query quit
 	rc readlink ReadOnlyBootPrompt reindex release renice rlog rm rmattr
 	rmindex rmdir roster route

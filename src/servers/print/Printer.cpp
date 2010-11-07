@@ -10,7 +10,13 @@
 
 #include "BeUtils.h"
 #include "pr_server.h"
-#include "PrinterDriverAddOn.h"
+// TODO enable when issue launching print_server_add_on is resolved
+#if 0
+#	include "PrintServerAddOn.h"
+#else
+#	include "PrinterDriverAddOn.h"
+#	define PrintServerAddOn PrinterDriverAddOn
+#endif
 #include "PrintServerApp.h"
 
 	// posix
@@ -180,7 +186,7 @@ status_t Printer::Remove()
 status_t
 Printer::FindPathToDriver(const char* driverName, BPath* path)
 {
-	return PrinterDriverAddOn::FindPathToDriver(driverName, path);
+	return PrintServerAddOn::FindPathToDriver(driverName, path);
 }
 
 
@@ -199,7 +205,7 @@ Printer::FindPathToDriver(const char* driverName, BPath* path)
 status_t Printer::ConfigurePrinter(const char* driverName,
 	const char* printerName)
 {
-	PrinterDriverAddOn addOn(driverName);
+	PrintServerAddOn addOn(driverName);
 	return addOn.AddPrinter(printerName);
 }
 
@@ -225,7 +231,7 @@ Printer::ConfigurePage(BMessage& settings)
 	if (result != B_OK)
 		return result;
 
-	PrinterDriverAddOn addOn(driver.String());
+	PrintServerAddOn addOn(driver.String());
 	result = addOn.ConfigPage(SpoolDir(), &settings);
 	if (result == B_OK) {
 		AddCurrentPrinter(settings);
@@ -255,7 +261,7 @@ Printer::ConfigureJob(BMessage& settings)
 	if (result != B_OK)
 		return result;
 
-	PrinterDriverAddOn addOn(driver.String());
+	PrintServerAddOn addOn(driver.String());
 	result = addOn.ConfigJob(SpoolDir(), &settings);
 	if (result == B_OK) {
 		AddCurrentPrinter(settings);
@@ -299,7 +305,7 @@ Printer::GetDefaultSettings(BMessage& settings)
 	if (result != B_OK)
 		return result;
 
-	PrinterDriverAddOn addOn(driver.String());
+	PrintServerAddOn addOn(driver.String());
 	result = addOn.DefaultSettings(SpoolDir(), &settings);
 	if (result == B_OK) {
 		AddCurrentPrinter(settings);
@@ -472,20 +478,20 @@ Printer::FindSpooledJob()
 // the spool file as argument.
 //
 // Parameters:
-//    spoolFile - the spool file.
+//    spoolFile - the path to the spool file.
 //
 // Returns:
 //    B_OK if successful.
 // ---------------------------------------------------------------
 status_t 
-Printer::PrintSpooledJob(BFile* spoolFile)
+Printer::PrintSpooledJob(const char* spoolFile)
 {
 	BString driver;
 	status_t result = GetDriverName(&driver);
 	if (result != B_OK)
 		return result;
 
-	PrinterDriverAddOn addOn(driver.String());
+	PrintServerAddOn addOn(driver.String());
 	return addOn.TakeJob(spoolFile, SpoolDir());
 }
 
@@ -507,10 +513,17 @@ Printer::PrintThread(Job* job)
 	bool failed = true;
 		// Can we continue?
 	if (!fAbort) {
-		BFile jobFile(&job->EntryRef(), B_READ_WRITE);
+		BPath path;
+		bool canOpenFile;
+		{
+			BEntry entry(&job->EntryRef());
+			path.SetTo(&entry);
+			BFile jobFile(path.Path(), B_READ_WRITE);
+			canOpenFile = jobFile.InitCheck() == B_OK;
+		}
 				// Tell the printer to print the spooled job
-		if (jobFile.InitCheck() == B_OK && PrintSpooledJob(&jobFile) == B_OK) {
-				// Remove spool file if printing was successfull.
+		if (canOpenFile && PrintSpooledJob(path.Path()) == B_OK) {
+				// Remove spool file if printing was successful.
 			job->Remove(); failed = false;
 		}
 	}

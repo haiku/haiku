@@ -8,6 +8,8 @@
  */
 #include "PrinterDriverAddOn.h"
 
+#include <File.h>
+
 #include "BeUtils.h"
 #include "pr_server.h"
 
@@ -21,7 +23,8 @@ static const char* kPrinterDriverFolderName = "Print";
 
 
 PrinterDriverAddOn::PrinterDriverAddOn(const char* driver)
-	: fAddOnID(-1)
+	:
+	fAddOnID(-1)
 {
 	BPath path;
 	status_t result;
@@ -125,11 +128,12 @@ PrinterDriverAddOn::DefaultSettings(BDirectory* spoolFolder, BMessage* settings)
 
 
 status_t
-PrinterDriverAddOn::TakeJob(BFile* spoolFile, BDirectory* spoolFolder)
+PrinterDriverAddOn::TakeJob(const char* spoolFile, BDirectory* spoolFolder)
 {
 	if (!IsLoaded())
 		return B_ERROR;
 
+	BFile file(spoolFile, B_READ_WRITE);
 	take_job_func_t func;
 	status_t result = get_image_symbol(fAddOnID, "take_job", B_SYMBOL_TYPE_TEXT,
 		(void**)&func);
@@ -139,10 +143,10 @@ PrinterDriverAddOn::TakeJob(BFile* spoolFile, BDirectory* spoolFolder)
 	// This seems to be required for legacy?
 	// HP PCL3 add-on crashes without it!
 	BMessage parameters(B_REFS_RECEIVED);
-	parameters.AddInt32("file", (int32)spoolFile);
+	parameters.AddInt32("file", (int32)&file);
 	parameters.AddInt32("printer", (int32)spoolFolder);
 
-	BMessage* message = (*func)(spoolFile, spoolFolder, &parameters);
+	BMessage* message = (*func)(&file, spoolFolder, &parameters);
 	if (message == NULL || message->what != 'okok')
 		result = B_ERROR;
 	delete message;

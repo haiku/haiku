@@ -259,6 +259,7 @@ SubInclude HAIKU_TOP src bin patch ;
 SubInclude HAIKU_TOP src bin pc ;
 SubInclude HAIKU_TOP src bin pcmcia-cs ;
 SubInclude HAIKU_TOP src bin playsound ;
+SubInclude HAIKU_TOP src bin printserveraddon ;
 SubInclude HAIKU_TOP src bin rc ;
 SubInclude HAIKU_TOP src bin rmd160 ;
 SubInclude HAIKU_TOP src bin screen_blanker ;
