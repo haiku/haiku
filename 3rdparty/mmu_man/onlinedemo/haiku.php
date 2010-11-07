@@ -3,7 +3,7 @@
 /*
  * haiku.php - an online Haiku demo using qemu and vnc.
  *
- * Copyright 2007-2009, Francois Revol, revol@free.fr.
+ * Copyright 2007-2010, Francois Revol, revol@free.fr.
  * Distributed under the terms of the MIT License.
  */
 
@@ -624,7 +624,7 @@ function output_audio_player_code($external_only=false)
 			echo "<source src=\"" . $url . "\" type=\"audio/mpeg\" />";
 		}
 		if (!$use_html5) {
-			echo "<object type=\"audio/x-mpeg\" width=\"300\" height=\"50\">";
+			echo "<object type=\"audio/mpeg\" width=\"300\" height=\"50\">";
 			echo "<param name=\"src\" value=\"" . $url . "\" />";
 			echo "<param name=\"controller\" value=\"true\" />";
 			echo "<param name=\"controls\" value=\"controlPanel\" />";
