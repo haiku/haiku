@@ -271,6 +271,9 @@ ali_terminate(ali_dev *card)
 		delete_sem(card->sem_buf_ready);
 
 	hardware_terminate(card);
+
+	(*gPCI->unreserve_device)(card->info.bus, card->info.device,
+		card->info.function, DRIVER_NAME, card);
 }
 
 
