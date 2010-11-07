@@ -618,6 +618,11 @@ teardown_cmedia_pci(
 	restore_interrupts(cp);
 
 	delete_sem(card->pcm.init_sem);
+
+#ifdef __HAIKU__
+	(*pci->unreserve_device)(card->info.bus, card->info.device,
+		card->info.function, DRIVER_NAME, card);
+#endif
 }
 
 
