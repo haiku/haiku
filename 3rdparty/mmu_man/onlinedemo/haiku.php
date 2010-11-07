@@ -379,7 +379,7 @@ function output_options_form()
 	echo "</td>\n</tr>\n";
 
 	
-	$enable_sound = 0;
+	$enable_sound = 1;
 	echo "<tr ";
 	if (!$enable_sound)
 		echo "class=\"haiku_online_disabled\"";
@@ -390,7 +390,7 @@ function output_options_form()
 	echo "<input type=\"checkbox\" name=\"sound\" id=\"sound_cb\" ";
 	echo "value=\"1\" ";
 	if ($enable_sound) {
-		echo "checked=\"checked\" /";
+		//echo "checked=\"checked\" /";
 	} else
 		echo "disabled=\"disabled\" /";
 	echo "><label for=\"sound_cb\">Sound</label>";
@@ -490,9 +490,18 @@ function start_qemu()
 		return $idx;
 	}
 	$pidfile = make_qemu_pidfile_name($idx);
-	$cmd = QEMU_BIN . " " . QEMU_ARGS;
+	$cmd = '';
+	if (isset($_GET['sound'])) {
+		$cmd .= "QEMU_AUDIO_DRV=twolame ";
+		//$cmd .= "QEMU_TWOLAME_SAMPLES=" . 4096 . " ";
+		$cmd .= "QEMU_TWOLAME_PORT=" . audio_port() . " ";
+	}
+	$cmd .= QEMU_BIN . " " . QEMU_ARGS;
 	if ($cpucount > 1)
 		$cmd .= " -smp " . $cpucount;
+	if (isset($_GET['sound'])) {
+		$cmd .= " -soundhw hda";
+	}
 	if (isset($_GET['serial'])) {
 		$cmd .= " -serial telnet::";
 		$cmd .= (SERIALPORTBASE + qemu_slot());
@@ -582,6 +591,9 @@ function output_vnc_info_file()
 	if (!is_my_session_valid())
 		die("Bad request");
 
+	header("Pragma: public");
+	header("Expires: 0");
+	header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
 	header("Content-type: application/x-vnc");
 	header('Content-Disposition: attachment; filename="onlinedemo.vnc"'); 
 
@@ -598,37 +610,86 @@ function output_vnc_info_file()
 
 function output_audio_player_code($external_only=false)
 {
-	if (true)
+	if (!isset($_GET['sound']))
 		return;
 
 	$port = audio_port();
 	$url = "http://" . $_SERVER['HTTP_HOST'] . ":$port/";
 	$icy = "icy://" . $_SERVER['HTTP_HOST'] . ":$port/";
+	$use_html5 = true;
+
 	if (!$external_only) {
-		echo "<embed src=\"$url\" type=\"audio/mpeg\" ";
-		echo "autoplay=\"true\" width=\"300\" height=\"50\" ";
-		echo "controller=\"true\" align=\"right\">";
+		if ($use_html5) {
+			echo "<audio autoplay=\"autoplay\" autobuffer=\"autobuffer\" controls=\"controls\">";
+			echo "<source src=\"" . $url . "\" type=\"audio/mpeg\" />";
+		}
+		if (!$use_html5) {
+			echo "<object type=\"audio/x-mpeg\" width=\"300\" height=\"50\">";
+			echo "<param name=\"src\" value=\"" . $url . "\" />";
+			echo "<param name=\"controller\" value=\"true\" />";
+			echo "<param name=\"controls\" value=\"controlPanel\" />";
+			echo "<param name=\"autoplay\" value=\"true\" />";
+			echo "<param name=\"autostart\" value=\"1\" />";
+
+			echo "<embed src=\"$url\" type=\"audio/mpeg\" ";
+			echo "autoplay=\"true\" width=\"300\" height=\"50\" ";
+			echo "controller=\"true\" align=\"right\" hidden=\"false\"></embed>";
+
+			echo "</object>";
+		}
+		if ($use_html5) {
+			echo "</audio>";
+		}
 	}
 	out("You can use an external audio play at " .
-	    "<a href=\"$url\">$url</a> or <a href=\"$icy\">$icy</a>, or use " .
-	    "<a href=\"" . $_SERVER['PHP_SELF'] . "?getfile=audiopls\">this playlist</a>.");
+	    "<a href=\"$url\">$url</a> or <a href=\"$icy\">$icy</a>, or use one of the playlists: " .
+	    "<a href=\"" . $_SERVER['PHP_SELF'] . "?getfile=audiom3u\">[M3U]</a> " .
+	    "<a href=\"" . $_SERVER['PHP_SELF'] . "?getfile=audiopls\">[PLS]</a>");
 }
 
-function output_audio_player_file()
+function output_audio_player_file_m3u()
 {
 	if (!is_my_session_valid())
 		die("Bad request");
 
+	header("Pragma: public");
+	header("Expires: 0");
+	header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
 	header("Content-type: audio/x-mpegurl");
 	//header("Content-type: text/plain");
-	//header('Content-Disposition: attachment; filename="onlinedemo.m3u"'); 
+	header('Content-Disposition: attachment; filename="onlinedemo.m3u"'); 
 
 	$port = audio_port();
 	$url = "http://" . $_SERVER['HTTP_HOST'] . ":$port/";
 
-	//echo "#EXTM3U\n";
-	//echo "#EXTINF:0," . PAGE_TITLE . "\n";
+	// cf. http://hanna.pyxidis.org/tech/m3u.html
+	echo "#EXTM3U\n";
+	echo "#EXTINF:0," . PAGE_TITLE . "\n";
 	echo "$url\n";
+	//echo "\n";
+}
+
+function output_audio_player_file_pls()
+{
+	if (!is_my_session_valid())
+		die("Bad request");
+
+	header("Pragma: public");
+	header("Expires: 0");
+	header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+	header("Content-type: audio/x-scpls");
+	//header("Content-type: text/plain");
+	header('Content-Disposition: attachment; filename="onlinedemo.pls"');
+
+	$port = audio_port();
+	$url = "http://" . $_SERVER['HTTP_HOST'] . ":$port/";
+
+	echo "[playlist]\n";
+	echo "numberofentries=1\n";
+	echo "File1=$url\n";
+	echo "Title1=" . PAGE_TITLE . "\n";
+	echo "Length1=-1\n";
+	echo "version=2\n";
 	//echo "\n";
 }
 
@@ -710,8 +771,11 @@ if (isset($_GET['getfile'])) {
 	case "vncinfo":
 		output_vnc_info_file();
 		break;
+	case "audiom3u":
+		output_audio_player_file_m3u();
+		break;
 	case "audiopls":
-		output_audio_player_file();
+		output_audio_player_file_pls();
 		break;
 	default:
 		die("Bad request");
@@ -739,7 +803,7 @@ if (isset($_GET['frame'])) {}
 <head>
 <meta name="robots" content="noindex, nofollow, noarchive" />
 <title><?php echo PAGE_TITLE; ?></title>
-<link rel="shortcut icon" href="http://www.haiku-os.org/themes/shijin/favicon.ico" type="image/x-icon" />
+<link rel="shortcut icon" href="http://www.haiku-os.org/sites/haiku-os.org/themes/shijin/favicon.ico" type="image/x-icon" />
 <style type="text/css">
 <!--
  /* basic style */
