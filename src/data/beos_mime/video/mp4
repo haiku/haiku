@@ -7,6 +7,7 @@ resource(2, "META:S:DESC") #'MSDC' "MP4 Movie";
 
 resource(3, "META:EXTENS") message(234) {
 	"extensions" = "mp4",
+	"extensions" = "MP4",
 	"extensions" = "m4v",
 	"type" = "video/mp4"
 };
