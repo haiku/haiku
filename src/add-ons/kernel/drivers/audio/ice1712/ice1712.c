@@ -378,7 +378,6 @@ init_driver(void)
 				break;
 			}
 
-#ifdef __HAIKU__
 			if ((err = (*pci->reserve_device)(cards[num_cards].info.bus,
 				cards[num_cards].info.device, cards[num_cards].info.function,
 				DRIVER_NAME, &cards[num_cards])) < B_OK) {
@@ -388,16 +387,13 @@ init_driver(void)
 					cards[num_cards].info.function, strerror(err));
 				continue;
 			}
-#endif
 			if (ice1712_setup(&cards[num_cards]) != B_OK) {
 			//Vendor_ID and Device_ID has been modified
 				TRACE("Setup of ice1712 %d failed\n", (int)(num_cards + 1));
-#ifdef __HAIKU__
 				(*pci->unreserve_device)(cards[num_cards].info.bus,
 					cards[num_cards].info.device,
 					cards[num_cards].info.function,
 					DRIVER_NAME, &cards[num_cards]);
-#endif
 			} else {
 				num_cards++;
 			}
@@ -439,10 +435,8 @@ ice_1712_shutdown(ice1712 *ice)
 
 	save_settings(ice);
 
-#ifdef __HAIKU__
 	(*pci->unreserve_device)(ice->info.bus, ice->info.device,
 		ice->info.function, DRIVER_NAME, ice);
-#endif
 }
 
 

@@ -386,7 +386,6 @@ init_driver(void)
 
 			memset(&gCards[gCardsCount], 0, sizeof(ali_dev));
 			gCards[gCardsCount].info = info;
-#ifdef __HAIKU__
 			if ((err = (*gPCI->reserve_device)(info.bus, info.device, info.function,
 				DRIVER_NAME, &gCards[gCardsCount])) < B_OK) {
 				dprintf("%s: failed to reserve_device(%d, %d, %d,): %s\n",
@@ -394,13 +393,10 @@ init_driver(void)
 					strerror(err));
 				continue;
 			}
-#endif
 			if (ali_setup(&gCards[gCardsCount])) {
 				TRACE("init_driver: setup of ali %ld failed\n", gCardsCount + 1);
-#ifdef __HAIKU__
 				(*gPCI->unreserve_device)(info.bus, info.device, info.function,
 					DRIVER_NAME, &gCards[gCardsCount]);
-#endif
 			}
 			else
 				gCardsCount++;
