@@ -1371,7 +1371,7 @@ ext2_read_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 
 	size_t length = bufferSize;
 	ino_t id;
-	status_t status = iterator->Get(dirent->d_name, &length, &id);
+	status_t status = iterator->GetNext(dirent->d_name, &length, &id);
 	if (status == B_ENTRY_NOT_FOUND) {
 		*_num = 0;
 		return B_OK;

@@ -25,6 +25,7 @@ public:
 
 			status_t	Next();
 			status_t	Get(char* name, size_t* _nameLength, ino_t* id);
+			status_t	GetNext(char* name, size_t* _nameLength, ino_t* id);
 
 			status_t	Rewind();
 			void		Restart();
@@ -56,6 +57,8 @@ protected:
 							bool firstSplit = false);
 
 			status_t	_NextBlock();
+			off_t		_Offset() { return fLogicalBlock * fBlockSize
+							+ fDisplacement; }
 
 
 	Inode*				fDirectory;

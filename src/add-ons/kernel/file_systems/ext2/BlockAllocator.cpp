@@ -660,7 +660,7 @@ BlockAllocator::Free(Transaction& transaction, off_t start, uint32 length)
 	TRACE("BlockAllocator::Free(): first block: %lu, blocks per group: %lu\n", 
 		fFirstBlock, fBlocksPerGroup);
 
-	//start -= fFirstBlock;
+	start -= fFirstBlock;
 	off_t end = start + length - 1;
 
 	uint32 group = start / fBlocksPerGroup;

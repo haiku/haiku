@@ -52,12 +52,12 @@ DirectoryIterator::DirectoryIterator(Inode* directory, off_t start,
 		: (directory->Size() - 1) / fBlockSize + 1),
 	fLogicalBlock(start / fBlockSize),
 	fDisplacement(start % fBlockSize),
-	fPreviousDisplacement(fPreviousDisplacement),
+	fPreviousDisplacement(fDisplacement),
 	fStartLogicalBlock(fLogicalBlock),
 	fStartDisplacement(fDisplacement)
 {
-	TRACE("DirectoryIterator::DirectoryIterator(): num blocks: %lu\n",
-		fNumBlocks);
+	TRACE("DirectoryIterator::DirectoryIterator() %lld: num blocks: %lu\n",
+		fDirectory->ID(), fNumBlocks);
 	fIndexing = parent != NULL;
 	fInitStatus = fDirectory->FindBlock(start, fPhysicalBlock);
 	fStartPhysicalBlock = fPhysicalBlock;
@@ -83,7 +83,8 @@ DirectoryIterator::InitCheck()
 status_t
 DirectoryIterator::Get(char* name, size_t* _nameLength, ino_t* _id)
 {
-	if (fLogicalBlock * fBlockSize + fDisplacement >= fDirectory->Size()) {
+	TRACE("DirectoryIterator::Get() ID %lld\n", fDirectory->ID());
+	if (_Offset() >= fDirectory->Size()) {
 		TRACE("DirectoryIterator::Get() out of entries\n");
 		return B_ENTRY_NOT_FOUND;
 	}
@@ -95,6 +96,9 @@ DirectoryIterator::Get(char* name, size_t* _nameLength, ino_t* _id)
 
 	TRACE("DirectoryIterator::Get(): Displacement: %lu\n", fDisplacement);
 	const ext2_dir_entry* entry = (const ext2_dir_entry*)&block[fDisplacement];
+
+	if (entry->Length() == 0 || entry->InodeID() == 0)
+		return B_BAD_DATA;
 
 	if (entry->NameLength() != 0) {
 		size_t length = entry->NameLength();
@@ -122,11 +126,24 @@ DirectoryIterator::Get(char* name, size_t* _nameLength, ino_t* _id)
 
 
 status_t
+DirectoryIterator::GetNext(char* name, size_t* _nameLength, ino_t* _id)
+{
+	status_t status;
+	while ((status = Get(name, _nameLength, _id)) == B_BAD_DATA) {
+		status = Next();
+		if (status != B_OK)
+			return status;
+	}
+	return status;
+}
+
+
+status_t
 DirectoryIterator::Next()
 {
-	TRACE("DirectoryIterator::Next()\n");
+	TRACE("DirectoryIterator::Next() fDirectory->ID() %lld\n", fDirectory->ID());
 
-	if (fLogicalBlock * fBlockSize + fDisplacement >= fDirectory->Size()) {
+	if (_Offset() >= fDirectory->Size()) {
 		TRACE("DirectoryIterator::Next() out of entries\n");
 		return B_ENTRY_NOT_FOUND;
 	}
@@ -144,20 +161,18 @@ DirectoryIterator::Next()
 	entry = (ext2_dir_entry*)(block + fDisplacement);
 
 	do {
-		TRACE("Checking entry at block %llu, displacement %lu\n", fPhysicalBlock,
-			fDisplacement);
+		TRACE("Checking entry at block %llu, displacement %lu entry inodeid %ld\n", fPhysicalBlock,
+			fDisplacement, entry->InodeID());
 
-		if (entry->Length() == 0) {
-			TRACE("empty entry.\n");
-			return B_ENTRY_NOT_FOUND;
-		}
-		if (!entry->IsValid()) {
-			TRACE("invalid entry.\n");
-			return B_BAD_DATA;
-		}
-
-		fPreviousDisplacement = fDisplacement;
-		fDisplacement += entry->Length();
+		if (entry->Length() != 0) {
+			if (!entry->IsValid()) {
+				TRACE("invalid entry.\n");
+				return B_BAD_DATA;
+			}
+			fPreviousDisplacement = fDisplacement;
+			fDisplacement += entry->Length();
+		} else 
+			fDisplacement = fBlockSize;
 
 		if (fDisplacement == fBlockSize) {
 			TRACE("Reached end of block\n");
@@ -167,23 +182,19 @@ DirectoryIterator::Next()
 			status_t status = _NextBlock();
 			if (status != B_OK)
 				return status;
-			
-			if (fLogicalBlock * fBlockSize + ext2_dir_entry::MinimumSize()
-					< fDirectory->Size()) {
-				status_t status = fDirectory->FindBlock(
-					fLogicalBlock * fBlockSize, fPhysicalBlock);
-				if (status != B_OK)
-					return status;
-			} else {
+						
+			if (_Offset() + ext2_dir_entry::MinimumSize()
+					>= fDirectory->Size()) {
 				TRACE("DirectoryIterator::Next() end of directory file\n");
 				return B_ENTRY_NOT_FOUND;
 			}
+			status = fDirectory->FindBlock(_Offset(), fPhysicalBlock);
+			if (status != B_OK)
+				return status;
 
-			if (entry->Length() == 0) {
-				block = cached.SetTo(fPhysicalBlock);
-				if (block == NULL)
-					return B_IO_ERROR;
-			}
+			block = cached.SetTo(fPhysicalBlock);
+			if (block == NULL)
+				return B_IO_ERROR;
 		} else if (fDisplacement > fBlockSize) {
 			TRACE("The entry isn't block aligned.\n");
 			// TODO: Is block alignment obligatory?
@@ -192,8 +203,11 @@ DirectoryIterator::Next()
 
 		entry = (ext2_dir_entry*)(block + fDisplacement);
 
-		TRACE("DirectoryIterator::Next() skipping entry\n");
-	} while (entry->Length() == 0);
+		TRACE("DirectoryIterator::Next() skipping entry %d %ld\n", entry->Length(), entry->InodeID());
+	} while (entry->Length() == 0 || entry->InodeID() == 0);
+
+	TRACE("DirectoryIterator::Next() entry->Length() %d entry->name %s\n",
+			entry->Length(), entry->name);
 
 	return B_OK;
 }
@@ -244,11 +258,10 @@ DirectoryIterator::AddEntry(Transaction& transaction, const char* name,
 		} else if (status != B_DEVICE_FULL)
 			return status;
 		
+		fDisplacement = 0;
 		status = _NextBlock();
-		if (status == B_OK) {
-			status = fDirectory->FindBlock(fLogicalBlock * fBlockSize,
-				fPhysicalBlock);
-		}
+		if (status == B_OK)
+			status = fDirectory->FindBlock(_Offset(), fPhysicalBlock);
 	}
 
 	if (status != B_ENTRY_NOT_FOUND)
@@ -299,15 +312,14 @@ DirectoryIterator::FindEntry(const char* name, ino_t* _id)
 	while (status == B_OK) {
 		size_t nameLength = EXT2_NAME_LENGTH;
 		status = Get(buffer, &nameLength, &id);
-		if (status != B_OK)
-			return status;
-
-		if (strcmp(name, buffer) == 0) {
-			if (_id != NULL)
-				*_id = id;
-			return B_OK;
-		}
-
+		if (status == B_OK) {
+			if (strcmp(name, buffer) == 0) {
+				if (_id != NULL)
+					*_id = id;
+				return B_OK;
+			}
+		} else if (status != B_BAD_DATA)
+			break;
 		status = Next();
 	}
 
@@ -318,6 +330,7 @@ DirectoryIterator::FindEntry(const char* name, ino_t* _id)
 status_t
 DirectoryIterator::RemoveEntry(Transaction& transaction)
 {
+	TRACE("DirectoryIterator::RemoveEntry()\n");
 	ext2_dir_entry* previousEntry;
 	ext2_dir_entry* dirEntry;
 	CachedBlock cached(fVolume);
@@ -331,9 +344,9 @@ DirectoryIterator::RemoveEntry(Transaction& transaction)
 		fDisplacement += previousEntry->Length();
 
 		if (fDisplacement == fBlockSize) {
-			memset(&previousEntry->name_length, 0, fBlockSize - 6);
+			previousEntry->SetInodeID(0);
 			fDisplacement = 0;
-			return Next();
+			return B_OK;
 		} else if (fDisplacement > fBlockSize) {
 			TRACE("DirectoryIterator::RemoveEntry(): Entry isn't aligned to "
 				"block entry.");
@@ -349,6 +362,8 @@ DirectoryIterator::RemoveEntry(Transaction& transaction)
 
 		return B_OK;
 	}
+
+	TRACE("DirectoryIterator::RemoveEntry() fDisplacement %ld\n", fDisplacement);
 
 	if (fPreviousDisplacement == fDisplacement) {
 		char buffer[EXT2_NAME_LENGTH + 1];
