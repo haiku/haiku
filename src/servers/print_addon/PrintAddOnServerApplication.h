@@ -5,8 +5,8 @@
  * Authors:
  *		Michael Pfeiffer
  */
-#ifndef PRINT_SERVER_ADD_ON_H
-#define PRINT_SERVER_ADD_ON_H
+#ifndef PRINT_ADD_ON_SERVER_H
+#define PRINT_ADD_ON_SERVER_H
 
 #include <Application.h>
 #include <Directory.h>
@@ -14,13 +14,13 @@
 #include <Message.h>
 #include <SupportDefs.h>
 
-#include <PrintServerAddOnProtocol.h>
+#include <PrintAddOnServerProtocol.h>
 
 
-class PrintServerAddOnApplication : public BApplication
+class PrintAddOnServerApplication : public BApplication
 {
 public:
-					PrintServerAddOnApplication(const char* signature);
+					PrintAddOnServerApplication(const char* signature);
 			void	MessageReceived(BMessage* message);
 
 private:

@@ -5,12 +5,12 @@
  * Authors:
  *		Michael Pfeiffer
  */
-#ifndef PRINT_SERVER_ADD_ON_PROTOCOL_H
-#define PRINT_SERVER_ADD_ON_PROTOCOL_H
+#ifndef PRINT_ADD_ON_SERVER_PROTOCOL_H
+#define PRINT_ADD_ON_SERVER_PROTOCOL_H
 
-extern const char* kPrintServerAddOnApplicationSignature;
+extern const char* kPrintAddOnServerApplicationSignature;
 
-extern const char* kPrintServerAddOnStatusAttribute;
+extern const char* kPrintAddOnServerStatusAttribute;
 extern const char* kPrinterDriverAttribute;
 extern const char* kPrinterNameAttribute;
 extern const char* kPrinterFolderAttribute;
@@ -25,7 +25,7 @@ enum {
 		// 		BString kPrinterDriverAttribute
 		// 		BString kPrinterNameAttribute
 		// Reply:
-		// 		int32 kPrintServerAddOnStatusAttribute
+		// 		int32 kPrintAddOnServerStatusAttribute
 
 	kMessageConfigPage = 'PScp',
 		// Request:
@@ -33,7 +33,7 @@ enum {
 		// 		BString kPrinterFolderAttribute
 		// 		BMessage kPrintSettingsAttribute
 		// Reply:
-		// 		int32 kPrintServerAddOnStatusAttribute
+		// 		int32 kPrintAddOnServerStatusAttribute
 		// 		BMessage kPrintSettingsAttribute (if status is B_OK)
 
 	kMessageConfigJob = 'PScj',
@@ -42,7 +42,7 @@ enum {
 		// 		BString kPrinterFolderAttribute
 		// 		BMessage kPrintSettingsAttribute
 		// Reply:
-		// 		int32 kPrintServerAddOnStatusAttribute
+		// 		int32 kPrintAddOnServerStatusAttribute
 		// 		BMessage kPrintSettingsAttribute (if status is B_OK)
 
 	kMessageDefaultSettings = 'PSds',
@@ -50,7 +50,7 @@ enum {
 		// 		BString kPrinterDriverAttribute
 		// 		BString kPrinterFolderAttribute
 		// Reply:
-		// 		int32 kPrintServerAddOnStatusAttribute
+		// 		int32 kPrintAddOnServerStatusAttribute
 		// 		BMessage kPrintSettingsAttribute (if status is B_OK)
 
 	kMessageTakeJob = 'PStj',
@@ -59,7 +59,7 @@ enum {
 		// 		BString kPrintJobFileAttribute
 		// 		BString kPrinterFolderAttribute
 		// Reply:
-		// 		int32 kPrintServerAddOnStatusAttribute
+		// 		int32 kPrintAddOnServerStatusAttribute
 };
 
 #endif

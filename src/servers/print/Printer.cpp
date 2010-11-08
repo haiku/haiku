@@ -10,7 +10,7 @@
 
 #include "BeUtils.h"
 #include "pr_server.h"
-#include "PrintServerAddOn.h"
+#include "PrintAddOnServer.h"
 #include "PrintServerApp.h"
 
 	// posix
@@ -180,7 +180,7 @@ status_t Printer::Remove()
 status_t
 Printer::FindPathToDriver(const char* driverName, BPath* path)
 {
-	return PrintServerAddOn::FindPathToDriver(driverName, path);
+	return PrintAddOnServer::FindPathToDriver(driverName, path);
 }
 
 
@@ -199,7 +199,7 @@ Printer::FindPathToDriver(const char* driverName, BPath* path)
 status_t Printer::ConfigurePrinter(const char* driverName,
 	const char* printerName)
 {
-	PrintServerAddOn addOn(driverName);
+	PrintAddOnServer addOn(driverName);
 	return addOn.AddPrinter(printerName);
 }
 
@@ -225,7 +225,7 @@ Printer::ConfigurePage(BMessage& settings)
 	if (result != B_OK)
 		return result;
 
-	PrintServerAddOn addOn(driver.String());
+	PrintAddOnServer addOn(driver.String());
 	result = addOn.ConfigPage(SpoolDir(), &settings);
 	if (result == B_OK) {
 		AddCurrentPrinter(settings);
@@ -255,7 +255,7 @@ Printer::ConfigureJob(BMessage& settings)
 	if (result != B_OK)
 		return result;
 
-	PrintServerAddOn addOn(driver.String());
+	PrintAddOnServer addOn(driver.String());
 	result = addOn.ConfigJob(SpoolDir(), &settings);
 	if (result == B_OK) {
 		AddCurrentPrinter(settings);
@@ -299,7 +299,7 @@ Printer::GetDefaultSettings(BMessage& settings)
 	if (result != B_OK)
 		return result;
 
-	PrintServerAddOn addOn(driver.String());
+	PrintAddOnServer addOn(driver.String());
 	result = addOn.DefaultSettings(SpoolDir(), &settings);
 	if (result == B_OK) {
 		AddCurrentPrinter(settings);
@@ -485,7 +485,7 @@ Printer::PrintSpooledJob(const char* spoolFile)
 	if (result != B_OK)
 		return result;
 
-	PrintServerAddOn addOn(driver.String());
+	PrintAddOnServer addOn(driver.String());
 	return addOn.TakeJob(spoolFile, SpoolDir());
 }
 

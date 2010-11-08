@@ -5,13 +5,13 @@
  * Authors:
  *		Michael Pfeiffer
  */
-#include "PrintServerAddOnApplication.h"
+#include "PrintAddOnServerApplication.h"
 
 #include <PrinterDriverAddOn.h>
 
 #include <String.h>
 
-PrintServerAddOnApplication::PrintServerAddOnApplication(const char* signature)
+PrintAddOnServerApplication::PrintAddOnServerApplication(const char* signature)
 	:
 	BApplication(signature)
 {
@@ -20,7 +20,7 @@ PrintServerAddOnApplication::PrintServerAddOnApplication(const char* signature)
 
 
 void
-PrintServerAddOnApplication::MessageReceived(BMessage* message)
+PrintAddOnServerApplication::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kMessageAddPrinter:
@@ -50,7 +50,7 @@ PrintServerAddOnApplication::MessageReceived(BMessage* message)
 
 
 void
-PrintServerAddOnApplication::AddPrinter(BMessage* message)
+PrintAddOnServerApplication::AddPrinter(BMessage* message)
 {
 	BString driver;
 	BString name;
@@ -66,7 +66,7 @@ PrintServerAddOnApplication::AddPrinter(BMessage* message)
 
 
 status_t
-PrintServerAddOnApplication::AddPrinter(const char* driver,
+PrintAddOnServerApplication::AddPrinter(const char* driver,
 	const char* spoolFolderName)
 {
 	PrinterDriverAddOn addOn(driver);
@@ -75,7 +75,7 @@ PrintServerAddOnApplication::AddPrinter(const char* driver,
 
 
 void
-PrintServerAddOnApplication::ConfigPage(BMessage* message)
+PrintAddOnServerApplication::ConfigPage(BMessage* message)
 {
 	BString driver;
 	BString folder;
@@ -101,7 +101,7 @@ PrintServerAddOnApplication::ConfigPage(BMessage* message)
 
 
 status_t
-PrintServerAddOnApplication::ConfigPage(const char* driver,
+PrintAddOnServerApplication::ConfigPage(const char* driver,
 	BDirectory* spoolFolder, BMessage* settings)
 {
 	PrinterDriverAddOn addOn(driver);
@@ -110,7 +110,7 @@ PrintServerAddOnApplication::ConfigPage(const char* driver,
 
 
 void
-PrintServerAddOnApplication::ConfigJob(BMessage* message)
+PrintAddOnServerApplication::ConfigJob(BMessage* message)
 {
 	BString driver;
 	BString folder;
@@ -136,7 +136,7 @@ PrintServerAddOnApplication::ConfigJob(BMessage* message)
 
 
 status_t
-PrintServerAddOnApplication::ConfigJob(const char* driver,
+PrintAddOnServerApplication::ConfigJob(const char* driver,
 				BDirectory* spoolFolder,
 				BMessage* settings)
 {
@@ -146,7 +146,7 @@ PrintServerAddOnApplication::ConfigJob(const char* driver,
 
 
 void
-PrintServerAddOnApplication::DefaultSettings(BMessage* message)
+PrintAddOnServerApplication::DefaultSettings(BMessage* message)
 {
 	BString driver;
 	BString folder;
@@ -171,7 +171,7 @@ PrintServerAddOnApplication::DefaultSettings(BMessage* message)
 
 
 status_t
-PrintServerAddOnApplication::DefaultSettings(const char* driver,
+PrintAddOnServerApplication::DefaultSettings(const char* driver,
 	BDirectory* spoolFolder, BMessage* settings)
 {
 	PrinterDriverAddOn addOn(driver);
@@ -180,7 +180,7 @@ PrintServerAddOnApplication::DefaultSettings(const char* driver,
 
 
 void
-PrintServerAddOnApplication::TakeJob(BMessage* message)
+PrintAddOnServerApplication::TakeJob(BMessage* message)
 {
 	BString driver;
 	BString folder;
@@ -200,7 +200,7 @@ PrintServerAddOnApplication::TakeJob(BMessage* message)
 
 
 status_t
-PrintServerAddOnApplication::TakeJob(const char* driver, const char* spoolFile,
+PrintAddOnServerApplication::TakeJob(const char* driver, const char* spoolFile,
 				BDirectory* spoolFolder)
 {
 	PrinterDriverAddOn addOn(driver);
@@ -209,18 +209,18 @@ PrintServerAddOnApplication::TakeJob(const char* driver, const char* spoolFile,
 
 
 void
-PrintServerAddOnApplication::SendReply(BMessage* message, status_t status)
+PrintAddOnServerApplication::SendReply(BMessage* message, status_t status)
 {
 	BMessage reply(B_REPLY);
-	reply.AddInt32(kPrintServerAddOnStatusAttribute, status);
+	reply.AddInt32(kPrintAddOnServerStatusAttribute, status);
 	message->SendReply(&reply);
 }
 
 
 void
-PrintServerAddOnApplication::SendReply(BMessage* message, BMessage* reply)
+PrintAddOnServerApplication::SendReply(BMessage* message, BMessage* reply)
 {
-	reply->AddInt32(kPrintServerAddOnStatusAttribute, B_OK);
+	reply->AddInt32(kPrintAddOnServerStatusAttribute, B_OK);
 	message->SendReply(reply);
 }
 
@@ -228,7 +228,7 @@ PrintServerAddOnApplication::SendReply(BMessage* message, BMessage* reply)
 int
 main(int argc, char* argv[])
 {
-	PrintServerAddOnApplication application(
-		kPrintServerAddOnApplicationSignature);
+	PrintAddOnServerApplication application(
+		kPrintAddOnServerApplicationSignature);
 	application.Run();
 }

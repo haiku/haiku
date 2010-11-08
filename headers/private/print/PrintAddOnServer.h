@@ -5,8 +5,8 @@
  * Authors:
  *		Michael Pfeiffer
  */
-#ifndef PRINT_SERVER_ADD_ON_H
-#define PRINT_SERVER_ADD_ON_H
+#ifndef PRINT_ADD_ON_SERVER_H
+#define PRINT_ADD_ON_SERVER_H
 
 
 #include <Directory.h>
@@ -18,11 +18,11 @@
 #include <SupportDefs.h>
 
 
-class PrintServerAddOn
+class PrintAddOnServer
 {
 public:
-						PrintServerAddOn(const char* driver);
-	virtual				~PrintServerAddOn();
+						PrintAddOnServer(const char* driver);
+	virtual				~PrintAddOnServer();
 
 			status_t	AddPrinter(const char* spoolFolderName);
 			status_t	ConfigPage(BDirectory* spoolFolder,

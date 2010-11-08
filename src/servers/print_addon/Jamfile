@@ -7,7 +7,7 @@ AddResources print_addon_server :
 ;
 
 Application print_addon_server :
-	PrintServerAddOnApplication.cpp
+	PrintAddOnServerApplication.cpp
 ;
 
 LinkAgainst print_addon_server : 

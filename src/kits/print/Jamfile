@@ -13,6 +13,6 @@ StaticLibrary libprintutils.a :
 	PicturePrinter.cpp
 	PrinterDriverAddOn.cpp
 	PrintTransport.cpp
-	PrintServerAddOn.cpp
-	PrintServerAddOnProtocol.cpp
+	PrintAddOnServer.cpp
+	PrintAddOnServerProtocol.cpp
 ;
