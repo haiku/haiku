@@ -125,7 +125,7 @@ mount(const char *filesystem, const char *where, const char *device, ulong flags
 		errno = err;
 		return -1;
 	}
-	return err;
+	return 0;
 }
 
 
@@ -139,6 +139,6 @@ unmount(const char *path)
 		errno = err;
 		return -1;
 	}
-	return err;
+	return 0;
 }
 
