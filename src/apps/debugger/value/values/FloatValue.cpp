@@ -47,6 +47,6 @@ FloatValue::ToVariant(BVariant& _value) const
 bool
 FloatValue::operator==(const Value& other) const
 {
-	const FloatValue* otherInt = dynamic_cast<const FloatValue*>(&other);
-	return otherInt != NULL ? fValue == otherInt->fValue : false;
+	const FloatValue* otherFloat = dynamic_cast<const FloatValue*>(&other);
+	return otherFloat != NULL ? fValue == otherFloat->fValue : false;
 }
