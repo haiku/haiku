@@ -316,12 +316,12 @@ BCountView::MouseDown(BPoint)
 			menu->Populate(NULL, Window(), false, false, true, false, true);
 
 		menu->SetTargetForItems(be_app);
-		BPoint pop_pt = Bounds().LeftBottom();
-		pop_pt.y += 3;
-		ConvertToScreen(&pop_pt);
-		BRect mouse_rect(Bounds());
-		ConvertToScreen(&mouse_rect);
-		menu->Go(pop_pt, true, true, mouse_rect);
+		BPoint point = Bounds().LeftBottom();
+		point.y += 3;
+		ConvertToScreen(&point);
+		BRect clickToOpenRect(Bounds());
+		ConvertToScreen(&clickToOpenRect);
+		menu->Go(point, true, true, clickToOpenRect);
 		delete menu;
 	}
 }
