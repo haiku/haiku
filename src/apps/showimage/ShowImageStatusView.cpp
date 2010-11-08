@@ -1,11 +1,13 @@
 /*
- * Copyright 2003-2009 Haiku Inc. All rights reserved.
+ * Copyright 2003-2010, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Fernando Francisco de Oliveira
  *		Michael Wilber
+ *		Axel Dörfler, axeld@pinc-software.de
  */
+
 
 #include "ShowImageStatusView.h"
 
@@ -13,6 +15,9 @@
 #include <MenuItem.h>
 #include <Path.h>
 #include <PopUpMenu.h>
+
+#include <tracker_private.h>
+#include "DirMenu.h"
 
 #include "ShowImageView.h"
 #include "ShowImageWindow.h"
@@ -77,47 +82,30 @@ ShowImageStatusView::Draw(BRect updateRect)
 void
 ShowImageStatusView::MouseDown(BPoint where)
 {
-	ShowImageWindow *window = dynamic_cast<ShowImageWindow *>(Window());
-	if (!window || window->GetShowImageView() == NULL)
-		return;
+	BPrivate::BDirMenu* menu = new BDirMenu(NULL, B_REFS_RECEIVED);
+	BEntry entry;
+	if (entry.SetTo(&fRef) == B_OK)
+		menu->Populate(&entry, Window(), false, false, true, false, true);
+	else
+		menu->Populate(NULL, Window(), false, false, true, false, true);
 
-	BPath path;
-	path.SetTo(window->GetShowImageView()->Image());
-
-	BPopUpMenu popup("no title");
-	popup.SetFont(be_plain_font);
-
-	while (path.GetParent(&path) == B_OK && path != "/") {
-		popup.AddItem(new BMenuItem(path.Leaf(), NULL));
-	}
-
-	BRect bounds(Bounds());
-	ConvertToScreen(&bounds);
-	where = bounds.LeftBottom();
-
-	BMenuItem *item;
-	item = popup.Go(where, true, false, ConvertToScreen(Bounds()));
-
-	if (item) {
-		path.SetTo(window->GetShowImageView()->Image());
-		path.GetParent(&path);
-		int index = popup.IndexOf(item);
-		while (index--)
-			path.GetParent(&path);
-		BMessenger tracker("application/x-vnd.Be-TRAK");
-		BMessage msg(B_REFS_RECEIVED);
-		entry_ref ref;
-		get_ref_for_path(path.Path(), &ref);
-		msg.AddRef("refs", &ref);
-		tracker.SendMessage(&msg);
-	}
+	menu->SetTargetForItems(BMessenger(kTrackerSignature));
+	BPoint point = Bounds().LeftBottom();
+	point.y += 3;
+	ConvertToScreen(&point);
+	BRect clickToOpenRect(Bounds());
+	ConvertToScreen(&clickToOpenRect);
+	menu->Go(point, true, true, clickToOpenRect);
+	delete menu;
 }
 
 
 void
-ShowImageStatusView::SetText(BString &text)
+ShowImageStatusView::Update(const entry_ref& ref, const BString& text)
 {
 	fText = text;
+	fRef = ref;
+
 	Invalidate();
 }
 

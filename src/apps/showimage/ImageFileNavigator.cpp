@@ -18,26 +18,20 @@
 
 #include "ImageFileNavigator.h"
 
-#include <deque>
-#include <map>
 #include <new>
-#include <set>
 
 #include <stdio.h>
 
-#include <Bitmap.h>
 #include <BitmapStream.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
-#include <Locker.h>
+//#include <Locker.h>
 #include <ObjectList.h>
-#include <Path.h>
+//#include <Path.h>
 #include <TranslatorRoster.h>
 
-#include <AutoDeleter.h>
 #include <tracker_private.h>
-#include <kernel/util/DoublyLinkedList.h>
 
 #include "ProgressWindow.h"
 #include "ShowImageConstants.h"
@@ -320,254 +314,10 @@ FolderNavigator::_CompareRefs(const entry_ref* refA, const entry_ref* refB)
 // #pragma mark -
 
 
-struct CacheEntry : DoublyLinkedListLinkImpl<CacheEntry> {
-	entry_ref				ref;
-	int32					page;
-	int32					pageCount;
-	BBitmap*				bitmap;
-	BString					type;
-	BString					mimeType;
-};
-
-
-struct QueueEntry {
-	entry_ref				ref;
-	int32					page;
-	std::set<BMessenger>	listeners;
-};
-
-
-class ImageCache {
-public:
-								ImageCache();
-	virtual						~ImageCache();
-
-			void				RetrieveImage(const entry_ref& ref,
-									const BMessenger* target);
-
-private:
-	static	status_t			_QueueWorkerThread(void* self);
-
-			status_t			_RetrieveImage(QueueEntry* entry,
-									BMessage& message);
-			void				_NotifyListeners(QueueEntry* entry,
-									BMessage& message);
-
-private:
-			typedef std::pair<entry_ref, int32> ImageSelector;
-			typedef std::map<ImageSelector, CacheEntry*> CacheMap;
-			typedef std::map<ImageSelector, QueueEntry*> QueueMap;
-			typedef std::deque<QueueEntry*> QueueDeque;
-			typedef DoublyLinkedList<CacheEntry> CacheList;
-
-			BLocker				fCacheLocker;
-			CacheMap			fCacheMap;
-			CacheList			fCacheEntriesByAge;
-			BLocker				fQueueLocker;
-			QueueMap			fQueueMap;
-			QueueDeque			fQueue;
-			vint32				fThreadCount;
-			int32				fMaxThreadCount;
-			uint64				fBytes;
-			uint64				fMaxBytes;
-			size_t				fMaxEntries;
-};
-
-
-ImageCache::ImageCache()
+ImageFileNavigator::ImageFileNavigator(const entry_ref& ref,
+	const BMessenger& trackerMessenger)
 	:
-	fCacheLocker("image cache"),
-	fQueueLocker("image queue"),
-	fThreadCount(0),
-	fBytes(0)
-{
-	system_info info;
-	get_system_info(&info);
-
-	fMaxThreadCount = (info.cpu_count + 1) / 2;
-	fMaxBytes = info.max_pages * B_PAGE_SIZE / 8;
-	fMaxEntries = 10;
-}
-
-
-ImageCache::~ImageCache()
-{
-	// TODO: delete CacheEntries, and QueueEntries
-}
-
-
-void
-ImageCache::RetrieveImage(const entry_ref& ref, const BMessenger* target)
-{
-	// TODO!
-}
-
-
-/*static*/ status_t
-ImageCache::_QueueWorkerThread(void* _self)
-{
-	ImageCache* self = (ImageCache*)_self;
-
-	// get next queue entry
-	while (true) {
-		self->fQueueLocker.Lock();
-		if (self->fQueue.empty()) {
-			self->fQueueLocker.Unlock();
-			break;
-		}
-
-		QueueEntry* entry = *self->fQueue.begin();
-		self->fQueue.pop_front();
-		self->fQueueLocker.Unlock();
-
-		if (entry == NULL)
-			break;
-
-		BMessage notification(kMsgImageLoaded);
-		status_t status = self->_RetrieveImage(entry, notification);
-		if (status != B_OK)
-			notification.AddInt32("error", status);
-
-		self->fQueueLocker.Lock();
-		self->fQueueMap.erase(std::make_pair(entry->ref, entry->page));
-		self->fQueueLocker.Unlock();
-
-		self->_NotifyListeners(entry, notification);
-		delete entry;
-	}
-
-	atomic_add(&self->fThreadCount, -1);
-	return B_OK;
-}
-
-
-status_t
-ImageCache::_RetrieveImage(QueueEntry* queueEntry, BMessage& message)
-{
-	CacheEntry* entry = new(std::nothrow) CacheEntry();
-	if (entry == NULL)
-		return B_NO_MEMORY;
-
-	ObjectDeleter<CacheEntry> deleter(entry);
-
-	BTranslatorRoster* roster = BTranslatorRoster::Default();
-	if (roster == NULL)
-		return B_ERROR;
-
-	if (!entry_ref_is_file(queueEntry->ref))
-		return B_IS_A_DIRECTORY;
-
-	BFile file;
-	status_t status = file.SetTo(&queueEntry->ref, B_READ_ONLY);
-	if (status != B_OK)
-		return status;
-
-	translator_info info;
-	memset(&info, 0, sizeof(translator_info));
-	BMessage ioExtension;
-
-	if (queueEntry->page != 0
-		&& ioExtension.AddInt32("/documentIndex", queueEntry->page) != B_OK)
-		return B_NO_MEMORY;
-
-// TODO: rethink this!
-#if 0
-	if (fProgressWindow != NULL) {
-		BMessage progress(kMsgProgressStatusUpdate);
-		if (ioExtension.AddMessenger("/progressMonitor",
-				fProgressWindow) == B_OK
-			&& ioExtension.AddMessage("/progressMessage", &progress) == B_OK)
-			fProgressWindow->Start();
-	}
-#endif
-
-	// Translate image data and create a new ShowImage window
-
-	BBitmapStream outstream;
-
-	status = roster->Identify(&file, &ioExtension, &info, 0, NULL,
-		B_TRANSLATOR_BITMAP);
-	if (status == B_OK) {
-		status = roster->Translate(&file, &info, &ioExtension, &outstream,
-			B_TRANSLATOR_BITMAP);
-	}
-
-#if 0
-	if (fProgressWindow != NULL)
-		fProgressWindow->Stop();
-#endif
-
-	if (status != B_OK)
-		return status;
-
-	BBitmap* bitmap;
-	if (outstream.DetachBitmap(&bitmap) != B_OK)
-		return B_ERROR;
-
-	entry->ref = queueEntry->ref;
-	entry->page = queueEntry->page;
-	entry->bitmap = bitmap;
-	entry->type = info.name;
-	entry->mimeType = info.MIME;
-
-	// get the number of documents (pages) if it has been supplied
-	int32 documentCount = 0;
-	if (ioExtension.FindInt32("/documentCount", &documentCount) == B_OK
-		&& documentCount > 0)
-		entry->pageCount = documentCount;
-	else
-		entry->pageCount = 1;
-
-	message.AddString("type", info.name);
-	message.AddString("mime", info.MIME);
-	message.AddRef("ref", &entry->ref);
-	message.AddInt32("page", entry->page);
-	message.AddPointer("bitmap", (void*)bitmap);
-
-	deleter.Detach();
-
-	fCacheLocker.Lock();
-
-	fCacheMap.insert(std::make_pair(
-		std::make_pair(entry->ref, entry->page), entry));
-	fCacheEntriesByAge.Add(entry);
-
-	fBytes += bitmap->BitsLength();
-
-	while (fBytes > fMaxBytes || fCacheMap.size() > fMaxEntries) {
-		if (fCacheMap.size() <= 2)
-			break;
-
-		// Remove the oldest entry
-		entry = fCacheEntriesByAge.RemoveHead();
-		fBytes -= entry->bitmap->BitsLength();
-		fCacheMap.erase(std::make_pair(entry->ref, entry->page));
-		delete entry;
-	}
-
-	fCacheLocker.Unlock();
-	return B_OK;
-}
-
-
-void
-ImageCache::_NotifyListeners(QueueEntry* entry, BMessage& message)
-{
-	std::set<BMessenger>::iterator iterator = entry->listeners.begin();
-	for (; iterator != entry->listeners.end(); iterator++) {
-		iterator->SendMessage(&message);
-	}
-}
-
-
-// #pragma mark -
-
-
-ImageFileNavigator::ImageFileNavigator(const BMessenger& target,
-	const entry_ref& ref, const BMessenger& trackerMessenger)
-	:
-	fTarget(target),
-	fProgressWindow(NULL),
+	fCurrentRef(ref),
 	fDocumentIndex(1),
 	fDocumentCount(1)
 {
@@ -585,95 +335,11 @@ ImageFileNavigator::~ImageFileNavigator()
 
 
 void
-ImageFileNavigator::SetProgressWindow(ProgressWindow* progressWindow)
+ImageFileNavigator::SetTo(const entry_ref& ref, int32 page, int32 pageCount)
 {
-	fProgressWindow = progressWindow;
-}
-
-
-status_t
-ImageFileNavigator::LoadImage(const entry_ref& ref, int32 page)
-{
-	BTranslatorRoster* roster = BTranslatorRoster::Default();
-	if (roster == NULL)
-		return B_ERROR;
-
-	if (!entry_ref_is_file(ref))
-		return B_ERROR;
-
-	BFile file(&ref, B_READ_ONLY);
-	translator_info info;
-	memset(&info, 0, sizeof(translator_info));
-	BMessage ioExtension;
-
-	if (page != 0 && ioExtension.AddInt32("/documentIndex", page) != B_OK)
-		return B_ERROR;
-
-	if (fProgressWindow != NULL) {
-		BMessage progress(kMsgProgressStatusUpdate);
-		if (ioExtension.AddMessenger("/progressMonitor",
-				fProgressWindow) == B_OK
-			&& ioExtension.AddMessage("/progressMessage", &progress) == B_OK)
-			fProgressWindow->Start();
-	}
-
-	// Translate image data and create a new ShowImage window
-
-	BBitmapStream outstream;
-
-	status_t status = roster->Identify(&file, &ioExtension, &info, 0, NULL,
-		B_TRANSLATOR_BITMAP);
-	if (status == B_OK) {
-		status = roster->Translate(&file, &info, &ioExtension, &outstream,
-			B_TRANSLATOR_BITMAP);
-	}
-
-	if (fProgressWindow != NULL)
-		fProgressWindow->Stop();
-
-	if (status != B_OK)
-		return status;
-
-	BBitmap* bitmap;
-	if (outstream.DetachBitmap(&bitmap) != B_OK)
-		return B_ERROR;
-
 	fCurrentRef = ref;
 	fDocumentIndex = page;
-
-	// get the number of documents (pages) if it has been supplied
-	int32 documentCount = 0;
-	if (ioExtension.FindInt32("/documentCount", &documentCount) == B_OK
-		&& documentCount > 0)
-		fDocumentCount = documentCount;
-	else
-		fDocumentCount = 1;
-
-	BMessage message(kMsgImageLoaded);
-	message.AddString("type", info.name);
-	message.AddString("mime", info.MIME);
-	message.AddRef("ref", &ref);
-	message.AddInt32("page", page);
-	message.AddPointer("bitmap", (void*)bitmap);
-	status = fTarget.SendMessage(&message);
-	if (status != B_OK) {
-		delete bitmap;
-		return status;
-	}
-
-	return B_OK;
-}
-
-
-void
-ImageFileNavigator::GetPath(BString* outPath)
-{
-	BEntry entry(&fCurrentRef);
-	BPath path;
-	if (entry.InitCheck() < B_OK || entry.GetPath(&path) < B_OK)
-		outPath->SetTo("");
-	else
-		outPath->SetTo(path.Path());
+	fDocumentCount = pageCount;
 }
 
 
@@ -695,7 +361,7 @@ bool
 ImageFileNavigator::FirstPage()
 {
 	if (fDocumentIndex != 1) {
-		LoadImage(fCurrentRef, 1);
+		fDocumentIndex = 1;
 		return true;
 	}
 	return false;
@@ -706,7 +372,7 @@ bool
 ImageFileNavigator::LastPage()
 {
 	if (fDocumentIndex != fDocumentCount) {
-		LoadImage(fCurrentRef, fDocumentCount);
+		fDocumentIndex = fDocumentCount;
 		return true;
 	}
 	return false;
@@ -717,7 +383,7 @@ bool
 ImageFileNavigator::NextPage()
 {
 	if (fDocumentIndex < fDocumentCount) {
-		LoadImage(fCurrentRef, ++fDocumentIndex);
+		fDocumentIndex++;
 		return true;
 	}
 	return false;
@@ -728,7 +394,7 @@ bool
 ImageFileNavigator::PreviousPage()
 {
 	if (fDocumentIndex > 1) {
-		LoadImage(fCurrentRef, --fDocumentIndex);
+		fDocumentIndex--;
 		return true;
 	}
 	return false;
@@ -740,31 +406,51 @@ ImageFileNavigator::GoToPage(int32 page)
 {
 	if (page > 0 && page <= fDocumentCount && page != fDocumentIndex) {
 		fDocumentIndex = page;
-		LoadImage(fCurrentRef, fDocumentIndex);
 		return true;
 	}
 	return false;
 }
 
 
-void
+bool
 ImageFileNavigator::FirstFile()
 {
-	_LoadNextImage(true, true);
+	entry_ref ref;
+	if (fNavigator->FindNextImage(fCurrentRef, ref, false, true)) {
+		SetTo(ref, 1, 1);
+		fNavigator->UpdateSelection(fCurrentRef);
+		return true;
+	}
+
+	return false;
 }
 
 
-void
+bool
 ImageFileNavigator::NextFile()
 {
-	_LoadNextImage(true, false);
+	entry_ref ref;
+	if (fNavigator->FindNextImage(fCurrentRef, ref, true, false)) {
+		SetTo(ref, 1, 1);
+		fNavigator->UpdateSelection(fCurrentRef);
+		return true;
+	}
+
+	return false;
 }
 
 
-void
+bool
 ImageFileNavigator::PreviousFile()
 {
-	_LoadNextImage(false, false);
+	entry_ref ref;
+	if (fNavigator->FindNextImage(fCurrentRef, ref, false, false)) {
+		SetTo(ref, 1, 1);
+		fNavigator->UpdateSelection(fCurrentRef);
+		return true;
+	}
+
+	return false;
 }
 
 
@@ -785,7 +471,7 @@ ImageFileNavigator::HasPreviousFile()
 
 
 /*!	Moves the current file into the trash.
-	Returns true if a new file is being loaded, false if not.
+	Returns true if a new file should be loaded, false if not.
 */
 bool
 ImageFileNavigator::MoveFileToTrash()
@@ -803,41 +489,12 @@ ImageFileNavigator::MoveFileToTrash()
 	// could be invalid
 	BMessenger tracker(kTrackerSignature);
 	if (tracker.SendMessage(&trash) != B_OK)
-		return true;
+		return false;
 
-	if (nextRef.device != -1 && LoadImage(nextRef) == B_OK) {
-		fNavigator->UpdateSelection(nextRef);
+	if (nextRef.device != -1) {
+		SetTo(nextRef, 1, 1);
 		return true;
 	}
 
 	return false;
 }
-
-
-// #pragma mark -
-
-
-status_t
-ImageFileNavigator::_LoadNextImage(bool next, bool rewind)
-{
-	entry_ref currentRef = fCurrentRef;
-	entry_ref ref;
-	if (fNavigator->FindNextImage(currentRef, ref, next, rewind)) {
-		// Keep trying to load images until:
-		// 1. The image loads successfully
-		// 2. The last file in the directory is found (for find next or find
-		//    first)
-		// 3. The first file in the directory is found (for find prev)
-		// 4. The call to _FindNextImage fails for any other reason
-		while (LoadImage(ref) != B_OK) {
-			currentRef = ref;
-			if (!fNavigator->FindNextImage(currentRef, ref, next, false))
-				return B_ENTRY_NOT_FOUND;
-		}
-		fNavigator->UpdateSelection(fCurrentRef);
-		return B_OK;
-	}
-	return B_ENTRY_NOT_FOUND;
-}
-
-

@@ -31,18 +31,16 @@ public:
 									const BMessenger& trackerMessenger);
 	virtual						~ShowImageWindow();
 
+			void				BuildContextMenu(BMenu* menu);
+
+protected:
 	virtual	void				FrameResized(float width, float height);
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	bool				QuitRequested();
 
-			ShowImageView*		GetShowImageView() const { return fImageView; }
-
-			void				UpdateTitle();
-			void				AddMenus(BMenuBar* bar);
-			void				BuildContextMenu(BMenu* menu);
-			void				WindowRedimension(BBitmap* bitmap);
-
 private:
+			void				_AddMenus(BMenuBar* bar);
+			void				_WindowRedimension(BBitmap* bitmap);
 			void				_BuildViewMenu(BMenu* menu, bool popupMenu);
 			BMenuItem*			_AddItemMenu(BMenu* menu, const char* label,
 									uint32 what, char shortcut, uint32 modifier,
@@ -66,6 +64,7 @@ private:
 			void				_SaveToFile(BMessage* message);
 									// Handle save file panel message
 			bool				_ClosePrompt();
+			status_t			_LoadImage();
 			void				_ToggleFullScreen();
 			void				_ApplySettings();
 			void				_SavePrintOptions();
@@ -88,6 +87,7 @@ private:
 			BRect				fWindowFrame;
 			BMessage*			fPrintSettings;
 			PrintOptions		fPrintOptions;
+
 			BString				fImageType;
 };
 

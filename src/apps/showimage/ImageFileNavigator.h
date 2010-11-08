@@ -22,27 +22,17 @@
 
 
 class Navigator;
-class ProgressWindow;
-
-enum {
-	kMsgImageLoaded = 'ifnL'
-};
 
 
 class ImageFileNavigator {
 public:
-								ImageFileNavigator(const BMessenger& target,
-									const entry_ref& ref,
+								ImageFileNavigator(const entry_ref& ref,
 									const BMessenger& trackerMessenger);
 	virtual						~ImageFileNavigator();
 
-			void				SetProgressWindow(
-									ProgressWindow* progressWindow);
-
-			status_t			LoadImage(const entry_ref& ref, int32 page = 1);
-			const entry_ref&	ImageRef() const { return fCurrentRef; }
-
-			void				GetPath(BString* name);
+			void				SetTo(const entry_ref& ref, int32 page = 1,
+									int32 pageCount = 1);
+			const entry_ref&	CurrentRef() const { return fCurrentRef; }
 
 			// The same image file may have multiple pages, TIFF images for
 			// example. The page count is determined at image loading time.
@@ -55,20 +45,15 @@ public:
 			bool				PreviousPage();
 			bool				GoToPage(int32 page);
 
-			void				FirstFile();
-			void				NextFile();
-			void				PreviousFile();
+			bool				FirstFile();
+			bool				NextFile();
+			bool				PreviousFile();
 			bool				HasNextFile();
 			bool				HasPreviousFile();
 
 			bool				MoveFileToTrash();
 
 private:
-			status_t			_LoadNextImage(bool next, bool rewind);
-
-private:
-			BMessenger			fTarget;
-			ProgressWindow*		fProgressWindow;
 			Navigator*			fNavigator;
 
 			entry_ref			fCurrentRef;

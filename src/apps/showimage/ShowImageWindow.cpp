@@ -44,7 +44,7 @@
 #include <TranslationUtils.h>
 #include <TranslatorRoster.h>
 
-#include "EntryMenuItem.h"
+#include "ImageCache.h"
 #include "ShowImageApp.h"
 #include "ShowImageConstants.h"
 #include "ShowImageStatusView.h"
@@ -79,7 +79,7 @@ ShowImageWindow::ShowImageWindow(const entry_ref& ref,
 	const BMessenger& trackerMessenger)
 	:
 	BWindow(BRect(5, 24, 250, 100), "", B_DOCUMENT_WINDOW, 0),
-	fNavigator(this, ref, trackerMessenger),
+	fNavigator(ref, trackerMessenger),
 	fSavePanel(NULL),
 	fBar(NULL),
 	fBrowseMenu(NULL),
@@ -96,7 +96,7 @@ ShowImageWindow::ShowImageWindow(const entry_ref& ref,
 
 	// create menu bar
 	fBar = new BMenuBar(BRect(0, 0, Bounds().right, 1), "menu_bar");
-	AddMenus(fBar);
+	_AddMenus(fBar);
 	AddChild(fBar);
 
 	BRect viewFrame = Bounds();
@@ -142,7 +142,7 @@ ShowImageWindow::ShowImageWindow(const entry_ref& ref,
 	SetSizeLimits(250, 100000, 100, 100000);
 
 	// finish creating the window
-	if (fNavigator.LoadImage(ref) != B_OK) {
+	if (_LoadImage() != B_OK) {
 		_LoadError(ref);
 		Quit();
 		return;
@@ -170,14 +170,6 @@ ShowImageWindow::ShowImageWindow(const entry_ref& ref,
 
 ShowImageWindow::~ShowImageWindow()
 {
-}
-
-
-void
-ShowImageWindow::UpdateTitle()
-{
-	BPath path(fImageView->Image());
-	SetTitle(path.Path());
 }
 
 
@@ -261,7 +253,7 @@ ShowImageWindow::_BuildViewMenu(BMenu* menu, bool popupMenu)
 
 
 void
-ShowImageWindow::AddMenus(BMenuBar* bar)
+ShowImageWindow::_AddMenus(BMenuBar* bar)
 {
 	BMenu* menu = new BMenu(B_TRANSLATE("File"));
 
@@ -377,7 +369,7 @@ ShowImageWindow::_AddDelayItem(BMenu* menu, const char* label, float value)
 
 
 void
-ShowImageWindow::WindowRedimension(BBitmap* bitmap)
+ShowImageWindow::_WindowRedimension(BBitmap* bitmap)
 {
 	BScreen screen;
 	if (!screen.IsValid())
@@ -492,12 +484,15 @@ ShowImageWindow::MessageReceived(BMessage* message)
 		case kMsgImageLoaded:
 		{
 			bool first = fImageView->Bitmap() == NULL;
+			entry_ref ref;
+			message->FindRef("ref", &ref);
+			if (!first && ref != fNavigator.CurrentRef()) {
+				// ignore older images
+				break;
+			}
 
 			status_t status = fImageView->SetImage(message);
 			if (status != B_OK) {
-				entry_ref ref;
-				message->FindRef("ref", &ref);
-
 				_LoadError(ref);
 
 				// quit if file could not be opened
@@ -507,9 +502,11 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			}
 
 			fImageType = message->FindString("type");
+			fNavigator.SetTo(ref, message->FindInt32("page"),
+				message->FindInt32("pageCount"));
 
 			if (first) {
-				WindowRedimension(fImageView->Bitmap());
+				_WindowRedimension(fImageView->Bitmap());
 				fImageView->ResetZoom();
 				fImageView->MakeFocus(true);
 					// to receive key messages
@@ -519,7 +516,7 @@ ShowImageWindow::MessageReceived(BMessage* message)
 				if (!fImageView->StretchesToBounds()
 					&& !fImageView->ShrinksToBounds()
 					&& !fFullScreen)
-					WindowRedimension(fImageView->Bitmap());
+					_WindowRedimension(fImageView->Bitmap());
 			}
 			break;
 		}
@@ -596,7 +593,9 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			}
 
 			_UpdateStatusText(message);
-			UpdateTitle();
+
+			BPath path(fImageView->Image());
+			SetTitle(path.Path());
 			break;
 		}
 
@@ -648,23 +647,23 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			break;
 
 		case MSG_PAGE_FIRST:
-			if (_ClosePrompt())
-				fNavigator.FirstPage();
+			if (_ClosePrompt() && fNavigator.FirstPage())
+				_LoadImage();
 			break;
 
 		case MSG_PAGE_LAST:
-			if (_ClosePrompt())
-				fNavigator.LastPage();
+			if (_ClosePrompt() && fNavigator.LastPage())
+				_LoadImage();
 			break;
 
 		case MSG_PAGE_NEXT:
-			if (_ClosePrompt())
-				fNavigator.NextPage();
+			if (_ClosePrompt() && fNavigator.NextPage())
+				_LoadImage();
 			break;
 
 		case MSG_PAGE_PREV:
-			if (_ClosePrompt())
-				fNavigator.PreviousPage();
+			if (_ClosePrompt() && fNavigator.PreviousPage())
+				_LoadImage();
 			break;
 
 		case MSG_GOTO_PAGE:
@@ -679,13 +678,15 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			int32 currentPage = fNavigator.CurrentPage();
 			int32 pages = fNavigator.PageCount();
 
+			// TODO: use radio mode instead!
 			if (newPage > 0 && newPage <= pages) {
 				BMenuItem* currentItem = fGoToPageMenu->ItemAt(currentPage - 1);
 				BMenuItem* newItem = fGoToPageMenu->ItemAt(newPage - 1);
 				if (currentItem != NULL && newItem != NULL) {
 					currentItem->SetMarked(false);
 					newItem->SetMarked(true);
-					fNavigator.GoToPage(newPage);
+					if (fNavigator.GoToPage(newPage))
+						_LoadImage();
 				}
 			}
 			break;
@@ -700,19 +701,23 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			break;
 
 		case MSG_FILE_PREV:
-			if (_ClosePrompt())
-				fNavigator.PreviousFile();
+			if (_ClosePrompt() && fNavigator.PreviousFile())
+				_LoadImage();
 			break;
 
 		case MSG_FILE_NEXT:
-			if (_ClosePrompt())
-				fNavigator.NextFile();
+			if (_ClosePrompt() && fNavigator.NextFile())
+				_LoadImage();
 			break;
 
 		case kMsgDeleteCurrentFile:
-			if (!fNavigator.MoveFileToTrash())
+		{
+			if (fNavigator.MoveFileToTrash())
+				_LoadImage();
+			else
 				PostMessage(B_QUIT_REQUESTED);
 			break;
+		}
 
 		case MSG_ROTATE_90:
 			fImageView->Rotate(90);
@@ -838,7 +843,7 @@ ShowImageWindow::_UpdateStatusText(const BMessage* message)
 		status << ", " << text;
 	}
 
-	fStatusView->SetText(status);
+	fStatusView->Update(fNavigator.CurrentRef(), status);
 }
 
 
@@ -934,6 +939,7 @@ ShowImageWindow::_SaveToFile(BMessage* message)
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "ClosePrompt"
 
+
 bool
 ShowImageWindow::_ClosePrompt()
 {
@@ -966,6 +972,15 @@ ShowImageWindow::_ClosePrompt()
 	// Close
 	fModified = false;
 	return true;
+}
+
+
+status_t
+ShowImageWindow::_LoadImage()
+{
+	BMessenger us(this);
+	return ImageCache::Default().RetrieveImage(fNavigator.CurrentRef(),
+		fNavigator.CurrentPage(), &us);
 }
 
 

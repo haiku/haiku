@@ -316,7 +316,7 @@ ShowImageView::_DeleteBitmap()
 		delete fDisplayBitmap;
 	fDisplayBitmap = NULL;
 
-	delete fBitmap;
+	// TODO: the bitmap is currently only owned by the cache!!!
 	fBitmap = NULL;
 }
 
@@ -751,6 +751,9 @@ ShowImageView::Draw(BRect updateRect)
 void
 ShowImageView::FrameResized(float /*width*/, float /*height*/)
 {
+	if (fBitmap == NULL)
+		return;
+
 	fFitToBoundsZoom = _FitToBoundsZoom();
 	SetZoom(_ShouldStretch() ? fFitToBoundsZoom : fZoom);
 }
