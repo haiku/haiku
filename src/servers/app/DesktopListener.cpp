@@ -12,7 +12,7 @@
 
 DesktopListener::~DesktopListener()
 {
-	
+
 }
 
 
@@ -100,7 +100,7 @@ DesktopObservable::NotifyKeyPressed(uint32 what, int32 key, int32 modifiers)
 
 	for (DesktopListener* listener = fDesktopListenerList.First();
 		listener != NULL; listener = fDesktopListenerList.GetNext(listener))
-		listener->KeyPressed(what, key, modifiers);	
+		listener->KeyPressed(what, key, modifiers);
 }
 
 
@@ -186,7 +186,7 @@ DesktopObservable::NotifyWindowResized(Window* window)
 
 
 void
-DesktopObservable::NotifyWindowActitvated(Window* window)
+DesktopObservable::NotifyWindowActivated(Window* window)
 {
 	if (fWeAreInvoking)
 		return;

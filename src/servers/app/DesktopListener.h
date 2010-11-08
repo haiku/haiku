@@ -36,7 +36,7 @@ public:
 
 	virtual void				WindowAdded(Window* window) = 0;
 	virtual void				WindowRemoved(Window* window) = 0;
-	
+
 	virtual void				KeyPressed(uint32 what, int32 key,
 									int32 modifiers) = 0;
 	virtual void				MouseEvent(BMessage* message) = 0;
@@ -102,7 +102,7 @@ public:
 
 			void				NotifyWindowMoved(Window* window);
 			void				NotifyWindowResized(Window* window);
-			void				NotifyWindowActitvated(Window* window);
+			void				NotifyWindowActivated(Window* window);
 			void				NotifyWindowSentBehind(Window* window,
 									Window* behindOf);
 			void				NotifyWindowWorkspacesChanged(Window* window,
@@ -133,7 +133,7 @@ private:
 		};
 
 		DesktopListenerDLList	fDesktopListenerList;
-		
+
 		// prevent recursive invokes
 		bool					fWeAreInvoking;
 };

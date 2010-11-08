@@ -159,7 +159,7 @@ KeyboardFilter::Filter(BMessage* message, EventTarget** _target,
 
 	message->FindInt32("key", &key);
 	message->FindInt32("modifiers", &modifiers);
-		
+
 	if ((message->what == B_KEY_DOWN || message->what == B_UNMAPPED_KEY_DOWN)) {
 		// Check for safe video mode (cmd + ctrl + escape)
 		if (key == 0x01 && (modifiers & B_COMMAND_KEY) != 0
@@ -919,7 +919,7 @@ Desktop::ActivateWindow(Window* window)
 
 	AutoWriteLocker _(fWindowLock);
 
-	NotifyWindowActitvated(window);
+	NotifyWindowActivated(window);
 
 	bool windowOnOtherWorkspace = !window->InWorkspace(fCurrentWorkspace);
 	if (windowOnOtherWorkspace
@@ -1413,7 +1413,7 @@ Desktop::AddWindow(Window *window)
 	}
 
 	_ChangeWindowWorkspaces(window, 0, window->Workspaces());
-	
+
 	NotifyWindowAdded(window);
 
 	UnlockAllWindows();
@@ -1433,7 +1433,7 @@ Desktop::RemoveWindow(Window *window)
 		fSubsetWindows.RemoveWindow(window);
 
 	_ChangeWindowWorkspaces(window, window->Workspaces(), 0);
-	
+
 	NotifyWindowRemoved(window);
 
 	UnlockAllWindows();
