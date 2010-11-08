@@ -1,7 +1,7 @@
 #include "PrintServerAddOnProtocol.h"
 
 const char* kPrintServerAddOnApplicationSignature =
-	"application/x-vnd.haiku-print-server-add-on";
+	"application/x-vnd.haiku-print-addon-server";
 
 const char* kPrintServerAddOnStatusAttribute = "status";
 const char* kPrinterDriverAttribute = "driver";

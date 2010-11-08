@@ -10,13 +10,7 @@
 
 #include "BeUtils.h"
 #include "pr_server.h"
-// TODO enable when issue launching print_server_add_on is resolved
-#if 0
-#	include "PrintServerAddOn.h"
-#else
-#	include "PrinterDriverAddOn.h"
-#	define PrintServerAddOn PrinterDriverAddOn
-#endif
+#include "PrintServerAddOn.h"
 #include "PrintServerApp.h"
 
 	// posix

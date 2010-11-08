@@ -2,15 +2,15 @@ SubDir HAIKU_TOP src servers print_addon ;
 
 UsePrivateHeaders shared print ;
 
-AddResources print_server_add_on :
-	print_server_add_on.rdef
+AddResources print_addon_server :
+	print_addon_server.rdef
 ;
 
-Application print_server_add_on :
+Application print_addon_server :
 	PrintServerAddOnApplication.cpp
 ;
 
-LinkAgainst print_server_add_on : 
+LinkAgainst print_addon_server : 
 	be 
 	root
 	libprintutils.a

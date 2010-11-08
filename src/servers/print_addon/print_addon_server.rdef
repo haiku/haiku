@@ -1,16 +1,16 @@
 
-resource app_signature "application/x-vnd.haiku-print-server-add-on";
+resource app_signature "application/x-vnd.haiku-print-addon-server";
 
 resource app_version {
 	major = 1,
 	middle = 0,
 	minor = 0,
 
-	variety = B_APPV_BETA,
+	variety = B_APPV_ALPHA,
 	internal = 0,
 
-	short_info = "print_server_add_on",
-	long_info = "print_server_add_on ©2010 Haiku"
+	short_info = "print_addon_server",
+	long_info = "print_addon_server ©2010 Haiku"
 };
 
 resource app_flags B_MULTIPLE_LAUNCH | B_BACKGROUND_APP;
