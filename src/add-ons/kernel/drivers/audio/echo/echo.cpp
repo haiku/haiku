@@ -920,6 +920,11 @@ uninit_driver(void)
 	num_cards = 0;
 	for (ix=0; ix<cnt; ix++) {
 		echo_shutdown(&cards[ix]);
+#ifdef __HAIKU__
+		(*pci->unreserve_device)(cards[ix].info.bus,
+			cards[ix].info.device, cards[ix].info.function,
+			DRIVER_NAME, &cards[ix]);
+#endif
 	}
 
 	memset(&cards, 0, sizeof(cards));

@@ -3045,6 +3045,11 @@ uninit_driver(void)
 
 	for (ix=0; ix<cnt; ix++) {
 		emuxki_shutdown(&cards[ix]);
+#ifdef __HAIKU__
+		(*pci->unreserve_device)(cards[ix].info.bus,
+			cards[ix].info.device, cards[ix].info.function,
+			DRIVER_NAME, &cards[ix]);
+#endif
 	}
 	memset(&cards, 0, sizeof(cards));
 	put_module(B_MPU_401_MODULE_NAME);
