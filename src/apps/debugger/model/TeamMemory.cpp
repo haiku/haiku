@@ -23,23 +23,21 @@ TeamMemory::ReadMemoryString(target_addr_t address, size_t maxLength,
 {
 	char buffer[B_PAGE_SIZE];
 
-	BString string;
-
+	_string.Truncate(0);
 	while (maxLength > 0) {
 		// read at max maxLength bytes, but don't read across page bounds
 		size_t toRead = std::min(maxLength,
 			B_PAGE_SIZE - size_t(address % B_PAGE_SIZE));
-
 		ssize_t bytesRead = ReadMemory(address, buffer, toRead);
 		if (bytesRead < 0)
-			return string.Length() == 0 ? bytesRead : B_OK;
+			return _string.Length() == 0 ? bytesRead : B_OK;
 
 		if (bytesRead == 0)
-			return string.Length() == 0 ? B_BAD_ADDRESS : B_OK;
+			return _string.Length() == 0 ? B_BAD_ADDRESS : B_OK;
 
 		// append the bytes read
 		size_t length = strnlen(buffer, bytesRead);
-		string.Append(buffer, length);
+		_string.Append(buffer, length);
 
 		// stop at end of string
 		if (length < (size_t)bytesRead)
