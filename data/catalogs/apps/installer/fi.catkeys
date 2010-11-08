@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Installer	3221058927
+1	finnish	x-vnd.Haiku-Installer	1949855347
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Asennusohjelma\n\ttekijä: Jérôme Duval ja Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Asennus valmis. Alkulataussektori kirjoitettiin kohteeseen '%s'. Jätä asennusohjelma painamalla Poistu-painiketta tai valitse uusi kohdetaltio toisen asennuksen suorittamiseksi.
 Quit	InstallerWindow		Poistu
@@ -74,3 +74,5 @@ Boot sector not written because of an internal error.	InstallProgress		Alkulatau
 Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Suoritetaan Alkulataushallinta ja Levyasema-asetukset…\n\nSulje molemmat sovellukset asennuksen jatkamiseksi.
 Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Sulje Alkulataushallintaikkuna ennen Asennusohjelmaikkunan sulkemista.
 Tools	InstallerWindow		Työkalut
+Stop	InstallerWindow		Pysäytä
+???	InstallerWindow	Unknown currently copied item	???

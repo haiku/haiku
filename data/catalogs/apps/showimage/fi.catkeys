@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-ShowImage	1038439310
+1	finnish	x-vnd.Haiku-ShowImage	2071534767
 Use as background…	Menus		Käytä taustana…
 5 seconds	Menus		5 sekuntia
 Slide delay	Menus		Diaviive
@@ -63,3 +63,15 @@ Shrink to window	Menus		Kutista ikkunaan
 OK	SaveToFile		Valmis
 The file '%s' could not be written.	SaveToFile		Tiedostoa '%s' ei voitu kirjoittaa.
 Progress monitor	ProgressWindow		Edistymisvalvonta
+Paste	Menus		Liitä
+File	Menus		Tiedosto
+Page setup…	Menus		Sivuasetus...
+Print…	Menus		Tulosta...
+Quit	Menus		Poistu
+Clear	Menus		Tyhjennä
+Edit	Menus		Muokkaa
+Close	Menus		Sulje
+Copy	Menus		Kopioi
+Cut	Menus		Leikkaa
+Select all	Menus		Valitse kaikki
+Save as…	Menus		Tallenna nimellä...

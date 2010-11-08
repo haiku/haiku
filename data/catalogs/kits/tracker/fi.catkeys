@@ -1,0 +1,320 @@
+1	finnish	x-vnd.Haiku-libtracker	2723586359
+Sorry, you can't save things at the root of your system.	libtracker		Valitettavasti et voi tallentaa mitään järjestelmäsi root-hakemistoon.
+Empty Trash	libtracker		Tyhjennä roskakori
+Recent folders	libtracker		Äskettäiset kansiot
+You cannot copy or move the root directory.	libtracker		Ei voida kopioida tai siirtää root-hakemistoa.
+starts with	libtracker		alkaa kohteella
+TiB	libtracker		TiB
+Duplicate	libtracker		Kaksoiskappale
+Link To:	libtracker		Linkki kohteeseen:
+Paste links	libtracker		Liitä linkit
+Volume icons	libtracker		Taltiokuvakkeet
+Relation	libtracker		Suhde
+Create a Query template	libtracker		Luo Kyselymallinne
+%num items	libtracker		%num kohdetta
+Name matches wildcard expression:###	libtracker		Nimi täsmää jokerilausekkeeseen:###
+Modified	libtracker		Muokattu
+Group	libtracker		Ryhmä
+Create link	libtracker		Luo linkki
+Moving: 	libtracker		Siirretään:
+Preparing to copy items…	libtracker		Valmistaudutaan kopioimaan kohteita...
+Error deleting items	libtracker		Virhe poistettaessa kohteita
+Sorry, saving more than one item is not allowed.	libtracker		Valitettavasti useamman kuin yhden kohteen tallentaminen ei ole sallittua.
+Open with…	libtracker		Avaa ohjelmalla...
+for %num files	libtracker		%num tiedostolle
+At %func \nfind_directory() failed. \nReason: %error	libtracker		Funktiossa %func \nfind_directory() epäonnistui. \nSyy: %error
+Unknown	libtracker		Tuntematon
+Close	libtracker		Sulje
+Go to parent	libtracker		Siirry ylätasolle
+%name info	libtracker	InfoWindow Title	%name-tiedot
+(Finish: %time - %finishtime minutes left)	libtracker		(Päättyminen: %time - %finishtime minuuttia jäljellä)
+Recent documents	libtracker		Äskettäiset asiakirjat
+Clean up	libtracker		Tyhjennä
+Find…	libtracker		Etsi...
+Mount all	libtracker		Liitä kaikki
+Opens with:	libtracker		Avaa ohjelmalla:
+Paste layout	libtracker		Liitä sijoittelu
+Cancel	libtracker		Peru
+Preparing to move items…	libtracker		Valmistaudutaan siirtämään kohteita...
+Invert selection	libtracker		Käänteinen valinta
+Error calculating folder size.	libtracker		Virhe laskettaessa kansion kokoa.
+Don't move files to Trash	libtracker		Älä siirrä tiedostoja roskakoriin
+Name	libtracker		Nimi
+Cut more	libtracker		Leikkaa lisää
+save text	libtracker		tallenna teksti
+Could not open \"%document\" (Missing symbol: %symbol). \n	libtracker		Ei voitu avata asiakirjaa \"%document\" (Puuttuva symboli: %symboli).\n
+Don't automount	libtracker		Älä liitä automaattisesti
+Sorry, the 'Character' attribute cannot store a multi-byte glyph.	libtracker		Valitettavasti attribuutti 'Character' ei  voi tallentaa monitavuista kirjoitusmerkkiä.
+Would you like to find a suitable application to open the file?	libtracker		Haluaisitko löytää sopivan sovelluksen tiedoston avaamiseen?
+Increase size	libtracker		Kasvata kokoa
+is	libtracker		on
+(Finish: %time - Over %finishtime hours left)	libtracker		(Päättyminen: %time - %finishtime tuntia jäljellä)
+Could not open \"%name\" (%error). 	libtracker		Ei voitu avata kohdetta \"%name\" (%error).
+Copying: 	libtracker		Kopioidaan:
+You cannot replace a folder or a symbolic link with a file.	libtracker		Et voi korvata kansiota tai symbolista linkkiä tiedostolla.
+Decrease size	libtracker		Pienennä kokoa
+There was an error deleting \"%name\":\n\t%error	libtracker		Virhe poistettaessa \"%name\":\n\t%error
+Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	libtracker		Oletko varma,että haluat poistaa valitutu kohteet? Tätä toimintoa ei voida perua.
+The target disk does not support creating links.	libtracker		Kohdelevy ei tue linkkien luontia.
+The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	libtracker		Valittua kohdetta ei voi siirtää roskakoriin. Haluaisitko sen sijaan poistaa sen? (Tätä toimintoa ei voi perua.)
+before	libtracker		ennen
+Copy more	libtracker		Kopio lisää
+Disks	libtracker		Levyt
+Cut	libtracker		Leikkaa
+The Tracker must be running to see Info windows.	libtracker		Jäljittäjä on oltava käynnissä Tiedot-ikkunoiden näkymiseksi.
+Desktop	libtracker		Työpöytä
+Create a Query	libtracker		Luo Kysely
+Could not update permissions of file \"%name\". %error	libtracker		Ei voitu päivittää tiedoston \”%name\" käyttöoikeuksia. %error
+Error in regular expression:\n\n'	libtracker		Virhe säännöllisessä lausekkeessa:\n\n'
+If you %action the mime settings, Haiku may not behave properly! Are you sure you want to do this? To %action the mime settings anyway, click \"Do it\".	libtracker		Jos suoritat toiminnon %action mime-asetuksiin, Haiku ei ehkä toimi oikein! Oletko varma, että haluat tehdä tämän? Jos suoritat toiminnon %action mime-asetuksiin, napsauta \"Tee se\".
+Resize to Fit	libtracker		Muuta koko sopimaan
+Add printer…	libtracker		Lisää tulostin...
+Trash	libtracker		Roskakori
+greater than	libtracker		suurempi kuin
+Other	libtracker		Muu
+GiB	libtracker		GiB
+Query name:	libtracker		Kyselynimi:
+Or	libtracker		Tai
+An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	libtracker		Kohde \"%name\" on jo olemassa kansiossa, ja saattaa sisältää\nalkioita, joilla on sama nimi. Haluaisitko korvata ne niillä, jotka sisältyvät kansioon, jota %verb?
+Do it	libtracker		Tee se
+There was an error writing the attribute.	libtracker		Virhe kirjoitettaessa attribuuttia.
+Emptying Trash… 	libtracker		Tyhjennetään roskakoria...
+Close all in workspace	libtracker		Sulje kaikissa työtiloissa
+Sorry, you cannot edit that attribute.	libtracker		Valitettavasti et voi muokata tätä attribuuttia.
+Deleting: 	libtracker		Poistetaan:
+The file \"%name\" already exists in the specified folder. Do you want to replace it?	libtracker		Tiedosto \"%name\" on jo olemassa määritellyssä kansiossa. Haluatko korvata sen?
+Revert	libtracker		Palauta
+Could not open \"%document\" with application \"%app\" (%error). 	libtracker		Ei voitu avata asiakirjaa \"%document\" sovelluksella \"%app\" (%error).
+no supporting apps	libtracker		ei tuettuja sovelluksia
+\nShould this be fixed?	libtracker		\nPitäisikö täm korjata?
+The specified name is already used as the name of a folder. Please choose another name.	libtracker		Määritelty nimi on jo käytössä kansionimenä. Valitse toinen nimi.
+Version	libtracker		Versio
+Invert	libtracker		Käännä
+by attribute	libtracker		: attribuutti
+There was a problem trying to save in the folder you specified. Please try another one.	libtracker		Pulma yritettäessä tallentaa määrittelemässäsi kansiossa. Yritä toista kansiota.
+Create relative link	libtracker		Luo suhteellinen linkki
+Attributes	libtracker		Attribuutit
+Mount server error	libtracker		Liittämispalvelinvirhe
+Sorry, there is not enough free space on the destination volume to copy the selection.	libtracker		Valitettavasti kohdetaltiolla ei ole riittävästi tilaa valinnan kopioimiseksi.
+Replace all	libtracker		Korvaa kaikki
+Owner	libtracker		Omistaja
+12 hour	libtracker		12 tuntia
+Select all	libtracker		Valitse kaikki
+Delete	libtracker		Poista
+Save as Query template:	libtracker		Tallenna Kysely-mallinne:
+Only the boot disk	libtracker		Vain alkukäynnistyslevy
+Set new link target	libtracker		Aseta uusi linkkikohde
+ends with	libtracker		loppuu kohteeseen
+If you %action the config folder, Haiku may not behave properly! Are you sure you want to do this? To %action the config folder anyway, click \"Do it\".	libtracker		Jos suoritat toiminnon %action config-kansiossa, Haiku ei ehkä toimi oikein! Oletko varma, että haluat tehdä tämän? Jos kuitenkin haluat suorittaa toiminnon %action config-kansiossa, napsauta \"Tee se\".
+Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	libtracker		Virhe kopioitaessa kansiota \"%name\":\n\t%error\n\nHaluaisitko jatkaa?
+OK	libtracker		Valmis
+Make active printer	libtracker		Valitse aktiivinen tulostin
+New	libtracker		Uusi
+Paused: click to resume or stop	libtracker		Tauotettu: napsauta jatka tai pysäytä
+Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	libtracker		Ei voitu avata asiakirjaa \"%document\" sovelluksella \"%app\" (Puuttuvat kirjastot: %library).\n
+MiB	libtracker		MiB
+Disk mount settings	libtracker		Levynliittämisasetukset
+Include trash	libtracker		Sisällytä roskakori
+Could not find an application to open \"%name\" (%error). 	libtracker		Ei kyetty löytämään avattava sovellusta \"%name\” (%error).
+(Finish: %time - Over %finishtime days left)	libtracker		(Valmistuminen: %time - %finishtime päivää jäljellä)
+Could not open \"%document\" (Missing libraries: %library). \n	libtracker		Ei voitu avata asiakirjaa \"%document\" (Puuttuvat kirjastot: %library).\n
+Preparing to restore items…	libtracker		Valmistaudutaan palauttamaan kohteita...
+You can't replace a folder with one of its sub-folders.	libtracker		Et voi korvata kansiota yhdellä sen alikansiosta.
+Mount all disks now	libtracker		Liitä nyt kaikki levyt
+Temporary	libtracker		Tilapäinen
+If you %action the home folder, Haiku may not behave properly! Are you sure you want to do this? To %action the home anyway, click \"Do it\".	libtracker		Jos suoritat toiminnon %action kotihakemistossa, Haiku saattaa käyttäytyä odottamattomasti! Oletko varma, että haluat tehdä tämän? Jos kuitenkin haluat suorittaa toiminnon %action, napsauta \"Tee se\".
+40 x 40	libtracker		40 x 40
+Previously mounted disks	libtracker		Aiemmin liitetyt levyt
+Create link here	libtracker		Luo linkki tänne
+Unmount	libtracker		Pura liittäminen
+That name is already taken. Please type another one.	libtracker		Nimi on jo varattu. Kirjoita toinen nimi.
+Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	libtracker		Ei voitu avata asiakirjaa \"%document\" sovelluksella \"%app\" (Puuttuva symboli: %symbol).\n
+less than	libtracker		vähemmän kuin
+Edit query	libtracker		Muokka kyselyä
+Original name	libtracker		Alkuperäinen nimi
+Preparing to delete items…	libtracker		Valmistaudutaan poistamaan kohteita...
+Created:	libtracker		Luotu:
+Location:	libtracker		Sijainti:
+New Query	libtracker		Uusi kysely
+Write	libtracker		Kirjoita
+Sorry, you can't copy items to the Trash.	libtracker		Valitettavasti eti voi kopioida kohteita roskakoriin.
+Mini icon view	libtracker		Minikuvakenäkymä
+Windows	libtracker		Ikkunat
+Ask before delete	libtracker		Kysy ennen poistamista
+matches regular expression	libtracker		täsmää säännölliseen lausekkeeseen
+Open and make preferred	libtracker		Avaa ja tee etusijainen
+Default application	libtracker		Oletussovellus
+Execute	libtracker		Suorita
+Created	libtracker		Luotu
+calculating…	libtracker		lasketaan...
+label too long	libtracker		nimiö on liian pitkä
+Link \"%name\" to:	libtracker	File dialog title for new sym link	Linkki \"%name\" kohteeseen:
+Query template	libtracker		Kyselymallinne
+Description:	libtracker		Kuvaus:
+You cannot replace a file with a folder or a symbolic link.	libtracker		Et voi korvata tiedostoa kansiolla tai symbolisella linkillä.
+Save	libtracker		Tallenna
+Month-day-year	libtracker		Kuukausi-päivä-vuosi
+link	libtracker	filename link	linkki
+Open	libtracker		Avaa
+Edit name	libtracker		Muokkaa nimeä
+Show folder location in title tab	libtracker		Näytä kansiosijainti otsikkovälilehdessä
+contains	libtracker		sisältää
+Formula %formula	libtracker	FindResultTitle	Kaava %formula
+You cannot put the Trash, home or Desktop directory into the trash.	libtracker		Et voi laittaa roskakoria, kotihakemistoa tai työpöytähakemistoa roskakoriin.
+Date & Time	libtracker		Päivämäärä & Aika
+Modified:	libtracker		Muokattu:
+Skip	libtracker		Ohita
+Examples:	libtracker		Esimerkit:
+24 hour	libtracker		24 tuntia
+Preparing to create links…	libtracker		Valmistaudutaan luomaan linkkejä...
+Error emptying Trash!	libtracker		Virhe tyhjennettäessä roskakoria!
+There was an error resolving the link.	libtracker		Virhe ratkaistaessa linkkiä.
+Move	libtracker		Siirrä
+You can't move a folder into itself or any of its own sub-folders.	libtracker		Et voi siirtää kansiota itseensä tai mihinkään sen alikansioon.
+Error %error loading Add-On %name.	libtracker		Virhe %error ladattaessa Lisäosaa %name
+Edit Query template	libtracker		Muokkaa Kyselymallinnetta
+Show shared volumes on Desktop	libtracker		Näytä jaetut taltiot työpöydällä
+Ignore case	libtracker		Ohita kirjainkoko
+Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	libtracker		Jotkut kohteet ovat jo tässä kansiossa samalla nimellä kuin kohteet, joita %verb.\n\nHaluaisitko korvata ne sellaisilla, jotka %verb tai kehotteella jokaisen kohdalla?
+Open parent	libtracker		Avaa ylätaso
+None	libtracker		Ei mitään
+You can't move or copy the trash.	libtracker		Et voi siirtää tai kopioida roskakoria.
+Create relative link here	libtracker		Luo suhteellinen linkki tänne
+moving	libtracker		siirretään
+Version:	libtracker		Versio:
+Capacity:	libtracker		Kapasiteetti:
+You cannot create a link to the root directory.	libtracker		Et voi luoda linkkiä root-hakemistoon.
+Are you sure you want to move or copy the selected item(s) to this folder?	libtracker		Oletko varma, että haluat siirtää tai kopioida valitut kohteet tähän kansioon?
+You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	libtracker		Yrität korvata kohteen:\n\t%name%dest\nkohteella:\n\t%name%src\n\nHaluaisitko korvata sen yhdellä olet %movemode?
+Move here	libtracker		Siirrä tänne
+Free space color	libtracker		Vapaatilaväri
+Read	libtracker		Luettu
+after	libtracker		jälkeen
+Size	libtracker		Koko
+Search	libtracker		Etsintä
+Recalculate folder size	libtracker		Laske kansion koko uudelleen
+Favorites	libtracker		Suosikit
+List view	libtracker		Luettelonäkymä
+Enable type-ahead filtering	libtracker		Ota käyttöön type-ahead-suodatus
+Show Disks icon	libtracker		Näytä levykuvake
+Edit templates…	libtracker		Muokkaa mallinteita...
+Add	libtracker		Lisää
+Disk mounting during boot	libtracker		Levynliittäminen alkulatauksen aikana
+Date order	libtracker		Päivämääräjärjestys
+Restoring: 	libtracker		Palautetaan:
+Settings…	libtracker		Asetukset...
+Sorry, could not create a new folder.	libtracker		Valitettavasti ei voida luoda uutta kansiota.
+Current folder	libtracker		Nykyinen kansio
+New folder %ld	libtracker		Uusi kansio %ld
+Cannot unmount the boot volume \"%name\".	libtracker		Ei voida poistaa alkulataustaltion \"%name\" liittämistä.
+48 x 48	libtracker		48 x 48
+Copy here	libtracker		Kopioi tänne
+%Ld bytes	libtracker		%Ld tavua
+Used space color	libtracker		Käytetyt tilavärit
+Location	libtracker		Sijainti
+Error moving \"%name\".	libtracker		Virhe siirrettäessä kohdetta \"%name\"
+Show volumes on Desktop	libtracker		Näytä taltiot työpöydällä
+Name = %name	libtracker	FindResultTitle	Nimi = %name
+matches wildcard expression	libtracker		täsmää jokerimerkkilausekkeeseen
+Window	libtracker		Ikkuna
+There was a problem trying to replace \"%name\". The item might be open or busy.	libtracker		Pulma yritettäessä korvata kohdetta \"%name\". Kohde voi olla avoin tai varattu.
+Proceed	libtracker		Edetään
+New folder%ld	libtracker		Uusi kansio%ld
+Year-month-day	libtracker		Vuosi-kuukausi-päivä
+New folder	libtracker		Uusi kansio
+File	libtracker		Tiedosto
+Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	libtracker		Virhe kopioitaessa tiedostoa \"%name\":\n\t%error\n\nHaluatko jatkaa?
+Close all	libtracker		Sulje kaikki
+(Finish: %time)	libtracker		(Valmistuminen: %time)
+Clock	libtracker		Kello
+Show navigator	libtracker		Näytä navigaattori
+Force identify	libtracker		Pakota tunnistamaan
+Mount settings…	libtracker		Liittämisasetukset...
+is not	libtracker		ei ole
+Clean up all	libtracker		Tyhjennä kaikki
+List folders first	libtracker		Luettele kansiot ensin
+Remove	libtracker		Poista
+All BeOS disks	libtracker		Kaikki BeOS-levyt
+no items	libtracker		ei kohteita
+copying	libtracker		kopioidaan
+Preferences…	libtracker		Asetukset...
+All disks	libtracker		Kaikki levyt
+Searching for disks to mount…	libtracker		Etsitään levyjä liitettäväksi...
+Tracker status	libtracker		Jäljittäjätila
+Identify	libtracker		Tunnista
+Automatic disk mounting	libtracker		Automaattinen levyliittäminen
+Add-ons	libtracker		Lisäosat
+The mount server could not be  contacted.	libtracker		Liittämispalvelimeen ei saatu yhteyttä.
+Select…	libtracker		Valitse...
+multiple disks	libtracker		useita levyjä
+Could not open \"%name\". The file is mistakenly marked as executable. 	libtracker		Ei voitu avata kohdetta \"%name\". Tiedosto on erehdyksessä merkitty suoritettavaksi.
+Single window navigation	libtracker		Yksittäisikkunanavigointi
+Done	libtracker		Valmis
+Open selection with:	libtracker		Avaa valinta attribuutilla:
+Paste	libtracker		Liitä
+32 x 32	libtracker		32 x 32
+Get info	libtracker		Hae tiedot
+Create %s clipping	libtracker		Luo %s leikkaus
+You must drop items on one of the disk icons in the \"Disks\" window.	libtracker		Sinun on pudotettava alkiot yhdelle \"Levvt\"-ikkunan kuvakkeille.
+Move to	libtracker		Siirrä kohteeseen
+by name	libtracker		/ nimi
+Warning space color	libtracker		Varoitustilaväri
+Add current folder	libtracker		Lisää nykyinen kansio
+Replace other file	libtracker		Korvaa toinen tiedosto
+%Ld B	libtracker		%Ld tavua
+Tracker preferences	libtracker		Jäljittäjäasetukset
+Prompt	libtracker		Kehote
+Kind	libtracker		Tyyppi
+Move to Trash	libtracker		Siirrä roskakoriin
+1 item	libtracker		1 kohde
+Size:	libtracker		Koko:
+Would you like to find some other suitable application?	libtracker		Haluatko löytää jonkun toisen sopivan sovelluksen?
+Files cannot be moved or deleted from a read-only volume.	libtracker		Tiedostoja ei voida siirtää tai poistaa kirjoitussuojatusta taltiosta.
+by formula	libtracker		/ kaavio
+(%bytes bytes)	libtracker		(%bytes tavua)
+Copy to	libtracker		Kopioi kohteeseen
+And	libtracker		Ja
+Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	libtracker		Jotkut valituista kohteista ei voida siirtää roskakoriin. Haluaisitko sen sijaan poistaa ne? (Tätä toimintoa ei voida perua.)
+Eject when unmounting	libtracker		Poista levyasemasta purettaessa liittämistä
+Error creating link to \"%name\".	libtracker		Virhe luotaessa linkkiä kohteeseen \"%name\".
+copy	libtracker	filename copy	kopioi
+Icon view	libtracker		Kuvakenäkymä
+Sorry, you can't create links in the Trash.	libtracker		Valitettavasti roskakoriin ei voi luoda linkkejä.
+Edit favorites…	libtracker		Muokkaa suosikkeja...
+If you %action the settings folder, Haiku may not behave properly! Are you sure you want to do this? To %action the settings folder anyway, click \"Do it\".	libtracker		Jos suoritat toiminnon %action asetuskansioon, Haiku saattaa käyttäytyä odottamattomasti! Oletko varma, että haluat tehdä tämän. Jos kuitenkin haluat suorittaa toiminnon %action asetuskansioon, napsauta painiketta \"Tee se\".
+On	libtracker		Päällä
+Space	libtracker		Tila
+Find	libtracker		Etsi
+Error moving \"%name\"	libtracker		Virhe siirrettäessä kohdetta \"%name\"
+(Finish: %time - %finishtime seconds left)	libtracker		(Valmistuminen: %time - %finishtime sekuntia jäljellä)
+That name is too long. Please type another one.	libtracker		Tämä nimi on liian pitkä. Kirjoita toinen nimi.
+Select	libtracker		Valitse
+Error moving \"%name\" to Trash. (%error)	libtracker		Virhe siirrettäessä kohdetta \"%name\" roskakoriin. (%error)
+Outline selection rectangle only	libtracker		Ääriviivavalintana on vain nelikulmio
+The specified name is illegal. Please choose another name.	libtracker		Määritetty nimi on virheellinen. Valitse toinen nimi.
+of %items	libtracker		/ %items
+Day-month-year	libtracker		Päivä-kuukausi-vuosi
+Preparing to empty Trash…	libtracker		Valmistaudutaan tyhjentämään roskakori...
+If you %action the system folder or its contents, you won't be able to boot Haiku! Are you sure you want to do this? To %action the system folder or its contents anyway, hold down the Shift key and click \"Do it\".	libtracker		Jos suoritat toimen %action järjestelmäkansioon tai sen sisältöön, ei kykene alkukäynnistämään Haikua! Oletko varma, että haluat tehdä tämän? Jos kaikesta huolimatta haluat suorittaa toiminnon %action järjestelmäkansiolle tai sen sisällölle, pidä Vaihto-näppäin alhaalla ja napsauta painiketa \"Tee se\".
+Kind:	libtracker		Tyyppi:
+Replace	libtracker		Korvaa
+Show space bars on volumes	libtracker		Näytä tilapalkit taltioissa
+Permissions	libtracker		Käyttöoikeudet
+An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	libtracker		Kohde nimeltä \"%name\" on jo olemassa tässä kansiossa. Haluatko korvata sen symbolisella linkillä, jota olet luomassa?
+64 x 64	libtracker		64 x 64
+You can't move or copy items to read-only volumes.	libtracker		Et voi siirtää tai kopioida kohteita kirjoitussuojattuun taltioon.
+You must have at least one attribute showing.	libtracker		Sinulla on oltava vähintään yksi attribuutti näytettäväksi.
+Copy layout	libtracker		Kopioi asettelu
+Empty folder	libtracker		Tyhjennä kansio
+All files and folders	libtracker		Kaikki tiedostot ja kansiot
+Restore	libtracker		Palauta
+The Tracker must be running to see set the default printer.	libtracker		Jäljittäjän on oltava käynnissä, jotta oletustulostin näkyy.
+Save Query as template…	libtracker		Tallenna Kysely mallinteena...
+KiB	libtracker		KiB
+Mount	libtracker		Liitä
+Creating links: 	libtracker		Luotiin linkkejä:
+<No recent items>	libtracker		<ei äskettäisiä kohteita>
+Copy	libtracker		Kopioi
+Could not open \"%document\" because application \"%app\" is in the Trash. 	libtracker		Ei voitu avata asiakirjaa \"%document\" koska sovellus \"%app\" on roskakorissa.
+Defaults	libtracker		Oletukset
+%capacity (%used used -- %free free)	libtracker		%capacity (%used käytetty -- %free vapaa)

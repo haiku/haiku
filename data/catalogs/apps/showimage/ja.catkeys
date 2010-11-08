@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-ShowImage	249555060
+1	japanese	x-vnd.Haiku-ShowImage	2071534767
 Use as background…	Menus		デスクトップの背景にする…
 5 seconds	Menus		５秒
 Slide delay	Menus		スライド間隔
@@ -60,3 +60,18 @@ Job setup	PrintOptionsWindow		ジョブ設定
 Original size	Menus		原寸に戻す
 Next page	Menus		次のページ
 Shrink to window	Menus		ウィンドウサイズに縮小
+OK	SaveToFile		Ok
+The file '%s' could not be written.	SaveToFile		画像ファイル「%s」を保存できませんでした。
+Progress monitor	ProgressWindow		進捗状況モニター
+Paste	Menus		貼り付け
+File	Menus		ファイル
+Page setup…	Menus		ページ設定…
+Print…	Menus		印刷…
+Quit	Menus		終了
+Clear	Menus		クリアー
+Edit	Menus		編集
+Close	Menus		閉じる
+Copy	Menus		コピー
+Cut	Menus		切り取り
+Select all	Menus		すべて選択
+Save as…	Menus		ファイル形式を選んで保存…

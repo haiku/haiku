@@ -1,8 +1,8 @@
-1	Japanese	x-vnd.Haiku-Fonts	1393111467
+1	japanese	x-vnd.Haiku-Fonts	1393111467
 Plain font:	Font view		標準フォント：
 Defaults	Main window		デフォルト
 Fonts	Main window		フォント
-Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		フォント\n\tCopyright 2004-2005, Haiku.\n\n
+Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		フォント\n\tCopyright 2004 - 2005, Haiku.\n\n
 Revert	Main window		元に戻す
 Size:	Font Selection view		サイズ：
 Menu font:	Font view		メニューフォント：

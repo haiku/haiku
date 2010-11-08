@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku.CodyCam	3253268296
+1	french	x-vnd.Haiku.CodyCam	2594096346
 Capturing Image…	VideoConsumer.cpp		Capture d'une image…
 Every 30 seconds	CodyCam		Toutes les 30 secondes
 File name:	CodyCam		Nom du fichier :
@@ -71,20 +71,29 @@ read: %d\n	SftpClient		lire : %d\n
 OK	CodyCam		OK
 Capture controls	CodyCam		Contrôles de capture
 Every hour	CodyCam		Toutes les heures
+Cannot connect the video source to the video window	CodyCam		Impossible de connecter la source vidéo à la fenêtre vidéo
 capture rate expected	CodyCam		Taux de capture attendu
+Error getting initial latency for the capture node	CodyCam		Erreur de récupération de la latence initiale du nœud de capture
 Send to…	CodyCam		Envoyer à...
 on or off expected	Settings	Do not translate 'on' and 'off'	on ou off attendu
 Quit	CodyCam		Quitter
+cmd: '%s'\n	FtpClient		commande : '%s'\n
 Never	CodyCam		Jamais
 CodyCam	CodyCam		CodyCam
 Cannot create a video window	CodyCam		Impossible de créer une fenêtre vidéo
 Every 10 minutes	CodyCam		Toutes les 10 minutes
+Cannot start the video source	CodyCam		Impossible d'initier la source vidéo
+Cannot start the video window	CodyCam		Impossible d'initier la fenêtre vidéo
 password expected	CodyCam		Mot de passe attendu
+reply: %d, %d\n	FtpClient		Réponse : %d, %d\n
+Cannot find the media roster	CodyCam		Impossible de trouver le diagramme des médias
 Every 4 hours	CodyCam		Toutes les 4 heures
 FTP	CodyCam		FTP
 File transmission failed	VideoConsumer.cpp		Erreur dans la transmission du fichier 
+Cannot seek time source!	CodyCam		Impossible de se déplacer dans la référence de temps
 File	CodyCam		Fichier
 Image Format Menu	CodyCam		Menu de formats d'images
 Every 30 minutes	CodyCam		Toutes les 30 minutes
 FTP Setup	CodyCam		Réglages FTP
 reply: '%s'\n	SftpClient		Réponse : '%s'\n
+Start video	CodyCam		Démarrer la vidéo

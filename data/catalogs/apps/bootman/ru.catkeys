@@ -15,8 +15,8 @@ Install boot menu	EntryPage	Title	Установить загрузочное м
 Choose this option to install a boot menu, allowing you to select which operating system to boot when you turn on your computer.	EntryPage		Выберите эту опцию для установки загрузочного меню, которое позволит выбрать операционную систему при включении компьютера.
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		Пожалуйста, выберите файл, содержащий загрузочную запись (MBR) для восстановления. Этот файл был создан при первой установке менеджера загрузки.
 Unnamed %d	LegacyBootDrive	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Unnamed %d
-The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager needs 2 KB available space before the first partition.	BootManagerController		Таблица разделов первого жесткого диска несовместима с менеджером загрузки.\nМенеджеру загрузки требуется 2 Кбайт свободного места перед первым разделом.
-Partition table not compatible	BootManagerController	Title	Несовместимая таблица разделов
+The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager needs 2 KB available space before the first partition.	BootManagerController		Таблица разделов первого жесткого диска несовместима с менеджером загрузки.\nМенеджеру загрузки требуется 2 Кб свободного места перед первым разделом.
+Partition table not compatible	BootManagerController	Title	Не совместимая таблица разделов 
 The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Были обнаружены следующие разделы. Пожалуйста, отметьте разделы, которые должны отображаться в загрузочном меню. Вы также можете присвоить имена разделам, которые будут отображаться в этом меню.
 The Master Boot Record of the boot device (%s) has been successfully restored from %s.	BootManagerController		Загрузочная запись (MBR) устройства (%s) была успешна восстановлена из %s.
 Select	FileSelectionPage	Button	Выбрать
@@ -26,7 +26,7 @@ Previous	WizardView	Button	Назад
 Choose this option to remove the boot menu previously installed by this program.\n	EntryPage		Выберите эту опцию для удаления загрузочного меню ранее установленного этой программой.\n
 Summary	BootManagerController	Title	Итог
 Installation of boot menu failed	BootManagerController	Title	Не удалось установить загрузочное меню
-The Master Boot Record could not be restored!	BootManagerController		Невозможно восстановить загрузочную запись (MBR)!
+The Master Boot Record could not be restored!	BootManagerController		Невозможно восстановаить загрузочную запись (MBR)!
 Partitions	PartitionsPage	Title	Разделы
 Done	BootManagerController	Button	Готово
 Partitions	DefaultPartitionPage	Pop up menu title	Разделы
@@ -41,15 +41,15 @@ Boot Manager	BootManagerWindow	Window Title	Менеджер загрузки
 Old Master Boot Record Saved failure	BootManagerController	Title	Старая главная загрузочная запись (MBR) сохранена неудачно
 Boot Manager is unable to read the partition table!	BootManagerController		Менеджеру загрузки не удалось прочитать таблицу разделов!
 Default Partition:	DefaultPartitionPage	Menu field label	Раздел по умолчанию:
-OK	BootManager		ОК
+OK	BootManager		Ok
 Unknown	LegacyBootDrive	Text is shown for an unknown partition type	Неизвестный
 Default Partition	DefaultPartitionPage	Title	Раздел по умолчанию
 Error reading partition table	BootManagerController	Title	Ошибка чтения таблицы разделов
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Все готово для записи загрузочного меню на диск. Вы уверены, что хотите продолжить?
-OK	BootManagerController	Button	ОК
+OK	BootManagerController	Button	Oк
 Backup Master Boot Record	BootManagerController	Title	Сохранить главную загрузочную запись (MBR)
-Haiku Boot Manager	BootManager	About text title	Haiku Boot Manager
-written by	BootManager		разработал
+Haiku Boot Manager	BootManager	About text title	Менеджер загрузки Haiku
+written by	BootManager		написан
 Copyright %year, Haiku Inc.\n	BootManager	Leave %year untranslated	Copyright %year, Haiku Inc.\n
 After two seconds	DefaultPartitionPage		2 секунды
 Timeout: %s	DefaultPartitionPage		Время ожидания: %s

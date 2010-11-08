@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-StyledEdit	154881138
+1	japanese	x-vnd.Haiku-StyledEdit	1187976595
 OK	LoadAlert		Ok
 ???	LoadAlert		???
 Left	Menus		左揃え
@@ -58,3 +58,15 @@ Cancel	SaveAlert		中止
 Save	SaveAlert		保存
 Don't save	SaveAlert		保存しない
 This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		このファイルは読み取り専用です。変更を\"%s\"ドキュメントに保存しますか？
+Paste	Menus		貼り付け
+File	Menus		ファイル
+Page setup…	Menus		ページ設定…
+Print…	Menus		印刷…
+Quit	Menus		終了
+Clear	Menus		クリアー
+Edit	Menus		編集
+Close	Menus		閉じる
+Copy	Menus		コピー
+Cut	Menus		切り取り
+Select all	Menus		全文選択
+Save as…	Menus		名前をつけて保存…

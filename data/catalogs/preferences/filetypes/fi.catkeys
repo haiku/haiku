@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-FileTypes	3175892074
+1	finnish	x-vnd.Haiku-FileTypes	1959260346
 Args only	Application Type Window		Vain argumentit
 Add group	New File Type Window		Lisää ryhmä
 Remove	Application Type Window		Poista
@@ -127,3 +127,7 @@ Select preferred application	FileTypes Window		Valitse ensisijainen sovellus
 FileTypes request	FileTypes Window		Tiedostotyyppien pyyntö
 (from super type)	FileTypes Window		(kantatyypistä)
 Preferred application	FileTypes Window		Ensisijainen sovellus
+Attribute	Attribute Window		Attribuutti
+Group name:	New File Type Window		Ryhmänimi:
+Display as:	Attribute Window	Tracker offers different display modes for attributes.	Näytetään tilassa:
+Right	Attribute Window	Attribute column alignment in Tracker	Oikealle

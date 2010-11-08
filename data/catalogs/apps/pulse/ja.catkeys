@@ -1,0 +1,45 @@
+1	japanese	x-vnd.Haiku-Pulse	2756001860
+OK	PrefsWindow		Ok
+Quit	DeskbarPulseView		終了
+Pulse	PulseWindow		Pulse
+Mini mode	DeskbarPulseView		ミニモード
+Remove replicant	CPUButton		レプリカントを 外す
+Active color	ConfigView		アクティブ色
+Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Usage: [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
+Fade colors	ConfigView		フェード色
+OK	DeskbarPulseView		Ok
+Deskbar mode	PrefsWindow		Deskbar モード
+Normal mode	PrefsWindow		ウィンドウモード
+Defaults	PrefsWindow		デフォルト
+Normal mode	MiniPulseView		ウィンドウモード
+Deskbar	CPUButton		Deskbar
+Frame color	ConfigView		フレーム色
+Mini mode	PrefsWindow		ミニモード
+OK	PulseApp		Ok
+Bar colors	ConfigView		配色
+Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	CPUButton		Pulse\n\nDavid Ramsey および Arve Hjønnevåg 作\nDaniel Switkin による更新
+Settings…	PulseView		設定…
+You can't disable the last active CPU.	PulseView		最後の CPU は無効にできません。
+Info	CPUButton		情報
+OK	PulseView		Ok
+Remove(): %s	DeskbarPulseView		Remove(): %s
+Deskbar menu	CPUButton		Deskbar メニュー
+About Pulse…	PulseView		Pulse について…
+Deskbar mode	MiniPulseView		Deskbar モード
+Quit	MiniPulseView		終了
+Pulse	NormalPulseView		Pulse
+Deskbar mode	NormalPulseView		Deskbar モード
+Width of icon:	ConfigView		アイコンの幅
+Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	PulseWindow		Pulse\n\nDavid Ramsey および Arve Hjønnevåg 作\nDaniel Switkin による更新
+You can't disable the last active CPU.	CPUButton		最後の CPU は無効にできません。
+Normal mode	DeskbarPulseView		ウィンドウモード
+OK	CPUButton		Ok
+About Pulse…	CPUButton		Pulse について…
+Mini mode	NormalPulseView		ミニモード
+Info	DeskbarPulseView		情報
+Pulse settings	PulseWindow		Pulse の設定
+Idle color	ConfigView		アイドル色
+Info	PulseWindow		情報
+Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	DeskbarPulseView		Pulse\n\nDavid Ramsey および Arve Hjønnevåg 作\nDaniel Switkin による更新
+OK	PulseWindow		Ok
+CPU progress bar	NormalPulseView		CPU プログレスバー

@@ -1,0 +1,49 @@
+1	simplified_chinese	x-vnd.Haiku-Locale	634081185
+Day in month (2 digits)	TimeFormatSettings		每月天数 （两位数）
+Available languages	Locale Preflet Window		可选语言
+Day of week (name)	TimeFormatSettings		每周天数（名称）
+Separator:	TimeFormatSettings		分隔符：
+Year (4 digits)	TimeFormatSettings		年(四位数)
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		没有可用语言！ 你无法使用！
+Thousand separator: 	TimeFormatSettings		千位数分隔符：
+After	TimeFormatSettings		之后
+Month name	TimeFormatSettings		月份
+Long format:	TimeFormatSettings		长格式：
+Currency	TimeFormatSettings		通用
+Before	TimeFormatSettings		之前
+Year	TimeFormatSettings		年
+Day of week in month	TimeFormatSettings		星期
+Short format:	TimeFormatSettings		短格式：
+Currency symbol:	TimeFormatSettings		通用符号：
+Space	TimeFormatSettings		时区
+Language	Locale Preflet Window		语言
+Month number	TimeFormatSettings		月份
+Year (2 digits)	TimeFormatSettings		年(两位数)
+Preferred languages	Locale Preflet Window		偏好语言
+Decimal separator: 	TimeFormatSettings		小数分隔符：
+Symbol position	TimeFormatSettings		符号位置
+Day of week (short name)	TimeFormatSettings		每周天数(简称)
+Numbers	TimeFormatSettings		数字
+24 hour	TimeFormatSettings		二十四小时
+(unknown format)	TimeFormatSettings		（未知格式）
+Negative marker:	TimeFormatSettings		负号：
+Day in month	TimeFormatSettings		日期
+Defaults	Locale Preflet Window		默认
+Separator	TimeFormatSettings		分隔符
+Country	Locale Preflet Window		国家
+Month number (2 digits)	TimeFormatSettings		月份(两位数)
+Revert	Locale Preflet Window		取消
+Negative marker	TimeFormatSettings		负号
+OK	Locale Preflet Window		确定
+Day of week	TimeFormatSettings		星期
+List separator: 	TimeFormatSettings		列表分隔符：
+Time	TimeFormatSettings		时间
+Date	TimeFormatSettings		日期
+12 hour	TimeFormatSettings		十二小时
+Locale	Locale Preflet		本地化
+None	TimeFormatSettings		无
+Example:	TimeFormatSettings		例如：
+Day	TimeFormatSettings		天
+Leading 0	TimeFormatSettings		归零
+Month	TimeFormatSettings		月份
+already chosen	LanguageListView		已经选择

@@ -1,8 +1,9 @@
-1	french	x-vnd.Haiku-Shortcuts	272089737
+1	french	x-vnd.Haiku-Shortcuts	2748280357
 OK	ShortcutsWindow		OK
 Cancel	ShortcutsWindow		Annuler
 Control	ShortcutsSpec	Name for modifier on keyboard	Contrôle
 Key	ShortcutsWindow		Touche
+Shortcuts\n\nBased on SpicyKeys for BeOS made by Jeremy Friesner.	ShortcutsApp		Raccourcis\n\nBasé sur SpicyKeys pour BeOS, écrit par Jeremy Friesner.
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 Shortcuts	ShortcutsWindow		Raccourcis
 Window	ShortcutsSpec	Name for modifier on keyboard	Fenêtre

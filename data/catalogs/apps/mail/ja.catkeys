@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Be-MAIL	3954244478
+1	japanese	x-vnd.Be-MAIL	694686022
 %d - Date	Mail		%d - 日付
 Attach attributes:	Mail		属性の添付：
 Inconsistency occurred in the undo/redo buffer.	Mail		Undo/Redo バッファに不一致が発生しました。
@@ -137,3 +137,7 @@ Select all	Mail		全て選択
 An error occurred trying to save this signature.	Mail		署名を保存しようとした時にエラーが発生しました。
 View	Mail		表示
 Mail couldn't find its dictionary.	Mail		スペルチェック用辞書データが見つかりません。
+Mail\n\n	Mail		Mail\n\n
+Written by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Robert Polic 作\nDr. Zoidberg チームによる機能強化\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n
+Text wrapping:	Mail		文字列の折り返し：
+File	Mail		ファイル

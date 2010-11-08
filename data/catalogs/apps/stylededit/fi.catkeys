@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-StyledEdit	154881138
+1	finnish	x-vnd.Haiku-StyledEdit	1187976595
 OK	LoadAlert		Valmis
 ???	LoadAlert		???
 Left	Menus		Vasen
@@ -58,3 +58,15 @@ Cancel	SaveAlert		Peru
 Save	SaveAlert		Tallenna
 Don't save	SaveAlert		Älä tallenna
 This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Tämä tiedosto on merkitty kirjoitussuojatuksi. Tallennetaanko muutokset asiakirjaan \"%s\"? 
+Paste	Menus		Liitä
+File	Menus		Tiedosto
+Page setup…	Menus		Sivuasetus...
+Print…	Menus		Tulosta...
+Quit	Menus		Poistu
+Clear	Menus		Tyhjennä
+Edit	Menus		Muokkaa
+Close	Menus		Sulje
+Copy	Menus		Kopioi
+Cut	Menus		Leikkaa
+Select all	Menus		Valitse kaikki
+Save as…	Menus		Tallenna nimellä...

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-bootman	2993174226
+1	japanese	x-vnd.Haiku-bootman	681536107
 The boot manager has been successfully installed on your system.	BootManagerController		ブートマネージャーがシステムにインストールされました。
 At least one partition must be selected!	BootManagerController		少なくとも１つのパーティションが選択されていなければなりません。
 The old Master Boot Record could not be saved to %s	BootManagerController		古いマスターブートレコード (MBR) を %s に保存できませんでした。
@@ -61,3 +61,4 @@ After five seconds	DefaultPartitionPage		5秒
 Never	DefaultPartitionPage		永久
 Immediately	DefaultPartitionPage		すぐに
 After three seconds	DefaultPartitionPage		3秒
+The old Master Boot Record was successfully saved to %s.	BootManagerController		旧マスターブートレコードが %s に正常に保存されました。

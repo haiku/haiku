@@ -1,0 +1,30 @@
+1	finnish	x-vnd.Haiku.TV	3791845041
+TV	MainWin		TV
+Channel	MainWin		Kanava
+Settings…	MainWin		Asetukset
+Interface	MainWin		Käyttöliittymä
+Keep aspect ratio	MainWin		Säilytä kuvasuhde
+Previous channel	MainWin		Edellinen kanava
+Settings	MainWin		Asetukset
+About %1…	MainWin	Parameter %1 is the name of the application.	Ohjelmasta %1
+No border	MainWin		Ei rajoja
+Always on top	MainWin		Aina päällimmäisenä
+OK	MainWin		Valmis
+Quit	MainWin		Poistu
+Full screen	MainWin		Kokoruutunäyttö
+\nRevision 	MainWin		\nKorjausversio
+Debug	MainWin		Vianjäljitys
+Scale to native size	MainWin		Skaalaa kotoperäiseen kokoon
+unknown	MainWin		tuntematon
+Next channel	MainWin		Seuraava kanava
+Error, interface is busy:\n\n	MainWin		Virhe, käyttöliittymä on varattu:\n\n
+None	MainWin		Ei mitään
+force 704 x 576, display aspect 4:3	MainWin		pakota 704 x 576, näytön kuvasuhde 4:3
+DVB - Digital Video Broadcasting TV	MainWin		DVB - Digitaalinen videolähetystv
+force 544 x 576, display aspect 4:3	MainWin		pakota 544 x 576, näytön kuvasuhde 4:3
+pixel aspect ratio	MainWin		pikselin kuvasuhde
+No menu	MainWin		Ei valikkoa
+\nBuild 	MainWin		\nRakennettu
+Error, connecting to interface failed:\n\n	MainWin		Virhe, yhdistäminen käyttöliittymään epäonnistui:\n\n
+\nVersion 	MainWin		\nVersio
+force 720 x 576, display aspect 4:3	MainWin		pakota 730 x 576, näytön kuvasuhde 4:3

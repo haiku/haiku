@@ -1,0 +1,7 @@
+1	finnish	x-vnd.Haiku-cmd-dstconfig	2552303152
+Ask me later	dstcheck		Kysy minulta myöhemmin
+Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is	dstcheck		Huomio!\n\nKesäaikaan siirtymisen vuoksi tietokoneesi kello saattaa olla tunnin väärässä.\nTietokoneesi ajattelee, että kello on 
+No	dstcheck		Ei
+Yes	dstcheck		Kyllä
+Would you like to set the clock?	dstcheck		Haluaisitko asettaa kellon?
+.\n\nIs this the correct time?	dstcheck		.\n\nOnko tämä oikea aika?

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Installer	863906579
+1	japanese	x-vnd.Haiku-Installer	1949855347
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Haiku インストーラー\n\tJérôme Duval および Stephan Aßmus 作\n\tCopyright 2005-2010, Haiku.\n\n
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		インストールが完了し、ブートセクターが「%s」に書き込まれました。「終了」ボタンでインストーラーを終了するか、他に Haiku をインストールするボリュームを選択してください。
 Quit	InstallerWindow		終了
@@ -63,3 +63,16 @@ OK	InstallerWindow		Ok
 Cancel	InstallerWindow		中止
 Additional disk space required: 0.0 KiB	InstallerWindow		必要な追加ディスク容量： 0.0 KiB
 The mount point could not be retrieved.	InstallProgress		マウントポイントを取得できませんでした。
+Bootman, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Haiku ブートメニューを設定する「Bootman」が起動できません。
+Quit Boot Manager	InstallerWindow		Boot Manager の終了
+Quit Boot Manager and DriveSetup	InstallerWindow		Boot Manager と DriveSetup を終了
+Set up boot menu	InstallerWindow		ブートメニューの設定
+Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Haiku インストーラーを閉じる前に Boot Manager と DriveSetup を終了してください。
+Quit DriveSetup	InstallerWindow		DriveSetup の終了
+Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Boot Manager 実行中…\n\nインストールを続けるには、Boot Manager を閉じてください。
+Boot sector not written because of an internal error.	InstallProgress		内部エラーが発生したため、ブートセクターは更新されていません。
+Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Boot Manager と DriveSetup が実行中…\n\nインストールを続けるには、両アプリケーションを閉じてください。
+Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Boot Manager ウィンドウを閉じてから。Haiku インストーラーウィンドウを閉じてください。
+Tools	InstallerWindow		ツール
+Stop	InstallerWindow		中断
+???	InstallerWindow	Unknown currently copied item	???

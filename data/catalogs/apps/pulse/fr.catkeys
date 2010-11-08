@@ -1,22 +1,29 @@
-1	french	x-vnd.Haiku-Pulse	4173314575
+1	french	x-vnd.Haiku-Pulse	2756001860
 OK	PrefsWindow		OK
 Quit	DeskbarPulseView		Quitter
 Pulse	PulseWindow		Pulse
 Mini mode	DeskbarPulseView		Mode miniature
 Remove replicant	CPUButton		Enlever le réplicant
 Active color	ConfigView		Couleur active
+Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
+Fade colors	ConfigView		Dégradé de couleurs
 OK	DeskbarPulseView		OK
 Deskbar mode	PrefsWindow		Mode deskbar
 Normal mode	PrefsWindow		Mode normal
+Defaults	PrefsWindow		Par défauts
 Normal mode	MiniPulseView		Mode normal
 Deskbar	CPUButton		Deskbar
 Frame color	ConfigView		Couleur du cadre
 Mini mode	PrefsWindow		Mode miniature
 OK	PulseApp		OK
+Bar colors	ConfigView		Couleurs de la jauge
 Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	CPUButton		Pulse\n\nÉcrit par David Ramsey et Arve Hjønnevåg\nModifié par Daniel Switkin
 Settings…	PulseView		Réglages…
 You can't disable the last active CPU.	PulseView		Vous ne pouvez pas désactiver le dernier processeur actif.
+Info	CPUButton		Informations
 OK	PulseView		OK
+Remove(): %s	DeskbarPulseView		Retirer() : %s
+Deskbar menu	CPUButton		Menu Deskbar
 About Pulse…	PulseView		À propos de Pulse…
 Deskbar mode	MiniPulseView		Mode Deskbar
 Quit	MiniPulseView		Quitter
@@ -29,5 +36,10 @@ Normal mode	DeskbarPulseView		Mode normal
 OK	CPUButton		OK
 About Pulse…	CPUButton		À propos de Pulse…
 Mini mode	NormalPulseView		Mode miniature
+Info	DeskbarPulseView		Informations
+Pulse settings	PulseWindow		Réglages de Pulse
+Idle color	ConfigView		Couleur inactive
+Info	PulseWindow		Informations
 Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	DeskbarPulseView		Pulse\n\nPar David Ramsey et Arve Hjønnevåg\nModifié par Daniel Switkin
 OK	PulseWindow		OK
+CPU progress bar	NormalPulseView		Jauge d'activité CPU

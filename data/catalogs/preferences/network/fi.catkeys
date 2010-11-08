@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Network	3643490310
+1	finnish	x-vnd.Haiku-Network	3742287184
 Gateway:	EthernetSettingsView		Yhdyskäytävä:
 Netmask:	EthernetSettingsView		Verkkopeite:
 DHCP	EthernetSettingsView		DHCP
@@ -16,3 +16,4 @@ Auto-configuring failed: 	EthernetSettingsView		Automaattiasetus epäonnistui:
 Static	EthernetSettingsView		Staattinen
 OK	EthernetSettingsView		Valmis
 Domain:	EthernetSettingsView		Verkkoalue:
+Disabled	EthernetSettingsView		Ota pois käytöstä

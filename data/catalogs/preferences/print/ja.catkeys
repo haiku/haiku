@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Be-PRNT	634957092
+1	japanese	x-vnd.Be-PRNT	4088995571
 Waiting	JobListView		待機中
 page	JobListView		ページ
 Cancel	AddPrinterDialog		中止
@@ -25,3 +25,4 @@ Print jobs: No printer selected	PrintersWindow		印刷ジョブ：プリンタ�
 Unknown status	JobListView		状態が不明
 Connected to:	AddPrinterDialog		ポート：
 Printer type:	AddPrinterDialog		プリンタの種類：
+pending jobs.	PrinterListView		個のジョブが印刷待ちです。

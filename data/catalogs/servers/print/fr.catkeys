@@ -1,4 +1,4 @@
-1	french	x-vnd.Be-PSRV	2725801967
+1	french	x-vnd.Be-PSRV	548014807
 Undefined	ConfigWindow		Indéfini
 Cancel	PrintServerApp		Annuler
 Page setup:	ConfigWindow		Réglages de page :
@@ -21,11 +21,16 @@ Print setup	ConfigWindow		Réglages d'impression
 Would you like to make @ the default printer?	PrintServerApp		Voudriez-vous faire de @, l'imprimante par défaut ?
 Page setup	ConfigWindow		Réglages de la mise en page
 Paper setup:	ConfigWindow		Choix du papier :
+Page %1 to %2	ConfigWindow		Page %1 sur %2
+Page %1 to %2, %3 copies	ConfigWindow		Page %1 sur %2, %3 exemplaires
+Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Tabloïd
 A6	ConfigWindow	ISO 216 paper size	A6
 B5	ConfigWindow	ISO 216 paper size	B5
 A0	ConfigWindow	ISO 216 paper size	A0
+Letter	ConfigWindow	ANSI A (letter), a North American paper size	Lettre
 A2	ConfigWindow	ISO 216 paper size	A2
 A4	ConfigWindow	ISO 216 paper size	A4
 A1	ConfigWindow	ISO 216 paper size	A1
 A3	ConfigWindow	ISO 216 paper size	A3
 A5	ConfigWindow	ISO 216 paper size	A5
+Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Tabloïd

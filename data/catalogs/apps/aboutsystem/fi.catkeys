@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-About	3104596334
+1	finnish	x-vnd.Haiku-About	2583642733
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (ja hänen NewOS-ytimensä)\n
 %ld Processors:	AboutView		%ld suoritinta:
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (projektin perustaja)\n\n
@@ -31,3 +31,7 @@ Google & their Google Summer of Code program\n\n	AboutView		Google ja heidän Go
 The BeGeistert team\n	AboutView		BeGeistert-ryhmä\n
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku and the Haiku logo are trademarks of Haiku, Inc.\n\n	AboutView		Copyright-oikeus Haiku-koodiin on Haiku, Inc.-yrityksen tai lähdekoodissa ilmaistujen tekijöiden omaisuutta. Haiku ja Haiku-logo ovat Haiku, Inc. -yrityksen tavaramerkkejä\n\n
 GCC %d Hybrid	AboutView		GCC %d Hybridi
+%d MiB total	AboutView		%d MiB yhteensä
+%d MiB used (%d%%)	AboutView		%d MiT käytetty (%d%%)
+The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT licence%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		Haikulle uniikki koodi, erityisesti yhdin ja kaikki koodi, johon sovellukset linkitetään, jaellaan %MIT licence%-lisenssin ehtojen alla. Jotkut järjestelmäkirjastot sisältävät kolmannen osapuolen koodia, joka jaetaan LGPL-lisenssin alla. Löydät kolmannen osapuolen copyright-tiedot alta.\n\n
+%total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB yhteensä, %inaccessible MiB luoksepääsemätön

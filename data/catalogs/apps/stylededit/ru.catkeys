@@ -1,5 +1,5 @@
-1	russian	x-vnd.Haiku-StyledEdit	2750476595
-OK	LoadAlert		ОК
+1	russian	x-vnd.Haiku-StyledEdit	1187976595
+OK	LoadAlert		Oк
 ???	LoadAlert		???
 Left	Menus		По левому краю
 Revert to the last version of \"%s\"? 	RevertToSavedAlert		Вернуться к последней версии \"%s\"? 
@@ -8,7 +8,7 @@ Size	Menus		Размер
 Save	QuitAlert		Сохранить
 Redo typing	Menus		Повторить
 Replace same	Menus		Заменить совпадение
-Can't undo	Menus		Невозможно отменить
+Can't Undo	Menus		Невозможно отменить
 Save	Menus		Сохранить
 Replace with:	FindandReplaceWindow		Заменить на:
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Невозможно вернуть, файл не найден: \"%s\".
@@ -20,13 +20,13 @@ Replace in all windows	FindandReplaceWindow		Заменить во всех ок
 Wrap lines	Menus		Перенос строк
 Cancel	RevertToSavedAlert		Отмена
 Document	Menus		Документ
-Save changes to the document \"%s\"? 	QuitAlert		Сохранить изменения в файле \"%s\"? 
+Save changes to the document \"%s\"? 	QuitAlert		Сохранить изменения в документе \"%s\"? 
 Font	Menus		Шрифт
 Replace all	FindandReplaceWindow		Заменить все
 Default	Open_and_SaveAsPanel		По умолчанию
 Cancel	FindandReplaceWindow		Отмена
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Ошибка при открытии \"%s\":\n\tФормат не поддерживается
-OK	RevertToSavedAlert		ОК
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Ошибка открытия \"%s\":\n\tНеподдерживаемый формат
+OK	RevertToSavedAlert		Oк
 Don't save	QuitAlert		Не сохранять
 Align	Menus		Выровнить
 Color	Menus		Цвет
@@ -48,8 +48,8 @@ Cancel	QuitAlert		Отмена
 Find…	Menus		Найти…
 Error loading \"%s\":\n\t%s	LoadAlert		Ошибка загрузки \"%s\":\n\t%s
 Black	Menus		Черный
-Untitled 	StyledEditWindow		Новый документ 
-OK	SaveAlert		ОК
+Untitled 	StyledEditWindow		Безымянный 
+OK	SaveAlert		Oк
 Find	FindandReplaceWindow		Найти
 Encoding	Open_and_SaveAsPanel		Кодировка
 Replace…	Menus		Заменить…
@@ -60,7 +60,7 @@ Don't save	SaveAlert		Не сохранять
 This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Этот файл отмечен только для чтения. Сохранить изменения в документе \"%s\"? 
 Paste	Menus		Вставить
 File	Menus		Файл
-Page setup…	Menus		Настройка печати…
+Page setup…	Menus		Настройка печати...
 Print…	Menus		Печать...
 Quit	Menus		Выход
 Clear	Menus		Очистить

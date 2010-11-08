@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-FileTypes	3867215334
+1	russian	x-vnd.Haiku-FileTypes	1959260346
 Args only	Application Type Window		Только аргументы
 Add group	New File Type Window		Добавить группу
 Remove	Application Type Window		Удалить
@@ -11,7 +11,7 @@ Add icon…	Icon View		Добавить значок…
 Do you want to save the changes?	Application Type Window		Хотите сохранить изменения?
 File type	FileType Window		Тип файла
 Could not change attributes	Attribute Window		Невозможно изменить атрибуты
-OK	FileTypes		ОК
+OK	FileTypes		Oк
 Save	Application Type Window		Сохранить
 Add	Extension Window		Добавить
 Select same preferred application as	FileType Window		Выбрать такое же предпочтительное приложение как у
@@ -22,18 +22,17 @@ Done	Extension Window		Готово
 Could not open file	FileType Window		Невозможно открыть файл
 Preferred application	FileType Window		Предпочтительное приложение
 Same as…	FileType Window		Такое же как…
-Same as…	FileType Window		Такой же как…
 File	Application Type Window		Файл
 Version:	Application Type Window		Версия:
 FileTypes request	FileTypes		Запрос типа файла
 Select…	FileType Window		Выбрать…
-Development	Application Type Window		В разработке
+Development	Application Type Window		Разрабатываемая
 Icon	FileType Window		Значок
 Special:	Attribute Window		Особый:
 Alpha	Application Type Window		Альфа
 Signature:	Application Type Window		Сигнатура:
 Quit, don't save	Application Type Window		Выйти без сохранения
-Add…	Application Type Window		Добавить…
+Add…	Application Type Window		Добавить...
 Select preferred application	FileType Window		Выбрать предпочтительное приложение
 Single launch	Application Type Window		Одиночный запуск
 The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Приложение \"%s\" не поддерживает данный тип файлов. Вы действительно хотите установить его?
@@ -48,7 +47,7 @@ Extension:	Extension Window		Расширение:
 Add	Attribute Window		Добавить
 Close	Application Type Window		Закрыть
 Golden master	Application Type Window		Золотая
-Could not open \"%s\":\n%s	FileTypes		Невозможно открыть \"%s\":\n%s
+Could not open \"%s\":\n%s	FileTypes		Невозмножно открыть \"%s\":\n%s
 Alignment:	Attribute Window		Выравнивание:
 Cancel	Extension Window		Отмена
 Application flags	Application Type Window		Флаги приложения
@@ -68,14 +67,14 @@ Default application	FileType Window		Приложение по умолчани�
 Long description:	Application Type Window		Подробное описание:
 Version info	Application Type Window		Версия приложения
 Center	Attribute Window	Attribute column alignment in Tracker	По центру
-Short description:	Application Type Window		Короткое описание:
+Short description:	Application Type Window		Краткое описание:
 File could not be opened	Preferred App Menu		Невозможно открыть файл
 Could not change file extensions	Extension Window		Невозможно изменить расширения файла
 Edit icon…	Icon View		Изменить значок…
 Save into resource file…	Application Type Window		Сохранить в ресурс-файл…
 Left	Attribute Window	Attribute column alignment in Tracker	По левому краю
 Visible	Attribute Window		Видимый
-Could not install file type	New File Type Window		Невозможно установить тип файла
+Could not install file type	New File Type Window		Невозможно уставновить тип файла
 Application type	Application Type Window		Тип приложения
 Application types…	FileTypes Window		Типы приложений…
 Recognition rule is not valid:\n\n	FileTypes Window		Неверно указано правило распознавания:\n\n
@@ -99,26 +98,25 @@ FileTypes request	Preferred App Menu		Запрос типа файла
 Description:	FileTypes Window		Описание:
 File	FileTypes Window		Файл
 Select…	FileTypes Window		Выбрать…
-FileTypes	FileTypes Window		Типы файлов
+FileTypes	FileTypes Window		FileTypes
 Open…	FileTypes Window		Открыть…
-FileTypes	FileTypes		FileTypes
+FileTypes	FileTypes		Типы файлов
 Extra attributes	FileTypes Window		Дополнительные атрибуты
-\twritten by Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n	FileTypes		\tРазработал Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n
-Add…	FileTypes Window		Добавить…
+\twritten by Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n	FileTypes		\tНаписана Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n
+Add…	FileTypes Window		Добавить...
 [Multiple files] file types	FileType Window		[Несколько файлов] типы файлов
 Quit	FileTypes Window		Выход
-%s file type	FileType Window		Тип файла %s
+%s file type	FileType Window		%s тип файла
 no icon	FileTypes Window		нет значка
 Settings	FileTypes Window		Настройки
 New resource file…	FileTypes Window		Новый ресурс-файл…
 Icon	FileTypes Window		Значок
-Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Удаление супертипа будет невозможно отменить.\nВсе типы файлов, которые принадлежат к этому супертипу, будут потеряны!\n\nВы уверены, что хотите сделать это? Для удаления всей группы зажмите клавишу Shift и нажмите \"Удалить\".
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Удаление супер типа невозможно отменить.\nВсе типы файлов, которые принадлежат к этому супер типу будут потеряны!\n\nВы уверены, что хотите сделать это? Для удаления всей группы зажмите клавишу Shift и нажмите \"Удалить\".
 Internal name:	FileTypes Window		Внутреннее имя:
 File recognition	FileTypes Window		Распознавание файла
 Cancel	Type List Window		Отмена
 Description	FileTypes Window		Описание
 None	FileTypes Window		Не выбрано
-Remove	FileTypes Window		Удалить
 Remove	FileTypes Window		Удалить
 This file type already exists	New File Type Window		Этот тип файла уже существует
 Same as…	FileTypes Window		Такое же как…
@@ -127,32 +125,9 @@ Cancel	Preferred App Menu		Отмена
 Cancel	FileTypes Window		Отмена
 Select preferred application	FileTypes Window		Выбрать предпочтительное приложение
 FileTypes request	FileTypes Window		Запрос типа файла
-(from super type)	FileTypes Window		(из супертипа)
+(from super type)	FileTypes Window		(из супер типа)
 Preferred application	FileTypes Window		Предпочтительное приложение
 Attribute	Attribute Window		Атрибут
 Group name:	New File Type Window		Имя группы:
 Display as:	Attribute Window	Tracker offers different display modes for attributes.	Отображать как
 Right	Attribute Window	Attribute column alignment in Tracker	По правому краю
-%1 application type	Application Type Window		Тип приложения %1
-Development	Application Types Window		В разработке
-Alpha	Application Types Window		Альфа
-Beta	Application Types Window		Бета
-Gamma	Application Types Window		Гамма
-Golden master	Application Types Window		Золотая
-Final	Application Types Window		Финальная
-Progress	Application Types Window		Состояние
-Abort	Application Types Window		Отменить
-Application types	Application Types Window		Типы приложений
-Remove uninstalled	Application Types Window		Очистить удаленные
-Information	Application Types Window		Информация
-Name:	Application Types Window		Имя:
-Signature:	Application Types Window		Сигнатура:
-Path:	Application Types Window		Путь:
-Version	Application Types Window		Версия
-Version:	Application Types Window		Версия:
-Description:	Application Types Window		Описание:
-Edit…	Application Types Window		Изменить…
-Launch	Application Types Window		Запустить
-Show in Tracker…	Application Types Window		Отобразить в Tracker…
-Removing uninstalled application types	Application Types Window		Очищение удаленных типов приложений 
-%ld Application type%s could be removed.	Application Types Window		Удалось очистить типов приложений: %ld.

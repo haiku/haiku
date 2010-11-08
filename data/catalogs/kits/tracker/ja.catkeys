@@ -1,0 +1,320 @@
+1	japanese	x-vnd.Haiku-libtracker	2723586359
+Sorry, you can't save things at the root of your system.	libtracker		システムのルートではファイルを保存できません。
+Empty Trash	libtracker		ごみ箱を空にする
+Recent folders	libtracker		最近開いたフォルダー
+You cannot copy or move the root directory.	libtracker		ルートフォルダーをコピーまたは移動はできません。
+starts with	libtracker		指定文字列で始まる
+TiB	libtracker		TiB
+Duplicate	libtracker		複製
+Link To:	libtracker		リンク先：
+Paste links	libtracker		リンクを貼り付ける
+Volume icons	libtracker		ディスクアイコン
+Relation	libtracker		関連
+Create a Query template	libtracker		クエリ雛型の作成
+%num items	libtracker		%num 個
+Name matches wildcard expression:###	libtracker		ファイル名がワイルドカード表現と一致： ###
+Modified	libtracker		更新日時
+Group	libtracker		グループ
+Create link	libtracker		リンクを作成
+Moving: 	libtracker		移動中ファイル：
+Preparing to copy items…	libtracker		コピーの準備をしています…
+Error deleting items	libtracker		ファイル削除中にエラー発生
+Sorry, saving more than one item is not allowed.	libtracker		2 項目以上は保存できません。
+Open with…	libtracker		指定アプリケーションで開く…
+for %num files	libtracker		合計 %num 項目
+At %func \nfind_directory() failed. \nReason: %error	libtracker		%func \nfind_directory() が失敗しました。\n原因： %error
+Unknown	libtracker		不明
+Close	libtracker		閉じる
+Go to parent	libtracker		親フォルダーへ移動
+%name info	libtracker	InfoWindow Title	%name の情報
+(Finish: %time - %finishtime minutes left)	libtracker		（完了： %time - %finishtime 分残っています）
+Recent documents	libtracker		最近開いたドキュメント
+Clean up	libtracker		アイコンの整列
+Find…	libtracker		検索…
+Mount all	libtracker		全てをマウント
+Opens with:	libtracker		このアプリケーションで開く：
+Paste layout	libtracker		レイアウトを貼り付ける
+Cancel	libtracker		中止
+Preparing to move items…	libtracker		移動の準備をしています…
+Invert selection	libtracker		選択範囲を反転
+Error calculating folder size.	libtracker		フォルダーサイズの計算中にエラー発生。
+Don't move files to Trash	libtracker		ごみ箱を経由せずに削除する
+Name	libtracker		名前
+Cut more	libtracker		さらに切り取る
+save text	libtracker		テキストを保存
+Could not open \"%document\" (Missing symbol: %symbol). \n	libtracker		「%document」を開くことができませんでした（シンボル %symbol がありません）。\n
+Don't automount	libtracker		自動マウントを使わない
+Sorry, the 'Character' attribute cannot store a multi-byte glyph.	libtracker		「Character」属性にはマルチバイト文字を保存できません。
+Would you like to find a suitable application to open the file?	libtracker		このファイルを開くことのできるアプリケーションを検索しますか？
+Increase size	libtracker		サイズを拡大
+is	libtracker		完全一致
+(Finish: %time - Over %finishtime hours left)	libtracker		（完了： %time - %finishtime 時間以上残っています）
+Could not open \"%name\" (%error). 	libtracker		「%name」を開くことができませんでした（%error）。
+Copying: 	libtracker		コピー中：
+You cannot replace a folder or a symbolic link with a file.	libtracker		フォルダーをリンクまたはファイルと置き換えることはできません。
+Decrease size	libtracker		サイズを縮小
+There was an error deleting \"%name\":\n\t%error	libtracker		「%name」を削除中にエラー発生：\n\t%error
+Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	libtracker		選択した項目を削除してもよろしいですか？削除した項目は復元できませんので、ご注意ください。
+The target disk does not support creating links.	libtracker		指定されたディスクはリンクをサポートしていません。
+The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	libtracker		選択した項目をごみ箱に捨てることはできません。完全に削除しても良いでしょうか？元は戻せませんので、ご注意ください。
+before	libtracker		以前
+Copy more	libtracker		さらにコピー
+Disks	libtracker		ディスク
+Cut	libtracker		切り取り
+The Tracker must be running to see Info windows.	libtracker		情報ウィンドウを表示するには、Tracker が実行されている必要があります。
+Desktop	libtracker		デスクトップ
+Create a Query	libtracker		クエリの作成
+Could not update permissions of file \"%name\". %error	libtracker		「%name」のアクセス許可を変更できませんでした。%error
+Error in regular expression:\n\n'	libtracker		正規表現にエラー：\n\n'
+If you %action the mime settings, Haiku may not behave properly! Are you sure you want to do this? To %action the mime settings anyway, click \"Do it\".	libtracker		mime 設定を%actionすると、Haiku が正常に動作しなくなる可能性があります。それでもこの操作を実行しますか？mime 設定を%actionするには 「強行」ボタンを押してください。
+Resize to Fit	libtracker		最適な表示サイズに変更
+Add printer…	libtracker		プリンタの追加…
+Trash	libtracker		ごみ箱
+greater than	libtracker		より大きい
+Other	libtracker		その他
+GiB	libtracker		GiB
+Query name:	libtracker		クエリ名：
+Or	libtracker		または
+An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	libtracker		「%name」という項目はこのフォルダーに既に存在し、同名の項目が含まれている可能性もあります。これらを全て%verbとしているフォルダーに入っている項目と置き換えますか？
+Do it	libtracker		強行
+There was an error writing the attribute.	libtracker		属性の書き込み中にエラーが発生しました。
+Emptying Trash… 	libtracker		ごみ箱を空にしています…
+Close all in workspace	libtracker		ワークスペース内の全てを閉じる
+Sorry, you cannot edit that attribute.	libtracker		この属性は編集できません。
+Deleting: 	libtracker		削除中：
+The file \"%name\" already exists in the specified folder. Do you want to replace it?	libtracker		指定のフォルダーに「%name」というファイルは既に存在します。置き換えますか？
+Revert	libtracker		元に戻す
+Could not open \"%document\" with application \"%app\" (%error). 	libtracker		「%app」は「%document」を開くことはできませんでした（%error）。
+no supporting apps	libtracker		対応するアプリケーションはありません
+\nShould this be fixed?	libtracker		\n修正しますか？
+The specified name is already used as the name of a folder. Please choose another name.	libtracker		指定された名前は既にフォルダー名として使用されています。別の名前を指定してください。
+Version	libtracker		バージョン
+Invert	libtracker		反転
+by attribute	libtracker		属性で検索
+There was a problem trying to save in the folder you specified. Please try another one.	libtracker		指定されたフォルダーへの保存に失敗しました。別のフォルダーを指定してみてください。
+Create relative link	libtracker		相対リンクを作成
+Attributes	libtracker		属性
+Mount server error	libtracker		マウントサーバーエラー
+Sorry, there is not enough free space on the destination volume to copy the selection.	libtracker		コピー先ディスクの空き容量が不足しています。コピーができません。
+Replace all	libtracker		全て置き換え
+Owner	libtracker		所有者
+12 hour	libtracker		12 時間制
+Select all	libtracker		全て選択
+Delete	libtracker		削除
+Save as Query template:	libtracker		クエリ雛型として保存する：
+Only the boot disk	libtracker		起動ディスクのみ
+Set new link target	libtracker		リンク先を変更
+ends with	libtracker		指定文字列で終わる
+If you %action the config folder, Haiku may not behave properly! Are you sure you want to do this? To %action the config folder anyway, click \"Do it\".	libtracker		「config」フォルダーを%actionしようとしましたが、実行すると Haiku が正常に動作しなくなる可能性はあります。それでもこの操作を実行しますか？このフォルダを  %action するには、 Shift キーを押しながら 「強行」ボタンを押してください。
+Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	libtracker		「%name」フォルダーをコピー中にエラーが発生：\n\t%error\n\n続けますか？
+OK	libtracker		Ok
+Make active printer	libtracker		プリンタを有効にする
+New	libtracker		新規
+Paused: click to resume or stop	libtracker		一時停止中：クリックで動作の再開また中断をしてください
+Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	libtracker		「%app」が「%document」を開くことはできませんでした（%library ライブラリが見つかりません）。 \n
+MiB	libtracker		MiB
+Disk mount settings	libtracker		ディスクマウント設定
+Include trash	libtracker		ごみ箱を含む
+Could not find an application to open \"%name\" (%error). 	libtracker		「%name」を開くアプリケーションは見つかりません（%error）。
+(Finish: %time - Over %finishtime days left)	libtracker		（完了： %time - %finishtime 日間以上残っています）
+Could not open \"%document\" (Missing libraries: %library). \n	libtracker		「%document」を開くことはできませんでした（%library ライブラリが見つかりません）。\n
+Preparing to restore items…	libtracker		復元の準備をしています…
+You can't replace a folder with one of its sub-folders.	libtracker		サブフォルダーを同名のフォルダーと置き換えることはできません。
+Mount all disks now	libtracker		全てのディスクを直ちにマウント
+Temporary	libtracker		一時的
+If you %action the home folder, Haiku may not behave properly! Are you sure you want to do this? To %action the home anyway, click \"Do it\".	libtracker		「home」フォルダーを%actionしたら、Haiku が正常に動作しなくなる可能性があります。それでもこの操作を実行しますか？「home」フォルダーを%actionするには「強行」ボタンをクリックしてください。
+40 x 40	libtracker		40 × 40
+Previously mounted disks	libtracker		以前にマウントされていたディスク
+Create link here	libtracker		ここにリンクを作成
+Unmount	libtracker		マウント解除
+That name is already taken. Please type another one.	libtracker		指定された名前は既に使用されています。別の名前を指定してください。
+Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	libtracker		「%document」を「%app」で開くことはできませんでした（%symbol シンボルが見つかりません）。\n
+less than	libtracker		より小さい
+Edit query	libtracker		クエリの編集
+Original name	libtracker		元の名前
+Preparing to delete items…	libtracker		削除の準備をしています…
+Created:	libtracker		作成日時：
+Location:	libtracker		場所：
+New Query	libtracker		新規クエリ
+Write	libtracker		書き込み
+Sorry, you can't copy items to the Trash.	libtracker		ごみ箱にコピーすることはできません。
+Mini icon view	libtracker		ミニアイコン表示
+Windows	libtracker		ウィンドウ
+Ask before delete	libtracker		削除前に確認する
+matches regular expression	libtracker		正規表現と一致
+Open and make preferred	libtracker		関連づけて開く
+Default application	libtracker		デフォルトアプリケーション
+Execute	libtracker		実行
+Created	libtracker		作成日時
+calculating…	libtracker		計算中…
+label too long	libtracker		ラベルが長すぎます
+Link \"%name\" to:	libtracker	File dialog title for new sym link	「%name」のリンク先：
+Query template	libtracker		クエリ雛形
+Description:	libtracker		説明：
+You cannot replace a file with a folder or a symbolic link.	libtracker		ファイルをフォルダまたはリンクと置き換えることはできません。
+Save	libtracker		保存
+Month-day-year	libtracker		月-日-年
+link	libtracker	filename link	リンク
+Open	libtracker		開く
+Edit name	libtracker		名前の変更
+Show folder location in title tab	libtracker		タイトルタブにフォルダー位置を表示
+contains	libtracker		含む
+Formula %formula	libtracker	FindResultTitle	式 %formula
+You cannot put the Trash, home or Desktop directory into the trash.	libtracker		「Trash」、「home」および「Desktop」フォルダーをごみ箱に捨てることはできません。
+Date & Time	libtracker		日付＆時刻
+Modified:	libtracker		更新日時
+Skip	libtracker		飛ばす
+Examples:	libtracker		例：
+24 hour	libtracker		24 時間制
+Preparing to create links…	libtracker		リンク作成の準備をしています…
+Error emptying Trash!	libtracker		ごみ箱を空にしている途中でエラー発生。
+There was an error resolving the link.	libtracker		リンクの解釈に失敗しました。
+Move	libtracker		移動
+You can't move a folder into itself or any of its own sub-folders.	libtracker		フォルダーを同じフォルダーやサブフォルダーに移動することはできません。
+Error %error loading Add-On %name.	libtracker		%name アドオンの読み込み中に %error エラーが発生
+Edit Query template	libtracker		クエリ雛形の編集
+Show shared volumes on Desktop	libtracker		共有ディスクをデスクトップに表示する
+Ignore case	libtracker		大文字/小文字を区別しない
+Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	libtracker		%verbしようとしているものと同じ名前の項目が既にフォルダの中に存在します。\n \n%verbして置き換えますか？それとも、一つずつ確認しますか？
+Open parent	libtracker		親フォルダーを開く
+None	libtracker		無し
+You can't move or copy the trash.	libtracker		ごみ箱の移動やコピーはできません。
+Create relative link here	libtracker		ここに相対リンクを作成
+moving	libtracker		移動中
+Version:	libtracker		バージョン：
+Capacity:	libtracker		容量：
+You cannot create a link to the root directory.	libtracker		ルートフォルダーにはリンクを作成できません。
+Are you sure you want to move or copy the selected item(s) to this folder?	libtracker		このフォルダに移動またはコピーしてよろしいですか？
+You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	libtracker		下記の項目：\n\n%name%src\n\nを\n\n%name%dest\n\nと置き換えようとしています。%movemodeをしょうとしている方の項目と置き換えますか？
+Move here	libtracker		ここに移動
+Free space color	libtracker		空き容量の色
+Read	libtracker		読み取り
+after	libtracker		以降
+Size	libtracker		サイズ
+Search	libtracker		検索
+Recalculate folder size	libtracker		フォルダーサイズを再度計算
+Favorites	libtracker		お気に入り
+List view	libtracker		一覧表示
+Enable type-ahead filtering	libtracker		Type ahead フィルターを有効にする
+Show Disks icon	libtracker		ディスクアイコンを表示
+Edit templates…	libtracker		雛形を編集…
+Add	libtracker		追加
+Disk mounting during boot	libtracker		起動時の設定
+Date order	libtracker		日付順
+Restoring: 	libtracker		復元中：
+Settings…	libtracker		設定…
+Sorry, could not create a new folder.	libtracker		新規フォルダーを作成できませんでした。
+Current folder	libtracker		現在のフォルダー
+New folder %ld	libtracker		新規 %ld フォルダー
+Cannot unmount the boot volume \"%name\".	libtracker		起動ディスク「%name」はマウント解除できません。
+48 x 48	libtracker		48 × 48
+Copy here	libtracker		ここにコピー
+%Ld bytes	libtracker		%Ld バイト
+Used space color	libtracker		使用済容量の色
+Location	libtracker		場所
+Error moving \"%name\".	libtracker		「%name」を移動中にエラー発生。
+Show volumes on Desktop	libtracker		ディスクをデスクトップに表示する
+Name = %name	libtracker	FindResultTitle	名前 = %name
+matches wildcard expression	libtracker		ワイルドカード表現と一致
+Window	libtracker		ウィンドウ
+There was a problem trying to replace \"%name\". The item might be open or busy.	libtracker		「%name」の置き換え中に問題が発生しました。置き換えられる項目は、開かれているか使用中の可能性があります。
+Proceed	libtracker		続行
+New folder%ld	libtracker		新規 %ld フォルダー
+Year-month-day	libtracker		年-月-日
+New folder	libtracker		新規フォルダー
+File	libtracker		ファイル
+Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	libtracker		「%name」をコピー中にエラー発生：\n\t%error\n\n続けますか？
+Close all	libtracker		全て閉じる
+(Finish: %time)	libtracker		（完了：%time）
+Clock	libtracker		時刻
+Show navigator	libtracker		ツールバーを表示
+Force identify	libtracker		ファイル形式を判別
+Mount settings…	libtracker		マウント設定…
+is not	libtracker		除く
+Clean up all	libtracker		全てを整列
+List folders first	libtracker		フォルダーを先頭に表示
+Remove	libtracker		削除
+All BeOS disks	libtracker		全 BFS パーティション
+no items	libtracker		0 項目
+copying	libtracker		コピー中
+Preferences…	libtracker		設定…
+All disks	libtracker		全パーティション
+Searching for disks to mount…	libtracker		マウントできるディスクを探しています…
+Tracker status	libtracker		Tracker の動作状況
+Identify	libtracker		ファイル形式を判別
+Automatic disk mounting	libtracker		自動マウント
+Add-ons	libtracker		アドオン
+The mount server could not be  contacted.	libtracker		マウントサーバーが応答しません。
+Select…	libtracker		選択…
+multiple disks	libtracker		複数ディスク
+Could not open \"%name\". The file is mistakenly marked as executable. 	libtracker		「%name」が開けません。このファイルは誤って実行可能ファイルに設定されています。
+Single window navigation	libtracker		単一ウィンドウで操作する
+Done	libtracker		完了
+Open selection with:	libtracker		選択ファイルをアプリケーションで開く：
+Paste	libtracker		貼り付け
+32 x 32	libtracker		32 × 32
+Get info	libtracker		詳細情報…
+Create %s clipping	libtracker		%s クリップを作成
+You must drop items on one of the disk icons in the \"Disks\" window.	libtracker		「Disks」ウィンドウのいずれのディスクアイコンへドロップする必要があります。
+Move to	libtracker		指定フォルダーに移動
+by name	libtracker		名前で検索
+Warning space color	libtracker		空き容量警告の色
+Add current folder	libtracker		このフォルダーを追加
+Replace other file	libtracker		既存の項目を置き換える
+%Ld B	libtracker		%Ld B
+Tracker preferences	libtracker		Tracker の設定
+Prompt	libtracker		一つずつ確認
+Kind	libtracker		種類
+Move to Trash	libtracker		ごみ箱に捨てる
+1 item	libtracker		1 項目
+Size:	libtracker		サイズ：
+Would you like to find some other suitable application?	libtracker		他に適切なアプリケーションを検索しますか？
+Files cannot be moved or deleted from a read-only volume.	libtracker		読み取り専用パーティションへの移動やファイルの削除はできません。
+by formula	libtracker		条件で検索
+(%bytes bytes)	libtracker		（%bytes バイト）
+Copy to	libtracker		指定フォルダーにコピー
+And	libtracker		かつ
+Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	libtracker		いくつかの選択項目はごみ箱に捨てられません。完全に削除してもよろしいですか？元に戻せませんので、ご注意ください。
+Eject when unmounting	libtracker		マウント解除時メディアを取り出す
+Error creating link to \"%name\".	libtracker		「%name」へのリンク作成中にエラー発生。
+copy	libtracker	filename copy	コピー
+Icon view	libtracker		アイコン表示
+Sorry, you can't create links in the Trash.	libtracker		ごみ箱にリンクを作ることはできません。
+Edit favorites…	libtracker		お気に入りの編集…
+If you %action the settings folder, Haiku may not behave properly! Are you sure you want to do this? To %action the settings folder anyway, click \"Do it\".	libtracker		各設定が保存される settings フォルダーを%actionすると、Haiku が正常に動作しなくなる可能性があります。それでもこの動作を実行しますか？settings フォルダーを%actionするには、「強行」ボタンをクリックしてください。
+On	libtracker		有効
+Space	libtracker		スペース
+Find	libtracker		検索
+Error moving \"%name\"	libtracker		「%name」移動中にエラー発生
+(Finish: %time - %finishtime seconds left)	libtracker		（完了： %time - %finishtime 秒残っています)
+That name is too long. Please type another one.	libtracker		名前が長すぎます。もっと短い名前にしてください。
+Select	libtracker		選択
+Error moving \"%name\" to Trash. (%error)	libtracker		「%name」をごみ箱へ移動中にエラー発生。 (%error)
+Outline selection rectangle only	libtracker		マウスドラグ選択時アウトラインのみ表示
+The specified name is illegal. Please choose another name.	libtracker		指定された名前は利用できない文字を含んでいます。他の名前を指定してください。
+of %items	libtracker		/ %items
+Day-month-year	libtracker		日-月-年
+Preparing to empty Trash…	libtracker		ごみ箱を空にする準備をしています…
+If you %action the system folder or its contents, you won't be able to boot Haiku! Are you sure you want to do this? To %action the system folder or its contents anyway, hold down the Shift key and click \"Do it\".	libtracker		「system」フォルダーを%actionした場合、Haiku が正常に動作しなくなる可能性があります。それでもこの動作を実行しますか？「system」フォルダーを%actionする際、Shift キーを押したまま「強行」ボタンをクリックしてください。
+Kind:	libtracker		種類：
+Replace	libtracker		置き換える
+Show space bars on volumes	libtracker		ディスクの容量グラフを表示する
+Permissions	libtracker		アクセス許可
+An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	libtracker		このフォルダーに「%name」という項目は既に存在します。作成しょうとしているリンクと置き換えますか？
+64 x 64	libtracker		64 × 64
+You can't move or copy items to read-only volumes.	libtracker		読み取り専用パーティションへファイルまたはフォルダーを移動やコピーはできません。
+You must have at least one attribute showing.	libtracker		最低一つの属性を表示する必要があります。
+Copy layout	libtracker		レイアウトをコピー
+Empty folder	libtracker		空フォルダー
+All files and folders	libtracker		全ファイルとフォルダー
+Restore	libtracker		復元
+The Tracker must be running to see set the default printer.	libtracker		デフォルトプリンターを設定するには、 Tracker が実行されている必要があります。
+Save Query as template…	libtracker		クエリ雛形として保存…
+KiB	libtracker		KiB
+Mount	libtracker		マウント
+Creating links: 	libtracker		作成中リンク：
+<No recent items>	libtracker		<最近使った項目はありません>
+Copy	libtracker		コピー
+Could not open \"%document\" because application \"%app\" is in the Trash. 	libtracker		「%app」はごみ箱に捨てられているため、「%document」を開くことはできませんでした。
+Defaults	libtracker		デフォルト
+%capacity (%used used -- %free free)	libtracker		%capacity（%used 使用中 -- %free 使用可能）

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Be-PSRV	101881708
+1	finnish	x-vnd.Be-PSRV	1211700656
 Undefined	ConfigWindow		Määrittelemätön
 Cancel	PrintServerApp		Peru
 Page setup:	ConfigWindow		Sivuasetus:
@@ -21,3 +21,34 @@ Print setup	ConfigWindow		Tulostinasetukset
 Would you like to make @ the default printer?	PrintServerApp		Haluaisitko tehdä @ oletustulostimeksi?
 Page setup	ConfigWindow		Sivuasetukset
 Paper setup:	ConfigWindow		Paperiasetukset:
+Return the number of available transports	PrintServerApp Scripting		Palauta käytettävissä olevien siirtojen lukumäärä
+Return the number of available printers	PrintServerApp Scripting		Palauta käytettävissä olevien tulostimien lukumäärä
+Get currently available ports/devices	Transport Scripting		Hae parhaillaan käytettävissä olevat portit/laitteet
+Retrieve or select the active printer	PrintServerApp Scripting		Nouda tai valitse käytössä oleva tulostin
+Retrieve a specific printer	PrintServerApp Scripting		Nouda tietty tulostin
+Page %1 to %2	ConfigWindow		Sivu %1 ... %2
+Get name of the printer add-on used for this printer	Printer Scripting		Hae tämän tulostimen käyttämän tulostinlisäosan nimi
+Printer server	ConfigWindow		Tulostinpalvelin
+Page %1 to %2, %3 copies	ConfigWindow		Sivu %1 ... %2, %3 kopiota
+Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Ledger-koko
+A6	ConfigWindow	ISO 216 paper size	A6
+B5	ConfigWindow	ISO 216 paper size	B5
+A0	ConfigWindow	ISO 216 paper size	A0
+Letter	ConfigWindow	ANSI A (letter), a North American paper size	Letter-koko
+A2	ConfigWindow	ISO 216 paper size	A2
+Show configuration window	PrintServerApp Scripting		Näytä asetusikkuna
+A4	ConfigWindow	ISO 216 paper size	A4
+Get comments about this printer	Printer Scripting		Hae kommentit tästä tulostimesta
+Get the transport configuration for this printer	Printer Scripting		Hae siirtoasetukset tälle tulostimelle
+Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	Legal-koko
+Get name of the transport add-on used for this printer	Printer Scripting		Hae tämän tulostimen käyttämän siirtolisäosan nimi
+All pages, %1 copies	ConfigWindow		Kaikki sivut, %1 kopiota
+Delete a specific printer	PrintServerApp Scripting		Poista tietty tulostin
+Create a new printer	PrintServerApp Scripting		Luo uusi tulostin
+A1	ConfigWindow	ISO 216 paper size	A1
+Retrieve a specific transport	PrintServerApp Scripting		Nouda tietty siirto
+Get name of printer	Printer Scripting		Hae tulostimen nimi
+A3	ConfigWindow	ISO 216 paper size	A3
+Get name of transport	Transport Scripting		Hae siirron nimi
+A5	ConfigWindow	ISO 216 paper size	A5
+Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Tabloid-koko

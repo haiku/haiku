@@ -1,9 +1,9 @@
-1	russian	x-vnd.Haiku-ShowImage	1529387143
-Use as background…	Menus		Сделать фоном рабочего стола…
+1	russian	x-vnd.Haiku-ShowImage	2071534767
+Use as background…	Menus		Использовать как фоновый рисунок…
 5 seconds	Menus		5 секунд
 Slide delay	Menus		Задержка слайд шоу 
 Zoom in	Menus		Увеличить
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Документ '%s' был изменен. Вы хотите закрыть его без сохраниения?
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Документ '%s' был изменен. Вы хотите закрыть его?
 8 seconds	Menus		8 секунд
 Previous page	Menus		Предыдущая страница
 View	Menus		Вид
@@ -11,6 +11,7 @@ Full screen	Menus		На весь экран
 Go to page	Menus		Перейти к странице
 Zoom out	Menus		Уменьшить
 20 seconds	Menus		20 секунд
+Invert colors	Menus		Инвертировать цвета
 3 seconds	Menus		3 секунды
 Rotate counterclockwise	Menus		Повернуть против часовой стрелки
 10 seconds	Menus		10 секунд
@@ -22,7 +23,7 @@ First page	Menus		Первая страница
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Документ '%s' (страница %d) был изменен. Вы хотите закрыть его?
 About ShowImage…	Menus		О программе…
 Open	Menus		Открыть
-OK	LoadAlerts		ОК
+OK	LoadAlerts		Oк
 Close	ClosePrompt		Закрыть
 Height:	ResizerWindow		Высота:
 Undo	Menus		Вернуть
@@ -30,46 +31,47 @@ Resize to (in 1/72 inches):	PrintOptionsWindow		Изменить размер (1
 Apply	ResizerWindow		Применить
 Keep original proportions	ResizerWindow		Сохранить пропорции
 9 seconds	Menus		9 секунд
-Flip left to right	Menus		Повернуть слева направо
+Flip left to right	Menus		Отобразить слева на право
 Show caption in full screen mode	Menus		Показывать название в полноэкранном режиме
 DPI:	PrintOptionsWindow		Разрешение (DPI):
 Next file	Menus		Следующий файл
 4 seconds	Menus		4 секунды
-Stretch to window	Menus		Растягивать до размеров окна
+Zoom to window	Menus		Под размер окна
 Close document	ClosePrompt		Закрыть документ
-ShowImage	LoadAlerts		Просмотр изображений
+ShowImage	LoadAlerts		Просмотрщик изображений
 Height: 	PrintOptionsWindow		Высота: 
 Cancel	ClosePrompt		Отмена
 Resize…	Menus		Изменить размер…
 Print options	PrintOptionsWindow		Настройки печати
 Width:	ResizerWindow		Ширина:
-ShowImage	AboutWindow		ShowImage
+ShowImage	AboutWindow		Просмотрщик изображений
 7 seconds	Menus		7 секунд
 Last page	Menus		Последняя страница
 Previous file	Menus		Предыдущий файл
 Resize	ResizerWindow		Изменить размер
 Slide show	Menus		Слайд шоу
-Fit image to page	PrintOptionsWindow		Подогнать размер изображения под страницу
-Flip top to bottom	Menus		Повернуть сверху вниз
+Fit image to page	PrintOptionsWindow		Подогнать изображение под окно
+Flip top to bottom	Menus		Отобразить сверху вниз
 Zoom factor in %:	PrintOptionsWindow		Увеличение в %:
 Width:	PrintOptionsWindow		Ширина:
 Image	Menus		Изображение
 Rotate clockwise	Menus		Повернуть по часовой стрелке
-Job setup	PrintOptionsWindow		Печать
+Job setup	PrintOptionsWindow		Настройка задания
 Original size	Menus		Оригинальный размер
 Next page	Menus		Следующая страница
-Shrink to window	Menus		Сжимать до размеров окна
-OK	SaveToFile		ОК
+Shrink to window	Menus		Уменьшить до размеров окна
+OK	SaveToFile		Oк
 The file '%s' could not be written.	SaveToFile		Невозможно записать файл '%s'.
 Progress monitor	ProgressWindow		Монитор состояния
+Paste	Menus		Вставить
 File	Menus		Файл
-Page setup…	Menus		Настройка печати…
-Print…	Menus		Печать…
+Page setup…	Menus		Настройка печати...
+Print…	Menus		Печать...
 Quit	Menus		Выход
-Clear selection	Menus		Очистить выделение
+Clear	Menus		Очистить
 Edit	Menus		Изменить
 Close	Menus		Закрыть
-Copy	Menus		Копировать
-Selection Mode	Menus		Режим выделения
+Copy	Menus		Копипровать
+Cut	Menus		Вырезать
 Select all	Menus		Выделить всё
-Save as…	Menus		Сохранить как…
+Save as…	Menus		Сохранить как...
