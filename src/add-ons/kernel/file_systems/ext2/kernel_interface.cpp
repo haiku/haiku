@@ -257,7 +257,7 @@ ext2_remove_vnode(fs_volume* _volume, fs_vnode* _node, bool reenter)
 	status = inode->WriteBack(transaction);
 	if (status != B_OK)
 		return status;
-	
+
 	TRACE("ext2_remove_vnode(): Freeing inode\n");
 	status = volume->FreeInode(transaction, inode->ID(), inode->IsDirectory());
 
@@ -414,7 +414,7 @@ ext2_get_file_map(fs_volume* _volume, fs_vnode* _node, off_t offset,
 		off_t blockOffset = block << volume->BlockShift();
 		uint32 blockLength = volume->BlockSize() * count;
 
-		if (index > 0 && (vecs[index - 1].offset 
+		if (index > 0 && (vecs[index - 1].offset
 				== blockOffset - vecs[index - 1].length
 				|| (vecs[index - 1].offset == -1 && block == 0))) {
 			vecs[index - 1].length += blockLength;
@@ -470,17 +470,17 @@ ext2_lookup(fs_volume* _volume, fs_vnode* _directory, const char* name,
 
 	HTree htree(volume, directory);
 	DirectoryIterator* iterator;
-	
+
 	status = htree.Lookup(name, &iterator);
 	if (status != B_OK)
 		return status;
-	
+
 	ObjectDeleter<DirectoryIterator> iteratorDeleter(iterator);
 
 	status = iterator->FindEntry(name, _vnodeID);
 	if (status != B_OK)
 		return status;
-	
+
 	return get_vnode(volume->FSVolume(), *_vnodeID, NULL);
 }
 
@@ -525,7 +525,7 @@ ext2_ioctl(fs_volume* _volume, fs_vnode* _node, void* _cookie, uint32 cmd,
 				}
 
 				TRACE("ioctl: Blocks cleared\n");
-				
+
 				transaction.Done();
 				transaction.Start(volume->GetJournal());
 			}
@@ -568,7 +568,7 @@ ext2_read_stat(fs_volume* _volume, fs_vnode* _node, struct stat* stat)
 	inode->GetModificationTime(&stat->st_mtim);
 	inode->GetChangeTime(&stat->st_ctim);
 	inode->GetCreationTime(&stat->st_crtim);
-	
+
 	stat->st_size = inode->Size();
 	stat->st_blocks = (inode->Size() + 511) / 512;
 
@@ -588,59 +588,72 @@ ext2_write_stat(fs_volume* _volume, fs_vnode* _node, const struct stat* stat,
 
 	Inode* inode = (Inode*)_node->private_node;
 
-	status_t status = inode->CheckPermissions(W_OK);
-	if (status < B_OK)
-		return status;
+	ext2_inode& node = inode->Node();
+	bool updateTime = false;
+	uid_t uid = geteuid();
+
+	bool isOwnerOrRoot = uid == 0 || uid == (uid_t)node.UserID();
+	bool hasWriteAccess = inode->CheckPermissions(W_OK) == B_OK;
 
 	TRACE("ext2_write_stat: Starting transaction\n");
 	Transaction transaction(volume->GetJournal());
 	inode->WriteLockInTransaction(transaction);
 
-	bool updateTime = false;
-
-	if ((mask & B_STAT_SIZE) != 0) {
+	if ((mask & B_STAT_SIZE) != 0 && inode->Size() != stat->st_size) {
 		if (inode->IsDirectory())
 			return B_IS_A_DIRECTORY;
 		if (!inode->IsFile())
 			return B_BAD_VALUE;
+		if (!hasWriteAccess)
+			return B_NOT_ALLOWED;
 
 		TRACE("ext2_write_stat: Old size: %ld, new size: %ld\n",
 			(long)inode->Size(), (long)stat->st_size);
-		if (inode->Size() != stat->st_size) {
-			off_t oldSize = inode->Size();
 
-			status = inode->Resize(transaction, stat->st_size);
-			if(status != B_OK)
-				return status;
+		off_t oldSize = inode->Size();
 
-			if ((mask & B_STAT_SIZE_INSECURE) == 0) {
-				rw_lock_write_unlock(inode->Lock());
-				inode->FillGapWithZeros(oldSize, inode->Size());
-				rw_lock_write_lock(inode->Lock());
-			}
+		status_t status = inode->Resize(transaction, stat->st_size);
+		if(status != B_OK)
+			return status;
 
-			updateTime = true;
+		if ((mask & B_STAT_SIZE_INSECURE) == 0) {
+			rw_lock_write_unlock(inode->Lock());
+			inode->FillGapWithZeros(oldSize, inode->Size());
+			rw_lock_write_lock(inode->Lock());
 		}
+
+		updateTime = true;
 	}
 
-	ext2_inode& node = inode->Node();
-
 	if ((mask & B_STAT_MODE) != 0) {
+		// only the user or root can do that
+		if (!isOwnerOrRoot)
+			return B_NOT_ALLOWED;
 		node.UpdateMode(stat->st_mode, S_IUMSK);
 		updateTime = true;
 	}
 
 	if ((mask & B_STAT_UID) != 0) {
+		// only root should be allowed
+		if (uid != 0)
+			return B_NOT_ALLOWED;
 		node.SetUserID(stat->st_uid);
 		updateTime = true;
 	}
+
 	if ((mask & B_STAT_GID) != 0) {
+		// only the user or root can do that
+		if (!isOwnerOrRoot)
+			return B_NOT_ALLOWED;
 		node.SetGroupID(stat->st_gid);
 		updateTime = true;
 	}
 
 	if ((mask & B_STAT_MODIFICATION_TIME) != 0 || updateTime
 		|| (mask & B_STAT_CHANGE_TIME) != 0) {
+		// the user or root can do that or any user with write access
+		if (!isOwnerOrRoot && !hasWriteAccess)
+			return B_NOT_ALLOWED;
 		struct timespec newTimespec = { 0, 0};
 
 		if ((mask & B_STAT_MODIFICATION_TIME) != 0)
@@ -655,10 +668,14 @@ ext2_write_stat(fs_volume* _volume, fs_vnode* _node, const struct stat* stat,
 
 		inode->SetModificationTime(&newTimespec);
 	}
-	if ((mask & B_STAT_CREATION_TIME) != 0)
+	if ((mask & B_STAT_CREATION_TIME) != 0) {
+		// the user or root can do that or any user with write access
+		if (!isOwnerOrRoot && !hasWriteAccess)
+			return B_NOT_ALLOWED;
 		inode->SetCreationTime(&stat->st_crtim);
+	}
 
-	status = inode->WriteBack(transaction);
+	status_t status = inode->WriteBack(transaction);
 	if (status == B_OK)
 		status = transaction.Done();
 	if (status == B_OK)
@@ -817,7 +834,7 @@ static status_t
 ext2_link(fs_volume* volume, fs_vnode* dir, const char* name, fs_vnode* node)
 {
 	// TODO
-	
+
 	return B_NOT_SUPPORTED;
 }
 
@@ -943,7 +960,7 @@ ext2_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
 
 			const HTreeRoot* data = (const HTreeRoot*)cached.SetTo(blockNum);
 			parentID = data->dotdot.InodeID();
-		} while (parentID != oldID && parentID != oldDirID 
+		} while (parentID != oldID && parentID != oldDirID
 			&& parentID != EXT2_ROOT_NODE);
 
 		if (parentID == oldID)
@@ -1013,7 +1030,7 @@ ext2_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
 			return status;
 	} else
 		return status;
-	
+
 	// Remove entry from source folder
 	status = oldIterator->RemoveEntry(transaction);
 	if (status != B_OK)
@@ -1047,7 +1064,7 @@ ext2_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
 	if (status != B_OK) {
 		entry_cache_remove(volume->ID(), oldDirectory->ID(), newName);
 		entry_cache_add(volume->ID(), newDirectory->ID(), oldName, oldID);
-	
+
 		return status;
 	}
 
@@ -1237,7 +1254,7 @@ ext2_read_link(fs_volume *_volume, fs_vnode *_node, char *buffer,
 static status_t
 ext2_create_dir(fs_volume* _volume, fs_vnode* _directory, const char* name,
 	int mode)
-{ 
+{
 	TRACE("ext2_create_dir()\n");
 	Volume* volume = (Volume*)_volume->private_volume;
 	Inode* directory = (Inode*)_directory->private_node;
@@ -1416,7 +1433,7 @@ ext2_free_dir_cookie(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 }
 
 
-static status_t 
+static status_t
 ext2_open_attr_dir(fs_volume *_volume, fs_vnode *_node, void **_cookie)
 {
 	Inode* inode = (Inode*)_node->private_node;
@@ -1512,7 +1529,7 @@ ext2_open_attr(fs_volume* _volume, fs_vnode* _node, const char* name,
 	int openMode, void** _cookie)
 {
 	TRACE("%s()\n", __FUNCTION__);
-	
+
 	Volume* volume = (Volume*)_volume->private_volume;
 	Inode* inode = (Inode*)_node->private_node;
 	Attribute attribute(inode);
@@ -1610,6 +1627,7 @@ fs_volume_ops gExt2VolumeOps = {
 	&ext2_get_vnode,
 };
 
+
 fs_vnode_ops gExt2VnodeOps = {
 	/* vnode operations */
 	&ext2_lookup,
@@ -1680,8 +1698,8 @@ fs_vnode_ops gExt2VnodeOps = {
 	NULL, //&ext2_write_attr_stat,
 	NULL, //&ext2_rename_attr,
 	NULL, //&ext2_remove_attr,
-	
 };
+
 
 static file_system_module_info sExt2FileSystem = {
 	{
@@ -1704,6 +1722,7 @@ static file_system_module_info sExt2FileSystem = {
 
 	NULL,
 };
+
 
 module_info *modules[] = {
 	(module_info *)&sExt2FileSystem,

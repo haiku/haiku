@@ -6,9 +6,9 @@
 
 #include "Inode.h"
 
-#include <fs_cache.h>
 #include <string.h>
 #include <util/AutoLock.h>
+#include <NodeMonitor.h>
 
 #include "CachedBlock.h"
 #include "DataStream.h"
@@ -51,7 +51,7 @@ Inode::Inode(Volume* volume, ino_t id)
 		fHasExtraAttributes = (fNodeSize == sizeof(ext2_inode)
 			&& fNode.ExtraInodeSize() + EXT2_INODE_NORMAL_SIZE
 				== sizeof(ext2_inode));
-		
+
 		if (IsDirectory() || (IsSymLink() && Size() < 60)) {
 			TRACE("Inode::Inode(): Not creating the file cache\n");
 			fCached = false;
@@ -130,7 +130,7 @@ Inode::WriteBack(Transaction& transaction)
 		 if (status != B_OK)
 			  return status;
 	}
-	
+
 	CachedBlock cached(fVolume);
 	uint8* inodeBlockData = cached.SetToWritable(transaction, blockNum);
 	if (inodeBlockData == NULL)
@@ -140,7 +140,7 @@ Inode::WriteBack(Transaction& transaction)
 		"index: %lu, inode size: %lu, node size: %lu, this: %p, node: %p\n",
 		fID, blockNum, inodeBlockData, fVolume->InodeBlockIndex(fID),
 		fVolume->InodeSize(), fNodeSize, this, &fNode);
-	memcpy(inodeBlockData + 
+	memcpy(inodeBlockData +
 			fVolume->InodeBlockIndex(fID) * fVolume->InodeSize(),
 		(uint8*)&fNode, fNodeSize);
 
@@ -187,32 +187,39 @@ Inode::UpdateNodeFromDisk()
 status_t
 Inode::CheckPermissions(int accessMode) const
 {
-	uid_t user = geteuid();
-	gid_t group = getegid();
-
 	// you never have write access to a read-only volume
-	if (accessMode & W_OK && fVolume->IsReadOnly())
+	if ((accessMode & W_OK) != 0 && fVolume->IsReadOnly())
 		return B_READ_ONLY_DEVICE;
 
-	// root users always have full access (but they can't execute files without
-	// any execute permissions set)
-	if (user == 0) {
-		if (!((accessMode & X_OK) != 0 && (Mode() & S_IXUSR) == 0)
-			|| S_ISDIR(Mode()))
-			return B_OK;
+	// get node permissions
+	mode_t mode = Mode();
+	int userPermissions = (mode & S_IRWXU) >> 6;
+	int groupPermissions = (mode & S_IRWXG) >> 3;
+	int otherPermissions = mode & S_IRWXO;
+
+	// get the node permissions for this uid/gid
+	int permissions = 0;
+	uid_t uid = geteuid();
+	gid_t gid = getegid();
+
+	if (uid == 0) {
+		// user is root
+		// root has always read/write permission, but at least one of the
+		// X bits must be set for execute permission
+		permissions = userPermissions | groupPermissions | otherPermissions
+			| R_OK | W_OK;
+	} else if (uid == (uid_t)fNode.UserID()) {
+		// user is node owner
+		permissions = userPermissions;
+	} else if (gid == (gid_t)fNode.GroupID()) {
+		// user is in owning group
+		permissions = groupPermissions;
+	} else {
+		// user is one of the others
+		permissions = otherPermissions;
 	}
 
-	// shift mode bits, to check directly against accessMode
-	mode_t mode = Mode();
-	if (user == (uid_t)fNode.UserID())
-		mode >>= 6;
-	else if (group == (gid_t)fNode.GroupID())
-		mode >>= 3;
-
-	if (accessMode & ~(mode & S_IRWXO))
-		return B_NOT_ALLOWED;
-
-	return B_OK;
+	return (accessMode & ~permissions) == 0 ? B_OK : B_NOT_ALLOWED;
 }
 
 
@@ -321,8 +328,8 @@ Inode::FindBlock(off_t offset, off_t& block, uint32 *_count)
 				if (_count) {
 					*_count = 1;
 					uint32 nextBlock = block;
-					while (((++index & (perBlock - 1)) != 0) 
-						&& indirectBlocks[index & (perBlock - 1)] 
+					while (((++index & (perBlock - 1)) != 0)
+						&& indirectBlocks[index & (perBlock - 1)]
 							== ++nextBlock)
 						(*_count)++;
 				}
@@ -391,9 +398,11 @@ Inode::WriteAt(Transaction& transaction, off_t pos, const uint8* buffer,
 
 	// NOTE: Debugging info to find why sometimes resize doesn't happen
 	size_t length = *_length;
+#ifdef TRACE_EXT2
 	off_t oldEnd = pos + length;
 	TRACE("Inode::WriteAt(): Old calc for end? %x:%x\n",
 		(int)(oldEnd >> 32), (int)(oldEnd & 0xFFFFFFFF));
+#endif
 
 	off_t end = pos + (off_t)length;
 	off_t oldSize = Size();
@@ -564,7 +573,7 @@ Inode::Unlink(Transaction& transaction)
 		if (firstOrphanID != 0) {
 			Vnode firstOrphan(fVolume, firstOrphanID);
 			Inode* nextOrphan;
-		
+
 			status = firstOrphan.Get(&nextOrphan);
 			if (status != B_OK)
 				return status;
@@ -625,7 +634,7 @@ Inode::Create(Transaction& transaction, Inode* parent, const char* name,
 
 			Vnode vnode(volume, entryID);
 			Inode* inode;
-	
+
 			status = vnode.Get(&inode);
 			if (status != B_OK) {
 				TRACE("Inode::Create() Failed to get the inode from the "
@@ -720,7 +729,7 @@ Inode::Create(Transaction& transaction, Inode* parent, const char* name,
 	inode->SetAccessTime(&timespec);
 	inode->SetCreationTime(&timespec);
 	inode->SetModificationTime(&timespec);
-	
+
 	if (sizeof(ext2_inode) < volume->InodeSize())
 		node.SetExtraInodeSize(sizeof(ext2_inode) - EXT2_INODE_NORMAL_SIZE);
 
@@ -979,9 +988,9 @@ Inode::_SetNumBlocks(uint64 numBlocks)
 	if (numBlocks > 0xffffffffffffULL) {
 		fNode.SetFlag(EXT2_INODE_HUGE_FILE);
 		numBlocks /= (fVolume->BlockSize() / 512);
-	} else 
+	} else
 		fNode.ClearFlag(EXT2_INODE_HUGE_FILE);
-		
+
 	fNode.SetNumBlocks64(numBlocks);
 	return B_OK;
 }
