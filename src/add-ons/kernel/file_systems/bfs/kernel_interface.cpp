@@ -36,7 +36,7 @@ static void
 fill_stat_time(const bfs_inode& node, struct stat& stat)
 {
 	bigtime_t now = real_time_clock_usecs();
-	stat.st_atim.tv_sec = now / 1000000LL; 
+	stat.st_atim.tv_sec = now / 1000000LL;
 	stat.st_atim.tv_nsec = (now % 1000000LL) * 1000;
 
 	stat.st_mtim.tv_sec = bfs_inode::ToSecs(node.LastModifiedTime());
@@ -778,51 +778,70 @@ bfs_write_stat(fs_volume* _volume, fs_vnode* _node, const struct stat* stat,
 	// TODO: we should definitely check a bit more if the new stats are
 	//	valid - or even better, the VFS should check this before calling us
 
-	status_t status = inode->CheckPermissions(W_OK);
-	if (status < B_OK)
-		RETURN_ERROR(status);
+	bfs_inode& node = inode->Node();
+	bool updateTime = false;
+	uid_t uid = geteuid();
+
+	bool isOwnerOrRoot = uid == 0 || uid == (uid_t)node.UserID();
+	bool hasWriteAccess = inode->CheckPermissions(W_OK) == B_OK;
 
 	Transaction transaction(volume, inode->BlockNumber());
 	inode->WriteLockInTransaction(transaction);
 
-	bfs_inode& node = inode->Node();
-	bool updateTime = false;
-
-	if ((mask & B_STAT_SIZE) != 0) {
-		// Since WSTAT_SIZE is the only thing that can fail directly, we
+	if ((mask & B_STAT_SIZE) != 0 && inode->Size() != stat->st_size) {
+		// Since B_STAT_SIZE is the only thing that can fail directly, we
 		// do it first, so that the inode state will still be consistent
 		// with the on-disk version
 		if (inode->IsDirectory())
 			return B_IS_A_DIRECTORY;
 		if (!inode->IsFile())
 			return B_BAD_VALUE;
+		if (!hasWriteAccess)
+			RETURN_ERROR(B_NOT_ALLOWED);
 
-		if (inode->Size() != stat->st_size) {
-			off_t oldSize = inode->Size();
+		off_t oldSize = inode->Size();
 
-			status = inode->SetFileSize(transaction, stat->st_size);
-			if (status != B_OK)
-				return status;
+		status_t status = inode->SetFileSize(transaction, stat->st_size);
+		if (status != B_OK)
+			return status;
 
-			// fill the new blocks (if any) with zeros
-			if ((mask & B_STAT_SIZE_INSECURE) == 0) {
-				// We must not keep the inode locked during a write operation,
-				// or else we might deadlock.
-				rw_lock_write_unlock(&inode->Lock());
-				inode->FillGapWithZeros(oldSize, inode->Size());
-				rw_lock_write_lock(&inode->Lock());
-			}
+		// fill the new blocks (if any) with zeros
+		if ((mask & B_STAT_SIZE_INSECURE) == 0) {
+			// We must not keep the inode locked during a write operation,
+			// or else we might deadlock.
+			rw_lock_write_unlock(&inode->Lock());
+			inode->FillGapWithZeros(oldSize, inode->Size());
+			rw_lock_write_lock(&inode->Lock());
+		}
 
-			if (!inode->IsDeleted()) {
-				Index index(volume);
-				index.UpdateSize(transaction, inode);
+		if (!inode->IsDeleted()) {
+			Index index(volume);
+			index.UpdateSize(transaction, inode);
 
-				updateTime = true;
-			}
+			updateTime = true;
 		}
 	}
 
+	if ((mask & B_STAT_UID) != 0) {
+		// only root should be allowed
+		if (uid != 0)
+			RETURN_ERROR(B_NOT_ALLOWED);
+		node.uid = HOST_ENDIAN_TO_BFS_INT32(stat->st_uid);
+		updateTime = true;
+	}
+
+	if ((mask & B_STAT_GID) != 0) {
+		// only the user or root can do that
+		if (!isOwnerOrRoot)
+			RETURN_ERROR(B_NOT_ALLOWED);
+		node.gid = HOST_ENDIAN_TO_BFS_INT32(stat->st_gid);
+		updateTime = true;
+	}
+
 	if ((mask & B_STAT_MODE) != 0) {
+		// only the user or root can do that
+		if (!isOwnerOrRoot)
+			RETURN_ERROR(B_NOT_ALLOWED);
 		PRINT(("original mode = %ld, stat->st_mode = %d\n", node.Mode(),
 			stat->st_mode));
 		node.mode = HOST_ENDIAN_TO_BFS_INT32((node.Mode() & ~S_IUMSK)
@@ -830,16 +849,18 @@ bfs_write_stat(fs_volume* _volume, fs_vnode* _node, const struct stat* stat,
 		updateTime = true;
 	}
 
-	if ((mask & B_STAT_UID) != 0) {
-		node.uid = HOST_ENDIAN_TO_BFS_INT32(stat->st_uid);
-		updateTime = true;
-	}
-	if ((mask & B_STAT_GID) != 0) {
-		node.gid = HOST_ENDIAN_TO_BFS_INT32(stat->st_gid);
-		updateTime = true;
+	if ((mask & B_STAT_CREATION_TIME) != 0) {
+		// the user or root can do that or any user with write access
+		if (!isOwnerOrRoot && !hasWriteAccess)
+			RETURN_ERROR(B_NOT_ALLOWED);
+		node.create_time
+			= HOST_ENDIAN_TO_BFS_INT64(bfs_inode::ToInode(stat->st_crtim));
 	}
 
 	if ((mask & B_STAT_MODIFICATION_TIME) != 0) {
+		// the user or root can do that or any user with write access
+		if (!isOwnerOrRoot && !hasWriteAccess)
+			RETURN_ERROR(B_NOT_ALLOWED);
 		if (!inode->InLastModifiedIndex()) {
 			// directory modification times are not part of the index
 			node.last_modified_time
@@ -851,11 +872,11 @@ bfs_write_stat(fs_volume* _volume, fs_vnode* _node, const struct stat* stat,
 				bfs_inode::ToInode(stat->st_mtim));
 		}
 	}
-	if ((mask & B_STAT_CREATION_TIME) != 0) {
-		node.create_time
-			= HOST_ENDIAN_TO_BFS_INT64(bfs_inode::ToInode(stat->st_crtim));
-	}
+
 	if ((mask & B_STAT_CHANGE_TIME) != 0 || updateTime) {
+		// the user or root can do that or any user with write access
+		if (!isOwnerOrRoot && !hasWriteAccess)
+			RETURN_ERROR(B_NOT_ALLOWED);
 		bigtime_t newTime;
 		if ((mask & B_STAT_CHANGE_TIME) == 0)
 			newTime = bfs_inode::ToInode(real_time_clock_usecs());
@@ -865,7 +886,7 @@ bfs_write_stat(fs_volume* _volume, fs_vnode* _node, const struct stat* stat,
 		node.status_change_time = HOST_ENDIAN_TO_BFS_INT64(newTime);
 	}
 
-	status = inode->WriteBack(transaction);
+	status_t status = inode->WriteBack(transaction);
 	if (status == B_OK)
 		status = transaction.Done();
 	if (status == B_OK)

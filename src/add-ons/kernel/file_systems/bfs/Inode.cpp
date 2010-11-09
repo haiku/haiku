@@ -489,33 +489,39 @@ Inode::UpdateNodeFromDisk()
 status_t
 Inode::CheckPermissions(int accessMode) const
 {
-	uid_t user = geteuid();
-	gid_t group = getegid();
-
 	// you never have write access to a read-only volume
 	if ((accessMode & W_OK) != 0 && fVolume->IsReadOnly())
 		return B_READ_ONLY_DEVICE;
 
-	// root users always have full access (but they can't execute files without
-	// any execute permissions set)
-	if (user == 0) {
-		if (!((accessMode & X_OK) != 0 && (Mode() & S_IXUSR) == 0)
-			|| (Mode() & S_DIRECTORY) != 0) {
-			return B_OK;
-		}
+	// get node permissions
+	mode_t mode = Mode();
+	int userPermissions = (mode & S_IRWXU) >> 6;
+	int groupPermissions = (mode & S_IRWXG) >> 3;
+	int otherPermissions = mode & S_IRWXO;
+
+	// get the node permissions for this uid/gid
+	int permissions = 0;
+	uid_t uid = geteuid();
+	gid_t gid = getegid();
+
+	if (uid == 0) {
+		// user is root
+		// root has always read/write permission, but at least one of the
+		// X bits must be set for execute permission
+		permissions = userPermissions | groupPermissions | otherPermissions
+			| R_OK | W_OK;
+	} else if (uid == (uid_t)fNode.UserID()) {
+		// user is node owner
+		permissions = userPermissions;
+	} else if (gid == (gid_t)fNode.GroupID()) {
+		// user is in owning group
+		permissions = groupPermissions;
+	} else {
+		// user is one of the others
+		permissions = otherPermissions;
 	}
 
-	// shift mode bits, to check directly against accessMode
-	mode_t mode = Mode();
-	if (user == (uid_t)fNode.UserID())
-		mode >>= 6;
-	else if (group == (gid_t)fNode.GroupID())
-		mode >>= 3;
-
-	if (accessMode & ~(mode & S_IRWXO))
-		return B_NOT_ALLOWED;
-
-	return B_OK;
+	return (accessMode & ~permissions) == 0 ? B_OK : B_NOT_ALLOWED;
 }
 
 
