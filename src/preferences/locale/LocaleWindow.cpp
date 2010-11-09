@@ -378,9 +378,14 @@ LocaleWindow::MessageReceived(BMessage* message)
 				break;
 
 			BListView* conventionsList = static_cast<BListView*>(listView);
+			if (conventionsList == NULL)
+				break;
 
 			LanguageListItem* item = static_cast<LanguageListItem*>
 				(conventionsList->ItemAt(conventionsList->CurrentSelection()));
+			if (item == NULL)
+				break;
+
 			BFormattingConventions conventions(item->ID());
 			gMutableLocaleRoster->SetDefaultFormattingConventions(conventions);
 
