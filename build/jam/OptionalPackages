@@ -991,12 +991,12 @@ if [ IsOptionalHaikuImagePackageAdded Libmng ] {
 		Echo "No optional package Libmng available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage libmng-1.0.10-x86-gcc4-2010-10-30.zip
-			: $(baseURL)/libmng-1.0.10-x86-gcc4-2010-10-30.zip
+			: $(baseLibURL)/libmng-1.0.10-x86-gcc4-2010-10-30.zip
 			:
 		;
 	} else {
 		InstallOptionalHaikuImagePackage libmng-1.0.10-x86-gcc2-2010-10-29.zip
-			: $(baseURL)/libmng-1.0.10-x86-gcc2-2010-10-29.zip
+			: $(baseLibURL)/libmng-1.0.10-x86-gcc2-2010-10-29.zip
 			:
 		;
 	}
