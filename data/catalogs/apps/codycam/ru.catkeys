@@ -3,7 +3,7 @@ Capturing Image…	VideoConsumer.cpp		Захват изображения…
 Every 30 seconds	CodyCam		Каждые 30 секунд
 File name:	CodyCam		Имя файла:
 Last Capture: 	VideoConsumer.cpp		Последний захват изображения: 
-Server login failed	VideoConsumer.cpp		Не удлаось подключиться к серверу
+Server login failed	VideoConsumer.cpp		Не удалось подключиться к серверу
 Remote host has closed the connection.\n	FtpClient		Сервер закрыл соединение.\n
 Login:	CodyCam		Логин:
 Format:	CodyCam		Формат:
@@ -13,7 +13,7 @@ login ID expected	CodyCam		укажите логин
 Rate:	CodyCam		Периодичность:
 JPEG image	CodyCam		JPEG изображение
 Capture Rate Menu	CodyCam		Меню периодичности захвата
-CodyCam\n\nThe Original BeOS webcam	CodyCam		Камера\n\nТа самая вебкамера из BeOS
+CodyCam\n\nThe Original BeOS webcam	CodyCam		CodyCam\n\nТа самая веб-камера из BeOS
 File %s # unterminated quote at end of file\n	SettingsHandler		Файл %s # unterminated quote at end of file\n
 Password:	CodyCam		Пароль:
 Passive FTP	CodyCam		Пасивный FTP
@@ -42,14 +42,14 @@ Cannot start time source!	CodyCam		Невозможно начать отсче�
 Cannot register the video window	CodyCam		Невозможно зарегистрировать видео окно
 Every 24 hours	CodyCam		Каждые 24 часа
 unknown command	SettingsHandler		неизвестная команда
-Video settings	CodyCam		Настройки видео
-Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		Невозможно найти видео источник. Для использования CodyCam вам нужна веб-камера.
+Video settings	CodyCam		Настройка видео
+Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		Не найден видеоисточник. \nДля использования CodyCam вам нужна веб-камера.
 still image filename expected	CodyCam		укажите название изображения
-About CodyCam	CodyCam		О приложении CodyCam
+About CodyCam	CodyCam		О программе
 invalid upload client %ld\n	VideoConsumer.cpp		неправильный клиент загрузки: %ld\n
 Every 15 seconds	CodyCam		Каждые 15 секунд
 Error writing output file	VideoConsumer.cpp		Ошибка при записи файла
-About Codycam…	CodyCam		О приложении Codycam…
+About Codycam…	CodyCam		О программе…
 Background View	CodyCam		Задний вид
 image file format expected	CodyCam		укажите формат изображения
 Cannot set the time source for the video source	CodyCam		Невозможно установить счетчик времени для видео источника
@@ -68,7 +68,7 @@ Connected…	VideoConsumer.cpp		Подключен…
 PASS <suppressed>  (real password sent)\n	FtpClient		ПАРОЛЬ <скрыт>  (реальный пароль отослан)\n
 Every 5 minutes	CodyCam		Каждые 5 минут
 read: %d\n	SftpClient		чтение: %d\n
-OK	CodyCam		Oк
+OK	CodyCam		ОК
 Capture controls	CodyCam		Управление захватом
 Every hour	CodyCam		Каждый час
 Cannot connect the video source to the video window	CodyCam		Невозможно подключить видео источник к видео окну
@@ -97,3 +97,4 @@ Every 30 minutes	CodyCam		Каждые 30 минут
 FTP Setup	CodyCam		Настроить FTP
 reply: '%s'\n	SftpClient		ответ: '%s'\n
 Start video	CodyCam		Запустить видео
+CodyCam	CodyCam		Камера

@@ -1,16 +1,16 @@
-1	russian	x-vnd.Haiku-Expander	1292562546
+1	russian	x-vnd.Haiku-Expander	2952054963
 Expand	ExpanderMenu		Распаковать
 Set destination…	ExpanderMenu		Путь для извлечения…
 File expanded	ExpanderWindow		Файл распакован
 The destination is read only.	ExpanderWindow		Путь назначения доступен только для чтения.
-Expander: Open	ExpanderWindow		Expander: Открыть
+Expander: Open	ExpanderWindow		Распаковщик: Открыть
 Select current	DirectoryFilePanel		Выбрать текущий
 Source	ExpanderWindow		Источник
 Error when expanding archive	ExpanderWindow		Ошибка при распаковке файла
 Hide contents	ExpanderWindow		Скрыть содержимое
 Cancel	ExpanderWindow		Отмена
 Continue	ExpanderWindow		Продолжить
-Expander	ExpanderWindow	!! Window Title !!	Expander
+Expander	ExpanderWindow	!! Window Title !!	Распаковщик
 The destination folder does not exist.	ExpanderWindow		Папка назначения не существует.
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Вы уверены, что хотите остановить распаковку этого\nархива? Некоторые файлы могли быть извлечены не полностью.
 Select	DirectoryFilePanel		Выбрать
@@ -26,14 +26,28 @@ Stop	ExpanderMenu		Остановить
 File	ExpanderMenu		Файл
 Expand	ExpanderWindow		Извлечь
 Close	ExpanderMenu		Закрыть
-The destination is not a folder.	ExpanderWindow		Указанный объет не является папкой.
+The destination is not a folder.	ExpanderWindow		Указанный объект не является папкой.
 About Expander…	ExpanderMenu		О программе…
-OK	About		Oк
+OK	About		ОК
 Set source…	ExpanderMenu		Выбрать источник…
 Select '%s'	DirectoryFilePanel		Выбрать '%s'
 Show contents	ExpanderMenu		Показать содержимое
 Stop	ExpanderWindow		Остановить
 Destination	ExpanderWindow		Назначение
-\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tразработан Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nОригиналььная Be версия разработана\nDominic, Hiroshi, Peter, Pavel and Robert\n
+\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\n\tразработал Jérôme Duvaln\n\t\Copyright 2004-2006, Haiku Inc.\n\nОригинальную Be версию разработали\nDominic, Hiroshi, Peter, Pavel и Robert\n
 Expander	About		Expander
-is not supported	ExpanderWindow		не поддерживается
+is not supported	ExpanderWindow		 не поддерживается
+Expander settings	ExpanderPreferences		Настройки извлечения
+Automatically expand files	ExpanderPreferences		Автоматически распаковывать файлы
+Close window when done expanding	ExpanderPreferences		Закрывать окно после распаковки
+Leave destination folder path empty	ExpanderPreferences		Оставить путь распаковки пустым
+Same directory as source (archive) file	ExpanderPreferences		Использовать ту же папку где находится архив
+Use:	ExpanderPreferences		Использовать:
+Select	ExpanderPreferences		Выбрать
+Open destination folder after extraction	ExpanderPreferences		Открыть папку с извлеченными файлами после распаковки
+Automatically show contents listing	ExpanderPreferences		Автоматически отображать содержимое архива
+Expansion:	ExpanderPreferences		Извлечение:
+Destination folder:	ExpanderPreferences		Путь для извлечения
+Other:	ExpanderPreferences		Другое:
+OK	ExpanderPreferences		ОК
+Cancel	ExpanderPreferences		Отмена

@@ -1,9 +1,9 @@
 1	russian	x-vnd.Be-TSKB	2686533917
 Applications	PreferencesWindow		Приложения
-Recent applications	BeMenu		Последние приложения
+Recent applications	BeMenu		Недавние приложения
 Edit menu…	PreferencesWindow		Изменить меню…
-Recent documents:	PreferencesWindow		Последние документы:
-Recent folders	BeMenu		Последние папки
+Recent documents:	PreferencesWindow		Недавние документы:
+Recent folders	BeMenu		Недавние папки
 Sort running applications	PreferencesWindow		Сортировать запущенные приложения
 Change time…	TimeView		Настроить время…
 <Be folder is empty>	BeMenu		<Папка Be пуста>
@@ -14,26 +14,26 @@ Always on top	PreferencesWindow		Всегда сверху
 Show all	WindowMenu		Показать все
 No windows	WindowMenu		Нет окон
 Power off	BeMenu		Выключить компьютер
-Auto-raise	PreferencesWindow		Всплывать при наведении
+Auto-raise	PreferencesWindow		Всплывать автоматически
 Full date	PreferencesWindow		Полная дата
 Hide time	TimeView		Скрыть часы
-Recent folders:	PreferencesWindow		Последние папки:
+Recent folders:	PreferencesWindow		Недавние папки:
 Deskbar preferences…	BeMenu		Настроить Deskbar…
-Show application expander	PreferencesWindow		Отображать экспандер приложения
+Show application expander	PreferencesWindow		Отображать список окон приложений
 Close all	WindowMenu		Закрыть все
 Deskbar preferences	PreferencesWindow		Настройки Deskbar
-Mount	BeMenu		Смонтировать
-Recent applications:	PreferencesWindow		Последние приложения:
+Mount	BeMenu		Подключить
+Recent applications:	PreferencesWindow		Недавние приложения:
 Tracker always first	PreferencesWindow		Tracker всегда первый
-About Haiku…	BeMenu		О Haiku…
+About Haiku…	BeMenu		О системе Haiku…
 Show calendar…	TimeView		Показать календарь…
 Restart system	BeMenu		Перезагрузить компьютер
 Find…	BeMenu		Найти…
 Restart Tracker	BeMenu		Перезапустить Tracker
 Show Time	Tray		Отображать время
-Expand new applications	PreferencesWindow		Раскрывать запущенное приложение
+Expand new applications	PreferencesWindow		Раскрывать список окон при запуске
 Clock	PreferencesWindow		Часы
-Recent documents	BeMenu		Последние документы
+Recent documents	BeMenu		Недавние документы
 Hide all	WindowMenu		Скрыть все
 Shutdown…	BeMenu		Завершение работы…
 Quit application	WindowMenu		Закрыть приложение

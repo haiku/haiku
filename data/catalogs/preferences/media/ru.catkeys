@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Media	2505372198
+1	russian	x-vnd.Haiku-Media	243366818
 Show volume control on Deskbar	Media views		Отображать регулятор громкости в Deskbar
 Audio input:	Media views		Аудио вход:
 Restarting media services\nStarting media server…\n	Media Window		Перезапуск медиа служб\nЗапуск медиа сервера…\n
@@ -9,7 +9,7 @@ Stopping media server…	Media Window		Остановка медиа серве�
 Video output:	Media views		Видео выход:
 Enable real-time audio	Media views		Включить аудио режим реального времени
 Quit	Media Window		Выход
-OK	Media Window		Ок
+OK	Media Window		ОК
 Enabling real-time video allows system to perform video operations as fast and smoothly as possible.  It achieves optimum performance by using more RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Режим реального времени для видео позволяет системе выполнять видео операции так быстро и гладко, насколько это возможно. Это достигается за счёт большей загрузки процессора и оперативной памяти.\n\nВключите эту функцию, только если вам нужна низкая латентность.
 Default nodes	Media views		Узлы по умолчанию
 Starting media server…	Media Window		Запуск медиа сервера…
@@ -18,13 +18,13 @@ Done shutting down.	Media Window		Остановка завершена.
 Cleaning up.	Media Window		Очистка.
 Telling media_addon_server to quit.	Media Window		Запрос завершения работы media_addon_server.
 Enable real-time video	Media views		Включить видео режим реального времени
-This hardware has no controls.	Media Window		Это оборудование не имеет настраиваемых параметров.
+This hardware has no controls.	Media Window		Это оборудование не имеет параметров настройки.
 Restarting media services\nShutting down media server\n	Media Window		Перезапуск медиа служб\nОстановка медиа сервера\n
 Audio output:	Media views		Аудио выход:
-Start media server	Media Window		Запуск медиа сервера
+Start media server	Media Window		Запустить медиа сервер
 Audio settings	Media Window		Настройки звука
 Could not connect to the media server.\nWould you like to start it ?	Media Window		Невозможно подключиться к медиа серверу.\nХотите запустить его?\n
-Ready for use…	Media Window		Готово к использованию…
+Ready for use…	Media Window		Готов к использованию…
 Real-time	Media views		Реальное время
 Restart media services	Media views		Перезапустить медиа службы
 Enabling real-time audio allows system to record and play audio as fast as possible.  It achieves this performance by using more CPU and RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Режим реального времени для аудио позволяет системе выполнять аудио операции так быстро и гладко, насколько это возможно. Это достигается за счёт большей загрузки процессора и оперативной памяти.\n\nВключите эту функцию, только если вам нужна низкая латентность.
@@ -32,3 +32,7 @@ Couldn't remove volume control in Deskbar: %s\n	Media Window		Невозможн
 Couldn't add volume control in Deskbar: %s\n	Media Window		Невозможно добавить регулятор громкости в Deskbar: %s\n
 Media	Media Window		Медиа
 Channel:	Media views		Канал:
+Audio settings	Media Window		Аудио
+Video settings	Media Window		Видео
+Audio mixer	Media Window		Микшер
+<none>	Media views		<нет>

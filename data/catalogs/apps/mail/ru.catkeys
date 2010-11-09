@@ -1,4 +1,4 @@
-1	russian	x-vnd.Be-MAIL	694686022
+1	russian	x-vnd.Be-MAIL	1685878103
 %d - Date	Mail		%d - Дата
 Attach attributes:	Mail		Прикрепление атрибутов:
 Inconsistency occurred in the undo/redo buffer.	Mail		Произошло несоответствие в буфере отмены/повтора.
@@ -14,7 +14,7 @@ Reply to all	Mail		Ответить всем
 Show icons & labels	Mail		Отображать иконки и надписи
 Remove attachment	Mail		Удалить вложение
 Button bar:	Mail		Панель кнопок:
-Beginner	Mail		Новичёк
+Beginner	Mail		Новичок
 Don't save	Mail		Не сохранять
 Expert	Mail		Эксперт
 Reply account:	Mail		Ответить, используя акканут:
@@ -39,7 +39,7 @@ Edit queries…	Mail		Изменить запросы…
 Paste	Mail		Вставить
 Save attachment…	Mail		Сохранить вложение…
 Include file attributes in attachments	Mail		Добавлять атрибуты файла во вложение
-OK	Mail		Ок
+OK	Mail		ОК
 Send	Mail		Отправить
 Show icons only	Mail		Отображать только иконки
 Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Удаление вложений из пересланного письма еще не реализовано!\nЭта функция еще не работает.
@@ -89,7 +89,7 @@ Really delete this signature? This cannot be undone.	Mail		Действител�
 Open	Mail		Открыть
 Quote	Mail		Цитата
 Add	Mail		Добавить
-Next message	Mail		Следущее сообщение
+Next message	Mail		Следующее сообщение
 User interface	Mail		Интерфейс пользователя
 Cancel	Mail		Отмена
 Send message	Mail		Послать сообщение
@@ -111,7 +111,7 @@ Encoding:	Mail		Кодировка:
 Font:	Mail		Шрифт:
 Save address	Mail		Сохранить адрес
 Queries	Mail		Запросы
-Do you wish to save this message as a draft before closing?	Mail		Сохранить это сообщение как черновик перед закрытием?
+Do you wish to save this message as a draft before closing?	Mail		Сохранить это сообщение как черновик?
 Save	Mail		Сохранить
 Random	Mail		Случайная
 Close and 	Mail		Закрыть и 
@@ -125,7 +125,7 @@ Open draft	Mail		Открыть черновик
 Cut	Mail		Вырезать
 Check spelling	Mail		Проверять орфографию 
 Set to Saved	Mail		Послать в сохраненные
-Open this link	Mail		Открыть эту сслыку
+Open this link	Mail		Открыть эту ссылку
 Auto signature:	Mail		Автоподпись:
 Add signature	Mail		Добавить подпись
 Need Tracker to move items to trash	Mail		Для перемещение объектов в Корзину требуется запущенный Tracker
@@ -137,7 +137,8 @@ Select all	Mail		Выделить все
 An error occurred trying to save this signature.	Mail		Произошла ошибка при попытке сохранить эту подпись.
 View	Mail		Вид
 Mail couldn't find its dictionary.	Mail		Невозможно найти файл словаря.
-Mail\n\n	Mail		Почта\n\n
-Written by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Разработано Robert Polic.\nУлучшено командой Dr. Zoidberg.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n
+Mail\n\n	Mail		Mail\n
+Mail	Mail		Почта
+Written by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Разработал Robert Polic.\nУлучшено командой Dr. Zoidberg.\n\nCopyright 1991-2001, Be, Inc.\nCopyright 2005-2010, Haiku, Inc.\n
 Text wrapping:	Mail		Перенос строк:
 File	Mail		Файл

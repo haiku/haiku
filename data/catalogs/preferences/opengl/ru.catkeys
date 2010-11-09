@@ -1,19 +1,19 @@
 1	russian	x-vnd.Haiku-OpenGL	899836772
 List stack size:	Capabilities		Размер стека списка:
 Information	InfoView		Информация
-Max. clipping planes:	Capabilities		Максимальное колличество отсечений:
-Max. texture units:	Capabilities		Максимальное колличество текстурных блоков:
+Max. clipping planes:	Capabilities		Максимальное количество отсечений:
+Max. texture units:	Capabilities		Максимальное количество текстурных блоков:
 Renderer name:	InfoView		Название рендера: 
 Vendor name:	InfoView		Имя поставщика:
 Attributes stack size:	Capabilities		Размер стека атрибутов:
 OpenGL version:	InfoView		Версия OpenGL:
 Name stack size:	Capabilities		Размер стекового имени:
-Auxiliary buffer(s):	Capabilities		Вспомагательный буфер(ы):
-Max. recommended vertex elements:	Capabilities		Максимальное рекомендованное колличество вершин:
+Auxiliary buffer(s):	Capabilities		Вспомогательных буферов:
+Max. recommended vertex elements:	Capabilities		Максимальное рекомендованное количество вершин:
 GLU version:	InfoView		Версия GLU:
 Model stack size:	Capabilities		Размер стека модели:
 Projection stack size:	Capabilities		Размер стека проекции:
-Max. lights:	Capabilities		Максимальное колличество источников света:
+Max. lights:	Capabilities		Максимальное количество источников света:
 Max. 2D texture size:	Capabilities		Максимальный размер 2D текстур:
 Max. convolution:	Capabilities		Максимальный оборот:
 GLUT API version:	InfoView		Версия GLUT API:
@@ -21,6 +21,6 @@ Texture stack size:	Capabilities		Размер стека текстуры:
 Max. evaluators equation order:	Capabilities		Максимальный оценочный блок команд:
 Max. 3D texture size:	Capabilities		Максимальный размер 3D текстуры:
 Capabilities	Capabilities		Возможности
-Max. recommended index elements:	Capabilities		Максимальное рекомендованное колличество индексов:
+Max. recommended index elements:	Capabilities		Максимальное рекомендованное количество индексов:
 Available	Extensions		Доступно
 Extensions	Extensions		Расширения

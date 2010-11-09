@@ -1,76 +1,66 @@
-1	russian	x-vnd.Haiku-Terminal	1150769874
+1	russian	x-vnd.Haiku-Terminal	3460363657
 Not found.	Terminal TermWindow		Не найдено
-Didn't find any available pseudo ttys.	Terminal Shell		Didn't find any available pseudo ttys.
 Switch Terminals	Terminal TermWindow		Переключить терминалы
 Change directory	Terminal TermView		Сменить каталог
-OK	Terminal TermWindow		Oк
+OK	Terminal TermWindow		ОК
 New Terminal	Terminal TermWindow		Новый терминал
-Terminal couldn't start the shell. Sorry.	Terminal TermApp		Терминал не может запустить оболочку. Простите.
+Terminal couldn't start the shell. Sorry.	Terminal TermApp		Терминал не смог запустить оболочку. Простите.
 Text size	Terminal TermWindow		Размер шрифта
 Match case	Terminal FindWindow		Учитывать регистр
 Quit	Terminal TermWindow		Выход
 Use default shell	Terminal Shell		Использовать оболочку по умолчанию
 Select all	Terminal TermWindow		Выделить всё
+Edit	Terminal TermWindow		Изменить
 Terminal	Terminal TermWindow		Терминал
 Save to file…	Terminal PrefWindow		Сохранить в файл…
-Failed to init pseudo tty.	Terminal Shell		Не удалось иницализировать псевдо tty.
-OK	Terminal PrefWindow		Oк
+OK	Terminal PrefWindow		ОК
 Font:	Terminal AppearancePrefView		Шрифт:
 Copy here	Terminal TermView		Копировать сюда
 Copy	Terminal TermWindow		Копировать
-could not set session leader.	Terminal Shell		could not set session leader.
-sigaction() failed: %s\n	Terminal TermApp		sigaction() failed: %s\n
-Unrecognized option \"%s\"\n	Terminal arguments parsing		Unrecognized option \"%s\"\n
-Print cancelled.	Terminal TermWindow		Печать отменена.
+Print cancelled.	Terminal TermWindow		Печать отменена
 Increase	Terminal TermWindow		Увеличить
 Settings	Terminal TermWindow		Настройки
 Window size	Terminal TermWindow		Размер окна
-Terminal settings	Terminal PrefWindow		Настройки трминала
+Terminal settings	Terminal PrefWindow		Настройки терминала
 Find	Terminal FindWindow		Найти
 Appearance	Terminal PrefWindow		Внешний вид
 Use selection	Terminal FindWindow		Использовать выделение
 Size:	Terminal AppearancePrefView		Размер:
-Cannot execute \"%command\":\n\t%error	Terminal Shell		Cannot execute \"%command\":\n\t%error
 Full screen	Terminal TermWindow		На весь экран
-Page setup…	Terminal TermWindow		Настройка печати...
-OK	Terminal TermView		Ок
+Page setup…	Terminal TermWindow		Настройка печати…
+OK	Terminal TermView		ОК
 Insert path	Terminal TermView		Вставить путь
-Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n
-No search string was entered.	Terminal TermWindow		Не введена строка поиска.
+No search string was entered.	Terminal TermWindow		Не введена строка поиска
 Don't save	Terminal PrefWindow		Не сохранять
 Match word	Terminal FindWindow		Только слово целиком
 Close tab	Terminal SmartTabView		Закрыть вкладку
 Nothing is selected.	Terminal TermWindow		Ничего не выделено
 Text not found.	Terminal TermWindow		Текст не найден
-Find…	Terminal TermWindow		Найти...
+Find…	Terminal TermWindow		Найти…
 Move here	Terminal TermView		Переместить сюда
-Secondary mouse button drop menu	Terminal TermView		Secondary mouse button drop menu
 Error!	Terminal getString		Ошибка!
 New tab	Terminal TermWindow		Новая вкладка
-can't open tty (%s).	Terminal Shell		can't open tty (%s).
 Decrease	Terminal TermWindow		Уменьшить
 Create link here	Terminal TermView		Создать ссылку здесь
-failed set terminal interface (TERMIOS).	Terminal Shell		failed set terminal interface (TERMIOS).
-Clear all	Terminal TermWindow		Очистить все
+Clear all	Terminal TermWindow		Очистить всё
 Text encoding	Terminal TermWindow		Кодировка
 size	Terminal TermView		размер
 Save as default	Terminal TermWindow		Сохранить
-Settings…	Terminal TermWindow		Настройки...
+Settings…	Terminal TermWindow		Настройки…
 Abort	Terminal Shell		Отменить
-mismatch handshake.	Terminal Shell		mismatch handshake.
 Color:	Terminal AppearancePrefView		Цвет:
 Print	Terminal TermWindow		Печать
 Use text:	Terminal FindWindow		Использовать текст:
 Cancel	Terminal TermWindow		Отмена
-OK	Terminal TermApp		Ок
+OK	Terminal TermApp		ОК
 Find failed	Terminal TermWindow		Строка не найдена
-Search forward	Terminal FindWindow		Искать вниз
-Find previous	Terminal TermWindow		Найти предыдущее
-About Terminal…	Terminal TermWindow		О программе....
+Shell 	Terminal TermWindow		Консоль 
+Search forward	Terminal FindWindow		Искать сверху вниз
+Find previous	Terminal TermWindow		Найти ранее
+About Terminal…	Terminal TermWindow		О программе…
 Find next	Terminal TermWindow		Найти далее
-Close active tab	Terminal TermWindow		Закрыть активную владку
+Close active tab	Terminal TermWindow		Закрыть активную вкладку
 Terminal	Terminal TermApp		Терминал
-PrefHandler::getRGB(%s) - key not found\n	Terminal getRGB		PrefHandler::getRGB(%s) - key not found\n
 Paste	Terminal TermWindow		Вставить
 Save changes to this settings panel?	Terminal PrefWindow		Сохранить изменения в панеле настройки?
 Cancel	Terminal PrefWindow		Отмена
@@ -78,7 +68,7 @@ Save	Terminal PrefWindow		Сохранить
 Cancel	Terminal TermView		Отмена
 -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h, --help вывести этот текст\n -t, --title установить заголовок окна\n -f, --fullscreen запустить в полном экране\n
 Color schema:	Terminal AppearancePrefView		Цветовая схема:
-Terminal\n\nwritten by Kazuho Okui and Takashi Murai\nupdated by Kian Duffy and others\n\nCopyright ©2003-2009, Haiku.\n	Terminal TermView		Терминал\n\nразработал Kazuho Okui и Takashi Murai\nобновлено Kian Duffy и многими другими\n\nCopyright ©2003-2009, Haiku.\n
+Terminal\n\nwritten by Kazuho Okui and Takashi Murai\nupdated by Kian Duffy and others\n\nCopyright ©2003-2009, Haiku.\n	Terminal TermView		Terminal\n\nразработал Kazuho Okui и Takashi Murai\nобновлено Kian Duffy и многими другими\n\nCopyright ©2003-2009, Haiku.\n
 Confirm exit if active programs exist	Terminal AppearancePrefView		Подтвержать выход если запущен процесс
-A process is still running.\nIf you close the Terminal the process will be killed.	Terminal TermWindow		В окне терминала запущен процесс.\nЕсли вы закроете это окно, то этот процесс будет завершён.
-Really quit?	Terminal TermWindow		Действитель выйти?
+A process is still running.\nIf you close the Terminal the process will be killed.	Terminal TermWindow		В окне терминала запущена программа.\nЕсли вы закроете это окно, то этот процесс будет завершён.
+Really quit?	Terminal TermWindow		Действительно выйти?

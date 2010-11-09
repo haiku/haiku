@@ -1,6 +1,6 @@
-1	russian	x-vnd.Haiku-About	2583642733
+1	russian	x-vnd.Haiku-About	2334824087
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (за его ядро NewOS)\n
-%ld Processors:	AboutView		%ld Процессоры:
+%ld Processors:	AboutView		Процессоров: %ld
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (основателю проекта)\n\n
 The Haiku-Ports team\n	AboutView		Команде Haiku-Ports\n
 Website, marketing & documentation:\n	AboutView		Веб-сайт, маркетинг и документация:\n
@@ -26,12 +26,12 @@ Version:	AboutView		Версия:
 [Click a license name to read the respective license.]\n\n	AboutView		[Щелкните левой кнопкой мыши на название лицензии для её прочтения.]\n\n
 License: 	AboutView		Лицензия: 
 Translations:\n	AboutView		Переводчики:\n
-... and the many people making donations!\n\n	AboutView		... и многим другим людям, которые делают пожертвования!\n\n
-Google & their Google Summer of Code program\n\n	AboutView		Корпорации Google и их программе Google Summer of Code\n\n
+... and the many people making donations!\n\n	AboutView		... и многим другим людям, делающим пожертвования!\n\n
+Google & their Google Summer of Code program\n	AboutView		Корпорации Google и их программе Google Summer of Code\n
 The BeGeistert team\n	AboutView		команде BeGeistert\n
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku and the Haiku logo are trademarks of Haiku, Inc.\n\n	AboutView		Права на код Haiku принадлежат Haiku, Inc. или конкретным авторам, указанным в исходном коде. Haiku и логотип Haiku являются торговыми марками Haiku, Inc.\n\n
 GCC %d Hybrid	AboutView		GCC %d Гибрид
-%d MiB total	AboutView		Всего %d МиБ
-%d MiB used (%d%%)	AboutView		Использовано %d МиБ (%d%%)
+%d MiB total	AboutView		Всего %d Мбайт
+%d MiB used (%d%%)	AboutView		%d Мбайт использовано  (%d%%)
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT licence%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		Код, написанный специально для Haiku, особенно ядро и весь код, с которым могут быть связаны приложения, распространяется на условиях %MIT licence%. Некоторые системные библиотеки содержат сторонний код, распространяемый под лицензией LGPL. Вы можете найти авторские права на этот код ниже.\n\n
-%total MiB total, %inaccessible MiB inaccessible	AboutView		%total МиБ всего, %inaccessible МиБ недоступно
+%total MiB total, %inaccessible MiB inaccessible	AboutView		%total Мбайт всего, %inaccessible Мбайт недоступно
