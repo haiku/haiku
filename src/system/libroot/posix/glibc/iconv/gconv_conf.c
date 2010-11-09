@@ -132,20 +132,20 @@ add_alias (char *rp, void *modules)
   struct gconv_alias *new_alias;
   char *from, *to, *wp;
 
-  while (__isspace_l (*rp, &_nl_C_locobj))
+  while (isspace(*rp))
     ++rp;
   from = wp = rp;
-  while (*rp != '\0' && !__isspace_l (*rp, &_nl_C_locobj))
-    *wp++ = __toupper_l (*rp++, &_nl_C_locobj);
+  while (*rp != '\0' && !isspace(*rp))
+    *wp++ = toupper (*rp++);
   if (*rp == '\0')
     /* There is no `to' string on the line.  Ignore it.  */
     return;
   *wp++ = '\0';
   to = ++rp;
-  while (__isspace_l (*rp, &_nl_C_locobj))
+  while (isspace(*rp))
     ++rp;
-  while (*rp != '\0' && !__isspace_l (*rp, &_nl_C_locobj))
-    *wp++ = __toupper_l (*rp++, &_nl_C_locobj);
+  while (*rp != '\0' && !isspace(*rp))
+    *wp++ = toupper (*rp++);
   if (to == wp)
     /* No `to' string, ignore the line.  */
     return;
@@ -253,30 +253,30 @@ add_module (char *rp, const char *directory, size_t dir_len, void **modules,
   int need_ext;
   int cost_hi;
 
-  while (__isspace_l (*rp, &_nl_C_locobj))
+  while (isspace(*rp))
     ++rp;
   from = rp;
-  while (*rp != '\0' && !__isspace_l (*rp, &_nl_C_locobj))
+  while (*rp != '\0' && !isspace(*rp))
     {
-      *rp = __toupper_l (*rp, &_nl_C_locobj);
+      *rp = toupper(*rp);
       ++rp;
     }
   if (*rp == '\0')
     return;
   *rp++ = '\0';
   to = wp = rp;
-  while (__isspace_l (*rp, &_nl_C_locobj))
+  while (isspace(*rp))
     ++rp;
-  while (*rp != '\0' && !__isspace_l (*rp, &_nl_C_locobj))
-    *wp++ = __toupper_l (*rp++, &_nl_C_locobj);
+  while (*rp != '\0' && !isspace(*rp))
+    *wp++ = toupper(*rp++);
   if (*rp == '\0')
     return;
   *wp++ = '\0';
   do
     ++rp;
-  while (__isspace_l (*rp, &_nl_C_locobj));
+  while (isspace(*rp));
   module = wp;
-  while (*rp != '\0' && !__isspace_l (*rp, &_nl_C_locobj))
+  while (*rp != '\0' && !isspace(*rp))
     *wp++ = *rp++;
   if (*rp == '\0')
     {
@@ -389,7 +389,7 @@ read_conf_file (const char *filename, const char *directory, size_t dir_len,
 	if (rp[n - 1] == '\n')
 	  rp[n - 1] = '\0';
 
-      while (__isspace_l (*rp, &_nl_C_locobj))
+      while (isspace(*rp))
 	++rp;
 
       /* If this is an empty line go on with the next one.  */
@@ -397,7 +397,7 @@ read_conf_file (const char *filename, const char *directory, size_t dir_len,
 	continue;
 
       word = rp;
-      while (*rp != '\0' && !__isspace_l (*rp, &_nl_C_locobj))
+      while (*rp != '\0' && !isspace(*rp))
 	++rp;
 
       if (rp - word == sizeof ("alias") - 1

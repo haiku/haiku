@@ -29,9 +29,9 @@ strip (char *wp, const char *s)
 
   while (*s != '\0')
     {
-      if (__isalnum_l (*s, &_nl_C_locobj)
+      if (isalnum(*s)
 	  || *s == '_' || *s == '-' || *s == '.')
-	*wp++ = __toupper_l (*s, &_nl_C_locobj);
+	*wp++ = toupper(*s);
       else if (*s == '/')
 	{
 	  if (++slash_count == 3)
@@ -52,7 +52,7 @@ static inline char * __attribute__ ((unused))
 upstr (char *dst, const char *str)
 {
   char *cp = dst;
-  while ((*cp++ = __toupper_l (*str++, &_nl_C_locobj)) != '\0')
+  while ((*cp++ = toupper(*str++)) != '\0')
     /* nothing */;
   return dst;
 }
