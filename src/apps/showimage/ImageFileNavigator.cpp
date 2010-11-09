@@ -470,6 +470,21 @@ ImageFileNavigator::HasPreviousFile()
 }
 
 
+bool
+ImageFileNavigator::GetNextFile(const entry_ref& ref, entry_ref& nextRef)
+{
+	return fNavigator->FindNextImage(ref, nextRef, true, false);
+}
+
+
+bool
+ImageFileNavigator::GetPreviousFile(const entry_ref& ref,
+	entry_ref& previousRef)
+{
+	return fNavigator->FindNextImage(ref, previousRef, false, false);
+}
+
+
 /*!	Moves the current file into the trash.
 	Returns true if a new file should be loaded, false if not.
 */

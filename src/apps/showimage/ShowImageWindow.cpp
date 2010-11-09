@@ -702,7 +702,7 @@ ShowImageWindow::MessageReceived(BMessage* message)
 
 		case MSG_FILE_PREV:
 			if (_ClosePrompt() && fNavigator.PreviousFile())
-				_LoadImage();
+				_LoadImage(false);
 			break;
 
 		case MSG_FILE_NEXT:
@@ -976,11 +976,37 @@ ShowImageWindow::_ClosePrompt()
 
 
 status_t
-ShowImageWindow::_LoadImage()
+ShowImageWindow::_LoadImage(bool forward)
 {
 	BMessenger us(this);
-	return ImageCache::Default().RetrieveImage(fNavigator.CurrentRef(),
-		fNavigator.CurrentPage(), &us);
+	status_t status = ImageCache::Default().RetrieveImage(
+		fNavigator.CurrentRef(), fNavigator.CurrentPage(), &us);
+	if (status != B_OK)
+		return status;
+
+	// Preload previous/next images - two in the navigation direction, one
+	// in the opposite direction.
+
+	entry_ref nextRef = fNavigator.CurrentRef();
+	if (_PreloadImage(forward, nextRef))
+		_PreloadImage(forward, nextRef);
+
+	entry_ref previousRef = fNavigator.CurrentRef();
+	_PreloadImage(!forward, previousRef);
+
+	return B_OK;
+}
+
+
+bool
+ShowImageWindow::_PreloadImage(bool forward, entry_ref& ref)
+{
+	entry_ref currentRef = ref;
+	if ((forward && !fNavigator.GetNextFile(currentRef, ref))
+		|| (!forward && !fNavigator.GetPreviousFile(currentRef, ref)))
+		return false;
+
+	return ImageCache::Default().RetrieveImage(ref) == B_OK;
 }
 
 

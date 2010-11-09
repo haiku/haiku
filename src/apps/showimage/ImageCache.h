@@ -42,8 +42,9 @@ class ImageCache {
 public:
 	static	ImageCache&			Default() { return sCache; }
 
-			status_t			RetrieveImage(const entry_ref& ref, int32 page,
-									const BMessenger* target);
+			status_t			RetrieveImage(const entry_ref& ref,
+									int32 page = 1,
+									const BMessenger* target = NULL);
 
 private:
 								ImageCache();

@@ -64,7 +64,8 @@ private:
 			void				_SaveToFile(BMessage* message);
 									// Handle save file panel message
 			bool				_ClosePrompt();
-			status_t			_LoadImage();
+			status_t			_LoadImage(bool forward = true);
+			bool				_PreloadImage(bool forward, entry_ref& ref);
 			void				_ToggleFullScreen();
 			void				_ApplySettings();
 			void				_SavePrintOptions();

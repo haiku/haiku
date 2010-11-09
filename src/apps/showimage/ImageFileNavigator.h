@@ -51,6 +51,11 @@ public:
 			bool				HasNextFile();
 			bool				HasPreviousFile();
 
+			bool				GetNextFile(const entry_ref& ref,
+									entry_ref& nextRef);
+			bool				GetPreviousFile(const entry_ref& ref,
+									entry_ref& previousRef);
+
 			bool				MoveFileToTrash();
 
 private:
