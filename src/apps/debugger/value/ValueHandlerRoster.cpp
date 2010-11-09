@@ -15,6 +15,7 @@
 #include "BoolValueHandler.h"
 #include "EnumerationValueHandler.h"
 #include "FloatValueHandler.h"
+#include "StringValueHandler.h"
 #include "Value.h"
 
 
@@ -106,6 +107,7 @@ ValueHandlerRoster::RegisterDefaultHandlers()
 	REGISTER_HANDLER(Enumeration)
 	REGISTER_HANDLER(Float)
 	REGISTER_HANDLER(Integer)
+	REGISTER_HANDLER(String)
 
 	return B_OK;
 }

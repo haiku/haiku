@@ -14,6 +14,7 @@
 #include "AddressValueNode.h"
 #include "ArrayValueNode.h"
 #include "CompoundValueNode.h"
+#include "CStringTypeHandler.h"
 #include "EnumerationValueNode.h"
 #include "PointerToMemberValueNode.h"
 #include "PrimitiveValueNode.h"
@@ -139,6 +140,11 @@ TypeHandlerRoster::RegisterDefaultHandlers()
 	REGISTER_HANDLER(Enumeration);
 	REGISTER_HANDLER(PointerToMember);
 	REGISTER_HANDLER(Primitive);
+
+	handler = new(std::nothrow) CStringTypeHandler();
+	handlerReference.SetTo(handler, true);
+	if (handler == NULL || !RegisterHandler(handler))
+		return B_NO_MEMORY;
 
 	return B_OK;
 }

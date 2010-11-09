@@ -185,3 +185,14 @@ ValueLoader::LoadValue(ValueLocation* location, type_code valueType,
 	_value = value;
 	return B_OK;
 }
+
+
+status_t
+ValueLoader::LoadStringValue(BVariant& location, type_code valueType,
+	BString& _value)
+{
+	static const size_t kMaxStringSize = 255;
+
+	return fTeamMemory->ReadMemoryString(location.ToUInt64(), kMaxStringSize,
+		_value);
+}

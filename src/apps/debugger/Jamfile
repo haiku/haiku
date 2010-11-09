@@ -27,6 +27,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui util ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui value ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) util ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) value ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) value type_handlers ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) value value_handlers ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) value value_nodes ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) value values ] ;
@@ -210,17 +211,22 @@ Application Debugger :
 	ValueNode.cpp
 	ValueNodeContainer.cpp
 
+	# value/type_handlers
+	CStringTypeHandler.cpp
+
 	# value/value_handlers
 	AddressValueHandler.cpp
 	BoolValueHandler.cpp
 	EnumerationValueHandler.cpp
 	FloatValueHandler.cpp
 	IntegerValueHandler.cpp
+	StringValueHandler.cpp
 
 	# value/value_nodes
 	AddressValueNode.cpp
 	ArrayValueNode.cpp
 	CompoundValueNode.cpp
+	CStringValueNode.cpp
 	EnumerationValueNode.cpp
 	PointerToMemberValueNode.cpp
 	PrimitiveValueNode.cpp
@@ -232,6 +238,7 @@ Application Debugger :
 	EnumerationValue.cpp
 	FloatValue.cpp
 	IntegerValue.cpp
+	StringValue.cpp
 
 	:
 	<nogrist>Debugger_demangler.o
