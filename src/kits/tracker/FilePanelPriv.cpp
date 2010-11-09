@@ -652,7 +652,7 @@ TFilePanel::Init(const BMessage *)
 	}
 
 	// add directory menu and menufield
-	fDirMenu = new BDirMenu(0, kSwitchDirectory, "refs");
+	fDirMenu = new BDirMenu(0, this, kSwitchDirectory, "refs");
 
 	font_height ht;
 	be_plain_font->GetHeight(&ht);

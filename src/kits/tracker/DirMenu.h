@@ -44,7 +44,8 @@ namespace BPrivate {
 
 class BDirMenu : public BPopUpMenu {
 public:
-	BDirMenu(BMenuBar *, uint32 command, const char *entryName = 0);
+	BDirMenu(BMenuBar *, BMessenger target, uint32 command,
+		const char *entryName = 0);
 	virtual ~BDirMenu();
 
 	void Populate(const BEntry *startDir, BWindow *originatingWindow,
@@ -53,10 +54,11 @@ public:
 	void AddItemToDirMenu(const BEntry *, BWindow *originatingWindow,
 		bool atEnd, bool addShortcuts, bool navMenuEntries = false);
 	void AddDisksIconToMenu(bool reverse = false);
-	
+
 	void SetMenuBar(BMenuBar *);
-	
+
 private:
+	BMessenger fTarget;
 	BMenuBar *fMenuBar;
 	uint32 fCommand;
 	BString fEntryName;

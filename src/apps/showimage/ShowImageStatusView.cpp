@@ -82,14 +82,14 @@ ShowImageStatusView::Draw(BRect updateRect)
 void
 ShowImageStatusView::MouseDown(BPoint where)
 {
-	BPrivate::BDirMenu* menu = new BDirMenu(NULL, B_REFS_RECEIVED);
+	BPrivate::BDirMenu* menu = new BDirMenu(NULL, BMessenger(kTrackerSignature),
+		B_REFS_RECEIVED);
 	BEntry entry;
 	if (entry.SetTo(&fRef) == B_OK)
 		menu->Populate(&entry, Window(), false, false, true, false, true);
 	else
 		menu->Populate(NULL, Window(), false, false, true, false, true);
 
-	menu->SetTargetForItems(BMessenger(kTrackerSignature));
 	BPoint point = Bounds().LeftBottom();
 	point.y += 3;
 	ConvertToScreen(&point);

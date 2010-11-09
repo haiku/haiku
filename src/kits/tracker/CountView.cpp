@@ -308,14 +308,13 @@ BCountView::MouseDown(BPoint)
 		return;
 
 	if (!window->TargetModel()->IsRoot()) {
-		BDirMenu *menu = new BDirMenu(NULL, B_REFS_RECEIVED);
+		BDirMenu *menu = new BDirMenu(NULL, be_app, B_REFS_RECEIVED);
 		BEntry entry;
 		if (entry.SetTo(window->TargetModel()->EntryRef()) == B_OK)
 			menu->Populate(&entry, Window(), false, false, true, false, true);
 		else
 			menu->Populate(NULL, Window(), false, false, true, false, true);
 
-		menu->SetTargetForItems(be_app);
 		BPoint point = Bounds().LeftBottom();
 		point.y += 3;
 		ConvertToScreen(&point);
