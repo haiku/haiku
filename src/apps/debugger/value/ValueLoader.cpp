@@ -188,8 +188,7 @@ ValueLoader::LoadValue(ValueLocation* location, type_code valueType,
 
 
 status_t
-ValueLoader::LoadStringValue(BVariant& location, type_code valueType,
-	BString& _value)
+ValueLoader::LoadStringValue(BVariant& location, BString& _value)
 {
 	static const size_t kMaxStringSize = 255;
 

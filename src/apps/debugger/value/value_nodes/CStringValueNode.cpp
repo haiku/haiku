@@ -73,8 +73,7 @@ CStringValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 	if (error != B_OK)
 		return error;
 
-	error = valueLoader->LoadStringValue(addressData, valueType,
-		valueData);
+	error = valueLoader->LoadStringValue(addressData, valueData);
 	if (error != B_OK)
 		return error;
 
