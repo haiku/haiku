@@ -229,6 +229,8 @@ StreamBase::StreamBase(BPositionIO* source, BLocker* sourceLock,
 	fStreamBuildsIndexWhileReading(false)
 {
 	// NOTE: Don't use streamLock here, it may not yet be initialized!
+
+	fIOContext.buffer = NULL;
 	av_new_packet(&fPacket, 0);
 	memset(&fFormat, 0, sizeof(media_format));
 }
@@ -429,7 +431,7 @@ StreamBase::FrameRate() const
 				&& fStream->codec->time_base.num) {
 				frameRate = 1 / av_q2d(fStream->codec->time_base);
 			}
-			
+
 			// TODO: Fix up interlaced video for real
 			if (frameRate == 50.0f)
 				frameRate = 25.0f;
@@ -520,7 +522,7 @@ StreamBase::Seek(uint32 flags, int64* frame, bigtime_t* time)
 				return B_ERROR;
 			}
 			seekAgain = false;
-	
+
 			// Our last packet is toast in any case. Read the next one so we
 			// know where we really seeked.
 			fReusePacket = false;
@@ -609,7 +611,7 @@ StreamBase::Seek(uint32 flags, int64* frame, bigtime_t* time)
 			bigtime_t foundTime = _ConvertFromStreamTimeBase(streamTimeStamp);
 			bigtime_t timeDiff = foundTime > *time
 				? foundTime - *time : *time - foundTime;
-		
+
 			if (timeDiff > 1000000
 				&& (fStreamBuildsIndexWhileReading
 					|| index == fStream->nb_index_entries - 1)) {
@@ -654,11 +656,11 @@ StreamBase::Seek(uint32 flags, int64* frame, bigtime_t* time)
 					*time = 0;
 			}
 		}
-	
+
 		// Our last packet is toast in any case. Read the next one so
 		// we know where we really sought.
 		bigtime_t foundTime = *time;
-	
+
 		fReusePacket = false;
 		if (_NextPacket(true) == B_OK) {
 			if (fPacket.pts != kNoPTSValue)
@@ -667,7 +669,7 @@ StreamBase::Seek(uint32 flags, int64* frame, bigtime_t* time)
 				TRACE_SEEK("  no PTS in packet after seeking\n");
 		} else
 			TRACE_SEEK("  _NextPacket() failed!\n");
-	
+
 		*time = foundTime;
 		TRACE_SEEK("  sought time: %.2fs\n", *time / 1000000.0);
 		if ((flags & B_MEDIA_SEEK_TO_FRAME) != 0) {
@@ -1105,7 +1107,7 @@ AVFormatReader::Stream::Init(int32 virtualIndex)
 			format->u.raw_audio.format
 				= avformat_to_beos_format(codecContext->sample_fmt);
 			format->u.raw_audio.buffer_size = 0;
-			
+
 			// Read one packet and mark it for later re-use. (So our first
 			// GetNextChunk() call does not read another packet.)
 			if (_NextPacket(true) == B_OK) {
