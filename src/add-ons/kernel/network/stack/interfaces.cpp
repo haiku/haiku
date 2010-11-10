@@ -739,8 +739,11 @@ Interface::Control(net_domain* domain, int32 option, ifreq& request,
 				flags |= request.ifr_flags;
 			}
 
-			if (oldFlags != flags)
+			if (oldFlags != flags) {
+				TRACE("Interface %p: flags changed from %" B_PRIx32 " to %"
+					B_PRIx32 "\n", this, oldFlags, flags);
 				notify_interface_changed(this, oldFlags, flags);
+			}
 
 			return status;
 		}
