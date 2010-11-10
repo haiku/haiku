@@ -1244,7 +1244,12 @@ ShutdownProcess::_WorkerDoShutdown()
 		BAlert* alert = new BAlert(title, text, "Cancel", otherText, defaultText,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->SetShortcut(0, B_ESCAPE);
+		// We want the alert to behave more like a regular window...
 		alert->SetFeel(B_NORMAL_WINDOW_FEEL);
+		// ...but not quit. Minimizing the alert would prevent the user from
+		// finding it again, since registrar does not have an entry in the
+		// Deskbar.
+		alert->SetFlags(alert->Flags() | B_NOT_MINIMIZABLE);
 		alert->SetWorkspaces(B_ALL_WORKSPACES);
 		int32 result = alert->Go();
 
