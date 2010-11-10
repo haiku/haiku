@@ -284,6 +284,23 @@ typedef void (*policy##_setup)(int);					\
 SET_DECLARE(policy##_set, policy##_setup);
 
 /*
+ * Authenticator modules handle 802.1x/WPA authentication.
+ */
+#define	IEEE80211_AUTH_MODULE(name, version)				\
+	_IEEE80211_POLICY_MODULE(auth, name, version)
+
+#define	IEEE80211_AUTH_ALG(name, alg, v)				\
+static void								\
+name##_modevent(int type)						\
+{									\
+	if (type == MOD_LOAD)						\
+		ieee80211_authenticator_register(alg, &v);		\
+	else								\
+		ieee80211_authenticator_unregister(alg);		\
+}									\
+TEXT_SET(auth_set, name##_modevent)
+
+/*
  * Scanner modules provide scanning policy.
  */
 #define	IEEE80211_SCANNER_MODULE(name, version)

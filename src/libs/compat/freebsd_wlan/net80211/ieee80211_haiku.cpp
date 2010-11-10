@@ -38,17 +38,17 @@
 #include "ieee80211_haiku.h"
 
 extern "C" {
-#include <sys/kernel.h>
-#include <sys/mbuf.h>
-#include <sys/bus.h>
-#include <sys/sockio.h>
+#	include <sys/kernel.h>
+#	include <sys/mbuf.h>
+#	include <sys/bus.h>
+#	include <sys/sockio.h>
 
-#include <net/if.h>
-#include <net/if_media.h>
-#include <net/if_types.h>
-#include <net/if_var.h>
+#	include <net/if.h>
+#	include <net/if_media.h>
+#	include <net/if_types.h>
+#	include <net/if_var.h>
 
-#include "ieee80211_var.h"
+#	include "ieee80211_var.h"
 };
 
 #include <SupportDefs.h>
@@ -60,6 +60,14 @@ extern "C" {
 #include <net_notifications.h>
 
 #include <shared.h>
+
+
+#define TRACE_WLAN
+#ifdef TRACE_WLAN
+#	define TRACE(x, ...) dprintf(x, __VA_ARGS__);
+#else
+#	define TRACE(x, ...) ;
+#endif
 
 
 #define	MC_ALIGN(m, len)									\
@@ -336,6 +344,7 @@ wlan_control(void* cookie, uint32 op, void* arg, size_t length)
 			if (user_memcpy(&request, arg, sizeof(struct ieee80211req)) != B_OK)
 				return B_BAD_ADDRESS;
 
+			TRACE("wlan_control: %ld, %d\n", op, request.i_type);
 			status_t status = ifp->if_ioctl(ifp, op, (caddr_t)&request);
 			if (status != B_OK)
 				return status;
@@ -345,6 +354,13 @@ wlan_control(void* cookie, uint32 op, void* arg, size_t length)
 				return B_BAD_ADDRESS;
 			return B_OK;
 		}
+
+		case SIOCSIFFLAGS:
+		case SIOCSIFMEDIA:
+		case SIOCGIFMEDIA:
+		case SIOCSIFMTU:
+			// Requests that make it here always come from the kernel
+			return ifp->if_ioctl(ifp, op, (caddr_t)arg);
 	}
 
 	return B_BAD_VALUE;
@@ -530,8 +546,7 @@ ieee80211_sysctl_vattach(struct ieee80211vap* vap)
 		| IEEE80211_MSG_DOTH
 		| IEEE80211_MSG_INACT
 		| IEEE80211_MSG_ROAM
-		| IEEE80211_MSG_RATECTL
-		;
+		| IEEE80211_MSG_RATECTL;
 }
 
 
@@ -555,7 +570,7 @@ ieee80211_vap_destroy(struct ieee80211vap* vap)
 void
 ieee80211_load_module(const char* modname)
 {
-	dprintf("%s not implemented, yet.\n", __func__);
+	dprintf("%s not implemented, yet: modname %s\n", __func__, modname);
 }
 
 
@@ -567,6 +582,8 @@ ieee80211_notify_node_join(struct ieee80211_node* ni, int newassoc)
 
 	if (ni == vap->iv_bss)
 		if_link_state_change(ifp, LINK_STATE_UP);
+
+	TRACE("%s\n", __FUNCTION__);
 
 	if (sNotificationModule != NULL) {
 		char messageBuffer[512];
@@ -590,6 +607,8 @@ ieee80211_notify_node_leave(struct ieee80211_node* ni)
 	if (ni == vap->iv_bss)
 		if_link_state_change(ifp, LINK_STATE_DOWN);
 
+	TRACE("%s\n", __FUNCTION__);
+
 	if (sNotificationModule != NULL) {
 		char messageBuffer[512];
 		KMessage message;
@@ -608,6 +627,8 @@ ieee80211_notify_scan_done(struct ieee80211vap* vap)
 {
 	release_sem_etc(vap->iv_ifp->scan_done_sem, 1,
 		B_DO_NOT_RESCHEDULE | B_RELEASE_ALL);
+
+	TRACE("%s\n", __FUNCTION__);
 
 	if (sNotificationModule != NULL) {
 		char messageBuffer[512];
@@ -701,10 +722,12 @@ ieee80211_notify_radio(struct ieee80211com* ic, int state)
 void
 ieee80211_sysctl_attach(struct ieee80211com* ic)
 {
+	dprintf("%s not implemented, yet.\n", __func__);
 }
 
 
 void
 ieee80211_sysctl_detach(struct ieee80211com* ic)
 {
+	dprintf("%s not implemented, yet.\n", __func__);
 }
