@@ -13,10 +13,11 @@
 
 #include <fs_attr.h>
 
+#include <ctype.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
-#include <ctype.h>
+#include <unistd.h>
 
 
 template<class Type>
