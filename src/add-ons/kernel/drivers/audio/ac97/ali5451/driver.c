@@ -271,9 +271,6 @@ ali_terminate(ali_dev *card)
 		delete_sem(card->sem_buf_ready);
 
 	hardware_terminate(card);
-
-	(*gPCI->unreserve_device)(card->info.bus, card->info.device,
-		card->info.function, DRIVER_NAME, card);
 }
 
 
@@ -418,8 +415,11 @@ uninit_driver(void)
 {
 	int32 i = gCardsCount;
 
-	while (i--)
+	while (i--) {
 		ali_terminate(&gCards[i]);
+		(*gPCI->unreserve_device)(gCards[i].info.bus, gCards[i].info.device,
+			gCards[i].info.function, DRIVER_NAME, &gCards[i]);
+	}
 	memset(&gCards, 0, sizeof(gCards));
 
 	put_module(B_PCI_MODULE_NAME);
