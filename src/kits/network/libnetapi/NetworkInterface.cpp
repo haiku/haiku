@@ -76,8 +76,8 @@ do_ifaliasreq(const char* name, int32 option,
 }
 
 
-static status_t
-do_request(int family, ifreq& request, const char* name, int option)
+template<typename T> status_t
+do_request(int family, T& request, const char* name, int option)
 {
 	int socket = ::socket(family, SOCK_DGRAM, 0);
 	if (socket < 0)
@@ -85,9 +85,9 @@ do_request(int family, ifreq& request, const char* name, int option)
 
 	FileDescriptorCloser closer(socket);
 
-	strlcpy(request.ifr_name, name, IF_NAMESIZE);
+	strlcpy(((struct ifreq&)request).ifr_name, name, IF_NAMESIZE);
 
-	if (ioctl(socket, option, &request, sizeof(struct ifreq)) < 0)
+	if (ioctl(socket, option, &request, sizeof(T)) < 0)
 		return errno;
 
 	return B_OK;
@@ -248,11 +248,14 @@ BNetworkInterface::MTU() const
 int32
 BNetworkInterface::Media() const
 {
-	ifreq request;
+	ifmediareq request;
+	request.ifm_count = 0;
+	request.ifm_ulist = NULL;
+
 	if (do_request(AF_INET, request, Name(), SIOCGIFMEDIA) != B_OK)
 		return -1;
 
-	return request.ifr_media;
+	return request.ifm_current;
 }
 
 

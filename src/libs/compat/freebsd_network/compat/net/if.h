@@ -56,16 +56,6 @@
 #define IFQ_MAXLEN			50
 
 
-struct ifmediareq {
-	char	ifm_name[IFNAMSIZ];	/* if name, e.g. "en0" */
-	int		ifm_current;		/* current media options */
-	int		ifm_mask;			/* don't care mask */
-	int		ifm_status;			/* media status */
-	int		ifm_active;			/* active options */
-	int		ifm_count;			/* # entries in ifm_ulist array */
-	int*	ifm_ulist;			/* media words */
-};
-
 /*
  * Structure describing information about an interface
  * which may be of interest to management entities.

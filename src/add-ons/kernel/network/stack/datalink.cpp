@@ -901,20 +901,39 @@ interface_protocol_control(net_datalink_protocol* _protocol, int32 option,
 		{
 			// set media
 			struct ifreq request;
-			if (user_memcpy(&request, argument, sizeof(struct ifreq)) < B_OK)
+			if (user_memcpy(&request, argument, sizeof(struct ifreq)) != B_OK)
 				return B_BAD_ADDRESS;
 
-			return interface->DeviceInterface()->device->module->set_media(
-				interface->device, request.ifr_media);
+			status_t status
+				= interface->device->module->set_media(
+					interface->device, request.ifr_media);
+			if (status == B_NOT_SUPPORTED) {
+				// TODO: this isn't so nice, and should be solved differently
+				// (for example by removing the set_media() call altogether, or
+				// making it able to deal properly with FreeBSD drivers as well)
+				// try driver directly
+				status = interface->device->module->control(
+					interface->device, SIOCSIFMEDIA, &request, sizeof(request));
+			}
+
+			return status;
 		}
 		case SIOCGIFMEDIA:
 		{
 			// get media
-			struct ifreq request;
-			request.ifr_media = interface->device->media;
+			struct ifmediareq request;
+			if (user_memcpy(&request, argument, IF_NAMESIZE) != B_OK)
+				return B_BAD_ADDRESS;
 
-			return user_memcpy(&((struct ifreq*)argument)->ifr_media,
-				&request.ifr_media, sizeof(request.ifr_media));
+			// TODO: see above.
+			if (interface->device->module->control(interface->device,
+					SIOCGIFMEDIA, &request,
+					sizeof(struct ifmediareq)) != B_OK) {
+				memset(&request, 0, sizeof(struct ifmediareq));
+				request.ifm_current = interface->device->media;
+			}
+
+			return user_memcpy(argument, &request, sizeof(struct ifmediareq));
 		}
 
 		case SIOCGIFMETRIC:
