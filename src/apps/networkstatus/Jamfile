@@ -16,7 +16,7 @@ Application NetworkStatus :
 	NetworkStatus.cpp
 	RadioView.cpp
 	: be $(HAIKU_LOCALE_LIBS) $(icon_libs) $(TARGET_NETWORK_LIBS)
-		$(TARGET_LIBSUPC++)
+		libbnetapi.so $(TARGET_LIBSUPC++)
 	: NetworkStatus.rdef NetworkStatusIcons.rdef
 ;
 

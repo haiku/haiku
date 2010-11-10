@@ -31,16 +31,18 @@
 #include <Locale.h>
 #include <MenuItem.h>
 #include <MessageRunner.h>
+#include <NetworkDevice.h>
+#include <NetworkInterface.h>
+#include <NetworkRoster.h>
 #include <PopUpMenu.h>
 #include <Resources.h>
 #include <Roster.h>
 #include <String.h>
 #include <TextView.h>
 
-#include <net_notifications.h>
-
 #include "NetworkStatus.h"
 #include "NetworkStatusIcons.h"
+#include "RadioView.h"
 
 
 #undef B_TRANSLATE_CONTEXT
@@ -63,6 +65,31 @@ const uint32 kMsgOpenNetworkPreferences = 'onwp';
 
 const uint32 kMinIconWidth = 16;
 const uint32 kMinIconHeight = 16;
+
+
+class WirelessNetworkMenuItem : public BMenuItem {
+public:
+								WirelessNetworkMenuItem(const char* name,
+									int32 signalQuality, bool encrypted,
+									BMessage* message);
+	virtual						~WirelessNetworkMenuItem();
+
+			void				SetSignalQuality(int32 quality);
+			int32				SignalQuality() const
+									{ return fQuality; }
+			bool				IsEncrypted() const
+									{ return fIsEncrypted; }
+
+protected:
+	virtual	void				DrawContent();
+	virtual	void				Highlight(bool isHighlighted);
+	virtual	void				GetContentSize(float* width, float* height);
+			void				DrawRadioIcon();
+
+private:
+			int32				fQuality;
+			bool				fIsEncrypted;
+};
 
 
 class SocketOpener {
@@ -90,6 +117,66 @@ public:
 private:
 	int	fSocket;
 };
+
+
+// #pragma mark - WirelessNetworkMenuItem
+
+
+WirelessNetworkMenuItem::WirelessNetworkMenuItem(const char* name,
+	int32 signalQuality, bool encrypted, BMessage* message)
+	:
+	BMenuItem(name, message),
+	fQuality(signalQuality),
+	fIsEncrypted(encrypted)
+{
+}
+
+
+WirelessNetworkMenuItem::~WirelessNetworkMenuItem()
+{
+}
+
+
+void
+WirelessNetworkMenuItem::SetSignalQuality(int32 quality)
+{
+	fQuality = quality;
+}
+
+
+void
+WirelessNetworkMenuItem::DrawContent()
+{
+	DrawRadioIcon();
+	BMenuItem::DrawContent();
+}
+
+
+void
+WirelessNetworkMenuItem::Highlight(bool isHighlighted)
+{
+	BMenuItem::Highlight(isHighlighted);
+}
+
+
+void
+WirelessNetworkMenuItem::GetContentSize(float* width, float* height)
+{
+	BMenuItem::GetContentSize(width, height);
+	*width += *height + 4;
+}
+
+
+void
+WirelessNetworkMenuItem::DrawRadioIcon()
+{
+	BRect bounds = Frame();
+	bounds.left = bounds.right - 4 - bounds.Height();
+	bounds.right -= 4;
+	bounds.bottom -= 2;
+
+	RadioView::Draw(Menu(), bounds, fQuality, RadioView::DefaultMax());
+}
 
 
 //	#pragma mark -
@@ -392,6 +479,8 @@ NetworkStatusView::MouseDown(BPoint point)
 	menu->SetAsyncAutoDestruct(true);
 	menu->SetFont(be_plain_font);
 
+	// Add interfaces
+
 	for (int32 i = 0; i < fInterfaces.CountItems(); i++) {
 		BString& name = *fInterfaces.ItemAt(i);
 
@@ -406,16 +495,43 @@ NetworkStatusView::MouseDown(BPoint point)
 	}
 
 	menu->AddSeparatorItem();
-	//menu->AddItem(new BMenuItem(B_TRANSLATE(
-	// "About NetworkStatus" B_UTF8_ELLIPSIS),
-	// new BMessage(B_ABOUT_REQUESTED)));
+
+	// Add wireless networks, if any
+
+	for (int32 i = 0; i < fInterfaces.CountItems(); i++) {
+		BNetworkDevice device(fInterfaces.ItemAt(i)->String());
+		if (!device.IsWireless())
+			continue;
+
+		wireless_network network;
+		int32 count = 0;
+		for (int32 i = 0; device.GetScanResultAt(i, network) == B_OK; i++) {
+			printf("%s: noise %u : rssi %u\n", network.name,
+				network.noise_level, network.signal_strength);
+			menu->AddItem(new WirelessNetworkMenuItem(network.name,
+				network.signal_strength, false, NULL));
+			count++;
+		}
+		if (count == 0) {
+			BMenuItem* item = new BMenuItem(
+				B_TRANSLATE("<no wireless networks found>"), NULL);
+			item->SetEnabled(false);
+			menu->AddItem(item);
+		}
+		menu->AddSeparatorItem();
+
+		// We only show the networks of the first wireless device we find.
+		break;
+	}
+
 	menu->AddItem(new BMenuItem(B_TRANSLATE(
 		"Open network preferences" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgOpenNetworkPreferences)));
 
-	if (fInDeskbar)
+	if (fInDeskbar) {
 		menu->AddItem(new BMenuItem(B_TRANSLATE("Quit"),
 			new BMessage(B_QUIT_REQUESTED)));
+	}
 	menu->SetTargetForItems(this);
 
 	ConvertToScreen(&point);
@@ -426,14 +542,14 @@ NetworkStatusView::MouseDown(BPoint point)
 void
 NetworkStatusView::_AboutRequested()
 {
-	BString _about = B_TRANSLATE(
+	BString about = B_TRANSLATE(
 		"NetworkStatus\n\twritten by %1 and Hugo Santos\n\t%2, Haiku, Inc.\n"
 		);
-	_about.ReplaceFirst("%1", "Axel Dörfler");
+	about.ReplaceFirst("%1", "Axel Dörfler");
 		// Append a new developer here
-	_about.ReplaceFirst("%2", "Copyright 2007-2010");
+	about.ReplaceFirst("%2", "Copyright 2007-2010");
 		// Append a new year here
-	BAlert* alert = new BAlert("about", _about, B_TRANSLATE("OK"));
+	BAlert* alert = new BAlert("about", about, B_TRANSLATE("OK"));
 	BTextView *view = alert->TextView();
 	BFont font;
 
@@ -462,18 +578,8 @@ NetworkStatusView::_PrepareRequest(struct ifreq& request, const char* name)
 int32
 NetworkStatusView::_DetermineInterfaceStatus(const char* name)
 {
-	SocketOpener socket;
-	if (socket.InitCheck() != B_OK)
-		return kStatusUnknown;
-
-	ifreq request;
-	if (!_PrepareRequest(request, name))
-		return kStatusUnknown;
-
-	uint32 flags = 0;
-	if (ioctl(socket, SIOCGIFFLAGS, &request, sizeof(struct ifreq)) == 0)
-		flags = request.ifr_flags;
-
+	BNetworkInterface interface(name);
+	uint32 flags = interface.Flags();
 	int32 status = kStatusNoLink;
 
 	// TODO: no kStatusLinkNoConfig yet
@@ -490,51 +596,22 @@ NetworkStatusView::_DetermineInterfaceStatus(const char* name)
 void
 NetworkStatusView::_Update(bool force)
 {
-	SocketOpener socket;
-	if (socket.InitCheck() != B_OK)
-		return;
-
-	// iterate over all interfaces and retrieve minimal status
-
-	ifconf config;
-	config.ifc_len = sizeof(config.ifc_value);
-	if (ioctl(socket, SIOCGIFCOUNT, &config, sizeof(struct ifconf)) < 0)
-		return;
-
-	uint32 count = (uint32)config.ifc_value;
-	if (count == 0)
-		return;
-
-	void* buffer = malloc(count * sizeof(struct ifreq));
-	if (buffer == NULL)
-		return;
-
-	config.ifc_len = count * sizeof(struct ifreq);
-	config.ifc_buf = buffer;
-	if (ioctl(socket, SIOCGIFCONF, &config, sizeof(struct ifconf)) < 0) {
-		free(buffer);
-		return;
-	}
-
-	ifreq* interface = (ifreq*)buffer;
-
 	int32 oldStatus = fStatus;
 	fStatus = kStatusUnknown;
 	fInterfaces.MakeEmpty();
 
-	for (uint32 i = 0; i < count; i++) {
-		if (strncmp(interface->ifr_name, "loop", 4) && interface->ifr_name[0]) {
-			fInterfaces.AddItem(new BString(interface->ifr_name));
-			int32 status = _DetermineInterfaceStatus(interface->ifr_name);
+	BNetworkRoster& roster = BNetworkRoster::Default();
+	BNetworkInterface interface;
+	uint32 cookie = 0;
+
+	while (roster.GetNextInterface(&cookie, interface) == B_OK) {
+		if ((interface.Flags() & IFF_LOOPBACK) == 0) {
+			fInterfaces.AddItem(new BString(interface.Name()));
+			int32 status = _DetermineInterfaceStatus(interface.Name());
 			if (status > fStatus)
 				fStatus = status;
 		}
-
-		interface = (ifreq *)((addr_t)interface
-			+ _SIZEOF_ADDR_IFREQ(interface[0]));
 	}
-
-	free(buffer);
 
 	if (fStatus != oldStatus)
 		Invalidate();
