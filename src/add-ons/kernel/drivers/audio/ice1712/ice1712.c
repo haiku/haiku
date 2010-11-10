@@ -434,9 +434,6 @@ ice_1712_shutdown(ice1712 *ice)
 	codec_write(ice, AK45xx_RESET_REGISTER, 0x00);
 
 	save_settings(ice);
-
-	(*pci->unreserve_device)(ice->info.bus, ice->info.device,
-		ice->info.function, DRIVER_NAME, ice);
 }
 
 
@@ -451,6 +448,9 @@ uninit_driver(void)
 
 	for (ix = 0; ix < cnt; ix++) {
 		ice_1712_shutdown(&cards[ix]);
+		(*pci->unreserve_device)(cards[ix].info.bus,
+			cards[ix].info.device, cards[ix].info.function,
+			DRIVER_NAME, &cards[ix]);
 	}
 	memset(&cards, 0, sizeof(cards));
 	put_module(B_MPU_401_MODULE_NAME);
