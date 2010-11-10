@@ -13,7 +13,7 @@
 #include <AutoDeleter.h>
 
 extern "C" {
-#include <net80211/ieee80211_ioctl.h>
+#	include <net80211/ieee80211_ioctl.h>
 }
 
 
@@ -39,6 +39,7 @@ get_80211(const char* name, int32 type, void* data, int32& length)
 	length = ireq.i_len;
 	return B_OK;
 }
+
 
 #if 0
 static status_t
@@ -75,6 +76,7 @@ set_80211(const char* name, int32 type, T& data, int32 length = 0,
 	return set_80211(name, &data, length, value);
 }
 #endif
+
 
 template<typename T> status_t
 do_request(T& request, const char* name, int option)
@@ -208,6 +210,21 @@ BNetworkDevice::GetHardwareAddress(BNetworkAddress& address)
 
 	address.SetTo(request.ifr_addr);
 	return B_OK;
+}
+
+
+bool
+BNetworkDevice::IsEthernet()
+{
+	return !IsWireless();
+}
+
+
+bool
+BNetworkDevice::IsWireless()
+{
+	// TODO: fix me!
+	return strstr(Name(), "wifi") != NULL;
 }
 
 
