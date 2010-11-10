@@ -94,7 +94,6 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	Yasm					- the assembler utility
 
 local baseURL = http://haiku-files.org/files/optional-packages ;
-local baseLibURL = http://haiku-files.org/files/optional-packages/lib ;
 local baseSourceURL = http://haiku-files.org/files/releases/r1alpha2/sources ;
 
 # ABI-compliance-checker
@@ -936,14 +935,14 @@ if [ IsOptionalHaikuImagePackageAdded LibEvent ] {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
 				libevent-1.4.13-x86-gcc4-2010-10-30.zip
-				: $(baseLibURL)/libevent-1.4.13-x86-gcc4-2010-10-30.zip
+				: $(baseURL)/lib/libevent-1.4.13-x86-gcc4-2010-10-30.zip
 				:
 				: true
 			;
 		} else {
 			InstallOptionalHaikuImagePackage
 				libevent-1.4.13-x86-gcc2-2010-10-29.zip
-				: $(baseLibURL)/libevent-1.4.13-x86-gcc2-2010-10-29.zip
+				: $(baseURL)/lib/libevent-1.4.13-x86-gcc2-2010-10-29.zip
 				:
 				: true
 			;
@@ -991,12 +990,12 @@ if [ IsOptionalHaikuImagePackageAdded Libmng ] {
 		Echo "No optional package Libmng available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage libmng-1.0.10-x86-gcc4-2010-10-30.zip
-			: $(baseLibURL)/libmng-1.0.10-x86-gcc4-2010-10-30.zip
+			: $(baseURL)/lib/libmng-1.0.10-x86-gcc4-2010-10-30.zip
 			:
 		;
 	} else {
 		InstallOptionalHaikuImagePackage libmng-1.0.10-x86-gcc2-2010-10-29.zip
-			: $(baseLibURL)/libmng-1.0.10-x86-gcc2-2010-10-29.zip
+			: $(baseURL)/lib/libmng-1.0.10-x86-gcc2-2010-10-29.zip
 			:
 		;
 	}
