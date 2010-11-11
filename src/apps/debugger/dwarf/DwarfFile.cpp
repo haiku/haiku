@@ -843,7 +843,8 @@ DwarfFile::ResolveLocation(CompilationUnit* unit,
 	DIESubprogram* subprogramEntry, const LocationDescription* location,
 	const DwarfTargetInterface* targetInterface,
 	target_addr_t instructionPointer, target_addr_t objectPointer,
-	target_addr_t framePointer, ValueLocation& _result)
+	target_addr_t framePointer, target_addr_t relocationDelta,
+	ValueLocation& _result)
 {
 	// get the expression
 	const void* expression;
@@ -857,7 +858,8 @@ DwarfFile::ResolveLocation(CompilationUnit* unit,
 	ExpressionEvaluationContext context(this, unit, subprogramEntry,
 		targetInterface, instructionPointer, objectPointer, framePointer);
 	DwarfExpressionEvaluator evaluator(&context);
-	return evaluator.EvaluateLocation(expression, expressionLength, _result);
+	return evaluator.EvaluateLocation(expression, expressionLength, 
+		relocationDelta, _result);
 }
 
 

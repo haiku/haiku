@@ -159,8 +159,8 @@ DwarfExpressionEvaluator::Evaluate(const void* expression, size_t size,
 
 status_t
 DwarfExpressionEvaluator::EvaluateLocation(const void* expression, size_t size,
-	ValueLocation& _location)
-{
+	target_addr_t relocationDelta, ValueLocation& _location)
+{	
 	_location.Clear();
 
 	// the empty expression is a valid one
@@ -181,7 +181,7 @@ DwarfExpressionEvaluator::EvaluateLocation(const void* expression, size_t size,
 			_Push(objectAddress);
 
 		ValuePieceLocation piece;
-		status_t error = _Evaluate(&piece);
+		status_t error = _Evaluate(&piece, relocationDelta);
 		if (error != B_OK)
 			return error;
 
@@ -229,7 +229,7 @@ DwarfExpressionEvaluator::EvaluateLocation(const void* expression, size_t size,
 				_Push(objectAddress);
 
 			ValuePieceLocation piece;
-			status_t error = _Evaluate(&piece);
+			status_t error = _Evaluate(&piece, relocationDelta);
 			if (error != B_OK)
 				return error;
 
@@ -262,7 +262,8 @@ DwarfExpressionEvaluator::EvaluateLocation(const void* expression, size_t size,
 
 
 status_t
-DwarfExpressionEvaluator::_Evaluate(ValuePieceLocation* _piece)
+DwarfExpressionEvaluator::_Evaluate(ValuePieceLocation* _piece,
+	target_addr_t relocationDelta)
 {
 	TRACE_EXPR_ONLY({
 		TRACE_EXPR("DwarfExpressionEvaluator::_Evaluate(%p, %lld)\n",
@@ -282,7 +283,7 @@ DwarfExpressionEvaluator::_Evaluate(ValuePieceLocation* _piece)
 		switch (opcode) {
 			case DW_OP_addr:
 				TRACE_EXPR("  DW_OP_addr\n");
-				_Push(fDataReader.ReadAddress(0));
+				_Push(fDataReader.ReadAddress(0) + relocationDelta);
 				break;
 			case DW_OP_const1u:
 				TRACE_EXPR("  DW_OP_const1u\n");

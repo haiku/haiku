@@ -41,6 +41,7 @@ public:
 									GlobalTypeCache* typeCache,
 									target_addr_t instructionPointer,
 									target_addr_t framePointer,
+									target_addr_t relocationDelta,
 									DwarfTargetInterface* targetInterface,
 									RegisterMap* fromDwarfRegisterMap);
 								~DwarfStackFrameDebugInfo();

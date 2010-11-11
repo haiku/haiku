@@ -69,6 +69,7 @@ public:
 									target_addr_t instructionPointer,
 									target_addr_t objectPointer,
 									target_addr_t framePointer,
+									target_addr_t relocationDelta,
 									ValueLocation& _result);
 									// The returned location will have DWARF
 									// semantics regarding register numbers and

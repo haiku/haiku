@@ -57,7 +57,8 @@ public:
 			status_t			Evaluate(const void* expression, size_t size,
 									target_addr_t& _result);
 			status_t			EvaluateLocation(const void* expression,
-									size_t size, ValueLocation& _location);
+									size_t size, target_addr_t relocationDelta,
+									ValueLocation& _location);
 									// The returned location will have DWARF
 									// semantics regarding register numbers and
 									// bit offsets/sizes (cf. bit pieces).
@@ -71,7 +72,8 @@ private:
 	inline	void				_Push(target_addr_t value);
 	inline	target_addr_t		_Pop();
 
-			status_t			_Evaluate(ValuePieceLocation* _piece);
+			status_t			_Evaluate(ValuePieceLocation* _piece,
+									target_addr_t relocationDelta = 0);
 			void				_DereferenceAddress(uint8 addressSize);
 			void				_DereferenceAddressSpaceAddress(
 									uint8 addressSize);

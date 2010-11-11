@@ -56,8 +56,8 @@ struct HasByteStridePredicate {
 DwarfTypeContext::DwarfTypeContext(Architecture* architecture, image_id imageID,
 	DwarfFile* file, CompilationUnit* compilationUnit,
 	DIESubprogram* subprogramEntry, target_addr_t instructionPointer,
-	target_addr_t framePointer, DwarfTargetInterface* targetInterface,
-	RegisterMap* fromDwarfRegisterMap)
+	target_addr_t framePointer, target_addr_t relocationDelta,
+	DwarfTargetInterface* targetInterface, RegisterMap* fromDwarfRegisterMap)
 	:
 	fArchitecture(architecture),
 	fImageID(imageID),
@@ -66,6 +66,7 @@ DwarfTypeContext::DwarfTypeContext(Architecture* architecture, image_id imageID,
 	fSubprogramEntry(subprogramEntry),
 	fInstructionPointer(instructionPointer),
 	fFramePointer(framePointer),
+	fRelocationDelta(relocationDelta),
 	fTargetInterface(targetInterface),
 	fFromDwarfRegisterMap(fromDwarfRegisterMap)
 {
@@ -218,7 +219,7 @@ DwarfType::ResolveLocation(DwarfTypeContext* typeContext,
 		typeContext->GetCompilationUnit(), typeContext->SubprogramEntry(),
 		description, typeContext->TargetInterface(),
 		typeContext->InstructionPointer(), objectAddress,
-		typeContext->FramePointer(), _location);
+		typeContext->FramePointer(), typeContext->RelocationDelta(), _location);
 	if (error != B_OK)
 		return error;
 

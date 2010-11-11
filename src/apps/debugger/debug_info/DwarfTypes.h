@@ -49,6 +49,7 @@ public:
 									DIESubprogram* subprogramEntry,
 									target_addr_t instructionPointer,
 									target_addr_t framePointer,
+									target_addr_t relocationDelta,
 									DwarfTargetInterface* targetInterface,
 									RegisterMap* fromDwarfRegisterMap);
 								~DwarfTypeContext();
@@ -67,6 +68,8 @@ public:
 									{ return fInstructionPointer; }
 			target_addr_t		FramePointer() const
 									{ return fFramePointer; }
+			target_addr_t		RelocationDelta() const
+									{ return fRelocationDelta; }
 			DwarfTargetInterface* TargetInterface() const
 									{ return fTargetInterface; }
 			RegisterMap*		FromDwarfRegisterMap() const
@@ -80,6 +83,7 @@ private:
 			DIESubprogram*		fSubprogramEntry;
 			target_addr_t		fInstructionPointer;
 			target_addr_t		fFramePointer;
+			target_addr_t		fRelocationDelta;
 			DwarfTargetInterface* fTargetInterface;
 			RegisterMap*		fFromDwarfRegisterMap;
 };

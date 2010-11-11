@@ -402,7 +402,8 @@ DwarfImageDebugInfo::GetType(GlobalTypeCache* cache,
 			if (typeContext == NULL) {
 				typeContext = new(std::nothrow)
 					DwarfTypeContext(fArchitecture, fImageInfo.ImageID(), fFile,
-					unit, NULL, 0, 0, &inputInterface, fromDwarfMap);
+					unit, NULL, 0, 0, fRelocationDelta, &inputInterface, 
+					fromDwarfMap);
 				if (typeContext == NULL)
 					return B_NO_MEMORY;
 				typeContextReference.SetTo(typeContext, true);
@@ -504,8 +505,8 @@ DwarfImageDebugInfo::CreateFrame(Image* image,
 	DwarfStackFrameDebugInfo* stackFrameDebugInfo
 		= new(std::nothrow) DwarfStackFrameDebugInfo(fArchitecture,
 			fImageInfo.ImageID(), fFile, unit, subprogramEntry, fTypeLookup,
-			fTypeCache, instructionPointer, framePointer, inputInterface,
-			fromDwarfMap);
+			fTypeCache, instructionPointer, framePointer, fRelocationDelta, 
+			inputInterface, fromDwarfMap);
 	if (stackFrameDebugInfo == NULL)
 		return B_NO_MEMORY;
 	Reference<DwarfStackFrameDebugInfo> stackFrameDebugInfoReference(

@@ -124,13 +124,13 @@ DwarfStackFrameDebugInfo::DwarfStackFrameDebugInfo(Architecture* architecture,
 	image_id imageID, DwarfFile* file, CompilationUnit* compilationUnit,
 	DIESubprogram* subprogramEntry, GlobalTypeLookup* typeLookup,
 	GlobalTypeCache* typeCache, target_addr_t instructionPointer,
-	target_addr_t framePointer, DwarfTargetInterface* targetInterface,
-	RegisterMap* fromDwarfRegisterMap)
+	target_addr_t framePointer, target_addr_t relocationDelta,
+	DwarfTargetInterface* targetInterface, RegisterMap* fromDwarfRegisterMap)
 	:
 	StackFrameDebugInfo(),
 	fTypeContext(new(std::nothrow) DwarfTypeContext(architecture, imageID, file,
 		compilationUnit, subprogramEntry, instructionPointer, framePointer,
-		targetInterface, fromDwarfRegisterMap)),
+		relocationDelta, targetInterface, fromDwarfRegisterMap)),
 	fTypeLookup(typeLookup),
 	fTypeCache(typeCache)
 {
@@ -159,7 +159,8 @@ DwarfStackFrameDebugInfo::Init()
 	DwarfTypeContext* typeContext = new(std::nothrow) DwarfTypeContext(
 		fTypeContext->GetArchitecture(), fTypeContext->ImageID(),
 		fTypeContext->File(), fTypeContext->GetCompilationUnit(), NULL, 0, 0,
-		fTypeContext->TargetInterface(), fTypeContext->FromDwarfRegisterMap());
+		fTypeContext->RelocationDelta(), fTypeContext->TargetInterface(), 
+		fTypeContext->FromDwarfRegisterMap());
 	if (typeContext == NULL)
 		return B_NO_MEMORY;
 	Reference<DwarfTypeContext> typeContextReference(typeContext, true);
