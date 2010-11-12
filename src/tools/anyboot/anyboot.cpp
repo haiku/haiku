@@ -1,3 +1,9 @@
+/*
+ * Copyright 2010 Michael Lotz, mmlr@mlotz.ch
+ * All rights reserved. Distributed under the terms of the MIT License.
+ */
+
+
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
