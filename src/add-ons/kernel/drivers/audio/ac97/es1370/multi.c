@@ -617,8 +617,16 @@ es1370_buffer_exchange(es1370_dev *card, multi_buffer_info *data)
 {
 	cpu_status status;
 	es1370_stream *pstream, *rstream;
+	multi_buffer_info buffer_info;
 
-	data->flags = B_MULTI_BUFFER_PLAYBACK | B_MULTI_BUFFER_RECORD;
+#ifdef __HAIKU__
+	if (user_memcpy(&buffer_info, data, sizeof(buffer_info)) < B_OK)
+		return B_BAD_ADDRESS;
+#else
+	memcpy(&buffer_info, data, sizeof(buffer_info));
+#endif
+
+	buffer_info.flags = B_MULTI_BUFFER_PLAYBACK | B_MULTI_BUFFER_RECORD;
 	
 	if (!(card->pstream->state & ES1370_STATE_STARTED))
 		es1370_stream_start(card->pstream, es1370_play_inth, card->pstream);
@@ -655,20 +663,27 @@ es1370_buffer_exchange(es1370_dev *card, multi_buffer_info *data)
 		rstream = card->rstream;
 	
 	/* do playback */
-	data->playback_buffer_cycle = pstream->buffer_cycle;
-	data->played_real_time = pstream->real_time;
-	data->played_frames_count = pstream->frames_count;
-	data->_reserved_0 = pstream->first_channel;
+	buffer_info.playback_buffer_cycle = pstream->buffer_cycle;
+	buffer_info.played_real_time = pstream->real_time;
+	buffer_info.played_frames_count = pstream->frames_count;
+	buffer_info._reserved_0 = pstream->first_channel;
 	pstream->update_needed = false;
 	
 	/* do record */
-	data->record_buffer_cycle = rstream->buffer_cycle;
-	data->recorded_frames_count = rstream->frames_count;
-	data->recorded_real_time = rstream->real_time;
-	data->_reserved_1 = rstream->first_channel;
+	buffer_info.record_buffer_cycle = rstream->buffer_cycle;
+	buffer_info.recorded_frames_count = rstream->frames_count;
+	buffer_info.recorded_real_time = rstream->real_time;
+	buffer_info._reserved_1 = rstream->first_channel;
 	rstream->update_needed = false;
 	unlock(status);
 	
+#ifdef __HAIKU__
+	if (user_memcpy(data, &buffer_info, sizeof(buffer_info)) < B_OK)
+		return B_BAD_ADDRESS;
+#else
+	memcpy(data, &buffer_info, sizeof(buffer_info));
+#endif
+
 	//TRACE(("buffer_exchange ended\n"));
 	return B_OK;
 }
