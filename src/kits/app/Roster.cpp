@@ -2249,97 +2249,106 @@ BRoster::_LaunchApp(const char* mimeType, const entry_ref* ref,
 		docRef = &_docRef;
 	}
 
-	// find the app
-	entry_ref appRef;
-	char signature[B_MIME_TYPE_LENGTH];
-	uint32 appFlags = B_REG_DEFAULT_APP_FLAGS;
-	bool wasDocument = true;
-	status_t error = _ResolveApp(mimeType, docRef, &appRef, signature,
-		&appFlags, &wasDocument);
-	DBG(OUT("  find app: %s (%lx)\n", strerror(error), error));
-
-	// build an argument vector
-	ArgVector argVector;
-	if (error == B_OK) {
-		error = argVector.Init(argc, args, &appRef,
-			(wasDocument ? docRef : NULL));
-	}
-	DBG(OUT("  build argv: %s (%lx)\n", strerror(error), error));
-
-	// pre-register the app (but ignore scipts)
-	app_info appInfo;
-	bool isScript = wasDocument && docRef != NULL && *docRef == appRef;
-	bool alreadyRunning = false;
-	uint32 appToken = 0;
-	team_id team = -1;
 	uint32 otherAppFlags = B_REG_DEFAULT_APP_FLAGS;
-	if (error == B_OK && !isScript) {
-		error = _AddApplication(signature, &appRef, appFlags, -1, -1, -1, false,
-			&appToken, &team);
-		if (error == B_ALREADY_RUNNING) {
-			DBG(OUT("  already running\n"));
-			alreadyRunning = true;
+	uint32 appFlags = B_REG_DEFAULT_APP_FLAGS;
+	bool alreadyRunning = false;
+	bool wasDocument = true;
+	status_t error = B_OK;
+	ArgVector argVector;
+	team_id team = -1;
 
-			// get the app flags for the running application
-			error = _IsAppRegistered(&appRef, team, appToken, NULL, &appInfo);
-			if (error == B_OK) {
-				otherAppFlags = appInfo.flags;
-				team = appInfo.team;
+	do {
+		// find the app
+		entry_ref appRef;
+		char signature[B_MIME_TYPE_LENGTH];
+		status_t error = _ResolveApp(mimeType, docRef, &appRef, signature,
+			&appFlags, &wasDocument);
+		DBG(OUT("  find app: %s (%lx)\n", strerror(error), error));
+		if (error != B_OK)
+			return error;
+
+		// build an argument vector
+		error = argVector.Init(argc, args, &appRef,
+			wasDocument ? docRef : NULL);
+		DBG(OUT("  build argv: %s (%lx)\n", strerror(error), error));
+		if (error != B_OK)
+			return error;
+
+		// pre-register the app (but ignore scipts)
+		uint32 appToken = 0;
+		app_info appInfo;
+		bool isScript = wasDocument && docRef != NULL && *docRef == appRef;
+		if (!isScript) {
+			error = _AddApplication(signature, &appRef, appFlags, -1, -1, -1, false,
+				&appToken, &team);
+			if (error == B_ALREADY_RUNNING) {
+				DBG(OUT("  already running\n"));
+				alreadyRunning = true;
+
+				// get the app flags for the running application
+				error = _IsAppRegistered(&appRef, team, appToken, NULL, &appInfo);
+				if (error == B_OK) {
+					otherAppFlags = appInfo.flags;
+					team = appInfo.team;
+				}
 			}
+			DBG(OUT("  pre-register: %s (%lx)\n", strerror(error), error));
 		}
-		DBG(OUT("  pre-register: %s (%lx)\n", strerror(error), error));
-	}
 
-	// launch the app
-	if (error == B_OK && !alreadyRunning) {
-		DBG(OUT("  token: %lu\n", appToken));
-		// load the app image
-		thread_id appThread = load_image(argVector.Count(),
-			const_cast<const char**>(argVector.Args()),
-			const_cast<const char**>(environ));
+		// launch the app
+		if (error == B_OK && !alreadyRunning) {
+			DBG(OUT("  token: %lu\n", appToken));
+			// load the app image
+			thread_id appThread = load_image(argVector.Count(),
+				const_cast<const char**>(argVector.Args()),
+				const_cast<const char**>(environ));
 
-		// get the app team
-		if (appThread >= 0) {
-			thread_info threadInfo;
-			error = get_thread_info(appThread, &threadInfo);
+			// get the app team
+			if (appThread >= 0) {
+				thread_info threadInfo;
+				error = get_thread_info(appThread, &threadInfo);
+				if (error == B_OK)
+					team = threadInfo.team;
+			} else if (wasDocument && appThread == B_NOT_AN_EXECUTABLE)
+				error = B_LAUNCH_FAILED_EXECUTABLE;
+			else
+				error = appThread;
+
+			DBG(OUT("  load image: %s (%lx)\n", strerror(error), error));
+			// finish the registration
+			if (error == B_OK && !isScript)
+				error = _SetThreadAndTeam(appToken, appThread, team);
+
+			DBG(OUT("  set thread and team: %s (%lx)\n", strerror(error), error));
+			// resume the launched team
 			if (error == B_OK)
-				team = threadInfo.team;
-		} else if (wasDocument && appThread == B_NOT_AN_EXECUTABLE)
-			error = B_LAUNCH_FAILED_EXECUTABLE;
-		else
-			error = appThread;
+				error = resume_thread(appThread);
 
-		DBG(OUT("  load image: %s (%lx)\n", strerror(error), error));
-		// finish the registration
-		if (error == B_OK && !isScript)
-			error = _SetThreadAndTeam(appToken, appThread, team);
+			DBG(OUT("  resume thread: %s (%lx)\n", strerror(error), error));
+			// on error: kill the launched team and unregister the app
+			if (error != B_OK) {
+				if (appThread >= 0)
+					kill_thread(appThread);
+				if (!isScript) {
+					_RemovePreRegApp(appToken);
 
-		DBG(OUT("  set thread and team: %s (%lx)\n", strerror(error), error));
-		// resume the launched team
-		if (error == B_OK)
-			error = resume_thread(appThread);
+					if (!wasDocument) {
+						// Remove app hint if it's this one
+						BMimeType appType(signature);
+						entry_ref hintRef;
 
-		DBG(OUT("  resume thread: %s (%lx)\n", strerror(error), error));
-		// on error: kill the launched team and unregister the app
-		if (error != B_OK) {
-			if (appThread >= 0)
-				kill_thread(appThread);
-			if (!isScript) {
-				_RemovePreRegApp(appToken);
-
-				if (!wasDocument) {
-					// Remove app hint if it's this one
-					BMimeType appType(signature);
-					entry_ref hintRef;
-
-					if (appType.InitCheck() == B_OK
-						&& appType.GetAppHint(&hintRef) == B_OK
-						&& appRef == hintRef)
-						appType.SetAppHint(NULL);
+						if (appType.InitCheck() == B_OK
+							&& appType.GetAppHint(&hintRef) == B_OK
+							&& appRef == hintRef) {
+							appType.SetAppHint(NULL);
+							// try again
+							continue;
+						}
+					}
 				}
 			}
 		}
-	}
+	} while (false);
 
 	if (alreadyRunning && current_team() == team) {
 		// The target team is calling us, so we don't send it the message
@@ -2443,9 +2452,10 @@ BRoster::_ResolveApp(const char* inType, entry_ref* ref,
 	entry_ref appRef;
 	status_t error;
 
-	if (inType)
+	if (inType) {
 		error = _TranslateType(inType, &appMeta, &appRef, &appFile);
-	else {
+		*_wasDocument = !(appMeta == inType);
+	} else {
 		error = _TranslateRef(ref, &appMeta, &appRef, &appFile,
 			_wasDocument);
 	}
