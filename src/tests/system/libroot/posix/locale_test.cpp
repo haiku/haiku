@@ -1819,30 +1819,42 @@ test_timeconversions()
 		gtm.tm_wday = -1;
 		gtm.tm_yday = -1;
 		test_mktime("GMT", gtm, testTime, 6, 197);
+
 		tm btm = {
 			9, 26, 20, 17, 6, 110, 6, 197, 1, 2 * 3600, (char*)"CEST"
 		};
-		test_localtime("Europe/Berlin", testTime, btm);
-		test_gmtime("Europe/Berlin", testTime, gtm);
+		test_localtime(":Europe/Berlin", testTime, btm);
+		test_gmtime(":Europe/Berlin", testTime, gtm);
 		btm.tm_wday = -1;
 		btm.tm_yday = -1;
-		test_mktime("Europe/Berlin", btm, testTime, 6, 197);
+		test_mktime(":Europe/Berlin", btm, testTime, 6, 197);
+
+		tm ctm = {
+			9, 26, 20, 17, 6, 110, 6, 197, 1, 2 * 3600, (char*)"CEST"
+		};
+		test_localtime("CET", testTime, ctm);
+		test_gmtime("CET", testTime, gtm);
+		ctm.tm_wday = -1;
+		ctm.tm_yday = -1;
+		test_mktime("CET", ctm, testTime, 6, 197);
+
 		tm latm = {
 			9, 26, 11, 17, 6, 110, 6, 197, 1, -7 * 3600, (char*)"PDT"
 		};
-		test_localtime("America/Los_Angeles", testTime, latm);
-		test_gmtime("America/Los_Angeles", testTime, gtm);
+		test_localtime(":America/Los_Angeles", testTime, latm);
+		test_gmtime(":America/Los_Angeles", testTime, gtm);
 		latm.tm_wday = -1;
 		latm.tm_yday = -1;
-		test_mktime("America/Los_Angeles", latm, testTime, 6, 197);
+		test_mktime(":America/Los_Angeles", latm, testTime, 6, 197);
+
 		tm ttm = {
 			9, 26, 3, 18, 6, 110, 0, 198, 0, 9 * 3600, (char*)"JST"
 		};
-		test_localtime("Asia/Tokyo", testTime, ttm);
-		test_gmtime("Asia/Tokyo", testTime, gtm);
+		test_localtime(":Asia/Tokyo", testTime, ttm);
+		test_gmtime(":Asia/Tokyo", testTime, gtm);
 		ttm.tm_wday = -1;
 		ttm.tm_yday = -1;
-		test_mktime("Asia/Tokyo", ttm, testTime, 0, 198);
+		test_mktime(":Asia/Tokyo", ttm, testTime, 0, 198);
 	}
 
 	{
@@ -1855,30 +1867,42 @@ test_timeconversions()
 		gtm.tm_wday = -1;
 		gtm.tm_yday = -1;
 		test_mktime("GMT", gtm, testTime, 2, 67);
+
 		tm btm = {
 			9, 26, 19, 9, 2, 110, 2, 67, 0, 3600, (char*)"CET"
 		};
-		test_localtime("Europe/Berlin", testTime, btm);
-		test_gmtime("Europe/Berlin", testTime, gtm);
+		test_localtime(":Europe/Berlin", testTime, btm);
+		test_gmtime(":Europe/Berlin", testTime, gtm);
 		btm.tm_wday = -1;
 		btm.tm_yday = -1;
-		test_mktime("Europe/Berlin", btm, testTime, 2, 67);
+		test_mktime(":Europe/Berlin", btm, testTime, 2, 67);
+
+		tm ctm = {
+			9, 26, 19, 9, 2, 110, 2, 67, 0, 3600, (char*)"CET"
+		};
+		test_localtime("CET", testTime, ctm);
+		test_gmtime("CET", testTime, gtm);
+		ctm.tm_wday = -1;
+		ctm.tm_yday = -1;
+		test_mktime("CET", ctm, testTime, 2, 67);
+
 		tm latm = {
 			9, 26, 10, 9, 2, 110, 2, 67, 0, -8 * 3600, (char*)"PST"
 		};
-		test_localtime("America/Los_Angeles", testTime, latm);
-		test_gmtime("America/Los_Angeles", testTime, gtm);
+		test_localtime(":America/Los_Angeles", testTime, latm);
+		test_gmtime(":America/Los_Angeles", testTime, gtm);
 		latm.tm_wday = -1;
 		latm.tm_yday = -1;
-		test_mktime("America/Los_Angeles", latm, testTime, 2, 67);
+		test_mktime(":America/Los_Angeles", latm, testTime, 2, 67);
+
 		tm ttm = {
 			9, 26, 3, 10, 2, 110, 3, 68, 0, 9 * 3600, (char*)"JST"
 		};
-		test_localtime("Asia/Tokyo", testTime, ttm);
-		test_gmtime("Asia/Tokyo", testTime, gtm);
+		test_localtime(":Asia/Tokyo", testTime, ttm);
+		test_gmtime(":Asia/Tokyo", testTime, gtm);
 		ttm.tm_wday = -1;
 		ttm.tm_yday = -1;
-		test_mktime("Asia/Tokyo", ttm, testTime, 3, 68);
+		test_mktime(":Asia/Tokyo", ttm, testTime, 3, 68);
 	}
 
 	{
@@ -1891,30 +1915,42 @@ test_timeconversions()
 		gtm.tm_wday = -1;
 		gtm.tm_yday = -1;
 		test_mktime("GMT", gtm, testTime, 4, 0);
+
 		tm btm = {
 			0, 0, 1, 1, 0, 70, 4, 0, 0, 1 * 3600, (char*)"CET"
 		};
-		test_localtime("Europe/Berlin", testTime, btm);
-		test_gmtime("Europe/Berlin", testTime, gtm);
+		test_localtime(":Europe/Berlin", testTime, btm);
+		test_gmtime(":Europe/Berlin", testTime, gtm);
 		btm.tm_wday = -1;
 		btm.tm_yday = -1;
-		test_mktime("Europe/Berlin", btm, testTime, 4, 0);
+		test_mktime(":Europe/Berlin", btm, testTime, 4, 0);
+
+		tm ctm = {
+			0, 0, 1, 1, 0, 70, 4, 0, 0, 1 * 3600, (char*)"CET"
+		};
+		test_localtime("CET", testTime, ctm);
+		test_gmtime("CET", testTime, gtm);
+		ctm.tm_wday = -1;
+		ctm.tm_yday = -1;
+		test_mktime("CET", ctm, testTime, 4, 0);
+
 		tm latm = {
 			0, 0, 16, 31, 11, 69, 3, 364, 0, -8 * 3600, (char*)"PST"
 		};
-		test_localtime("America/Los_Angeles", testTime, latm);
-		test_gmtime("America/Los_Angeles", testTime, gtm);
+		test_localtime(":America/Los_Angeles", testTime, latm);
+		test_gmtime(":America/Los_Angeles", testTime, gtm);
 		latm.tm_wday = -1;
 		latm.tm_yday = -1;
-		test_mktime("America/Los_Angeles", latm, testTime, 3, 364);
+		test_mktime(":America/Los_Angeles", latm, testTime, 3, 364);
+
 		tm ttm = {
 			0, 0, 9, 1, 0, 70, 4, 0, 0, 9 * 3600, (char*)"JST"
 		};
-		test_localtime("Asia/Tokyo", testTime, ttm);
-		test_gmtime("Asia/Tokyo", testTime, gtm);
+		test_localtime(":Asia/Tokyo", testTime, ttm);
+		test_gmtime(":Asia/Tokyo", testTime, gtm);
 		ttm.tm_wday = -1;
 		ttm.tm_yday = -1;
-		test_mktime("Asia/Tokyo", ttm, testTime, 4, 0);
+		test_mktime(":Asia/Tokyo", ttm, testTime, 4, 0);
 	}
 }
 

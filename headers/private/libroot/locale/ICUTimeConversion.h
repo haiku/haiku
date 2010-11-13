@@ -25,7 +25,7 @@ public:
 	virtual void				Initialize(
 									TimeConversionDataBridge* dataBridge);
 
-			status_t			TZSet(const char* timeZoneID);
+			status_t			TZSet(const char* timeZoneID, const char* tz);
 
 			status_t			Localtime(const time_t* inTime,
 									struct tm* tmOut);

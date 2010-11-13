@@ -39,13 +39,41 @@ ICUTimeConversion::Initialize(TimeConversionDataBridge* dataBridge)
 
 
 status_t
-ICUTimeConversion::TZSet(const char* timeZoneID)
+ICUTimeConversion::TZSet(const char* timeZoneID, const char* tz)
 {
-	// nothing to do if the given name matches any name of the current timezone
-	if (strcasecmp(fTimeZoneID, timeZoneID) == 0)
-		return B_OK;
+	// The given TZ environment variable's content overrides the default
+	// system timezone.
+	if (tz != NULL) {
+		// If the value given in the TZ env-var starts with a colon, that
+		// value is implementation specific, we expect a full timezone ID.
+		if (*tz == ':') {
+			// nothing to do if the given name matches the current timezone
+			if (strcasecmp(fTimeZoneID, tz + 1) == 0)
+				return B_OK;
 
-	strlcpy(fTimeZoneID, timeZoneID, sizeof(fTimeZoneID));
+			strlcpy(fTimeZoneID, tz + 1, sizeof(fTimeZoneID));
+		} else {
+			// We ignore anything following the timezone name, as those values
+			// are determined by the corresponding ICU-timezone (and glibc's
+			// tzset() implementation seems to do the same).
+			const char* tzNameEnd = tz;
+			while(isalpha(*tzNameEnd))
+				++tzNameEnd;
+
+			strlcpy(fTimeZoneID, tz,
+				min_c((uint32)(1 + tzNameEnd - tz), sizeof(fTimeZoneID)));
+
+			// nothing to do if the given name matches the current timezone
+			if (strcasecmp(fTimeZoneID, fDataBridge->addrOfTZName[0]) == 0)
+				return B_OK;
+		}
+	} else {
+		// nothing to do if the given name matches the current timezone
+		if (strcasecmp(fTimeZoneID, timeZoneID) == 0)
+			return B_OK;
+
+		strlcpy(fTimeZoneID, timeZoneID, sizeof(fTimeZoneID));
+	}
 
 	ObjectDeleter<TimeZone> icuTimeZone = TimeZone::createTimeZone(fTimeZoneID);
 	if (icuTimeZone.Get() == NULL)
@@ -71,16 +99,20 @@ ICUTimeConversion::TZSet(const char* timeZoneID)
 	*fDataBridge->addrOfDaylight = icuTimeZone->useDaylightTime();
 
 	for (int i = 0; i < 2; ++i) {
-		UnicodeString icuString;
-		icuTimeZone->getDisplayName(i == 1, TimeZone::SHORT_COMMONLY_USED,
-			fTimeData.ICULocale(), icuString);
-		CheckedArrayByteSink byteSink(fDataBridge->addrOfTZName[i],
-			sizeof(fTimeZoneID));
-		icuString.toUTF8(byteSink);
+		if (tz != NULL && *tz != ':' && i == 0) {
+			strcpy(fDataBridge->addrOfTZName[0], fTimeZoneID);
+		} else {
+			UnicodeString icuString;
+			icuTimeZone->getDisplayName(i == 1, TimeZone::SHORT_COMMONLY_USED,
+				fTimeData.ICULocale(), icuString);
+			CheckedArrayByteSink byteSink(fDataBridge->addrOfTZName[i],
+				sizeof(fTimeZoneID));
+			icuString.toUTF8(byteSink);
 
-		// make sure to canonicalize "GMT+00:00" to just "GMT"
-		if (strcmp(fDataBridge->addrOfTZName[i], "GMT+00:00") == 0)
-			fDataBridge->addrOfTZName[i][3] = '\0';
+			// make sure to canonicalize "GMT+00:00" to just "GMT"
+			if (strcmp(fDataBridge->addrOfTZName[i], "GMT+00:00") == 0)
+				fDataBridge->addrOfTZName[i][3] = '\0';
+		}
 	}
 
 	return B_OK;

@@ -45,7 +45,7 @@ public:
 	virtual status_t			Strxfrm(char* out, const char* in, size_t size,
 									size_t& outSize);
 
-	virtual status_t			TZSet(const char* timeZoneID);
+	virtual status_t			TZSet(const char* timeZoneID, const char* tz);
 	virtual	status_t			Localtime(const time_t* inTime,
 									struct tm* tmOut);
 	virtual status_t			Gmtime(const time_t* inTime, struct tm* tmOut);

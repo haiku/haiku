@@ -245,11 +245,11 @@ ICULocaleBackend::Strxfrm(char* out, const char* in, size_t size,
 
 
 status_t
-ICULocaleBackend::TZSet(const char* timeZoneID)
+ICULocaleBackend::TZSet(const char* timeZoneID, const char* tz)
 {
 	ErrnoMaintainer errnoMaintainer;
 
-	return fTimeConversion.TZSet(timeZoneID);
+	return fTimeConversion.TZSet(timeZoneID, tz);
 }
 
 

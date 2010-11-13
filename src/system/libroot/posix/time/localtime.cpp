@@ -39,15 +39,9 @@ tzset(void)
 		return;
 
 	char timeZoneID[B_FILE_NAME_LENGTH] = { "GMT" };
+	_kern_get_timezone(NULL, timeZoneID, sizeof(timeZoneID));
 
-	const char* tz = getenv("TZ");
-	if (tz != NULL)
-		strlcpy(timeZoneID, tz, sizeof(timeZoneID));
-	else
-		_kern_get_timezone(NULL, timeZoneID, sizeof(timeZoneID));
-
-	if (gLocaleBackend != NULL)
-		gLocaleBackend->TZSet(timeZoneID);
+	gLocaleBackend->TZSet(timeZoneID, getenv("TZ"));
 }
 
 

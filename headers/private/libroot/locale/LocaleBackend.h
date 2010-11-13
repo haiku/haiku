@@ -127,7 +127,8 @@ public:
 	virtual status_t			Strxfrm(char* out, const char* in, size_t size,
 									size_t& outSize) = 0;
 
-	virtual status_t			TZSet(const char* timeZoneID) = 0;
+	virtual status_t			TZSet(const char* timeZoneID,
+									const char* tz) = 0;
 	virtual	status_t			Localtime(const time_t* inTime,
 									struct tm* tmOut) = 0;
 	virtual	status_t			Gmtime(const time_t* inTime,
