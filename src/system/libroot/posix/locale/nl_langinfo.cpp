@@ -19,7 +19,7 @@ extern "C" char*
 nl_langinfo(nl_item item)
 {
 	if (item < 0 || item >= _NL_LANGINFO_LAST)
-		return "";
+		return const_cast<char*>("");
 
 	if (gLocaleBackend != NULL)
 		return const_cast<char*>(gLocaleBackend->GetLanginfo(item));
