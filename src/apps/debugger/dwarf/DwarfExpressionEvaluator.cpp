@@ -36,10 +36,12 @@ static const uint32 kMaxOperationCount			= 10000;
 
 
 DwarfExpressionEvaluationContext::DwarfExpressionEvaluationContext(
-	const DwarfTargetInterface* targetInterface, uint8 addressSize)
+	const DwarfTargetInterface* targetInterface, uint8 addressSize,
+	target_addr_t relocationDelta)
 	:
 	fTargetInterface(targetInterface),
-	fAddressSize(addressSize)
+	fAddressSize(addressSize),
+	fRelocationDelta(relocationDelta)
 {
 }
 
@@ -159,8 +161,8 @@ DwarfExpressionEvaluator::Evaluate(const void* expression, size_t size,
 
 status_t
 DwarfExpressionEvaluator::EvaluateLocation(const void* expression, size_t size,
-	target_addr_t relocationDelta, ValueLocation& _location)
-{	
+	ValueLocation& _location)
+{
 	_location.Clear();
 
 	// the empty expression is a valid one
@@ -181,7 +183,7 @@ DwarfExpressionEvaluator::EvaluateLocation(const void* expression, size_t size,
 			_Push(objectAddress);
 
 		ValuePieceLocation piece;
-		status_t error = _Evaluate(&piece, relocationDelta);
+		status_t error = _Evaluate(&piece);
 		if (error != B_OK)
 			return error;
 
@@ -229,7 +231,7 @@ DwarfExpressionEvaluator::EvaluateLocation(const void* expression, size_t size,
 				_Push(objectAddress);
 
 			ValuePieceLocation piece;
-			status_t error = _Evaluate(&piece, relocationDelta);
+			status_t error = _Evaluate(&piece);
 			if (error != B_OK)
 				return error;
 
@@ -262,8 +264,7 @@ DwarfExpressionEvaluator::EvaluateLocation(const void* expression, size_t size,
 
 
 status_t
-DwarfExpressionEvaluator::_Evaluate(ValuePieceLocation* _piece,
-	target_addr_t relocationDelta)
+DwarfExpressionEvaluator::_Evaluate(ValuePieceLocation* _piece)
 {
 	TRACE_EXPR_ONLY({
 		TRACE_EXPR("DwarfExpressionEvaluator::_Evaluate(%p, %lld)\n",
@@ -283,7 +284,7 @@ DwarfExpressionEvaluator::_Evaluate(ValuePieceLocation* _piece,
 		switch (opcode) {
 			case DW_OP_addr:
 				TRACE_EXPR("  DW_OP_addr\n");
-				_Push(fDataReader.ReadAddress(0) + relocationDelta);
+				_Push(fDataReader.ReadAddress(0) + fContext->RelocationDelta());
 				break;
 			case DW_OP_const1u:
 				TRACE_EXPR("  DW_OP_const1u\n");

@@ -19,12 +19,16 @@ class DwarfExpressionEvaluationContext {
 public:
 								DwarfExpressionEvaluationContext(
 									const DwarfTargetInterface* targetInterface,
-									uint8 addressSize);
+									uint8 addressSize,
+									target_addr_t relocationDelta);
 	virtual						~DwarfExpressionEvaluationContext();
 
 			const DwarfTargetInterface* TargetInterface() const
 									{ return fTargetInterface; }
 			uint8				AddressSize() const	{ return fAddressSize; }
+
+			target_addr_t			RelocationDelta() const
+									{ return fRelocationDelta; }
 
 	virtual	bool				GetObjectAddress(target_addr_t& _address) = 0;
 	virtual	bool				GetFrameAddress(target_addr_t& _address) = 0;
@@ -43,6 +47,7 @@ public:
 protected:
 			const DwarfTargetInterface* fTargetInterface;
 			uint8				fAddressSize;
+			target_addr_t		fRelocationDelta;
 };
 
 
@@ -57,8 +62,7 @@ public:
 			status_t			Evaluate(const void* expression, size_t size,
 									target_addr_t& _result);
 			status_t			EvaluateLocation(const void* expression,
-									size_t size, target_addr_t relocationDelta,
-									ValueLocation& _location);
+									size_t size, ValueLocation& _location);
 									// The returned location will have DWARF
 									// semantics regarding register numbers and
 									// bit offsets/sizes (cf. bit pieces).
@@ -72,8 +76,7 @@ private:
 	inline	void				_Push(target_addr_t value);
 	inline	target_addr_t		_Pop();
 
-			status_t			_Evaluate(ValuePieceLocation* _piece,
-									target_addr_t relocationDelta = 0);
+			status_t			_Evaluate(ValuePieceLocation* _piece);
 			void				_DereferenceAddress(uint8 addressSize);
 			void				_DereferenceAddressSpaceAddress(
 									uint8 addressSize);

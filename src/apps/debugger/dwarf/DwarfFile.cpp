@@ -36,9 +36,11 @@ public:
 		DIESubprogram* subprogramEntry,
 		const DwarfTargetInterface* targetInterface,
 		target_addr_t instructionPointer, target_addr_t objectPointer,
-		target_addr_t framePointer)
+		target_addr_t framePointer,
+		target_addr_t relocationDelta)
 		:
-		DwarfExpressionEvaluationContext(targetInterface, unit->AddressSize()),
+		DwarfExpressionEvaluationContext(targetInterface, unit->AddressSize(),
+			relocationDelta),
 		fFile(file),
 		fUnit(unit),
 		fSubprogramEntry(subprogramEntry),
@@ -828,7 +830,7 @@ DwarfFile::EvaluateExpression(CompilationUnit* unit,
 	target_addr_t valueToPush, bool pushValue, target_addr_t& _result)
 {
 	ExpressionEvaluationContext context(this, unit, subprogramEntry,
-		targetInterface, instructionPointer, 0, framePointer);
+		targetInterface, instructionPointer, 0, framePointer, 0);
 	DwarfExpressionEvaluator evaluator(&context);
 
 	if (pushValue && evaluator.Push(valueToPush) != B_OK)
@@ -856,10 +858,11 @@ DwarfFile::ResolveLocation(CompilationUnit* unit,
 
 	// evaluate it
 	ExpressionEvaluationContext context(this, unit, subprogramEntry,
-		targetInterface, instructionPointer, objectPointer, framePointer);
+		targetInterface, instructionPointer, objectPointer, framePointer,
+		relocationDelta);
 	DwarfExpressionEvaluator evaluator(&context);
-	return evaluator.EvaluateLocation(expression, expressionLength, 
-		relocationDelta, _result);
+	return evaluator.EvaluateLocation(expression, expressionLength,
+		_result);
 }
 
 
