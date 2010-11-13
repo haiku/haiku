@@ -1,10 +1,12 @@
 /*
- * Copyright 2006-2007, Haiku. All rights reserved.
+ * Copyright 2006-2010, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
+
+
 #include "MessageImporter.h"
 
 #include <new>
@@ -23,9 +25,10 @@
 #include "StyleContainer.h"
 #include "VectorPath.h"
 
+
 using std::nothrow;
 
-// constructor
+
 MessageImporter::MessageImporter()
 #ifdef ICON_O_MATIC
 	: Importer()
@@ -33,12 +36,12 @@ MessageImporter::MessageImporter()
 {
 }
 
-// destructor
+
 MessageImporter::~MessageImporter()
 {
 }
 
-// Import
+
 status_t
 MessageImporter::Import(Icon* icon, BPositionIO* stream)
 {
@@ -77,11 +80,8 @@ MessageImporter::Import(Icon* icon, BPositionIO* stream)
 
 	BMessage archive;
 	ret = archive.Unflatten(stream);
-	if (ret < B_OK) {
-		printf("MessageImporter::Import() - "
-			   "error unflattening icon archive: %s\n", strerror(ret));
+	if (ret != B_OK)
 		return ret;
-	}
 
 	// paths
 	PathContainer* paths = icon->Paths();
@@ -112,12 +112,13 @@ MessageImporter::Import(Icon* icon, BPositionIO* stream)
 	return B_OK;
 }
 
+
 // #pragma mark -
 
-// _ImportPaths
+
 status_t
 MessageImporter::_ImportPaths(const BMessage* archive,
-							  PathContainer* paths) const
+	PathContainer* paths) const
 {
 	BMessage allPaths;
 	status_t ret = archive->FindMessage("paths", &allPaths);
@@ -139,10 +140,10 @@ MessageImporter::_ImportPaths(const BMessage* archive,
 	return ret;
 }
 
-// _ImportStyles
+
 status_t
 MessageImporter::_ImportStyles(const BMessage* archive,
-							   StyleContainer* styles) const
+	StyleContainer* styles) const
 {
 	BMessage allStyles;
 	status_t ret = archive->FindMessage("styles", &allStyles);
@@ -164,12 +165,10 @@ MessageImporter::_ImportStyles(const BMessage* archive,
 	return ret;
 }
 
-// _ImportShapes
+
 status_t
-MessageImporter::_ImportShapes(const BMessage* archive,
-							   PathContainer* paths,
-							   StyleContainer* styles,
-							   ShapeContainer* shapes) const
+MessageImporter::_ImportShapes(const BMessage* archive, PathContainer* paths,
+	StyleContainer* styles, ShapeContainer* shapes) const
 {
 	BMessage allShapes;
 	status_t ret = archive->FindMessage("shapes", &allShapes);
@@ -233,4 +232,3 @@ MessageImporter::_ImportShapes(const BMessage* archive,
 
 	return ret;
 }
-
