@@ -833,6 +833,7 @@ ActivityView::AddDataSource(const DataSource* source, const BMessage* state)
 		valuesDeleter.Detach();
 		viewValuesDeleter.Detach();
 		sourceDeleter.Detach();
+		insert++;
 	}
 
 #ifdef __HAIKU__
