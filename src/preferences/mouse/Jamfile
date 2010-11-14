@@ -2,11 +2,11 @@ SubDir HAIKU_TOP src preferences mouse ;
 
 UsePrivateHeaders input ;
 
-Preference Mouse : 
-	Mouse.cpp 
-	MouseSettings.cpp 
+Preference Mouse :
+	Mouse.cpp
+	MouseSettings.cpp
 	MouseWindow.cpp
-	MouseView.cpp 
+	MouseView.cpp
 	SettingsView.cpp
 	: translation be $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
 	: Mouse.rdef

@@ -102,7 +102,7 @@ MouseView::~MouseView()
 }
 
 
-void 
+void
 MouseView::GetPreferredSize(float* _width, float* _height)
 {
 	if (_width)
@@ -164,19 +164,19 @@ MouseView::MouseDown(BPoint where)
 	// the user clicked inside our view, but another window is on top.
 	if (clipping.Contains(where)) {
 		button = _ConvertFromVisualOrder(button);
-	
+
 		BPopUpMenu menu("Mouse Map Menu");
 		BMessage message(kMsgMouseMap);
 		message.AddInt32("button", button);
-	
+
 		menu.AddItem(new BMenuItem("1", new BMessage(message)));
 		menu.AddItem(new BMenuItem("2", new BMessage(message)));
 		menu.AddItem(new BMenuItem("3", new BMessage(message)));
-	
+
 		menu.ItemAt(getMappingNumber(fSettings.Mapping(button)))
 			->SetMarked(true);
 		menu.SetTargetForItems(Window());
-	
+
 		ConvertToScreen(&where);
 		menu.Go(where, true);
 	}
@@ -195,7 +195,7 @@ MouseView::AttachedToWindow()
 }
 
 
-void 
+void
 MouseView::Draw(BRect updateFrame)
 {
 	BRect mouseBody(Bounds());
@@ -240,7 +240,7 @@ MouseView::Draw(BRect updateFrame)
 
 		if (i > 0 && fType > i) {
 			// left border
-			SetHighColor(pressed ? 
+			SetHighColor(pressed ?
 				kButtonPressedColor : kButtonReleasedLeftColor);
 			StrokeLine(BPoint(border.LeftTop()), BPoint(border.LeftBottom()));
 
@@ -252,15 +252,15 @@ MouseView::Draw(BRect updateFrame)
 
 			SetHighColor(middlePressed ?
 				kButtonPressedSeparatorColor : kButtonReleasedSeparatorColor);
-			StrokeLine(BPoint(separator.LeftTop()), 
+			StrokeLine(BPoint(separator.LeftTop()),
 				BPoint(separator.LeftBottom()));
 		}
 
 		if (fType > 1 && i + 1 < fType) {
 			// right border
-			SetHighColor(pressed ? 
+			SetHighColor(pressed ?
 				kButtonPressedColor : kButtonReleasedRightColor);
-			StrokeLine(BPoint(border.RightTop()), 
+			StrokeLine(BPoint(border.RightTop()),
 				BPoint(border.RightBottom()));
 		}
 
@@ -269,10 +269,10 @@ MouseView::Draw(BRect updateFrame)
 		SetHighColor(kButtonTextColor);
 
 		char number[2] = {0};
-		number[0] = getMappingNumber(map.button[_ConvertFromVisualOrder(i)]) 
+		number[0] = getMappingNumber(map.button[_ConvertFromVisualOrder(i)])
 			+ '1';
 
-		DrawString(number, BPoint(border.left + 
+		DrawString(number, BPoint(border.left +
 			(border.Width() - StringWidth(number)) / 2, kButtonTop + 18));
 	}
 }
@@ -296,7 +296,7 @@ MouseView::_ConvertFromVisualOrder(int32 i)
 }
 
 
-void 
+void
 MouseView::SetMouseType(int32 type)
 {
 	fType = type;
@@ -311,7 +311,7 @@ MouseView::MouseMapUpdated()
 }
 
 
-void 
+void
 MouseView::UpdateFromSettings()
 {
 	SetMouseType(fSettings.MouseType());

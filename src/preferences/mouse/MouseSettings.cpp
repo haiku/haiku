@@ -48,7 +48,7 @@ MouseSettings::~MouseSettings()
 }
 
 
-status_t 
+status_t
 MouseSettings::_GetSettingsPath(BPath &path)
 {
 	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
@@ -60,7 +60,7 @@ MouseSettings::_GetSettingsPath(BPath &path)
 }
 
 
-void 
+void
 MouseSettings::_RetrieveSettings()
 {
 	// retrieve current values
@@ -91,14 +91,14 @@ MouseSettings::_RetrieveSettings()
 		return;
 
 #if R5_COMPATIBLE
-	const off_t kOffset = sizeof(mouse_settings) - sizeof(mouse_map) 
+	const off_t kOffset = sizeof(mouse_settings) - sizeof(mouse_map)
 		+ sizeof(int32) * 3;
 		// we have to do this because mouse_map counts 16 buttons in OBOS
 #else
 	const off_t kOffset = sizeof(mouse_settings);
 #endif
 
-	if (file.ReadAt(kOffset, &fWindowPosition, sizeof(BPoint)) 
+	if (file.ReadAt(kOffset, &fWindowPosition, sizeof(BPoint))
 		!= sizeof(BPoint)) {
 		// set default window position (invalid positions will be
 		// corrected by the application; the window will be centered
@@ -106,14 +106,14 @@ MouseSettings::_RetrieveSettings()
 		fWindowPosition.x = -1;
 		fWindowPosition.y = -1;
 	}
-	
+
 #ifdef DEBUG
 	Dump();
 #endif
 }
 
 
-status_t 
+status_t
 MouseSettings::_SaveSettings()
 {
 	BPath path;
@@ -126,7 +126,7 @@ MouseSettings::_SaveSettings()
 		return status;
 
 #if R5_COMPATIBLE
-	const off_t kOffset = sizeof(mouse_settings) - sizeof(mouse_map) 
+	const off_t kOffset = sizeof(mouse_settings) - sizeof(mouse_map)
 		+ sizeof(int32) * 3;
 	// we have to do this because mouse_map counts 16 buttons in OBOS
 #else
@@ -144,8 +144,8 @@ void
 MouseSettings::Dump()
 {
 	printf("type:\t\t%ld button mouse\n", fSettings.type);
-	printf("map:\t\tleft = %lu : middle = %lu : right = %lu\n", 
-		fSettings.map.button[0], fSettings.map.button[2], 
+	printf("map:\t\tleft = %lu : middle = %lu : right = %lu\n",
+		fSettings.map.button[0], fSettings.map.button[2],
 		fSettings.map.button[1]);
 	printf("click speed:\t%Ld\n", fSettings.click_speed);
 	printf("accel:\t\t%s\n", fSettings.accel.enabled ? "enabled" : "disabled");
@@ -179,7 +179,7 @@ MouseSettings::Dump()
 			break;
 	}
 	printf("focus follows mouse mode:\t%s\n", focus_follows_mouse_mode);
-	printf("accept first click:\t%s\n", 
+	printf("accept first click:\t%s\n",
 		fAcceptFirstClick ? "enabled" : "disabled");
 }
 #endif
@@ -225,7 +225,7 @@ MouseSettings::IsDefaultable()
 
 
 //	Reverts to the active settings at program startup
-void 
+void
 MouseSettings::Revert()
 {
 	SetClickSpeed(fOriginalSettings.click_speed);
@@ -235,7 +235,7 @@ MouseSettings::Revert()
 	SetMouseMode(fOriginalMode);
 	SetFocusFollowsMouseMode(fOriginalFocusFollowsMouseMode);
 	SetAcceptFirstClick(fOriginalAcceptFirstClick);
-	
+
 	SetMapping(fOriginalSettings.map);
 }
 
@@ -257,7 +257,7 @@ MouseSettings::SetMouseType(int32 type)
 }
 
 
-bigtime_t 
+bigtime_t
 MouseSettings::ClickSpeed() const
 {
 	return 1000000LL - fSettings.click_speed;
@@ -304,14 +304,14 @@ MouseSettings::Mapping(int32 index) const
 }
 
 
-void 
+void
 MouseSettings::Mapping(mouse_map &map) const
 {
 	map = fSettings.map;
 }
 
 
-void 
+void
 MouseSettings::SetMapping(int32 index, uint32 button)
 {
 	fSettings.map.button[index] = button;
@@ -330,7 +330,7 @@ MouseSettings::SetMapping(mouse_map &map)
 }
 
 
-void 
+void
 MouseSettings::SetMouseMode(mode_mouse mode)
 {
 	set_mouse_mode(mode);
@@ -342,14 +342,14 @@ void
 MouseSettings::SetFocusFollowsMouseMode(mode_focus_follows_mouse mode)
 {
 	set_focus_follows_mouse_mode(mode);
-	fFocusFollowsMouseMode = mode;	
+	fFocusFollowsMouseMode = mode;
 }
 
 
-void 
+void
 MouseSettings::SetAcceptFirstClick(bool accept_first_click)
 {
 	set_accept_first_click(accept_first_click);
-	fAcceptFirstClick = accept_first_click;	
+	fAcceptFirstClick = accept_first_click;
 }
 
