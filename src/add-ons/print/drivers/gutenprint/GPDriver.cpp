@@ -86,7 +86,7 @@ void
 GPDriver::SetParameter(BString& parameter, PrinterCap::CapID category,
 	int value)
 {
-	const BaseCap* capability;
+	const EnumCap* capability;
 	capability = getPrinterCap()->findCap(category, value);
 	if (capability != NULL && capability->fKey != "")
 		parameter = capability->Key();
@@ -100,19 +100,43 @@ GPDriver::SetDriverSpecificSettings()
 	int count = getPrinterCap()->countCap(category);
 	const BaseCap** capabilities = getPrinterCap()->enumCap(category);
 	for (int i = 0; i < count; i++) {
-		const BaseCap* capability = capabilities[i];
+		const DriverSpecificCap* capability =
+			dynamic_cast<const DriverSpecificCap*>(capabilities[i]);
+		if (capability == NULL) {
+			fprintf(stderr, "Internal error: DriverSpecificCap name='%s' "
+				"has wrong type!\n", capabilities[i]->Label());
+			continue;
+		}
+
 		PrinterCap::CapID id = static_cast<PrinterCap::CapID>(capability->ID());
-		AddDriverSpecificSetting(id, capability->fKey.c_str());
+		const char* key = capability->fKey.c_str();
+		switch (capability->fType) {
+			case DriverSpecificCap::kList:
+				AddDriverSpecificSetting(id, key);
+				break;
+			case DriverSpecificCap::kBoolean:
+				AddDriverSpecificBooleanSetting(id, key);
+				break;
+			case DriverSpecificCap::kIntRange:
+				AddDriverSpecificIntSetting(id, key);
+				break;
+			case DriverSpecificCap::kIntDimension:
+				AddDriverSpecificDimensionSetting(id, key);
+				break;
+			case DriverSpecificCap::kDoubleRange:
+				AddDriverSpecificDoubleSetting(id, key);
+				break;
+		}
 	}
 }
 
 
 void
 GPDriver::AddDriverSpecificSetting(PrinterCap::CapID category, const char* key) {
-	const BaseCap* capability = NULL;
-	if (getJobData()->HasDriverSpecificSetting(key))
+	const EnumCap* capability = NULL;
+	if (getJobData()->Settings().HasString(key))
 	{
-		const string& value = getJobData()->DriverSpecificSetting(key);
+		const string& value = getJobData()->Settings().GetString(key);
 		capability = getPrinterCap()->findCapWithKey(category, value.c_str());
 	}
 
@@ -127,7 +151,43 @@ GPDriver::AddDriverSpecificSetting(PrinterCap::CapID category, const char* key) 
 		return;
 	}
 
-	fConfiguration.fDriverSpecificSettings[key] = capability->fKey;
+	fConfiguration.fStringSettings[key] = capability->fKey;
+}
+
+
+void
+GPDriver::AddDriverSpecificBooleanSetting(PrinterCap::CapID category,
+	const char* key) {
+	if (getJobData()->Settings().HasBoolean(key))
+		fConfiguration.fBooleanSettings[key] =
+			getJobData()->Settings().GetBoolean(key);
+}
+
+
+void
+GPDriver::AddDriverSpecificIntSetting(PrinterCap::CapID category,
+	const char* key) {
+	if (getJobData()->Settings().HasInt(key))
+		fConfiguration.fIntSettings[key] =
+			getJobData()->Settings().GetInt(key);
+}
+
+
+void
+GPDriver::AddDriverSpecificDimensionSetting(PrinterCap::CapID category,
+	const char* key) {
+	if (getJobData()->Settings().HasInt(key))
+		fConfiguration.fDimensionSettings[key] =
+			getJobData()->Settings().GetInt(key);
+}
+
+
+void
+GPDriver::AddDriverSpecificDoubleSetting(PrinterCap::CapID category,
+	const char* key) {
+	if (getJobData()->Settings().HasDouble(key))
+		fConfiguration.fDoubleSettings[key] =
+			getJobData()->Settings().GetDouble(key);
 }
 
 

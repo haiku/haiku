@@ -42,13 +42,28 @@ public:
 	void	PageSizeParameter(const char* name, const char* key,
 		const char* displayName, BSize pageSize, BRect imageableArea);
 	void	EndParameter(const char* name);
+	void	BooleanParameter(const char* name, const char* displayName,
+						bool defaultValue,
+						stp_parameter_class_t parameterClass);
+	void	DoubleParameter(const char* name, const char* displayName,
+						double lower, double upper, double defaultValue,
+						stp_parameter_class_t parameterClass);
+	void	IntParameter(const char* name, const char* displayName, int lower,
+						int upper, int defaultValue,
+						stp_parameter_class_t parameterClass);
+	void	DimensionParameter(const char* name, const char* displayName,
+						int lower, int upper, int defaultValue,
+						stp_parameter_class_t parameterClass);
 	void	EndVisit();
 
 protected:
+	bool	IsSupported(stp_parameter_class_t parameterClass);
 	void	AddDefaultInputSlot();
 	void	SetDriverSpecificCategories();
-	void	AddCapability(GPArray<struct BaseCap>& array, BaseCap* capability,
+	void	AddCapability(GPArray<struct BaseCap>& array, EnumCap* capability,
 		const char* key);
+	void	AddDriverSpecificCapability(const char* name, const char*
+				displayName, DriverSpecificCap::Type type, BaseCap* capability);
 
 private:
 	GPCapabilityExtractorState	fState;

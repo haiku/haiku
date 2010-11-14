@@ -29,7 +29,11 @@ public:
 	int fXDPI;
 	int fYDPI;
 
-	map<string, string> fDriverSpecificSettings;
+	map<string, string> fStringSettings;
+	map<string, bool> fBooleanSettings;
+	map<string, int32> fIntSettings;
+	map<string, int32> fDimensionSettings;
+	map<string, double> fDoubleSettings;
 };
 
 #endif

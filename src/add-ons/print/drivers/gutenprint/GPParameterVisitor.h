@@ -39,6 +39,14 @@ public:
 			void	VisitParameter(stp_parameter_list_t list,
 				const stp_parameter_t* parameter, stp_parameter_t* description);
 			void	VisitStringList(stp_parameter_t* parameter);
+			void	VisitBooleanParameter(stp_parameter_t* description,
+						stp_parameter_class_t parameterClass);
+			void	VisitDoubleParameter(stp_parameter_t* description,
+						stp_parameter_class_t parameterClass);
+			void	VisitIntParameter(stp_parameter_t* description,
+						stp_parameter_class_t parameterClass);
+			void	VisitDimensionParameter(stp_parameter_t* description,
+						stp_parameter_class_t parameterClass);
 
 	virtual	bool	BeginParameter(const char* name, const char* displayName,
 						stp_parameter_class_t parameterClass) = 0;
@@ -54,6 +62,19 @@ public:
 						const char* displayName, BSize pageSize,
 						BRect imageableArea) = 0;
 	virtual	void	EndParameter(const char* name) = 0;
+	virtual void	BooleanParameter(const char* name, const char* displayName,
+						bool defaultValue,
+						stp_parameter_class_t parameterClass) = 0;
+	virtual void	DoubleParameter(const char* name, const char* displayName,
+						double lower, double upper, double defaultValue,
+						stp_parameter_class_t parameterClass) = 0;
+	virtual void	IntParameter(const char* name, const char* displayName,
+						int lower, int upper, int defaultValue,
+						stp_parameter_class_t parameterClass) = 0;
+	virtual void	DimensionParameter(const char* name,
+						const char* displayName, int lower,
+						int upper, int defaultValue,
+						stp_parameter_class_t parameterClass) = 0;
 	virtual	void	EndVisit() = 0;
 
 private:

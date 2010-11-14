@@ -5,6 +5,7 @@
 
 #include "JobData.h"
 
+#include <Debug.h>
 #include <InterfaceDefs.h>
 #include <Message.h>
 
@@ -45,12 +46,157 @@ static const char* kJDScaledPhysicalRect    = "JJJJ_scaled_physical_rect";
 static const char* kJDResolution            = "JJJJ_resolution";
 static const char* kJDDriverSpecificSettings = "JJJJ_driverSpecificSettings";
 
-static const char* kDriverSpecificSettingsSeparator = ";";
 
-
-JobData::JobData(BMessage *msg, const PrinterCap *cap, Settings settings)
+DriverSpecificSettings::DriverSpecificSettings()
 {
-	load(msg, cap, settings);
+}
+
+
+DriverSpecificSettings::DriverSpecificSettings(
+	const DriverSpecificSettings& settings)
+	:
+	fSettings(settings.fSettings)
+{
+}
+
+
+DriverSpecificSettings &
+DriverSpecificSettings::operator=(const DriverSpecificSettings &settings)
+{
+	fSettings = settings.fSettings;
+	return *this;
+}
+
+
+void
+DriverSpecificSettings::MakeEmpty()
+{
+	fSettings.MakeEmpty();
+}
+
+
+bool
+DriverSpecificSettings::HasString(const char* key) const
+{
+	const char* value;
+	return fSettings.FindString(key, &value) == B_OK;
+}
+
+
+const char*
+DriverSpecificSettings::GetString(const char* key) const
+{
+	ASSERT(HasString(key));
+	const char* value = NULL;
+	fSettings.FindString(key, &value);
+	return value;
+}
+
+
+void
+DriverSpecificSettings::SetString(const char* key, const char* value)
+{
+	if (HasString(key))
+		fSettings.ReplaceString(key, value);
+	else
+		fSettings.AddString(key, value);
+}
+
+
+bool
+DriverSpecificSettings::HasBoolean(const char* key) const
+{
+	bool value;
+	return fSettings.FindBool(key, &value) == B_OK;
+}
+
+
+bool
+DriverSpecificSettings::GetBoolean(const char* key) const
+{
+	ASSERT(HasBoolean(key));
+	bool value;
+	fSettings.FindBool(key, &value);
+	return value;
+}
+
+
+void
+DriverSpecificSettings::SetBoolean(const char* key, bool value)
+{
+	if (HasBoolean(key))
+		fSettings.ReplaceBool(key, value);
+	else
+		fSettings.AddBool(key, value);
+}
+
+
+bool
+DriverSpecificSettings::HasInt(const char* key) const
+{
+	int32 value;
+	return fSettings.FindInt32(key, &value) == B_OK;
+}
+
+
+int32
+DriverSpecificSettings::GetInt(const char* key) const
+{
+	ASSERT(HasInt(key));
+	int32 value;
+	fSettings.FindInt32(key, &value);
+	return value;
+}
+
+
+void
+DriverSpecificSettings::SetInt(const char* key, int32 value)
+{
+	if (HasInt(key))
+		fSettings.ReplaceInt32(key, value);
+	else
+		fSettings.AddInt32(key, value);
+}
+
+
+bool
+DriverSpecificSettings::HasDouble(const char* key) const
+{
+	double value;
+	return fSettings.FindDouble(key, &value) == B_OK;
+}
+
+
+double
+DriverSpecificSettings::GetDouble(const char* key) const
+{
+	ASSERT(HasDouble(key));
+	double value;
+	fSettings.FindDouble(key, &value);
+	return value;
+}
+
+
+void
+DriverSpecificSettings::SetDouble(const char* key, double value)
+{
+	if (HasDouble(key))
+		fSettings.ReplaceDouble(key, value);
+	else
+		fSettings.AddDouble(key, value);
+}
+
+
+BMessage&
+DriverSpecificSettings::Message()
+{
+	return fSettings;
+}
+
+
+JobData::JobData(BMessage *msg, const PrinterCap *cap, SettingType type)
+{
+	load(msg, cap, type);
 }
 
 
@@ -91,7 +237,7 @@ JobData::operator=(const JobData &job_data)
 	fPrintStyle            = job_data.fPrintStyle;
 	fBindingLocation       = job_data.fBindingLocation;
 	fPageOrder             = job_data.fPageOrder;
-	fSettings              = job_data.fSettings;
+	fSettingType           = job_data.fSettingType;
 	fMsg                   = job_data.fMsg;
 	fColor                 = job_data.fColor;
 	fDitherType            = job_data.fDitherType;
@@ -105,10 +251,10 @@ JobData::operator=(const JobData &job_data)
 
 
 void
-JobData::load(BMessage *msg, const PrinterCap *cap, Settings settings)
+JobData::load(BMessage *msg, const PrinterCap *cap, SettingType type)
 {
 	fMsg = msg;
-	fSettings = settings;
+	fSettingType = type;
 
 	const PaperCap *paperCap = NULL;
  
@@ -297,10 +443,9 @@ JobData::load(BMessage *msg, const PrinterCap *cap, Settings settings)
 	else
 		fMarginUnit = kUnitInch;
 
-	BString serializedSettings;
-	if (msg->HasString(kJDDriverSpecificSettings))
-		msg->FindString(kJDDriverSpecificSettings, &serializedSettings);
-	DeserializePrinterSpecificSettings(serializedSettings);
+	if (msg->HasMessage(kJDDriverSpecificSettings))
+		msg->FindMessage(kJDDriverSpecificSettings,
+			&fDriverSpecificSettings.Message());
 }
 
 
@@ -357,139 +502,87 @@ JobData::save(BMessage *msg)
 
 	// make sure job settings are not present in page settings
 	msg->RemoveName(kJDShowPreview);
-	if (fSettings == kJobSettings)
+	if (fSettingType == kJobSettings)
 		msg->AddBool(kJDShowPreview, fShowPreview);
 	
 	msg->RemoveName(kJDNup);
-	if (fSettings == kJobSettings)
+	if (fSettingType == kJobSettings)
 		msg->AddInt32(kJDNup, fNup);
 
 	msg->RemoveName(kJDFirstPage);
-	if (fSettings == kJobSettings)
+	if (fSettingType == kJobSettings)
 		msg->AddInt32(kJDFirstPage, fFirstPage);
 
 	msg->RemoveName(kJDLastPage);
-	if (fSettings == kJobSettings)
+	if (fSettingType == kJobSettings)
 		msg->AddInt32(kJDLastPage, fLastPage);
 
 	msg->RemoveName(kJDGamma);
-	if (fSettings == kJobSettings)
+	if (fSettingType == kJobSettings)
 		msg->AddFloat(kJDGamma, fGamma);
 
 	msg->RemoveName(kJDInkDensity);
-	if (fSettings == kJobSettings)
+	if (fSettingType == kJobSettings)
 		msg->AddFloat(kJDInkDensity, fInkDensity);
 
 	msg->RemoveName(kJDPaperSource);
-	if (fSettings == kJobSettings)
+	if (fSettingType == kJobSettings)
 		msg->AddInt32(kJDPaperSource, fPaperSource);
 
 	msg->RemoveName(kJDCopies);
-	if (fSettings == kJobSettings)
+	if (fSettingType == kJobSettings)
 		msg->AddInt32(kJDCopies, fCopies);
 
 	msg->RemoveName(kJDCollate);
-	if (fSettings == kJobSettings)
+	if (fSettingType == kJobSettings)
 		msg->AddBool(kJDCollate, fCollate);
 
 	msg->RemoveName(kJDReverse);
-	if (fSettings == kJobSettings)
+	if (fSettingType == kJobSettings)
 		msg->AddBool(kJDReverse, fReverse);
 
 	msg->RemoveName(kJDPrintStyle);
-	if (fSettings == kJobSettings)
+	if (fSettingType == kJobSettings)
 		msg->AddInt32(kJDPrintStyle, fPrintStyle);
 
 	msg->RemoveName(kJDBindingLocation);
-	if (fSettings == kJobSettings)
+	if (fSettingType == kJobSettings)
 		msg->AddInt32(kJDBindingLocation, fBindingLocation);
 
 	msg->RemoveName(kJDPageOrder);
-	if (fSettings == kJobSettings)
+	if (fSettingType == kJobSettings)
 		msg->AddInt32(kJDPageOrder, fPageOrder);
 
 	msg->RemoveName(kJDColor);
-	if (fSettings == kJobSettings)
+	if (fSettingType == kJobSettings)
 		msg->AddInt32(kJDColor, fColor);
 
 	msg->RemoveName(kJDDitherType);
-	if (fSettings == kJobSettings)
+	if (fSettingType == kJobSettings)
 		msg->AddInt32(kJDDitherType, fDitherType);
 	
 	msg->RemoveName(kJDPageSelection);
-	if (fSettings == kJobSettings)
+	if (fSettingType == kJobSettings)
 		msg->AddInt32(kJDPageSelection, fPageSelection);
 
 	msg->RemoveName(kJDDriverSpecificSettings);
-	if (fSettings == kJobSettings)
+	if (fSettingType == kJobSettings)
 	{
-		BString serializedSettings;
-		SerializePrinterSpecificSettings(serializedSettings);
-		msg->AddString(kJDDriverSpecificSettings, serializedSettings);
+		msg->AddMessage(kJDDriverSpecificSettings,
+			&fDriverSpecificSettings.Message());
 	}
 }
 
 
-bool
-JobData::HasDriverSpecificSetting(const string& category) const
+DriverSpecificSettings&
+JobData::Settings()
 {
-	return fDriverSpecificSettings.find(category) !=
-		fDriverSpecificSettings.end();
+	return fDriverSpecificSettings;
 }
 
 
-const string&
-JobData::DriverSpecificSetting(const string& category) const
+const DriverSpecificSettings&
+JobData::Settings() const
 {
-	return fDriverSpecificSettings.find(category)->second;
-}
-
-
-void
-JobData::SetDriverSpecificSetting(const string& category, const string& value)
-{
-	fDriverSpecificSettings[category] = value;
-}
-
-
-void
-JobData::SerializePrinterSpecificSettings(BString& serializedSettings)
-{
-	bool first = true;
-	map<string, string>::iterator it = fDriverSpecificSettings.begin();
-	for (; it != fDriverSpecificSettings.end(); it++) {
-		if (first)
-			first = false;
-		else
-			serializedSettings << kDriverSpecificSettingsSeparator;
-
-		serializedSettings << it->first.c_str()
-			<< kDriverSpecificSettingsSeparator
-			<< it->second.c_str();
-	}
-}
-
-
-void
-JobData::DeserializePrinterSpecificSettings(BString& serializedSettings)
-{
-	// Note: strtok_r terminates the string after the first token
-	fDriverSpecificSettings.clear();
-
-	int length = serializedSettings.Length() + 1;
-	char* state = NULL;
-	char* buffer = serializedSettings.LockBuffer(length);
-	const char* separator = kDriverSpecificSettingsSeparator;
-	char* token = strtok_r(buffer, separator, &state);
-	while (token != NULL) {
-		char* key = token;
-		token = strtok_r(NULL, separator, &state);
-		if (token == NULL)
-			break;
-		char* value = token;
-		fDriverSpecificSettings[key] = value;
-		token = strtok_r(NULL, separator, &state);
-	}
-
-	serializedSettings.UnlockBuffer(0);
+	return fDriverSpecificSettings;
 }

@@ -52,7 +52,7 @@ public:
 
 SelectPrinterDialog::SelectPrinterDialog(GPData* data)
 	:
-	DialogWindow(BRect(10, 10, 400, 400),
+	DialogWindow(BRect(100, 100, 500, 500),
 		"Select Printer", B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
 		B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS),
 	fData(data)

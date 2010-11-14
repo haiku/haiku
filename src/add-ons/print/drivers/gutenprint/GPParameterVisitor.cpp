@@ -125,6 +125,7 @@ GPParameterVisitor::VisitParameter(stp_parameter_list_t list,
 {
 	// TODO decide which parameters should be revealed to user
 	// e.g. up to STP_PARAMETER_LEVEL_ADVANCED4;
+	// const stp_parameter_level_t kMaxLevel = STP_PARAMETER_LEVEL_ADVANCED4;
 	const stp_parameter_level_t kMaxLevel = STP_PARAMETER_LEVEL_BASIC;
 	stp_parameter_class_t parameterClass = parameter->p_class;
 	if (parameter->read_only ||
@@ -148,15 +149,19 @@ GPParameterVisitor::VisitParameter(stp_parameter_list_t list,
 			break;
 
 		case STP_PARAMETER_TYPE_BOOLEAN:
+			VisitBooleanParameter(description, parameterClass);
 			break;
 
 		case STP_PARAMETER_TYPE_DOUBLE:
+			VisitDoubleParameter(description, parameterClass);
 			break;
 
 		case STP_PARAMETER_TYPE_INT:
+			VisitIntParameter(description, parameterClass);
 			break;
 
 		case STP_PARAMETER_TYPE_DIMENSION:
+			VisitDimensionParameter(description, parameterClass);
 			break;
 
 		default:
@@ -212,4 +217,59 @@ GPParameterVisitor::VisitStringList(stp_parameter_t* parameter)
 			StringParameter(name, key, displayName);
 		}
 	}
+}
+
+
+void
+GPParameterVisitor::VisitBooleanParameter(stp_parameter_t* description,
+	stp_parameter_class_t parameterClass)
+{
+	bool defaultValue = true;
+	if (description->is_mandatory)
+		defaultValue = description->deflt.boolean;
+	BooleanParameter(description->name, description->text, defaultValue,
+		parameterClass);
+}
+
+
+void
+GPParameterVisitor::VisitDoubleParameter(stp_parameter_t* description,
+			stp_parameter_class_t parameterClass)
+{
+	const char* name = description->name;
+	const char* text = description->text;
+	double lower = description->bounds.dbl.lower;
+	double upper = description->bounds.dbl.upper;
+	double defaultValue = description->deflt.dbl;
+	if (lower <= defaultValue && defaultValue <= upper)
+		DoubleParameter(name, text, lower, upper, defaultValue, parameterClass);
+}
+
+
+void
+GPParameterVisitor::VisitIntParameter(stp_parameter_t* description,
+			stp_parameter_class_t parameterClass)
+{
+	const char* name = description->name;
+	const char* text = description->text;
+	int lower = description->bounds.integer.lower;
+	int upper = description->bounds.integer.upper;
+	int defaultValue = description->deflt.integer;
+	if (lower <= defaultValue && defaultValue <= upper)
+		IntParameter(name, text, lower, upper, defaultValue, parameterClass);
+}
+
+
+void
+GPParameterVisitor::VisitDimensionParameter(stp_parameter_t* description,
+			stp_parameter_class_t parameterClass)
+{
+	const char* name = description->name;
+	const char* text = description->text;
+	int lower = description->bounds.dimension.lower;
+	int upper = description->bounds.dimension.upper;
+	int defaultValue = description->deflt.dimension;
+	if (lower <= defaultValue && defaultValue <= upper)
+		DimensionParameter(name, text, lower, upper, defaultValue,
+			parameterClass);
 }

@@ -50,10 +50,10 @@
 using namespace std;
 
 
-struct NupCap : public BaseCap {
+struct NupCap : public EnumCap {
 	NupCap(const string &label, bool isDefault, int nup)
 		:
-		BaseCap(label, isDefault),
+		EnumCap(label, isDefault),
 		fNup(nup)
 	{}
 
@@ -63,11 +63,11 @@ struct NupCap : public BaseCap {
 };
 
 
-struct DitherCap : public BaseCap {
+struct DitherCap : public EnumCap {
 	DitherCap(const string &label, bool isDefault,
 		Halftone::DitherType ditherType)
 		:
-		BaseCap(label, isDefault),
+		EnumCap(label, isDefault),
 		fDitherType(ditherType)
 	{}
 
@@ -116,6 +116,9 @@ const BaseCap *gDitherTypes[] = {
 };
 
 
+static const char* kCategoryID = "id";
+
+
 enum {
 	kMsgRangeAll = 'JSdl',
 	kMsgRangeSelection,
@@ -125,9 +128,17 @@ enum {
 	kMsgCollateChanged,
 	kMsgReverseChanged,
 	kMsgDuplexChanged,
+	kMsgIntSliderChanged,
+	kMsgDoubleSliderChanged,
 	kMsgNone = 0
 };
 
+
+BString& operator<<(BString& text, double value)
+{
+	text << (float)value;
+	return text;
+}
 
 JobSetupView::JobSetupView(JobData* jobData, PrinterData* printerData,
 	const PrinterCap *printerCap)
@@ -256,8 +267,8 @@ JobSetupView::AttachedToWindow()
 	// Pages per sheet
 	fNup = new BPopUpMenu("");
 	fNup->SetRadioMode(true);
-	FillCapabilityMenu(fNup, kMsgNone, gNups, sizeof(gNups) / sizeof(gNups[0]),
-		(int)fJobData->getNup());
+	FillCapabilityMenu(fNup, kMsgNone, gNups,
+		sizeof(gNups) / sizeof(gNups[0]), (int)fJobData->getNup());
 	BMenuField* pagesPerSheet = new BMenuField("pagesPerSheet",
 		"Pages Per Sheet:", fNup);
 
@@ -356,6 +367,14 @@ JobSetupView::AttachedToWindow()
 	qualityGridLayout->SetSpacing(0, 0);
 	qualityGridLayout->SetInsets(5, 5, 5, 5);
 	qualityBox->AddChild(qualityGrid);
+	// TODO put qualityGrid in a scroll view
+	// the layout of the box surrounding the scroll view using the following
+	// code is not correct; the box still has the size of the qualityGird;
+	// and the scroll view is vertically centered inside the box!
+	//BScrollView* qualityScroller = new BScrollView("qualityScroller",
+	//	qualityGrid, 0, false, true);
+	//qualityScroller->SetExplicitMaxSize(BSize(500, 500));
+	//qualityBox->AddChild(qualityScroller);
 
 	BGridView* pageRangeGrid = new BGridView();
 	BGridLayout* pageRangeLayout = pageRangeGrid->GridLayout();
@@ -503,40 +522,175 @@ JobSetupView::AddDriverSpecificSettings(BGridLayout* gridLayout, int row)
 		PrinterCap::kDriverSpecificCapabilities);
 
 	for (int i = 0; i < count; i ++) {
-		const DriverSpecificCap* capability = static_cast<const DriverSpecificCap*>(
-			capabilities[i]);
+		const DriverSpecificCap* capability =
+			static_cast<const DriverSpecificCap*>(capabilities[i]);
 
-		const char* label = capability->fLabel.c_str();
-		BPopUpMenu* popUpMenu = new BPopUpMenu(label);
-		popUpMenu->SetRadioMode(true);
+		switch (capability->fType) {
+			case DriverSpecificCap::kList:
+				AddPopUpMenu(capability, gridLayout, row);
+				break;
+			case DriverSpecificCap::kBoolean:
+				AddCheckBox(capability, gridLayout, row);
+				break;
+			case DriverSpecificCap::kIntRange:
+			case DriverSpecificCap::kIntDimension:
+				AddIntSlider(capability, gridLayout, row);
+				break;
+			case DriverSpecificCap::kDoubleRange:
+				AddDoubleSlider(capability, gridLayout, row);
+				break;
 
-		PrinterCap::CapID category = static_cast<PrinterCap::CapID>(
-			capability->ID());
-
-		const BaseCap** categoryCapabilities = fPrinterCap->enumCap(category);
-
-		int categoryCount = fPrinterCap->countCap(category);
-
-		string value = GetDriverSpecificValue(category, capability->Key());
-		PrinterCap::KeyPredicate predicate(value.c_str());
-
-		FillCapabilityMenu(popUpMenu, kMsgNone, categoryCapabilities,
-			categoryCount, predicate);
-
-		BString menuLabel = label;
-		menuLabel << ":";
-		BMenuField* menuField = new BMenuField(label, menuLabel.String(),
-			popUpMenu);
-		popUpMenu->SetTargetForItems(this);
-
-		gridLayout->AddItem(menuField->CreateLabelLayoutItem(),
-			0, row);
-		gridLayout->AddItem(menuField->CreateMenuBarLayoutItem(),
-			1, row);
-		row ++;
-
-		fDriverSpecificLists[category] = popUpMenu;
+		}
 	}
+}
+
+
+void
+JobSetupView::AddPopUpMenu(const DriverSpecificCap* capability,
+	BGridLayout* gridLayout, int& row)
+{
+	const char* label = capability->fLabel.c_str();
+	BPopUpMenu* popUpMenu = new BPopUpMenu(label);
+	popUpMenu->SetRadioMode(true);
+
+	PrinterCap::CapID category = static_cast<PrinterCap::CapID>(
+		capability->ID());
+
+	const BaseCap** categoryCapabilities = fPrinterCap->enumCap(category);
+
+	int categoryCount = fPrinterCap->countCap(category);
+
+	string value = GetDriverSpecificValue(category, capability->Key());
+	PrinterCap::KeyPredicate predicate(value.c_str());
+
+	FillCapabilityMenu(popUpMenu, kMsgNone, categoryCapabilities,
+		categoryCount, predicate);
+
+	BString menuLabel = label;
+	menuLabel << ":";
+	BMenuField* menuField = new BMenuField(label, menuLabel.String(),
+		popUpMenu);
+	popUpMenu->SetTargetForItems(this);
+
+	gridLayout->AddItem(menuField->CreateLabelLayoutItem(),
+		0, row);
+	gridLayout->AddItem(menuField->CreateMenuBarLayoutItem(),
+		1, row);
+	row ++;
+
+	fDriverSpecificPopUpMenus[category] = popUpMenu;
+}
+
+
+void
+JobSetupView::AddCheckBox(const DriverSpecificCap* capability,
+	BGridLayout* gridLayout, int& row)
+{
+	PrinterCap::CapID category = static_cast<PrinterCap::CapID>(
+		capability->ID());
+	const BooleanCap* booleanCap = fPrinterCap->findBooleanCap(category);
+	if (booleanCap == NULL) {
+		fprintf(stderr, "Internal error: BooleanCap for '%s' not found!\n",
+			capability->Label());
+		return;
+	}
+
+	const char* key = capability->Key();
+	BString name;
+	name << "pds_" << key;
+	BCheckBox* checkBox = new BCheckBox(name.String(), capability->Label(),
+		NULL);
+
+	bool value = booleanCap->DefaultValue();
+	if (fJobData->Settings().HasBoolean(key))
+		value = fJobData->Settings().GetBoolean(key);
+	if (value)
+		checkBox->SetValue(B_CONTROL_ON);
+
+	gridLayout->AddView(checkBox, 0, row, 2);
+	row ++;
+
+	fDriverSpecificCheckBoxes[capability->Key()] = checkBox;
+}
+
+
+void
+JobSetupView::AddIntSlider(const DriverSpecificCap* capability,
+	BGridLayout* gridLayout, int& row)
+{
+	PrinterCap::CapID category = static_cast<PrinterCap::CapID>(
+		capability->ID());
+	const IntRangeCap* range = fPrinterCap->findIntRangeCap(category);
+	if (range == NULL) {
+		fprintf(stderr, "Internal error: IntRangeCap for '%s' not found!\n",
+			capability->Label());
+		return;
+	}
+
+	const char* label = capability->Label();
+	const char* key = capability->Key();
+	BString name;
+	name << "pds_" << key;
+	BMessage* message = new BMessage(kMsgIntSliderChanged);
+	message->AddInt32(kCategoryID, category);
+	BSlider* slider = new BSlider(name.String(), label,
+		message, 0, 1000, B_HORIZONTAL);
+	slider->SetModificationMessage(new BMessage(*message));
+	slider->SetTarget(this);
+
+	int32 value = range->DefaultValue();
+	if (fJobData->Settings().HasInt(key))
+		value = fJobData->Settings().GetInt(key);
+	float position = (value - range->Lower()) /
+		(range->Upper() - range->Lower());
+	slider->SetPosition(position);
+
+	gridLayout->AddView(slider, 0, row, 2);
+	row ++;
+
+	IntRange intRange(label, key, range, slider);
+	fDriverSpecificIntSliders[category] = intRange;
+	intRange.UpdateLabel();
+}
+
+
+void
+JobSetupView::AddDoubleSlider(const DriverSpecificCap* capability,
+	BGridLayout* gridLayout, int& row)
+{
+	PrinterCap::CapID category = static_cast<PrinterCap::CapID>(
+		capability->ID());
+	const DoubleRangeCap* range = fPrinterCap->findDoubleRangeCap(category);
+	if (range == NULL) {
+		fprintf(stderr, "Internal error: DoubleRangeCap for '%s' not found!\n",
+			capability->Label());
+		return;
+	}
+
+	const char* label = capability->Label();
+	const char* key = capability->Key();
+	BString name;
+	name << "pds_" << key;
+	BMessage* message = new BMessage(kMsgDoubleSliderChanged);
+	message->AddInt32(kCategoryID, category);
+	BSlider* slider = new BSlider(name.String(), label,
+		message, 0, 1000, B_HORIZONTAL);
+	slider->SetModificationMessage(new BMessage(*message));
+	slider->SetTarget(this);
+
+	double value = range->DefaultValue();
+	if (fJobData->Settings().HasDouble(key))
+		value = fJobData->Settings().GetDouble(key);
+	float position = static_cast<float>((value - range->Lower()) /
+		(range->Upper() - range->Lower()));
+	slider->SetPosition(position);
+
+	gridLayout->AddView(slider, 0, row, 2);
+	row ++;
+
+	DoubleRange doubleRange(label, key, range, slider);
+	fDriverSpecificDoubleSliders[category] = doubleRange;
+	doubleRange.UpdateLabel();
 }
 
 
@@ -544,10 +698,10 @@ string
 JobSetupView::GetDriverSpecificValue(PrinterCap::CapID category,
 	const char* key)
 {
-	if (fJobData->HasDriverSpecificSetting(key))
-		return fJobData->DriverSpecificSetting(key);
+	if (fJobData->Settings().HasString(key))
+		return fJobData->Settings().GetString(key);
 
-	const BaseCap* defaultCapability = fPrinterCap->getDefaultCap(category);
+	const EnumCap* defaultCapability = fPrinterCap->getDefaultCap(category);
 	return defaultCapability->fKey;
 }
 
@@ -563,7 +717,7 @@ JobSetupView::FillCapabilityMenu(BPopUpMenu* menu, uint32 message,
 	BMenuItem* defaultItem = NULL;
 	BMenuItem* item = NULL;
 	while (count--) {
-		const BaseCap* capability = *capabilities;
+		const EnumCap* capability = dynamic_cast<const EnumCap*>(*capabilities);
 		if (message != kMsgNone)
 			item = new BMenuItem(capability->fLabel.c_str(),
 				new BMessage(message));
@@ -622,7 +776,11 @@ JobSetupView::GetID(const BaseCap** capabilities, int count, const char* label,
 	int defaultValue)
 {
 	while (count--) {
-		const BaseCap* capability = *capabilities;
+		const EnumCap* capability =
+			dynamic_cast<const EnumCap*>(*capabilities);
+		if (capability == NULL)
+			break;
+
 		if (capability->fLabel == label)
 			return capability->ID();
 	}
@@ -665,7 +823,15 @@ JobSetupView::MessageReceived(BMessage* message)
 	
 	case kMsgReverseChanged:
 		fPages->setReverse(fReverse->Value() == B_CONTROL_ON);
-		break;	
+		break;
+
+	case kMsgIntSliderChanged:
+		UpdateIntSlider(message);
+		break;
+
+	case kMsgDoubleSliderChanged:
+		UpdateDoubleSlider(message);
+		break;
 	}
 }
 
@@ -678,6 +844,28 @@ JobSetupView::UpdateHalftonePreview()
 
 	fHalftone->preview(Gamma(), InkDensity(), DitherType(),
 		Color() != JobData::kMonochrome);
+}
+
+
+void
+JobSetupView::UpdateIntSlider(BMessage* message)
+{
+	int32 id;
+	if (message->FindInt32(kCategoryID, &id) != B_OK)
+		return;
+	PrinterCap::CapID capID = static_cast<PrinterCap::CapID>(id);
+	fDriverSpecificIntSliders[capID].UpdateLabel();
+}
+
+
+void
+JobSetupView::UpdateDoubleSlider(BMessage* message)
+{
+	int32 id;
+	if (message->FindInt32(kCategoryID, &id) != B_OK)
+		return;
+	PrinterCap::CapID capID = static_cast<PrinterCap::CapID>(id);
+	fDriverSpecificDoubleSliders[capID].UpdateLabel();
 }
 
 
@@ -779,16 +967,48 @@ JobSetupView::UpdateJobData()
 		pageSelection = JobData::kEvenNumberedPages;
 	fJobData->setPageSelection(pageSelection);
 	
-	std::map<PrinterCap::CapID, BPopUpMenu*>::iterator it =
-		fDriverSpecificLists.begin();
-	for(; it != fDriverSpecificLists.end(); it++) {
-		PrinterCap::CapID category = it->first;
-		BPopUpMenu* popUpMenu = it->second;
-		const char* key = fPrinterCap->findCap(
-			PrinterCap::kDriverSpecificCapabilities, (int)category)->Key();
-		const char* label = popUpMenu->FindMarked()->Label();
-		const char* value = fPrinterCap->findCap(category, label)->Key();
-		fJobData->SetDriverSpecificSetting(key, value);
+	{
+		std::map<PrinterCap::CapID, BPopUpMenu*>::iterator it =
+			fDriverSpecificPopUpMenus.begin();
+		for(; it != fDriverSpecificPopUpMenus.end(); it++) {
+			PrinterCap::CapID category = it->first;
+			BPopUpMenu* popUpMenu = it->second;
+			const char* key = fPrinterCap->findCap(
+				PrinterCap::kDriverSpecificCapabilities, (int)category)->Key();
+			const char* label = popUpMenu->FindMarked()->Label();
+			const char* value = static_cast<const EnumCap*>(fPrinterCap->
+				findCap(category, label))->Key();
+			fJobData->Settings().SetString(key, value);
+		}
+	}
+
+	{
+		std::map<string, BCheckBox*>::iterator it =
+			fDriverSpecificCheckBoxes.begin();
+		for(; it != fDriverSpecificCheckBoxes.end(); it++) {
+			const char* key = it->first.c_str();
+			BCheckBox* checkBox = it->second;
+			bool value = checkBox->Value() == B_CONTROL_ON;
+			fJobData->Settings().SetBoolean(key, value);
+		}
+	}
+
+	{
+		std::map<PrinterCap::CapID, IntRange>::iterator it =
+			fDriverSpecificIntSliders.begin();
+		for(; it != fDriverSpecificIntSliders.end(); it++) {
+			IntRange& range = it->second;
+			fJobData->Settings().SetInt(range.Key(), range.Value());
+		}
+	}
+
+	{
+		std::map<PrinterCap::CapID, DoubleRange>::iterator it =
+			fDriverSpecificDoubleSliders.begin();
+		for(; it != fDriverSpecificDoubleSliders.end(); it++) {
+			DoubleRange& range = it->second;
+			fJobData->Settings().SetDouble(range.Key(), range.Value());
+		}
 	}
 
 	fJobData->save();

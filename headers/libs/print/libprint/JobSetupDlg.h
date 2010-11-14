@@ -20,6 +20,7 @@ class BCheckBox;
 class BGridLayout;
 class BPopUpMenu;
 class BRadioButton;
+class BSlider;
 class BTextControl;
 class BTextView;
 class HalftoneView;
@@ -27,6 +28,79 @@ class JobData;
 class PagesView;
 class PrinterCap;
 class PrinterData;
+
+extern BString& operator<<(BString& text, double value);
+
+template<typename T, typename R>
+class Range
+{
+public:
+	Range();
+	Range(const char* label, const char* key, const R* range, BSlider* slider);
+	const char* Key() const;
+	T Value();
+	void UpdateLabel();
+
+private:
+	const char* fLabel;
+	const char* fKey;
+	const R* fRange;
+	BSlider* fSlider;
+};
+
+
+template<typename T, typename R>
+Range<T, R>::Range()
+	:
+	fKey(NULL),
+	fRange(NULL),
+	fSlider(NULL)
+{
+}
+
+
+template<typename T, typename R>
+Range<T, R>::Range(const char* label, const char* key, const R* range,
+	BSlider* slider)
+	:
+	fLabel(label),
+	fKey(key),
+	fRange(range),
+	fSlider(slider)
+{
+
+}
+
+
+template<typename T, typename R>
+const char*
+Range<T, R>::Key() const
+{
+	return fKey;
+}
+
+
+template<typename T, typename R>
+T
+Range<T, R>::Value()
+{
+	return static_cast<T>(fRange->Lower() +
+		(fRange->Upper() - fRange->Lower()) * fSlider->Position());
+}
+
+
+template<typename T, typename R>
+void
+Range<T, R>::UpdateLabel()
+{
+	BString label = fLabel;
+	label << " (" << Value() << ")";
+	fSlider->SetLabel(label.String());
+}
+
+
+typedef Range<int32, IntRangeCap> IntRange;
+typedef Range<double, DoubleRangeCap> DoubleRange;
 
 class JobSetupView : public BView {
 public:
@@ -41,6 +115,14 @@ private:
 			bool	IsHalftoneConfigurationNeeded();
 			void	CreateHalftoneConfigurationUI();
 			void	AddDriverSpecificSettings(BGridLayout* gridLayout, int row);
+			void	AddPopUpMenu(const DriverSpecificCap* capability,
+						BGridLayout* gridLayout, int& row);
+			void	AddCheckBox(const DriverSpecificCap* capability,
+						BGridLayout* gridLayout, int& row);
+			void	AddIntSlider(const DriverSpecificCap* capability,
+						BGridLayout* gridLayout, int& row);
+			void	AddDoubleSlider(const DriverSpecificCap* capability,
+						BGridLayout* gridLayout, int& row);
 			string	GetDriverSpecificValue(PrinterCap::CapID category,
 						const char* key);
 			template<typename Predicate>
@@ -58,12 +140,15 @@ private:
 						JobData::PageSelection pageSelection);
 			void	AllowOnlyDigits(BTextView* textView, int maxDigits);
 			void	UpdateHalftonePreview();
+			void	UpdateIntSlider(BMessage* message);
+			void	UpdateDoubleSlider(BMessage* message);
 
 			JobData::Color			Color();
 			Halftone::DitherType	DitherType();
 			float					Gamma();
 			float					InkDensity();
 			JobData::PaperSource	PaperSource();
+
 
 	BTextControl*		fCopies;
 	BTextControl*		fFromPage;
@@ -88,7 +173,10 @@ private:
 	BRadioButton*		fAllPages;
 	BRadioButton*		fOddNumberedPages;
 	BRadioButton*		fEvenNumberedPages;
-	std::map<PrinterCap::CapID, BPopUpMenu*> fDriverSpecificLists;
+	std::map<PrinterCap::CapID, BPopUpMenu*>	fDriverSpecificPopUpMenus;
+	std::map<string, BCheckBox*>				fDriverSpecificCheckBoxes;
+	std::map<PrinterCap::CapID, IntRange>		fDriverSpecificIntSliders;
+	std::map<PrinterCap::CapID, DoubleRange>	fDriverSpecificDoubleSliders;
 	BCheckBox*			fPreview;
 };
 

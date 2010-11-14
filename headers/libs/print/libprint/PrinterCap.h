@@ -17,18 +17,26 @@ enum {
 };
 
 struct BaseCap {
-							BaseCap(const string &label, bool isDefault);
+							BaseCap(const string &label);
 	virtual					~BaseCap();
+
+			const char*		Label() const;
+
+			string			fLabel;
+};
+
+struct EnumCap : public BaseCap {
+							EnumCap(const string& label, bool isDefault);
 
 	virtual	int32			ID() const = 0;
 			const char*		Key() const;
 
-			string			fLabel;
 			bool			fIsDefault;
 			string			fKey;
 };
 
-struct PaperCap : public BaseCap {
+
+struct PaperCap : public EnumCap {
 							PaperCap(const string &label, bool isDefault,
 								JobData::Paper paper, const BRect &paperRect,
 								const BRect &physicalRect);
@@ -40,7 +48,7 @@ struct PaperCap : public BaseCap {
 			BRect			fPhysicalRect;
 };
 
-struct PaperSourceCap : public BaseCap {
+struct PaperSourceCap : public EnumCap {
 							PaperSourceCap(const string &label, bool isDefault,
 								JobData::PaperSource paperSource);
 
@@ -49,7 +57,7 @@ struct PaperSourceCap : public BaseCap {
 			JobData::PaperSource	fPaperSource;
 };
 
-struct ResolutionCap : public BaseCap {
+struct ResolutionCap : public EnumCap {
 							ResolutionCap(const string &label, bool isDefault,
 								int32 id, int xResolution, int yResolution);
 
@@ -60,7 +68,7 @@ struct ResolutionCap : public BaseCap {
 			int				fYResolution;
 };
 
-struct OrientationCap : public BaseCap {
+struct OrientationCap : public EnumCap {
 							OrientationCap(const string &label, bool isDefault,
 									JobData::Orientation orientation);
 
@@ -69,7 +77,7 @@ struct OrientationCap : public BaseCap {
 			JobData::Orientation	fOrientation;
 };
 
-struct PrintStyleCap : public BaseCap {
+struct PrintStyleCap : public EnumCap {
 							PrintStyleCap(const string &label, bool isDefault,
 								JobData::PrintStyle printStyle);
 
@@ -78,7 +86,7 @@ struct PrintStyleCap : public BaseCap {
 			JobData::PrintStyle		fPrintStyle;
 };
 
-struct BindingLocationCap : public BaseCap {
+struct BindingLocationCap : public EnumCap {
 							BindingLocationCap(const string &label,
 								bool isDefault,
 								JobData::BindingLocation bindingLocation);
@@ -88,7 +96,7 @@ struct BindingLocationCap : public BaseCap {
 			JobData::BindingLocation	fBindingLocation;
 };
 
-struct ColorCap : public BaseCap {
+struct ColorCap : public EnumCap {
 							ColorCap(const string &label, bool isDefault,
 								JobData::Color color);
 
@@ -97,7 +105,7 @@ struct ColorCap : public BaseCap {
 			JobData::Color	fColor;
 };
 
-struct ProtocolClassCap : public BaseCap {
+struct ProtocolClassCap : public EnumCap {
 							ProtocolClassCap(const string &label,
 								bool isDefault, int32 protocolClass,
 								const string &description);
@@ -109,11 +117,13 @@ struct ProtocolClassCap : public BaseCap {
 };
 
 
-struct DriverSpecificCap : public BaseCap {
+struct DriverSpecificCap : public EnumCap {
 		enum Type {
 			kList,
-			kCheckBox,
-			kRange
+			kBoolean,
+			kIntRange,
+			kIntDimension,
+			kDoubleRange
 		};
 
 							DriverSpecificCap(const string& label,
@@ -125,12 +135,50 @@ struct DriverSpecificCap : public BaseCap {
 			Type			fType;
 };
 
-struct ListItemCap : public BaseCap {
+struct ListItemCap : public EnumCap {
 							ListItemCap(const string& label,
 								bool isDefault, int32 id);
 
 			int32			ID() const;
+
+private:
 			int32			fID;
+};
+
+struct BooleanCap : public BaseCap {
+							BooleanCap(const string& label, bool defaultValue);
+
+			bool			DefaultValue() const;
+
+private:
+			bool			fDefaultValue;
+};
+
+struct IntRangeCap : public BaseCap {
+							IntRangeCap(const string& label, int lower,
+								int upper, int defaultValue);
+
+			int32			Lower() const;
+			int32			Upper() const;
+			int32			DefaultValue() const;
+
+private:
+			int32			fLower;
+			int32			fUpper;
+			int32			fDefaultValue;
+};
+
+struct DoubleRangeCap : public BaseCap {
+							DoubleRangeCap(const string& label, double lower,
+								double upper, double defaultValue);
+
+			double			Lower() const;
+			double			Upper() const;
+			double			DefaultValue() const;
+
+			double			fLower;
+			double			fUpper;
+			double			fDefaultValue;
 };
 
 class PrinterData;
@@ -170,7 +218,10 @@ public:
 
 
 		bool operator()(const BaseCap* baseCap) {
-			return baseCap->ID() == fID;
+			const EnumCap* enumCap = dynamic_cast<const EnumCap*>(baseCap);
+			if (enumCap == NULL)
+				return false;
+			return enumCap->ID() == fID;
 		}
 
 		int fID;
@@ -201,7 +252,10 @@ public:
 
 
 		bool operator()(const BaseCap* baseCap) {
-			return baseCap->fKey == fKey;
+			const EnumCap* enumCap = dynamic_cast<const EnumCap*>(baseCap);
+			if (enumCap == NULL)
+				return false;
+			return enumCap->fKey == fKey;
 		}
 
 		const char* fKey;
@@ -211,11 +265,15 @@ public:
 	virtual	int				countCap(CapID category) const = 0;
 	virtual	bool			isSupport(CapID category) const = 0;
 	virtual	const BaseCap**	enumCap(CapID category) const = 0;
-			const BaseCap*	getDefaultCap(CapID category) const;
-			const BaseCap*	findCap(CapID category, int id) const;
+			const EnumCap*	getDefaultCap(CapID category) const;
+			const EnumCap*	findCap(CapID category, int id) const;
 			const BaseCap*	findCap(CapID category, const char* label) const;
-			const BaseCap*	findCapWithKey(CapID category, const char* key)
+			const EnumCap*	findCapWithKey(CapID category, const char* key)
 								const;
+
+			const BooleanCap*		findBooleanCap(CapID category) const;
+			const IntRangeCap*		findIntRangeCap(CapID category) const;
+			const DoubleRangeCap*	findDoubleRangeCap(CapID category) const;
 
 			int				getProtocolClass() const;
 

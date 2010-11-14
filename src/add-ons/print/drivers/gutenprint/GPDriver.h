@@ -30,6 +30,14 @@ protected:
 	void		SetDriverSpecificSettings();
 	void		AddDriverSpecificSetting(PrinterCap::CapID category,
 					const char* key);
+	void		AddDriverSpecificBooleanSetting(PrinterCap::CapID category,
+					const char* key);
+	void		AddDriverSpecificIntSetting(PrinterCap::CapID category,
+					const char* key);
+	void		AddDriverSpecificDimensionSetting(PrinterCap::CapID category,
+					const char* key);
+	void		AddDriverSpecificDoubleSetting(PrinterCap::CapID category,
+					const char* key);
 	bool		startPage(int page);
 	bool		nextBand(BBitmap* bitmap, BPoint* offset);
 	bool		endPage(int page);

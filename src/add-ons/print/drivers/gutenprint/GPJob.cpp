@@ -97,11 +97,49 @@ GPJob::Begin()
 	stp_set_string_parameter(fVariables, "PrintingMode",
 		fConfiguration->fPrintingMode);
 
-	map<string, string>::iterator it = fConfiguration->fDriverSpecificSettings.
-		begin();
-	for (; it != fConfiguration->fDriverSpecificSettings.end(); it ++) {
-		stp_set_string_parameter(fVariables, it->first.c_str(),
-			it->second.c_str());
+	{
+		map<string, string>::iterator it = fConfiguration->fStringSettings.
+			begin();
+		for (; it != fConfiguration->fStringSettings.end(); it ++) {
+			stp_set_string_parameter(fVariables, it->first.c_str(),
+				it->second.c_str());
+		}
+	}
+
+	{
+		map<string, bool>::iterator it = fConfiguration->fBooleanSettings.
+			begin();
+		for (; it != fConfiguration->fBooleanSettings.end(); it ++) {
+			stp_set_boolean_parameter(fVariables, it->first.c_str(),
+				it->second);
+		}
+	}
+
+	{
+		map<string, int32>::iterator it = fConfiguration->fIntSettings.
+			begin();
+		for (; it != fConfiguration->fIntSettings.end(); it ++) {
+			stp_set_int_parameter(fVariables, it->first.c_str(),
+				it->second);
+		}
+	}
+
+	{
+		map<string, int32>::iterator it = fConfiguration->fDimensionSettings.
+			begin();
+		for (; it != fConfiguration->fDimensionSettings.end(); it ++) {
+			stp_set_dimension_parameter(fVariables, it->first.c_str(),
+				it->second);
+		}
+	}
+
+	{
+		map<string, double>::iterator it = fConfiguration->fDoubleSettings.
+			begin();
+		for (; it != fConfiguration->fDoubleSettings.end(); it ++) {
+			stp_set_float_parameter(fVariables, it->first.c_str(),
+				it->second);
+		}
 	}
 
 	stp_set_string_parameter(fVariables, "InputImageType",

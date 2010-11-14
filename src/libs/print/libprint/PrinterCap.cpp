@@ -6,10 +6,9 @@
 #include "PrinterCap.h"
 #include "PrinterData.h"
 
-BaseCap::BaseCap(const string &label, bool isDefault)
+BaseCap::BaseCap(const string &label)
 	:
-	fLabel(label),
-	fIsDefault(isDefault)
+	fLabel(label)
 {
 }
 
@@ -20,7 +19,22 @@ BaseCap::~BaseCap()
 
 
 const char*
-BaseCap::Key() const
+BaseCap::Label() const
+{
+	return fLabel.c_str();
+}
+
+
+EnumCap::EnumCap(const string &label, bool isDefault)
+	:
+	BaseCap(label),
+	fIsDefault(isDefault)
+{
+}
+
+
+const char*
+EnumCap::Key() const
 {
 	return fKey.c_str();
 }
@@ -29,7 +43,7 @@ BaseCap::Key() const
 PaperCap::PaperCap(const string &label, bool isDefault, JobData::Paper paper,
 	const BRect &paperRect, const BRect &physicalRect)
 	:
-	BaseCap(label, isDefault),
+	EnumCap(label, isDefault),
 	fPaper(paper),
 	fPaperRect(paperRect),
 	fPhysicalRect(physicalRect)
@@ -47,7 +61,7 @@ PaperCap::ID() const
 PaperSourceCap::PaperSourceCap(const string &label, bool isDefault,
 	JobData::PaperSource paperSource)
 	:
-	BaseCap(label, isDefault),
+	EnumCap(label, isDefault),
 	fPaperSource(paperSource)
 {
 }
@@ -63,7 +77,7 @@ PaperSourceCap::ID() const
 ResolutionCap::ResolutionCap(const string &label, bool isDefault,
 	int32 id, int xResolution, int yResolution)
 	:
-	BaseCap(label, isDefault),
+	EnumCap(label, isDefault),
 	fID(id),
 	fXResolution(xResolution),
 	fYResolution(yResolution)
@@ -81,7 +95,7 @@ ResolutionCap::ID() const
 OrientationCap::OrientationCap(const string &label, bool isDefault,
 	JobData::Orientation orientation)
 	:
-	BaseCap(label, isDefault),
+	EnumCap(label, isDefault),
 	fOrientation(orientation)
 {
 }
@@ -97,7 +111,7 @@ OrientationCap::ID() const
 PrintStyleCap::PrintStyleCap(const string &label, bool isDefault,
 	JobData::PrintStyle printStyle)
 	:
-	BaseCap(label, isDefault),
+	EnumCap(label, isDefault),
 	fPrintStyle(printStyle)
 {
 }
@@ -113,7 +127,7 @@ PrintStyleCap::ID() const
 BindingLocationCap::BindingLocationCap(const string &label, bool isDefault,
 	JobData::BindingLocation bindingLocation)
 	:
-	BaseCap(label, isDefault),
+	EnumCap(label, isDefault),
 	fBindingLocation(bindingLocation)
 {
 }
@@ -128,7 +142,7 @@ BindingLocationCap::ID() const
 
 ColorCap::ColorCap(const string &label, bool isDefault, JobData::Color color)
 	:
-	BaseCap(label, isDefault),
+	EnumCap(label, isDefault),
 	fColor(color)
 {
 }
@@ -144,7 +158,7 @@ ColorCap::ID() const
 ProtocolClassCap::ProtocolClassCap(const string &label, bool isDefault,
 	int32 protocolClass, const string &description)
 	:
-	BaseCap(label, isDefault),
+	EnumCap(label, isDefault),
 	fProtocolClass(protocolClass),
 	fDescription(description)
 {
@@ -161,7 +175,7 @@ ProtocolClassCap::ID() const
 DriverSpecificCap::DriverSpecificCap(const string& label, int32 category,
 	Type type)
 	:
-	BaseCap(label, false),
+	EnumCap(label, false),
 	fCategory(category),
 	fType(type)
 {
@@ -177,7 +191,7 @@ DriverSpecificCap::ID() const
 
 ListItemCap::ListItemCap(const string& label, bool isDefault, int32 id)
 	:
-	BaseCap(label, isDefault),
+	EnumCap(label, isDefault),
 	fID(id)
 {
 }
@@ -187,6 +201,85 @@ int32
 ListItemCap::ID() const
 {
 	return fID;
+}
+
+
+BooleanCap::BooleanCap(const string& label, bool defaultValue)
+	:
+	BaseCap(label),
+	fDefaultValue(defaultValue)
+{
+}
+
+
+bool
+BooleanCap::DefaultValue() const
+{
+	return fDefaultValue;
+}
+
+
+IntRangeCap::IntRangeCap(const string& label, int lower, int upper,
+	int defaultValue)
+	:
+	BaseCap(label),
+	fLower(lower),
+	fUpper(upper),
+	fDefaultValue(defaultValue)
+{
+}
+
+
+int32
+IntRangeCap::Lower() const
+{
+	return fLower;
+}
+
+
+int32
+IntRangeCap::Upper() const
+{
+	return fUpper;
+}
+
+
+int32
+IntRangeCap::DefaultValue() const
+{
+	return fDefaultValue;
+}
+
+
+DoubleRangeCap::DoubleRangeCap(const string& label, double lower, double upper,
+	double defaultValue)
+	:
+	BaseCap(label),
+	fLower(lower),
+	fUpper(upper),
+	fDefaultValue(defaultValue)
+{
+}
+
+
+double
+DoubleRangeCap::Lower() const
+{
+	return fLower;
+}
+
+
+double
+DoubleRangeCap::Upper() const
+{
+	return fUpper;
+}
+
+
+double
+DoubleRangeCap::DefaultValue() const
+{
+	return fDefaultValue;
 }
 
 
@@ -202,7 +295,7 @@ PrinterCap::~PrinterCap()
 }
 
 
-const BaseCap*
+const EnumCap*
 PrinterCap::getDefaultCap(CapID category) const
 {
 	int count = countCap(category);
@@ -211,13 +304,18 @@ PrinterCap::getDefaultCap(CapID category) const
 
 	const BaseCap **base_cap = enumCap(category);
 	while (count--) {
-		if ((*base_cap)->fIsDefault) {
-			return *base_cap;
+		const EnumCap* enumCap = dynamic_cast<const EnumCap*>(*base_cap);
+		if (enumCap == NULL)
+			return NULL;
+
+		if (enumCap->fIsDefault) {
+			return enumCap;
 		}
+
 		base_cap++;
 	}
 
-	return enumCap(category)[0];
+	return static_cast<const EnumCap*>(enumCap(category)[0]);
 }
 
 
@@ -240,11 +338,11 @@ PrinterCap::findCap(CapID category, Predicate& predicate) const
 
 }
 
-const BaseCap*
+const EnumCap*
 PrinterCap::findCap(CapID category, int id) const
 {
 	IDPredicate predicate(id);
-	return findCap(category, predicate);
+	return static_cast<const EnumCap*>(findCap(category, predicate));
 }
 
 
@@ -256,11 +354,38 @@ PrinterCap::findCap(CapID category, const char* label) const
 }
 
 
-const BaseCap*
+const EnumCap*
 PrinterCap::findCapWithKey(CapID category, const char* key) const
 {
 	KeyPredicate predicate(key);
-	return findCap(category, predicate);
+	return static_cast<const EnumCap*>(findCap(category, predicate));
+}
+
+
+const BooleanCap*
+PrinterCap::findBooleanCap(CapID category) const
+{
+	if (countCap(category) != 1)
+		return NULL;
+	return dynamic_cast<const BooleanCap*>(enumCap(category)[0]);
+}
+
+
+const IntRangeCap*
+PrinterCap::findIntRangeCap(CapID category) const
+{
+	if (countCap(category) != 1)
+		return NULL;
+	return dynamic_cast<const IntRangeCap*>(enumCap(category)[0]);
+}
+
+
+const DoubleRangeCap*
+PrinterCap::findDoubleRangeCap(CapID category) const
+{
+	if (countCap(category) != 1)
+		return NULL;
+	return dynamic_cast<const DoubleRangeCap*>(enumCap(category)[0]);
 }
 
 

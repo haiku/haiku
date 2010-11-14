@@ -51,9 +51,7 @@ GPCapabilityExtractor::BeginParameter(const char* name, const char* displayName,
 		fState = kExtractPrintingModeParameter;
 	} else {
 		GP_PRINT("Parameter: %s - %s\n", name, displayName);
-		bool recordParameter = parameterClass == STP_PARAMETER_CLASS_FEATURE ||
-			parameterClass == STP_PARAMETER_CLASS_OUTPUT;
-		if (!recordParameter)
+		if (!IsSupported(parameterClass))
 			return false;
 
 		fState = kExtractParameter;
@@ -117,7 +115,7 @@ GPCapabilityExtractor::StringParameter(const char* name, const char* key,
 		const char* displayName)
 {
 	bool isDefault = fDefaultKey == key;
-	BaseCap* capability;
+	EnumCap* capability;
 
 	switch (fState) {
 		case kExtractResolutionParameter:
@@ -154,7 +152,7 @@ GPCapabilityExtractor::ResolutionParameter(const char* name, const char* key,
 		const char* displayName, int x, int y)
 {
 	bool isDefault = fDefaultKey == key;
-	BaseCap* capability;
+	EnumCap* capability;
 	int resolution;
 
 	switch (fState) {
@@ -188,7 +186,7 @@ GPCapabilityExtractor::PageSizeParameter(const char* name, const char* key,
 	const char* displayName, BSize pageSize, BRect imageableArea)
 {
 	bool isDefault = fDefaultKey == key;
-	BaseCap* capability;
+	EnumCap* capability;
 
 	switch (fState) {
 		case kExtractPageSizeParameter:
@@ -215,11 +213,78 @@ GPCapabilityExtractor::EndParameter(const char* name)
 
 
 void
+GPCapabilityExtractor::BooleanParameter(const char* name,
+	const char* displayName, bool defaultValue,
+	stp_parameter_class_t parameterClass)
+{
+	if (!IsSupported(parameterClass))
+		return;
+
+	BooleanCap* capability = new BooleanCap(displayName, defaultValue);
+	AddDriverSpecificCapability(name, displayName, DriverSpecificCap::kBoolean,
+		capability);
+}
+
+
+void
+GPCapabilityExtractor::DoubleParameter(const char* name,
+	const char* displayName, double lower, double upper, double defaultValue,
+	stp_parameter_class_t parameterClass)
+{
+	if (!IsSupported(parameterClass))
+		return;
+
+	DoubleRangeCap* capability = new DoubleRangeCap(displayName, lower, upper,
+		defaultValue);
+	AddDriverSpecificCapability(name, displayName,
+		DriverSpecificCap::kDoubleRange, capability);
+}
+
+
+void
+GPCapabilityExtractor::IntParameter(const char* name, const char* displayName,
+	int lower, int upper, int defaultValue,
+	stp_parameter_class_t parameterClass)
+{
+	if (!IsSupported(parameterClass))
+		return;
+
+	IntRangeCap* capability = new IntRangeCap(displayName, lower, upper,
+		defaultValue);
+	AddDriverSpecificCapability(name, displayName, DriverSpecificCap::kIntRange,
+		capability);
+}
+
+
+void
+GPCapabilityExtractor::DimensionParameter(const char* name,
+	const char* displayName, int lower, int upper, int defaultValue,
+	stp_parameter_class_t parameterClass)
+{
+	if (!IsSupported(parameterClass))
+		return;
+
+	IntRangeCap* capability = new IntRangeCap(displayName, lower, upper,
+		defaultValue);
+	AddDriverSpecificCapability(name, displayName,
+		DriverSpecificCap::kIntDimension, capability);
+}
+
+
+void
 GPCapabilityExtractor::EndVisit()
 {
 	if (fCapabilities->fInputSlots.Size() == 0)
 		AddDefaultInputSlot();
 	SetDriverSpecificCategories();
+}
+
+
+bool
+GPCapabilityExtractor::IsSupported(stp_parameter_class_t parameterClass)
+{
+	return parameterClass == STP_PARAMETER_CLASS_FEATURE
+		|| parameterClass == STP_PARAMETER_CLASS_OUTPUT;
 }
 
 
@@ -252,9 +317,28 @@ GPCapabilityExtractor::SetDriverSpecificCategories()
 
 void
 GPCapabilityExtractor::AddCapability(GPArray<struct BaseCap>& array,
-	BaseCap* capability, const char* key)
+	EnumCap* capability, const char* key)
 {
 	capability->fKey = key;
 	array.Array()[fIndex] = capability;
 	fIndex ++;
+}
+
+
+void
+GPCapabilityExtractor::AddDriverSpecificCapability(const char* name,
+	const char*	displayName, DriverSpecificCap::Type type, BaseCap* capability)
+{
+	DriverSpecificCap* parent = new DriverSpecificCap(displayName,
+		fNextDriverSpecificCategoryID, type);
+	parent->fKey = name;
+
+	fDriverSpecificCategories.push_back(parent);
+
+	GPArray<struct BaseCap>& array = fCapabilities->fDriverSpecificCapabilities
+		[fNextDriverSpecificCategoryID];
+	array.SetSize(1);
+	array.Array()[0] = capability;
+
+	fNextDriverSpecificCategoryID++;
 }
