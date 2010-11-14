@@ -870,7 +870,7 @@ CPUUsageDataSource::_SetCPU(int32 cpu)
 	fCPU = cpu;
 	fLabel = "CPU";
 	if (SystemInfo().CPUCount() > 1)
-		fLabel << " " << cpu;
+		fLabel << " " << cpu + 1;
 
 	fShortLabel = fLabel;
 	fLabel << " usage";
