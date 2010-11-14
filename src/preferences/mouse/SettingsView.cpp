@@ -119,9 +119,9 @@ SettingsView::SettingsView(MouseSettings &settings)
 	fDoubleClick->SetAlignment(B_ALIGN_LEFT, B_ALIGN_CENTER);
 
 	// Add the "Mouse focus mode" pop up menu
-	fFocusMenu = new BPopUpMenu(B_TRANSLATE("Click to activate"));
+	fFocusMenu = new BPopUpMenu(B_TRANSLATE("Click to focus and raise"));
 
-	const char *focusLabels[] = {B_TRANSLATE_MARK("Click to activate"),
+	const char *focusLabels[] = {B_TRANSLATE_MARK("Click to focus and raise"),
 		B_TRANSLATE_MARK("Click to focus"),
 		B_TRANSLATE_MARK("Focus follows mouse")};
 	const mode_mouse focusModes[] = {B_NORMAL_MOUSE, B_CLICK_TO_FOCUS_MOUSE,

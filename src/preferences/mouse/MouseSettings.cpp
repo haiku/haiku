@@ -155,7 +155,7 @@ MouseSettings::Dump()
 	char *mode = "unknown";
 	switch (fMode) {
 		case B_NORMAL_MOUSE:
-			mode = "click to activate";
+			mode = "click to focus and raise";
 			break;
 		case B_CLICK_TO_FOCUS_MOUSE:
 			mode = "click to focus";
