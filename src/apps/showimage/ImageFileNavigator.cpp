@@ -26,9 +26,7 @@
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
-//#include <Locker.h>
 #include <ObjectList.h>
-//#include <Path.h>
 #include <TranslatorRoster.h>
 
 #include <tracker_private.h>
@@ -76,7 +74,7 @@ private:
 
 class FolderNavigator : public Navigator {
 public:
-								FolderNavigator(const entry_ref& ref);
+								FolderNavigator(entry_ref& ref);
 	virtual						~FolderNavigator();
 
 	virtual	bool				FindNextImage(const entry_ref& currentRef,
@@ -223,18 +221,27 @@ TrackerNavigator::UpdateSelection(const entry_ref& ref)
 // #pragma mark -
 
 
-FolderNavigator::FolderNavigator(const entry_ref& ref)
+FolderNavigator::FolderNavigator(entry_ref& ref)
 	:
 	fEntries(true)
 {
-	node_ref nodeRef;
-	nodeRef.device = ref.device;
-	nodeRef.node = ref.directory;
+	BEntry entry(&ref);
+	if (entry.IsDirectory())
+		fFolder.SetTo(&ref);
+	else {
+		node_ref nodeRef;
+		nodeRef.device = ref.device;
+		nodeRef.node = ref.directory;
 
-	fFolder.SetTo(&nodeRef);
+		fFolder.SetTo(&nodeRef);
+	}
+
 	_BuildEntryList();
 
 	// TODO: monitor the directory for changes, sort it naturally
+
+	if (entry.IsDirectory())
+		FindNextImage(ref, ref, false, true);
 }
 
 
@@ -321,10 +328,11 @@ ImageFileNavigator::ImageFileNavigator(const entry_ref& ref,
 	fDocumentIndex(1),
 	fDocumentCount(1)
 {
+	// TODO: allow selecting a folder from Tracker as well!
 	if (trackerMessenger.IsValid())
 		fNavigator = new TrackerNavigator(trackerMessenger);
 	else
-		fNavigator = new FolderNavigator(ref);
+		fNavigator = new FolderNavigator(fCurrentRef);
 }
 
 
