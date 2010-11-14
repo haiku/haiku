@@ -2452,9 +2452,10 @@ BRoster::_ResolveApp(const char* inType, entry_ref* ref,
 	entry_ref appRef;
 	status_t error;
 
-	if (inType) {
+	if (inType != NULL) {
 		error = _TranslateType(inType, &appMeta, &appRef, &appFile);
-		*_wasDocument = !(appMeta == inType);
+		if (_wasDocument != NULL)
+			*_wasDocument = !(appMeta == inType);
 	} else {
 		error = _TranslateRef(ref, &appMeta, &appRef, &appFile,
 			_wasDocument);
