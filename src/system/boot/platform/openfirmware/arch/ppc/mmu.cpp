@@ -645,7 +645,7 @@ arch_set_callback(void)
 		puts("set-callback failed!");
 		return B_ERROR;
 	}
-	//printf("old callback = %p\n", old);
+	//printf("old callback = %p\n", oldCallback);
 
 	return B_OK;
 }
