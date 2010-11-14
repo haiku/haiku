@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2007-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -7,6 +7,7 @@
 #include "ProgressWindow.h"
 
 #include <stdio.h>
+#include <string.h>
 
 #include <Autolock.h>
 #include <Catalog.h>
@@ -24,10 +25,13 @@ static const uint32 kMsgShow = 'show';
 #define B_TRANSLATE_CONTEXT "ProgressWindow"
 
 
-ProgressWindow::ProgressWindow(BWindow* referenceWindow, bool center)
+ProgressWindow::ProgressWindow()
 	:
 	BWindow(BRect(0, 0, 250, 100), B_TRANSLATE("Progress monitor"),
-		B_MODAL_WINDOW_LOOK, B_FLOATING_APP_WINDOW_FEEL,
+		B_MODAL_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,// B_FLOATING_APP_WINDOW_FEEL,
+		// TODO: a bug in the app_server prevents an initial floating-app feel
+		// to work correctly; the window will then not be visible for the first
+		// image, even though it's later set to normal feel in that case.
 		B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS),
 	fRunner(NULL)
 {
@@ -45,14 +49,7 @@ ProgressWindow::ProgressWindow(BWindow* referenceWindow, bool center)
 	fStatusBar->SetResizingMode(B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT);
 	view->AddChild(fStatusBar);
 
-	BScreen screen(referenceWindow);
-	if (!center) {
-		ResizeTo(Bounds().Width(), height + 9);
-		// TODO: frame width!
-		MoveTo(screen.Frame().left + 5,
-			screen.Frame().bottom - Bounds().Height() - 5);
-	} else
-		CenterIn(screen.Frame());
+	ResizeTo(Bounds().Width(), height + 9);
 
 	Run();
 }
@@ -65,9 +62,26 @@ ProgressWindow::~ProgressWindow()
 
 
 void
-ProgressWindow::Start()
+ProgressWindow::Start(BWindow* referenceWindow, bool center)
 {
 	BAutolock _(this);
+
+	BScreen screen(referenceWindow);
+	if (!center) {
+		BMessage settings;
+		GetDecoratorSettings(&settings);
+
+		int32 borderWidth;
+		if (settings.FindInt32("border", &borderWidth) != B_OK)
+			borderWidth = 5;
+
+		MoveTo(screen.Frame().left + borderWidth,
+			screen.Frame().bottom - Bounds().Height() - borderWidth);
+	} else
+		CenterIn(screen.Frame());
+
+	SetFeel(referenceWindow->IsHidden()
+		? B_NORMAL_WINDOW_FEEL : B_FLOATING_APP_WINDOW_FEEL);
 
 	fRetrievedUpdate = false;
 	fRetrievedShow = false;
@@ -104,7 +118,7 @@ ProgressWindow::MessageReceived(BMessage *message)
 			fRetrievedShow = true;
 			break;
 
-		case kMsgProgressStatusUpdate:
+		case kMsgProgressUpdate:
 			float percent;
 			if (message->FindFloat("percent", &percent) == B_OK)
 				fStatusBar->Update(percent - fStatusBar->CurrentValue());

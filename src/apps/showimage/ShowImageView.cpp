@@ -12,6 +12,7 @@
  *		yellowTAB GmbH
  *		Bernd Korz
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 
 
@@ -49,9 +50,8 @@
 
 #include <tracker_private.h>
 
-#include "ProgressWindow.h"
+#include "ImageCache.h"
 #include "ShowImageApp.h"
-#include "ShowImageConstants.h"
 #include "ShowImageWindow.h"
 
 
@@ -68,11 +68,16 @@ class PopUpMenu : public BPopUpMenu {
 };
 
 
+// the delay time for hiding the cursor in 1/10 seconds (the pulse rate)
+#define HIDE_CURSOR_DELAY_TIME 20
 #define SHOW_IMAGE_ORIENTATION_ATTRIBUTE "ShowImage:orientation"
+
+
 const rgb_color kBorderColor = { 0, 0, 0, 255 };
 
 enum ShowImageView::image_orientation
-ShowImageView::fTransformation[ImageProcessor::kNumberOfAffineTransformations][kNumberOfOrientations] = {
+ShowImageView::fTransformation[ImageProcessor::kNumberOfAffineTransformations]
+		[kNumberOfOrientations] = {
 	// rotate 90°
 	{k90, k180, k270, k0, k270V, k0V, k90V, k0H},
 	// rotate -90°
@@ -168,6 +173,7 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 		uint32 flags)
 	:
 	BView(rect, name, resizingMode, flags),
+	fBitmapOwner(NULL),
 	fBitmap(NULL),
 	fDisplayBitmap(NULL),
 	fSelectionBitmap(NULL),
@@ -178,10 +184,8 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 
 	fBitmapLocationInView(0.0, 0.0),
 
-	fShrinkToBounds(true),
 	fStretchToBounds(false),
-	fFitToBoundsZoom(1.0),
-	fFullScreen(false),
+	fHideCursor(false),
 	fScrollingBitmap(false),
 	fCreatingSelection(false),
 	fFirstPoint(0.0, 0.0),
@@ -194,14 +198,13 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 	fShowCaption(false),
 	fShowingPopUpMenu(false),
 	fHideCursorCountDown(HIDE_CURSOR_DELAY_TIME),
-	fIsActiveWin(true),
-	fProgressWindow(NULL)
+	fIsActiveWin(true)
 {
 	ShowImageSettings* settings;
 	settings = my_app->Settings();
 	if (settings->Lock()) {
-		fShrinkToBounds = settings->GetBool("ShrinksToBounds", fShrinkToBounds);
-		fStretchToBounds = settings->GetBool("ZoomToBounds", fStretchToBounds);
+		fStretchToBounds = settings->GetBool("StretchToBounds",
+			fStretchToBounds);
 		fSlideShowDelay = settings->GetInt32("SlideShowDelay", fSlideShowDelay);
 		fScaleBilinear = settings->GetBool("ScaleBilinear", fScaleBilinear);
 		settings->Unlock();
@@ -246,8 +249,7 @@ ShowImageView::Pulse()
 	}
 #endif
 
-	// Hide cursor in full screen mode
-	if (fFullScreen && !fHasSelection && !fShowingPopUpMenu && fIsActiveWin) {
+	if (fHideCursor && !fHasSelection && !fShowingPopUpMenu && fIsActiveWin) {
 		if (fHideCursorCountDown <= 0)
 			be_app->ObscureCursor();
 		else
@@ -316,7 +318,12 @@ ShowImageView::_DeleteBitmap()
 		delete fDisplayBitmap;
 	fDisplayBitmap = NULL;
 
-	// TODO: the bitmap is currently only owned by the cache!!!
+	if (fBitmapOwner != NULL)
+		fBitmapOwner->ReleaseReference();
+	else
+		delete fBitmap;
+
+	fBitmapOwner = NULL;
 	fBitmap = NULL;
 }
 
@@ -342,6 +349,8 @@ ShowImageView::SetImage(const BMessage* message)
 	if (status == B_OK) {
 		fFormatDescription = message->FindString("type");
 		fMimeType = message->FindString("mime");
+
+		message->FindPointer("bitmapOwner", (void**)&fBitmapOwner);
 	}
 
 	return status;
@@ -417,9 +426,7 @@ ShowImageView::SetImage(const entry_ref* ref, BBitmap* bitmap)
 
 	be_roster->AddToRecentDocuments(ref, kApplicationSignature);
 
-	fFitToBoundsZoom = _FitToBoundsZoom();
-	ResetZoom();
-	Invalidate();
+	FitToBounds();
 	_Notify();
 	return B_OK;
 }
@@ -480,33 +487,22 @@ ShowImageView::SetShowCaption(bool show)
 
 
 void
-ShowImageView::SetShrinkToBounds(bool enable)
-{
-	if (fShrinkToBounds != enable) {
-		_SettingsSetBool("ShrinksToBounds", enable);
-		fShrinkToBounds = enable;
-		if (enable)
-			SetZoom(fFitToBoundsZoom);
-	}
-}
-
-
-void
 ShowImageView::SetStretchToBounds(bool enable)
 {
 	if (fStretchToBounds != enable) {
-		_SettingsSetBool("ZoomToBounds", enable);
+		_SettingsSetBool("StretchToBounds", enable);
 		fStretchToBounds = enable;
 		if (enable)
-			SetZoom(fFitToBoundsZoom);
+			FitToBounds();
 	}
 }
 
 
 void
-ShowImageView::SetFullScreen(bool fullScreen)
+ShowImageView::SetHideIdlingCursor(bool hide)
 {
-	fFullScreen = fullScreen;
+	fHideCursor = hide;
+	FitToBounds();
 }
 
 
@@ -531,35 +527,16 @@ ShowImageView::SetScaleBilinear(bool enabled)
 void
 ShowImageView::AttachedToWindow()
 {
-	ResetZoom();
+	FitToBounds();
 	fUndo.SetWindow(Window());
 	FixupScrollBars();
-
-	fProgressWindow = new ProgressWindow(Window());
 }
 
 
 void
-ShowImageView::DetachedFromWindow()
+ShowImageView::FrameResized(float width, float height)
 {
-	fProgressWindow->Lock();
-	fProgressWindow->Quit();
-}
-
-
-bool
-ShowImageView::_ShouldShrink() const
-{
-	return fShrinkToBounds && fBitmap->Bounds().Width() > Bounds().Width()
-		&& fBitmap->Bounds().Height() > Bounds().Height();
-}
-
-
-bool
-ShowImageView::_ShouldStretch() const
-{
-	return fStretchToBounds && fBitmap->Bounds().Width() < Bounds().Width()
-		&& fBitmap->Bounds().Height() < Bounds().Height();
+	FixupScrollBars();
 }
 
 
@@ -745,17 +722,6 @@ ShowImageView::Draw(BRect updateRect)
 		}
 		fSelectionBox.Draw(this, updateRect);
 	}
-}
-
-
-void
-ShowImageView::FrameResized(float /*width*/, float /*height*/)
-{
-	if (fBitmap == NULL)
-		return;
-
-	fFitToBoundsZoom = _FitToBoundsZoom();
-	SetZoom(_ShouldStretch() ? fFitToBoundsZoom : fZoom);
 }
 
 
@@ -1336,6 +1302,12 @@ ShowImageView::KeyDown(const char* bytes, int32 numBytes)
 		case B_DELETE:
 			_SendMessageToWindow(kMsgDeleteCurrentFile);
 			break;
+		case '0':
+			FitToBounds();
+			break;
+		case '1':
+			SetZoom(1.0f);
+			break;
 		case '+':
 		case '=':
 			ZoomIn();
@@ -1394,9 +1366,9 @@ ShowImageView::_ShowPopUpMenu(BPoint screen)
 	if (!fShowingPopUpMenu) {
 	  PopUpMenu* menu = new PopUpMenu("PopUpMenu", this);
 
-	  ShowImageWindow* showImage = dynamic_cast<ShowImageWindow*>(Window());
-	  if (showImage)
-		  showImage->BuildContextMenu(menu);
+	  ShowImageWindow* window = dynamic_cast<ShowImageWindow*>(Window());
+	  if (window != NULL)
+		  window->BuildContextMenu(menu);
 
 	  screen += BPoint(2, 2);
 	  menu->Go(screen, true, true, true);
@@ -1421,22 +1393,6 @@ void
 ShowImageView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-// TODO!
-#if 0
-		case B_SIMPLE_DATA:
-			if (message->WasDropped()) {
-				uint32 type;
-				int32 count;
-				status_t ret = message->GetInfo("refs", &type, &count);
-				if (ret == B_OK && type == B_REF_TYPE) {
-					// If file was dropped, open it as the selection
-					entry_ref ref;
-					if (message->FindRef("refs", 0, &ref) == B_OK)
-						SetImage(&ref);
-				}
-			}
-			break;
-#endif
 		case B_COPY_TARGET:
 			_HandleDrop(message);
 			break;
@@ -1456,7 +1412,8 @@ ShowImageView::MessageReceived(BMessage* message)
 
 
 void
-ShowImageView::FixupScrollBar(orientation o, float bitmapLength, float viewLength)
+ShowImageView::FixupScrollBar(orientation o, float bitmapLength,
+	float viewLength)
 {
 	float prop, range;
 	BScrollBar *psb;
@@ -1609,10 +1566,11 @@ ShowImageView::CopySelectionToClipboard()
 void
 ShowImageView::SetZoom(float zoom, BPoint where)
 {
+	float fitToBoundsZoom = _FitToBoundsZoom();
 	if (zoom > 32)
 		zoom = 32;
-	if (zoom < fFitToBoundsZoom / 2)
-		zoom = fFitToBoundsZoom / 2;
+	if (zoom < fitToBoundsZoom / 2)
+		zoom = fitToBoundsZoom / 2;
 
 	if (zoom == fZoom) {
 		// window size might have changed
@@ -1652,8 +1610,9 @@ ShowImageView::ZoomIn(BPoint where)
 	// snap zoom to "fit to bounds", and "original size"
 	float zoom = fZoom * 1.2;
 	float zoomSnap = fZoom * 1.25;
-	if (fZoom < fFitToBoundsZoom && zoomSnap > fFitToBoundsZoom)
-		zoom = fFitToBoundsZoom;
+	float fitToBoundsZoom = _FitToBoundsZoom();
+	if (fZoom < fitToBoundsZoom - 0.001 && zoomSnap > fitToBoundsZoom)
+		zoom = fitToBoundsZoom;
 	if (fZoom < 1.0 && zoomSnap > 1.0)
 		zoom = 1.0;
 
@@ -1667,8 +1626,9 @@ ShowImageView::ZoomOut(BPoint where)
 	// snap zoom to "fit to bounds", and "original size"
 	float zoom = fZoom / 1.2;
 	float zoomSnap = fZoom / 1.25;
-	if (fZoom > fFitToBoundsZoom && zoomSnap < fFitToBoundsZoom)
-		zoom = fFitToBoundsZoom;
+	float fitToBoundsZoom = _FitToBoundsZoom();
+	if (fZoom > fitToBoundsZoom + 0.001 && zoomSnap < fitToBoundsZoom)
+		zoom = fitToBoundsZoom;
 	if (fZoom > 1.0 && zoomSnap < 1.0)
 		zoom = 1.0;
 
@@ -1676,21 +1636,21 @@ ShowImageView::ZoomOut(BPoint where)
 }
 
 
-/*!	Resets the zoom to what it should be when opening an image, depending
-	on the current settings.
+/*!	Fits to image to the view bounds.
 */
 void
-ShowImageView::ResetZoom()
+ShowImageView::FitToBounds()
 {
 	if (fBitmap == NULL)
 		return;
 
-	fFitToBoundsZoom = _FitToBoundsZoom();
-
-	if (_ShouldShrink() || _ShouldStretch())
-		SetZoom(fFitToBoundsZoom);
+	float fitToBoundsZoom = _FitToBoundsZoom();
+	if (!fStretchToBounds && fitToBoundsZoom > 1.0f)
+		SetZoom(1.0f);
 	else
-		SetZoom(1.0);
+		SetZoom(fitToBoundsZoom);
+
+	FixupScrollBars();
 }
 
 

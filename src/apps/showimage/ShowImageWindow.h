@@ -21,8 +21,23 @@ class BFilePanel;
 class BMenu;
 class BMenuBar;
 class BMenuItem;
+class ProgressWindow;
 class ShowImageView;
 class ShowImageStatusView;
+
+
+// public message constants
+enum {
+	MSG_MODIFIED				= 'mMOD',
+	MSG_UPDATE_STATUS			= 'mUPS',
+	MSG_UPDATE_STATUS_TEXT		= 'mUPT',
+	MSG_SELECTION				= 'mSEL',
+	MSG_FILE_NEXT				= 'mFLN',
+	MSG_FILE_PREV				= 'mFLP',
+	kMsgDeleteCurrentFile		= 'mDcF',
+	MSG_SLIDE_SHOW				= 'mSSW',
+	MSG_EXIT_FULL_SCREEN		= 'mEFS'
+};
 
 
 class ShowImageWindow : public BWindow {
@@ -34,13 +49,13 @@ public:
 			void				BuildContextMenu(BMenu* menu);
 
 protected:
-	virtual	void				FrameResized(float width, float height);
+	virtual void				Zoom(BPoint origin, float width, float height);
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	bool				QuitRequested();
 
 private:
 			void				_AddMenus(BMenuBar* bar);
-			void				_WindowRedimension(BBitmap* bitmap);
+			void				_ResizeWindowToImage();
 			void				_BuildViewMenu(BMenu* menu, bool popupMenu);
 			BMenuItem*			_AddItemMenu(BMenu* menu, const char* label,
 									uint32 what, char shortcut, uint32 modifier,
@@ -55,7 +70,6 @@ private:
 			void				_MarkMenuItem(BMenu* menu, uint32 what,
 									bool marked);
 			void				_MarkSlideShowDelay(float value);
-			void				_ResizeToWindow(bool shrink, uint32 what);
 
 			void				_UpdateStatusText(const BMessage* message);
 			void				_LoadError(const entry_ref& ref);
@@ -82,6 +96,7 @@ private:
 			BMenu*				fSlideShowDelay;
 			ShowImageView*		fImageView;
 			ShowImageStatusView* fStatusView;
+			ProgressWindow*		fProgressWindow;
 			bool				fModified;
 			bool				fFullScreen;
 			bool				fShowCaption;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2007-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef PROGRESS_WINDOW_H
@@ -13,15 +13,21 @@ class BMessageRunner;
 class BStatusBar;
 
 
+// public message constants
+enum {
+	kMsgProgressUpdate = 'pwPU'
+};
+
+
 class ProgressWindow : public BWindow {
 public:
-								ProgressWindow(BWindow* referenceWindow,
-									bool center = false);
+								ProgressWindow();
 	virtual						~ProgressWindow();
 
 	virtual void 				MessageReceived(BMessage* message);
 
-			void				Start();
+			void				Start(BWindow* referenceWindow,
+									bool center = false);
 			void				Stop();
 
 private:

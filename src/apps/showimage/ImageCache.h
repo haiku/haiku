@@ -15,6 +15,7 @@
 #include <String.h>
 
 #include <kernel/util/DoublyLinkedList.h>
+#include <Referenceable.h>
 
 
 class BBitmap;
@@ -24,7 +25,18 @@ struct QueueEntry;
 
 
 enum {
-	kMsgImageLoaded = 'ifnL'
+	kMsgImageCacheImageLoaded		= 'icIL',
+	kMsgImageCacheProgressUpdate	= 'icPU'
+};
+
+
+class BitmapOwner : public Referenceable {
+public:
+								BitmapOwner(BBitmap* bitmap);
+	virtual						~BitmapOwner();
+
+private:
+			BBitmap*			fBitmap;
 };
 
 
@@ -33,6 +45,7 @@ struct CacheEntry : DoublyLinkedListLinkImpl<CacheEntry> {
 	int32					page;
 	int32					pageCount;
 	BBitmap*				bitmap;
+	BitmapOwner*			bitmapOwner;
 	BString					type;
 	BString					mimeType;
 };

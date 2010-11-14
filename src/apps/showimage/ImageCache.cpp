@@ -35,6 +35,22 @@ struct QueueEntry {
 // #pragma mark -
 
 
+BitmapOwner::BitmapOwner(BBitmap* bitmap)
+	:
+	fBitmap(bitmap)
+{
+}
+
+
+BitmapOwner::~BitmapOwner()
+{
+	delete fBitmap;
+}
+
+
+// #pragma mark -
+
+
 ImageCache::ImageCache()
 	:
 	fLocker("image cache"),
@@ -177,16 +193,14 @@ ImageCache::_RetrieveImage(QueueEntry* queueEntry, CacheEntry** _entry)
 		&& ioExtension.AddInt32("/documentIndex", queueEntry->page) != B_OK)
 		return B_NO_MEMORY;
 
-// TODO: rethink this!
-#if 0
-	if (fProgressWindow != NULL) {
-		BMessage progress(kMsgProgressStatusUpdate);
-		if (ioExtension.AddMessenger("/progressMonitor",
-				fProgressWindow) == B_OK
-			&& ioExtension.AddMessage("/progressMessage", &progress) == B_OK)
-			fProgressWindow->Start();
+	// TODO: this doesn't work for images that already are in the queue...
+	if (!queueEntry->listeners.empty()) {
+		BMessage progress(kMsgImageCacheProgressUpdate);
+		progress.AddRef("ref", &queueEntry->ref);
+		ioExtension.AddMessenger("/progressMonitor",
+			*queueEntry->listeners.begin());
+		ioExtension.AddMessage("/progressMessage", &progress);
 	}
-#endif
 
 	// Translate image data and create a new ShowImage window
 
@@ -198,18 +212,18 @@ ImageCache::_RetrieveImage(QueueEntry* queueEntry, CacheEntry** _entry)
 		status = roster->Translate(&file, &info, &ioExtension, &outstream,
 			B_TRANSLATOR_BITMAP);
 	}
-
-#if 0
-	if (fProgressWindow != NULL)
-		fProgressWindow->Stop();
-#endif
-
 	if (status != B_OK)
 		return status;
 
 	BBitmap* bitmap;
 	if (outstream.DetachBitmap(&bitmap) != B_OK)
 		return B_ERROR;
+
+	entry->bitmapOwner = new(std::nothrow) BitmapOwner(bitmap);
+	if (entry->bitmapOwner == NULL) {
+		delete bitmap;
+		return B_NO_MEMORY;
+	}
 
 	entry->ref = queueEntry->ref;
 	entry->page = queueEntry->page;
@@ -244,6 +258,8 @@ ImageCache::_RetrieveImage(QueueEntry* queueEntry, CacheEntry** _entry)
 		entry = fCacheEntriesByAge.RemoveHead();
 		fBytes -= entry->bitmap->BitsLength();
 		fCacheMap.erase(std::make_pair(entry->ref, entry->page));
+
+		entry->bitmapOwner->ReleaseReference();
 		delete entry;
 	}
 
@@ -259,7 +275,7 @@ ImageCache::_NotifyListeners(CacheEntry* entry, QueueEntry* queueEntry)
 	if (queueEntry->listeners.empty())
 		return;
 
-	BMessage notification(kMsgImageLoaded);
+	BMessage notification(kMsgImageCacheImageLoaded);
 	_BuildNotification(entry, notification);
 
 	if (queueEntry->status != B_OK)
@@ -278,7 +294,7 @@ ImageCache::_NotifyTarget(CacheEntry* entry, const BMessenger* target)
 	if (target == NULL)
 		return;
 
-	BMessage notification(kMsgImageLoaded);
+	BMessage notification(kMsgImageCacheImageLoaded);
 	_BuildNotification(entry, notification);
 
 	target->SendMessage(&notification);
@@ -291,10 +307,14 @@ ImageCache::_BuildNotification(CacheEntry* entry, BMessage& message)
 	if (entry == NULL)
 		return;
 
+	entry->bitmapOwner->AcquireReference();
+		// this is the reference owned by the target
+
 	message.AddString("type", entry->type);
 	message.AddString("mime", entry->mimeType);
 	message.AddRef("ref", &entry->ref);
 	message.AddInt32("page", entry->page);
 	message.AddInt32("pageCount", entry->pageCount);
 	message.AddPointer("bitmap", (void*)entry->bitmap);
+	message.AddPointer("bitmapOwner", (void*)entry->bitmapOwner);
 }

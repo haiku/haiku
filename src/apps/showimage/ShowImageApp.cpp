@@ -9,6 +9,7 @@
  *		Ryan Leavengood
  */
 
+
 #include "ShowImageApp.h"
 
 #include <stdio.h>
@@ -26,12 +27,13 @@
 #include "ShowImageWindow.h"
 
 
-#define WINDOWS_TO_IGNORE 1
-
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "AboutWindow"
 
+
 const char* kApplicationSignature = "application/x-vnd.Haiku-ShowImage";
+const int32 kWindowsToIgnore = 1;
+	// ignore the always open file panel
 
 
 ShowImageApp::ShowImageApp()
@@ -87,7 +89,7 @@ ShowImageApp::ArgvReceived(int32 argc, char **argv)
 void
 ShowImageApp::ReadyToRun()
 {
-	if (CountWindows() == WINDOWS_TO_IGNORE)
+	if (CountWindows() == kWindowsToIgnore)
 		fOpenPanel->Show();
 	else {
 		// If image windows are already open
@@ -107,9 +109,6 @@ ShowImageApp::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case MSG_FILE_OPEN:
 			fOpenPanel->Show();
-			break;
-
-		case MSG_WINDOW_QUIT:
 			break;
 
 		case B_CANCEL:
@@ -137,6 +136,7 @@ ShowImageApp::AboutRequested()
 		"Michael Wilber",
 		"Michael Pfeiffer",
 		"Ryan Leavengood",
+		"Axel Dörfler",
 		NULL
 	};
 	BAboutWindow about(B_TRANSLATE("ShowImage"), 2003, authors);
@@ -149,7 +149,7 @@ ShowImageApp::Pulse()
 {
 	// Bug: The BFilePanel is automatically closed if the volume that
 	// is displayed is unmounted.
-	if (!IsLaunching() && CountWindows() <= WINDOWS_TO_IGNORE) {
+	if (!IsLaunching() && CountWindows() <= kWindowsToIgnore) {
 		// If the application is not launching and
 		// all windows are closed except for the file open panel,
 		// quit the application
@@ -212,8 +212,8 @@ ShowImageApp::_BroadcastToWindows(BMessage* message)
 	const int32 count = CountWindows();
 	for (int32 i = 0; i < count; i ++) {
 		// BMessenger checks for us if BWindow is still a valid object
-		BMessenger msgr(WindowAt(i));
-		msgr.SendMessage(message);
+		BMessenger messenger(WindowAt(i));
+		messenger.SendMessage(message);
 	}
 }
 
@@ -238,7 +238,7 @@ ShowImageApp::_CheckClipboard()
 		be_clipboard->Unlock();
 	}
 
-	BMessage msg(MSG_CLIPBOARD_CHANGED);
+	BMessage msg(B_CLIPBOARD_CHANGED);
 	msg.AddBool("data_available", dataAvailable);
 	_BroadcastToWindows(&msg);
 }

@@ -18,6 +18,11 @@
 #include <FilePanel.h>
 
 
+enum {
+	MSG_FILE_OPEN				= 'mFOP',
+};
+
+
 class ShowImageApp : public BApplication {
 public:
 								ShowImageApp();

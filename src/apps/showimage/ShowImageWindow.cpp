@@ -10,6 +10,7 @@
  *		Michael Pfeiffer
  *		yellowTAB GmbH
  *		Bernd Korz
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 
 
@@ -45,6 +46,7 @@
 #include <TranslatorRoster.h>
 
 #include "ImageCache.h"
+#include "ProgressWindow.h"
 #include "ShowImageApp.h"
 #include "ShowImageConstants.h"
 #include "ShowImageStatusView.h"
@@ -54,6 +56,40 @@
 // BMessage field names used in Save messages
 const char* kTypeField = "be:type";
 const char* kTranslatorField = "be:translator";
+
+
+// message constants
+enum {
+	MSG_CAPTURE_MOUSE			= 'mCPM',
+	MSG_CHANGE_FOCUS			= 'mCFS',
+	MSG_WINDOW_QUIT				= 'mWQT',
+	MSG_OUTPUT_TYPE				= 'BTMN',
+	MSG_SAVE_PANEL				= 'mFSP',
+	MSG_CLEAR_SELECT			= 'mCSL',
+	MSG_SELECT_ALL				= 'mSAL',
+	MSG_SELECTION_MODE			= 'mSLM',
+	MSG_PAGE_FIRST				= 'mPGF',
+	MSG_PAGE_LAST				= 'mPGL',
+	MSG_PAGE_NEXT				= 'mPGN',
+	MSG_PAGE_PREV				= 'mPGP',
+	MSG_GOTO_PAGE				= 'mGTP',
+	MSG_ZOOM_IN					= 'mZIN',
+	MSG_ZOOM_OUT				= 'mZOU',
+	MSG_SCALE_BILINEAR			= 'mSBL',
+	MSG_DESKTOP_BACKGROUND		= 'mDBG',
+	MSG_ROTATE_90				= 'mR90',
+	MSG_ROTATE_270				= 'mR27',
+	MSG_FLIP_LEFT_TO_RIGHT		= 'mFLR',
+	MSG_FLIP_TOP_TO_BOTTOM		= 'mFTB',
+	MSG_SLIDE_SHOW_DELAY		= 'mSSD',
+	MSG_FULL_SCREEN				= 'mFSC',
+	MSG_SHOW_CAPTION			= 'mSCP',
+	MSG_PAGE_SETUP				= 'mPSU',
+	MSG_PREPARE_PRINT			= 'mPPT',
+	kMsgFitToWindow				= 'mFtW',
+	kMsgOriginalSize			= 'mOSZ',
+	kMsgStretchToWindow			= 'mStW'
+};
 
 
 // This is temporary solution for building BString with printf like format.
@@ -87,6 +123,7 @@ ShowImageWindow::ShowImageWindow(const entry_ref& ref,
 	fSlideShowDelay(NULL),
 	fImageView(NULL),
 	fStatusView(NULL),
+	fProgressWindow(new ProgressWindow()),
 	fModified(false),
 	fFullScreen(false),
 	fShowCaption(true),
@@ -106,7 +143,8 @@ ShowImageWindow::ShowImageWindow(const entry_ref& ref,
 
 	// create the image view
 	fImageView = new ShowImageView(viewFrame, "image_view", B_FOLLOW_ALL,
-		B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE | B_PULSE_NEEDED);
+		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_PULSE_NEEDED
+			| B_FRAME_EVENTS);
 	// wrap a scroll view around the view
 	BScrollView* scrollView = new BScrollView("image_scroller", fImageView,
 		B_FOLLOW_ALL, 0, false, false, B_PLAIN_BORDER);
@@ -170,6 +208,8 @@ ShowImageWindow::ShowImageWindow(const entry_ref& ref,
 
 ShowImageWindow::~ShowImageWindow()
 {
+	fProgressWindow->Lock();
+	fProgressWindow->Quit();
 }
 
 
@@ -212,7 +252,9 @@ ShowImageWindow::_BuildViewMenu(BMenu* menu, bool popupMenu)
 	menu->AddSeparatorItem();
 
 	_AddItemMenu(menu, B_TRANSLATE("Original size"),
-		MSG_ORIGINAL_SIZE, '1', 0, this);
+		kMsgOriginalSize, '1', 0, this);
+	_AddItemMenu(menu, B_TRANSLATE("Fit to window"),
+		kMsgFitToWindow, '0', 0, this);
 	_AddItemMenu(menu, B_TRANSLATE("Zoom in"), MSG_ZOOM_IN, '+', 0, this);
 	_AddItemMenu(menu, B_TRANSLATE("Zoom out"), MSG_ZOOM_OUT, '-', 0, this);
 
@@ -221,13 +263,8 @@ ShowImageWindow::_BuildViewMenu(BMenu* menu, bool popupMenu)
 	if (!popupMenu || fFullScreen) {
 		_AddItemMenu(menu, B_TRANSLATE("High-quality zooming"),
 			MSG_SCALE_BILINEAR, 0, 0, this);
-
-		menu->AddSeparatorItem();
-
-		_AddItemMenu(menu, B_TRANSLATE("Shrink to window"),
-			MSG_SHRINK_TO_WINDOW, 0, 0, this);
 		_AddItemMenu(menu, B_TRANSLATE("Stretch to window"),
-			MSG_STRETCH_TO_WINDOW, 0, 0, this);
+			kMsgStretchToWindow, 0, 0, this);
 
 		menu->AddSeparatorItem();
 	}
@@ -240,9 +277,8 @@ ShowImageWindow::_BuildViewMenu(BMenu* menu, bool popupMenu)
 		MSG_SHOW_CAPTION, 0, 0, this);
 	_MarkMenuItem(menu, MSG_SHOW_CAPTION, fShowCaption);
 
-	_MarkMenuItem(menu, MSG_SCALE_BILINEAR, fImageView->GetScaleBilinear());
-	_MarkMenuItem(menu, MSG_SHRINK_TO_WINDOW, fImageView->ShrinksToBounds());
-	_MarkMenuItem(menu, MSG_STRETCH_TO_WINDOW, fImageView->StretchesToBounds());
+	_MarkMenuItem(menu, MSG_SCALE_BILINEAR, fImageView->ScaleBilinear());
+	_MarkMenuItem(menu, kMsgStretchToWindow, fImageView->StretchesToBounds());
 
 	if (popupMenu) {
 		menu->AddSeparatorItem();
@@ -369,10 +405,11 @@ ShowImageWindow::_AddDelayItem(BMenu* menu, const char* label, float value)
 
 
 void
-ShowImageWindow::_WindowRedimension(BBitmap* bitmap)
+ShowImageWindow::_ResizeWindowToImage()
 {
+	BBitmap* bitmap = fImageView->Bitmap();
 	BScreen screen;
-	if (!screen.IsValid())
+	if (bitmap == NULL || !screen.IsValid())
 		return;
 
 	// TODO: use View::GetPreferredSize() instead?
@@ -407,13 +444,6 @@ ShowImageWindow::_WindowRedimension(BBitmap* bitmap)
 		height = maxHeight;
 
 	ResizeTo(width, height);
-}
-
-
-void
-ShowImageWindow::FrameResized(float width, float height)
-{
-	BWindow::FrameResized(width, height);
 }
 
 
@@ -467,22 +497,30 @@ ShowImageWindow::_MarkSlideShowDelay(float value)
 
 
 void
-ShowImageWindow::_ResizeToWindow(bool shrink, uint32 what)
+ShowImageWindow::Zoom(BPoint origin, float width, float height)
 {
-	bool enabled = _ToggleMenuItem(what);
-	if (shrink)
-		fImageView->SetShrinkToBounds(enabled);
-	else
-		fImageView->SetStretchToBounds(enabled);
+	_ToggleFullScreen();
 }
 
 
 void
 ShowImageWindow::MessageReceived(BMessage* message)
 {
+	if (message->WasDropped()) {
+		uint32 type;
+		int32 count;
+		status_t status = message->GetInfo("refs", &type, &count);
+		if (status == B_OK && type == B_REF_TYPE) {
+			message->what = B_REFS_RECEIVED;
+			be_app->PostMessage(message);
+		}
+	}
+
 	switch (message->what) {
-		case kMsgImageLoaded:
+		case kMsgImageCacheImageLoaded:
 		{
+			fProgressWindow->Stop();
+
 			bool first = fImageView->Bitmap() == NULL;
 			entry_ref ref;
 			message->FindRef("ref", &ref);
@@ -505,18 +543,25 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			fNavigator.SetTo(ref, message->FindInt32("page"),
 				message->FindInt32("pageCount"));
 
+			if (first || (!fImageView->StretchesToBounds() && !fFullScreen)) {
+				_ResizeWindowToImage();
+				fImageView->FitToBounds();
+			}
 			if (first) {
-				_WindowRedimension(fImageView->Bitmap());
-				fImageView->ResetZoom();
 				fImageView->MakeFocus(true);
 					// to receive key messages
-
 				Show();
-			} else {
-				if (!fImageView->StretchesToBounds()
-					&& !fImageView->ShrinksToBounds()
-					&& !fFullScreen)
-					_WindowRedimension(fImageView->Bitmap());
+			}
+			break;
+		}
+
+		case kMsgImageCacheProgressUpdate:
+		{
+			entry_ref ref;
+			if (message->FindRef("ref", &ref) == B_OK
+				&& ref == fNavigator.CurrentRef()) {
+				message->what = kMsgProgressUpdate;
+				fProgressWindow->PostMessage(message);
 			}
 			break;
 		}
@@ -692,12 +737,13 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
-		case MSG_SHRINK_TO_WINDOW:
-			_ResizeToWindow(true, message->what);
+		case kMsgFitToWindow:
+			fImageView->FitToBounds();
 			break;
 
-		case MSG_STRETCH_TO_WINDOW:
-			_ResizeToWindow(false, message->what);
+		case kMsgStretchToWindow:
+			fImageView->SetStretchToBounds(
+				_ToggleMenuItem(kMsgStretchToWindow));
 			break;
 
 		case MSG_FILE_PREV:
@@ -802,7 +848,7 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			fImageView->ZoomOut();
 			break;
 
-		case MSG_ORIGINAL_SIZE:
+		case kMsgOriginalSize:
 			fImageView->SetZoom(1.0);
 			break;
 
@@ -984,6 +1030,8 @@ ShowImageWindow::_LoadImage(bool forward)
 	if (status != B_OK)
 		return status;
 
+	fProgressWindow->Start(this);
+
 	// Preload previous/next images - two in the navigation direction, one
 	// in the opposite direction.
 
@@ -1034,10 +1082,12 @@ ShowImageWindow::_ToggleFullScreen()
 		SetFlags(Flags() & ~(B_NOT_RESIZABLE | B_NOT_MOVABLE));
 	}
 
-	fImageView->SetFullScreen(fFullScreen);
-	fImageView->SetShowCaption(fFullScreen && fShowCaption);
 	MoveTo(frame.left, frame.top);
 	ResizeTo(frame.Width(), frame.Height());
+
+	fImageView->SetHideIdlingCursor(fFullScreen);
+	fImageView->SetShowCaption(fFullScreen && fShowCaption);
+	fImageView->FitToBounds();
 }
 
 
@@ -1199,11 +1249,5 @@ ShowImageWindow::QuitRequested()
 		return false;
 	}
 
-	bool quit = _ClosePrompt();
-	if (quit) {
-		// tell the app to forget about this window
-		be_app->PostMessage(MSG_WINDOW_QUIT);
-	}
-
-	return quit;
+	return _ClosePrompt();
 }

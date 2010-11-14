@@ -15,10 +15,6 @@
 #define SHOW_IMAGE_VIEW_H
 
 
-#include "Filter.h"
-#include "SelectionBox.h"
-#include "ShowImageUndo.h"
-
 #include <Bitmap.h>
 #include <Entry.h>
 #include <NodeInfo.h>
@@ -26,11 +22,13 @@
 #include <TranslatorRoster.h>
 #include <View.h>
 
+#include "Filter.h"
+#include "SelectionBox.h"
+#include "ShowImageUndo.h"
 
-// the delay time for hiding the cursor in 1/10 seconds (the pulse rate)
-#define HIDE_CURSOR_DELAY_TIME 20
 
-class ProgressWindow;
+class BitmapOwner;
+
 
 class ShowImageView : public BView {
 public:
@@ -39,9 +37,8 @@ public:
 	virtual						~ShowImageView();
 
 	virtual	void				AttachedToWindow();
-	virtual	void				DetachedFromWindow();
+	virtual void				FrameResized(float width, float height);
 	virtual	void				Draw(BRect updateRect);
-	virtual	void				FrameResized(float width, float height);
 	virtual	void				MouseDown(BPoint point);
 	virtual	void				MouseMoved(BPoint point, uint32 state,
 									const BMessage* dragMessage);
@@ -68,16 +65,14 @@ public:
 			void				SaveToFile(BDirectory* dir, const char* name,
 									BBitmap* bitmap,
 									const translation_format* format);
+
 			void				SetScaleBilinear(bool b);
-			bool				GetScaleBilinear() { return fScaleBilinear; }
+			bool				ScaleBilinear() { return fScaleBilinear; }
 			void				SetShowCaption(bool show);
-			void				SetShrinkToBounds(bool enable);
-			bool				ShrinksToBounds() const
-									{ return fShrinkToBounds; }
 			void				SetStretchToBounds(bool enable);
 			bool				StretchesToBounds() const
 									{ return fStretchToBounds; }
-			void				SetFullScreen(bool fullScreen);
+			void				SetHideIdlingCursor(bool hide);
 
 			void				FixupScrollBar(enum orientation orientation,
 									float bitmapLength, float viewLength);
@@ -99,11 +94,13 @@ public:
 			void				StartSlideShow();
 			void				StopSlideShow();
 
+			void				FitToBounds();
 			void				SetZoom(float zoom,
 									BPoint where = BPoint(-1, -1));
+			float				Zoom() const
+									{ return fZoom; }
 			void				ZoomIn(BPoint where = BPoint(-1, -1));
 			void				ZoomOut(BPoint where = BPoint(-1, -1));
-			void				ResetZoom();
 
 			// Image manipulation
 			void				Rotate(int degree); // 90 and 270 only
@@ -151,7 +148,6 @@ private:
 			void				_UserDoImageOperation(
 									enum ImageProcessor::operation op,
 									bool quiet = false);
-			bool				_ShouldShrink() const;
 			bool				_ShouldStretch() const;
 			float				_FitToBoundsZoom() const;
 			BRect				_AlignBitmap();
@@ -193,6 +189,7 @@ private:
 			ShowImageUndo		fUndo;
 			entry_ref			fCurrentRef;
 
+			BitmapOwner*		fBitmapOwner;
 			BBitmap*			fBitmap;
 			BBitmap*			fDisplayBitmap;
 			BBitmap*			fSelectionBitmap;
@@ -203,10 +200,8 @@ private:
 
 			BPoint				fBitmapLocationInView;
 
-			bool				fShrinkToBounds;
 			bool				fStretchToBounds;
-			float				fFitToBoundsZoom;
-			bool				fFullScreen;
+			bool				fHideCursor;
 			bool				fScrollingBitmap;
 			bool				fCreatingSelection;
 			BPoint				fFirstPoint;
@@ -237,8 +232,6 @@ private:
 				// Hides the cursor when it reaches zero
 			bool				fIsActiveWin;
 				// Is the parent window the active window?
-
-			ProgressWindow*		fProgressWindow;
 
 			image_orientation	fImageOrientation;
 	static	image_orientation	fTransformation[
