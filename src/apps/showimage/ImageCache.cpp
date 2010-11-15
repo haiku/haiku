@@ -95,6 +95,13 @@ ImageCache::RetrieveImage(const entry_ref& ref, int32 page,
 	QueueEntry* entry;
 
 	if (findQueue == fQueueMap.end()) {
+		if (target == NULL && fCacheMap.size() < 5
+			&& fBytes > fMaxBytes * 1 / 2) {
+			// Don't accept any further precaching if we're low on memory
+			// anyway.
+			return B_NO_MEMORY;
+		}
+
 		// Push new entry to the queue
 		entry = new(std::nothrow) QueueEntry();
 		if (entry == NULL)
