@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku, Inc.
+ * Copyright 2001-2010, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -105,11 +105,11 @@ detect_simd()
 //	#pragma mark -
 
 
-/*!
-	\brief Constructor
+/*!	\brief Constructor
 
-	This loads the default fonts, allocates all the major global variables, spawns the main housekeeping
-	threads, loads user preferences for the UI and decorator, and allocates various locks.
+	This loads the default fonts, allocates all the major global variables,
+	spawns the main housekeeping threads, loads user preferences for the UI
+	and decorator, and allocates various locks.
 */
 AppServer::AppServer()
 	:

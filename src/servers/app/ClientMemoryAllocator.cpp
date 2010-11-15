@@ -1,13 +1,13 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
  */
 
-/*!
-	This class manages a pool of areas for one client. The client is supposed
+
+/*!	This class manages a pool of areas for one client. The client is supposed
 	to clone these areas into its own address space to access the data.
 	This mechanism is only used for bitmaps for far.
 

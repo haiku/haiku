@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -35,28 +35,31 @@ typedef DoublyLinkedList<chunk> chunk_list;
 
 
 class ClientMemoryAllocator {
-	public:
-		ClientMemoryAllocator(ServerApp* application);
-		~ClientMemoryAllocator();
+public:
+								ClientMemoryAllocator(ServerApp* application);
+								~ClientMemoryAllocator();
 
-		status_t InitCheck();
+			status_t			InitCheck();
 
-		void *Allocate(size_t size, void** _address, bool& newArea);
-		void Free(void* cookie);
+			void*				Allocate(size_t size, void** _address,
+									bool& newArea);
+			void				Free(void* cookie);
 
-		area_id Area(void* cookie);
-		uint32 AreaOffset(void* cookie);
+			area_id				Area(void* cookie);
+			uint32				AreaOffset(void* cookie);
 
-		bool Lock();
-		void Unlock();
+			bool				Lock();
+			void				Unlock();
 
-	private:
-		struct block *_AllocateChunk(size_t size, bool& newArea);
+private:
+			struct block*		_AllocateChunk(size_t size, bool& newArea);
 
-		ServerApp*	fApplication;
-		MultiLocker	fLock;
-		chunk_list	fChunks;
-		block_list	fFreeBlocks;
+private:
+			ServerApp*			fApplication;
+			MultiLocker			fLock;
+			chunk_list			fChunks;
+			block_list			fFreeBlocks;
 };
+
 
 #endif	/* CLIENT_MEMORY_ALLOCATOR_H */
