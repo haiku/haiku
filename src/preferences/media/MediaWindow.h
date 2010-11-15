@@ -43,10 +43,18 @@ class MediaWindow : public BWindow
 public:
 								MediaWindow(BRect frame);
    								~MediaWindow();
+    		status_t			InitCheck();
+
+	// methods to be called by MediaListItems...
+			void				SelectNode(dormant_node_info* node);
+			void				SelectAudioSettings(const char* title);
+			void				SelectVideoSettings(const char* title);
+			void				SelectAudioMixer(const char* title);
+
     virtual	bool 				QuitRequested();
     virtual	void				MessageReceived(BMessage* message);
     virtual	void				FrameResized(float width, float height);
-    		status_t			InitCheck();
+
 
 private:
 
@@ -56,16 +64,35 @@ private:
 			status_t			InitMedia(bool first);
 			void				_FindNodes();
 			void				_FindNodes(media_type type, uint64 kind,
-									NodeList& into);
-			void				_AddNodeItems(NodeList& from, bool isVideo);
+									NodeList& into);	
+			void				_AddNodeItems(NodeList &from,
+									MediaListItem::media_type type);
 			void				_EmptyNodeLists();
 
-			MediaListItem*		FindMediaListItem(dormant_node_info* info);
+			NodeListItem*		_FindNodeListItem(dormant_node_info* info);
 			void				InitWindow();
 
 	static	status_t			RestartMediaServices(void* data);
 	static	bool				UpdateProgress(int stage, const char * message,
 									void * cookie);
+
+			void				_ClearParamView();
+			void				_MakeParamView();
+			void				_MakeEmptyParamView();
+
+	struct SmartNode {
+								SmartNode(const BMessenger& notifyHandler);
+								~SmartNode();
+			void				SetTo(dormant_node_info* node);
+			void				SetTo(const media_node& node);
+			bool				IsSet();
+								operator media_node();
+
+	private:
+			void				_FreeNode();
+			media_node*			fNode;
+			BMessenger			fMessenger;
+	};
 	
 			BBox*				fBox;
 			BListView*			fListView;
@@ -74,7 +101,7 @@ private:
 			SettingsView*		fAudioView;
 			SettingsView*		fVideoView;
     			    
-			media_node*			fCurrentNode;
+			SmartNode			fCurrentNode;
 			BParameterWeb*		fParamWeb;
 			
 
@@ -83,9 +110,6 @@ private:
 			NodeList			fVideoInputs;
 			NodeList			fVideoOutputs;
 	
-			MediaIcons			fIcons;
-
-
 			MediaAlert*			fAlert;
 			status_t			fInitCheck;
 };

@@ -14,17 +14,25 @@ class BResources;
 struct MediaIcons {
 								MediaIcons();
 
+	struct IconSet {
+								IconSet();
+
+			BBitmap				inputIcon;
+			BBitmap				outputIcon;
+	};
+
+
 			BBitmap				devicesIcon;
 			BBitmap				mixerIcon;
-			BBitmap				tvIcon;
-			BBitmap				camIcon;
-			BBitmap				micIcon;
-			BBitmap				speakerIcon;
 
-			BRect				IconRectAt(const BPoint& topLeft);
-private:
+			IconSet				audioIcons;
+			IconSet				videoIcons;
+
+	static	BRect				IconRectAt(const BPoint& topLeft);
 
 	static	const BRect			sBounds;
+
+private:
 
 			void				_LoadBitmap(BResources* resources, int32 id,
 									BBitmap* bitmap);

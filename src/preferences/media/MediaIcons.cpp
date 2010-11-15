@@ -15,14 +15,20 @@
 
 const BRect MediaIcons::sBounds(0, 0, 15, 15);
 
+
+MediaIcons::IconSet::IconSet()
+	:
+	inputIcon(MediaIcons::sBounds, B_CMAP8),
+	outputIcon(MediaIcons::sBounds, B_CMAP8)
+{
+}
+
+
+
 MediaIcons::MediaIcons()
 	:
 	devicesIcon(sBounds, B_CMAP8),
-	mixerIcon(sBounds, B_CMAP8),
-	tvIcon(sBounds, B_CMAP8),
-	camIcon(sBounds, B_CMAP8),
-	micIcon(sBounds, B_CMAP8),
-	speakerIcon(sBounds, B_CMAP8)
+	mixerIcon(sBounds, B_CMAP8)
 {
 	app_info info;
 	be_app->GetAppInfo(&info);
@@ -32,10 +38,10 @@ MediaIcons::MediaIcons()
 
 	_LoadBitmap(&resources, devices_icon, &devicesIcon);
 	_LoadBitmap(&resources, mixer_icon, &mixerIcon);
-	_LoadBitmap(&resources, tv_icon, &tvIcon);
-	_LoadBitmap(&resources, cam_icon, &camIcon);
-	_LoadBitmap(&resources, mic_icon, &micIcon);
-	_LoadBitmap(&resources, speaker_icon, &speakerIcon);
+	_LoadBitmap(&resources, tv_icon, &videoIcons.outputIcon);
+	_LoadBitmap(&resources, cam_icon, &videoIcons.inputIcon);
+	_LoadBitmap(&resources, mic_icon, &audioIcons.inputIcon);
+	_LoadBitmap(&resources, speaker_icon, &audioIcons.outputIcon);
 }
 
 

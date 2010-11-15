@@ -26,6 +26,7 @@ public:
 			status_t			InitCheck();
 
 private:
+			MediaIcons			fIcons;
 			MediaWindow*		fWindow;
 };
 
