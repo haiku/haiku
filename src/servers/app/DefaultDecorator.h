@@ -41,6 +41,9 @@ public:
 									BPoint point, int32 buttons,
 									int32 modifiers);
 
+			float				BorderWidth();
+			float				TabHeight();
+
 protected:
 	virtual void				_DoLayout();
 

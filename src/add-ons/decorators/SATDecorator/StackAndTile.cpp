@@ -189,13 +189,14 @@ StackAndTile::WindowResized(Window* window)
 	SATWindow* satWindow = GetSATWindow(window);
 	if (!satWindow)
 		return;
+	satWindow->Resized();
 
 	if (SATKeyPressed() && fCurrentSATWindow)
 		satWindow->FindSnappingCandidates();
 	else {
 		satWindow->DoGroupLayout();
 
-		// Do a window layout for all windows. TODO: mybe do it a bit more
+		// Do a window layout for all windows. TODO: maybe do it a bit more
 		// efficient
 		SATGroup* group = satWindow->GetGroup();
 		if (!group)

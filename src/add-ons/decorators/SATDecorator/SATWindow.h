@@ -65,8 +65,6 @@ private:
 			Constraint*			fTopConstraint;
 			Constraint*			fMinWidthConstraint;
 			Constraint*			fMinHeightConstraint;
-			Constraint*			fMaxWidthConstraint;
-			Constraint*			fMaxHeightConstraint;
 			Constraint*			fWidthConstraint;
 			Constraint*			fHeightConstraint;
 };
@@ -78,7 +76,7 @@ public:
 								~SATWindow();
 
 			Window*				GetWindow() { return fWindow; }
-			SATDecorator*		GetDecorator();
+			SATDecorator*		GetDecorator() const;
 			StackAndTile*		GetStackAndTile() { return fStackAndTile; }
 			Desktop*			GetDesktop() { return fDesktop; }
 			//! Can be NULL if memory allocation failed!
@@ -109,6 +107,8 @@ public:
 
 			void				SetSizeLimits(int32 minWidth, int32 maxWidth,
 									int32 minHeight, int32 maxHeight);
+			// hook called when window has been resized form the outside
+			void				Resized();
 
 			//! \return the complete window frame including the Decorator
 			BRect				CompleteWindowFrame();
@@ -130,6 +130,7 @@ public:
 
 private:
 			void				_InitGroup();
+			void				_UpdateSizeLimits();
 
 			Window*				fWindow;
 			StackAndTile*		fStackAndTile;
@@ -149,6 +150,14 @@ private:
 			SATSnappingBehaviourList	fSATSnappingBehaviourList;
 
 			bool				fShutdown;
+
+			int32				fOriginalMinWidth;
+			int32				fOriginalMaxWidth;
+			int32				fOriginalMinHeight;
+			int32				fOriginalMaxHeight;
+
+			float				fOriginalWidth;
+			float				fOriginalHeight;
 };
 
 

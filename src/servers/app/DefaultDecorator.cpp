@@ -247,6 +247,22 @@ DefaultDecorator::MouseAction(const BMessage* message, BPoint point,
 }
 
 
+float
+DefaultDecorator::BorderWidth()
+{
+	return fBorderWidth;
+}
+
+
+float
+DefaultDecorator::TabHeight()
+{
+	if (fTabRect.IsValid())
+		return fTabRect.Height();
+	return BorderWidth();
+}
+
+
 void
 DefaultDecorator::_DoLayout()
 {
