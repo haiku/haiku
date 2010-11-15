@@ -19,6 +19,9 @@
 using namespace BPrivate;
 
 
+const uint32 kExtentPenalty = 10;
+
+
 GroupCookie::GroupCookie(SATWindow* satWindow)
 	:
 	fSATWindow(satWindow),
@@ -42,7 +45,6 @@ GroupCookie::GroupCookie(SATWindow* satWindow)
 	fWidthConstraint(NULL),
 	fHeightConstraint(NULL)
 {
-	
 }
 
 
@@ -50,9 +52,6 @@ GroupCookie::~GroupCookie()
 {
 	Uninit();
 }
-
-
-const uint32 kExtentPenalty = 10;
 
 
 void
@@ -66,7 +65,7 @@ GroupCookie::DoGroupLayout(SATWindow* triggerWindow)
 	// adjust window size soft constraints
 	fWidthConstraint->SetRightSide(frame.Width());
 	fHeightConstraint->SetRightSide(frame.Height());
-	
+
 	// adjust window position soft constraints
 	// (a bit more penalty for them so they take precedence)
 	fLeftConstraint->SetRightSide(frame.left);
@@ -218,7 +217,7 @@ GroupCookie::Uninit()
 	fTopBorder = NULL;
 	fRightBorder = NULL;
 	fBottomBorder = NULL;
-	
+
 	delete fLeftBorderConstraint;
 	delete fTopBorderConstraint;
 	delete fRightBorderConstraint;
@@ -272,6 +271,9 @@ GroupCookie::_UpdateWindowSize(const BRect& frame)
 	fWidthConstraint->SetRightSide(frame.Width());
 	fHeightConstraint->SetRightSide(frame.Height());
 }
+
+
+// #pragma mark -
 
 
 SATWindow::SATWindow(StackAndTile* sat, Window* window)
@@ -539,7 +541,7 @@ SATWindow::CompleteWindowFrame()
 	frame.left -= decorator->BorderWidth();
 	frame.right += decorator->BorderWidth() + 1;
 	frame.top -= decorator->BorderWidth() + decorator->TabHeight() + 1;
-	frame.bottom += decorator->BorderWidth();		
+	frame.bottom += decorator->BorderWidth();
 
 	return frame;
 }
@@ -552,12 +554,15 @@ SATWindow::GetSizeLimits(int32* minWidth, int32* maxWidth, int32* minHeight,
 	fWindow->GetSizeLimits(minWidth, maxWidth, minHeight, maxHeight);
 
 	SATDecorator* decorator = GetDecorator();
-	if (!decorator)
+	if (decorator == NULL)
 		return;
-	*minWidth += 2 * decorator->BorderWidth() + 1;
-	*minHeight += 2 * decorator->BorderWidth() + decorator->TabHeight() + 1;
-	*maxWidth += 2 * decorator->BorderWidth() + 1;
-	*maxHeight += 2 * decorator->BorderWidth() + decorator->TabHeight() + 1;
+
+	*minWidth += 2 * (int32)decorator->BorderWidth() + 1;
+	*minHeight += 2 * (int32)decorator->BorderWidth()
+		+ (int32)decorator->TabHeight() + 1;
+	*maxWidth += 2 * (int32)decorator->BorderWidth() + 1;
+	*maxHeight += 2 * (int32)decorator->BorderWidth()
+		+ (int32)decorator->TabHeight() + 1;
 }
 
 
@@ -723,17 +728,18 @@ SATWindow::_UpdateSizeLimits()
 				&maxDecorWidth, &maxDecorHeight);
 		BRect frame = fWindow->Frame();
 		if (fOriginalMinWidth <= minDecorWidth)
-			minWidth = frame.Width();
+			minWidth = frame.IntegerWidth();
 		if (fOriginalMinHeight <= minDecorHeight)
-			minHeight = frame.Height();
+			minHeight = frame.IntegerHeight();
 	}
 	fWindow->SetSizeLimits(minWidth, B_SIZE_UNLIMITED,
 		minHeight, B_SIZE_UNLIMITED);
 
-	
+
 	if (decorator) {
-		minWidth += 2 * decorator->BorderWidth();
-		minHeight += 2 * decorator->BorderWidth() + decorator->TabHeight() + 1;
+		minWidth += 2 * (int32)decorator->BorderWidth();
+		minHeight += 2 * (int32)decorator->BorderWidth()
+			+ (int32)decorator->TabHeight() + 1;
 	}
 	fGroupCookie->SetSizeLimits(minWidth, B_SIZE_UNLIMITED, minHeight,
 		B_SIZE_UNLIMITED);
