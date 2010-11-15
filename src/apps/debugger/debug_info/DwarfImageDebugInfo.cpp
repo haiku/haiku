@@ -278,9 +278,8 @@ DwarfImageDebugInfo::GetFunctions(BObjectList<FunctionDebugInfo>& functions)
 
 			DIESubprogram* subprogramEntry = static_cast<DIESubprogram*>(entry);
 
-			// ignore declarations, prototypes, and inlined functions
+			// ignore declarations and inlined functions
 			if (subprogramEntry->IsDeclaration()
-				|| subprogramEntry->IsPrototyped()
 				|| subprogramEntry->Inline() == DW_INL_inlined
 				|| subprogramEntry->Inline() == DW_INL_declared_inlined) {
 				continue;
@@ -402,7 +401,7 @@ DwarfImageDebugInfo::GetType(GlobalTypeCache* cache,
 			if (typeContext == NULL) {
 				typeContext = new(std::nothrow)
 					DwarfTypeContext(fArchitecture, fImageInfo.ImageID(), fFile,
-					unit, NULL, 0, 0, fRelocationDelta, &inputInterface, 
+					unit, NULL, 0, 0, fRelocationDelta, &inputInterface,
 					fromDwarfMap);
 				if (typeContext == NULL)
 					return B_NO_MEMORY;
@@ -505,7 +504,7 @@ DwarfImageDebugInfo::CreateFrame(Image* image,
 	DwarfStackFrameDebugInfo* stackFrameDebugInfo
 		= new(std::nothrow) DwarfStackFrameDebugInfo(fArchitecture,
 			fImageInfo.ImageID(), fFile, unit, subprogramEntry, fTypeLookup,
-			fTypeCache, instructionPointer, framePointer, fRelocationDelta, 
+			fTypeCache, instructionPointer, framePointer, fRelocationDelta,
 			inputInterface, fromDwarfMap);
 	if (stackFrameDebugInfo == NULL)
 		return B_NO_MEMORY;
