@@ -51,6 +51,8 @@ public:
 			bool				Lock();
 			void				Unlock();
 
+			void				Dump();
+
 private:
 			struct block*		_AllocateChunk(size_t size, bool& newArea);
 

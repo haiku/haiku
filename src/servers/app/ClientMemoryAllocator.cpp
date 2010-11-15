@@ -211,6 +211,32 @@ ClientMemoryAllocator::Unlock()
 }
 
 
+void
+ClientMemoryAllocator::Dump()
+{
+	AutoReadLocker locker(fLock);
+
+	debug_printf("Application %ld, %s: chunks:\n", fApplication->ClientTeam(),
+		fApplication->Signature());
+
+	chunk_list::Iterator iterator = fChunks.GetIterator();
+	int32 i = 0;
+	while (struct chunk* chunk = iterator.Next()) {
+		debug_printf("  [%4ld] %p, area %ld, base %p, size %lu\n", i++, chunk,
+			chunk->area, chunk->base, chunk->size);
+	}
+
+	debug_printf("free blocks:\n");
+
+	block_list::Iterator blockIterator = fFreeBlocks.GetIterator();
+	i = 0;
+	while (struct block* block = blockIterator.Next()) {
+		debug_printf("  [%6ld] %p, chunk %p, base %p, size %lu\n", i++, block,
+			block->chunk, block->base, block->size);
+	}
+}
+
+
 struct block *
 ClientMemoryAllocator::_AllocateChunk(size_t size, bool& newArea)
 {

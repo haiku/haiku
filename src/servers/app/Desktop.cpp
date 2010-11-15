@@ -2265,7 +2265,7 @@ Desktop::_PrepareQuit()
 
 
 void
-Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
+Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 {
 	switch (code) {
 		case AS_CREATE_APP:
@@ -2285,7 +2285,7 @@ Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			port_id	clientLooperPort = -1;
 			port_id clientReplyPort = -1;
 			int32 htoken = B_NULL_TOKEN;
-			char *appSignature = NULL;
+			char* appSignature = NULL;
 
 			link.Read<port_id>(&clientReplyPort);
 			link.Read<port_id>(&clientLooperPort);
@@ -2294,7 +2294,7 @@ Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			if (link.ReadString(&appSignature) != B_OK)
 				break;
 
-			ServerApp *app = new ServerApp(this, clientReplyPort,
+			ServerApp* app = new ServerApp(this, clientReplyPort,
 				clientLooperPort, clientTeamID, htoken, appSignature);
 			if (app->InitCheck() == B_OK
 				&& app->Run()) {
@@ -2334,10 +2334,10 @@ Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// Run through the list of apps and nuke the proper one
 
 			int32 count = fApplications.CountItems();
-			ServerApp *removeApp = NULL;
+			ServerApp* removeApp = NULL;
 
 			for (int32 i = 0; i < count; i++) {
-				ServerApp *app = fApplications.ItemAt(i);
+				ServerApp* app = fApplications.ItemAt(i);
 
 				if (app->Thread() == thread) {
 					fApplications.RemoveItemAt(i);
@@ -2387,6 +2387,7 @@ Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 
 		case AS_APP_CRASHED:
+		case AS_DUMP_ALLOCATOR:
 		{
 			BAutolock locker(fApplicationsLock);
 
@@ -2398,7 +2399,7 @@ Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				ServerApp* app = fApplications.ItemAt(i);
 
 				if (app->ClientTeam() == team)
-					app->PostMessage(AS_APP_CRASHED);
+					app->PostMessage(code);
 			}
 			break;
 		}

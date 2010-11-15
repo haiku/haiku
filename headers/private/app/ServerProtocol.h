@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku.
+ * Copyright 2001-2010, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -81,7 +81,7 @@ enum {
 
 	AS_BEGIN_RECT_TRACKING,
 	AS_END_RECT_TRACKING,
-	
+
 	AS_GET_CURSOR_POSITION,
 	AS_GET_CURSOR_BITMAP,
 
@@ -335,6 +335,9 @@ enum {
 
 	// desktop listener communications
 	AS_TALK_TO_DESKTOP_LISTENER,
+
+	// debugging helper
+	AS_DUMP_ALLOCATOR,
 
 	AS_LAST_CODE
 };

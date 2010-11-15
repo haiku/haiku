@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku.
+ * Copyright 2001-2010, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -543,6 +543,10 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				}
 				fDesktop->UnlockAllWindows();
 			}
+			break;
+
+		case AS_DUMP_ALLOCATOR:
+			fMemoryAllocator.Dump();
 			break;
 
 		case AS_CREATE_WINDOW:

@@ -1,12 +1,18 @@
 SubDir HAIKU_TOP src tests servers app ;
 
+UsePrivateHeaders app graphics input interface shared storage ;
+
+SimpleTest app_server_debug :
+	app_server_debug.cpp
+	: be
+;
+
 SetSubDirSupportedPlatforms libbe_test ;
 
 # No need to define any of those targets, when not building for libbe_test
 if $(TARGET_PLATFORM) = libbe_test {
 
 UseLibraryHeaders agg png zlib ;
-UsePrivateHeaders app graphics input interface shared storage ;
 UsePrivateHeaders [ FDirName graphics common ] ;
 
 # headers/build/private/kernel is needed for safemode.h and syscalls.h.
