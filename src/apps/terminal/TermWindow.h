@@ -79,7 +79,9 @@ private:
 			void				_GetPreferredFont(BFont &font);
 			status_t			_DoPageSetup();
 			void				_DoPrint();
-			void				_AddTab(Arguments* args);
+			void				_AddTab(Arguments* args,
+									const BString& currentDirectory
+										= BString());
 			void				_RemoveTab(int32 index);
 			bool				_CanClose(int32 index);
 			TermViewContainerView* _ActiveTermViewContainerView() const;

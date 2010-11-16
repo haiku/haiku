@@ -53,6 +53,7 @@
 #include "Encoding.h"
 #include "InlineInput.h"
 #include "Shell.h"
+#include "ShellParameters.h"
 #include "TermConst.h"
 #include "TerminalBuffer.h"
 #include "TerminalCharClassifier.h"
@@ -422,7 +423,8 @@ private:
 //	#pragma mark -
 
 
-TermView::TermView(BRect frame, int32 argc, const char** argv, int32 historySize)
+TermView::TermView(BRect frame, const ShellParameters& shellParameters,
+	int32 historySize)
 	: BView(frame, "termview", B_FOLLOW_ALL,
 		B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE),
 	fColumns(COLUMNS_DEFAULT),
@@ -435,15 +437,15 @@ TermView::TermView(BRect frame, int32 argc, const char** argv, int32 historySize
 	fReportButtonMouseEvent(false),
 	fReportAnyMouseEvent(false)
 {
-	status_t status = _InitObject(argc, argv);
+	status_t status = _InitObject(shellParameters);
 	if (status != B_OK)
 		throw status;
 	SetTermSize(frame);
 }
 
 
-TermView::TermView(int rows, int columns, int32 argc, const char** argv,
-		int32 historySize)
+TermView::TermView(int rows, int columns,
+	const ShellParameters& shellParameters, int32 historySize)
 	: BView(BRect(0, 0, 0, 0), "termview", B_FOLLOW_ALL,
 		B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE),
 	fColumns(columns),
@@ -456,7 +458,7 @@ TermView::TermView(int rows, int columns, int32 argc, const char** argv,
 	fReportButtonMouseEvent(false),
 	fReportAnyMouseEvent(false)
 {
-	status_t status = _InitObject(argc, argv);
+	status_t status = _InitObject(shellParameters);
 	if (status != B_OK)
 		throw status;
 
@@ -507,7 +509,7 @@ TermView::TermView(BMessage* archive)
 	}
 
 	// TODO: Retrieve colors, history size, etc. from archive
-	status_t status = _InitObject(argc, argv);
+	status_t status = _InitObject(ShellParameters(argc, argv));
 	if (status != B_OK)
 		throw status;
 
@@ -524,7 +526,7 @@ TermView::TermView(BMessage* archive)
 	already be initialized; they are not touched by this method.
 */
 status_t
-TermView::_InitObject(int32 argc, const char** argv)
+TermView::_InitObject(const ShellParameters& shellParameters)
 {
 	SetFlags(Flags() | B_WILL_DRAW | B_FRAME_EVENTS
 		| B_FULL_UPDATE_ON_RESIZE/* | B_INPUT_METHOD_AWARE*/);
@@ -596,8 +598,11 @@ TermView::_InitObject(int32 argc, const char** argv)
 
 	SetTermFont(be_fixed_font);
 
-	error = fShell->Open(fRows, fColumns,
-		EncodingAsShortString(fEncoding), argc, argv);
+	// set the shell parameters' encoding
+	ShellParameters modifiedShellParameters(shellParameters);
+	modifiedShellParameters.SetEncoding(EncodingAsShortString(fEncoding));
+
+	error = fShell->Open(fRows, fColumns, modifiedShellParameters);
 
 	if (error < B_OK)
 		return error;

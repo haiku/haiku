@@ -20,6 +20,7 @@ Application Terminal :
 	PrefHandler.cpp
 	PrefWindow.cpp
 	Shell.cpp
+	ShellParameters.cpp
 	SmartTabView.cpp
 	TermApp.cpp
 	TerminalBuffer.cpp

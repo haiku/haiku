@@ -18,6 +18,7 @@
 
 
 class ActiveProcessInfo;
+class ShellParameters;
 // TODO: Maybe merge TermParse and Shell classes ?
 class TerminalBuffer;
 class TermParse;
@@ -28,8 +29,8 @@ public:
 								Shell();
 	virtual						~Shell();
 
-			status_t			Open(int row, int col, const char* encoding,
-									int argc, const char** argv);
+			status_t			Open(int row, int col,
+									const ShellParameters& parameters);
 			void				Close();
 
 			const char*			TTYName() const;
@@ -53,8 +54,8 @@ public:
 	virtual void				DetachBuffer();
 
 private:
-			status_t			_Spawn(int row, int col, const char* encoding,
-									int argc, const char** argv);
+			status_t			_Spawn(int row, int col,
+									const ShellParameters& parameters);
 
 private:
 			int					fFd;

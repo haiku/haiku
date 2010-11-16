@@ -29,16 +29,19 @@ class BStringView;
 class BasicTerminalBuffer;
 class InlineInput;
 class ResizeWindow;
+class ShellParameters;
 class TermBuffer;
 class TerminalBuffer;
 class Shell;
 
 class TermView : public BView {
 public:
-							TermView(BRect frame, int32 argc, const char** argv,
+							TermView(BRect frame,
+								const ShellParameters& shellParameters,
 								int32 historySize);
-							TermView(int rows, int columns, int32 argc,
-								const char** argv, int32 historySize);
+							TermView(int rows, int columns,
+								const ShellParameters& shellParameters,
+								int32 historySize);
 							TermView(BMessage* archive);
 							~TermView();
 
@@ -133,7 +136,7 @@ private:
 	inline	void			_InvalidateTextRect(int32 x1, int32 y1, int32 x2,
 								int32 y2);
 
-			status_t		_InitObject(int32 argc, const char** argv);
+			status_t		_InitObject(const ShellParameters& shellParameters);
 
 			status_t		_AttachShell(Shell* shell);
 			void			_DetachShell();

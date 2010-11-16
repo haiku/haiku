@@ -31,6 +31,7 @@
 #include <ScrollView.h>
 #include <String.h>
 
+#include "ActiveProcessInfo.h"
 #include "Arguments.h"
 #include "AppearPrefView.h"
 #include "Encoding.h"
@@ -38,6 +39,7 @@
 #include "Globals.h"
 #include "PrefWindow.h"
 #include "PrefHandler.h"
+#include "ShellParameters.h"
 #include "SmartTabView.h"
 #include "TermConst.h"
 #include "TermScrollView.h"
@@ -61,7 +63,8 @@ const static uint32 kSetActiveTab = 'STab';
 
 class CustomTermView : public TermView {
 public:
-	CustomTermView(int32 rows, int32 columns, int32 argc, const char **argv, int32 historySize = 1000);
+	CustomTermView(int32 rows, int32 columns,
+		const ShellParameters& shellParameters, int32 historySize = 1000);
 	virtual void NotifyQuit(int32 reason);
 	virtual void SetTitle(const char *title);
 };
@@ -690,7 +693,12 @@ TermWindow::MessageReceived(BMessage *message)
 			if (fTabView->CountTabs() < kMaxTabs) {
 				if (fFullScreen)
 					_ActiveTermView()->ScrollBar()->Show();
-				_AddTab(NULL);
+
+				ActiveProcessInfo info;
+				if (_ActiveTermView()->GetActiveProcessInfo(info))
+					_AddTab(NULL, info.CurrentDirectory());
+				else
+					_AddTab(NULL);
 			}
 			break;
 
@@ -828,22 +836,19 @@ TermWindow::_DoPrint()
 
 
 void
-TermWindow::_AddTab(Arguments* args)
+TermWindow::_AddTab(Arguments* args, const BString& currentDirectory)
 {
 	int argc = 0;
 	const char* const* argv = NULL;
 	if (args != NULL)
 		args->GetShellArguments(argc, argv);
+	ShellParameters shellParameters(argc, argv, currentDirectory);
 
 	try {
-		// Note: I don't pass the Arguments class directly to the termview,
-		// only to avoid adding it as a dependency: in other words, to keep
-		// the TermView class as agnostic as possible about the surrounding
-		// world.
 		CustomTermView* view = new CustomTermView(
 			PrefHandler::Default()->getInt32(PREF_ROWS),
 			PrefHandler::Default()->getInt32(PREF_COLS),
-			argc, (const char**)argv,
+			shellParameters,
 			PrefHandler::Default()->getInt32(PREF_HISTORY_SIZE));
 
 		TermViewContainerView* containerView = new TermViewContainerView(view);
@@ -1104,9 +1109,10 @@ TermWindow::_NewSessionID()
 
 
 // CustomTermView
-CustomTermView::CustomTermView(int32 rows, int32 columns, int32 argc, const char **argv, int32 historySize)
+CustomTermView::CustomTermView(int32 rows, int32 columns,
+	const ShellParameters& shellParameters, int32 historySize)
 	:
-	TermView(rows, columns, argc, argv, historySize)
+	TermView(rows, columns, shellParameters, historySize)
 {
 }
 

@@ -40,6 +40,7 @@
 #include <extended_system_info_defs.h>
 
 #include "ActiveProcessInfo.h"
+#include "ShellParameters.h"
 #include "TermConst.h"
 #include "TermParse.h"
 #include "TerminalBuffer.h"
@@ -139,12 +140,12 @@ Shell::~Shell()
 
 
 status_t
-Shell::Open(int row, int col, const char *encoding, int argc, const char **argv)
+Shell::Open(int row, int col, const ShellParameters& parameters)
 {
 	if (fFd >= 0)
 		return B_ERROR;
 
-	status_t status = _Spawn(row, col, encoding, argc, argv);
+	status_t status = _Spawn(row, col, parameters);
 	if (status < B_OK)
 		return status;
 
@@ -382,8 +383,10 @@ initialize_termios(struct termios &tio)
 #define B_TRANSLATE_CONTEXT "Terminal Shell"
 
 status_t
-Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **argv)
+Shell::_Spawn(int row, int col, const ShellParameters& parameters)
 {
+	const char** argv = (const char**)parameters.Arguments();
+	int argc = parameters.ArgumentCount();
 	const char* defaultArgs[3] = {kDefaultShell, "-l", NULL};
 	struct passwd passwdStruct;
 	struct passwd *passwdResult;
@@ -533,7 +536,11 @@ Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **arg
 		 */
 		setenv("TERM", "xterm", true);
 		setenv("TTY", ttyName, true);
-		setenv("TTYPE", encoding, true);
+		setenv("TTYPE", parameters.Encoding(), true);
+
+		// set the current working directory, if one is given
+		if (parameters.CurrentDirectory().Length() > 0)
+			chdir(parameters.CurrentDirectory().String());
 
 		execve(argv[0], (char * const *)argv, environ);
 
