@@ -17,6 +17,7 @@
 #include <SupportDefs.h>
 
 
+class ActiveProcessInfo;
 // TODO: Maybe merge TermParse and Shell classes ?
 class TerminalBuffer;
 class TermParse;
@@ -44,8 +45,9 @@ public:
 			int					FD() const;
 			pid_t				ProcessID() const	{ return fProcessID; }
 
-			pid_t				ActiveProcessGroup() const;
 			bool				HasActiveProcesses() const;
+			bool				GetActiveProcessInfo(
+									ActiveProcessInfo& _info) const;
 
 	virtual	status_t			AttachBuffer(TerminalBuffer* buffer);
 	virtual void				DetachBuffer();

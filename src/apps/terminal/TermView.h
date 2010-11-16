@@ -19,6 +19,7 @@
 #include "TermPos.h"
 
 
+class ActiveProcessInfo;
 class BClipboard;
 class BMessageRunner;
 class BScrollBar;
@@ -46,8 +47,9 @@ public:
 
 	virtual void			GetPreferredSize(float* _width, float* _height);
 
-			pid_t			ActiveProcessGroup() const;
 			bool			IsShellBusy() const;
+			bool			GetActiveProcessInfo(
+								ActiveProcessInfo& _info) const;
 
 			const char*		TerminalName() const;
 

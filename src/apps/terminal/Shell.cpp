@@ -29,9 +29,17 @@
 #include <unistd.h>
 
 #include <Catalog.h>
-#include <OS.h>
+#include <Entry.h>
 #include <Locale.h>
+#include <OS.h>
+#include <Path.h>
 
+#include <util/KMessage.h>
+
+#include <extended_system_info.h>
+#include <extended_system_info_defs.h>
+
+#include "ActiveProcessInfo.h"
 #include "TermConst.h"
 #include "TermParse.h"
 #include "TerminalBuffer.h"
@@ -231,19 +239,51 @@ Shell::FD() const
 }
 
 
-pid_t
-Shell::ActiveProcessGroup() const
-{
-	return tcgetpgrp(fFd);
-}
-
-
 bool
 Shell::HasActiveProcesses() const
 {
 	pid_t running = tcgetpgrp(fFd);
 	if (running == fProcessID || running == -1)
 		return false;
+
+	return true;
+}
+
+
+bool
+Shell::GetActiveProcessInfo(ActiveProcessInfo& _info) const
+{
+	_info.Unset();
+
+	// get the foreground process group
+	pid_t process = tcgetpgrp(fFd);
+	if (process < 0)
+		return false;
+
+	// get more info on the process group leader
+	KMessage info;
+	status_t error = get_extended_team_info(process, B_TEAM_INFO_BASIC, info);
+	if (error != B_OK)
+		return false;
+
+	// fetch the name and the current directory from the info
+	const char* name;
+	int32 cwdDevice;
+	int64 cwdDirectory;
+	if (info.FindString("name", &name) != B_OK
+		|| info.FindInt32("cwd device", &cwdDevice) != B_OK
+		|| info.FindInt64("cwd directory", &cwdDirectory) != B_OK) {
+		return false;
+	}
+
+	// convert the node ref into a path
+	entry_ref cwdRef(cwdDevice, cwdDirectory, ".");
+	BPath cwdPath;
+	if (cwdPath.SetTo(&cwdRef) != B_OK)
+		return false;
+
+	// set the result
+	_info.SetTo(process, fProcessID, name, cwdPath.Path());
 
 	return true;
 }

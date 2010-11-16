@@ -4,7 +4,10 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src kits tracker ] ;
 
+UsePrivateHeaders libroot kernel system ;
+
 Application Terminal :
+	ActiveProcessInfo.cpp
 	AppearPrefView.cpp
 	Arguments.cpp
 	BasicTerminalBuffer.cpp

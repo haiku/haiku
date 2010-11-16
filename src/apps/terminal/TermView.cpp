@@ -24,6 +24,7 @@
 #include <algorithm>
 #include <new>
 
+#include "ActiveProcessInfo.h"
 #include <Alert.h>
 #include <Application.h>
 #include <Beep.h>
@@ -628,17 +629,22 @@ TermView::~TermView()
 }
 
 
-pid_t
-TermView::ActiveProcessGroup() const
-{
-	return fShell != NULL ? fShell->ActiveProcessGroup() : -1;
-}
-
-
 bool
 TermView::IsShellBusy() const
 {
 	return fShell != NULL && fShell->HasActiveProcesses();
+}
+
+
+bool
+TermView::GetActiveProcessInfo(ActiveProcessInfo& _info) const
+{
+	if (fShell == NULL) {
+		_info.Unset();
+		return false;
+	}
+
+	return fShell->GetActiveProcessInfo(_info);
 }
 
 
