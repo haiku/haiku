@@ -138,6 +138,25 @@ TermApp::ReadyToRun()
 }
 
 
+bool
+TermApp::QuitRequested()
+{
+	// check whether the system is shutting down
+	BMessage* message = CurrentMessage();
+	bool shutdown;
+	if (message != NULL && message->FindBool("_shutdown_", &shutdown) == B_OK
+		&& shutdown) {
+		// The system is shutting down. Quit the window synchronously. This
+		// skips the checks for running processes and the "Are you sure..."
+		// alert.
+		if (fTermWindow->Lock())
+			fTermWindow->Quit();
+	}
+
+	return BApplication::QuitRequested();
+}
+
+
 void
 TermApp::Quit()
 {

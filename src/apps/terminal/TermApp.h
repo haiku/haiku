@@ -49,12 +49,13 @@ public:
 	virtual						~TermApp();
 
 protected:
-			void				ReadyToRun();
-			void				Quit();
-			void				AboutRequested();
-			void				MessageReceived(BMessage* message);
-			void				RefsReceived(BMessage* message);
-			void				ArgvReceived(int32 argc, char** argv);
+	virtual	void				ReadyToRun();
+	virtual bool				QuitRequested();
+	virtual	void				Quit();
+	virtual	void				AboutRequested();
+	virtual	void				MessageReceived(BMessage* message);
+	virtual	void				RefsReceived(BMessage* message);
+	virtual	void				ArgvReceived(int32 argc, char** argv);
 
 private:
 			status_t			_MakeTermWindow(BRect& frame,
