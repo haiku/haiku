@@ -477,6 +477,15 @@ TermWindow::MessageReceived(BMessage *message)
 
 		case MENU_NEW_TERM:
 		{
+			// Set our current working directory to that of the active tab, so
+			// that the new terminal and its shell inherit it.
+			// Note: That's a bit lame. We should rather fork() and change the
+			// CWD in the child, but since ATM there aren't any side effects of
+			// changing our CWD, we save ourselves the trouble.
+			ActiveProcessInfo activeProcessInfo;
+			if (_ActiveTermView()->GetActiveProcessInfo(activeProcessInfo))
+				chdir(activeProcessInfo.CurrentDirectory());
+
 			app_info info;
 			be_app->GetAppInfo(&info);
 
