@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Haiku.
+ * Copyright 2001-2010, Haiku.
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai.
  *
@@ -28,12 +28,13 @@
  * THE SOFTWARE.
  *
  */
-#ifndef __TERMWINDOW_H
-#define __TERMWINDOW_H
+#ifndef TERM_WINDOW_H
+#define TERM_WINDOW_H
 
 
 #include <String.h>
 #include <Window.h>
+
 
 class Arguments;
 class BFont;
@@ -48,82 +49,84 @@ class TermViewContainerView;
 
 class TermWindow : public BWindow {
 public:
-	TermWindow(BRect frame, const char* title, uint32 workspaces,
-		Arguments *args);
-	virtual ~TermWindow();
+								TermWindow(BRect frame, const char* title,
+									uint32 workspaces, Arguments* args);
+	virtual						~TermWindow();
 
-			void	SetSessionWindowTitle(TermView* termView,
-						const char* title);
-			void	SessionChanged();
+			void				SetSessionWindowTitle(TermView* termView,
+									const char* title);
+			void				SessionChanged();
 
 protected:
-	virtual bool	QuitRequested();
-	virtual void	MessageReceived(BMessage *message);
-	virtual void	WindowActivated(bool);
-	virtual void	MenusBeginning();
-	virtual	void	Zoom(BPoint leftTop, float width, float height);
-	virtual void	FrameResized(float newWidth, float newHeight);
+	virtual bool				QuitRequested();
+	virtual void				MessageReceived(BMessage* message);
+	virtual void				WindowActivated(bool);
+	virtual void				MenusBeginning();
+	virtual	void				Zoom(BPoint leftTop, float width, float height);
+	virtual void				FrameResized(float newWidth, float newHeight);
 
 private:
-	struct Session;
-	class TabView;
-	friend class TabView;
+			struct Session;
+			class TabView;
+			friend class TabView;
 
-	void			_SetTermColors(TermViewContainerView *termView);
-	void			_InitWindow();
-	void			_SetupMenu();
-	static BMenu*	_MakeEncodingMenu();
-	static BMenu*	_MakeWindowSizeMenu();
-	
-	void			_GetPreferredFont(BFont &font);
-	status_t		_DoPageSetup();
-	void			_DoPrint();
-	void			_AddTab(Arguments *args);
-	void			_RemoveTab(int32 index);
-	bool			_CanClose(int32 index);
-	TermViewContainerView* _ActiveTermViewContainerView() const;
-	TermViewContainerView* _TermViewContainerViewAt(int32 index) const;
-	TermView*		_ActiveTermView() const;
-	TermView*		_TermViewAt(int32 index) const;
-	int32			_IndexOfTermView(TermView* termView) const;
-	void			_CheckChildren();
-	void			_ResizeView(TermView *view);
-	
-	int32			_NewSessionID();
+			void				_SetTermColors(TermViewContainerView* termView);
+			void				_InitWindow();
+			void				_SetupMenu();
+			static BMenu*		_MakeEncodingMenu();
+			static BMenu*		_MakeWindowSizeMenu();
 
-	BString			fInitialTitle;
-	BList			fSessions;
+			void				_GetPreferredFont(BFont &font);
+			status_t			_DoPageSetup();
+			void				_DoPrint();
+			void				_AddTab(Arguments* args);
+			void				_RemoveTab(int32 index);
+			bool				_CanClose(int32 index);
+			TermViewContainerView* _ActiveTermViewContainerView() const;
+			TermViewContainerView* _TermViewContainerViewAt(int32 index) const;
+			TermView*			_ActiveTermView() const;
+			TermView*			_TermViewAt(int32 index) const;
+			int32				_IndexOfTermView(TermView* termView) const;
+			void				_CheckChildren();
+			void				_ResizeView(TermView* view);
 
-	TabView			*fTabView;
-	TermView		*fTermView;
+			int32				_NewSessionID();
 
-	BMenuBar		*fMenubar;
-	BMenu			*fFilemenu;
-	BMenu			*fEditmenu;
-	BMenu			*fEncodingmenu;
-	BMenu			*fHelpmenu;
-	BMenu			*fWindowSizeMenu;
-	BMenu			*fSizeMenu;
+private:
+			BString				fInitialTitle;
+			BList				fSessions;
 
-	BMessage		*fPrintSettings;
-	PrefWindow		*fPrefWindow;
-	FindWindow		*fFindPanel;
-	BRect			fSavedFrame;
-	window_look		fSavedLook;
+			TabView*			fTabView;
+			TermView*			fTermView;
 
-	// Saved search parameters
-	BString			fFindString;
-	BMenuItem		*fFindNextMenuItem;
-	BMenuItem 		*fFindPreviousMenuItem;
-	BMenuItem		*fIncreaseFontSizeMenuItem;
-	BMenuItem		*fDecreaseFontSizeMenuItem;
+			BMenuBar*			fMenubar;
+			BMenu*				fFilemenu;
+			BMenu*				fEditmenu;
+			BMenu*				fEncodingmenu;
+			BMenu*				fHelpmenu;
+			BMenu*				fWindowSizeMenu;
+			BMenu*				fSizeMenu;
 
-	bool			fFindSelection;
-	bool			fForwardSearch;
-	bool			fMatchCase;
-	bool			fMatchWord;
+			BMessage*			fPrintSettings;
+			PrefWindow*			fPrefWindow;
+			FindWindow*			fFindPanel;
+			BRect				fSavedFrame;
+			window_look			fSavedLook;
 
-	bool			fFullScreen;
+			// Saved search parameters
+			BString				fFindString;
+			BMenuItem*			fFindNextMenuItem;
+			BMenuItem *			fFindPreviousMenuItem;
+			BMenuItem*			fIncreaseFontSizeMenuItem;
+			BMenuItem*			fDecreaseFontSizeMenuItem;
+
+			bool				fFindSelection;
+			bool				fForwardSearch;
+			bool				fMatchCase;
+			bool				fMatchWord;
+
+			bool				fFullScreen;
 };
 
-#endif // __TERMWINDOW_H
+
+#endif // TERM_WINDOW_H

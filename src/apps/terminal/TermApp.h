@@ -1,7 +1,7 @@
 /*
- * Copyright 2001-2008, Haiku.
+ * Copyright 2001-2010, Haiku.
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
- * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
+ * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files or portions
@@ -37,51 +37,60 @@
 #include <File.h>
 #include <String.h>
 
+
 class Arguments;
 class BRect;
 class BWindow;
+
+
 class TermApp : public BApplication {
-	public:
-		TermApp();
-		virtual ~TermApp();
+public:
+								TermApp();
+	virtual						~TermApp();
 
-	protected:
-		void ReadyToRun();
-		void Quit();
-		void AboutRequested();
-		void MessageReceived(BMessage* message);
-		void RefsReceived(BMessage* message);
-		void ArgvReceived(int32 argc, char** argv);
+protected:
+			void				ReadyToRun();
+			void				Quit();
+			void				AboutRequested();
+			void				MessageReceived(BMessage* message);
+			void				RefsReceived(BMessage* message);
+			void				ArgvReceived(int32 argc, char** argv);
 
-	private:
-		status_t _MakeTermWindow(BRect& frame, uint32 workspaces);
-		status_t _GetWindowPositionFile(BFile* file, uint32 openMode);
-		status_t _LoadWindowPosition(BRect* frame, uint32* workspaces);
-		status_t _SaveWindowPosition(BMessage* message);
-		void _SwitchTerm();
-		void _ActivateTermWindow(team_id id);
-		bool _IsSwitchTarget(team_id id);
-		void _SanitizeIDs(BMessage* data, uint8* windows, ssize_t length);
-		bool _UpdateIDs(bool set, uint8* windows, ssize_t maxLength,
-			ssize_t* _length);
-		void _UpdateRegistration(bool set);
-		void _UnregisterTerminal();
-		void _RegisterTerminal();
+private:
+			status_t			_MakeTermWindow(BRect& frame,
+									uint32 workspaces);
+			status_t			_GetWindowPositionFile(BFile* file,
+									uint32 openMode);
+			status_t			_LoadWindowPosition(BRect* frame,
+									uint32* workspaces);
+			status_t			_SaveWindowPosition(BMessage* message);
+			void				_SwitchTerm();
+			void				_ActivateTermWindow(team_id id);
+			bool				_IsSwitchTarget(team_id id);
+			void				_SanitizeIDs(BMessage* data, uint8* windows,
+									ssize_t length);
+			bool				_UpdateIDs(bool set, uint8* windows,
+									ssize_t maxLength, ssize_t* _length);
+			void				_UpdateRegistration(bool set);
+			void				_UnregisterTerminal();
+			void				_RegisterTerminal();
 
-		void _HandleChildCleanup();
-		static void _SigChildHandler(int signal, void* data);
-		static status_t _ChildCleanupThread(void* data);
+			void				_HandleChildCleanup();
+	static	void				_SigChildHandler(int signal, void* data);
+	static	status_t			_ChildCleanupThread(void* data);
 
-		void _Usage(char *name);
+			void				_Usage(char *name);
 
-		bool		fStartFullscreen;
-		BString		fWindowTitle;
-		int32		fWindowNumber;
+private:
+			bool				fStartFullscreen;
+			BString				fWindowTitle;
+			int32				fWindowNumber;
 
-		BWindow*	fTermWindow;
-		BRect		fTermFrame;
-		uint32		fTermWorkspaces;
-		Arguments	*fArgs;
+			BWindow*			fTermWindow;
+			BRect				fTermFrame;
+			uint32				fTermWorkspaces;
+			Arguments*			fArgs;
 };
+
 
 #endif	// TERM_APP_H
