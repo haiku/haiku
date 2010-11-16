@@ -254,10 +254,13 @@ TermWindow::_CanClose(int32 index)
 	}
 
 	if (isBusy) {
-		const char* alertMessage = B_TRANSLATE("A process is still running.\n"
-			"If you close the Terminal the process will be killed.");
-		BAlert* alert = new BAlert(B_TRANSLATE("Really quit?"),
-			alertMessage, B_TRANSLATE("OK"), B_TRANSLATE("Cancel"), NULL,
+		const char* alertMessage = index == -1 || fSessions.CountItems() == 1
+			? B_TRANSLATE("A process is still running.\n"
+				"If you close the Terminal, the process will be killed.")
+			: B_TRANSLATE("A process is still running.\n"
+				"If you close the tab, the process will be killed.");
+		BAlert* alert = new BAlert(B_TRANSLATE("Really close?"),
+			alertMessage, B_TRANSLATE("Close"), B_TRANSLATE("Cancel"), NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		int32 result = alert->Go();
 		if (result == 1)
