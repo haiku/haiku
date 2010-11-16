@@ -628,6 +628,13 @@ TermView::~TermView()
 }
 
 
+pid_t
+TermView::ActiveProcessGroup() const
+{
+	return fShell != NULL ? fShell->ActiveProcessGroup() : -1;
+}
+
+
 bool
 TermView::IsShellBusy() const
 {

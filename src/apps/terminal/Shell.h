@@ -44,6 +44,7 @@ public:
 			int					FD() const;
 			pid_t				ProcessID() const	{ return fProcessID; }
 
+			pid_t				ActiveProcessGroup() const;
 			bool				HasActiveProcesses() const;
 
 	virtual	status_t			AttachBuffer(TerminalBuffer* buffer);

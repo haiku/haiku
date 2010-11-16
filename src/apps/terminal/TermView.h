@@ -46,6 +46,7 @@ public:
 
 	virtual void			GetPreferredSize(float* _width, float* _height);
 
+			pid_t			ActiveProcessGroup() const;
 			bool			IsShellBusy() const;
 
 			const char*		TerminalName() const;
@@ -73,7 +74,7 @@ public:
 			BScrollBar*		ScrollBar() const { return fScrollBar; };
 
 			void			SetMouseClipboard(BClipboard *);
-			
+
 	virtual void			SetTitle(const char* title);
 	virtual void			NotifyQuit(int32 reason);
 
@@ -95,7 +96,7 @@ public:
 
 			void			DisableResizeView(int32 disableCount = 1);
 	static	void			AboutRequested();
-	
+
 protected:
 	virtual void			AttachedToWindow();
 	virtual void			DetachedFromWindow();

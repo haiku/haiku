@@ -231,6 +231,13 @@ Shell::FD() const
 }
 
 
+pid_t
+Shell::ActiveProcessGroup() const
+{
+	return tcgetpgrp(fFd);
+}
+
+
 bool
 Shell::HasActiveProcesses() const
 {
