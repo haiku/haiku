@@ -13,6 +13,7 @@ MergeObject os_main.o :
 	debug.c
 	driver_settings.cpp
 	find_directory.cpp
+	extended_system_info.cpp
 	fs_attr.cpp
 	fs_index.c
 	fs_info.c

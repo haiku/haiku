@@ -23,6 +23,8 @@
 #include <AutoDeleter.h>
 #include <FindDirectory.h>
 
+#include <extended_system_info_defs.h>
+
 #include <boot_device.h>
 #include <elf.h>
 #include <file_cache.h>
@@ -3605,3 +3607,85 @@ _user_get_team_usage_info(team_id team, int32 who, team_usage_info* userInfo,
 	return status;
 }
 
+
+status_t
+_user_get_extended_team_info(team_id teamID, uint32 flags, void* buffer,
+	size_t size, size_t* _sizeNeeded)
+{
+	// check parameters
+	if ((buffer != NULL && !IS_USER_ADDRESS(buffer))
+		|| (buffer == NULL && size > 0)
+		|| _sizeNeeded == NULL || !IS_USER_ADDRESS(_sizeNeeded)) {
+		return B_BAD_ADDRESS;
+	}
+
+	KMessage info;
+
+	if ((flags & B_TEAM_INFO_BASIC) != 0) {
+		// allocate memory for a copy of the team struct
+		struct team* teamClone = new(std::nothrow) team;
+		if (teamClone == NULL)
+			return B_NO_MEMORY;
+		ObjectDeleter<struct team> teamCloneDeleter(teamClone);
+
+		io_context* ioContext;
+		{
+			// get the team structure
+			InterruptsSpinLocker _(gTeamSpinlock);
+			struct team* team = teamID == B_CURRENT_TEAM
+				? thread_get_current_thread()->team
+				: team_get_team_struct_locked(teamID);
+			if (team == NULL)
+				return B_BAD_TEAM_ID;
+
+			// copy it
+			memcpy(teamClone, team, sizeof(*team));
+
+			// also fetch a reference to the I/O context
+			ioContext = team->io_context;
+			vfs_get_io_context(ioContext);
+		}
+		CObjectDeleter<io_context> ioContextPutter(ioContext,
+			&vfs_put_io_context);
+
+		// add the basic data to the info message
+		if (info.AddInt32("id", teamClone->id) != B_OK
+			|| info.AddString("name", teamClone->name) != B_OK
+			|| info.AddInt32("process group", teamClone->group_id) != B_OK
+			|| info.AddInt32("session", teamClone->session_id) != B_OK
+			|| info.AddInt32("uid", teamClone->real_uid) != B_OK
+			|| info.AddInt32("gid", teamClone->real_gid) != B_OK
+			|| info.AddInt32("euid", teamClone->effective_uid) != B_OK
+			|| info.AddInt32("egid", teamClone->effective_gid) != B_OK) {
+			return B_NO_MEMORY;
+		}
+
+		// get the current working directory from the I/O context
+		dev_t cwdDevice;
+		ino_t cwdDirectory;
+		{
+			MutexLocker ioContextLocker(ioContext->io_mutex);
+			vfs_vnode_to_node_ref(ioContext->cwd, &cwdDevice, &cwdDirectory);
+		}
+
+		if (info.AddInt32("cwd device", cwdDevice) != B_OK
+			|| info.AddInt64("cwd directory", cwdDirectory) != B_OK) {
+			return B_NO_MEMORY;
+		}
+	}
+
+	// TODO: Support the other flags!
+
+	// copy the needed size and, if it fits, the message back to userland
+	size_t sizeNeeded = info.ContentSize();
+	if (user_memcpy(_sizeNeeded, &sizeNeeded, sizeof(sizeNeeded)) != B_OK)
+		return B_BAD_ADDRESS;
+
+	if (sizeNeeded > size)
+		return B_BUFFER_OVERFLOW;
+
+	if (user_memcpy(buffer, info.Buffer(), sizeNeeded) != B_OK)
+		return B_BAD_ADDRESS;
+
+	return B_OK;
+}
