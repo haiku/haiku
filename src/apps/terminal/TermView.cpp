@@ -870,9 +870,6 @@ TermView::Encoding() const
 void
 TermView::SetEncoding(int encoding)
 {
-	// TODO: Shell::_Spawn() sets the "TTYPE" environment variable using
-	// the string value of encoding. But when this function is called and
-	// the encoding changes, the new value is never passed to Shell.
 	fEncoding = encoding;
 
 	BAutolock _(fTextBuffer);
