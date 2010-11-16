@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2005-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -635,8 +635,8 @@ void
 KMessage::Dump(void (*printFunc)(const char*, ...)) const
 {
 	Header* header = _Header();
-	printFunc("KMessage: buffer: %p (size/capacity: %ld/%ld), flags: 0x0lx\n",
-		fBuffer, header->size, fBufferCapacity, fFlags);
+	printFunc("KMessage: buffer: %p (size/capacity: %ld/%ld), flags: %#"
+		B_PRIx32 "\n", fBuffer, header->size, fBufferCapacity, fFlags);
 
 	KMessageField field;
 	while (GetNextField(&field) == B_OK) {
