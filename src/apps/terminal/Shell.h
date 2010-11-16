@@ -2,58 +2,63 @@
  * Copyright 2007 Haiku, Inc.
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Copyright (c) 2004 Daniel Furrer <assimil8or@users.sourceforge.net>
- * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
+ * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai.
  * Distributed under the terms of the MIT License.
  * Authors:
  *		Stefano Ceccherini <stefano.ceccherini@gmail.com>
  *		Kian Duffy <myob@users.sourceforge.net>
  *		Kazuho Okui
- *		Takashi Murai 
+ *		Takashi Murai
  */
 #ifndef _SHELL_H
 #define _SHELL_H
 
+
 #include <SupportDefs.h>
+
 
 // TODO: Maybe merge TermParse and Shell classes ?
 class TerminalBuffer;
 class TermParse;
 
+
 class Shell {
 public:
-			Shell();
-	virtual		~Shell();
+								Shell();
+	virtual						~Shell();
 
-	status_t	Open(int row, int col, const char* encoding,
-							int argc, const char** argv);
-	void		Close();
-	
-	const char*	TTYName() const;
+			status_t			Open(int row, int col, const char* encoding,
+									int argc, const char** argv);
+			void				Close();
 
-	ssize_t		Read(void* buffer, size_t numBytes) const;
-	ssize_t		Write(const void* buffer, size_t numBytes);
+			const char*			TTYName() const;
 
-	status_t	UpdateWindowSize(int row, int columns);
+			ssize_t				Read(void* buffer, size_t numBytes) const;
+			ssize_t				Write(const void* buffer, size_t numBytes);
 
-	status_t	GetAttr(struct termios& attr) const;
-	status_t	SetAttr(const struct termios& attr);
+			status_t			UpdateWindowSize(int row, int columns);
 
-	int			FD() const;
-	pid_t		ProcessID() const	{ return fProcessID; }
+			status_t			GetAttr(struct termios& attr) const;
+			status_t			SetAttr(const struct termios& attr);
 
-	bool		HasActiveProcesses() const;
-	
-	virtual	status_t	AttachBuffer(TerminalBuffer* buffer);
-	virtual void	DetachBuffer();
-	
+			int					FD() const;
+			pid_t				ProcessID() const	{ return fProcessID; }
+
+			bool				HasActiveProcesses() const;
+
+	virtual	status_t			AttachBuffer(TerminalBuffer* buffer);
+	virtual void				DetachBuffer();
+
 private:
-	int		fFd;
-	pid_t		fProcessID;
-	TermParse*	fTermParse;
-	bool		fAttached;
+			status_t			_Spawn(int row, int col, const char* encoding,
+									int argc, const char** argv);
 
-	status_t	_Spawn(int row, int col, const char* encoding,
-							int argc, const char** argv);
+private:
+			int					fFd;
+			pid_t				fProcessID;
+			TermParse*			fTermParse;
+			bool				fAttached;
 };
+
 
 #endif // _SHELL_H
