@@ -1,16 +1,16 @@
 /*
- * Copyright 2001-2007, Haiku, Inc.
+ * Copyright 2001-2010, Haiku, Inc.
  * Copyright 2003-2004 Kian Duffy, myob@users.sourceforge.net
- * Parts Copyright 1998-1999 Kazuho Okui and Takashi Murai. 
+ * Parts Copyright 1998-1999 Kazuho Okui and Takashi Murai.
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 #ifndef APPEARANCE_PREF_VIEW_H
 #define APPEARANCE_PREF_VIEW_H
 
 
+#include <GroupView.h>
 #include <Messenger.h>
 #include <String.h>
-#include <GroupView.h>
 
 
 const ulong MSG_HALF_FONT_CHANGED	= 'mchf';
@@ -36,45 +36,48 @@ class BMenuField;
 class BPopUpMenu;
 class BCheckBox;
 
+
 class AppearancePrefView : public BGroupView {
 public:
-								AppearancePrefView(const char *name,
+								AppearancePrefView(const char* name,
 									const BMessenger &messenger);
 
 	virtual	void				Revert();
-	virtual void				MessageReceived(BMessage *message);
+	virtual void				MessageReceived(BMessage* message);
 	virtual void				AttachedToWindow();
 
-	virtual	void				GetPreferredSize(float *_width,
-									float *_height);
+	virtual	void				GetPreferredSize(float* _width,
+									float* _height);
 
 private:
 			void				_EnableCustomColors(bool enable);
 
-			void				_ChangeColorSchema(color_schema *schema);
-			void				_SetCurrentColorSchema(BMenuField *field);
+			void				_ChangeColorSchema(color_schema* schema);
+			void				_SetCurrentColorSchema(BMenuField* field);
 
 	static	BMenu*				_MakeFontMenu(uint32 command,
-									const char *defaultFamily,
-									const char *defaultStyle);
+									const char* defaultFamily,
+									const char* defaultStyle);
 	static	BMenu*				_MakeSizeMenu(uint32 command,
 									uint8 defaultSize);
-	
-	static	BPopUpMenu*			_MakeMenu(uint32 msg, const char **items,
-										const char *defaultItem);
 
-	static	BPopUpMenu*			_MakeColorSchemaMenu(uint32 msg, const color_schema **schemas,
-									const color_schema *defaultItemName);
-			
-			BCheckBox			*fWarnOnExit;
-			BMenuField			*fFont;
-			BMenuField			*fFontSize;
+	static	BPopUpMenu*			_MakeMenu(uint32 msg, const char** items,
+										const char* defaultItem);
 
-			BMenuField			*fColorSchemaField;
-			BMenuField			*fColorField;
-			BColorControl		*fColorControl;
+	static	BPopUpMenu*			_MakeColorSchemaMenu(uint32 msg,
+									const color_schema** schemas,
+									const color_schema* defaultItemName);
+
+			BCheckBox*			fWarnOnExit;
+			BMenuField*			fFont;
+			BMenuField*			fFontSize;
+
+			BMenuField*			fColorSchemaField;
+			BMenuField*			fColorField;
+			BColorControl*		fColorControl;
 
 			BMessenger			fTerminalMessenger;
 };
+
 
 #endif	// APPEARANCE_PREF_VIEW_H

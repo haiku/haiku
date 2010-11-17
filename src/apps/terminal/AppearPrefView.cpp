@@ -129,7 +129,8 @@ AppearancePrefView::AppearancePrefView(const char* name,
 	fColorSchemaField->SetAlignment(B_ALIGN_RIGHT);
 
 	fColorControl->SetEnabled(false);
-	fColorControl->SetValue(PrefHandler::Default()->getRGB(PREF_TEXT_FORE_COLOR));
+	fColorControl->SetValue(
+		PrefHandler::Default()->getRGB(PREF_TEXT_FORE_COLOR));
 
 	fWarnOnExit->SetValue(PrefHandler::Default()->getBool(PREF_WARN_ON_EXIT));
 
@@ -419,7 +420,7 @@ AppearancePrefView::_MakeSizeMenu(uint32 command, uint8 defaultSize)
 
 
 /*static*/ BPopUpMenu*
-AppearancePrefView::_MakeMenu(uint32 msg, const char **items,
+AppearancePrefView::_MakeMenu(uint32 msg, const char** items,
 	const char* defaultItemName)
 {
 	BPopUpMenu* menu = new BPopUpMenu("");
@@ -429,7 +430,7 @@ AppearancePrefView::_MakeMenu(uint32 msg, const char **items,
 		if (!strcmp((*items), ""))
 			menu->AddSeparatorItem();
 		else {
-			BMessage *message = new BMessage(msg);
+			BMessage* message = new BMessage(msg);
 			menu->AddItem(new BMenuItem((*items), message));
 		}
 
@@ -444,7 +445,7 @@ AppearancePrefView::_MakeMenu(uint32 msg, const char **items,
 
 
 /*static*/ BPopUpMenu*
-AppearancePrefView::_MakeColorSchemaMenu(uint32 msg, const color_schema **items,
+AppearancePrefView::_MakeColorSchemaMenu(uint32 msg, const color_schema** items,
 	const color_schema* defaultItemName)
 {
 	BPopUpMenu* menu = new BPopUpMenu("");
@@ -454,7 +455,7 @@ AppearancePrefView::_MakeColorSchemaMenu(uint32 msg, const color_schema **items,
 		if (!strcmp((*items)->name, ""))
 			menu->AddSeparatorItem();
 		else {
-			BMessage *message = new BMessage(msg);
+			BMessage* message = new BMessage(msg);
 			message->AddPointer("color_schema", (const void*)*items);
 			menu->AddItem(new BMenuItem((*items)->name, message));
 		}
