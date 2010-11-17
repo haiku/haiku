@@ -137,20 +137,7 @@ PrefHandler::GetDefaultPath(BPath& path)
 	if (status != B_OK)
 		return status;
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
-	status = path.Append("Default");
-#else
-	status = path.Append("HaikuTerminal_settings");
-#endif
-
-	return status;
-}
-
-
-status_t
-PrefHandler::Open(const char *path)
-{
-	return _LoadFromFile(path);
+	return path.Append("Default");
 }
 
 
@@ -158,22 +145,6 @@ status_t
 PrefHandler::OpenText(const char *path)
 {
 	return _LoadFromTextFile(path);
-}
-
-
-status_t
-PrefHandler::Save(const char *path)
-{
-	// make sure the target path exists
-#if 0
-	// TODO: currently not needed as we're reusing the standard directory
-	BPath directoryPath(path);
-	if (directoryPath.GetParent(&directoryPath) == B_OK)
-		create_directory(directoryPath.Path(), 0755);
-#endif
-
-	BFile file(path, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
-	return fContainer.Flatten(&file);
 }
 
 
@@ -384,49 +355,6 @@ PrefHandler::_ConfirmFont(const char *key, const BFont *fallback)
 
 	fallback->GetFamilyAndStyle(&family, NULL);
 	setString(key, family);
-}
-
-
-status_t
-PrefHandler::_LoadFromFile(const char* path)
-{
-	// Future: It would be nice if we could simply use a flatened BMessage to
-	// save the settings. (Who cares about compatibility in this case anyway?)
-
-	BFile file(path, B_READ_ONLY);
-	status_t status = file.InitCheck();
-	if (status != B_OK)
-		return status;
-
-	//fContainer.MakeEmpty();
-	//fContainer.Unflatten(&file);
-
-	off_t size;
-	if (file.GetSize(&size) != B_OK || size != sizeof(struct termprefs))
-		return B_ERROR;
-
-	struct termprefs prefs;
-	file.Read(&prefs, size);
-	if (prefs.magic != TP_MAGIC || prefs.version != TP_VERSION)
-		return B_ERROR;
-
-	// Valid settings file!
-
-	setInt32(PREF_COLS, prefs.cols);
-	setInt32(PREF_ROWS, prefs.rows);
-	setInt32(PREF_HALF_FONT_SIZE, prefs.font_size);
-	char *font_family = strtok(prefs.font, "/");
-	char *font_style = strtok(NULL, "");
-	setString(PREF_HALF_FONT_FAMILY, font_family);
-	setString(PREF_HALF_FONT_STYLE, font_style);
-	setRGB(PREF_TEXT_BACK_COLOR, prefs.bg);
-	setRGB(PREF_TEXT_FORE_COLOR, prefs.fg);
-	setRGB(PREF_SELECT_BACK_COLOR, prefs.selbg);
-	setRGB(PREF_SELECT_FORE_COLOR, prefs.selfg);
-	setString(PREF_TEXT_ENCODING, EncodingAsString(prefs.encoding));
-	setBool(PREF_WARN_ON_EXIT, prefs.warn_on_exit);
-
-	return B_OK;
 }
 
 
