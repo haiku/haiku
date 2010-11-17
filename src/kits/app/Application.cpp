@@ -31,8 +31,6 @@
 #include <RegistrarDefs.h>
 #include <Resources.h>
 #include <Roster.h>
-#include <Screen.h>
-#include <String.h>
 #include <Window.h>
 
 #include <AppMisc.h>
@@ -48,46 +46,6 @@
 
 
 using namespace BPrivate;
-
-
-void
-restore_window_geometry(BWindow* window, const BMessage* windowGeometry)
-{
-	BRect frame;
-	status_t status = windowGeometry->FindRect("frame", &frame);
-	if (status == B_OK) {
-		// make sure window is on the screen
-		BScreen screen;
-		BRect screenFrame = screen.Frame();
-		if (screenFrame.right < frame.left || screenFrame.bottom < frame.top)
-			frame.OffsetBy(-frame.top, -frame.left);
-
-		window->MoveTo(frame.LeftTop());
-		window->ResizeTo(frame.Width(), frame.Height());
-	}
-
-	uint32 workspaces;
-	status = windowGeometry->FindInt32("workspaces", (int32*)&workspaces);
-	if (status == B_OK)
-		window->SetWorkspaces(workspaces);
-
-	BMessage decoratroSettings;
-	status = windowGeometry->FindMessage("decorator_settings",
-		&decoratroSettings);
-	if (status == B_OK)
-		window->SetDecoratorSettings(decoratroSettings);
-}
-
-
-void
-save_window_geometry(const BWindow* window, BMessage* windowGeometry)
-{
-	windowGeometry->AddRect("frame", window->Frame());
-	windowGeometry->AddInt32("workspaces", window->Workspaces());
-	BMessage decoratroSettings;
-	if (window->GetDecoratorSettings(&decoratroSettings) == B_OK)
-		windowGeometry->AddMessage("decorator_settings", &decoratroSettings);
-}
 
 
 BApplication *be_app = NULL;
@@ -316,7 +274,6 @@ BApplication::_InitData(const char *signature, bool initGUI, status_t *_error)
 	fServerAllocator = NULL;
 	fInitialWorkspace = 0;
 	//fDraggedMessage = NULL;
-	fHasBeenRestored = 0;
 	fReadyToRunCalled = false;
 
 	// initially, there is no pulse
@@ -615,8 +572,6 @@ BApplication::ReadyToRun()
 	// supposed to be implemented by subclasses
 }
 
-#include "ApplicationPrivate.h"
-
 
 void
 BApplication::MessageReceived(BMessage *message)
@@ -641,19 +596,6 @@ BApplication::MessageReceived(BMessage *message)
 			// (see _InitData())
 			be_roster->ActivateApp(Team());
 			break;
-
-		case kRestoreStateMsg:
-			if (RestoreState(message) == B_OK)
-				fHasBeenRestored = 1;
-			break;
-
-		case kSaveStateMsg:
-		{
-			BMessage state;
-			if (SaveState(&state) == B_OK)
-				message->SendReply(&state);
-			break;
-		}
 
 		default:
 			BLooper::MessageReceived(message);
@@ -1083,56 +1025,6 @@ status_t
 BApplication::Perform(perform_code d, void *arg)
 {
 	return BLooper::Perform(d, arg);
-}
-
-
-bool
-BApplication::HasBeenRestored()
-{
-	return fHasBeenRestored != 0;
-}
-
-
-status_t
-BApplication::RestoreState(const BMessage* state)
-{
-	int32 i = 0;
-	while (true) {
-		BMessage windowState;
-		if (state->FindMessage("window", i, &windowState) != B_OK)
-			break;
-		i++;
- 
-		BString title;
-		if (windowState.FindString("title", &title) != B_OK)
-			continue;
-
-		for (int i = 0; i < CountWindows(); i++) {
-			BWindow* window = WindowAt(i);
-			if (title != window->Title())
-				continue;
-			restore_window_geometry(window, &windowState);
-		}
-	}
-
-	return B_OK;
-}
-
-
-status_t
-BApplication::SaveState(BMessage* state) const
-{
-	// just store all window positions
-	for (int i = 0; i < CountWindows(); i++) {
-		BWindow* window = WindowAt(i);
-		
-		BMessage windowState;
-		save_window_geometry(window, &windowState);
-		windowState.AddString("title", window->Title());
-		state->AddMessage("window", &windowState);
-	}
-
-	return B_OK;
 }
 
 
