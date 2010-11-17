@@ -32,6 +32,7 @@
 #define TERM_WINDOW_H
 
 
+#include <MessageRunner.h>
 #include <String.h>
 #include <Window.h>
 
@@ -49,11 +50,12 @@ class TermViewContainerView;
 
 class TermWindow : public BWindow {
 public:
-								TermWindow(BRect frame, const char* title,
+								TermWindow(BRect frame, const BString& title,
+									bool isUserDefinedTitle, int32 windowIndex,
 									uint32 workspaces, Arguments* args);
 	virtual						~TermWindow();
 
-			void				SetSessionWindowTitle(TermView* termView,
+			void				SetSessionTitle(TermView* termView,
 									const char* title);
 			void				SessionChanged();
 
@@ -66,6 +68,12 @@ protected:
 	virtual void				FrameResized(float newWidth, float newHeight);
 
 private:
+			struct Title {
+				BString			title;
+				BString			pattern;
+				bool			patternUserDefined;
+			};
+
 			struct Session;
 			class TabView;
 			friend class TabView;
@@ -92,10 +100,18 @@ private:
 			void				_CheckChildren();
 			void				_ResizeView(TermView* view);
 
+			void				_TitleSettingsChanged();
+			void				_UpdateTitles();
+			void				_UpdateSessionTitle(int32 index);
+
 			int32				_NewSessionID();
 
 private:
-			BString				fInitialTitle;
+			Title				fTitle;
+			BString				fSessionTitlePattern;
+			int32				fWindowIndex;
+			BMessageRunner		fTitleUpdateRunner;
+
 			BList				fSessions;
 
 			TabView*			fTabView;

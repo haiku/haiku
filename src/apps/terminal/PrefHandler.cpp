@@ -57,6 +57,8 @@ static const pref_defaults kTermDefaults[] = {
 	{ PREF_GUI_LANGUAGE,		"English"},
 	{ PREF_IM_AWARE,			"0"},
 
+	{ PREF_TAB_TITLE,			"%1d: %p" },
+	{ PREF_WINDOW_TITLE,		"Terminal %i: %t" },
 	{ PREF_WARN_ON_EXIT,		PREF_TRUE },
 
 	{ NULL, NULL},

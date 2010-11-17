@@ -59,6 +59,7 @@ main()
 TermApp::TermApp()
 	: BApplication(TERM_SIGNATURE),
 	fStartFullscreen(false),
+	fWindowTitleUserDefined(false),
 	fWindowNumber(-1),
 	fTermWindow(NULL),
 	fArgs(NULL)
@@ -222,8 +223,10 @@ TermApp::ArgvReceived(int32 argc, char **argv)
 		return;
 	}
 
-	if (fArgs->Title() != NULL)
+	if (fArgs->Title() != NULL) {
 		fWindowTitle = fArgs->Title();
+		fWindowTitleUserDefined = true;
+	}
 
 	fStartFullscreen = fArgs->FullScreen();
 }
@@ -361,8 +364,8 @@ status_t
 TermApp::_MakeTermWindow(BRect &frame, uint32 workspaces)
 {
 	try {
-		fTermWindow = new TermWindow(frame, fWindowTitle.String(), workspaces,
-			fArgs);
+		fTermWindow = new TermWindow(frame, fWindowTitle,
+			fWindowTitleUserDefined, fWindowNumber, workspaces, fArgs);
 	} catch (int error) {
 		return (status_t)error;
 	} catch (...) {

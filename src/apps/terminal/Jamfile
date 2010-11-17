@@ -17,6 +17,7 @@ Application Terminal :
 	Globals.cpp
 	HistoryBuffer.cpp
 	InlineInput.cpp
+	PatternEvaluator.cpp
 	PrefHandler.cpp
 	PrefWindow.cpp
 	Shell.cpp
@@ -29,6 +30,7 @@ Application Terminal :
 	TermScrollView.cpp
 	TermView.cpp
 	TermWindow.cpp
+	TitlePlaceholderMapper.cpp
 	VTKeyTbl.c
 	VTPrsTbl.c
 	: be $(HAIKU_LOCALE_LIBS) tracker textencoding $(TARGET_LIBSUPC++)

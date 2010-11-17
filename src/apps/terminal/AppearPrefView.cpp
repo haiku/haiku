@@ -106,17 +106,48 @@ AppearancePrefView::AppearancePrefView(const char* name,
 			colorsPopUp);
 	fColorField->SetEnabled(false);
 
+	fTabTitle = new BTextControl("tabTitle", B_TRANSLATE("Tab title:"), "",
+		NULL);
+	fTabTitle->SetModificationMessage(
+		new BMessage(MSG_TAB_TITLE_SETTING_CHANGED));
+	fTabTitle->SetToolTip(B_TRANSLATE(
+		"The pattern specifying the tab titles. The following placeholders\n"
+		"can be used:\n"
+		"\t%d\t-\tThe current working directory of the active process.\n"
+		"\t\t\tOptionally the maximum number of path components can be\n"
+		"\t\t\tspecified. E.g. '%2d' for at most two components.\n"
+		"\t%i\t-\tThe index of the tab.\n"
+		"\t%p\t-\tThe name of the active process.\n"
+		"\t%%\t-\tThe character '%'."));
+
+	fWindowTitle = new BTextControl("windowTitle", B_TRANSLATE("Window title:"),
+		"", NULL);
+	fWindowTitle->SetModificationMessage(
+		new BMessage(MSG_WINDOW_TITLE_SETTING_CHANGED));
+	fWindowTitle->SetToolTip(B_TRANSLATE(
+		"The pattern specifying the window titles. The following placeholders\n"
+		"can be used:\n"
+		"\t%d\t-\tThe current working directory of the active process in the.\n"
+		"\t\t\tcurrent tab. Optionally the maximum number of path components\n"
+		"\t\t\tcan be specified. E.g. '%2d' for at most two components.\n"
+		"\t%i\t-\tThe index of the window.\n"
+		"\t%p\t-\tThe name of the active process in the current tab.\n"
+		"\t%t\t-\tThe title of the current tab.\n"
+		"\t%%\t-\tThe character '%'."));
+
 	BLayoutBuilder::Group<>(this)
 		.SetInsets(5, 5, 5, 5)
 		.AddGrid(5, 5)
-			.Add(fFont->CreateLabelLayoutItem(), 0, 0)
-			.Add(fFont->CreateMenuBarLayoutItem(), 1, 0)
-			.Add(fFontSize->CreateLabelLayoutItem(), 0, 1)
-			.Add(fFontSize->CreateMenuBarLayoutItem(), 1, 1)
-			.Add(fColorSchemaField->CreateLabelLayoutItem(), 0, 2)
-			.Add(fColorSchemaField->CreateMenuBarLayoutItem(), 1, 2)
-			.Add(fColorField->CreateLabelLayoutItem(), 0, 3)
-			.Add(fColorField->CreateMenuBarLayoutItem(), 1, 3)
+			.AddTextControl(fTabTitle, 0, 0, B_ALIGN_RIGHT)
+			.AddTextControl(fWindowTitle, 0, 1, B_ALIGN_RIGHT)
+			.Add(fFont->CreateLabelLayoutItem(), 0, 2)
+			.Add(fFont->CreateMenuBarLayoutItem(), 1, 2)
+			.Add(fFontSize->CreateLabelLayoutItem(), 0, 3)
+			.Add(fFontSize->CreateMenuBarLayoutItem(), 1, 3)
+			.Add(fColorSchemaField->CreateLabelLayoutItem(), 0, 4)
+			.Add(fColorSchemaField->CreateMenuBarLayoutItem(), 1, 4)
+			.Add(fColorField->CreateLabelLayoutItem(), 0, 5)
+			.Add(fColorField->CreateMenuBarLayoutItem(), 1, 5)
 			.End()
 		.AddGlue()
 		.Add(fColorControl = new BColorControl(BPoint(10, 10),
@@ -127,6 +158,9 @@ AppearancePrefView::AppearancePrefView(const char* name,
 	fFontSize->SetAlignment(B_ALIGN_RIGHT);
 	fColorField->SetAlignment(B_ALIGN_RIGHT);
 	fColorSchemaField->SetAlignment(B_ALIGN_RIGHT);
+
+	fTabTitle->SetText(PrefHandler::Default()->getString(PREF_TAB_TITLE));
+	fWindowTitle->SetText(PrefHandler::Default()->getString(PREF_WINDOW_TITLE));
 
 	fColorControl->SetEnabled(false);
 	fColorControl->SetValue(
@@ -158,6 +192,9 @@ AppearancePrefView::GetPreferredSize(float* _width, float* _height)
 void
 AppearancePrefView::Revert()
 {
+	fTabTitle->SetText(PrefHandler::Default()->getString(PREF_TAB_TITLE));
+	fWindowTitle->SetText(PrefHandler::Default()->getString(PREF_WINDOW_TITLE));
+
 	fWarnOnExit->SetValue(PrefHandler::Default()->getBool(
 		PREF_WARN_ON_EXIT));
 
@@ -175,6 +212,8 @@ AppearancePrefView::Revert()
 void
 AppearancePrefView::AttachedToWindow()
 {
+	fTabTitle->SetTarget(this);
+	fWindowTitle->SetTarget(this);
 	fWarnOnExit->SetTarget(this);
 
 	fFontSize->Menu()->SetTargetForItems(this);
@@ -271,6 +310,30 @@ AppearancePrefView::MessageReceived(BMessage* msg)
 					modified = true;
 			}
 			break;
+
+		case MSG_TAB_TITLE_SETTING_CHANGED:
+		{
+			BString oldValue(PrefHandler::Default()->getString(PREF_TAB_TITLE));
+			if (oldValue != fTabTitle->Text()) {
+				PrefHandler::Default()->setString(PREF_TAB_TITLE,
+					fTabTitle->Text());
+				modified = true;
+			}
+			break;
+		}
+
+		case MSG_WINDOW_TITLE_SETTING_CHANGED:
+		{
+			BString oldValue(PrefHandler::Default()->getString(
+				PREF_WINDOW_TITLE));
+			if (oldValue != fWindowTitle->Text()) {
+				PrefHandler::Default()->setString(PREF_WINDOW_TITLE,
+					fWindowTitle->Text());
+				modified = true;
+			}
+			break;
+		}
+
 		default:
 			BView::MessageReceived(msg);
 			return;

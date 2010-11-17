@@ -85,6 +85,7 @@ private:
 private:
 			bool				fStartFullscreen;
 			BString				fWindowTitle;
+			bool				fWindowTitleUserDefined;
 			int32				fWindowNumber;
 
 			BWindow*			fTermWindow;

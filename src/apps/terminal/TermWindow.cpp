@@ -44,6 +44,7 @@
 #include "TermConst.h"
 #include "TermScrollView.h"
 #include "TermView.h"
+#include "TitlePlaceholderMapper.h"
 
 
 const static int32 kMaxTabs = 6;
@@ -55,6 +56,7 @@ const static uint32 kCloseView = 'ClVw';
 const static uint32 kIncreaseFontSize = 'InFs';
 const static uint32 kDecreaseFontSize = 'DcFs';
 const static uint32 kSetActiveTab = 'STab';
+const static uint32 kUpdateTitles = 'UPti';
 
 
 #undef B_TRANSLATE_CONTEXT
@@ -100,8 +102,7 @@ private:
 
 struct TermWindow::Session {
 	int32					id;
-	BString					name;
-	BString					windowTitle;
+	Title					title;
 	TermViewContainerView*	containerView;
 
 	Session(int32 id, TermViewContainerView* containerView)
@@ -109,8 +110,9 @@ struct TermWindow::Session {
 		id(id),
 		containerView(containerView)
 	{
-		name = B_TRANSLATE("Shell ");
-		name << id;
+		title.title = B_TRANSLATE("Shell ");
+		title.title << id;
+		title.patternUserDefined = false;
 	}
 };
 
@@ -140,12 +142,14 @@ private:
 };
 
 
-TermWindow::TermWindow(BRect frame, const char* title, uint32 workspaces,
+TermWindow::TermWindow(BRect frame, const BString& title,
+	bool isUserDefinedTitle, int32 windowIndex, uint32 workspaces,
 	Arguments* args)
 	:
 	BWindow(frame, title, B_DOCUMENT_WINDOW,
 		B_CURRENT_WORKSPACE | B_QUIT_ON_WINDOW_CLOSE, workspaces),
-	fInitialTitle(title),
+	fWindowIndex(windowIndex),
+	fTitleUpdateRunner(this, BMessage(kUpdateTitles), 1000000),
 	fTabView(NULL),
 	fMenubar(NULL),
 	fFilemenu(NULL),
@@ -166,6 +170,12 @@ TermWindow::TermWindow(BRect frame, const char* title, uint32 workspaces,
 	fMatchWord(false),
 	fFullScreen(false)
 {
+	// apply the title settings
+	fTitle.title = title;
+	fTitle.pattern = title;
+	fTitle.patternUserDefined = isUserDefinedTitle;
+	_TitleSettingsChanged();
+
 	_InitWindow();
 	_AddTab(args);
 }
@@ -189,15 +199,13 @@ TermWindow::~TermWindow()
 
 
 void
-TermWindow::SetSessionWindowTitle(TermView* termView, const char* title)
+TermWindow::SetSessionTitle(TermView* termView, const char* title)
 {
 	int32 index = _IndexOfTermView(termView);
 	if (Session* session = (Session*)fSessions.ItemAt(index)) {
-		session->windowTitle = title;
-		BTab* tab = fTabView->TabAt(index);
-		tab->SetLabel(session->windowTitle.String());
-		if (index == fTabView->Selection())
-			SetTitle(session->windowTitle.String());
+		session->title.pattern = title;
+		session->title.patternUserDefined = true;
+		_UpdateSessionTitle(index);
 	}
 }
 
@@ -205,9 +213,7 @@ TermWindow::SetSessionWindowTitle(TermView* termView, const char* title)
 void
 TermWindow::SessionChanged()
 {
-	int32 index = fTabView->Selection();
-	if (Session* session = (Session*)fSessions.ItemAt(index))
-		SetTitle(session->windowTitle.String());
+	_UpdateSessionTitle(fTabView->Selection());
 }
 
 
@@ -509,6 +515,11 @@ TermWindow::MessageReceived(BMessage *message)
 			fPrefWindow = NULL;
 			break;
 
+		case MSG_WINDOW_TITLE_SETTING_CHANGED:
+		case MSG_TAB_TITLE_SETTING_CHANGED:
+			_TitleSettingsChanged();
+			break;
+
 		case MENU_FIND_STRING:
 			if (!fFindPanel) {
 				fFindPanel = new FindWindow(this, fFindString, fFindSelection,
@@ -755,6 +766,10 @@ TermWindow::MessageReceived(BMessage *message)
 			break;
 		}
 
+		case kUpdateTitles:
+			_UpdateTitles();
+			break;
+
 		default:
 			BWindow::MessageReceived(message);
 			break;
@@ -870,7 +885,6 @@ TermWindow::_AddTab(Arguments* args, const BString& currentDirectory)
 			fTabView->SetScrollView(scrollView);
 
 		Session* session = new Session(_NewSessionID(), containerView);
-		session->windowTitle = fInitialTitle;
 		fSessions.AddItem(session);
 
 		BFont font;
@@ -905,10 +919,6 @@ TermWindow::_AddTab(Arguments* args, const BString& currentDirectory)
 
 		BTab* tab = new BTab;
 		fTabView->AddTab(scrollView, tab);
-		tab->SetLabel(session->name.String());
-			// TODO: Use a better name. For example, do like MacOS X's Terminal
-			// and update the title using the last executed command ?
-			// Or like Gnome's Terminal and use the current path ?
 		view->SetScrollBar(scrollView->ScrollBar(B_VERTICAL));
 		view->SetMouseClipboard(gMouseClipboard);
 		view->SetEncoding(EncodingID(
@@ -916,8 +926,10 @@ TermWindow::_AddTab(Arguments* args, const BString& currentDirectory)
 
 		_SetTermColors(containerView);
 
-		// TODO: No fTabView->Select(tab); ?
-		fTabView->Select(fTabView->CountTabs() - 1);
+		int32 tabIndex = fTabView->CountTabs() - 1;
+		fTabView->Select(tabIndex);
+
+		_UpdateSessionTitle(tabIndex);
 	} catch (...) {
 		// most probably out of memory. That's bad.
 		// TODO: Should cleanup, I guess
@@ -1096,6 +1108,72 @@ TermWindow::_MakeWindowSizeMenu()
 }
 
 
+void
+TermWindow::_TitleSettingsChanged()
+{
+	if (!fTitle.patternUserDefined)
+		fTitle.pattern = PrefHandler::Default()->getString(PREF_WINDOW_TITLE);
+
+	fSessionTitlePattern = PrefHandler::Default()->getString(PREF_TAB_TITLE);
+
+	_UpdateTitles();
+}
+
+
+void
+TermWindow::_UpdateTitles()
+{
+	int32 sessionCount = fSessions.CountItems();
+	for (int32 i = 0; i < sessionCount; i++)
+		_UpdateSessionTitle(i);
+}
+
+
+void
+TermWindow::_UpdateSessionTitle(int32 index)
+{
+	Session* session = (Session*)fSessions.ItemAt(index);
+	if (session == NULL)
+		return;
+
+	// get the active process info
+	ActiveProcessInfo activeProcessInfo;
+	if (!_TermViewAt(index)->GetActiveProcessInfo(activeProcessInfo))
+		return;
+
+	// evaluate the session title pattern
+	BString sessionTitlePattern = session->title.patternUserDefined
+		? session->title.pattern : fSessionTitlePattern;
+	TabTitlePlaceholderMapper tabMapper(activeProcessInfo, session->id);
+	const BString& sessionTitle = PatternEvaluator::Evaluate(
+		sessionTitlePattern, tabMapper);
+
+	// set the tab title
+	if (sessionTitle != session->title.title) {
+		session->title.title = sessionTitle;
+		BTab* tab = fTabView->TabAt(index);
+		tab->SetLabel(session->title.title);
+		fTabView->Invalidate(fTabView->TabFrame(index));
+	}
+
+	// If this is the active tab, also recompute the window title.
+	if (index != fTabView->Selection())
+		return;
+
+	// evaluate the window title pattern
+	WindowTitlePlaceholderMapper windowMapper(activeProcessInfo, fWindowIndex,
+		sessionTitle);
+	const BString& windowTitle = PatternEvaluator::Evaluate(fTitle.pattern,
+		windowMapper);
+
+	// set the window title
+	if (windowTitle != fTitle.title) {
+		fTitle.title = windowTitle;
+		SetTitle(fTitle.title);
+	}
+}
+
+
 int32
 TermWindow::_NewSessionID()
 {
@@ -1152,6 +1230,6 @@ CustomTermView::NotifyQuit(int32 reason)
 void
 CustomTermView::SetTitle(const char* title)
 {
-	dynamic_cast<TermWindow*>(Window())->SetSessionWindowTitle(this, title);
+	dynamic_cast<TermWindow*>(Window())->SetSessionTitle(this, title);
 }
 

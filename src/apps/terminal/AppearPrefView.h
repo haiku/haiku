@@ -13,28 +13,31 @@
 #include <String.h>
 
 
-const ulong MSG_HALF_FONT_CHANGED	= 'mchf';
-const ulong MSG_HALF_SIZE_CHANGED	= 'mchs';
-const ulong MSG_FULL_FONT_CHANGED	= 'mcff';
-const ulong MSG_FULL_SIZE_CHANGED	= 'mcfs';
-const ulong MSG_COLOR_FIELD_CHANGED	= 'mccf';
-const ulong MSG_COLOR_CHANGED		= 'mcbc';
-const ulong MSG_COLOR_SCHEMA_CHANGED		= 'mccs';
+static const uint32 MSG_HALF_FONT_CHANGED				= 'mchf';
+static const uint32 MSG_HALF_SIZE_CHANGED				= 'mchs';
+static const uint32 MSG_FULL_FONT_CHANGED				= 'mcff';
+static const uint32 MSG_FULL_SIZE_CHANGED				= 'mcfs';
+static const uint32 MSG_COLOR_FIELD_CHANGED				= 'mccf';
+static const uint32 MSG_COLOR_CHANGED					= 'mcbc';
+static const uint32 MSG_COLOR_SCHEMA_CHANGED			= 'mccs';
 
-const ulong MSG_WARN_ON_EXIT_CHANGED	= 'mwec';
-const ulong MSG_COLS_CHANGED            = 'mccl';
-const ulong MSG_ROWS_CHANGED            = 'mcrw';
-const ulong MSG_HISTORY_CHANGED         = 'mhst';
+static const uint32 MSG_TAB_TITLE_SETTING_CHANGED		= 'mtts';
+static const uint32 MSG_WINDOW_TITLE_SETTING_CHANGED	= 'mwts';
+static const uint32 MSG_WARN_ON_EXIT_CHANGED			= 'mwec';
+static const uint32 MSG_COLS_CHANGED					= 'mccl';
+static const uint32 MSG_ROWS_CHANGED					= 'mcrw';
+static const uint32 MSG_HISTORY_CHANGED 				= 'mhst';
 
-const ulong MSG_PREF_MODIFIED		= 'mpmo';
+static const uint32 MSG_PREF_MODIFIED					= 'mpmo';
 
 
 struct color_schema;
+class BCheckBox;
 class BColorControl;
 class BMenu;
 class BMenuField;
 class BPopUpMenu;
-class BCheckBox;
+class BTextControl;
 
 
 class AppearancePrefView : public BGroupView {
@@ -75,6 +78,9 @@ private:
 			BMenuField*			fColorSchemaField;
 			BMenuField*			fColorField;
 			BColorControl*		fColorControl;
+
+			BTextControl*		fTabTitle;
+			BTextControl*		fWindowTitle;
 
 			BMessenger			fTerminalMessenger;
 };
