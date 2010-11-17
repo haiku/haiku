@@ -334,8 +334,7 @@ StackAndTile::SetDecoratorSettings(Window* window, const BMessage& settings)
 	if (!satWindow)
 		return false;
 
-	//return satWindow->SetSettings(settings);
-	return false;
+	return satWindow->SetSettings(settings);
 }
 
 
@@ -346,7 +345,7 @@ StackAndTile::GetDecoratorSettings(Window* window, BMessage& settings)
 	if (!satWindow)
 		return;
 
-	//satWindow->GetSettings(&settings);
+	satWindow->GetSettings(settings);
 }
 
 
@@ -358,16 +357,26 @@ StackAndTile::GetSATWindow(Window* window)
 	if (it != fSATWindowMap.end())
 		return it->second;
 
-	// for now don't create window on the fly
-	return NULL;
 	// If we don't know this window, memory allocation might has been failed
-	// previously. Try to add window now
-/*	SATWindow* satWindow = new (std::nothrow)SATWindow(
-		window, this);
+	// previously. Try to add the window now.
+	SATWindow* satWindow = new (std::nothrow)SATWindow(this, window);
 	if (satWindow)
 		fSATWindowMap[window] = satWindow;
 
-	return satWindow;*/
+	return satWindow;
+}
+
+
+SATWindow*
+StackAndTile::FindSATWindow(uint64 id)
+{
+	for (SATWindowMap::const_iterator it = fSATWindowMap.begin();
+		it != fSATWindowMap.end(); it++) {
+		SATWindow* window = it->second;
+		if (window->Id() == id)
+			return window;
+	}
+	return NULL;
 }
 
 

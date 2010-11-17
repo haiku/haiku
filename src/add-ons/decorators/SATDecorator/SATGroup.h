@@ -133,7 +133,7 @@ public:
 									Crossing* rightBottom);
 								~WindowArea();
 
-			bool					SetGroup(SATGroup* group);
+			bool				SetGroup(SATGroup* group);
 
 	const	SATWindowList&		WindowList() { return fWindowList; }
 	const	SATWindowList&		LayerOrder() { return fWindowLayerOrder; }
@@ -200,6 +200,9 @@ private:
 typedef BObjectList<WindowArea> WindowAreaList;
 typedef BObjectList<Tab> TabList;
 
+class BMessage;
+class StackAndTile;
+
 
 class SATGroup : public BReferenceable {
 public:
@@ -233,6 +236,12 @@ public:
 			Tab*				FindHorizontalTab(float position);
 			Tab*				FindVerticalTab(float position);
 
+			void				WindowAreaRemoved(WindowArea* area);
+
+	static	status_t			RestoreGroup(const BMessage& archive,
+									StackAndTile* sat);
+			status_t			ArchiveGroup(BMessage& archive);
+
 private:
 			BReference<Tab>		_AddHorizontalTab(float position = 0);
 			BReference<Tab>		_AddVerticalTab(float position = 0);
@@ -243,7 +252,7 @@ private:
 			Tab*				_FindTab(const TabList& list, float position);
 
 			void				_SplitGroupIfNecessary(
-									SATWindow* removedWindow);
+									WindowArea* removedArea);
 			void				_FillNeighbourList(
 									WindowAreaList& neighbourWindows,
 									WindowArea* area);
@@ -260,7 +269,7 @@ private:
 									WindowAreaList& neighbourWindows,
 									WindowArea* window);
 			bool				_FindConnectedGroup(WindowAreaList& seedList,
-									SATWindow* removedWindow,
+									WindowArea* removedArea,
 									WindowAreaList& newGroup);
 			void				_FollowSeed(WindowArea* area, WindowArea* veto,
 									WindowAreaList& seedList,

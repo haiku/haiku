@@ -289,6 +289,8 @@ SATWindow::SATWindow(StackAndTile* sat, Window* window)
 	fSATTiling(this),
 	fShutdown(false)
 {
+	fId = _GenerateId();
+
 	fDesktop = fWindow->Desktop();
 
 	fGroupCookie = &fOwnGroupCookie;
@@ -680,6 +682,29 @@ SATWindow::TabLocationMoved(float location, bool shifting)
 }
 
 
+uint64
+SATWindow::Id()
+{
+	return fId;
+}
+
+
+bool
+SATWindow::SetSettings(const BMessage& message)
+{
+	if (message.FindInt64("window_id", (int64*)&fId) != B_OK)
+		return false;
+	return true;
+}
+
+
+void
+SATWindow::GetSettings(BMessage& message)
+{
+	message.AddInt64("window_id", fId);
+}
+
+
 void
 SATWindow::_InitGroup()
 {
@@ -743,4 +768,14 @@ SATWindow::_UpdateSizeLimits()
 	}
 	fGroupCookie->SetSizeLimits(minWidth, B_SIZE_UNLIMITED, minHeight,
 		B_SIZE_UNLIMITED);
+}
+
+
+uint64
+SATWindow::_GenerateId()
+{
+	bigtime_t time = real_time_clock_usecs();
+	srand(time);
+	int16 randNumber = rand();
+	return (time & ~0xFFFF) | randNumber;
 }

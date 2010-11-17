@@ -89,6 +89,7 @@ public:
 									{ return fSATKeyPressed; }
 
 		SATWindow*				GetSATWindow(Window* window);
+		SATWindow*				FindSATWindow(uint64 id);
 
 private:
 			void				_StartSAT();

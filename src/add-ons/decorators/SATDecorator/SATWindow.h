@@ -128,9 +128,14 @@ public:
 			bool				SetStackedTabMoving(bool moving = true);
 			void				TabLocationMoved(float location, bool shifting);
 
+			uint64				Id();
+
+			bool				SetSettings(const BMessage& message);
+			void				GetSettings(BMessage& message);
 private:
 			void				_InitGroup();
 			void				_UpdateSizeLimits();
+			uint64				_GenerateId();
 
 			Window*				fWindow;
 			StackAndTile*		fStackAndTile;
@@ -158,6 +163,8 @@ private:
 
 			float				fOriginalWidth;
 			float				fOriginalHeight;
+
+			uint64				fId;
 };
 
 

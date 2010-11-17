@@ -9,11 +9,17 @@
 
 #include "SATGroup.h"
 
+#include <vector>
+
 #include <Debug.h>
+#include <Message.h>
 
 #include "SATWindow.h"
 #include "StackAndTile.h"
 #include "Window.h"
+
+
+using namespace std;
 
 
 WindowArea::WindowArea(Crossing* leftTop, Crossing* rightTop,
@@ -46,6 +52,9 @@ WindowArea::SetGroup(SATGroup* group)
 
 WindowArea::~WindowArea()
 {
+	if (fGroup)
+		fGroup->WindowAreaRemoved(this);
+
 	_CleanupCorners();
 	SetGroup(NULL);
 }
@@ -706,8 +715,6 @@ SATGroup::RemoveWindow(SATWindow* window)
 	if (!fSATWindowList.RemoveItem(window))
 		return false;
 
-	_SplitGroupIfNecessary(window);
-
 	WindowArea* area = window->GetWindowArea();
 	if (area)
 		area->_RemoveWindow(window);
@@ -781,6 +788,119 @@ SATGroup::AdjustWindows(SATWindow* triggerWindow)
 		windowSAT->MoveWindowToSAT(
 			triggerWindow->GetWindow()->CurrentWorkspace());
 	}
+}
+
+
+void
+SATGroup::WindowAreaRemoved(WindowArea* area)
+{
+	_SplitGroupIfNecessary(area);
+}
+
+
+status_t
+SATGroup::RestoreGroup(const BMessage& archive, StackAndTile* sat)
+{
+	// create new group
+	SATGroup* group = new (std::nothrow)SATGroup;
+	if (!group)
+		return B_NO_MEMORY;
+	BReference<SATGroup> groupRef;
+	groupRef.SetTo(group, true);
+
+	int32 nHTabs, nVTabs;
+	status_t status;
+	status = archive.FindInt32("htab_count", &nHTabs);
+	if (status != B_OK)
+		return status;
+	status = archive.FindInt32("vtab_count", &nVTabs);
+	if (status != B_OK)
+		return status;
+
+	vector<BReference<Tab> > tempHTabs;
+	for (int i = 0; i < nHTabs; i++) {
+		BReference<Tab> tab = group->_AddHorizontalTab();
+		if (!tab)
+			return B_NO_MEMORY;
+		tempHTabs.push_back(tab);
+	}
+	vector<BReference<Tab> > tempVTabs;
+	for (int i = 0; i < nVTabs; i++) {
+		BReference<Tab> tab = group->_AddVerticalTab();
+		if (!tab)
+			return B_NO_MEMORY;
+		tempVTabs.push_back(tab);
+	}
+
+	BMessage areaArchive;
+	for (int32 i = 0; archive.FindMessage("area", i, &areaArchive) == B_OK;
+		i++) {
+		uint32 leftTab, rightTab, topTab, bottomTab;
+		if (areaArchive.FindInt32("left_tab", (int32*)&leftTab) != B_OK
+			|| areaArchive.FindInt32("right_tab", (int32*)&rightTab) != B_OK
+			|| areaArchive.FindInt32("top_tab", (int32*)&topTab) != B_OK
+			|| areaArchive.FindInt32("bottom_tab", (int32*)&bottomTab) != B_OK)
+			return B_ERROR;
+
+		if (leftTab >= tempVTabs.size() || rightTab >= tempVTabs.size())
+			return B_BAD_VALUE;
+		if (topTab >= tempHTabs.size() || bottomTab >= tempHTabs.size())
+			return B_BAD_VALUE;
+
+		Tab* left = tempVTabs[leftTab];
+		Tab* right = tempVTabs[rightTab];
+		Tab* top = tempHTabs[topTab];
+		Tab* bottom = tempHTabs[bottomTab];
+
+		// adding windows to area
+		int64 windowId;
+		WindowArea* area = NULL;
+		for (int32 i = 0;
+			areaArchive.FindInt64("window", i, &windowId) == B_OK; i++) {
+			SATWindow* window = sat->FindSATWindow(windowId);
+			if (!window)
+				continue;
+
+			if (area == NULL) {
+				if (!group->AddWindow(window, left, top, right, bottom))
+					return B_ERROR;
+				area = window->GetWindowArea();
+			} else {
+				if (!group->AddWindow(window, area))
+					return B_ERROR;
+			}
+		}
+	}
+	return B_OK;
+}
+
+
+status_t
+SATGroup::ArchiveGroup(BMessage& archive)
+{
+	archive.AddInt32("htab_count", fHorizontalTabs.CountItems());
+	archive.AddInt32("vtab_count", fVerticalTabs.CountItems());
+
+	for (int i = 0; i < fWindowAreaList.CountItems(); i++) {
+		WindowArea* area = fWindowAreaList.ItemAt(i);
+		int32 leftTab = fVerticalTabs.IndexOf(area->LeftTab());
+		int32 rightTab = fVerticalTabs.IndexOf(area->RightTab());
+		int32 topTab = fHorizontalTabs.IndexOf(area->TopTab());
+		int32 bottomTab = fHorizontalTabs.IndexOf(area->BottomTab());
+
+		BMessage areaMessage;
+		areaMessage.AddInt32("left_tab", leftTab);
+		areaMessage.AddInt32("right_tab", rightTab);
+		areaMessage.AddInt32("top_tab", topTab);
+		areaMessage.AddInt32("bottom_tab", bottomTab);
+
+		const SATWindowList& windowList = area->WindowList();
+		for (int a = 0; a < windowList.CountItems(); a++)
+			areaMessage.AddInt64("window", windowList.ItemAt(a)->Id());
+
+		archive.AddMessage("area", &areaMessage);
+	}
+	return B_OK;
 }
 
 
@@ -860,20 +980,19 @@ SATGroup::_FindTab(const TabList& list, float position)
 
 
 void
-SATGroup::_SplitGroupIfNecessary(SATWindow* removedWindow)
+SATGroup::_SplitGroupIfNecessary(WindowArea* removedArea)
 {
 	// if there are windows stacked in the area we don't need to split
-	WindowArea* area = removedWindow->GetWindowArea();
-	if (!area || area->WindowList().CountItems() > 1)
+	if (!removedArea || removedArea->WindowList().CountItems() > 1)
 		return;
 
 	WindowAreaList neighbourWindows;
 
-	_FillNeighbourList(neighbourWindows, removedWindow->GetWindowArea());
+	_FillNeighbourList(neighbourWindows, removedArea);
 
 	bool ownGroupProcessed = false;
 	WindowAreaList newGroup;
-	while (_FindConnectedGroup(neighbourWindows, removedWindow, newGroup)) {
+	while (_FindConnectedGroup(neighbourWindows, removedArea, newGroup)) {
 		STRACE_SAT("Connected group found; %i windows:\n",
 			(int)newGroup.CountItems());
 		for (int i = 0; i < newGroup.CountItems(); i++) {
@@ -903,8 +1022,6 @@ void
 SATGroup::_FillNeighbourList(WindowAreaList& neighbourWindows,
 	WindowArea* area)
 {
-	if (!area)
-		return;
 	_LeftNeighbours(neighbourWindows, area);
 	_RightNeighbours(neighbourWindows, area);
 	_TopNeighbours(neighbourWindows, area);
@@ -1018,19 +1135,16 @@ SATGroup::_BottomNeighbours(WindowAreaList& neighbourWindows,
 
 
 bool
-SATGroup::_FindConnectedGroup(WindowAreaList& seedList,
-	SATWindow* removedWindow, WindowAreaList& newGroup)
+SATGroup::_FindConnectedGroup(WindowAreaList& seedList, WindowArea* removedArea,
+	WindowAreaList& newGroup)
 {
 	if (seedList.CountItems() == 0)
-		return false;
-	WindowArea* vetoArea = removedWindow->GetWindowArea();
-	if (!vetoArea)
 		return false;
 
 	WindowArea* area = seedList.RemoveItemAt(0);
 	newGroup.AddItem(area);
 
-	_FollowSeed(area, vetoArea, seedList, newGroup);
+	_FollowSeed(area, removedArea, seedList, newGroup);
 	return true;
 }
 
