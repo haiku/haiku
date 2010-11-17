@@ -135,12 +135,16 @@ public:
 									int32 column, int32 row,
 									alignment labelAlignment
 										= B_ALIGN_HORIZONTAL_UNSET,
-									int32 columnCount = 1, int32 rowCount = 1);
+									int32 labelColumnCount = 1,
+									int32 fieldColumnCount = 1,
+									int32 rowCount = 1);
 	inline	ThisBuilder&		AddTextControl(BTextControl* textControl,
 									int32 column, int32 row,
 									alignment labelAlignment
 										= B_ALIGN_HORIZONTAL_UNSET,
-									int32 columnCount = 1, int32 rowCount = 1);
+									int32 labelColumnCount = 1,
+									int32 textColumnCount = 1,
+									int32 rowCount = 1);
 
 	inline	GroupBuilder		AddGroup(enum orientation orientation,
 									float spacing, int32 column, int32 row,
@@ -148,7 +152,7 @@ public:
 	inline	GroupBuilder		AddGroup(BGroupView* groupView,	int32 column,
 									int32 row, int32 columnCount = 1,
 									int32 rowCount = 1);
-	inline	GroupBuilder		AddGroup(BGroupLayout* groupLayout, 
+	inline	GroupBuilder		AddGroup(BGroupLayout* groupLayout,
 									int32 column, int32 row,
 									int32 columnCount = 1, int32 rowCount = 1);
 
@@ -608,14 +612,15 @@ Grid<ParentBuilder>::Add(BLayoutItem* item, int32 column, int32 row,
 template<typename ParentBuilder>
 typename Grid<ParentBuilder>::ThisBuilder&
 Grid<ParentBuilder>::AddMenuField(BMenuField* menuField, int32 column,
-	int32 row, alignment labelAlignment, int32 columnCount, int32 rowCount)
+	int32 row, alignment labelAlignment, int32 labelColumnCount,
+	int32 fieldColumnCount, int32 rowCount)
 {
 	BLayoutItem* item = menuField->CreateLabelLayoutItem();
 	item->SetExplicitAlignment(
 		BAlignment(labelAlignment, B_ALIGN_VERTICAL_UNSET));
-	fLayout->AddItem(item, column, row, columnCount, rowCount);
-	fLayout->AddItem(menuField->CreateMenuBarLayoutItem(), column + columnCount,
-		row, columnCount, rowCount);
+	fLayout->AddItem(item, column, row, labelColumnCount, rowCount);
+	fLayout->AddItem(menuField->CreateMenuBarLayoutItem(),
+		column + labelColumnCount, row, fieldColumnCount, rowCount);
 	return *this;
 }
 
@@ -623,14 +628,15 @@ Grid<ParentBuilder>::AddMenuField(BMenuField* menuField, int32 column,
 template<typename ParentBuilder>
 typename Grid<ParentBuilder>::ThisBuilder&
 Grid<ParentBuilder>::AddTextControl(BTextControl* textControl, int32 column,
-	int32 row, alignment labelAlignment, int32 columnCount, int32 rowCount)
+	int32 row, alignment labelAlignment, int32 labelColumnCount,
+	int32 textColumnCount, int32 rowCount)
 {
 	BLayoutItem* item = textControl->CreateLabelLayoutItem();
 	item->SetExplicitAlignment(
 		BAlignment(labelAlignment, B_ALIGN_VERTICAL_UNSET));
-	fLayout->AddItem(item, column, row, columnCount, rowCount);
+	fLayout->AddItem(item, column, row, labelColumnCount, rowCount);
 	fLayout->AddItem(textControl->CreateTextViewLayoutItem(),
-		column + columnCount, row, columnCount, rowCount);
+		column + labelColumnCount, row, textColumnCount, rowCount);
 	return *this;
 }
 
@@ -704,7 +710,7 @@ Grid<ParentBuilder>::AddSplit(enum orientation orientation, float spacing,
 	builder.SetParent(this);
 	fLayout->AddView(builder.View(), column, row, columnCount, rowCount);
 	return builder;
-} 
+}
 
 
 template<typename ParentBuilder>
@@ -716,7 +722,7 @@ Grid<ParentBuilder>::AddSplit(BSplitView* splitView, int32 column, int32 row,
 	builder.SetParent(this);
 	fLayout->AddView(builder.View(), column, row, columnCount, rowCount);
 	return builder;
-} 
+}
 
 
 template<typename ParentBuilder>
