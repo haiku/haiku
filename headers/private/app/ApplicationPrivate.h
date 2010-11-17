@@ -14,6 +14,10 @@
 struct server_read_only_memory;
 
 
+const uint32 kRestoreStateMsg = '_RSM';
+const uint32 kSaveStateMsg = '_SSM';
+
+
 class BApplication::Private {
 	public:
 		static inline BPrivate::PortLink *ServerLink()

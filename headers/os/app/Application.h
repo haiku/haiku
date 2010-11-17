@@ -29,6 +29,10 @@ namespace BPrivate {
 }
 
 
+void restore_window_geometry(BWindow* window, const BMessage* windowGeometry);
+void save_window_geometry(const BWindow* window, BMessage* windowGeometry);
+
+
 class BApplication : public BLooper {
 public:
 								BApplication(const char* signature);
@@ -91,6 +95,12 @@ public:
 
 	class Private;
 
+protected:
+	// Session Manager
+			bool				HasBeenRestored();
+	virtual	status_t			RestoreState(const BMessage* state);
+	virtual	status_t			SaveState(BMessage* state) const;
+
 private:
 	typedef BLooper _inherited;
 
@@ -145,8 +155,9 @@ private:
 			BMessageRunner*		fPulseRunner;
 			status_t			fInitError;
 			void*				fServerReadOnlyMemory;
-			uint32				_reserved[12];
+			uint32				_reserved[11];
 
+			uint32				fHasBeenRestored;
 			bool				fReadyToRunCalled;
 };
 
