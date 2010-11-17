@@ -2,6 +2,7 @@
 
 #include <new>
 
+#include <MediaFile.h>
 #include <Path.h>
 
 #include <audioproperties.h>
@@ -24,7 +25,7 @@ AudioTagAnalyser::InitCheck()
 }
 
 
-#include <stdio.h>
+
 void
 AudioTagAnalyser::AnalyseEntry(const entry_ref& ref)
 {
@@ -41,16 +42,43 @@ AudioTagAnalyser::AnalyseEntry(const entry_ref& ref)
 	printf("artist: %s, title: %s, album: %s\n", artist.toCString(),
 		   title.toCString(), album.toCString());
 
-	BFile file(path.Path(), B_READ_ONLY);
+	BFile file(&ref, B_READ_ONLY);
 	if (file.InitCheck() != B_OK)
 		return;
 
 	const char* cArtist = artist.toCString(true);
-	file.WriteAttr("Media:Artist", B_STRING_TYPE, 0, cArtist, strlen(cArtist));
+	file.WriteAttr("Audio:Artist", B_STRING_TYPE, 0, cArtist, strlen(cArtist));
 	const char* cTitle = title.toCString(true);
 	file.WriteAttr("Media:Title", B_STRING_TYPE, 0, cTitle, strlen(cTitle));
 	const char* cAlbum = album.toCString(true);
-	file.WriteAttr("Media:Album", B_STRING_TYPE, 0, cAlbum, strlen(cAlbum));
+	file.WriteAttr("Audio:Album", B_STRING_TYPE, 0, cAlbum, strlen(cAlbum));
+/*
+	BMediaFile mediaFile(&ref);
+	if (mediaFile.InitCheck() != B_OK)
+		return;
+
+	BMessage metaData;
+	if (mediaFile.GetMetaData(&metaData) != B_OK)
+		return;
+
+	BFile file(&ref, B_READ_ONLY);
+	if (file.InitCheck() != B_OK)
+		return;
+
+	BString dataString;
+	if (metaData.FindString("artist", &dataString) == B_OK)
+		file.WriteAttr("Audio:Artist", B_STRING_TYPE, 0, dataString.String(),
+			dataString.Length());
+	if (metaData.FindString("title", &dataString) == B_OK)
+		file.WriteAttr("Media:Title", B_STRING_TYPE, 0, dataString.String(),
+			dataString.Length());
+	if (metaData.FindString("album", &dataString) == B_OK)
+		file.WriteAttr("Audio:Album", B_STRING_TYPE, 0, dataString.String(),
+			dataString.Length());
+	if (metaData.FindString("track", &dataString) == B_OK)
+		file.WriteAttr("Audio:Track", B_STRING_TYPE, 0, dataString.String(),
+			dataString.Length());*/
+	
 }
 
 
