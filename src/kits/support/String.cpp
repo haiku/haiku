@@ -1191,19 +1191,19 @@ BString::FindLast(const char* string, int32 beforeOffset) const
 int32
 BString::FindLast(char c) const
 {
-	const char* start = String();
-	const char* end = String() + Length();
+	const char* const start = String();
+	const char* end = String() + Length() - 1;
 
 	// Scans the string backwards until we found
 	// the character, or we reach the string's start
-	while (end != start && *end != c) {
+	while (end >= start && *end != c) {
 		end--;
 	}
 
-	if (end == start)
+	if (end < start)
 		return B_ERROR;
 
-	return end - String();
+	return end - start;
 }
 
 
@@ -1213,19 +1213,19 @@ BString::FindLast(char c, int32 beforeOffset) const
 	if (beforeOffset < 0)
 		return B_ERROR;
 
-	const char* start = String();
-	const char* end = String() + min_clamp0(beforeOffset, Length());
+	const char* const start = String();
+	const char* end = String() + min_clamp0(beforeOffset + 1, Length()) - 1;
 
 	// Scans the string backwards until we found
 	// the character, or we reach the string's start
-	while (end > start && *end != c) {
+	while (end >= start && *end != c) {
 		end--;
 	}
 
-	if (end <= start)
+	if (end < start)
 		return B_ERROR;
 
-	return end - String();
+	return end - start;
 }
 
 
