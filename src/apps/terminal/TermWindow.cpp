@@ -363,8 +363,10 @@ TermWindow::_SetupMenu()
 		B_TRANSLATE("About Terminal" B_UTF8_ELLIPSIS),
 		new BMessage(B_ABOUT_REQUESTED)));
 	fFilemenu->AddSeparatorItem();
+	fFilemenu->AddItem(new BMenuItem(B_TRANSLATE("Close window"),
+		new BMessage(B_QUIT_REQUESTED), 'W', B_SHIFT_KEY));
 	fFilemenu->AddItem(new BMenuItem(B_TRANSLATE("Close active tab"),
-		new BMessage(kCloseView), 'W', B_SHIFT_KEY));
+		new BMessage(kCloseView), 'W'));
 	fFilemenu->AddItem(new BMenuItem(B_TRANSLATE("Quit"),
 		new BMessage(B_QUIT_REQUESTED), 'Q'));
 	fMenubar->AddItem(fFilemenu);
