@@ -47,89 +47,89 @@
 
 
 // Menu Message
-const uint32 MENU_SWITCH_TERM   = 'MSWT';
-const uint32 MENU_NEW_TERM      = 'MNTE';
-const uint32 MENU_PREF_OPEN     = 'MPre';
-const uint32 MENU_CLEAR_ALL     = 'MCAl';
-const uint32 MENU_HELP          = 'Mhlp';
-const uint32 MENU_COMMAND_HELP  = 'Mchp';
-const uint32 MENU_SHOW_GPL      = 'Mgpl';
-const uint32 MENU_ENCODING      = 'Menc';
-const uint32 MENU_PAGE_SETUP    = 'Mpst';
-const uint32 MENU_PRINT         = 'Mpnt';
-const uint32 MENU_FIND_STRING   = 'Mfpr';
-const uint32 MENU_FIND_NEXT  	= 'Mfnx';
-const uint32 MENU_FIND_PREVIOUS = 'Mfbw';
-const uint32 MENU_SHOW_COLOR	= 'Mcol';
+static const uint32 MENU_SWITCH_TERM	= 'MSWT';
+static const uint32 MENU_NEW_TERM		= 'MNTE';
+static const uint32 MENU_PREF_OPEN		= 'MPre';
+static const uint32 MENU_CLEAR_ALL		= 'MCAl';
+static const uint32 MENU_HELP			= 'Mhlp';
+static const uint32 MENU_COMMAND_HELP	= 'Mchp';
+static const uint32 MENU_SHOW_GPL		= 'Mgpl';
+static const uint32 MENU_ENCODING		= 'Menc';
+static const uint32 MENU_PAGE_SETUP		= 'Mpst';
+static const uint32 MENU_PRINT			= 'Mpnt';
+static const uint32 MENU_FIND_STRING	= 'Mfpr';
+static const uint32 MENU_FIND_NEXT		= 'Mfnx';
+static const uint32 MENU_FIND_PREVIOUS	= 'Mfbw';
+static const uint32 MENU_SHOW_COLOR		= 'Mcol';
 
-const uint32 M_GET_DEVICE_NUM	= 'Mgdn';
+static const uint32 M_GET_DEVICE_NUM	= 'Mgdn';
 
 
 // Preference Message
-const ulong PSET__COLS							= 'pcol';
-const ulong PSET__ROWS							= 'prow';
-const ulong PSET__HFONT							= 'phfn';
-const ulong PSET__HFONT_SIZE					= 'phfs';
-const ulong PSET_FORE_COLOR						= 'pfcl';
-const ulong PSET_BACK_COLOR						= 'pbcl';
-const ulong PSET__CODING						= 'pcod';
+static const ulong PSET__COLS							= 'pcol';
+static const ulong PSET__ROWS							= 'prow';
+static const ulong PSET__HFONT							= 'phfn';
+static const ulong PSET__HFONT_SIZE						= 'phfs';
+static const ulong PSET_FORE_COLOR						= 'pfcl';
+static const ulong PSET_BACK_COLOR						= 'pbcl';
+static const ulong PSET__CODING							= 'pcod';
 
 // Terminal Size Messages
-const uint32 EIGHTYTWENTYFOUR					= 'etfo';
-const uint32 EIGHTYTWENTYFIVE					= 'etfv';
-const uint32 EIGHTYFORTY						= 'efor';
-const uint32 ONETHREETWOTWENTYFOUR				= 'hunf';
-const uint32 ONETHREETWOTWENTYFIVE				= 'hunv';
-const uint32 FULLSCREEN							= 'fscr';
+static const uint32 EIGHTYTWENTYFOUR					= 'etfo';
+static const uint32 EIGHTYTWENTYFIVE					= 'etfv';
+static const uint32 EIGHTYFORTY							= 'efor';
+static const uint32 ONETHREETWOTWENTYFOUR				= 'hunf';
+static const uint32 ONETHREETWOTWENTYFIVE				= 'hunv';
+static const uint32 FULLSCREEN							= 'fscr';
 
-const uint32 MSG_FONT_CHANGED					= 'fntc';
-const uint32 SAVE_AS_DEFAULT 					= 'sadf';
-const uint32 MSG_CHECK_CHILDREN					= 'ckch';
-const uint32 MSG_PREVIOUS_TAB					= 'ptab';
-const uint32 MSG_NEXT_TAB						= 'ntab';
-const uint32 MSG_REMOVE_RESIZE_VIEW_IF_NEEDED	= 'rmrv';
-const uint32 MSG_TERMINAL_BUFFER_CHANGED		= 'bufc';
-const uint32 MSG_SET_TERMNAL_TITLE				= 'sett';
-const uint32 MSG_QUIT_TERMNAL					= 'qutt';
-const uint32 MSG_REPORT_MOUSE_EVENT				= 'mous';
-const uint32 MSG_SAVE_WINDOW_POSITION			= 'swps';
+static const uint32 MSG_FONT_CHANGED					= 'fntc';
+static const uint32 SAVE_AS_DEFAULT 					= 'sadf';
+static const uint32 MSG_CHECK_CHILDREN					= 'ckch';
+static const uint32 MSG_PREVIOUS_TAB					= 'ptab';
+static const uint32 MSG_NEXT_TAB						= 'ntab';
+static const uint32 MSG_REMOVE_RESIZE_VIEW_IF_NEEDED	= 'rmrv';
+static const uint32 MSG_TERMINAL_BUFFER_CHANGED			= 'bufc';
+static const uint32 MSG_SET_TERMNAL_TITLE				= 'sett';
+static const uint32 MSG_QUIT_TERMNAL					= 'qutt';
+static const uint32 MSG_REPORT_MOUSE_EVENT				= 'mous';
+static const uint32 MSG_SAVE_WINDOW_POSITION			= 'swps';
 
 // Preference Read/Write Keys
-const char* const PREF_HALF_FONT_FAMILY = "Half Font Family";
-const char* const PREF_HALF_FONT_STYLE = "Half Font Style";
-const char* const PREF_HALF_FONT_SIZE = "Half Font Size";
+static const char* const PREF_HALF_FONT_FAMILY = "Half Font Family";
+static const char* const PREF_HALF_FONT_STYLE = "Half Font Style";
+static const char* const PREF_HALF_FONT_SIZE = "Half Font Size";
 
-const char* const PREF_TEXT_FORE_COLOR = "Text";
-const char* const PREF_TEXT_BACK_COLOR = "Background";
-const char* const PREF_SELECT_FORE_COLOR = "Selected text";
-const char* const PREF_SELECT_BACK_COLOR = "Selected background";
+static const char* const PREF_TEXT_FORE_COLOR = "Text";
+static const char* const PREF_TEXT_BACK_COLOR = "Background";
+static const char* const PREF_SELECT_FORE_COLOR = "Selected text";
+static const char* const PREF_SELECT_BACK_COLOR = "Selected background";
 
-const char* const PREF_IM_FORE_COLOR = "IM foreground color";
-const char* const PREF_IM_BACK_COLOR = "IM background color";
-const char* const PREF_IM_SELECT_COLOR = "IM selection color";
+static const char* const PREF_IM_FORE_COLOR = "IM foreground color";
+static const char* const PREF_IM_BACK_COLOR = "IM background color";
+static const char* const PREF_IM_SELECT_COLOR = "IM selection color";
 
-const char* const PREF_ANSI_BLACK_COLOR = "ANSI black color";
-const char* const PREF_ANSI_RED_COLOR = "ANSI red color";
-const char* const PREF_ANSI_GREEN_COLOR = "ANSI green color";
-const char* const PREF_ANSI_YELLOW_COLOR = "ANSI yellow color";
-const char* const PREF_ANSI_BLUE_COLOR = "ANSI blue color";
-const char* const PREF_ANSI_MAGENTA_COLOR = "ANSI magenta color";
-const char* const PREF_ANSI_CYAN_COLOR = "ANSI cyan color";
-const char* const PREF_ANSI_WHITE_COLOR = "ANSI white color";
+static const char* const PREF_ANSI_BLACK_COLOR = "ANSI black color";
+static const char* const PREF_ANSI_RED_COLOR = "ANSI red color";
+static const char* const PREF_ANSI_GREEN_COLOR = "ANSI green color";
+static const char* const PREF_ANSI_YELLOW_COLOR = "ANSI yellow color";
+static const char* const PREF_ANSI_BLUE_COLOR = "ANSI blue color";
+static const char* const PREF_ANSI_MAGENTA_COLOR = "ANSI magenta color";
+static const char* const PREF_ANSI_CYAN_COLOR = "ANSI cyan color";
+static const char* const PREF_ANSI_WHITE_COLOR = "ANSI white color";
 
-const char* const PREF_HISTORY_SIZE = "History size";
-const char* const PREF_CURSOR_BLINKING = "Cursor blinking rate";
+static const char* const PREF_HISTORY_SIZE = "History size";
+static const char* const PREF_CURSOR_BLINKING = "Cursor blinking rate";
 
-const char* const PREF_IM_AWARE = "Input method aware";
+static const char* const PREF_IM_AWARE = "Input method aware";
 
-const char* const PREF_COLS = "Cols";
-const char* const PREF_ROWS = "Rows";
-const char* const PREF_SHELL = "Shell";
+static const char* const PREF_COLS = "Cols";
+static const char* const PREF_ROWS = "Rows";
+static const char* const PREF_SHELL = "Shell";
 
-const char* const PREF_TEXT_ENCODING = "Text encoding";
-const char* const PREF_GUI_LANGUAGE = "Language";
+static const char* const PREF_TEXT_ENCODING = "Text encoding";
+static const char* const PREF_GUI_LANGUAGE = "Language";
 
-const char* const PREF_WARN_ON_EXIT = "Warn on exit";
+static const char* const PREF_WARN_ON_EXIT = "Warn on exit";
 
 // Color type
 enum {
@@ -141,11 +141,11 @@ enum {
 
 // Preference Folder and setting path
 
-const int32 DEFAULT = -1;
+static const int32 DEFAULT = -1;
 
 // Font Width
-const int  HALF_WIDTH = 1;
-const int  FULL_WIDTH = 2;
+static const int  HALF_WIDTH = 1;
+static const int  FULL_WIDTH = 2;
 
 // Scroll direction flag
 enum{
