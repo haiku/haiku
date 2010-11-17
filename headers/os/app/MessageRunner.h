@@ -15,7 +15,13 @@ public:
 									const BMessage* message, bigtime_t interval,
 									int32 count = -1);
 								BMessageRunner(BMessenger target,
+									const BMessage& message, bigtime_t interval,
+									int32 count = -1);
+								BMessageRunner(BMessenger target,
 									const BMessage* message, bigtime_t interval,
+									int32 count, BMessenger replyTo);
+								BMessageRunner(BMessenger target,
+									const BMessage& message, bigtime_t interval,
 									int32 count, BMessenger replyTo);
 	virtual						~BMessageRunner();
 

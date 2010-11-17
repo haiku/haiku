@@ -49,6 +49,34 @@ BMessageRunner::BMessageRunner(BMessenger target, const BMessage* message,
 
 /*!	\brief Creates and initializes a new BMessageRunner.
 
+	The target for replies to the delivered message(s) is \c be_app_messenger.
+
+	The success of the initialization can (and should) be asked for via
+	InitCheck(). This object will not take ownership of the \a message, you
+	may freely change or delete it after creation.
+
+	\note As soon as the last message has been sent, the message runner
+		  becomes unusable. InitCheck() will still return \c B_OK, but
+		  SetInterval(), SetCount() and GetInfo() will fail.
+
+	\param target Target of the message(s).
+	\param message The message to be sent to the target.
+	\param interval Period of time before the first message is sent and
+		   between messages (if more than one shall be sent) in microseconds.
+	\param count Specifies how many times the message shall be sent.
+		   A value less than \c 0 for an unlimited number of repetitions.
+*/
+BMessageRunner::BMessageRunner(BMessenger target, const BMessage& message,
+	bigtime_t interval, int32 count)
+	:
+	fToken(-1)
+{
+	_InitData(target, &message, interval, count, be_app_messenger);
+}
+
+
+/*!	\brief Creates and initializes a new BMessageRunner.
+
 	This constructor version additionally allows to specify the target for
 	replies to the delivered message(s).
 
@@ -74,6 +102,36 @@ BMessageRunner::BMessageRunner(BMessenger target, const BMessage* message,
 	fToken(-1)
 {
 	_InitData(target, message, interval, count, replyTo);
+}
+
+
+/*!	\brief Creates and initializes a new BMessageRunner.
+
+	This constructor version additionally allows to specify the target for
+	replies to the delivered message(s).
+
+	The success of the initialization can (and should) be asked for via
+	InitCheck(). This object will not take ownership of the \a message, you
+	may freely change or delete it after creation.
+
+	\note As soon as the last message has been sent, the message runner
+		  becomes unusable. InitCheck() will still return \c B_OK, but
+		  SetInterval(), SetCount() and GetInfo() will fail.
+
+	\param target Target of the message(s).
+	\param message The message to be sent to the target.
+	\param interval Period of time before the first message is sent and
+		   between messages (if more than one shall be sent) in microseconds.
+	\param count Specifies how many times the message shall be sent.
+		   A value less than \c 0 for an unlimited number of repetitions.
+	\param replyTo Target replies to the delivered message(s) shall be sent to.
+*/
+BMessageRunner::BMessageRunner(BMessenger target, const BMessage& message,
+	bigtime_t interval, int32 count, BMessenger replyTo)
+	:
+	fToken(-1)
+{
+	_InitData(target, &message, interval, count, replyTo);
 }
 
 
