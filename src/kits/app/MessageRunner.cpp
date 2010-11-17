@@ -1,23 +1,24 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2010, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Ingo Weinhold (bonefish@users.sf.net)
+ *		Ingo Weinhold, ingo_weinhold@gmx.de
  */
 
 
+#include <MessageRunner.h>
+
 #include <Application.h>
 #include <AppMisc.h>
-#include <MessageRunner.h>
 #include <RegistrarDefs.h>
 #include <Roster.h>
 #include <RosterPrivate.h>
 
+
 using namespace BPrivate;
 
 
-// constructor
 /*!	\brief Creates and initializes a new BMessageRunner.
 
 	The target for replies to the delivered message(s) is \c be_app_messenger.
@@ -37,14 +38,15 @@ using namespace BPrivate;
 	\param count Specifies how many times the message shall be sent.
 		   A value less than \c 0 for an unlimited number of repetitions.
 */
-BMessageRunner::BMessageRunner(BMessenger target, const BMessage *message,
-							   bigtime_t interval, int32 count)
-	: fToken(-1)
+BMessageRunner::BMessageRunner(BMessenger target, const BMessage* message,
+	bigtime_t interval, int32 count)
+	:
+	fToken(-1)
 {
 	_InitData(target, message, interval, count, be_app_messenger);
 }
 
-// constructor
+
 /*!	\brief Creates and initializes a new BMessageRunner.
 
 	This constructor version additionally allows to specify the target for
@@ -66,10 +68,10 @@ BMessageRunner::BMessageRunner(BMessenger target, const BMessage *message,
 		   A value less than \c 0 for an unlimited number of repetitions.
 	\param replyTo Target replies to the delivered message(s) shall be sent to.
 */
-BMessageRunner::BMessageRunner(BMessenger target, const BMessage *message,
-							   bigtime_t interval, int32 count,
-							   BMessenger replyTo)
-	: fToken(-1)
+BMessageRunner::BMessageRunner(BMessenger target, const BMessage* message,
+	bigtime_t interval, int32 count, BMessenger replyTo)
+	:
+	fToken(-1)
 {
 	_InitData(target, message, interval, count, replyTo);
 }
@@ -94,7 +96,7 @@ BMessageRunner::~BMessageRunner()
 	// ignore the reply, we can't do anything anyway
 }
 
-// InitCheck
+
 /*!	\brief Returns the status of the initialization.
 
 	\note As soon as the last message has been sent, the message runner
@@ -110,7 +112,7 @@ BMessageRunner::InitCheck() const
 	return fToken >= 0 ? B_OK : fToken;
 }
 
-// SetInterval
+
 /*!	\brief Sets the interval of time between messages.
 	\param interval The new interval in microseconds.
 	\return
@@ -125,7 +127,7 @@ BMessageRunner::SetInterval(bigtime_t interval)
 	return _SetParams(true, interval, false, 0);
 }
 
-// SetCount
+
 /*!	\brief Sets the number of times message shall be sent.
 	\param count Specifies how many times the message shall be sent.
 		   A value less than \c 0 for an unlimited number of repetitions.
@@ -141,7 +143,7 @@ BMessageRunner::SetCount(int32 count)
 	return _SetParams(false, 0, true, count);
 }
 
-// GetInfo
+
 /*!	\brief Returns the time interval between two messages and the number of
 		   times the message has still to be sent.
 
@@ -158,17 +160,20 @@ BMessageRunner::SetCount(int32 count)
 	  messages that had to be sent have already been sent.
 */
 status_t
-BMessageRunner::GetInfo(bigtime_t *interval, int32 *count) const
+BMessageRunner::GetInfo(bigtime_t* interval, int32* count) const
 {
 	status_t error =  (fToken >= 0 ? B_OK : B_BAD_VALUE);
+
 	// compose the request message
 	BMessage request(B_REG_GET_MESSAGE_RUNNER_INFO);
 	if (error == B_OK)
 		error = request.AddInt32("token", fToken);
+
 	// send the request
 	BMessage reply;
 	if (error == B_OK)
 		error = BRoster::Private().SendTo(&request, &reply, false);
+
 	// evaluate the reply
 	if (error == B_OK) {
 		if (reply.what == B_REG_SUCCESS) {
@@ -179,6 +184,7 @@ BMessageRunner::GetInfo(bigtime_t *interval, int32 *count) const
 					*count = _count;
 			} else
 				error = B_ERROR;
+
 			// interval
 			bigtime_t _interval;
 			if (reply.FindInt64("interval", &_interval) == B_OK) {
@@ -209,7 +215,7 @@ BMessageRunner::GetInfo(bigtime_t *interval, int32 *count) const
 		   A value less than \c 0 for an unlimited number of repetitions.
 */
 /*static*/ status_t
-BMessageRunner::StartSending(BMessenger target, const BMessage *message,
+BMessageRunner::StartSending(BMessenger target, const BMessage* message,
 	bigtime_t interval, int32 count)
 {
 	int32 token = _RegisterRunner(target, message, interval, count, true,
@@ -232,7 +238,7 @@ BMessageRunner::StartSending(BMessenger target, const BMessage *message,
 	\param replyTo Target replies to the delivered message(s) shall be sent to.
 */
 /*static*/ status_t
-BMessageRunner::StartSending(BMessenger target, const BMessage *message,
+BMessageRunner::StartSending(BMessenger target, const BMessage* message,
 	bigtime_t interval, int32 count, BMessenger replyTo)
 {
 	int32 token = _RegisterRunner(target, message, interval, count, true, replyTo);
@@ -248,7 +254,7 @@ void BMessageRunner::_ReservedMessageRunner4() {}
 void BMessageRunner::_ReservedMessageRunner5() {}
 void BMessageRunner::_ReservedMessageRunner6() {}
 
-// copy constructor
+
 /*!	\brief Privatized copy constructor to prevent usage.
 */
 BMessageRunner::BMessageRunner(const BMessageRunner &)
@@ -256,13 +262,13 @@ BMessageRunner::BMessageRunner(const BMessageRunner &)
 {
 }
 
-// =
+
 /*!	\brief Privatized assignment operator to prevent usage.
 */
 BMessageRunner &
 BMessageRunner::operator=(const BMessageRunner &)
 {
-	return *this;
+	return* this;
 }
 
 
@@ -284,7 +290,7 @@ BMessageRunner::operator=(const BMessageRunner &)
 	\param replyTo Target replies to the delivered message(s) shall be sent to.
 */
 void
-BMessageRunner::_InitData(BMessenger target, const BMessage *message,
+BMessageRunner::_InitData(BMessenger target, const BMessage* message,
 	bigtime_t interval, int32 count, BMessenger replyTo)
 {
 	fToken = _RegisterRunner(target, message, interval, count, false, replyTo);
@@ -305,7 +311,7 @@ BMessageRunner::_InitData(BMessenger target, const BMessage *message,
 		while trying to register it.
 */
 /*static*/ int32
-BMessageRunner::_RegisterRunner(BMessenger target, const BMessage *message,
+BMessageRunner::_RegisterRunner(BMessenger target, const BMessage* message,
 	bigtime_t interval, int32 count, bool detach, BMessenger replyTo)
 {
 	status_t error = B_OK;
@@ -402,4 +408,3 @@ BMessageRunner::_SetParams(bool resetInterval, bigtime_t interval,
 	}
 	return error;
 }
-
