@@ -95,10 +95,11 @@ ImageCache::RetrieveImage(const entry_ref& ref, int32 page,
 	QueueEntry* entry;
 
 	if (findQueue == fQueueMap.end()) {
-		if (target == NULL && fCacheMap.size() < 5
-			&& fBytes > fMaxBytes * 1 / 2) {
+		if (target == NULL
+			&& ((fCacheMap.size() < 5 && fBytes > fMaxBytes * 1 / 2)
+				|| (fMaxThreadCount == 1 && fQueueMap.size() > 1))) {
 			// Don't accept any further precaching if we're low on memory
-			// anyway.
+			// anyway, or if there is already a busy queue.
 			return B_NO_MEMORY;
 		}
 
@@ -290,7 +291,10 @@ ImageCache::_NotifyListeners(CacheEntry* entry, QueueEntry* queueEntry)
 
 	std::set<BMessenger>::iterator iterator = queueEntry->listeners.begin();
 	for (; iterator != queueEntry->listeners.end(); iterator++) {
-		iterator->SendMessage(&notification);
+		if (iterator->SendMessage(&notification) == B_OK) {
+			entry->bitmapOwner->AcquireReference();
+				// this is the reference owned by the target
+		}
 	}
 }
 
@@ -304,7 +308,10 @@ ImageCache::_NotifyTarget(CacheEntry* entry, const BMessenger* target)
 	BMessage notification(kMsgImageCacheImageLoaded);
 	_BuildNotification(entry, notification);
 
-	target->SendMessage(&notification);
+	if (target->SendMessage(&notification) == B_OK) {
+		entry->bitmapOwner->AcquireReference();
+			// this is the reference owned by the target
+	}
 }
 
 
@@ -313,9 +320,6 @@ ImageCache::_BuildNotification(CacheEntry* entry, BMessage& message)
 {
 	if (entry == NULL)
 		return;
-
-	entry->bitmapOwner->AcquireReference();
-		// this is the reference owned by the target
 
 	message.AddString("type", entry->type);
 	message.AddString("mime", entry->mimeType);

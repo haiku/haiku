@@ -521,16 +521,24 @@ ShowImageWindow::MessageReceived(BMessage* message)
 		{
 			fProgressWindow->Stop();
 
+			BitmapOwner* bitmapOwner = NULL;
+			message->FindPointer("bitmapOwner", (void**)&bitmapOwner);
+
 			bool first = fImageView->Bitmap() == NULL;
 			entry_ref ref;
 			message->FindRef("ref", &ref);
 			if (!first && ref != fNavigator.CurrentRef()) {
 				// ignore older images
+				if (bitmapOwner != NULL)
+					bitmapOwner->ReleaseReference();
 				break;
 			}
 
 			status_t status = fImageView->SetImage(message);
 			if (status != B_OK) {
+				if (bitmapOwner != NULL)
+					bitmapOwner->ReleaseReference();
+
 				_LoadError(ref);
 
 				// quit if file could not be opened
