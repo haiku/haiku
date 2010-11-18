@@ -119,9 +119,10 @@ struct TermWindow::Session {
 
 class TermWindow::TabView : public SmartTabView {
 public:
-	TabView(TermWindow* window, BRect frame, const char *name)
+	TabView(TermWindow* window, BRect frame, const char *name,
+		button_width width)
 		:
-		SmartTabView(frame, name),
+		SmartTabView(frame, name, width),
 		fWindow(window)
 	{
 	}
@@ -233,7 +234,7 @@ TermWindow::_InitWindow()
 	BRect textFrame = Bounds();
 	textFrame.top = fMenubar->Bounds().bottom + 1.0;
 
-	fTabView = new TabView(this, textFrame, "tab view");
+	fTabView = new TabView(this, textFrame, "tab view", B_WIDTH_FROM_WIDEST);
 	AddChild(fTabView);
 
 	// Make the scroll view one pixel wider than the tab view container view, so
@@ -1151,9 +1152,10 @@ TermWindow::_UpdateSessionTitle(int32 index)
 	// set the tab title
 	if (sessionTitle != session->title.title) {
 		session->title.title = sessionTitle;
-		BTab* tab = fTabView->TabAt(index);
-		tab->SetLabel(session->title.title);
-		fTabView->Invalidate(fTabView->TabFrame(index));
+		fTabView->TabAt(index)->SetLabel(session->title.title);
+		fTabView->Invalidate();
+			// Invalidate the complete tab view, since other tabs might change
+			// their positions.
 	}
 
 	// If this is the active tab, also recompute the window title.
