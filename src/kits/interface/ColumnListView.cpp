@@ -119,7 +119,7 @@ static const unsigned char kUpSortArrow8x8Invert[] = {
 	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
 };
 
-static const float kTintedLineTint = 0.7 * B_NO_TINT + 0.3 * B_DARKEN_1_TINT;
+static const float kTintedLineTint = 1.04;
 
 static const float kTitleHeight = 16.0;
 static const float kLatchWidth = 15.0;
@@ -127,7 +127,7 @@ static const float kLatchWidth = 15.0;
 
 static const rgb_color kColor[B_COLOR_TOTAL] =
 {
-    {236, 236, 236, 255},           // B_COLOR_BACKGROUND
+    {255, 255, 255, 255},           // B_COLOR_BACKGROUND
     {  0,   0,   0, 255},           // B_COLOR_TEXT
     {148, 148, 148, 255},           // B_COLOR_ROW_DIVIDER
     {190, 190, 190, 255},           // B_COLOR_SELECTION
