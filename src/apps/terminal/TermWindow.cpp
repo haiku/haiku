@@ -688,16 +688,7 @@ TermWindow::MessageReceived(BMessage *message)
 		}
 
 		case kNewTab:
-			if (fTabView->CountTabs() < kMaxTabs) {
-				if (fFullScreen)
-					_ActiveTermView()->ScrollBar()->Show();
-
-				ActiveProcessInfo info;
-				if (_ActiveTermView()->GetActiveProcessInfo(info))
-					_AddTab(NULL, info.CurrentDirectory());
-				else
-					_AddTab(NULL);
-			}
+			_NewTab();
 			break;
 
 		case kCloseView:
@@ -834,6 +825,22 @@ TermWindow::_DoPrint()
 	}
 
 	job.CommitJob();
+}
+
+
+void
+TermWindow::_NewTab()
+{
+	if (fTabView->CountTabs() < kMaxTabs) {
+		if (fFullScreen)
+			_ActiveTermView()->ScrollBar()->Show();
+
+		ActiveProcessInfo info;
+		if (_ActiveTermView()->GetActiveProcessInfo(info))
+			_AddTab(NULL, info.CurrentDirectory());
+		else
+			_AddTab(NULL);
+	}
 }
 
 
@@ -1029,20 +1036,29 @@ TermWindow::TabSelected(SmartTabView* tabView, int32 index)
 void
 TermWindow::TabDoubleClicked(SmartTabView* tabView, BPoint point, int32 index)
 {
-	// TODO:...
+	if (index >= 0) {
+		// TODO: Open the change title dialog!
+	} else {
+		// not clicked on a tab -- create a new one
+		_NewTab();
+	}
 }
 
 
 void
 TermWindow::TabMiddleClicked(SmartTabView* tabView, BPoint point, int32 index)
 {
-	_RemoveTab(index);
+	if (index >= 0)
+		_RemoveTab(index);
 }
 
 
 void
 TermWindow::TabRightClicked(SmartTabView* tabView, BPoint point, int32 index)
 {
+	if (index < 0)
+		return;
+
 	TermView* termView = _TermViewAt(index);
 	if (termView == NULL)
 		return;

@@ -96,6 +96,7 @@ private:
 			void				_GetPreferredFont(BFont &font);
 			status_t			_DoPageSetup();
 			void				_DoPrint();
+			void				_NewTab();
 			void				_AddTab(Arguments* args,
 									const BString& currentDirectory
 										= BString());

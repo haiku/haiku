@@ -70,24 +70,22 @@ SmartTabView::MouseDown(BPoint point)
 
 	if (CountTabs() > 1) {
 		int32 tabIndex = _ClickedTabIndex(point);
-		if (tabIndex >= 0) {
-			int32 buttons = 0;
-			int32 clickCount = 0;
-			Window()->CurrentMessage()->FindInt32("buttons", &buttons);
-			Window()->CurrentMessage()->FindInt32("clicks", &clickCount);
+		int32 buttons = 0;
+		int32 clickCount = 0;
+		Window()->CurrentMessage()->FindInt32("buttons", &buttons);
+		Window()->CurrentMessage()->FindInt32("clicks", &clickCount);
 
-			if ((buttons & B_PRIMARY_MOUSE_BUTTON) != 0 && clickCount == 2) {
-				if (fListener != NULL)
-					fListener->TabDoubleClicked(this, point, tabIndex);
-			} else if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0) {
-				if (fListener != NULL)
-					fListener->TabRightClicked(this, point, tabIndex);
-				handled = true;
-			} else if ((buttons & B_TERTIARY_MOUSE_BUTTON) != 0) {
-				if (fListener != NULL)
-					fListener->TabMiddleClicked(this, point, tabIndex);
-				handled = true;
-			}
+		if ((buttons & B_PRIMARY_MOUSE_BUTTON) != 0 && clickCount == 2) {
+			if (fListener != NULL)
+				fListener->TabDoubleClicked(this, point, tabIndex);
+		} else if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0) {
+			if (fListener != NULL)
+				fListener->TabRightClicked(this, point, tabIndex);
+			handled = true;
+		} else if ((buttons & B_TERTIARY_MOUSE_BUTTON) != 0) {
+			if (fListener != NULL)
+				fListener->TabMiddleClicked(this, point, tabIndex);
+			handled = true;
 		}
 	}
 
