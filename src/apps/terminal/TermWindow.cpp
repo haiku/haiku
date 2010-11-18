@@ -1070,7 +1070,11 @@ TermWindow::TabRightClicked(SmartTabView* tabView, BPoint point, int32 index)
 	popUpMenu->AddItem(new BMenuItem(B_TRANSLATE("Close tab"), message));
 	popUpMenu->SetAsyncAutoDestruct(true);
 	popUpMenu->SetTargetForItems(BMessenger(this));
-	popUpMenu->Go(tabView->ConvertToScreen(point), true, true, true);
+
+	BPoint screenWhere = tabView->ConvertToScreen(point);
+	BRect mouseRect(screenWhere, screenWhere);
+	mouseRect.InsetBy(-4.0, -4.0);
+	popUpMenu->Go(screenWhere, true, true, mouseRect, true);
 }
 
 
