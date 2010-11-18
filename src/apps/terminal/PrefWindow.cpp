@@ -153,6 +153,8 @@ PrefWindow::_Revert()
 
 		fTerminalMessenger.SendMessage(MSG_HALF_FONT_CHANGED);
 		fTerminalMessenger.SendMessage(MSG_COLOR_CHANGED);
+		fTerminalMessenger.SendMessage(MSG_TAB_TITLE_SETTING_CHANGED);
+		fTerminalMessenger.SendMessage(MSG_WINDOW_TITLE_SETTING_CHANGED);
 
 		fDirty = false;
 	}
