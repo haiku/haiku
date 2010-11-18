@@ -63,6 +63,9 @@ const static uint32 kUpdateTitles = 'UPti';
 #define B_TRANSLATE_CONTEXT "Terminal TermWindow"
 
 
+// #pragma mark - CustomTermView
+
+
 class CustomTermView : public TermView {
 public:
 	CustomTermView(int32 rows, int32 columns,
@@ -70,6 +73,9 @@ public:
 	virtual void NotifyQuit(int32 reason);
 	virtual void SetTitle(const char *title);
 };
+
+
+// #pragma mark - TermViewContainerView
 
 
 class TermViewContainerView : public BView {
@@ -100,21 +106,54 @@ private:
 };
 
 
+// #pragma mark - SessionID
+
+
+TermWindow::SessionID::SessionID(int32 id)
+	:
+	fID(id)
+{
+}
+
+
+TermWindow::SessionID::SessionID(const BMessage& message, const char* field)
+	:
+	fID(-1)
+{
+	message.FindInt32(field, &fID);
+}
+
+
+status_t
+TermWindow::SessionID::AddToMessage(BMessage& message, const char* field) const
+{
+	return message.AddInt32(field, fID);
+}
+
+
+// #pragma mark - Session
+
+
 struct TermWindow::Session {
-	int32					id;
+	SessionID				id;
+	int32					index;
 	Title					title;
 	TermViewContainerView*	containerView;
 
-	Session(int32 id, TermViewContainerView* containerView)
+	Session(SessionID id, int32 index, TermViewContainerView* containerView)
 		:
 		id(id),
+		index(index),
 		containerView(containerView)
 	{
 		title.title = B_TRANSLATE("Shell ");
-		title.title << id;
+		title.title << index;
 		title.patternUserDefined = false;
 	}
 };
+
+
+// #pragma mark - TermWindow
 
 
 TermWindow::TermWindow(BRect frame, const BString& title,
@@ -125,6 +164,7 @@ TermWindow::TermWindow(BRect frame, const BString& title,
 		B_CURRENT_WORKSPACE | B_QUIT_ON_WINDOW_CLOSE, workspaces),
 	fWindowIndex(windowIndex),
 	fTitleUpdateRunner(this, BMessage(kUpdateTitles), 1000000),
+	fNextSessionID(0),
 	fTabView(NULL),
 	fMenubar(NULL),
 	fFilemenu(NULL),
@@ -867,7 +907,8 @@ TermWindow::_AddTab(Arguments* args, const BString& currentDirectory)
 		if (fSessions.IsEmpty())
 			fTabView->SetScrollView(scrollView);
 
-		Session* session = new Session(_NewSessionID(), containerView);
+		Session* session = new Session(_NewSessionID(), _NewSessionIndex(),
+			containerView);
 		fSessions.AddItem(session);
 
 		BFont font;
@@ -1179,7 +1220,7 @@ TermWindow::_UpdateSessionTitle(int32 index)
 	// evaluate the session title pattern
 	BString sessionTitlePattern = session->title.patternUserDefined
 		? session->title.pattern : fSessionTitlePattern;
-	TabTitlePlaceholderMapper tabMapper(activeProcessInfo, session->id);
+	TabTitlePlaceholderMapper tabMapper(activeProcessInfo, session->index);
 	const BString& sessionTitle = PatternEvaluator::Evaluate(
 		sessionTitlePattern, tabMapper);
 
@@ -1210,15 +1251,22 @@ TermWindow::_UpdateSessionTitle(int32 index)
 }
 
 
-int32
+TermWindow::SessionID
 TermWindow::_NewSessionID()
+{
+	return fNextSessionID++;
+}
+
+
+int32
+TermWindow::_NewSessionIndex()
 {
 	for (int32 id = 1; ; id++) {
 		bool used = false;
 
 		for (int32 i = 0;
 			 Session* session = (Session*)fSessions.ItemAt(i); i++) {
-			if (id == session->id) {
+			if (id == session->index) {
 				used = true;
 				break;
 			}

@@ -85,6 +85,18 @@ private:
 				bool			patternUserDefined;
 			};
 
+			struct SessionID {
+								SessionID(int32 id);
+								SessionID(const BMessage& message,
+									const char* field);
+
+				status_t		AddToMessage(BMessage& message,
+									const char* field) const;
+
+			private:
+				int32			fID;
+			};
+
 			struct Session;
 
 			void				_SetTermColors(TermViewContainerView* termView);
@@ -114,7 +126,8 @@ private:
 			void				_UpdateTitles();
 			void				_UpdateSessionTitle(int32 index);
 
-			int32				_NewSessionID();
+			SessionID			_NewSessionID();
+			int32				_NewSessionIndex();
 
 private:
 			Title				fTitle;
@@ -123,6 +136,7 @@ private:
 			BMessageRunner		fTitleUpdateRunner;
 
 			BList				fSessions;
+			int32				fNextSessionID;
 
 			SmartTabView*		fTabView;
 			TermView*			fTermView;
