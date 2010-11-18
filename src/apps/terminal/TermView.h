@@ -1,15 +1,17 @@
 /*
- * Copyright 2001-2009, Haiku.
+ * Copyright 2001-2010, Haiku.
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai.
  *
  * Distributed under the terms of the MIT license.
  * Authors:
- *		Stefano Ceccherini <stefano.ceccherini@gmail.com>
+ *		Stefano Ceccherini, stefano.ceccherini@gmail.com
  *		Kian Duffy, myob@users.sourceforge.net
+ *		Ingo Weinhold, ingo_weinhold@gmx.de
  */
 #ifndef TERMVIEW_H
 #define TERMVIEW_H
+
 
 #include <Autolock.h>
 #include <Messenger.h>
@@ -35,6 +37,9 @@ class TerminalBuffer;
 class Shell;
 
 class TermView : public BView {
+public:
+			class Listener;
+
 public:
 							TermView(BRect frame,
 								const ShellParameters& shellParameters,
@@ -80,9 +85,6 @@ public:
 
 			void			SetMouseClipboard(BClipboard *);
 
-	virtual void			SetTitle(const char* title);
-	virtual void			NotifyQuit(int32 reason);
-
 			// edit functions
 			void			Copy(BClipboard* clipboard);
 			void			Paste(BClipboard* clipboard);
@@ -95,12 +97,15 @@ public:
 								bool matchCase, bool matchWord);
 			void			GetSelection(BString& string);
 
-			void			CheckShellGone();
+			bool			CheckShellGone() const;
 
 			void			InitiateDrag();
 
 			void			DisableResizeView(int32 disableCount = 1);
 	static	void			AboutRequested();
+
+			void			SetListener(Listener* listener)
+								{ fListener = listener; }
 
 protected:
 	virtual void			AttachedToWindow();
@@ -125,6 +130,9 @@ protected:
 	virtual BHandler*		ResolveSpecifier(BMessage* msg, int32 index,
 								BMessage* specifier, int32 form,
 								const char* property);
+
+private:
+			class CharClassifier;
 
 private:
 			// point and text offset conversion
@@ -196,9 +204,9 @@ private:
 			void			_HandleInputMethodChanged(BMessage* message);
 			void			_HandleInputMethodLocationRequest();
 			void			_CancelInputMethod();
-private:
-	class CharClassifier;
 
+private:
+			Listener*		fListener;
 			Shell*			fShell;
 
 			BMessageRunner*	fWinchRunner;
@@ -276,6 +284,20 @@ private:
 			bool			fReportButtonMouseEvent;
 			bool			fReportAnyMouseEvent;
 			BClipboard*		fMouseClipboard;
+};
+
+
+class TermView::Listener {
+public:
+	virtual						~Listener();
+
+	// all hooks called in the window thread
+	virtual	void				NotifyTermViewQuit(TermView* view,
+									int32 reason);
+	virtual	void				SetTermViewTitle(TermView* view,
+									const char* title);
+	virtual	void				PreviousTermView(TermView* view, bool move);
+	virtual	void				NextTermView(TermView* view, bool move);
 };
 
 

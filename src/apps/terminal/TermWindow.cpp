@@ -43,7 +43,6 @@
 #include "ShellParameters.h"
 #include "TermConst.h"
 #include "TermScrollView.h"
-#include "TermView.h"
 #include "TitlePlaceholderMapper.h"
 
 
@@ -61,18 +60,6 @@ const static uint32 kUpdateTitles = 'UPti';
 
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "Terminal TermWindow"
-
-
-// #pragma mark - CustomTermView
-
-
-class CustomTermView : public TermView {
-public:
-	CustomTermView(int32 rows, int32 columns,
-		const ShellParameters& shellParameters, int32 historySize = 1000);
-	virtual void NotifyQuit(int32 reason);
-	virtual void SetTitle(const char *title);
-};
 
 
 // #pragma mark - TermViewContainerView
@@ -210,18 +197,6 @@ TermWindow::~TermWindow()
 
 	for (int32 i = 0; Session* session = (Session*)fSessions.ItemAt(i); i++)
 		delete session;
-}
-
-
-void
-TermWindow::SetSessionTitle(TermView* termView, const char* title)
-{
-	int32 index = _IndexOfTermView(termView);
-	if (Session* session = (Session*)fSessions.ItemAt(index)) {
-		session->title.pattern = title;
-		session->title.patternUserDefined = true;
-		_UpdateSessionTitle(index);
-	}
 }
 
 
@@ -702,21 +677,6 @@ TermWindow::MessageReceived(BMessage *message)
 			_CheckChildren();
 			break;
 
-		case MSG_PREVIOUS_TAB:
-		case MSG_NEXT_TAB:
-		{
-			TermView* termView;
-			if (message->FindPointer("termView", (void**)&termView) == B_OK) {
-				int32 count = fSessions.CountItems();
-				int32 index = _IndexOfTermView(termView);
-				if (count > 1 && index >= 0) {
-					index += message->what == MSG_PREVIOUS_TAB ? -1 : 1;
-					fTabView->Select((index + count) % count);
-				}
-			}
-			break;
-		}
-
 		case kSetActiveTab:
 		{
 			int32 index;
@@ -894,11 +854,12 @@ TermWindow::_AddTab(Arguments* args, const BString& currentDirectory)
 	ShellParameters shellParameters(argc, argv, currentDirectory);
 
 	try {
-		CustomTermView* view = new CustomTermView(
+		TermView* view = new TermView(
 			PrefHandler::Default()->getInt32(PREF_ROWS),
 			PrefHandler::Default()->getInt32(PREF_COLS),
 			shellParameters,
 			PrefHandler::Default()->getInt32(PREF_HISTORY_SIZE));
+		view->SetListener(this);
 
 		TermViewContainerView* containerView = new TermViewContainerView(view);
 		BScrollView* scrollView = new TermScrollView("scrollView",
@@ -989,6 +950,22 @@ TermWindow::_RemoveTab(int32 index)
 }
 
 
+void
+TermWindow::_NavigateTab(int32 index, int32 direction, bool move)
+{
+	int32 count = fSessions.CountItems();
+	if (count <= 1 || index < 0 || index >= count)
+		return;
+
+	if (move) {
+		// TODO: Move the tab!
+	} else {
+		index += direction;
+		fTabView->Select((index + count) % count);
+	}
+}
+
+
 TermViewContainerView*
 TermWindow::_ActiveTermViewContainerView() const
 {
@@ -1043,7 +1020,8 @@ TermWindow::_CheckChildren()
 	int32 count = fSessions.CountItems();
 	for (int32 i = count - 1; i >= 0; i--) {
 		Session* session = (Session*)fSessions.ItemAt(i);
-		session->containerView->GetTermView()->CheckShellGone();
+		if (session->containerView->GetTermView()->CheckShellGone())
+			NotifyTermViewQuit(session->containerView->GetTermView(), 0);
 	}
 }
 
@@ -1116,6 +1094,44 @@ TermWindow::TabRightClicked(SmartTabView* tabView, BPoint point, int32 index)
 	BRect mouseRect(screenWhere, screenWhere);
 	mouseRect.InsetBy(-4.0, -4.0);
 	popUpMenu->Go(screenWhere, true, true, mouseRect, true);
+}
+
+
+void
+TermWindow::NotifyTermViewQuit(TermView* view, int32 reason)
+{
+	// Since the notification can come from the view, we send a message to
+	// ourselves to avoid deleting the caller synchronously.
+	BMessage message(kCloseView);
+	message.AddPointer("termView", view);
+	message.AddInt32("reason", reason);
+	PostMessage(&message);
+}
+
+
+void
+TermWindow::SetTermViewTitle(TermView* view, const char* title)
+{
+	int32 index = _IndexOfTermView(view);
+	if (Session* session = (Session*)fSessions.ItemAt(index)) {
+		session->title.pattern = title;
+		session->title.patternUserDefined = true;
+		_UpdateSessionTitle(index);
+	}
+}
+
+
+void
+TermWindow::PreviousTermView(TermView* view, bool move)
+{
+	_NavigateTab(_IndexOfTermView(view), -1, move);
+}
+
+
+void
+TermWindow::NextTermView(TermView* view, bool move)
+{
+	_NavigateTab(_IndexOfTermView(view), 1, move);
 }
 
 
@@ -1276,44 +1292,3 @@ TermWindow::_NewSessionIndex()
 			return id;
 	}
 }
-
-
-// #pragma mark -
-
-
-// CustomTermView
-CustomTermView::CustomTermView(int32 rows, int32 columns,
-	const ShellParameters& shellParameters, int32 historySize)
-	:
-	TermView(rows, columns, shellParameters, historySize)
-{
-}
-
-
-void
-CustomTermView::NotifyQuit(int32 reason)
-{
-	BWindow* window = Window();
-	// TODO: If we got this from a view in a tab not currently selected,
-	// Window() will be NULL, as the view is detached.
-	// So we send the message to the first application window
-	// This isn't so cool, but should be safe, since a Terminal
-	// application has only one window, at least for now.
-	if (window == NULL)
-		window = be_app->WindowAt(0);
-
-	if (window != NULL) {
-		BMessage message(kCloseView);
-		message.AddPointer("termView", this);
-		message.AddInt32("reason", reason);
-		window->PostMessage(&message);
-	}
-}
-
-
-void
-CustomTermView::SetTitle(const char* title)
-{
-	dynamic_cast<TermWindow*>(Window())->SetSessionTitle(this, title);
-}
-

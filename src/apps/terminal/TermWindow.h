@@ -37,6 +37,7 @@
 #include <Window.h>
 
 #include "SmartTabView.h"
+#include "TermView.h"
 
 
 class Arguments;
@@ -45,19 +46,17 @@ class BMenu;
 class BMenuBar;
 class FindWindow;
 class PrefWindow;
-class TermView;
 class TermViewContainerView;
 
 
-class TermWindow : public BWindow, private SmartTabView::Listener {
+class TermWindow : public BWindow, private SmartTabView::Listener,
+	private TermView::Listener {
 public:
 								TermWindow(BRect frame, const BString& title,
 									bool isUserDefinedTitle, int32 windowIndex,
 									uint32 workspaces, Arguments* args);
 	virtual						~TermWindow();
 
-			void				SetSessionTitle(TermView* termView,
-									const char* title);
 			void				SessionChanged();
 
 protected:
@@ -77,6 +76,14 @@ private:
 									BPoint point, int32 index);
 	virtual	void				TabRightClicked(SmartTabView* tabView,
 									BPoint point, int32 index);
+
+	// TermView::Listener
+	virtual	void				NotifyTermViewQuit(TermView* view,
+									int32 reason);
+	virtual	void				SetTermViewTitle(TermView* view,
+									const char* title);
+	virtual	void				PreviousTermView(TermView* view, bool move);
+	virtual	void				NextTermView(TermView* view, bool move);
 
 private:
 			struct Title {
@@ -108,11 +115,15 @@ private:
 			void				_GetPreferredFont(BFont &font);
 			status_t			_DoPageSetup();
 			void				_DoPrint();
+
 			void				_NewTab();
 			void				_AddTab(Arguments* args,
 									const BString& currentDirectory
 										= BString());
 			void				_RemoveTab(int32 index);
+			void				_NavigateTab(int32 index, int32 direction,
+									bool move);
+
 			bool				_CanClose(int32 index);
 			TermViewContainerView* _ActiveTermViewContainerView() const;
 			TermViewContainerView* _TermViewContainerViewAt(int32 index) const;
