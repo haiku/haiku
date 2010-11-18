@@ -38,7 +38,7 @@ TitlePlaceholderMapper::MapPlaceholder(char placeholder, int64 number,
 					 number--;
 				}
 
-				if (index >= 0 && index + 1 < directory.Length())
+				if (number == 0 && index >= 0 && index + 1 < directory.Length())
 					directory.Remove(0, index + 1);
 			}
 
