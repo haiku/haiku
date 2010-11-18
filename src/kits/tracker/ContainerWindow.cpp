@@ -3900,10 +3900,9 @@ BContainerWindow::SetSingleWindowBrowseShortcuts(bool enabled)
 		if (!Navigator())
 			return;
 
-		RemoveShortcut(B_DOWN_ARROW, B_OPTION_KEY | B_COMMAND_KEY);
+		RemoveShortcut(B_DOWN_ARROW, B_COMMAND_KEY | B_OPTION_KEY);
+		RemoveShortcut(B_UP_ARROW, B_COMMAND_KEY);
 		RemoveShortcut(B_UP_ARROW, B_COMMAND_KEY | B_OPTION_KEY);
-		RemoveShortcut(B_UP_ARROW, B_COMMAND_KEY | B_OPTION_KEY | B_CONTROL_KEY);
-		RemoveShortcut(B_UP_ARROW, B_COMMAND_KEY | B_CONTROL_KEY);
 
 		AddShortcut(B_LEFT_ARROW, B_COMMAND_KEY,
 			new BMessage(kNavigatorCommandBackward), Navigator());
@@ -3930,16 +3929,14 @@ BContainerWindow::SetSingleWindowBrowseShortcuts(bool enabled)
 		RemoveShortcut(B_UP_ARROW, B_OPTION_KEY | B_COMMAND_KEY);
 			// This also changes meaning, added again below.
 
-		AddShortcut(B_DOWN_ARROW, B_OPTION_KEY | B_COMMAND_KEY,
+		AddShortcut(B_DOWN_ARROW, B_COMMAND_KEY | B_OPTION_KEY,
 			new BMessage(kOpenSelection), PoseView());
 		AddShortcut(B_UP_ARROW, B_COMMAND_KEY,
 			new BMessage(kOpenParentDir), PoseView());
 			// We change the meaning from kNavigatorCommandUp to kOpenParentDir.
 		AddShortcut(B_UP_ARROW, B_COMMAND_KEY | B_OPTION_KEY,
 			new BMessage(kOpenParentDir), PoseView());
-		AddShortcut(B_UP_ARROW, B_COMMAND_KEY | B_OPTION_KEY | B_CONTROL_KEY,
-			new BMessage(kOpenParentDir), PoseView());
-			// the command option results in closing the parent window
+			// command + option results in closing the parent window
 	}
 }
 
