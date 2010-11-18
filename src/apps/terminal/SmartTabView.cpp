@@ -1,9 +1,10 @@
 /*
- * Copyright 2007-2009, Haiku. All rights reserved.
+ * Copyright 2007-2010, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  *	Authors:
  *		Stefano Ceccherini (burton666@libero.it)
+ *		Ingo Weinhold (ingo_weinhold@gmx.de)
  */
 
 
@@ -16,20 +17,18 @@
 
 #include "SmartTabView.h"
 
+#include <stdio.h>
+
 #include <Catalog.h>
 #include <Locale.h>
-#include <MenuItem.h>
 #include <Message.h>
 #include <Messenger.h>
-#include <PopUpMenu.h>
 #include <Screen.h>
 #include <ScrollView.h>
 #include <Window.h>
 
-#include <stdio.h>
 
-
-const static uint32 kCloseTab = 'ClTb';
+// #pragma mark - SmartTabView
 
 
 SmartTabView::SmartTabView(BRect frame, const char* name, button_width width,
@@ -37,7 +36,8 @@ SmartTabView::SmartTabView(BRect frame, const char* name, button_width width,
 	:
 	BTabView(frame, name, width, resizingMode, flags),
 	fInsets(0, 0, 0, 0),
-	fScrollView(NULL)
+	fScrollView(NULL),
+	fListener(NULL)
 {
 	// Resize the container view to fill the complete tab view for single-tab
 	// mode. Later, when more than one tab is added, we shrink the container
@@ -62,8 +62,6 @@ SmartTabView::SetInsets(float left, float top, float right, float bottom)
 	fInsets.bottom = bottom;
 }
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Terminal SmartTabView"
 
 void
 SmartTabView::MouseDown(BPoint point)
@@ -73,22 +71,21 @@ SmartTabView::MouseDown(BPoint point)
 	if (CountTabs() > 1) {
 		int32 tabIndex = _ClickedTabIndex(point);
 		if (tabIndex >= 0) {
-			int32 buttons;
+			int32 buttons = 0;
+			int32 clickCount = 0;
 			Window()->CurrentMessage()->FindInt32("buttons", &buttons);
-			if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0) {
-				BMessage* message = new BMessage(kCloseTab);
-				message->AddInt32("index", tabIndex);
+			Window()->CurrentMessage()->FindInt32("clicks", &clickCount);
 
-				BPopUpMenu* popUpMenu = new BPopUpMenu("tab menu");
-				popUpMenu->AddItem(new BMenuItem(B_TRANSLATE("Close tab"),
-					message));
-				popUpMenu->SetAsyncAutoDestruct(true);
-				popUpMenu->SetTargetForItems(BMessenger(this));
-				popUpMenu->Go(ConvertToScreen(point), true, true, true);
-
+			if ((buttons & B_PRIMARY_MOUSE_BUTTON) != 0 && clickCount == 2) {
+				if (fListener != NULL)
+					fListener->TabDoubleClicked(this, point, tabIndex);
+			} else if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0) {
+				if (fListener != NULL)
+					fListener->TabRightClicked(this, point, tabIndex);
 				handled = true;
 			} else if ((buttons & B_TERTIARY_MOUSE_BUTTON) != 0) {
-				RemoveAndDeleteTab(tabIndex);
+				if (fListener != NULL)
+					fListener->TabMiddleClicked(this, point, tabIndex);
 				handled = true;
 			}
 		}
@@ -114,24 +111,6 @@ SmartTabView::AllAttached()
 
 
 void
-SmartTabView::MessageReceived(BMessage *message)
-{
-	switch (message->what) {
-		case kCloseTab:
-		{
-			int32 tabIndex = 0;
-			if (message->FindInt32("index", &tabIndex) == B_OK)
-				RemoveAndDeleteTab(tabIndex);
-			break;
-		}
-		default:
-			BTabView::MessageReceived(message);
-			break;
-	}
-}
-
-
-void
 SmartTabView::Select(int32 index)
 {
 	BTabView::Select(index);
@@ -142,20 +121,9 @@ SmartTabView::Select(int32 index)
 				- fInsets.left - fInsets.right,
 			ContainerView()->Bounds().Height() - fInsets.top - fInsets.bottom);
 	}
-}
 
-
-void
-SmartTabView::RemoveAndDeleteTab(int32 index)
-{
-	// Select another tab
-	if (index == Selection()) {
-		if (index > 0)
-			Select(index - 1);
-		else if (index < CountTabs())
-			Select(index + 1);
-	}
-	delete RemoveTab(index);
+	if (fListener != NULL)
+		fListener->TabSelected(this, index);
 }
 
 
@@ -271,4 +239,39 @@ SmartTabView::_ClickedTabIndex(const BPoint& point)
 	}
 
 	return -1;
+}
+
+
+// #pragma mark - Listener
+
+
+SmartTabView::Listener::~Listener()
+{
+}
+
+
+void
+SmartTabView::Listener::TabSelected(SmartTabView* tabView, int32 index)
+{
+}
+
+
+void
+SmartTabView::Listener::TabDoubleClicked(SmartTabView* tabView, BPoint point,
+	int32 index)
+{
+}
+
+
+void
+SmartTabView::Listener::TabMiddleClicked(SmartTabView* tabView, BPoint point,
+	int32 index)
+{
+}
+
+
+void
+SmartTabView::Listener::TabRightClicked(SmartTabView* tabView, BPoint point,
+	int32 index)
+{
 }

@@ -1,9 +1,10 @@
 /*
- * Copyright 2007-2009, Haiku. All rights reserved.
+ * Copyright 2007-2010, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  *	Authors:
  *		Stefano Ceccherini (burton666@libero.it)
+ *		Ingo Weinhold (ingo_weinhold@gmx.de)
  */
 #ifndef SMART_TAB_VIEW_H
 #define SMART_TAB_VIEW_H
@@ -17,6 +18,9 @@ class BScrollView;
 
 
 class SmartTabView : public BTabView {
+public:
+			class Listener;
+
 public:
 								SmartTabView(BRect frame, const char* name,
 									button_width width = B_WIDTH_AS_USUAL,
@@ -40,11 +44,7 @@ public:
 	virtual void				AttachedToWindow();
 	virtual void				AllAttached();
 
-	virtual void				MessageReceived(BMessage* message);
-
 	virtual	void				Select(int32 tab);
-
-	virtual	void				RemoveAndDeleteTab(int32 index);
 
 	virtual	void				AddTab(BView* target, BTab* tab = NULL);
 	virtual BTab*				RemoveTab(int32 index);
@@ -53,12 +53,31 @@ public:
 
 			void				SetScrollView(BScrollView* scrollView);
 
+			void				SetListener(Listener* listener)
+									{ fListener = listener; }
+
 private:
 			int32				_ClickedTabIndex(const BPoint& point);
 
 private:
 			BRect				fInsets;
 			BScrollView*		fScrollView;
+			Listener*			fListener;
 };
+
+
+class SmartTabView::Listener {
+public:
+	virtual						~Listener();
+
+	virtual	void				TabSelected(SmartTabView* tabView, int32 index);
+	virtual	void				TabDoubleClicked(SmartTabView* tabView,
+									BPoint point, int32 index);
+	virtual	void				TabMiddleClicked(SmartTabView* tabView,
+									BPoint point, int32 index);
+	virtual	void				TabRightClicked(SmartTabView* tabView,
+									BPoint point, int32 index);
+};
+
 
 #endif // SMART_TAB_VIEW_H

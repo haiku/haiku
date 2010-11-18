@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2010, Haiku, Inc. All rights reserved.
  * Copyright (c) 2004 Daniel Furrer <assimil8or@users.sourceforge.net>
  * Copyright (c) 2003-2004 Kian Duffy <myob@users.sourceforge.net>
  * Copyright (C) 1998,99 Kazuho Okui and Takashi Murai.
@@ -24,6 +24,7 @@
 #include <MenuBar.h>
 #include <MenuItem.h>
 #include <Path.h>
+#include <PopUpMenu.h>
 #include <PrintJob.h>
 #include <Roster.h>
 #include <Screen.h>
@@ -40,7 +41,6 @@
 #include "PrefWindow.h"
 #include "PrefHandler.h"
 #include "ShellParameters.h"
-#include "SmartTabView.h"
 #include "TermConst.h"
 #include "TermScrollView.h"
 #include "TermView.h"
@@ -114,32 +114,6 @@ struct TermWindow::Session {
 		title.title << id;
 		title.patternUserDefined = false;
 	}
-};
-
-
-class TermWindow::TabView : public SmartTabView {
-public:
-	TabView(TermWindow* window, BRect frame, const char *name,
-		button_width width)
-		:
-		SmartTabView(frame, name, width),
-		fWindow(window)
-	{
-	}
-
-	virtual	void Select(int32 tab)
-	{
-		SmartTabView::Select(tab);
-		fWindow->SessionChanged();
-	}
-
-	virtual	void RemoveAndDeleteTab(int32 index)
-	{
-		fWindow->_RemoveTab(index);
-	}
-
-private:
-	TermWindow*	fWindow;
 };
 
 
@@ -234,7 +208,8 @@ TermWindow::_InitWindow()
 	BRect textFrame = Bounds();
 	textFrame.top = fMenubar->Bounds().bottom + 1.0;
 
-	fTabView = new TabView(this, textFrame, "tab view", B_WIDTH_FROM_WIDEST);
+	fTabView = new SmartTabView(textFrame, "tab view", B_WIDTH_FROM_WIDEST);
+	fTabView->SetListener(this);
 	AddChild(fTabView);
 
 	// Make the scroll view one pixel wider than the tab view container view, so
@@ -1041,6 +1016,45 @@ TermWindow::FrameResized(float newWidth, float newHeight)
 	TermView* view = _ActiveTermView();
 	PrefHandler::Default()->setInt32(PREF_COLS, view->Columns());
 	PrefHandler::Default()->setInt32(PREF_ROWS, view->Rows());
+}
+
+
+void
+TermWindow::TabSelected(SmartTabView* tabView, int32 index)
+{
+	SessionChanged();
+}
+
+
+void
+TermWindow::TabDoubleClicked(SmartTabView* tabView, BPoint point, int32 index)
+{
+	// TODO:...
+}
+
+
+void
+TermWindow::TabMiddleClicked(SmartTabView* tabView, BPoint point, int32 index)
+{
+	_RemoveTab(index);
+}
+
+
+void
+TermWindow::TabRightClicked(SmartTabView* tabView, BPoint point, int32 index)
+{
+	TermView* termView = _TermViewAt(index);
+	if (termView == NULL)
+		return;
+
+	BMessage* message = new BMessage(kCloseView);
+	message->AddPointer("termview", termView);
+
+	BPopUpMenu* popUpMenu = new BPopUpMenu("tab menu");
+	popUpMenu->AddItem(new BMenuItem(B_TRANSLATE("Close tab"), message));
+	popUpMenu->SetAsyncAutoDestruct(true);
+	popUpMenu->SetTargetForItems(BMessenger(this));
+	popUpMenu->Go(tabView->ConvertToScreen(point), true, true, true);
 }
 
 

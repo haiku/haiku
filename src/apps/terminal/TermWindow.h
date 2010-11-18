@@ -36,6 +36,8 @@
 #include <String.h>
 #include <Window.h>
 
+#include "SmartTabView.h"
+
 
 class Arguments;
 class BFont;
@@ -43,12 +45,11 @@ class BMenu;
 class BMenuBar;
 class FindWindow;
 class PrefWindow;
-class SmartTabView;
 class TermView;
 class TermViewContainerView;
 
 
-class TermWindow : public BWindow {
+class TermWindow : public BWindow, private SmartTabView::Listener {
 public:
 								TermWindow(BRect frame, const BString& title,
 									bool isUserDefinedTitle, int32 windowIndex,
@@ -68,6 +69,16 @@ protected:
 	virtual void				FrameResized(float newWidth, float newHeight);
 
 private:
+	// SmartTabView::Listener
+	virtual	void				TabSelected(SmartTabView* tabView, int32 index);
+	virtual	void				TabDoubleClicked(SmartTabView* tabView,
+									BPoint point, int32 index);
+	virtual	void				TabMiddleClicked(SmartTabView* tabView,
+									BPoint point, int32 index);
+	virtual	void				TabRightClicked(SmartTabView* tabView,
+									BPoint point, int32 index);
+
+private:
 			struct Title {
 				BString			title;
 				BString			pattern;
@@ -75,8 +86,6 @@ private:
 			};
 
 			struct Session;
-			class TabView;
-			friend class TabView;
 
 			void				_SetTermColors(TermViewContainerView* termView);
 			void				_InitWindow();
@@ -114,7 +123,7 @@ private:
 
 			BList				fSessions;
 
-			TabView*			fTabView;
+			SmartTabView*		fTabView;
 			TermView*			fTermView;
 
 			BMenuBar*			fMenubar;
