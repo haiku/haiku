@@ -9,32 +9,190 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <ListView.h>
 #include <Bitmap.h>
+#include <ColumnTypes.h>
 #include <FindDirectory.h>
+#include <MimeType.h>
+#include <MessageRunner.h>
 #include <NodeInfo.h>
 #include <Path.h>
 #include <Roster.h>
-#include <MimeType.h>
-#include <MessageRunner.h>
 #include <String.h>
 
 #include "TeamsListView.h"
 
 
-TeamListItem::TeamListItem(team_info& info)
+// #pragma mark - BitmapStringField
+
+
+BBitmapStringField::BBitmapStringField(BBitmap* bitmap, const char* string)
 	:
-	BStringItem("", false),
-	fIcon(NULL)
+	Inherited(string),
+	fBitmap(bitmap)
+{
+}
+
+
+BBitmapStringField::~BBitmapStringField()
+{
+	delete fBitmap;
+}
+
+
+void
+BBitmapStringField::SetBitmap(BBitmap* bitmap)
+{
+	delete fBitmap;
+	fBitmap = bitmap;
+	// TODO: cause a redraw?
+}
+
+
+// #pragma mark - TeamsColumn
+
+
+float TeamsColumn::sTextMargin = 0.0;
+
+
+TeamsColumn::TeamsColumn(const char* title, float width, float minWidth,
+		float maxWidth, uint32 truncateMode, alignment align)
+	:
+	Inherited(title, width, minWidth, maxWidth, align),
+	fTruncateMode(truncateMode)
+{
+	SetWantsEvents(true);
+}
+
+
+void
+TeamsColumn::DrawField(BField* field, BRect rect, BView* parent)
+{
+	BBitmapStringField* bitmapField
+		= dynamic_cast<BBitmapStringField*>(field);
+	BStringField* stringField = dynamic_cast<BStringField*>(field);
+
+	if (bitmapField) {
+		const BBitmap* bitmap = bitmapField->Bitmap();
+
+		// figure out the placement
+		float x = 0.0;
+		BRect r = bitmap ? bitmap->Bounds() : BRect(0, 0, 15, 15);
+		float y = rect.top + ((rect.Height() - r.Height()) / 2);
+		float width = 0.0;
+
+		switch (Alignment()) {
+			default:
+			case B_ALIGN_LEFT:
+			case B_ALIGN_CENTER:
+				x = rect.left + sTextMargin;
+				width = rect.right - (x + r.Width()) - (2 * sTextMargin);
+				r.Set(x + r.Width(), rect.top, rect.right - width, rect.bottom);
+				break;
+
+			case B_ALIGN_RIGHT:
+				x = rect.right - sTextMargin - r.Width();
+				width = (x - rect.left - (2 * sTextMargin));
+				r.Set(rect.left, rect.top, rect.left + width, rect.bottom);
+				break;
+		}
+
+		if (width != bitmapField->Width()) {
+			BString truncatedString(bitmapField->String());
+			parent->TruncateString(&truncatedString, fTruncateMode, width + 2);
+			bitmapField->SetClippedString(truncatedString.String());
+			bitmapField->SetWidth(width);
+		}
+
+		// draw the bitmap
+		if (bitmap) {
+			parent->SetDrawingMode(B_OP_ALPHA);
+			parent->DrawBitmap(bitmap, BPoint(x, y));
+			parent->SetDrawingMode(B_OP_OVER);
+		}
+
+		// draw the string
+		DrawString(bitmapField->ClippedString(), parent, r);
+
+	} else if (stringField) {
+
+		float width = rect.Width() - (2 * sTextMargin);
+
+		if (width != stringField->Width()) {
+			BString truncatedString(stringField->String());
+
+			parent->TruncateString(&truncatedString, fTruncateMode, width + 2);
+			stringField->SetClippedString(truncatedString.String());
+			stringField->SetWidth(width);
+		}
+
+		DrawString(stringField->ClippedString(), parent, rect);
+	}
+}
+
+
+float
+TeamsColumn::GetPreferredWidth(BField *_field, BView* parent) const
+{
+	BBitmapStringField* bitmapField
+		= dynamic_cast<BBitmapStringField*>(_field);
+	BStringField* stringField = dynamic_cast<BStringField*>(_field);
+
+	float parentWidth = Inherited::GetPreferredWidth(_field, parent);
+	float width = 0.0;
+
+	if (bitmapField) {
+		const BBitmap* bitmap = bitmapField->Bitmap();
+		BFont font;
+		parent->GetFont(&font);
+		width = font.StringWidth(bitmapField->String()) + 3 * sTextMargin;
+		if (bitmap)
+			width += bitmap->Bounds().Width();
+		else
+			width += 16;
+	} else if (stringField) {
+		BFont font;
+		parent->GetFont(&font);
+		width = font.StringWidth(stringField->String()) + 2 * sTextMargin;
+	}
+	return max_c(width, parentWidth);
+}
+
+
+bool
+TeamsColumn::AcceptsField(const BField* field) const
+{
+	return dynamic_cast<const BStringField*>(field) != NULL;
+}
+
+
+void
+TeamsColumn::InitTextMargin(BView* parent)
+{
+	BFont font;
+	parent->GetFont(&font);
+	sTextMargin = ceilf(font.Size() * 0.8);
+}
+
+
+// #pragma mark - TeamRow
+
+
+enum {
+	kNameColumn,
+	kIDColumn,
+	kThreadCountColumn,
+};
+
+
+TeamRow::TeamRow(team_info& info)
+	: BRow(20.0)
 {
 	_SetTo(info);
 }
 
 
-TeamListItem::TeamListItem(team_id team)
-	:
-	BStringItem("", false),
-	fIcon(NULL)
+TeamRow::TeamRow(team_id team)
+	: BRow(20.0)
 {
 	team_info info;
 	get_team_info(team, &info);
@@ -42,89 +200,8 @@ TeamListItem::TeamListItem(team_id team)
 }
 
 
-TeamListItem::~TeamListItem()
-{
-	delete fIcon;
-}
-
-
-void
-TeamListItem::DrawItem(BView* owner, BRect frame, bool complete)
-{
-	BRect rect = frame;
-
-	if (fIcon) {
-		rgb_color highColor = owner->HighColor();
-		rgb_color lowColor = owner->LowColor();
-
-		if (IsSelected() || complete) {
-			// Draw the background...
-			if (IsSelected())
-				owner->SetLowColor(tint_color(lowColor, B_DARKEN_2_TINT));
-
-			owner->FillRect(rect, B_SOLID_LOW);
-		}
-
-		BPoint point(rect.left + 2.0f,
-		rect.top + (rect.Height() - B_MINI_ICON) / 2.0f);
-
-		// Draw icon
-		owner->SetDrawingMode(B_OP_ALPHA);
-		owner->DrawBitmap(fIcon, point);
-		owner->SetDrawingMode(B_OP_COPY);
-
-		owner->MovePenTo(rect.left + B_MINI_ICON + 8.0f, frame.top + fBaselineOffset);
-
-		if (!IsEnabled())
-			owner->SetHighColor(tint_color(owner->HighColor(), B_LIGHTEN_2_TINT));
-		else
-			owner->SetHighColor(0, 0, 0);
-
-		owner->DrawString(Text());
-
-		owner->SetHighColor(highColor);
-		owner->SetLowColor(lowColor);
-	} else
-		// No icon, fallback on plain StringItem...
-		BStringItem::DrawItem(owner, rect, complete);
-}
-
-
-void
-TeamListItem::Update(BView* owner, const BFont* font)
-{
-		BStringItem::Update(owner, font);
-
-		if (Height() < B_MINI_ICON + 4.0f)
-				SetHeight(B_MINI_ICON + 4.0f);
-
-		font_height fontHeight;
-		font->GetHeight(&fontHeight);
-
-		fBaselineOffset = fontHeight.ascent +
-			+ (Height() - ceilf(fontHeight.ascent + fontHeight.descent)) / 2.0f;
-}
-
-
-/* static */
-int
-TeamListItem::Compare(const void* a, const void* b)
-{
-	const BListItem*itemA = *static_cast<const BListItem* const *>(a);
-	const BListItem*itemB = *static_cast<const BListItem* const *>(b);
-	const TeamListItem*teamItemA = dynamic_cast<const TeamListItem*>(itemA);
-	const TeamListItem*teamItemB = dynamic_cast<const TeamListItem*>(itemB);
-
-	if (teamItemA != NULL && teamItemB != NULL) {
-		return teamItemA->fTeamInfo.team - teamItemB->fTeamInfo.team;
-	}
-
-	return 0;
-}
-
-
 status_t
-TeamListItem::_SetTo(team_info& info)
+TeamRow::_SetTo(team_info& info)
 {
 	BPath systemPath;
 	team_info teamInfo = fTeamInfo = info;
@@ -156,39 +233,61 @@ TeamListItem::_SetTo(team_info& info)
 		entry.GetRef(&appInfo.ref);
 	}
 
-	SetText(teamInfo.args);
+	BBitmap* icon = new BBitmap(BRect(0, 0, B_MINI_ICON - 1, B_MINI_ICON - 1), B_RGBA32);
 
-	fIcon = new BBitmap(BRect(0, 0, B_MINI_ICON - 1, B_MINI_ICON - 1), B_RGBA32);
-
-	status = BNodeInfo::GetTrackerIcon(&appInfo.ref, fIcon, B_MINI_ICON);
+	status = BNodeInfo::GetTrackerIcon(&appInfo.ref, icon, B_MINI_ICON);
 	if (status != B_OK) {
 			BMimeType genericAppType(B_APP_MIME_TYPE);
-			status = genericAppType.GetIcon(fIcon, B_MINI_ICON);
+			status = genericAppType.GetIcon(icon, B_MINI_ICON);
 	}
 
 	if (status != B_OK) {
-		delete fIcon;
-		fIcon = NULL;
+		delete icon;
+		icon = NULL;
 	}
+
+	BString tmp;
+	tmp << teamInfo.team;
+
+	SetField(new BBitmapStringField(icon, teamInfo.args), kNameColumn);
+	SetField(new BStringField(tmp), kIDColumn);
+
+	tmp = "";
+	tmp << teamInfo.thread_count;
+
+	SetField(new BStringField(tmp), kThreadCountColumn);
 
 	return status;
 }
 
-//	#pragma mark -
+
+//	#pragma mark - TeamsListView
 
 
 TeamsListView::TeamsListView(BRect frame, const char* name)
 	:
-	BListView(frame, name, B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL),
+	Inherited(frame, name, B_FOLLOW_ALL, 0, B_NO_BORDER, true),
 	fUpdateRunner(NULL)
 {
+	AddColumn(new TeamsColumn("Name", 400, 100, 600,
+		B_TRUNCATE_BEGINNING), kNameColumn);
+	AddColumn(new TeamsColumn("ID", 80, 40, 100,
+		B_TRUNCATE_MIDDLE, B_ALIGN_RIGHT), kIDColumn);
+
+/*
+	AddColumn(new TeamsColumn("Thread count", 100, 50, 500,
+		B_TRUNCATE_MIDDLE, B_ALIGN_RIGHT), kThreadCountColumn);
+*/
+	SetSortingEnabled(false);
+
 	team_info tmi;
 	get_team_info(B_CURRENT_TEAM, &tmi);
 	fThisTeam = tmi.team;
-
+/*
 #ifdef __HAIKU__
 	SetFlags(Flags() | B_SUBPIXEL_PRECISE);
 #endif
+*/
 }
 
 
@@ -201,7 +300,8 @@ TeamsListView::~TeamsListView()
 void
 TeamsListView::AttachedToWindow()
 {
-	BListView::AttachedToWindow();
+	Inherited::AttachedToWindow();
+	TeamsColumn::InitTextMargin(ScrollView());
 
 	_InitList();
 
@@ -215,18 +315,14 @@ TeamsListView::AttachedToWindow()
 void
 TeamsListView::DetachedFromWindow()
 {
-	BListView::DetachedFromWindow();
+	Inherited::DetachedFromWindow();
 
 	be_roster->StopWatching(this);
 
 	delete fUpdateRunner;
 	fUpdateRunner = NULL;
 
-	// free all items, they will be retrieved again in AttachedToWindow()
-	for (int32 i = CountItems(); i-- > 0;) {
-		delete ItemAt(i);
-	}
-	MakeEmpty();
+	Clear(); // MakeEmpty();
 }
 
 
@@ -244,12 +340,12 @@ TeamsListView::MessageReceived(BMessage* message)
 			if (message->FindInt32("be:team", &team) != B_OK)
 				break;
 
-			TeamListItem* item = new(std::nothrow) TeamListItem(team);
-			if (item != NULL) {
-				if (!AddItem(item))
-					delete item;
-				else
+			TeamRow* row = new(std::nothrow) TeamRow(team);
+			if (row != NULL) {
+				AddRow(row);
+				/*else
 					SortItems(&TeamListItem::Compare);
+				*/
 			}
 			break;
 		}
@@ -260,30 +356,30 @@ TeamsListView::MessageReceived(BMessage* message)
 			if (message->FindInt32("be:team", &team) != B_OK)
 				break;
 
-			TeamListItem* item = FindItem(team);
-			if (item != NULL) {
-				RemoveItem(item);
-				delete item;
+			TeamRow* row = FindTeamRow(team);
+			if (row != NULL) {
+				RemoveRow(row);
+				delete row;
 			}
 			break;
 		}
 
 		default:
-			BListView::MessageReceived(message);
+			Inherited::MessageReceived(message);
 	}
 }
 
 
-TeamListItem*
-TeamsListView::FindItem(team_id teamId)
+TeamRow*
+TeamsListView::FindTeamRow(team_id teamId)
 {
-	for (int32 i = CountItems(); i-- > 0;) {
-		TeamListItem* item = dynamic_cast<TeamListItem*>(ItemAt(i));
-		if (item == NULL)
+	for (int32 i = CountRows(); i-- > 0;) {
+		TeamRow* row = dynamic_cast<TeamRow*>(RowAt(i));
+		if (row == NULL)
 			continue;
 
-		if (item->TeamID() == teamId)
-			return item;
+		if (row->TeamID() == teamId)
+			return row;
 	}
 
 	return NULL;
@@ -297,8 +393,8 @@ TeamsListView::_InitList()
 	team_info tmi;
 
 	while (get_next_team_info(&tmi_cookie, &tmi) == B_OK) {
-		TeamListItem* item = new(std::nothrow)  TeamListItem(tmi);
-		if (item == NULL) {
+		TeamRow* row = new(std::nothrow)  TeamRow(tmi);
+		if (row == NULL) {
 			// Memory issue. Bail out.
 			break;
 		}
@@ -306,15 +402,11 @@ TeamsListView::_InitList()
 		if (tmi.team == B_SYSTEM_TEAM ||
 			tmi.team == fThisTeam) {
 			// We don't support debugging kernel and... ourself!
-			item->SetEnabled(false);
+			row->SetEnabled(false);
 		}
 
-		if (!AddItem(item))
-			delete item;
-
+		AddRow(row);
 	}
-
-	// SortItems(&TeamListItem::Compare);
 }
 
 
@@ -323,44 +415,37 @@ TeamsListView::_UpdateList()
 {
 	int32 tmi_cookie = 0;
 	team_info tmi;
-	TeamListItem* item;
+	TeamRow* row;
 	int32 index = 0;
 
 	// NOTA: assuming get_next_team_info() returns teams ordered by team ID...
 	while (get_next_team_info(&tmi_cookie, &tmi) == B_OK) {
 
-		item = (TeamListItem*) ItemAt(index);
-		while (item && tmi.team > item->TeamID()) {
-				RemoveItem(item);
-				delete item;
-				item = (TeamListItem*) ItemAt(index);
+		row = dynamic_cast<TeamRow*>(RowAt(index));
+		while (row && tmi.team > row->TeamID()) {
+				RemoveRow(row);
+				delete row;
+				row = dynamic_cast<TeamRow*>(RowAt(index));
 		}
 
-		if (item == NULL || tmi.team != item->TeamID()) {
-			// Team not found in previously known teams list: insert a new item
-			TeamListItem* newItem = new(std::nothrow) TeamListItem(tmi);
-			if (newItem != NULL) {
-				bool added;
-
-				if (item == NULL) {
-					// No item found with bigger team id: append at list end
-					added = AddItem(newItem);
+		if (row == NULL || tmi.team != row->TeamID()) {
+			// Team not found in previously known teams list: insert a new row
+			TeamRow* newRow = new(std::nothrow) TeamRow(tmi);
+			if (newRow != NULL) {
+				if (row == NULL) {
+					// No row found with bigger team id: append at list end
+					AddRow(newRow);
 				} else
-					added = AddItem(newItem, index);
-
-				if (!added) {
-					// AddItem() failed! Memory Issue?
-					delete newItem;
-				}
+					AddRow(newRow, index);
 			}
 		}
 		index++;	// Move list sync head.
 	}
 
-	// Remove tail list items, if we don't walk list thru the end
-	while ((item = (TeamListItem*) ItemAt(index)) != NULL) {
-		RemoveItem(item);
-		delete item;
-		item = (TeamListItem*) ItemAt(++index);
+	// Remove tail list rows, if we don't walk list thru the end
+	while ((row = dynamic_cast<TeamRow*>(RowAt(index))) != NULL) {
+		RemoveRow(row);
+		delete row;
+		row = dynamic_cast<TeamRow*>(RowAt(++index));
 	}
 }

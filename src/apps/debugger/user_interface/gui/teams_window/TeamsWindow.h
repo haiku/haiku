@@ -12,7 +12,7 @@ class BListView;
 class BFile;
 class BMessage;
 class SettingsManager;
-
+class TeamsListView;
 
 class TeamsWindow : public BWindow {
 public:
@@ -32,7 +32,7 @@ private:
 			status_t			_SaveSettings();
 
 private:
-			BListView*			fTeamsListView;
+			TeamsListView*		fTeamsListView;
 			SettingsManager*	fSettingsManager;
 
 };

@@ -60,12 +60,10 @@ TeamsWindow::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case kMsgDebugThisTeam:
 		{
-			TeamListItem* item = dynamic_cast<TeamListItem*>(fTeamsListView->ItemAt(
-				fTeamsListView->CurrentSelection()));
-
-			if (item != NULL) {
+			TeamRow* row = dynamic_cast<TeamRow*>(fTeamsListView->CurrentSelection());
+			if (row != NULL) {
 				BMessage message(MSG_DEBUG_THIS_TEAM);
-				message.AddInt32("team", item->TeamID());
+				message.AddInt32("team", row->TeamID());
 				be_app_messenger.SendMessage(&message);
 			}
 			break;
@@ -109,21 +107,11 @@ TeamsWindow::_Init()
 
 	// Add a teams list view
 	frame = Bounds();
-	frame.right -= B_V_SCROLL_BAR_WIDTH;
-
+	frame.InsetBy(-1, -1);
 	fTeamsListView = new TeamsListView(frame, "TeamsList");
 	fTeamsListView->SetInvocationMessage(new BMessage(kMsgDebugThisTeam));
 
-	BScrollView * teamsScroller = new BScrollView("TeamsListScroller",
-		fTeamsListView, B_FOLLOW_ALL_SIDES, 0, false, true, B_NO_BORDER);
-
-	AddChild(teamsScroller);
-
-	// small visual tweak
-	if (BScrollBar* scrollBar = teamsScroller->ScrollBar(B_VERTICAL)) {
-		scrollBar->MoveBy(0, -1);
-		scrollBar->ResizeBy(0, -(B_H_SCROLL_BAR_HEIGHT - 2));
-	}
+	AddChild(fTeamsListView);
 }
 
 

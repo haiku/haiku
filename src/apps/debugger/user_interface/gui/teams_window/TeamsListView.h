@@ -1,50 +1,93 @@
 /*
- * Copyright 2009-2010, Philippe Houdoin, phoudoin@haiku-os.org. All rights reserved.
- * Distributed under the terms of the MIT License.
+ * Copyright 2009-2010 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT license.
+ *
+ * Authors:
+ *		Philippe Houdoin
  */
 #ifndef TEAMS_LIST_ITEM_H
 #define TEAMS_LIST_ITEM_H
 
 
-#include <ListView.h>
-#include <StringItem.h>
+#include <ColumnListView.h>
+#include <ColumnTypes.h>
 #include <OS.h>
 
 class BBitmap;
 class BMessageRunner;
 
 
-class TeamListItem : public BStringItem {
+// A field type displaying both a bitmap and a string so that the
+// tree display looks nicer (both text and bitmap are indented)
+class BBitmapStringField : public BStringField {
+	typedef BStringField Inherited;
 public:
-								TeamListItem(team_info & teamInfo);
-								TeamListItem(team_id teamId);
-	virtual 					~TeamListItem();
+								BBitmapStringField(BBitmap* bitmap,
+									const char* string);
+	virtual						~BBitmapStringField();
+
+			void				SetBitmap(BBitmap* bitmap);
+			const BBitmap*		Bitmap() const
+									{ return fBitmap; }
+
+private:
+			BBitmap*			fBitmap;
+};
+
+
+// BColumn for TeamsListView which knows how to render
+// a BBitmapStringField
+class TeamsColumn : public BTitledColumn {
+	typedef BTitledColumn Inherited;
+public:
+								TeamsColumn(const char* title,
+									float width, float minWidth,
+									float maxWidth, uint32 truncateMode,
+									alignment align = B_ALIGN_LEFT);
+
+	virtual	void				DrawField(BField* field, BRect rect,
+									BView* parent);
+	virtual float				GetPreferredWidth(BField* field, BView* parent) const;
+
+	virtual	bool				AcceptsField(const BField* field) const;
+
+	static	void				InitTextMargin(BView* parent);
+
+private:
+			uint32				fTruncateMode;
+	static	float				sTextMargin;
+};
+
+
+
+class TeamRow : public BRow {
+	typedef BRow Inherited;
+public:
+								TeamRow(team_info & teamInfo);
+								TeamRow(team_id teamId);
 
 public:
-	virtual void 				DrawItem(BView *owner, BRect itemRect,
-									bool drawEverything = false);
-	virtual void 				Update(BView *owner, const BFont *font);
+			team_id				TeamID() const 				{ return fTeamInfo.team; }
 
-			team_id				TeamID()  { return fTeamInfo.team; };
-
-	static 	int 				Compare(const void* a, const void* b);
+	virtual	void				SetEnabled(bool enabled) 	{ fEnabled = enabled; }
+			bool				IsEnabled() const			{ return fEnabled; }
 
 private:
 			status_t			_SetTo(team_info & info);
 
 private:
+			bool				fEnabled;
 			team_info			fTeamInfo;
-			BBitmap *			fIcon;
-			float				fBaselineOffset;
 };
 
 
-class TeamsListView : public BListView {
+class TeamsListView : public BColumnListView {
+	typedef BColumnListView Inherited;
 public:
 								TeamsListView(BRect frame, const char* name);
 	virtual 					~TeamsListView();
 
-			TeamListItem* 		FindItem(team_id teamId);
+			TeamRow* 			FindTeamRow(team_id teamId);
 
 protected:
 	virtual void 				AttachedToWindow();
