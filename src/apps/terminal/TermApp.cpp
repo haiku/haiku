@@ -176,9 +176,9 @@ TermApp::AboutRequested()
 
 
 void
-TermApp::MessageReceived(BMessage* msg)
+TermApp::MessageReceived(BMessage* message)
 {
-	switch (msg->what) {
+	switch (message->what) {
 		case MENU_SWITCH_TERM:
 			_SwitchTerm();
 			break;
@@ -192,12 +192,12 @@ TermApp::MessageReceived(BMessage* msg)
 			BMessage reply(B_REPLY);
 			reply.AddBool("minimized", fTermWindow->IsMinimized());
 			reply.AddInt32("workspaces", fTermWindow->Workspaces());
-			msg->SendReply(&reply);
+			message->SendReply(&reply);
 			break;
 		}
 
 		case MSG_SAVE_WINDOW_POSITION:
-			_SaveWindowPosition(msg);
+			_SaveWindowPosition(message);
 			break;
 
 		case MSG_CHECK_CHILDREN:
@@ -205,7 +205,7 @@ TermApp::MessageReceived(BMessage* msg)
 			break;
 
 		default:
-			BApplication::MessageReceived(msg);
+			BApplication::MessageReceived(message);
 			break;
 	}
 }
