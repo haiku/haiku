@@ -47,8 +47,11 @@ TitlePlaceholderMapper::MapPlaceholder(char placeholder, int64 number,
 		}
 
 		case 'p':
-			// process name
-			_string = fProcessInfo.Name();
+			// process name -- use "--", if the shell is active
+			if (fProcessInfo.ID() == fProcessInfo.ShellProcessID())
+				_string = "--";
+			else
+				_string = fProcessInfo.Name();
 			return true;
 	}
 
