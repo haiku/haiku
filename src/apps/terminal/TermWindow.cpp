@@ -161,6 +161,7 @@ TermWindow::TermWindow(BRect frame, const BString& title,
 	fNextSessionID(0),
 	fTabView(NULL),
 	fMenuBar(NULL),
+	fSwitchTerminalsMenuItem(NULL),
 	fEncodingMenu(NULL),
 	fPrintSettings(NULL),
 	fPrefWindow(NULL),
@@ -185,11 +186,20 @@ TermWindow::TermWindow(BRect frame, const BString& title,
 
 	_InitWindow();
 	_AddTab(args);
+
+	// register as an application roster listener -- we want to know when other
+	// terminals are started and quit, so we can update the our
+	// "Switch Terminals" menu item.
+	be_roster->StartWatching(this);
+
+	_UpdateSwitchTerminalsMenuItem();
 }
 
 
 TermWindow::~TermWindow()
 {
+	be_roster->StopWatching(this);
+
 	_FinishTitleDialog();
 
 	if (fPrefWindow)
@@ -356,6 +366,7 @@ TermWindow::_SetupMenu()
 		// Terminal
 		.AddMenu(B_TRANSLATE("Terminal"))
 			.AddItem(B_TRANSLATE("Switch Terminals"), MENU_SWITCH_TERM, B_TAB)
+				.GetItem(fSwitchTerminalsMenuItem)
 			.AddItem(B_TRANSLATE("New Terminal"), MENU_NEW_TERM, 'N')
 			.AddItem(B_TRANSLATE("New tab"), kNewTab, 'T')
 			.AddSeparator()
@@ -797,6 +808,17 @@ TermWindow::MessageReceived(BMessage *message)
 		case kEditWindowTitle:
 			_OpenSetWindowTitleDialog();
 			break;
+
+		case B_SOME_APP_LAUNCHED:
+		case B_SOME_APP_QUIT:
+		{
+			BString signature;
+			if (message->FindString("be:signature", &signature) == B_OK
+				&& signature == TERM_SIGNATURE) {
+				_UpdateSwitchTerminalsMenuItem();
+			}
+			break;
+		}
 
 		default:
 			BWindow::MessageReceived(message);
@@ -1344,6 +1366,18 @@ TermWindow::_MakeWindowSizeMenu()
 		new BMessage(FULLSCREEN), B_ENTER));
 
 	return menu;
+}
+
+
+void
+TermWindow::_UpdateSwitchTerminalsMenuItem()
+{
+	// get the running Terminal teams
+	BList teams;
+	be_roster->GetAppList(TERM_SIGNATURE, &teams);
+
+	// update the menu item
+	fSwitchTerminalsMenuItem->SetEnabled(teams.CountItems() > 1);
 }
 
 

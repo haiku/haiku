@@ -123,8 +123,9 @@ private:
 			void				_SetTermColors(TermViewContainerView* termView);
 			void				_InitWindow();
 			void				_SetupMenu();
-			static BMenu*		_MakeEncodingMenu();
-			static BMenu*		_MakeWindowSizeMenu();
+	static	BMenu*				_MakeEncodingMenu();
+	static	BMenu*				_MakeWindowSizeMenu();
+			void				_UpdateSwitchTerminalsMenuItem();
 
 			void				_GetPreferredFont(BFont &font);
 			status_t			_DoPageSetup();
@@ -174,6 +175,7 @@ private:
 			SmartTabView*		fTabView;
 
 			BMenuBar*			fMenuBar;
+			BMenuItem*			fSwitchTerminalsMenuItem;
 			BMenu*				fEncodingMenu;
 
 			BMessage*			fPrintSettings;
