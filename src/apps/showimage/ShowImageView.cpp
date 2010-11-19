@@ -376,8 +376,7 @@ ShowImageView::SetImage(const entry_ref* ref, BBitmap* bitmap)
 		// prepare the display bitmap
 		if (fBitmap->ColorSpace() == B_RGBA32)
 			fDisplayBitmap = compose_checker_background(fBitmap);
-
-		if (!fDisplayBitmap)
+		if (fDisplayBitmap == NULL)
 			fDisplayBitmap = fBitmap;
 
 		BNode node(ref);
@@ -1210,23 +1209,12 @@ ShowImageView::_ScrollRestricted(float x, float y, bool absolute)
 	if (y != 0)
 		y = _LimitToRange(y, B_VERTICAL, absolute);
 
-	// hide the caption when using mouse wheel
-	// in full screen mode
-	// to prevent the caption from dirtying up the image
-	// during scrolling.
-	bool caption = fShowCaption;
-	if (caption) {
-		fShowCaption = false;
-		_UpdateCaption();
-	}
+	// We invalidate before we scroll to avoid the caption messing up the
+	// image, and to prevent it from flickering
+	if (fShowCaption)
+		Invalidate();
 
 	ScrollBy(x, y);
-
-	if (caption) {
-		// show the caption again
-		fShowCaption = true;
-		_UpdateCaption();
-	}
 }
 
 
