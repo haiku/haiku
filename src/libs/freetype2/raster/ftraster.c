@@ -3385,6 +3385,7 @@
                 FT_Raster  *araster )
   {
      static TRaster  the_raster;
+     FT_UNUSED( memory );
 
 
      *araster = (FT_Raster)&the_raster;

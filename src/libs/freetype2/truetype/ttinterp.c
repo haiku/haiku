@@ -6773,12 +6773,11 @@
         {
           if ( ( CUR.pts.tags[point] & mask ) != 0 )
           {
-            if ( point > 0 )
-              _iup_worker_interpolate( &V,
-                                       cur_touched + 1,
-                                       point - 1,
-                                       cur_touched,
-                                       point );
+            _iup_worker_interpolate( &V,
+                                     cur_touched + 1,
+                                     point - 1,
+                                     cur_touched,
+                                     point );
             cur_touched = point;
           }
 
@@ -8127,6 +8126,15 @@
 #ifdef TT_CONFIG_OPTION_STATIC_RASTER
     *exc = cur;
 #endif
+
+    /* If any errors have occurred, function tables may be broken. */
+    /* Force a re-execution of `prep' and `fpgm' tables if no      */
+    /* bytecode debugger is run.                                   */
+    if ( CUR.error && !CUR.instruction_trap )
+    {
+      FT_TRACE1(( "  The interpreter returned error 0x%x\n", CUR.error ));
+      exc->size->cvt_ready      = FALSE;  
+    }
 
     return CUR.error;
   }
