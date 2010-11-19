@@ -106,10 +106,9 @@ TermWindow::SessionID::SessionID(int32 id)
 
 
 TermWindow::SessionID::SessionID(const BMessage& message, const char* field)
-	:
-	fID(-1)
 {
-	message.FindInt32(field, &fID);
+	if (message.FindInt32(field, &fID) != B_OK)
+		fID = -1;
 }
 
 
