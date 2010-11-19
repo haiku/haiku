@@ -37,6 +37,7 @@
 #include <Window.h>
 
 #include "SmartTabView.h"
+#include "SetTitleDialog.h"
 #include "TermView.h"
 
 
@@ -50,7 +51,7 @@ class TermViewContainerView;
 
 
 class TermWindow : public BWindow, private SmartTabView::Listener,
-	private TermView::Listener {
+	private TermView::Listener, private SetTitleDialog::Listener {
 public:
 								TermWindow(BRect frame, const BString& title,
 									bool isUserDefinedTitle, int32 windowIndex,
@@ -85,6 +86,12 @@ private:
 	virtual	void				PreviousTermView(TermView* view);
 	virtual	void				NextTermView(TermView* view);
 
+	// SetTitleDialog::Listener
+	virtual	void				TitleChanged(SetTitleDialog* dialog,
+									const BString& title,
+									bool titleUserDefined);
+	virtual	void				SetTitleDialogDone(SetTitleDialog* dialog);
+
 private:
 			struct Title {
 				BString			title;
@@ -93,12 +100,17 @@ private:
 			};
 
 			struct SessionID {
-								SessionID(int32 id);
+								SessionID(int32 id = -1);
 								SessionID(const BMessage& message,
 									const char* field);
 
 				status_t		AddToMessage(BMessage& message,
 									const char* field) const;
+
+				bool			operator==(const SessionID& other) const
+									{ return fID == other.fID; }
+				bool			operator!=(const SessionID& other) const
+									{ return !(*this == other); }
 
 			private:
 				int32			fID;
@@ -125,17 +137,21 @@ private:
 									bool move);
 
 			bool				_CanClose(int32 index);
+
 			TermViewContainerView* _ActiveTermViewContainerView() const;
 			TermViewContainerView* _TermViewContainerViewAt(int32 index) const;
 			TermView*			_ActiveTermView() const;
 			TermView*			_TermViewAt(int32 index) const;
 			int32				_IndexOfTermView(TermView* termView) const;
+			Session*			_SessionForID(const SessionID& sessionID) const;
+
 			void				_CheckChildren();
 			void				_ResizeView(TermView* view);
 
 			void				_TitleSettingsChanged();
 			void				_UpdateTitles();
 			void				_UpdateSessionTitle(int32 index);
+			void				_FinishTitleDialog();
 
 			SessionID			_NewSessionID();
 			int32				_NewSessionIndex();
@@ -150,7 +166,6 @@ private:
 			int32				fNextSessionID;
 
 			SmartTabView*		fTabView;
-			TermView*			fTermView;
 
 			BMenuBar*			fMenubar;
 			BMenu*				fFilemenu;
@@ -165,6 +180,9 @@ private:
 			FindWindow*			fFindPanel;
 			BRect				fSavedFrame;
 			window_look			fSavedLook;
+
+			SetTitleDialog*		fSetTabTitleDialog;
+			SessionID			fSetTabTitleSession;
 
 			// Saved search parameters
 			BString				fFindString;

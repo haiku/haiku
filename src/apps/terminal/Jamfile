@@ -20,6 +20,7 @@ Application Terminal :
 	PatternEvaluator.cpp
 	PrefHandler.cpp
 	PrefWindow.cpp
+	SetTitleDialog.cpp
 	Shell.cpp
 	ShellParameters.cpp
 	SmartTabView.cpp

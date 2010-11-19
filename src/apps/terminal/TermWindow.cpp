@@ -19,6 +19,7 @@
 #include <Catalog.h>
 #include <Clipboard.h>
 #include <Dragger.h>
+#include <LayoutUtils.h>
 #include <Locale.h>
 #include <Menu.h>
 #include <MenuBar.h>
@@ -40,6 +41,7 @@
 #include "Globals.h"
 #include "PrefWindow.h"
 #include "PrefHandler.h"
+#include "SetTitleDialog.h"
 #include "ShellParameters.h"
 #include "TermConst.h"
 #include "TermScrollView.h"
@@ -163,6 +165,7 @@ TermWindow::TermWindow(BRect frame, const BString& title,
 	fPrefWindow(NULL),
 	fFindPanel(NULL),
 	fSavedFrame(0, 0, -1, -1),
+	fSetTabTitleDialog(NULL),
 	fFindString(""),
 	fFindNextMenuItem(NULL),
 	fFindPreviousMenuItem(NULL),
@@ -185,6 +188,8 @@ TermWindow::TermWindow(BRect frame, const BString& title,
 
 TermWindow::~TermWindow()
 {
+	_FinishTitleDialog();
+
 	if (fPrefWindow)
 		fPrefWindow->PostMessage(B_QUIT_REQUESTED);
 
@@ -279,6 +284,8 @@ TermWindow::_CanClose(int32 index)
 bool
 TermWindow::QuitRequested()
 {
+	_FinishTitleDialog();
+
 	if (!_CanClose(-1))
 		return false;
 
@@ -688,6 +695,24 @@ TermWindow::MessageReceived(BMessage *message)
 				message->what == MSG_MOVE_TAB_LEFT ? -1 : 1, true);
 			break;
 
+		case MSG_TAB_TITLE_CHANGED:
+		{
+			// tab title changed message from SetTitleDialog
+			SessionID sessionID(*message, "session");
+			if (Session* session = _SessionForID(sessionID)) {
+				BString title;
+				if (message->FindString("title", &title) == B_OK) {
+					session->title.pattern = title;
+					session->title.patternUserDefined = true;
+				} else {
+					session->title.pattern.Truncate(0);
+					session->title.patternUserDefined = false;
+				}
+				_UpdateSessionTitle(fSessions.IndexOf(session));
+			}
+			break;
+		}
+
 		case kSetActiveTab:
 		{
 			int32 index;
@@ -942,6 +967,9 @@ TermWindow::_AddTab(Arguments* args, const BString& currentDirectory)
 void
 TermWindow::_RemoveTab(int32 index)
 {
+	_FinishTitleDialog();
+		// always close to avoid confusion
+
 	if (fSessions.CountItems() > 1) {
 		if (!_CanClose(index))
 			return;
@@ -1032,6 +1060,18 @@ TermWindow::_IndexOfTermView(TermView* termView) const
 }
 
 
+TermWindow::Session*
+TermWindow::_SessionForID(const SessionID& sessionID) const
+{
+	for (int32 i = 0; Session* session = (Session*)fSessions.ItemAt(i); i++) {
+		if (session->id == sessionID)
+			return session;
+	}
+
+	return NULL;
+}
+
+
 void
 TermWindow::_CheckChildren()
 {
@@ -1074,7 +1114,32 @@ void
 TermWindow::TabDoubleClicked(SmartTabView* tabView, BPoint point, int32 index)
 {
 	if (index >= 0) {
-		// TODO: Open the change title dialog!
+		// If a dialog is active, finish it.
+		_FinishTitleDialog();
+
+		BString toolTip = BString(B_TRANSLATE(
+			"The pattern specifying the current tab title. The following "
+				"placeholders\n"
+			"can be used:\n")) << kTooTipSetTabTitlePlaceholders;
+		fSetTabTitleDialog = new SetTitleDialog(
+			B_TRANSLATE("Set tab title"), B_TRANSLATE("Tab title:"),
+			toolTip);
+
+		Session* session = (Session*)fSessions.ItemAt(index);
+		bool userDefined = session->title.patternUserDefined;
+		const BString& title = userDefined
+			? session->title.pattern : fSessionTitlePattern;
+		fSetTabTitleSession = session->id;
+
+		// place the dialog window directly under the tab, but keep it on screen
+		BPoint location = tabView->ConvertToScreen(
+			tabView->TabFrame(index).LeftBottom() + BPoint(0, 1));
+		BRect frame(fSetTabTitleDialog->Frame().OffsetToCopy(location));
+		BSize screenSize(BScreen(fSetTabTitleDialog).Frame().Size());
+		fSetTabTitleDialog->MoveTo(
+			BLayoutUtils::MoveIntoFrame(frame, screenSize).LeftTop());
+
+		fSetTabTitleDialog->Go(title, userDefined, this);
 	} else {
 		// not clicked on a tab -- create a new one
 		_NewTab();
@@ -1135,6 +1200,33 @@ TermWindow::SetTermViewTitle(TermView* view, const char* title)
 		session->title.pattern = title;
 		session->title.patternUserDefined = true;
 		_UpdateSessionTitle(index);
+	}
+}
+
+
+void
+TermWindow::TitleChanged(SetTitleDialog* dialog, const BString& title,
+	bool titleUserDefined)
+{
+	if (dialog != fSetTabTitleDialog)
+		return;
+
+	BMessage message(MSG_TAB_TITLE_CHANGED);
+	fSetTabTitleSession.AddToMessage(message, "session");
+	if (titleUserDefined)
+		message.AddString("title", title);
+
+	PostMessage(&message);
+}
+
+
+void
+TermWindow::SetTitleDialogDone(SetTitleDialog* dialog)
+{
+	if (dialog == fSetTabTitleDialog) {
+		fSetTabTitleSession = SessionID();
+		fSetTabTitleDialog = NULL;
+			// assuming this is atomic
 	}
 }
 
@@ -1281,6 +1373,21 @@ TermWindow::_UpdateSessionTitle(int32 index)
 	if (windowTitle != fTitle.title) {
 		fTitle.title = windowTitle;
 		SetTitle(fTitle.title);
+	}
+}
+
+
+void
+TermWindow::_FinishTitleDialog()
+{
+	SetTitleDialog* oldDialog = fSetTabTitleDialog;
+	if (oldDialog != NULL && oldDialog->Lock()) {
+		// might have been unset in the meantime, so recheck
+		if (fSetTabTitleDialog == oldDialog) {
+			oldDialog->Finish();
+				// this also unsets the variables
+		}
+		oldDialog->Unlock();
 	}
 }
 
