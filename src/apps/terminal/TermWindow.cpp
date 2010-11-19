@@ -158,7 +158,7 @@ TermWindow::TermWindow(BRect frame, const BString& title,
 	fFilemenu(NULL),
 	fEditmenu(NULL),
 	fEncodingmenu(NULL),
-	fHelpmenu(NULL),
+	fSettingsMenu(NULL),
 	fWindowSizeMenu(NULL),
 	fPrintSettings(NULL),
 	fPrefWindow(NULL),
@@ -405,7 +405,7 @@ TermWindow::_SetupMenu()
 	fMenubar->AddItem(fEditmenu);
 
 	// Make Help Menu.
-	fHelpmenu = new BMenu(B_TRANSLATE("Settings"));
+	fSettingsMenu = new BMenu(B_TRANSLATE("Settings"));
 	fWindowSizeMenu = _MakeWindowSizeMenu();
 
 	fEncodingmenu = _MakeEncodingMenu();
@@ -421,16 +421,16 @@ TermWindow::_SetupMenu()
 	fSizeMenu->AddItem(fIncreaseFontSizeMenuItem);
 	fSizeMenu->AddItem(fDecreaseFontSizeMenuItem);
 
-	fHelpmenu->AddItem(fWindowSizeMenu);
-	fHelpmenu->AddItem(fEncodingmenu);
-	fHelpmenu->AddItem(fSizeMenu);
-	fHelpmenu->AddSeparatorItem();
-	fHelpmenu->AddItem(new BMenuItem(B_TRANSLATE("Settings" B_UTF8_ELLIPSIS),
-		new BMessage(MENU_PREF_OPEN)));
-	fHelpmenu->AddSeparatorItem();
-	fHelpmenu->AddItem(new BMenuItem(B_TRANSLATE("Save as default"),
+	fSettingsMenu->AddItem(fWindowSizeMenu);
+	fSettingsMenu->AddItem(fEncodingmenu);
+	fSettingsMenu->AddItem(fSizeMenu);
+	fSettingsMenu->AddSeparatorItem();
+	fSettingsMenu->AddItem(new BMenuItem(
+		B_TRANSLATE("Settings" B_UTF8_ELLIPSIS), new BMessage(MENU_PREF_OPEN)));
+	fSettingsMenu->AddSeparatorItem();
+	fSettingsMenu->AddItem(new BMenuItem(B_TRANSLATE("Save as default"),
 		new BMessage(SAVE_AS_DEFAULT)));
-	fMenubar->AddItem(fHelpmenu);
+	fMenubar->AddItem(fSettingsMenu);
 
 	AddChild(fMenubar);
 }

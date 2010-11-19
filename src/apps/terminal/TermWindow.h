@@ -175,7 +175,7 @@ private:
 			BMenu*				fFilemenu;
 			BMenu*				fEditmenu;
 			BMenu*				fEncodingmenu;
-			BMenu*				fHelpmenu;
+			BMenu*				fSettingsMenu;
 			BMenu*				fWindowSizeMenu;
 			BMenu*				fSizeMenu;
 
