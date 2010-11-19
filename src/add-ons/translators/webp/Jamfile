@@ -1,0 +1,29 @@
+SubDir HAIKU_TOP src add-ons translators webp ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
+SubDirHdrs [ FDirName $(SUBDIR) webp ] ;
+
+
+Translator WEBPTranslator :
+
+	main.cpp
+
+	WEBPTranslator.cpp
+	ConfigView.cpp
+
+	bits.c
+	dsp.c
+	frame.c
+	quant.c
+	tree.c
+	vp8.c
+	webp.c
+	yuv.c
+
+	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++)
+	$(HAIKU_LOCALE_LIBS)
+	: true
+;
+
