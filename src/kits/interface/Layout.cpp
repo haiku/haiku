@@ -267,7 +267,7 @@ BLayout::IndexOfView(BView* child) const
 
 
 bool
-BLayout::AncestorsVisible()
+BLayout::AncestorsVisible() const
 {
 	return fAncestorsVisible;
 }
@@ -286,7 +286,7 @@ BLayout::InvalidateLayout(bool children)
 
 	if (children) {
 		for (int32 i = CountItems() - 1; i >= 0; i--)
-			ItemAt(i)->InvalidateLayout(children);	
+			ItemAt(i)->InvalidateLayout(children);
 	}
 
 	if (fOwner && BView::Private(fOwner).MinMaxValid())
@@ -366,7 +366,7 @@ BLayout::Relayout(bool immediate)
 }
 
 
-	
+
 void
 BLayout::_LayoutWithinContext(bool force, BLayoutContext* context)
 {
@@ -392,7 +392,7 @@ BLayout::_LayoutWithinContext(bool force, BLayoutContext* context)
 		// already been triggered).
 		int32 nestedLayoutCount = fNestedLayouts.CountItems();
 		for (int32 i = 0; i < nestedLayoutCount; i++) {
-			BLayout* layout = (BLayout*)fNestedLayouts.ItemAt(i); 
+			BLayout* layout = (BLayout*)fNestedLayouts.ItemAt(i);
 			if ((layout->fState & B_LAYOUT_NECESSARY) != 0)
 				layout->_LayoutWithinContext(force, context);
 		}
@@ -462,7 +462,7 @@ BLayout::AllUnarchived(const BMessage* from)
 		err = ItemUnarchived(from, item, i);
 		if (err != B_OK) {
 			fItems.RemoveItem(i);
-			ItemRemoved(item, i);	
+			ItemRemoved(item, i);
 			return err;
 		}
 

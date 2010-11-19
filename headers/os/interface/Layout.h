@@ -44,7 +44,7 @@ public:
 			int32				IndexOfItem(const BLayoutItem* item) const;
 			int32				IndexOfView(BView* child) const;
 
-			bool				AncestorsVisible();
+			bool				AncestorsVisible() const;
 
 	// Layouting related methods
 
