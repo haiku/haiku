@@ -55,6 +55,7 @@ const static int32 kTermViewOffset = 3;
 // messages constants
 static const uint32 kNewTab = 'NTab';
 static const uint32 kCloseView = 'ClVw';
+static const uint32 kCloseOtherViews = 'CloV';
 static const uint32 kIncreaseFontSize = 'InFs';
 static const uint32 kDecreaseFontSize = 'DcFs';
 static const uint32 kSetActiveTab = 'STab';
@@ -739,6 +740,21 @@ TermWindow::MessageReceived(BMessage *message)
 			break;
 		}
 
+		case kCloseOtherViews:
+		{
+			Session* session = _SessionForID(SessionID(*message, "session"));
+			if (session == NULL)
+				break;
+
+			int32 count = fSessions.CountItems();
+			for (int32 i = count - 1; i >= 0; i--) {
+				if (_SessionAt(i) != session)
+					_RemoveTab(i);
+			}
+
+			break;
+		}
+
 		case kIncreaseFontSize:
 		case kDecreaseFontSize:
 		{
@@ -1167,12 +1183,17 @@ TermWindow::TabRightClicked(SmartTabView* tabView, BPoint point, int32 index)
 	BMessage* closeMessage = new BMessage(kCloseView);
 	_SessionAt(index)->id.AddToMessage(*closeMessage, "session");
 
+	BMessage* closeOthersMessage = new BMessage(kCloseOtherViews);
+	_SessionAt(index)->id.AddToMessage(*closeOthersMessage, "session");
+
 	BMessage* editTitleMessage = new BMessage(kEditTabTitle);
 	_SessionAt(index)->id.AddToMessage(*editTitleMessage, "session");
 
 	BPopUpMenu* popUpMenu = new BPopUpMenu("tab menu");
 	BLayoutBuilder::Menu<>(popUpMenu)
 		.AddItem(B_TRANSLATE("Close tab"), closeMessage)
+		.AddItem(B_TRANSLATE("Close other tabs"), closeOthersMessage)
+		.AddSeparator()
 		.AddItem(B_TRANSLATE("Edit tab title" B_UTF8_ELLIPSIS),
 			editTitleMessage)
 	;
