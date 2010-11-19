@@ -219,13 +219,13 @@ BLayoutUtils::MoveIntoFrame(BRect rect, BSize frameSize)
 	// enforce horizontal limits; favor left edge
 	if (rect.right > frameSize.width)
 		leftTop.x -= rect.right - frameSize.width;
-	if (rect.left < 0)
+	if (leftTop.x < 0)
 		leftTop.x = 0;
 
 	// enforce vertical limits; favor top edge
 	if (rect.bottom > frameSize.height)
 		leftTop.y -= rect.bottom - frameSize.height;
-	if (rect.top < 0)
+	if (leftTop.y < 0)
 		leftTop.y = 0;
 
 	return rect.OffsetToSelf(leftTop);
