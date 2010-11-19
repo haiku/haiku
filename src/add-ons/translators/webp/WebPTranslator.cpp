@@ -157,9 +157,8 @@ WebPTranslator::DerivedTranslate(BPositionIO* stream,
 	uint8* out = WebPDecodeRGB((const uint8*)streamData, streamSize, &width, &height);
 	free(streamData);
 
-	if (out == NULL) {
+	if (out == NULL)
 		return B_ILLEGAL_DATA;
-	}
 
 	FreeAllocation _(out);
 
