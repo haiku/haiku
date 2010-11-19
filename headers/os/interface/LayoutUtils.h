@@ -27,7 +27,7 @@ public:
 									float& preferred);
 	static	void				FixSizeConstraints(BSize& min, BSize& max,
 									BSize& preferred);
-	
+
 	static	BSize				ComposeSize(BSize size, BSize layoutSize);
 	static	BAlignment			ComposeAlignment(BAlignment alignment,
 									BAlignment layoutAlignment);
@@ -35,6 +35,7 @@ public:
 	static	BRect				AlignInFrame(BRect frame, BSize maxSize,
 									BAlignment alignment);
 	static	void				AlignInFrame(BView* view, BRect frame);
+	static	BRect				MoveIntoFrame(BRect rect, BSize maxSize);
 };
 
 #endif	//	_LAYOUT_UTILS_H

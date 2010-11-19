@@ -1,6 +1,6 @@
 /*
- * Copyright 2006, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
- * All rights reserved. Distributed under the terms of the MIT License.
+ * Copyright 2006-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
  */
 
 #include <LayoutUtils.h>
@@ -15,10 +15,10 @@
 // 	float sum = a + b + 1;
 // 	if (sum >= B_SIZE_UNLIMITED)
 // 		return B_SIZE_UNLIMITED;
-// 	
+//
 // 	return sum;
 // }
-// 
+//
 // // AddSizesFloat
 // float
 // BLayoutUtils::AddSizesFloat(float a, float b, float c)
@@ -52,7 +52,7 @@ BLayoutUtils::AddDistances(float a, float b)
 	float sum = a + b + 1;
 	if (sum >= B_SIZE_UNLIMITED)
 		return B_SIZE_UNLIMITED;
-	
+
 	return sum;
 }
 
@@ -117,7 +117,7 @@ BLayoutUtils::FixSizeConstraints(BSize& min, BSize& max, BSize& preferred)
 }
 
 
-// ComposeSize	
+// ComposeSize
 BSize
 BLayoutUtils::ComposeSize(BSize size, BSize layoutSize)
 {
@@ -171,11 +171,11 @@ BLayoutUtils::AlignInFrame(BView* view, BRect frame)
 {
  	BSize maxSize = view->MaxSize();
  	BAlignment alignment = view->LayoutAlignment();
- 
+
  	if (view->HasHeightForWidth()) {
  		// The view has height for width, so we do the horizontal alignment
  		// ourselves and restrict the height max constraint respectively.
- 
+
  		if (maxSize.width < frame.Width()
  			&& alignment.horizontal != B_ALIGN_USE_FULL_WIDTH) {
  			frame.OffsetBy(floor((frame.Width() - maxSize.width)
@@ -183,19 +183,50 @@ BLayoutUtils::AlignInFrame(BView* view, BRect frame)
  			frame.right = frame.left + maxSize.width;
  		}
  		alignment.horizontal = B_ALIGN_USE_FULL_WIDTH;
- 
+
  		float minHeight;
  		float maxHeight;
  		float preferredHeight;
  		view->GetHeightForWidth(frame.Width(), &minHeight, &maxHeight,
  			&preferredHeight);
- 		
+
  		frame.bottom = frame.top + max_c(frame.Height(), minHeight);
  		maxSize.height = minHeight;
  	}
- 
+
  	frame = AlignInFrame(frame, maxSize, alignment);
  	view->MoveTo(frame.LeftTop());
  	view->ResizeTo(frame.Size());
 }
 
+
+/*!	Offsets a rectangle's location so that it lies fully in a given rectangular
+	frame.
+
+	If the rectangle is too wide/high to fully fit in the frame, its left/top
+	edge is offset to 0. The rect's size always remains unchanged.
+
+	\param rect The rectangle to be moved.
+	\param frameSize The size of the frame the rect shall be moved into. The
+		frame's left-top is (0, 0).
+	\return The modified rect.
+*/
+/*static*/ BRect
+BLayoutUtils::MoveIntoFrame(BRect rect, BSize frameSize)
+{
+	BPoint leftTop(rect.LeftTop());
+
+	// enforce horizontal limits; favor left edge
+	if (rect.right > frameSize.width)
+		leftTop.x -= rect.right - frameSize.width;
+	if (rect.left < 0)
+		leftTop.x = 0;
+
+	// enforce vertical limits; favor top edge
+	if (rect.bottom > frameSize.height)
+		leftTop.y -= rect.bottom - frameSize.height;
+	if (rect.top < 0)
+		leftTop.y = 0;
+
+	return rect.OffsetToSelf(leftTop);
+}
