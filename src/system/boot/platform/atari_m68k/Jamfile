@@ -19,6 +19,13 @@ UsePrivateHeaders [ FDirName storage ] ;
 
 #SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;
 
+local genericPlatformSources =
+	text_menu.cpp
+	video_blit.cpp
+	video_splash.cpp
+	video_rle.cpp
+;
+
 
 KernelMergeObject boot_platform_atari_m68k_shell.o :
 	shell.S
@@ -51,8 +58,7 @@ KernelMergeObject boot_platform_atari_m68k_other.o :
 	video.cpp
 	#apm.cpp
 
-	# generic
-	text_menu.cpp
+	$(genericPlatformSources)
 
 	# VESA/DDC EDID
 	#decode_edid.c
@@ -137,7 +143,7 @@ AtariBootPrgLd haiku.prg :
 ;
 
 
-SEARCH on [ FGristFiles text_menu.cpp ]
+SEARCH on [ FGristFiles $(genericPlatformSources) ]
 	= [ FDirName $(HAIKU_TOP) src system boot platform generic ] ;
 
 # Tell the build system to where stage1.bin can be found, so it can be used
