@@ -110,30 +110,17 @@ AppearancePrefView::AppearancePrefView(const char* name,
 		NULL);
 	fTabTitle->SetModificationMessage(
 		new BMessage(MSG_TAB_TITLE_SETTING_CHANGED));
-	fTabTitle->SetToolTip(B_TRANSLATE(
+	fTabTitle->SetToolTip(BString(B_TRANSLATE(
 		"The pattern specifying the tab titles. The following placeholders\n"
-		"can be used:\n"
-		"\t%d\t-\tThe current working directory of the active process.\n"
-		"\t\t\tOptionally the maximum number of path components can be\n"
-		"\t\t\tspecified. E.g. '%2d' for at most two components.\n"
-		"\t%i\t-\tThe index of the tab.\n"
-		"\t%p\t-\tThe name of the active process.\n"
-		"\t%%\t-\tThe character '%'."));
+		"can be used:\n")) << kTooTipSetTabTitlePlaceholders);
 
 	fWindowTitle = new BTextControl("windowTitle", B_TRANSLATE("Window title:"),
 		"", NULL);
 	fWindowTitle->SetModificationMessage(
 		new BMessage(MSG_WINDOW_TITLE_SETTING_CHANGED));
-	fWindowTitle->SetToolTip(B_TRANSLATE(
+	fWindowTitle->SetToolTip(BString(B_TRANSLATE(
 		"The pattern specifying the window titles. The following placeholders\n"
-		"can be used:\n"
-		"\t%d\t-\tThe current working directory of the active process in the.\n"
-		"\t\t\tcurrent tab. Optionally the maximum number of path components\n"
-		"\t\t\tcan be specified. E.g. '%2d' for at most two components.\n"
-		"\t%i\t-\tThe index of the window.\n"
-		"\t%p\t-\tThe name of the active process in the current tab.\n"
-		"\t%t\t-\tThe title of the current tab.\n"
-		"\t%%\t-\tThe character '%'."));
+		"can be used:\n")) << kTooTipSetWindowTitlePlaceholders);
 
 	BLayoutBuilder::Group<>(this)
 		.SetInsets(5, 5, 5, 5)

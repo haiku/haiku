@@ -26,6 +26,7 @@ Application Terminal :
 	TermApp.cpp
 	TerminalBuffer.cpp
 	TerminalCharClassifier.cpp
+	TermConst.cpp
 	TermParse.cpp
 	TermScrollView.cpp
 	TermView.cpp

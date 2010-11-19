@@ -134,6 +134,10 @@ static const char* const PREF_WARN_ON_EXIT = "Warn on exit";
 static const char* const PREF_TAB_TITLE = "Tab title";
 static const char* const PREF_WINDOW_TITLE = "Window title";
 
+// shared strings
+extern const char* const kTooTipSetTabTitlePlaceholders;
+extern const char* const kTooTipSetWindowTitlePlaceholders;
+
 // Color type
 enum {
   TEXT_FOREGROUND_COLOR,
