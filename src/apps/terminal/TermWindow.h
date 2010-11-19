@@ -155,6 +155,7 @@ private:
 			void				_TitleSettingsChanged();
 			void				_UpdateTitles();
 			void				_UpdateSessionTitle(int32 index);
+			void				_OpenSetTabTitleDialog(int32 index);
 			void				_OpenSetWindowTitleDialog();
 			void				_FinishTitleDialog();
 

@@ -53,13 +53,16 @@ const static int32 kMaxTabs = 6;
 const static int32 kTermViewOffset = 3;
 
 // messages constants
-const static uint32 kNewTab = 'NTab';
-const static uint32 kCloseView = 'ClVw';
-const static uint32 kIncreaseFontSize = 'InFs';
-const static uint32 kDecreaseFontSize = 'DcFs';
-const static uint32 kSetActiveTab = 'STab';
-const static uint32 kUpdateTitles = 'UPti';
-const static uint32 kSetWindowTitle = 'SWti';
+static const uint32 kNewTab = 'NTab';
+static const uint32 kCloseView = 'ClVw';
+static const uint32 kIncreaseFontSize = 'InFs';
+static const uint32 kDecreaseFontSize = 'DcFs';
+static const uint32 kSetActiveTab = 'STab';
+static const uint32 kUpdateTitles = 'UPti';
+static const uint32 kEditTabTitle = 'ETti';
+static const uint32 kEditWindowTitle = 'EWti';
+static const uint32 kTabTitleChanged = 'TTch';
+static const uint32 kWindowTitleChanged = 'WTch';
 
 
 #undef B_TRANSLATE_CONTEXT
@@ -385,7 +388,7 @@ TermWindow::_SetupMenu()
 				.SetEnabled(false)
 			.AddSeparator()
 			.AddItem(B_TRANSLATE("Window title" B_UTF8_ELLIPSIS),
-				kSetWindowTitle)
+				kEditWindowTitle)
 		.End()
 
 		// Settings
@@ -669,7 +672,7 @@ TermWindow::MessageReceived(BMessage *message)
 				message->what == MSG_MOVE_TAB_LEFT ? -1 : 1, true);
 			break;
 
-		case MSG_TAB_TITLE_CHANGED:
+		case kTabTitleChanged:
 		{
 			// tab title changed message from SetTitleDialog
 			SessionID sessionID(*message, "session");
@@ -687,7 +690,7 @@ TermWindow::MessageReceived(BMessage *message)
 			break;
 		}
 
-		case MSG_WINDOW_TITLE_CHANGED:
+		case kWindowTitleChanged:
 		{
 			// window title changed message from SetTitleDialog
 			BString title;
@@ -767,7 +770,15 @@ TermWindow::MessageReceived(BMessage *message)
 			_UpdateTitles();
 			break;
 
-		case kSetWindowTitle:
+		case kEditTabTitle:
+		{
+			SessionID sessionID(*message, "session");
+			if (Session* session = _SessionForID(sessionID))
+				_OpenSetTabTitleDialog(_IndexOfSession(session));
+			break;
+		}
+
+		case kEditWindowTitle:
 			_OpenSetWindowTitleDialog();
 			break;
 
@@ -1126,32 +1137,8 @@ void
 TermWindow::TabDoubleClicked(SmartTabView* tabView, BPoint point, int32 index)
 {
 	if (index >= 0) {
-		// If a dialog is active, finish it.
-		_FinishTitleDialog();
-
-		BString toolTip = BString(B_TRANSLATE(
-			"The pattern specifying the current tab title. The following "
-				"placeholders\n"
-			"can be used:\n")) << kTooTipSetTabTitlePlaceholders;
-		fSetTabTitleDialog = new SetTitleDialog(
-			B_TRANSLATE("Set tab title"), B_TRANSLATE("Tab title:"),
-			toolTip);
-
-		Session* session = _SessionAt(index);
-		bool userDefined = session->title.patternUserDefined;
-		const BString& title = userDefined
-			? session->title.pattern : fSessionTitlePattern;
-		fSetTabTitleSession = session->id;
-
-		// place the dialog window directly under the tab, but keep it on screen
-		BPoint location = tabView->ConvertToScreen(
-			tabView->TabFrame(index).LeftBottom() + BPoint(0, 1));
-		BRect frame(fSetTabTitleDialog->Frame().OffsetToCopy(location));
-		BSize screenSize(BScreen(fSetTabTitleDialog).Frame().Size());
-		fSetTabTitleDialog->MoveTo(
-			BLayoutUtils::MoveIntoFrame(frame, screenSize).LeftTop());
-
-		fSetTabTitleDialog->Go(title, userDefined, this);
+		// clicked on a tab -- open the title dialog
+		_OpenSetTabTitleDialog(index);
 	} else {
 		// not clicked on a tab -- create a new one
 		_NewTab();
@@ -1177,11 +1164,19 @@ TermWindow::TabRightClicked(SmartTabView* tabView, BPoint point, int32 index)
 	if (termView == NULL)
 		return;
 
-	BMessage* message = new BMessage(kCloseView);
-	_SessionAt(index)->id.AddToMessage(*message, "session");
+	BMessage* closeMessage = new BMessage(kCloseView);
+	_SessionAt(index)->id.AddToMessage(*closeMessage, "session");
+
+	BMessage* editTitleMessage = new BMessage(kEditTabTitle);
+	_SessionAt(index)->id.AddToMessage(*editTitleMessage, "session");
 
 	BPopUpMenu* popUpMenu = new BPopUpMenu("tab menu");
-	popUpMenu->AddItem(new BMenuItem(B_TRANSLATE("Close tab"), message));
+	BLayoutBuilder::Menu<>(popUpMenu)
+		.AddItem(B_TRANSLATE("Close tab"), closeMessage)
+		.AddItem(B_TRANSLATE("Edit tab title" B_UTF8_ELLIPSIS),
+			editTitleMessage)
+	;
+
 	popUpMenu->SetAsyncAutoDestruct(true);
 	popUpMenu->SetTargetForItems(BMessenger(this));
 
@@ -1224,7 +1219,7 @@ TermWindow::TitleChanged(SetTitleDialog* dialog, const BString& title,
 {
 	if (dialog == fSetTabTitleDialog) {
 		// tab title
-		BMessage message(MSG_TAB_TITLE_CHANGED);
+		BMessage message(kTabTitleChanged);
 		fSetTabTitleSession.AddToMessage(message, "session");
 		if (titleUserDefined)
 			message.AddString("title", title);
@@ -1232,7 +1227,7 @@ TermWindow::TitleChanged(SetTitleDialog* dialog, const BString& title,
 		PostMessage(&message);
 	} else if (dialog == fSetWindowTitleDialog) {
 		// window title
-		BMessage message(MSG_WINDOW_TITLE_CHANGED);
+		BMessage message(kWindowTitleChanged);
 		if (titleUserDefined)
 			message.AddString("title", title);
 
@@ -1395,6 +1390,38 @@ TermWindow::_UpdateSessionTitle(int32 index)
 		fTitle.title = windowTitle;
 		SetTitle(fTitle.title);
 	}
+}
+
+
+void
+TermWindow::_OpenSetTabTitleDialog(int32 index)
+{
+	// If a dialog is active, finish it.
+	_FinishTitleDialog();
+
+	BString toolTip = BString(B_TRANSLATE(
+		"The pattern specifying the current tab title. The following "
+			"placeholders\n"
+		"can be used:\n")) << kTooTipSetTabTitlePlaceholders;
+	fSetTabTitleDialog = new SetTitleDialog(
+		B_TRANSLATE("Set tab title"), B_TRANSLATE("Tab title:"),
+		toolTip);
+
+	Session* session = _SessionAt(index);
+	bool userDefined = session->title.patternUserDefined;
+	const BString& title = userDefined
+		? session->title.pattern : fSessionTitlePattern;
+	fSetTabTitleSession = session->id;
+
+	// place the dialog window directly under the tab, but keep it on screen
+	BPoint location = fTabView->ConvertToScreen(
+		fTabView->TabFrame(index).LeftBottom() + BPoint(0, 1));
+	BRect frame(fSetTabTitleDialog->Frame().OffsetToCopy(location));
+	BSize screenSize(BScreen(fSetTabTitleDialog).Frame().Size());
+	fSetTabTitleDialog->MoveTo(
+		BLayoutUtils::MoveIntoFrame(frame, screenSize).LeftTop());
+
+	fSetTabTitleDialog->Go(title, userDefined, this);
 }
 
 
