@@ -1131,7 +1131,7 @@ XHDIDrive::ReadBlocks(void *buffer, off_t first, int32 count)
 status_t 
 platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 {
-	TRACE(("boot drive ID: %x\n", gBootDriveID));
+	TRACE(("boot drive ID: %x API: %d\n", gBootDriveID, gBootDriveAPI));
 	init_xhdi();
 
 	//XXX: FIXME
@@ -1150,12 +1150,24 @@ platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 			drive = new(nothrow) XHDIDrive(gBootDriveID, gBootDriveID, 0);
 			break;
 		case ATARI_BOOT_DRVAPI_UNKNOWN:
+		{
+			// we don't know yet, try to ask ARAnyM via NatFeat
+			int id = nat_feat_get_bootdrive();
+			if (id > -1) {
+				gBootDriveID = id;
+				dprintf("nat_fead_get_bootdrive() = %d\n", id);
+				// XXX: which API does it refer to ??? id = letter - 'a'
+				drive = new(nothrow) XHDIDrive(gBootDriveID, gBootDriveID, 0);
+				break;
+			}
+		}
 		default:
 			dprintf("unknown boot drive API %d\n", gBootDriveAPI);
 			return B_ERROR;
 			drive = new(nothrow) BIOSDrive(gBootDriveID);
 	}
-	if (drive->InitCheck() != B_OK) {
+
+	if (drive == NULL || drive->InitCheck() != B_OK) {
 		dprintf("no boot drive!\n");
 		return B_ERROR;
 	}
