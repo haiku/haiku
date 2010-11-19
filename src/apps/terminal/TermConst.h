@@ -91,6 +91,8 @@ static const uint32 MSG_SET_TERMNAL_TITLE				= 'sett';
 static const uint32 MSG_QUIT_TERMNAL					= 'qutt';
 static const uint32 MSG_REPORT_MOUSE_EVENT				= 'mous';
 static const uint32 MSG_SAVE_WINDOW_POSITION			= 'swps';
+static const uint32 MSG_MOVE_TAB_LEFT					= 'mvtl';
+static const uint32 MSG_MOVE_TAB_RIGHT					= 'mvtr';
 
 // Preference Read/Write Keys
 static const char* const PREF_HALF_FONT_FAMILY = "Half Font Family";

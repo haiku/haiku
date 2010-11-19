@@ -220,6 +220,11 @@ TermWindow::_InitWindow()
 		AddShortcut('1' + i, B_COMMAND_KEY, message);
 	}
 
+	AddShortcut(B_LEFT_ARROW, B_COMMAND_KEY | B_SHIFT_KEY,
+		new BMessage(MSG_MOVE_TAB_LEFT));
+	AddShortcut(B_RIGHT_ARROW, B_COMMAND_KEY | B_SHIFT_KEY,
+		new BMessage(MSG_MOVE_TAB_RIGHT));
+
 	BRect textFrame = Bounds();
 	textFrame.top = fMenubar->Bounds().bottom + 1.0;
 
@@ -677,6 +682,12 @@ TermWindow::MessageReceived(BMessage *message)
 			_CheckChildren();
 			break;
 
+		case MSG_MOVE_TAB_LEFT:
+		case MSG_MOVE_TAB_RIGHT:
+			_NavigateTab(_IndexOfTermView(_ActiveTermView()),
+				message->what == MSG_MOVE_TAB_LEFT ? -1 : 1, true);
+			break;
+
 		case kSetActiveTab:
 		{
 			int32 index;
@@ -957,12 +968,19 @@ TermWindow::_NavigateTab(int32 index, int32 direction, bool move)
 	if (count <= 1 || index < 0 || index >= count)
 		return;
 
+	int32 newIndex = (index + direction + count) % count;
+	if (newIndex == index)
+		return;
+
 	if (move) {
-		// TODO: Move the tab!
-	} else {
-		index += direction;
-		fTabView->Select((index + count) % count);
+		// move the given tab to the new index
+		Session* session = (Session*)fSessions.RemoveItem(index);
+		fSessions.AddItem(session, newIndex);
+		fTabView->MoveTab(index, newIndex);
 	}
+
+	// activate the respective tab
+	fTabView->Select(newIndex);
 }
 
 
@@ -1122,16 +1140,16 @@ TermWindow::SetTermViewTitle(TermView* view, const char* title)
 
 
 void
-TermWindow::PreviousTermView(TermView* view, bool move)
+TermWindow::PreviousTermView(TermView* view)
 {
-	_NavigateTab(_IndexOfTermView(view), -1, move);
+	_NavigateTab(_IndexOfTermView(view), -1, false);
 }
 
 
 void
-TermWindow::NextTermView(TermView* view, bool move)
+TermWindow::NextTermView(TermView* view)
 {
-	_NavigateTab(_IndexOfTermView(view), 1, move);
+	_NavigateTab(_IndexOfTermView(view), 1, false);
 }
 
 

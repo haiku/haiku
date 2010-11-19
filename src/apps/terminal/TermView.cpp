@@ -1589,10 +1589,8 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 		case B_LEFT_ARROW:
 			if (rawChar == B_LEFT_ARROW) {
 				if ((mod & B_SHIFT_KEY) != 0) {
-					if (fListener != NULL) {
-						fListener->PreviousTermView(this,
-							(mod & B_COMMAND_KEY) != 0);
-					}
+					if (fListener != NULL)
+						fListener->PreviousTermView(this);
 					return;
 				}
 				if ((mod & B_CONTROL_KEY) || (mod & B_COMMAND_KEY))
@@ -1605,10 +1603,8 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 		case B_RIGHT_ARROW:
 			if (rawChar == B_RIGHT_ARROW) {
 				if ((mod & B_SHIFT_KEY) != 0) {
-					if (fListener != NULL) {
-						fListener->NextTermView(this,
-							(mod & B_COMMAND_KEY) != 0);
-					}
+					if (fListener != NULL)
+						fListener->NextTermView(this);
 					return;
 				}
 				if ((mod & B_CONTROL_KEY) || (mod & B_COMMAND_KEY))
@@ -3310,12 +3306,12 @@ TermView::Listener::SetTermViewTitle(TermView* view, const char* title)
 
 
 void
-TermView::Listener::PreviousTermView(TermView* view, bool move)
+TermView::Listener::PreviousTermView(TermView* view)
 {
 }
 
 
 void
-TermView::Listener::NextTermView(TermView* view, bool move)
+TermView::Listener::NextTermView(TermView* view)
 {
 }

@@ -296,8 +296,8 @@ public:
 									int32 reason);
 	virtual	void				SetTermViewTitle(TermView* view,
 									const char* title);
-	virtual	void				PreviousTermView(TermView* view, bool move);
-	virtual	void				NextTermView(TermView* view, bool move);
+	virtual	void				PreviousTermView(TermView* view);
+	virtual	void				NextTermView(TermView* view);
 };
 
 
