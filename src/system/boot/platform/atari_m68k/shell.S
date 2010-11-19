@@ -474,9 +474,12 @@ copysect_loop:
 	// all done
 super_done:
 	// XXX: copy the rest !
+#if 1
+	// XXX: force floppy boot for testing to get the kernel tgz for now
 	move.b		#ATARI_BOOT_DRVAPI_FLOPPY,ATARI_ZBEOS_BASE + gBootDriveAPI - _bs_entry 
 	move.b		#0,ATARI_ZBEOS_BASE + gBootDriveID - _bs_entry 
 	move.b		#1,ATARI_ZBEOS_BASE + gBootedFromImage - _bs_entry 
+#endif
 
 	move.l		#0,%d0
 
