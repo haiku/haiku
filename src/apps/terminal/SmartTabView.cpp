@@ -206,6 +206,29 @@ SmartTabView::RemoveTab(int32 index)
 }
 
 
+void
+SmartTabView::MoveTab(int32 index, int32 newIndex)
+{
+	// check the indexes
+	int32 count = CountTabs();
+	if (index == newIndex || index < 0 || newIndex < 0 || index >= count
+		|| newIndex >= count) {
+		return;
+	}
+
+	// Remove the tab from its position and add it to the end. Then cycle the
+	// tabs starting after the new position (save the tab already moved) to the
+	// end.
+	BTab* tab = BTabView::RemoveTab(index);
+	BTabView::AddTab(tab->View(), tab);
+
+	for (int32 i = newIndex; i < count - 1; i++) {
+		tab = BTabView::RemoveTab(newIndex);
+		BTabView::AddTab(tab->View(), tab);
+	}
+}
+
+
 BRect
 SmartTabView::DrawTabs()
 {

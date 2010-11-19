@@ -48,6 +48,7 @@ public:
 
 	virtual	void				AddTab(BView* target, BTab* tab = NULL);
 	virtual BTab*				RemoveTab(int32 index);
+			void				MoveTab(int32 index, int32 newIndex);
 
 	virtual BRect				DrawTabs();
 
