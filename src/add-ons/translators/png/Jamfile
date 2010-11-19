@@ -5,6 +5,10 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 UseLibraryHeaders png zlib ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
+if $(HAIKU_GCC_VERSION[1]) = 2 {
+	SubDirCcFlags -DPNG_NO_PEDANTIC_WARNINGS ;
+}
+
 Translator PNGTranslator : 
 	PNGMain.cpp
 	PNGTranslator.cpp

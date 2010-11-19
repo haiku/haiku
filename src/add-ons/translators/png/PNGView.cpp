@@ -19,6 +19,7 @@
 #include <TextView.h>
 
 #include <stdio.h>
+#define PNG_NO_PEDANTIC_WARNINGS
 #include <png.h>
 
 

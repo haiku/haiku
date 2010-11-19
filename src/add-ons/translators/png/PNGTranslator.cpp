@@ -33,6 +33,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <OS.h>
+#define PNG_NO_PEDANTIC_WARNINGS
 #include <png.h>
 #include "PNGTranslator.h"
 #include "PNGView.h"
