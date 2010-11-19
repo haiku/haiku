@@ -143,6 +143,7 @@ private:
 			TermView*			_ActiveTermView() const;
 			TermView*			_TermViewAt(int32 index) const;
 			int32				_IndexOfTermView(TermView* termView) const;
+	inline	Session*			_SessionAt(int32 index) const;
 			Session*			_SessionForID(const SessionID& sessionID) const;
 
 			void				_CheckChildren();

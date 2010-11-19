@@ -200,7 +200,7 @@ TermWindow::~TermWindow()
 
 	PrefHandler::DeleteDefault();
 
-	for (int32 i = 0; Session* session = (Session*)fSessions.ItemAt(i); i++)
+	for (int32 i = 0; Session* session = _SessionAt(i); i++)
 		delete session;
 }
 
@@ -976,7 +976,7 @@ TermWindow::_RemoveTab(int32 index)
 		if (Session* session = (Session*)fSessions.RemoveItem(index)) {
 			if (fSessions.CountItems() == 1) {
 				fTabView->SetScrollView(dynamic_cast<BScrollView*>(
-					((Session*)fSessions.ItemAt(0))->containerView->Parent()));
+					(_SessionAt(0))->containerView->Parent()));
 			}
 
 			delete session;
@@ -1022,7 +1022,7 @@ TermWindow::_ActiveTermViewContainerView() const
 TermViewContainerView*
 TermWindow::_TermViewContainerViewAt(int32 index) const
 {
-	if (Session* session = (Session*)fSessions.ItemAt(index))
+	if (Session* session = _SessionAt(index))
 		return session->containerView;
 	return NULL;
 }
@@ -1060,10 +1060,17 @@ TermWindow::_IndexOfTermView(TermView* termView) const
 }
 
 
+inline TermWindow::Session*
+TermWindow::_SessionAt(int32 index) const
+{
+	return (Session*)fSessions.ItemAt(index);
+}
+
+
 TermWindow::Session*
 TermWindow::_SessionForID(const SessionID& sessionID) const
 {
-	for (int32 i = 0; Session* session = (Session*)fSessions.ItemAt(i); i++) {
+	for (int32 i = 0; Session* session = _SessionAt(i); i++) {
 		if (session->id == sessionID)
 			return session;
 	}
@@ -1077,7 +1084,7 @@ TermWindow::_CheckChildren()
 {
 	int32 count = fSessions.CountItems();
 	for (int32 i = count - 1; i >= 0; i--) {
-		Session* session = (Session*)fSessions.ItemAt(i);
+		Session* session = _SessionAt(i);
 		if (session->containerView->GetTermView()->CheckShellGone())
 			NotifyTermViewQuit(session->containerView->GetTermView(), 0);
 	}
@@ -1125,7 +1132,7 @@ TermWindow::TabDoubleClicked(SmartTabView* tabView, BPoint point, int32 index)
 			B_TRANSLATE("Set tab title"), B_TRANSLATE("Tab title:"),
 			toolTip);
 
-		Session* session = (Session*)fSessions.ItemAt(index);
+		Session* session = _SessionAt(index);
 		bool userDefined = session->title.patternUserDefined;
 		const BString& title = userDefined
 			? session->title.pattern : fSessionTitlePattern;
@@ -1196,7 +1203,7 @@ void
 TermWindow::SetTermViewTitle(TermView* view, const char* title)
 {
 	int32 index = _IndexOfTermView(view);
-	if (Session* session = (Session*)fSessions.ItemAt(index)) {
+	if (Session* session = _SessionAt(index)) {
 		session->title.pattern = title;
 		session->title.patternUserDefined = true;
 		_UpdateSessionTitle(index);
@@ -1334,7 +1341,7 @@ TermWindow::_UpdateTitles()
 void
 TermWindow::_UpdateSessionTitle(int32 index)
 {
-	Session* session = (Session*)fSessions.ItemAt(index);
+	Session* session = _SessionAt(index);
 	if (session == NULL)
 		return;
 
@@ -1406,7 +1413,7 @@ TermWindow::_NewSessionIndex()
 		bool used = false;
 
 		for (int32 i = 0;
-			 Session* session = (Session*)fSessions.ItemAt(i); i++) {
+			 Session* session = _SessionAt(i); i++) {
 			if (id == session->index) {
 				used = true;
 				break;
