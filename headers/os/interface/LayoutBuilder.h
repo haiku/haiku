@@ -6,11 +6,15 @@
 #define	_LAYOUT_BUILDER_H
 
 
+#include <new>
+
 #include <GridLayout.h>
 #include <GridView.h>
 #include <GroupLayout.h>
 #include <GroupView.h>
+#include <Menu.h>
 #include <MenuField.h>
+#include <MenuItem.h>
 #include <SpaceLayoutItem.h>
 #include <SplitView.h>
 #include <TextControl.h>
@@ -23,6 +27,8 @@ template<typename ParentBuilder> class Base;
 template<typename ParentBuilder = void*> class Group;
 template<typename ParentBuilder = void*> class Grid;
 template<typename ParentBuilder = void*> class Split;
+template<typename ParentBuilder = void*> class Menu;
+template<typename ParentBuilder = void*> class MenuItem;
 
 
 template<typename ParentBuilder>
@@ -245,6 +251,54 @@ public:
 
 private:
 			BSplitView*			fView;
+};
+
+
+template<typename ParentBuilder>
+class Menu : public Base<ParentBuilder> {
+public:
+	typedef Menu<ParentBuilder>		ThisBuilder;
+	typedef MenuItem<ParentBuilder>	ItemBuilder;
+	typedef Menu<ThisBuilder>		MenuBuilder;
+
+public:
+	inline						Menu(BMenu* menu);
+
+	inline	ThisBuilder&		GetMenu(BMenu*& _menu);
+
+	inline	ItemBuilder			AddItem(BMenuItem* item);
+	inline	ItemBuilder			AddItem(BMenu* menu);
+	inline	ItemBuilder			AddItem(const char* label, BMessage* message,
+									char shortcut = 0, uint32 modifiers = 0);
+	inline	ItemBuilder			AddItem(const char* label, uint32 messageWhat,
+									char shortcut = 0, uint32 modifiers = 0);
+
+	inline	MenuBuilder			AddMenu(BMenu* menu);
+	inline	MenuBuilder			AddMenu(const char* title,
+									menu_layout layout = B_ITEMS_IN_COLUMN);
+
+	inline	ThisBuilder&		AddSeparator();
+
+private:
+			BMenu*				fMenu;
+};
+
+
+template<typename ParentBuilder>
+class MenuItem : public Menu<ParentBuilder> {
+public:
+	typedef MenuItem<ParentBuilder>	ThisBuilder;
+
+public:
+	inline						MenuItem(ParentBuilder* parentBuilder,
+									BMenu* menu, BMenuItem* item);
+
+	inline	ThisBuilder&		GetItem(BMenuItem*& _item);
+
+	inline	ThisBuilder&		SetEnabled(bool enabled);
+
+private:
+			BMenuItem*			fMenuItem;
 };
 
 
@@ -962,6 +1016,151 @@ template<typename ParentBuilder>
 Split<ParentBuilder>::operator BSplitView*()
 {
 	return fView;
+}
+
+
+// #pragma mark - Menu
+
+
+template<typename ParentBuilder>
+Menu<ParentBuilder>::Menu(BMenu* menu)
+	:
+	fMenu(menu)
+{
+}
+
+
+template<typename ParentBuilder>
+typename Menu<ParentBuilder>::ThisBuilder&
+Menu<ParentBuilder>::GetMenu(BMenu*& _menu)
+{
+	_menu = fMenu;
+	return *this;
+}
+
+
+template<typename ParentBuilder>
+typename Menu<ParentBuilder>::ItemBuilder
+Menu<ParentBuilder>::AddItem(BMenuItem* item)
+{
+	fMenu->AddItem(item);
+	return MenuItem<ParentBuilder>(this->fParent, fMenu, item);
+}
+
+
+template<typename ParentBuilder>
+typename Menu<ParentBuilder>::ItemBuilder
+Menu<ParentBuilder>::AddItem(BMenu* menu)
+{
+	if (!fMenu->AddItem(menu))
+		throw std::bad_alloc();
+
+	return MenuItem<ParentBuilder>(this->fParent, fMenu,
+		fMenu->ItemAt(fMenu->CountItems() - 1));
+}
+
+
+template<typename ParentBuilder>
+typename Menu<ParentBuilder>::ItemBuilder
+Menu<ParentBuilder>::AddItem(const char* label, BMessage* message,
+	char shortcut, uint32 modifiers)
+{
+	BMenuItem* item = new BMenuItem(label, message, shortcut, modifiers);
+	if (!fMenu->AddItem(item))
+		delete item;
+
+	return MenuItem<ParentBuilder>(this->fParent, fMenu, item);
+}
+
+
+template<typename ParentBuilder>
+typename Menu<ParentBuilder>::ItemBuilder
+Menu<ParentBuilder>::AddItem(const char* label, uint32 messageWhat,
+	char shortcut, uint32 modifiers)
+{
+	BMessage* message = new BMessage(messageWhat);
+	BMenuItem* item;
+	try {
+		item = new BMenuItem(label, message, shortcut, modifiers);
+	} catch (...) {
+		delete message;
+		throw;
+	}
+
+	if (!fMenu->AddItem(item))
+		delete item;
+
+	return MenuItem<ParentBuilder>(this->fParent, fMenu, item);
+}
+
+
+template<typename ParentBuilder>
+typename Menu<ParentBuilder>::ThisBuilder&
+Menu<ParentBuilder>::AddSeparator()
+{
+	fMenu->AddSeparatorItem();
+	return *this;
+}
+
+
+template<typename ParentBuilder>
+typename Menu<ParentBuilder>::MenuBuilder
+Menu<ParentBuilder>::AddMenu(BMenu* menu)
+{
+	if (!fMenu->AddItem(menu))
+		throw std::bad_alloc();
+
+	MenuBuilder builder(menu);
+	builder.SetParent(this);
+	return builder;
+}
+
+
+template<typename ParentBuilder>
+typename Menu<ParentBuilder>::MenuBuilder
+Menu<ParentBuilder>::AddMenu(const char* title, menu_layout layout)
+{
+	BMenu* menu = new BMenu(title, layout);
+	if (!fMenu->AddItem(menu)) {
+		delete menu;
+		throw std::bad_alloc();
+	}
+
+	MenuBuilder builder(menu);
+	builder.SetParent(this);
+	return builder;
+}
+
+
+// #pragma mark - MenuItem
+
+
+template<typename ParentBuilder>
+MenuItem<ParentBuilder>::MenuItem(ParentBuilder* parentBuilder, BMenu* menu,
+	BMenuItem* item)
+	:
+	Menu<ParentBuilder>(menu),
+	fMenuItem(item)
+{
+	SetParent(parentBuilder);
+}
+
+
+template<typename ParentBuilder>
+typename MenuItem<ParentBuilder>::ThisBuilder&
+MenuItem<ParentBuilder>::GetItem(BMenuItem*& _item)
+{
+	_item = fMenuItem;
+	return *this;
+}
+
+
+template<typename ParentBuilder>
+typename MenuItem<ParentBuilder>::ThisBuilder&
+MenuItem<ParentBuilder>::SetEnabled(bool enabled)
+{
+	fMenuItem->SetEnabled(enabled);
+	return *this;
 }
 
 
