@@ -1445,7 +1445,7 @@ FrameMoved(origin);
 
 		case B_LAYOUT_WINDOW:
 		{
-			_CheckSizeLimits();
+			UpdateSizeLimits();
 
 			// do the actual layout
 			fTopView->Layout(false);
@@ -1557,6 +1557,30 @@ BWindow::GetSizeLimits(float* _minWidth, float* _maxWidth, float* _minHeight,
 		*_maxHeight = fMaxHeight;
 	if (_maxWidth != NULL)
 		*_maxWidth = fMaxWidth;
+}
+
+
+/*!	Updates the window's size limits from the minimum and maximum sizes of its
+	top view.
+
+	Is a no-op, unless the \c B_AUTO_UPDATE_SIZE_LIMITS window flag is set.
+
+	The method is called automatically after a layout invalidation. Since it is
+	invoked asynchronously, calling this method manually is necessary, if it is
+	desired to adjust the limits (and as a possible side effect the window size)
+	earlier (e.g. before the first Show()).
+*/
+void
+BWindow::UpdateSizeLimits()
+{
+	if ((fFlags & B_AUTO_UPDATE_SIZE_LIMITS) != 0) {
+		// Get min/max constraints of the top view and enforce window
+		// size limits respectively.
+		BSize minSize = fTopView->MinSize();
+		BSize maxSize = fTopView->MaxSize();
+		SetSizeLimits(minSize.width, maxSize.width,
+			minSize.height, maxSize.height);
+	}
 }
 
 
@@ -2501,7 +2525,7 @@ void
 BWindow::CenterIn(const BRect& rect)
 {
 	// Set size limits now if needed
-	_CheckSizeLimits();
+	UpdateSizeLimits();
 
 	MoveTo(BLayoutUtils::AlignInFrame(rect, Size(),
 		BAlignment(B_ALIGN_HORIZONTAL_CENTER,
@@ -3960,20 +3984,6 @@ BWindow::_GetDecoratorSize(float* _borderWidth, float* _tabHeight) const
 		*_borderWidth = borderWidth;
 	if (_tabHeight != NULL)
 		*_tabHeight = tabHeight;
-}
-
-
-void
-BWindow::_CheckSizeLimits()
-{
-	if (fFlags & B_AUTO_UPDATE_SIZE_LIMITS) {
-		// Get min/max constraints of the top view and enforce window
-		// size limits respectively.
-		BSize minSize = fTopView->MinSize();
-		BSize maxSize = fTopView->MaxSize();
-		SetSizeLimits(minSize.width, maxSize.width,
-			minSize.height, maxSize.height);
-	}
 }
 
 
