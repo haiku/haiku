@@ -8,6 +8,7 @@
 #ifndef WEBP_TRANSLATOR_H
 #define WEBP_TRANSLATOR_H
 
+
 #include <ByteOrder.h>
 #include <DataIO.h>
 #include <File.h>
@@ -29,25 +30,29 @@
 #define BITS_OUT_QUALITY 1
 #define BITS_OUT_CAPABILITY 0.9
 
+
 class WebPTranslator : public BaseTranslator {
 public:
-	WebPTranslator();
+							WebPTranslator();
 
-	virtual status_t DerivedIdentify(BPositionIO *inSource,
-		const translation_format *inFormat, BMessage *ioExtension,
-		translator_info *outInfo, uint32 outType);
+	virtual status_t 		DerivedIdentify(BPositionIO* stream,
+								const translation_format* format,
+								BMessage* settings, translator_info* info,
+								uint32 outType);
 
-	virtual status_t DerivedTranslate(BPositionIO *inSource,
-		const translator_info *inInfo, BMessage *ioExtension,
-		uint32 outType, BPositionIO *outDestination, int32 baseType);
+	virtual status_t 		DerivedTranslate(BPositionIO* stream,
+								const translator_info* info,
+								BMessage* settings, uint32 outType,
+								BPositionIO* target, int32 baseType);
 
-	virtual BView *NewConfigView(TranslatorSettings *settings);
+	virtual BView*			NewConfigView(TranslatorSettings* settings);
 
 protected:
-	virtual ~WebPTranslator();
+	virtual 				~WebPTranslator();
 		// this is protected because the object is deleted by the
 		// Release() function instead of being deleted directly by
 		// the user
 };
+
 
 #endif // #ifndef WEBP_TRANSLATOR_H

@@ -83,8 +83,7 @@ WebPTranslator::WebPTranslator()
 		WEBP_TRANSLATOR_VERSION,
 		sInputFormats, kNumInputFormats,
 		sOutputFormats, kNumOutputFormats,
-		"WebPTranslator_Settings",
-		sDefaultSettings, kNumDefaultSettings,
+		"WebPTranslator_Settings", sDefaultSettings, kNumDefaultSettings,
 		B_TRANSLATOR_BITMAP, WEBP_IMAGE_FORMAT)
 {
 }
@@ -96,9 +95,9 @@ WebPTranslator::~WebPTranslator()
 
 
 status_t
-WebPTranslator::DerivedIdentify(BPositionIO *stream,
-	const translation_format *format, BMessage *settings,
-	translator_info *info, uint32 outType)
+WebPTranslator::DerivedIdentify(BPositionIO* stream,
+	const translation_format* format, BMessage* settings,
+	translator_info* info, uint32 outType)
 {
 	if (!outType)
 		outType = B_TRANSLATOR_BITMAP;
@@ -129,9 +128,9 @@ WebPTranslator::DerivedIdentify(BPositionIO *stream,
 
 
 status_t
-WebPTranslator::DerivedTranslate(BPositionIO *stream,
-		const translator_info *info, BMessage *settings,
-		uint32 outType, BPositionIO *target, int32 baseType)
+WebPTranslator::DerivedTranslate(BPositionIO* stream,
+		const translator_info* info, BMessage* settings,
+		uint32 outType, BPositionIO* target, int32 baseType)
 {
 	if (!outType)
 		outType = B_TRANSLATOR_BITMAP;
@@ -159,11 +158,8 @@ WebPTranslator::DerivedTranslate(BPositionIO *stream,
 	free(streamData);
 
 	if (out == NULL) {
-		printf("WebPDecodeRGB(%p, %lld) failed.\n", streamData, streamSize);
 		return B_ILLEGAL_DATA;
 	}
-	printf("WebPDecodeRGB(%p, %lld) succeed: %d x %d WebP image decoded.\n",
-		streamData, streamSize, width, height);
 
 	FreeAllocation _(out);
 
@@ -192,6 +188,7 @@ WebPTranslator::DerivedTranslate(BPositionIO *stream,
 
 	if (headerOnly)
 		return B_OK;
+
 	uint32 dataLeft = dataSize;
 	uint8* p = out;
 	uint8 rgb[3];
@@ -216,8 +213,8 @@ WebPTranslator::DerivedTranslate(BPositionIO *stream,
 
 
 
-BView *
-WebPTranslator::NewConfigView(TranslatorSettings *settings)
+BView*
+WebPTranslator::NewConfigView(TranslatorSettings* settings)
 {
 	return new ConfigView();
 }
@@ -226,7 +223,7 @@ WebPTranslator::NewConfigView(TranslatorSettings *settings)
 //	#pragma mark -
 
 
-BTranslator *
+BTranslator*
 make_nth_translator(int32 n, image_id you, uint32 flags, ...)
 {
 	if (n != 0)

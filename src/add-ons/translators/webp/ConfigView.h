@@ -13,9 +13,10 @@
 
 
 class ConfigView : public BView {
-	public:
-		ConfigView(uint32 flags = B_WILL_DRAW);
-		virtual ~ConfigView();
+public:
+							ConfigView(uint32 flags = B_WILL_DRAW);
+	virtual 				~ConfigView();
 };
+
 
 #endif	/* CONFIG_VIEW_H */

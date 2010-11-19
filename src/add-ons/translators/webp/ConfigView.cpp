@@ -10,10 +10,10 @@
 #include "ConfigView.h"
 #include "WebPTranslator.h"
 
-#include <StringView.h>
 #include <CheckBox.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
+#include <StringView.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -24,7 +24,7 @@ ConfigView::ConfigView(uint32 flags)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	BStringView *fTitle = new BStringView("title", "WebP Images");
+	BStringView* fTitle = new BStringView("title", "WebP Images");
 	fTitle->SetFont(be_bold_font);
 
 	char version[256];
@@ -33,15 +33,15 @@ ConfigView::ConfigView(uint32 flags)
 		int(B_TRANSLATION_MINOR_VERSION(WEBP_TRANSLATOR_VERSION)),
 		int(B_TRANSLATION_REVISION_VERSION(WEBP_TRANSLATOR_VERSION)),
 		__DATE__);
-	BStringView *fVersion = new BStringView("version", version);
+	BStringView* fVersion = new BStringView("version", version);
 
-	BStringView *fCopyright = new BStringView("copyright",
+	BStringView* fCopyright = new BStringView("copyright",
 		B_UTF8_COPYRIGHT "2010 Haiku Inc.");
 
-	BStringView *fCopyright2 = new BStringView("copyright2",
+	BStringView* fCopyright2 = new BStringView("copyright2",
 		"Based on libwebp v0.1");
 
-	BStringView *fCopyright3 = new BStringView("copyright3",
+	BStringView* fCopyright3 = new BStringView("copyright3",
 		B_UTF8_COPYRIGHT "2010 Google Inc.");
 
 	// Build the layout
