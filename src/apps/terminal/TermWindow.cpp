@@ -946,7 +946,7 @@ TermWindow::_RemoveTab(int32 index)
 		if (Session* session = (Session*)fSessions.RemoveItem(index)) {
 			if (fSessions.CountItems() == 1) {
 				fTabView->SetScrollView(dynamic_cast<BScrollView*>(
-					(_SessionAt(0))->containerView->Parent()));
+					_SessionAt(0)->containerView->Parent()));
 			}
 
 			delete session;
