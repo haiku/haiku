@@ -57,7 +57,7 @@ public:
 
 			void				LayoutItems(bool force = false);
 			BRect				LayoutArea();
-			BLayoutContext*		LayoutContext();
+			BLayoutContext*		LayoutContext() const;
 
 	// Archiving methods
 

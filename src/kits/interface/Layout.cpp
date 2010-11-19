@@ -558,7 +558,7 @@ BLayout::ResetLayoutInvalidation()
 
 
 BLayoutContext*
-BLayout::LayoutContext()
+BLayout::LayoutContext() const
 {
 	return fContext;
 }
