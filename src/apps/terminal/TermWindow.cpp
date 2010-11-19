@@ -19,6 +19,7 @@
 #include <Catalog.h>
 #include <Clipboard.h>
 #include <Dragger.h>
+#include <LayoutBuilder.h>
 #include <LayoutUtils.h>
 #include <Locale.h>
 #include <Menu.h>
@@ -155,11 +156,7 @@ TermWindow::TermWindow(BRect frame, const BString& title,
 	fNextSessionID(0),
 	fTabView(NULL),
 	fMenuBar(NULL),
-	fFileMenu(NULL),
-	fEditMenu(NULL),
 	fEncodingMenu(NULL),
-	fSettingsMenu(NULL),
-	fWindowSizeMenu(NULL),
 	fPrintSettings(NULL),
 	fPrefWindow(NULL),
 	fFindPanel(NULL),
@@ -349,88 +346,61 @@ TermWindow::_MakeEncodingMenu()
 void
 TermWindow::_SetupMenu()
 {
-	// Menu bar object.
-	fMenuBar = new BMenuBar(Bounds(), "mbar");
+	BLayoutBuilder::Menu<>(fMenuBar = new BMenuBar(Bounds(), "mbar"))
+		// Terminal
+		.AddMenu(B_TRANSLATE("Terminal"))
+			.AddItem(B_TRANSLATE("Switch Terminals"), MENU_SWITCH_TERM, B_TAB)
+			.AddItem(B_TRANSLATE("New Terminal"), MENU_NEW_TERM, 'N')
+			.AddItem(B_TRANSLATE("New tab"), kNewTab, 'T')
+			.AddSeparator()
+			.AddItem(B_TRANSLATE("Page setup" B_UTF8_ELLIPSIS), MENU_PAGE_SETUP)
+			.AddItem(B_TRANSLATE("Print"), MENU_PRINT,'P')
+			.AddSeparator()
+			.AddItem(B_TRANSLATE("About Terminal" B_UTF8_ELLIPSIS),
+				B_ABOUT_REQUESTED)
+			.AddSeparator()
+			.AddItem(B_TRANSLATE("Close window"), B_QUIT_REQUESTED, 'W',
+				B_SHIFT_KEY)
+			.AddItem(B_TRANSLATE("Close active tab"), kCloseView, 'W')
+			.AddItem(B_TRANSLATE("Quit"), B_QUIT_REQUESTED, 'Q')
+		.End()
 
-	// Make File Menu.
-	fFileMenu = new BMenu(B_TRANSLATE("Terminal"));
-	fFileMenu->AddItem(new BMenuItem(B_TRANSLATE("Switch Terminals"),
-		new BMessage(MENU_SWITCH_TERM), B_TAB));
-	fFileMenu->AddItem(new BMenuItem(B_TRANSLATE("New Terminal"),
-		new BMessage(MENU_NEW_TERM), 'N'));
-	fFileMenu->AddItem(new BMenuItem(B_TRANSLATE("New tab"),
-		new BMessage(kNewTab), 'T'));
+		// Edit
+		.AddMenu(B_TRANSLATE("Edit"))
+			.AddItem(B_TRANSLATE("Copy"), B_COPY,'C')
+			.AddItem(B_TRANSLATE("Paste"), B_PASTE,'V')
+			.AddSeparator()
+			.AddItem(B_TRANSLATE("Select all"), B_SELECT_ALL, 'A')
+			.AddItem(B_TRANSLATE("Clear all"), MENU_CLEAR_ALL, 'L')
+			.AddSeparator()
+			.AddItem(B_TRANSLATE("Find" B_UTF8_ELLIPSIS), MENU_FIND_STRING,'F')
+			.AddItem(B_TRANSLATE("Find previous"), MENU_FIND_PREVIOUS, 'G',
+					B_SHIFT_KEY)
+				.GetItem(fFindPreviousMenuItem)
+				.SetEnabled(false)
+			.AddItem(B_TRANSLATE("Find next"), MENU_FIND_NEXT, 'G')
+				.GetItem(fFindNextMenuItem)
+				.SetEnabled(false)
+		.End()
 
-	fFileMenu->AddSeparatorItem();
-	fFileMenu->AddItem(new BMenuItem(B_TRANSLATE("Page setup" B_UTF8_ELLIPSIS),
-		new BMessage(MENU_PAGE_SETUP)));
-	fFileMenu->AddItem(new BMenuItem(B_TRANSLATE("Print"),
-		new BMessage(MENU_PRINT),'P'));
-	fFileMenu->AddSeparatorItem();
-	fFileMenu->AddItem(new BMenuItem(
-		B_TRANSLATE("About Terminal" B_UTF8_ELLIPSIS),
-		new BMessage(B_ABOUT_REQUESTED)));
-	fFileMenu->AddSeparatorItem();
-	fFileMenu->AddItem(new BMenuItem(B_TRANSLATE("Close window"),
-		new BMessage(B_QUIT_REQUESTED), 'W', B_SHIFT_KEY));
-	fFileMenu->AddItem(new BMenuItem(B_TRANSLATE("Close active tab"),
-		new BMessage(kCloseView), 'W'));
-	fFileMenu->AddItem(new BMenuItem(B_TRANSLATE("Quit"),
-		new BMessage(B_QUIT_REQUESTED), 'Q'));
-	fMenuBar->AddItem(fFileMenu);
-
-	// Make Edit Menu.
-	fEditMenu = new BMenu(B_TRANSLATE("Edit"));
-	fEditMenu->AddItem(new BMenuItem(B_TRANSLATE("Copy"),
-		new BMessage(B_COPY),'C'));
-	fEditMenu->AddItem(new BMenuItem(B_TRANSLATE("Paste"),
-		new BMessage(B_PASTE),'V'));
-	fEditMenu->AddSeparatorItem();
-	fEditMenu->AddItem(new BMenuItem(B_TRANSLATE("Select all"),
-		new BMessage(B_SELECT_ALL), 'A'));
-	fEditMenu->AddItem(new BMenuItem(B_TRANSLATE("Clear all"),
-		new BMessage(MENU_CLEAR_ALL), 'L'));
-	fEditMenu->AddSeparatorItem();
-	fEditMenu->AddItem(new BMenuItem(B_TRANSLATE("Find" B_UTF8_ELLIPSIS),
-		new BMessage(MENU_FIND_STRING),'F'));
-	fFindPreviousMenuItem = new BMenuItem(B_TRANSLATE("Find previous"),
-		new BMessage(MENU_FIND_PREVIOUS), 'G', B_SHIFT_KEY);
-	fEditMenu->AddItem(fFindPreviousMenuItem);
-	fFindPreviousMenuItem->SetEnabled(false);
-	fFindNextMenuItem = new BMenuItem(B_TRANSLATE("Find next"),
-		new BMessage(MENU_FIND_NEXT), 'G');
-	fEditMenu->AddItem(fFindNextMenuItem);
-	fFindNextMenuItem->SetEnabled(false);
-
-	fMenuBar->AddItem(fEditMenu);
-
-	// Make Help Menu.
-	fSettingsMenu = new BMenu(B_TRANSLATE("Settings"));
-	fWindowSizeMenu = _MakeWindowSizeMenu();
-
-	fEncodingMenu = _MakeEncodingMenu();
-
-	fSizeMenu = new BMenu(B_TRANSLATE("Text size"));
-
-	fIncreaseFontSizeMenuItem = new BMenuItem(B_TRANSLATE("Increase"),
-		new BMessage(kIncreaseFontSize), '+', B_COMMAND_KEY);
-
-	fDecreaseFontSizeMenuItem = new BMenuItem(B_TRANSLATE("Decrease"),
-		new BMessage(kDecreaseFontSize), '-', B_COMMAND_KEY);
-
-	fSizeMenu->AddItem(fIncreaseFontSizeMenuItem);
-	fSizeMenu->AddItem(fDecreaseFontSizeMenuItem);
-
-	fSettingsMenu->AddItem(fWindowSizeMenu);
-	fSettingsMenu->AddItem(fEncodingMenu);
-	fSettingsMenu->AddItem(fSizeMenu);
-	fSettingsMenu->AddSeparatorItem();
-	fSettingsMenu->AddItem(new BMenuItem(
-		B_TRANSLATE("Settings" B_UTF8_ELLIPSIS), new BMessage(MENU_PREF_OPEN)));
-	fSettingsMenu->AddSeparatorItem();
-	fSettingsMenu->AddItem(new BMenuItem(B_TRANSLATE("Save as default"),
-		new BMessage(SAVE_AS_DEFAULT)));
-	fMenuBar->AddItem(fSettingsMenu);
+		// Settings
+		.AddMenu(B_TRANSLATE("Settings"))
+			.AddItem(_MakeWindowSizeMenu())
+			.AddItem(fEncodingMenu = _MakeEncodingMenu())
+			.AddMenu(B_TRANSLATE("Text size"))
+				.AddItem(B_TRANSLATE("Increase"), kIncreaseFontSize, '+',
+						B_COMMAND_KEY)
+					.GetItem(fIncreaseFontSizeMenuItem)
+				.AddItem(B_TRANSLATE("Decrease"), kDecreaseFontSize, '-',
+						B_COMMAND_KEY)
+					.GetItem(fDecreaseFontSizeMenuItem)
+			.End()
+			.AddSeparator()
+			.AddItem(B_TRANSLATE("Settings" B_UTF8_ELLIPSIS), MENU_PREF_OPEN)
+			.AddSeparator()
+			.AddItem(B_TRANSLATE("Save as default"), SAVE_AS_DEFAULT)
+		.End()
+	;
 
 	AddChild(fMenuBar);
 }
