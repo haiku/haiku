@@ -104,6 +104,8 @@ private:
 								SessionID(const BMessage& message,
 									const char* field);
 
+				bool			IsValid() const		{ return fID >= 0; }
+
 				status_t		AddToMessage(BMessage& message,
 									const char* field) const;
 
@@ -145,6 +147,7 @@ private:
 			int32				_IndexOfTermView(TermView* termView) const;
 	inline	Session*			_SessionAt(int32 index) const;
 			Session*			_SessionForID(const SessionID& sessionID) const;
+	inline	int32				_IndexOfSession(Session* session) const;
 
 			void				_CheckChildren();
 			void				_ResizeView(TermView* view);

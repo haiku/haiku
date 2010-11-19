@@ -708,7 +708,7 @@ TermWindow::MessageReceived(BMessage *message)
 					session->title.pattern.Truncate(0);
 					session->title.patternUserDefined = false;
 				}
-				_UpdateSessionTitle(fSessions.IndexOf(session));
+				_UpdateSessionTitle(_IndexOfSession(session));
 			}
 			break;
 		}
@@ -729,11 +729,12 @@ TermWindow::MessageReceived(BMessage *message)
 
 		case kCloseView:
 		{
-			TermView* termView;
 			int32 index = -1;
-			if (message->FindPointer("termView", (void**)&termView) == B_OK)
-				index = _IndexOfTermView(termView);
-			else
+			SessionID sessionID(*message, "session");
+			if (sessionID.IsValid()) {
+				if (Session* session = _SessionForID(sessionID))
+					index = _IndexOfSession(session);
+			} else
 				index = _IndexOfTermView(_ActiveTermView());
 
 			if (index >= 0)
@@ -1060,7 +1061,7 @@ TermWindow::_IndexOfTermView(TermView* termView) const
 }
 
 
-inline TermWindow::Session*
+TermWindow::Session*
 TermWindow::_SessionAt(int32 index) const
 {
 	return (Session*)fSessions.ItemAt(index);
@@ -1076,6 +1077,13 @@ TermWindow::_SessionForID(const SessionID& sessionID) const
 	}
 
 	return NULL;
+}
+
+
+int32
+TermWindow::_IndexOfSession(Session* session) const
+{
+	return fSessions.IndexOf(session);
 }
 
 
@@ -1173,7 +1181,7 @@ TermWindow::TabRightClicked(SmartTabView* tabView, BPoint point, int32 index)
 		return;
 
 	BMessage* message = new BMessage(kCloseView);
-	message->AddPointer("termview", termView);
+	_SessionAt(index)->id.AddToMessage(*message, "session");
 
 	BPopUpMenu* popUpMenu = new BPopUpMenu("tab menu");
 	popUpMenu->AddItem(new BMenuItem(B_TRANSLATE("Close tab"), message));
@@ -1192,10 +1200,12 @@ TermWindow::NotifyTermViewQuit(TermView* view, int32 reason)
 {
 	// Since the notification can come from the view, we send a message to
 	// ourselves to avoid deleting the caller synchronously.
-	BMessage message(kCloseView);
-	message.AddPointer("termView", view);
-	message.AddInt32("reason", reason);
-	PostMessage(&message);
+	if (Session* session = _SessionAt(_IndexOfTermView(view))) {
+		BMessage message(kCloseView);
+		session->id.AddToMessage(message, "session");
+		message.AddInt32("reason", reason);
+		PostMessage(&message);
+	}
 }
 
 
