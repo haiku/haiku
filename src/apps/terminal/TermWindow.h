@@ -171,10 +171,10 @@ private:
 
 			SmartTabView*		fTabView;
 
-			BMenuBar*			fMenubar;
-			BMenu*				fFilemenu;
-			BMenu*				fEditmenu;
-			BMenu*				fEncodingmenu;
+			BMenuBar*			fMenuBar;
+			BMenu*				fFileMenu;
+			BMenu*				fEditMenu;
+			BMenu*				fEncodingMenu;
 			BMenu*				fSettingsMenu;
 			BMenu*				fWindowSizeMenu;
 			BMenu*				fSizeMenu;

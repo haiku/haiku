@@ -154,10 +154,10 @@ TermWindow::TermWindow(BRect frame, const BString& title,
 	fTitleUpdateRunner(this, BMessage(kUpdateTitles), 1000000),
 	fNextSessionID(0),
 	fTabView(NULL),
-	fMenubar(NULL),
-	fFilemenu(NULL),
-	fEditmenu(NULL),
-	fEncodingmenu(NULL),
+	fMenuBar(NULL),
+	fFileMenu(NULL),
+	fEditMenu(NULL),
+	fEncodingMenu(NULL),
 	fSettingsMenu(NULL),
 	fWindowSizeMenu(NULL),
 	fPrintSettings(NULL),
@@ -230,7 +230,7 @@ TermWindow::_InitWindow()
 		new BMessage(MSG_MOVE_TAB_RIGHT));
 
 	BRect textFrame = Bounds();
-	textFrame.top = fMenubar->Bounds().bottom + 1.0;
+	textFrame.top = fMenuBar->Bounds().bottom + 1.0;
 
 	fTabView = new SmartTabView(textFrame, "tab view", B_WIDTH_FROM_WIDEST);
 	fTabView->SetListener(this);
@@ -303,7 +303,7 @@ TermWindow::MenusBeginning()
 	TermView* view = _ActiveTermView();
 
 	// Syncronize Encode Menu Pop-up menu and Preference.
-	BMenuItem* item = fEncodingmenu->FindItem(
+	BMenuItem* item = fEncodingMenu->FindItem(
 		EncodingAsString(view->Encoding()));
 	if (item != NULL)
 		item->SetMarked(true);
@@ -350,65 +350,65 @@ void
 TermWindow::_SetupMenu()
 {
 	// Menu bar object.
-	fMenubar = new BMenuBar(Bounds(), "mbar");
+	fMenuBar = new BMenuBar(Bounds(), "mbar");
 
 	// Make File Menu.
-	fFilemenu = new BMenu(B_TRANSLATE("Terminal"));
-	fFilemenu->AddItem(new BMenuItem(B_TRANSLATE("Switch Terminals"),
+	fFileMenu = new BMenu(B_TRANSLATE("Terminal"));
+	fFileMenu->AddItem(new BMenuItem(B_TRANSLATE("Switch Terminals"),
 		new BMessage(MENU_SWITCH_TERM), B_TAB));
-	fFilemenu->AddItem(new BMenuItem(B_TRANSLATE("New Terminal"),
+	fFileMenu->AddItem(new BMenuItem(B_TRANSLATE("New Terminal"),
 		new BMessage(MENU_NEW_TERM), 'N'));
-	fFilemenu->AddItem(new BMenuItem(B_TRANSLATE("New tab"),
+	fFileMenu->AddItem(new BMenuItem(B_TRANSLATE("New tab"),
 		new BMessage(kNewTab), 'T'));
 
-	fFilemenu->AddSeparatorItem();
-	fFilemenu->AddItem(new BMenuItem(B_TRANSLATE("Page setup" B_UTF8_ELLIPSIS),
+	fFileMenu->AddSeparatorItem();
+	fFileMenu->AddItem(new BMenuItem(B_TRANSLATE("Page setup" B_UTF8_ELLIPSIS),
 		new BMessage(MENU_PAGE_SETUP)));
-	fFilemenu->AddItem(new BMenuItem(B_TRANSLATE("Print"),
+	fFileMenu->AddItem(new BMenuItem(B_TRANSLATE("Print"),
 		new BMessage(MENU_PRINT),'P'));
-	fFilemenu->AddSeparatorItem();
-	fFilemenu->AddItem(new BMenuItem(
+	fFileMenu->AddSeparatorItem();
+	fFileMenu->AddItem(new BMenuItem(
 		B_TRANSLATE("About Terminal" B_UTF8_ELLIPSIS),
 		new BMessage(B_ABOUT_REQUESTED)));
-	fFilemenu->AddSeparatorItem();
-	fFilemenu->AddItem(new BMenuItem(B_TRANSLATE("Close window"),
+	fFileMenu->AddSeparatorItem();
+	fFileMenu->AddItem(new BMenuItem(B_TRANSLATE("Close window"),
 		new BMessage(B_QUIT_REQUESTED), 'W', B_SHIFT_KEY));
-	fFilemenu->AddItem(new BMenuItem(B_TRANSLATE("Close active tab"),
+	fFileMenu->AddItem(new BMenuItem(B_TRANSLATE("Close active tab"),
 		new BMessage(kCloseView), 'W'));
-	fFilemenu->AddItem(new BMenuItem(B_TRANSLATE("Quit"),
+	fFileMenu->AddItem(new BMenuItem(B_TRANSLATE("Quit"),
 		new BMessage(B_QUIT_REQUESTED), 'Q'));
-	fMenubar->AddItem(fFilemenu);
+	fMenuBar->AddItem(fFileMenu);
 
 	// Make Edit Menu.
-	fEditmenu = new BMenu(B_TRANSLATE("Edit"));
-	fEditmenu->AddItem(new BMenuItem(B_TRANSLATE("Copy"),
+	fEditMenu = new BMenu(B_TRANSLATE("Edit"));
+	fEditMenu->AddItem(new BMenuItem(B_TRANSLATE("Copy"),
 		new BMessage(B_COPY),'C'));
-	fEditmenu->AddItem(new BMenuItem(B_TRANSLATE("Paste"),
+	fEditMenu->AddItem(new BMenuItem(B_TRANSLATE("Paste"),
 		new BMessage(B_PASTE),'V'));
-	fEditmenu->AddSeparatorItem();
-	fEditmenu->AddItem(new BMenuItem(B_TRANSLATE("Select all"),
+	fEditMenu->AddSeparatorItem();
+	fEditMenu->AddItem(new BMenuItem(B_TRANSLATE("Select all"),
 		new BMessage(B_SELECT_ALL), 'A'));
-	fEditmenu->AddItem(new BMenuItem(B_TRANSLATE("Clear all"),
+	fEditMenu->AddItem(new BMenuItem(B_TRANSLATE("Clear all"),
 		new BMessage(MENU_CLEAR_ALL), 'L'));
-	fEditmenu->AddSeparatorItem();
-	fEditmenu->AddItem(new BMenuItem(B_TRANSLATE("Find" B_UTF8_ELLIPSIS),
+	fEditMenu->AddSeparatorItem();
+	fEditMenu->AddItem(new BMenuItem(B_TRANSLATE("Find" B_UTF8_ELLIPSIS),
 		new BMessage(MENU_FIND_STRING),'F'));
 	fFindPreviousMenuItem = new BMenuItem(B_TRANSLATE("Find previous"),
 		new BMessage(MENU_FIND_PREVIOUS), 'G', B_SHIFT_KEY);
-	fEditmenu->AddItem(fFindPreviousMenuItem);
+	fEditMenu->AddItem(fFindPreviousMenuItem);
 	fFindPreviousMenuItem->SetEnabled(false);
 	fFindNextMenuItem = new BMenuItem(B_TRANSLATE("Find next"),
 		new BMessage(MENU_FIND_NEXT), 'G');
-	fEditmenu->AddItem(fFindNextMenuItem);
+	fEditMenu->AddItem(fFindNextMenuItem);
 	fFindNextMenuItem->SetEnabled(false);
 
-	fMenubar->AddItem(fEditmenu);
+	fMenuBar->AddItem(fEditMenu);
 
 	// Make Help Menu.
 	fSettingsMenu = new BMenu(B_TRANSLATE("Settings"));
 	fWindowSizeMenu = _MakeWindowSizeMenu();
 
-	fEncodingmenu = _MakeEncodingMenu();
+	fEncodingMenu = _MakeEncodingMenu();
 
 	fSizeMenu = new BMenu(B_TRANSLATE("Text size"));
 
@@ -422,7 +422,7 @@ TermWindow::_SetupMenu()
 	fSizeMenu->AddItem(fDecreaseFontSizeMenuItem);
 
 	fSettingsMenu->AddItem(fWindowSizeMenu);
-	fSettingsMenu->AddItem(fEncodingmenu);
+	fSettingsMenu->AddItem(fEncodingMenu);
 	fSettingsMenu->AddItem(fSizeMenu);
 	fSettingsMenu->AddSeparatorItem();
 	fSettingsMenu->AddItem(new BMenuItem(
@@ -430,9 +430,9 @@ TermWindow::_SetupMenu()
 	fSettingsMenu->AddSeparatorItem();
 	fSettingsMenu->AddItem(new BMenuItem(B_TRANSLATE("Save as default"),
 		new BMessage(SAVE_AS_DEFAULT)));
-	fMenubar->AddItem(fSettingsMenu);
+	fMenuBar->AddItem(fSettingsMenu);
 
-	AddChild(fMenubar);
+	AddChild(fMenuBar);
 }
 
 
@@ -627,12 +627,12 @@ TermWindow::MessageReceived(BMessage *message)
 		case FULLSCREEN:
 			if (!fSavedFrame.IsValid()) { // go fullscreen
 				_ActiveTermView()->DisableResizeView();
-				float mbHeight = fMenubar->Bounds().Height() + 1;
+				float mbHeight = fMenuBar->Bounds().Height() + 1;
 				fSavedFrame = Frame();
 				BScreen screen(this);
 				_ActiveTermView()->ScrollBar()->ResizeBy(0, (B_H_SCROLL_BAR_HEIGHT - 2));
 
-				fMenubar->Hide();
+				fMenuBar->Hide();
 				fTabView->ResizeBy(0, mbHeight);
 				fTabView->MoveBy(0, -mbHeight);
 				fSavedLook = Look();
@@ -643,8 +643,8 @@ TermWindow::MessageReceived(BMessage *message)
 				fFullScreen = true;
 			} else { // exit fullscreen
 				_ActiveTermView()->DisableResizeView();
-				float mbHeight = fMenubar->Bounds().Height() + 1;
-				fMenubar->Show();
+				float mbHeight = fMenuBar->Bounds().Height() + 1;
+				fMenuBar->Show();
 				_ActiveTermView()->ScrollBar()->ResizeBy(0, -(B_H_SCROLL_BAR_HEIGHT - 2));
 				ResizeTo(fSavedFrame.Width(), fSavedFrame.Height());
 				MoveTo(fSavedFrame.left, fSavedFrame.top);
@@ -916,8 +916,8 @@ TermWindow::_AddTab(Arguments* args, const BString& currentDirectory)
 		view->GetFontSize(&width, &height);
 
 		float minimumHeight = -1;
-		if (fMenubar)
-			minimumHeight += fMenubar->Bounds().Height() + 1;
+		if (fMenuBar)
+			minimumHeight += fMenuBar->Bounds().Height() + 1;
 		if (fTabView && fTabView->CountTabs() > 0)
 			minimumHeight += fTabView->TabHeight() + 1;
 		SetSizeLimits(MIN_COLS * width - 1, MAX_COLS * width - 1,
@@ -933,7 +933,7 @@ TermWindow::_AddTab(Arguments* args, const BString& currentDirectory)
 
 			// Resize Window
 			ResizeTo(viewWidth + B_V_SCROLL_BAR_WIDTH,
-				viewHeight + fMenubar->Bounds().Height() + 1);
+				viewHeight + fMenuBar->Bounds().Height() + 1);
 				// NOTE: Width is one pixel too small, since the scroll view
 				// is one pixel wider than its parent.
 		}
@@ -1268,8 +1268,8 @@ TermWindow::_ResizeView(TermView *view)
 	view->GetFontSize(&fontWidth, &fontHeight);
 
 	float minimumHeight = -1;
-	if (fMenubar)
-		minimumHeight += fMenubar->Bounds().Height() + 1;
+	if (fMenuBar)
+		minimumHeight += fMenuBar->Bounds().Height() + 1;
 	if (fTabView && fTabView->CountTabs() > 1)
 		minimumHeight += fTabView->TabHeight() + 1;
 
@@ -1283,7 +1283,7 @@ TermWindow::_ResizeView(TermView *view)
 	width += B_V_SCROLL_BAR_WIDTH;
 		// NOTE: Width is one pixel too small, since the scroll view
 		// is one pixel wider than its parent.
-	height += fMenubar->Bounds().Height() + 1;
+	height += fMenuBar->Bounds().Height() + 1;
 
 	ResizeTo(width, height);
 
