@@ -5,7 +5,7 @@ resource(1, "META:TYPE") "image/webp";
 
 resource(2, "META:SNIFF_RULE") "0.50 (\"RIFF????WEBP\" & 0xffffffff00000000ffffffff)";
 
-resource(3, "META:S:DESC") #'MSDC' "WEBP image";
+resource(3, "META:S:DESC") #'MSDC' "WebP image";
 
 resource(4, "META:EXTENS") message(234) {
 	"extensions" = "webp",

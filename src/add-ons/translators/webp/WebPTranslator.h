@@ -21,7 +21,7 @@
 #include "BaseTranslator.h"
 
 #define WEBP_TRANSLATOR_VERSION B_TRANSLATION_MAKE_VERSION(0,1,0)
-#define WEBP_IMAGE_FORMAT	'WEBP'
+#define WEBP_IMAGE_FORMAT	'WebP'
 
 #define WEBP_IN_QUALITY 0.90
 #define WEBP_IN_CAPABILITY 0.90
@@ -29,9 +29,9 @@
 #define BITS_OUT_QUALITY 1
 #define BITS_OUT_CAPABILITY 0.9
 
-class WEBPTranslator : public BaseTranslator {
+class WebPTranslator : public BaseTranslator {
 public:
-	WEBPTranslator();
+	WebPTranslator();
 
 	virtual status_t DerivedIdentify(BPositionIO *inSource,
 		const translation_format *inFormat, BMessage *ioExtension,
@@ -44,17 +44,10 @@ public:
 	virtual BView *NewConfigView(TranslatorSettings *settings);
 
 protected:
-	virtual ~WEBPTranslator();
+	virtual ~WebPTranslator();
 		// this is protected because the object is deleted by the
 		// Release() function instead of being deleted directly by
 		// the user
-
-private:
-	status_t translate_from_bits(BPositionIO *inSource, uint32 outType,
-		BPositionIO *outDestination);
-
-	status_t translate_from_tiff(BPositionIO *inSource, BMessage *ioExtension,
-		uint32 outType, BPositionIO *outDestination);
 };
 
 #endif // #ifndef WEBP_TRANSLATOR_H

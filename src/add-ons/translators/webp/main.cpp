@@ -8,15 +8,16 @@
 
 
 #include <Application.h>
-#include "WEBPTranslator.h"
+
+#include "WebPTranslator.h"
 #include "TranslatorWindow.h"
 
 int
 main()
 {
-	BApplication app("application/x-vnd.Haiku-WEBPTranslator");
-	if (LaunchTranslatorWindow(new WEBPTranslator,
-		"WEBP Settings") != B_OK)
+	BApplication app("application/x-vnd.Haiku-WebPTranslator");
+	if (LaunchTranslatorWindow(new WebPTranslator,
+		"WebP Settings") != B_OK)
 		return 1;
 
 	app.Run();

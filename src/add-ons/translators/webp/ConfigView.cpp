@@ -8,7 +8,7 @@
 
 
 #include "ConfigView.h"
-#include "WEBPTranslator.h"
+#include "WebPTranslator.h"
 
 #include <StringView.h>
 #include <CheckBox.h>

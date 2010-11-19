@@ -6,11 +6,11 @@ SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 SubDirHdrs [ FDirName $(SUBDIR) webp ] ;
 
 
-Translator WEBPTranslator :
+Translator WebPTranslator :
 
 	main.cpp
 
-	WEBPTranslator.cpp
+	WebPTranslator.cpp
 	ConfigView.cpp
 
 	bits.c

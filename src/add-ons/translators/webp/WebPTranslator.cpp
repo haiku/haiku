@@ -7,7 +7,7 @@
  */
 
 
-#include "WEBPTranslator.h"
+#include "WebPTranslator.h"
 #include "ConfigView.h"
 
 #include "decode.h"
@@ -48,7 +48,7 @@ translation_format sInputFormats[] = {
 		WEBP_IN_QUALITY,
 		WEBP_IN_CAPABILITY,
 		"image/webp",
-		"WEBP image"
+		"WebP image"
 	},
 };
 
@@ -60,7 +60,7 @@ translation_format sOutputFormats[] = {
 		BITS_OUT_QUALITY,
 		BITS_OUT_CAPABILITY,
 		"image/x-be-bitmap",
-		"Be Bitmap Format (WEBPTranslator)"
+		"Be Bitmap Format (WebPTranslator)"
 	},
 };
 
@@ -78,25 +78,25 @@ const uint32 kNumDefaultSettings = sizeof(sDefaultSettings) / sizeof(TranSetting
 //	#pragma mark -
 
 
-WEBPTranslator::WEBPTranslator()
-	: BaseTranslator("WEBP images", "WEBP image translator",
+WebPTranslator::WebPTranslator()
+	: BaseTranslator("WebP images", "WebP image translator",
 		WEBP_TRANSLATOR_VERSION,
 		sInputFormats, kNumInputFormats,
 		sOutputFormats, kNumOutputFormats,
-		"WEBPTranslator_Settings",
+		"WebPTranslator_Settings",
 		sDefaultSettings, kNumDefaultSettings,
 		B_TRANSLATOR_BITMAP, WEBP_IMAGE_FORMAT)
 {
 }
 
 
-WEBPTranslator::~WEBPTranslator()
+WebPTranslator::~WebPTranslator()
 {
 }
 
 
 status_t
-WEBPTranslator::DerivedIdentify(BPositionIO *stream,
+WebPTranslator::DerivedIdentify(BPositionIO *stream,
 	const translation_format *format, BMessage *settings,
 	translator_info *info, uint32 outType)
 {
@@ -121,7 +121,7 @@ WEBPTranslator::DerivedIdentify(BPositionIO *stream,
 	info->group = B_TRANSLATOR_BITMAP;
 	info->quality = WEBP_IN_QUALITY;
 	info->capability = WEBP_IN_CAPABILITY;
-	snprintf(info->name, sizeof(info->name), "WEBP image");
+	snprintf(info->name, sizeof(info->name), "WebP image");
 	strcpy(info->MIME, "image/webp");
 
 	return B_OK;
@@ -129,7 +129,7 @@ WEBPTranslator::DerivedIdentify(BPositionIO *stream,
 
 
 status_t
-WEBPTranslator::DerivedTranslate(BPositionIO *stream,
+WebPTranslator::DerivedTranslate(BPositionIO *stream,
 		const translator_info *info, BMessage *settings,
 		uint32 outType, BPositionIO *target, int32 baseType)
 {
@@ -162,7 +162,7 @@ WEBPTranslator::DerivedTranslate(BPositionIO *stream,
 		printf("WebPDecodeRGB(%p, %lld) failed.\n", streamData, streamSize);
 		return B_ILLEGAL_DATA;
 	}
-	printf("WebPDecodeRGB(%p, %lld) succeed: %d x %d WEBP image decoded.\n",
+	printf("WebPDecodeRGB(%p, %lld) succeed: %d x %d WebP image decoded.\n",
 		streamData, streamSize, width, height);
 
 	FreeAllocation _(out);
@@ -172,9 +172,9 @@ WEBPTranslator::DerivedTranslate(BPositionIO *stream,
 	TranslatorBitmap bitmapHeader;
 	bitmapHeader.magic = B_TRANSLATOR_BITMAP;
 	bitmapHeader.bounds.Set(0, 0, width - 1, height - 1);
-	bitmapHeader.rowBytes = width * 4;
-	bitmapHeader.colors = B_RGB32;
-	bitmapHeader.dataSize = width * 4 * height;
+	bitmapHeader.rowBytes = width * 3;
+	bitmapHeader.colors = B_RGB24;
+	bitmapHeader.dataSize = width * 3 * height;
 
 	// write out Be's Bitmap header
 	swap_data(B_UINT32_TYPE, &bitmapHeader, sizeof(TranslatorBitmap),
@@ -192,28 +192,19 @@ WEBPTranslator::DerivedTranslate(BPositionIO *stream,
 
 	if (headerOnly)
 		return B_OK;
-/*
-	bytesWritten = target->Write(out, dataSize);
-	if (bytesWritten < B_OK)
-		return bytesWritten;
-
-	if (bytesWritten != (ssize_t)dataSize)
-		return B_IO_ERROR;
-*/
-
 	uint32 dataLeft = dataSize;
 	uint8* p = out;
-	uint8 rgb[4] = { 0, 0, 0, 255};
+	uint8 rgb[3];
 	while (dataLeft) {
 		rgb[0] = *(p+2);
 		rgb[1] = *(p+1);
 		rgb[2] = *(p);
 
-		bytesWritten = target->Write(rgb, 4);
+		bytesWritten = target->Write(rgb, 3);
 		if (bytesWritten < B_OK)
 			return bytesWritten;
 
-		if (bytesWritten != 4)
+		if (bytesWritten != 3)
 			return B_IO_ERROR;
 
 		p += 3;
@@ -226,7 +217,7 @@ WEBPTranslator::DerivedTranslate(BPositionIO *stream,
 
 
 BView *
-WEBPTranslator::NewConfigView(TranslatorSettings *settings)
+WebPTranslator::NewConfigView(TranslatorSettings *settings)
 {
 	return new ConfigView();
 }
@@ -241,5 +232,5 @@ make_nth_translator(int32 n, image_id you, uint32 flags, ...)
 	if (n != 0)
 		return NULL;
 
-	return new WEBPTranslator();
+	return new WebPTranslator();
 }
