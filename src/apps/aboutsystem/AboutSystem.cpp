@@ -1549,6 +1549,13 @@ AboutView::_CreateCreditsView()
 		.SetLicense("GNU GPL v2")
 		.SetURL("http://gutenprint.sourceforge.net"));
 
+	// libwebp
+	_AddPackageCredit(PackageCredit("libwebp")
+		.SetCopyright(COPYRIGHT_STRING
+			"2010 by Google Inc. All rights reserved.")
+		.SetLicense("BSD (3-clause)")
+		.SetURL("http://www.webmproject.org/code/#libwebp_webp_image_decoder_library"));
+
 	_AddCopyrightsFromAttribute();
 	_AddPackageCreditEntries();
 

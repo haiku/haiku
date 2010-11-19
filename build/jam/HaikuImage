@@ -122,7 +122,7 @@ SYSTEM_ADD_ONS_TRANSLATORS = BMPTranslator EXRTranslator GIFTranslator
 	HVIFTranslator ICOTranslator JPEGTranslator JPEG2000Translator
 	PCXTranslator PNGTranslator PPMTranslator
 	RAWTranslator RTF-Translator SGITranslator STXTTranslator TGATranslator
-	TIFFTranslator WonderBrushTranslator
+	TIFFTranslator WebPTranslator WonderBrushTranslator
 ;
 SYSTEM_ADD_ONS_LOCALE_CATALOGS = <catalog-addon>zeta <catalog-addon>plaintext ;
 SYSTEM_ADD_ONS_MEDIA = cortex_audioadapter.media_addon
@@ -139,8 +139,8 @@ SYSTEM_ADD_ONS_MEDIA = cortex_audioadapter.media_addon
 	#legacy.media_addon
 ;
 SYSTEM_ADD_ONS_MEDIA_PLUGINS = $(X86_ONLY)ffmpeg raw_decoder ;
-SYSTEM_ADD_ONS_PRINT = 
-	Canon\ LIPS3\ Compatible 
+SYSTEM_ADD_ONS_PRINT =
+	Canon\ LIPS3\ Compatible
 	Canon\ LIPS4\ Compatible
 	Gutenprint
 	PCL5\ Compatible
