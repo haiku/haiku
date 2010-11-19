@@ -35,7 +35,7 @@ public:
 	static	BRect				AlignInFrame(BRect frame, BSize maxSize,
 									BAlignment alignment);
 	static	void				AlignInFrame(BView* view, BRect frame);
-	static	BRect				MoveIntoFrame(BRect rect, BSize maxSize);
+	static	BRect				MoveIntoFrame(BRect rect, BSize frameSize);
 };
 
 #endif	//	_LAYOUT_UTILS_H
