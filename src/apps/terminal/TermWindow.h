@@ -155,6 +155,7 @@ private:
 			void				_TitleSettingsChanged();
 			void				_UpdateTitles();
 			void				_UpdateSessionTitle(int32 index);
+			void				_OpenSetWindowTitleDialog();
 			void				_FinishTitleDialog();
 
 			SessionID			_NewSessionID();
@@ -180,6 +181,7 @@ private:
 			BRect				fSavedFrame;
 			window_look			fSavedLook;
 
+			SetTitleDialog*		fSetWindowTitleDialog;
 			SetTitleDialog*		fSetTabTitleDialog;
 			SessionID			fSetTabTitleSession;
 

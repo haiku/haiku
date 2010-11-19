@@ -59,6 +59,7 @@ const static uint32 kIncreaseFontSize = 'InFs';
 const static uint32 kDecreaseFontSize = 'DcFs';
 const static uint32 kSetActiveTab = 'STab';
 const static uint32 kUpdateTitles = 'UPti';
+const static uint32 kSetWindowTitle = 'SWti';
 
 
 #undef B_TRANSLATE_CONTEXT
@@ -161,6 +162,7 @@ TermWindow::TermWindow(BRect frame, const BString& title,
 	fPrefWindow(NULL),
 	fFindPanel(NULL),
 	fSavedFrame(0, 0, -1, -1),
+	fSetWindowTitleDialog(NULL),
 	fSetTabTitleDialog(NULL),
 	fFindString(""),
 	fFindNextMenuItem(NULL),
@@ -381,6 +383,9 @@ TermWindow::_SetupMenu()
 			.AddItem(B_TRANSLATE("Find next"), MENU_FIND_NEXT, 'G')
 				.GetItem(fFindNextMenuItem)
 				.SetEnabled(false)
+			.AddSeparator()
+			.AddItem(B_TRANSLATE("Window title" B_UTF8_ELLIPSIS),
+				kSetWindowTitle)
 		.End()
 
 		// Settings
@@ -682,6 +687,25 @@ TermWindow::MessageReceived(BMessage *message)
 			break;
 		}
 
+		case MSG_WINDOW_TITLE_CHANGED:
+		{
+			// window title changed message from SetTitleDialog
+			BString title;
+			if (message->FindString("title", &title) == B_OK) {
+				fTitle.pattern = title;
+				fTitle.patternUserDefined = true;
+			} else {
+				fTitle.pattern
+					= PrefHandler::Default()->getString(PREF_WINDOW_TITLE);
+				fTitle.patternUserDefined = false;
+			}
+
+			_UpdateSessionTitle(fTabView->Selection());
+				// updates the window title as a side effect
+
+			break;
+		}
+
 		case kSetActiveTab:
 		{
 			int32 index;
@@ -741,6 +765,10 @@ TermWindow::MessageReceived(BMessage *message)
 
 		case kUpdateTitles:
 			_UpdateTitles();
+			break;
+
+		case kSetWindowTitle:
+			_OpenSetWindowTitleDialog();
 			break;
 
 		default:
@@ -1194,15 +1222,22 @@ void
 TermWindow::TitleChanged(SetTitleDialog* dialog, const BString& title,
 	bool titleUserDefined)
 {
-	if (dialog != fSetTabTitleDialog)
-		return;
+	if (dialog == fSetTabTitleDialog) {
+		// tab title
+		BMessage message(MSG_TAB_TITLE_CHANGED);
+		fSetTabTitleSession.AddToMessage(message, "session");
+		if (titleUserDefined)
+			message.AddString("title", title);
 
-	BMessage message(MSG_TAB_TITLE_CHANGED);
-	fSetTabTitleSession.AddToMessage(message, "session");
-	if (titleUserDefined)
-		message.AddString("title", title);
+		PostMessage(&message);
+	} else if (dialog == fSetWindowTitleDialog) {
+		// window title
+		BMessage message(MSG_WINDOW_TITLE_CHANGED);
+		if (titleUserDefined)
+			message.AddString("title", title);
 
-	PostMessage(&message);
+		PostMessage(&message);
+	}
 }
 
 
@@ -1364,6 +1399,29 @@ TermWindow::_UpdateSessionTitle(int32 index)
 
 
 void
+TermWindow::_OpenSetWindowTitleDialog()
+{
+	// If a dialog is active, finish it.
+	_FinishTitleDialog();
+
+	BString toolTip = BString(B_TRANSLATE(
+		"The pattern specifying the window title. The following placeholders\n"
+		"can be used:\n")) << kTooTipSetTabTitlePlaceholders;
+	fSetWindowTitleDialog = new SetTitleDialog(B_TRANSLATE("Set window title"),
+		B_TRANSLATE("Window title:"), toolTip);
+
+	// center the dialog in the window frame, but keep it on screen
+	fSetWindowTitleDialog->CenterIn(Frame());
+	BRect frame(fSetWindowTitleDialog->Frame());
+	BSize screenSize(BScreen(fSetWindowTitleDialog).Frame().Size());
+	fSetWindowTitleDialog->MoveTo(
+		BLayoutUtils::MoveIntoFrame(frame, screenSize).LeftTop());
+
+	fSetWindowTitleDialog->Go(fTitle.pattern, fTitle.patternUserDefined, this);
+}
+
+
+void
 TermWindow::_FinishTitleDialog()
 {
 	SetTitleDialog* oldDialog = fSetTabTitleDialog;
@@ -1374,6 +1432,18 @@ TermWindow::_FinishTitleDialog()
 				// this also unsets the variables
 		}
 		oldDialog->Unlock();
+		return;
+	}
+
+	oldDialog = fSetWindowTitleDialog;
+	if (oldDialog != NULL && oldDialog->Lock()) {
+		// might have been unset in the meantime, so recheck
+		if (fSetWindowTitleDialog == oldDialog) {
+			oldDialog->Finish();
+				// this also unsets the variable
+		}
+		oldDialog->Unlock();
+		return;
 	}
 }
 
