@@ -19,6 +19,7 @@ uint32 gXHDIVersion = 0;
 
 NatFeatCookie *gNatFeatCookie = NULL;
 uint32 gDebugPrintfNatFeatID = 0;
+uint32 gBootstrapNatFeatID = 0;
 
 
 /*! Maps TOS error codes to native errors
@@ -29,7 +30,7 @@ toserror(int32 err)
 	// generated from:
 	// http://www.fortunecity.com/skyscraper/apple/308/html/appendd.htm
 	// with:
-	// while read N; do read V; read L; echo -e "\tcase $V: /* $N - $L */\n\t\treturn EINVAL;"; done >> errs
+	// while read N; do read V; read L; echo -e "\tcase $V: /* $N - $L */\n\t\treturn B_BAD_VALUE;"; done >> errs
 	switch (err) {
 	/* BIOS errors */
 	case 0: /* E_OK - No error */
@@ -39,11 +40,11 @@ toserror(int32 err)
 	case -2: /* EDRVNR - Drive not ready */
 		return B_DEV_NOT_READY;
 	case -3: /* EUNCMD - Unknown command */
-		return EINVAL;	//XXX
+		return B_BAD_VALUE;	//XXX
 	case -4: /* E_CRC - CRC error */
 		return B_DEV_CRC_ERROR;
 	case -5: /* EBADRQ - Bad request */
-		return EINVAL;	//XXX
+		return B_BAD_VALUE;	//XXX
 	case -6: /* E_SEEK - Seek error */
 		return B_DEV_SEEK_ERROR;
 	case -7: /* EMEDIA - Unknown media */
@@ -51,7 +52,7 @@ toserror(int32 err)
 	case -8: /* ESECNF - Sector not found */
 		return B_DEV_FORMAT_ERROR;
 	case -9: /* EPAPER - Out of paper */
-		return ENODEV;
+		return B_DEVICE_NOT_FOUND;
 	case -10: /* EWRITF - Write fault */
 		return B_DEV_WRITE_ERROR;
 	case -11: /* EREADF - Read fault */
@@ -68,7 +69,7 @@ toserror(int32 err)
 		return B_DEV_MEDIA_CHANGE_REQUESTED;
 	/* GEMDOS errors */
 	case -32: /* EINVFN - Invalid function */
-		return EINVAL;
+		return B_BAD_VALUE;
 	case -33: /* EFILNF - File not found */
 		return B_FILE_NOT_FOUND;
 	case -34: /* EPTHNF - Path not found */
@@ -76,35 +77,35 @@ toserror(int32 err)
 	case -35: /* ENHNDL - No more handles */
 		return B_NO_MORE_FDS;
 	case -36: /* EACCDN - Access denied */
-		return EACCES;
+		return B_PERMISSION_DENIED;
 	case -37: /* EIHNDL - Invalid handle */
-		return EBADF;
+		return B_FILE_ERROR;
 	case -39: /* ENSMEM - Insufficient memory */
-		return ENOMEM;
+		return B_NO_MEMORY;
 	case -40: /* EIMBA - Invalid memory block address */
-		return EFAULT;
+		return B_BAD_ADDRESS;
 	case -46: /* EDRIVE - Invalid drive specification */
 		return B_DEV_BAD_DRIVE_NUM;
 	case -48: /* ENSAME - Cross device rename */
-		return EXDEV;
+		return B_CROSS_DEVICE_LINK;
 	case -49: /* ENMFIL - No more files */
-		return EMFILE;
+		return B_NO_MORE_FDS;
 	case -58: /* ELOCKED - Record is already locked */
-		return EINVAL;	//XXX
+		return B_BAD_VALUE;	//XXX
 	case -59: /* ENSLOCK - Invalid lock removal request */
-		return EINVAL;	//XXX
+		return B_BAD_VALUE;	//XXX
 	case -64: /* ERANGE or ENAMETOOLONG - Range error */
-		return ENAMETOOLONG;
+		return B_NAME_TOO_LONG;
 	case -65: /* EINTRN - Internal error */
 		return B_ERROR;
 	case -66: /* EPLFMT - Invalid program load format */
-		return ENOEXEC;
+		return B_NOT_AN_EXECUTABLE;
 	case -67: /* EGSBF - Memory block growth failure */
-		return EINVAL;
+		return B_BAD_VALUE;
 	case -80: /* ELOOP - Too many symbolic links */
-		return ELOOP;
+		return B_LINK_LIMIT;
 	case -200: /* EMOUNT - Mount point crossed (indicator) */
-		return EINVAL;	
+		return B_BAD_VALUE;	
 	default:
 		return B_ERROR;
 	}
@@ -132,7 +133,7 @@ xhdierror(int32 err)
 		} else if (ide & (1 << 6)) {	// uncorrectable error
 			return B_DEV_UNREADABLE;
 		} else if (ide & (1 << 2)) {	// command aborted
-			return EINTR;
+			return B_INTERRUPTED;
 		} else if (ide & (1 << 5)) {	// media change
 			return B_DEV_MEDIA_CHANGED;
 		} else if (ide & (1 << 3)) {	// media change requested
@@ -155,7 +156,7 @@ xhdierror(int32 err)
 		case 0x13:
 			return B_DEV_FORMAT_ERROR;
 		case 0x20:
-			return EINTR;
+			return B_INTERRUPTED;
 		case 0x28:
 			return B_DEV_FORMAT_ERROR;
 		case 0x5a:
@@ -197,9 +198,9 @@ init_xhdi(void)
 	
 	c = tos_find_cookie(XHDI_COOKIE);
 	if (!c)
-		return ENOENT;
+		return B_ENTRY_NOT_FOUND;
 	if (((uint32 *)c->pvalue)[-1] != XHDI_MAGIC)
-		return EINVAL;
+		return B_BAD_VALUE;
 	gXHDIEntryPoint = c->pvalue;
 	gXHDIVersion = XHGetVersion();
 	return B_OK;
@@ -222,8 +223,10 @@ init_nat_features(void)
 			nat_features()->nfCall;
 		gKernelArgs.arch_args.plat_args.atari.nat_feat.nf_dprintf_id =
 			gDebugPrintfNatFeatID;
+		// find other natfeat ids
+		gBootstrapNatFeatID = nat_feat_getid("BOOTSTRAP");
 	}
-	return nat_features() ? B_OK : ENOENT;
+	return nat_features() ? B_OK : B_ENTRY_NOT_FOUND;
 }
 
 
@@ -232,4 +235,21 @@ nat_feat_debugprintf(const char *str)
 {
 	if (gDebugPrintfNatFeatID)
 		nat_feat_call(gDebugPrintfNatFeatID, 0, str);
+}
+
+extern "C" int
+nat_feat_get_bootdrive(void)
+{
+	if (gBootstrapNatFeatID == 0)
+		return -1;
+	return nat_feat_call(gBootstrapNatFeatID, 1);
+}
+
+extern "C" status_t
+nat_feat_get_bootargs(char *str, long size)
+{
+	status_t err;
+	if (gBootstrapNatFeatID == 0)
+		return B_ERROR;
+	return toserror(nat_feat_call(gBootstrapNatFeatID, 2, str, size));
 }

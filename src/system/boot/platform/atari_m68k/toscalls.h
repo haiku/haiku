@@ -801,11 +801,14 @@ static inline int32 nat_feat_getid(const char *name)
 	int32 ret = -1;				\
 	NatFeatCookie *c = nat_features();	\
 	if (c)					\
-		ret = c->nfCall(id | code, a);	\
+		ret = c->nfCall(id | code, ##a);	\
 	ret;					\
 })
 
 extern void nat_feat_debugprintf(const char *str);
+
+extern int nat_feat_get_bootdrive(void);
+extern status_t nat_feat_get_bootargs(char *str, long size);
 
 #endif /* __ASSEMBLER__ */
 
