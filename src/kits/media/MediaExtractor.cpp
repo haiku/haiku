@@ -82,7 +82,7 @@ MediaExtractor::MediaExtractor(BDataIO* source, int32 flags)
 	for (int32 i = 0; i < fStreamCount; i++) {
 		fStreamInfo[i].status = B_OK;
 		fStreamInfo[i].cookie = 0;
-		fStreamInfo[i].hasCookie = true;
+		fStreamInfo[i].hasCookie = false;
 		fStreamInfo[i].infoBuffer = 0;
 		fStreamInfo[i].infoBufferSize = 0;
 		fStreamInfo[i].chunkCache
@@ -99,13 +99,14 @@ MediaExtractor::MediaExtractor(BDataIO* source, int32 flags)
 
 	// create all stream cookies
 	for (int32 i = 0; i < fStreamCount; i++) {
-		if (B_OK != fReader->AllocateCookie(i, &fStreamInfo[i].cookie)) {
+		if (fReader->AllocateCookie(i, &fStreamInfo[i].cookie) != B_OK) {
 			fStreamInfo[i].cookie = 0;
 			fStreamInfo[i].hasCookie = false;
 			fStreamInfo[i].status = B_ERROR;
 			ERROR("MediaExtractor::MediaExtractor: AllocateCookie for stream "
 				"%ld failed\n", i);
-		}
+		} else
+			fStreamInfo[i].hasCookie = true;
 	}
 
 	// get info for all streams
