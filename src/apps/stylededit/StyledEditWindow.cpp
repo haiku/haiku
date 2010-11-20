@@ -76,7 +76,7 @@ bs_printf(BString* string, const char* format, ...)
 StyledEditWindow::StyledEditWindow(BRect frame, int32 id, uint32 encoding)
 	: BWindow(frame, "untitled", B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS)
 {
-	InitWindow(encoding);
+	_InitWindow(encoding);
 	BString unTitled(B_TRANSLATE("Untitled "));
 	unTitled << id;
 	SetTitle(unTitled.String());
@@ -89,7 +89,7 @@ StyledEditWindow::StyledEditWindow(BRect frame, int32 id, uint32 encoding)
 StyledEditWindow::StyledEditWindow(BRect frame, entry_ref* ref, uint32 encoding)
 	: BWindow(frame, "untitled", B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS)
 {
-	InitWindow(encoding);
+	_InitWindow(encoding);
 	OpenFile(ref);
 	Show();
 }
@@ -103,312 +103,45 @@ StyledEditWindow::~StyledEditWindow()
 }
 
 
+void
+StyledEditWindow::Quit()
+{
+	_SaveAttrs();
+	if (StyledEditApp* app = dynamic_cast<StyledEditApp*>(be_app))
+		app->CloseDocument();
+	BWindow::Quit();
+}
+
+
 #undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Menus"
+#define B_TRANSLATE_CONTEXT "QuitAlert"
 
 
-void
-StyledEditWindow::InitWindow(uint32 encoding)
+bool
+StyledEditWindow::QuitRequested()
 {
-	fPrintSettings = NULL;
-	fSaveMessage = NULL;
+	if (fClean)
+		return true;
 
-	// undo modes
-	fUndoFlag = false;
-	fCanUndo = false;
-	fRedoFlag = false;
-	fCanRedo = false;
+	BString alertText;
+	bs_printf(&alertText,
+		B_TRANSLATE("Save changes to the document \"%s\"? "), Title());
 
-	// clean modes
-	fUndoCleans = false;
-	fRedoCleans = false;
-	fClean = true;
+	int32 index = _ShowAlert(alertText, B_TRANSLATE("Cancel"),
+		B_TRANSLATE("Don't save"), B_TRANSLATE("Save"),	B_WARNING_ALERT);
 
-	// search- state
-	fReplaceString = "";
-	fStringToFind = "";
-	fCaseSens = false;
-	fWrapAround = false;
-	fBackSearch = false;
+	if (index == 0)
+		return false;	// "cancel": dont save, dont close the window
 
-	// add menubar
-	fMenuBar = new BMenuBar(BRect(0, 0, 0, 0), "menubar");
-	AddChild(fMenuBar);
+	if (index == 1)
+		return true;	// "don't save": just close the window
 
-	// add textview and scrollview
-
-	BRect viewFrame = Bounds();
-	viewFrame.top = fMenuBar->Bounds().Height() + 1;
-	viewFrame.right -=  B_V_SCROLL_BAR_WIDTH;
-	viewFrame.left = 0;
-	viewFrame.bottom -= B_H_SCROLL_BAR_HEIGHT;
-
-	BRect textBounds = viewFrame;
-	textBounds.OffsetTo(B_ORIGIN);
-	textBounds.InsetBy(TEXT_INSET, TEXT_INSET);
-
-	fTextView= new StyledEditView(viewFrame, textBounds, this);
-	fTextView->SetDoesUndo(true);
-	fTextView->SetStylable(true);
-	fTextView->SetEncoding(encoding);
-
-	fScrollView = new BScrollView("scrollview", fTextView, B_FOLLOW_ALL, 0,
-		true, true, B_PLAIN_BORDER);
-	AddChild(fScrollView);
-	fTextView->MakeFocus(true);
-
-	// Add "File"-menu:
-	BMenu* menu = new BMenu(B_TRANSLATE("File"));
-	fMenuBar->AddItem(menu);
-
-	BMenuItem* menuItem;
-	menu->AddItem(menuItem = new BMenuItem(B_TRANSLATE("New"),
-		new BMessage(MENU_NEW), 'N'));
-	menuItem->SetTarget(be_app);
-
-	menu->AddItem(menuItem = new BMenuItem(fRecentMenu =
-		new BMenu(B_TRANSLATE("Open" B_UTF8_ELLIPSIS)),
-			new BMessage(MENU_OPEN)));
-	menuItem->SetShortcut('O', 0);
-	menuItem->SetTarget(be_app);
-	menu->AddSeparatorItem();
-
-	menu->AddItem(fSaveItem = new BMenuItem(B_TRANSLATE("Save"),
-		new BMessage(MENU_SAVE), 'S'));
-	fSaveItem->SetEnabled(false);
-	menu->AddItem(menuItem = new BMenuItem(
-		B_TRANSLATE("Save as" B_UTF8_ELLIPSIS), new BMessage(MENU_SAVEAS)));
-	menuItem->SetShortcut('S', B_SHIFT_KEY);
-	menuItem->SetEnabled(true);
-
-	menu->AddItem(fRevertItem =
-		new BMenuItem(B_TRANSLATE("Revert to saved" B_UTF8_ELLIPSIS),
-		new BMessage(MENU_REVERT)));
-	fRevertItem->SetEnabled(false);
-	menu->AddItem(menuItem = new BMenuItem(B_TRANSLATE("Close"),
-		new BMessage(MENU_CLOSE), 'W'));
-
-	menu->AddSeparatorItem();
-	menu->AddItem(menuItem = new BMenuItem(
-		B_TRANSLATE("Page setup" B_UTF8_ELLIPSIS),
-		new BMessage(MENU_PAGESETUP)));
-	menu->AddItem(menuItem = new BMenuItem(
-		B_TRANSLATE("Print" B_UTF8_ELLIPSIS),
-		new BMessage(MENU_PRINT), 'P'));
-
-	menu->AddSeparatorItem();
-	menu->AddItem(menuItem = new BMenuItem(B_TRANSLATE("Quit"),
-		new BMessage(MENU_QUIT), 'Q'));
-
-	// Add the "Edit"-menu:
-	menu = new BMenu(B_TRANSLATE("Edit"));
-	fMenuBar->AddItem(menu);
-
-	menu->AddItem(fUndoItem = new BMenuItem(B_TRANSLATE("Can't undo"),
-		new BMessage(B_UNDO), 'Z'));
-	fUndoItem->SetEnabled(false);
-
-	menu->AddSeparatorItem();
-	menu->AddItem(fCutItem = new BMenuItem(B_TRANSLATE("Cut"),
-		new BMessage(B_CUT), 'X'));
-	fCutItem->SetEnabled(false);
-	fCutItem->SetTarget(fTextView);
-
-	menu->AddItem(fCopyItem = new BMenuItem(B_TRANSLATE("Copy"),
-		new BMessage(B_COPY), 'C'));
-	fCopyItem->SetEnabled(false);
-	fCopyItem->SetTarget(fTextView);
-
-	menu->AddItem(menuItem = new BMenuItem(B_TRANSLATE("Paste"),
-		new BMessage(B_PASTE), 'V'));
-	menuItem->SetTarget(fTextView);
-	menu->AddItem(fClearItem = new BMenuItem(B_TRANSLATE("Clear"),
-		new BMessage(MENU_CLEAR)));
-	fClearItem->SetEnabled(false);
-	fClearItem->SetTarget(fTextView);
-
-	menu->AddSeparatorItem();
-	menu->AddItem(menuItem = new BMenuItem(B_TRANSLATE("Select all"),
-		new BMessage(B_SELECT_ALL), 'A'));
-	menuItem->SetTarget(fTextView);
-
-	menu->AddSeparatorItem();
-	menu->AddItem(menuItem = new BMenuItem(B_TRANSLATE("Find" B_UTF8_ELLIPSIS),
-		new BMessage(MENU_FIND), 'F'));
-	menu->AddItem(fFindAgainItem= new BMenuItem(B_TRANSLATE("Find again"),
-		new BMessage(MENU_FIND_AGAIN), 'G'));
-	fFindAgainItem->SetEnabled(false);
-
-	menu->AddItem(menuItem = new BMenuItem(B_TRANSLATE("Find selection"),
-		new BMessage(MENU_FIND_SELECTION), 'H'));
-	menu->AddItem(menuItem = new BMenuItem(
-		B_TRANSLATE("Replace" B_UTF8_ELLIPSIS),
-		new BMessage(MENU_REPLACE), 'R'));
-	menu->AddItem(fReplaceSameItem = new BMenuItem(B_TRANSLATE("Replace same"),
-		new BMessage(MENU_REPLACE_SAME), 'T'));
-	fReplaceSameItem->SetEnabled(false);
-
-	// Add the "Font"-menu:
-	fFontMenu = new BMenu(B_TRANSLATE("Font"));
-	fMenuBar->AddItem(fFontMenu);
-
-	//"Size"-subMenu
-	fFontSizeMenu = new BMenu(B_TRANSLATE("Size"));
-	fFontSizeMenu->SetRadioMode(true);
-	fFontMenu->AddItem(fFontSizeMenu);
-
-	const int32 fontSizes[] = {9, 10, 11, 12, 14, 18, 24, 36, 48, 72};
-	for (uint32 i = 0; i < sizeof(fontSizes) / sizeof(fontSizes[0]); i++) {
-		BMessage* fontMessage = new BMessage(FONT_SIZE);
-		fontMessage->AddFloat("size", fontSizes[i]);
-
-		char label[64];
-		snprintf(label, sizeof(label), "%ld", fontSizes[i]);
-		fFontSizeMenu->AddItem(menuItem = new BMenuItem(label, fontMessage));
-
-		if (fontSizes[i] == (int32)be_plain_font->Size())
-			menuItem->SetMarked(true);
+	if (!fSaveMessage) {
+		SaveAs(new BMessage(SAVE_THEN_QUIT));
+		return false;
 	}
 
-	// "Color"-subMenu
-	fFontColorMenu = new BMenu(B_TRANSLATE("Color"));
-	fFontColorMenu->SetRadioMode(true);
-	fFontMenu->AddItem(fFontColorMenu);
-
-	fFontColorMenu->AddItem(fBlackItem = new BMenuItem(B_TRANSLATE("Black"),
-		new BMessage(FONT_COLOR)));
-	fBlackItem->SetMarked(true);
-	fFontColorMenu->AddItem(fRedItem = new ColorMenuItem(B_TRANSLATE("Red"),
-		RED, new BMessage(FONT_COLOR)));
-	fFontColorMenu->AddItem(fGreenItem = new ColorMenuItem(B_TRANSLATE("Green"),
-		GREEN, new BMessage(FONT_COLOR)));
-	fFontColorMenu->AddItem(fBlueItem = new ColorMenuItem(B_TRANSLATE("Blue"),
-		BLUE, new BMessage(FONT_COLOR)));
-	fFontColorMenu->AddItem(fCyanItem = new ColorMenuItem(B_TRANSLATE("Cyan"),
-		CYAN, new BMessage(FONT_COLOR)));
-	fFontColorMenu->AddItem(fMagentaItem = new ColorMenuItem(B_TRANSLATE("Magenta"),
-		MAGENTA, new BMessage(FONT_COLOR)));
-	fFontColorMenu->AddItem(fYellowItem = new ColorMenuItem(B_TRANSLATE("Yellow"),
-		YELLOW, new BMessage(FONT_COLOR)));
-	fFontMenu->AddSeparatorItem();
-
-	// Available fonts
-
-	fCurrentFontItem = 0;
-	fCurrentStyleItem = 0;
-
-	BMenu* subMenu;
-	int32 numFamilies = count_font_families();
-	for (int32 i = 0; i < numFamilies; i++) {
-		font_family family;
-		if (get_font_family(i, &family) == B_OK) {
-			subMenu = new BMenu(family);
-			subMenu->SetRadioMode(true);
-			fFontMenu->AddItem(menuItem = new BMenuItem(subMenu,
-				new BMessage(FONT_FAMILY)));
-
-			int32 numStyles = count_font_styles(family);
-			for (int32 j = 0; j < numStyles; j++) {
-				font_style style;
-				uint32 flags;
-				if (get_font_style(family, j, &style, &flags) == B_OK) {
-					subMenu->AddItem(menuItem = new BMenuItem(style,
-						new BMessage(FONT_STYLE)));
-				}
-			}
-		}
-	}
-
-	// Add the "Document"-menu:
-	menu = new BMenu(B_TRANSLATE("Document"));
-	fMenuBar->AddItem(menu);
-
-	// "Align"-subMenu:
-	subMenu = new BMenu(B_TRANSLATE("Align"));
-	subMenu->SetRadioMode(true);
-
-	subMenu->AddItem(fAlignLeft = new BMenuItem(B_TRANSLATE("Left"),
-		new BMessage(ALIGN_LEFT)));
-	fAlignLeft->SetMarked(true);
-
-	subMenu->AddItem(fAlignCenter = new BMenuItem(B_TRANSLATE("Center"),
-		new BMessage(ALIGN_CENTER)));
-	subMenu->AddItem(fAlignRight = new BMenuItem(B_TRANSLATE("Right"),
-		new BMessage(ALIGN_RIGHT)));
-	menu->AddItem(subMenu);
-	menu->AddItem(fWrapItem = new BMenuItem(B_TRANSLATE("Wrap lines"),
-		new BMessage(WRAP_LINES)));
-	fWrapItem->SetMarked(true);
-
-	menu->AddSeparatorItem();
-    menu->AddItem(menuItem = new BMenuItem(
-    	B_TRANSLATE("Statistics" B_UTF8_ELLIPSIS),
-    	new BMessage(SHOW_STATISTICS)));
-
-	fSavePanel = NULL;
-	fSavePanelEncodingMenu = NULL;
-		// build lazily
-}
-
-
-void
-StyledEditWindow::LoadAttrs()
-{
-	entry_ref dir;
-	const char* name;
-	if (fSaveMessage->FindRef("directory", &dir) != B_OK
-		|| fSaveMessage->FindString("name", &name) != B_OK)
-		return;
-
-	BPath documentPath(&dir);
-	documentPath.Append(name);
-
-	BNode documentNode(documentPath.Path());
-	if (documentNode.InitCheck() != B_OK)
-		return;
-
-	BRect newFrame;
-	ssize_t bytesRead = documentNode.ReadAttr(kInfoAttributeName, B_RECT_TYPE,
-		0, &newFrame, sizeof(BRect));
-	if (bytesRead != sizeof(BRect))
-		return;
-
-	swap_data(B_RECT_TYPE, &newFrame, sizeof(BRect), B_SWAP_BENDIAN_TO_HOST);
-
-	// Check if the frame in on screen, otherwise, ignore it
-	BScreen screen(this);
-	if (newFrame.Width() > 32 && newFrame.Height() > 32
-		&& screen.Frame().Contains(newFrame)) {
-		MoveTo(newFrame.left, newFrame.top);
-		ResizeTo(newFrame.Width(), newFrame.Height());
-	}
-}
-
-
-void
-StyledEditWindow::SaveAttrs()
-{
-	if (!fSaveMessage)
-		return;
-
-	entry_ref dir;
-	const char* name;
-	if (fSaveMessage->FindRef("directory", &dir) != B_OK
-		|| fSaveMessage->FindString("name", &name) != B_OK)
-		return;
-
-	BPath documentPath(&dir);
-	documentPath.Append(name);
-
-	BNode documentNode(documentPath.Path());
-	if (documentNode.InitCheck() != B_OK)
-		return;
-
-	BRect frame(Frame());
-	swap_data(B_RECT_TYPE, &frame, sizeof(BRect), B_SWAP_HOST_TO_BENDIAN);
-
-	documentNode.WriteAttr(kInfoAttributeName, B_RECT_TYPE, 0, &frame,
-		sizeof(BRect));
+	return Save() == B_OK;
 }
 
 
@@ -446,7 +179,7 @@ StyledEditWindow::MessageReceived(BMessage* message)
 			break;
 
 		case MENU_REVERT:
-			RevertToSaved();
+			_RevertToSaved();
 			break;
 
 		case MENU_CLOSE:
@@ -492,36 +225,37 @@ StyledEditWindow::MessageReceived(BMessage* message)
 		{
 			BRect findWindowFrame(100, 100, 400, 235);
 			BWindow* window = new FindWindow(findWindowFrame, this,
-				&fStringToFind, fCaseSens, fWrapAround, fBackSearch);
+				&fStringToFind, fCaseSensitive, fWrapAround, fBackSearch);
 			window->Show();
 			break;
 		}
 		case MSG_SEARCH:
 			message->FindString("findtext", &fStringToFind);
 			fFindAgainItem->SetEnabled(true);
-			message->FindBool("casesens", &fCaseSens);
+			message->FindBool("casesens", &fCaseSensitive);
 			message->FindBool("wrap", &fWrapAround);
 			message->FindBool("backsearch", &fBackSearch);
 
-			Search(fStringToFind, fCaseSens, fWrapAround, fBackSearch);
+			_Search(fStringToFind, fCaseSensitive, fWrapAround, fBackSearch);
 			break;
 		case MENU_FIND_AGAIN:
-			Search(fStringToFind, fCaseSens, fWrapAround, fBackSearch);
+			_Search(fStringToFind, fCaseSensitive, fWrapAround, fBackSearch);
 			break;
 		case MENU_FIND_SELECTION:
-			FindSelection();
+			_FindSelection();
 			break;
 		case MENU_REPLACE:
 		{
 			BRect replaceWindowFrame(100, 100, 400, 284);
 			BWindow* window = new ReplaceWindow(replaceWindowFrame, this,
-				&fStringToFind, &fReplaceString, fCaseSens, fWrapAround, fBackSearch);
+				&fStringToFind, &fReplaceString, fCaseSensitive, fWrapAround,
+				fBackSearch);
 			window->Show();
 			break;
 		}
 		case MSG_REPLACE:
 		{
-			message->FindBool("casesens", &fCaseSens);
+			message->FindBool("casesens", &fCaseSensitive);
 			message->FindBool("wrap", &fWrapAround);
 			message->FindBool("backsearch", &fBackSearch);
 
@@ -531,16 +265,18 @@ StyledEditWindow::MessageReceived(BMessage* message)
 			fFindAgainItem->SetEnabled(true);
 			fReplaceSameItem->SetEnabled(true);
 
-			Replace(fStringToFind, fReplaceString, fCaseSens, fWrapAround, fBackSearch);
+			_Replace(fStringToFind, fReplaceString, fCaseSensitive, fWrapAround,
+				fBackSearch);
 			break;
 		}
 		case MENU_REPLACE_SAME:
-			Replace(fStringToFind, fReplaceString, fCaseSens, fWrapAround, fBackSearch);
+			_Replace(fStringToFind, fReplaceString, fCaseSensitive, fWrapAround,
+				fBackSearch);
 			break;
 
 		case MSG_REPLACE_ALL:
 		{
-			message->FindBool("casesens", &fCaseSens);
+			message->FindBool("casesens", &fCaseSensitive);
 			message->FindString("FindText",&fStringToFind);
 			message->FindString("ReplaceText",&fReplaceString);
 
@@ -551,9 +287,9 @@ StyledEditWindow::MessageReceived(BMessage* message)
 			fReplaceSameItem->SetEnabled(true);
 
 			if (allWindows)
-				SearchAllWindows(fStringToFind, fReplaceString, fCaseSens);
+				SearchAllWindows(fStringToFind, fReplaceString, fCaseSensitive);
 			else
-				ReplaceAll(fStringToFind, fReplaceString, fCaseSens);
+				_ReplaceAll(fStringToFind, fReplaceString, fCaseSensitive);
 			break;
 		}
 
@@ -563,7 +299,7 @@ StyledEditWindow::MessageReceived(BMessage* message)
 		{
 			float fontSize;
 			if (message->FindFloat("size", &fontSize) == B_OK)
-				SetFontSize(fontSize);
+				_SetFontSize(fontSize);
 			break;
 		}
 		case FONT_FAMILY:
@@ -575,7 +311,7 @@ StyledEditWindow::MessageReceived(BMessage* message)
 				BMenuItem* item = static_cast<BMenuItem*>(ptr);
 				fontFamily = item->Label();
 			}
-			SetFontStyle(fontFamily, fontStyle);
+			_SetFontStyle(fontFamily, fontStyle);
 			break;
 		}
 		case FONT_STYLE:
@@ -593,7 +329,7 @@ StyledEditWindow::MessageReceived(BMessage* message)
 						fontFamily = super_item->Label();
 				}
 			}
-			SetFontStyle(fontFamily, fontStyle);
+			_SetFontStyle(fontFamily, fontStyle);
 			break;
 		}
 		case FONT_COLOR:
@@ -601,19 +337,19 @@ StyledEditWindow::MessageReceived(BMessage* message)
 			void* ptr;
 			if (message->FindPointer("source", &ptr) == B_OK) {
 				if (ptr == fBlackItem)
-					SetFontColor(&BLACK);
+					_SetFontColor(&BLACK);
 				else if (ptr == fRedItem)
-					SetFontColor(&RED);
+					_SetFontColor(&RED);
 				else if (ptr == fGreenItem)
-					SetFontColor(&GREEN);
+					_SetFontColor(&GREEN);
 				else if (ptr == fBlueItem)
-					SetFontColor(&BLUE);
+					_SetFontColor(&BLUE);
 				else if (ptr == fCyanItem)
-					SetFontColor(&CYAN);
+					_SetFontColor(&CYAN);
 				else if (ptr == fMagentaItem)
-					SetFontColor(&MAGENTA);
+					_SetFontColor(&MAGENTA);
 				else if (ptr == fYellowItem)
-					SetFontColor(&YELLOW);
+					_SetFontColor(&YELLOW);
 			}
 			break;
 		}
@@ -866,48 +602,6 @@ StyledEditWindow::MenusBeginning()
 }
 
 
-void
-StyledEditWindow::Quit()
-{
-	SaveAttrs();
-	if (StyledEditApp* app = dynamic_cast<StyledEditApp*>(be_app))
-		app->CloseDocument();
-	BWindow::Quit();
-}
-
-
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "QuitAlert"
-
-
-bool
-StyledEditWindow::QuitRequested()
-{
-	if (fClean)
-		return true;
-
-	BString alertText;
-	bs_printf(&alertText,
-		B_TRANSLATE("Save changes to the document \"%s\"? "), Title());
-
-	int32 index = _ShowAlert(alertText, B_TRANSLATE("Cancel"),
-		B_TRANSLATE("Don't save"), B_TRANSLATE("Save"),	B_WARNING_ALERT);
-
-	if (index == 0)
-		return false;	// "cancel": dont save, dont close the window
-
-	if (index == 1)
-		return true;	// "don't save": just close the window
-
-	if (!fSaveMessage) {
-		SaveAs(new BMessage(SAVE_THEN_QUIT));
-		return false;
-	}
-
-	return Save() == B_OK;
-}
-
-
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "SaveAlert"
 
@@ -944,8 +638,8 @@ StyledEditWindow::Save(BMessage* message)
 				bs_printf(&alertText, B_TRANSLATE("This file is marked "
 					"Read-Only. Save changes to the document \"%s\"? "), name);
 				switch (_ShowAlert(alertText, B_TRANSLATE("Cancel"),
-					B_TRANSLATE("Don't save"),
-					B_TRANSLATE("Save"), B_WARNING_ALERT)) {
+						B_TRANSLATE("Don't save"),
+						B_TRANSLATE("Save"), B_WARNING_ALERT)) {
 					case 0:
 						return B_CANCELED;
 					case 1:
@@ -1044,71 +738,6 @@ StyledEditWindow::SaveAs(BMessage* message)
 }
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "LoadAlert"
-
-
-status_t
-StyledEditWindow::_LoadFile(entry_ref* ref)
-{
-	BEntry entry(ref, true);
-		// traverse an eventual link
-
-	status_t status = entry.InitCheck();
-	if (status == B_OK && entry.IsDirectory())
-		status = B_IS_A_DIRECTORY;
-
-	BFile file;
-	if (status == B_OK)
-		status = file.SetTo(&entry, B_READ_ONLY);
-	if (status == B_OK)
-		status = fTextView->GetStyledText(&file);
-
-	if (status == B_ENTRY_NOT_FOUND) {
-		// Treat non-existing files consideratley; we just want to get an
-		// empty window for them - to create this new document
-		status = B_OK;
-	}
-
-	if (status != B_OK) {
-		// If an error occured, bail out and tell the user what happened
-		BEntry entry(ref, true);
-		char name[B_FILE_NAME_LENGTH];
-		if (entry.GetName(name) != B_OK)
-			strcpy(name, B_TRANSLATE("???"));
-
-		BString text;
-		if (status == B_BAD_TYPE)
-			bs_printf(&text,
-				B_TRANSLATE("Error loading \"%s\":\n\tUnsupported format"), name);
-		else
-			bs_printf(&text, B_TRANSLATE("Error loading \"%s\":\n\t%s"),
-				name, strerror(status));
-
-		_ShowAlert(text, B_TRANSLATE("OK"), "", "", B_STOP_ALERT);
-		return status;
-	}
-
-	// update alignment
-	switch (fTextView->Alignment()) {
-		case B_ALIGN_LEFT:
-		default:
-			fAlignLeft->SetMarked(true);
-			break;
-		case B_ALIGN_CENTER:
-			fAlignCenter->SetMarked(true);
-			break;
-		case B_ALIGN_RIGHT:
-			fAlignRight->SetMarked(true);
-			break;
-	}
-
-	// update word wrapping
-	fWrapItem->SetMarked(fTextView->DoesWordWrap());
-	return B_OK;
-}
-
-
 void
 StyledEditWindow::OpenFile(entry_ref* ref)
 {
@@ -1133,70 +762,9 @@ StyledEditWindow::OpenFile(entry_ref* ref)
 		fSaveMessage->AddString("name", name);
 		SetTitle(name);
 
-		LoadAttrs();
+		_LoadAttrs();
 	}
 	fTextView->Select(0, 0);
-}
-
-
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "RevertToSavedAlert"
-
-
-void
-StyledEditWindow::RevertToSaved()
-{
-	entry_ref ref;
-	const char* name;
-
-	fSaveMessage->FindRef("directory", &ref);
-	fSaveMessage->FindString("name", &name);
-
-	BDirectory dir(&ref);
-	status_t status = dir.InitCheck();
-	BEntry entry;
-	if (status == B_OK)
-		status = entry.SetTo(&dir, name);
-
-	if (status == B_OK)
-		status = entry.GetRef(&ref);
-
-	if (status != B_OK || !entry.Exists()) {
-		BString alertText;
-		bs_printf(&alertText,
-			B_TRANSLATE("Cannot revert, file not found: \"%s\"."), name);
-		_ShowAlert(alertText, B_TRANSLATE("OK"), "", "", B_STOP_ALERT);
-		return;
-	}
-
-	BString alertText;
-	bs_printf(&alertText,
-		B_TRANSLATE("Revert to the last version of \"%s\"? "), Title());
-	if (_ShowAlert(alertText, B_TRANSLATE("Cancel"), B_TRANSLATE("OK"),
-		"", B_WARNING_ALERT) != 1)
-		return;
-
-	fTextView->Reset();
-	if (_LoadFile(&ref) != B_OK)
-		return;
-
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Menus"
-
-	// clear undo modes
-	fUndoItem->SetLabel(B_TRANSLATE("Can't undo"));
-	fUndoItem->SetEnabled(false);
-	fUndoFlag = false;
-	fCanUndo = false;
-	fRedoFlag = false;
-	fCanRedo = false;
-
-	// clear clean modes
-	fSaveItem->SetEnabled(false);
-	fRevertItem->SetEnabled(false);
-	fUndoCleans = false;
-	fRedoCleans = false;
-	fClean = true;
 }
 
 
@@ -1297,120 +865,9 @@ StyledEditWindow::Print(const char* documentName)
 }
 
 
-bool
-StyledEditWindow::Search(BString string, bool caseSensitive, bool wrap, bool backsearch)
-{
-	int32 start;
-	int32 finish;
-
-	start = B_ERROR;
-
-	int32 length = string.Length();
-	if (length == 0)
-		return false;
-
-	BString viewText(fTextView->Text());
-	int32 textStart, textFinish;
-	fTextView->GetSelection(&textStart, &textFinish);
-	if (backsearch) {
-		if (caseSensitive) {
-			start = viewText.FindLast(string, textStart);
-		} else {
-			start = viewText.IFindLast(string, textStart);
-		}
-	} else {
-		if (caseSensitive == true) {
-			start = viewText.FindFirst(string, textFinish);
-		} else {
-			start = viewText.IFindFirst(string, textFinish);
-		}
-	}
-	if (start == B_ERROR && wrap) {
-		if (backsearch) {
-			if (caseSensitive) {
-				start = viewText.FindLast(string, viewText.Length());
-			} else {
-				start = viewText.IFindLast(string, viewText.Length());
-			}
-		} else {
-			if (caseSensitive) {
-				start = viewText.FindFirst(string, 0);
-			} else {
-				start = viewText.IFindFirst(string, 0);
-			}
-		}
-	}
-
-	if (start != B_ERROR) {
-		finish = start + length;
-		fTextView->Select(start, finish);
-		fTextView->ScrollToSelection();
-		return true;
-	}
-
-	return false;
-}
-
-
 void
-StyledEditWindow::FindSelection()
-{
-	int32 selectionStart, selectionFinish;
-	fTextView->GetSelection(&selectionStart, &selectionFinish);
-
-	int32 selectionLength = selectionFinish- selectionStart;
-
-	BString viewText = fTextView->Text();
-	viewText.CopyInto(fStringToFind, selectionStart, selectionLength);
-	fFindAgainItem->SetEnabled(true);
-	Search(fStringToFind, fCaseSens, fWrapAround, fBackSearch);
-}
-
-
-bool
-StyledEditWindow::Replace(BString findthis, BString replaceWith, bool caseSensitive,
-	bool wrap, bool backsearch)
-{
-	if (Search(findthis, caseSensitive, wrap, backsearch)) {
-		int32 start, finish;
-		fTextView->GetSelection(&start, &finish);
-
-		_UpdateCleanUndoRedoSaveRevert();
-		fTextView->SetSuppressChanges(true);
-		fTextView->Delete(start, start + findthis.Length());
-		fTextView->Insert(start, replaceWith.String(), replaceWith.Length());
-		fTextView->SetSuppressChanges(false);
-		fTextView->Select(start, start + replaceWith.Length());
-		fTextView->ScrollToSelection();
-		return true;
-	}
-
-	return false;
-}
-
-
-void
-StyledEditWindow::ReplaceAll(BString findthis, BString replaceWith, bool caseSensitive)
-{
-	bool first = true;
-	fTextView->SetSuppressChanges(true);
-	while (Search(findthis, caseSensitive, true, false)) {
-		if (first) {
-			_UpdateCleanUndoRedoSaveRevert();
-			first = false;
-		}
-		int32 start, finish;
-		fTextView->GetSelection(&start, &finish);
-
-		fTextView->Delete(start, start + findthis.Length());
-		fTextView->Insert(start, replaceWith.String(), replaceWith.Length());
-	}
-	fTextView->SetSuppressChanges(false);
-}
-
-
-void
-StyledEditWindow::SearchAllWindows(BString find, BString replace, bool caseSensitive)
+StyledEditWindow::SearchAllWindows(BString find, BString replace,
+	bool caseSensitive)
 {
 	int32 numWindows;
 	numWindows = be_app->CountWindows();
@@ -1433,8 +890,580 @@ StyledEditWindow::SearchAllWindows(BString find, BString replace, bool caseSensi
 }
 
 
+bool
+StyledEditWindow::IsDocumentEntryRef(const entry_ref* ref)
+{
+	if (ref == NULL)
+		return false;
+
+	if (fSaveMessage == NULL)
+		return false;
+
+	entry_ref dir;
+	const char* name;
+	if (fSaveMessage->FindRef("directory", &dir) != B_OK
+		|| fSaveMessage->FindString("name", &name) != B_OK)
+		return false;
+
+	entry_ref documentRef;
+	BPath documentPath(&dir);
+	documentPath.Append(name);
+	get_ref_for_path(documentPath.Path(), &documentRef);
+
+	return *ref == documentRef;
+}
+
+
+// #pragma mark - private methods
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Menus"
+
+
 void
-StyledEditWindow::SetFontSize(float fontSize)
+StyledEditWindow::_InitWindow(uint32 encoding)
+{
+	fPrintSettings = NULL;
+	fSaveMessage = NULL;
+
+	// undo modes
+	fUndoFlag = false;
+	fCanUndo = false;
+	fRedoFlag = false;
+	fCanRedo = false;
+
+	// clean modes
+	fUndoCleans = false;
+	fRedoCleans = false;
+	fClean = true;
+
+	// search- state
+	fReplaceString = "";
+	fStringToFind = "";
+	fCaseSensitive = false;
+	fWrapAround = false;
+	fBackSearch = false;
+
+	// add menubar
+	fMenuBar = new BMenuBar(BRect(0, 0, 0, 0), "menubar");
+	AddChild(fMenuBar);
+
+	// add textview and scrollview
+
+	BRect viewFrame = Bounds();
+	viewFrame.top = fMenuBar->Bounds().Height() + 1;
+	viewFrame.right -=  B_V_SCROLL_BAR_WIDTH;
+	viewFrame.left = 0;
+	viewFrame.bottom -= B_H_SCROLL_BAR_HEIGHT;
+
+	BRect textBounds = viewFrame;
+	textBounds.OffsetTo(B_ORIGIN);
+	textBounds.InsetBy(TEXT_INSET, TEXT_INSET);
+
+	fTextView= new StyledEditView(viewFrame, textBounds, this);
+	fTextView->SetDoesUndo(true);
+	fTextView->SetStylable(true);
+	fTextView->SetEncoding(encoding);
+
+	fScrollView = new BScrollView("scrollview", fTextView, B_FOLLOW_ALL, 0,
+		true, true, B_PLAIN_BORDER);
+	AddChild(fScrollView);
+	fTextView->MakeFocus(true);
+
+	// Add "File"-menu:
+	BMenu* menu = new BMenu(B_TRANSLATE("File"));
+	fMenuBar->AddItem(menu);
+
+	BMenuItem* menuItem;
+	menu->AddItem(menuItem = new BMenuItem(B_TRANSLATE("New"),
+		new BMessage(MENU_NEW), 'N'));
+	menuItem->SetTarget(be_app);
+
+	menu->AddItem(menuItem = new BMenuItem(fRecentMenu =
+		new BMenu(B_TRANSLATE("Open" B_UTF8_ELLIPSIS)),
+			new BMessage(MENU_OPEN)));
+	menuItem->SetShortcut('O', 0);
+	menuItem->SetTarget(be_app);
+	menu->AddSeparatorItem();
+
+	menu->AddItem(fSaveItem = new BMenuItem(B_TRANSLATE("Save"),
+		new BMessage(MENU_SAVE), 'S'));
+	fSaveItem->SetEnabled(false);
+	menu->AddItem(menuItem = new BMenuItem(
+		B_TRANSLATE("Save as" B_UTF8_ELLIPSIS), new BMessage(MENU_SAVEAS)));
+	menuItem->SetShortcut('S', B_SHIFT_KEY);
+	menuItem->SetEnabled(true);
+
+	menu->AddItem(fRevertItem =
+		new BMenuItem(B_TRANSLATE("Revert to saved" B_UTF8_ELLIPSIS),
+		new BMessage(MENU_REVERT)));
+	fRevertItem->SetEnabled(false);
+	menu->AddItem(menuItem = new BMenuItem(B_TRANSLATE("Close"),
+		new BMessage(MENU_CLOSE), 'W'));
+
+	menu->AddSeparatorItem();
+	menu->AddItem(menuItem = new BMenuItem(
+		B_TRANSLATE("Page setup" B_UTF8_ELLIPSIS),
+		new BMessage(MENU_PAGESETUP)));
+	menu->AddItem(menuItem = new BMenuItem(
+		B_TRANSLATE("Print" B_UTF8_ELLIPSIS),
+		new BMessage(MENU_PRINT), 'P'));
+
+	menu->AddSeparatorItem();
+	menu->AddItem(menuItem = new BMenuItem(B_TRANSLATE("Quit"),
+		new BMessage(MENU_QUIT), 'Q'));
+
+	// Add the "Edit"-menu:
+	menu = new BMenu(B_TRANSLATE("Edit"));
+	fMenuBar->AddItem(menu);
+
+	menu->AddItem(fUndoItem = new BMenuItem(B_TRANSLATE("Can't undo"),
+		new BMessage(B_UNDO), 'Z'));
+	fUndoItem->SetEnabled(false);
+
+	menu->AddSeparatorItem();
+	menu->AddItem(fCutItem = new BMenuItem(B_TRANSLATE("Cut"),
+		new BMessage(B_CUT), 'X'));
+	fCutItem->SetEnabled(false);
+	fCutItem->SetTarget(fTextView);
+
+	menu->AddItem(fCopyItem = new BMenuItem(B_TRANSLATE("Copy"),
+		new BMessage(B_COPY), 'C'));
+	fCopyItem->SetEnabled(false);
+	fCopyItem->SetTarget(fTextView);
+
+	menu->AddItem(menuItem = new BMenuItem(B_TRANSLATE("Paste"),
+		new BMessage(B_PASTE), 'V'));
+	menuItem->SetTarget(fTextView);
+	menu->AddItem(fClearItem = new BMenuItem(B_TRANSLATE("Clear"),
+		new BMessage(MENU_CLEAR)));
+	fClearItem->SetEnabled(false);
+	fClearItem->SetTarget(fTextView);
+
+	menu->AddSeparatorItem();
+	menu->AddItem(menuItem = new BMenuItem(B_TRANSLATE("Select all"),
+		new BMessage(B_SELECT_ALL), 'A'));
+	menuItem->SetTarget(fTextView);
+
+	menu->AddSeparatorItem();
+	menu->AddItem(menuItem = new BMenuItem(B_TRANSLATE("Find" B_UTF8_ELLIPSIS),
+		new BMessage(MENU_FIND), 'F'));
+	menu->AddItem(fFindAgainItem= new BMenuItem(B_TRANSLATE("Find again"),
+		new BMessage(MENU_FIND_AGAIN), 'G'));
+	fFindAgainItem->SetEnabled(false);
+
+	menu->AddItem(menuItem = new BMenuItem(B_TRANSLATE("Find selection"),
+		new BMessage(MENU_FIND_SELECTION), 'H'));
+	menu->AddItem(menuItem = new BMenuItem(
+		B_TRANSLATE("Replace" B_UTF8_ELLIPSIS),
+		new BMessage(MENU_REPLACE), 'R'));
+	menu->AddItem(fReplaceSameItem = new BMenuItem(B_TRANSLATE("Replace same"),
+		new BMessage(MENU_REPLACE_SAME), 'T'));
+	fReplaceSameItem->SetEnabled(false);
+
+	// Add the "Font"-menu:
+	fFontMenu = new BMenu(B_TRANSLATE("Font"));
+	fMenuBar->AddItem(fFontMenu);
+
+	//"Size"-subMenu
+	fFontSizeMenu = new BMenu(B_TRANSLATE("Size"));
+	fFontSizeMenu->SetRadioMode(true);
+	fFontMenu->AddItem(fFontSizeMenu);
+
+	const int32 fontSizes[] = {9, 10, 11, 12, 14, 18, 24, 36, 48, 72};
+	for (uint32 i = 0; i < sizeof(fontSizes) / sizeof(fontSizes[0]); i++) {
+		BMessage* fontMessage = new BMessage(FONT_SIZE);
+		fontMessage->AddFloat("size", fontSizes[i]);
+
+		char label[64];
+		snprintf(label, sizeof(label), "%ld", fontSizes[i]);
+		fFontSizeMenu->AddItem(menuItem = new BMenuItem(label, fontMessage));
+
+		if (fontSizes[i] == (int32)be_plain_font->Size())
+			menuItem->SetMarked(true);
+	}
+
+	// "Color"-subMenu
+	fFontColorMenu = new BMenu(B_TRANSLATE("Color"));
+	fFontColorMenu->SetRadioMode(true);
+	fFontMenu->AddItem(fFontColorMenu);
+
+	fFontColorMenu->AddItem(fBlackItem = new BMenuItem(B_TRANSLATE("Black"),
+		new BMessage(FONT_COLOR)));
+	fBlackItem->SetMarked(true);
+	fFontColorMenu->AddItem(fRedItem = new ColorMenuItem(B_TRANSLATE("Red"),
+		RED, new BMessage(FONT_COLOR)));
+	fFontColorMenu->AddItem(fGreenItem = new ColorMenuItem(B_TRANSLATE("Green"),
+		GREEN, new BMessage(FONT_COLOR)));
+	fFontColorMenu->AddItem(fBlueItem = new ColorMenuItem(B_TRANSLATE("Blue"),
+		BLUE, new BMessage(FONT_COLOR)));
+	fFontColorMenu->AddItem(fCyanItem = new ColorMenuItem(B_TRANSLATE("Cyan"),
+		CYAN, new BMessage(FONT_COLOR)));
+	fFontColorMenu->AddItem(fMagentaItem = new ColorMenuItem(B_TRANSLATE("Magenta"),
+		MAGENTA, new BMessage(FONT_COLOR)));
+	fFontColorMenu->AddItem(fYellowItem = new ColorMenuItem(B_TRANSLATE("Yellow"),
+		YELLOW, new BMessage(FONT_COLOR)));
+	fFontMenu->AddSeparatorItem();
+
+	// Available fonts
+
+	fCurrentFontItem = 0;
+	fCurrentStyleItem = 0;
+
+	BMenu* subMenu;
+	int32 numFamilies = count_font_families();
+	for (int32 i = 0; i < numFamilies; i++) {
+		font_family family;
+		if (get_font_family(i, &family) == B_OK) {
+			subMenu = new BMenu(family);
+			subMenu->SetRadioMode(true);
+			fFontMenu->AddItem(menuItem = new BMenuItem(subMenu,
+				new BMessage(FONT_FAMILY)));
+
+			int32 numStyles = count_font_styles(family);
+			for (int32 j = 0; j < numStyles; j++) {
+				font_style style;
+				uint32 flags;
+				if (get_font_style(family, j, &style, &flags) == B_OK) {
+					subMenu->AddItem(menuItem = new BMenuItem(style,
+						new BMessage(FONT_STYLE)));
+				}
+			}
+		}
+	}
+
+	// Add the "Document"-menu:
+	menu = new BMenu(B_TRANSLATE("Document"));
+	fMenuBar->AddItem(menu);
+
+	// "Align"-subMenu:
+	subMenu = new BMenu(B_TRANSLATE("Align"));
+	subMenu->SetRadioMode(true);
+
+	subMenu->AddItem(fAlignLeft = new BMenuItem(B_TRANSLATE("Left"),
+		new BMessage(ALIGN_LEFT)));
+	fAlignLeft->SetMarked(true);
+
+	subMenu->AddItem(fAlignCenter = new BMenuItem(B_TRANSLATE("Center"),
+		new BMessage(ALIGN_CENTER)));
+	subMenu->AddItem(fAlignRight = new BMenuItem(B_TRANSLATE("Right"),
+		new BMessage(ALIGN_RIGHT)));
+	menu->AddItem(subMenu);
+	menu->AddItem(fWrapItem = new BMenuItem(B_TRANSLATE("Wrap lines"),
+		new BMessage(WRAP_LINES)));
+	fWrapItem->SetMarked(true);
+
+	menu->AddSeparatorItem();
+    menu->AddItem(menuItem = new BMenuItem(
+    	B_TRANSLATE("Statistics" B_UTF8_ELLIPSIS),
+    	new BMessage(SHOW_STATISTICS)));
+
+	fSavePanel = NULL;
+	fSavePanelEncodingMenu = NULL;
+		// build lazily
+}
+
+
+void
+StyledEditWindow::_LoadAttrs()
+{
+	entry_ref dir;
+	const char* name;
+	if (fSaveMessage->FindRef("directory", &dir) != B_OK
+		|| fSaveMessage->FindString("name", &name) != B_OK)
+		return;
+
+	BPath documentPath(&dir);
+	documentPath.Append(name);
+
+	BNode documentNode(documentPath.Path());
+	if (documentNode.InitCheck() != B_OK)
+		return;
+
+	BRect newFrame;
+	ssize_t bytesRead = documentNode.ReadAttr(kInfoAttributeName, B_RECT_TYPE,
+		0, &newFrame, sizeof(BRect));
+	if (bytesRead != sizeof(BRect))
+		return;
+
+	swap_data(B_RECT_TYPE, &newFrame, sizeof(BRect), B_SWAP_BENDIAN_TO_HOST);
+
+	// Check if the frame in on screen, otherwise, ignore it
+	BScreen screen(this);
+	if (newFrame.Width() > 32 && newFrame.Height() > 32
+		&& screen.Frame().Contains(newFrame)) {
+		MoveTo(newFrame.left, newFrame.top);
+		ResizeTo(newFrame.Width(), newFrame.Height());
+	}
+}
+
+
+void
+StyledEditWindow::_SaveAttrs()
+{
+	if (!fSaveMessage)
+		return;
+
+	entry_ref dir;
+	const char* name;
+	if (fSaveMessage->FindRef("directory", &dir) != B_OK
+		|| fSaveMessage->FindString("name", &name) != B_OK)
+		return;
+
+	BPath documentPath(&dir);
+	documentPath.Append(name);
+
+	BNode documentNode(documentPath.Path());
+	if (documentNode.InitCheck() != B_OK)
+		return;
+
+	BRect frame(Frame());
+	swap_data(B_RECT_TYPE, &frame, sizeof(BRect), B_SWAP_HOST_TO_BENDIAN);
+
+	documentNode.WriteAttr(kInfoAttributeName, B_RECT_TYPE, 0, &frame,
+		sizeof(BRect));
+}
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "LoadAlert"
+
+
+status_t
+StyledEditWindow::_LoadFile(entry_ref* ref)
+{
+	BEntry entry(ref, true);
+		// traverse an eventual link
+
+	status_t status = entry.InitCheck();
+	if (status == B_OK && entry.IsDirectory())
+		status = B_IS_A_DIRECTORY;
+
+	BFile file;
+	if (status == B_OK)
+		status = file.SetTo(&entry, B_READ_ONLY);
+	if (status == B_OK)
+		status = fTextView->GetStyledText(&file);
+
+	if (status == B_ENTRY_NOT_FOUND) {
+		// Treat non-existing files consideratley; we just want to get an
+		// empty window for them - to create this new document
+		status = B_OK;
+	}
+
+	if (status != B_OK) {
+		// If an error occured, bail out and tell the user what happened
+		BEntry entry(ref, true);
+		char name[B_FILE_NAME_LENGTH];
+		if (entry.GetName(name) != B_OK)
+			strcpy(name, B_TRANSLATE("???"));
+
+		BString text;
+		if (status == B_BAD_TYPE)
+			bs_printf(&text,
+				B_TRANSLATE("Error loading \"%s\":\n\tUnsupported format"), name);
+		else
+			bs_printf(&text, B_TRANSLATE("Error loading \"%s\":\n\t%s"),
+				name, strerror(status));
+
+		_ShowAlert(text, B_TRANSLATE("OK"), "", "", B_STOP_ALERT);
+		return status;
+	}
+
+	// update alignment
+	switch (fTextView->Alignment()) {
+		case B_ALIGN_LEFT:
+		default:
+			fAlignLeft->SetMarked(true);
+			break;
+		case B_ALIGN_CENTER:
+			fAlignCenter->SetMarked(true);
+			break;
+		case B_ALIGN_RIGHT:
+			fAlignRight->SetMarked(true);
+			break;
+	}
+
+	// update word wrapping
+	fWrapItem->SetMarked(fTextView->DoesWordWrap());
+	return B_OK;
+}
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "RevertToSavedAlert"
+
+
+void
+StyledEditWindow::_RevertToSaved()
+{
+	entry_ref ref;
+	const char* name;
+
+	fSaveMessage->FindRef("directory", &ref);
+	fSaveMessage->FindString("name", &name);
+
+	BDirectory dir(&ref);
+	status_t status = dir.InitCheck();
+	BEntry entry;
+	if (status == B_OK)
+		status = entry.SetTo(&dir, name);
+
+	if (status == B_OK)
+		status = entry.GetRef(&ref);
+
+	if (status != B_OK || !entry.Exists()) {
+		BString alertText;
+		bs_printf(&alertText,
+			B_TRANSLATE("Cannot revert, file not found: \"%s\"."), name);
+		_ShowAlert(alertText, B_TRANSLATE("OK"), "", "", B_STOP_ALERT);
+		return;
+	}
+
+	BString alertText;
+	bs_printf(&alertText,
+		B_TRANSLATE("Revert to the last version of \"%s\"? "), Title());
+	if (_ShowAlert(alertText, B_TRANSLATE("Cancel"), B_TRANSLATE("OK"),
+		"", B_WARNING_ALERT) != 1)
+		return;
+
+	fTextView->Reset();
+	if (_LoadFile(&ref) != B_OK)
+		return;
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Menus"
+
+	// clear undo modes
+	fUndoItem->SetLabel(B_TRANSLATE("Can't undo"));
+	fUndoItem->SetEnabled(false);
+	fUndoFlag = false;
+	fCanUndo = false;
+	fRedoFlag = false;
+	fCanRedo = false;
+
+	// clear clean modes
+	fSaveItem->SetEnabled(false);
+	fRevertItem->SetEnabled(false);
+	fUndoCleans = false;
+	fRedoCleans = false;
+	fClean = true;
+}
+
+
+bool
+StyledEditWindow::_Search(BString string, bool caseSensitive, bool wrap,
+	bool backSearch)
+{
+	int32 start;
+	int32 finish;
+
+	start = B_ERROR;
+
+	int32 length = string.Length();
+	if (length == 0)
+		return false;
+
+	BString viewText(fTextView->Text());
+	int32 textStart, textFinish;
+	fTextView->GetSelection(&textStart, &textFinish);
+	if (backSearch) {
+		if (caseSensitive)
+			start = viewText.FindLast(string, textStart);
+		else
+			start = viewText.IFindLast(string, textStart);
+	} else {
+		if (caseSensitive)
+			start = viewText.FindFirst(string, textFinish);
+		else
+			start = viewText.IFindFirst(string, textFinish);
+	}
+	if (start == B_ERROR && wrap) {
+		if (backSearch) {
+			if (caseSensitive)
+				start = viewText.FindLast(string, viewText.Length());
+			else
+				start = viewText.IFindLast(string, viewText.Length());
+		} else {
+			if (caseSensitive)
+				start = viewText.FindFirst(string, 0);
+			else
+				start = viewText.IFindFirst(string, 0);
+		}
+	}
+
+	if (start != B_ERROR) {
+		finish = start + length;
+		fTextView->Select(start, finish);
+		fTextView->ScrollToSelection();
+		return true;
+	}
+
+	return false;
+}
+
+
+void
+StyledEditWindow::_FindSelection()
+{
+	int32 selectionStart, selectionFinish;
+	fTextView->GetSelection(&selectionStart, &selectionFinish);
+
+	int32 selectionLength = selectionFinish- selectionStart;
+
+	BString viewText = fTextView->Text();
+	viewText.CopyInto(fStringToFind, selectionStart, selectionLength);
+	fFindAgainItem->SetEnabled(true);
+	_Search(fStringToFind, fCaseSensitive, fWrapAround, fBackSearch);
+}
+
+
+bool
+StyledEditWindow::_Replace(BString findThis, BString replaceWith,
+	bool caseSensitive, bool wrap, bool backSearch)
+{
+	if (_Search(findThis, caseSensitive, wrap, backSearch)) {
+		int32 start, finish;
+		fTextView->GetSelection(&start, &finish);
+
+		_UpdateCleanUndoRedoSaveRevert();
+		fTextView->SetSuppressChanges(true);
+		fTextView->Delete(start, start + findThis.Length());
+		fTextView->Insert(start, replaceWith.String(), replaceWith.Length());
+		fTextView->SetSuppressChanges(false);
+		fTextView->Select(start, start + replaceWith.Length());
+		fTextView->ScrollToSelection();
+		return true;
+	}
+
+	return false;
+}
+
+
+void
+StyledEditWindow::_ReplaceAll(BString findThis, BString replaceWith,
+	bool caseSensitive)
+{
+	bool first = true;
+	fTextView->SetSuppressChanges(true);
+	while (_Search(findThis, caseSensitive, true, false)) {
+		if (first) {
+			_UpdateCleanUndoRedoSaveRevert();
+			first = false;
+		}
+		int32 start, finish;
+		fTextView->GetSelection(&start, &finish);
+
+		fTextView->Delete(start, start + findThis.Length());
+		fTextView->Insert(start, replaceWith.String(), replaceWith.Length());
+	}
+	fTextView->SetSuppressChanges(false);
+}
+
+
+void
+StyledEditWindow::_SetFontSize(float fontSize)
 {
 	uint32 sameProperties;
 	BFont font;
@@ -1448,7 +1477,7 @@ StyledEditWindow::SetFontSize(float fontSize)
 
 
 void
-StyledEditWindow::SetFontColor(const rgb_color* color)
+StyledEditWindow::_SetFontColor(const rgb_color* color)
 {
 	uint32 sameProperties;
 	BFont font;
@@ -1461,7 +1490,7 @@ StyledEditWindow::SetFontColor(const rgb_color* color)
 
 
 void
-StyledEditWindow::SetFontStyle(const char* fontFamily, const char* fontStyle)
+StyledEditWindow::_SetFontStyle(const char* fontFamily, const char* fontStyle)
 {
 	BFont font;
 	uint32 sameProperties;
@@ -1497,6 +1526,39 @@ StyledEditWindow::SetFontStyle(const char* fontFamily, const char* fontStyle)
 	}
 
 	_UpdateCleanUndoRedoSaveRevert();
+}
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Statistics"
+
+
+int32
+StyledEditWindow::_ShowStatistics()
+{
+	size_t words = 0;
+	bool inWord = false;
+    size_t length = fTextView->TextLength();
+
+	for (size_t i = 0; i < length; i++)	{
+		if (BUnicodeChar::IsSpace(fTextView->Text()[i])) {
+			inWord = false;
+		} else if (!inWord)	{
+			words++;
+			inWord = true;
+		}
+	}
+
+	BString result;
+	result << B_TRANSLATE("Document statistics") << '\n' << '\n'
+		<< B_TRANSLATE("Lines:") << ' ' << fTextView->CountLines() << '\n'
+		<< B_TRANSLATE("Characters:") << ' ' << length << '\n'
+		<< B_TRANSLATE("Words:") << ' ' << words;
+
+	BAlert* alert = new BAlert("Statistics", result, B_TRANSLATE("OK"), NULL,
+		NULL, B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_INFO_ALERT);
+
+	return alert->Go();
 }
 
 
@@ -1537,66 +1599,6 @@ StyledEditWindow::_ShowAlert(const BString& text, const BString& label,
 	BAlert* alert = new BAlert("Alert", text.String(), label.String(), button2,
 		button3, B_WIDTH_AS_USUAL, spacing, type);
 	alert->SetShortcut(0, B_ESCAPE);
-
-	return alert->Go();
-}
-
-
-bool
-StyledEditWindow::IsDocumentEntryRef(const entry_ref* ref)
-{
-	if (ref == NULL)
-		return false;
-
-	if (fSaveMessage == NULL)
-		return false;
-
-	entry_ref dir;
-	const char* name;
-	if (fSaveMessage->FindRef("directory", &dir) != B_OK
-		|| fSaveMessage->FindString("name", &name) != B_OK)
-		return false;
-
-	entry_ref documentRef;
-	BPath documentPath(&dir);
-	documentPath.Append(name);
-	get_ref_for_path(documentPath.Path(), &documentRef);
-
-	if (*ref == documentRef)
-		return true;
-
-	return false;
-}
-
-
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Statistics"
-
-
-int32
-StyledEditWindow::_ShowStatistics()
-{
-	size_t words = 0;
-	bool inWord = false;
-    size_t length = fTextView->TextLength();
-
-	for (size_t i = 0; i < length; i++)	{
-		if (BUnicodeChar::IsSpace(fTextView->Text()[i])) {
-			inWord = false;
-		} else if (!inWord)	{
-			words++;
-			inWord = true;
-		}
-	}
-
-	BString result;
-	result << B_TRANSLATE("Document statistics") << '\n' << '\n'
-		<< B_TRANSLATE("Lines:") << ' ' << fTextView->CountLines() << '\n'
-		<< B_TRANSLATE("Characters:") << ' ' << length << '\n'
-		<< B_TRANSLATE("Words:") << ' ' << words;
-
-	BAlert* alert = new BAlert("Statistics", result, B_TRANSLATE("OK"), NULL,
-		NULL, B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_INFO_ALERT);
 
 	return alert->Go();
 }
