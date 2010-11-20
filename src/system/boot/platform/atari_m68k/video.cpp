@@ -57,6 +57,7 @@ public:
 	status_t	InitStatus() const { return fInitStatus; };
 
 	virtual status_t	Enumerate() = 0;
+	virtual status_t	Decode(int16 id, struct video_mode *mode);
 	virtual status_t	Get(struct video_mode *mode) = 0;
 	virtual status_t	Set(const struct video_mode *mode) = 0;
 	virtual status_t	Unset(const struct video_mode *mode) { return B_OK; };
@@ -67,6 +68,8 @@ public:
 	virtual int16	Height(const struct video_mode *mode=NULL);
 	virtual int16	Depth(const struct video_mode *mode=NULL);
 	virtual int16	BytesPerRow(const struct video_mode *mode=NULL);
+	
+	virtual void	MakeLabel(const struct video_mode *mode, char *label, size_t len);
 
 private:
 	const char *fName;
@@ -135,6 +138,15 @@ dprintf("add_video_mode(%d x %d %s)\n", videoMode->width, videoMode->height, vid
 //	#pragma mark - 
 
 
+status_t
+ModeOps::Decode(int16 id, struct video_mode *mode)
+{
+	mode->ops = this;
+	mode->mode = id;
+	return B_OK;
+}
+
+
 struct video_mode *
 ModeOps::AllocMode()
 {
@@ -175,26 +187,87 @@ ModeOps::BytesPerRow(const struct video_mode *mode)
 }
 
 
+void
+ModeOps::MakeLabel(const struct video_mode *mode, char *label, size_t len)
+{
+	sprintf(label, "%ux%u %u bit (%s)", mode->width, mode->height,
+			mode->bits_per_pixel, mode->ops->Name());
+
+}
+
+
 //	#pragma mark - Falcon XBIOS API
 
 class FalconModeOps : public ModeOps {
 public:
-	FalconModeOps() : ModeOps("Falcon XBIOS") { fInitStatus = B_OK; };
+	FalconModeOps() : ModeOps("Falcon XBIOS") {};
 	~FalconModeOps() {};
+	virtual status_t	Init();
 	virtual status_t	Enumerate();
+	virtual status_t	Decode(int16 id, struct video_mode *mode);
 	virtual status_t	Get(struct video_mode *mode);
 	virtual status_t	Set(const struct video_mode *mode);
+	virtual status_t	Unset(const struct video_mode *mode);
+	virtual addr_t		Framebuffer();
+	virtual void		MakeLabel(const struct video_mode *mode,
+							char *label, size_t len);
+private:
+	static int16		fPreviousMode;
 };
+
+
+int16 FalconModeOps::fPreviousMode = -1;
+
+
+status_t
+FalconModeOps::Init()
+{
+	const tos_cookie *c = tos_find_cookie('_VDO');
+	if (c == NULL)
+		return ENODEV;
+	if (c->ivalue < 0x00030000)
+		return ENODEV;
+	fInitStatus = B_OK;
+	dprintf("FalconModeOps::Init() ok\n");
+	return fInitStatus;
+}
+
 
 
 status_t
 FalconModeOps::Enumerate()
 {
+	if (fInitStatus < B_OK)
+		return fInitStatus;
+	dprintf("FalconModeOps::Enumerate() ok\n");
+
+	int16 modes[] = { 0x003a, 0x003b, 0x003c, 0x000c, 0x0034, 0x0004/*0x003a, 0x003b, 0x0003, 0x000c, 0x000b, 0x0033, 0x000c, 0x001c*/ };
+	for (int i = 0; i < sizeof(modes) / sizeof(int16); i++) {
+		video_mode *videoMode = AllocMode();
+		if (videoMode == NULL)
+			continue;
+
+		if (Decode(modes[i], videoMode) != B_OK)
+			continue;
+dprintf("add %dx%d %d 0x%04x\n", videoMode->width, videoMode->height, videoMode->bits_per_pixel, modes[i]);
+		add_video_mode(videoMode);
+
+	}
+	return B_OK;
+
 	int16 monitor;
+	bool vga = false;
+	bool tv = false;
 	monitor = VgetMonitor();
 	switch (monitor) {
 		case 0:
-			panic("Monochrome ??");
+			panic("Monochrome ?\n");
+			break;
+		case 2:
+			vga = true;
+			break;
+		case 3:
+			tv = true;
 			break;
 		//case 4 & 5: check for CT60
 		case 1:
@@ -207,8 +280,37 @@ FalconModeOps::Enumerate()
 
 
 status_t
+FalconModeOps::Decode(int16 id, struct video_mode *mode)
+{
+	bool vga = (id & 0x0010) != 0;
+	//bool pal = (id & 0x0020) != 0;
+	bool overscan = (id & 0x0040) != 0;
+	bool st = (id & 0x0080) != 0;
+	bool interlace = (id & 0x0100) != 0;
+	bool dbl = interlace;
+
+	mode->ops = this;
+	mode->mode = id;
+	// cf. F30.TXT
+	mode->width = (id & 0x0008) ? 640 : 320;
+	mode->height = (vga ? (interlace ? 400 : 200) : (dbl ? 240 : 480));
+	if (overscan) {
+		// *= 1.2
+		mode->width = (mode->width * 12) / 10;
+		mode->height = (mode->width * 12) / 10;
+	}
+	mode->bits_per_pixel = 1 << (id & 0x0007);
+	mode->bytes_per_row = mode->width * mode->bits_per_pixel / 8;
+	return B_OK;
+}
+
+
+status_t
 FalconModeOps::Get(struct video_mode *mode)
 {
+	if (fInitStatus < B_OK)
+		return fInitStatus;
+
 	int16 m = VsetMode(VM_INQUIRE);
 	int bpp;
 	int width = 320;
@@ -229,7 +331,65 @@ FalconModeOps::Get(struct video_mode *mode)
 status_t
 FalconModeOps::Set(const struct video_mode *mode)
 {
-	return ENODEV;
+	if (fInitStatus < B_OK)
+		return fInitStatus;
+	if (mode == NULL)
+		return B_BAD_VALUE;
+
+	dprintf("VgetSize(-1) %d\n", VgetSize(-1));
+	dprintf("VgetSize(m) %d\n", VgetSize(mode->mode));
+
+	fPreviousMode = VsetMode(VM_INQUIRE);
+	// XXX this crashes
+
+#warning M68K: FIXME: allocate framebuffer
+	//VsetScreen(((uint32)-1), ((uint32)-1), 3, mode->mode);
+	VsetScreen(((uint32)0x00d00000), ((uint32)0x00d00000), 3, mode->mode);
+
+	return B_OK;
+}
+
+
+status_t
+FalconModeOps::Unset(const struct video_mode *mode)
+{
+	if (fInitStatus < B_OK)
+		return fInitStatus;
+
+	if (fPreviousMode != -1)
+		VsetScreen((uint32)-1, (uint32)-1, 3, fPreviousMode);
+		// VsetMode(fPreviousMode);
+	fPreviousMode = -1;
+
+	//int16 old = VsetMode(mode->mode);
+	//int16 old = VsetScreen((uint32)-1, (uint32)-1, 3, mode->mode);
+
+	return B_OK;
+}
+
+
+addr_t
+FalconModeOps::Framebuffer()
+{
+	addr_t fb = (addr_t)Physbase();
+	dprintf("fb 0x%08lx\n", fb);
+	return fb;
+}
+
+
+void
+FalconModeOps::MakeLabel(const struct video_mode *mode, char *label, size_t len)
+{
+	ModeOps::MakeLabel(mode, label, len);
+	label += strlen(label);
+	// XXX no len check
+	int16 m = mode->mode;
+	/*sprintf(label, "%s%s%s%s",
+		m & 0x0010 ? " vga" : " tv",
+		m & 0x0020 ? " pal" : "",
+		m & 0x0040 ? " oscan" : "",
+		//m & 0x0080 ? " tv" : "",
+		m & 0x0100 ? " ilace" : "");*/
 }
 
 
@@ -277,7 +437,7 @@ NFVDIModeOps::Init()
 	fNatFeatId = nat_feat_getid("fVDI");
 	if (fNatFeatId == 0)
 		return B_ERROR;
-	dprintf("fVDI natfeat id %d\n", fNatFeatId);
+	dprintf("fVDI natfeat id 0x%08lx\n", fNatFeatId);
 	
 	int32 version = nat_feat_call(fNatFeatId, FVDI_GET_VERSION);
 	dprintf("fVDI NF version %lx\n", version);
@@ -482,8 +642,7 @@ video_mode_menu()
 	video_mode *mode = NULL;
 	while ((mode = (video_mode *)list_get_next_item(&sModeList, mode)) != NULL) {
 		char label[64];
-		sprintf(label, "%ux%u %u bit (%s)", mode->width, mode->height,
-			mode->bits_per_pixel, mode->ops->Name());
+		mode->ops->MakeLabel(mode, label, sizeof(label));
 
 		menu->AddItem(item = new(nothrow) MenuItem(label));
 		item->SetData(mode);
@@ -538,7 +697,8 @@ platform_switch_to_logo(void)
 			* gKernelArgs.frame_buffer.bytes_per_row;
 		gKernelArgs.frame_buffer.physical_buffer.start =
 			sMode->ops->Framebuffer();
-sFrameBuffer = sMode->ops->Framebuffer();
+		//XXX: FIXME: this is just for testing...
+		sFrameBuffer = sMode->ops->Framebuffer();
 	} else {
 		gKernelArgs.frame_buffer.enabled = false;
 		return;
@@ -562,9 +722,12 @@ sFrameBuffer = sMode->ops->Framebuffer();
 			gKernelArgs.frame_buffer.physical_buffer.size, kDefaultPageFlags);
 	}
 #endif
-dprintf("splash fb @ %p\n", sFrameBuffer);
 	video_display_splash(sFrameBuffer);
-dprintf("splash done\n");
+	
+	spin(50000000);
+	sMode->Unset();
+	dprintf("splash done\n");
+	
 }
 
 
@@ -593,11 +756,18 @@ platform_init_video(void)
 	// ToDo: implement me
 	dprintf("current video mode: \n");
 	dprintf("Vsetmode(-1): 0x%08x\n", VsetMode(VM_INQUIRE));
-	sFalconModeOps.Init();
-	sFalconModeOps.Enumerate();
+	dprintf("Physbase %p\n", Physbase());
+	dprintf("Logbase %p\n", Logbase());
+
 	// NF VDI does not implement FVDI_GET_FBADDR :(
 	//sNFVDIModeOps.Init();
 	//sNFVDIModeOps.Enumerate();
+
+	if (sFalconModeOps.Init() == B_OK) {
+		sFalconModeOps.Enumerate();
+	} else {
+		dprintf("No usable video API found\n");
+	}
 	
 	return B_OK;
 }
