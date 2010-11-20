@@ -103,6 +103,30 @@ extern "C" {
 	retvalue;					\
 })
 
+#define toscallWWL(trapnr, callnr, p1, p2, p3)		\
+({							\
+	register int32 retvalue __asm__("d0");		\
+	int16 _p1 = (int16)(p1);			\
+	int16 _p2 = (int16)(p2);			\
+	int32 _p3 = (int32)(p3);			\
+							\
+	__asm__ volatile				\
+	(/*"; toscall(" #trapnr ", " #callnr ")"*/"\n	\
+		move.l	%3,-(%%sp) \n			\
+		move.w	%2,-(%%sp) \n			\
+		move.w	%1,-(%%sp) \n			\
+		move.w	%[calln],-(%%sp)\n		\
+		trap	%[trapn]\n			\
+		add.l	#10,%%sp \n "			\
+	: "=r"(retvalue)	/* output */		\
+	: "r"(_p1), "r"(_p2),				\
+	  "r"(_p3),			/* input */	\
+	  [trapn]"i"(trapnr),[calln]"i"(callnr)		\
+	: TOS_CLOBBER_LIST /* clobbered regs */		\
+	);						\
+	retvalue;					\
+})
+
 #define toscallWLWWWL(trapnr, callnr, p1, p2, p3, p4, p5, p6)	\
 ({							\
 	register int32 retvalue __asm__("d0");		\
@@ -196,6 +220,8 @@ extern "C" {
 
 /* pointer versions */
 #define toscallP(trapnr, callnr, a) toscallL(trapnr, callnr, (int32)a)
+#define toscallWWP(trapnr, callnr, p1, p2, p3)		\
+	toscallWWL(trapnr, callnr, p1, p2, (int32)p3)
 #define toscallWPWWWL(trapnr, callnr, p1, p2, p3, p4, p5, p6) \
 	toscallWLWWWL(trapnr, callnr, p1, (int32)p2, p3, p4, p5, p6)
 #define toscallPLWWWWW(trapnr, callnr, p1, p2, p3, p4, p5, p6, p7)		\
@@ -221,7 +247,7 @@ extern "C" {
 /* 
  * TOS Variables
  * only relevant ones,
- * see toshyp.atari.org/003004.htm
+ * see http://toshyp.atari.org/en/003004.html
  */
 #define TOSVAR_autopath	_TOSV_P(0x4ca)
 #define TOSVAR_bootdev	_TOSV_W(0x446)
@@ -402,6 +428,7 @@ static inline int Bconputs(int16 handle, const char *string)
 #define VgetMonitor() toscallV(XBIOS_TRAP, 89)
 #define mon_type() toscallV(XBIOS_TRAP, 89)
 #define VgetSize(mode) toscallW(XBIOS_TRAP, 91, (int16)mode)
+#define VsetRGB(index, count, array) toscallWWP(XBIOS_TRAP, 93, (int16)index, (int16)count, (void *)array)
 #define Locksnd() toscallV(XBIOS_TRAP, 128)
 #define Unlocksnd() toscallV(XBIOS_TRAP, 129)
 
