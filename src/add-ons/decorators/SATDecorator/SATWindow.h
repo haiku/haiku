@@ -85,7 +85,8 @@ public:
 									return fGroupCookie->GetWindowArea(); }
 
 			bool				HandleMessage(SATWindow* sender,
-									BPrivate::ServerLink& link);
+									BPrivate::LinkReceiver& link,
+									BPrivate::LinkSender& reply);
 
 			bool				PropagateToGroup(SATGroup* group,
 									WindowArea* area);

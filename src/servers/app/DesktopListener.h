@@ -32,7 +32,8 @@ public:
 	virtual	void				ListenerUnregistered() = 0;
 
 	virtual bool				HandleMessage(Window* sender,
-									BPrivate::ServerLink& link) = 0;
+									BPrivate::LinkReceiver& link,
+									BPrivate::LinkSender& reply) = 0;
 
 	virtual void				WindowAdded(Window* window) = 0;
 	virtual void				WindowRemoved(Window* window) = 0;
@@ -85,7 +86,8 @@ public:
 	const DesktopListenerDLList&	GetDesktopListenerList();
 
 			bool				MessageForListener(Window* sender,
-									BPrivate::ServerLink& link);
+									BPrivate::LinkReceiver& link,
+									BPrivate::LinkSender& reply);
 
 			void				NotifyWindowAdded(Window* window);
 			void				NotifyWindowRemoved(Window* window);

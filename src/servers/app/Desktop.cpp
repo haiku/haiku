@@ -2078,7 +2078,6 @@ Desktop::WriteWindowInfo(int32 serverToken, BPrivate::LinkSender& sender)
 	::Window* tmp = window->Window();
 	if (tmp) {
 		BMessage message;
-		GetDecoratorSettings(tmp, message);
 		if (tmp->GetDecoratorSettings(&message)) {
 			BRect tabFrame;
 			message.FindRect("tab frame", &tabFrame);
@@ -2442,6 +2441,27 @@ Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			link.Read<bool>(&moveFocusWindow);
 
 			SetWorkspace(index, moveFocusWindow);
+			break;
+		}
+
+		case AS_TALK_TO_DESKTOP_LISTENER:
+		{
+			port_id clientReplyPort;
+			if (link.Read<port_id>(&clientReplyPort) != B_OK)
+				break;
+
+			BPrivate::LinkSender reply(clientReplyPort);
+			LockAllWindows();
+			if (MessageForListener(NULL, link, reply)) {
+				UnlockAllWindows();
+				break;
+			}
+
+			// unhandled message at least send an error if needed
+			if (link.NeedsReply()) {
+				reply.StartMessage(B_ERROR);
+				reply.Flush();
+			}
 			break;
 		}
 

@@ -49,14 +49,14 @@ DesktopObservable::GetDesktopListenerList()
 
 bool
 DesktopObservable::MessageForListener(Window* sender,
-	BPrivate::ServerLink& link)
+	BPrivate::LinkReceiver& link, BPrivate::LinkSender& reply)
 {
 	int32 identifier;
 	link.Read<int32>(&identifier);
 	for (DesktopListener* listener = fDesktopListenerList.First();
 		listener != NULL; listener = fDesktopListenerList.GetNext(listener)) {
 		if (listener->Identifier() == identifier) {
-			if (!listener->HandleMessage(sender, link))
+			if (!listener->HandleMessage(sender, link, reply))
 				break;
 			return true;
 		}

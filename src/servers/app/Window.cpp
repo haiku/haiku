@@ -1072,6 +1072,9 @@ Window::SetDecoratorSettings(const BMessage& settings, BRegion& dirty)
 bool
 Window::GetDecoratorSettings(BMessage* settings)
 {
+	if (fDesktop)
+		fDesktop->GetDecoratorSettings(this, *settings);
+
 	if (fDecorator)
 		return fDecorator->GetSettings(settings);
 

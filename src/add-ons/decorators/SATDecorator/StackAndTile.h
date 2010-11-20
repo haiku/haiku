@@ -48,7 +48,8 @@ public:
 	virtual	void				ListenerUnregistered();
 
 	virtual bool				HandleMessage(Window* sender,
-									BPrivate::ServerLink& link);
+									BPrivate::LinkReceiver& link,
+									BPrivate::LinkSender& reply);
 
 	virtual void				WindowAdded(Window* window);
 	virtual void				WindowRemoved(Window* window);
@@ -95,6 +96,10 @@ private:
 			void				_StartSAT();
 			void				_StopSAT();
 			void				_ActivateWindow(SATWindow* window);
+			bool				_HandleMessage(BPrivate::LinkReceiver& link,
+									BPrivate::LinkSender& reply);
+
+			Desktop*			fDesktop;
 
 			bool				fSATKeyPressed;
 		

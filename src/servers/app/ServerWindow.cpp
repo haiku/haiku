@@ -1161,7 +1161,8 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 		case AS_TALK_TO_DESKTOP_LISTENER:
 		{
-			if (fDesktop->MessageForListener(fWindow, fLink))
+			if (fDesktop->MessageForListener(fWindow, fLink.Receiver(),
+				fLink.Sender()))
 				break;
 			// unhandled message at least send an error if needed
 			if (link.NeedsReply()) {

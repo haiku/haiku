@@ -15,13 +15,22 @@ namespace BPrivate {
 const int32 kMagicSATIdentifier = 'SATI';
 
 
+enum sat_target {
+	kStacking,
+	kTiling
+};
+
+
 enum sat_messages {
 	kAddWindowToStack,
 	kRemoveWindowFromStack,
 	kRemoveWindowFromStackAt,
 	kCountWindowsOnStack,
 	kWindowOnStackAt,
-	kStackHasWindow
+	kStackHasWindow,
+
+	kSaveAllGroups,
+	kRestoreGroup
 };
 
 

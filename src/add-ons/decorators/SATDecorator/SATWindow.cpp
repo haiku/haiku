@@ -11,6 +11,8 @@
 
 #include <Debug.h>
 
+#include "StackAndTilePrivate.h"
+
 #include "SATGroup.h"
 #include "ServerApp.h"
 #include "Window.h"
@@ -347,9 +349,15 @@ SATWindow::GetGroup()
 
 
 bool
-SATWindow::HandleMessage(SATWindow* sender, BPrivate::ServerLink& link)
+SATWindow::HandleMessage(SATWindow* sender, BPrivate::LinkReceiver& link,
+	BPrivate::LinkSender& reply)
 {
-	return StackingEventHandler::HandleMessage(sender, link);
+	int32 target;
+	link.Read<int32>(&target);
+	if (target == kStacking)
+		return StackingEventHandler::HandleMessage(sender, link, reply);
+
+	return false;
 }
 
 
@@ -382,7 +390,8 @@ SATWindow::AddedToGroup(SATGroup* group, WindowArea* area)
 		return false;
 	}
 
-	area->UpdateSizeLimits();
+	if (group->CountItems() > 1)
+		area->UpdateSizeLimits();
 
 	if (group->CountItems() == 2)
 		group->WindowAt(0)->_UpdateSizeLimits();
@@ -692,8 +701,10 @@ SATWindow::Id()
 bool
 SATWindow::SetSettings(const BMessage& message)
 {
-	if (message.FindInt64("window_id", (int64*)&fId) != B_OK)
+	uint64 id;
+	if (message.FindInt64("window_id", (int64*)&id) != B_OK)
 		return false;
+	fId = id;
 	return true;
 }
 

@@ -19,7 +19,8 @@ class StackingEventHandler
 {
 public:
 	static bool				HandleMessage(SATWindow* sender,
-								BPrivate::ServerLink& link);
+								BPrivate::LinkReceiver& link,
+								BPrivate::LinkSender& reply);
 };
 
 

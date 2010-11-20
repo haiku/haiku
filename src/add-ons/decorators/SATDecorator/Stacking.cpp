@@ -33,7 +33,7 @@ const float kMaxTabWidth = 165.;
 
 bool
 StackingEventHandler::HandleMessage(SATWindow* sender,
-	BPrivate::ServerLink& link)
+	BPrivate::LinkReceiver& link, BPrivate::LinkSender& reply)
 {
 	Desktop* desktop = sender->GetDesktop();
 	StackAndTile* stackAndTile = sender->GetStackAndTile();
@@ -63,8 +63,8 @@ StackingEventHandler::HandleMessage(SATWindow* sender,
 			SATWindow* parent = area->WindowList().ItemAt(position);
 			Window* window = desktop->WindowForClientLooperPort(port);
 			if (!parent || !window) {
-				link.StartMessage(B_BAD_VALUE);
-				link.Flush();
+				reply.StartMessage(B_BAD_VALUE);
+				reply.Flush();
 				break;
 			}
 
@@ -74,8 +74,8 @@ StackingEventHandler::HandleMessage(SATWindow* sender,
 			if (!parent->StackWindow(candidate))
 				return false;
 
-			link.StartMessage(B_OK);
-			link.Flush();
+			reply.StartMessage(B_OK);
+			reply.Flush();
 			break;
 		}
 		case kRemoveWindowFromStack:
@@ -94,8 +94,8 @@ StackingEventHandler::HandleMessage(SATWindow* sender,
 
 			Window* window = desktop->WindowForClientLooperPort(port);
 			if (!window) {
-				link.StartMessage(B_BAD_VALUE);
-				link.Flush();
+				reply.StartMessage(B_BAD_VALUE);
+				reply.Flush();
 				break;
 			}
 			SATWindow* candidate = stackAndTile->GetSATWindow(window);
@@ -116,8 +116,8 @@ StackingEventHandler::HandleMessage(SATWindow* sender,
 				return false;
 			SATWindow* removeWindow = area->WindowList().ItemAt(position);
 			if (!removeWindow) {
-				link.StartMessage(B_BAD_VALUE);
-				link.Flush();
+				reply.StartMessage(B_BAD_VALUE);
+				reply.Flush();
 				break;
 			}
 
@@ -125,11 +125,11 @@ StackingEventHandler::HandleMessage(SATWindow* sender,
 				return false;
 
 			ServerWindow* window = removeWindow->GetWindow()->ServerWindow();
-			link.StartMessage(B_OK);
-			link.Attach<port_id>(window->ClientLooperPort());
-			link.Attach<int32>(window->ClientToken());
-			link.Attach<team_id>(window->ClientTeam());
-			link.Flush();
+			reply.StartMessage(B_OK);
+			reply.Attach<port_id>(window->ClientLooperPort());
+			reply.Attach<int32>(window->ClientToken());
+			reply.Attach<team_id>(window->ClientTeam());
+			reply.Flush();
 			break;
 		}
 		case kCountWindowsOnStack:
@@ -137,9 +137,9 @@ StackingEventHandler::HandleMessage(SATWindow* sender,
 			WindowArea* area = sender->GetWindowArea();
 			if (!area)
 				return false;
-			link.StartMessage(B_OK);
-			link.Attach<int32>(area->WindowList().CountItems());
-			link.Flush();
+			reply.StartMessage(B_OK);
+			reply.Attach<int32>(area->WindowList().CountItems());
+			reply.Flush();
 			break;
 		}
 		case kWindowOnStackAt:
@@ -152,17 +152,17 @@ StackingEventHandler::HandleMessage(SATWindow* sender,
 				return false;
 			SATWindow* satWindow = area->WindowList().ItemAt(position);
 			if (!satWindow) {
-				link.StartMessage(B_BAD_VALUE);
-				link.Flush();
+				reply.StartMessage(B_BAD_VALUE);
+				reply.Flush();
 				break;
 			}
 
 			ServerWindow* window = satWindow->GetWindow()->ServerWindow();
-			link.StartMessage(B_OK);
-			link.Attach<port_id>(window->ClientLooperPort());
-			link.Attach<int32>(window->ClientToken());
-			link.Attach<team_id>(window->ClientTeam());
-			link.Flush();
+			reply.StartMessage(B_OK);
+			reply.Attach<port_id>(window->ClientLooperPort());
+			reply.Attach<int32>(window->ClientToken());
+			reply.Attach<team_id>(window->ClientTeam());
+			reply.Flush();
 			break;
 		}
 		case kStackHasWindow:
@@ -177,8 +177,8 @@ StackingEventHandler::HandleMessage(SATWindow* sender,
 
 			Window* window = desktop->WindowForClientLooperPort(port);
 			if (!window) {
-				link.StartMessage(B_BAD_VALUE);
-				link.Flush();
+				reply.StartMessage(B_BAD_VALUE);
+				reply.Flush();
 				break;
 			}
 			SATWindow* candidate = stackAndTile->GetSATWindow(window);
@@ -188,9 +188,9 @@ StackingEventHandler::HandleMessage(SATWindow* sender,
 			WindowArea* area = sender->GetWindowArea();
 			if (!area)
 				return false;
-			link.StartMessage(B_OK);
-			link.Attach<bool>(area->WindowList().HasItem(candidate));
-			link.Flush();
+			reply.StartMessage(B_OK);
+			reply.Attach<bool>(area->WindowList().HasItem(candidate));
+			reply.Flush();
 			break;
 		}
 		default:
