@@ -1155,9 +1155,9 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 	fWrapItem->SetMarked(true);
 
 	menu->AddSeparatorItem();
-    menu->AddItem(menuItem = new BMenuItem(
-    	B_TRANSLATE("Statistics" B_UTF8_ELLIPSIS),
-    	new BMessage(SHOW_STATISTICS)));
+	menu->AddItem(menuItem = new BMenuItem(
+		B_TRANSLATE("Statistics" B_UTF8_ELLIPSIS),
+		new BMessage(SHOW_STATISTICS)));
 
 	fSavePanel = NULL;
 	fSavePanelEncodingMenu = NULL;
@@ -1538,7 +1538,7 @@ StyledEditWindow::_ShowStatistics()
 {
 	size_t words = 0;
 	bool inWord = false;
-    size_t length = fTextView->TextLength();
+	size_t length = fTextView->TextLength();
 
 	for (size_t i = 0; i < length; i++)	{
 		if (BUnicodeChar::IsSpace(fTextView->Text()[i])) {
