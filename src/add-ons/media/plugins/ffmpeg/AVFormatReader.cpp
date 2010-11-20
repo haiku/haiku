@@ -580,10 +580,8 @@ StreamBase::Seek(uint32 flags, int64* frame, bigtime_t* time)
 				TRACE_SEEK("  found time: %lld -> %lld (%.2f)\n", *time,
 					foundTime, foundTime / 1000000.0);
 				*time = foundTime;
-				if ((flags & B_MEDIA_SEEK_TO_FRAME) != 0) {
-					*frame = *time * frameRate / 1000000LL + 0.5;
-					TRACE_SEEK("  seeked frame: %lld\n", *frame);
-				}
+				*frame = (uint64)(*time * frameRate / 1000000LL + 0.5);
+				TRACE_SEEK("  seeked frame: %lld\n", *frame);
 			} else {
 				TRACE_SEEK("  _NextPacket() failed!\n");
 				return B_ERROR;
@@ -672,10 +670,8 @@ StreamBase::Seek(uint32 flags, int64* frame, bigtime_t* time)
 
 		*time = foundTime;
 		TRACE_SEEK("  sought time: %.2fs\n", *time / 1000000.0);
-		if ((flags & B_MEDIA_SEEK_TO_FRAME) != 0) {
-			*frame = *time * frameRate / 1000000.0 + 0.5;
-			TRACE_SEEK("  sought frame: %lld\n", *frame);
-		}
+		*frame = (uint64)(*time * frameRate / 1000000.0 + 0.5);
+		TRACE_SEEK("  sought frame: %lld\n", *frame);
 	}
 
 	return B_OK;
