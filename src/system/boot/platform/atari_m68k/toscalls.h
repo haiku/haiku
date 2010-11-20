@@ -1,9 +1,6 @@
 /*
- * Copyright 2007, Haiku, Inc. All Rights Reserved.
- * Distributed under the terms of the MIT license.
- *
- * Author:
- *		François Revol, revol@free.fr.
+ * Copyright 2008-2010, François Revol, revol@free.fr. All rights reserved.
+ * Distributed under the terms of the MIT License.
  */
 #ifndef _TOSCALLS_H
 #define _TOSCALLS_H

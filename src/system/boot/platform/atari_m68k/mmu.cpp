@@ -1,4 +1,5 @@
 /*
+ * Copyright 2008-2010, François Revol, revol@free.fr. All rights reserved.
  * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de.
  * Based on code written by Travis Geiselbrecht for NewOS.
  *

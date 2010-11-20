@@ -1,10 +1,8 @@
 /*
+ * Copyright 2008-2010, François Revol, revol@free.fr. All rights reserved.
  * Copyright 2005, Ingo Weinhold, bonefish@users.sf.net.
  * Copyright 2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT license.
- *
- * Author:
- *		François Revol, revol@free.fr.
  */
 
 #define FUNCTION(x) .global x; .type x,@function; x

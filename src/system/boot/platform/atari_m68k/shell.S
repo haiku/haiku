@@ -1,11 +1,9 @@
 /*
+ * Copyright 2008-2010, François Revol, revol@free.fr. All rights reserved.
  * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Copyright 2005, Ingo Weinhold, bonefish@users.sf.net.
  * Copyright 2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT license.
- *
- * Author:
- *		François Revol, revol@free.fr.
  */
 
 /**	This file contains the boot floppy and BFS boot block entry points for

@@ -1,10 +1,7 @@
 /*
- * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2008-2010, François Revol, revol@free.fr. All rights reserved.
  * Distributed under the terms of the MIT License.
- *
- * calculate_cpu_conversion_factor() was written by Travis Geiselbrecht and
- * licensed under the NewOS license.
- */
+*/
 
 
 #include "cpu.h"
