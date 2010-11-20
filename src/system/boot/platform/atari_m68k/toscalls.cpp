@@ -216,7 +216,7 @@ init_nat_features(void)
 	if (nat_features()) {
 		// find debugprintf id
 		gDebugPrintfNatFeatID = nat_feat_getid("DEBUGPRINTF");
-		dprintf("DEBUGPRINTF natfeat id %d\n", gDebugPrintfNatFeatID);
+		dprintf("DEBUGPRINTF natfeat id 0x%08lx\n", gDebugPrintfNatFeatID);
 		// pass native features infos to the kernel
 		gKernelArgs.arch_args.plat_args.atari.nat_feat.nf_get_id =
 			nat_features()->nfGetID;
@@ -226,7 +226,7 @@ init_nat_features(void)
 			gDebugPrintfNatFeatID;
 		// find other natfeat ids
 		gBootstrapNatFeatID = nat_feat_getid("BOOTSTRAP");
-		dprintf("BOOTSTRAP natfeat id %d\n", gBootstrapNatFeatID);
+		dprintf("BOOTSTRAP natfeat id 0x%08lx\n", gBootstrapNatFeatID);
 	}
 	return nat_features() ? B_OK : B_ENTRY_NOT_FOUND;
 }
