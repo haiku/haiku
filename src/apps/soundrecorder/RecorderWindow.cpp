@@ -2,7 +2,7 @@
  * Copyright 2005, Jérôme Duval. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Inspired by SoundCapture from Be newsletter (Media Kit Basics: 
+ * Inspired by SoundCapture from Be newsletter (Media Kit Basics:
  *	Consumers and Producers)
  */
 
@@ -103,7 +103,7 @@ struct wave_struct
 
 
 RecorderWindow::RecorderWindow() :
-	BWindow(BRect(XPOS,YPOS,XPOS+MIN_WIDTH,YPOS+MIN_HEIGHT), "SoundRecorder", 
+	BWindow(BRect(XPOS,YPOS,XPOS+MIN_WIDTH,YPOS+MIN_HEIGHT), "SoundRecorder",
 		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_NOT_V_RESIZABLE | B_NOT_ZOOMABLE),
 		fPlayer(NULL),
 		fSoundList(NULL),
@@ -129,14 +129,14 @@ RecorderWindow::RecorderWindow() :
 	CalcSizes(MIN_WIDTH, MIN_HEIGHT);
 
 	SetTitle(B_TRANSLATE("SoundRecorder"));
-	
+
 	fInitCheck = InitWindow();
 	if (fInitCheck != B_OK) {
 		if (fInitCheck == B_NAME_NOT_FOUND)
-			ErrorAlert(B_TRANSLATE("Cannot find default audio hardware"), 
+			ErrorAlert(B_TRANSLATE("Cannot find default audio hardware"),
 				fInitCheck);
 		else
-			ErrorAlert(B_TRANSLATE("Cannot connect to media server"), 
+			ErrorAlert(B_TRANSLATE("Cannot connect to media server"),
 				fInitCheck);
 		PostMessage(B_QUIT_REQUESTED);
 	} else
@@ -148,12 +148,9 @@ RecorderWindow::~RecorderWindow()
 {
 	//	The sound consumer and producer are Nodes; it has to be released and the Roster
 	//	will reap it when it's done.
-	if (fRecordNode) {
+	if (fRecordNode)
 		fRecordNode->Release();
-	}
-	if (fPlayer) {
-		delete fPlayer;
-	}
+	delete fPlayer;
 
 	if (fPlayTrack && fPlayFile)
 		fPlayFile->ReleaseTrack(fPlayTrack);
@@ -169,9 +166,8 @@ RecorderWindow::~RecorderWindow()
 			WINDOW((stderr, "clean up item %d\n", i+1));
 			SoundListItem* item = dynamic_cast<SoundListItem *>(fSoundList->ItemAt(i));
 			if (item) {
-				if (item->IsTemp()) {
+				if (item->IsTemp())
 					item->Entry().Remove();	//	delete temp file
-				}
 				delete item;
 			}
 		}
@@ -193,20 +189,19 @@ RecorderWindow::InitCheck()
 
 
 void
-RecorderWindow::CalcSizes(float min_wid, float min_hei)
+RecorderWindow::CalcSizes(float min_width, float min_height)
 {
 	//	Set up size limits based on new screen size
 	BScreen screen(this);
-	BRect r = screen.Frame();
-	float wid = r.Width()-12;
-	SetSizeLimits(min_wid, wid, min_hei, r.Height()-24);
+	BRect rect = screen.Frame();
+	float width = rect.Width() - 12;
+	SetSizeLimits(min_width, width, min_height, rect.Height() - 24);
 
 	//	Don't zoom to cover all of screen; user can resize last bit if necessary.
 	//	This leaves other windows visible.
-	if (wid > 640) {
-		wid = 640 + (wid-640)/2;
-	}
-	SetZoomLimits(wid, r.Height()-24);
+	if (width > 640)
+		width = 640 + (width - 640) / 2;
+	SetZoomLimits(width, rect.Height() - 24);
 }
 
 
@@ -219,44 +214,36 @@ RecorderWindow::InitWindow()
 	try {
 		//	Find temp directory for recorded sounds.
 		BPath path;
-		if (!(error = find_directory(B_COMMON_TEMP_DIRECTORY, &path))) {
+		if (!(error = find_directory(B_COMMON_TEMP_DIRECTORY, &path)))
 			error = fTempDir.SetTo(path.Path());
-		}
-		if (error < 0) {
+		if (error < 0)
 			goto bad_mojo;
-		}
 
 		//	Make sure the media roster is there (which means the server is there).
 		fRoster = BMediaRoster::Roster(&error);
-		if (!fRoster) {
+		if (!fRoster)
 			goto bad_mojo;
-		}
 
 		error = fRoster->GetAudioInput(&fAudioInputNode);
-		if (error < B_OK) {	//	there's no input?
+		if (error < B_OK) //	there's no input?
 			goto bad_mojo;
-		}
 
 		error = fRoster->GetAudioMixer(&fAudioMixerNode);
-		if (error < B_OK) {	//	there's no mixer?
+		if (error < B_OK) //	there's no mixer?
 			goto bad_mojo;
-		}
 
 		//	Create our internal Node which records sound, and register it.
 		fRecordNode = new SoundConsumer("Sound Recorder");
 		error = fRoster->RegisterNode(fRecordNode);
-		if (error < B_OK) {
+		if (error < B_OK)
 			goto bad_mojo;
-		}
 
 		//	Create the window header with controls
 		BRect r(Bounds());
 		r.bottom = r.top + 175;
-		BBox *background = new BBox(r, "_background", B_FOLLOW_LEFT_RIGHT 
+		BBox *background = new BBox(r, "_background", B_FOLLOW_LEFT_RIGHT
 			| B_FOLLOW_TOP, B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP, B_NO_BORDER);
 		AddChild(background);
-
-
 
 		r = background->Bounds();
 		r.left = 0;
@@ -276,7 +263,7 @@ RecorderWindow::InitWindow()
 		r.right -= 26;
 		r.top = 115;
 		r.bottom = r.top + 30;
-		fTrackSlider = new TrackSlider(r, "trackSlider", new BMessage(POSITION_CHANGED), 
+		fTrackSlider = new TrackSlider(r, "trackSlider", new BMessage(POSITION_CHANGED),
 			B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 		background->AddChild(fTrackSlider);
 
@@ -286,7 +273,7 @@ RecorderWindow::InitWindow()
 		buttonRect = BRect(BPoint(0,0), kSkipButtonSize);
 		buttonRect.OffsetTo(background->Bounds().LeftBottom() - BPoint(-7, 25));
 		fRewindButton = new TransportButton(buttonRect, B_TRANSLATE("Rewind"),
-			kSkipBackBitmapBits, kPressedSkipBackBitmapBits, 
+			kSkipBackBitmapBits, kPressedSkipBackBitmapBits,
 			kDisabledSkipBackBitmapBits, new BMessage(REWIND));
 		background->AddChild(fRewindButton);
 
@@ -294,7 +281,7 @@ RecorderWindow::InitWindow()
 		buttonRect = BRect(BPoint(0,0), kStopButtonSize);
 		buttonRect.OffsetTo(background->Bounds().LeftBottom() - BPoint(-48, 25));
 		fStopButton = new TransportButton(buttonRect, B_TRANSLATE("Stop"),
-			kStopButtonBitmapBits, kPressedStopButtonBitmapBits, 
+			kStopButtonBitmapBits, kPressedStopButtonBitmapBits,
 			kDisabledStopButtonBitmapBits, new BMessage(STOP));
 		background->AddChild(fStopButton);
 
@@ -340,14 +327,14 @@ RecorderWindow::InitWindow()
 
 		buttonRect = BRect(BPoint(0,0), kSpeakerIconBitmapSize);
 		buttonRect.OffsetTo(background->Bounds().RightBottom() - BPoint(121, 17));
-		SpeakerView *speakerView = new SpeakerView(buttonRect, 
+		SpeakerView *speakerView = new SpeakerView(buttonRect,
 			B_FOLLOW_LEFT | B_FOLLOW_TOP);
 		speakerView->SetResizingMode(B_FOLLOW_RIGHT | B_FOLLOW_TOP);
 		background->AddChild(speakerView);
 
 		buttonRect = BRect(BPoint(0,0), BPoint(84, 19));
 		buttonRect.OffsetTo(background->Bounds().RightBottom() - BPoint(107, 20));
-		fVolumeSlider = new VolumeSlider(buttonRect, "volumeSlider", 
+		fVolumeSlider = new VolumeSlider(buttonRect, "volumeSlider",
 			B_FOLLOW_LEFT | B_FOLLOW_TOP);
 		fVolumeSlider->SetResizingMode(B_FOLLOW_RIGHT | B_FOLLOW_TOP);
 		background->AddChild(fVolumeSlider);
@@ -374,11 +361,11 @@ RecorderWindow::InitWindow()
 		r.top += 4;
 		r.right -= B_V_SCROLL_BAR_WIDTH;
 		r.bottom -= 25;
-		fSoundList = new SoundListView(r, B_TRANSLATE("Sound List"), 
+		fSoundList = new SoundListView(r, B_TRANSLATE("Sound List"),
 			B_FOLLOW_ALL);
 		fSoundList->SetSelectionMessage(new BMessage(SOUND_SELECTED));
 		fSoundList->SetViewColor(216, 216, 216);
-		BScrollView *scroller = new BScrollView("scroller", fSoundList, 
+		BScrollView *scroller = new BScrollView("scroller", fSoundList,
 			B_FOLLOW_ALL, 0, false, true, B_FANCY_BORDER);
 		fBottomBox->AddChild(scroller);
 
@@ -403,7 +390,7 @@ RecorderWindow::InitWindow()
 		fFileInfoBox->AddChild(fFormat);
 		r.top += 13;
 		r.bottom = r.top + 15;
-		fCompression = new BStringView(r, "compression", 
+		fCompression = new BStringView(r, "compression",
 			B_TRANSLATE("Compression:"));
 		fFileInfoBox->AddChild(fCompression);
 		r.top += 13;
@@ -412,12 +399,12 @@ RecorderWindow::InitWindow()
 		fFileInfoBox->AddChild(fChannels);
 		r.top += 13;
 		r.bottom = r.top + 15;
-		fSampleSize = new BStringView(r, "samplesize", 
+		fSampleSize = new BStringView(r, "samplesize",
 			B_TRANSLATE("Sample size:"));
 		fFileInfoBox->AddChild(fSampleSize);
 		r.top += 13;
 		r.bottom = r.top + 15;
-		fSampleRate = new BStringView(r, "samplerate", 
+		fSampleRate = new BStringView(r, "samplerate",
 			B_TRANSLATE("Sample rate:"));
 		fFileInfoBox->AddChild(fSampleRate);
 		r.top += 13;
@@ -451,14 +438,16 @@ RecorderWindow::InitWindow()
 			popup->AddItem(item);
 			media_node_id ni[12];
 			int32 ni_count = 12;
-			error = fRoster->GetInstancesFor(dni[i].addon, dni[i].flavor_id, 
+			error = fRoster->GetInstancesFor(dni[i].addon, dni[i].flavor_id,
 				ni, &ni_count);
-			if (error == B_OK)
-				for (int j = 0; j < ni_count; j++)
+			if (error == B_OK) {
+				for (int j = 0; j < ni_count; j++) {
 					if (ni[j] == fAudioInputNode.node) {
 						strcpy(selected_name, dni[i].name);
 						break;
 					}
+				}
+			}
 		}
 
 		//	Create the actual widget
@@ -469,7 +458,8 @@ RecorderWindow::InitWindow()
 		r.InsetBy(10,10);
 		r.top = r.bottom - 18;
 		fInputField = new BMenuField(r, "Input", B_TRANSLATE("Input:"), popup);
-		fInputField->SetDivider(fInputField->StringWidth(B_TRANSLATE("Input:")) + 4.0f);
+		fInputField->SetDivider(fInputField->StringWidth(B_TRANSLATE("Input:"))
+			+ 4.0f);
 		fBottomBox->AddChild(fInputField);
 
 		fBottomBox->AddChild(fFileInfoBox);
@@ -493,17 +483,14 @@ RecorderWindow::InitWindow()
 
 	//	Error handling.
 bad_mojo:
-	if (error >= 0) {
+	if (error >= 0)
 		error = B_ERROR;
-	}
-	if (fRecordNode) {
+	if (fRecordNode)
 		fRecordNode->Release();
-	}
 
 	delete fPlayer;
-	if (!fInputField) {
+	if (!fInputField)
 		delete popup;
-	}
 	return error;
 }
 
@@ -582,25 +569,26 @@ RecorderWindow::MessageReceived(BMessage * message)
 		break;
 	case POSITION_CHANGED:
 		{
-		bigtime_t right, left, main;
-		if (message->FindInt64("main", &main) == B_OK) {
-			if (fPlayTrack) {
-				fPlayTrack->SeekToTime(fTrackSlider->MainTime());
-				fPlayFrame = fPlayTrack->CurrentFrame();
+			bigtime_t right, left, main;
+			if (message->FindInt64("main", &main) == B_OK) {
+				if (fPlayTrack) {
+					fPlayTrack->SeekToTime(fTrackSlider->MainTime());
+					fPlayFrame = fPlayTrack->CurrentFrame();
+				}
+				fScopeView->SetMainTime(main);
 			}
-			fScopeView->SetMainTime(main);
+			if (message->FindInt64("right", &right) == B_OK) {
+				if (fPlayTrack) {
+					fPlayLimit = MIN(fPlayFrames,
+						(off_t)(right * fPlayFormat.u.raw_audio.frame_rate
+							/ 1000000LL));
+				}
+				fScopeView->SetRightTime(right);
+			}
+			if (message->FindInt64("left", &left) == B_OK)
+				fScopeView->SetLeftTime(left);
+			break;
 		}
-		if (message->FindInt64("right", &right) == B_OK) {
-			if (fPlayTrack)
-				fPlayLimit = MIN(fPlayFrames, 
-					(off_t)(right * fPlayFormat.u.raw_audio.frame_rate/1000000LL));
-			fScopeView->SetRightTime(right);
-		}
-		if (message->FindInt64("left", &left) == B_OK) {
-			fScopeView->SetLeftTime(left);
-		}
-		}
-		break;
 	case LOOP:
 		fLooping = fLoopButton->ButtonState();
 		break;
@@ -655,9 +643,9 @@ RecorderWindow::Record(BMessage * message)
 		return;
 	}
 	//	Reserve space on disk (creates fewer fragments)
-	err = fRecFile.SetSize(4 * fRecordFormat.u.raw_audio.channel_count 
-		* fRecordFormat.u.raw_audio.frame_rate 
-		* (fRecordFormat.u.raw_audio.format 
+	err = fRecFile.SetSize(4 * fRecordFormat.u.raw_audio.channel_count
+		* fRecordFormat.u.raw_audio.frame_rate
+		* (fRecordFormat.u.raw_audio.format
 			& media_raw_audio_format::B_AUDIO_SIZE_MASK));
 	if (err < B_OK) {
 		ErrorAlert(B_TRANSLATE("Cannot record a sound that long"), err);
@@ -672,7 +660,7 @@ RecorderWindow::Record(BMessage * message)
 	//	Hook up input
 	err = MakeRecordConnection(fAudioInputNode);
 	if (err < B_OK) {
-		ErrorAlert(B_TRANSLATE("Cannot connect to the selected sound input"), 
+		ErrorAlert(B_TRANSLATE("Cannot connect to the selected sound input"),
 			err);
 		fRecEntry.Remove();
 		fRecEntry.Unset();
@@ -683,12 +671,10 @@ RecorderWindow::Record(BMessage * message)
 	bigtime_t then = fRecordNode->TimeSource()->Now() + 50000LL;
 	fRoster->StartNode(fRecordNode->Node(), then);
 	if (fAudioInputNode.kind & B_TIME_SOURCE) {
-		fRoster->StartNode(fAudioInputNode, 
+		fRoster->StartNode(fAudioInputNode,
 			fRecordNode->TimeSource()->RealTimeFor(then, 0));
-	}
-	else {
+	} else
 		fRoster->StartNode(fAudioInputNode, then);
-	}
 }
 
 
@@ -713,18 +699,17 @@ RecorderWindow::Play(BMessage * message)
 		return;
 	}
 
-	fPlayLimit = MIN(fPlayFrames, (off_t)(fTrackSlider->RightTime() 
+	fPlayLimit = MIN(fPlayFrames, (off_t)(fTrackSlider->RightTime()
 		* fPlayFormat.u.raw_audio.frame_rate / 1000000LL));
 	fPlayTrack->SeekToTime(fTrackSlider->MainTime());
 	fPlayFrame = fPlayTrack->CurrentFrame();
 
 	// Create our internal Node which plays sound, and register it.
-	fPlayer = new BSoundPlayer(fAudioMixerNode, &fPlayFormat.u.raw_audio, 
+	fPlayer = new BSoundPlayer(fAudioMixerNode, &fPlayFormat.u.raw_audio,
 		"Sound Player");
 	status_t err = fPlayer->InitCheck();
-	if (err < B_OK) {
+	if (err < B_OK)
 		return;
-	}
 
 	fVolumeSlider->SetSoundPlayer(fPlayer);
 	fPlayer->SetCallbacks(PlayFile, NotifyPlayFile, this);
@@ -753,9 +738,8 @@ RecorderWindow::Save(BMessage * message)
 	//	Find the item to save.
 	int32 index = fSoundList->CurrentSelection();
 	SoundListItem* pItem = dynamic_cast<SoundListItem*>(fSoundList->ItemAt(index));
-	if ((! pItem) || (pItem->Entry().InitCheck() != B_OK)) {
+	if ((! pItem) || (pItem->Entry().InitCheck() != B_OK))
 		return;
-	}
 
 	// Update the save panel and show it.
 	char filename[B_FILE_NAME_LENGTH];
@@ -785,8 +769,7 @@ RecorderWindow::DoSave(BMessage * message)
 
 	if ((message->FindPointer("sound list item", (void**) &pItem) == B_OK)
 		&& (message->FindRef("directory", &new_dir_ref) == B_OK)
-		&& (message->FindString("name", &new_name) == B_OK))
-	{
+		&& (message->FindString("name", &new_name) == B_OK)) {
 		BEntry& oldEntry = pItem->Entry();
 		BFile oldFile(&oldEntry, B_READ_WRITE);
 		if (oldFile.InitCheck() != B_OK)
@@ -824,17 +807,15 @@ RecorderWindow::Input(BMessage * message)
 	//	User selected input from pop-up
 	const dormant_node_info * dni = 0;
 	ssize_t size = 0;
-	if (message->FindData("node", B_RAW_TYPE, (const void **)&dni, &size)) {
+	if (message->FindData("node", B_RAW_TYPE, (const void **)&dni, &size))
 		return;		//	bad input selection message
-	}
 
 	media_node_id node_id;
 	status_t error = fRoster->GetInstancesFor(dni->addon, dni->flavor_id, &node_id);
-	if (error != B_OK) {
+	if (error != B_OK)
 		fRoster->InstantiateDormantNode(*dni, &fAudioInputNode);
-	} else {
+	else
 		fRoster->GetNodeFor(node_id, &fAudioInputNode);
-	}
 }
 
 
@@ -848,7 +829,7 @@ RecorderWindow::Selected(BMessage * message)
 		return;
 	status_t err = UpdatePlayFile(pItem, true);
 	if (err != B_OK) {
-		ErrorAlert(B_TRANSLATE("Cannot recognize this file as a media file"), 
+		ErrorAlert(B_TRANSLATE("Cannot recognize this file as a media file"),
 			err == B_MEDIA_NO_HANDLER ? B_OK : err);
 		RemoveCurrentSoundItem();
 	}
@@ -931,9 +912,9 @@ RecorderWindow::MakeRecordConnection(const media_node & input)
 		return err;
 	}
 
-	//	Using the same structs for input and output is OK in 
+	//	Using the same structs for input and output is OK in
 	//  BMediaRoster::Connect().
-	err = fRoster->Connect(fAudioOutput.source, fRecInput.destination, 
+	err = fRoster->Connect(fAudioOutput.source, fRecInput.destination,
 		&fRecordFormat, &fAudioOutput, &fRecInput);
 	if (err < B_OK) {
 		CONNECT((stderr, "RecorderWindow::MakeRecordConnection():"
@@ -944,9 +925,9 @@ RecorderWindow::MakeRecordConnection(const media_node & input)
 	}
 
 	//	Start the time source if it's not running.
-	if ((tsobj->Node() != input) && !tsobj->IsRunning()) {
+	if ((tsobj->Node() != input) && !tsobj->IsRunning())
 		fRoster->StartNode(tsobj->Node(), BTimeSource::RealTime());
-	}
+
 	tsobj->Release();	//	we're done with this time source instance!
 	return B_OK;
 }
@@ -960,7 +941,7 @@ RecorderWindow::BreakRecordConnection()
 	//	If we are the last connection, the Node will stop automatically since it
 	//	has nowhere to send data to.
 	err = fRoster->StopNode(fRecInput.node, 0);
-	err = fRoster->Disconnect(fAudioOutput.node.node, fAudioOutput.source, 
+	err = fRoster->Disconnect(fAudioOutput.node.node, fAudioOutput.source,
 		fRecInput.node.node, fRecInput.destination);
 	fAudioOutput.source = media_source::null;
 	fRecInput.destination = media_destination::null;
@@ -987,11 +968,11 @@ RecorderWindow::StopRecording()
 		header.format.format_tag = 1;
 		header.format.channels = fRecordFormat.u.raw_audio.channel_count;
 		header.format.samples_per_sec = (uint32)fRecordFormat.u.raw_audio.frame_rate;
-		header.format.avg_bytes_per_sec = (uint32)(fRecordFormat.u.raw_audio.frame_rate 
+		header.format.avg_bytes_per_sec = (uint32)(fRecordFormat.u.raw_audio.frame_rate
 			* fRecordFormat.u.raw_audio.channel_count
 			* (fRecordFormat.u.raw_audio.format & 0xf));
 		header.format.bits_per_sample = (fRecordFormat.u.raw_audio.format & 0xf) * 8;
-		header.format.block_align = (fRecordFormat.u.raw_audio.format & 0xf) 
+		header.format.block_align = (fRecordFormat.u.raw_audio.format & 0xf)
 			* fRecordFormat.u.raw_audio.channel_count;
 		header.data_chunk.fourcc = FOURCC('d','a','t','a');
 		header.data_chunk.len = fRecSize;
@@ -1001,10 +982,9 @@ RecorderWindow::StopRecording()
 		fRecFile.SetSize(fRecSize + sizeof(header));
 		//	We reserve space; make sure we cut off any excess at the end.
 		AddSoundItem(fRecEntry, true);
-	}
-	else {
+	} else
 		fRecEntry.Remove();
-	}
+
 	//	We're done for this time.
 	fRecEntry.Unset();
 	//	Close the file.
@@ -1134,7 +1114,7 @@ RecorderWindow::UpdatePlayFile(SoundListItem* item, bool updateDisplay)
 	BString channels = B_TRANSLATE("Channels: ");
 	channels << fPlayFormat.u.raw_audio.channel_count;
 	BString samplesize = B_TRANSLATE("Sample size: ");
-	samplesize << 8 * (fPlayFormat.u.raw_audio.format & 0xf) 
+	samplesize << 8 * (fPlayFormat.u.raw_audio.format & 0xf)
 		<< B_TRANSLATE(" bits");
 	BString samplerate = B_TRANSLATE("Sample rate: ");
 	samplerate << (int)fPlayFormat.u.raw_audio.frame_rate;
@@ -1257,7 +1237,7 @@ RecorderWindow::NotifyRecordFile(void * cookie, int32 code, ...)
 
 
 void
-RecorderWindow::PlayFile(void * cookie, void * data, size_t size, 
+RecorderWindow::PlayFile(void * cookie, void * data, size_t size,
 	const media_raw_audio_format & format)
 {
 	//	Callback called from the SoundProducer when producing buffers.
@@ -1284,7 +1264,7 @@ RecorderWindow::PlayFile(void * cookie, void * data, size_t size,
 
 
 void
-RecorderWindow::NotifyPlayFile(void * cookie, 
+RecorderWindow::NotifyPlayFile(void * cookie,
 	BSoundPlayer::sound_player_notification code, ...)
 {
 	if ((code == BSoundPlayer::B_STOPPED) || (code == BSoundPlayer::B_SOUND_DONE)) {
@@ -1324,15 +1304,15 @@ RecorderWindow::RefsReceived(BMessage *msg)
 		countBad++;
 	}
 
-	if (countBad > 0 && countGood == 0)
+	if (countBad > 0 && countGood == 0) {
 		(new BAlert(B_TRANSLATE("Nothing to play"), B_TRANSLATE("None of the "
-			"files appear to be audio files"), B_TRANSLATE("OK"), NULL, NULL, 
+			"files appear to be audio files"), B_TRANSLATE("OK"), NULL, NULL,
 			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
-	else if (countGood > 0) {
+	} else if (countGood > 0) {
 		if (countBad > 0)
 			(new BAlert(B_TRANSLATE("Invalid audio files"), B_TRANSLATE("Some "
-				"of the files don't appear to be audio files"), 
-				B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, 
+				"of the files don't appear to be audio files"),
+				B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL,
 				B_WARNING_ALERT))->Go();
 		fSoundList->Select(fSoundList->CountItems() - 1);
 	}
@@ -1352,34 +1332,34 @@ RecorderWindow::CopyTarget(BMessage *msg)
 				&& msg->FindRef("directory", &dir) == B_OK) {
 				BDirectory directory(&dir);
 				BFile file(&directory, name, O_RDWR | O_TRUNC);
-				
+
 				// seek time
 				bigtime_t start = fTrackSlider->LeftTime();
-				
+
 				// write data
-				bigtime_t diffTime = fTrackSlider->RightTime() 
+				bigtime_t diffTime = fTrackSlider->RightTime()
 					- fTrackSlider->LeftTime();
 				int64 framesToWrite = (int64) (diffTime
 					* fPlayFormat.u.raw_audio.frame_rate / 1000000LL);
-				int32 frameSize = (fPlayFormat.u.raw_audio.format & 0xf) 
+				int32 frameSize = (fPlayFormat.u.raw_audio.format & 0xf)
 					* fPlayFormat.u.raw_audio.channel_count;
 
 				wave_struct header;
 				header.riff.riff_id = FOURCC('R','I','F','F');
-				header.riff.len 
+				header.riff.len
 					= (frameSize * framesToWrite) + sizeof(header) - 8;
 				header.riff.wave_id = FOURCC('W','A','V','E');
 				header.format_chunk.fourcc = FOURCC('f','m','t',' ');
 				header.format_chunk.len = sizeof(header.format);
 				header.format.format_tag = 1;
 				header.format.channels = fPlayFormat.u.raw_audio.channel_count;
-				header.format.samples_per_sec 
+				header.format.samples_per_sec
 					= (uint32)fPlayFormat.u.raw_audio.frame_rate;
-				header.format.avg_bytes_per_sec 
-					= (uint32)(fPlayFormat.u.raw_audio.frame_rate 
+				header.format.avg_bytes_per_sec
+					= (uint32)(fPlayFormat.u.raw_audio.frame_rate
 					* fPlayFormat.u.raw_audio.channel_count
 					* (fPlayFormat.u.raw_audio.format & 0xf));
-				header.format.bits_per_sample 
+				header.format.bits_per_sample
 					= (fPlayFormat.u.raw_audio.format & 0xf) * 8;
 				header.format.block_align = frameSize;
 				header.data_chunk.fourcc = FOURCC('d','a','t','a');
@@ -1388,7 +1368,7 @@ RecorderWindow::CopyTarget(BMessage *msg)
 				file.Write(&header, sizeof(header));
 
 				char *data = (char *)malloc(fPlayFormat.u.raw_audio.buffer_size);
-				
+
 				fPlayTrack->SeekToTime(&start);
 				fPlayFrame = fPlayTrack->CurrentFrame();
 				while (framesToWrite > 0) {
@@ -1402,7 +1382,7 @@ RecorderWindow::CopyTarget(BMessage *msg)
 					file.Write(data, frames * frameSize);
 					framesToWrite -= frames;
 				}
-				
+
 				file.Sync();
 				free(data);
 				BNodeInfo nodeInfo(&file);

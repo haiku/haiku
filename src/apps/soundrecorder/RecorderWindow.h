@@ -4,9 +4,9 @@
  *
  * Inspired by SoundCapture from Be newsletter (Media Kit Basics: Consumers and Producers)
  */
-
 #ifndef RECORDERWINDOW_H
 #define RECORDERWINDOW_H
+
 
 #include <Catalog.h>
 #include <Directory.h>
@@ -45,7 +45,7 @@ public:
 		RecorderWindow();
 	virtual	~RecorderWindow();
 		status_t InitCheck();
-		
+
 
 	virtual	bool QuitRequested();
 	virtual	void MessageReceived(BMessage * message);
@@ -71,7 +71,7 @@ public:
 
 		void AddSoundItem(const BEntry& entry, bool temp = false);
 		void RemoveCurrentSoundItem();
-		
+
 private:
 		BMediaRoster * fRoster;
 		VUView *fVUView;
@@ -93,7 +93,7 @@ private:
 		SoundListView * fSoundList;
 		BDirectory fTempDir;
 		int fTempCount;
-		
+
 		BBox * fBottomBox;
 		BBox * fFileInfoBox;
 		BStringView *fFilename;
@@ -113,7 +113,7 @@ private:
 		BEntry fRecEntry;
 
 		media_format fRecordFormat;
-		
+
 		BFile fRecFile;
 		off_t fRecSize;
 
@@ -127,16 +127,16 @@ private:
 		int64 fPlayLimit;
 		int64 fPlayFrame;
 		int64 fPlayFrames;
-		
+
 		bool fLooping;
-		
+
 		media_node fAudioMixerNode;
-		
+
 		BFilePanel *fSavePanel;
 		status_t fInitCheck;
 
 		status_t InitWindow();
-		
+
 		void Record(BMessage * message);
 		void Play(BMessage * message);
 		void Stop(BMessage * message);
@@ -149,7 +149,7 @@ private:
 		status_t MakeRecordConnection(const media_node & input);
 		status_t BreakRecordConnection();
 		status_t StopRecording();
-		
+
 		status_t MakePlayConnection(const media_multi_audio_format & format);
 		status_t BreakPlayConnection();
 		status_t StopPlaying();
@@ -166,10 +166,9 @@ static	void NotifyRecordFile(void * cookie, int32 code, ...);
 
 static	void PlayFile(void * cookie, void * data, size_t size, const media_raw_audio_format & format);
 static	void NotifyPlayFile(void * cookie, BSoundPlayer::sound_player_notification code, ...);
-				
+
 		void RefsReceived(BMessage *msg);
 		void CopyTarget(BMessage *msg);
 };
 
 #endif	/*	RECORDERWINDOW_H */
-
