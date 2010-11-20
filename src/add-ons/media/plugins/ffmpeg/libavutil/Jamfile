@@ -4,8 +4,8 @@ SubDir HAIKU_TOP src add-ons media plugins ffmpeg libavutil ;
 TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
 	: -Wall -Wmissing-prototypes -Wsign-compare -Wpointer-arith ] ;
 
-SubDirHdrs [ FDirName $(SUBDIR) .. ] ;
-SubDirHdrs [ FDirName $(SUBDIR) ../libavcodec ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) libavcodec ] ;
 
 # filter warnings we don't want here
 TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)

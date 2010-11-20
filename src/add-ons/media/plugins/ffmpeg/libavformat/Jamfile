@@ -19,7 +19,6 @@ StaticLibrary libavformat.a :
 	4xm.c
 	adtsenc.c
 	aea.c
-	aiff.c
 	aiffdec.c
 	aiffenc.c
 	allformats.c
@@ -148,9 +147,6 @@ StaticLibrary libavformat.a :
 	rmenc.c
 	rpl.c
 	rtp.c
-	rtp_aac.c
-	rtp_h264.c
-	rtp_mpv.c
 	rtpdec.c
 	rtpdec_amr.c
 	rtpdec_asf.c

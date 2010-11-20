@@ -9,6 +9,8 @@ SubDirHdrs [ FDirName $(SUBDIR) libavformat ] ;
 SubDirHdrs [ FDirName $(SUBDIR) libavutil ] ;
 SubDirHdrs [ FDirName $(SUBDIR) libswscale ] ;
 
+SubDirC++Flags -D__STDC_CONSTANT_MACROS ;
+
 Addon ffmpeg :
  	AVCodecDecoder.cpp
  	AVCodecEncoder.cpp
