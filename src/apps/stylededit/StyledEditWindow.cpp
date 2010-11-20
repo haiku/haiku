@@ -41,6 +41,7 @@
 #include <TextControl.h>
 #include <TextView.h>
 #include <TranslationUtils.h>
+#include <UnicodeChar.h>
 
 
 using namespace BPrivate;
@@ -338,6 +339,11 @@ StyledEditWindow::InitWindow(uint32 encoding)
 	menu->AddItem(fWrapItem = new BMenuItem(B_TRANSLATE("Wrap lines"),
 		new BMessage(WRAP_LINES)));
 	fWrapItem->SetMarked(true);
+
+	menu->AddSeparatorItem();
+    menu->AddItem(menuItem = new BMenuItem(
+    	B_TRANSLATE("Statistics" B_UTF8_ELLIPSIS),
+    	new BMessage(SHOW_STATISTICS)));
 
 	fSavePanel = NULL;
 	fSavePanelEncodingMenu = NULL;
@@ -645,6 +651,9 @@ StyledEditWindow::MessageReceived(BMessage* message)
 			_UpdateCleanUndoRedoSaveRevert();
 			break;
 		}
+		case SHOW_STATISTICS:
+			_ShowStatistics();
+			break;
 		case ENABLE_ITEMS:
 			fCutItem->SetEnabled(true);
 			fCopyItem->SetEnabled(true);
@@ -1559,3 +1568,35 @@ StyledEditWindow::IsDocumentEntryRef(const entry_ref* ref)
 	return false;
 }
 
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Statistics"
+
+
+int32
+StyledEditWindow::_ShowStatistics()
+{
+	size_t words = 0;
+	bool inWord = false;
+    size_t length = fTextView->TextLength();
+
+	for (size_t i = 0; i < length; i++)	{
+		if (BUnicodeChar::IsSpace(fTextView->Text()[i])) {
+			inWord = false;
+		} else if (!inWord)	{
+			words++;
+			inWord = true;
+		}
+	}
+
+	BString result;
+	result << B_TRANSLATE("Document statistics") << '\n' << '\n'
+		<< B_TRANSLATE("Lines:") << ' ' << fTextView->CountLines() << '\n'
+		<< B_TRANSLATE("Characters:") << ' ' << length << '\n'
+		<< B_TRANSLATE("Words:") << ' ' << words;
+
+	BAlert* alert = new BAlert("Statistics", result, B_TRANSLATE("OK"), NULL,
+		NULL, B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_INFO_ALERT);
+
+	return alert->Go();
+}

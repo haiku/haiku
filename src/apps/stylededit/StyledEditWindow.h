@@ -59,6 +59,7 @@ class StyledEditWindow : public BWindow {
 		void			SetFontSize(float fontSize);
 		void			SetFontColor(const rgb_color *color);
 		void			SetFontStyle(const char *fontFamily, const char *fontStyle);
+		int32			_ShowStatistics();
 		status_t		_LoadFile(entry_ref* ref);
 		void			RevertToSaved();
 		void			_UpdateCleanUndoRedoSaveRevert();

@@ -63,6 +63,7 @@ const uint32 ALIGN_LEFT					= 'ALle';
 const uint32 ALIGN_CENTER				= 'ALce';
 const uint32 ALIGN_RIGHT				= 'ALri';
 const uint32 WRAP_LINES					= 'MDwr';
+const uint32 SHOW_STATISTICS			= 'MDss';
 
 // enables "edit" menuitems
 const uint32 ENABLE_ITEMS				= 'ENit';
