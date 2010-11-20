@@ -112,7 +112,12 @@ platform_start_kernel(void)
 extern "C" void
 platform_exit(void)
 {
-	// Terminate
+	// Terminate if running under ARAnyM
+	int32 nfShutdownId = nat_feat_getid("NF_SHUTDOWN");
+	if (nfShutdownId)
+		nat_feat_call(nfShutdownId, 0);
+
+	// This crashes...
 	// TODO: Puntaes() instead ?
 	Pterm0();
 }
@@ -143,6 +148,7 @@ _start(void)
 	Bconout(DEV_CON, 'K');
 	console_init();
 	Bconout(DEV_CON, 'U');
+	Bconout(DEV_CON, '\n');
 	dprintf("membot   = %p\n", (void*)*TOSVAR_membot);
 	dprintf("memtop   = %p\n", (void*)*TOSVAR_memtop);
 	dprintf("v_bas_ad = %p\n", *TOSVAR_v_bas_ad);
