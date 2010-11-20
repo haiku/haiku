@@ -134,6 +134,32 @@ extern "C" {
 	retvalue;					\
 })
 
+#define toscallLLWW(trapnr, callnr, p1, p2, p3, p4)	\
+({							\
+	register int32 retvalue __asm__("d0");		\
+	int32 _p1 = (int32)(p1);			\
+	int32 _p2 = (int32)(p2);			\
+	int16 _p3 = (int16)(p3);			\
+	int16 _p4 = (int16)(p4);			\
+							\
+	__asm__ volatile				\
+	(/*"; toscall(" #trapnr ", " #callnr ")"*/"\n	\
+		move.w	%4,-(%%sp) \n			\
+		move.w	%3,-(%%sp) \n			\
+		move.l	%2,-(%%sp) \n			\
+		move.l	%1,-(%%sp) \n			\
+		move.w	%[calln],-(%%sp)\n		\
+		trap	%[trapn]\n			\
+		add.l	#14,%%sp \n "			\
+	: "=r"(retvalue)	/* output */		\
+	: "r"(_p1), "r"(_p2),				\
+	  "r"(_p3), "r"(_p4),		/* input */	\
+	  [trapn]"i"(trapnr),[calln]"i"(callnr)		\
+	: TOS_CLOBBER_LIST /* clobbered regs */		\
+	);						\
+	retvalue;					\
+})
+
 #define toscallLLWWWWW(trapnr, callnr, p1, p2, p3, p4, p5, p6, p7)	\
 ({							\
 	register int32 retvalue __asm__("d0");		\
@@ -174,7 +200,8 @@ extern "C" {
 	toscallWLWWWL(trapnr, callnr, p1, (int32)p2, p3, p4, p5, p6)
 #define toscallPLWWWWW(trapnr, callnr, p1, p2, p3, p4, p5, p6, p7)		\
 	toscallLLWWWWW(trapnr, callnr, (int32)p1, (int32)p2, p3, p4, p5, p6, p7)
-
+#define toscallPPWW(trapnr, callnr, p1, p2, p3, p4)		\
+	toscallLLWW(trapnr, callnr, (int32)p1, (int32)p2, p3, p4)
 
 
 #endif /* __ASSEMBLER__ */
@@ -357,7 +384,7 @@ static inline int Bconputs(int16 handle, const char *string)
 #define Logbase() (void *)toscallV(XBIOS_TRAP, 3)
 //#define Getrez() toscallV(XBIOS_TRAP, 4)
 #define Setscreen(log, phys, mode) toscallPPW(XBIOS_TRAP, 5, (void *)log, (void *)phys, (int16)mode)
-#define VsetScreen(log, phys, mode, modecode) toscallPPW(XBIOS_TRAP, 5, (void *)log, (void *)phys, (int16)mode)
+#define VsetScreen(log, phys, mode, modecode) toscallPPWW(XBIOS_TRAP, 5, (void *)log, (void *)phys, (int16)mode, (int16)modecode)
 #define Floprd(buf, dummy, dev, sect, track, side, count) toscallPLWWWWW(XBIOS_TRAP, 8, (void *)buf, (int32)dummy, (int16)dev, (int16)sect, (int16)track, (int16)side, (int16)count)
 //#define Mfpint() toscallV(XBIOS_TRAP, 13, )
 #define Rsconf(speed, flow, ucr, rsr, tsr, scr) toscallWWWWWW(XBIOS_TRAP, 15, (int16)speed, (int16)flow, (int16)ucr, (int16)rsr, (int16)tsr, (int16)scr)
@@ -373,6 +400,8 @@ static inline int Bconputs(int16 handle, const char *string)
 #define NVMaccess(op, start, count, buffer) toscallWWWP(XBIOS_TRAP, 46, (int16)op, (int16)start, (int16)count, (char *)buffer)
 #define VsetMode(mode) toscallW(XBIOS_TRAP, 88, (int16)mode)
 #define VgetMonitor() toscallV(XBIOS_TRAP, 89)
+#define mon_type() toscallV(XBIOS_TRAP, 89)
+#define VgetSize(mode) toscallW(XBIOS_TRAP, 91, (int16)mode)
 #define Locksnd() toscallV(XBIOS_TRAP, 128)
 #define Unlocksnd() toscallV(XBIOS_TRAP, 129)
 
