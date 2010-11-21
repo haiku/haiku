@@ -24,37 +24,37 @@ ConfigView::ConfigView(uint32 flags)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	BStringView* fTitle = new BStringView("title", "WebP Images");
-	fTitle->SetFont(be_bold_font);
+	BStringView* title = new BStringView("title", "WebP Images");
+	title->SetFont(be_bold_font);
 
-	char version[256];
-	sprintf(version, "Version %d.%d.%d, %s",
+	char versionString[256];
+	sprintf(versionString, "Version %d.%d.%d, %s",
 		int(B_TRANSLATION_MAJOR_VERSION(WEBP_TRANSLATOR_VERSION)),
 		int(B_TRANSLATION_MINOR_VERSION(WEBP_TRANSLATOR_VERSION)),
 		int(B_TRANSLATION_REVISION_VERSION(WEBP_TRANSLATOR_VERSION)),
 		__DATE__);
-	BStringView* fVersion = new BStringView("version", version);
+	BStringView* version = new BStringView("version", versionString);
 
-	BStringView* fCopyright = new BStringView("copyright",
+	BStringView* copyright = new BStringView("copyright",
 		B_UTF8_COPYRIGHT "2010 Haiku Inc.");
 
-	BStringView* fCopyright2 = new BStringView("copyright2",
+	BStringView* copyright2 = new BStringView("copyright2",
 		"Based on libwebp v0.1");
 
-	BStringView* fCopyright3 = new BStringView("copyright3",
+	BStringView* copyright3 = new BStringView("copyright3",
 		B_UTF8_COPYRIGHT "2010 Google Inc.");
 
 	// Build the layout
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, 7)
-		.Add(fTitle)
+		.Add(title)
 		.AddGlue()
-		.Add(fVersion)
-		.Add(fCopyright)
+		.Add(version)
+		.Add(copyright)
 		.AddGlue()
-		.Add(fCopyright2)
-		.Add(fCopyright3)
+		.Add(copyright2)
+		.Add(copyright3)
 		.AddGlue()
 		.SetInsets(5, 5, 5, 5)
 	);
