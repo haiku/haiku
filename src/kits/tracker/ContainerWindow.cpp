@@ -2517,32 +2517,32 @@ BContainerWindow::ShowContextMenu(BPoint loc, const entry_ref *ref, BView *)
 	if (ref) {
 		// clicked on a pose, show file or volume context menu
 		Model model(ref);
-		
+
 		if (model.IsTrash()) {
 
 			if (fTrashContextMenu->Window() || Dragging())
 				return;
-			
+
 			DeleteSubmenu(fNavigationItem);
-	
+
 			// selected item was trash, show the trash context menu instead
 
 			EnableNamedMenuItem(fTrashContextMenu, kEmptyTrash,
 				static_cast<TTracker *>(be_app)->TrashFull());
-	
+
 			SetupNavigationMenu(ref, fTrashContextMenu);
 			fTrashContextMenu->Go(global, true, true, true);
 		} else {
-		
+
 			bool showAsVolume = false;
 			bool filePanel = PoseView()->IsFilePanel();
-		
+
 			if (Dragging()) {
 				fContextMenu = NULL;
-		
+
 				BEntry entry;
 				model.GetEntry(&entry);
-		
+
 				// only show for directories (directory, volume, root)
 				//
 				// don't show a popup for the trash or printers
@@ -2554,20 +2554,20 @@ BContainerWindow::ShowContextMenu(BPoint loc, const entry_ref *ref, BView *)
 				// SlowContextPopup::AttachedToWindow and
 				// reset in DetachedFromWindow
 				// see the notes in SlowContextPopup::AttachedToWindow
-		
+
 				if (!FSIsPrintersDir(&entry) && !fDragContextMenu->IsShowing()) {
 					// printf("ShowContextMenu - target is %s %i\n", ref->name, IsShowing(ref));
 					fDragContextMenu->ClearMenu();
-		
+
 					// in case the ref is a symlink, resolve it
 					// only pop open for directories
 					BEntry resolvedEntry(ref, true);
 					if (!resolvedEntry.IsDirectory())
 						return;
-		
+
 					entry_ref resolvedRef;
 					resolvedEntry.GetRef(&resolvedRef);
-		
+
 					// use the resolved ref for the menu
 					fDragContextMenu->SetNavDir(&resolvedRef);
 					fDragContextMenu->SetTypesList(fCachedTypesList);
@@ -2578,7 +2578,7 @@ BContainerWindow::ShowContextMenu(BPoint loc, const entry_ref *ref, BView *)
 						fDragContextMenu->InitTrackingHook(
 							&BPoseView::MenuTrackingHook, &target, fDragMessage);
 					}
-		
+
 					// this is now asynchronous so that we don't
 					// deadlock in Window::Quit,
 					fDragContextMenu->Go(global, true, false, true);
@@ -2589,45 +2589,45 @@ BContainerWindow::ShowContextMenu(BPoint loc, const entry_ref *ref, BView *)
 				showAsVolume = true;
 			} else
 				fContextMenu = fFileContextMenu;
-		
+
 			// clean up items from last context menu
-		
+
 			if (fContextMenu) {
 				if (fContextMenu->Window())
 					return;
 				else
 					MenusEnded();
-		
+
 				if (model.InitCheck() == B_OK) { // ??? Do I need this ???
 					if (showAsVolume) {
 						// non-volume enable/disable copy, move, identify
 						EnableNamedMenuItem(fContextMenu, kDuplicateSelection, false);
 						EnableNamedMenuItem(fContextMenu, kMoveToTrash, false);
 						EnableNamedMenuItem(fContextMenu, kIdentifyEntry, false);
-		
+
 						// volume model, enable/disable the Unmount item
 						bool ejectableVolumeSelected = false;
-		
+
 						BVolume boot;
 						BVolumeRoster().GetBootVolume(&boot);
 						BVolume volume;
 						volume.SetTo(model.NodeRef()->device);
 						if (volume != boot)
 							ejectableVolumeSelected = true;
-		
+
 						EnableNamedMenuItem(fContextMenu,
 							B_TRANSLATE("Unmount"),	ejectableVolumeSelected);
 					}
 				}
-		
+
 				SetupNavigationMenu(ref, fContextMenu);
 				if (!showAsVolume && !filePanel) {
 					SetupMoveCopyMenus(ref, fContextMenu);
 					SetupOpenWithMenu(fContextMenu);
 				}
-		
+
 				UpdateMenu(fContextMenu, kPosePopUpContext);
-		
+
 				fContextMenu->Go(global, true, true, true);
 			}
 		}
@@ -3917,6 +3917,8 @@ BContainerWindow::SetSingleWindowBrowseShortcuts(bool enabled)
 			new BMessage(kNavigatorCommandForward), Navigator());
 		AddShortcut(B_UP_ARROW, B_OPTION_KEY | B_COMMAND_KEY,
 			new BMessage(kNavigatorCommandUp), Navigator());
+		AddShortcut(B_DOWN_ARROW, B_OPTION_KEY | B_COMMAND_KEY,
+			new BMessage(kOpenSelection), PoseView());
 
 	} else {
 		RemoveShortcut(B_LEFT_ARROW, B_COMMAND_KEY);
@@ -3927,6 +3929,7 @@ BContainerWindow::SetSingleWindowBrowseShortcuts(bool enabled)
 		RemoveShortcut(B_LEFT_ARROW, B_OPTION_KEY | B_COMMAND_KEY);
 		RemoveShortcut(B_RIGHT_ARROW, B_OPTION_KEY | B_COMMAND_KEY);
 		RemoveShortcut(B_UP_ARROW, B_OPTION_KEY | B_COMMAND_KEY);
+		RemoveShortcut(B_DOWN_ARROW, B_COMMAND_KEY | B_OPTION_KEY);
 			// This also changes meaning, added again below.
 
 		AddShortcut(B_DOWN_ARROW, B_COMMAND_KEY | B_OPTION_KEY,
