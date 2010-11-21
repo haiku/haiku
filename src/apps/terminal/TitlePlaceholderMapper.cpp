@@ -18,7 +18,6 @@ TitlePlaceholderMapper::TitlePlaceholderMapper(
 }
 
 
-#include <stdio.h>
 bool
 TitlePlaceholderMapper::MapPlaceholder(char placeholder, int64 number,
 	bool numberGiven, BString& _string)
