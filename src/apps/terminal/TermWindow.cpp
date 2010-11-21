@@ -293,34 +293,56 @@ TermWindow::_CanClose(int32 index)
 	if (!warnOnExit)
 		return true;
 
-	bool isBusy = false;
-	if (index != -1)
-		isBusy = _TermViewAt(index)->IsShellBusy();
-	else {
+	uint32 busyProcessCount = 0;
+	BString busyProcessNames;
+		// all names, separated by "\n\t"
+
+	if (index != -1) {
+		ActiveProcessInfo info;
+		if (_TermViewAt(index)->GetActiveProcessInfo(info)
+			&& info.ID() != info.ShellProcessID()) {
+			busyProcessCount++;
+			busyProcessNames = info.Name();
+		}
+	} else {
 		for (int32 i = 0; i < fSessions.CountItems(); i++) {
-			if (_TermViewAt(i)->IsShellBusy()) {
-				isBusy = true;
-				break;
+			ActiveProcessInfo info;
+			if (_TermViewAt(i)->GetActiveProcessInfo(info)
+				&& info.ID() != info.ShellProcessID()) {
+				if (++busyProcessCount > 1)
+					busyProcessNames << "\n\t";
+				busyProcessNames << info.Name();
 			}
 		}
 	}
 
-	if (isBusy) {
-		const char* alertMessage = index == -1 || fSessions.CountItems() == 1
-			? B_TRANSLATE("A process is still running.\n"
+	if (busyProcessCount == 0)
+		return true;
+
+	BString alertMessage;
+	if (busyProcessCount == 1) {
+		// Only one pending process. Select the alert text depending on whether
+		// the terminal will be closed.
+		alertMessage = index == -1 || fSessions.CountItems() == 1
+			? B_TRANSLATE("The process \"%1\" is still running.\n"
 				"If you close the Terminal, the process will be killed.")
-			: B_TRANSLATE("A process is still running.\n"
+			: B_TRANSLATE("The process \"%1\" is still running.\n"
 				"If you close the tab, the process will be killed.");
-		BAlert* alert = new BAlert(B_TRANSLATE("Really close?"),
-			alertMessage, B_TRANSLATE("Close"), B_TRANSLATE("Cancel"), NULL,
-			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		alert->SetShortcut(1, B_ESCAPE);
-		int32 result = alert->Go();
-		if (result == 1)
-			return false;
+	} else {
+		// multiple pending processes
+		alertMessage = B_TRANSLATE(
+			"The following processes are still running:\n\n"
+			"\t%1\n\n"
+			"If you close the tab, the processes will be killed.");
 	}
 
-	return true;
+	alertMessage.ReplaceFirst("%1", busyProcessNames);
+
+	BAlert* alert = new BAlert(B_TRANSLATE("Really close?"),
+		alertMessage, B_TRANSLATE("Close"), B_TRANSLATE("Cancel"), NULL,
+		B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+	alert->SetShortcut(1, B_ESCAPE);
+	return alert->Go() == 0;
 }
 
 
