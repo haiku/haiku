@@ -84,7 +84,7 @@ NewFileTypeWindow::NewFileTypeWindow(FileTypesWindow* target,
 
 	// filter out invalid characters that can't be part of a MIME type name
 	BTextView* nameControlTextView = fNameControl->TextView();
-	const char* disallowedCharacters = "/<>@,;:\"()[]?=";
+	const char* disallowedCharacters = "/<>@,;:\"()[]?= ";
 	for (int32 i = 0; disallowedCharacters[i]; i++) {
 		nameControlTextView->DisallowChar(disallowedCharacters[i]);
 	}
