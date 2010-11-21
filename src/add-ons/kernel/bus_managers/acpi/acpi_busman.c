@@ -84,10 +84,10 @@ static void dump_madt() {
 	while (true) {
 		status = AcpiGetTable (ACPI_SIG_MADT, ++madtCount, &madt);
 		if (status != AE_OK) break;
-		
+/*		
 		dprintf("acpi: MADT TABLE:\n");
 		AcpiDmDumpDataTable( madt );
-/*		entry = madt + 44;
+		entry = madt + 44;
 		end = madt + madt->Header.Length;
 		while (entry < end) {
 			dprintf("\t\tType: %d\n", entry->Type);
@@ -303,9 +303,9 @@ remove_notify_handler(acpi_handle device, uint32 handlerType,
 
 
 status_t
-enable_gpe(acpi_handle handle, uint32 gpeNumber, uint32 flags)
+enable_gpe(acpi_handle handle, uint32 gpeNumber)
 {
-	return AcpiEnableGpe(handle, gpeNumber, flags) == AE_OK ? B_OK : B_ERROR;
+	return AcpiEnableGpe(handle, gpeNumber) == AE_OK ? B_OK : B_ERROR;
 }
 
 

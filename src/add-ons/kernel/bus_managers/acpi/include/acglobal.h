@@ -199,6 +199,14 @@ UINT8       ACPI_INIT_GLOBAL (AcpiGbl_EnableAmlDebugObject, FALSE);
  */
 UINT8       ACPI_INIT_GLOBAL (AcpiGbl_CopyDsdtLocally, FALSE);
 
+/*
+ * Optionally truncate I/O addresses to 16 bits. Provides compatibility
+ * with other ACPI implementations. NOTE: During ACPICA initialization,
+ * this value is set to TRUE if any Windows OSI strings have been
+ * requested by the BIOS.
+ */
+UINT8       ACPI_INIT_GLOBAL (AcpiGbl_TruncateIoAddresses, FALSE);
+
 
 /* AcpiGbl_FADT is a local copy of the FADT, converted to a common format. */
 
@@ -206,6 +214,7 @@ ACPI_TABLE_FADT             AcpiGbl_FADT;
 UINT32                      AcpiCurrentGpeCount;
 UINT32                      AcpiGbl_TraceFlags;
 ACPI_NAME                   AcpiGbl_TraceMethodName;
+BOOLEAN                     AcpiGbl_SystemAwakeAndRunning;
 
 #endif
 
@@ -275,6 +284,10 @@ ACPI_EXTERN BOOLEAN                     AcpiGbl_GlobalLockPresent;
 ACPI_EXTERN ACPI_SPINLOCK               AcpiGbl_GpeLock;      /* For GPE data structs and registers */
 ACPI_EXTERN ACPI_SPINLOCK               AcpiGbl_HardwareLock; /* For ACPI H/W except GPE registers */
 
+/* Mutex for _OSI support */
+
+ACPI_EXTERN ACPI_MUTEX                  AcpiGbl_OsiMutex;
+
 /* Reader/Writer lock is used for namespace walk and dynamic table unload */
 
 ACPI_EXTERN ACPI_RW_LOCK                AcpiGbl_NamespaceRwLock;
@@ -303,7 +316,7 @@ ACPI_EXTERN ACPI_INIT_HANDLER           AcpiGbl_InitHandler;
 ACPI_EXTERN ACPI_TABLE_HANDLER          AcpiGbl_TableHandler;
 ACPI_EXTERN void                       *AcpiGbl_TableHandlerContext;
 ACPI_EXTERN ACPI_WALK_STATE            *AcpiGbl_BreakpointWalk;
-
+ACPI_EXTERN ACPI_INTERFACE_HANDLER      AcpiGbl_InterfaceHandler;
 
 /* Owner ID support */
 
@@ -322,8 +335,8 @@ ACPI_EXTERN UINT8                       AcpiGbl_DebuggerConfiguration;
 ACPI_EXTERN BOOLEAN                     AcpiGbl_StepToNextCall;
 ACPI_EXTERN BOOLEAN                     AcpiGbl_AcpiHardwarePresent;
 ACPI_EXTERN BOOLEAN                     AcpiGbl_EventsInitialized;
-ACPI_EXTERN BOOLEAN                     AcpiGbl_SystemAwakeAndRunning;
 ACPI_EXTERN UINT8                       AcpiGbl_OsiData;
+ACPI_EXTERN ACPI_INTERFACE_INFO        *AcpiGbl_SupportedInterfaces;
 
 
 #ifndef DEFINE_ACPI_GLOBALS
@@ -355,6 +368,7 @@ extern const char                      *AcpiGbl_RegionTypes[ACPI_NUM_PREDEFINED_
 ACPI_EXTERN ACPI_MEMORY_LIST           *AcpiGbl_GlobalList;
 ACPI_EXTERN ACPI_MEMORY_LIST           *AcpiGbl_NsNodeList;
 ACPI_EXTERN BOOLEAN                     AcpiGbl_DisplayFinalMemStats;
+ACPI_EXTERN BOOLEAN                     AcpiGbl_DisableMemTracking;
 #endif
 
 
@@ -464,6 +478,7 @@ ACPI_EXTERN UINT8                       AcpiGbl_DbOutputFlags;
 ACPI_EXTERN BOOLEAN                     AcpiGbl_DbOpt_disasm;
 ACPI_EXTERN BOOLEAN                     AcpiGbl_DbOpt_verbose;
 ACPI_EXTERN ACPI_EXTERNAL_LIST         *AcpiGbl_ExternalList;
+ACPI_EXTERN ACPI_EXTERNAL_FILE         *AcpiGbl_ExternalFileList;
 #endif
 
 

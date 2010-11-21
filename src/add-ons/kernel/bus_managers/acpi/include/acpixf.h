@@ -120,7 +120,7 @@
 
 /* Current ACPICA subsystem version in YYYYMMDD format */
 
-#define ACPI_CA_VERSION                 0x20100428
+#define ACPI_CA_VERSION                 0x20101013
 
 #include "actypes.h"
 #include "actbl.h"
@@ -130,6 +130,7 @@
  */
 extern UINT32               AcpiCurrentGpeCount;
 extern ACPI_TABLE_FADT      AcpiGbl_FADT;
+extern BOOLEAN              AcpiGbl_SystemAwakeAndRunning;
 
 /* Runtime configuration of debug print levels */
 
@@ -147,6 +148,7 @@ extern ACPI_NAME            AcpiGbl_TraceMethodName;
 extern UINT32               AcpiGbl_TraceFlags;
 extern UINT8                AcpiGbl_EnableAmlDebugObject;
 extern UINT8                AcpiGbl_CopyDsdtLocally;
+extern UINT8                AcpiGbl_TruncateIoAddresses;
 
 
 /*
@@ -202,9 +204,16 @@ ACPI_STATUS
 AcpiPurgeCachedObjects (
     void);
 
+ACPI_STATUS
+AcpiInstallInterface (
+    ACPI_STRING             InterfaceName);
+
+ACPI_STATUS
+AcpiRemoveInterface (
+    ACPI_STRING             InterfaceName);
 
 /*
- * ACPI Memory managment
+ * ACPI Memory management
  */
 void *
 AcpiAllocate (
@@ -427,6 +436,10 @@ ACPI_STATUS
 AcpiInstallExceptionHandler (
     ACPI_EXCEPTION_HANDLER  Handler);
 
+ACPI_STATUS
+AcpiInstallInterfaceHandler (
+    ACPI_INTERFACE_HANDLER  Handler);
+
 
 /*
  * Event interfaces
@@ -472,19 +485,23 @@ AcpiSetGpe (
 ACPI_STATUS
 AcpiEnableGpe (
     ACPI_HANDLE             GpeDevice,
-    UINT32                  GpeNumber,
-    UINT8                   GpeType);
+    UINT32                  GpeNumber);
 
 ACPI_STATUS
 AcpiDisableGpe (
     ACPI_HANDLE             GpeDevice,
-    UINT32                  GpeNumber,
-    UINT8                   GpeType);
+    UINT32                  GpeNumber);
 
 ACPI_STATUS
 AcpiClearGpe (
     ACPI_HANDLE             GpeDevice,
     UINT32                  GpeNumber);
+
+ACPI_STATUS
+AcpiGpeWakeup (
+    ACPI_HANDLE             GpeDevice,
+    UINT32                  GpeNumber,
+    UINT8                   Action);
 
 ACPI_STATUS
 AcpiGetGpeStatus (

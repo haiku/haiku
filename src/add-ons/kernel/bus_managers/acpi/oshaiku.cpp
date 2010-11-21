@@ -854,27 +854,6 @@ AcpiOsGetTimer()
 
 /******************************************************************************
  *
- * FUNCTION:    AcpiOsValidateInterface
- *
- * PARAMETERS:  interface           - Requested interface to be validated
- *
- * RETURN:      AE_OK if interface is supported, AE_SUPPORT otherwise
- *
- * DESCRIPTION: Match an interface string to the interfaces supported by the
- *              host. Strings originate from an AML call to the _OSI method.
- *
- *****************************************************************************/
-ACPI_STATUS
-AcpiOsValidateInterface(char *interface)
-{
-	DEBUG_FUNCTION_F("interface: \"%s\"", interface);
-	// TODO: This looks unimplemented.
-	return AE_SUPPORT;
-}
-
-
-/******************************************************************************
- *
  * FUNCTION:    AcpiOsReadPciConfiguration
  *
  * PARAMETERS:  pciId               Seg/Bus/Dev
@@ -888,11 +867,9 @@ AcpiOsValidateInterface(char *interface)
  *
  *****************************************************************************/
 ACPI_STATUS
-AcpiOsReadPciConfiguration(ACPI_PCI_ID *pciId, UINT32 reg, void *value,
+AcpiOsReadPciConfiguration(ACPI_PCI_ID *pciId, UINT32 reg, UINT64 *value,
 		UINT32 width)
 {
-	uint32 *val;
-	val = (uint32*)value;
 #ifdef _KERNEL_MODE
 	DEBUG_FUNCTION();
 
@@ -900,7 +877,7 @@ AcpiOsReadPciConfiguration(ACPI_PCI_ID *pciId, UINT32 reg, void *value,
 		case 8:
 		case 16:
 		case 32:
-			*val = gPCIManager->read_pci_config(
+			*value = gPCIManager->read_pci_config(
 				pciId->Bus, pciId->Device, pciId->Function, reg, width / 8);
 			break;
 		default:
@@ -939,13 +916,6 @@ AcpiOsWritePciConfiguration(ACPI_PCI_ID *pciId, UINT32 reg,
 #else
 	return AE_ERROR;
 #endif
-}
-
-
-void
-AcpiOsDerivePciId(ACPI_HANDLE rhandle, ACPI_HANDLE chandle, ACPI_PCI_ID **pciId)
-{
-// TODO: Implement this!
 }
 
 

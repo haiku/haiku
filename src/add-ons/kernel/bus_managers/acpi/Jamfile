@@ -6,45 +6,11 @@ SubDirHdrs [ FDirName $(SUBDIR) include platform ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) pci ] ;
 SubDirCcFlags -fno-pic -D_KERNEL_MODE ;
 
-local events_src =
-	evevent.c
-	evgpe.c
-	evgpeblk.c
-	evgpeinit.c
-	evgpeutil.c
-	evmisc.c
-	evregion.c
-	evrgnini.c
-	evsci.c
-	evxface.c
-	evxfevnt.c
-	evxfregn.c
-	;
-
-local hardware_src =
-	hwacpi.c
-	hwgpe.c
-	hwregs.c
-	hwsleep.c
-	hwtimer.c
-	hwvalid.c
-	hwxface.c
-;
 
 local common_src =
-	dmtable.c
 	dmtbdump.c
 	dmtbinfo.c
-;
-
-local debugger_src =
-	dbdisply.c
-	dbxface.c
-;
-
-local disassembler_src =
-	dmobject.c
-;
+	;
 
 local dispatcher_src =
 	dsfield.c
@@ -60,6 +26,21 @@ local dispatcher_src =
 	dswstate.c
 	;
 
+local events_src =
+	evevent.c
+	evgpe.c
+	evgpeblk.c
+	evgpeinit.c
+	evgpeutil.c
+	evmisc.c
+	evregion.c
+	evrgnini.c
+	evsci.c
+	evxface.c
+	evxfevnt.c
+	evxfregn.c
+	;
+	
 local executer_src =
 	exconfig.c
 	exconvrt.c
@@ -87,17 +68,16 @@ local executer_src =
 	exutils.c
 	;
 
-local parser_src =
-	psargs.c
-	psloop.c
-	psopcode.c
-	psparse.c
-	psscope.c
-	pstree.c
-	psutils.c
-	pswalk.c
-	psxface.c
-	;
+local hardware_src =
+	hwacpi.c
+	hwgpe.c
+	hwpci.c
+	hwregs.c
+	hwsleep.c
+	hwtimer.c
+	hwvalid.c
+	hwxface.c
+;
 
 local namespace_src =
 	nsaccess.c
@@ -119,6 +99,18 @@ local namespace_src =
 	nsxfeval.c
 	nsxfname.c
 	nsxfobj.c
+	;
+
+local parser_src =
+	psargs.c
+	psloop.c
+	psopcode.c
+	psparse.c
+	psscope.c
+	pstree.c
+	psutils.c
+	pswalk.c
+	psxface.c
 	;
 
 local resources_src =
@@ -161,35 +153,38 @@ local utilities_src =
 	utmisc.c
 	utmutex.c
 	utobject.c
+	utosi.c
 	utresrc.c
 	utstate.c
 	uttrack.c
 	utxface.c
+	utxferror.c
 	;
 
 StaticLibrary libacpi_ca.a :
-	$(events_src)
-	$(hardware_src)
+	$(common_src)
+	$(compiler_src)
 	$(dispatcher_src)
+	$(events_src)
 	$(executer_src)
-	$(parser_src)
+	$(hardware_src)
 	$(namespace_src)
+	$(parser_src)
 	$(resources_src)
 	$(tables_src)
 	$(utilities_src)
-	$(common_src)
-	 ;
+	;
 
+SEARCH on [ FGristFiles $(common_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi common ] ;
+SEARCH on [ FGristFiles $(dispatcher_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi dispatcher ] ;
 SEARCH on [ FGristFiles $(events_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi events ] ;
+SEARCH on [ FGristFiles $(executer_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi executer ] ;
 SEARCH on [ FGristFiles $(hardware_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi hardware ] ;
 SEARCH on [ FGristFiles $(namespace_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi namespace ] ;
-SEARCH on [ FGristFiles $(resources_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi resources ] ;
-SEARCH on [ FGristFiles $(tables_src) tbutils.c ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi tables ] ;
-SEARCH on [ FGristFiles $(utilities_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi utilities ] ;
-SEARCH on [ FGristFiles $(dispatcher_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi dispatcher ] ;
-SEARCH on [ FGristFiles $(executer_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi executer ] ;
 SEARCH on [ FGristFiles $(parser_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi parser ] ;
-SEARCH on [ FGristFiles $(common_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi common ] ;
+SEARCH on [ FGristFiles $(resources_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi resources ] ;
+SEARCH on [ FGristFiles $(tables_src) ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi tables ] ;
+SEARCH on [ FGristFiles $(utilities_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi utilities ] ;
 
 KernelAddon acpi :
 	oshaiku.cpp

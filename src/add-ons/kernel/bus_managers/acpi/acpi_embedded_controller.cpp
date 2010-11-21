@@ -374,8 +374,7 @@ embedded_controller_init_driver(device_node* dev, void** _driverCookie)
 	}
 
 	// Enable runtime GPEs for the handler.
-	status = sc->ec_acpi_module->enable_gpe(sc->ec_gpehandle, sc->ec_gpebit,
-		ACPI_GPE_TYPE_RUNTIME);
+	status = sc->ec_acpi_module->enable_gpe(sc->ec_gpehandle, sc->ec_gpebit);
 	if (status != B_OK) {
 		TRACE("AcpiEnableGpe failed.\n");
 		goto error;

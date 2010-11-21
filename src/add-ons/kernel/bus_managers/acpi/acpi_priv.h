@@ -61,8 +61,7 @@ typedef struct acpi_root_info {
 
 	/* GPE Handler */
 
-	status_t	(*enable_gpe)(acpi_handle handle, uint32 gpeNumber,
-					uint32 flags);
+	status_t	(*enable_gpe)(acpi_handle handle, uint32 gpeNumber);
 	status_t	(*set_gpe)(acpi_handle handle, uint32 gpeNumber,
 					uint8 action);
 	status_t	(*install_gpe_handler)(acpi_handle handle, uint32 gpeNumber,
@@ -154,7 +153,7 @@ status_t install_notify_handler(acpi_handle device,	uint32 handlerType,
 status_t remove_notify_handler(acpi_handle device, uint32 handlerType,
 	acpi_notify_handler handler);
 
-status_t enable_gpe(acpi_handle handle, uint32 gpeNumber, uint32 flags);
+status_t enable_gpe(acpi_handle handle, uint32 gpeNumber);
 status_t set_gpe(acpi_handle handle, uint32 gpeNumber, uint8 action);
 status_t install_gpe_handler(acpi_handle handle, uint32 gpeNumber, uint32 type,
 	acpi_event_handler handler, void* data);
