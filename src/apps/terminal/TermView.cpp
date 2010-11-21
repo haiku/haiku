@@ -3052,6 +3052,7 @@ TermView::AboutRequested()
 			"updated by Kian Duffy and others\n\n"
 			"Copyright " B_UTF8_COPYRIGHT "2003-2009, Haiku.\n"),
 		B_TRANSLATE("OK"));
+	alert->SetShortcut(0, B_ESCAPE);
 	if (alert != NULL)
 		alert->Go();
 }

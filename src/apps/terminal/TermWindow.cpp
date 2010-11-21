@@ -314,6 +314,7 @@ TermWindow::_CanClose(int32 index)
 		BAlert* alert = new BAlert(B_TRANSLATE("Really close?"),
 			alertMessage, B_TRANSLATE("Close"), B_TRANSLATE("Cancel"), NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->SetShortcut(1, B_ESCAPE);
 		int32 result = alert->Go();
 		if (result == 1)
 			return false;
@@ -656,6 +657,7 @@ TermWindow::MessageReceived(BMessage *message)
 				BAlert* alert = new BAlert(B_TRANSLATE("Find failed"),
 					errorMsg, B_TRANSLATE("OK"), NULL, NULL,
 					B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+				alert->SetShortcut(0, B_ESCAPE);
 
 				alert->Go();
 				fFindPreviousMenuItem->SetEnabled(false);
@@ -981,9 +983,11 @@ TermWindow::_DoPageSetup()
 void
 TermWindow::_DoPrint()
 {
-	if (!fPrintSettings || (_DoPageSetup() != B_OK)) {
-		(new BAlert(B_TRANSLATE("Cancel"), B_TRANSLATE("Print cancelled."),
-			B_TRANSLATE("OK")))->Go();
+	if (!fPrintSettings || _DoPageSetup() != B_OK) {
+		BAlert* alert = new BAlert(B_TRANSLATE("Cancel"),
+			B_TRANSLATE("Print cancelled."), B_TRANSLATE("OK"));
+		alert->SetShortcut(0, B_ESCAPE);
+		alert->Go();
 		return;
 	}
 
