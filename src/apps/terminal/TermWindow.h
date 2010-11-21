@@ -38,10 +38,12 @@
 
 #include "SmartTabView.h"
 #include "SetTitleDialog.h"
+#include "TerminalRoster.h"
 #include "TermView.h"
 
 
 class Arguments;
+class BFile;
 class BFont;
 class BMenu;
 class BMenuBar;
@@ -51,11 +53,11 @@ class TermViewContainerView;
 
 
 class TermWindow : public BWindow, private SmartTabView::Listener,
-	private TermView::Listener, private SetTitleDialog::Listener {
+	private TermView::Listener, private SetTitleDialog::Listener,
+	private TerminalRoster::Listener {
 public:
-								TermWindow(BRect frame, const BString& title,
-									bool isUserDefinedTitle, int32 windowIndex,
-									uint32 workspaces, Arguments* args);
+								TermWindow(const BString& title,
+									Arguments* args);
 	virtual						~TermWindow();
 
 			void				SessionChanged();
@@ -63,10 +65,15 @@ public:
 protected:
 	virtual bool				QuitRequested();
 	virtual void				MessageReceived(BMessage* message);
-	virtual void				WindowActivated(bool);
+	virtual void				WindowActivated(bool activated);
 	virtual void				MenusBeginning();
 	virtual	void				Zoom(BPoint leftTop, float width, float height);
 	virtual void				FrameResized(float newWidth, float newHeight);
+	virtual void				WorkspacesChanged(uint32 oldWorkspaces,
+									uint32 newWorkspaces);
+	virtual void				WorkspaceActivated(int32 workspace,
+									bool state);
+	virtual void				Minimize(bool minimize);
 
 private:
 	// SmartTabView::Listener
@@ -91,6 +98,9 @@ private:
 									const BString& title,
 									bool titleUserDefined);
 	virtual	void				SetTitleDialogDone(SetTitleDialog* dialog);
+
+	// TerminalRoster::Listener
+	virtual	void				TerminalInfosUpdated(TerminalRoster* roster);
 
 private:
 			struct Title {
@@ -120,12 +130,19 @@ private:
 
 			struct Session;
 
+private:
 			void				_SetTermColors(TermViewContainerView* termView);
 			void				_InitWindow();
 			void				_SetupMenu();
 	static	BMenu*				_MakeEncodingMenu();
 	static	BMenu*				_MakeWindowSizeMenu();
 			void				_UpdateSwitchTerminalsMenuItem();
+
+			status_t			_GetWindowPositionFile(BFile* file,
+									uint32 openMode);
+			status_t			_LoadWindowPosition(BRect* frame,
+									uint32* workspaces);
+			status_t			_SaveWindowPosition();
 
 			void				_GetPreferredFont(BFont &font);
 			status_t			_DoPageSetup();
@@ -160,13 +177,17 @@ private:
 			void				_OpenSetWindowTitleDialog();
 			void				_FinishTitleDialog();
 
+			void				_SwitchTerminal();
+			team_id				_FindSwitchTerminalTarget();
+
 			SessionID			_NewSessionID();
 			int32				_NewSessionIndex();
 
 private:
+			TerminalRoster		fTerminalRoster;
+
 			Title				fTitle;
 			BString				fSessionTitlePattern;
-			int32				fWindowIndex;
 			BMessageRunner		fTitleUpdateRunner;
 
 			BList				fSessions;

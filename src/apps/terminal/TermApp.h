@@ -58,23 +58,7 @@ protected:
 	virtual	void				ArgvReceived(int32 argc, char** argv);
 
 private:
-			status_t			_MakeTermWindow(BRect& frame,
-									uint32 workspaces);
-			status_t			_GetWindowPositionFile(BFile* file,
-									uint32 openMode);
-			status_t			_LoadWindowPosition(BRect* frame,
-									uint32* workspaces);
-			status_t			_SaveWindowPosition(BMessage* message);
-			void				_SwitchTerm();
-			void				_ActivateTermWindow(team_id id);
-			bool				_IsSwitchTarget(team_id id);
-			void				_SanitizeIDs(BMessage* data, uint8* windows,
-									ssize_t length);
-			bool				_UpdateIDs(bool set, uint8* windows,
-									ssize_t maxLength, ssize_t* _length);
-			void				_UpdateRegistration(bool set);
-			void				_UnregisterTerminal();
-			void				_RegisterTerminal();
+			status_t			_MakeTermWindow();
 
 			void				_HandleChildCleanup();
 	static	void				_SigChildHandler(int signal, void* data);
@@ -85,12 +69,8 @@ private:
 private:
 			bool				fStartFullscreen;
 			BString				fWindowTitle;
-			bool				fWindowTitleUserDefined;
-			int32				fWindowNumber;
 
 			BWindow*			fTermWindow;
-			BRect				fTermFrame;
-			uint32				fTermWorkspaces;
 			Arguments*			fArgs;
 };
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2001-2010, Haiku, Inc. All rights reserved.
  * Copyright (c) 2003-2004 Kian Duffy <myob@users.sourceforge.net>
  * Copyright (C) 1998,99 Kazuho Okui and Takashi Murai.
  *
@@ -19,7 +19,6 @@
 #include <Catalog.h>
 #include <Clipboard.h>
 #include <Catalog.h>
-#include <FindDirectory.h>
 #include <InterfaceDefs.h>
 #include <Locale.h>
 #include <NodeInfo.h>
@@ -27,7 +26,6 @@
 #include <Roster.h>
 #include <Screen.h>
 #include <String.h>
-
 
 #include "Arguments.h"
 #include "Globals.h"
@@ -39,9 +37,6 @@
 
 static bool sUsageRequested = false;
 //static bool sGeometryRequested = false;
-
-const ulong MSG_ACTIVATE_TERM = 'msat';
-const ulong MSG_TERM_WINDOW_INFO = 'mtwi';
 
 
 int
@@ -59,29 +54,10 @@ main()
 TermApp::TermApp()
 	: BApplication(TERM_SIGNATURE),
 	fStartFullscreen(false),
-	fWindowTitleUserDefined(false),
-	fWindowNumber(-1),
 	fTermWindow(NULL),
 	fArgs(NULL)
 {
-
 	fArgs = new Arguments(0, NULL);
-
-	fWindowTitle = B_TRANSLATE("Terminal");
-	_RegisterTerminal();
-
-	if (fWindowNumber > 0)
-		fWindowTitle << " " << fWindowNumber;
-
-	if (_LoadWindowPosition(&fTermFrame, &fTermWorkspaces) != B_OK) {
-		int i = fWindowNumber / 16;
-		int j = fWindowNumber % 16;
-		int k = (j * 16) + (i * 64) + 50;
-		int l = (j * 16)  + 50;
-
-		fTermFrame.Set(k, l, k + 50, k + 50);
-		fTermWorkspaces = B_CURRENT_WORKSPACE;
-	}
 }
 
 
@@ -120,7 +96,7 @@ TermApp::ReadyToRun()
 	// init the mouse copy'n'paste clipboard
 	gMouseClipboard = new BClipboard(MOUSE_CLIPBOARD_NAME, true);
 
-	status_t status = _MakeTermWindow(fTermFrame, fTermWorkspaces);
+	status_t status = _MakeTermWindow();
 
 	// failed spawn, print stdout and open alert panel
 	// TODO: This alert does never show up.
@@ -161,9 +137,6 @@ TermApp::QuitRequested()
 void
 TermApp::Quit()
 {
-	if (!sUsageRequested)
-		_UnregisterTerminal();
-
 	BApplication::Quit();
 }
 
@@ -179,25 +152,8 @@ void
 TermApp::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case MENU_SWITCH_TERM:
-			_SwitchTerm();
-			break;
-
 		case MSG_ACTIVATE_TERM:
 			fTermWindow->Activate();
-			break;
-
-		case MSG_TERM_WINDOW_INFO:
-		{
-			BMessage reply(B_REPLY);
-			reply.AddBool("minimized", fTermWindow->IsMinimized());
-			reply.AddInt32("workspaces", fTermWindow->Workspaces());
-			message->SendReply(&reply);
-			break;
-		}
-
-		case MSG_SAVE_WINDOW_POSITION:
-			_SaveWindowPosition(message);
 			break;
 
 		case MSG_CHECK_CHILDREN:
@@ -223,10 +179,8 @@ TermApp::ArgvReceived(int32 argc, char **argv)
 		return;
 	}
 
-	if (fArgs->Title() != NULL) {
+	if (fArgs->Title() != NULL)
 		fWindowTitle = fArgs->Title();
-		fWindowTitleUserDefined = true;
-	}
 
 	fStartFullscreen = fArgs->FullScreen();
 }
@@ -270,102 +224,10 @@ TermApp::RefsReceived(BMessage* message)
 
 
 status_t
-TermApp::_GetWindowPositionFile(BFile* file, uint32 openMode)
-{
-	BPath path;
-	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path, true);
-	if (status != B_OK)
-		return status;
-
-	status = path.Append("Terminal_windows");
-	if (status != B_OK)
-		return status;
-
-	return file->SetTo(path.Path(), openMode);
-}
-
-
-status_t
-TermApp::_LoadWindowPosition(BRect* frame, uint32* workspaces)
-{
-	status_t status;
-	BMessage position;
-
-	BFile file;
-	status = _GetWindowPositionFile(&file, B_READ_ONLY);
-	if (status != B_OK)
-		return status;
-
-	status = position.Unflatten(&file);
-
-	file.Unset();
-
-	if (status != B_OK)
-		return status;
-
-	status = position.FindRect("rect", fWindowNumber - 1, frame);
-	if (status != B_OK)
-		return status;
-
-	int32 _workspaces;
-	status = position.FindInt32("workspaces", fWindowNumber - 1, &_workspaces);
-	if (status != B_OK)
-		return status;
-	if (modifiers() & B_SHIFT_KEY)
-		*workspaces = _workspaces;
-	else
-		*workspaces = B_CURRENT_WORKSPACE;
-
-	return B_OK;
-}
-
-
-status_t
-TermApp::_SaveWindowPosition(BMessage* position)
-{
-	BFile file;
-	BMessage originalSettings;
-
-	// We append ourself to the existing settings file
-	// So we have to read it, insert our BMessage, and rewrite it.
-
-	status_t status = _GetWindowPositionFile(&file, B_READ_ONLY);
-	if (status == B_OK) {
-		originalSettings.Unflatten(&file);
-			// No error checking on that : it fails if the settings
-			// file is missing, but we can create it.
-
-		file.Unset();
-	}
-
-	// Append the new settings
-	BRect rect;
-	position->FindRect("rect", &rect);
-	if (originalSettings.ReplaceRect("rect", fWindowNumber - 1, rect) != B_OK)
-		originalSettings.AddRect("rect", rect);
-
-	int32 workspaces;
-	position->FindInt32("workspaces", &workspaces);
-	if (originalSettings.ReplaceInt32("workspaces", fWindowNumber - 1, workspaces)
-			!= B_OK)
-		originalSettings.AddInt32("workspaces", workspaces);
-
-	// Resave the whole thing
-	status = _GetWindowPositionFile (&file,
-		B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
-	if (status != B_OK)
-		return status;
-
-	return originalSettings.Flatten(&file);
-}
-
-
-status_t
-TermApp::_MakeTermWindow(BRect &frame, uint32 workspaces)
+TermApp::_MakeTermWindow()
 {
 	try {
-		fTermWindow = new TermWindow(frame, fWindowTitle,
-			fWindowTitleUserDefined, fWindowNumber, workspaces, fArgs);
+		fTermWindow = new TermWindow(fWindowTitle, fArgs);
 	} catch (int error) {
 		return (status_t)error;
 	} catch (...) {
@@ -375,240 +237,6 @@ TermApp::_MakeTermWindow(BRect &frame, uint32 workspaces)
 	fTermWindow->Show();
 
 	return B_OK;
-}
-
-
-void
-TermApp::_ActivateTermWindow(team_id id)
-{
-	BMessenger app(TERM_SIGNATURE, id);
-	if (app.IsTargetLocal())
-		fTermWindow->Activate();
-	else
-		app.SendMessage(MSG_ACTIVATE_TERM);
-}
-
-
-void
-TermApp::_SwitchTerm()
-{
-	team_id myId = be_app->Team();
-	BList teams;
-	be_roster->GetAppList(TERM_SIGNATURE, &teams);
-
-	int32 numTerms = teams.CountItems();
-	if (numTerms <= 1)
-		return;
-
-	// Find our position in the app teams.
-	int32 i;
-
-	for (i = 0; i < numTerms; i++) {
-		if (myId == reinterpret_cast<team_id>(teams.ItemAt(i)))
-			break;
-	}
-
-	do {
-		if (--i < 0)
-			i = numTerms - 1;
-	} while (!_IsSwitchTarget(reinterpret_cast<team_id>(teams.ItemAt(i))));
-
-	// Activate switched terminal.
-	_ActivateTermWindow(reinterpret_cast<team_id>(teams.ItemAt(i)));
-}
-
-
-bool
-TermApp::_IsSwitchTarget(team_id id)
-{
-	uint32 currentWorkspace = 1L << current_workspace();
-
-	BMessenger app(TERM_SIGNATURE, id);
-	if (app.IsTargetLocal()) {
-		return !fTermWindow->IsMinimized()
-			&& (fTermWindow->Workspaces() & currentWorkspace) != 0;
-	}
-
-	BMessage reply;
-	if (app.SendMessage(MSG_TERM_WINDOW_INFO, &reply) != B_OK)
-		return false;
-
-	bool minimized;
-	int32 workspaces;
-	if (reply.FindBool("minimized", &minimized) != B_OK
-		|| reply.FindInt32("workspaces", &workspaces) != B_OK)
-		return false;
-
-	return !minimized && (workspaces & currentWorkspace) != 0;
-}
-
-
-/*!	Checks if all teams that have an ID-to-team mapping in the message
-	are still running.
-	The IDs for teams that are gone will be made available again, and
-	their mapping is removed from the message.
-*/
-void
-TermApp::_SanitizeIDs(BMessage* data, uint8* windows, ssize_t length)
-{
-	BList teams;
-	be_roster->GetAppList(TERM_SIGNATURE, &teams);
-
-	for (int32 i = 0; i < length; i++) {
-		if (!windows[i])
-			continue;
-
-		BString id("id-");
-		id << i + 1;
-
-		team_id team;
-		if (data->FindInt32(id.String(), &team) != B_OK)
-			continue;
-
-		if (!teams.HasItem((void*)team)) {
-			windows[i] = false;
-			data->RemoveName(id.String());
-		}
-	}
-}
-
-
-/*!
-	Removes the current fWindowNumber (ID) from the supplied array, or
-	finds a free ID in it, and sets fWindowNumber accordingly.
-*/
-bool
-TermApp::_UpdateIDs(bool set, uint8* windows, ssize_t maxLength,
-	ssize_t* _length)
-{
-	ssize_t length = *_length;
-
-	if (set) {
-		int32 i;
-		for (i = 0; i < length; i++) {
-			if (!windows[i]) {
-				windows[i] = true;
-				fWindowNumber = i + 1;
-				break;
-			}
-		}
-
-		if (i == length) {
-			if (length >= maxLength)
-				return false;
-
-			windows[length] = true;
-			length++;
-			fWindowNumber = length;
-		}
-	} else {
-		// update information and write it back
-		windows[fWindowNumber - 1] = false;
-	}
-
-	*_length = length;
-	return true;
-}
-
-
-void
-TermApp::_UpdateRegistration(bool set)
-{
-	if (set)
-		fWindowNumber = -1;
-	else if (fWindowNumber < 0)
-		return;
-
-#ifdef __HAIKU__
-	// use BClipboard - it supports atomic access in Haiku
-	BClipboard clipboard(TERM_SIGNATURE);
-
-	while (true) {
-		if (!clipboard.Lock())
-			return;
-
-		BMessage* data = clipboard.Data();
-
-		const uint8* windowsData;
-		uint8 windows[512];
-		ssize_t length;
-		if (data->FindData("ids", B_RAW_TYPE,
-				(const void**)&windowsData, &length) != B_OK)
-			length = 0;
-
-		if (length > (ssize_t)sizeof(windows))
-			length = sizeof(windows);
-		if (length > 0)
-			memcpy(windows, windowsData, length);
-
-		_SanitizeIDs(data, windows, length);
-
-		status_t status = B_OK;
-		if (_UpdateIDs(set, windows, sizeof(windows), &length)) {
-			// add/remove our ID-to-team mapping
-			BString id("id-");
-			id << fWindowNumber;
-
-			if (set)
-				data->AddInt32(id.String(), Team());
-			else
-				data->RemoveName(id.String());
-
-			data->RemoveName("ids");
-			//if (data->ReplaceData("ids", B_RAW_TYPE, windows, length) != B_OK)
-			data->AddData("ids", B_RAW_TYPE, windows, length);
-
-			status = clipboard.Commit(true);
-		}
-
-		clipboard.Unlock();
-
-		if (status == B_OK)
-			break;
-	}
-#else	// !__HAIKU__
-	// use a file to store the IDs - unfortunately, locking
-	// doesn't work on BeOS either here
-	int fd = open("/tmp/terminal_ids", O_RDWR | O_CREAT);
-	if (fd < 0)
-		return;
-
-	struct flock lock;
-	lock.l_type = F_WRLCK;
-	lock.l_whence = SEEK_CUR;
-	lock.l_start = 0;
-	lock.l_len = -1;
-	fcntl(fd, F_SETLKW, &lock);
-
-	uint8 windows[512];
-	ssize_t length = read_pos(fd, 0, windows, sizeof(windows));
-	if (length < 0) {
-		close(fd);
-		return;
-	}
-
-	if (length > (ssize_t)sizeof(windows))
-		length = sizeof(windows);
-
-	if (_UpdateIDs(set, windows, sizeof(windows), &length))
-		write_pos(fd, 0, windows, length);
-
-	close(fd);
-#endif	// !__HAIKU__
-}
-
-
-void
-TermApp::_UnregisterTerminal()
-{
-	_UpdateRegistration(false);
-}
-
-
-void
-TermApp::_RegisterTerminal()
-{
-	_UpdateRegistration(true);
 }
 
 

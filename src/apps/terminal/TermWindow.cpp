@@ -19,6 +19,8 @@
 #include <Catalog.h>
 #include <Clipboard.h>
 #include <Dragger.h>
+#include <File.h>
+#include <FindDirectory.h>
 #include <LayoutBuilder.h>
 #include <LayoutUtils.h>
 #include <Locale.h>
@@ -33,6 +35,8 @@
 #include <ScrollBar.h>
 #include <ScrollView.h>
 #include <String.h>
+
+#include <AutoLocker.h>
 
 #include "ActiveProcessInfo.h"
 #include "Arguments.h"
@@ -64,6 +68,7 @@ static const uint32 kEditTabTitle = 'ETti';
 static const uint32 kEditWindowTitle = 'EWti';
 static const uint32 kTabTitleChanged = 'TTch';
 static const uint32 kWindowTitleChanged = 'WTch';
+static const uint32 kUpdateSwitchTerminalsMenuItem = 'Ustm';
 
 
 #undef B_TRANSLATE_CONTEXT
@@ -150,13 +155,10 @@ struct TermWindow::Session {
 // #pragma mark - TermWindow
 
 
-TermWindow::TermWindow(BRect frame, const BString& title,
-	bool isUserDefinedTitle, int32 windowIndex, uint32 workspaces,
-	Arguments* args)
+TermWindow::TermWindow(const BString& title, Arguments* args)
 	:
-	BWindow(frame, title, B_DOCUMENT_WINDOW,
-		B_CURRENT_WORKSPACE | B_QUIT_ON_WINDOW_CLOSE, workspaces),
-	fWindowIndex(windowIndex),
+	BWindow(BRect(0, 0, 0, 0), title, B_DOCUMENT_WINDOW,
+		B_CURRENT_WORKSPACE | B_QUIT_ON_WINDOW_CLOSE),
 	fTitleUpdateRunner(this, BMessage(kUpdateTitles), 1000000),
 	fNextSessionID(0),
 	fTabView(NULL),
@@ -178,27 +180,55 @@ TermWindow::TermWindow(BRect frame, const BString& title,
 	fMatchWord(false),
 	fFullScreen(false)
 {
+	// register this terminal
+	fTerminalRoster.Register(Team(), this);
+	fTerminalRoster.SetListener(this);
+	int32 id = fTerminalRoster.ID();
+
 	// apply the title settings
-	fTitle.title = title;
 	fTitle.pattern = title;
-	fTitle.patternUserDefined = isUserDefinedTitle;
+	if (fTitle.pattern.Length() == 0) {
+		fTitle.pattern = B_TRANSLATE("Terminal");
+
+		if (id >= 0)
+			fTitle.pattern << " " << id + 1;
+
+		fTitle.patternUserDefined = false;
+	} else
+		fTitle.patternUserDefined = true;
+
+	fTitle.title = fTitle.pattern;
+	fTitle.pattern = title;
+
 	_TitleSettingsChanged();
 
+	// get the saved window position and workspaces
+	BRect frame;
+	uint32 workspaces;
+	if (_LoadWindowPosition(&frame, &workspaces) == B_OK) {
+		// apply
+		MoveTo(frame.LeftTop());
+		ResizeTo(frame.Width(), frame.Height());
+		SetWorkspaces(workspaces);
+	} else {
+		// use computed defaults
+		int i = id / 16;
+		int j = id % 16;
+		int k = (j * 16) + (i * 64) + 50;
+		int l = (j * 16)  + 50;
+
+		MoveTo(k, l);
+	}
+
+	// init the GUI and add a tab
 	_InitWindow();
 	_AddTab(args);
-
-	// register as an application roster listener -- we want to know when other
-	// terminals are started and quit, so we can update the our
-	// "Switch Terminals" menu item.
-	be_roster->StartWatching(this);
-
-	_UpdateSwitchTerminalsMenuItem();
 }
 
 
 TermWindow::~TermWindow()
 {
-	be_roster->StopWatching(this);
+	fTerminalRoster.Unregister();
 
 	_FinishTitleDialog();
 
@@ -301,10 +331,7 @@ TermWindow::QuitRequested()
 	if (!_CanClose(-1))
 		return false;
 
-	BMessage position = BMessage(MSG_SAVE_WINDOW_POSITION);
-	position.AddRect("rect", Frame());
-	position.AddInt32("workspaces", Workspaces());
-	be_app->PostMessage(&position);
+	_SaveWindowPosition();
 
 	return BWindow::QuitRequested();
 }
@@ -423,6 +450,98 @@ TermWindow::_SetupMenu()
 	;
 
 	AddChild(fMenuBar);
+
+	_UpdateSwitchTerminalsMenuItem();
+}
+
+
+status_t
+TermWindow::_GetWindowPositionFile(BFile* file, uint32 openMode)
+{
+	BPath path;
+	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path, true);
+	if (status != B_OK)
+		return status;
+
+	status = path.Append("Terminal_windows");
+	if (status != B_OK)
+		return status;
+
+	return file->SetTo(path.Path(), openMode);
+}
+
+
+status_t
+TermWindow::_LoadWindowPosition(BRect* frame, uint32* workspaces)
+{
+	status_t status;
+	BMessage position;
+
+	BFile file;
+	status = _GetWindowPositionFile(&file, B_READ_ONLY);
+	if (status != B_OK)
+		return status;
+
+	status = position.Unflatten(&file);
+
+	file.Unset();
+
+	if (status != B_OK)
+		return status;
+
+	int32 id = fTerminalRoster.ID();
+	status = position.FindRect("rect", id, frame);
+	if (status != B_OK)
+		return status;
+
+	int32 _workspaces;
+	status = position.FindInt32("workspaces", id, &_workspaces);
+	if (status != B_OK)
+		return status;
+	if (modifiers() & B_SHIFT_KEY)
+		*workspaces = _workspaces;
+	else
+		*workspaces = B_CURRENT_WORKSPACE;
+
+	return B_OK;
+}
+
+
+status_t
+TermWindow::_SaveWindowPosition()
+{
+	BFile file;
+	BMessage originalSettings;
+
+	// We append ourself to the existing settings file
+	// So we have to read it, insert our BMessage, and rewrite it.
+
+	status_t status = _GetWindowPositionFile(&file, B_READ_ONLY);
+	if (status == B_OK) {
+		originalSettings.Unflatten(&file);
+			// No error checking on that : it fails if the settings
+			// file is missing, but we can create it.
+
+		file.Unset();
+	}
+
+	// Append the new settings
+	int32 id = fTerminalRoster.ID();
+	BRect rect(Frame());
+	if (originalSettings.ReplaceRect("rect", id, rect) != B_OK)
+		originalSettings.AddRect("rect", rect);
+
+	int32 workspaces = Workspaces();
+	if (originalSettings.ReplaceInt32("workspaces", id, workspaces) != B_OK)
+		originalSettings.AddInt32("workspaces", workspaces);
+
+	// Resave the whole thing
+	status = _GetWindowPositionFile (&file,
+		B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
+	if (status != B_OK)
+		return status;
+
+	return originalSettings.Flatten(&file);
 }
 
 
@@ -472,7 +591,7 @@ TermWindow::MessageReceived(BMessage *message)
 			break;
 
 		case MENU_SWITCH_TERM:
-			be_app->PostMessage(MENU_SWITCH_TERM);
+			_SwitchTerminal();
 			break;
 
 		case MENU_NEW_TERM:
@@ -809,16 +928,9 @@ TermWindow::MessageReceived(BMessage *message)
 			_OpenSetWindowTitleDialog();
 			break;
 
-		case B_SOME_APP_LAUNCHED:
-		case B_SOME_APP_QUIT:
-		{
-			BString signature;
-			if (message->FindString("be:signature", &signature) == B_OK
-				&& signature == TERM_SIGNATURE) {
-				_UpdateSwitchTerminalsMenuItem();
-			}
+		case kUpdateSwitchTerminalsMenuItem:
+			_UpdateSwitchTerminalsMenuItem();
 			break;
-		}
 
 		default:
 			BWindow::MessageReceived(message);
@@ -830,7 +942,8 @@ TermWindow::MessageReceived(BMessage *message)
 void
 TermWindow::WindowActivated(bool activated)
 {
-	BWindow::WindowActivated(activated);
+	if (activated)
+		_UpdateSwitchTerminalsMenuItem();
 }
 
 
@@ -1165,6 +1278,28 @@ TermWindow::FrameResized(float newWidth, float newHeight)
 
 
 void
+TermWindow::WorkspacesChanged(uint32 oldWorkspaces, uint32 newWorkspaces)
+{
+	fTerminalRoster.SetWindowInfo(IsMinimized(), Workspaces());
+}
+
+
+void
+TermWindow::WorkspaceActivated(int32 workspace, bool state)
+{
+	fTerminalRoster.SetWindowInfo(IsMinimized(), Workspaces());
+}
+
+
+void
+TermWindow::Minimize(bool minimize)
+{
+	BWindow::Minimize(minimize);
+	fTerminalRoster.SetWindowInfo(IsMinimized(), Workspaces());
+}
+
+
+void
 TermWindow::TabSelected(SmartTabView* tabView, int32 index)
 {
 	SessionChanged();
@@ -1291,6 +1426,13 @@ TermWindow::SetTitleDialogDone(SetTitleDialog* dialog)
 
 
 void
+TermWindow::TerminalInfosUpdated(TerminalRoster* roster)
+{
+	PostMessage(kUpdateSwitchTerminalsMenuItem);
+}
+
+
+void
 TermWindow::PreviousTermView(TermView* view)
 {
 	_NavigateTab(_IndexOfTermView(view), -1, false);
@@ -1372,12 +1514,7 @@ TermWindow::_MakeWindowSizeMenu()
 void
 TermWindow::_UpdateSwitchTerminalsMenuItem()
 {
-	// get the running Terminal teams
-	BList teams;
-	be_roster->GetAppList(TERM_SIGNATURE, &teams);
-
-	// update the menu item
-	fSwitchTerminalsMenuItem->SetEnabled(teams.CountItems() > 1);
+	fSwitchTerminalsMenuItem->SetEnabled(_FindSwitchTerminalTarget() >= 0);
 }
 
 
@@ -1435,8 +1572,8 @@ TermWindow::_UpdateSessionTitle(int32 index)
 		return;
 
 	// evaluate the window title pattern
-	WindowTitlePlaceholderMapper windowMapper(activeProcessInfo, fWindowIndex,
-		sessionTitle);
+	WindowTitlePlaceholderMapper windowMapper(activeProcessInfo,
+		fTerminalRoster.ID() + 1, sessionTitle);
 	const BString& windowTitle = PatternEvaluator::Evaluate(fTitle.pattern,
 		windowMapper);
 
@@ -1526,6 +1663,60 @@ TermWindow::_FinishTitleDialog()
 		}
 		oldDialog->Unlock();
 		return;
+	}
+}
+
+
+void
+TermWindow::_SwitchTerminal()
+{
+	team_id teamID = _FindSwitchTerminalTarget();
+	if (teamID < 0)
+		return;
+
+	BMessenger app(TERM_SIGNATURE, teamID);
+	app.SendMessage(MSG_ACTIVATE_TERM);
+}
+
+
+team_id
+TermWindow::_FindSwitchTerminalTarget()
+{
+	AutoLocker<TerminalRoster> rosterLocker(fTerminalRoster);
+
+	team_id myTeamID = Team();
+
+	int32 numTerms = fTerminalRoster.CountTerminals();
+	if (numTerms <= 1)
+		return -1;
+
+	// Find our position in the Terminal teams.
+	int32 i;
+
+	for (i = 0; i < numTerms; i++) {
+		if (myTeamID == fTerminalRoster.TerminalAt(i)->team)
+			break;
+	}
+
+	if (i == numTerms) {
+		// we didn't find ourselves -- that shouldn't happen
+		return -1;
+	}
+
+	uint32 currentWorkspace = 1L << current_workspace();
+
+	while (true) {
+		if (--i < 0)
+			i = numTerms - 1;
+
+		const TerminalRoster::Info* info = fTerminalRoster.TerminalAt(i);
+		if (info->team == myTeamID) {
+			// That's ourselves again. We've run through the complete list.
+			return -1;
+		}
+
+		if (!info->minimized && (info->workspaces & currentWorkspace) != 0)
+			return info->team;
 	}
 }
 
