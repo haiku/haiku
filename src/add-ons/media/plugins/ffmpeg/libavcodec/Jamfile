@@ -25,12 +25,13 @@ StaticLibrary libavcodec.a :
 	4xm.c
 	8bps.c
 	8svx.c
-	aac.c
 	aac_ac3_parser.c
 	aac_adtstoasc_bsf.c
 	aac_parser.c
 	aaccoder.c
+	aacdec.c
 	aacenc.c
+	aacps.c
 	aacpsy.c
 	aacsbr.c
 	aactab.c
