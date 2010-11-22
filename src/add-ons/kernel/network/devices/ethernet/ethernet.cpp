@@ -120,7 +120,7 @@ ethernet_init(const char *name, net_device **_device)
 {
 	// make sure this is a device in /dev/net, but not the
 	// networking (userland) stack driver
-	if (strncmp(name, "/dev/net/", 9) || !strcmp(name, "/dev/net/stack")
+	if (strncmp(name, "/dev/net/", 9)
 		|| !strcmp(name, "/dev/net/userland_server"))
 		return B_BAD_VALUE;
 
