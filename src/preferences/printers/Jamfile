@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src preferences print ;
+SubDir HAIKU_TOP src preferences printers ;
 
 UsePrivateHeaders shared print ;
 
@@ -10,14 +10,14 @@ Preference Printers :
 	JobListView.cpp
 	SpoolFolder.cpp
 	TransportMenu.cpp
-	Globals.cpp 
-	: 
-	be 
-	translation 
+	Globals.cpp
+	:
+	be
+	translation
 	libprintutils.a
 	$(TARGET_LIBSUPC++)
 	$(HAIKU_LOCALE_LIBS)
-	: 
+	:
 	Printers.rdef
 	;
 
@@ -30,4 +30,4 @@ DoCatalogs Printers :
 	PrintersWindow.cpp
 	TransportMenu.cpp
 ;
-	
+
