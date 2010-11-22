@@ -1,0 +1,19 @@
+SubDir HAIKU_TOP src add-ons kernel network devices dialup ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+if $(TARGET_PLATFORM) != haiku {
+	UseHeaders [ FStandardOSHeaders ] : true ;
+		# Needed for <support/Errors.h> and maybe other stuff.
+	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
+		# We need the public network headers also when not compiling for Haiku.
+		# Unfortunately we get more than we want, namely all POSIX headers.
+}
+
+UsePrivateKernelHeaders ;
+UsePrivateHeaders net ;
+
+KernelAddon dialup :
+	dialup.cpp
+;
+
