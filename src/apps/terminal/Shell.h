@@ -14,7 +14,7 @@
 #define _SHELL_H
 
 
-#include <SupportDefs.h>
+#include "ShellInfo.h"
 
 
 class ActiveProcessInfo;
@@ -44,7 +44,10 @@ public:
 			status_t			SetAttr(const struct termios& attr);
 
 			int					FD() const;
-			pid_t				ProcessID() const	{ return fProcessID; }
+			pid_t				ProcessID() const
+									{ return fShellInfo.ProcessID(); }
+			const ShellInfo&	Info() const
+									{ return fShellInfo; }
 
 			bool				HasActiveProcesses() const;
 			bool				GetActiveProcessInfo(
@@ -58,6 +61,7 @@ private:
 									const ShellParameters& parameters);
 
 private:
+			ShellInfo			fShellInfo;
 			int					fFd;
 			pid_t				fProcessID;
 			TermParse*			fTermParse;

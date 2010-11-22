@@ -302,17 +302,25 @@ TermWindow::_CanClose(int32 index)
 		// all names, separated by "\n\t"
 
 	if (index != -1) {
+		ShellInfo shellInfo;
 		ActiveProcessInfo info;
-		if (_TermViewAt(index)->GetActiveProcessInfo(info)
-			&& info.ID() != info.ShellProcessID()) {
+		TermView* termView = _TermViewAt(index);
+		if (termView->GetShellInfo(shellInfo)
+			&& termView->GetActiveProcessInfo(info)
+			&& (info.ID() != shellInfo.ProcessID()
+				|| !shellInfo.IsDefaultShell())) {
 			busyProcessCount++;
 			busyProcessNames = info.Name();
 		}
 	} else {
 		for (int32 i = 0; i < fSessions.CountItems(); i++) {
+			ShellInfo shellInfo;
 			ActiveProcessInfo info;
-			if (_TermViewAt(i)->GetActiveProcessInfo(info)
-				&& info.ID() != info.ShellProcessID()) {
+			TermView* termView = _TermViewAt(i);
+			if (termView->GetShellInfo(shellInfo)
+				&& termView->GetActiveProcessInfo(info)
+				&& (info.ID() != shellInfo.ProcessID()
+					|| !shellInfo.IsDefaultShell())) {
 				if (++busyProcessCount > 1)
 					busyProcessNames << "\n\t";
 				busyProcessNames << info.Name();
@@ -1576,15 +1584,20 @@ TermWindow::_UpdateSessionTitle(int32 index)
 	if (session == NULL)
 		return;
 
-	// get the active process info
+	// get the shell and active process infos
+	ShellInfo shellInfo;
 	ActiveProcessInfo activeProcessInfo;
-	if (!_TermViewAt(index)->GetActiveProcessInfo(activeProcessInfo))
+	TermView* termView = _TermViewAt(index);
+	if (!termView->GetShellInfo(shellInfo)
+		|| !termView->GetActiveProcessInfo(activeProcessInfo)) {
 		return;
+	}
 
 	// evaluate the session title pattern
 	BString sessionTitlePattern = session->title.patternUserDefined
 		? session->title.pattern : fSessionTitlePattern;
-	TabTitlePlaceholderMapper tabMapper(activeProcessInfo, session->index);
+	TabTitlePlaceholderMapper tabMapper(shellInfo, activeProcessInfo,
+		session->index);
 	const BString& sessionTitle = PatternEvaluator::Evaluate(
 		sessionTitlePattern, tabMapper);
 
@@ -1602,7 +1615,7 @@ TermWindow::_UpdateSessionTitle(int32 index)
 		return;
 
 	// evaluate the window title pattern
-	WindowTitlePlaceholderMapper windowMapper(activeProcessInfo,
+	WindowTitlePlaceholderMapper windowMapper(shellInfo, activeProcessInfo,
 		fTerminalRoster.ID() + 1, sessionTitle);
 	const BString& windowTitle = PatternEvaluator::Evaluate(fTitle.pattern,
 		windowMapper);

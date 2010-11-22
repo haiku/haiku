@@ -14,15 +14,13 @@ class ActiveProcessInfo {
 public:
 								ActiveProcessInfo();
 
-			void				SetTo(pid_t id, pid_t shellID,
-									const BString& name,
+			void				SetTo(pid_t id, const BString& name,
 									const BString& currentDirectory);
 			void				Unset();
 
 			bool				IsValid() const			{ return fID >= 0; }
 
 			pid_t				ID() const				{ return fID; }
-			pid_t				ShellProcessID() const	{ return fShellID; }
 
 			const BString&		Name() const			{ return fName; }
 			const BString&		CurrentDirectory() const
@@ -30,7 +28,6 @@ public:
 
 private:
 			pid_t				fID;
-			pid_t				fShellID;
 			BString				fName;
 			BString				fCurrentDirectory;
 };

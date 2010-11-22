@@ -10,7 +10,6 @@
 ActiveProcessInfo::ActiveProcessInfo()
 	:
 	fID(-1),
-	fShellID(-1),
 	fName(),
 	fCurrentDirectory()
 {
@@ -18,11 +17,10 @@ ActiveProcessInfo::ActiveProcessInfo()
 
 
 void
-ActiveProcessInfo::SetTo(pid_t id, pid_t shellID, const BString& name,
+ActiveProcessInfo::SetTo(pid_t id, const BString& name,
 	const BString& currentDirectory)
 {
 	fID = id;
-	fShellID = shellID;
 	fName = name;
 	fCurrentDirectory = currentDirectory;
 }
@@ -32,7 +30,6 @@ void
 ActiveProcessInfo::Unset()
 {
 	fID = -1;
-	fShellID = -1;
 	fName = BString();
 	fCurrentDirectory = BString();
 }

@@ -8,6 +8,7 @@
 
 #include "ActiveProcessInfo.h"
 #include "PatternEvaluator.h"
+#include "ShellInfo.h"
 
 
 /*! Class mapping the placeholders common for window and tab titles.
@@ -15,6 +16,7 @@
 class TitlePlaceholderMapper : public PatternEvaluator::PlaceholderMapper {
 public:
 								TitlePlaceholderMapper(
+									const ShellInfo& shellInfo,
 									const ActiveProcessInfo& processInfo);
 
 	virtual	bool				MapPlaceholder(char placeholder,
@@ -22,6 +24,7 @@ public:
 									BString& _string);
 
 private:
+			ShellInfo			fShellInfo;
 			ActiveProcessInfo	fProcessInfo;
 };
 
@@ -29,6 +32,7 @@ private:
 class WindowTitlePlaceholderMapper : public TitlePlaceholderMapper {
 public:
 								WindowTitlePlaceholderMapper(
+									const ShellInfo& shellInfo,
 									const ActiveProcessInfo& processInfo,
 									int32 windowIndex, const BString& tabTitle);
 
@@ -45,6 +49,7 @@ private:
 class TabTitlePlaceholderMapper : public TitlePlaceholderMapper {
 public:
 								TabTitlePlaceholderMapper(
+									const ShellInfo& shellInfo,
 									const ActiveProcessInfo& processInfo,
 									int32 tabIndex);
 

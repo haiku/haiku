@@ -22,6 +22,7 @@ Application Terminal :
 	PrefWindow.cpp
 	SetTitleDialog.cpp
 	Shell.cpp
+	ShellInfo.cpp
 	ShellParameters.cpp
 	SmartTabView.cpp
 	TermApp.cpp

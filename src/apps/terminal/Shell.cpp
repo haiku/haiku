@@ -126,7 +126,6 @@ typedef struct
 Shell::Shell()
 	:
 	fFd(-1),
-	fProcessID(-1),
 	fTermParse(NULL),
 	fAttached(false)
 {
@@ -167,8 +166,8 @@ Shell::Close()
 
 	if (fFd >= 0) {
 		close(fFd);
-		kill(-fProcessID, SIGHUP);
-		fProcessID = -1;
+		kill(-fShellInfo.ProcessID(), SIGHUP);
+		fShellInfo.SetProcessID(-1);
 		int status;
 		wait(&status);
 		fFd = -1;
@@ -244,7 +243,7 @@ bool
 Shell::HasActiveProcesses() const
 {
 	pid_t running = tcgetpgrp(fFd);
-	if (running == fProcessID || running == -1)
+	if (running == fShellInfo.ProcessID() || running == -1)
 		return false;
 
 	return true;
@@ -284,7 +283,7 @@ Shell::GetActiveProcessInfo(ActiveProcessInfo& _info) const
 		return false;
 
 	// set the result
-	_info.SetTo(process, fProcessID, name, cwdPath.Path());
+	_info.SetTo(process, name, cwdPath.Path());
 
 	return true;
 }
@@ -391,6 +390,7 @@ Shell::_Spawn(int row, int col, const ShellParameters& parameters)
 	struct passwd passwdStruct;
 	struct passwd *passwdResult;
 	char stringBuffer[256];
+
 	if (argv == NULL || argc == 0) {
 		if (!getpwuid_r(getuid(), &passwdStruct, stringBuffer,
 				sizeof(stringBuffer), &passwdResult)) {
@@ -399,7 +399,10 @@ Shell::_Spawn(int row, int col, const ShellParameters& parameters)
 
 		argv = defaultArgs;
 		argc = 2;
-	}
+
+		fShellInfo.SetDefaultShell(true);
+	} else
+		fShellInfo.SetDefaultShell(false);
 
 	signal(SIGTTOU, SIG_IGN);
 
@@ -427,14 +430,15 @@ Shell::_Spawn(int row, int col, const ShellParameters& parameters)
 	thread_id terminalThread = find_thread(NULL);
 
 	/* Fork a child process. */
-	if ((fProcessID = fork()) < 0) {
+	fShellInfo.SetProcessID(fork());
+	if (fShellInfo.ProcessID() < 0) {
 		close(master);
 		return B_ERROR;
 	}
 
 	handshake_t handshake;
 
-	if (fProcessID == 0) {
+	if (fShellInfo.ProcessID() == 0) {
 		// Now in child process.
 
 		// close the PTY master side
@@ -595,7 +599,7 @@ Shell::_Spawn(int row, int col, const ShellParameters& parameters)
 				handshake.row = row;
 				handshake.col = col;
 				handshake.status = PTY_WS;
-				send_handshake_message(fProcessID, handshake);
+				send_handshake_message(fShellInfo.ProcessID(), handshake);
 				break;
 		}
 	}

@@ -661,6 +661,19 @@ TermView::GetActiveProcessInfo(ActiveProcessInfo& _info) const
 }
 
 
+bool
+TermView::GetShellInfo(ShellInfo& _info) const
+{
+	if (fShell == NULL) {
+		_info = ShellInfo();
+		return false;
+	}
+
+	_info = fShell->Info();
+	return true;
+}
+
+
 /* static */
 BArchivable *
 TermView::Instantiate(BMessage* data)

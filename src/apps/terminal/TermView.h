@@ -31,6 +31,7 @@ class BStringView;
 class BasicTerminalBuffer;
 class InlineInput;
 class ResizeWindow;
+class ShellInfo;
 class ShellParameters;
 class TermBuffer;
 class TerminalBuffer;
@@ -58,6 +59,7 @@ public:
 			bool			IsShellBusy() const;
 			bool			GetActiveProcessInfo(
 								ActiveProcessInfo& _info) const;
+			bool			GetShellInfo(ShellInfo& _info) const;
 
 			const char*		TerminalName() const;
 
