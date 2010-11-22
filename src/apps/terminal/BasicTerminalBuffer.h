@@ -108,7 +108,7 @@ public:
 			void				InsertCR();
 			void				InsertLF();
 			void				InsertRI();
-			void				InsertTab();
+			void				InsertTab(uint32 attr);
 			void				SetInsertMode(int flag);
 			void				InsertSpace(int32 num);
 			void				InsertLines(int32 numLines);

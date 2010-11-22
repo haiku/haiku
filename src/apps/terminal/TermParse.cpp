@@ -605,7 +605,7 @@ TermParse::EscParse()
 					break;
 
 				case CASE_TAB:
-					fBuffer->InsertTab();
+					fBuffer->InsertTab(fAttr);
 					break;
 
 				case CASE_ESC:

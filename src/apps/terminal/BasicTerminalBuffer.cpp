@@ -656,21 +656,23 @@ BasicTerminalBuffer::InsertRI()
 
 
 void
-BasicTerminalBuffer::InsertTab()
+BasicTerminalBuffer::InsertTab(uint32 attributes)
 {
 	int32 x;
 
 	fSoftWrappedCursor = false;
 
+	// Find the next tab stop
 	for (x = fCursor.x + 1; x < fWidth && !fTabStops[x]; x++)
 		;
+	// Ensure x stayx within the line bounds
 	x = restrict_value(x, 0, fWidth - 1);
 
 	if (x != fCursor.x) {
 		TerminalLine* line = _LineAt(fCursor.y);
 		for (int32 i = fCursor.x; i <= x; i++) {
 			line->cells[i].character = ' ';		
-			line->cells[i].attributes = line->cells[fCursor.x - 1].attributes;
+			line->cells[i].attributes = attributes;
 		}
 		fCursor.x = x;
 		if (line->length < fCursor.x)
