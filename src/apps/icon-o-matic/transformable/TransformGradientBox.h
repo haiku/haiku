@@ -9,18 +9,19 @@
 #define TRANSFORM_GRADIENT_BOX_H
 
 
+#include "IconBuild.h"
 #include "TransformBox.h"
 
 
 class CanvasView;
 
-namespace BPrivate {
-namespace Icon {
+_BEGIN_ICON_NAMESPACE
 	class Gradient;
 	class Shape;
-}
-}
-using namespace BPrivate::Icon;
+_END_ICON_NAMESPACE
+
+_USING_ICON_NAMESPACE
+
 
 class TransformGradientBox : public TransformBox {
  public:

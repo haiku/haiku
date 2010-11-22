@@ -25,7 +25,7 @@ CreateLocaleBackendInstance()
 
 LibbeLocaleBackend::LibbeLocaleBackend()
 {
-	gMutableLocaleRoster->GetSystemCatalog(&systemCatalog);
+	MutableLocaleRoster::Default()->GetSystemCatalog(&systemCatalog);
 }
 
 

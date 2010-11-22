@@ -9,6 +9,9 @@
 #include "BaseDevice.h"
 
 
+namespace BPrivate {
+
+
 class FileDevice : public BaseDevice {
 public:
 							FileDevice();
@@ -50,6 +53,12 @@ private:
 	int						fFD;
 	off_t					fFileSize;
 };
+
+
+} // namespace BPrivate
+
+
+using BPrivate::FileDevice;
 
 
 #endif	// FILE_DEVICE_H

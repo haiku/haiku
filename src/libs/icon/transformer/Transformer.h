@@ -16,9 +16,11 @@
 #	include <SupportDefs.h>
 #endif
 
+#include "IconBuild.h"
 
-namespace BPrivate {
-namespace Icon {
+
+_BEGIN_ICON_NAMESPACE
+
 
 class VertexSource {
  public:
@@ -62,7 +64,8 @@ class Transformer : public VertexSource {
 			VertexSource&		fSource;
 };
 
-}	// namespace Icon
-}	// namespace BPrivate
+
+_END_ICON_NAMESPACE
+
 
 #endif	// TRANSFORMER_H

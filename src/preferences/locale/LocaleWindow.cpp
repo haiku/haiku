@@ -30,7 +30,7 @@
 #include "LanguageListView.h"
 
 
-using BPrivate::gMutableLocaleRoster;
+using BPrivate::MutableLocaleRoster;
 
 
 #undef B_TRANSLATE_CONTEXT
@@ -92,7 +92,8 @@ LocaleWindow::LocaleWindow()
 
 	// Fill the language list from the LocaleRoster data
 	BMessage availableLanguages;
-	if (be_locale_roster->GetAvailableLanguages(&availableLanguages) == B_OK) {
+	if (BLocaleRoster::Default()->GetAvailableLanguages(&availableLanguages)
+			== B_OK) {
 		BString currentID;
 		LanguageListItem* lastAddedCountryItem = NULL;
 
@@ -178,7 +179,7 @@ LocaleWindow::LocaleWindow()
 
 	// get all available formatting conventions (by language)
 	BFormattingConventions defaultConventions;
-	be_locale->GetFormattingConventions(&defaultConventions);
+	BLocale::Default()->GetFormattingConventions(&defaultConventions);
 	BString conventionID;
 	fInitialConventionsItem = NULL;
 	LanguageListItem* lastAddedConventionsItem = NULL;
@@ -387,7 +388,8 @@ LocaleWindow::MessageReceived(BMessage* message)
 				break;
 
 			BFormattingConventions conventions(item->ID());
-			gMutableLocaleRoster->SetDefaultFormattingConventions(conventions);
+			MutableLocaleRoster::Default()->SetDefaultFormattingConventions(
+				conventions);
 
 			_SettingsChanged();
 			fFormatView->Refresh();
@@ -440,7 +442,7 @@ bool
 LocaleWindow::_IsReversible() const
 {
 	BMessage preferredLanguages;
-	be_locale_roster->GetPreferredLanguages(&preferredLanguages);
+	BLocaleRoster::Default()->GetPreferredLanguages(&preferredLanguages);
 
 	return !preferredLanguages.HasSameData(fInitialPreferredLanguages);
 }
@@ -459,7 +461,7 @@ LocaleWindow::_PreferredLanguagesChanged()
 			preferredLanguages.AddString("language", item->ID());
 		index++;
 	}
-	gMutableLocaleRoster->SetPreferredLanguages(&preferredLanguages);
+	MutableLocaleRoster::Default()->SetPreferredLanguages(&preferredLanguages);
 
 	_EnableDisableLanguages();
 }
@@ -495,7 +497,7 @@ void
 LocaleWindow::_Refresh(bool setInitial)
 {
 	BMessage preferredLanguages;
-	be_locale_roster->GetPreferredLanguages(&preferredLanguages);
+	BLocaleRoster::Default()->GetPreferredLanguages(&preferredLanguages);
 	if (setInitial)
 		fInitialPreferredLanguages = preferredLanguages;
 
@@ -574,11 +576,12 @@ LocaleWindow::_Defaults()
 {
 	BMessage preferredLanguages;
 	preferredLanguages.AddString("language", "en");
-	gMutableLocaleRoster->SetPreferredLanguages(&preferredLanguages);
+	MutableLocaleRoster::Default()->SetPreferredLanguages(&preferredLanguages);
 	_SetPreferredLanguages(preferredLanguages);
 
 	BFormattingConventions conventions("en_US");
-	gMutableLocaleRoster->SetDefaultFormattingConventions(conventions);
+	MutableLocaleRoster::Default()->SetDefaultFormattingConventions(
+		conventions);
 
 	fConventionsListView->DeselectAll();
 	if (fDefaultConventionsItem != NULL) {

@@ -11,8 +11,8 @@
 #include <PosixLanginfo.h>
 
 
-using BPrivate::gLocaleBackend;
-using BPrivate::gPosixLanginfo;
+using BPrivate::Libroot::gLocaleBackend;
+using BPrivate::Libroot::gPosixLanginfo;
 
 
 extern "C" char*

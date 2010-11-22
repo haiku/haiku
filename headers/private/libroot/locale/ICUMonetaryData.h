@@ -13,6 +13,7 @@
 
 
 namespace BPrivate {
+namespace Libroot {
 
 
 class ICUMonetaryData : public ICULocaleconvData {
@@ -63,6 +64,7 @@ private:
 };
 
 
+}	// namespace Libroot
 }	// namespace BPrivate
 
 

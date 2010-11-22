@@ -11,9 +11,11 @@
 
 #include <SupportDefs.h>
 
+#include "IconBuild.h"
 
-namespace BPrivate {
-namespace Icon {
+
+_BEGIN_ICON_NAMESPACE
+
 
 extern const uint32 FLAT_ICON_MAGIC;
 
@@ -73,7 +75,8 @@ bool write_coord(LittleEndianBuffer& buffer, float coord);
 bool read_float_24(LittleEndianBuffer& buffer, float& value);
 bool write_float_24(LittleEndianBuffer& buffer, float value);
 
-}	// namespace Icon
-}	// namespace BPrivate
+
+_END_ICON_NAMESPACE
+
 
 #endif	// FLAT_ICON_FORMAT_H

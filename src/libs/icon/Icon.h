@@ -9,6 +9,7 @@
 #define ICON_H
 
 
+#include "IconBuild.h"
 #include "ShapeContainer.h"
 
 #ifdef ICON_O_MATIC
@@ -23,8 +24,8 @@
 class BRect;
 
 
-namespace BPrivate {
-namespace Icon {
+_BEGIN_ICON_NAMESPACE
+
 
 class PathContainer;
 class StyleContainer;
@@ -90,7 +91,8 @@ class Icon {
 #endif
 };
 
-}	// namespace Icon
-}	// namespace BPrivate
+
+_END_ICON_NAMESPACE
+
 
 #endif	// ICON_H

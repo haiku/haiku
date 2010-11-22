@@ -10,17 +10,18 @@
 
 
 #include "Command.h"
+#include "IconBuild.h"
 
 #include <InterfaceDefs.h>
 
 
-namespace BPrivate {
-namespace Icon {
+_BEGIN_ICON_NAMESPACE
 	class Shape;
 	class Style;
-}
-}
-using namespace BPrivate::Icon;
+_END_ICON_NAMESPACE
+
+_USING_ICON_NAMESPACE
+
 
 class AssignStyleCommand : public Command {
  public:

@@ -10,8 +10,8 @@
 // Anti-Grain Geometry - Version 2.2
 // Copyright (C) 2002-2004 Maxim Shemanarev (http://www.antigrain.com)
 //
-// Permission to copy, use, modify, sell and distribute this software 
-// is granted provided this copyright notice appears in all copies. 
+// Permission to copy, use, modify, sell and distribute this software
+// is granted provided this copyright notice appears in all copies.
 // This software is provided "as is" without express or implied
 // warranty, and with no claim as to its suitability for any purpose.
 //
@@ -39,17 +39,18 @@
 #include <agg_path_storage.h>
 #include <agg_rasterizer_scanline_aa.h>
 
+#include "IconBuild.h"
 #include "PathTokenizer.h"
+
 
 class SVGImporter;
 
-namespace BPrivate {
-namespace Icon {
+_BEGIN_ICON_NAMESPACE
 	class Icon;
 	class Transformable;
-}
-}
-using namespace BPrivate::Icon;
+_END_ICON_NAMESPACE
+
+_USING_ICON_NAMESPACE
 
 namespace agg {
 namespace svg {
@@ -159,7 +160,7 @@ class DocumentBuilder {
 									   double x,  double y, bool rel = false);
 			void				curve3(double x, double y, bool rel = false);	// T, t
 			void				curve4(double x1, double y1,					// C, c
-									   double x2, double y2, 
+									   double x2, double y2,
 									   double x,  double y, bool rel = false);
 			void				curve4(double x2, double y2,					// S, s
 									   double x,  double y, bool rel = false);
@@ -181,12 +182,12 @@ class DocumentBuilder {
 
 			void				SetTitle(const char* title);
 			void				SetDimensions(uint32 width, uint32 height, BRect viewBox);
-	
+
 
 			// Call these functions on <g> tag (start_element, end_element respectively)
 			void				push_attr();
 			void				pop_attr();
-		
+
 			// Attribute setting functions.
 			void				fill(const rgba8& f);
 			void				stroke(const rgba8& s);
@@ -203,7 +204,7 @@ class DocumentBuilder {
 			void				line_cap(line_cap_e cap);
 			void				miter_limit(double ml);
 			trans_affine&		transform();
-		
+
 /*			// Make all polygons CCW-oriented
 			void				arrange_orientations()
 			{

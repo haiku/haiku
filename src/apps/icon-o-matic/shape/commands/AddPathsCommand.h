@@ -10,15 +10,16 @@
 
 
 #include "Command.h"
+#include "IconBuild.h"
 
 
-namespace BPrivate {
-namespace Icon {
+_BEGIN_ICON_NAMESPACE
 	class VectorPath;
 	class PathContainer;
-}
-}
-using namespace BPrivate::Icon;
+_END_ICON_NAMESPACE
+
+_USING_ICON_NAMESPACE
+
 
 class AddPathsCommand : public Command {
  public:
@@ -29,7 +30,7 @@ class AddPathsCommand : public Command {
 									bool ownsPaths,
 									int32 index);
 	virtual						~AddPathsCommand();
-	
+
 	virtual	status_t			InitCheck();
 
 	virtual	status_t			Perform();

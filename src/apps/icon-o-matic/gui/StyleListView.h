@@ -20,15 +20,15 @@ class Selection;
 class ShapeStyleListener;
 class StyleListItem;
 
-namespace BPrivate {
-namespace Icon {
+_BEGIN_ICON_NAMESPACE
 	class Shape;
 	class ShapeContainer;
 	class ShapeListener;
 	class Style;
-}
-}
-using namespace BPrivate::Icon;
+_END_ICON_NAMESPACE
+
+_USING_ICON_NAMESPACE
+
 
 class StyleListView : public SimpleListView,
 					  public StyleContainerListener {

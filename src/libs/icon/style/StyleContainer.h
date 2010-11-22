@@ -11,9 +11,11 @@
 
 #include <List.h>
 
+#include "IconBuild.h"
 
-namespace BPrivate {
-namespace Icon {
+
+_BEGIN_ICON_NAMESPACE
+
 
 class Style;
 
@@ -66,7 +68,8 @@ class StyleContainer {
 #endif // ICON_O_MATIC
 };
 
-}	// namespace Icon
-}	// namespace BPrivate
+
+_END_ICON_NAMESPACE
+
 
 #endif	// STYLE_MANAGER_H

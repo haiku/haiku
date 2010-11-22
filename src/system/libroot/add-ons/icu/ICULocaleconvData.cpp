@@ -10,6 +10,7 @@
 
 
 namespace BPrivate {
+namespace Libroot {
 
 
 status_t
@@ -29,4 +30,5 @@ ICULocaleconvData::_SetLocaleconvEntry(const DecimalFormatSymbols* formatSymbols
 }
 
 
+}	// namespace Libroot
 }	// namespace BPrivate

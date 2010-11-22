@@ -89,7 +89,7 @@ CalendarMenuWindow::CalendarMenuWindow(BPoint where)
 	fSuppressFirstClose(true)
 {
 	BPrivate::week_start startOfWeek
-		= (BPrivate::week_start)be_locale->StartOfWeek();
+		= (BPrivate::week_start)BLocale::Default()->StartOfWeek();
 
 	RemoveShortcut('H', B_COMMAND_KEY | B_CONTROL_KEY);
 	AddShortcut('W', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));

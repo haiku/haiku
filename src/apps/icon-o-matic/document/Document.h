@@ -9,20 +9,18 @@
 #define DOCUMENT_H
 
 
+#include "IconBuild.h"
 #include "Observable.h"
 #include "RWLocker.h"
 
 #include <String.h>
 
+
 struct entry_ref;
 
-namespace BPrivate {
-namespace Icon {
-
-class Icon;
-
-}	// namespace Icon
-}	// namespace BPrivate
+_BEGIN_ICON_NAMESPACE
+	class Icon;
+_END_ICON_NAMESPACE
 
 class CommandStack;
 class DocumentSaver;
@@ -51,8 +49,8 @@ class Document : public RWLocker,
 	inline	::DocumentSaver*	ExportSaver() const
 									{ return fExportSaver; }
 
-			void				SetIcon(BPrivate::Icon::Icon* icon);
-	inline	BPrivate::Icon::Icon* Icon() const
+			void				SetIcon(_ICON_NAMESPACE Icon* icon);
+	inline	_ICON_NAMESPACE Icon* Icon() const
 									{ return fIcon; }
 
 			void				MakeEmpty(bool includingSavers = true);
@@ -60,7 +58,7 @@ class Document : public RWLocker,
 			bool				IsEmpty() const;
 
  private:
-			BPrivate::Icon::Icon* fIcon;
+			_ICON_NAMESPACE Icon* fIcon;
 			::CommandStack*		fCommandStack;
 			::Selection*		fSelection;
 

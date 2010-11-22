@@ -49,6 +49,8 @@ public:
 								BLocale(const BLocale& other);
 								~BLocale();
 
+	static	const BLocale*		Default();
+
 			BLocale&			operator=(const BLocale& other);
 
 			status_t			GetCollator(BCollator* collator) const;
@@ -153,10 +155,6 @@ private:
 			BFormattingConventions	fConventions;
 			BLanguage			fLanguage;
 };
-
-
-// global locale object
-extern const BLocale* be_locale;
 
 
 //--- collator short-hands inlines ---

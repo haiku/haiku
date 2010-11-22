@@ -13,6 +13,7 @@
 
 
 namespace BPrivate {
+namespace Libroot {
 
 
 ICUCtypeData::ICUCtypeData()
@@ -192,4 +193,5 @@ ICUCtypeData::GetLanginfo(int index)
 }
 
 
+}	// namespace Libroot
 }	// namespace BPrivate

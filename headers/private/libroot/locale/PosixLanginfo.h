@@ -7,11 +7,13 @@
 
 
 namespace BPrivate {
+namespace Libroot {
 
 
 extern const char* gPosixLanginfo[];
 
 
+}	// namespace Libroot
 }	// namespace BPrivate
 
 

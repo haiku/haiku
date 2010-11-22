@@ -16,8 +16,8 @@
 #include "LocaleBackend.h"
 
 
-using BPrivate::gLocaleBackend;
-using BPrivate::LocaleBackend;
+using BPrivate::Libroot::gLocaleBackend;
+using BPrivate::Libroot::LocaleBackend;
 
 
 static char sStandardTZName[64] 		= { "???" };

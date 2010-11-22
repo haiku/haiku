@@ -21,6 +21,7 @@ extern locale_data* _nl_current_LC_NUMERIC;
 
 
 namespace BPrivate {
+namespace Libroot {
 
 
 LocaleCtypeDataBridge::LocaleCtypeDataBridge()
@@ -89,4 +90,5 @@ LocaleDataBridge::LocaleDataBridge()
 }
 
 
+}	// namespace Libroot
 }	// namespace BPrivate

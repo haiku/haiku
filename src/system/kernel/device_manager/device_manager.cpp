@@ -72,6 +72,10 @@ typedef struct io_resource_info {
 	io_resource			resource;		// info about actual resource
 } io_resource_info;
 
+
+namespace {
+
+
 class Device : public AbstractModuleDevice,
 	public DoublyLinkedListLinkImpl<Device> {
 public:
@@ -94,6 +98,10 @@ private:
 	const char*				fModuleName;
 	bool					fRemovedFromParent;
 };
+
+
+} // unnamed namespace
+
 
 typedef DoublyLinkedList<Device> DeviceList;
 typedef DoublyLinkedList<device_node> NodeList;

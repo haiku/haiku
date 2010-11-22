@@ -10,20 +10,21 @@
 
 
 #include "Command.h"
+#include "IconBuild.h"
 
 
-namespace BPrivate {
-namespace Icon {
+_BEGIN_ICON_NAMESPACE
 	class VectorPath;
-}
-}
-using namespace BPrivate::Icon;
+_END_ICON_NAMESPACE
+
+_USING_ICON_NAMESPACE
+
 
 class PathCommand : public Command {
  public:
 								PathCommand(VectorPath* path);
 	virtual						~PathCommand();
-	
+
 	virtual	status_t			InitCheck();
 	virtual void				GetName(BString& name);
 

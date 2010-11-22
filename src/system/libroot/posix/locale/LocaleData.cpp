@@ -25,6 +25,7 @@
 
 
 namespace BPrivate {
+namespace Libroot {
 
 
 /*
@@ -323,9 +324,10 @@ const char* gPosixLanginfo[_NL_LANGINFO_LAST] = {
 #endif // !_KERNEL_MODE
 
 
+}	// namespace Libroot
 }	// namespace BPrivate
 
 
-const unsigned short* 	__ctype_b 		= &BPrivate::gPosixClassInfo[128];
-const int* 				__ctype_tolower = &BPrivate::gPosixToLowerMap[128];
-const int* 				__ctype_toupper = &BPrivate::gPosixToUpperMap[128];
+const unsigned short* __ctype_b = &BPrivate::Libroot::gPosixClassInfo[128];
+const int* __ctype_tolower = &BPrivate::Libroot::gPosixToLowerMap[128];
+const int* __ctype_toupper = &BPrivate::Libroot::gPosixToUpperMap[128];

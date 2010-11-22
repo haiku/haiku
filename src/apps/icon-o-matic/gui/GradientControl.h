@@ -11,24 +11,23 @@
 
 #include <View.h>
 
-
 #if LIB_LAYOUT
 #	include <layout.h>
 #endif
 
-namespace BPrivate {
-namespace Icon {
+#include "IconBuild.h"
 
-class Gradient;
 
-}	// namespace Icon
-}	// namespace BPrivate
+_BEGIN_ICON_NAMESPACE
+	class Gradient;
+_END_ICON_NAMESPACE
+
 
 enum {
 	MSG_GRADIENT_CONTROL_FOCUS_CHANGED	= 'gcfc',
 };
 
-class GradientControl : 
+class GradientControl :
 						#if LIB_LAYOUT
 						public MView,
 						#endif
@@ -61,9 +60,9 @@ class GradientControl :
 	virtual	void				FrameResized(float width, float height);
 
 								// GradientControl
-			void				SetGradient(const BPrivate::Icon::Gradient*
+			void				SetGradient(const _ICON_NAMESPACE Gradient*
 											gradient);
-			BPrivate::Icon::Gradient* Gradient() const
+			_ICON_NAMESPACE Gradient* Gradient() const
 									{ return fGradient; }
 
 			void				SetCurrentStop(const rgb_color& color);
@@ -81,7 +80,7 @@ class GradientControl :
 			float				_OffsetFor(BPoint where) const;
 			void				_UpdateCurrentColor() const;
 
- 			BPrivate::Icon::Gradient* fGradient;
+ 			_ICON_NAMESPACE Gradient* fGradient;
 			BBitmap*			fGradientBitmap;
 			int32				fDraggingStepIndex;
 			int32				fCurrentStepIndex;

@@ -24,13 +24,13 @@
 
 
 using std::nothrow;
-using namespace BPrivate::Icon;
+_USING_ICON_NAMESPACE
 
 
 // constructor
 Document::Document(const char* name)
 	: RWLocker("document rw lock"),
-	  fIcon(new (nothrow) BPrivate::Icon::Icon()),
+	  fIcon(new (nothrow) _ICON_NAMESPACE Icon()),
 	  fCommandStack(new (nothrow) ::CommandStack()),
 	  fSelection(new (nothrow) ::Selection()),
 
@@ -87,7 +87,7 @@ Document::SetExportSaver(::DocumentSaver* saver)
 
 // SetIcon
 void
-Document::SetIcon(BPrivate::Icon::Icon* icon)
+Document::SetIcon(_ICON_NAMESPACE Icon* icon)
 {
 	if (fIcon == icon)
 		return;
@@ -121,6 +121,6 @@ Document::IsEmpty() const
 {
 	return fIcon->Styles()->CountStyles() == 0
 		&& fIcon->Paths()->CountPaths() == 0
-		&& fIcon->Shapes()->CountShapes() == 0; 
+		&& fIcon->Shapes()->CountShapes() == 0;
 }
 

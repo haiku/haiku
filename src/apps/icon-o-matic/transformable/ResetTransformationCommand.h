@@ -9,14 +9,17 @@
 #ifndef RESET_TRANSFORM_COMMAND_H
 #define RESET_TRANSFORM_COMMAND_H
 
-#include "Command.h"
 
-namespace BPrivate {
-namespace Icon {
+#include "Command.h"
+#include "IconBuild.h"
+
+
+_BEGIN_ICON_NAMESPACE
 	class Transformable;
-}
-}
-using BPrivate::Icon::Transformable;
+_END_ICON_NAMESPACE
+
+_USING_ICON_NAMESPACE
+
 
 class ResetTransformationCommand : public Command {
  public:
@@ -24,7 +27,7 @@ class ResetTransformationCommand : public Command {
 										Transformable** const objects,
 										int32 count);
 	virtual						~ResetTransformationCommand();
-	
+
 	// Command interface
 	virtual	status_t			InitCheck();
 

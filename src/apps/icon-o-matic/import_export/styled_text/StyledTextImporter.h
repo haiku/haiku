@@ -17,16 +17,14 @@ class BShape;
 struct text_run;
 struct text_run_array;
 
-namespace BPrivate {
-namespace Icon {
+_BEGIN_ICON_NAMESPACE
 	class Icon;
 	class Style;
 	class VectorPath;
 	class PathContainer;
 	class ShapeContainer;
 	class StyleContainer;
-}
-}
+_END_ICON_NAMESPACE
 
 struct style_map {
 	text_run *run;
@@ -44,7 +42,7 @@ class StyledTextImporter : public Importer {
 									   const entry_ref* ref);
 
  private:
-			status_t			_Import(Icon* icon, const char *text, 
+			status_t			_Import(Icon* icon, const char *text,
 										text_run_array *runs);
 
 			status_t			_AddStyle(Icon *icon, text_run *run);

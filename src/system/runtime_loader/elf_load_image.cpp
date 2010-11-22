@@ -270,8 +270,8 @@ parse_dynamic_segment(image_t* image)
 			case DT_RELASZ:
 				image->rela_len = d[i].d_un.d_val;
 				break;
-			// TK: procedure linkage table
 			case DT_JMPREL:
+				// procedure linkage table relocations
 				image->pltrel = (struct Elf32_Rel*)
 					(d[i].d_un.d_ptr + image->regions[0].delta);
 				break;
@@ -307,8 +307,31 @@ parse_dynamic_segment(image_t* image)
 			case DT_VERNEEDNUM:
 				image->num_needed_versions = d[i].d_un.d_val;
 				break;
+			case DT_SYMBOLIC:
+				image->flags |= RFLAG_SYMBOLIC;
+				break;
+			case DT_FLAGS:
+			{
+				uint32 flags = d[i].d_un.d_val;
+				if ((flags & DF_SYMBOLIC) != 0)
+					image->flags |= RFLAG_SYMBOLIC;
+				break;
+			}
 			default:
 				continue;
+
+			// TODO: Implement:
+			// DT_RELENT: The size of a DT_REL entry.
+			// DT_RELAENT: The size of a DT_RELA entry.
+			// DT_SYMENT: The size of a symbol table entry.
+			// DT_PLTREL: The type of the PLT relocation entries (DT_JMPREL).
+			// DT_BIND_NOW/DF_BIND_NOW: No lazy binding allowed.
+			// DT_INIT_ARRAY[SZ], DT_FINI_ARRAY[SZ]: Initialization/termination
+			//		function arrays.
+			// DT_PREINIT_ARRAY[SZ]: Preinitialization function array.
+			// DT_RUNPATH: Library search path (supersedes DT_RPATH).
+			// DT_TEXTREL/DF_TEXTREL: Indicates whether text relocations are
+			//		required (for optimization purposes only).
 		}
 	}
 

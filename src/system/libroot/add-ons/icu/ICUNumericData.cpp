@@ -12,6 +12,7 @@
 
 
 namespace BPrivate {
+namespace Libroot {
 
 
 ICUNumericData::ICUNumericData(struct lconv& localeConv)
@@ -123,4 +124,5 @@ ICUNumericData::GetLanginfo(int index)
 }
 
 
+}	// namespace Libroot
 }	// namespace BPrivate

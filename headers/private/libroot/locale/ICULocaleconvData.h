@@ -12,6 +12,7 @@
 
 
 namespace BPrivate {
+namespace Libroot {
 
 
 typedef DecimalFormatSymbols::ENumberFormatSymbol FormatSymbol;
@@ -27,6 +28,7 @@ protected:
 };
 
 
+}	// namespace Libroot
 }	// namespace BPrivate
 
 

@@ -362,7 +362,7 @@ BFormattingConventions::GetName(BString& name,
 	BString displayLanguageID;
 	if (displayLanguage == NULL) {
 		BLanguage defaultLanguage;
-		be_locale->GetLanguage(&defaultLanguage);
+		BLocale::Default()->GetLanguage(&defaultLanguage);
 		displayLanguageID = defaultLanguage.Code();
 	} else {
 		displayLanguageID = displayLanguage->Code();

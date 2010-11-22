@@ -18,6 +18,7 @@
 #include <Autolock.h>
 #include <Catalog.h>
 #include <Collator.h>
+#include <Debug.h>
 #include <DefaultCatalog.h>
 #include <Directory.h>
 #include <Entry.h>
@@ -125,8 +126,6 @@ CatalogAddOnInfo::UnloadIfPossible()
 // #pragma mark - RosterData
 
 
-RosterData gRosterData;
-
 static const char* kPriorityAttr = "ADDON:priority";
 
 static const char* kLanguageField = "language";
@@ -134,10 +133,31 @@ static const char* kLanguageField = "language";
 static const char* kTimezoneField = "timezone";
 static const char* kOffsetField = "offset";
 
+static RosterData sRosterData(BLanguage("en_US"),
+	BFormattingConventions("en_US"));
+
 
 RosterData::RosterData()
 	:
 	fLock("LocaleRosterData"),
+	fAreResourcesLoaded(false)
+{
+	openlog_team("liblocale.so", LOG_PID, LOG_USER);
+#ifndef DEBUG
+	setlogmask_team(LOG_UPTO(LOG_WARNING));
+#endif
+
+	InitializeCatalogAddOns();
+
+	Refresh();
+}
+
+
+RosterData::RosterData(const BLanguage& language,
+	const BFormattingConventions& conventions)
+	:
+	fLock("LocaleRosterData"),
+	fDefaultLocale(&language, &conventions),
 	fAreResourcesLoaded(false)
 {
 	openlog_team("liblocale.so", LOG_PID, LOG_USER);
@@ -157,6 +177,13 @@ RosterData::~RosterData()
 
 	CleanupCatalogAddOns();
 	closelog();
+}
+
+
+/*static*/ RosterData*
+RosterData::Default()
+{
+	return &sRosterData;
 }
 
 
@@ -626,8 +653,7 @@ RosterData::_AddPreferredLanguagesToMessage(BMessage* message) const
 // #pragma mark - MutableLocaleRoster
 
 
-static MutableLocaleRoster gLocaleRoster;
-MutableLocaleRoster* gMutableLocaleRoster = &gLocaleRoster;
+static MutableLocaleRoster sLocaleRoster;
 
 
 MutableLocaleRoster::MutableLocaleRoster()
@@ -640,24 +666,32 @@ MutableLocaleRoster::~MutableLocaleRoster()
 }
 
 
+/*static*/ MutableLocaleRoster*
+MutableLocaleRoster::Default()
+{
+	return &sLocaleRoster;
+}
+
+
 status_t
 MutableLocaleRoster::SetDefaultFormattingConventions(const BFormattingConventions& newFormattingConventions)
 {
-	return gRosterData.SetDefaultFormattingConventions(newFormattingConventions);
+	return RosterData::Default()->SetDefaultFormattingConventions(
+		newFormattingConventions);
 }
 
 
 status_t
 MutableLocaleRoster::SetDefaultTimeZone(const BTimeZone& newZone)
 {
-	return gRosterData.SetDefaultTimeZone(newZone);
+	return RosterData::Default()->SetDefaultTimeZone(newZone);
 }
 
 
 status_t
 MutableLocaleRoster::SetPreferredLanguages(const BMessage* languages)
 {
-	return gRosterData.SetPreferredLanguages(languages);
+	return RosterData::Default()->SetPreferredLanguages(languages);
 }
 
 
@@ -686,14 +720,14 @@ MutableLocaleRoster::CreateCatalog(const char* type, const char* signature,
 	if (!type || !signature || !language)
 		return NULL;
 
-	BAutolock lock(gRosterData.fLock);
+	BAutolock lock(RosterData::Default()->fLock);
 	if (!lock.IsLocked())
 		return NULL;
 
-	int32 count = gRosterData.fCatalogAddOnInfos.CountItems();
+	int32 count = RosterData::Default()->fCatalogAddOnInfos.CountItems();
 	for (int32 i = 0; i < count; ++i) {
-		CatalogAddOnInfo* info
-			= (CatalogAddOnInfo*)gRosterData.fCatalogAddOnInfos.ItemAt(i);
+		CatalogAddOnInfo* info = (CatalogAddOnInfo*)
+			RosterData::Default()->fCatalogAddOnInfos.ItemAt(i);
 		if (info->fName.ICompare(type)!=0 || !info->MakeSureItsLoaded()
 			|| !info->fCreateFunc)
 			continue;
@@ -727,14 +761,14 @@ MutableLocaleRoster::LoadCatalog(const char* signature, const char* language,
 	if (!signature)
 		return NULL;
 
-	BAutolock lock(gRosterData.fLock);
+	BAutolock lock(RosterData::Default()->fLock);
 	if (!lock.IsLocked())
 		return NULL;
 
-	int32 count = gRosterData.fCatalogAddOnInfos.CountItems();
+	int32 count = RosterData::Default()->fCatalogAddOnInfos.CountItems();
 	for (int32 i = 0; i < count; ++i) {
-		CatalogAddOnInfo* info
-			= (CatalogAddOnInfo*)gRosterData.fCatalogAddOnInfos.ItemAt(i);
+		CatalogAddOnInfo* info = (CatalogAddOnInfo*)
+			RosterData::Default()->fCatalogAddOnInfos.ItemAt(i);
 
 		if (!info->MakeSureItsLoaded() || !info->fInstantiateFunc)
 			continue;
@@ -801,14 +835,14 @@ MutableLocaleRoster::LoadEmbeddedCatalog(entry_ref* appOrAddOnRef)
 	if (!appOrAddOnRef)
 		return NULL;
 
-	BAutolock lock(gRosterData.fLock);
+	BAutolock lock(RosterData::Default()->fLock);
 	if (!lock.IsLocked())
 		return NULL;
 
-	int32 count = gRosterData.fCatalogAddOnInfos.CountItems();
+	int32 count = RosterData::Default()->fCatalogAddOnInfos.CountItems();
 	for (int32 i = 0; i < count; ++i) {
-		CatalogAddOnInfo* info
-			= (CatalogAddOnInfo*)gRosterData.fCatalogAddOnInfos.ItemAt(i);
+		CatalogAddOnInfo* info = (CatalogAddOnInfo*)
+			RosterData::Default()->fCatalogAddOnInfos.ItemAt(i);
 
 		if (!info->MakeSureItsLoaded() || !info->fInstantiateEmbeddedFunc)
 			continue;
@@ -837,7 +871,7 @@ MutableLocaleRoster::UnloadCatalog(BCatalogAddOn* catalog)
 	if (!catalog)
 		return B_BAD_VALUE;
 
-	BAutolock lock(gRosterData.fLock);
+	BAutolock lock(RosterData::Default()->fLock);
 	if (!lock.IsLocked())
 		return B_ERROR;
 
@@ -846,10 +880,10 @@ MutableLocaleRoster::UnloadCatalog(BCatalogAddOn* catalog)
 
 	while (catalog) {
 		nextCatalog = catalog->Next();
-		int32 count = gRosterData.fCatalogAddOnInfos.CountItems();
+		int32 count = RosterData::Default()->fCatalogAddOnInfos.CountItems();
 		for (int32 i = 0; i < count; ++i) {
 			CatalogAddOnInfo* info = static_cast<CatalogAddOnInfo*>(
-				gRosterData.fCatalogAddOnInfos.ItemAt(i));
+				RosterData::Default()->fCatalogAddOnInfos.ItemAt(i));
 			if (info->fLoadedCatalogs.HasItem(catalog)) {
 				info->fLoadedCatalogs.RemoveItem(catalog);
 				delete catalog;
@@ -864,8 +898,3 @@ MutableLocaleRoster::UnloadCatalog(BCatalogAddOn* catalog)
 
 
 }	// namespace BPrivate
-
-
-BLocaleRoster* be_locale_roster = &BPrivate::gLocaleRoster;
-
-const BLocale* be_locale = &BPrivate::gRosterData.fDefaultLocale;

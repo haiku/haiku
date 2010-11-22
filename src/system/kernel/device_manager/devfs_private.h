@@ -9,7 +9,12 @@
 #include <SupportDefs.h>
 
 
-class BaseDevice;
+namespace BPrivate {
+	class BaseDevice;
+}
+
+using BPrivate::BaseDevice;
+
 
 status_t devfs_publish_device(const char* path, BaseDevice* device);
 status_t devfs_unpublish_device(BaseDevice* device, bool disconnect);

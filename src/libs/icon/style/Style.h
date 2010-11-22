@@ -14,6 +14,7 @@
 #	include "Observer.h"
 #endif
 
+#include "IconBuild.h"
 #include "IconRenderer.h"
 	// TODO: put GammaTable into its own file
 
@@ -24,8 +25,9 @@
 
 class BMessage;
 
-namespace BPrivate {
-namespace Icon {
+
+_BEGIN_ICON_NAMESPACE
+
 
 class Gradient;
 
@@ -62,9 +64,9 @@ class Style {
 	inline	rgb_color			Color() const
 									{ return fColor; }
 
-			void				SetGradient(const BPrivate::Icon::Gradient*
+			void				SetGradient(const _ICON_NAMESPACE Gradient*
 											gradient);
-			BPrivate::Icon::Gradient* Gradient() const
+			_ICON_NAMESPACE Gradient* Gradient() const
 									{ return fGradient; }
 
 			const agg::rgba8*	Colors() const
@@ -75,7 +77,7 @@ class Style {
 
  private:
 			rgb_color			fColor;
-			BPrivate::Icon::Gradient* fGradient;
+			_ICON_NAMESPACE Gradient* fGradient;
 
 			// hold gradient color array
 			agg::rgba8*			fColors;
@@ -85,9 +87,11 @@ class Style {
 	mutable	bool				fGammaCorrectedColorsValid;
 };
 
-}	// namespace Icon
-}	// namespace BPrivate
 
-using namespace BPrivate::Icon;
+_END_ICON_NAMESPACE
+
+
+_USING_ICON_NAMESPACE
+
 
 #endif	// STYLE_H

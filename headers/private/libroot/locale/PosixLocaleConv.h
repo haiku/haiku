@@ -10,11 +10,13 @@
 
 
 namespace BPrivate {
+namespace Libroot {
 
 
 extern struct lconv gPosixLocaleConv;
 
 
+}	// namespace Libroot
 }	// namespace BPrivate
 
 

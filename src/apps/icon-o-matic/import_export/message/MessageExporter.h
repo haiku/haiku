@@ -14,8 +14,7 @@
 class BMessage;
 class BPositionIO;
 
-namespace BPrivate {
-namespace Icon {
+_BEGIN_ICON_NAMESPACE
 	class Icon;
 	class PathContainer;
 	class Shape;
@@ -23,8 +22,8 @@ namespace Icon {
 	class StyleContainer;
 	class Transformer;
 	class VectorPath;
-}
-}
+_END_ICON_NAMESPACE
+
 
 class MessageExporter : public Exporter {
  public:

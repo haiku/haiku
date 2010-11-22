@@ -13,6 +13,7 @@
 #	include "IconObject.h"
 #	include "Observer.h"
 #endif
+#include "IconBuild.h"
 #include "PathContainer.h"
 #include "PathSource.h"
 #include "Transformable.h"
@@ -22,8 +23,8 @@
 #include <Rect.h>
 
 
-namespace BPrivate {
-namespace Icon {
+_BEGIN_ICON_NAMESPACE
+
 
 class Style;
 
@@ -46,12 +47,12 @@ class ShapeListener {
 
 #ifdef ICON_O_MATIC
 class Shape : public IconObject,
-			  public BPrivate::Icon::Transformable,
+			  public _ICON_NAMESPACE Transformable,
 			  public Observer,	// observing all the paths and the style
 			  public PathContainerListener,
 			  public PathListener {
 #else
-class Shape : public BPrivate::Icon::Transformable {
+class Shape : public _ICON_NAMESPACE Transformable {
 #endif
 
  public:
@@ -164,7 +165,8 @@ class Shape : public BPrivate::Icon::Transformable {
 #endif
 };
 
-}	// namespace Icon
-}	// namespace BPrivate
+
+_END_ICON_NAMESPACE
+
 
 #endif	// SHAPE_H

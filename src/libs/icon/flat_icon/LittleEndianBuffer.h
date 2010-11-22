@@ -11,9 +11,11 @@
 
 #include <SupportDefs.h>
 
+#include "IconBuild.h"
 
-namespace BPrivate {
-namespace Icon {
+
+_BEGIN_ICON_NAMESPACE
+
 
 class LittleEndianBuffer {
  public:
@@ -58,7 +60,8 @@ class LittleEndianBuffer {
 			bool				fOwnsBuffer;
 };
 
-}	// namespace Icon
-}	// namespace BPrivate
+
+_END_ICON_NAMESPACE
+
 
 #endif	// LITTLE_ENDIAN_BUFFER_H

@@ -10,15 +10,16 @@
 
 
 #include "Command.h"
+#include "IconBuild.h"
 
 
-namespace BPrivate {
-namespace Icon {
+_BEGIN_ICON_NAMESPACE
 	class Shape;
 	class Transformer;
-}
-}
-using namespace BPrivate::Icon;
+_END_ICON_NAMESPACE
+
+_USING_ICON_NAMESPACE
+
 
 // TODO: make a templated "remove items" command?
 
@@ -29,7 +30,7 @@ class RemoveTransformersCommand : public Command {
 									const int32* indices,
 									int32 count);
 	virtual						~RemoveTransformersCommand();
-	
+
 	virtual	status_t			InitCheck();
 
 	virtual	status_t			Perform();

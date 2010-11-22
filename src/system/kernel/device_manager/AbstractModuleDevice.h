@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2008-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
@@ -8,6 +8,9 @@
 
 
 #include "BaseDevice.h"
+
+
+namespace BPrivate {
 
 
 class AbstractModuleDevice : public BaseDevice {
@@ -48,6 +51,12 @@ protected:
 	device_module_info*		fDeviceModule;
 	void*					fDeviceData;
 };
+
+
+} // namespace BPrivate
+
+
+using BPrivate::AbstractModuleDevice;
 
 
 #endif	// ABSTRACT_MODULE_DEVICE_H

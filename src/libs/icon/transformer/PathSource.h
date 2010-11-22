@@ -9,14 +9,15 @@
 #define PATH_SOURCE_H
 
 
+#include "IconBuild.h"
 #include "Transformer.h"
 
 #include "agg_path_storage.h"
 #include "agg_conv_curve.h"
 
 
-namespace BPrivate {
-namespace Icon {
+_BEGIN_ICON_NAMESPACE
+
 
 class PathContainer;
 class VectorPath;
@@ -50,7 +51,8 @@ class PathSource : public VertexSource {
 		 	double				fLastTransformerScale;
 };
 
-}	// namespace Icon
-}	// namespace BPrivate
+
+_END_ICON_NAMESPACE
+
 
 #endif	// PATH_SOURCE_H

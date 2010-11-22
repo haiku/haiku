@@ -10,16 +10,18 @@
 
 
 #include "Command.h"
+#include "IconBuild.h"
+
 
 // TODO: make a templated "move items" command?
 
-namespace BPrivate {
-namespace Icon {
+_BEGIN_ICON_NAMESPACE
 	class Style;
 	class StyleContainer;
-}
-}
-using namespace BPrivate::Icon;
+_END_ICON_NAMESPACE
+
+_USING_ICON_NAMESPACE
+
 
 class MoveStylesCommand : public Command {
  public:
@@ -29,7 +31,7 @@ class MoveStylesCommand : public Command {
 									int32 count,
 									int32 toIndex);
 	virtual						~MoveStylesCommand();
-	
+
 	virtual	status_t			InitCheck();
 
 	virtual	status_t			Perform();

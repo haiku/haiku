@@ -13,13 +13,16 @@
 
 #include <agg_trans_affine.h>
 
-namespace BPrivate {
-namespace Icon {
+#include "IconBuild.h"
+
+
+_BEGIN_ICON_NAMESPACE
+
 
 class Transformable : public agg::trans_affine {
  public:
 	enum {
-		matrix_size = 6,	
+		matrix_size = 6,
 	};
 
 								Transformable();
@@ -69,10 +72,12 @@ class Transformable : public agg::trans_affine {
 		// is changed for some reason
 };
 
-} // namespace Icon
-} // namespace BPrivate
 
-using namespace BPrivate::Icon;
+_END_ICON_NAMESPACE
+
+
+_USING_ICON_NAMESPACE
+
 
 #endif // TRANSFORMABLE_H
 

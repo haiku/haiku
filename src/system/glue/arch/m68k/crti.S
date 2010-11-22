@@ -21,10 +21,10 @@
 
 .section .init
 FUNCTION(_init):
-	jsr	_init_before
+	jsr	__haiku_init_before
 	// crtbegin.o stuff comes here
 
 .section .fini
 FUNCTION(_fini):
-	jsr	_term_before
+	jsr	__haiku_term_before
 	// crtbegin.o stuff comes here

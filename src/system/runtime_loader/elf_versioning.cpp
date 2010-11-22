@@ -130,6 +130,7 @@ init_image_version_infos(image_t* image)
 				elf_version_info& info = image->versions[versionIndex];
 				info.hash = definition->vd_hash;
 				info.name = STRING(image, verdaux->vda_name);
+				info.file_name = NULL;
 			}
 
 			definition = (Elf32_Verdef*)

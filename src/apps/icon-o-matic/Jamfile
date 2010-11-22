@@ -4,10 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 # defines (get all the extra stuff in from libicon.a classes)
-local defines = [ FDefines ICON_O_MATIC=1 ] ;
-
-SubDirCcFlags $(defines) ;
-SubDirC++Flags $(defines) ;
+DEFINES = ICON_O_MATIC=1 ;
 
 # libicon.a source directories
 local iconSourceDirs =

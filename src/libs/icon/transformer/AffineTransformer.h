@@ -9,14 +9,15 @@
 #define AFFINE_TRANSFORMER_H
 
 
+#include "IconBuild.h"
 #include "Transformer.h"
 
 #include <agg_conv_transform.h>
 #include <agg_trans_affine.h>
 
 
-namespace BPrivate {
-namespace Icon {
+_BEGIN_ICON_NAMESPACE
+
 
 typedef agg::conv_transform<VertexSource,
 							agg::trans_affine>	Affine;
@@ -57,7 +58,8 @@ class AffineTransformer : public Transformer,
 #endif
 };
 
-}	// namespace Icon
-}	// namespace BPrivate
+
+_END_ICON_NAMESPACE
+
 
 #endif	// AFFINE_TRANSFORMER_H

@@ -40,7 +40,7 @@ LanguageListItem::LanguageListItem(const char* text, const char* id,
 	fCode(code)
 {
 	fIcon = new(std::nothrow) BBitmap(BRect(0, 0, 15, 15), B_RGBA32);
-	if (fIcon != NULL && be_locale_roster->GetFlagIconForCountry(fIcon,
+	if (fIcon != NULL && BLocaleRoster::Default()->GetFlagIconForCountry(fIcon,
 			countryCode) != B_OK) {
 		delete fIcon;
 		fIcon = NULL;

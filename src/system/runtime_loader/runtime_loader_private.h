@@ -39,6 +39,9 @@
 	} while (false)
 
 
+struct SymbolLookupCache;
+
+
 extern struct user_space_program_args* gProgramArgs;
 extern struct rld_export gRuntimeLoader;
 extern char* (*gGetEnv)(const char* name);
@@ -69,7 +72,7 @@ status_t get_library_symbol(void* handle, void* caller, const char* symbolName,
 status_t get_next_image_dependency(image_id id, uint32* cookie,
 	const char** _name);
 int resolve_symbol(image_t* rootImage, image_t* image, struct Elf32_Sym* sym,
-	addr_t* sym_addr);
+	SymbolLookupCache* cache, addr_t* sym_addr);
 
 
 status_t elf_verify_header(void* header, int32 length);
@@ -80,7 +83,8 @@ status_t elf_reinit_after_fork(void);
 status_t heap_init(void);
 
 // arch dependent prototypes
-status_t arch_relocate_image(image_t* rootImage, image_t* image);
+status_t arch_relocate_image(image_t* rootImage, image_t* image,
+	SymbolLookupCache* cache);
 
 #ifdef __cplusplus
 }

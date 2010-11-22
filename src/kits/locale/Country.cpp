@@ -83,7 +83,7 @@ BCountry::GetName(BString& name, const BLanguage* displayLanguage) const
 	BString appLanguage;
 	if (displayLanguage == NULL) {
 		BMessage preferredLanguage;
-		be_locale_roster->GetPreferredLanguages(&preferredLanguage);
+		BLocaleRoster::Default()->GetPreferredLanguages(&preferredLanguage);
 		preferredLanguage.FindString("language", 0, &appLanguage);
 	} else {
 		appLanguage = displayLanguage->Code();
@@ -112,13 +112,14 @@ BCountry::GetIcon(BBitmap* result) const
 	const char* code = fICULocale->getCountry();
 	if (code == NULL)
 		return  B_ERROR;
-	return be_locale_roster->GetFlagIconForCountry(result, code);
+	return BLocaleRoster::Default()->GetFlagIconForCountry(result, code);
 }
 
 
 status_t
 BCountry::GetAvailableTimeZones(BMessage* timeZones) const
 {
-	return be_locale_roster->GetAvailableTimeZonesForCountry(timeZones, Code());
+	return BLocaleRoster::Default()->GetAvailableTimeZonesForCountry(timeZones,
+		Code());
 }
 

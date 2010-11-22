@@ -277,9 +277,10 @@ void
 TTimeEdit::_UpdateFields()
 {
 	time_t time = fTime.Time_t();
-	be_locale->FormatTime(&fText, fFieldPositions, fFieldPosCount, time,
+	BLocale::Default()->FormatTime(&fText, fFieldPositions, fFieldPosCount,
+		time, B_MEDIUM_TIME_FORMAT);
+	BLocale::Default()->GetTimeFields(fFields, fFieldCount,
 		B_MEDIUM_TIME_FORMAT);
-	be_locale->GetTimeFields(fFields, fFieldCount, B_MEDIUM_TIME_FORMAT);
 }
 
 
@@ -676,9 +677,10 @@ void
 TDateEdit::_UpdateFields()
 {
 	time_t time = BDateTime(fDate, BTime()).Time_t();
-	be_locale->FormatDate(&fText, fFieldPositions, fFieldPosCount, time,
+	BLocale::Default()->FormatDate(&fText, fFieldPositions, fFieldPosCount,
+		time, B_SHORT_DATE_FORMAT);
+	BLocale::Default()->GetDateFields(fFields, fFieldCount,
 		B_SHORT_DATE_FORMAT);
-	be_locale->GetDateFields(fFields, fFieldCount, B_SHORT_DATE_FORMAT);
 }
 
 

@@ -180,23 +180,23 @@ TranslationComparator(const void* left, const void* right)
 
 	BLanguage* language;
 	BString leftName;
-	if (be_locale_roster->GetLanguage(leftTranslation->languageCode, &language)
-			== B_OK) {
+	if (BLocaleRoster::Default()->GetLanguage(leftTranslation->languageCode,
+			&language) == B_OK) {
 		language->GetName(leftName);
 		delete language;
 	} else
 		leftName = leftTranslation->languageCode;
 
 	BString rightName;
-	if (be_locale_roster->GetLanguage(rightTranslation->languageCode, &language)
-			== B_OK) {
+	if (BLocaleRoster::Default()->GetLanguage(rightTranslation->languageCode,
+			&language) == B_OK) {
 		language->GetName(rightName);
 		delete language;
 	} else
 		rightName = rightTranslation->languageCode;
 
 	BCollator collator;
-	be_locale->GetCollator(&collator);
+	BLocale::Default()->GetCollator(&collator);
 	return collator.Compare(leftName.String(), rightName.String());
 }
 
@@ -1105,8 +1105,8 @@ AboutView::_CreateCreditsView()
 			= *(const Translation*)sortedTranslations.ItemAt(i);
 
 		langName.Truncate(0);
-		if (be_locale_roster->GetLanguage(translation.languageCode, &lang)
-			== B_OK) {
+		if (BLocaleRoster::Default()->GetLanguage(translation.languageCode,
+				&lang) == B_OK) {
 			lang->GetName(langName);
 			delete lang;
 		} else {

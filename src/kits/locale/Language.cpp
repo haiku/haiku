@@ -130,7 +130,7 @@ BLanguage::GetName(BString& name, const BLanguage* displayLanguage) const
 	BString appLanguage;
 	if (displayLanguage == NULL) {
 		BMessage preferredLanguage;
-		be_locale_roster->GetPreferredLanguages(&preferredLanguage);
+		BLocaleRoster::Default()->GetPreferredLanguages(&preferredLanguage);
 		preferredLanguage.FindString("language", 0, &appLanguage);
 	} else {
 		appLanguage = displayLanguage->Code();

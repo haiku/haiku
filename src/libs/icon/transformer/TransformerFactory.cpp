@@ -17,7 +17,8 @@
 # include <Message.h>
 #endif
 
-using namespace BPrivate::Icon;
+
+_USING_ICON_NAMESPACE
 
 
 // TransformerFor

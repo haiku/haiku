@@ -9,18 +9,19 @@
 #define TRANSFORM_POINTS_COMMAND_H
 
 
+#include "IconBuild.h"
 #include "TransformBox.h"
 #include "TransformCommand.h"
 
 
-namespace BPrivate {
-namespace Icon {
+_BEGIN_ICON_NAMESPACE
 	struct control_point;
 	class Transformable;
 	class VectorPath;
-}
-}
-using namespace BPrivate::Icon;
+_END_ICON_NAMESPACE
+
+_USING_ICON_NAMESPACE
+
 
 class TransformPointsCommand : public TransformCommand,
 							   public TransformBoxListener {
@@ -42,7 +43,7 @@ class TransformPointsCommand : public TransformCommand,
 										const char* name,
 										int32 nameIndex);
 	virtual						~TransformPointsCommand();
-	
+
 	// Command interface
 	virtual	status_t			InitCheck();
 

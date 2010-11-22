@@ -10,15 +10,16 @@
 
 
 #include "Command.h"
+#include "IconBuild.h"
 
 
-namespace BPrivate {
-namespace Icon {
+_BEGIN_ICON_NAMESPACE
 	class Shape;
 	class Transformable;
-}
-}
-using namespace BPrivate::Icon;
+_END_ICON_NAMESPACE
+
+_USING_ICON_NAMESPACE
+
 
 class FreezeTransformationCommand : public Command {
  public:
@@ -26,7 +27,7 @@ class FreezeTransformationCommand : public Command {
 									Shape** const shapes,
 									int32 count);
 	virtual						~FreezeTransformationCommand();
-	
+
 	virtual	status_t			InitCheck();
 
 	virtual	status_t			Perform();

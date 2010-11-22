@@ -10,15 +10,16 @@
 
 
 #include "Command.h"
+#include "IconBuild.h"
 
 
-namespace BPrivate {
-namespace Icon {
+_BEGIN_ICON_NAMESPACE
 	class Shape;
 	class Transformer;
-}
-}
-using namespace BPrivate::Icon;
+_END_ICON_NAMESPACE
+
+_USING_ICON_NAMESPACE
+
 
 // TODO: make a templated "add items" command?
 
@@ -30,7 +31,7 @@ class AddTransformersCommand : public Command {
 									int32 count,
 									int32 index);
 	virtual						~AddTransformersCommand();
-	
+
 	virtual	status_t			InitCheck();
 
 	virtual	status_t			Perform();

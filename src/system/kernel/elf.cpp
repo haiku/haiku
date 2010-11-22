@@ -901,6 +901,7 @@ init_image_version_infos(elf_image_info* image)
 				elf_version_info& info = image->versions[versionIndex];
 				info.hash = definition->vd_hash;
 				info.name = STRING(image, verdaux->vda_name);
+				info.file_name = NULL;
 			}
 
 			definition = (Elf32_Verdef*)
@@ -972,68 +973,62 @@ status_t
 elf_resolve_symbol(struct elf_image_info *image, struct Elf32_Sym *symbol,
 	struct elf_image_info *sharedImage, addr_t *_symbolAddress)
 {
-	switch (symbol->st_shndx) {
-		case SHN_UNDEF:
-		{
-			struct Elf32_Sym *newSymbol;
-			const char *symbolName = SYMNAME(image, symbol);
+	// Local symbols references are always resolved to the given symbol.
+	if (ELF32_ST_BIND(symbol->st_info) == STB_LOCAL) {
+		*_symbolAddress = symbol->st_value + image->text_region.delta;
+		return B_OK;
+	}
 
-			// get the version info
-			const elf_version_info* versionInfo = NULL;
-			if (image->symbol_versions != NULL) {
-				uint32 index = symbol - image->syms;
-				uint32 versionIndex = VER_NDX(image->symbol_versions[index]);
-				if (versionIndex >= VER_NDX_INITIAL)
-					versionInfo = image->versions + versionIndex;
-			}
+	// Non-local symbols we try to resolve to the kernel image first.
+	const char *symbolName = SYMNAME(image, symbol);
 
-			// it's undefined, must be outside this image, try the other image
-			newSymbol = elf_find_symbol(sharedImage, symbolName, versionInfo,
-				false);
-			if (newSymbol == NULL) {
-				// Weak undefined symbols get a value of 0, if unresolved.
-				if (ELF32_ST_BIND(symbol->st_info) == STB_WEAK) {
-					*_symbolAddress = 0;
-					return B_OK;
-				}
+	// get the version info
+	const elf_version_info* versionInfo = NULL;
+	if (image->symbol_versions != NULL) {
+		uint32 index = symbol - image->syms;
+		uint32 versionIndex = VER_NDX(image->symbol_versions[index]);
+		if (versionIndex >= VER_NDX_INITIAL)
+			versionInfo = image->versions + versionIndex;
+	}
 
-				dprintf("\"%s\": could not resolve symbol '%s'\n",
-					image->name, symbolName);
-				return B_MISSING_SYMBOL;
-			}
+	// find the symbol
+	elf_image_info* foundImage = sharedImage;
+	struct Elf32_Sym* foundSymbol = elf_find_symbol(sharedImage, symbolName,
+		versionInfo, false);
+	if (foundSymbol == NULL) {
+		// not found yet, try to resolve in the requesting image
+		foundImage = image;
+		foundSymbol = elf_find_symbol(image, symbolName, versionInfo, false);
+	}
 
-			// make sure they're the same type
-			if (ELF32_ST_TYPE(symbol->st_info)
-					!= ELF32_ST_TYPE(newSymbol->st_info)) {
-				dprintf("elf_resolve_symbol: found symbol '%s' in shared image "
-					"but wrong type\n", symbolName);
-				return B_MISSING_SYMBOL;
-			}
-
-			if (ELF32_ST_BIND(newSymbol->st_info) != STB_GLOBAL
-				&& ELF32_ST_BIND(newSymbol->st_info) != STB_WEAK) {
-				TRACE(("elf_resolve_symbol: found symbol '%s' but not "
-					"exported\n", symbolName));
-				return B_MISSING_SYMBOL;
-			}
-
-			*_symbolAddress = newSymbol->st_value
-				+ sharedImage->text_region.delta;
+	if (foundSymbol == NULL) {
+		// Weak undefined symbols get a value of 0, if unresolved.
+		if (ELF32_ST_BIND(symbol->st_info) == STB_WEAK) {
+			*_symbolAddress = 0;
 			return B_OK;
 		}
-		case SHN_ABS:
-			*_symbolAddress = symbol->st_value;
-			return B_OK;
-		case SHN_COMMON:
-			// ToDo: finish this
-			TRACE(("elf_resolve_symbol: COMMON symbol, finish me!\n"));
-			return B_ERROR;
 
-		default:
-			// standard symbol
-			*_symbolAddress = symbol->st_value + image->text_region.delta;
-			return B_OK;
+		dprintf("\"%s\": could not resolve symbol '%s'\n", image->name,
+			symbolName);
+		return B_MISSING_SYMBOL;
 	}
+
+	// make sure they're the same type
+	if (ELF32_ST_TYPE(symbol->st_info) != ELF32_ST_TYPE(foundSymbol->st_info)) {
+		dprintf("elf_resolve_symbol: found symbol '%s' in shared image "
+			"but wrong type\n", symbolName);
+		return B_MISSING_SYMBOL;
+	}
+
+	if (ELF32_ST_BIND(foundSymbol->st_info) != STB_GLOBAL
+		&& ELF32_ST_BIND(foundSymbol->st_info) != STB_WEAK) {
+		TRACE(("elf_resolve_symbol: found symbol '%s' but not exported\n",
+			symbolName));
+		return B_MISSING_SYMBOL;
+	}
+
+	*_symbolAddress = foundSymbol->st_value + foundImage->text_region.delta;
+	return B_OK;
 }
 
 
@@ -1043,7 +1038,7 @@ elf_relocate(struct elf_image_info *image)
 {
 	int status = B_NO_ERROR;
 
-	TRACE(("top of elf_relocate\n"));
+	TRACE(("elf_relocate(%p (\"%s\"))\n", image, image->name));
 
 	// deal with the rels first
 	if (image->rel) {

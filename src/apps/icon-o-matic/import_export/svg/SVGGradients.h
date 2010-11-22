@@ -15,11 +15,12 @@
 #include <Message.h>
 #include <String.h>
 
-namespace BPrivate {
-namespace Icon {
+#include "IconBuild.h"
+
+
+_BEGIN_ICON_NAMESPACE
 	class Gradient;
-}
-}
+_END_ICON_NAMESPACE
 
 namespace agg {
 namespace svg {

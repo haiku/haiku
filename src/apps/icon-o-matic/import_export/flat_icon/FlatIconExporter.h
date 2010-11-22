@@ -16,18 +16,15 @@ class BMessage;
 class BNode;
 class BPositionIO;
 
-namespace BPrivate {
-namespace Icon {
+_BEGIN_ICON_NAMESPACE
+	class Gradient;
+	class LittleEndianBuffer;
+	class PathContainer;
+	class ShapeContainer;
+	class StyleContainer;
+	class VectorPath;
+_END_ICON_NAMESPACE
 
-class Gradient;
-class LittleEndianBuffer;
-class PathContainer;
-class ShapeContainer;
-class StyleContainer;
-class VectorPath;
-
-}	// namespace Icon
-}	// namespace BPrivate
 
 #define PRINT_STATISTICS 1
 
@@ -86,7 +83,7 @@ class FlatIconExporter : public Exporter {
 											 int32& straightCount,
 											 int32& lineCount,
 											 int32& curveCount);
-			 
+
 #if PRINT_STATISTICS
 			int32				fStyleSectionSize;
 			int32				fGradientSize;

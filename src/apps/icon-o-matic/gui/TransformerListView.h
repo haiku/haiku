@@ -18,11 +18,10 @@ class CommandStack;
 class TransformerItem;
 class Selection;
 
-namespace BPrivate {
-namespace Icon {
+_BEGIN_ICON_NAMESPACE
 	class Transformer;
-}
-}
+_END_ICON_NAMESPACE
+
 
 class TransformerListView : public SimpleListView,
 							public ShapeListener {

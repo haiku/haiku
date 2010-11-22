@@ -9,13 +9,14 @@
 #define CONTOUR_TRANSFORMER_H
 
 
+#include "IconBuild.h"
 #include "Transformer.h"
 
 #include <agg_conv_contour.h>
 
 
-namespace BPrivate {
-namespace Icon {
+_BEGIN_ICON_NAMESPACE
+
 
 typedef agg::conv_contour<VertexSource>		Contour;
 
@@ -54,7 +55,7 @@ class ContourTransformer : public Transformer,
 #endif
 };
 
-}	// namespace Icon
-}	// namespace BPrivate
+_END_ICON_NAMESPACE
+
 
 #endif	// CONTOUR_TRANSFORMER_H

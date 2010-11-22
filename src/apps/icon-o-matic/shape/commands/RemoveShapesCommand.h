@@ -10,15 +10,16 @@
 
 
 #include "Command.h"
+#include "IconBuild.h"
 
 
-namespace BPrivate {
-namespace Icon {
+_BEGIN_ICON_NAMESPACE
 	class Shape;
 	class ShapeContainer;
-}
-}
-using namespace BPrivate::Icon;
+_END_ICON_NAMESPACE
+
+_USING_ICON_NAMESPACE
+
 
 class RemoveShapesCommand : public Command {
  public:
@@ -27,7 +28,7 @@ class RemoveShapesCommand : public Command {
 									int32* const indices,
 									int32 count);
 	virtual						~RemoveShapesCommand();
-	
+
 	virtual	status_t			InitCheck();
 
 	virtual	status_t			Perform();

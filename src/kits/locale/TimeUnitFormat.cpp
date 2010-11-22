@@ -90,7 +90,7 @@ BTimeUnitFormat::SetLocale(const BLocale* locale)
 	if (fLocale != NULL)
 		fLocale->GetLanguage(&language);
 	else
-		be_locale->GetLanguage(&language);
+		BLocale::Default()->GetLanguage(&language);
 
 	Locale icuLocale(language.Code());
 	UErrorCode icuStatus = U_ZERO_ERROR;

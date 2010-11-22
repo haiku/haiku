@@ -15,6 +15,7 @@
 # include "Observable.h"
 #endif // ICON_O_MATIC
 
+#include "IconBuild.h"
 #include "Transformable.h"
 
 #include <GraphicsDefs.h>
@@ -37,8 +38,9 @@ enum interpolation_type {
 	INTERPOLATION_SMOOTH
 };
 
-namespace BPrivate {
-namespace Icon {
+
+_BEGIN_ICON_NAMESPACE
+
 
 #ifdef ICON_O_MATIC
 class Gradient : public BArchivable,
@@ -115,7 +117,8 @@ class Gradient : public Transformable {
 			bool				fInheritTransformation;
 };
 
-}	// namespace Icon
-}	// namespace BPrivate
+
+_END_ICON_NAMESPACE
+
 
 #endif	// GRADIENT_TRANSFORMABLE_H

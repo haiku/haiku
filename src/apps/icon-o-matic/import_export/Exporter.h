@@ -12,18 +12,19 @@
 #include <Entry.h>
 #include <OS.h>
 
+#include "IconBuild.h"
+
+
 class BPositionIO;
 class Document;
 
-namespace BPrivate {
-namespace Icon {
 
-class Icon;
+_BEGIN_ICON_NAMESPACE
+	class Icon;
+_END_ICON_NAMESPACE
 
-}	// namespace Icon
-}	// namespace BPrivate
+_USING_ICON_NAMESPACE
 
-using namespace BPrivate::Icon;
 
 class Exporter {
  public:

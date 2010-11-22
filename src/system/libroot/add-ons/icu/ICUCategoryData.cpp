@@ -12,6 +12,7 @@
 
 
 namespace BPrivate {
+namespace Libroot {
 
 
 ICUCategoryData::ICUCategoryData()
@@ -130,4 +131,5 @@ ICUCategoryData::_ConvertUnicodeStringToLocaleconvEntry(
 }
 
 
+}	// namespace Libroot
 }	// namespace BPrivate

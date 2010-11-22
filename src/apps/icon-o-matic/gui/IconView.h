@@ -16,12 +16,11 @@
 
 class BBitmap;
 
-namespace BPrivate {
-namespace Icon {
+_BEGIN_ICON_NAMESPACE
 	class IconRenderer;
-}
-}
-using namespace BPrivate::Icon;
+_END_ICON_NAMESPACE
+
+_USING_ICON_NAMESPACE
 
 class IconView : public BView,
 				 public IconListener {

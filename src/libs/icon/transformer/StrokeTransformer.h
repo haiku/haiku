@@ -9,13 +9,14 @@
 #define STROKE_TRANSFORMER_H
 
 
+#include "IconBuild.h"
 #include "Transformer.h"
 
 #include <agg_conv_stroke.h>
 
 
-namespace BPrivate {
-namespace Icon {
+_BEGIN_ICON_NAMESPACE
+
 
 typedef agg::conv_stroke<VertexSource> Stroke;
 
@@ -56,7 +57,8 @@ class StrokeTransformer : public Transformer,
 #endif
 };
 
-}	// namespace Icon
-}	// namespace BPrivate
+
+_END_ICON_NAMESPACE
+
 
 #endif	// STROKE_TRANSFORMER_H

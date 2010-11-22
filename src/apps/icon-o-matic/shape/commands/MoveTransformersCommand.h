@@ -10,16 +10,19 @@
 
 
 #include "Command.h"
+#include "IconBuild.h"
+
 
 // TODO: make a templated "move items" command?
 
-namespace BPrivate {
-namespace Icon {
+
+_BEGIN_ICON_NAMESPACE
 	class Shape;
 	class Transformer;
-}
-}
-using namespace BPrivate::Icon;
+_END_ICON_NAMESPACE
+
+_USING_ICON_NAMESPACE
+
 
 class MoveTransformersCommand : public Command {
  public:
@@ -29,7 +32,7 @@ class MoveTransformersCommand : public Command {
 									int32 count,
 									int32 toIndex);
 	virtual						~MoveTransformersCommand();
-	
+
 	virtual	status_t			InitCheck();
 
 	virtual	status_t			Perform();

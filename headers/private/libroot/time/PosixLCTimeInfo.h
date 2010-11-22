@@ -10,11 +10,13 @@
 
 
 namespace BPrivate {
+namespace Libroot {
 
 
 extern const struct lc_time_t gPosixLCTimeInfo;
 
 
+}	// namespace Libroot
 }	// namespace BPrivate
 
 

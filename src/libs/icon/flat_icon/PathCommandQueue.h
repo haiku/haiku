@@ -9,13 +9,15 @@
 #define PATH_COMMAND_QUEUE_H
 
 
+#include "IconBuild.h"
 #include "LittleEndianBuffer.h"
+
 
 class BPoint;
 
 
-namespace BPrivate {
-namespace Icon {
+_BEGIN_ICON_NAMESPACE
+
 
 class VectorPath;
 
@@ -55,7 +57,8 @@ class PathCommandQueue {
 			uint8				fCommandCount;
 };
 
-}	// namespace Icon
-}	// namespace BPrivate
+
+_END_ICON_NAMESPACE
+
 
 #endif	// PATH_COMMAND_QUEUE_H

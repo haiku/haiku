@@ -83,7 +83,7 @@ TimedAlert::GetLabel(BString &string)
 	time(&t);
 	localtime_r(&t, &tm);
 
-	be_locale->FormatTime(timestring, 15, t, B_SHORT_TIME_FORMAT);
+	BLocale::Default()->FormatTime(timestring, 15, t, B_SHORT_TIME_FORMAT);
 
 	string += " ";
 	string += timestring;

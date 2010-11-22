@@ -75,10 +75,17 @@ BLocaleRoster::~BLocaleRoster()
 }
 
 
+/*static*/ BLocaleRoster*
+BLocaleRoster::Default()
+{
+	return MutableLocaleRoster::Default();
+}
+
+
 status_t
 BLocaleRoster::Refresh()
 {
-	return gRosterData.Refresh();
+	return RosterData::Default()->Refresh();
 }
 
 
@@ -88,11 +95,12 @@ BLocaleRoster::GetDefaultTimeZone(BTimeZone* timezone) const
 	if (!timezone)
 		return B_BAD_VALUE;
 
-	BAutolock lock(gRosterData.fLock);
+	RosterData* rosterData = RosterData::Default();
+	BAutolock lock(rosterData->fLock);
 	if (!lock.IsLocked())
 		return B_ERROR;
 
-	*timezone = gRosterData.fDefaultTimeZone;
+	*timezone = rosterData->fDefaultTimeZone;
 
 	return B_OK;
 }
@@ -120,11 +128,12 @@ BLocaleRoster::GetPreferredLanguages(BMessage* languages) const
 	if (!languages)
 		return B_BAD_VALUE;
 
-	BAutolock lock(gRosterData.fLock);
+	RosterData* rosterData = RosterData::Default();
+	BAutolock lock(rosterData->fLock);
 	if (!lock.IsLocked())
 		return B_ERROR;
 
-	*languages = gRosterData.fPreferredLanguages;
+	*languages = rosterData->fPreferredLanguages;
 
 	return B_OK;
 }
@@ -234,20 +243,21 @@ BLocaleRoster::GetFlagIconForCountry(BBitmap* flagIcon, const char* countryCode)
 	if (countryCode == NULL)
 		return B_BAD_DATA;
 
-	BAutolock lock(gRosterData.fLock);
+	RosterData* rosterData = RosterData::Default();
+	BAutolock lock(rosterData->fLock);
 	if (!lock.IsLocked())
 		return B_ERROR;
 
-	if (!gRosterData.fAreResourcesLoaded) {
-		status_t result = gRosterData.fResources.SetToImage(&gRosterData);
+	if (!rosterData->fAreResourcesLoaded) {
+		status_t result = rosterData->fResources.SetToImage(rosterData);
 		if (result != B_OK)
 			return result;
 
-		result = gRosterData.fResources.PreloadResourceType();
+		result = rosterData->fResources.PreloadResourceType();
 		if (result != B_OK)
 			return result;
 
-		gRosterData.fAreResourcesLoaded = true;
+		rosterData->fAreResourcesLoaded = true;
 	}
 
 	size_t size;
@@ -262,8 +272,8 @@ BLocaleRoster::GetFlagIconForCountry(BBitmap* flagIcon, const char* countryCode)
 	normalizedCode[0] = toupper(countryCode[codeLength - 2]);
 	normalizedCode[1] = toupper(countryCode[codeLength - 1]);
 
-	const void* buffer = gRosterData.fResources.LoadResource(B_VECTOR_ICON_TYPE,
-		normalizedCode, &size);
+	const void* buffer = rosterData->fResources.LoadResource(
+		B_VECTOR_ICON_TYPE, normalizedCode, &size);
 	if (buffer == NULL || size == 0)
 		return B_NAME_NOT_FOUND;
 
@@ -279,14 +289,15 @@ BLocaleRoster::GetAvailableCatalogs(BMessage*  languageList,
 	if (languageList == NULL)
 		return B_BAD_VALUE;
 
-	BAutolock lock(gRosterData.fLock);
+	RosterData* rosterData = RosterData::Default();
+	BAutolock lock(rosterData->fLock);
 	if (!lock.IsLocked())
 		return B_ERROR;
 
-	int32 count = gRosterData.fCatalogAddOnInfos.CountItems();
+	int32 count = rosterData->fCatalogAddOnInfos.CountItems();
 	for (int32 i = 0; i < count; ++i) {
 		CatalogAddOnInfo* info
-			= (CatalogAddOnInfo*)gRosterData.fCatalogAddOnInfos.ItemAt(i);
+			= (CatalogAddOnInfo*)rosterData->fCatalogAddOnInfos.ItemAt(i);
 
 		if (!info->MakeSureItsLoaded() || !info->fLanguagesFunc)
 			continue;

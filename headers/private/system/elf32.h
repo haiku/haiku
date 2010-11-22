@@ -228,30 +228,40 @@ struct Elf32_Dyn {
 	} d_un;
 };
 
-#define DT_NULL		0
-#define DT_NEEDED	1
-#define DT_PLTRELSZ	2
-#define DT_PLTGOT	3
-#define DT_HASH		4
-#define DT_STRTAB	5
-#define DT_SYMTAB	6
-#define DT_RELA		7
-#define DT_RELASZ	8
-#define DT_RELAENT	9
-#define DT_STRSZ	10
-#define DT_SYMENT	11
-#define DT_INIT		12
-#define DT_FINI		13
-#define DT_SONAME	14
-#define DT_RPATH	15
-#define DT_SYMBOLIC	16
-#define DT_REL		17
-#define DT_RELSZ	18
-#define DT_RELENT	19
-#define DT_PLTREL	20
-#define DT_DEBUG	21
-#define DT_TEXTREL	22
-#define DT_JMPREL	23
+#define DT_NULL				0
+#define DT_NEEDED			1
+#define DT_PLTRELSZ			2
+#define DT_PLTGOT			3
+#define DT_HASH				4
+#define DT_STRTAB			5
+#define DT_SYMTAB			6
+#define DT_RELA				7
+#define DT_RELASZ			8
+#define DT_RELAENT			9
+#define DT_STRSZ			10
+#define DT_SYMENT			11
+#define DT_INIT				12
+#define DT_FINI				13
+#define DT_SONAME			14
+#define DT_RPATH			15
+#define DT_SYMBOLIC			16
+#define DT_REL				17
+#define DT_RELSZ			18
+#define DT_RELENT			19
+#define DT_PLTREL			20
+#define DT_DEBUG			21
+#define DT_TEXTREL			22
+#define DT_JMPREL			23
+#define DT_BIND_NOW			24	/* no lazy binding */
+#define DT_INIT_ARRAY		25	/* init function array */
+#define DT_FINI_ARRAY		26	/* termination function array */
+#define DT_INIT_ARRAYSZ		27	/* init function array size */
+#define DT_FINI_ARRAYSZ		28	/* termination function array size */
+#define DT_RUNPATH			29	/* library search path (supersedes DT_RPATH) */
+#define DT_FLAGS			30	/* flags (see below) */
+#define DT_ENCODING			32
+#define DT_PREINIT_ARRAY	32	/* preinitialization array */
+#define DT_PREINIT_ARRAYSZ	33	/* preinitialization array size */
 
 #define DT_VERSYM       0x6ffffff0	/* symbol version table */
 #define DT_VERDEF		0x6ffffffc	/* version definition table */
@@ -261,6 +271,14 @@ struct Elf32_Dyn {
 
 #define DT_LOPROC		0x70000000
 #define DT_HIPROC		0x7fffffff
+
+
+/* DT_FLAGS values */
+#define DF_ORIGIN		0x01
+#define DF_SYMBOLIC		0x02
+#define DF_TEXTREL		0x04
+#define DF_BIND_NOW		0x08
+#define DF_STATIC_TLS	0x10
 
 
 /* version definition section */

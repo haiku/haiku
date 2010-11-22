@@ -12,6 +12,7 @@
 
 
 namespace BPrivate {
+namespace Libroot {
 
 
 ICUCollateData::ICUCollateData()
@@ -173,4 +174,5 @@ ICUCollateData::_ToUnicodeString(const char* in, UnicodeString& out)
 }
 
 
+}	// namespace Libroot
 }	// namespace BPrivate

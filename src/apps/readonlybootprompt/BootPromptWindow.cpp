@@ -39,7 +39,7 @@
 #include "KeymapListItem.h"
 
 
-using BPrivate::gMutableLocaleRoster;
+using BPrivate::MutableLocaleRoster;
 
 
 enum {
@@ -59,8 +59,8 @@ public:
 		fLanguage(language)
 	{
 		fIcon = new(std::nothrow) BBitmap(BRect(0, 0, 15, 15), B_RGBA32);
-		if (fIcon != NULL && be_locale_roster->GetFlagIconForCountry(fIcon,
-				language) != B_OK) {
+		if (fIcon != NULL && BLocaleRoster::Default()->GetFlagIconForCountry(
+				fIcon, language) != B_OK) {
 			delete fIcon;
 			fIcon = NULL;
 		}
@@ -247,7 +247,7 @@ BootPromptWindow::BootPromptWindow()
 			| B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	// Get the list of all known languages (suffice to do it only once)
-	be_locale_roster->GetAvailableLanguages(&fInstalledLanguages);
+	BLocaleRoster::Default()->GetAvailableLanguages(&fInstalledLanguages);
 
 	fInfoTextView = new TextBitmapView(BSize(480, 140));
 	static_cast<TextBitmapView*>(fInfoTextView)->SetInsets(5, 5, 5, 5);
@@ -333,7 +333,7 @@ BootPromptWindow::MessageReceived(BMessage* message)
 				BMessage preferredLanguages;
 				preferredLanguages.AddString("language",
 					languageItem->Language());
-				gMutableLocaleRoster->SetPreferredLanguages(
+				MutableLocaleRoster::Default()->SetPreferredLanguages(
 					&preferredLanguages);
 				_InitCatalog(true);
 			}
@@ -368,14 +368,14 @@ BootPromptWindow::_InitCatalog(bool saveSettings)
 
 	BMessage settings;
 	BString language;
-	if (be_locale_roster->GetCatalog()->GetLanguage(&language) == B_OK) {
+	if (BLocaleRoster::Default()->GetCatalog()->GetLanguage(&language) == B_OK)
 		settings.AddString("language", language.String());
-	}
 
-	gMutableLocaleRoster->SetPreferredLanguages(&settings);
+	MutableLocaleRoster::Default()->SetPreferredLanguages(&settings);
 
 	BFormattingConventions conventions(language.String());
-	gMutableLocaleRoster->SetDefaultFormattingConventions(conventions);
+	MutableLocaleRoster::Default()->SetDefaultFormattingConventions(
+		conventions);
 }
 
 
@@ -422,7 +422,7 @@ BootPromptWindow::_PopulateLanguages()
 
 	// Get current first preferred language of the user
 	BMessage preferredLanguages;
-	be_locale_roster->GetPreferredLanguages(&preferredLanguages);
+	BLocaleRoster::Default()->GetPreferredLanguages(&preferredLanguages);
 	const char* firstPreferredLanguage;
 	if (preferredLanguages.FindString("language", &firstPreferredLanguage)
 			!= B_OK) {
@@ -431,7 +431,7 @@ BootPromptWindow::_PopulateLanguages()
 	}
 
 	BMessage installedCatalogs;
-	be_locale_roster->GetAvailableCatalogs(&installedCatalogs,
+	BLocaleRoster::Default()->GetAvailableCatalogs(&installedCatalogs,
 		"x-vnd.Haiku-ReadOnlyBootPrompt");
 
 	BFont font;
@@ -446,7 +446,8 @@ BootPromptWindow::_PopulateLanguages()
 	for (int32 i = 0; installedCatalogs.FindString("language", i, &languageID)
 			== B_OK; i++) {
 		BLanguage* language;
-		if (be_locale_roster->GetLanguage(languageID, &language) == B_OK) {
+		if (BLocaleRoster::Default()->GetLanguage(languageID, &language)
+				== B_OK) {
 			BString name;
 			language->GetNativeName(name);
 

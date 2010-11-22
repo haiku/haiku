@@ -19,12 +19,12 @@ class CommandStack;
 class ShapeListItem;
 class Selection;
 
-namespace BPrivate {
-namespace Icon {
+_BEGIN_ICON_NAMESPACE
 	class Shape;
-}
-}
-using namespace BPrivate::Icon;
+_END_ICON_NAMESPACE
+
+_USING_ICON_NAMESPACE
+
 
 enum {
 	MSG_ADD_SHAPE					= 'adsh',

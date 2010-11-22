@@ -10,7 +10,7 @@
 #include "Transformer.h"
 
 
-using namespace BPrivate::Icon;
+_USING_ICON_NAMESPACE
 
 
 // constructor

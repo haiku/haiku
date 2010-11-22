@@ -15,6 +15,7 @@
 
 
 namespace BPrivate {
+namespace Libroot {
 
 
 ICUTimeConversion::ICUTimeConversion(const ICUTimeData& timeData)
@@ -217,4 +218,5 @@ ICUTimeConversion::_FillTmValues(const TimeZone* icuTimeZone,
 }
 
 
+}	// namespace Libroot
 }	// namespace BPrivate

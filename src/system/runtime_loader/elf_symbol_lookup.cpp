@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -20,9 +20,22 @@
 #include "runtime_loader_private.h"
 
 
+/*!	Checks whether \a name matches the name of \a image.
+
+	It is expected that \a name does not contain directory components. It is
+	compared with the base name of \a image's name.
+
+	\param image The image.
+	\param name The name to check against. Can be NULL, in which case \c false
+		is returned.
+	\return \c true, iff \a name is non-NULL and matches the name of \a image.
+*/
 static bool
 equals_image_name(image_t* image, const char* name)
 {
+	if (name == NULL)
+		return false;
+
 	const char* lastSlash = strrchr(name, '/');
 	return strcmp(image->name, lastSlash != NULL ? lastSlash + 1 : name) == 0;
 }
@@ -231,16 +244,23 @@ find_symbol_breadth_first(image_t* image, const SymbolLookupInfo& lookupInfo,
 	queue[count++] = image;
 	image->flags |= RFLAG_VISITED;
 
-	bool found = false;
+	Elf32_Sym* candidateSymbol = NULL;
+	image_t* candidateImage = NULL;
+
 	while (index < count) {
 		// pop next image
 		image = queue[index++];
 
-		if (find_symbol(image, lookupInfo, _location) == B_OK) {
-			if (_foundInImage != NULL)
-				*_foundInImage = image;
-			found = true;
-			break;
+		Elf32_Sym* symbol = find_symbol(image, lookupInfo);
+		if (symbol != NULL) {
+			bool isWeak = ELF32_ST_BIND(symbol->st_info) == STB_WEAK;
+			if (candidateImage == NULL || !isWeak) {
+				candidateSymbol = symbol;
+				candidateImage = image;
+
+				if (!isWeak)
+					break;
+			}
 		}
 
 		// push needed images
@@ -257,7 +277,20 @@ find_symbol_breadth_first(image_t* image, const SymbolLookupInfo& lookupInfo,
 	for (uint32 i = 0; i < count; i++)
 		queue[i]->flags &= ~RFLAG_VISITED;
 
-	return found ? B_OK : B_ENTRY_NOT_FOUND;
+	if (candidateSymbol == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	// compute the symbol location
+	*_location = (void*)(candidateSymbol->st_value
+		+ candidateImage->regions[0].delta);
+	int32 symbolType = lookupInfo.type;
+	patch_defined_symbol(candidateImage, lookupInfo.name, _location,
+		&symbolType);
+
+	if (_foundInImage != NULL)
+		*_foundInImage = candidateImage;
+
+	return B_OK;
 }
 
 
@@ -285,182 +318,226 @@ find_undefined_symbol_beos(image_t* rootImage, image_t* image,
 
 Elf32_Sym*
 find_undefined_symbol_global(image_t* rootImage, image_t* image,
-	const SymbolLookupInfo& lookupInfo, image_t** foundInImage)
+	const SymbolLookupInfo& lookupInfo, image_t** _foundInImage)
 {
 	// Global load order symbol resolution: All loaded images are searched for
 	// the symbol in the order they have been loaded. We skip add-on images and
 	// RTLD_LOCAL images though.
+	image_t* candidateImage = NULL;
+	Elf32_Sym* candidateSymbol = NULL;
+
+	// If the requesting image is linked symbolically, look up the symbol there
+	// first.
+	bool symbolic = (image->flags & RFLAG_SYMBOLIC) != 0;
+	if (symbolic) {
+		candidateSymbol = find_symbol(image, lookupInfo);
+		if (candidateSymbol != NULL) {
+			if (ELF32_ST_BIND(candidateSymbol->st_info) != STB_WEAK) {
+				*_foundInImage = image;
+				return candidateSymbol;
+			}
+
+			candidateImage = image;
+		}
+	}
+
 	image_t* otherImage = get_loaded_images().head;
 	while (otherImage != NULL) {
 		if (otherImage == rootImage
-			|| (otherImage->type != B_ADD_ON_IMAGE
-				&& (otherImage->flags
-					& (RTLD_GLOBAL | RFLAG_USE_FOR_RESOLVING)) != 0)) {
-			Elf32_Sym *symbol = find_symbol(otherImage, lookupInfo);
-			if (symbol) {
-				*foundInImage = otherImage;
-				return symbol;
+				? !symbolic
+				: (otherImage->type != B_ADD_ON_IMAGE
+					&& (otherImage->flags
+						& (RTLD_GLOBAL | RFLAG_USE_FOR_RESOLVING)) != 0)) {
+			if (Elf32_Sym* symbol = find_symbol(otherImage, lookupInfo)) {
+				if (ELF32_ST_BIND(symbol->st_info) != STB_WEAK) {
+					*_foundInImage = otherImage;
+					return symbol;
+				}
+
+				if (candidateSymbol == NULL) {
+					candidateSymbol = symbol;
+					candidateImage = otherImage;
+				}
 			}
 		}
 		otherImage = otherImage->next;
 	}
 
-	return NULL;
+	if (candidateSymbol != NULL)
+		*_foundInImage = candidateImage;
+
+	return candidateSymbol;
 }
 
 
 Elf32_Sym*
 find_undefined_symbol_add_on(image_t* rootImage, image_t* image,
-	const SymbolLookupInfo& lookupInfo, image_t** foundInImage)
+	const SymbolLookupInfo& lookupInfo, image_t** _foundInImage)
 {
-	// Do a breadth-first resolution in the add-on dependency scope,
-	// skipping the add-on itself.
-	Elf32_Sym* foundSymbol = NULL;
+	// Similar to global load order symbol resolution: All loaded images are
+	// searched for the symbol in the order they have been loaded. We skip
+	// add-on images and RTLD_LOCAL images though. The root image (i.e. the
+	// add-on image) is skipped, too, but for the add-on itself we look up
+	// a symbol that hasn't been found anywhere else in the add-on image.
+	// The reason for skipping the add-on image is that we must not resolve
+	// library symbol references to symbol definitions in the add-on, as
+	// libraries can be shared between different add-ons and we must not
+	// introduce connections between add-ons.
+	image_t* candidateImage = NULL;
+	Elf32_Sym* candidateSymbol = NULL;
 
-	image_t* queue[count_loaded_images()];
-	uint32 count = 0;
-	uint32 index = 0;
-	queue[count++] = image;
-	image->flags |= RFLAG_VISITED;
-
-	image_t* currentImage;
-	while (index < count) {
-		// pop next image
-		currentImage = queue[index++];
-
-		if (currentImage != image) {
-			foundSymbol = find_symbol(currentImage, lookupInfo);
-			if (foundSymbol != NULL) {
-				if (foundInImage != NULL)
-					*foundInImage = currentImage;
-				break;
+	// If the requesting image is linked symbolically, look up the symbol there
+	// first.
+	bool symbolic = (image->flags & RFLAG_SYMBOLIC) != 0;
+	if (symbolic) {
+		candidateSymbol = find_symbol(image, lookupInfo);
+		if (candidateSymbol != NULL) {
+			if (ELF32_ST_BIND(candidateSymbol->st_info) != STB_WEAK) {
+				*_foundInImage = image;
+				return candidateSymbol;
 			}
-		}
 
-		// push needed images
-		for (uint32 i = 0; i < currentImage->num_needed; i++) {
-			image_t* needed = currentImage->needed[i];
-			if ((needed->flags & RFLAG_VISITED) == 0) {
-				queue[count++] = needed;
-				needed->flags |= RFLAG_VISITED;
-			}
+			candidateImage = image;
 		}
 	}
 
-	// clear visited flags
-	for (uint32 i = 0; i < count; i++)
-		queue[i]->flags &= ~RFLAG_VISITED;
+	image_t* otherImage = get_loaded_images().head;
+	while (otherImage != NULL) {
+		if (otherImage != rootImage
+			&& otherImage->type != B_ADD_ON_IMAGE
+			&& (otherImage->flags
+				& (RTLD_GLOBAL | RFLAG_USE_FOR_RESOLVING)) != 0) {
+			if (Elf32_Sym* symbol = find_symbol(otherImage, lookupInfo)) {
+				if (ELF32_ST_BIND(symbol->st_info) != STB_WEAK) {
+					*_foundInImage = otherImage;
+					return symbol;
+				}
 
-	return foundSymbol;
+				if (candidateSymbol == NULL) {
+					candidateSymbol = symbol;
+					candidateImage = otherImage;
+				}
+			}
+		}
+		otherImage = otherImage->next;
+	}
+
+	// If the symbol has not been found and we're trying to resolve a reference
+	// in the add-on image, we also try to look it up there.
+	if (!symbolic && candidateSymbol == NULL && image == rootImage) {
+		candidateSymbol = find_symbol(image, lookupInfo);
+		candidateImage = image;
+	}
+
+	if (candidateSymbol != NULL)
+		*_foundInImage = candidateImage;
+
+	return candidateSymbol;
 }
 
 
 int
 resolve_symbol(image_t* rootImage, image_t* image, struct Elf32_Sym* sym,
-	addr_t* symAddress)
+	SymbolLookupCache* cache, addr_t* symAddress)
 {
-	switch (sym->st_shndx) {
-		case SHN_UNDEF:
-		{
-			struct Elf32_Sym* sharedSym;
-			image_t* sharedImage;
-			const char* symName = SYMNAME(image, sym);
+	uint32 index = sym - image->syms;
 
-			// get the version info
-			const elf_version_info* versionInfo = NULL;
-			if (image->symbol_versions != NULL) {
-				uint32 index = sym - image->syms;
-				uint32 versionIndex = VER_NDX(image->symbol_versions[index]);
-				if (versionIndex >= VER_NDX_INITIAL)
-					versionInfo = image->versions + versionIndex;
-			}
+	// check the cache first
+	if (cache->IsSymbolValueCached(index)) {
+		*symAddress = cache->SymbolValueAt(index);
+		return B_OK;
+	}
 
-			int32 type = B_SYMBOL_TYPE_ANY;
-			if (ELF32_ST_TYPE(sym->st_info) == STT_FUNC)
-				type = B_SYMBOL_TYPE_TEXT;
-			else if (ELF32_ST_TYPE(sym->st_info) == STT_OBJECT)
-				type = B_SYMBOL_TYPE_DATA;
+	struct Elf32_Sym* sharedSym;
+	image_t* sharedImage;
+	const char* symName = SYMNAME(image, sym);
 
-			// it's undefined, must be outside this image, try the other images
-			sharedSym = rootImage->find_undefined_symbol(rootImage, image,
-				SymbolLookupInfo(symName, type, versionInfo), &sharedImage);
-			void* location = NULL;
+	// get the symbol type
+	int32 type = B_SYMBOL_TYPE_ANY;
+	if (ELF32_ST_TYPE(sym->st_info) == STT_FUNC)
+		type = B_SYMBOL_TYPE_TEXT;
+	else if (ELF32_ST_TYPE(sym->st_info) == STT_OBJECT)
+		type = B_SYMBOL_TYPE_DATA;
 
-			enum {
-				ERROR_NO_SYMBOL,
-				ERROR_WRONG_TYPE,
-				ERROR_NOT_EXPORTED,
-				ERROR_UNPATCHED
-			};
-			uint32 lookupError = ERROR_UNPATCHED;
-
-			if (sharedSym == NULL) {
-				// symbol not found at all
-				lookupError = ERROR_NO_SYMBOL;
-				sharedImage = NULL;
-			} else if (ELF32_ST_TYPE(sym->st_info) != STT_NOTYPE
-				&& ELF32_ST_TYPE(sym->st_info)
-					!= ELF32_ST_TYPE(sharedSym->st_info)) {
-				// symbol not of the requested type
-				lookupError = ERROR_WRONG_TYPE;
-				sharedImage = NULL;
-			} else if (ELF32_ST_BIND(sharedSym->st_info) != STB_GLOBAL
-				&& ELF32_ST_BIND(sharedSym->st_info) != STB_WEAK) {
-				// symbol not exported
-				lookupError = ERROR_NOT_EXPORTED;
-				sharedImage = NULL;
-			} else {
-				// symbol is fine, get its location
-				location = (void*)(sharedSym->st_value
-					+ sharedImage->regions[0].delta);
-			}
-
-			patch_undefined_symbol(rootImage, image, symName, &sharedImage,
-				&location, &type);
-
-			if (location == NULL) {
-				switch (lookupError) {
-					case ERROR_NO_SYMBOL:
-						FATAL("%s: Could not resolve symbol '%s'\n",
-							image->path, symName);
-						break;
-					case ERROR_WRONG_TYPE:
-						FATAL("%s: Found symbol '%s' in shared image but wrong "
-							"type\n", image->path, symName);
-						break;
-					case ERROR_NOT_EXPORTED:
-						FATAL("%s: Found symbol '%s', but not exported\n",
-							image->path, symName);
-						break;
-					case ERROR_UNPATCHED:
-						FATAL("%s: Found symbol '%s', but was hidden by symbol "
-							"patchers\n", image->path, symName);
-						break;
-				}
-
-				if (report_errors())
-					gErrorMessage.AddString("missing symbol", symName);
-
-				return B_MISSING_SYMBOL;
-			}
-
-			*symAddress = (addr_t)location;
-			return B_OK;
+	if (ELF32_ST_BIND(sym->st_info) == STB_LOCAL) {
+		// Local symbols references are always resolved to the given symbol.
+		sharedImage = image;
+		sharedSym = sym;
+	} else {
+		// get the version info
+		const elf_version_info* versionInfo = NULL;
+		if (image->symbol_versions != NULL) {
+			uint32 versionIndex = VER_NDX(image->symbol_versions[index]);
+			if (versionIndex >= VER_NDX_INITIAL)
+				versionInfo = image->versions + versionIndex;
 		}
 
-		case SHN_ABS:
-			*symAddress = sym->st_value + image->regions[0].delta;
-			return B_NO_ERROR;
-
-		case SHN_COMMON:
-			// TODO: finish this
-			FATAL("%s: elf_resolve_symbol: COMMON symbol, finish me!\n",
-				image->path);
-			return B_ERROR; //ERR_NOT_IMPLEMENTED_YET;
-
-		default:
-			// standard symbol
-			*symAddress = sym->st_value + image->regions[0].delta;
-			return B_NO_ERROR;
+		// search the symbol
+		sharedSym = rootImage->find_undefined_symbol(rootImage, image,
+			SymbolLookupInfo(symName, type, versionInfo), &sharedImage);
 	}
+
+	enum {
+		ERROR_NO_SYMBOL,
+		ERROR_WRONG_TYPE,
+		ERROR_NOT_EXPORTED,
+		ERROR_UNPATCHED
+	};
+	uint32 lookupError = ERROR_UNPATCHED;
+
+	void* location = NULL;
+	if (sharedSym == NULL) {
+		// symbol not found at all
+		lookupError = ERROR_NO_SYMBOL;
+		sharedImage = NULL;
+	} else if (ELF32_ST_TYPE(sym->st_info) != STT_NOTYPE
+		&& ELF32_ST_TYPE(sym->st_info)
+			!= ELF32_ST_TYPE(sharedSym->st_info)) {
+		// symbol not of the requested type
+		lookupError = ERROR_WRONG_TYPE;
+		sharedImage = NULL;
+	} else if (ELF32_ST_BIND(sharedSym->st_info) != STB_GLOBAL
+		&& ELF32_ST_BIND(sharedSym->st_info) != STB_WEAK) {
+		// symbol not exported
+		lookupError = ERROR_NOT_EXPORTED;
+		sharedImage = NULL;
+	} else {
+		// symbol is fine, get its location
+		location = (void*)(sharedSym->st_value
+			+ sharedImage->regions[0].delta);
+	}
+
+	patch_undefined_symbol(rootImage, image, symName, &sharedImage, &location,
+		&type);
+
+	if (location == NULL) {
+		switch (lookupError) {
+			case ERROR_NO_SYMBOL:
+				FATAL("%s: Could not resolve symbol '%s'\n",
+					image->path, symName);
+				break;
+			case ERROR_WRONG_TYPE:
+				FATAL("%s: Found symbol '%s' in shared image but wrong "
+					"type\n", image->path, symName);
+				break;
+			case ERROR_NOT_EXPORTED:
+				FATAL("%s: Found symbol '%s', but not exported\n",
+					image->path, symName);
+				break;
+			case ERROR_UNPATCHED:
+				FATAL("%s: Found symbol '%s', but was hidden by symbol "
+					"patchers\n", image->path, symName);
+				break;
+		}
+
+		if (report_errors())
+			gErrorMessage.AddString("missing symbol", symName);
+
+		return B_MISSING_SYMBOL;
+	}
+
+	cache->SetSymbolValueAt(index, (addr_t)location);
+
+	*symAddress = (addr_t)location;
+	return B_OK;
 }

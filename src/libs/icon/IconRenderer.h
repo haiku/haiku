@@ -19,12 +19,15 @@
 #include <agg_span_allocator.h>
 #include <agg_trans_affine.h>
 
+#include "IconBuild.h"
+
+
 class BBitmap;
 class BRect;
 
 
-namespace BPrivate {
-namespace Icon {
+_BEGIN_ICON_NAMESPACE
+
 
 class Icon;
 
@@ -66,7 +69,7 @@ class IconRenderer {
 									// used when no background bitmap
 									// is set
 
-			const BPrivate::Icon::GammaTable& GammaTable() const
+			const _ICON_NAMESPACE GammaTable& GammaTable() const
 									{ return fGammaTable; }
 
 			void				Demultiply();
@@ -83,7 +86,7 @@ class IconRenderer {
 			agg::rgba8			fBackgroundColor;
 			const Icon*			fIcon;
 
-			BPrivate::Icon::GammaTable fGammaTable;
+			_ICON_NAMESPACE GammaTable fGammaTable;
 
 			RenderingBuffer		fRenderingBuffer;
 			PixelFormat			fPixelFormat;
@@ -100,7 +103,8 @@ class IconRenderer {
 			Transformation		fGlobalTransform;
 };
 
-}	// namespace Icon
-}	// namespace BPrivate
+
+_END_ICON_NAMESPACE
+
 
 #endif // ICON_RENDERER_H

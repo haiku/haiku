@@ -12,6 +12,7 @@
 
 
 namespace BPrivate {
+namespace Libroot {
 
 
 ICUMonetaryData::ICUMonetaryData(struct lconv& localeConv)
@@ -319,4 +320,5 @@ ICUMonetaryData::_DetermineSignPos(const UnicodeString& prefix,
 }
 
 
+}	// namespace Libroot
 }	// namespace BPrivate

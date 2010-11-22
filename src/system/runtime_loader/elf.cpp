@@ -198,7 +198,9 @@ load_dependencies(image_t* image)
 static status_t
 relocate_image(image_t *rootImage, image_t *image)
 {
-	status_t status = arch_relocate_image(rootImage, image);
+	SymbolLookupCache cache(image);
+
+	status_t status = arch_relocate_image(rootImage, image, &cache);
 	if (status < B_OK) {
 		FATAL("%s: Troubles relocating: %s\n", image->path, strerror(status));
 		return status;
@@ -796,6 +798,9 @@ get_library_symbol(void* handle, void* caller, const char* symbolName,
 			bool hitCallerImage = false;
 			set_image_flags_recursively(callerImage, RFLAG_USE_FOR_RESOLVING);
 
+			Elf32_Sym* candidateSymbol = NULL;
+			image_t* candidateImage = NULL;
+
 			image_t* image = get_loaded_images().head;
 			for (; image != NULL; image = image->next) {
 				// skip the caller image
@@ -818,14 +823,27 @@ get_library_symbol(void* handle, void* caller, const char* symbolName,
 				if (symbol == NULL)
 					continue;
 
+				// found a symbol
+				bool isWeak = ELF32_ST_BIND(symbol->st_info) == STB_WEAK;
+				if (candidateImage == NULL || !isWeak) {
+					candidateSymbol = symbol;
+					candidateImage = image;
+
+					if (!isWeak)
+						break;
+				}
+
+				// symbol is weak, so we need to continue
+			}
+
+			if (candidateSymbol != NULL) {
 				// found the symbol
-				*_location = (void*)(symbol->st_value
-					+ image->regions[0].delta);
+				*_location = (void*)(candidateSymbol->st_value
+					+ candidateImage->regions[0].delta);
 				int32 symbolType = B_SYMBOL_TYPE_TEXT;
-				patch_defined_symbol(image, symbolName, _location,
+				patch_defined_symbol(candidateImage, symbolName, _location,
 					&symbolType);
 				status = B_OK;
-				break;
 			}
 
 			clear_image_flags_recursively(callerImage, RFLAG_USE_FOR_RESOLVING);

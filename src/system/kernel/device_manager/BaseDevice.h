@@ -9,6 +9,9 @@
 #include <device_manager.h>
 
 
+namespace BPrivate {
+
+
 class BaseDevice {
 public:
 							BaseDevice();
@@ -47,6 +50,12 @@ public:
 protected:
 	ino_t					fID;
 };
+
+
+} // namespace BPrivate
+
+
+using BPrivate::BaseDevice;
 
 
 #endif	// BASE_DEVICE_H

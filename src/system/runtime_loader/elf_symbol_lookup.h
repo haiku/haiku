@@ -1,9 +1,13 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef ELF_SYMBOL_LOOKUP_H
 #define ELF_SYMBOL_LOOKUP_H
+
+
+#include <stdlib.h>
+#include <string.h>
 
 #include <runtime_loader.h>
 
@@ -43,6 +47,60 @@ struct SymbolLookupInfo {
 		version(version)
 	{
 	}
+};
+
+
+struct SymbolLookupCache {
+	SymbolLookupCache(image_t* image)
+		:
+		fTableSize(image->symhash[1]),
+		fValues(NULL),
+		fValuesResolved(NULL)
+	{
+		if (fTableSize > 0) {
+			fValues = (addr_t*)malloc(sizeof(addr_t) * fTableSize);
+
+			size_t elementCount = (fTableSize + 31) / 32;
+			fValuesResolved = (uint32*)malloc(4 * elementCount);
+			memset(fValuesResolved, 0, 4 * elementCount);
+
+			if (fValues == NULL || fValuesResolved == NULL) {
+				free(fValuesResolved);
+				free(fValues);
+				fTableSize = 0;
+			}
+		}
+	}
+
+	~SymbolLookupCache()
+	{
+		free(fValuesResolved);
+		free(fValues);
+	}
+
+	bool IsSymbolValueCached(size_t index) const
+	{
+		return index < fTableSize
+			&& (fValuesResolved[index / 32] & (1 << (index % 32))) != 0;
+	}
+
+	addr_t SymbolValueAt(size_t index) const
+	{
+		return fValues[index];
+	}
+
+	void SetSymbolValueAt(size_t index, addr_t value)
+	{
+		if (index < fTableSize) {
+			fValues[index] = value;
+			fValuesResolved[index / 32] |= 1 << (index % 32);
+		}
+	}
+
+private:
+	size_t	fTableSize;
+	addr_t*	fValues;
+	uint32*	fValuesResolved;
 };
 
 

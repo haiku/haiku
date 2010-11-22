@@ -12,7 +12,9 @@
 #include <Entry.h>
 #include <Window.h>
 
+#include "IconBuild.h"
 #include "Observer.h"
+
 
 class BMenu;
 class BMenuBar;
@@ -29,12 +31,12 @@ class StyleView;
 class SwatchGroup;
 class TransformerListView;
 
-namespace BPrivate {
-namespace Icon {
+_BEGIN_ICON_NAMESPACE
 	class Icon;
-}
-}
-using namespace BPrivate::Icon;
+_END_ICON_NAMESPACE
+
+_USING_ICON_NAMESPACE
+
 
 class MultipleManipulatorState;
 

@@ -12,6 +12,7 @@
 
 
 namespace BPrivate {
+namespace Libroot {
 
 
 LocaleBackend* gLocaleBackend = NULL;
@@ -52,7 +53,7 @@ status_t
 LocaleBackend::LoadBackend()
 {
 	if (gLocaleBackend == NULL) {
-		pthread_once(&sBackendInitOnce, &BPrivate::LoadBackend);
+		pthread_once(&sBackendInitOnce, &BPrivate::Libroot::LoadBackend);
 		if (gLocaleBackend != NULL)
 			gLocaleBackend->Initialize(&sLocaleDataBridge);
 	}
@@ -61,4 +62,5 @@ LocaleBackend::LoadBackend()
 }
 
 
+}	// namespace Libroot
 }	// namespace BPrivate

@@ -7,6 +7,7 @@
 
 
 namespace BPrivate {
+namespace Libroot {
 
 
 /*
@@ -22,6 +23,7 @@ extern const int gPosixToLowerMap[384];
 extern const int gPosixToUpperMap[384];
 
 
+}	// namespace Libroot
 }	// namespace BPrivate
 
 

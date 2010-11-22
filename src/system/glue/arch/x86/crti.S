@@ -24,7 +24,7 @@ FUNCTION(_init):
 	pushl	%ebp
 	movl	%esp, %ebp
 	pushl	8(%ebp)		// put image ID on the stack again
-	call	_init_before
+	call	__haiku_init_before
 	// crtbegin.o stuff comes here
 
 .section .fini
@@ -32,5 +32,5 @@ FUNCTION(_fini):
 	pushl	%ebp
 	movl	%esp, %ebp
 	pushl	8(%ebp)
-	call	_term_before
+	call	__haiku_term_before
 	// crtend.o stuff comes here

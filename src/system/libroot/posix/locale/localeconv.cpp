@@ -12,7 +12,7 @@
 
 #ifndef _KERNEL_MODE
 #include "LocaleBackend.h"
-using BPrivate::gLocaleBackend;
+using BPrivate::Libroot::gLocaleBackend;
 #endif
 
 
@@ -24,5 +24,5 @@ localeconv(void)
 		return const_cast<lconv*>(gLocaleBackend->LocaleConv());
 #endif
 
-	return &BPrivate::gPosixLocaleConv;
+	return &BPrivate::Libroot::gPosixLocaleConv;
 }

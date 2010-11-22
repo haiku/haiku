@@ -73,7 +73,7 @@ write_8_check(addr_t *P, Elf32_Word value)
 
 static int
 relocate_rela(image_t *rootImage, image_t *image, struct Elf32_Rela *rel,
-	int rel_len)
+	int rel_len, SymbolLookupCache* cache)
 {
 	int i;
 	addr_t S;
@@ -101,7 +101,7 @@ relocate_rela(image_t *rootImage, image_t *image, struct Elf32_Rela *rel,
 				status_t status;
 				sym = SYMBOL(image, ELF32_R_SYM(rel[i].r_info));
 
-				status = resolve_symbol(rootImage, image, sym, &S);
+				status = resolve_symbol(rootImage, image, sym, cache, &S);
 				if (status < B_OK) {
 					TRACE(("resolve symbol \"%s\" returned: %ld\n",
 						SYMNAME(image, sym), status));
@@ -195,14 +195,14 @@ relocate_rela(image_t *rootImage, image_t *image, struct Elf32_Rela *rel,
 					break;
 				TRACE(("R_68K_PLT16 overflow\n"));
 				return B_BAD_DATA;
-				
+
 			case R_68K_PLT8:
 				REQUIRE_PLT;
 				if (write_8_check(P, (L + A - P)))
 					break;
 				TRACE(("R_68K_PLT8 overflow\n"));
 				return B_BAD_DATA;
-				
+
 			case R_68K_PLT32O:
 				REQUIRE_PLT;
 				write_32(P, (L + A));
@@ -272,7 +272,8 @@ relocate_rela(image_t *rootImage, image_t *image, struct Elf32_Rela *rel,
 
 
 status_t
-arch_relocate_image(image_t *rootImage, image_t *image)
+arch_relocate_image(image_t *rootImage, image_t *image,
+	SymbolLookupCache* cache)
 {
 	status_t status;
 
@@ -294,7 +295,8 @@ arch_relocate_image(image_t *rootImage, image_t *image)
 	}
 
 	if (image->rela) {
-		status = relocate_rela(rootImage, image, image->rela, image->rela_len);
+		status = relocate_rela(rootImage, image, image->rela, image->rela_len,
+			cache);
 		//int i;
 		if (status < B_OK)
 			return status;

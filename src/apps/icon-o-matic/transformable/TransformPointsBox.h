@@ -10,18 +10,19 @@
 
 
 #include "CanvasTransformBox.h"
+#include "IconBuild.h"
 
 
 class CanvasView;
 class PathManipulator;
 
-namespace BPrivate {
-namespace Icon {
+_BEGIN_ICON_NAMESPACE
 	class VectorPath;
 	struct control_point;
-}
-}
-using namespace BPrivate::Icon;
+_END_ICON_NAMESPACE
+
+_USING_ICON_NAMESPACE
+
 
 class TransformPointsBox : public CanvasTransformBox {
  public:

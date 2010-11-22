@@ -15,11 +15,15 @@
 #	include <SupportDefs.h>
 #endif
 
+#include "IconBuild.h"
+
+
 class BMessage;
 class BPositionIO;
 
-namespace BPrivate {
-namespace Icon {
+
+_BEGIN_ICON_NAMESPACE
+
 
 class Icon;
 class LittleEndianBuffer;
@@ -62,7 +66,8 @@ class FlatIconImporter {
 											 ShapeContainer* shapes);
 };
 
-}	// namespace Icon
-}	// namespace BPrivate
+
+_END_ICON_NAMESPACE
+
 
 #endif	// FLAT_ICON_IMPORTER_H

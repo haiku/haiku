@@ -17,6 +17,7 @@
 
 
 namespace BPrivate {
+namespace Libroot {
 
 
 ICUTimeData::ICUTimeData(struct lc_time_t& lcTimeInfo)
@@ -413,4 +414,5 @@ ICUTimeData::ICULocale() const
 }
 
 
+}	// namespace Libroot
 }	// namespace BPrivate

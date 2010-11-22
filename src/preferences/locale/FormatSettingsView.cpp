@@ -38,7 +38,7 @@
 #include "LocalePreflet.h"
 
 
-using BPrivate::gMutableLocaleRoster;
+using BPrivate::MutableLocaleRoster;
 
 
 #undef B_TRANSLATE_CONTEXT
@@ -261,10 +261,11 @@ FormatSettingsView::MessageReceived(BMessage* message)
 		case kClockFormatChange:
 		{
 			BFormattingConventions conventions;
-			be_locale->GetFormattingConventions(&conventions);
+			BLocale::Default()->GetFormattingConventions(&conventions);
 			conventions.SetExplicitUse24HourClock(
 				f24HourRadioButton->Value() ? true : false);
-			gMutableLocaleRoster->SetDefaultFormattingConventions(conventions);
+			MutableLocaleRoster::Default()->SetDefaultFormattingConventions(
+				conventions);
 
 			_UpdateExamples();
 			Window()->PostMessage(kMsgSettingsChanged);
@@ -274,10 +275,11 @@ FormatSettingsView::MessageReceived(BMessage* message)
 		case kStringsLanguageChange:
 		{
 			BFormattingConventions conventions;
-			be_locale->GetFormattingConventions(&conventions);
+			BLocale::Default()->GetFormattingConventions(&conventions);
 			conventions.SetUseStringsFromPreferredLanguage(
 				fUseLanguageStringsCheckBox->Value() ? true : false);
-			gMutableLocaleRoster->SetDefaultFormattingConventions(conventions);
+			MutableLocaleRoster::Default()->SetDefaultFormattingConventions(
+				conventions);
 
 			_UpdateExamples();
 
@@ -294,7 +296,8 @@ FormatSettingsView::MessageReceived(BMessage* message)
 void
 FormatSettingsView::Revert()
 {
-	gMutableLocaleRoster->SetDefaultFormattingConventions(fInitialConventions);
+	MutableLocaleRoster::Default()->SetDefaultFormattingConventions(
+		fInitialConventions);
 
 	_UpdateExamples();
 }
@@ -304,7 +307,7 @@ void
 FormatSettingsView::Refresh(bool setInitial)
 {
 	BFormattingConventions conventions;
-	be_locale->GetFormattingConventions(&conventions);
+	BLocale::Default()->GetFormattingConventions(&conventions);
 	if (setInitial)
 		fInitialConventions = conventions;
 
@@ -330,7 +333,7 @@ bool
 FormatSettingsView::IsReversible() const
 {
 	BFormattingConventions conventions;
-	be_locale->GetFormattingConventions(&conventions);
+	BLocale::Default()->GetFormattingConventions(&conventions);
 
 	return conventions != fInitialConventions;
 }
@@ -342,49 +345,49 @@ FormatSettingsView::_UpdateExamples()
 	time_t timeValue = (time_t)time(NULL);
 	BString result;
 
-	be_locale->FormatDate(&result, timeValue, B_FULL_DATE_FORMAT);
+	BLocale::Default()->FormatDate(&result, timeValue, B_FULL_DATE_FORMAT);
 	fFullDateExampleView->SetText(result);
 
-	be_locale->FormatDate(&result, timeValue, B_LONG_DATE_FORMAT);
+	BLocale::Default()->FormatDate(&result, timeValue, B_LONG_DATE_FORMAT);
 	fLongDateExampleView->SetText(result);
 
-	be_locale->FormatDate(&result, timeValue, B_MEDIUM_DATE_FORMAT);
+	BLocale::Default()->FormatDate(&result, timeValue, B_MEDIUM_DATE_FORMAT);
 	fMediumDateExampleView->SetText(result);
 
-	be_locale->FormatDate(&result, timeValue, B_SHORT_DATE_FORMAT);
+	BLocale::Default()->FormatDate(&result, timeValue, B_SHORT_DATE_FORMAT);
 	fShortDateExampleView->SetText(result);
 
-	be_locale->FormatTime(&result, timeValue, B_FULL_TIME_FORMAT);
+	BLocale::Default()->FormatTime(&result, timeValue, B_FULL_TIME_FORMAT);
 	fFullTimeExampleView->SetText(result);
 
-	be_locale->FormatTime(&result, timeValue, B_LONG_TIME_FORMAT);
+	BLocale::Default()->FormatTime(&result, timeValue, B_LONG_TIME_FORMAT);
 	fLongTimeExampleView->SetText(result);
 
-	be_locale->FormatTime(&result, timeValue, B_MEDIUM_TIME_FORMAT);
+	BLocale::Default()->FormatTime(&result, timeValue, B_MEDIUM_TIME_FORMAT);
 	fMediumTimeExampleView->SetText(result);
 
-	be_locale->FormatTime(&result, timeValue, B_SHORT_TIME_FORMAT);
+	BLocale::Default()->FormatTime(&result, timeValue, B_SHORT_TIME_FORMAT);
 	fShortTimeExampleView->SetText(result);
 
-	status_t status = be_locale->FormatNumber(&result, 1234.5678);
+	status_t status = BLocale::Default()->FormatNumber(&result, 1234.5678);
 	if (status == B_OK)
 		fPositiveNumberExampleView->SetText(result);
 	else
 		fPositiveNumberExampleView->SetText("ERROR");
 
-	status = be_locale->FormatNumber(&result, -1234.5678);
+	status = BLocale::Default()->FormatNumber(&result, -1234.5678);
 	if (status == B_OK)
 		fNegativeNumberExampleView->SetText(result);
 	else
 		fNegativeNumberExampleView->SetText("ERROR");
 
-	status = be_locale->FormatMonetary(&result, 1234.56);
+	status = BLocale::Default()->FormatMonetary(&result, 1234.56);
 	if (status == B_OK)
 		fPositiveMonetaryExampleView->SetText(result);
 	else
 		fPositiveMonetaryExampleView->SetText("ERROR");
 
-	status = be_locale->FormatMonetary(&result, -1234.56);
+	status = BLocale::Default()->FormatMonetary(&result, -1234.56);
 	if (status == B_OK)
 		fNegativeMonetaryExampleView->SetText(result);
 	else

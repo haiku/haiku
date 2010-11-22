@@ -42,12 +42,12 @@ BLocale::BLocale(const BLanguage* language,
 	if (conventions != NULL)
 		fConventions = *conventions;
 	else
-		be_locale->GetFormattingConventions(&fConventions);
+		BLocale::Default()->GetFormattingConventions(&fConventions);
 
 	if (language != NULL)
 		fLanguage = *language;
 	else
-		be_locale->GetLanguage(&fLanguage);
+		BLocale::Default()->GetLanguage(&fLanguage);
 }
 
 
@@ -56,6 +56,13 @@ BLocale::BLocale(const BLocale& other)
 	fConventions(other.fConventions),
 	fLanguage(other.fLanguage)
 {
+}
+
+
+/*static*/ const BLocale*
+BLocale::Default()
+{
+	return &BPrivate::RosterData::Default()->fDefaultLocale;
 }
 
 

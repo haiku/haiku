@@ -515,7 +515,7 @@ TBarApp::MessageReceived(BMessage* message)
 
 		case B_LOCALE_CHANGED:
 		{
-			be_locale_roster->Refresh();
+			BLocaleRoster::Default()->Refresh();
 
 			BMessenger(fBarWindow->FindView("_deskbar_tv_")).SendMessage(
 				message);

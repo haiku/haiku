@@ -11,18 +11,21 @@
 
 #include <String.h>
 
+#include "IconBuild.h"
+
+
 class BMessage;
 
 
-namespace BPrivate {
-namespace Icon {
+_BEGIN_ICON_NAMESPACE
+
 
 class Transformer;
 class VertexSource;
 
 class TransformerFactory {
  public:
-								
+
 	static	Transformer*		TransformerFor(uint32 type,
 											   VertexSource& source);
 
@@ -37,7 +40,8 @@ class TransformerFactory {
 #endif // ICON_O_MATIC
 };
 
-}	// namespace Icon
-}	// namespace BPrivate
+
+_END_ICON_NAMESPACE
+
 
 #endif	// TRANSFORMER_FACTORY_H

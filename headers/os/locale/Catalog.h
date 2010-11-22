@@ -93,24 +93,26 @@ private:
 // Translation macros which may be used to shorten translation requests:
 #undef B_TRANSLATE
 #define B_TRANSLATE(string) \
-	be_locale_roster->GetCatalog()->GetString((string), B_TRANSLATE_CONTEXT)
+	BLocaleRoster::Default()->GetCatalog()->GetString((string), \
+		B_TRANSLATE_CONTEXT)
 
 #undef B_TRANSLATE_WITH_CONTEXT
 #define B_TRANSLATE_WITH_CONTEXT(string, context) \
-	be_locale_roster->GetCatalog()->GetString((string), (context))
+	BLocaleRoster::Default()->GetCatalog()->GetString((string), (context))
 
 #undef B_TRANSLATE_COMMENT
 #define B_TRANSLATE_COMMENT(string, comment) \
-	be_locale_roster->GetCatalog()->GetString((string), B_TRANSLATE_CONTEXT, \
-		(comment))
+	BLocaleRoster::Default()->GetCatalog()->GetString((string), \
+		B_TRANSLATE_CONTEXT, (comment))
 
 #undef B_TRANSLATE_ALL
 #define B_TRANSLATE_ALL(string, context, comment) \
-	be_locale_roster->GetCatalog()->GetString((string), (context), (comment))
+	BLocaleRoster::Default()->GetCatalog()->GetString((string), (context), \
+		(comment))
 
 #undef B_TRANSLATE_ID
 #define B_TRANSLATE_ID(id) \
-	be_locale_roster->GetCatalog()->GetString((id))
+	BLocaleRoster::Default()->GetCatalog()->GetString((id))
 
 // Translation markers which can be used to mark static strings/IDs which
 // are used as key for translation requests (at other places in the code):

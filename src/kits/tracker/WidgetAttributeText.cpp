@@ -190,12 +190,12 @@ TruncTimeBase(BString* result, int64 value, const View* view, float width)
 
 	time_t timeValue = (time_t)value;
 
-	if (be_locale->FormatDateTime(buffer, 256, timeValue, B_FULL_DATE_FORMAT,
-		B_MEDIUM_TIME_FORMAT) == B_OK)
+	if (BLocale::Default()->FormatDateTime(buffer, 256, timeValue,
+			B_FULL_DATE_FORMAT, B_MEDIUM_TIME_FORMAT) == B_OK)
 		resultWidth = view->StringWidth(buffer);
 
 	if (resultWidth > width
-		&& be_locale->FormatDateTime(buffer, 256, timeValue,
+		&& BLocale::Default()->FormatDateTime(buffer, 256, timeValue,
 			B_SHORT_DATE_FORMAT, B_SHORT_TIME_FORMAT) == B_OK) {
 		resultWidth = view->StringWidth(buffer);
 	}

@@ -9,9 +9,10 @@
 #include <image.h>
 
 
-void _init_before(image_id id);
-void _init_after(image_id id);
-void _term_before(image_id id);
-void _term_after(image_id id);
+void __haiku_init_before(image_id id);
+void __haiku_init_after(image_id id);
+void __haiku_term_before(image_id id);
+void __haiku_term_after(image_id id);
+
 
 #endif	/* INIT_TERM_DYN_H */

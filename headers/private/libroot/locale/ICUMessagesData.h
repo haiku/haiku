@@ -11,6 +11,7 @@
 
 
 namespace BPrivate {
+namespace Libroot {
 
 
 class ICUMessagesData : public ICUCategoryData {
@@ -33,6 +34,7 @@ private:
 };
 
 
+}	// namespace Libroot
 }	// namespace BPrivate
 
 

@@ -15,11 +15,15 @@
 #	include <SupportDefs.h>
 #endif
 
+#include "IconBuild.h"
+
+
 class BMessage;
 class BPositionIO;
 
-namespace BPrivate {
-namespace Icon {
+
+_BEGIN_ICON_NAMESPACE
+
 
 class Icon;
 class PathContainer;
@@ -50,7 +54,8 @@ class MessageImporter {
 											  ShapeContainer* shapes) const;
 };
 
-}	// namespace Icon
-}	// namespace BPrivate
+
+_END_ICON_NAMESPACE
+
 
 #endif // MESSAGE_IMPORTER_H

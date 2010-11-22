@@ -16,6 +16,7 @@
 
 
 namespace BPrivate {
+namespace Libroot {
 
 
 extern "C" LocaleBackend*
@@ -370,4 +371,5 @@ ICULocaleBackend::_SetPosixLocale(int category)
 }
 
 
+}	// namespace Libroot
 }	// namespace BPrivate

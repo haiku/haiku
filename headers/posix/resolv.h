@@ -406,7 +406,7 @@ const char *	loc_ntoa(const u_char *, char *);
 int				dn_skipname(const u_char *, const u_char *);
 void			putlong(u_int32_t, u_char *);
 void			putshort(u_int16_t, u_char *);
-#ifndef __ultrix__
+#if !defined(__ultrix__) && !defined(__HAIKU__)
 u_int16_t		_getshort(const u_char *);
 u_int32_t		_getlong(const u_char *);
 #endif

@@ -9,14 +9,15 @@
 #define PERSPECTIVE_TRANSFORMER_H
 
 
+#include "IconBuild.h"
 #include "Transformer.h"
 
 #include <agg_conv_transform.h>
 #include <agg_trans_perspective.h>
 
 
-namespace BPrivate {
-namespace Icon {
+_BEGIN_ICON_NAMESPACE
+
 
 typedef agg::conv_transform<VertexSource,
 							agg::trans_perspective>	Perspective;
@@ -55,7 +56,8 @@ class PerspectiveTransformer : public Transformer,
 #endif
 };
 
-}	// namespace Icon
-}	// namespace BPrivate
+
+_END_ICON_NAMESPACE
+
 
 #endif	// PERSPECTIVE_TRANSFORMER_H

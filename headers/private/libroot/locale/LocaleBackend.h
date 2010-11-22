@@ -18,6 +18,7 @@ struct locale_data;		// glibc
 
 
 namespace BPrivate {
+namespace Libroot {
 
 
 struct LocaleCtypeDataBridge {
@@ -144,6 +145,7 @@ public:
 extern LocaleBackend* gLocaleBackend;
 
 
+}	// namespace Libroot
 }	// namespace BPrivate
 
 

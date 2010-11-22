@@ -116,7 +116,7 @@ BDurationFormat::SetTimeZone(const BTimeZone* timeZone)
 	if (timeZone == NULL) {
 		BTimeZone defaultTimeZone;
 		status_t result
-			= be_locale_roster->GetDefaultTimeZone(&defaultTimeZone);
+			= BLocaleRoster::Default()->GetDefaultTimeZone(&defaultTimeZone);
 		if (result != B_OK)
 			return result;
 		zonePrivate.SetTo(&defaultTimeZone);

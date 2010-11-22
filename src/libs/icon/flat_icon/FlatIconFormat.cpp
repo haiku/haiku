@@ -12,8 +12,8 @@
 #include "LittleEndianBuffer.h"
 
 
-namespace BPrivate {
-namespace Icon {
+_BEGIN_ICON_NAMESPACE
+
 
 const uint32 FLAT_ICON_MAGIC = 'ficn';
 
@@ -85,7 +85,7 @@ read_float_24(LittleEndianBuffer& buffer, float& _value)
 	int sign = (shortValue & 0x800000) >> 23;
 	int exponent = ((shortValue & 0x7e0000) >> 17) - 32;
 	int mantissa = (shortValue & 0x01ffff) << 6;
-	
+
 	if (shortValue == 0)
 		_value = 0.0;
 	else {
@@ -110,7 +110,7 @@ write_float_24(LittleEndianBuffer& buffer, float _value)
 	int sign = (value & 0x80000000) >> 31;
 	int exponent = ((value & 0x7f800000) >> 23) - 127;
 	int mantissa = value & 0x007fffff;
-	
+
 	if (exponent >= 32 || exponent < -32) {
 		uint8 zero = 0;
 		return buffer.Write(zero) && buffer.Write(zero)
@@ -126,5 +126,5 @@ write_float_24(LittleEndianBuffer& buffer, float _value)
 		&& buffer.Write((uint8)(shortValue & 0xff));
 }
 
-}	// namespace Icon
-}	// namespace BPrivate
+
+_END_ICON_NAMESPACE

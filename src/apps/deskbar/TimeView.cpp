@@ -84,7 +84,7 @@ TTimeView::TTimeView(float maxWidth, float height, bool showSeconds,
 	fLastDateStr[0] = 0;
 	fNeedToUpdate = true;
 
-	fLocale = *be_locale;
+	fLocale = *BLocale::Default();
 }
 
 
@@ -96,7 +96,7 @@ TTimeView::TTimeView(BMessage* data)
 	data->FindBool("seconds", &fShowSeconds);
 	data->FindBool("interval", &fInterval);
 
-	fLocale = *be_locale;
+	fLocale = *BLocale::Default();
 }
 #endif
 
@@ -357,7 +357,7 @@ TTimeView::ShowSeconds(bool on)
 void
 TTimeView::Update()
 {
-	fLocale = *be_locale;
+	fLocale = *BLocale::Default();
 	GetCurrentTime();
 	GetCurrentDate();
 

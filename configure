@@ -478,6 +478,7 @@ if [ $targetArch = "x86" ]; then
 		0.[0-6].*)		;;
 		*)				versionOK=1 ;;
 	esac
+versionOK=1
 
 	if [ $versionOK = 0 ]; then
 		echo "The yasm assembler version 0.7.0 or later must be installed."

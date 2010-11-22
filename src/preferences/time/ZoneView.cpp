@@ -51,7 +51,7 @@
 #include "TimeWindow.h"
 
 
-using BPrivate::gMutableLocaleRoster;
+using BPrivate::MutableLocaleRoster;
 using BPrivate::ObjectDeleter;
 
 
@@ -184,11 +184,11 @@ TimeZoneView::GetToolTipAt(BPoint point, BToolTip** _tip)
 
 	BString nowInTimeZone;
 	time_t now = time(NULL);
-	be_locale->FormatTime(&nowInTimeZone, now, B_SHORT_TIME_FORMAT,
+	BLocale::Default()->FormatTime(&nowInTimeZone, now, B_SHORT_TIME_FORMAT,
 		&item->TimeZone());
 
 	BString dateInTimeZone;
-	be_locale->FormatDate(&dateInTimeZone, now, B_SHORT_DATE_FORMAT,
+	BLocale::Default()->FormatDate(&dateInTimeZone, now, B_SHORT_DATE_FORMAT,
 		&item->TimeZone());
 
 	BString toolTip = item->Text();
@@ -276,13 +276,13 @@ void
 TimeZoneView::_BuildZoneMenu()
 {
 	BTimeZone defaultTimeZone;
-	be_locale_roster->GetDefaultTimeZone(&defaultTimeZone);
+	BLocaleRoster::Default()->GetDefaultTimeZone(&defaultTimeZone);
 
 	BLanguage language;
-	be_locale->GetLanguage(&language);
+	BLocale::Default()->GetLanguage(&language);
 
 	BMessage countryList;
-	be_locale_roster->GetAvailableCountries(&countryList);
+	BLocaleRoster::Default()->GetAvailableCountries(&countryList);
 	countryList.AddString("country", "");
 
 	/*
@@ -308,7 +308,7 @@ TimeZoneView::_BuildZoneMenu()
 
 		// Now list the timezones for this country
 		BMessage zoneList;
-		be_locale_roster->GetAvailableTimeZonesForCountry(&zoneList,
+		BLocaleRoster::Default()->GetAvailableTimeZonesForCountry(&zoneList,
 			countryCode.Length() == 0 ? NULL : countryCode.String());
 
 		int32 count = 0;
@@ -508,7 +508,7 @@ TimeZoneView::_SetSystemTimeZone()
 	fCurrentZoneItem = item;
 	const BTimeZone& timeZone = item->TimeZone();
 
-	gMutableLocaleRoster->SetDefaultTimeZone(timeZone);
+	MutableLocaleRoster::Default()->SetDefaultTimeZone(timeZone);
 
 	_kern_set_timezone(timeZone.OffsetFromGMT(), timeZone.ID().String(),
 		timeZone.ID().Length());
@@ -534,7 +534,8 @@ TimeZoneView::_FormatTime(const BTimeZone& timeZone)
 				: 0;
 		now -= timeZone.OffsetFromGMT() - currentOffset;
 	}
-	be_locale->FormatTime(&result, now, B_SHORT_TIME_FORMAT, &timeZone);
+	BLocale::Default()->FormatTime(&result, now, B_SHORT_TIME_FORMAT,
+		&timeZone);
 
 	return result;
 }

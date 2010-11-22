@@ -17,13 +17,13 @@
 .section .init
 	// the image ID and program args are still on the stack
 	.set	noreorder
-	jal	_init_after
+	jal	__haiku_init_after
 	nop
 	.set	reorder
 
 .section .fini
 	// the image ID and program args are still on the stack
-	.set	noreorder	
-	jal	_term_after
+	.set	noreorder
+	jal	__haiku_term_after
 	nop
 	.set	reorder

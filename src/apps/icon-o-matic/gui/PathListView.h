@@ -12,23 +12,24 @@
 #include "ListViews.h"
 #include "PathContainer.h"
 
+
 class BMenu;
 class BMenuItem;
 
-namespace BPrivate {
-namespace Icon {
+_BEGIN_ICON_NAMESPACE
 	class VectorPath;
 	class Shape;
 	class ShapeContainer;
-}
-}
+_END_ICON_NAMESPACE
 
 class CommandStack;
 class PathListItem;
 class Selection;
 class ShapePathListener;
 
-using namespace BPrivate::Icon;
+
+_USING_ICON_NAMESPACE
+
 
 class PathListView : public SimpleListView,
 					 public PathContainerListener {

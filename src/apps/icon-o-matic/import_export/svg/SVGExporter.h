@@ -14,15 +14,15 @@
 #include <String.h>
 
 
-namespace BPrivate {
-namespace Icon {
+_BEGIN_ICON_NAMESPACE
 	class Gradient;
 	class Shape;
 	class Style;
 	class Transformable;
-}
-}
-using namespace BPrivate::Icon;
+_END_ICON_NAMESPACE
+
+_USING_ICON_NAMESPACE
+
 
 class SVGExporter : public Exporter {
  public:

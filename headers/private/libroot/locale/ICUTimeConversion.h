@@ -15,6 +15,7 @@
 
 
 namespace BPrivate {
+namespace Libroot {
 
 
 class ICUTimeConversion {
@@ -45,6 +46,7 @@ private:
 };
 
 
+}	// namespace Libroot
 }	// namespace BPrivate
 
 

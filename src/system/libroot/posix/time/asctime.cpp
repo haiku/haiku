@@ -11,7 +11,7 @@
 #include "PosixLCTimeInfo.h"
 
 
-using BPrivate::gPosixLCTimeInfo;
+using BPrivate::Libroot::gPosixLCTimeInfo;
 
 
 static char*

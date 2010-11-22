@@ -10,17 +10,18 @@
 
 
 #include "Command.h"
+#include "IconBuild.h"
 
 #include <List.h>
 
 
-namespace BPrivate {
-namespace Icon {
+_BEGIN_ICON_NAMESPACE
 	class Style;
 	class StyleContainer;
-}
-}
-using namespace BPrivate::Icon;
+_END_ICON_NAMESPACE
+
+_USING_ICON_NAMESPACE
+
 
 class RemoveStylesCommand : public Command {
  public:
@@ -29,7 +30,7 @@ class RemoveStylesCommand : public Command {
 									Style** const styles,
 									int32 count);
 	virtual						~RemoveStylesCommand();
-	
+
 	virtual	status_t			InitCheck();
 
 	virtual	status_t			Perform();

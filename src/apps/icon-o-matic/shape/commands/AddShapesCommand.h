@@ -10,17 +10,18 @@
 
 
 #include "Command.h"
+#include "IconBuild.h"
 
 
 class Selection;
 
-namespace BPrivate {
-namespace Icon {
+_BEGIN_ICON_NAMESPACE
 	class Shape;
 	class ShapeContainer;
-}
-}
-using namespace BPrivate::Icon;
+_END_ICON_NAMESPACE
+
+_USING_ICON_NAMESPACE
+
 
 class AddShapesCommand : public Command {
  public:
@@ -31,7 +32,7 @@ class AddShapesCommand : public Command {
 									int32 index,
 									Selection* selection);
 	virtual						~AddShapesCommand();
-	
+
 	virtual	status_t			InitCheck();
 
 	virtual	status_t			Perform();

@@ -21,6 +21,7 @@
 
 
 namespace BPrivate {
+namespace Libroot {
 
 
 class ICULocaleBackend : public LocaleBackend {
@@ -77,6 +78,7 @@ private:
 };
 
 
+}	// namespace Libroot
 }	// namespace BPrivate
 
 

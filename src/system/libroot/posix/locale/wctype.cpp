@@ -11,7 +11,7 @@
 #include "LocaleBackend.h"
 
 
-using BPrivate::gLocaleBackend;
+using BPrivate::Libroot::gLocaleBackend;
 
 /*
  * In many of the following functions, we make use of the fact that with

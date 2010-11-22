@@ -28,7 +28,7 @@
 .section .init
 FUNCTION(_init):
 	.set	noreorder
-	jal	_init_before
+	jal	__haiku_init_before
 	nop
 	.set	reorder
 	// crtbegin.o stuff comes here
@@ -36,7 +36,7 @@ FUNCTION(_init):
 .section .fini
 FUNCTION(_fini):
 	.set	noreorder
-	jal	_term_before
+	jal	__haiku_term_before
 	nop
 	.set	reorder
 	// crtbegin.o stuff comes here

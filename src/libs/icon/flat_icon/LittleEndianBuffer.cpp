@@ -15,7 +15,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-using namespace BPrivate::Icon;
+
+_USING_ICON_NAMESPACE
+
 
 #define CHUNK_SIZE 256
 

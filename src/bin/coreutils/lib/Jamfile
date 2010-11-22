@@ -9,7 +9,7 @@ SubDirCcFlags -DHAVE_CONFIG_H -DB_ENABLE_INCOMPLETE_POSIX_AT_SUPPORT ;
 SubDirSysHdrs $(SUBDIR) ;
 #SubDirSysHdrs $(SUBDIR) $(DOTDOT) ;
 
-StaticLibrary libfetish.a : 
+StaticLibrary libfetish.a :
 #	__fpending.c
 #	acl.c
 #	alloca.c
@@ -205,7 +205,7 @@ StaticLibrary libfetish.a :
 #	strtoull.c
 #	strtoumax.c
 	tempname.c
-	time_r.c
+#	time_r.c
 	trim.c
 	u8-uctomb.c
 	u8-uctomb-aux.c

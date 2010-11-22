@@ -30,7 +30,7 @@
 #	define B_LARGE_ICON_TYPE	'ICON'
 #endif
 
-using namespace BPrivate::Icon;
+_USING_ICON_NAMESPACE;
 using std::nothrow;
 
 

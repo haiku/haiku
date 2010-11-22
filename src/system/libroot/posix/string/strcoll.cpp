@@ -10,7 +10,7 @@
 #include "LocaleBackend.h"
 
 
-using BPrivate::gLocaleBackend;
+using BPrivate::Libroot::gLocaleBackend;
 
 
 extern "C" int

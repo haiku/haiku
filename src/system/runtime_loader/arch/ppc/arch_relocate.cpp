@@ -22,7 +22,7 @@
 
 static int
 relocate_rel(image_t *rootImage, image_t *image, struct Elf32_Rel *rel,
-	int rel_len)
+	int rel_len, SymbolLookupCache* cache)
 {
 	// ToDo: implement me!
 
@@ -31,20 +31,22 @@ relocate_rel(image_t *rootImage, image_t *image, struct Elf32_Rel *rel,
 
 
 status_t
-arch_relocate_image(image_t *rootImage, image_t *image)
+arch_relocate_image(image_t *rootImage, image_t *image,
+	SymbolLookupCache* cache)
 {
 	status_t status = B_NO_ERROR;
 
 	// deal with the rels first
 	if (image->rel) {
-		status = relocate_rel(rootImage, image, image->rel, image->rel_len);
+		status = relocate_rel(rootImage, image, image->rel, image->rel_len,
+			cache);
 		if (status < B_OK)
 			return status;
 	}
 
 	if (image->pltrel) {
 		status = relocate_rel(rootImage, image, image->pltrel,
-			image->pltrel_len);
+			image->pltrel_len, cache);
 		if (status < B_OK)
 			return status;
 	}

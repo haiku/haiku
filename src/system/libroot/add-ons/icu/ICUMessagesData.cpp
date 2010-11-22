@@ -11,6 +11,7 @@
 
 
 namespace BPrivate {
+namespace Libroot {
 
 
 void
@@ -57,4 +58,5 @@ ICUMessagesData::GetLanginfo(int index)
 }
 
 
+}	// namespace Libroot
 }	// namespace BPrivate

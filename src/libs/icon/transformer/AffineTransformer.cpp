@@ -20,7 +20,7 @@
 #include <new>
 
 
-using namespace BPrivate::Icon;
+_USING_ICON_NAMESPACE
 using std::nothrow;
 
 
@@ -179,7 +179,7 @@ AffineTransformer::SetToPropertyObject(const PropertyObject* object)
 		|| newScaleY != scaleY) {
 
 		reset();
-		
+
 		multiply(agg::trans_affine_scaling(newScaleX, newScaleY));
 		multiply(agg::trans_affine_rotation(newR));
 		multiply(agg::trans_affine_translation(newTX, newTY));

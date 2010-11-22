@@ -10,17 +10,18 @@
 
 
 #include "Command.h"
+#include "IconBuild.h"
 
 #include <List.h>
 
 
-namespace BPrivate {
-namespace Icon {
+_BEGIN_ICON_NAMESPACE
 	class VectorPath;
 	class PathContainer;
-}
-}
-using namespace BPrivate::Icon;
+_END_ICON_NAMESPACE
+
+_USING_ICON_NAMESPACE
+
 
 class RemovePathsCommand : public Command {
  public:
@@ -29,7 +30,7 @@ class RemovePathsCommand : public Command {
 									VectorPath** const paths,
 									int32 count);
 	virtual						~RemovePathsCommand();
-	
+
 	virtual	status_t			InitCheck();
 
 	virtual	status_t			Perform();

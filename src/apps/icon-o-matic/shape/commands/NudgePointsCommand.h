@@ -9,18 +9,19 @@
 #define NUDGE_POINTS_ACTION_H
 
 
+#include "IconBuild.h"
 #include "TransformCommand.h"
 
 #include <String.h>
 
 
-namespace BPrivate {
-namespace Icon {
+_BEGIN_ICON_NAMESPACE
 	class VectorPath;
 	struct control_point;
-}
-}
-using namespace BPrivate::Icon;
+_END_ICON_NAMESPACE
+
+_USING_ICON_NAMESPACE
+
 
 class NudgePointsCommand : public TransformCommand {
  public:
@@ -31,7 +32,7 @@ class NudgePointsCommand : public TransformCommand {
 												   int32 count);
 
 	virtual						~NudgePointsCommand();
-	
+
 	virtual	status_t			InitCheck();
 
  protected:

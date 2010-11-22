@@ -34,6 +34,8 @@ public:
 								MutableLocaleRoster();
 								~MutableLocaleRoster();
 
+	static	MutableLocaleRoster* Default();
+
 			status_t			SetDefaultFormattingConventions(
 									const BFormattingConventions& conventions);
 			status_t			SetDefaultTimeZone(const BTimeZone& zone);
@@ -55,9 +57,6 @@ public:
 									const char* signature,
 									const char* language);
 };
-
-
-extern MutableLocaleRoster* gMutableLocaleRoster;
 
 
 typedef BCatalogAddOn* (*InstantiateCatalogFunc)(const char* name,
@@ -116,7 +115,11 @@ struct RosterData {
 			BResources			fResources;
 
 								RosterData();
+								RosterData(const BLanguage& language,
+									const BFormattingConventions& conventions);
 								~RosterData();
+
+	static	RosterData*			Default();
 
 			void				InitializeCatalogAddOns();
 			void				CleanupCatalogAddOns();
@@ -148,9 +151,6 @@ private:
 			status_t			_AddPreferredLanguagesToMessage(
 									BMessage* message) const;
 };
-
-
-extern RosterData gRosterData;
 
 
 }	// namespace BPrivate

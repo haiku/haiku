@@ -30,6 +30,8 @@ public:
 								BLocaleRoster();
 								~BLocaleRoster();
 
+	static	BLocaleRoster*		Default();
+
 			status_t			GetDefaultTimeZone(BTimeZone* timezone) const;
 
 			status_t			GetLanguage(const char* languageCode,
@@ -74,9 +76,6 @@ private:
 	static	BCatalog*			_GetCatalog(BCatalog* catalog,
 									vint32* catalogInitStatus);
 };
-
-
-extern BLocaleRoster* be_locale_roster;
 
 
 #endif	// _LOCALE_ROSTER_H_

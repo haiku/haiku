@@ -11,19 +11,20 @@
 
 #include <GraphicsDefs.h>
 
+#include "IconBuild.h"
+
 
 class AddPathsCommand;
 class AddStylesCommand;
 
-namespace BPrivate {
-namespace Icon {
+_BEGIN_ICON_NAMESPACE
 	class PathContainer;
 	class Style;
 	class StyleContainer;
 	class VectorPath;
-}
-}
-using namespace BPrivate::Icon;
+_END_ICON_NAMESPACE
+
+_USING_ICON_NAMESPACE
 
 
 void new_style(rgb_color color, StyleContainer* container,

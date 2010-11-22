@@ -9,6 +9,7 @@
 #define STYLE_VIEW_H
 
 
+#include "IconBuild.h"
 #include "Observer.h"
 
 #include <View.h>
@@ -20,13 +21,13 @@ class CommandStack;
 class CurrentColor;
 class GradientControl;
 
-namespace BPrivate {
-namespace Icon {
+_BEGIN_ICON_NAMESPACE
 	class Gradient;
 	class Style;
-}
-}
-using namespace BPrivate::Icon;
+_END_ICON_NAMESPACE
+
+_USING_ICON_NAMESPACE
+
 
 // TODO: write lock the document when changing something...
 
