@@ -333,7 +333,7 @@ TermWindow::_CanClose(int32 index)
 		alertMessage = B_TRANSLATE(
 			"The following processes are still running:\n\n"
 			"\t%1\n\n"
-			"If you close the tab, the processes will be killed.");
+			"If you close the Terminal, the processes will be killed.");
 	}
 
 	alertMessage.ReplaceFirst("%1", busyProcessNames);
