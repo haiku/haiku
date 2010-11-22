@@ -100,9 +100,9 @@ Soll eine Verknüpfung erstellt werden?" "Auf dem Desktop" "In der Deskbar" "Nei
 		<td valign="top"><p><span class="cli">open</span> ist ein nützliches kleines Tool. Es öffnet jedwede Datei mit ihrer bevorzugten Anwendung oder startet eine bestimmte Anwendung anhand ihrer Signatur ohne ihren genauen Pfad kennen zu müssen. Das funktioniert auch mit URLs und sogar den "virtuellen" Verzeichnissen, <tt>.</tt> für das aktuelle Verzeichnis und <tt>..</tt> für das übergeordnete, die dann im Tracker geöffnet werden.</p>
 </td></tr>
 <tr><td><p><span class="cli">desklink</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p>Mit <span class="cli">desklink</span> kann im Deskbar Tray ein Icon für jedwede Datei, Ordner, Query oder Anwendung installiert werden. Dabei gibt es die Möglichkeit bei einem Rechtsklick auf das entsprechende Icon ein Kontextmenü mit besonderen Funktionen anzubieten. Folgendes Beispiel macht das mit der Anwendung <span class="app">Screenshot</span> (das "<tt>\</tt>" in der ersten Zeile dient nur einem Zeilenumbruch im Terminal):</p>
-<pre class="terminal">desklink "cmd=Aktives Fenster (2s):/boot/system/apps/Screenshot --window --border --delay 2" \
-"cmd=Replicant entfernen:desklink --remove=Screenshot" /boot/system/apps/Screenshot
+		<td valign="top"><p>Mit <span class="cli">desklink</span> kann im Deskbar Tray ein Icon für jedwede Datei, Ordner, Query oder Anwendung installiert werden. Dabei gibt es die Möglichkeit bei einem Rechtsklick auf das entsprechende Icon ein Kontextmenü mit besonderen Funktionen anzubieten. Folgendes Beispiel macht das mit dem Konsolenprogramm <span class="app">screenshot</span> (das "<tt>\</tt>" in der ersten Zeile dient nur einem Zeilenumbruch im Terminal):</p>
+<pre class="terminal">desklink "cmd=Aktives Fenster (2s):/bin/screenshot --window --border --delay 2" \
+"cmd=Replicant entfernen:desklink --remove=screenshot" /bin/screenshot
 </pre>
 <p><img src="../images/apps-images/cli-desklink.png" alt="cli-alert.png" /></p>
 </td></tr></table>

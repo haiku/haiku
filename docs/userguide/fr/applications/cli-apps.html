@@ -99,10 +99,10 @@ Parmi les paramètres disponibles, vous pouvez définir un répertoire de dépar
 <tr><td><p><span class="cli">open</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">open</span> est un petit outils très pratique pour ouvrir n'importe quel fichier avec son application préférée, ou pour démarrer une application particulière à partir de sa signature sans avoir besoin de connaître son emplacement exact. Ça fonctionne également avec les URLs, et même avec les dossiers "virtuels" <tt>.</tt> et <tt>..</tt> qui représentent respectivement le dossier courant et le dossier parent, qui seront ainsi ouvert dans le Tracker.</p></td></tr>
 <tr><td><p><span class="cli">desklink</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">desklink</span> vous permet d'installer une icône à partir de n'importe quel fichier, dossier, requête ou application dans le cartouche de la Deskbar. Vous pourrez également pourvoir le menu contextuel d'actions spécifiques à exécuter quand vous ferez un clic droit sur l'icône.
+		<td valign="top"><p><span class="cli">desklink</span> vous permet d'installer une icône dans le cartouche de la Deskbar à partir de n'importe quel fichier, dossier, requête ou application. Vous pourrez également pourvoir le menu contextuel d'actions spécifiques à exécuter quand vous ferez un clic droit sur l'icône.
 Voici par exemple comment ajouter <span class="app">Screenshot</span> avec diverses options (le "<tt>\</tt>" à la fin de la première ligne sert juste au saut de ligne dans Terminal) :</p>
-<pre class="terminal">desklink "cmd=Active window (2s):/boot/system/apps/Screenshot --window --border --delay 2" \
-"cmd=Remove replicant:desklink --remove=Screenshot" /boot/system/apps/Screenshot
+<pre class="terminal"> desklink "cmd=Active window (2s):/bin/screenshot --window --border --delay 2" \
+"cmd=Remove replicant:desklink --remove=screenshot" /bin/screenshot
 </pre>
 <p><img src="../images/apps-images/cli-desklink.png" alt="cli-alert.png" /></p>
 </td></tr></table>

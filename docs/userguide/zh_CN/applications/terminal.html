@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2010, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -49,6 +49,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
 
 <h2><img src="../../images/apps-images/terminal-icon_64.png" alt="terminal-icon_64.png" width="64" height="64" />终端</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -63,25 +64,42 @@
 <p>终端是Haiku中具有用户界面的bash，即 Bourne Again Shell。</p>
 <p>请参考 <a href="../bash-scripting.html">脚本</a> 这一主题获取有关Shell的在线教程，同时也可以阅读<a href="cli-apps.html">Haiku的命令行程序</a>。在本文中，我们重点关注终端本身的使用。</p>
 
-<h3>
+<h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="appearance" name="appearance">外观</a></h3>
+<a id="windows-tabs" name="windows-tabs">Windows and tabs</a></h2>
 <p>您可以根据需要打开任意数量的终端，可以简单的启动，或者从正在运行的终端中使用 <span class="key">ALT</span> <span class="key">N</span> 组合键来打开多个终端窗口。您也可以使用终端的标签视图方式，使用 <span class="key">ALT</span> <span class="key">T</span> 组合键打开新的终端标签。</p>
-<p>终端的窗口和其他窗口一样可以调整尺寸，或者使用 <span class="menu">Settings | Window Size</span> 菜单中的预置尺寸。 <span class="key">ALT</span> <span class="key">ENTER</span> 组合键将会切换到全屏模式。</p>
-<p>调整的窗口尺寸和文字编码只有通过 <span class="menu">Settings | Save as default</span> 才可以进行保持不变。</p>
 <img src="../images/apps-images/terminal.png" alt="terminal.png" />
 <br />
-<p><span class="menu">Settings | Preferences</span> 打开一个面板用于设置字体类型，字体大小以及不同文本和背景的颜色。您可以把不同的设置保存为独立的配置文件，而后通过双击则会打开具有相应配置的终端。<br />
-按下 <span class="button">OK</span> 将会默认保存和使用当前配置。</p>
+<p>Double-clicking into the emtpy part of the tab bar opens a new tab; onto a tab opens a dialog to rename its title. There are several %-designated variables that are explained with a tooltip when you hover the mouse over the text field.<br />
+By default, <tt>%1d: %p</tt>, a tab shows the current directory and, separated by a <tt>:</tt>, the name of the currently running process (or <tt>--</tt> if it's just bash running, probably idling). The screenshot above shows the first tab with a FTP session in the <span class="path">Desktop</span> folder and a second tab idling at <span class="path">home</span>.<br />
+Via <span class="menu">Edit|Window title...</span> the Terminal window's title can be edited in a similar way.</p>
+<p>Right-clicking a tab shows a context menu to <span class="menu">Close tab</span>, <span class="menu">Close other tabs</span> or, like double-clicking, <span class="menu">Edit tab title...</span>.</p>
+<p>终端的窗口和其他窗口一样可以调整尺寸，或者使用 <span class="menu">Settings | Window Size</span> 菜单中的预置尺寸。 <span class="key">ALT</span> <span class="key">ENTER</span> 组合键将会切换到全屏模式。</p>
+<p>调整的窗口尺寸和文字编码只有通过 <span class="menu">Settings | Save as default</span> 才可以进行保持不变。</p>
 
-<h3>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="settings" name="settings">Settings</a></h2>
+<p><span class="menu">Settings | Settings...</span> opens a panel to configure the standard settings of a Terminal.</p>
+<img src="../images/apps-images/terminal-settings.png" alt="terminal-settings.png" />
+<br />
+<p>It starts off with the "formulas" for naming tab and window titles. Again, tooltips show the available variables. Below that you set font type, font size and the different text and background colors. You can choose a pre-defined color schema like <span class="menu">Black on white</span> or <span class="menu">White on black</span> or create a <span class="menu">Custom</span> one using the color picker below.<br />
+Activate the checkbox to <span class="menu">Confirm exit if active programs exist</span> and you'll be warned when trying to close a Terminal window while an app is still being executed.<br />
+You can save different settings as separate profiles, which on double-click open an accordingly configured Terminal.<br />
+Pressing <span class="button">OK</span> will save the current settings as default.</p>
+
+<h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="customization" name="customization">Bash的定制</a></h3>
+<a id="shortcuts" name="shortcuts">快捷键</a></h2>
+<p>您可以在 <a href="../keyboard-shortcuts.html#terminal">快捷键和组合键</a> 主题中找到非常有用的快捷键的列表。</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="customization" name="customization">Bash的定制</a></h2>
 <p>由于bash来自于Unix，它具有无数的可定制的方式。对于用户，有两个文件至关重要： <span class="cli">.profile</span> 和 <span class="cli">.inputrc</span> 。
 <br />
 这两个文件可以在 <span class="path">home/</span> 文件夹中予以创建， 然后将会添加到或者覆盖系统默认在 <span class="path">/boot/system/etc/</span> 中定义的配置文件。</p>
 
-<h4>.profile</h4>
+<h3>.profile</h3>
 <p>在您每次打开新的终端时， <span class="cli">.profile</span> 都会被载入程序。在该文件中，设置了所有影响到bash行为和外观的各种类型的设备接口和变量。你可以在网络上找到许多资源，它们将会给出所有可能性的详细介绍。</p>
 <p>Haiku/BeOS Tip Server提供了许多入门的技巧，例如：</p>
 <ul>
@@ -92,17 +110,12 @@
 </ul>
 <p>还有很多类似的信息，<a href="http://betips.net/index.php?s=.profile">请参阅</a>。</p>
 
-<h4>.inputrc</h4>
+<h3>.inputrc</h3>
 <p> <span class="cli">.inputrc</span> 用于处理键盘关联的配置。由于Haiku默认提供了非常有用的配置，您不需要修改相关的设置。如果您确实有特殊的需要，可以参考许多在线的资源，例如<a href="http://tiswww.case.edu/php/chet/readline/rluserman.html"> GNU 的命令行读取库</a> 。</p>
 
-<h3>
+<h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="shortcuts" name="shortcuts">快捷键</a></h3>
-<p>您可以在 <a href="../keyboard-shortcuts.html#terminal">快捷键和组合键</a> 主题中找到非常有用的快捷键的列表。</p>
-
-<h3>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="hints" name="hints">关于终端的提醒</a></h3>
+<a id="hints" name="hints">关于终端的提醒</a></h2>
 <ul><li><p>从Tracker窗口中拖拽文件或者文件夹到终端将会在光标的位置插入它的路径。而使用右键拖拽将会弹出一个右键菜单，显示附加的操作：</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="menu">Insert Path</span></td><td> </td><td>插入一个文件的路径，与左键拖拽文件到终端类似。</td></tr>

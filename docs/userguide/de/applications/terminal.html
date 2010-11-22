@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2010, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -51,6 +51,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Solange die Übersetzung dieser Seite noch nicht ganz fertig ist, erscheint für die noch fehlenden Teile die englische Version.</div>
 
 <h2><img src="../../images/apps-images/terminal-icon_64.png" alt="terminal-icon_64.png" width="64" height="64" />Terminal</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -64,24 +65,41 @@
 <p>Das Terminal ist Haikus Schnittstelle zur Bash, der "Bourne Again Shell".</p>
 <p>Einige Anleitungen zum Arbeiten in der Konsole finden sich in <a href="../bash-scripting.html">Bash und Skripten</a>. Außerdem werden im Kapitel <a href="cli-apps.html">Haikus Konsolenprogramme</a> einige Haiku-spezifischen Befehle vorgestellt. Hier geht es um die Anwendung Terminal an sich.</p>
 
-<h3>
+<h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="appearance" name="appearance">Darstellung</a></h3>
+<a id="windows-tabs" name="windows-tabs">Fenster und Reiter</a></h2>
 <p>Es können beliebig viele Terminals geöffnet werden. Entweder jedes in seinem eigenen Fenster - durch einfaches Starten, oder mit <span class="key">ALT</span> <span class="key">N</span> von einem bereits laufenden Terminal aus - oder man benutzt die Reiterfunktion vom Terminal und öffnet einen neuen Reiter mit <span class="key">ALT</span> <span class="key">T</span>.</p>
-<p>Ein Terminal-Fenster kann wie jedes andere Programmfenster in seiner Größe verändert werden. Es sind auch vorgegebene Einstellungen unter <span class="menu">Settings | Window Size</span> vorhanden. Mittels <span class="key">ALT</span> <span class="key">ENTER</span> kann in den Vollbild-Modus (und zurück) geschaltet werden.</p>
-<p>Geänderte Fenstergröße und Text-Kodierung werden nur behalten, wenn sie mit dem Menüpunkt <span class="menu">Settings | Save as default</span> als Voreinstellung gespeichert werden.</p>
 <img src="../images/apps-images/terminal.png" alt="terminal.png" />
 <br />
-<p>Über <span class="menu">Settings | Settings...</span> kann man die Schriftart und -größe, sowie die Farbe von Text und Hintergrund festlegen. Verschiedene Einstellungen können in Profil-Dateien abgespeichert werden. EIn späterer Doppelklick auf so eine Datei startet ein entsprechend konfiguriertes Terminal.<br />
-Mit <span class="button">OK</span> wird die aktuelle Einstellung als Standard übernommen.</p>
+<p>Double-clicking into the emtpy part of the tab bar opens a new tab; onto a tab opens a dialog to rename its title. There are several %-designated variables that are explained with a tooltip when you hover the mouse over the text field.<br />
+By default, <tt>%1d: %p</tt>, a tab shows the current directory and, separated by a <tt>:</tt>, the name of the currently running process (or <tt>--</tt> if it's just bash running, probably idling). The screenshot above shows the first tab with a FTP session in the <span class="path">Desktop</span> folder and a second tab idling at <span class="path">home</span>.<br />
+Via <span class="menu">Edit|Window title...</span> the Terminal window's title can be edited in a similar way.</p>
+<p>Right-clicking a tab shows a context menu to <span class="menu">Close tab</span>, <span class="menu">Close other tabs</span> or, like double-clicking, <span class="menu">Edit tab title...</span>.</p>
+<p>Ein Terminal-Fenster kann wie jedes andere Programmfenster in seiner Größe verändert werden. Es sind auch vorgegebene Einstellungen unter <span class="menu">Settings | Window Size</span> vorhanden. Mittels <span class="key">ALT</span> <span class="key">ENTER</span> kann in den Vollbild-Modus (und zurück) geschaltet werden.</p>
+<p>Geänderte Fenstergröße und Text-Kodierung werden nur behalten, wenn sie mit dem Menüpunkt <span class="menu">Settings | Save as default</span> als Voreinstellung gespeichert werden.</p>
 
-<h3>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="settings" name="settings">Settings</a></h2>
+<p><span class="menu">Settings | Settings...</span> opens a panel to configure the standard settings of a Terminal.</p>
+<img src="../images/apps-images/terminal-settings.png" alt="terminal-settings.png" />
+<br />
+<p>It starts off with the "formulas" for naming tab and window titles. Again, tooltips show the available variables. Below that you set font type, font size and the different text and background colors. You can choose a pre-defined color schema like <span class="menu">Black on white</span> or <span class="menu">White on black</span> or create a <span class="menu">Custom</span> one using the color picker below.<br />
+Activate the checkbox to <span class="menu">Confirm exit if active programs exist</span> and you'll be warned when trying to close a Terminal window while an app is still being executed.<br />
+You can save different settings as separate profiles, which on double-click open an accordingly configured Terminal.<br />
+Pressing <span class="button">OK</span> will save the current settings as default.</p>
+
+<h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="customization" name="customization">Personalisierung der Bash</a></h3>
+<a id="shortcuts" name="shortcuts">Tastaturkürzel</a></h2>
+<p>Eine Liste mit Tastaturkürzeln ist unter <a href="../keyboard-shortcuts.html#terminal">Abkürzungen und Tastenkombinationen</a> aufgelistet.</p>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="customization" name="customization">Personalisierung der Bash</a></h2>
 <p>Da die Bash aus der Unix-Welt stammt, gibt es unzählige Möglichkeiten sie anzupassen. Zwei davon sind für den Anwender besonders interessant: <span class="cli">.profile</span> und <span class="cli">.inputrc</span><br />
 Werden diese beiden Dateien im <span class="path">home/</span> Verzeichnis angelegt, erweiteren oder ersetzen die Standardwerte, die in <span class="path">/boot/system/etc/</span> festgelegt sind, </p>
 
-<h4>.profile</h4>
+<h3>.profile</h3>
 <p>Die Datei <span class="cli">.profile</span> wird jedes Mal geladen, wenn ein neues Terminal gestartet wird. Durch sie werden die verschiedensten Variablen und Verhalten innerhalb der Bash definiert. Im Internet findet man eine Unmenge an Dokumentation, die alle Möglichkeiten im Detail zeigt.</p>
 <p>Der Haiku/BeOS Tipp-Server enthält einige Beispiele und Tipps, unter anderem:</p>
 <ul>
@@ -92,17 +110,12 @@ Werden diese beiden Dateien im <span class="path">home/</span> Verzeichnis angel
 </ul>
 <p>Noch mehr Tipps gibt es <a href="http://betips.net/index.php?s=.profile">hier</a>.</p>
 
-<h4>.inputrc</h4>
+<h3>.inputrc</h3>
 <p>Die Datei <span class="cli">.inputrc</span> kümmert sich um die Tastaturzuweisungen. Da Haiku aber bereits mit einer sinnvollen Voreinstellung eingerichtet ist, wird man hier wenig ändern müssen - außer man hat spezielle Bedürfnisse. In diesem Fall sei auf die <a href="http://php.net/manual/de/book.readline.php"> GNU Readline Bibliothek</a> im Internet verwiesen.</p>
 
-<h3>
+<h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="shortcuts" name="shortcuts">Tastaturkürzel</a></h3>
-<p>Eine Liste mit Tastaturkürzeln ist unter <a href="../keyboard-shortcuts.html#terminal">Abkürzungen und Tastenkombinationen</a> aufgelistet.</p>
-
-<h3>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="hints" name="hints">Tipps für das Arbeiten mit dem Terminal</a></h3>
+<a id="hints" name="hints">Tipps für das Arbeiten mit dem Terminal</a></h2>
 <ul><li><p>Wird eine Datei aus einem Tracker-Fenster ins Terminal gezogen, so wird der Pfad zu dieser Datei an der aktuellen Cursor-Position eingefügt. Wird sie mittels der rechten Maustaste hineingezogen, gibt es mehrere Möglichkeiten zur Auswahl:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="menu">Insert Path</span></td><td> </td><td>Fügt den Pfad zu dieser Datei ein.</td></tr>
