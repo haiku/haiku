@@ -612,9 +612,14 @@ BasicTerminalBuffer::FillScreen(UTF8Char c, uint32 width, uint32 attributes)
 
 
 void
-BasicTerminalBuffer::InsertCR()
+BasicTerminalBuffer::InsertCR(uint32 attributes)
 {
-	_LineAt(fCursor.y)->softBreak = false;
+	TerminalLine* line = _LineAt(fCursor.y);
+	line->cells[fCursor.x].attributes = attributes;
+	line->cells[fCursor.x].character = ' ';
+	line->length ++;
+
+	line->softBreak = false;
 	fSoftWrappedCursor = false;
 	fCursor.x = 0;
 	_CursorChanged();

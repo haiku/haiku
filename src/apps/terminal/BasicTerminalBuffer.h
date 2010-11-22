@@ -105,7 +105,7 @@ public:
 									uint32 width, uint32 attributes);
 			void				FillScreen(UTF8Char c, uint32 width, uint32 attr);
 
-			void				InsertCR();
+			void				InsertCR(uint32 attrs);
 			void				InsertLF();
 			void				InsertRI();
 			void				InsertTab(uint32 attr);
