@@ -223,6 +223,10 @@ TermWindow::TermWindow(const BString& title, Arguments* args)
 	// init the GUI and add a tab
 	_InitWindow();
 	_AddTab(args);
+
+	// Announce our window as no longer minimized. That's not true, since it's
+	// still hidden at this point, but it will be shown very soon.
+	fTerminalRoster.SetWindowInfo(false, Workspaces());
 }
 
 
