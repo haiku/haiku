@@ -63,17 +63,53 @@ const uint32 kMsgRemoveType = 'rmtp';
 const uint32 kMsgTypeRemoved = 'tprm';
 
 
-// TextView that filters the tab key to be able to tab-navigate while editing
+//! TextView that filters the tab key to be able to tab-navigate while editing
 class TabFilteringTextView : public BTextView {
-	public:
-		TabFilteringTextView(const char* name);
-		virtual ~TabFilteringTextView();
-		virtual void KeyDown(const char* bytes, int32 count);
+public:
+								TabFilteringTextView(const char* name);
+	virtual						~TabFilteringTextView();
+
+	virtual	void				KeyDown(const char* bytes, int32 count);
+};
+
+class SupportedTypeItem : public BStringItem {
+public:
+								SupportedTypeItem(const char* type);
+	virtual						~SupportedTypeItem();
+
+			const char*			Type() const { return fType.String(); }
+			::Icon&				Icon() { return fIcon; }
+
+			void				SetIcon(::Icon* icon);
+			void				SetIcon(entry_ref& ref, const char* type);
+
+	static	int					Compare(const void* _a, const void* _b);
+
+private:
+			BString				fType;
+			::Icon				fIcon;
+};
+
+class SupportedTypeListView : public DropTargetListView {
+public:
+								SupportedTypeListView(const char* name,
+									list_view_type
+										type = B_SINGLE_SELECTION_LIST,
+									uint32 flags = B_WILL_DRAW
+										| B_FRAME_EVENTS | B_NAVIGABLE);
+	virtual						~SupportedTypeListView();
+
+	virtual	void				MessageReceived(BMessage* message);
+	virtual	bool				AcceptsDrag(const BMessage* message);
 };
 
 
+// #pragma mark -
+
+
 TabFilteringTextView::TabFilteringTextView(const char* name)
-	:	BTextView(name, B_WILL_DRAW | B_PULSE_NEEDED)
+	:
+	BTextView(name, B_WILL_DRAW | B_PULSE_NEEDED)
 {
 }
 
@@ -93,33 +129,7 @@ TabFilteringTextView::KeyDown(const char* bytes, int32 count)
 }
 
 
-class SupportedTypeItem : public BStringItem {
-	public:
-		SupportedTypeItem(const char* type);
-		~SupportedTypeItem();
-
-		const char* Type() const { return fType.String(); }
-		::Icon& Icon() { return fIcon; }
-		void SetIcon(::Icon* icon);
-		void SetIcon(entry_ref& ref, const char* type);
-
-		static int Compare(const void* _a, const void* _b);
-
-	private:
-		BString	fType;
-		::Icon	fIcon;
-};
-
-class SupportedTypeListView : public DropTargetListView {
-	public:
-		SupportedTypeListView(const char* name,
-			list_view_type type = B_SINGLE_SELECTION_LIST,
-			uint32 flags = B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE);
-		virtual ~SupportedTypeListView();
-
-		virtual void MessageReceived(BMessage* message);
-		virtual bool AcceptsDrag(const BMessage* message);
-};
+// #pragma mark -
 
 
 SupportedTypeItem::SupportedTypeItem(const char* type)
@@ -277,7 +287,7 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 	// filter out invalid characters that can't be part of a MIME type name
 	BTextView* textView = fSignatureControl->TextView();
 	textView->SetMaxBytes(B_MIME_TYPE_LENGTH);
-	const char* disallowedCharacters = "<>@,;:\"()[]?=";
+	const char* disallowedCharacters = "<>@,;:\"()[]?= ";
 	for (int32 i = 0; disallowedCharacters[i]; i++) {
 		textView->DisallowChar(disallowedCharacters[i]);
 	}
@@ -408,6 +418,18 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 	BSize minScrollSize = scrollView->ScrollBar(B_VERTICAL)->MinSize();
 	minScrollSize.width += fLongDescriptionView->MinSize().width;
 	scrollView->SetExplicitMinSize(minScrollSize);
+
+	// Manually set a minimum size for the version text controls
+	// TODO: the same does not work when applied to the layout items
+	float width = be_plain_font->StringWidth("99") + 16;
+	fMajorVersionControl->TextView()->SetExplicitMinSize(
+		BSize(width, fMajorVersionControl->MinSize().height));
+	fMiddleVersionControl->TextView()->SetExplicitMinSize(
+		BSize(width, fMiddleVersionControl->MinSize().height));
+	fMinorVersionControl->TextView()->SetExplicitMinSize(
+		BSize(width, fMinorVersionControl->MinSize().height));
+	fInternalVersionControl->TextView()->SetExplicitMinSize(
+		BSize(width, fInternalVersionControl->MinSize().height));
 
 	versionBox->AddChild(BGridLayoutBuilder(padding / 2, padding / 2)
 		.Add(fMajorVersionControl->CreateLabelLayoutItem(), 0, 0)
