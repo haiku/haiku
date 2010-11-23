@@ -71,7 +71,7 @@ ClientMemoryAllocator::InitCheck()
 }
 
 
-void *
+void*
 ClientMemoryAllocator::Allocate(size_t size, void** _address, bool& newArea)
 {
 	// Search best matching free block from the list
@@ -124,7 +124,7 @@ ClientMemoryAllocator::Allocate(size_t size, void** _address, bool& newArea)
 
 
 void
-ClientMemoryAllocator::Free(void *cookie)
+ClientMemoryAllocator::Free(void* cookie)
 {
 	if (cookie == NULL)
 		return;
@@ -136,13 +136,12 @@ ClientMemoryAllocator::Free(void *cookie)
 	block_iterator iterator = fFreeBlocks.GetIterator();
 	struct block* before = NULL;
 	struct block* after = NULL;
-	struct block* block;
 
 	// TODO: this could be done better if free blocks are sorted,
 	//	and if we had one free blocks list per chunk!
 	//	IOW this is a bit slow...
 
-	while ((block = iterator.Next()) != NULL) {
+	while (struct block* block = iterator.Next()) {
 		if (block->chunk != freeBlock->chunk)
 			continue;
 
@@ -159,17 +158,30 @@ ClientMemoryAllocator::Free(void *cookie)
 		fFreeBlocks.Remove(after);
 		free(after);
 		free(freeBlock);
+		freeBlock = before;
 	} else if (before != NULL) {
 		before->size += freeBlock->size;
 		free(freeBlock);
+		freeBlock = before;
 	} else if (after != NULL) {
 		after->base -= freeBlock->size;
 		after->size += freeBlock->size;
 		free(freeBlock);
+		freeBlock = after;
 	} else
 		fFreeBlocks.Add(freeBlock);
 
-	// TODO: check if the whole chunk is free now (we could delete it then)
+	if (freeBlock->size == freeBlock->chunk->size) {
+		// We can delete the chunk now
+		struct chunk* chunk = freeBlock->chunk;
+
+		fFreeBlocks.Remove(freeBlock);
+		free(freeBlock);
+
+		fChunks.Remove(chunk);
+		delete_area(chunk->area);
+		free(chunk);
+	}
 }
 
 
@@ -237,7 +249,7 @@ ClientMemoryAllocator::Dump()
 }
 
 
-struct block *
+struct block*
 ClientMemoryAllocator::_AllocateChunk(size_t size, bool& newArea)
 {
 	// round up to multiple of page size
