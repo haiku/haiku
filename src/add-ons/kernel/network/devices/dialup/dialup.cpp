@@ -39,12 +39,13 @@ enum dialup_state {
 
 struct dialup_device : net_device {
 	int				fd;
+	struct termios	line_config;
 	dialup_state 	state;
-	char*			init_string;
-	char*			dial_string;
-	char*			escape_string;
+	char			init_string[64];
+	char			dial_string[64];
+	char			escape_string[8];
 	bigtime_t		escape_silence;
-	char*			hangup_string;
+	char			hangup_string[16];
 };
 
 net_buffer_module_info* gBufferModule;
@@ -74,7 +75,7 @@ dialup_init(const char* name, net_device** _device)
 
 	strcpy(device->name, name);
 	device->flags = IFF_POINTOPOINT;
-	device->type = IFT_PPP;
+	device->type = IFT_PPP; // this device handle RFC 1331 frame format only
 	device->mtu = 1502;
 	device->media = 0;
 	device->header_length = 8; // HDLC_HEADER_LENGTH;
@@ -82,11 +83,12 @@ dialup_init(const char* name, net_device** _device)
 	device->state = DOWN;
 
 	// default AT strings
-	device->init_string = strdup("ATZ");
-	device->dial_string = strdup("ATDT");
-	device->escape_string = strdup("+++");
-	device->escape_silence  = 1000000;
-	device->hangup_string = strdup("ATH0");
+	strncpy(device->init_string, "ATZ", sizeof(device->init_string));
+	strncpy(device->dial_string, "ATDT", sizeof(device->dial_string));
+	strncpy(device->hangup_string, "ATH0", sizeof(device->hangup_string));
+
+	strncpy(device->escape_string, "+++", sizeof(device->escape_string));
+	device->escape_silence = 1000000;
 
 	*_device = device;
 	return B_OK;
@@ -97,15 +99,9 @@ status_t
 dialup_uninit(net_device* _device)
 {
 	dialup_device* device = (dialup_device*)_device;
-	free(device->init_string);
-	free(device->dial_string);
-	free(device->escape_string);
-	free(device->hangup_string);
-
 	delete device;
 
 	put_module(NET_BUFFER_MODULE_NAME);
-
 	return B_OK;
 }
 
@@ -120,21 +116,22 @@ dialup_up(net_device* _device)
 		return errno;
 
 	// init port
-	struct termios options;
-	if (ioctl(device->fd, TCGETA, &options, sizeof(options)) < 0)
+	if (ioctl(device->fd, TCGETA, &device->line_config,
+		sizeof(device->line_config)) < 0)
 		goto err;
 
 	// adjust options
-	options.c_cflag &= ~CBAUD;
-	options.c_cflag |= B115200;	// TODO: make this configurable too...
-	options.c_cflag |= (CLOCAL | CREAD);
-	options.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
-	options.c_oflag &= ~OPOST;
-	options.c_cc[VMIN] = 0;
-	options.c_cc[VTIME] = 10;
+	device->line_config.c_cflag &= ~CBAUD;
+	device->line_config.c_cflag |= B115200;	// TODO: make this configurable too...
+	device->line_config.c_cflag |= (CLOCAL | CREAD);
+	device->line_config.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
+	device->line_config.c_oflag &= ~OPOST;
+	device->line_config.c_cc[VMIN] = 0;
+	device->line_config.c_cc[VTIME] = 10;
 
 	// set new options
-	if(ioctl(device->fd, TCSETA, &options) < 0)
+	if(ioctl(device->fd, TCSETA, &device->line_config,
+		sizeof(device->line_config)) < 0)
 		goto err;
 
 	// TODO: init modem & start dialing phase
@@ -160,6 +157,8 @@ dialup_down(net_device* _device)
 			strlen(device->escape_string)) > 0) {
 			snooze(device->escape_silence);
 			// TODO: send hangup string and check for OK ack
+			write(device->fd, device->hangup_string,
+				strlen(device->hangup_string));
 		}
 		device->flags &= ~IFF_LINK;
 	}
