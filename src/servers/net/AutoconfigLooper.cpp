@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -17,7 +17,8 @@
 #include <sys/socket.h>
 #include <sys/sockio.h>
 
-#include <net_notifications.h>
+#include <NetworkInterface.h>
+#include <NetworkNotifications.h>
 
 #include "DHCPClient.h"
 #include "NetServer.h"
@@ -57,20 +58,11 @@ AutoconfigLooper::_RemoveClient()
 void
 AutoconfigLooper::_Configure()
 {
-	ifreq request;
-	if (!prepare_request(request, fDevice.String()))
-		return;
-
 	// set IFF_CONFIGURING flag on interface
 
-	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
-	if (socket < 0)
-		return;
-
-	if (ioctl(socket, SIOCGIFFLAGS, &request, sizeof(struct ifreq)) == 0) {
-		request.ifr_flags |= IFF_CONFIGURING;
-		ioctl(socket, SIOCSIFFLAGS, &request, sizeof(struct ifreq));
-	}
+	BNetworkInterface interface(fDevice.String());
+	int32 flags = interface.Flags() & ~IFF_AUTO_CONFIGURED;
+	interface.SetFlags(flags | IFF_CONFIGURING);
 
 	// remove current handler
 
@@ -81,10 +73,8 @@ AutoconfigLooper::_Configure()
 	fCurrentClient = new DHCPClient(fTarget, fDevice.String());
 	AddHandler(fCurrentClient);
 
-	if (fCurrentClient->Initialize() == B_OK) {
-		close(socket);
+	if (fCurrentClient->Initialize() == B_OK)
 		return;
-	}
 
 	_RemoveClient();
 
@@ -94,23 +84,20 @@ AutoconfigLooper::_Configure()
 	// TODO: have a look at zeroconf
 	// TODO: this could also be done add-on based
 
-	if (ioctl(socket, SIOCGIFFLAGS, &request, sizeof(struct ifreq)) == 0
-		&& (request.ifr_flags & IFF_CONFIGURING) == 0) {
+	if ((interface.Flags() & IFF_CONFIGURING) == 0) {
 		// Someone else configured the interface in the mean time
-		close(socket);
 		return;
 	}
 
-	close(socket);
+	BMessage message(kMsgConfigureInterface);
+	message.AddString("device", fDevice.String());
+	message.AddBool("auto", true);
 
-	BMessage interface(kMsgConfigureInterface);
-	interface.AddString("device", fDevice.String());
-	interface.AddBool("auto", true);
-
-	uint8 mac[6];
+	BNetworkAddress link;
 	uint8 last = 56;
-	if (get_mac_address(fDevice.String(), mac) == B_OK) {
+	if (interface.GetHardwareAddress(link) == B_OK) {
 		// choose IP address depending on the MAC address, if available
+		uint8* mac = link.LinkLevelAddress();
 		last = mac[0] ^ mac[1] ^ mac[2] ^ mac[3] ^ mac[4] ^ mac[5];
 		if (last > 253)
 			last = 253;
@@ -126,11 +113,11 @@ AutoconfigLooper::_Configure()
 	snprintf(string, sizeof(string), "169.254.0.%u", last);
 
 	BMessage address;
-	address.AddString("family", "inet");
+	address.AddInt32("family", AF_INET);
 	address.AddString("address", string);
-	interface.AddMessage("address", &address);
+	message.AddMessage("address", &address);
 
-	fTarget.SendMessage(&interface);
+	fTarget.SendMessage(&message);
 }
 
 

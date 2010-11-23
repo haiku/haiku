@@ -29,6 +29,8 @@
 #include <Deskbar.h>
 #include <Directory.h>
 #include <Entry.h>
+#include <NetworkInterface.h>
+#include <NetworkRoster.h>
 #include <Path.h>
 #include <PathMonitor.h>
 #include <Roster.h>
@@ -54,27 +56,24 @@ public:
 	virtual	void				MessageReceived(BMessage* message);
 
 private:
-			bool				_IsValidInterface(int socket, const char* name);
-			void				_RemoveInvalidInterfaces(int socket);
-			status_t			_RemoveInterface(int socket, const char* name);
-			status_t			_DisableInterface(int socket, const char* name);
-			bool				_TestForInterface(int socket, const char* name);
-			status_t			_ConfigureInterface(int socket,
-									BMessage& interface,
-									bool fromMessage = false);
+			bool				_IsValidInterface(BNetworkInterface& interface);
+			void				_RemoveInvalidInterfaces();
+			status_t			_RemoveInterface(const char* name);
+			status_t			_DisableInterface(const char* name);
+			bool				_TestForInterface(const char* name);
+			status_t			_ConfigureInterface(BMessage& interface);
 			status_t			_ConfigureResolver(
 									BMessage& resolverConfiguration);
 			bool				_QuitLooperForDevice(const char* device);
 			AutoconfigLooper*	_LooperForDevice(const char* device);
-			status_t			_ConfigureDevice(int socket, const char* path);
-			void				_ConfigureDevices(int socket, const char* path,
+			status_t			_ConfigureDevice(const char* path);
+			void				_ConfigureDevices(const char* path,
 									BMessage* suggestedInterface = NULL);
-			void				_ConfigureInterfaces(int socket,
+			void				_ConfigureInterfaces(
 									BMessage* _missingDevice = NULL);
 			void				_BringUpInterfaces();
 			void				_StartServices();
-			void				_HandleDeviceMonitor(int socket,
-									BMessage* message);
+			void				_HandleDeviceMonitor(BMessage* message);
 
 private:
 			Settings			fSettings;
@@ -87,164 +86,73 @@ struct address_family {
 	int			family;
 	const char*	name;
 	const char*	identifiers[4];
-	bool		(*parse_address)(const char* string, sockaddr* _address);
-	void		(*set_any_address)(sockaddr* address);
-	void		(*set_port)(sockaddr* address, int32 port);
 };
 
-
-// AF_INET family
-static bool inet_parse_address(const char* string, sockaddr* address);
-static void inet_set_any_address(sockaddr* address);
-static void inet_set_port(sockaddr* address, int32 port);
 
 static const address_family kFamilies[] = {
 	{
 		AF_INET,
 		"inet",
 		{"AF_INET", "inet", "ipv4", NULL},
-		inet_parse_address,
-		inet_set_any_address,
-		inet_set_port
 	},
-	{ -1, NULL, {NULL}, NULL }
+	{
+		AF_INET6,
+		"inet6",
+		{"AF_INET6", "inet6", "ipv6", NULL},
+	},
+	{ -1, NULL, {NULL} }
 };
 
 
-static bool
-inet_parse_address(const char* string, sockaddr* _address)
-{
-	in_addr inetAddress;
-
-	if (inet_aton(string, &inetAddress) != 1)
-		return false;
-
-	sockaddr_in& address = *(sockaddr_in *)_address;
-	address.sin_family = AF_INET;
-	address.sin_len = sizeof(struct sockaddr_in);
-	address.sin_port = 0;
-	address.sin_addr = inetAddress;
-	memset(&address.sin_zero[0], 0, sizeof(address.sin_zero));
-
-	return true;
-}
-
-
-void
-inet_set_any_address(sockaddr* _address)
-{
-	sockaddr_in& address = *(sockaddr_in*)_address;
-	address.sin_family = AF_INET;
-	address.sin_len = sizeof(struct sockaddr_in);
-	address.sin_port = 0;
-	address.sin_addr.s_addr = INADDR_ANY;
-	memset(&address.sin_zero[0], 0, sizeof(address.sin_zero));
-}
-
-
-void
-inet_set_port(sockaddr* _address, int32 port)
-{
-	sockaddr_in& address = *(sockaddr_in*)_address;
-	address.sin_port = port;
-}
-
-
-//	#pragma mark -
-
-
-bool
-get_family_index(const char* name, int32& familyIndex)
+int
+get_address_family(const char* argument)
 {
 	for (int32 i = 0; kFamilies[i].family >= 0; i++) {
 		for (int32 j = 0; kFamilies[i].identifiers[j]; j++) {
-			if (!strcmp(name, kFamilies[i].identifiers[j])) {
+			if (!strcmp(argument, kFamilies[i].identifiers[j])) {
 				// found a match
-				familyIndex = i;
-				return true;
+				return kFamilies[i].family;
 			}
 		}
 	}
 
-	// defaults to AF_INET
-	familyIndex = 0;
-	return false;
+	return AF_UNSPEC;
 }
 
 
-int
-family_at_index(int32 index)
-{
-	return kFamilies[index].family;
-}
-
-
+/*!	Parses the \a argument as network \a address for the specified \a family.
+	If \a family is \c AF_UNSPEC, \a family will be overwritten with the family
+	of the successfully parsed address.
+*/
 bool
-parse_address(int32 familyIndex, const char* argument, struct sockaddr& address)
+parse_address(int32& family, const char* argument, BNetworkAddress& address)
 {
 	if (argument == NULL)
 		return false;
 
-	return kFamilies[familyIndex].parse_address(argument, &address);
-}
-
-
-void
-set_any_address(int32 familyIndex, struct sockaddr& address)
-{
-	kFamilies[familyIndex].set_any_address(&address);
-}
-
-
-void
-set_port(int32 familyIndex, struct sockaddr& address, int32 port)
-{
-	kFamilies[familyIndex].set_port(&address, port);
-}
-
-
-bool
-prepare_request(ifreq& request, const char* name)
-{
-	if (strlen(name) >= IF_NAMESIZE)
+	status_t status = address.SetTo(family, argument, (uint16)0,
+		B_NO_ADDRESS_RESOLUTION);
+	if (status != B_OK)
 		return false;
 
-	strcpy(request.ifr_name, name);
+	if (family == AF_UNSPEC) {
+		// Test if we support the resulting address family
+		bool supported = false;
+
+		for (int32 i = 0; kFamilies[i].family >= 0; i++) {
+			if (kFamilies[i].family == address.Family()) {
+				supported = true;
+				break;
+			}
+		}
+		if (!supported)
+			return false;
+
+		// Take over family from address
+		family = address.Family();
+	}
+
 	return true;
-}
-
-
-status_t
-get_mac_address(const char* device, uint8* address)
-{
-	int socket = ::socket(AF_LINK, SOCK_DGRAM, 0);
-	if (socket < 0)
-		return errno;
-
-	ifreq request;
-	if (!prepare_request(request, device)) {
-		close(socket);
-		return B_ERROR;
-	}
-
-	if (ioctl(socket, SIOCGIFADDR, &request, sizeof(struct ifreq)) < 0) {
-		close(socket);
-		return errno;
-	}
-
-	close(socket);
-
-	sockaddr_dl &link = *(sockaddr_dl *)&request.ifr_addr;
-	if (link.sdl_type != IFT_ETHER)
-		return B_BAD_TYPE;
-
-	if (link.sdl_alen == 0)
-		return B_ENTRY_NOT_FOUND;
-
-	uint8 *mac = (uint8 *)LLADDR(&link);
-	memcpy(address, mac, 6);
-
-	return B_OK;
 }
 
 
@@ -252,14 +160,15 @@ get_mac_address(const char* device, uint8* address)
 
 
 NetServer::NetServer(status_t& error)
-	: BServer(kNetServerSignature, false, &error)
+	:
+	BServer(kNetServerSignature, false, &error)
 {
 }
 
 
 NetServer::~NetServer()
 {
-	BPrivate::BPathMonitor::StopWatching("/dev/net", this);	
+	BPrivate::BPathMonitor::StopWatching("/dev/net", this);
 }
 
 
@@ -288,7 +197,7 @@ NetServer::ReadyToRun()
 	fSettings.StartMonitoring(this);
 	_BringUpInterfaces();
 	_StartServices();
-	
+
 	BPrivate::BPathMonitor::StartWatching("/dev/net", B_ENTRY_CREATED
 		| B_ENTRY_REMOVED | B_WATCH_FILES_ONLY | B_WATCH_RECURSIVELY, this);
 }
@@ -301,25 +210,13 @@ NetServer::MessageReceived(BMessage* message)
 		case B_PATH_MONITOR:
 		{
 			fSettings.Update(message);
-			
-			// we need a socket to talk to the networking stack
-			int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
-			if (socket < 0)
-				break;
-			_HandleDeviceMonitor(socket, message);
-			close(socket);
+			_HandleDeviceMonitor(message);
 			break;
 		}
 
 		case kMsgInterfaceSettingsUpdated:
 		{
-			// we need a socket to talk to the networking stack
-			int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
-			if (socket < 0)
-				break;
-
-			_ConfigureInterfaces(socket);
-			close(socket);
+			_ConfigureInterfaces();
 			break;
 		}
 
@@ -334,32 +231,18 @@ NetServer::MessageReceived(BMessage* message)
 
 		case kMsgConfigureInterface:
 		{
-#if 0
-			if (!message->ReturnAddress().IsTargetLocal()) {
-				// for now, we only accept this message from add-ons
-				break;
-			}
-#endif
-
-			// we need a socket to talk to the networking stack
-			int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
-			if (socket < 0)
-				break;
-
-			status_t status = _ConfigureInterface(socket, *message, true);
+			status_t status = _ConfigureInterface(*message);
 
 			BMessage reply(B_REPLY);
 			reply.AddInt32("status", status);
 			message->SendReply(&reply);
-
-			close(socket);
 			break;
 		}
 
 		case kMsgConfigureResolver:
 		{
 			status_t status = _ConfigureResolver(*message);
-			
+
 			BMessage reply(B_REPLY);
 			reply.AddInt32("status", status);
 			message->SendReply(&reply);
@@ -373,52 +256,24 @@ NetServer::MessageReceived(BMessage* message)
 }
 
 
-/*!
-	Checks if an interface is valid, that is, if it has an address in any
+/*!	Checks if an interface is valid, that is, if it has an address in any
 	family, and, in case of ethernet, a hardware MAC address.
 */
 bool
-NetServer::_IsValidInterface(int socket, const char* name)
+NetServer::_IsValidInterface(BNetworkInterface& interface)
 {
-	ifreq request;
-	if (!prepare_request(request, name))
-		return B_ERROR;
-
 	// check if it has an address
 
-	int32 addresses = 0;
-
-	for (int32 i = 0; kFamilies[i].family >= 0; i++) {
-		int familySocket = ::socket(kFamilies[i].family, SOCK_DGRAM, 0);
-		if (familySocket < 0)
-			continue;
-
-		if (ioctl(familySocket, SIOCGIFADDR, &request, sizeof(struct ifreq)) == 0) {
-			if (request.ifr_addr.sa_family == kFamilies[i].family)
-				addresses++;
-		}
-
-		close(familySocket);
-	}
-
-	if (addresses == 0)
+	if (interface.CountAddresses() == 0)
 		return false;
 
 	// check if it has a hardware address, too, in case of ethernet
 
-	int linkSocket = ::socket(AF_LINK, SOCK_DGRAM, 0);
-	if (linkSocket < 0)
+	BNetworkAddress link;
+	if (interface.GetHardwareAddress(link) != B_OK)
 		return false;
 
-	if (ioctl(linkSocket, SIOCGIFADDR, &request, sizeof(struct ifreq)) < 0) {
-		close(linkSocket);
-		return false;
-	}
-
-	close(linkSocket);
-
-	sockaddr_dl &link = *(sockaddr_dl *)&request.ifr_addr;
-	if (link.sdl_type == IFT_ETHER && link.sdl_alen < 6)
+	if (link.LinkLevelType() == IFT_ETHER && link.LinkLevelAddressLength() != 6)
 		return false;
 
 	return true;
@@ -426,153 +281,81 @@ NetServer::_IsValidInterface(int socket, const char* name)
 
 
 void
-NetServer::_RemoveInvalidInterfaces(int socket)
+NetServer::_RemoveInvalidInterfaces()
 {
-	// get a list of all interfaces
+	BNetworkRoster& roster = BNetworkRoster::Default();
+	BNetworkInterface interface;
+	uint32 cookie = 0;
 
-	ifconf config;
-	config.ifc_len = sizeof(config.ifc_value);
-	if (ioctl(socket, SIOCGIFCOUNT, &config, sizeof(struct ifconf)) < 0)
-		return;
-
-	uint32 count = (uint32)config.ifc_value;
-	if (count == 0) {
-		// there are no interfaces yet
-		return;
-	}
-
-	void *buffer = malloc(count * sizeof(struct ifreq));
-	if (buffer == NULL) {
-		fprintf(stderr, "%s: Out of memory.\n", Name());
-		return;
-	}
-
-	config.ifc_len = count * sizeof(struct ifreq);
-	config.ifc_buf = buffer;
-	if (ioctl(socket, SIOCGIFCONF, &config, sizeof(struct ifconf)) < 0) {
-		free(buffer);
-		return;
-	}
-
-	ifreq *interface = (ifreq *)buffer;
-
-	for (uint32 i = 0; i < count; i++) {
-		if (!_IsValidInterface(socket, interface->ifr_name)) {
+	while (roster.GetNextInterface(&cookie, interface) == B_OK) {
+		if (!_IsValidInterface(interface)) {
 			// remove invalid interface
-			_RemoveInterface(socket, interface->ifr_name);
+			_RemoveInterface(interface.Name());
 		}
-
-		interface = (ifreq *)((addr_t)interface + IF_NAMESIZE
-			+ interface->ifr_addr.sa_len);
 	}
-
-	free(buffer);
 }
 
 
 bool
-NetServer::_TestForInterface(int socket, const char* name)
+NetServer::_TestForInterface(const char* name)
 {
-	// get a list of all interfaces
 
-	ifconf config;
-	config.ifc_len = sizeof(config.ifc_value);
-	if (ioctl(socket, SIOCGIFCOUNT, &config, sizeof(struct ifconf)) < 0)
-		return false;
-
-	uint32 count = (uint32)config.ifc_value;
-	if (count == 0) {
-		// there are no interfaces yet
-		return false;
-	}
-
-	void *buffer = malloc(count * sizeof(struct ifreq));
-	if (buffer == NULL) {
-		fprintf(stderr, "%s: Out of memory.\n", Name());
-		return false;
-	}
-
-	config.ifc_len = count * sizeof(struct ifreq);
-	config.ifc_buf = buffer;
-	if (ioctl(socket, SIOCGIFCONF, &config, sizeof(struct ifconf)) < 0) {
-		free(buffer);
-		return false;
-	}
-
-	ifreq *interface = (ifreq *)buffer;
+	BNetworkRoster& roster = BNetworkRoster::Default();
 	int32 nameLength = strlen(name);
-	bool success = false;
+	BNetworkInterface interface;
+	uint32 cookie = 0;
 
-	for (uint32 i = 0; i < count; i++) {
-		if (!strncmp(interface->ifr_name, name, nameLength)) {
-			success = true;
-			break;
-		}
-
-		interface = (ifreq *)((addr_t)interface + IF_NAMESIZE
-			+ interface->ifr_addr.sa_len);
+	while (roster.GetNextInterface(&cookie, interface) == B_OK) {
+		if (!strncmp(interface.Name(), name, nameLength))
+			return true;
 	}
 
-	free(buffer);
-	return success;
+	return false;
 }
 
 
 status_t
-NetServer::_RemoveInterface(int socket, const char* name)
+NetServer::_RemoveInterface(const char* name)
 {
-	ifreq request;
-	if (!prepare_request(request, name))
-		return B_ERROR;
-		
-	if (ioctl(socket, SIOCDIFADDR, &request, sizeof(request)) < 0) {
+	BNetworkRoster& roster = BNetworkRoster::Default();
+	status_t status = roster.RemoveInterface(name);
+	if (status != B_OK) {
 		fprintf(stderr, "%s: Could not delete interface %s: %s\n",
-			Name(), name, strerror(errno));
-		return B_ERROR;
+			Name(), name, strerror(status));
+		return status;
 	}
-	
+
 	return B_OK;
 }
 
 
 status_t
-NetServer::_DisableInterface(int socket, const char* name)
+NetServer::_DisableInterface(const char* name)
 {
-	ifreq request;
-	if (!prepare_request(request, name))
-		return B_ERROR;
+	BNetworkInterface interface(name);
+	int32 flags = interface.Flags();
 
-	if (ioctl(socket, SIOCGIFFLAGS, &request, sizeof(struct ifreq)) < 0) {
-		fprintf(stderr, "%s: Getting flags failed: %s\n", Name(), 
-			strerror(errno));
-		return B_ERROR;
-	}
 	// Set interface down
-	request.ifr_flags &= ~(IFF_UP | IFF_AUTO_CONFIGURED | IFF_CONFIGURING);
+	flags &= ~(IFF_UP | IFF_AUTO_CONFIGURED | IFF_CONFIGURING);
 
-	if (ioctl(socket, SIOCSIFFLAGS, &request, sizeof(struct ifreq)) < 0) {
-		fprintf(stderr, "%s: Setting flags failed: %s\n", Name(), 
-			strerror(errno));
-		return B_ERROR;
+	status_t status = interface.SetFlags(flags);
+	if (status != B_OK) {
+		fprintf(stderr, "%s: Setting flags failed: %s\n", Name(),
+			strerror(status));
+		return status;
 	}
 
-	fprintf(stderr, "%s: set %s interface down...\n", Name(), name); 
-	
+	fprintf(stderr, "%s: set %s interface down...\n", Name(), name);
 	return B_OK;
 }
 
 
 status_t
-NetServer::_ConfigureInterface(int socket, BMessage& interface,
-	bool fromMessage)
+NetServer::_ConfigureInterface(BMessage& interface)
 {
-	const char *device;
+	const char* device;
 	if (interface.FindString("device", &device) != B_OK)
 		return B_BAD_VALUE;
-
-	ifreq request;
-	if (!prepare_request(request, device))
-		return B_ERROR;
 
 	bool startAutoConfig = false;
 
@@ -595,41 +378,28 @@ NetServer::_ConfigureInterface(int socket, BMessage& interface,
 	BMessage addressMessage;
 	for (int32 index = 0; interface.FindMessage("address", index,
 			&addressMessage) == B_OK; index++) {
-		const char* family;
-		if (addressMessage.FindString("family", &family) < B_OK)
-			continue;
+		int32 family;
+		if (addressMessage.FindInt32("family", &family) != B_OK) {
+			const char* familyString;
+			if (addressMessage.FindString("family", &familyString) == B_OK) {
+				if (get_address_family(familyString) == AF_UNSPEC) {
+					// we don't support this family
+					continue;
+				}
+			}
+		} else
+			family = AF_UNSPEC;
 
-		int32 familyIndex;
-		if (!get_family_index(family, familyIndex)) {
-			// we don't support this family
-			continue;
-		}
+		BNetworkInterface interface(device);
+		if (!interface.Exists()) {
+			// the interface does not exist yet, we have to add it first
+			BNetworkRoster& roster = BNetworkRoster::Default();
 
-		int familySocket = socket;
-		if (family_at_index(familyIndex) != AF_INET)
-			socket = ::socket(family_at_index(familyIndex), SOCK_DGRAM, 0);
-		if (socket < 0) {
-			// the family is not available in this environment
-			continue;
-		}
-
-		uint32 interfaceIndex = 0;
-		if (ioctl(socket, SIOCGIFINDEX, &request, sizeof(request)) >= 0)
-			interfaceIndex = request.ifr_index;
-
-		if (interfaceIndex == 0) {
-			// we need to create the interface first
-			ifaliasreq request;
-			strlcpy(request.ifra_name, device, IF_NAMESIZE);
-
-			request.ifra_addr.ss_family = AF_UNSPEC;
-			request.ifra_mask.ss_family = AF_UNSPEC;
-			request.ifra_broadaddr.ss_family = AF_UNSPEC;
-
-			if (ioctl(socket, SIOCAIFADDR, &request, sizeof(request)) < 0) {
+			status_t status = roster.AddInterface(interface);
+			if (status != B_OK) {
 				fprintf(stderr, "%s: Could not add interface: %s\n", Name(),
-					strerror(errno));
-				return errno;
+					strerror(status));
+				return status;
 			}
 		}
 
@@ -638,129 +408,97 @@ NetServer::_ConfigureInterface(int socket, BMessage& interface,
 		bool autoConfig;
 		if (addressMessage.FindBool("auto_config", &autoConfig) != B_OK)
 			autoConfig = false;
-#if 0
-		if (autoConfig && fromMessage) {
-			// we don't accept auto-config messages this way
-			continue;
-		}
-#endif
 
-		bool hasAddress = false, hasMask = false, hasPeer = false;
-		bool hasBroadcast = false;
-		struct sockaddr address, mask, peer, broadcast, gateway;
+		BNetworkAddress address;
+		BNetworkAddress mask;
+		BNetworkAddress broadcast;
+		BNetworkAddress peer;
+		BNetworkAddress gateway;
+
 		const char* string;
 
 		if (!autoConfig) {
-			if (addressMessage.FindString("address", &string) == B_OK
-				&& parse_address(familyIndex, string, address)) {
-				hasAddress = true;
+			if (addressMessage.FindString("address", &string) == B_OK) {
+				parse_address(family, string, address);
 
-				if (addressMessage.FindString("mask", &string) == B_OK
-					&& parse_address(familyIndex, string, mask))
-					hasMask = true;
+				if (addressMessage.FindString("mask", &string) == B_OK)
+					parse_address(family, string, mask);
 			}
-			if (addressMessage.FindString("peer", &string) == B_OK
-				&& parse_address(familyIndex, string, peer))
-				hasPeer = true;
-			if (addressMessage.FindString("broadcast", &string) == B_OK
-				&& parse_address(familyIndex, string, broadcast))
-				hasBroadcast = true;
+
+			if (addressMessage.FindString("peer", &string) == B_OK)
+				parse_address(family, string, peer);
+
+			if (addressMessage.FindString("broadcast", &string) == B_OK)
+				parse_address(family, string, broadcast);
 		}
-
-		route_entry route;
-		memset(&route, 0, sizeof(route_entry));
-		route.flags = RTF_STATIC | RTF_DEFAULT;
-
-		request.ifr_route = route;
 
 		if (autoConfig) {
 			_QuitLooperForDevice(device);
 			startAutoConfig = true;
 		} else if (addressMessage.FindString("gateway", &string) == B_OK
-			&& parse_address(familyIndex, string, gateway)) {
+			&& parse_address(family, string, gateway)) {
 			// add gateway route, if we're asked for it
-
-			ioctl(socket, SIOCDELRT, &request, sizeof(request));
+			interface.RemoveDefaultRoute(family);
 				// Try to remove a previous default route, doesn't matter
 				// if it fails.
 
-			route.flags = RTF_STATIC | RTF_DEFAULT | RTF_GATEWAY;
-			route.gateway = &gateway;
-
-			request.ifr_route = route;
-			if (ioctl(socket, SIOCADDRT, &request, sizeof(request)) < 0) {
+			status_t status = interface.AddDefaultRoute(gateway);
+			if (status != B_OK) {
 				fprintf(stderr, "%s: Could not add route for %s: %s\n",
 					Name(), device, strerror(errno));
 			}
 		}
 
-		// set addresses
+		// set address/mask/broadcast/peer
 
-		if (hasAddress) {
-			memcpy(&request.ifr_addr, &address, address.sa_len);
+		if (!address.IsEmpty() || !mask.IsEmpty() || !broadcast.IsEmpty()) {
+			BNetworkInterfaceAddress interfaceAddress;
+			interfaceAddress.SetAddress(address);
+			interfaceAddress.SetMask(mask);
+			if (!broadcast.IsEmpty())
+				interfaceAddress.SetBroadcast(broadcast);
+			else if (!peer.IsEmpty())
+				interfaceAddress.SetDestination(peer);
 
-			if (ioctl(familySocket, SIOCSIFADDR, &request, sizeof(struct ifreq)) < 0) {
-				fprintf(stderr, "%s: Setting address failed: %s\n", Name(), strerror(errno));
-				continue;
-			}
-		}
-
-		if (ioctl(familySocket, SIOCGIFFLAGS, &request, sizeof(struct ifreq)) < 0) {
-			fprintf(stderr, "%s: Getting flags failed: %s\n", Name(), strerror(errno));
-			continue;
-		}
-		int32 currentFlags = request.ifr_flags;
-
-		if (hasMask) {
-			memcpy(&request.ifr_mask, &mask, mask.sa_len);
-
-			if (ioctl(familySocket, SIOCSIFNETMASK, &request, sizeof(struct ifreq)) < 0) {
-				fprintf(stderr, "%s: Setting subnet mask failed: %s\n", Name(), strerror(errno));
-				continue;
-			}
-		}
-
-		if (hasBroadcast) {
-			memcpy(&request.ifr_broadaddr, &broadcast, broadcast.sa_len);
-
-			if (ioctl(familySocket, SIOCSIFBRDADDR, &request, sizeof(struct ifreq)) < 0) {
-				fprintf(stderr, "%s: Setting broadcast address failed: %s\n", Name(), strerror(errno));
-				continue;
-			}
-		}
-
-		if (hasPeer) {
-			memcpy(&request.ifr_dstaddr, &peer, peer.sa_len);
-
-			if (ioctl(familySocket, SIOCSIFDSTADDR, &request, sizeof(struct ifreq)) < 0) {
-				fprintf(stderr, "%s: Setting peer address failed: %s\n", Name(), strerror(errno));
-				continue;
+			status_t status = interface.SetAddress(interfaceAddress);
+			if (status != B_OK) {
+				fprintf(stderr, "%s: Setting address failed: %s\n", Name(),
+					strerror(status));
+				return status;
 			}
 		}
 
 		// set flags
 
 		if (flags != 0) {
-			request.ifr_flags = (currentFlags & ~IFF_CONFIGURING) | flags;
+			int32 newFlags = interface.Flags();
+			newFlags = (newFlags & ~IFF_CONFIGURING) | flags;
 			if (!autoConfigured)
-				request.ifr_flags = request.ifr_flags & ~IFF_AUTO_CONFIGURED;
+				newFlags &= ~IFF_AUTO_CONFIGURED;
 
-			if (ioctl(familySocket, SIOCSIFFLAGS, &request, sizeof(struct ifreq)) < 0)
-				fprintf(stderr, "%s: Setting flags failed: %s\n", Name(), strerror(errno));
+			status_t status = interface.SetFlags(newFlags);
+			if (status != B_OK) {
+				fprintf(stderr, "%s: Setting flags failed: %s\n", Name(),
+					strerror(status));
+			}
 		}
 
 		// set options
 
 		if (mtu != -1) {
-			request.ifr_mtu = mtu;
-			if (ioctl(familySocket, SIOCSIFMTU, &request, sizeof(struct ifreq)) < 0)
-				fprintf(stderr, "%s: Setting MTU failed: %s\n", Name(), strerror(errno));
+			status_t status = interface.SetMTU(mtu);
+			if (status != B_OK) {
+				fprintf(stderr, "%s: Setting MTU failed: %s\n", Name(),
+					strerror(status));
+			}
 		}
 
 		if (metric != -1) {
-			request.ifr_metric = metric;
-			if (ioctl(familySocket, SIOCSIFMETRIC, &request, sizeof(struct ifreq)) < 0)
-				fprintf(stderr, "%s: Setting metric failed: %s\n", Name(), strerror(errno));
+			status_t status = interface.SetMetric(metric);
+			if (status != B_OK) {
+				fprintf(stderr, "%s: Setting metric failed: %s\n", Name(),
+					strerror(status));
+			}
 		}
 	}
 
@@ -800,7 +538,7 @@ NetServer::_ConfigureResolver(BMessage& resolverConfiguration)
 		const char* domain;
 		if (resolverConfiguration.FindString("domain", &domain) == B_OK)
 			fprintf(file, "domain %s\n", domain);
-		
+
 		fclose(file);
 	}
 	return B_OK;
@@ -835,22 +573,22 @@ NetServer::_LooperForDevice(const char* device)
 
 
 status_t
-NetServer::_ConfigureDevice(int socket, const char* path)
+NetServer::_ConfigureDevice(const char* device)
 {
 	// bring interface up, but don't configure it just yet
 	BMessage interface;
-	interface.AddString("device", path);
+	interface.AddString("device", device);
 	BMessage address;
 	address.AddString("family", "inet");
 	address.AddBool("auto_config", true);
 	interface.AddMessage("address", &address);
 
-	return _ConfigureInterface(socket, interface);
+	return _ConfigureInterface(interface);
 }
 
 
 void
-NetServer::_ConfigureDevices(int socket, const char* startPath,
+NetServer::_ConfigureDevices(const char* startPath,
 	BMessage* suggestedInterface)
 {
 	BDirectory directory(startPath);
@@ -868,18 +606,18 @@ NetServer::_ConfigureDevices(int socket, const char* startPath,
 			if (suggestedInterface != NULL
 				&& suggestedInterface->RemoveName("device") == B_OK
 				&& suggestedInterface->AddString("device", path.Path()) == B_OK
-				&& _ConfigureInterface(socket, *suggestedInterface) == B_OK)
+				&& _ConfigureInterface(*suggestedInterface) == B_OK)
 				suggestedInterface = NULL;
 			else
-				_ConfigureDevice(socket, path.Path());
+				_ConfigureDevice(path.Path());
 		} else if (entry.IsDirectory())
-			_ConfigureDevices(socket, path.Path(), suggestedInterface);
+			_ConfigureDevices(path.Path(), suggestedInterface);
 	}
 }
 
 
 void
-NetServer::_ConfigureInterfaces(int socket, BMessage* _missingDevice)
+NetServer::_ConfigureInterfaces(BMessage* _missingDevice)
 {
 	BMessage interface;
 	uint32 cookie = 0;
@@ -888,11 +626,11 @@ NetServer::_ConfigureInterfaces(int socket, BMessage* _missingDevice)
 		const char *device;
 		if (interface.FindString("device", &device) != B_OK)
 			continue;
-			
+
 		bool disabled = false;
 		if (interface.FindBool("disabled", &disabled) == B_OK && disabled) {
 			// disabled by user request
-			_DisableInterface(socket, device);
+			_DisableInterface(device);
 			continue;
 		}
 
@@ -908,7 +646,7 @@ NetServer::_ConfigureInterfaces(int socket, BMessage* _missingDevice)
 			}
 		}
 
-		_ConfigureInterface(socket, interface);
+		_ConfigureInterface(interface);
 	}
 }
 
@@ -924,17 +662,18 @@ NetServer::_BringUpInterfaces()
 		Quit();
 		return;
 	}
+	close(socket);
 
-	_RemoveInvalidInterfaces(socket);
+	_RemoveInvalidInterfaces();
 
 	// First, we look into the settings, and try to bring everything up from there
 
 	BMessage missingDevice;
-	_ConfigureInterfaces(socket, &missingDevice);
+	_ConfigureInterfaces(&missingDevice);
 
 	// check configuration
 
-	if (!_TestForInterface(socket, "loop")) {
+	if (!_TestForInterface("loop")) {
 		// there is no loopback interface, create one
 		BMessage interface;
 		interface.AddString("device", "loop");
@@ -943,19 +682,17 @@ NetServer::_BringUpInterfaces()
 		address.AddString("address", "127.0.0.1");
 		interface.AddMessage("address", &address);
 
-		_ConfigureInterface(socket, interface);
+		_ConfigureInterface(interface);
 	}
 
 	// TODO: also check if the networking driver is correctly initialized!
 	//	(and check for other devices to take over its configuration)
 
-	if (!_TestForInterface(socket, "/dev/net/")) {
+	if (!_TestForInterface("/dev/net/")) {
 		// there is no driver configured - see if there is one and try to use it
-		_ConfigureDevices(socket, "/dev/net",
+		_ConfigureDevices("/dev/net",
 			missingDevice.HasString("device") ? &missingDevice : NULL);
 	}
-
-	close(socket);
 }
 
 
@@ -971,7 +708,7 @@ NetServer::_StartServices()
 
 
 void
-NetServer::_HandleDeviceMonitor(int socket, BMessage* message)
+NetServer::_HandleDeviceMonitor(BMessage* message)
 {
 	int32 opcode;
 	if (message->FindInt32("opcode", &opcode) != B_OK
@@ -983,11 +720,11 @@ NetServer::_HandleDeviceMonitor(int socket, BMessage* message)
 	if (message->FindString("watched_path", &watchedPath) != B_OK
 		|| message->FindString("path", &path) != B_OK)
 		return;
-		
+
 	if (opcode == B_ENTRY_CREATED)
-		_ConfigureDevice(socket, path);
+		_ConfigureDevice(path);
 	else
-		_RemoveInterface(socket, path);
+		_RemoveInterface(path);
 }
 
 

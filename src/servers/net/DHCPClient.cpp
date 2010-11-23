@@ -13,6 +13,8 @@
 
 #include <Message.h>
 #include <MessageRunner.h>
+#include <NetworkDevice.h>
+#include <NetworkInterface.h>
 
 #include <arpa/inet.h>
 #include <errno.h>
@@ -332,23 +334,24 @@ dhcp_message::FinishOptions(uint8* options)
 
 
 DHCPClient::DHCPClient(BMessenger target, const char* device)
-	: AutoconfigClient("dhcp", target, device),
+	:
+	AutoconfigClient("dhcp", target, device),
 	fConfiguration(kMsgConfigureInterface),
 	fResolverConfiguration(kMsgConfigureResolver),
 	fRunner(NULL),
+	fServer(AF_INET, NULL, DHCP_SERVER_PORT),
 	fLeaseTime(0)
 {
 	fStartTime = system_time();
 	fTransactionID = (uint32)fStartTime;
 
-	fStatus = get_mac_address(device, fMAC);
-	if (fStatus < B_OK)
+	BNetworkAddress link;
+	BNetworkInterface interface(device);
+	fStatus = interface.GetHardwareAddress(link);
+	if (fStatus != B_OK)
 		return;
 
-	memset(&fServer, 0, sizeof(struct sockaddr_in));
-	fServer.sin_family = AF_INET;
-	fServer.sin_len = sizeof(struct sockaddr_in);
-	fServer.sin_port = htons(DHCP_SERVER_PORT);
+	memcpy(fMAC, link.LinkLevelAddress(), sizeof(fMAC));
 
 	openlog_thread("DHCP", 0, LOG_DAEMON);
 }
@@ -393,12 +396,7 @@ DHCPClient::_Negotiate(dhcp_state state)
 	if (socket < 0)
 		return errno;
 
-	sockaddr_in local;
-	memset(&local, 0, sizeof(struct sockaddr_in));
-	local.sin_family = AF_INET;
-	local.sin_len = sizeof(struct sockaddr_in);
-	local.sin_port = htons(DHCP_CLIENT_PORT);
-	local.sin_addr.s_addr = INADDR_ANY;
+	BNetworkAddress local(AF_INET, NULL, DHCP_CLIENT_PORT);
 
 	// Enable reusing the port . This is needed in case there is more
 	// than 1 interface that needs to be configured. Note that the only reason
@@ -407,17 +405,13 @@ DHCPClient::_Negotiate(dhcp_state state)
 	int option = 1;
 	setsockopt(socket, SOL_SOCKET, SO_REUSEPORT, &option, sizeof(option));
 
-	if (bind(socket, (struct sockaddr*)&local, sizeof(local)) < 0) {
+	if (bind(socket, local, local.Length()) < 0) {
 		close(socket);
 		return errno;
 	}
 
-	sockaddr_in broadcast;
-	memset(&broadcast, 0, sizeof(struct sockaddr_in));
-	broadcast.sin_family = AF_INET;
-	broadcast.sin_len = sizeof(struct sockaddr_in);
-	broadcast.sin_port = htons(DHCP_SERVER_PORT);
-	broadcast.sin_addr.s_addr = INADDR_BROADCAST;
+	BNetworkAddress broadcast;
+	broadcast.SetToBroadcast(AF_INET, DHCP_SERVER_PORT);
 
 	option = 1;
 	setsockopt(socket, SOL_SOCKET, SO_BROADCAST, &option, sizeof(option));
@@ -425,19 +419,10 @@ DHCPClient::_Negotiate(dhcp_state state)
 	if (state == INIT) {
 		// The local interface does not have an address yet, bind the socket
 		// to the device directly.
-		int linkSocket = ::socket(AF_LINK, SOCK_DGRAM, 0);
-		if (linkSocket >= 0) {
-			// we need to know the index of the device to be able to bind to it
-			ifreq request;
-			prepare_request(request, Device());
-			if (ioctl(linkSocket, SIOCGIFINDEX, &request, sizeof(struct ifreq))
-					== 0) {
-				setsockopt(socket, SOL_SOCKET, SO_BINDTODEVICE,
-					&request.ifr_index, sizeof(int));
-			}
+		BNetworkDevice device(Device());
+		int index = device.Index();
 
-			close(linkSocket);
-		}
+		setsockopt(socket, SOL_SOCKET, SO_BINDTODEVICE, &index, sizeof(int));
 	}
 
 	bigtime_t previousLeaseTime = fLeaseTime;
@@ -558,7 +543,7 @@ DHCPClient::_Negotiate(dhcp_state state)
 				status = Target().SendMessage(&fConfiguration, &reply);
 				if (status == B_OK)
 					status = reply.FindInt32("status", &fStatus);
-					
+
 				// configure resolver
 				reply.MakeEmpty();
 				status = Target().SendMessage(&fResolverConfiguration, &reply);
@@ -653,7 +638,7 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address,
 				break;
 			}
 			case OPTION_SERVER_ADDRESS:
-				fServer.sin_addr.s_addr = *(in_addr_t*)data;
+				fServer.SetAddress(*(in_addr_t*)data);
 				break;
 
 			case OPTION_ADDRESS_LEASE_TIME:
@@ -684,8 +669,8 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address,
 					min_c(size + 1, sizeof(domain)));
 
 				syslog(LOG_INFO, "DHCP domain name: \"%s\"\n", domain);
-				
-				resolverConfiguration.AddString("domain", domain);	
+
+				resolverConfiguration.AddString("domain", domain);
 				break;
 			}
 
@@ -718,9 +703,10 @@ DHCPClient::_PrepareMessage(dhcp_message& message, dhcp_state state)
 		case DHCP_RELEASE:
 		{
 			// add server identifier option
+			const sockaddr_in& server = (sockaddr_in&)fServer.SockAddr();
 			uint8* next = message.PrepareMessage(type);
 			next = message.PutOption(next, OPTION_SERVER_ADDRESS,
-				(uint32)fServer.sin_addr.s_addr);
+				(uint32)server.sin_addr.s_addr);
 
 			// In RENEWAL or REBINDING state, we must set the client_address field, and not
 			// use OPTION_REQUEST_IP_ADDRESS for DHCP_REQUEST messages
@@ -805,14 +791,13 @@ DHCPClient::_ToString(in_addr_t address) const
 
 status_t
 DHCPClient::_SendMessage(int socket, dhcp_message& message,
-	sockaddr_in& address) const
+	const BNetworkAddress& address) const
 {
 	syslog(LOG_DEBUG, "DHCP send message %u for %s\n", message.Type(),
 		Device());
 
 	ssize_t bytesSent = sendto(socket, &message, message.Size(),
-		address.sin_addr.s_addr == INADDR_BROADCAST ? MSG_BCAST : 0,
-		(struct sockaddr*)&address, sizeof(sockaddr_in));
+		address.IsBroadcast() ? MSG_BCAST : 0, address, address.Length());
 	if (bytesSent < 0)
 		return errno;
 

@@ -16,7 +16,7 @@ Server net_server :
 	DHCPClient.cpp
 	Services.cpp
 
-	: be libnetwork.so $(TARGET_LIBSTDC++)
+	: be network bnetapi $(TARGET_LIBSTDC++)
 	# for PPP
 	#libppp.a
 ;

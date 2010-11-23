@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -12,6 +12,7 @@
 #include "Settings.h"
 
 #include <Autolock.h>
+#include <NetworkAddress.h>
 
 #include <errno.h>
 #include <netdb.h>
@@ -31,7 +32,7 @@ struct service_address {
 	int		family;
 	int		type;
 	int		protocol;
-	sockaddr address;
+	BNetworkAddress address;
 
 	bool operator==(const struct service_address& other) const;
 };
@@ -100,8 +101,7 @@ service_address::operator==(const struct service_address& other) const
 	return family == other.family
 		&& type == other.type
 		&& protocol == other.protocol
-		&& address.sa_len == other.address.sa_len
-		&& !memcmp(&address, &other.address, address.sa_len);
+		&& address == other.address;
 }
 
 
@@ -274,7 +274,8 @@ Services::_StartService(struct service& service)
 
 		address.socket = socket(address.family, address.type, address.protocol);
 		if (address.socket < 0
-			|| bind(address.socket, &address.address, address.address.sa_len) < 0
+			|| bind(address.socket, address.address, address.address.Length())
+					< 0
 			|| fcntl(address.socket, F_SETFD, FD_CLOEXEC) < 0) {
 			failed = true;
 			break;
@@ -378,13 +379,12 @@ Services::_ToService(const BMessage& message, struct service*& service)
 
 	// we default to inet/tcp/port-from-service-name if nothing is specified
 	const char* string;
-	int32 serviceFamilyIndex;
-	int32 serviceFamily = -1;
 	if (message.FindString("family", &string) != B_OK)
 		string = "inet";
 
-	if (get_family_index(string, serviceFamilyIndex))
-		serviceFamily = family_at_index(serviceFamilyIndex);
+	int32 serviceFamily = get_address_family(string);
+	if (serviceFamily == AF_UNSPEC)
+		serviceFamily = AF_INET;
 
 	int32 serviceProtocol;
 	if (message.FindString("protocol", &string) == B_OK)
@@ -424,11 +424,9 @@ Services::_ToService(const BMessage& message, struct service*& service)
 		if (address.FindString("family", &string) != B_OK)
 			continue;
 
-		int32 familyIndex;
-		if (!get_family_index(string, familyIndex))
+		serviceAddress.family = get_address_family(string);
+		if (serviceAddress.family == AF_UNSPEC)
 			continue;
-
-		serviceAddress.family = family_at_index(familyIndex);
 
 		if (address.FindString("protocol", &string) == B_OK)
 			serviceAddress.protocol = parse_protocol(string);
@@ -443,16 +441,16 @@ Services::_ToService(const BMessage& message, struct service*& service)
 			serviceAddress.type = serviceType;
 
 		if (address.FindString("address", &string) == B_OK) {
-			if (!parse_address(familyIndex, string, serviceAddress.address))
+			if (!parse_address(serviceFamily, string, serviceAddress.address))
 				continue;
 		} else
-			set_any_address(familyIndex, serviceAddress.address);
+			serviceAddress.address.SetToWildcard(serviceFamily);
 
 		int32 port;
 		if (address.FindInt32("port", &port) != B_OK)
 			port = servicePort;
 
-		set_port(familyIndex, serviceAddress.address, port);
+		serviceAddress.address.SetPort(port);
 		serviceAddress.socket = -1;
 
 		serviceAddress.owner = service;
@@ -472,9 +470,8 @@ Services::_ToService(const BMessage& message, struct service*& service)
 		serviceAddress.family = serviceFamily;
 		serviceAddress.type = serviceType;
 		serviceAddress.protocol = serviceProtocol;
+		serviceAddress.address.SetToWildcard(serviceFamily, servicePort);
 
-		set_any_address(serviceFamilyIndex, serviceAddress.address);
-		set_port(serviceFamilyIndex, serviceAddress.address, servicePort);
 		serviceAddress.socket = -1;
 
 		serviceAddress.owner = service;
