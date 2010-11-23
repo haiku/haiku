@@ -57,6 +57,43 @@ static net_stack_module_info* sStackModule;
 
 
 static status_t
+switch_to_command_mode(dialup_device* device)
+{
+	if (device->state != UP || !device->data_mode)
+		return B_ERROR;
+
+	snooze(device->escape_silence);
+
+	ssize_t size = write(device->fd, device->escape_string,
+			strlen(device->escape_string));
+	if (size != (ssize_t)strlen(device->escape_string))
+		return B_IO_ERROR;
+
+	snooze(device->escape_silence);
+	device->data_mode = false;
+	return B_OK;
+}
+
+#if 0
+static status_t
+switch_to_data_mode(dialup_device* device)
+{
+	if (device->state != UP)
+		return B_OK;
+
+	// TODO: check if it's needed, as these days any
+	// escaped AT commands switch back to data mode automatically
+	// after their completion...
+	ssize_t size = write(device->fd, "ATO", 3);
+	if (size != 3)
+		return B_IO_ERROR;
+
+	device->data_mode = true;
+	return B_OK;
+}
+#endif
+
+static status_t
 send_command(dialup_device* device, const char* command)
 {
 	status_t status;
@@ -66,11 +103,11 @@ send_command(dialup_device* device, const char* command)
 			return status;
 	}
 
-	ssize_t bytesWritten = write(device->fd, command, strlen(command);
+	ssize_t bytesWritten = write(device->fd, command, strlen(command));
 	if (bytesWritten != (ssize_t)strlen(command))
 		return B_IO_ERROR;
 
-	if (write(fd, "\r", 1) != 1)
+	if (write(device->fd, "\r", 1) != 1)
 		return B_IO_ERROR;
 
 	return B_OK;
@@ -116,56 +153,22 @@ read_command_reply(dialup_device* device, const char* command,
 
 
 static status_t
-switch_to_command_mode(dialup_device* device)
-{
-	if (device->state != UP || !device->data_mode)
-		return B_ERROR;
-
-	snooze(device->escape_silence);
-
-	ssize_t size = write(device->fd, device->escape_string,
-			strlen(device->escape_string));
-	if (size != (ssize_t)strlen(device->escape_string))
-		return B_IO_ERROR;
-
-	snooze(device->escape_silence);
-	device->data_mode = false;
-	return B_OK;
-}
-
-
-static status_t
-switch_to_data_mode(dialup_device* device)
-{
-	if (device->state != UP)
-		return B_OK;
-
-	// TODO: check if it's needed, as these days any
-	// escaped AT commands switch back to data mode automatically
-	// after their completion...
-	status_t status = send_command(device, "ATO");
-	if (status == B_OK);
-		device->data_mode = true;
-
-	return status;
-}
-
-
-static status_t
-hangup_device(dialup_device* device)
+hangup(dialup_device* device)
 {
 	if (device->state != UP)
 		return B_ERROR;
 
 	// TODO: turn device's DTR down instead. Or do that too after sending command
 	char reply[8];
+
 	if (send_command(device, device->hangup_string) != B_OK
 		|| read_command_reply(device, device->hangup_string,
 			reply, sizeof(reply)) != B_OK
 		|| strcmp(reply, "OK"))
 		return B_ERROR;
 
-	device->flags &= ~IFF_LINK;
+	device->state = DOWN;
+	return B_OK;
 }
 
 
@@ -270,23 +273,28 @@ dialup_up(net_device* _device)
 	}
 
 	// Send dialing string
-	if (send_command(device, device->dialing_string) != B_OK
-		|| read_command_reply(device, device->dialing_string,
+	if (send_command(device, device->dial_string) != B_OK
+		|| read_command_reply(device, device->dial_string,
 			reply, sizeof(reply)) != B_OK
 		|| strncmp(reply, "CONNECT", 7)) {
 		errno = B_IO_ERROR;
 		goto err;
 	}
+
+	device->state = UP;
 	device->data_mode = true;
 
-	device->media |= IFM_FULL_DUPLEX
+	device->media |= IFM_FULL_DUPLEX;
 	device->flags |= IFF_LINK;
 
 	device->link_quality = 1000;
 	if (strlen(reply) > 7) {
+		// get speed from "CONNECTxxxx" reply
 		device->link_speed = atoi(&reply[8]);
-	else
-		device->link_speed = 19200;	// check default baudrate
+	} else {
+		// Set default speed (theorically, it could be 300 bits/s even)
+		device->link_speed = 19200;
+	}
 
 	return B_OK;
 
@@ -304,12 +312,13 @@ dialup_down(net_device* _device)
 {
 	dialup_device* device = (dialup_device*)_device;
 
-	if (device->flags & IFF_LINK &&
-		hangup_device(device) == B_OK)
+	if (device->flags & IFF_LINK
+		&& hangup(device) == B_OK)
 		device->flags &= ~IFF_LINK;
 
 	close(device->fd);
 	device->fd = -1;
+	device->media = 0;
 }
 
 
