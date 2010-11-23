@@ -386,12 +386,12 @@ rtl8169_rx_int(rtl8169_device *device)
 static status_t
 rtl8169_get_link_state(rtl8169_device *device)
 {
-	bool link_ok = false; 
+	bool link_ok = false;
 	bool full_duplex = false;
-	uint32 speed = 0; 
+	uint32 speed = 0;
 	bool linkStateChange = false;
 	uint32 phy;
-	
+
 	dump_phy_stat(device);
 	print_link_status(device);
 
@@ -414,11 +414,11 @@ rtl8169_get_link_state(rtl8169_device *device)
 			}
 		}
 	}
-	
+
 	linkStateChange = (link_ok != device->link_ok
-		|| full_duplex != device->full_duplex 
+		|| full_duplex != device->full_duplex
 		|| speed != device->speed);
-		
+
 	device->link_ok = link_ok;
 	device->full_duplex = full_duplex;
 	device->speed = speed;
@@ -970,17 +970,17 @@ rtl8169_control(void *cookie, uint32 op, void *arg, size_t len)
 		case ETHER_GET_LINK_STATE:
 		{
 			ether_link_state_t state;
-			
+
 			state.media = IFM_ETHER;
 			state.media |= (device->link_ok ? IFM_ACTIVE : 0);
 			state.media |= (device->full_duplex ? IFM_FULL_DUPLEX : IFM_HALF_DUPLEX);
-			if (device->speed == 1000000)
+			if (device->speed == 1000000000)
 				state.media |= IFM_1000_T;
-			else if (device->speed == 100000)
+			else if (device->speed == 100000000)
 				state.media |= IFM_100_TX;
-			else if (device->speed == 10000)
+			else if (device->speed == 10000000)
 				state.media |= IFM_10_T;
-		
+
 			state.speed = device->speed;
 			state.quality = 1000;
 

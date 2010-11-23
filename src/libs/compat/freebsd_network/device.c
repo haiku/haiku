@@ -74,7 +74,7 @@ compat_close(void *cookie)
 
 	if_printf(ifp, "compat_close()\n");
 
-	atomic_or(&ifp->flags, DEVICE_CLOSED);	
+	atomic_or(&ifp->flags, DEVICE_CLOSED);
 
 	wlan_close(cookie);
 
@@ -265,11 +265,11 @@ compat_control(void *cookie, uint32 op, void *arg, size_t length)
 			if ((mediareq.ifm_status & IFM_ACTIVE) != 0)
 				state.media |= IFM_ACTIVE;
 			if ((mediareq.ifm_active & IFM_10_T) != 0)
-				state.speed = 10000;
+				state.speed = 10000000;
 			else if ((mediareq.ifm_active & IFM_100_TX) != 0)
-				state.speed = 100000;
+				state.speed = 100000000;
 			else
-				state.speed = 1000000;
+				state.speed = 1000000000;
 			state.quality = 1000;
 
 			return user_memcpy(arg, &state, sizeof(ether_link_state_t));

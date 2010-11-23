@@ -509,15 +509,15 @@ b57_ioctl(void *cookie,uint32 op,void *data,size_t len)
 			switch (pUmDevice->lm_dev.LineSpeed) {
 				case LM_LINE_SPEED_10MBPS:
 					state.media |= IFM_10_T;
-					state.speed = 10000;
+					state.speed = 10000000;
 					break;
 				case LM_LINE_SPEED_100MBPS:
 					state.media |= IFM_100_TX;
-					state.speed = 100000;
+					state.speed = 100000000;
 					break;
 				case LM_LINE_SPEED_1000MBPS:
 					state.media |= IFM_1000_T;
-					state.speed = 1000000;
+					state.speed = 1000000000;
 					break;
 				default:
 					state.speed = 0;

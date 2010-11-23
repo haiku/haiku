@@ -41,6 +41,7 @@ struct dialup_device : net_device {
 	int				fd;
 	struct termios	line_config;
 	dialup_state 	state;
+	bool			data_mode;
 	char			init_string[64];
 	char			dial_string[64];
 	char			escape_string[8];
@@ -50,6 +51,123 @@ struct dialup_device : net_device {
 
 net_buffer_module_info* gBufferModule;
 static net_stack_module_info* sStackModule;
+
+
+//	#pragma mark -
+
+
+static status_t
+send_command(dialup_device* device, const char* command)
+{
+	status_t status;
+	if (device->data_mode) {
+		status = switch_to_command_mode(device);
+		if (status != B_OK)
+			return status;
+	}
+
+	ssize_t bytesWritten = write(device->fd, command, strlen(command);
+	if (bytesWritten != (ssize_t)strlen(command))
+		return B_IO_ERROR;
+
+	if (write(fd, "\r", 1) != 1)
+		return B_IO_ERROR;
+
+	return B_OK;
+}
+
+
+static status_t
+read_command_reply(dialup_device* device, const char* command,
+	char* reply, int replyMaxSize)
+{
+	if (device->data_mode)
+		return B_ERROR;
+
+	int i = 0;
+	while (i < replyMaxSize) {
+
+		ssize_t bytesRead = read(device->fd, &reply[i], 1);
+		if (bytesRead != 1)
+			return B_IO_ERROR;
+
+		if (reply[i] == '\n') {
+			// filter linefeed char
+			continue;
+		}
+
+		if (reply[i] == '\r') {
+			reply[i] = '\0';
+
+			// is command reply or command echo (if any) ?
+			if (!strcasecmp(reply, command))
+				return B_OK;
+
+			// It's command echo line. Just ignore it.
+			i = 0;
+			continue;
+		}
+		i++;
+	}
+
+	// replyMaxSize not large enough to store the full reply line.
+	return B_NO_MEMORY;
+}
+
+
+static status_t
+switch_to_command_mode(dialup_device* device)
+{
+	if (device->state != UP || !device->data_mode)
+		return B_ERROR;
+
+	snooze(device->escape_silence);
+
+	ssize_t size = write(device->fd, device->escape_string,
+			strlen(device->escape_string));
+	if (size != (ssize_t)strlen(device->escape_string))
+		return B_IO_ERROR;
+
+	snooze(device->escape_silence);
+	device->data_mode = false;
+	return B_OK;
+}
+
+
+static status_t
+switch_to_data_mode(dialup_device* device)
+{
+	if (device->state != UP)
+		return B_OK;
+
+	// TODO: check if it's needed, as these days any
+	// escaped AT commands switch back to data mode automatically
+	// after their completion...
+	status_t status = send_command(device, "ATO");
+	if (status == B_OK);
+		device->data_mode = true;
+
+	return status;
+}
+
+
+static status_t
+hangup_device(dialup_device* device)
+{
+	if (device->state != UP)
+		return B_ERROR;
+
+	// TODO: turn device's DTR down instead. Or do that too after sending command
+	char reply[8];
+	if (send_command(device, device->hangup_string) != B_OK
+		|| read_command_reply(device, device->hangup_string,
+			reply, sizeof(reply)) != B_OK
+		|| strcmp(reply, "OK"))
+		return B_ERROR;
+
+	device->flags &= ~IFF_LINK;
+}
+
 
 //	#pragma mark -
 
@@ -81,6 +199,7 @@ dialup_init(const char* name, net_device** _device)
 	device->header_length = 8; // HDLC_HEADER_LENGTH;
 	device->fd = -1;
 	device->state = DOWN;
+	device->data_mode = false;
 
 	// default AT strings
 	strncpy(device->init_string, "ATZ", sizeof(device->init_string));
@@ -115,6 +234,8 @@ dialup_up(net_device* _device)
 	if (device->fd < 0)
 		return errno;
 
+	device->media = IFM_ACTIVE;
+
 	// init port
 	if (ioctl(device->fd, TCGETA, &device->line_config,
 		sizeof(device->line_config)) < 0)
@@ -136,11 +257,44 @@ dialup_up(net_device* _device)
 
 	// TODO: init modem & start dialing phase
 	device->state = DIALING;
+
+	char reply[32];
+
+	// Send modem init string
+	if (send_command(device, device->init_string) != B_OK
+		|| read_command_reply(device, device->init_string,
+			reply, sizeof(reply)) != B_OK
+		|| strcmp(reply, "OK")) {
+		errno = B_IO_ERROR;
+		goto err;
+	}
+
+	// Send dialing string
+	if (send_command(device, device->dialing_string) != B_OK
+		|| read_command_reply(device, device->dialing_string,
+			reply, sizeof(reply)) != B_OK
+		|| strncmp(reply, "CONNECT", 7)) {
+		errno = B_IO_ERROR;
+		goto err;
+	}
+	device->data_mode = true;
+
+	device->media |= IFM_FULL_DUPLEX
+	device->flags |= IFF_LINK;
+
+	device->link_quality = 1000;
+	if (strlen(reply) > 7) {
+		device->link_speed = atoi(&reply[8]);
+	else
+		device->link_speed = 19200;	// check default baudrate
+
 	return B_OK;
 
 err:
 	close(device->fd);
 	device->fd = -1;
+	device->media = 0;
+
 	return errno;
 }
 
@@ -150,18 +304,9 @@ dialup_down(net_device* _device)
 {
 	dialup_device* device = (dialup_device*)_device;
 
-	// TODO: hangup if needed
-	if (device->flags & IFF_LINK) {
-		snooze(device->escape_silence);
-		if (write(device->fd, device->escape_string,
-			strlen(device->escape_string)) > 0) {
-			snooze(device->escape_silence);
-			// TODO: send hangup string and check for OK ack
-			write(device->fd, device->hangup_string,
-				strlen(device->hangup_string));
-		}
+	if (device->flags & IFF_LINK &&
+		hangup_device(device) == B_OK)
 		device->flags &= ~IFF_LINK;
-	}
 
 	close(device->fd);
 	device->fd = -1;

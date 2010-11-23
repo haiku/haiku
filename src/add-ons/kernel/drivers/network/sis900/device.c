@@ -62,11 +62,11 @@ bug(const char *format, ...)
 	char    c[2048];
 	int     i;
 	int     file;
-	
+
 	if ((file = open("/boot/home/sis900-driver.log", O_RDWR | O_APPEND | O_CREAT)) >= 0) {
 //		time_t timer = time(NULL);
 //		strftime(c, 2048, "%H:%M:S: ", localtime(&timer));
-		
+
 		va_start(vl, format);
 		i = vsprintf(c, format, vl);
 		va_end(vl);
@@ -84,7 +84,7 @@ void
 dumpBlock(const char *buffer, int size, const char *prefix)
 {
 	int i;
-	
+
 	for (i = 0; i < size;)
 	{
 		int start = i;
@@ -162,7 +162,7 @@ createSemaphores(struct sis_info *info)
 #endif
 
 	info->rxLock = info->txLock = 0;
-	
+
 	return B_OK;
 }
 
@@ -195,7 +195,7 @@ readSettings(struct sis_info *info)
 	if ((info->fixedMode & LINK_DUPLEX_MASK) == 0
 		|| (info->fixedMode & LINK_SPEED_MASK) == 0)
 		info->fixedMode = 0;
-	
+
 	unload_driver_settings(handle);
 }
 
@@ -224,7 +224,7 @@ device_open(const char *name, uint32 flags, void **cookie)
 		}
 		if (!thisName)
 			return EINVAL;
-	
+
 		// check if device is already open
 		mask = 1L << id;
 		if (atomic_or(&gDeviceOpenMask, mask) & mask)
@@ -278,7 +278,7 @@ device_open(const char *name, uint32 flags, void **cookie)
 
 			// check link mode & add timer (once every second)
 			sis900_checkMode(info);
-			add_timer(&info->timer, sis900_timer, 1000000LL, B_PERIODIC_TIMER);	
+			add_timer(&info->timer, sis900_timer, 1000000LL, B_PERIODIC_TIMER);
 
 			return B_OK;
 		}
@@ -390,7 +390,7 @@ device_ioctl(void *data, uint32 msg, void *buffer, size_t bufferLength)
 				| (info->full_duplex ? IFM_FULL_DUPLEX : IFM_HALF_DUPLEX)
 				| (info->speed == LINK_SPEED_100_MBIT ? IFM_100_TX : IFM_10_T);
 			state.speed = info->speed == LINK_SPEED_100_MBIT
-				? 100000 : 10000;
+				? 100000000 : 10000000;
 			state.quality = 1000;
 
 			return user_memcpy(buffer, &state, sizeof(ether_link_state_t));

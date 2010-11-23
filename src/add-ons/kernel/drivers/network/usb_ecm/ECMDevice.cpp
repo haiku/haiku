@@ -273,7 +273,7 @@ ECMDevice::Control(uint32 op, void *buffer, size_t length)
 			state->media = IFM_ETHER | IFM_FULL_DUPLEX
 				| (fHasConnection ? IFM_ACTIVE : 0);
 			state->quality = 1000;
-			state->speed = fDownstreamSpeed / 1000;
+			state->speed = fDownstreamSpeed;
 			return B_OK;
 		}
 #endif

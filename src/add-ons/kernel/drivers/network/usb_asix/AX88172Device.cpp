@@ -2,8 +2,8 @@
  *	ASIX AX88172/AX88772/AX88178 USB 2.0 Ethernet Driver.
  *	Copyright (c) 2008 S.Zharski <imker@gmx.li>
  *	Distributed under the terms of the MIT license.
- *	
- *	Heavily based on code of the 
+ *
+ *	Heavily based on code of the
  *	Driver for USB Ethernet Control Model devices
  *	Copyright (C) 2008 Michael Lotz <mmlr@mlotz.ch>
  *	Distributed under the terms of the MIT license.
@@ -37,7 +37,7 @@ enum AX88172_Requests {
 	READ_MF_ARRAY		= 0x15, // C0 15 00 00 00 00 0800 Read Multi-Filter Array
 	WRITE_MF_ARRAY		= 0x16, // 40 16 00 00 00 00 0800 Write Multi-Filter Array
 	READ_NODEID			= 0x17, // C0 17 00 00 00 00 0600 Read Node ID
-	WRITE_NODEID		= 0x18, // 
+	WRITE_NODEID		= 0x18, //
 	READ_PHYID			= 0x19, // C0 19 00 00 00 00 0200 Read Ethernet/HomePNA PhyID
 	READ_MEDIUM_STATUS	= 0x1A, // C0 1A 00 00 00 00 0100 Read Medium Status
 	WRITE_MEDIUM_MODE	= 0x1B, // 40 1B MM 00 00 00 0000 Write Medium Mode
@@ -49,21 +49,21 @@ enum AX88172_Requests {
 
 // RX Control Register bits
 enum AX88172_RXControl {
-	RXCTL_PROMISCUOUS	= 0x0001, // 
-	RXCTL_ALL_MULTICAT	= 0x0002, // 
+	RXCTL_PROMISCUOUS	= 0x0001, //
+	RXCTL_ALL_MULTICAT	= 0x0002, //
 	RXCTL_UNICAST		= 0x0004, //  ???
 	RXCTL_BROADCAST		= 0x0008, //
-	RXCTL_MULTICAST		= 0x0010, // 
+	RXCTL_MULTICAST		= 0x0010, //
 	RXCTL_START			= 0x0080  //
 };
 
 // PHY IDs request answer data layout
 struct PhyIDs {
-	uint8 PhyID1; 
+	uint8 PhyID1;
 	uint8 PhyID2;
 } _PACKED;
 
-// Medium state bits 
+// Medium state bits
 enum AX88172_MediumState {
 	MEDIUM_STATE_FULL_DUPLEX	= 0x02,
 	MEDIUM_STATE_TX_ABORT_ALLOW	= 0x04,
@@ -88,19 +88,19 @@ enum AX88172_GPIO {
 	GPIO_IO_2	= 0x20
 };
 
-// Notification data layout 
+// Notification data layout
 struct AX88172Notify {
-	uint8 btA1;	
-	uint8 bt01;	
-	uint8 btNN; // AX88172_LinkState below 
-	uint8 bt03;	
-	uint8 bt04;	
-	uint8 bt80;	// 90h 
-	uint8 bt06;	
-	uint8 bt07;	
+	uint8 btA1;
+	uint8 bt01;
+	uint8 btNN; // AX88172_LinkState below
+	uint8 bt03;
+	uint8 bt04;
+	uint8 bt80;	// 90h
+	uint8 bt06;
+	uint8 bt07;
 } _PACKED;
 
-// Link-State bits 
+// Link-State bits
 enum AX88172_LinkState {
 	LINK_STATE_PHY1	= 0x01,
 	LINK_STATE_PHY2	= 0x02
@@ -119,7 +119,7 @@ status_t
 AX88172Device::InitDevice()
 {
 	fFrameSize = maxFrameSize;
-	
+
 	fReadNodeIDRequest = READ_NODEID;
 	fReadRXControlRequest = READ_RX_CONTROL;
 	fWriteRXControlRequest = WRITE_RX_CONTROL;
@@ -132,7 +132,7 @@ AX88172Device::InitDevice()
 		TRACE_ALWAYS("Error of allocating memory for notify buffer.\n");
 		return B_NO_MEMORY;
 	}
-	
+
 	TRACE_RET(B_OK);
 	return B_OK;
 }
@@ -145,12 +145,12 @@ AX88172Device::SetupDevice(bool deviceReplugged)
 	}
 
 	result = fMII.Init(fDevice,
-			SW_MII_OP, READ_MII, WRITE_MII, 
+			SW_MII_OP, READ_MII, WRITE_MII,
 			READ_MII_OP_MODE, HW_MII_OP, READ_PHYID);
 
-	if(result == B_OK) 
+	if(result == B_OK)
 		return fMII.SetupPHY();
-	
+
 	TRACE_RET(result);
 	return result;
 }
@@ -162,10 +162,10 @@ AX88172Device::StartDevice()
 	size_t actualLength = 0;
 
 	for(size_t i = 0; i < sizeof(fIPG)/sizeof(fIPG[0]); i++) {
-		status_t result = gUSBModule->send_request(fDevice, 
+		status_t result = gUSBModule->send_request(fDevice,
 					USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
 					WRITE_IPG0, 0, 0, sizeof(fIPG[i]), &fIPG[i], &actualLength);
-	
+
 		if(result != B_OK) {
 			TRACE_ALWAYS("Error writing IPG%d: %#010x\n", i, result);
 			return result;
@@ -177,15 +177,15 @@ AX88172Device::StartDevice()
 		}
 	}
 
-	uint16 rxcontrol = RXCTL_START | RXCTL_MULTICAST 
+	uint16 rxcontrol = RXCTL_START | RXCTL_MULTICAST
 							| RXCTL_UNICAST | RXCTL_BROADCAST;
 	status_t result = WriteRXControlRegister(rxcontrol);
 	if(result != B_OK) {
 		TRACE_ALWAYS("Error of writing %#04x RX Control:%#010x\n", rxcontrol, result);
-	} 
+	}
 
 	TRACE_RET(result);
-	return result; 
+	return result;
 }
 
 
@@ -195,26 +195,26 @@ AX88172Device::OnNotify(uint32 actualLength)
 	if (actualLength < sizeof(AX88172Notify)) {
 		TRACE_ALWAYS("Data underrun error. %d of %d bytes received\n",
 										actualLength, sizeof(AX88172Notify));
-		return B_BAD_DATA; 
+		return B_BAD_DATA;
 	}
-		
-	AX88172Notify *notification	= (AX88172Notify *)fNotifyBuffer; 
+
+	AX88172Notify *notification	= (AX88172Notify *)fNotifyBuffer;
 
 	if(notification->btA1 != 0xa1) {
-		TRACE_ALWAYS("Notify magic byte is invalid: %#02x\n", 
+		TRACE_ALWAYS("Notify magic byte is invalid: %#02x\n",
 														notification->btA1);
 	}
-	
+
 	uint phyIndex = 0;
 	bool linkIsUp = fHasConnection;
 	switch(fMII.ActivePHY()) {
 		case PrimaryPHY:
 			phyIndex = 1;
-			linkIsUp = (notification->btNN & LINK_STATE_PHY1) == LINK_STATE_PHY1; 
+			linkIsUp = (notification->btNN & LINK_STATE_PHY1) == LINK_STATE_PHY1;
 			break;
 		case SecondaryPHY:
 			phyIndex = 2;
-			linkIsUp = (notification->btNN & LINK_STATE_PHY2) == LINK_STATE_PHY2; 
+			linkIsUp = (notification->btNN & LINK_STATE_PHY2) == LINK_STATE_PHY2;
 			break;
 		default:
 		case CurrentPHY:
@@ -226,7 +226,7 @@ AX88172Device::OnNotify(uint32 actualLength)
 	fHasConnection = linkIsUp;
 
 	if(linkStateChange) {
-		TRACE("Link state of PHY%d has been changed to '%s'\n", 
+		TRACE("Link state of PHY%d has been changed to '%s'\n",
 									phyIndex, fHasConnection ? "up" : "down");
 	}
 
@@ -255,20 +255,20 @@ AX88172Device::GetLinkState(ether_link_state *linkState)
 	}
 
 	TRACE_FLOW("ANAR:%04x ANLPAR:%04x\n", miiANAR, miiANLPAR);
-	
+
 	uint16 mediumStatus = miiANAR & miiANLPAR;
-		
+
 	linkState->quality = 1000;
-	
+
 	linkState->media   = IFM_ETHER | (fHasConnection ? IFM_ACTIVE : 0);
-    linkState->media  |= mediumStatus & (ANLPAR_TX_FD | ANLPAR_10_FD) ? 
+    linkState->media  |= mediumStatus & (ANLPAR_TX_FD | ANLPAR_10_FD) ?
 											IFM_FULL_DUPLEX : IFM_HALF_DUPLEX;
-	
-	linkState->speed   = mediumStatus & (ANLPAR_TX_FD | ANLPAR_TX_HD) ? 100000 : 10000;
-	
-	TRACE_FLOW("Medium state: %s, %lld MBit/s, %s duplex.\n", 
+
+	linkState->speed   = mediumStatus & (ANLPAR_TX_FD | ANLPAR_TX_HD) ? 100000000 : 10000000;
+
+	TRACE_FLOW("Medium state: %s, %lld MBit/s, %s duplex.\n",
 						(linkState->media & IFM_ACTIVE) ? "active" : "inactive",
-						linkState->speed / 1000,
+						linkState->speed,
 						(linkState->media & IFM_FULL_DUPLEX) ? "full" : "half");
 	return B_OK;
 }

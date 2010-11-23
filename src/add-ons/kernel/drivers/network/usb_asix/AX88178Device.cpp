@@ -2,8 +2,8 @@
  *	ASIX AX88172/AX88772/AX88178 USB 2.0 Ethernet Driver.
  *	Copyright (c) 2008 S.Zharski <imker@gmx.li>
  *	Distributed under the terms of the MIT license.
- *	
- *	Heavily based on code of the 
+ *
+ *	Heavily based on code of the
  *	Driver for USB Ethernet Control Model devices
  *	Copyright (C) 2008 Michael Lotz <mmlr@mlotz.ch>
  *	Distributed under the terms of the MIT license.
@@ -15,45 +15,45 @@
 
 // Vendor USB requests for AX88178
 enum AX88178_Requests {
-	READ_RXTX_SRAM		= 0x02, //C002_AA0B_0C00_0800 Rx/Tx SRAM Read             
-	WRITE_RXTX_SRAM		= 0x03,	//4003_AA0B_0C00_0800 Rx/Tx SRAM Write            
+	READ_RXTX_SRAM		= 0x02, //C002_AA0B_0C00_0800 Rx/Tx SRAM Read
+	WRITE_RXTX_SRAM		= 0x03,	//4003_AA0B_0C00_0800 Rx/Tx SRAM Write
 	SW_MII_OP			= 0x06, //4006_0000_0000_0000 SW Serial Management Control
-	READ_MII			= 0x07, //c007_aa00_cc00_0200 PHY Read                    
-	WRITE_MII			= 0x08, //4008_aa00_cc00_0200 PHY Write                   
-	READ_MII_STATUS		= 0x09, //c009_0000_0000_0100 Serial Management Status    
+	READ_MII			= 0x07, //c007_aa00_cc00_0200 PHY Read
+	WRITE_MII			= 0x08, //4008_aa00_cc00_0200 PHY Write
+	READ_MII_STATUS		= 0x09, //c009_0000_0000_0100 Serial Management Status
 	HW_MII_OP			= 0x0A, //400a_0000_0000_0000 HW Serial Management Control
-	READ_SROM			= 0x0B, //C00B_AA00_0000_0200 SROM Read                   
-	WRITE_SROM			= 0x0C, //400C_AA00_CCDD_0000 SROM Write                  
-	WRITE_SROM_ENABLE	= 0x0D, //400D_0000_0000_0000 SROM Write Enable           
-	WRITE_SROM_DISABLE	= 0x0E, //400E_0000_0000_0000 SROM Write Disable          
-	READ_RX_CONTROL		= 0x0F, //C00F_0000_0000_0200 Read Rx Control             
-	WRITE_RX_CONTROL	= 0x10, //4010_AABB_0000_0000 Write Rx Control            
-	READ_IPGS			= 0x11, //C011_0000_0000_0300 Read IPG/IPG1/IPG2 Register 
+	READ_SROM			= 0x0B, //C00B_AA00_0000_0200 SROM Read
+	WRITE_SROM			= 0x0C, //400C_AA00_CCDD_0000 SROM Write
+	WRITE_SROM_ENABLE	= 0x0D, //400D_0000_0000_0000 SROM Write Enable
+	WRITE_SROM_DISABLE	= 0x0E, //400E_0000_0000_0000 SROM Write Disable
+	READ_RX_CONTROL		= 0x0F, //C00F_0000_0000_0200 Read Rx Control
+	WRITE_RX_CONTROL	= 0x10, //4010_AABB_0000_0000 Write Rx Control
+	READ_IPGS			= 0x11, //C011_0000_0000_0300 Read IPG/IPG1/IPG2 Register
 	WRITE_IPGS			= 0x12, //4012_AABB_CC00_0000 Write IPG/IPG1/IPG2 Register
-	READ_NODEID			= 0x13, //C013_0000_0000_0600 Read Node ID                
-	WRITE_NODEID		= 0x14, //4014_0000_0000_0600 Write Node ID               
-	READ_MF_ARRAY		= 0x15, //C015_0000_0000_0800 Read Multicast Filter Array 
+	READ_NODEID			= 0x13, //C013_0000_0000_0600 Read Node ID
+	WRITE_NODEID		= 0x14, //4014_0000_0000_0600 Write Node ID
+	READ_MF_ARRAY		= 0x15, //C015_0000_0000_0800 Read Multicast Filter Array
 	WRITE_MF_ARRAY		= 0x16, //4016_0000_0000_0800 Write Multicast Filter Array
-	READ_TEST			= 0x17, //4017_AA00_0000_0000 Write Test Register         
+	READ_TEST			= 0x17, //4017_AA00_0000_0000 Write Test Register
 	READ_PHYID			= 0x19, //C019_0000_0000_0200 Read Ethernet/HomePNA PHY Address
-	READ_MEDIUM_STATUS	= 0x1A, //C01A_0000_0000_0200 Read Medium Status         
-	WRITE_MEDIUM_MODE	= 0x1B, //401B_AABB_0000_0000 Write Medium Mode Register 
-	GET_MONITOR_MODE	= 0x1C, //C01C_0000_0000_0100 Read Monitor Mode Status   
+	READ_MEDIUM_STATUS	= 0x1A, //C01A_0000_0000_0200 Read Medium Status
+	WRITE_MEDIUM_MODE	= 0x1B, //401B_AABB_0000_0000 Write Medium Mode Register
+	GET_MONITOR_MODE	= 0x1C, //C01C_0000_0000_0100 Read Monitor Mode Status
 	SET_MONITOR_MODE	= 0x1D, //401D_AA00_0000_0000 Write Monitor Mode Register
-	READ_GPIOS			= 0x1E, //C01E_0000_0000_0100 Read GPIOs Status          
-	WRITE_GPIOS			= 0x1F, //401F_AA00_0000_0000 Write GPIOs                
-	WRITE_SOFT_RESET	= 0x20, //4020_AA00_0000_0000 Write Software Reset       
-	READ_MIIS_IF_STATE	= 0x21, //C021_AA00_0000_0100 Read MII/GMII/RGMII Interface Status  
+	READ_GPIOS			= 0x1E, //C01E_0000_0000_0100 Read GPIOs Status
+	WRITE_GPIOS			= 0x1F, //401F_AA00_0000_0000 Write GPIOs
+	WRITE_SOFT_RESET	= 0x20, //4020_AA00_0000_0000 Write Software Reset
+	READ_MIIS_IF_STATE	= 0x21, //C021_AA00_0000_0100 Read MII/GMII/RGMII Interface Status
 	WRITE_MIIS_IF_STATE	= 0x22  //4022_AA00_0000_0000 Write MII/GMII/RGMII Interface Control
 };
 
 // RX Control Register bits
 enum AX88178_RXControl {
-	RXCTL_PROMISCUOUS	= 0x0001, // 
-	RXCTL_ALL_MULTICAT	= 0x0002, // 
+	RXCTL_PROMISCUOUS	= 0x0001, //
+	RXCTL_ALL_MULTICAT	= 0x0002, //
 //	RXCTL_SEP			= 0x0004, //  do not set it!
 	RXCTL_BROADCAST		= 0x0008, //
-	RXCTL_MULTICAST		= 0x0010, // 
+	RXCTL_MULTICAST		= 0x0010, //
 	RXCTL_AP			= 0x0020, //
 	RXCTL_START			= 0x0080, //
 	RXCTL_USB_MFB		= 0x0100  // Max Frame Burst TX on USB
@@ -61,7 +61,7 @@ enum AX88178_RXControl {
 
 // PHY IDs request answer data layout
 struct AX88178_PhyIDs {
-	uint8 SecPhyID; 
+	uint8 SecPhyID;
 	uint8 PriPhyID2;
 } _PACKED;
 
@@ -84,7 +84,7 @@ enum AX88178_MediumState {
 	MEDIUM_STATE_SM_ON 	= 0x1000
 };
 
-// Monitor Mode bits 
+// Monitor Mode bits
 enum AX88178_MonitorMode {
 	MONITOR_MODE_MOM	= 0x01,
 	MONITOR_MODE_RWLU	= 0x02,
@@ -92,7 +92,7 @@ enum AX88178_MonitorMode {
 	MONITOR_MODE_US 	= 0x10
 };
 
-// General Purpose I/O Register 
+// General Purpose I/O Register
 enum AX88178_GPIO {
 	GPIO_OO_0EN	= 0x01,
 	GPIO_IO_0	= 0x02,
@@ -103,7 +103,7 @@ enum AX88178_GPIO {
 	GPIO_RSE	= 0x80
 };
 
-// Software Reset Register bits 
+// Software Reset Register bits
 enum AX88178_SoftwareReset {
 	SW_RESET_RR		= 0x01,
 	SW_RESET_RT		= 0x02,
@@ -121,12 +121,12 @@ enum AX88178_MIISInterfaceStatus {
 
 // Notification data layout
 struct AX88178_Notify {
-	uint8  btA1;	
-	uint8  bt01;	
+	uint8  btA1;
+	uint8  bt01;
 	uint8  btBB; // AX88178_BBState below
-	uint8  bt03;	
-	uint16 regCCDD;	
-	uint16 regEEFF;	
+	uint8  bt03;
+	uint16 regCCDD;
+	uint16 regEEFF;
 } _PACKED;
 
 // Link-State bits
@@ -151,20 +151,20 @@ AX88178Device::InitDevice()
 {
 	fFrameSize = maxFrameSize;
 	fUseTRXHeader = true;
-		
+
 	fReadNodeIDRequest = READ_NODEID;
 	fReadRXControlRequest = READ_RX_CONTROL;
 	fWriteRXControlRequest = WRITE_RX_CONTROL;
-	
+
 	fPromiscuousBits = RXCTL_PROMISCUOUS;
-	
+
 	fNotifyBufferLength = sizeof(AX88178_Notify);
 	fNotifyBuffer = (uint8 *)malloc(fNotifyBufferLength);
 	if (fNotifyBuffer == NULL) {
 		TRACE_ALWAYS("Error of allocating memory for notify buffer.\n");
 		return B_NO_MEMORY;
 	}
-	
+
 	TRACE_RET(B_OK);
 	return B_OK;
 }
@@ -179,7 +179,7 @@ AX88178Device::SetupDevice(bool deviceReplugged)
 	}
 
 	result = fMII.Init(fDevice,
-			SW_MII_OP, READ_MII, WRITE_MII, 
+			SW_MII_OP, READ_MII, WRITE_MII,
 			READ_MII_STATUS, HW_MII_OP, READ_PHYID);
 
 	if(result != B_OK) {
@@ -188,35 +188,35 @@ AX88178Device::SetupDevice(bool deviceReplugged)
 
 	size_t actualLength = 0;
 	// get the "magic" word from EEPROM
-	result = gUSBModule->send_request(fDevice, 
+	result = gUSBModule->send_request(fDevice,
 						USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
 						WRITE_SROM_ENABLE, 0, 0, 0, 0, &actualLength);
-	
+
 	if(result != B_OK) {
 		TRACE_ALWAYS("Error of enabling SROM access:%#010x\n", result);
 		return result;
 	}
-	
+
 	uint16 eepromData = 0;
-	status_t op_result = gUSBModule->send_request(fDevice, 
+	status_t op_result = gUSBModule->send_request(fDevice,
 							USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_IN,
-							READ_SROM, 0x17, 0, 
+							READ_SROM, 0x17, 0,
 							sizeof(eepromData), &eepromData, &actualLength);
-	
+
 	if(op_result != B_OK) {
 		TRACE_ALWAYS("Error of reading SROM data:%#010x\n", result);
 	}
-	
+
 	if(actualLength != sizeof(eepromData)) {
 		TRACE_ALWAYS("Mismatch of reading SROM data."
-						"Read %d bytes instead of %d\n", 
+						"Read %d bytes instead of %d\n",
 							 actualLength, sizeof(eepromData));
 	}
-	
-	result = gUSBModule->send_request(fDevice, 
+
+	result = gUSBModule->send_request(fDevice,
 						USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
 						WRITE_SROM_DISABLE, 0, 0, 0, 0, &actualLength);
-	
+
 	if(result != B_OK) {
 		TRACE_ALWAYS("Error of disabling SROM access: %#010x\n", result);
 		return result;
@@ -241,21 +241,21 @@ AX88178Device::SetupDevice(bool deviceReplugged)
 		{ 30000  , GPIO_OO_1EN                        },
 		{ 30000  , GPIO_OO_1EN | GPIO_IO_1            },
 	};
-	
+
 	bool bCase8 = (eepromData >> 8) != 1;
 	size_t from = bCase8 ? 0 : 4;
 	size_t to   = bCase8 ? 3 : 6;
 
 	for(size_t i = from; i <= to; i++) {
-		result = gUSBModule->send_request(fDevice, 
+		result = gUSBModule->send_request(fDevice,
 					USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
-					WRITE_GPIOS, GPIOCommands[i].value, 
+					WRITE_GPIOS, GPIOCommands[i].value,
 					0, 0, 0, &actualLength);
-		
+
 		snooze(GPIOCommands[i].delay);
 
 		if(result != B_OK) {
-			TRACE_ALWAYS("Error of GPIO setup command %d:[%#04x]: %#010x\n", 
+			TRACE_ALWAYS("Error of GPIO setup command %d:[%#04x]: %#010x\n",
 										i, GPIOCommands[i].value, result);
 			return result;
 		}
@@ -263,34 +263,34 @@ AX88178Device::SetupDevice(bool deviceReplugged)
 
 	uint8 uSWReset = 0;
 	// finally a bit of exercises for SW reset register...
-	result = gUSBModule->send_request(fDevice, 
+	result = gUSBModule->send_request(fDevice,
 						USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
 						WRITE_SOFT_RESET, uSWReset, 0, 0, 0, &actualLength);
-	
+
 	if(result != B_OK) {
 		TRACE_ALWAYS("Error of SW reset to %#02x: %#010x\n", uSWReset, result);
 		return result;
 	}
 
 	snooze(150000);
-	
+
 	uSWReset = SW_RESET_PRL | SW_RESET_BIT6;
-	result = gUSBModule->send_request(fDevice, 
+	result = gUSBModule->send_request(fDevice,
 						USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
 						WRITE_SOFT_RESET, uSWReset,	0, 0, 0, &actualLength);
-	
+
 	if(result != B_OK) {
 		TRACE_ALWAYS("Error of SW reset to %#02x: %#010x\n", uSWReset, result);
 		return result;
 	}
 
 	snooze(150000);
-	
+
 	result = WriteRXControlRegister(0);
 	if(result != B_OK) {
 		TRACE_ALWAYS("Error of writing %#04x RX Control:%#010x\n", 0, result);
 		return result;
-	} 
+	}
 
 	result = fMII.SetupPHY();
 
@@ -303,10 +303,10 @@ status_t
 AX88178Device::StartDevice()
 {
 	size_t actualLength = 0;
-	status_t result = gUSBModule->send_request(fDevice, 
+	status_t result = gUSBModule->send_request(fDevice,
 						USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
 						WRITE_IPGS, 0, 0, sizeof(fIPG), fIPG, &actualLength);
-	
+
 	if(result != B_OK) {
 		TRACE_ALWAYS("Error of writing IPGs:%#010x\n", result);
 		return result;
@@ -324,7 +324,7 @@ AX88178Device::StartDevice()
 	}
 
 	TRACE_RET(result);
-	return result; 
+	return result;
 }
 
 
@@ -334,13 +334,13 @@ AX88178Device::OnNotify(uint32 actualLength)
 	if (actualLength < sizeof(AX88178_Notify)) {
 		TRACE_ALWAYS("Data underrun error. %d of %d bytes received\n",
 										actualLength, sizeof(AX88178_Notify));
-		return B_BAD_DATA; 
+		return B_BAD_DATA;
 	}
-		
-	AX88178_Notify *notification	= (AX88178_Notify *)fNotifyBuffer; 
+
+	AX88178_Notify *notification	= (AX88178_Notify *)fNotifyBuffer;
 
 	if(notification->btA1 != 0xa1) {
-		TRACE_ALWAYS("Notify magic byte is invalid: %#02x\n", 
+		TRACE_ALWAYS("Notify magic byte is invalid: %#02x\n",
 														notification->btA1);
 	}
 
@@ -349,11 +349,11 @@ AX88178Device::OnNotify(uint32 actualLength)
 	switch(fMII.ActivePHY()) {
 		case PrimaryPHY:
 			phyIndex = 1;
-			linkIsUp = (notification->btBB & LINK_STATE_PPLS) == LINK_STATE_PPLS; 
+			linkIsUp = (notification->btBB & LINK_STATE_PPLS) == LINK_STATE_PPLS;
 			break;
 		case SecondaryPHY:
 			phyIndex = 2;
-			linkIsUp = (notification->btBB & LINK_STATE_SPLS) == LINK_STATE_SPLS; 
+			linkIsUp = (notification->btBB & LINK_STATE_SPLS) == LINK_STATE_SPLS;
 			break;
 		default:
 		case CurrentPHY:
@@ -365,7 +365,7 @@ AX88178Device::OnNotify(uint32 actualLength)
 	fHasConnection = linkIsUp;
 
 	if(linkStateChange) {
-		TRACE("Link state of PHY%d has been changed to '%s'\n", 
+		TRACE("Link state of PHY%d has been changed to '%s'\n",
 									phyIndex, fHasConnection ? "up" : "down");
 	}
 
@@ -381,37 +381,37 @@ AX88178Device::GetLinkState(ether_link_state *linkState)
 {
 	size_t actualLength = 0;
 	uint16 mediumStatus = 0;
-	status_t result = gUSBModule->send_request(fDevice, 
+	status_t result = gUSBModule->send_request(fDevice,
 						USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_IN,
-						READ_MEDIUM_STATUS, 0, 0, sizeof(mediumStatus), 
+						READ_MEDIUM_STATUS, 0, 0, sizeof(mediumStatus),
 						&mediumStatus, &actualLength);
-	
+
 	if(result != B_OK) {
 		TRACE_ALWAYS("Error of reading medium status:%#010x.\n", result);
 		return result;
 	}
-	
+
 	if(actualLength != sizeof(mediumStatus)) {
 		TRACE_ALWAYS("Mismatch of reading medium status."
-							"Read %d bytes instead of %d\n", 
+							"Read %d bytes instead of %d\n",
 									actualLength, sizeof(mediumStatus));
 	}
 
 	TRACE_FLOW("Medium status is %#04x\n", mediumStatus);
-	
+
 	linkState->quality = 1000;
-	
+
 	linkState->media   = IFM_ETHER | (fHasConnection ? IFM_ACTIVE : 0);
-    linkState->media  |= (mediumStatus & MEDIUM_STATE_FD) ? 
+    linkState->media  |= (mediumStatus & MEDIUM_STATE_FD) ?
 							IFM_FULL_DUPLEX : IFM_HALF_DUPLEX;
-	
-	linkState->speed   = (mediumStatus & MEDIUM_STATE_PS_100) ? 100000 : 10000;
-	linkState->speed   = (mediumStatus & MEDIUM_STATE_GM) ? 
-												1000000 : linkState->speed;
-	
-	TRACE_FLOW("Medium state: %s, %lld MBit/s, %s duplex.\n", 
+
+	linkState->speed   = (mediumStatus & MEDIUM_STATE_PS_100) ? 100000000 : 10000000;
+	linkState->speed   = (mediumStatus & MEDIUM_STATE_GM) ?
+												1000000000 : linkState->speed;
+
+	TRACE_FLOW("Medium state: %s, %lld MBit/s, %s duplex.\n",
 						(linkState->media & IFM_ACTIVE) ? "active" : "inactive",
-						linkState->speed / 1000,
+						linkState->speed,
 						(linkState->media & IFM_FULL_DUPLEX) ? "full" : "half");
 	return B_OK;
 }

@@ -37,7 +37,7 @@ typedef struct ether_address {
 typedef struct ether_link_state {
 	uint32	media;		/* as specified in net/if_media.h */
 	uint32  quality;	/* in one tenth of a percent */
-	uint64	speed;		/* in Kbit/s */
+	uint64	speed;		/* in bit/s */
 } ether_link_state_t;
 
 #endif	/* _ETHER_DRIVER_H */

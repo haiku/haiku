@@ -1,7 +1,7 @@
 /* Intel PRO/1000 Family Driver
  * Copyright (C) 2004 Marcus Overhagen <marcus@overhagen.de>. All rights reserved.
  *
- * Permission to use, copy, modify and distribute this software and its 
+ * Permission to use, copy, modify and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
  * that the above copyright notice appear in all copies, and that both the
  * copyright notice and this permission notice appear in supporting documentation.
@@ -52,11 +52,11 @@ ipro1000_read_settings(ipro1000_device *device)
 	void *handle;
 	const char *param;
 	int mtu;
-	
+
 	handle = load_driver_settings("ipro1000");
 	if (!handle)
 		return;
-	
+
 	param = get_driver_parameter(handle, "mtu", "-1", "-1");
 	mtu = atoi(param);
 	if (mtu >= 50 && mtu <= 1500)
@@ -75,36 +75,36 @@ ipro1000_open(const char *name, uint32 flags, void** cookie)
 	char *deviceName;
 	int dev_id;
 	int mask;
-	
+
 	DEVICE_DEBUGOUT("ipro1000_open()");
 
 	for (dev_id = 0; (deviceName = gDevNameList[dev_id]) != NULL; dev_id++) {
 		if (!strcmp(name, deviceName))
 			break;
-	}		
+	}
 	if (deviceName == NULL) {
 		ERROROUT("invalid device name");
 		return B_ERROR;
 	}
-	
+
 	// allow only one concurrent access
 	mask = 1 << dev_id;
 	if (atomic_or(&gOpenMask, mask) & mask)
 		return B_BUSY;
-		
+
 	*cookie = device = (ipro1000_device *)malloc(sizeof(ipro1000_device));
 	if (!device) {
 		atomic_and(&gOpenMask, ~(1 << dev_id));
 		return B_NO_MEMORY;
 	}
-	
+
 	memset(device, 0, sizeof(*device));
 
 	device->devId = dev_id;
 	device->pciInfo = gDevList[dev_id];
 	device->nonblocking = (flags & O_NONBLOCK) ? true : false;
 	device->closed = false;
-	
+
 	device->pciBus 	= device->pciInfo->bus;
 	device->pciDev	= device->pciInfo->device;
 	device->pciFunc	= device->pciInfo->function;
@@ -114,14 +114,14 @@ ipro1000_open(const char *name, uint32 flags, void** cookie)
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	device->linkChangeSem = -1;
 #endif
-	
+
 	ipro1000_read_settings(device);
 
 	if (em_attach(device) != 0) {
 		DEVICE_DEBUGOUT("em_attach failed");
 		goto err;
 	}
-	
+
 	return B_OK;
 
 err:
@@ -137,7 +137,7 @@ ipro1000_close(void* cookie)
 	ipro1000_device *device = (ipro1000_device *)cookie;
 	struct ifnet *ifp = &device->adapter->interface_data.ac_if;
 	DEVICE_DEBUGOUT("ipro1000_close()");
-	
+
 	device->closed = true;
 	release_sem(ifp->if_rcv_sem);
 
@@ -169,9 +169,9 @@ ipro1000_read(void* cookie, off_t position, void *buf, size_t* num_bytes)
 	struct mbuf *mb;
 	status_t stat;
 	int len;
-	
+
 //	DEVICE_DEBUGOUT("ipro1000_read() enter");
-	
+
 	if (device->closed) {
 		DEVICE_DEBUGOUT("ipro1000_read() interrupted 1");
 		return B_INTERRUPTED;
@@ -191,13 +191,13 @@ retry:
 		DEVICE_DEBUGOUT("ipro1000_read() error");
 		return B_ERROR;
 	}
-	
+
 	IF_DEQUEUE(&ifp->if_rcv, mb);
 	if (!mb) {
 		ERROROUT("ipro1000_read() mbuf not ready");
 		goto retry;
 	}
-	
+
 	len = mb->m_len;
 	if (len < 0)
 		len = 0;
@@ -206,9 +206,9 @@ retry:
 
 	memcpy(buf, mtod(mb, uint8 *), len); // XXX this is broken for jumbo frames
 	*num_bytes = len;
-	
+
 	m_freem(mb);
-	
+
 //	DEVICE_DEBUGOUT1("ipro1000_read() leave, %d bytes", len);
 	return B_OK;
 }
@@ -221,10 +221,10 @@ ipro1000_write(void* cookie, off_t position, const void* buffer, size_t* num_byt
 	ipro1000_device *device = (ipro1000_device *)cookie;
 	struct ifnet *ifp = &device->adapter->interface_data.ac_if;
 	struct mbuf *mb;
-	
+
 //	DEVICE_DEBUGOUT("ipro1000_write() enter");
 
-	// allocate mbuf	
+	// allocate mbuf
 	for (;;) {
 		MGETHDR(mb, M_DONTWAIT, MT_DATA);
 		if (mb)
@@ -271,7 +271,7 @@ ipro1000_write(void* cookie, off_t position, const void* buffer, size_t* num_byt
 	}
 
 //	DEVICE_DEBUGOUT("ipro1000_write() 5");
-	
+
 	// send everything (if still required)
 	if (ifp->if_snd.ifq_head != NULL)
 		ifp->if_start(ifp);
@@ -284,14 +284,14 @@ ipro1000_write(void* cookie, off_t position, const void* buffer, size_t* num_byt
 //				return B_INTERRUPTED;
 //		}
 //	}
-	
+
 //	t = system_time() - t;
-	
+
 //	if (t > 20)
 //		DEVICE_DEBUGOUT("write %Ld", t);
 
 //	DEVICE_DEBUGOUT("ipro1000_write() finished");
-	
+
 	return B_OK;
 }
 
@@ -312,12 +312,12 @@ ipro1000_control(void *cookie, uint32 op, void *arg, size_t len)
 		case ETHER_INIT:
 			DEVICE_DEBUGOUT("ipro1000_control() ETHER_INIT");
 			return B_OK;
-		
+
 		case ETHER_GETADDR:
 			DEVICE_DEBUGOUT("ipro1000_control() ETHER_GETADDR");
 			memcpy(arg, &device->macaddr, sizeof(device->macaddr));
 			return B_OK;
-			
+
 		case ETHER_NONBLOCK:
 			if (*(int32 *)arg) {
 				DEVICE_DEBUGOUT("non blocking mode on");
@@ -375,11 +375,11 @@ ipro1000_control(void *cookie, uint32 op, void *arg, size_t len)
 			if (mediareq.ifm_status & IFM_ACTIVE)
 				state.media |= IFM_ACTIVE;
 			if (mediareq.ifm_active & IFM_10_T)
-				state.speed = 10000;
+				state.speed = 10000000;
 			else if (mediareq.ifm_active & IFM_100_TX)
-				state.speed = 100000;
+				state.speed = 100000000;
 			else
-				state.speed = 1000000;
+				state.speed = 1000000000;
 			state.quality = 1000;
 
 			return user_memcpy(arg, &state, sizeof(ether_link_state_t));
