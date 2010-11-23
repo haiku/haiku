@@ -73,15 +73,15 @@ BNetworkAddress::BNetworkAddress(const sockaddr_dl& address)
 }
 
 
-BNetworkAddress::BNetworkAddress(const in_addr_t address)
+BNetworkAddress::BNetworkAddress(in_addr_t address, uint16 port)
 {
-	SetTo(address);
+	SetTo(address, port);
 }
 
 
-BNetworkAddress::BNetworkAddress(const in6_addr* address)
+BNetworkAddress::BNetworkAddress(const in6_addr& address, uint16 port)
 {
-	SetTo(address);
+	SetTo(address, port);
 }
 
 
@@ -266,28 +266,28 @@ BNetworkAddress::SetTo(const sockaddr_dl& address)
 
 
 void
-BNetworkAddress::SetTo(const in_addr_t inetAddress)
+BNetworkAddress::SetTo(in_addr_t inetAddress, uint16 port)
 {
-	sockaddr_in& address = (sockaddr_in&)fAddress;
 	memset(&fAddress, 0, sizeof(sockaddr_storage));
 
-	address.sin_family = AF_INET;
-	address.sin_len = sizeof(sockaddr_in);
-	address.sin_addr.s_addr = inetAddress;
+	fAddress.ss_family = AF_INET;
+	fAddress.ss_len = sizeof(sockaddr_in);
+	SetAddress(inetAddress);
+	SetPort(port);
 	fStatus = B_OK;
 }
 
 
 void
-BNetworkAddress::SetTo(const in6_addr* inet6Address)
+BNetworkAddress::SetTo(const in6_addr& inet6Address, uint16 port)
 {
-	sockaddr_in6& address = (sockaddr_in6&)fAddress;
 	memset(&fAddress, 0, sizeof(sockaddr_storage));
 
-	address.sin6_family = AF_INET6;
-	address.sin6_len = sizeof(sockaddr_in6);
-	memcpy(address.sin6_addr.s6_addr, inet6Address,
-		sizeof(address.sin6_addr.s6_addr));
+	fAddress.ss_family = AF_INET6;
+	fAddress.ss_len = sizeof(sockaddr_in6);
+	SetAddress(inet6Address);
+	SetPort(port);
+
 	fStatus = B_OK;
 }
 
@@ -383,9 +383,34 @@ BNetworkAddress::SetToMask(int family, uint32 prefixLength)
 
 
 status_t
-BNetworkAddress::SetToWildcard(int family)
+BNetworkAddress::SetToWildcard(int family, uint16 port)
 {
-	return SetTo(family, NULL);
+	return SetTo(family, NULL, port);
+}
+
+
+status_t
+BNetworkAddress::SetAddress(in_addr_t inetAddress)
+{
+	if (Family() != AF_INET)
+		return B_BAD_VALUE;
+
+	sockaddr_in& address = (sockaddr_in&)fAddress;
+	address.sin_addr.s_addr = inetAddress;
+	return B_OK;
+}
+
+
+status_t
+BNetworkAddress::SetAddress(const in6_addr& inet6Address)
+{
+	if (Family() != AF_INET6)
+		return B_BAD_VALUE;
+
+	sockaddr_in6& address = (sockaddr_in6&)fAddress;
+	memcpy(address.sin6_addr.s6_addr, &inet6Address,
+		sizeof(address.sin6_addr.s6_addr));
+	return B_OK;
 }
 
 
@@ -1022,7 +1047,19 @@ BNetworkAddress::operator sockaddr*()
 }
 
 
+BNetworkAddress::operator const sockaddr*()
+{
+	return (sockaddr*)&fAddress;
+}
+
+
 BNetworkAddress::operator sockaddr&()
+{
+	return (sockaddr&)fAddress;
+}
+
+
+BNetworkAddress::operator const sockaddr&()
 {
 	return (sockaddr&)fAddress;
 }

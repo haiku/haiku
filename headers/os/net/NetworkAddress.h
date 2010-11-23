@@ -33,8 +33,10 @@ public:
 								BNetworkAddress(const sockaddr_in& address);
 								BNetworkAddress(const sockaddr_in6& address);
 								BNetworkAddress(const sockaddr_dl& address);
-								BNetworkAddress(const in_addr_t address);
-								BNetworkAddress(const in6_addr* address);
+								BNetworkAddress(in_addr_t address,
+									uint16 port = 0);
+								BNetworkAddress(const in6_addr& address,
+									uint16 port = 0);
 								BNetworkAddress(const BNetworkAddress& other);
 								BNetworkAddress(BMessage* archive);
 	virtual						~BNetworkAddress();
@@ -57,15 +59,18 @@ public:
 			void				SetTo(const sockaddr_in& address);
 			void				SetTo(const sockaddr_in6& address);
 			void				SetTo(const sockaddr_dl& address);
-			void				SetTo(const in_addr_t address);
-			void				SetTo(const in6_addr* address);
+			void				SetTo(in_addr_t address, uint16 port = 0);
+			void				SetTo(const in6_addr& address, uint16 port = 0);
 			void				SetTo(const BNetworkAddress& other);
 
 			status_t			SetToBroadcast(int family, uint16 port = 0);
 			status_t			SetToLocal();
 			status_t			SetToLoopback();
 			status_t			SetToMask(int family, uint32 prefixLength);
-			status_t			SetToWildcard(int family);
+			status_t			SetToWildcard(int family, uint16 port = 0);
+
+			status_t			SetAddress(in_addr_t address);
+			status_t			SetAddress(const in6_addr& address);
 			void				SetPort(uint16 port);
 			status_t			SetPort(const char* service);
 
@@ -126,7 +131,9 @@ public:
 
 								operator const sockaddr*() const;
 								operator const sockaddr&() const;
+								operator const sockaddr*();
 								operator sockaddr*();
+								operator const sockaddr&();
 								operator sockaddr&();
 
 private:
