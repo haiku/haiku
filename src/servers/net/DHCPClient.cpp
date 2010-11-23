@@ -9,7 +9,6 @@
 
 
 #include "DHCPClient.h"
-#include "NetServer.h"
 
 #include <Message.h>
 #include <MessageRunner.h>
@@ -23,6 +22,12 @@
 #include <syslog.h>
 #include <sys/sockio.h>
 #include <sys/time.h>
+
+#include <Debug.h>
+#include <Message.h>
+#include <MessageRunner.h>
+
+#include "NetServer.h"
 
 
 // See RFC 2131 for DHCP, see RFC 1533 for BOOTP/DHCP options
@@ -136,6 +141,8 @@ struct dhcp_message {
 	uint8* PutOption(uint8* options, message_option option, const uint8* data,
 		uint32 size);
 	uint8* FinishOptions(uint8* options);
+
+	static const char* TypeToString(message_type type);
 } _PACKED;
 
 #define DHCP_FLAG_BROADCAST		0x8000
@@ -153,6 +160,7 @@ static const uint8 kRequestParameters[] = {
 
 dhcp_message::dhcp_message(message_type type)
 {
+	ASSERT(this == offsetof(this, opcode));
 	memset(this, 0, sizeof(*this));
 	options_magic = htonl(OPTION_MAGIC);
 
@@ -330,6 +338,27 @@ dhcp_message::FinishOptions(uint8* options)
 }
 
 
+/*static*/ const char*
+dhcp_message::TypeToString(message_type type)
+{
+	switch (type) {
+#define CASE(x) case x: return #x;
+		CASE(DHCP_NONE)
+		CASE(DHCP_DISCOVER)
+		CASE(DHCP_OFFER)
+		CASE(DHCP_REQUEST)
+		CASE(DHCP_DECLINE)
+		CASE(DHCP_ACK)
+		CASE(DHCP_NACK)
+		CASE(DHCP_RELEASE)
+		CASE(DHCP_INFORM)
+#undef CASE
+	}
+
+	return "<unknown>";
+}
+
+
 //	#pragma mark -
 
 
@@ -480,6 +509,9 @@ DHCPClient::_Negotiate(dhcp_state state)
 			continue;
 		}
 
+		syslog(LOG_DEBUG, "DHCP received %s for %s\n",
+			dhcp_message::TypeToString(message->Type()), Device());
+
 		switch (message->Type()) {
 			case DHCP_NONE:
 			default:
@@ -488,8 +520,6 @@ DHCPClient::_Negotiate(dhcp_state state)
 
 			case DHCP_OFFER:
 			{
-				syslog(LOG_DEBUG, "DHCP received offer for %s\n", Device());
-
 				// first offer wins
 				if (state != INIT)
 					break;
@@ -524,7 +554,6 @@ DHCPClient::_Negotiate(dhcp_state state)
 
 			case DHCP_ACK:
 			{
-				syslog(LOG_DEBUG, "DHCP received ack for %s\n", Device());
 				if (state != REQUESTING && state != REBINDING
 					&& state != RENEWAL)
 					continue;
@@ -533,7 +562,8 @@ DHCPClient::_Negotiate(dhcp_state state)
 				BMessage address;
 				fResolverConfiguration.MakeEmpty();
 				_ParseOptions(*message, address, fResolverConfiguration);
-					// TODO: currently, only lease time and DNS is updated this way
+					// TODO: currently, only lease time and DNS is updated this
+					// way
 
 				// our address request has been acknowledged
 				state = ACKNOWLEDGED;
@@ -553,8 +583,6 @@ DHCPClient::_Negotiate(dhcp_state state)
 			}
 
 			case DHCP_NACK:
-				syslog(LOG_DEBUG, "DHCP received nack for %s\n", Device());
-
 				if (state != REQUESTING)
 					continue;
 
@@ -793,8 +821,8 @@ status_t
 DHCPClient::_SendMessage(int socket, dhcp_message& message,
 	const BNetworkAddress& address) const
 {
-	syslog(LOG_DEBUG, "DHCP send message %u for %s\n", message.Type(),
-		Device());
+	syslog(LOG_DEBUG, "DHCP send message %s for %s\n",
+		dhcp_message::TypeToString(message.Type()), Device());
 
 	ssize_t bytesSent = sendto(socket, &message, message.Size(),
 		address.IsBroadcast() ? MSG_BCAST : 0, address, address.Length());
