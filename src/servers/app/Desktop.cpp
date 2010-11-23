@@ -2387,6 +2387,7 @@ Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 		case AS_APP_CRASHED:
 		case AS_DUMP_ALLOCATOR:
+		case AS_DUMP_BITMAPS:
 		{
 			BAutolock locker(fApplicationsLock);
 

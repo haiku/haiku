@@ -37,18 +37,48 @@ send_debug_message(team_id team, int32 code)
 }
 
 
+void
+usage()
+{
+	fprintf(stderr, "usage: %s -[ab] <team-id> [...]\n", __progname);
+	exit(1);
+}
+
+
 int
 main(int argc, char** argv)
 {
-	if (argc == 1) {
-		fprintf(stderr, "usage: %s <team-id> [...]\n", __progname);
-		return 1;
+	if (argc == 1)
+		usage();
+
+	bool dumpAllocator = false;
+	bool dumpBitmaps = false;
+
+	int32 i = 1;
+	while (argv[i][0] == '-') {
+		const char* arg = &argv[i][1];
+		while (arg[0]) {
+			if (arg[0] == 'a')
+				dumpAllocator = true;
+			else if (arg[0] == 'b')
+				dumpBitmaps = true;
+			else
+				usage();
+
+			arg++;
+		}
+		i++;
 	}
 
 	for (int32 i = 1; i < argc; i++) {
 		team_id team = atoi(argv[i]);
-		if (team > 0)
+		if (team <= 0)
+			continue;
+
+		if (dumpAllocator)
 			send_debug_message(team, AS_DUMP_ALLOCATOR);
+		if (dumpBitmaps)
+			send_debug_message(team, AS_DUMP_BITMAPS);
 	}
 
 	return 0;

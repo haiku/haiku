@@ -338,6 +338,7 @@ enum {
 
 	// debugging helper
 	AS_DUMP_ALLOCATOR,
+	AS_DUMP_BITMAPS,
 
 	AS_LAST_CODE
 };

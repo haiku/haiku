@@ -548,6 +548,23 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		case AS_DUMP_ALLOCATOR:
 			fMemoryAllocator.Dump();
 			break;
+		case AS_DUMP_BITMAPS:
+		{
+			fMapLocker.Lock();
+
+			debug_printf("Application %ld, %s: %d bitmaps:\n", ClientTeam(),
+				Signature(), (int)fBitmapMap.size());
+
+			BitmapMap::const_iterator iterator = fBitmapMap.begin();
+			for (; iterator != fBitmapMap.end(); iterator++) {
+				ServerBitmap* bitmap = iterator->second;
+				debug_printf("  [%ld] %ldx%ld, area %ld, size %ld\n",
+					bitmap->Token(), bitmap->Width(), bitmap->Height(),
+					bitmap->Area(), bitmap->BitsLength());
+			}
+			fMapLocker.Unlock();
+			break;
+		}
 
 		case AS_CREATE_WINDOW:
 		case AS_CREATE_OFFSCREEN_WINDOW:
