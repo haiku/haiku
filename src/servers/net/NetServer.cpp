@@ -384,11 +384,13 @@ NetServer::_ConfigureInterface(BMessage& interface)
 			if (addressMessage.FindString("family", &familyString) == B_OK) {
 				if (get_address_family(familyString) == AF_UNSPEC) {
 					// we don't support this family
+					fprintf(stderr, "%s: Ignore unknown family: %s\n", Name(),
+						familyString);
 					continue;
 				}
-			}
-		} else
-			family = AF_UNSPEC;
+			} else
+				family = AF_UNSPEC;
+		}
 
 		BNetworkInterface interface(device);
 		if (!interface.Exists()) {
