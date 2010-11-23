@@ -1144,15 +1144,21 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 	subMenu->AddItem(fAlignLeft = new BMenuItem(B_TRANSLATE("Left"),
 		new BMessage(ALIGN_LEFT)));
 	fAlignLeft->SetMarked(true);
+	fAlignLeft->SetShortcut('L', B_OPTION_KEY);
 
 	subMenu->AddItem(fAlignCenter = new BMenuItem(B_TRANSLATE("Center"),
 		new BMessage(ALIGN_CENTER)));
+	fAlignCenter->SetShortcut('C', B_OPTION_KEY);
+
 	subMenu->AddItem(fAlignRight = new BMenuItem(B_TRANSLATE("Right"),
 		new BMessage(ALIGN_RIGHT)));
+	fAlignRight->SetShortcut('R', B_OPTION_KEY);
+
 	menu->AddItem(subMenu);
 	menu->AddItem(fWrapItem = new BMenuItem(B_TRANSLATE("Wrap lines"),
 		new BMessage(WRAP_LINES)));
 	fWrapItem->SetMarked(true);
+	fWrapItem->SetShortcut('W', B_OPTION_KEY);
 
 	menu->AddSeparatorItem();
 	menu->AddItem(menuItem = new BMenuItem(
