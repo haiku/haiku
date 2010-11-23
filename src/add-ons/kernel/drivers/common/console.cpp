@@ -607,7 +607,7 @@ _console_write(struct console_desc *console, const void *buffer, size_t length)
 						break;
 					default:
 						process_vt100_command(console, *c, true, console->args,
-							console->arg_count + 1);
+							0);
 						console->state = CONSOLE_STATE_NORMAL;
 						break;
 				}
