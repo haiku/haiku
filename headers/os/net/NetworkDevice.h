@@ -31,6 +31,7 @@ public:
 			void				SetTo(const char* name);
 
 			const char*			Name() const;
+			uint32				Index() const;
 
 			uint32				Flags() const;
 			bool				HasLink() const;

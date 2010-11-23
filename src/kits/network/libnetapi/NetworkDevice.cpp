@@ -138,6 +138,17 @@ BNetworkDevice::Name() const
 
 
 uint32
+BNetworkDevice::Index() const
+{
+	ifreq request;
+	if (do_request(request, Name(), SIOCGIFINDEX) != B_OK)
+		return 0;
+
+	return request.ifr_index;
+}
+
+
+uint32
 BNetworkDevice::Flags() const
 {
 	ifreq request;
