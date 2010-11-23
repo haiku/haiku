@@ -61,6 +61,9 @@ public:
 	inline	int32				HistorySize() const;
 	inline	int32				HistoryCapacity() const;
 
+			bool				IsAlternateScreenActive() const
+									{ return fAlternateScreenActive; }
+
 			TerminalBufferDirtyInfo& DirtyInfo()	{ return fDirtyInfo; }
 
 	virtual	status_t			ResizeTo(int32 width, int32 height);
