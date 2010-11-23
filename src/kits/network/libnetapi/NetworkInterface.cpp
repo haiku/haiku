@@ -11,6 +11,9 @@
 #include <sys/sockio.h>
 
 #include <AutoDeleter.h>
+#include <Messenger.h>
+
+#include <NetServer.h>
 
 
 static int
@@ -24,6 +27,22 @@ family_from_interface_address(const BNetworkInterfaceAddress& address)
 		return address.Destination().Family();
 
 	return AF_INET;
+}
+
+
+static int
+family_from_route(const route_entry& route)
+{
+	if (route.destination != NULL && route.destination->sa_family != AF_UNSPEC)
+		return route.destination->sa_family;
+	if (route.mask != NULL && route.mask->sa_family != AF_UNSPEC)
+		return route.mask->sa_family;
+	if (route.gateway != NULL && route.gateway->sa_family != AF_UNSPEC)
+		return route.gateway->sa_family;
+	if (route.source != NULL && route.source->sa_family != AF_UNSPEC)
+		return route.source->sa_family;
+
+	return AF_UNSPEC;
 }
 
 
@@ -220,6 +239,17 @@ const char*
 BNetworkInterface::Name() const
 {
 	return fName;
+}
+
+
+uint32
+BNetworkInterface::Index() const
+{
+	ifreq request;
+	if (do_request(AF_INET, request, Name(), SIOCGIFINDEX) != B_OK)
+		return 0;
+
+	return request.ifr_index;
 }
 
 
@@ -478,4 +508,81 @@ BNetworkInterface::GetHardwareAddress(BNetworkAddress& address)
 
 	address.SetTo(request.ifr_addr);
 	return B_OK;
+}
+
+
+status_t
+BNetworkInterface::AddRoute(const route_entry& route)
+{
+	int family = family_from_route(route);
+	if (family == AF_UNSPEC)
+		return B_BAD_VALUE;
+
+	ifreq request;
+	request.ifr_route = route;
+	return do_request(family, request, Name(), SIOCADDRT);
+}
+
+
+status_t
+BNetworkInterface::AddDefaultRoute(const BNetworkAddress& gateway)
+{
+	route_entry route;
+	memset(&route, 0, sizeof(route_entry));
+	route.flags = RTF_STATIC | RTF_DEFAULT | RTF_GATEWAY;
+	route.gateway = const_cast<sockaddr*>(&gateway.SockAddr());
+
+	return AddRoute(route);
+}
+
+
+status_t
+BNetworkInterface::RemoveRoute(const route_entry& route)
+{
+	int family = family_from_route(route);
+	if (family == AF_UNSPEC)
+		return B_BAD_VALUE;
+
+	return RemoveRoute(family, route);
+}
+
+
+status_t
+BNetworkInterface::RemoveRoute(int family, const route_entry& route)
+{
+	ifreq request;
+	request.ifr_route = route;
+	return do_request(family, request, Name(), SIOCDELRT);
+}
+
+
+status_t
+BNetworkInterface::RemoveDefaultRoute(int family)
+{
+	route_entry route;
+	memset(&route, 0, sizeof(route_entry));
+	route.flags = RTF_STATIC | RTF_DEFAULT;
+
+	return RemoveRoute(family, route);
+}
+
+
+status_t
+BNetworkInterface::AutoConfigure(int family)
+{
+	BMessage message(kMsgConfigureInterface);
+	message.AddString("device", Name());
+
+	BMessage address;
+	address.AddInt32("family", family);
+	address.AddBool("auto_config", true);
+	message.AddMessage("address", &address);
+
+	BMessenger networkServer(kNetServerSignature);
+	BMessage reply;
+	status_t status = networkServer.SendMessage(&message, &reply);
+	if (status == B_OK)
+		reply.FindInt32("status", &status);
+
+	return status;
 }

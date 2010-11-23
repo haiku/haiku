@@ -100,6 +100,15 @@ public:
 
 			status_t			GetHardwareAddress(BNetworkAddress& address);
 
+			status_t			AddRoute(const route_entry& route);
+			status_t			AddDefaultRoute(const BNetworkAddress& gateway);
+			status_t			RemoveRoute(const route_entry& route);
+			status_t			RemoveRoute(int family,
+									const route_entry& route);
+			status_t			RemoveDefaultRoute(int family);
+
+			status_t			AutoConfigure(int family);
+
 private:
 			char				fName[IF_NAMESIZE];
 			BList				fAddresses;
