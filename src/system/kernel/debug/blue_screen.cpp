@@ -525,8 +525,7 @@ parse_character(char c)
 					// anyway
 					break;
 				default:
-					process_vt100_command(c, true, sScreen.args,
-						sScreen.arg_count + 1);
+					process_vt100_command(c, true, sScreen.args, 0);
 					sScreen.state = CONSOLE_STATE_NORMAL;
 					break;
 			}
