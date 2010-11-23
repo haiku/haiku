@@ -22,8 +22,10 @@ public:
 			status_t			GetNextInterface(uint32* cookie,
 									BNetworkInterface& interface) const;
 
+			status_t			AddInterface(const char* name);
 			status_t			AddInterface(
 									const BNetworkInterface& interface);
+			status_t			RemoveInterface(const char* name);
 			status_t			RemoveInterface(
 									const BNetworkInterface& interface);
 

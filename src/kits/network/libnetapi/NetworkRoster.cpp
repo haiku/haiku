@@ -106,7 +106,7 @@ BNetworkRoster::GetNextInterface(uint32* cookie,
 
 
 status_t
-BNetworkRoster::AddInterface(const BNetworkInterface& interface)
+BNetworkRoster::AddInterface(const char* name)
 {
 	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
 	if (socket < 0)
@@ -114,7 +114,7 @@ BNetworkRoster::AddInterface(const BNetworkInterface& interface)
 
 	ifaliasreq request;
 	memset(&request, 0, sizeof(ifaliasreq));
-	strlcpy(request.ifra_name, interface.Name(), IF_NAMESIZE);
+	strlcpy(request.ifra_name, name, IF_NAMESIZE);
 
 	if (ioctl(socket, SIOCAIFADDR, &request, sizeof(request)) != 0)
 		return errno;
@@ -124,14 +124,21 @@ BNetworkRoster::AddInterface(const BNetworkInterface& interface)
 
 
 status_t
-BNetworkRoster::RemoveInterface(const BNetworkInterface& interface)
+BNetworkRoster::AddInterface(const BNetworkInterface& interface)
+{
+	return AddInterface(interface.Name());
+}
+
+
+status_t
+BNetworkRoster::RemoveInterface(const char* name)
 {
 	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
 	if (socket < 0)
 		return errno;
 
 	ifreq request;
-	strlcpy(request.ifr_name, interface.Name(), IF_NAMESIZE);
+	strlcpy(request.ifr_name, name, IF_NAMESIZE);
 
 	request.ifr_addr.sa_family = AF_UNSPEC;
 
@@ -139,6 +146,13 @@ BNetworkRoster::RemoveInterface(const BNetworkInterface& interface)
 		return errno;
 
 	return B_OK;
+}
+
+
+status_t
+BNetworkRoster::RemoveInterface(const BNetworkInterface& interface)
+{
+	return RemoveInterface(interface.Name());
 }
 
 
