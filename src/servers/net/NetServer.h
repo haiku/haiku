@@ -11,20 +11,10 @@
 
 #include <SupportDefs.h>
 
-#include <net/if.h>
+#include <NetServer.h>
 
 
 class BNetworkAddress;
-
-
-// TODO: move this into a private shared header
-// NOTE: this header is used by other applications (such as ifconfig,
-// and Network) because of these defines
-#define kNetServerSignature		"application/x-vnd.haiku-net_server"
-#define kMsgConfigureInterface	'COif'
-#define kMsgConfigureResolver	'COrs'
-#define kMsgJoinNetwork			'JNnw'
-#define kMsgLeaveNetwork		'LVnw'
 
 
 int get_address_family(const char* argument);

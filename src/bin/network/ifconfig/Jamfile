@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src bin network ifconfig ;
 
-UseHeaders [ FDirName $(HAIKU_TOP) src servers net ] : true ;
+UsePrivateHeaders net ;
 
 BinCommand ifconfig :
 	ifconfig.cpp

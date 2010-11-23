@@ -5,7 +5,6 @@ UsePrivateHeaders net shared ;
 UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
 	: true ;
 UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_wlan ] : true ;
-UseHeaders [ FDirName $(HAIKU_TOP) src servers net ] : true ;
 
 SharedLibrary libbnetapi.so :
 	init.cpp
