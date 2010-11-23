@@ -23,11 +23,16 @@
 #include <string.h>
 #include <unistd.h>
 #include <termios.h>
+#include <sys/uio.h>
 
-#define HDLC_CONTROL_ESCAPE	0x7d
+
 #define HDLC_FLAG_SEQUENCE	0x7e
+#define HDLC_CONTROL_ESCAPE	0x7d
+
 #define HDLC_ALL_STATIONS	0xff
 #define HDLC_UI				0x03
+
+#define HDLC_HEADER_LENGTH	4
 
 
 enum dialup_state {
@@ -186,7 +191,7 @@ dialup_init(const char* name, net_device** _device)
 	if (status < B_OK)
 		return status;
 
-	dialup_device* device = new (std::nothrow) dialup_device;
+	dialup_device* device = new (std::nothrow)dialup_device;
 	if (device == NULL) {
 		put_module(NET_BUFFER_MODULE_NAME);
 		return B_NO_MEMORY;
@@ -197,9 +202,9 @@ dialup_init(const char* name, net_device** _device)
 	strcpy(device->name, name);
 	device->flags = IFF_POINTOPOINT;
 	device->type = IFT_PPP; // this device handle RFC 1331 frame format only
-	device->mtu = 1502;
+	device->mtu = 1500;
 	device->media = 0;
-	device->header_length = 8; // HDLC_HEADER_LENGTH;
+	device->header_length = HDLC_HEADER_LENGTH;
 	device->fd = -1;
 	device->state = DOWN;
 	device->data_mode = false;
@@ -224,6 +229,7 @@ dialup_uninit(net_device* _device)
 	delete device;
 
 	put_module(NET_BUFFER_MODULE_NAME);
+	gBufferModule = NULL;
 	return B_OK;
 }
 
@@ -246,6 +252,8 @@ dialup_up(net_device* _device)
 
 	// adjust options
 	device->line_config.c_cflag &= ~CBAUD;
+	device->line_config.c_cflag &= CSIZE;
+	device->line_config.c_cflag &= CS8;
 	device->line_config.c_cflag |= B115200;	// TODO: make this configurable too...
 	device->line_config.c_cflag |= (CLOCAL | CREAD);
 	device->line_config.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
@@ -258,27 +266,31 @@ dialup_up(net_device* _device)
 		sizeof(device->line_config)) < 0)
 		goto err;
 
-	// TODO: init modem & start dialing phase
-	device->state = DIALING;
+	// init modem & start dialing phase
 
 	char reply[32];
 
-	// Send modem init string
-	if (send_command(device, device->init_string) != B_OK
-		|| read_command_reply(device, device->init_string,
-			reply, sizeof(reply)) != B_OK
-		|| strcmp(reply, "OK")) {
-		errno = B_IO_ERROR;
-		goto err;
+	if (strlen(device->init_string) > 0) {
+		// Send modem init string
+		if (send_command(device, device->init_string) != B_OK
+			|| read_command_reply(device, device->init_string,
+				reply, sizeof(reply)) != B_OK
+			|| strcmp(reply, "OK")) {
+			errno = B_IO_ERROR;
+			goto err;
+		}
 	}
 
-	// Send dialing string
-	if (send_command(device, device->dial_string) != B_OK
-		|| read_command_reply(device, device->dial_string,
-			reply, sizeof(reply)) != B_OK
-		|| strncmp(reply, "CONNECT", 7)) {
-		errno = B_IO_ERROR;
-		goto err;
+	if (strlen(device->dial_string) > 0) {
+		// Send dialing string
+		device->state = DIALING;
+		if (send_command(device, device->dial_string) != B_OK
+			|| read_command_reply(device, device->dial_string,
+				reply, sizeof(reply)) != B_OK
+			|| strncmp(reply, "CONNECT", 7)) {
+			errno = B_IO_ERROR;
+			goto err;
+		}
 	}
 
 	device->state = UP;
@@ -334,7 +346,88 @@ dialup_control(net_device* _device, int32 op, void* argument,
 status_t
 dialup_send_data(net_device* _device, net_buffer* buffer)
 {
-	return B_NOT_SUPPORTED;
+	dialup_device* device = (dialup_device*)_device;
+
+	if (device->fd == -1)
+		return B_FILE_ERROR;
+
+	dprintf("try to send HDLC packet of %lu bytes (flags %ld):\n", buffer->size, buffer->flags);
+
+	if (buffer->size < HDLC_HEADER_LENGTH)
+		return B_BAD_VALUE;
+
+	iovec* ioVectors = NULL;
+	iovec* ioVector;
+	uint8* packet = NULL;
+	int packetSize = 0;
+	status_t status;
+	ssize_t bytesWritten;
+
+	uint32 vectorCount = gBufferModule->count_iovecs(buffer);
+	if (vectorCount < 1) {
+		status = B_BAD_VALUE;
+		goto err;
+	}
+
+	ioVectors = (iovec*)malloc(sizeof(iovec)*vectorCount);
+	if (ioVectors == NULL) {
+		status = B_NO_MEMORY;
+		goto err;
+	}
+	gBufferModule->get_iovecs(buffer, ioVectors, vectorCount);
+
+	// encode HDLC packet
+
+	// worst case: begin and end sequence flags and each byte needing escape
+	packet = (uint8*) malloc(2 + 2 * buffer->size);
+	if (packet == NULL) {
+		status = B_NO_MEMORY;
+		goto err;
+	}
+
+	// mark frame start
+	packet[packetSize++] = HDLC_FLAG_SEQUENCE;
+
+	ioVector = ioVectors;
+	while (vectorCount--) {
+		uint8* data = (uint8*) ioVector->iov_base;
+		for (unsigned int i = 0; i < ioVector->iov_len; i++) {
+			if (data[i] < 0x20
+				|| data[i] == HDLC_FLAG_SEQUENCE
+				|| data[i] == HDLC_CONTROL_ESCAPE) {
+				// needs escape
+				packet[packetSize++] = HDLC_CONTROL_ESCAPE;
+				packet[packetSize++] = data[i] ^ 0x20;
+			} else
+				packet[packetSize++] = data[i];
+		}
+		// next io vector
+		ioVector++;
+	}
+	// mark frame end
+	packet[packetSize++] = HDLC_FLAG_SEQUENCE;
+
+	// send HDLC packet
+
+	bytesWritten = write(device->fd, packet, packetSize);
+	if (bytesWritten < 0) {
+		device->stats.send.errors++;
+		status = errno;
+		goto err;
+	}
+
+	device->stats.send.packets++;
+	device->stats.send.bytes += bytesWritten;
+	status = B_OK;
+	goto done;
+
+err:
+	device->stats.send.errors++;
+
+done:
+	free(ioVectors);
+	free(packet);
+	return status;
 }
 
 
