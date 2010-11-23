@@ -167,21 +167,19 @@ media_parse_subtype(const char* string, int media, int* type)
 }
 
 
-static bool
-get_address_family(const char* argument, int& family)
+int
+get_address_family(const char* argument)
 {
 	for (int32 i = 0; kFamilies[i].family >= 0; i++) {
 		for (int32 j = 0; kFamilies[i].identifiers[j]; j++) {
 			if (!strcmp(argument, kFamilies[i].identifiers[j])) {
 				// found a match
-				family = kFamilies[i].family;
-				return true;
+				return kFamilies[i].family;
 			}
 		}
 	}
 
-	family = AF_UNSPEC;
-	return false;
+	return AF_UNSPEC;
 }
 
 
@@ -216,7 +214,7 @@ parse_address(int& family, const char* argument, BNetworkAddress& address)
 	if (family == AF_UNSPEC) {
 		// Test if we support the resulting address family
 		bool supported = false;
-	
+
 		for (int32 i = 0; kFamilies[i].family >= 0; i++) {
 			if (kFamilies[i].family == address.Family()) {
 				supported = true;
@@ -440,8 +438,8 @@ delete_interface(const char* name, char* const* args, int32 argCount)
 	BNetworkInterface interface(name);
 
 	for (int32 i = 0; i < argCount; i++) {
-		int family;
-		if (get_address_family(args[i], family))
+		int family = get_address_family(args[i]);
+		if (family != AF_UNSPEC)
 			i++;
 
 		BNetworkAddress address;
@@ -461,7 +459,7 @@ delete_interface(const char* name, char* const* args, int32 argCount)
 	if (argCount == 0) {
 		// Delete interface
 		BNetworkRoster& roster = BNetworkRoster::Default();
-		
+
 		status_t status = roster.RemoveInterface(interface);
 		if (status != B_OK) {
 			fprintf(stderr, "%s: Could not delete interface %s: %s\n",
@@ -477,16 +475,16 @@ configure_interface(const char* name, char* const* args,
 {
 	// try to parse address family
 
-	int family;
 	int32 i = 0;
-	if (get_address_family(args[i], family))
+	int family = get_address_family(args[i]);
+	if (family != AF_UNSPEC)
 		i++;
 
 	// try to parse address
 
 	BNetworkAddress address;
 	BNetworkAddress mask;
-	
+
 	if (parse_address(family, args[i], address)) {
 		i++;
 
@@ -498,7 +496,7 @@ configure_interface(const char* name, char* const* args,
 	if (!interface.Exists()) {
 		// the interface does not exist yet, we have to add it first
 		BNetworkRoster& roster = BNetworkRoster::Default();
-		
+
 		status_t status = roster.AddInterface(interface);
 		if (status != B_OK) {
 			fprintf(stderr, "%s: Could not add interface: %s\n", kProgramName,
@@ -702,28 +700,13 @@ configure_interface(const char* name, char* const* args,
 	// start auto configuration, if asked for
 
 	if (doAutoConfig) {
-		BMessage message(kMsgConfigureInterface);
-		message.AddString("device", name);
-		BMessage address;
-		address.AddString("family", address_family_for(family)->name);
-		address.AddBool("auto_config", true);
-		message.AddMessage("address", &address);
-
-		BMessenger networkServer(kNetServerSignature);
-		if (networkServer.IsValid()) {
-			BMessage reply;
-			status_t status = networkServer.SendMessage(&message, &reply);
-			if (status != B_OK) {
-				fprintf(stderr, "%s: Sending auto-config message failed: %s\n",
-					kProgramName, strerror(status));
-			} else if (reply.FindInt32("status", &status) == B_OK
-					&& status != B_OK) {
-				fprintf(stderr, "%s: Auto-configuring failed: %s\n",
-					kProgramName, strerror(status));
-			}
-		} else {
+		status_t status = interface.AutoConfigure(family);
+		if (status == B_BAD_PORT_ID) {
 			fprintf(stderr, "%s: The net_server needs to run for the auto "
 				"configuration!\n", kProgramName);
+		} else if (status != B_OK) {
+			fprintf(stderr, "%s: Auto-configuring failed: %s\n", kProgramName,
+				strerror(status));
 		}
 	}
 }
