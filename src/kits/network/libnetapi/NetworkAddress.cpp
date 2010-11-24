@@ -308,8 +308,8 @@ BNetworkAddress::SetToBroadcast(int family, uint16 port)
 
 	memset(&fAddress, 0, sizeof(sockaddr_storage));
 	fAddress.ss_family = family;
-	((sockaddr_in&)fAddress).sin_addr.s_addr = INADDR_BROADCAST;
-
+	fAddress.ss_len = sizeof(sockaddr_in);
+	SetAddress(INADDR_BROADCAST);
 	SetPort(port);
 	return fStatus = B_OK;
 }
