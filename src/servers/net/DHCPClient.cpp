@@ -192,7 +192,7 @@ dhcp_message::NextOption(dhcp_option_cookie& cookie,
 
 	switch (cookie.state) {
 		case 1:
-			// iterate options from "options"
+			// options from "options"
 			bytesLeft = sizeof(options) - (cookie.next - options);
 			break;
 
@@ -211,7 +211,7 @@ dhcp_message::NextOption(dhcp_option_cookie& cookie,
 		if (bytesLeft == 0) {
 			cookie.state++;
 
-			// handle option(s) overload in file and/or server_name fields.
+			// handle option overload in file and/or server_name fields.
 			switch (cookie.state) {
 				case 2:
 					// options from "file"
@@ -230,7 +230,7 @@ dhcp_message::NextOption(dhcp_option_cookie& cookie,
 					break;
 
 				case 4:
-					// no more options
+					// no more place to look for options
 					return false;
 			}
 
