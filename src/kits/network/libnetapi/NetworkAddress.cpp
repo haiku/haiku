@@ -274,6 +274,7 @@ BNetworkAddress::SetTo(in_addr_t inetAddress, uint16 port)
 	fAddress.ss_len = sizeof(sockaddr_in);
 	SetAddress(inetAddress);
 	SetPort(port);
+
 	fStatus = B_OK;
 }
 
@@ -306,12 +307,8 @@ BNetworkAddress::SetToBroadcast(int family, uint16 port)
 	if (family != AF_INET)
 		return fStatus = B_NOT_SUPPORTED;
 
-	memset(&fAddress, 0, sizeof(sockaddr_storage));
-	fAddress.ss_family = family;
-	fAddress.ss_len = sizeof(sockaddr_in);
-	SetAddress(INADDR_BROADCAST);
-	SetPort(port);
-	return fStatus = B_OK;
+	SetTo(INADDR_BROADCAST, port);
+	return B_OK;
 }
 
 
@@ -319,7 +316,7 @@ status_t
 BNetworkAddress::SetToLocal()
 {
 	// TODO: choose a local address from the network interfaces
-	return B_NOT_SUPPORTED;
+	return fStatus = B_NOT_SUPPORTED;
 }
 
 
@@ -375,10 +372,10 @@ BNetworkAddress::SetToMask(int family, uint32 prefixLength)
 		}
 
 		default:
-			return B_NOT_SUPPORTED;
+			return fStatus = B_NOT_SUPPORTED;
 	}
 
-	return B_OK;
+	return fStatus = B_OK;
 }
 
 
@@ -387,24 +384,18 @@ BNetworkAddress::SetToWildcard(int family, uint16 port)
 {
 	switch (family) {
 		case AF_INET:
-			memset(&fAddress, 0, sizeof(sockaddr_storage));
-			fAddress.ss_len = sizeof(sockaddr_in);
-			SetAddress(INADDR_ANY);
+			SetTo(INADDR_ANY, port);
 			break;
 
 		case AF_INET6:
-			memset(&fAddress, 0, sizeof(sockaddr_storage));
-			fAddress.ss_len = sizeof(sockaddr_in6);
-			SetAddress(in6addr_any);
+			SetTo(in6addr_any, port);
 			break;
 
 		default:
-			return B_NOT_SUPPORTED;
+			return fStatus = B_NOT_SUPPORTED;
 	}
 
-	fAddress.ss_family = family;
-	SetPort(port);
-	return fStatus = B_OK;
+	return B_OK;
 }
 
 
