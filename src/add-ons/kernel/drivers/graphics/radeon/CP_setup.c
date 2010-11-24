@@ -1,11 +1,11 @@
 /*
 	Copyright (c) 2002, Thomas Kurschel
-	
+
 
 	Part of Radeon accelerant
-		
+
 	CP initialization/sync/cleanup.
-	
+
 	It also handles command buffer synchronization.
 
 	non-local memory is used as following:
@@ -71,7 +71,7 @@
 \
 		ioctl( ai->fd, RADEON_FREE_MEM, &fm ); \
 	}
-	
+
 #else
 
 // macros for kernel-space
@@ -101,7 +101,7 @@
 	mem_free( \
 		di->memmgr[ mem_type == mt_nonlocal ? di->si->nonlocal_type : mem_type], \
 		handle, NULL );
-	
+
 #endif
 
 
@@ -120,31 +120,31 @@ void Radeon_WaitForIdle( device_info *di, bool acquire_lock, bool keep_lock )
 {
 	if( acquire_lock )
 		ACQUIRE_BEN( di->si->cp.lock );
-	
+
 	Radeon_WaitForFifo( di, 64 );
-	
+
 	while( 1 ) {
 		bigtime_t start_time = system_time();
-	
+
 		do {
 			if( (INREG( di->regs, RADEON_RBBM_STATUS ) & RADEON_RBBM_ACTIVE) == 0 ) {
 				Radeon_FlushPixelCache( di );
-				
+
 				if( acquire_lock && !keep_lock)
 					RELEASE_BEN( di->si->cp.lock );
-					
+
 				return;
 			}
-			
+
 			snooze( 1 );
 		} while( system_time() - start_time < 1000000 );
-		
+
 		SHOW_ERROR( 3, "Engine didn't become idle (rbbm_status=%lx, cp_stat=%lx, tlb_address=%lx, tlb_data=%lx)",
 			INREG( di->regs, RADEON_RBBM_STATUS ),
 			INREG( di->regs, RADEON_CP_STAT ),
 			INREG( di->regs, RADEON_AIC_TLB_ADDR ),
 			INREG( di->regs, RADEON_AIC_TLB_DATA ));
-		
+
 		LOG( di->si->log, _Radeon_WaitForIdle );
 
 		Radeon_ResetEngine( di );
@@ -158,18 +158,18 @@ void Radeon_WaitForFifo( device_info *di, int entries )
 {
 	while( 1 ) {
 		bigtime_t start_time = system_time();
-	
+
 		do {
 			int slots = INREG( di->regs, RADEON_RBBM_STATUS ) & RADEON_RBBM_FIFOCNT_MASK;
-			
-			if ( slots >= entries ) 
+
+			if ( slots >= entries )
 				return;
 
 			snooze( 1 );
 		} while( system_time() - start_time < 1000000 );
-		
+
 		LOG( di->si->log, _Radeon_WaitForFifo );
-		
+
 		Radeon_ResetEngine( di );
 	}
 }
@@ -178,20 +178,20 @@ void Radeon_WaitForFifo( device_info *di, int entries )
 void Radeon_FlushPixelCache( device_info *di )
 {
 	bigtime_t start_time;
-	
+
 	OUTREGP( di->regs, RADEON_RB2D_DSTCACHE_CTLSTAT, RADEON_RB2D_DC_FLUSH_ALL,
 		~RADEON_RB2D_DC_FLUSH_ALL );
 
 	start_time = system_time();
-	
+
 	do {
-		if( (INREG( di->regs, RADEON_RB2D_DSTCACHE_CTLSTAT ) 
-			 & RADEON_RB2D_DC_BUSY) == 0 ) 
+		if( (INREG( di->regs, RADEON_RB2D_DSTCACHE_CTLSTAT )
+			 & RADEON_RB2D_DC_BUSY) == 0 )
 			return;
 
 		snooze( 1 );
 	} while( system_time() - start_time < 1000000 );
-	
+
 	LOG( di->si->log, _Radeon_FlushPixelCache );
 
 	SHOW_ERROR0( 0, "pixel cache didn't become empty" );
@@ -205,7 +205,7 @@ void Radeon_ResetEngine( device_info *di )
 	shared_info *si = di->si;
 	uint32 clock_cntl_index, mclk_cntl, rbbm_soft_reset, host_path_cntl;
 	uint32 cur_read_ptr;
-	
+
 	SHOW_FLOW0( 3, "" );
 
 	Radeon_FlushPixelCache( di );
@@ -213,7 +213,7 @@ void Radeon_ResetEngine( device_info *di )
 	clock_cntl_index = INREG( regs, RADEON_CLOCK_CNTL_INDEX );
 	RADEONPllErrataAfterIndex( regs, di->asic );	// drm has no errata here!
 	mclk_cntl = Radeon_INPLL( regs, di->asic, RADEON_MCLK_CNTL );
-			
+
 	// enable clock of units to be reset
 	Radeon_OUTPLL( regs, di->asic, RADEON_MCLK_CNTL, mclk_cntl |
       RADEON_FORCEON_MCLKA |
@@ -245,7 +245,7 @@ void Radeon_ResetEngine( device_info *di )
 		   RADEON_SOFT_RESET_E2 |
 		   RADEON_SOFT_RESET_RB ) );
 	INREG( regs, RADEON_RBBM_SOFT_RESET);
-	
+
     OUTREG( regs, RADEON_HOST_PATH_CNTL, host_path_cntl | RADEON_HDP_SOFT_RESET );
     INREG( regs, RADEON_HOST_PATH_CNTL );
     OUTREG( regs, RADEON_HOST_PATH_CNTL, host_path_cntl );
@@ -254,22 +254,22 @@ void Radeon_ResetEngine( device_info *di )
    	OUTREG( regs, RADEON_CLOCK_CNTL_INDEX, clock_cntl_index );
    	//RADEONPllErrataAfterIndex( regs, di->asic ); // drm doesn't do this here!
    	OUTREG( regs, RADEON_RBBM_SOFT_RESET, rbbm_soft_reset);
-   	
+
 	if ( di->acc_dma )
 	{
 		// reset ring buffer
 		cur_read_ptr = INREG( regs, RADEON_CP_RB_RPTR );
 		OUTREG( regs, RADEON_CP_RB_WPTR, cur_read_ptr );
-		
+
 		//if( si->cp.ring.head ) {
 		// during init, there are no feedback data
 		if( si->cp.feedback.mem_handle != 0 ) {
-			*(uint32 *)MEM2CPU( si->cp.feedback.mem_type, si->cp.feedback.head_mem_offset) = 
+			*(uint32 *)MEM2CPU( si->cp.feedback.mem_type, si->cp.feedback.head_mem_offset) =
 				cur_read_ptr;
 			//	*si->cp.ring.head = cur_read_ptr;
 			si->cp.ring.tail = cur_read_ptr;
 		}
-	
+
 		// mark all buffers as being finished
 		Radeon_DiscardAllIndirectBuffers( di );
 	}
@@ -284,9 +284,9 @@ static void loadMicroEngineRAMData( device_info *di )
 {
 	int i;
 	const uint32 (*microcode)[2];
-	
+
 	SHOW_FLOW0( 3, "" );
-	
+
 	switch( di->asic ) {
 	case rt_r300:
 	case rt_rv350:
@@ -306,7 +306,7 @@ static void loadMicroEngineRAMData( device_info *di )
 	Radeon_WaitForIdle( di, false, false );
 
 	OUTREG( di->regs, RADEON_CP_ME_RAM_ADDR, 0 );
-	
+
 	for ( i = 0 ; i < 256 ; i++ ) {
 		OUTREG( di->regs, RADEON_CP_ME_RAM_DATAH, microcode[i][1] );
 		OUTREG( di->regs, RADEON_CP_ME_RAM_DATAL, microcode[i][0] );
@@ -329,15 +329,15 @@ static status_t initRingBuffer( device_info *di, int aring_size )
 	// (it seems that they cannot be in graphics memory, at least
 	//  I had serious coherency problems when I tried that)
 	memory_type = mt_nonlocal;
-	
-	ALLOC_MEM( aring_size * 4, memory_type, true, 
+
+	ALLOC_MEM( aring_size * 4, memory_type, true,
 		&cp->ring.mem_handle, &offset );
 
 	if( res != B_OK ) {
 		SHOW_ERROR0( 0, "Cannot allocate ring buffer" );
 		return res;
 	}
-	
+
 	// setup CP buffer
 	cp->ring.mem_type = memory_type;
 	cp->ring.mem_offset = offset;
@@ -349,14 +349,14 @@ static status_t initRingBuffer( device_info *di, int aring_size )
 
 	// set ring buffer size
 	// (it's log2 of qwords)
-	OUTREG( regs, RADEON_CP_RB_CNTL, log2( cp->ring.size / 2 ));
-	SHOW_INFO( 3, "CP buffer size mask=%d", log2( cp->ring.size / 2 ) );
+	OUTREG( regs, RADEON_CP_RB_CNTL, radeon_log2( cp->ring.size / 2 ));
+	SHOW_INFO( 3, "CP buffer size mask=%d", radeon_log2( cp->ring.size / 2 ) );
 
 	// set write pointer delay to zero;
 	// we assume that memory synchronization is done correctly my MoBo
 	// and Radeon_SendCP contains a hack that hopefully fixes such problems
 	OUTREG( regs, RADEON_CP_RB_WPTR_DELAY, 0 );
-	
+
 	memset( MEM2CPU( cp->ring.mem_type, cp->ring.mem_offset), 0, cp->ring.size * 4 );
 
 	// set CP buffer pointers
@@ -371,15 +371,15 @@ static status_t initRingBuffer( device_info *di, int aring_size )
 static void uninitRingBuffer( device_info *di )
 {
 	vuint8 *regs = di->regs;
-	
+
 	// abort any activity
 	Radeon_ResetEngine( di );
-	
+
 	// disable CP BM
-	OUTREG( regs, RADEON_CP_CSQ_CNTL, RADEON_CSQ_PRIDIS_INDDIS );	
+	OUTREG( regs, RADEON_CP_CSQ_CNTL, RADEON_CSQ_PRIDIS_INDDIS );
 	// read-back for flushing
 	INREG( regs, RADEON_CP_CSQ_CNTL );
-	
+
 	FREE_MEM( mt_nonlocal, di->si->cp.ring.mem_handle );
 }
 
@@ -395,15 +395,15 @@ static status_t initCPFeedback( device_info *di )
 	// poll it without locking the bus (PCI memory is the only
 	// cachable memory available)
 	memory_type = mt_PCI;
-	
-	ALLOC_MEM( RADEON_SCRATCH_REG_OFFSET + 0x40, memory_type, true, 
+
+	ALLOC_MEM( RADEON_SCRATCH_REG_OFFSET + 0x40, memory_type, true,
 		&cp->feedback.mem_handle, &offset );
 
 	if( res != B_OK ) {
 		SHOW_ERROR0( 0, "Cannot allocate buffers for status information" );
 		return res;
 	}
-	
+
 	// setup CP read pointer buffer
 	cp->feedback.mem_type = memory_type;
 	cp->feedback.head_mem_offset = offset;
@@ -416,7 +416,7 @@ static status_t initCPFeedback( device_info *di )
 	cp->feedback.scratch_vm_start = MEM2GC( memory_type, cp->feedback.scratch_mem_offset );
 	OUTREG( regs, RADEON_SCRATCH_ADDR, cp->feedback.scratch_vm_start );
 	OUTREG( regs, RADEON_SCRATCH_UMSK, 0x3f );
-	
+
 	*(uint32 *)MEM2CPU( cp->feedback.mem_type, cp->feedback.head_mem_offset) = 0;
 	memset( MEM2CPU( cp->feedback.mem_type, cp->feedback.scratch_mem_offset), 0, 0x40 );
 	//*cp->ring.head = 0;
@@ -427,10 +427,10 @@ static status_t initCPFeedback( device_info *di )
 static void uninitCPFeedback( device_info *di )
 {
 	vuint8 *regs = di->regs;
-	
+
 	// don't allow any scratch buffer update
 	OUTREG( regs, RADEON_SCRATCH_UMSK, 0x0 );
-	
+
 	FREE_MEM( mt_PCI, di->si->cp.feedback.mem_handle );
 }
 
@@ -441,10 +441,10 @@ static status_t initIndirectBuffers( device_info *di )
 	memory_type_e memory_type;
 	int i;
 	status_t res;
-	
+
 	memory_type = mt_nonlocal;
-	
-	ALLOC_MEM( NUM_INDIRECT_BUFFERS * INDIRECT_BUFFER_SIZE * 4, memory_type, 
+
+	ALLOC_MEM( NUM_INDIRECT_BUFFERS * INDIRECT_BUFFER_SIZE * 4, memory_type,
 		true, &cp->buffers.mem_handle, &offset );
 
 	if( res != B_OK ) {
@@ -455,22 +455,22 @@ static status_t initIndirectBuffers( device_info *di )
 	cp->buffers.mem_type = memory_type;
 	cp->buffers.mem_offset = offset;
 	cp->buffers.vm_start = MEM2GC( memory_type, cp->buffers.mem_offset );
-	
+
 	for( i = 0; i < NUM_INDIRECT_BUFFERS - 1; ++i ) {
 		cp->buffers.buffers[i].next = i + 1;
 	}
-	
+
 	cp->buffers.buffers[i].next = -1;
-	
+
 	cp->buffers.free_list = 0;
 	cp->buffers.oldest = -1;
 	cp->buffers.newest = -1;
 	cp->buffers.active_state = -1;
 	cp->buffers.cur_tag = 0;
-	
-	memset( MEM2CPU( cp->buffers.mem_type, cp->buffers.mem_offset), 0, 
+
+	memset( MEM2CPU( cp->buffers.mem_type, cp->buffers.mem_offset), 0,
 		NUM_INDIRECT_BUFFERS * INDIRECT_BUFFER_SIZE * 4 );
-	
+
 	return B_OK;
 }
 
@@ -481,20 +481,20 @@ static void uninitIndirectBuffers( device_info *di )
 
 // initialize CP so it's ready for BM
 status_t Radeon_InitCP( device_info *di )
-{	
+{
 	thread_id thid;
     thread_info thinfo;
 	status_t res;
-	
+
 	SHOW_FLOW0( 3, "" );
-	
+
 	// this is _really_ necessary so functions like ResetEngine() know
 	// that the CP is not set up yet
 	memset( &di->si->cp, 0, sizeof( di->si->cp ));
-	
+
 	if( (res = INIT_BEN( di->si->cp.lock, "Radeon CP" )) < 0 )
 		return res;
-	
+
 	// HACK: change owner of benaphore semaphore to team of calling thread;
 	// reason: user code cannot acquire kernel semaphores, but the accelerant
 	// is in user space; interestingly, it's enough to change the semaphore's
@@ -503,13 +503,13 @@ status_t Radeon_InitCP( device_info *di )
 	thid = find_thread( NULL );
     get_thread_info( thid, &thinfo );
     set_sem_owner( di->si->cp.lock.sem, thinfo.team );
-	
+
 	// init raw CP
 	if ( di->acc_dma ) loadMicroEngineRAMData( di );
 
 	// do soft-reset
 	Radeon_ResetEngine( di );
-	
+
 	// after warm-reset, the CP may still be active and thus react to
 	// register writes during initialization unpredictably, so we better
 	// stop it first
@@ -524,21 +524,21 @@ status_t Radeon_InitCP( device_info *di )
 		res = initRingBuffer( di, CP_RING_SIZE );
 		if( res < 0 )
 			goto err4;
-		
+
 		res = initCPFeedback( di );
 		if( res < 0 )
 			goto err3;
-			
+
 		res = initIndirectBuffers( di );
 		if( res < 0 )
 			goto err2;
-			
+
 		// tell CP to use BM
 		Radeon_WaitForIdle( di, false, false );
-		
+
 		// enable direct and indirect CP bus mastering
 		OUTREG( di->regs, RADEON_CP_CSQ_CNTL, RADEON_CSQ_PRIBM_INDBM );
-		
+
 		// allow bus mastering in general
 		OUTREGP( di->regs, RADEON_BUS_CNTL, 0, ~RADEON_BUS_MASTER_DIS );
 	}
@@ -552,15 +552,15 @@ status_t Radeon_InitCP( device_info *di )
 		RADEON_ISYNC_ANY3D_IDLE2D |
 		RADEON_ISYNC_WAIT_IDLEGUI |
 		RADEON_ISYNC_CPSCRATCH_IDLEGUI );
-		 
+
 	SHOW_FLOW( 3, "bus_cntl=%lx", INREG( di->regs, RADEON_BUS_CNTL ));
 
 	SHOW_FLOW0( 3, "Done" );
-		
+
 	return B_OK;
-	
+
 //err:
-//	uninitIndirectBuffers( ai );	
+//	uninitIndirectBuffers( ai );
 err2:
 	uninitCPFeedback( di );
 err3:
@@ -578,19 +578,19 @@ void Radeon_UninitCP( device_info *di )
 
 	// abort any pending commands
 	Radeon_ResetEngine( di );
-	
+
 	// disable CP BM
-	OUTREG( regs, RADEON_CP_CSQ_CNTL, RADEON_CSQ_PRIDIS_INDDIS );	
+	OUTREG( regs, RADEON_CP_CSQ_CNTL, RADEON_CSQ_PRIDIS_INDDIS );
 	// read-back for flushing
 	INREG( regs, RADEON_CP_CSQ_CNTL );
-	
+
 	if ( di->acc_dma )
 	{
 		uninitRingBuffer( di );
 		uninitCPFeedback( di );
 		uninitIndirectBuffers( di );
 	}
-		
+
 	DELETE_BEN( di->si->cp.lock );
 }
 
@@ -601,29 +601,29 @@ void Radeon_UninitCP( device_info *di )
 void Radeon_DiscardAllIndirectBuffers( device_info *di )
 {
 	CP_info *cp = &di->si->cp;
-	
+
 	// during init, there is no indirect buffer
 	if( cp->buffers.mem_handle == 0 )
 		return;
-	
+
 	// mark all sent indirect buffers as free
 	while( cp->buffers.oldest != -1 ) {
-		indirect_buffer *oldest_buffer = 
+		indirect_buffer *oldest_buffer =
 			&cp->buffers.buffers[cp->buffers.oldest];
 		int tmp_oldest_buffer;
-			
+
 		SHOW_FLOW( 0, "%d", cp->buffers.oldest );
-		
+
 		// remove buffer from "used" list
 		tmp_oldest_buffer = oldest_buffer->next;
-			
+
 		if( tmp_oldest_buffer == -1 )
 			cp->buffers.newest = -1;
-			
+
 		// put it on free list
 		oldest_buffer->next = cp->buffers.free_list;
 		cp->buffers.free_list = cp->buffers.oldest;
-		
+
 		cp->buffers.oldest = tmp_oldest_buffer;
 	}
 }
@@ -637,7 +637,7 @@ void Radeon_SetDynamicClock( device_info *di, int mode)
     vuint8 *regs = di->regs;
     radeon_type asic = di->asic;
     uint32 tmp;
-    
+
     switch(mode) {
 	case 0: /* Turn everything OFF (ForceON to everything)*/
 		if ( di->num_crtc != 2 ) {
@@ -657,7 +657,7 @@ void Radeon_SetDynamicClock( device_info *di, int mode)
 				R300_SCLK_FORCE_GA  |
 				R300_SCLK_FORCE_CBA);
 			Radeon_OUTPLL(regs, asic, R300_SCLK_CNTL2, tmp);
-	
+
 			tmp = Radeon_INPLL(regs, asic, RADEON_SCLK_CNTL);
 			tmp |= (RADEON_SCLK_FORCE_DISP2 | RADEON_SCLK_FORCE_CP      |
 				RADEON_SCLK_FORCE_HDP   | RADEON_SCLK_FORCE_DISP1   |
@@ -668,11 +668,11 @@ void Radeon_SetDynamicClock( device_info *di, int mode)
 				R300_SCLK_FORCE_US      | RADEON_SCLK_FORCE_TV_SCLK |
 				R300_SCLK_FORCE_SU      | RADEON_SCLK_FORCE_OV0);
 			Radeon_OUTPLL(regs, asic, RADEON_SCLK_CNTL, tmp);
-	
+
 			tmp = Radeon_INPLL(regs, asic, RADEON_SCLK_MORE_CNTL);
 			tmp |= RADEON_SCLK_MORE_FORCEON;
 			Radeon_OUTPLL(regs, asic, RADEON_SCLK_MORE_CNTL, tmp);
-	
+
 			tmp = Radeon_INPLL(regs, asic, RADEON_MCLK_CNTL);
 			tmp |= (RADEON_FORCEON_MCLKA |
 				RADEON_FORCEON_MCLKB |
@@ -680,13 +680,13 @@ void Radeon_SetDynamicClock( device_info *di, int mode)
 				RADEON_FORCEON_YCLKB |
 				RADEON_FORCEON_MC);
 			Radeon_OUTPLL(regs, asic, RADEON_MCLK_CNTL, tmp);
-	
+
 			tmp = Radeon_INPLL(regs, asic, RADEON_VCLK_ECP_CNTL);
 			tmp &= ~(RADEON_PIXCLK_ALWAYS_ONb  |
 				RADEON_PIXCLK_DAC_ALWAYS_ONb |
 			R300_DISP_DAC_PIXCLK_DAC_BLANK_OFF);
 			Radeon_OUTPLL(regs, asic, RADEON_VCLK_ECP_CNTL, tmp);
-	
+
 			tmp = Radeon_INPLL(regs, asic, RADEON_PIXCLKS_CNTL);
 			tmp &= ~(RADEON_PIX2CLK_ALWAYS_ONb         |
 				RADEON_PIX2CLK_DAC_ALWAYS_ONb     |
@@ -707,7 +707,7 @@ void Radeon_SetDynamicClock( device_info *di, int mode)
 			tmp = Radeon_INPLL(regs, asic, RADEON_SCLK_CNTL);
 			tmp |= (RADEON_SCLK_FORCE_CP | RADEON_SCLK_FORCE_E2);
 			tmp |= RADEON_SCLK_FORCE_SE;
-	
+
 			if ( di->num_crtc != 2 ) {
 				tmp |= ( RADEON_SCLK_FORCE_RB    |
 				RADEON_SCLK_FORCE_TDM   |
@@ -729,9 +729,9 @@ void Radeon_SetDynamicClock( device_info *di, int mode)
 					RADEON_SCLK_FORCE_VIP);
 			}
 			Radeon_OUTPLL(regs, asic, RADEON_SCLK_CNTL, tmp);
-	
+
 			snooze(16000);
-	
+
 			if ((asic == rt_r300) || (asic == rt_r350)) {
 				tmp = Radeon_INPLL(regs, asic, R300_SCLK_CNTL2);
 				tmp |= ( R300_SCLK_FORCE_TCL |
@@ -740,7 +740,7 @@ void Radeon_SetDynamicClock( device_info *di, int mode)
 				Radeon_OUTPLL(regs, asic, R300_SCLK_CNTL2, tmp);
 				snooze(16000);
 			}
-	
+
 			if (di->is_igp) {
 				tmp = Radeon_INPLL(regs, asic, RADEON_MCLK_CNTL);
 				tmp &= ~(RADEON_FORCEON_MCLKA |
@@ -748,7 +748,7 @@ void Radeon_SetDynamicClock( device_info *di, int mode)
 				Radeon_OUTPLL(regs, asic, RADEON_MCLK_CNTL, tmp);
 				snooze(16000);
 			}
-	
+
 			if ((asic == rt_rv200) ||
 				(asic == rt_rv250) ||
 				(asic == rt_rv280)) {
@@ -757,7 +757,7 @@ void Radeon_SetDynamicClock( device_info *di, int mode)
 				Radeon_OUTPLL(regs, asic, RADEON_SCLK_MORE_CNTL, tmp);
 				snooze(16000);
 			}
-	
+
 			tmp = Radeon_INPLL(regs, asic, RADEON_PIXCLKS_CNTL);
 			tmp &= ~(RADEON_PIX2CLK_ALWAYS_ONb         |
 				RADEON_PIX2CLK_DAC_ALWAYS_ONb     |
@@ -766,10 +766,10 @@ void Radeon_SetDynamicClock( device_info *di, int mode)
 				RADEON_PIXCLK_DIG_TMDS_ALWAYS_ONb |
 				RADEON_PIXCLK_LVDS_ALWAYS_ONb     |
 				RADEON_PIXCLK_TMDS_ALWAYS_ONb);
-		
+
 			Radeon_OUTPLL(regs, asic, RADEON_PIXCLKS_CNTL, tmp);
 			snooze(16000);
-	
+
 			tmp = Radeon_INPLL(regs, asic, RADEON_VCLK_ECP_CNTL);
 			tmp &= ~(RADEON_PIXCLK_ALWAYS_ONb  |
 				RADEON_PIXCLK_DAC_ALWAYS_ONb);
@@ -789,8 +789,8 @@ void Radeon_SetDynamicClock( device_info *di, int mode)
 				RADEON_SCLK_FORCE_PB   | RADEON_SCLK_FORCE_TAM  |
 				RADEON_SCLK_FORCE_TDM);
 			Radeon_OUTPLL(regs, asic, RADEON_SCLK_CNTL, tmp);
-		} else if ((asic == rt_r300) 
-				|| (asic == rt_r350) 
+		} else if ((asic == rt_r300)
+				|| (asic == rt_r350)
 				|| (asic == rt_rv350)) {
 			if (asic == rt_rv350) {
 				tmp = Radeon_INPLL(regs, asic, R300_SCLK_CNTL2);
@@ -801,7 +801,7 @@ void Radeon_SetDynamicClock( device_info *di, int mode)
 					R300_SCLK_GA_MAX_DYN_STOP_LAT  |
 					R300_SCLK_CBA_MAX_DYN_STOP_LAT);
 				Radeon_OUTPLL(regs, asic, R300_SCLK_CNTL2, tmp);
-	
+
 				tmp = Radeon_INPLL(regs, asic, RADEON_SCLK_CNTL);
 				tmp &= ~(RADEON_SCLK_FORCE_DISP2 | RADEON_SCLK_FORCE_CP      |
 					RADEON_SCLK_FORCE_HDP   | RADEON_SCLK_FORCE_DISP1   |
@@ -813,17 +813,17 @@ void Radeon_SetDynamicClock( device_info *di, int mode)
 					R300_SCLK_FORCE_SU      | RADEON_SCLK_FORCE_OV0);
 					tmp |=  RADEON_DYN_STOP_LAT_MASK;
 				Radeon_OUTPLL(regs, asic, RADEON_SCLK_CNTL, tmp);
-	
+
 				tmp = Radeon_INPLL(regs, asic, RADEON_SCLK_MORE_CNTL);
 				tmp &= ~RADEON_SCLK_MORE_FORCEON;
 				tmp |=  RADEON_SCLK_MORE_MAX_DYN_STOP_LAT;
 				Radeon_OUTPLL(regs, asic, RADEON_SCLK_MORE_CNTL, tmp);
-	
+
 				tmp = Radeon_INPLL(regs, asic, RADEON_VCLK_ECP_CNTL);
 				tmp |= (RADEON_PIXCLK_ALWAYS_ONb |
 					RADEON_PIXCLK_DAC_ALWAYS_ONb);
 				Radeon_OUTPLL(regs, asic, RADEON_VCLK_ECP_CNTL, tmp);
-	
+
 				tmp = Radeon_INPLL(regs, asic, RADEON_PIXCLKS_CNTL);
 				tmp |= (RADEON_PIX2CLK_ALWAYS_ONb         |
 				RADEON_PIX2CLK_DAC_ALWAYS_ONb     |
@@ -839,20 +839,20 @@ void Radeon_SetDynamicClock( device_info *di, int mode)
 					R300_P2G2CLK_ALWAYS_ONb           |
 					R300_P2G2CLK_ALWAYS_ONb);
 				Radeon_OUTPLL(regs, asic, RADEON_PIXCLKS_CNTL, tmp);
-	
+
 				tmp = Radeon_INPLL(regs, asic, RADEON_MCLK_MISC);
 				tmp |= (RADEON_MC_MCLK_DYN_ENABLE |
 					RADEON_IO_MCLK_DYN_ENABLE);
 				Radeon_OUTPLL(regs, asic, RADEON_MCLK_MISC, tmp);
-	
+
 				tmp = Radeon_INPLL(regs, asic, RADEON_MCLK_CNTL);
 				tmp |= (RADEON_FORCEON_MCLKA |
 					RADEON_FORCEON_MCLKB);
-	
+
 				tmp &= ~(RADEON_FORCEON_YCLKA  |
 					RADEON_FORCEON_YCLKB  |
 					RADEON_FORCEON_MC);
-	
+
 				/* Some releases of vbios have set DISABLE_MC_MCLKA
 				and DISABLE_MC_MCLKB bits in the vbios table.  Setting these
 				bits will cause H/W hang when reading video memory with dynamic clocking
@@ -871,7 +871,7 @@ void Radeon_SetDynamicClock( device_info *di, int mode)
 						R300_DISABLE_MC_MCLKB);
 					}
 				}
-	
+
 				Radeon_OUTPLL(regs, asic, RADEON_MCLK_CNTL, tmp);
 			} else {
 				tmp = Radeon_INPLL(regs, asic, RADEON_SCLK_CNTL);
@@ -879,7 +879,7 @@ void Radeon_SetDynamicClock( device_info *di, int mode)
 				tmp |= RADEON_SCLK_FORCE_CP;
 				Radeon_OUTPLL(regs, asic, RADEON_SCLK_CNTL, tmp);
 				snooze(15000);
-	
+
 				tmp = Radeon_INPLL(regs, asic, R300_SCLK_CNTL2);
 				tmp &= ~(R300_SCLK_FORCE_TCL |
 				R300_SCLK_FORCE_GA  |
@@ -888,28 +888,28 @@ void Radeon_SetDynamicClock( device_info *di, int mode)
 			}
 		} else {
 			tmp = Radeon_INPLL(regs, asic, RADEON_CLK_PWRMGT_CNTL);
-	
+
 			tmp &= ~(RADEON_ACTIVE_HILO_LAT_MASK     |
 				RADEON_DISP_DYN_STOP_LAT_MASK   |
 				RADEON_DYN_STOP_MODE_MASK);
-	
+
 			tmp |= (RADEON_ENGIN_DYNCLK_MODE |
 			(0x01 << RADEON_ACTIVE_HILO_LAT_SHIFT));
 			Radeon_OUTPLL(regs, asic, RADEON_CLK_PWRMGT_CNTL, tmp);
 			snooze(15000);
-	
+
 			tmp = Radeon_INPLL(regs, asic, RADEON_CLK_PIN_CNTL);
 			tmp |= RADEON_SCLK_DYN_START_CNTL;
 			Radeon_OUTPLL(regs, asic, RADEON_CLK_PIN_CNTL, tmp);
 			snooze(15000);
-	
+
 			/* When DRI is enabled, setting DYN_STOP_LAT to zero can cause some R200
 			to lockup randomly, leave them as set by BIOS.
 			*/
 			tmp = Radeon_INPLL(regs, asic, RADEON_SCLK_CNTL);
 			/*tmp &= RADEON_SCLK_SRC_SEL_MASK;*/
 			tmp &= ~RADEON_SCLK_FORCEON_MASK;
-	
+
 			/*RAGE_6::A11 A12 A12N1 A13, RV250::A11 A12, R300*/
 			if (((asic == rt_rv250) &&
 				((INREG( regs, RADEON_CONFIG_CNTL) & RADEON_CFG_ATI_REV_ID_MASK) <
@@ -921,39 +921,39 @@ void Radeon_SetDynamicClock( device_info *di, int mode)
 				tmp |= RADEON_SCLK_FORCE_CP;
 				tmp |= RADEON_SCLK_FORCE_VIP;
 			}
-	
+
 			Radeon_OUTPLL(regs, asic, RADEON_SCLK_CNTL, tmp);
-	
+
 			if ((asic == rt_rv200) ||
 				(asic == rt_rv250) ||
 				(asic == rt_rv280)) {
 				tmp = Radeon_INPLL(regs, asic, RADEON_SCLK_MORE_CNTL);
 				tmp &= ~RADEON_SCLK_MORE_FORCEON;
-	
+
 				/* RV200::A11 A12 RV250::A11 A12 */
 				if (((asic == rt_rv200) ||
 					 (asic == rt_rv250)) &&
 					((INREG( regs, RADEON_CONFIG_CNTL) & RADEON_CFG_ATI_REV_ID_MASK) <
-					  RADEON_CFG_ATI_REV_A13)) 
+					  RADEON_CFG_ATI_REV_A13))
 				{
 					tmp |= RADEON_SCLK_MORE_FORCEON;
 				}
 				Radeon_OUTPLL(regs, asic, RADEON_SCLK_MORE_CNTL, tmp);
 				snooze(15000);
 			}
-	
+
 			/* RV200::A11 A12, RV250::A11 A12 */
 			if (((asic == rt_rv200) ||
 				 (asic == rt_rv250)) &&
 				((INREG( regs, RADEON_CONFIG_CNTL) & RADEON_CFG_ATI_REV_ID_MASK) <
-				  RADEON_CFG_ATI_REV_A13)) 
+				  RADEON_CFG_ATI_REV_A13))
 			{
 				tmp = Radeon_INPLL(regs, asic, RADEON_PLL_PWRMGT_CNTL);
 				tmp |= RADEON_TCL_BYPASS_DISABLE;
 				Radeon_OUTPLL(regs, asic, RADEON_PLL_PWRMGT_CNTL, tmp);
 			}
 			snooze(15000);
-	
+
 			/*enable dynamic mode for display clocks (PIXCLK and PIX2CLK)*/
 			tmp = Radeon_INPLL(regs, asic, RADEON_PIXCLKS_CNTL);
 			tmp |=  (RADEON_PIX2CLK_ALWAYS_ONb         |
@@ -963,14 +963,14 @@ void Radeon_SetDynamicClock( device_info *di, int mode)
 				RADEON_PIXCLK_DIG_TMDS_ALWAYS_ONb |
 				RADEON_PIXCLK_LVDS_ALWAYS_ONb     |
 				RADEON_PIXCLK_TMDS_ALWAYS_ONb);
-	
+
 			Radeon_OUTPLL(regs, asic, RADEON_PIXCLKS_CNTL, tmp);
 			snooze(15000);
-	
+
 			tmp = Radeon_INPLL(regs, asic, RADEON_VCLK_ECP_CNTL);
 			tmp |= (RADEON_PIXCLK_ALWAYS_ONb  |
 				RADEON_PIXCLK_DAC_ALWAYS_ONb);
-	
+
 			Radeon_OUTPLL(regs, asic, RADEON_VCLK_ECP_CNTL, tmp);
 			snooze(15000);
 		}

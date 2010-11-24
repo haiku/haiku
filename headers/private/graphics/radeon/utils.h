@@ -1,9 +1,9 @@
 /*
 	Copyright (c) 2002/03, Thomas Kurschel
-	
+
 
 	Part of Radeon accelerant
-		
+
 	Utility functions
 */
 
@@ -15,7 +15,7 @@ extern "C" {
 #endif
 
 
-extern int log2( uint32 x );
+extern int radeon_log2( uint32 x );
 
 static inline int RoundDiv( int num, int den )
 {

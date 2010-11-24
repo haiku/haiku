@@ -1,9 +1,9 @@
 /*
 	Copyright (c) 2002, Thomas Kurschel
-	
+
 
 	Part of Radeon driver
-		
+
 	some utility functions
 */
 
@@ -11,7 +11,7 @@
 #include "utils.h"
 
 // get ceil( log2( size ))
-int log2( uint32 x )
+int radeon_log2( uint32 x )
 {
 	int res;
 	uint32 tmp;
