@@ -388,6 +388,7 @@ dialup_send_data(net_device* _device, net_buffer* buffer)
 	// mark frame start
 	packet[packetSize++] = HDLC_FLAG_SEQUENCE;
 
+	// encode frame data
 	ioVector = ioVectors;
 	while (vectorCount--) {
 		uint8* data = (uint8*) ioVector->iov_base;
@@ -404,6 +405,7 @@ dialup_send_data(net_device* _device, net_buffer* buffer)
 		// next io vector
 		ioVector++;
 	}
+
 	// mark frame end
 	packet[packetSize++] = HDLC_FLAG_SEQUENCE;
 
@@ -411,7 +413,6 @@ dialup_send_data(net_device* _device, net_buffer* buffer)
 
 	bytesWritten = write(device->fd, packet, packetSize);
 	if (bytesWritten < 0) {
-		device->stats.send.errors++;
 		status = errno;
 		goto err;
 	}
