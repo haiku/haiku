@@ -64,7 +64,6 @@ protected:
 									BRegion* updateRegion = NULL);
 
 	virtual void				_SetFocus();
-	virtual void				_SetColors();
 
 	virtual	void				_MoveBy(BPoint offset);
 	virtual	void				_ResizeBy(BPoint offset, BRegion* dirty);

@@ -454,13 +454,6 @@ WinDecorator::_SetFocus(void)
 
 
 void
-WinDecorator::_SetColors()
-{
-	_SetFocus();
-}
-
-
-void
 WinDecorator::_MoveBy(BPoint pt)
 {
 	// Move all internal rectangles the appropriate amount

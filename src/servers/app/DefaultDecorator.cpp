@@ -845,13 +845,6 @@ DefaultDecorator::_SetFocus()
 
 
 void
-DefaultDecorator::_SetColors()
-{
-	_SetFocus();
-}
-
-
-void
 DefaultDecorator::_MoveBy(BPoint offset)
 {
 	STRACE(("DefaultDecorator: Move By (%.1f, %.1f)\n", offset.x, offset.y));

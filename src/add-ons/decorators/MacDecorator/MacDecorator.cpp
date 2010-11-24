@@ -705,13 +705,6 @@ MacDecorator::_SetFlags(uint32 flags, BRegion* updateRegion)
 
 
 void
-MacDecorator::_SetColors()
-{
-	_SetFocus();
-}
-
-
-void
 MacDecorator::_MoveBy(BPoint offset)
 {
 	fFrame.OffsetBy(offset);

@@ -74,7 +74,6 @@ protected:
 									BRegion* updateRegion = NULL);
 
 	virtual void				_SetFocus();
-	virtual void				_SetColors();
 
 	virtual	void				_MoveBy(BPoint offset);
 	virtual	void				_ResizeBy(BPoint offset, BRegion* dirty);
@@ -99,22 +98,22 @@ private:
 			RGBColor			fButtonLowColor;
 			RGBColor			fTextColor;
 			RGBColor			fTabColor;
-	
+
 			RGBColor*			fFrameColors;
-	
+
 			// Individual rects for handling window frame
 			// rendering the proper way
 			BRect				fRightBorder;
 			BRect				fLeftBorder;
 			BRect				fTopBorder;
 			BRect				fBottomBorder;
-	
+
 			int32				fBorderWidth;
-	
+
 			uint32				fTabOffset;
 			float				fTabLocation;
 			float				fTextOffset;
-	
+
 			float				fMinTabSize;
 			float				fMaxTabSize;
 			BString				fTruncatedTitle;

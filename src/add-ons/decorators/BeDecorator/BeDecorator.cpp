@@ -855,13 +855,6 @@ BeDecorator::_SetFocus()
 
 
 void
-BeDecorator::_SetColors()
-{
-	_SetFocus();
-}
-
-
-void
 BeDecorator::_MoveBy(BPoint pt)
 {
 	STRACE(("BeDecorator: Move By (%.1f, %.1f)\n", pt.x, pt.y));

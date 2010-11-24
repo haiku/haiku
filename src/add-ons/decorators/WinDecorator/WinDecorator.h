@@ -56,8 +56,6 @@ protected:
 			void				_SetFlags(uint32 flags,
 									BRegion* updateRegion = NULL);
 
-			void				_SetColors();
-
 			void				_MoveBy(BPoint pt);
 			void				_ResizeBy(BPoint pt, BRegion* dirty);
 
