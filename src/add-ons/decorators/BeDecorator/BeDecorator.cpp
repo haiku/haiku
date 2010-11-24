@@ -89,7 +89,7 @@ BeDecorAddOn::BeDecorAddOn(image_id id, const char* name)
 	:
 	DecorAddOn(id, name)
 {
-	
+
 }
 
 
@@ -214,76 +214,47 @@ BeDecorator::GetSizeLimits(int32* minWidth, int32* minHeight,
 }
 
 
-click_type
-BeDecorator::MouseAction(const BMessage* message, BPoint point, int32 buttons,
-	int32 modifiers)
+Decorator::Region
+BeDecorator::RegionAt(BPoint where) const
 {
-#ifdef DEBUG_DECORATOR
-	printf("BeDecorator: Clicked\n");
-	printf("\tPoint: (%.1f,%.1f)\n", point.x, point.y);
-	printf("\tButtons: %ld, Modifiers: 0x%lx\n", buttons, modifiers);
-#endif // DEBUG_DECORATOR
+	// Let the base class version identify hits of the buttons and the tab.
+	Region region = Decorator::RegionAt(where);
+	if (region != REGION_NONE)
+		return region;
 
-	if (buttons != 0)
-		fWasDoubleClick = message->FindInt32("clicks") == 2;
+	// check the resize corner
+	if (fLook == B_DOCUMENT_WINDOW_LOOK && fResizeRect.Contains(where))
+		return REGION_RIGHT_BOTTOM_CORNER;
 
-	// In checking for hit test stuff, we start with the smallest rectangles
-	// the user might be clicking on and gradually work our way out into larger
-	// rectangles.
-	if (!(fFlags & B_NOT_CLOSABLE) && fCloseRect.Contains(point))
-		return CLICK_CLOSE;
+	// hit-test the borders
+	if (fLeftBorder.Contains(where))
+		return REGION_LEFT_BORDER;
+	if (fTopBorder.Contains(where))
+		return REGION_TOP_BORDER;
 
-	if (!(fFlags & B_NOT_ZOOMABLE) && fZoomRect.Contains(point))
-		return CLICK_ZOOM;
+	// Part of the bottom and right borders may be a resize-region, so we have
+	// to check explicitly, if it has been it.
+	if (fRightBorder.Contains(where))
+		region = REGION_RIGHT_BORDER;
+	else if (fBottomBorder.Contains(where))
+		region = REGION_BOTTOM_BORDER;
+	else
+		return REGION_NONE;
 
-	if (fLook == B_DOCUMENT_WINDOW_LOOK && fResizeRect.Contains(point))
-		return CLICK_RESIZE;
-
-	bool clicked = false;
-
-	// Clicking in the tab?
-	if (fTabRect.Contains(point)) {
-		// tab sliding in any case if either shift key is held down
-		// except sliding up-down by moving mouse left-right would look strange
-		if ((modifiers & B_SHIFT_KEY) && (fLook != kLeftTitledWindowLook))
-			return CLICK_SLIDE_TAB;
-
-		clicked = true;
-	} else if (fLeftBorder.Contains(point) || fRightBorder.Contains(point)
-		|| fTopBorder.Contains(point) || fBottomBorder.Contains(point)) {
-		// Clicked on border
-
-		// check resize area
-		if (!(fFlags & B_NOT_RESIZABLE)
-			&& (fLook == B_TITLED_WINDOW_LOOK
-				|| fLook == B_FLOATING_WINDOW_LOOK
-				|| fLook == B_MODAL_WINDOW_LOOK
-				|| fLook == kLeftTitledWindowLook)) {
-			BRect resizeRect(BPoint(fBottomBorder.right - kBorderResizeLength,
-				fBottomBorder.bottom - kBorderResizeLength),
-				fBottomBorder.RightBottom());
-			if (resizeRect.Contains(point))
-				return CLICK_RESIZE;
-		}
-
-		clicked = true;
+	// check resize area
+	if ((fFlags & B_NOT_RESIZABLE) == 0
+		&& (fLook == B_TITLED_WINDOW_LOOK
+			|| fLook == B_FLOATING_WINDOW_LOOK
+			|| fLook == B_MODAL_WINDOW_LOOK
+			|| fLook == kLeftTitledWindowLook)) {
+		BRect resizeRect(BPoint(fBottomBorder.right - kBorderResizeLength,
+			fBottomBorder.bottom - kBorderResizeLength),
+			fBottomBorder.RightBottom());
+		if (resizeRect.Contains(where))
+			return REGION_RIGHT_BOTTOM_CORNER;
 	}
 
-	if (clicked) {
-		// NOTE: On R5, windows are not moved to back if clicked inside the
-		// resize area with the second mouse button. So we check this after
-		// the check above
-		if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0)
-			return CLICK_MOVE_TO_BACK;
-
-		if (fWasDoubleClick && !(fFlags & B_NOT_MINIMIZABLE))
-			return CLICK_MINIMIZE;
-
-		return CLICK_DRAG;
-	}
-
-	// Guess user didn't click anything
-	return CLICK_NONE;
+	return region;
 }
 
 

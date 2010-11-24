@@ -6,6 +6,7 @@
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Clemens Zeidler <haiku@clemens-zeidler.de>
+ *		Ingo Weinhold <ingo_weinhold@gmx.de>
  */
 #ifndef DECORATOR_H
 #define DECORATOR_H
@@ -47,6 +48,27 @@ enum click_type {
 
 
 class Decorator {
+public:
+			enum Region {
+				REGION_NONE,
+
+				REGION_TAB,
+
+				REGION_CLOSE_BUTTON,
+				REGION_ZOOM_BUTTON,
+				REGION_MINIMIZE_BUTTON,
+
+				REGION_LEFT_BORDER,
+				REGION_RIGHT_BORDER,
+				REGION_TOP_BORDER,
+				REGION_BOTTOM_BORDER,
+
+				REGION_LEFT_TOP_CORNER,
+				REGION_LEFT_BOTTOM_CORNER,
+				REGION_RIGHT_TOP_CORNER,
+				REGION_RIGHT_BOTTOM_CORNER
+			};
+
 public:
 							Decorator(DesktopSettings& settings, BRect rect,
 								window_look look, uint32 flags);
@@ -91,8 +113,7 @@ public:
 
 			const BRegion&	GetFootprint();
 
-	virtual	click_type		MouseAction(const BMessage* message, BPoint where,
-								int32 buttons, int32 modifiers);
+	virtual	Region			RegionAt(BPoint where) const;
 
 			void			MoveBy(float x, float y);
 			void			MoveBy(BPoint offset);

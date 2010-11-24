@@ -9,10 +9,13 @@
  *		Axel Dörfler <axeld@pinc-software.de>
  *		Brecht Machiels <brecht@mos6581.org>
  *		Clemens Zeidler <haiku@clemens-zeidler.de>
+ *		Ingo Weinhold <ingo_weinhold@gmx.de>
  */
 
 
 #include "DefaultWindowBehaviour.h"
+
+#include <WindowPrivate.h>
 
 #include "Desktop.h"
 #include "DrawingEngine.h"
@@ -27,6 +30,7 @@
 #endif
 
 
+// The span between mouse down
 static const bigtime_t kWindowActivationTimeout = 500000LL;
 
 
@@ -39,11 +43,14 @@ DefaultWindowBehaviour::DefaultWindowBehaviour(Window* window)
 	fIsZooming(false),
 	fIsSlidingTab(false),
 	fActivateOnMouseUp(false),
+	fMinimizeCheckOnMouseUp(false),
 
 	fLastMousePosition(0.0f, 0.0f),
 	fMouseMoveDistance(0.0f),
 	fLastMoveTime(0),
-	fLastSnapTime(0)
+	fLastSnapTime(0),
+	fLastModifiers(0),
+	fResetClickCount(0)
 {
 	fDesktop = fWindow->Desktop();
 }
@@ -65,33 +72,106 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where)
 
 	int32 modifiers = message->FindInt32("modifiers");
 	bool windowModifier = _IsWindowModifier(modifiers);
+
+	// Get the click count and reset it, if the modifiers changed in the
+	// meantime.
+	// TODO: This should be done in a better place (e.g. the input server). It
+	// should also reset clicks after mouse movement (which we don't do here
+	// either -- though that's probably acceptable).
+	int32 clickCount = message->FindInt32("clicks");
+	if (clickCount <= 1) {
+		fResetClickCount = 0;
+	} else if (modifiers != fLastModifiers
+		|| clickCount - fResetClickCount < 1) {
+		fResetClickCount = clickCount - 1;
+		clickCount = 1;
+	} else
+		clickCount -= fResetClickCount;
+	fLastModifiers = modifiers;
+
+	Region hitRegion = REGION_NONE;
 	click_type action = CLICK_NONE;
 
 	if (windowModifier || inBorderRegion) {
-		// Click on the window border or we have the window modifier keys held
-		int32 buttons = message->FindInt32("buttons");
+		// click on the window decorator or we have the window modifier keys
+		// held
 
-		if (inBorderRegion)
-			action = _ActionFor(message, buttons, modifiers);
-		else {
-			if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0)
-				action = CLICK_MOVE_TO_BACK;
-			else if ((fWindow->Flags() & B_NOT_MINIMIZABLE) == 0
-				&& message->FindInt32("clicks") == 2)
-				action = CLICK_MINIMIZE;
-			else if ((fWindow->Flags() & B_NOT_MOVABLE) == 0
-				&& decorator != NULL)
-				action = CLICK_DRAG;
-			else {
-				// pass click on to the application
-				windowModifier = false;
-			}
+		// get the functional hit region
+		if (windowModifier) {
+			// click with window modifier keys -- let the whole window behave
+			// like the border
+			hitRegion = REGION_BORDER;
+		} else {
+			// click on the decorator -- get the exact region
+			hitRegion = _RegionFor(message);
+		}
+
+		// translate the region into an action
+		int32 buttons = message->FindInt32("buttons");
+		bool leftButton = (buttons & B_PRIMARY_MOUSE_BUTTON) != 0;
+		bool rightButton = (buttons & B_SECONDARY_MOUSE_BUTTON) != 0;
+		uint32 flags = fWindow->Flags();
+
+		switch (hitRegion) {
+			case REGION_NONE:
+				break;
+
+			case REGION_TAB:
+				// tab sliding in any case if either shift key is held down
+				// except sliding up-down by moving mouse left-right would look
+				// strange
+				if (leftButton && (modifiers & B_SHIFT_KEY) != 0
+					&& fWindow->Look() != kLeftTitledWindowLook) {
+					action = CLICK_SLIDE_TAB;
+					break;
+				}
+				// otherwise fall through -- same handling as for the border...
+
+			case REGION_BORDER:
+				if (leftButton)
+					action = CLICK_DRAG;
+				else if (rightButton)
+					action = CLICK_MOVE_TO_BACK;
+				break;
+
+			case REGION_CLOSE_BUTTON:
+				if (leftButton) {
+					action = (flags & B_NOT_CLOSABLE) == 0
+						? CLICK_CLOSE : CLICK_DRAG;
+				} else if (rightButton)
+					action = CLICK_MOVE_TO_BACK;
+				break;
+
+			case REGION_ZOOM_BUTTON:
+				if (leftButton) {
+					action = (flags & B_NOT_ZOOMABLE) == 0
+						? CLICK_ZOOM : CLICK_DRAG;
+				} else if (rightButton)
+					action = CLICK_MOVE_TO_BACK;
+				break;
+
+			case REGION_MINIMIZE_BUTTON:
+				if (leftButton) {
+					action = (flags & B_NOT_MINIMIZABLE) == 0
+						? CLICK_MINIMIZE : CLICK_DRAG;
+				} else if (rightButton)
+					action = CLICK_MOVE_TO_BACK;
+				break;
+
+			case REGION_RESIZE_CORNER:
+				if (leftButton) {
+					action = (flags & B_NOT_RESIZABLE) == 0
+						? CLICK_RESIZE : CLICK_DRAG;
+				} else if (rightButton)
+					action = CLICK_MOVE_TO_BACK;
+				break;
 		}
 	}
 
-	if (!windowModifier && !inBorderRegion) {
-		// This is a click inside the window's contents
-		return false;
+	if (action == CLICK_NONE) {
+		// No action -- if this is a click inside the window's contents,
+		// let it be forwarded to the window.
+		return inBorderRegion;
 	}
 
 	DesktopSettings desktopSettings(fDesktop);
@@ -165,9 +245,6 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where)
 		engine->UnlockParallelAccess();
 
 		fWindow->RegionPool()->Recycle(visibleBorder);
-	} else if (fIsMinimizing) {
-		fWindow->ServerWindow()->NotifyQuitRequested();
-		return true;
 	}
 
 	if (action == CLICK_MOVE_TO_BACK) {
@@ -184,12 +261,15 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where)
 		else {
 			fDesktop->SetFocusWindow(fWindow);
 
-			if (action == CLICK_DRAG || action == CLICK_RESIZE) {
+			if (action == CLICK_DRAG || action == CLICK_RESIZE)
 				fActivateOnMouseUp = true;
-				fMouseMoveDistance = 0.0f;
-				fLastMoveTime = system_time();
-			}
 		}
+
+		if (fIsDragging && clickCount == 2)
+			fMinimizeCheckOnMouseUp = true;
+
+		fMouseMoveDistance = 0.0f;
+		fLastMoveTime = system_time();
 	}
 
 	return true;
@@ -201,11 +281,9 @@ DefaultWindowBehaviour::MouseUp(BMessage* message, BPoint where)
 {
 	Decorator* decorator = fWindow->Decorator();
 
-	if (decorator != NULL) {
-		int32 modifiers = message->FindInt32("modifiers");
-		int32 buttons = message->FindInt32("buttons");
-		click_type action = _ActionFor(message, buttons, modifiers);
+	int32 buttons = message->FindInt32("buttons");
 
+	if (decorator != NULL) {
 		// redraw decorator
 		BRegion* visibleBorder = fWindow->RegionPool()->GetRegion();
 		fWindow->GetBorderRegion(visibleBorder);
@@ -218,44 +296,54 @@ DefaultWindowBehaviour::MouseUp(BMessage* message, BPoint where)
 		if (fIsZooming) {
 			fIsZooming = false;
 			decorator->SetZoom(false);
-			if (action == CLICK_ZOOM)
+			if (_RegionFor(message) == REGION_ZOOM_BUTTON)
 				fWindow->ServerWindow()->NotifyZoom();
 		}
 		if (fIsClosing) {
 			fIsClosing = false;
 			decorator->SetClose(false);
-			if (action == CLICK_CLOSE)
+			if (_RegionFor(message) == REGION_CLOSE_BUTTON)
 				fWindow->ServerWindow()->NotifyQuitRequested();
 		}
 		if (fIsMinimizing) {
 			fIsMinimizing = false;
 			decorator->SetMinimize(false);
-			if (action == CLICK_MINIMIZE || _IsWindowModifier(modifiers))
+			if (_RegionFor(message) == REGION_MINIMIZE_BUTTON)
 				fWindow->ServerWindow()->NotifyMinimize(true);
 		}
 
 		engine->UnlockParallelAccess();
 
 		fWindow->RegionPool()->Recycle(visibleBorder);
-
-		// if the primary mouse button is released, stop
-		// dragging/resizing/sliding
-		if ((buttons & B_PRIMARY_MOUSE_BUTTON) == 0) {
-			fIsDragging = false;
-			fIsResizing = false;
-			fIsSlidingTab = false;
-		}
 	}
 
-	// in FFM mode, activate the window and bring it
-	// to front in case this was a drag click but the
-	// mouse was not moved
-	if (fActivateOnMouseUp) {
-		fActivateOnMouseUp = false;
-		// on R5, there is a time window for this feature
-		// ie, click and press too long, nothing will happen
-		if (system_time() - fLastMoveTime < kWindowActivationTimeout)
-			fDesktop->ActivateWindow(fWindow);
+	// if the primary mouse button is released, stop
+	// dragging/resizing/sliding
+	if ((buttons & B_PRIMARY_MOUSE_BUTTON) == 0) {
+		if (fMinimizeCheckOnMouseUp) {
+			// If the modifiers haven't changed in the meantime and not too
+			// much time has elapsed, we're supposed to minimize the window.
+			fMinimizeCheckOnMouseUp = false;
+			if (message->FindInt32("modifiers") == fLastModifiers
+				&& (fWindow->Flags() & B_NOT_MINIMIZABLE) == 0
+				&& system_time() - fLastMoveTime < kWindowActivationTimeout) {
+				fWindow->ServerWindow()->NotifyMinimize(true);
+			}
+		}
+
+		// In FFM mode, activate the window and bring it to front in case this
+		// was a drag click but the mouse was not moved.
+		if (fActivateOnMouseUp) {
+			fActivateOnMouseUp = false;
+			// on R5, there is a time window for this feature
+			// ie, click and press too long, nothing will happen
+			if (system_time() - fLastMoveTime < kWindowActivationTimeout)
+				fDesktop->ActivateWindow(fWindow);
+		}
+
+		fIsDragging = false;
+		fIsResizing = false;
+		fIsSlidingTab = false;
 	}
 }
 
@@ -285,10 +373,12 @@ DefaultWindowBehaviour::MouseMoved(BMessage *message, BPoint where, bool isFake)
 			// the then current mouse position
 			return;
 		}
-		if (fActivateOnMouseUp) {
+		if (fActivateOnMouseUp || fMinimizeCheckOnMouseUp) {
 			if (now - fLastMoveTime >= kWindowActivationTimeout) {
-				// This click is too long already for window activation.
+				// This click is too long already for window activation/
+				// minimizing.
 				fActivateOnMouseUp = false;
+				fMinimizeCheckOnMouseUp = false;
 			}
 		} else
 			fLastMoveTime = now;
@@ -303,16 +393,14 @@ DefaultWindowBehaviour::MouseMoved(BMessage *message, BPoint where, bool isFake)
 		engine->LockParallelAccess();
 		engine->ConstrainClippingRegion(visibleBorder);
 
-		int32 buttons = message->FindInt32("buttons");
-		int32 modifiers = message->FindInt32("modifiers");
-		click_type type = _ActionFor(message, buttons, modifiers);
+		Region hitRegion = _RegionFor(message);
 
 		if (fIsZooming)
-			decorator->SetZoom(type == CLICK_ZOOM);
+			decorator->SetZoom(hitRegion == REGION_ZOOM_BUTTON);
 		else if (fIsClosing)
-			decorator->SetClose(type == CLICK_CLOSE);
+			decorator->SetClose(hitRegion == REGION_CLOSE_BUTTON);
 		else if (fIsMinimizing)
-			decorator->SetMinimize(type == CLICK_MINIMIZE);
+			decorator->SetMinimize(hitRegion == REGION_MINIMIZE_BUTTON);
 
 		engine->UnlockParallelAccess();
 		fWindow->RegionPool()->Recycle(visibleBorder);
@@ -329,11 +417,12 @@ DefaultWindowBehaviour::MouseMoved(BMessage *message, BPoint where, bool isFake)
 
 	// If the window was moved enough, it doesn't come to
 	// the front in FFM mode when the mouse is released.
-	if (fActivateOnMouseUp) {
+	if (fActivateOnMouseUp || fMinimizeCheckOnMouseUp) {
 		fMouseMoveDistance += delta.x * delta.x + delta.y * delta.y;
-		if (fMouseMoveDistance > 16.0f)
+		if (fMouseMoveDistance > 16.0f) {
 			fActivateOnMouseUp = false;
-		else
+			fMinimizeCheckOnMouseUp = false;
+		} else
 			delta = B_ORIGIN;
 	}
 
@@ -403,19 +492,52 @@ DefaultWindowBehaviour::_IsWindowModifier(int32 modifiers) const
 }
 
 
-click_type
-DefaultWindowBehaviour::_ActionFor(const BMessage* message, int32 buttons,
-	int32 modifiers) const
+DefaultWindowBehaviour::Region
+DefaultWindowBehaviour::_RegionFor(const BMessage* message) const
 {
 	Decorator* decorator = fWindow->Decorator();
 	if (decorator == NULL)
-		return CLICK_NONE;
+		return REGION_NONE;
 
 	BPoint where;
 	if (message->FindPoint("where", &where) != B_OK)
-		return CLICK_NONE;
+		return REGION_NONE;
 
-	return decorator->MouseAction(message, where, buttons, modifiers);
+	// translate the tab region into a functional region
+	switch (decorator->RegionAt(where)) {
+		case Decorator::REGION_NONE:
+			return REGION_NONE;
+
+		case Decorator::REGION_TAB:
+			return REGION_TAB;
+
+		case Decorator::REGION_CLOSE_BUTTON:
+			return REGION_CLOSE_BUTTON;
+
+		case Decorator::REGION_ZOOM_BUTTON:
+			return REGION_ZOOM_BUTTON;
+
+		case Decorator::REGION_MINIMIZE_BUTTON:
+			return REGION_MINIMIZE_BUTTON;
+
+		case Decorator::REGION_LEFT_BORDER:
+		case Decorator::REGION_RIGHT_BORDER:
+		case Decorator::REGION_TOP_BORDER:
+		case Decorator::REGION_BOTTOM_BORDER:
+			return REGION_BORDER;
+
+		case Decorator::REGION_LEFT_TOP_CORNER:
+		case Decorator::REGION_LEFT_BOTTOM_CORNER:
+		case Decorator::REGION_RIGHT_TOP_CORNER:
+			// not supported yet
+			return REGION_BORDER;
+
+		case Decorator::REGION_RIGHT_BOTTOM_CORNER:
+			return REGION_RESIZE_CORNER;
+
+		default:
+			return REGION_NONE;
+	}
 }
 
 

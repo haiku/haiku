@@ -37,9 +37,7 @@ public:
 	virtual	void				GetSizeLimits(int32* minWidth, int32* minHeight,
 									int32* maxWidth, int32* maxHeight) const;
 
-	virtual	click_type			MouseAction(const BMessage* message,
-									BPoint point, int32 buttons,
-									int32 modifiers);
+	virtual	Region				RegionAt(BPoint where) const;
 
 			float				BorderWidth();
 			float				TabHeight();
@@ -134,10 +132,6 @@ protected:
 			float				fMaxTabSize;
 			BString				fTruncatedTitle;
 			int32				fTruncatedTitleLength;
-
-private:
-			click_type			fLastAction;
-			bool				fWasDoubleClick;
 };
 
 

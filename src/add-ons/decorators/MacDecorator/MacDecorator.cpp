@@ -34,7 +34,7 @@ MacDecorAddOn::MacDecorAddOn(image_id id, const char* name)
 	:
 	DecorAddOn(id, name)
 {
-	
+
 }
 
 
@@ -64,7 +64,7 @@ MacDecorator::MacDecorator(DesktopSettings& settings, BRect rect,
 	frame_midcol = (rgb_color){ 216, 216, 216, 255 };
 	frame_lowcol = (rgb_color){ 110, 110, 110, 255 };
 	frame_lowercol = (rgb_color){ 0, 0, 0, 255 };
-	
+
 	fButtonHighColor = (rgb_color){ 232, 232, 232, 255 };
 	fButtonLowColor = (rgb_color){ 128, 128, 128, 255 };
 
@@ -72,7 +72,7 @@ MacDecorator::MacDecorator(DesktopSettings& settings, BRect rect,
 	fNonFocusTextColor = settings.UIColor(B_WINDOW_INACTIVE_TEXT_COLOR);
 
 	_DoLayout();
-	
+
 	textoffset=5;
 
 	STRACE(("MacDecorator()\n"));
@@ -117,43 +117,29 @@ MacDecorator::Draw()
 // TODO : add GetSizeLimits
 
 
-click_type
-MacDecorator::MouseAction(const BMessage* message, BPoint point, int32 buttons,
-	int32 modifiers)
+Decorator::Region
+MacDecorator::RegionAt(BPoint where) const
 {
-	if (!(fFlags & B_NOT_CLOSABLE) && fCloseRect.Contains(point)) {
-		STRACE(("MacDecorator():Clicked() - Close\n"));
-		return CLICK_CLOSE;
-	}
+	// Let the base class version identify hits of the buttons and the tab.
+	Region region = Decorator::RegionAt(where);
+	if (region != REGION_NONE)
+		return region;
 
-	if (!(fFlags & B_NOT_ZOOMABLE) && fZoomRect.Contains(point)) {
-		STRACE(("MacDecorator():Clicked() - Zoom\n"));
-		return CLICK_ZOOM;
-	}
-	
-	// Clicking in the tab?
-	if (fTabRect.Contains(point)) {
-		// Here's part of our window management stuff
-		/* TODO: This is missing CLICK_MOVETOFRONT
-		if(buttons == B_PRIMARY_MOUSE_BUTTON && !IsFocus())
-			return CLICK_MOVETOFRONT;
-		*/
-		return CLICK_DRAG;
-	}
+	// check the resize corner
+	if (fLook == B_DOCUMENT_WINDOW_LOOK && fResizeRect.Contains(where))
+		return REGION_RIGHT_BOTTOM_CORNER;
 
-	// We got this far, so user is clicking on the border?
+	// hit-test the borders
 	if (!(fFlags & B_NOT_RESIZABLE)
 		&& (fLook == B_TITLED_WINDOW_LOOK
 			|| fLook == B_FLOATING_WINDOW_LOOK
 			|| fLook == B_MODAL_WINDOW_LOOK)
-		&& fBorderRect.Contains(point) && !fFrame.Contains(point)) {
-		STRACE(("MacDecorator():Clicked() - Resize\n"));
-		return CLICK_RESIZE;
+		&& fBorderRect.Contains(where) && !fFrame.Contains(where)) {
+		return REGION_BOTTOM_BORDER;
+			// TODO: Determine the actual border!
 	}
 
-	// Guess user didn't click anything
-	STRACE(("MacDecorator():Clicked()\n"));
-	return CLICK_NONE;
+	return REGION_NONE;
 }
 
 
@@ -215,7 +201,7 @@ MacDecorator::_DoLayout()
 		fMinimizeRect=fZoomRect;
 
 		fCloseRect.OffsetTo(fTabRect.left+4,fTabRect.top+4);
-	
+
 		fZoomRect.OffsetBy(0-(fZoomRect.Width()+4),0);
 		if (Title() && fDrawingEngine) {
 			titlepixelwidth=fDrawingEngine->StringWidth(Title(),strlen(Title()));
@@ -468,7 +454,7 @@ MacDecorator::_DrawTab(BRect invalid)
 			}
 		}
 
-		// Draw the buttons if we're supposed to	
+		// Draw the buttons if we're supposed to
 		if (!(fFlags & B_NOT_CLOSABLE))
 			_DrawClose(fCloseRect);
 		if (!(fFlags & B_NOT_ZOOMABLE))
@@ -776,7 +762,7 @@ MacDecorator::_GetFootprint(BRegion* region)
 
 	if (fLook == B_NO_BORDER_WINDOW_LOOK)
 		return;
-	
+
 	region->Set(fBorderRect);
 	region->Exclude(fFrame);
 

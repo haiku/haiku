@@ -77,7 +77,7 @@ WinDecorator::WinDecorator(DesktopSettings& settings, BRect rect,
 
 	// Do initial decorator setup
 	_DoLayout();
-	
+
 	textoffset=5;
 
 	STRACE(("WinDecorator()\n"));
@@ -119,40 +119,29 @@ WinDecorator::Draw()
 // TODO : add GetSizeLimits
 
 
-click_type
-WinDecorator::MouseAction(const BMessage* message, BPoint where, int32 buttons,
-	int32 modifiers)
+Decorator::Region
+WinDecorator::RegionAt(BPoint where) const
 {
-	if (!(fFlags & B_NOT_CLOSABLE) && fCloseRect.Contains(where))
-		return CLICK_CLOSE;
+	// Let the base class version identify hits of the buttons and the tab.
+	Region region = Decorator::RegionAt(where);
+	if (region != REGION_NONE)
+		return region;
 
-	if (!(fFlags & B_NOT_ZOOMABLE) && fZoomRect.Contains(where))
-		return CLICK_ZOOM;
-	
-	// Clicking in the tab?
-	if (fTabRect.Contains(where)) {
-		// Here's part of our window management stuff
-		/* TODO: This is missing CLICK_MOVETOFRONT
-		if(buttons == B_PRIMARY_MOUSE_BUTTON && !IsFocus())
-			return CLICK_MOVETOFRONT;
-		*/
-		return CLICK_DRAG;
+	// check the resize corner
+	if (fLook == B_DOCUMENT_WINDOW_LOOK && fResizeRect.Contains(where))
+		return REGION_RIGHT_BOTTOM_CORNER;
+
+	// hit-test the borders
+	if (!(fFlags & B_NOT_RESIZABLE)
+		&& (fLook == B_TITLED_WINDOW_LOOK
+			|| fLook == B_FLOATING_WINDOW_LOOK
+			|| fLook == B_MODAL_WINDOW_LOOK)
+		&& fBorderRect.Contains(where) && !fFrame.Contains(where)) {
+		return REGION_BOTTOM_BORDER;
+			// TODO: Determine the actual border!
 	}
 
-	// We got this far, so user is clicking on the border?
-	if (fBorderRect.Contains(where) && !fFrame.Contains(where)) {
-		STRACE(("WinDecorator():Clicked() - Resize\n"));
-		if (!(fFlags & B_NOT_RESIZABLE)
-			&& (fLook == B_TITLED_WINDOW_LOOK
-				|| fLook == B_FLOATING_WINDOW_LOOK
-				|| fLook == B_MODAL_WINDOW_LOOK)) {
-					return CLICK_RESIZE;
-		}
-	}
-
-	// Guess user didn't click anything
-	STRACE(("WinDecorator():Clicked()\n"));
-	return CLICK_NONE;
+	return REGION_NONE;
 }
 
 
@@ -162,7 +151,7 @@ WinDecorator::_DoLayout()
 	STRACE(("WinDecorator()::_DoLayout()\n"));
 
 	bool hasTab = false;
-	
+
 	fBorderRect=fFrame;
 	fTabRect=fFrame;
 
@@ -224,13 +213,13 @@ WinDecorator::_DrawFrame(BRect rect)
 		return;
 
 	BRect r = fBorderRect;
-	
+
 	fDrawingEngine->SetHighColor(frame_lowercol);
 	fDrawingEngine->StrokeRect(r);
 
 	if (fLook == B_BORDERED_WINDOW_LOOK)
 		return;
-	
+
 	BPoint pt;
 
 	pt=r.RightTop();
@@ -242,7 +231,7 @@ WinDecorator::_DrawFrame(BRect rect)
 
 	fDrawingEngine->StrokeLine(r.RightTop(),r.RightBottom(),frame_lowercol);
 	fDrawingEngine->StrokeLine(r.LeftBottom(),r.RightBottom(),frame_lowercol);
-	
+
 	r.InsetBy(1,1);
 	pt=r.RightTop();
 	pt.x--;
@@ -253,7 +242,7 @@ WinDecorator::_DrawFrame(BRect rect)
 
 	fDrawingEngine->StrokeLine(r.RightTop(),r.RightBottom(),frame_lowcol);
 	fDrawingEngine->StrokeLine(r.LeftBottom(),r.RightBottom(),frame_lowcol);
-	
+
 	r.InsetBy(1,1);
 	fDrawingEngine->StrokeRect(r,frame_midcol);
 	r.InsetBy(1,1);
@@ -273,7 +262,7 @@ WinDecorator::_DrawTab(BRect invalid)
 
 	_DrawTitle(fTabRect);
 
-	// Draw the buttons if we're supposed to	
+	// Draw the buttons if we're supposed to
 	// TODO : we should still draw the buttons if they are disabled, but grey them out
 	if (!(fFlags & B_NOT_CLOSABLE) && invalid.Intersects(fCloseRect))
 		_DrawClose(fCloseRect);
@@ -287,14 +276,14 @@ WinDecorator::_DrawClose(BRect r)
 {
 	// Just like DrawZoom, but for a close button
 	_DrawBeveledRect(r,GetClose());
-	
+
 	// Draw the X
 
 	BRect rect(r);
 	rect.InsetBy(4,4);
 	rect.right--;
 	rect.top--;
-	
+
 	if (GetClose())
 		rect.OffsetBy(1,1);
 
@@ -333,7 +322,7 @@ void
 WinDecorator::_DrawZoom(BRect r)
 {
 	_DrawBeveledRect(r,GetZoom());
-	
+
 	// Draw the Zoom box
 
 	BRect rect(r);
@@ -341,7 +330,7 @@ WinDecorator::_DrawZoom(BRect r)
 	rect.InsetBy(1,0);
 	rect.bottom--;
 	rect.right--;
-	
+
 	if (GetZoom())
 		rect.OffsetBy(1,1);
 
@@ -363,7 +352,7 @@ WinDecorator::_DrawMinimize(BRect r)
 	BRect rect(r.left+5,r.bottom-4,r.right-5,r.bottom-3);
 	if(GetMinimize())
 		rect.OffsetBy(1,1);
-	
+
 	fDrawingEngine->SetHighColor(RGBColor(0,0,0));
 	fDrawingEngine->StrokeRect(rect);
 }
@@ -523,7 +512,7 @@ WinDecorator::_GetFootprint(BRegion* region)
 
 	if (fLook == B_NO_BORDER_WINDOW_LOOK)
 		return;
-	
+
 	region->Set(fBorderRect);
 	region->Include(fTabRect);
 	region->Exclude(fFrame);
@@ -553,7 +542,7 @@ WinDecorator::_DrawBeveledRect(BRect r, bool down)
 	RGBColor mid;
 	RGBColor low;
 	RGBColor lower;
-	
+
 	if (down) {
 		lower.SetColor(255,255,255);
 		low.SetColor(216,216,216);
@@ -582,7 +571,7 @@ WinDecorator::_DrawBeveledRect(BRect r, bool down)
 	pt=rect.RightTop();
 	pt.y++;
 	fDrawingEngine->StrokeLine(pt,rect.RightBottom(),lower);
-	
+
 	// Bottom shading
 	pt=rect.LeftBottom();
 	pt.x++;
@@ -600,12 +589,12 @@ WinDecorator::_DrawBeveledRect(BRect r, bool down)
 	pt=rect.RightTop();
 	pt.y++;
 	fDrawingEngine->StrokeLine(pt,rect.RightBottom(),lower);
-	
+
 	// Bottom inside shading
 	pt=rect.LeftBottom();
 	pt.x++;
 	fDrawingEngine->StrokeLine(pt,rect.RightBottom(),lower);
-	
+
 	rect.InsetBy(1,1);
 
 	fDrawingEngine->FillRect(rect,mid);

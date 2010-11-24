@@ -32,9 +32,7 @@ public:
 			void				Draw(BRect updateRect);
 			void				Draw();
 
-	click_type					MouseAction(const BMessage* message,
-									BPoint point, int32 buttons,
-									int32 modifiers);
+	virtual	Region				RegionAt(BPoint where) const;
 
 protected:
 			void				_DoLayout();
@@ -57,7 +55,7 @@ protected:
 									BRegion* updateRegion = NULL);
 			void				_SetFlags(uint32 flags,
 									BRegion* updateRegion = NULL);
-	
+
 			void				_SetColors();
 
 			void				_MoveBy(BPoint offset);

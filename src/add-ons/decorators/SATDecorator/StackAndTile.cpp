@@ -140,12 +140,22 @@ StackAndTile::MouseDown(Window* window, BMessage* message, const BPoint& where)
 	// we are only interested in single clicks
 	if (message->FindInt32("clicks") == 2)
 		return;
-	int32 modifiers = message->FindInt32("modifiers");
-	int32 buttons = message->FindInt32("buttons");
-	click_type clickArea = satWindow->GetDecorator()->MouseAction(message,
-		where, buttons, modifiers);
-	if (clickArea != CLICK_DRAG && clickArea < CLICK_RESIZE)
-		return;
+
+	switch (satWindow->GetDecorator()->RegionAt(where)) {
+		case Decorator::REGION_TAB:
+		case Decorator::REGION_LEFT_BORDER:
+		case Decorator::REGION_RIGHT_BORDER:
+		case Decorator::REGION_TOP_BORDER:
+		case Decorator::REGION_BOTTOM_BORDER:
+		case Decorator::REGION_LEFT_TOP_CORNER:
+		case Decorator::REGION_LEFT_BOTTOM_CORNER:
+		case Decorator::REGION_RIGHT_TOP_CORNER:
+		case Decorator::REGION_RIGHT_BOTTOM_CORNER:
+			break;
+
+		default:
+			return;
+	}
 
 	ASSERT(fCurrentSATWindow == NULL);
 	fCurrentSATWindow = satWindow;
@@ -330,7 +340,7 @@ StackAndTile::WindowLookChanged(Window* window, window_look look)
 	SATGroup* group = satWindow->GetGroup();
 	if (!group)
 		return;
-	group->RemoveWindow(satWindow);	
+	group->RemoveWindow(satWindow);
 }
 
 
@@ -617,5 +627,5 @@ WindowIterator::_ReverseRewind()
 
 SATSnappingBehaviour::~SATSnappingBehaviour()
 {
-	
+
 }
