@@ -17,21 +17,21 @@ class BMessage;
 
 class WindowBehaviour {
 public:
-							WindowBehaviour();
-	virtual					~WindowBehaviour();
+								WindowBehaviour();
+	virtual						~WindowBehaviour();
 
 	//! \return true if event was a WindowBehaviour event and should be discard
-	virtual bool			MouseDown(BMessage* message, BPoint where) = 0;
-	virtual void			MouseUp(BMessage* message, BPoint where) = 0;
-	virtual void			MouseMoved(BMessage *message, BPoint where,
-								bool isFake) = 0;
+	virtual	bool				MouseDown(BMessage* message, BPoint where) = 0;
+	virtual	void				MouseUp(BMessage* message, BPoint where) = 0;
+	virtual	void				MouseMoved(BMessage *message, BPoint where,
+									bool isFake) = 0;
 
-		bool				IsDragging() const { return fIsDragging; }
-		bool				IsResizing() const { return fIsResizing; }
+			bool				IsDragging() const { return fIsDragging; }
+			bool				IsResizing() const { return fIsResizing; }
 
 protected:
-		bool				fIsResizing : 1;
-		bool				fIsDragging : 1;
+			bool				fIsResizing : 1;
+			bool				fIsDragging : 1;
 };
 
 
