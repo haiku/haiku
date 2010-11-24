@@ -50,9 +50,7 @@ public:
 	virtual	void				GetSizeLimits(int32* minWidth, int32* minHeight,
 									int32* maxWidth, int32* maxHeight) const;
 
-	virtual	click_type			MouseAction(const BMessage* message,
-									BPoint pointt, int32 buttons,
-									int32 modifiers);
+	virtual Region				RegionAt(BPoint where) const;
 
 protected:
 	virtual void				_DoLayout();
