@@ -160,7 +160,7 @@ static const uint8 kRequestParameters[] = {
 
 dhcp_message::dhcp_message(message_type type)
 {
-	ASSERT(this == offsetof(this, opcode));
+	// ASSERT(this == offsetof(this, opcode));
 	memset(this, 0, sizeof(*this));
 	options_magic = htonl(OPTION_MAGIC);
 
@@ -180,10 +180,10 @@ bool
 dhcp_message::NextOption(dhcp_option_cookie& cookie,
 	message_option& option, const uint8*& data, size_t& size) const
 {
-	if (cookie.state == 0) {
-		if (!HasOptions())
-			return false;
+	if (!HasOptions())
+		return false;
 
+	if (cookie.state == 0) {
 		cookie.state++;
 		cookie.next = options;
 	}
@@ -192,32 +192,58 @@ dhcp_message::NextOption(dhcp_option_cookie& cookie,
 
 	switch (cookie.state) {
 		case 1:
-			// options from "options"
-			bytesLeft = sizeof(options) + cookie.next - options;
+			// iterate options from "options"
+			bytesLeft = sizeof(options) - (cookie.next - options);
 			break;
 
 		case 2:
 			// options from "file"
-			bytesLeft = sizeof(options) + cookie.next - options;
+			bytesLeft = sizeof(file) - (cookie.next - file);
 			break;
 
 		case 3:
 			// options from "server_name"
-			bytesLeft = sizeof(options) + cookie.next - options;
+			bytesLeft = sizeof(server_name) - (cookie.next - server_name);
 			break;
 	}
 
 	while (true) {
 		if (bytesLeft == 0) {
-			// TODO: suppport OPTION_OVERLOAD!
-			cookie.state = 4;
-			return false;
+			cookie.state++;
+
+			// handle option(s) overload in file and/or server_name fields.
+			switch (cookie.state) {
+				case 2:
+					// options from "file"
+					if (cookie.file_has_options) {
+						bytesLeft = sizeof(file);
+						cookie.next = file;
+					}
+					break;
+
+				case 3:
+					// options from "server_name"
+					if (cookie.server_name_has_options) {
+						bytesLeft = sizeof(server_name);
+						cookie.next = server_name;
+					}
+					break;
+
+				case 4:
+					// no more options
+					return false;
+			}
+
+			if (bytesLeft == 0) {
+				// no options for this state, try next one
+				continue;
+			}
 		}
 
 		option = (message_option)cookie.next[0];
 		if (option == OPTION_END) {
-			cookie.state = 4;
-			return false;
+			bytesLeft = 0;
+			continue;
 		} else if (option == OPTION_PAD) {
 			bytesLeft--;
 			cookie.next++;
@@ -227,6 +253,7 @@ dhcp_message::NextOption(dhcp_option_cookie& cookie,
 		size = cookie.next[1];
 		data = &cookie.next[2];
 		cookie.next += 2 + size;
+		bytesLeft -= 2 + size;
 
 		if (option == OPTION_OVERLOAD) {
 			cookie.file_has_options = data[0] & 1;
@@ -425,7 +452,8 @@ DHCPClient::_Negotiate(dhcp_state state)
 	if (socket < 0)
 		return errno;
 
-	BNetworkAddress local(AF_INET, NULL, DHCP_CLIENT_PORT);
+	BNetworkAddress local;
+	local.SetToWildcard(AF_INET, DHCP_CLIENT_PORT);
 
 	// Enable reusing the port . This is needed in case there is more
 	// than 1 interface that needs to be configured. Note that the only reason
