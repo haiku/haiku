@@ -48,27 +48,31 @@ private:
 				REGION_RESIZE_CORNER
 			};
 
+			struct State;
+			struct MouseTrackingState;
+			struct DragState;
+			struct ResizeState;
+			struct SlideTabState;
+			struct DecoratorButtonState;
+
+			// to keep gcc 2 happy
+			friend struct State;
+			friend struct MouseTrackingState;
+			friend struct DragState;
+			friend struct ResizeState;
+			friend struct SlideTabState;
+			friend struct DecoratorButtonState;
+
 private:
 			bool				_IsWindowModifier(int32 modifiers) const;
 			Region				_RegionFor(const BMessage* message) const;
-			void				_AlterDeltaForSnap(BPoint& delta,
-									bigtime_t now);
+
+			void				_NextState(State* state);
 
 protected:
 			Window*				fWindow;
 			Desktop*			fDesktop;
-
-			bool				fIsClosing : 1;
-			bool				fIsMinimizing : 1;
-			bool				fIsZooming : 1;
-			bool				fIsSlidingTab : 1;
-			bool				fActivateOnMouseUp : 1;
-			bool				fMinimizeCheckOnMouseUp : 1;
-
-			BPoint				fLastMousePosition;
-			float				fMouseMoveDistance;
-			bigtime_t			fLastMoveTime;
-			bigtime_t			fLastSnapTime;
+			State*				fState;
 			int32				fLastModifiers;
 			int32				fResetClickCount;
 };
