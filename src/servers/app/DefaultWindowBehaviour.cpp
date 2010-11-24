@@ -700,63 +700,65 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where)
 		}
 
 		// translate the region into an action
-		bool leftButton = (buttons & B_PRIMARY_MOUSE_BUTTON) != 0;
-		bool rightButton = (buttons & B_SECONDARY_MOUSE_BUTTON) != 0;
 		uint32 flags = fWindow->Flags();
 
-		switch (hitRegion) {
-			case REGION_NONE:
-				break;
-
-			case REGION_TAB:
-				// tab sliding in any case if either shift key is held down
-				// except sliding up-down by moving mouse left-right would look
-				// strange
-				if (leftButton && (modifiers & B_SHIFT_KEY) != 0
-					&& fWindow->Look() != kLeftTitledWindowLook) {
-					action = ACTION_SLIDE_TAB;
+		if ((buttons & B_PRIMARY_MOUSE_BUTTON) != 0) {
+			// left mouse button
+			switch (hitRegion) {
+				case REGION_NONE:
 					break;
-				}
-				// otherwise fall through -- same handling as for the border...
 
-			case REGION_BORDER:
-				if (leftButton)
+				case REGION_TAB:
+					// tab sliding in any case if either shift key is held down
+					// except sliding up-down by moving mouse left-right would
+					// look strange
+					if ((modifiers & B_SHIFT_KEY) != 0
+						&& fWindow->Look() != kLeftTitledWindowLook) {
+						action = ACTION_SLIDE_TAB;
+						break;
+					}
+					// otherwise fall through -- same handling as for the
+					// border...
+
+				case REGION_BORDER:
 					action = ACTION_DRAG;
-				else if (rightButton)
-					action = ACTION_RESIZE_BORDER;
-				break;
+					break;
 
-			case REGION_CLOSE_BUTTON:
-				if (leftButton) {
+				case REGION_CLOSE_BUTTON:
 					action = (flags & B_NOT_CLOSABLE) == 0
 						? ACTION_CLOSE : ACTION_DRAG;
-				} else if (rightButton)
-					action = ACTION_RESIZE_BORDER;
-				break;
+					break;
 
-			case REGION_ZOOM_BUTTON:
-				if (leftButton) {
+				case REGION_ZOOM_BUTTON:
 					action = (flags & B_NOT_ZOOMABLE) == 0
 						? ACTION_ZOOM : ACTION_DRAG;
-				} else if (rightButton)
-					action = ACTION_RESIZE_BORDER;
-				break;
+					break;
 
-			case REGION_MINIMIZE_BUTTON:
-				if (leftButton) {
+				case REGION_MINIMIZE_BUTTON:
 					action = (flags & B_NOT_MINIMIZABLE) == 0
 						? ACTION_MINIMIZE : ACTION_DRAG;
-				} else if (rightButton)
-					action = ACTION_RESIZE_BORDER;
-				break;
+					break;
 
-			case REGION_RESIZE_CORNER:
-				if (leftButton) {
+				case REGION_RESIZE_CORNER:
 					action = (flags & B_NOT_RESIZABLE) == 0
 						? ACTION_RESIZE : ACTION_DRAG;
-				} else if (rightButton)
+					break;
+			}
+		} else if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0) {
+			// right mouse button
+			switch (hitRegion) {
+				case REGION_NONE:
+					break;
+
+				case REGION_TAB:
+				case REGION_BORDER:
+				case REGION_CLOSE_BUTTON:
+				case REGION_ZOOM_BUTTON:
+				case REGION_MINIMIZE_BUTTON:
+				case REGION_RESIZE_CORNER:
 					action = ACTION_RESIZE_BORDER;
-				break;
+					break;
+			}
 		}
 	}
 
