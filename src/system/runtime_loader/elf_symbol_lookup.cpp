@@ -298,14 +298,19 @@ Elf32_Sym*
 find_undefined_symbol_beos(image_t* rootImage, image_t* image,
 	const SymbolLookupInfo& lookupInfo, image_t** foundInImage)
 {
-	// BeOS style symbol resolution: It is sufficient to check the direct
-	// dependencies. The linker would have complained, if the symbol wasn't
-	// there.
+	// BeOS style symbol resolution: It is sufficient to check the image itself
+	// and its direct dependencies. The linker would have complained, if the
+	// symbol wasn't there.
+	Elf32_Sym* symbol = find_symbol(image, lookupInfo);
+	if (symbol != NULL) {
+		*foundInImage = image;
+		return symbol;
+	}
+
 	for (uint32 i = 0; i < image->num_needed; i++) {
 		if (image->needed[i]->dynamic_ptr) {
-			Elf32_Sym *symbol = find_symbol(image->needed[i],
-				lookupInfo);
-			if (symbol) {
+			symbol = find_symbol(image->needed[i], lookupInfo);
+			if (symbol != NULL) {
 				*foundInImage = image->needed[i];
 				return symbol;
 			}
