@@ -673,8 +673,8 @@ DefaultDecorator::_DrawClose(BRect rect)
 	int32 index = (fButtonFocus ? 0 : 1) + (GetClose() ? 0 : 2);
 	ServerBitmap* bitmap = fCloseBitmaps[index];
 	if (bitmap == NULL) {
-		bitmap = _GetBitmapForButton(CLICK_CLOSE, GetClose(), fButtonFocus,
-			rect.IntegerWidth(), rect.IntegerHeight(), this);
+		bitmap = _GetBitmapForButton(REGION_CLOSE_BUTTON, GetClose(),
+			fButtonFocus, rect.IntegerWidth(), rect.IntegerHeight(), this);
 		fCloseBitmaps[index] = bitmap;
 	}
 
@@ -726,8 +726,8 @@ DefaultDecorator::_DrawZoom(BRect rect)
 	int32 index = (fButtonFocus ? 0 : 1) + (GetZoom() ? 0 : 2);
 	ServerBitmap* bitmap = fZoomBitmaps[index];
 	if (bitmap == NULL) {
-		bitmap = _GetBitmapForButton(CLICK_ZOOM, GetZoom(), fButtonFocus,
-			rect.IntegerWidth(), rect.IntegerHeight(), this);
+		bitmap = _GetBitmapForButton(REGION_ZOOM_BUTTON, GetZoom(),
+			fButtonFocus, rect.IntegerWidth(), rect.IntegerHeight(), this);
 		fZoomBitmaps[index] = bitmap;
 	}
 
@@ -1247,7 +1247,7 @@ DefaultDecorator::_InvalidateBitmaps()
 
 
 ServerBitmap*
-DefaultDecorator::_GetBitmapForButton(int32 item, bool down, bool focus,
+DefaultDecorator::_GetBitmapForButton(Region item, bool down, bool focus,
 	int32 width, int32 height, DefaultDecorator* object)
 {
 	// TODO: the list of shared bitmaps is never freed
@@ -1294,14 +1294,14 @@ DefaultDecorator::_GetBitmapForButton(int32 item, bool down, bool focus,
 	BRect rect(0, 0, width - 1, height - 1);
 
 	STRACE(("DefaultDecorator creating bitmap for %s %sfocus %s at size %ldx%ld\n",
-		item == CLICK_CLOSE ? "close" : "zoom", focus ? "" : "non-",
+		item == REGION_CLOSE_BUTTON ? "close" : "zoom", focus ? "" : "non-",
 		down ? "down" : "up", width, height));
 	switch (item) {
-		case CLICK_CLOSE:
+		case REGION_CLOSE_BUTTON:
 			object->_DrawBlendedRect(sBitmapDrawingEngine, rect, down, focus);
 			break;
 
-		case CLICK_ZOOM:
+		case REGION_ZOOM_BUTTON:
 		{
 			// init the background
 			sBitmapDrawingEngine->FillRect(rect, B_TRANSPARENT_COLOR);
@@ -1321,6 +1321,9 @@ DefaultDecorator::_GetBitmapForButton(int32 item, bool down, bool focus,
 				down, focus);
 			break;
 		}
+
+		default:
+			break;
 	}
 
 	UtilityBitmap* bitmap = sBitmapDrawingEngine->ExportToBitmap(width, height,

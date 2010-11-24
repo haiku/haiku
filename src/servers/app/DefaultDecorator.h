@@ -89,7 +89,7 @@ private:
 									BRect rect, bool down, bool focus);
 			void				_LayoutTabItems(const BRect& tabRect);
 			void 				_InvalidateBitmaps();
-	static	ServerBitmap*		_GetBitmapForButton(int32 item, bool down,
+	static	ServerBitmap*		_GetBitmapForButton(Region item, bool down,
 									bool focus, int32 width, int32 height,
 									DefaultDecorator* object);
 

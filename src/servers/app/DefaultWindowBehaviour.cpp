@@ -92,10 +92,10 @@ protected:
 
 struct DefaultWindowBehaviour::MouseTrackingState : State {
 	MouseTrackingState(DefaultWindowBehaviour& behavior, BPoint where,
-		bool activateOnMouseUp, bool minimizeCheckOnMouseUp)
+		bool windowActionOnMouseUp, bool minimizeCheckOnMouseUp)
 		:
 		State(behavior),
-		fActivateOnMouseUp(activateOnMouseUp),
+		fWindowActionOnMouseUp(windowActionOnMouseUp),
 		fMinimizeCheckOnMouseUp(minimizeCheckOnMouseUp),
 		fLastMousePosition(where),
 		fMouseMoveDistance(0),
@@ -122,14 +122,12 @@ struct DefaultWindowBehaviour::MouseTrackingState : State {
 			}
 		}
 
-		// In FFM mode, activate the window and bring it to front in case
-		// this was a drag click but the mouse was not moved.
-		if (fActivateOnMouseUp) {
-			fActivateOnMouseUp = false;
-			// on R5, there is a time window for this feature
-			// ie, click and press too long, nothing will happen
+		// Perform the window action in case the mouse was not moved.
+		if (fWindowActionOnMouseUp) {
+			// There is a time window for this feature, i.e. click and press
+			// too long, nothing will happen.
 			if (system_time() - fLastMoveTime < kWindowActivationTimeout)
-				fDesktop->ActivateWindow(fWindow);
+				MouseUpWindowAction();
 		}
 
 		fBehavior._NextState(NULL);
@@ -146,11 +144,11 @@ struct DefaultWindowBehaviour::MouseTrackingState : State {
 			// the then current mouse position
 			return;
 		}
-		if (fActivateOnMouseUp || fMinimizeCheckOnMouseUp) {
+		if (fWindowActionOnMouseUp || fMinimizeCheckOnMouseUp) {
 			if (now - fLastMoveTime >= kWindowActivationTimeout) {
 				// This click is too long already for window activation/
 				// minimizing.
-				fActivateOnMouseUp = false;
+				fWindowActionOnMouseUp = false;
 				fMinimizeCheckOnMouseUp = false;
 				fLastMoveTime = now;
 			}
@@ -168,10 +166,10 @@ struct DefaultWindowBehaviour::MouseTrackingState : State {
 
 		// If the window was moved enough, it doesn't come to
 		// the front in FFM mode when the mouse is released.
-		if (fActivateOnMouseUp || fMinimizeCheckOnMouseUp) {
+		if (fWindowActionOnMouseUp || fMinimizeCheckOnMouseUp) {
 			fMouseMoveDistance += delta.x * delta.x + delta.y * delta.y;
 			if (fMouseMoveDistance > 16.0f) {
-				fActivateOnMouseUp = false;
+				fWindowActionOnMouseUp = false;
 				fMinimizeCheckOnMouseUp = false;
 			} else
 				delta = B_ORIGIN;
@@ -187,10 +185,18 @@ struct DefaultWindowBehaviour::MouseTrackingState : State {
 		UpdateFFMFocus(isFake);
 	}
 
-	virtual void MouseMovedAction(BPoint& delta, bigtime_t now) = 0;
+	virtual void MouseMovedAction(BPoint& delta, bigtime_t now)
+	{
+	}
+
+	virtual void MouseUpWindowAction()
+	{
+		// default is window activation
+		fDesktop->ActivateWindow(fWindow);
+	}
 
 protected:
-	bool				fActivateOnMouseUp : 1;
+	bool				fWindowActionOnMouseUp : 1;
 	bool				fMinimizeCheckOnMouseUp : 1;
 
 	BPoint				fLastMousePosition;
@@ -538,7 +544,7 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where)
 	Decorator* decorator = fWindow->Decorator();
 
 	Region hitRegion = REGION_NONE;
-	click_type action = CLICK_NONE;
+	Action action = ACTION_NONE;
 
 	bool inBorderRegion = false;
 	if (decorator != NULL)
@@ -575,48 +581,48 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where)
 				// strange
 				if (leftButton && (modifiers & B_SHIFT_KEY) != 0
 					&& fWindow->Look() != kLeftTitledWindowLook) {
-					action = CLICK_SLIDE_TAB;
+					action = ACTION_SLIDE_TAB;
 					break;
 				}
 				// otherwise fall through -- same handling as for the border...
 
 			case REGION_BORDER:
 				if (leftButton)
-					action = CLICK_DRAG;
+					action = ACTION_DRAG;
 				else if (rightButton)
-					action = CLICK_MOVE_TO_BACK;
+					action = ACTION_RESIZE_BORDER;
 				break;
 
 			case REGION_CLOSE_BUTTON:
 				if (leftButton) {
 					action = (flags & B_NOT_CLOSABLE) == 0
-						? CLICK_CLOSE : CLICK_DRAG;
+						? ACTION_CLOSE : ACTION_DRAG;
 				} else if (rightButton)
-					action = CLICK_MOVE_TO_BACK;
+					action = ACTION_RESIZE_BORDER;
 				break;
 
 			case REGION_ZOOM_BUTTON:
 				if (leftButton) {
 					action = (flags & B_NOT_ZOOMABLE) == 0
-						? CLICK_ZOOM : CLICK_DRAG;
+						? ACTION_ZOOM : ACTION_DRAG;
 				} else if (rightButton)
-					action = CLICK_MOVE_TO_BACK;
+					action = ACTION_RESIZE_BORDER;
 				break;
 
 			case REGION_MINIMIZE_BUTTON:
 				if (leftButton) {
 					action = (flags & B_NOT_MINIMIZABLE) == 0
-						? CLICK_MINIMIZE : CLICK_DRAG;
+						? ACTION_MINIMIZE : ACTION_DRAG;
 				} else if (rightButton)
-					action = CLICK_MOVE_TO_BACK;
+					action = ACTION_RESIZE_BORDER;
 				break;
 
 			case REGION_RESIZE_CORNER:
 				if (leftButton) {
 					action = (flags & B_NOT_RESIZABLE) == 0
-						? CLICK_RESIZE : CLICK_DRAG;
+						? ACTION_RESIZE : ACTION_DRAG;
 				} else if (rightButton)
-					action = CLICK_MOVE_TO_BACK;
+					action = ACTION_RESIZE_BORDER;
 				break;
 		}
 	}
@@ -631,7 +637,7 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where)
 			fResetClickCount = 0;
 	}
 
-	if (action == CLICK_NONE) {
+	if (action == ACTION_NONE) {
 		// No action -- if this is a click inside the window's contents,
 		// let it be forwarded to the window.
 		return inBorderRegion;
@@ -642,13 +648,13 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where)
 		// Ignore clicks on decorator buttons if the
 		// non-floating window doesn't have focus
 		if (!fWindow->IsFocus() && !fWindow->IsFloating()
-			&& action != CLICK_MOVE_TO_BACK
-			&& action != CLICK_RESIZE && action != CLICK_SLIDE_TAB)
-			action = CLICK_DRAG;
+			&& action != ACTION_RESIZE_BORDER
+			&& action != ACTION_RESIZE && action != ACTION_SLIDE_TAB)
+			action = ACTION_DRAG;
 	}
 
 	bool activateOnMouseUp = false;
-	if (action != CLICK_MOVE_TO_BACK) {
+	if (action != ACTION_RESIZE_BORDER) {
 		// activate window if in click to activate mode, else only focus it
 		if (desktopSettings.MouseMode() == B_NORMAL_MOUSE) {
 			fDesktop->ActivateWindow(fWindow);
@@ -660,34 +666,34 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where)
 
 	// switch to the new state
 	switch (action) {
-		case CLICK_CLOSE:
-		case CLICK_ZOOM:
-		case CLICK_MINIMIZE:
+		case ACTION_CLOSE:
+		case ACTION_ZOOM:
+		case ACTION_MINIMIZE:
 			_NextState(
 				new (std::nothrow) DecoratorButtonState(*this, hitRegion));
-			STRACE_CLICK(("===> CLICK_CLOSE/ZOOM/MINIMIZE\n"));
+			STRACE_CLICK(("===> ACTION_CLOSE/ZOOM/MINIMIZE\n"));
 			break;
 
-		case CLICK_DRAG:
+		case ACTION_DRAG:
 			_NextState(new (std::nothrow) DragState(*this, where,
 				activateOnMouseUp, clickCount == 2));
-			STRACE_CLICK(("===> CLICK_DRAG\n"));
+			STRACE_CLICK(("===> ACTION_DRAG\n"));
 			break;
 
-		case CLICK_RESIZE:
+		case ACTION_RESIZE:
 			_NextState(new (std::nothrow) ResizeState(*this, where,
 				activateOnMouseUp));
-			STRACE_CLICK(("===> CLICK_RESIZE\n"));
+			STRACE_CLICK(("===> ACTION_RESIZE\n"));
 			break;
 
-		case CLICK_SLIDE_TAB:
+		case ACTION_SLIDE_TAB:
 			_NextState(new (std::nothrow) SlideTabState(*this, where));
-			STRACE_CLICK(("===> CLICK_SLIDE_TAB\n"));
+			STRACE_CLICK(("===> ACTION_SLIDE_TAB\n"));
 			break;
 
-		case CLICK_MOVE_TO_BACK:
+		case ACTION_RESIZE_BORDER:
 			fDesktop->SendWindowBehind(fWindow);
-			STRACE_CLICK(("===> CLICK_MOVE_TO_BACK\n"));
+			STRACE_CLICK(("===> ACTION_RESIZE_BORDER\n"));
 			break;
 
 		default:

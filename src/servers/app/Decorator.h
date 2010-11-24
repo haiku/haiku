@@ -25,28 +25,6 @@ class ServerFont;
 class BRegion;
 
 
-enum click_type {
-	CLICK_NONE = 0,
-	CLICK_ZOOM,
-	CLICK_CLOSE,
-	CLICK_MINIMIZE,
-	CLICK_TAB,
-	CLICK_DRAG,
-	CLICK_MOVE_TO_BACK,
-	CLICK_SLIDE_TAB,
-
-	CLICK_RESIZE,
-	CLICK_RESIZE_L,
-	CLICK_RESIZE_T,
-	CLICK_RESIZE_R,
-	CLICK_RESIZE_B,
-	CLICK_RESIZE_LT,
-	CLICK_RESIZE_RT,
-	CLICK_RESIZE_LB,
-	CLICK_RESIZE_RB
-};
-
-
 class Decorator {
 public:
 			enum Region {

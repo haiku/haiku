@@ -48,6 +48,18 @@ private:
 				REGION_RESIZE_CORNER
 			};
 
+			enum Action {
+				ACTION_NONE,
+				ACTION_ZOOM,
+				ACTION_CLOSE,
+				ACTION_MINIMIZE,
+				ACTION_TAB,
+				ACTION_DRAG,
+				ACTION_SLIDE_TAB,
+				ACTION_RESIZE,
+				ACTION_RESIZE_BORDER
+			};
+
 			struct State;
 			struct MouseTrackingState;
 			struct DragState;
