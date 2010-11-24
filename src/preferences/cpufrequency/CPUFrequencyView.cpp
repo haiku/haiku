@@ -1,10 +1,11 @@
 /*
- * Copyright 2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2009-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Clemens Zeidler, haiku@clemens-zeidler.de
  */
+
 
 #include "CPUFrequencyView.h"
 
@@ -34,8 +35,9 @@ const bigtime_t	kMilliSecond = 1000;
 
 
 CPUFrequencyView::CPUFrequencyView(BRect frame,
-		PreferencesStorage<freq_preferences>* storage)
-	:	BView(frame, "CPUFrequencyView", B_FOLLOW_NONE, B_WILL_DRAW),
+	PreferencesStorage<freq_preferences>* storage)
+	:
+	BView(frame, "CPUFrequencyView", B_FOLLOW_NONE, B_WILL_DRAW),
 		fStorage(storage)
 {
 	BGroupLayout* mainLayout = new BGroupLayout(B_VERTICAL);
@@ -55,17 +57,15 @@ CPUFrequencyView::CPUFrequencyView(BRect frame,
 	mainLayout->AddView(policyBox);
 
 	fPolicyMenu = new BMenu(B_TRANSLATE("Stepping policy: "));
-	BMenuField *menuField = new BMenuField(
-		B_TRANSLATE("Stepping policy: "), fPolicyMenu);
-
+	BMenuField *menuField = new BMenuField("", fPolicyMenu);
 	policyLayout->AddView(menuField);
 
 	// dynamic stepping
 	BBox *dynamicBox = new BBox(rect, "dynamicBox");
 	dynamicBox->SetLabel(B_TRANSLATE("Dynamic stepping"));
 	BGroupLayout* dynamicLayout = new BGroupLayout(B_VERTICAL);
-	dynamicLayout->SetInsets(10, dynamicBox->TopBorderOffset() * 2 + 10,
-								10, 10);
+	dynamicLayout->SetInsets(10, dynamicBox->TopBorderOffset() * 2 + 10, 10,
+		10);
 	dynamicLayout->SetSpacing(10);
 	dynamicBox->SetLayout(dynamicLayout);
 	mainLayout->AddView(dynamicBox);
@@ -74,10 +74,8 @@ CPUFrequencyView::CPUFrequencyView(BRect frame,
 	fColorStepView->SetFrequencys(fDriverInterface.GetCpuFrequencyStates());
 
 	fIntegrationTime = new BTextControl(BRect(0,0,Bounds().Width(),10),
-										"intergal",
-										B_TRANSLATE("Integration time [ms]: "),
-										"",
-										new BMessage(kIntegrationTimeChanged));
+		"intergal", B_TRANSLATE("Integration time [ms]: "), "",
+		new BMessage(kIntegrationTimeChanged));
 
 	dynamicLayout->AddView(fColorStepView);
 	dynamicLayout->AddView(fIntegrationTime);
@@ -91,13 +89,12 @@ CPUFrequencyView::CPUFrequencyView(BRect frame,
 	statusBox->SetLayout(statusLayout);
 	mainLayout->AddView(statusBox);
 
-	fStatusView = new StatusView(BRect(0, 0, 5, 5), false,
-									fStorage);
+	fStatusView = new StatusView(BRect(0, 0, 5, 5), false, fStorage);
 	fStatusView->ShowPopUpMenu(false);
 
 	fInstallButton = new BButton("installButton",
-								B_TRANSLATE("Install replicant into Deskbar"),
-								new BMessage(kInstallIntoDeskbar));
+		B_TRANSLATE("Install replicant into Deskbar"),
+		new BMessage(kInstallIntoDeskbar));
 
 	statusLayout->AddView(fStatusView);
 	statusLayout->AddView(fInstallButton);
@@ -159,8 +156,8 @@ CPUFrequencyView::MessageReceived(BMessage* message)
 void
 CPUFrequencyView::AttachedToWindow()
 {
-	fFrequencyMenu = new FrequencyMenu(fPolicyMenu, this,
-		fStorage, &fDriverInterface);
+	fFrequencyMenu = new FrequencyMenu(fPolicyMenu, this, fStorage,
+		&fDriverInterface);
 	AddFilter(fFrequencyMenu);
 
 	fColorStepView->SetTarget(this);
