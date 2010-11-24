@@ -491,6 +491,7 @@ DefaultWindowBehaviour::DefaultWindowBehaviour(Window* window)
 	fDesktop(window->Desktop()),
 	fState(NULL),
 	fLastModifiers(0),
+	fLastMouseButtons(0),
 	fResetClickCount(0)
 {
 }
@@ -506,21 +507,26 @@ bool
 DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where)
 {
 	// Get the click count and reset it, if the modifiers changed in the
-	// meantime.
-	// TODO: This should be done in a better place (e.g. the input server). It
-	// should also reset clicks after mouse movement (which we don't do here
-	// either -- though that's probably acceptable).
+	// meantime. Do the same when this is not the button we've seen before.
+	// TODO: At least the modifier check should be done in a better place
+	// (e.g. the input server). It should also reset clicks after mouse
+	// movement (which we don't do here either -- though that's probably
+	// acceptable).
 	int32 clickCount = message->FindInt32("clicks");
 	int32 modifiers = message->FindInt32("modifiers");
+	int32 buttons = message->FindInt32("buttons");
+
 	if (clickCount <= 1) {
 		fResetClickCount = 0;
-	} else if (modifiers != fLastModifiers
+	} else if (modifiers != fLastModifiers || buttons != fLastMouseButtons
 		|| clickCount - fResetClickCount < 1) {
 		fResetClickCount = clickCount - 1;
 		clickCount = 1;
 	} else
 		clickCount -= fResetClickCount;
+
 	fLastModifiers = modifiers;
+	fLastMouseButtons = buttons;
 
 	// if a state is active, let it do the job
 	if (fState != NULL)
@@ -554,7 +560,6 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where)
 		}
 
 		// translate the region into an action
-		int32 buttons = message->FindInt32("buttons");
 		bool leftButton = (buttons & B_PRIMARY_MOUSE_BUTTON) != 0;
 		bool rightButton = (buttons & B_SECONDARY_MOUSE_BUTTON) != 0;
 		uint32 flags = fWindow->Flags();

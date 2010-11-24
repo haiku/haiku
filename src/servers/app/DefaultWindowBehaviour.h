@@ -74,6 +74,7 @@ protected:
 			Desktop*			fDesktop;
 			State*				fState;
 			int32				fLastModifiers;
+			int32				fLastMouseButtons;
 			int32				fResetClickCount;
 };
 
