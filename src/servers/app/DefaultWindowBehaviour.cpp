@@ -15,6 +15,8 @@
 
 #include "DefaultWindowBehaviour.h"
 
+#include <math.h>
+
 #include <WindowPrivate.h>
 
 #include "Desktop.h"
@@ -92,9 +94,11 @@ protected:
 
 struct DefaultWindowBehaviour::MouseTrackingState : State {
 	MouseTrackingState(DefaultWindowBehaviour& behavior, BPoint where,
-		bool windowActionOnMouseUp, bool minimizeCheckOnMouseUp)
+		bool windowActionOnMouseUp, bool minimizeCheckOnMouseUp,
+		int32 mouseButton = B_PRIMARY_MOUSE_BUTTON)
 		:
 		State(behavior),
+		fMouseButton(mouseButton),
 		fWindowActionOnMouseUp(windowActionOnMouseUp),
 		fMinimizeCheckOnMouseUp(minimizeCheckOnMouseUp),
 		fLastMousePosition(where),
@@ -105,9 +109,9 @@ struct DefaultWindowBehaviour::MouseTrackingState : State {
 
 	virtual void MouseUp(BMessage* message, BPoint where)
 	{
-		// ignore, if it's not the primary mouse button
+		// ignore, if it's not our mouse button
 		int32 buttons = message->FindInt32("buttons");
-		if ((buttons & B_PRIMARY_MOUSE_BUTTON) != 0)
+		if ((buttons & fMouseButton) != 0)
 			return;
 
 		if (fMinimizeCheckOnMouseUp) {
@@ -196,6 +200,7 @@ struct DefaultWindowBehaviour::MouseTrackingState : State {
 	}
 
 protected:
+	int32				fMouseButton;
 	bool				fWindowActionOnMouseUp : 1;
 	bool				fMinimizeCheckOnMouseUp : 1;
 
@@ -371,6 +376,134 @@ struct DefaultWindowBehaviour::SlideTabState : MouseTrackingState {
 		else
 			delta = BPoint(0, 0);
 	}
+};
+
+
+// #pragma mark - ResizeBorderState
+
+
+struct DefaultWindowBehaviour::ResizeBorderState : MouseTrackingState {
+	ResizeBorderState(DefaultWindowBehaviour& behavior, BPoint where)
+		:
+		MouseTrackingState(behavior, where, true, false,
+			B_SECONDARY_MOUSE_BUTTON),
+		fHorizontal(NONE),
+		fVertical(NONE)
+	{
+		// Compute the window center relative location of where. We divide by
+		// the width respective the height, so we compensate for the window's
+		// aspect ratio.
+		BRect frame(fWindow->Frame());
+		if (frame.Width() + 1 == 0 || frame.Height() + 1 == 0)
+			return;
+
+		float x = (where.x - (frame.left + frame.right) / 2)
+			/ (frame.Width() + 1);
+		float y = (where.y - (frame.top + frame.bottom) / 2)
+			/ (frame.Height() + 1);
+
+		// compute the angle
+		if (x == 0 && y == 0)
+			return;
+
+		float angle = atan2f(y, x);
+
+		// rotate by 22.5 degree to align our sectors with 45 degree multiples
+		angle += M_PI / 8;
+
+		// add 180 degree to the negative values, so we get a nice 0 to 360
+		// degree range
+		if (angle < 0)
+			angle += M_PI * 2;
+
+		switch (int(angle / M_PI_4)) {
+			case 0:
+				fHorizontal = RIGHT;
+				break;
+			case 1:
+				fHorizontal = RIGHT;
+				fVertical = BOTTOM;
+				break;
+			case 2:
+				fVertical = BOTTOM;
+				break;
+			case 3:
+				fHorizontal = LEFT;
+				fVertical = BOTTOM;
+				break;
+			case 4:
+				fHorizontal = LEFT;
+				break;
+			case 5:
+				fHorizontal = LEFT;
+				fVertical = TOP;
+				break;
+			case 6:
+				fVertical = TOP;
+				break;
+			case 7:
+			default:
+				fHorizontal = RIGHT;
+				fVertical = TOP;
+				break;
+		}
+	}
+
+	virtual void MouseMovedAction(BPoint& delta, bigtime_t now)
+	{
+		if ((fWindow->Flags() & B_NOT_RESIZABLE) != 0) {
+			delta = BPoint(0, 0);
+			return;
+		}
+
+		if ((fWindow->Flags() & B_NOT_H_RESIZABLE) != 0 || fHorizontal == NONE)
+			delta.x = 0;
+		if ((fWindow->Flags() & B_NOT_V_RESIZABLE) != 0 || fVertical == NONE)
+			delta.y = 0;
+
+		if (delta.x == 0 && delta.y == 0)
+			return;
+
+		// Resize first -- due to the window size limits this is not unlikely
+		// to turn out differently from what we request.
+		BPoint oldRightBottom = fWindow->Frame().RightBottom();
+
+		fDesktop->ResizeWindowBy(fWindow, delta.x * fHorizontal,
+			delta.y * fVertical);
+
+		// constrain delta to true change in size
+		delta = fWindow->Frame().RightBottom() - oldRightBottom;
+		delta.x *= fHorizontal;
+		delta.y *= fVertical;
+
+		// see, if we have to move, too
+		float moveX = fHorizontal == LEFT ? delta.x : 0;
+		float moveY = fVertical == TOP ? delta.y : 0;
+
+		if (moveX != 0 || moveY != 0)
+			fDesktop->MoveWindowBy(fWindow, moveX, moveY);
+	}
+
+	virtual void MouseUpWindowAction()
+	{
+		fDesktop->SendWindowBehind(fWindow);
+	}
+
+private:
+	enum {
+		// 1 for the "natural" resize border, -1 for the opposite,
+		// so multiplying the movement delta by that value results in the size
+		// change.
+		LEFT	= -1,
+		TOP		= -1,
+		NONE	= 0,
+		RIGHT	= 1,
+		BOTTOM	= 1
+	};
+
+private:
+	int8	fHorizontal;
+	int8	fVertical;
 };
 
 
@@ -692,7 +825,7 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where)
 			break;
 
 		case ACTION_RESIZE_BORDER:
-			fDesktop->SendWindowBehind(fWindow);
+			_NextState(new (std::nothrow) ResizeBorderState(*this, where));
 			STRACE_CLICK(("===> ACTION_RESIZE_BORDER\n"));
 			break;
 

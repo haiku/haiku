@@ -65,6 +65,7 @@ private:
 			struct DragState;
 			struct ResizeState;
 			struct SlideTabState;
+			struct ResizeBorderState;
 			struct DecoratorButtonState;
 
 			// to keep gcc 2 happy
@@ -73,6 +74,7 @@ private:
 			friend struct DragState;
 			friend struct ResizeState;
 			friend struct SlideTabState;
+			friend struct ResizeBorderState;
 			friend struct DecoratorButtonState;
 
 private:
