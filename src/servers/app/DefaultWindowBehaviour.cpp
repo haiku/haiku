@@ -492,6 +492,7 @@ DefaultWindowBehaviour::DefaultWindowBehaviour(Window* window)
 	fState(NULL),
 	fLastModifiers(0),
 	fLastMouseButtons(0),
+	fLastRegion(REGION_NONE),
 	fResetClickCount(0)
 {
 }
@@ -618,6 +619,16 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where)
 					action = CLICK_MOVE_TO_BACK;
 				break;
 		}
+	}
+
+	// The hit region changed since the last the click. Reset the click count.
+	if (hitRegion != fLastRegion) {
+		fLastRegion = hitRegion;
+		clickCount = 1;
+
+		fResetClickCount = message->FindInt32("clicks") - 1;
+		if (fResetClickCount < 0)
+			fResetClickCount = 0;
 	}
 
 	if (action == CLICK_NONE) {

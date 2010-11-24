@@ -75,6 +75,7 @@ protected:
 			State*				fState;
 			int32				fLastModifiers;
 			int32				fLastMouseButtons;
+			Region				fLastRegion;
 			int32				fResetClickCount;
 };
 
