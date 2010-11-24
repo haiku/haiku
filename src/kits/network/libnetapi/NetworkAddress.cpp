@@ -385,7 +385,26 @@ BNetworkAddress::SetToMask(int family, uint32 prefixLength)
 status_t
 BNetworkAddress::SetToWildcard(int family, uint16 port)
 {
-	return SetTo(family, NULL, port);
+	switch (family) {
+		case AF_INET:
+			memset(&fAddress, 0, sizeof(sockaddr_storage));
+			fAddress.ss_len = sizeof(sockaddr_in);
+			SetAddress(INADDR_ANY);
+			break;
+
+		case AF_INET6:
+			memset(&fAddress, 0, sizeof(sockaddr_storage));
+			fAddress.ss_len = sizeof(sockaddr_in6);
+			SetAddress(in6addr_any);
+			break;
+
+		default:
+			return B_NOT_SUPPORTED;
+	}
+
+	fAddress.ss_family = family;
+	SetPort(port);
+	return fStatus = B_OK;
 }
 
 
