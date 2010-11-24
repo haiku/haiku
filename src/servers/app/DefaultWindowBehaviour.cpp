@@ -67,7 +67,7 @@ struct DefaultWindowBehaviour::State {
 	{
 	}
 
-	void UpateFFMFocus(bool isFake)
+	void UpdateFFMFocus(bool isFake)
 	{
 		// change focus in FFM mode
 		DesktopSettings desktopSettings(fDesktop);
@@ -184,7 +184,7 @@ struct DefaultWindowBehaviour::MouseTrackingState : State {
 		fLastMousePosition += delta;
 
 		// update the FFM focus
-		UpateFFMFocus(isFake);
+		UpdateFFMFocus(isFake);
 	}
 
 	virtual void MouseMovedAction(BPoint& delta, bigtime_t now) = 0;
@@ -437,7 +437,7 @@ struct DefaultWindowBehaviour::DecoratorButtonState : State {
 		_RedrawDecorator(message);
 
 		// update the FFM focus
-		UpateFFMFocus(isFake);
+		UpdateFFMFocus(isFake);
 	}
 
 private:
