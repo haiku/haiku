@@ -470,6 +470,17 @@ SATDecorator::GetComponentColors(Component component, ComponentColors _colors)
 			_colors[COLOR_TAB_TEXT] = kFocusTextColor;
 			break;
 
+		case COMPONENT_CLOSE_BUTTON:
+		case COMPONENT_ZOOM_BUTTON:
+			if (!fTabHighlighted) {
+				DefaultDecorator::GetComponentColors(component, _colors);
+				return;
+			}
+
+			_colors[COLOR_BUTTON] = kHighlightTabColor;
+			_colors[COLOR_BUTTON_LIGHT] = kHighlightTabColorLight;
+			break;
+
 		case COMPONENT_LEFT_BORDER:
 		case COMPONENT_RIGHT_BORDER:
 		case COMPONENT_TOP_BORDER:

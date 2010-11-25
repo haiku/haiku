@@ -726,7 +726,7 @@ DefaultDecorator::_DrawClose(BRect rect)
 	ServerBitmap* bitmap = fCloseBitmaps[index];
 	if (bitmap == NULL) {
 		bitmap = _GetBitmapForButton(COMPONENT_CLOSE_BUTTON, GetClose(),
-			fButtonFocus, rect.IntegerWidth(), rect.IntegerHeight(), this);
+			rect.IntegerWidth(), rect.IntegerHeight());
 		fCloseBitmaps[index] = bitmap;
 	}
 
@@ -782,7 +782,7 @@ DefaultDecorator::_DrawZoom(BRect rect)
 	ServerBitmap* bitmap = fZoomBitmaps[index];
 	if (bitmap == NULL) {
 		bitmap = _GetBitmapForButton(COMPONENT_ZOOM_BUTTON, GetZoom(),
-			fButtonFocus, rect.IntegerWidth(), rect.IntegerHeight(), this);
+			rect.IntegerWidth(), rect.IntegerHeight());
 		fZoomBitmaps[index] = bitmap;
 	}
 
@@ -1167,6 +1167,17 @@ DefaultDecorator::GetComponentColors(Component component,
 			}
 			break;
 
+		case COMPONENT_CLOSE_BUTTON:
+		case COMPONENT_ZOOM_BUTTON:
+			if (fButtonFocus) {
+				_colors[COLOR_BUTTON] = kFocusTabColor;
+				_colors[COLOR_BUTTON_LIGHT] = kFocusTabColorLight;
+			} else {
+				_colors[COLOR_BUTTON] = kNonFocusTabColor;
+				_colors[COLOR_BUTTON_LIGHT] = kNonFocusTabColorLight;
+			}
+			break;
+
 		case COMPONENT_LEFT_BORDER:
 		case COMPONENT_RIGHT_BORDER:
 		case COMPONENT_TOP_BORDER:
@@ -1224,25 +1235,21 @@ DefaultDecorator::_DrawButtonBitmap(ServerBitmap* bitmap, BRect rect)
 
 
 /*!	\brief Draws a framed rectangle with a gradient.
-	\param down The rectangle should be drawn recessed or not
+	\param down The rectangle should be drawn recessed or not.
+	\param colors A button color array with the colors to be used.
 */
 void
 DefaultDecorator::_DrawBlendedRect(DrawingEngine* engine, BRect rect,
-	bool down, bool focus)
+	bool down, const ComponentColors& colors)
 {
-	ComponentColors colors;
-	GetComponentColors(COMPONENT_TAB, colors);
-
 	// figure out which colors to use
 	rgb_color startColor, endColor;
-	rgb_color tabColor = focus ? kFocusTabColor : kNonFocusTabColor;
-		// TODO: Use GetComponentColors() only!
 	if (down) {
-		startColor = tint_color(tabColor, B_DARKEN_1_TINT);
-		endColor = colors[COLOR_TAB_LIGHT];
+		startColor = tint_color(colors[COLOR_BUTTON], B_DARKEN_1_TINT);
+		endColor = colors[COLOR_BUTTON_LIGHT];
 	} else {
-		startColor = tint_color(tabColor, B_LIGHTEN_MAX_TINT);
-		endColor = tabColor;
+		startColor = tint_color(colors[COLOR_BUTTON], B_LIGHTEN_MAX_TINT);
+		endColor = colors[COLOR_BUTTON];
 	}
 
 	// fill
@@ -1257,7 +1264,7 @@ DefaultDecorator::_DrawBlendedRect(DrawingEngine* engine, BRect rect,
 
 	// outline
 	rect.InsetBy(-1, -1);
-	engine->StrokeRect(rect, tint_color(tabColor, B_DARKEN_2_TINT));
+	engine->StrokeRect(rect, tint_color(colors[COLOR_BUTTON], B_DARKEN_2_TINT));
 }
 
 
@@ -1343,24 +1350,27 @@ DefaultDecorator::_InvalidateBitmaps()
 
 
 ServerBitmap*
-DefaultDecorator::_GetBitmapForButton(Component item, bool down, bool focus,
-	int32 width, int32 height, DefaultDecorator* object)
+DefaultDecorator::_GetBitmapForButton(Component item, bool down, int32 width,
+	int32 height)
 {
 	// TODO: the list of shared bitmaps is never freed
 	struct decorator_bitmap {
 		Component			item;
 		bool				down;
-		bool				focus;
 		int32				width;
 		int32				height;
-		rgb_color			focusColor;
-		rgb_color			nonFocusColor;
+		rgb_color			baseColor;
+		rgb_color			lightColor;
 		UtilityBitmap*		bitmap;
 		decorator_bitmap*	next;
 	};
 
 	static BLocker sBitmapListLock("decorator lock", true);
 	static decorator_bitmap* sBitmapList = NULL;
+
+	ComponentColors colors;
+	GetComponentColors(item, colors);
+
 	BAutolock locker(sBitmapListLock);
 
 	// search our list for a matching bitmap
@@ -1368,10 +1378,9 @@ DefaultDecorator::_GetBitmapForButton(Component item, bool down, bool focus,
 	decorator_bitmap* current = sBitmapList;
 	while (current) {
 		if (current->item == item && current->down == down
-			&& current->focus == focus && current->width == width
-			&& current->height == height
-			&& current->focusColor == object->kFocusTabColor
-			&& current->nonFocusColor == object->kNonFocusTabColor) {
+			&& current->width == width && current->height == height
+			&& current->baseColor == colors[COLOR_BUTTON]
+			&& current->lightColor == colors[COLOR_BUTTON_LIGHT]) {
 			return current->bitmap;
 		}
 
@@ -1389,12 +1398,12 @@ DefaultDecorator::_GetBitmapForButton(Component item, bool down, bool focus,
 
 	BRect rect(0, 0, width - 1, height - 1);
 
-	STRACE(("DefaultDecorator creating bitmap for %s %sfocus %s at size %ldx%ld\n",
-		item == COMPONENT_CLOSE_BUTTON ? "close" : "zoom", focus ? "" : "non-",
+	STRACE(("DefaultDecorator creating bitmap for %s %s at size %ldx%ld\n",
+		item == COMPONENT_CLOSE_BUTTON ? "close" : "zoom",
 		down ? "down" : "up", width, height));
 	switch (item) {
 		case COMPONENT_CLOSE_BUTTON:
-			object->_DrawBlendedRect(sBitmapDrawingEngine, rect, down, focus);
+			_DrawBlendedRect(sBitmapDrawingEngine, rect, down, colors);
 			break;
 
 		case COMPONENT_ZOOM_BUTTON:
@@ -1406,15 +1415,13 @@ DefaultDecorator::_GetBitmapForButton(Component item, bool down, bool focus,
 			BRect zoomRect(rect);
 			zoomRect.left += inset;
 			zoomRect.top += inset;
-			object->_DrawBlendedRect(sBitmapDrawingEngine, zoomRect,
-				down, focus);
+			_DrawBlendedRect(sBitmapDrawingEngine, zoomRect, down, colors);
 
 			inset = floorf(width / 2.1);
 			zoomRect = rect;
 			zoomRect.right -= inset;
 			zoomRect.bottom -= inset;
-			object->_DrawBlendedRect(sBitmapDrawingEngine, zoomRect,
-				down, focus);
+			_DrawBlendedRect(sBitmapDrawingEngine, zoomRect, down, colors);
 			break;
 		}
 
@@ -1436,12 +1443,11 @@ DefaultDecorator::_GetBitmapForButton(Component item, bool down, bool focus,
 
 	entry->item = item;
 	entry->down = down;
-	entry->focus = focus;
 	entry->width = width;
 	entry->height = height;
 	entry->bitmap = bitmap;
-	entry->focusColor = object->kFocusTabColor;
-	entry->nonFocusColor = object->kNonFocusTabColor;
+	entry->baseColor = colors[COLOR_BUTTON];
+	entry->lightColor = colors[COLOR_BUTTON_LIGHT];
 	entry->next = sBitmapList;
 	sBitmapList = entry;
 	return bitmap;

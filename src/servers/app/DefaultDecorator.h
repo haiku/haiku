@@ -68,6 +68,11 @@ protected:
 				COLOR_TAB_TEXT			= 6
 			};
 
+			enum {
+				COLOR_BUTTON			= 0,
+				COLOR_BUTTON_LIGHT		= 1
+			};
+
 			typedef rgb_color ComponentColors[7];
 
 protected:
@@ -118,12 +123,12 @@ private:
  			void				_DrawButtonBitmap(ServerBitmap* bitmap,
  									BRect rect);
 			void				_DrawBlendedRect(DrawingEngine *engine,
-									BRect rect, bool down, bool focus);
+									BRect rect, bool down,
+									const ComponentColors& colors);
 			void				_LayoutTabItems(const BRect& tabRect);
 			void 				_InvalidateBitmaps();
-	static	ServerBitmap*		_GetBitmapForButton(Component item, bool down,
-									bool focus, int32 width, int32 height,
-									DefaultDecorator* object);
+			ServerBitmap*		_GetBitmapForButton(Component item, bool down,
+									int32 width, int32 height);
 
 protected:
 	static	const rgb_color		kFrameColors[4];
