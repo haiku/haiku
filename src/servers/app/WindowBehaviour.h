@@ -26,6 +26,8 @@ public:
 	virtual	void				MouseMoved(BMessage *message, BPoint where,
 									bool isFake) = 0;
 
+	virtual	void				ModifiersChanged(int32 modifiers);
+
 			bool				IsDragging() const { return fIsDragging; }
 			bool				IsResizing() const { return fIsResizing; }
 

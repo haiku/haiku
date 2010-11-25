@@ -490,6 +490,19 @@ Desktop::BroadcastToAllWindows(int32 code)
 void
 Desktop::KeyEvent(uint32 what, int32 key, int32 modifiers)
 {
+	if (LockAllWindows()) {
+		Window* window = MouseEventWindow();
+		if (window == NULL)
+			window = WindowAt(fLastMousePosition);
+
+		if (window != NULL) {
+			if (what == B_MODIFIERS_CHANGED)
+				window->ModifiersChanged(modifiers);
+		}
+
+		UnlockAllWindows();
+	}
+
 	NotifyKeyPressed(what, key, modifiers);
 }
 

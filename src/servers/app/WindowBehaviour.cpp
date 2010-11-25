@@ -15,11 +15,15 @@ WindowBehaviour::WindowBehaviour()
 	fIsResizing(false),
 	fIsDragging(false)
 {
-
 }
 
 
 WindowBehaviour::~WindowBehaviour()
 {
+}
 
+
+void
+WindowBehaviour::ModifiersChanged(int32 modifiers)
+{
 }

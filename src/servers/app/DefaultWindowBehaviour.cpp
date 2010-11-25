@@ -859,6 +859,12 @@ DefaultWindowBehaviour::MouseMoved(BMessage *message, BPoint where, bool isFake)
 }
 
 
+void
+DefaultWindowBehaviour::ModifiersChanged(int32 modifiers)
+{
+}
+
+
 bool
 DefaultWindowBehaviour::_IsWindowModifier(int32 modifiers) const
 {

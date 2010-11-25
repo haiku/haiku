@@ -34,6 +34,8 @@ public:
 	virtual	void				MouseMoved(BMessage *message, BPoint where,
 									bool isFake);
 
+	virtual	void				ModifiersChanged(int32 modifiers);
+
 private:
 			enum Region {
 				REGION_NONE,

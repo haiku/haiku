@@ -151,6 +151,8 @@ public:
 									int32* _viewToken, bool isLatestMouseMoved,
 									bool isFake);
 
+			void				ModifiersChanged(int32 modifiers);
+
 			// some hooks to inform the client window
 			// TODO: move this to ServerWindow maybe?
 			void				WorkspaceActivated(int32 index, bool active);

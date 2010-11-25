@@ -867,6 +867,13 @@ Window::MouseMoved(BMessage *message, BPoint where, int32* _viewToken,
 }
 
 
+void
+Window::ModifiersChanged(int32 modifiers)
+{
+	fWindowBehaviour->ModifiersChanged(modifiers);
+}
+
+
 // #pragma mark -
 
 
@@ -1046,7 +1053,7 @@ Window::SetTabLocation(float location, BRegion& dirty)
 {
 	if (fDecorator)
 		return fDecorator->SetTabLocation(location, &dirty);
-		
+
 	return false;
 }
 
