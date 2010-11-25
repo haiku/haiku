@@ -46,6 +46,7 @@ struct dialup_device : net_device {
 	int				fd;
 	struct termios	line_config;
 	dialup_state 	state;
+	bigtime_t		last_closing_flag_sequence_time;
 	bool			data_mode;
 	char			init_string[64];
 	char			dial_string[64];
@@ -205,9 +206,11 @@ dialup_init(const char* name, net_device** _device)
 	device->mtu = 1500;
 	device->media = 0;
 	device->header_length = HDLC_HEADER_LENGTH;
+
 	device->fd = -1;
 	device->state = DOWN;
 	device->data_mode = false;
+	device->last_closing_flag_sequence_time = 0;
 
 	// default AT strings
 	strncpy(device->init_string, "ATZ", sizeof(device->init_string));
@@ -362,6 +365,7 @@ dialup_send_data(net_device* _device, net_buffer* buffer)
 	int packetSize = 0;
 	status_t status;
 	ssize_t bytesWritten;
+	bigtime_t now;
 
 	uint32 vectorCount = gBufferModule->count_iovecs(buffer);
 	if (vectorCount < 1) {
@@ -379,14 +383,19 @@ dialup_send_data(net_device* _device, net_buffer* buffer)
 	// encode HDLC packet
 
 	// worst case: begin and end sequence flags and each byte needing escape
-	packet = (uint8*) malloc(2 + 2 * buffer->size);
+	packet = (uint8*)malloc(2 + 2 * buffer->size);
 	if (packet == NULL) {
 		status = B_NO_MEMORY;
 		goto err;
 	}
 
-	// mark frame start
-	packet[packetSize++] = HDLC_FLAG_SEQUENCE;
+	// Mark frame start if the prior frame closing flag was sent
+	// more than a second ago.
+	// Otherwise, the prior closing flag sequence is the open flag of this
+	// frame
+	now = system_time();
+	if (now - device->last_closing_flag_sequence_time > 1000000)
+		packet[packetSize++] = HDLC_FLAG_SEQUENCE;
 
 	// encode frame data
 	ioVector = ioVectors;
@@ -416,6 +425,7 @@ dialup_send_data(net_device* _device, net_buffer* buffer)
 		status = errno;
 		goto err;
 	}
+	device->last_closing_flag_sequence_time = system_time();
 
 	device->stats.send.packets++;
 	device->stats.send.bytes += bytesWritten;
