@@ -11,8 +11,11 @@
 
 #include <Region.h>
 
+#include "Decorator.h"
+
 
 class BMessage;
+class ClickTarget;
 
 
 class WindowBehaviour {
@@ -20,8 +23,9 @@ public:
 								WindowBehaviour();
 	virtual						~WindowBehaviour();
 
-	//! \return true if event was a WindowBehaviour event and should be discard
-	virtual	bool				MouseDown(BMessage* message, BPoint where) = 0;
+	virtual	bool				MouseDown(BMessage* message, BPoint where,
+									int32 lastHitRegion, int32& clickCount,
+									int32& _hitRegion) = 0;
 	virtual	void				MouseUp(BMessage* message, BPoint where) = 0;
 	virtual	void				MouseMoved(BMessage *message, BPoint where,
 									bool isFake) = 0;

@@ -29,7 +29,9 @@ public:
 								DefaultWindowBehaviour(Window* window);
 	virtual						~DefaultWindowBehaviour();
 
-	virtual	bool				MouseDown(BMessage* message, BPoint where);
+	virtual	bool				MouseDown(BMessage* message, BPoint where,
+									int32 lastHitRegion, int32& clickCount,
+									int32& _hitRegion);
 	virtual	void				MouseUp(BMessage* message, BPoint where);
 	virtual	void				MouseMoved(BMessage *message, BPoint where,
 									bool isFake);
@@ -38,7 +40,7 @@ public:
 
 private:
 			enum Region {
-				REGION_NONE,
+				REGION_NONE = 0,
 
 				REGION_TAB,
 				REGION_BORDER,
@@ -90,9 +92,6 @@ protected:
 			Desktop*			fDesktop;
 			State*				fState;
 			int32				fLastModifiers;
-			int32				fLastMouseButtons;
-			Region				fLastRegion;
-			int32				fResetClickCount;
 };
 
 

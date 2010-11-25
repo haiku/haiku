@@ -14,6 +14,7 @@
 
 #include "Window.h"
 
+#include "ClickTarget.h"
 #include "Decorator.h"
 #include "DecorManager.h"
 #include "Desktop.h"
@@ -781,14 +782,47 @@ Window::EnableUpdateRequests()
 // #pragma mark -
 
 
-void
-Window::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
-{
-	DesktopSettings desktopSettings(fDesktop);
+/*!	\brief Handles a mouse-down message for the window.
 
-	bool eventEaten = fWindowBehaviour->MouseDown(message, where);
-	if (!eventEaten) {
+	\param message The message.
+	\param where The point where the mouse click happened.
+	\param lastClickTarget The target of the previous click.
+	\param clickCount The number of subsequent, no longer than double-click
+		interval separated clicks that have happened so far. This number doesn't
+		necessarily match the value in the message. It has already been
+		pre-processed in order to avoid erroneous multi-clicks (e.g. when a
+		different button has been used or a different window was targeted). This
+		is an in-out variable. The method can reset the value to 1, if it
+		doesn't want this event handled as a multi-click. Returning a different
+		click target will also make the caller reset the click count.
+	\param _clickTarget Set by the method to a value identifying the clicked
+		element. If not explicitly set, an invalid click target is assumed.
+*/
+void
+Window::MouseDown(BMessage* message, BPoint where,
+	const ClickTarget& lastClickTarget, int32& clickCount,
+	ClickTarget& _clickTarget)
+{
+	// If the previous click hit our decorator, get the hit region.
+	int32 windowToken = fWindow->ServerToken();
+	int32 lastHitRegion = 0;
+	if (lastClickTarget.GetType() == ClickTarget::TYPE_WINDOW_DECORATOR
+		&& lastClickTarget.WindowToken() == windowToken) {
+		lastHitRegion = lastClickTarget.WindowElement();
+	}
+
+	// Let the window behavior process the mouse event.
+	int32 hitRegion = 0;
+	bool eventEaten = fWindowBehaviour->MouseDown(message, where, lastHitRegion,
+		clickCount, hitRegion);
+
+	if (eventEaten) {
+		// click on the decorator (or equivalent)
+		_clickTarget = ClickTarget(ClickTarget::TYPE_WINDOW_DECORATOR,
+			windowToken, (int32)hitRegion);
+	} else {
 		// click was inside the window contents
+		int32 viewToken = B_NULL_TOKEN;
 		if (View* view = ViewAt(where)) {
 			if (HasModal())
 				return;
@@ -801,6 +835,7 @@ Window::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 
 				// Activate or focus the window in case it doesn't accept first
 				// click, depending on the mouse mode
+				DesktopSettings desktopSettings(fDesktop);
 				if (desktopSettings.MouseMode() == B_NORMAL_MOUSE
 					&& !acceptFirstClick)
 					fDesktop->ActivateWindow(this);
@@ -819,9 +854,12 @@ Window::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 			}
 
 			// fill out view token for the view under the mouse
-			*_viewToken = view->Token();
+			viewToken = view->Token();
 			view->MouseDown(message, where);
 		}
+
+		_clickTarget = ClickTarget(ClickTarget::TYPE_WINDOW_CONTENTS,
+			windowToken, viewToken);
 	}
 }
 

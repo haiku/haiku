@@ -27,6 +27,7 @@ namespace BPrivate {
 	class PortLink;
 };
 
+class ClickTarget;
 class ClientLooper;
 class Decorator;
 class Desktop;
@@ -144,7 +145,9 @@ public:
 									int32 xOffset, int32 yOffset);
 
 			void				MouseDown(BMessage* message, BPoint where,
-									int32* _viewToken);
+									const ClickTarget& lastClickTarget,
+									int32& clickCount,
+									ClickTarget& _clickTarget);
 			void				MouseUp(BMessage* message, BPoint where,
 									int32* _viewToken);
 			void				MouseMoved(BMessage* message, BPoint where,

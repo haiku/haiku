@@ -19,6 +19,7 @@
 
 #include <WindowPrivate.h>
 
+#include "ClickTarget.h"
 #include "Desktop.h"
 #include "DrawingEngine.h"
 #include "Window.h"
@@ -120,8 +121,7 @@ struct DefaultWindowBehaviour::MouseTrackingState : State {
 			fMinimizeCheckOnMouseUp = false;
 			if (message->FindInt32("modifiers") == fBehavior.fLastModifiers
 				&& (fWindow->Flags() & B_NOT_MINIMIZABLE) == 0
-				&& system_time() - fLastMoveTime
-					< kWindowActivationTimeout) {
+				&& system_time() - fLastMoveTime < kWindowActivationTimeout) {
 				fWindow->ServerWindow()->NotifyMinimize(true);
 			}
 		}
@@ -629,10 +629,7 @@ DefaultWindowBehaviour::DefaultWindowBehaviour(Window* window)
 	fWindow(window),
 	fDesktop(window->Desktop()),
 	fState(NULL),
-	fLastModifiers(0),
-	fLastMouseButtons(0),
-	fLastRegion(REGION_NONE),
-	fResetClickCount(0)
+	fLastModifiers(0)
 {
 }
 
@@ -644,29 +641,11 @@ DefaultWindowBehaviour::~DefaultWindowBehaviour()
 
 
 bool
-DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where)
+DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where,
+	int32 lastHitRegion, int32& clickCount, int32& _hitRegion)
 {
-	// Get the click count and reset it, if the modifiers changed in the
-	// meantime. Do the same when this is not the button we've seen before.
-	// TODO: At least the modifier check should be done in a better place
-	// (e.g. the input server). It should also reset clicks after mouse
-	// movement (which we don't do here either -- though that's probably
-	// acceptable).
-	int32 clickCount = message->FindInt32("clicks");
-	int32 modifiers = message->FindInt32("modifiers");
+	fLastModifiers = message->FindInt32("modifiers");
 	int32 buttons = message->FindInt32("buttons");
-
-	if (clickCount <= 1) {
-		fResetClickCount = 0;
-	} else if (modifiers != fLastModifiers || buttons != fLastMouseButtons
-		|| clickCount - fResetClickCount < 1) {
-		fResetClickCount = clickCount - 1;
-		clickCount = 1;
-	} else
-		clickCount -= fResetClickCount;
-
-	fLastModifiers = modifiers;
-	fLastMouseButtons = buttons;
 
 	// if a state is active, let it do the job
 	if (fState != NULL)
@@ -683,7 +662,7 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where)
 	if (decorator != NULL)
 		inBorderRegion = decorator->GetFootprint().Contains(where);
 
-	bool windowModifier = _IsWindowModifier(modifiers);
+	bool windowModifier = _IsWindowModifier(fLastModifiers);
 
 	if (windowModifier || inBorderRegion) {
 		// click on the window decorator or we have the window modifier keys
@@ -712,7 +691,7 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where)
 					// tab sliding in any case if either shift key is held down
 					// except sliding up-down by moving mouse left-right would
 					// look strange
-					if ((modifiers & B_SHIFT_KEY) != 0
+					if ((fLastModifiers & B_SHIFT_KEY) != 0
 						&& fWindow->Look() != kLeftTitledWindowLook) {
 						action = ACTION_SLIDE_TAB;
 						break;
@@ -762,21 +741,17 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where)
 		}
 	}
 
-	// The hit region changed since the last the click. Reset the click count.
-	if (hitRegion != fLastRegion) {
-		fLastRegion = hitRegion;
-		clickCount = 1;
-
-		fResetClickCount = message->FindInt32("clicks") - 1;
-		if (fResetClickCount < 0)
-			fResetClickCount = 0;
-	}
+	_hitRegion = (int32)hitRegion;
 
 	if (action == ACTION_NONE) {
 		// No action -- if this is a click inside the window's contents,
 		// let it be forwarded to the window.
 		return inBorderRegion;
 	}
+
+	// reset the click count, if the hit region differs from the previous one
+	if (hitRegion != lastHitRegion)
+		clickCount = 1;
 
 	DesktopSettings desktopSettings(fDesktop);
 	if (!desktopSettings.AcceptFirstClick()) {

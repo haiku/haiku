@@ -36,6 +36,7 @@
 #include <WindowInfo.h>
 
 #include "AppServer.h"
+#include "ClickTarget.h"
 #include "DecorManager.h"
 #include "DesktopSettingsPrivate.h"
 #include "DrawingEngine.h"
@@ -65,6 +66,20 @@
 #endif
 
 
+static inline float
+square_vector_length(float x, float y)
+{
+	return x * x + y * y;
+}
+
+
+static inline float
+square_distance(const BPoint& a, const BPoint& b)
+{
+	return square_vector_length(a.x - b.x, a.y - b.y);
+}
+
+
 class KeyboardFilter : public EventFilter {
 	public:
 		KeyboardFilter(Desktop* desktop);
@@ -83,14 +98,19 @@ class KeyboardFilter : public EventFilter {
 
 
 class MouseFilter : public EventFilter {
-	public:
-		MouseFilter(Desktop* desktop);
+public:
+	MouseFilter(Desktop* desktop);
 
-		virtual filter_result Filter(BMessage* message, EventTarget** _target,
-			int32* _viewToken, BMessage* latestMouseMoved);
+	virtual filter_result Filter(BMessage* message, EventTarget** _target,
+		int32* _viewToken, BMessage* latestMouseMoved);
 
-	private:
-		Desktop*	fDesktop;
+private:
+	Desktop*	fDesktop;
+	int32		fLastClickButtons;
+	int32		fLastClickModifiers;
+	int32		fResetClickCount;
+	BPoint		fLastClickPoint;
+	ClickTarget	fLastClickTarget;
 };
 
 
@@ -218,7 +238,12 @@ KeyboardFilter::RemoveTarget(EventTarget* target)
 
 MouseFilter::MouseFilter(Desktop* desktop)
 	:
-	fDesktop(desktop)
+	fDesktop(desktop),
+	fLastClickButtons(0),
+	fLastClickModifiers(0),
+	fResetClickCount(0),
+	fLastClickPoint(),
+	fLastClickTarget()
 {
 }
 
@@ -248,9 +273,66 @@ MouseFilter::Filter(BMessage* message, EventTarget** _target, int32* _viewToken,
 		// dispatch event to the window
 		switch (message->what) {
 			case B_MOUSE_DOWN:
-				window->MouseDown(message, where, &viewToken);
+			{
+				int32 windowToken = window->ServerWindow()->ServerToken();
+
+				// First approximation of click count validation. We reset the
+				// click count when modifiers or pressed buttons have changed
+				// or when we've got a different click target, or when the
+				// previous click location is too far from the new one. We can
+				// only check the window of the click target here; we'll recheck
+				// after asking the window.
+				int32 modifiers = message->FindInt32("modifiers");
+
+				int32 originalClickCount = message->FindInt32("clicks");
+				if (originalClickCount <= 0)
+					originalClickCount = 1;
+
+				int32 clickCount = originalClickCount;
+				if (clickCount > 1) {
+					if (modifiers != fLastClickModifiers
+						|| buttons != fLastClickButtons
+						|| !fLastClickTarget.IsValid()
+						|| fLastClickTarget.WindowToken() != windowToken
+						|| square_distance(where, fLastClickPoint) >= 16
+						|| clickCount - fResetClickCount < 1) {
+						clickCount = 1;
+					} else
+						clickCount -= fResetClickCount;
+				}
+
+				// notify the window
+				ClickTarget clickTarget;
+				window->MouseDown(message, where, fLastClickTarget, clickCount,
+					clickTarget);
+
+				// If the click target changed, always reset the click count.
+				if (clickCount != 1 && clickTarget != fLastClickTarget)
+					clickCount = 1;
+
+				// update our click count management attributes
+				fResetClickCount = originalClickCount - clickCount;
+				fLastClickTarget = clickTarget;
+				fLastClickButtons = buttons;
+				fLastClickModifiers = modifiers;
+				fLastClickPoint = where;
+
+				// get the view token from the click target
+				if (clickTarget.GetType() == ClickTarget::TYPE_WINDOW_CONTENTS)
+					viewToken = clickTarget.WindowElement();
+
+				// update the message's "clicks" field, if necessary
+				if (clickCount != originalClickCount) {
+					if (message->HasInt32("clicks"))
+						message->ReplaceInt32("clicks", clickCount);
+					else
+						message->AddInt32("clicks", clickCount);
+				}
+
+				// notify desktop listeners
 				fDesktop->NotifyMouseDown(window, message, where);
 				break;
+			}
 
 			case B_MOUSE_UP:
 				window->MouseUp(message, where, &viewToken);
@@ -273,6 +355,13 @@ MouseFilter::Filter(BMessage* message, EventTarget** _target, int32* _viewToken,
 			*_viewToken = viewToken;
 			*_target = &window->EventTarget();
 		}
+	} else if (message->what == B_MOUSE_DOWN) {
+		// the mouse-down didn't hit a window -- reset the click target
+		fResetClickCount = 0;
+		fLastClickTarget = ClickTarget();
+		fLastClickButtons = message->FindInt32("buttons");
+		fLastClickModifiers = message->FindInt32("modifiers");
+		fLastClickPoint = where;
 	}
 
 	if (window == NULL || viewToken == B_NULL_TOKEN) {
