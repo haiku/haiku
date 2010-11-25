@@ -406,79 +406,6 @@ SATDecorator::_LayoutTabItems(const BRect& tabRect)
 }
 
 
-void
-SATDecorator::_DrawTab(BRect invalid)
-{
-	STRACE(("_DrawTab(%.1f,%.1f,%.1f,%.1f)\n",
-			invalid.left, invalid.top, invalid.right, invalid.bottom));
-	// If a window has a tab, this will draw it and any buttons which are
-	// in it.
-	if (!fTabRect.IsValid() || !invalid.Intersects(fTabRect))
-		return;
-
-	// outer frame
-	fDrawingEngine->StrokeLine(fTabRect.LeftTop(), fTabRect.LeftBottom(),
-		fFrameColors[0]);
-	fDrawingEngine->StrokeLine(fTabRect.LeftTop(), fTabRect.RightTop(),
-		fFrameColors[0]);
-	if (fLook != kLeftTitledWindowLook) {
-		fDrawingEngine->StrokeLine(fTabRect.RightTop(), fTabRect.RightBottom(),
-			fFrameColors[5]);
-	} else {
-		fDrawingEngine->StrokeLine(fTabRect.LeftBottom(),
-			fTabRect.RightBottom(), fFrameColors[5]);
-	}
-
-	// bevel
-	fDrawingEngine->StrokeLine(BPoint(fTabRect.left + 1, fTabRect.top + 1),
-		BPoint(fTabRect.left + 1,
-			fTabRect.bottom - (fLook == kLeftTitledWindowLook ? 1 : 0)),
-		fTabColorBevel);
-	fDrawingEngine->StrokeLine(BPoint(fTabRect.left + 1, fTabRect.top + 1),
-		BPoint(fTabRect.right - (fLook == kLeftTitledWindowLook ? 0 : 1),
-			fTabRect.top + 1),
-		fTabColorBevel);
-
-	if (fLook != kLeftTitledWindowLook) {
-		fDrawingEngine->StrokeLine(BPoint(fTabRect.right - 1, fTabRect.top + 2),
-			BPoint(fTabRect.right - 1, fTabRect.bottom), fTabColorShadow);
-	} else {
-		fDrawingEngine->StrokeLine(
-			BPoint(fTabRect.left + 2, fTabRect.bottom - 1),
-			BPoint(fTabRect.right, fTabRect.bottom - 1), fTabColorShadow);
-	}
-
-	// fill
-	BGradientLinear gradient;
-	gradient.SetStart(fTabRect.LeftTop());
-	gradient.AddColor(fTabColorLight, 0);
-	gradient.AddColor(fTabColor, 255);
-
-	if (fLook != kLeftTitledWindowLook) {
-		gradient.SetEnd(fTabRect.LeftBottom());
-		fDrawingEngine->FillRect(BRect(fTabRect.left + 2, fTabRect.top + 2,
-			fTabRect.right - 2, fTabRect.bottom), gradient);
-	} else {
-		gradient.SetEnd(fTabRect.RightTop());
-		fDrawingEngine->FillRect(BRect(fTabRect.left + 2, fTabRect.top + 2,
-			fTabRect.right, fTabRect.bottom - 2), gradient);
-	}
-
-	_DrawTitle(fTabRect);
-
-	// Draw the buttons if we're supposed to
-	if (!(fFlags & B_NOT_CLOSABLE) && invalid.Intersects(fCloseRect))
-		_DrawClose(fCloseRect);
-
-	if (fStackedMode) {
-		if (fStackedDrawZoom && invalid.Intersects(fZoomRect))
-			_DrawZoom(fZoomRect);
-	}
-	else if (!(fFlags & B_NOT_ZOOMABLE) && invalid.Intersects(fZoomRect))
-		_DrawZoom(fZoomRect);
-}
-
-
 bool
 SATDecorator::_SetTabLocation(float location, BRegion* updateRegion)
 {
@@ -535,6 +462,24 @@ SATDecorator::_SetFocus()
 
 	_DoLayout();
 
+}
+
+
+void
+SATDecorator::DrawButtons(const BRect& invalid)
+{
+	// Draw the buttons if we're supposed to
+	if (!(fFlags & B_NOT_CLOSABLE) && invalid.Intersects(fCloseRect))
+		_DrawClose(fCloseRect);
+
+	if (fStackedMode) {
+		// TODO: This should be solved differently. We don't just want to not
+		// draw the button, we actually want it removed. So rather add extra
+		// flags to remove the individual buttons to DefaultDecorator.
+		if (fStackedDrawZoom && invalid.Intersects(fZoomRect))
+			_DrawZoom(fZoomRect);
+	} else if (!(fFlags & B_NOT_ZOOMABLE) && invalid.Intersects(fZoomRect))
+		_DrawZoom(fZoomRect);
 }
 
 

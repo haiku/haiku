@@ -80,6 +80,9 @@ protected:
 									float* offset, float* size,
 									float* inset) const;
 
+	// DefaultDecorator customization points
+	virtual	void				DrawButtons(const BRect& invalid);
+
 private:
 			void				_UpdateFont(DesktopSettings& settings);
  			void				_DrawButtonBitmap(ServerBitmap* bitmap,

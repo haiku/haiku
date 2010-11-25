@@ -655,11 +655,7 @@ DefaultDecorator::_DrawTab(BRect invalid)
 
 	_DrawTitle(fTabRect);
 
-	// Draw the buttons if we're supposed to
-	if (!(fFlags & B_NOT_CLOSABLE) && invalid.Intersects(fCloseRect))
-		_DrawClose(fCloseRect);
-	if (!(fFlags & B_NOT_ZOOMABLE) && invalid.Intersects(fZoomRect))
-		_DrawZoom(fZoomRect);
+	DrawButtons(invalid);
 }
 
 
@@ -1087,6 +1083,17 @@ DefaultDecorator::_GetFootprint(BRegion *region)
 		region->Include(BRect(fFrame.right - knobSize, fFrame.bottom - knobSize,
 			fFrame.right, fFrame.bottom));
 	}
+}
+
+
+void
+DefaultDecorator::DrawButtons(const BRect& invalid)
+{
+	// Draw the buttons if we're supposed to
+	if (!(fFlags & B_NOT_CLOSABLE) && invalid.Intersects(fCloseRect))
+		_DrawClose(fCloseRect);
+	if (!(fFlags & B_NOT_ZOOMABLE) && invalid.Intersects(fZoomRect))
+		_DrawZoom(fZoomRect);
 }
 
 

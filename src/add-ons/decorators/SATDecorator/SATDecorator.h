@@ -56,12 +56,13 @@ public:
 
 protected:
 			void				_DoLayout();
-			void				_DrawTab(BRect r);
 			void				_LayoutTabItems(const BRect& tabRect);
 
 			bool				_SetTabLocation(float location,
 									BRegion* updateRegion = NULL);
 			void				_SetFocus();
+
+	virtual	void				DrawButtons(const BRect& invalid);
 
 private:
 			bool				fTabHighlighted;
