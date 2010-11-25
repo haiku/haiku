@@ -491,7 +491,7 @@ ShowImageView::SetStretchToBounds(bool enable)
 	if (fStretchToBounds != enable) {
 		_SettingsSetBool("StretchToBounds", enable);
 		fStretchToBounds = enable;
-		if (enable)
+		if (enable || fZoom > 1.0)
 			FitToBounds();
 	}
 }
