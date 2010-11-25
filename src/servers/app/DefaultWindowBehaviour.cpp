@@ -70,19 +70,6 @@ struct DefaultWindowBehaviour::State {
 	{
 	}
 
-	void UpdateFFMFocus(bool isFake)
-	{
-		// change focus in FFM mode
-		DesktopSettings desktopSettings(fDesktop);
-		if (desktopSettings.FocusFollowsMouse()
-			&& !fWindow->IsFocus() && !(fWindow->Flags() & B_AVOID_FOCUS)) {
-			// If the mouse move is a fake one, we set the focus to NULL, which
-			// will cause the window that had focus last to retrieve it again - this
-			// makes FFM much nicer to use with the keyboard.
-			fDesktop->SetFocusWindow(isFake ? NULL : fWindow);
-		}
-	}
-
 protected:
 	DefaultWindowBehaviour&	fBehavior;
 	Window*					fWindow;
@@ -184,9 +171,6 @@ struct DefaultWindowBehaviour::MouseTrackingState : State {
 
 		// set the new mouse position
 		fLastMousePosition += delta;
-
-		// update the FFM focus
-		UpdateFFMFocus(isFake);
 	}
 
 	virtual void MouseMovedAction(BPoint& delta, bigtime_t now)
@@ -574,9 +558,6 @@ struct DefaultWindowBehaviour::DecoratorButtonState : State {
 	virtual void MouseMoved(BMessage* message, BPoint where, bool isFake)
 	{
 		_RedrawDecorator(message);
-
-		// update the FFM focus
-		UpdateFFMFocus(isFake);
 	}
 
 private:
@@ -831,6 +812,16 @@ DefaultWindowBehaviour::MouseMoved(BMessage *message, BPoint where, bool isFake)
 {
 	if (fState != NULL)
 		fState->MouseMoved(message, where, isFake);
+
+	// change focus in FFM mode
+	DesktopSettings desktopSettings(fDesktop);
+	if (desktopSettings.FocusFollowsMouse()
+		&& !fWindow->IsFocus() && !(fWindow->Flags() & B_AVOID_FOCUS)) {
+		// If the mouse move is a fake one, we set the focus to NULL, which
+		// will cause the window that had focus last to retrieve it again - this
+		// makes FFM much nicer to use with the keyboard.
+		fDesktop->SetFocusWindow(isFake ? NULL : fWindow);
+	}
 }
 
 
