@@ -1,9 +1,10 @@
 /*
- * Copyright 2010, Haiku.
+ * Copyright 2010, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Clemens Zeidler <haiku@clemens-zeidler.de>
+ *		Ingo Weinhold <ingo_weinhold@gmx.de>
  */
 
 
@@ -26,6 +27,23 @@
 
 
 static const float kResizeKnobSize = 18.0;
+
+static const rgb_color kHighlightFrameColors[6] = {
+	{ 152, 0, 0, 255 },
+	{ 240, 0, 0, 255 },
+	{ 224, 0, 0, 255 },
+	{ 208, 0, 0, 255 },
+	{ 152, 0, 0, 255 },
+	{ 108, 0, 0, 255 }
+};
+
+static const rgb_color kHighlightTabColor	= { 255, 0, 0, 255 };
+static const rgb_color kHighlightTabColorLight = tint_color(kHighlightTabColor,
+	(B_LIGHTEN_MAX_TINT + B_LIGHTEN_2_TINT) / 2);
+static const rgb_color kHighlightTabColorBevel = tint_color(kHighlightTabColor,
+	B_LIGHTEN_2_TINT);
+static const rgb_color kHighlightTabColorShadow = tint_color(kHighlightTabColor,
+	(B_DARKEN_1_TINT + B_NO_TINT) / 2);
 
 
 SATDecorAddOn::SATDecorAddOn(image_id id, const char* name)
@@ -73,40 +91,12 @@ SATDecorator::SATDecorator(DesktopSettings& settings, BRect frame,
 	fStackedTabLength(0)
 {
 	fStackedDrawZoom = IsFocus();
-
-	// all colors are state based
-	fNonHighlightFrameColors[0] = (rgb_color){ 152, 152, 152, 255 };
-	fNonHighlightFrameColors[1] = (rgb_color){ 240, 240, 240, 255 };
-	fNonHighlightFrameColors[2] = (rgb_color){ 152, 152, 152, 255 };
-	fNonHighlightFrameColors[3] = (rgb_color){ 108, 108, 108, 255 };
-
-
-	fHighlightFrameColors[0] = (rgb_color){ 152, 0, 0, 255 };
-	fHighlightFrameColors[1] = (rgb_color){ 240, 0, 0, 255 };
-	fHighlightFrameColors[2] = (rgb_color){ 224, 0, 0, 255 };
-	fHighlightFrameColors[3] = (rgb_color){ 208, 0, 0, 255 };
-	fHighlightFrameColors[4] = (rgb_color){ 152, 0, 0, 255 };
-	fHighlightFrameColors[5] = (rgb_color){ 108, 0, 0, 255 };
-
-	// initial colors
-	fFrameColors[0] = fNonHighlightFrameColors[0];
-	fFrameColors[1] = fNonHighlightFrameColors[1];
-	fFrameColors[4] = fNonHighlightFrameColors[2];
-	fFrameColors[5] = fNonHighlightFrameColors[3];
-
-	fHighlightTabColor = (rgb_color){ 255, 0, 0, 255 };
 }
 
 
 void
 SATDecorator::HighlightTab(bool active, BRegion* dirty)
 {
-	if (active)
-		fTabColor = fHighlightTabColor;
-	else if (IsFocus())
-		fTabColor = fFocusTabColor;
-	else
-		fTabColor = fNonFocusTabColor;
 	dirty->Include(fTabRect);
 	fTabHighlighted = active;
 }
@@ -115,28 +105,8 @@ SATDecorator::HighlightTab(bool active, BRegion* dirty)
 void
 SATDecorator::HighlightBorders(bool active, BRegion* dirty)
 {
-	if (active) {
-		fFrameColors[0] = fHighlightFrameColors[0];
-		fFrameColors[1] = fHighlightFrameColors[1];
-		fFrameColors[2] = fHighlightFrameColors[2];
-		fFrameColors[3] = fHighlightFrameColors[3];
-		fFrameColors[4] = fHighlightFrameColors[4];
-		fFrameColors[5] = fHighlightFrameColors[5];
-	} else if (IsFocus()) {
-		fFrameColors[0] = fNonHighlightFrameColors[0];
-		fFrameColors[1] = fNonHighlightFrameColors[1];
-		fFrameColors[2] = fFocusFrameColors[0];
-		fFrameColors[3] = fFocusFrameColors[1];
-		fFrameColors[4] = fNonHighlightFrameColors[2];
-		fFrameColors[5] = fNonHighlightFrameColors[3];
-	} else {
-		fFrameColors[0] = fNonHighlightFrameColors[0];
-		fFrameColors[1] = fNonHighlightFrameColors[1];
-		fFrameColors[2] = fNonFocusFrameColors[0];
-		fFrameColors[3] = fNonFocusFrameColors[1];
-		fFrameColors[4] = fNonHighlightFrameColors[2];
-		fFrameColors[5] = fNonHighlightFrameColors[3];
-	}
+	dirty->Include(fTabRect);
+		// for the frame lines
 	dirty->Include(fLeftBorder);
 	dirty->Include(fRightBorder);
 	dirty->Include(fTopBorder);
@@ -480,6 +450,62 @@ SATDecorator::DrawButtons(const BRect& invalid)
 			_DrawZoom(fZoomRect);
 	} else if (!(fFlags & B_NOT_ZOOMABLE) && invalid.Intersects(fZoomRect))
 		_DrawZoom(fZoomRect);
+}
+
+
+void
+SATDecorator::GetComponentColors(Region component, ComponentColors _colors)
+{
+	switch (component) {
+		case REGION_TAB:
+			if (fBordersHighlighted) {
+				_colors[COLOR_TAB_FRAME_LIGHT] = kHighlightFrameColors[0];
+				_colors[COLOR_TAB_FRAME_DARK] = kHighlightFrameColors[5];
+			} else {
+				_colors[COLOR_TAB_FRAME_LIGHT] = kFrameColors[0];
+				_colors[COLOR_TAB_FRAME_DARK] = kFrameColors[3];
+			}
+
+			if (fTabHighlighted) {
+				_colors[COLOR_TAB] = kHighlightTabColor;
+				_colors[COLOR_TAB_LIGHT] = kHighlightTabColorLight;
+				_colors[COLOR_TAB_BEVEL] = kHighlightTabColorBevel;
+				_colors[COLOR_TAB_SHADOW] = kHighlightTabColorShadow;
+				_colors[COLOR_TAB_TEXT] = kFocusTextColor;
+			} else if (fButtonFocus) {
+				_colors[COLOR_TAB] = kFocusTabColor;
+				_colors[COLOR_TAB_LIGHT] = kFocusTabColorLight;
+				_colors[COLOR_TAB_BEVEL] = kFocusTabColorBevel;
+				_colors[COLOR_TAB_SHADOW] = kFocusTabColorShadow;
+				_colors[COLOR_TAB_TEXT] = kFocusTextColor;
+			} else {
+				_colors[COLOR_TAB] = kNonFocusTabColor;
+				_colors[COLOR_TAB_LIGHT] = kNonFocusTabColorLight;
+				_colors[COLOR_TAB_BEVEL] = kNonFocusTabColorBevel;
+				_colors[COLOR_TAB_SHADOW] = kNonFocusTabColorShadow;
+				_colors[COLOR_TAB_TEXT] = kNonFocusTextColor;
+			}
+			break;
+
+		case REGION_LEFT_BORDER:
+		case REGION_RIGHT_BORDER:
+		case REGION_TOP_BORDER:
+		case REGION_BOTTOM_BORDER:
+		case REGION_RIGHT_BOTTOM_CORNER:
+		default:
+			if (!fBordersHighlighted) {
+				DefaultDecorator::GetComponentColors(component, _colors);
+				return;
+			}
+
+			_colors[0] = kHighlightFrameColors[0];
+			_colors[1] = kHighlightFrameColors[1];
+			_colors[2] = kHighlightFrameColors[2];
+			_colors[3] = kHighlightFrameColors[3];
+			_colors[4] = kHighlightFrameColors[4];
+			_colors[5] = kHighlightFrameColors[5];
+			break;
+	}
 }
 
 

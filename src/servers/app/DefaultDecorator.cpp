@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Haiku.
+ * Copyright 2001-2010, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -65,32 +65,51 @@ blend_color_value(uint8 a, uint8 b, float position)
 //	#pragma mark -
 
 
+const rgb_color DefaultDecorator::kFrameColors[4] = {
+	{ 152, 152, 152, 255 },
+	{ 240, 240, 240, 255 },
+	{ 152, 152, 152, 255 },
+	{ 108, 108, 108, 255 }
+};
+
+const rgb_color DefaultDecorator::kFocusFrameColors[2] = {
+	{ 224, 224, 224, 255 },
+	{ 208, 208, 208, 255 }
+};
+
+const rgb_color DefaultDecorator::kNonFocusFrameColors[2] = {
+	{ 232, 232, 232, 255 },
+	{ 232, 232, 232, 255 }
+};
+
+
+
 // TODO: get rid of DesktopSettings here, and introduce private accessor
 //	methods to the Decorator base class
 DefaultDecorator::DefaultDecorator(DesktopSettings& settings, BRect rect,
-		window_look look, uint32 flags)
-	: Decorator(settings, rect, look, flags),
+	window_look look, uint32 flags)
+	:
+	Decorator(settings, rect, look, flags),
+	// focus color constants
+	kFocusTabColor(settings.UIColor(B_WINDOW_TAB_COLOR)),
+	kFocusTabColorLight(tint_color(kFocusTabColor,
+ 		(B_LIGHTEN_MAX_TINT + B_LIGHTEN_2_TINT) / 2)),
+	kFocusTabColorBevel(tint_color(kFocusTabColor, B_LIGHTEN_2_TINT)),
+	kFocusTabColorShadow(tint_color(kFocusTabColor,
+ 		(B_DARKEN_1_TINT + B_NO_TINT) / 2)),
+	kFocusTextColor(settings.UIColor(B_WINDOW_TEXT_COLOR)),
+	// non-focus color constants
+	kNonFocusTabColor(settings.UIColor(B_WINDOW_INACTIVE_TAB_COLOR)),
+	kNonFocusTabColorLight(tint_color(kNonFocusTabColor,
+ 		(B_LIGHTEN_MAX_TINT + B_LIGHTEN_2_TINT) / 2)),
+	kNonFocusTabColorBevel(tint_color(kNonFocusTabColor, B_LIGHTEN_2_TINT)),
+	kNonFocusTabColorShadow(tint_color(kNonFocusTabColor,
+ 		(B_DARKEN_1_TINT + B_NO_TINT) / 2)),
+	kNonFocusTextColor(settings.UIColor(B_WINDOW_INACTIVE_TEXT_COLOR)),
 	fTabOffset(0),
 	fTabLocation(0.0)
 {
 	_UpdateFont(settings);
-
-	// common colors to both focus and non focus state
-	fFrameColors[0] = (rgb_color){ 152, 152, 152, 255 };
-	fFrameColors[1] = (rgb_color){ 240, 240, 240, 255 };
-	fFrameColors[4] = (rgb_color){ 152, 152, 152, 255 };
-	fFrameColors[5] = (rgb_color){ 108, 108, 108, 255 };
-
-	// state based colors
-	fFocusFrameColors[0] = (rgb_color){ 224, 224, 224, 255 };
-	fFocusFrameColors[1] = (rgb_color){ 208, 208, 208, 255 };
-	fNonFocusFrameColors[0] = (rgb_color){ 232, 232, 232, 255 };
-	fNonFocusFrameColors[1] = fNonFocusFrameColors[0];
-
-	fFocusTabColor = settings.UIColor(B_WINDOW_TAB_COLOR);
-	fFocusTextColor = settings.UIColor(B_WINDOW_TEXT_COLOR);
-	fNonFocusTabColor = settings.UIColor(B_WINDOW_INACTIVE_TAB_COLOR);
-	fNonFocusTextColor = settings.UIColor(B_WINDOW_INACTIVE_TEXT_COLOR);
 
 	fCloseBitmaps[0] = fCloseBitmaps[1] = fCloseBitmaps[2] = fCloseBitmaps[3]
 		= fZoomBitmaps[0] = fZoomBitmaps[1] = fZoomBitmaps[2] = fZoomBitmaps[3]
@@ -418,9 +437,12 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 		{
 			// top
 			if (invalid.Intersects(fTopBorder)) {
+				ComponentColors colors;
+				GetComponentColors(REGION_TOP_BORDER, colors);
+
 				for (int8 i = 0; i < 5; i++) {
 					fDrawingEngine->StrokeLine(BPoint(r.left + i, r.top + i),
-						BPoint(r.right - i, r.top + i), fFrameColors[i]);
+						BPoint(r.right - i, r.top + i), colors[i]);
 				}
 				if (fTabRect.IsValid()) {
 					// grey along the bottom of the tab
@@ -428,30 +450,39 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 					fDrawingEngine->StrokeLine(
 						BPoint(fTabRect.left + 2, fTabRect.bottom + 1),
 						BPoint(fTabRect.right - 2, fTabRect.bottom + 1),
-						fFrameColors[2]);
+						colors[2]);
 				}
 			}
 			// left
 			if (invalid.Intersects(fLeftBorder.InsetByCopy(0, -fBorderWidth))) {
+				ComponentColors colors;
+				GetComponentColors(REGION_LEFT_BORDER, colors);
+
 				for (int8 i = 0; i < 5; i++) {
 					fDrawingEngine->StrokeLine(BPoint(r.left + i, r.top + i),
-						BPoint(r.left + i, r.bottom - i), fFrameColors[i]);
+						BPoint(r.left + i, r.bottom - i), colors[i]);
 				}
 			}
 			// bottom
 			if (invalid.Intersects(fBottomBorder)) {
+				ComponentColors colors;
+				GetComponentColors(REGION_BOTTOM_BORDER, colors);
+
 				for (int8 i = 0; i < 5; i++) {
 					fDrawingEngine->StrokeLine(BPoint(r.left + i, r.bottom - i),
 						BPoint(r.right - i, r.bottom - i),
-						fFrameColors[(4 - i) == 4 ? 5 : (4 - i)]);
+						colors[(4 - i) == 4 ? 5 : (4 - i)]);
 				}
 			}
 			// right
 			if (invalid.Intersects(fRightBorder.InsetByCopy(0, -fBorderWidth))) {
+				ComponentColors colors;
+				GetComponentColors(REGION_RIGHT_BORDER, colors);
+
 				for (int8 i = 0; i < 5; i++) {
 					fDrawingEngine->StrokeLine(BPoint(r.right - i, r.top + i),
 						BPoint(r.right - i, r.bottom - i),
-						fFrameColors[(4 - i) == 4 ? 5 : (4 - i)]);
+						colors[(4 - i) == 4 ? 5 : (4 - i)]);
 				}
 			}
 			break;
@@ -462,9 +493,12 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 		{
 			// top
 			if (invalid.Intersects(fTopBorder)) {
+				ComponentColors colors;
+				GetComponentColors(REGION_TOP_BORDER, colors);
+
 				for (int8 i = 0; i < 3; i++) {
 					fDrawingEngine->StrokeLine(BPoint(r.left + i, r.top + i),
-						BPoint(r.right - i, r.top + i), fFrameColors[i * 2]);
+						BPoint(r.right - i, r.top + i), colors[i * 2]);
 				}
 				if (fTabRect.IsValid() && fLook != kLeftTitledWindowLook) {
 					// grey along the bottom of the tab
@@ -472,14 +506,17 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 					fDrawingEngine->StrokeLine(
 						BPoint(fTabRect.left + 2, fTabRect.bottom + 1),
 						BPoint(fTabRect.right - 2, fTabRect.bottom + 1),
-						fFrameColors[2]);
+						colors[2]);
 				}
 			}
 			// left
 			if (invalid.Intersects(fLeftBorder.InsetByCopy(0, -fBorderWidth))) {
+				ComponentColors colors;
+				GetComponentColors(REGION_LEFT_BORDER, colors);
+
 				for (int8 i = 0; i < 3; i++) {
 					fDrawingEngine->StrokeLine(BPoint(r.left + i, r.top + i),
-						BPoint(r.left + i, r.bottom - i), fFrameColors[i * 2]);
+						BPoint(r.left + i, r.bottom - i), colors[i * 2]);
 				}
 				if (fLook == kLeftTitledWindowLook && fTabRect.IsValid()) {
 					// grey along the right side of the tab
@@ -487,31 +524,43 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 					fDrawingEngine->StrokeLine(
 						BPoint(fTabRect.right + 1, fTabRect.top + 2),
 						BPoint(fTabRect.right + 1, fTabRect.bottom - 2),
-						fFrameColors[2]);
+						colors[2]);
 				}
 			}
 			// bottom
 			if (invalid.Intersects(fBottomBorder)) {
+				ComponentColors colors;
+				GetComponentColors(REGION_BOTTOM_BORDER, colors);
+
 				for (int8 i = 0; i < 3; i++) {
 					fDrawingEngine->StrokeLine(BPoint(r.left + i, r.bottom - i),
 						BPoint(r.right - i, r.bottom - i),
-						fFrameColors[(2 - i) == 2 ? 5 : (2 - i) * 2]);
+						colors[(2 - i) == 2 ? 5 : (2 - i) * 2]);
 				}
 			}
 			// right
 			if (invalid.Intersects(fRightBorder.InsetByCopy(0, -fBorderWidth))) {
+				ComponentColors colors;
+				GetComponentColors(REGION_RIGHT_BORDER, colors);
+
 				for (int8 i = 0; i < 3; i++) {
 					fDrawingEngine->StrokeLine(BPoint(r.right - i, r.top + i),
 						BPoint(r.right - i, r.bottom - i),
-						fFrameColors[(2 - i) == 2 ? 5 : (2 - i) * 2]);
+						colors[(2 - i) == 2 ? 5 : (2 - i) * 2]);
 				}
 			}
 			break;
 		}
 
 		case B_BORDERED_WINDOW_LOOK:
-			fDrawingEngine->StrokeRect(r, fFrameColors[5]);
+		{
+			// TODO: Draw the borders individually!
+			ComponentColors colors;
+			GetComponentColors(REGION_LEFT_BORDER, colors);
+
+			fDrawingEngine->StrokeRect(r, colors[5]);
 			break;
+		}
 
 		default:
 			// don't draw a border frame
@@ -521,6 +570,9 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 	// Draw the resize knob if we're supposed to
 	if (!(fFlags & B_NOT_RESIZABLE)) {
 		r = fResizeRect;
+
+		ComponentColors colors;
+		GetComponentColors(REGION_RIGHT_BOTTOM_CORNER, colors);
 
 		switch (fLook) {
 			case B_DOCUMENT_WINDOW_LOOK:
@@ -536,19 +588,19 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 				BGradientLinear gradient;
 				gradient.SetStart(bg.LeftTop());
 				gradient.SetEnd(bg.RightBottom());
-				gradient.AddColor(fFrameColors[1], 0);
-				gradient.AddColor(fFrameColors[2], 255);
+				gradient.AddColor(colors[1], 0);
+				gradient.AddColor(colors[2], 255);
 
 				fDrawingEngine->FillRect(bg, gradient);
 
 				fDrawingEngine->StrokeLine(BPoint(x - 15, y - 15),
-					BPoint(x - 15, y - 2), fFrameColors[0]);
+					BPoint(x - 15, y - 2), colors[0]);
 				fDrawingEngine->StrokeLine(BPoint(x - 14, y - 14),
-					BPoint(x - 14, y - 1), fFrameColors[1]);
+					BPoint(x - 14, y - 1), colors[1]);
 				fDrawingEngine->StrokeLine(BPoint(x - 15, y - 15),
-					BPoint(x - 2, y - 15), fFrameColors[0]);
+					BPoint(x - 2, y - 15), colors[0]);
 				fDrawingEngine->StrokeLine(BPoint(x - 14, y - 14),
-					BPoint(x - 1, y - 14), fFrameColors[1]);
+					BPoint(x - 1, y - 14), colors[1]);
 
 				if (!IsFocus())
 					break;
@@ -559,7 +611,7 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 					for (int8 j = 1; j <= i; j++) {
 						BPoint pt1(x - (3 * j) + 1, y - (3 * (5 - i)) + 1);
 						BPoint pt2(x - (3 * j) + 2, y - (3 * (5 - i)) + 2);
-						fDrawingEngine->StrokePoint(pt1, fFrameColors[0]);
+						fDrawingEngine->StrokePoint(pt1, colors[0]);
 						fDrawingEngine->StrokePoint(pt2, kWhite);
 					}
 				}
@@ -579,11 +631,11 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 				fDrawingEngine->StrokeLine(
 					BPoint(fRightBorder.left, fBottomBorder.bottom - kBorderResizeLength),
 					BPoint(fRightBorder.right - 1, fBottomBorder.bottom - kBorderResizeLength),
-					fFrameColors[0]);
+					colors[0]);
 				fDrawingEngine->StrokeLine(
 					BPoint(fRightBorder.right - kBorderResizeLength, fBottomBorder.top),
 					BPoint(fRightBorder.right - kBorderResizeLength, fBottomBorder.bottom - 1),
-					fFrameColors[0]);
+					colors[0]);
 				break;
 			}
 
@@ -605,43 +657,48 @@ DefaultDecorator::_DrawTab(BRect invalid)
 	if (!fTabRect.IsValid() || !invalid.Intersects(fTabRect))
 		return;
 
+	ComponentColors colors;
+	GetComponentColors(REGION_TAB, colors);
+
 	// outer frame
 	fDrawingEngine->StrokeLine(fTabRect.LeftTop(), fTabRect.LeftBottom(),
-		fFrameColors[0]);
+		colors[COLOR_TAB_FRAME_LIGHT]);
 	fDrawingEngine->StrokeLine(fTabRect.LeftTop(), fTabRect.RightTop(),
-		fFrameColors[0]);
+		colors[COLOR_TAB_FRAME_LIGHT]);
 	if (fLook != kLeftTitledWindowLook) {
 		fDrawingEngine->StrokeLine(fTabRect.RightTop(), fTabRect.RightBottom(),
-			fFrameColors[5]);
+			colors[COLOR_TAB_FRAME_DARK]);
 	} else {
 		fDrawingEngine->StrokeLine(fTabRect.LeftBottom(),
-			fTabRect.RightBottom(), fFrameColors[5]);
+			fTabRect.RightBottom(), colors[COLOR_TAB_FRAME_DARK]);
 	}
 
 	// bevel
 	fDrawingEngine->StrokeLine(BPoint(fTabRect.left + 1, fTabRect.top + 1),
 		BPoint(fTabRect.left + 1,
 			fTabRect.bottom - (fLook == kLeftTitledWindowLook ? 1 : 0)),
-		fTabColorBevel);
+		colors[COLOR_TAB_BEVEL]);
 	fDrawingEngine->StrokeLine(BPoint(fTabRect.left + 1, fTabRect.top + 1),
 		BPoint(fTabRect.right - (fLook == kLeftTitledWindowLook ? 0 : 1),
 			fTabRect.top + 1),
-		fTabColorBevel);
+		colors[COLOR_TAB_BEVEL]);
 
 	if (fLook != kLeftTitledWindowLook) {
 		fDrawingEngine->StrokeLine(BPoint(fTabRect.right - 1, fTabRect.top + 2),
-			BPoint(fTabRect.right - 1, fTabRect.bottom), fTabColorShadow);
+			BPoint(fTabRect.right - 1, fTabRect.bottom),
+			colors[COLOR_TAB_SHADOW]);
 	} else {
 		fDrawingEngine->StrokeLine(
 			BPoint(fTabRect.left + 2, fTabRect.bottom - 1),
-			BPoint(fTabRect.right, fTabRect.bottom - 1), fTabColorShadow);
+			BPoint(fTabRect.right, fTabRect.bottom - 1),
+			colors[COLOR_TAB_SHADOW]);
 	}
 
 	// fill
 	BGradientLinear gradient;
 	gradient.SetStart(fTabRect.LeftTop());
-	gradient.AddColor(fTabColorLight, 0);
-	gradient.AddColor(fTabColor, 255);
+	gradient.AddColor(colors[COLOR_TAB_LIGHT], 0);
+	gradient.AddColor(colors[COLOR_TAB], 255);
 
 	if (fLook != kLeftTitledWindowLook) {
 		gradient.SetEnd(fTabRect.LeftBottom());
@@ -682,8 +739,11 @@ DefaultDecorator::_DrawTitle(BRect r)
 {
 	STRACE(("_DrawTitle(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
 
+	ComponentColors colors;
+	GetComponentColors(REGION_TAB, colors);
+
 	fDrawingEngine->SetDrawingMode(B_OP_OVER);
-	fDrawingEngine->SetHighColor(fTextColor);
+	fDrawingEngine->SetHighColor(colors[COLOR_TAB_TEXT]);
 	fDrawingEngine->SetFont(fDrawState.Font());
 
 	// figure out position of text
@@ -812,30 +872,9 @@ DefaultDecorator::_SetFlags(uint32 flags, BRegion* updateRegion)
 void
 DefaultDecorator::_SetFocus()
 {
-	// SetFocus() performs necessary duties for color swapping and
-	// other things when a window is deactivated or activated.
-
-	if (IsFocus()
+	fButtonFocus = IsFocus()
 		|| ((fLook == B_FLOATING_WINDOW_LOOK || fLook == kLeftTitledWindowLook)
-			&& (fFlags & B_AVOID_FOCUS) != 0)) {
-		fTabColor = fFocusTabColor;
-		fTextColor = fFocusTextColor;
-		fFrameColors[2] = fFocusFrameColors[0];
-		fFrameColors[3] = fFocusFrameColors[1];
-		fButtonFocus = true;
-	} else {
-		fTabColor = fNonFocusTabColor;
-		fTextColor = fNonFocusTextColor;
-		fFrameColors[2] = fNonFocusFrameColors[0];
-		fFrameColors[3] = fNonFocusFrameColors[1];
-		fButtonFocus = false;
-	}
-
-	fTabColorBevel = tint_color(fTabColor,
-		(B_LIGHTEN_MAX_TINT + B_LIGHTEN_2_TINT) / 2);
-	fTabColorLight = tint_color(fTabColor, B_LIGHTEN_2_TINT);
-	fTabColorShadow = tint_color(fTabColor,
-		(B_DARKEN_1_TINT + B_NO_TINT) / 2);
+			&& (fFlags & B_AVOID_FOCUS) != 0);
 }
 
 
@@ -1097,6 +1136,59 @@ DefaultDecorator::DrawButtons(const BRect& invalid)
 }
 
 
+/*!	Returns the frame colors for the specified decorator component.
+
+	The meaning of the color array elements depends on the specified component.
+	For some components some array elements are unused.
+
+	\param region The region for which to return the frame colors.
+	\param colors An array of colors to be initialized by the function.
+*/
+void
+DefaultDecorator::GetComponentColors(Region component, ComponentColors _colors)
+{
+	switch (component) {
+		case REGION_TAB:
+			_colors[COLOR_TAB_FRAME_LIGHT] = kFrameColors[0];
+			_colors[COLOR_TAB_FRAME_DARK] = kFrameColors[3];
+			if (fButtonFocus) {
+				_colors[COLOR_TAB] = kFocusTabColor;
+				_colors[COLOR_TAB_LIGHT] = kFocusTabColorLight;
+				_colors[COLOR_TAB_BEVEL] = kFocusTabColorBevel;
+				_colors[COLOR_TAB_SHADOW] = kFocusTabColorShadow;
+				_colors[COLOR_TAB_TEXT] = kFocusTextColor;
+			} else {
+				_colors[COLOR_TAB] = kNonFocusTabColor;
+				_colors[COLOR_TAB_LIGHT] = kNonFocusTabColorLight;
+				_colors[COLOR_TAB_BEVEL] = kNonFocusTabColorBevel;
+				_colors[COLOR_TAB_SHADOW] = kNonFocusTabColorShadow;
+				_colors[COLOR_TAB_TEXT] = kNonFocusTextColor;
+			}
+			break;
+
+		case REGION_LEFT_BORDER:
+		case REGION_RIGHT_BORDER:
+		case REGION_TOP_BORDER:
+		case REGION_BOTTOM_BORDER:
+		case REGION_RIGHT_BOTTOM_CORNER:
+		default:
+			// common colors to both focus and non focus state
+			_colors[0] = kFrameColors[0];
+			_colors[1] = kFrameColors[1];
+			if (fButtonFocus) {
+				_colors[2] = kFocusFrameColors[0];
+				_colors[3] = kFocusFrameColors[1];
+			} else {
+				_colors[2] = kNonFocusFrameColors[0];
+				_colors[3] = kNonFocusFrameColors[1];
+			}
+			_colors[4] = kFrameColors[2];
+			_colors[5] = kFrameColors[3];
+			break;
+	}
+}
+
+
 void
 DefaultDecorator::_UpdateFont(DesktopSettings& settings)
 {
@@ -1137,12 +1229,16 @@ void
 DefaultDecorator::_DrawBlendedRect(DrawingEngine* engine, BRect rect,
 	bool down, bool focus)
 {
+	ComponentColors colors;
+	GetComponentColors(REGION_TAB, colors);
+
 	// figure out which colors to use
 	rgb_color startColor, endColor;
-	rgb_color tabColor = focus ? fFocusTabColor : fNonFocusTabColor;
+	rgb_color tabColor = focus ? kFocusTabColor : kNonFocusTabColor;
+		// TODO: Use GetComponentColors() only!
 	if (down) {
 		startColor = tint_color(tabColor, B_DARKEN_1_TINT);
-		endColor = fTabColorLight;
+		endColor = colors[COLOR_TAB_LIGHT];
 	} else {
 		startColor = tint_color(tabColor, B_LIGHTEN_MAX_TINT);
 		endColor = tabColor;
@@ -1273,8 +1369,8 @@ DefaultDecorator::_GetBitmapForButton(Region item, bool down, bool focus,
 		if (current->item == item && current->down == down
 			&& current->focus == focus && current->width == width
 			&& current->height == height
-			&& current->focusColor == object->fFocusTabColor
-			&& current->nonFocusColor == object->fNonFocusTabColor) {
+			&& current->focusColor == object->kFocusTabColor
+			&& current->nonFocusColor == object->kNonFocusTabColor) {
 			return current->bitmap;
 		}
 
@@ -1343,8 +1439,8 @@ DefaultDecorator::_GetBitmapForButton(Region item, bool down, bool focus,
 	entry->width = width;
 	entry->height = height;
 	entry->bitmap = bitmap;
-	entry->focusColor = object->fFocusTabColor;
-	entry->nonFocusColor = object->fNonFocusTabColor;
+	entry->focusColor = object->kFocusTabColor;
+	entry->nonFocusColor = object->kNonFocusTabColor;
 	entry->next = sBitmapList;
 	sBitmapList = entry;
 	return bitmap;

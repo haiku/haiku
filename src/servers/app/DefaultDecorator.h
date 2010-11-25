@@ -1,11 +1,12 @@
 /*
- * Copyright 2001-2010, Haiku.
+ * Copyright 2001-2010, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Clemens Zeidler <haiku@clemens-zeidler.de>
+ *		Ingo Weinhold <ingo_weinhold@gmx.de>
  */
 #ifndef DEFAULT_DECORATOR_H
 #define DEFAULT_DECORATOR_H
@@ -41,6 +42,19 @@ public:
 
 			float				BorderWidth();
 			float				TabHeight();
+
+protected:
+			enum {
+				COLOR_TAB_FRAME_LIGHT	= 0,
+				COLOR_TAB_FRAME_DARK	= 1,
+				COLOR_TAB				= 2,
+				COLOR_TAB_LIGHT			= 3,
+				COLOR_TAB_BEVEL			= 4,
+				COLOR_TAB_SHADOW		= 5,
+				COLOR_TAB_TEXT			= 6
+			};
+
+			typedef rgb_color ComponentColors[7];
 
 protected:
 	virtual void				_DoLayout();
@@ -82,6 +96,8 @@ protected:
 
 	// DefaultDecorator customization points
 	virtual	void				DrawButtons(const BRect& invalid);
+	virtual	void				GetComponentColors(Region component,
+									ComponentColors _colors);
 
 private:
 			void				_UpdateFont(DesktopSettings& settings);
@@ -96,22 +112,21 @@ private:
 									DefaultDecorator* object);
 
 protected:
-			rgb_color			fButtonHighColor;
-			rgb_color			fButtonLowColor;
-			rgb_color			fTabColor;
-			rgb_color			fFocusTabColor;
-			rgb_color			fNonFocusTabColor;
-			rgb_color			fTextColor;
-			rgb_color			fFocusTextColor;
-			rgb_color			fNonFocusTextColor;
+	static	const rgb_color		kFrameColors[4];
+	static	const rgb_color		kFocusFrameColors[2];
+	static	const rgb_color		kNonFocusFrameColors[2];
 
-			rgb_color			fTabColorLight;
-			rgb_color			fTabColorBevel;
-			rgb_color			fTabColorShadow;
+			const rgb_color		kFocusTabColor;
+			const rgb_color		kFocusTabColorLight;
+			const rgb_color		kFocusTabColorBevel;
+			const rgb_color		kFocusTabColorShadow;
+			const rgb_color		kFocusTextColor;
 
-			rgb_color			fFrameColors[6];
-			rgb_color			fFocusFrameColors[2];
-			rgb_color			fNonFocusFrameColors[2];
+			const rgb_color		kNonFocusTabColor;
+			const rgb_color		kNonFocusTabColorLight;
+			const rgb_color		kNonFocusTabColorBevel;
+			const rgb_color		kNonFocusTabColorShadow;
+			const rgb_color		kNonFocusTextColor;
 
 			bool				fButtonFocus;
 			ServerBitmap*		fCloseBitmaps[4];

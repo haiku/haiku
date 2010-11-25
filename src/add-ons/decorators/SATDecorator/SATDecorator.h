@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Haiku.
+ * Copyright 2010, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -63,13 +63,12 @@ protected:
 			void				_SetFocus();
 
 	virtual	void				DrawButtons(const BRect& invalid);
+	virtual	void				GetComponentColors(Region component,
+									ComponentColors _colors);
 
 private:
 			bool				fTabHighlighted;
 			bool				fBordersHighlighted;
-			rgb_color			fHighlightTabColor;
-			rgb_color			fNonHighlightFrameColors[4];
-			rgb_color			fHighlightFrameColors[6];
 
 			bool				fStackedMode;
 			bool				fStackedDrawZoom;
