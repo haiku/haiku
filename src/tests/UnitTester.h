@@ -1,18 +1,26 @@
-#ifndef __unit_tester_helper_h__
-#define __unit_tester_helper_h__
+/*
+ * Copyright 2002-2010, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
+#ifndef UNIT_TESTER_SHELL_H
+#define UNIT_TESTER_SHELL_H
+
 
 #include <TestShell.h>
+
 #include <string>
+
 
 class UnitTesterShell : public BTestShell {
 public:
-	UnitTesterShell(const string &description = "", SyncObject *syncObject = 0);
+								UnitTesterShell(const string &description = "",
+									SyncObject *syncObject = 0);
+
 protected:
-	virtual void PrintDescription(int argc, char *argv[]);
-	virtual void PrintValidArguments();
-	virtual void LoadDynamicSuites();
+	virtual	void				PrintDescription(int argc, char *argv[]);
+	virtual	void				PrintValidArguments();
+	virtual	void				LoadDynamicSuites();
 };
 
-//extern UnitTesterShell shell;
 
-#endif // __unit_tester_helper_h__
+#endif // UNIT_TESTER_SHELL_H
