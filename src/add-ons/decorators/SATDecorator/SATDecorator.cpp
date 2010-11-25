@@ -105,8 +105,6 @@ SATDecorator::HighlightTab(bool active, BRegion* dirty)
 void
 SATDecorator::HighlightBorders(bool active, BRegion* dirty)
 {
-	dirty->Include(fTabRect);
-		// for the frame lines
 	dirty->Include(fLeftBorder);
 	dirty->Include(fRightBorder);
 	dirty->Include(fTopBorder);
@@ -458,33 +456,18 @@ SATDecorator::GetComponentColors(Region component, ComponentColors _colors)
 {
 	switch (component) {
 		case REGION_TAB:
-			if (fBordersHighlighted) {
-				_colors[COLOR_TAB_FRAME_LIGHT] = kHighlightFrameColors[0];
-				_colors[COLOR_TAB_FRAME_DARK] = kHighlightFrameColors[5];
-			} else {
-				_colors[COLOR_TAB_FRAME_LIGHT] = kFrameColors[0];
-				_colors[COLOR_TAB_FRAME_DARK] = kFrameColors[3];
+			if (!fTabHighlighted) {
+				DefaultDecorator::GetComponentColors(component, _colors);
+				return;
 			}
 
-			if (fTabHighlighted) {
-				_colors[COLOR_TAB] = kHighlightTabColor;
-				_colors[COLOR_TAB_LIGHT] = kHighlightTabColorLight;
-				_colors[COLOR_TAB_BEVEL] = kHighlightTabColorBevel;
-				_colors[COLOR_TAB_SHADOW] = kHighlightTabColorShadow;
-				_colors[COLOR_TAB_TEXT] = kFocusTextColor;
-			} else if (fButtonFocus) {
-				_colors[COLOR_TAB] = kFocusTabColor;
-				_colors[COLOR_TAB_LIGHT] = kFocusTabColorLight;
-				_colors[COLOR_TAB_BEVEL] = kFocusTabColorBevel;
-				_colors[COLOR_TAB_SHADOW] = kFocusTabColorShadow;
-				_colors[COLOR_TAB_TEXT] = kFocusTextColor;
-			} else {
-				_colors[COLOR_TAB] = kNonFocusTabColor;
-				_colors[COLOR_TAB_LIGHT] = kNonFocusTabColorLight;
-				_colors[COLOR_TAB_BEVEL] = kNonFocusTabColorBevel;
-				_colors[COLOR_TAB_SHADOW] = kNonFocusTabColorShadow;
-				_colors[COLOR_TAB_TEXT] = kNonFocusTextColor;
-			}
+			_colors[COLOR_TAB_FRAME_LIGHT] = kFrameColors[0];
+			_colors[COLOR_TAB_FRAME_DARK] = kFrameColors[3];
+			_colors[COLOR_TAB] = kHighlightTabColor;
+			_colors[COLOR_TAB_LIGHT] = kHighlightTabColorLight;
+			_colors[COLOR_TAB_BEVEL] = kHighlightTabColorBevel;
+			_colors[COLOR_TAB_SHADOW] = kHighlightTabColorShadow;
+			_colors[COLOR_TAB_TEXT] = kFocusTextColor;
 			break;
 
 		case REGION_LEFT_BORDER:
