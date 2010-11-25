@@ -44,6 +44,20 @@ public:
 			float				TabHeight();
 
 protected:
+			enum Component {
+				COMPONENT_TAB,
+
+				COMPONENT_CLOSE_BUTTON,
+				COMPONENT_ZOOM_BUTTON,
+
+				COMPONENT_LEFT_BORDER,
+				COMPONENT_RIGHT_BORDER,
+				COMPONENT_TOP_BORDER,
+				COMPONENT_BOTTOM_BORDER,
+
+				COMPONENT_RESIZE_CORNER
+			};
+
 			enum {
 				COLOR_TAB_FRAME_LIGHT	= 0,
 				COLOR_TAB_FRAME_DARK	= 1,
@@ -96,7 +110,7 @@ protected:
 
 	// DefaultDecorator customization points
 	virtual	void				DrawButtons(const BRect& invalid);
-	virtual	void				GetComponentColors(Region component,
+	virtual	void				GetComponentColors(Component component,
 									ComponentColors _colors);
 
 private:
@@ -107,7 +121,7 @@ private:
 									BRect rect, bool down, bool focus);
 			void				_LayoutTabItems(const BRect& tabRect);
 			void 				_InvalidateBitmaps();
-	static	ServerBitmap*		_GetBitmapForButton(Region item, bool down,
+	static	ServerBitmap*		_GetBitmapForButton(Component item, bool down,
 									bool focus, int32 width, int32 height,
 									DefaultDecorator* object);
 

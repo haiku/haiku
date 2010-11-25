@@ -63,7 +63,7 @@ protected:
 			void				_SetFocus();
 
 	virtual	void				DrawButtons(const BRect& invalid);
-	virtual	void				GetComponentColors(Region component,
+	virtual	void				GetComponentColors(Component component,
 									ComponentColors _colors);
 
 private:

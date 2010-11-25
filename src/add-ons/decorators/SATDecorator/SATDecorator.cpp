@@ -452,10 +452,10 @@ SATDecorator::DrawButtons(const BRect& invalid)
 
 
 void
-SATDecorator::GetComponentColors(Region component, ComponentColors _colors)
+SATDecorator::GetComponentColors(Component component, ComponentColors _colors)
 {
 	switch (component) {
-		case REGION_TAB:
+		case COMPONENT_TAB:
 			if (!fTabHighlighted) {
 				DefaultDecorator::GetComponentColors(component, _colors);
 				return;
@@ -470,11 +470,11 @@ SATDecorator::GetComponentColors(Region component, ComponentColors _colors)
 			_colors[COLOR_TAB_TEXT] = kFocusTextColor;
 			break;
 
-		case REGION_LEFT_BORDER:
-		case REGION_RIGHT_BORDER:
-		case REGION_TOP_BORDER:
-		case REGION_BOTTOM_BORDER:
-		case REGION_RIGHT_BOTTOM_CORNER:
+		case COMPONENT_LEFT_BORDER:
+		case COMPONENT_RIGHT_BORDER:
+		case COMPONENT_TOP_BORDER:
+		case COMPONENT_BOTTOM_BORDER:
+		case COMPONENT_RESIZE_CORNER:
 		default:
 			if (!fBordersHighlighted) {
 				DefaultDecorator::GetComponentColors(component, _colors);
