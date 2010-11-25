@@ -6,6 +6,7 @@
  *		Clemens Zeidler <haiku@clemens-zeidler.de>
  */
 
+
 #include "SATDecorator.h"
 
 #include <new>
@@ -468,7 +469,7 @@ SATDecorator::_DrawTab(BRect invalid)
 	// Draw the buttons if we're supposed to
 	if (!(fFlags & B_NOT_CLOSABLE) && invalid.Intersects(fCloseRect))
 		_DrawClose(fCloseRect);
-	
+
 	if (fStackedMode) {
 		if (fStackedDrawZoom && invalid.Intersects(fZoomRect))
 			_DrawZoom(fZoomRect);
@@ -541,4 +542,3 @@ extern "C" DecorAddOn* (instantiate_decor_addon)(image_id id, const char* name)
 {
 	return new (std::nothrow)SATDecorAddOn(id, name);
 }
-
