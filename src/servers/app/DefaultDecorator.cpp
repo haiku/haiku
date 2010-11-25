@@ -85,7 +85,6 @@ DefaultDecorator::DefaultDecorator(DesktopSettings& settings, BRect rect,
 	fFocusFrameColors[0] = (rgb_color){ 224, 224, 224, 255 };
 	fFocusFrameColors[1] = (rgb_color){ 208, 208, 208, 255 };
 	fNonFocusFrameColors[0] = (rgb_color){ 232, 232, 232, 255 };
-	fNonFocusFrameColors[1] = (rgb_color){ 216, 216, 216, 255 };
 	fNonFocusFrameColors[1] = fNonFocusFrameColors[0];
 
 	fFocusTabColor = settings.UIColor(B_WINDOW_TAB_COLOR);
