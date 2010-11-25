@@ -4412,7 +4412,7 @@ BView::MessageReceived(BMessage* msg)
 				}
 			}
 			break;
-		case 2:
+		case 3:
 			err = replyMsg.AddInt32("result", CountChildren());
 			break;
 		default:
