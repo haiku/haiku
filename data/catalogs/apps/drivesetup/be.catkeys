@@ -1,0 +1,76 @@
+1	belarusian	x-vnd.Haiku-DriveSetup	1943527736
+Delete	MainWindow		Выдаліць
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Сапрўды жадаеце запісаць змены на дыск?\n\nУсе данные на абраным падзеле будуць беззваротна згублены!
+Rescan	MainWindow		Перасканіраваць
+OK	MainWindow		ОК
+Could not aquire partitioning information.	MainWindow		Не ўдалося атрымаць інфармацыю аб падзелах.
+There's no space on the partition where a child partition could be created.	MainWindow		Няма мечца на падзеле для стварэння даччынага падзела.
+<empty>	DiskView		<пуста>
+Unable to find the selected partition by ID.	MainWindow		Не ўдалося знайсці абраны падзел па ID.
+Select a partition from the list below.	DiskView		Абярыце падзел са спісу нішэй.
+No disk devices have been recognized.	DiskView		Не знойдзена ніякіх дыскавых прыладаў.
+The selected disk is read-only.	MainWindow		Абраны дыск толькі для чытання.
+Partition name:	CreateParamsPanel		Імя падзелу:
+Initialize	MainWindow		Ініцыялізіраваць
+Could not mount partition %s.	MainWindow		Не ўдалося змантаваць падзел %s.
+The partition %s is already unmounted.	MainWindow		Падзел %s ужо змантаваны.
+Failed to initialize the partition. No changes have been written to disk.	MainWindow		Не ўдалося ініцыялізіраваць падзел. Змены не былі запісаны на дыск.
+Failed to delete the partition. No changes have been written to disk.	MainWindow		Не ўдалося выдаліць падзел. Змены не былі запісаны на дыск.
+Partition type:	CreateParamsPanel		Тып падзелу:
+Could not delete the selected partition.	MainWindow		Немагчыма выдаліць абраны падзел.
+Error: 	MainWindow	in any error alert	Памылка:
+Partition %ld	DiskView		Падзел %ld
+The partition %s has been successfully initialized.\n	MainWindow		Падзел %s паспяхова ініцыялізаваны.\n
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Не ўдалося ініцыялізіраваць падзел %s. (На дыск нічога не запісана.)
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Сапрўды жадаеце запісаць змены на дыск?\n\nУсе данные на абраным падзеле будуць беззваротна згублены!
+Mounted at	PartitionList		Змантавана ў
+Failed to initialize the partition %s!\n	MainWindow		Не ўдалося ініцыялізіраваць падзел %s!\n
+There was an error acquiring the partition row.	MainWindow		Адбылася памылка пры атрыманні раду падзелаў.
+You need to select a partition entry from the list.	MainWindow		Вам патрэбна абраць падзел са спісу.
+Format (not implemented)	MainWindow		Фарматавать (неажыццявіма)
+The currently selected partition does not have a parent partition.	MainWindow		Абраны падзел не мае бацькоўскага падзелу.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Сапрўды жадаеце запісаць змены на дыск?\n\nУсе данные на абраным падзеле будуць беззваротна згублены!
+Offset: %ld MB	Support		Адступ: %ld MB
+Write changes	MainWindow		Запісаць змены
+There was an error preparing the disk for modifications.	MainWindow		Адбылася памылка пры падрыхтоўцы дыску да мадыфікацый.
+The partition %s is already mounted.	MainWindow		Падзел %s ужо змантаваны.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Сапрўды жадаеце запісаць змены на дыск?\n\nУсе данные на абраным падзеле будуць беззваротна згублены!
+Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Сапрўды жадаеце выдаліць абраны падзел?\n\nУсе данные на абраным падзеле будуць беззваротна згублены!
+Create…	MainWindow		Стварыць...
+Disk system \"%s\"\" not found!	MainWindow		Дыскавая сістэма \"%s\"\" не знойдзена!
+Could not unmount partition %s.	MainWindow		Не ўдалося змантаваць падзел %s.
+Mount	MainWindow		Змантаваць
+Create	CreateParamsPanel		Стварыць
+Device	DiskView		Прылада
+Disk	MainWindow		Дыск
+Volume name	PartitionList		Імя тому
+Continue	MainWindow		Працягнуць
+Cannot delete the selected partition.	MainWindow		Немагчыма выдаліць абраны падзел.
+Mount all	MainWindow		Зманатаваць усё
+Cancel	CreateParamsPanel		Адмяніць
+Delete partition	MainWindow		Выдаліць падзел
+End: %ld MB	Support		Канец %ld MB
+Eject	MainWindow		Выцягнуць
+Partition	MainWindow		Падзел
+File system	PartitionList		Файлавая сістэма
+Validation of the given creation parameters failed.	MainWindow		Не удалася праверка дадзеных параметраў стварэння падзелу.
+Size	PartitionList		Памер
+Validation of the given initialization parameters failed.	MainWindow		Не удалася праверка дадзеных параметраў ініцыялізацыі падзелу.
+The selected partition does not contain a partitioning system.	MainWindow		Абраны падзел не мае сістымы дзялення.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Сапрўды жадаеце запісаць змены на дыск?\n\nУсе данные на абраным падзеле будуць беззваротна згублены!
+The partition %s is currently mounted.	MainWindow		Падзел %s зараз змантаваны.
+Partition size	CreateParamsPanel		Памер падзелу
+Surface test (not implemented)	MainWindow		Тэст паверхні (не ажыццявіма)
+Creation of the partition has failed.	MainWindow		Не удалося стварыць падзел.
+The currently selected partition is not empty.	MainWindow		Абраны зараз падзел не пусты.
+Unmount	MainWindow		Размантаваць
+<empty>	PartitionList		<пуста>
+Initialize	InitParamsPanel		Ініцыялізаваць
+Device	PartitionList		Прылада
+Cancel	MainWindow		Адмяніць
+Cancel	InitParamsPanel		Адмяніць
+%ld MiB	Support		%ld MiB
+DriveSetup	MainWindow		Разметка Дыску
+Are you sure you want to initialize the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Сапраўды ініцыялізаваць падзел \"%s\"? У вас спытаюць яшчэ, перад тым як запісаць змены на дыск.
+Are you sure you want to initialize the partition? You will be asked again before changes are written to the disk.	MainWindow		Сапраўды ініцыялізаваць падзел? У вас спытаюць яшчэ, перад тым як запісаць змены на дыск.
+Parameters	PartitionList		Параметры

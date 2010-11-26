@@ -1,6 +1,6 @@
 1	belarusian	x-vnd.Haiku-CPUFrequencyPref	4060072235
 Ok	Status view		Так
-CPU frequency status view	CPU Frequency View		Паказнік стану працэсара
+CPU frequency status view	CPU Frequency View		Паказнік стану частаты працэсара
 Set state	Status view		Пазначыць стан
 Defaults	Pref Window		Прадвызначаныя
 Install replicant into Deskbar	CPU Frequency View		Усталяваць рэплікант у Deskbar

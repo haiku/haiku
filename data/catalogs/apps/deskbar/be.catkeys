@@ -1,44 +1,39 @@
-1	belarusian	x-vnd.Be-TSKB	3714198408
-Edit menu…	PreferencesWindow		Меню праўкі…
+1	belarusian	x-vnd.Be-TSKB	34208151
 Applications	PreferencesWindow		Праграмы
-24 hour clock	PreferencesWindow		рэжым 24 гадзін
-Recent documents:	PreferencesWindow		Ранейшыя дакументы:
-Recent folders	BeMenu		Ранейшыя тэчкі
-Sort running applications	PreferencesWindow		Упарадкавац працуючыя праграмы
-Recent applications	BeMenu		Ранейшыя праграмы
-Change time…	TimeView		Змяніць час…
-<Be folder is empty>	BeMenu		<Тэчка Be нічога не змяшчае>
-Window	PreferencesWindow		Вакно
+Recent applications	BeMenu		Нядаўнія праграмы
+Edit menu…	PreferencesWindow		Змяніць меню...
+Recent documents:	PreferencesWindow		Нядаўнія дакументы:
+Recent folders	BeMenu		Нядаўнія каталёгі
+Sort running applications	PreferencesWindow		Сартыравать запушчаныя праграмы
+Change time…	TimeView		Змяніць час...
+<Be folder is empty>	BeMenu		<Be каталёг пусты>
+Window	PreferencesWindow		Акно
 Menu	PreferencesWindow		Меню
-Show seconds	PreferencesWindow		Пакзваць секунды
+Show seconds	PreferencesWindow		Паказваць секунды
 Always on top	PreferencesWindow		Заўсёды наверсе
-Show all	WindowMenu		Паказаць ўсё
-No windows	WindowMenu		Вокнаў няма
-Power off	BeMenu		Выключыць сілкаванне
-Auto-raise	PreferencesWindow		Аўта-паказ
-Full date	PreferencesWindow		Поўная дата
-Hide time	TimeView		Скрыць час
-Recent folders:	PreferencesWindow		Ранейшыя тэчкі:
-Deskbar preferences…	BeMenu		Перавагі Дэскбару…
-Show application expander	PreferencesWindow		Паказваць пашыраны ліст праграмаў
-Close all	WindowMenu		Закрыць ўсё
-Deskbar preferences	PreferencesWindow		Перавагі Дэскбару
-Mount	BeMenu		Мацаваць
-European date	PreferencesWindow		Еўрапейская фарма часу
-Recent applications:	PreferencesWindow		Ранейшыя праграмы:
-Tracker always first	PreferencesWindow		Тракер заўсёды наперадзе
+Show all	WindowMenu		Паказаць усё
+No windows	WindowMenu		Без вокнаў
+Power off	BeMenu		Выключыць
+Auto-raise	PreferencesWindow		Узнікаць аўтаматычна
+Hide time	TimeView		Час на схаванне
+Recent folders:	PreferencesWindow		Нядаўнія каталёгі:
+Deskbar preferences…	BeMenu		Наладкі Deskbar...
+Show application expander	PreferencesWindow		Паказваць кнопку спісу праграм
+Close all	WindowMenu		Закрыць усё
+Deskbar preferences	PreferencesWindow		Наладкі Deskbar
+Mount	BeMenu		Змантаваць
+Recent applications:	PreferencesWindow		Нядаўнія праграмы
+Tracker always first	PreferencesWindow		Трэкер заўсёды першы
 About Haiku…	BeMenu		Пра Haiku…
-Show calendar…	TimeView		Паказваць каляндар…
-Restart system	BeMenu		Перазапусьціць сістэму
-Find…	BeMenu		Шукаць…
-Restart Tracker	BeMenu		Перазапусьціць Трэкер
-Show Time	Tray		Паказваць Час
-Expand new applications	PreferencesWindow		Разгортваць новыя праграмы
+Show calendar…	TimeView		Паказаць календар...
+Restart system	BeMenu		Перазагрузіць сістэму
+Find…	BeMenu		Знайсці...
+Restart Tracker	BeMenu		Перазапусціць Трэкер
+Show Time	Tray		Паказаць Час
+Expand new applications	PreferencesWindow		Разгарнуць новыя праграмы
 Clock	PreferencesWindow		Гадзіннік
-Recent documents	BeMenu		Ранейшыя дакументы
-Hide all	WindowMenu		Схаваць ўсё
-Shutdown…	BeMenu		Выключыць…
-Suspend	BeMenu		Прыпыніць
-Quit application	WindowMenu		Спыніць праграму
-About this system…	BeMenu		Пра сістэму…
-Show replicants	BeMenu		Паказваць рэпліканты
+Recent documents	BeMenu		Нядаўнія дакументы
+Hide all	WindowMenu		Схаваць усё
+Shutdown…	BeMenu		Выключыць...
+Quit application	WindowMenu		Выйсці з праграмы
+Show replicants	BeMenu		Паказаць рэпліканты
