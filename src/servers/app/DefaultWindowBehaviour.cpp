@@ -668,53 +668,10 @@ private:
 		float y = (where.y - (frame.top + frame.bottom) / 2)
 			/ (frame.Height() + 1);
 
-		// compute the angle
-		if (x == 0 && y == 0)
-			return;
-
-		float angle = atan2f(y, x);
-
-		// rotate by 22.5 degree to align our sectors with 45 degree multiples
-		angle += M_PI / 8;
-
-		// add 180 degree to the negative values, so we get a nice 0 to 360
-		// degree range
-		if (angle < 0)
-			angle += M_PI * 2;
-
-		int8 horizontal = NONE;
-		int8 vertical = NONE;
-		switch (int(angle / M_PI_4)) {
-			case 0:
-				horizontal = RIGHT;
-				break;
-			case 1:
-				horizontal = RIGHT;
-				vertical = BOTTOM;
-				break;
-			case 2:
-				vertical = BOTTOM;
-				break;
-			case 3:
-				horizontal = LEFT;
-				vertical = BOTTOM;
-				break;
-			case 4:
-				horizontal = LEFT;
-				break;
-			case 5:
-				horizontal = LEFT;
-				vertical = TOP;
-				break;
-			case 6:
-				vertical = TOP;
-				break;
-			case 7:
-			default:
-				horizontal = RIGHT;
-				vertical = TOP;
-				break;
-		}
+		// compute the resize direction
+		int8 horizontal;
+		int8 vertical;
+		_ComputeResizeDirection(x, y, horizontal, vertical);
 
 		// update the highlight, if necessary
 		if (horizontal != fHorizontal || vertical != fVertical) {
@@ -729,6 +686,68 @@ private:
 	BPoint	fLastMousePosition;
 	int8	fHorizontal;
 	int8	fVertical;
+};
+
+
+// #pragma mark - State
+
+
+struct DefaultWindowBehaviour::HumdingerResizeState : State {
+	HumdingerResizeState(DefaultWindowBehaviour& behavior, BPoint where)
+		:
+		State(behavior),
+		fInitialMousePosition(where),
+		fJitterPhase(true)
+	{
+	}
+
+	virtual void EnterState(State* previousState)
+	{
+		fDesktop->SetManagementCursor(
+			fDesktop->GetCursorManager().GetCursor(B_CURSOR_ID_MOVE));
+	}
+
+	virtual void ExitState(State* nextState)
+	{
+		fBehavior._ResetResizeCursor();
+	}
+
+	virtual void MouseUp(BMessage* message, BPoint where)
+	{
+		// Leave the state, when the middle mouse button has been released.
+		int32 buttons = message->FindInt32("buttons");
+		if ((buttons & B_TERTIARY_MOUSE_BUTTON) == 0)
+			fBehavior._NextState(NULL);
+	}
+
+	virtual void MouseMoved(BMessage* message, BPoint where, bool isFake)
+	{
+		// ignore the initial movement
+		float dx = where.x - fInitialMousePosition.x;
+		float dy = where.y - fInitialMousePosition.y;
+		if (dx * dx + dy * dy < (fJitterPhase ? 16 : 64))
+			return;
+
+		// Enter the next phase, if we're still in the first one.
+		if (fJitterPhase) {
+			fInitialMousePosition = where;
+			fJitterPhase = false;
+			return;
+		}
+
+		// The mouse has moved far enough for us to take a guess in which
+		// direction.
+		int8 horizontal;
+		int8 vertical;
+		_ComputeResizeDirection(dx, dy, horizontal, vertical);
+
+		fBehavior._NextState(new (std::nothrow) ResizeBorderState(fBehavior,
+			where, horizontal, vertical));
+	}
+
+private:
+	BPoint	fInitialMousePosition;
+	bool	fJitterPhase;
 };
 
 
@@ -870,6 +889,11 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where,
 				default:
 					break;
 			}
+		} else if ((buttons & B_TERTIARY_MOUSE_BUTTON) != 0) {
+			// Middle-click anywhere on the window shall initiate
+			// humdinger-resize mode.
+			if (windowModifier && hitRegion != Decorator::REGION_NONE)
+				action = ACTION_HUMDINGER_RESIZE;
 		}
 	}
 
@@ -937,6 +961,11 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where,
 			_NextState(new (std::nothrow) ResizeBorderState(*this, where,
 				hitRegion));
 			STRACE_CLICK(("===> ACTION_RESIZE_BORDER\n"));
+			break;
+
+		case ACTION_HUMDINGER_RESIZE:
+			_NextState(new (std::nothrow) HumdingerResizeState(*this, where));
+			STRACE_CLICK(("===> ACTION_HUMDINGER_RESIZE\n"));
 			break;
 
 		default:
@@ -1096,30 +1125,6 @@ DefaultWindowBehaviour::_SetBorderHighlights(int8 horizontal, int8 vertical,
 }
 
 
-void
-DefaultWindowBehaviour::_NextState(State* state)
-{
-	// exit the old state
-	if (fState != NULL)
-		fState->ExitState(state);
-
-	// set and enter the new state
-	State* oldState = fState;
-	fState = state;
-
-	if (fState != NULL) {
-		fState->EnterState(oldState);
-		fDesktop->SetMouseEventWindow(fWindow);
-	} else if (oldState != NULL) {
-		// no state anymore -- reset the mouse event window, if it's still us
-		if (fDesktop->MouseEventWindow() == fWindow)
-			fDesktop->SetMouseEventWindow(NULL);
-	}
-
-	delete oldState;
-}
-
-
 ServerCursor*
 DefaultWindowBehaviour::_ResizeCursorFor(int8 horizontal, int8 vertical)
 {
@@ -1162,4 +1167,83 @@ void
 DefaultWindowBehaviour::_ResetResizeCursor()
 {
 	fDesktop->SetManagementCursor(NULL);
+}
+
+
+/*static*/ void
+DefaultWindowBehaviour::_ComputeResizeDirection(float x, float y,
+	int8& _horizontal, int8& _vertical)
+{
+	_horizontal = NONE;
+	_vertical = NONE;
+
+	// compute the angle
+	if (x == 0 && y == 0)
+		return;
+
+	float angle = atan2f(y, x);
+
+	// rotate by 22.5 degree to align our sectors with 45 degree multiples
+	angle += M_PI / 8;
+
+	// add 180 degree to the negative values, so we get a nice 0 to 360
+	// degree range
+	if (angle < 0)
+		angle += M_PI * 2;
+
+	switch (int(angle / M_PI_4)) {
+		case 0:
+			_horizontal = RIGHT;
+			break;
+		case 1:
+			_horizontal = RIGHT;
+			_vertical = BOTTOM;
+			break;
+		case 2:
+			_vertical = BOTTOM;
+			break;
+		case 3:
+			_horizontal = LEFT;
+			_vertical = BOTTOM;
+			break;
+		case 4:
+			_horizontal = LEFT;
+			break;
+		case 5:
+			_horizontal = LEFT;
+			_vertical = TOP;
+			break;
+		case 6:
+			_vertical = TOP;
+			break;
+		case 7:
+		default:
+			_horizontal = RIGHT;
+			_vertical = TOP;
+			break;
+	}
+}
+
+
+void
+DefaultWindowBehaviour::_NextState(State* state)
+{
+	// exit the old state
+	if (fState != NULL)
+		fState->ExitState(state);
+
+	// set and enter the new state
+	State* oldState = fState;
+	fState = state;
+
+	if (fState != NULL) {
+		fState->EnterState(oldState);
+		fDesktop->SetMouseEventWindow(fWindow);
+	} else if (oldState != NULL) {
+		// no state anymore -- reset the mouse event window, if it's still us
+		if (fDesktop->MouseEventWindow() == fWindow)
+			fDesktop->SetMouseEventWindow(NULL);
+	}
+
+	delete oldState;
 }

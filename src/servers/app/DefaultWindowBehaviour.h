@@ -49,7 +49,8 @@ private:
 				ACTION_DRAG,
 				ACTION_SLIDE_TAB,
 				ACTION_RESIZE,
-				ACTION_RESIZE_BORDER
+				ACTION_RESIZE_BORDER,
+				ACTION_HUMDINGER_RESIZE
 			};
 
 			enum {
@@ -71,6 +72,7 @@ private:
 			struct ResizeBorderState;
 			struct DecoratorButtonState;
 			struct ManageWindowState;
+			struct HumdingerResizeState;
 
 			// to keep gcc 2 happy
 			friend struct State;
@@ -81,6 +83,7 @@ private:
 			friend struct ResizeBorderState;
 			friend struct DecoratorButtonState;
 			friend struct ManageWindowState;
+			friend struct HumdingerResizeState;
 
 private:
 			bool				_IsWindowModifier(int32 modifiers) const;
@@ -94,6 +97,8 @@ private:
 			void				_SetResizeCursor(int8 horizontal,
 									int8 vertical);
 			void				_ResetResizeCursor();
+	static	void				_ComputeResizeDirection(float x, float y,
+									int8& _horizontal, int8& _vertical);
 
 			void				_NextState(State* state);
 
