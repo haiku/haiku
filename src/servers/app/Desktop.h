@@ -91,6 +91,8 @@ public:
 
 			void				SetCursor(ServerCursor* cursor);
 			ServerCursorReference Cursor() const;
+			void				SetManagementCursor(ServerCursor* newCursor);
+
 			void				SetLastMouseState(const BPoint& position,
 									int32 buttons, Window* windowUnderMouse);
 									// for use by the mouse filter only
@@ -330,6 +332,8 @@ private:
 			BLocker				fWorkspacesLock;
 
 			CursorManager		fCursorManager;
+			ServerCursorReference fCursor;
+			ServerCursorReference fManagementCursor;
 
 			MultiLocker			fWindowLock;
 

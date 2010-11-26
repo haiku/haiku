@@ -9,6 +9,7 @@
  *		Andrej Spielmann <andrej.spielmann@seh.ox.ac.uk>
  *		Brecht Machiels <brecht@mos6581.org>
  *		Clemens Zeidler <haiku@clemens-zeidler.de>
+ *		Ingo Weinhold <ingo_weinhold@gmx.de>
  */
 
 
@@ -605,14 +606,32 @@ Desktop::SetCursor(ServerCursor* newCursor)
 	if (newCursor == NULL)
 		newCursor = fCursorManager.GetCursor(B_CURSOR_ID_SYSTEM_DEFAULT);
 
-	HWInterface()->SetCursor(newCursor);
+	if (newCursor == fCursor)
+		return;
+
+	fCursor = newCursor;
+
+	if (fManagementCursor.Get() == NULL)
+		HWInterface()->SetCursor(newCursor);
 }
 
 
 ServerCursorReference
 Desktop::Cursor() const
 {
-	return HWInterface()->Cursor();
+	return fCursor;
+}
+
+
+void
+Desktop::SetManagementCursor(ServerCursor* newCursor)
+{
+	if (newCursor == fManagementCursor)
+		return;
+
+	fManagementCursor = newCursor;
+
+	HWInterface()->SetCursor(newCursor != NULL ? newCursor : fCursor.Get());
 }
 
 
