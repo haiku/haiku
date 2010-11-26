@@ -1,0 +1,13 @@
+1	belarusian	x-vnd.Haiku-Appearance	4074731948
+Defaults	APRWindow		Прадвызначаныя
+Success	Colors tab		Паспяховы
+Failure	Colors tab		Памылковы
+Revert	APRWindow		Вярнуць
+Tooltip background	Colors tab		Фон падказкі
+Selected menu item background	Colors tab		Фон пазначанага пункту меню
+Window tab text	Colors tab		Тэкст загалоўку акна
+Document text	Colors tab		Тэкст дакументу
+Selected menu item text	Colors tab		Тэкст пазначанага пункту меню
+Menu background	Colors tab		Фон меню
+Panel background	Colors tab		Тло панэлі
+Colors	APRWindow		Колеры

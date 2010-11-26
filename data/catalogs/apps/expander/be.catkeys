@@ -1,0 +1,39 @@
+1	belarusian	x-vnd.Haiku-Expander	3642794258
+Expand	ExpanderMenu		Распакаваць
+Set destination…	ExpanderMenu		Задаць прызначэнне…
+File expanded	ExpanderWindow		Файл распакаваны
+The destination is read only.	ExpanderWindow		Запіс ў тэчку прызначэння не дазволены.
+Expander: Open	ExpanderWindow		Распакоўшчык: Адкрыць
+ is not supported	ExpanderWindow		не падтрымліваецца
+Select current	DirectoryFilePanel		Пазначыць бягучы
+Source	ExpanderWindow		Крыніца
+Error when expanding archive	ExpanderWindow		Памылка падчас распакоўкі архіву
+Hide contents	ExpanderWindow		Схаваць змест
+Cancel	ExpanderWindow		Скасаваць
+Continue	ExpanderWindow		Працягваць
+Expander	ExpanderWindow	!! Window Title !!	Распакоўшчык
+The destination folder does not exist.	ExpanderWindow		Тэчка прызначэння не існуе.
+Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Спыніць распакоўку гэтага \nархіва? Ужо распакаваныя файлы могуць быць няпоўнымі.
+Select	DirectoryFilePanel		Пазначыць
+Creating listing for 	ExpanderWindow		Стварэнне спісу для 
+Settings	ExpanderMenu		Налады
+Settings…	ExpanderMenu		Налады…
+Expander: Choose destination	DirectoryFilePanel		Распакоўшчык: Вылучыць прызначэнне
+Show contents	ExpanderWindow		Паказаць змест
+Expanding file 	ExpanderWindow		Распакоўваецца файл 
+The folder was either moved, renamed or not\nsupported.	ExpanderWindow		The folder was either moved, renamed or not\nsupported.
+The file doesn't exist	ExpanderWindow		Гэтая тэчка не існуе
+Stop	ExpanderMenu		Спыніць
+\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tпраграма распрацавана Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nзыходная версія для BeOS была распрацавана \nDominic, Hiroshi, Peter, Pavel and Robert\n
+File	ExpanderMenu		Файл
+Expand	ExpanderWindow		Распакаваць
+Close	ExpanderMenu		Закрыць
+The destination is not a folder.	ExpanderWindow		Прызначэнне не з´яўляецца тэчкай.
+Expander	About		Распакоўшчык
+About Expander…	ExpanderMenu		Пра Распакоўшчык…
+OK	About		Так
+Set source…	ExpanderMenu		Задаць крыніцу…
+Select '%s'	DirectoryFilePanel		Пазначыць '%s'
+Show contents	ExpanderMenu		Паказаць змест
+Stop	ExpanderWindow		Спыніць
+Destination	ExpanderWindow		Прызначэнне
