@@ -185,27 +185,41 @@ template <class View>
 float
 TruncTimeBase(BString* result, int64 value, const View* view, float width)
 {
-	float resultWidth = 0;
-	char buffer[256];
+	float resultWidth = width + 1;
 
 	time_t timeValue = (time_t)value;
 
-	if (BLocale::Default()->FormatDateTime(buffer, 256, timeValue,
-			B_FULL_DATE_FORMAT, B_MEDIUM_TIME_FORMAT) == B_OK)
-		resultWidth = view->StringWidth(buffer);
+	struct {
+		BDateFormatStyle dateStyle;
+		BTimeFormatStyle timeStyle;
+	} formats[5] = {
+		{ B_FULL_DATE_FORMAT, B_MEDIUM_TIME_FORMAT },
+		{ B_LONG_DATE_FORMAT, B_MEDIUM_TIME_FORMAT },
+		{ B_LONG_DATE_FORMAT, B_SHORT_TIME_FORMAT },
+		{ B_MEDIUM_DATE_FORMAT, B_SHORT_TIME_FORMAT },
+		{ B_SHORT_DATE_FORMAT, B_SHORT_TIME_FORMAT },
+	};
+
+	BString date;
+	for (int i = 0; resultWidth > width && i < 5; ++i) {
+		if (BLocale::Default()->FormatDateTime(&date, timeValue,
+				formats[i].dateStyle, formats[i].timeStyle) == B_OK) {
+			resultWidth = view->StringWidth(date.String(), date.Length());
+		}
+	}
 
 	if (resultWidth > width
-		&& BLocale::Default()->FormatDateTime(buffer, 256, timeValue,
-			B_SHORT_DATE_FORMAT, B_SHORT_TIME_FORMAT) == B_OK) {
-		resultWidth = view->StringWidth(buffer);
+		&& BLocale::Default()->FormatDate(&date, timeValue,
+			B_SHORT_DATE_FORMAT) == B_OK) {
+		resultWidth = view->StringWidth(date.String(), date.Length());
 	}
 
 	if (resultWidth > width) {
 		// even the shortest format string didn't do it, insert ellipsis
-		resultWidth = TruncStringBase(result, buffer, (ssize_t)strlen(buffer),
-			view, width);
+		resultWidth = TruncStringBase(result, date.String(),
+			(ssize_t)date.Length(), view, width);
 	} else
-		*result = buffer;
+		*result = date;
 
 	return resultWidth;
 }
