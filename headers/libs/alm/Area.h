@@ -107,8 +107,12 @@ private:
 								Area(BLayoutItem* item);
 
 			void				_Init(LinearSpec* ls, XTab* left, YTab* top,
-									XTab* right, YTab* bottom);
-			void				_Init(LinearSpec* ls, Row* row, Column* column);
+									XTab* right, YTab* bottom,
+									Variable* scaleWidth,
+									Variable* scaleHeight);
+			void				_Init(LinearSpec* ls, Row* row, Column* column,
+									Variable* scaleWidth,
+									Variable* scaleHeight);
 
 			void				_DoLayout();
 
@@ -144,6 +148,9 @@ private:
 			Constraint*			fPreferredContentHeight;
 			double				fContentAspectRatio;
 			Constraint*			fContentAspectRatioC;
+
+			Variable*			fScaleWidth;
+			Variable*			fScaleHeight;
 
 public:
 	friend class		BALMLayout;

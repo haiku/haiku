@@ -593,13 +593,17 @@ Area::Area(BLayoutItem* item)
  * Initialize variables.
  */
 void
-Area::_Init(LinearSpec* ls, XTab* left, YTab* top, XTab* right, YTab* bottom)
+Area::_Init(LinearSpec* ls, XTab* left, YTab* top, XTab* right, YTab* bottom,
+	Variable* scaleWidth, Variable* scaleHeight)
 {
 	fLS = ls;
 	fLeft = left;
 	fRight = right;
 	fTop = top;
 	fBottom = bottom;
+
+	fScaleWidth = scaleWidth;
+	fScaleHeight = scaleHeight;
 
 	// adds the two essential constraints of the area that make sure that the
 	// left x-tab is really to the left of the right x-tab, and the top y-tab
@@ -612,11 +616,12 @@ Area::_Init(LinearSpec* ls, XTab* left, YTab* top, XTab* right, YTab* bottom)
 	fConstraints.AddItem(fMinContentWidth);
 	fConstraints.AddItem(fMinContentHeight);
 
-	fPreferredContentWidth = fLS->AddConstraint(-1.0, fLeft, 1.0, fRight,
-		OperatorType(EQ), 0, fShrinkPenalties.Height(), fGrowPenalties.Width());
+	fPreferredContentWidth = fLS->AddConstraint(-1.0, fLeft, 1.0, fRight, -1.0,
+		fScaleWidth, OperatorType(EQ), 0, fShrinkPenalties.Height(),
+		fGrowPenalties.Width());
 
-	fPreferredContentHeight = fLS->AddConstraint(-1.0, fTop, 1.0, fBottom,
-		OperatorType(EQ), 0, fShrinkPenalties.Height(),
+	fPreferredContentHeight = fLS->AddConstraint(-1.0, fTop, 1.0, fBottom, -1.0,
+		fScaleHeight, OperatorType(EQ), 0, fShrinkPenalties.Height(),
 		fGrowPenalties.Height());
 
 	fConstraints.AddItem(fPreferredContentWidth);
@@ -625,9 +630,11 @@ Area::_Init(LinearSpec* ls, XTab* left, YTab* top, XTab* right, YTab* bottom)
 
 
 void
-Area::_Init(LinearSpec* ls, Row* row, Column* column)
+Area::_Init(LinearSpec* ls, Row* row, Column* column, Variable* scaleWidth,
+	Variable* scaleHeight)
 {
-	_Init(ls, column->Left(), row->Top(), column->Right(), row->Bottom());
+	_Init(ls, column->Left(), row->Top(), column->Right(), row->Bottom(),
+		scaleWidth, scaleHeight);
 	fRow = row;
 	fColumn = column;
 }
@@ -718,6 +725,9 @@ Area::_UpdatePreferredConstraint(BSize preferred)
 	if (preferred.height > 0)
 		height = preferred.Height() + TopInset() + BottomInset();
 
-	fPreferredContentWidth->SetRightSide(width);
-	fPreferredContentHeight->SetRightSide(height);
+	fPreferredContentWidth->SetLeftSide(-1.0, fLeft, 1.0, fRight, -width,
+		fScaleWidth);
+
+	fPreferredContentHeight->SetLeftSide(-1.0, fTop, 1.0, fBottom, -height,
+		fScaleHeight);
 }

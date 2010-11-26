@@ -52,12 +52,16 @@ BALMLayout::BALMLayout(float spacing, BALMLayout* friendLayout)
 	fPreferredSize = kUnsetSize;
 
 	fPerformancePath = NULL;
+
+	fScaleWidth = fSolver->AddVariable();
+	fScaleHeight = fSolver->AddVariable();
 }
 
 
 BALMLayout::~BALMLayout()
 {
-	
+	delete fScaleWidth;
+	delete fScaleHeight;
 }
 
 
@@ -479,7 +483,7 @@ BALMLayout::AddItem(BLayoutItem* item, XTab* left, YTab* top, XTab* right,
 		return NULL;
 	fCurrentArea = area;
 
-	area->_Init(fSolver, left, top, right, bottom);
+	area->_Init(fSolver, left, top, right, bottom, fScaleWidth, fScaleHeight);
 	return area;
 }
 
@@ -494,7 +498,7 @@ BALMLayout::AddItem(BLayoutItem* item, Row* row, Column* column)
 		return NULL;
 	fCurrentArea = area;
 
-	area->_Init(fSolver, row, column);
+	area->_Init(fSolver, row, column, fScaleWidth, fScaleHeight);
 	return area;
 }
 

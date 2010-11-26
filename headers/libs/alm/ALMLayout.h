@@ -151,6 +151,9 @@ private:
 			float				fSpacing;
 
 			Area*				fCurrentArea;
+
+			Variable*			fScaleWidth;
+			Variable*			fScaleHeight;
 };
 
 }	// namespace BALM
