@@ -491,39 +491,36 @@ Constraint::Constraint(LinearSpec* ls, SummandList* summands, OperatorType op,
 {
 	double coeffs[summands->CountItems() + 2];
 	int varIndexes[summands->CountItems() + 2];
-	int32 i;
-	for (i = 0; i < summands->CountItems(); i++) {
-		Summand* s = summands->ItemAt(i);
-		coeffs[i] = s->Coeff();
-		varIndexes[i] = s->Var()->Index();
+	int32 nCoefficient = 0;
+	for (; nCoefficient < summands->CountItems(); nCoefficient++) {
+		Summand* s = summands->ItemAt(nCoefficient);
+		coeffs[nCoefficient] = s->Coeff();
+		varIndexes[nCoefficient] = s->Var()->Index();
 	}
 
-	if (penaltyNeg != INFINITY
-		&& fOp != OperatorType(LE)) {
+	if (penaltyNeg != INFINITY && penaltyNeg != 0. && fOp != OperatorType(LE)) {
 		fDNegObjSummand = new Summand(penaltyNeg, ls->AddVariable());
 		fLS->fObjFunction->AddItem(fDNegObjSummand);
-		varIndexes[i] = fDNegObjSummand->Var()->Index();
-		coeffs[i] = 1.0;
-		i++;
+		varIndexes[nCoefficient] = fDNegObjSummand->Var()->Index();
+		coeffs[nCoefficient] = 1.0;
+		nCoefficient++;
 	}
 	else
 		fDNegObjSummand = NULL;
 
-	if (penaltyPos != INFINITY
-		&& fOp != OperatorType(GE)) {
+	if (penaltyPos != INFINITY && penaltyPos != 0. && fOp != OperatorType(GE)) {
 		fDPosObjSummand = new Summand(penaltyPos, ls->AddVariable());
 		fLS->fObjFunction->AddItem(fDPosObjSummand);
-		varIndexes[i] = fDPosObjSummand->Var()->Index();
-		coeffs[i] = -1.0;
-		i++;
+		varIndexes[nCoefficient] = fDPosObjSummand->Var()->Index();
+		coeffs[nCoefficient] = -1.0;
+		nCoefficient++;
 	}
 	else
 		fDPosObjSummand = NULL;
 
-	if (!add_constraintex(fLS->fLP, i, &coeffs[0], &varIndexes[0],
-			((fOp == OperatorType(EQ)) ? EQ
-			: (fOp == OperatorType(GE)) ? GE
-			: LE), rightSide))
+	if (!add_constraintex(fLS->fLP, nCoefficient, &coeffs[0], &varIndexes[0],
+			(fOp == OperatorType(EQ) ? EQ : (fOp == OperatorType(GE)) ? GE
+				: LE), rightSide))
 		STRACE(("Error in add_constraintex."));
 
 	fLS->UpdateObjectiveFunction();

@@ -25,6 +25,11 @@ LinearSpec::LinearSpec()
 	fLP = make_lp(0, 0);
 	if (fLP == NULL)
 		printf("Couldn't construct a new model.");
+
+	// minimize the objective functions, this is the default of lp_solve so we
+	// don't have to do it here:
+	// set_minim(fLP);
+
 	set_verbose(fLP, 1);
 }
 
