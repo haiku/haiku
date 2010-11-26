@@ -242,6 +242,29 @@ DefaultDecorator::RegionAt(BPoint where) const
 }
 
 
+bool
+DefaultDecorator::SetRegionHighlight(Region region, uint8 highlight,
+	BRegion* dirty)
+{
+	// Invalidate the bitmap caches for the close/zoom button, when the
+	// highlight changes.
+	switch (region) {
+		case REGION_CLOSE_BUTTON:
+			if (highlight != RegionHighlight(region))
+				memset(&fCloseBitmaps, 0, sizeof(fCloseBitmaps));
+			break;
+		case REGION_ZOOM_BUTTON:
+			if (highlight != RegionHighlight(region))
+				memset(&fZoomBitmaps, 0, sizeof(fZoomBitmaps));
+			break;
+		default:
+			break;
+	}
+
+	return Decorator::SetRegionHighlight(region, highlight, dirty);
+}
+
+
 void
 DefaultDecorator::ExtendDirtyRegion(Region region, BRegion& dirty)
 {
@@ -1498,7 +1521,6 @@ DefaultDecorator::_GetBitmapForButton(Component item, bool down, int32 width,
 	sBitmapList = entry;
 	return bitmap;
 }
-
 
 
 void

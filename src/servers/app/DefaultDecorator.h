@@ -40,6 +40,9 @@ public:
 
 	virtual	Region				RegionAt(BPoint where) const;
 
+	virtual	bool				SetRegionHighlight(Region region,
+									uint8 highlight, BRegion* dirty);
+
 	virtual	void				ExtendDirtyRegion(Region region,
 									BRegion& dirty);
 
