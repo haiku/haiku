@@ -247,7 +247,8 @@ struct intel_free_graphics_memory {
 #define INTEL_INTERRUPT_IDENTITY		0x020a4
 #define INTEL_INTERRUPT_MASK			0x020a8
 #define INTEL_INTERRUPT_STATUS			0x020ac
-#define INTERRUPT_VBLANK				(1 << 7)
+#define INTERRUPT_VBLANK_PIPEA			(1 << 7)
+#define INTERRUPT_VBLANK_PIPEB			(1 << 5)
 
 // ring buffer
 #define INTEL_PRIMARY_RING_BUFFER		0x02030
@@ -358,6 +359,7 @@ struct intel_free_graphics_memory {
 #define INTEL_DISPLAY_B_PIPE_SIZE		0x71190
 
 #define INTEL_DISPLAY_B_PIPE_CONTROL	0x71008
+#define INTEL_DISPLAY_B_PIPE_STATUS		0x71024
 
 #define INTEL_DISPLAY_B_CONTROL			0x71180
 #define INTEL_DISPLAY_B_BASE			0x71184

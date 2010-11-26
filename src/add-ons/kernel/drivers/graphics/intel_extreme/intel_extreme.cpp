@@ -82,12 +82,20 @@ intel_interrupt_handler(void *data)
 
 	int32 handled = B_HANDLED_INTERRUPT;
 
-	if ((identity & INTERRUPT_VBLANK) != 0) {
+	if ((identity & INTERRUPT_VBLANK_PIPEA) != 0) {
 		handled = release_vblank_sem(info);
 
 		// make sure we'll get another one of those
 		write32(info.registers + INTEL_DISPLAY_A_PIPE_STATUS,
-			DISPLAY_PIPE_VBLANK_STATUS);
+			DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
+	}
+
+	if ((identity & INTERRUPT_VBLANK_PIPEB) != 0) {
+		handled = release_vblank_sem(info);
+
+		// make sure we'll get another one of those
+		write32(info.registers + INTEL_DISPLAY_B_PIPE_STATUS,
+			DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
 	}
 
 	// setting the bit clears it!
@@ -111,9 +119,8 @@ init_interrupt_handler(intel_info &info)
 	thread_id thread = find_thread(NULL);
 	thread_info threadInfo;
 	if (get_thread_info(thread, &threadInfo) != B_OK
-		|| set_sem_owner(info.shared_info->vblank_sem, threadInfo.team) != B_OK) {
+		|| set_sem_owner(info.shared_info->vblank_sem, threadInfo.team) != B_OK)
 		status = B_ERROR;
-	}
 
 	if (status == B_OK && info.pci->u.h0.interrupt_pin != 0x00
 		&& info.pci->u.h0.interrupt_line != 0xff) {
@@ -124,15 +131,18 @@ init_interrupt_handler(intel_info &info)
 		status = install_io_interrupt_handler(info.pci->u.h0.interrupt_line,
 			&intel_interrupt_handler, (void *)&info, 0);
 		if (status == B_OK) {
+			write32(info.registers + INTEL_DISPLAY_A_PIPE_STATUS,
+				DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
+			write32(info.registers + INTEL_DISPLAY_B_PIPE_STATUS,
+				DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
+			write16(info.registers + INTEL_INTERRUPT_IDENTITY, ~0);
+
 			// enable interrupts - we only want VBLANK interrupts
 			write16(info.registers + INTEL_INTERRUPT_ENABLED,
 				read16(info.registers + INTEL_INTERRUPT_ENABLED)
-				| INTERRUPT_VBLANK);
-			write16(info.registers + INTEL_INTERRUPT_MASK, ~INTERRUPT_VBLANK);
-
-			write32(info.registers + INTEL_DISPLAY_A_PIPE_STATUS,
-				DISPLAY_PIPE_VBLANK_STATUS);
-			write16(info.registers + INTEL_INTERRUPT_IDENTITY, ~0);
+				| INTERRUPT_VBLANK_PIPEA | INTERRUPT_VBLANK_PIPEB);
+			write16(info.registers + INTEL_INTERRUPT_MASK,
+				~(INTERRUPT_VBLANK_PIPEA | INTERRUPT_VBLANK_PIPEB));
 		}
 	}
 	if (status < B_OK) {
@@ -142,6 +152,7 @@ init_interrupt_handler(intel_info &info)
 		info.fake_interrupts = true;
 
 		// TODO: fake interrupts!
+		TRACE((DEVICE_NAME "Fake interrupt mode (no PCI interrupt line assigned)"));
 		status = B_ERROR;
 	}
 
