@@ -62,8 +62,6 @@ int32 smp_get_current_cpu(void);
 
 int smp_intercpu_int_handler(int32 cpu);
 
-void _acquire_spinlock(spinlock* lock);
-
 #ifdef __cplusplus
 }
 #endif
@@ -78,7 +76,7 @@ acquire_spinlock_inline(spinlock* lock)
 {
 	if (atomic_or((int32*)lock, 1) == 0)
 		return;
-	_acquire_spinlock(lock);
+	acquire_spinlock(lock);
 }
 
 

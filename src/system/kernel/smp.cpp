@@ -293,7 +293,7 @@ process_all_pending_ici(int32 currentCPU)
 
 
 void
-_acquire_spinlock(spinlock* lock)
+acquire_spinlock(spinlock* lock)
 {
 #if DEBUG_SPINLOCKS
 	if (are_interrupts_enabled()) {
@@ -1294,6 +1294,3 @@ memory_write_barrier(void)
 {
 	arch_cpu_memory_write_barrier();
 }
-
-
-#pragma weak acquire_spinlock=_acquire_spinlock
