@@ -279,6 +279,7 @@ UrlWrapper::ArgvReceived(int32 argc, char** argv)
 	if (proto == "ftp") {
 		BString cmd("ftp ");
 		
+		cmd << proto << "://";
 		/*
 		if (user.Length())
 			cmd << "-l " << user << " ";
@@ -328,10 +329,11 @@ UrlWrapper::ArgvReceived(int32 argc, char** argv)
 		return;
 	}
 
-	if (proto == "http") {
+	if (proto == "http" /*|| proto == "ftp"*/) {
 		BString cmd("/bin/wget ");
 		
 		//cmd << url;
+		cmd << proto << "://";
 		if (url.HasUser())
 			cmd << user << "@";
 		cmd << full;
