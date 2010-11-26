@@ -57,6 +57,7 @@ Decorator::Decorator(DesktopSettings& settings, BRect rect, window_look look,
 
 	fFootprintValid(false)
 {
+	memset(&fRegionHighlights, HIGHLIGHT_NONE, sizeof(fRegionHighlights));
 }
 
 
@@ -421,6 +422,33 @@ Decorator::SetTabLocation(float location, BRegion* updateRegion)
 }
 
 
+/*!	\brief Sets a specific highlight for a decorator region.
+
+	Can be overridden by derived classes, but the base class version must be
+	called, if the highlight shall be applied.
+
+	\param region The decorator region.
+	\param highlight The value identifying the kind of highlight.
+	\param dirty The dirty region to be extended, if the highlight changes. Can
+		be \c NULL.
+	\return \c true, if the highlight could be applied.
+*/
+bool
+Decorator::SetRegionHighlight(Region region, uint8 highlight, BRegion* dirty)
+{
+	int32 index = (int32)region - 1;
+	if (index < 0 || index >= REGION_COUNT - 1)
+		return false;
+
+	fRegionHighlights[index] = highlight;
+
+	if (dirty != NULL)
+		ExtendDirtyRegion(region, *dirty);
+
+	return true;
+}
+
+
 bool
 Decorator::SetSettings(const BMessage& settings, BRegion* updateRegion)
 {
@@ -520,6 +548,19 @@ Decorator::UIColor(color_which which)
 	// TODO: for now - calling ui_color() from within the app_server
 	//	will always return the default colors (as there is no be_app)
 	return ui_color(which);
+}
+
+
+/*!	\brief Extends a dirty region by a decorator region.
+
+	Must be implemented by derived classes.
+
+	\param region The decorator region.
+	\param dirty The dirty region to be extended.
+*/
+void
+Decorator::ExtendDirtyRegion(Region region, BRegion& dirty)
+{
 }
 
 

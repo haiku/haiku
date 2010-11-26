@@ -44,7 +44,16 @@ public:
 				REGION_LEFT_TOP_CORNER,
 				REGION_LEFT_BOTTOM_CORNER,
 				REGION_RIGHT_TOP_CORNER,
-				REGION_RIGHT_BOTTOM_CORNER
+				REGION_RIGHT_BOTTOM_CORNER,
+
+				REGION_COUNT
+			};
+
+			enum {
+				HIGHLIGHT_NONE,
+				HIGHLIGHT_RESIZE_BORDER,
+
+				HIGHLIGHT_USER_DEFINED
 			};
 
 public:
@@ -106,6 +115,10 @@ public:
 	virtual	float			TabLocation() const
 								{ return 0.0; }
 
+	virtual	bool			SetRegionHighlight(Region region, uint8 highlight,
+								BRegion* dirty);
+	inline	uint8			RegionHighlight(Region region) const;
+
 			bool			SetSettings(const BMessage& settings,
 								BRegion* updateRegion = NULL);
 	virtual	bool			GetSettings(BMessage* settings) const;
@@ -120,6 +133,8 @@ public:
 	virtual	void			DrawZoom();
 
 			rgb_color		UIColor(color_which which);
+
+	virtual	void			ExtendDirtyRegion(Region region, BRegion& dirty);
 
 protected:
 			int32			_TitleWidth() const
@@ -184,6 +199,18 @@ private:
 
 			BRegion			fFootprint;
 			bool			fFootprintValid : 1;
+
+			uint8			fRegionHighlights[REGION_COUNT - 1];
 };
+
+
+uint8
+Decorator::RegionHighlight(Region region) const
+{
+	int32 index = (int32)region - 1;
+	return index >= 0 && index < REGION_COUNT - 1
+		? fRegionHighlights[index] : 0;
+}
+
 
 #endif	// DECORATOR_H

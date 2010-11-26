@@ -242,6 +242,51 @@ DefaultDecorator::RegionAt(BPoint where) const
 }
 
 
+void
+DefaultDecorator::ExtendDirtyRegion(Region region, BRegion& dirty)
+{
+	switch (region) {
+		case REGION_TAB:
+			dirty.Include(fTabRect);
+			break;
+
+		case REGION_CLOSE_BUTTON:
+			if ((fFlags & B_NOT_CLOSABLE) == 0)
+				dirty.Include(fCloseRect);
+			break;
+
+		case REGION_ZOOM_BUTTON:
+			if ((fFlags & B_NOT_ZOOMABLE) == 0)
+				dirty.Include(fZoomRect);
+			break;
+
+		case REGION_LEFT_BORDER:
+			dirty.Include(fLeftBorder);
+			break;
+
+		case REGION_RIGHT_BORDER:
+			dirty.Include(fRightBorder);
+			break;
+
+		case REGION_TOP_BORDER:
+			dirty.Include(fTopBorder);
+			break;
+
+		case REGION_BOTTOM_BORDER:
+			dirty.Include(fBottomBorder);
+			break;
+
+		case REGION_RIGHT_BOTTOM_CORNER:
+			if ((fFlags & B_NOT_RESIZABLE) == 0)
+				dirty.Include(fResizeRect);
+			break;
+
+		default:
+			break;
+	}
+}
+
+
 float
 DefaultDecorator::BorderWidth()
 {
@@ -438,7 +483,7 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 			// top
 			if (invalid.Intersects(fTopBorder)) {
 				ComponentColors colors;
-				GetComponentColors(COMPONENT_TOP_BORDER, colors);
+				_GetComponentColors(COMPONENT_TOP_BORDER, colors);
 
 				for (int8 i = 0; i < 5; i++) {
 					fDrawingEngine->StrokeLine(BPoint(r.left + i, r.top + i),
@@ -456,7 +501,7 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 			// left
 			if (invalid.Intersects(fLeftBorder.InsetByCopy(0, -fBorderWidth))) {
 				ComponentColors colors;
-				GetComponentColors(COMPONENT_LEFT_BORDER, colors);
+				_GetComponentColors(COMPONENT_LEFT_BORDER, colors);
 
 				for (int8 i = 0; i < 5; i++) {
 					fDrawingEngine->StrokeLine(BPoint(r.left + i, r.top + i),
@@ -466,7 +511,7 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 			// bottom
 			if (invalid.Intersects(fBottomBorder)) {
 				ComponentColors colors;
-				GetComponentColors(COMPONENT_BOTTOM_BORDER, colors);
+				_GetComponentColors(COMPONENT_BOTTOM_BORDER, colors);
 
 				for (int8 i = 0; i < 5; i++) {
 					fDrawingEngine->StrokeLine(BPoint(r.left + i, r.bottom - i),
@@ -477,7 +522,7 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 			// right
 			if (invalid.Intersects(fRightBorder.InsetByCopy(0, -fBorderWidth))) {
 				ComponentColors colors;
-				GetComponentColors(COMPONENT_RIGHT_BORDER, colors);
+				_GetComponentColors(COMPONENT_RIGHT_BORDER, colors);
 
 				for (int8 i = 0; i < 5; i++) {
 					fDrawingEngine->StrokeLine(BPoint(r.right - i, r.top + i),
@@ -494,7 +539,7 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 			// top
 			if (invalid.Intersects(fTopBorder)) {
 				ComponentColors colors;
-				GetComponentColors(COMPONENT_TOP_BORDER, colors);
+				_GetComponentColors(COMPONENT_TOP_BORDER, colors);
 
 				for (int8 i = 0; i < 3; i++) {
 					fDrawingEngine->StrokeLine(BPoint(r.left + i, r.top + i),
@@ -512,7 +557,7 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 			// left
 			if (invalid.Intersects(fLeftBorder.InsetByCopy(0, -fBorderWidth))) {
 				ComponentColors colors;
-				GetComponentColors(COMPONENT_LEFT_BORDER, colors);
+				_GetComponentColors(COMPONENT_LEFT_BORDER, colors);
 
 				for (int8 i = 0; i < 3; i++) {
 					fDrawingEngine->StrokeLine(BPoint(r.left + i, r.top + i),
@@ -530,7 +575,7 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 			// bottom
 			if (invalid.Intersects(fBottomBorder)) {
 				ComponentColors colors;
-				GetComponentColors(COMPONENT_BOTTOM_BORDER, colors);
+				_GetComponentColors(COMPONENT_BOTTOM_BORDER, colors);
 
 				for (int8 i = 0; i < 3; i++) {
 					fDrawingEngine->StrokeLine(BPoint(r.left + i, r.bottom - i),
@@ -541,7 +586,7 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 			// right
 			if (invalid.Intersects(fRightBorder.InsetByCopy(0, -fBorderWidth))) {
 				ComponentColors colors;
-				GetComponentColors(COMPONENT_RIGHT_BORDER, colors);
+				_GetComponentColors(COMPONENT_RIGHT_BORDER, colors);
 
 				for (int8 i = 0; i < 3; i++) {
 					fDrawingEngine->StrokeLine(BPoint(r.right - i, r.top + i),
@@ -556,7 +601,7 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 		{
 			// TODO: Draw the borders individually!
 			ComponentColors colors;
-			GetComponentColors(COMPONENT_LEFT_BORDER, colors);
+			_GetComponentColors(COMPONENT_LEFT_BORDER, colors);
 
 			fDrawingEngine->StrokeRect(r, colors[5]);
 			break;
@@ -572,7 +617,7 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 		r = fResizeRect;
 
 		ComponentColors colors;
-		GetComponentColors(COMPONENT_RESIZE_CORNER, colors);
+		_GetComponentColors(COMPONENT_RESIZE_CORNER, colors);
 
 		switch (fLook) {
 			case B_DOCUMENT_WINDOW_LOOK:
@@ -658,7 +703,7 @@ DefaultDecorator::_DrawTab(BRect invalid)
 		return;
 
 	ComponentColors colors;
-	GetComponentColors(COMPONENT_TAB, colors);
+	_GetComponentColors(COMPONENT_TAB, colors);
 
 	// outer frame
 	fDrawingEngine->StrokeLine(fTabRect.LeftTop(), fTabRect.LeftBottom(),
@@ -740,7 +785,7 @@ DefaultDecorator::_DrawTitle(BRect r)
 	STRACE(("_DrawTitle(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
 
 	ComponentColors colors;
-	GetComponentColors(COMPONENT_TAB, colors);
+	_GetComponentColors(COMPONENT_TAB, colors);
 
 	fDrawingEngine->SetDrawingMode(B_OP_OVER);
 	fDrawingEngine->SetHighColor(colors[COLOR_TAB_TEXT]);
@@ -1141,11 +1186,12 @@ DefaultDecorator::DrawButtons(const BRect& invalid)
 	The meaning of the color array elements depends on the specified component.
 	For some components some array elements are unused.
 
-	\param region The region for which to return the frame colors.
+	\param component The component for which to return the frame colors.
+	\param highlight The highlight set for the component.
 	\param colors An array of colors to be initialized by the function.
 */
 void
-DefaultDecorator::GetComponentColors(Component component,
+DefaultDecorator::GetComponentColors(Component component, uint8 highlight,
 	ComponentColors _colors)
 {
 	switch (component) {
@@ -1369,7 +1415,7 @@ DefaultDecorator::_GetBitmapForButton(Component item, bool down, int32 width,
 	static decorator_bitmap* sBitmapList = NULL;
 
 	ComponentColors colors;
-	GetComponentColors(item, colors);
+	_GetComponentColors(item, colors);
 
 	BAutolock locker(sBitmapListLock);
 
@@ -1451,4 +1497,42 @@ DefaultDecorator::_GetBitmapForButton(Component item, bool down, int32 width,
 	entry->next = sBitmapList;
 	sBitmapList = entry;
 	return bitmap;
+}
+
+
+
+void
+DefaultDecorator::_GetComponentColors(Component component,
+	ComponentColors _colors)
+{
+	// get the highlight for our component
+	Region region;
+	switch (component) {
+		case COMPONENT_TAB:
+			region = REGION_TAB;
+			break;
+		case COMPONENT_CLOSE_BUTTON:
+			region = REGION_CLOSE_BUTTON;
+			break;
+		case COMPONENT_ZOOM_BUTTON:
+			region = REGION_ZOOM_BUTTON;
+			break;
+		case COMPONENT_LEFT_BORDER:
+			region = REGION_LEFT_BORDER;
+			break;
+		case COMPONENT_RIGHT_BORDER:
+			region = REGION_RIGHT_BORDER;
+			break;
+		case COMPONENT_TOP_BORDER:
+			region = REGION_TOP_BORDER;
+			break;
+		case COMPONENT_BOTTOM_BORDER:
+			region = REGION_BOTTOM_BORDER;
+			break;
+		case COMPONENT_RESIZE_CORNER:
+			region = REGION_RIGHT_BOTTOM_CORNER;
+			break;
+	}
+
+	return GetComponentColors(component, RegionHighlight(region), _colors);
 }

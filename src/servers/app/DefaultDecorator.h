@@ -40,6 +40,9 @@ public:
 
 	virtual	Region				RegionAt(BPoint where) const;
 
+	virtual	void				ExtendDirtyRegion(Region region,
+									BRegion& dirty);
+
 			float				BorderWidth();
 			float				TabHeight();
 
@@ -116,7 +119,7 @@ protected:
 	// DefaultDecorator customization points
 	virtual	void				DrawButtons(const BRect& invalid);
 	virtual	void				GetComponentColors(Component component,
-									ComponentColors _colors);
+									uint8 highlight, ComponentColors _colors);
 
 private:
 			void				_UpdateFont(DesktopSettings& settings);
@@ -129,6 +132,9 @@ private:
 			void 				_InvalidateBitmaps();
 			ServerBitmap*		_GetBitmapForButton(Component item, bool down,
 									int32 width, int32 height);
+
+			void				_GetComponentColors(Component component,
+									ComponentColors _colors);
 
 protected:
 	static	const rgb_color		kFrameColors[4];

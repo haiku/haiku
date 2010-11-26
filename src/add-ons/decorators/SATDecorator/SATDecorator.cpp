@@ -97,7 +97,14 @@ SATDecorator::SATDecorator(DesktopSettings& settings, BRect frame,
 void
 SATDecorator::HighlightTab(bool active, BRegion* dirty)
 {
-	dirty->Include(fTabRect);
+	if (active == fTabHighlighted)
+		return;
+
+	uint8 highlight = active ? HIGHLIGHT_STACK_AND_TILE : 0;
+	SetRegionHighlight(REGION_TAB, highlight, dirty);
+	SetRegionHighlight(REGION_CLOSE_BUTTON, highlight, dirty);
+	SetRegionHighlight(REGION_ZOOM_BUTTON, highlight, dirty);
+
 	fTabHighlighted = active;
 }
 
@@ -105,11 +112,16 @@ SATDecorator::HighlightTab(bool active, BRegion* dirty)
 void
 SATDecorator::HighlightBorders(bool active, BRegion* dirty)
 {
-	dirty->Include(fLeftBorder);
-	dirty->Include(fRightBorder);
-	dirty->Include(fTopBorder);
-	dirty->Include(fBottomBorder);
-	dirty->Include(fResizeRect);
+	if (active == fBordersHighlighted)
+		return;
+
+	uint8 highlight = active ? HIGHLIGHT_STACK_AND_TILE : 0;
+	SetRegionHighlight(REGION_LEFT_BORDER, highlight, dirty);
+	SetRegionHighlight(REGION_RIGHT_BORDER, highlight, dirty);
+	SetRegionHighlight(REGION_TOP_BORDER, highlight, dirty);
+	SetRegionHighlight(REGION_BOTTOM_BORDER, highlight, dirty);
+	SetRegionHighlight(REGION_RIGHT_BOTTOM_CORNER, highlight, dirty);
+
 	fBordersHighlighted = active;
 }
 
@@ -452,15 +464,17 @@ SATDecorator::DrawButtons(const BRect& invalid)
 
 
 void
-SATDecorator::GetComponentColors(Component component, ComponentColors _colors)
+SATDecorator::GetComponentColors(Component component, uint8 highlight,
+	ComponentColors _colors)
 {
+	// we handle only our own highlights
+	if (highlight != HIGHLIGHT_STACK_AND_TILE) {
+		DefaultDecorator::GetComponentColors(component, highlight, _colors);
+		return;
+	}
+
 	switch (component) {
 		case COMPONENT_TAB:
-			if (!fTabHighlighted) {
-				DefaultDecorator::GetComponentColors(component, _colors);
-				return;
-			}
-
 			_colors[COLOR_TAB_FRAME_LIGHT] = kFrameColors[0];
 			_colors[COLOR_TAB_FRAME_DARK] = kFrameColors[3];
 			_colors[COLOR_TAB] = kHighlightTabColor;
@@ -472,11 +486,6 @@ SATDecorator::GetComponentColors(Component component, ComponentColors _colors)
 
 		case COMPONENT_CLOSE_BUTTON:
 		case COMPONENT_ZOOM_BUTTON:
-			if (!fTabHighlighted) {
-				DefaultDecorator::GetComponentColors(component, _colors);
-				return;
-			}
-
 			_colors[COLOR_BUTTON] = kHighlightTabColor;
 			_colors[COLOR_BUTTON_LIGHT] = kHighlightTabColorLight;
 			break;
@@ -487,11 +496,6 @@ SATDecorator::GetComponentColors(Component component, ComponentColors _colors)
 		case COMPONENT_BOTTOM_BORDER:
 		case COMPONENT_RESIZE_CORNER:
 		default:
-			if (!fBordersHighlighted) {
-				DefaultDecorator::GetComponentColors(component, _colors);
-				return;
-			}
-
 			_colors[0] = kHighlightFrameColors[0];
 			_colors[1] = kHighlightFrameColors[1];
 			_colors[2] = kHighlightFrameColors[2];

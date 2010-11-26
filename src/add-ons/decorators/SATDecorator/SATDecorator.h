@@ -31,6 +31,11 @@ protected:
 
 class SATDecorator : public DefaultDecorator {
 public:
+			enum {
+				HIGHLIGHT_STACK_AND_TILE = HIGHLIGHT_USER_DEFINED
+			};
+
+public:
 								SATDecorator(DesktopSettings& settings,
 									BRect frame, window_look look,
 									uint32 flags);
@@ -64,7 +69,7 @@ protected:
 
 	virtual	void				DrawButtons(const BRect& invalid);
 	virtual	void				GetComponentColors(Component component,
-									ComponentColors _colors);
+									 uint8 highlight, ComponentColors _colors);
 
 private:
 			bool				fTabHighlighted;
