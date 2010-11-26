@@ -174,7 +174,9 @@ Area::SetLeft(XTab* left)
 	fColumn = NULL;
 
 	fMinContentWidth->SetLeftSide(-1.0, fLeft, 1.0, fRight);
-	fPreferredContentWidth->SetLeftSide(-1.0, fLeft, 1.0, fRight);
+	BSize preferredSize = fLayoutItem->PreferredSize();
+	_UpdatePreferredWidthConstraint(preferredSize);
+
 	if (fMaxContentWidth != NULL)
 		fMaxContentWidth->SetLeftSide(-1.0, fLeft, 1.0, fRight);
 
@@ -195,7 +197,8 @@ Area::SetRight(XTab* right)
 	fColumn = NULL;
 
 	fMinContentWidth->SetLeftSide(-1.0, fLeft, 1.0, fRight);
-	fPreferredContentWidth->SetLeftSide(-1.0, fLeft, 1.0, fRight);
+	BSize preferredSize = fLayoutItem->PreferredSize();
+	_UpdatePreferredWidthConstraint(preferredSize);
 	if (fMaxContentWidth != NULL)
 		fMaxContentWidth->SetLeftSide(-1.0, fLeft, 1.0, fRight);
 
@@ -214,7 +217,8 @@ Area::SetTop(YTab* top)
 	fRow = NULL;
 
 	fMinContentHeight->SetLeftSide(-1.0, fTop, 1.0, fBottom);
-	fPreferredContentHeight->SetLeftSide(-1.0, fTop, 1.0, fBottom);
+	BSize preferredSize = fLayoutItem->PreferredSize();
+	_UpdatePreferredHeightConstraint(preferredSize);
 	if (fMaxContentHeight != NULL)
 		fMaxContentHeight->SetLeftSide(-1.0, fTop, 1.0, fBottom);
 
@@ -233,7 +237,8 @@ Area::SetBottom(YTab* bottom)
 	fRow = NULL;
 
 	fMinContentHeight->SetLeftSide(-1.0, fTop, 1.0, fBottom);
-	fPreferredContentHeight->SetLeftSide(-1.0, fTop, 1.0, fBottom);
+	BSize preferredSize = fLayoutItem->PreferredSize();
+	_UpdatePreferredHeightConstraint(preferredSize);
 	if (fMaxContentHeight != NULL)
 		fMaxContentHeight->SetLeftSide(-1.0, fTop, 1.0, fBottom);
 
@@ -540,7 +545,8 @@ Area::InvalidateSizeConstraints()
 
 	_UpdateMinSizeConstraint(minSize);
 	_UpdateMaxSizeConstraint(maxSize);
-	_UpdatePreferredConstraint(prefSize);
+	_UpdatePreferredWidthConstraint(prefSize);
+	_UpdatePreferredHeightConstraint(prefSize);
 }
 
 
@@ -716,17 +722,23 @@ Area::_UpdateMaxSizeConstraint(BSize max)
 
 
 void
-Area::_UpdatePreferredConstraint(BSize preferred)
+Area::_UpdatePreferredWidthConstraint(BSize& preferred)
 {
 	float width = 32000;
-	float height = 32000;
 	if (preferred.width > 0)
 		width = preferred.Width() + LeftInset() + RightInset();
-	if (preferred.height > 0)
-		height = preferred.Height() + TopInset() + BottomInset();
-
+	
 	fPreferredContentWidth->SetLeftSide(-1.0, fLeft, 1.0, fRight, -width,
 		fScaleWidth);
+}
+
+
+void
+Area::_UpdatePreferredHeightConstraint(BSize& preferred)
+{
+	float height = 32000;
+	if (preferred.height > 0)
+		height = preferred.Height() + TopInset() + BottomInset();
 
 	fPreferredContentHeight->SetLeftSide(-1.0, fTop, 1.0, fBottom, -height,
 		fScaleHeight);

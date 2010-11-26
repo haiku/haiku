@@ -118,7 +118,10 @@ private:
 
 			void				_UpdateMinSizeConstraint(BSize min);
 			void				_UpdateMaxSizeConstraint(BSize max);
-			void				_UpdatePreferredConstraint(BSize preferred);
+			void				_UpdatePreferredWidthConstraint(
+									BSize& preferred);
+			void				_UpdatePreferredHeightConstraint(
+									BSize& preferred);
 
 private:
 			BLayoutItem*		fLayoutItem;
