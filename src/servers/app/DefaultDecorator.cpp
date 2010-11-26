@@ -17,6 +17,7 @@
 
 #include "DefaultDecorator.h"
 
+#include <algorithm>
 #include <new>
 #include <stdio.h>
 
@@ -284,11 +285,25 @@ DefaultDecorator::ExtendDirtyRegion(Region region, BRegion& dirty)
 			break;
 
 		case REGION_LEFT_BORDER:
-			dirty.Include(fLeftBorder);
+			if (fLeftBorder.IsValid()) {
+				// fLeftBorder doesn't include the corners, so we have to add
+				// them manually.
+				BRect rect(fLeftBorder);
+				rect.top = fTopBorder.top;
+				rect.bottom = fBottomBorder.bottom;
+				dirty.Include(rect);
+			}
 			break;
 
 		case REGION_RIGHT_BORDER:
-			dirty.Include(fRightBorder);
+			if (fRightBorder.IsValid()) {
+				// fRightBorder doesn't include the corners, so we have to add
+				// them manually.
+				BRect rect(fRightBorder);
+				rect.top = fTopBorder.top;
+				rect.bottom = fBottomBorder.bottom;
+				dirty.Include(rect);
+			}
 			break;
 
 		case REGION_TOP_BORDER:
@@ -1253,7 +1268,6 @@ DefaultDecorator::GetComponentColors(Component component, uint8 highlight,
 		case COMPONENT_BOTTOM_BORDER:
 		case COMPONENT_RESIZE_CORNER:
 		default:
-			// common colors to both focus and non focus state
 			_colors[0] = kFrameColors[0];
 			_colors[1] = kFrameColors[1];
 			if (fButtonFocus) {
@@ -1265,6 +1279,15 @@ DefaultDecorator::GetComponentColors(Component component, uint8 highlight,
 			}
 			_colors[4] = kFrameColors[2];
 			_colors[5] = kFrameColors[3];
+
+			// for the resize-border highlight dye everything bluish.
+			if (highlight == HIGHLIGHT_RESIZE_BORDER) {
+				for (int32 i = 0; i < 6; i++) {
+					_colors[i].red = std::max((int)_colors[i].red - 80, 0);
+					_colors[i].green = std::max((int)_colors[i].green - 80, 0);
+					_colors[i].blue = 255;
+				}
+			}
 			break;
 	}
 }
