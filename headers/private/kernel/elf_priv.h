@@ -34,6 +34,8 @@ struct elf_image_info {
 	addr_t		dynamic_section;		// pointer to the dynamic section
 	struct elf_linked_image *linked_images;
 
+	bool		symbolic;
+
 	struct Elf32_Ehdr *elf_header;
 
 	// pointer to symbol participation data structures
