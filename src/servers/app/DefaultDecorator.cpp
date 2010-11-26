@@ -1506,7 +1506,7 @@ DefaultDecorator::_GetComponentColors(Component component,
 	ComponentColors _colors)
 {
 	// get the highlight for our component
-	Region region;
+	Region region = REGION_NONE;
 	switch (component) {
 		case COMPONENT_TAB:
 			region = REGION_TAB;
