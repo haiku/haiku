@@ -57,9 +57,13 @@ struct DefaultWindowBehaviour::State {
 	{
 	}
 
-	virtual bool MouseDown(BMessage* message, BPoint where)
+	virtual void ExitState(State* nextState)
 	{
-		return false;
+	}
+
+	virtual bool MouseDown(BMessage* message, BPoint where, bool& _unhandled)
+	{
+		return true;
 	}
 
 	virtual void MouseUp(BMessage* message, BPoint where)
@@ -67,6 +71,10 @@ struct DefaultWindowBehaviour::State {
 	}
 
 	virtual void MouseMoved(BMessage* message, BPoint where, bool isFake)
+	{
+	}
+
+	virtual void ModifiersChanged(BPoint where, int32 modifiers)
 	{
 	}
 
@@ -206,7 +214,7 @@ struct DefaultWindowBehaviour::DragState : MouseTrackingState {
 	{
 	}
 
-	virtual bool MouseDown(BMessage* message, BPoint where)
+	virtual bool MouseDown(BMessage* message, BPoint where, bool& _unhandled)
 	{
 		// right-click while dragging shall bring the window to front
 		int32 buttons = message->FindInt32("buttons");
@@ -215,10 +223,10 @@ struct DefaultWindowBehaviour::DragState : MouseTrackingState {
 				fDesktop->ActivateWindow(fWindow);
 			else
 				fDesktop->SendWindowBehind(fWindow);
-			return false;
+			return true;
 		}
 
-		return MouseTrackingState::MouseDown(message, where);
+		return MouseTrackingState::MouseDown(message, where, _unhandled);
 	}
 
 	virtual void MouseMovedAction(BPoint& delta, bigtime_t now)
@@ -367,70 +375,59 @@ struct DefaultWindowBehaviour::SlideTabState : MouseTrackingState {
 
 
 struct DefaultWindowBehaviour::ResizeBorderState : MouseTrackingState {
-	ResizeBorderState(DefaultWindowBehaviour& behavior, BPoint where)
+	ResizeBorderState(DefaultWindowBehaviour& behavior, BPoint where,
+		Decorator::Region region)
 		:
 		MouseTrackingState(behavior, where, true, false,
 			B_SECONDARY_MOUSE_BUTTON),
 		fHorizontal(NONE),
 		fVertical(NONE)
 	{
-		// Compute the window center relative location of where. We divide by
-		// the width respective the height, so we compensate for the window's
-		// aspect ratio.
-		BRect frame(fWindow->Frame());
-		if (frame.Width() + 1 == 0 || frame.Height() + 1 == 0)
-			return;
-
-		float x = (where.x - (frame.left + frame.right) / 2)
-			/ (frame.Width() + 1);
-		float y = (where.y - (frame.top + frame.bottom) / 2)
-			/ (frame.Height() + 1);
-
-		// compute the angle
-		if (x == 0 && y == 0)
-			return;
-
-		float angle = atan2f(y, x);
-
-		// rotate by 22.5 degree to align our sectors with 45 degree multiples
-		angle += M_PI / 8;
-
-		// add 180 degree to the negative values, so we get a nice 0 to 360
-		// degree range
-		if (angle < 0)
-			angle += M_PI * 2;
-
-		switch (int(angle / M_PI_4)) {
-			case 0:
-				fHorizontal = RIGHT;
+		switch (region) {
+			case Decorator::REGION_TAB:
+				// TODO: Handle like the border it is attached to (top/left)?
 				break;
-			case 1:
-				fHorizontal = RIGHT;
-				fVertical = BOTTOM;
-				break;
-			case 2:
-				fVertical = BOTTOM;
-				break;
-			case 3:
-				fHorizontal = LEFT;
-				fVertical = BOTTOM;
-				break;
-			case 4:
+			case Decorator::REGION_LEFT_BORDER:
 				fHorizontal = LEFT;
 				break;
-			case 5:
+			case Decorator::REGION_RIGHT_BORDER:
+				fHorizontal = RIGHT;
+				break;
+			case Decorator::REGION_TOP_BORDER:
+				fVertical = TOP;
+				break;
+			case Decorator::REGION_BOTTOM_BORDER:
+				fVertical = BOTTOM;
+				break;
+			case Decorator::REGION_LEFT_TOP_CORNER:
 				fHorizontal = LEFT;
 				fVertical = TOP;
 				break;
-			case 6:
+			case Decorator::REGION_LEFT_BOTTOM_CORNER:
+				fHorizontal = LEFT;
+				fVertical = BOTTOM;
+				break;
+			case Decorator::REGION_RIGHT_TOP_CORNER:
+				fHorizontal = RIGHT;
 				fVertical = TOP;
 				break;
-			case 7:
+			case Decorator::REGION_RIGHT_BOTTOM_CORNER:
+				fHorizontal = RIGHT;
+				fVertical = BOTTOM;
+				break;
 			default:
-				fHorizontal = RIGHT;
-				fVertical = TOP;
 				break;
 		}
+	}
+
+	ResizeBorderState(DefaultWindowBehaviour& behavior, BPoint where,
+		int8 horizontal, int8 vertical)
+		:
+		MouseTrackingState(behavior, where, true, false,
+			B_SECONDARY_MOUSE_BUTTON),
+		fHorizontal(horizontal),
+		fVertical(vertical)
+	{
 	}
 
 	virtual void MouseMovedAction(BPoint& delta, bigtime_t now)
@@ -474,18 +471,6 @@ struct DefaultWindowBehaviour::ResizeBorderState : MouseTrackingState {
 	}
 
 private:
-	enum {
-		// 1 for the "natural" resize border, -1 for the opposite,
-		// so multiplying the movement delta by that value results in the size
-		// change.
-		LEFT	= -1,
-		TOP		= -1,
-		NONE	= 0,
-		RIGHT	= 1,
-		BOTTOM	= 1
-	};
-
-private:
 	int8	fHorizontal;
 	int8	fVertical;
 };
@@ -495,7 +480,8 @@ private:
 
 
 struct DefaultWindowBehaviour::DecoratorButtonState : State {
-	DecoratorButtonState(DefaultWindowBehaviour& behavior, Region button)
+	DecoratorButtonState(DefaultWindowBehaviour& behavior,
+		Decorator::Region button)
 		:
 		State(behavior),
 		fButton(button)
@@ -525,21 +511,21 @@ struct DefaultWindowBehaviour::DecoratorButtonState : State {
 			engine->ConstrainClippingRegion(visibleBorder);
 
 			switch (fButton) {
-				case REGION_CLOSE_BUTTON:
+				case Decorator::REGION_CLOSE_BUTTON:
 					decorator->SetClose(false);
-					if (fBehavior._RegionFor(message) == REGION_CLOSE_BUTTON)
+					if (fBehavior._RegionFor(message) == fButton)
 						fWindow->ServerWindow()->NotifyQuitRequested();
 					break;
 
-				case REGION_ZOOM_BUTTON:
+				case Decorator::REGION_ZOOM_BUTTON:
 					decorator->SetZoom(false);
-					if (fBehavior._RegionFor(message) == REGION_ZOOM_BUTTON)
+					if (fBehavior._RegionFor(message) == fButton)
 						fWindow->ServerWindow()->NotifyZoom();
 					break;
 
-				case REGION_MINIMIZE_BUTTON:
+				case Decorator::REGION_MINIMIZE_BUTTON:
 					decorator->SetMinimize(false);
-					if (fBehavior._RegionFor(message) == REGION_MINIMIZE_BUTTON)
+					if (fBehavior._RegionFor(message) == fButton)
 						fWindow->ServerWindow()->NotifyMinimize(true);
 					break;
 
@@ -572,20 +558,20 @@ private:
 			engine->LockParallelAccess();
 			engine->ConstrainClippingRegion(visibleBorder);
 
-			Region hitRegion = message != NULL
+			Decorator::Region hitRegion = message != NULL
 				? fBehavior._RegionFor(message) : fButton;
 
 			switch (fButton) {
-				case REGION_CLOSE_BUTTON:
-					decorator->SetClose(hitRegion == REGION_CLOSE_BUTTON);
+				case Decorator::REGION_CLOSE_BUTTON:
+					decorator->SetClose(hitRegion == fButton);
 					break;
 
-				case REGION_ZOOM_BUTTON:
-					decorator->SetZoom(hitRegion == REGION_ZOOM_BUTTON);
+				case Decorator::REGION_ZOOM_BUTTON:
+					decorator->SetZoom(hitRegion == fButton);
 					break;
 
-				case REGION_MINIMIZE_BUTTON:
-					decorator->SetMinimize(hitRegion == REGION_MINIMIZE_BUTTON);
+				case Decorator::REGION_MINIMIZE_BUTTON:
+					decorator->SetMinimize(hitRegion == fButton);
 					break;
 
 				default:
@@ -598,7 +584,141 @@ private:
 	}
 
 protected:
-	Region	fButton;
+	Decorator::Region	fButton;
+};
+
+
+// #pragma mark - ManageWindowState
+
+
+struct DefaultWindowBehaviour::ManageWindowState : State {
+	ManageWindowState(DefaultWindowBehaviour& behavior, BPoint where)
+		:
+		State(behavior),
+		fLastMousePosition(where),
+		fHorizontal(NONE),
+		fVertical(NONE)
+	{
+	}
+
+	virtual void EnterState(State* previousState)
+	{
+		_UpdateBorders(fLastMousePosition);
+	}
+
+	virtual void ExitState(State* nextState)
+	{
+		fBehavior._SetBorderHighlights(fHorizontal, fVertical, false);
+	}
+
+	virtual bool MouseDown(BMessage* message, BPoint where, bool& _unhandled)
+	{
+		// We're only interested, if the secondary mouse button was pressed.
+		// Othewise let the our caller handle the event.
+		int32 buttons = message->FindInt32("buttons");
+		if ((buttons & B_SECONDARY_MOUSE_BUTTON) == 0) {
+			_unhandled = true;
+			return true;
+		}
+
+		fBehavior._NextState(new (std::nothrow) ResizeBorderState(fBehavior,
+			where, fHorizontal, fVertical));
+		return true;
+	}
+
+	virtual void MouseMoved(BMessage* message, BPoint where, bool isFake)
+	{
+		// If the mouse is still over our window, update the borders. Otherwise
+		// leave the state.
+		if (fDesktop->WindowAt(where) == fWindow) {
+			fLastMousePosition = where;
+			_UpdateBorders(fLastMousePosition);
+		} else
+			fBehavior._NextState(NULL);
+	}
+
+	virtual void ModifiersChanged(BPoint where, int32 modifiers)
+	{
+		if (!fBehavior._IsWindowModifier(modifiers))
+			fBehavior._NextState(NULL);
+	}
+
+private:
+	void _UpdateBorders(BPoint where)
+	{
+		// Compute the window center relative location of where. We divide by
+		// the width respective the height, so we compensate for the window's
+		// aspect ratio.
+		BRect frame(fWindow->Frame());
+		if (frame.Width() + 1 == 0 || frame.Height() + 1 == 0)
+			return;
+
+		float x = (where.x - (frame.left + frame.right) / 2)
+			/ (frame.Width() + 1);
+		float y = (where.y - (frame.top + frame.bottom) / 2)
+			/ (frame.Height() + 1);
+
+		// compute the angle
+		if (x == 0 && y == 0)
+			return;
+
+		float angle = atan2f(y, x);
+
+		// rotate by 22.5 degree to align our sectors with 45 degree multiples
+		angle += M_PI / 8;
+
+		// add 180 degree to the negative values, so we get a nice 0 to 360
+		// degree range
+		if (angle < 0)
+			angle += M_PI * 2;
+
+		int8 horizontal = NONE;
+		int8 vertical = NONE;
+		switch (int(angle / M_PI_4)) {
+			case 0:
+				horizontal = RIGHT;
+				break;
+			case 1:
+				horizontal = RIGHT;
+				vertical = BOTTOM;
+				break;
+			case 2:
+				vertical = BOTTOM;
+				break;
+			case 3:
+				horizontal = LEFT;
+				vertical = BOTTOM;
+				break;
+			case 4:
+				horizontal = LEFT;
+				break;
+			case 5:
+				horizontal = LEFT;
+				vertical = TOP;
+				break;
+			case 6:
+				vertical = TOP;
+				break;
+			case 7:
+			default:
+				horizontal = RIGHT;
+				vertical = TOP;
+				break;
+		}
+
+		// update the highlight, if necessary
+		if (horizontal != fHorizontal || vertical != fVertical) {
+			fBehavior._SetBorderHighlights(fHorizontal, fVertical, false);
+			fHorizontal = horizontal;
+			fVertical = vertical;
+			fBehavior._SetBorderHighlights(fHorizontal, fVertical, true);
+		}
+	}
+
+private:
+	BPoint	fLastMousePosition;
+	int8	fHorizontal;
+	int8	fVertical;
 };
 
 
@@ -629,14 +749,19 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where,
 	int32 buttons = message->FindInt32("buttons");
 
 	// if a state is active, let it do the job
-	if (fState != NULL)
-		return fState->MouseDown(message, where);
+	if (fState != NULL) {
+		bool unhandled = false;
+		bool result = fState->MouseDown(message, where, unhandled);
+		if (!unhandled)
+			return result;
+	}
 
-	// No state active yet -- determine the click region and decide what to do.
+	// No state active yet, or it wants us to handle the event -- determine the
+	// click region and decide what to do.
 
 	Decorator* decorator = fWindow->Decorator();
 
-	Region hitRegion = REGION_NONE;
+	Decorator::Region hitRegion = Decorator::REGION_NONE;
 	Action action = ACTION_NONE;
 
 	bool inBorderRegion = false;
@@ -653,7 +778,7 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where,
 		if (windowModifier) {
 			// click with window modifier keys -- let the whole window behave
 			// like the border
-			hitRegion = REGION_BORDER;
+			hitRegion = Decorator::REGION_LEFT_BORDER;
 		} else {
 			// click on the decorator -- get the exact region
 			hitRegion = _RegionFor(message);
@@ -665,10 +790,7 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where,
 		if ((buttons & B_PRIMARY_MOUSE_BUTTON) != 0) {
 			// left mouse button
 			switch (hitRegion) {
-				case REGION_NONE:
-					break;
-
-				case REGION_TAB:
+				case Decorator::REGION_TAB:
 					// tab sliding in any case if either shift key is held down
 					// except sliding up-down by moving mouse left-right would
 					// look strange
@@ -677,46 +799,65 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where,
 						action = ACTION_SLIDE_TAB;
 						break;
 					}
-					// otherwise fall through -- same handling as for the
-					// border...
-
-				case REGION_BORDER:
 					action = ACTION_DRAG;
 					break;
 
-				case REGION_CLOSE_BUTTON:
+				case Decorator::REGION_LEFT_BORDER:
+				case Decorator::REGION_RIGHT_BORDER:
+				case Decorator::REGION_TOP_BORDER:
+				case Decorator::REGION_BOTTOM_BORDER:
+					action = ACTION_DRAG;
+					break;
+
+				case Decorator::REGION_CLOSE_BUTTON:
 					action = (flags & B_NOT_CLOSABLE) == 0
 						? ACTION_CLOSE : ACTION_DRAG;
 					break;
 
-				case REGION_ZOOM_BUTTON:
+				case Decorator::REGION_ZOOM_BUTTON:
 					action = (flags & B_NOT_ZOOMABLE) == 0
 						? ACTION_ZOOM : ACTION_DRAG;
 					break;
 
-				case REGION_MINIMIZE_BUTTON:
+				case Decorator::REGION_MINIMIZE_BUTTON:
 					action = (flags & B_NOT_MINIMIZABLE) == 0
 						? ACTION_MINIMIZE : ACTION_DRAG;
 					break;
 
-				case REGION_RESIZE_CORNER:
+				case Decorator::REGION_LEFT_TOP_CORNER:
+				case Decorator::REGION_LEFT_BOTTOM_CORNER:
+				case Decorator::REGION_RIGHT_TOP_CORNER:
+					// TODO: Handle correctly!
+					action = ACTION_DRAG;
+					break;
+
+				case Decorator::REGION_RIGHT_BOTTOM_CORNER:
 					action = (flags & B_NOT_RESIZABLE) == 0
 						? ACTION_RESIZE : ACTION_DRAG;
+					break;
+
+				default:
 					break;
 			}
 		} else if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0) {
 			// right mouse button
 			switch (hitRegion) {
-				case REGION_NONE:
+				case Decorator::REGION_TAB:
+				case Decorator::REGION_LEFT_BORDER:
+				case Decorator::REGION_RIGHT_BORDER:
+				case Decorator::REGION_TOP_BORDER:
+				case Decorator::REGION_BOTTOM_BORDER:
+				case Decorator::REGION_CLOSE_BUTTON:
+				case Decorator::REGION_ZOOM_BUTTON:
+				case Decorator::REGION_MINIMIZE_BUTTON:
+				case Decorator::REGION_LEFT_TOP_CORNER:
+				case Decorator::REGION_LEFT_BOTTOM_CORNER:
+				case Decorator::REGION_RIGHT_TOP_CORNER:
+				case Decorator::REGION_RIGHT_BOTTOM_CORNER:
+					action = ACTION_RESIZE_BORDER;
 					break;
 
-				case REGION_TAB:
-				case REGION_BORDER:
-				case REGION_CLOSE_BUTTON:
-				case REGION_ZOOM_BUTTON:
-				case REGION_MINIMIZE_BUTTON:
-				case REGION_RESIZE_CORNER:
-					action = ACTION_RESIZE_BORDER;
+				default:
 					break;
 			}
 		}
@@ -783,17 +924,14 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where,
 			break;
 
 		case ACTION_RESIZE_BORDER:
-			_NextState(new (std::nothrow) ResizeBorderState(*this, where));
+			_NextState(new (std::nothrow) ResizeBorderState(*this, where,
+				hitRegion));
 			STRACE_CLICK(("===> ACTION_RESIZE_BORDER\n"));
 			break;
 
 		default:
 			break;
 	}
-
-	// If we have a state now, it surely wants all further mouse events.
-	if (fState != NULL)
-		fDesktop->SetMouseEventWindow(fWindow);
 
 	return true;
 }
@@ -808,10 +946,15 @@ DefaultWindowBehaviour::MouseUp(BMessage* message, BPoint where)
 
 
 void
-DefaultWindowBehaviour::MouseMoved(BMessage *message, BPoint where, bool isFake)
+DefaultWindowBehaviour::MouseMoved(BMessage* message, BPoint where, bool isFake)
 {
-	if (fState != NULL)
+	if (fState != NULL) {
 		fState->MouseMoved(message, where, isFake);
+	} else {
+		// If the window modifiers are hold, enter the window management state.
+		if (_IsWindowModifier(message->FindInt32("modifiers")))
+			_NextState(new(std::nothrow) ManageWindowState(*this, where));
+	}
 
 	// change focus in FFM mode
 	DesktopSettings desktopSettings(fDesktop);
@@ -828,6 +971,17 @@ DefaultWindowBehaviour::MouseMoved(BMessage *message, BPoint where, bool isFake)
 void
 DefaultWindowBehaviour::ModifiersChanged(int32 modifiers)
 {
+	BPoint where;
+	int32 buttons;
+	fDesktop->GetLastMouseState(&where, &buttons);
+
+	if (fState != NULL) {
+		fState->ModifiersChanged(where, modifiers);
+	} else {
+		// If the window modifiers are hold, enter the window management state.
+		if (_IsWindowModifier(modifiers))
+			_NextState(new(std::nothrow) ManageWindowState(*this, where));
+	}
 }
 
 
@@ -840,51 +994,94 @@ DefaultWindowBehaviour::_IsWindowModifier(int32 modifiers) const
 }
 
 
-DefaultWindowBehaviour::Region
+Decorator::Region
 DefaultWindowBehaviour::_RegionFor(const BMessage* message) const
 {
 	Decorator* decorator = fWindow->Decorator();
 	if (decorator == NULL)
-		return REGION_NONE;
+		return Decorator::REGION_NONE;
 
 	BPoint where;
 	if (message->FindPoint("where", &where) != B_OK)
-		return REGION_NONE;
+		return Decorator::REGION_NONE;
 
-	// translate the tab region into a functional region
-	switch (decorator->RegionAt(where)) {
-		case Decorator::REGION_NONE:
-			return REGION_NONE;
+	return decorator->RegionAt(where);
+}
 
-		case Decorator::REGION_TAB:
-			return REGION_TAB;
 
-		case Decorator::REGION_CLOSE_BUTTON:
-			return REGION_CLOSE_BUTTON;
+void
+DefaultWindowBehaviour::_SetBorderHighlights(int8 horizontal, int8 vertical,
+	bool active)
+{
+	if (Decorator* decorator = fWindow->Decorator()) {
+		uint8 highlight = active
+			? Decorator::HIGHLIGHT_RESIZE_BORDER
+			: Decorator::HIGHLIGHT_NONE;
 
-		case Decorator::REGION_ZOOM_BUTTON:
-			return REGION_ZOOM_BUTTON;
+		// set the highlights for the borders
+		BRegion dirtyRegion;
+		switch (horizontal) {
+			case LEFT:
+				decorator->SetRegionHighlight(Decorator::REGION_LEFT_BORDER,
+					highlight, &dirtyRegion);
+				break;
+			case RIGHT:
+				decorator->SetRegionHighlight(
+					Decorator::REGION_RIGHT_BORDER, highlight,
+					&dirtyRegion);
+				break;
+		}
 
-		case Decorator::REGION_MINIMIZE_BUTTON:
-			return REGION_MINIMIZE_BUTTON;
+		switch (vertical) {
+			case TOP:
+				decorator->SetRegionHighlight(Decorator::REGION_TOP_BORDER,
+					highlight, &dirtyRegion);
+				break;
+			case BOTTOM:
+				decorator->SetRegionHighlight(
+					Decorator::REGION_BOTTOM_BORDER, highlight,
+					&dirtyRegion);
+				break;
+		}
 
-		case Decorator::REGION_LEFT_BORDER:
-		case Decorator::REGION_RIGHT_BORDER:
-		case Decorator::REGION_TOP_BORDER:
-		case Decorator::REGION_BOTTOM_BORDER:
-			return REGION_BORDER;
+		// set the highlights for the corners
+		if (horizontal != NONE && vertical != NONE) {
+			if (horizontal == LEFT) {
+				if (vertical == TOP) {
+					decorator->SetRegionHighlight(
+						Decorator::REGION_LEFT_TOP_CORNER, highlight,
+						&dirtyRegion);
+				} else {
+					decorator->SetRegionHighlight(
+						Decorator::REGION_LEFT_BOTTOM_CORNER, highlight,
+						&dirtyRegion);
+				}
+			} else {
+				if (vertical == TOP) {
+					decorator->SetRegionHighlight(
+						Decorator::REGION_RIGHT_TOP_CORNER, highlight,
+						&dirtyRegion);
+				} else {
+					decorator->SetRegionHighlight(
+						Decorator::REGION_RIGHT_BOTTOM_CORNER, highlight,
+						&dirtyRegion);
+				}
+			}
+		}
 
-		case Decorator::REGION_LEFT_TOP_CORNER:
-		case Decorator::REGION_LEFT_BOTTOM_CORNER:
-		case Decorator::REGION_RIGHT_TOP_CORNER:
-			// not supported yet
-			return REGION_BORDER;
+		// invalidate the affected regions
+		dirtyRegion.IntersectWith(&fWindow->VisibleRegion());
+		BRect dirtyRect(dirtyRegion.Frame());
 
-		case Decorator::REGION_RIGHT_BOTTOM_CORNER:
-			return REGION_RESIZE_CORNER;
+		if (dirtyRect.IsValid()) {
+			DrawingEngine* engine = decorator->GetDrawingEngine();
+			engine->LockParallelAccess();
+			engine->ConstrainClippingRegion(&dirtyRegion);
 
-		default:
-			return REGION_NONE;
+			decorator->Draw(dirtyRect);
+
+			engine->UnlockParallelAccess();
+		}
 	}
 }
 
@@ -892,11 +1089,22 @@ DefaultWindowBehaviour::_RegionFor(const BMessage* message) const
 void
 DefaultWindowBehaviour::_NextState(State* state)
 {
+	// exit the old state
+	if (fState != NULL)
+		fState->ExitState(state);
+
+	// set and enter the new state
 	State* oldState = fState;
 	fState = state;
 
-	if (fState != NULL)
+	if (fState != NULL) {
 		fState->EnterState(oldState);
+		fDesktop->SetMouseEventWindow(fWindow);
+	} else if (oldState != NULL) {
+		// no state anymore -- reset the mouse event window, if it's still us
+		if (fDesktop->MouseEventWindow() == fWindow)
+			fDesktop->SetMouseEventWindow(NULL);
+	}
 
 	delete oldState;
 }

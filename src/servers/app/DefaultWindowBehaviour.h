@@ -39,19 +39,6 @@ public:
 	virtual	void				ModifiersChanged(int32 modifiers);
 
 private:
-			enum Region {
-				REGION_NONE = 0,
-
-				REGION_TAB,
-				REGION_BORDER,
-
-				REGION_CLOSE_BUTTON,
-				REGION_ZOOM_BUTTON,
-				REGION_MINIMIZE_BUTTON,
-
-				REGION_RESIZE_CORNER
-			};
-
 			enum Action {
 				ACTION_NONE,
 				ACTION_ZOOM,
@@ -64,6 +51,17 @@ private:
 				ACTION_RESIZE_BORDER
 			};
 
+			enum {
+				// 1 for the "natural" resize border, -1 for the opposite, so
+				// multiplying the movement delta by that value results in the
+				// size change.
+				LEFT	= -1,
+				TOP		= -1,
+				NONE	= 0,
+				RIGHT	= 1,
+				BOTTOM	= 1
+			};
+
 			struct State;
 			struct MouseTrackingState;
 			struct DragState;
@@ -71,6 +69,7 @@ private:
 			struct SlideTabState;
 			struct ResizeBorderState;
 			struct DecoratorButtonState;
+			struct ManageWindowState;
 
 			// to keep gcc 2 happy
 			friend struct State;
@@ -80,10 +79,14 @@ private:
 			friend struct SlideTabState;
 			friend struct ResizeBorderState;
 			friend struct DecoratorButtonState;
+			friend struct ManageWindowState;
 
 private:
 			bool				_IsWindowModifier(int32 modifiers) const;
-			Region				_RegionFor(const BMessage* message) const;
+			Decorator::Region	_RegionFor(const BMessage* message) const;
+
+			void				_SetBorderHighlights(int8 horizontal,
+									int8 vertical, bool active);
 
 			void				_NextState(State* state);
 
