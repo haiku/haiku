@@ -45,16 +45,13 @@ public:
 		YTab* y1 = layout->AddYTab();
 		YTab* y2 = layout->AddYTab();
 
-		Area* a1 = layout->AddView(button1, layout->Left(), layout->Top(), x2,
+		layout->AddView(button1, layout->Left(), layout->Top(), x2,
 			y1);
 		layout->AddView(button2, x2, layout->Top(), layout->Right(), y2);
-		Area* a3 = layout->AddView(button3, x1, y2, layout->Right(),
+		layout->AddView(button3, x1, y2, layout->Right(),
 			layout->Bottom());
 		layout->AddView(button4, layout->Left(), y1, x1, layout->Bottom());
 		layout->AddView(textView1, x1, y1, x2, y2);
-
-		a1->SetWidthAs(a3);
-		a1->SetHeightAs(a3);
 
 		// alternative setup
 		/* 
