@@ -329,7 +329,7 @@ UrlWrapper::ArgvReceived(int32 argc, char** argv)
 		return;
 	}
 
-	if (proto == "http" /*|| proto == "ftp"*/) {
+	if (proto == "http" || proto == "https" /*|| proto == "ftp"*/) {
 		BString cmd("/bin/wget ");
 		
 		//cmd << url;

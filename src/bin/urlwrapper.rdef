@@ -9,6 +9,7 @@ resource(1, "BEOS:FILE_TYPES") message
 	"types" = "text/x-webloc",
 	"types" = "application/x-vnd.Be.URL.file",
 	"types" = "application/x-vnd.Be.URL.http",
+	"types" = "application/x-vnd.Be.URL.https",
 	"types" = "application/x-vnd.Be.URL.query",
 	"types" = "application/x-vnd.Be.URL.sh",
 	"types" = "application/x-vnd.Be.URL.beshare",
