@@ -430,6 +430,16 @@ struct DefaultWindowBehaviour::ResizeBorderState : MouseTrackingState {
 	{
 	}
 
+	virtual void EnterState(State* previousState)
+	{
+		fBehavior._SetResizeCursor(fHorizontal, fVertical);
+	}
+
+	virtual void ExitState(State* nextState)
+	{
+		fBehavior._ResetResizeCursor();
+	}
+
 	virtual void MouseMovedAction(BPoint& delta, bigtime_t now)
 	{
 		if ((fWindow->Flags() & B_NOT_RESIZABLE) != 0) {
@@ -1107,4 +1117,49 @@ DefaultWindowBehaviour::_NextState(State* state)
 	}
 
 	delete oldState;
+}
+
+
+ServerCursor*
+DefaultWindowBehaviour::_ResizeCursorFor(int8 horizontal, int8 vertical)
+{
+	// get the cursor ID corresponding to the border/corner
+	BCursorID cursorID = B_CURSOR_ID_SYSTEM_DEFAULT;
+
+	if (horizontal == LEFT) {
+		if (vertical == TOP)
+			cursorID = B_CURSOR_ID_RESIZE_NORTH_WEST;
+		else if (vertical == BOTTOM)
+			cursorID = B_CURSOR_ID_RESIZE_SOUTH_WEST;
+		else
+			cursorID = B_CURSOR_ID_RESIZE_WEST;
+	} else if (horizontal == RIGHT) {
+		if (vertical == TOP)
+			cursorID = B_CURSOR_ID_RESIZE_NORTH_EAST;
+		else if (vertical == BOTTOM)
+			cursorID = B_CURSOR_ID_RESIZE_SOUTH_EAST;
+		else
+			cursorID = B_CURSOR_ID_RESIZE_EAST;
+	} else {
+		if (vertical == TOP)
+			cursorID = B_CURSOR_ID_RESIZE_NORTH;
+		else if (vertical == BOTTOM)
+			cursorID = B_CURSOR_ID_RESIZE_SOUTH;
+	}
+
+	return fDesktop->GetCursorManager().GetCursor(cursorID);
+}
+
+
+void
+DefaultWindowBehaviour::_SetResizeCursor(int8 horizontal, int8 vertical)
+{
+	fDesktop->SetManagementCursor(_ResizeCursorFor(horizontal, vertical));
+}
+
+
+void
+DefaultWindowBehaviour::_ResetResizeCursor()
+{
+	fDesktop->SetManagementCursor(NULL);
 }

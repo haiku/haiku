@@ -17,6 +17,7 @@
 
 #include "WindowBehaviour.h"
 
+#include "ServerCursor.h"
 #include "Decorator.h"
 
 
@@ -87,6 +88,12 @@ private:
 
 			void				_SetBorderHighlights(int8 horizontal,
 									int8 vertical, bool active);
+
+			ServerCursor*		_ResizeCursorFor(int8 horizontal,
+									int8 vertical);
+			void				_SetResizeCursor(int8 horizontal,
+									int8 vertical);
+			void				_ResetResizeCursor();
 
 			void				_NextState(State* state);
 
