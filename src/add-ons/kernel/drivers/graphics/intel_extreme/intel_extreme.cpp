@@ -119,8 +119,10 @@ init_interrupt_handler(intel_info &info)
 	thread_id thread = find_thread(NULL);
 	thread_info threadInfo;
 	if (get_thread_info(thread, &threadInfo) != B_OK
-		|| set_sem_owner(info.shared_info->vblank_sem, threadInfo.team) != B_OK)
+		|| set_sem_owner(info.shared_info->vblank_sem, threadInfo.team)
+			!= B_OK) {
 		status = B_ERROR;
+	}
 
 	if (status == B_OK && info.pci->u.h0.interrupt_pin != 0x00
 		&& info.pci->u.h0.interrupt_line != 0xff) {
