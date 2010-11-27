@@ -224,14 +224,23 @@ open_executable(char *name, image_type type, const char *rpath,
 	if (strchr(name, '/')) {
 		// the name already contains a path, we don't have to search for it
 		fd = _kern_open(-1, name, O_RDONLY, 0);
-		if (fd >= 0 || type != B_LIBRARY_IMAGE)
+		if (fd >= 0 || type == B_APP_IMAGE)
+			return fd;
+
+		// can't search harder an absolute path add-on name!
+		if (type == B_ADD_ON_IMAGE && name[0] == '/')
 			return fd;
 
 		// Even though ELF specs don't say this, we give shared libraries
-		// another chance and look them up in the usual search paths - at
+		// and relative path based add-ons another chance and look
+		// them up in the usual search paths - at
 		// least that seems to be what BeOS does, and since it doesn't hurt...
-		paths = strrchr(name, '/') + 1;
-		memmove(name, paths, strlen(paths) + 1);
+		if (type == B_LIBRARY_IMAGE) {
+			// For library (but not add-on),  strip any path from name
+			// Relative path of add-on is kept
+			paths = strrchr(name, '/') + 1;
+			memmove(name, paths, strlen(paths) + 1);
+		}
 	}
 
 	// let's evaluate the system path variables to find the container
