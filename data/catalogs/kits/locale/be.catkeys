@@ -1,0 +1,9 @@
+1	belarusian	system	2677153267
+%3.2f GiB	StringForSize		%3.2f ГіБ
+%3.2f KiB	StringForSize		%3.2f КіБ
+%d bytes	StringForSize		%d байтаў
+Green:	ColorControl		Зялёны:
+%.2f TiB	StringForSize		%.2f ТіБ
+Red:	ColorControl		Чырвоны:
+%3.2f MiB	StringForSize		%3.2f МіБ
+Blue:	ColorControl		Сіні:

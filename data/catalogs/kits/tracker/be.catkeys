@@ -1,0 +1,151 @@
+1	belarusian	x-vnd.Be-TRAK	905407605
+Mini icon view	Container Window		Маленькія значкі
+Original name	Container Window		Зыходнае імя
+Close all	Container Window		Закрыць ўсё
+Add-ons	Container Window		Дадаткі
+ minutes	Status Window		 хвілін
+Create relative link	Container Window		Стварыць адносную спасылку
+Copy	Container Window		Капіраваць
+Automatic disk mounting	AutoMounter Settings		Аўтаматычнае мацаванне дыскаў
+ hours	Status Window		 гадзін
+Only the boot disk	AutoMounter Settings		Толькі загрузачны дыск
+There was an error writing the attribute.	Widget Attribute Text		Памылка падчас запісу атрыбута.
+Mount	Container Window		Мацаваць
+Icon view	Container Window		Значкі
+All disks	AutoMounter Settings		Усе дыскі
+Tracker status	Status Window		Стан Тракера
+Deleting: 	Status Window		Знішчэнне: 
+Duplicate	Container Window		Дублікаваць
+Edit templates…	Template Menu		Праўка шаблонаў…
+Date & Time	Tracker Settings Window		Дата & Час
+Tracker preferences	Tracker Settings Window		Перавагі Тракера
+Cancel	Font view		Скасаваць
+To: 	Status Window		Каму: 
+Mini icon view	Volume Window		Маленькія значкі
+Unmount	Container Window		Адмацаваць
+Current folder	Container Window		Бягучая тэчка
+Don't automount	AutoMounter Settings		Не мацаваць
+Identify	Container Window		Ідэнтыфікаваць
+ of 	Status Window	As in 1 of 5	 з 
+Outline selection rectangle only	Settings Views		Вылучаць толькі контур прастакутніка
+New	Template Menu		Новы
+Clock	Settings Views		Гадзіннік
+All BeOS disks	AutoMounter Settings		Усе BeOS дыскі
+Close all in workspace	Container Window		Зачыніць ўсё на бягучай стольніцы
+Cut more	Container Window		Выразаць болей
+The mount server could not be contacted.	AutoMounter Settings		Немагчыма далучацца да сервера мацавання дыскаў.
+Background	Tracker Settings Window		Фон
+Replace other file	Widget Attribute Text		Замяніць другі файл
+Open parent	Container Window		Адчыніць бацькоўскі
+Force identify	Container Window		Пераідэнтыфікаваць
+Name	Container Window		Імя
+Creating links: 	Status Window		Стварэнне спасылак: 
+Decrease size	Container Window		Зменшыць памер
+Size	Container Window		Памер
+Paused: click to resume or stop	Status Window		Прыпынена: націсніце каб працягнуць ці спыніць
+Single window navigation	Settings Views		Навігацыя ў адным вакне
+Copy layout	Container Window		Капіраваць расклад
+Find…	Container Window		Шукаць…
+Unmount	Volume Window		Адмацаваць
+Eject when unmounting	AutoMounter Settings		Вызваляць падчас адмацавання
+Cancel	Widget Attribute Text		Скасаваць
+Preparing to move items…	Status Window		Падрыхтоўка да перамяшчэння элементаў…
+Preparing to create links…	Status Window		Падрыхтоўка да стварэння спасылак…
+Preparing to empty Trash…	Status Window		Падрыхтоўка да спустошання Сметніцы…
+Create link	Container Window		Стварыць спасылку
+ seconds	Status Window		секунд
+Mount server error	AutoMounter Settings		Памылка сервера мацавання дыскаў
+Done	AutoMounter Settings		Зроблена
+Sorry, the 'Character' attribute cannot store a multi-byte glyph.	Widget Attribute Text		Нажаль атрыбут тыпу 'Сімвал' ня можа змяшчаць шматбайтавы гліф.
+File	Container Window		Файл
+Mount settings…	Volume Window		Перавагі мацавання…
+Preparing to delete items…	Status Window		Падрыхтоўка да знішчэння элементаў…
+Kind	Container Window		Тып
+OK	AutoMounter Settings		Так
+Mount settings…	Settings Views		Перавагі мацавання…
+Created	Container Window		Створаны
+Disk mounting during boot	AutoMounter Settings		Мацаванне дыску падчас загрузкі
+Select…	Container Window		Вылучыць…
+Paste links	Container Window		Уставіць спасылкі
+Find…	Volume Window		Шукаць…
+Windows	Tracker Settings Window		Вокны
+Tracker/Tracker New Templates	Template Menu		Трэкер/Новыя шаблоны Трэкера
+Mount all disks now	AutoMounter Settings		Прымацаваь усе дыскі
+Show Disks icon	Settings Views		Паказваць значак Дыскаў
+New folder	Container Window		Новая тэчка
+Sorry, you cannot edit that attribute.	Widget Attribute Text		Нажаль немагчыма правіць гэты атрыбут.
+Mount	Volume Window		Мацаваць
+Restore	Container Window		Аднавіць
+Restoring: 	Status Window		Аднаўленне: 
+List folders first	Settings Views		Групаваць тэчкі спераду
+Disk mount settings	AutoMounter Settings		Перавагі мацавання дыскаў
+Preparing to restore items…	Status Window		Падрыхтоўка да аднаўлення элементаў…
+Close	Container Window		Закрыць
+Invert selection	Container Window		Інвертаваць вылучэнне
+Resize to fit	Container Window		Змяніць каб змяшчаць ўсё
+Open	Container Window		Адкрыць
+no items	Count View		няма элементаў
+1 item	Count View		1 элемент
+Preferences…	Container Window		Перавагі…
+Window	Container Window		Вакно
+Copying: 	Status Window		Капіраванне: 
+That name is already taken. Please type another one.	Widget Attribute Text		Гэтае імя ўжо зарэгістраване. Калі ласка, абярыце іншае імя.
+Move here	Container Window		Перасунуць сюды.
+Revert	Tracker Settings Window		Вярнуць
+Increase size	Container Window		Павялічыць памер
+ days	Status Window		дзён
+Show volumes on Desktop	Settings Views		Паказваць падзелы на Стольніцы
+Volume icons	Tracker Settings Window		Значкі падзелаў
+Edit name	Container Window		Правіць імя
+Desktop	Tracker Settings Window		Стольніца
+Delete	Container Window		Знішчыць
+Create link here	Container Window		Стварыць тут спасылку
+Open with…	Container Window		Адкрыць з дапамогай…
+%d items	Count View		%d элементаў
+Clean up all	Container Window		Прыбраць усё
+Copy to	Container Window		Капіраваць у 
+There was an error resolving the link.	Font view		Памылка пачас вырашэння спасылкі
+Permissions	Container Window		Правы доступу
+Resize to fit	Volume Window		Змяніць каб змяшчаць ўсё
+Move to	Container Window		Перасунуць у 
+Location	Container Window		Знаходжанне
+Over 	Status Window	More than	Па-над 
+Copy here	Container Window		Капіраваць сюды
+List View	Tracker Settings Window		Спіс
+Finish: 	Status Window		Завяршэнне: 
+Copy more	Container Window		Капіраваць болей
+Trash	Tracker Settings Window		Сметніца
+%Ld bytes	Widget Attribute Text		%Ld байтаў
+Paste layout	Container Window		Уставіць расклад
+Show shared volumes on Desktop	Settings Views		Паказваць супольныя падзелы на Стольніцы
+Add printer…	Container Window		Дадаць друкарку…
+Day-month-year	Settings Views		Дзень-месяц-год
+Error %s loading add-On %s.	Container Window		Памылка %s падчас загрузкі дадатку %s.
+Emptying Trash… 	Status Window		Спустошанне Сметніцы… 
+Recent folders	Container Window		Ранейшыя тэчкі
+Select all	Container Window		Пазначыць ўсё
+Cut	Container Window		Выразаць
+ left	Status Window	Remaining	 левы
+Empty Trash	Container Window		Спустошыць Сметніцу
+Show folder location in title tab	Settings Views		Паказваць шлах да тэчкі ў загалоўку
+Year-month-day	Settings Views		Год-месяц-дзень
+Date order	Settings Views		Чын Даты
+12 hour	Settings Views		12 гадзін
+Get info	Container Window		Атрымаць інфармацыю
+24 hour	Settings Views		24 гадзіны
+Searching for disks to mount…	Status Window		Пошук дыскаў для мацавання…
+Empty folder	Slow Context Popup		Спустошыць тэчку
+Modified	Container Window		Мадыфікаваны
+Previously mounted disks	AutoMounter Settings		Раней замацаваныя дыскі
+Defaults	Tracker Settings Window		Прадвызначаныя
+Move to Trash	Container Window		Выкінуць у сметніцу
+Make active printer	Container Window		Зрабіць актыўнай друкаркай
+List view	Container Window		Спіс
+Paste	Container Window		Уставіць
+Attributes	Container Window		Атрыбуты
+Edit query	Container Window		Правіць запыт
+Moving: 	Status Window		Персоўванне: 
+Create relative link here	Container Window		Стварыц тут адносную спасылку
+Show navigator	Settings Views		Паказваць навігатар
+Clean up	Container Window		Прыбраць
+Preparing to copy items…	Status Window		Падрыхтоўка да капіравання элементаў…
