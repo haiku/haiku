@@ -26,7 +26,8 @@
 
 class OffscreenClock : public BView {
 public:
-							OffscreenClock(BRect frame, const char* name);
+							OffscreenClock(BRect frame, const char* name,
+								bool drawSecondHand = true);
 	virtual					~OffscreenClock();
 
 			void		 	SetTime(int32 hour, int32 minute, int32 second);
@@ -62,10 +63,13 @@ private:
 
 			bool			fHourDragging;
 			bool			fMinuteDragging;
+			
+			bool			fDrawSecondHand;
 };
 
 
-OffscreenClock::OffscreenClock(BRect frame, const char* name)
+OffscreenClock::OffscreenClock(BRect frame, const char* name,
+	bool drawSecondHand)
 	:
 	BView(frame, name, B_FOLLOW_NONE, B_WILL_DRAW),
 	fHours(0),
@@ -73,7 +77,8 @@ OffscreenClock::OffscreenClock(BRect frame, const char* name)
 	fSeconds(0),
 	fDirty(true),
 	fHourDragging(false),
-	fMinuteDragging(false)
+	fMinuteDragging(false),
+	fDrawSecondHand(drawSecondHand)
 {
 	SetFlags(Flags() | B_SUBPIXEL_PRECISE);
 
@@ -343,13 +348,15 @@ OffscreenClock::_DrawHands(float x, float y, float radius,
 	offsetY = (radius * 0.9) * cosf((minutes * M_PI) / 30.0);
 	StrokeLine(BPoint(x, y), BPoint(x + offsetX, y - offsetY));
 
-	// calc, draw second hand
-	SetHighColor(secondsColor);
-	SetPenSize(1.0);
-	offsetX = (radius * 0.95) * sinf((fSeconds * M_PI) / 30.0);
-	offsetY = (radius * 0.95) * cosf((fSeconds * M_PI) / 30.0);
-	StrokeLine(BPoint(x, y), BPoint(x + offsetX, y - offsetY));
-
+	if (fDrawSecondHand) {
+		// calc, draw second hand
+		SetHighColor(secondsColor);
+		SetPenSize(1.0);
+		offsetX = (radius * 0.95) * sinf((fSeconds * M_PI) / 30.0);
+		offsetY = (radius * 0.95) * cosf((fSeconds * M_PI) / 30.0);
+		StrokeLine(BPoint(x, y), BPoint(x + offsetX, y - offsetY));
+	}
+	
 	// draw the center knob
 	SetHighColor(knobColor);
 	FillEllipse(BPoint(x, y), radius * 0.06, radius * 0.06);
@@ -359,11 +366,14 @@ OffscreenClock::_DrawHands(float x, float y, float radius,
 //	#pragma mark -
 
 
-TAnalogClock::TAnalogClock(BRect frame, const char* name)
+TAnalogClock::TAnalogClock(BRect frame, const char* name,
+	bool drawSecondHand = true, bool interactive = true)
 	:
 	BView(frame, name, B_FOLLOW_NONE, B_WILL_DRAW | B_DRAW_ON_CHILDREN),
 	fBitmap(NULL),
 	fClock(NULL),
+	fDrawSecondHand(drawSecondHand),
+	fInteractive(interactive),
 	fDraggingHourHand(false),
 	fDraggingMinuteHand(false),
 	fTimeChangeIsOngoing(false)
@@ -381,7 +391,7 @@ TAnalogClock::~TAnalogClock()
 void
 TAnalogClock::_InitView(BRect rect)
 {
-	fClock = new OffscreenClock(Bounds(), "offscreen");
+	fClock = new OffscreenClock(Bounds(), "offscreen", fDrawSecondHand);
 	fBitmap = new BBitmap(Bounds(), B_RGB32, true);
 	fBitmap->Lock();
 	fBitmap->AddChild(fClock);
@@ -430,6 +440,11 @@ TAnalogClock::MessageReceived(BMessage* message)
 void
 TAnalogClock::MouseDown(BPoint point)
 {
+	if(!fInteractive) {
+		BView::MouseDown(point);
+		return;
+	}
+	
 	fDraggingMinuteHand = fClock->InMinuteHand(point);
 	if (fDraggingMinuteHand) {
 		fClock->SetMinuteDragging(true);
@@ -450,6 +465,11 @@ TAnalogClock::MouseDown(BPoint point)
 void
 TAnalogClock::MouseUp(BPoint point)
 {
+	if(!fInteractive) {
+		BView::MouseUp(point);
+		return;
+	}
+	
 	if (fDraggingHourHand || fDraggingMinuteHand) {
 		int32 hour, minute, second;
 		fClock->GetTime(&hour, &minute, &second);
@@ -470,6 +490,10 @@ TAnalogClock::MouseUp(BPoint point)
 void
 TAnalogClock::MouseMoved(BPoint point, uint32 transit, const BMessage* message)
 {
+	if(!fInteractive) {
+		BView::MouseMoved(point, transit, message);
+		return;
+	}
 
 	if (fDraggingMinuteHand)
 		fClock->SetMinuteHand(point);
@@ -501,7 +525,11 @@ TAnalogClock::SetTime(int32 hour, int32 minute, int32 second)
 	if (fClock)
 		fClock->SetTime(hour, minute, second);
 
-	Invalidate();
+	BWindow* window = Window();
+	if (window && window->Lock()) {
+		Invalidate();
+		Window()->Unlock();
+	}
 }
 
 

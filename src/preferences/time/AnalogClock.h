@@ -19,7 +19,8 @@ class OffscreenClock;
 
 class TAnalogClock : public BView {
 public:
-								TAnalogClock(BRect frame, const char* name);
+								TAnalogClock(BRect frame, const char* name,
+									bool drawSecondHand = true, bool interactive = true);
 	virtual						~TAnalogClock();
 
 	virtual	void				AttachedToWindow();
@@ -41,6 +42,8 @@ private:
 			BBitmap*			fBitmap;
 			OffscreenClock*		fClock;
 
+			bool				fDrawSecondHand;
+			bool				fInteractive;
 			bool				fDraggingHourHand;
 			bool				fDraggingMinuteHand;
 
