@@ -56,6 +56,7 @@ extern void		abort(void);
 extern int		atexit(void (*func)(void));
 extern int		atfork(void (*func)(void));
 extern void		exit(int);
+extern void		_Exit(int);
 
 /* misc functions */
 extern char		*realpath(const char *path, char *resolved);

@@ -4,6 +4,7 @@
  */
 
 
+#include <stdlib.h>
 #include <unistd.h>
 #include <syscalls.h>
 
@@ -20,3 +21,9 @@ _exit(int status)
 	_kern_exit_team(status);
 }
 
+
+void
+_Exit(int status)
+{
+	_exit(status);
+}
