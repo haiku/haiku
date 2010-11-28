@@ -68,7 +68,7 @@ private:
 	OutputStream*		fOutputStream;
 	GPJobConfiguration*	fConfiguration;
 
-	bool					fFirstPage;
+	bool					fHasPages;
 	stp_image_t				fImage;
 	stp_vars_t*				fVariables;
 	const stp_printer_t*	fPrinter;

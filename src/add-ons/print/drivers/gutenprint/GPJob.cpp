@@ -15,7 +15,7 @@ GPJob::GPJob()
 	fApplicationName(),
 	fOutputStream(NULL),
 	fConfiguration(NULL),
-	fFirstPage(true),
+	fHasPages(false),
 	fVariables(NULL),
 	fBands(NULL),
 	fCachedBand(NULL),
@@ -162,7 +162,7 @@ GPJob::End()
 	if (fVariables == NULL)
 		return;
 
-	if (!fFirstPage)
+	if (fHasPages)
 		stp_end_job(fVariables, &fImage);
 
 	stp_vars_destroy(fVariables);
@@ -297,8 +297,8 @@ GPJob::PrintPage(list<GPBand*>& bands) {
 		return B_ERROR;
 	}
 
-	if (fFirstPage) {
-		fFirstPage = false;
+	if (!fHasPages) {
+		fHasPages = true;
 		stp_start_job(fVariables, &fImage);
 	}
 
