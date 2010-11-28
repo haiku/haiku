@@ -92,6 +92,7 @@ public:
 									bool findNonWords, TermPos& start,
 									TermPos& end) const;
 			int32				LineLength(int32 index) const;
+			int32				GetLineColor(int32 index) const;
 
 			bool				Find(const char* pattern, const TermPos& start,
 									bool forward, bool caseSensitive,

@@ -7,6 +7,8 @@
 
 #include <SupportDefs.h>
 
+#include "TermConst.h"
+
 #include "UTF8Char.h"
 
 
@@ -19,11 +21,13 @@ struct TerminalCell {
 struct TerminalLine {
 	uint16			length;
 	bool			softBreak;	// soft line break
+	uint32			attributes;
 	TerminalCell	cells[1];
 
 	inline void Clear()
 	{
 		length = 0;
+		attributes = 0;
 		softBreak = false;
 	}
 };
@@ -41,6 +45,7 @@ struct HistoryLine {
 	uint16			attributesRunCount;	// number of attribute runs
 	uint16			byteLength : 15;	// number of bytes in the line
 	bool			softBreak : 1;		// soft line break;
+	uint32			attributes;
 
 	AttributesRun* AttributesRuns() const
 	{

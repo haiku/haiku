@@ -1428,24 +1428,9 @@ TermView::Draw(BRect updateRect)
 						SetHighColor(fSelectBackColor);
 						FillRect(rect);
 					} else {
-						// We are not in the selection, so we have to try to
-						// guess the color for this line from the last char
-						// that was drawn in it.
-						int t = 1;
-						while (count == 0 && i - t >= 0) {
-							count = fVisibleTextBuffer->GetString(
-								j - firstVisible,
-								i - t, lastColumn, buf, attr);
-							t++;
-						}
-
-						// If the line is completely empty, we use the default
-						// back color.
-						// TODO: It would be better to look at the line above,
-						// or ensure each line is always initialized with an
-						// attribute telling wat color to set.
-						SetHighColor(count ? kTermColorTable[IS_BACKCOLOR(attr)]
-							: kTermColorTable[0]);
+						uint32 backcolor = IS_BACKCOLOR(fVisibleTextBuffer->GetLineColor(j));
+						rgb_color rgb_back = kTermColorTable[backcolor];
+						SetHighColor(rgb_back);
 						FillRect(rect);
 					}
 

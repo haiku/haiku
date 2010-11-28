@@ -240,6 +240,7 @@ BasicTerminalBuffer::SynchronizeWith(const BasicTerminalBuffer* other,
 		if (sourceLine != NULL) {
 			if (sourceLine != destLine) {
 				destLine->length = sourceLine->length;
+				destLine->attributes = sourceLine->attributes;
 				destLine->softBreak = sourceLine->softBreak;
 				if (destLine->length > 0) {
 					memcpy(destLine->cells, sourceLine->cells,
@@ -444,6 +445,14 @@ BasicTerminalBuffer::LineLength(int32 index) const
 }
 
 
+int32
+BasicTerminalBuffer::GetLineColor(int32 index) const
+{
+//	TerminalLine* lineBuffer = ALLOC_LINE_ON_STACK(fWidth);
+	TerminalLine* line = _LineAt(index);
+	return line != NULL ? line->attributes : 0;
+}
+
 bool
 BasicTerminalBuffer::Find(const char* _pattern, const TermPos& start,
 	bool forward, bool caseSensitive, bool matchWord, TermPos& _matchStart,
@@ -615,10 +624,8 @@ void
 BasicTerminalBuffer::InsertCR(uint32 attributes)
 {
 	TerminalLine* line = _LineAt(fCursor.y);
-	line->cells[fCursor.x].attributes = attributes;
-	line->cells[fCursor.x].character = ' ';
-	line->length ++;
 
+	line->attributes = attributes;
 	line->softBreak = false;
 	fSoftWrappedCursor = false;
 	fCursor.x = 0;

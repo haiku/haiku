@@ -118,6 +118,7 @@ HistoryBuffer::GetTerminalLineAt(int32 index, TerminalLine* buffer) const
 
 	buffer->length = charCount;
 	buffer->softBreak = line->softBreak;
+	buffer->attributes = line->attributes;
 
 	return buffer;
 }
@@ -186,6 +187,7 @@ HistoryBuffer::AddLine(const TerminalLine* line)
 		attributesRun->length = line->length - attributesRun->offset;
 
 	historyLine->softBreak = line->softBreak;
+	historyLine->attributes = line->attributes;
 //debug_printf("  line: \"%.*s\", history size now: %ld\n", historyLine->byteLength, historyLine->Chars(), fSize);
 }
 
