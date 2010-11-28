@@ -367,7 +367,7 @@ OffscreenClock::_DrawHands(float x, float y, float radius,
 
 
 TAnalogClock::TAnalogClock(BRect frame, const char* name,
-	bool drawSecondHand = true, bool interactive = true)
+	bool drawSecondHand, bool interactive)
 	:
 	BView(frame, name, B_FOLLOW_NONE, B_WILL_DRAW | B_DRAW_ON_CHILDREN),
 	fBitmap(NULL),
