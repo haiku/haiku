@@ -186,21 +186,26 @@ GPBinding::EndPage() throw(TransportException)
 {
 	status_t status = fJob.PrintPage(fBands);
 	DeleteBands();
-	if (status != B_OK)
+	if (status == B_IO_ERROR)
 		throw TransportException("I/O Error");
+	if (status == B_ERROR) {
+		BString message;
+		fJob.GetErrorMessage(message);
+		throw TransportException(message.String());
+	}
 }
 
 
-void
+status_t
 GPBinding::AddBitmapToPage(BBitmap* bitmap, BRect validRect, BPoint where)
 {
 	GPBand* band = new(nothrow) GPBand(bitmap, validRect, where);
 	if (band == NULL) {
-		// TODO report error
-		return;
+		return B_NO_MEMORY;
 	}
 
 	fBands.push_back(band);
+	return B_OK;
 }
 
 
@@ -210,8 +215,9 @@ GPBinding::InitGutenprint()
 	if (fInitialized)
 		return;
 	fInitialized = true;
-	// TODO make sure this creates no memory leaks,
-	// as there is no "destroy" counter part
+	// there is no "destroy" counter part so this creates memory leaks
+	// this is no problem because the print server loads printer add-ons
+	// in a new application instance that is terminated when not used anymore
 	stp_init();
 	stp_set_output_codeset("UTF-8");
 }

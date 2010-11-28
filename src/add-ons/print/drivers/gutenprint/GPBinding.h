@@ -48,7 +48,7 @@ public:
 	void		EndJob() throw(TransportException);
 	void		BeginPage() throw(TransportException);
 	void		EndPage() throw(TransportException);
-	void		AddBitmapToPage(BBitmap* bitmap, BRect validRect, BPoint where);
+	status_t	AddBitmapToPage(BBitmap* bitmap, BRect validRect, BPoint where);
 
 private:
 	void		InitGutenprint();

@@ -19,7 +19,7 @@ GPJob::GPJob()
 	fVariables(NULL),
 	fBands(NULL),
 	fCachedBand(NULL),
-	fWriteError(B_OK)
+	fStatus(B_OK)
 {
 	fImage.init = ImageInit;
 	fImage.reset = ImageReset;
@@ -61,7 +61,7 @@ GPJob::SetOutputStream(OutputStream* outputStream)
 status_t
 GPJob::Begin()
 {
-	fWriteError = B_OK;
+	fStatus = B_OK;
 
 	stp_init();
 
@@ -217,8 +217,8 @@ from72dpi(int value, int toUnit)
 
 status_t
 GPJob::PrintPage(list<GPBand*>& bands) {
-	if (fWriteError != B_OK)
-		return fWriteError;
+	if (fStatus != B_OK)
+		return fStatus;
 
 	fPrintRect = GetPrintRectangle(bands);
 	fBands = &bands;
@@ -304,7 +304,14 @@ GPJob::PrintPage(list<GPBand*>& bands) {
 
 	stp_print(fVariables, &fImage);
 
-	return fWriteError;
+	return fStatus;
+}
+
+
+void
+GPJob::GetErrorMessage(BString& message)
+{
+	message = fErrorMessage;
 }
 
 
@@ -356,7 +363,7 @@ GPJob::Height()
 stp_image_status_t
 GPJob::GetRow(unsigned char* data, size_t size, int row)
 {
-	if (fWriteError != B_OK)
+	if (fStatus != B_OK)
 		return STP_IMAGE_STATUS_ABORT;
 
 	// row is relative to left, top of image
@@ -454,7 +461,7 @@ GPJob::Write(const char* data, size_t size)
 	try {
 		fOutputStream->Write(data, size);
 	} catch (TransportException e) {
-		fWriteError = B_IO_ERROR;
+		fStatus = B_IO_ERROR;
 	}
 }
 
@@ -462,8 +469,9 @@ GPJob::Write(const char* data, size_t size)
 void
 GPJob::ReportError(const char* data, size_t size)
 {
-	// TODO report error in printer add-on
-	fprintf(stderr, "GPJob Gutenprint Error: %*s\n", (int)size, data);
+	if (fStatus == B_OK)
+		fStatus = B_ERROR;
+	fErrorMessage.Append(data, size);
 }
 
 

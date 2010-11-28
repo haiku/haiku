@@ -207,6 +207,7 @@ GPDriver::endPage(int)
 		return true;
 	}
 	catch (TransportException& err) {
+		ShowError(err.what());
 		return false;
 	} 
 }
@@ -220,6 +221,7 @@ GPDriver::endDoc(bool)
 		return true;
 	}
 	catch (TransportException& err) {
+		ShowError(err.what());
 		return false;
 	} 
 }
@@ -261,25 +263,25 @@ GPDriver::nextBand(BBitmap* bitmap, BPoint* offset)
 
 			x = rc.left;
 			y += rc.top;
-/*
-			int width = rc.right - rc.left + 1;
-			int height = rc.bottom - rc.top + 1;
-			int delta = bitmap->BytesPerRow();
 
-			DBGMSG(("width = %d\n", width));
-			DBGMSG(("height = %d\n", height));
-			DBGMSG(("delta = %d\n", delta));
-			DBGMSG(("renderobj->get_pixel_depth() = %d\n", fHalftone->getPixelDepth()));
-*/
 			int width = rc.right - rc.left + 1;
 			int height = rc.bottom - rc.top + 1;
 			fprintf(stderr, "GPDriver nextBand x %d, y %d, width %d,"
 				" height %d\n",
 				x, y, width, height);
 			BRect imageRect(rc.left, rc.top, rc.right, rc.bottom);
-			fBinding.AddBitmapToPage(bitmap, imageRect, BPoint(x, y));
+			status_t status;
+			status = fBinding.AddBitmapToPage(bitmap, imageRect, BPoint(x, y));
+			if (status == B_NO_MEMORY) {
+				ShowError("Out of memory");
+				return false;
+			} else if (status != B_OK) {
+				ShowError("Unknown error");
+				return false;
+			}
+
 		} else {
-			DBGMSG(("band bitmap is clean.\n"));
+			DBGMSG(("band bitmap is empty.\n"));
 		}
 
 		if (y >= page_height) {
@@ -292,8 +294,19 @@ GPDriver::nextBand(BBitmap* bitmap, BPoint* offset)
 		return true;
 	}
 	catch (TransportException& err) {
-		BAlert* alert = new BAlert("", err.what(), "OK");
-		alert->Go();
+		ShowError(err.what());
 		return false;
 	} 
+}
+
+
+void
+GPDriver::ShowError(const char* message)
+{
+	BString text;
+	text << "An error occurred attempting to print with Gutenprint:";
+	text << "\n";
+	text << message;
+	BAlert* alert = new BAlert("", text.String(), "OK");
+	alert->Go();
 }

@@ -42,6 +42,7 @@ protected:
 	bool		nextBand(BBitmap* bitmap, BPoint* offset);
 	bool		endPage(int page);
 	bool		endDoc(bool success);
+	void		ShowError(const char* message);
 
 private:
 	GPBinding		fBinding;

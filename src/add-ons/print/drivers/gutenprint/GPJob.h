@@ -34,6 +34,8 @@ public:
 
 	status_t	PrintPage(list<GPBand*>& bands);
 
+	void		GetErrorMessage(BString& message);
+
 private:
 	BRect	GetPrintRectangle(list<GPBand*>& bands);
 	GPBand*	FindBand(int line);
@@ -75,6 +77,7 @@ private:
 	BRect					fPrintRect;
 	list<GPBand*>*			fBands;
 	GPBand*					fCachedBand;
-	status_t				fWriteError;
+	status_t				fStatus;
+	BString					fErrorMessage;
 };
 #endif
