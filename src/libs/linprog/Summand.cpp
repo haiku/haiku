@@ -62,7 +62,7 @@ Summand::SetVar(Variable* var)
  */
 Summand::~Summand()
 {
-  fVar->fUsingSummands.RemoveItem(this);
+
 }
 
 
@@ -74,5 +74,4 @@ Summand::Summand(double coeff, Variable* var)
 	fCoeff = coeff;
 	fVar = var;
 	fUsedInPenaltyFunction = false;
-	fVar->fUsingSummands.AddItem(this);
 }

@@ -61,8 +61,6 @@ protected:
 private:
 			LinearSpec*			fLS;
 
-			BObjectList<Summand>	fUsingSummands;
-				// All Summands that link to this Variable
 			double				fValue;
 			double				fMin;
 			double				fMax;
@@ -72,7 +70,6 @@ private:
 
 public:
 	friend class		LinearSpec;
-	friend class		Summand;
 };
 
 
