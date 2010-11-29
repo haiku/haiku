@@ -106,6 +106,9 @@ private:
 			BMenuItem*			fMagentaItem;
 			BMenuItem*			fYellowItem;
 
+			BMenuItem*			fBoldItem;
+			BMenuItem*			fItalicItem;
+
 			BMenuItem*			fWrapItem;
 			BMenuItem*			fAlignLeft;
 			BMenuItem*			fAlignCenter;

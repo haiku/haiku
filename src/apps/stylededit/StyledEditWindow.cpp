@@ -311,6 +311,12 @@ StyledEditWindow::MessageReceived(BMessage* message)
 				BMenuItem* item = static_cast<BMenuItem*>(ptr);
 				fontFamily = item->Label();
 			}
+
+			BFont font;
+			font.SetFamilyAndStyle(fontFamily, fontStyle);
+			fItalicItem->SetMarked((font.Face() & B_ITALIC_FACE) != 0);
+			fBoldItem->SetMarked((font.Face() & B_BOLD_FACE) != 0);
+
 			_SetFontStyle(fontFamily, fontStyle);
 			break;
 		}
@@ -329,7 +335,47 @@ StyledEditWindow::MessageReceived(BMessage* message)
 						fontFamily = super_item->Label();
 				}
 			}
+
+			BFont font;
+			font.SetFamilyAndStyle(fontFamily, fontStyle);
+			fItalicItem->SetMarked((font.Face() & B_ITALIC_FACE) != 0);
+			fBoldItem->SetMarked((font.Face() & B_BOLD_FACE) != 0);
+
 			_SetFontStyle(fontFamily, fontStyle);
+			break;
+		}
+		case kMsgSetItalic:
+		{
+			uint32 sameProperties;
+			BFont font;
+			fTextView->GetFontAndColor(&font, &sameProperties);
+
+			if (fItalicItem->IsMarked())
+				font.SetFace(B_REGULAR_FACE);
+			fItalicItem->SetMarked(!fItalicItem->IsMarked());
+
+			font_family family;
+			font_style style;
+			font.GetFamilyAndStyle(&family, &style);
+
+			_SetFontStyle(family, style);
+			break;
+		}
+		case kMsgSetBold:
+		{
+			uint32 sameProperties;
+			BFont font;
+			fTextView->GetFontAndColor(&font, &sameProperties);
+
+			if (fBoldItem->IsMarked())
+				font.SetFace(B_REGULAR_FACE);
+			fBoldItem->SetMarked(!fBoldItem->IsMarked());
+
+			font_family family;
+			font_style style;
+			font.GetFamilyAndStyle(&family, &style);
+
+			_SetFontStyle(family, style);
 			break;
 		}
 		case FONT_COLOR:
@@ -581,11 +627,13 @@ StyledEditWindow::MenusBeginning()
 		if (menu != NULL) {
 			BMenuItem* item = menu->FindItem(style);
 			fCurrentStyleItem = item;
-			if (fCurrentStyleItem != NULL) {
+			if (fCurrentStyleItem != NULL)
 				item->SetMarked(true);
-			}
 		}
 	}
+
+	fBoldItem->SetMarked((font.Face() & B_BOLD_FACE) != 0);
+	fItalicItem->SetMarked((font.Face() & B_ITALIC_FACE) != 0);
 
 	switch (fTextView->Alignment()) {
 		case B_ALIGN_LEFT:
@@ -1106,6 +1154,15 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 		YELLOW, new BMessage(FONT_COLOR)));
 	fFontMenu->AddSeparatorItem();
 
+	// "Bold" & "Italic" menu items
+	fFontMenu->AddItem(fBoldItem = new BMenuItem(B_TRANSLATE("Bold"),
+		new BMessage(kMsgSetBold)));
+	fFontMenu->AddItem(fItalicItem = new BMenuItem(B_TRANSLATE("Italic"),
+		new BMessage(kMsgSetItalic)));
+	fBoldItem->SetShortcut('B', 0);
+	fItalicItem->SetShortcut('I', 0);
+	fFontMenu->AddSeparatorItem();
+
 	// Available fonts
 
 	fCurrentFontItem = 0;
@@ -1522,6 +1579,20 @@ StyledEditWindow::_SetFontStyle(const char* fontFamily, const char* fontStyle)
 	}
 
 	font.SetFamilyAndStyle(fontFamily, fontStyle);
+
+	uint16 face = 0;
+
+	if (!(font.Face() & B_REGULAR_FACE))
+		face = font.Face();
+
+	if (fBoldItem->IsMarked())
+		face |= B_BOLD_FACE;
+
+	if (fItalicItem->IsMarked())
+		face |= B_ITALIC_FACE;
+
+	font.SetFace(face);
+
 	fTextView->SetFontAndColor(&font);
 
 	BMenuItem* superItem;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -25,7 +25,7 @@ const uint32 MENU_NEW					= 'MFnw';
 const uint32 MENU_OPEN					= 'MFop';
 const uint32 MENU_SAVE					= 'MSav';
 const uint32 MENU_SAVEAS				= 'MEsa';
-const uint32 MENU_REVERT				= 'MFre'; 
+const uint32 MENU_REVERT				= 'MFre';
 const uint32 MENU_CLOSE					= 'MFcl';
 const uint32 MENU_PAGESETUP				= 'MFps';
 const uint32 MENU_PRINT					= 'MFpr';
@@ -48,6 +48,8 @@ const uint32 FONT_SIZE					= 'FMsi';
 const uint32 FONT_FAMILY				= 'FFch';
 const uint32 FONT_STYLE					= 'FSch';
 const uint32 FONT_COLOR					= 'Fcol';
+const uint32 kMsgSetItalic				= 'Fita';
+const uint32 kMsgSetBold				= 'Fbld';
 
 // fontcolors
 const rgb_color	BLACK 					= {0, 0, 0, 255};
@@ -68,7 +70,7 @@ const uint32 SHOW_STATISTICS			= 'MDss';
 // enables "edit" menuitems
 const uint32 ENABLE_ITEMS				= 'ENit';
 const uint32 DISABLE_ITEMS				= 'DIit';
-const uint32 CHANGE_WINDOW				= 'CHwi'; 
+const uint32 CHANGE_WINDOW				= 'CHwi';
 const uint32 TEXT_CHANGED				= 'TEch';
 
 // file panel constants
