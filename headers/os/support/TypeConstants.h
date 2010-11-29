@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2005-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Author:
@@ -59,6 +59,7 @@ enum {
 	B_UINT8_TYPE					= 'UBYT',
 	B_VECTOR_ICON_TYPE				= 'VICN',
 	B_XATTR_TYPE					= 'XATR',
+	B_NETWORK_ADDRESS_TYPE			= 'NWAD',
 
 	// deprecated, do not use
 	B_ASCII_TYPE					= 'TEXT'	// use B_STRING_TYPE instead

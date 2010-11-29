@@ -16,7 +16,7 @@
 #include <String.h>
 
 
-class BNetworkAddress : public BArchivable {
+class BNetworkAddress : public BFlattenable {
 public:
 								BNetworkAddress();
 								BNetworkAddress(const char* address,
@@ -38,7 +38,6 @@ public:
 								BNetworkAddress(const in6_addr& address,
 									uint16 port = 0);
 								BNetworkAddress(const BNetworkAddress& other);
-								BNetworkAddress(BMessage* archive);
 	virtual						~BNetworkAddress();
 
 			status_t			InitCheck() const;
@@ -117,11 +116,17 @@ public:
 			BString				HostName() const;
 			BString				ServiceName() const;
 
-	virtual	status_t			Archive(BMessage* into, bool deep = true) const;
-	static	BArchivable*		Instantiate(BMessage* archive);
-
 			bool				Equals(const BNetworkAddress& other,
 									bool includePort = true) const;
+
+	// BFlattenable implementation
+	virtual	bool				IsFixedSize() const;
+	virtual	type_code			TypeCode() const;
+	virtual	ssize_t				FlattenedSize() const;
+
+	virtual	status_t			Flatten(void* buffer, ssize_t size) const;
+	virtual	status_t			Unflatten(type_code code, const void* buffer,
+									ssize_t size);
 
 			BNetworkAddress&	operator=(const BNetworkAddress& other);
 

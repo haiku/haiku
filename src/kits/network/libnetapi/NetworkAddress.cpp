@@ -93,13 +93,6 @@ BNetworkAddress::BNetworkAddress(const BNetworkAddress& other)
 }
 
 
-BNetworkAddress::BNetworkAddress(BMessage* archive)
-{
-	// TODO: implement me
-	fStatus = B_NO_INIT;
-}
-
-
 BNetworkAddress::BNetworkAddress()
 {
 	Unset();
@@ -921,24 +914,6 @@ BNetworkAddress::ServiceName() const
 }
 
 
-status_t
-BNetworkAddress::Archive(BMessage* into, bool deep) const
-{
-	// TODO: implement me!
-	return B_ERROR;
-}
-
-
-/*static*/ BArchivable*
-BNetworkAddress::Instantiate(BMessage* archive)
-{
-	if (archive != NULL)
-		return new BNetworkAddress(archive);
-
-	return NULL;
-}
-
-
 bool
 BNetworkAddress::Equals(const BNetworkAddress& other, bool includePort) const
 {
@@ -973,6 +948,58 @@ BNetworkAddress::Equals(const BNetworkAddress& other, bool includePort) const
 			return memcmp(&fAddress, &other.fAddress, fAddress.ss_len);
 	}
 }
+
+
+// #pragma mark - BFlattenable implementation
+
+
+bool
+BNetworkAddress::IsFixedSize() const
+{
+	return false;
+}
+
+
+type_code
+BNetworkAddress::TypeCode() const
+{
+	return B_NETWORK_ADDRESS_TYPE;
+}
+
+
+ssize_t
+BNetworkAddress::FlattenedSize() const
+{
+	return Length();
+}
+
+
+status_t
+BNetworkAddress::Flatten(void* buffer, ssize_t size) const
+{
+	if (buffer == NULL || size < FlattenedSize())
+		return B_BAD_VALUE;
+
+	memcpy(buffer, &fAddress, Length());
+	return B_OK;
+}
+
+
+status_t
+BNetworkAddress::Unflatten(type_code code, const void* buffer, ssize_t size)
+{
+	// 2 bytes minimum for family, and length
+	if (buffer == NULL || size < 2)
+		return fStatus = B_BAD_VALUE;
+	if (!AllowsTypeCode(code))
+		return fStatus = B_BAD_TYPE;
+
+	memcpy(&fAddress, buffer, min_c(size, (ssize_t)sizeof(fAddress)));
+	return fStatus = B_OK;
+}
+
+
+// #pragma mark - operators
 
 
 BNetworkAddress&
