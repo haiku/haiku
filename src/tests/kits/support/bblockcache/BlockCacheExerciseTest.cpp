@@ -1,14 +1,15 @@
 /*
-	$Id: BlockCacheExerciseTest.cpp 10124 2004-11-21 18:37:49Z shatty $
-	
 	This file tests basic functionality of BBlockCache.
-	
-	*/
+*/
 
 
 #include "BlockCacheExerciseTest.h"
-#include "cppunit/TestCaller.h"
+
+#include <stdlib.h>
+
 #include <BlockCache.h>
+
+#include "cppunit/TestCaller.h"
 
 
 /*
@@ -16,29 +17,26 @@
  *   Descr: This method is the only constructor for the BlockCacheExerciseTest
  *          class.
  */
-		
-
-	BlockCacheExerciseTest::BlockCacheExerciseTest(std::string name) : 
-		TestCase(name),
-		theCache(NULL),
-		numBlocksInCache(0),
-		sizeOfBlocksInCache(0),
-		sizeOfNonCacheBlocks(0),
-		isMallocTest(false)
+BlockCacheExerciseTest::BlockCacheExerciseTest(std::string name)
+	: 
+	TestCase(name),
+	theCache(NULL),
+	numBlocksInCache(0),
+	sizeOfBlocksInCache(0),
+	sizeOfNonCacheBlocks(0),
+	isMallocTest(false)
 {
-	}
+}
 
 
 /*
  *  Method: BlockCacheExerciseTest::~BlockCacheExerciseTest()
  *   Descr: This method is the destructor for the BlockCacheExerciseTest class.
  */
-
-
-	BlockCacheExerciseTest::~BlockCacheExerciseTest()
+BlockCacheExerciseTest::~BlockCacheExerciseTest()
 {
-	}
-		
+}
+
 
 /*
  *  Method:  BlockCacheExerciseTest::TestBlockCache()
@@ -88,9 +86,8 @@
  *                
  *           The sum total of these actions test the BBlockCache.
  */
-	
-
-	void BlockCacheExerciseTest::TestBlockCache(void)
+void
+BlockCacheExerciseTest::TestBlockCache(void)
 {
 
 	// First get all items from the cache plus ten more
@@ -146,10 +143,10 @@
 		          sizeOfBlocksInCache);
 		FreeBlock(nonCacheList.ItemAt(nonCacheList.CountItems() / 3),
 		          sizeOfNonCacheBlocks);
-		}
 	}
-	
-	
+}
+
+
 /*
  *  Method:  BlockCacheExerciseTest::BuildLists()
  *   Descr:  This method gets all of the blocks from the cache in order to
@@ -159,9 +156,8 @@
  *           access allocated memory without resorting to malloc()'s or new's,
  *           this should be a fair assumption.
  */
-	
-
-	void BlockCacheExerciseTest::BuildLists(void)
+void
+BlockCacheExerciseTest::BuildLists()
 {
 	freeList.MakeEmpty();
 	usedList.MakeEmpty();
@@ -181,31 +177,30 @@
  *   Descr:  This method returns a pointer from the BBlockCache, checking
  *           the value before passing it to the caller.
  */
-	
-
-	void *BlockCacheExerciseTest::GetBlock(size_t blockSize)
+void *
+BlockCacheExerciseTest::GetBlock(size_t blockSize)
 {
 	void *thePtr = theCache->Get(blockSize);
 	
 	// This new pointer should not be one which we already
 	// have from the BBlockCache which we haven't given back
 	// yet.
-	assert(!usedList.HasItem(thePtr));
-	assert(!nonCacheList.HasItem(thePtr));
+	CPPUNIT_ASSERT(!usedList.HasItem(thePtr));
+	CPPUNIT_ASSERT(!nonCacheList.HasItem(thePtr));
 	
 	if (blockSize == sizeOfBlocksInCache) {
 		// If this block was one which could have come from the
 		// cache and there are free items on the cache, it
 		// should be one of those free blocks.
 		if (freeList.CountItems() > 0) {
-			assert(freeList.RemoveItem(thePtr));
+			CPPUNIT_ASSERT(freeList.RemoveItem(thePtr));
 		}
-		assert(usedList.AddItem(thePtr));
+		CPPUNIT_ASSERT(usedList.AddItem(thePtr));
 	} else {
 		// A "non-cache sized" block should never come from the
 		// free list.
-		assert(!freeList.HasItem(thePtr));
-		assert(nonCacheList.AddItem(thePtr));
+		CPPUNIT_ASSERT(!freeList.HasItem(thePtr));
+		CPPUNIT_ASSERT(nonCacheList.AddItem(thePtr));
 	}
 	return(thePtr);
 }
@@ -216,13 +211,12 @@
  *   Descr:  This method passes the pointer back to the BBlockCache
  *           and checks the sanity of the lists.
  */
-	
-
-	void BlockCacheExerciseTest::SaveBlock(void *thePtr, size_t blockSize)
+void
+BlockCacheExerciseTest::SaveBlock(void *thePtr, size_t blockSize)
 {
 	// The memory block being returned to the cache should
 	// not already be free.
-	assert(!freeList.HasItem(thePtr));
+	CPPUNIT_ASSERT(!freeList.HasItem(thePtr));
 	
 	if (blockSize == sizeOfBlocksInCache) {
 		// If there is room on the free list, when this block
@@ -230,18 +224,18 @@
 		// free list.  Therefore we will also track it as
 		// a free block on the cache.
 		if (freeList.CountItems() < numBlocksInCache) {
-			assert(freeList.AddItem(thePtr));
+			CPPUNIT_ASSERT(freeList.AddItem(thePtr));
 		}
 		
 		// This block should not be on the non-cache list but it
 		// should be on the used list.
-		assert(!nonCacheList.HasItem(thePtr));
-		assert(usedList.RemoveItem(thePtr));
+		CPPUNIT_ASSERT(!nonCacheList.HasItem(thePtr));
+		CPPUNIT_ASSERT(usedList.RemoveItem(thePtr));
 	} else {
 		// This block should not be on the used list but it should
 		// be on the non-cache list.
-		assert(!usedList.HasItem(thePtr));
-		assert(nonCacheList.RemoveItem(thePtr));
+		CPPUNIT_ASSERT(!usedList.HasItem(thePtr));
+		CPPUNIT_ASSERT(nonCacheList.RemoveItem(thePtr));
 	}
 	theCache->Save(thePtr, blockSize);
 }
@@ -252,24 +246,23 @@
  *   Descr:  This method frees the block directly using delete[] or free(),
  *           checking the sanity of the lists as it does the operation.
  */
-	
-
-	void BlockCacheExerciseTest::FreeBlock(void *thePtr, size_t blockSize)
+void
+BlockCacheExerciseTest::FreeBlock(void *thePtr, size_t blockSize)
 {
 	// The block being freed should not already have been
 	// returned to the cache.
-	assert(!freeList.HasItem(thePtr));
+	CPPUNIT_ASSERT(!freeList.HasItem(thePtr));
 	
 	if (blockSize == sizeOfBlocksInCache) {
 		// This block should not be on the non-cache list but it
 		// should be on the used list.
-		assert(!nonCacheList.HasItem(thePtr));
-		assert(usedList.RemoveItem(thePtr));
+		CPPUNIT_ASSERT(!nonCacheList.HasItem(thePtr));
+		CPPUNIT_ASSERT(usedList.RemoveItem(thePtr));
 	} else {
 		// This block should not be on the used list but it should
 		// be on the non-cache list.
-		assert(!usedList.HasItem(thePtr));
-		assert(nonCacheList.RemoveItem(thePtr));
+		CPPUNIT_ASSERT(!usedList.HasItem(thePtr));
+		CPPUNIT_ASSERT(nonCacheList.RemoveItem(thePtr));
 	}
 	if (isMallocTest) {
 		free(thePtr);
@@ -292,9 +285,8 @@
  *             3. Frees all blocks left after the test to prevent
  *                memory leaks.
  */
-	
-
-	void BlockCacheExerciseTest::PerformTest(void)
+void
+BlockCacheExerciseTest::PerformTest(void)
 {
 	for (numBlocksInCache = 8; numBlocksInCache < 513; numBlocksInCache *= 2) {
 		for (sizeOfBlocksInCache = 13; sizeOfBlocksInCache < 9478; sizeOfBlocksInCache *= 3) {
@@ -306,7 +298,7 @@
 			
 			isMallocTest = false;
 			theCache = new BBlockCache(numBlocksInCache, sizeOfBlocksInCache, B_OBJECT_CACHE);
-			assert(theCache != NULL);
+			CPPUNIT_ASSERT(theCache != NULL);
 			
 			// Query the cache and determine the blocks in it.
 			BuildLists();
@@ -323,7 +315,7 @@
 	
 			isMallocTest = true;
 			theCache = new BBlockCache(numBlocksInCache, sizeOfBlocksInCache, B_MALLOC_CACHE);
-			assert(theCache != NULL);
+			CPPUNIT_ASSERT(theCache != NULL);
 	
 			// Query the cache and determine the blocks in it.
 			BuildLists();
@@ -347,9 +339,7 @@
  *   Descr:  This static member function returns a test caller for performing 
  *           the "BlockCacheExerciseTest" test.
  */
-
-
-CppUnit::Test *BlockCacheExerciseTest::suite(void)
+CppUnit::Test *BlockCacheExerciseTest::suite()
 {	
 	typedef CppUnit::TestCaller<BlockCacheExerciseTest>
 		BlockCacheExerciseTestCaller;

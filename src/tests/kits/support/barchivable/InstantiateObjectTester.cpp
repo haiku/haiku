@@ -12,9 +12,12 @@
  */
 //------------------------------------------------------------------------------
 
+#include "InstantiateObjectTester.h"
+
 // Standard Includes -----------------------------------------------------------
 #include <errno.h>
 #include <stdexcept>
+#include <iostream>
 
 // System Includes -------------------------------------------------------------
 #include <Roster.h>
@@ -27,8 +30,9 @@
 
 // Local Includes --------------------------------------------------------------
 #include "remoteobjectdef/RemoteTestObject.h"
-#include "InstantiateObjectTester.h"
 #include "LocalTestObject.h"
+
+using namespace std;
 
 // Local Defines ---------------------------------------------------------------
 #define FORMAT_AND_THROW(MSG, ERR)	\

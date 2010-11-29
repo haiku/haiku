@@ -11,10 +11,10 @@
 #define BenaphoreLockCountTest1_H
 
 
-#include "LockerTestCase.h"
 #include <string>
 
-class CppUnit::Test;
+#include "LockerTestCase.h"
+
 	
 class BenaphoreLockCountTest1 : public LockerTestCase {	
 private:

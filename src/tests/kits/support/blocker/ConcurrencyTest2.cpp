@@ -117,7 +117,7 @@ void ConcurrencyTest2::AcquireThread(void)
 {	
 	SafetyLock theSafetyLock(theLocker);
 	
-	assert(theLocker->Lock());
+	CPPUNIT_ASSERT(theLocker->Lock());
 	NextSubTest();
 	snooze(SNOOZE_TIME);					
 	NextSubTest();
@@ -171,7 +171,7 @@ void ConcurrencyTest2::TimeoutThread(void)
 	
 	snooze(SNOOZE_TIME/2);
 	NextSubTest();
-	assert(theLocker->LockWithTimeout(SNOOZE_TIME/10) == B_TIMED_OUT);
+	CPPUNIT_ASSERT(theLocker->LockWithTimeout(SNOOZE_TIME/10) == B_TIMED_OUT);
 	NextSubTest();
 	LockingLoop();
 	NextSubTest();
@@ -209,19 +209,19 @@ void ConcurrencyTest2::LockingLoop(void)
 	
 	for (i = 0; i < MAXLOOP; i++) {	
 		CheckLock(0);
-		assert(AcquireLock(i, true));
+		CPPUNIT_ASSERT(AcquireLock(i, true));
 		
-		assert(!lockTestValue);
+		CPPUNIT_ASSERT(!lockTestValue);
 		lockTestValue = true;
 		CheckLock(1);
 		
-		assert(AcquireLock(i, false));
+		CPPUNIT_ASSERT(AcquireLock(i, false));
 		CheckLock(2);
 		
 		theLocker->Unlock();
 		CheckLock(1);
 		
-		assert(lockTestValue);
+		CPPUNIT_ASSERT(lockTestValue);
 		lockTestValue = false;
 		theLocker->Unlock();
 		CheckLock(0);

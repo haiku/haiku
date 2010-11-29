@@ -11,9 +11,13 @@
 
 
 #include "ConstructionTest1.h"
-#include <cppunit/TestCaller.h>
-#include <OS.h>
+
+#include <string.h>
+
 #include <Locker.h>
+#include <OS.h>
+
+#include <cppunit/TestCaller.h>
 
 
 /*
@@ -51,7 +55,7 @@ bool
 {
 	sem_info theSemInfo;
 	
-	assert(get_sem_info(lockerArg->Sem(), &theSemInfo) == B_OK);
+	CPPUNIT_ASSERT(get_sem_info(lockerArg->Sem(), &theSemInfo) == B_OK);
 	return(strcmp(name, theSemInfo.name) == 0);
 }
 
@@ -69,7 +73,7 @@ bool
 {
 	int32 semCount;
 	
-	assert(get_sem_count(lockerArg->Sem(), &semCount) == B_OK);
+	CPPUNIT_ASSERT(get_sem_count(lockerArg->Sem(), &semCount) == B_OK);
 	switch (semCount) {
 		case 0: return(true);
 				break;
@@ -79,7 +83,7 @@ bool
 				// This should not happen.  The semaphore count should be
 				// 0 for a benaphore, 1 for a semaphore.  No other value
 				// is legal in this case.
-				assert(false);
+				CPPUNIT_ASSERT(false);
 				break;
 		}
 	return(false);
@@ -96,33 +100,33 @@ bool
 void ConstructionTest1::PerformTest(void)
 {
 	NextSubTest();
-	assert(NameMatches("some BLocker", theLocker));
-	assert(IsBenaphore(theLocker));
+	CPPUNIT_ASSERT(NameMatches("some BLocker", theLocker));
+	CPPUNIT_ASSERT(IsBenaphore(theLocker));
 	
 	NextSubTest();
 	BLocker locker1("test string");
-	assert(NameMatches("test string", &locker1));
-	assert(IsBenaphore(&locker1));
+	CPPUNIT_ASSERT(NameMatches("test string", &locker1));
+	CPPUNIT_ASSERT(IsBenaphore(&locker1));
 	
 	NextSubTest();
 	BLocker locker2(false);
-	assert(NameMatches("some BLocker", &locker2));
-	assert(!IsBenaphore(&locker2));
+	CPPUNIT_ASSERT(NameMatches("some BLocker", &locker2));
+	CPPUNIT_ASSERT(!IsBenaphore(&locker2));
 	
 	NextSubTest();
 	BLocker locker3(true);
-	assert(NameMatches("some BLocker", &locker3));
-	assert(IsBenaphore(&locker3));
+	CPPUNIT_ASSERT(NameMatches("some BLocker", &locker3));
+	CPPUNIT_ASSERT(IsBenaphore(&locker3));
 	
 	NextSubTest();
 	BLocker locker4("test string", false);
-	assert(NameMatches("test string", &locker4));
-	assert(!IsBenaphore(&locker4));
+	CPPUNIT_ASSERT(NameMatches("test string", &locker4));
+	CPPUNIT_ASSERT(!IsBenaphore(&locker4));
 	
 	NextSubTest();
 	BLocker locker5("test string", true);
-	assert(NameMatches("test string", &locker5));
-	assert(IsBenaphore(&locker5));
+	CPPUNIT_ASSERT(NameMatches("test string", &locker5));
+	CPPUNIT_ASSERT(IsBenaphore(&locker5));
 }
 
 

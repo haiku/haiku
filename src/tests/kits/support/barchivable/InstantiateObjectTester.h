@@ -1,65 +1,42 @@
-//------------------------------------------------------------------------------
-//	InstantiateObjectTester.h
-//
-//------------------------------------------------------------------------------
+#ifndef INSTANTIATE_OBJECT_TESTER_H
+#define INSTANTIATE_OBJECT_TESTER_H
 
-#ifndef INSTANTIATEOBJECTTESTER_H
-#define INSTANTIATEOBJECTTESTER_H
 
-// Standard Includes -----------------------------------------------------------
-
-// System Includes -------------------------------------------------------------
-
-// Project Includes ------------------------------------------------------------
-
-// Local Includes --------------------------------------------------------------
 #include "LocalCommon.h"
 
-// Local Defines ---------------------------------------------------------------
 
-// Globals ---------------------------------------------------------------------
+class TInstantiateObjectTester : public BTestCase {
+public:
+								TInstantiateObjectTester(
+									std::string name = "");
 
-//------------------------------------------------------------------------------
-class TInstantiateObjectTester : public BTestCase
-{
-	public:
-		TInstantiateObjectTester(std::string name = "");
-
-		void Case1();
-		void Case2();
-		void Case3();
-		void Case4();
-		void Case5();
-		void Case6();
-		void Case7();
-		void Case8();
-		void Case9();
-		void Case10();
-		void Case11();
-		void Case12();
-		void Case13();
-		void Case14();
+			void				Case1();
+			void				Case2();
+			void				Case3();
+			void				Case4();
+			void				Case5();
+			void				Case6();
+			void				Case7();
+			void				Case8();
+			void				Case9();
+			void				Case10();
+			void				Case11();
+			void				Case12();
+			void				Case13();
+			void				Case14();
 		
-		void RunTests();
+			void				RunTests();
 
-		static CppUnit::Test* Suite();
+	static	CppUnit::Test*		Suite();
 
-	private:
-		void		LoadAddon();
-		void		UnloadAddon();
-		std::string	GetLocalSignature();
+private:
+			void				LoadAddon();
+			void				UnloadAddon();
+			std::string			GetLocalSignature();
 
-		image_id	fAddonId;
+private:
+			image_id			fAddonId;
 };
-//------------------------------------------------------------------------------
-
-#endif	//INSTANTIATEOBJECTTESTER_H
-
-/*
- * $Log $
- *
- * $Id  $
- *
- */
 
 
+#endif	// INSTANTIATE_OBJECT_TESTER_H

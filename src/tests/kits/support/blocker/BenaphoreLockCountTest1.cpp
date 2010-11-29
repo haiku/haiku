@@ -22,11 +22,14 @@
 	*/
 
 
-#include <ThreadedTestCaller.h>
 #include "BenaphoreLockCountTest1.h"
+
 #include <cppunit/Test.h>
 #include <cppunit/TestSuite.h>
+
 #include <Locker.h>
+
+#include <ThreadedTestCaller.h>
 
 
 // This constant is used to determine the number of microseconds to
@@ -91,38 +94,38 @@ void BenaphoreLockCountTest1::TestThread1(void)
 	SafetyLock theSafetyLock2(&thread2Lock);
 	SafetyLock theSafetyLock3(&thread3Lock);
 	
-	assert(thread2Lock.Lock());
+	CPPUNIT_ASSERT(thread2Lock.Lock());
 	NextSubTest();
-	assert(thread3Lock.Lock());
+	CPPUNIT_ASSERT(thread3Lock.Lock());
 	NextSubTest();
 
-	assert(CheckLockRequests(0));
+	CPPUNIT_ASSERT(CheckLockRequests(0));
 	NextSubTest();
-	assert(theLocker->Lock());
+	CPPUNIT_ASSERT(theLocker->Lock());
 	NextSubTest();
 	
-	assert(CheckLockRequests(1));
+	CPPUNIT_ASSERT(CheckLockRequests(1));
 	NextSubTest();
 	
 	thread2Lock.Unlock();
 	NextSubTest();
 	snooze(SNOOZE_TIME);
 	NextSubTest();
-	assert(CheckLockRequests(3));
+	CPPUNIT_ASSERT(CheckLockRequests(3));
 	NextSubTest();
 	
 	thread3Lock.Unlock();
 	NextSubTest();
 	snooze(SNOOZE_TIME);
 	NextSubTest();
-	assert(CheckLockRequests(5));
+	CPPUNIT_ASSERT(CheckLockRequests(5));
 	NextSubTest();
 	
 	theLocker->Unlock();
 	NextSubTest();
 	snooze(SNOOZE_TIME);
 	NextSubTest();
-	assert(CheckLockRequests(2));
+	CPPUNIT_ASSERT(CheckLockRequests(2));
 	NextSubTest();
 	}
 
@@ -143,16 +146,16 @@ void BenaphoreLockCountTest1::TestThread2(void)
 	
 	snooze(SNOOZE_TIME / 10);
 	NextSubTest();
-	assert(thread2Lock.Lock());
+	CPPUNIT_ASSERT(thread2Lock.Lock());
 	NextSubTest();
 	
-	assert(theLocker->LockWithTimeout(SNOOZE_TIME / 10) == B_TIMED_OUT);
+	CPPUNIT_ASSERT(theLocker->LockWithTimeout(SNOOZE_TIME / 10) == B_TIMED_OUT);
 	NextSubTest();
-	assert(theLocker->Lock());
+	CPPUNIT_ASSERT(theLocker->Lock());
 	NextSubTest();
 	int actual = theLocker->CountLockRequests();
 	NextSubTest();
-	assert((actual == 3) || (actual == 4));
+	CPPUNIT_ASSERT((actual == 3) || (actual == 4));
 	NextSubTest();
 	theLocker->Unlock();
 	NextSubTest();
@@ -175,16 +178,16 @@ void BenaphoreLockCountTest1::TestThread3(void)
 	
 	snooze(SNOOZE_TIME / 10);
 	NextSubTest();
-	assert(thread3Lock.Lock());
+	CPPUNIT_ASSERT(thread3Lock.Lock());
 	NextSubTest();
 	
-	assert(theLocker->LockWithTimeout(SNOOZE_TIME / 10) == B_TIMED_OUT);
+	CPPUNIT_ASSERT(theLocker->LockWithTimeout(SNOOZE_TIME / 10) == B_TIMED_OUT);
 	NextSubTest();
-	assert(theLocker->Lock());
+	CPPUNIT_ASSERT(theLocker->Lock());
 	NextSubTest();
 	int actual = theLocker->CountLockRequests();
 	NextSubTest();
-	assert((actual == 3) || (actual == 4));
+	CPPUNIT_ASSERT((actual == 3) || (actual == 4));
 	NextSubTest();
 	theLocker->Unlock();
 	NextSubTest();

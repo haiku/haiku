@@ -91,30 +91,30 @@ void SemaphoreLockCountTest1::TestThread1(void)
 	SafetyLock theSafetyLock3(&thread3Lock);
 	
 	NextSubTest();
-	assert(thread2Lock.Lock());
-	assert(thread3Lock.Lock());
+	CPPUNIT_ASSERT(thread2Lock.Lock());
+	CPPUNIT_ASSERT(thread3Lock.Lock());
 
 	NextSubTest();
-	assert(CheckLockRequests(1));
-	assert(theLocker->Lock());
+	CPPUNIT_ASSERT(CheckLockRequests(1));
+	CPPUNIT_ASSERT(theLocker->Lock());
 	
 	NextSubTest();
-	assert(CheckLockRequests(2));
+	CPPUNIT_ASSERT(CheckLockRequests(2));
 	
 	NextSubTest();
 	thread2Lock.Unlock();
 	snooze(SNOOZE_TIME);
-	assert(CheckLockRequests(4));
+	CPPUNIT_ASSERT(CheckLockRequests(4));
 	
 	NextSubTest();
 	thread3Lock.Unlock();
 	snooze(SNOOZE_TIME);
-	assert(CheckLockRequests(6));
+	CPPUNIT_ASSERT(CheckLockRequests(6));
 	
 	NextSubTest();
 	theLocker->Unlock();
 	snooze(SNOOZE_TIME);
-	assert(CheckLockRequests(3));
+	CPPUNIT_ASSERT(CheckLockRequests(3));
 	}
 
 
@@ -134,13 +134,13 @@ void SemaphoreLockCountTest1::TestThread2(void)
 	
 	NextSubTest();
 	snooze(SNOOZE_TIME / 10);
-	assert(thread2Lock.Lock());
+	CPPUNIT_ASSERT(thread2Lock.Lock());
 	
 	NextSubTest();
-	assert(theLocker->LockWithTimeout(SNOOZE_TIME / 10) == B_TIMED_OUT);
-	assert(theLocker->Lock());
+	CPPUNIT_ASSERT(theLocker->LockWithTimeout(SNOOZE_TIME / 10) == B_TIMED_OUT);
+	CPPUNIT_ASSERT(theLocker->Lock());
 	int actual = theLocker->CountLockRequests();
-	assert((actual == 4) || (actual == 5));
+	CPPUNIT_ASSERT((actual == 4) || (actual == 5));
 	theLocker->Unlock();
 }
 
@@ -161,13 +161,13 @@ void SemaphoreLockCountTest1::TestThread3(void)
 	
 	NextSubTest();
 	snooze(SNOOZE_TIME / 10);
-	assert(thread3Lock.Lock());
+	CPPUNIT_ASSERT(thread3Lock.Lock());
 	
 	NextSubTest();
-	assert(theLocker->LockWithTimeout(SNOOZE_TIME / 10) == B_TIMED_OUT);
-	assert(theLocker->Lock());
+	CPPUNIT_ASSERT(theLocker->LockWithTimeout(SNOOZE_TIME / 10) == B_TIMED_OUT);
+	CPPUNIT_ASSERT(theLocker->Lock());
 	int actual = theLocker->CountLockRequests();
-	assert((actual == 4) || (actual == 5));
+	CPPUNIT_ASSERT((actual == 4) || (actual == 5));
 	theLocker->Unlock();
 }
 

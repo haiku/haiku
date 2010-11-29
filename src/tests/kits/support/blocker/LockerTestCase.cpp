@@ -60,11 +60,11 @@ void LockerTestCase::CheckLock(int expectedCount)
 	int32 actualCount = theLocker->CountLocks();
 	
 	if (expectedCount > 0) {
-		assert(isLocked);
-		assert(expectedThread == actualThread);
-		assert(expectedCount == actualCount);
+		CPPUNIT_ASSERT(isLocked);
+		CPPUNIT_ASSERT(expectedThread == actualThread);
+		CPPUNIT_ASSERT(expectedCount == actualCount);
 	} else {
-		assert(!((isLocked) && (actualThread == expectedThread)));
+		CPPUNIT_ASSERT(!((isLocked) && (actualThread == expectedThread)));
 	}
 	return;
 }

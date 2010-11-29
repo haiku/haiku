@@ -13,10 +13,8 @@
 
 #include "LockerTestCase.h"
 
-class CppUnit::Test;
 
-class ConcurrencyTest2 : public LockerTestCase {
-	
+class ConcurrencyTest2 : public LockerTestCase {	
 private:
 	bool lockTestValue;
 
@@ -31,9 +29,7 @@ public:
 	void AcquireThread(void);
 	void TimeoutThread(void);
 	static CppUnit::Test *suite(void);
-	};
-	
+};
+
+
 #endif
-
-
-

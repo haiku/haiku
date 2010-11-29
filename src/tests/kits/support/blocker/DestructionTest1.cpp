@@ -63,7 +63,7 @@ const bigtime_t SNOOZE_TIME = 200000;
 
 void DestructionTest1::TestThread1(void)
 {
-	assert(theLocker->Lock());	
+	CPPUNIT_ASSERT(theLocker->Lock());	
 	NextSubTest();
 	snooze(SNOOZE_TIME);
 	NextSubTest();
@@ -71,7 +71,7 @@ void DestructionTest1::TestThread1(void)
 	NextSubTest();
 	snooze(SNOOZE_TIME);
 	NextSubTest();
-	assert(!theLocker->Lock());
+	CPPUNIT_ASSERT(!theLocker->Lock());
 	NextSubTest();
 	}
 
@@ -89,7 +89,7 @@ void DestructionTest1::TestThread2(void)
 	
 	snooze(SNOOZE_TIME);
 	NextSubTest();
-	assert(theLocker->Lock());
+	CPPUNIT_ASSERT(theLocker->Lock());
 	NextSubTest();
 	snooze(SNOOZE_TIME);	
 	NextSubTest();

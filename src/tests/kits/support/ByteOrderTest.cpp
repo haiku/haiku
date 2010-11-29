@@ -1,18 +1,20 @@
-/* 
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+/*
+ * Copyright 2004-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 
-#include "TestCase.h"
 #include "ByteOrderTest.h"
-#include <TestUtils.h>
-#include <cppunit/TestCaller.h>
-#include <cppunit/TestSuite.h>
+
+#include <math.h>
+#include <string.h>
 
 #include <ByteOrder.h>
 
-#include <math.h>
+#include <cppunit/TestCaller.h>
+#include <cppunit/TestSuite.h>
+
+#include <TestUtils.h>
 
 
 using namespace CppUnit;
