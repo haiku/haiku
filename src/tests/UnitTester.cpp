@@ -4,7 +4,7 @@
  */
 
 
-#include <iostream>
+#include <stdio.h>
 
 #include <SemaphoreSyncObject.h>
 #include <Directory.h>
@@ -12,7 +12,7 @@
 #include "UnitTester.h"
 
 
-UnitTesterShell::UnitTesterShell(const string &description,
+UnitTesterShell::UnitTesterShell(const std::string &description,
 	SyncObject *syncObject)
 	:
 	BTestShell(description, syncObject)
@@ -23,13 +23,9 @@ UnitTesterShell::UnitTesterShell(const string &description,
 void
 UnitTesterShell::PrintDescription(int argc, char *argv[])
 {
-	string AppName = argv[0];
-	cout << endl;
-	cout << "This program is the central testing framework for the purpose"
-		<< endl;
-	cout << "of testing and verifying the various kits, classes, functions,"
-		<< endl;
-	cout << "and the like that comprise Haiku." << endl;
+	printf("This program is the central testing framework for the purpose\n"
+		"of testing and verifying the various kits, classes, functions,\n"
+		"and the like that comprise Haiku.\n");
 }
 
 
@@ -37,12 +33,11 @@ void
 UnitTesterShell::PrintValidArguments()
 {
 	BTestShell::PrintValidArguments();
-	cout << indent << "-haiku       Runs tests linked against our Haiku "
-		"libraries (*default*)" << endl;
-	cout << indent << "-r5          Runs tests linked against Be Inc.'s R5 "
-		"libraries (instead" << endl;
-	cout << indent << "             of our libraries) for the sake of "
-		"comparison." << endl;
+	printf("\t-haiku       Runs tests linked against our Haiku "
+			"libraries (*default*)\n"
+		"\t-r5          Runs tests linked against Be Inc.'s R5 "
+			"libraries (instead\n"
+		"\t             of our libraries) for the sake of comparison.\n");
 }
 
 
@@ -50,7 +45,7 @@ void
 UnitTesterShell::LoadDynamicSuites()
 {
 	// Add the appropriate test lib path
-	string defaultLibDir = string(GlobalTestDir()) + "/lib";
+	std::string defaultLibDir = std::string(GlobalTestDir()) + "/lib";
 	fLibDirs.insert(defaultLibDir);
 
 	// Load away

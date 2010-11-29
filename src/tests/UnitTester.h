@@ -13,8 +13,9 @@
 
 class UnitTesterShell : public BTestShell {
 public:
-								UnitTesterShell(const string &description = "",
-									SyncObject *syncObject = 0);
+								UnitTesterShell(
+									const std::string &description = "",
+									SyncObject *syncObject = NULL);
 
 protected:
 	virtual	void				PrintDescription(int argc, char *argv[]);
