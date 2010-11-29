@@ -623,7 +623,7 @@ Area::_Init(LinearSpec* ls, XTab* left, YTab* top, XTab* right, YTab* bottom,
 	fConstraints.AddItem(fMinContentHeight);
 
 	fPreferredContentWidth = fLS->AddConstraint(-1.0, fLeft, 1.0, fRight, -1.0,
-		fScaleWidth, OperatorType(EQ), 0, fShrinkPenalties.Height(),
+		fScaleWidth, OperatorType(EQ), 0, fShrinkPenalties.Width(),
 		fGrowPenalties.Width());
 
 	fPreferredContentHeight = fLS->AddConstraint(-1.0, fTop, 1.0, fBottom, -1.0,
