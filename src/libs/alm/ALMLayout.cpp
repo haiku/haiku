@@ -73,7 +73,7 @@ BALMLayout::~BALMLayout()
 XTab*
 BALMLayout::AddXTab()
 {
-	XTab* tab = new XTab(fSolver);
+	XTab* tab = new(std::nothrow) XTab(fSolver);
 	if (!tab)
 		return NULL;
 	if (!fSolver->AddVariable(tab)) {
@@ -93,7 +93,7 @@ BALMLayout::AddXTab()
 YTab*
 BALMLayout::AddYTab()
 {
-	YTab* tab = new YTab(fSolver);
+	YTab* tab = new(std::nothrow) YTab(fSolver);
 	if (!tab)
 		return NULL;
 	if (!fSolver->AddVariable(tab)) {
@@ -113,7 +113,7 @@ BALMLayout::AddYTab()
 Row*
 BALMLayout::AddRow()
 {
-	return new Row(this);
+	return new(std::nothrow) Row(this);
 }
 
 
@@ -127,7 +127,7 @@ BALMLayout::AddRow()
 Row*
 BALMLayout::AddRow(YTab* top, YTab* bottom)
 {
-	Row* row = new Row(this);
+	Row* row = new(std::nothrow) Row(this);
 	if (top != NULL)
 		row->Constraints()->AddItem(row->Top()->IsEqual(top));
 	if (bottom != NULL)
@@ -144,7 +144,7 @@ BALMLayout::AddRow(YTab* top, YTab* bottom)
 Column*
 BALMLayout::AddColumn()
 {
-	return new Column(this);
+	return new(std::nothrow) Column(this);
 }
 
 
@@ -158,7 +158,7 @@ BALMLayout::AddColumn()
 Column*
 BALMLayout::AddColumn(XTab* left, XTab* right)
 {
-	Column* column = new Column(this);
+	Column* column = new(std::nothrow) Column(this);
 	if (left != NULL)
 		column->Constraints()->AddItem(column->Left()->IsEqual(left));
 	if (right != NULL)
@@ -794,7 +794,7 @@ BALMLayout::_SolveLayout()
 	// them.
 	BFile* file = NULL;
 	if (fPerformancePath != NULL) {
-		file = new BFile(fPerformancePath,
+		file = new(std::nothrow) BFile(fPerformancePath,
 			B_READ_WRITE | B_CREATE_FILE | B_OPEN_AT_END);
 	}
 
@@ -823,9 +823,9 @@ BALMLayout::_CalculateMinSize()
 {
 	_UpdateAreaConstraints();
 
-	SummandList* newObjFunction = new SummandList(2);
-	newObjFunction->AddItem(new Summand(1.0, fRight));
-	newObjFunction->AddItem(new Summand(1.0, fBottom));
+	SummandList* newObjFunction = new(std::nothrow) SummandList(2);
+	newObjFunction->AddItem(new(std::nothrow) Summand(1.0, fRight));
+	newObjFunction->AddItem(new(std::nothrow) Summand(1.0, fBottom));
 	SummandList* oldObjFunction = fSolver->SwapObjectiveFunction(
 		newObjFunction);
 	_SolveLayout();
@@ -852,9 +852,9 @@ BALMLayout::_CalculateMaxSize()
 {
 	_UpdateAreaConstraints();
 
-	SummandList* newObjFunction = new SummandList(2);
-	newObjFunction->AddItem(new Summand(-1.0, fRight));
-	newObjFunction->AddItem(new Summand(-1.0, fBottom));
+	SummandList* newObjFunction = new(std::nothrow) SummandList(2);
+	newObjFunction->AddItem(new(std::nothrow) Summand(-1.0, fRight));
+	newObjFunction->AddItem(new(std::nothrow) Summand(-1.0, fBottom));
 	SummandList* oldObjFunction = fSolver->SwapObjectiveFunction(
 		newObjFunction);
 	_SolveLayout();

@@ -1,10 +1,15 @@
 /*
  * Copyright 2007-2008, Christof Lutteroth, lutteroth@cs.auckland.ac.nz
  * Copyright 2007-2008, James Kim, jkim202@ec.auckland.ac.nz
+ * Copyright 2010, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "Constraint.h"
+
+#include <new>
+
 #include "LinearSpec.h"
 #include "Variable.h"
 
@@ -109,7 +114,7 @@ Constraint::SetLeftSide(double coeff1, Variable* var1)
 	for (int i=0; i<fLeftSide->CountItems(); i++)
 		delete fLeftSide->ItemAt(i);
 	fLeftSide->MakeEmpty();
-	fLeftSide->AddItem(new Summand(coeff1, var1));
+	fLeftSide->AddItem(new(std::nothrow) Summand(coeff1, var1));
 	UpdateLeftSide();
 }
 
@@ -124,8 +129,8 @@ Constraint::SetLeftSide(double coeff1, Variable* var1,
 	for (int i=0; i<fLeftSide->CountItems(); i++)
 		delete fLeftSide->ItemAt(i);
 	fLeftSide->MakeEmpty();
-	fLeftSide->AddItem(new Summand(coeff1, var1));
-	fLeftSide->AddItem(new Summand(coeff2, var2));
+	fLeftSide->AddItem(new(std::nothrow) Summand(coeff1, var1));
+	fLeftSide->AddItem(new(std::nothrow) Summand(coeff2, var2));
 	UpdateLeftSide();
 }
 
@@ -141,9 +146,9 @@ Constraint::SetLeftSide(double coeff1, Variable* var1,
 	for (int i=0; i<fLeftSide->CountItems(); i++)
 		delete fLeftSide->ItemAt(i);
 	fLeftSide->MakeEmpty();
-	fLeftSide->AddItem(new Summand(coeff1, var1));
-	fLeftSide->AddItem(new Summand(coeff2, var2));
-	fLeftSide->AddItem(new Summand(coeff3, var3));
+	fLeftSide->AddItem(new(std::nothrow) Summand(coeff1, var1));
+	fLeftSide->AddItem(new(std::nothrow) Summand(coeff2, var2));
+	fLeftSide->AddItem(new(std::nothrow) Summand(coeff3, var3));
 	UpdateLeftSide();
 }
 
@@ -160,10 +165,10 @@ Constraint::SetLeftSide(double coeff1, Variable* var1,
 	for (int i=0; i<fLeftSide->CountItems(); i++)
 		delete fLeftSide->ItemAt(i);
 	fLeftSide->MakeEmpty();
-	fLeftSide->AddItem(new Summand(coeff1, var1));
-	fLeftSide->AddItem(new Summand(coeff2, var2));
-	fLeftSide->AddItem(new Summand(coeff3, var3));
-	fLeftSide->AddItem(new Summand(coeff4, var4));
+	fLeftSide->AddItem(new(std::nothrow) Summand(coeff1, var1));
+	fLeftSide->AddItem(new(std::nothrow) Summand(coeff2, var2));
+	fLeftSide->AddItem(new(std::nothrow) Summand(coeff3, var3));
+	fLeftSide->AddItem(new(std::nothrow) Summand(coeff4, var4));
 	UpdateLeftSide();
 }
 
@@ -263,7 +268,7 @@ Constraint::SetPenaltyNeg(double value)
 		return;
 
 	if (fDNegObjSummand == NULL) {
-		fDNegObjSummand = new Summand(value, fLS->AddVariable());
+		fDNegObjSummand = new(std::nothrow) Summand(value, fLS->AddVariable());
 		fLS->ObjectiveFunction()->AddItem(fDNegObjSummand);
 		UpdateLeftSide();
 		fLS->UpdateObjectiveFunction();
@@ -305,7 +310,7 @@ Constraint::SetPenaltyPos(double value)
 		return;
 
 	if (fDPosObjSummand == NULL) {
-		fDPosObjSummand = new Summand(value, fLS->AddVariable());
+		fDPosObjSummand = new(std::nothrow) Summand(value, fLS->AddVariable());
 		fLS->ObjectiveFunction()->AddItem(fDPosObjSummand);
 		UpdateLeftSide();
 		fLS->UpdateObjectiveFunction();
@@ -499,7 +504,8 @@ Constraint::Constraint(LinearSpec* ls, SummandList* summands, OperatorType op,
 	}
 
 	if (penaltyNeg != INFINITY && penaltyNeg != 0. && fOp != OperatorType(LE)) {
-		fDNegObjSummand = new Summand(penaltyNeg, ls->AddVariable());
+		fDNegObjSummand = new(std::nothrow) Summand(penaltyNeg,
+			ls->AddVariable());
 		fLS->fObjFunction->AddItem(fDNegObjSummand);
 		varIndexes[nCoefficient] = fDNegObjSummand->Var()->Index();
 		coeffs[nCoefficient] = 1.0;
@@ -509,7 +515,8 @@ Constraint::Constraint(LinearSpec* ls, SummandList* summands, OperatorType op,
 		fDNegObjSummand = NULL;
 
 	if (penaltyPos != INFINITY && penaltyPos != 0. && fOp != OperatorType(GE)) {
-		fDPosObjSummand = new Summand(penaltyPos, ls->AddVariable());
+		fDPosObjSummand = new(std::nothrow) Summand(penaltyPos,
+			ls->AddVariable());
 		fLS->fObjFunction->AddItem(fDPosObjSummand);
 		varIndexes[nCoefficient] = fDPosObjSummand->Var()->Index();
 		coeffs[nCoefficient] = -1.0;
