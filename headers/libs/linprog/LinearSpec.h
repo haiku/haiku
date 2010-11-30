@@ -43,6 +43,10 @@ public:
 			bool				SetRange(Variable* variable, double min,
 									double max);
 
+			bool				AddConstraint(Constraint* constraint);
+			bool				RemoveConstraint(Constraint* constraint,
+									bool deleteConstraint = true);
+
 			Constraint*			AddConstraint(SummandList* summands,
 									OperatorType op, double rightSide);
 			Constraint*			AddConstraint(double coeff1, Variable* var1,
@@ -108,9 +112,21 @@ public:
 
 	const	ConstraintList&		Constraints() const;
 
+protected:
+	friend class Constraint;
+ 			bool				UpdateLeftSide(Constraint* constraint);
+			bool				UpdateRightSide(Constraint* constraint);
+			bool				UpdateOperator(Constraint* constraint);
 private:
-			ResultType			Presolve();
-			void				RemovePresolved();
+			/*! Check if all entries != NULL otherwise delete the list and its
+			entries. */
+			bool				_CheckSummandList(SummandList* list);
+			Constraint*			_AddConstraint(SummandList* leftSide,
+									OperatorType op, double rightSide,
+									double penaltyNeg, double penaltyPos);
+
+			ResultType			_Presolve();
+			void				_RemovePresolved();
 
 			lprec*				fLpPresolved;
 			OptimizationType	fOptimization;
@@ -121,9 +137,6 @@ private:
 			ResultType			fResult;
 			double 				fObjectiveValue;
 			double 				fSolvingTime;
-
-public:
-	friend class		Constraint;
 
 };
 

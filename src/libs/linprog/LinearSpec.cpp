@@ -43,7 +43,7 @@ LinearSpec::LinearSpec()
  */
 LinearSpec::~LinearSpec()
 {
-	RemovePresolved();
+	_RemovePresolved();
 	for (int32 i = 0; i < fConstraints.CountItems(); i++)
 		delete (Constraint*)fConstraints.ItemAt(i);
 	for (int32 i = 0; i < fObjFunction->CountItems(); i++)
@@ -80,6 +80,9 @@ LinearSpec::AddVariable()
 bool
 LinearSpec::AddVariable(Variable* variable)
 {
+	if (variable->IsValid())
+		return false;
+
 	double d = 0;
 	int i = 0;
 
@@ -90,7 +93,7 @@ LinearSpec::AddVariable(Variable* variable)
 		return false;
 	}
 
-	if (!SetRange(variable, -20000, 20000)) {
+	if (!SetRange(variable, variable->Min(), variable->Max())) {
 		RemoveVariable(variable, false);
 		return false;
 	}
@@ -110,7 +113,29 @@ LinearSpec::RemoveVariable(Variable* variable, bool deleteVariable)
 	if (!del_column(fLP, index))
 		return false;
 	fVariables.RemoveItemAt(index - 1);
-	variable->Invalidate();
+	variable->fIsValid = false;
+
+	// invalidate all constraints that use this variable
+	ConstraintList markedForInvalidation;
+	const ConstraintList& constraints = Constraints();
+	for (int i = 0; i < constraints.CountItems(); i++) {
+		Constraint* constraint = constraints.ItemAt(i);
+
+		if (!constraint->IsValid())
+			continue;
+
+		SummandList* summands = constraint->LeftSide();
+		for (int j = 0; j < summands->CountItems(); j++) {
+			Summand* summand = summands->ItemAt(j);
+			if (summand->Var() == variable) {
+				markedForInvalidation.AddItem(constraint);
+				break;
+			}
+		}
+	}
+	for (int i = 0; i < markedForInvalidation.CountItems(); i++)
+		markedForInvalidation.ItemAt(i)->Invalidate();
+
 
 	if (deleteVariable)
 		delete variable;
@@ -137,6 +162,147 @@ LinearSpec::SetRange(Variable* variable, double min, double max)
 }
 
 
+bool
+LinearSpec::AddConstraint(Constraint* constraint)
+{
+	SummandList* summands = constraint->LeftSide();
+	OperatorType op = constraint->Op();
+	double rightSide = constraint->RightSide();
+	double penaltyNeg = constraint->PenaltyNeg();
+	double penaltyPos = constraint->PenaltyPos();
+
+	double coeffs[summands->CountItems() + 2];
+	int varIndexes[summands->CountItems() + 2];
+	int32 nCoefficient = 0;
+	for (; nCoefficient < summands->CountItems(); nCoefficient++) {
+		Summand* s = summands->ItemAt(nCoefficient);
+		coeffs[nCoefficient] = s->Coeff();
+		varIndexes[nCoefficient] = s->Var()->Index();
+	}
+
+	if (penaltyNeg != INFINITY && penaltyNeg != 0. && op != OperatorType(LE)) {
+		constraint->fDNegObjSummand
+			= new(std::nothrow) Summand(constraint->PenaltyNeg(),
+				AddVariable());
+		fObjFunction->AddItem(constraint->fDNegObjSummand);
+		varIndexes[nCoefficient] = constraint->fDNegObjSummand->Var()->Index();
+		coeffs[nCoefficient] = 1.0;
+		nCoefficient++;
+	}
+
+	if (penaltyPos != INFINITY && penaltyPos != 0. && op != OperatorType(GE)) {
+		constraint->fDPosObjSummand
+			= new(std::nothrow) Summand(constraint->PenaltyPos(),
+				AddVariable());
+		fObjFunction->AddItem(constraint->fDPosObjSummand);
+		varIndexes[nCoefficient] = constraint->fDPosObjSummand->Var()->Index();
+		coeffs[nCoefficient] = -1.0;
+		nCoefficient++;
+	}
+
+	if (!add_constraintex(fLP, nCoefficient, &coeffs[0], &varIndexes[0],
+			(op == OperatorType(EQ) ? EQ : (op == OperatorType(GE)) ? GE
+				: LE), rightSide))
+		return false;
+
+	UpdateObjectiveFunction();
+	fConstraints.AddItem(constraint);
+
+	return true;
+}
+
+
+bool
+LinearSpec::RemoveConstraint(Constraint* constraint, bool deleteConstraint)
+{
+	if (constraint->fDNegObjSummand) {
+		fObjFunction->RemoveItem(constraint->fDNegObjSummand);
+		delete constraint->fDNegObjSummand->Var();
+		delete constraint->fDNegObjSummand;
+		constraint->fDNegObjSummand = NULL;
+	}
+	if (constraint->fDPosObjSummand) {
+		fObjFunction->RemoveItem(constraint->fDPosObjSummand);
+		delete constraint->fDPosObjSummand->Var();
+		delete constraint->fDPosObjSummand;
+		constraint->fDPosObjSummand = NULL;
+	}
+
+	del_constraint(fLP, constraint->Index());
+	fConstraints.RemoveItem(constraint);
+	constraint->fIsValid = false;
+
+	if (deleteConstraint)
+		delete constraint;
+	return true;
+}
+
+
+bool
+LinearSpec::UpdateLeftSide(Constraint* constraint)
+{
+	if (!constraint->IsValid())
+		return false;
+
+	SummandList* leftSide = constraint->LeftSide();
+	OperatorType op = constraint->Op();
+
+	double coeffs[leftSide->CountItems() + 2];
+	int varIndexes[leftSide->CountItems() + 2];
+	int32 i;
+	for (i = 0; i < leftSide->CountItems(); i++) {
+		Summand* s = leftSide->ItemAt(i);
+		coeffs[i] = s->Coeff();
+		varIndexes[i] = s->Var()->Index();
+	}
+
+	if (constraint->fDNegObjSummand != NULL && op != OperatorType(LE)) {
+		varIndexes[i] = constraint->fDNegObjSummand->Var()->Index();
+		coeffs[i] = 1.0;
+		i++;
+	}
+
+	if (constraint->fDPosObjSummand != NULL && op != OperatorType(GE)) {
+		varIndexes[i] = constraint->fDPosObjSummand->Var()->Index();
+		coeffs[i] = -1.0;
+		i++;
+	}
+
+	if (!set_rowex(fLP, constraint->Index(), i, &coeffs[0],
+		&varIndexes[0]))
+		return false;
+
+	UpdateObjectiveFunction();
+	_RemovePresolved();
+	return true;
+}
+
+
+bool
+LinearSpec::UpdateRightSide(Constraint* constraint)
+{
+	if (!set_rh(fLP, constraint->Index(), constraint->RightSide()))
+		return false;
+
+	_RemovePresolved();
+	return true;
+}
+
+
+bool
+LinearSpec::UpdateOperator(Constraint* constraint)
+{
+	OperatorType op = constraint->Op();
+	if (!set_constr_type(fLP, constraint->Index(),
+		(op == OperatorType(EQ)) ? EQ : (op == OperatorType(GE)) ? GE
+			: LE))
+		return false;
+
+	_RemovePresolved();
+	return true;
+}
+
+
 /**
  * Adds a new hard linear constraint to the specification.
  *
@@ -150,10 +316,7 @@ Constraint*
 LinearSpec::AddConstraint(SummandList* summands, OperatorType op,
 	double rightSide)
 {
-	Constraint* c = new(std::nothrow) Constraint(this, summands, op, rightSide,
-		INFINITY, INFINITY);
-	RemovePresolved();
-	return c;
+	return AddConstraint(summands, op, rightSide, INFINITY, INFINITY);
 }
 
 
@@ -170,12 +333,7 @@ Constraint*
 LinearSpec::AddConstraint(double coeff1, Variable* var1,
 	OperatorType op, double rightSide)
 {
-	SummandList* summands = new(std::nothrow) SummandList(1);
-	summands->AddItem(new(std::nothrow) Summand(coeff1, var1));
-	Constraint* c = new(std::nothrow) Constraint(this, summands, op, rightSide,
-		INFINITY, INFINITY);
-	RemovePresolved();
-	return c;
+	return AddConstraint(coeff1, var1, op, rightSide, INFINITY, INFINITY);
 }
 
 
@@ -194,13 +352,8 @@ Constraint*
 LinearSpec::AddConstraint(double coeff1, Variable* var1,
 	double coeff2, Variable* var2, OperatorType op, double rightSide)
 {
-	SummandList* summands = new(std::nothrow) SummandList(2);
-	summands->AddItem(new(std::nothrow) Summand(coeff1, var1));
-	summands->AddItem(new(std::nothrow) Summand(coeff2, var2));
-	Constraint* c = new(std::nothrow) Constraint(this, summands, op, rightSide,
-		INFINITY, INFINITY);
-	RemovePresolved();
-	return c;
+	return AddConstraint(coeff1, var1, coeff2, var2, op, rightSide, INFINITY,
+		INFINITY);
 }
 
 
@@ -222,14 +375,8 @@ LinearSpec::AddConstraint(double coeff1, Variable* var1,
 		double coeff2, Variable* var2, double coeff3, Variable* var3,
 		OperatorType op, double rightSide)
 {
-	SummandList* summands = new(std::nothrow) SummandList(3);
-	summands->AddItem(new(std::nothrow) Summand(coeff1, var1));
-	summands->AddItem(new(std::nothrow) Summand(coeff2, var2));
-	summands->AddItem(new(std::nothrow) Summand(coeff3, var3));
-	Constraint* c = new(std::nothrow) Constraint(this, summands, op, rightSide,
-		INFINITY, INFINITY);
-	RemovePresolved();
-	return c;
+	return AddConstraint(coeff1, var1, coeff2, var2, coeff3, var3, op,
+		rightSide, INFINITY, INFINITY);
 }
 
 
@@ -253,15 +400,8 @@ LinearSpec::AddConstraint(double coeff1, Variable* var1,
 		double coeff2, Variable* var2, double coeff3, Variable* var3,
 		double coeff4, Variable* var4, OperatorType op, double rightSide)
 {
-	SummandList* summands = new(std::nothrow) SummandList(3);
-	summands->AddItem(new(std::nothrow) Summand(coeff1, var1));
-	summands->AddItem(new(std::nothrow) Summand(coeff2, var2));
-	summands->AddItem(new(std::nothrow) Summand(coeff3, var3));
-	summands->AddItem(new(std::nothrow) Summand(coeff4, var4));
-	Constraint* c = new(std::nothrow) Constraint(this, summands, op, rightSide,
-		INFINITY, INFINITY);
-	RemovePresolved();
-	return c;
+	return AddConstraint(coeff1, var1, coeff2, var2, coeff3, var3, coeff4, var4,
+		op, rightSide, INFINITY, INFINITY);
 }
 
 
@@ -280,10 +420,7 @@ Constraint*
 LinearSpec::AddConstraint(SummandList* summands, OperatorType op,
 		double rightSide, double penaltyNeg, double penaltyPos)
 {
-	Constraint* c = new(std::nothrow) Constraint(this, summands, op, rightSide,
-			penaltyNeg, penaltyPos);
-	RemovePresolved();
-	return c;
+	return _AddConstraint(summands, op, rightSide, penaltyNeg, penaltyPos);
 }
 
 
@@ -302,11 +439,12 @@ LinearSpec::AddConstraint(double coeff1, Variable* var1,
 		OperatorType op, double rightSide, double penaltyNeg, double penaltyPos)
 {
 	SummandList* summands = new(std::nothrow) SummandList(1);
+	if (!summands)
+		return NULL;
 	summands->AddItem(new(std::nothrow) Summand(coeff1, var1));
-	Constraint* c = new(std::nothrow) Constraint(this, summands, op, rightSide,
-		penaltyNeg, penaltyPos);
-	RemovePresolved();
-	return c;
+	if (!_CheckSummandList(summands))
+		return NULL;
+	return _AddConstraint(summands, op, rightSide, penaltyNeg, penaltyPos);
 }
 
 
@@ -328,12 +466,13 @@ LinearSpec::AddConstraint(double coeff1, Variable* var1,
 	double penaltyNeg, double penaltyPos)
 {
 	SummandList* summands = new(std::nothrow) SummandList(2);
+	if (!summands)
+		return NULL;
 	summands->AddItem(new(std::nothrow) Summand(coeff1, var1));
 	summands->AddItem(new(std::nothrow) Summand(coeff2, var2));
-	Constraint* c = new(std::nothrow) Constraint(this, summands, op, rightSide,
-		penaltyNeg, penaltyPos);
-	RemovePresolved();
-	return c;
+	if (!_CheckSummandList(summands))
+		return NULL;
+	return _AddConstraint(summands, op, rightSide, penaltyNeg, penaltyPos);
 }
 
 
@@ -357,13 +496,14 @@ LinearSpec::AddConstraint(double coeff1, Variable* var1,
 	OperatorType op, double rightSide, double penaltyNeg, double penaltyPos)
 {
 	SummandList* summands = new(std::nothrow) SummandList(2);
+	if (!summands)
+		return NULL;
 	summands->AddItem(new(std::nothrow) Summand(coeff1, var1));
 	summands->AddItem(new(std::nothrow) Summand(coeff2, var2));
 	summands->AddItem(new(std::nothrow) Summand(coeff3, var3));
-	Constraint* c = new(std::nothrow) Constraint(this, summands, op, rightSide,
-		penaltyNeg, penaltyPos);
-	RemovePresolved();
-	return c;
+	if (!_CheckSummandList(summands))
+		return NULL;
+	return _AddConstraint(summands, op, rightSide, penaltyNeg, penaltyPos);
 }
 
 
@@ -390,14 +530,15 @@ LinearSpec::AddConstraint(double coeff1, Variable* var1,
 	double penaltyNeg, double penaltyPos)
 {
 	SummandList* summands = new(std::nothrow) SummandList(2);
+	if (!summands)
+		return NULL;
 	summands->AddItem(new(std::nothrow) Summand(coeff1, var1));
 	summands->AddItem(new(std::nothrow) Summand(coeff2, var2));
 	summands->AddItem(new(std::nothrow) Summand(coeff3, var3));
 	summands->AddItem(new(std::nothrow) Summand(coeff4, var4));
-	Constraint* c = new(std::nothrow) Constraint(this, summands, op, rightSide,
-		penaltyNeg, penaltyPos);
-	RemovePresolved();
-	return c;
+	if (!_CheckSummandList(summands))
+		return NULL;
+	return _AddConstraint(summands, op, rightSide, penaltyNeg, penaltyPos);
 }
 
 
@@ -475,7 +616,44 @@ LinearSpec::UpdateObjectiveFunction()
 	if (!set_obj_fnex(fLP, size, &coeffs[0], &varIndexes[0]))
 		printf("Error in set_obj_fnex.\n");
 
-	RemovePresolved();
+	_RemovePresolved();
+}
+
+
+bool
+LinearSpec::_CheckSummandList(SummandList* list)
+{
+	bool ok = true;
+	for (int i = 0; i < list->CountItems(); i++) {
+		if (list->ItemAt(i) == NULL) {
+			ok = false;
+			break;
+		}
+	}
+	if (ok)
+		return true;
+
+	for (int i = 0; i < list->CountItems(); i++)
+		delete list->ItemAt(i);
+	delete list;
+	return false;
+}
+
+
+Constraint*
+LinearSpec::_AddConstraint(SummandList* leftSide, OperatorType op,
+	double rightSide, double penaltyNeg, double penaltyPos)
+{
+	Constraint* constraint = new(std::nothrow) Constraint(this, leftSide,
+		op, rightSide, penaltyNeg, penaltyPos);
+	if (constraint == NULL)
+		return NULL;
+	if (!AddConstraint(constraint)) {
+		delete constraint;
+		return NULL;
+	}
+	_RemovePresolved();
+	return constraint;
 }
 
 
@@ -485,7 +663,7 @@ LinearSpec::UpdateObjectiveFunction()
  * to avoid an old cached presolved model getting out of sync.
  */
 void
-LinearSpec::RemovePresolved()
+LinearSpec::_RemovePresolved()
 {
 	if (fLpPresolved == NULL)
 		return;
@@ -503,7 +681,7 @@ LinearSpec::RemovePresolved()
  * @return the result of the solving attempt
  */
 ResultType
-LinearSpec::Presolve()
+LinearSpec::_Presolve()
 {
 	bigtime_t start, end;
 	start = system_time();
@@ -543,7 +721,7 @@ ResultType
 LinearSpec::Solve()
 {
 	if (fLpPresolved != NULL)
-		return Presolve();
+		return _Presolve();
 
 	bigtime_t start, end;
 	start = system_time();

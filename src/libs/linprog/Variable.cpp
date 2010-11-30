@@ -281,29 +281,7 @@ Variable::Invalidate()
 		return;
 
 	fIsValid = false;
-	
 	fLS->RemoveVariable(this, false);
-
-	// invalidate all constraints that use this variable
-	ConstraintList markedForInvalidation;
-	const ConstraintList& constraints = fLS->Constraints();
-	for (int i = 0; i < constraints.CountItems(); i++) {
-		Constraint* constraint = constraints.ItemAt(i);
-
-		if (!constraint->IsValid())
-			continue;
-
-		SummandList* summands = constraint->LeftSide();
-		for (int j = 0; j < summands->CountItems(); j++) {
-			Summand* summand = summands->ItemAt(j);
-			if (summand->Var() == this) {
-				markedForInvalidation.AddItem(constraint);
-				break;
-			}
-		}
-	}
-	for (int i = 0; i < markedForInvalidation.CountItems(); i++)
-		markedForInvalidation.ItemAt(i)->Invalidate();
 }
 
 
@@ -314,8 +292,8 @@ Variable::Variable(LinearSpec* ls)
 	:
 	fLS(ls),
 	fValue(NAN),
-	fMin(0),
-	fMax(DBL_MAX),
+	fMin(-20000),
+	fMax(20000),
 	fLabel(NULL),
 	fIsValid(false)
 {

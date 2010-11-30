@@ -33,7 +33,7 @@ public:
 
 			SummandList*		LeftSide();
 			void				SetLeftSide(SummandList* summands);
-			void				UpdateLeftSide();
+			
 			void				SetLeftSide(double coeff1, Variable* var1);
 			void				SetLeftSide(double coeff1, Variable* var1,
 									double coeff2, Variable* var2);
@@ -73,14 +73,18 @@ public:
 protected:
 								Constraint(LinearSpec* ls,
 									SummandList* summands, OperatorType op,
-									double rightSide, double penaltyNeg,
-									double penaltyPos);
+									double rightSide,
+									double penaltyNeg = INFINITY,
+									double penaltyPos = INFINITY);
 
 private:
 			LinearSpec*			fLS;
 			SummandList*		fLeftSide;
 			OperatorType		fOp;
 			double				fRightSide;
+
+			double				fPenaltyNeg;
+			double				fPenaltyPos;
 			Summand*			fDNegObjSummand;
 			Summand*			fDPosObjSummand;
 			BString				fLabel;
