@@ -448,7 +448,8 @@ BasicTerminalBuffer::LineLength(int32 index) const
 int32
 BasicTerminalBuffer::GetLineColor(int32 index) const
 {
-	TerminalLine* line = _LineAt(index);
+	TerminalLine* lineBuffer = ALLOC_LINE_ON_STACK(fWidth);
+	TerminalLine* line = _HistoryLineAt(index, lineBuffer);
 	return line != NULL ? line->attributes : 0;
 }
 

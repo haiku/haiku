@@ -1428,7 +1428,9 @@ TermView::Draw(BRect updateRect)
 						SetHighColor(fSelectBackColor);
 						FillRect(rect);
 					} else {
-						uint32 backcolor = IS_BACKCOLOR(fVisibleTextBuffer->GetLineColor(j));
+						int lineIndexInHistory = j + fTextBuffer->HistorySize();
+						uint32 backcolor = IS_BACKCOLOR(fVisibleTextBuffer->GetLineColor(
+							lineIndexInHistory));
 						rgb_color rgb_back = kTermColorTable[backcolor];
 						SetHighColor(rgb_back);
 						FillRect(rect);
