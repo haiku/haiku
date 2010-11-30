@@ -73,9 +73,8 @@ public:
 protected:
 								Constraint(LinearSpec* ls,
 									SummandList* summands, OperatorType op,
-									double rightSide,
-									double penaltyNeg = INFINITY,
-									double penaltyPos = INFINITY);
+									double rightSide, double penaltyNeg,
+									double penaltyPos);
 
 private:
 			LinearSpec*			fLS;
