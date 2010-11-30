@@ -79,13 +79,12 @@ public:
 
 private:
 	USBPrinter *fPrinter;
+	USBPrinterRoster *fRoster;
 };
 
 
 // Set transport_features so we stay loaded
 uint32 transport_features = B_TRANSPORT_IS_HOTPLUG;
-
-USBPrinterRoster gUSBPrinterRoster;
 
 
 USBPrinterRoster::USBPrinterRoster()
@@ -170,7 +169,7 @@ USBPrinterRoster::DeviceAdded(BUSBDevice *dev)
 
 
 void 
-USBPrinterRoster::DeviceRemoved(BUSBDevice* dev)
+USBPrinterRoster::DeviceRemoved(BUSBDevice *dev)
 {
 	PrinterMap::Iterator iterator = fPrinters.GetIterator();
 	while (iterator.HasNext()) {
@@ -186,7 +185,7 @@ USBPrinterRoster::DeviceRemoved(BUSBDevice* dev)
 
 
 status_t 
-USBPrinterRoster::ListPrinters(BMessage* msg)
+USBPrinterRoster::ListPrinters(BMessage *msg)
 {
 	PrinterMap::Iterator iterator = fPrinters.GetIterator();
 	while (iterator.HasNext()) {
@@ -233,8 +232,8 @@ USBPrinter::Read(void *buf, size_t size)
 BDataIO * 
 instantiate_transport(BDirectory *printer, BMessage *msg) 
 {
-	USBTransport * transport = new USBTransport(printer, msg);
-	if (transport->InitCheck() == B_OK)
+	USBTransport *transport = new(std::nothrow) USBTransport(printer, msg);
+	if (transport != NULL && transport->InitCheck() == B_OK)
 		return transport;
 	
 	delete transport; 
@@ -244,9 +243,12 @@ instantiate_transport(BDirectory *printer, BMessage *msg)
 
 // List detected printers
 status_t 
-list_transport_ports(BMessage* msg)
+list_transport_ports(BMessage *msg)
 {
-	return gUSBPrinterRoster.ListPrinters(msg);
+	USBPrinterRoster roster;
+	status_t status = roster.ListPrinters(msg);
+	roster.Stop();
+	return status;
 }
 
 
@@ -256,15 +258,19 @@ USBTransport::USBTransport(BDirectory *printer, BMessage *msg)
 {
 	BString key;
 
-	if (printer->ReadAttrString("transport_address", &key) < 0)
+	if (printer->ReadAttrString("transport_address", &key) != B_OK)
 		return;
 
-	fPrinter = gUSBPrinterRoster.Printer(key.String());
-	if (!fPrinter)
+	fRoster = new(std::nothrow) USBPrinterRoster;
+	if (fRoster == NULL)
+		return;
+
+	fPrinter = fRoster->Printer(key.String());
+	if (fPrinter == NULL)
 		return;
 
 	// If caller doesn't care...
-	if (!msg)
+	if (msg == NULL)
 		return;
 
 	// Fill up the message
@@ -274,7 +280,10 @@ USBTransport::USBTransport(BDirectory *printer, BMessage *msg)
 
 USBTransport::~USBTransport()
 {
-	gUSBPrinterRoster.Stop();
+	if (fRoster != NULL) {
+		fRoster->Stop();
+		delete fRoster;
+	}
 }
 
 
