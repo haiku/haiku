@@ -475,6 +475,7 @@ INPUT                  = . \
                          ../../headers/os/drivers/USB3.h \
                          ../../headers/os/drivers/USB_spec.h \
 						 ../../headers/os/interface/AbstractLayout.h \
+						 ../../headers/os/interface/Box.h \
 						 ../../headers/os/interface/GridLayout.h \
 						 ../../headers/os/interface/GroupLayout.h \
 						 ../../headers/os/interface/Layout.h \

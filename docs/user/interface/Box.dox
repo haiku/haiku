@@ -1,0 +1,217 @@
+/*
+ * Copyright 2010, Haiku inc.
+ * Distributed under the terms of the MIT Licence.
+ *
+ * Documentation by:
+ *  Clark Gaeble
+ *  Adrien Destugues <pulkomandy@pulkomandy.ath.cx>
+ * Corresponds to:
+ *  /trunk/headers/os/interface/Box.h  rev 39685
+ *  /trunk/src/kits/interface/Box.cpp  rev 39685
+
+/*!
+\file Box.h
+\brief Defines the BBox class
+*/
+
+/*! \class BBox
+	\ingroup interface
+	\brief Class just drawing a square box with a label in a window.
+	
+	A Box represents a square on the interface with dimensions, an optional
+	name, and no interactivity.
+
+	This would be used to visually group elements together.
+*/
+
+/*! \fn BBox::BBox(BRect frame, const char *name = NULL, uint32 resizingMode = B_FOLLOW_LEFT | B_FOLLOW_TOP, uint32 flags = B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP, border_style border = B_FANCY_BORDER)
+	\brief Constructs a Box from a set of dimensions.
+
+	This is the only constructor that can be used if the box is to be inserted
+	in a window that doesn't use the layout system.
+
+	\param frame        The bounds of the box.
+	\param name         The name of the box.
+	\param resizingMode Defines the behavior of the box as the window resizes.
+	\param flags        Behavior flags for the box.
+	\param border       Sets the initial style of the border.
+*/
+
+
+/*! \fn BBox::BBox(const char* name, uint32 flags = B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP, border_style border = B_FANCY_BORDER, BView* child = NULL)
+ \brief Constructs a named Box, with dimensions defined automatically by the Layout Kit.
+
+ \param name   The name of the box.
+ \param flags  Behavior flags for the box.
+ \param border Defines the initial border style.
+ \param child  Adds an initial child to the box. See: Layout Kit
+*/
+ 							
+
+/*! \fn BBox::BBox(border_style border, BView* child)
+	\brief Constructs an anonymous Box, with a defined border style and a child.
+
+	There can only be a single child view in the box. This view can, however,
+	act as a nesting container if you need more things to show inside the box.
+
+	\param border The initial border style of the box.
+	\param child  The child of the Box.
+*/
+ 		
+
+/*! \fn BBox::BBox(BMessage* archive)
+	\brief For archive restoration, allows a box to be constructed from an
+		archive message.
+ 
+	You don't usually call this directly, if you want to build a BBox from a
+	message, prefer calling Instanciate, which can properly handle errors.
+	
+	If the archive is a deep one, the box will also unarchive all of its
+	children recursively.
+
+	\param archive  The archive to restore from.
+*/
+ 							
+		
+/*! \fn static BArchivable*	BBox::Instantiate(BMessage* archive)
+	\brief Creates a new BBox from an archive.
+
+	If the message is a valid box, an instance of BBox (created from the
+	archive) will be returned. Otherwise, this function will return NULL.
+*/
+ 		
+
+/*! \fn virtual	status_t BBox::Archive(BMessage* archive, bool deep = true) const;
+	\brief Archives the box into archive.
+
+	\param   archive The target archive which the box data will go into.
+	\param   deep    Whether or not to recursively archive the children.
+	\returns B_OK if the archive was successful.
+*/
+ 		
+ 
+/*! \fn virtual	void BBox::SetBorder(border_style border)
+	\brief Sets the border style.
+*/
+ 		
+
+/*! \fn border_style BBox::Border() const
+	\brief Gets the border style.
+*/
+ 		
+ 
+/*! \fn float BBox::TopBorderOffset()
+	\brief Gets the label's distance from the very top of the Box, in pixels.
+*/
+ 		
+
+/*! \fn BRect BBox::InnerFrame()
+	\brief Returns the rectangle just inside the border.
+*/
+ 		
+ 
+/*! \fn void BBox::SetLabel(const char* string)
+	\brief Sets the label's text.
+	
+	This text is shown as the box title on screen, so the user can identify the
+	purpose of it.
+*/
+ 		
+
+/*! \fn status_t BBox::SetLabel(BView* viewLabel)
+	\brief Sets the label from a pre-existing BView.
+
+ 	You can use any type of BView for this, such as a BPopupMenu.
+	This version of SetLabel is much more powerful than
+	SetLabel(const char* string). It allows building a box which contents can
+	be changed depending on the label widget.
+*/
+ 		
+ 
+/*! \fn const char*	BBox::Label() const
+	\brief Gets the label's text.
+	
+	This only works if the label view is a BTextView.
+*/
+ 		
+
+/*! \fn BView*	BBox::LabelView() const
+	\brief Gets the BView representing the label.
+*/
+ 		
+ 
+/*! \fn virtual	void BBox::Draw(BRect updateRect)
+	\brief Draws onto the parent window the part of the box that intersects
+		the dirty area.
+		
+	\param updateRect The area that needs to be redrawn. Note the box may draw
+		more than asked.
+*/
+ 		
+
+/*! \fn virtual	void BBox::AttachedToWindow()
+	\brief Hook called when the box is attached to a window.
+
+	This function sets the box background color to the parent's one.
+
+	If you are using the layout system, the box is also resized depending
+	on the layout of the parent view.
+*/
+
+		
+/*! \fn virtual void BBox::FrameResized(float width, float height)
+	\brief Called when the box needs to change its size.
+	
+	This function may be called either because the window in which the box is
+	was resized, or because the window layout was otherwise altered.
+	
+	It recomputes the bounds of the box and makes it redraw itself as needed.
+*/
+ 		
+
+/*! \fn 	virtual void BBox::ResizeToPreferred()
+	\brief Resizes the box to its preferred dimensions.
+	
+	This only works in the layout system mode.
+*/
+ 	
+
+/*!	virtual void BBox::GetPreferredSize(float* _width, float* _height)
+	\brief Gets the dimensions the box would prefer to be.
+	
+	The size is computed from the children sizes, unless it was explicitly set
+	for the box.
+
+	\param _width  An output parameter. The width of the preferred size is placed in here.
+	\param _height An output parameter. The height of the preferred size is placed in here.
+*/
+ 	
+
+/*! \fn virtual	BSize BBox::MinSize()
+	\brief Gets the minimum possible size of the Box.
+	
+	This size ensures the label and all the childs are visible.
+*/
+ 		
+
+/*!	\fn virtual	BSize BBox::MaxSize()
+	\brief Gets the maximum possible size of the Box.
+	
+	The maximum size depends on the children.
+*/
+ 	
+
+/*! \fn virtual	BSize BBox::PreferredSize()
+	\brief Returns the box's preferred size.
+	
+	This is the same as GetPreferredSize, but using the more convenient BSize
+	struct.
+*/
+
+
+/*! \fn virtual	void BBox::DoLayout()
+	\brief Lays out the box. Moves everything to its appropriate position.
+	
+	This only works if the box uses the layout system, ie., was created with
+	one of the BRect-less constructors.
+*/
