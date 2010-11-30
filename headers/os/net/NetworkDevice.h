@@ -53,6 +53,8 @@ public:
 			status_t			GetScanResultAt(int32 index,
 									wireless_network& network);
 
+			status_t			JoinNetwork(wireless_network& network,
+									const char* password = NULL);
 			status_t			JoinNetwork(const BNetworkAddress& address,
 									const char* password = NULL);
 			status_t			LeaveNetwork();
