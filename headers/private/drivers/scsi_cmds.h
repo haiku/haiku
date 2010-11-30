@@ -160,10 +160,10 @@
 	// operator requests medium removal
 
 // some scsi op-codes
-#define	SCSI_OP_TEST_UNIT_READY				0x00
+#define SCSI_OP_TEST_UNIT_READY				0x00
 #define SCSI_OP_REQUEST_SENSE				0x03
 #define SCSI_OP_FORMAT						0x04
-#define	SCSI_OP_READ_6						0x08
+#define SCSI_OP_READ_6						0x08
 #define SCSI_OP_WRITE_6						0x0a
 #define SCSI_OP_INQUIRY						0x12
 #define SCSI_OP_VERIFY_6					0x13
@@ -172,26 +172,27 @@
 #define SCSI_OP_RELEASE						0x17
 #define SCSI_OP_MODE_SENSE_6				0x1a
 #define SCSI_OP_START_STOP					0x1b
-#define	SCSI_OP_RECEIVE_DIAGNOSTIC			0x1c
-#define	SCSI_OP_SEND_DIAGNOSTIC				0x1d
+#define SCSI_OP_RECEIVE_DIAGNOSTIC			0x1c
+#define SCSI_OP_SEND_DIAGNOSTIC				0x1d
 #define SCSI_OP_PREVENT_ALLOW				0x1e
-#define	SCSI_OP_READ_CAPACITY				0x25
-#define	SCSI_OP_READ_10						0x28
+#define SCSI_OP_READ_CAPACITY				0x25
+#define SCSI_OP_READ_10						0x28
 #define SCSI_OP_WRITE_10					0x2a
 #define SCSI_OP_POSITION_TO_ELEMENT			0x2b
 #define SCSI_OP_VERIFY_10					0x2f
-#define	SCSI_OP_SYNCHRONIZE_CACHE			0x35
-#define	SCSI_OP_WRITE_BUFFER				0x3b
-#define	SCSI_OP_READ_BUFFER					0x3c
-#define	SCSI_OP_CHANGE_DEFINITION			0x40
+#define SCSI_OP_SYNCHRONIZE_CACHE			0x35
+#define SCSI_OP_WRITE_BUFFER				0x3b
+#define SCSI_OP_READ_BUFFER					0x3c
+#define SCSI_OP_CHANGE_DEFINITION			0x40
 #define SCSI_OP_READ_SUB_CHANNEL			0x42
 #define SCSI_OP_READ_TOC					0x43
 #define SCSI_OP_PLAY_MSF					0x47
 #define SCSI_OP_PLAY_AUDIO_TRACK_INDEX		0x48	// obsolete, spec missing
 #define SCSI_OP_PAUSE_RESUME				0x4b
 #define SCSI_OP_STOP_PLAY					0x4e
-#define	SCSI_OP_MODE_SELECT_10				0x55
-#define	SCSI_OP_MODE_SENSE_10				0x5A
+#define SCSI_OP_MODE_SELECT_10				0x55
+#define SCSI_OP_MODE_SENSE_10				0x5a
+#define SCSI_OP_VARIABLE_LENGTH_CDB			0x7f
 #define SCSI_OP_READ_16						0x88
 #define SCSI_OP_WRITE_16					0x8a
 #define SCSI_OP_VERIFY_16					0x8f
@@ -207,6 +208,10 @@
 
 // Service-Action-In defines
 #define SCSI_SAI_READ_CAPACITY_16			0x10
+#define SCSI_SAI_READ_LONG					0x11
+
+// Service-Action-Out defines
+#define SCSI_SAO_WRITE_LONG					0x11
 
 
 // INQUIRY
