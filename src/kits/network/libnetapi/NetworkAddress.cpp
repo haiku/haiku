@@ -438,42 +438,73 @@ BNetworkAddress::SetPort(uint16 port)
 void
 BNetworkAddress::SetToLinkLevel(uint8* address, size_t length)
 {
-	// TODO: implement me!
+	sockaddr_dl& link = (sockaddr_dl&)fAddress;
+	memset(&link, 0, sizeof(sockaddr_dl));
+
+	link.sdl_family = AF_LINK;
+	link.sdl_alen = length;
+	memcpy(LLADDR(&link), address, length);
+
+	link.sdl_len = sizeof(sockaddr_dl);
+	if (length > sizeof(link.sdl_data))
+		link.sdl_len += length - sizeof(link.sdl_data);
 }
 
 
 void
 BNetworkAddress::SetToLinkLevel(const char* name)
 {
-	// TODO: implement me!
+	sockaddr_dl& link = (sockaddr_dl&)fAddress;
+	memset(&link, 0, sizeof(sockaddr_dl));
+
+	size_t length = strlen(name);
+	if (length > sizeof(fAddress) - sizeof(sockaddr_dl) + sizeof(link.sdl_data))
+		length = sizeof(fAddress) - sizeof(sockaddr_dl) + sizeof(link.sdl_data);
+
+	link.sdl_family = AF_LINK;
+	link.sdl_nlen = length;
+
+	memcpy(link.sdl_data, name, link.sdl_nlen);
+
+	link.sdl_len = sizeof(sockaddr_dl);
+	if (link.sdl_nlen > sizeof(link.sdl_data))
+		link.sdl_len += link.sdl_nlen - sizeof(link.sdl_data);
 }
 
 
 void
 BNetworkAddress::SetToLinkLevel(uint32 index)
 {
-	// TODO: implement me!
+	sockaddr_dl& link = (sockaddr_dl&)fAddress;
+	memset(&link, 0, sizeof(sockaddr_dl));
+
+	link.sdl_family = AF_LINK;
+	link.sdl_len = sizeof(sockaddr_dl);
+	link.sdl_index = index;
 }
 
 
 void
 BNetworkAddress::SetLinkLevelIndex(uint32 index)
 {
-	// TODO: implement me!
+	sockaddr_dl& link = (sockaddr_dl&)fAddress;
+	link.sdl_index = index;
 }
 
 
 void
 BNetworkAddress::SetLinkLevelType(uint32 type)
 {
-	// TODO: implement me!
+	sockaddr_dl& link = (sockaddr_dl&)fAddress;
+	link.sdl_type = type;
 }
 
 
 void
 BNetworkAddress::SetLinkLevelFrameType(uint32 frameType)
 {
-	// TODO: implement me!
+	sockaddr_dl& link = (sockaddr_dl&)fAddress;
+	link.sdl_e_type = frameType;
 }
 
 
