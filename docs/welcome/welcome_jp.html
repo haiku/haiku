@@ -12,6 +12,7 @@
  *		Stephan Aßmus <superstippi@gmx.de> 
  * Translators:
  *		iwaim
+ *		Shota Fukumori
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -47,7 +48,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h2>
 <a id="welcome" name="welcome">Haikuへようこそ！</a></h2>
@@ -56,19 +56,19 @@
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="bugreport" name="bugreport">バグに注意</a></h2>
-<p>We have been working hard to fix all possibly show stopping bugs, however, being an alpha release, there are bound to be plenty left undiscovered.</p>
-<div class="box-warning">We discourage using alpha versions as a production system. Your data could very well be altered, mangled or downright destroyed.</div>
+<p>私たち開発チームはできるだけバグを修正することにつとめています。しかし、これはアルファ版です。まだ見つかっていない沢山のバグが残っているかもしれません。</p>
+<div class="box-warning">私たちはアルファ版を実際の場面で使うことを望んではいません。あなたのデータは壊れたり、無くなったりするかもしれません。</div>
 
-<p>One of the main reasons for releasing an alpha version is to attract more people to test the system and discover bugs or provide suggestions for future enhancements. Please file bugs and enhancements in our bug tracker after using its search function to avoid duplicates.</p>
+<p>私たちがアルファ版をリリースした理由の一つに、もっとたくさんの人に Haiku を触ってもらい、システムのテストとバグの発見など、 Haiku の向上を目指すためがあります。バグを見つけた場合、バグ・トラッカーで検索してまだ報告されていなければ (重複を防ぐために) 報告していただけると助かります。</p>
 <ul>
-	<li><a href="http://dev.haiku-os.org/wiki" class="printurl">Haiku Bug Tracker</a></li>
-	<li><a href="jp/bugreports.html">Tips for a helpful bug report</a></li>
+	<li><a href="http://dev.haiku-os.org/wiki" class="printurl">Haiku バグ・トラッカー</a></li>
+	<li><a href="jp/bugreports.html">良いバグレポートをするためのヒント</a></li>
 </ul>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="system" name="system">システムを把握する</a></h2>
-<p>The first release(s) of Haiku will be very much like the BeOS R5, the operating system it is reimplementing. If you never experienced it, have a look at these links:</p>
+<p>最初の Haiku のリリースは BeOS R5 の再実装のようになる予定ですが、まだ体験していないならこれらも見ると良いでしょう:</p>
 <ul>
 	<li><a href="../userguide/jp/contents.html">Haiku ユーザーガイド</a></li>
 	<li><a href="http://www.haiku-os.org/community/" class="printurl">BeOS および Haiku 関連ウエブサイト一覧</a></li>
@@ -76,49 +76,49 @@
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="software" name="software">Installing more software</a></h2>
-<p>Because of our binary and source compatibility, many BeOS applications run on Haiku (you may have to install the optional package "beoscompatibility" for some programs, see below). After downloading a package, simply unzip it (double clicking opens <span class="app">Expander</span>) to <span class="path">/boot/apps/</span> and start the application from there.</p>
+<a id="software" name="software">ソフトウェアを追加する</a></h2>
+<p>だいたいの BeOS 向けアプリケーションは Haiku でもバイナリーとソースコードの互換性から動くとおもわれます。 (ただし、オプションの "beoscompatibility" パッケージのインストールが必要です) パッケージをダウンロードし、 unzip (ダブルクリックで <span class="app">Expander</span> が開きます) を <span class="path">/boot/apps/</span> にすることでアプリケーションを起動させることができます。</p>
 
-<p>Popular software repositories are:</p>
+<p>有名なソフトウェアのレポジトリの一覧:</p>
 <ul>
 	<li><a href="http://www.haikuware.com" class="printurl">Haikuware</a></li>
 	<li><a href="http://www.bebits.com" class="printurl">BeBits</a></li>
-	<li><a href="http://ports.haiku-files.org/" class="printurl">HaikuPorts</a> - maintains patches for ported software</li>
-	<li><a href="http://www.osdrawer.net/" class="printurl">OsDrawer</a> - hosts native BeOS and Haiku open source software projects</li>
+	<li><a href="http://ports.haiku-files.org/" class="printurl">HaikuPorts</a> - 移植されたソフトウェアやパッチのメンテナンスを行っています</li>
+	<li><a href="http://www.osdrawer.net/" class="printurl">OsDrawer</a> - ネイティブ BeOS と Haiku のソフトウェアを提供しています</li>
 </ul>
 
-<p>There are also so-called Optional Packages, which are used by Haiku's build system. It is not intended for end users to manually extract and install them. Instead, a utility script is provided, <tt>installoptionalpackage</tt>. This script is meant to bridge the gap while Haiku's package management is still under construction. It will allow you to install most of the available Optional Packages.<br />
-You'll have to run a command in Terminal: <tt>installoptionalpackage -h</tt> explains its usage.</p>
+<p>Haiku のビルドシステムで使われているオプショナルパッケージというものがあります。 これはユーザーが手動で展開・インストールを行うために用意はされていません。そのかわり、 <tt>installoptionalpackage</tt> というユーティリティスクリプトが用意されています。このスクリプトは Haiku のパッケージ管理システム (まだ未完成) の穴を埋めるためのもので、たくさんのオプショナルパッケージのインストールを容易にするために用意されています。<br />
+以下のコマンドをターミナルで実行することで使い方を知ることができます: <tt>installoptionalpackage -h</tt></p>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="software" name="wifi">Wifi in Haiku</a></h2>
-<p>Wifi does work to some extent. At the moment you can only connect to unencrypted or WEP encrypted wireless networks. Due to several different licensing policies of different vendors, a manual installation process for the firmware may be required. A list of working devices and instructions for installation can be found on our <a href="jp/wifi.html">Wifi</a> page (also <a href="http://www.haiku-os.org/guides/wifi">online</a>).</p> 
+<a id="software" name="wifi">Haiku での Wifi</a></h2>
+<p>Wifi は一部動作します。今現在、WEPで暗号化されているか、暗号化されていないワイヤレスネットワークのみサポートされています。これはいくつかのベンダーの異なるライセンスによるもので、Wifiのファームウェアの手動インストールが必要です。動作するデバイスのリストとファームウェアのインストールプロセスは <a href="jp/wifi.html">Wifi</a> ページを参照ください。 (そのページの<a href="http://www.haiku-os.org/guides/wifi">オンライン版</a>もあわせてご覧ください)。</p> 
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="api" name="api">APIを理解する</a></h2>
-<p>Since Haiku is a reimplementation, the API is still the same as for BeOS R5 (with some additions). Therefore the documentation in the Be Book is still a valid resource. Thanks to ACCESS, who owns the rights to former Be Inc. property, we are allowed to provide a copy of the Be Book.</p>
+<p>Haiku は再実装のため、APIは BeOS R5 と同じで少しの追加だけになっています。そのため、 Be Book にあるドキュメントはまだ有用な情報です。 Be Inc. を持つ ACCESS に感謝します。私たちは Be Book のコピーを提供することを許可されました。</p>
 
-<p>There are additional resources that should help you getting started:</p>
+<p>以下があなたを助けるであろう追加のドキュメントです:</p>
 <ul>
-	<li><a href="http://www.haiku-os.org/development/faq" class="printurl">Development FAQ</a></li>
-	<li><a href="http://dev.haiku-os.org/browser/" class="printurl">Source Browser</a></li>
-	<li><a href="http://www.haiku-os.org/legacy-docs/bebook/" class="printurl">The Be Book</a></li>
-	<li><a href="http://www.haiku-os.org/legacy-docs/benewsletter/" class="printurl">Be Newsletter Archive</a></li>
+	<li><a href="http://www.haiku-os.org/development/faq" class="printurl">開発 FAQ</a></li>
+	<li><a href="http://dev.haiku-os.org/browser/" class="printurl">ソース・ブラウザー</a></li>
+	<li><a href="http://www.haiku-os.org/legacy-docs/bebook/" class="printurl">Be Book</a></li>
+	<li><a href="http://www.haiku-os.org/legacy-docs/benewsletter/" class="printurl">Be ニュースレター アーカイブ</a></li>
 </ul>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="contact" name="contact">Getting in contact</a></h2>
-<p>Get in contact with other developers and users and join the discussions on IRC, in our forums or the mailing lists. When many different people come together, rules have to established to keep communication effective. Please respect our <a href="http://www.haiku-os.org/community/ml/etiquette">Mailing List Etiquette</a>.</p>
+<a id="contact" name="contact">連絡を取り合う</a></h2>
+<p>IRCやフォーラム、メーリングリストでで他の開発者やユーザーと連絡や議論ができます。たくさんの人々が一緒に活動をするには、ルールにしっかりと準拠して行動をする必要があります。<a href="http://www.haiku-os.org/community/ml/etiquette">メーリングリストでのルール</a> に準拠して行動をするようにお願いします。</p>
 <ul>
 	<li><a href="http://www.haiku-os.org/community/irc" class="printurl">IRC チャンネル</a></li>
 	<li><a href="http://www.haiku-os.org/forum" class="printurl">フォーラム</a></li>
-	<li><a href="http://www.freelists.org/list/haiku" class="printurl">General mailing list</a></li>
-	<li><a href="http://www.freelists.org/list/haiku-development" class="printurl">Development mailing list concerning Haiku itself</a></li>
+	<li><a href="http://www.freelists.org/list/haiku" class="printurl">一般 メーリングリスト</a></li>
+	<li><a href="http://www.freelists.org/list/haiku-development" class="printurl">Haiku にかかわる開発者のためのメーリングリスト</a></li>
 	<li><a href="http://www.freelists.org/list/haiku-3rdparty-dev" class="printurl">サードパーティソフトウェア開発者のためのメーリングリスト</a></li>
-	<li><a href="http://www.haiku-os.org/community/ml" class="printurl">Overview of all mailing lists</a></li>
+	<li><a href="http://www.haiku-os.org/community/ml" class="printurl">その他のメーリングリスト</a></li>
 </ul>
 
 </div>

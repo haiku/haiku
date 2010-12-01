@@ -9,12 +9,15 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		fyskij
+ *		Barret
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Tracker Add-Ons</title>
+	<title>Gli Add-On del Tracker</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
@@ -47,35 +50,35 @@
 
 <div id="content">
 <div>
-<div class="box-info">La traduzione di questa pagina non è stata completata. Per questo motivo le parti non tradotte sono visibili in inglese.</div>
 
-<h1>Tracker Add-Ons</h1>
+<h1>Gli Add-On del Tracker</h1>
 
-<p>Applications can install add-ons so they can be invoked easily on a selection of files from Tracker. Only the add-ons that can handle a specific filetype are presented under <span class="menu">Add-Ons</span> from the context menu or the <span class="menu">File</span> menu of a Tracker window. Some add-ons don't necessarily need a file to work on and are thus always present.</p>
-<p>Tracker Add-Ons, or links to applications that can act as add-ons, can be installed in three different locations (see topic <a href="filesystem-layout.html">Filesystem layout</a>):</p>
+<p>Le Applicazioni possono installare gli add-on in modo che essi possano essere facilmente invocati quando si selezionano dei file dal Tracker. Solo gli addon che possono gestire un tipo di file sono presenti nel menu <span class="menu">Add-Ons</span> o nel menu <span class="menu">File</span> di una finestra del Tracker. Alcuni add-on non hanno necessariamente bisogno di un file su cui lavorare e quindi sono sempre presenti nel menu.</p>
+<p>Gli Add-On del Tracker, o i collegamenti alle applicazioni in grado di agire come add-on, possono essere installati in tre percorsi diversi (guarda l'argomento <a href="filesystem-layout.html">Filesystem layout</a>):</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/system/system/add-ons/Tracker/</span></td><td>   </td><td> for system provided add-ons.</td></tr>
-<tr><td><span class="path">/boot/common/add-ons/Tracker/</span></td><td>   </td><td> for add-ons available to every user.</td></tr>
-<tr><td><span class="path">/boot/home/config/add-ons/Tracker/</span></td><td>   </td><td> for add-ons only available to yourself.</td></tr>
+<tr><td><span class="path">/boot/system/system/add-ons/Tracker/</span></td><td>   </td><td>per gli add-on forniti dal sistema.</td></tr>
+<tr><td><span class="path">/boot/common/add-ons/Tracker/</span></td><td>   </td><td>per gli add-on disponibili a tutti gli utenti.</td></tr>
+<tr><td><span class="path">/boot/home/config/add-ons/Tracker/</span></td><td>   </td><td>per gli add-on disponibili solo al tuo utente</td></tr>
 </table>
-<p>The file name of an add-on can be suffixed with a dash and capital letter, and is then available via keyboard shortcut. For example, <span class="app">Open Target Folder-T</span> opens with <span class="key">ALT</span> <span class="key">OPT</span> <span class="key">T</span>.<br />
-Of course, you have to take care of possible shortcut collisions when deciding on a shortcut. You can't have the same for different add-ons.</p>
+<p>Il nome del file di un addon può essere indicato con il suffisso "-" e lettera maiuscola, ed è quindi disponibile tramite la scorciatoia da tastiera.
+Per esempio, puoi aprire <span class="app">Open Target Folder-T</span> con <span class="key">ALT</span> <span class="key">OPT</span> <span class="key">T</span>.<br />
+Naturalmente, devi assicurarti che non ci siano collisioni tra le varie possibili scorciatioie quando ne scegli una. Non puoi avere la stessa scorciatoia per diversi addon.</p>
 
-<h2><a id="system-add-ons" name="system-add-ons">Haiku's Tracker Add-Ons</a></h2>
-<p>These Tracker Add-Ons come with every Haiku installation:</p>
+<h2><a id="system-add-ons" name="system-add-ons">Gli Add-On del Tracker di Haiku</a></h2>
+<p>Questi Add-On del Tracker sono disponibili con ogni installazione di Haiku:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="4"> 
 	<tr><td class="onelinetop"><b>Background</b><i>-B</i></td>
-		<td valign="top">Opens the <a href="preferences/backgrounds.html">Background</a> preferences to change the color or image of the Desktop or any folder. Invoked on an image file the Background panel is launched with that image already loaded as a potential background.</td></tr>
+		<td valign="top">Apre le preferenze del <a href="preferences/backgrounds.html">Background</a> per cambiare il colore o l'immagine del Desktop o di qualsiasi altra cartella. Invocato con un file immagine il pannello Background verrà lanciato con l'immagine caricata come possibile sfondo.</td></tr>
 	<tr><td class="onelinetop"><b>DiskUsage</b><i>-I</i></td>
-		<td valign="top">Starts the <a href="applications/diskusage.html">DiskUsage</a> application with the according folder as basis.</td></tr>
+		<td valign="top">Lancia l'applicazione <a href="applications/diskusage.html">DiskUsage</a> con la cartella di base specificata.</td></tr>
 	<tr><td class="onelinetop"><b>FileType</b><i>-F</i></td>
-		<td valign="top">Invoked on a file, opens its specific <a href="filetypes.html">FileType</a> panel, otherwise the general FileTypes preferences are launched.</td></tr>
+		<td valign="top">Invocato con un file, apre il suo specifico pannello <a href="filetypes.html">FileType</a>, in caso contrario verrà lanciato il pannello generico delle preferenze FileTypes.</td></tr>
 	<tr><td class="onelinetop"><b>Open Target Folder</b><i>-O</i></td>
-		<td valign="top">Can only be used on a linked file and opens the folder that file lives in.</td></tr>
+		<td valign="top">Può essere utilizzato solo con un collegamento ad un file e apre la cartella in cui si trova.</td></tr>
 	<tr><td class="onelinetop"><b>TextSearch</b><i>-G</i></td>
-		<td valign="top">Starts the <a href="applications/textsearch.html">TextSearch</a> application to look for a string in the selected folder (and its subfolders).</td></tr>
+		<td valign="top">Apre l'applicazione <a href="applications/textsearch.html">TextSearch</a> per cercare una stringa nella cartella selezionata (e nelle sue sottocartelle).</td></tr>
 	<tr><td class="onelinetop"><b>ZipOMatic</b><i>-Z</i></td>
-		<td valign="top">A selection of files will be added to a zip archive, invoked without a selection opens a panel to create an archive via drag&amp;drop.</td></tr>
+		<td valign="top">I file selezionati verranno aggiunti ad un archivio zip, invocandolo senza una selezione si aprirà un pannello per creare un archvio tramite drag&amp;drop.</td></tr>
 </table>
 
 </div>

@@ -48,7 +48,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />コマンドライン・アプリケーション</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -100,8 +99,8 @@ Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
 		<td valign="top"><p><span class="cli">open</span>は非常に便利な小さいツールです。このコマンドを使うと任意のファイルを適切なアプリケーションで開くことや、シグナチャーを用いることで正確なパスを知ることなしにアプリケーションを起動することができます。このコマンドはURLや「仮想的な」ディレクトリを用いることさえできます。ディレクトリの場合は<tt>.</tt>でカレント・ディレクトリを、<tt>..</tt>で親ディレクトリを表すことができ、Trackerでそのフォルダを開くことができます。</p>
 </td></tr>
 <tr><td><p><span class="cli">desklink</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">desklink</span> can install an icon for any file, folder, query or application in the Deskbar tray. It also offers the option to provide a context menu when right-clicking an icon to execute special actions. As an example, try this to add the commandline app <span class="app">screenshot</span> with various options (the "<tt>\</tt>" in the first line is just for the line break in Terminal):</p>
-<pre class="terminal"> desklink "cmd=Active window (2s):/bin/screenshot --window --border --delay 2" \
+		<td valign="top"><p><span class="cli">desklink</span>を使用すると、任意のファイルやフォルダ、クエリ、アプリケーションのアイコンをDeskbarトレイにインストールすることができます。特別なアクションを実行するためにアイコンを右クリックしたときに表示されるコンテクスト・メニューを定義するためのオプションもあります。例として、次のように色々なオプション(1行目の"<tt>/</tt>"はTerminalでの改行を表します)を付けて<span class="app">Screenshot</span>をDeskbarに追加してみましょう:</p>
+<pre class="terminal">desklink "cmd=Active window (2s):/bin/screenshot --window --border --delay 2" \
 "cmd=Remove replicant:desklink --remove=screenshot" /bin/screenshot
 </pre>
 <p><img src="../images/apps-images/cli-desklink.png" alt="cli-alert.png" /></p>

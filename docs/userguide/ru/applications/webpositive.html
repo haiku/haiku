@@ -8,6 +8,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Omar Rizwan
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Rodastahm Islamov
@@ -50,28 +51,93 @@
 
 <div id="content">
 <div>
+<div class="box-info">Перевод этой страницы еще не завершен. Пока это не произойдет, незавершенные части будут на английском.</div>
 
 <h2><img src="../../images/apps-images/webpositive-icon_64.png" alt="webpositive-icon_64.png" width="64" height="64" />WebPositive</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Расположение в Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Приложения (Applications)</span></td></tr>
 <tr><td>Расположение в Tracker:</td><td></td><td><span class="path">/boot/system/apps/WebPositive</span></td></tr>
-<tr><td>Настройки хранятся по адресу:</td><td></td><td><span class="path">~/config/settings/WebPositive/</span> - Настройки, куки, кэш и история посещений</td></tr>
+<tr><td>Настройки хранятся по адресу:	</td><td></td><td><span class="path">~/config/settings/WebPositive/</span> - Настройки, куки, кэш и история посещений</td></tr>
 <tr><td></td><td></td><td><span class="path">~/config/settings/WebPositive/Bookmarks</span> - Хранятся закладки в виде файлов</td></tr>
 </table>
 <p><br /></p>
 <p>WebPositive, либо сокращенно Web+, является родным браузером Haiku (т.е. написан исключительно под Haiku и не является портированным, как BeZillaBrowser). Вторая часть названия позаимствована у браузера BeOS NetPositive, первая взята из названия движка, на котором работает браузер - WebKit. Это библиотека с открытым исходным кодом для рендеринга HTML, она также лежит в основе других браузеров, таких как Safari и Google Chrome. Благодаря тому, что WebKit постоянно развивается, Web+ сможет идти в ногу с новейшими веб-технологиями.</p>
-<p>Сегодня Web+ находится в глубокой разработке. Вскоре документация станет доступна.</p>
-<p>Если вы столкнулись с какими-либо проблемами при использовании WebPositive, вы можете: 1) <a href="../../../welcome/ru/bugreports.html">отправить сообщение об ошибке</a>  2) воспользоваться старым портированным BeZillaBrowser (при помощи <a href="../../../welcome/welcome_ru.html#software">installoptionalpackage</a>).</p>
+
+<img src="../images/apps-images/webpositive.png" alt="webpositive.png" />
+<br />
+<p>You'll control your Web browsing with the <em>Locator bar</em>. To go to a Web page, type the URL into the Locator box and either press <span class="key">RETURN</span> or click the <span class="button">Go</span> button to the right of the Locator box. Web+ will suggest previous URLs as you type; you can go through previously typed URL with the <span class="key">UP</span> and <span class="key">DOWN</span> arrow keys. The icons on the <em>Locator bar</em> give you control over the current page, allowing you to go back, forward, stop loading, or return to your <em>Start page</em>.</p>
+
+<p>If you need to quickly locate content in a page, Web+ includes in-page search. Use <span class="menu">Edit | Find</span> or <span class="key">ALT</span> <span class="key">F</span> to call up the Find bar, then type your search phrase and press <span class="key">RETURN</span>. Further presses of <span class="key">RETURN</span> or <span class="key">ALT</span> <span class="key">G</span> will go through the matches on the page. The <em>Match case</em> option restricts matches to those with the same spelling as your search phrase. Besides in-page search, the <span class="menu">Edit</span> menu also includes clipboard functions: cut, copy, and paste.</p>
+
+<p>The <span class="menu">View</span> menu offers several functions to set the display of Web pages. First, <span class="menu">View | Reload</span> refreshes the Web page so you can see any changes. You set the font size and zoom level of the Web page here as well; you can also choose whether to apply zoom to images as well as text. If you need more room to view the page, you can move into fullscreen mode with <span class="menu">View | Fullscreen</span>. Finally, if you want to view the HTML source code of the current page, <span class="menu">View | Page source</span> opens up an external editor to edit the source.</p>
+
+<p>In case you need to find a page you've already accessed, Web+ has the <span class="menu">History</span> menu. This menu contains the <span class="menu">Back</span> and <span class="menu">Forward</span> commands which are in the <em>Locator bar</em>, but it also has a list of all pages in your browsing history, organized by day.</p>
+
+<p>Last, the <span class="menu">Bookmarks</span> menu lets you add the current page as a bookmark and manage your bookmarks in Tracker. It also lets you see all the bookmarks themselves.</p>
+
+<p>Right-clicking on your Web page or on elements in the page brings up a context menu. In this menu, you can <span class="menu">Stop</span> page loading. If you right-click a link, you can <span class="menu">Download link to disk</span>, <span class="menu">Open</span>, or <span class="menu">Open in new tab</span>. You can also <span class="menu">Copy link to clipboard</span> for use elsewhere. You can take similar actions with right-clicked images embedded in Web pages: <span class="menu">Download image to disk</span>, <span class="menu">Copy image to clipboard</span>, or <span class="menu">Open image in new window</span>. Right-clicking selected text allows you to <span class="menu">Copy</span> to the clipboard. </p>
+
+<p>In the <em>Status bar</em> at the bottom of WebPositive's interface, you can preview where links will take you. Hover over a link in a Web page and its destination URL will appear in the <em>Status bar</em>. This bar will also show you progress as Web+ loads a new Web page.</p>
+
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="settings" name="settings">Settings</a></h2>
+<p>You can access the Web+ settings dialog from <span class="menu">Window | Settings</span>.</p>
+<img src="../images/apps-images/web+settings.png" alt="web+settings.png" />
+<br />
+<p>Many of the options are self-explanatory. The WebPositive <em>Start page</em> and <em>Search page</em> can be set here. You can also change which pages appear in new windows and tabs. Finally, you can change the default fonts and add a proxy server in this dialog.</p>
+<p>The <em>Auto-hide interface in fullscreen mode</em> option will cause the interface to roll out of view if you don't use it for a short time while in fullscreen mode. Likewise, the <em>Auto-hide mouse pointer</em> option removes the mouse pointer from view when you are scrolling through a Web page.</p>
+
+<div class="box-info">Web+ currently only uses the <em>Search page</em> as a possible default page for new tabs and windows. It doesn't have built-in Web search; you have to go to your search engine and type in your query there.</div>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="shortcuts" name="shortcuts">Keyboard shortcuts</a></h2>
+<p>These are some commonly used keyboard shortcuts in WebPositive:</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="key">ALT</span> <span class="key">T</span></td><td> </td><td>Opens a new tab.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">W</span></td><td> </td><td>Closes the current tab.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">N</span></td><td> </td><td>Opens a new window.</td></tr>
+<tr><td><span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">W</span></td><td> </td><td>Closes the current window.</td></tr>
+<tr><td><span class="key">CMD</span> click</td><td> </td><td>Opens the clicked link in a new background tab.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">R</span></td><td> </td><td>Refreshes the current page.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">B</span></td><td> </td><td>Bookmarks this page.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">LEFT</span></td><td> </td><td>Goes back to the last Web page.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">F</span></td><td> </td><td>Opens the Find bar for in-page searching.</td></tr>
+</table>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="bookmarks" name="bookmarks">Bookmarks</a></h2>
+<p>One of WebPositive's unique features is its handling of bookmarks.</p>
+<img src="../images/apps-images/web+bookmarks.png" alt="web+bookmarks.png" />
+<br />
+<p>Web+ stores your bookmarks as files in Haiku's file system, and you can manage them with Tracker: <span class="key">ALT</span> <span class="key">M</span> will bring up your Bookmarks folder in Tracker. The files themselves are blank. Instead, Web+ stores each bookmark's URL and page title as <a href="../attributes.html">attributes</a>.</p>
+<p>There are a number of advantages to this format; attribute storage is easy to filter and edit. Make sure that you first make the bookmark attributes visible from the <span class="menu">Attributes</span> menu in Tracker first. To add keywords to a bookmark, just right-click the bookmark in Tracker and choose <span class="menu">Edit name</span>, then use <span class="key">TAB</span> to navigate to the keywords field. Once you're editing that field, type in your new keywords and press <span class="key">RETURN</span>. You can edit the names, page titles and URLs of existing bookmarks with the same process.</p>
+
+<div class="box-info">WebPositive's approach toward bookmarks allows for quick searching. In <span class="menu">Window | Preferences</span> in Tracker, go to the <span class="menu">Windows</span> tab and choose <em>Enable type-ahead filtering</em>. Now, whenever you are in a bookmark-filled folder in Tracker, you can type phrases from the title, URL, or keywords of the bookmark you want and filter through the results. This tip is especially helpful if you fill in keywords beforehand. Note that it only works for flat folders and not hierarchies, so you will need to copy your bookmarks into one folder to use this.</div>
+
+<h2>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="downloads" name="downloads">Downloads</a></h2>
+<p>Web+ also supports managing your downloads in a similar way. The <em>Downloads</em> window appears when you begin a download; you can call it up manually from the <span class="menu">Windows</span> menu. From here, you can open, restart, or remove previous downloads.</p>
+<img src="../images/apps-images/web+downloads-window.png" alt="web+downloads-window.png" />
+<br />
+<p>Much like it does with bookmarks, Web+ stores information about each download as an attribute. The original URL of the download remains an attribute of the file, so you can always return to the source of the file.</p>
+<p>Web+ will update and adjust to changes to the downloaded files. Notice that <span class="path">sunday.pdf</span> was deleted, so its icon was ghosted out in the <em>Downloads</em> window. <span class="path">documents.html</span> was renamed from its original name of <span class="path">documents</span>, and the Downloads window updated accordingly. </p>
+<img src="../images/apps-images/web+downloads-folder.png" alt="web+downloads-folder.png" />
+<br />
+<div class="box-info">In the Web+ Settings, you can choose a default folder for downloads. However, if you need a download in a different place, just move it while downloading, and Web+ will continue to download. Moving the file to the Trash will cancel the download.</div>
+<div class="box-warning">Closing Web+ will cancel your current downloads! Web+ will pop up a warning dialog if you have an ongoing download and try to quit.</div>
 
 </div>
 </div>
-<!--
+
 <div class="nav">
-<div><span>
+<div class="inner"><span>
  «  <a href="tv.html">TV</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Приложения</a> 
 </span></div>
 </div>
--->
+
 </body>
 </html>

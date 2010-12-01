@@ -9,12 +9,15 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		fyskij
+ *		Barret
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Haiku's GUI</title>
+	<title>Interfaccia grafica di Haiku</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
@@ -39,7 +42,8 @@
 <li><a href="../en/gui.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="filesystem-layout.html">Filesystem layout</a> 
+ «  <a href="filesystem-layout.html">Filesystem Layout
+</a> 
 ::  <a href="contents.html" class="uplink">Contenuti</a> 
 ::  <a href="workspaces.html">Workspaces</a>  »
 </span></div>
@@ -47,71 +51,78 @@
 
 <div id="content">
 <div>
-<div class="box-info">La traduzione di questa pagina non è stata completata. Per questo motivo le parti non tradotte sono visibili in inglese.</div>
 
-<h1>Haiku's GUI</h1>
+<h1>Interfaccia grafica di Haiku</h1>
 
-<p>Haiku's graphical user interface is an integral part of the system. Unlike Unix-based operating systems, there's no separate window manager and booting just into a command line shell is not possible. Haiku's focus being on the desktop user, this is just not considered necessary.</p>
-<p>As you probably have experience with other graphical environments, let's skip over the standards like menus, right-click context menus, drag&amp;drop etc. Let's have a look at the few unique aspects of Haiku's GUI instead.</p>
+<p>L'interfaccia grafica (GUI) di Haiku è parte integrante del sistema. Al contrario dei sistemi operativi Unix, non c'è un gestore delle finestre (window manager) separato e l'avvio in una shell testuale (linea di comando) non è possibile; ciò è semplicemente non ritenuto necessario, il focus di Haiku è l'utente desktop.</p>
+<p>Probabilente avrai già esperienza con altri ambienti grafici, quindi saltiamo i classici menu da tasto destro, drag &amp; drop, ecc...e cerchiamo invece di focalizzarci sui pochi aspetti unici della GUI di Haiku.</p>
 <img src="images/gui-images/gui.png" alt="gui.png" />
-<p>There are only a few things in Haiku's GUI that aren't obvious and deserve an explanation.</p>
+<p>Alcuni aspetti nella GUI di Haiku non sono evidenti e quindi devono essere approfonditi.</p>
 <ol>
-<li><p>The Deskbar is Haiku's "Start" menu and taskbar, if you will. See topic <a href="deskbar.html">Deskbar</a>.</p></li>
-<li>The yellow tab offers more than just a program's name or a document's filename:
-<ul><li>You can move it by holding the <span class="key">SHIFT</span> key while dragging it to another position, enabling you to stack a number of windows and conveniently access them by their named tab.</li>
-<li>You minimize a window with a double-click on its tab (or with <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span>). A such hidden window can be accessed by its entry in the <a href="deskbar.html">Deskbar</a> or the <a href="twitcher.html">Twitcher</a>.</li>
-<li>You can send a window to the back with a right-click on its tab (or its border).</li></ul></li>
-<li><p>The close button.</p></li>
-<li><p>The "zoom" button (or <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span>). In most applications, this will expand a window to maximum size. It doesn't have to, however. Tracker windows, for example, will resize to best fit the contents.</p></li>
-<li><p>The resize corner. Dragging anywhere else on a window's border will move the window.</p></li>
+<li><p>La Deskbar è il menu "Start" di Haiku e la barra applicazioni, se volete. Leggi il capitolo <a href="deskbar.html">Deskbar</a>.</p></li>
+<li>Il tab giallo offre molto di più che il nome del programma o il nome del file aperto:
+<ul><li>Puoi spostarlo tenendo premuto il tasto<span class="key">SHIFT</span> mentre lo trascini in un'altra posizione, consentendoti di impilare un certo numero di finestre ed accedere ad esse comodamente dal nome del loro tab.</li>
+<li>Puoi minimizzare una finestra con un doppio click sul suo tab, (o con <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span>). Puoi avere accesso alle finestre nascoste dalla loro voce nella <a href="deskbar.html">Deskbar</a> o nel <a href="twitcher.html">Twitcher</a>.</li>
+<li>Puoi mandare una finestra sul retro con un click destro sul suo tab (o sul suo bordo).</li></ul></li>
+<li><p>Il pulsante di chiusura.</p></li>
+<li><p>Il bottone "zoom" (o <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span>). Nella maggior parte delle applicazioni, espanderà la finestra alla dimensione massima. Ma questo, tuttavia, non è obbligatorio. Le finestre del Tracker, per esempio, verranno ridimensionate per adattarsi nel miglior modo possibile al contenuto.</p></li>
+<li><p>L'angolo di ridimensionamento. Il trascinamento di una finestra in qualsiasi altro luogo sul confine sposterà la finestra.</p></li>
 </ol>
-<div class="box-info">While holding <span class="key">CTRL</span> <span class="key">ALT</span>, you can click anywhere into a window to move it with the left mouse button; the right mouse button sends it to the back.</div>
+<div class="box-info">Tenendo premuti i tasti <span class="key">CTRL</span> <span class="key">ALT</span>, puoi cliccare su qualsiasi punto della finestra e muoverla con il pulsante sinistro del mouse; il pulsante destro del mouse, invece, riporta la finestra alla posizione iniziale.</div>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="open-save-panel" name="open-save-panel">Open and save panels</a></h2>
-<p>When opening or saving a file from any application, a panel like this opens:</p>
+<a id="open-save-panel" name="open-save-panel">Apri e salva i pannelli.</a></h2>
+<p>Quando stai aprendo o salvando un file da un'applicazione, ti apparirà un pannello come questo:</p>
 <img src="images/gui-images/open-save.png" alt="open-save.png" />
-<p>It has all the usual things: A list of files of the current folder to choose from, in case of a save panel, a text field to enter a filename and a pop-up menu for different file formats and their settings.<br />
-You can enter parent folders with the pop-up menu above the file listing.</p>
-<p>If you already have a Tracker window with the location for a file open, you can simply drag either any file or the folder-representation (i.e. the symbol to the far right in its menu bar) into the panel. This changes the panel to that new location.</p>
+<p>Offre tutte le caratteristiche più in uso: una lista di file da scegliere dalla cartella aperta, o in caso di un pannello di salvataggio, un campo di testo per inserire il nome del file e un pop-up menu per i differenti formati del file e le impostazioni.<br />
+E' possibile accedere alle cartelle superiori con il menu a scomparsa sopra l'elenco dei file.</p>
+<p>Se hai già una finestra Tracker con il percorso per un file aperto, si può semplicemente trascinare ogni tipo file o la cartella di rappresentazione (ovvero il simbolo all'estremità destra nel menu bar) nel pannello.
+Questo modifica il pannello nella nuova posizione.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="open-save-shortcuts" name="open-save-shortcuts">Keyboard shortcuts</a></h3>
-<p>Many shortcuts in open and save panels are the same used in Tracker. Besides the commands that are also available through the <span class="menu">File</span> menu, there are a few not that obvious:</p>
+<a id="open-save-shortcuts" name="open-save-shortcuts">Tasti di scelta rapida</a></h3>
+<p>Numerose scorciatoie nei pannelli per aprire e salvare sono gli stessi usati nel Tracker.
+Oltre ai comandi che sono disponibili attraverso il menu <span class="menu">File</span>, ce ne sono altri non evidenti:</p>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="key">ALT</span> <span class="key">N</span></td><td></td><td> Creates a new folder.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">E</span></td><td></td><td> Lets you rename the selected entry.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">↑</span></td><td style="width:24px;"></td><td> Moves into the parent folder.</td></tr>
-<tr><td class="onelinetop"><span class="key">ALT</span> <span class="key">↓</span> or <span class="key">ENTER</span></td><td></td><td> Moves into the selected folder.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">D</span></td><td></td><td> Takes you to your Desktop.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">H</span></td><td></td><td> Takes you to your Home folder.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">N</span></td><td></td><td> Crea una nuova cartella.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">E</span></td><td></td><td>Consente di rinominare la voce selezionata.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">↑</span></td><td style="width:24px;"></td><td>Sposta nella cartella superiore.</td></tr>
+<tr><td class="onelinetop"><span class="key">ALT</span> <span class="key">↓</span> o <span class="key">INVIO</span></td><td></td><td>Sposta nella cartella selezionata,</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">D</span></td><td></td><td>Ti consente di accedere al Desktop.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">H</span></td><td></td><td>Ti consente di accedere alla cartella Home.</td></tr>
 </table>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="favorites-recent" name="favorites-recent">Favorites and recent folders</a></h3>
-<p>The <span class="menu">Favorites</span> menu in open and save panels provides recently visited folders and favorite locations that you can set up yourself. As indicated by the little arrow, you can also use these locations to navigate further down the hierarchy via submenus.</p>
+<a id="favorites-recent" name="favorites-recent">Preferiti e cartelle recenti</a></h3>
+<p>Il menu <span class="menu">Favorites</span> (presente nei pannelli di apertura e salvataggio) fornisce una scleta fra le cartelle visitate di recente e quelle preferite, che puoi impostare tu stesso. Come indicato dalla piccola freccia, puoi usare questi percorsi per navigare, attraverso i sottomenu, più in profondità nella gerarchia.</p>
 <img src="images/gui-images/favorites.png" alt="favorites.png" />
-<p>To add a Favorite, you simply navigate to your destination and choose <span class="menu">Favorites | Add Current Folder</span>. From now on it will appear in every open/save panel. To remove a Favorite, choose <span class="menu">Favorites | Configure Favorites...</span> and delete its entry.<br />
-All Favorites are kept in <span class="path">/boot/home/config/settings/Tracker/Go/</span>. So you might as well add and remove links to files and folders there directly.</p>
+<p>Per aggiungere un Favorito, devi semplicemente navigare fino alla tua destinazione e scegliere:
+<span class="menu">Favorites | Add Current Folder</span>. Da ora in poi questa apparirà in ogni pannello di apertura/salvataggio.
+Per rimuovere un Favorito, seleziona <span class="menu">Favorites | Configure Favorites...</span> e cancella la sua voce.<br />
+Tutti i favoriti sono conservati nella cartella <span class="path">/boot/home/config/settings/Tracker/Go/</span>. Quindi potresti anche aggiungere e rimuovere direttamente i link per file e cartelle.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="replicants" name="replicants">Replicants</a></h2>
-<p>Replicants are small self-contained parts of applications that can be integrated into other programs. Provided Deskbar's option to <span class="menu">Show Replicants</span> is activated, you'll recognize a replicantable part of an application by its small handle, normally in the bottom right corner:</p>
+<a id="replicants" name="replicants">I Replicant</a></h2>
+<p>I Replicant sono piccole parti di applicazioni che possono essere integrate in altri programmi.
+A patto che l'opzione della Deskbar <span class="menu">Visualizza i Replicant</span> sia stata attivata, vedrai una parte "replicabile" di un'applicazione dalla sua piccola maniglia, normalmente nell'angolo in basso a destra:</p>
 <img src="../images/gui-images/replicant.png" alt="replicant.png" />
-<p>The most prominent place that accepts Replicants is the Desktop: You simply drag&amp;drop the little handle onto it. From now on it's part of the Desktop and the Replicant's originating app doesn't have to be started for it to work.<br />
-A right-click on a Replicant handle offers a context menu to show the originating app's <span class="menu">About</span> window and to <span class="menu">Remove Replicant</span>.</p>
-<div class="box-info">Should you experience difficulties with a Replicant on the Desktop and just can't get rid of it, delete <span class="path">~/config/settings/Tracker/tracker_shelf</span>. Unfortunately, this will remove <i>all</i> Replicants from the Desktop.</div>
-<p>Examples for replicatable applications are the graphs of the <a href="applications/activitymonitor.html">ActivityMonitor</a>, the <a href="workspaces.html">Workspaces applet</a> or <a href="applications/deskcalc.html">DeskCalc</a>.</p>
+<p>Il luogo più importante che accetta i Replicant è il Desktop: dove tu puoi semplicemente spostare la piccola maniglia su di esso.
+Da ora in poi è parte del Desktop e l'applicazione principale del Replicant non deve essere avviata per farlo funzionare.<br />
+Un tasto destro sull'uncino del Replicant permette di visualizzare la finestra <span class="menu">About</span> dell'applicazione principale e rimuovere il Replicant.</p>
+<div class="box-info">In caso di difficoltà con un Replicant sul Desktop e se non riesci a rimuoverlo, cancella <span class="path">~/config/settings/Tracker/tracker_shelf</span> . Sfortunatamente questo rimuoverà 
+<i>tutti </i> i Replicant dal Desktop.</div>
+<p>Esempi di applicazioni "replicatable" sono i grafici dell'<a href="applications/activitymonitor.html">ActivityMonitor</a>, dell'<a href="workspaces.html">applet dei Workspace </a> o il <a href="applications/deskcalc.html">DeskCalc</a>.</p>
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="filesystem-layout.html">Filesystem layout</a> 
+ «  <a href="filesystem-layout.html">Filesystem Layout
+</a> 
 ::  <a href="contents.html" class="uplink">Contenuti</a> 
 ::  <a href="workspaces.html">Workspaces</a>  »
 </span></div>
