@@ -472,9 +472,16 @@ void
 SATWindow::FindSnappingCandidates()
 {
 	fOngoingSnapping = NULL;
+
+	if (fWindow->Feel() != B_NORMAL_WINDOW_FEEL)
+		return;
+
 	GroupIterator groupIterator(fStackAndTile, GetWindow()->Desktop());
 	for (SATGroup* group = groupIterator.NextGroup(); group;
 		group = groupIterator.NextGroup()) {
+		if (group->CountItems() == 1
+			&& group->WindowAt(0)->GetWindow()->Feel() != B_NORMAL_WINDOW_FEEL)
+			continue;
 		for (int i = 0; i < fSATSnappingBehaviourList.CountItems(); i++) {
 			if (fSATSnappingBehaviourList.ItemAt(i)->FindSnappingCandidates(
 				group)) {
