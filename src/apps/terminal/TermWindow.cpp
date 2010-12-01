@@ -1068,9 +1068,6 @@ void
 TermWindow::_NewTab()
 {
 	if (fTabView->CountTabs() < kMaxTabs) {
-		// if (fFullScreen)
-		//	_ActiveTermView()->ScrollBar()->Show();
-
 		ActiveProcessInfo info;
 		if (_ActiveTermView()->GetActiveProcessInfo(info))
 			_AddTab(NULL, info.CurrentDirectory());
@@ -1183,8 +1180,6 @@ TermWindow::_RemoveTab(int32 index)
 
 			delete session;
 			delete fTabView->RemoveTab(index);
-			// if (fFullScreen)
-			//	_ActiveTermView()->ScrollBar()->Hide();
 		}
 	} else
 		PostMessage(B_QUIT_REQUESTED);
