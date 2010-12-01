@@ -16,6 +16,12 @@
 #include <sys/sockio.h>
 
 
+BNetworkAddress::BNetworkAddress()
+{
+	Unset();
+}
+
+
 BNetworkAddress::BNetworkAddress(const char* host, uint16 port, uint32 flags)
 {
 	SetTo(host, port, flags);
@@ -90,12 +96,6 @@ BNetworkAddress::BNetworkAddress(const BNetworkAddress& other)
 	fAddress(other.fAddress),
 	fStatus(other.fStatus)
 {
-}
-
-
-BNetworkAddress::BNetworkAddress()
-{
-	Unset();
 }
 
 
@@ -995,6 +995,11 @@ BNetworkAddress::Unflatten(type_code code, const void* buffer, ssize_t size)
 		return fStatus = B_BAD_TYPE;
 
 	memcpy(&fAddress, buffer, min_c(size, (ssize_t)sizeof(fAddress)));
+
+	// check if this can contain a valid address
+	if (fAddress.ss_family != AF_UNSPEC && size < (ssize_t)sizeof(sockaddr))
+		return fStatus = B_BAD_VALUE;
+
 	return fStatus = B_OK;
 }
 
