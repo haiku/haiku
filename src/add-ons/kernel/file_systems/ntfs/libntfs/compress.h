@@ -29,5 +29,13 @@
 extern s64 ntfs_compressed_attr_pread(ntfs_attr *na, s64 pos, s64 count,
 		void *b);
 
+extern s64 ntfs_compressed_pwrite(ntfs_attr *na, runlist_element *brl, s64 wpos,
+				s64 offs, s64 to_write, s64 rounded,
+				const void *b, int compressed_part,
+				VCN *update_from);
+
+extern int ntfs_compressed_close(ntfs_attr *na, runlist_element *brl,
+				s64 offs, VCN *update_from);
+
 #endif /* defined _NTFS_COMPRESS_H */
 

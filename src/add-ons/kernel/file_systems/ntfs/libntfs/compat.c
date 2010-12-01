@@ -77,7 +77,7 @@ int ffs(int x)
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static const char sccsid[] = "@(#)daemon.c	8.1 (Berkeley) 6/4/93";
-static const char rcsid[] = "$Id: compat.c,v 1.2 2008/07/17 15:01:48 szaka Exp $";
+static const char rcsid[] = "$Id: compat.c,v 1.1.1.1.2.1 2008-08-16 15:17:44 jpandre Exp $";
 #endif /* LIBC_SCCS and not lint */
 
 /*
@@ -164,7 +164,7 @@ int daemon(int nochdir, int noclose) {
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static const char sccsid[] = "strsep.c	8.1 (Berkeley) 6/4/93";
-static const char rcsid[] = "$Id: compat.c,v 1.2 2008/07/17 15:01:48 szaka Exp $";
+static const char rcsid[] = "$Id: compat.c,v 1.1.1.1.2.1 2008-08-16 15:17:44 jpandre Exp $";
 #endif /* LIBC_SCCS and not lint */
 
 /*

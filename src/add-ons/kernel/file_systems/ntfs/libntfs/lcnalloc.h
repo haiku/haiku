@@ -42,6 +42,7 @@ extern runlist *ntfs_cluster_alloc(ntfs_volume *vol, VCN start_vcn, s64 count,
 		LCN start_lcn, const NTFS_CLUSTER_ALLOCATION_ZONES zone);
 
 extern int ntfs_cluster_free_from_rl(ntfs_volume *vol, runlist *rl);
+extern int ntfs_cluster_free_basic(ntfs_volume *vol, s64 lcn, s64 count);
 
 extern int ntfs_cluster_free(ntfs_volume *vol, ntfs_attr *na, VCN start_vcn,
 		s64 count);

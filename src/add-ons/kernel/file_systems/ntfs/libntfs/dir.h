@@ -67,18 +67,21 @@ extern ntfschar NTFS_INDEX_R[3];
 
 extern u64 ntfs_inode_lookup_by_name(ntfs_inode *dir_ni,
 		const ntfschar *uname, const int uname_len);
+extern u64 ntfs_inode_lookup_by_mbsname(ntfs_inode *dir_ni, const char *name);
+extern void ntfs_inode_update_mbsname(ntfs_inode *dir_ni, const char *name,
+				u64 inum);
 
 extern ntfs_inode *ntfs_pathname_to_inode(ntfs_volume *vol, ntfs_inode *parent,
 		const char *pathname);
-
-extern ntfs_inode *ntfs_create(ntfs_inode *dir_ni, ntfschar *name, u8 name_len,
-		dev_t type);
-extern ntfs_inode *ntfs_create_device(ntfs_inode *dir_ni,
-		ntfschar *name, u8 name_len, dev_t type, dev_t dev);
-extern ntfs_inode *ntfs_create_symlink(ntfs_inode *dir_ni,
+extern ntfs_inode *ntfs_create(ntfs_inode *dir_ni, le32 securid,
+		ntfschar *name,	u8 name_len, mode_t type);
+extern ntfs_inode *ntfs_create_device(ntfs_inode *dir_ni, le32 securid,
+		ntfschar *name, u8 name_len, mode_t type, dev_t dev);
+extern ntfs_inode *ntfs_create_symlink(ntfs_inode *dir_ni, le32 securid,
 		ntfschar *name, u8 name_len, ntfschar *target, int target_len);
 extern int ntfs_check_empty_dir(ntfs_inode *ni);
-extern int ntfs_delete(ntfs_inode *ni, ntfs_inode *dir_ni, ntfschar *name,
+extern int ntfs_delete(ntfs_volume *vol, const char *path,
+		ntfs_inode *ni, ntfs_inode *dir_ni, ntfschar *name,
 		u8 name_len);
 
 extern int ntfs_link(ntfs_inode *ni, ntfs_inode *dir_ni, ntfschar *name,
@@ -109,6 +112,23 @@ typedef int (*ntfs_filldir_t)(void *dirent, const ntfschar *name,
 
 extern int ntfs_readdir(ntfs_inode *dir_ni, s64 *pos,
 		void *dirent, ntfs_filldir_t filldir);
+
+ntfs_inode *ntfs_dir_parent_inode(ntfs_inode *ni);
+
+int ntfs_get_ntfs_dos_name(ntfs_inode *ni, ntfs_inode *dir_ni,
+			char *value, size_t size);
+int ntfs_set_ntfs_dos_name(ntfs_inode *ni, ntfs_inode *dir_ni,
+			const char *value, size_t size,	int flags);
+int ntfs_remove_ntfs_dos_name(ntfs_inode *ni, ntfs_inode *dir_ni);
+
+#if CACHE_INODE_SIZE
+
+struct CACHED_GENERIC;
+
+extern int ntfs_dir_inode_hash(const struct CACHED_GENERIC *cached);
+extern int ntfs_dir_lookup_hash(const struct CACHED_GENERIC *cached);
+
+#endif
 
 #endif /* defined _NTFS_DIR_H */
 

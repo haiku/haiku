@@ -5,6 +5,7 @@
  * Copyright (c) 2002-2008 Szabolcs Szakacsits
  * Copyright (c) 2004-2007 Yura Pakhuchiy
  * Copyright (c) 2004-2005 Richard Russon
+ * Copyright (c) 2009-2010 Jean-Pierre Andre
  *
  * This program/include file is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
@@ -35,11 +36,17 @@
 #ifdef HAVE_ERRNO_H
 #include <errno.h>
 #endif
+#ifdef HAVE_SETXATTR
+#include <sys/xattr.h>
+#endif
 
+#include "param.h"
 #include "compat.h"
 #include "types.h"
-#include "attrib.h"
+#include "volume.h"
+#include "cache.h"
 #include "inode.h"
+#include "attrib.h"
 #include "debug.h"
 #include "mft.h"
 #include "attrlist.h"
@@ -149,12 +156,14 @@ static void __ntfs_inode_release(ntfs_inode *ni)
  * Return a pointer to the ntfs_inode structure on success or NULL on error,
  * with errno set to the error code.
  */
-ntfs_inode *ntfs_inode_open(ntfs_volume *vol, const MFT_REF mref)
+static ntfs_inode *ntfs_inode_real_open(ntfs_volume *vol, const MFT_REF mref)
 {
 	s64 l;
 	ntfs_inode *ni = NULL;
 	ntfs_attr_search_ctx *ctx;
 	STANDARD_INFORMATION *std_info;
+	le32 lthle;
+	int olderrno;
 
 	ntfs_log_enter("Entering for inode %lld\n", (long long)MREF(mref));
 	if (!vol) {
@@ -177,22 +186,41 @@ ntfs_inode *ntfs_inode_open(ntfs_volume *vol, const MFT_REF mref)
 	/* Receive some basic information about inode. */
 	if (ntfs_attr_lookup(AT_STANDARD_INFORMATION, AT_UNNAMED,
 				0, CASE_SENSITIVE, 0, NULL, 0, ctx)) {
-		ntfs_log_perror("No STANDARD_INFORMATION in base record\n");
+		if (!ni->mrec->base_mft_record)
+			ntfs_log_perror("No STANDARD_INFORMATION in base record"
+					" %lld", (long long)MREF(mref));
 		goto put_err_out;
 	}
 	std_info = (STANDARD_INFORMATION *)((u8 *)ctx->attr +
 			le16_to_cpu(ctx->attr->value_offset));
 	ni->flags = std_info->file_attributes;
-	ni->creation_time = ntfs2utc(std_info->creation_time);
-	ni->last_data_change_time = ntfs2utc(std_info->last_data_change_time);
-	ni->last_mft_change_time = ntfs2utc(std_info->last_mft_change_time);
-	ni->last_access_time = ntfs2utc(std_info->last_access_time);
+	ni->creation_time = std_info->creation_time;
+	ni->last_data_change_time = std_info->last_data_change_time;
+	ni->last_mft_change_time = std_info->last_mft_change_time;
+	ni->last_access_time = std_info->last_access_time;
+  		/* JPA insert v3 extensions if present */
+                /* length may be seen as 72 (v1.x) or 96 (v3.x) */
+	lthle = ctx->attr->length;
+	if (le32_to_cpu(lthle) > sizeof(STANDARD_INFORMATION)) {
+		set_nino_flag(ni, v3_Extensions);
+		ni->owner_id = std_info->owner_id;
+		ni->security_id = std_info->security_id;
+		ni->quota_charged = std_info->quota_charged;
+		ni->usn = std_info->usn;
+	} else {
+		clear_nino_flag(ni, v3_Extensions);
+		ni->owner_id = const_cpu_to_le32(0);
+		ni->security_id = const_cpu_to_le32(0);
+	}
 	/* Set attribute list information. */
-	if (ntfs_attr_lookup(AT_ATTRIBUTE_LIST, AT_UNNAMED, 0, 0, 0, NULL, 0,
-			ctx)) {
+	olderrno = errno;
+	if (ntfs_attr_lookup(AT_ATTRIBUTE_LIST, AT_UNNAMED, 0,
+			CASE_SENSITIVE, 0, NULL, 0, ctx)) {
 		if (errno != ENOENT)
 			goto put_err_out;
 		/* Attribute list attribute does not present. */
+		/* restore previous errno to avoid misinterpretation */
+		errno = olderrno;
 		goto get_size;
 	}
 	NInoSetAttrList(ni);
@@ -201,7 +229,8 @@ ntfs_inode *ntfs_inode_open(ntfs_volume *vol, const MFT_REF mref)
 		goto put_err_out;
 	if (l > 0x40000) {
 		errno = EIO;
-		ntfs_log_perror("Too large attrlist (%lld)\n", (long long)l);
+		ntfs_log_perror("Too large attrlist attribute (%lld), inode "
+				"%lld", (long long)l, (long long)MREF(mref));
 		goto put_err_out;
 	}
 	ni->attr_list_size = l;
@@ -213,15 +242,19 @@ ntfs_inode *ntfs_inode_open(ntfs_volume *vol, const MFT_REF mref)
 		goto put_err_out;
 	if (l != ni->attr_list_size) {
 		errno = EIO;
-		ntfs_log_perror("Unexpected attrlist size (%lld <> %u)\n",
-				(long long)l, ni->attr_list_size);
+		ntfs_log_perror("Unexpected attrlist size (%lld <> %u), inode "
+				"%lld", (long long)l, ni->attr_list_size, 
+				(long long)MREF(mref));
 		goto put_err_out;
 	}
 get_size:
+	olderrno = errno;
 	if (ntfs_attr_lookup(AT_DATA, AT_UNNAMED, 0, 0, 0, NULL, 0, ctx)) {
 		if (errno != ENOENT)
 			goto put_err_out;
 		/* Directory or special file. */
+		/* restore previous errno to avoid misinterpretation */
+		errno = olderrno;
 		ni->data_size = ni->allocated_size = 0;
 	} else {
 		if (ctx->attr->non_resident) {
@@ -237,6 +270,7 @@ get_size:
 			ni->data_size = le32_to_cpu(ctx->attr->value_length);
 			ni->allocated_size = (ni->data_size + 7) & ~7;
 		}
+		set_nino_flag(ni,KnownSize);
 	}
 	ntfs_attr_put_search_ctx(ctx);
 out:	
@@ -275,7 +309,8 @@ err_out:
  *	EINVAL	@ni is invalid (probably it is an extent inode).
  *	EIO	I/O error while trying to write inode to disk.
  */
-int ntfs_inode_close(ntfs_inode *ni)
+
+int ntfs_inode_real_close(ntfs_inode *ni)
 {
 	int ret = -1;
 	
@@ -295,7 +330,7 @@ int ntfs_inode_close(ntfs_inode *ni)
 	/* Is this a base inode with mapped extent inodes? */
 	if (ni->nr_extents > 0) {
 		while (ni->nr_extents > 0) {
-			if (ntfs_inode_close(ni->extent_nis[0])) {
+			if (ntfs_inode_real_close(ni->extent_nis[0])) {
 				if (errno != EIO)
 					errno = EBUSY;
 				goto err;
@@ -335,8 +370,10 @@ int ntfs_inode_close(ntfs_inode *ni)
 				/* Ignore errors, they don't really matter. */
 				if (tmp_nis)
 					base_ni->extent_nis = tmp_nis;
-			} else if (tmp_nis)
+			} else if (tmp_nis) {
 				free(tmp_nis);
+				base_ni->extent_nis = (ntfs_inode**)NULL;
+			}
 			/* Allow for error checking. */
 			i = -1;
 			break;
@@ -356,6 +393,154 @@ int ntfs_inode_close(ntfs_inode *ni)
 err:
 	ntfs_log_leave("\n");
 	return ret;
+}
+
+#if CACHE_NIDATA_SIZE
+
+/*
+ *		Free an inode structure when there is not more space
+ *	in the cache
+ */
+
+void ntfs_inode_nidata_free(const struct CACHED_GENERIC *cached)
+{
+        ntfs_inode_real_close(((const struct CACHED_NIDATA*)cached)->ni);
+}
+
+/*
+ *		Compute a hash value for an inode entry
+ */
+
+int ntfs_inode_nidata_hash(const struct CACHED_GENERIC *item)
+{
+	return (((const struct CACHED_NIDATA*)item)->inum
+			% (2*CACHE_NIDATA_SIZE));
+}
+
+/*
+ *		inum comparing for entering/fetching from cache
+ */
+
+static int idata_cache_compare(const struct CACHED_GENERIC *cached,
+			const struct CACHED_GENERIC *wanted)
+{
+	return (((const struct CACHED_NIDATA*)cached)->inum
+			!= ((const struct CACHED_NIDATA*)wanted)->inum);
+}
+
+/*
+ *		Invalidate an inode entry when not needed anymore.
+ *	The entry should have been synced, it may be reused later,
+ *	if it is requested before it is dropped from cache.
+ */
+
+void ntfs_inode_invalidate(ntfs_volume *vol, const MFT_REF mref)
+{
+	struct CACHED_NIDATA item;
+	int count;
+
+	item.inum = MREF(mref);
+	item.ni = (ntfs_inode*)NULL;
+	item.pathname = (const char*)NULL;
+	item.varsize = 0;
+	count = ntfs_invalidate_cache(vol->nidata_cache,
+				GENERIC(&item),idata_cache_compare,CACHE_FREE);
+}
+
+#endif
+
+/*
+ *		Open an inode
+ *
+ *	When possible, an entry recorded in the cache is reused
+ *
+ *	**NEVER REOPEN** an inode, this can lead to a duplicated
+ * 	cache entry (hard to detect), and to an obsolete one being
+ *	reused. System files are however protected from being cached.
+ */
+
+ntfs_inode *ntfs_inode_open(ntfs_volume *vol, const MFT_REF mref)
+{
+	ntfs_inode *ni;
+#if CACHE_NIDATA_SIZE
+	struct CACHED_NIDATA item;
+	struct CACHED_NIDATA *cached;
+
+		/* fetch idata from cache */
+	item.inum = MREF(mref);
+	debug_double_inode(item.inum,1);
+	item.pathname = (const char*)NULL;
+	item.varsize = 0;
+	cached = (struct CACHED_NIDATA*)ntfs_fetch_cache(vol->nidata_cache,
+				GENERIC(&item),idata_cache_compare);
+	if (cached) {
+		ni = cached->ni;
+		/* do not keep open entries in cache */
+		ntfs_remove_cache(vol->nidata_cache,
+				(struct CACHED_GENERIC*)cached,0);
+	} else {
+		ni = ntfs_inode_real_open(vol, mref);
+	}
+#else
+	ni = ntfs_inode_real_open(vol, mref);
+#endif
+	return (ni);
+}
+
+/*
+ *		Close an inode entry
+ *
+ *	If cacheing is in use, the entry is synced and kept available
+ *	in cache for further use.
+ *
+ *	System files (inode < 16 or having the IS_4 flag) are protected
+ *	against being cached.
+ */
+
+int ntfs_inode_close(ntfs_inode *ni)
+{
+	int res;
+#if CACHE_NIDATA_SIZE
+	BOOL dirty;
+	struct CACHED_NIDATA item;
+
+	if (ni) {
+		debug_double_inode(ni->mft_no,0);
+		/* do not cache system files : could lead to double entries */
+		if (ni->vol && ni->vol->nidata_cache
+			&& ((ni->mft_no == FILE_root)
+			    || ((ni->mft_no >= FILE_first_user)
+				&& !(ni->mrec->flags & MFT_RECORD_IS_4)))) {
+			/* If we have dirty metadata, write it out. */
+			dirty = NInoDirty(ni) || NInoAttrListDirty(ni);
+			if (dirty) {
+				res = ntfs_inode_sync(ni);
+					/* do a real close if sync failed */
+				if (res)
+					ntfs_inode_real_close(ni);
+			} else
+				res = 0;
+
+			if (!res) {
+					/* feed idata into cache */
+				item.inum = ni->mft_no;
+				item.ni = ni;
+				item.pathname = (const char*)NULL;
+				item.varsize = 0;
+				debug_cached_inode(ni);
+				ntfs_enter_cache(ni->vol->nidata_cache,
+					GENERIC(&item), idata_cache_compare);
+			}
+		} else {
+			/* cache not ready or system file, really close */
+			res = ntfs_inode_real_close(ni);
+		}
+	} else
+		res = 0;
+#else
+	res = ntfs_inode_real_close(ni);
+#endif
+	return (res);
 }
 
 /**
@@ -514,6 +699,8 @@ static int ntfs_inode_sync_standard_information(ntfs_inode *ni)
 {
 	ntfs_attr_search_ctx *ctx;
 	STANDARD_INFORMATION *std_info;
+	u32 lth;
+	le32 lthle;
 
 	ntfs_log_trace("Entering for inode %lld\n", (long long)ni->mft_no);
 
@@ -530,10 +717,27 @@ static int ntfs_inode_sync_standard_information(ntfs_inode *ni)
 	std_info = (STANDARD_INFORMATION *)((u8 *)ctx->attr +
 			le16_to_cpu(ctx->attr->value_offset));
 	std_info->file_attributes = ni->flags;
-	std_info->creation_time = utc2ntfs(ni->creation_time);
-	std_info->last_data_change_time = utc2ntfs(ni->last_data_change_time);
-	std_info->last_mft_change_time = utc2ntfs(ni->last_mft_change_time);
-	std_info->last_access_time = utc2ntfs(ni->last_access_time);
+	if (!test_nino_flag(ni, TimesSet)) {
+		std_info->creation_time = ni->creation_time;
+		std_info->last_data_change_time = ni->last_data_change_time;
+		std_info->last_mft_change_time = ni->last_mft_change_time;
+		std_info->last_access_time = ni->last_access_time;
+	}
+
+		/* JPA update v3.x extensions, ensuring consistency */
+
+	lthle = ctx->attr->length;
+	lth = le32_to_cpu(lthle);
+	if (test_nino_flag(ni, v3_Extensions)
+	    && (lth <= sizeof(STANDARD_INFORMATION)))
+		ntfs_log_error("bad sync of standard information\n");
+
+	if (lth > sizeof(STANDARD_INFORMATION)) {
+		std_info->owner_id = ni->owner_id;
+		std_info->security_id = ni->security_id;
+		std_info->quota_charged = ni->quota_charged;
+		std_info->usn = ni->usn;
+	}
 	ntfs_inode_mark_dirty(ctx->ntfs_ino);
 	ntfs_attr_put_search_ctx(ctx);
 	return 0;
@@ -547,12 +751,15 @@ static int ntfs_inode_sync_standard_information(ntfs_inode *ni)
  *
  * Return 0 on success or -1 on error with errno set to the error code.
  */
-static int ntfs_inode_sync_file_name(ntfs_inode *ni)
+static int ntfs_inode_sync_file_name(ntfs_inode *ni, ntfs_inode *dir_ni)
 {
 	ntfs_attr_search_ctx *ctx = NULL;
 	ntfs_index_context *ictx;
 	ntfs_inode *index_ni;
 	FILE_NAME_ATTR *fn;
+	FILE_NAME_ATTR *fnx;
+	REPARSE_POINT *rpp;
+	le32 reparse_tag;
 	int err = 0;
 
 	ntfs_log_trace("Entering for inode %lld\n", (long long)ni->mft_no);
@@ -561,6 +768,17 @@ static int ntfs_inode_sync_file_name(ntfs_inode *ni)
 	if (!ctx) {
 		err = errno;
 		goto err_out;
+	}
+	/* Collect the reparse tag, if any */
+	reparse_tag = cpu_to_le32(0);
+	if (ni->flags & FILE_ATTR_REPARSE_POINT) {
+		if (!ntfs_attr_lookup(AT_REPARSE_POINT, NULL,
+				0, CASE_SENSITIVE, 0, NULL, 0, ctx)) {
+			rpp = (REPARSE_POINT*)((u8 *)ctx->attr +
+					le16_to_cpu(ctx->attr->value_offset));
+			reparse_tag = rpp->reparse_tag;
+		}
+		ntfs_attr_reinit_search_ctx(ctx);
 	}
 	/* Walk through all FILE_NAME attributes and update them. */
 	while (!ntfs_attr_lookup(AT_FILE_NAME, NULL, 0, 0, 0, NULL, 0, ctx)) {
@@ -576,7 +794,10 @@ static int ntfs_inode_sync_file_name(ntfs_inode *ni)
 			 */
 			index_ni = ni;
 		} else
-			index_ni = ntfs_inode_open(ni->vol, 
+			if (dir_ni)
+				index_ni = dir_ni;
+			else
+				index_ni = ntfs_inode_open(ni->vol, 
 					le64_to_cpu(fn->parent_directory));
 		if (!index_ni) {
 			if (!err)
@@ -591,7 +812,8 @@ static int ntfs_inode_sync_file_name(ntfs_inode *ni)
 				err = errno;
 			ntfs_log_perror("Failed to get index ctx, inode %lld",
 					(long long)index_ni->mft_no);
-			if (ni != index_ni && ntfs_inode_close(index_ni) && !err)
+			if ((ni != index_ni) && !dir_ni
+			    && ntfs_inode_close(index_ni) && !err)
 				err = errno;
 			continue;
 		}
@@ -610,19 +832,34 @@ static int ntfs_inode_sync_file_name(ntfs_inode *ni)
 			continue;
 		}
 		/* Update flags and file size. */
-		fn = (FILE_NAME_ATTR *)ictx->data;
-		fn->file_attributes =
-				(fn->file_attributes & ~FILE_ATTR_VALID_FLAGS) |
+		fnx = (FILE_NAME_ATTR *)ictx->data;
+		fnx->file_attributes =
+				(fnx->file_attributes & ~FILE_ATTR_VALID_FLAGS) |
 				(ni->flags & FILE_ATTR_VALID_FLAGS);
-		fn->allocated_size = cpu_to_sle64(ni->allocated_size);
-		fn->data_size = cpu_to_sle64(ni->data_size);
-		fn->creation_time = utc2ntfs(ni->creation_time);
-		fn->last_data_change_time = utc2ntfs(ni->last_data_change_time);
-		fn->last_mft_change_time = utc2ntfs(ni->last_mft_change_time);
-		fn->last_access_time = utc2ntfs(ni->last_access_time);
+		if (ni->mrec->flags & MFT_RECORD_IS_DIRECTORY)
+			fnx->data_size = fnx->allocated_size
+				= const_cpu_to_le64(0);
+		else {
+			fnx->allocated_size = cpu_to_sle64(ni->allocated_size);
+			fnx->data_size = cpu_to_sle64(ni->data_size);
+		}
+			/* update or clear the reparse tag in the index */
+		fnx->reparse_point_tag = reparse_tag;
+		if (!test_nino_flag(ni, TimesSet)) {
+			fnx->creation_time = ni->creation_time;
+			fnx->last_data_change_time = ni->last_data_change_time;
+			fnx->last_mft_change_time = ni->last_mft_change_time;
+			fnx->last_access_time = ni->last_access_time;
+		} else {
+			fnx->creation_time = fn->creation_time;
+			fnx->last_data_change_time = fn->last_data_change_time;
+			fnx->last_mft_change_time = fn->last_mft_change_time;
+			fnx->last_access_time = fn->last_access_time;
+		}
 		ntfs_index_entry_mark_dirty(ictx);
 		ntfs_index_ctx_put(ictx);
-		if ((ni != index_ni) && ntfs_inode_close(index_ni) && !err)
+		if ((ni != index_ni) && !dir_ni
+		    && ntfs_inode_close(index_ni) && !err)
 			err = errno;
 	}
 	/* Check for real error occurred. */
@@ -664,11 +901,10 @@ err_out:
  *	EBUSY	- Inode and/or one of its extents is busy, try again later.
  *	EIO	- I/O error while writing the inode (or one of its extents).
  */
-int ntfs_inode_sync(ntfs_inode *ni)
+static int ntfs_inode_sync_in_dir(ntfs_inode *ni, ntfs_inode *dir_ni)
 {
 	int ret = 0;
 	int err = 0;
-
 	if (!ni) {
 		errno = EINVAL;
 		ntfs_log_error("Failed to sync NULL inode\n");
@@ -690,7 +926,7 @@ int ntfs_inode_sync(ntfs_inode *ni)
 	/* Update FILE_NAME's in the index. */
 	if ((ni->mrec->flags & MFT_RECORD_IN_USE) && ni->nr_extents != -1 &&
 			NInoFileNameTestAndClearDirty(ni) &&
-			ntfs_inode_sync_file_name(ni)) {
+			ntfs_inode_sync_file_name(ni, dir_ni)) {
 		if (!err || errno == EIO) {
 			err = errno;
 			if (err != EIO)
@@ -791,6 +1027,28 @@ sync_inode:
 	
 	ntfs_log_leave("\n");
 	return ret;
+}
+
+int ntfs_inode_sync(ntfs_inode *ni)
+{
+	return (ntfs_inode_sync_in_dir(ni, (ntfs_inode*)NULL));
+}
+
+/*
+ *		Close an inode with an open parent inode
+ */
+
+int ntfs_inode_close_in_dir(ntfs_inode *ni, ntfs_inode *dir_ni)
+{
+	int res;
+
+	res = ntfs_inode_sync_in_dir(ni, dir_ni);
+	if (res) {
+		if (errno != EIO)
+			errno = EBUSY;
+	} else
+		res = ntfs_inode_close(ni);
+	return (res);
 }
 
 /**
@@ -1079,7 +1337,7 @@ put_err_out:
  */
 void ntfs_inode_update_times(ntfs_inode *ni, ntfs_time_update_flags mask)
 {
-	time_t now;
+	ntfs_time now;
 
 	if (!ni) {
 		ntfs_log_error("%s(): Invalid arguments.\n", __FUNCTION__);
@@ -1090,7 +1348,7 @@ void ntfs_inode_update_times(ntfs_inode *ni, ntfs_time_update_flags mask)
 			NVolReadOnly(ni->vol) || !mask)
 		return;
 
-	now = time(NULL);
+	now = ntfs_current_time();
 	if (mask & NTFS_UPDATE_ATIME)
 		ni->last_access_time = now;
 	if (mask & NTFS_UPDATE_MTIME)
@@ -1145,3 +1403,164 @@ int ntfs_inode_badclus_bad(u64 mft_no, ATTR_RECORD *attr)
 
 	return ret;
 }
+
+#ifdef HAVE_SETXATTR	/* extended attributes interface required */
+
+/*
+ *		Get high precision NTFS times
+ *
+ *	They are returned in following order : create, update, access, change
+ *	provided they fit in requested size.
+ *
+ *	Returns the modified size if successfull (or 32 if buffer size is null)
+ *		-errno if failed
+ */
+
+int ntfs_inode_get_times(ntfs_inode *ni, char *value, size_t size)
+{
+	ntfs_attr_search_ctx *ctx;
+	STANDARD_INFORMATION *std_info;
+	u64 *times;
+	int ret;
+
+	ret = 0;
+	ctx = ntfs_attr_get_search_ctx(ni, NULL);
+	if (ctx) {
+		if (ntfs_attr_lookup(AT_STANDARD_INFORMATION, AT_UNNAMED,
+				     0, CASE_SENSITIVE, 0, NULL, 0, ctx)) {
+			ntfs_log_perror("Failed to get standard info (inode %lld)",
+					(long long)ni->mft_no);
+		} else {
+			std_info = (STANDARD_INFORMATION *)((u8 *)ctx->attr +
+					le16_to_cpu(ctx->attr->value_offset));
+			if (value && (size >= 8)) {
+				times = (u64*)value;
+				times[0] = le64_to_cpu(std_info->creation_time);
+				ret = 8;
+				if (size >= 16) {
+					times[1] = le64_to_cpu(std_info->last_data_change_time);
+					ret = 16;
+				}
+				if (size >= 24) {
+					times[2] = le64_to_cpu(std_info->last_access_time);
+					ret = 24;
+				}
+				if (size >= 32) {
+					times[3] = le64_to_cpu(std_info->last_mft_change_time);
+					ret = 32;
+				}
+			} else
+				if (!size)
+					ret = 32;
+				else
+					ret = -ERANGE;
+			}
+		ntfs_attr_put_search_ctx(ctx);
+	}		
+	return (ret ? ret : -errno);
+}
+
+/*
+ *		Set high precision NTFS times
+ *
+ *	They are expected in this order : create, update, access
+ *	provided they are present in input. The change time is set to
+ *	current time.
+ *
+ *	The times are inserted directly in the standard_information and
+ *	file names attributes to avoid manipulating low precision times
+ *
+ *	Returns 0 if success
+ *		-1 if there were an error (described by errno)
+ */
+
+int ntfs_inode_set_times(ntfs_inode *ni, const char *value, size_t size,
+			int flags)
+{
+	ntfs_attr_search_ctx *ctx;
+	STANDARD_INFORMATION *std_info;
+	FILE_NAME_ATTR *fn;
+	const u64 *times;
+	ntfs_time now;
+	int cnt;
+	int ret;
+
+	ret = -1;
+	if ((size >= 8) && !(flags & XATTR_CREATE)) {
+		times = (const u64*)value;
+		now = ntfs_current_time();
+			/* update the standard information attribute */
+		ctx = ntfs_attr_get_search_ctx(ni, NULL);
+		if (ctx) {
+			if (ntfs_attr_lookup(AT_STANDARD_INFORMATION,
+					AT_UNNAMED, 0, CASE_SENSITIVE,
+					0, NULL, 0, ctx)) {
+				ntfs_log_perror("Failed to get standard info (inode %lld)",
+						(long long)ni->mft_no);
+			} else {
+				std_info = (STANDARD_INFORMATION *)((u8 *)ctx->attr +
+					le16_to_cpu(ctx->attr->value_offset));
+				/*
+				 * Mark times set to avoid overwriting
+				 * them when the inode is closed.
+				 * The inode structure must also be updated
+				 * (with loss of precision) because of cacheing.
+				 * TODO : use NTFS precision in inode, and
+				 * return sub-second times in getattr()
+				 */
+				set_nino_flag(ni, TimesSet);
+				std_info->creation_time = cpu_to_le64(times[0]);
+				ni->creation_time
+					= std_info->creation_time;
+				if (size >= 16) {
+					std_info->last_data_change_time = cpu_to_le64(times[1]);
+					ni->last_data_change_time
+						= std_info->last_data_change_time;
+				}
+				if (size >= 24) {
+					std_info->last_access_time = cpu_to_le64(times[2]);
+					ni->last_access_time
+						= std_info->last_access_time;
+				}
+				std_info->last_mft_change_time = now;
+				ni->last_mft_change_time = now;
+				ntfs_inode_mark_dirty(ctx->ntfs_ino);
+				NInoFileNameSetDirty(ni);
+
+				/* update the file names attributes */
+				ntfs_attr_reinit_search_ctx(ctx);
+				cnt = 0;
+				while (!ntfs_attr_lookup(AT_FILE_NAME,
+						AT_UNNAMED, 0, CASE_SENSITIVE,
+						0, NULL, 0, ctx)) {
+					fn = (FILE_NAME_ATTR*)((u8 *)ctx->attr +
+						le16_to_cpu(ctx->attr->value_offset));
+					fn->creation_time
+						= cpu_to_le64(times[0]);
+					if (size >= 16)
+						fn->last_data_change_time
+							= cpu_to_le64(times[1]);
+					if (size >= 24)
+						fn->last_access_time
+							= cpu_to_le64(times[2]);
+					fn->last_mft_change_time = now;
+					cnt++;
+				}
+				if (cnt)
+					ret = 0;
+				else {
+					ntfs_log_perror("Failed to get file names (inode %lld)",
+						(long long)ni->mft_no);
+				}
+			}
+			ntfs_attr_put_search_ctx(ctx);
+		}
+	} else
+		if (size < 8)
+			errno = ERANGE;
+		else
+			errno = EEXIST;
+	return (ret);
+}
+
+#endif /* HAVE_SETXATTR */

@@ -5,6 +5,7 @@
  * Copyright (c) 2002-2005 Richard Russon
  * Copyright (c) 2002-2008 Szabolcs Szakacsits
  * Copyright (c) 2004 Yura Pakhuchiy
+ * Copyright (c) 2007-2009 Jean-Pierre Andre
  *
  * This program/include file is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
@@ -108,6 +109,42 @@ static runlist_element *ntfs_rl_realloc(runlist_element *rl, int old_size,
 	if (old_size == new_size)
 		return rl;
 	return realloc(rl, new_size);
+}
+
+/*
+ *		Extend a runlist by some entry count
+ *	The runlist may have to be reallocated
+ *
+ *	Returns the reallocated runlist
+ *		or NULL if reallocation was not possible (with errno set)
+ *		the runlist is left unchanged if the reallocation fails
+ */
+
+runlist_element *ntfs_rl_extend(ntfs_attr *na, runlist_element *rl,
+			int more_entries)
+{
+	runlist_element *newrl;
+	int last;
+	int irl;
+
+	if (na->rl && rl) {
+		irl = (int)(rl - na->rl);
+		last = irl;
+		while (na->rl[last].length)
+			last++;
+		newrl = ntfs_rl_realloc(na->rl,last+1,last+more_entries+1);
+		if (!newrl) {
+			errno = ENOMEM;
+			rl = (runlist_element*)NULL;
+		} else
+			na->rl = newrl;
+			rl = &newrl[irl];
+	} else {
+		ntfs_log_error("Cannot extend unmapped runlist");
+		errno = EIO;
+		rl = (runlist_element*)NULL;
+	}
+	return (rl);
 }
 
 /**
@@ -742,7 +779,7 @@ runlist_element *ntfs_runlists_merge(runlist_element *drl,
  * two into one, if that is possible (we check for overlap and discard the new
  * runlist if overlap present before returning NULL, with errno = ERANGE).
  */
-runlist_element *ntfs_mapping_pairs_decompress_i(const ntfs_volume *vol,
+static runlist_element *ntfs_mapping_pairs_decompress_i(const ntfs_volume *vol,
 		const ATTR_RECORD *attr, runlist_element *old_rl)
 {
 	VCN vcn;		/* Current vcn. */
@@ -1124,8 +1161,9 @@ rl_err_out:
 /**
  * ntfs_rl_pwrite - scatter write to disk
  * @vol:	ntfs volume to write to
- * @rl:		runlist specifying where to write the data to
- * @pos:	byte position within runlist @rl at which to begin the write
+ * @rl:		runlist entry specifying where to write the data to
+ * @ofs:	offset in file for runlist element indicated in @rl
+ * @pos:	byte position from runlist beginning at which to begin the write
  * @count:	number of bytes to write
  * @b:		data buffer to write to disk
  *
@@ -1144,9 +1182,9 @@ rl_err_out:
  * of invalid arguments.
  */
 s64 ntfs_rl_pwrite(const ntfs_volume *vol, const runlist_element *rl,
-		const s64 pos, s64 count, void *b)
+		s64 ofs, const s64 pos, s64 count, void *b)
 {
-	s64 written, to_write, ofs, total = 0;
+	s64 written, to_write, total = 0;
 	int err = EIO;
 
 	if (!vol || !rl || pos < 0 || count < 0) {
@@ -1159,9 +1197,11 @@ s64 ntfs_rl_pwrite(const ntfs_volume *vol, const runlist_element *rl,
 	if (!count)
 		goto out;
 	/* Seek in @rl to the run containing @pos. */
-	for (ofs = 0; rl->length && (ofs + (rl->length <<
-			vol->cluster_size_bits) <= pos); rl++)
+	while (rl->length && (ofs + (rl->length <<
+			vol->cluster_size_bits) <= pos)) {
 		ofs += (rl->length << vol->cluster_size_bits);
+		rl++;
+	}
 	/* Offset in the run at which to begin writing. */
 	ofs = pos - ofs;
 	for (total = 0LL; count; rl++, ofs = 0) {
@@ -1230,19 +1270,18 @@ errno_set:
  */
 int ntfs_get_nr_significant_bytes(const s64 n)
 {
-	s64 l = n;
+	u64 l;
 	int i;
-	s8 j;
 
-	i = 0;
-	do {
-		l >>= 8;
-		i++;
-	} while (l != 0LL && l != -1LL);
-	j = (n >> 8 * (i - 1)) & 0xff;
-	/* If the sign bit is wrong, we need an extra byte. */
-	if ((n < 0LL && j >= 0) || (n > 0LL && j < 0))
-		i++;
+	l = (n < 0 ? ~n : n);
+	i = 1;
+	if (l >= 128) {
+		l >>= 7;
+		do {
+			i++;
+			l >>= 8;
+		} while (l);
+	}
 	return i;
 }
 
@@ -1267,7 +1306,7 @@ int ntfs_get_nr_significant_bytes(const s64 n)
  *	EIO	- The runlist is corrupt.
  */
 int ntfs_get_size_for_mapping_pairs(const ntfs_volume *vol,
-		const runlist_element *rl, const VCN start_vcn)
+		const runlist_element *rl, const VCN start_vcn, int max_size)
 {
 	LCN prev_lcn;
 	int rls;
@@ -1326,7 +1365,7 @@ int ntfs_get_size_for_mapping_pairs(const ntfs_volume *vol,
 		rl++;
 	}
 	/* Do the full runs. */
-	for (; rl->length; rl++) {
+	for (; rl->length && (rls <= max_size); rl++) {
 		if (rl->length < 0 || rl->lcn < LCN_HOLE)
 			goto err_out;
 		/* Header byte + length. */
@@ -1441,7 +1480,7 @@ err_out:
  */
 int ntfs_mapping_pairs_build(const ntfs_volume *vol, u8 *dst,
 		const int dst_len, const runlist_element *rl,
-		const VCN start_vcn, VCN *const stop_vcn)
+		const VCN start_vcn, runlist_element const **stop_rl)
 {
 	LCN prev_lcn;
 	u8 *dst_max, *dst_next;
@@ -1453,8 +1492,8 @@ int ntfs_mapping_pairs_build(const ntfs_volume *vol, u8 *dst,
 	if (!rl) {
 		if (start_vcn)
 			goto val_err;
-		if (stop_vcn)
-			*stop_vcn = 0;
+		if (stop_rl)
+			*stop_rl = rl;
 		if (dst_len < 1)
 			goto nospc_err;
 		goto ok;
@@ -1549,8 +1588,8 @@ int ntfs_mapping_pairs_build(const ntfs_volume *vol, u8 *dst,
 		dst += 1 + len_len + lcn_len;
 	}
 	/* Set stop vcn. */
-	if (stop_vcn)
-		*stop_vcn = rl->vcn;
+	if (stop_rl)
+		*stop_rl = rl;
 ok:	
 	/* Add terminator byte. */
 	*dst = 0;
@@ -1558,8 +1597,8 @@ out:
 	return ret;
 size_err:
 	/* Set stop vcn. */
-	if (stop_vcn)
-		*stop_vcn = rl->vcn;
+	if (stop_rl)
+		*stop_rl = rl;
 	/* Add terminator byte. */
 	*dst = 0;
 nospc_err:
@@ -1598,7 +1637,11 @@ int ntfs_rl_truncate(runlist **arl, const VCN start_vcn)
 
 	if (!arl || !*arl) {
 		errno = EINVAL;
-		ntfs_log_perror("rl_truncate error: arl: %p *arl: %p", arl, *arl);
+		if (!arl)
+			ntfs_log_perror("rl_truncate error: arl: %p", arl);
+		else
+			ntfs_log_perror("rl_truncate error:"
+				" arl: %p *arl: %p", arl, *arl);
 		return -1;
 	}
 	

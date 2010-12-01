@@ -1,8 +1,6 @@
 /*
- * misc.h : miscellaneous exports
- *		- memory allocation
  *
- * Copyright (c) 2008 Jean-Pierre Andre
+ * Copyright (c) 2009 Martin Bene
  *
  * This program/include file is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
@@ -20,11 +18,13 @@
  * Foundation,Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef _NTFS_MISC_H_
-#define _NTFS_MISC_H_
+#ifndef EFS_H
+#define EFS_H
 
-void *ntfs_calloc(size_t size);
-void *ntfs_malloc(size_t size);
+int ntfs_get_efs_info(ntfs_inode *ni, char *value, size_t size);
 
-#endif /* _NTFS_MISC_H_ */
+int ntfs_set_efs_info(ntfs_inode *ni,
+			const char *value, size_t size,	int flags);
+int ntfs_efs_fixup_attribute(ntfs_attr_search_ctx *ctx, ntfs_attr *na);
 
+#endif /* EFS_H */

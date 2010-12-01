@@ -25,6 +25,34 @@
 #ifndef _NTFS_INDEX_H
 #define _NTFS_INDEX_H
 
+/* Convenience macros to test the versions of gcc.
+ *  Use them like this:
+ *  #if __GNUC_PREREQ (2,8)
+ *  ... code requiring gcc 2.8 or later ...
+ *  #endif
+ *  Note - they won't work for gcc1 or glibc1, since the _MINOR macros
+ *  were not defined then. 
+ */
+
+#ifndef __GNUC_PREREQ
+# if defined __GNUC__ && defined __GNUC_MINOR__
+#  define __GNUC_PREREQ(maj, min) \
+        ((__GNUC__ << 16) + __GNUC_MINOR__ >= ((maj) << 16) + (min))
+# else
+#  define __GNUC_PREREQ(maj, min) 0
+# endif
+#endif
+
+/* allows us to warn about unused results of certain function calls */
+#ifndef __attribute_warn_unused_result__
+# if __GNUC_PREREQ (3,4)
+#  define __attribute_warn_unused_result__ \
+    __attribute__ ((__warn_unused_result__))
+# else
+#  define __attribute_warn_unused_result__ /* empty */
+# endif
+#endif
+
 #include "attrib.h"
 #include "types.h"
 #include "layout.h"
@@ -34,6 +62,9 @@
 #define  VCN_INDEX_ROOT_PARENT  ((VCN)-2)
 
 #define  MAX_PARENT_VCN		32
+
+typedef int (*COLLATE)(ntfs_volume *vol, const void *data1, int len1,
+					 const void *data2, int len2);
 
 /**
  * struct ntfs_index_context -
@@ -88,7 +119,7 @@ typedef struct {
 	INDEX_ENTRY *entry;
 	void *data;
 	u16 data_len;
-	COLLATION_RULES cr;
+	COLLATE collate;
 	BOOL is_in_root;
 	INDEX_ROOT *ir;
 	ntfs_attr_search_ctx *actx;
@@ -108,11 +139,15 @@ extern void ntfs_index_ctx_put(ntfs_index_context *ictx);
 extern void ntfs_index_ctx_reinit(ntfs_index_context *ictx);
 
 extern int ntfs_index_lookup(const void *key, const int key_len,
+		ntfs_index_context *ictx) __attribute_warn_unused_result__;
+
+extern INDEX_ENTRY *ntfs_index_next(INDEX_ENTRY *ie,
 		ntfs_index_context *ictx);
 
 extern int ntfs_index_add_filename(ntfs_inode *ni, FILE_NAME_ATTR *fn,
 		MFT_REF mref);
-extern int ntfs_index_remove(ntfs_inode *ni, const void *key, const int keylen);
+extern int ntfs_index_remove(ntfs_inode *dir_ni, ntfs_inode *ni,
+		const void *key, const int keylen);
 
 extern INDEX_ROOT *ntfs_index_root_get(ntfs_inode *ni, ATTR_RECORD *attr);
 
@@ -123,6 +158,10 @@ extern void ntfs_index_entry_mark_dirty(ntfs_index_context *ictx);
 extern char *ntfs_ie_filename_get(INDEX_ENTRY *ie);
 extern void ntfs_ie_filename_dump(INDEX_ENTRY *ie);
 extern void ntfs_ih_filename_dump(INDEX_HEADER *ih);
+
+/* the following was added by JPA for use in security.c */
+extern int ntfs_ie_add(ntfs_index_context *icx, INDEX_ENTRY *ie);
+extern int ntfs_index_rm(ntfs_index_context *icx);
 
 #endif /* _NTFS_INDEX_H */
 

@@ -29,9 +29,6 @@
 
 #define NTFS_COLLATION_ERROR -2
 
-extern BOOL ntfs_is_collation_rule_supported(COLLATION_RULES cr);
-extern int ntfs_collate(ntfs_volume *vol, COLLATION_RULES cr,
-			const void *data1, const int data1_len,
-			const void *data2, const int data2_len);
+extern COLLATE ntfs_get_collate_function(COLLATION_RULES);
 
 #endif /* _NTFS_COLLATE_H */

@@ -3,17 +3,19 @@ SubDir HAIKU_TOP src add-ons kernel file_systems ntfs libntfs ;
 DEFINES += HAVE_CONFIG_H=1 ;
 
 KernelStaticLibrary libntfs.a :
+	acls.c
 	attrib.c
 	attrlist.c
 	bitmap.c
 	bootsect.c
+	cache.c
 	collate.c
 	compat.c
 	compress.c
 	debug.c
 	device.c
-	device_io.c
 	dir.c
+	efs.c
 	index.c
 	inode.c
 	lcnalloc.c
@@ -22,8 +24,11 @@ KernelStaticLibrary libntfs.a :
 	mft.c
 	misc.c
 	mst.c
+	object_id.c
+	reparse.c
 	runlist.c
 	security.c
 	unistr.c
+	unix_io.c
 	volume.c
 ;

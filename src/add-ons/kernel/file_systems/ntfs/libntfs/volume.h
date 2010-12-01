@@ -61,11 +61,13 @@
 /* Forward declaration */
 typedef struct _ntfs_volume ntfs_volume;
 
+#include "param.h"
 #include "types.h"
 #include "support.h"
 #include "device.h"
 #include "inode.h"
 #include "attrib.h"
+#include "index.h"
 
 /**
  * enum ntfs_mount_flags -
@@ -105,6 +107,10 @@ typedef enum {
 	NV_ReadOnly,		/* 1: Volume is read-only. */
 	NV_CaseSensitive,	/* 1: Volume is mounted case-sensitive. */
 	NV_LogFileEmpty,	/* 1: $logFile journal is empty. */
+	NV_ShowSysFiles,	/* 1: Show NTFS metafiles. */
+	NV_ShowHidFiles,	/* 1: Show files marked hidden. */
+	NV_HideDotFiles,	/* 1: Set hidden flag on dot files */
+	NV_Compression,		/* 1: allow compression */
 } ntfs_volume_state_bits;
 
 #define  test_nvol_flag(nv, flag)	 test_bit(NV_##flag, (nv)->state)
@@ -122,6 +128,22 @@ typedef enum {
 #define NVolLogFileEmpty(nv)		 test_nvol_flag(nv, LogFileEmpty)
 #define NVolSetLogFileEmpty(nv)		  set_nvol_flag(nv, LogFileEmpty)
 #define NVolClearLogFileEmpty(nv)	clear_nvol_flag(nv, LogFileEmpty)
+
+#define NVolShowSysFiles(nv)		 test_nvol_flag(nv, ShowSysFiles)
+#define NVolSetShowSysFiles(nv)		  set_nvol_flag(nv, ShowSysFiles)
+#define NVolClearShowSysFiles(nv)	clear_nvol_flag(nv, ShowSysFiles)
+
+#define NVolShowHidFiles(nv)		 test_nvol_flag(nv, ShowHidFiles)
+#define NVolSetShowHidFiles(nv)		  set_nvol_flag(nv, ShowHidFiles)
+#define NVolClearShowHidFiles(nv)	clear_nvol_flag(nv, ShowHidFiles)
+
+#define NVolHideDotFiles(nv)		 test_nvol_flag(nv, HideDotFiles)
+#define NVolSetHideDotFiles(nv)		  set_nvol_flag(nv, HideDotFiles)
+#define NVolClearHideDotFiles(nv)	clear_nvol_flag(nv, HideDotFiles)
+
+#define NVolCompression(nv)		 test_nvol_flag(nv, Compression)
+#define NVolSetCompression(nv)		  set_nvol_flag(nv, Compression)
+#define NVolClearCompression(nv)	clear_nvol_flag(nv, Compression)
 
 /*
  * NTFS version 1.1 and 1.2 are used by Windows NT4.
@@ -154,7 +176,7 @@ struct _ntfs_volume {
 	ntfs_inode *vol_ni;	/* ntfs_inode structure for FILE_Volume. */
 	u8 major_ver;		/* Ntfs major version of volume. */
 	u8 minor_ver;		/* Ntfs minor version of volume. */
-	u16 flags;		/* Bit array of VOLUME_* flags. */
+	le16 flags;		/* Bit array of VOLUME_* flags. */
 
 	u16 sector_size;	/* Byte size of a sector. */
 	u8 sector_size_bits;	/* Log(2) of the byte size of a sector. */
@@ -167,6 +189,7 @@ struct _ntfs_volume {
 
 	/* Variables used by the cluster and mft allocators. */
 	u8 mft_zone_multiplier;	/* Initial mft zone multiplier. */
+	u8 full_zones;		/* cluster zones which are full */
 	s64 mft_data_pos;	/* Mft record number at which to allocate the
 				   next mft record. */
 	LCN mft_zone_start;	/* First cluster of the mft zone. */
@@ -196,6 +219,12 @@ struct _ntfs_volume {
 				   bit means that the mft record is in use and
 				   vice versa. */
 
+	ntfs_inode *secure_ni;	/* ntfs_inode structure for FILE $Secure */
+	ntfs_index_context *secure_xsii; /* index for using $Secure:$SII */
+	ntfs_index_context *secure_xsdh; /* index for using $Secure:$SDH */
+	int secure_reentry;  /* check for non-rentries */
+	unsigned int secure_flags;  /* flags, see security.h for values */
+
 	int mftmirr_size;	/* Size of the FILE_MFTMirr in mft records. */
 	LCN mftmirr_lcn;	/* Logical cluster number of the data attribute
 				   for FILE_MFTMirr. */
@@ -208,6 +237,9 @@ struct _ntfs_volume {
 				   FILE_UpCase. */
 	u32 upcase_len;		/* Length in Unicode characters of the upcase
 				   table. */
+	ntfschar *locase;	/* Lower case equivalents of all 65536 2-byte
+				   Unicode characters. Only if option
+				   case_ignore is set. */
 
 	ATTR_DEF *attrdef;	/* Attribute definitions. Obtained from
 				   FILE_AttrDef. */
@@ -217,6 +249,25 @@ struct _ntfs_volume {
 	s64 free_clusters; 	/* Track the number of free clusters which
 				   greatly improves statfs() performance */
 	s64 free_mft_records; 	/* Same for free mft records (see above) */
+	BOOL efs_raw;		/* volume is mounted for raw access to
+				   efs-encrypted files */
+
+#if CACHE_INODE_SIZE
+	struct CACHE_HEADER *xinode_cache;
+#endif
+#if CACHE_NIDATA_SIZE
+	struct CACHE_HEADER *nidata_cache;
+#endif
+#if CACHE_LOOKUP_SIZE
+	struct CACHE_HEADER *lookup_cache;
+#endif
+#if CACHE_SECURID_SIZE
+	struct CACHE_HEADER *securid_cache;
+#endif
+#if CACHE_LEGACY_SIZE
+	struct CACHE_HEADER *legacy_cache;
+#endif
+
 };
 
 extern const char *ntfs_home;
@@ -236,12 +287,17 @@ extern int ntfs_version_is_supported(ntfs_volume *vol);
 extern int ntfs_volume_check_hiberfile(ntfs_volume *vol, int verbose);
 extern int ntfs_logfile_reset(ntfs_volume *vol);
 
-extern int ntfs_volume_write_flags(ntfs_volume *vol, const u16 flags);
+extern int ntfs_volume_write_flags(ntfs_volume *vol, const le16 flags);
 
 extern int ntfs_volume_error(int err);
 extern void ntfs_mount_error(const char *vol, const char *mntpoint, int err);
 
+extern int ntfs_volume_get_free_space(ntfs_volume *vol);
+
+extern int ntfs_set_shown_files(ntfs_volume *vol,
+		BOOL show_sys_files, BOOL show_hid_files, BOOL hide_dot_files);
 extern int ntfs_set_locale(void);
+extern int ntfs_set_ignore_case(ntfs_volume *vol);
 
 #endif /* defined _NTFS_VOLUME_H */
 

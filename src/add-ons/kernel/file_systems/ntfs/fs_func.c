@@ -922,7 +922,8 @@ fs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode,
 				result = errno;
 		}
 	} else {
-		ni = ntfs_create(bi, uname, unameLength, S_IFREG);
+		le32 securid = 0;
+		ni = ntfs_create(bi, securid, uname, unameLength, S_IFREG);
 		if (ni)	{
 			*_vnid = MREF(ni->mft_no);
 
@@ -1296,6 +1297,7 @@ fs_create_symlink(fs_volume *_vol, fs_vnode *_dir, const char *name,
 	int utargetLength;
 	status_t result = B_NO_ERROR;
 	int fmode;
+	le32 securid = 0;
 
 	LOCK_VOL(ns);
 
@@ -1324,7 +1326,7 @@ fs_create_symlink(fs_volume *_vol, fs_vnode *_dir, const char *name,
 		goto exit;
 	}
 
-	sym = ntfs_create_symlink(bi, uname, unameLength, utarget, utargetLength);
+	sym = ntfs_create_symlink(bi, securid, uname, unameLength, utarget, utargetLength);
 	if (sym == NULL) {
 		result = EINVAL;
 		goto exit;
@@ -1385,6 +1387,7 @@ fs_mkdir(fs_volume *_vol, fs_vnode *_dir, const char *name,	int perms)
 	ntfs_inode *ni = NULL;
 	ntfs_inode *bi = NULL;
 	status_t result = B_NO_ERROR;
+	le32 securid = 0;
 
 	if (ns->flags & B_FS_IS_READONLY) {
 		ERRPRINT("ntfs is read-only\n");
@@ -1417,7 +1420,7 @@ fs_mkdir(fs_volume *_vol, fs_vnode *_dir, const char *name,	int perms)
 		goto exit;
 	}
 
-	ni = ntfs_create(bi, uname, unameLength, S_IFDIR);
+	ni = ntfs_create(bi, securid, uname, unameLength, S_IFDIR);
 	if (ni)	{
 		ino_t vnid = MREF(ni->mft_no);
 
@@ -1481,6 +1484,8 @@ fs_rename(fs_volume *_vol, fs_vnode *_odir, const char *oldname,
 	int uoldnameLength;
 
 	status_t result = B_NO_ERROR;
+	
+	char path[MAX_PATH];
 
 	if (ns->flags & B_FS_IS_READONLY) {
 		ERRPRINT("ntfs is read-only\n");
@@ -1568,7 +1573,12 @@ fs_rename(fs_volume *_vol, fs_vnode *_odir, const char *oldname,
 		notify_entry_moved(ns->id, MREF(odi->mft_no), oldname, MREF(ndi->mft_no),
 			newname, onode->vnid);
 
-		ntfs_delete(oi, odi, uoldname, uoldnameLength);
+		if (utils_inode_get_name(oi, path, MAX_PATH) == 0) {
+			result = EINVAL;
+			goto exit;
+		}
+
+		ntfs_delete(ns->ntvol, path, oi, odi, uoldname, uoldnameLength);
 		oi = odi = NULL;
 			/* ntfs_delete() always closes ni and dir_ni */
 
@@ -1615,7 +1625,12 @@ fs_rename(fs_volume *_vol, fs_vnode *_odir, const char *oldname,
 			newname, onode->vnid);
 		put_vnode(_vol, onode->vnid);
 
-		ntfs_delete(oi, odi, uoldname, uoldnameLength);
+		if (utils_inode_get_name(oi, path, MAX_PATH) == 0) {
+			result = EINVAL;
+			goto exit;
+		}
+
+		ntfs_delete(ns->ntvol, path, oi, odi, uoldname, uoldnameLength);
 		oi = odi = NULL;
 			/* ntfs_delete() always closes ni and dir_ni */
 	}
@@ -1640,14 +1655,16 @@ exit:
 static status_t
 do_unlink(fs_volume *_vol, vnode *dir, const char *name, bool isdir)
 {
-	nspace *vol = (nspace*)_vol->private_volume;
+	nspace *ns = (nspace*)_vol->private_volume;
 	ino_t vnid;
 	vnode *node = NULL;
 	ntfs_inode *ni = NULL;
 	ntfs_inode *bi = NULL;
 	ntfschar *uname = NULL;
 	int unameLength;
-	status_t result = B_NO_ERROR;
+	char path[MAX_PATH];
+	
+	status_t result = B_NO_ERROR;	
 
 	unameLength = ntfs_mbstoucs(name, &uname);
 	if (unameLength < 0) {
@@ -1655,7 +1672,7 @@ do_unlink(fs_volume *_vol, vnode *dir, const char *name, bool isdir)
 		goto exit1;
 	}
 
-	bi = ntfs_inode_open(vol->ntvol, dir->vnid);
+	bi = ntfs_inode_open(ns->ntvol, dir->vnid);
 	if (bi == NULL) {
 		result = ENOENT;
 		goto exit1;
@@ -1675,7 +1692,7 @@ do_unlink(fs_volume *_vol, vnode *dir, const char *name, bool isdir)
 		goto exit1;
 	}
 
-	ni = ntfs_inode_open(vol->ntvol, node->vnid);
+	ni = ntfs_inode_open(ns->ntvol, node->vnid);
 	if (ni == NULL) {
 		result = ENOENT;
 		goto exit2;
@@ -1695,15 +1712,20 @@ do_unlink(fs_volume *_vol, vnode *dir, const char *name, bool isdir)
 		goto exit2;
 	}
 
+	if (utils_inode_get_name(ni, path, MAX_PATH) == 0) {
+		result = EINVAL;
+		goto exit2;
+	}
+
 	// TODO: the file must not be deleted here, only unlinked!
-	if (ntfs_delete(ni, bi, uname, unameLength))
+	if (ntfs_delete(ns->ntvol, path, ni, bi, uname, unameLength))
 	 	result = errno;
 
 	ni = bi = NULL;
 
 	node->parent_vnid = dir->vnid;
 
-	notify_entry_removed(vol->id, dir->vnid, name, vnid);
+	notify_entry_removed(ns->id, dir->vnid, name, vnid);
 
 	result = remove_vnode(_vol, vnid);
 

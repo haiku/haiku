@@ -69,6 +69,40 @@
 #endif
 
 /**
+ * fsync replacement which makes every effort to try to get the data down to
+ * disk, using different means for different operating systems. Specifically,
+ * it issues the proper fcntl for Mac OS X or does fsync where it is available
+ * or as a last resort calls the fsync function. Information on this problem
+ * was retrieved from:
+ *   http://mirror.linux.org.au/pub/linux.conf.au/2007/video/talks/278.pdf
+ */
+static int ntfs_fsync(int fildes)
+{
+	int ret = -1;
+#if defined(__APPLE__) || defined(__DARWIN__)
+# ifndef F_FULLFSYNC
+#  error "Mac OS X: F_FULLFSYNC is not defined. Either you didn't include fcntl.h or you're using an older, unsupported version of Mac OS X (pre-10.3)."
+# endif
+	/* 
+	 * Apple has disabled fsync() for internal disk drives in OS X.
+	 * To force a synchronization of disk contents, we use a Mac OS X
+	 * specific fcntl, F_FULLFSYNC. 
+	 */
+	ret = fcntl(fildes, F_FULLFSYNC, NULL);
+	if (ret) {
+		/* 
+		 * If we are not on a file system that supports this,
+		 * then fall back to a plain fsync. 
+		 */
+		ret = fsync(fildes);
+	}
+#else
+	ret = fsync(fildes);
+#endif
+	return ret;
+}
+
+/**
  * ntfs_device_unix_io_open - Open a device and lock it exclusively
  * @dev:
  * @flags:
@@ -155,7 +189,7 @@ static int ntfs_device_unix_io_close(struct ntfs_device *dev)
 		return -1;
 	}
 	if (NDevDirty(dev))
-		if (fsync(DEV_FD(dev))) {
+		if (ntfs_fsync(DEV_FD(dev))) {
 			ntfs_log_perror("Failed to fsync device %s", dev->d_name);
 			return -1;
 		}
@@ -281,7 +315,7 @@ static int ntfs_device_unix_io_sync(struct ntfs_device *dev)
 	int res = 0;
 	
 	if (!NDevReadOnly(dev)) {
-		res = fsync(DEV_FD(dev));
+		res = ntfs_fsync(DEV_FD(dev));
 		if (res)
 			ntfs_log_perror("Failed to sync device %s", dev->d_name);
 		else
