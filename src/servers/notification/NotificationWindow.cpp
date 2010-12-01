@@ -149,7 +149,7 @@ NotificationWindow::MessageReceived(BMessage* message)
 				messageOkay = false;
 			if (message->FindString("title", &title) != B_OK)
 				messageOkay = false;
-			if (message->FindString("app", &app) != B_OK 
+			if (message->FindString("app", &app) != B_OK
 				&& message->FindString("appTitle", &app) != B_OK)
 				messageOkay = false;
 
@@ -188,12 +188,12 @@ NotificationWindow::MessageReceived(BMessage* message)
 						group = aIt->second;
 
 					group->AddInfo(view);
-						
+
 					ResizeAll();
-					
+
 					reply.AddInt32("error", B_OK);
 				} else
-					reply.AddInt32("Error", B_ERROR);
+					reply.AddInt32("error", B_NOT_ALLOWED);
 			} else {
 				reply.what = B_MESSAGE_NOT_UNDERSTOOD;
 				reply.AddInt32("error", B_ERROR);
@@ -243,7 +243,7 @@ NotificationWindow::ResolveSpecifier(BMessage* msg, int32 index,
 				handler = this;
 				break;
 			}
-			case B_SET_PROPERTY: 
+			case B_SET_PROPERTY:
 			case B_GET_PROPERTY:
 			{
 				int32 i;
@@ -411,13 +411,13 @@ NotificationWindow::PopupAnimation(float width, float height)
 			sy = frame.bottom;
 			y = sy - height - pad;
 			x = sx;
-			break;	
+			break;
 		default:
 			break;
 	}
 
 	MoveTo(x, y);
-	
+
 	if (IsHidden() && fViews.size() != 0)
 		Show();
 	// Activate();// it hides floaters from apps :-(
