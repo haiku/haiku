@@ -775,7 +775,8 @@ TermWindow::MessageReceived(BMessage *message)
 				float mbHeight = fMenuBar->Bounds().Height() + 1;
 				fSavedFrame = Frame();
 				BScreen screen(this);
-				_ActiveTermView()->ScrollBar()->ResizeBy(0, (B_H_SCROLL_BAR_HEIGHT - 2));
+				for (int32 i = fTabView->CountTabs() - 1; i >=0 ; i--)
+					_TermViewAt(i)->ScrollBar()->ResizeBy(0, (B_H_SCROLL_BAR_HEIGHT - 1));
 
 				fMenuBar->Hide();
 				fTabView->ResizeBy(0, mbHeight);
@@ -790,7 +791,8 @@ TermWindow::MessageReceived(BMessage *message)
 				_ActiveTermView()->DisableResizeView();
 				float mbHeight = fMenuBar->Bounds().Height() + 1;
 				fMenuBar->Show();
-				_ActiveTermView()->ScrollBar()->ResizeBy(0, -(B_H_SCROLL_BAR_HEIGHT - 2));
+				for (int32 i = fTabView->CountTabs() - 1; i >=0 ; i--)
+					_TermViewAt(i)->ScrollBar()->ResizeBy(0, -(B_H_SCROLL_BAR_HEIGHT - 1));
 				ResizeTo(fSavedFrame.Width(), fSavedFrame.Height());
 				MoveTo(fSavedFrame.left, fSavedFrame.top);
 				fTabView->ResizeBy(0, -mbHeight);
@@ -1066,8 +1068,8 @@ void
 TermWindow::_NewTab()
 {
 	if (fTabView->CountTabs() < kMaxTabs) {
-		if (fFullScreen)
-			_ActiveTermView()->ScrollBar()->Show();
+		// if (fFullScreen)
+		//	_ActiveTermView()->ScrollBar()->Show();
 
 		ActiveProcessInfo info;
 		if (_ActiveTermView()->GetActiveProcessInfo(info))
@@ -1098,6 +1100,8 @@ TermWindow::_AddTab(Arguments* args, const BString& currentDirectory)
 		TermViewContainerView* containerView = new TermViewContainerView(view);
 		BScrollView* scrollView = new TermScrollView("scrollView",
 			containerView, view, fSessions.IsEmpty());
+		if (!fFullScreen)
+			scrollView->ScrollBar(B_VERTICAL)->ResizeBy(0, -(B_H_SCROLL_BAR_HEIGHT - 1));
 
 		if (fSessions.IsEmpty())
 			fTabView->SetScrollView(scrollView);
@@ -1179,8 +1183,8 @@ TermWindow::_RemoveTab(int32 index)
 
 			delete session;
 			delete fTabView->RemoveTab(index);
-			if (fFullScreen)
-				_ActiveTermView()->ScrollBar()->Hide();
+			// if (fFullScreen)
+			//	_ActiveTermView()->ScrollBar()->Hide();
 		}
 	} else
 		PostMessage(B_QUIT_REQUESTED);
