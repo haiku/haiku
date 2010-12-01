@@ -32,6 +32,14 @@ enum stepping_mode {
 
 struct freq_preferences
 {
+	bool IsEqual(const freq_preferences& prefs) {
+		if (mode == prefs.mode && custom_stepping == prefs.custom_stepping
+			&& stepping_threshold == prefs.stepping_threshold
+			&& integration_time == prefs.integration_time)
+			return true;
+		return false;
+	}
+
 	// stepping mode
 	stepping_mode	mode;
 	int16			custom_stepping;

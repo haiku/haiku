@@ -63,6 +63,9 @@ public:
 			BString&			PreferencesFile() {	return fPreferencesFile; }
 			status_t			GetPreferencesPath(BPath &path);
 
+			bool				DefaultsSet();
+			bool				StartPrefsSet();
+
 private:
 			BString				fPreferencesFile;
 
@@ -107,6 +110,7 @@ public:
 
 private:
 			void				_MoveToPosition();
+			void				_UpdateButtons();
 
 			BView*				fPreferencesView;
 			BButton*			fRevertButton;
@@ -235,6 +239,22 @@ PreferencesStorage<Preferences>::SavePreferences()
 
 
 template<typename Preferences>
+bool
+PreferencesStorage<Preferences>::DefaultsSet()
+{
+	return fPreferences.IsEqual(fDefaultPreferences);
+}
+
+
+template<typename Preferences>
+bool
+PreferencesStorage<Preferences>::StartPrefsSet()
+{
+	return fPreferences.IsEqual(fStartPreferences);
+}
+
+
+template<typename Preferences>
 PrefFileWatcher<Preferences>::PrefFileWatcher(
 	PreferencesStorage<Preferences>* storage, BHandler* target)
 	:
@@ -343,9 +363,10 @@ PreferencesWindow<Preferences>::PreferencesWindow(const char* title,
 	fRevertButton = new BButton(B_TRANSLATE("Revert"),
 		new BMessage(kRevertMsg));
 
-	fRevertButton->SetEnabled(false);
 	buttonView->AddChild(fRevertButton);
 	buttonView->GetLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
+
+	_UpdateButtons();
 
 	SetLayout(new BGroupLayout(B_VERTICAL));
 	fRootLayout = new BGroupLayout(B_VERTICAL);
@@ -377,19 +398,19 @@ PreferencesWindow<Preferences>::MessageReceived(BMessage *msg)
 	switch(msg->what)
 	{
 		case kConfigChangedMsg:
-			fRevertButton->SetEnabled(true);
+			_UpdateButtons();
 			break;
 
 		case kDefaultMsg:
 			PreferencesStorage<Preferences>::Defaults();
-			fRevertButton->SetEnabled(true);
+			_UpdateButtons();
 			if (fPreferencesView)
 				PostMessage(kDefaultMsg, fPreferencesView);
 			break;
 
 		case kRevertMsg:
 			PreferencesStorage<Preferences>::Revert();
-			fRevertButton->SetEnabled(false);
+			_UpdateButtons();
 			if (fPreferencesView)
 				PostMessage(kRevertMsg, fPreferencesView);
 			break;
@@ -441,6 +462,22 @@ PreferencesWindow<Preferences>::_MoveToPosition()
 	}
 	MoveTo(position);
 }
+
+
+template<typename Preferences>
+void
+PreferencesWindow<Preferences>::_UpdateButtons()
+{
+	if (!PreferencesStorage<Preferences>::DefaultsSet())
+		fDefaultButton->SetEnabled(true);
+	else
+		fDefaultButton->SetEnabled(false);
+	if (!PreferencesStorage<Preferences>::StartPrefsSet())
+		fRevertButton->SetEnabled(true);
+	else
+		fRevertButton->SetEnabled(false);
+}
+
 
 #undef B_TRANSLATE_CONTEXT
 
