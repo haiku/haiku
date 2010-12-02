@@ -904,10 +904,9 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where,
 		} else if ((buttons & B_TERTIARY_MOUSE_BUTTON) != 0) {
 			// Middle-click anywhere on the window shall initiate
 			// humdinger-resize mode.
-			if (windowModifier && hitRegion != Decorator::REGION_NONE) {
-				action = (flags & B_NOT_RESIZABLE) == 0
-					? ACTION_HUMDINGER_RESIZE : ACTION_DRAG;
-			}
+			if (windowModifier && hitRegion != Decorator::REGION_NONE
+				&& (flags & B_NOT_RESIZABLE) == 0)
+				action = ACTION_HUMDINGER_RESIZE;
 		}
 	}
 
