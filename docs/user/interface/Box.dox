@@ -198,7 +198,7 @@
 */
 
 
-/*!	virtual void BBox::GetPreferredSize(float* _width, float* _height)
+/*!	\fn virtual void BBox::GetPreferredSize(float* _width, float* _height)
 	\brief Gets the dimensions the box would prefer to be.
 
 	The size is computed from the children sizes, unless it was explicitly set
