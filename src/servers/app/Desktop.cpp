@@ -201,8 +201,9 @@ KeyboardFilter::Filter(BMessage* message, EventTarget** _target,
 			{
 				STRACE(("Set Workspace %ld\n", key - 1));
 
-				fDesktop->SetWorkspaceAsync(key - B_F1_KEY,
-					(modifiers & B_SHIFT_KEY) != 0);
+				bool takeWindow = (modifiers & B_SHIFT_KEY) != 0
+					|| fDesktop->MouseEventWindow() != NULL;
+				fDesktop->SetWorkspaceAsync(key - B_F1_KEY, takeWindow);
 				return B_SKIP_MESSAGE;
 			}
 		} if (key == 0x11
