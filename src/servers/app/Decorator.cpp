@@ -440,6 +440,8 @@ Decorator::SetRegionHighlight(Region region, uint8 highlight, BRegion* dirty)
 	if (index < 0 || index >= REGION_COUNT - 1)
 		return false;
 
+	if (fRegionHighlights[index] == highlight)
+		return true;
 	fRegionHighlights[index] = highlight;
 
 	if (dirty != NULL)
