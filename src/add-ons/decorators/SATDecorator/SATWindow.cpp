@@ -601,51 +601,32 @@ SATWindow::HighlightTab(bool active)
 	if (!decorator)
 		return false;
 
-	if (IsTabHighlighted() == active)
-		return false;
-
 	BRegion dirty;
-	decorator->HighlightTab(active, &dirty);
-	fWindow->ProcessDirtyRegion(dirty);
+	uint8 highlight = active ?  SATDecorator::HIGHLIGHT_STACK_AND_TILE : 0;
+	decorator->SetRegionHighlight(SATDecorator::REGION_TAB, highlight, &dirty);
+	decorator->SetRegionHighlight(SATDecorator::REGION_CLOSE_BUTTON, highlight,
+		&dirty);
+	decorator->SetRegionHighlight(SATDecorator::REGION_ZOOM_BUTTON, highlight,
+		&dirty);
 
+	fWindow->ProcessDirtyRegion(dirty);
 	return true;
 }
 
 
 bool
-SATWindow::HighlightBorders(bool active)
+SATWindow::HighlightBorders(Decorator::Region region, bool active)
 {
 	SATDecorator* decorator = GetDecorator();
 	if (!decorator)
 		return false;
 
-	if (IsBordersHighlighted() == active)
-		return false;
-
 	BRegion dirty;
-	decorator->HighlightBorders(active, &dirty);
+	uint8 highlight = active ? SATDecorator::HIGHLIGHT_STACK_AND_TILE : 0;
+	decorator->SetRegionHighlight(region, highlight, &dirty);
+
 	fWindow->ProcessDirtyRegion(dirty);
 	return true;
-}
-
-
-bool
-SATWindow::IsTabHighlighted()
-{
-	SATDecorator* decorator = GetDecorator();
-	if (decorator)
-		return decorator->IsTabHighlighted();
-	return false;
-}
-
-
-bool
-SATWindow::IsBordersHighlighted()
-{
-	SATDecorator* decorator = GetDecorator();
-	if (decorator)
-		return decorator->IsBordersHighlighted();
-	return false;
 }
 
 

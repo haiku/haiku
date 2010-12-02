@@ -440,28 +440,44 @@ SATTiling::_HighlightWindows(SATGroup* group, bool highlight)
 	const TabList* hTabs = group->HorizontalTabs();
 	const TabList* vTabs = group->VerticalTabs();
 	// height light windows at all four sites
-	_SearchHighlightWindow(fFreeAreaLeft, fFreeAreaTop, fFreeAreaBottom, hTabs,
-		fFreeAreaTop ? Corner::kLeftBottom : Corner::kLeftTop, highlight);
+	bool leftWindowsFound = _SearchHighlightWindow(fFreeAreaLeft, fFreeAreaTop, fFreeAreaBottom, hTabs,
+		fFreeAreaTop ? Corner::kLeftBottom : Corner::kLeftTop,
+		Decorator::REGION_RIGHT_BORDER, highlight);
 
-	_SearchHighlightWindow(fFreeAreaTop, fFreeAreaLeft, fFreeAreaRight, vTabs,
-		fFreeAreaLeft ? Corner::kRightTop : Corner::kLeftTop, highlight);
+	bool topWindowsFound = _SearchHighlightWindow(fFreeAreaTop, fFreeAreaLeft, fFreeAreaRight, vTabs,
+		fFreeAreaLeft ? Corner::kRightTop : Corner::kLeftTop,
+		Decorator::REGION_BOTTOM_BORDER, highlight);
 
-	_SearchHighlightWindow(fFreeAreaRight, fFreeAreaTop, fFreeAreaBottom, hTabs,
-		fFreeAreaTop ? Corner::kRightBottom : Corner::kRightTop, highlight);
+	bool rightWindowsFound = _SearchHighlightWindow(fFreeAreaRight, fFreeAreaTop, fFreeAreaBottom, hTabs,
+		fFreeAreaTop ? Corner::kRightBottom : Corner::kRightTop,
+		Decorator::REGION_LEFT_BORDER, highlight);
 
-	_SearchHighlightWindow(fFreeAreaBottom, fFreeAreaLeft, fFreeAreaRight,
+	bool bottomWindowsFound = _SearchHighlightWindow(fFreeAreaBottom, fFreeAreaLeft, fFreeAreaRight,
 		vTabs, fFreeAreaLeft ? Corner::kRightBottom : Corner::kLeftBottom,
-		highlight);
+		Decorator::REGION_TOP_BORDER, highlight);
+
+	if (leftWindowsFound)
+		fSATWindow->HighlightBorders(Decorator::REGION_LEFT_BORDER, highlight);
+	if (topWindowsFound)
+		fSATWindow->HighlightBorders(Decorator::REGION_TOP_BORDER, highlight);
+	if (rightWindowsFound)
+		fSATWindow->HighlightBorders(Decorator::REGION_RIGHT_BORDER, highlight);
+	if (bottomWindowsFound) {
+		fSATWindow->HighlightBorders(Decorator::REGION_BOTTOM_BORDER,
+			highlight);
+	}
 }
 
 
-void
+bool
 SATTiling::_SearchHighlightWindow(Tab* tab, Tab* firstOrthTab,
 	Tab* secondOrthTab, const TabList* orthTabs, Corner::position_t areaCorner,
-	bool highlight)
+	Decorator::Region region, bool highlight)
 {
+	bool windowsFound = false;
+
 	if (!tab)
-		return;
+		return false;
 
 	int8 searchDir = 1;
 	Tab* startOrthTab = NULL;
@@ -477,11 +493,11 @@ SATTiling::_SearchHighlightWindow(Tab* tab, Tab* firstOrthTab,
 		endOrthTab = firstOrthTab;
 	}
 	else
-		return;
+		return false;
 
 	int32 index = orthTabs->IndexOf(startOrthTab);
 	if (index < 0)
-		return;
+		return false;
 
 	for (; index < orthTabs->CountItems() && index >= 0; index += searchDir) {
 		Tab* orthTab = orthTabs->ItemAt(index);
@@ -491,20 +507,24 @@ SATTiling::_SearchHighlightWindow(Tab* tab, Tab* firstOrthTab,
 		if (!crossing)
 			continue;
 		Corner* corner = crossing->GetCorner(areaCorner);
-		if (corner->windowArea)
-			_HighlightWindows(corner->windowArea, highlight);
+		if (corner->windowArea) {
+			_HighlightWindows(corner->windowArea, region,  highlight);
+			windowsFound = true;
+		}
 	}
+	return windowsFound;
 }
 
 
 void
-SATTiling::_HighlightWindows(WindowArea* area, bool highlight)
+SATTiling::_HighlightWindows(WindowArea* area, Decorator::Region region,
+	bool highlight)
 {
-	const SATWindowList& list = area->WindowList();
-	for (int i = 0; i < list.CountItems(); i++)
-		list.ItemAt(i)->HighlightBorders(highlight);
-
-	fSATWindow->HighlightBorders(highlight);
+	const SATWindowList& list = area->LayerOrder();
+	SATWindow* topWindow = list.ItemAt(list.CountItems() - 1);
+	if (topWindow == NULL)
+		return;
+	topWindow->HighlightBorders(region, highlight);
 }
 
 

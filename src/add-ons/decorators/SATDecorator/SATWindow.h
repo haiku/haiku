@@ -120,7 +120,8 @@ public:
 			bool				PositionManagedBySAT();
 
 			bool				HighlightTab(bool active);
-			bool				HighlightBorders(bool active);
+			bool				HighlightBorders(Decorator::Region region,
+									bool active);
 			bool				IsTabHighlighted();
 			bool				IsBordersHighlighted();
 

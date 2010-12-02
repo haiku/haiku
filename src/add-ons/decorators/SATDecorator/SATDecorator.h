@@ -40,13 +40,6 @@ public:
 									BRect frame, window_look look,
 									uint32 flags);
 
-			void 				HighlightTab(bool active, BRegion* dirty);
-			void 				HighlightBorders(bool active, BRegion* dirty);
-			bool				IsTabHighlighted() const
-									{ return fTabHighlighted; }
-			bool				IsBordersHighlighted() const
-									{ return fBordersHighlighted; }
-
 			/*! Indicates that window is stacked */
 			void				SetStackedMode(bool stacked, BRegion* dirty);
 			bool				StackedMode() const
@@ -72,9 +65,6 @@ protected:
 									 uint8 highlight, ComponentColors _colors);
 
 private:
-			bool				fTabHighlighted;
-			bool				fBordersHighlighted;
-
 			bool				fStackedMode;
 			bool				fStackedDrawZoom;
 			float				fStackedTabLength;

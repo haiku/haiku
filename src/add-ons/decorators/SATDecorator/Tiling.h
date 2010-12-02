@@ -9,6 +9,8 @@
 #define TILING_H
 
 #include "ObjectList.h"
+
+#include "Decorator.h"
 #include "StackAndTile.h"
 
 
@@ -48,11 +50,12 @@ private:
 
 		void				_HighlightWindows(SATGroup* group,
 								bool highlight = true);
-		void				_SearchHighlightWindow(Tab* tab, Tab* firstOrthTab,
+		bool				_SearchHighlightWindow(Tab* tab, Tab* firstOrthTab,
 								Tab* secondOrthTab, const TabList* orthTabs,
-								Corner::position_t areaCorner, bool highlight);
+								Corner::position_t areaCorner,
+								Decorator::Region region, bool highlight);
 		void				_HighlightWindows(WindowArea* area,
-								bool highlight);
+								Decorator::Region region, bool highlight);
 
 		void				_ResetSearchResults();
 

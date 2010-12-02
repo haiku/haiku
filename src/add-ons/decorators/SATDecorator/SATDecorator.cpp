@@ -84,45 +84,10 @@ SATDecorator::SATDecorator(DesktopSettings& settings, BRect frame,
 	:
 	DefaultDecorator(settings, frame, look, flags),
 
-	fTabHighlighted(false),
-	fBordersHighlighted(false),
-
 	fStackedMode(false),
 	fStackedTabLength(0)
 {
 	fStackedDrawZoom = IsFocus();
-}
-
-
-void
-SATDecorator::HighlightTab(bool active, BRegion* dirty)
-{
-	if (active == fTabHighlighted)
-		return;
-
-	uint8 highlight = active ? HIGHLIGHT_STACK_AND_TILE : 0;
-	SetRegionHighlight(REGION_TAB, highlight, dirty);
-	SetRegionHighlight(REGION_CLOSE_BUTTON, highlight, dirty);
-	SetRegionHighlight(REGION_ZOOM_BUTTON, highlight, dirty);
-
-	fTabHighlighted = active;
-}
-
-
-void
-SATDecorator::HighlightBorders(bool active, BRegion* dirty)
-{
-	if (active == fBordersHighlighted)
-		return;
-
-	uint8 highlight = active ? HIGHLIGHT_STACK_AND_TILE : 0;
-	SetRegionHighlight(REGION_LEFT_BORDER, highlight, dirty);
-	SetRegionHighlight(REGION_RIGHT_BORDER, highlight, dirty);
-	SetRegionHighlight(REGION_TOP_BORDER, highlight, dirty);
-	SetRegionHighlight(REGION_BOTTOM_BORDER, highlight, dirty);
-	SetRegionHighlight(REGION_RIGHT_BOTTOM_CORNER, highlight, dirty);
-
-	fBordersHighlighted = active;
 }
 
 
