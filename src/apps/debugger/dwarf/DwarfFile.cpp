@@ -619,8 +619,8 @@ DwarfFile::UnwindCallFrame(CompilationUnit* unit,
 			if (location >= initialLocation
 				&& location < initialLocation + addressRange) {
 				// This is the FDE we're looking for.
-				off_t remaining = (off_t)length
-					- (dataReader.Offset() - lengthOffset);
+				off_t remaining = lengthOffset + length
+					- dataReader.Offset();
 				if (remaining < 0)
 					return B_BAD_DATA;
 
@@ -666,14 +666,16 @@ DwarfFile::UnwindCallFrame(CompilationUnit* unit,
 
 				// read the FDE augmentation data (if any)
 				FDEAugmentation fdeAugmentation;
-				off_t fdeOffset = dataReader.Offset();
 				error = cieAugmentation.ReadFDEData(dataReader,
 					fdeAugmentation);
 				if (error != B_OK) {
 					TRACE_CFI("  failed to read FDE augmentation data!\n");
 					return error;
 				}
-				remaining -= dataReader.Offset() - fdeOffset;
+				// adjust remaining byte count to take augmentation bytes
+				// (if any) into account.
+				remaining = lengthOffset + length
+					- dataReader.Offset();
 
 				error = context.SaveInitialRuleSet();
 				if (error != B_OK)
