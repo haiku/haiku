@@ -432,6 +432,15 @@ struct DefaultWindowBehaviour::ResizeBorderState : MouseTrackingState {
 
 	virtual void EnterState(State* previousState)
 	{
+		if ((fWindow->Flags() & B_NOT_RESIZABLE) != 0)
+			fHorizontal = fVertical = NONE;
+		else {
+			if ((fWindow->Flags() & B_NOT_H_RESIZABLE) != 0)
+				fHorizontal = NONE;
+
+			if ((fWindow->Flags() & B_NOT_V_RESIZABLE) != 0)
+				fVertical = NONE;
+		}
 		fBehavior._SetResizeCursor(fHorizontal, fVertical);
 	}
 
@@ -442,14 +451,9 @@ struct DefaultWindowBehaviour::ResizeBorderState : MouseTrackingState {
 
 	virtual void MouseMovedAction(BPoint& delta, bigtime_t now)
 	{
-		if ((fWindow->Flags() & B_NOT_RESIZABLE) != 0) {
-			delta = BPoint(0, 0);
-			return;
-		}
-
-		if ((fWindow->Flags() & B_NOT_H_RESIZABLE) != 0 || fHorizontal == NONE)
+		if (fHorizontal == NONE)
 			delta.x = 0;
-		if ((fWindow->Flags() & B_NOT_V_RESIZABLE) != 0 || fVertical == NONE)
+		if (fVertical == NONE)
 			delta.y = 0;
 
 		if (delta.x == 0 && delta.y == 0)
@@ -656,6 +660,9 @@ struct DefaultWindowBehaviour::ManageWindowState : State {
 private:
 	void _UpdateBorders(BPoint where)
 	{
+		if ((fWindow->Flags() & B_NOT_RESIZABLE) != 0)
+			return;
+
 		// Compute the window center relative location of where. We divide by
 		// the width respective the height, so we compensate for the window's
 		// aspect ratio.
@@ -672,6 +679,11 @@ private:
 		int8 horizontal;
 		int8 vertical;
 		_ComputeResizeDirection(x, y, horizontal, vertical);
+
+		if ((fWindow->Flags() & B_NOT_H_RESIZABLE) != 0)
+			horizontal = NONE;
+		if ((fWindow->Flags() & B_NOT_V_RESIZABLE) != 0)
+			vertical = NONE;
 
 		// update the highlight, if necessary
 		if (horizontal != fHorizontal || vertical != fVertical) {
@@ -892,8 +904,10 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where,
 		} else if ((buttons & B_TERTIARY_MOUSE_BUTTON) != 0) {
 			// Middle-click anywhere on the window shall initiate
 			// humdinger-resize mode.
-			if (windowModifier && hitRegion != Decorator::REGION_NONE)
-				action = ACTION_HUMDINGER_RESIZE;
+			if (windowModifier && hitRegion != Decorator::REGION_NONE) {
+				action = (flags & B_NOT_RESIZABLE) == 0
+					? ACTION_HUMDINGER_RESIZE : ACTION_DRAG;
+			}
 		}
 	}
 
