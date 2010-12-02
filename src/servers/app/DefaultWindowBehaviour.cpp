@@ -1123,18 +1123,7 @@ DefaultWindowBehaviour::_SetBorderHighlights(int8 horizontal, int8 vertical,
 		}
 
 		// invalidate the affected regions
-		dirtyRegion.IntersectWith(&fWindow->VisibleRegion());
-		BRect dirtyRect(dirtyRegion.Frame());
-
-		if (dirtyRect.IsValid()) {
-			DrawingEngine* engine = decorator->GetDrawingEngine();
-			engine->LockParallelAccess();
-			engine->ConstrainClippingRegion(&dirtyRegion);
-
-			decorator->Draw(dirtyRect);
-
-			engine->UnlockParallelAccess();
-		}
+		fWindow->ProcessDirtyRegion(dirtyRegion);
 	}
 }
 

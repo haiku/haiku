@@ -3357,9 +3357,13 @@ Desktop::_SetWorkspace(int32 index, bool moveFocusWindow)
 	int32 previousIndex = fCurrentWorkspace;
 	rgb_color previousColor = fWorkspaces[fCurrentWorkspace].Color();
 	bool movedMouseEventWindow = false;
-	Window* movedWindow = fMouseEventWindow;
-	if (movedWindow == NULL && moveFocusWindow)
-		movedWindow = FocusWindow();
+	Window* movedWindow = NULL;
+	if (moveFocusWindow) {
+		if (fMouseEventWindow != NULL)
+			movedWindow = fMouseEventWindow;
+		else
+			movedWindow = FocusWindow();
+	}
 
 	if (movedWindow != NULL) {
 		if (movedWindow->IsNormal()) {
