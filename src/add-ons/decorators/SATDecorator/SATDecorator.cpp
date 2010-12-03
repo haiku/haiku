@@ -29,15 +29,17 @@
 static const float kResizeKnobSize = 18.0;
 
 static const rgb_color kHighlightFrameColors[6] = {
-	{ 72, 152, 0, 255 },
-	{ 160, 240, 0, 255 },
-	{ 144, 224, 0, 255 },
-	{ 128, 208, 0, 255 },
-	{ 72, 152, 0, 255 },
-	{ 38, 108, 0, 255 }
+	{ 52, 52, 52, 255 },
+	{ 140, 140, 140, 255 },
+	{ 124, 124, 124, 255 },
+	{ 108, 108, 108, 255 },
+	{ 52, 52, 52, 255 },
+	{ 8, 8, 8, 255 }
 };
 
-static const rgb_color kHighlightTabColor	= { 128, 208, 0, 255 };
+static const rgb_color kTabColor = {255, 203, 0, 255};
+static const rgb_color kHighlightTabColor = tint_color(kTabColor,
+	B_DARKEN_2_TINT);
 static const rgb_color kHighlightTabColorLight = tint_color(kHighlightTabColor,
 	(B_LIGHTEN_MAX_TINT + B_LIGHTEN_2_TINT) / 2);
 static const rgb_color kHighlightTabColorBevel = tint_color(kHighlightTabColor,
