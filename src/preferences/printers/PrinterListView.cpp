@@ -301,6 +301,7 @@ PrinterItem::PrinterItem(PrintersWindow* window, const BDirectory& node,
 	_GetStringProperty(PSRV_PRINTER_ATTR_PRT_NAME, fName);
 	_GetStringProperty(PSRV_PRINTER_ATTR_COMMENTS, fComments);
 	_GetStringProperty(PSRV_PRINTER_ATTR_TRANSPORT, fTransport);
+	_GetStringProperty(PSRV_PRINTER_ATTR_TRANSPORT_ADDR, fTransportAddress);
 	_GetStringProperty(PSRV_PRINTER_ATTR_DRV_NAME, fDriverName);
 
 	BPath path;
@@ -405,6 +406,7 @@ PrinterItem::DrawItem(BView *owner, BRect /*bounds*/, bool complete)
 	BPoint namePt(iconPt + BPoint(x, fntheight));
 	BPoint driverPt(iconPt + BPoint(x, fntheight * 2.0));
 	BPoint defaultPt(iconPt + BPoint(x, fntheight * 3.0));
+	BPoint transportPt(iconPt + BPoint(x, fntheight * 3.0));
 
 	float totalWidth = bounds.Width() - iconColumnWidth;
 	float maximumWidth = fLayoutData.fLeftColumnMaximumWidth +
@@ -418,8 +420,7 @@ PrinterItem::DrawItem(BView *owner, BRect /*bounds*/, bool complete)
 	}
 
 	BPoint pendingPt(bounds.right - width - 8.0, namePt.y);
-	BPoint transportPt(bounds.right - width - 8.0, driverPt.y);
-	BPoint commentPt(bounds.right - width - 8.0, defaultPt.y);
+	BPoint commentPt(bounds.right - width - 8.0, driverPt.y);
 
 
 	drawing_mode mode = owner->DrawingMode();
@@ -443,18 +444,30 @@ PrinterItem::DrawItem(BView *owner, BRect /*bounds*/, bool complete)
 	// left of item
 	BString s = fName;
 	owner->TruncateString(&s, B_TRUNCATE_MIDDLE, pendingPt.x - namePt.x);
+
+	owner->SetFont(be_bold_font);
 	owner->DrawString(s.String(), s.Length(), namePt);
-	s = fDriverName.String();
-	owner->TruncateString(&s, B_TRUNCATE_MIDDLE, pendingPt.x - driverPt.x);
+	owner->SetFont(&font);
+
+	s = B_TRANSLATE("Driver: %driver%");
+	s.ReplaceFirst("%driver%", fDriverName);
+	owner->TruncateString(&s, B_TRUNCATE_END, bounds.Width() - commentPt.x);
 	owner->DrawString(s.String(), s.Length(), driverPt);
+
+
+	if (fTransport.Length() > 0) {
+		s = B_TRANSLATE("Transport: %transport% %transport_address%");
+		s.ReplaceFirst("%transport%", fTransport);
+		s.ReplaceFirst("%transport_address%", fTransportAddress);
+		owner->TruncateString(&s, B_TRUNCATE_BEGINNING, totalWidth);
+		owner->DrawString(s.String(), s.Length(), transportPt);
+	}
 
 	// right of item
 	s = fPendingJobs;
-	owner->TruncateString(&s, B_TRUNCATE_MIDDLE, bounds.Width() - pendingPt.x);
+	owner->TruncateString(&s, B_TRUNCATE_END, bounds.Width() - pendingPt.x);
 	owner->DrawString(s.String(), s.Length(), pendingPt);
-	s = fTransport;
-	owner->TruncateString(&s, B_TRUNCATE_MIDDLE, bounds.Width() - transportPt.x);
-	owner->DrawString(s.String(), s.Length(), transportPt);
+
 	s = fComments;
 	owner->TruncateString(&s, B_TRUNCATE_MIDDLE, bounds.Width() - commentPt.x);
 	owner->DrawString(s.String(), s.Length(), commentPt);

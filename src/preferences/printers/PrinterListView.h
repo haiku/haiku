@@ -98,6 +98,7 @@ private:
 			BDirectory			fNode;
 			BString				fComments;
 			BString				fTransport;
+			BString				fTransportAddress;
 			BString				fDriverName;
 			BString				fName;
 			BString				fPendingJobs;
