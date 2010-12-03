@@ -1,16 +1,18 @@
+
+
+#include "SetupWindow.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <Alert.h>
 #include <Button.h>
+#include <Directory.h>
+#include <NetEndpoint.h>
 #include <Rect.h>
+#include <String.h>
 #include <TextControl.h>
 #include <View.h>
-#include <Directory.h>
-#include <Alert.h>
-#include <String.h>
-#include <NetEndpoint.h>
-
-#include "SetupWindow.h"
 
 #define	DLG_WIDTH		370
 #define DLG_HEIGHT		100
@@ -22,7 +24,7 @@
 #define SERVER_V		10
 #define SERVER_WIDTH	(DLG_WIDTH - SERVER_H - SERVER_H)
 #define SERVER_HEIGHT	20
-#define SERVER_TEXT		"Printer host name"
+#define SERVER_TEXT		"Printer address"
 
 #define QUEUE_H			10
 #define QUEUE_V			SERVER_V + SERVER_HEIGHT + 2
@@ -70,42 +72,46 @@ enum MSGS {
 
 class SetupView : public BView {
 public:
-	SetupView(BRect, BDirectory *);
-	~SetupView() {}
-	virtual void AttachedToWindow();
-	bool UpdateViewData();
+							SetupView(BRect, BDirectory* );
+	virtual void 			AttachedToWindow();
 
+		bool 				CheckSetup();
 private:
-	BTextControl *server;
-	BTextControl *queue;
-	BDirectory   *dir;
+
+		BTextControl*		fServerAddress;
+		BTextControl*		fQueuePort;
+		BDirectory*			fPrinterDirectory;
 };
 
-SetupView::SetupView(BRect frame, BDirectory *d)
-	: BView(frame, "", B_FOLLOW_ALL, B_WILL_DRAW), dir(d)
+
+SetupView::SetupView(BRect frame, BDirectory* directory)
+	: BView(frame, "", B_FOLLOW_ALL, B_WILL_DRAW),
+	fPrinterDirectory(directory)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
 
-void SetupView::AttachedToWindow()
+
+void
+SetupView::AttachedToWindow()
 {
 	float width = MAX(StringWidth(SERVER_TEXT), StringWidth(QUEUE_TEXT)) + 10;
 
 	/* server name box */
 
-	server = new BTextControl(SERVER_RECT, "", SERVER_TEXT, "", NULL);
-	AddChild(server);
-	server->SetDivider(width);
+	fServerAddress = new BTextControl(SERVER_RECT, "", SERVER_TEXT, "<printer's hostname or address>", NULL);
+	AddChild(fServerAddress);
+	fServerAddress->SetDivider(width);
 
 	/* queue name box */
 
-	queue = new BTextControl(QUEUE_RECT, "", QUEUE_TEXT, "9100", NULL);	// 9100 is default HP JetDirect port number
-	AddChild(queue);
-	queue->SetDivider(width);
+	fQueuePort = new BTextControl(QUEUE_RECT, "", QUEUE_TEXT, "9100", NULL);	// 9100 is default HP JetDirect port number
+	AddChild(fQueuePort);
+	fQueuePort->SetDivider(width);
 
 	/* cancel */
 
-	BButton *button = new BButton(CANCEL_RECT, "", CANCEL_TEXT, new BMessage(M_CANCEL));
+	BButton* button = new BButton(CANCEL_RECT, "", CANCEL_TEXT, new BMessage(M_CANCEL));
 	AddChild(button);
 
 	/* ok */
@@ -115,92 +121,106 @@ void SetupView::AttachedToWindow()
 	button->MakeDefault(true);
 }
 
-bool SetupView::UpdateViewData()
+
+bool
+SetupView::CheckSetup()
 {
-	if (*server->Text() && *queue->Text()) {
-		BNetEndpoint *ep = new BNetEndpoint(SOCK_STREAM);
+	if (*fServerAddress->Text() && *fQueuePort->Text()) {
+		BNetEndpoint* ep = new BNetEndpoint(SOCK_STREAM);
 		if (ep->InitCheck() == B_NO_ERROR) {
-			uint16 port = atoi(queue->Text());
-			
+			uint16 port = atoi(fQueuePort->Text());
+
 			if (! port)
 				port = 9100;
-			
-			if (ep->Connect(server->Text(), atoi(queue->Text())) != B_OK) {
+
+			if (ep->Connect(fServerAddress->Text(), port) != B_OK) {
 				BString text;
-				text << "Fail to connect to " << server->Text() << ":" << (int) port << "!";  
-				BAlert *alert = new BAlert("", text.String(), "OK");
+				text << "Fail to connect to " << fServerAddress->Text() << ":" << (int) port << "!";
+				BAlert* alert = new BAlert("", text.String(), "OK");
 				alert->Go();
 				return false;
 			};
 
 			char str[256];
-			sprintf(str, "%s:%s", server->Text(), queue->Text());
-			dir->WriteAttr("hp_jetdirect:host", B_STRING_TYPE, 0, server->Text(), strlen(server->Text()) + 1);
-			dir->WriteAttr("hp_jetdirect:port", B_UINT16_TYPE, 0, &port, sizeof(port));
+			sprintf(str, "%s:%d", fServerAddress->Text(), port);
+			fPrinterDirectory->WriteAttr("transport_address", B_STRING_TYPE,
+				0, str, strlen(str) + 1);
 			return true;
 		};
 	};
 
-	BAlert *alert = new BAlert("", "please input parameters.", "OK");
+	BAlert* alert = new BAlert("", "please input parameters.", "OK");
 	alert->Go();
 	return false;
 }
 
-SetupWindow::SetupWindow(BDirectory *dir)
+
+// #pragma mark -
+
+
+SetupWindow::SetupWindow(BDirectory* printerDirectory)
 	: BWindow(BRect(100, 100, 100 + DLG_WIDTH, 100 + DLG_HEIGHT),
 		"HP JetDirect Setup", B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
 		B_NOT_RESIZABLE | B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE)
 {
-	result = 0;
+	fResult = 0;
 
 	Lock();
-	SetupView *view = new SetupView(Bounds(), dir);
+	SetupView* view = new SetupView(Bounds(), printerDirectory);
 	AddChild(view);
 	Unlock();
 
-	semaphore = create_sem(0, "SetupWindowSem");
+	fExitSem = create_sem(0, "SetupWindowSem");
 }
 
-bool SetupWindow::QuitRequested()
+
+bool
+SetupWindow::QuitRequested()
 {
-	result = B_ERROR;
-	release_sem(semaphore);
+	fResult = B_ERROR;
+	release_sem(fExitSem);
 	return true;
 }
 
-void SetupWindow::MessageReceived(BMessage *msg)
+
+void
+SetupWindow::MessageReceived(BMessage* msg)
 {
 	bool success;
 
 	switch (msg->what) {
-	case M_OK:
-		Lock();
-		success = ((SetupView *)ChildAt(0))->UpdateViewData();
-		Unlock();
-		if (success) {
-			result = B_NO_ERROR;
-			release_sem(semaphore);
-		}
-		break;
+		case M_OK:
+			Lock();
+			success = ((SetupView*)ChildAt(0))->CheckSetup();
+			Unlock();
+			if (success) {
+				fResult = B_NO_ERROR;
+				release_sem(fExitSem);
+			}
+			break;
 
-	case M_CANCEL:
-		result = B_ERROR;
-		release_sem(semaphore);
-		break;
+		case M_CANCEL:
+			fResult = B_ERROR;
+			release_sem(fExitSem);
+			break;
 
-	default:
-		BWindow::MessageReceived(msg);
-		break;
+		default:
+			BWindow::MessageReceived(msg);
+			break;
 	}
 }
 
-int SetupWindow::Go()
+
+int
+SetupWindow::Go()
 {
 	Show();
-	acquire_sem(semaphore);
-	delete_sem(semaphore);
-	int value = result;
+	acquire_sem(fExitSem);
+	delete_sem(fExitSem);
+	int value = fResult;
 	Lock();
 	Quit();
 	return value;
 }
+
+

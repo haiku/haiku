@@ -7,15 +7,15 @@ class BDirectory;
 
 class SetupWindow : public BWindow {
 public:
-	SetupWindow(BDirectory *);
-	~SetupWindow() {}
-	virtual bool QuitRequested();
-	virtual void MessageReceived(BMessage *message);
-	int Go();
+							SetupWindow(BDirectory* printerDirectory);
+
+	virtual bool 			QuitRequested();
+	virtual void 			MessageReceived(BMessage* message);
+			int 			Go();
 
 private:
-	int  result;
-	long semaphore;
+			int  fResult;
+			long fExitSem;
 };
 
 #endif	// SETUPWINDOW_H
