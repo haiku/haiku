@@ -1,34 +1,37 @@
-1	belarusian	x-vnd.Haiku-Media	2505372198
-Ready for use…	Media Window		Гатовы да карыстання…
-Enabling real-time audio allows system to record and play audio as fast as possible.  It achieves this performance by using more CPU and RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Опцыя Гук Рэальнага Часу дазваляе сістэме карыстаць больш рэсурсаў цэнтральнага працэсара і аператыўнай памяці дзеля больш роўнага і мяккага выканання аперацыяў з гукавай інфармацыяй.\n\nРэкамендуецца задзейснічаць гэтую магчымасьць толькі ў самых неабходных выпадках.
-Video input:	Media views		Відэа ўвод:
-Enable real-time video	Media views		Задзейнічаць Відэа Рэальнага Часу
-Waiting for media_server to quit.	Media Window		Чакаецца выключэнне Медыя Сервера
-Cleaning up.	Media Window		Прыборка
+1	belarusian	x-vnd.Haiku-Media	243366818
+Show volume control on Deskbar	Media views		Усталяваць кіраванне гукам у Deskbar
+Audio input:	Media views		Гукавы ўваход:
+Restarting media services\nStarting media server…\n	Media Window		Запуск Медыя службаў наноў\nЗапуск Медыя Сервера…\n
+Video input:	Media views		Відэа ўваход:
+Waiting for media_server to quit.	Media Window		Чакаецца выключэнне media_server
 Defaults	Media views		Прадвызначаныя
-Default nodes	Media views		Прадвызначаныя Вузлы
+Stopping media server…	Media Window		Спыненне медыясервера…
+Video output:	Media views		Відэа Выхад:
+Enable real-time audio	Media views		Задзейнічаць гук рэальнага часу
+Quit	Media Window		Выйсці
+OK	Media Window		ОК
+Enabling real-time video allows system to perform video operations as fast and smoothly as possible.  It achieves optimum performance by using more RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Опцыя відэа рэальнага часу дазваляе сістэме карыстаць больш рэсурсаў цэнтральнага працэсара і аператыўнай памяці дзеля больш роўнага і мяккага выканання аперацый з відэаінфармацыяй.\n\nРэкамендуецца задзейнічаць гэтую магчымасць толькі ў самых неабходных выпадках.
+Default nodes	Media views		Прадвызначаныя вузлы
+Starting media server…	Media Window		Запускаецца медыясервер…
+Restart the media server to apply changes.	Media views		Перезапусціць медыясервер каб ужыць змены ў наладках.
+Done shutting down.	Media Window		Медыясервер спынены.
+Cleaning up.	Media Window		Прыборка.
+Telling media_addon_server to quit.	Media Window		Адпраўка каманды выхаду да media_addon_server.
+Enable real-time video	Media views		Задзейнічаць відэа рэальнага часу
+This hardware has no controls.	Media Window		Гэтая апаратура не мае элементаў кіравання.
+Restarting media services\nShutting down media server\n	Media Window		Запуск медыяслужбаў наноў\nЗакрыццё медыясервера\n
+Audio output:	Media views		Гукавы выхад:
+Start media server	Media Window		Запусціць медыясервер
+Audio settings	Media Window		Наладкі гука
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Немагчыма далучыцца да медыясервера\n Жадаеце яго стартаваць?\n
+Ready for use…	Media Window		Гатовы да карыстання…
+Real-time	Media views		Рэальны час
+Restart media services	Media views		Перазапусціць медыясервер
+Enabling real-time audio allows system to record and play audio as fast as possible.  It achieves this performance by using more CPU and RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Опцыя гуку рэальнага часу дазваляе сістэме карыстаць больш рэсурсаў цэнтральнага працэсара і аператыўнай памяці дзеля больш роўнага і мяккага выканання аперацыяў з гукавай інфармацыяй.\n\nРэкамендуецца задзейнічаць гэтую магчымасьць толькі ў самых неабходных выпадках.
 Couldn't remove volume control in Deskbar: %s\n	Media Window		Немагчыма выдаліць кіраванне гукам з Deskbar : %s\n
 Couldn't add volume control in Deskbar: %s\n	Media Window		Немагчыма ўсталяваць кіраванне гукам у Deskbar: %s\n
-Stopping media server…	Media Window		Спыненне Медыя Сервера…
-Quit	Media Window		Выйсце
-OK	Media Window		Так
-Starting media server…	Media Window		Запускаецца Медыя Сервер…
-Done shutting down.	Media Window		Медыя Сервер спынены.
-Video output:	Media views		Відеа Вывад:
-Could not connect to the media server.\nWould you like to start it ?	Media Window		Немагчыма далучыцца да Медыя Сервера\n Жадаеце яго стартаваць?\n
-Real-time	Media views		Рэальны Час
-Restart media services	Media views		Перазапусціць Медыя Сервер
-Enabling real-time video allows system to perform video operations as fast and smoothly as possible.  It achieves optimum performance by using more RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Опцыя Відэа Рэальнага Часу дазваляе сістэме карыстаць больш рэсурсаў цэнтральнага працэсара і аператыўнай памяці дзеля больш роўнага і мяккага выканання аперацыяў з відэа інфармацыяй.\n\nРэкамендуецца задзейснічаць гэтую магчымасьць толькі ў самых неабходных выпадках.
-Telling media_addon_server to quit.	Media Window		Паведамленне media_addon_server-а пра тэрміновае выйсце.
-This hardware has no controls.	Media Window		Гэтая апаратура ня мае элементаў кіравання.
-Audio output:	Media views		Гукавы вывад:
-Restarting media services\nStarting media server…\n	Media Window		Запуск Медыя службаў наноў\nЗапуск Медыя Сервера…\n
-Enable real-time audio	Media views		Задзейнічаць Гук Рэальнага Часу
-Audio settings	Media Window		Наладкі гука
-Start media server	Media Window		Запусціць Медыя Сервер
 Media	Media Window		Медыя
-Restarting media services\nShutting down media server\n	Media Window		Запуск Медыя службаў наноў\nЗакрыццё Медыя Сервера\n
 Channel:	Media views		Канал:
-Show volume control on Deskbar	Media views		Усталяваць кіраванне гукам у Deskbar
-Restart the media server to apply changes.	Media views		Перезапусціць Медыя Сервер каб ужыць змены ў наладках.
-Audio input:	Media views		Гукавы ўвод:
+Video settings	Media Window		Наладкі відэа
+Audio mixer	Media Window		Аўдыё мікшар
+<none>	Media views		<няма>

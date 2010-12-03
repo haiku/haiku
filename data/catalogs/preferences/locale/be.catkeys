@@ -1,49 +1,25 @@
-1	belarusian	x-vnd.Haiku-Locale	1551394073
-Day in month (2 digits)	TimeFormatSettings		Дзень месяцу (2 лічбы)
+1	belarusian	x-vnd.Haiku-Locale	2295953467
 Available languages	Locale Preflet Window		Наяўныя мовы
-Day of week (name)	TimeFormatSettings		Дзень тыдню (назва)
-Separator:	TimeFormatSettings		Дзельнік:
-Year (4 digits)	TimeFormatSettings		Год (4 лічбы)
-Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Спіс наяўных моваў ня знойдзены! Немагчыма запусціць канфігурацыйную прагаму!
-Thousand separator: 	TimeFormatSettings		Дзельнік тысяч:
-After	TimeFormatSettings		Пасьля
-Month name	TimeFormatSettings		Назва месяцу
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Спіс наяўных моваў не знойдзены! Немагчыма запусціць канфігурацыйную праграму!
 Long format:	TimeFormatSettings		Доўгі фармат:
-Currency	TimeFormatSettings		Грошы
-Before	TimeFormatSettings		Перад
-Year	TimeFormatSettings		Год
-Day of week in month	TimeFormatSettings		дзень тыдня ў месяцы
+Currency	TimeFormatSettings		Валюта
 Short format:	TimeFormatSettings		Скарочаны фармат:
-Currency symbol:	TimeFormatSettings		Грашовы сімвал:
-Space	TimeFormatSettings		Абшар
 Language	Locale Preflet Window		Мова
-Month number	TimeFormatSettings		Нумар месяцу
-Year (2 digits)	TimeFormatSettings		Год (2 лічбы)
 Preferred languages	Locale Preflet Window		Пажаданыя мовы
-Decimal separator: 	TimeFormatSettings		Дзесятковы дзельнік:
-Symbol position	TimeFormatSettings		Сімвал пазіцыі
-Day of week (short name)	TimeFormatSettings		Дзень тыдню (скарочаны)
 Numbers	TimeFormatSettings		Лічбы
 24 hour	TimeFormatSettings		24 гадзіны
- (unknown format)	TimeFormatSettings		(невядомы фармат)
-Negative marker:	TimeFormatSettings		Мінусовы маркер:
-Day in month	TimeFormatSettings		Дзень месяцу
-OK	Locale Preflet Window		Так
 Defaults	Locale Preflet Window		Прадвызначаныя
-Month	TimeFormatSettings		Месяц
-Separator	TimeFormatSettings		Дзельнік
-Country	Locale Preflet Window		Краіна
-Month number (2 digits)	TimeFormatSettings		Нумар месяцу (2 лічбы)
 Revert	Locale Preflet Window		Вярнуць
-Negative marker	TimeFormatSettings		Мінусовы маркер
-Day of week	TimeFormatSettings		Дзень тыдня
-List separator: 	TimeFormatSettings		Дзельнік спісу:
-12 hour	TimeFormatSettings		12 гадзін
+OK	Locale Preflet Window		ОК
 Time	TimeFormatSettings		Час
 Date	TimeFormatSettings		Дата
+12 hour	TimeFormatSettings		12 гадзін
 Locale	Locale Preflet		Лакаль
-None	TimeFormatSettings		Ні водзін
-Clock	TimeFormatSettings		Гадзіннік
-Example:	TimeFormatSettings		Прыклад:
-Day	TimeFormatSettings		Дзень
-Leading 0	TimeFormatSettings		Leading 0
+already chosen	LanguageListView		ужо выбрана
+Negative:	TimeFormatSettings		Адмоўна:
+Use month/day-names from preferred language	TimeFormatSettings		Ужываць імены месяцоў і дзён з пажаданай мовы
+Formatting	Locale Preflet Window		Фарматаванне
+Locale	Locale Preflet Window		Лакаль
+Full format:	TimeFormatSettings		Поўны фармат
+Medium format:	TimeFormatSettings		Сярэдні фармат
+Positive:	TimeFormatSettings		Станоўча:

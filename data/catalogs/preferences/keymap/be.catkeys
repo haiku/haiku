@@ -2,18 +2,18 @@
 Tilde trigger	Keymap window		Tilde
 Grave trigger	Keymap window		Grave
 Select dead keys	Keymap window		Пазначыць трыгеры (Dead Keys)
-Quit	Keymap window		Выйсце
-Switch shortcut keys to Haiku mode	Keymap window		Пераключыць хуткія клавішы у Haiku рэжым
+Quit	Keymap window		Выйсці
 Circumflex trigger	Keymap window		Circumflex
 Diaeresis trigger	Keymap window		Diaeresis
 Open…	Keymap window		Адкрыць…
-System:	Keymap window		Сістэмные:
-Switch shortcut keys	Keymap window		Пераключыць хуткія клавішы
-User:	Keymap window		Карыстальніка:
+System:	Keymap window		Сістэмныя:
+Switch shortcut keys	Keymap window		Пераключыць хуткія камбінацыі
+User:	Keymap window		Карыстач:
+Switch shortcut keys to Haiku mode	Keymap window		Пераключыць камбінацыі ў рэжым Haiku
 Keymap	Keymap window		Мапа клавіятуры
-Sample and clipboard:	Keymap window		Прыклад ды буфер абмену:
-Layout	Keymap window		План клавіятуры
-Switch shortcut keys to Windows/Linux mode	Keymap window		Пераключыць хуткія клавішы у Windows/Linux рэжым
+Sample and clipboard:	Keymap window		Прыклад і буфер абмену:
+Layout	Keymap window		Расклад клавіятуры
+Switch shortcut keys to Windows/Linux mode	Keymap window		Пераключыць камбінацыі у рэжым Windows/Linux
 Revert	Keymap window		Вярнуць
 Save as…	Keymap window		Захаваць як…
 File	Keymap window		Файл

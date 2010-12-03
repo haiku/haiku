@@ -1,0 +1,48 @@
+1	belarusian	x-vnd.Haiku-Mail	1416961282
+Select account type	Config Views		Выбраць тып акаунту
+Mail checking	Config Window		Праверка пошты
+Settings	Config Window		Наладкі
+Only when dial-up is connected	Config Window		Толькі пры падключаным дайл-апе
+While sending and receiving	Config Window		Пры адпраўцы і атрыманні
+days	Config Window		дзен
+Start mail services on startup	Config Window		Запускаць паштовыя службы пры загрузцы
+Receive mail only	Config Views		Толькі прымаць пошту
+Account name:	Config Views		Імя акаунту
+OK	Config Views		ОК
+The filter could not be moved. Deleting filter.	Config Views		Немагчыма перамесціць фільтар. Фільтар выдаляецца.
+Revert	Config Window		Адмяніць
+Accounts	Config Window		Акаунты
+Account type:	Config Views		Тып акаунту
+Remove	Config Window		Выдаліць
+Miscellaneous	Config Window		Розныя
+Show connection status window:	Config Window		Паказваць статус спалучэння:
+While sending	Config Window		Пры адапраўленні
+Schedule outgoing mail when dial-up is disconnected	Config Window		Запланаваць адпраўку пошты на час падключэння дайл-апу
+hours	Config Window		гадзін
+Add	Config Window		Дадаць
+Send mail only	Config Views		Толбкі адпраўляць пошту
+E-mail	Account		Электронная пошта
+Unnamed	Account		Неназвана
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nАгульныя опцыі немагчыма адмяніць.\n\nПамылка пры атрыманні агульных опцый:\n%s\n
+Send and receive mail	Config Views		Адпраўляць і атрымліваць пошту
+Real name:	Config Views		Рэальнае імя:
+· Outgoing	Account		· Выходныя
+Return address:	Config Views		Адрас звароту:
+· E-mail filters	Account		· Фільтары пошты
+· Incoming	Account		· Уваходныя
+Edit mailbox menu…	Config Window		Правіць меню паштовай скрыні...
+Remove	Config Views		Выдаліць
+Could not create inbound chain.	Account		Немагчыма стварыць уваходны ланцужок
+Check every	Config Window		Правяраць кожныя
+never	Config Window		ніколі
+Incoming mail filters	Config Views		Уваходныя фільтры пошты
+Account settings	Config Views		Наладкі акаунту
+minutes	Config Window		хвілін
+Error retrieving general settings: %s\n	Config Window		Памылка пры атрыманні агульных наладак: %s\n
+OK	Account		ОК
+Apply	Config Window		Прымяніць
+Could not create outbound chain.	Account		Не ўдалося стварыць выходны ланцужок.
+Always	Config Window		Заўсёды
+Add filter	Config Views		Дадаць фільтр
+Outgoing mail filters	Config Views		Фільтры выходнай пошты
+\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nСтварыце акаунт з дапамогай кнопкі Дадаць.\n\nВыдаліце акаунт кнопкай Выдаліць.\n\nВыберыце элемент у спісе, каб змяніць яго параметры.

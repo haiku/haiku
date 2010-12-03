@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Be-PRNT	403433619
+1	belarusian	x-vnd.Be-PRNT	634957092
 Waiting	JobListView		Чакае
 page	JobListView		старонка
 Cancel	AddPrinterDialog		Скасаваць
@@ -9,7 +9,6 @@ No pending jobs.	PrinterListView		Чарга заданняў пустая.
 pages	JobListView		старонак
 Processing	JobListView		Выконваецца
 Printer name:	AddPrinterDialog		Імя друкаркі:
- pending jobs.	PrinterListView		 заданняў у чарзе.
 Restart job	PrintersWindow		Перазапусціць заданне
 Add	AddPrinterDialog		Дадаць
 Make default	PrintersWindow		Зрабіць прадвызначаным

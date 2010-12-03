@@ -1,0 +1,11 @@
+1	belarusian	x-vnd.Haiku-InstalledPackages	3041446229
+No package selected.	UninstallView		Пакункі не выбраныя.
+Remove	UninstallView		Выдаліць
+Installed packages	UninstallWindow		Усталяваныя пакункі
+Close	UninstallApplication		Закрыць
+InstalledPackages	UninstallApplication		InstalledPackages
+BeOS legacy .pkg package removing application for Haiku.\n\nCopyright 2007,\nŁukasz 'Sil2100' Zemczak\n\nCopyright (c) 2007 Haiku, Inc.\n	UninstallApplication		Праграма для Haiku для выдалення старых .pkg пакункаў BeOS.\n\nCopyright 2007,\nŁukasz 'Sil2100' Zemczak\n\nCopyright (c) 2007 Haiku, Inc.\n
+Package description	UninstallView		Апісанне пакунку
+The package you selected has been successfully removed from your system.	UninstallView		Выбраны пакунак паспяхова выдалены з вашай сістэмы.
+OK	UninstallView		ОК
+The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Выбраны пакунак не выдалены з вашай сістэмы. Магчыма, дадзеная інфармацыя неправільная.

@@ -1,19 +1,18 @@
-1	belarusian	x-vnd.Haiku-Mouse	104106491
-Click to activate	SettingsView		Націсніце каб актывізаваць
+1	belarusian	x-vnd.Haiku-Mouse	3392409209
 Mouse type:	SettingsView		Тып мышы:
 Warp	SettingsView		Заварот
-2-Button	SettingsView		дзве кнопкі
-Double-click test area	SettingsView		Месца праверкі
+2-Button	SettingsView		Дзвюхкнопкавая
+Double-click test area	SettingsView		Месца праверкі падвойнага кліка
 Revert	MouseWindow		Вярнуць
 ...by Andrew Edward McCall	MouseApplication		... распрацавана Andrew Edward McCall
 Mouse acceleration	SettingsView		Паскарэнне мышы
 Click to focus	SettingsView		Фокус па націску
-3-Button	SettingsView		тры кнопкі
-Mouse speed	SettingsView		Хуткасць
+3-Button	SettingsView		Трохкнопкавая
+Mouse speed	SettingsView		Хуткасць мышы
 Focus mode:	SettingsView		Рэжым фокуса:
 Instant warp	SettingsView		Імгненны заварот
 Dig Deal	MouseApplication		Так!
-1-Button	SettingsView		адна кнопка
+1-Button	SettingsView		Аднанопкавая
 Double-click speed	SettingsView		Хуткасць падвойнага кліку
 Defaults	MouseWindow		Прадвызначаныя
 Focus follows mouse	SettingsView		Фокус суправаджае мыш
@@ -22,3 +21,4 @@ Fast	SettingsView		Хутка
 Normal	SettingsView		Нармальна
 Mouse	MouseWindow		Мыш
 Slow	SettingsView		Павольна
+Click to focus and raise	SettingsView		Клік факусіруе і падымае наверх

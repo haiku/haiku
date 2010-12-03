@@ -1,21 +1,15 @@
-1	belarusian	x-vnd.Haiku-StyledEdit	2750476595
-Paste	Menus		Уставіць
+1	belarusian	x-vnd.Haiku-StyledEdit	2108192170
 OK	LoadAlert		Так
-File	Menus		Файл
 ???	LoadAlert		???
 Left	Menus		Левы
 Revert to the last version of \"%s\"? 	RevertToSavedAlert		Вярнуцца да апошняй версіі \"%s\"? 
 Search backwards	FindandReplaceWindow		Шукаць ў адваротным накірунку
 Size	Menus		Памер
 Save	QuitAlert		Захаваць
-Page setup…	Menus		Устаноўкі старонкі…
-Redo typing	Menus		Паўтарыць набор
-Print…	Menus		Друкаваць…
 Replace same	Menus		Змяніць аднолькава
-Can't undo	Menus		Немагчыма адмняніць
+Can't Undo	Menus		Немагчыма адмняніць
 Save	Menus		Захаваць
 Replace with:	FindandReplaceWindow		Змяніць на:
-Cancel	SaveAlert		Скасаваць
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Немагчыма вярнуцца, файл \"%s\" ня знойдзены.
 Case-sensitive	FindandReplaceWindow		З улікам рэгістру
 Green	Menus		Зялёны
@@ -23,18 +17,13 @@ Revert to saved…	Menus		Вярнуцца да захаванага…
 Yellow	Menus		Жоўты
 Replace in all windows	FindandReplaceWindow		Замяняць ва ўсіх вокнах
 Wrap lines	Menus		Пераносіць радкі
-Quit	Menus		Выйсце
 Cancel	RevertToSavedAlert		Скасаваць
 Document	Menus		Дакумент
-Clear	Menus		Ачысціць
 Save changes to the document \"%s\"? 	QuitAlert		Захаваць адрэдагаваны дакумент \"%s\"? 
-Edit	Menus		Правіць
 Font	Menus		Шрыфт
 Replace all	FindandReplaceWindow		Замяняць агулам
 Default	Open_and_SaveAsPanel		Прадвызначаны
 Cancel	FindandReplaceWindow		Скасаваць
-Save	SaveAlert		Захаваць
-Close	Menus		Закрыць
 Error loading \"%s\":\n\tUnsupported format	LoadAlert		Немагчыма загрузіць \"%s\":\n\tГэты фармат не падтрымліваецца
 OK	RevertToSavedAlert		Так
 Don't save	QuitAlert		Не захоўваць
@@ -51,22 +40,19 @@ Wrap-around search	FindandReplaceWindow		Пошук з пераходам
 Find selection	Menus		Шукаць пазначанае
 Find:	FindandReplaceWindow		Пошук:
 Error saving \"%s\":\n%s	SaveAlert		Немагчыма захаваць \"%s\":\n%s
-Copy	Menus		Капіраваць
-Cut	Menus		Выразаць
 Replace	FindandReplaceWindow		Замяніць
-Undo typing	Menus		Вярнуць набор
 Find again	Menus		Шукаць далей
 Cancel	QuitAlert		Скасаваць
 Find…	Menus		Пошук…
-Select all	Menus		Пазначыць ўсё
-Don't save	SaveAlert		Не захоўваць
 Error loading \"%s\":\n\t%s	LoadAlert		Немагчыма загрузіць \"%s\":\n\t%s
-This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Гэты файл пазначаны толькі для чытання. Захаваць змены ў дакумент \"%s\"? 
 Black	Menus		Чорны
 Untitled 	StyledEditWindow		Без назвы
 OK	SaveAlert		Так
 Find	FindandReplaceWindow		Шукаць
 Encoding	Open_and_SaveAsPanel		Кадоўка
-Save as…	Menus		Захаваць як…
 Replace…	Menus		Замяняць…
 Right	Menus		Права
+Cancel	SaveAlert		Скасаваць
+Save	SaveAlert		Захаваць
+Don't save	SaveAlert		Не захоўваць
+This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Гэты файл пазначаны толькі для чытання. Захаваць змены ў дакумент \"%s\"? 

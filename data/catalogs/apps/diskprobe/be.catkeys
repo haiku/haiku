@@ -1,5 +1,8 @@
 1	belarusian	x-vnd.Haiku-DiskProbe	679412978
 File offset: 	ProbeView		Адступ:
+DiskProbe	OpenWindow		DiskProbe
+%ld (native)	ProbeView		%ld (родны)
+64 bit unsigned value:	TypeEditors		64-бітнае значэнне без знаку
 Find again	ProbeView		Знайсці зноў
 Text	FindWindow		Тэкст
 Find…	ProbeView		Знайсці...
@@ -20,15 +23,14 @@ PNG format	TypeEditors		Фармат PNG
 Font size	ProbeView		Памер шрыфту
 Attribute type: 	ProbeView		Тып атрыбуту:
 Attribute	AttributeWindow		Атрыбут
-Number:	TypeEditors		Нумар:
 8 bit signed value:	TypeEditors		8-бітнае знакавае занчэнне
+Number:	TypeEditors		Нумар:
 Save	ProbeView		Захаваць
 Number editor	TypeEditors		Рэдактар нумараў
 No type editor available	AttributeWindow		Рэдактар тыпаў недаступны
 Double precision floating-point value:	TypeEditors		Значэнне з плаваючай запятой двайной дакладнасці:
 Device: 	ProbeView		Прылада:
 Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Сапраўды жадаеце выдаліць атрыбут \"%s\" з файла\"%s\"?\n\nВы не зможаце адмяніць гэтае дзеянне.
-64 bit unsigned value:	TypeEditors		64-бітнае значэнне без знаку
 8 bit unsigned value:	TypeEditors		8-бітнае занчэнне без знаку
 Block	ProbeView		Блок
 Back	ProbeView		Назад
@@ -74,14 +76,14 @@ OK	ProbeView		Так
 Add	ProbeView		Дадаць
 Edit	ProbeView		Рэдагаваць
 Native: %Ld (0x%0*Lx)	ProbeView		Родны: %Ld (0x%0*Lx)
+32 bit unsigned value:	TypeEditors		32-бітнае значэнне без знаку:
 Cancel	AttributeWindow		Адмена
 Type editor not supported	ProbeView		Рэдактар тыпаў не падтрымліваецца
-32 bit unsigned value:	TypeEditors		32-бітнае значэнне без знаку:
 MIME type editor	TypeEditors		Рэдактар MIME тыпаў
+Swapped: %Ld (0x%0*Lx)	ProbeView		Перастаўлены: %Ld (0x%0*Lx)
 Find	FindWindow		Знайсці
 Remove	AttributeWindow		Выдаліць
 Print…	ProbeView		Надрукаваць...
-Swapped: %Ld (0x%0*Lx)	ProbeView		Перастаўлены: %Ld (0x%0*Lx)
 Block %Ld (0x%Lx)	ProbeView		Блок %Ld (0x%Lx)
 Could not open file \"%s\": %s\n	DiskProbe		Не ўдалося адкрыць файл \"%s\": %s\n
 Select all	ProbeView		Выбраць усё
@@ -92,16 +94,17 @@ Mode:	FindWindow		Рэжым:
 15 bit	TypeEditors		15 біт
 Open device	FileWindow		Адкрыць прыладу
 Could not find search string.	ProbeView		Не атрымалася знайсці страку пошуку.
+16 bit unsigned value:	TypeEditors		16-бітные значэнне без знаку
 Attribute offset: 	ProbeView		Адступ атрыбуту:
 Redo	ProbeView		Яшчэ раз
 File: 	ProbeView		Файл:
-16 bit unsigned value:	TypeEditors		16-бітные значэнне без знаку
-of 	ProbeView		з
 32 bit unsigned pointer:	TypeEditors		32-бітны указальнік без знаку:
+of 	ProbeView		з
 DiskProbe\n\twritten by Axel Dörfler\n\tCopyright 2004-2007, Haiku.\n\nOriginal Be version by Robert Polic\n	DiskProbe		DiskProbe\n\tствораны Axel Dörfler\n\tCopyright 2004-2007, Haiku.\n\nАрыгінальная BeOS-версія - Robert Polic\n
 Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Не ўдалося запісаць у файл:\n%s\n\nУсе змены будуць згублены, калі вы выйдзеце.
 32 bit	TypeEditors		32 біт
 Cancel	ProbeView		Адмена
+Swapped: 0x%0*Lx	ProbeView		Перастаўлены: 0x%0*Lx
 Grayscale	TypeEditors		Адценні шэрага
 32 bit signed value:	TypeEditors		32-бітнае падпісанае значэнне:
 DiskProbe request	DiskProbe		Запыт DiskProbe
@@ -126,10 +129,7 @@ Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if
 Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Не ўдалося прачытаць выяву
 Message	TypeEditors	This is the type of view	Паведамленне
 Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Не ўдалося адкрыць \"%s\":\n%s
+of 0x0	ProbeView	This is a part of \"Block 0xXXXX of 0x0026\" message. In languages without 'of' structure it can be replaced simply with '/'.	з 0x0
 Image view	TypeEditors	Image means here a picture file, not a disk image.	Від выявы
 Image	TypeEditors	This is the type of view	Выява
 About DiskProbe…	FileWindow		Пра DiskProbe…
-DiskProbe	OpenWindow		DiskProbe
-%ld (native)	ProbeView		%ld (родны)
-Swapped: 0x%0*Lx	ProbeView		Перастаўлены: 0x%0*Lx
-of 0x0	ProbeView	This is a part of \"Block 0xXXXX of 0x0026\" message. In languages without 'of' structure it can be replaced simply with '/'.	з 0x0
