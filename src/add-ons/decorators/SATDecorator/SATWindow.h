@@ -96,7 +96,8 @@ public:
 
 			// hook function called from SATGroup
 			bool				AddedToGroup(SATGroup* group, WindowArea* area);
-			bool				RemovedFromGroup(SATGroup* group);
+			bool				RemovedFromGroup(SATGroup* group,
+									bool stayBelowMouse);
 			void				RemovedFromArea(WindowArea* area);
 
 			bool				StackWindow(SATWindow* child);
@@ -138,6 +139,9 @@ private:
 			void				_InitGroup();
 			void				_UpdateSizeLimits();
 			uint64				_GenerateId();
+
+			void				_RestoreOriginalSize(
+									bool stayBelowMouse = true);
 
 			Window*				fWindow;
 			StackAndTile*		fStackAndTile;

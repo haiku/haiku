@@ -223,7 +223,10 @@ public:
 			/*! Add a window to an existing window area. */
 			bool				AddWindow(SATWindow* window, WindowArea* area,
 									SATWindow* after = NULL);
-			bool				RemoveWindow(SATWindow* window);
+			/*! If stayBelowMouse is true move the removed window below the
+			cursor if necessary. */
+			bool				RemoveWindow(SATWindow* window,
+									bool stayBelowMouse = true);
 			int32				CountItems();
 			SATWindow*			WindowAt(int32 index);
 

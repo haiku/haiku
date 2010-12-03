@@ -710,7 +710,7 @@ SATGroup::AddWindow(SATWindow* window, WindowArea* area, SATWindow* after)
 
 
 bool
-SATGroup::RemoveWindow(SATWindow* window)
+SATGroup::RemoveWindow(SATWindow* window, bool stayBelowMouse)
 {
 	if (!fSATWindowList.RemoveItem(window))
 		return false;
@@ -722,7 +722,7 @@ SATGroup::RemoveWindow(SATWindow* window)
 	for (int i = 0; i < CountItems(); i++)
 		WindowAt(i)->DoGroupLayout();
 
-	window->RemovedFromGroup(this);
+	window->RemovedFromGroup(this, stayBelowMouse);
 	// Do nothing after removing the window from the group because this
 	// could have released the last reference and destroyed ourself.
 	return true;

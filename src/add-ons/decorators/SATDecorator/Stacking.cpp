@@ -101,7 +101,7 @@ StackingEventHandler::HandleMessage(SATWindow* sender,
 			SATWindow* candidate = stackAndTile->GetSATWindow(window);
 			if (!candidate)
 				return false;
-			if (!group->RemoveWindow(candidate))
+			if (!group->RemoveWindow(candidate, false))
 				return false;
 			break;
 		}
@@ -121,7 +121,7 @@ StackingEventHandler::HandleMessage(SATWindow* sender,
 				break;
 			}
 
-			if (!group->RemoveWindow(removeWindow))
+			if (!group->RemoveWindow(removeWindow, false))
 				return false;
 
 			ServerWindow* window = removeWindow->GetWindow()->ServerWindow();

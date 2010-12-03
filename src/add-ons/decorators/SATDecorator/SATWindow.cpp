@@ -400,28 +400,14 @@ SATWindow::AddedToGroup(SATGroup* group, WindowArea* area)
 
 
 bool
-SATWindow::RemovedFromGroup(SATGroup* group)
+SATWindow::RemovedFromGroup(SATGroup* group, bool stayBelowMouse)
 {
 	STRACE_SAT("SATWindow::RemovedFromGroup group: %p window %s\n", group,
 		fWindow->Title());
 
-	fWindow->SetSizeLimits(fOriginalMinWidth, fOriginalMaxWidth,
-		fOriginalMinHeight, fOriginalMaxHeight);
-	BRect frame = fWindow->Frame();
-	float x = 0, y = 0;
-	if (fWindow->Look() == B_MODAL_WINDOW_LOOK
-		|| fWindow->Look() == B_BORDERED_WINDOW_LOOK
-		|| fWindow->Look() == B_NO_BORDER_WINDOW_LOOK
-		|| (fWindow->Flags() & B_NOT_RESIZABLE) != 0) {
-		x = fOriginalWidth - frame.Width();
-		y = fOriginalHeight - frame.Height();
-	} else {
-		if ((fWindow->Flags() & B_NOT_H_RESIZABLE) != 0)
-			x = fOriginalWidth - frame.Width();
-		if ((fWindow->Flags() & B_NOT_V_RESIZABLE) != 0)
-			y = fOriginalHeight - frame.Height();
-	}
-	fDesktop->ResizeWindowBy(fWindow, x, y);
+	_RestoreOriginalSize(stayBelowMouse);
+	if (group->CountItems() == 1)
+		group->WindowAt(0)->_RestoreOriginalSize(false);
 
 	if (fShutdown) {
 		fGroupCookie->Uninit();
@@ -777,4 +763,68 @@ SATWindow::_GenerateId()
 	srand(time);
 	int16 randNumber = rand();
 	return (time & ~0xFFFF) | randNumber;
+}
+
+void
+SATWindow::_RestoreOriginalSize(bool stayBelowMouse)
+{
+	// restore size
+	fWindow->SetSizeLimits(fOriginalMinWidth, fOriginalMaxWidth,
+		fOriginalMinHeight, fOriginalMaxHeight);
+	BRect frame = fWindow->Frame();
+	float x = 0, y = 0;
+	if (fWindow->Look() == B_MODAL_WINDOW_LOOK
+		|| fWindow->Look() == B_BORDERED_WINDOW_LOOK
+		|| fWindow->Look() == B_NO_BORDER_WINDOW_LOOK
+		|| (fWindow->Flags() & B_NOT_RESIZABLE) != 0) {
+		x = fOriginalWidth - frame.Width();
+		y = fOriginalHeight - frame.Height();
+	} else {
+		if ((fWindow->Flags() & B_NOT_H_RESIZABLE) != 0)
+			x = fOriginalWidth - frame.Width();
+		if ((fWindow->Flags() & B_NOT_V_RESIZABLE) != 0)
+			y = fOriginalHeight - frame.Height();
+	}
+	fDesktop->ResizeWindowBy(fWindow, x, y);
+
+	if (!stayBelowMouse)
+		return;
+	// verify that the window stays below the mouse
+	BPoint mousePosition;
+	int32 buttons;
+	fDesktop->GetLastMouseState(&mousePosition, &buttons);
+	SATDecorator* decorator = GetDecorator();
+	if (decorator) {
+		BRect tabRect = decorator->TabRect();
+		if (mousePosition.y < tabRect.bottom
+			&& mousePosition.x <= frame.right + decorator->BorderWidth() +1
+			&& mousePosition.x >= frame.left + decorator->BorderWidth()) {
+			// verify mouse stays on the tab
+			float deltaX = 0;
+			if (tabRect.right < mousePosition.x)
+				deltaX = mousePosition.x - tabRect.right + 20;
+			else if (tabRect.left > mousePosition.x)
+				deltaX = mousePosition.x - tabRect.left - 20;
+			fDesktop->MoveWindowBy(fWindow, deltaX, 0);
+		} else {
+			// verify mouse stays on the border
+			float deltaX = 0;
+			float deltaY = 0;
+			BRect newFrame = fWindow->Frame();
+			if (x != 0 && mousePosition.x > frame.left
+				&& mousePosition.x > newFrame.right) {
+				deltaX = mousePosition.x - newFrame.right;
+				if (mousePosition.x > frame.right)
+					deltaX -= mousePosition.x - frame.right;
+			}
+			if (y != 0 && mousePosition.y > frame.top
+				&& mousePosition.y > newFrame.bottom) {
+				deltaY = mousePosition.y - newFrame.bottom;
+				if (mousePosition.y > frame.bottom)
+					deltaY -= mousePosition.y - frame.bottom;
+			}
+
+			fDesktop->MoveWindowBy(fWindow, deltaX, deltaY);
+		}
+	}
 }
