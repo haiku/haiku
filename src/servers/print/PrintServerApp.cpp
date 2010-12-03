@@ -437,7 +437,7 @@ PrintServerApp::CreatePrinter(const char* printerName, const char* driverName,
 		} else {
 			info.SetTo(B_TRANSLATE(
 				"A printer with that name already exists, "
-				"but its not usable at all! Replace?"));
+				"but it's not usable at all! Replace?"));
 		}
 
 		if (info.Length() != 0) {
