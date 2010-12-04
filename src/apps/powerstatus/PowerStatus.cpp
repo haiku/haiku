@@ -79,9 +79,10 @@ PowerStatus::ReadyToRun()
 		isInstalled = deskbar.HasItem(kDeskbarItemName);
 	}
 
-	if (isDeskbarRunning && !isInstalled) {
-		BAlert* alert = new BAlert("", "Do you want PowerStatus to live in the Deskbar?",
-			"Don't", "Install", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+	if (isDeskbarRunning && !isInstalled) {		
+		BAlert* alert = new BAlert("", "You can run PowerStatus in a window "
+			"or install it in Deskbar's tray.", "Run in window",
+			"Install in Deskbar", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->SetShortcut(0, B_ESCAPE);
 
 		if (alert->Go()) {
