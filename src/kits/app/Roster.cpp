@@ -2261,7 +2261,7 @@ BRoster::_LaunchApp(const char* mimeType, const entry_ref* ref,
 		// find the app
 		entry_ref appRef;
 		char signature[B_MIME_TYPE_LENGTH];
-		status_t error = _ResolveApp(mimeType, docRef, &appRef, signature,
+		error = _ResolveApp(mimeType, docRef, &appRef, signature,
 			&appFlags, &wasDocument);
 		DBG(OUT("  find app: %s (%lx)\n", strerror(error), error));
 		if (error != B_OK)
