@@ -166,7 +166,7 @@ LinkProtocol::Bind(const sockaddr* address)
 	sockaddr_dl& linkAddress = *(sockaddr_dl*)address;
 
 	if (linkAddress.sdl_type != 0) {
-		fBoundType = B_NET_FRAME_TYPE(linkAddress.sdl_type, 
+		fBoundType = B_NET_FRAME_TYPE(linkAddress.sdl_type,
 			linkAddress.sdl_e_type);
 		// Bind to the type requested - this is needed in order to
 		// receive any buffers
@@ -181,6 +181,9 @@ LinkProtocol::Bind(const sockaddr* address)
 
 	fBoundToDevice = boundTo;
 	socket->bound_to_device = boundTo->device->index;
+
+	memcpy(&socket->address, address, sizeof(struct sockaddr_storage));
+	socket->address.ss_len = sizeof(struct sockaddr_storage);
 
 	return B_OK;
 }
@@ -198,6 +201,7 @@ LinkProtocol::Unbind()
 	put_device_interface(fBoundToDevice);
 
 	socket->bound_to_device = 0;
+	socket->address.ss_len = 0;
 	return B_OK;
 }
 
@@ -217,7 +221,7 @@ LinkProtocol::MTU()
 status_t
 LinkProtocol::SocketStatus(bool peek) const
 {
-	if (fMonitoredDevice == NULL)
+	if (fMonitoredDevice == NULL && !IsBound())
 		return B_DEVICE_NOT_FOUND;
 
 	return LocalDatagramSocket::SocketStatus(peek);
@@ -290,7 +294,7 @@ user_request_get_device_interface(void* value, struct ifreq& request,
 //	#pragma mark - net_protocol module
 
 
-static net_protocol* 
+static net_protocol*
 link_init_protocol(net_socket* socket)
 {
 	LinkProtocol* protocol = new (std::nothrow) LinkProtocol(socket);
@@ -580,7 +584,7 @@ link_read_avail(net_protocol* protocol)
 }
 
 
-static struct net_domain* 
+static struct net_domain*
 link_get_domain(net_protocol* protocol)
 {
 	return sDomain;
