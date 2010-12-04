@@ -153,11 +153,11 @@ ethernet_frame_send_data(net_datalink_protocol* protocol, net_buffer* buffer)
 	ether_header &header = bufferHeader.Data();
 
 	header.type = htons(source.sdl_e_type);
-	memcpy(header.source, source.sdl_data, ETHER_ADDRESS_LENGTH);
+	memcpy(header.source, LLADDR(&source), ETHER_ADDRESS_LENGTH);
 	if ((buffer->flags & MSG_BCAST) != 0)
 		memcpy(header.destination, kBroadcastAddress, ETHER_ADDRESS_LENGTH);
 	else
-		memcpy(header.destination, destination.sdl_data, ETHER_ADDRESS_LENGTH);
+		memcpy(header.destination, LLADDR(&destination), ETHER_ADDRESS_LENGTH);
 
 	bufferHeader.Sync();
 		// make sure the framing is already written to the buffer at this point
