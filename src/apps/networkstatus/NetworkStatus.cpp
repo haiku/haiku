@@ -151,9 +151,10 @@ NetworkStatus::ReadyToRun()
 	}
 
 	if (isDeskbarRunning && !isInstalled) {
-		BAlert* alert = new BAlert("", B_TRANSLATE("Do you want NetworkStatus "
-			"to live in the Deskbar?"), B_TRANSLATE("Don't"),
-			B_TRANSLATE("Install"), NULL, B_WIDTH_AS_USUAL,	B_WARNING_ALERT);
+		BAlert* alert = new BAlert("", B_TRANSLATE("You can run NetworkStatus "
+			"in a window or install it in Deskbar's tray."),
+			B_TRANSLATE("Run in window"), B_TRANSLATE("Install in Deskbar"),
+			NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->SetShortcut(0, B_ESCAPE);
 
 		if (alert->Go() == 1) {
