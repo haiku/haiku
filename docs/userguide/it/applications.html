@@ -54,41 +54,41 @@
 
 <h1>Applicazioni</h1>
 
-<p>Prima di esaminare tutte le applicazioni che offre Haiku, vediamo in dettaglio come installare e rimuovere programmi scaricati dalla rete, per esempio da uno dei siti citati nella pagina di <a href="../../welcome/welcome_it.html#software">Benvenuto</a>.</p>
-<div class="box-info">Dovresti estrarre ed installare gli archivi solo da Haiku. Se per esempio estrai un pacchetto da Linux o da Windows e copi la cartella su Haiku perderai tutti gli attributi vitali per il sistema, poiché normalmente i meta-dati non sono gestiti da questi sistemi operativi.</div>
+<p>Prima di esaminare tutte le applicazioni che offre Haiku, vediamo in dettaglio come installare e rimuovere i programmi scaricati dalla rete, per esempio da uno dei siti citati nella pagina di <a href="../../welcome/welcome_it.html#software">Benvenuto</a>.</p>
+<div class="box-info">In genere bisogna estrarre ed installare gli archivi solo da Haiku. Se un pacchetto viene estratto da Linux o da Windows e la sua cartella viene copiata su Haiku verranno persi tutti gli attributi vitali poiché normalmente questi sistemi operativi non gestiscono i meta dati.</div>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="install" name="install">Installare le applicazioni</a></h2>
 <p>Il software per Haiku, è sempre distribuito sotto forma di archivio. La maggior parte delle volte si tratta di un file ZIP, mentre alcuni vecchi pacchetti per BeOS sono nel formato PKG di Sofware Valet. Software Valet era in grado di eseguire automaticamente degli script di installazione, quindi (su Haiku) dopo un doppio click bisogna semplicemente scegliere una cartella di installazione ed il programma si preoccuperà di fare tutto il lavoro.<br />
-Se si tratta di un archivio in formato ZIP, dopo aver effettuato un doppio click si aprirà <span class="app">Expander</span> dove potrai estrarlo ed impostare la destinazione. Come spiegato nel capitolo <a href="filesystem-layout.html">Filesystem layout</a>, questa destinazione potrebbe essere :</p>
+Se si tratta di un archivio in formato ZIP, effettuando un doppio click si aprirà <span class="app">Expander</span> dove è possibile impostare la destinazione ed infine estrarlo. Come spiegato nel capitolo <a href="filesystem-layout.html">Filesystem layout</a>, questa destinazione può essere :</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td><span class="path">/boot/common/apps/</span></td><td>   </td><td> per applicazioni disponibili a tutti gli utenti</td></tr>
 <tr><td><span class="path">/boot/home/apps/</span></td><td>   </td><td> per applicazioni disponibili solo al tuo utente</td></tr>
 </table>
-<p>Questa distinzione diventerà rilevante non appena Haiku otterrà il supporto per la multiutenza (ovviamente).
+<p>Questa distinzione naturalmente diventerà rilevante non appena Haiku otterrà il supporto per la multiutenza.
 
 </p>
-<p>Quando l'archivio è stato estratto, dovresti guardare il contenuto della cartella appena creata. Spesso potresti trovare dei file ReadMe ed altra documentazione utile.</p>
-<p>Alcuni programmi hanno bisogno di una successiva configurazione. Ad esempio, <a href="tracker-add-ons.html"> gli Add-On del Tracker </a>, <a href="preferences/datatranslations.html">i Translator</a> o altri componenti che servono a migliorare il sistema, devono essere inseriti nelle giuste cartelle. Altrimenti potresti trovare un piccolo script (spesso con estensione<span class="cli">.sh</span>) come <span class="cli">install</span> il quale con un semplice doppio click si occuperà di fare tutto il lavoro.<br />
-A volte troverai delle cartelle che puntano alla corretta destinazione, come ad esempio "<span class="cli">drag [filename] here...</span>". Così, seguendo questa semplice istruzione il file verrà installato.</p>
-<p>La maggior parte delle volte, naturalmente, non sarà necessario niente di tutto questo, ti basterà semplicemente estrarre l'archivio.
+<p>Quando l'archivio è stato estratto, si consiglia di guardare all'interno della cartella appena creata. Di solito è possibile trovare dei file ReadMe ed altra documentazione utile.</p>
+<p>Alcuni programmi hanno bisogno di una successiva configurazione. Ad esempio, <a href="tracker-add-ons.html"> gli Add-On del Tracker</a>, <a href="preferences/datatranslations.html">i Translator</a> e gli altri componenti utili ad estendere il sistema, devono essere inseriti nelle cartelle corrette. In alternativa è possibile trovare uno script (spesso con estensione<span class="cli">.sh</span>, per esempio <span class="cli">install</span>) che con un semplice doppio click si occupa di di installare il programma.<br />
+E' anche possibile trovare delle cartelle che puntano alla destinazione corretta, come "<span class="cli">drag [filename] here...</span>". In questo caso è sufficiente trascinare il file nella cartella.</p>
+<p>Naturalmente, estraendo l'archivio la maggior parte delle volte non è necessario niente di tutto questo.
 <br />
-i Capitoli <a href="deskbar.html">La Deskbar</a> oppure <a href="desktop-applets/launchbox.html">LaunchBox</a> spiegano come aggiungere dei comandi rapidi alla nuova applicazione installata.</p>
+I Capitoli <a href="deskbar.html">La Deskbar</a> oppure <a href="desktop-applets/launchbox.html">LaunchBox</a> spiegano come aggiungere dei comandi rapidi alla nuova applicazione.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="uninstall" name="uninstall">Rimuovere le Applicazioni</a></h2>
 <p>Se l'installazione è stata fatta con uno script automatico, è possibile che ci sia anche uno script di rimozione. In quel caso, basterà semplicemente eseguirlo con un doppio click.
 <br />
-Altrimenti, per disinstallare un'applicazione, basterà semplicemente rimuovere la sua cartella di installazione.</p>
-<p>Facendo così, ovviamente, le possibili configurazioni presenti in <span class="path">~/config/settings</span> non verranno cancellate. Potrebbe essere utile se vuoi mantenere la configurazione in vista di una possibile reinstallazione del programma. Inoltre, (quando l'installazione li fornisce) non vengono cancellati i file del tipo "<span class="cli">drag [filename] here...</span>".</p>
-<p>Un metodo per ottenere velocemente tutti i file dell'applicazione, è quello di fare una ricerca veloce di una parte significativa del suo nome. La query mostrerà il binario dell'applicazione, la sua cartella di installazione, le sue impostazioni e se possibile i collegamenti nella Deskbar ecc. Semplicemente, seleziona i file rilevanti e cancellali.</p>
+Altrimenti, è possibile disinstallare un'applicazione, rimuovendo la sua cartella di installazione.</p>
+<p>Ovviamente, in questo modo le possibili configurazioni presenti in <span class="path">~/config/settings</span> non vengono cancellate. Può essere utile se l'utente vuole mantenere la configurazione in vista di una possibile reinstallazione del programma. Inoltre, (quando l'installazione li fornisce) i file presenti nelle cartelle del tipo "<span class="cli">drag [filename] here...</span>" non vengono eliminati.</p>
+<p>Un metodo per ottenere velocemente tutti i file di un'applicazione, è quello di fare una veloce ricerca usando una parte rilevante del suo nome. La query mostrerà il binario dell'applicazione, la sua cartella di installazione, le sue impostazioni e se possibile i collegamenti nella Deskbar ecc. Sarà sufficiente selezionare tutti i file rilevanti ed eliminarli.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="list-of-apps" name="list-of-apps">Le Applicazioni di Haiku</a></h2>
-<p>Haiku viene fornito con un set di applicazioni per lo più piccole ed essenziali. Puoi trovarle in <span class="path">/boot/system/apps/</span> oppure <span class="path">/boot/common/apps/</span>. Le applicazioni che non vengono avviate con un doppio click su di un file (ad esempio ShowImage per i file di immagini) possono essere trovate nel menu <span class="menu">Applicazioni</span> della Deskbar.</p>
+<p>Haiku viene fornito con un set di applicazioni per lo più piccole ed essenziali. Puoi trovarle in <span class="path">/boot/system/apps/</span> oppure in <span class="path">/boot/common/apps/</span>.  Possono essere trovate nel menu <span class="menu">Applicazioni</span> della Deskbar le applicazioni che solitamente non vengono avviate tramite il doppio click su di un file (ad esempio ShowImage per i file di immagini).</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td style="width:24px;"><img src="../images/apps-images/activitymonitor-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/activitymonitor.html">ActivityMonitor</a></td><td style="width:10px;"> </td>
 		<td valign="top">Uno strumento per tenere sotto controllo risorse come CPU e uso della memoria.</td></tr>
@@ -121,7 +121,7 @@ Altrimenti, per disinstallare un'applicazione, basterà semplicemente rimuovere 
 	<tr><td style="width:24px;"><img src="../images/apps-images/midiplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/midiplayer.html">MidiPlayer</a></td><td> </td>
 		<td valign="top"><span style="color:silver">Un player per file MIDI. [<i>mancante</i>]</span></td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/packageinstaller-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/packageinstaller.html">PackageInstaller</a></td><td> </td>
-		<td valign="top"><span style="color:silver">Installer per i pacchetti PKG di BeOS. [<i>still missing</i>]</span></td></tr>
+		<td valign="top"><span style="color:silver">Installer per i pacchetti PKG di BeOS. [<i>mancante</i>]</span></td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/people-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/people.html">People</a></td><td> </td>
 		<td valign="top">Un gestore dei contatti.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/poorman-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/poorman.html">PoorMan</a></td><td> </td>
@@ -147,15 +147,16 @@ Altrimenti, per disinstallare un'applicazione, basterà semplicemente rimuovere 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="cli-apps" name="cli-apps">Le applicazioni su riga di comando di Haiku</a></h2>
-<p>Oltre ai normali strumenti da riga di comando che sono presenti nella bash o che sono necessari per essere compatibili con lo standard POSIX, ci sono alcune applicazioni da riga di comando specifiche di Haiku di cui è giusto parlare. Questi comandi sono spesso utili per creare script, si veda comunque il capitolo <a href="bash-scripting.html">Bash e Scripting</a>.</p>
+<p>Oltre ai normali strumenti da riga di comando presenti nella bash o a quelli necessari per essere compatibili con lo standard POSIX, è giusto parlare di alcune applicazioni da riga di comando specifiche di Haiku. Questi comandi sono spesso utili per creare script, è consigliabile comunque leggere il capitolo <a href="bash-scripting.html">Bash e Scripting</a>.</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-		<tr><td style="width:24px;"><img src="../images/apps-images/cli-app-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/cli-apps.html">Applicazioni da riga di comando</a></td><td> </td></tr>
+		<tr><td style="width:24px;"><img src="../images/apps-images/cli-app-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/list-cli-apps.html">Lista di tutte le applicazioni da riga di comando</a></td><td> </td></tr>
+		<tr><td style="width:24px;"><img src="../images/apps-images/cli-app-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/cli-apps.html">Haiku-specific commandline applications</a></td><td> </td></tr>
 </table>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="list-of-bundled-apps" name="list-of-bundled-apps">Applicazioni incluse</a></h2>
-<p>Oltre ai programmi elencati sopra, che sono tutti mantenuti dal progetto Haiku, ci sono alcune applicazioni essenziali incluse di default in un sistema Haiku. Per queste applicazioni i bug e le richieste di feature devono essere inoltrate al loro mantainer.</p>
+<p>Oltre ai programmi elencati qui sopra, tutti mantenuti dal progetto Haiku, ci sono alcune applicazioni essenziali incluse di default in un sistema Haiku. Per queste applicazioni eventuali bug e richieste di feature devono essere inoltrate al loro mantainer.</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 		<tr><td style="width:24px;"><img src="../images/apps-images/bepdf-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/bepdf.html">BePDF</a></td><td style="width:10px;"> </td>
 		<td valign="top">Un visualizzatore di file  <acronym title="Portable Document Format">PDF</acronym>.</td></tr>

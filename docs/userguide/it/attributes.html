@@ -65,7 +65,7 @@
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="attributes-tracker" name="attributes-tracker">Gli Attributi nel Tracker</a></h2>
 <p>Gli attributi sono visualizzati in modo simile a un database o a un foglio di calcolo. Usando il Tracker potrai scegliere quali attributi visualizzare (colonne) ed ordinare di conseguenza la lista dei file (righe).</p>
-<p>Per fare questo, apri una finestra del Tracker, clicca nel menu <span class="menu">Attributes</span> e scegli l'attributo che desideri visualizzare. Oppure, semplicemente clicca con il tasto destro su una colonna e segna le voci nel menu contestuale. È possibile riordinare le colonne facendo un semplice drag&amp;drop della colonna. Spostare una colonna fuori da una finestra, è un modo veloce per eliminare le colonne indesiderate.</p>
+<p>Per farlo, apri una finestra del Tracker, clicca nel menu <span class="menu">Attributi</span> e scegli l'attributo che desideri visualizzare. Oppure, semplicemente clicca con il tasto destro su una colonna e segna le voci nel menu contestuale. È possibile riordinare le colonne facendo un semplice drag&amp;drop della colonna. Spostare una colonna fuori da una finestra, è un modo veloce per eliminare le colonne indesiderate.</p>
 <p>Per ridimensionare automaticamente una colonna nella sua larghezza ottimale, è sufficiente fare un doppio click nella linea tra due attributi.</p>
 <p>Per cambiare l'ordinamento da crescente a decrescente, è sufficiente cliccare su una colonna. Puoi stabilire un ordinamento secondario premendo il tasto <span class="key">SHIFT</span> mentre clicchi su una colonna. Puoi ordinare i file People per società e in quell'ordinamento, puoi riordinare tutto per nome, per esempio. Guarda gli screenshot sopra come esempio. L'ordinamento secondario è segnato da un indicatore di colore più chiaro accanto al titolo.</p>
 <p>Modificare questi attributi è semplice come rinominare un file: Ad esempio cliccando su una voce, o premendo <span class="key">ALT</span> <span class="key">E</span> muovendosi attraverso gli attributi con <span class="key">TAB</span> e <span class="key">SHIFT</span> <span class="key">TAB</span>. Premendo <span class="key">ESC</span> si abbandona la modalità di modifica senza applicare alcun cambiamento.</p>
@@ -81,7 +81,7 @@
 <a id="listattr" name="listattr">listattr</a></h3>
 <p><span class="cli">listattr</span> elenca gli attributi di un file, ma non mostra il loro contenuto.</p>
 <pre>uso: listattr 'nomefile' ['nomefile' ...]</pre>
-<p>Dal nostro precedente screenshot di esempio:</p>
+<p>Dal precedente screenshot di esempio:</p>
 <pre class="terminal"> ~/people -&gt;listattr Clara\ Botters
 File: Clara Botters
    Type         Size                 Name
@@ -107,10 +107,10 @@ MIME String         21  "BEOS:TYPE"
     Raw Data         20  "_trk/pinfo_le"
  
 131 bytes total in attributes.</pre>
-<p>Besides all the "<tt>META:*</tt>" attributes that hold the contact's information, there are two attributes that are managed by the system:</p>
+<p>Oltre a tutti gli attributi "<tt>META:*</tt>" che contengono le informazioni del contatto, ci sono due attributi che sono gestiti dal sistema:</p>
 <ul>
-<li><p><tt>BEOS:TYPE</tt> holds the file type as a <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> string, here "<tt>application/x-person</tt>". It determines the default icon and the application that opens the file when you e.g. double click it.</p></li>
-<li><p>"<tt>_trk/pinfo_le</tt>" is the attribute with which Tracker keeps track of a file's icon position.</p></li></ul>
+<li><p><tt>BEOS:TYPE</tt> gestisce il tipo di file come una stringa di tipo <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym>, in questo caso "<tt>application/x-person</tt>". Determina l'icona predefinita e l'applicazione che apre quel file, per esempio quando lo si esegue con un doppio click.</p></li>
+<li><p>"<tt>_trk/pinfo_le</tt>" è l'attributo con cui il Tracker tiene traccia della posizione dell'icona associata al file.</p></li></ul>
 <div class="box-info">Note the backslash after "Clara". In Terminal you have to "escape" special characters like <tt>'"*\$?!</tt>. The space between "Clara" and "Botters" is also one of those. Therefore the backslash is really in front of the space character, and not after "Clara".</div>
 
 <h3>
@@ -139,24 +139,25 @@ Clara Botters : string : Whelton</pre>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="rmattr" name="rmattr">rmattr</a></h3>
-<p><span class="cli">rmattr</span> completely removes an attribute from a file.</p>
+<p><span class="cli">rmattr</span> rimuove completamente un attribuo da un file.</p>
 
 <pre>usage: rmattr [-p] attr filename1 [filename2...]
          'attr' is the name of an attribute of the file
          If '-p' is specified, 'attr' is regarded as a pattern.</pre>
-<p>Though in all practicality it would be enough to just not fill the "Fax" attribute, you can completely remove it from Clara's file by typing:</p>
+<p>Anche se sarebbe abbastanza semplice non riempire l'attributo "Fax", puoi rimuoverlo completamente dal file di Clara digitando:</p>
 <pre class="terminal"> ~/people -&gt;rmattr META:fax Clara\ Botters</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="copyattr" name="copyattr">copyattr</a></h3>
-<p><span class="cli">copyattr</span> copies attributes from one or more files to another. By default, the actual contents of the file is <b>not</b> copied.</p>
+<p><span class="cli">copyattr</span> copia gli attributi da uno o più file ad un altro. Di default, il contenuto del file <b>non</b> viene copiato.</p>
 <pre>Usage: copyattr &lt;options&gt; &lt;source&gt; [ ... ] &lt;destination&gt;</pre>
 
-<p>If you do want to copy the attributes plus the data of the file itself, you can add the option "<span class="cli">-d</span>" or "<span class="cli">--data</span>".</p>
+<p>Se vuoi copiare gli attributi del file, più i contenuti del file stesso, è semplicemente necessario aggiungere l'opzione "<span class="cli">-d</span>" o "<span class="cli">--data</span>".</p>
 
 <p><br /></p>
-<p>More information on these commands and their options can be found by typing the command name followed by "<span class="cli">-h</span>" or "<span class="cli">--help</span>".</p>
+<p>
+Ulteriori informazioni su questi comandi e le loro opzioni possono essere trovati digitando il nome del comando seguito da "<span class="cli">-h</span>" oppure "<span class="cli">--help</span>".</p>
 
 </div>
 </div>

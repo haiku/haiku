@@ -4,10 +4,11 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2010, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Maciej Bałuta
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Vasco Costa
@@ -49,6 +50,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h2><img src="../../images/desktop-applets-images/networkstatus-icon_64.png" alt="networkstatus-icon_64.png" width="64" height="64" />NetworkStatus</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
@@ -56,7 +58,21 @@
 <tr><td>Localização:</td><td></td><td><span class="path">/boot/system/apps/NetworkStatus</span></td></tr>
 <tr><td>Definições:</td><td></td><td><i>nenhuma</i></td></tr>
 </table>
-<p>Ainda não há documentação. Se deseja contribuir, por favor anuncie-o na <a href="http://www.freelists.org/list/haiku-doc">lista de correio de Documentação</a> para evitar duplicação.</p>
+<p>NetworkStatus shows the status of your network connections. If it's not yet running, launching the applet will ask if it should open in window mode or live in the Deskbar tray. In window mode you're able to resize the icon by resizing the window and use the <a href="../gui.html#replicants">Replicant</a> handle to drag it to the Desktop.<br />
+Wherever it's installed, it's operated via a right-click context menu.</p>
+<p><img src="../images/networkstatus-images/applet.png" alt="NetworkStatus applet" /><br />
+The first section contains network devices' names with their state. Below are wireless networks found by the first wireless adapter. You can <span class="menu">Open network preferences...</span> to change your <a href="../preferences/network.html">network configuration</a> or <span class="menu">Quit</span> the applet.</p>
+<p><img src="../images/networkstatus-images/status.png" alt="NetworkStatus - status of the interface" /><br />
+Clicking on a network device's name in the context menu shows its IP, broadcast and netmask addresses.</p>
+
+<h2>Status icons</h2>
+<table summary="status icons" border="0" cellspacing="0" cellpadding="2">
+	<tr><td><img src="../images/networkstatus-images/icon-ready.png" /></td><td style="width:15px;"></td><td>Ready</td><td>Link is established.</td></tr>
+	<tr><td><img src="../images/networkstatus-images/icon-connecting.png" /></td><td></td><td>Configuring</td><td>Connecting in progress.</td></tr>
+	<tr><td><img src="../images/networkstatus-images/icon-nosettings.png" /></td><td></td><td>No stateful configuration</td><td>Some settings are missing (check <a href="../preferences/network.html">IP configuration</a>).</td></tr>
+	<tr><td><img src="../images/networkstatus-images/icon-noconnection.png" /></td><td></td><td>No link</td><td>There is no physical connection (probably the network cable is not connected and wireless networks are unavailable).</td></tr>
+	<tr><td><img src="../images/networkstatus-images/icon-nodevices.png" /></td><td></td><td>-</td><td>There are no network adapters available (if you are sure that at least one is connected, there are probably no drivers yet).</td></tr>
+</table>
 
 </div>
 </div>

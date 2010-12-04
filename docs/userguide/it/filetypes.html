@@ -11,6 +11,7 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Andrea
+ *		Barret
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -52,8 +53,8 @@
 
 <h1>Filetypes</h1>
 
-<p>Diversamente da Windows, Haiku non si basa sull'estensione a 3 lettere per un tipo di file (per esempio .txt, .jpg, .mp3). Questo metodo è solamente un ripiego in caso di malfunzionamenti. Haiku usa lo standard <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> come è anche usato su internet</p>
-<div class="box-info">Nonostante non ci sia nessun motivo per utilizzare le estensioni dei file in Haiku, ricordatevi di utilizzarle qualora si desidera condividere file con utenti di sistemi operativi diversi, ad esempio via email, per un upload su un server o tramite scambio di una pennetta USB. In caso contrario il sistema potrebbe non riconoscere il file.</div>
+<p>Diversamente da Windows, Haiku non si basa sull'estensione a 3 lettere per un tipo di file (per esempio .txt, .jpg, .mp3). Questo metodo è solamente un ripiego in caso di malfunzionamenti. Haiku usa lo standard <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> per i tipi allo stesso modo di internet.</p>
+<div class="box-info">Nonostante non ci sia nessun motivo per utilizzare le estensioni dei file in Haiku, bisogna ricordare di utilizzarle qualora si desidera condividere file con utenti di sistemi operativi diversi, ad esempio via email, per un upload su un server o tramite scambio di una pennetta USB. In caso contrario il sistema potrebbe non riconoscere il file.</div>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="specific-file" name="specific-file">Impostare il tipo di file per uno specifico file</a></h2>
@@ -63,23 +64,23 @@
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a name="filetype" id="filetype">File Type</a></h3>
-<p>Il file poco sopra è in formato PNG, con la stringa MIME image/png. Diciamo che si conosca che esso non sia un file PNG ma bensì una GIF. Si può modificare sia inserendo la corretta stringa MIME a mano, sia attraverso uno dei due pulsanti sotto la casella di testo:</p>
+<p>Il file qui sopra è in formato PNG, con la stringa MIME image/png. Immaginiamo che si conosca che esso non è un file PNG ma bensì un file GIF. Si può modificare sia inserendo la corretta stringa MIME a mano, sia attraverso uno dei due pulsanti sotto la casella di testo:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="button">Select...</span></td><td> </td><td>Mostra una gerarchia di file dove puoi navigare sino a giungere a <tt>image | GIF Image</tt>.</td></tr>
-<tr><td><span class="button">Same as...</span></td><td> </td><td>apre una finestra di dialogo in cui scegliere qualsiasi file che abbia già il tipo di file che stai cercando.</td></tr>
+<tr><td><span class="button">Seleziona...</span></td><td> </td><td>Mostra una gerarchia di file dove puoi navigare sino a giungere a <tt>image | GIF Image</tt>.</td></tr>
+<tr><td><span class="button">Uguale a...</span></td><td> </td><td>apre una finestra di dialogo in cui scegliere qualsiasi file che abbia già il tipo di file che stai cercando.</td></tr>
 </table>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="preferred-app" name="preferred-app">L'applicazione preferita</a></h3>
-<p>Questo menu pop-up mostra un elenco di tutte le applicazioni in grado di gestire questo tipo di file in particolare. Da qui si può scegliere quale programma debba aprire il file specifico dopo averci cliccato sopra due volte. Si potrebbe, ad esempio cambiare l'applicazione preferita di un file HTML dal browser in un editor di testo per lavorarci sopra. Ogni altro file HTML si apre ancora attraverso il browser, solamente questo file si aprirà con il vostro editor di testo.</p>
+<p>Questo menu pop-up mostra un elenco di tutte le applicazioni in grado di gestire questo tipo di file in particolare. Da qui è possibile scegliere quale programma debba aprire il file specifico dopo averci cliccato sopra due volte. Si potrebbe, ad esempio cambiare l'applicazione preferita di un file HTML dal browser in un editor di testo per lavorarci sopra. Ogni altro file HTML si apre ancora attraverso il browser, solamente questo file si aprirà con il vostro editor di testo.</p>
 
-<p>La <span class="menu">Default Application</span> è l'applicazione impostata globalmente per questo tipo di file. Se non c'è il programma desiderato da associare al file tra quelli proposti nel menu a comparsa, si può utilizzare i pulsanti <span class="button">Select...</span> e <span class="button">Same As...</span> che fanno la medesima cosa descritta poco sopra.</p>
+<p>La <span class="menu">Default Application</span> è l'applicazione impostata globalmente per questo tipo di file. Se non c'è il programma desiderato da associare al file tra quelli proposti nel menu a comparsa, si possono utilizzare i pulsanti <span class="button">Select...</span> e <span class="button">Same As...</span> che fanno la medesima cosa descritta poco fa.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="icon" name="icon">L'icona</a></h3>
-<p>Se vi state chiedendo come mai l'icona in alto a destra sia vuota: Le icone normalmente sono ereditate dal filetype di default per il sistema. Si può aprire il <span class="app">Filetype Add-On</span> di un file che contiene un icona e utilizzare il drag&amp;drop sino dentro l'icona del file. Oppure cliccando due volte sull'icona e si crea o si modifica la nostra icona. Per maggiori informazioni sulle icone e su come creare la propria, dai un' occhiata al topic <a href="applications/icon-o-matic.html">Icon-O-Matic</a>.</p>
+<p>Se vi state chiedendo come mai l'icona in alto a destra sia vuota: Le icone normalmente sono ereditate dal filetype di default del sistema. Si può aprire l'<span class="app">Add-On Filetype </span> di un file che contiene un'icona ed utilizzare il drag&amp;drop fino al quadrato che mostra l'icona del file. Oppure cliccandoci due volte è possibile creare o modificare la nostra icona. Per maggiori informazioni sulle icone e su come creare la propria, consultare il capitolo <a href="applications/icon-o-matic.html">Icon-O-Matic</a>.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -89,11 +90,11 @@
 <p>Nella parte superiore, al posto della stringa MIME, apparirà la firma dell'applicazione. Attraverso essa il sistema trova dove è installato il programma.</p>
 <p>Al di sotto di essa ci sono diverse opzioni, per controllare il comportamento dell'applicazione:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Single Launch</span></td><td> </td><td>Una sola istanza dell'applicazione può essere in esecuzione per ogni tipo di file eseguibile. Se hai due copie di una determinata applicazione, tuttavia, possono correre a fianco.</td></tr>
-<tr><td><span class="menu">Multiple Launch</span></td><td> </td><td>Più istanza di un applicazione possono essere in esecuzione.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Exclusive Launch</span></td><td> </td><td>Una e una sola istanza con la firma di quell'applicazione è consentita di essere in esecuzione.</td></tr>
-<tr><td><span class="menu">Args Only</span></td><td> </td><td>Indica che l'applicazione non risponde ai messaggi.</td></tr>
-<tr><td><span class="menu">Background App</span></td><td> </td><td>L'applicazione non apparirà in in <a href="twitcher.html">Twitcher</a> o nella lista delle applicazioni sulla deskbar.</td></tr>
+<tr><td><span class="menu">Istanza unica</span></td><td> </td><td>Una sola istanza dell'applicazione può essere in esecuzione per ogni tipo di file eseguibile. Tuttavia se ci sono due copie di una determinata applicazione, possono funzionare assieme.</td></tr>
+<tr><td><span class="menu">Istanze multiple</span></td><td> </td><td>Più istanza di un applicazione possono essere in esecuzione.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Istanza esclusiva</span></td><td> </td><td>Una e una sola istanza con la firma di quell'applicazione è consentita di essere in esecuzione.</td></tr>
+<tr><td><span class="menu">Solo argomenti</span></td><td> </td><td>Indica che l'applicazione non risponde ai messaggi.</td></tr>
+<tr><td><span class="menu">Sfondo</span></td><td> </td><td>L'applicazione non apparirà nel <a href="twitcher.html">Twitcher</a> o nella lista delle applicazioni sulla deskbar.</td></tr>
 </table>
 <p>Poi c'è l'elenco dei tipi di file supportati. E' possibile aggiungere (e rimuovere) tipi di file se ritieni che l'applicazione sia in grado di gestirli. Di conseguenza l'applicazione apparirà nel menu delle applicazioni preferite o nel menu contestuale del tracker: <span class="menu">Open with...</span> quando si clicca con il tasto destro su un determinato file.</p>
 <p>In fondo ci sono le informazioni sulla versione dell'eseguibile e del suo copyright. Come anche la firma dell'applicazione, esse vengono scritte dall'autore dell'applicazione e non devono essere modificate.</p>
@@ -101,9 +102,9 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="filetypes-preferences" name="filetypes-preferences">Impostazioni globali con le preferenze del filetype</a></h2>
-<p>Le preferenze del <span class="app">FileTypes</span> non si occupano dei singoli file, ma delle impostazioni globali per ogni tipo di file. Si può modificare le icone di default e le applicazioni preferite, o aggiungere, rimuovere e modificare le proprietà dell'intero tipo di file. Si può anche creare il vostro tipo di file completamente da zero. </p>
+<p>La preflet <span class="app">FileTypes</span> non si occupa dei singoli file, ma delle impostazioni globali per ogni tipo di file. Si possono modificare le icone di default e le applicazioni preferite, o aggiungere, rimuovere e modificare le proprietà dell'intero tipo di file. E' possibile anche creare un nuovo tipo completamente da zero. </p>
 <p>Tutti i tipi di file e le loro configurazioni sono conservati in <span class="path">/boot/home/config/settings/beos_mime/</span>. Prima di iniziare a sperimentare, può essere prudente fare un backup della cartella...</p>
-<p>Per saperne di più sulle preferenze dei <span class="app">FileTypes</span>, dai un' occhiata al documento: <a href="workshop-filetypes+attributes.html">Filetypes, Attributes, Index and Queries</a>.</p>
+<p>Per saperne di più sulle preferenze dei <span class="app">FileTypes</span>, consultare il documento: <a href="workshop-filetypes+attributes.html">Filetypes, Attributes, Index and Queries</a>.</p>
 
 </div>
 </div>

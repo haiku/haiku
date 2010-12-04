@@ -9,12 +9,14 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Kentaro Ozeki
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Keymap</title>
+	<title>キーマップ</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -39,9 +41,9 @@
 <li><a href="../../en/preferences/keymap.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="keyboard.html">Keyboard</a> 
+ «  <a href="keyboard.html">キーボード</a> 
 ::  <a href="../preferences.html" class="uplink">Preferences</a> 
-::  <a href="locale.html">Locale</a>  »
+::  <a href="locale.html">ロケール</a>  »
 </span></div>
 </div>
 
@@ -49,43 +51,43 @@
 <div>
 <div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h2><img src="../../images/prefs-images/keymap-icon_64.png" alt="keymap-icon_64.png" width="64" height="64" />Keymap</h2>
+<h2><img src="../../images/prefs-images/keymap-icon_64.png" alt="keymap-icon_64.png" width="64" height="64" />キーマップ</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbarメニュー:</td><td style="width:15px;"></td><td><span class="menu">設定</span></td></tr>
 <tr><td>場所:</td><td></td><td><span class="path">/boot/system/preferences/Keymap</span></td></tr>
-<tr><td>設定ファイル:</td><td></td><td><span class="path">~/config/settings/Keymap/*</span> - Location of user modified keymaps.<br />
+<tr><td>設定ファイル:</td><td></td><td><span class="path">~/config/settings/Keymap/*</span> - ユーザーが変更したキーマップの場所<br />
 <span class="path">~/config/settings/Key_map</span></td></tr>
 </table>
 <p><br /></p>
 <img src="../images/prefs-images/keymap.png" alt="keymap.png" />
-<p>To the right, the Keymap window shows a representation of your keyboard. When you press a key, the corresponding key is darkened and the assigned symbol is entered into the <i>Sample and Clipboard</i> text field at the bottom. From there you can also copy and paste it into a document.<br />
-Thus, the Keymap preferences are not only for configuring your local keymap, but are also useful when looking for a special symbol used in other languages. For example, you can switch the keymap to "French", find the "ç" and copy it into your mail to François. (Though you'll find the "cedil" also in other keymaps...)</p>
-<p>Pressing modifier keys like <span class="key">SHIFT</span>, <span class="key">CONTROL</span> or <span class="key">OPTION</span> changes the displayed keyboard accordingly.</p>
+<p>キーマップウィンドウは向かって右側にあなたのキーボードの図を示します。実際のキーを押すと、対応するキーが暗くなり、割り当てられている文字や記号が下の<i>Sample and Clipboard</i>テキストフィールドに入力されます。ここからドキュメントにコピー&amp;ペーストすることもできます。<br />
+従って、キーマップの設定はローカルのキーマップを構成するだけでなく、他の言語で使われる特別な文字や記号を探すのにも役立ちます。例えば、キーマップを"French(フランス語)"に変更し、"ç"を探してFrançoisへのメールにコピーすることができます。(もっとも、他のキーマップでも"セディーユ"は見つかるでしょう)</p>
+<p><span class="key">SHIFT</span>キー、<span class="key">CONTROL</span>キーや<span class="key">OPTION</span>キーといった修飾キーを押すと、表示されるキーボードはそれに応じて変化します。 </p>
 <p>Then there are the keys that are marked with a blue background. These keys are called <i>Dead Keys</i> that can change the key you press after that. If you click on such a blue key with your mouse, those changeable keys light up yellow. Click again and everything's back to normal. Examples are é, ñ, ó or ë.</p>
-<p>Below the keyboard representation are two more options:</p>
+<p>キーボードの図の下に、さらに2つのオプションがあります: </p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Select Dead Keys</span></td><td> </td><td>for setting the above mentioned blue keys.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Switch Shortcut Key...</span></td><td> </td><td>for using the shortcut key in Windows/Linux mode, i.e. <span class="key">CONTROL</span> (normally <span class="key">CTRL</span>) or Haiku mode, i.e. <span class="key">COMMAND</span> (normally <span class="key">ALT</span>).</td></tr>
+<tr><td><span class="menu">Select Dead Keys</span>(デッドキーを選択)</td><td> </td><td>上で触れた青いキーの設定用です。</td></tr>
+<tr><td class="onelinetop"><span class="menu">Switch Shortcut Key...</span>(ショートカットキーを切り替え…)</td><td> </td><td>ショートカットキーを<span class="key">CONTROL</span> (普通<span class="key">CTRL</span>)を用いるWindows/Linuxモードで利用するか、<span class="key">COMMAND</span> (普通<span class="key">ALT</span>)を用いるHaikuモードで利用するかを切り替えます。</td></tr>
 </table>
-<p>The lists on the left offer the available pre-configured keymaps of the system, and below that, if available, user-defined maps. You can change a keymap via drag&amp;drop in the keyboard representation: a left-click-drag copies a key, a right-click-drag exchanges the two keys.<br />
-When you're done you can save the result from the menu <span class="menu">File | Save...</span>. Your modified map will only appear in the user-defined list if it's stored in <span class="path">~/config/settings/Keymap/</span>. Otherwise you'll have to manually load it via <span class="menu">File | Open...</span>.</p>
-<p>To better match the Keymap panel to your physical keyboard, there are several different settings available from the <span class="menu">Layout</span> menu.</p>
-<p>The font used in the keyboard representation is set from the <span class="menu">Font</span> menu. Note, that it may or may not contain all symbols for a specific keymap.</p>
-<p>Finally, there's a <span class="button">Revert</span> button to bring back the settings that were active when you started the Keymap preferences.</p>
+<p>左の一覧はシステムによって用意されたキーマップで、もし利用可能であれば、その下にユーザー定義のキーマップが列挙されます。画面キーボードでドラッグ&amp;ドロップしてキーマップを変更することができます。左クリックでドラッグするとキーのコピー、右クリックでドラッグするとキーの交換になります。<br />
+変更を終えたら、変更後の結果を<span class="menu">File | Save...</span>メニューから保存することができます。変更したキーマップは<span class="path">~/config/settings/Keymap/</span>に置かれている場合のみユーザー定義の一覧に表示されます。もしそうでなければ、<span class="menu">File | Open...</span>から手動で読込む必要があります。</p>
+<p>キーマップパネルと物理キーボードをより一致させるために、 <span class="menu">Layout</span>メニューからいくつかの異なった設定が利用できます。</p>
+<p>画面キーボードで使われるフォントは<span class="menu">Font</span>メニューで変更できます。フォントが全ての文字と記号を含むとは限らないということに注意してください。</p>
+<p>キーマップの設定を始めた時点の設定に戻すために<span class="button">Revert</span>ボタンもあります。 </p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="advanced-keymapping" name="advanced-keymapping">Advanced keymap manipulation</a></h2>
-<p>There's another method to customize your keymap besides the Keymap preference panel. It involves editing a text file containing loads of hex values, which may appear daunting on first sight, but isn't really that impossible to grasp.</p>
-<p>You can dump the current keymap with a command in Terminal:</p>
+<a id="advanced-keymapping" name="advanced-keymapping">高度なキーマップの操作</a></h2>
+<p>キーマップをカスタマイズする方法は、キーマップ設定パネル以外にもあります。多くの16進値を含んだテキストファイルを編集する必要があるので、一見複雑で面倒に見えますが、扱うのはそれほど不可能ではありません。</p>
+<p>ターミナルに次のコマンドを入力することで現在のキーマップをダンプすることができます: </p>
 <pre class="terminal">keymap -d &gt; MyKeymap</pre>
-<p>The generated text file can then be opened in a text editor. Make sure to use a fixed font in that editor or you'll never grok that file...<br />
-At the beginning of that file, you'll find a legend of a stylized keyboard with the hex value corresponding to each key. Below that are the actual assignments of every value. You can do all the customizing that's also available from the Keymap preference panel, and then some. If you happen to have some special keys on your keyboard, you may be able to activate them. That is, use them as ordinary keys or like an option or control key. You won't be able to, for example, have your multimedia keys de/increase the volume or start some application. For this you can use e.g. <a href="http://www.haikuware.com/directory/view-details/utilities/desktop-accessories/spicykeys" class="noprinturl">SpicyKeys</a>.</p>
-<p>When you're finished, you'll save the file and have your system load the modified keymap with this command:</p>
+<p>生成されたテキストファイルはテキストエディタで開くことができます。エディタで等幅フォントを使っていることをよく確認してください。そうでなければいつまでも内容を理解できないでしょう。<br />
+ファイルの冒頭に、16進数と対応するキーの凡例が用意されています。その下にそれぞれの値の実際の割り当てが記述されています。キーマップ設定パネルで行えるすべてのカスタマイズに加え、いくつかの設定が可能です。もしキーボードに特別なキーがある場合は、それらを有効にすることができます。普通のキーとして使うか、あるいはオプションキーやコントロールキーとして使うことができますが、例えばマルチメディアキーを音量アップ/ダウンやアプリケーションの起動に割り当てることはできません。これには例えば<a href="http://www.haikuware.com/directory/view-details/utilities/desktop-accessories/spicykeys" class="noprinturl">SpicyKeys</a>を利用します。</p>
+<p>設定を終えたら、ファイルを保存して、次のコマンドでシステムに変更したキーマップを読込ませます: </p>
 <pre class="terminal">keymap -s &lt; MyKeymap</pre>
-<p>If you'd like to import this keymap into the Keymap panel, you have to compile it first to a binary format:</p>
+<p>このキーマップをキーマップパネルにインポートしたい場合は、まずファイルをバイナリ形式に不コンパイルする必要があります: </p>
 <pre class="terminal">keymap -c &lt; MyKeymap</pre>
-<p>This will produce a file <span class="cli">keymap.out</span> which you can load into Keymap via its <span class="menu">Open...</span> menu. By the way, the keymap command is able to load this binary format as well: <span class="cli">keymap -l &lt; keymap.out</span></p>
+<p>これで生成される<span class="cli">keymap.out</span>を<span class="menu">Open...</span>メニューから読込むことができます。ちなみに、次のキーマップコマンドでもこのバイナリ形式を同様に読込むことができます: <span class="cli">keymap -l &lt; keymap.out</span></p>
 <p>This is the dumped file (the rightmost keys of the stylized keyboard are cut-off for a nicer display on this page):</p>
 
 <pre>#!/bin/keymap -s
@@ -368,9 +370,9 @@ TildeTab = Normal Shift Option Option-Shift CapsLock CapsLock-Shift CapsLock-Opt
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="keyboard.html">Keyboard</a> 
+ «  <a href="keyboard.html">キーボード</a> 
 ::  <a href="../preferences.html" class="uplink">Preferences</a> 
-::  <a href="locale.html">Locale</a>  »
+::  <a href="locale.html">ロケール</a>  »
 </span></div>
 </div>
 
