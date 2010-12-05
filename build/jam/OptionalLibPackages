@@ -28,7 +28,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 
 
 local baseURL = http://haiku-files.org/files/optional-packages ;
-local baseSourceURL = http://haiku-files.org/files/releases/r1alpha2/sources ;
+local baseSourceURL = http://haiku-files.org/files/sources ;
 
 
 # AllegroLibs
