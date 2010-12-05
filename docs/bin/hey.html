@@ -4,7 +4,7 @@
 <TITLE>hey Documentation</TITLE>
 </HEAD>
 <BODY BGCOLOR=#FFFFFF>
-<HR><CENTER><h1>hey version 1.2.6</h1>
+<HR><CENTER><h1>hey version 1.2.8</h1>
 </CENTER>
 <HR>
 <BASEFONT size=4>
@@ -19,7 +19,7 @@ Use it at your own risk.
 
 <UL>
 <LI>unzip the archive by doubleclicking on <CODE>hey-YYYYMMDD.zip</CODE> or by dropping it on Expander
-<LI>open the right project file depending on the hardware platform and select 'Make' from the 'Project' menu to compile it 
+<LI>open the right project file depending on the hardware platform and select 'Make' from the 'Project' menu to compile it
 <LI>you may want to move the executable (<CODE>hey</CODE>) to <CODE>/boot/home/config/bin</CODE> </p>
 </ul>
 <p>
@@ -28,17 +28,17 @@ Use it at your own risk.
 <h2>Usage</h2>
 hey should be used from Terminal. When you start it without parameters it will display the command line syntax it accepts:
 <PRE><CODE>
-hey v1.2.6, written by Attila Mezei (amezei@mail.datanet.hu)
-usage: hey [-s] &lt;app|signature&gt; [let &lt;specifier&gt; do] &lt;verb&gt; &lt;specifier_1&gt; &lt;of &lt;specifier_n&gt;&gt;* 
-           [to &lt;value&gt;] [with name=&ltvalue&gt [and name=&ltvalue&gt]*]
+hey v1.2.8, written by Attila Mezei (attila.mezei@mail.datanet.hu)
+usage: hey [-s][-o] &lt;app|signature|teamid&gt; [let &lt;specifier&gt; do] &lt;verb&gt; &lt;specifier_1&gt; &lt;of
+           &lt;specifier_n&gt;&gt;* [to &lt;value&gt;] [with name=&lt;value&gt; [and name=&lt;value&gt;]*]
 where  &lt;verb&gt; : DO|GET|SET|COUNT|CREATE|DELETE|GETSUITES|QUIT|SAVE|LOAD|'what'
-  &lt;specifier&gt; : [the] &lt;property_name&gt; [ &lt;index&gt; | name | "name" | '"name"']
-      &lt;index&gt; : index | '['index']' | '['-reverse_index']' | '['fromvalue to tovalue']'
+  &lt;specifier&gt; : [the] &lt;property_name&gt; [ &lt;index&gt; | name | "name" | '"name"' ]
       &lt;index&gt; : int | -int | '['int']' | '['-int']' | '['startint to end']'
-      &lt;value&gt; : "string" | &lt;integer&gt; | &lt;float&gt; | bool(value) | int8(value) |
-                int16(value) | int32(value) | float(value) | double(value) |
-                BPoint(x,y) | BRect(l,t,r,b) | rgb_color(r,g,b,a) | file(path)   
+      &lt;value&gt; : "string" | &lt;integer&gt; | &lt;float&gt; | bool(value) | int8(value)
+                | int16(value) | int32(value) | float(value) | double(value)
+                | BPoint(x,y) | BRect(l,t,r,b) | rgb_color(r,g,b,a) | file(path)
 options: -s: silent
+         -o: output result to stdout for easy parsing
 
 </CODE></PRE>
 <br>
@@ -57,7 +57,7 @@ The verbs send the following messages:
 <li>SAVE: B_SAVE_REQUESTED
 <li>LOAD: B_REFS_RECEIVED
 </ul>
-You can use your own verbs if you specify the value names and constants in the 'value_info' structure. See <A HREF="file:///boot/beos/documentation/Be%20Book/The%20Application%20Kit/PropertyInfo.html">BPropertyInfo</A> and <A HREF="file:///boot/develop/headers/be/app/PropertyInfo.h">PropertyInfo.h</A> for details.
+You can use your own verbs if you specify the value names and constants in the 'value_info' structure. See <A HREF="http://www.haiku-os.org/legacy-docs/bebook/BPropertyInfo_Overview.html">BPropertyInfo</A> and <A HREF="file:///boot/develop/headers/be/app/PropertyInfo.h">PropertyInfo.h</A> for details.
 <p>
 Note that the verb is not case sensitive but the specifier names (e.g. "Frame", "Label"...) are. You can use 'what' constants
 directly, like
@@ -102,6 +102,29 @@ You can check the message to be sent to the application by setting the DEBUG_HEY
 <br>
 
 <h2>History</h2>
+v1.2.8
+<ul>
+<li>
+		(Sander Stoks): Added command-line option -o which will output the "result" value
+		in the reply message to stdout, so you can use it in shell scripting more easily:
+		"hey Becasso get AspectRatio of Canvas 0"
+		outputs
+		Reply BMessage(B_REPLY):
+		   "result" (B_DOUBLE_TYPE) : 0.600
+		but "hey -o Becasso get AspectRatio of Canvas 0"
+		outputs 0.600000 directly.
+</ul>
+v1.2.7
+<ul>
+<li>
+		by Sander Stoks: Made a fork since I don't think Attila still supports "hey", and
+		because the latest version on BeBits seems to be 1.2.4.
+		Changes w.r.t. 1.2.6: When an application returns an error on a message, hey now
+		keeps iterating over applications with the same signature.  This is useful because,
+		for instance, Terminal starts as a new process for each instance, so it previously
+		wouldn't work to move a specific Terminal window using hey.  You can now say
+		"hey Terminal set Frame of Window foo to BRect[...]".
+</ul>
 v1.2.6
 <ul>
 <li>syntax extended by Sander Stoks <sander@adamation.com> to allow:
@@ -132,7 +155,7 @@ v1.2.4
     more like english, bare reverse-index-specifiers are now handled, and
     named specifiers can contain only digits by quoting it (but make sure the
     shell passes the quotes through).
-      
+
 <li>Hey(target,const char*,reply) was previously limited to 100 tokens.
     It now uses a vector<> so it's only limited by available memory.
 
@@ -140,7 +163,7 @@ v1.2.4
 </ul>
 v1.2.3
 <ul>
-<li>new option: -s for silent processing (no reply or errors printed) AM 
+<li>new option: -s for silent processing (no reply or errors printed) AM
 </ul>
 v1.2.2
 <ul>
@@ -150,7 +173,7 @@ v1.2.2
 </ul>
 v1.2.1
 <ul>
-<li>compiled for R4 with minor modifications of BPropertyInfo usage 
+<li>compiled for R4 with minor modifications of BPropertyInfo usage
 </ul>
 v1.2.0
 <ul>
@@ -170,8 +193,8 @@ v1.1.1
 
 <li>		The range specifier sent to the target was 1 greater than it should've been. Fixed.
 
-<li>		'hey' made the assumption that the first thread in a team will be the 
-		application thread (and therefore have the application's name).  
+<li>		'hey' made the assumption that the first thread in a team will be the
+		application thread (and therefore have the application's name).
 		This was not always the case. Fix from Scott Lindsey (wombat@gobe.com).
 </ul>
 v1.1.0
@@ -247,7 +270,7 @@ For these examples you need to start the Network preferences application
 <PRE><CODE>	hey Network set Frame of View 0 of Window "Network" to 'BRect(0,0,100,400)'
 	hey Network set Hidden of View 0 of View 0 of Window "Network" to true
 	hey Network set Label of View 5 of View 0 of Window "Network" to "Restart Something"
-	hey Network set Value of View 0 of View 2 of View 0 of Window "Network" to 1 
+	hey Network set Value of View 0 of View 2 of View 0 of Window "Network" to 1
 	hey Network set Text of View 2 of View 2 of View 0 of Window "Network" to "joe"
 </CODE></PRE>
 <h3>Close a window in an application</h3>
