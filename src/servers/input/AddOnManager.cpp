@@ -123,14 +123,17 @@ instantiate_add_on(image_id image, const char* path, const char* type)
 
 AddOnManager::AddOnManager(bool safeMode)
 	:
-	BLooper("add-on manager"),
+	AddOnMonitor(),
+	fHandler(new(std::nothrow) MonitorHandler(this)),
 	fSafeMode(safeMode)
 {
+	SetHandler(fHandler);
 }
 
 
 AddOnManager::~AddOnManager()
 {
+	delete fHandler;
 }
 
 
@@ -175,6 +178,7 @@ AddOnManager::MessageReceived(BMessage* message)
 			return;
 
 		default:
+			AddOnMonitor::MessageReceived(message);
 			return;
 	}
 
@@ -255,17 +259,6 @@ AddOnManager::_RegisterAddOns()
 {
 	CALLED();
 	BAutolock locker(this);
-	status_t err;
-
-	fHandler = new MonitorHandler(this);
-	fAddOnMonitor = new AddOnMonitor(fHandler);
-
-	err = fAddOnMonitor->InitCheck();
-	if (err != B_OK) {
-		ERROR("AddOnManager::RegisterAddOns(): fAddOnMonitor->InitCheck() "
-			"returned %s\n", strerror(err));
-		return;
-	}
 
 	const directory_which directories[] = {
 		B_USER_ADDONS_DIRECTORY,
@@ -301,13 +294,6 @@ void
 AddOnManager::_UnregisterAddOns()
 {
 	BAutolock locker(this);
-
-	BMessenger messenger(fAddOnMonitor);
-	messenger.SendMessage(B_QUIT_REQUESTED);
-	int32 exitValue;
-	wait_for_thread(fAddOnMonitor->Thread(), &exitValue);
-	delete fHandler;
-	fHandler = NULL;
 
 	// We have to stop manually the add-ons because the monitor doesn't
 	// disable them on exit
@@ -624,9 +610,9 @@ AddOnManager::_LoadReplicant()
 	be_app->GetAppInfo(&info);
 
 	status_t err = BDeskbar().AddItem(&info.ref);
-	if (err != B_OK) {
+	if (err != B_OK)
 		ERROR("Deskbar refuses to add method replicant: %s\n", strerror(err));
-	}
+
 	BMessage request(B_GET_PROPERTY);
 	BMessenger to;
 	BMessenger status;

@@ -25,7 +25,7 @@
 
 using namespace BPrivate;
 
-class AddOnManager : public BLooper {
+class AddOnManager : public AddOnMonitor {
 public:
 								AddOnManager(bool safeMode);
 								~AddOnManager();
@@ -122,9 +122,8 @@ private:
 			PathList			fDevicePaths;
 
 			MonitorHandler*		fHandler;
-			AddOnMonitor*		fAddOnMonitor;
 
-			bool fSafeMode;
+			bool				fSafeMode;
 };
 
 #endif	// ADD_ON_MANAGER_H
