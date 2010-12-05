@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008, Haiku, Inc. All rights reserved.
+ * Copyright 2004-2010, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -30,10 +30,10 @@ public:
 								AddOnManager(bool safeMode);
 								~AddOnManager();
 
+	virtual	void 				MessageReceived(BMessage* message);
+
 			void				LoadState();
 			void				SaveState();
-
-			void 				MessageReceived(BMessage* message);
 
 			status_t			StartMonitoringDevice(DeviceAddOn* addOn,
 									const char* device);
