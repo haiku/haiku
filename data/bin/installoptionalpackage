@@ -385,7 +385,7 @@ function DownloadAllBuildFiles()
 	# DownloadAllBuildFiles
 	# Retreive the necessary jam files from svn.
 	local buildFiles="OptionalPackages OptionalPackageDependencies \
-		OptionalBuildFeatures"
+		OptionalBuildFeatures OptionalLibPackages"
 	for file in ${buildFiles} ; do
 		GetBuildFile ${file}
 	done
@@ -481,6 +481,7 @@ function GeneratePackageNames()
 
 	local regExp='/^if\ \[\ IsOptionalHaikuImagePackageAdded/p'
 	sed -n -e "$regExp" ${baseDir}/OptionalPackages > ${file}.temp
+	sed -n -e "$regExp" ${baseDir}/OptionalLibPackages >> ${file}.temp
 	while read line ; do
 		# in each non-filtered line, the 4th word is the optional package
 		local pkg=`echo ${line} | awk '{print $4}'`
@@ -571,8 +572,9 @@ function AddPackages()
 		for package in ${packagesToInstall} ; do
 			# output the "if [ IsOptionalHaikuImagePackageAdded..." code block
 			local regExp="if\ \[\ IsOptionalHaikuImagePackageAdded\ ${package}"
-			local inputFile="${baseDir}/OptionalPackages"
-			sed -n "/^$regExp/,/^\}/p" ${inputFile} >> ${tmpDir}/optpkg.jam
+			for inputFile in OptionalPackages OptionalLibPackages ; do
+				sed -n "/^$regExp/,/^\}/p" "${baseDir}/${inputFile}" >> ${tmpDir}/optpkg.jam
+			done
 		done
 
 		ConvertJamToBash "${tmpDir}/optpkg.jam"
