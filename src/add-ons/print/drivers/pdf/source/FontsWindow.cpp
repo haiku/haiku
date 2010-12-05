@@ -108,7 +108,7 @@ DragListView::InitiateDrag(BPoint point, int32 index, bool wasSelected)
 FontsWindow::FontsWindow(Fonts *fonts)
 	:	HWindow(BRect(0,0,400,220), "Fonts", B_TITLED_WINDOW_LOOK,
  			B_MODAL_APP_WINDOW_FEEL, B_NOT_RESIZABLE | B_NOT_MINIMIZABLE |
- 			B_NOT_ZOOMABLE)
+ 			B_NOT_ZOOMABLE | B_CLOSE_ON_ESCAPE)
 {
 	// ---- Ok, build a default page setup user interface
 	BRect		r, r1;

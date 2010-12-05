@@ -350,7 +350,7 @@ PageSetupDlg::PageSetupDlg(JobData *job_data, PrinterData *printer_data, const P
 	: DialogWindow(BRect(100, 100, 160, 160),
 		"Page Setup", B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
 		B_NOT_RESIZABLE | B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE
-			| B_AUTO_UPDATE_SIZE_LIMITS)
+			| B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE)
 {
 	AddShortcut('W',B_COMMAND_KEY,new BMessage(B_QUIT_REQUESTED));
 

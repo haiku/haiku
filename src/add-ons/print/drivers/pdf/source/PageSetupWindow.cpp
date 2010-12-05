@@ -98,7 +98,7 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 	: HWindow(BRect(0, 0, 200, 100), "Page setup", B_TITLED_WINDOW_LOOK,
  		B_MODAL_APP_WINDOW_FEEL,
  		B_NOT_RESIZABLE | B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE
-			| B_AUTO_UPDATE_SIZE_LIMITS),
+			| B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE),
 	 fResult(B_ERROR),
 	 fSetupMsg(msg),
 	 fAdvancedSettings(*msg),

@@ -51,7 +51,7 @@ THE SOFTWARE.
 
 DocInfoWindow::DocInfoWindow(BMessage *docInfo)
 	: HWindow(BRect(0, 0, 400, 250), "Document Information", B_TITLED_WINDOW_LOOK,
-		B_MODAL_APP_WINDOW_FEEL, B_NOT_MINIMIZABLE),
+		B_MODAL_APP_WINDOW_FEEL, B_NOT_MINIMIZABLE | B_CLOSE_ON_ESCAPE),
 	fDocInfo(docInfo)
 {
 	BRect bounds(Bounds());

@@ -30,7 +30,7 @@ JobSetupWindow::JobSetupWindow(BMessage *msg, const char * printerName)
 	: BlockingWindow(BRect(0, 0, 100, 100), "Job Setup",
 		B_TITLED_WINDOW_LOOK,
  		B_MODAL_APP_WINDOW_FEEL, B_NOT_RESIZABLE | B_NOT_MINIMIZABLE |
- 			B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
+ 			B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE),
 	fPrinterName(printerName),
 	fSetupMsg(msg)
 {

@@ -75,7 +75,8 @@ public:
 };
 
 AboutBoxWindow::AboutBoxWindow(BRect frame, const char *driver_name, const char *version, const char *copyright)
-	: BWindow(frame, "", B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE )
+	: BWindow(frame, "", B_TITLED_WINDOW,
+		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_CLOSE_ON_ESCAPE)
 {
 	char title[256];
 	sprintf(title, "About %s Driver", driver_name);

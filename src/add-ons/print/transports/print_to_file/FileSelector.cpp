@@ -37,7 +37,7 @@
 
 FileSelector::FileSelector(void)
 	: BWindow(BRect(0,0,320,160), "printtofile", B_TITLED_WINDOW,
-	B_NOT_ZOOMABLE, B_CURRENT_WORKSPACE)
+	B_NOT_ZOOMABLE | B_CLOSE_ON_ESCAPE, B_CURRENT_WORKSPACE)
 {
 	fExitSem = create_sem(0, "FileSelector");
 	fResult = B_ERROR;

@@ -54,7 +54,8 @@ SelectPrinterDialog::SelectPrinterDialog(GPData* data)
 	:
 	DialogWindow(BRect(100, 100, 500, 500),
 		"Select Printer", B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
-		B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS),
+		B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS
+			| B_CLOSE_ON_ESCAPE),
 	fData(data)
 {
 	SetResult(B_ERROR);

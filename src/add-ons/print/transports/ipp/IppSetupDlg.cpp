@@ -148,7 +148,8 @@ bool IppSetupView::UpdateViewData()
 IppSetupDlg::IppSetupDlg(BDirectory *dir)
 	: BWindow(BRect(100, 100, 100 + DLG_WIDTH, 100 + DLG_HEIGHT),
 		"IPP Setup", B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
-		B_NOT_RESIZABLE | B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE)
+		B_NOT_RESIZABLE | B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE
+			| B_CLOSE_ON_ESCAPE)
 {
 	result = 0;
 

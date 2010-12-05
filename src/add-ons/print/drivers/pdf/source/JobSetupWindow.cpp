@@ -57,7 +57,7 @@ JobSetupWindow::JobSetupWindow(BMessage *msg, const char * printerName)
 			B_TITLED_WINDOW_LOOK,
 			B_MODAL_APP_WINDOW_FEEL,
 			B_NOT_RESIZABLE | B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE
-				| B_AUTO_UPDATE_SIZE_LIMITS)
+				| B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE)
 {
 	fSetupMsg = msg;
 	fExitSem = create_sem(0, "JobSetup");
