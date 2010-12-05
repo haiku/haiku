@@ -15,30 +15,22 @@
 #include <stdio.h>
 
 
+AddOnMonitor::AddOnMonitor()
+	:
+	BLooper("AddOnMonitor"),
+	fInitCheck(B_NO_INIT),
+	fPulseRunner(NULL)
+{
+}
+
+
 AddOnMonitor::AddOnMonitor(AddOnMonitorHandler* handler)
 	:
 	BLooper("AddOnMonitor"),
-	fInitCheck(B_NO_INIT)
+	fInitCheck(B_NO_INIT),
+	fPulseRunner(NULL)
 {
-	AddHandler(handler);
-	SetPreferredHandler(handler);
-
-	status_t status;
-	BMessenger messenger(handler, this, &status);
-	if (status != B_OK) {
-		fInitCheck = status;
-		return;
-	}
-
-	BMessage pulseMessage(B_PULSE);
-	fPulseRunner = new BMessageRunner(messenger, &pulseMessage, 1000000);
-	status = fPulseRunner->InitCheck();
-	if (status != B_OK) {
-		fInitCheck = status;
-		fprintf(stderr, "AddOnMonitor() : bad status returned by "
-			"fPulseRunner->InitCheck()\n");
-		return;
-	}
+	SetHandler(handler);
 
 	thread_id id = Run();
 	if (id < 0) {
@@ -46,8 +38,6 @@ AddOnMonitor::AddOnMonitor(AddOnMonitorHandler* handler)
 		fprintf(stderr, "AddOnMonitor() : bad id returned by Run()\n");
 		return;
 	}
-
-	fInitCheck = B_OK;
 }
 
 
@@ -61,4 +51,43 @@ status_t
 AddOnMonitor::InitCheck()
 {
 	return fInitCheck;
+}
+
+
+void
+AddOnMonitor::SetHandler(AddOnMonitorHandler* handler)
+{
+	if (handler == NULL)
+		return;
+
+	AddHandler(handler);
+	SetPreferredHandler(handler);
+
+	delete fPulseRunner;
+	fPulseRunner = NULL;
+
+	status_t status;
+	BMessenger messenger(handler, this, &status);
+	if (status != B_OK) {
+		fInitCheck = status;
+		return;
+	}
+
+	BMessage pulseMessage(B_PULSE);
+	fPulseRunner = new(std::nothrow) BMessageRunner(messenger, &pulseMessage,
+		1000000);
+	if (fPulseRunner == NULL) {
+		fInitCheck = B_NO_MEMORY;
+		return;
+	}
+
+	status = fPulseRunner->InitCheck();
+	if (status != B_OK) {
+		fInitCheck = status;
+		fprintf(stderr, "AddOnMonitor() : bad status returned by "
+			"fPulseRunner->InitCheck()\n");
+		return;
+	}
+
+	fInitCheck = B_OK;
 }
