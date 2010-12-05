@@ -1,10 +1,11 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
  *		Clemens Zeidler, haiku@Clemens-Zeidler.de
+ *		Alexander von Gluck, kallisti5@unixzen.com 
  */
 
 
@@ -177,8 +178,10 @@ PowerStatusView::_DrawBattery(BRect rect)
 		rect.left - 1, floorf(rect.bottom - rect.Height() / 4)));
 
 	int32 percent = fPercent;
-	if (percent > 100 || percent < 0 || !fHasBattery)
+	if (percent > 100)
 		percent = 100;
+	else if (percent < 0 || !fHasBattery)
+		percent = 0;
 
 	if (percent > 0) {
 		rect.InsetBy(gap, gap);
@@ -332,18 +335,18 @@ PowerStatusView::Update(bool force)
 
 	_GetBatteryInfo(&fBatteryInfo, fBatteryID);
 
-	if (fBatteryInfo.full_capacity != 0)
+	fHasBattery = (fBatteryInfo.state & BATTERY_CRITICAL_STATE) == 0;
+
+	if (fBatteryInfo.full_capacity > 0 && fHasBattery) {
 		fPercent = (100 * fBatteryInfo.capacity) / fBatteryInfo.full_capacity;
-
-	fTimeLeft = fBatteryInfo.time_left;
-	if ((fBatteryInfo.state & BATTERY_CHARGING) != 0)
-		fOnline = true;
-	else
+		fOnline = (fBatteryInfo.state & BATTERY_CHARGING) != 0;
+		fTimeLeft = fBatteryInfo.time_left;
+	} else {
+		fPercent = 0;
 		fOnline = false;
+		fTimeLeft = false;
+	}
 
-	// TODO: if critical really means that, its name should be changed...
-	fHasBattery = (fBatteryInfo.state & BATTERY_CRITICAL_STATE) == 0
-		&& fPercent >= 0;
 
 	if (fInDeskbar) {
 		// make sure the tray icon is large enough
