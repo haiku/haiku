@@ -302,45 +302,8 @@ GPJob::PrintPage(list<GPBand*>& bands) {
 	if (bottom > imageableArea.bottom)
 		bottom = imageableArea.bottom;
 
-	fprintf(stderr, "GPJob image left %d, top %d, right %d, bottom %d\n",
-		(int)left, (int)top, (int)right, (int)bottom);
-
-	// make sure the width and height in pixels is a whole number
-	// by increasing the width and height in 1/72 Inches to a multiple of 72
-	//
-	// TODO the "whole number" condition has to be dropped; in the current
-	// implementation up to 1 Inch of the total width or height cannot be
-	// used; using the gcd of 72 and x or y DPI this could be reduced;
-	// for example if DPI is 600 to 1/3 Inch which is still not acceptable.
-	//
-	// the position might have to be changed in order to stay inside
-	// the imageable area; if it gets too large it is decreased by one Inch
 	int32 width = right - left;
 	int32 height = bottom - top;
-	coordinateSystem.RoundUpToWholeInches(width, height);
-	right = left + width;
-	bottom = top + height;
-
-	// again make sure the image is inside the imageable area
-	if (right > imageableArea.right) {
-		right = imageableArea.right;
-		left = right - width;
-		if (left < imageableArea.left) {
-			left = imageableArea.left;
-			right = left + width - kGutenprintUnit;
-		}
-		width = right - left;
-	}
-
-	if (bottom > imageableArea.bottom) {
-		bottom = imageableArea.bottom;
-		top = bottom - height;
-		if (top < imageableArea.top) {
-			top = imageableArea.top;
-			bottom = top + height - kGutenprintUnit;
-		}
-		height = bottom - top;
-	}
 
 	// because of rounding and clipping in the previous step,
 	// now the image frame has to be synchronized
