@@ -71,11 +71,12 @@ SYSTEM_APPS = AboutSystem ActivityMonitor CharacterMap CodyCam DeskCalc Devices
 ;
 SYSTEM_PREFERENCES = Appearance Backgrounds CPUFrequency DataTranslations
 	<preference>Deskbar E-mail FileTypes Fonts Keyboard Keymap Locale Media
-	Mouse Network Notifications OpenGL Printers Screen ScreenSaver Shortcuts Sounds Time
-	Touchpad <preference>Tracker VirtualMemory
+	Mouse Network Notifications OpenGL Printers Screen ScreenSaver Shortcuts
+	Sounds Time Touchpad <preference>Tracker VirtualMemory
 ;
 SYSTEM_DEMOS = BSnow Chart Clock Cortex FontDemo GLTeapot
-	$(HAIKU_INCLUDE_TRADEMARKS)Haiku3d Mandelbrot Pairs Playground Pulse Sudoku
+	$(HAIKU_INCLUDE_TRADEMARKS)Haiku3d Mandelbrot OverlayImage Pairs Playground
+	Pulse Sudoku
 ;
 SYSTEM_LIBS =
 	libbe.so libbsd.so libbnetapi.so
@@ -347,8 +348,8 @@ AddSymlinkToHaikuImage home config settings Mail : ../../../mail/in : mailbox ;
 AddDirectoryToHaikuImage home config be Applications ;
 DESKBAR_APPLICATIONS = ActivityMonitor CharacterMap CodyCam CDPlayer DeskCalc
 	Devices DiskProbe DriveSetup DiskUsage Expander Icon-O-Matic Installer
-	Magnify	Mail MediaConverter MediaPlayer MidiPlayer People PoorMan Screenshot
-	SoundRecorder StyledEdit Terminal TV
+	Magnify	Mail MediaConverter MediaPlayer MidiPlayer People PoorMan
+	Screenshot SoundRecorder StyledEdit Terminal TV
 ;
 local linkTarget ;
 for linkTarget in $(DESKBAR_APPLICATIONS) {
