@@ -10,6 +10,67 @@
 #include <Debug.h>
 
 
+// 72 DPI
+static const int32 kGutenprintUnit = 72;
+
+class CoordinateSystem
+{
+public:
+	CoordinateSystem()
+	:
+	fXDPI(0),
+	fYDPI(0)
+	{
+	}
+
+
+	void SetDPI(int32 x, int32 y) {
+		fXDPI = x;
+		fYDPI = y;
+	}
+
+
+	void ToGutenprint(int32 fromX, int32 fromY, int32& toX, int32& toY) {
+		toX = fromX * kGutenprintUnit / fXDPI;
+		toY = fromY * kGutenprintUnit / fYDPI;
+	}
+
+
+	void ToGutenprintCeiling(int32 fromX, int32 fromY, int32& toX, int32& toY) {
+		toX = (fromX * kGutenprintUnit + fXDPI - 1) / fXDPI;
+		toY = (fromY * kGutenprintUnit + fYDPI - 1) / fYDPI;
+	}
+
+
+	void FromGutenprint(int32 fromX, int32 fromY, int32& toX, int32& toY) {
+		toX = fromX * fXDPI / kGutenprintUnit;
+		toY = fromY * fYDPI / kGutenprintUnit;
+	}
+
+	void FromGutenprintCeiling(int32 fromX, int32 fromY, int32& toX, int32& toY) {
+		toX = (fromX * fXDPI + kGutenprintUnit - 1) / kGutenprintUnit;
+		toY = (fromY * fYDPI + kGutenprintUnit - 1) / kGutenprintUnit;
+	}
+
+	void SizeFromGutenprint(int32 fromWidth, int32 fromHeight,
+		int32& toWidth, int32& toHeight) {
+		toWidth = fromWidth * fXDPI / kGutenprintUnit;
+		toHeight = fromHeight * fYDPI / kGutenprintUnit;
+	}
+
+	void RoundUpToWholeInches(int32& width, int32& height) {
+		width = ((width + kGutenprintUnit - 1) / kGutenprintUnit)
+			* kGutenprintUnit;
+		height = ((height + kGutenprintUnit - 1) / kGutenprintUnit)
+			* kGutenprintUnit;
+	}
+
+private:
+	int32 fXDPI;
+	int32 fYDPI;
+};
+
+
 GPJob::GPJob()
 	:
 	fApplicationName(),
@@ -169,130 +230,150 @@ GPJob::End()
 	fVariables = NULL;
 }
 
-
-static int
-gcd(int a, int b)
-{
-	// Euclidean algorithm for greatest common divisor
-	while (b != 0) {
-		int t = b;
-		b = a % b;
-		a = t;
-	}
-	return a;
-}
-
-
-static int
-to72dpiFloor(int value, int fromUnit) {
-	// proper rounding is important in this formula
-	// do not "optimize"
-	const int toUnit = 72;
-	int g = gcd(toUnit, fromUnit);
-	int n = toUnit / g;
-	int m = fromUnit / g;
-	return (value / m) * n;
-}
-
-
-static int
-to72dpiCeiling(int value, int fromUnit) {
-	// proper rounding is important in this formula
-	// do not "optimize"
-	const int toUnit = 72;
-	int g = gcd(toUnit, fromUnit);
-	int n = toUnit / g;
-	int m = fromUnit / g;
-	return ((value + m - 1) / m) * n;
-}
-
-
-static int
-from72dpi(int value, int toUnit)
-{
-	const int fromUnit = 72;
-	return value * toUnit / fromUnit;
-}
-
-
 status_t
 GPJob::PrintPage(list<GPBand*>& bands) {
 	if (fStatus != B_OK)
 		return fStatus;
 
-	fPrintRect = GetPrintRectangle(bands);
 	fBands = &bands;
 	fCachedBand = NULL;
 
-	{
-		int left;
-		int top;
-		int right;
-		int bottom;
-		stp_get_imageable_area(fVariables, &left, &right, &bottom, &top);
-		fprintf(stderr, "GPJob imageable area left %d, top %d, right %d, "
-			"bottom %d\n",
-			left, top, right, bottom);
+	Rectangle<int> imageableArea;
+	stp_get_imageable_area(fVariables, &imageableArea.left,
+		&imageableArea.right, &imageableArea.bottom, &imageableArea.top);
+	fprintf(stderr, "GPJob imageable area left %d, top %d, right %d, "
+		"bottom %d\n",
+		imageableArea.left, imageableArea.top, imageableArea.right,
+		imageableArea.bottom);
+	fprintf(stderr, "GPJob width %d %s, height %d %s\n",
+		imageableArea.Width(),
+		imageableArea.Width() % 72 == 0 ? "whole inches" : "not whole inches",
+		imageableArea.Height(),
+		imageableArea.Height() % 72 == 0 ? "whole inches" : "not whole inches"
+		);
 
+	CoordinateSystem coordinateSystem;
+	coordinateSystem.SetDPI(fConfiguration->fXDPI, fConfiguration->fYDPI);
+	{
+		// GPBand offset is relative to imageable area left, top
+		// but it has to be absolute to left, top of page
+		int32 offsetX;
+		int32 offsetY;
+		coordinateSystem.FromGutenprintCeiling(imageableArea.left,
+			imageableArea.top, offsetX, offsetY);
+
+		BPoint offset(offsetX, offsetY);
+		list<GPBand*>::iterator it = fBands->begin();
+		for (; it != fBands->end(); it++) {
+			(*it)->fWhere += offset;
+		}
 	}
 
-	{
-		int left = (int)fPrintRect.left;
-		int top = (int)fPrintRect.top;
-		int width = fPrintRect.IntegerWidth() + 1;
-		int height = fPrintRect.IntegerHeight() + 1;
-
-		fprintf(stderr, "GPJob raw image dimensions left %d, top %d, width %d, height %d\n",
-			left, top, width, height);
-	}
-
-	int xDPI = fConfiguration->fXDPI;
-	int yDPI = fConfiguration->fYDPI;
-
-	// left, top of the image on the page in 1/72 Inches
-	int left = static_cast<int>(fPrintRect.left);
-	left = to72dpiFloor(left, xDPI);
-	int top = static_cast<int>(fPrintRect.top);
-	top = to72dpiFloor(top, yDPI);
-
-	// because of rounding in the previous step,
-	// now the image left, top has to be synchronized
-	fPrintRect.left = from72dpi(left, xDPI);
-	fPrintRect.top = from72dpi(top, yDPI);
-
-	// width and height of the image on the page in 1/72 Inches
-	int width = fPrintRect.IntegerWidth() + 1;
-	width = to72dpiCeiling(width, xDPI);
-	int height = fPrintRect.IntegerHeight() + 1;
-	height = to72dpiCeiling(height, yDPI);
-
-	// synchronize image right and bottom too
-	fPrintRect.right = fPrintRect.left + from72dpi(width, xDPI);
-	fPrintRect.bottom = fPrintRect.top + from72dpi(height, yDPI);
+	fPrintRect = GetPrintRectangle(bands);
 
 	{
 		int left = (int)fPrintRect.left;
 		int top = (int)fPrintRect.top;
-		int width = fPrintRect.IntegerWidth() + 1;
-		int height = fPrintRect.IntegerHeight() + 1;
+		int width = fPrintRect.Width() + 1;
+		int height = fPrintRect.Height() + 1;
 
-		fprintf(stderr, "GPJob image dimensions left %d, top %d, width %d, height %d\n",
+		fprintf(stderr, "GPJob bitmap bands frame left %d, top %d, width %d, "
+			"height %d\n",
 			left, top, width, height);
 	}
 
-	fprintf(stderr, "GPJob image dimensions in 1/72 Inches:\n"
-		"left %d, top %d, width %d, height %d\n",
-		left, top, width, height);
+	// calculate the position and size of the image to be printed on the page
+	// unit: 1/72 Inches
+	// constraints: the image must be inside the imageable area
+	int32 left;
+	int32 top;
+	coordinateSystem.ToGutenprint(fPrintRect.left, fPrintRect.top, left, top);
+	if (left < imageableArea.left)
+		left = imageableArea.left;
+	if (top < imageableArea.top)
+		top = imageableArea.top;
 
-	stp_set_width(fVariables, width);
-	stp_set_height(fVariables, height);
+	int32 right;
+	int32 bottom;
+	coordinateSystem.ToGutenprintCeiling(fPrintRect.right, fPrintRect.bottom,
+		right, bottom);
+	if (right > imageableArea.right)
+		right = imageableArea.right;
+	if (bottom > imageableArea.bottom)
+		bottom = imageableArea.bottom;
+
+	fprintf(stderr, "GPJob image left %d, top %d, right %d, bottom %d\n",
+		(int)left, (int)top, (int)right, (int)bottom);
+
+	// make sure the width and height in pixels is a whole number
+	// by increasing the width and height in 1/72 Inches to a multiple of 72
+	//
+	// TODO the "whole number" condition has to be dropped; in the current
+	// implementation up to 1 Inch of the total width or height cannot be
+	// used; using the gcd of 72 and x or y DPI this could be reduced;
+	// for example if DPI is 600 to 1/3 Inch which is still not acceptable.
+	//
+	// the position might have to be changed in order to stay inside
+	// the imageable area; if it gets too large it is decreased by one Inch
+	int32 width = right - left;
+	int32 height = bottom - top;
+	coordinateSystem.RoundUpToWholeInches(width, height);
+	right = left + width;
+	bottom = top + height;
+
+	// again make sure the image is inside the imageable area
+	if (right > imageableArea.right) {
+		right = imageableArea.right;
+		left = right - width;
+		if (left < imageableArea.left) {
+			left = imageableArea.left;
+			right = left + width - kGutenprintUnit;
+		}
+		width = right - left;
+	}
+
+	if (bottom > imageableArea.bottom) {
+		bottom = imageableArea.bottom;
+		top = bottom - height;
+		if (top < imageableArea.top) {
+			top = imageableArea.top;
+			bottom = top + height - kGutenprintUnit;
+		}
+		height = bottom - top;
+	}
+
+	// because of rounding and clipping in the previous step,
+	// now the image frame has to be synchronized
+	coordinateSystem.FromGutenprint(left, top, fPrintRect.left, fPrintRect.top);
+	int32 printRectWidth;
+	int32 printRectHeight;
+	coordinateSystem.SizeFromGutenprint(width, height, printRectWidth,
+		printRectHeight);
+	fPrintRect.right = fPrintRect.left + printRectWidth - 1;
+	fPrintRect.bottom = fPrintRect.top + printRectHeight - 1;
+	{
+		int left = fPrintRect.left;
+		int top = fPrintRect.top;
+		int width = fPrintRect.Width() + 1;
+		int height = fPrintRect.Height() + 1;
+
+		fprintf(stderr, "GPJob image dimensions left %d, top %d, width %d, "
+			"height %d\n",
+			left, top, width, height);
+	}
+
+	fprintf(stderr, "GPJob image dimensions in 1/72 Inches: "
+		"left %d, top %d, right %d, bottom %d\n",
+		(int)left, (int)top, (int)right, (int)bottom);
+
+	stp_set_width(fVariables, right - left);
+	stp_set_height(fVariables, bottom - top);
 	stp_set_left(fVariables, left);
 	stp_set_top(fVariables, top);
 
 	stp_merge_printvars(fVariables, stp_printer_get_defaults(fPrinter));
 
 	if (!stp_verify(fVariables)) {
-		// TODO report error
 		fprintf(stderr, "GPJob PrintPage: invalid variables\n");
 		return B_ERROR;
 	}
@@ -315,7 +396,7 @@ GPJob::GetErrorMessage(BString& message)
 }
 
 
-BRect
+RectInt32
 GPJob::GetPrintRectangle(list<GPBand*>& bands)
 {
 	list<GPBand*>::iterator it = bands.begin();
@@ -349,14 +430,14 @@ GPJob::Reset()
 int
 GPJob::Width()
 {
-	return static_cast<int>(fPrintRect.IntegerWidth() + 1);
+	return fPrintRect.Width() + 1;
 }
 
 
 int
 GPJob::Height()
 {
-	return static_cast<int>(fPrintRect.IntegerHeight() + 1);
+	return fPrintRect.Height() + 1;
 }
 
 
@@ -367,8 +448,8 @@ GPJob::GetRow(unsigned char* data, size_t size, int row)
 		return STP_IMAGE_STATUS_ABORT;
 
 	// row is relative to left, top of image
-	// convert it to absolute value
-	int line = static_cast<int>(fPrintRect.top) + row;
+	// convert it to absolute y coordinate value
+	int line = fPrintRect.top + row;
 
 	FillWhite(data, size);
 
@@ -407,19 +488,30 @@ GPJob::FillRow(GPBand* band, unsigned char* data, size_t size, int line)
 		band->fValidRect.top);
 	int imageLeft = static_cast<int>(band->fValidRect.left);
 
-	const int sourceDelta = band->fBitmap.BytesPerRow();
+	const int sourceBytesPerRow = band->fBitmap.BytesPerRow();
 	const int kSourceBytesPerPixel = 4; // BGRA
 	const unsigned char* source =
 		static_cast<unsigned char*>(band->fBitmap.Bits())
-		+ imageTop * sourceDelta
+		+ imageTop * sourceBytesPerRow
 		+ imageLeft * kSourceBytesPerPixel;
 
 	int dataLeft = static_cast<int>(band->fWhere.x - fPrintRect.left);
+	int sourcePixelsToSkip = 0;
+	if (dataLeft < 0) {
+		sourcePixelsToSkip = -dataLeft;
+		dataLeft = 0;
+	}
+	int width = band->fValidRect.IntegerWidth() + 1 - sourcePixelsToSkip;
+	source += sourcePixelsToSkip * kSourceBytesPerPixel;
+	if (width <= 0)
+		return;
 
 	const int kTargetBytesPerPixel = 3; // RGB
 	unsigned char* target = &data[dataLeft * kTargetBytesPerPixel];
+	int maxWidth = size / kTargetBytesPerPixel - dataLeft;
+	if (width > maxWidth)
+		width = maxWidth;
 
-	const int width = band->fValidRect.IntegerWidth() + 1;
 	ASSERT(0 <= imageTop && imageTop <= band->fValidRect.IntegerHeight());
 	ASSERT((dataLeft + width) * kTargetBytesPerPixel <= size);
 
