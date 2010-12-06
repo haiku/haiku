@@ -46,12 +46,15 @@ DoCatalogs Terminal :
 	:
 	AppearPrefView.cpp
 	Arguments.cpp
+	Colors.cpp
 	FindWindow.cpp
 	PrefHandler.cpp
 	PrefWindow.cpp
+	SetTitleDialog.cpp
 	Shell.cpp
 	SmartTabView.cpp
 	TermApp.cpp
+	TermConst.cpp
 	TermView.cpp
 	TermWindow.cpp
 	: en.catalog

@@ -73,10 +73,10 @@ AppearancePrefView::AppearancePrefView(const char* name,
 	fTerminalMessenger(messenger)
 {
 	const char* kColorTable[] = {
-		B_TRANSLATE(PREF_TEXT_FORE_COLOR),
-		B_TRANSLATE(PREF_TEXT_BACK_COLOR),
-		B_TRANSLATE(PREF_SELECT_FORE_COLOR),
-		B_TRANSLATE(PREF_SELECT_BACK_COLOR),
+		B_TRANSLATE("Text"),
+		B_TRANSLATE("Background"),
+		B_TRANSLATE("Selected text"),
+		B_TRANSLATE("Selected background"),
 		NULL
 	};
 
