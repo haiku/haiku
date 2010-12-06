@@ -797,7 +797,7 @@ SATWindow::_RestoreOriginalSize(bool stayBelowMouse)
 	if (decorator == NULL)
 		return;
 	BRect tabRect = decorator->TabRect();
-	if (mousePosition.y < tabRect.bottom
+	if (mousePosition.y < tabRect.bottom && mousePosition.y > tabRect.top
 		&& mousePosition.x <= frame.right + decorator->BorderWidth() +1
 		&& mousePosition.x >= frame.left + decorator->BorderWidth()) {
 		// verify mouse stays on the tab

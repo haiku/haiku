@@ -43,7 +43,7 @@ public:
 			/*! Indicates that window is stacked */
 			void				SetStackedMode(bool stacked, BRegion* dirty);
 			bool				StackedMode() const
-									{ return fStackedMode; };
+									{ return fStackedMode; }
 
 			/*! Set the tab length if the decorator is in stacked mode and if
 				the tab is the last one in the tab bar. */
