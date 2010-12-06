@@ -115,7 +115,7 @@ ifaddrlist(register struct ifaddrlist **ipaddrp, register char *errbuf)
 	nipaddr = 0;
 	for (; ifrp < ifend; ifrp = ifnext) {
 #ifdef HAVE_SOCKADDR_SA_LEN
-		n = ifrp->ifr_addr.sa_len + sizeof(ifrp->ifr_name);
+		n = _SIZEOF_ADDR_IFREQ(*ifrp);
 		/*
 		 * our ifreqs from SIOCGIFCONF dumps are very packed
 		*/
