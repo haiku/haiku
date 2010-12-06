@@ -635,7 +635,7 @@ DwarfFile::UnwindCallFrame(CompilationUnit* unit,
 					cieID = lengthOffset - cieID;
 				}
 
-				TRACE_CFI("  found fde: length: %llu (%lld), CIE offset: %llu, "
+				TRACE_CFI("  found fde: length: %llu (%lld), CIE offset: %#llx, "
 					"location: %#llx, range: %#llx\n", length, remaining, cieID,
 					initialLocation, addressRange);
 
@@ -1581,8 +1581,8 @@ DwarfFile::_ParseCIE(CompilationUnit* unit, CfaContext& context,
 
 	uint8 version = dataReader.Read<uint8>(0);
 	if (version != 1) {
-		TRACE_CFI("  cie: length: %llu, version: %u -- unsupported\n",
-			length, version);
+		TRACE_CFI("  cie: length: %llu, offset: %#llx, version: %u "
+			"-- unsupported\n",	length, cieOffset, version);
 		return B_UNSUPPORTED;
 	}
 
@@ -1593,10 +1593,11 @@ DwarfFile::_ParseCIE(CompilationUnit* unit, CfaContext& context,
 	context.SetDataAlignment(dataReader.ReadSignedLEB128(0));
 	context.SetReturnAddressRegister(dataReader.ReadUnsignedLEB128(0));
 
-	TRACE_CFI("  cie: length: %llu, version: %u, augmentation: \"%s\", "
-		"aligment: code: %lu, data: %ld, return address reg: %lu\n", length,
-		version, cieAugmentation.String(), context.CodeAlignment(),
-		context.DataAlignment(), context.ReturnAddressRegister());
+	TRACE_CFI("  cie: length: %llu, offset: %#llx, version: %u, augmentation: "
+		"\"%s\", aligment: code: %lu, data: %ld, return address reg: %lu\n",
+		length, cieOffset, version, cieAugmentation.String(),
+		context.CodeAlignment(), context.DataAlignment(),
+		context.ReturnAddressRegister());
 
 	status_t error = cieAugmentation.Read(dataReader);
 	if (error != B_OK) {
