@@ -434,8 +434,14 @@ DwarfImageDebugInfo::CreateFrame(Image* image,
 	if (function == NULL)
 		return B_BAD_VALUE;
 
-	TRACE_CFI("DwarfImageDebugInfo::CreateFrame(): subprogram DIE: %p\n",
-		function->SubprogramEntry());
+	FunctionID* functionID = functionInstance->GetFunctionID();
+	if (functionID == NULL)
+		return B_NO_MEMORY;
+	Reference<FunctionID> functionIDReference(functionID, true);
+
+	TRACE_CFI("DwarfImageDebugInfo::CreateFrame(): subprogram DIE: %p, "
+		"function: %s\n", function->SubprogramEntry(),
+		functionID->FunctionName().String());
 
 	int32 registerCount = fArchitecture->CountRegisters();
 	const Register* registers = fArchitecture->Registers();
@@ -530,11 +536,6 @@ DwarfImageDebugInfo::CreateFrame(Image* image,
 	frame->SetReturnAddress(previousCpuState->InstructionPointer());
 		// Note, this is correct, since we actually retrieved the return
 		// address. Our caller will fix the IP for us.
-
-	FunctionID* functionID = functionInstance->GetFunctionID();
-	if (functionID == NULL)
-		return B_NO_MEMORY;
-	Reference<FunctionID> functionIDReference(functionID, true);
 
 	// create function parameter objects
 	for (DebugInfoEntryList::ConstIterator it = subprogramEntry->Parameters()
