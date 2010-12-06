@@ -5,11 +5,18 @@
 
 #include "Colors.h"
 
+#include <Catalog.h>
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Terminal colors schema"
+
+
 const rgb_color kBlack= { 0, 0, 0, 255 };
 const rgb_color kWhite = { 255, 255, 255, 255 };
 
 const struct color_schema kBlackOnWhite = {
-	"Black on White",
+	B_TRANSLATE("Black on White"),
 	kBlack,
 	kWhite,
 	kWhite,
@@ -20,7 +27,7 @@ const struct color_schema kBlackOnWhite = {
 
 
 const struct color_schema kWhiteOnBlack = {
-	"White on Black",
+	B_TRANSLATE("White on Black"),
 	kWhite,
 	kBlack,
 	kBlack,
@@ -31,7 +38,7 @@ const struct color_schema kWhiteOnBlack = {
 
 
 struct color_schema gCustomSchema = {
-	"Custom"
+	B_TRANSLATE("Custom")
 };
 
 const color_schema* gPredefinedSchemas[] = {

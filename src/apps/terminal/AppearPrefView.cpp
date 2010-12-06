@@ -73,10 +73,10 @@ AppearancePrefView::AppearancePrefView(const char* name,
 	fTerminalMessenger(messenger)
 {
 	const char* kColorTable[] = {
-		PREF_TEXT_FORE_COLOR,
-		PREF_TEXT_BACK_COLOR,
-		PREF_SELECT_FORE_COLOR,
-		PREF_SELECT_BACK_COLOR,
+		B_TRANSLATE(PREF_TEXT_FORE_COLOR),
+		B_TRANSLATE(PREF_TEXT_BACK_COLOR),
+		B_TRANSLATE(PREF_SELECT_FORE_COLOR),
+		B_TRANSLATE(PREF_SELECT_BACK_COLOR),
 		NULL
 	};
 
@@ -94,12 +94,12 @@ AppearancePrefView::AppearancePrefView(const char* name,
 	fFont = new BMenuField(B_TRANSLATE("Font:"), fontMenu);
 	fFontSize = new BMenuField(B_TRANSLATE("Size:"), sizeMenu);
 
-	BPopUpMenu* schemasPopUp =_MakeColorSchemaMenu(MSG_COLOR_SCHEMA_CHANGED,
+	BPopUpMenu* schemasPopUp = _MakeColorSchemaMenu(MSG_COLOR_SCHEMA_CHANGED,
 		gPredefinedSchemas, gPredefinedSchemas[0]);
 	fColorSchemaField = new BMenuField(B_TRANSLATE("Color schema:"),
 		schemasPopUp);
 
-	BPopUpMenu* colorsPopUp =_MakeMenu(MSG_COLOR_FIELD_CHANGED, kColorTable,
+	BPopUpMenu* colorsPopUp = _MakeMenu(MSG_COLOR_FIELD_CHANGED, kColorTable,
 		kColorTable[0]);
 
 	fColorField = new BMenuField(B_TRANSLATE("Color:"),
@@ -213,7 +213,7 @@ AppearancePrefView::AttachedToWindow()
   	_SetCurrentColorSchema(fColorSchemaField);
   	bool enableCustomColors =
 		!strcmp(fColorSchemaField->Menu()->FindMarked()->Label(),
-			"Custom");
+			gCustomSchema.name);
 
   	_EnableCustomColors(enableCustomColors);
 }
