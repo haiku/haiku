@@ -72,7 +72,7 @@ public:
 			void				BroadcastToAllApps(int32 code);
 			void				BroadcastToAllWindows(int32 code);
 
-			void				KeyEvent(uint32 what, int32 key,
+			filter_result		KeyEvent(uint32 what, int32 key,
 									int32 modifiers);
 	// Locking
 			bool				LockSingleWindow()

@@ -38,7 +38,7 @@ public:
 	virtual void				WindowAdded(Window* window) = 0;
 	virtual void				WindowRemoved(Window* window) = 0;
 
-	virtual void				KeyPressed(uint32 what, int32 key,
+	virtual bool				KeyPressed(uint32 what, int32 key,
 									int32 modifiers) = 0;
 	virtual void				MouseEvent(BMessage* message) = 0;
 	virtual void				MouseDown(Window* window, BMessage* message,
@@ -92,7 +92,7 @@ public:
 			void				NotifyWindowAdded(Window* window);
 			void				NotifyWindowRemoved(Window* window);
 
-			void				NotifyKeyPressed(uint32 what, int32 key,
+			bool				NotifyKeyPressed(uint32 what, int32 key,
 									int32 modifiers);
 			void				NotifyMouseEvent(BMessage* message);
 			void				NotifyMouseDown(Window* window,

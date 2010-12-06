@@ -221,9 +221,7 @@ KeyboardFilter::Filter(BMessage* message, EventTarget** _target,
 		|| message->what == B_INPUT_METHOD_EVENT)
 		_UpdateFocus(key, modifiers, _target);
 
-	fDesktop->KeyEvent(message->what, key, modifiers);
-
-	return B_DISPATCH_MESSAGE;
+	return fDesktop->KeyEvent(message->what, key, modifiers);
 }
 
 
@@ -578,7 +576,7 @@ Desktop::BroadcastToAllWindows(int32 code)
 }
 
 
-void
+filter_result
 Desktop::KeyEvent(uint32 what, int32 key, int32 modifiers)
 {
 	if (LockAllWindows()) {
@@ -594,7 +592,10 @@ Desktop::KeyEvent(uint32 what, int32 key, int32 modifiers)
 		UnlockAllWindows();
 	}
 
-	NotifyKeyPressed(what, key, modifiers);
+	if (NotifyKeyPressed(what, key, modifiers))
+		return B_SKIP_MESSAGE;
+
+	return B_DISPATCH_MESSAGE;
 }
 
 

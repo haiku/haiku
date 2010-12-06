@@ -54,7 +54,7 @@ public:
 	virtual void				WindowAdded(Window* window);
 	virtual void				WindowRemoved(Window* window);
 	
-	virtual void				KeyPressed(uint32 what, int32 key,
+	virtual bool				KeyPressed(uint32 what, int32 key,
 									int32 modifiers);
 	virtual void				MouseEvent(BMessage* message) {}
 	virtual void				MouseDown(Window* window, BMessage* message,

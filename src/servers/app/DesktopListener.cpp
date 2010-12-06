@@ -91,16 +91,20 @@ DesktopObservable::NotifyWindowRemoved(Window* window)
 }
 
 
-void
+bool
 DesktopObservable::NotifyKeyPressed(uint32 what, int32 key, int32 modifiers)
 {
 	if (fWeAreInvoking)
-		return;
+		return false;
 	InvokeGuard invokeGuard(fWeAreInvoking);
 
+	bool skipEvent = false;
 	for (DesktopListener* listener = fDesktopListenerList.First();
-		listener != NULL; listener = fDesktopListenerList.GetNext(listener))
-		listener->KeyPressed(what, key, modifiers);
+		listener != NULL; listener = fDesktopListenerList.GetNext(listener)) {
+		if (listener->KeyPressed(what, key, modifiers))
+			skipEvent = true;
+	}
+	return skipEvent;
 }
 
 

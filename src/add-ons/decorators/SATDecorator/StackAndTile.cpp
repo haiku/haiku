@@ -113,7 +113,7 @@ StackAndTile::WindowRemoved(Window* window)
 }
 
 
-void
+bool
 StackAndTile::KeyPressed(uint32 what, int32 key, int32 modifiers)
 {
 	// switch to and from stacking and snapping mode
@@ -126,7 +126,83 @@ StackAndTile::KeyPressed(uint32 what, int32 key, int32 modifiers)
 			_StartSAT();
 	}
 
-	return;
+	if (!SATKeyPressed() || what != B_KEY_DOWN)
+		return false;
+
+	const int kArrowKeyUp = 87;
+	const int kArrowKeyDown = 98;
+
+	switch (key) {
+		case kArrowKeyDown:
+		{
+			SATWindow* frontWindow = GetSATWindow(fDesktop->FocusWindow());
+			SATGroup* currentGroup = NULL;
+			if (frontWindow)
+				currentGroup = frontWindow->GetGroup();
+			if (currentGroup && currentGroup->CountItems() <= 1)
+				currentGroup = NULL;
+
+			GroupIterator groups(this, fDesktop);
+			bool currentFound = false;
+			while (true) {
+				SATGroup* group = groups.NextGroup();
+				if (group == NULL)
+					break;
+				if (group->CountItems() <= 1)
+					continue;
+
+				if (currentGroup == NULL)
+					currentFound = true;
+						// if no group is selected just activate the first one
+				else if (currentGroup == group) {
+					currentFound = true;
+					continue;
+				}
+				if (currentFound) {
+					_ActivateWindow(group->WindowAt(0));
+					if (currentGroup) {
+						Window* window = currentGroup->WindowAt(0)->GetWindow();
+						fDesktop->SendWindowBehind(window);
+						WindowSentBehind(window, NULL);
+					}
+					return true;
+				}
+			}
+			break;
+		}
+
+		case kArrowKeyUp:
+		{
+			SATWindow* frontWindow = GetSATWindow(fDesktop->FocusWindow());
+			SATGroup* currentGroup = NULL;
+			if (frontWindow)
+				currentGroup = frontWindow->GetGroup();
+			if (currentGroup && currentGroup->CountItems() <= 1)
+				currentGroup = NULL;
+
+			SATGroup* backmostGroup = NULL;
+			GroupIterator groups(this, fDesktop);
+			while (true) {
+				SATGroup* group = groups.NextGroup();
+				if (group == NULL)
+					break;
+				if (group->CountItems() <= 1)
+					continue;
+				// if no group is selected just activate the first one
+				if (currentGroup == NULL) {
+					_ActivateWindow(group->WindowAt(0));
+					return true;
+				}
+				backmostGroup = group;
+			}
+			if (backmostGroup && backmostGroup != currentGroup) {
+				_ActivateWindow(backmostGroup->WindowAt(0));
+				return true;
+			}
+			break;
+		}
+	}
+	return false;
 }
 
 
@@ -369,6 +445,9 @@ StackAndTile::GetDecoratorSettings(Window* window, BMessage& settings)
 SATWindow*
 StackAndTile::GetSATWindow(Window* window)
 {
+	if (window == NULL)
+		return NULL;
+
 	SATWindowMap::const_iterator it = fSATWindowMap.find(
 		window);
 	if (it != fSATWindowMap.end())
