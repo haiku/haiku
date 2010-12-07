@@ -801,7 +801,7 @@ SourceView::MarkerView::MarkerView(SourceView* sourceView, Team* team,
 	rgb_color background = ui_color(B_PANEL_BACKGROUND_COLOR);
 	fBreakpointOptionMarker = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
 		B_DARKEN_1_TINT);
-	SetViewColor(background);
+	SetViewColor(tint_color(background, B_LIGHTEN_2_TINT));
 }
 
 
