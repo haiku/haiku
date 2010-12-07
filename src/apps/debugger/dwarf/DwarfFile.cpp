@@ -1613,8 +1613,8 @@ DwarfFile::_ParseCIE(CompilationUnit* unit, CfaContext& context,
 	if (remaining < 0)
 		return B_BAD_DATA;
 
-	return _ParseFrameInfoInstructions(unit, context, cieOffset
-		+ dataReader.Offset(), remaining);
+	return _ParseFrameInfoInstructions(unit, context, 
+		cieOffset + dataReader.Offset(), remaining);
 }
 
 
