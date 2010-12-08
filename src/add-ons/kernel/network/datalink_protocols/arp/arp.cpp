@@ -208,7 +208,7 @@ ipv4_to_ether_multicast(sockaddr_dl *destination, const sockaddr_in *source)
 	destination->sdl_family = AF_LINK;
 	destination->sdl_index = 0;
 	destination->sdl_type = IFT_ETHER;
-	destination->sdl_e_type = ETHER_TYPE_IP;
+	destination->sdl_e_type = htons(ETHER_TYPE_IP);
 	destination->sdl_nlen = destination->sdl_slen = 0;
 	destination->sdl_alen = ETHER_ADDRESS_LENGTH;
 
@@ -285,7 +285,7 @@ arp_entry::Add(in_addr_t protocolAddress, sockaddr_dl *hardwareAddress,
 	if (hardwareAddress != NULL) {
 		// this entry is already resolved
 		entry->hardware_address = *hardwareAddress;
-		entry->hardware_address.sdl_e_type = ETHER_TYPE_IP;
+		entry->hardware_address.sdl_e_type = htons(ETHER_TYPE_IP);
 	} else {
 		// this entry still needs to be resolved
 		entry->hardware_address.sdl_alen = 0;
@@ -459,7 +459,7 @@ arp_set_local_entry(arp_protocol* protocol, const sockaddr* local)
 	address.sdl_len = sizeof(sockaddr_dl);
 	address.sdl_family = AF_LINK;
 	address.sdl_type = IFT_ETHER;
-	address.sdl_e_type = ETHER_TYPE_IP;
+	address.sdl_e_type = htons(ETHER_TYPE_IP);
 	address.sdl_nlen = 0;
 	address.sdl_slen = 0;
 	address.sdl_alen = interface->device->address.length;
@@ -823,7 +823,7 @@ arp_start_resolve(arp_protocol* protocol, in_addr_t address, arp_entry** _entry)
 	source.sdl_family = AF_LINK;
 	source.sdl_index = device->index;
 	source.sdl_type = IFT_ETHER;
-	source.sdl_e_type = ETHER_TYPE_ARP;
+	source.sdl_e_type = htons(ETHER_TYPE_ARP);
 	source.sdl_nlen = source.sdl_slen = 0;
 	source.sdl_alen = ETHER_ADDRESS_LENGTH;
 	memcpy(source.sdl_data, device->address.data, ETHER_ADDRESS_LENGTH);
@@ -862,7 +862,7 @@ arp_control(const char *subsystem, uint32 function, void *buffer,
 			hardwareAddress.sdl_family = AF_LINK;
 			hardwareAddress.sdl_index = 0;
 			hardwareAddress.sdl_type = IFT_ETHER;
-			hardwareAddress.sdl_e_type = ETHER_TYPE_IP;
+			hardwareAddress.sdl_e_type = htons(ETHER_TYPE_IP);
 			hardwareAddress.sdl_nlen = hardwareAddress.sdl_slen = 0;
 			hardwareAddress.sdl_alen = ETHER_ADDRESS_LENGTH;
 			memcpy(hardwareAddress.sdl_data, control.ethernet_address,

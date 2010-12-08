@@ -52,7 +52,7 @@ ethernet_deframe(net_device* device, net_buffer* buffer)
 	source.sdl_family = AF_LINK;
 	source.sdl_index = device->index;
 	source.sdl_type = IFT_ETHER;
-	source.sdl_e_type = type;
+	source.sdl_e_type = header.type;
 	source.sdl_nlen = source.sdl_slen = 0;
 	source.sdl_alen = ETHER_ADDRESS_LENGTH;
 	memcpy(source.sdl_data, header.source, ETHER_ADDRESS_LENGTH);
@@ -61,7 +61,7 @@ ethernet_deframe(net_device* device, net_buffer* buffer)
 	destination.sdl_family = AF_LINK;
 	destination.sdl_index = device->index;
 	destination.sdl_type = IFT_ETHER;
-	destination.sdl_e_type = type;
+	destination.sdl_e_type = header.type;
 	destination.sdl_nlen = destination.sdl_slen = 0;
 	destination.sdl_alen = ETHER_ADDRESS_LENGTH;
 	memcpy(destination.sdl_data, header.destination, ETHER_ADDRESS_LENGTH);
@@ -152,7 +152,7 @@ ethernet_frame_send_data(net_datalink_protocol* protocol, net_buffer* buffer)
 
 	ether_header &header = bufferHeader.Data();
 
-	header.type = htons(source.sdl_e_type);
+	header.type = source.sdl_e_type;
 	memcpy(header.source, LLADDR(&source), ETHER_ADDRESS_LENGTH);
 	if ((buffer->flags & MSG_BCAST) != 0)
 		memcpy(header.destination, kBroadcastAddress, ETHER_ADDRESS_LENGTH);

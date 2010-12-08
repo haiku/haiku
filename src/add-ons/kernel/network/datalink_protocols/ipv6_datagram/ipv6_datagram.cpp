@@ -161,7 +161,7 @@ ipv6_to_ether_multicast(sockaddr_dl* destination, const sockaddr_in6* source)
 	destination->sdl_family = AF_LINK;
 	destination->sdl_index = 0;
 	destination->sdl_type = IFT_ETHER;
-	destination->sdl_e_type = ETHER_TYPE_IPV6;
+	destination->sdl_e_type = htons(ETHER_TYPE_IPV6);
 	destination->sdl_nlen = destination->sdl_slen = 0;
 	destination->sdl_alen = ETHER_ADDRESS_LENGTH;
 
@@ -284,14 +284,14 @@ ndp_entry::Hash(void* _entry, const void* _key, uint32 range)
 }
 
 
-ndp_entry* 
+ndp_entry*
 ndp_entry::Lookup(const in6_addr& address)
 {
 	return (ndp_entry*)hash_lookup(sCache, &address);
 }
 
 
-ndp_entry* 
+ndp_entry*
 ndp_entry::Add(const in6_addr& protocolAddress, sockaddr_dl* hardwareAddress,
 	uint32 flags)
 {
@@ -312,7 +312,7 @@ ndp_entry::Add(const in6_addr& protocolAddress, sockaddr_dl* hardwareAddress,
 	if (hardwareAddress != NULL) {
 		// this entry is already resolved
 		entry->hardware_address = *hardwareAddress;
-		entry->hardware_address.sdl_e_type = ETHER_TYPE_IPV6;
+		entry->hardware_address.sdl_e_type = htons(ETHER_TYPE_IPV6);
 	} else {
 		// this entry still needs to be resolved
 		entry->hardware_address.sdl_alen = 0;
@@ -614,7 +614,7 @@ ndp_set_local_entry(ipv6_datalink_protocol* protocol, const sockaddr* local)
 	address.sdl_len = sizeof(sockaddr_dl);
 	address.sdl_family = AF_LINK;
 	address.sdl_type = IFT_ETHER;
-	address.sdl_e_type = ETHER_TYPE_IPV6;
+	address.sdl_e_type = htons(ETHER_TYPE_IPV6);
 	address.sdl_nlen = 0;
 	address.sdl_slen = 0;
 	address.sdl_alen = interface->device->address.length;
@@ -685,7 +685,7 @@ ndp_receive_solicitation(net_buffer* buffer, bool* reuseBuffer)
 		hardwareAddress.sdl_family = AF_LINK;
 		hardwareAddress.sdl_index = 0;
 		hardwareAddress.sdl_type = IFT_ETHER;
-		hardwareAddress.sdl_e_type = ETHER_TYPE_IPV6;
+		hardwareAddress.sdl_e_type = htons(ETHER_TYPE_IPV6);
 		hardwareAddress.sdl_nlen = hardwareAddress.sdl_slen = 0;
 		hardwareAddress.sdl_alen = ETHER_ADDRESS_LENGTH;
 		memcpy(LLADDR(&hardwareAddress), header.link_address,
@@ -760,7 +760,7 @@ ndp_receive_advertisement(net_buffer* buffer)
 	hardwareAddress.sdl_family = AF_LINK;
 	hardwareAddress.sdl_index = 0;
 	hardwareAddress.sdl_type = IFT_ETHER;
-	hardwareAddress.sdl_e_type = ETHER_TYPE_IPV6;
+	hardwareAddress.sdl_e_type = htons(ETHER_TYPE_IPV6);
 	hardwareAddress.sdl_nlen = hardwareAddress.sdl_slen = 0;
 	hardwareAddress.sdl_alen = ETHER_ADDRESS_LENGTH;
 	memcpy(LLADDR(&hardwareAddress), header.link_address, ETHER_ADDRESS_LENGTH);
@@ -1049,7 +1049,7 @@ ipv6_datalink_send_data(net_datalink_protocol* _protocol, net_buffer* buffer)
 			if (status < B_OK)
 				return status;
 		}
-			
+
 		if ((entry->flags & NDP_FLAG_REJECT) != 0)
 			return EHOSTUNREACH;
 		if (!(entry->flags & NDP_FLAG_VALID)) {
@@ -1112,7 +1112,7 @@ ipv6_datalink_change_address(net_datalink_protocol* _protocol,
 			// Those are the options we handle
 			if ((protocol->interface->flags & IFF_UP) != 0) {
 				// Update NDP entry for the local address
-			
+
 				if (newAddress != NULL && newAddress->sa_family == AF_INET6) {
 					status_t status = ndp_set_local_entry(protocol, newAddress);
 					if (status != B_OK)
@@ -1144,13 +1144,13 @@ ipv6_datalink_change_address(net_datalink_protocol* _protocol,
 					socketAddress.sin6_addr.s6_addr[0] = 0xff;
 
 					net_route route;
-					memset(&route, 0, sizeof(net_route));			
+					memset(&route, 0, sizeof(net_route));
 					route.destination = (sockaddr*)&socketAddress;
 					route.mask = (sockaddr*)&socketAddress;
 					route.flags = 0;
 					sDatalinkModule->remove_route(address->domain, &route);
 				}
-			}			
+			}
 			break;
 
 		default:
