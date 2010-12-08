@@ -77,8 +77,8 @@ public:
 			void				SetToLinkLevel(const char* name);
 			void				SetToLinkLevel(uint32 index);
 			void				SetLinkLevelIndex(uint32 index);
-			void				SetLinkLevelType(uint32 type);
-			void				SetLinkLevelFrameType(uint32 frameType);
+			void				SetLinkLevelType(uint8 type);
+			void				SetLinkLevelFrameType(uint16 frameType);
 
 			int					Family() const;
 			uint16				Port() const;
@@ -103,8 +103,8 @@ public:
 
 			uint32				LinkLevelIndex() const;
 			BString				LinkLevelInterface() const;
-			uint32				LinkLevelType() const;
-			uint32				LinkLevelFrameType() const;
+			uint8				LinkLevelType() const;
+			uint16				LinkLevelFrameType() const;
 			uint8*				LinkLevelAddress() const;
 			size_t				LinkLevelAddressLength() const;
 

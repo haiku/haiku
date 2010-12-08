@@ -493,7 +493,7 @@ BNetworkAddress::SetLinkLevelIndex(uint32 index)
 
 
 void
-BNetworkAddress::SetLinkLevelType(uint32 type)
+BNetworkAddress::SetLinkLevelType(uint8 type)
 {
 	sockaddr_dl& link = (sockaddr_dl&)fAddress;
 	link.sdl_type = type;
@@ -501,10 +501,10 @@ BNetworkAddress::SetLinkLevelType(uint32 type)
 
 
 void
-BNetworkAddress::SetLinkLevelFrameType(uint32 frameType)
+BNetworkAddress::SetLinkLevelFrameType(uint16 frameType)
 {
 	sockaddr_dl& link = (sockaddr_dl&)fAddress;
-	link.sdl_e_type = frameType;
+	link.sdl_e_type = htons(frameType);
 }
 
 
@@ -791,17 +791,17 @@ BNetworkAddress::LinkLevelInterface() const
 }
 
 
-uint32
+uint8
 BNetworkAddress::LinkLevelType() const
 {
 	return ((sockaddr_dl&)fAddress).sdl_type;
 }
 
 
-uint32
+uint16
 BNetworkAddress::LinkLevelFrameType() const
 {
-	return ((sockaddr_dl&)fAddress).sdl_e_type;
+	return ntohs(((sockaddr_dl&)fAddress).sdl_e_type);
 }
 
 
