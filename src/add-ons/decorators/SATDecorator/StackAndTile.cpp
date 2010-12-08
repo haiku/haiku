@@ -126,7 +126,8 @@ StackAndTile::KeyPressed(uint32 what, int32 key, int32 modifiers)
 			_StartSAT();
 	}
 
-	if (!SATKeyPressed() || what != B_KEY_DOWN)
+	if (!SATKeyPressed() || (modifiers & B_COMMAND_KEY) == 0
+		|| what != B_KEY_DOWN)
 		return false;
 
 	const int kArrowKeyUp = 87;
