@@ -8,23 +8,20 @@
 #ifndef _USB_SERIAL_DRIVER_H_
 #define _USB_SERIAL_DRIVER_H_
 
-#include <OS.h>
-#include <KernelExport.h>
 #include <Drivers.h>
+#include <KernelExport.h>
+#include <OS.h>
+#include <USB3.h>
+
+#include <lock.h>
 #include <string.h>
 
-#ifdef __HAIKU__
-#include <lock.h>
-#else
-#include "BeOSCompatibility.h"
-#endif
-#include "kernel_cpp.h"
 #include "Tracing.h"
-#include "USB3.h"
 
 extern "C" {
 #include <tty_module.h>
 }
+
 
 #define DRIVER_NAME		"usb_serial"	// driver name for debug output
 #define DEVICES_COUNT	20				// max simultaneously open devices

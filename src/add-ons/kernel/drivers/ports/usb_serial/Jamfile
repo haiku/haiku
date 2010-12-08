@@ -1,11 +1,7 @@
 SubDir HAIKU_TOP src add-ons kernel drivers ports usb_serial ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
-if $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
-	UsePrivateKernelHeaders ;
-	UseHeaders [ FDirName $(HAIKU_TOP) headers os drivers tty ] : true ;
-}
+UsePrivateKernelHeaders ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers os drivers tty ] : true ;
 
 SubDirC++Flags -fno-rtti ;
 
@@ -21,13 +17,3 @@ KernelAddon usb_serial :
 ;
 
 AddResources usb_serial : usb_serial.rdef ;
-
-
-Package haiku-usb_serial-cvs
-	:
-	usb_serial
-	:
-	boot home config add-ons kernel drivers bin ;
-
-Package haiku-usb_serial-cvs : <usb_serial!driver>usb_serial.settings.sample
-        : boot home config settings kernel drivers sample ;

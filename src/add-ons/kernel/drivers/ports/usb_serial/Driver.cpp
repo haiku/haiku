@@ -260,7 +260,6 @@ usb_serial_control(void *cookie, uint32 op, void *arg, size_t length)
 }
 
 
-#if defined(B_BEOS_VERSION_DANO) || defined(__HAIKU__)
 /* usb_serial_select - handle select start */
 static status_t
 usb_serial_select(void *cookie, uint8 event, uint32 ref, selectsync *sync)
@@ -281,7 +280,6 @@ usb_serial_deselect(void *cookie, uint8 event, selectsync *sync)
 	SerialDevice *device = (SerialDevice *)cookie;
 	return device->DeSelect(event, sync);
 }
-#endif // DANO, HAIKU
 
 
 /* usb_serial_close - handle close() calls */
@@ -357,10 +355,8 @@ find_device(const char *name)
 		usb_serial_control,			/* -> control entry point */
 		usb_serial_read,			/* -> read entry point */
 		usb_serial_write,			/* -> write entry point */
-#if defined(B_BEOS_VERSION_DANO) || defined(__HAIKU__)
 		usb_serial_select,			/* -> select entry point */
 		usb_serial_deselect			/* -> deselect entry point */
-#endif
 	};
 
 	TRACE_FUNCALLS("> find_device(%s)\n", name);
