@@ -184,10 +184,18 @@ FTDIDevice::SetControlLineState(uint16 state)
 
 	int32 control;
 	control = (state & CLS_LINE_RTS) ? FTDI_SIO_SET_RTS_HIGH : FTDI_SIO_SET_RTS_LOW;
-	control |= (state & CLS_LINE_DTR) ? FTDI_SIO_SET_DTR_HIGH : FTDI_SIO_SET_DTR_LOW;
 
 	size_t length = 0;
 	status_t status = gUSBModule->send_request(Device(),
+		USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
+		FTDI_SIO_MODEM_CTRL, control,
+		FTDI_PIT_DEFAULT, 0, NULL, &length);
+
+	if (status != B_OK)
+		TRACE_ALWAYS("= FTDIDevice::SetControlLineState(): control set request failed: 0x%08x\n", status);
+
+	control = (state & CLS_LINE_DTR) ? FTDI_SIO_SET_DTR_HIGH : FTDI_SIO_SET_DTR_LOW;
+	status = gUSBModule->send_request(Device(),
 		USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
 		FTDI_SIO_MODEM_CTRL, control,
 		FTDI_PIT_DEFAULT, 0, NULL, &length);
