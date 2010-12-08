@@ -21,35 +21,41 @@ extern "C" {
 	typedef void (*PFN_exit_transport)(void);
 }
 
+
 class TransportException {
+public:
+					TransportException(const string &what_arg);
+	const char*		What() const;
+
 private:
 	string fWhat;
-public:
-	TransportException(const string &what_arg) : fWhat(what_arg) {}
-	const char *what() const { return fWhat.c_str(); }
 };
+
 
 class Transport {
 public:
-	Transport(const PrinterData *printer_data);
-	~Transport();
-	void write(const void *buffer, size_t size) throw(TransportException);
-	bool check_abort() const;
-	bool is_print_to_file_canceled() const;
-	const string &last_error() const;
+					Transport(const PrinterData* printerData);
+					~Transport();
+
+	void			Write(const void *buffer, size_t size)
+						throw (TransportException);
+	bool			CheckAbort() const;
+	bool			IsPrintToFileCanceled() const;
+	const string&	LastError() const;
 
 protected:
-	void set_last_error(const char *e);
-	Transport(const Transport &);
-	Transport &operator = (const Transport &);
+					Transport(const Transport& transport);
+					Transport &operator=(const Transport& transport);
+
+	void			SetLastError(const char* message);
 
 private:
-	image_id           fImage;
-	PFN_init_transport fInitTransport;
-	PFN_exit_transport fExitTransport;
-	BDataIO            *fDataStream;
-	bool               fAbort;
-	string             fLastErrorString;
+	image_id			fImage;
+	PFN_init_transport	fInitTransport;
+	PFN_exit_transport	fExitTransport;
+	BDataIO*			fDataStream;
+	bool				fAbort;
+	string				fLastErrorString;
 };
 
 #endif	// __TRANSPORT_H

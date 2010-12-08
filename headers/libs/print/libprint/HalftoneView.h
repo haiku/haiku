@@ -12,17 +12,21 @@
 class HalftonePreviewView : public BView
 {
 public:
-	HalftonePreviewView(BRect frame, const char* name, uint32 resizeMask, uint32 flags);
+			HalftonePreviewView(BRect frame, const char* name,
+				uint32 resizeMask, uint32 flags);
 
-	void preview(float gamma, float min, Halftone::DitherType ditherType, bool color);
+	void	Preview(float gamma, float min, Halftone::DitherType ditherType,
+				bool color);
 };
 
 class HalftoneView : public BView
 {
 public:
-	HalftoneView(BRect frame, const char* name, uint32 resizeMask, uint32 flags);
+			HalftoneView(BRect frame, const char* name, uint32 resizeMask,
+				uint32 flags);
 
-	void preview(float gamma, float min, Halftone::DitherType ditherType, bool color);
+	void	Preview(float gamma, float min, Halftone::DitherType ditherType,
+				bool color);
 
 private:
 	HalftonePreviewView* fPreview;

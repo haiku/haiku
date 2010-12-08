@@ -19,8 +19,8 @@ class ProtocolClassItem : public BStringItem {
 public:
 					ProtocolClassItem(const ProtocolClassCap* cap);
 
-		int			getProtocolClass();
-		const char*	getDescription();
+		int			GetProtocolClass() const;
+		const char*	GetDescription() const;
 
 private:
 	const ProtocolClassCap *fProtocolClassCap;	

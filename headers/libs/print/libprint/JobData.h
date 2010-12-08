@@ -26,9 +26,9 @@ class DriverSpecificSettings
 {
 public:
 	DriverSpecificSettings();
-	DriverSpecificSettings(const DriverSpecificSettings& settings);
+	DriverSpecificSettings(const DriverSpecificSettings& Settings);
 
-	DriverSpecificSettings &operator=(const DriverSpecificSettings &settings);
+	DriverSpecificSettings &operator=(const DriverSpecificSettings &Settings);
 
 	void MakeEmpty();
 
@@ -262,6 +262,110 @@ public:
 		kEvenNumberedPages
 	};
 
+				JobData(BMessage* message, const PrinterCap* printerCap,
+					SettingType type);
+				~JobData();
+
+				JobData(const JobData& jobData);
+	JobData&	operator=(const JobData& jobData);
+
+	void		Load(BMessage* message, const PrinterCap* printerCap,
+					SettingType type);
+	void		Save(BMessage* message = NULL);
+
+	bool		GetShowPreview() const;
+	void		SetShowPreview(bool showPreview);
+
+	Paper		GetPaper() const;
+	void		SetPaper(Paper paper);
+
+	int32		GetResolutionID() const;
+	void		SetResolutionID(int32 resolution);
+
+	int32		GetXres() const;
+	void		SetXres(int32 xres);
+
+	int32		GetYres() const;
+	void		SetYres(int32 yres);
+
+	Orientation	GetOrientation() const;
+	void		SetOrientation(Orientation orientation);
+
+	float		GetScaling() const;
+	void		SetScaling(float scaling);
+
+	const BRect&	GetPaperRect() const;
+	void 			SetPaperRect(const BRect& paperRect);
+
+	const BRect&	GetScaledPaperRect() const;
+	void  			SetScaledPaperRect(const BRect& paperRect);
+
+	const BRect&	GetPrintableRect() const;
+	void 			SetPrintableRect(const BRect& printableRect);
+
+	const BRect&	GetScaledPrintableRect() const;
+	void			SetScaledPrintableRect(const BRect& printableRect);
+
+	const BRect&	GetPhysicalRect() const;
+	void 			SetPhysicalRect(const BRect& PhysicalRect);
+
+	const BRect&	GetScaledPhysicalRect() const;
+	void			SetScaledPhysicalRect(const BRect& PhysicalRect);
+
+	int32			GetNup() const;
+	void			SetNup(int32 nup);
+
+	bool			GetReverse() const;
+	void			SetReverse(bool reverse);
+
+	int32			GetFirstPage() const;
+	void			SetFirstPage(int32 firstPage);
+
+	int32			GetLastPage() const;
+	void			SetLastPage(int32 lastPage);
+
+	// libprint supports only B_RGB32
+	color_space		GetSurfaceType() const;
+
+	float			GetGamma() const;
+	void			SetGamma(float gamma);
+
+	float			GetInkDensity() const;
+	void			SetInkDensity(float inkDensity);
+
+	PaperSource		GetPaperSource() const;
+	void			SetPaperSource(PaperSource paperSource);
+
+	int32			GetCopies() const;
+	void			SetCopies(int32 copies);
+
+	bool			GetCollate() const;
+	void			SetCollate(bool collate);
+
+	PrintStyle		GetPrintStyle() const;
+	void			SetPrintStyle(PrintStyle printStyle);
+
+	BindingLocation	GetBindingLocation() const;
+	void			SetBindingLocation(BindingLocation bindingLocation);
+
+	PageOrder		GetPageOrder() const;
+	void			SetPageOrder(PageOrder pageOrder);
+	
+	Color			GetColor() const;
+	void			SetColor(Color color);
+	
+	Halftone::DitherType	GetDitherType() const;
+	void					SetDitherType(Halftone::DitherType ditherType);
+	
+	PageSelection	GetPageSelection() const;
+	void			SetPageSelection(PageSelection pageSelection);
+	
+	MarginUnit		GetMarginUnit() const;
+	void			SetMarginUnit(MarginUnit marginUnit);
+
+	DriverSpecificSettings& 		Settings();
+	const DriverSpecificSettings&	Settings() const;
+
 private:
 	bool        fShowPreview;
 	Paper       fPaper;
@@ -295,110 +399,416 @@ private:
 	PageSelection        fPageSelection;
 	MarginUnit  fMarginUnit;
 	DriverSpecificSettings fDriverSpecificSettings;
-
-public:
-	JobData(BMessage *msg, const PrinterCap *cap, SettingType type);
-	~JobData();
-
-	JobData(const JobData &job_data);
-	JobData &operator = (const JobData &job_data);
-
-	void load(BMessage *msg, const PrinterCap *cap, SettingType type);
-	void save(BMessage *msg = NULL);
-
-	bool getShowPreview() const { return fShowPreview; }
-	void setShowPreview(bool showPreview) { fShowPreview = showPreview; }
-
-	Paper getPaper() const { return fPaper; }
-	void  setPaper(Paper paper) { fPaper = paper; }
-
-	int32 getResolutionID() const { return fResolutionID; }
-	void setResolutionID(int32 resolution) { fResolutionID = resolution; }
-
-	int32 getXres() const { return fXRes; } 
-	void  setXres(int32 xres) { fXRes = xres; }
-
-	int32 getYres() const { return fYRes; }
-	void  setYres(int32 yres) { fYRes = yres; };
-
-	Orientation getOrientation() const { return fOrientation; }
-	void  setOrientation(Orientation orientation) { fOrientation = orientation; }
-
-	float getScaling() const { return fScaling; }
-	void  setScaling(float scaling) { fScaling = scaling; }
-
-	const BRect &getPaperRect() const { return fPaperRect; }
-	void  setPaperRect(const BRect &paper_rect) { fPaperRect = paper_rect; }
-
-	const BRect &getScaledPaperRect() const { return fScaledPaperRect; }
-	void  setScaledPaperRect(const BRect &paper_rect) { fScaledPaperRect = paper_rect; }
-
-	const BRect &getPrintableRect() const { return fPrintableRect; }
-	void  setPrintableRect(const BRect &printable_rect) { fPrintableRect = printable_rect; }
-
-	const BRect &getScaledPrintableRect() const { return fScaledPrintableRect; }
-	void  setScaledPrintableRect(const BRect &printable_rect) { fScaledPrintableRect = printable_rect; }
-
-	const BRect &getPhysicalRect() const { return fPhysicalRect; }
-	void  setPhysicalRect(const BRect &Physical_rect) { fPhysicalRect = Physical_rect; }
-
-	const BRect &getScaledPhysicalRect() const { return fScaledPhysicalRect; }
-	void  setScaledPhysicalRect(const BRect &Physical_rect) { fScaledPhysicalRect = Physical_rect; }
-
-	int32 getNup() const { return fNup; }
-	void  setNup(int32 nup) { fNup = nup; }
-
-	bool getReverse() const { return fReverse; }
-	void  setReverse(bool reverse) { fReverse = reverse; }
-
-	int32 getFirstPage() const { return fFirstPage; }
-	void  setFirstPage(int32 first_page) { fFirstPage = first_page; }
-
-	int32 getLastPage() const { return fLastPage; }
-	void  setLastPage(int32 last_page) { fLastPage = last_page; }
-
-	// libprint supports only B_RGB32
-	color_space getSurfaceType() const { return B_RGB32; }
-
-	float getGamma() const { return fGamma; }
-	void setGamma(float gamma) { fGamma = gamma; }
-
-	float getInkDensity() const { return fInkDensity; }
-	void setInkDensity(float inkDensity) { fInkDensity = inkDensity; }
-
-	PaperSource getPaperSource() const { return fPaperSource; }
-	void setPaperSource(PaperSource paper_source) { fPaperSource = paper_source; };
-
-	int32 getCopies() const { return fCopies; }
-	void  setCopies(int32 copies) { fCopies = copies; }
-
-	bool getCollate() const { return fCollate; }
-	void setCollate(bool collate) { fCollate = collate; }
-
-	PrintStyle getPrintStyle() const { return fPrintStyle; }
-	void setPrintStyle(PrintStyle print_style) { fPrintStyle = print_style; }
-
-	BindingLocation getBindingLocation() const { return fBindingLocation; }
-	void setBindingLocation(BindingLocation binding_location) { fBindingLocation = binding_location; }
-
-	PageOrder getPageOrder() const { return fPageOrder; }
-	void setPageOrder(PageOrder page_order) { fPageOrder = page_order; }
-	
-	Color getColor() const { return fColor; }
-	void setColor(Color color) { fColor = color; }
-	
-	Halftone::DitherType getDitherType() const { return fDitherType; }
-	void setDitherType(Halftone::DitherType dither_type) { fDitherType = dither_type; }
-	
-	PageSelection getPageSelection() const { return fPageSelection; }
-	void setPageSelection(PageSelection pageSelection) { fPageSelection = pageSelection; }
-	
-	MarginUnit getMarginUnit() const { return fMarginUnit; }
-	void setMarginUnit(MarginUnit marginUnit) { fMarginUnit = marginUnit; }
-
-	DriverSpecificSettings& Settings();
-	const DriverSpecificSettings& Settings() const;
-
 };
+
+
+inline bool
+JobData::GetShowPreview() const
+{
+	return fShowPreview;
+}
+
+inline void
+JobData::SetShowPreview(bool showPreview)
+{
+	fShowPreview = showPreview;
+}
+
+
+inline JobData::Paper
+JobData::GetPaper() const
+{
+	return fPaper;
+}
+
+
+inline void
+JobData::SetPaper(Paper paper)
+{
+	fPaper = paper;
+}
+
+
+inline int32
+JobData::GetResolutionID() const
+{
+	return fResolutionID;
+}
+
+
+inline void
+JobData::SetResolutionID(int32 resolution)
+{
+	fResolutionID = resolution;
+}
+
+
+inline int32
+JobData::GetXres() const
+{
+	return fXRes;
+}
+
+
+inline void
+JobData::SetXres(int32 xres)
+{
+	fXRes = xres;
+}
+
+
+inline int32
+JobData::GetYres() const
+{
+	return fYRes;
+}
+
+
+inline void
+JobData::SetYres(int32 yres)
+{
+	fYRes = yres;
+};
+
+
+inline JobData::Orientation
+JobData::GetOrientation() const
+{
+	return fOrientation;
+}
+
+
+inline void
+JobData::SetOrientation(Orientation orientation)
+{
+	fOrientation = orientation;
+}
+
+
+inline float
+JobData::GetScaling() const
+{
+	return fScaling;
+}
+
+
+inline void
+JobData::SetScaling(float scaling)
+{
+	fScaling = scaling;
+}
+
+
+inline const BRect&
+JobData::GetPaperRect() const
+{
+	return fPaperRect;
+}
+
+
+inline void
+JobData::SetPaperRect(const BRect &rect)
+{
+	fPaperRect = rect;
+}
+
+
+inline const BRect&
+JobData::GetScaledPaperRect() const
+{
+	return fScaledPaperRect;
+}
+
+
+inline void
+JobData::SetScaledPaperRect(const BRect &rect)
+{
+	fScaledPaperRect = rect;
+}
+
+
+inline const BRect &
+JobData::GetPrintableRect() const
+{
+	return fPrintableRect;
+}
+
+
+inline void
+JobData::SetPrintableRect(const BRect &rect)
+{
+	fPrintableRect = rect;
+}
+
+
+inline const BRect&
+JobData::GetScaledPrintableRect() const
+{
+	return fScaledPrintableRect;
+}
+
+
+inline void
+JobData::SetScaledPrintableRect(const BRect &rect)
+{
+	fScaledPrintableRect = rect;
+}
+
+
+inline const BRect&
+JobData::GetPhysicalRect() const
+{
+	return fPhysicalRect;
+}
+
+
+inline void
+JobData::SetPhysicalRect(const BRect &rect)
+{
+	fPhysicalRect = rect;
+}
+
+
+inline const BRect&
+JobData::GetScaledPhysicalRect() const
+{
+	return fScaledPhysicalRect;
+}
+
+
+
+inline void
+JobData::SetScaledPhysicalRect(const BRect &rect)
+{
+	fScaledPhysicalRect = rect;
+}
+
+
+inline int32
+JobData::GetNup() const
+{
+	return fNup;
+}
+
+
+inline void
+JobData::SetNup(int32 nup)
+{
+	fNup = nup;
+}
+
+
+inline bool
+JobData::GetReverse() const
+{
+	return fReverse;
+}
+
+
+inline void
+JobData::SetReverse(bool reverse)
+{
+	fReverse = reverse;
+}
+
+
+inline int32
+JobData::GetFirstPage() const
+{
+	return fFirstPage;
+}
+
+
+inline void
+JobData::SetFirstPage(int32 firstPage)
+{
+	fFirstPage = firstPage;
+}
+
+
+inline int32
+JobData::GetLastPage() const
+{
+	return fLastPage;
+}
+
+
+inline void
+JobData::SetLastPage(int32 lastPage)
+{
+	fLastPage = lastPage;
+}
+
+
+color_space
+inline JobData::GetSurfaceType() const
+{
+	return B_RGB32;
+}
+
+
+inline float
+JobData::GetGamma() const
+{
+	return fGamma;
+}
+
+
+inline void
+JobData::SetGamma(float gamma)
+{
+	fGamma = gamma;
+}
+
+
+inline float
+JobData::GetInkDensity() const
+{
+	return fInkDensity;
+}
+
+
+inline void
+JobData::SetInkDensity(float inkDensity)
+{
+	fInkDensity = inkDensity;
+}
+
+
+inline JobData::PaperSource
+JobData::GetPaperSource() const
+{
+	return fPaperSource;
+}
+
+
+inline void
+JobData::SetPaperSource(PaperSource paperSource)
+{
+	fPaperSource = paperSource;
+};
+
+
+inline int32
+JobData::GetCopies() const
+{
+	return fCopies;
+}
+
+
+inline void
+JobData::SetCopies(int32 copies)
+{
+	fCopies = copies;
+}
+
+
+inline bool
+JobData::GetCollate() const
+{
+	return fCollate;
+}
+
+
+inline void
+JobData::SetCollate(bool collate)
+{
+	fCollate = collate;
+}
+
+
+inline JobData::PrintStyle
+JobData::GetPrintStyle() const
+{
+	return fPrintStyle;
+}
+
+
+inline void
+JobData::SetPrintStyle(PrintStyle print_style)
+{
+	fPrintStyle = print_style;
+}
+
+
+inline JobData::BindingLocation
+JobData::GetBindingLocation() const
+{
+	return fBindingLocation;
+}
+
+
+inline void
+JobData::SetBindingLocation(BindingLocation binding_location)
+{
+	fBindingLocation = binding_location;
+}
+
+
+inline JobData::PageOrder
+JobData::GetPageOrder() const { return fPageOrder; }
+
+
+inline void
+JobData::SetPageOrder(PageOrder page_order)
+{
+	fPageOrder = page_order;
+}
+
+
+inline JobData::Color
+JobData::GetColor() const
+{
+	return fColor;
+}
+
+
+inline void
+JobData::SetColor(Color color)
+{
+	fColor = color;
+}
+
+
+inline Halftone::DitherType
+JobData::GetDitherType() const
+{
+	return fDitherType;
+}
+
+
+inline void
+JobData::SetDitherType(Halftone::DitherType dither_type)
+{
+	fDitherType = dither_type;
+}
+
+
+inline JobData::PageSelection
+JobData::GetPageSelection() const
+{
+	return fPageSelection;
+}
+
+
+inline void
+JobData::SetPageSelection(PageSelection pageSelection)
+{
+	fPageSelection = pageSelection;
+}
+
+
+inline MarginUnit
+JobData::GetMarginUnit() const
+{
+	return fMarginUnit;
+}
+
+
+inline void
+JobData::SetMarginUnit(MarginUnit marginUnit)
+{
+	fMarginUnit = marginUnit;
+}
 
 #endif	/* __JOBDATA_H */

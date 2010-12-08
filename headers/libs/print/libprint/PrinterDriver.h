@@ -17,35 +17,39 @@ class GraphicsDriver;
 
 class PrinterDriver {
 public:
-	PrinterDriver(BNode* spoolFolder);
-	virtual ~PrinterDriver();
+							PrinterDriver(BNode* spoolFolder);
+	virtual					~PrinterDriver();
 
-	virtual const char* GetSignature() const = 0;
-	virtual const char* GetDriverName() const = 0;
-	virtual const char* GetVersion() const = 0;
-	virtual const char* GetCopyright() const = 0;
+	virtual	const char*		GetSignature() const = 0;
+	virtual	const char*		GetDriverName() const = 0;
+	virtual	const char*		GetVersion() const = 0;
+	virtual	const char*		GetCopyright() const = 0;
 
-	virtual PrinterCap* InstantiatePrinterCap(PrinterData* printerData) = 0;
-	virtual PrinterData* InstantiatePrinterData(BNode* node);
-	virtual GraphicsDriver* InstantiateGraphicsDriver(BMessage* settings, PrinterData* printerData, PrinterCap* printerCap) = 0;
+	virtual	PrinterCap*		InstantiatePrinterCap(PrinterData* printerData) = 0;
+	virtual	PrinterData*	InstantiatePrinterData(BNode* node);
+	virtual	GraphicsDriver*	InstantiateGraphicsDriver(BMessage* settings,
+								PrinterData* printerData,
+								PrinterCap* printerCap) = 0;
 	
-	void InitPrinterDataAndCap();
+			void			InitPrinterDataAndCap();
 
-	virtual void About();
-	virtual char* AddPrinter(char* printerName);
-	BMessage* ConfigPage(BMessage* settings);
-	BMessage* ConfigJob(BMessage* settings);
-	BMessage* TakeJob(BFile* printJob, BMessage* settings);
+	virtual	void			About();
+	virtual	char*			AddPrinter(char* printerName);
+			BMessage*		ConfigPage(BMessage* settings);
+			BMessage*		ConfigJob(BMessage* settings);
+			BMessage*		TakeJob(BFile* printJob, BMessage* settings);
 
 protected:
-	
-	PrinterData* GetPrinterData() { return fPrinterData; }
-	PrinterCap* GetPrinterCap() { return fPrinterCap; }
+			PrinterData*	GetPrinterData() { return fPrinterData; }
+			PrinterCap*		GetPrinterCap() { return fPrinterCap; }
 
 private:
-	bool ReadSettings(const char* attrName, BMessage* settings);
-	void WriteSettings(const char* attrName, BMessage* settings);
-	void MergeWithPreviousSettings(const char* attrName, BMessage* settings);
+			bool			_ReadSettings(const char* attrName,
+								BMessage* settings);
+			void			_WriteSettings(const char* attrName,
+								BMessage* settings);
+			void			_MergeWithPreviousSettings(const char* attrName,
+								BMessage* settings);
 
 	BNode*          fSpoolFolder;
 	PrinterData*    fPrinterData;

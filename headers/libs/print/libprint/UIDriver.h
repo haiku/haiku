@@ -15,22 +15,26 @@ class JobData;
 
 class UIDriver {
 public:
-	UIDriver(BMessage *msg, PrinterData *printer_data, const PrinterCap *printer_cap);
-	virtual ~UIDriver();
-	BMessage *configPage();
-	BMessage *configJob();
+						UIDriver(BMessage* message, PrinterData* printerData,
+							const PrinterCap* printerCap);
+	virtual				~UIDriver();
+			BMessage*	ConfigPage();
+			BMessage*	ConfigJob();
 
 protected:
-	virtual long doPageSetup(JobData *job_data, PrinterData *printer_data, const PrinterCap *printer_cap);
-	virtual long doJobSetup(JobData *job_data, PrinterData *printer_data, const PrinterCap *printer_cap);
+						UIDriver(const UIDriver &);
 
-	UIDriver(const UIDriver &);
-	UIDriver &operator = (const UIDriver &);
+			UIDriver&	operator=(const UIDriver &);
+
+	virtual	long		PageSetup(JobData* jobData, PrinterData* printerData,
+							const PrinterCap* printerCap);
+	virtual	long		JobSetup(JobData* jobData, PrinterData* printerData,
+							const PrinterCap* printerCap);
 
 private:
-	BMessage         *fMsg;
-	PrinterData      *fPrinterData;
-	const PrinterCap *fPrinterCap;
+	BMessage*			fMsg;
+	PrinterData*		fPrinterData;
+	const PrinterCap*	fPrinterCap;
 };
 
 #endif	/* __UIDRIVER_H */

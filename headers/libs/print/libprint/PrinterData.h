@@ -15,72 +15,91 @@ class BNode;
 
 class PrinterData {
 public:
-	PrinterData(BNode *node = NULL);
-	virtual ~PrinterData();
-	virtual void load();
-	virtual void save();
+						PrinterData(BNode* node = NULL);
+	virtual				~PrinterData();
 
-	const string &getDriverName() const;
-	const string &getPrinterName() const;
-	const string &getComments() const;
-	const string &getTransport() const;
-	int getProtocolClass() const;
+	virtual	void		Load();
+	virtual	void		Save();
 
-	void  setPrinterName(const char *printer_name);
-	void  setComments(const char *comments);
-	void  setProtocolClass(int protocolClass);
+			const string&	GetDriverName() const;
+			const string&	GetPrinterName() const;
+			const string&	GetComments() const;
+			const string&	GetTransport() const;
+			int				GetProtocolClass() const;
 
-	bool getPath(string &path) const;
+			void			SetPrinterName(const char* printerName);
+			void			SetComments(const char* comments);
+			void			SetProtocolClass(int protocolClass);
+
+			bool			GetPath(string& path) const;
 
 protected:
-	PrinterData(const PrinterData &printer_data);
-	PrinterData &operator = (const PrinterData &printer_data);
+						PrinterData(const PrinterData &printer_data);
 
-	BNode  *fNode;
+			PrinterData&	operator=(const PrinterData &printer_data);
+
+	BNode*	fNode;
+
 private:
-	string fDriverName;
-	string fPrinterName;
-	string fComments;
-	string fTransport;
-	int    fProtocolClass;
+	string	fDriverName;
+	string	fPrinterName;
+	string	fComments;
+	string	fTransport;
+	int		fProtocolClass;
 };
 
-inline const string &PrinterData::getDriverName() const
+
+inline const string&
+PrinterData::GetDriverName() const
 {
 	return fDriverName;
 }
 
-inline const string &PrinterData::getPrinterName() const
+
+inline const string&
+PrinterData::GetPrinterName() const
 {
 	return fPrinterName;
 }
 
-inline const string &PrinterData::getComments() const
+
+inline const string&
+PrinterData::GetComments() const
 {
 	return fComments;
 }
 
-inline const string &PrinterData::getTransport() const
+
+inline const string&
+PrinterData::GetTransport() const
 {
 	return fTransport;
 }
 
-inline int PrinterData::getProtocolClass() const
+
+inline int
+PrinterData::GetProtocolClass() const
 {
 	return fProtocolClass;
 }
 
-inline void PrinterData::setPrinterName(const char *printer_name)
+
+inline void
+PrinterData::SetPrinterName(const char* printerName)
 {
-	fPrinterName = printer_name;
+	fPrinterName = printerName;
 }
 
-inline void PrinterData::setComments(const char *comments)
+
+inline void
+PrinterData::SetComments(const char* comments)
 {
 	fComments = comments;
 }
 
-inline void PrinterData::setProtocolClass(int protocolClass)
+
+inline void
+PrinterData::SetProtocolClass(int protocolClass)
 {
 	fProtocolClass = protocolClass;
 }

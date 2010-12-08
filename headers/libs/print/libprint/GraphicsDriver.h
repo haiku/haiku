@@ -148,7 +148,7 @@ GraphicsDriver::GetSpoolMetaData() const
 inline int
 GraphicsDriver::GetProtocolClass() const
 {
-	return fPrinterData->getProtocolClass();
+	return fPrinterData->GetProtocolClass();
 }
 
 

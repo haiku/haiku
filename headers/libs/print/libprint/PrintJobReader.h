@@ -35,52 +35,57 @@ THE SOFTWARE.
 #include <Picture.h>
 
 class PrintJobPage {
-	BFile fJobFile; // the job file
-	off_t fNextPicture; // offset to first picture
-	int32 fNumberOfPictures; // of this page
-	int32 fPicture; // the picture returned by NextPicture()
-	status_t fStatus;
-
 public:
-	PrintJobPage();
-	PrintJobPage(const PrintJobPage& copy);
-	PrintJobPage(BFile* jobFile, off_t start);
-	status_t InitCheck() const;
+					PrintJobPage();
+					PrintJobPage(const PrintJobPage& copy);
+					PrintJobPage(BFile* jobFile, off_t start);
 
-	int32 NumberOfPictures() const { return fNumberOfPictures; }
+	status_t		InitCheck() const;
 
-	status_t NextPicture(BPicture& picture, BPoint& p, BRect& r);
+	int32			NumberOfPictures() const { return fNumberOfPictures; }
+
+	status_t		NextPicture(BPicture& picture, BPoint& p, BRect& r);
 
 	PrintJobPage& operator=(const PrintJobPage& copy);
+
+private:
+	BFile		fJobFile;			// the job file
+	off_t		fNextPicture;		// offset to first picture
+	int32		fNumberOfPictures;	// of this page
+	int32		fPicture;			// the picture returned by NextPicture()
+	status_t	fStatus;
 };
 
+
 class PrintJobReader {
-	BFile fJobFile;  // the job file
-	int32 fNumberOfPages; // the number of pages in the job file
-	BMessage fJobSettings; // the settings extracted from the job file
-	off_t* fPageIndex; // start positions of pages in the job file
-
-	void BuildPageIndex();
-
 public:
-	PrintJobReader(BFile* jobFile);
-	virtual ~PrintJobReader();
+					PrintJobReader(BFile* jobFile);
+	virtual			~PrintJobReader();
 
-		// test after construction if this is a valid job file
-	status_t InitCheck() const;
+			// test after construction if this is a valid job file
+			status_t	InitCheck() const;
 
-		// accessors to informations from job file
-	int32 NumberOfPages() const { return fNumberOfPages; }
-	int32 FirstPage() const;
-	int32 LastPage() const;
-	const BMessage* JobSettings() const { return &fJobSettings; }
-	BRect PaperRect() const;
-	BRect PrintableRect() const;
-	void GetResolution(int32 *xdpi, int32 *ydpi) const;
-	float GetScale() const;
+			// accessors to informations from job file
+			int32		NumberOfPages() const { return fNumberOfPages; }
+			int32		FirstPage() const;
+			int32		LastPage() const;
+			const BMessage*	JobSettings() const { return &fJobSettings; }
+			BRect		PaperRect() const;
+			BRect		PrintableRect() const;
+			void		GetResolution(int32* xdpi, int32* ydpi) const;
+			float		GetScale() const;
 
-		// retrieve page
-	status_t GetPage(int32 no, PrintJobPage& pjp);
+			// retrieve page
+			status_t	GetPage(int32 no, PrintJobPage& pjp);
+
+private:
+			void		_BuildPageIndex();
+
+	BFile		fJobFile;		// the job file
+	int32		fNumberOfPages;	// the number of pages in the job file
+	BMessage	fJobSettings;	// the settings extracted from the job file
+	off_t*		fPageIndex;		// start positions of pages in the job file
+
 };
 
 #endif

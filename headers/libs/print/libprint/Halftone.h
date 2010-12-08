@@ -30,7 +30,10 @@ typedef union {
 } ColorRGB32;
 
 class Halftone;
-typedef void (Halftone::*PFN_dither)(uchar *dst, const uchar *src, int x, int y, int width);
+
+typedef void (Halftone::*PFN_dither)(uchar* destination, const uchar* source,
+	int x, int y, int width);
+
 typedef uint (*PFN_gray)(ColorRGB32 c);
 
 class Halftone {
@@ -41,108 +44,139 @@ public:
 		kType3,
 		kTypeFloydSteinberg,
 	};
+
 	enum GrayFunction {
 		kMixToGray,
 		kRedChannel,
 		kGreenChannel,
 		kBlueChannel
 	};
+
 	enum Planes {
 		kPlaneMonochrome1, // 1 bit depth (0 white, 1 black)
 		kPlaneRGB1,        // 3 planes, 1 bit depth (0 black, 7 white)
 	};
+
 	enum BlackValue {
 		kHighValueMeansBlack,
 		kLowValueMeansBlack,
 	};
-	Halftone(color_space cs, double gamma = 1.4, double min = 0.0, DitherType dither_type = kTypeFloydSteinberg);
-	~Halftone();
-	void setPlanes(Planes planes);
-	void setBlackValue(BlackValue blackValue);
-	void dither(uchar *dst, const uchar *src, int x, int y, int width);
-	int getPixelDepth() const;
-	const uchar *getPattern() const;
-	void setPattern(const uchar *pattern);
+
+					Halftone(color_space colorSpace, double gamma = 1.4,
+						double min = 0.0,
+						DitherType dither_type = kTypeFloydSteinberg);
+					~Halftone();
+
+			void	SetPlanes(Planes planes);
+			void	SetBlackValue(BlackValue blackValue);
+
+			void	Dither(uchar *destination, const uchar *source, int x,
+						int y, int width);
+
+			int		GetPixelDepth() const;
+
+			const uchar*	GetPattern() const;
+			void			SetPattern(const uchar *pattern);
 
 protected:
-	// PFN_gray: return value of 0 means low density (or black) and value of 255 means high density (or white)
-	PFN_gray getGrayFunction() const;
-	void setGrayFunction(PFN_gray gray);
-	void setGrayFunction(GrayFunction grayFunction);
+			Halftone(const Halftone &);
 
-	void createGammaTable(double gamma, double min);
-	void initElements(int x, int y, uchar *elements);
-	uint getDensity(ColorRGB32 c) const;
-	uchar convertUsingBlackValue(uchar byte) const;
-	void ditherRGB32(uchar *dst, const uchar *src, int x, int y, int width);
+			Halftone&	operator=(const Halftone &);
 
-	void initFloydSteinberg();
-	void deleteErrorTables();
-	void uninitFloydSteinberg();
-	void setupErrorBuffer(int x, int y, int width);
-	void ditherFloydSteinberg(uchar *dst, const uchar* src, int x, int y, int width);
+			// PFN_gray: return value of 0 means low density (or black) and
+			// value of 255 means high density (or white)
+			PFN_gray	GetGrayFunction() const;
+			void		SetGrayFunction(PFN_gray gray);
+			void		SetGrayFunction(GrayFunction grayFunction);
 
-	Halftone(const Halftone &);
-	Halftone &operator = (const Halftone &);
+			void		CreateGammaTable(double gamma, double min);
+			void		InitElements(int x, int y, uchar* elements);
+			uint		GetDensity(ColorRGB32 c) const;
+			uchar		ConvertUsingBlackValue(uchar byte) const;
+			void		DitherRGB32(uchar* destination, const uchar* source,
+							int x, int y, int width);
+
+			void		InitFloydSteinberg();
+			void		DeleteErrorTables();
+			void		UninitFloydSteinberg();
+			void		SetupErrorBuffer(int x, int y, int width);
+			void		DitherFloydSteinberg(uchar* destination,
+							const uchar* source, int x, int y, int width);
 
 private:
 	enum {
 		kGammaTableSize = 256,
 		kMaxNumberOfPlanes = 3
 	};
+
 	PFN_dither		fDither;
-	PFN_gray        fGray;
-	int             fPixelDepth;
-	Planes          fPlanes;
-	BlackValue      fBlackValue;
-	const uchar     *fPattern;
-	uint            fGammaTable[kGammaTableSize];
-	int             fNumberOfPlanes;
-	int             fCurrentPlane;
+	PFN_gray		fGray;
+	int				fPixelDepth;
+	Planes			fPlanes;
+	BlackValue		fBlackValue;
+	const uchar*	fPattern;
+	uint			fGammaTable[kGammaTableSize];
+	int				fNumberOfPlanes;
+	int				fCurrentPlane;
 	// fields used for floyd-steinberg dithering
-	int             fX;
-	int             fY;
-	int             fWidth;
-	int             *fErrorTables[kMaxNumberOfPlanes];
+	int				fX;
+	int				fY;
+	int				fWidth;
+	int*			fErrorTables[kMaxNumberOfPlanes];
 };
 
-inline int Halftone::getPixelDepth() const
+
+inline int
+Halftone::GetPixelDepth() const
 {
 	return fPixelDepth;
 }
 
-inline const uchar * Halftone::getPattern() const
+
+inline const uchar*
+Halftone::GetPattern() const
 {
 	return fPattern;
 }
 
-inline void Halftone::setPattern(const uchar *pattern)
+
+inline void
+Halftone::SetPattern(const uchar* pattern)
 {
 	fPattern = pattern;
 }
 
-inline PFN_gray Halftone::getGrayFunction() const
+
+inline PFN_gray
+Halftone::GetGrayFunction() const
 {
 	return fGray;
 }
-inline void Halftone::setGrayFunction(PFN_gray gray)
+
+
+inline void
+Halftone::SetGrayFunction(PFN_gray gray)
 {
 	fGray = gray;
 }
 
-inline uint Halftone::getDensity(ColorRGB32 c) const
+
+inline uint
+Halftone::GetDensity(ColorRGB32 c) const
 {
 	return fGammaTable[fGray(c)];
 }
 
-inline uchar Halftone::convertUsingBlackValue(uchar byte) const
+
+inline uchar
+Halftone::ConvertUsingBlackValue(uchar byte) const
 {
 	// bits with value = '1' in byte mean black
-	if (fBlackValue == kHighValueMeansBlack) {
+	if (fBlackValue == kHighValueMeansBlack)
 		return byte;
-	} else {
-		return ~byte;
-	}
+
+	return ~byte;
 }
+
 
 #endif	/* __HALFTONE_H */

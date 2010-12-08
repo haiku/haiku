@@ -16,12 +16,12 @@ public:
 	void GetPreferredSize(float *width, float *height);
 	void Draw(BRect rect);
 	
-	void setCollate(bool collate);
-	void setReverse(bool reverse);
+	void SetCollate(bool collate);
+	void SetReverse(bool reverse);
 
 private:
-	void DrawPages(BPoint position, int number, int count);
-	void DrawPage(BPoint position, int number);
+	void _DrawPages(BPoint position, int number, int count);
+	void _DrawPage(BPoint position, int number);
 
 	bool fCollate;
 	bool fReverse;	
