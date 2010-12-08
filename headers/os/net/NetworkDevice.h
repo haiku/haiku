@@ -19,7 +19,42 @@ struct wireless_network {
 	BNetworkAddress		address;
 	uint8				noise_level;
 	uint8				signal_strength;
+	uint32				flags;
+	uint32				authentication_mode;
+	uint32				cipher;
+	uint32				key_mode;
 };
+
+// flags
+#define B_NETWORK_IS_ENCRYPTED			0x01
+
+// authentication modes
+enum {
+	B_NETWORK_AUTHENTICATION_NONE		= 0,
+	B_NETWORK_AUTHENTICATION_WEP		= 1,
+	B_NETWORK_AUTHENTICATION_WPA		= 2,
+	B_NETWORK_AUTHENTICATION_WPA2		= 3
+};
+
+// cipher algorithms
+enum {
+	B_NETWORK_CIPHER_NONE				= 0x01,
+	B_NETWORK_CIPHER_WEP_40				= 0x02,
+	B_NETWORK_CIPHER_WEP_104			= 0x04,
+	B_NETWORK_CIPHER_WEP_TKIP			= 0x08,
+	B_NETWORK_CIPHER_WEP_CCMP			= 0x10,
+	B_NETWORK_CIPHER_WEP_AES_128_CMAC	= 0x20
+};
+
+// key modes
+enum {
+	B_KEY_MODE_IEEE802_1X				= 0x0001,
+	B_KEY_MODE_PSK						= 0x0002,
+	B_KEY_MODE_IEEE802_1X_SHA256		= 0x0080,
+	B_KEY_MODE_PSK_SHA256				= 0x0100,
+	B_KEY_MODE_WPS						= 0x0200
+};
+
 
 class BNetworkDevice {
 public:
@@ -31,6 +66,7 @@ public:
 			void				SetTo(const char* name);
 
 			const char*			Name() const;
+			bool				Exists() const;
 			uint32				Index() const;
 
 			uint32				Flags() const;
@@ -49,17 +85,29 @@ public:
 
 			status_t			Scan(bool wait = true,
 									bool forceRescan = true);
-			ssize_t				CountScanResults();
-			status_t			GetScanResultAt(int32 index,
+
+			status_t			GetNextNetwork(uint32& cookie,
+									wireless_network& network);
+			status_t			GetNetwork(const char* name,
+									wireless_network& network);
+			status_t			GetNetwork(const BNetworkAddress& address,
 									wireless_network& network);
 
-			status_t			JoinNetwork(wireless_network& network,
+			status_t			JoinNetwork(const char* name,
+									const char* password = NULL);
+			status_t			JoinNetwork(const wireless_network& network,
 									const char* password = NULL);
 			status_t			JoinNetwork(const BNetworkAddress& address,
 									const char* password = NULL);
-			status_t			LeaveNetwork();
-			status_t			GetCurrentNetwork(wireless_network& network);
-			status_t			GetCurrentNetwork(BNetworkAddress& address);
+
+			status_t			LeaveNetwork(const char* name);
+			status_t			LeaveNetwork(const wireless_network& network);
+			status_t			LeaveNetwork(const BNetworkAddress& address);
+
+			status_t			GetNextAssociatedNetwork(uint32& cookie,
+									wireless_network& network);
+			status_t			GetNextAssociatedNetwork(uint32& cookie,
+									BNetworkAddress& address);
 
 private:
 			char				fName[IF_NAMESIZE];

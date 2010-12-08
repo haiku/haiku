@@ -11,6 +11,8 @@
 
 #include "NetworkStatusView.h"
 
+#include <set>
+
 #include <arpa/inet.h>
 #include <net/if.h>
 #include <stdio.h>
@@ -503,13 +505,23 @@ NetworkStatusView::MouseDown(BPoint point)
 		if (!device.IsWireless())
 			continue;
 
+		std::set<BNetworkAddress> associated;
+		BNetworkAddress address;
+		uint32 cookie = 0;
+		while (device.GetNextAssociatedNetwork(cookie, address) == B_OK)
+			associated.insert(address);
+
 		wireless_network network;
 		int32 count = 0;
-		for (int32 i = 0; device.GetScanResultAt(i, network) == B_OK; i++) {
-			printf("%s: noise %u : rssi %u\n", network.name,
-				network.noise_level, network.signal_strength);
-			menu->AddItem(new WirelessNetworkMenuItem(network.name,
-				network.signal_strength, false, NULL));
+		cookie = 0;
+		while (device.GetNextNetwork(cookie, network) == B_OK) {
+			BMenuItem* item = new WirelessNetworkMenuItem(network.name,
+				network.signal_strength,
+				(network.flags & B_NETWORK_IS_ENCRYPTED) != 0, NULL);
+			menu->AddItem(item);
+			if (associated.find(network.address) != associated.end())
+				item->SetMarked(true);
+
 			count++;
 		}
 		if (count == 0) {
