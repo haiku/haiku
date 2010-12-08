@@ -9,10 +9,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <Catalog.h>
 #include <GridLayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
 #include <Slider.h>
 #include <String.h>
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "SettingsWindow"
 
 
 static const uint32 kMsgUpdateTimeInterval = 'upti';
@@ -91,7 +95,7 @@ SettingsWindow::SettingsWindow(ActivityWindow* target)
 {
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
-	fIntervalSlider = new IntervalSlider("Update time interval:",
+	fIntervalSlider = new IntervalSlider(B_TRANSLATE("Update time interval:"),
 		new BMessage(kMsgUpdateTimeInterval), kNumUpdateIntervals);
 	fIntervalSlider->SetInterval(target->RefreshInterval());
 

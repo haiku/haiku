@@ -18,6 +18,7 @@
 #include <Application.h>
 #include <Autolock.h>
 #include <Bitmap.h>
+#include <Catalog.h>
 #include <Dragger.h>
 #include <fs_attr.h>
 #include <MenuItem.h>
@@ -33,6 +34,8 @@
 #include "SystemInfo.h"
 #include "SystemInfoHandler.h"
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "ActivityView"
 
 template<typename ObjectType>
 class ListAddDeleter {
@@ -991,7 +994,7 @@ ActivityView::MouseDown(BPoint where)
 	BPopUpMenu *menu = new BPopUpMenu(B_EMPTY_STRING, false, false);
 	menu->SetFont(be_plain_font);
 
-	BMenu* additionalMenu = new BMenu("Additional items");
+	BMenu* additionalMenu = new BMenu(B_TRANSLATE("Additional items"));
 	additionalMenu->SetFont(be_plain_font);
 
 	SystemInfo info;
@@ -1018,7 +1021,8 @@ ActivityView::MouseDown(BPoint where)
 
 	menu->AddItem(new BMenuItem(additionalMenu));
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem(fShowLegend ? "Hide legend" : "Show legend",
+	menu->AddItem(new BMenuItem(fShowLegend ?
+		B_TRANSLATE("Hide legend") : B_TRANSLATE("Show legend"),
 		new BMessage(kMsgToggleLegend)));
 
 	menu->SetTargetForItems(this);
@@ -1029,7 +1033,8 @@ ActivityView::MouseDown(BPoint where)
 		menu->AddSeparatorItem();
 		BMessage* message = new BMessage(kMsgRemoveView);
 		message->AddPointer("view", this);
-		menu->AddItem(item = new BMenuItem("Remove graph", message));
+		menu->AddItem(item = new BMenuItem(B_TRANSLATE("Remove graph"),
+			message));
 		item->SetTarget(window);
 	}
 

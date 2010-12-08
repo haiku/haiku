@@ -9,6 +9,7 @@
 #include <stdio.h>
 
 #include <Application.h>
+#include <Catalog.h>
 #include <File.h>
 #include <FindDirectory.h>
 #ifdef __HAIKU__
@@ -25,6 +26,8 @@
 #include "DataSource.h"
 #include "SettingsWindow.h"
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "ActivityWindow"
 
 static const uint32 kMsgAddView = 'advw';
 static const uint32 kMsgShowSettings = 'shst';
@@ -113,24 +116,27 @@ ActivityWindow::ActivityWindow()
 	// add menu
 
 	// "File" menu
-	BMenu* menu = new BMenu("File");
+	BMenu* menu = new BMenu(B_TRANSLATE("File"));
 	BMenuItem* item;
 
-	menu->AddItem(new BMenuItem("Add graph", new BMessage(kMsgAddView)));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Add graph"),
+		new BMessage(kMsgAddView)));
 	menu->AddSeparatorItem();
 
-	menu->AddItem(item = new BMenuItem("About ActivityMonitor" B_UTF8_ELLIPSIS,
+	menu->AddItem(item = new BMenuItem(
+		B_TRANSLATE("About ActivityMonitor" B_UTF8_ELLIPSIS),
 		new BMessage(B_ABOUT_REQUESTED)));
 	menu->AddSeparatorItem();
 
-	menu->AddItem(new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED), 'Q'));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Quit"),
+		new BMessage(B_QUIT_REQUESTED), 'Q'));
 	menu->SetTargetForItems(this);
 	item->SetTarget(be_app);
 	menuBar->AddItem(menu);
 
 	// "Settings" menu
-	menu = new BMenu("Settings");
-	menu->AddItem(new BMenuItem("Settings" B_UTF8_ELLIPSIS,
+	menu = new BMenu(B_TRANSLATE("Settings"));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Settings" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgShowSettings)));
 	menu->SetTargetForItems(this);
 	menuBar->AddItem(menu);

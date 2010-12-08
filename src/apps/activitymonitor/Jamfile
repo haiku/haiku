@@ -11,6 +11,19 @@ Application ActivityMonitor :
 	SystemInfo.cpp
 	SystemInfoHandler.cpp
 
-	: be tracker media libbnetapi.so $(TARGET_LIBSTDC++) $(TARGET_NETWORK_LIBS)
-	: ActivityMonitor.rdef
+	:
+	be tracker media libbnetapi.so $(TARGET_LIBSTDC++) $(TARGET_NETWORK_LIBS)
+	$(HAIKU_LOCALE_LIBS)
+	:
+	ActivityMonitor.rdef
 	;
+
+DoCatalogs ActivityMonitor :
+    x-vnd.Haiku-ActivityMonitor
+    :
+	ActivityMonitor.cpp
+	ActivityView.cpp
+	ActivityWindow.cpp
+	DataSource.cpp
+	SettingsWindow.cpp
+;

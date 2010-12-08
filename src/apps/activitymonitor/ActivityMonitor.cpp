@@ -10,10 +10,13 @@
 
 #include <Alert.h>
 #include <Application.h>
+#include <Catalog.h>
 #include <TextView.h>
 
 #include "ActivityWindow.h"
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "ActivityMonitor"
 
 const char* kSignature = "application/x-vnd.Haiku-ActivityMonitor";
 
@@ -61,9 +64,10 @@ ActivityMonitor::AboutRequested()
 /*static*/ void
 ActivityMonitor::ShowAbout()
 {
-	BAlert *alert = new BAlert("about", "ActivityMonitor\n"
+	BAlert *alert = new BAlert(B_TRANSLATE("about"),
+		B_TRANSLATE("ActivityMonitor\n"
 		"\twritten by Axel Dörfler\n"
-		"\tCopyright 2008, Haiku Inc.\n", "OK");
+		"\tCopyright 2008, Haiku Inc.\n"), "OK");
 	BTextView *view = alert->TextView();
 	BFont font;
 
