@@ -452,6 +452,36 @@ link_control(net_protocol* _protocol, int level, int option, void* value,
 				&request.ifr_flags, sizeof(request.ifr_flags));
 		}
 
+		case SIOCGIFMEDIA:
+		{
+			// get media
+			if (*_length < sizeof(ifmediareq))
+				return B_BAD_VALUE;
+
+			net_device_interface* interface;
+			struct ifmediareq request;
+			if (!user_request_get_device_interface(value, (ifreq&)request,
+					interface))
+				return B_BAD_ADDRESS;
+
+			if (interface == NULL)
+				return B_DEVICE_NOT_FOUND;
+
+			if (user_memcpy(&request, value, sizeof(ifmediareq)) != B_OK)
+				return B_BAD_ADDRESS;
+
+			// TODO: see above.
+			if (interface->device->module->control(interface->device,
+					SIOCGIFMEDIA, &request,
+					sizeof(struct ifmediareq)) != B_OK) {
+				memset(&request, 0, sizeof(struct ifmediareq));
+				request.ifm_active = request.ifm_current
+					= interface->device->media;
+			}
+
+			return user_memcpy(value, &request, sizeof(struct ifmediareq));
+		}
+
 		case SIOCSPACKETCAP:
 		{
 			// Only root is allowed to capture packets
