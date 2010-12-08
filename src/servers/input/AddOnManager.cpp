@@ -145,7 +145,7 @@ AddOnManager::MessageReceived(BMessage* message)
 	BMessage reply;
 	status_t status;
 
-	ERROR("%s what: %.4s\n", __PRETTY_FUNCTION__, (char*)&message->what);
+	TRACE("%s what: %.4s\n", __PRETTY_FUNCTION__, (char*)&message->what);
 
 	switch (message->what) {
 		case IS_FIND_DEVICES:
