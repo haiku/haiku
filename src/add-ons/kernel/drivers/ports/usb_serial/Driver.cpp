@@ -21,7 +21,6 @@ SerialDevice *gSerialDevices[DEVICES_COUNT];
 char *gDeviceNames[DEVICES_COUNT + 1];
 usb_module_info *gUSBModule = NULL;
 tty_module_info *gTTYModule = NULL;
-struct ddomain gSerialDomain;
 sem_id gDriverLock = -1;
 
 
@@ -188,12 +187,14 @@ uninit_driver()
 
 
 bool
-usb_serial_service(struct tty *ptty, struct ddrover *ddr, uint flags)
+usb_serial_service(struct tty *tty, uint32 op, void *buffer, size_t length)
 {
-	TRACE_FUNCALLS("> usb_serial_service(0x%08x, 0x%08x, 0x%08x)\n", ptty, ddr, flags);
+	TRACE_FUNCALLS("> usb_serial_service(%p, 0x%08lx, %p, %lu)\n", tty,
+		op, buffer, length);
 
 	for (int32 i = 0; i < DEVICES_COUNT; i++) {
-		if (gSerialDevices[i] && gSerialDevices[i]->Service(ptty, ddr, flags)) {
+		if (gSerialDevices[i]
+			&& gSerialDevices[i]->Service(tty, op, buffer, length)) {
 			TRACE_FUNCRET("< usb_serial_service() returns: true\n");
 			return true;
 		}

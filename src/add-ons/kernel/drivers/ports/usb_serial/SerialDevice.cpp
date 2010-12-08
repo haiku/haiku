@@ -35,11 +35,14 @@ SerialDevice::SerialDevice(usb_device device, uint16 vendorID,
 		fDoneWrite(-1),
 		fControlOut(0),
 		fInputStopped(false),
+		fMasterTTY(NULL),
+		fSlaveTTY(NULL),
+		fTTYCookie(NULL),
 		fDeviceThread(-1),
 		fStopDeviceThread(false)
 {
-	memset(&fTTYFile, 0, sizeof(ttyfile));
-	memset(&fTTY, 0, sizeof(tty));
+	mutex_init(&fReadLock, "usb_serial read lock");
+	mutex_init(&fWriteLock, "usb_serial write lock");
 }
 
 
@@ -101,12 +104,10 @@ SerialDevice::SetWritePipe(usb_pipe handle)
 
 
 void
-SerialDevice::SetModes()
+SerialDevice::SetModes(struct termios *tios)
 {
-	struct termios tios;
-	memcpy(&tios, &fTTY.t, sizeof(struct termios));
 	uint16 newControl = fControlOut;
-	TRACE_FUNCRES(trace_termios, &tios);
+	TRACE_FUNCRES(trace_termios, tios);
 
 	static uint32 baudRates[] = {
 		0x00000000, //B0
@@ -133,28 +134,26 @@ SerialDevice::SetModes()
 	};
 
 	uint32 baudCount = sizeof(baudRates) / sizeof(baudRates[0]);
-	uint32 baudIndex = tios.c_cflag & CBAUD;
+	uint32 baudIndex = tios->c_cflag & CBAUD;
+	if (baudIndex == 0)
+		baudIndex = tios->c_ispeed;
+	if (baudIndex == 0)
+		baudIndex = tios->c_ospeed;
 	if (baudIndex > baudCount)
 		baudIndex = baudCount - 1;
 
 	usb_serial_line_coding lineCoding;
 	lineCoding.speed = baudRates[baudIndex];
-	lineCoding.stopbits = (tios.c_cflag & CSTOPB) ? LC_STOP_BIT_2 : LC_STOP_BIT_1;
+	lineCoding.stopbits = (tios->c_cflag & CSTOPB) ? LC_STOP_BIT_2 : LC_STOP_BIT_1;
 
-	if (tios.c_cflag & PARENB) {
+	if (tios->c_cflag & PARENB) {
 		lineCoding.parity = LC_PARITY_EVEN;
-		if (tios.c_cflag & PARODD)
+		if (tios->c_cflag & PARODD)
 			lineCoding.parity = LC_PARITY_ODD;
 	} else
 		lineCoding.parity = LC_PARITY_NONE;
 
-	lineCoding.databits = (tios.c_cflag & CS8) ? 8 : 7;
-
-	if (lineCoding.speed == 0) {
-		newControl &= 0xfffffffe;
-		lineCoding.speed = fLineCoding.speed;
-	} else
-		newControl = CLS_LINE_DTR;
+	lineCoding.databits = (tios->c_cflag & CS8) ? 8 : 7;
 
 	if (fControlOut != newControl) {
 		fControlOut = newControl;
@@ -176,64 +175,64 @@ SerialDevice::SetModes()
 
 
 bool
-SerialDevice::Service(struct tty *ptty, struct ddrover *ddr, uint flags)
+SerialDevice::Service(struct tty *tty, uint32 op, void *buffer, size_t length)
 {
-	if (&fTTY != ptty)
+	if (tty != fMasterTTY)
 		return false;
 
-	if (flags <= TTYGETSIGNALS) {
-		switch (flags) {
-			case TTYENABLE:
-				TRACE("TTYENABLE\n");
-				gTTYModule->ttyhwsignal(ptty, ddr, TTYHWDCD, false);
-				gTTYModule->ttyhwsignal(ptty, ddr, TTYHWCTS, true);
-				fControlOut = CLS_LINE_DTR | CLS_LINE_RTS;
-				SetControlLineState(fControlOut);
-				break;
+	switch (op) {
+		case TTYENABLE:
+		{
+			bool enable = *(bool *)buffer;
+			TRACE("TTYENABLE: %sable\n", enable ? "en" : "dis");
 
-			case TTYDISABLE:
-				TRACE("TTYDISABLE\n");
-				gTTYModule->ttyhwsignal(ptty, ddr, TTYHWDCD, false);
-				fControlOut = 0x0;
-				SetControlLineState(fControlOut);
-				break;
+			gTTYModule->tty_hardware_signal(fTTYCookie, TTYHWDCD, enable);
+			gTTYModule->tty_hardware_signal(fTTYCookie, TTYHWCTS, enable);
 
-			case TTYISTOP:
-				TRACE("TTYISTOP\n");
-				fInputStopped = true;
-				gTTYModule->ttyhwsignal(ptty, ddr, TTYHWCTS, false);
-				break;
-
-			case TTYIRESUME:
-				TRACE("TTYIRESUME\n");
-				gTTYModule->ttyhwsignal(ptty, ddr, TTYHWCTS, true);
-				fInputStopped = false;
-				break;
-
-			case TTYGETSIGNALS:
-				TRACE("TTYGETSIGNALS\n");
-				gTTYModule->ttyhwsignal(ptty, ddr, TTYHWDCD, true);
-				gTTYModule->ttyhwsignal(ptty, ddr, TTYHWCTS, true);
-				gTTYModule->ttyhwsignal(ptty, ddr, TTYHWDSR, false);
-				gTTYModule->ttyhwsignal(ptty, ddr, TTYHWRI, false);
-				break;
-
-			case TTYSETMODES:
-				TRACE("TTYSETMODES\n");
-				SetModes();
-				break;
-
-			case TTYOSTART:
-			case TTYOSYNC:
-			case TTYSETBREAK:
-			case TTYCLRBREAK:
-			case TTYSETDTR:
-			case TTYCLRDTR:
-				TRACE("TTY other\n");
-				break;
+			fControlOut = enable ? CLS_LINE_DTR | CLS_LINE_RTS : 0;
+			SetControlLineState(fControlOut);
+			return true;
 		}
 
-		return true;
+		case TTYISTOP:
+			fInputStopped = *(bool *)buffer;
+			TRACE("TTYISTOP: %sstopped\n", fInputStopped ? "" : "not ");
+			gTTYModule->tty_hardware_signal(fTTYCookie, TTYHWCTS, !fInputStopped);
+			return true;
+
+		case TTYGETSIGNALS:
+			TRACE("TTYGETSIGNALS\n");
+			gTTYModule->tty_hardware_signal(fTTYCookie, TTYHWDCD,
+				(fControlOut & (CLS_LINE_DTR | CLS_LINE_RTS)) != 0);
+			gTTYModule->tty_hardware_signal(fTTYCookie, TTYHWCTS, !fInputStopped);
+			gTTYModule->tty_hardware_signal(fTTYCookie, TTYHWDSR, false);
+			gTTYModule->tty_hardware_signal(fTTYCookie, TTYHWRI, false);
+			return true;
+
+		case TTYSETMODES:
+			TRACE("TTYSETMODES\n");
+			SetModes((struct termios *)buffer);
+			return true;
+
+		case TTYSETDTR:
+		case TTYSETRTS:
+		{
+			bool set = *(bool *)buffer;
+			uint8 bit = TTYSETDTR ? CLS_LINE_DTR : CLS_LINE_RTS;
+			if (set)
+				fControlOut |= bit;
+			else
+				fControlOut &= ~bit;
+
+			SetControlLineState(fControlOut);
+			return true;
+		}
+
+		case TTYOSTART:
+		case TTYOSYNC:
+		case TTYSETBREAK:
+			TRACE("TTY other\n");
+			return true;
 	}
 
 	return false;
@@ -249,23 +248,28 @@ SerialDevice::Open(uint32 flags)
 	if (fDeviceRemoved)
 		return B_DEV_NOT_READY;
 
-	gTTYModule->ttyinit(&fTTY, true);
-	fTTYFile.tty = &fTTY;
-	fTTYFile.flags = flags;
-	ResetDevice();
-
-	struct ddrover *ddr = gTTYModule->ddrstart(NULL);
-	if (!ddr)
+	fMasterTTY = gTTYModule->tty_create(usb_serial_service, true);
+	if (fMasterTTY == NULL) {
+		TRACE_ALWAYS("open: failed to init master tty\n");
 		return B_NO_MEMORY;
-
-	gTTYModule->ddacquire(ddr, &gSerialDomain);
-	status_t status = gTTYModule->ttyopen(&fTTYFile, ddr, usb_serial_service);
-	gTTYModule->ddrdone(ddr);
-
-	if (status < B_OK) {
-		TRACE_ALWAYS("open: failed to open tty\n");
-		return status;
 	}
+
+	fSlaveTTY = gTTYModule->tty_create(NULL, false);
+	if (fSlaveTTY == NULL) {
+		TRACE_ALWAYS("open: failed to init slave tty\n");
+		gTTYModule->tty_destroy(fMasterTTY);
+		return B_NO_MEMORY;
+	}
+
+	fTTYCookie = gTTYModule->tty_create_cookie(fMasterTTY, fSlaveTTY, flags);
+	if (fTTYCookie == NULL) {
+		TRACE_ALWAYS("open: failed to init tty cookie\n");
+		gTTYModule->tty_destroy(fMasterTTY);
+		gTTYModule->tty_destroy(fSlaveTTY);
+		return B_NO_MEMORY;
+	}
+
+	ResetDevice();
 
 	fDeviceThread = spawn_kernel_thread(DeviceThread, "usb_serial device thread",
 		B_NORMAL_PRIORITY, this);
@@ -280,8 +284,9 @@ SerialDevice::Open(uint32 flags)
 	fControlOut = CLS_LINE_DTR | CLS_LINE_RTS;
 	SetControlLineState(fControlOut);
 
-	status = gUSBModule->queue_interrupt(fControlPipe, fInterruptBuffer,
-		fInterruptBufferSize, InterruptCallbackFunction, this);
+	status_t status = gUSBModule->queue_interrupt(fControlPipe,
+		fInterruptBuffer, fInterruptBufferSize, InterruptCallbackFunction,
+		this);
 	if (status < B_OK)
 		TRACE_ALWAYS("failed to queue initial interrupt\n");
 
@@ -305,15 +310,7 @@ SerialDevice::Read(char *buffer, size_t *numBytes)
 		return status;
 	}
 
-	struct ddrover *ddr = gTTYModule->ddrstart(NULL);
-	if (!ddr) {
-		*numBytes = 0;
-		mutex_unlock(&fReadLock);
-		return B_NO_MEMORY;
-	}
-
-	status = gTTYModule->ttyread(&fTTYFile, ddr, buffer, numBytes);
-	gTTYModule->ddrdone(ddr);
+	status = gTTYModule->tty_read(fTTYCookie, buffer, numBytes);
 
 	mutex_unlock(&fReadLock);
 	return status;
@@ -383,13 +380,7 @@ SerialDevice::Control(uint32 op, void *arg, size_t length)
 	if (fDeviceRemoved)
 		return B_DEV_NOT_READY;
 
-	struct ddrover *ddr = gTTYModule->ddrstart(NULL);
-	if (!ddr)
-		return B_NO_MEMORY;
-
-	status_t status = gTTYModule->ttycontrol(&fTTYFile, ddr, op, arg, length);
-	gTTYModule->ddrdone(ddr);
-	return status;
+	return gTTYModule->tty_control(fTTYCookie, op, arg, length);
 }
 
 
@@ -399,13 +390,7 @@ SerialDevice::Select(uint8 event, uint32 ref, selectsync *sync)
 	if (fDeviceRemoved)
 		return B_DEV_NOT_READY;
 
-	struct ddrover *ddr = gTTYModule->ddrstart(NULL);
-	if (!ddr)
-		return B_NO_MEMORY;
-
-	status_t status = gTTYModule->ttyselect(&fTTYFile, ddr, event, ref, sync);
-	gTTYModule->ddrdone(ddr);
-	return status;
+	return gTTYModule->tty_select(fTTYCookie, event, ref, sync);
 }
 
 
@@ -415,13 +400,7 @@ SerialDevice::DeSelect(uint8 event, selectsync *sync)
 	if (fDeviceRemoved)
 		return B_DEV_NOT_READY;
 
-	struct ddrover *ddr = gTTYModule->ddrstart(NULL);
-	if (!ddr)
-		return B_NO_MEMORY;
-
-	status_t status = gTTYModule->ttydeselect(&fTTYFile, ddr, event, sync);
-	gTTYModule->ddrdone(ddr);
-	return status;
+	return gTTYModule->tty_deselect(fTTYCookie, event, sync);
 }
 
 
@@ -436,28 +415,19 @@ SerialDevice::Close()
 		gUSBModule->cancel_queued_transfers(fControlPipe);
 	}
 
-	struct ddrover *ddr = gTTYModule->ddrstart(NULL);
-	if (!ddr)
-		return B_NO_MEMORY;
-
-	status_t status = gTTYModule->ttyclose(&fTTYFile, ddr);
-	gTTYModule->ddrdone(ddr);
+	gTTYModule->tty_destroy_cookie(fTTYCookie);
 
 	fDeviceOpen = false;
-	return status;
+	return B_OK;
 }
 
 
 status_t
 SerialDevice::Free()
 {
-	struct ddrover *ddr = gTTYModule->ddrstart(NULL);
-	if (!ddr)
-		return B_NO_MEMORY;
-
-	status_t status = gTTYModule->ttyfree(&fTTYFile, ddr);
-	gTTYModule->ddrdone(ddr);
-	return status;
+	gTTYModule->tty_destroy(fMasterTTY);
+	gTTYModule->tty_destroy(fSlaveTTY);
+	return B_OK;
 }
 
 
@@ -575,21 +545,10 @@ SerialDevice::DeviceThread(void *data)
 		if (readLength == 0)
 			continue;
 
-		ddrover *ddr = gTTYModule->ddrstart(NULL);
-		if (!ddr) {
-			TRACE_ALWAYS("device thread: ddrstart problem\n");
-			return B_NO_MEMORY;
-		}
-
 		while (device->fInputStopped)
 			snooze(100);
 
-		gTTYModule->ttyilock(&device->fTTY, ddr, true);
-		for (size_t i = 0; i < readLength; i++)
-			gTTYModule->ttyin(&device->fTTY, ddr, buffer[i]);
-
-		gTTYModule->ttyilock(&device->fTTY, ddr, false);
-		gTTYModule->ddrdone(ddr);
+		gTTYModule->tty_write(device->fTTYCookie, buffer, &readLength);
 	}
 
 	return B_OK;

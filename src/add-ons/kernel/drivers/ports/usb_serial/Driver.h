@@ -23,7 +23,7 @@
 #include "USB3.h"
 
 extern "C" {
-#include <ttylayer.h>
+#include <tty_module.h>
 }
 
 #define DRIVER_NAME		"usb_serial"	// driver name for debug output
@@ -90,7 +90,8 @@ status_t	usb_serial_device_removed(void *cookie);
 status_t	init_hardware();
 void		uninit_driver();
 
-bool		usb_serial_service(struct tty *ptty, struct ddrover *ddr, uint flags);
+bool		usb_serial_service(struct tty *tty, uint32 op, void *buffer,
+				size_t length);
 
 status_t	usb_serial_open(const char *name, uint32 flags, void **cookie);
 status_t	usb_serial_read(void *cookie, off_t position, void *buffer, size_t *numBytes);

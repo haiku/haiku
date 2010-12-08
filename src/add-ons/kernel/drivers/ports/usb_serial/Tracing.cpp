@@ -18,14 +18,14 @@
 #if DEBUG
 bool gLogEnabled = true;
 #else
-bool gLogEnabled = false;
+bool gLogEnabled = true;
 #endif
 
 bool gLogToFile = false;
 bool gLogAppend = false;
-bool gLogFunctionCalls = false;
-bool gLogFunctionReturns = false;
-bool gLogFunctionResults = false;
+bool gLogFunctionCalls = true;
+bool gLogFunctionReturns = true;
+bool gLogFunctionResults = true;
 
 static const char *sLogFilePath="/boot/home/"DRIVER_NAME".log";
 static sem_id sLogLock;
@@ -100,15 +100,6 @@ usb_serial_trace(bool force, char *format, ...)
 
 
 void
-trace_ddomain(struct ddomain *dd)
-{
-	TRACE("struct ddomain:\n"
-		"\tddrover: 0x%08x\n"
-		"\tbg: %d, locked: %d\n", dd->r, dd->bg, dd->locked);
-}
-
-
-void
 trace_termios(struct termios *tios)
 {
 	TRACE("struct termios:\n"
@@ -120,66 +111,10 @@ trace_termios(struct termios *tios)
 //		"\tc_ixxxxx: 0x%08x\n"
 //		"\tc_oxxxxx: 0x%08x\n"
 		"\tc_cc[0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x]\n",
-		tios->c_iflag, tios->c_oflag, tios->c_cflag, tios->c_lflag, 
-		tios->c_line, 
-//		tios->c_ixxxxx, tios->c_oxxxxx, 
-		tios->c_cc[0], tios->c_cc[1], tios->c_cc[2], tios->c_cc[3], 
-		tios->c_cc[4], tios->c_cc[5], tios->c_cc[6], tios->c_cc[7], 
+		tios->c_iflag, tios->c_oflag, tios->c_cflag, tios->c_lflag,
+		tios->c_line,
+//		tios->c_ixxxxx, tios->c_oxxxxx,
+		tios->c_cc[0], tios->c_cc[1], tios->c_cc[2], tios->c_cc[3],
+		tios->c_cc[4], tios->c_cc[5], tios->c_cc[6], tios->c_cc[7],
 		tios->c_cc[8], tios->c_cc[9], tios->c_cc[10]);
-}
-
-
-void
-trace_str(struct str *str)
-{
-	TRACE("struct str:\n"
-		"\tbuffer:    0x%08x\n"
-		"\tbufsize:   %d\n"
-		"\tcount:     %d\n"
-		"\ttail:      %d\n"
-		"\tallocated: %d\n",
-		str->buffer, str->bufsize, str->count, str->tail, str->allocated);
-}
-
-
-void
-trace_winsize(struct winsize *ws)
-{
-	TRACE("struct winsize:\n"
-		"\tws_row:    %d\n"
-		"\tws_col:    %d\n"
-		"\tws_xpixel: %d\n"
-		"\tws_ypixel: %d\n",
-		ws->ws_row, ws->ws_col, ws->ws_xpixel, ws->ws_ypixel);
-}
-
-
-void
-trace_tty(struct tty *tty)
-{
-	TRACE("struct tty:\n"
-		"\tnopen: %d, flags: 0x%08x,\n", tty->nopen, tty->flags);
-
-	TRACE("ddomain dd:\n");
-	trace_ddomain(&tty->dd);
-	TRACE("ddomain ddi:\n");
-	trace_ddomain(&tty->ddi);
-
-	TRACE("\tpgid: %08x\n", tty->pgid);
-	TRACE("termios t:");
-	trace_termios(&tty->t);
-
-	TRACE("\tiactivity: %d, ibusy: %d\n", tty->iactivity, tty->ibusy);
-
-	TRACE("str istr:\n");
-	trace_str(&tty->istr);
-	TRACE("str rstr:\n");
-	trace_str(&tty->rstr);
-	TRACE("str ostr:\n");
-	trace_str(&tty->ostr);
-
-	TRACE("winsize wsize:\n");
-	trace_winsize(&tty->wsize);
-
-	TRACE("\tservice: 0x%08x\n", tty->service);
 }

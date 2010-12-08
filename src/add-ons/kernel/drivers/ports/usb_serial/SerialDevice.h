@@ -42,9 +42,9 @@ static	SerialDevice *			MakeDevice(usb_device device, uint16 vendorID,
 		char *					WriteBuffer() { return fWriteBuffer; };
 		size_t					WriteBufferSize() { return fWriteBufferSize; };
 
-		void					SetModes();
-		bool					Service(struct tty *ptty, struct ddrover *ddr,
-									uint flags);
+		void					SetModes(struct termios *tios);
+		bool					Service(struct tty *tty, uint32 op,
+									void *buffer, size_t length);
 
 		status_t				Open(uint32 flags);
 		status_t				Read(char *buffer, size_t *numBytes);
@@ -68,7 +68,7 @@ virtual	status_t				SetLineCoding(usb_serial_line_coding *coding);
 virtual	status_t				SetControlLineState(uint16 state);
 
 virtual	void					OnRead(char **buffer, size_t *numBytes);
-virtual	void					OnWrite(const char *buffer, size_t *numBytes, 
+virtual	void					OnWrite(const char *buffer, size_t *numBytes,
 									size_t *packetBytes);
 virtual	void					OnClose();
 
@@ -127,8 +127,9 @@ static	void					InterruptCallbackFunction(void *cookie,
 
 		uint16					fControlOut;
 		bool					fInputStopped;
-		struct ttyfile			fTTYFile;
-		struct tty				fTTY;
+		struct tty *			fMasterTTY;
+		struct tty *			fSlaveTTY;
+		struct tty_cookie *		fTTYCookie;
 
 		/* device thread management */
 		thread_id				fDeviceThread;

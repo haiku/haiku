@@ -30,10 +30,6 @@ extern bool gLogFunctionResults;
 	if (gLogFunctionResults) \
 		func(param);
 
-void trace_ddomain(struct ddomain *dd);
 void trace_termios(struct termios *tios);
-void trace_str(struct str *str);
-void trace_winsize(struct winsize *ws);
-void trace_tty(struct tty *tty);
 
 #endif //_USB_SERIAL_TRACING_H_
