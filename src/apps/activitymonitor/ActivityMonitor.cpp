@@ -67,7 +67,7 @@ ActivityMonitor::ShowAbout()
 	BAlert *alert = new BAlert(B_TRANSLATE("about"),
 		B_TRANSLATE("ActivityMonitor\n"
 		"\twritten by Axel Dörfler\n"
-		"\tCopyright 2008, Haiku Inc.\n"), "OK");
+		"\tCopyright 2008, Haiku Inc.\n"), B_TRANSLATE("OK"));
 	BTextView *view = alert->TextView();
 	BFont font;
 
