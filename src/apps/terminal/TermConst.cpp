@@ -22,7 +22,7 @@ const char* const kTooTipSetTabTitlePlaceholders = B_TRANSLATE(
 	"\t%%\t-\tThe character '%'.");
 
 const char* const kTooTipSetWindowTitlePlaceholders = B_TRANSLATE(
-	"\t%d\t-\tThe current working directory of the active process in the.\n"
+	"\t%d\t-\tThe current working directory of the active process in the\n"
 	"\t\t\tcurrent tab. Optionally the maximum number of path components\n"
 	"\t\t\tcan be specified. E.g. '%2d' for at most two components.\n"
 	"\t%i\t-\tThe index of the window.\n"
