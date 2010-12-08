@@ -1,3 +1,9 @@
+/*
+ * Copyright 2010 Oliver Ruiz Dorantes
+ * Copyright 2010 Dan-Matei Epure, mateiepure@gmail.com
+ * Copyright BeNet Team (Original Project)
+ * All rights reserved. Distributed under the terms of the MIT License.
+ */
 #ifndef _Output_h
 #define _Output_h
 
@@ -7,8 +13,9 @@
 #include <Button.h>
 #include <TabView.h>
 
-const uint32 MSG_OUTPUT_RESET		= 'outr';
-const uint32 MSG_OUTPUT_RESET_ALL	= 'opra';
+const uint32 kMsgOutputReset	= 'outr';
+const uint32 kMsgOutputResetAll	= 'opra';
+
 
 class OutputView : public BView
 {
@@ -16,21 +23,22 @@ public:
 	OutputView(BRect frame);
 	virtual void	FrameResized(float width, float height);
 
-	void			Add(const char* text)	{m_pTextView->Insert(text);}
-	void			Clear()					{m_pTextView->Delete(0,m_pTextView->TextLength());}
+	void			Add(const char* text)	{fTextView->Insert(text);}
+	void			Clear()					{fTextView->Delete(0, fTextView->TextLength());}
 
 private:
-	BTextView*		m_pTextView;
-	BScrollBar*		m_pScrollBar;
+	BTextView*		fTextView;
+	BScrollBar*		fScrollBar;
 };
-
 
 
 class Output : public BWindow
 {
 public:
 	static Output*	Instance();
+	
 	~Output();
+	
 	virtual bool	QuitRequested();
 	virtual void	MessageReceived(BMessage* msg);
 	virtual void	FrameMoved(BPoint point);
@@ -38,26 +46,29 @@ public:
 	void			AddTab(const char* text, int32 index);
 
 	void            Post(const char* text, uint32 index);
-	int				Postf(uint32 index, const char *format, ...);
+	int				Postf(uint32 index, const char* format, ...);
 
-private: // functions
+private: 
+	// functions
 	Output();
 	void			Add(const char* text, OutputView* view);
 
-private: // data
-	static Output*	m_instance;
-	BTab*			m_pAllTab;
+private: 
+	// data
+	static Output*	sInstance;
+	BTab*			fAllTab;
 
-	OutputView*		m_pAll;
+	OutputView*		fAll;
 
-	BButton*		m_pReset;
-	BButton*		m_pResetAll;
+	BButton*		fReset;
+	BButton*		fResetAll;
 	
 	BTabView* 		fTabView;
 	
 	BList*			fTabsList;
 	BList*			fOutputViewsList;
-	BRect			fBounds; // Bounds for tabs
+	BRect			fBounds; 
+						// Bounds for tabs
 };
 
 
