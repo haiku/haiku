@@ -166,7 +166,7 @@ SelectPrinterDialog::Save()
 {
 	BString driverName = GetSelectedItemValue(fPrintersListView);
 	fData->fGutenprintDriverName = driverName;
-	fData->save();
+	fData->Save();
 }
 
 

@@ -108,7 +108,7 @@ PSCap::PSCap(const PrinterData* printer_data)
 
 
 int
-PSCap::countCap(CapID capid) const
+PSCap::CountCap(CapID capid) const
 {
 	switch (capid) {
 		case kPaper:
@@ -126,7 +126,7 @@ PSCap::countCap(CapID capid) const
 
 
 const BaseCap**
-PSCap::enumCap(CapID capid) const
+PSCap::GetCaps(CapID capid) const
 {
 	switch (capid) {
 		case kPaper:
@@ -144,7 +144,7 @@ PSCap::enumCap(CapID capid) const
 
 
 bool
-PSCap::isSupport(CapID capid) const
+PSCap::IsSupport(CapID capid) const
 {
 	switch (capid) {
 		case kPaper:

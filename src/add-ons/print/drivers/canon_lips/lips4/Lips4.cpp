@@ -46,9 +46,9 @@ LIPS4Driver::StartDocument()
 		_SetNumberOfCopies();
 		_SidePrintingControl();
 		_SetBindingMargin();
-		fHalftone = new Halftone(GetJobData()->getSurfaceType(),
-			GetJobData()->getGamma(), GetJobData()->getInkDensity(),
-			GetJobData()->getDitherType());
+		fHalftone = new Halftone(GetJobData()->GetSurfaceType(),
+			GetJobData()->GetGamma(), GetJobData()->GetInkDensity(),
+			GetJobData()->GetDitherType());
 		return true;
 	}
 	catch (TransportException& err) {
@@ -161,12 +161,12 @@ LIPS4Driver::NextBand(BBitmap* bitmap, BPoint* offset)
 			DBGMSG(("in_size = %d\n", in_size));
 			DBGMSG(("out_size = %d\n", out_size));
 			DBGMSG(("delta = %d\n", delta));
-			DBGMSG(("fHalftone_engine->get_pixel_depth() = %d\n",
-				fHalftone->getPixelDepth()));
+			DBGMSG(("fHalftone_engine->Get_pixel_depth() = %d\n",
+				fHalftone->GetPixelDepth()));
 
 			uchar* ptr = static_cast<uchar*>(bitmap->Bits())
 						+ rc.top * delta
-						+ (rc.left * fHalftone->getPixelDepth()) / 8;
+						+ (rc.left * fHalftone->GetPixelDepth()) / 8;
 
 			int compression_method;
 			int compressed_size;
@@ -185,7 +185,7 @@ LIPS4Driver::NextBand(BBitmap* bitmap, BPoint* offset)
 			_Move(x, y);
 
 			for (int i = rc.top; i <= rc.bottom; i++) {
-				fHalftone->dither(ptr2, ptr, x, y, width);
+				fHalftone->Dither(ptr2, ptr, x, y, width);
 				ptr  += delta;
 				ptr2 += widthByte;
 				y++;
@@ -233,7 +233,7 @@ LIPS4Driver::NextBand(BBitmap* bitmap, BPoint* offset)
 		return true;
 	}
 	catch (TransportException& err) {
-		BAlert* alert = new BAlert("", err.what(), "OK");
+		BAlert* alert = new BAlert("", err.What(), "OK");
 		alert->Go();
 		return false;
 	} 
@@ -250,7 +250,7 @@ LIPS4Driver::_BeginTextMode()
 void
 LIPS4Driver::_JobStart()
 {
-	WriteSpoolString("\033P41;%d;1J\033\\", GetJobData()->getXres());
+	WriteSpoolString("\033P41;%d;1J\033\\", GetJobData()->GetXres());
 }
 
 
@@ -281,7 +281,7 @@ LIPS4Driver::_SizeUnitMode()
 void
 LIPS4Driver::_SelectSizeUnit()
 {
-	WriteSpoolString("\033[?7;%d I", GetJobData()->getXres());
+	WriteSpoolString("\033[?7;%d I", GetJobData()->GetXres());
 }
 
 
@@ -305,7 +305,7 @@ LIPS4Driver::_PaperFeedMode()
 
 	int i;
 
-	switch (GetJobData()->getPaperSource()) {
+	switch (GetJobData()->GetPaperSource()) {
 		case JobData::kManual:
 			i = 10;
 			break;
@@ -333,7 +333,7 @@ LIPS4Driver::_SelectPageFormat()
 {
 	int i;
 
-	switch (GetJobData()->getPaper()) {
+	switch (GetJobData()->GetPaper()) {
 		case JobData::kA3:
 			i = 12;
 			break;
@@ -383,7 +383,7 @@ LIPS4Driver::_SelectPageFormat()
 			break;
 	}
 
-	if (JobData::kLandscape == GetJobData()->getOrientation())
+	if (JobData::kLandscape == GetJobData()->GetOrientation())
 		i++;
 
 	WriteSpoolString("\033[%d;;p", i);
@@ -400,14 +400,14 @@ LIPS4Driver::_DisableAutoFF()
 void
 LIPS4Driver::_SetNumberOfCopies()
 {
-	WriteSpoolString("\033[%ldv", GetJobData()->getCopies());
+	WriteSpoolString("\033[%ldv", GetJobData()->GetCopies());
 }
 
 
 void
 LIPS4Driver::_SidePrintingControl()
 {
-	if (GetJobData()->getPrintStyle() == JobData::kSimplex)
+	if (GetJobData()->GetPrintStyle() == JobData::kSimplex)
 		WriteSpoolString("\033[0#x");
 	else
 		WriteSpoolString("\033[2;0#x");
@@ -417,7 +417,7 @@ LIPS4Driver::_SidePrintingControl()
 void
 LIPS4Driver::_SetBindingMargin()
 {
-	if (GetJobData()->getPrintStyle() == JobData::kDuplex) {
+	if (GetJobData()->GetPrintStyle() == JobData::kDuplex) {
 		int i;
 //		switch (job_data()->binding_location()) {
 //		case kLongEdgeLeft:
@@ -478,7 +478,7 @@ LIPS4Driver::_RasterGraphics(int compression_size, int widthbyte, int height,
 		"\033[%ld;%ld;%d;%ld;%ld.r",
 		compression_size,
 		widthbyte,
-		GetJobData()->getXres(),
+		GetJobData()->GetXres(),
 		compression_method,
 		height);
 

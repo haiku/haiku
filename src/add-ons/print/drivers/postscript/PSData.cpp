@@ -15,16 +15,16 @@
 
 
 void
-PSData::load()
+PSData::Load()
 {
-	PrinterData::load();
+	PrinterData::Load();
 	fNode->ReadAttrString(PD_PPD_PATH, &fPPD);
 }
 
 
 void
-PSData::save()
+PSData::Save()
 {
-	PrinterData::save();
+	PrinterData::Save();
 	fNode->WriteAttrString(PD_PPD_PATH, &fPPD);
 }

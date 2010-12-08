@@ -18,47 +18,55 @@ using namespace std;
 
 #include "Pattern.h"
 
-static uint gray(ColorRGB32 c)
+
+static uint
+ToGray(ColorRGB32 c)
 {
-	if (c.little.red == c.little.green && c.little.red == c.little.blue) {
+	if (c.little.red == c.little.green && c.little.red == c.little.blue)
 		return c.little.red;
-	} else {
-		return (c.little.red * 3 + c.little.green * 6 + c.little.blue) / 10;
-	}
+	return (c.little.red * 3 + c.little.green * 6 + c.little.blue) / 10;
 }
 
-static uint channel_red(ColorRGB32 c)
+
+static uint
+GetRedValue(ColorRGB32 c)
 {
 	return c.little.red;	
 }
 
-static uint channel_green(ColorRGB32 c)
+
+static uint
+GetGreenValue(ColorRGB32 c)
 {
 	return c.little.green;	
 }
 
-static uint channel_blue(ColorRGB32 c)
+
+static uint
+GetBlueValue(ColorRGB32 c)
 {
 	return c.little.blue;	
 }
 
-Halftone::Halftone(color_space cs, double gamma, double min, DitherType dither_type)
+
+Halftone::Halftone(color_space colorSpace, double gamma, double min,
+	DitherType ditherType)
 {
-	fPixelDepth = color_space2pixel_depth(cs);
-	fGray       = gray;
-	setPlanes(kPlaneMonochrome1);
-	setBlackValue(kHighValueMeansBlack);
+	fPixelDepth = color_space2pixel_depth(colorSpace);
+	fGray       = ToGray;
+	SetPlanes(kPlaneMonochrome1);
+	SetBlackValue(kHighValueMeansBlack);
 	
-	initFloydSteinberg();
+	InitFloydSteinberg();
 	
-	createGammaTable(gamma, min);
+	CreateGammaTable(gamma, min);
 	
-	if (dither_type == kTypeFloydSteinberg) {
-		fDither = &Halftone::ditherFloydSteinberg;
+	if (ditherType == kTypeFloydSteinberg) {
+		fDither = &Halftone::DitherFloydSteinberg;
 		return;
 	}
 
-	switch (dither_type) {
+	switch (ditherType) {
 	case kType2:
 		fPattern = pattern16x16_type2;
 		break;
@@ -70,10 +78,10 @@ Halftone::Halftone(color_space cs, double gamma, double min, DitherType dither_t
 		break;
 	}
 
-	switch (cs) {
+	switch (colorSpace) {
 	case B_RGB32:
 	case B_RGB32_BIG:
-		fDither = &Halftone::ditherRGB32;
+		fDither = &Halftone::DitherRGB32;
 		break;
 	default:
 		fDither = NULL;
@@ -81,17 +89,20 @@ Halftone::Halftone(color_space cs, double gamma, double min, DitherType dither_t
 	}
 }
 
+
 Halftone::~Halftone()
 {
-	uninitFloydSteinberg();
+	UninitFloydSteinberg();
 }
 
-void Halftone::setPlanes(Planes planes)
+
+void
+Halftone::SetPlanes(Planes planes)
 {
 	fPlanes = planes;
 	if (planes == kPlaneMonochrome1) {
 		fNumberOfPlanes = 1;
-		fGray = gray;
+		fGray = ToGray;
 	} else {
 		ASSERT(planes == kPlaneRGB1);
 		fNumberOfPlanes = 3;
@@ -99,23 +110,28 @@ void Halftone::setPlanes(Planes planes)
 	fCurrentPlane = 0;
 }
 
-void Halftone::setBlackValue(BlackValue blackValue)
+
+void
+Halftone::SetBlackValue(BlackValue blackValue)
 {
 	fBlackValue = blackValue;
 }
 
-void Halftone::createGammaTable(double gamma, double min)
+
+void
+Halftone::CreateGammaTable(double gamma, double min)
 {
-	uint *g = fGammaTable;
 	const double kScalingFactor = 255.0 - min;
 	for (int i = 0; i < kGammaTableSize; i++) {
 		const double kGammaCorrectedValue = pow((double)i / 255.0, gamma);
 		const double kTranslatedValue = min + kGammaCorrectedValue * kScalingFactor;
-		*g++ = (uint)(kTranslatedValue);
+		fGammaTable[i] = (uint)(kTranslatedValue);
 	}
 }
 
-void Halftone::initElements(int x, int y, uchar *elements)
+
+void
+Halftone::InitElements(int x, int y, uchar* elements)
 {
 	x &= 0x0F;
 	y &= 0x0F;
@@ -125,74 +141,70 @@ void Halftone::initElements(int x, int y, uchar *elements)
 	const uchar *right = left + 0x0F;
 
 	for (int i = 0; i < 16; i++) {
-		*elements++ = *pos;
-		if (pos >= right) {
+		elements[i] = *pos;
+		if (pos >= right)
 			pos = left;
-		} else {
+		else
 			pos++;
-		}
 	}
 }
 
-void Halftone::dither(
-	uchar *dst,
-	const uchar *src,
-	int x,
-	int y,
+
+void
+Halftone::Dither(uchar* destination, const uchar* source, int x, int y,
 	int width)
 {
 	if (fPlanes == kPlaneRGB1) {
 		switch (fCurrentPlane) {
 			case 0: 
-				setGrayFunction(kRedChannel);
+				SetGrayFunction(kRedChannel);
 				break;
 			case 1:
-				setGrayFunction(kGreenChannel);
+				SetGrayFunction(kGreenChannel);
 				break;
 			case 2:
-				setGrayFunction(kBlueChannel);
+				SetGrayFunction(kBlueChannel);
 				break;
 		}
 	} else {
 		ASSERT(fGray == &gray);
 	}
 
-	(this->*fDither)(dst, src, x, y, width);
+	(this->*fDither)(destination, source, x, y, width);
 
 	// next plane
 	fCurrentPlane ++;
-	if (fCurrentPlane >= fNumberOfPlanes) {
+	if (fCurrentPlane >= fNumberOfPlanes)
 		fCurrentPlane = 0;
-	}
 }
 
-void Halftone::setGrayFunction(GrayFunction grayFunction)
+
+void
+Halftone::SetGrayFunction(GrayFunction grayFunction)
 {
 	PFN_gray function = NULL;
 	switch (grayFunction) {
-		case kMixToGray: function = gray;
+		case kMixToGray: function = ToGray;
 			break;
-		case kRedChannel: function = channel_red;
+		case kRedChannel: function = GetRedValue;
 			break;
-		case kGreenChannel: function = channel_green;
+		case kGreenChannel: function = GetGreenValue;
 			break;
-		case kBlueChannel: function = channel_blue;
+		case kBlueChannel: function = GetBlueValue;
 			break;
 	};
-	setGrayFunction(function);
+	SetGrayFunction(function);
 }
 
-void Halftone::ditherRGB32(
-	uchar *dst,
-	const uchar *a_src,
-	int x,
-	int y,
+
+void
+Halftone::DitherRGB32(uchar *destination, const uchar *source0, int x, int y,
 	int width)
 {
 	uchar elements[16];
-	initElements(x, y, elements);
+	InitElements(x, y, elements);
 
-	const ColorRGB32 *src = (const ColorRGB32 *)a_src;
+	const ColorRGB32* source = reinterpret_cast<const ColorRGB32*>(source0);
 
 	int widthByte = (width + 7) / 8;
 	int remainder = width % 8;
@@ -206,8 +218,8 @@ void Halftone::ditherRGB32(
 	uchar *e = elements;
 	uchar *last_e = elements + 16;
 
-	c = *src;
-	density = getDensity(c);
+	c = *source;
+	density = GetDensity(c);
 
 	if (width >= 8) {
 		for (i = 0; i < widthByte - 1; i++) {
@@ -216,46 +228,54 @@ void Halftone::ditherRGB32(
 				e = elements;
 			}
 			for (j = 0; j < 8; j++) {
-				if (c.little.red != src->little.red || c.little.green != src->little.green || c.little.blue != src->little.blue) {
-					c = *src;
-					density = getDensity(c);
+				if (c.little.red != source->little.red
+					|| c.little.green != source->little.green
+					|| c.little.blue != source->little.blue) {
+					c = *source;
+					density = GetDensity(c);
 				}
-				src++;
+				source++;
 				if (density <= *e++) {
 					cur |= (0x80 >> j);
 				}
 			}
-			*dst++ = convertUsingBlackValue(cur);
+			*destination++ = ConvertUsingBlackValue(cur);
 		}
 	}
+
 	if (remainder > 0) {
 		cur = 0;
 		if (e == last_e) {
 			e = elements;
 		}
 		for (j = 0; j < remainder; j++) {
-			if (c.little.red != src->little.red || c.little.green != src->little.green || c.little.blue != src->little.blue) {
-				c = *src;
-				density = getDensity(c);
+			if (c.little.red != source->little.red
+				|| c.little.green != source->little.green
+				|| c.little.blue != source->little.blue) {
+				c = *source;
+				density = GetDensity(c);
 			}
-			src++;
+			source++;
 			if (density <= *e++) {
 				cur |= (0x80 >> j);
 			}
 		}
-		*dst++ = convertUsingBlackValue(cur);
+		*destination++ = ConvertUsingBlackValue(cur);
 	}
 }
+
 
 // Floyd-Steinberg dithering
-void Halftone::initFloydSteinberg()
+void
+Halftone::InitFloydSteinberg()
 {
-	for (int i = 0; i < kMaxNumberOfPlanes; i ++) {
+	for (int i = 0; i < kMaxNumberOfPlanes; i ++)
 		fErrorTables[i] = NULL;
-	}
 }
 
-void Halftone::deleteErrorTables()
+
+void
+Halftone::DeleteErrorTables()
 {
 	for (int i = 0; i < kMaxNumberOfPlanes; i ++) {
 		delete fErrorTables[i];
@@ -263,14 +283,18 @@ void Halftone::deleteErrorTables()
 	}
 }
 
-void Halftone::uninitFloydSteinberg()
+
+void
+Halftone::UninitFloydSteinberg()
 {
-	deleteErrorTables();
+	DeleteErrorTables();
 }
 
-void Halftone::setupErrorBuffer(int x, int y, int width)
+
+void
+Halftone::SetupErrorBuffer(int x, int y, int width)
 {
-	deleteErrorTables();
+	DeleteErrorTables();
 	fX = x; 
 	fY = y; 
 	fWidth = width;
@@ -282,22 +306,29 @@ void Halftone::setupErrorBuffer(int x, int y, int width)
 	}	
 }
 
-void Halftone::ditherFloydSteinberg(uchar *dst, const uchar* a_src, int x, int y, int width)
-{
-	if (fErrorTables[fCurrentPlane] == NULL || fX != x || fCurrentPlane == 0 && fY != y - 1 || fCurrentPlane > 0 && fY != y || fWidth != width) {
-		setupErrorBuffer(x, y, width);
-	} else {
-		fY = y;
-	}
 
-	int* error_table = &fErrorTables[fCurrentPlane][1];
-	int current_error = error_table[0], error;
-	error_table[0] = 0;
-	const ColorRGB32 *src = (const ColorRGB32 *)a_src;
+void
+Halftone::DitherFloydSteinberg(uchar *destination, const uchar* source0,
+	int x, int y, int width)
+{
+	if (fErrorTables[fCurrentPlane] == NULL || fX != x
+		|| (fCurrentPlane == 0 && fY != y - 1)
+		|| (fCurrentPlane > 0 && fY != y)
+		|| fWidth != width)
+		SetupErrorBuffer(x, y, width);
+	else
+		fY = y;
+
+	int* errorTable = &fErrorTables[fCurrentPlane][1];
+	int current_error = errorTable[0];
+	int error;
+	errorTable[0] = 0;
+
+	const ColorRGB32 *source = reinterpret_cast<const ColorRGB32 *>(source0);
 	uchar cur = 0; // cleared bit means white, set bit means black
-	for (int x = 0; x < width; x ++, src ++) {
+	for (int x = 0; x < width; x ++, source ++) {
 		const int bit = 7 - x % 8;		
-		const int density = getDensity(*src) + current_error / 16;
+		const int density = GetDensity(*source) + current_error / 16;
 		
 		if (density < 128) {
 			error = density;
@@ -310,7 +341,7 @@ void Halftone::ditherFloydSteinberg(uchar *dst, const uchar* a_src, int x, int y
 		//        0 X 7 (current_error)
 		// (left) 3 5 1 (right)
 		//       (middle)
-		int* right = &error_table[x+1];
+		int* right = &errorTable[x+1];
 		current_error = (*right) + 7 * error;
 		*right = 1 * error;
 		
@@ -321,16 +352,16 @@ void Halftone::ditherFloydSteinberg(uchar *dst, const uchar* a_src, int x, int y
 		*left += 3 * error;
 		
 		if (bit == 0) {
-			*dst = convertUsingBlackValue(cur);
+			*destination = ConvertUsingBlackValue(cur);
 			// advance to next byte
-			dst ++;
+			destination ++;
 			cur = 0;
 		}
 	}
 	
 	const bool hasRest = (width % 8) != 0;
 	if (hasRest) {
-		*dst = convertUsingBlackValue(cur);
+		*destination = ConvertUsingBlackValue(cur);
 	}
 }
 

@@ -26,8 +26,8 @@ public:
 					}
 
 	// PrinterData overrides
-	virtual	void	load();
-	virtual	void	save();
+	virtual	void	Load();
+	virtual	void	Save();
 
 	BString fPPD;
 };

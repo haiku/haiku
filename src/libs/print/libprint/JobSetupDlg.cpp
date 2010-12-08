@@ -175,7 +175,7 @@ JobSetupView::CreatePageSelectionItem(const char* name, const char* label,
 	JobData::PageSelection pageSelection)
 {
 	BRadioButton* button = new BRadioButton(name, label, NULL);
-	if (fJobData->getPageSelection() == pageSelection) {
+	if (fJobData->GetPageSelection() == pageSelection) {
 		button->SetValue(B_CONTROL_ON);
 	}
 	return button;
@@ -207,7 +207,7 @@ JobSetupView::AttachedToWindow()
 	fColorType = new BPopUpMenu("color");
 	fColorType->SetRadioMode(true);
 	FillCapabilityMenu(fColorType, kMsgQuality, PrinterCap::kColor,
-		fJobData->getColor());
+		fJobData->GetColor());
 	BMenuField* colorMenuField = new BMenuField("color", "Color:", fColorType);
 	fColorType->SetTargetForItems(this);
 	
@@ -232,8 +232,8 @@ JobSetupView::AttachedToWindow()
 	fToPage->SetAlignment(B_ALIGN_LEFT, B_ALIGN_RIGHT);
 	AllowOnlyDigits(fToPage->TextView(), 6);
 
-	int first_page = fJobData->getFirstPage();
-	int last_page  = fJobData->getLastPage();
+	int first_page = fJobData->GetFirstPage();
+	int last_page  = fJobData->GetLastPage();
 
 	if (first_page <= 1 && last_page <= 0) {
 		fAll->SetValue(B_CONTROL_ON);
@@ -260,7 +260,7 @@ JobSetupView::AttachedToWindow()
 	fPaperFeed = new BPopUpMenu("");
 	fPaperFeed->SetRadioMode(true);
 	FillCapabilityMenu(fPaperFeed, kMsgNone, PrinterCap::kPaperSource,
-		fJobData->getPaperSource());
+		fJobData->GetPaperSource());
 	BMenuField* paperSourceMenufield = new BMenuField("paperSource",
 		"Paper Source:", fPaperFeed);
 
@@ -268,15 +268,15 @@ JobSetupView::AttachedToWindow()
 	fNup = new BPopUpMenu("");
 	fNup->SetRadioMode(true);
 	FillCapabilityMenu(fNup, kMsgNone, gNups,
-		sizeof(gNups) / sizeof(gNups[0]), (int)fJobData->getNup());
+		sizeof(gNups) / sizeof(gNups[0]), (int)fJobData->GetNup());
 	BMenuField* pagesPerSheet = new BMenuField("pagesPerSheet",
 		"Pages Per Sheet:", fNup);
 
 	// duplex
-	if (fPrinterCap->isSupport(PrinterCap::kPrintStyle)) {
+	if (fPrinterCap->IsSupport(PrinterCap::kPrintStyle)) {
 		fDuplex = new BCheckBox("duplex", "Duplex",
 			new BMessage(kMsgDuplexChanged));
-		if (fJobData->getPrintStyle() != JobData::kSimplex) {
+		if (fJobData->GetPrintStyle() != JobData::kSimplex) {
 			fDuplex->SetValue(B_CONTROL_ON);
 		}
 		fDuplex->SetTarget(this);
@@ -289,13 +289,13 @@ JobSetupView::AttachedToWindow()
 	AllowOnlyDigits(fCopies->TextView(), 3);
 
 	BString copies;
-	copies << fJobData->getCopies();
+	copies << fJobData->GetCopies();
 	fCopies->SetText(copies.String());
 
 	// collate
 	fCollate = new BCheckBox("collate", "Collate",
 		new BMessage(kMsgCollateChanged));
-	if (fJobData->getCollate()) {
+	if (fJobData->GetCollate()) {
 		fCollate->SetValue(B_CONTROL_ON);
 	}
 	fCollate->SetTarget(this);
@@ -303,7 +303,7 @@ JobSetupView::AttachedToWindow()
 	// reverse
 	fReverse = new BCheckBox("reverse", "Reverse Order",
 		new BMessage(kMsgReverseChanged));
-	if (fJobData->getReverse()) {
+	if (fJobData->GetReverse()) {
 		fReverse->SetValue(B_CONTROL_ON);
 	}
 	fReverse->SetTarget(this);
@@ -312,8 +312,8 @@ JobSetupView::AttachedToWindow()
 	// TODO make layout API compatible
 	fPages = new PagesView(BRect(0, 0, 150, 40), "pages", B_FOLLOW_ALL,
 		B_WILL_DRAW);
-	fPages->setCollate(fJobData->getCollate());
-	fPages->setReverse(fJobData->getReverse());
+	fPages->SetCollate(fJobData->GetCollate());
+	fPages->SetReverse(fJobData->GetReverse());
 	fPages->SetExplicitMinSize(BSize(150, 40));
 	fPages->SetExplicitMaxSize(BSize(150, 40));
 	
@@ -329,7 +329,7 @@ JobSetupView::AttachedToWindow()
 		"Even-Numbered Pages", JobData::kEvenNumberedPages);
 
 	fPreview = new BCheckBox("preview", "Show preview before printing", NULL);
-	if (fJobData->getShowPreview())
+	if (fJobData->GetShowPreview())
 		fPreview->SetValue(B_CONTROL_ON);
 
 	// separator line
@@ -458,7 +458,7 @@ JobSetupView::AttachedToWindow()
 bool
 JobSetupView::IsHalftoneConfigurationNeeded()
 {
-	return fPrinterCap->isSupport(PrinterCap::kHalftone);
+	return fPrinterCap->IsSupport(PrinterCap::kHalftone);
 }
 
 
@@ -470,7 +470,7 @@ JobSetupView::CreateHalftoneConfigurationUI()
 	fDitherType->SetRadioMode(true);
 	FillCapabilityMenu(fDitherType, kMsgQuality, gDitherTypes,
 		sizeof(gDitherTypes) / sizeof(gDitherTypes[0]),
-		(int)fJobData->getDitherType());
+		(int)fJobData->GetDitherType());
 	fDitherMenuField = new BMenuField("dithering", "Dot Pattern:",
 		fDitherType);
 	fDitherType->SetTargetForItems(this);
@@ -492,7 +492,7 @@ JobSetupView::CreateHalftoneConfigurationUI()
 		-300, 300);
 
 	fGamma->SetLimitLabels("Lighter", "Darker");
-	fGamma->SetValue((int32)(100 * log(fJobData->getGamma()) / log(2.0)));
+	fGamma->SetValue((int32)(100 * log(fJobData->GetGamma()) / log(2.0)));
 	fGamma->SetHashMarks(B_HASH_MARKS_BOTH);
 	fGamma->SetHashMarkCount(7);
 	fGamma->SetModificationMessage(new BMessage(kMsgQuality));
@@ -503,7 +503,7 @@ JobSetupView::CreateHalftoneConfigurationUI()
 		new BMessage(kMsgQuality), 0, 127);
 
 	fInkDensity->SetLimitLabels("Min", "Max");
-	fInkDensity->SetValue((int32)fJobData->getInkDensity());
+	fInkDensity->SetValue((int32)fJobData->GetInkDensity());
 	fInkDensity->SetHashMarks(B_HASH_MARKS_BOTH);
 	fInkDensity->SetHashMarkCount(10);
 	fInkDensity->SetModificationMessage(new BMessage(kMsgQuality));
@@ -514,11 +514,11 @@ JobSetupView::CreateHalftoneConfigurationUI()
 void
 JobSetupView::AddDriverSpecificSettings(BGridLayout* gridLayout, int row)
 {
-	if (!fPrinterCap->isSupport(PrinterCap::kDriverSpecificCapabilities))
+	if (!fPrinterCap->IsSupport(PrinterCap::kDriverSpecificCapabilities))
 		return;
 
-	int count = fPrinterCap->countCap(PrinterCap::kDriverSpecificCapabilities);
-	const BaseCap** capabilities = fPrinterCap->enumCap(
+	int count = fPrinterCap->CountCap(PrinterCap::kDriverSpecificCapabilities);
+	const BaseCap** capabilities = fPrinterCap->GetCaps(
 		PrinterCap::kDriverSpecificCapabilities);
 
 	for (int i = 0; i < count; i ++) {
@@ -556,9 +556,9 @@ JobSetupView::AddPopUpMenu(const DriverSpecificCap* capability,
 	PrinterCap::CapID category = static_cast<PrinterCap::CapID>(
 		capability->ID());
 
-	const BaseCap** categoryCapabilities = fPrinterCap->enumCap(category);
+	const BaseCap** categoryCapabilities = fPrinterCap->GetCaps(category);
 
-	int categoryCount = fPrinterCap->countCap(category);
+	int categoryCount = fPrinterCap->CountCap(category);
 
 	string value = GetDriverSpecificValue(category, capability->Key());
 	PrinterCap::KeyPredicate predicate(value.c_str());
@@ -588,7 +588,7 @@ JobSetupView::AddCheckBox(const DriverSpecificCap* capability,
 {
 	PrinterCap::CapID category = static_cast<PrinterCap::CapID>(
 		capability->ID());
-	const BooleanCap* booleanCap = fPrinterCap->findBooleanCap(category);
+	const BooleanCap* booleanCap = fPrinterCap->FindBooleanCap(category);
 	if (booleanCap == NULL) {
 		fprintf(stderr, "Internal error: BooleanCap for '%s' not found!\n",
 			capability->Label());
@@ -620,7 +620,7 @@ JobSetupView::AddIntSlider(const DriverSpecificCap* capability,
 {
 	PrinterCap::CapID category = static_cast<PrinterCap::CapID>(
 		capability->ID());
-	const IntRangeCap* range = fPrinterCap->findIntRangeCap(category);
+	const IntRangeCap* range = fPrinterCap->FindIntRangeCap(category);
 	if (range == NULL) {
 		fprintf(stderr, "Internal error: IntRangeCap for '%s' not found!\n",
 			capability->Label());
@@ -660,7 +660,7 @@ JobSetupView::AddDoubleSlider(const DriverSpecificCap* capability,
 {
 	PrinterCap::CapID category = static_cast<PrinterCap::CapID>(
 		capability->ID());
-	const DoubleRangeCap* range = fPrinterCap->findDoubleRangeCap(category);
+	const DoubleRangeCap* range = fPrinterCap->FindDoubleRangeCap(category);
 	if (range == NULL) {
 		fprintf(stderr, "Internal error: DoubleRangeCap for '%s' not found!\n",
 			capability->Label());
@@ -701,7 +701,7 @@ JobSetupView::GetDriverSpecificValue(PrinterCap::CapID category,
 	if (fJobData->Settings().HasString(key))
 		return fJobData->Settings().GetString(key);
 
-	const EnumCap* defaultCapability = fPrinterCap->getDefaultCap(category);
+	const EnumCap* defaultCapability = fPrinterCap->GetDefaultCap(category);
 	return defaultCapability->fKey;
 }
 
@@ -756,8 +756,8 @@ JobSetupView::FillCapabilityMenu(BPopUpMenu* menu, uint32 message,
 	PrinterCap::CapID category, int id)
 {
 	PrinterCap::IDPredicate predicate(id);
-	int count = fPrinterCap->countCap(category);
-	const BaseCap **capabilities = fPrinterCap->enumCap(category);
+	int count = fPrinterCap->CountCap(category);
+	const BaseCap **capabilities = fPrinterCap->GetCaps(category);
 	FillCapabilityMenu(menu, message, capabilities, count, predicate);
 }
 
@@ -818,11 +818,11 @@ JobSetupView::MessageReceived(BMessage* message)
 		break;
 
 	case kMsgCollateChanged:
-		fPages->setCollate(fCollate->Value() == B_CONTROL_ON);
+		fPages->SetCollate(fCollate->Value() == B_CONTROL_ON);
 		break;
 	
 	case kMsgReverseChanged:
-		fPages->setReverse(fReverse->Value() == B_CONTROL_ON);
+		fPages->SetReverse(fReverse->Value() == B_CONTROL_ON);
 		break;
 
 	case kMsgIntSliderChanged:
@@ -842,7 +842,7 @@ JobSetupView::UpdateHalftonePreview()
 	if (!IsHalftoneConfigurationNeeded())
 		return;
 
-	fHalftone->preview(Gamma(), InkDensity(), DitherType(),
+	fHalftone->Preview(Gamma(), InkDensity(), DitherType(),
 		Color() != JobData::kMonochrome);
 }
 
@@ -873,7 +873,7 @@ JobData::Color
 JobSetupView::Color()
 {
 	const char *label = fColorType->FindMarked()->Label();
-	const BaseCap* capability = fPrinterCap->findCap(PrinterCap::kColor, label);
+	const BaseCap* capability = fPrinterCap->FindCap(PrinterCap::kColor, label);
 	if (capability == NULL)
 		return JobData::kMonochrome;
 
@@ -911,11 +911,11 @@ JobData::PaperSource
 JobSetupView::PaperSource()
 {
 	const char *label = fPaperFeed->FindMarked()->Label();
-	const BaseCap* capability = fPrinterCap->findCap(PrinterCap::kPaperSource,
+	const BaseCap* capability = fPrinterCap->FindCap(PrinterCap::kPaperSource,
 		label);
 
 	if (capability == NULL)
-		capability = fPrinterCap->getDefaultCap(PrinterCap::kPaperSource);
+		capability = fPrinterCap->GetDefaultCap(PrinterCap::kPaperSource);
 	return static_cast<const PaperSourceCap*>(capability)->fPaperSource;
 
 }
@@ -923,12 +923,12 @@ JobSetupView::PaperSource()
 bool 
 JobSetupView::UpdateJobData()
 {
-	fJobData->setShowPreview(fPreview->Value() == B_CONTROL_ON);
-	fJobData->setColor(Color());
+	fJobData->SetShowPreview(fPreview->Value() == B_CONTROL_ON);
+	fJobData->SetColor(Color());
 	if (IsHalftoneConfigurationNeeded()) {
-		fJobData->setGamma(Gamma());
-		fJobData->setInkDensity(InkDensity());
-		fJobData->setDitherType(DitherType());
+		fJobData->SetGamma(Gamma());
+		fJobData->SetInkDensity(InkDensity());
+		fJobData->SetDitherType(DitherType());
 	}
 
 	int first_page;
@@ -942,30 +942,30 @@ JobSetupView::UpdateJobData()
 		last_page  = atoi(fToPage->Text());
 	}
 
-	fJobData->setFirstPage(first_page);
-	fJobData->setLastPage(last_page);
+	fJobData->SetFirstPage(first_page);
+	fJobData->SetLastPage(last_page);
 
-	fJobData->setPaperSource(PaperSource());
+	fJobData->SetPaperSource(PaperSource());
 
-	fJobData->setNup(GetID(gNups, sizeof(gNups) / sizeof(gNups[0]),
+	fJobData->SetNup(GetID(gNups, sizeof(gNups) / sizeof(gNups[0]),
 		fNup->FindMarked()->Label(), 1));
 
-	if (fPrinterCap->isSupport(PrinterCap::kPrintStyle)) {
-		fJobData->setPrintStyle((B_CONTROL_ON == fDuplex->Value())
+	if (fPrinterCap->IsSupport(PrinterCap::kPrintStyle)) {
+		fJobData->SetPrintStyle((B_CONTROL_ON == fDuplex->Value())
 			? JobData::kDuplex : JobData::kSimplex);
 	}
 
-	fJobData->setCopies(atoi(fCopies->Text()));
+	fJobData->SetCopies(atoi(fCopies->Text()));
 
-	fJobData->setCollate(B_CONTROL_ON == fCollate->Value());
-	fJobData->setReverse(B_CONTROL_ON == fReverse->Value());
+	fJobData->SetCollate(B_CONTROL_ON == fCollate->Value());
+	fJobData->SetReverse(B_CONTROL_ON == fReverse->Value());
 
 	JobData::PageSelection pageSelection = JobData::kAllPages;
 	if (fOddNumberedPages->Value() == B_CONTROL_ON)
 		pageSelection = JobData::kOddNumberedPages;
 	if (fEvenNumberedPages->Value() == B_CONTROL_ON)
 		pageSelection = JobData::kEvenNumberedPages;
-	fJobData->setPageSelection(pageSelection);
+	fJobData->SetPageSelection(pageSelection);
 	
 	{
 		std::map<PrinterCap::CapID, BPopUpMenu*>::iterator it =
@@ -973,11 +973,11 @@ JobSetupView::UpdateJobData()
 		for(; it != fDriverSpecificPopUpMenus.end(); it++) {
 			PrinterCap::CapID category = it->first;
 			BPopUpMenu* popUpMenu = it->second;
-			const char* key = fPrinterCap->findCap(
+			const char* key = fPrinterCap->FindCap(
 				PrinterCap::kDriverSpecificCapabilities, (int)category)->Key();
 			const char* label = popUpMenu->FindMarked()->Label();
 			const char* value = static_cast<const EnumCap*>(fPrinterCap->
-				findCap(category, label))->Key();
+				FindCap(category, label))->Key();
 			fJobData->Settings().SetString(key, value);
 		}
 	}
@@ -1011,7 +1011,7 @@ JobSetupView::UpdateJobData()
 		}
 	}
 
-	fJobData->save();
+	fJobData->Save();
 	return true;
 }
 

@@ -166,7 +166,7 @@ const ColorCap* colors[] = {
 
 
 int
-Lips4Cap::countCap(CapID capid) const
+Lips4Cap::CountCap(CapID capid) const
 {
 	switch (capid) {
 		case kPaper:
@@ -188,7 +188,7 @@ Lips4Cap::countCap(CapID capid) const
 
 
 const BaseCap**
-Lips4Cap::enumCap(CapID capid) const
+Lips4Cap::GetCaps(CapID capid) const
 {
 	switch (capid) {
 		case kPaper:
@@ -210,7 +210,7 @@ Lips4Cap::enumCap(CapID capid) const
 
 
 bool
-Lips4Cap::isSupport(CapID capid) const
+Lips4Cap::IsSupport(CapID capid) const
 {
 	switch (capid) {
 		case kPaper:

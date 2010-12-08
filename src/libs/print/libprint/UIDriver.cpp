@@ -13,8 +13,12 @@
 #include "DbgMsg.h"
 
 
-UIDriver::UIDriver(BMessage *msg, PrinterData *printer_data, const PrinterCap *printer_cap)
-	: fMsg(msg), fPrinterData(printer_data), fPrinterCap(printer_cap)
+UIDriver::UIDriver(BMessage* message, PrinterData *printerData,
+	const PrinterCap *printerCap)
+	:
+	fMsg(message),
+	fPrinterData(printerData),
+	fPrinterCap(printerCap)
 {
 }
 
@@ -25,52 +29,56 @@ UIDriver::~UIDriver()
 
 
 BMessage*
-UIDriver::configPage()
+UIDriver::ConfigPage()
 {
-	BMessage *clone_msg = new BMessage(*fMsg);
-	JobData *job_data = new JobData(clone_msg, fPrinterCap, JobData::kPageSettings);
+	BMessage *clonedMessage = new BMessage(*fMsg);
+	JobData *jobData = new JobData(clonedMessage, fPrinterCap,
+		JobData::kPageSettings);
 
-	if (doPageSetup(job_data,fPrinterData, fPrinterCap) < 0) {
-		delete clone_msg;
-		clone_msg = NULL;
+	if (PageSetup(jobData, fPrinterData, fPrinterCap) < 0) {
+		delete clonedMessage;
+		clonedMessage = NULL;
 	} else {
-		clone_msg->what = 'okok';
+		clonedMessage->what = 'okok';
 	}
 
-	delete job_data;
-	return clone_msg;
+	delete jobData;
+	return clonedMessage;
 }
 
 
 BMessage*
-UIDriver::configJob()
+UIDriver::ConfigJob()
 {
-	BMessage *clone_msg = new BMessage(*fMsg);
-	JobData *job_data = new JobData(clone_msg, fPrinterCap, JobData::kJobSettings);
+	BMessage *clonedMessage = new BMessage(*fMsg);
+	JobData *jobData = new JobData(clonedMessage, fPrinterCap,
+		JobData::kJobSettings);
 
-	if (doJobSetup(job_data, fPrinterData, fPrinterCap) < 0) {
-		delete clone_msg;
-		clone_msg = NULL;
+	if (JobSetup(jobData, fPrinterData, fPrinterCap) < 0) {
+		delete clonedMessage;
+		clonedMessage = NULL;
 	} else {
-		clone_msg->what = 'okok';
+		clonedMessage->what = 'okok';
 	}
 
-	delete job_data;
-	return clone_msg;
+	delete jobData;
+	return clonedMessage;
 }
 
 
 long
-UIDriver::doPageSetup(JobData *job_data, PrinterData *printer_data, const PrinterCap *printer_cap)
+UIDriver::PageSetup(JobData* jobData, PrinterData* printerData,
+	const PrinterCap* printerCap)
 {
-	PageSetupDlg *dlg = new PageSetupDlg(job_data, printer_data, printer_cap);
-	return dlg->Go();
+	PageSetupDlg *dialog = new PageSetupDlg(jobData, printerData, printerCap);
+	return dialog->Go();
 }
 
 
 long
-UIDriver::doJobSetup(JobData *job_data, PrinterData *printer_data, const PrinterCap *printer_cap)
+UIDriver::JobSetup(JobData *jobData, PrinterData *printerData,
+	const PrinterCap *printerCap)
 {
-	JobSetupDlg *dlg = new JobSetupDlg(job_data, printer_data, printer_cap);
-	return dlg->Go();
+	JobSetupDlg *dialog = new JobSetupDlg(jobData, printerData, printerCap);
+	return dialog->Go();
 }

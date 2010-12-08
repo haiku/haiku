@@ -172,7 +172,7 @@ SelectPPDDlg::Save()
 			(fPrintersListView->ItemAt(idx))->fPPDPath;
 
 	fPSData->fPPD = ppdPath;
-	fPSData->save();
+	fPSData->Save();
 }
 
 

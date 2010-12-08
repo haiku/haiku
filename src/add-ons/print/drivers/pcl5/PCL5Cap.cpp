@@ -109,7 +109,7 @@ PCL5Cap::PCL5Cap(const PrinterData* printer_data)
 
 
 int
-PCL5Cap::countCap(CapID capid) const
+PCL5Cap::CountCap(CapID capid) const
 {
 	switch (capid) {
 		case kPaper:
@@ -127,7 +127,7 @@ PCL5Cap::countCap(CapID capid) const
 
 
 const BaseCap**
-PCL5Cap::enumCap(CapID capid) const
+PCL5Cap::GetCaps(CapID capid) const
 {
 	switch (capid) {
 		case kPaper:
@@ -145,7 +145,7 @@ PCL5Cap::enumCap(CapID capid) const
 
 
 bool
-PCL5Cap::isSupport(CapID capid) const
+PCL5Cap::IsSupport(CapID capid) const
 {
 	switch (capid) {
 		case kPaper:

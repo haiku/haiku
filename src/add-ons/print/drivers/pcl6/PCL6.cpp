@@ -72,9 +72,9 @@ PCL6Driver::StartDocument()
 {
 	try {
 		_JobStart();
-		fHalftone = new Halftone(GetJobData()->getSurfaceType(),
-			GetJobData()->getGamma(), GetJobData()->getInkDensity(),
-			GetJobData()->getDitherType());
+		fHalftone = new Halftone(GetJobData()->GetSurfaceType(),
+			GetJobData()->GetGamma(), GetJobData()->GetInkDensity(),
+			GetJobData()->GetDitherType());
 		return true;
 	}
 	catch (TransportException& err) {
@@ -175,7 +175,7 @@ PCL6Driver::NextBand(BBitmap* bitmap, BPoint* offset)
 		return true;
 	}
 	catch (TransportException& err) {
-		BAlert* alert = new BAlert("", err.what(), "OK");
+		BAlert* alert = new BAlert("", err.What(), "OK");
 		alert->Go();
 		return false;
 	} 
@@ -240,9 +240,9 @@ PCL6Driver::_JobStart()
 	fWriter = new PCL6Writer(this);
 	PCL6Writer::ProtocolClass pc =
 		(PCL6Writer::ProtocolClass)GetProtocolClass();
-	fWriter->PJLHeader(pc, GetJobData()->getXres(),
+	fWriter->PJLHeader(pc, GetJobData()->GetXres(),
 		"Copyright (c) 2003 - 2010 Haiku");
-	fWriter->BeginSession(GetJobData()->getXres(), GetJobData()->getYres(),
+	fWriter->BeginSession(GetJobData()->GetXres(), GetJobData()->GetYres(),
 		PCL6Writer::kInch, PCL6Writer::kBackChAndErrPage);
 	fWriter->OpenDataSource();
 	fMediaSide = PCL6Writer::kFrontMediaSide;
@@ -253,17 +253,17 @@ bool
 PCL6Driver::StartPage(int)
 {
 	PCL6Writer::Orientation orientation = PCL6Writer::kPortrait;
-	if (GetJobData()->getOrientation() == JobData::kLandscape) {
+	if (GetJobData()->GetOrientation() == JobData::kLandscape) {
 		orientation = PCL6Writer::kLandscape;
 	}
 	
 	PCL6Writer::MediaSize mediaSize = 
-		_MediaSize(GetJobData()->getPaper());
+		_MediaSize(GetJobData()->GetPaper());
 	PCL6Writer::MediaSource mediaSource = 
-		_MediaSource(GetJobData()->getPaperSource());
-	if (GetJobData()->getPrintStyle() == JobData::kSimplex) {
+		_MediaSource(GetJobData()->GetPaperSource());
+	if (GetJobData()->GetPrintStyle() == JobData::kSimplex) {
 		fWriter->BeginPage(orientation, mediaSize, mediaSource);
-	} else if (GetJobData()->getPrintStyle() == JobData::kDuplex) {
+	} else if (GetJobData()->GetPrintStyle() == JobData::kDuplex) {
 		// TODO move duplex binding option to UI
 		fWriter->BeginPage(orientation, mediaSize, mediaSource, 
 			PCL6Writer::kDuplexVerticalBinding, fMediaSide);
@@ -276,8 +276,8 @@ PCL6Driver::StartPage(int)
 		return false;
 	
 	// PageOrigin from Windows NT printer driver
-	int x = 142 * GetJobData()->getXres() / 600;
-	int y = 100 * GetJobData()->getYres() / 600;
+	int x = 142 * GetJobData()->GetXres() / 600;
+	int y = 100 * GetJobData()->GetYres() / 600;
 	fWriter->SetPageOrigin(x, y);
 	fWriter->SetColorSpace(_UseColorMode() ? PCL6Writer::kRGB
 		: PCL6Writer::kGray);
@@ -363,7 +363,7 @@ bool
 PCL6Driver::EndPage(int)
 {
 	try {
-		fWriter->EndPage(GetJobData()->getCopies());
+		fWriter->EndPage(GetJobData()->GetCopies());
 		return true;
 	}
 	catch (TransportException& err) {
@@ -394,7 +394,7 @@ PCL6Driver::_Move(int x, int y)
 bool
 PCL6Driver::_SupportsRLECompression()
 {
-	return GetJobData()->getColor() != JobData::kColorCompressionDisabled;
+	return GetJobData()->GetColor() != JobData::kColorCompressionDisabled;
 }
 
 
@@ -402,14 +402,14 @@ bool
 PCL6Driver::_SupportsDeltaRowCompression()
 {
 	return GetProtocolClass() >= PCL6Writer::kProtocolClass2_1
-		&& GetJobData()->getColor() != JobData::kColorCompressionDisabled;
+		&& GetJobData()->GetColor() != JobData::kColorCompressionDisabled;
 }
 
 
 bool
 PCL6Driver::_UseColorMode()
 {
-	return GetJobData()->getColor() != JobData::kMonochrome;
+	return GetJobData()->GetColor() != JobData::kMonochrome;
 }
 
 

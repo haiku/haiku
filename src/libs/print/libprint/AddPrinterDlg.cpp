@@ -21,13 +21,13 @@ ProtocolClassItem::ProtocolClassItem(const ProtocolClassCap* cap)
 
 
 int 
-ProtocolClassItem::getProtocolClass()
+ProtocolClassItem::GetProtocolClass() const
 {
 	return fProtocolClassCap->fProtocolClass;
 }
 
 const char *
-ProtocolClassItem::getDescription()
+ProtocolClassItem::GetDescription() const
 {
 	return fProtocolClassCap->fDescription.c_str();
 }
@@ -71,9 +71,9 @@ AddPrinterView::AttachedToWindow()
 	
 	protocolClassBox->AddChild(protocolClassScroller);
 
-	int count = fPrinterCap->countCap(PrinterCap::kProtocolClass);
+	int count = fPrinterCap->CountCap(PrinterCap::kProtocolClass);
 	ProtocolClassCap **protocolClasses =
-		(ProtocolClassCap **)fPrinterCap->enumCap(PrinterCap::kProtocolClass);
+		(ProtocolClassCap **)fPrinterCap->GetCaps(PrinterCap::kProtocolClass);
 	while (count--) {
 		const ProtocolClassCap *protocolClass = *protocolClasses;
 		
@@ -152,7 +152,7 @@ AddPrinterView::MessageReceived(BMessage* msg)
 	if (msg->what == kMsgProtocolClassChanged) {
 		ProtocolClassItem *item = CurrentSelection();
 		if (item != NULL) {
-			fDescription->SetText(item->getDescription());
+			fDescription->SetText(item->GetDescription());
 		}		
 	} else {
 		BView::MessageReceived(msg);
@@ -165,8 +165,8 @@ AddPrinterView::Save()
 {
 	ProtocolClassItem* item = CurrentSelection();
 	if (item != NULL) {
-		fPrinterData->setProtocolClass(item->getProtocolClass());
-		fPrinterData->save();
+		fPrinterData->SetProtocolClass(item->GetProtocolClass());
+		fPrinterData->Save();
 	}
 }
 

@@ -29,7 +29,7 @@ GPCapabilities::~GPCapabilities()
 }
 
 int
-GPCapabilities::countCap(CapID category) const
+GPCapabilities::CountCap(CapID category) const
 {
 	const GPArray<struct BaseCap>* capabilities;
 
@@ -55,7 +55,7 @@ GPCapabilities::countCap(CapID category) const
 
 
 const BaseCap**
-GPCapabilities::enumCap(CapID category) const
+GPCapabilities::GetCaps(CapID category) const
 {
 	typedef const BaseCap** ArrayType;
 	const GPArray<struct BaseCap>* capabilities;
@@ -82,7 +82,7 @@ GPCapabilities::enumCap(CapID category) const
 
 
 bool
-GPCapabilities::isSupport(CapID category) const
+GPCapabilities::IsSupport(CapID category) const
 {
 	switch (category) {
 		case kPaper:
@@ -92,14 +92,14 @@ GPCapabilities::isSupport(CapID category) const
 			return true;
 
 		default:
-			return countCap(category) > 0;
+			return CountCap(category) > 0;
 	}
 }
 
 void
 GPCapabilities::InitCapabilitiesFromGutenprint()
 {
-	const GPData* data = dynamic_cast<const GPData*>(getPrinterData());
+	const GPData* data = dynamic_cast<const GPData*>(GetPrinterData());
 	ASSERT(data != NULL);
 	// capabilities are available only after printer model
 	// has been selected

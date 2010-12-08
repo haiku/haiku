@@ -111,7 +111,7 @@ Lips3Cap::Lips3Cap(const PrinterData* printer_data)
 
 
 int
-Lips3Cap::countCap(CapID capid) const
+Lips3Cap::CountCap(CapID capid) const
 {
 	switch (capid) {
 		case kPaper:
@@ -129,7 +129,7 @@ Lips3Cap::countCap(CapID capid) const
 
 
 const
-BaseCap **Lips3Cap::enumCap(CapID capid) const
+BaseCap **Lips3Cap::GetCaps(CapID capid) const
 {
 	switch (capid) {
 		case kPaper:
@@ -147,7 +147,7 @@ BaseCap **Lips3Cap::enumCap(CapID capid) const
 
 
 bool
-Lips3Cap::isSupport(CapID capid) const
+Lips3Cap::IsSupport(CapID capid) const
 {
 	switch (capid) {
 		case kPaper:

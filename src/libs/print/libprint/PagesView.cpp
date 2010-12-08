@@ -40,20 +40,20 @@ void PagesView::Draw(BRect rect)
 	BPoint position(3, 3);
 	if (fCollate) {
 		BPoint next(kPageWidth + kPageHorizontalIndent * 2 + 10, 0);
-		DrawPages(position, 1, 3);
+		_DrawPages(position, 1, 3);
 		position += next;
-		DrawPages(position, 1, 3);
+		_DrawPages(position, 1, 3);
 	} else {
 		BPoint next(kPageWidth + kPageHorizontalIndent * 1 + 10, 0);
 		for (int i = 1; i <= 3; i ++) {
 			int page = fReverse ? 4 - i : i;
-			DrawPages(position, page, 2);
+			_DrawPages(position, page, 2);
 			position += next;
 		}
 	}
 }
 
-void PagesView::DrawPages(BPoint position, int number, int count)
+void PagesView::_DrawPages(BPoint position, int number, int count)
 {
 	position.x += kPageHorizontalIndent * (count - 1);
 	BPoint next(-kPageHorizontalIndent, kPageVerticalIndent);
@@ -65,18 +65,18 @@ void PagesView::DrawPages(BPoint position, int number, int count)
 			} else {
 				page = count - i;
 			}
-			DrawPage(position, page);
+			_DrawPage(position, page);
 			position += next;
 		}
 	} else {
 		for (int i = 0; i < count; i ++) {
-			DrawPage(position, number);
+			_DrawPage(position, number);
 			position += next;
 		}
 	}
 }
 
-void PagesView::DrawPage(BPoint position, int number)
+void PagesView::_DrawPage(BPoint position, int number)
 {
 	const rgb_color pageBackgroundColor = {255, 255, 255};
 	const rgb_color pageBorderColor = {0, 0, 0};
@@ -109,13 +109,13 @@ void PagesView::DrawPage(BPoint position, int number)
 		BPoint(kPageWidth - kPageHorizontalIndent + 1, kPageHeight - 2));
 }
 	
-void PagesView::setCollate(bool collate)
+void PagesView::SetCollate(bool collate)
 {
 	fCollate = collate;
 	Invalidate();
 }
 
-void PagesView::setReverse(bool reverse)
+void PagesView::SetReverse(bool reverse)
 {
 	fReverse = reverse;
 	Invalidate();

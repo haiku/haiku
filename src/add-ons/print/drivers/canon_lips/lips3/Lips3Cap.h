@@ -12,9 +12,9 @@
 class Lips3Cap : public PrinterCap {
 public:
 					Lips3Cap(const PrinterData* printer_data);
-	virtual	int		countCap(CapID) const;
-	virtual	bool	isSupport(CapID) const;
-	virtual	const	BaseCap **enumCap(CapID) const;
+	virtual	int		CountCap(CapID) const;
+	virtual	bool	IsSupport(CapID) const;
+	virtual	const	BaseCap **GetCaps(CapID) const;
 };
 
 #endif // __LIPS3CAP_H

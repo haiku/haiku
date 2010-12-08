@@ -60,7 +60,7 @@ PrinterDriver::InstantiatePrinterData(BNode* node)
 void 
 PrinterDriver::InitPrinterDataAndCap() {
 	fPrinterData = InstantiatePrinterData(fSpoolFolder);
-	fPrinterData->load();
+	fPrinterData->Load();
 	// NOTE: moved the load above from the constructor of PrinterData as
 	//   we're inheriting from PrinterData and want our overridden versions
 	//   of load to be called
@@ -89,8 +89,8 @@ PrinterDriver::AddPrinter(char* printerName)
 	DBGMSG(("\tprinter_name: %s\n", printerName));
 	DBGMSG(("<%s: add_printer\n", GetDriverName()));
 	
-	if (fPrinterCap->isSupport(PrinterCap::kProtocolClass)) {
-		if (fPrinterCap->countCap(PrinterCap::kProtocolClass) > 1) {
+	if (fPrinterCap->IsSupport(PrinterCap::kProtocolClass)) {
+		if (fPrinterCap->CountCap(PrinterCap::kProtocolClass) > 1) {
 			AddPrinterDlg *dialog;
 			dialog = new AddPrinterDlg(fPrinterData, fPrinterCap);
 			if (dialog->Go() != B_OK) {
@@ -99,10 +99,11 @@ PrinterDriver::AddPrinter(char* printerName)
 			}
 		} else {
 			const ProtocolClassCap* pcCap;
-			pcCap = (const ProtocolClassCap*)fPrinterCap->getDefaultCap(PrinterCap::kProtocolClass);
+			pcCap = (const ProtocolClassCap*)fPrinterCap->GetDefaultCap(
+				PrinterCap::kProtocolClass);
 			if (pcCap != NULL) {
-				fPrinterData->setProtocolClass(pcCap->fProtocolClass);
-				fPrinterData->save();
+				fPrinterData->SetProtocolClass(pcCap->fProtocolClass);
+				fPrinterData->Save();
 			}
 		}
 	}
@@ -117,10 +118,10 @@ PrinterDriver::ConfigPage(BMessage* settings)
 	DUMP_BNODE(fSpoolFolder);
 	
 	BMessage pageSettings(*settings);
-	MergeWithPreviousSettings(kAttrPageSettings, &pageSettings);
-	UIDriver drv(&pageSettings, fPrinterData, fPrinterCap);
-	BMessage *result = drv.configPage();
-	WriteSettings(kAttrPageSettings, result);
+	_MergeWithPreviousSettings(kAttrPageSettings, &pageSettings);
+	UIDriver uiDriver(&pageSettings, fPrinterData, fPrinterCap);
+	BMessage *result = uiDriver.ConfigPage();
+	_WriteSettings(kAttrPageSettings, result);
 
 	DUMP_BMESSAGE(result);
 	DBGMSG(("<%s: config_page\n", GetDriverName()));
@@ -135,10 +136,10 @@ PrinterDriver::ConfigJob(BMessage* settings)
 	DUMP_BNODE(fSpoolFolder);
 	
 	BMessage jobSettings(*settings);
-	MergeWithPreviousSettings(kAttrJobSettings, &jobSettings);
-	UIDriver drv(&jobSettings, fPrinterData, fPrinterCap);
-	BMessage *result = drv.configJob();
-	WriteSettings(kAttrJobSettings, result);
+	_MergeWithPreviousSettings(kAttrJobSettings, &jobSettings);
+	UIDriver uiDriver(&jobSettings, fPrinterData, fPrinterCap);
+	BMessage *result = uiDriver.ConfigJob();
+	_WriteSettings(kAttrJobSettings, result);
 	
 	DUMP_BMESSAGE(result);
 	DBGMSG(("<%s: config_job\n", GetDriverName()));
@@ -154,7 +155,7 @@ PrinterDriver::TakeJob(BFile* printJob, BMessage* settings)
 
 	fGraphicsDriver = InstantiateGraphicsDriver(settings, fPrinterData, fPrinterCap);
 	const JobData* jobData = fGraphicsDriver->GetJobData(printJob);
-	if (jobData != NULL && jobData->getShowPreview()) {
+	if (jobData != NULL && jobData->GetShowPreview()) {
 		off_t offset = printJob->Position();
 		PreviewWindow *preview = new PreviewWindow(printJob, true);
 		if (preview->Go() != B_OK) {
@@ -171,7 +172,7 @@ PrinterDriver::TakeJob(BFile* printJob, BMessage* settings)
 
 // read settings from spool folder attribute
 bool 
-PrinterDriver::ReadSettings(const char* attrName, BMessage* settings)
+PrinterDriver::_ReadSettings(const char* attrName, BMessage* settings)
 {
 	attr_info info;
 	char*  data;
@@ -192,7 +193,7 @@ PrinterDriver::ReadSettings(const char* attrName, BMessage* settings)
 
 // write settings to spool folder attribute
 void 
-PrinterDriver::WriteSettings(const char* attrName, BMessage* settings)
+PrinterDriver::_WriteSettings(const char* attrName, BMessage* settings)
 {
 	if (settings == NULL || settings->what != 'okok') return;
 	
@@ -210,12 +211,12 @@ PrinterDriver::WriteSettings(const char* attrName, BMessage* settings)
 
 // read settings from spool folder attribute and merge them to current settings
 void 
-PrinterDriver::MergeWithPreviousSettings(const char* attrName, BMessage* settings)
+PrinterDriver::_MergeWithPreviousSettings(const char* attrName, BMessage* settings)
 {
 	if (settings == NULL) return;
 	
 	BMessage stored;
-	if (ReadSettings(attrName, &stored)) {
+	if (_ReadSettings(attrName, &stored)) {
 		AddFields(&stored, settings);
 		*settings = stored;
 	}

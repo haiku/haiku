@@ -137,7 +137,7 @@ PrintJobReader::PrintJobReader(BFile* jobFile)
 			fNumberOfPages = header.page_count;
 			fPageIndex = new off_t[fNumberOfPages];
 
-			BuildPageIndex();
+			_BuildPageIndex();
 		}
 	}
 }
@@ -155,7 +155,7 @@ status_t PrintJobReader::InitCheck() const
 }
 
 
-void PrintJobReader::BuildPageIndex()
+void PrintJobReader::_BuildPageIndex()
 {
 	off_t next_page;
 	int32 number_of_pictures;

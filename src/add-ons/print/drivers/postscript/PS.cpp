@@ -113,9 +113,9 @@ PSDriver::StartDocument()
 		_StartFilterIfNeeded();
 
 		_JobStart();
-		fHalftone = new Halftone(GetJobData()->getSurfaceType(),
-			GetJobData()->getGamma(), GetJobData()->getInkDensity(),
-			GetJobData()->getDitherType());
+		fHalftone = new Halftone(GetJobData()->GetSurfaceType(),
+			GetJobData()->GetGamma(), GetJobData()->GetInkDensity(),
+			GetJobData()->GetDitherType());
 		return true;
 	}
 	catch (TransportException& err) {
@@ -156,13 +156,13 @@ PSDriver::EndPage(int)
 void
 PSDriver::_SetupCTM()
 {
-	const float leftMargin = GetJobData()->getPrintableRect().left;
-	const float topMargin = GetJobData()->getPrintableRect().top;
-	if (GetJobData()->getOrientation() == JobData::kPortrait) {
+	const float leftMargin = GetJobData()->GetPrintableRect().left;
+	const float topMargin = GetJobData()->GetPrintableRect().top;
+	if (GetJobData()->GetOrientation() == JobData::kPortrait) {
 		// move origin from bottom left to top left
 		// and set margin
 		_WritePSString("%f %f translate\n", leftMargin,
-			GetJobData()->getPaperRect().Height()-topMargin);
+			GetJobData()->GetPaperRect().Height()-topMargin);
 	} else {
 		// landscape:
 		// move origin from bottom left to margin top and left 
@@ -172,8 +172,8 @@ PSDriver::_SetupCTM()
 	}
 	// y values increase from top to bottom
 	// units of measure is dpi
-	_WritePSString("72 %d div 72 -%d div scale\n", GetJobData()->getXres(),
-		GetJobData()->getYres());
+	_WritePSString("72 %d div 72 -%d div scale\n", GetJobData()->GetXres(),
+		GetJobData()->GetYres());
 }
 
 
@@ -241,7 +241,7 @@ PSDriver::NextBand(BBitmap* bitmap, BPoint* offset)
 			x = rc.left;
 			y += rc.top;
 
-			bool color = GetJobData()->getColor() == JobData::kColor;
+			bool color = GetJobData()->GetColor() == JobData::kColor;
 			int width = rc.right - rc.left + 1;
 			int widthByte = (width + 7) / 8;
 				// byte boundary
@@ -255,12 +255,12 @@ PSDriver::NextBand(BBitmap* bitmap, BPoint* offset)
 			DBGMSG(("height = %d\n", height));
 			DBGMSG(("out_size = %d\n", out_size));
 			DBGMSG(("delta = %d\n", delta));
-			DBGMSG(("renderobj->get_pixel_depth() = %d\n",
-				fHalftone->getPixelDepth()));
+			DBGMSG(("renderobj->Get_pixel_depth() = %d\n",
+				fHalftone->GetPixelDepth()));
 
 			uchar* ptr = static_cast<uchar*>(bitmap->Bits())
 						+ rc.top * delta
-						+ (rc.left * fHalftone->getPixelDepth()) / 8;
+						+ (rc.left * fHalftone->GetPixelDepth()) / 8;
 
 			int compression_method;
 			int compressed_size;
@@ -293,7 +293,7 @@ PSDriver::NextBand(BBitmap* bitmap, BPoint* offset)
 						in += 4;
 					}
 				} else {
-					fHalftone->dither(in_buffer, ptr, x, y, width);
+					fHalftone->Dither(in_buffer, ptr, x, y, width);
 
 					uchar* in = in_buffer;
 					uchar* out = out_buffer;
@@ -335,7 +335,7 @@ PSDriver::NextBand(BBitmap* bitmap, BPoint* offset)
 		return true;
 	}
 	catch (TransportException& err) {
-		BAlert* alert = new BAlert("", err.what(), "OK");
+		BAlert* alert = new BAlert("", err.What(), "OK");
 		alert->Go();
 		return false;
 	} 
@@ -349,14 +349,14 @@ PSDriver::_JobStart()
 	_WritePSString("%%!PS-Adobe-3.0\n");
 	_WritePSString("%%%%LanguageLevel: 1\n");
 	_WritePSString("%%%%Title: %s\n",
-		GetSpoolMetaData()->getDescription().c_str());
+		GetSpoolMetaData()->GetDescription().c_str());
 	_WritePSString("%%%%Creator: %s\n",
-		GetSpoolMetaData()->getMimeType().c_str());
+		GetSpoolMetaData()->GetMimeType().c_str());
 	_WritePSString("%%%%CreationDate: %s",
-		GetSpoolMetaData()->getCreationTime().c_str());
+		GetSpoolMetaData()->GetCreationTime().c_str());
 	_WritePSString("%%%%DocumentMedia: Plain %d %d white 0 ( )\n",
-		GetJobData()->getPaperRect().IntegerWidth(),
-		GetJobData()->getPaperRect().IntegerHeight());
+		GetJobData()->GetPaperRect().IntegerWidth(),
+		GetJobData()->GetPaperRect().IntegerHeight());
 	_WritePSString("%%%%Pages: (atend)\n");
 	_WritePSString("%%%%EndComments\n");
 	
@@ -370,7 +370,7 @@ void
 PSDriver::_StartRasterGraphics(int x, int y, int width, int height,
 	int widthByte)
 {
-	bool color = GetJobData()->getColor() == JobData::kColor;
+	bool color = GetJobData()->GetColor() == JobData::kColor;
 	fCompressionMethod = -1;
 	_WritePSString("gsave\n");
 	_WritePSString("/s %d string def\n", widthByte);

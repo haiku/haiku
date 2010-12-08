@@ -54,7 +54,7 @@ const void*
 MonochromeRasterizer::RasterizeLine(int x, int y,
 	const ColorRGB32Little* source)
 {
-	GetHalftone()->dither(fCurrentLine, (const uchar*)source, x, y, GetWidth());
+	GetHalftone()->Dither(fCurrentLine, (const uchar*)source, x, y, GetWidth());
 	
 	uchar* out = fCurrentLine;
 
@@ -127,8 +127,8 @@ ColorRasterizer::ColorRasterizer::ColorRasterizer(Halftone* halftone)
 	for (int plane = 0; plane < 3; plane ++)
 		fPlaneBuffers[plane] = NULL;
 
-	halftone->setPlanes(Halftone::kPlaneRGB1);
-	halftone->setBlackValue(Halftone::kLowValueMeansBlack);
+	halftone->SetPlanes(Halftone::kPlaneRGB1);
+	halftone->SetBlackValue(Halftone::kLowValueMeansBlack);
 }
 
 
@@ -173,7 +173,7 @@ ColorRasterizer::RasterizeLine(int x, int y, const ColorRGB32Little* source)
 	
 	// dither each color component
 	for (int plane = 0; plane < 3; plane ++)
-		GetHalftone()->dither(fPlaneBuffers[plane], (const uchar*)source, x, y,
+		GetHalftone()->Dither(fPlaneBuffers[plane], (const uchar*)source, x, y,
 			GetWidth());
 	
 	DUMP_BITS((stderr, "red   "), fPlaneBuffers[0], fPlaneBufferSize);

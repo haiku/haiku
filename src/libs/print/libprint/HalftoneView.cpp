@@ -3,16 +3,18 @@
 #include <Bitmap.h>
 #include <StringView.h>
 
-HalftonePreviewView::HalftonePreviewView(
-	BRect frame, 
-	const char* name, 
-	uint32 resizeMask, 
-	uint32 flags)
-	: BView(frame, name, resizeMask, flags)
+
+HalftonePreviewView::HalftonePreviewView(BRect frame, const char* name,
+	uint32 resizeMask, uint32 flags)
+	:
+	BView(frame, name, resizeMask, flags)
 {
 }
 
-void HalftonePreviewView::preview(float gamma, float min, Halftone::DitherType ditherType, bool color)
+
+void
+HalftonePreviewView::Preview(float gamma, float min,
+	Halftone::DitherType ditherType, bool color)
 {
 	const color_space kColorSpace = B_RGB32;
 	const float right = Bounds().Width();
@@ -67,7 +69,7 @@ void HalftonePreviewView::preview(float gamma, float min, Halftone::DitherType d
 	
 	// create preview image 
 	Halftone halftone(kColorSpace, gamma, min, ditherType);
-	halftone.setBlackValue(Halftone::kLowValueMeansBlack);
+	halftone.SetBlackValue(Halftone::kLowValueMeansBlack);
 
 	const int widthBytes = (width + 7) / 8; // byte boundary
 	uchar* buffer = new uchar[widthBytes];
@@ -77,13 +79,13 @@ void HalftonePreviewView::preview(float gamma, float min, Halftone::DitherType d
 	
 	const int numPlanes = color ? 3 : 1;
 	if (color) {
-		halftone.setPlanes(Halftone::kPlaneRGB1);
+		halftone.SetPlanes(Halftone::kPlaneRGB1);
 	}
 
 	for (int y = 0; y < height; y ++) {
 		for (int plane = 0; plane < numPlanes;  plane ++) {
 			// halftone the preview image
-			halftone.dither(buffer, src, 0, y, width);
+			halftone.Dither(buffer, src, 0, y, width);
 			
 			// convert the plane(s) to RGB32
 			ColorRGB32Little* dst = (ColorRGB32Little*)dstRow;
@@ -123,12 +125,11 @@ void HalftonePreviewView::preview(float gamma, float min, Halftone::DitherType d
 	Invalidate();
 }
 
-HalftoneView::HalftoneView(
-	BRect frame, 
-	const char* name, 
-	uint32 resizeMask, 
+
+HalftoneView::HalftoneView(BRect frame, const char* name, uint32 resizeMask,
 	uint32 flags)
-	: BView(frame, name, resizeMask, flags)
+	:
+	BView(frame, name, resizeMask, flags)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
@@ -187,7 +188,10 @@ HalftoneView::HalftoneView(
 	AddChild(fPreview);
 }
 
-void HalftoneView::preview(float gamma, float min, Halftone::DitherType ditherType, bool color)
+
+void
+HalftoneView::Preview(float gamma, float min,
+	Halftone::DitherType ditherType, bool color)
 {
-	fPreview->preview(gamma, min, ditherType, color);
+	fPreview->Preview(gamma, min, ditherType, color);
 }

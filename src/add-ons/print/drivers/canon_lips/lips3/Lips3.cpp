@@ -44,9 +44,9 @@ LIPS3Driver::StartDocument()
 		_PaperFeedMode();
 		_DisableAutoFF();
 		_SetNumberOfCopies();
-		fHalftone = new Halftone(GetJobData()->getSurfaceType(),
-			GetJobData()->getGamma(), GetJobData()->getInkDensity(),
-			GetJobData()->getDitherType());
+		fHalftone = new Halftone(GetJobData()->GetSurfaceType(),
+			GetJobData()->GetGamma(), GetJobData()->GetInkDensity(),
+			GetJobData()->GetDitherType());
 		return true;
 	}
 	catch (TransportException& err) {
@@ -151,12 +151,12 @@ LIPS3Driver::NextBand(BBitmap* bitmap, BPoint* offset)
 			DBGMSG(("in_size = %d\n", in_size));
 			DBGMSG(("out_size = %d\n", out_size));
 			DBGMSG(("delta = %d\n", delta));
-			DBGMSG(("renderobj->get_pixel_depth() = %d\n",
-				fHalftone->getPixelDepth()));
+			DBGMSG(("renderobj->Get_pixel_depth() = %d\n",
+				fHalftone->GetPixelDepth()));
 
 			uchar* ptr = static_cast<uchar*>(bitmap->Bits())
 						+ rc.top * delta
-						+ (rc.left * fHalftone->getPixelDepth()) / 8;
+						+ (rc.left * fHalftone->GetPixelDepth()) / 8;
 
 			int compressionMethod;
 			int compressedSize;
@@ -175,7 +175,7 @@ LIPS3Driver::NextBand(BBitmap* bitmap, BPoint* offset)
 			_Move(x, y);
 
 			for (int i = rc.top; i <= rc.bottom; i++) {
-				fHalftone->dither(ptr2, ptr, x, y, width);
+				fHalftone->Dither(ptr2, ptr, x, y, width);
 				ptr  += delta;
 				ptr2 += widthByte;
 				y++;
@@ -223,7 +223,7 @@ LIPS3Driver::NextBand(BBitmap* bitmap, BPoint* offset)
 		return true;
 	}
 	catch (TransportException& err) {
-		BAlert* alert = new BAlert("", err.what(), "OK");
+		BAlert* alert = new BAlert("", err.What(), "OK");
 		alert->Go();
 		return false;
 	} 
@@ -272,7 +272,7 @@ LIPS3Driver::_SelectPageFormat()
 	int width  = 0;
 	int height = 0;
 
-	switch (GetJobData()->getPaper()) {
+	switch (GetJobData()->GetPaper()) {
 	case JobData::kA3:
 		i = 12;
 		break;
@@ -319,12 +319,12 @@ LIPS3Driver::_SelectPageFormat()
 //
 	default:
 		i = 80;
-		width  = GetJobData()->getPaperRect().IntegerWidth();
-		height = GetJobData()->getPaperRect().IntegerHeight();
+		width  = GetJobData()->GetPaperRect().IntegerWidth();
+		height = GetJobData()->GetPaperRect().IntegerHeight();
 		break;
 	}
 
-	if (JobData::kLandscape == GetJobData()->getOrientation())
+	if (JobData::kLandscape == GetJobData()->GetOrientation())
 		i++;
 
 	if (i < 80)
@@ -354,7 +354,7 @@ LIPS3Driver::_PaperFeedMode()
 
 	int i;
 
-	switch (GetJobData()->getPaperSource()) {
+	switch (GetJobData()->GetPaperSource()) {
 		case JobData::kManual:
 			i = 1;
 			break;
@@ -384,7 +384,7 @@ LIPS3Driver::_DisableAutoFF()
 void
 LIPS3Driver::_SetNumberOfCopies()
 {
-	WriteSpoolString("\033[%ldv", GetJobData()->getCopies());
+	WriteSpoolString("\033[%ldv", GetJobData()->GetCopies());
 }
 
 
@@ -423,7 +423,7 @@ LIPS3Driver::_RasterGraphics( int compressionSize, int widthbyte, int height,
 //  0 RAW
 //  9 compress-3
 	WriteSpoolString("\033[%d;%d;%d;%d;%d.r", compressionSize, widthbyte,
-		GetJobData()->getXres(), compressionMethod, height);
+		GetJobData()->GetXres(), compressionMethod, height);
 
 	WriteSpoolData(buffer, compressionSize);
 }

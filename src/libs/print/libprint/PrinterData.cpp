@@ -16,17 +16,22 @@ const char *PD_COMMENTS         = "Comments";
 const char *PD_TRANSPORT        = "transport";
 const char *PD_PROTOCOL_CLASS   = "libprint:protocolClass";
 
+
 PrinterData::PrinterData(BNode *node)
-	: fNode(node),
+	:
+	fNode(node),
 	fProtocolClass(0)
 {
 }
+
 
 PrinterData::~PrinterData()
 {
 }
 
-void PrinterData::load()
+
+void
+PrinterData::Load()
 {
 	if (fNode == NULL) return;
 	
@@ -47,26 +52,36 @@ void PrinterData::load()
 	fProtocolClass = (int)valueI32;
 }
 
-void PrinterData::save()
+
+void
+PrinterData::Save()
 {
-	if (fNode == NULL) return;
+	if (fNode == NULL)
+		return;
 
 	int32 valueI32 = (int32)fProtocolClass;
-	fNode->WriteAttr(PD_PROTOCOL_CLASS, B_INT32_TYPE, 0, &valueI32, sizeof(valueI32));
+	fNode->WriteAttr(PD_PROTOCOL_CLASS, B_INT32_TYPE, 0, &valueI32,
+		sizeof(valueI32));
 }
 
-bool PrinterData::getPath(string &path) const
+
+bool
+PrinterData::GetPath(string &path) const
 {
-	if (fNode == NULL) return false;
+	if (fNode == NULL)
+		return false;
 	
 	node_ref nref;
-	if (fNode->GetNodeRef(&nref) != B_OK) return false;
+	if (fNode->GetNodeRef(&nref) != B_OK)
+		return false;
 
 	BDirectory dir(&nref);
-	if (dir.InitCheck() != B_OK) return false;
+	if (dir.InitCheck() != B_OK)
+		return false;
 		
 	BPath path0(&dir, ".");
-	if (path0.InitCheck() != B_OK) return false;
+	if (path0.InitCheck() != B_OK)
+		return false;
 		
 	path = path0.Path();
 	return true;

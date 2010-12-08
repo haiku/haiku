@@ -19,28 +19,48 @@
 using namespace std;
 
 
-Transport::Transport(const PrinterData *printer_data)
-	: fImage(-1), fInitTransport(0), fExitTransport(0), fDataStream(0), fAbort(false)
+TransportException::TransportException(const string& what)
+	:
+	fWhat(what)
+{
+}
+
+
+const char*
+TransportException::What() const
+{
+	return fWhat.c_str();
+}
+
+
+Transport::Transport(const PrinterData *printerData)
+	:
+	fImage(-1),
+	fInitTransport(0),
+	fExitTransport(0),
+	fDataStream(0),
+	fAbort(false)
 {
 	BPath path;
 
 	if (B_OK == find_directory(B_USER_ADDONS_DIRECTORY, &path)) {
 		path.Append("Print/transport");
-		path.Append(printer_data->getTransport().c_str());
+		path.Append(printerData->GetTransport().c_str());
 		DBGMSG(("load_add_on: %s\n", path.Path()));
 		fImage = load_add_on(path.Path());
 	}
+
 	if (fImage < 0) {
 		if (B_OK == find_directory(B_BEOS_ADDONS_DIRECTORY, &path)) {
 			path.Append("Print/transport");
-			path.Append(printer_data->getTransport().c_str());
+			path.Append(printerData->GetTransport().c_str());
 			DBGMSG(("load_add_on: %s\n", path.Path()));
 			fImage = load_add_on(path.Path());
 		}
 	}
 
 	if (fImage < 0) {
-		set_last_error("cannot load a transport add-on");
+		SetLastError("cannot load a transport add-on");
 		return;
 	}
 
@@ -50,24 +70,24 @@ Transport::Transport(const PrinterData *printer_data)
 	get_image_symbol(fImage, "exit_transport", B_SYMBOL_TYPE_TEXT, (void **)&fExitTransport);
 
 	if (fInitTransport == NULL) {
-		set_last_error("get_image_symbol failed.");
+		SetLastError("get_image_symbol failed.");
 		DBGMSG(("init_transport is NULL\n"));
 	}
 
 	if (fExitTransport == NULL) {
-		set_last_error("get_image_symbol failed.");
+		SetLastError("get_image_symbol failed.");
 		DBGMSG(("exit_transport is NULL\n"));
 	}
 
 	if (fInitTransport) {
 		string spool_path;
-		printer_data->getPath(spool_path);
+		printerData->GetPath(spool_path);
 		BMessage *msg = new BMessage('TRIN');
 		msg->AddString("printer_file", spool_path.c_str());
 		fDataStream = (*fInitTransport)(msg);
 		delete msg;
 		if (fDataStream == 0) {
-			set_last_error("init_transport failed.");
+			SetLastError("init_transport failed.");
 		}
 	}
 }
@@ -85,21 +105,21 @@ Transport::~Transport()
 
 
 bool
-Transport::check_abort() const
+Transport::CheckAbort() const
 {
 	return fDataStream == 0;
 }
 
 
 const
-string &Transport::last_error() const
+string &Transport::LastError() const
 {
 	return fLastErrorString;
 }
 
 
 bool
-Transport::is_print_to_file_canceled() const
+Transport::IsPrintToFileCanceled() const
 {
 	// The BeOS "Print To File" transport add-on returns a non-NULL BDataIO *
 	// even after user filepanel cancellation!
@@ -109,7 +129,7 @@ Transport::is_print_to_file_canceled() const
 
 
 void
-Transport::set_last_error(const char *e)
+Transport::SetLastError(const char *e)
 {
 	fLastErrorString = e;
 	fAbort = true;
@@ -117,13 +137,13 @@ Transport::set_last_error(const char *e)
 
 
 void
-Transport::write(const void *buffer, size_t size) throw(TransportException)
+Transport::Write(const void* buffer, size_t size) throw(TransportException)
 {
 	if (fDataStream) {
 		if (size == (size_t)fDataStream->Write(buffer, size)) {
 			return;
 		}
-		set_last_error("BDataIO::Write failed.");
+		SetLastError("BDataIO::Write failed.");
 	}
-	throw TransportException(last_error());
+	throw TransportException(LastError());
 }

@@ -38,9 +38,9 @@ PCL5Driver::StartDocument()
 {
 	try {
 		_JobStart();
-		fHalftone = new Halftone(GetJobData()->getSurfaceType(),
-			GetJobData()->getGamma(), GetJobData()->getInkDensity(),
-			GetJobData()->getDitherType());
+		fHalftone = new Halftone(GetJobData()->GetSurfaceType(),
+			GetJobData()->GetGamma(), GetJobData()->GetInkDensity(),
+			GetJobData()->GetDitherType());
 		return true;
 	}
 	catch (TransportException& err) {
@@ -138,11 +138,11 @@ PCL5Driver::NextBand(BBitmap* bitmap, BPoint* offset)
 			DBGMSG(("in_size = %d\n", in_size));
 			DBGMSG(("out_size = %d\n", out_size));
 			DBGMSG(("delta = %d\n", delta));
-			DBGMSG(("renderobj->get_pixel_depth() = %d\n", fHalftone->getPixelDepth()));
+			DBGMSG(("renderobj->Get_pixel_depth() = %d\n", fHalftone->GetPixelDepth()));
 
 			uchar* ptr = static_cast<uchar*>(bitmap->Bits())
 						+ rc.top * delta
-						+ (rc.left * fHalftone->getPixelDepth()) / 8;
+						+ (rc.left * fHalftone->GetPixelDepth()) / 8;
 
 			int compressionMethod;
 			int compressedSize;
@@ -159,19 +159,19 @@ PCL5Driver::NextBand(BBitmap* bitmap, BPoint* offset)
 			_Move(x, y);
 			_StartRasterGraphics(width, height);
 
-			const bool color = GetJobData()->getColor() == JobData::kColor;
+			const bool color = GetJobData()->GetColor() == JobData::kColor;
 			const int num_planes = color ? 3 : 1;
 			
 			if (color) {
-				fHalftone->setPlanes(Halftone::kPlaneRGB1);
-				fHalftone->setBlackValue(Halftone::kLowValueMeansBlack);
+				fHalftone->SetPlanes(Halftone::kPlaneRGB1);
+				fHalftone->SetBlackValue(Halftone::kLowValueMeansBlack);
 			}
 			
 			for (int i = rc.top; i <= rc.bottom; i++) {
 			
 				for (int plane = 0; plane < num_planes; plane ++) {
 										
-					fHalftone->dither(in_buffer, ptr, x, y, width);
+					fHalftone->Dither(in_buffer, ptr, x, y, width);
 							
 					compressedSize = pack_bits(out_buffer, in_buffer, in_size);
 					
@@ -212,7 +212,7 @@ PCL5Driver::NextBand(BBitmap* bitmap, BPoint* offset)
 		return true;
 	}
 	catch (TransportException& err) {
-		BAlert* alert = new BAlert("", err.what(), "OK");
+		BAlert* alert = new BAlert("", err.What(), "OK");
 		alert->Go();
 		return false;
 	} 
@@ -222,15 +222,15 @@ PCL5Driver::NextBand(BBitmap* bitmap, BPoint* offset)
 void
 PCL5Driver::_JobStart()
 {
-	const bool color = GetJobData()->getColor() == JobData::kColor;
+	const bool color = GetJobData()->GetColor() == JobData::kColor;
 	// enter PCL5
 	WriteSpoolString("\033%%-12345X@PJL ENTER LANGUAGE=PCL\n");
 	// reset
 	WriteSpoolString("\033E");
 	// dpi
-	WriteSpoolString("\033*t%dR", GetJobData()->getXres());
+	WriteSpoolString("\033*t%dR", GetJobData()->GetXres());
 	// unit of measure
-	WriteSpoolString("\033&u%dD", GetJobData()->getXres());
+	WriteSpoolString("\033&u%dD", GetJobData()->GetXres());
 	// page size
 	WriteSpoolString("\033&l0A");
 	// page orientation
@@ -246,7 +246,7 @@ PCL5Driver::_JobStart()
 	// clear horizontal margins
 	WriteSpoolString("\0339");
 	// number of copies
-	// WriteSpoolString("\033&l%ldL", GetJobData()->getCopies());
+	// WriteSpoolString("\033&l%ldL", GetJobData()->GetCopies());
 }
 
 

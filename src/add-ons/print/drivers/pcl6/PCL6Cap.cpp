@@ -273,15 +273,15 @@ PCL6Cap::PCL6Cap(const PrinterData* printer_data)
 
 
 int
-PCL6Cap::countCap(CapID capid) const
+PCL6Cap::CountCap(CapID capid) const
 {
 	switch (capid) {
 		case kPaper:
-			if (getProtocolClass() >= PCL6Writer::kProtocolClass2_1)
+			if (GetProtocolClass() >= PCL6Writer::kProtocolClass2_1)
 				return sizeof(papers2_1) / sizeof(papers2_1[0]);
 			return sizeof(papers1_1) / sizeof(papers1_1[0]);
 		case kPaperSource:
-			if (getProtocolClass() >= PCL6Writer::kProtocolClass2_0)
+			if (GetProtocolClass() >= PCL6Writer::kProtocolClass2_0)
 				return sizeof(paperSources2_0) / sizeof(paperSources2_0[0]);
 			return sizeof(paperSources1_1) / sizeof(paperSources1_1[0]);
 		case kResolution:
@@ -299,15 +299,15 @@ PCL6Cap::countCap(CapID capid) const
 
 
 const BaseCap**
-PCL6Cap::enumCap(CapID capid) const
+PCL6Cap::GetCaps(CapID capid) const
 {
 	switch (capid) {
 		case kPaper:
-			if (getProtocolClass() >= PCL6Writer::kProtocolClass2_1)
+			if (GetProtocolClass() >= PCL6Writer::kProtocolClass2_1)
 				return (const BaseCap **)papers2_1;
 			return (const BaseCap**)papers1_1;
 		case kPaperSource:
-			if (getProtocolClass() >= PCL6Writer::kProtocolClass2_0)
+			if (GetProtocolClass() >= PCL6Writer::kProtocolClass2_0)
 				return (const BaseCap **)paperSources2_0;
 			return (const BaseCap**)paperSources1_1;
 		case kResolution:
@@ -325,7 +325,7 @@ PCL6Cap::enumCap(CapID capid) const
 
 
 bool
-PCL6Cap::isSupport(CapID capid) const
+PCL6Cap::IsSupport(CapID capid) const
 {
 	switch (capid) {
 		case kPaper:

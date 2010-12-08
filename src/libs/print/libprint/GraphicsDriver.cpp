@@ -115,30 +115,30 @@ GraphicsDriver::_SetupData(BFile* spoolFile)
 
 	fRealJobData = new JobData(*fOrgJobData);
 
-	switch (fOrgJobData->getNup()) {
+	switch (fOrgJobData->GetNup()) {
 	case 2:
 	case 8:
 	case 32:
 	case 128:
-		fRealJobData->setPrintableRect(
-			RotateRect(fOrgJobData->getPrintableRect()));
-		fRealJobData->setScaledPrintableRect(
-			RotateRect(fOrgJobData->getScaledPrintableRect()));
-		fRealJobData->setPhysicalRect(
-			RotateRect(fOrgJobData->getPhysicalRect()));
-		fRealJobData->setScaledPhysicalRect(
-			RotateRect(fOrgJobData->getScaledPhysicalRect()));
+		fRealJobData->SetPrintableRect(
+			RotateRect(fOrgJobData->GetPrintableRect()));
+		fRealJobData->SetScaledPrintableRect(
+			RotateRect(fOrgJobData->GetScaledPrintableRect()));
+		fRealJobData->SetPhysicalRect(
+			RotateRect(fOrgJobData->GetPhysicalRect()));
+		fRealJobData->SetScaledPhysicalRect(
+			RotateRect(fOrgJobData->GetScaledPhysicalRect()));
 
-		if (JobData::kPortrait == fOrgJobData->getOrientation())
-			fRealJobData->setOrientation(JobData::kLandscape);
+		if (JobData::kPortrait == fOrgJobData->GetOrientation())
+			fRealJobData->SetOrientation(JobData::kLandscape);
 		else
-			fRealJobData->setOrientation(JobData::kPortrait);
+			fRealJobData->SetOrientation(JobData::kPortrait);
 		break;
 	}
 
-	if (fOrgJobData->getCollate() && fPageCount > 1) {
-		fRealJobData->setCopies(1);
-		fInternalCopies = fOrgJobData->getCopies();
+	if (fOrgJobData->GetCollate() && fPageCount > 1) {
+		fRealJobData->SetCopies(1);
+		fInternalCopies = fOrgJobData->GetCopies();
 	} else {
 		fInternalCopies = 1;
 	}
@@ -163,12 +163,12 @@ GraphicsDriver::_CleanupData()
 void 
 GraphicsDriver::_SetupBitmap()
 {
-	fPixelDepth = color_space2pixel_depth(fOrgJobData->getSurfaceType());
+	fPixelDepth = color_space2pixel_depth(fOrgJobData->GetSurfaceType());
 
-	fPageWidth  = (fRealJobData->getPhysicalRect().IntegerWidth()
-		* fOrgJobData->getXres() + 71) / 72;
-	fPageHeight = (fRealJobData->getPhysicalRect().IntegerHeight()
-		* fOrgJobData->getYres() + 71) / 72;
+	fPageWidth  = (fRealJobData->GetPhysicalRect().IntegerWidth()
+		* fOrgJobData->GetXres() + 71) / 72;
+	fPageHeight = (fRealJobData->GetPhysicalRect().IntegerHeight()
+		* fOrgJobData->GetYres() + 71) / 72;
 
 	int widthByte = (fPageWidth * fPixelDepth + 7) / 8;
 	int size = widthByte * fPageHeight;
@@ -182,7 +182,7 @@ GraphicsDriver::_SetupBitmap()
 		fBandHeight = fPageHeight;
 	} else {
 		fBandCount  = (size + kMaxMemorySize - 1) / kMaxMemorySize;
-		if ((JobData::kLandscape == fRealJobData->getOrientation())
+		if ((JobData::kLandscape == fRealJobData->GetOrientation())
 			&& (fFlags & kGDFRotateBandBitmap)) {
 			fBandWidth  = (fPageWidth + fBandCount - 1) / fBandCount;
 			fBandHeight = fPageHeight;
@@ -201,7 +201,7 @@ GraphicsDriver::_SetupBitmap()
 
 	BRect rect;
 	rect.Set(0, 0, fBandWidth - 1, fBandHeight - 1);
-	fBitmap = new BBitmap(rect, fOrgJobData->getSurfaceType(), true);
+	fBitmap = new BBitmap(rect, fOrgJobData->GetSurfaceType(), true);
 	fView   = new BView(rect, "", B_FOLLOW_ALL, B_WILL_DRAW);
 	fBitmap->AddChild(fView);
 }
@@ -419,9 +419,9 @@ GraphicsDriver::_PrintPage(PageDataList* pages)
 		fView->ConstrainClippingRegion(NULL);
 		fView->FillRect(fView->Bounds());
 
-		BPoint scale = GetScale(fOrgJobData->getNup(),
-			fOrgJobData->getPhysicalRect(), fOrgJobData->getScaling());
-		float real_scale = min(scale.x, scale.y) * fOrgJobData->getXres()
+		BPoint scale = GetScale(fOrgJobData->GetNup(),
+			fOrgJobData->GetPhysicalRect(), fOrgJobData->GetScaling());
+		float real_scale = min(scale.x, scale.y) * fOrgJobData->GetXres()
 			/ 72.0f;
 		fView->SetScale(real_scale);
 		float x = offset.x / real_scale;
@@ -430,16 +430,16 @@ GraphicsDriver::_PrintPage(PageDataList* pages)
 
 		for (PageDataList::iterator it = pages->begin(); it != pages->end();
 			it++) {
-			BPoint left_top(GetOffset(fOrgJobData->getNup(), page_index++,
-				fOrgJobData->getOrientation(), &scale,
-				fOrgJobData->getScaledPhysicalRect(),
-				fOrgJobData->getScaledPrintableRect(),
-				fOrgJobData->getPhysicalRect()));
+			BPoint left_top(GetOffset(fOrgJobData->GetNup(), page_index++,
+				fOrgJobData->GetOrientation(), &scale,
+				fOrgJobData->GetScaledPhysicalRect(),
+				fOrgJobData->GetScaledPrintableRect(),
+				fOrgJobData->GetPhysicalRect()));
 
 			left_top.x -= x;
 			left_top.y -= y;
 
-			BRect clip(fOrgJobData->getScaledPrintableRect());
+			BRect clip(fOrgJobData->GetScaledPrintableRect());
 			clip.OffsetTo(left_top);
 
 			BRegion *region = new BRegion();
@@ -474,7 +474,7 @@ GraphicsDriver::_CollectPages(SpoolData* spoolData, PageDataList* pages)
 {
 	// collect the pages to be printed on the physical page
 	PageData *page_data;
-	int nup = fOrgJobData->getNup();
+	int nup = fOrgJobData->GetNup();
 	bool more;
 	do {
 		more = spoolData->enumObject(&page_data);
@@ -506,25 +506,25 @@ GraphicsDriver::_PrintDocument(SpoolData* spoolData)
 	success = true;
 	page_index = 0;
 	
-	if (fPrinterCap->isSupport(PrinterCap::kCopyCommand))
+	if (fPrinterCap->IsSupport(PrinterCap::kCopyCommand))
 		// let the printer perform the copy operation
 		copies = 1;
 	else
 		// send the page multiple times to the printer
-		copies = fRealJobData->getCopies();
+		copies = fRealJobData->GetCopies();
 
 	fStatusWindow -> SetPageCopies(copies);
 		// inform fStatusWindow about number of copies
 	
 	// printing of even/odd numbered pages only is valid in simplex mode
-	bool simplex = fRealJobData->getPrintStyle() == JobData::kSimplex;
+	bool simplex = fRealJobData->GetPrintStyle() == JobData::kSimplex;
 	
 	if (spoolData->startEnum()) {
 		do {
 			DBGMSG(("page index = %d\n", page_index));
 
 			if (simplex
-				&& fRealJobData->getPageSelection()
+				&& fRealJobData->GetPageSelection()
 					== JobData::kEvenNumberedPages)
 				// skip odd numbered page
 				more = _SkipPages(spoolData);
@@ -537,7 +537,7 @@ GraphicsDriver::_PrintDocument(SpoolData* spoolData)
 			more = _CollectPages(spoolData, &pages);
 			
 			if (more && simplex
-				&& fRealJobData->getPageSelection()
+				&& fRealJobData->GetPageSelection()
 					== JobData::kOddNumberedPages)
 				// skip even numbered page
 				more = _SkipPages(spoolData);
@@ -569,9 +569,9 @@ GraphicsDriver::_PrintDocument(SpoolData* spoolData)
 
 #ifndef USE_PREVIEW_FOR_DEBUG
 	if (success
-		&& fPrinterCap->isSupport(PrinterCap::kPrintStyle)
-		&& (fOrgJobData->getPrintStyle() != JobData::kSimplex)
-		&& (((page_index + fOrgJobData->getNup() - 1) / fOrgJobData->getNup())
+		&& fPrinterCap->IsSupport(PrinterCap::kPrintStyle)
+		&& (fOrgJobData->GetPrintStyle() != JobData::kSimplex)
+		&& (((page_index + fOrgJobData->GetNup() - 1) / fOrgJobData->GetNup())
 			% 2)) {
 		// append an empty page on the back side of the page in duplex or
 		// booklet mode
@@ -605,21 +605,21 @@ GraphicsDriver::PrintJob(BFile* spoolFile)
 
 	fTransport = new Transport(fPrinterData);
 
-	if (fTransport->check_abort()) {
+	if (fTransport->CheckAbort()) {
 		success = false;
-	} else if (!fTransport->is_print_to_file_canceled()) {
+	} else if (!fTransport->IsPrintToFileCanceled()) {
 		BStopWatch stopWatch("printJob", !MEASURE_PRINT_JOB_TIME);
 		_SetupBitmap();
-		SpoolData spoolData(spoolFile, fPageCount, fOrgJobData->getNup(),
-			fOrgJobData->getReverse());
+		SpoolData spoolData(spoolFile, fPageCount, fOrgJobData->GetNup(),
+			fOrgJobData->GetReverse());
 		success = StartDocument();
 		if (success) {
 			fStatusWindow = new StatusWindow(
-				fRealJobData->getPageSelection() == JobData::kOddNumberedPages,
-				fRealJobData->getPageSelection() == JobData::kEvenNumberedPages, 												
-				fRealJobData->getFirstPage(),
+				fRealJobData->GetPageSelection() == JobData::kOddNumberedPages,
+				fRealJobData->GetPageSelection() == JobData::kEvenNumberedPages,
+				fRealJobData->GetFirstPage(),
 				fPageCount, 
-				fInternalCopies,fRealJobData->getNup());
+				fInternalCopies,fRealJobData->GetNup());
 				
 			while (fInternalCopies--) {
 				success = _PrintDocument(&spoolData);
@@ -638,8 +638,8 @@ GraphicsDriver::PrintJob(BFile* spoolFile)
 
 	if (success == false) {
 		BAlert *alert;
-		if (fTransport->check_abort())
-			alert = new BAlert("", fTransport->last_error().c_str(), "OK");
+		if (fTransport->CheckAbort())
+			alert = new BAlert("", fTransport->LastError().c_str(), "OK");
 		else
 			alert = new BAlert("", "Printer not responding.", "OK");
 		alert->Go();
@@ -707,7 +707,7 @@ GraphicsDriver::WriteSpoolData(const void* buffer, size_t size)
 	if (fTransport == NULL)
 		return
 
-	fTransport->write(buffer, size);
+	fTransport->Write(buffer, size);
 }
 
 
@@ -722,7 +722,7 @@ GraphicsDriver::WriteSpoolString(const char* format, ...)
 	va_list	ap;
 	va_start(ap, format);
 	vsprintf(buffer, format, ap);
-	fTransport->write(buffer, strlen(buffer));
+	fTransport->Write(buffer, strlen(buffer));
 	va_end(ap);
 }
 
@@ -734,7 +734,7 @@ GraphicsDriver::WriteSpoolChar(char c)
 	if (fTransport == NULL)
 		return;
 
-	fTransport->write(&c, 1);
+	fTransport->Write(&c, 1);
 }
 
 

@@ -77,7 +77,7 @@ PageSetupView::AddOrientationItem(const char* name, JobData::Orientation orienta
 
 	fOrientation->AddItem(item);
 	item->SetTarget(this);
-	if (fJobData->getOrientation() == orientation) {
+	if (fJobData->GetOrientation() == orientation) {
 		item->SetMarked(true);
 	} else if (fOrientation->CountItems() == 1) {
 		item->SetMarked(true);
@@ -92,9 +92,9 @@ PageSetupView::AttachedToWindow()
 	int        count;
 
 	// margin
-	MarginUnit units = fJobData->getMarginUnit();
-	BRect paper = fJobData->getPaperRect();
-	BRect margin = fJobData->getPrintableRect();
+	MarginUnit units = fJobData->GetMarginUnit();
+	BRect paper = fJobData->GetPaperRect();
+	BRect margin = fJobData->GetPrintableRect();
 
 	// re-calculate the margin from the printable rect in points
 	margin.top -= paper.top;
@@ -111,15 +111,15 @@ PageSetupView::AttachedToWindow()
 	marked = false;
 	fPaper = new BPopUpMenu("paperSize");
 	fPaper->SetRadioMode(true);
-	count = fPrinterCap->countCap(PrinterCap::kPaper);
-	PaperCap **paper_cap = (PaperCap **)fPrinterCap->enumCap(PrinterCap::kPaper);
+	count = fPrinterCap->CountCap(PrinterCap::kPaper);
+	PaperCap **paper_cap = (PaperCap **)fPrinterCap->GetCaps(PrinterCap::kPaper);
 	while (count--) {
 		BMessage *msg = new BMessage(kMsgPaperChanged);
 		msg->AddPointer("paperCap", *paper_cap);
 		item = new BMenuItem((*paper_cap)->fLabel.c_str(), msg);
 		fPaper->AddItem(item);
 		item->SetTarget(this);
-		if ((*paper_cap)->fPaper == fJobData->getPaper()) {
+		if ((*paper_cap)->fPaper == fJobData->GetPaper()) {
 			item->SetMarked(true);
 			marked = true;
 		}
@@ -135,12 +135,12 @@ PageSetupView::AttachedToWindow()
 
 	BMenuField* orientation = new BMenuField("orientation", "Orientation:", fOrientation);
 
-	count = fPrinterCap->countCap(PrinterCap::kOrientation);
+	count = fPrinterCap->CountCap(PrinterCap::kOrientation);
 	if (count == 0) {
 		AddOrientationItem("Portrait", JobData::kPortrait);
 		AddOrientationItem("Landscape", JobData::kLandscape);
 	} else {
-		OrientationCap **orientation_cap = (OrientationCap **)fPrinterCap->enumCap(PrinterCap::kOrientation);
+		OrientationCap **orientation_cap = (OrientationCap **)fPrinterCap->GetCaps(PrinterCap::kOrientation);
 		while (count--) {
 			AddOrientationItem((*orientation_cap)->fLabel.c_str(),
 				(*orientation_cap)->fOrientation);
@@ -152,14 +152,14 @@ PageSetupView::AttachedToWindow()
 	marked = false;
 	fResolution = new BPopUpMenu("resolution");
 	fResolution->SetRadioMode(true);
-	count = fPrinterCap->countCap(PrinterCap::kResolution);
-	ResolutionCap **resolution_cap = (ResolutionCap **)fPrinterCap->enumCap(PrinterCap::kResolution);
+	count = fPrinterCap->CountCap(PrinterCap::kResolution);
+	ResolutionCap **resolution_cap = (ResolutionCap **)fPrinterCap->GetCaps(PrinterCap::kResolution);
 	while (count--) {
 		item = new BMenuItem((*resolution_cap)->fLabel.c_str(), NULL);
 		fResolution->AddItem(item);
 		item->SetTarget(this);
-		if (((*resolution_cap)->fXResolution == fJobData->getXres()) &&
-			((*resolution_cap)->fYResolution == fJobData->getYres())) {
+		if (((*resolution_cap)->fXResolution == fJobData->GetXres()) &&
+			((*resolution_cap)->fYResolution == fJobData->GetYres())) {
 			item->SetMarked(true);
 			marked = true;
 		}
@@ -171,7 +171,7 @@ PageSetupView::AttachedToWindow()
 
 	// scale
 	BString scale;
-	scale << (int)fJobData->getScaling();
+	scale << (int)fJobData->GetScaling();
 	fScaling = new BTextControl("scale", "Scale [%]:",
 									scale.String(),
 	                                NULL);
@@ -253,32 +253,32 @@ PageSetupView::GetPaperCap()
 		item->Message()->FindPointer("paperCap", &pointer) == B_OK) {
 		return (PaperCap*)pointer;
 	} else {
-		return (PaperCap*)fPrinterCap->getDefaultCap(PrinterCap::kPaper);
+		return (PaperCap*)fPrinterCap->GetDefaultCap(PrinterCap::kPaper);
 	}
 }
 
 bool
 PageSetupView::UpdateJobData()
 {
-	fJobData->setOrientation(GetOrientation());
+	fJobData->SetOrientation(GetOrientation());
 
 	PaperCap *paperCap = GetPaperCap();
 	BRect paper_rect = paperCap->fPaperRect;
 	BRect physical_rect = paperCap->fPhysicalRect;
-	fJobData->setPaper(paperCap->fPaper);
+	fJobData->SetPaper(paperCap->fPaper);
 
 	const char *resolutionLabel = fResolution->FindMarked()->Label();
 	const ResolutionCap* resolution = static_cast<const ResolutionCap*>(
-		fPrinterCap->findCap(PrinterCap::kResolution, resolutionLabel));
+		fPrinterCap->FindCap(PrinterCap::kResolution, resolutionLabel));
 	ASSERT(resolution != NULL);
 	if (resolution != NULL) {
-		fJobData->setXres(resolution->fXResolution);
-		fJobData->setYres(resolution->fYResolution);
-		fJobData->setResolutionID(resolution->ID());
+		fJobData->SetXres(resolution->fXResolution);
+		fJobData->SetYres(resolution->fYResolution);
+		fJobData->SetResolutionID(resolution->ID());
 	}
 
 	// rotate paper and physical rectangle if landscape orientation
-	if (JobData::kLandscape == fJobData->getOrientation()) {
+	if (JobData::kLandscape == fJobData->GetOrientation()) {
 		swap(&paper_rect.left, &paper_rect.top);
 		swap(&paper_rect.right, &paper_rect.bottom);
 		swap(&physical_rect.left, &physical_rect.top);
@@ -286,7 +286,7 @@ PageSetupView::UpdateJobData()
 	}
 
 	// adjust printable rect by margin
-	fJobData->setMarginUnit(fMarginView->Unit());
+	fJobData->SetMarginUnit(fMarginView->Unit());
 	BRect margin = fMarginView->Margin();
 	BRect printable_rect;
 	printable_rect.left = paper_rect.left + margin.left;
@@ -309,15 +309,15 @@ PageSetupView::UpdateJobData()
 
 	float scalingR = 100.0 / scaling;
 
-	fJobData->setScaling(scaling);
-	fJobData->setPaperRect(paper_rect);
-	fJobData->setScaledPaperRect(ScaleRect(paper_rect, scalingR));
-	fJobData->setPrintableRect(printable_rect);
-	fJobData->setScaledPrintableRect(ScaleRect(printable_rect, scalingR));
-	fJobData->setPhysicalRect(physical_rect);
-	fJobData->setScaledPhysicalRect(ScaleRect(physical_rect, scalingR));
+	fJobData->SetScaling(scaling);
+	fJobData->SetPaperRect(paper_rect);
+	fJobData->SetScaledPaperRect(ScaleRect(paper_rect, scalingR));
+	fJobData->SetPrintableRect(printable_rect);
+	fJobData->SetScaledPrintableRect(ScaleRect(printable_rect, scalingR));
+	fJobData->SetPhysicalRect(physical_rect);
+	fJobData->SetScaledPhysicalRect(ScaleRect(physical_rect, scalingR));
 
-	fJobData->save();
+	fJobData->Save();
 	return true;
 }
 

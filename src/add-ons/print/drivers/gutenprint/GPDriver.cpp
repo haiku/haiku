@@ -51,21 +51,21 @@ GPDriver::StartDocument()
 		fConfiguration.fDriver = data->fGutenprintDriverName;
 
 		SetParameter(fConfiguration.fPageSize, PrinterCap::kPaper,
-			GetJobData()->getPaper());
+			GetJobData()->GetPaper());
 
 		SetParameter(fConfiguration.fResolution, PrinterCap::kResolution,
-			GetJobData()->getResolutionID());
+			GetJobData()->GetResolutionID());
 
-		fConfiguration.fXDPI = GetJobData()->getXres();
-		fConfiguration.fYDPI = GetJobData()->getYres();
+		fConfiguration.fXDPI = GetJobData()->GetXres();
+		fConfiguration.fYDPI = GetJobData()->GetYres();
 
 		SetParameter(fConfiguration.fInputSlot, PrinterCap::kPaperSource,
-			GetJobData()->getPaperSource());
+			GetJobData()->GetPaperSource());
 
 		SetParameter(fConfiguration.fPrintingMode, PrinterCap::kColor,
-			GetJobData()->getColor());
+			GetJobData()->GetColor());
 
-		if (GetPrinterCap()->isSupport(PrinterCap::kDriverSpecificCapabilities))
+		if (GetPrinterCap()->IsSupport(PrinterCap::kDriverSpecificCapabilities))
 			SetDriverSpecificSettings();
 
 		fprintf(stderr, "Driver: %s\n", fConfiguration.fDriver.String());
@@ -87,7 +87,7 @@ GPDriver::SetParameter(BString& parameter, PrinterCap::CapID category,
 	int value)
 {
 	const EnumCap* capability;
-	capability = GetPrinterCap()->findCap(category, value);
+	capability = GetPrinterCap()->FindCap(category, value);
 	if (capability != NULL && capability->fKey != "")
 		parameter = capability->Key();
 }
@@ -97,8 +97,8 @@ void
 GPDriver::SetDriverSpecificSettings()
 {
 	PrinterCap::CapID category = PrinterCap::kDriverSpecificCapabilities;
-	int count = GetPrinterCap()->countCap(category);
-	const BaseCap** capabilities = GetPrinterCap()->enumCap(category);
+	int count = GetPrinterCap()->CountCap(category);
+	const BaseCap** capabilities = GetPrinterCap()->GetCaps(category);
 	for (int i = 0; i < count; i++) {
 		const DriverSpecificCap* capability =
 			dynamic_cast<const DriverSpecificCap*>(capabilities[i]);
@@ -137,13 +137,13 @@ GPDriver::AddDriverSpecificSetting(PrinterCap::CapID category, const char* key) 
 	if (GetJobData()->Settings().HasString(key))
 	{
 		const string& value = GetJobData()->Settings().GetString(key);
-		capability = GetPrinterCap()->findCapWithKey(category, value.c_str());
+		capability = GetPrinterCap()->FindCapWithKey(category, value.c_str());
 	}
 
 	if (capability == NULL) {
 		// job data should contain a value;
 		// try to use the default value anyway
-		capability = GetPrinterCap()->getDefaultCap(category);
+		capability = GetPrinterCap()->GetDefaultCap(category);
 	}
 
 	if (capability == NULL) {
@@ -207,7 +207,7 @@ GPDriver::EndPage(int)
 		return true;
 	}
 	catch (TransportException& err) {
-		ShowError(err.what());
+		ShowError(err.What());
 		return false;
 	} 
 }
@@ -221,7 +221,7 @@ GPDriver::EndDocument(bool)
 		return true;
 	}
 	catch (TransportException& err) {
-		ShowError(err.what());
+		ShowError(err.What());
 		return false;
 	} 
 }
@@ -294,7 +294,7 @@ GPDriver::NextBand(BBitmap* bitmap, BPoint* offset)
 		return true;
 	}
 	catch (TransportException& err) {
-		ShowError(err.what());
+		ShowError(err.What());
 		return false;
 	} 
 }

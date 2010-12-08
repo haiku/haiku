@@ -296,13 +296,13 @@ PrinterCap::~PrinterCap()
 
 
 const EnumCap*
-PrinterCap::getDefaultCap(CapID category) const
+PrinterCap::GetDefaultCap(CapID category) const
 {
-	int count = countCap(category);
+	int count = CountCap(category);
 	if (count <= 0)
 		return NULL;
 
-	const BaseCap **base_cap = enumCap(category);
+	const BaseCap **base_cap = GetCaps(category);
 	while (count--) {
 		const EnumCap* enumCap = dynamic_cast<const EnumCap*>(*base_cap);
 		if (enumCap == NULL)
@@ -315,19 +315,19 @@ PrinterCap::getDefaultCap(CapID category) const
 		base_cap++;
 	}
 
-	return static_cast<const EnumCap*>(enumCap(category)[0]);
+	return static_cast<const EnumCap*>(GetCaps(category)[0]);
 }
 
 
 template<typename Predicate>
 const BaseCap*
-PrinterCap::findCap(CapID category, Predicate& predicate) const
+PrinterCap::FindCap(CapID category, Predicate& predicate) const
 {
-	int count = countCap(category);
+	int count = CountCap(category);
 	if (count <= 0)
 		return NULL;
 
-	const BaseCap **base_cap = enumCap(category);
+	const BaseCap **base_cap = GetCaps(category);
 	while (count--) {
 		if (predicate(*base_cap)) {
 			return *base_cap;
@@ -339,64 +339,64 @@ PrinterCap::findCap(CapID category, Predicate& predicate) const
 }
 
 const EnumCap*
-PrinterCap::findCap(CapID category, int id) const
+PrinterCap::FindCap(CapID category, int id) const
 {
 	IDPredicate predicate(id);
-	return static_cast<const EnumCap*>(findCap(category, predicate));
+	return static_cast<const EnumCap*>(FindCap(category, predicate));
 }
 
 
 const BaseCap*
-PrinterCap::findCap(CapID category, const char* label) const
+PrinterCap::FindCap(CapID category, const char* label) const
 {
 	LabelPredicate predicate(label);
-	return findCap(category, predicate);
+	return FindCap(category, predicate);
 }
 
 
 const EnumCap*
-PrinterCap::findCapWithKey(CapID category, const char* key) const
+PrinterCap::FindCapWithKey(CapID category, const char* key) const
 {
 	KeyPredicate predicate(key);
-	return static_cast<const EnumCap*>(findCap(category, predicate));
+	return static_cast<const EnumCap*>(FindCap(category, predicate));
 }
 
 
 const BooleanCap*
-PrinterCap::findBooleanCap(CapID category) const
+PrinterCap::FindBooleanCap(CapID category) const
 {
-	if (countCap(category) != 1)
+	if (CountCap(category) != 1)
 		return NULL;
-	return dynamic_cast<const BooleanCap*>(enumCap(category)[0]);
+	return dynamic_cast<const BooleanCap*>(GetCaps(category)[0]);
 }
 
 
 const IntRangeCap*
-PrinterCap::findIntRangeCap(CapID category) const
+PrinterCap::FindIntRangeCap(CapID category) const
 {
-	if (countCap(category) != 1)
+	if (CountCap(category) != 1)
 		return NULL;
-	return dynamic_cast<const IntRangeCap*>(enumCap(category)[0]);
+	return dynamic_cast<const IntRangeCap*>(GetCaps(category)[0]);
 }
 
 
 const DoubleRangeCap*
-PrinterCap::findDoubleRangeCap(CapID category) const
+PrinterCap::FindDoubleRangeCap(CapID category) const
 {
-	if (countCap(category) != 1)
+	if (CountCap(category) != 1)
 		return NULL;
-	return dynamic_cast<const DoubleRangeCap*>(enumCap(category)[0]);
+	return dynamic_cast<const DoubleRangeCap*>(GetCaps(category)[0]);
 }
 
 
 int
-PrinterCap::getProtocolClass() const {
-	return fPrinterData->getProtocolClass();
+PrinterCap::GetProtocolClass() const {
+	return fPrinterData->GetProtocolClass();
 }
 
 
-const
-PrinterData *PrinterCap::getPrinterData() const
+const PrinterData*
+PrinterCap::GetPrinterData() const
 {
 	return fPrinterData;
 }

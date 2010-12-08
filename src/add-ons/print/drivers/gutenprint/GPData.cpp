@@ -15,18 +15,18 @@
 
 
 void
-GPData::load()
+GPData::Load()
 {
-	PrinterData::load();
+	PrinterData::Load();
 	fNode->ReadAttrString(PD_PRINTER_DRIVER_ATTRIBUTE,
 		&fGutenprintDriverName);
 }
 
 
 void
-GPData::save()
+GPData::Save()
 {
-	PrinterData::save();
+	PrinterData::Save();
 	fNode->WriteAttrString(PD_PRINTER_DRIVER_ATTRIBUTE,
 		&fGutenprintDriverName);
 }

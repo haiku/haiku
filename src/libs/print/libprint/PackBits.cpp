@@ -28,28 +28,39 @@ enum STATUS {
 	MATCHED
 };
 
-#define WRITE_TO_RUN_BUF(byte) { if (write) *runbuf ++ = byte; else runbuf ++; }
-#define WRITE_CONTROL(byte) { if (write) *control = byte; }
+#define WRITE_TO_RUN_BUF(byte) \
+	{ \
+		if (write) \
+			*runbuf ++ = byte; \
+		else \
+			runbuf ++; \
+	}
+
+#define WRITE_CONTROL(byte) \
+	{ \
+		if (write) \
+			*control = byte; \
+	}
 
 template <bool write>
 class PackBits {
 public:
-	static int doIt(unsigned char *pOut, const unsigned char *pIn, int n)
+	static int Run(unsigned char* destination, const unsigned char* source, int n)
 	{
 		int i;
-		unsigned char *control;
-		unsigned char *runbuf;
+		unsigned char* control;
+		unsigned char* runbuf;
 		unsigned char thisbyte;
 		unsigned char runbyte;
 		STATUS status;
 	
 		i = 0;
 		status  = INITIAL;
-		control = runbuf = pOut;
-		runbyte = *pIn++;
+		control = runbuf = destination;
+		runbyte = *source++;
 	
 		while (--n) {
-			thisbyte = *pIn++;
+			thisbyte = *source++;
 			switch (status) {
 			case INITIAL:
 				control   = runbuf++;
@@ -127,21 +138,21 @@ public:
 		}
 		WRITE_TO_RUN_BUF(runbyte);
 	
-		return runbuf - pOut;
+		return runbuf - destination;
 	}
 };
 
 
-int pack_bits_size(const unsigned char *pIn, int n)
+int pack_bits_size(const unsigned char* source, int size)
 {
-	PackBits<false> calculateSize;
-	return calculateSize.doIt(NULL, pIn, n);
+	PackBits<false> compressedSizeCalculator;
+	return compressedSizeCalculator.Run(NULL, source, size);
 }
 
-int pack_bits(unsigned char *pOut, const unsigned char *pIn, int n)
+int pack_bits(unsigned char* destination, const unsigned char* source, int size)
 {
-	PackBits<true> compress;
-	return compress.doIt(pOut, pIn, n);
+	PackBits<true> compressor;
+	return compressor.Run(destination, source, size);
 }
 
 #ifdef DBG_CON_STREAM
@@ -166,23 +177,23 @@ int main(int argc, char **argv)
 	long size = ftell(input);
 	fseek(input, 0, SEEK_SET);
 
-	unsigned char *pIn  = new unsigned char[size];
-	fread(pIn, size, 1, input);
+	unsigned char* source  = new unsigned char[size];
+	fread(source, size, 1, input);
 
-	long outSize = pack_bits_size(pIn, size);
+	long outSize = pack_bits_size(source, size);
 	printf("input size: %d\noutput size: %d\n", (int)size, (int)outSize);
 
-	unsigned char *pOut = new unsigned char[outSize];
+	unsigned char* destination = new unsigned char[outSize];
 
-	int cnt = pack_bits(pOut, pIn, size);
+	int cnt = pack_bits(destination, source, size);
 
-	fwrite(pOut, cnt, 1, output);
+	fwrite(destination, cnt, 1, output);
 
 	fclose(input);
 	fclose(output);
 
-	delete [] pIn;
-	delete [] pOut;
+	delete [] source;
+	delete [] destination;
 
 }
 #endif

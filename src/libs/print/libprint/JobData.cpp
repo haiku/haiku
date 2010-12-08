@@ -194,9 +194,9 @@ DriverSpecificSettings::Message()
 }
 
 
-JobData::JobData(BMessage *msg, const PrinterCap *cap, SettingType type)
+JobData::JobData(BMessage *message, const PrinterCap *printerCap, SettingType settingType)
 {
-	load(msg, cap, type);
+	Load(message, printerCap, settingType);
 }
 
 
@@ -205,370 +205,374 @@ JobData::~JobData()
 }
 
 
-JobData::JobData(const JobData &job_data)
+JobData::JobData(const JobData &jobData)
 {
-	*this = job_data;
+	*this = jobData;
 }
 
 
 JobData&
-JobData::operator=(const JobData &job_data)
+JobData::operator=(const JobData &jobData)
 {
-	fShowPreview           = job_data.fShowPreview;
-	fPaper                 = job_data.fPaper;
-	fResolutionID          = job_data.fResolutionID;
-	fXRes                  = job_data.fXRes;
-	fYRes                  = job_data.fYRes;
-	fOrientation           = job_data.fOrientation;
-	fScaling               = job_data.fScaling;
-	fPaperRect             = job_data.fPaperRect;
-	fScaledPaperRect       = job_data.fScaledPaperRect;
-	fPrintableRect         = job_data.fPrintableRect;
-	fScaledPrintableRect   = job_data.fScaledPrintableRect;
-	fNup                   = job_data.fNup;
-	fFirstPage             = job_data.fFirstPage;
-	fLastPage              = job_data.fLastPage;
-	fGamma                 = job_data.fGamma;
-	fInkDensity            = job_data.fInkDensity;
-	fPaperSource           = job_data.fPaperSource;
-	fCopies                = job_data.fCopies;
-	fCollate               = job_data.fCollate;
-	fReverse               = job_data.fReverse;
-	fPrintStyle            = job_data.fPrintStyle;
-	fBindingLocation       = job_data.fBindingLocation;
-	fPageOrder             = job_data.fPageOrder;
-	fSettingType           = job_data.fSettingType;
-	fMsg                   = job_data.fMsg;
-	fColor                 = job_data.fColor;
-	fDitherType            = job_data.fDitherType;
-	fPageSelection         = job_data.fPageSelection;
-	fMarginUnit            = job_data.fMarginUnit;
-	fPhysicalRect          = job_data.fPhysicalRect;
-	fScaledPhysicalRect    = job_data.fScaledPhysicalRect;
-	fDriverSpecificSettings = job_data.fDriverSpecificSettings;
+	fShowPreview           = jobData.fShowPreview;
+	fPaper                 = jobData.fPaper;
+	fResolutionID          = jobData.fResolutionID;
+	fXRes                  = jobData.fXRes;
+	fYRes                  = jobData.fYRes;
+	fOrientation           = jobData.fOrientation;
+	fScaling               = jobData.fScaling;
+	fPaperRect             = jobData.fPaperRect;
+	fScaledPaperRect       = jobData.fScaledPaperRect;
+	fPrintableRect         = jobData.fPrintableRect;
+	fScaledPrintableRect   = jobData.fScaledPrintableRect;
+	fNup                   = jobData.fNup;
+	fFirstPage             = jobData.fFirstPage;
+	fLastPage              = jobData.fLastPage;
+	fGamma                 = jobData.fGamma;
+	fInkDensity            = jobData.fInkDensity;
+	fPaperSource           = jobData.fPaperSource;
+	fCopies                = jobData.fCopies;
+	fCollate               = jobData.fCollate;
+	fReverse               = jobData.fReverse;
+	fPrintStyle            = jobData.fPrintStyle;
+	fBindingLocation       = jobData.fBindingLocation;
+	fPageOrder             = jobData.fPageOrder;
+	fSettingType           = jobData.fSettingType;
+	fMsg                   = jobData.fMsg;
+	fColor                 = jobData.fColor;
+	fDitherType            = jobData.fDitherType;
+	fPageSelection         = jobData.fPageSelection;
+	fMarginUnit            = jobData.fMarginUnit;
+	fPhysicalRect          = jobData.fPhysicalRect;
+	fScaledPhysicalRect    = jobData.fScaledPhysicalRect;
+	fDriverSpecificSettings = jobData.fDriverSpecificSettings;
 	return *this;
 }
 
 
 void
-JobData::load(BMessage *msg, const PrinterCap *cap, SettingType type)
+JobData::Load(BMessage* message, const PrinterCap* printerCap,
+	SettingType settingType)
 {
-	fMsg = msg;
-	fSettingType = type;
+	fMsg = message;
+	fSettingType = settingType;
 
 	const PaperCap *paperCap = NULL;
  
- 	if (msg->HasBool(kJDShowPreview))
- 		fShowPreview = msg->FindBool(kJDShowPreview);
+ 	if (message->HasBool(kJDShowPreview))
+ 		fShowPreview = message->FindBool(kJDShowPreview);
  	else
  		fShowPreview = false;
  
-	if (msg->HasInt32(kJDPaper))
-		fPaper = (Paper)msg->FindInt32(kJDPaper);
-	else if (cap->isSupport(PrinterCap::kPaper)) {
-		paperCap = (const PaperCap *)cap->getDefaultCap(PrinterCap::kPaper);
+	if (message->HasInt32(kJDPaper))
+		fPaper = (Paper)message->FindInt32(kJDPaper);
+	else if (printerCap->IsSupport(PrinterCap::kPaper)) {
+		paperCap = (const PaperCap *)printerCap->GetDefaultCap(
+			PrinterCap::kPaper);
 		fPaper = paperCap->fPaper;
 	} else
 		fPaper = kA4;
 
-	if (msg->HasInt32(kJDResolution)) {
-		msg->FindInt32(kJDResolution, &fResolutionID);
-	} else if (cap->isSupport(PrinterCap::kResolution)) {
-		fResolutionID = cap->getDefaultCap(PrinterCap::kResolution)->ID();
+	if (message->HasInt32(kJDResolution)) {
+		message->FindInt32(kJDResolution, &fResolutionID);
+	} else if (printerCap->IsSupport(PrinterCap::kResolution)) {
+		fResolutionID = printerCap->GetDefaultCap(PrinterCap::kResolution)
+			->ID();
 	} else {
 		// should not reach here!
 		fResolutionID = 0;
 	}
 
-	if (msg->HasInt64(kJDXRes)) {
+	if (message->HasInt64(kJDXRes)) {
 		int64 xres64; 
-		msg->FindInt64(kJDXRes, &xres64);
+		message->FindInt64(kJDXRes, &xres64);
 		fXRes = xres64; 
-	} else if (cap->isSupport(PrinterCap::kResolution)) {
-		fXRes = ((const ResolutionCap *)cap->getDefaultCap(
+	} else if (printerCap->IsSupport(PrinterCap::kResolution)) {
+		fXRes = ((const ResolutionCap *)printerCap->GetDefaultCap(
 			PrinterCap::kResolution))->fXResolution;
 	} else {
 		fXRes = 300; 
 	}
 
-	if (msg->HasInt64(kJDYRes)) {
+	if (message->HasInt64(kJDYRes)) {
 		int64 yres64;
-		msg->FindInt64(kJDYRes, &yres64);
+		message->FindInt64(kJDYRes, &yres64);
 		fYRes = yres64;
-	} else if (cap->isSupport(PrinterCap::kResolution)) {
-		fYRes = ((const ResolutionCap *)cap->getDefaultCap(
+	} else if (printerCap->IsSupport(PrinterCap::kResolution)) {
+		fYRes = ((const ResolutionCap *)printerCap->GetDefaultCap(
 			PrinterCap::kResolution))->fYResolution;
 	} else {
 		fYRes = 300;
 	}
 
-	if (msg->HasInt32(kJDOrientation))
-		fOrientation = (Orientation)msg->FindInt32(kJDOrientation);
-	else if (cap->isSupport(PrinterCap::kOrientation))
-		fOrientation = ((const OrientationCap *)cap->getDefaultCap(
+	if (message->HasInt32(kJDOrientation))
+		fOrientation = (Orientation)message->FindInt32(kJDOrientation);
+	else if (printerCap->IsSupport(PrinterCap::kOrientation))
+		fOrientation = ((const OrientationCap *)printerCap->GetDefaultCap(
 			PrinterCap::kOrientation))->fOrientation;
 	else
 		fOrientation = kPortrait;
 
-	if (msg->HasFloat(kJDScaling))
-		fScaling = msg->FindFloat(kJDScaling);
+	if (message->HasFloat(kJDScaling))
+		fScaling = message->FindFloat(kJDScaling);
 	else
 		fScaling = 100.0f;
 
-	if (msg->HasRect(kJDPaperRect)) {
-		fPaperRect = msg->FindRect(kJDPaperRect);
+	if (message->HasRect(kJDPaperRect)) {
+		fPaperRect = message->FindRect(kJDPaperRect);
 	} else if (paperCap != NULL) {
 		fPaperRect = paperCap->fPaperRect;
 	}
 
-	if (msg->HasRect(kJDScaledPaperRect)) {
-		fScaledPaperRect = msg->FindRect(kJDScaledPaperRect);
+	if (message->HasRect(kJDScaledPaperRect)) {
+		fScaledPaperRect = message->FindRect(kJDScaledPaperRect);
 	} else {
 		fScaledPaperRect = fPaperRect;
 	}
 
-	if (msg->HasRect(kJDPrintableRect)) {
-		fPrintableRect = msg->FindRect(kJDPrintableRect);
+	if (message->HasRect(kJDPrintableRect)) {
+		fPrintableRect = message->FindRect(kJDPrintableRect);
 	} else if (paperCap != NULL) {
 		fPrintableRect = paperCap->fPhysicalRect;
 	}
 
-	if (msg->HasRect(kJDScaledPrintableRect)) {
-		fScaledPrintableRect = msg->FindRect(kJDScaledPrintableRect);
+	if (message->HasRect(kJDScaledPrintableRect)) {
+		fScaledPrintableRect = message->FindRect(kJDScaledPrintableRect);
 	} else {
 		fScaledPrintableRect = fPrintableRect;
 	}
 
-	if (msg->HasRect(kJDPhysicalRect)) {
-		fPhysicalRect = msg->FindRect(kJDPhysicalRect);
+	if (message->HasRect(kJDPhysicalRect)) {
+		fPhysicalRect = message->FindRect(kJDPhysicalRect);
 	} else if (paperCap != NULL) {
 		fPhysicalRect = paperCap->fPhysicalRect;
 	}
 
-	if (msg->HasRect(kJDScaledPhysicalRect)) {
-		fScaledPhysicalRect = msg->FindRect(kJDScaledPhysicalRect);
+	if (message->HasRect(kJDScaledPhysicalRect)) {
+		fScaledPhysicalRect = message->FindRect(kJDScaledPhysicalRect);
 	} else {
 		fScaledPhysicalRect = fPhysicalRect;
 	}
 
-	if (msg->HasInt32(kJDFirstPage))
-		fFirstPage = msg->FindInt32(kJDFirstPage);
+	if (message->HasInt32(kJDFirstPage))
+		fFirstPage = message->FindInt32(kJDFirstPage);
 	else
 		fFirstPage = 1;
 
-	if (msg->HasInt32(kJDLastPage))
-		fLastPage = msg->FindInt32(kJDLastPage);
+	if (message->HasInt32(kJDLastPage))
+		fLastPage = message->FindInt32(kJDLastPage);
 	else
 		fLastPage = -1;
 
-	if (msg->HasInt32(kJDNup))
-		fNup = msg->FindInt32(kJDNup);
+	if (message->HasInt32(kJDNup))
+		fNup = message->FindInt32(kJDNup);
 	else
 		fNup = 1;
 
-	if (msg->HasFloat(kJDGamma))
+	if (message->HasFloat(kJDGamma))
 		fGamma = fMsg->FindFloat(kJDGamma);
 	else
 		fGamma = 0.25f;
 
-	if (msg->HasFloat(kJDInkDensity))
+	if (message->HasFloat(kJDInkDensity))
 		fInkDensity = fMsg->FindFloat(kJDInkDensity);
 	else
 		fInkDensity = 0.0f;
 
-	if (msg->HasInt32(kJDPaperSource))
+	if (message->HasInt32(kJDPaperSource))
 		fPaperSource = (PaperSource)fMsg->FindInt32(kJDPaperSource);
-	else if (cap->isSupport(PrinterCap::kPaperSource))
-		fPaperSource = ((const PaperSourceCap *)cap->getDefaultCap(
+	else if (printerCap->IsSupport(PrinterCap::kPaperSource))
+		fPaperSource = ((const PaperSourceCap *)printerCap->GetDefaultCap(
 			PrinterCap::kPaperSource))->fPaperSource;
 	else
 		fPaperSource = kAuto;
 
-	if (msg->HasInt32(kJDCopies))
-		fCopies = msg->FindInt32(kJDCopies);
+	if (message->HasInt32(kJDCopies))
+		fCopies = message->FindInt32(kJDCopies);
 	else
 		fCopies = 1;
 
-	if (msg->HasBool(kJDCollate))
-		fCollate = msg->FindBool(kJDCollate);
+	if (message->HasBool(kJDCollate))
+		fCollate = message->FindBool(kJDCollate);
 	else
 		fCollate = false;
 
-	if (msg->HasBool(kJDReverse))
-		fReverse = msg->FindBool(kJDReverse);
+	if (message->HasBool(kJDReverse))
+		fReverse = message->FindBool(kJDReverse);
 	else
 		fReverse = false;
 
-	if (msg->HasInt32(kJDPrintStyle))
-		fPrintStyle = (PrintStyle)msg->FindInt32(kJDPrintStyle);
-	else if (cap->isSupport(PrinterCap::kPrintStyle))
-		fPrintStyle = ((const PrintStyleCap *)cap->getDefaultCap(
+	if (message->HasInt32(kJDPrintStyle))
+		fPrintStyle = (PrintStyle)message->FindInt32(kJDPrintStyle);
+	else if (printerCap->IsSupport(PrinterCap::kPrintStyle))
+		fPrintStyle = ((const PrintStyleCap *)printerCap->GetDefaultCap(
 			PrinterCap::kPrintStyle))->fPrintStyle;
 	else
 		fPrintStyle = kSimplex;
 
-	if (msg->HasInt32(kJDBindingLocation))
-		fBindingLocation = (BindingLocation)msg->FindInt32(kJDBindingLocation);
-	else if (cap->isSupport(PrinterCap::kBindingLocation))
-		fBindingLocation = ((const BindingLocationCap *)cap->getDefaultCap(
-			PrinterCap::kBindingLocation))->fBindingLocation;
+	if (message->HasInt32(kJDBindingLocation))
+		fBindingLocation = (BindingLocation)message->FindInt32(
+			kJDBindingLocation);
+	else if (printerCap->IsSupport(PrinterCap::kBindingLocation))
+		fBindingLocation = ((const BindingLocationCap *)printerCap->
+			GetDefaultCap(PrinterCap::kBindingLocation))->fBindingLocation;
 	else
 		fBindingLocation = kLongEdgeLeft;
 
-	if (msg->HasInt32(kJDPageOrder))
-		fPageOrder = (PageOrder)msg->FindInt32(kJDPageOrder);
+	if (message->HasInt32(kJDPageOrder))
+		fPageOrder = (PageOrder)message->FindInt32(kJDPageOrder);
 	else
 		fPageOrder = kAcrossFromLeft;
 
-	if (msg->HasInt32(kJDColor))
-		fColor = (Color)msg->FindInt32(kJDColor);
-	else if (cap->isSupport(PrinterCap::kColor))
-		fColor = ((const ColorCap *)cap->getDefaultCap(PrinterCap::kColor))
-			->fColor;
+	if (message->HasInt32(kJDColor))
+		fColor = (Color)message->FindInt32(kJDColor);
+	else if (printerCap->IsSupport(PrinterCap::kColor))
+		fColor = ((const ColorCap *)printerCap->GetDefaultCap(
+			PrinterCap::kColor))->fColor;
 	else
 		fColor = kMonochrome;
 	
-	if (msg->HasInt32(kJDDitherType))
-		fDitherType = (Halftone::DitherType)msg->FindInt32(kJDDitherType);
+	if (message->HasInt32(kJDDitherType))
+		fDitherType = (Halftone::DitherType)message->FindInt32(kJDDitherType);
 	else
 		fDitherType = Halftone::kTypeFloydSteinberg;
 	
-	if (msg->HasInt32(kJDPageSelection))
-		fPageSelection = (PageSelection)msg->FindInt32(kJDPageSelection);
+	if (message->HasInt32(kJDPageSelection))
+		fPageSelection = (PageSelection)message->FindInt32(kJDPageSelection);
 	else
 		fPageSelection = kAllPages;
 
-	if (msg->HasInt32(kJDMarginUnit))
-		fMarginUnit = (MarginUnit)msg->FindInt32(kJDMarginUnit);
+	if (message->HasInt32(kJDMarginUnit))
+		fMarginUnit = (MarginUnit)message->FindInt32(kJDMarginUnit);
 	else
 		fMarginUnit = kUnitInch;
 
-	if (msg->HasMessage(kJDDriverSpecificSettings))
-		msg->FindMessage(kJDDriverSpecificSettings,
+	if (message->HasMessage(kJDDriverSpecificSettings))
+		message->FindMessage(kJDDriverSpecificSettings,
 			&fDriverSpecificSettings.Message());
 }
 
 
 void
-JobData::save(BMessage *msg)
+JobData::Save(BMessage* message)
 {
-	if (msg == NULL) {
-		msg = fMsg;
+	if (message == NULL) {
+		message = fMsg;
 	}
 
 	// page settings
-	msg->RemoveName(kJDPaper);
-	msg->AddInt32(kJDPaper, fPaper);
+	message->RemoveName(kJDPaper);
+	message->AddInt32(kJDPaper, fPaper);
 
-	msg->RemoveName(kJDResolution);
-	msg->AddInt32(kJDResolution, fResolutionID);
+	message->RemoveName(kJDResolution);
+	message->AddInt32(kJDResolution, fResolutionID);
 
-	msg->RemoveName(kJDXRes);
-	msg->AddInt64(kJDXRes, fXRes);
+	message->RemoveName(kJDXRes);
+	message->AddInt64(kJDXRes, fXRes);
 	
-	msg->RemoveName(kJDYRes);
-	msg->AddInt64(kJDYRes, fYRes);
+	message->RemoveName(kJDYRes);
+	message->AddInt64(kJDYRes, fYRes);
 
-	msg->RemoveName(kJDOrientation);
-	msg->AddInt32(kJDOrientation, fOrientation);
+	message->RemoveName(kJDOrientation);
+	message->AddInt32(kJDOrientation, fOrientation);
 
-	msg->RemoveName(kJDScaling);
-	msg->AddFloat(kJDScaling, fScaling);
+	message->RemoveName(kJDScaling);
+	message->AddFloat(kJDScaling, fScaling);
 
-	msg->RemoveName(kJDPaperRect);
-	msg->AddRect(kJDPaperRect, fPaperRect);
+	message->RemoveName(kJDPaperRect);
+	message->AddRect(kJDPaperRect, fPaperRect);
 
-	msg->RemoveName(kJDScaledPaperRect);
-	msg->AddRect(kJDScaledPaperRect, fScaledPaperRect);
+	message->RemoveName(kJDScaledPaperRect);
+	message->AddRect(kJDScaledPaperRect, fScaledPaperRect);
 
-	msg->RemoveName(kJDPrintableRect);
-	msg->AddRect(kJDPrintableRect, fPrintableRect);
+	message->RemoveName(kJDPrintableRect);
+	message->AddRect(kJDPrintableRect, fPrintableRect);
 
-	msg->RemoveName(kJDScaledPrintableRect);
-	msg->AddRect(kJDScaledPrintableRect, fScaledPrintableRect);
+	message->RemoveName(kJDScaledPrintableRect);
+	message->AddRect(kJDScaledPrintableRect, fScaledPrintableRect);
 
-	msg->RemoveName(kJDPhysicalRect);
-	msg->AddRect(kJDPhysicalRect, fPhysicalRect);
+	message->RemoveName(kJDPhysicalRect);
+	message->AddRect(kJDPhysicalRect, fPhysicalRect);
 
-	msg->RemoveName(kJDScaledPhysicalRect);
-	msg->AddRect(kJDScaledPhysicalRect, fScaledPhysicalRect);
+	message->RemoveName(kJDScaledPhysicalRect);
+	message->AddRect(kJDScaledPhysicalRect, fScaledPhysicalRect);
 
-	msg->RemoveName(kJDMarginUnit);
-	msg->AddInt32(kJDMarginUnit, fMarginUnit);
+	message->RemoveName(kJDMarginUnit);
+	message->AddInt32(kJDMarginUnit, fMarginUnit);
 
 	// page settings end here
 	
 	// job settings
 
 	// make sure job settings are not present in page settings
-	msg->RemoveName(kJDShowPreview);
+	message->RemoveName(kJDShowPreview);
 	if (fSettingType == kJobSettings)
-		msg->AddBool(kJDShowPreview, fShowPreview);
+		message->AddBool(kJDShowPreview, fShowPreview);
 	
-	msg->RemoveName(kJDNup);
+	message->RemoveName(kJDNup);
 	if (fSettingType == kJobSettings)
-		msg->AddInt32(kJDNup, fNup);
+		message->AddInt32(kJDNup, fNup);
 
-	msg->RemoveName(kJDFirstPage);
+	message->RemoveName(kJDFirstPage);
 	if (fSettingType == kJobSettings)
-		msg->AddInt32(kJDFirstPage, fFirstPage);
+		message->AddInt32(kJDFirstPage, fFirstPage);
 
-	msg->RemoveName(kJDLastPage);
+	message->RemoveName(kJDLastPage);
 	if (fSettingType == kJobSettings)
-		msg->AddInt32(kJDLastPage, fLastPage);
+		message->AddInt32(kJDLastPage, fLastPage);
 
-	msg->RemoveName(kJDGamma);
+	message->RemoveName(kJDGamma);
 	if (fSettingType == kJobSettings)
-		msg->AddFloat(kJDGamma, fGamma);
+		message->AddFloat(kJDGamma, fGamma);
 
-	msg->RemoveName(kJDInkDensity);
+	message->RemoveName(kJDInkDensity);
 	if (fSettingType == kJobSettings)
-		msg->AddFloat(kJDInkDensity, fInkDensity);
+		message->AddFloat(kJDInkDensity, fInkDensity);
 
-	msg->RemoveName(kJDPaperSource);
+	message->RemoveName(kJDPaperSource);
 	if (fSettingType == kJobSettings)
-		msg->AddInt32(kJDPaperSource, fPaperSource);
+		message->AddInt32(kJDPaperSource, fPaperSource);
 
-	msg->RemoveName(kJDCopies);
+	message->RemoveName(kJDCopies);
 	if (fSettingType == kJobSettings)
-		msg->AddInt32(kJDCopies, fCopies);
+		message->AddInt32(kJDCopies, fCopies);
 
-	msg->RemoveName(kJDCollate);
+	message->RemoveName(kJDCollate);
 	if (fSettingType == kJobSettings)
-		msg->AddBool(kJDCollate, fCollate);
+		message->AddBool(kJDCollate, fCollate);
 
-	msg->RemoveName(kJDReverse);
+	message->RemoveName(kJDReverse);
 	if (fSettingType == kJobSettings)
-		msg->AddBool(kJDReverse, fReverse);
+		message->AddBool(kJDReverse, fReverse);
 
-	msg->RemoveName(kJDPrintStyle);
+	message->RemoveName(kJDPrintStyle);
 	if (fSettingType == kJobSettings)
-		msg->AddInt32(kJDPrintStyle, fPrintStyle);
+		message->AddInt32(kJDPrintStyle, fPrintStyle);
 
-	msg->RemoveName(kJDBindingLocation);
+	message->RemoveName(kJDBindingLocation);
 	if (fSettingType == kJobSettings)
-		msg->AddInt32(kJDBindingLocation, fBindingLocation);
+		message->AddInt32(kJDBindingLocation, fBindingLocation);
 
-	msg->RemoveName(kJDPageOrder);
+	message->RemoveName(kJDPageOrder);
 	if (fSettingType == kJobSettings)
-		msg->AddInt32(kJDPageOrder, fPageOrder);
+		message->AddInt32(kJDPageOrder, fPageOrder);
 
-	msg->RemoveName(kJDColor);
+	message->RemoveName(kJDColor);
 	if (fSettingType == kJobSettings)
-		msg->AddInt32(kJDColor, fColor);
+		message->AddInt32(kJDColor, fColor);
 
-	msg->RemoveName(kJDDitherType);
+	message->RemoveName(kJDDitherType);
 	if (fSettingType == kJobSettings)
-		msg->AddInt32(kJDDitherType, fDitherType);
+		message->AddInt32(kJDDitherType, fDitherType);
 	
-	msg->RemoveName(kJDPageSelection);
+	message->RemoveName(kJDPageSelection);
 	if (fSettingType == kJobSettings)
-		msg->AddInt32(kJDPageSelection, fPageSelection);
+		message->AddInt32(kJDPageSelection, fPageSelection);
 
-	msg->RemoveName(kJDDriverSpecificSettings);
+	message->RemoveName(kJDDriverSpecificSettings);
 	if (fSettingType == kJobSettings)
 	{
-		msg->AddMessage(kJDDriverSpecificSettings,
+		message->AddMessage(kJDDriverSpecificSettings,
 			&fDriverSpecificSettings.Message());
 	}
 }

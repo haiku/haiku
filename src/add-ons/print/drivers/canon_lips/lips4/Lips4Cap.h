@@ -13,9 +13,9 @@ class Lips4Cap : public PrinterCap {
 public:
 					Lips4Cap(const PrinterData* printer_data)
 						: PrinterCap(printer_data) {}
-	virtual	int		countCap(CapID) const;
-	virtual	bool	isSupport(CapID) const;
-	virtual	const	BaseCap** enumCap(CapID) const;
+	virtual	int		CountCap(CapID) const;
+	virtual	bool	IsSupport(CapID) const;
+	virtual	const	BaseCap** GetCaps(CapID) const;
 };
 
 #endif // __LIPS4CAP_H

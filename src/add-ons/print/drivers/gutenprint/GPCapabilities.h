@@ -25,9 +25,9 @@ public:
 					GPCapabilities(const PrinterData* printer_data);
 					~GPCapabilities();
 
-	virtual	int		countCap(CapID) const;
-	virtual	bool	isSupport(CapID) const;
-	virtual	const	BaseCap **enumCap(CapID) const;
+	virtual	int		CountCap(CapID) const;
+	virtual	bool	IsSupport(CapID) const;
+	virtual	const	BaseCap **GetCaps(CapID) const;
 
 private:
 	void			InitCapabilitiesFromGutenprint();
