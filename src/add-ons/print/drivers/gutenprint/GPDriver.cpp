@@ -28,44 +28,44 @@
 using namespace std;
 
 
-GPDriver::GPDriver(BMessage* msg, PrinterData* printer_data,
-	const PrinterCap* printer_cap)
+GPDriver::GPDriver(BMessage* message, PrinterData* printerData,
+	const PrinterCap* printerCap)
 	:
-	GraphicsDriver(msg, printer_data, printer_cap)
+	GraphicsDriver(message, printerData, printerCap)
 {
 }
 
 void
-GPDriver::Write(const void *buffer, size_t size)
-	throw(TransportException)
+GPDriver::Write(const void* buffer, size_t size)
+	throw (TransportException)
 {
-	writeSpoolData(buffer, size);
+	WriteSpoolData(buffer, size);
 }
 
 bool
-GPDriver::startDoc()
+GPDriver::StartDocument()
 {
 	try {
-		const GPData* data = dynamic_cast<const GPData*>(getPrinterData());
+		const GPData* data = dynamic_cast<const GPData*>(GetPrinterData());
 		ASSERT(data != NULL);
 		fConfiguration.fDriver = data->fGutenprintDriverName;
 
 		SetParameter(fConfiguration.fPageSize, PrinterCap::kPaper,
-			getJobData()->getPaper());
+			GetJobData()->getPaper());
 
 		SetParameter(fConfiguration.fResolution, PrinterCap::kResolution,
-			getJobData()->getResolutionID());
+			GetJobData()->getResolutionID());
 
-		fConfiguration.fXDPI = getJobData()->getXres();
-		fConfiguration.fYDPI = getJobData()->getYres();
+		fConfiguration.fXDPI = GetJobData()->getXres();
+		fConfiguration.fYDPI = GetJobData()->getYres();
 
 		SetParameter(fConfiguration.fInputSlot, PrinterCap::kPaperSource,
-			getJobData()->getPaperSource());
+			GetJobData()->getPaperSource());
 
 		SetParameter(fConfiguration.fPrintingMode, PrinterCap::kColor,
-			getJobData()->getColor());
+			GetJobData()->getColor());
 
-		if (getPrinterCap()->isSupport(PrinterCap::kDriverSpecificCapabilities))
+		if (GetPrinterCap()->isSupport(PrinterCap::kDriverSpecificCapabilities))
 			SetDriverSpecificSettings();
 
 		fprintf(stderr, "Driver: %s\n", fConfiguration.fDriver.String());
@@ -87,7 +87,7 @@ GPDriver::SetParameter(BString& parameter, PrinterCap::CapID category,
 	int value)
 {
 	const EnumCap* capability;
-	capability = getPrinterCap()->findCap(category, value);
+	capability = GetPrinterCap()->findCap(category, value);
 	if (capability != NULL && capability->fKey != "")
 		parameter = capability->Key();
 }
@@ -97,8 +97,8 @@ void
 GPDriver::SetDriverSpecificSettings()
 {
 	PrinterCap::CapID category = PrinterCap::kDriverSpecificCapabilities;
-	int count = getPrinterCap()->countCap(category);
-	const BaseCap** capabilities = getPrinterCap()->enumCap(category);
+	int count = GetPrinterCap()->countCap(category);
+	const BaseCap** capabilities = GetPrinterCap()->enumCap(category);
 	for (int i = 0; i < count; i++) {
 		const DriverSpecificCap* capability =
 			dynamic_cast<const DriverSpecificCap*>(capabilities[i]);
@@ -134,16 +134,16 @@ GPDriver::SetDriverSpecificSettings()
 void
 GPDriver::AddDriverSpecificSetting(PrinterCap::CapID category, const char* key) {
 	const EnumCap* capability = NULL;
-	if (getJobData()->Settings().HasString(key))
+	if (GetJobData()->Settings().HasString(key))
 	{
-		const string& value = getJobData()->Settings().GetString(key);
-		capability = getPrinterCap()->findCapWithKey(category, value.c_str());
+		const string& value = GetJobData()->Settings().GetString(key);
+		capability = GetPrinterCap()->findCapWithKey(category, value.c_str());
 	}
 
 	if (capability == NULL) {
 		// job data should contain a value;
 		// try to use the default value anyway
-		capability = getPrinterCap()->getDefaultCap(category);
+		capability = GetPrinterCap()->getDefaultCap(category);
 	}
 
 	if (capability == NULL) {
@@ -158,41 +158,41 @@ GPDriver::AddDriverSpecificSetting(PrinterCap::CapID category, const char* key) 
 void
 GPDriver::AddDriverSpecificBooleanSetting(PrinterCap::CapID category,
 	const char* key) {
-	if (getJobData()->Settings().HasBoolean(key))
+	if (GetJobData()->Settings().HasBoolean(key))
 		fConfiguration.fBooleanSettings[key] =
-			getJobData()->Settings().GetBoolean(key);
+			GetJobData()->Settings().GetBoolean(key);
 }
 
 
 void
 GPDriver::AddDriverSpecificIntSetting(PrinterCap::CapID category,
 	const char* key) {
-	if (getJobData()->Settings().HasInt(key))
+	if (GetJobData()->Settings().HasInt(key))
 		fConfiguration.fIntSettings[key] =
-			getJobData()->Settings().GetInt(key);
+			GetJobData()->Settings().GetInt(key);
 }
 
 
 void
 GPDriver::AddDriverSpecificDimensionSetting(PrinterCap::CapID category,
 	const char* key) {
-	if (getJobData()->Settings().HasInt(key))
+	if (GetJobData()->Settings().HasInt(key))
 		fConfiguration.fDimensionSettings[key] =
-			getJobData()->Settings().GetInt(key);
+			GetJobData()->Settings().GetInt(key);
 }
 
 
 void
 GPDriver::AddDriverSpecificDoubleSetting(PrinterCap::CapID category,
 	const char* key) {
-	if (getJobData()->Settings().HasDouble(key))
+	if (GetJobData()->Settings().HasDouble(key))
 		fConfiguration.fDoubleSettings[key] =
-			getJobData()->Settings().GetDouble(key);
+			GetJobData()->Settings().GetDouble(key);
 }
 
 
 bool
-GPDriver::startPage(int)
+GPDriver::StartPage(int)
 {
 	fBinding.BeginPage();
 	return true;
@@ -200,7 +200,7 @@ GPDriver::startPage(int)
 
 
 bool
-GPDriver::endPage(int)
+GPDriver::EndPage(int)
 {
 	try {
 		fBinding.EndPage();
@@ -214,7 +214,7 @@ GPDriver::endPage(int)
 
 
 bool
-GPDriver::endDoc(bool)
+GPDriver::EndDocument(bool)
 {
 	try {
 		fBinding.EndJob();
@@ -228,7 +228,7 @@ GPDriver::endDoc(bool)
 
 
 bool
-GPDriver::nextBand(BBitmap* bitmap, BPoint* offset)
+GPDriver::NextBand(BBitmap* bitmap, BPoint* offset)
 {
 	DBGMSG(("> nextBand\n"));
 	try {
@@ -245,10 +245,10 @@ GPDriver::nextBand(BBitmap* bitmap, BPoint* offset)
 		int x = (int)offset->x;
 		int y = (int)offset->y;
 
-		int page_height = getPageHeight();
+		int pageHeight = GetPageHeight();
 
-		if (y + height > page_height)
-			height = page_height - y;
+		if (y + height > pageHeight)
+			height = pageHeight - y;
 
 		rc.bottom = height - 1;
 
@@ -284,7 +284,7 @@ GPDriver::nextBand(BBitmap* bitmap, BPoint* offset)
 			DBGMSG(("band bitmap is empty.\n"));
 		}
 
-		if (y >= page_height) {
+		if (y >= pageHeight) {
 			offset->x = -1.0;
 			offset->y = -1.0;
 		} else

@@ -24,7 +24,7 @@ public:
 					throw(TransportException);
 
 protected:
-	bool		startDoc();
+	bool		StartDocument();
 	void		SetParameter(BString& parameter, PrinterCap::CapID category,
 					int value);
 	void		SetDriverSpecificSettings();
@@ -38,10 +38,10 @@ protected:
 					const char* key);
 	void		AddDriverSpecificDoubleSetting(PrinterCap::CapID category,
 					const char* key);
-	bool		startPage(int page);
-	bool		nextBand(BBitmap* bitmap, BPoint* offset);
-	bool		endPage(int page);
-	bool		endDoc(bool success);
+	bool		StartPage(int page);
+	bool		NextBand(BBitmap* bitmap, BPoint* offset);
+	bool		EndPage(int page);
+	bool		EndDocument(bool success);
 	void		ShowError(const char* message);
 
 private:

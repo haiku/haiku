@@ -20,41 +20,35 @@
 #include "PrinterData.h"
 #include "ValidRect.h"
 
-#if (!__MWERKS__ || defined(MSIPL_USING_NAMESPACE))
-using namespace std;
-#else 
-#define std
-#endif
 
-
-LIPS4Driver::LIPS4Driver(BMessage* msg, PrinterData* printer_data,
-	const PrinterCap *printer_cap)
+LIPS4Driver::LIPS4Driver(BMessage* message, PrinterData* printerData,
+	const PrinterCap* printerCap)
 	:
-	GraphicsDriver(msg, printer_data, printer_cap)
+	GraphicsDriver(message, printerData, printerCap),
+	fHalftone(NULL)
 {
-	fHalftone = NULL;
 }
 
 
 bool
-LIPS4Driver::startDoc()
+LIPS4Driver::StartDocument()
 {
 	try {
-		beginTextMode();
-		jobStart();
-		colorModeDeclaration();
-		softReset();
-		sizeUnitMode();
-		selectSizeUnit();
-		paperFeedMode();
-		selectPageFormat();
-		disableAutoFF();
-		setNumberOfCopies();
-		sidePrintingControl();
-		setBindingMargin();
-		fHalftone = new Halftone(getJobData()->getSurfaceType(),
-			getJobData()->getGamma(), getJobData()->getInkDensity(),
-			getJobData()->getDitherType());
+		_BeginTextMode();
+		_JobStart();
+		_ColorModeDeclaration();
+		_SoftReset();
+		_SizeUnitMode();
+		_SelectSizeUnit();
+		_PaperFeedMode();
+		_SelectPageFormat();
+		_DisableAutoFF();
+		_SetNumberOfCopies();
+		_SidePrintingControl();
+		_SetBindingMargin();
+		fHalftone = new Halftone(GetJobData()->getSurfaceType(),
+			GetJobData()->getGamma(), GetJobData()->getInkDensity(),
+			GetJobData()->getDitherType());
 		return true;
 	}
 	catch (TransportException& err) {
@@ -64,12 +58,12 @@ LIPS4Driver::startDoc()
 
 
 bool
-LIPS4Driver::startPage(int)
+LIPS4Driver::StartPage(int)
 {
 	try {
 		fCurrentX = 0;
 		fCurrentY = 0;
-		memorizedPosition();
+		_MemorizedPosition();
 		return true;
 	}
 	catch (TransportException& err) {
@@ -79,10 +73,10 @@ LIPS4Driver::startPage(int)
 
 
 bool
-LIPS4Driver::endPage(int)
+LIPS4Driver::EndPage(int)
 {
 	try {
-		formFeed();
+		_FormFeed();
 		return true;
 	}
 	catch (TransportException& err) {
@@ -92,13 +86,13 @@ LIPS4Driver::endPage(int)
 
 
 bool
-LIPS4Driver::endDoc(bool)
+LIPS4Driver::EndDocument(bool)
 {
 	try {
 		if (fHalftone)
 			delete fHalftone;
 
-		jobEnd();
+		_JobEnd();
 		return true;
 	}
 	catch (TransportException& err) {
@@ -108,7 +102,7 @@ LIPS4Driver::endDoc(bool)
 
 
 bool
-LIPS4Driver::nextBand(BBitmap* bitmap, BPoint* offset)
+LIPS4Driver::NextBand(BBitmap* bitmap, BPoint* offset)
 {
 	DBGMSG(("> nextBand\n"));
 
@@ -117,7 +111,7 @@ LIPS4Driver::nextBand(BBitmap* bitmap, BPoint* offset)
 		if (bitmap == NULL) {
 			uchar dummy[1];
 			dummy[0] =  '\0';
-			rasterGraphics(1, 1, 1, 0, dummy);
+			_RasterGraphics(1, 1, 1, 0, dummy);
 			DBGMSG(("< next_band\n"));
 			return true;
 		}
@@ -135,7 +129,7 @@ LIPS4Driver::nextBand(BBitmap* bitmap, BPoint* offset)
 		int x = (int)offset->x;
 		int y = (int)offset->y;
 
-		int page_height = getPageHeight();
+		int page_height = GetPageHeight();
 
 		if (y + height > page_height)
 			height = page_height - y;
@@ -188,7 +182,7 @@ LIPS4Driver::nextBand(BBitmap* bitmap, BPoint* offset)
 
 			DBGMSG(("move\n"));
 
-			move(x, y);
+			_Move(x, y);
 
 			for (int i = rc.top; i <= rc.bottom; i++) {
 				fHalftone->dither(ptr2, ptr, x, y, width);
@@ -219,7 +213,7 @@ LIPS4Driver::nextBand(BBitmap* bitmap, BPoint* offset)
 			DBGMSG(("height = %d\n", height));
 			DBGMSG(("compression_method = %d\n", compression_method));
 
-			rasterGraphics(
+			_RasterGraphics(
 				compressed_size,	// size,
 				widthByte,			// widthByte
 				height,				// height,
@@ -247,52 +241,52 @@ LIPS4Driver::nextBand(BBitmap* bitmap, BPoint* offset)
 
 
 void
-LIPS4Driver::beginTextMode()
+LIPS4Driver::_BeginTextMode()
 {
-	writeSpoolString("\033%%@");
+	WriteSpoolString("\033%%@");
 }
 
 
 void
-LIPS4Driver::jobStart()
+LIPS4Driver::_JobStart()
 {
-	writeSpoolString("\033P41;%d;1J\033\\", getJobData()->getXres());
+	WriteSpoolString("\033P41;%d;1J\033\\", GetJobData()->getXres());
 }
 
 
 void
-LIPS4Driver::colorModeDeclaration()
+LIPS4Driver::_ColorModeDeclaration()
 {
 //	if (color)
-//		writeSpoolString("\033[1\"p");
+//		WriteSpoolString("\033[1\"p");
 //	else
-		writeSpoolString("\033[0\"p");
+		WriteSpoolString("\033[0\"p");
 }
 
 
 void
-LIPS4Driver::softReset()
+LIPS4Driver::_SoftReset()
 {
-	writeSpoolString("\033<");
+	WriteSpoolString("\033<");
 }
 
 
 void
-LIPS4Driver::sizeUnitMode()
+LIPS4Driver::_SizeUnitMode()
 {
-	writeSpoolString("\033[11h");
+	WriteSpoolString("\033[11h");
 }
 
 
 void
-LIPS4Driver::selectSizeUnit()
+LIPS4Driver::_SelectSizeUnit()
 {
-	writeSpoolString("\033[?7;%d I", getJobData()->getXres());
+	WriteSpoolString("\033[?7;%d I", GetJobData()->getXres());
 }
 
 
 void
-LIPS4Driver::paperFeedMode()
+LIPS4Driver::_PaperFeedMode()
 {
 	// 0 auto
 	// --------------
@@ -311,7 +305,7 @@ LIPS4Driver::paperFeedMode()
 
 	int i;
 
-	switch (getJobData()->getPaperSource()) {
+	switch (GetJobData()->getPaperSource()) {
 		case JobData::kManual:
 			i = 10;
 			break;
@@ -330,16 +324,16 @@ LIPS4Driver::paperFeedMode()
 			break;
 	}
 
-	writeSpoolString("\033[%dq", i);
+	WriteSpoolString("\033[%dq", i);
 }
 
 
 void
-LIPS4Driver::selectPageFormat()
+LIPS4Driver::_SelectPageFormat()
 {
 	int i;
 
-	switch (getJobData()->getPaper()) {
+	switch (GetJobData()->getPaper()) {
 		case JobData::kA3:
 			i = 12;
 			break;
@@ -389,41 +383,41 @@ LIPS4Driver::selectPageFormat()
 			break;
 	}
 
-	if (JobData::kLandscape == getJobData()->getOrientation())
+	if (JobData::kLandscape == GetJobData()->getOrientation())
 		i++;
 
-	writeSpoolString("\033[%d;;p", i);
+	WriteSpoolString("\033[%d;;p", i);
 }
 
 
 void
-LIPS4Driver::disableAutoFF()
+LIPS4Driver::_DisableAutoFF()
 {
-	writeSpoolString("\033[?2h");
+	WriteSpoolString("\033[?2h");
 }
 
 
 void
-LIPS4Driver::setNumberOfCopies()
+LIPS4Driver::_SetNumberOfCopies()
 {
-	writeSpoolString("\033[%ldv", getJobData()->getCopies());
+	WriteSpoolString("\033[%ldv", GetJobData()->getCopies());
 }
 
 
 void
-LIPS4Driver::sidePrintingControl()
+LIPS4Driver::_SidePrintingControl()
 {
-	if (getJobData()->getPrintStyle() == JobData::kSimplex)
-		writeSpoolString("\033[0#x");
+	if (GetJobData()->getPrintStyle() == JobData::kSimplex)
+		WriteSpoolString("\033[0#x");
 	else
-		writeSpoolString("\033[2;0#x");
+		WriteSpoolString("\033[2;0#x");
 }
 
 
 void
-LIPS4Driver::setBindingMargin()
+LIPS4Driver::_SetBindingMargin()
 {
-	if (getJobData()->getPrintStyle() == JobData::kDuplex) {
+	if (GetJobData()->getPrintStyle() == JobData::kDuplex) {
 		int i;
 //		switch (job_data()->binding_location()) {
 //		case kLongEdgeLeft:
@@ -439,87 +433,87 @@ LIPS4Driver::setBindingMargin()
 //			i = 3;
 //			break;
 //		}
-		writeSpoolString("\033[%d;0#w", i);
+		WriteSpoolString("\033[%d;0#w", i);
 	}
 }
 
 
 void
-LIPS4Driver::memorizedPosition()
+LIPS4Driver::_MemorizedPosition()
 {
-	writeSpoolString("\033[0;1;0x");
+	WriteSpoolString("\033[0;1;0x");
 }
 
 
 void
-LIPS4Driver::moveAbsoluteHorizontal(int x)
+LIPS4Driver::_MoveAbsoluteHorizontal(int x)
 {
-	writeSpoolString("\033[%ld`", x);
+	WriteSpoolString("\033[%ld`", x);
 }
 
 
 void
-LIPS4Driver::carriageReturn()
+LIPS4Driver::_CarriageReturn()
 {
-	writeSpoolChar('\x0d');
+	WriteSpoolChar('\x0d');
 }
 
 
 void
-LIPS4Driver::moveDown(int dy)
+LIPS4Driver::_MoveDown(int dy)
 {
-	writeSpoolString("\033[%lde", dy);
+	WriteSpoolString("\033[%lde", dy);
 }
 
 
 void
-LIPS4Driver::rasterGraphics(int compression_size, int widthbyte, int height,
+LIPS4Driver::_RasterGraphics(int compression_size, int widthbyte, int height,
 	int compression_method, const uchar* buffer)
 {
 // 0  RAW
 // 10 RLE
 // 11 packbits
 
-	writeSpoolString(
+	WriteSpoolString(
 		"\033[%ld;%ld;%d;%ld;%ld.r",
 		compression_size,
 		widthbyte,
-		getJobData()->getXres(),
+		GetJobData()->getXres(),
 		compression_method,
 		height);
 
-	writeSpoolData(buffer, compression_size);
+	WriteSpoolData(buffer, compression_size);
 }
 
 
 void
-LIPS4Driver::formFeed()
+LIPS4Driver::_FormFeed()
 {
-	writeSpoolChar('\014');
+	WriteSpoolChar('\014');
 }
 
 
 void
-LIPS4Driver::jobEnd()
+LIPS4Driver::_JobEnd()
 {
-	writeSpoolString("\033P0J\033\\");
+	WriteSpoolString("\033P0J\033\\");
 }
 
 
 void
-LIPS4Driver::move(int x, int y)
+LIPS4Driver::_Move(int x, int y)
 {
 	if (fCurrentX != x) {
 		if (x) {
-			moveAbsoluteHorizontal(x);
+			_MoveAbsoluteHorizontal(x);
 		} else {
-			carriageReturn();
+			_CarriageReturn();
 		}
 		fCurrentX = x;
 	}
 	if (fCurrentY != y) {
 		int dy = y - fCurrentY;
-		moveDown(dy);
+		_MoveDown(dy);
 		fCurrentY = y;
 	}
 }

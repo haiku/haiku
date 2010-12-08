@@ -29,28 +29,23 @@
 #include "UIDriver.h"
 #include "ValidRect.h"
 
-#if (!__MWERKS__ || defined(MSIPL_USING_NAMESPACE))
-using namespace std;
-#else 
-#define std
-#endif
 
-
-PSDriver::PSDriver(BMessage* msg, PrinterData* printer_data,
-	const PrinterCap* printer_cap)
+PSDriver::PSDriver(BMessage* message, PrinterData* printerData,
+	const PrinterCap* printerCap)
 	:
-	GraphicsDriver(msg, printer_data, printer_cap)
+	GraphicsDriver(message, printerData, printerCap),
+	fPrintedPages(0),
+	fCompressionMethod(0),
+	fHalftone(NULL),
+	fFilterIO(NULL)
 {
-	fPrintedPages = 0;
-	fHalftone = NULL;
-	fFilterIO = NULL;
 }
 
 
 void
-PSDriver::StartFilterIfNeeded()
+PSDriver::_StartFilterIfNeeded()
 {
-	const PSData* data = dynamic_cast<const PSData*>(getPrinterData());
+	const PSData* data = dynamic_cast<const PSData*>(GetPrinterData());
 	PPDParser parser(BPath(data->fPPD.String()));
 	if (parser.InitCheck() == B_OK) {
 		BString param = parser.GetParameter("FoomaticRIPCommandLine");
@@ -72,20 +67,20 @@ PSDriver::StartFilterIfNeeded()
 
 
 void
-PSDriver::FlushFilterIfNeeded()
+PSDriver::_FlushFilterIfNeeded()
 {
 	if (fFilterIO) {
 		char buffer[1024];
 		ssize_t len;
 
 		while ((len = fFilterIO->Read(buffer, sizeof(buffer))) > 0)
-			writeSpoolData(buffer, len);
+			WriteSpoolData(buffer, len);
 	}
 }
 
 
 void
-PSDriver::writePSString(const char* format, ...)
+PSDriver::_WritePSString(const char* format, ...)
 {
 	char str[256];
 	va_list	ap;
@@ -95,32 +90,32 @@ PSDriver::writePSString(const char* format, ...)
 	if (fFilterIO)
 		fFilterIO->Write(str, strlen(str));
 	else
-		writeSpoolData(str, strlen(str));
+		WriteSpoolData(str, strlen(str));
 
 	va_end(ap);
 }
 
 
 void 
-PSDriver::writePSData(const void* data, size_t size)
+PSDriver::_WritePSData(const void* data, size_t size)
 {
 	if (fFilterIO)
 		fFilterIO->Write(data, size);
 	else
-		writeSpoolData(data, size);
+		WriteSpoolData(data, size);
 }
 
 
 bool
-PSDriver::startDoc()
+PSDriver::StartDocument()
 {
 	try {
-		StartFilterIfNeeded();
+		_StartFilterIfNeeded();
 
-		jobStart();
-		fHalftone = new Halftone(getJobData()->getSurfaceType(),
-			getJobData()->getGamma(), getJobData()->getInkDensity(),
-			getJobData()->getDitherType());
+		_JobStart();
+		fHalftone = new Halftone(GetJobData()->getSurfaceType(),
+			GetJobData()->getGamma(), GetJobData()->getInkDensity(),
+			GetJobData()->getDitherType());
 		return true;
 	}
 	catch (TransportException& err) {
@@ -130,25 +125,25 @@ PSDriver::startDoc()
 
 
 bool
-PSDriver::startPage(int page)
+PSDriver::StartPage(int page)
 {
 	page ++;
-	writePSString("%%%%Page: %d %d\n", page, page);
-	writePSString("gsave\n");
-	setupCTM();
+	_WritePSString("%%%%Page: %d %d\n", page, page);
+	_WritePSString("gsave\n");
+	_SetupCTM();
 	return true;
 }
 
 
 bool
-PSDriver::endPage(int)
+PSDriver::EndPage(int)
 {
 	try {
 		fPrintedPages ++;
-		writePSString("grestore\n");
-		writePSString("showpage\n");
+		_WritePSString("grestore\n");
+		_WritePSString("showpage\n");
 
-		FlushFilterIfNeeded();
+		_FlushFilterIfNeeded();
 
 		return true;
 	}
@@ -159,37 +154,38 @@ PSDriver::endPage(int)
 
 
 void
-PSDriver::setupCTM()
+PSDriver::_SetupCTM()
 {
-	const float leftMargin = getJobData()->getPrintableRect().left;
-	const float topMargin = getJobData()->getPrintableRect().top;
-	if (getJobData()->getOrientation() == JobData::kPortrait) {
+	const float leftMargin = GetJobData()->getPrintableRect().left;
+	const float topMargin = GetJobData()->getPrintableRect().top;
+	if (GetJobData()->getOrientation() == JobData::kPortrait) {
 		// move origin from bottom left to top left
 		// and set margin
-		writePSString("%f %f translate\n", leftMargin,
-			getJobData()->getPaperRect().Height()-topMargin);
+		_WritePSString("%f %f translate\n", leftMargin,
+			GetJobData()->getPaperRect().Height()-topMargin);
 	} else {
 		// landscape:
 		// move origin from bottom left to margin top and left 
 		// and rotate page contents
-		writePSString("%f %f translate\n", topMargin, leftMargin);
-		writePSString("90 rotate\n");
+		_WritePSString("%f %f translate\n", topMargin, leftMargin);
+		_WritePSString("90 rotate\n");
 	}
 	// y values increase from top to bottom
 	// units of measure is dpi
-	writePSString("72 %d div 72 -%d div scale\n", getJobData()->getXres(),
-		getJobData()->getYres());
+	_WritePSString("72 %d div 72 -%d div scale\n", GetJobData()->getXres(),
+		GetJobData()->getYres());
 }
 
 
 bool
-PSDriver::endDoc(bool)
+PSDriver::EndDocument(bool)
 {
 	try {
 		if (fHalftone) {
 			delete fHalftone;
+			fHalftone = NULL;
 		}
-		jobEnd();
+		_JobEnd();
 		return true;
 	}
 	catch (TransportException& err) {
@@ -198,8 +194,8 @@ PSDriver::endDoc(bool)
 }
 
 
-inline uchar
-hex_digit(uchar value) 
+static inline uchar
+ToHexDigit(uchar value)
 {
 	if (value <= 9) return '0' + value;
 	else return 'a' + (value - 10);
@@ -207,7 +203,7 @@ hex_digit(uchar value)
 
 
 bool 
-PSDriver::nextBand(BBitmap* bitmap, BPoint* offset)
+PSDriver::NextBand(BBitmap* bitmap, BPoint* offset)
 {
 	DBGMSG(("> nextBand\n"));
 
@@ -225,7 +221,7 @@ PSDriver::nextBand(BBitmap* bitmap, BPoint* offset)
 		int x = (int)offset->x;
 		int y = (int)offset->y;
 
-		int page_height = getPageHeight();
+		int page_height = GetPageHeight();
 
 		if (y + height > page_height) {
 			height = page_height - y;
@@ -245,7 +241,7 @@ PSDriver::nextBand(BBitmap* bitmap, BPoint* offset)
 			x = rc.left;
 			y += rc.top;
 
-			bool color = getJobData()->getColor() == JobData::kColor;
+			bool color = GetJobData()->getColor() == JobData::kColor;
 			int width = rc.right - rc.left + 1;
 			int widthByte = (width + 7) / 8;
 				// byte boundary
@@ -281,19 +277,19 @@ PSDriver::nextBand(BBitmap* bitmap, BPoint* offset)
 			DBGMSG(("move\n"));
 
 			int size = color ? width * 3 : in_size;
-			startRasterGraphics(x, y, width, height, size);
+			_StartRasterGraphics(x, y, width, height, size);
 
 			for (int i = rc.top; i <= rc.bottom; i++) {
 				if (color) {
 					uchar* out = out_buffer;
 					uchar* in  = ptr;
 					for (int w = width; w > 0; w --) {
-						*out++ = hex_digit((in[2]) >> 4);
-						*out++ = hex_digit((in[2]) & 15);
-						*out++ = hex_digit((in[1]) >> 4);
-						*out++ = hex_digit((in[1]) & 15);
-						*out++ = hex_digit((in[0]) >> 4);
-						*out++ = hex_digit((in[0]) & 15);
+						*out++ = ToHexDigit((in[2]) >> 4);
+						*out++ = ToHexDigit((in[2]) & 15);
+						*out++ = ToHexDigit((in[1]) >> 4);
+						*out++ = ToHexDigit((in[1]) & 15);
+						*out++ = ToHexDigit((in[0]) >> 4);
+						*out++ = ToHexDigit((in[0]) & 15);
 						in += 4;
 					}
 				} else {
@@ -304,8 +300,8 @@ PSDriver::nextBand(BBitmap* bitmap, BPoint* offset)
 				
 					for (int w = in_size; w > 0; w --, in ++) {
 						*in = ~*in; // invert pixels
-						*out++ = hex_digit((*in) >> 4);
-						*out++ = hex_digit((*in) & 15);
+						*out++ = ToHexDigit((*in) >> 4);
+						*out++ = ToHexDigit((*in) & 15);
 					}
 				}
 				
@@ -315,7 +311,7 @@ PSDriver::nextBand(BBitmap* bitmap, BPoint* offset)
 					compressed_size = out_size;
 				}
 
-				rasterGraphics(
+				_RasterGraphics(
 					compression_method,
 					buffer,
 					compressed_size);
@@ -324,7 +320,7 @@ PSDriver::nextBand(BBitmap* bitmap, BPoint* offset)
 				y++;
 			}
 
-			endRasterGraphics();
+			_EndRasterGraphics();
 
 		} else
 			DBGMSG(("band bitmap is clean.\n"));
@@ -347,79 +343,77 @@ PSDriver::nextBand(BBitmap* bitmap, BPoint* offset)
 
 
 void 
-PSDriver::jobStart()
+PSDriver::_JobStart()
 {
 	// PostScript header
-	writePSString("%%!PS-Adobe-3.0\n");
-	writePSString("%%%%LanguageLevel: 1\n");
-	writePSString("%%%%Title: %s\n",
-		getSpoolMetaData()->getDescription().c_str());
-	writePSString("%%%%Creator: %s\n",
-		getSpoolMetaData()->getMimeType().c_str());
-	writePSString("%%%%CreationDate: %s",
-		getSpoolMetaData()->getCreationTime().c_str());
-	writePSString("%%%%DocumentMedia: Plain %d %d white 0 ( )\n",
-		getJobData()->getPaperRect().IntegerWidth(),
-		getJobData()->getPaperRect().IntegerHeight());
-	writePSString("%%%%Pages: (atend)\n");	
-	writePSString("%%%%EndComments\n");
+	_WritePSString("%%!PS-Adobe-3.0\n");
+	_WritePSString("%%%%LanguageLevel: 1\n");
+	_WritePSString("%%%%Title: %s\n",
+		GetSpoolMetaData()->getDescription().c_str());
+	_WritePSString("%%%%Creator: %s\n",
+		GetSpoolMetaData()->getMimeType().c_str());
+	_WritePSString("%%%%CreationDate: %s",
+		GetSpoolMetaData()->getCreationTime().c_str());
+	_WritePSString("%%%%DocumentMedia: Plain %d %d white 0 ( )\n",
+		GetJobData()->getPaperRect().IntegerWidth(),
+		GetJobData()->getPaperRect().IntegerHeight());
+	_WritePSString("%%%%Pages: (atend)\n");
+	_WritePSString("%%%%EndComments\n");
 	
-	writePSString("%%%%BeginDefaults\n");
-	writePSString("%%%%PageMedia: Plain\n");
-	writePSString("%%%%EndDefaults\n");
+	_WritePSString("%%%%BeginDefaults\n");
+	_WritePSString("%%%%PageMedia: Plain\n");
+	_WritePSString("%%%%EndDefaults\n");
 }
 
 
 void 
-PSDriver::startRasterGraphics(int x, int y, int width, int height,
+PSDriver::_StartRasterGraphics(int x, int y, int width, int height,
 	int widthByte)
 {
-	bool color = getJobData()->getColor() == JobData::kColor;
+	bool color = GetJobData()->getColor() == JobData::kColor;
 	fCompressionMethod = -1;
-	writePSString("gsave\n");
-	writePSString("/s %d string def\n", widthByte);
-	writePSString("%d %d translate\n", x, y);
-	writePSString("%d %d scale\n", width, height);
+	_WritePSString("gsave\n");
+	_WritePSString("/s %d string def\n", widthByte);
+	_WritePSString("%d %d translate\n", x, y);
+	_WritePSString("%d %d scale\n", width, height);
 	if (color)
-		writePSString("%d %d 8\n", width, height); // 8 bpp
+		_WritePSString("%d %d 8\n", width, height); // 8 bpp
 	else
-		writePSString("%d %d 1\n", width, height); // 1 bpp
-	writePSString("[%d 0 0 %d 0 0]\n", width, height);
-	writePSString("{ currentfile s readhexstring pop }\n");
+		_WritePSString("%d %d 1\n", width, height); // 1 bpp
+	_WritePSString("[%d 0 0 %d 0 0]\n", width, height);
+	_WritePSString("{ currentfile s readhexstring pop }\n");
 	if (color) {
-		writePSString("false 3\n"); // single data source, 3 color components
-		writePSString("colorimage\n");
+		_WritePSString("false 3\n"); // single data source, 3 color components
+		_WritePSString("colorimage\n");
 	} else
-		writePSString("image\n\n");
+		_WritePSString("image\n\n");
 }
 
 
 void 
-PSDriver::endRasterGraphics()
+PSDriver::_EndRasterGraphics()
 {
-	writePSString("grestore\n");
+	_WritePSString("grestore\n");
 }
 
 
 void 
-PSDriver::rasterGraphics(
-	int compression_method,
-	const uchar* buffer,
+PSDriver::_RasterGraphics(int compression_method, const uchar* buffer,
 	int size)
 {
 	if (fCompressionMethod != compression_method) {
 		fCompressionMethod = compression_method;
 	}
-	writePSData(buffer, size);
-	writePSString("\n");
+	_WritePSData(buffer, size);
+	_WritePSString("\n");
 }
 
 
 void 
-PSDriver::jobEnd()
+PSDriver::_JobEnd()
 {
-	writePSString("%%%%Pages: %d\n", fPrintedPages);
-	writePSString("%%%%EOF\n");
+	_WritePSString("%%%%Pages: %d\n", fPrintedPages);
+	_WritePSString("%%%%EOF\n");
 
-	FlushFilterIfNeeded();
+	_FlushFilterIfNeeded();
 }

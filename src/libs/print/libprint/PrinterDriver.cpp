@@ -30,10 +30,11 @@
 // Implementation of PrinterDriver
 
 PrinterDriver::PrinterDriver(BNode* spoolFolder)
-	: fSpoolFolder(spoolFolder)
-	, fPrinterData(NULL)
-	, fPrinterCap(NULL)
-	, fGraphicsDriver(NULL)
+	:
+	fSpoolFolder(spoolFolder),
+	fPrinterData(NULL),
+	fPrinterCap(NULL),
+	fGraphicsDriver(NULL)
 {
 }
 
@@ -152,7 +153,7 @@ PrinterDriver::TakeJob(BFile* printJob, BMessage* settings)
 	DUMP_BNODE(fSpoolFolder);
 
 	fGraphicsDriver = InstantiateGraphicsDriver(settings, fPrinterData, fPrinterCap);
-	const JobData* jobData = fGraphicsDriver->getJobData(printJob);
+	const JobData* jobData = fGraphicsDriver->GetJobData(printJob);
 	if (jobData != NULL && jobData->getShowPreview()) {
 		off_t offset = printJob->Position();
 		PreviewWindow *preview = new PreviewWindow(printJob, true);
@@ -161,7 +162,7 @@ PrinterDriver::TakeJob(BFile* printJob, BMessage* settings)
 		}
 		printJob->Seek(offset, SEEK_SET);
 	}	
-	BMessage *result = fGraphicsDriver->takeJob(printJob);
+	BMessage *result = fGraphicsDriver->TakeJob(printJob);
 
 	DUMP_BMESSAGE(result);
 	DBGMSG(("<%s: take_job\n", GetDriverName()));

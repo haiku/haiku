@@ -14,25 +14,25 @@ class Halftone;
 
 class PCL5Driver : public GraphicsDriver {
 public:
-						PCL5Driver(BMessage* msg, PrinterData* printer_data,
-							const PrinterCap* printer_cap);
+						PCL5Driver(BMessage* message, PrinterData* printerData,
+							const PrinterCap* printerCap);
 
 protected:
-	virtual	bool		startDoc();
-	virtual	bool		startPage(int page);
-	virtual	bool		nextBand(BBitmap* bitmap, BPoint* offset);
-	virtual	bool		endPage(int page);
-	virtual	bool		endDoc(bool success);
+	virtual	bool		StartDocument();
+	virtual	bool		StartPage(int page);
+	virtual	bool		NextBand(BBitmap* bitmap, BPoint* offset);
+	virtual	bool		EndPage(int page);
+	virtual	bool		EndDocument(bool success);
 
 private:
-			void		move(int x, int y);
-			void		jobStart();
-			void		startRasterGraphics(int width, int height);
-			void		endRasterGraphics();
-			void		rasterGraphics(int compression_method,
+			void		_Move(int x, int y);
+			void		_JobStart();
+			void		_StartRasterGraphics(int width, int height);
+			void		_EndRasterGraphics();
+			void		_RasterGraphics(int compression_method,
 							const uchar* buffer, int size, bool lastPlane);
-			void		jobEnd();
-			int			bytesToEnterCompressionMethod(int compression_method);
+			void		_JobEnd();
+			int			_BytesToEnterCompressionMethod(int compression_method);
 
 			int			fCompressionMethod;
 			Halftone*	fHalftone;

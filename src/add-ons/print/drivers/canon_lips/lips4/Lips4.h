@@ -14,37 +14,39 @@ class Halftone;
 
 class LIPS4Driver : public GraphicsDriver {
 public:
-						LIPS4Driver(BMessage *msg, PrinterData *printer_data, const PrinterCap *cap);
+						LIPS4Driver(BMessage* message,
+							PrinterData* printerData,
+							const PrinterCap* printerCap);
 
 protected:
-	virtual	bool		startDoc();
-	virtual	bool		startPage(int page);
-	virtual	bool		nextBand(BBitmap *bitmap, BPoint *offset);
-	virtual	bool		endPage(int page);
-	virtual	bool		endDoc(bool success);
+	virtual	bool		StartDocument();
+	virtual	bool		StartPage(int page);
+	virtual	bool		NextBand(BBitmap* bitmap, BPoint* offset);
+	virtual	bool		EndPage(int page);
+	virtual	bool		EndDocument(bool success);
 
 private:
-			void		move(int x, int y);
-			void		beginTextMode();
-			void		jobStart();
-			void		colorModeDeclaration();
-			void		softReset();
-			void		sizeUnitMode();
-			void		selectSizeUnit();
-			void		paperFeedMode();
-			void		selectPageFormat();
-			void		disableAutoFF();
-			void		setNumberOfCopies();
-			void		sidePrintingControl();
-			void		setBindingMargin();
-			void		memorizedPosition();
-			void		moveAbsoluteHorizontal(int x);
-			void		carriageReturn();
-			void		moveDown(int dy);
-			void rasterGraphics(int size, int widthbyte, int height,
-				int compression_method, const uchar* buffer);
-			void		formFeed();
-			void		jobEnd();
+			void		_Move(int x, int y);
+			void		_BeginTextMode();
+			void		_JobStart();
+			void		_ColorModeDeclaration();
+			void		_SoftReset();
+			void		_SizeUnitMode();
+			void		_SelectSizeUnit();
+			void		_PaperFeedMode();
+			void		_SelectPageFormat();
+			void		_DisableAutoFF();
+			void		_SetNumberOfCopies();
+			void		_SidePrintingControl();
+			void		_SetBindingMargin();
+			void		_MemorizedPosition();
+			void		_MoveAbsoluteHorizontal(int x);
+			void		_CarriageReturn();
+			void		_MoveDown(int dy);
+			void		_RasterGraphics(int size, int widthbyte, int height,
+							int compressionMethod, const uchar* buffer);
+			void		_FormFeed();
+			void		_JobEnd();
 
 			int			fCurrentX;
 			int			fCurrentY;

@@ -680,7 +680,7 @@ void PreviewView::_DrawPage(BRect rect)
 	}
 	printRect.OffsetBy(_ContentRect().LeftTop());
 
-	BPoint scalingXY = GraphicsDriver::getScale(fNumberOfPagesPerPage, printRect, 100.0);
+	BPoint scalingXY = GraphicsDriver::GetScale(fNumberOfPagesPerPage, printRect, 100.0);
 	float scaling = min_c(scalingXY.x, scalingXY.y);
 
 	printRect = ScaleDown(printRect, _ZoomFactor() * scaling);

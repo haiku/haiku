@@ -15,30 +15,30 @@ class Halftone;
 
 class PSDriver : public GraphicsDriver {
 public:
-						PSDriver(BMessage* msg, PrinterData* printer_data,
-							const PrinterCap* printer_cap);
+						PSDriver(BMessage* message, PrinterData* printerData,
+							const PrinterCap* printerCap);
 
 protected:
-	virtual	bool		startDoc();
-	virtual	bool		startPage(int page);
-	virtual	bool		nextBand(BBitmap* bitmap, BPoint* offset);
-	virtual	bool		endPage(int page);
-	virtual	bool		endDoc(bool success);
+	virtual	bool		StartDocument();
+	virtual	bool		StartPage(int page);
+	virtual	bool		NextBand(BBitmap* bitmap, BPoint* offset);
+	virtual	bool		EndPage(int page);
+	virtual	bool		EndDocument(bool success);
 
 private:
-			void		setupCTM();
-			void		jobStart();
-			void		startRasterGraphics(int x, int y, int width,
+			void		_SetupCTM();
+			void		_JobStart();
+			void		_StartRasterGraphics(int x, int y, int width,
 							int height, int widthByte);
-			void		endRasterGraphics();
-			void		rasterGraphics(int compression_method,
+			void		_EndRasterGraphics();
+			void		_RasterGraphics(int compression_method,
 							const uchar* buffer, int size);
-			void		jobEnd();
+			void		_JobEnd();
 
-			void		StartFilterIfNeeded();
-			void		FlushFilterIfNeeded();
-			void		writePSString(const char* format, ...);
-			void		writePSData(const void* data, size_t size);
+			void		_StartFilterIfNeeded();
+			void		_FlushFilterIfNeeded();
+			void		_WritePSString(const char* format, ...);
+			void		_WritePSData(const void* data, size_t size);
 
 			int			fPrintedPages;
 			int			fCompressionMethod;

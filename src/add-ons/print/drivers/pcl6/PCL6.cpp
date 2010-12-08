@@ -25,12 +25,6 @@
 #include "UIDriver.h"
 #include "ValidRect.h"
 
-#if (!__MWERKS__ || defined(MSIPL_USING_NAMESPACE))
-using namespace std;
-#else 
-#define std
-#endif
-
 
 // DeltaRowStreamCompressor writes the delta row directly to the 
 // in the contructor specified stream.
@@ -55,31 +49,32 @@ private:
 };
 
 
-PCL6Driver::PCL6Driver(BMessage* msg, PrinterData* printer_data,
-	const PrinterCap* printer_cap)
+PCL6Driver::PCL6Driver(BMessage* message, PrinterData* printerData,
+	const PrinterCap* printerCap)
 	:
-	GraphicsDriver(msg, printer_data, printer_cap)
+	GraphicsDriver(message, printerData, printerCap),
+	fWriter(NULL),
+	fMediaSide(PCL6Writer::kFrontMediaSide),
+	fHalftone(NULL)
 {
-	fHalftone = NULL;
-	fWriter = NULL;
 }
 
 
 void
-PCL6Driver::write(const uint8* data, uint32 size)
+PCL6Driver::Write(const uint8* data, uint32 size)
 {
-	writeSpoolData(data, size);
+	WriteSpoolData(data, size);
 }
 
 
 bool
-PCL6Driver::startDoc()
+PCL6Driver::StartDocument()
 {
 	try {
-		jobStart();
-		fHalftone = new Halftone(getJobData()->getSurfaceType(),
-			getJobData()->getGamma(), getJobData()->getInkDensity(),
-			getJobData()->getDitherType());
+		_JobStart();
+		fHalftone = new Halftone(GetJobData()->getSurfaceType(),
+			GetJobData()->getGamma(), GetJobData()->getInkDensity(),
+			GetJobData()->getDitherType());
 		return true;
 	}
 	catch (TransportException& err) {
@@ -89,12 +84,12 @@ PCL6Driver::startDoc()
 
 
 bool
-PCL6Driver::endDoc(bool)
+PCL6Driver::EndDocument(bool)
 {
 	try {
 		if (fHalftone)
 			delete fHalftone;
-		jobEnd();
+		_JobEnd();
 		return true;
 	}
 	catch (TransportException& err) {
@@ -104,7 +99,7 @@ PCL6Driver::endDoc(bool)
 
 
 bool
-PCL6Driver::nextBand(BBitmap* bitmap, BPoint* offset)
+PCL6Driver::NextBand(BBitmap* bitmap, BPoint* offset)
 {
 	DBGMSG(("> nextBand\n"));
 
@@ -112,7 +107,7 @@ PCL6Driver::nextBand(BBitmap* bitmap, BPoint* offset)
 		int y = (int)offset->y;
 	
 		PCL6Rasterizer* rasterizer;
-		if (useColorMode()) {
+		if (_UseColorMode()) {
 			#if COLOR_DEPTH == 8
 				rasterizer = new ColorRGBRasterizer(fHalftone);
 			#elif COLOR_DEPTH == 1
@@ -125,14 +120,14 @@ PCL6Driver::nextBand(BBitmap* bitmap, BPoint* offset)
 
 		auto_ptr<Rasterizer> _rasterizer(rasterizer);
 		bool valid = rasterizer->SetBitmap((int)offset->x, (int)offset->y,
-			bitmap, getPageHeight());
+			bitmap, GetPageHeight());
 		
 		if (valid) {
 			rasterizer->InitializeBuffer();
 			
 			// Use compressor to calculate delta row size
 			DeltaRowCompressor* deltaRowCompressor = NULL;
-			if (supportsDeltaRowCompression()) {
+			if (_SupportsDeltaRowCompression()) {
 				deltaRowCompressor = 
 					new DeltaRowCompressor(rasterizer->GetOutRowSize(), 0);
 				if (deltaRowCompressor->InitCheck() != B_OK) {
@@ -166,11 +161,11 @@ PCL6Driver::nextBand(BBitmap* bitmap, BPoint* offset)
 			int outRowSize = rasterizer->GetOutRowSize();
 			int width = rasterizer->GetWidth();
 			int height = rasterizer->GetHeight();
-			writeBitmap(outBuffer, outBufferSize, outRowSize, xPage, yPage,
+			_WriteBitmap(outBuffer, outBufferSize, outRowSize, xPage, yPage,
 				width, height, deltaRowSize);
 		}
 
-		if (y >= getPageHeight()) {
+		if (y >= GetPageHeight()) {
 			offset->x = -1.0;
 			offset->y = -1.0;
 		} else {
@@ -188,7 +183,7 @@ PCL6Driver::nextBand(BBitmap* bitmap, BPoint* offset)
 
 
 void
-PCL6Driver::writeBitmap(const uchar* buffer, int outSize, int rowSize, int x,
+PCL6Driver::_WriteBitmap(const uchar* buffer, int outSize, int rowSize, int x,
 	int y, int width, int height, int deltaRowSize)
 {
 	// choose the best compression method
@@ -196,14 +191,14 @@ PCL6Driver::writeBitmap(const uchar* buffer, int outSize, int rowSize, int x,
 	int dataSize = outSize;
 
 #if ENABLE_DELTA_ROW_COMPRESSION
-	if (supportsDeltaRowCompression() && deltaRowSize < dataSize) {
+	if (_SupportsDeltaRowCompression() && deltaRowSize < dataSize) {
 		compressionMethod = PCL6Writer::kDeltaRowCompression;
 		dataSize = deltaRowSize;
 	}
 #endif
 
 #if ENABLE_RLE_COMPRESSION
-	if (supportsRLECompression()) {
+	if (_SupportsRLECompression()) {
 		int rleSize = pack_bits_size(buffer, outSize);
 		if (rleSize < dataSize) {
 			compressionMethod = PCL6Writer::kRLECompression;
@@ -213,14 +208,14 @@ PCL6Driver::writeBitmap(const uchar* buffer, int outSize, int rowSize, int x,
 #endif
 	
 	// write bitmap
-	move(x, y);
+	_Move(x, y);
 	
-	startRasterGraphics(x, y, width, height, compressionMethod);
+	_StartRasterGraphics(x, y, width, height, compressionMethod);
 
-	rasterGraphics(buffer, outSize, dataSize, rowSize, height,
+	_RasterGraphics(buffer, outSize, dataSize, rowSize, height,
 		compressionMethod);
 
-	endRasterGraphics();
+	_EndRasterGraphics();
 	
 #if DISPLAY_COMPRESSION_STATISTICS
 	fprintf(stderr, "Out Size       %d %2.2f\n", (int)outSize, 100.0);
@@ -239,15 +234,15 @@ PCL6Driver::writeBitmap(const uchar* buffer, int outSize, int rowSize, int x,
 
 
 void
-PCL6Driver::jobStart()
+PCL6Driver::_JobStart()
 {
 	// PCL6 begin
 	fWriter = new PCL6Writer(this);
 	PCL6Writer::ProtocolClass pc =
-		(PCL6Writer::ProtocolClass)getProtocolClass();
-	fWriter->PJLHeader(pc, getJobData()->getXres(),
-		"Copyright (c) 2003, 2004 Haiku");
-	fWriter->BeginSession(getJobData()->getXres(), getJobData()->getYres(),
+		(PCL6Writer::ProtocolClass)GetProtocolClass();
+	fWriter->PJLHeader(pc, GetJobData()->getXres(),
+		"Copyright (c) 2003 - 2010 Haiku");
+	fWriter->BeginSession(GetJobData()->getXres(), GetJobData()->getYres(),
 		PCL6Writer::kInch, PCL6Writer::kBackChAndErrPage);
 	fWriter->OpenDataSource();
 	fMediaSide = PCL6Writer::kFrontMediaSide;
@@ -255,20 +250,20 @@ PCL6Driver::jobStart()
 
 
 bool
-PCL6Driver::startPage(int)
+PCL6Driver::StartPage(int)
 {
 	PCL6Writer::Orientation orientation = PCL6Writer::kPortrait;
-	if (getJobData()->getOrientation() == JobData::kLandscape) {
+	if (GetJobData()->getOrientation() == JobData::kLandscape) {
 		orientation = PCL6Writer::kLandscape;
 	}
 	
 	PCL6Writer::MediaSize mediaSize = 
-		PCL6Driver::mediaSize(getJobData()->getPaper());
+		_MediaSize(GetJobData()->getPaper());
 	PCL6Writer::MediaSource mediaSource = 
-		PCL6Driver::mediaSource(getJobData()->getPaperSource());
-	if (getJobData()->getPrintStyle() == JobData::kSimplex) {
+		_MediaSource(GetJobData()->getPaperSource());
+	if (GetJobData()->getPrintStyle() == JobData::kSimplex) {
 		fWriter->BeginPage(orientation, mediaSize, mediaSource);
-	} else if (getJobData()->getPrintStyle() == JobData::kDuplex) {
+	} else if (GetJobData()->getPrintStyle() == JobData::kDuplex) {
 		// TODO move duplex binding option to UI
 		fWriter->BeginPage(orientation, mediaSize, mediaSource, 
 			PCL6Writer::kDuplexVerticalBinding, fMediaSide);
@@ -281,10 +276,10 @@ PCL6Driver::startPage(int)
 		return false;
 	
 	// PageOrigin from Windows NT printer driver
-	int x = 142 * getJobData()->getXres() / 600;
-	int y = 100 * getJobData()->getYres() / 600;
+	int x = 142 * GetJobData()->getXres() / 600;
+	int y = 100 * GetJobData()->getYres() / 600;
 	fWriter->SetPageOrigin(x, y);
-	fWriter->SetColorSpace(useColorMode() ? PCL6Writer::kRGB 
+	fWriter->SetColorSpace(_UseColorMode() ? PCL6Writer::kRGB
 		: PCL6Writer::kGray);
 	fWriter->SetPaintTxMode(PCL6Writer::kOpaque);
 	fWriter->SetSourceTxMode(PCL6Writer::kOpaque);
@@ -294,11 +289,11 @@ PCL6Driver::startPage(int)
 
 
 void
-PCL6Driver::startRasterGraphics(int x, int y, int width, int height,
+PCL6Driver::_StartRasterGraphics(int x, int y, int width, int height,
 	PCL6Writer::Compression compressionMethod)
 {
 	PCL6Writer::ColorDepth colorDepth;
-	if (useColorMode()) {
+	if (_UseColorMode()) {
 		#if COLOR_DEPTH == 8
 			colorDepth = PCL6Writer::k8Bit;
 		#elif COLOR_DEPTH == 1
@@ -316,14 +311,14 @@ PCL6Driver::startRasterGraphics(int x, int y, int width, int height,
 
 
 void
-PCL6Driver::endRasterGraphics()
+PCL6Driver::_EndRasterGraphics()
 {
 	fWriter->EndImage();
 }
 
 
 void
-PCL6Driver::rasterGraphics(const uchar* buffer, int bufferSize, int dataSize,
+PCL6Driver::_RasterGraphics(const uchar* buffer, int bufferSize, int dataSize,
 	int rowSize, int height, int compressionMethod)
 {
 	// write bitmap byte size
@@ -365,10 +360,10 @@ PCL6Driver::rasterGraphics(const uchar* buffer, int bufferSize, int dataSize,
 
 
 bool
-PCL6Driver::endPage(int)
+PCL6Driver::EndPage(int)
 {
 	try {
-		fWriter->EndPage(getJobData()->getCopies());
+		fWriter->EndPage(GetJobData()->getCopies());
 		return true;
 	}
 	catch (TransportException& err) {
@@ -378,7 +373,7 @@ PCL6Driver::endPage(int)
 
 
 void
-PCL6Driver::jobEnd()
+PCL6Driver::_JobEnd()
 {
 	fWriter->CloseDataSource();
 	fWriter->EndSession();
@@ -390,36 +385,36 @@ PCL6Driver::jobEnd()
 
 
 void
-PCL6Driver::move(int x, int y)
+PCL6Driver::_Move(int x, int y)
 {
 	fWriter->SetCursor(x, y);
 }
 
 
 bool
-PCL6Driver::supportsRLECompression()
+PCL6Driver::_SupportsRLECompression()
 {
-	return getJobData()->getColor() != JobData::kColorCompressionDisabled;
+	return GetJobData()->getColor() != JobData::kColorCompressionDisabled;
 }
 
 
 bool
-PCL6Driver::supportsDeltaRowCompression()
+PCL6Driver::_SupportsDeltaRowCompression()
 {
-	return getProtocolClass() >= PCL6Writer::kProtocolClass2_1
-		&& getJobData()->getColor() != JobData::kColorCompressionDisabled;
+	return GetProtocolClass() >= PCL6Writer::kProtocolClass2_1
+		&& GetJobData()->getColor() != JobData::kColorCompressionDisabled;
 }
 
 
 bool
-PCL6Driver::useColorMode()
+PCL6Driver::_UseColorMode()
 {
-	return getJobData()->getColor() != JobData::kMonochrome;
+	return GetJobData()->getColor() != JobData::kMonochrome;
 }
 
 
 PCL6Writer::MediaSize
-PCL6Driver::mediaSize(JobData::Paper paper)
+PCL6Driver::_MediaSize(JobData::Paper paper)
 {
 	switch (paper) {
 		case JobData::kLetter:
@@ -466,7 +461,7 @@ PCL6Driver::mediaSize(JobData::Paper paper)
 
 
 PCL6Writer::MediaSource
-PCL6Driver::mediaSource(JobData::PaperSource source)
+PCL6Driver::_MediaSource(JobData::PaperSource source)
 {
 	switch (source) {
 		case JobData::kAuto:

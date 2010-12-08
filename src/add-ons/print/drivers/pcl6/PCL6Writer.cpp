@@ -46,7 +46,7 @@ void
 PCL6Writer::Flush()
 {
 	if (fIndex > 0) {
-		fStream->write(fBuffer, fIndex);
+		fStream->Write(fBuffer, fIndex);
 		fIndex = 0;
 	}
 }

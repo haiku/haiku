@@ -18,35 +18,35 @@ class Halftone;
 class PCL6Driver : public GraphicsDriver, public PCL6WriterStream
 {
 public:
-					PCL6Driver(BMessage* msg, PrinterData* printer_data,
-						const PrinterCap* printer_cap);
+					PCL6Driver(BMessage* message, PrinterData* printerData,
+						const PrinterCap* printerCap);
 
-			void	write(const uint8* data, uint32 size);
+			void	Write(const uint8* data, uint32 size);
 
 protected:
-	virtual	bool	startDoc();
-	virtual	bool	startPage(int page);
-	virtual	bool	nextBand(BBitmap* bitmap, BPoint* offset);
-	virtual	bool	endPage(int page);
-	virtual	bool	endDoc(bool success);
+	virtual	bool	StartDocument();
+	virtual	bool	StartPage(int page);
+	virtual	bool	NextBand(BBitmap* bitmap, BPoint* offset);
+	virtual	bool	EndPage(int page);
+	virtual	bool	EndDocument(bool success);
 
 private:
-			bool	supportsRLECompression();
-			bool	supportsDeltaRowCompression();
-			bool	useColorMode();
-			PCL6Writer::MediaSize mediaSize(JobData::Paper paper);
-			PCL6Writer::MediaSource	mediaSource(JobData::PaperSource source);
-			void	move(int x, int y);
-			void	jobStart();
-			void	writeBitmap(const uchar* buffer, int outSize, int rowSize,
+			bool	_SupportsRLECompression();
+			bool	_SupportsDeltaRowCompression();
+			bool	_UseColorMode();
+			PCL6Writer::MediaSize _MediaSize(JobData::Paper paper);
+			PCL6Writer::MediaSource	_MediaSource(JobData::PaperSource source);
+			void	_Move(int x, int y);
+			void	_JobStart();
+			void	_WriteBitmap(const uchar* buffer, int outSize, int rowSize,
 						int x, int y, int width, int height, int deltaRowSize);
-			void	startRasterGraphics(int x, int y, int width, int height,
+			void	_StartRasterGraphics(int x, int y, int width, int height,
 						PCL6Writer::Compression compressionMethod);
-			void	endRasterGraphics();
-			void	rasterGraphics(const uchar* buffer, int bufferSize,
+			void	_EndRasterGraphics();
+			void	_RasterGraphics(const uchar* buffer, int bufferSize,
 						int dataSize, int rowSize, int height,
 						int compression_method);
-			void	jobEnd();
+			void	_JobEnd();
 
 			PCL6Writer*	fWriter;
 			PCL6Writer::MediaSide fMediaSide; // side if in duplex mode
