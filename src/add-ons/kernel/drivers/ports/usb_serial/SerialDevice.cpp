@@ -5,6 +5,8 @@
  * Copyright (c) 2003 by Siarzhuk Zharski <imker@gmx.li>
  * Distributed under the terms of the MIT License.
  */
+#include <new>
+
 #include "SerialDevice.h"
 #include "USB3.h"
 
@@ -637,7 +639,7 @@ SerialDevice::MakeDevice(usb_device device, uint16 vendorID,
 			if (!description)
 				break;
 
-			return new ProlificDevice(device, vendorID, productID, description);
+			return new(std::nothrow) ProlificDevice(device, vendorID, productID, description);
 		}
 
 		case VENDOR_FTDI:
@@ -650,7 +652,7 @@ SerialDevice::MakeDevice(usb_device device, uint16 vendorID,
 			if (!description)
 				break;
 
-			return new FTDIDevice(device, vendorID, productID, description);
+			return new(std::nothrow) FTDIDevice(device, vendorID, productID, description);
 		}
 
 		case VENDOR_PALM:
@@ -664,9 +666,9 @@ SerialDevice::MakeDevice(usb_device device, uint16 vendorID,
 			if (!description)
 				break;
 
-			return new KLSIDevice(device, vendorID, productID, description);
+			return new(std::nothrow) KLSIDevice(device, vendorID, productID, description);
 		}
 	}
 
-	return new ACMDevice(device, vendorID, productID, "CDC ACM compatible device");
+	return new(std::nothrow) ACMDevice(device, vendorID, productID, "CDC ACM compatible device");
 }

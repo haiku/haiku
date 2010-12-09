@@ -90,15 +90,6 @@ void		uninit_driver();
 bool		usb_serial_service(struct tty *tty, uint32 op, void *buffer,
 				size_t length);
 
-status_t	usb_serial_open(const char *name, uint32 flags, void **cookie);
-status_t	usb_serial_read(void *cookie, off_t position, void *buffer, size_t *numBytes);
-status_t	usb_serial_write(void *cookie, off_t position, const void *buffer, size_t *numBytes);
-status_t	usb_serial_control(void *cookie, uint32 op, void *arg, size_t length);
-status_t	usb_serial_select(void *cookie, uint8 event, uint32 ref, selectsync *sync);
-status_t	usb_serial_deselect(void *coookie, uint8 event, selectsync *sync);
-status_t	usb_serial_close(void *cookie);
-status_t	usb_serial_free(void *cookie);
-
 const char **publish_devices();
 device_hooks *find_device(const char *name);
 }

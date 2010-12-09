@@ -10,7 +10,7 @@
 
 void load_settings();
 void create_log_file();
-void usb_serial_trace(bool force, char *format, ...);
+void usb_serial_trace(bool force, const char *format, ...);
 
 #define TRACE_ALWAYS(x...) usb_serial_trace(true, x);
 #define TRACE(x...) usb_serial_trace(false, x);
