@@ -55,7 +55,9 @@ const static settings_template kNetworkTemplate[] = {
 	{B_STRING_TYPE, "name", NULL, true},
 	{B_STRING_TYPE, "mac", NULL},
 	{B_STRING_TYPE, "password", NULL},
-	// TODO: possibility to specify encryption modes
+	{B_STRING_TYPE, "authentication", NULL},
+	{B_STRING_TYPE, "cipher", NULL},
+	{B_STRING_TYPE, "key", NULL},
 	{0, NULL, NULL}
 };
 

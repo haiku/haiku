@@ -29,6 +29,7 @@
 #include <Deskbar.h>
 #include <Directory.h>
 #include <Entry.h>
+#include <NetworkDevice.h>
 #include <NetworkInterface.h>
 #include <NetworkRoster.h>
 #include <Path.h>
@@ -38,9 +39,15 @@
 #include <TextView.h>
 #include <FindDirectory.h>
 
+#include <AutoDeleter.h>
+
 #include "AutoconfigLooper.h"
 #include "Services.h"
 #include "Settings.h"
+
+extern "C" {
+#	include <net80211/ieee80211_ioctl.h>
+}
 
 
 typedef std::map<std::string, AutoconfigLooper*> LooperMap;
@@ -106,6 +113,52 @@ static const address_family kFamilies[] = {
 	},
 	{ -1, NULL, {NULL} }
 };
+
+
+// #pragma mark - private functions
+
+
+static status_t
+set_80211(const char* name, int32 type, void* data,
+	int32 length = 0, int32 value = 0)
+{
+	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
+	if (socket < 0)
+		return errno;
+
+	FileDescriptorCloser closer(socket);
+
+	struct ieee80211req ireq;
+	strlcpy(ireq.i_name, name, IF_NAMESIZE);
+	ireq.i_type = type;
+	ireq.i_val = value;
+	ireq.i_len = length;
+	ireq.i_data = data;
+
+	if (ioctl(socket, SIOCS80211, &ireq, sizeof(struct ieee80211req)) < 0)
+		return errno;
+
+	return B_OK;
+}
+
+
+static int32
+translate_wep_key(const char*& buffer, char* key)
+{
+	memset(key, 0, IEEE80211_KEYBUF_SIZE);
+
+	// TODO: support possibility to set them all
+	if (buffer[0] != '\0') {
+		int32 length = strlcpy(key, buffer, IEEE80211_KEYBUF_SIZE);
+		buffer += length;
+		return length;
+	}
+
+	return 0;
+}
+
+
+// #pragma mark - exported functions
 
 
 int
@@ -766,6 +819,10 @@ NetServer::_HandleDeviceMonitor(BMessage* message)
 status_t
 NetServer::_JoinNetwork(const BMessage& message, const char* name)
 {
+	const char* deviceName;
+	if (message.FindString("device", &deviceName) != B_OK)
+		return B_BAD_VALUE;
+
 	BNetworkAddress address;
 	message.FindFlat("address", &address);
 
@@ -781,10 +838,10 @@ NetServer::_JoinNetwork(const BMessage& message, const char* name)
 
 	bool found = false;
 	uint32 cookie = 0;
-	BMessage network;
-	while (fSettings.GetNextNetwork(cookie, network) == B_OK) {
+	BMessage networkMessage;
+	while (fSettings.GetNextNetwork(cookie, networkMessage) == B_OK) {
 		const char* networkName;
-		if (network.FindString("name", &networkName) == B_OK
+		if (networkMessage.FindString("name", &networkName) == B_OK
 			&& name != NULL && address.Family() != AF_LINK
 			&& !strcmp(name, networkName)) {
 			found = true;
@@ -792,7 +849,7 @@ NetServer::_JoinNetwork(const BMessage& message, const char* name)
 		}
 
 		const char* mac;
-		if (network.FindString("mac", &mac) == B_OK
+		if (networkMessage.FindString("mac", &mac) == B_OK
 			&& address.Family() == AF_LINK) {
 			BNetworkAddress link(AF_LINK, mac);
 			if (link == address) {
@@ -804,10 +861,101 @@ NetServer::_JoinNetwork(const BMessage& message, const char* name)
 
 	const char* password;
 	if (message.FindString("password", &password) != B_OK && found)
-		password = network.FindString("password");
+		password = networkMessage.FindString("password");
+
+	// Get network
+	BNetworkDevice device(deviceName);
+	wireless_network network;
+	if ((address.Family() != AF_LINK
+			|| device.GetNetwork(address, network) != B_OK)
+		&& device.GetNetwork(name, network) != B_OK) {
+		// We did not find a network - just ignore that, and continue
+		// with some defaults
+		strlcpy(network.name, name, sizeof(network.name));
+		network.address = address;
+		network.authentication_mode = B_NETWORK_AUTHENTICATION_NONE;
+		network.cipher = 0;
+		network.group_cipher = 0;
+		network.key_mode = 0;
+	}
+
+	const char* string;
+	if (message.FindString("authentication", &string) == B_OK
+		|| (found && networkMessage.FindString("authentication", &string)
+				== B_OK)) {
+		if (!strcasecmp(string, "wpa2")) {
+			network.authentication_mode = B_NETWORK_AUTHENTICATION_WPA2;
+			network.key_mode = B_KEY_MODE_IEEE802_1X;
+			network.cipher = network.group_cipher = B_NETWORK_CIPHER_CCMP;
+		} else if (!strcasecmp(string, "wpa")) {
+			network.authentication_mode = B_NETWORK_AUTHENTICATION_WPA;
+			network.key_mode = B_KEY_MODE_IEEE802_1X;
+			network.cipher = network.group_cipher = B_NETWORK_CIPHER_TKIP;
+		} else if (!strcasecmp(string, "wep")) {
+			network.authentication_mode = B_NETWORK_AUTHENTICATION_WEP;
+			network.key_mode = B_KEY_MODE_NONE;
+			network.cipher = network.group_cipher = B_NETWORK_CIPHER_WEP_40;
+		} else if (strcasecmp(string, "none") && strcasecmp(string, "open"))
+			fprintf(stderr, "%s: invalid authentication mode.\n", name);
+	}
 
 	// TODO: if password is still NULL, ask password manager once we have one
-	// TODO: join for real!
+	// TODO: remove the clear text settings password once we have
+
+	if (password == NULL
+		&& network.authentication_mode > B_NETWORK_AUTHENTICATION_NONE)
+		return B_NOT_ALLOWED;
+
+	// Join the specified network with the specified authentication method
+
+	if (network.authentication_mode < B_NETWORK_AUTHENTICATION_WPA) {
+		// we join the network ourselves
+		status_t status = set_80211(deviceName, IEEE80211_IOC_SSID,
+			network.name, strlen(network.name));
+		if (status != B_OK) {
+			fprintf(stderr, "%s: joining SSID failed: %s\n", name,
+				strerror(status));
+			return status;
+		}
+
+		if (network.authentication_mode == B_NETWORK_AUTHENTICATION_WEP) {
+			status = set_80211(deviceName, IEEE80211_IOC_WEP, NULL, 0,
+				IEEE80211_WEP_ON);
+			if (status != B_OK) {
+				fprintf(stderr, "%s: turning on WEP failed: %s\n", name,
+					strerror(status));
+				return status;
+			}
+
+			const char* buffer = password;
+
+			// set key
+			for (int32 i = 0; i < 4; i++) {
+				char key[IEEE80211_KEYBUF_SIZE];
+				int32 keyLength = translate_wep_key(buffer, key);
+				status = set_80211(deviceName, IEEE80211_IOC_WEPKEY, key,
+					keyLength);
+				if (status != B_OK)
+					break;
+			}
+
+			if (status == B_OK) {
+				status = set_80211(deviceName, IEEE80211_IOC_WEPKEY, NULL, 0,
+					0);
+			}
+
+			if (status != B_OK) {
+				fprintf(stderr, "%s: setting WEP keys failed: %s\n", name,
+					strerror(status));
+				return status;
+			}
+		}
+
+		return B_OK;
+	}
+
+	// TODO: join via wpa_supplicant
+
 	return B_ERROR;
 }
 
