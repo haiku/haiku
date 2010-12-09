@@ -142,6 +142,9 @@ public:
 								operator sockaddr&();
 
 private:
+			status_t			_ParseLinkAddress(const char* address);
+
+private:
 			sockaddr_storage	fAddress;
 			status_t			fStatus;
 };

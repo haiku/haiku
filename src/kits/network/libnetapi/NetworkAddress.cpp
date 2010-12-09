@@ -10,10 +10,24 @@
 #include <NetworkRoster.h>
 
 #include <arpa/inet.h>
+#include <ctype.h>
 #include <errno.h>
 #include <netinet/in.h>
 #include <stdio.h>
 #include <sys/sockio.h>
+
+
+static uint8
+from_hex(char hex)
+{
+	if (isdigit(hex))
+		return hex - '0';
+
+	return tolower(hex) - 'a' + 10;
+}
+
+
+// #pragma mark -
 
 
 BNetworkAddress::BNetworkAddress()
@@ -163,6 +177,12 @@ BNetworkAddress::SetTo(const char* host, const char* service, uint32 flags)
 status_t
 BNetworkAddress::SetTo(int family, const char* host, uint16 port, uint32 flags)
 {
+	if (family == AF_LINK) {
+		if (port != 0)
+			return B_BAD_VALUE;
+		return _ParseLinkAddress(host);
+	}
+
 	BNetworkAddressResolver resolver;
 	status_t status = resolver.SetTo(family, host, port, flags);
 	if (status != B_OK)
@@ -177,6 +197,12 @@ status_t
 BNetworkAddress::SetTo(int family, const char* host, const char* service,
 	uint32 flags)
 {
+	if (family == AF_LINK) {
+		if (service != NULL)
+			return B_BAD_VALUE;
+		return _ParseLinkAddress(host);
+	}
+
 	BNetworkAddressResolver resolver;
 	status_t status = resolver.SetTo(family, host, service, flags);
 	if (status != B_OK)
@@ -1135,4 +1161,32 @@ BNetworkAddress::operator sockaddr&()
 BNetworkAddress::operator const sockaddr&()
 {
 	return (sockaddr&)fAddress;
+}
+
+
+// #pragma mark - private
+
+
+status_t
+BNetworkAddress::_ParseLinkAddress(const char* address)
+{
+	uint8 linkAddress[128];
+	uint32 length = 0;
+	while (length < sizeof(linkAddress)) {
+		if (!isxdigit(address[0]) || !isxdigit(address[1]))
+			return B_BAD_VALUE;
+
+		linkAddress[length++] = (from_hex(address[0]) << 4)
+			| from_hex(address[1]);
+
+		if (address[2] == '\0')
+			break;
+		if (address[2] != ':')
+			return B_BAD_VALUE;
+
+		address += 3;
+	}
+
+	SetToLinkLevel(linkAddress, length);
+	return B_OK;
 }
