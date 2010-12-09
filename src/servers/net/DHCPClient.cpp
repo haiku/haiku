@@ -469,7 +469,7 @@ DHCPClient::_Negotiate(dhcp_state state)
 	BNetworkAddress local;
 	local.SetToWildcard(AF_INET, DHCP_CLIENT_PORT);
 
-	// Enable reusing the port . This is needed in case there is more
+	// Enable reusing the port. This is needed in case there is more
 	// than 1 interface that needs to be configured. Note that the only reason
 	// this works is because there is code below to bind to a specific
 	// interface.
