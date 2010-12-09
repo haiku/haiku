@@ -31,7 +31,9 @@ tty_module_info *gTTYModule = NULL;
 #else
 tty_module_info_v1_bone *gTTYModule = NULL;
 #endif
+#ifdef __BEOS__
 struct ddomain gSerialDomain;
+#endif
 sem_id gDriverLock = -1;
 bool gHandleISA = false;
 
@@ -297,10 +299,10 @@ scan_bus(bus_type bus)
 	while ((gConfigManagerModule->get_next_device_info(bus, 
 		&cookie, &big_info.di, sizeof(big_info)) == B_OK)) {
 		// skip disabled devices
-		if (dinfo.flags & B_DEVICE_INFO_ENABLED == 0)
+		if ((dinfo.flags & B_DEVICE_INFO_ENABLED) == 0)
 			continue;
 		// skip non configured devices
-		if (dinfo.flags & B_DEVICE_INFO_CONFIGURED == 0)
+		if ((dinfo.flags & B_DEVICE_INFO_CONFIGURED) == 0)
 			continue;
 		// and devices in error
 		if (dinfo.config_status < B_OK)
@@ -467,8 +469,12 @@ next_split:
 			TRACE_ALWAYS("inserting device at io 0x%04lx as %s\n", ioport, 
 				supported->name);
 
-			
+
+#ifdef __HAIKU__
+			device = new(std::nothrow) SerialDevice(supported, ioport, irq, master);
+#else
 			device = new SerialDevice(supported, ioport, irq, master);
+#endif
 			if (pc_serial_insert_device(device) < B_OK) {
 				TRACE_ALWAYS("can't insert device\n");
 				continue;
@@ -504,7 +510,7 @@ scan_pci_alt()
 	// probe PCI devices
 	for (ix = 0; (*gPCIModule->get_nth_pci_info)(ix, &info) == B_OK; ix++) {
 		// sanity check
-		if (info.header_type & PCI_header_type_mask != PCI_header_type_generic)
+		if ((info.header_type & PCI_header_type_mask) != PCI_header_type_generic)
 			continue;
 		/*
 		TRACE_ALWAYS("probing PCI device %2d [%x|%x|%x] %04x:%04x\n",
@@ -614,7 +620,11 @@ next_split_alt:
 
 			
 /**/
+#ifdef __HAIKU__
+			device = new(std::nothrow) SerialDevice(supported, ioport, irq, master);
+#else
 			device = new SerialDevice(supported, ioport, irq, master);
+#endif
 			if (pc_serial_insert_device(device) < B_OK) {
 				TRACE_ALWAYS("can't insert device\n");
 				continue;
@@ -732,9 +742,10 @@ init_driver()
 
 	status = ENOENT;
 
+#ifdef __BEOS__
 	memset(&gSerialDomain, 0, sizeof(gSerialDomain));
 	ddbackground(&gSerialDomain);
-
+#endif
 
 	scan_bus(B_ISA_BUS);
 	//scan_bus(B_PCI_BUS);
@@ -797,6 +808,26 @@ uninit_driver()
 }
 
 
+#ifdef __HAIKU__
+bool
+pc_serial_service(struct tty *tty, uint32 op, void *buffer, size_t length)
+{
+	TRACE_FUNCALLS("> pc_serial_service(%p, 0x%08lx, %p, %lu)\n", tty,
+		op, buffer, length);
+
+
+	for (int32 i = 0; i < DEVICES_COUNT; i++) {
+		if (gSerialDevices[i]
+			&& gSerialDevices[i]->Service(tty, op, buffer, length)) {
+			TRACE_FUNCRET("< pc_serial_service() returns: true\n");
+			return true;
+		}
+	}
+
+	TRACE_FUNCRET("< pc_serial_service() returns: false\n");
+	return false;
+}
+#else /* __HAIKU__ */
 bool
 pc_serial_service(struct tty *ptty, struct ddrover *ddr, uint flags)
 {
@@ -812,6 +843,7 @@ pc_serial_service(struct tty *ptty, struct ddrover *ddr, uint flags)
 	TRACE_FUNCRET("< pc_serial_service() returns: false\n");
 	return false;
 }
+#endif /* __HAIKU__ */
 
 
 int32

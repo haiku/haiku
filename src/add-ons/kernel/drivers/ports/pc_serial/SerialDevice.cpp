@@ -38,12 +38,19 @@ SerialDevice::SerialDevice(const struct serial_support_descriptor *device,
 		fDoneWrite(-1),
 		fControlOut(0),
 		fInputStopped(false),
+#ifdef __HAIKU__
+		fMasterTTY(NULL),
+		fSlaveTTY(NULL),
+		fTTYCookie(NULL),
+#endif /* __HAIKU__ */
 		fDeviceThread(-1),
 		fStopDeviceThread(false)
 {
+#ifdef __BEOS__
 	memset(&fTTYFile, 0, sizeof(ttyfile));
 	memset(&fTTY, 0, sizeof(tty));
 	memset(&fRover, 0, sizeof(ddrover));
+#endif /* __BEOS__ */
 }
 
 
@@ -87,21 +94,30 @@ SerialDevice::Init()
 }
 
 
+#ifdef __BEOS__
 void
 SerialDevice::SetModes()
 {
 	struct termios tios;
 	memcpy(&tios, &fTTY.t, sizeof(struct termios));
-	//TRACE_FUNCRES(trace_termios, &tios);
+	SetModes(&tios);
+}
+#endif /* __BEOS__ */
+
+
+void
+SerialDevice::SetModes(struct termios *tios)
+{
+	//TRACE_FUNCRES(trace_termios, tios);
 	spin(10000);
-	uint32 baudIndex = tios.c_cflag & CBAUD;
+	uint32 baudIndex = tios->c_cflag & CBAUD;
 	if (baudIndex > BLAST)
 		baudIndex = BLAST;
 
 	uint8 lcr = 0;
 	uint16 divisor = SupportDescriptor()->bauds[baudIndex];
 
-	switch (tios.c_cflag & CSIZE) {
+	switch (tios->c_cflag & CSIZE) {
 #if	CS5 != CS7
 	// in case someday...
 	case CS5:
@@ -120,11 +136,11 @@ SerialDevice::SetModes()
 		break;
 	}
 
-	if (tios.c_cflag & CSTOPB)
+	if (tios->c_cflag & CSTOPB)
 		lcr |= LCR_2STOP;
-	if (tios.c_cflag & PARENB)
+	if (tios->c_cflag & PARENB)
 		lcr |= LCR_P_EN;
-	if (tios.c_cflag & PARODD == 0)
+	if ((tios->c_cflag & PARODD) == 0)
 		lcr |= LCR_P_EVEN;
 
 	if (baudIndex == B0) {
@@ -179,16 +195,16 @@ SerialDevice::SetModes()
 
 	usb_serial_line_coding lineCoding;
 	lineCoding.speed = baudRates[baudIndex];
-	lineCoding.stopbits = (tios.c_cflag & CSTOPB) ? LC_STOP_BIT_2 : LC_STOP_BIT_1;
+	lineCoding.stopbits = (tios->c_cflag & CSTOPB) ? LC_STOP_BIT_2 : LC_STOP_BIT_1;
 
-	if (tios.c_cflag & PARENB) {
+	if (tios->c_cflag & PARENB) {
 		lineCoding.parity = LC_PARITY_EVEN;
-		if (tios.c_cflag & PARODD)
+		if (tios->c_cflag & PARODD)
 			lineCoding.parity = LC_PARITY_ODD;
 	} else
 		lineCoding.parity = LC_PARITY_NONE;
 
-	lineCoding.databits = (tios.c_cflag & CS8) ? 8 : 7;
+	lineCoding.databits = (tios->c_cflag & CS8) ? 8 : 7;
 
 	if (lineCoding.speed == 0) {
 		newControl &= 0xfffffffe;
@@ -216,6 +232,127 @@ SerialDevice::SetModes()
 }
 
 
+#ifdef __HAIKU__
+
+
+bool
+SerialDevice::Service(struct tty *tty, uint32 op, void *buffer, size_t length)
+{
+	uint8 msr;
+	status_t err;
+
+	if (tty != fMasterTTY)
+		return false;
+
+	TRACE("%s(,0x%08lx,,%d)\n", __FUNCTION__, op, length);
+
+	switch (op) {
+		case TTYENABLE:
+		{
+			bool enable = *(bool *)buffer;
+			TRACE("TTYENABLE: %sable\n", enable ? "en" : "dis");
+
+			if (enable) {
+				//XXX:must call SetModes();
+				err = install_io_interrupt_handler(IRQ(), pc_serial_interrupt, this, 0);
+				TRACE("installing irq handler for %d: %s\n", IRQ(), strerror(err));
+			} else {
+				// remove the handler
+				remove_io_interrupt_handler(IRQ(), pc_serial_interrupt, this);
+				// disable IRQ
+				WriteReg8(IER, 0);
+				WriteReg8(MCR, 0);
+			}
+
+			msr = ReadReg8(MSR);
+
+			SignalControlLineState(TTYHWDCD, msr & MSR_DCD);
+			SignalControlLineState(TTYHWCTS, msr & MSR_CTS);
+
+			if (enable) {
+				// 
+				WriteReg8(MCR, MCR_DTR | MCR_RTS | MCR_IRQ_EN /*| MCR_LOOP*//*XXXXXXX*/);
+				// enable irqs
+				WriteReg8(IER, IER_RLS | IER_MS | IER_RDA);
+				//WriteReg8(IER, IER_RDA);
+			}
+
+			return true;
+		}
+
+		case TTYISTOP:
+			fInputStopped = *(bool *)buffer;
+			TRACE("TTYISTOP: %sstopped\n", fInputStopped ? "" : "not ");
+
+			if (fInputStopped)
+				MaskReg8(MCR, MCR_RTS);
+			else
+				OrReg8(MCR, MCR_RTS);
+
+			//gTTYModule->ttyhwsignal(ptty, ddr, TTYHWCTS, false);
+			//SignalControlLineState(TTYHWCTS, !fInputStopped);
+			//msr = ReadReg8(MSR);
+			//SignalControlLineState(TTYHWCTS, msr & MSR_CTS);
+			return true;
+
+		case TTYGETSIGNALS:
+			TRACE("TTYGETSIGNALS\n");
+			msr = ReadReg8(MSR);
+			SignalControlLineState(TTYHWDCD, msr & MSR_DCD);
+			SignalControlLineState(TTYHWCTS, msr & MSR_CTS);
+			SignalControlLineState(TTYHWDSR, msr & MSR_DSR);
+			SignalControlLineState(TTYHWRI, msr & MSR_RI);
+			return true;
+
+		case TTYSETMODES:
+			TRACE("TTYSETMODES\n");
+			SetModes((struct termios *)buffer);
+//WriteReg8(IER, IER_RLS | IER_MS | IER_RDA);
+			return true;
+
+		case TTYSETDTR:
+		case TTYSETRTS:
+		{
+			bool set = *(bool *)buffer;
+			uint8 bit = TTYSETDTR ? MCR_DTR : MCR_RTS;
+			if (set)
+				OrReg8(MCR, bit);
+			else
+				MaskReg8(MCR, bit);
+
+			return true;
+		}
+
+		case TTYOSTART:
+			TRACE("TTYOSTART\n");
+			// enable irqs
+			WriteReg8(IER, IER_RLS | IER_MS | IER_RDA | IER_THRE);
+			return true;
+		case TTYOSYNC:
+			TRACE("TTYOSYNC\n");
+			return (ReadReg8(LSR) & (LSR_THRE | LSR_TSRE)) == (LSR_THRE | LSR_TSRE);
+			return true;
+		case TTYSETBREAK:
+		{
+			bool set = *(bool *)buffer;
+			if (set)
+				OrReg8(MCR, LCR_BREAK);
+			else
+				MaskReg8(MCR, LCR_BREAK);
+
+			return true;
+		}
+		default:
+			return false;
+	}
+
+	return false;
+}
+
+
+#else /* __HAIKU__ */
+
+
 bool
 SerialDevice::Service(struct tty *ptty, struct ddrover *ddr, uint flags)
 {
@@ -227,113 +364,115 @@ SerialDevice::Service(struct tty *ptty, struct ddrover *ddr, uint flags)
 
 	TRACE("%s(,,0x%08lx)\n", __FUNCTION__, flags);
 
-	if (flags <= TTYGETSIGNALS) {
-		switch (flags) {
-			case TTYENABLE:
-				TRACE("TTYENABLE\n");
-				
-				SetModes();
-				err = install_io_interrupt_handler(IRQ(), pc_serial_interrupt, this, 0);
-				TRACE("installing irq handler for %d: %s\n", IRQ(), strerror(err));
-				msr = ReadReg8(MSR);
-				gTTYModule->ttyhwsignal(ptty, ddr, TTYHWDCD, msr & MSR_DCD);
-				gTTYModule->ttyhwsignal(ptty, ddr, TTYHWCTS, msr & MSR_CTS);
-				// 
-				WriteReg8(MCR, MCR_DTR | MCR_RTS | MCR_IRQ_EN /*| MCR_LOOP*//*XXXXXXX*/);
-				// enable irqs
-				WriteReg8(IER, IER_RLS | IER_MS | IER_RDA);
-				//WriteReg8(IER, IER_RDA);
-				break;
+	switch (flags) {
+		case TTYENABLE:
+			TRACE("TTYENABLE\n");
 
-			case TTYDISABLE:
-				TRACE("TTYDISABLE\n");
-				// remove the handler
-				remove_io_interrupt_handler(IRQ(), pc_serial_interrupt, this);
-				// disable IRQ
-				WriteReg8(IER, 0);
-				WriteReg8(MCR, 0);
-				msr = ReadReg8(MSR);
-				gTTYModule->ttyhwsignal(ptty, ddr, TTYHWDCD, msr & MSR_DCD);
-				break;
+			SetModes();
+			err = install_io_interrupt_handler(IRQ(), pc_serial_interrupt, this, 0);
+			TRACE("installing irq handler for %d: %s\n", IRQ(), strerror(err));
+			msr = ReadReg8(MSR);
+			gTTYModule->ttyhwsignal(ptty, ddr, TTYHWDCD, msr & MSR_DCD);
+			gTTYModule->ttyhwsignal(ptty, ddr, TTYHWCTS, msr & MSR_CTS);
+			// 
+			WriteReg8(MCR, MCR_DTR | MCR_RTS | MCR_IRQ_EN /*| MCR_LOOP*//*XXXXXXX*/);
+			// enable irqs
+			WriteReg8(IER, IER_RLS | IER_MS | IER_RDA);
+			//WriteReg8(IER, IER_RDA);
+			break;
 
-			case TTYISTOP:
-				TRACE("TTYISTOP\n");
-				MaskReg8(MCR, MCR_RTS);
-				//fInputStopped = true;
-				//gTTYModule->ttyhwsignal(ptty, ddr, TTYHWCTS, false);
-				break;
+		case TTYDISABLE:
+			TRACE("TTYDISABLE\n");
+			// remove the handler
+			remove_io_interrupt_handler(IRQ(), pc_serial_interrupt, this);
+			// disable IRQ
+			WriteReg8(IER, 0);
+			WriteReg8(MCR, 0);
+			msr = ReadReg8(MSR);
+			gTTYModule->ttyhwsignal(ptty, ddr, TTYHWDCD, msr & MSR_DCD);
+			break;
 
-			case TTYIRESUME:
-				TRACE("TTYIRESUME\n");
-				OrReg8(MCR, MCR_RTS);
-				//gTTYModule->ttyhwsignal(ptty, ddr, TTYHWCTS, true);
-				//fInputStopped = false;
-				break;
+		case TTYISTOP:
+			TRACE("TTYISTOP\n");
+			MaskReg8(MCR, MCR_RTS);
+			//fInputStopped = true;
+			//gTTYModule->ttyhwsignal(ptty, ddr, TTYHWCTS, false);
+			break;
 
-			case TTYGETSIGNALS:
-				TRACE("TTYGETSIGNALS\n");
-				msr = ReadReg8(MSR);
-				gTTYModule->ttyhwsignal(ptty, ddr, TTYHWDCD, msr & MSR_DCD);
-				gTTYModule->ttyhwsignal(ptty, ddr, TTYHWCTS, msr & MSR_CTS);
-				gTTYModule->ttyhwsignal(ptty, ddr, TTYHWDSR, msr & MSR_DSR);
-				gTTYModule->ttyhwsignal(ptty, ddr, TTYHWRI, msr & MSR_RI);
-				break;
+		case TTYIRESUME:
+			TRACE("TTYIRESUME\n");
+			OrReg8(MCR, MCR_RTS);
+			//gTTYModule->ttyhwsignal(ptty, ddr, TTYHWCTS, true);
+			//fInputStopped = false;
+			break;
 
-			case TTYSETMODES:
-				TRACE("TTYSETMODES\n");
-				SetModes();
+		case TTYGETSIGNALS:
+			TRACE("TTYGETSIGNALS\n");
+			msr = ReadReg8(MSR);
+			gTTYModule->ttyhwsignal(ptty, ddr, TTYHWDCD, msr & MSR_DCD);
+			gTTYModule->ttyhwsignal(ptty, ddr, TTYHWCTS, msr & MSR_CTS);
+			gTTYModule->ttyhwsignal(ptty, ddr, TTYHWDSR, msr & MSR_DSR);
+			gTTYModule->ttyhwsignal(ptty, ddr, TTYHWRI, msr & MSR_RI);
+			break;
+
+		case TTYSETMODES:
+			TRACE("TTYSETMODES\n");
+			SetModes();
 //WriteReg8(IER, IER_RLS | IER_MS | IER_RDA);
-				break;
+			break;
 
-			case TTYOSTART:
-				TRACE("TTYOSTART\n");
-				// enable irqs
-				WriteReg8(IER, IER_RLS | IER_MS | IER_RDA | IER_THRE);
-				break;
-			case TTYOSYNC:
-				TRACE("TTYOSYNC\n");
-				return (ReadReg8(LSR) & (LSR_THRE | LSR_TSRE)) == (LSR_THRE | LSR_TSRE);
-				break;
-			case TTYSETBREAK:
-				TRACE("TTYSETBREAK\n");
-				OrReg8(LCR, LCR_BREAK);
-				break;
-			case TTYCLRBREAK:
-				TRACE("TTYCLRBREAK\n");
-				MaskReg8(LCR, LCR_BREAK);
-				break;
-			case TTYSETDTR:
-				TRACE("TTYSETDTR\n");
-				OrReg8(MCR, MCR_DTR);
-				break;
-			case TTYCLRDTR:
-				TRACE("TTYCLRDTR\n");
-				MaskReg8(MCR, MCR_DTR);
-				break;
-		}
-
-		return true;
+		case TTYOSTART:
+			TRACE("TTYOSTART\n");
+			// enable irqs
+			WriteReg8(IER, IER_RLS | IER_MS | IER_RDA | IER_THRE);
+			break;
+		case TTYOSYNC:
+			TRACE("TTYOSYNC\n");
+			return (ReadReg8(LSR) & (LSR_THRE | LSR_TSRE)) == (LSR_THRE | LSR_TSRE);
+			break;
+		case TTYSETBREAK:
+			TRACE("TTYSETBREAK\n");
+			OrReg8(LCR, LCR_BREAK);
+			break;
+		case TTYCLRBREAK:
+			TRACE("TTYCLRBREAK\n");
+			MaskReg8(LCR, LCR_BREAK);
+			break;
+		case TTYSETDTR:
+			TRACE("TTYSETDTR\n");
+			OrReg8(MCR, MCR_DTR);
+			break;
+		case TTYCLRDTR:
+			TRACE("TTYCLRDTR\n");
+			MaskReg8(MCR, MCR_DTR);
+			break;
+		default:
+			return false;
 	}
 
 	return false;
 }
+#endif /* __HAIKU__ */
 
 
 int32
 SerialDevice::InterruptHandler()
 {
 	int32 ret = B_UNHANDLED_INTERRUPT;
+#ifdef __HAIKU__
+	//XXX: what should we do here ? (certainly not use a mutex !)
+#else /* __HAIKU__ */
 	gTTYModule->ddrstart(&fRover);
 	gTTYModule->ttyilock(&fTTY, &fRover, true);
+#endif /* __HAIKU__ */
 
 	uint8 iir, lsr, msr;
-	int count;
 
 	while (((iir = ReadReg8(IIR)) & IIR_PENDING) == 0) { // 0 means yes
 		int fifoavail = 1;
 		
 		//DEBUG
-//		for (count = 0; ReadReg8(LSR) & LSR_DR; count++)
+//		for (int count = 0; ReadReg8(LSR) & LSR_DR; count++)
 //			gTTYModule->ttyin(&fTTY, &fRover, ReadReg8(RBR));
 
 		switch (iir & (IIR_IMASK | IIR_TO)) {
@@ -341,12 +480,17 @@ SerialDevice::InterruptHandler()
 			TRACE(("IIR_THRE\n"));
 			// check how much fifo we can use
 			//XXX: move to Init() ?
-			if (iir & IIR_FMASK == IIR_FMASK)
+			if ((iir & IIR_FMASK) == IIR_FMASK)
 				fifoavail = 16;
 			if (iir & IIR_F64EN)
 				fifoavail = 64;
 			for (int i = 0; i < fifoavail; i++) {
-				int chr = gTTYModule->ttyout(&fTTY, &fRover);
+				int chr;
+#ifdef __HAIKU__
+				chr = 'H';//XXX: what should we do here ? (certainly not call tty_read() !)
+#else /* __HAIKU__ */
+				chr = gTTYModule->ttyout(&fTTY, &fRover);
+#endif /* __HAIKU__ */
 				if (chr < 0) {
 					//WriteReg8(THB, (uint8)chr);
 					break;
@@ -361,7 +505,11 @@ SerialDevice::InterruptHandler()
 			TRACE(("IIR_TO/RDA\n"));
 			// while data is ready... get it
 			while (ReadReg8(LSR) & LSR_DR)
+#ifdef __HAIKU__
+				ReadReg8(RBR);//XXX: what should we do here ? (certainly not call tty_write() !)
+#else /* __HAIKU__ */
 				gTTYModule->ttyin(&fTTY, &fRover, ReadReg8(RBR));
+#endif /* __HAIKU__ */
 			break;
 		case IIR_RLS:
 			TRACE(("IIR_RLS\n"));
@@ -374,13 +522,13 @@ SerialDevice::InterruptHandler()
 			// modem signals changed
 			msr = ReadReg8(MSR);
 			if (msr & MSR_DDCD)
-				gTTYModule->ttyhwsignal(&fTTY, &fRover, TTYHWDCD, msr & MSR_DCD);
+				SignalControlLineState(TTYHWDCD, msr & MSR_DCD);
 			if (msr & MSR_DCTS)
-				gTTYModule->ttyhwsignal(&fTTY, &fRover, TTYHWCTS, msr & MSR_CTS);
+				SignalControlLineState(TTYHWCTS, msr & MSR_CTS);
 			if (msr & MSR_DDSR)
-				gTTYModule->ttyhwsignal(&fTTY, &fRover, TTYHWDSR, msr & MSR_DSR);
+				SignalControlLineState(TTYHWDSR, msr & MSR_DSR);
 			if (msr & MSR_TERI)
-				gTTYModule->ttyhwsignal(&fTTY, &fRover, TTYHWRI, msr & MSR_RI);
+				SignalControlLineState(TTYHWRI, msr & MSR_RI);
 			break;
 		default:
 			TRACE(("IIR_?\n"));
@@ -392,8 +540,12 @@ SerialDevice::InterruptHandler()
 	}
 
 
+#ifdef __HAIKU__
+	//XXX: what should we do here ? (certainly not use a mutex !)
+#else /* __HAIKU__ */
 	gTTYModule->ttyilock(&fTTY, &fRover, false);
 	gTTYModule->ddrdone(&fRover);
+#endif /* __HAIKU__ */
 	TRACE_FUNCRET("< IRQ:%d\n", ret);
 	return ret;
 }
@@ -402,15 +554,45 @@ SerialDevice::InterruptHandler()
 status_t
 SerialDevice::Open(uint32 flags)
 {
+	status_t status = B_OK;
+
 	if (fDeviceOpen)
 		return B_BUSY;
 
 	if (fDeviceRemoved)
 		return B_DEV_NOT_READY;
 
+#ifdef __HAIKU__
+	fMasterTTY = gTTYModule->tty_create(pc_serial_service, true);
+	if (fMasterTTY == NULL) {
+		TRACE_ALWAYS("open: failed to init master tty\n");
+		return B_NO_MEMORY;
+	}
+
+	fSlaveTTY = gTTYModule->tty_create(NULL, false);
+	if (fSlaveTTY == NULL) {
+		TRACE_ALWAYS("open: failed to init slave tty\n");
+		gTTYModule->tty_destroy(fMasterTTY);
+		return B_NO_MEMORY;
+	}
+
+	fTTYCookie = gTTYModule->tty_create_cookie(fMasterTTY, fSlaveTTY, flags);
+	if (fTTYCookie == NULL) {
+		TRACE_ALWAYS("open: failed to init tty cookie\n");
+		gTTYModule->tty_destroy(fMasterTTY);
+		gTTYModule->tty_destroy(fSlaveTTY);
+		return B_NO_MEMORY;
+	}
+
+	ResetDevice();
+
+#else /* __HAIKU__ */
+
 	gTTYModule->ttyinit(&fTTY, false);
 	fTTYFile.tty = &fTTY;
 	fTTYFile.flags = flags;
+
+
 	ResetDevice();
 
 	struct ddrover *ddr = gTTYModule->ddrstart(NULL);
@@ -418,8 +600,10 @@ SerialDevice::Open(uint32 flags)
 		return B_NO_MEMORY;
 
 	gTTYModule->ddacquire(ddr, &gSerialDomain);
-	status_t status = gTTYModule->ttyopen(&fTTYFile, ddr, pc_serial_service);
+	status = gTTYModule->ttyopen(&fTTYFile, ddr, pc_serial_service);
 	gTTYModule->ddrdone(ddr);
+
+#endif /* __HAIKU__ */
 
 	if (status < B_OK) {
 		TRACE_ALWAYS("open: failed to open tty\n");
@@ -460,30 +644,33 @@ SerialDevice::Read(char *buffer, size_t *numBytes)
 	}
 
 	status_t status;
-#if 0
-	status_t status = mutex_lock(&fReadLock);
+
+#ifdef __HAIKU__
+
+	status = mutex_lock(&fReadLock);
 	if (status != B_OK) {
 		TRACE_ALWAYS("read: failed to get read lock\n");
 		*numBytes = 0;
 		return status;
 	}
-#endif
+
+	status = gTTYModule->tty_read(fTTYCookie, buffer, numBytes);
+
+	mutex_unlock(&fReadLock);
+
+#else /* __HAIKU__ */
 
 	struct ddrover *ddr = gTTYModule->ddrstart(NULL);
 	if (!ddr) {
 		*numBytes = 0;
-#if 0
-		mutex_unlock(&fReadLock);
-#endif
 		return B_NO_MEMORY;
 	}
 
 	status = gTTYModule->ttyread(&fTTYFile, ddr, buffer, numBytes);
 	gTTYModule->ddrdone(ddr);
 
-#if 0
-	mutex_unlock(&fReadLock);
-#endif
+#endif /* __HAIKU__ */
+
 	return status;
 }
 
@@ -491,10 +678,25 @@ SerialDevice::Read(char *buffer, size_t *numBytes)
 status_t
 SerialDevice::Write(const char *buffer, size_t *numBytes)
 {
-	size_t bytesLeft = *numBytes;
+	//size_t bytesLeft = *numBytes;
 	//*numBytes = 0;
 
 	status_t status = EINVAL;
+
+#ifdef __HAIKU__
+
+	status = mutex_lock(&fWriteLock);
+	if (status != B_OK) {
+		TRACE_ALWAYS("write: failed to get write lock\n");
+		return status;
+	}
+
+	//XXX: WTF tty_write() is not for write() hook ?
+	//status = gTTYModule->tty_write(fTTYCookie, buffer, numBytes);
+	mutex_unlock(&fWriteLock);
+
+#else /* __HAIKU__ */
+
 	struct ddrover *ddr = gTTYModule->ddrstart(NULL);
 	if (!ddr) {
 		*numBytes = 0;
@@ -503,6 +705,8 @@ SerialDevice::Write(const char *buffer, size_t *numBytes)
 
 	status = gTTYModule->ttywrite(&fTTYFile, ddr, buffer, numBytes);
 	gTTYModule->ddrdone(ddr);
+
+#endif /* __HAIKU__ */
 
 #if 0
 	status_t status = mutex_lock(&fWriteLock);
@@ -560,15 +764,26 @@ SerialDevice::Write(const char *buffer, size_t *numBytes)
 status_t
 SerialDevice::Control(uint32 op, void *arg, size_t length)
 {
+	status_t status = B_OK;
+
 	if (fDeviceRemoved)
 		return B_DEV_NOT_READY;
+
+#ifdef __HAIKU__
+
+	status = gTTYModule->tty_control(fTTYCookie, op, arg, length);
+
+#else /* __HAIKU__ */
 
 	struct ddrover *ddr = gTTYModule->ddrstart(NULL);
 	if (!ddr)
 		return B_NO_MEMORY;
 
-	status_t status = gTTYModule->ttycontrol(&fTTYFile, ddr, op, arg, length);
+	status = gTTYModule->ttycontrol(&fTTYFile, ddr, op, arg, length);
 	gTTYModule->ddrdone(ddr);
+
+#endif /* __HAIKU__ */
+
 	return status;
 }
 
@@ -579,13 +794,22 @@ SerialDevice::Select(uint8 event, uint32 ref, selectsync *sync)
 	if (fDeviceRemoved)
 		return B_DEV_NOT_READY;
 
+#ifdef __HAIKU__
+
+	return gTTYModule->tty_select(fTTYCookie, event, ref, sync);
+
+#else /* __HAIKU__ */
+
 	struct ddrover *ddr = gTTYModule->ddrstart(NULL);
 	if (!ddr)
 		return B_NO_MEMORY;
 
 	status_t status = gTTYModule->ttyselect(&fTTYFile, ddr, event, ref, sync);
 	gTTYModule->ddrdone(ddr);
+
 	return status;
+
+#endif /* __HAIKU__ */
 }
 
 
@@ -595,19 +819,30 @@ SerialDevice::DeSelect(uint8 event, selectsync *sync)
 	if (fDeviceRemoved)
 		return B_DEV_NOT_READY;
 
+#ifdef __HAIKU__
+
+	return gTTYModule->tty_deselect(fTTYCookie, event, sync);
+
+#else /* __HAIKU__ */
+
 	struct ddrover *ddr = gTTYModule->ddrstart(NULL);
 	if (!ddr)
 		return B_NO_MEMORY;
 
 	status_t status = gTTYModule->ttydeselect(&fTTYFile, ddr, event, sync);
 	gTTYModule->ddrdone(ddr);
+
 	return status;
+
+#endif /* __HAIKU__ */
 }
 
 
 status_t
 SerialDevice::Close()
 {
+	status_t status = B_OK;
+
 	OnClose();
 
 	if (!fDeviceRemoved) {
@@ -618,12 +853,17 @@ SerialDevice::Close()
 #endif
 	}
 
+#ifdef __HAIKU__
+	gTTYModule->tty_destroy_cookie(fTTYCookie);
+#else /* __HAIKU__ */
 	struct ddrover *ddr = gTTYModule->ddrstart(NULL);
 	if (!ddr)
 		return B_NO_MEMORY;
 
-	status_t status = gTTYModule->ttyclose(&fTTYFile, ddr);
+	status = gTTYModule->ttyclose(&fTTYFile, ddr);
 	gTTYModule->ddrdone(ddr);
+
+#endif /* __HAIKU__ */
 
 	fDeviceOpen = false;
 	return status;
@@ -633,12 +873,18 @@ SerialDevice::Close()
 status_t
 SerialDevice::Free()
 {
+	status_t status = B_OK;
+#ifdef __HAIKU__
+	gTTYModule->tty_destroy(fMasterTTY);
+	gTTYModule->tty_destroy(fSlaveTTY);
+#else /* __HAIKU__ */
 	struct ddrover *ddr = gTTYModule->ddrstart(NULL);
 	if (!ddr)
 		return B_NO_MEMORY;
 
-	status_t status = gTTYModule->ttyfree(&fTTYFile, ddr);
+	status = gTTYModule->ttyfree(&fTTYFile, ddr);
 	gTTYModule->ddrdone(ddr);
+#endif /* __HAIKU__ */
 	return status;
 }
 
@@ -661,7 +907,7 @@ SerialDevice::Removed()
 	gUSBModule->cancel_queued_transfers(fControlPipe);
 #endif
 
-	int32 result = B_OK;
+	//int32 result = B_OK;
 	//wait_for_thread(fDeviceThread, &result);
 	fDeviceThread = -1;
 
@@ -696,9 +942,14 @@ SerialDevice::SetLineCoding(usb_serial_line_coding *coding)
 #endif
 
 status_t
-SerialDevice::SetControlLineState(uint16 state)
+SerialDevice::SignalControlLineState(int line, bool enable)
 {
-	// default implementation - does nothing
+#ifdef __HAIKU__
+	gTTYModule->tty_hardware_signal(fTTYCookie, line, enable);
+#else
+	// XXX: only works for interrupt handler, Service func must pass the ddrover
+	gTTYModule->ttyhwsignal(&fTTY, &fRover, line, enable);
+#endif
 	return B_OK;
 }
 
@@ -727,8 +978,8 @@ SerialDevice::OnClose()
 int32
 SerialDevice::DeviceThread(void *data)
 {
-	SerialDevice *device = (SerialDevice *)data;
 #if 0
+	SerialDevice *device = (SerialDevice *)data;
 
 	while (!device->fStopDeviceThread) {
 		status_t status = gUSBModule->queue_bulk(device->fReadPipe,
@@ -868,7 +1119,7 @@ SerialDevice::MakeDevice(usb_device device, uint16 vendorID,
 			if (!description)
 				break;
 
-			return new ProlificDevice(device, vendorID, productID, description);
+			return new(std::nothrow) ProlificDevice(device, vendorID, productID, description);
 		}
 
 		case VENDOR_FTDI:
@@ -881,7 +1132,7 @@ SerialDevice::MakeDevice(usb_device device, uint16 vendorID,
 			if (!description)
 				break;
 
-			return new FTDIDevice(device, vendorID, productID, description);
+			return new(std::nothrow) FTDIDevice(device, vendorID, productID, description);
 		}
 
 		case VENDOR_PALM:
@@ -895,11 +1146,11 @@ SerialDevice::MakeDevice(usb_device device, uint16 vendorID,
 			if (!description)
 				break;
 
-			return new KLSIDevice(device, vendorID, productID, description);
+			return new(std::nothrow) KLSIDevice(device, vendorID, productID, description);
 		}
 	}
 
-	return new ACMDevice(device, vendorID, productID, "CDC ACM compatible device");
+	return new(std::nothrow) ACMDevice(device, vendorID, productID, "CDC ACM compatible device");
 }
 #endif
 

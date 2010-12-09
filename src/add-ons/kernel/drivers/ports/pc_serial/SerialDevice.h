@@ -43,9 +43,17 @@ static	SerialDevice *			MakeDevice(struct serial_config_descriptor
 		char *					WriteBuffer() { return fWriteBuffer; };
 		size_t					WriteBufferSize() { return fWriteBufferSize; };
 
+#ifdef __BEOS__
 		void					SetModes();
+#endif
+		void					SetModes(struct termios *tios);
+#ifdef __HAIKU__
+		bool					Service(struct tty *tty, uint32 op,
+									void *buffer, size_t length);
+#else
 		bool					Service(struct tty *ptty, struct ddrover *ddr,
 									uint flags);
+#endif
 
 		int32					InterruptHandler();
 
@@ -68,10 +76,11 @@ virtual	status_t				AddDevice(const struct serial_config_descriptor *device);
 virtual	status_t				ResetDevice();
 
 //virtual	status_t				SetLineCoding(usb_serial_line_coding *coding);
-virtual	status_t				SetControlLineState(uint16 state);
+//virtual	status_t				SetControlLineState(uint16 state);
+virtual	status_t				SignalControlLineState(int line, bool enable);
 
 virtual	void					OnRead(char **buffer, size_t *numBytes);
-virtual	void					OnWrite(const char *buffer, size_t *numBytes, 
+virtual	void					OnWrite(const char *buffer, size_t *numBytes,
 									size_t *packetBytes);
 virtual	void					OnClose();
 
@@ -138,9 +147,15 @@ static	void					InterruptCallbackFunction(void *cookie,
 
 		uint16					fControlOut;
 		bool					fInputStopped;
+#ifdef __HAIKU__
+		struct tty *			fMasterTTY;
+		struct tty *			fSlaveTTY;
+		struct tty_cookie *		fTTYCookie;
+#else
 		struct ttyfile			fTTYFile;
 		struct tty				fTTY;
 		struct ddrover			fRover;
+#endif
 
 		/* device thread management */
 		thread_id				fDeviceThread;

@@ -22,14 +22,19 @@
 
 #ifdef __HAIKU__
 #include <lock.h>
+#include <new>
 #else
 #include "BeOSCompatibility.h"
-#endif
 #include "kernel_cpp.h"
+#endif
 #include "Tracing.h"
 
 extern "C" {
+#ifdef __HAIKU__
+#include <tty_module.h>
+#else
 #include <ttylayer.h>
+#endif
 }
 
 
@@ -135,7 +140,7 @@ typedef struct pc_serial_line_coding_s {
 
 
 
-#ifndef __HAIKU__
+#ifdef __BEOS__
 
 // All this mess is due to BeOS R5 and BONE having
 // an incompatible module API for the same version
@@ -184,8 +189,7 @@ struct tty_module_info_v1_bone {
 	void	(*ddrdone)(struct ddrover *);
 	void	(*ddacquire)(struct ddrover *, struct ddomain *);
 };
-#endif
-
+#endif /* __BEOS__ */
 
 
 extern config_manager_for_driver_module_info *gConfigManagerModule;
@@ -199,10 +203,16 @@ extern tty_module_info_v1_bone *gTTYModule;
 extern struct ddomain gSerialDomain;
 
 extern "C" {
+
 status_t	init_hardware();
 void		uninit_driver();
 
+#ifdef __BEOS__
 bool		pc_serial_service(struct tty *ptty, struct ddrover *ddr, uint flags);
+#else
+bool		pc_serial_service(struct tty *tty, uint32 op, void *buffer,
+				size_t length);
+#endif /* __BEOS__ */
 int32		pc_serial_interrupt(void *arg);
 
 status_t	pc_serial_open(const char *name, uint32 flags, void **cookie);
@@ -216,6 +226,7 @@ status_t	pc_serial_free(void *cookie);
 
 const char **publish_devices();
 device_hooks *find_device(const char *name);
+
 }
 
 

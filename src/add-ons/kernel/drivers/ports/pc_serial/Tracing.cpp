@@ -69,7 +69,7 @@ create_log_file()
 
 
 void
-usb_serial_trace(bool force, char *format, ...)
+usb_serial_trace(bool force, const char *format, ...)
 {
 	if (!gLogEnabled && !force)
 		return;
@@ -99,15 +99,6 @@ usb_serial_trace(bool force, char *format, ...)
 
 
 void
-trace_ddomain(struct ddomain *dd)
-{
-	TRACE("struct ddomain:\n"
-		"\tddrover: 0x%08x\n"
-		"\tbg: %d, locked: %d\n", dd->r, dd->bg, dd->locked);
-}
-
-
-void
 trace_termios(struct termios *tios)
 {
 	TRACE("struct termios:\n"
@@ -125,6 +116,18 @@ trace_termios(struct termios *tios)
 		tios->c_cc[0], tios->c_cc[1], tios->c_cc[2], tios->c_cc[3], 
 		tios->c_cc[4], tios->c_cc[5], tios->c_cc[6], tios->c_cc[7], 
 		tios->c_cc[8], tios->c_cc[9], tios->c_cc[10]);
+}
+
+
+#ifdef __BEOS__
+
+
+void
+trace_ddomain(struct ddomain *dd)
+{
+	TRACE("struct ddomain:\n"
+		"\tddrover: 0x%08x\n"
+		"\tbg: %d, locked: %d\n", dd->r, dd->bg, dd->locked);
 }
 
 
@@ -182,3 +185,6 @@ trace_tty(struct tty *tty)
 
 	TRACE("\tservice: 0x%08x\n", tty->service);
 }
+
+
+#endif /* __BEOS__ */
