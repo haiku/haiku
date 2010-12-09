@@ -1390,7 +1390,7 @@ tty_write_to_tty_slave_unsafe(tty_cookie* sourceCookie, const char* data,
 	return B_OK;
 }
 
-
+#if 0
 static void
 dump_tty_settings(struct tty_settings& settings)
 {
@@ -1440,7 +1440,7 @@ dump_tty_struct(struct tty& tty)
 		kprintf(" %p", cookie);
 	kprintf("\n");
 }
-
+#endif
 
 // #pragma mark - device functions
 
