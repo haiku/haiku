@@ -64,43 +64,6 @@ get_80211(const char* name, int32 type, void* data, int32& length)
 }
 
 
-#if 0
-static status_t
-set_80211(const char* name, int32 type, void* data,
-	int32 length = 0, int32 value = 0)
-{
-	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
-	if (socket < 0)
-		return errno;
-
-	FileDescriptorCloser closer(socket);
-
-	struct ieee80211req ireq;
-	strlcpy(ireq.i_name, name, IF_NAMESIZE);
-	ireq.i_type = type;
-	ireq.i_val = value;
-	ireq.i_len = length;
-	ireq.i_data = data;
-
-	if (ioctl(socket, SIOCS80211, &ireq, sizeof(struct ieee80211req)) < 0)
-		return errno;
-
-	return B_OK;
-}
-
-
-template<typename T> status_t
-set_80211(const char* name, int32 type, T& data, int32 length = 0,
-	int32 value = 0)
-{
-	if (length == 0)
-		length = sizeof(T);
-
-	return set_80211(name, &data, length, value);
-}
-#endif
-
-
 template<typename T> status_t
 do_request(T& request, const char* name, int option)
 {

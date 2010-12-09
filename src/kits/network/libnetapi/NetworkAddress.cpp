@@ -1117,6 +1117,17 @@ BNetworkAddress::operator<(const BNetworkAddress& other) const
 				sizeof(address.sin6_addr));
 			break;
 		}
+
+		case AF_LINK:
+			if (LinkLevelAddressLength() < other.LinkLevelAddressLength())
+				return true;
+			if (LinkLevelAddressLength() > other.LinkLevelAddressLength())
+				return true;
+
+			// TODO: could compare index, and name, too
+			compare = memcmp(LinkLevelAddress(), other.LinkLevelAddress(),
+				LinkLevelAddressLength());
+			break;
 	}
 
 	if (compare < 0)
