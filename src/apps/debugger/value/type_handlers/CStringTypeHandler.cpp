@@ -34,7 +34,7 @@ CStringTypeHandler::SupportsType(Type* type)
 			modifiedType = dynamic_cast<ModifiedType*>(
 				addressType->BaseType());
 		}
-	} else if (arrayType != NULL) {
+	} else if (arrayType != NULL && arrayType->CountDimensions() == 1) {
 		baseType = dynamic_cast<PrimitiveType*>(
 				arrayType->BaseType());
 		if (baseType == NULL) {
