@@ -75,6 +75,10 @@ private:
 			void				_StartServices();
 			void				_HandleDeviceMonitor(BMessage* message);
 
+			status_t			_JoinNetwork(const BMessage& message,
+									const char* name = NULL);
+			status_t			_LeaveNetwork(const BMessage& message);
+
 private:
 			Settings			fSettings;
 			LooperMap			fDeviceMap;
@@ -249,6 +253,26 @@ NetServer::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case kMsgJoinNetwork:
+		{
+			status_t status = _JoinNetwork(*message);
+
+			BMessage reply(B_REPLY);
+			reply.AddInt32("status", status);
+			message->SendReply(&reply);
+			break;
+		}
+
+		case kMsgLeaveNetwork:
+		{
+			status_t status = _LeaveNetwork(*message);
+
+			BMessage reply(B_REPLY);
+			reply.AddInt32("status", status);
+			message->SendReply(&reply);
+			break;
+		}
+
 		default:
 			BApplication::MessageReceived(message);
 			return;
@@ -351,32 +375,54 @@ NetServer::_DisableInterface(const char* name)
 
 
 status_t
-NetServer::_ConfigureInterface(BMessage& interface)
+NetServer::_ConfigureInterface(BMessage& message)
 {
-	const char* device;
-	if (interface.FindString("device", &device) != B_OK)
+	const char* name;
+	if (message.FindString("device", &name) != B_OK)
 		return B_BAD_VALUE;
 
 	bool startAutoConfig = false;
 
 	int32 flags;
-	if (interface.FindInt32("flags", &flags) < B_OK)
+	if (message.FindInt32("flags", &flags) < B_OK)
 		flags = IFF_UP;
 
 	bool autoConfigured;
-	if (interface.FindBool("auto", &autoConfigured) == B_OK && autoConfigured)
+	if (message.FindBool("auto", &autoConfigured) == B_OK && autoConfigured)
 		flags |= IFF_AUTO_CONFIGURED;
 
 	int32 mtu;
-	if (interface.FindInt32("mtu", &mtu) < B_OK)
+	if (message.FindInt32("mtu", &mtu) < B_OK)
 		mtu = -1;
 
 	int32 metric;
-	if (interface.FindInt32("metric", &metric) < B_OK)
+	if (message.FindInt32("metric", &metric) < B_OK)
 		metric = -1;
 
+	BNetworkInterface interface(name);
+	if (!interface.Exists()) {
+		// the interface does not exist yet, we have to add it first
+		BNetworkRoster& roster = BNetworkRoster::Default();
+
+		status_t status = roster.AddInterface(interface);
+		if (status != B_OK) {
+			fprintf(stderr, "%s: Could not add interface: %s\n",
+				interface.Name(), strerror(status));
+			return status;
+		}
+	}
+
+	const char* networkName;
+	if (message.FindString("network", &networkName) != B_OK) {
+		status_t status = _JoinNetwork(message, networkName);
+		if (status != B_OK) {
+			fprintf(stderr, "%s: joining network \"%s\" failed: %s\n",
+				interface.Name(), networkName, strerror(status));
+		}
+	}
+
 	BMessage addressMessage;
-	for (int32 index = 0; interface.FindMessage("address", index,
+	for (int32 index = 0; message.FindMessage("address", index,
 			&addressMessage) == B_OK; index++) {
 		int32 family;
 		if (addressMessage.FindInt32("family", &family) != B_OK) {
@@ -390,19 +436,6 @@ NetServer::_ConfigureInterface(BMessage& interface)
 				}
 			} else
 				family = AF_UNSPEC;
-		}
-
-		BNetworkInterface interface(device);
-		if (!interface.Exists()) {
-			// the interface does not exist yet, we have to add it first
-			BNetworkRoster& roster = BNetworkRoster::Default();
-
-			status_t status = roster.AddInterface(interface);
-			if (status != B_OK) {
-				fprintf(stderr, "%s: Could not add interface: %s\n", Name(),
-					strerror(status));
-				return status;
-			}
 		}
 
 		// retrieve addresses
@@ -435,7 +468,7 @@ NetServer::_ConfigureInterface(BMessage& interface)
 		}
 
 		if (autoConfig) {
-			_QuitLooperForDevice(device);
+			_QuitLooperForDevice(name);
 			startAutoConfig = true;
 		} else if (addressMessage.FindString("gateway", &string) == B_OK
 			&& parse_address(family, string, gateway)) {
@@ -447,7 +480,7 @@ NetServer::_ConfigureInterface(BMessage& interface)
 			status_t status = interface.AddDefaultRoute(gateway);
 			if (status != B_OK) {
 				fprintf(stderr, "%s: Could not add route for %s: %s\n",
-					Name(), device, strerror(errno));
+					Name(), name, strerror(errno));
 			}
 		}
 
@@ -506,10 +539,10 @@ NetServer::_ConfigureInterface(BMessage& interface)
 
 	if (startAutoConfig) {
 		// start auto configuration
-		AutoconfigLooper* looper = new AutoconfigLooper(this, device);
+		AutoconfigLooper* looper = new AutoconfigLooper(this, name);
 		looper->Run();
 
-		fDeviceMap[device] = looper;
+		fDeviceMap[name] = looper;
 	}
 
 	return B_OK;
@@ -727,6 +760,63 @@ NetServer::_HandleDeviceMonitor(BMessage* message)
 		_ConfigureDevice(path);
 	else
 		_RemoveInterface(path);
+}
+
+
+status_t
+NetServer::_JoinNetwork(const BMessage& message, const char* name)
+{
+	BNetworkAddress address;
+	message.FindFlat("address", &address);
+
+	if (name == NULL)
+		message.FindString("name", &name);
+	if (name == NULL) {
+		// No name specified, we need a network address
+		if (address.Family() != AF_LINK)
+			return B_BAD_VALUE;
+	}
+
+	// Search for a network configuration that may override the defaults
+
+	bool found = false;
+	uint32 cookie = 0;
+	BMessage network;
+	while (fSettings.GetNextNetwork(cookie, network) == B_OK) {
+		const char* networkName;
+		if (network.FindString("name", &networkName) == B_OK
+			&& name != NULL && address.Family() != AF_LINK
+			&& !strcmp(name, networkName)) {
+			found = true;
+			break;
+		}
+
+		const char* mac;
+		if (network.FindString("mac", &mac) == B_OK
+			&& address.Family() == AF_LINK) {
+			BNetworkAddress link(AF_LINK, mac);
+			if (link == address) {
+				found = true;
+				break;
+			}
+		}
+	}
+
+	const char* password;
+	if (message.FindString("password", &password) != B_OK && found)
+		password = network.FindString("password");
+
+	// TODO: if password is still NULL, ask password manager once we have one
+	// TODO: join for real!
+	return B_ERROR;
+}
+
+
+status_t
+NetServer::_LeaveNetwork(const BMessage& message)
+{
+	// TODO: not yet implemented
+	return B_NOT_SUPPORTED;
 }
 
 

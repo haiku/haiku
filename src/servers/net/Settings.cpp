@@ -44,14 +44,24 @@ const static settings_template kInterfaceTemplate[] = {
 	{B_STRING_TYPE, "device", NULL, true},
 	{B_BOOL_TYPE, "disabled", NULL},
 	{B_MESSAGE_TYPE, "address", kInterfaceAddressTemplate},
+	{B_STRING_TYPE, "network", NULL},
 	{B_INT32_TYPE, "flags", NULL},
 	{B_INT32_TYPE, "metric", NULL},
 	{B_INT32_TYPE, "mtu", NULL},
 	{0, NULL, NULL}
 };
 
+const static settings_template kNetworkTemplate[] = {
+	{B_STRING_TYPE, "name", NULL, true},
+	{B_STRING_TYPE, "mac", NULL},
+	{B_STRING_TYPE, "password", NULL},
+	// TODO: possibility to specify encryption modes
+	{0, NULL, NULL}
+};
+
 const static settings_template kInterfacesTemplate[] = {
 	{B_MESSAGE_TYPE, "interface", kInterfaceTemplate},
+	{B_MESSAGE_TYPE, "network", kNetworkTemplate},
 	{0, NULL, NULL}
 };
 
@@ -359,7 +369,19 @@ status_t
 Settings::GetNextInterface(uint32& cookie, BMessage& interface)
 {
 	status_t status = fInterfaces.FindMessage("interface", cookie, &interface);
-	if (status < B_OK)
+	if (status != B_OK)
+		return status;
+
+	cookie++;
+	return B_OK;
+}
+
+
+status_t
+Settings::GetNextNetwork(uint32& cookie, BMessage& network)
+{
+	status_t status = fInterfaces.FindMessage("network", cookie, &network);
+	if (status != B_OK)
 		return status;
 
 	cookie++;
@@ -371,7 +393,7 @@ status_t
 Settings::GetNextService(uint32& cookie, BMessage& service)
 {
 	status_t status = fServices.FindMessage("service", cookie, &service);
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
 
 	cookie++;
