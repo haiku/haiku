@@ -69,16 +69,20 @@ CStringValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 	BVariant addressData;
 	BString valueData;
 	status_t error = B_OK;
+	size_t maxSize = 255;
 	if (dynamic_cast<AddressType*>(fType) != NULL) {
 		error = valueLoader->LoadValue(location, valueType, false,
 			addressData);
-	} else
+	} else {
 		addressData.SetTo(location->PieceAt(0).address);
+		maxSize = dynamic_cast<ArrayType*>(fType)
+			->DimensionAt(0)->CountElements();
+	}
 
 	if (error != B_OK)
 		return error;
 
-	error = valueLoader->LoadStringValue(addressData, valueData);
+	error = valueLoader->LoadStringValue(addressData, maxSize, valueData);
 	if (error != B_OK)
 		return error;
 

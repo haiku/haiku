@@ -32,7 +32,7 @@ public:
 									BVariant& _value);
 
 			status_t			LoadStringValue(BVariant& location,
-									BString& _value);
+									size_t maxSize, BString& _value);
 
 private:
 			Architecture*		fArchitecture;
