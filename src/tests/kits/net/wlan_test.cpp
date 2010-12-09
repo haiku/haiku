@@ -21,11 +21,30 @@ usage()
 }
 
 
+const char*
+get_authentication_mode(uint32 mode)
+{
+	switch (mode) {
+		default:
+		case B_NETWORK_AUTHENTICATION_NONE:
+			return "-";
+		case B_NETWORK_AUTHENTICATION_WEP:
+			return "WEP";
+		case B_NETWORK_AUTHENTICATION_WPA:
+			return "WPA";
+		case B_NETWORK_AUTHENTICATION_WPA2:
+			return "WPA2";
+	}
+}
+
+
 void
 show(const wireless_network& network)
 {
-	printf("%-32s  %s  %3g dB%s\n", network.name,
-		network.address.ToString().String(), network.signal_strength / 2.0,
+	printf("%-32s  %s  %4g dB %s C%02" B_PRIx32 " K%02" B_PRIx32
+		" %s\n", network.name, network.address.ToString().String(),
+		network.signal_strength / 2.0, get_authentication_mode(
+			network.authentication_mode), network.cipher, network.key_mode,
 		(network.flags & B_NETWORK_IS_ENCRYPTED) != 0 ? " (encrypted)" : "");
 }
 

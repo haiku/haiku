@@ -22,6 +22,14 @@ extern "C" {
 }
 
 
+//#define TRACE_DEVICE
+#ifdef TRACE_DEVICE
+#	define TRACE(x, ...) printf(x, __VA_ARGS__);
+#else
+#	define TRACE(x, ...) ;
+#endif
+
+
 namespace {
 
 
@@ -111,26 +119,216 @@ do_request(T& request, const char* name, int option)
 }
 
 
+//! Read a 16 bit little endian value
+static uint16
+read_le16(uint8*& data, int32& length)
+{
+	uint16 value = B_LENDIAN_TO_HOST_INT16(*(uint16*)data);
+	data += 2;
+	length -= 2;
+	return value;
+}
+
+
+//! Read a 32 bit little endian value
+static uint32
+read_le32(uint8*& data, int32& length)
+{
+	uint32 value = B_LENDIAN_TO_HOST_INT32(*(uint32*)data);
+	data += 4;
+	length -= 4;
+	return value;
+}
+
+
+static uint32
+from_rsn_cipher(uint32 cipher)
+{
+	if ((cipher & 0xffffff) != RSN_OUI)
+		return B_NETWORK_CIPHER_CCMP;
+
+	switch (cipher >> 24) {
+		case RSN_CSE_NULL:
+			return B_NETWORK_CIPHER_NONE;
+		case RSN_CSE_WEP40:
+			return B_NETWORK_CIPHER_WEP_40;
+		case RSN_CSE_WEP104:
+			return B_NETWORK_CIPHER_WEP_104;
+		case RSN_CSE_TKIP:
+			return B_NETWORK_CIPHER_TKIP;
+		default:
+		case RSN_CSE_CCMP:
+			return B_NETWORK_CIPHER_CCMP;
+		case RSN_CSE_WRAP:
+			return B_NETWORK_CIPHER_AES_128_CMAC;
+	}
+}
+
+
+static uint32
+from_rsn_key_mode(uint32 mode)
+{
+	if ((mode & 0xffffff) != RSN_OUI)
+		return B_KEY_MODE_IEEE802_1X;
+
+	switch (mode >> 24) {
+		default:
+		case RSN_ASE_8021X_UNSPEC:
+			return B_KEY_MODE_IEEE802_1X;
+		case RSN_ASE_8021X_PSK:
+			return B_KEY_MODE_PSK;
+		// the following are currently not defined in net80211
+		case 3:
+			return B_KEY_MODE_FT_IEEE802_1X;
+		case 4:
+			return B_KEY_MODE_FT_PSK;
+		case 5:
+			return B_KEY_MODE_IEEE802_1X_SHA256;
+		case 6:
+			return B_KEY_MODE_PSK_SHA256;
+	}
+}
+
+
+//! Parse RSN/WPA information elements common data
+static void
+parse_ie_rsn_wpa(wireless_network& network, uint8*& data, int32& length)
+{
+	if (length >= 4) {
+		// parse group cipher
+		network.group_cipher = from_rsn_cipher(read_le32(data, length));
+	} else if (length > 0)
+		return;
+
+	if (length >= 2) {
+		// parse unicast cipher
+		uint16 count = read_le16(data, length);
+		network.cipher = 0;
+
+		for (uint16 i = 0; i < count; i++) {
+			if (length < 4)
+				return;
+			network.cipher |= from_rsn_cipher(read_le32(data, length));
+		}
+	} else if (length > 0)
+		return;
+
+	if (length >= 2) {
+		// parse key management mode
+		uint16 count = read_le16(data, length);
+		network.key_mode = 0;
+
+		for (uint16 i = 0; i < count; i++) {
+			if (length < 4)
+				return;
+			network.key_mode |= from_rsn_key_mode(read_le32(data, length));
+		}
+	} else if (length > 0)
+		return;
+
+	// TODO: capabilities, and PMKID following in case of RSN
+}
+
+
+//! Parse RSN (Robust Security Network) information element.
+static void
+parse_ie_rsn(wireless_network& network, ie_data* ie)
+{
+	network.authentication_mode = B_NETWORK_AUTHENTICATION_WPA2;
+	network.cipher = B_NETWORK_CIPHER_CCMP;
+	network.group_cipher = B_NETWORK_CIPHER_CCMP;
+	network.key_mode = B_KEY_MODE_IEEE802_1X;
+
+	int32 length = ie->length;
+	if (length < 2)
+		return;
+
+	uint8* data = ie->data;
+
+	uint16 version = read_le16(data, length);
+	if (version != RSN_VERSION)
+		return;
+
+	parse_ie_rsn_wpa(network, data, length);
+}
+
+
+//! Parse WPA information element.
+static bool
+parse_ie_wpa(wireless_network& network, ie_data* ie)
+{
+	int32 length = ie->length;
+	if (length < 6)
+		return false;
+
+	uint8* data = ie->data;
+
+	uint32 oui = read_le32(data, length);
+	TRACE("  oui: %" B_PRIx32 "\n", oui);
+	if (oui != ((WPA_OUI_TYPE << 24) | WPA_OUI))
+		return false;
+
+	uint16 version = read_le16(data, length);
+	if (version != WPA_VERSION)
+		return false;
+
+	network.authentication_mode = B_NETWORK_AUTHENTICATION_WPA;
+	network.cipher = B_NETWORK_CIPHER_TKIP;
+	network.group_cipher = B_NETWORK_CIPHER_TKIP;
+	network.key_mode = B_KEY_MODE_IEEE802_1X;
+
+	parse_ie_rsn_wpa(network, data, length);
+	return true;
+}
+
+
 //! Parse information elements.
 static void
 parse_ie(wireless_network& network, uint8* _ie, int32 ieLength)
 {
 	struct ie_data* ie = (ie_data*)_ie;
+	bool hadRSN = false;
+	bool hadWPA = false;
 
 	while (ieLength > 1) {
+		TRACE("ie type %u\n", ie->type);
 		switch (ie->type) {
 			case IEEE80211_ELEMID_SSID:
 				strlcpy(network.name, (char*)ie->data,
 					min_c(ie->length + 1, (int)sizeof(network.name)));
 				break;
 			case IEEE80211_ELEMID_RSN:
-				// TODO: we might need to parse those in order to find out
-				// the authentication mode (WPA info in vendor?)
+				parse_ie_rsn(network, ie);
+				hadRSN = true;
+				break;
+			case IEEE80211_ELEMID_VENDOR:
+				if (!hadRSN && parse_ie_wpa(network, ie))
+					hadWPA = true;
 				break;
 		}
 
 		ieLength -= 2 + ie->length;
 		ie = (ie_data*)((uint8*)ie + 2 + ie->length);
+	}
+
+	if (hadRSN || hadWPA) {
+		// Determine authentication mode
+
+		if ((network.key_mode & (B_KEY_MODE_IEEE802_1X_SHA256
+				| B_KEY_MODE_PSK_SHA256)) != 0) {
+			network.authentication_mode = B_NETWORK_AUTHENTICATION_WPA2;
+		} else if ((network.key_mode & (B_KEY_MODE_IEEE802_1X
+				| B_KEY_MODE_PSK | B_KEY_MODE_FT_IEEE802_1X
+				| B_KEY_MODE_FT_PSK)) != 0) {
+			if (!hadRSN)
+				network.authentication_mode = B_NETWORK_AUTHENTICATION_WPA;
+		} else if ((network.key_mode & B_KEY_MODE_NONE) != 0) {
+			if ((network.cipher & (B_NETWORK_CIPHER_WEP_40
+					| B_NETWORK_CIPHER_WEP_104)) != 0)
+				network.authentication_mode = B_NETWORK_AUTHENTICATION_WEP;
+			else
+				network.authentication_mode = B_NETWORK_AUTHENTICATION_NONE;
+		}
 	}
 }
 
@@ -188,8 +386,11 @@ fill_wireless_network(wireless_network& network,
 	network.noise_level = info.isi_noise;
 	network.flags |= (info.isi_capinfo & IEEE80211_CAPINFO_PRIVACY) != 0
 		? B_NETWORK_IS_ENCRYPTED : 0;
+
 	network.authentication_mode = 0;
-		// TODO: build from IE if possible
+	network.cipher = 0;
+	network.group_cipher = 0;
+	network.key_mode = 0;
 
 	parse_ie(network, info);
 }
@@ -206,8 +407,11 @@ fill_wireless_network(wireless_network& network, const char* networkName,
 	network.noise_level = result.isr_noise;
 	network.flags = (result.isr_capinfo & IEEE80211_CAPINFO_PRIVACY)
 		!= 0 ? B_NETWORK_IS_ENCRYPTED : 0;
+
 	network.authentication_mode = 0;
-		// TODO: build from IE if possible
+	network.cipher = 0;
+	network.group_cipher = 0;
+	network.key_mode = 0;
 
 	parse_ie(network, result);
 }

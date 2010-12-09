@@ -22,6 +22,7 @@ struct wireless_network {
 	uint32				flags;
 	uint32				authentication_mode;
 	uint32				cipher;
+	uint32				group_cipher;
 	uint32				key_mode;
 };
 
@@ -41,15 +42,18 @@ enum {
 	B_NETWORK_CIPHER_NONE				= 0x01,
 	B_NETWORK_CIPHER_WEP_40				= 0x02,
 	B_NETWORK_CIPHER_WEP_104			= 0x04,
-	B_NETWORK_CIPHER_WEP_TKIP			= 0x08,
-	B_NETWORK_CIPHER_WEP_CCMP			= 0x10,
-	B_NETWORK_CIPHER_WEP_AES_128_CMAC	= 0x20
+	B_NETWORK_CIPHER_TKIP				= 0x08,
+	B_NETWORK_CIPHER_CCMP				= 0x10,
+	B_NETWORK_CIPHER_AES_128_CMAC		= 0x20
 };
 
 // key modes
 enum {
 	B_KEY_MODE_IEEE802_1X				= 0x0001,
 	B_KEY_MODE_PSK						= 0x0002,
+	B_KEY_MODE_NONE						= 0x0004,
+	B_KEY_MODE_FT_IEEE802_1X			= 0x0020,
+	B_KEY_MODE_FT_PSK					= 0x0040,
 	B_KEY_MODE_IEEE802_1X_SHA256		= 0x0080,
 	B_KEY_MODE_PSK_SHA256				= 0x0100,
 	B_KEY_MODE_WPS						= 0x0200
