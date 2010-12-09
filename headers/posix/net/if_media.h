@@ -44,7 +44,7 @@
 #define	IFM_NMASK		0x000000e0	/* Media type */
 #define	IFM_TMASK		0x0000001f	/* Media subtype */
 #define	IFM_OMASK		0x0000ff00	/* Type specific options */
-#define	IFM_GMASK		0xffff0000	/* Generic options */
+#define	IFM_GMASK		0x0ff00000	/* Generic options */
 
 /* Macros for the masks */
 
