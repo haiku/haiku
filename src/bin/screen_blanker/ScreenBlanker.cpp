@@ -74,6 +74,7 @@ ScreenBlanker::ReadyToRun()
 		fRunner->Run();
 	} else {
 		fprintf(stderr, "could not load the screensaver addon\n");
+		fWindow->ChildAt(0)->SetViewColor(0, 0, 0);
 	}
 
 	fWindow->SetFullScreen(true);
@@ -284,7 +285,7 @@ ScreenBlanker::_Shutdown()
 		if (fWindow->Lock())
 			fWindow->Quit();
 	}
-	
+
 	delete fRunner;
 }
 
