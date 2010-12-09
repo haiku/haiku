@@ -64,6 +64,7 @@ extern "C" _EXPORT BView *instantiate_deskbar_item(void);
 
 const uint32 kMsgShowConfiguration = 'shcf';
 const uint32 kMsgOpenNetworkPreferences = 'onwp';
+const uint32 kMsgJoinNetwork = 'join';
 
 const uint32 kMinIconWidth = 16;
 const uint32 kMinIconHeight = 16;
@@ -350,6 +351,27 @@ NetworkStatusView::MessageReceived(BMessage* message)
 			_OpenNetworksPreferences();
 			break;
 
+		case kMsgJoinNetwork:
+		{
+			const char* deviceName;
+			const char* name;
+			if (message->FindString("device", &deviceName) == B_OK
+				&& message->FindString("name", &name) == B_OK) {
+				BNetworkDevice device(deviceName);
+				status_t status = device.JoinNetwork(name);
+				if (status != B_OK) {
+					BString text
+						= B_TRANSLATE("Could not join wireless network:\n");
+					text << strerror(status);
+					BAlert* alert = new BAlert(name, text.String(),
+						B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL,
+						B_STOP_ALERT);
+					alert->Go(NULL);
+				}
+			}
+			break;
+		}
+
 		case B_ABOUT_REQUESTED:
 			_AboutRequested();
 			break;
@@ -515,9 +537,13 @@ NetworkStatusView::MouseDown(BPoint point)
 		int32 count = 0;
 		cookie = 0;
 		while (device.GetNextNetwork(cookie, network) == B_OK) {
+			BMessage* message = new BMessage(kMsgJoinNetwork);
+			message->AddString("device", device.Name());
+			message->AddString("name", network.name);
+
 			BMenuItem* item = new WirelessNetworkMenuItem(network.name,
 				network.signal_strength,
-				(network.flags & B_NETWORK_IS_ENCRYPTED) != 0, NULL);
+				(network.flags & B_NETWORK_IS_ENCRYPTED) != 0, message);
 			menu->AddItem(item);
 			if (associated.find(network.address) != associated.end())
 				item->SetMarked(true);
