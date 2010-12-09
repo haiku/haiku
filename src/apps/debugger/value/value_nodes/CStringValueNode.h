@@ -15,7 +15,7 @@ class AddressType;
 class CStringValueNode : public ChildlessValueNode {
 public:
 								CStringValueNode(ValueNodeChild* nodeChild,
-									AddressType* type);
+									Type* type);
 	virtual						~CStringValueNode();
 
 	virtual	Type*				GetType() const;
@@ -26,7 +26,7 @@ public:
 									Value*& _value);
 
 private:
-			AddressType*		fType;
+			Type*				fType;
 };
 
 #endif	// CSTRING_VALUE_NODE_H

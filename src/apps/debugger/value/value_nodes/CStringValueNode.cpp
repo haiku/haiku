@@ -21,7 +21,7 @@
 
 
 CStringValueNode::CStringValueNode(ValueNodeChild* nodeChild,
-	AddressType* type)
+	Type* type)
 	:
 	ChildlessValueNode(nodeChild),
 	fType(type)
@@ -68,8 +68,13 @@ CStringValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 
 	BVariant addressData;
 	BString valueData;
-	status_t error = valueLoader->LoadValue(location, valueType, false,
-		addressData);
+	status_t error = B_OK;
+	if (dynamic_cast<AddressType*>(fType) != NULL) {
+		error = valueLoader->LoadValue(location, valueType, false,
+			addressData);
+	} else
+		addressData.SetTo(location->PieceAt(0).address);
+
 	if (error != B_OK)
 		return error;
 

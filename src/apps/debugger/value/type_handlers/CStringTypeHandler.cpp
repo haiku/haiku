@@ -23,27 +23,38 @@ float
 CStringTypeHandler::SupportsType(Type* type)
 {
 	AddressType* addressType = dynamic_cast<AddressType*>(type);
+	ArrayType* arrayType = dynamic_cast<ArrayType*>(type);
+	PrimitiveType* baseType = NULL;
+	ModifiedType* modifiedType = NULL;
 	if (addressType != NULL && addressType->AddressKind()
-			== DERIVED_TYPE_POINTER) {
-		PrimitiveType* baseType = dynamic_cast<PrimitiveType*>(
-			addressType->BaseType());
-
-		if (baseType == NULL) {
-			ModifiedType* modifiedType = dynamic_cast<ModifiedType*>(
-			addressType->BaseType());
-			if (modifiedType == NULL)
-				return 0.0f;
-
+		== DERIVED_TYPE_POINTER) {
 			baseType = dynamic_cast<PrimitiveType*>(
-				modifiedType->ResolveRawType(false));
-			if (baseType == NULL)
-				return 0.0f;
+				addressType->BaseType());
+		if (baseType == NULL) {
+			modifiedType = dynamic_cast<ModifiedType*>(
+				addressType->BaseType());
 		}
-
-		if (baseType->TypeConstant() == B_UINT8_TYPE
-			|| baseType->TypeConstant() == B_INT8_TYPE)
-			return 0.8f;
+	} else if (arrayType != NULL) {
+		baseType = dynamic_cast<PrimitiveType*>(
+				arrayType->BaseType());
+		if (baseType == NULL) {
+			modifiedType = dynamic_cast<ModifiedType*>(
+				arrayType->BaseType());
+		}
 	}
+
+	if (baseType == NULL && modifiedType == NULL)
+		return 0.0f;
+	else if (modifiedType != NULL) {
+		baseType = dynamic_cast<PrimitiveType*>(
+			modifiedType->ResolveRawType(false));
+		if (baseType == NULL)
+			return 0.0f;
+	}
+
+	if (baseType->TypeConstant() == B_UINT8_TYPE
+		|| baseType->TypeConstant() == B_INT8_TYPE)
+		return 0.8f;
 
 	return 0.0f;
 }
@@ -56,10 +67,8 @@ CStringTypeHandler::CreateValueNode(ValueNodeChild* nodeChild, Type* type,
 	if (SupportsType(type) == 0.0f)
 		return B_BAD_VALUE;
 
-	AddressType* supportedType = dynamic_cast<AddressType*>(type);
-
 	ValueNode* node = new(std::nothrow) CStringValueNode(nodeChild,
-		supportedType);
+		type);
 
 	if (node == NULL)
 		return B_NO_MEMORY;
