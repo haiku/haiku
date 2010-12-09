@@ -74,7 +74,12 @@ main(int argc, char** argv)
 			if (argc == 4) {
 				// list the named entry
 				wireless_network network;
-				status_t status = device.GetNetwork(argv[3], network);
+				BNetworkAddress link;
+				status_t status = link.SetTo(AF_LINK, argv[3]);
+				if (status == B_OK)
+					status = device.GetNetwork(link, network);
+				else
+					status = device.GetNetwork(argv[3], network);
 				if (status != B_OK) {
 					fprintf(stderr, "getting network failed: %s\n",
 						strerror(status));
