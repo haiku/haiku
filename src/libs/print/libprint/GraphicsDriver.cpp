@@ -9,6 +9,7 @@
 
 #include <Alert.h>
 #include <Bitmap.h>
+#include <Debug.h>
 #include <Message.h>
 #include <PrintJob.h>
 #include <Region.h>
@@ -45,10 +46,10 @@ enum {
 GraphicsDriver::GraphicsDriver(BMessage* message, PrinterData* printerData,
 	const PrinterCap* printerCap)
 	:
-	fFlags(0),
 	fMessage(message),
 	fView(NULL),
 	fBitmap(NULL),
+	fRotatedBitmap(NULL),
 	fTransport(NULL),
 	fOrgJobData(NULL),
 	fRealJobData(NULL),
@@ -182,8 +183,7 @@ GraphicsDriver::_SetupBitmap()
 		fBandHeight = fPageHeight;
 	} else {
 		fBandCount  = (size + kMaxMemorySize - 1) / kMaxMemorySize;
-		if ((JobData::kLandscape == fRealJobData->GetOrientation())
-			&& (fFlags & kGDFRotateBandBitmap)) {
+		if (_NeedRotateBitmapBand()) {
 			fBandWidth  = (fPageWidth + fBandCount - 1) / fBandCount;
 			fBandHeight = fPageHeight;
 		} else {
@@ -204,6 +204,12 @@ GraphicsDriver::_SetupBitmap()
 	fBitmap = new BBitmap(rect, fOrgJobData->GetSurfaceType(), true);
 	fView   = new BView(rect, "", B_FOLLOW_ALL, B_WILL_DRAW);
 	fBitmap->AddChild(fView);
+
+	if (_NeedRotateBitmapBand()) {
+		BRect rotatedRect(0, 0, rect.bottom, rect.right);
+		fRotatedBitmap = new BBitmap(rotatedRect, fOrgJobData->GetSurfaceType(),
+			false);
+	}
 }
 
 
@@ -213,6 +219,9 @@ GraphicsDriver::_CleanupBitmap()
 	delete fBitmap;
 	fBitmap = NULL;
 	fView   = NULL;
+
+	delete fRotatedBitmap;
+	fRotatedBitmap = NULL;
 }
 
 
@@ -460,7 +469,7 @@ GraphicsDriver::_PrintPage(PageDataList* pages)
 			}
 		}
 
-		if (!NextBand(fBitmap, &offset))
+		if (!_PrintBand(fBitmap, &offset))
 			return false;
 
 	} while (offset.x >= 0.0f && offset.y >= 0.0f);
@@ -468,6 +477,57 @@ GraphicsDriver::_PrintPage(PageDataList* pages)
 	return true;
 }
 
+
+bool
+GraphicsDriver::_PrintBand(BBitmap* band, BPoint* offset)
+{
+	if (!_NeedRotateBitmapBand())
+		return NextBand(band, offset);
+
+	_RotateInto(fRotatedBitmap, band);
+
+	BPoint rotatedOffset(offset->y, offset->x);
+	bool success = NextBand(fRotatedBitmap, &rotatedOffset);
+	offset->x = rotatedOffset.y;
+	offset->y = rotatedOffset.x;
+
+	return success;
+}
+
+
+void
+GraphicsDriver::_RotateInto(BBitmap* target, const BBitmap* source)
+{
+	ASSERT(target->ColorSpace() == B_RGB32);
+	ASSERT(source->ColorSpace() == B_RGB32);
+	ASSERT(target->Bounds().IntegerWidth() == source->Bounds().IntegerHeight());
+	ASSERT(target->Bounds().IntegerHeight() == source->Bounds().IntegerWidth());
+
+	const int32 width = source->Bounds().IntegerWidth() + 1;
+	const int32 height = source->Bounds().IntegerHeight() + 1;
+
+	const int32 sourceBPR = source->BytesPerRow();
+	const int32 targetBPR = target->BytesPerRow();
+
+	const uint8_t* sourceBits =
+		reinterpret_cast<const uint8_t*>(source->Bits());
+	uint8_t* targetBits = static_cast<uint8_t*>(target->Bits());
+
+	for (int32 y = 0; y < height; y ++) {
+		for (int32 x = 0; x < width; x ++) {
+			const uint32_t* sourcePixel =
+				reinterpret_cast<const uint32_t*>(sourceBits + sourceBPR * y
+					+ sizeof(uint32_t) * x);
+
+			int32 targetX = (height - y - 1);
+			int32 targetY = x;
+			uint32_t* targetPixel =
+				reinterpret_cast<uint32_t*>(targetBits + targetBPR * targetY
+					+ sizeof(uint32_t) * targetX);
+			*targetPixel = *sourcePixel;
+		}
+	}
+}
 
 bool 
 GraphicsDriver::_CollectPages(SpoolData* spoolData, PageDataList* pages)
@@ -595,7 +655,7 @@ GraphicsDriver::GetJobData(BFile* spoolFile)
 
 
 bool 
-GraphicsDriver::PrintJob(BFile* spoolFile)
+GraphicsDriver::_PrintJob(BFile* spoolFile)
 {
 	bool success = true;
 	if (!_SetupData(spoolFile)) {
@@ -653,11 +713,10 @@ GraphicsDriver::PrintJob(BFile* spoolFile)
 
 
 BMessage*
-GraphicsDriver::TakeJob(BFile* spoolFile, uint32 flags)
+GraphicsDriver::TakeJob(BFile* spoolFile)
 {
-	fFlags = flags;
 	BMessage *msg;
-	if (PrintJob(spoolFile))
+	if (_PrintJob(spoolFile))
 		msg = new BMessage('okok');
 	else
 		msg = new BMessage('baad');
@@ -705,8 +764,7 @@ GraphicsDriver::WriteSpoolData(const void* buffer, size_t size)
 	throw (TransportException)
 {
 	if (fTransport == NULL)
-		return
-
+		return;
 	fTransport->Write(buffer, size);
 }
 
@@ -735,6 +793,14 @@ GraphicsDriver::WriteSpoolChar(char c)
 		return;
 
 	fTransport->Write(&c, 1);
+}
+
+
+bool
+GraphicsDriver::_NeedRotateBitmapBand() const
+{
+	return JobData::kLandscape == fRealJobData->GetOrientation()
+		&& !fPrinterCap->Supports(PrinterCap::kCanRotatePageInLandscape);
 }
 
 

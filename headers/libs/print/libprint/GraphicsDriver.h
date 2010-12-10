@@ -22,11 +22,6 @@ class PrinterData;
 class PrinterCap;
 
 
-enum {
-	kGDFRotateBandBitmap = 1
-};
-
-
 class GraphicsDriver {
 public:
 				GraphicsDriver(BMessage* message, PrinterData* printerData,
@@ -34,7 +29,7 @@ public:
 	virtual		~GraphicsDriver();
 
 	const JobData*	GetJobData(BFile* spoolFile);
-	BMessage*		TakeJob(BFile* spoolFile, uint32 flags = 0);
+	BMessage*		TakeJob(BFile* spoolFile);
 	static BPoint	GetScale(int32 nup, BRect physicalRect, float scaling);
 	static BPoint	GetOffset(int32 nup, int index,
 						JobData::Orientation orientation, const BPoint* scale,
@@ -70,11 +65,7 @@ protected:
 			const SpoolMetaData*	GetSpoolMetaData() const;
 			int						GetProtocolClass() const;
 
-			int		GetPageWidth() const;
 			int		GetPageHeight() const;
-			int		GetBandWidth() const;
-			int		GetBandHeight() const;
-			int		GetPixelDepth() const;
 
 private:
 			bool	_SetupData(BFile* file);
@@ -82,20 +73,25 @@ private:
 			void	_CleanupData();
 			void	_CleanupBitmap();
 			bool	_PrintPage(PageDataList* pages);
+			bool	_PrintBand(BBitmap* band, BPoint* offset);
+			void	_RotateInto(BBitmap* target, const BBitmap* source);
 			bool	_CollectPages(SpoolData* spoolData, PageDataList* pages);
 			bool	_SkipPages(SpoolData* spoolData);
 			bool	_PrintDocument(SpoolData* spoolData);
-			bool	PrintJob(BFile* file);
+			bool	_PrintJob(BFile* file);
+
+			bool	_NeedRotateBitmapBand() const;
+
 	static	void	_ConvertRGB32ToRGB24(const void* src, void* dst, int width);
 	static	void	_ConvertCMAP8ToRGB24(const void* src, void* dst, int width);
 	static	uint8	_ConvertToGray(uint8 r, uint8 g, uint8 b);
 	static	void	_ConvertRGB32ToGray(const void* src, void* dst, int width);
 	static	void	_ConvertCMAP8ToGray(const void* src, void* dst, int width);
 
-	uint32				fFlags;
 	BMessage*			fMessage;
 	BView*				fView;
 	BBitmap*			fBitmap;
+	BBitmap*			fRotatedBitmap;
 	Transport*			fTransport;
 	JobData*			fOrgJobData;
 	JobData*			fRealJobData;
@@ -153,31 +149,11 @@ GraphicsDriver::GetProtocolClass() const
 
 
 inline int
-GraphicsDriver::GetPageWidth() const
-{
-	return fPageWidth;
-}
-
-
-inline int
 GraphicsDriver::GetPageHeight() const
 {
-	return fPageHeight;
+	if (!_NeedRotateBitmapBand())
+		return fPageHeight;
+	return fPageWidth;
 }
-
-
-inline int
-GraphicsDriver::GetBandWidth() const
-{
-	return fBandWidth;
-}
-
-
-inline int
-GraphicsDriver::GetBandHeight() const
-{
-	return fBandHeight;
-}
-
 
 #endif	/* __GRAPHICSDRIVER_H */

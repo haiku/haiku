@@ -200,10 +200,13 @@ public:
 		kDriverSpecificCapabilities,
 
 		// Static boolean settings follow.
-		// For them isSupport() has to be implemented only.
+		// For them Supports() has to be implemented only.
 		kCopyCommand,	// supports printer page copy command?
 		kHalftone,		// needs the printer driver the configuration
 						// for class Halftone?
+		kCanRotatePageInLandscape,
+						// can the printer driver rotate the page
+						// printing in landscape
 
 		// The driver specific generic capabilities start here
 		kDriverSpecificCapabilitiesBegin = 100
