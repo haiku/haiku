@@ -158,14 +158,14 @@ class TrashMonitor : public BHandler {
 			}
 
 			if (opcode == B_ENTRY_MOVED) {
-				entry_ref entry;
+				entry_ref ref;
 				const char* name;
-				msg->FindInt64("to directory", &entry.directory);
-				msg->FindInt32("device", &entry.device);
+				msg->FindInt64("to directory", &ref.directory);
+				msg->FindInt32("device", &ref.device);
 				msg->FindString("name", &name);
-				entry.set_name(name);
+				ref.set_name(name);
 
-				BNode node(&entry);
+				BNode node(&ref);
 				int32 chain;
 
 				// check it's a mail
@@ -179,7 +179,7 @@ class TrashMonitor : public BHandler {
 				// check if it was moved to trash
 				bool moved_to_trash = false;
 				BPath trashPath;
-				BPath entryPath(&entry);
+				BEntry entry(&ref);
 				BVolumeRoster volumes;
 				BVolume volume;
 				while (volumes.GetNextVolume(&volume) == B_OK) {
@@ -189,8 +189,8 @@ class TrashMonitor : public BHandler {
 						continue;
 					}
 
-					if (strncmp(entryPath.Path(), trashPath.Path(),
-						strlen(trashPath.Path())) == 0) {
+					BDirectory trash(trashPath.Path());
+					if (trash.Contains(&entry)) {
 						moved_to_trash = true;
 						break;
 					}
