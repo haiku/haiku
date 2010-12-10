@@ -691,7 +691,13 @@ DwarfCompoundType::_ResolveDataMemberLocation(DwarfType* memberType,
 			if (fEntry->Tag() != DW_TAG_union_type)
 				return B_BAD_VALUE;
 
-			if (!location->SetTo(parentLocation, 0, memberType->ByteSize() * 8))
+			// since all members start at the same location, set up
+			// the location by hand since we don't want the size difference
+			// between the overall union and the member being
+			// factored into the assigned address.
+			ValuePieceLocation piece = parentLocation.PieceAt(0);
+			piece.SetSize(memberType->ByteSize());
+			if (!location->AddPiece(piece))
 				return B_NO_MEMORY;
 
 			break;
