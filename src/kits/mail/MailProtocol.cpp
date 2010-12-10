@@ -180,20 +180,11 @@ class TrashMonitor : public BHandler {
 				bool moved_to_trash = false;
 				BPath trashPath;
 				BEntry entry(&ref);
-				BVolumeRoster volumes;
-				BVolume volume;
-				while (volumes.GetNextVolume(&volume) == B_OK) {
-					BPath trashPath;
-					if (find_directory(B_TRASH_DIRECTORY, &trashPath,
-						false, &volume) != B_OK) {
-						continue;
-					}
-
+				BVolume volume(ref.device);
+				if (find_directory(B_TRASH_DIRECTORY, &trashPath,
+						false, &volume) == B_OK) {
 					BDirectory trash(trashPath.Path());
-					if (trash.Contains(&entry)) {
-						moved_to_trash = true;
-						break;
-					}
+					moved_to_trash = trash.Contains(&entry);
 				}
 
 				messages_for_us += (moved_to_trash) ? 1 : -1;
