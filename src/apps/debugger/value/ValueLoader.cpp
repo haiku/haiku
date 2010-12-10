@@ -193,5 +193,5 @@ ValueLoader::LoadStringValue(BVariant& location, size_t maxSize, BString& _value
 	static const size_t kMaxStringSize = 255;
 
 	return fTeamMemory->ReadMemoryString(location.ToUInt64(),
-		maxSize > kMaxStringSize ? kMaxStringSize : maxSize, _value);
+		std::min(maxSize, kMaxStringSize), _value);
 }
