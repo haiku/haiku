@@ -10,23 +10,24 @@
 
 
 #include <Application.h>
-#include <Message.h>
-#include <File.h>
-#include <MessageRunner.h>
-#include <Deskbar.h>
-#include <Roster.h>
-#include <Button.h>
-#include <StringView.h>
-#include <Mime.h>
 #include <Beep.h>
+#include <Button.h>
+#include <ChainRunner.h>
+#include <Deskbar.h>
+#include <File.h>
+#include <FindDirectory.h>
 #include <fs_index.h>
 #include <fs_info.h>
-#include <String.h>
-#include <VolumeRoster.h>
-#include <Query.h>
-#include <ChainRunner.h>
+#include <Message.h>
+#include <MessageRunner.h>
+#include <Mime.h>
 #include <NodeMonitor.h>
 #include <Path.h>
+#include <Query.h>
+#include <Roster.h>
+#include <String.h>
+#include <StringView.h>
+#include <VolumeRoster.h>
 
 #include <string.h>
 #include <stdio.h>
@@ -78,7 +79,8 @@ public:
 
 private:
 			void				_UpdateAutoCheck(bigtime_t interval);
-			bool				_IsPending(BNode& entry) const;
+	static	bool				_IsPending(BNode& node);
+	static	bool				_IsEntryInTrash(BEntry& entry);
 
 private:
 			BMessageRunner*		fAutoCheckRunner;
@@ -515,6 +517,9 @@ MailDaemonApp::SendPendingMessages(BMessage* msg)
 				off_t size;
 
 				while (query.GetNextEntry(&entry) == B_OK) {
+					if (_IsEntryInTrash(entry))
+						continue;
+
 					while (node.SetTo(&entry) == B_BUSY)
 						snooze(1000);
 					if (!_IsPending(node))
@@ -560,6 +565,9 @@ MailDaemonApp::SendPendingMessages(BMessage* msg)
 				off_t size;
 
 				while (query.GetNextEntry(&entry) == B_OK) {
+					if (_IsEntryInTrash(entry))
+						continue;
+
 					node.SetTo(&entry);
 					if (!_IsPending(node))
 						continue;
@@ -606,8 +614,10 @@ MailDaemonApp::Pulse()
 
 /*!	Work-around for a broken index that contains out-of-date information.
 */
+
+/* static */
 bool
-MailDaemonApp::_IsPending(BNode& node) const
+MailDaemonApp::_IsPending(BNode& node)
 {
 	int32 flags;
 	if (node.ReadAttr(B_MAIL_ATTR_FLAGS, B_INT32_TYPE, 0, &flags, sizeof(int32))
@@ -615,6 +625,27 @@ MailDaemonApp::_IsPending(BNode& node) const
 		return false;
 
 	return (flags & B_MAIL_PENDING) != 0;
+}
+
+
+/* static */
+bool
+MailDaemonApp::_IsEntryInTrash(BEntry& entry)
+{
+	entry_ref ref;
+
+	entry.GetRef(&ref);
+	BPath trashPath;
+	BPath entryPath(&entry);
+	BVolume volume(ref.device);
+	if (volume.InitCheck() == B_OK) {
+		find_directory(B_TRASH_DIRECTORY, &trashPath, false, &volume);
+		if (strncmp(entryPath.Path(), trashPath.Path(),
+			strlen(trashPath.Path())) == 0)
+			return true;
+	}
+
+	return false;
 }
 
 
