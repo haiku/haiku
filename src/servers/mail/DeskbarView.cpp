@@ -131,13 +131,16 @@ bool DeskbarView::_EntryInTrash(const entry_ref* entry)
 	BPath trashPath;
 	BPath entryPath(entry);
 	BVolume volume(entry->device);
-	if (volume.InitCheck() == B_OK) {
-		find_directory(B_TRASH_DIRECTORY, &trashPath, false, &volume);
-		if (strncmp(entryPath.Path(), trashPath.Path(), 
-			strlen(trashPath.Path())) == 0)
+	if (volume.InitCheck() == B_OK
+		&& find_directory(B_TRASH_DIRECTORY, &trashPath, false,
+			&volume) == B_OK) {
+		char path[PATH_MAX];
+		strncpy(path, trashPath.Path(), sizeof(path));
+		strncat(path, "/", sizeof(path));
+		if (strncmp(entryPath.Path(), path, strlen(path)) == 0)
 			return true;
 	}
-	
+
 	return false;
 }
 
@@ -252,7 +255,7 @@ DeskbarView::MessageReceived(BMessage* message)
 			int32 what;
 			dev_t device;
 			ino_t directory;
-			const char *name;			
+			const char *name;
 			entry_ref ref;
 			message->FindInt32("opcode", &what);
 			message->FindInt32("device", &device);

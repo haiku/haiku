@@ -638,10 +638,13 @@ MailDaemonApp::_IsEntryInTrash(BEntry& entry)
 	BPath trashPath;
 	BPath entryPath(&entry);
 	BVolume volume(ref.device);
-	if (volume.InitCheck() == B_OK) {
-		find_directory(B_TRASH_DIRECTORY, &trashPath, false, &volume);
-		if (strncmp(entryPath.Path(), trashPath.Path(),
-			strlen(trashPath.Path())) == 0)
+	if (volume.InitCheck() == B_OK
+		&& find_directory(B_TRASH_DIRECTORY, &trashPath,
+			false, &volume) == B_OK) {
+		char path[PATH_MAX];
+		strncpy(path, trashPath.Path(), sizeof(path));
+		strncat(path, "/", sizeof(path));
+		if (strncmp(entryPath.Path(), path, strlen(path)) == 0)
 			return true;
 	}
 
