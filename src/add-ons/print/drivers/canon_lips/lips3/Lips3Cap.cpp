@@ -147,7 +147,7 @@ BaseCap **Lips3Cap::GetCaps(CapID capid) const
 
 
 bool
-Lips3Cap::IsSupport(CapID capid) const
+Lips3Cap::Supports(CapID capid) const
 {
 	switch (capid) {
 		case kPaper:

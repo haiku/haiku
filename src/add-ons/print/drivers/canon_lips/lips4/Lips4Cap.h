@@ -14,7 +14,7 @@ public:
 					Lips4Cap(const PrinterData* printer_data)
 						: PrinterCap(printer_data) {}
 	virtual	int		CountCap(CapID) const;
-	virtual	bool	IsSupport(CapID) const;
+	virtual	bool	Supports(CapID) const;
 	virtual	const	BaseCap** GetCaps(CapID) const;
 };
 

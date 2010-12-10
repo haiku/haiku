@@ -273,7 +273,7 @@ JobSetupView::AttachedToWindow()
 		"Pages Per Sheet:", fNup);
 
 	// duplex
-	if (fPrinterCap->IsSupport(PrinterCap::kPrintStyle)) {
+	if (fPrinterCap->Supports(PrinterCap::kPrintStyle)) {
 		fDuplex = new BCheckBox("duplex", "Duplex",
 			new BMessage(kMsgDuplexChanged));
 		if (fJobData->GetPrintStyle() != JobData::kSimplex) {
@@ -458,7 +458,7 @@ JobSetupView::AttachedToWindow()
 bool
 JobSetupView::IsHalftoneConfigurationNeeded()
 {
-	return fPrinterCap->IsSupport(PrinterCap::kHalftone);
+	return fPrinterCap->Supports(PrinterCap::kHalftone);
 }
 
 
@@ -514,7 +514,7 @@ JobSetupView::CreateHalftoneConfigurationUI()
 void
 JobSetupView::AddDriverSpecificSettings(BGridLayout* gridLayout, int row)
 {
-	if (!fPrinterCap->IsSupport(PrinterCap::kDriverSpecificCapabilities))
+	if (!fPrinterCap->Supports(PrinterCap::kDriverSpecificCapabilities))
 		return;
 
 	int count = fPrinterCap->CountCap(PrinterCap::kDriverSpecificCapabilities);
@@ -950,7 +950,7 @@ JobSetupView::UpdateJobData()
 	fJobData->SetNup(GetID(gNups, sizeof(gNups) / sizeof(gNups[0]),
 		fNup->FindMarked()->Label(), 1));
 
-	if (fPrinterCap->IsSupport(PrinterCap::kPrintStyle)) {
+	if (fPrinterCap->Supports(PrinterCap::kPrintStyle)) {
 		fJobData->SetPrintStyle((B_CONTROL_ON == fDuplex->Value())
 			? JobData::kDuplex : JobData::kSimplex);
 	}

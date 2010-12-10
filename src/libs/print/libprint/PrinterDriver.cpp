@@ -89,7 +89,7 @@ PrinterDriver::AddPrinter(char* printerName)
 	DBGMSG(("\tprinter_name: %s\n", printerName));
 	DBGMSG(("<%s: add_printer\n", GetDriverName()));
 	
-	if (fPrinterCap->IsSupport(PrinterCap::kProtocolClass)) {
+	if (fPrinterCap->Supports(PrinterCap::kProtocolClass)) {
 		if (fPrinterCap->CountCap(PrinterCap::kProtocolClass) > 1) {
 			AddPrinterDlg *dialog;
 			dialog = new AddPrinterDlg(fPrinterData, fPrinterCap);

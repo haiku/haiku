@@ -57,7 +57,7 @@ public:
 	void	EndVisit();
 
 protected:
-	bool	IsSupported(stp_parameter_class_t parameterClass);
+	bool	Supportsed(stp_parameter_class_t parameterClass);
 	void	AddDefaultInputSlot();
 	void	SetDriverSpecificCategories();
 	void	AddCapability(GPArray<struct BaseCap>& array, EnumCap* capability,

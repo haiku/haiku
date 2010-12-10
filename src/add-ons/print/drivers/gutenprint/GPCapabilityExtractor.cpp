@@ -51,7 +51,7 @@ GPCapabilityExtractor::BeginParameter(const char* name, const char* displayName,
 		fState = kExtractPrintingModeParameter;
 	} else {
 		GP_PRINT("Parameter: %s - %s\n", name, displayName);
-		if (!IsSupported(parameterClass))
+		if (!Supportsed(parameterClass))
 			return false;
 
 		fState = kExtractParameter;
@@ -217,7 +217,7 @@ GPCapabilityExtractor::BooleanParameter(const char* name,
 	const char* displayName, bool defaultValue,
 	stp_parameter_class_t parameterClass)
 {
-	if (!IsSupported(parameterClass))
+	if (!Supportsed(parameterClass))
 		return;
 
 	BooleanCap* capability = new BooleanCap(displayName, defaultValue);
@@ -231,7 +231,7 @@ GPCapabilityExtractor::DoubleParameter(const char* name,
 	const char* displayName, double lower, double upper, double defaultValue,
 	stp_parameter_class_t parameterClass)
 {
-	if (!IsSupported(parameterClass))
+	if (!Supportsed(parameterClass))
 		return;
 
 	DoubleRangeCap* capability = new DoubleRangeCap(displayName, lower, upper,
@@ -246,7 +246,7 @@ GPCapabilityExtractor::IntParameter(const char* name, const char* displayName,
 	int lower, int upper, int defaultValue,
 	stp_parameter_class_t parameterClass)
 {
-	if (!IsSupported(parameterClass))
+	if (!Supportsed(parameterClass))
 		return;
 
 	IntRangeCap* capability = new IntRangeCap(displayName, lower, upper,
@@ -261,7 +261,7 @@ GPCapabilityExtractor::DimensionParameter(const char* name,
 	const char* displayName, int lower, int upper, int defaultValue,
 	stp_parameter_class_t parameterClass)
 {
-	if (!IsSupported(parameterClass))
+	if (!Supportsed(parameterClass))
 		return;
 
 	IntRangeCap* capability = new IntRangeCap(displayName, lower, upper,
@@ -281,7 +281,7 @@ GPCapabilityExtractor::EndVisit()
 
 
 bool
-GPCapabilityExtractor::IsSupported(stp_parameter_class_t parameterClass)
+GPCapabilityExtractor::Supportsed(stp_parameter_class_t parameterClass)
 {
 	return parameterClass == STP_PARAMETER_CLASS_FEATURE
 		|| parameterClass == STP_PARAMETER_CLASS_OUTPUT;

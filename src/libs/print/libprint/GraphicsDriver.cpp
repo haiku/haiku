@@ -506,7 +506,7 @@ GraphicsDriver::_PrintDocument(SpoolData* spoolData)
 	success = true;
 	page_index = 0;
 	
-	if (fPrinterCap->IsSupport(PrinterCap::kCopyCommand))
+	if (fPrinterCap->Supports(PrinterCap::kCopyCommand))
 		// let the printer perform the copy operation
 		copies = 1;
 	else
@@ -569,7 +569,7 @@ GraphicsDriver::_PrintDocument(SpoolData* spoolData)
 
 #ifndef USE_PREVIEW_FOR_DEBUG
 	if (success
-		&& fPrinterCap->IsSupport(PrinterCap::kPrintStyle)
+		&& fPrinterCap->Supports(PrinterCap::kPrintStyle)
 		&& (fOrgJobData->GetPrintStyle() != JobData::kSimplex)
 		&& (((page_index + fOrgJobData->GetNup() - 1) / fOrgJobData->GetNup())
 			% 2)) {

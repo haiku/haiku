@@ -82,7 +82,7 @@ GPCapabilities::GetCaps(CapID category) const
 
 
 bool
-GPCapabilities::IsSupport(CapID category) const
+GPCapabilities::Supports(CapID category) const
 {
 	switch (category) {
 		case kPaper:

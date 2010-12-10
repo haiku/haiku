@@ -263,8 +263,9 @@ public:
 	};
 
 	virtual	int				CountCap(CapID category) const = 0;
-	virtual	bool			IsSupport(CapID category) const = 0;
+	virtual	bool			Supports(CapID category) const = 0;
 	virtual	const BaseCap**	GetCaps(CapID category) const = 0;
+
 			const EnumCap*	GetDefaultCap(CapID category) const;
 			const EnumCap*	FindCap(CapID category, int id) const;
 			const BaseCap*	FindCap(CapID category, const char* label) const;

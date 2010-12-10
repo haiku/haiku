@@ -210,7 +210,7 @@ Lips4Cap::GetCaps(CapID capid) const
 
 
 bool
-Lips4Cap::IsSupport(CapID capid) const
+Lips4Cap::Supports(CapID capid) const
 {
 	switch (capid) {
 		case kPaper:

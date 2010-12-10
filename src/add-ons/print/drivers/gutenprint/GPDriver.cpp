@@ -65,7 +65,7 @@ GPDriver::StartDocument()
 		SetParameter(fConfiguration.fPrintingMode, PrinterCap::kColor,
 			GetJobData()->GetColor());
 
-		if (GetPrinterCap()->IsSupport(PrinterCap::kDriverSpecificCapabilities))
+		if (GetPrinterCap()->Supports(PrinterCap::kDriverSpecificCapabilities))
 			SetDriverSpecificSettings();
 
 		fprintf(stderr, "Driver: %s\n", fConfiguration.fDriver.String());

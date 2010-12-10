@@ -26,7 +26,7 @@ public:
 					~GPCapabilities();
 
 	virtual	int		CountCap(CapID) const;
-	virtual	bool	IsSupport(CapID) const;
+	virtual	bool	Supports(CapID) const;
 	virtual	const	BaseCap **GetCaps(CapID) const;
 
 private:

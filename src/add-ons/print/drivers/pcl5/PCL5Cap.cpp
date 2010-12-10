@@ -145,7 +145,7 @@ PCL5Cap::GetCaps(CapID capid) const
 
 
 bool
-PCL5Cap::IsSupport(CapID capid) const
+PCL5Cap::Supports(CapID capid) const
 {
 	switch (capid) {
 		case kPaper:

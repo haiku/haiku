@@ -144,7 +144,7 @@ PSCap::GetCaps(CapID capid) const
 
 
 bool
-PSCap::IsSupport(CapID capid) const
+PSCap::Supports(CapID capid) const
 {
 	switch (capid) {
 		case kPaper:
