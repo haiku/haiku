@@ -474,6 +474,7 @@ KeyboardDevice::_ControlThread()
 				fInputMethodStarted = true;
 
 			activeDeadKey = newDeadKey;
+			delete[] string;
 		}
 
 		if (msg != NULL && fOwner->EnqueueMessage(msg) != B_OK)

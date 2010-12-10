@@ -167,10 +167,6 @@ keyboard_reader(void* arg)
 			}
 		} else if (isKeyDown) {
 			// start of a dead key
-			char* string = NULL;
-			int32 numBytes = 0;
-			keymap.GetChars(keycode, modifiers, 0, &string, &numBytes);
-
 			activeDeadKey = newDeadKey;
 		}
 	}
