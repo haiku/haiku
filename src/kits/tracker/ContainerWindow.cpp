@@ -3382,7 +3382,8 @@ BContainerWindow::AddMimeTypesToMenu(BMenu *menu)
 	BPath path;
 	if (TargetModel() != NULL) {
 		TargetModel()->GetPath(&path);
-		if (strstr(path.Path(), "/" kQueryTemplates "/") != NULL) {
+		if (path.InitCheck() == B_OK
+			&& strstr(path.Path(), "/" kQueryTemplates "/") != NULL) {
 			// demangle MIME type name
 			BString name(TargetModel()->Name());
 			name.ReplaceFirst('_', '/');
