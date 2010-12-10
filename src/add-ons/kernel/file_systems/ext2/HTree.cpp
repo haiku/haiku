@@ -110,7 +110,7 @@ HTree::Lookup(const char* name, DirectoryIterator** iterator)
 {
 	TRACE("HTree::Lookup()\n");
 	if (!fIndexed || (name[0] == '.'
-		&& (name[1] == '\0' || (name[1] == '.' && name[2] == '0')))) {
+		&& (name[1] == '\0' || (name[1] == '.' && name[2] == '\0')))) {
 		// No HTree support or looking for trivial directories
 		return _FallbackToLinearIteration(iterator);
 	}

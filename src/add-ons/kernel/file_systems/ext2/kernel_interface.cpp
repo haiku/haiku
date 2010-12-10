@@ -32,6 +32,7 @@
 #else
 #	define TRACE(x...) ;
 #endif
+#define ERROR(x...) dprintf("\33[34mext2:\33[0m " x)
 
 
 #define EXT2_IO_SIZE	65536
@@ -131,7 +132,7 @@ ext2_mount(fs_volume* _volume, const char* device, uint32 flags,
 
 	status_t status = volume->Mount(device, flags);
 	if (status != B_OK) {
-		TRACE("Failed mounting the volume. Error: %s\n", strerror(status));
+		ERROR("Failed mounting the volume. Error: %s\n", strerror(status));
 		delete volume;
 		return status;
 	}
@@ -194,7 +195,7 @@ ext2_get_vnode(fs_volume* _volume, ino_t id, fs_vnode* _node, int* _type,
 	Volume* volume = (Volume*)_volume->private_volume;
 
 	if (id < 2 || id > volume->NumInodes()) {
-		dprintf("ext2: invalid inode id %lld requested!\n", id);
+		ERROR("invalid inode id %lld requested!\n", id);
 		return B_BAD_VALUE;
 	}
 
@@ -211,7 +212,8 @@ ext2_get_vnode(fs_volume* _volume, ino_t id, fs_vnode* _node, int* _type,
 		_node->ops = &gExt2VnodeOps;
 		*_type = inode->Mode();
 		*_flags = 0;
-	}
+	} else
+		ERROR("get_vnode: InitCheck() failed. Error: %s\n", strerror(status));
 
 	return status;
 }
