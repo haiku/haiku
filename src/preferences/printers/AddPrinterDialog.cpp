@@ -320,7 +320,8 @@ AddPrinterDialog::_FillMenu(BMenu* menu, const char* path, uint32 what)
 
 			char type[B_MIME_TYPE_LENGTH + 1];
 			info.GetType(type);
-			if (strcmp(type, B_APP_MIME_TYPE) != 0)
+			BString mimeType(type);
+			if (mimeType.ICompare(B_APP_MIME_TYPE) != 0)
 				continue;
 
 			BPath path;
