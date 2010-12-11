@@ -19,6 +19,7 @@
 
 #include <Message.h>
 #include <Messenger.h>
+#include <NetworkDevice.h>
 #include <NetworkInterface.h>
 #include <NetworkRoster.h>
 
@@ -52,7 +53,7 @@ struct media_type {
 	} subtypes [6];
 	struct {
 		int option;
-		bool ro;
+		bool read_only;
 		const char* name;
 		const char* pretty;
 	} options [6];
@@ -119,7 +120,9 @@ usage(int status)
 {
 	printf("usage: %s [<interface> [<address family>] [<address> [<mask>] | "
 			"auto-config] [<option/flags>...]]\n"
-		"\t%s --delete interface [...]\n\n"
+		"       %s --delete <interface> [...]\n"
+		"       %s <interface> [scan|join|leave] [<network> "
+			"[<password>]]\n\n"
 		"Where <option> can be the following:\n"
 		"  netmask <addr>     - networking subnet mask\n"
 		"  prefixlen <number> - subnet mask length in bits\n"
@@ -128,7 +131,8 @@ usage(int status)
 		"  mtu <bytes>        - maximal transfer unit\n"
 		"  metric <number>    - metric number to use (defaults to 0)\n"
 		"  media <media>      - media type to use (defaults to auto)\n",
-		kProgramName, kProgramName);
+		kProgramName, kProgramName, kProgramName);
+
 	for (int32 i = 0; kMediaTypes[i].type >= 0; i++) {
 		printf("For %s <media> can be one of: ", kMediaTypes[i].pretty);
 		for (int32 j = 0; kMediaTypes[i].subtypes[j].subtype >= 0; j++)
@@ -244,6 +248,218 @@ prefix_length_to_mask(int family, const char* argument, BNetworkAddress& mask)
 }
 
 
+//	#pragma mark - wireless support
+
+
+const char*
+get_key_mode(uint32 mode)
+{
+	if ((mode & B_KEY_MODE_WPS) != 0)
+		return "WPS";
+	if ((mode & B_KEY_MODE_PSK_SHA256) != 0)
+		return "PSK-SHA256";
+	if ((mode & B_KEY_MODE_IEEE802_1X_SHA256) != 0)
+		return "IEEE 802.1x-SHA256";
+	if ((mode & B_KEY_MODE_FT_PSK) != 0)
+		return "FT-PSK";
+	if ((mode & B_KEY_MODE_FT_IEEE802_1X) != 0)
+		return "FT-IEEE 802.1x";
+	if ((mode & B_KEY_MODE_NONE) != 0)
+		return "-";
+	if ((mode & B_KEY_MODE_PSK) != 0)
+		return "PSK";
+	if ((mode & B_KEY_MODE_IEEE802_1X) != 0)
+		return "IEEE 802.1x";
+
+	return "";
+}
+
+
+const char*
+get_cipher(uint32 cipher)
+{
+	if ((cipher & B_NETWORK_CIPHER_AES_128_CMAC) != 0)
+		return "AES-128-CMAC";
+	if ((cipher & B_NETWORK_CIPHER_CCMP) != 0)
+		return "CCMP";
+	if ((cipher & B_NETWORK_CIPHER_TKIP) != 0)
+		return "TKIP";
+	if ((cipher & B_NETWORK_CIPHER_WEP_104) != 0)
+		return "WEP-104";
+	if ((cipher & B_NETWORK_CIPHER_WEP_40) != 0)
+		return "WEP-40";
+
+	return "";
+}
+
+
+const char*
+get_authentication_mode(uint32 mode, uint32 flags)
+{
+	switch (mode) {
+		default:
+		case B_NETWORK_AUTHENTICATION_NONE:
+			if ((flags & B_NETWORK_IS_ENCRYPTED) != 0)
+				return "(encrypted)";
+			return "-";
+		case B_NETWORK_AUTHENTICATION_WEP:
+			return "WEP";
+		case B_NETWORK_AUTHENTICATION_WPA:
+			return "WPA";
+		case B_NETWORK_AUTHENTICATION_WPA2:
+			return "WPA2";
+	}
+}
+
+
+void
+show_wireless_network_header(bool verbose)
+{
+	printf("%-32s %-20s %s  %s\n", "name", "address", "signal", "auth");
+}
+
+
+void
+show_wireless_network(const wireless_network& network, bool verbose)
+{
+	printf("%-32s %-20s %6u  %s\n", network.name,
+		network.address.ToString().String(),
+		network.signal_strength / 2,
+		get_authentication_mode(network.authentication_mode, network.flags));
+}
+
+
+bool
+configure_wireless(const char* name, char* const* args, int32 argCount)
+{
+	enum {
+		NONE,
+		LIST,
+		JOIN,
+		LEAVE
+	} mode = NONE;
+
+	if (!strcmp(args[0], "list") || !strcmp(args[0], "scan"))
+		mode = LIST;
+	else if (!strcmp(args[0], "join"))
+		mode = JOIN;
+	else if (!strcmp(args[0], "leave"))
+		mode = LEAVE;
+
+	if (mode == NONE)
+		return false;
+
+	BNetworkDevice device(name);
+	if (!device.Exists()) {
+		fprintf(stderr, "%s: \"%s\" does not exist!\n", kProgramName, name);
+		exit(1);
+	}
+	if (!device.IsWireless()) {
+		fprintf(stderr, "%s: \"%s\" is not a WLAN device!\n", kProgramName,
+			name);
+		exit(1);
+	}
+
+	args++;
+	argCount--;
+
+	switch (mode) {
+		case LIST:
+		{
+			// list wireless network(s)
+
+			bool verbose = false;
+			if (argCount > 0 && !strcmp(args[0], "-v")) {
+				verbose = true;
+				args++;
+				argCount--;
+			}
+			show_wireless_network_header(verbose);
+
+			if (argCount > 0) {
+				// list the named entries
+				for (int32 i = 0; i < argCount; i++) {
+					wireless_network network;
+					BNetworkAddress link;
+					status_t status;
+					if (link.SetTo(AF_LINK, args[i]) == B_OK)
+						status = device.GetNetwork(link, network);
+					else
+						status = device.GetNetwork(args[i], network);
+					if (status != B_OK) {
+						fprintf(stderr, "%s: Getting network failed: %s\n",
+							kProgramName, strerror(status));
+					} else
+						show_wireless_network(network, verbose);
+				}
+			} else {
+				// list them all
+				wireless_network network;
+				uint32 cookie = 0;
+				while (device.GetNextNetwork(cookie, network) == B_OK)
+					show_wireless_network(network, verbose);
+			}
+			break;
+		}
+
+		case JOIN:
+		{
+			// join a wireless network
+			if (argCount > 2) {
+				fprintf(stderr, "usage: %s %s join <network> [<password>]\n",
+					kProgramName, name);
+				exit(1);
+			}
+
+			const char* password = NULL;
+			if (argCount == 2)
+				password = args[1];
+
+			BNetworkAddress link;
+			status_t status;
+			if (link.SetTo(AF_LINK, args[0]) == B_OK)
+				status = device.JoinNetwork(link, password);
+			else
+				status = device.JoinNetwork(args[0], password);
+			if (status != B_OK) {
+				fprintf(stderr, "%s: Joining network failed: %s\n",
+					kProgramName, strerror(status));
+				exit(1);
+			}
+			break;
+		}
+
+		case LEAVE:
+		{
+			// leave a wireless network
+			if (argCount != 1) {
+				fprintf(stderr, "usage: %s %s leave <network>\n", kProgramName,
+					name);
+				exit(1);
+			}
+
+			BNetworkAddress link;
+			status_t status;
+			if (link.SetTo(AF_LINK, args[0]) == B_OK)
+				status = device.LeaveNetwork(link);
+			else
+				status = device.LeaveNetwork(args[0]);
+			if (status != B_OK) {
+				fprintf(stderr, "%s: Leaving network failed: %s\n",
+					kProgramName, strerror(status));
+				exit(1);
+			}
+			break;
+		}
+
+		case NONE:
+			break;
+	}
+
+	return true;
+}
+
+
 //	#pragma mark -
 
 
@@ -312,7 +528,7 @@ list_interface(const char* name)
 		if (address.Length() == 0)
 			address = "none";
 
-		printf("Hardware Type: %s, Address: %s\n", type, address.String());
+		printf("Hardware type: %s, Address: %s\n", type, address.String());
 	} else
 		printf("No link level: %s\n", strerror(status));
 
@@ -343,7 +559,32 @@ list_interface(const char* name)
 		}
 
 		if (show)
-			printf("\tMedia Type: %s\n", type);
+			printf("\tMedia type: %s\n", type);
+	}
+
+	// Print associated wireless network(s)
+
+	BNetworkDevice device(name);
+	if (device.IsWireless()) {
+		wireless_network network;
+		bool first = true;
+		uint32 cookie = 0;
+		while (device.GetNextAssociatedNetwork(cookie, network) == B_OK) {
+			if (first) {
+				printf("\tNetwork: ");
+				first = false;
+			} else
+				printf("\t\t");
+
+			printf("%s, Address: %s, %s", network.name,
+				network.address.ToString().String(),
+				get_authentication_mode(network.authentication_mode,
+					network.flags));
+			const char* keyMode = get_key_mode(network.key_mode);
+			if (keyMode != NULL)
+				printf(", %s/%s", keyMode, get_cipher(network.cipher));
+			putchar('\n');
+		}
 	}
 
 	uint32 flags = interface.Flags();
@@ -470,8 +711,7 @@ delete_interface(const char* name, char* const* args, int32 argCount)
 
 
 void
-configure_interface(const char* name, char* const* args,
-	int32 argCount)
+configure_interface(const char* name, char* const* args, int32 argCount)
 {
 	// try to parse address family
 
@@ -758,6 +998,9 @@ main(int argc, char** argv)
 
 	const char* name = argv[1];
 	if (argc > 2) {
+		if (configure_wireless(name, argv + 2, argc - 2))
+			return 0;
+
 		// Add or configure an interface
 
 		configure_interface(name, argv + 2, argc - 2);
