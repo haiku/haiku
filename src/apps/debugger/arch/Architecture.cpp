@@ -73,15 +73,12 @@ Architecture::InitRegisterRules(CfaContext& context) const
 		switch (registers[i].Type()) {
 			case REGISTER_TYPE_STACK_POINTER:
 			{
-				// TODO: determine why this fails to retrieve the
-				// correct values.
-//				context.RegisterRule(dwarfReg)->SetToLocationOffset(0);
+				context.RegisterRule(dwarfReg)->SetToValueOffset(0);
 				break;
 			}
 			default:
 			{
-				if (registers[i].IsCalleePreserved())
-					context.RegisterRule(dwarfReg)->SetToSameValue();
+				context.RegisterRule(dwarfReg)->SetToSameValue();
 				break;
 			}
 		}
