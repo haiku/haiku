@@ -64,7 +64,7 @@ TableCellStringRenderer::RenderValue(Value* value, BRect rect,
 	string += "\"";
 
 	TableCellValueRendererUtils::DrawString(targetView, rect, string,
-		B_ALIGN_LEFT, true);
+		B_ALIGN_RIGHT, true);
 }
 
 
