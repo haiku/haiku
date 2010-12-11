@@ -58,7 +58,7 @@ main(int argc, char** argv)
 
 	BNetworkDevice device(argv[1]);
 	if (!device.Exists()) {
-		fprintf(stderr, "\"%s\" does not exit!\n", argv[1]);
+		fprintf(stderr, "\"%s\" does not exist!\n", argv[1]);
 		return 1;
 	}
 	if (!device.IsWireless()) {
