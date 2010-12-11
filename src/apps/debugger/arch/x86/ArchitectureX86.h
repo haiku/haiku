@@ -23,6 +23,7 @@ public:
 
 	virtual	int32				CountRegisters() const;
 	virtual	const Register*		Registers() const;
+	virtual status_t			InitRegisterRules(CfaContext& context) const;
 
 	virtual	status_t			GetDwarfRegisterMaps(RegisterMap** _toDwarf,
 									RegisterMap** _fromDwarf) const;

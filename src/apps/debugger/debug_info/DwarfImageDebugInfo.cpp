@@ -99,6 +99,11 @@ struct DwarfImageDebugInfo::BasicTargetInterface : DwarfTargetInterface {
 		return reg != NULL && reg->IsCalleePreserved();
 	}
 
+	virtual status_t InitRegisterRules(CfaContext& context) const
+	{
+		return fArchitecture->InitRegisterRules(context);
+	}
+
 	virtual bool ReadMemory(target_addr_t address, void* buffer,
 		size_t size) const
 	{

@@ -10,11 +10,14 @@
 #include <AutoDeleter.h>
 #include <AutoLocker.h>
 
+#include "CfaContext.h"
 #include "CpuState.h"
 #include "FunctionInstance.h"
 #include "Image.h"
 #include "ImageDebugInfo.h"
 #include "ImageDebugInfoProvider.h"
+#include "Register.h"
+#include "RegisterMap.h"
 #include "SpecificImageDebugInfo.h"
 #include "StackTrace.h"
 #include "Team.h"
@@ -39,6 +42,52 @@ status_t
 Architecture::Init()
 {
 	return B_OK;
+}
+
+
+status_t
+Architecture::InitRegisterRules(CfaContext& context) const
+{
+	// Init the initial register rules. The DWARF 3 specs on the
+	// matter: "The default rule for all columns before
+	// interpretation of the initial instructions is the undefined
+	// rule. However, an ABI authoring body or a compilation system
+	// authoring body may specify an alternate default value for any
+	// or all columns."
+	// GCC's assumes the "same value" rule for all callee preserved
+	// registers. We set them respectively.
+	// the stack pointer is initialized to
+	// CFA offset 0 by default.
+	const Register* registers = Registers();
+	RegisterMap* toDwarf = NULL;
+	status_t result = GetDwarfRegisterMaps(&toDwarf, NULL);
+	if (result != B_OK)
+		return result;
+
+	BReference<RegisterMap> toDwarfMapReference(toDwarf, true);
+	for (int32 i = 0; i < CountRegisters(); i++) {
+		int32 dwarfReg = toDwarf->MapRegisterIndex(i);
+		if (dwarfReg < 0 || dwarfReg > CountRegisters() - 1)
+			continue;
+
+		switch (registers[i].Type()) {
+			case REGISTER_TYPE_STACK_POINTER:
+			{
+				// TODO: determine why this fails to retrieve the
+				// correct values.
+//				context.RegisterRule(dwarfReg)->SetToLocationOffset(0);
+				break;
+			}
+			default:
+			{
+				if (registers[i].IsCalleePreserved())
+					context.RegisterRule(dwarfReg)->SetToSameValue();
+				break;
+			}
+		}
+	}
+
+	return result;
 }
 
 

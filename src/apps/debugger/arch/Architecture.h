@@ -15,6 +15,7 @@
 #include "Types.h"
 
 
+class CfaContext;
 class CpuState;
 class DisassembledCode;
 class FunctionDebugInfo;
@@ -45,6 +46,7 @@ public:
 
 	virtual	int32				CountRegisters() const = 0;
 	virtual	const Register*		Registers() const = 0;
+	virtual status_t			InitRegisterRules(CfaContext& context) const;
 
 	virtual	status_t			GetDwarfRegisterMaps(RegisterMap** _toDwarf,
 									RegisterMap** _fromDwarf) const = 0;

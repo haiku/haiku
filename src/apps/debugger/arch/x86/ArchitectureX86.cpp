@@ -12,6 +12,7 @@
 
 #include <AutoDeleter.h>
 
+#include "CfaContext.h"
 #include "CpuStateX86.h"
 #include "DisassembledCode.h"
 #include "FunctionDebugInfo.h"
@@ -192,6 +193,20 @@ ArchitectureX86::Registers() const
 	return fRegisters.Elements();
 }
 
+
+status_t
+ArchitectureX86::InitRegisterRules(CfaContext& context) const
+{
+	status_t error = Architecture::InitRegisterRules(context);
+	if (error != B_OK)
+		return error;
+
+	// set up rule for EIP register
+	context.RegisterRule(fToDwarfRegisterMap->MapRegisterIndex(
+		X86_REGISTER_EIP))->SetToLocationOffset(-4);
+
+	return B_OK;
+}
 
 status_t
 ArchitectureX86::GetDwarfRegisterMaps(RegisterMap** _toDwarf,

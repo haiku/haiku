@@ -36,6 +36,7 @@ local debugAnalyzerSources
 	= [ FDirName $(HAIKU_TOP) src apps debuganalyzer ] ;
 
 SubDirHdrs [ FDirName $(SUBDIR) demangler ] ;
+SubDirHdrs [ FDirName $(SUBDIR) dwarf ] ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) src bin debug ] ;
 SubDirHdrs [ FDirName $(debugAnalyzerSources) gui ] ;
 

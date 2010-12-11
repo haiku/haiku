@@ -645,18 +645,9 @@ DwarfFile::UnwindCallFrame(CompilationUnit* unit,
 				if (error != B_OK)
 					return error;
 
-				// Init the initial register rules. The DWARF 3 specs on the
-				// matter: "The default rule for all columns before
-				// interpretation of the initial instructions is the undefined
-				// rule. However, an ABI authoring body or a compilation system
-				// authoring body may specify an alternate default value for any
-				// or all columns."
-				// GCC's assumes the "same value" rule for all callee preserved
-				// registers. We set them respectively.
-				for (uint32 i = 0; i < registerCount; i++) {
-					if (outputInterface->IsCalleePreservedRegister(i))
-						context.RegisterRule(i)->SetToSameValue();
-				}
+				error = outputInterface->InitRegisterRules(context);
+				if (error != B_OK)
+					return error;
 
 				// process the CIE
 				CIEAugmentation cieAugmentation;
@@ -1613,7 +1604,7 @@ DwarfFile::_ParseCIE(CompilationUnit* unit, CfaContext& context,
 	if (remaining < 0)
 		return B_BAD_DATA;
 
-	return _ParseFrameInfoInstructions(unit, context, 
+	return _ParseFrameInfoInstructions(unit, context,
 		cieOffset + dataReader.Offset(), remaining);
 }
 
