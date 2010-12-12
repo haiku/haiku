@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Be-TSKB	2686533917
+1	lithuanian	x-vnd.Be-TSKB	34208151
 Applications	PreferencesWindow		Programos
 Recent applications	BeMenu		Naudotos programos
 Edit menu…	PreferencesWindow		Taisyti meniu…
@@ -15,7 +15,6 @@ Show all	WindowMenu		Rodyti visus
 No windows	WindowMenu		Langų nėra
 Power off	BeMenu		Išjungti
 Auto-raise	PreferencesWindow		Automatiškai iškilti
-Full date	PreferencesWindow		Ilgasis datos formatas
 Hide time	TimeView		Nerodyti laikrodžio
 Recent folders:	PreferencesWindow		Paskiausi aplankai:
 Deskbar preferences…	BeMenu		Užduočių juostos parinktys…

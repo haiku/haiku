@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-StyledEdit	154881138
+1	portuguese	x-vnd.Haiku-StyledEdit	2108192170
 OK	LoadAlert		OK
 ???	LoadAlert		???
 Left	Menus		À esquerda
@@ -6,7 +6,6 @@ Revert to the last version of \"%s\"? 	RevertToSavedAlert		Reverter para a últi
 Search backwards	FindandReplaceWindow		Localizar anterior
 Size	Menus		Tamanho
 Save	QuitAlert		Guardar
-Redo typing	Menus		Refazer introdução de texto
 Replace same	Menus		Substituir todos
 Can't Undo	Menus		Impossível desfazer
 Save	Menus		Guardar
@@ -42,7 +41,6 @@ Find selection	Menus		Localizar selecção
 Find:	FindandReplaceWindow		Localizar:
 Error saving \"%s\":\n%s	SaveAlert		Erro ao guardar \"%s\":\n%s
 Replace	FindandReplaceWindow		Substituir
-Undo typing	Menus		Anular introdução de texto
 Find again	Menus		Localizar seguinte
 Cancel	QuitAlert		Cancelar
 Find…	Menus		Localizar..

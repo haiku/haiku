@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Be-PSRV	1211700656
+1	finnish	x-vnd.Be-PSRV	1761631281
 Undefined	ConfigWindow		Määrittelemätön
 Cancel	PrintServerApp		Peru
 Page setup:	ConfigWindow		Sivuasetus:
@@ -9,13 +9,11 @@ Would you like to set one up now?	PrintServerApp		Haluaisitko asettaa yhden nyt?
 Portrait	ConfigWindow		Pystysuora
 All pages	ConfigWindow		Kaikki sivut
 There is no default printer set up.	PrintServerApp		Ei ole olemassa tulostimen oletusasetusta.
-There already exists a printer you are going to create, but it's driver could not be found! Replace?	PrintServerApp		On jo olemassa sellainen tulostin, jota olet luomassa, mutta sen ajuria ei löydy! Korvataanko?
 Printer:	ConfigWindow		Tulostin:
 Select a printer	ConfigWindow		Valitse tulostin
 No	PrintServerApp		Ei
 Landscape	ConfigWindow		Vaakasuora
 There are no printers set up.	PrintServerApp		Ei ole asetettavia tulostimia.
-There already exists a printer you are going to create, but it's not usable at all! Replace?	PrintServerApp		On jo olemassa tulostin, jota olet luomassa, mutta se ei ole ollenkaan käyttökelpoinen! Korvataanko?
 OK	PrintServerApp		Valmis
 Print setup	ConfigWindow		Tulostinasetukset
 Would you like to make @ the default printer?	PrintServerApp		Haluaisitko tehdä @ oletustulostimeksi?
@@ -52,3 +50,5 @@ A3	ConfigWindow	ISO 216 paper size	A3
 Get name of transport	Transport Scripting		Hae siirron nimi
 A5	ConfigWindow	ISO 216 paper size	A5
 Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Tabloid-koko
+A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Tulostin tuolla nimellä on jo olemassa, mutta sen ajuria ei voitu löytää
+A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Tulostin tuolla nimellä on jo olemassa, mutta se ei ole ollenkaan käytettävissä! Korvataanko?

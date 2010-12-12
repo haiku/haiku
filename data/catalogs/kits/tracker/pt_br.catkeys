@@ -1,320 +1,124 @@
-1	brazilian_portuguese	x-vnd.Haiku-libtracker	2723586359
-Sorry, you can't save things at the root of your system.	libtracker		Desculpe, você não pode salvar coisas na pasta raiz de seu sistema.
-Empty Trash	libtracker		Lixeira vazia
-Recent folders	libtracker		Pastas recentes
-You cannot copy or move the root directory.	libtracker		Você não pode copiar ou mover na pasta raiz.
-starts with	libtracker		começa com
-TiB	libtracker		TiB
-Duplicate	libtracker		Duplicar
-Link To:	libtracker		Atalho para:
-Paste links	libtracker		Colar atalhos
-Volume icons	libtracker		Ícones de volume
-Relation	libtracker		Relação
-Create a Query template	libtracker		Criar um modelo de Consulta
-%num items	libtracker		%num items
-Name matches wildcard expression:###	libtracker		Nome corresponde a expressão curinga:###
-Modified	libtracker		Modificado
-Group	libtracker		Grupo
-Create link	libtracker		Criar atalho
-Moving: 	libtracker		Movendo:
-Preparing to copy items…	libtracker		Preparando para copiar items...
-Error deleting items	libtracker		Erro ao apagar items
-Sorry, saving more than one item is not allowed.	libtracker		Desculpe, salvando mais do que um item não é permitido.
-Open with…	libtracker		Abrir com...
-for %num files	libtracker		para %num arquivos
-At %func \nfind_directory() failed. \nReason: %error	libtracker		Na %func \nfind_directory() falhou. \nMotivo: %error
-Unknown	libtracker		Desconhecido
-Close	libtracker		Fechar
-Go to parent	libtracker		Ir para ascendente
-%name info	libtracker	InfoWindow Title	Informação de %name
-(Finish: %time - %finishtime minutes left)	libtracker		(Término: %time - %finishtime minutos restantes)
-Recent documents	libtracker		Documentos recentes
-Clean up	libtracker		Organizar
-Find…	libtracker		Localizar...
-Mount all	libtracker		Montar tudo
-Opens with:	libtracker		Abrir com:
-Paste layout	libtracker		Esquema de colagem
-Cancel	libtracker		Cancelar
-Preparing to move items…	libtracker		Preparando para mover items...
-Invert selection	libtracker		Inverter seleção
-Error calculating folder size.	libtracker		Erro ao calcular tamanho de pasta
-Don't move files to Trash	libtracker		Não mover arquivos para a Lixeira
-Name	libtracker		Nome
-Cut more	libtracker		Recortar mais
-save text	libtracker		salvar texto
-Could not open \"%document\" (Missing symbol: %symbol). \n	libtracker		Não foi possível abrir \"%document\" (Símbolo faltante: %symbol). \n
-Don't automount	libtracker		Não montar automaticamente
-Sorry, the 'Character' attribute cannot store a multi-byte glyph.	libtracker		Desculpe, o atributo 'Caractere' não pode armazenar um glifo multi-byte
-Would you like to find a suitable application to open the file?	libtracker		Você gostaria de encontrar um aplicativo compatível para abrir o arquivo?
-Increase size	libtracker		Aumentar o tamanho
-is	libtracker		é
-(Finish: %time - Over %finishtime hours left)	libtracker		(Término: %time - Mais de %finishtime horas restantes)
-Could not open \"%name\" (%error). 	libtracker		Não foi possível abrir \"%name\" (%error).
-Copying: 	libtracker		Copiando:
-You cannot replace a folder or a symbolic link with a file.	libtracker		Não foi possível substituir uma pasta ou um atalho com um arquivo.
-Decrease size	libtracker		Diminuir o tamanho
-There was an error deleting \"%name\":\n\t%error	libtracker		Houve um erro ao apagar \"%name\":\n\t%error
-Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	libtracker		Você tem certeza que deseja apagar os item(s) selecionado(s)? Esta operação não pode ser desfeita.
-The target disk does not support creating links.	libtracker		O disco de destino não suporta a criação de atalhos.
-The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	libtracker		O item selecionado não pode ser movido para a Lixeira. Ao invés disso, você deseja apagá-lo? (Esta operação não pode ser desfeita.)
-before	libtracker		antes
-Copy more	libtracker		Copiar mais
-Disks	libtracker		Discos
-Cut	libtracker		Recortar
-The Tracker must be running to see Info windows.	libtracker		O Tracker precisa estar funcionando para ver as janelas de Informação.
-Desktop	libtracker		Área de Trabalho
-Create a Query	libtracker		Criar uma Consulta
-Could not update permissions of file \"%name\". %error	libtracker		Não foi possível atualizar as permissões do arquivo \"%name\". %error
-Error in regular expression:\n\n'	libtracker		Erro na expressão regular:\n\n'
-If you %action the mime settings, Haiku may not behave properly! Are you sure you want to do this? To %action the mime settings anyway, click \"Do it\".	libtracker		Se você %action as configurações MIME, o Haiku não pode funcionar corretamente! Você tem certeza que deseja fazer mesmo assim? Para %action as configurações MIME de qualquer jeito, clique em \"Fazer\".
-Resize to Fit	libtracker		Redimensionar para caber
-Add printer…	libtracker		Adicionar impressora...
-Trash	libtracker		Lixeira
-greater than	libtracker		maior do que
-Other	libtracker		Outro
-GiB	libtracker		GiB
-Query name:	libtracker		Nome da Consulta:
-Or	libtracker		Ou
-An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	libtracker		Um item de nome \"%name\" já existe nesta pasta, e pode conter\nitens  com os mesmos nomes. Você gostaria de substituí-los com aqueles contidos na pasta que você está %verb?
-Do it	libtracker		Fazer
-There was an error writing the attribute.	libtracker		Houve um erro ao escrever o atributo
-Emptying Trash… 	libtracker		Limpando a Lixeira
-Close all in workspace	libtracker		Fechar tudo no Ambiente de Trabalho
-Sorry, you cannot edit that attribute.	libtracker		Desculpe, você não pode editar aquele atributo.
-Deleting: 	libtracker		Apagando:
-The file \"%name\" already exists in the specified folder. Do you want to replace it?	libtracker		O arquivo \"%name\" já existe na pasta especificada. Você deseja substituí-lo?
-Revert	libtracker		Reverter
-Could not open \"%document\" with application \"%app\" (%error). 	libtracker		Não foi possível abrir \"%document\" com o aplicativo \"%app\" (%error).
-no supporting apps	libtracker		Sem aplicativos suportados
-\nShould this be fixed?	libtracker		\nIsto será consertado?
-The specified name is already used as the name of a folder. Please choose another name.	libtracker		O nome especificado já está em uso como o nome de uma pasta. Por favor escolha um outro nome.
-Version	libtracker		Versão
-Invert	libtracker		Inverter
-by attribute	libtracker		por atributo
-There was a problem trying to save in the folder you specified. Please try another one.	libtracker		Houve um problema ao tentar salvar na pasta especificada. Por favor tente em outra pasta.
-Create relative link	libtracker		Criar um atalho relativo
-Attributes	libtracker		Atributos
-Mount server error	libtracker		Erro no Servidor de Montagem
-Sorry, there is not enough free space on the destination volume to copy the selection.	libtracker		Desculpe, não há espaço livre no volume de destino para copiar a seleção.
-Replace all	libtracker		Substituir tudo
-Owner	libtracker		Proprietário
-12 hour	libtracker		12 horas
-Select all	libtracker		Selecionar tudo
-Delete	libtracker		Apagar
-Save as Query template:	libtracker		Salvar como modelo de Consulta:
-Only the boot disk	libtracker		Somente o disco de inicialização
-Set new link target	libtracker		Definir o alvo do novo atalho
-ends with	libtracker		terminado em
-If you %action the config folder, Haiku may not behave properly! Are you sure you want to do this? To %action the config folder anyway, click \"Do it\".	libtracker		Se você %action a pasta de configurações, o Haiku pode não funcionar corretamente! Você tem certeza que deseja continuar mesmo assim? Para %action a pasta de configurações de qualquer jeito, clique em \"Fazer\".
-Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	libtracker		Erro copiando pasta \"%name\":\n\t%error\n\nVocê deseja continuar?
-OK	libtracker		OK
-Make active printer	libtracker		Definir impressora padrão
-New	libtracker		Novo
-Paused: click to resume or stop	libtracker		Pausado: clique para continuar ou parar
-Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	libtracker		Não foi possível abrir \"%document\" com o aplicativo \"%app\" (Bibliotecas faltantes: %library). \n
-MiB	libtracker		MiB
-Disk mount settings	libtracker		Configurações de montagem de disco
-Include trash	libtracker		Incluir Lixeira
-Could not find an application to open \"%name\" (%error). 	libtracker		Não foi possível encontrar um aplicativo para abrir  \"%name\" (%error).
-(Finish: %time - Over %finishtime days left)	libtracker		(Término: %time - Mais de %finishtime dias restantes)
-Could not open \"%document\" (Missing libraries: %library). \n	libtracker		Não foi possível abrir \"%document\" (Bibliotecas faltantes: %library). \n
-Preparing to restore items…	libtracker		Preparando para restaurar items...
-You can't replace a folder with one of its sub-folders.	libtracker		Você não pode substituir uma pasta com uma de suas sub-pastas.
-Mount all disks now	libtracker		Montar todos os discos agora
-Temporary	libtracker		Temporário
-If you %action the home folder, Haiku may not behave properly! Are you sure you want to do this? To %action the home anyway, click \"Do it\".	libtracker		Se você %action a pasta pessoal, o Haiku não poderá funcionar corretamente! Você tem certeza que deseja continuar mesmo assim? Para %action a pasta pessoal de qualquer jeito, clique em \"Fazer\".
-40 x 40	libtracker		40 x 40
-Previously mounted disks	libtracker		Discos montados anteriormente
-Create link here	libtracker		Criar um atalho aqui
-Unmount	libtracker		Desmontar
-That name is already taken. Please type another one.	libtracker		Este nome já foi escolhido. Por favor escolha outro.
-Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	libtracker		Não foi possível abir \"%document\" com o aplicativo \"%app\" (Símbolo faltante: %symbol). \n
-less than	libtracker		menor do que
-Edit query	libtracker		Editar Consulta
-Original name	libtracker		Nome original
-Preparing to delete items…	libtracker		Preparando para apagar itens
-Created:	libtracker		Criado:
-Location:	libtracker		Localização:
-New Query	libtracker		Nova Consulta
-Write	libtracker		Escrever
-Sorry, you can't copy items to the Trash.	libtracker		Desculpe, você não pode copiar itens na Lixeira.
-Mini icon view	libtracker		Ícones pequenos
-Windows	libtracker		Janelas
-Ask before delete	libtracker		Perguntar antes de apagar
-matches regular expression	libtracker		corresponde à expressão regular
-Open and make preferred	libtracker		Abrir e definir como preferido
-Default application	libtracker		Aplicativo padrão
-Execute	libtracker		Executar
-Created	libtracker		Criado
-calculating…	libtracker		calculando...
-label too long	libtracker		rótulo muito grande
-Link \"%name\" to:	libtracker	File dialog title for new sym link	Atalho \%name\" para:
-Query template	libtracker		Modelo de Consulta
-Description:	libtracker		Descrição
-You cannot replace a file with a folder or a symbolic link.	libtracker		Você não pode substituir um arquivo com uma posta ou um atalho.
-Save	libtracker		Salvar
-Month-day-year	libtracker		Mês-dia-ano
-link	libtracker	filename link	atalho
-Open	libtracker		Abrir
-Edit name	libtracker		Editar nome
-Show folder location in title tab	libtracker		Mostrar localização da pasta na aba de título
-contains	libtracker		contém
-Formula %formula	libtracker	FindResultTitle	Fórmula %formula
-You cannot put the Trash, home or Desktop directory into the trash.	libtracker		Você não pode colocar a Lixeira, pasta pessoal ou a Área de Trabalho na Lixeira.
-Date & Time	libtracker		Data & Hora
-Modified:	libtracker		Modificado:
-Skip	libtracker		Pular
-Examples:	libtracker		Exemplos:
-24 hour	libtracker		24 horas
-Preparing to create links…	libtracker		Preparando para criar atalhos...
-Error emptying Trash!	libtracker		Erro ao limpar a Lixeira!
-There was an error resolving the link.	libtracker		Houve um erro ao resolver o atalho
-Move	libtracker		Mover
-You can't move a folder into itself or any of its own sub-folders.	libtracker		Você não pode mover uma pasta para dentro de si mesma ou para qualquer de suas sub-pastas.
-Error %error loading Add-On %name.	libtracker		Erro %error carregando Adicional %name.
-Edit Query template	libtracker		Editar modelo de Consulta
-Show shared volumes on Desktop	libtracker		Mostrar volumes integrados na Área de Trabalho
-Ignore case	libtracker		Ignorar caso
-Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	libtracker		Alguns items já existem nesta pasta com os mesmos nomes dos itens que você quer %verb.\n \nVocê gostaria de substituí-los com aqueles que você vai %verb ou ser perguntado em cada um deles?
-Open parent	libtracker		Abrir ascendente
-None	libtracker		Nenhum
-You can't move or copy the trash.	libtracker		Você não pode mover ou copiar a Lixeira.
-Create relative link here	libtracker		Criar um atalho relativo aqui
-moving	libtracker		movendo
-Version:	libtracker		Versão:
-Capacity:	libtracker		Capacidade:
-You cannot create a link to the root directory.	libtracker		Você não pode criar um atalho na pasta raiz.
-Are you sure you want to move or copy the selected item(s) to this folder?	libtracker		Você tem certeza que deseja mover ou copiar os itens selecionados para esta pasta?
-You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	libtracker		Você está tentando substituir o item:\n\t%name%dest\ncom:\n\t%name%src\n\nVocê gostaria de substituí-lo com aquele que você vai %movemode?
-Move here	libtracker		Mover aqui
-Free space color	libtracker		Cor do espaço livre
-Read	libtracker		Ler
-after	libtracker		depois
-Size	libtracker		Tamanho
-Search	libtracker		Localizar
-Recalculate folder size	libtracker		Recalcular tamanho da pasta
-Favorites	libtracker		Favoritos
-List view	libtracker		Lista
-Enable type-ahead filtering	libtracker		Habilitar tipo à frente de filtragem
-Show Disks icon	libtracker		Mostrar ícone de Discos
-Edit templates…	libtracker		Editar modelos...
-Add	libtracker		Adicionar
-Disk mounting during boot	libtracker		Montagem de discos durante a inicialização
-Date order	libtracker		Ordem por data
-Restoring: 	libtracker		Restaurando:
-Settings…	libtracker		Configurações...
-Sorry, could not create a new folder.	libtracker		Desculpe, não foi possível criar uma nova pasta
-Current folder	libtracker		Pasta atual
-New folder %ld	libtracker		Nova pasta %ld
-Cannot unmount the boot volume \"%name\".	libtracker		Não foi possível desmontar o volume de inicialização  \"%name\".
-48 x 48	libtracker		48 x 48
-Copy here	libtracker		Copiar aqui
-%Ld bytes	libtracker		%Ld bytes
-Used space color	libtracker		Cor do espaço em uso
-Location	libtracker		Localização
-Error moving \"%name\".	libtracker		Erro movendo \"%name\".
-Show volumes on Desktop	libtracker		Mostrar volumes na Área de Trabalho
-Name = %name	libtracker	FindResultTitle	Nome = %name
-matches wildcard expression	libtracker		corresponde à expressão curinga
-Window	libtracker		Janela
-There was a problem trying to replace \"%name\". The item might be open or busy.	libtracker		Houve um problema ao tentar substituir \"%name\". O item pode estar aberto ou ocupado.
-Proceed	libtracker		Prosseguir
-New folder%ld	libtracker		Nova pasta%ld
-Year-month-day	libtracker		Ano-mês-dia
-New folder	libtracker		Nova pasta
-File	libtracker		Arquivo
-Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	libtracker		Erro copiando arquivo \"%name\":\n\t%error\n\nVocê gostaria de continuar?
-Close all	libtracker		Fechar tudo
-(Finish: %time)	libtracker		(Término: %time)
-Clock	libtracker		Relógio
-Show navigator	libtracker		Mostrar navegador
-Force identify	libtracker		Forçar identificação
-Mount settings…	libtracker		Configurações de montagem...
-is not	libtracker		não é
-Clean up all	libtracker		Organizar tudo
-List folders first	libtracker		Listar pastas primeiramente
-Remove	libtracker		Remover
-All BeOS disks	libtracker		Todos os discos BeOS
-no items	libtracker		sem itens
-copying	libtracker		copiando
-Preferences…	libtracker		Preferências...
-All disks	libtracker		Todos os discos
-Searching for disks to mount…	libtracker		Procurando por discos para montar...
-Tracker status	libtracker		Status do Tracker
-Identify	libtracker		Identificar
-Automatic disk mounting	libtracker		Montagem automática de discos
-Add-ons	libtracker		Adicionais
-The mount server could not be  contacted.	libtracker		O Servidor de Montagem não pode ser contactado.
-Select…	libtracker		Selecionar...
-multiple disks	libtracker		múltiplos discos
-Could not open \"%name\". The file is mistakenly marked as executable. 	libtracker		Não foi possível abrir \"%name\". O arquivo foi erroneamente marcado como executável.
-Single window navigation	libtracker		Navegação em janela única
-Done	libtracker		Feito
-Open selection with:	libtracker		Abrir seleção com:
-Paste	libtracker		Colar
-32 x 32	libtracker		32 x 32
-Get info	libtracker		Obter informação
-Create %s clipping	libtracker		Criar %s recortes
-You must drop items on one of the disk icons in the \"Disks\" window.	libtracker		Você precisa arrastar itens em um dos ícones de disco na janela de \"Discos\"
-Move to	libtracker		Mover para
-by name	libtracker		por nome
-Warning space color	libtracker		Cor de espaço em alerta
-Add current folder	libtracker		Adicionar a pasta atual
-Replace other file	libtracker		Substituir outro arquivo
-%Ld B	libtracker		%Ld B
-Tracker preferences	libtracker		Preferências do Tracker
-Prompt	libtracker		Perguntar
-Kind	libtracker		Espécie
-Move to Trash	libtracker		Mover para a Lixeira
-1 item	libtracker		1 tem
-Size:	libtracker		Tamanho:
-Would you like to find some other suitable application?	libtracker		Você gostaria de encontrar outro aplicativo compatível?
-Files cannot be moved or deleted from a read-only volume.	libtracker		Os arquivos não pode ser movidos ou apagados em um volume marcado como somente leitura.
-by formula	libtracker		por fórmula
-(%bytes bytes)	libtracker		(%bytes bytes)
-Copy to	libtracker		Copiar para
-And	libtracker		E
-Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	libtracker		Alguns dos itens selecionados não pode ser movidos para a Lixeira. Ao invés disso, você gostaria de deletá-los? (Esta operação não pode ser desfeita)
-Eject when unmounting	libtracker		Ejetar quando desmontar
-Error creating link to \"%name\".	libtracker		Erro criando atalho para \"%name\".
-copy	libtracker	filename copy	cópia
-Icon view	libtracker		Ícone
-Sorry, you can't create links in the Trash.	libtracker		Desculpe, você não pode criar atalhos na Lixeira.
-Edit favorites…	libtracker		Editar favoritos...
-If you %action the settings folder, Haiku may not behave properly! Are you sure you want to do this? To %action the settings folder anyway, click \"Do it\".	libtracker		Se você %action a pasta de configurações, o Haiku não poderá funcionar corretamente. Você tem certeza que deseja continuar? Para %action a pasta de configurações de qualquer jeito, clique em \"Fazer\".
-On	libtracker		Ligado
-Space	libtracker		Espaço
-Find	libtracker		Localizar
-Error moving \"%name\"	libtracker		Erro movendo \"%name\"
-(Finish: %time - %finishtime seconds left)	libtracker		(Término: %time - %finishtime segundos restantes)
-That name is too long. Please type another one.	libtracker		O nome é muito grande. Por favor digite um outro nome.
-Select	libtracker		Selecionar
-Error moving \"%name\" to Trash. (%error)	libtracker		Erro movendo \"%name\" para a Lixeira. (%error)
-Outline selection rectangle only	libtracker		Somente retângulo de seleção sem linha
-The specified name is illegal. Please choose another name.	libtracker		O nome especificado é ilegal. Por favor escolha um outro nome.
-of %items	libtracker		de %items
-Day-month-year	libtracker		Dia-mês-ano
-Preparing to empty Trash…	libtracker		Preparando para limpar a Lixeira...
-If you %action the system folder or its contents, you won't be able to boot Haiku! Are you sure you want to do this? To %action the system folder or its contents anyway, hold down the Shift key and click \"Do it\".	libtracker		Se você %action a pasta do sistema ou o seu conteúdo, você não poderá inicializar o Haiku! Você tem certeza que deseja continuar? Para %action a pasta do sistema ou o seu conteúdo de qualquer jeito, pressione e segure a tecla Shift e clique em \"Fazer\".
-Kind:	libtracker		Espécie:
-Replace	libtracker		Substituir
-Show space bars on volumes	libtracker		Mostrar barra de espaço nos volumes
-Permissions	libtracker		Permissões
-An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	libtracker		Um item nomeado \"%name\" já existe nesta pasta. Você gostaria de substituí-lo com o atalho que você está criando?
-64 x 64	libtracker		64 x 64
-You can't move or copy items to read-only volumes.	libtracker		Você não pode mover ou copiar itens para volumes marcados como somente leitura.
-You must have at least one attribute showing.	libtracker		Você precisa ter pelo menos um atributo sendo mostrado.
-Copy layout	libtracker		Esquema de cópia
-Empty folder	libtracker		Pasta vazia
-All files and folders	libtracker		Todos os arquivos e pastas
-Restore	libtracker		Restaurar
-The Tracker must be running to see set the default printer.	libtracker		O Tracker precisa estar funcionando parar ver e definir uma impressora padrão.
-Save Query as template…	libtracker		Salvar Consulta como modelo...
-KiB	libtracker		KiB
-Mount	libtracker		Montar
-Creating links: 	libtracker		Criando atalhos:
-<No recent items>	libtracker		<Sem itens recentes>
-Copy	libtracker		Copiar
-Could not open \"%document\" because application \"%app\" is in the Trash. 	libtracker		Não foi possível abrir \"%document\" porque o aplicativo \"%app\" está na Lixeira.
-Defaults	libtracker		Padrões
-%capacity (%used used -- %free free)	libtracker		%capacity (%used usados -- %free livres)
+1	brazilian_portuguese	x-vnd.Haiku-libtracker	139125009
+OK	WidgetAttributeText		OK
+Icon view	VolumeWindow		Em ícones
+Add-ons	FilePanelPriv		Adicionais
+Desktop	Model		Desktop
+Identify	ContainerWindow		Identificar
+Warning space color	SettingsView		Cor do espaço de aviso
+Close	VolumeWindow		Fechar
+Open	OpenWithWindow		Abrir
+Tracker status	StatusWindow		Status do Tracker
+Eject when unmounting	AutoMounterSettings		Ejetar quando desmontar
+Window	ContainerWindow		Janela 
+Decrease size	ContainerWindow		Diminuir tamanho
+Mini icon view	VolumeWindow		Em miniaturas
+You must have at least one attribute showing.	PoseView		Você precisa ao menos de um atributo visível.
+Permissions	InfoWindow		Permissões
+Invert selection	VolumeWindow		Inverter seleção
+Recent documents	FavoritesMenu		Documentos recentes
+Modified	QueryPoseView		Modificado
+Created	ContainerWindow		Criado
+If you %action the home folder, Haiku may not behave properly! Are you sure you want to do this? To %action the home anyway, click \"Do it\".	FSUtils		Se você %action a pasta home, o Haiku pode não funcionar corretamente! Você tem certeza que deseja continuar? Para %action a pasta home de qualquer maneira, clique em \"Fazer mesmo assim\".
+Error %error loading Add-On %name.	ContainerWindow		Erro %error ao carregar o Adicional %name.
+contains	SelectionWindow		contém
+Sorry, you can't save things at the root of your system.	FilePanelPriv		Desculpe, mas você não pode salvar coisas no menu raiz de seu sistema.
+Show shared volumes on Desktop	SettingsView		Mostrar volumes compartilhados no Desktop
+Paste links	ContainerWindow		Colar links
+Name	OpenWithWindow		Nome
+Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Não foi possível abrir \"%document\" porque o aplicativo \"%app\" está na Lixeira.
+File	ContainerWindow		Arquivo
+Handles any %type	OpenWithWindow		Lidar com qualquer %tipo
+Delete	ContainerWindow		Deletar
+32 x 32	ContainerWindow		32 x 32
+Cannot unmount the boot volume \"%name\".	FSUtils		Não foi possível desmontar volume de boot \"%name\".
+Open with…	ContainerWindow		Abrir com...
+(Finish: %time - Over %finishtime hours left)	StatusWindow		(Término: %time - até %finishtime horas restantes)
+Write	FilePermissionsView		Escrever
+for %num files	InfoWindow		em %num arquivos
+Modified	PoseView		Modificado
+Make active printer	ContainerWindow		Marcar como impressora ativa
+Create link here	ContainerWindow		Criar atalho aqui
+Moving: 	StatusWindow		Movendo: 
+before	FindPanel		antes
+On	FindPanel		Em
+MiB	WidgetAttributeText		MiB
+greater than	FindPanel		maior que
+Delete	PoseView		Deletar
+Select all	ContainerWindow		Selecionar tudo
+Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Desculpe, o atributo 'Charactere' não pode armazenar um valor do tipo multi-byte.
+Clean up	DeskWindow		Organizar
+You cannot copy or move the root directory.	FSUtils		Você não pode copiar ou mover o menu raiz
+Invert selection	FilePanelPriv		Inverter seleção
+save text	FilePanelPriv		salvar texto
+Select all	FilePanelPriv		Selecionar tudo
+Link to:	InfoWindow		Atalho para:
+Location	ContainerWindow		Local
+Location	QueryPoseView		Local
+Icon view	ContainerWindow		Em ícones
+Size	QueryPoseView		Tamanho
+Emptying Trash… 	StatusWindow		Limpando Lixeira...
+Close all in workspace	ContainerWindow		Fechar tudo no workspace
+Empty Trash	ContainerWindow		Limpar Lixeira
+Name = %name	FindPanel	FindResultTitle	Nome = %name
+Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Você tem certeza que deseja mover ou copiar o(s) item(ns) selecionado(s) para esta pasta?
+Mount server error	AutoMounterSettings		Erro do servidor de montagem
+Do it	FSUtils		Fazer mesmo assim
+Search	FindPanel		Localizar
+Preparing to empty Trash…	StatusWindow		Preparando para limpar a Lixeira...
+Disks	Model		Discos
+Create link	ContainerWindow		Criar atalho
+Decrease size	DeskWindow		Diminuir tamanho
+Size	ContainerWindow		Tamanho
+All disks	AutoMounterSettings		Todos os discos
+Would you like to find some other suitable application?	FSUtils		Você gostaria de encontrar outro aplicativo que possa servir?
+Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Não foi possível abrir \"%document\" com o aplicativo \"%app\" (Bibliotecas faltantes: %library). \n
+no items	CountView		sem itens
+Ignore case	SelectionWindow		ignorar caso
+is not	FindPanel		não é
+OK	AutoMounterSettings		OK
+Windows	TrackerSettingsWindow		Janelas
+Tracker preferences	TrackerSettingsWindow		Preferências do Tracker
+Cut	FilePanelPriv		Recortar
+Replace	FilePanelPriv		Substituir
+rename	TextWidget		renomear
+Select all	VolumeWindow		Selecionar tudo
+Opens with:	InfoWindow		Abre com:
+Open	ContainerWindow		Abrir
+(%SizeProcessed of %TotalSize, %BytesPerSecond/s)	StatusWindow		(%SizeProcessed de %TotalSize, %BytesPerSecond/s)
+Error calculating folder size.	InfoWindow		Erro calculando o tamanho da pasta.
+New folder	FilePanelPriv		Nova pasta
+%name info	InfoWindow	InfoWindow Title	Informações de %name
+Favorites	FavoritesMenu		Favoritos
+Add-ons	VolumeWindow		Adicionais
+Sorry, you can't copy items to the Trash.	PoseView		Desculpe, você não pode copiar itens para a Lixeira.
+List view	VolumeWindow		Em lista
+matches wildcard expression	SelectionWindow		encaixa na expressão coringa
+You cannot replace a folder or a symbolic link with a file.	FSUtils		Você não pode substituir uma pasta ou um atalho por um arquivo.
+Show space bars on volumes	SettingsView		Mostrar barras de espaço nos volumes
+Invert selection	ContainerWindow		Inverter seleção
+Increase size	DeskWindow		Aumentar tamanho
+Resize to fit	ContainerWindow		Reduzir para caber
+%Ld bytes	WidgetAttributeText		%Ld bytes
+Add printer…	ContainerWindow		Adicionar impressora...
+Open	VolumeWindow		Abrir
+New folder	ContainerWindow		Nova pasta
+Kind	ContainerWindow		Espécie
+Select…	ContainerWindow		Selecionar....
+Copy to	ContainerWindow		Copiar para
+Move to Trash	ContainerWindow		Mover para Lixeira
+Move to	ContainerWindow		Mover para
+Create %s clipping	PoseView		Criar %s recorte
+Set new link target	InfoWindow		Selecione o destino do atalho
+Save as Query template:	FindPanel		Salvar como modelo de Consulta
+Cancel	FSUtils		Cancelar
+Edit name	ContainerWindow		Editar nome
+Show volumes on Desktop	SettingsView		Mostrar volumes no Desktop
+KiB	WidgetAttributeText		KiB
+Defaults	TrackerSettingsWindow		Padrões
+%num items	CountView		%num itens
+Mini icon view	ContainerWindow		Em miniatura
+Clean up	VolumeWindow		Organizar
+OK	TrackerInitialState		OK
+Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Não foi possível abrir \"%name\". O arquivo está erroneamente marcado como executável.
+Add-ons	ContainerWindow		Adicionais
+Edit templates…	TemplatesMenu		Editar modelos...

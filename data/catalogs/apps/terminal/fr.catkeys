@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Terminal	1150769874
+1	french	x-vnd.Haiku-Terminal	1893661790
 Not found.	Terminal TermWindow		Non trouvé
 Didn't find any available pseudo ttys.	Terminal Shell		Aucun pseudo tty disponible trouvé.
 Switch Terminals	Terminal TermWindow		Inverser les Terminaux
@@ -39,7 +39,6 @@ Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui a
 No search string was entered.	Terminal TermWindow		Aucun texte à rechercher n'a été indiqué.
 Don't save	Terminal PrefWindow		Ne pas sauver
 Match word	Terminal FindWindow		Rechercher le mot
-Close tab	Terminal SmartTabView		Fermer l'onglet
 Nothing is selected.	Terminal TermWindow		Rien n'est selectionné.
 Text not found.	Terminal TermWindow		Texte non trouvé
 Find…	Terminal TermWindow		Rechercher…
@@ -69,7 +68,6 @@ Find previous	Terminal TermWindow		Rechercher le précédent
 About Terminal…	Terminal TermWindow		À propos de Terminal…
 Find next	Terminal TermWindow		Rechercher le suivant
 Close active tab	Terminal TermWindow		Fermer l'onglet actif
-Terminal	Terminal TermApp		Terminal
 PrefHandler::getRGB(%s) - key not found\n	Terminal getRGB		PrefHandler::getRGB( %s ) - clé non trouvé\n
 Paste	Terminal TermWindow		Coller
 Save changes to this settings panel?	Terminal PrefWindow		Voulez-vous enregistrer les changements de ce panneau de réglage ?
@@ -80,5 +78,13 @@ Cancel	Terminal TermView		Annuler
 Color schema:	Terminal AppearancePrefView		Schéma de couleur
 Terminal\n\nwritten by Kazuho Okui and Takashi Murai\nupdated by Kian Duffy and others\n\nCopyright ©2003-2009, Haiku.\n	Terminal TermView		Terminal\n\nÉcrit par Kazuho Okui et Takashi Murai\nMis à jour par by Kian Duffy et d'autres\n\nCopyright ©2003-2009, Haiku.\n
 Confirm exit if active programs exist	Terminal AppearancePrefView		Demander une confirmation à la fermeture si un programme est actif
-A process is still running.\nIf you close the Terminal the process will be killed.	Terminal TermWindow		Une tâche tourne encore.\nSi vous fermer le Terminal, cette tâche sera détruite.
-Really quit?	Terminal TermWindow		Quitter ?
+Edit	Terminal TermWindow		Éditer
+Shell 	Terminal TermWindow		Interpréteur de commande
+Close tab	Terminal TermWindow		Fermer l'onglet
+Window title:	Terminal AppearancePrefView		Titre de la fenêtre :
+Window title:	Terminal TermWindow		Titre de la fenêtre :
+Tab title:	Terminal AppearancePrefView		Titre de l'onglet :
+Window title…	Terminal TermWindow		Titre de la fenêtre…
+Close other tabs	Terminal TermWindow		Fermer les autres onglets
+Close	Terminal TermWindow		Fermer
+Close window	Terminal TermWindow		Fermer la fenêtre

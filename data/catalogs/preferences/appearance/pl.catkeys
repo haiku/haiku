@@ -1,9 +1,10 @@
-1	polish	x-vnd.Haiku-Appearance	540349844
+1	polish	x-vnd.Haiku-Appearance	3612090060
 Control highlight	Colors tab		Podkreślenie kontrolki
 Control border	Colors tab		Obramowanie kontrolki
 Antialiasing type:	AntialiasingSettingsView		Typ antyaliasingu:
 Shadow	Colors tab		Cień
 On	AntialiasingSettingsView		Włącz
+Defaults	APRWindow		Ustaw jako domyślne
 Grayscale	AntialiasingSettingsView		Odcienie szarości
 Shine	Colors tab		Połysk
 Off	AntialiasingSettingsView		Wyłącz
@@ -12,6 +13,7 @@ Inactive window tab text	Colors tab		Tekst nieaktywnej zakładki okna
 Failure	Colors tab		Niepowodzenie
 Hinting menu	AntialiasingSettingsView		Menu hintingu
 Document background	Colors tab		Tło dokumentu
+Revert	APRWindow		Przywróć ustawienia
 Window tab	Colors tab		Zakładka okna
 Tooltip background	Colors tab		Tło podpowiedzi
 Selected menu item background	Colors tab		Tło zaznaczonego elementu menu

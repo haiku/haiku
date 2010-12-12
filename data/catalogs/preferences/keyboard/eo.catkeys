@@ -6,7 +6,7 @@ Defaults	KeyboardWindow		Aprioraj
 Key repeat rate	KeyboardView		Klavripeta rapideco
 Revert	KeyboardWindow		Malfari
 Delay until key repeat	KeyboardView		Malfruo antaŭ klavripeto
-OK	KeyboardApplication		Daŭrigi
+OK	KeyboardApplication		Bone
 Fast	KeyboardView		Rapida
 Slow	KeyboardView		Malrapida
 Something has gone wrong!	KeyboardApplication		Io malbona okazis!

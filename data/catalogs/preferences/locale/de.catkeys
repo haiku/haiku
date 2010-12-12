@@ -1,49 +1,18 @@
-1	german	x-vnd.Haiku-Locale	634081185
-Day in month (2 digits)	TimeFormatSettings		Tag des Monats (2-stellig)
+1	german	x-vnd.Haiku-Locale	1431723094
 Available languages	Locale Preflet Window		Verfügbare Sprachen
-Day of week (name)	TimeFormatSettings		Wochentag (Name)
-Separator:	TimeFormatSettings		Trennzeichen:
-Year (4 digits)	TimeFormatSettings		Jahr (4-stellig)
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Es wurden keine verfügbaren Sprachen gefunden. Dieses Preflet kann daher nicht verwendet werden!
-Thousand separator: 	TimeFormatSettings		Tausendertrennzeichen:
-After	TimeFormatSettings		Dahinter
-Month name	TimeFormatSettings		Monatsname
 Long format:	TimeFormatSettings		Langformat:
 Currency	TimeFormatSettings		Währung
-Before	TimeFormatSettings		Davor
-Year	TimeFormatSettings		Jahr
-Day of week in month	TimeFormatSettings		Wochentag im Monat
 Short format:	TimeFormatSettings		Kurzformat:
-Currency symbol:	TimeFormatSettings		Währungssymbol:
-Space	TimeFormatSettings		Abstand
 Language	Locale Preflet Window		Sprache
-Month number	TimeFormatSettings		Monatsnummer
-Year (2 digits)	TimeFormatSettings		Jahr (2-stellig)
 Preferred languages	Locale Preflet Window		Bevorzugte Sprache
-Decimal separator: 	TimeFormatSettings		Dezimaltrennzeichen:
-Symbol position	TimeFormatSettings		Symbolposition
-Day of week (short name)	TimeFormatSettings		Wochentag (Abkz.)
 Numbers	TimeFormatSettings		Zahlen
 24 hour	TimeFormatSettings		24 Stunden
-(unknown format)	TimeFormatSettings		 (unbekanntes Format)
-Negative marker:	TimeFormatSettings		Minuszeichen:
-Day in month	TimeFormatSettings		Tag des Monats
 Defaults	Locale Preflet Window		Standardwerte
-Separator	TimeFormatSettings		Trennzeichen
-Country	Locale Preflet Window		Land
-Month number (2 digits)	TimeFormatSettings		Monatsnummer (2-stellig)
 Revert	Locale Preflet Window		Zurücknehmen
-Negative marker	TimeFormatSettings		Minuszeichen
 OK	Locale Preflet Window		Ok
-Day of week	TimeFormatSettings		Wochentag
-List separator: 	TimeFormatSettings		Listentrennzeichen:
 Time	TimeFormatSettings		Zeit
 Date	TimeFormatSettings		Datum
 12 hour	TimeFormatSettings		12 Stunden
 Locale	Locale Preflet		Locale - Landes- und Spracheinstellungen
-None	TimeFormatSettings		Ohne
-Example:	TimeFormatSettings		Beispiel:
-Day	TimeFormatSettings		Tag
-Leading 0	TimeFormatSettings		Führende Null
-Month	TimeFormatSettings		Monat
 already chosen	LanguageListView		bereits ausgewählt

@@ -1,49 +1,17 @@
-1	esperanto	x-vnd.Haiku-Locale	1551394073
-Day in month (2 digits)	TimeFormatSettings		Tago de monato (2 ciferoj)
+1	esperanto	x-vnd.Haiku-Locale	2023461026
 Available languages	Locale Preflet Window		Haveblaj lingvoj
-Day of week (name)	TimeFormatSettings		Tago de monato (nomo)
-Separator:	TimeFormatSettings		Apartigosigno:
-Year (4 digits)	TimeFormatSettings		Jaro (4 ciferoj)
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		La listo de haveblaj lingvoj estas maltrovebla! Do vi ne povas uzi ĉi-tiu preferileto!
-Thousand separator: 	TimeFormatSettings		Apartigosigno de miloj:
-After	TimeFormatSettings		Post
-Month name	TimeFormatSettings		Monata nomo
 Long format:	TimeFormatSettings		Longa aranĝo:
 Currency	TimeFormatSettings		Valuto
-Before	TimeFormatSettings		Antaŭ
-Year	TimeFormatSettings		Jaro
-Day of week in month	TimeFormatSettings		Tago de semajno en monato
 Short format:	TimeFormatSettings		Mallonga aranĝo:
-Currency symbol:	TimeFormatSettings		Monsigno:
-Space	TimeFormatSettings		Spaceto
 Language	Locale Preflet Window		Lingvo
-Month number	TimeFormatSettings		Monata numero
-Year (2 digits)	TimeFormatSettings		Jaro (2 ciferoj)
 Preferred languages	Locale Preflet Window		Preferaj lingvoj
-Decimal separator: 	TimeFormatSettings		Decimala apartigosigno:
-Symbol position	TimeFormatSettings		Signa pozicio
-Day of week (short name)	TimeFormatSettings		Tago de semajno (mallonga nomo)
 Numbers	TimeFormatSettings		Numeroj
 24 hour	TimeFormatSettings		24 hora
- (unknown format)	TimeFormatSettings		 (nekona formato)
-Negative marker:	TimeFormatSettings		Negativa marko:
-Day in month	TimeFormatSettings		Tago de monato
-OK	Locale Preflet Window		Daŭrigi
 Defaults	Locale Preflet Window		Aprioraj
-Month	TimeFormatSettings		Monato
-Separator	TimeFormatSettings		Apartigosigno
-Country	Locale Preflet Window		Lando
-Month number (2 digits)	TimeFormatSettings		Monata numero (2 ciferoj)
 Revert	Locale Preflet Window		Malfari
-Negative marker	TimeFormatSettings		Negativa marko
-Day of week	TimeFormatSettings		Tago de semajno
-List separator: 	TimeFormatSettings		Lista apartigosigno:
-12 hour	TimeFormatSettings		12 hora
+OK	Locale Preflet Window		Bone
 Time	TimeFormatSettings		Horo
 Date	TimeFormatSettings		Dato
+12 hour	TimeFormatSettings		12 hora
 Locale	Locale Preflet		Lokaĵaro
-None	TimeFormatSettings		Neniu
-Clock	TimeFormatSettings		Horloĝo
-Example:	TimeFormatSettings		Ekzemple:
-Day	TimeFormatSettings		Tago
-Leading 0	TimeFormatSettings		Antaŭa 0

@@ -1,4 +1,4 @@
-1	brazilian_portuguese	x-vnd.Haiku-Terminal	1776148061
+1	brazilian_portuguese	x-vnd.Haiku-Terminal	1595480755
 Didn't find any available pseudo ttys.	Terminal Shell		Não foi encontrado nenhum pseudo ttys disponível
 Change directory	Terminal TermView		Mudar de pasta
 Use default shell	Terminal Shell		Utilizar shell padrão
@@ -15,7 +15,6 @@ Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui a
 No search string was entered.	Terminal TermWindow		Não foi introduzida nenhuma expressão para localizar.
 Don't save	Terminal PrefWindow		Não salvar
 Match word	Terminal FindWindow		Palavra exata
-Close tab	Terminal SmartTabView		Fechar aba
 Nothing is selected.	Terminal TermWindow		Não há nada selecionado.
 Move here	Terminal TermView		Mover aqui
 Secondary mouse button drop menu	Terminal TermView		Menu de contexto do segundo botão do mouse
@@ -35,4 +34,5 @@ Save	Terminal PrefWindow		Salvar
 -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		 -h, --help mostra esta ajuda\n -t, --title define o título da janela\n -f, --fullscreen iniciar em tela inteira\n
 Terminal\n\nwritten by Kazuho Okui and Takashi Murai\nupdated by Kian Duffy and others\n\nCopyright ©2003-2009, Haiku.\n	Terminal TermView		Terminal\n\nescrito por Kazuho Okui e Takashi Murai\natualizado por Kian Duffy 
 Confirm exit if active programs exist	Terminal AppearancePrefView		Confirmar saída se existirem aplicativos em execução
-A process is still running.\nIf you close the Terminal the process will be killed.	Terminal TermWindow		Um processo ainda está funcionando.\nSe fechar o Terminal o processo será terminado.
+Edit	Terminal TermWindow		Editar
+Shell 	Terminal TermWindow		Shell

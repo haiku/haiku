@@ -1,0 +1,31 @@
+1	finnish	x-vnd.Be-PRNT	407752036
+Waiting	JobListView		Odotetaan
+page	JobListView		sivu
+Cancel	AddPrinterDialog		Peru
+Add printer	AddPrinterDialog		Lisää tulostin
+Printers	PrintersWindow		Tulostimet
+Default Printer	PrinterListView		Oletustulostin
+No pending jobs.	PrinterListView		Ei odottamassa olevia töitä.
+pages	JobListView		sivua
+Processing	JobListView		Käsitellään
+Printer name:	AddPrinterDialog		Tulostinnimi:
+pending jobs.	PrinterListView		odottavat työt.
+Restart job	PrintersWindow		Käynnistä työ uudelleen
+Add	AddPrinterDialog		Lisää
+Make default	PrintersWindow		Tee oletukseksi
+Cancel job	PrintersWindow		Peru työ
+1 pending job.	PrinterListView		1 odottava työ.
+Remove	PrintersWindow		Poista
+<pick one>	AddPrinterDialog		<poimi yksi>
+Add …	PrintersWindow		Lisää ...
+Print jobs for 	PrintersWindow		Tulosta työt kohteelle
+Failed	JobListView		Epäonnistui
+%.2f KB	JobListView		%.2f kilotavua
+Completed	JobListView		Valmis
+No printer found!	TransportMenu		Tulostinta ei löytynyt!
+Print jobs: No printer selected	PrintersWindow		Tulostustyöt: Tulostinta ei ole valittu
+Unknown status	JobListView		Tuntematon tila
+Connected to:	AddPrinterDialog		Yhdistetty kohteeseen:
+Printer type:	AddPrinterDialog		Tulostintyyppi:
+Transport: %transport% %transport_address%	PrinterListView		Siirto: %transport% %transport_address%
+Driver: %driver%	PrinterListView		Ajuri: %driver%

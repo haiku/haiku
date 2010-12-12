@@ -7,13 +7,13 @@ Cavern	Main Window		Grota
 Volume:	Main Window		Głośność:
 Reverb:	Main Window		Pogłos:
 OK	Main Window		OK
-MidiPlayer	Main Window		MidiPlayer
 Off	Main Window		Wyłącz
 Dungeon	Main Window		Lochy
 Play	Main Window		Odtwórz
 Garage	Main Window		Garaż
 Closet	Main Window		Szafa
-Drop MIDI file here	Scope View		Przeciągnij plik MIDI tutaj
 Igor's lab	Main Window		Labolatorium Igora
 Scope	Main Window		Zakres
 Could not load song	Main Window		Nie można załadować piosenki
+MidiPlayer	Main Window		MidiPlayer
+Drop MIDI file here	Scope View		Przeciągnij plik MIDI tutaj

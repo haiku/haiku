@@ -1,8 +1,7 @@
-1	brazilian_portuguese	x-vnd.Haiku-StyledEdit	1497992737
+1	brazilian_portuguese	x-vnd.Haiku-StyledEdit	3451303769
 Search backwards	FindandReplaceWindow		Localizar anterior
 Size	Menus		Tamanho
 Save	QuitAlert		Salvar
-Redo typing	Menus		Refazer digitação
 Replace same	Menus		Substituir tudo
 Can't Undo	Menus		Impossível desfazer
 Save	Menus		Salvar
@@ -16,7 +15,6 @@ Don't save	QuitAlert		Não salvar
 Center	Menus		Centralizado
 Find selection	Menus		Localizar seleção
 Error saving \"%s\":\n%s	SaveAlert		Erro ao salvar \"%s\":\n%s
-Undo typing	Menus		Desfazer digitação
 Save	SaveAlert		Salvar
 Don't save	SaveAlert		Não salvar
 This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Este arquivo está marcado como somente leitura. Salvar alterações ao documento \"%s\"?

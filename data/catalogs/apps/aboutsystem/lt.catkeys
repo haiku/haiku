@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-About	801836987
+1	lithuanian	x-vnd.Haiku-About	2318986409
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht'as (bei jo NewOS branduolys)\n
 %ld Processors:	AboutView		%ld Procesoriai:
 Michael Phipps (project founder)\n\n	AboutView		Michael'is Phipps'as (porojekto įkūrėjas)\n\n
@@ -27,7 +27,6 @@ Version:	AboutView		Versija:
 License: 	AboutView		Leidimas: 
 Translations:\n	AboutView		Vertimai:\n
 ... and the many people making donations!\n\n	AboutView		... ir daugeliui kitų aukojusių žmonių!\n\n
-Google & their Google Summer of Code program\n\n	AboutView		„Google“ės ir jos „Google Summer of Code“  programai\n\n
 The BeGeistert team\n	AboutView		„BeGeistert“ komandai\n
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku and the Haiku logo are trademarks of Haiku, Inc.\n\n	AboutView		Haiku pirminių tekstų autorinės teisės priklauso Haiku, Inc. arba autoriams, nurodytiems tuose pirminiuose tekstuose. Haiku bei Haiku ženklas yra Haiku, Inc. prekių ženklai.\n\n
 GCC %d Hybrid	AboutView		GCC %d hibridas

@@ -1,6 +1,5 @@
-1	hungarian	x-vnd.Haiku-DriveSetup	4234569363
+1	hungarian	x-vnd.Haiku-DriveSetup	201850780
 Delete	MainWindow		Törlés
-Are you sure you want to initialize the selected partition? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		Biztosan el szeretné kezdeni a kiválasztott partíción a műveletek végrehajtását? A folyamat még megszakítható mielőtt az írási szakasz elkezdődne!
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Biztosan jóváhagyja az adatok felírását a lemezre?\n\nEz esetben a partíció teljes tartalma visszavonhatatlanul meg fog semmisülni.
 Rescan	MainWindow		Frissítés
 OK	MainWindow		Rendben
@@ -18,7 +17,6 @@ The partition %s is already unmounted.	MainWindow		%s partíció már le van csa
 Failed to initialize the partition. No changes have been written to disk.	MainWindow		Az előkészítés nem járt sikerrel, a lemez tartalma érintetlen maradt.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Nem sikerült törölni a partíciót, a lemez tartalma érintetlen maradt.
 Partition type:	CreateParamsPanel		Partíció típusa:
-Are you sure you want to initialize the partition \"%s\"? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		Megkezdődhet a(z) „%s” nevű partíció előkészítése? A folyamat még megszakítható mielőtt az írási szakasz elkezdődne!
 Could not delete the selected partition.	MainWindow		A kiválasztott partíció nem törölhető.
 Error: 	MainWindow	in any error alert	Hiba: 
 Partition %ld	DiskView		%ld. paríció

@@ -1,0 +1,134 @@
+1	polish	x-vnd.Haiku-FileTypes	525617155
+Args only	Application Type Window		Tylko argumenty
+Add group	New File Type Window		Dodaj grupę
+Remove	Application Type Window		Usuń
+Select same type as	FileType Window		Wybierz taki sam typ jak
+Remove icon	Icon View		Usuń ikonę
+Supported types	Application Type Window		Obsługiwane typy
+Internal name:	New File Type Window		Nazwa wewnętrzna:
+New file type	New File Type Window		Nowy typ pliku
+Add icon…	Icon View		Dodaj ikonę…
+Do you want to save the changes?	Application Type Window		Czy chcesz zapisać zmiany?
+File type	FileType Window		Typ pliku
+Could not change attributes	Attribute Window		Nie można zmienić atrybutów
+OK	FileTypes		OK
+Save	Application Type Window		Zapisz
+Add	Extension Window		Dodaj
+Select same preferred application as	FileType Window		Wybierz taką samą preferowaną aplikację jak w przypadku
+Cancel	Attribute Window		Anuluj
+Multiple launch	Application Type Window		Wiele uruchomień
+Group:	New File Type Window		Grupa:
+Done	Extension Window		Gotowe
+Could not open file	FileType Window		Nie można otworzyć pliku
+Preferred application	FileType Window		Preferowana aplikacja
+Same as…	FileType Window		Takie same jak…
+File	Application Type Window		Plik
+Version:	Application Type Window		Wersja:
+FileTypes request	FileTypes		Żądanie FileTypes
+Select…	FileType Window		Wybierz...
+Development	Application Type Window		Rozwój
+Icon	FileType Window		Ikona
+Special:	Attribute Window		Specjalne:
+Alpha	Application Type Window		Alpha
+Signature:	Application Type Window		Sygnatura:
+Quit, don't save	Application Type Window		Wyjdź i nie zapisuj
+Add…	Application Type Window		Dodaj…
+Select preferred application	FileType Window		Wybierz preferowaną aplikację
+Single launch	Application Type Window		Pojedyncze uruchomienie
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Program \"%s\" nie obsługuje tego typu plików.\nCzy chcesz go ustawić mimo to?
+Type:	Attribute Window		Typ:
+Done	Attribute Window		Gotowe
+Set Preferred Application	Preferred App Menu		Ustaw preferowaną aplikację
+Background app	Application Type Window		Aplikacja działająca w tle
+Add new group	New File Type Window		Dodaj nową grupę
+Cancel	Application Type Window		Anuluj
+Cancel	New File Type Window		Anuluj
+Extension:	Extension Window		Rozszerzenie:
+Add	Attribute Window		Dodaj
+Close	Application Type Window		Zamknij
+Golden master	Application Type Window		Golden master
+Could not open \"%s\":\n%s	FileTypes		Nie można otworzyć \"%s\":\n%s
+Alignment:	Attribute Window		Wyrównanie:
+Cancel	Extension Window		Anuluj
+Application flags	Application Type Window		Flagi aplikacji
+Editable	Attribute Window	If Tracker allows to edit this attribute.	Modyfikowalne
+Width:	Attribute Window	Default column width in Tracker for this attribute.	Szerokość:
+Save request	Application Type Window		Zapisz żądanie
+Beta	Application Type Window		Beta
+Attribute name:	Attribute Window		Nazwa atrybutów:
+Extension	Extension Window		Rozszerzenie
+Add type	New File Type Window		Dodaj typ
+Internal name:	Attribute Window		Nazwa wewnętrzna:
+Final	Application Type Window		Finalna
+Open file	FileTypes		Otwórz plik
+Exclusive launch	Application Type Window		Wyłączne uruchomienie
+Gamma	Application Type Window		Gamma
+Default application	FileType Window		Domyślna aplikacja
+Long description:	Application Type Window		Długi opis:
+Version info	Application Type Window		Informacja o wersji
+Center	Attribute Window	Attribute column alignment in Tracker	Do środka
+Short description:	Application Type Window		Krótki opis:
+File could not be opened	Preferred App Menu		Nie można otworzyć pliku
+Could not change file extensions	Extension Window		Nie można zmienić rozszerzeń plików
+Edit icon…	Icon View		Edytuj ikonę…
+Save into resource file…	Application Type Window		Zapisz do pliku zasobów…
+Left	Attribute Window	Attribute column alignment in Tracker	Do lewej
+Visible	Attribute Window		Widoczne
+Could not install file type	New File Type Window		Nie można zainstalować typu plików
+Application type	Application Type Window		Typ aplikacji
+Application types…	FileTypes Window		Typy aplikacji...
+Recognition rule is not valid:\n\n	FileTypes Window		Zasada rozpoznawania jest nieprawidłowa:\n\n
+Show icons in list	FileTypes Window		Wyświetl ikony w liście
+Type name:	FileTypes Window		Podaj nazwę:
+About FileTypes…	FileTypes Window		O FileTypes...
+Choose type	Type List Window		Wybierz typ
+Rule:	FileTypes Window		Zasada:
+Multiple files from \"%s\" file type	FileType Window		Wiele plików z typu pliku \"%s"
+Could not retrieve preferred application of this file	Preferred App Menu		Nie można odnaleźć preferowanej aplikacji dla tego typu pliku
+Extensions:	FileTypes Window		Rozszerzenia:
+Select same preferred application as	FileTypes Window		Wybierz taką samą preferowaną aplikację jako
+Could not retrieve application signature	Preferred App Menu		Nie można otrzymać sygnatury aplikacji
+Icon	Application Type Window		Ikona
+Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Usuwanie typu pliku nie może być cofnięte.\nCzy na pewno chcesz go usunąć?
+(from application)	FileTypes Window		(od aplikacji)
+Could not set preferred application	FileTypes Window		Nie można ustawić preferowanej aplikacji
+Done	Type List Window		Gotowe
+Show recognition rule	FileTypes Window		Pokaż zasadę rozpoznawania
+FileTypes request	Preferred App Menu		Żądanie FileTypes
+Description:	FileTypes Window		Opis:
+File	FileTypes Window		Plik
+Select…	FileTypes Window		Wybierz:
+FileTypes	FileTypes Window		FileTypes
+Open…	FileTypes Window		Otwórz...
+FileTypes	FileTypes		FileTypes
+Extra attributes	FileTypes Window		Dodatkowe atrybuty
+\twritten by Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n	FileTypes		\tnapisane przez Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n
+Add…	FileTypes Window		Dodaj...
+[Multiple files] file types	FileType Window		[Wiele plików] typów plików
+Quit	FileTypes Window		Zamknij
+%s file type	FileType Window		typ pliku %s
+no icon	FileTypes Window		brak ikony
+Settings	FileTypes Window		Ustawienia
+New resource file…	FileTypes Window		Nowy plik zasobów...
+Icon	FileTypes Window		Ikona
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Usuwanie supertypu nie może być cofnięte.\nWszystkie typy plików które należą do supertypu zostaną utracone!\n\nCzy na pewno chcsz to zrobić? Aby usunąć całą grupę, przytrzymaj klawisz Shift i naciśnij \"Usuń\".
+Internal name:	FileTypes Window		Wewnętrzna nazwa:
+File recognition	FileTypes Window		Rozpoznawanie pliku
+Cancel	Type List Window		Anuluj
+Description	FileTypes Window		Opis
+None	FileTypes Window		Brak
+Remove	FileTypes Window		Usuń
+This file type already exists	New File Type Window		Ten typ pliku już istnieje
+Same as…	FileTypes Window		Taki sam jak...
+Could not remove file type: %s\n	FileTypes Window		Nie można usunąć typu pliku: %s\n
+Cancel	Preferred App Menu		Anuluj
+Cancel	FileTypes Window		Anuluj
+Select preferred application	FileTypes Window		Wybierz preferowaną aplikację
+FileTypes request	FileTypes Window		Żądanie FileTypes
+(from super type)	FileTypes Window		(od supertypu)
+Preferred application	FileTypes Window		Preferowana aplikacja
+Attribute	Attribute Window		Atrybut
+Group name:	New File Type Window		Nazwa grupy:
+Display as:	Attribute Window	Tracker offers different display modes for attributes.	Wyświetl jako:
+Right	Attribute Window	Attribute column alignment in Tracker	Do prawej
+%1 application type	Application Type Window		%1 typ aplikacji

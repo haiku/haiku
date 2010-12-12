@@ -1,6 +1,5 @@
-1	korean	x-vnd.Haiku-DriveSetup	4234569363
+1	korean	x-vnd.Haiku-DriveSetup	201850780
 Delete	MainWindow		지우기
-Are you sure you want to initialize the selected partition? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		당신이 선택한 파티션을 정말로 초기화 하시겠습니까? 초기화 매개변수를 입력한 다음에, 당신은 바뀐 사항을 디스크에 적용하기 전에 취소 할 수 있습니다.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		당신은 지금 변경 사항을 디스크에 기록하시겠습니까?\n\n선택된 파티션의 모든 데이타가 영원히 지워질것입니다!
 Rescan	MainWindow		다시 스캔
 OK	MainWindow		확인
@@ -18,7 +17,6 @@ The partition %s is already unmounted.	MainWindow		이 파티션 %s은(는) 이�
 Failed to initialize the partition. No changes have been written to disk.	MainWindow		파티션 초기화 실패.어떤 변화도 디스크에 기록되지 않았습니다.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		파티션 삭제 실패. 어떤 변화도 디스크에 기록되지 않았습니다.
 Partition type:	CreateParamsPanel		파티션 형식:
-Are you sure you want to initialize the partition \"%s\"? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		당신은 정말로 파티션\"%s\"을 초기화하시겠습니까? 초기화 매개변수를 입력한 다음에, 당신은 디스크에 변경 사항을 기록하기전에 이 작업을 취소 할 수 있습니다.
 Could not delete the selected partition.	MainWindow		선택된 파티션을 지울 수 없습니다.
 Error: 	MainWindow	in any error alert	에러: 
 Partition %ld	DiskView		파티션 %ld

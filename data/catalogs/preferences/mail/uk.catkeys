@@ -1,45 +1,48 @@
-1	ukrainian	x-vnd.Haiku-Mail	2349748505
-Select account type	Config Views		Виберіть тип аккаунта
+1	ukrainian	x-vnd.Haiku-Mail	1416961282
+Select account type	Config Views		Виберіть тип аккаунту
 Mail checking	Config Window		Перевірка пошти
-Settings	Config Window		Настройки
-Only when dial-up is connected	Config Window		Тільки коли dial-up підключений
-While sending and receiving	Config Window		Поки їде відправка і отримання
+Settings	Config Window		Налаштування
+Only when dial-up is connected	Config Window		Тільки коли включений  dial-up 
+While sending and receiving	Config Window		Поки іде відправка і отримання
 days	Config Window		днів
-Start mail services on startup	Config Window		Запускати почтові сервіси при включенні
-Receive mail only	Config Views		Тільки отримування пошти
+Start mail services on startup	Config Window		Запускати поштовий сервіс при старті
+Receive mail only	Config Views		Тільки при отриманні пошти
 Account name:	Config Views		Ім'я аккаунта:
-OK	Config Views		OK
-The filter could not be moved. Deleting filter.	Config Views		Фільтр не видалено. Видалити.
+OK	Config Views		Гаразд
+The filter could not be moved. Deleting filter.	Config Views		Фільтр неможливо запустити. Видалити його.
 Revert	Config Window		Повернути
 Accounts	Config Window		Аккаунти
-Account type:	Config Views		Тип аккаунта:
+Account type:	Config Views		Тип аккаунту:
 Remove	Config Window		Видалити
 Miscellaneous	Config Window		Змішаний
 Show connection status window:	Config Window		Показати вікно стану підключення:
-While sending	Config Window		Поки відсилається
-Schedule outgoing mail when dial-up is disconnected	Config Window		Помістити вихідні листи в чергу на відправку поки dial-up від'єднано
+While sending	Config Window		Поки відправляється
+Schedule outgoing mail when dial-up is disconnected	Config Window		Schedule вихідну пошту коли
 hours	Config Window		годин
 Add	Config Window		Додати
-Send mail only	Config Views		Тільки відправка пошти
-E-mail	Account		Ел. пошта
+Send mail only	Config Views		Тільки при відправці
+E-mail	Account		E-mail
 Unnamed	Account		Неназваний
-\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nОсновні настройки неможливо відновити.\n\nПомилка відновлення основних настройок:\n%s\n
-Send and receive mail	Config Views		Отримання і відправка пошти
-Real name:	Config Views		Справжнє ім'я:
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nОсновні налаштування неможливо повернути.\n\nПомилка при відновленні налаштувань:\n%s\n
+Send and receive mail	Config Views		При відправці і отриманні пошти
+Real name:	Config Views		Справжнє ім'я
+· Outgoing	Account		Вихідна
 Return address:	Config Views		Зворотня адреса:
-Edit mailbox menu…	Config Window		Редагувати меню почтової скриньки…
+· E-mail filters	Account		Поштові фільтри
+· Incoming	Account		Вхідна
+Edit mailbox menu…	Config Window		Редагувати поштове меню
 Remove	Config Views		Видалити
-Could not create inbound chain.	Account		Неможливо створити ланцюг вхідних .
-Check every	Config Window		Перевірити кожен
-never	Config Window		Ніколи
-Incoming mail filters	Config Views		Фільтри вхідної пошти
-Account settings	Config Views		Настройки аккаунту
+Could not create inbound chain.	Account		Неможливо створити ланцюг вхідних
+Check every	Config Window		Перевірити кожне
+never	Config Window		ніколи
+Incoming mail filters	Config Views		Вхідний поштовий фільтр
+Account settings	Config Views		Налаштування аккаунта
 minutes	Config Window		хвилин
-Error retrieving general settings: %s\n	Config Window		Помилка відновлення основних настройок: %s\n
-OK	Account		OK
-Apply	Config Window		Використати
-Could not create outbound chain.	Account		Неможливо створити ланцюг вихідних.
+Error retrieving general settings: %s\n	Config Window		Помилка при відновленні основних налаштувань: %s\n
+OK	Account		Гаразд
+Apply	Config Window		Прийняти
+Could not create outbound chain.	Account		Неможливо створити ланцюг вихідних
 Always	Config Window		Завжди
 Add filter	Config Views		Додати фільтр
-Outgoing mail filters	Config Views		Фільтр вихідної пошти
-\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nСтворити новий аккаунт при допомозі кнопки Додати (Add).\n\nВидалити аккаунт при допомозі кнопки Видалити (Remove) на вибраному пункті .\n\nВибрати пункт зі списку для зміни його настройок.
+Outgoing mail filters	Config Views		Фільтри вихідної пошти
+\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nСтворіть новий аккаунт натиснувши кнопкуAdd .\n\nВидаліть аккаунт при допомозі кнопкиRemove на вибраному пункті\n\nВиберіть пункт зі списку при необхідності зміни його налаштувань.

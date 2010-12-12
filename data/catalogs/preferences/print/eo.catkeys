@@ -1,0 +1,27 @@
+1	esperanto	x-vnd.Be-PRNT	634957092
+Waiting	JobListView		Atendante
+page	JobListView		paĝo
+Cancel	AddPrinterDialog		Nuligi
+Add printer	AddPrinterDialog		Aldoni printilon
+Printers	PrintersWindow		Printiloj
+Default Printer	PrinterListView		Apriora Printilo
+No pending jobs.	PrinterListView		Neniu atendantaj taskoj.
+pages	JobListView		paĝoj
+Processing	JobListView		Traktante
+Printer name:	AddPrinterDialog		Nomo de printilo:
+Restart job	PrintersWindow		Restarti laboron
+Add	AddPrinterDialog		Aldoni
+Make default	PrintersWindow		Apriorigi
+Cancel job	PrintersWindow		Nuligi laboron
+1 pending job.	PrinterListView		1 atendanta laboro.
+Remove	PrintersWindow		Forviŝi
+<pick one>	AddPrinterDialog		<elektu unu>
+Add …	PrintersWindow		Aldoni…
+Print jobs for 	PrintersWindow		Printlaboroj pro 
+Failed	JobListView		Malsukcesis
+%.2f KB	JobListView		%.2f KB
+Completed	JobListView		Fina
+Print jobs: No printer selected	PrintersWindow		Printlaboroj: Neniu printilo elektita
+Unknown status	JobListView		Nekonata stato
+Connected to:	AddPrinterDialog		Konektita al:
+Printer type:	AddPrinterDialog		Printilotipo:

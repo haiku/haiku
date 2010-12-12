@@ -1,7 +1,7 @@
-1	polish	x-vnd.Haiku-About	2941736986
+1	polish	x-vnd.Haiku-About	2350236915
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (i jego kernela NewOS)\n
 %ld Processors:	AboutView		Liczba procesorów %ld:
-Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (fundatora projektu)\n\n
+Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (twórcy projektu)\n\n
 The Haiku-Ports team\n	AboutView		Zespółu Haiku-Ports\n
 Website, marketing & documentation:\n	AboutView		Strona WWW, marketing i dokumentacja:\n
 Revision	AboutView		Rewizja
@@ -14,14 +14,25 @@ Unknown	AboutView		Nieznany
 %.2f GHz	AboutView		%.2f GHz
 Memory:	AboutView		Pamięć:
 Past maintainers:\n	AboutView		Wcześniejsi współpracownicy:\n
-The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the 	AboutView		Kod źródłowy unikalny dla Haiku, szczególnie jądra systemu i aplikacji z nim rozprowadzanych, dystrybuowany jest pod warunkami 
 \n\nSpecial thanks to:\n	AboutView		\n\nSpecjalne podziękowania dla:\n
 Licenses: 	AboutView		Licencje: 
-. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		. Niektóre  biblioteki systemowe zawieraja oprogramowanie objęte licencją LGPL. Prawa autorskie do nich można znaleźć poniżej.\n\n
 \nCopyrights\n\n	AboutView		\nPrawa autorskie\n\n
-Current maintainers:\n	AboutView		Obecni wspołpracownicy:\n
+Current maintainers:\n	AboutView		Obecni współpracownicy:\n
 Time running:	AboutView		Czas działania:
-MIT license	AboutView		licencji MIT
-The Haikuware team and their bounty program\n	AboutView		Zespółu Haikuware i ich program bounty\n
+The Haikuware team and their bounty program\n	AboutView		Zespółu Haikuware i ich program nagród\n
 About this system	AboutWindow		O systemie
 Version:	AboutView		Wersja:
+%ld MHz	AboutView		%ld MHz
+[Click a license name to read the respective license.]\n\n	AboutView		[Kliknij na nazwę licencji, aby wyświetlić jej treść.]\n\n
+License: 	AboutView		Licencja: 
+Translations:\n	AboutView		Tłumaczenie:\n
+... and the many people making donations!\n\n	AboutView		... oraz wielu ludzi, którzy wysyłają dotacje!\n\n
+The BeGeistert team\n	AboutView		Grupy BeGeistert\n
+The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku and the Haiku logo are trademarks of Haiku, Inc.\n\n	AboutView		Prawo autorskie do kodu systemu operacyjnego Haiku jest własnością firmy Haiku Inc. lub poszczególnych autorów, uwzględnionych odpowiednio w kodzie źródłowym. Haiku oraz logo Haiku są znakami towarowymi firmy Haiku Inc.\n\n
+GCC %d Hybrid	AboutView		GCC %d Hybrid
+%d MiB total	AboutView		%d MiB ogółem
+%d MiB used (%d%%)	AboutView		%d MiB użyte (%d%%)
+The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT licence%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		Kod unikalny dla projektu Haiku, w szczególności jądro systemu oraz kod źródłowy, do którego odwołują się aplikacje systemowe, jest udostępniany na licencji %MIT licence%. Część bibliotek systemowych zawiera kod źródłowy stron trzecich, dystrybuowany na zasadach licencji LGPL. Prawa autorskie do kodu stron trzecich możesz znaleźć na liście poniżej.\n\n
+%total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB ogółem, %inaccessible MiB nieosiągalne
+Google & their Google Summer of Code program\n	AboutView		Google oraz programu Google Summer of Code
+The University of Auckland and Christof Lutteroth\n\n	AboutView		Uniwersytetu w Auckland oraz Christofa Lutterotha

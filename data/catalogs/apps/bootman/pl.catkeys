@@ -1,0 +1,64 @@
+1	polish	x-vnd.Haiku-bootman	681536107
+The boot manager has been successfully installed on your system.	BootManagerController		Menedżer rozruchowy został poprawnie zainstalowany na twoim systemie.
+At least one partition must be selected!	BootManagerController		Musi zostać wybrana przynajmniej jedna partycja!
+The old Master Boot Record could not be saved to %s	BootManagerController		Nie udało się zapisać starego menedżera rozruchowego na %s
+The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		Główny Rekord Rozruchowy (MBR) urządzenia:\n\t%s\nzostanie teraz zapisany na dysku. Proszę wybrać plik, na którym zostanie zapisana kopia obecnego rekordu rozruchowego.\n\nJeśli z jakiegokolwiek powodu instalacja się nie powiedzie, lub jeśli zajdzie potrzeba usunięcia menu rozruchowego, wystarczy uruchomić program bootman i wybrać opcję odinstalowania.
+About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Główny Rekord Rozruchowy (MBR) dysku %disk z pliku %file zostanie przywrócony. Czy chcesz kontynuować?
+An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		Wystąpił błąd podczas zapisywania menu rozruchowego. Główny sektor rozruchowy może być uszkodzony, spróbuj go przywrócić.
+Uninstall boot menu	EntryPage	Title	Usuń menu rozruchowe
+Write boot menu	BootManagerController	Button	Zapisz menu rozruchowe
+File:	FileSelectionPage	Text control label	Plik:
+Uninstallation of boot menu completed	BootManagerController	Title	Usuwanie menu rozruchowego zakończone
+Next	WizardView	Button	Następne
+Back	BootManagerController	Button	Wróć
+Install boot menu	EntryPage	Title	Instaluj menu rozruchowe
+Choose this option to install a boot menu, allowing you to select which operating system to boot when you turn on your computer.	EntryPage		Wybierz tę opcję, aby zainstalować menu rozruchowe. Pozwoli Ci ono wybrać system operacyjny podczas startu komputera.
+Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		Proszę wybrać plik, z którego ma zostać przywrócona kopia Głównego Sektora Rozruchowego (MBR). Jest to plik, który został utworzony podczas pierwszej instalacji menedżera rozruchowego.
+Unnamed %d	LegacyBootDrive	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Bez nazwy %d
+The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager needs 2 KB available space before the first partition.	BootManagerController		Tablica partycji pierwszego dysku twardego nie jest kompatybilna z Menadżerem Rozruchowym.\nMenedżer Rozruchowy potrzebuje 2KB wolnego miejsca przed pierwszą partycją.
+Partition table not compatible	BootManagerController	Title	Niekompatybilna tablica partycji
+The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Następujące partycje zostały wykryte na dysku twardym. Zaznacz te, które powinny pojawić się w menu rozruchowym. Możesz także przypisać do każdej nazwę, aby ułatwić późniejszą identyfikację.
+The Master Boot Record of the boot device (%s) has been successfully restored from %s.	BootManagerController		Główny Rekord Rozruchowy urządzenia (%s) został pomyślnie przywrócony z %s.
+Select	FileSelectionPage	Button	Wybierz
+Next	BootManagerController	Button	Dalej
+Restore MBR	BootManagerController	Button	Przywróć MBR
+Previous	WizardView	Button	Poprzedni
+Choose this option to remove the boot menu previously installed by this program.\n	EntryPage		Wybierz tę opcję aby usunąć menu rozruchowe zainstalowane wcześniej przez ten program.\n
+Summary	BootManagerController	Title	Podsumowanie
+Installation of boot menu failed	BootManagerController	Title	Instalacja menu rozruchowego nie powiodła się
+The Master Boot Record could not be restored!	BootManagerController		Struktura Master Boot Record nie mogła zostać przywrócona!
+Partitions	PartitionsPage	Title	Partycje
+Done	BootManagerController	Button	OK
+Partitions	DefaultPartitionPage	Pop up menu title	Partycje
+Uninstallation of boot menu failed	BootManagerController	Title	Usunięcie menu rozruchowego zakończyło się niepowodzeniem
+About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Za chwilę nastąpi zapis menu uruchomieniowego na dysk uruchomieniowy (%s). Zweryfikuj informacje podane poniżej zanim program kontynuuje swoją pracę.
+Installation of boot menu completed	BootManagerController	Title	Instalacja menu rozruchowego zakończona
+Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Wskaż plik z kopią sektora MBR. Jest to plik, który został utworzony gdy menadżer rozruchowy był instalowany po raz pierwszy.
+Uninstall boot manager	BootManagerController	Title	Usuń menedżer rozruchowy
+Uninstall Boot Manager	UninstallPage	Title	Usuń menedżer rozruchowy
+Old Master Boot Record saved	BootManagerController	Title	Zachowano starą wersję sektora MBR
+Boot Manager	BootManagerWindow	Window Title	Menedżer Rozruchowy
+Old Master Boot Record Saved failure	BootManagerController	Title	Zapis starej wersji sektora MBR nie powiódł się
+Boot Manager is unable to read the partition table!	BootManagerController		Menadżer rozruchowy nie może odczytać tablicy partycji!
+Default Partition:	DefaultPartitionPage	Menu field label	Partycja domyślna:
+OK	BootManager		OK
+Unknown	LegacyBootDrive	Text is shown for an unknown partition type	Nieznany typ
+Default Partition	DefaultPartitionPage	Title	Domyślna Partycja
+Error reading partition table	BootManagerController	Title	Błąd podczas odczytu tablicy partycji
+About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Za chwilę nastąpi zapis menu uruchomieniowego na dysk twardy. Czy jesteś pewien, że chcesz kontynuować?
+OK	BootManagerController	Button	OK
+Backup Master Boot Record	BootManagerController	Title	Kopia zapasowa sektora MBR
+Haiku Boot Manager	BootManager	About text title	Menedżer Rozruchowy Haiku
+written by	BootManager		napisany przez
+Copyright %year, Haiku Inc.\n	BootManager	Leave %year untranslated	Copyright %year, Haiku Inc.\n
+After two seconds	DefaultPartitionPage		Po dwóch sekundach
+Timeout: %s	DefaultPartitionPage		Czas oczekiwania: %s
+After four seconds	DefaultPartitionPage		Po czterech sekundach
+Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		Proszę wybrać domyślną partycję i czas oczekiwania.\nMenu rozruchowe załaduje system z domyślnej partycji po ustalonym czasie oczekiwania, chyba, że w tym czasie wybierzesz inną. Możesz także tak ustawić menu rozruchowe, aby w nieskończoność czekało na wybór.\nTrzymaj klawisz 'ALT' podczas uruchamiania, aby wyłączyć czas oczekiwania w menu rozruchowym.
+After one second	DefaultPartitionPage		Po jednej sekundzie
+After one minute	DefaultPartitionPage		Po minucie
+After five seconds	DefaultPartitionPage		Po pięciu sekundach
+Never	DefaultPartitionPage		Nigdy
+Immediately	DefaultPartitionPage		Natychmiast
+After three seconds	DefaultPartitionPage		Po trzech sekundach
+The old Master Boot Record was successfully saved to %s.	BootManagerController		Stara wersja sektora MBR została z powodzeniem zapisana do %s.

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Fonts	1355959961
+1	ukrainian	x-vnd.Haiku-Fonts	1393111467
 Plain font:	Font view		Простий шрифт:
 Defaults	Main window		По замовчуванню
 Fonts	Main window		Шрифти
@@ -9,3 +9,4 @@ Menu font:	Font view		Шрифт меню:
 Fixed font:	Font view		Моноширний шрифт:
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Гей, хлопці, не смію - на ґанку ваша файна їжа знищується бурундучком.
 Bold font:	Font view		Виділений шрифт:
+OK	main		Гаразд

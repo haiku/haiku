@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku-About	2583642733
+1	simplified_chinese	x-vnd.Haiku-About	2350236915
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (和他的 NewOS 系统核心)\n
 %ld Processors:	AboutView		%ld 处理器:
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (项目创始人)\n\n
@@ -27,7 +27,6 @@ Version:	AboutView		版本：
 License: 	AboutView		授权: 
 Translations:\n	AboutView		翻译:\n
 ... and the many people making donations!\n\n	AboutView		... 以及其他更多的贡献者!\n\n
-Google & their Google Summer of Code program\n\n	AboutView		谷歌以及谷歌编程夏令营\n\n
 The BeGeistert team\n	AboutView		BeGeistert 项目组 \n
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku and the Haiku logo are trademarks of Haiku, Inc.\n\n	AboutView		Haiku, Inc拥有Haiku的源代码版权，或由在源代码中明确标识软件开发者所有。Haiku和Haiku logo为Haiku, Inc.注册商标。\n\n
 GCC %d Hybrid	AboutView		GCC %d Hybird
@@ -35,3 +34,5 @@ GCC %d Hybrid	AboutView		GCC %d Hybird
 %d MiB used (%d%%)	AboutView		已使用%d MiB (%d%%)
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT licence%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		专用于Haiku的代码在%MIT协议%下发布，特别是内核与所有应用程序可能链接使用的代码。某些系统库可能包含在LGPL协议下发布的第三方代码。在下面的介绍中，您可以找到第三方代码所使用的授权协议。\n\n
 %total MiB total, %inaccessible MiB inaccessible	AboutView		总计 %total MiB， 不可用 %inaccessible MiB
+Google & their Google Summer of Code program\n	AboutView		谷歌与它们的谷歌编程之夏项目\n
+The University of Auckland and Christof Lutteroth\n\n	AboutView		奥克兰大学与 Christof Lutteroth\n\n

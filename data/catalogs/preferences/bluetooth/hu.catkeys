@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-BluetoothPrefs	3802999910
+1	hungarian	x-vnd.Haiku-BluetoothPrefs	3689983287
 About Bluetooth…	Window		A Bluetoothról…
 Handheld	Settings view		Mobiltelefon
 Default inquiry time:	Settings view		Alapértelmezett lekérdezési időkorlát:
@@ -49,5 +49,4 @@ Retrieving names...	Inquiry panel		Nevek lekérdezése…
 Help	Window		Segítség
 Add…	Remote devices		Hozzáadás…
 Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Haiku Bluetooth rendszer, (ARCE)\n\nLétrehozta: Oliver Ruiz Dorantes\n\nA következők támogatásával:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nKöszönjük azoknak, akik segítettek…\n\nHardver szállításával/adományozásával:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nGazdaságilag:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nJavításokkal:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nAki megtanított engem minderre:\n\t- A yellowTAB csapat
- seconds	Inquiry panel		másodperc
 Server	Settings view		Kiszolgáló

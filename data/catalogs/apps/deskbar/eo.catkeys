@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Be-TSKB	2834616797
+1	esperanto	x-vnd.Be-TSKB	3272391255
 Applications	PreferencesWindow		Aplikaĵoj
 Recent applications	BeMenu		Ĵusaj aplikaĵoj
 Edit menu…	PreferencesWindow		Menuo Redakti…
@@ -9,3 +9,24 @@ Change time…	TimeView		Regli la horloĝon…
 <Be folder is empty>	BeMenu		<La dosierujo Be estas malplena>
 Window	PreferencesWindow		Fenestro
 Menu	PreferencesWindow		Menuo
+Show seconds	PreferencesWindow		Vidigi sekundojn
+Always on top	PreferencesWindow		Ĉiam malfone
+Show all	WindowMenu		Vidigi ĉiujn
+No windows	WindowMenu		Neniu fenestro
+Power off	BeMenu		Malŝalti
+Auto-raise	PreferencesWindow		Aŭtomate malfonigi
+Hide time	TimeView		Kaŝi horloĝon
+Recent folders:	PreferencesWindow		Ĵusaj dosierujoj:
+Deskbar preferences…	BeMenu		Deskbar agordoj…
+Close all	WindowMenu		Fermi ĉiujn
+Deskbar preferences	PreferencesWindow		Deskbar agordoj
+Mount	BeMenu		Munti
+Recent applications:	PreferencesWindow		Ĵusaj aplikaĵoj:
+Tracker always first	PreferencesWindow		Tracker ĉiam unua
+About Haiku…	BeMenu		Pri Haiku…
+Find…	BeMenu		Trovi…
+Show Time	Tray		Vidigi Horloĝon
+Clock	PreferencesWindow		Horloĝo
+Recent documents	BeMenu		Ĵusaj dokumentoj
+Hide all	WindowMenu		Kaŝi ĉiujn
+Quit application	WindowMenu		Eliri aplikaĵon

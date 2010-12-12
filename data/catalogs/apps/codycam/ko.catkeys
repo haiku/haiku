@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku.CodyCam	2594096346
+1	korean	x-vnd.Haiku.CodyCam	1322454590
 Capturing Image…	VideoConsumer.cpp		이미지 갈무리중…
 Every 30 seconds	CodyCam		매 30초마다
 File name:	CodyCam		파일 이름:
@@ -50,7 +50,6 @@ invalid upload client %ld\n	VideoConsumer.cpp		올바르지 않은 업로드 클
 Every 15 seconds	CodyCam		매 15초마다
 Error writing output file	VideoConsumer.cpp		츨력 파일 쓰기 에러
 About Codycam…	CodyCam		Codycam 정보…
-Background View	CodyCam		배경 보기
 image file format expected	CodyCam		정지 이미지 형식이 요구됨
 Cannot set the time source for the video source	CodyCam		비디오 원본의 시간 원본을 설정할 수 없음
 Type:	CodyCam		형식:
@@ -94,6 +93,5 @@ Cannot seek time source!	CodyCam		시간 원본을 찾을 수 없습니다!
 File	CodyCam		파일
 Image Format Menu	CodyCam		이미지 형식 메뉴
 Every 30 minutes	CodyCam		매 30분마다
-FTP Setup	CodyCam		FTP 설정
 reply: '%s'\n	SftpClient		응답: '%s'\n
 Start video	CodyCam		비디오 시작

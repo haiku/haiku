@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Expander	2957181365
+1	ukrainian	x-vnd.Haiku-Expander	1292562546
 Expand	ExpanderMenu		Розпакувати
 Set destination…	ExpanderMenu		Встановити ціль…
 File expanded	ExpanderWindow		Файл розпаковано
@@ -36,3 +36,4 @@ Stop	ExpanderWindow		Зупинити
 Destination	ExpanderWindow		Ціль
 \n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tАвтор Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nАвтори Be версії \nDominic, Hiroshi, Peter, Pavel і Robert\nПереклад Віктор Чумак aka 386sx\nn
 Expander	About		Expander
+is not supported	ExpanderWindow		Це не підтримується

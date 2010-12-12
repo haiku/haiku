@@ -1,320 +1,435 @@
-1	finnish	x-vnd.Haiku-libtracker	2723586359
-Sorry, you can't save things at the root of your system.	libtracker		Valitettavasti et voi tallentaa mitään järjestelmäsi root-hakemistoon.
-Empty Trash	libtracker		Tyhjennä roskakori
-Recent folders	libtracker		Äskettäiset kansiot
-You cannot copy or move the root directory.	libtracker		Ei voida kopioida tai siirtää root-hakemistoa.
-starts with	libtracker		alkaa kohteella
-TiB	libtracker		TiB
-Duplicate	libtracker		Kaksoiskappale
-Link To:	libtracker		Linkki kohteeseen:
-Paste links	libtracker		Liitä linkit
-Volume icons	libtracker		Taltiokuvakkeet
-Relation	libtracker		Suhde
-Create a Query template	libtracker		Luo Kyselymallinne
-%num items	libtracker		%num kohdetta
-Name matches wildcard expression:###	libtracker		Nimi täsmää jokerilausekkeeseen:###
-Modified	libtracker		Muokattu
-Group	libtracker		Ryhmä
-Create link	libtracker		Luo linkki
-Moving: 	libtracker		Siirretään:
-Preparing to copy items…	libtracker		Valmistaudutaan kopioimaan kohteita...
-Error deleting items	libtracker		Virhe poistettaessa kohteita
-Sorry, saving more than one item is not allowed.	libtracker		Valitettavasti useamman kuin yhden kohteen tallentaminen ei ole sallittua.
-Open with…	libtracker		Avaa ohjelmalla...
-for %num files	libtracker		%num tiedostolle
-At %func \nfind_directory() failed. \nReason: %error	libtracker		Funktiossa %func \nfind_directory() epäonnistui. \nSyy: %error
-Unknown	libtracker		Tuntematon
-Close	libtracker		Sulje
-Go to parent	libtracker		Siirry ylätasolle
-%name info	libtracker	InfoWindow Title	%name-tiedot
-(Finish: %time - %finishtime minutes left)	libtracker		(Päättyminen: %time - %finishtime minuuttia jäljellä)
-Recent documents	libtracker		Äskettäiset asiakirjat
-Clean up	libtracker		Tyhjennä
-Find…	libtracker		Etsi...
-Mount all	libtracker		Liitä kaikki
-Opens with:	libtracker		Avaa ohjelmalla:
-Paste layout	libtracker		Liitä sijoittelu
-Cancel	libtracker		Peru
-Preparing to move items…	libtracker		Valmistaudutaan siirtämään kohteita...
-Invert selection	libtracker		Käänteinen valinta
-Error calculating folder size.	libtracker		Virhe laskettaessa kansion kokoa.
-Don't move files to Trash	libtracker		Älä siirrä tiedostoja roskakoriin
-Name	libtracker		Nimi
-Cut more	libtracker		Leikkaa lisää
-save text	libtracker		tallenna teksti
-Could not open \"%document\" (Missing symbol: %symbol). \n	libtracker		Ei voitu avata asiakirjaa \"%document\" (Puuttuva symboli: %symboli).\n
-Don't automount	libtracker		Älä liitä automaattisesti
-Sorry, the 'Character' attribute cannot store a multi-byte glyph.	libtracker		Valitettavasti attribuutti 'Character' ei  voi tallentaa monitavuista kirjoitusmerkkiä.
-Would you like to find a suitable application to open the file?	libtracker		Haluaisitko löytää sopivan sovelluksen tiedoston avaamiseen?
-Increase size	libtracker		Kasvata kokoa
-is	libtracker		on
-(Finish: %time - Over %finishtime hours left)	libtracker		(Päättyminen: %time - %finishtime tuntia jäljellä)
-Could not open \"%name\" (%error). 	libtracker		Ei voitu avata kohdetta \"%name\" (%error).
-Copying: 	libtracker		Kopioidaan:
-You cannot replace a folder or a symbolic link with a file.	libtracker		Et voi korvata kansiota tai symbolista linkkiä tiedostolla.
-Decrease size	libtracker		Pienennä kokoa
-There was an error deleting \"%name\":\n\t%error	libtracker		Virhe poistettaessa \"%name\":\n\t%error
-Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	libtracker		Oletko varma,että haluat poistaa valitutu kohteet? Tätä toimintoa ei voida perua.
-The target disk does not support creating links.	libtracker		Kohdelevy ei tue linkkien luontia.
-The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	libtracker		Valittua kohdetta ei voi siirtää roskakoriin. Haluaisitko sen sijaan poistaa sen? (Tätä toimintoa ei voi perua.)
-before	libtracker		ennen
-Copy more	libtracker		Kopio lisää
-Disks	libtracker		Levyt
-Cut	libtracker		Leikkaa
-The Tracker must be running to see Info windows.	libtracker		Jäljittäjä on oltava käynnissä Tiedot-ikkunoiden näkymiseksi.
-Desktop	libtracker		Työpöytä
-Create a Query	libtracker		Luo Kysely
-Could not update permissions of file \"%name\". %error	libtracker		Ei voitu päivittää tiedoston \”%name\" käyttöoikeuksia. %error
-Error in regular expression:\n\n'	libtracker		Virhe säännöllisessä lausekkeessa:\n\n'
-If you %action the mime settings, Haiku may not behave properly! Are you sure you want to do this? To %action the mime settings anyway, click \"Do it\".	libtracker		Jos suoritat toiminnon %action mime-asetuksiin, Haiku ei ehkä toimi oikein! Oletko varma, että haluat tehdä tämän? Jos suoritat toiminnon %action mime-asetuksiin, napsauta \"Tee se\".
-Resize to Fit	libtracker		Muuta koko sopimaan
-Add printer…	libtracker		Lisää tulostin...
-Trash	libtracker		Roskakori
-greater than	libtracker		suurempi kuin
-Other	libtracker		Muu
-GiB	libtracker		GiB
-Query name:	libtracker		Kyselynimi:
-Or	libtracker		Tai
-An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	libtracker		Kohde \"%name\" on jo olemassa kansiossa, ja saattaa sisältää\nalkioita, joilla on sama nimi. Haluaisitko korvata ne niillä, jotka sisältyvät kansioon, jota %verb?
-Do it	libtracker		Tee se
-There was an error writing the attribute.	libtracker		Virhe kirjoitettaessa attribuuttia.
-Emptying Trash… 	libtracker		Tyhjennetään roskakoria...
-Close all in workspace	libtracker		Sulje kaikissa työtiloissa
-Sorry, you cannot edit that attribute.	libtracker		Valitettavasti et voi muokata tätä attribuuttia.
-Deleting: 	libtracker		Poistetaan:
-The file \"%name\" already exists in the specified folder. Do you want to replace it?	libtracker		Tiedosto \"%name\" on jo olemassa määritellyssä kansiossa. Haluatko korvata sen?
-Revert	libtracker		Palauta
-Could not open \"%document\" with application \"%app\" (%error). 	libtracker		Ei voitu avata asiakirjaa \"%document\" sovelluksella \"%app\" (%error).
-no supporting apps	libtracker		ei tuettuja sovelluksia
-\nShould this be fixed?	libtracker		\nPitäisikö täm korjata?
-The specified name is already used as the name of a folder. Please choose another name.	libtracker		Määritelty nimi on jo käytössä kansionimenä. Valitse toinen nimi.
-Version	libtracker		Versio
-Invert	libtracker		Käännä
-by attribute	libtracker		: attribuutti
-There was a problem trying to save in the folder you specified. Please try another one.	libtracker		Pulma yritettäessä tallentaa määrittelemässäsi kansiossa. Yritä toista kansiota.
-Create relative link	libtracker		Luo suhteellinen linkki
-Attributes	libtracker		Attribuutit
-Mount server error	libtracker		Liittämispalvelinvirhe
-Sorry, there is not enough free space on the destination volume to copy the selection.	libtracker		Valitettavasti kohdetaltiolla ei ole riittävästi tilaa valinnan kopioimiseksi.
-Replace all	libtracker		Korvaa kaikki
-Owner	libtracker		Omistaja
-12 hour	libtracker		12 tuntia
-Select all	libtracker		Valitse kaikki
-Delete	libtracker		Poista
-Save as Query template:	libtracker		Tallenna Kysely-mallinne:
-Only the boot disk	libtracker		Vain alkukäynnistyslevy
-Set new link target	libtracker		Aseta uusi linkkikohde
-ends with	libtracker		loppuu kohteeseen
-If you %action the config folder, Haiku may not behave properly! Are you sure you want to do this? To %action the config folder anyway, click \"Do it\".	libtracker		Jos suoritat toiminnon %action config-kansiossa, Haiku ei ehkä toimi oikein! Oletko varma, että haluat tehdä tämän? Jos kuitenkin haluat suorittaa toiminnon %action config-kansiossa, napsauta \"Tee se\".
-Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	libtracker		Virhe kopioitaessa kansiota \"%name\":\n\t%error\n\nHaluaisitko jatkaa?
-OK	libtracker		Valmis
-Make active printer	libtracker		Valitse aktiivinen tulostin
-New	libtracker		Uusi
-Paused: click to resume or stop	libtracker		Tauotettu: napsauta jatka tai pysäytä
-Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	libtracker		Ei voitu avata asiakirjaa \"%document\" sovelluksella \"%app\" (Puuttuvat kirjastot: %library).\n
-MiB	libtracker		MiB
-Disk mount settings	libtracker		Levynliittämisasetukset
-Include trash	libtracker		Sisällytä roskakori
-Could not find an application to open \"%name\" (%error). 	libtracker		Ei kyetty löytämään avattava sovellusta \"%name\” (%error).
-(Finish: %time - Over %finishtime days left)	libtracker		(Valmistuminen: %time - %finishtime päivää jäljellä)
-Could not open \"%document\" (Missing libraries: %library). \n	libtracker		Ei voitu avata asiakirjaa \"%document\" (Puuttuvat kirjastot: %library).\n
-Preparing to restore items…	libtracker		Valmistaudutaan palauttamaan kohteita...
-You can't replace a folder with one of its sub-folders.	libtracker		Et voi korvata kansiota yhdellä sen alikansiosta.
-Mount all disks now	libtracker		Liitä nyt kaikki levyt
-Temporary	libtracker		Tilapäinen
-If you %action the home folder, Haiku may not behave properly! Are you sure you want to do this? To %action the home anyway, click \"Do it\".	libtracker		Jos suoritat toiminnon %action kotihakemistossa, Haiku saattaa käyttäytyä odottamattomasti! Oletko varma, että haluat tehdä tämän? Jos kuitenkin haluat suorittaa toiminnon %action, napsauta \"Tee se\".
-40 x 40	libtracker		40 x 40
-Previously mounted disks	libtracker		Aiemmin liitetyt levyt
-Create link here	libtracker		Luo linkki tänne
-Unmount	libtracker		Pura liittäminen
-That name is already taken. Please type another one.	libtracker		Nimi on jo varattu. Kirjoita toinen nimi.
-Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	libtracker		Ei voitu avata asiakirjaa \"%document\" sovelluksella \"%app\" (Puuttuva symboli: %symbol).\n
-less than	libtracker		vähemmän kuin
-Edit query	libtracker		Muokka kyselyä
-Original name	libtracker		Alkuperäinen nimi
-Preparing to delete items…	libtracker		Valmistaudutaan poistamaan kohteita...
-Created:	libtracker		Luotu:
-Location:	libtracker		Sijainti:
-New Query	libtracker		Uusi kysely
-Write	libtracker		Kirjoita
-Sorry, you can't copy items to the Trash.	libtracker		Valitettavasti eti voi kopioida kohteita roskakoriin.
-Mini icon view	libtracker		Minikuvakenäkymä
-Windows	libtracker		Ikkunat
-Ask before delete	libtracker		Kysy ennen poistamista
-matches regular expression	libtracker		täsmää säännölliseen lausekkeeseen
-Open and make preferred	libtracker		Avaa ja tee etusijainen
-Default application	libtracker		Oletussovellus
-Execute	libtracker		Suorita
-Created	libtracker		Luotu
-calculating…	libtracker		lasketaan...
-label too long	libtracker		nimiö on liian pitkä
-Link \"%name\" to:	libtracker	File dialog title for new sym link	Linkki \"%name\" kohteeseen:
-Query template	libtracker		Kyselymallinne
-Description:	libtracker		Kuvaus:
-You cannot replace a file with a folder or a symbolic link.	libtracker		Et voi korvata tiedostoa kansiolla tai symbolisella linkillä.
-Save	libtracker		Tallenna
-Month-day-year	libtracker		Kuukausi-päivä-vuosi
-link	libtracker	filename link	linkki
-Open	libtracker		Avaa
-Edit name	libtracker		Muokkaa nimeä
-Show folder location in title tab	libtracker		Näytä kansiosijainti otsikkovälilehdessä
-contains	libtracker		sisältää
-Formula %formula	libtracker	FindResultTitle	Kaava %formula
-You cannot put the Trash, home or Desktop directory into the trash.	libtracker		Et voi laittaa roskakoria, kotihakemistoa tai työpöytähakemistoa roskakoriin.
-Date & Time	libtracker		Päivämäärä & Aika
-Modified:	libtracker		Muokattu:
-Skip	libtracker		Ohita
-Examples:	libtracker		Esimerkit:
-24 hour	libtracker		24 tuntia
-Preparing to create links…	libtracker		Valmistaudutaan luomaan linkkejä...
-Error emptying Trash!	libtracker		Virhe tyhjennettäessä roskakoria!
-There was an error resolving the link.	libtracker		Virhe ratkaistaessa linkkiä.
-Move	libtracker		Siirrä
-You can't move a folder into itself or any of its own sub-folders.	libtracker		Et voi siirtää kansiota itseensä tai mihinkään sen alikansioon.
-Error %error loading Add-On %name.	libtracker		Virhe %error ladattaessa Lisäosaa %name
-Edit Query template	libtracker		Muokkaa Kyselymallinnetta
-Show shared volumes on Desktop	libtracker		Näytä jaetut taltiot työpöydällä
-Ignore case	libtracker		Ohita kirjainkoko
-Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	libtracker		Jotkut kohteet ovat jo tässä kansiossa samalla nimellä kuin kohteet, joita %verb.\n\nHaluaisitko korvata ne sellaisilla, jotka %verb tai kehotteella jokaisen kohdalla?
-Open parent	libtracker		Avaa ylätaso
-None	libtracker		Ei mitään
-You can't move or copy the trash.	libtracker		Et voi siirtää tai kopioida roskakoria.
-Create relative link here	libtracker		Luo suhteellinen linkki tänne
-moving	libtracker		siirretään
-Version:	libtracker		Versio:
-Capacity:	libtracker		Kapasiteetti:
-You cannot create a link to the root directory.	libtracker		Et voi luoda linkkiä root-hakemistoon.
-Are you sure you want to move or copy the selected item(s) to this folder?	libtracker		Oletko varma, että haluat siirtää tai kopioida valitut kohteet tähän kansioon?
-You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	libtracker		Yrität korvata kohteen:\n\t%name%dest\nkohteella:\n\t%name%src\n\nHaluaisitko korvata sen yhdellä olet %movemode?
-Move here	libtracker		Siirrä tänne
-Free space color	libtracker		Vapaatilaväri
-Read	libtracker		Luettu
-after	libtracker		jälkeen
-Size	libtracker		Koko
-Search	libtracker		Etsintä
-Recalculate folder size	libtracker		Laske kansion koko uudelleen
-Favorites	libtracker		Suosikit
-List view	libtracker		Luettelonäkymä
-Enable type-ahead filtering	libtracker		Ota käyttöön type-ahead-suodatus
-Show Disks icon	libtracker		Näytä levykuvake
-Edit templates…	libtracker		Muokkaa mallinteita...
-Add	libtracker		Lisää
-Disk mounting during boot	libtracker		Levynliittäminen alkulatauksen aikana
-Date order	libtracker		Päivämääräjärjestys
-Restoring: 	libtracker		Palautetaan:
-Settings…	libtracker		Asetukset...
-Sorry, could not create a new folder.	libtracker		Valitettavasti ei voida luoda uutta kansiota.
-Current folder	libtracker		Nykyinen kansio
-New folder %ld	libtracker		Uusi kansio %ld
-Cannot unmount the boot volume \"%name\".	libtracker		Ei voida poistaa alkulataustaltion \"%name\" liittämistä.
-48 x 48	libtracker		48 x 48
-Copy here	libtracker		Kopioi tänne
-%Ld bytes	libtracker		%Ld tavua
-Used space color	libtracker		Käytetyt tilavärit
-Location	libtracker		Sijainti
-Error moving \"%name\".	libtracker		Virhe siirrettäessä kohdetta \"%name\"
-Show volumes on Desktop	libtracker		Näytä taltiot työpöydällä
-Name = %name	libtracker	FindResultTitle	Nimi = %name
-matches wildcard expression	libtracker		täsmää jokerimerkkilausekkeeseen
-Window	libtracker		Ikkuna
-There was a problem trying to replace \"%name\". The item might be open or busy.	libtracker		Pulma yritettäessä korvata kohdetta \"%name\". Kohde voi olla avoin tai varattu.
-Proceed	libtracker		Edetään
-New folder%ld	libtracker		Uusi kansio%ld
-Year-month-day	libtracker		Vuosi-kuukausi-päivä
-New folder	libtracker		Uusi kansio
-File	libtracker		Tiedosto
-Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	libtracker		Virhe kopioitaessa tiedostoa \"%name\":\n\t%error\n\nHaluatko jatkaa?
-Close all	libtracker		Sulje kaikki
-(Finish: %time)	libtracker		(Valmistuminen: %time)
-Clock	libtracker		Kello
-Show navigator	libtracker		Näytä navigaattori
-Force identify	libtracker		Pakota tunnistamaan
-Mount settings…	libtracker		Liittämisasetukset...
-is not	libtracker		ei ole
-Clean up all	libtracker		Tyhjennä kaikki
-List folders first	libtracker		Luettele kansiot ensin
-Remove	libtracker		Poista
-All BeOS disks	libtracker		Kaikki BeOS-levyt
-no items	libtracker		ei kohteita
-copying	libtracker		kopioidaan
-Preferences…	libtracker		Asetukset...
-All disks	libtracker		Kaikki levyt
-Searching for disks to mount…	libtracker		Etsitään levyjä liitettäväksi...
-Tracker status	libtracker		Jäljittäjätila
-Identify	libtracker		Tunnista
-Automatic disk mounting	libtracker		Automaattinen levyliittäminen
-Add-ons	libtracker		Lisäosat
-The mount server could not be  contacted.	libtracker		Liittämispalvelimeen ei saatu yhteyttä.
-Select…	libtracker		Valitse...
-multiple disks	libtracker		useita levyjä
-Could not open \"%name\". The file is mistakenly marked as executable. 	libtracker		Ei voitu avata kohdetta \"%name\". Tiedosto on erehdyksessä merkitty suoritettavaksi.
-Single window navigation	libtracker		Yksittäisikkunanavigointi
-Done	libtracker		Valmis
-Open selection with:	libtracker		Avaa valinta attribuutilla:
-Paste	libtracker		Liitä
-32 x 32	libtracker		32 x 32
-Get info	libtracker		Hae tiedot
-Create %s clipping	libtracker		Luo %s leikkaus
-You must drop items on one of the disk icons in the \"Disks\" window.	libtracker		Sinun on pudotettava alkiot yhdelle \"Levvt\"-ikkunan kuvakkeille.
-Move to	libtracker		Siirrä kohteeseen
-by name	libtracker		/ nimi
-Warning space color	libtracker		Varoitustilaväri
-Add current folder	libtracker		Lisää nykyinen kansio
-Replace other file	libtracker		Korvaa toinen tiedosto
-%Ld B	libtracker		%Ld tavua
-Tracker preferences	libtracker		Jäljittäjäasetukset
-Prompt	libtracker		Kehote
-Kind	libtracker		Tyyppi
-Move to Trash	libtracker		Siirrä roskakoriin
-1 item	libtracker		1 kohde
-Size:	libtracker		Koko:
-Would you like to find some other suitable application?	libtracker		Haluatko löytää jonkun toisen sopivan sovelluksen?
-Files cannot be moved or deleted from a read-only volume.	libtracker		Tiedostoja ei voida siirtää tai poistaa kirjoitussuojatusta taltiosta.
-by formula	libtracker		/ kaavio
-(%bytes bytes)	libtracker		(%bytes tavua)
-Copy to	libtracker		Kopioi kohteeseen
-And	libtracker		Ja
-Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	libtracker		Jotkut valituista kohteista ei voida siirtää roskakoriin. Haluaisitko sen sijaan poistaa ne? (Tätä toimintoa ei voida perua.)
-Eject when unmounting	libtracker		Poista levyasemasta purettaessa liittämistä
-Error creating link to \"%name\".	libtracker		Virhe luotaessa linkkiä kohteeseen \"%name\".
-copy	libtracker	filename copy	kopioi
-Icon view	libtracker		Kuvakenäkymä
-Sorry, you can't create links in the Trash.	libtracker		Valitettavasti roskakoriin ei voi luoda linkkejä.
-Edit favorites…	libtracker		Muokkaa suosikkeja...
-If you %action the settings folder, Haiku may not behave properly! Are you sure you want to do this? To %action the settings folder anyway, click \"Do it\".	libtracker		Jos suoritat toiminnon %action asetuskansioon, Haiku saattaa käyttäytyä odottamattomasti! Oletko varma, että haluat tehdä tämän. Jos kuitenkin haluat suorittaa toiminnon %action asetuskansioon, napsauta painiketta \"Tee se\".
-On	libtracker		Päällä
-Space	libtracker		Tila
-Find	libtracker		Etsi
-Error moving \"%name\"	libtracker		Virhe siirrettäessä kohdetta \"%name\"
-(Finish: %time - %finishtime seconds left)	libtracker		(Valmistuminen: %time - %finishtime sekuntia jäljellä)
-That name is too long. Please type another one.	libtracker		Tämä nimi on liian pitkä. Kirjoita toinen nimi.
-Select	libtracker		Valitse
-Error moving \"%name\" to Trash. (%error)	libtracker		Virhe siirrettäessä kohdetta \"%name\" roskakoriin. (%error)
-Outline selection rectangle only	libtracker		Ääriviivavalintana on vain nelikulmio
-The specified name is illegal. Please choose another name.	libtracker		Määritetty nimi on virheellinen. Valitse toinen nimi.
-of %items	libtracker		/ %items
-Day-month-year	libtracker		Päivä-kuukausi-vuosi
-Preparing to empty Trash…	libtracker		Valmistaudutaan tyhjentämään roskakori...
-If you %action the system folder or its contents, you won't be able to boot Haiku! Are you sure you want to do this? To %action the system folder or its contents anyway, hold down the Shift key and click \"Do it\".	libtracker		Jos suoritat toimen %action järjestelmäkansioon tai sen sisältöön, ei kykene alkukäynnistämään Haikua! Oletko varma, että haluat tehdä tämän? Jos kaikesta huolimatta haluat suorittaa toiminnon %action järjestelmäkansiolle tai sen sisällölle, pidä Vaihto-näppäin alhaalla ja napsauta painiketa \"Tee se\".
-Kind:	libtracker		Tyyppi:
-Replace	libtracker		Korvaa
-Show space bars on volumes	libtracker		Näytä tilapalkit taltioissa
-Permissions	libtracker		Käyttöoikeudet
-An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	libtracker		Kohde nimeltä \"%name\" on jo olemassa tässä kansiossa. Haluatko korvata sen symbolisella linkillä, jota olet luomassa?
-64 x 64	libtracker		64 x 64
-You can't move or copy items to read-only volumes.	libtracker		Et voi siirtää tai kopioida kohteita kirjoitussuojattuun taltioon.
-You must have at least one attribute showing.	libtracker		Sinulla on oltava vähintään yksi attribuutti näytettäväksi.
-Copy layout	libtracker		Kopioi asettelu
-Empty folder	libtracker		Tyhjennä kansio
-All files and folders	libtracker		Kaikki tiedostot ja kansiot
-Restore	libtracker		Palauta
-The Tracker must be running to see set the default printer.	libtracker		Jäljittäjän on oltava käynnissä, jotta oletustulostin näkyy.
-Save Query as template…	libtracker		Tallenna Kysely mallinteena...
-KiB	libtracker		KiB
-Mount	libtracker		Liitä
-Creating links: 	libtracker		Luotiin linkkejä:
-<No recent items>	libtracker		<ei äskettäisiä kohteita>
-Copy	libtracker		Kopioi
-Could not open \"%document\" because application \"%app\" is in the Trash. 	libtracker		Ei voitu avata asiakirjaa \"%document\" koska sovellus \"%app\" on roskakorissa.
-Defaults	libtracker		Oletukset
-%capacity (%used used -- %free free)	libtracker		%capacity (%used käytetty -- %free vapaa)
+1	finnish	x-vnd.Haiku-libtracker	3424530812
+OK	WidgetAttributeText		Valmis
+Icon view	VolumeWindow		Kuvakenäkymä
+Add-ons	FilePanelPriv		Lisäosat
+Desktop	Model		Työpöytä
+Identify	ContainerWindow		Tunnista
+Warning space color	SettingsView		Varoitustilaväri
+Close	VolumeWindow		Sulje
+Open	OpenWithWindow		Avaa
+Tracker status	StatusWindow		Tracker-tila
+Eject when unmounting	AutoMounterSettings		Poista laitteesta irrotettaessa
+Window	ContainerWindow		Ikkuna
+Decrease size	ContainerWindow		Pienennä kokoa
+Mini icon view	VolumeWindow		Minikuvakenäkymä
+You must have at least one attribute showing.	PoseView		Sinulla on oltava vähintään yksi attribuutti näytettäväksi.
+Permissions	InfoWindow		Käyttöoikeudet
+Invert selection	VolumeWindow		Käänteinen valinta
+Recent documents	FavoritesMenu		Äskettäiset asiakirjat
+Modified	QueryPoseView		Muokattu
+Created	ContainerWindow		Luotu
+If you %action the home folder, Haiku may not behave properly! Are you sure you want to do this? To %action the home anyway, click \"Do it\".	FSUtils		Jos suoritat toiminnon %action kotikansiossa, Haiku ei ehkä käyttäydy oikein! Oletko varma, että haluat ehdä tämän? Jos kuitenkin haluat tehdä toiminnon %action kotikansiossa, napsauta painiketta \"Tee se\".
+Error %error loading Add-On %name.	ContainerWindow		Virher %error ladattaessa lisäosaa %name.
+contains	SelectionWindow		sisältää
+Sorry, you can't save things at the root of your system.	FilePanelPriv		Et voi valitettavasti tallentaa asioita järjestelmäsi root-kansioon.
+Show shared volumes on Desktop	SettingsView		Näytä jaetut taltiot työpöydällä
+Paste links	ContainerWindow		Liitä linkit
+Name	OpenWithWindow		Nimi
+Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Ei voitu avata asiakirjaa \"%document\", koska sovellus \"%app\" on roskakorissa.
+File	ContainerWindow		Tiedosto
+Handles any %type	OpenWithWindow		Käsittelee mitä tahansa %type-tyyppiä
+Delete	ContainerWindow		Poista
+32 x 32	ContainerWindow		32 x 32
+Cannot unmount the boot volume \"%name\".	FSUtils		Et voi irrottaa alkukäynnistystaltiota \"%name\".
+Open with…	ContainerWindow		Avaa sovelluksella...
+(Finish: %time - Over %finishtime hours left)	StatusWindow		(Loppuminen: %time - Yli %finishtime tuntia jäljellä)
+Write	FilePermissionsView		Kirjoita
+for %num files	InfoWindow		%num tiedostolle
+Modified	PoseView		Muokattu
+Make active printer	ContainerWindow		Tee aktiivinen tulostin
+Create link here	ContainerWindow		Luo linkki tähän
+Moving: 	StatusWindow		Siirretään:
+before	FindPanel		ennen
+On	FindPanel		Kohteessa
+MiB	WidgetAttributeText		MiB
+greater than	FindPanel		suurempi kuin
+Delete	PoseView		Poista
+Select all	ContainerWindow		Valitse kaikki
+Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Attribuuttia 'Character' ei voi tallentaa monitavuiseen kirjoitusmerkkiin.
+Clean up	DeskWindow		Tyhjennä
+You cannot copy or move the root directory.	FSUtils		Et voi kopioida tai siirtää root-hakemistoon.
+Invert selection	FilePanelPriv		Käänteinen valinta
+save text	FilePanelPriv		tallenna teksti
+Select all	FilePanelPriv		Valitse kaikki
+Link to:	InfoWindow		Linkitä kohteeseen:
+Location	ContainerWindow		Sijainti
+Location	QueryPoseView		Sijainti
+Icon view	ContainerWindow		Kuvakenäkymä
+Size	QueryPoseView		Koko
+Emptying Trash… 	StatusWindow		Tyhjennetään roskakoria...
+Close all in workspace	ContainerWindow		Sulje kaikki työtilat
+Empty Trash	ContainerWindow		Tyhjennä roskakori
+Name = %name	FindPanel	FindResultTitle	Nimi = %name
+Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Oletko varma, että haluat kopioida tai siirtää halutut kohteet tähän kansioon?
+Does not handle file	OpenWithWindow		Ei käsittele tiedostoa
+Mount server error	AutoMounterSettings		Liittämispalvelinvirhe
+Do it	FSUtils		Tee se
+Search	FindPanel		Haku
+Preparing to empty Trash…	StatusWindow		Valmistaudutaan tyhjentämään roskakori...
+Disks	Model		Levyt
+Create link	ContainerWindow		Luo linkki
+Decrease size	DeskWindow		Pienennä kokoa
+Size	ContainerWindow		Koko
+All disks	AutoMounterSettings		Kaikki levyt
+Would you like to find some other suitable application?	FSUtils		Haluaisitko etsiä jonkun toisen sopivan sovelluksen?
+Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Ei voitu avata asiakirjaa \"%document\" sovelluksella \"%app\" (Puuttuvat kirjastot: %library). \n
+no items	CountView		ei kohteita
+Ignore case	SelectionWindow		Ohita kirjainkoko
+is not	FindPanel		ei ole
+OK	AutoMounterSettings		Valmis
+Windows	TrackerSettingsWindow		Ikkunat
+Tracker preferences	TrackerSettingsWindow		Tracker-asetukset
+Cut	FilePanelPriv		Leikkaa
+Replace	FilePanelPriv		Korvaa
+rename	TextWidget		nimeä uudelleen
+Select all	VolumeWindow		Valitse kaikki
+Opens with:	InfoWindow		Avaa sovelluksella:
+Open	ContainerWindow		Avaa
+(%SizeProcessed of %TotalSize, %BytesPerSecond/s)	StatusWindow		(%SizeProcessed / %TotalSize, %BytesPerSecond/s)
+Error calculating folder size.	InfoWindow		Virhe laskettaessa kansiokokoa
+New folder	FilePanelPriv		Uusi kansio
+%name info	InfoWindow	InfoWindow Title	%name-tiedot
+Favorites	FavoritesMenu		Suosikit
+Add-ons	VolumeWindow		Lisäosat
+Sorry, you can't copy items to the Trash.	PoseView		Et voi valitettavasti kopioida kohteita roskakoriin.
+List view	VolumeWindow		Luettelonäkymä
+matches wildcard expression	SelectionWindow		täsmää jokerilausekkeeseen
+You cannot replace a folder or a symbolic link with a file.	FSUtils		Et voi korvata kansiota tai symbolista linkkiä tiedostoon.
+Show space bars on volumes	SettingsView		Näytä tilapalkit taltioissa
+Invert selection	ContainerWindow		Käänteinen valinta
+Increase size	DeskWindow		Kasvata kokoa
+Resize to fit	ContainerWindow		Muuta koko sopimaan
+%Ld bytes	WidgetAttributeText		%Ld tavua
+Add printer…	ContainerWindow		Lisää tulostin...
+Open	VolumeWindow		Avaa
+New folder	ContainerWindow		Uusi kansio
+Kind	ContainerWindow		Tyyppi
+Select…	ContainerWindow		Valitse...
+Copy to	ContainerWindow		Kopioi kohteeseen
+Move to Trash	ContainerWindow		Siirrä roskakoriin
+Move to	ContainerWindow		Siirrä kohteeseen
+Create %s clipping	PoseView		Luo %s leikkausta
+Set new link target	InfoWindow		Aseta uusi linkityskohde
+Save as Query template:	FindPanel		Tallenna kyselymallinteena
+Cancel	FSUtils		Peru
+Edit name	ContainerWindow		Muokka nimeä
+Show volumes on Desktop	SettingsView		Näytä taltiot työpöydällä
+KiB	WidgetAttributeText		KiB
+Defaults	TrackerSettingsWindow		Oletukset
+%num items	CountView		%num alkiota
+Mini icon view	ContainerWindow		Minikuvakenäkymä
+Clean up	VolumeWindow		Tyhjennä
+OK	TrackerInitialState		Valmis
+Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Ei voitu avata kohdetta \"%name\". Tiedosto on virheellisesti merkitty suoritettavaksi tiedostoksi.
+Add-ons	ContainerWindow		Lisäosat
+Edit templates…	TemplatesMenu		Muokkaa mallinteita...
+An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Kohde nimeltä \"%name\" on jo olemassa tässä kansiossa. Haluaisitko korvata sen symbolisella linkillä, jota olet luomassa?
+Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Kohdetaltiolla ei ole valitettavasti tarpeeksi tilaa valinnan kopioimiseksi.
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Ei voitu avata asiakirjaa \"%document\" sovelluksella \"%app\" (%error). 
+(Finish: %time - %finishtime seconds left)	StatusWindow		(Loppuminen: %time - %finishtime sekuntia jäljellä)
+Sorry, saving more than one item is not allowed.	FilePanelPriv		Useamman kuin yhden kohteen tallentaminen ei ole sallittua.
+Searching for disks to mount…	StatusWindow		Etsitään liitettäviä levyjä...
+New folder	FSUtils		Uusi kansio
+Free space color	SettingsView		Vapaan tilan väri
+Cut	ContainerWindow		Leikkaa
+Remove	FindPanel		Poista
+Resize to fit	QueryContainerWindow		Muuta koko sopimaan
+Desktop	TrackerSettingsWindow		Työpöytä
+Sorry, you can't copy items to the Trash.	FSClipBoard		Et voi valitettavasti kopioida kohteita roskakoriin.
+by attribute	FindPanel		attribuutin mukaan
+Disk mounting during boot	AutoMounterSettings		Levyn liittäminen alkulatauksen aikana
+New Query	FindPanel		Uusi kysely
+(Finish: %time - %finishtime minutes left)	StatusWindow		(Loppuminen: %time - %finishtime minuuttia jäljellä)
+Preparing to move items…	StatusWindow		Valmistaudutaan siirtämään kohteita...
+You cannot replace a file with a folder or a symbolic link.	FSUtils		Et voi korvata tiedostoa kansiolla tai symbolisella linkillä.
+Unmount	InfoWindow		Irrota
+no supporting apps	OpenWithWindow		ei tukevia sovelluksia
+That name is already taken. Please type another one.	InfoWindow		Tuo nimi on jo varattu. Kirjoita toinen nimi.
+Sorry, you can't create links in the Trash.	PoseView		Et voi valitettavasti luoda linkkejä roskakorissa.
+An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Kohde nimellä \"%name\" on jo olemassa tässä kansiossa, ja saattaa sisältää\nsamannimisiä kohteita. Haluaisitko korvata ne niillä, jotka sijaitsevat kansiossa, jolle ole tehnyt %verb?
+Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Linkki \"%name\" kohteeseen:
+Mount settings…	VolumeWindow		Liittämisasetukset...
+Select…	VolumeWindow		Valitse...
+All disks	FindPanel		Kaikki levyt
+Revert	TrackerSettingsWindow		Palauta
+Invert selection	QueryContainerWindow		Käänteinen valinta
+Execute	FilePermissionsView		Suorita
+Size	FindPanel		Koko
+1 item	CountView		1 kohde
+Open parent	ContainerWindow		Avaa päätaso
+Location:	InfoWindow		Sijainti:
+Edit favorites…	FilePanelPriv		Muokkaa suosikkeja...
+Create relative link	ContainerWindow		Luo suhteellinen linkki
+Copy	ContainerWindow		Kopioi
+Size	PoseView		Koko
+Location	OpenWithWindow		Sijainti
+Force identify	ContainerWindow		Pakota tunnistus
+Duplicate	ContainerWindow		Kaksoiskappale
+New folder%ld	FSUtils		Uusi kansio%ld
+Outline selection rectangle only	SettingsView		Vain ääriviivavalintaruuta
+If you %action the system folder or its contents, you won't be able to boot Haiku! Are you sure you want to do this? To %action the system folder or its contents anyway, hold down the Shift key and click \"Do it\".	FSUtils		Jos suoritat toiminnon %action järjestelmäkansiolle tai sen sisällölle, et kykene enää alkulataamaan Haikua! Oletko varma, että haluat tehdä tämän? Jos kuitenkin haluat suorittaa toiminnon %action järjestelmäkansiolle tai sen sisällölle, pidä alhaalla vaihtonäppäin ja napsauta painiketta \"Tee se\".
+Select all	DeskWindow		Valitse kaikki
+OK	InfoWindow		Valmis
+Replace	FSUtils		Korvaa
+You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		Yrität korvata kohdetta:\n\t%name%dest\nkohtella:\n\t%name%src\n\nHaluaisitko korvata sen sillä, jonka olet %movemode?
+Mini icon view	DeskWindow		Minikuvakenäkymä
+Error in regular expression:\n\n'%errstring'	PoseView		Virhe säännöllisessä lausekkeessa:\n\n'%errstring'
+Mount all	MountMenu		Liitä kaikki
+calculating…	InfoWindow		lasketaan...
+Unmount	VolumeWindow		Irrota
+Edit name	VolumeWindow		Muokka nimeä
+Mount all disks now	AutoMounterSettings		Liitä kaikki levyt nyt
+Untitled bitmap	PoseView		Otsikoton bittikarttatiedosto
+of %items	StatusWindow		/ %items
+Description:	InfoWindow		Kuvaus:
+New	DeskWindow		Uusi
+Open	InfoWindow		Avaa
+64 x 64	ContainerWindow		64 x 64
+Replace all	FSUtils		Korvaa kaikki
+The application \"%appname\" does not support the type of document you are about to open. Are you sure you want to proceed? If you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Sovellus \"%appname\" ei tue sen tyyppistä asiakirjaa, jota olet avaamassa. Oletko varma, että haluat jatkaa? Jos tiedät, että sovellus tukee dokumenttityyppiä, sinun pitäisi ottaa yhteyttä sovelluksen julkaisijaan ja pyytää heitä päivittämään dokumenttisi tyyppi tuettujen tyyppien luetteloon.
+Preparing to restore items…	StatusWindow		Valmistaudutaan palauttamaan kohteita...
+Replace other file	WidgetAttributeText		Korvaa muu tiedosto
+Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Joitakin valittuja kohteita ei voi siirtää roskakoriin. Haluaisitko sen sijaan poistaa ne? (Tätä toimintoa ei voi palauttaa.)
+You cannot create a link to the root directory.	FSUtils		Et voi luoda linkki juurihakemistoon.
+48 x 48	ContainerWindow		48 x 48
+Resize to fit	VolumeWindow		Muunna koko sopimaan
+Could not find application \"%appname\"	OpenWithWindow		Ei voitu löytää sovellusta \"%appname\"
+The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Valittua kohdetta ei voida siirtää roskakoriin. Haluaisitko sen sijaan poistaa sen? (Tätä toimintoa ei voida palauttaa.)
+Invert	SelectionWindow		Käänteinen
+Save Query as template…	FindPanel		Tallenna kysely mallinteena...
+Find	FindPanel		Haku
+Get info	ContainerWindow		Hae tiedot
+Error creating link to \"%name\".	FSUtils		Virhe luotaessa linkkiä kohteeseen \"%name\".
+Select	SelectionWindow		Valitse
+Or	FindPanel		Tai
+The Tracker must be running to see set the default printer.	PoseView		Tracker-ohjelman on oltava käynnissä oletustulostimen näkymiseksi.
+by formula	FindPanel		kaavan mukaan
+40 x 40	DeskWindow		40 x 40
+Name	PoseView		Nimi
+Group	FilePermissionsView		Ryhmä
+Version:	InfoWindow		Versio:
+Created:	InfoWindow		Luotu:
+\nShould this be fixed?	FSUtils		\nPitäisikö tämä korjata?
+Copying: 	StatusWindow		Kopioidaan:
+Capacity:	InfoWindow		Kapasiteetti:
+Delete	FilePanelPriv		Poista
+Save	FindPanel		Tallenna
+copy	FSUtils	filename copy	kopioi
+Temporary	FindPanel		Tilapäinen
+Version	OpenWithWindow		Versio
+Default application	InfoWindow		Oletussovellus
+Preparing to copy items…	StatusWindow		Valmistaudutaan kopioimaan kohteita...
+Show folder location in title tab	SettingsView		Näytä kansion sijainti otsikkovälilehdessä
+Proceed	FSUtils		Jatketaan
+Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Tässä kansiossa on jo joitakin kohteita, joilla on samat nimet kin kohteilla, jolle haluat tehdä %verb.\n \nHaluaisitko korvata ne niillä kohteilla, jolle teet %verb vai haluatko kysymyskehotteen jokaiselle?
+The mount server could not be contacted.	AutoMounterSettings		Liittämispalvelimeen ei saatu yhteyttä.
+Error deleting items	FSUtils		Virhe poistettaessa kohteita
+Create relative link here	ContainerWindow		Luo suhteellinen linkki tähän
+matches regular expression	SelectionWindow		täsmää säännöllisen lausekkeen kanssa
+Mount settings…	SettingsView		Liittämisasetukset...
+Edit name	InfoWindow		Muokkaa nimeä
+Could not open \"%name\" (%error). 	FSUtils		Ei voitu avata kohdetta \"%name\" (%error)
+Paste	ContainerWindow		Liitä
+Modified:	InfoWindow		Muokattu:
+Error moving \"%name\".	FSUtils		Virhe siirrettäessä kohdetta \"%name\".
+TiB	WidgetAttributeText		TiB
+40 x 40	ContainerWindow		40 x 40
+The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Tiedosto \"%name\" on jo olemassa määritellyssä kansiossa. Haluatko korvata sen?
+Cancel	ContainerWindow		Peru
+Only the boot disk	AutoMounterSettings		Vain alkulatauslevy
+Trash	TrackerSettingsWindow		Roskakori
+Unmount	ContainerWindow		Irrota
+If you %action the config folder, Haiku may not behave properly! Are you sure you want to do this? To %action the config folder anyway, click \"Do it\".	FSUtils		Jos suoritat toiminnon %action config-kansiolle, Haiku ei ehkä toimi oikein! Oletko varma, että haluat tehdä tämän? Jos kuitenkin haluat tehdä toiminnon %action config-kansiolle, napsauta painiketta \"Tee se\".
+Copy layout	ContainerWindow		Kopioi sijoittelu
+label too long	PoseView		nimike on liian pitkä
+Cancel	Tracker		Peru
+Sorry, you cannot edit that attribute.	WidgetAttributeText		Et voi valitettavasti muokata tuota attribuuttia.
+Name	ContainerWindow		Nimi
+Disk mount settings	AutoMounterSettings		Levyn liittämisasetukset
+48 x 48	DeskWindow		48 x 48
+OK	OpenWithWindow		Valmis
+Add current folder	FilePanelPriv		Lisää nykyinen kansio
+Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Ei voitu avata asiakirjaa \"%document\" sovelluksella \"%app\" (Puuttuva symboli: %symbol). \n
+The target disk does not support creating links.	FSUtils		Kohdelevy ei tue linkkien luomista.
+starts with	SelectionWindow		alkaa kohteella
+Preparing to delete items…	StatusWindow		Valmistaudutaan poistamaan kohteita...
+Enable type-ahead filtering	SettingsView		Ota pois käytöstä kirjoituspuskurisuodatus
+(Finish: %time - Over %finishtime days left)	StatusWindow		(Loppuminen: %time - Yli %finishtime päivää jäljellä)
+Would you like to find a suitable application to open the file?	FSUtils		Haluaisitko löytää sopivan sovelluksen tiedoston avaamiseen?
+There was an error writing the attribute.	WidgetAttributeText		Attribuutin kirjoittamisessa tapahtui virhe.
+Recalculate folder size	InfoWindow		Laske kansion koko uudelleen
+Unknown	WidgetAttributeText		Tuntematon
+Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Ei voitu avata asiakirjaa \"%document\" (Symboli puuttu: %symbol).\n
+by name	FindPanel		nimen mukaan
+Creating links: 	StatusWindow		Luodaan linkit:
+Paused: click to resume or stop	StatusWindow		Keskeytetty: napsauta painiketta resume tai stop
+Preferred for %type	OpenWithWindow		Ensisijainen tyypille %type
+GiB	WidgetAttributeText		GiB
+There was an error deleting \"%name\":\n\t%error	FSUtils		Kohdetta \"%name\" poistettaessa tapahtui virhe:\n\t%error
+Paste	FilePanelPriv		Liitä
+Copy more	ContainerWindow		Kopioi lisää
+OK	PoseView		Valmis
+Read	FilePermissionsView		Lue
+Clean up all	ContainerWindow		Tyhjennä kaikki
+New folder	TemplatesMenu		Uusi kansio
+Move here	ContainerWindow		Siirrä tänne
+File	FilePanelPriv		Tiedosto
+Error moving \"%name\"	FSUtils		Virhe siirrettäessä kohdetta \"%name\"
+You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Sinun on pudotettava kohteet \"Levyt\"-ikkunan yhdelle levykuvakkeelle.
+Cancel	WidgetAttributeText		Peru
+Could not find an application to open \"%name\" (%error). 	FSUtils		Ei voitu löytää sovellusta avattavaksi \"%name\" (%error).
+Create a Query template	FindPanel		Luo kyselymallinne
+Previously mounted disks	AutoMounterSettings		Aiemmin liitetyt levyt
+%Ld B	WidgetAttributeText		%Ld B
+copying	FSUtils		kopioidaan
+Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Virhe kopioitaessa kansiota \"%name\":\n\t%error\n\nHaluaisitko jatkaa?
+Show Disks icon	SettingsView		Näytä levyjen kuvake
+Mount	VolumeWindow		Liitä
+Cancel	PoseView		Peru
+\n\t(%Ld bytes, 	FSUtils		\n\t(%Ld tavua, 
+You can't move or copy items to read-only volumes.	FSUtils		Et voi siirtää tai kopioida kohteita kirjoitussuojatuille taltioille.
+Unknown	FilePermissionsView		Tuntematon
+All files and folders	FindPanel		Kaikki tiedostot ja kansiot
+Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		Ei voitu avata asiakirjaa \"%document\" (Puuttuvat kirjastot: %library).\n
+The Tracker must be running to see Info windows.	PoseView		Tacker-ohjelman on oltava käynnissä, jotta voit nähdä tietoikkunat.
+Other	FilePermissionsView		Muu
+Query name:	FindPanel		Kyselynimi:
+Permissions	ContainerWindow		Käyttöoikeudet
+moving	FSUtils		siirretään
+Identify	InfoWindow		Tunnista
+Recent folders	ContainerWindow		Nykyiset kansiot
+Close all	ContainerWindow		Sulje kaikki
+Include trash	FindPanel		Sisällytä roskakori
+Query template	FindPanel		Kyselymallinne
+Open %name with:	OpenWithWindow		Avaa kohde %name sovelluksella:
+Empty folder	NavMenu		Tyhjennä kansio
+Copy here	ContainerWindow		Kopioi tänne
+Move to Trash	FilePanelPriv		Siirrä roskakoriin
+Current folder	ContainerWindow		Nykyinen kansio
+(Finish: %time)	StatusWindow		(Loppuminen: %time)
+The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Määritelty nimi on jo käytössä kansionimenä. Valitse toinen nimi.
+Clean up	ContainerWindow		Tyhjennä
+after	FindPanel		jälkeen
+Select…	QueryContainerWindow		Valitse...
+link	FSUtils	filename link	linkki
+At %func \nfind_directory() failed. \nReason: %error	TrackerInitialState		Funktio %func kohteessa\nfind_directory() epäonnistui. \nSyy: %error
+The specified name is illegal. Please choose another name.	FilePanelPriv		Määritelty nimi on virheellinen. Valitse toinen nimi.
+You can't move a folder into itself or any of its own sub-folders.	FSUtils		Et voi siirtää kansiota itseensä tai mihinkään sen omista alikansioista.
+List view	ContainerWindow		Luettelonäkymä
+Handles any file	OpenWithWindow		Käsittelee kaikkia tiedostoja
+Get info	FilePanelPriv		Hae tiedot
+32 x 32	DeskWindow		32 x 32
+Cancel	FilePanelPriv		Peru
+Disks	DirMenu		Levyt
+New folder %ld	FSUtils		Uusi kansio %ld
+All BeOS disks	AutoMounterSettings		Kaikki BeOS-levyt
+Used space color	SettingsView		Käytetyn tilan väri
+Sorry, could not create a new folder.	FSUtils		Ei valitettavasti voitu luoda uutta kansiota.
+multiple disks	FindPanel		useita levyjä
+Done	AutoMounterSettings		Valmis
+You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Sinun on pudottava kohteet yhteen \"Levyt\"-ikkunan levykuvakkeista.
+Untitled clipping	PoseView		Otsikoton leikkaus
+Don't automount	AutoMounterSettings		Älä liitä automaattisesti
+Save	FilePanelPriv		Tallenna
+To: %dir	StatusWindow		Kohteeseen: %dir
+Window	FilePanelPriv		Ikkuna
+Find…	VolumeWindow		Etsi...
+Edit name	FilePanelPriv		Muokkaa nimeä
+Size:	InfoWindow		Koko:
+Empty folder	SlowContextPopup		Tyhjennä kansio
+Open selection with:	OpenWithWindow		Avaa valinta sovelluksella:
+(%bytes bytes)	InfoWindow		(%bytes tavua)
+Preparing to create links…	StatusWindow		Valmistaudutaan luomaan linkkejä...
+Show navigator	SettingsView		Näytä navigaattori
+List folders first	SettingsView		Luettele kansiot ensin
+Get info	VolumeWindow		Hae tiedot
+Name	SelectionWindow		Nimi
+Trash	Model		Roskakori
+Favorites	FilePanelPriv		Suosikit
+Name	QueryPoseView		Nimi
+Delete	FSUtils		Poista
+Modified	FindPanel		Muokattu
+Error moving \"%name\" to Trash. (%error)	FSUtils		Virhe siirrettäessä kohdetta \"%name\" roskakoriin. (%error)
+You can't replace a folder with one of its sub-folders.	FSUtils		Et voi korvata kansiota yhdellä sen alikansioista.
+<No recent items>	FavoritesMenu		<Ei nykyisiä kohteita>
+Preferences…	ContainerWindow		Asetukset...
+Move	PoseView		Siirrä
+Open and make preferred	OpenWithWindow		Avaa ja tee ensisijaiseksi
+Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Oletko varma, että haluat poistaa valitut kohteet? Tätä toimintoa ei voi palauttaa.
+Add-ons	DeskWindow		Lisäosat
+Name	FindPanel		Nimi
+And	FindPanel		Ja
+Select…	DeskWindow		Valitse...
+If you %action the mime settings, Haiku may not behave properly! Are you sure you want to do this? To %action the mime settings anyway, click \"Do it\".	FSUtils		Jos suoritat toiminnon %action mime-asetuksille, Haiku ei ehkä toimi oikein! Oletko varma, että haluat tehdä tämän? Jos kuitenkin haluat suorittaa toiminnon %action mime-asetuksille, napsauta painiketta \"Tee se\".
+Copy	FilePanelPriv		Kopioi
+Icon view	DeskWindow		Kuvakenäkymä
+Select all	QueryContainerWindow		Valitse kaikki
+Files cannot be moved or deleted from a read-only volume.	PoseView		Tiedostoja ei voi siirtää tai poistaa kirjoitussuojatulta taltiolta.
+There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Kohteen \"%name\" korvaaminen epäonnistui. Kohde ei ehkä ole avattu tai se on varattu.
+You cannot put the Trash, home or Desktop directory into the trash.	FSUtils		Et voi laittaa roskakoria, kotihakemistoa tai työpöytähakemistoa roskakoriin.
+Owner	FilePermissionsView		Omistaja
+There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Tallentaminen haluamaasi kansioon epäonnistui. Kokeile jotain toista kansiota.
+Restore	ContainerWindow		Palauta
+Restoring: 	StatusWindow		Palautetaan:
+Skip	FSUtils		Ohita
+Settings…	MountMenu		Asetukset...
+Error emptying Trash!	FSUtils		Virhe tyhjennettäessä roskakoria!
+Recent folders	FavoritesMenu		Äskettäiset kansiot
+Close	ContainerWindow		Sulje
+Preferred for file	OpenWithWindow		Ensisijainen tiedostolle
+Go to parent	FilePanelPriv		Siirry ylätasolle
+Cancel	OpenWithWindow		Peru
+That name is too long. Please type another one.	InfoWindow		Tuo nimi on liian pitkä. Kirjoita joku toinen nimi.
+OK	FSUtils		Valmis
+Paste layout	ContainerWindow		Liitä sijoittelu
+Select	InfoWindow		Valitse
+Could not update permissions of file \"%name\". %error	FSUtils		Ei voitu päivittää tiedoston \"%name\" käyttöoikeuksia. %error
+Select…	FilePanelPriv		Valitse...
+Don't move files to Trash	SettingsView		Älä siirrä tiedostoja roskakoriin
+There was an error resolving the link.	Tracker		Virhe linkin ratkaisemisessa.
+%BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
+You can't move or copy the trash.	FSUtils		Et voi siirtää tai kopioida roskakoriin.
+ends with	SelectionWindow		loppuu kohteella
+Volume icons	TrackerSettingsWindow		Taltiokuvakkeet
+That name is already taken. Please type another one.	WidgetAttributeText		Tuo nimi on jo varattu. Kirjoita joku toinen.
+Close	QueryContainerWindow		Sulje
+Formula %formula	FindPanel	FindResultTitle	Kaava %formula
+Kind:	InfoWindow		Tyyppi:
+starts with	FindPanel		alkaa kohteella
+Increase size	ContainerWindow		Kasvata kokoa
+is	FindPanel		on
+Attributes	ContainerWindow		Attribuutit
+Handles %type	OpenWithWindow		Käsittelee tyyppiä %type
+ends with	FindPanel		loppuu kohteella
+New	ContainerWindow		Uusi
+Name matches wildcard expression:###	SelectionWindow		Nimi täsmää jokerilausekkeeseen:###
+less than	FindPanel		vähemmän kuin
+64 x 64	DeskWindow		64 x 64
+Modified	ContainerWindow		Muokattu
+Edit Query template	FindPanel		Muokkaa kyselymallinnetta
+Prompt	FSUtils		Kehoite
+Edit query	ContainerWindow		Muokkaa kyselyä
+Find…	ContainerWindow		Etsi...
+Create a Query	FindPanel		Lue kysely
+Move to Trash	FSUtils		Siirrä roskakoriin
+Automatic disk mounting	AutoMounterSettings		Automaattinen levyliittäminen
+Original name	ContainerWindow		Alkuperäinen nimi
+Find	FSUtils		Etsi
+Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Virhe kopioitaessa tiedostoa \"%name\":\n\t%error\n\nHaluaisitko jatkaa?
+Ask before delete	SettingsView		Kysy ennen poistoa
+Single window navigation	SettingsView		Yksittäisikkunanavigointi
+If you %action the settings folder, Haiku may not behave properly! Are you sure you want to do this? To %action the settings folder anyway, click \"Do it\".	FSUtils		Jos suoritat toiminnon %action asetuskansiolle, Haiku ei ehkä toimi oikein! Oletko varma, että haluat tehdä tämän? Jos kaikesta huolimatta haluat suorittaa toiminnon %action asetuskansiolle, napsauta painiketta \"Tee se\".
+move	FSUtils		siirrä
+parent folder	NavMenu		Ylemmän tason kansio
+contains	FindPanel		sisältää
+Relation	OpenWithWindow		Suhde
+Open	FilePanelPriv		Avaa
+rename	InfoWindow		nimeä uudelleen
+Mount	DeskWindow		Liitä
+Mount	ContainerWindow		Liitä
+%capacity (%used used -- %free free)	InfoWindow		%capacity (%used käytetty -- %free vapaa)
+Cancel	FSClipBoard		Peru
+Cut more	ContainerWindow		Leikkaa lisää
+Deleting: 	StatusWindow		Poistetaan:
+Empty Trash	InfoWindow		Poista roskakori
+Add	FindPanel		Lisää

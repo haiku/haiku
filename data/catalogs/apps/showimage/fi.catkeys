@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-ShowImage	2071534767
+1	finnish	x-vnd.Haiku-ShowImage	2679963118
 Use as background…	Menus		Käytä taustana…
 5 seconds	Menus		5 sekuntia
 Slide delay	Menus		Diaviive
@@ -11,7 +11,6 @@ Full screen	Menus		Kokoruutu
 Go to page	Menus		Siirry sivulle
 Zoom out	Menus		Loitonna
 20 seconds	Menus		20 sekuntia
-Invert colors	Menus		Käännä värit
 3 seconds	Menus		3 sekuntia
 Rotate counterclockwise	Menus		Pyöritä vastapäivään
 10 seconds	Menus		10 sekuntia
@@ -22,33 +21,23 @@ Could not load image! Either the file or an image translator for it does not exi
 First page	Menus		Ensimmäinen sivu
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Asiakirja '%s' (sivu %d) on muuttunut. Haluatko sulkea asiakirjan?
 About ShowImage…	Menus		ShowImage-ohjelmasta…
-Open	Menus		Avaa
-OK	LoadAlerts		Valmis
 Close	ClosePrompt		Sulje
-Height:	ResizerWindow		Korkeus:
 Undo	Menus		Peru
 Resize to (in 1/72 inches):	PrintOptionsWindow		Skaalaa kokoon (1/72 tuumissa):
-Apply	ResizerWindow		Sovella
-Keep original proportions	ResizerWindow		Säilytä alkuperäinen kuvasuhde
 9 seconds	Menus		9 sekuntia
 Flip left to right	Menus		Käännä ympäri vasemmalta oikealle
 Show caption in full screen mode	Menus		Näytä kuvateksti kokoruututilassa
 DPI:	PrintOptionsWindow		DPI:
 Next file	Menus		Seuraava tiedosto
 4 seconds	Menus		4 sekuntia
-Zoom to window	Menus		Rajaa ikkunaan
 Close document	ClosePrompt		Sulje asiakirja
-ShowImage	LoadAlerts		ShowImage
 Height: 	PrintOptionsWindow		Korkeus: 
 Cancel	ClosePrompt		Peru
-Resize…	Menus		Skaalaa…
 Print options	PrintOptionsWindow		Tulostusvalitsimet
-Width:	ResizerWindow		Leveys:
 ShowImage	AboutWindow		ShowImage
 7 seconds	Menus		7 sekuntia
 Last page	Menus		Viimeinen sivu
 Previous file	Menus		Edellinen tiedosto
-Resize	ResizerWindow		Skaalaa
 Slide show	Menus		Diaesitys
 Fit image to page	PrintOptionsWindow		Sovita kuva sivulle
 Flip top to bottom	Menus		Käännä ympäri ylhäältä alas
@@ -59,19 +48,22 @@ Rotate clockwise	Menus		Pyöritä myötäpäivään
 Job setup	PrintOptionsWindow		Työasetukset
 Original size	Menus		Alkuperäiskoko
 Next page	Menus		Seuraava sivu
-Shrink to window	Menus		Kutista ikkunaan
 OK	SaveToFile		Valmis
 The file '%s' could not be written.	SaveToFile		Tiedostoa '%s' ei voitu kirjoittaa.
 Progress monitor	ProgressWindow		Edistymisvalvonta
-Paste	Menus		Liitä
 File	Menus		Tiedosto
 Page setup…	Menus		Sivuasetus...
 Print…	Menus		Tulosta...
 Quit	Menus		Poistu
-Clear	Menus		Tyhjennä
 Edit	Menus		Muokkaa
 Close	Menus		Sulje
 Copy	Menus		Kopioi
-Cut	Menus		Leikkaa
 Select all	Menus		Valitse kaikki
 Save as…	Menus		Tallenna nimellä...
+Open…	Menus		Avaa...
+ShowImage	Menus		Kuvannäytin
+Clear selection	Menus		Tyhjennä valinta
+Selection Mode	Menus		Valintatila
+Stretch to window	Menus		Venytä ikkunaan
+OK	Alerts		Valmis
+Fit to window	Menus		Sovita ikkunaan

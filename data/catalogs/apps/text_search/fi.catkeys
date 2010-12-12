@@ -1,8 +1,7 @@
-1	finnish	x-vnd.Haiku.TextSearch	2912179465
+1	finnish	x-vnd.Haiku.TextSearch	3449010850
 %s: Not enough room to escape the filename.	Grepper		%s: Ei kylliksi tilaa tiedostonimen ohittamiseen.
 Trim to selection	GrepWindow		Leikkaa valintaan
 Follow symbolic links	GrepWindow		Seuraa symbolisia linkkejä
-Set which files to search	GrepWindow		Aseta mitkä tiedostot etsitään
 Close	GrepWindow		Sulje
 Cancel	GrepWindow		Peru
 The unselected files will be removed from the list.	GrepWindow		Valitsemattomat tiedostot poistetaan luettelosta.
@@ -31,5 +30,6 @@ Show files in Tracker	GrepWindow		Näytä tiedostot Jäljittäjässä
 About TextSearch…	GrepWindow		Ohjelmasta Tekstihaku...
 Case-sensitive	GrepWindow		Kirjainkoosta riippuva
 Text files only	GrepWindow		Vain tekstitiedostot
-Skip sub-folders starting with a dot	GrepWindow		Ohita alikansiot, jotka alkavat pisteellä
 Show lines	GrepWindow		Näytä rivit
+Set target…	GrepWindow		Aseta kohde...
+Skip folders starting with a dot	GrepWindow		Ohita kansiot, joiden nimet alkavat pisteellä

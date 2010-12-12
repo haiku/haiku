@@ -1,6 +1,5 @@
-1	french	x-vnd.Haiku-DriveSetup	4234569363
+1	french	x-vnd.Haiku-DriveSetup	1943527736
 Delete	MainWindow		Supprimer
-Are you sure you want to initialize the selected partition? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		Êtes-vous sûr de vouloir initialiser la partition sélectionnée ? Après avoir entré les paramètres d'initialisation, vous pouvez annuler cette opération juste avant l'écriture définitive sur disque.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Êtes-vous sûr de vouloir écrire les changements sur le disque ?\n\nToutes les données de la partition sélectionnée seront effacées si vous le faites !
 Rescan	MainWindow		Rechercher
 OK	MainWindow		OK
@@ -18,7 +17,6 @@ The partition %s is already unmounted.	MainWindow		La partition %s est déjà d�
 Failed to initialize the partition. No changes have been written to disk.	MainWindow		Impossible d'initialiser la partition. Aucun changement n'a été enregistré sur le disque.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Impossible de supprimer la partition. Aucun changement n'a été enregistré sur le disque.
 Partition type:	CreateParamsPanel		Type de partition :
-Are you sure you want to initialize the partition \"%s\"? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		Êtes-vous sur de vouloir initialiser la partition \"%s\" ? Après avoir entré les paramètres, vous pourrez annuler l'opération juste avant l'écriture définitive sur le disque.
 Could not delete the selected partition.	MainWindow		Impossible de supprimer la partition sélectionnée.
 Error: 	MainWindow	in any error alert	Erreur : 
 Partition %ld	DiskView		Partition %ld
@@ -72,3 +70,7 @@ Device	PartitionList		Périphérique
 Cancel	MainWindow		Annuler
 Cancel	InitParamsPanel		Annuler
 %ld MiB	Support		%ld Mio
+DriveSetup	MainWindow		Gestionnaire de Disques
+Are you sure you want to initialize the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Êtes-vous sûr de vouloir initialiser la partition « %s » ? La question vous sera à nouveau posée avant que les modifications ne soient écrites sur le disque.
+Are you sure you want to initialize the partition? You will be asked again before changes are written to the disk.	MainWindow		Êtes-vous sûr de vouloir initialiser la partition ? La question vous sera à nouveau posée avant que les modifications ne soient écrites sur le disque.
+Parameters	PartitionList		Paramètres

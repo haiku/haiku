@@ -1,0 +1,56 @@
+1	japanese	x-vnd.Haiku-BluetoothPrefs	912779521
+About Bluetooth…	Window		Bluetooth について…
+Handheld	Settings view		ハンドヘルド機器
+Default inquiry time:	Settings view		デフォルトの問い合わせ時間：
+Add device to list	Inquiry panel		デバイスを一覧に追加
+Starting scan...	Inquiry panel		スキャン開始...
+Show bluetooth console…	Window		Bluetooth コンソールを表示…
+Smart phone	Settings view		スマートフォン
+seconds	Inquiry panel		秒
+Server	Window		サーバー
+Stop bluetooth services…	Window		Bluetoothサービスを停止…
+Identify host as:	Settings view		ホスト名:
+View	Window		ビュー
+Refresh…	Remote devices		更新…
+Pair…	Remote devices		ペアリング…
+Incoming connections policy:	Settings view		着信接続ポリシ：
+From all devices	Settings view		全てのデバイスから
+Show name	Extended local device view		名前を表示
+Local devices found on system:	Settings view		認識されたローカルデバイス :
+Scanning completed.	Inquiry panel		スキャンが完了しました。
+Remote devices	Window		リモートデバイス
+Remove	Remote devices		削除
+15 secs	Settings view		15 秒
+Start bluetooth services…	Window		Bluetoothサービスを開始…
+Policy...	Settings view		ポリシ...
+61 secs	Settings view		61 秒
+There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		このシステムには Bluetooth ローカルデバイスが登録されていません。
+Identify us as...	Settings view		自機名...
+Remaining 	Inquiry panel		残り 
+As blocked	Remote devices		ブロック状態
+Pick LocalDevice...	Settings view		ローカルデバイスの選択...
+Defaults	Window		デフォルト
+Inquiry	Inquiry panel		問い合わせ
+Desktop	Settings view		デスクトップ
+Revert	Window		元に戻す
+Remote devices list…	Window		リモートデバイス一覧…
+Laptop	Settings view		ラップトップ
+Retrieving name of 	Inquiry panel		このデバイスの名前を取得中：
+Bluetooth	Window		Bluetooth
+Discoverable	Extended local device view		発見可能
+Service classes: 	Device View		サービスクラス：
+Connections & channels…	Window		接続＆チャンネル…
+Refresh LocalDevices…	Window		ローカルデバイスを更新…
+Settings	Window		設定
+Only from trusted devices	Settings view		信用されているデバイスのみ
+Scanning progress	Inquiry panel		スキャンの進行状況
+Always ask	Settings view		常に確認する
+Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		リモートデバイスのBluetooth機能がアクティブになっていることを確認してください。スキャンを開始するには「問い合わせ」ボタンを押してください。デバイスの名前を取得するに必要な時間は不明ですが、デバイス毎に3秒以内に完了すると思われます。その後一覧に追加ができて、ペアリングが可能になります。
+Retrieving names...	Inquiry panel		名前を取得しています...
+Help	Window		ヘルプ
+Add…	Remote devices		追加…
+Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Haiku Bluetooth システム, (ARCE)\n\nOliver Ruiz Dorantes作\n\nその他の貢献者：\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\n次の方々にも感謝…\n\nハードウェアを提供していただいた方々:\n\t- Henry Jair Abril Florez (el Colombiano)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\n金銭的な支援をしていただいた方々:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nパッチ提供者：\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\n全ての知識を提供してくれた：\n\t- yellowTABチーム
+Server	Settings view		サーバー
+OK	main		OK
+Disconnect	Remote devices		切断
+Authenticate	Extended local device view		認証

@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-About	3104596334
+1	danish	x-vnd.Haiku-About	326778460
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (og hans NewOS kerne)\n
 %ld Processors:	AboutView		%ld Processorer:
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (projekt grundlægger)\n\n
@@ -27,7 +27,6 @@ Version:	AboutView		Version:
 License: 	AboutView		Licens: 
 Translations:\n	AboutView		Oversættelser:\n
 ... and the many people making donations!\n\n	AboutView		... og de mange folk der har doneret!\n\n
-Google & their Google Summer of Code program\n\n	AboutView		Google og deres Google Summer of Code program\n\n
 The BeGeistert team\n	AboutView		BeGeistert holdet\n
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku and the Haiku logo are trademarks of Haiku, Inc.\n\n	AboutView		Ophavsretten til Haiku koden er ejet af Haiku, Inc. eller af den respektive forfatter, hvis udtrykkeligt skrevet i koden. Haiku og Haiku logoet er trademarks ejet af Haiku, Inc.\n\n
 GCC %d Hybrid	AboutView		GCC %d Hybrid

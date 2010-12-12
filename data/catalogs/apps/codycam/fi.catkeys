@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku.CodyCam	2594096346
+1	finnish	x-vnd.Haiku.CodyCam	1322454590
 Capturing Image…	VideoConsumer.cpp		Kaapataan kuva…
 Every 30 seconds	CodyCam		Joka 30. sekunti
 File name:	CodyCam		Tiedostonimi:
@@ -50,7 +50,6 @@ invalid upload client %ld\n	VideoConsumer.cpp		virheellinen lähetysasiakas %ld\
 Every 15 seconds	CodyCam		Joka 15. sekunti
 Error writing output file	VideoConsumer.cpp		Virhe kirjoitettaessa tulostetiedostoa
 About Codycam…	CodyCam		Codycam-ohjelmasta…
-Background View	CodyCam		Taustanäkymä
 image file format expected	CodyCam		odotettiin kuvatiedostomuotoa
 Cannot set the time source for the video source	CodyCam		Ei voida asettaa aikalähdettä videolähteeseen
 Type:	CodyCam		Tyyppi:
@@ -94,6 +93,5 @@ Cannot seek time source!	CodyCam		Ei voida etsiä aikalähdettä!
 File	CodyCam		Tiedosto
 Image Format Menu	CodyCam		Kuvamuotovalikko
 Every 30 minutes	CodyCam		Joka 30. minuutti
-FTP Setup	CodyCam		FTP-asetukset
 reply: '%s'\n	SftpClient		vastaus: '%s'\n
 Start video	CodyCam		Käynnistä video

@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-BluetoothPrefs	3802999910
+1	korean	x-vnd.Haiku-BluetoothPrefs	3689983287
 About Bluetooth…	Window		블루투스 정보...
 Handheld	Settings view		핸드헬드
 Default inquiry time:	Settings view		기본 조회 시간:
@@ -49,5 +49,4 @@ Retrieving names...	Inquiry panel		이름 검색중..
 Help	Window		도움말
 Add…	Remote devices		추가…
 Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Haiku 블루투스 시스템, (ARCE)\n\nOliver Ruiz Dorantes 만듬\n\n도움을 준 분들:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\n도움을 준 분들께 감사합니다...\n\n배송/하드웨어 기부:\n\t- Henry Jair Abril Florez (콜롬비아인)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\n경제적으로 지원해준 분:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\n패치 제공한 분:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\n테스트 해준 분:\n\t- Petter H. Juliussen\n이 모즌 지식을 내게 준 분:\n\t- the yellowTAB 팀
- seconds	Inquiry panel		초
 Server	Settings view		서버

@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku-Media	2505372198
+1	simplified_chinese	x-vnd.Haiku-Media	243366818
 Show volume control on Deskbar	Media views		在 Deskbar 中显示声音控制
 Audio input:	Media views		音频输出:
 Restarting media services\nStarting media server…\n	Media Window		重启多媒体服务\n正在启动 media server…\n
@@ -32,3 +32,6 @@ Couldn't remove volume control in Deskbar: %s\n	Media Window		不能够将声音
 Couldn't add volume control in Deskbar: %s\n	Media Window		不能够将声音控制添加到 Deskbar: %s\n
 Media	Media Window		多媒体
 Channel:	Media views		频道:
+Video settings	Media Window		视频设置
+Audio mixer	Media Window		音频混合器
+<none>	Media views		<无>

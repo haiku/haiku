@@ -1,6 +1,5 @@
-1	ukrainian	x-vnd.Haiku-DriveSetup	4234569363
+1	ukrainian	x-vnd.Haiku-DriveSetup	1943527736
 Delete	MainWindow		Видалити
-Are you sure you want to initialize the selected partition? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		Ви дійсно бажаєте зініціалізувати цей розділ. Після вибору параметрів ініціалізації у вас залишається можливість перервати операцію безпосередньо перед самим записом на диск.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Ви впевнені, що бажаєте записати зміни на диск зараз?\n\nВсі дані на вибраному розділі будуть безповоротно втрачені!
 Rescan	MainWindow		Пересканувати
 OK	MainWindow		OK
@@ -18,7 +17,6 @@ The partition %s is already unmounted.	MainWindow		Розділ %s повніс�
 Failed to initialize the partition. No changes have been written to disk.	MainWindow		Ініціалізація розділу призупинена. Жодні зміни не були записані на диск.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Видалення розділу призупинене. Жодні зміни не були записані на диск.
 Partition type:	CreateParamsPanel		Тип розділу:
-Are you sure you want to initialize the partition \"%s\"? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		Ви впевнені, що бажаєте ініціалізувати розділ \"%s\"? Після введення параметрів, ви можете відмінити цю операцію до запису змін назад на диск.
 Could not delete the selected partition.	MainWindow		Неможливо видалити вибраний розділ.
 Error: 	MainWindow	in any error alert	Помилка: 
 Partition %ld	DiskView		Розділ %ld
@@ -72,3 +70,7 @@ Device	PartitionList		Прилад
 Cancel	MainWindow		Відмінити
 Cancel	InitParamsPanel		Відмінити
 %ld MiB	Support		%ld MiB
+DriveSetup	MainWindow		DriveSetup
+Are you sure you want to initialize the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		 	Ви впевнені , що бажаєте ініціалізувати розділ \"%s\"? Ви повинні будете відповісти повторно при запису на диск.
+Are you sure you want to initialize the partition? You will be asked again before changes are written to the disk.	MainWindow		A? You will be asked again before changes are written to the disk.
+Parameters	PartitionList		Параметри

@@ -1,4 +1,3 @@
-1	german	x-vnd.Haiku-Terminal	3099618322
+1	german	x-vnd.Haiku-Terminal	2291023521
 -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h, --help diesen Hilfetext anzeigen\n -t, --title Fenstertitel setzen\n -f, --fullscreen Vollbildmodus starten\n
 Color schema:	Terminal AppearancePrefView		Farbschema:
-A process is still running.\nIf you close the Terminal the process will be killed.	Terminal TermWindow		Ein Prozess ist noch Aktiv\nSchliessen des Terminals beendet (kill) diesen Prozess.

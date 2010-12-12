@@ -88,7 +88,7 @@ This is alpha-quality software! It means there is a high risk of losing importan
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		ВАЖНАЯ ІНФАРМАЦЫЯ НАКОНТ УСТАЛЁЎКІ\n\n
 2.1) GRUB 1\n	InstallerApp		2.1) GRUB 1\n
 Welcome to the Haiku Installer!\n\n	InstallerApp		Прывітанне! Гэта ўсталёўшчык Haiku.\n\n
-The first logical partition always has the number \"4\", regardless of the number of primary partitions.\n\n	InstallerApp		Першы лагічны падзел заўсёды пад нумарам \"4\", нягледзячы на нумары асноўных падзелаў.\n\n
+The first logical partition always has the number \"4\", regardless of the number of primary partitions.\n\n	InstallerApp		Gершы лагічны падзел заўсёды пад нумарам \"4\", нягледзячы на нумары асноўных падзелаў.\n\n
 GRUB's naming scheme is still: (hdN,n)\n\n	InstallerApp		Для GRUB схема імёнаў тая ж: (hdN,n)\n\n
 \tsudo <your favorite text editor> /boot/grub/menu.lst\n\n	InstallerApp		\tsudo <пажаданы рэдактар> /boot/grub/menu.lst\n\n
 \tsudo <your favorite text editor> /etc/default/grub\n\n	InstallerApp		\tsudo <пажаданы рэдактар> /etc/default/grub\n\n

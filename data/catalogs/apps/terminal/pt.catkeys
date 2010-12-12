@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-Terminal	1150769874
+1	portuguese	x-vnd.Haiku-Terminal	3600669258
 Not found.	Terminal TermWindow		Não encontrado.
 Didn't find any available pseudo ttys.	Terminal Shell		Nenhum pseudo tty disponível encontrado.
 Switch Terminals	Terminal TermWindow		Alternar Terminais
@@ -39,7 +39,6 @@ Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui a
 No search string was entered.	Terminal TermWindow		Não foi introduzida nenhuma cadeia de procura.
 Don't save	Terminal PrefWindow		Não guardar
 Match word	Terminal FindWindow		Palavras exactas
-Close tab	Terminal SmartTabView		Fechar separador
 Nothing is selected.	Terminal TermWindow		Não há nada seleccionado.
 Text not found.	Terminal TermWindow		Texto não encontrado.
 Find…	Terminal TermWindow		Localizar...
@@ -69,7 +68,6 @@ Find previous	Terminal TermWindow		Anterior
 About Terminal…	Terminal TermWindow		Sobre o Terminal
 Find next	Terminal TermWindow		Encontrar o seguinte
 Close active tab	Terminal TermWindow		Fechar separador activo
-Terminal	Terminal TermApp		Terminal
 PrefHandler::getRGB(%s) - key not found\n	Terminal getRGB		PrefHandler::getRGB(%s) - chave não encontrada\n
 Paste	Terminal TermWindow		Colar
 Save changes to this settings panel?	Terminal PrefWindow		Guardar alterações a este painel de opções?
@@ -80,5 +78,3 @@ Cancel	Terminal TermView		Cancelar
 Color schema:	Terminal AppearancePrefView		Esquema de cores:
 Terminal\n\nwritten by Kazuho Okui and Takashi Murai\nupdated by Kian Duffy and others\n\nCopyright ©2003-2009, Haiku.\n	Terminal TermView		Terminal\n\nescrito por Kazuho Okui e Takashi Murai\nactualizado por Kian Duffy 
 Confirm exit if active programs exist	Terminal AppearancePrefView		Confirmar saída se existirem programas activos
-A process is still running.\nIf you close the Terminal the process will be killed.	Terminal TermWindow		A process is still running.\nSe fechar o Terminal o processo será terminado.
-Really quit?	Terminal TermWindow		Deseja mesmo sair?

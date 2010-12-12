@@ -1,4 +1,4 @@
-1	brazilian_portuguese	x-vnd.Haiku-ShowImage	2886902971
+1	brazilian_portuguese	x-vnd.Haiku-ShowImage	3986770096
 Use as background…	Menus		Usar como papel de parede...
 5 seconds	Menus		5 segundos
 Slide delay	Menus		Tempo de transição
@@ -11,7 +11,6 @@ Full screen	Menus		Tela inteira
 Go to page	Menus		Ir para a página
 Zoom out	Menus		Diminuir zoom
 20 seconds	Menus		20 segundos
-Invert colors	Menus		Inverter cores
 3 seconds	Menus		3 segundos
 Rotate counterclockwise	Menus		Girar em sentido antiorário
 10 seconds	Menus		10 segundos
@@ -22,32 +21,23 @@ Could not load image! Either the file or an image translator for it does not exi
 First page	Menus		Primeira página
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		O documento '%s' (página %d) foi modificado. Você deseja fechar o documento?
 About ShowImage…	Menus		Sobre o Visualizador de Imagens…
-Open	Menus		Abrir
 Close	ClosePrompt		Fechar
-Height:	ResizerWindow		Altura:
 Undo	Menus		Desfazer
 Resize to (in 1/72 inches):	PrintOptionsWindow		Redimensionar para (em 1/72 polegadas):
-Apply	ResizerWindow		Aplicar
-Keep original proportions	ResizerWindow		Manter as proporções originais
 9 seconds	Menus		9 segundos
 Flip left to right	Menus		Inverter da esquerda para direita
 Show caption in full screen mode	Menus		Mostrar legenda no modo de tela inteira
 DPI:	PrintOptionsWindow		DPI:
 Next file	Menus		Próximo arquivo
 4 seconds	Menus		4 segundos
-Zoom to window	Menus		Zoom para janela
 Close document	ClosePrompt		Fechar documento
-ShowImage	LoadAlerts		Visualizador de Imagens
 Height: 	PrintOptionsWindow		Altura: 
 Cancel	ClosePrompt		Cancelar
-Resize…	Menus		Redimensionar…
 Print options	PrintOptionsWindow		Opções de impressão
-Width:	ResizerWindow		Largura:
 ShowImage	AboutWindow		Visualizador de Imagens
 7 seconds	Menus		7 segundos
 Last page	Menus		Última página
 Previous file	Menus		Arquivo anterior
-Resize	ResizerWindow		Redimensionar
 Slide show	Menus		Show de slides
 Fit image to page	PrintOptionsWindow		Ajudar a imagem a página
 Flip top to bottom	Menus		Inverter de cima para baixo
@@ -58,19 +48,15 @@ Rotate clockwise	Menus		Girar em sentido horário
 Job setup	PrintOptionsWindow		Configurar trabalho
 Original size	Menus		Tamanho original
 Next page	Menus		Próxima página
-Shrink to window	Menus		Reduzir para janela
 OK	SaveToFile		OK
 The file '%s' could not be written.	SaveToFile		Este arquivo '%s' não pode ser escrito.
 Progress monitor	ProgressWindow		Monitor de progresso
-Paste	Menus		Colar
 File	Menus		Arquivo
 Page setup…	Menus		Configurar página...
 Print…	Menus		Imprimir..
 Quit	Menus		Sair
-Clear	Menus		Limpar
 Edit	Menus		Editar
 Close	Menus		Fechar
 Copy	Menus		Copiar
-Cut	Menus		Recortar
 Select all	Menus		Selecionar tudo
 Save as…	Menus		Salvar como...

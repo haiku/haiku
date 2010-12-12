@@ -1,49 +1,18 @@
-1	lithuanian	x-vnd.Haiku-Locale	634081185
-Day in month (2 digits)	TimeFormatSettings		diena mėnesyje (2 skaitmenys)
+1	lithuanian	x-vnd.Haiku-Locale	1431723094
 Available languages	Locale Preflet Window		Galimos kalbos
-Day of week (name)	TimeFormatSettings		savaitės diena (pavadinimas)
-Separator:	TimeFormatSettings		Skirtukas:
-Year (4 digits)	TimeFormatSettings		Metai (4 skaitmenys)
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Neprieinamos kalbos! Nepavyks šituo pasinaudoti!
-Thousand separator: 	TimeFormatSettings		Tūkstančių skirtukas:
-After	TimeFormatSettings		Po
-Month name	TimeFormatSettings		mėnesio pavadinimas
 Long format:	TimeFormatSettings		Pilnai:
 Currency	TimeFormatSettings		Valiuta
-Before	TimeFormatSettings		Prieš
-Year	TimeFormatSettings		Metai
-Day of week in month	TimeFormatSettings		savaitės diena mėnesyje
 Short format:	TimeFormatSettings		Trumpai:
-Currency symbol:	TimeFormatSettings		Valiutos ženklas:
-Space	TimeFormatSettings		Tarpas
 Language	Locale Preflet Window		Kalba
-Month number	TimeFormatSettings		mėnesio skaičius
-Year (2 digits)	TimeFormatSettings		Metai (2 skaitmenys)
 Preferred languages	Locale Preflet Window		Pageidautinos kalbos
-Decimal separator: 	TimeFormatSettings		Dešimtainis skirtukas:
-Symbol position	TimeFormatSettings		Ženklo vieta
-Day of week (short name)	TimeFormatSettings		savaitės diena (trumpai)
 Numbers	TimeFormatSettings		Skaičiai
 24 hour	TimeFormatSettings		24 valnadų
-(unknown format)	TimeFormatSettings		 (nežinomas)
-Negative marker:	TimeFormatSettings		Neigiamumo žymuo:
-Day in month	TimeFormatSettings		diena mėnesyje
 Defaults	Locale Preflet Window		Numatytai
-Separator	TimeFormatSettings		Skirtukas
-Country	Locale Preflet Window		Šalis
-Month number (2 digits)	TimeFormatSettings		mėnesio skaičius (2 skaitmenys)
 Revert	Locale Preflet Window		Grįžti
-Negative marker	TimeFormatSettings		Neigiamumo žymuo
 OK	Locale Preflet Window		Gerai
-Day of week	TimeFormatSettings		savaitės diena
-List separator: 	TimeFormatSettings		Sąrašo skirtukas
 Time	TimeFormatSettings		Laikas
 Date	TimeFormatSettings		Data
 12 hour	TimeFormatSettings		12 valandų
 Locale	Locale Preflet		Kalba
-None	TimeFormatSettings		Jokio
-Example:	TimeFormatSettings		Pavyzdys:
-Day	TimeFormatSettings		Diena
-Leading 0	TimeFormatSettings		Priekiniai 0
-Month	TimeFormatSettings		Mėnuo
 already chosen	LanguageListView		jau pasirinkta

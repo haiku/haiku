@@ -1,48 +1,25 @@
-1	ukrainian	x-vnd.Haiku-Locale	1225819117
-Day in month (2 digits)	TimeFormatSettings		День в місяці (2 цифри)
+1	ukrainian	x-vnd.Haiku-Locale	2295953467
 Available languages	Locale Preflet Window		Доступні мови
-Day of week (name)	TimeFormatSettings		День тижня (назва)
-Separator:	TimeFormatSettings		Розділювач:
-Year (4 digits)	TimeFormatSettings		Рік (4 цифри)
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Неможливо знайти доступні мови! Ви не можете  використовувати цю функцію!
-Thousand separator: 	TimeFormatSettings		Розділювач тисяч
-After	TimeFormatSettings		Після
-Month name	TimeFormatSettings		Назва місяця
 Long format:	TimeFormatSettings		Звичний  формат:
 Currency	TimeFormatSettings		Валюта
-Before	TimeFormatSettings		До
-Year	TimeFormatSettings		Рік
-Day of week in month	TimeFormatSettings		День тижня в місяці
 Short format:	TimeFormatSettings		Скорочений формат:
-Currency symbol:	TimeFormatSettings		Символ валюти:
-Space	TimeFormatSettings		Простір
 Language	Locale Preflet Window		Мова
-Month number	TimeFormatSettings		Номер місяця
-Year (2 digits)	TimeFormatSettings		Рік (2 цифри)
 Preferred languages	Locale Preflet Window		Мови ,що переважають
-Decimal separator: 	TimeFormatSettings		Десятковий розділювач
-Symbol position	TimeFormatSettings		Позиція символа
-Day of week (short name)	TimeFormatSettings		День тижня (скорочено)
 Numbers	TimeFormatSettings		Номери
 24 hour	TimeFormatSettings		24 години
-(unknown format)	TimeFormatSettings		 (невідомий формат)
-Negative marker:	TimeFormatSettings		Негативний маркер:
-Day in month	TimeFormatSettings		День місяця
 Defaults	Locale Preflet Window		По замовчуванню
-Separator	TimeFormatSettings		Розділювач
-Country	Locale Preflet Window		Країна
-Month number (2 digits)	TimeFormatSettings		Номер місяця  (2 цифри)
 Revert	Locale Preflet Window		Повернути
-Negative marker	TimeFormatSettings		Негативний маркер
 OK	Locale Preflet Window		Ok
-Day of week	TimeFormatSettings		День тижня
-List separator: 	TimeFormatSettings		Розділювач листів
 Time	TimeFormatSettings		Час
 Date	TimeFormatSettings		Дата
 12 hour	TimeFormatSettings		12 годин
 Locale	Locale Preflet		Locale
-None	TimeFormatSettings		жоден
-Example:	TimeFormatSettings		Приклад:
-Day	TimeFormatSettings		День
-Leading 0	TimeFormatSettings		інтервал між стрічками 0
-Month	TimeFormatSettings		Місяць
+already chosen	LanguageListView		повністю закритий
+Negative:	TimeFormatSettings		Негатив:
+Use month/day-names from preferred language	TimeFormatSettings		Використовувати місяць/день для вибраної мови
+Formatting	Locale Preflet Window		Форматування
+Locale	Locale Preflet Window		Локаль
+Full format:	TimeFormatSettings		Повний формат:
+Medium format:	TimeFormatSettings		Середній формат:
+Positive:	TimeFormatSettings		Позитив:

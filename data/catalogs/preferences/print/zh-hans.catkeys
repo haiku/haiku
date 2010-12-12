@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Be-PRNT	4088995571
+1	simplified_chinese	x-vnd.Be-PRNT	980664982
 Waiting	JobListView		等待
 page	JobListView		页面
 Cancel	AddPrinterDialog		取消
@@ -26,3 +26,4 @@ Unknown status	JobListView		未知状态
 Connected to:	AddPrinterDialog		连接到:
 Printer type:	AddPrinterDialog		打印机类型：
 pending jobs.	PrinterListView		挂起任务
+No printer found!	TransportMenu		未发现打印机！

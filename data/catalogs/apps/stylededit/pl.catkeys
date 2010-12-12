@@ -1,0 +1,80 @@
+1	polish	x-vnd.Haiku-StyledEdit	3614078026
+OK	LoadAlert		OK
+???	LoadAlert		???
+Left	Menus		Lewo
+Revert to the last version of \"%s\"? 	RevertToSavedAlert		Przywrócić ostatnią wersję \"%s\"? 
+Search backwards	FindandReplaceWindow		Szukaj wstecz
+Size	Menus		Rozmiar
+Save	QuitAlert		Zapisz
+Replace same	Menus		Zamień odpowiednik
+Can't Undo	Menus		Nie można cofnąć
+Save	Menus		Zapisz
+Replace with:	FindandReplaceWindow		Zamień na:
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nie można przywrócić, nie znaleziono pliku: \"%s\".
+Case-sensitive	FindandReplaceWindow		Wielkość liter brana pod uwagę
+Green	Menus		Zielony
+Revert to saved…	Menus		Przywróć zapisane…
+Yellow	Menus		Żółty
+Replace in all windows	FindandReplaceWindow		Zamień we wszystkich oknach
+Wrap lines	Menus		Zawijaj wiersze
+Cancel	RevertToSavedAlert		Anuluj
+Document	Menus		Dokument
+Save changes to the document \"%s\"? 	QuitAlert		Zapisać zmiany w dokumencie \"%s\"? 
+Font	Menus		Czcionka
+Replace all	FindandReplaceWindow		Zamień wszystkie
+Default	Open_and_SaveAsPanel		Domyślne
+Cancel	FindandReplaceWindow		Anuluj
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Błąd podczas otwierania \"%s\":\n\tFormat nieobsługiwany
+OK	RevertToSavedAlert		OK
+Don't save	QuitAlert		Nie zapisuj
+Align	Menus		Wyrównaj
+Color	Menus		Kolor
+Red	Menus		Czerwony
+Open…	Menus		Otwórz...
+Center	Menus		Wyśrodkuj
+Blue	Menus		Niebieski
+Cyan	Menus		Cyjan
+Magenta	Menus		Magenta
+New	Menus		Nowy
+Wrap-around search	FindandReplaceWindow		Szukanie owijające
+Find selection	Menus		Znajdź zaznaczenie
+Find:	FindandReplaceWindow		Znajdź:
+Error saving \"%s\":\n%s	SaveAlert		Błąd podczas zapisywania \"%s\":\n%s
+Replace	FindandReplaceWindow		Zamień
+Find again	Menus		Znajdź następne
+Cancel	QuitAlert		Anuluj
+Find…	Menus		Znajdź…
+Error loading \"%s\":\n\t%s	LoadAlert		Błąd podczas ładowania \"%s\":\n\t%s
+Black	Menus		Czarny
+Untitled 	StyledEditWindow		Bez tytułu
+OK	SaveAlert		OK
+Find	FindandReplaceWindow		Znajdź
+Encoding	Open_and_SaveAsPanel		Kodowanie
+Replace…	Menus		Zastąp…
+Right	Menus		Prawo
+Cancel	SaveAlert		Anuluj
+Save	SaveAlert		Zapisz
+Don't save	SaveAlert		Nie zapisuj
+This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Ten plik jest oznaczony jako tylko do odczytu. Zapisać zmiany w dokumencie \"%s\"? 
+Paste	Menus		Wklej
+File	Menus		Plik
+Page setup…	Menus		Ustawienia strony...
+Print…	Menus		Drukuj...
+Quit	Menus		Wyjdź
+Clear	Menus		Wyczyść
+Edit	Menus		Edytuj
+Close	Menus		Zamknij
+Copy	Menus		Kopiuj
+Cut	Menus		Wytnij
+Select all	Menus		Zaznacz wszystko
+Save as…	Menus		Zapisz jako...
+Lines:	Statistics		Linie:
+Document statistics	Statistics		Statystyki dokumentu
+Statistics…	Menus		Statystyki...
+Words:	Statistics		Słów:
+OK	Statistics		OK
+Undo typing	QuitAlert		Cofnij pisanie
+Characters:	Statistics		Znaków:
+Redo typing	QuitAlert		Powtórz pisanie
+Italic	Menus		Kursywa
+Bold	Menus		Pogrubienie

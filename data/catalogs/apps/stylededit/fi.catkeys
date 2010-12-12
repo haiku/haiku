@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-StyledEdit	1187976595
+1	finnish	x-vnd.Haiku-StyledEdit	3614078026
 OK	LoadAlert		Valmis
 ???	LoadAlert		???
 Left	Menus		Vasen
@@ -6,7 +6,6 @@ Revert to the last version of \"%s\"? 	RevertToSavedAlert		Palauta viimeinen \"%
 Search backwards	FindandReplaceWindow		Etsi taaksepäin
 Size	Menus		Koko
 Save	QuitAlert		Tallenna
-Redo typing	Menus		Toista kirjoittaminen
 Replace same	Menus		Korvaa sama
 Can't Undo	Menus		Ei voi perua
 Save	Menus		Tallenna
@@ -42,7 +41,6 @@ Find selection	Menus		Hakuvalinta
 Find:	FindandReplaceWindow		Haku:
 Error saving \"%s\":\n%s	SaveAlert		Virhe tallennettaessa \"%s\":\n%s
 Replace	FindandReplaceWindow		Korvaa
-Undo typing	Menus		Peru kirjoitus
 Find again	Menus		Hae uudelleen
 Cancel	QuitAlert		Peru
 Find…	Menus		Hae…
@@ -70,3 +68,13 @@ Copy	Menus		Kopioi
 Cut	Menus		Leikkaa
 Select all	Menus		Valitse kaikki
 Save as…	Menus		Tallenna nimellä...
+Lines:	Statistics		Riviä:
+Document statistics	Statistics		Asiakirjan tilastot
+Statistics…	Menus		Tilastot...
+Words:	Statistics		Sanoja:
+OK	Statistics		Valmis
+Undo typing	QuitAlert		Perutaan kirjoitus
+Characters:	Statistics		Merkkejä:
+Redo typing	QuitAlert		Toista kirjoitus
+Italic	Menus		Kursivoitu
+Bold	Menus		Lihavoitu

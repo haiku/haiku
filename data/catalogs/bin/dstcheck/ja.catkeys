@@ -1,0 +1,7 @@
+1	japanese	x-vnd.Haiku-cmd-dstconfig	2552303152
+Ask me later	dstcheck		あとで
+Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is	dstcheck		注意!\n\nサマータイムから変更すると、あなたのコンピューターの時計は1時間元に戻ります。\nコンピューターは次のように考えます
+No	dstcheck		いいえ
+Yes	dstcheck		はい
+Would you like to set the clock?	dstcheck		時計をセットしてもよろしいですか?
+.\n\nIs this the correct time?	dstcheck		.\n\nこれは正しい時間ですか?

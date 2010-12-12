@@ -1,4 +1,4 @@
-1	brazilian_portuguese	x-vnd.Haiku.CodyCam	1832811833
+1	brazilian_portuguese	x-vnd.Haiku.CodyCam	561170077
 Capturing Image…	VideoConsumer.cpp		Capturando imagem...
 Every 30 seconds	CodyCam		A cada 30 segundos
 File name:	CodyCam		Nome do arquivo
@@ -45,7 +45,6 @@ invalid upload client %ld\n	VideoConsumer.cpp		Cliente de upload inválido %ld\n
 Every 15 seconds	CodyCam		A cada 15 segundos
 Error writing output file	VideoConsumer.cpp		Erro escrevendo arquivo de destino
 About Codycam…	CodyCam		Sobre o CodyCam...
-Background View	CodyCam		Visualização de fundo
 image file format expected	CodyCam		formato de arquivo esperado
 Cannot set the time source for the video source	CodyCam		Não foi possível ajustar o tempo para a origem de vídeo
 Type:	CodyCam		Tipo:
@@ -89,6 +88,5 @@ Cannot seek time source!	CodyCam		Não foi possível procurar uma fonte de tempo
 File	CodyCam		Arquivo
 Image Format Menu	CodyCam		Menu de formato de imagem
 Every 30 minutes	CodyCam		A cada 30 minutos
-FTP Setup	CodyCam		Configurar FTP
 reply: '%s'\n	SftpClient		resposta: '%s'\n
 Start video	CodyCam		Iniciar video

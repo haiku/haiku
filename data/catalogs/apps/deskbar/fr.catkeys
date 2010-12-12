@@ -1,4 +1,4 @@
-1	french	x-vnd.Be-TSKB	2686533917
+1	french	x-vnd.Be-TSKB	34208151
 Applications	PreferencesWindow		Applications
 Recent applications	BeMenu		Applications récentes
 Edit menu…	PreferencesWindow		Éditer le menu…
@@ -15,7 +15,6 @@ Show all	WindowMenu		Montrer tout
 No windows	WindowMenu		Pas de fenêtres
 Power off	BeMenu		Éteindre
 Auto-raise	PreferencesWindow		Auto-montée
-Full date	PreferencesWindow		Date complète
 Hide time	TimeView		Cacher l'heure
 Recent folders:	PreferencesWindow		Dossiers récents :
 Deskbar preferences…	BeMenu		Réglages de la Deskbar…

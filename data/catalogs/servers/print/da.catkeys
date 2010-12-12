@@ -1,4 +1,4 @@
-1	danish	x-vnd.Be-PSRV	101881708
+1	danish	x-vnd.Be-PSRV	3878243268
 Undefined	ConfigWindow		Udefineret
 Cancel	PrintServerApp		Afbryd
 Page setup:	ConfigWindow		Side opsætning:
@@ -9,13 +9,11 @@ Would you like to set one up now?	PrintServerApp		Ønsker du at indstille en nu?
 Portrait	ConfigWindow		Portræt
 All pages	ConfigWindow		Alle sider
 There is no default printer set up.	PrintServerApp		Der er ikke konfigureret nogen standard printer.
-There already exists a printer you are going to create, but it's driver could not be found! Replace?	PrintServerApp		Printeren du laver findes allerede. men dens sriver kan ikke findes. Erstart?
 Printer:	ConfigWindow		Printer:
 Select a printer	ConfigWindow		Vælg en printer
 No	PrintServerApp		Nej
 Landscape	ConfigWindow		Landskab
 There are no printers set up.	PrintServerApp		Ingen printer er konfigureret
-There already exists a printer you are going to create, but it's not usable at all! Replace?	PrintServerApp		Printeren du laver findes allerede. men den er ikke brugbar. Erstart?
 OK	PrintServerApp		OK
 Print setup	ConfigWindow		Printer indstillinger
 Would you like to make @ the default printer?	PrintServerApp		Ønsker du at markere @ som standard printer?

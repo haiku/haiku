@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-StyledEdit	1187976595
+1	french	x-vnd.Haiku-StyledEdit	3614078026
 OK	LoadAlert		OK
 ???	LoadAlert		???
 Left	Menus		À gauche
@@ -6,7 +6,6 @@ Revert to the last version of \"%s\"? 	RevertToSavedAlert		Retourner à la derni
 Search backwards	FindandReplaceWindow		Chercher en arrière
 Size	Menus		Taille
 Save	QuitAlert		Sauvegarder
-Redo typing	Menus		Refaire la frappe
 Replace same	Menus		Remplacer le même
 Can't Undo	Menus		Impossible d'annuler
 Save	Menus		Sauvegarder
@@ -42,7 +41,6 @@ Find selection	Menus		Chercher la sélection
 Find:	FindandReplaceWindow		Chercher :
 Error saving \"%s\":\n%s	SaveAlert		Erreur d'enregistrement de \"%s\":\n%s
 Replace	FindandReplaceWindow		Remplacer
-Undo typing	Menus		Défaire la frappe
 Find again	Menus		Chercher encore
 Cancel	QuitAlert		Annuler
 Find…	Menus		Chercher…
@@ -70,3 +68,13 @@ Copy	Menus		Copier
 Cut	Menus		Couper
 Select all	Menus		Selectionner tout
 Save as…	Menus		Enregistrer sous…
+Lines:	Statistics		Lignes :
+Document statistics	Statistics		Statistiques du document
+Statistics…	Menus		Statistiques…
+Words:	Statistics		Mots :
+OK	Statistics		OK
+Undo typing	QuitAlert		Annuler la saisie
+Characters:	Statistics		Personnes :
+Redo typing	QuitAlert		Rétablir la saisie
+Italic	Menus		Italique
+Bold	Menus		Gras

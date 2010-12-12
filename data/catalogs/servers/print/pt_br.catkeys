@@ -1,11 +1,9 @@
-1	brazilian_portuguese	x-vnd.Be-PSRV	1829110700
+1	brazilian_portuguese	x-vnd.Be-PSRV	1310504964
 Undefined	ConfigWindow		Indefinido
 Would you like to set one up now?	PrintServerApp		Deseja configurar uma impressora agora?
 Portrait	ConfigWindow		Retrato
 There is no default printer set up.	PrintServerApp		Não existe nenhuma impressora padrão instalada.
-There already exists a printer you are going to create, but it's driver could not be found! Replace?	PrintServerApp		A impressora que deseja criar já está instalada. mas o driver não pôde ser encontrado! Substituir?
 Landscape	ConfigWindow		Paisagem
-There already exists a printer you are going to create, but it's not usable at all! Replace?	PrintServerApp		A impressora que está tentando instalar já existe, mas não pode ser usada. Substituir?
 Return the number of available transports	PrintServerApp Scripting		Mostrar o número de transportes disponíveis
 Return the number of available printers	PrintServerApp Scripting		Mostrar o número de impressoras disponíveis
 Get currently available ports/devices	Transport Scripting		Obter as portas/dispositivos atualmente disponíveis

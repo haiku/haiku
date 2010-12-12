@@ -1,6 +1,5 @@
-1	portuguese	x-vnd.Haiku-DriveSetup	4234569363
+1	portuguese	x-vnd.Haiku-DriveSetup	201850780
 Delete	MainWindow		Apagar
-Are you sure you want to initialize the selected partition? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		Tem a certeza que quer inicializar a partição seleccionada? De notar que poderá cancelar esta operação não será executada imediatamente.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Tem a certeza que quer aplicar todas as alterações agora?\n\nTodos os dados na partição seleccionada serão perdidos de forma irrecuperável se o fizer!
 Rescan	MainWindow		Reanalisar
 OK	MainWindow		OK
@@ -18,7 +17,6 @@ The partition %s is already unmounted.	MainWindow		A partição %s já foi desmo
 Failed to initialize the partition. No changes have been written to disk.	MainWindow		Não foi possível inicializar a partição. Nenhuma alteração foi escrita no disco.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Não foi possível apagar a partição. Nenhuma alteração foi escrita no disco.
 Partition type:	CreateParamsPanel		Tipo de partição:
-Are you sure you want to initialize the partition \"%s\"? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		Tem a certeza que quer inicializar a partição \"%s\"? De notar que poderá cancelar esta operação não será executada imediatamente.
 Could not delete the selected partition.	MainWindow		Não foi possível apagar a partição seleccionada.
 Error: 	MainWindow	in any error alert	Erro: 
 Partition %ld	DiskView		Partição %ld

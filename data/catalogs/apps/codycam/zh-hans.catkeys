@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku.CodyCam	2594096346
+1	simplified_chinese	x-vnd.Haiku.CodyCam	1322454590
 Capturing Image…	VideoConsumer.cpp		捕获图像…
 Every 30 seconds	CodyCam		每30秒一次
 File name:	CodyCam		文件名：
@@ -50,7 +50,6 @@ invalid upload client %ld\n	VideoConsumer.cpp		无效的上传客户端 %d\n
 Every 15 seconds	CodyCam		每15秒
 Error writing output file	VideoConsumer.cpp		输出文件写入出错
 About Codycam…	CodyCam		关于 CodyCam...
-Background View	CodyCam		背景视图
 image file format expected	CodyCam		预期的图像文件格式
 Cannot set the time source for the video source	CodyCam		无法为视频源设置时间源
 Type:	CodyCam		类型：
@@ -94,6 +93,5 @@ Cannot seek time source!	CodyCam		无法找到时间源！
 File	CodyCam		文件
 Image Format Menu	CodyCam		图像格式菜单
 Every 30 minutes	CodyCam		每30分钟
-FTP Setup	CodyCam		FTP 设置
 reply: '%s'\n	SftpClient		回复：‘%s’\n
 Start video	CodyCam		启动录像

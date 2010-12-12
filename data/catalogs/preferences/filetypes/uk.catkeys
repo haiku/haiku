@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-FileTypes	2161646265
+1	ukrainian	x-vnd.Haiku-FileTypes	525617155
 Args only	Application Type Window		Тільки аргументи
 Add group	New File Type Window		Додати групу
 Remove	Application Type Window		Видалити
@@ -76,3 +76,59 @@ Left	Attribute Window	Attribute column alignment in Tracker	Вліво
 Visible	Attribute Window		Видимий
 Could not install file type	New File Type Window		Неможливо встановити тип файлу
 Application type	Application Type Window		Тип додатку
+Application types…	FileTypes Window		Типи додатків...
+Recognition rule is not valid:\n\n	FileTypes Window		Правило розпізнання недоступне:
+Show icons in list	FileTypes Window		Показати іконки в списку
+Type name:	FileTypes Window		І'мя типу:
+About FileTypes…	FileTypes Window		Про FileTypes…
+Choose type	Type List Window		змінити тип
+Rule:	FileTypes Window		Правило:
+Multiple files from \"%s\" file type	FileType Window		Багаточисельні файли \"%s\" типу файлу
+Could not retrieve preferred application of this file	Preferred App Menu		Неможливо виправити бажаний додаток для цього файлу
+Extensions:	FileTypes Window		Розширення:
+Select same preferred application as	FileTypes Window		Вибрати такий самий бажаний додаток як у
+Could not retrieve application signature	Preferred App Menu		Неможливо виправити підпис додатку
+Icon	Application Type Window		Іконка
+Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Видалення типу файлу незворотнє.\nВи впевнені , що бажаєте видалити його?
+(from application)	FileTypes Window		(з додатку)
+Could not set preferred application	FileTypes Window		Неможливо встановити бажаного додатку
+Done	Type List Window		Виконано
+Show recognition rule	FileTypes Window		Показати правило розпізнавання
+FileTypes request	Preferred App Menu		Запит FileTypes 
+Description:	FileTypes Window		Опис:
+File	FileTypes Window		Файл
+Select…	FileTypes Window		Вибрати...
+FileTypes	FileTypes Window		FileTypes
+Open…	FileTypes Window		Відкрити...
+FileTypes	FileTypes		 	FileTypes
+Extra attributes	FileTypes Window		Суператрибути
+\twritten by Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n	FileTypes		\tАвтор Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n
+Add…	FileTypes Window		Додати...
+[Multiple files] file types	FileType Window		 	FileTypes
+Quit	FileTypes Window		Вийти
+%s file type	FileType Window		%s тип файлу
+no icon	FileTypes Window		іконка відсутня
+Settings	FileTypes Window		Налаштування
+New resource file…	FileTypes Window		Новий файл джерела…
+Icon	FileTypes Window		Іконка
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Видалення супер типу незоротнє.\nВсі типи файлів що відносяться до нього будуть втрачені!\n\nВи впевнені , що бажаєте цього? Для видалення цілої групи утримуючи клавішу Shift натисніть \"Remove (Видалити)\".
+Internal name:	FileTypes Window		Внутрішнє ім'я:
+File recognition	FileTypes Window		Розпізнання файлу
+Cancel	Type List Window		Відмінити
+Description	FileTypes Window		Опис
+None	FileTypes Window		Немає
+Remove	FileTypes Window		Видалити
+This file type already exists	New File Type Window		Тип файлу повністю присутній
+Same as…	FileTypes Window		Такий як ...
+Could not remove file type: %s\n	FileTypes Window		Неможливо видалити тип файлу: %s\n
+Cancel	Preferred App Menu		Відмінити
+Cancel	FileTypes Window		Відмінити
+Select preferred application	FileTypes Window		Вибрати бажаний додаток
+FileTypes request	FileTypes Window		Запит FileTypes 
+(from super type)	FileTypes Window		(для супер типу)
+Preferred application	FileTypes Window		Бажаний додаток
+Attribute	Attribute Window		Атрибут
+Group name:	New File Type Window		Ім'я групи
+Display as:	Attribute Window	Tracker offers different display modes for attributes.	Показати як:
+Right	Attribute Window	Attribute column alignment in Tracker	Вправо
+%1 application type	Application Type Window		%1 тип додатку

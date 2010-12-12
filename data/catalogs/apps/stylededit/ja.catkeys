@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-StyledEdit	1187976595
+1	japanese	x-vnd.Haiku-StyledEdit	3141287627
 OK	LoadAlert		Ok
 ???	LoadAlert		???
 Left	Menus		左揃え
@@ -6,7 +6,6 @@ Revert to the last version of \"%s\"? 	RevertToSavedAlert		\"%s\" を最後に�
 Search backwards	FindandReplaceWindow		逆方向検索
 Size	Menus		サイズ
 Save	QuitAlert		保存
-Redo typing	Menus		入力をやり直す
 Replace same	Menus		繰り返し置換
 Can't Undo	Menus		元に戻せない
 Save	Menus		保存
@@ -42,7 +41,6 @@ Find selection	Menus		選択範囲を検索
 Find:	FindandReplaceWindow		検索：
 Error saving \"%s\":\n%s	SaveAlert		\"%s\" を保存中エラーが発生しました：\n%s
 Replace	FindandReplaceWindow		置換
-Undo typing	Menus		入力を元に戻す
 Find again	Menus		次を検索
 Cancel	QuitAlert		中止
 Find…	Menus		検索…

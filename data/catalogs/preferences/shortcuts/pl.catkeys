@@ -1,0 +1,56 @@
+1	polish	x-vnd.Haiku-Shortcuts	1120793954
+Error, NULL state description?\n	ShortcutsSpec		Błąd, brak opisu stanu?\n
+MoveMouse	ShortcutsSpec		MoveMouse
+OK	ShortcutsWindow		OK
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Skróty nie mogły zapisać ustawienia klawiszy.
+Cancel	ShortcutsWindow		Anuluj
+InsertString	ShortcutsSpec		InsertString
+Append KeySet…	ShortcutsWindow		Dodaj KeySet...
+Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
+Key	ShortcutsWindow		Przycisk
+Open KeySet…	ShortcutsWindow		Otwórz KeySet....
+Shortcuts\n\nBased on SpicyKeys for BeOS made by Jeremy Friesner.	ShortcutsApp		Shortcuts\n\nOparte na SpicyKeys dla BeOS autorstwa Jeremiego Friesnera
+MouseUp	ShortcutsSpec		MouseUp
+Revert to saved	ShortcutsWindow		Cofnięto do zapisu
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
+Shortcuts	ShortcutsWindow		Skróty
+*InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Tutaj umieść swój tekst\"
+*MouseUp	ShortcutsWindow		*MouseUp
+(Choose application with file requester)	ShortcutsWindow		(Wybierz aplikację żądającą pliku)
+Window	ShortcutsSpec	Name for modifier on keyboard	Window
+*LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Skróty nie zdołały otworzyć pliku KeySet!
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"
+SendMessage	ShortcutsSpec		SendMessage
+MoveMouseTo	ShortcutsSpec		MoveMouseTo
+Save	ShortcutsWindow		Zapisz
+*MouseButton 1	ShortcutsWindow		*MouseButton 1
+*MoveMouse +20 +0	ShortcutsWindow		*MoveMouse +20 +0
+MouseDown	ShortcutsSpec		MouseDown
+Remove selected shortcut	ShortcutsWindow		Usuń zaznaczony skrót
+MouseButton	ShortcutsSpec		MouseButton
+Add new shortcut	ShortcutsWindow		Dodaj nowy skrót
+Save & apply	ShortcutsWindow		Zapisz i zastosuj
+OK	ShortcutsApp		OK
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SendMessage application/x-vnd.Be-TRAK 'Tfnd'
+Append	ShortcutsWindow		Dodaj
+File	ShortcutsWindow		Plik
+Beep	ShortcutsSpec		Beep
+Quit	ShortcutsWindow		Wyjdź
+*MouseDown	ShortcutsWindow		*MouseDown
+Don't save	ShortcutsWindow		Nie zapisuj
+Multi	ShortcutsSpec		Multi
+Application	ShortcutsWindow		Aplikacja
+Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
+*Beep	ShortcutsWindow		*Beep
+*MoveMouseTo 50% 50%	ShortcutsWindow		*MoveMouseTo 50% 50%
+Save KeySet as…	ShortcutsWindow		Zapisz KeySet jako...
+Open	ShortcutsWindow		Otwórz
+Really quit without saving your changes?	ShortcutsWindow		Wyjść nie zapisując zmian?
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Skróty nie zdołały przetworzyć pliku Keyset!
+Select	ShortcutsWindow		Wybierz
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Skróty nie zdołały zapisać pliku Keyset!
+About Shortcuts	ShortcutsWindow		O Skrótach
+Oh no	ShortcutsWindow		Och nie
+About Shortcuts	ShortcutsApp		O Skrótach
+LaunchHandler	ShortcutsSpec		LaunchHandler

@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-StyledEdit	2108192170
+1	belarusian	x-vnd.Haiku-StyledEdit	3282773893
 OK	LoadAlert		Так
 ???	LoadAlert		???
 Left	Menus		Левы
@@ -56,3 +56,22 @@ Cancel	SaveAlert		Скасаваць
 Save	SaveAlert		Захаваць
 Don't save	SaveAlert		Не захоўваць
 This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Гэты файл пазначаны толькі для чытання. Захаваць змены ў дакумент \"%s\"? 
+Paste	Menus		Уставіць
+File	Menus		Файл
+Page setup…	Menus		Наладкі старонкі...
+Print…	Menus		Друкаваць...
+Quit	Menus		Выйсці
+Clear	Menus		Ачысціць
+Edit	Menus		Рэдагаваць
+Close	Menus		Закрыць
+Copy	Menus		Капіяваць
+Cut	Menus		Выразаць
+Select all	Menus		Абраць усё
+Lines:	Statistics		Строкаў:
+Document statistics	Statistics		Статыстыка дакументу
+Statistics…	Menus		Статыстыка...
+Words:	Statistics		Словаў:
+OK	Statistics		ОК
+Undo typing	QuitAlert		Адмяніць увод
+Italic	Menus		Наклонны
+Bold	Menus		Полужырны

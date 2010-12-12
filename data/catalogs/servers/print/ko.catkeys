@@ -1,4 +1,4 @@
-1	korean	x-vnd.Be-PSRV	101881708
+1	korean	x-vnd.Be-PSRV	3878243268
 Undefined	ConfigWindow		정의되지 않음
 Cancel	PrintServerApp		취소
 Page setup:	ConfigWindow		페이지 설정:
@@ -9,13 +9,11 @@ Would you like to set one up now?	PrintServerApp		지금 프린터를 추가하�
 Portrait	ConfigWindow		세로
 All pages	ConfigWindow		모든 페이지
 There is no default printer set up.	PrintServerApp		설정된 기본 프린터가 없습니다.
-There already exists a printer you are going to create, but it's driver could not be found! Replace?	PrintServerApp		당신이 추가하고자 하는 프린터가 이미 존재합니다, 하지만 드라이버를 찾을 수 없습니다! 바꾸겠습니까?
 Printer:	ConfigWindow		프린터:
 Select a printer	ConfigWindow		프린터 선택
 No	PrintServerApp		아니오
 Landscape	ConfigWindow		가로
 There are no printers set up.	PrintServerApp		설정된 프린터가 없습니다.
-There already exists a printer you are going to create, but it's not usable at all! Replace?	PrintServerApp		당신이 추가하고자 하는 프린터가 이미 존재합니다, 하지만  사용할 수 없습니다! 바꾸겠습니까?
 OK	PrintServerApp		확인
 Print setup	ConfigWindow		프린터 설정
 Would you like to make @ the default printer?	PrintServerApp		@를 기본 프린터로 만들겠습니까?

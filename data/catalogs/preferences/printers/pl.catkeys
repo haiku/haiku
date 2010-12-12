@@ -1,0 +1,31 @@
+1	polish	x-vnd.Be-PRNT	407752036
+Waiting	JobListView		Oczekuję
+page	JobListView		strona
+Cancel	AddPrinterDialog		Anuluj
+Add printer	AddPrinterDialog		Dodaj drukarkę
+Printers	PrintersWindow		Drukarki
+Default Printer	PrinterListView		Domyślna drukarka
+No pending jobs.	PrinterListView		Brak aktywnych zadań
+pages	JobListView		strony
+Processing	JobListView		W toku
+Printer name:	AddPrinterDialog		Nazwa drukarki:
+pending jobs.	PrinterListView		zadanie w toku.
+Restart job	PrintersWindow		Zrestartuj zadanie
+Add	AddPrinterDialog		Dodaj
+Make default	PrintersWindow		Utwórz domyślny
+Cancel job	PrintersWindow		Anuluj zadanie
+1 pending job.	PrinterListView		1 zadanie w toku.
+Remove	PrintersWindow		Usuń
+<pick one>	AddPrinterDialog		<wybierz jeden>
+Add …	PrintersWindow		Dodaj ...
+Print jobs for 	PrintersWindow		Drukowanie dla
+Failed	JobListView		Nie wykonano
+%.2f KB	JobListView		%.2f KB
+Completed	JobListView		Ukończono
+No printer found!	TransportMenu		Nie znaleziono drukarek!
+Print jobs: No printer selected	PrintersWindow		Drukowanie: Nie wybrano drukarki
+Unknown status	JobListView		Nieznany status
+Connected to:	AddPrinterDialog		Podłączono do:
+Printer type:	AddPrinterDialog		Typ drukarki:
+Transport: %transport% %transport_address%	PrinterListView		Transport: %transport% %transport_address%
+Driver: %driver%	PrinterListView		Sterownik: %driver%

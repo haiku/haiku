@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Be-TSKB	2686533917
+1	japanese	x-vnd.Be-TSKB	34208151
 Applications	PreferencesWindow		アプリケーション
 Recent applications	BeMenu		最近使ったアプリケーション
 Edit menu…	PreferencesWindow		メニューの編集…
@@ -15,7 +15,6 @@ Show all	WindowMenu		すべてを表示
 No windows	WindowMenu		ウィンドウ無し
 Power off	BeMenu		電源を切る
 Auto-raise	PreferencesWindow		マウスオーバーで手前に
-Full date	PreferencesWindow		長い日付形式
 Hide time	TimeView		時刻を隠す
 Recent folders:	PreferencesWindow		最近開いたフォルダー：
 Deskbar preferences…	BeMenu		Deskbarの設定…

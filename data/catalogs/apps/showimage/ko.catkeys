@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-ShowImage	1038439310
+1	korean	x-vnd.Haiku-ShowImage	855053980
 Use as background…	Menus		배경으로 사용…
 5 seconds	Menus		5초
 Slide delay	Menus		슬라이드 대기시간
@@ -11,7 +11,6 @@ Full screen	Menus		전체 화면
 Go to page	Menus		페이지 찾아가기
 Zoom out	Menus		축소
 20 seconds	Menus		20초
-Invert colors	Menus		색 반전
 3 seconds	Menus		3초
 Rotate counterclockwise	Menus		시계 반대반향으로 회전
 10 seconds	Menus		10초
@@ -22,33 +21,23 @@ Could not load image! Either the file or an image translator for it does not exi
 First page	Menus		첫 페이지
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		이 문서 '%s' (페이지 %d)는 변경되었습니다. 이 문서를 닫겠습니까?
 About ShowImage…	Menus		ShowImage 정보…
-Open	Menus		열기
-OK	LoadAlerts		확인
 Close	ClosePrompt		닫기
-Height:	ResizerWindow		높이:
 Undo	Menus		되돌리기
 Resize to (in 1/72 inches):	PrintOptionsWindow		(1/72 인치)로 크기 변경:
-Apply	ResizerWindow		적용
-Keep original proportions	ResizerWindow		원래 비율 유지
 9 seconds	Menus		9초
 Flip left to right	Menus		좌우 바꾸기
 Show caption in full screen mode	Menus		전체 화면 모드에서 설명 보기
 DPI:	PrintOptionsWindow		해상도:
 Next file	Menus		다음 파일
 4 seconds	Menus		4초
-Zoom to window	Menus		창에 꽉 차게 확대
 Close document	ClosePrompt		문서 닫기
-ShowImage	LoadAlerts		이미지보기
 Height: 	PrintOptionsWindow		높이: 
 Cancel	ClosePrompt		취소
-Resize…	Menus		크기조절…
 Print options	PrintOptionsWindow		인쇄 옵션
-Width:	ResizerWindow		너비:
 ShowImage	AboutWindow		이미지보기
 7 seconds	Menus		7초
 Last page	Menus		마지막 페이지
 Previous file	Menus		이전 파일
-Resize	ResizerWindow		크기 조절
 Slide show	Menus		슬라이드 쇼
 Fit image to page	PrintOptionsWindow		페이지에 이미지 맞게 하기
 Flip top to bottom	Menus		상하 바꾸기
@@ -59,7 +48,6 @@ Rotate clockwise	Menus		시계방향으로 회전
 Job setup	PrintOptionsWindow		작업 설정
 Original size	Menus		원래 크기
 Next page	Menus		다음 페이지
-Shrink to window	Menus		창에 맞게 줄이기
 OK	SaveToFile		확인
 The file '%s' could not be written.	SaveToFile		이 파일 '%s' 을 기록할 수 없습니다.
 Progress monitor	ProgressWindow		진행 모니터

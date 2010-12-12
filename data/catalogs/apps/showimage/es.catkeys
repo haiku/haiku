@@ -1,4 +1,4 @@
-1	spanish	x-vnd.Haiku-ShowImage	249555060
+1	spanish	x-vnd.Haiku-ShowImage	66169730
 Use as background…	Menus		Usar como fondo de pantalla…
 5 seconds	Menus		5 segundos
 Slide delay	Menus		Retardo de diapositiva
@@ -11,7 +11,6 @@ Full screen	Menus		Pantalla completa
 Go to page	Menus		Ir a página
 Zoom out	Menus		Alejar
 20 seconds	Menus		20 segundos
-Invert colors	Menus		Invertir colores
 3 seconds	Menus		3 segundos
 Rotate counterclockwise	Menus		Rotar en sentido antihorario
 10 seconds	Menus		10 segundos
@@ -22,33 +21,23 @@ Could not load image! Either the file or an image translator for it does not exi
 First page	Menus		Primera página
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		El documento '%s' (página %d) ha cambiado. ¿Desea cerrarlo?
 About ShowImage…	Menus		Acerca de ShowImage
-Open	Menus		Abrir
-OK	LoadAlerts		Aceptar
 Close	ClosePrompt		Cerrar
-Height:	ResizerWindow		Alto:
 Undo	Menus		Deshacer
 Resize to (in 1/72 inches):	PrintOptionsWindow		Redimensionar a  (en 1/72 pulgadas):
-Apply	ResizerWindow		Aplicar
-Keep original proportions	ResizerWindow		Conservar proporciones originales
 9 seconds	Menus		9 segundos
 Flip left to right	Menus		Invertir de izquierda a derecha
 Show caption in full screen mode	Menus		Mostrar título en modo de pantalla completa
 DPI:	PrintOptionsWindow		Puntos por pulgada (DPI):
 Next file	Menus		Archivo siguiente
 4 seconds	Menus		4 segundos
-Zoom to window	Menus		Ajustar al tamaño de la ventana
 Close document	ClosePrompt		Cerrar documento
-ShowImage	LoadAlerts		ShowImage
 Height: 	PrintOptionsWindow		Alto:
 Cancel	ClosePrompt		Cancelar
-Resize…	Menus		Redimensionar...
 Print options	PrintOptionsWindow		Opciones de impresión
-Width:	ResizerWindow		Ancho:
 ShowImage	AboutWindow		ShowImage
 7 seconds	Menus		7 segundos
 Last page	Menus		Última página
 Previous file	Menus		Archivo anterior
-Resize	ResizerWindow		Redimensionar
 Slide show	Menus		Exponer diapositivas
 Fit image to page	PrintOptionsWindow		Ajustar imagen a la página
 Flip top to bottom	Menus		Invertir de arriba a abajo
@@ -59,4 +48,3 @@ Rotate clockwise	Menus		Rotar en sentido horario
 Job setup	PrintOptionsWindow		Configuración de tareas
 Original size	Menus		Tamaño original
 Next page	Menus		Página siguiente
-Shrink to window	Menus		Ajustar al tamaño de la ventana

@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Be-PSRV	2286010912
+1	simplified_chinese	x-vnd.Be-PSRV	1767405176
 Undefined	ConfigWindow		未定义
 Cancel	PrintServerApp		取消
 Page setup:	ConfigWindow		页面设置:
@@ -9,13 +9,11 @@ Would you like to set one up now?	PrintServerApp		是否进行设置?
 Portrait	ConfigWindow		类型
 All pages	ConfigWindow		所有页面
 There is no default printer set up.	PrintServerApp		打印机默认设置不存在.
-There already exists a printer you are going to create, but it's driver could not be found! Replace?	PrintServerApp		打印机已存在， 但是驱动未发现！是否重新设置？
 Printer:	ConfigWindow		打印机:
 Select a printer	ConfigWindow		选择打印机
 No	PrintServerApp		无
 Landscape	ConfigWindow		背景
 There are no printers set up.	PrintServerApp		没有打印机设置。
-There already exists a printer you are going to create, but it's not usable at all! Replace?	PrintServerApp		创建的打印机已经存在，但是仍然无法使用！是否重新设置?
 OK	PrintServerApp		确定
 Print setup	ConfigWindow		打印设置
 Would you like to make @ the default printer?	PrintServerApp		是否设置 @ 为默认打印机?

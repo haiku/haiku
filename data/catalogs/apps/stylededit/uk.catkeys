@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-StyledEdit	3978770058
+1	ukrainian	x-vnd.Haiku-StyledEdit	1637113794
 OK	LoadAlert		OK
 ???	LoadAlert		???
 Left	Menus		Вліво
@@ -6,7 +6,6 @@ Revert to the last version of \"%s\"? 	RevertToSavedAlert		Повернутис�
 Search backwards	FindandReplaceWindow		Повторний пошук
 Size	Menus		Розмір
 Save	QuitAlert		Зберегти
-Redo typing	Menus		Відмінити набір
 Replace same	Menus		Перемістити  це саме
 Can't Undo	Menus		Неможливо відмінити
 Save	Menus		Зберегти
@@ -42,7 +41,6 @@ Find selection	Menus		Знайти  вибране
 Find:	FindandReplaceWindow		Знайти:
 Error saving \"%s\":\n%s	SaveAlert		Помилка збереження "%s":\n%s
 Replace	FindandReplaceWindow		Перемістити
-Undo typing	Menus		Відмінити набір
 Find again	Menus		Повторний пошук
 Cancel	QuitAlert		Відмінити
 Find…	Menus		Знайти…

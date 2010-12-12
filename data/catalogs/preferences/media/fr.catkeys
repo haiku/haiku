@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Media	2505372198
+1	french	x-vnd.Haiku-Media	243366818
 Show volume control on Deskbar	Media views		Afficher le contrôle de volume dans la Deskbar
 Audio input:	Media views		Entrée son :
 Restarting media services\nStarting media server…\n	Media Window		Redémarrage des services media\nDémarrage du serveur media…\n
@@ -32,3 +32,6 @@ Couldn't remove volume control in Deskbar: %s\n	Media Window		Impossible d'enlev
 Couldn't add volume control in Deskbar: %s\n	Media Window		Impossible d'ajouter le contrôle du volume dans la Deskbar: %s\n
 Media	Media Window		Média
 Channel:	Media views		Canal :
+Video settings	Media Window		Réglages vidéo
+Audio mixer	Media Window		Mélangeur audio
+<none>	Media views		<Aucun>

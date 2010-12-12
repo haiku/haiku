@@ -1,8 +1,7 @@
-1	french	x-vnd.Haiku.TextSearch	2912179465
+1	french	x-vnd.Haiku.TextSearch	3384815827
 %s: Not enough room to escape the filename.	Grepper		%s: Pas assez de place pour coder le nom du fichier.
 Trim to selection	GrepWindow		Réduire à la sélection
 Follow symbolic links	GrepWindow		Suivre les liens symboliques
-Set which files to search	GrepWindow		Sélectionner les fichiers à examiner
 Close	GrepWindow		Fermer
 Cancel	GrepWindow		Annuler
 The unselected files will be removed from the list.	GrepWindow		Les fichiers non-sélectionnés seront retirés de la liste.
@@ -31,5 +30,4 @@ Show files in Tracker	GrepWindow		Montrer les fichiers dans le Tracker
 About TextSearch…	GrepWindow		À propos de TextSearch…
 Case-sensitive	GrepWindow		Sensible à la casse
 Text files only	GrepWindow		Seulement les fichiers texte
-Skip sub-folders starting with a dot	GrepWindow		Ignorer les dossiers dont le nom commence par un point.
 Show lines	GrepWindow		Montrer les lignes

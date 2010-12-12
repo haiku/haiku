@@ -1,4 +1,4 @@
-1	brazilian_portuguese	x-vnd.Haiku-BluetoothPrefs	871075421
+1	brazilian_portuguese	x-vnd.Haiku-BluetoothPrefs	165289553
 Handheld	Settings view		Computador de mão
 Default inquiry time:	Settings view		Tempo de consulta padrão:
 Starting scan...	Inquiry panel		Pesquisando...
@@ -7,7 +7,6 @@ Smart phone	Settings view		Smartphone
 Identify host as:	Settings view		Identificar host como:
 Refresh…	Remote devices		Atualizar...
 Pair…	Remote devices		Par...
-Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t & Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\n\t- Adrien Destugues\n\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Sistema Bluetooth do Haiku (ARCE)\n\nCriado por Oliver Ruiz Dorantes\n\nCom ajuda de:\n\t- Mika Lindqvist\n\t- Maksym Yevmenkin\n\nAgradecimentos aos que ajudaram...\n\nEnviando ou doando hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t & Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomicamente:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nCom patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTestando:\n\t- Petter H. Juliussen\n\t- Adrien Destugues\n\nQuem me deu todo o conhecimento:\n\t- o grupo yellowTAB
 Incoming connections policy:	Settings view		Política de conexões de entrada:
 From all devices	Settings view		De todos os dispositivos
 Local devices found on system:	Settings view		Dispositivos locais encontrados no sistema:

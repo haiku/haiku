@@ -1,6 +1,5 @@
-1	danish	x-vnd.Haiku-DriveSetup	4234569363
+1	danish	x-vnd.Haiku-DriveSetup	201850780
 Delete	MainWindow		Slet
-Are you sure you want to initialize the selected partition? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		Er du sikker på at du ønsker at initialisere den valgte partition? Efter initialisations parametrene er indtastet, er det muligt at afbryde proceduren inden at ændringerne skrives til disken.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Er du sikker på at du ønsker at skrive ændringerne tilbage til disken nu?\n\nData på den valgte partition vil blive permanent slettet!
 Rescan	MainWindow		Søg igen
 OK	MainWindow		OK
@@ -18,7 +17,6 @@ The partition %s is already unmounted.	MainWindow		Partitionen %s er allerede mo
 Failed to initialize the partition. No changes have been written to disk.	MainWindow		Fejl i forbindelse med initialisering af partitionen. Der er ikke blevet skrevet nogle ændringer til disken.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Fejl i forbindelse med at slette partitionen. Der er ikke blevet skrevet nogle ændringer til disken.
 Partition type:	CreateParamsPanel		Partition type:
-Are you sure you want to initialize the partition \"%s\"? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		Er du sikker på at du vil initialisere partition \"%s\"? Efter initialisations parametrene er indtastet, er det muligt at afbryde proceduren inden at ændringerne skrives til disken.
 Could not delete the selected partition.	MainWindow		Kunne ikke slette den valgte partition.
 Error: 	MainWindow	in any error alert	Fejl:
 Partition %ld	DiskView		Partition %ld

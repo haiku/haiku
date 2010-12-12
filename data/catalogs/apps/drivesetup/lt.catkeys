@@ -1,6 +1,5 @@
-1	lithuanian	x-vnd.Haiku-DriveSetup	4234569363
+1	lithuanian	x-vnd.Haiku-DriveSetup	201850780
 Delete	MainWindow		Šalinti
-Are you sure you want to initialize the selected partition? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		Tikrai norite įžymėti pasirinktą skirsnį?\nPo įžymėjimo apibrėžčių įvedimo galėsite atšaukti šį veiksmą prieš pat įrašant pakeitimus į laikmeną.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Tikrai dabar norite pakeitimus įrašyti tiesiai į laikmeną?\n\nJei tęsite toliau – visi duomenys, esantys pasirinktame skirsnyje, bus negrįžtamai prarasti!
 Rescan	MainWindow		Peržvalgyti
 OK	MainWindow		Gerai
@@ -18,7 +17,6 @@ The partition %s is already unmounted.	MainWindow		Skirsnis %s jau atjungtas.
 Failed to initialize the partition. No changes have been written to disk.	MainWindow		Įžymėti skirsnio nepavyko. Pakeitimų į laikmeną įrašyta nebuvo.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Pašalinti skirsnio nepavyko. Pakeitimų į laikmeną įrašyta nebuvo.
 Partition type:	CreateParamsPanel		Skirsnio tipas:
-Are you sure you want to initialize the partition \"%s\"? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		Tikrai norite įžymėti skrisnį „%s“?\nPo įžymėjimo apibrėžčių įvedimo galėsite atšaukti šį veiksmą prieš pat įrašant pakeitimus į laikmeną.
 Could not delete the selected partition.	MainWindow		Pasirinkto skirsnio pašalinti negalima.
 Error: 	MainWindow	in any error alert	Klaida: 
 Partition %ld	DiskView		Skirsnis %ld

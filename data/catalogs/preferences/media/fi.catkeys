@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Media	2505372198
+1	finnish	x-vnd.Haiku-Media	243366818
 Show volume control on Deskbar	Media views		Näytä voimakkuusohjain Pöytäpalkissa
 Audio input:	Media views		Äänisyöte:
 Restarting media services\nStarting media server…\n	Media Window		Käynnistetään media-palvelut uudelleen\nKäynnistetään media-palvelin…\n
@@ -32,3 +32,6 @@ Couldn't remove volume control in Deskbar: %s\n	Media Window		Ei voitu poistaa �
 Couldn't add volume control in Deskbar: %s\n	Media Window		Ei voitu lisätä äänenvoimakkuusohjainta Pöytäpalkkiin: %s\n
 Media	Media Window		Media
 Channel:	Media views		Kanava:
+Video settings	Media Window		Videoasetukset
+Audio mixer	Media Window		Äänisekoitin
+<none>	Media views		<ei mitään>

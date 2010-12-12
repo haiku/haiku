@@ -1,0 +1,88 @@
+1	japanese	x-vnd.Haiku-Bluetooth	3550394259
+Display	DeviceClass		ディスプレイ
+Capturing	DeviceClass		キャプチャリング
+Printer	DeviceClass		プリンター
+Uncategorized	DeviceClass		未分類
+1-17% utilized	DeviceClass		1-17% 利用
+Positioning	DeviceClass		位置
+Rendering	DeviceClass		描画
+Phone	DeviceClass		電話
+17-33% utilized	DeviceClass		17-33% 利用
+#ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady#無効な名前です
+Combo keyboard/pointing device	DeviceClass		キーボードとポインティングデバイス
+Controller	DeviceClass		コントローラー
+No service available	DeviceClass		サービスが有効ではありません
+Wearable	DeviceClass	A wearable computer	ウェアラブル
+Handheld	DeviceClass		ハンドヘルド
+Invalid device class!\n	DeviceClass		無効なデバイスクラスです!\n
+Sensing device	DeviceClass		センサー
+Computer	DeviceClass		コンピュータ
+Cellular	DeviceClass		携帯電話
+Microphone	DeviceClass		マイク
+Unknown (reserved) minor device class	DeviceClass		不明 (予約済) の副デバイスクラス
+Cordless	DeviceClass		コードレス
+Common ISDN access	DeviceClass		一般的な ISDN 接続
+83-99% utilized	DeviceClass		83-99% 利用
+Scanner	DeviceClass		スキャナー
+Game	DeviceClass		ゲーム
+Gamepad	DeviceClass		ゲームパッド
+(reserved)	DeviceClass		(予約済)
+Desktop workstation	DeviceClass		デスクトップ ワークステーション
+Audio/Video	DeviceClass		音声/映像
+Glasses	DeviceClass		メガネ
+Keyboard	DeviceClass		キーボード
+Camera	DeviceClass		カメラ
+Major class: 	DeviceClass		主クラス:
+50-67% utilized	DeviceClass		50-67% 利用
+Card reader	DeviceClass		カードリーダー
+Set-top box	DeviceClass		セットトップボックス
+Helmet	DeviceClass		ヘルメット
+Laptop	DeviceClass		ラップトップ
+Car audio	DeviceClass		カー・オーディオ
+SIM card reader	DeviceClass		SIM カードリーダー
+Headphones	DeviceClass		ヘッドホン
+Information	DeviceClass		情報
+Remote control	DeviceClass		リモコン
+Service classes: 	DeviceClass		サービスクラス:
+Pager	DeviceClass	A small radio device to receive short text messages	ポケットベル
+Object transfer	DeviceClass		オブジェクト転送
+Gaming/Toy	DeviceClass		ゲーム/玩具
+Audio	DeviceClass		音声
+Robot	DeviceClass		ロボット
+Camcorder	DeviceClass		ビデオカメラ
+Digitizer tablet	DeviceClass		タブレット
+Loudspeaker	DeviceClass		拡声器
+Joystick	DeviceClass		ジョイスティック
+LAN access	DeviceClass		LAN 接続
+Wrist watch	DeviceClass		腕時計
+Minor class: 	DeviceClass		副クラス:
+Networking	DeviceClass		ネットワーク接続
+Portable audio	DeviceClass		ポータブルオーディオ
+Device conforms to the headset profile	DeviceClass		デバイスはヘッドセットプロファイルが利用できる
+Hands-free	DeviceClass		ハンズフリー
+#CommandFailed#Not Valid name	RemoteDevice		#CommandFailed#無効な名前です
+Vehicle	DeviceClass		自動車
+Palm	DeviceClass	A palm-held device	Palm
+Video display and loudspeaker	DeviceClass		ビデオディスプレイと拡声器
+Peripheral	DeviceClass		周辺機器
+#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError#無効な名前です
+Wired modem or voice gateway	DeviceClass		有線モデムかボイスゲートウェイ
+Jacket	DeviceClass		ジャケット
+Unspecified	DeviceClass		未分類
+Fully available	DeviceClass		全て有効
+67-83% utilized	DeviceClass		67-83% 利用
+Not implemented	RemoteDevice		未実装
+#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest#無効な名前です
+Server	DeviceClass		サーバー
+Video conferencing	DeviceClass		ビデオ会議
+Video camera	DeviceClass		ビデオカメラ
+HiFi audio device	DeviceClass		HiFi オーディオ機器
+Smart phone	DeviceClass		スマートフォン
+Telephony	DeviceClass		電話通信
+Doll/Action figure	DeviceClass		フィギュア
+VCR	DeviceClass		ビデオデッキ
+Video monitor	DeviceClass		ビデオモニター
+Pointing device	DeviceClass		ポインティングデバイス
+Miscellaneous	DeviceClass		複数
+33-50% utilized	DeviceClass		33-50% 利用
+Imaging	DeviceClass		イメージ

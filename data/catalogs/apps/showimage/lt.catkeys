@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-ShowImage	1038439310
+1	lithuanian	x-vnd.Haiku-ShowImage	855053980
 Use as background…	Menus		Padaryti darbastalio fonu…
 5 seconds	Menus		5 sek.
 Slide delay	Menus		Skaidrės užlaikymas
@@ -11,7 +11,6 @@ Full screen	Menus		Visu ekranu
 Go to page	Menus		Pereiti puslapin
 Zoom out	Menus		Mažinti
 20 seconds	Menus		20 sek.
-Invert colors	Menus		Apversti spalvas
 3 seconds	Menus		3 sek.
 Rotate counterclockwise	Menus		Pasukti prieš laikrodžio rodyklę
 10 seconds	Menus		10 sek.
@@ -22,33 +21,23 @@ Could not load image! Either the file or an image translator for it does not exi
 First page	Menus		Pirmasis puslapis
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokumentas „%s“ (puslapis %d) pakeistas. Norite uždaryti?
 About ShowImage…	Menus		Apie programą…
-Open	Menus		Atidaryti
-OK	LoadAlerts		Gerai
 Close	ClosePrompt		Uždaryti
-Height:	ResizerWindow		Aukštis:
 Undo	Menus		Atšaukti
 Resize to (in 1/72 inches):	PrintOptionsWindow		Keisti dydį (1/72 colių):
-Apply	ResizerWindow		Taikyti
-Keep original proportions	ResizerWindow		Išlaikyti pirmininį santykį
 9 seconds	Menus		9 sek.
 Flip left to right	Menus		Apversti kairę su dešine
 Show caption in full screen mode	Menus		Rodyti pavadinimą viso ekrano rodoje
 DPI:	PrintOptionsWindow		Raiška (DPI):
 Next file	Menus		Kita byla
 4 seconds	Menus		4 sek.
-Zoom to window	Menus		Didinti palei langą
 Close document	ClosePrompt		Uždaryti dokumentą
-ShowImage	LoadAlerts		Veizyklė
 Height: 	PrintOptionsWindow		Aukštis: 
 Cancel	ClosePrompt		Atsisakyti
-Resize…	Menus		Keisti dydį…
 Print options	PrintOptionsWindow		Spaudos parinktys
-Width:	ResizerWindow		Plotis:
 ShowImage	AboutWindow		Veizyklė
 7 seconds	Menus		7 sek.
 Last page	Menus		Paskutinis puslapis
 Previous file	Menus		Ankstesnis puslapis
-Resize	ResizerWindow		Dydžio keitimas
 Slide show	Menus		Skaidrių ratas
 Fit image to page	PrintOptionsWindow		Įtalpinti puslapin
 Flip top to bottom	Menus		Apversti viršų su apačia
@@ -59,7 +48,6 @@ Rotate clockwise	Menus		Pasukti pagal laikrodžio rodyklę
 Job setup	PrintOptionsWindow		Užduoties nustatymai
 Original size	Menus		Pirminis dydis
 Next page	Menus		Kitas puslapis
-Shrink to window	Menus		Mažinti palei langą
 OK	SaveToFile		Gerai
 The file '%s' could not be written.	SaveToFile		Byla „%s“ neįrašoma.
 Progress monitor	ProgressWindow		Pažangos vaizdas

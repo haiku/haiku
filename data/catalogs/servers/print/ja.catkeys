@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Be-PSRV	1211700656
+1	japanese	x-vnd.Be-PSRV	693094920
 Undefined	ConfigWindow		未定義
 Cancel	PrintServerApp		中止
 Page setup:	ConfigWindow		ページ設定：
@@ -9,13 +9,11 @@ Would you like to set one up now?	PrintServerApp		プリンターを追加しま
 Portrait	ConfigWindow		縦
 All pages	ConfigWindow		全ページ
 There is no default printer set up.	PrintServerApp		デフォルトプリンターが設定されていません。
-There already exists a printer you are going to create, but it's driver could not be found! Replace?	PrintServerApp		この種類のプリンターは既にインストールされていますが、ドライバーが見つかりません。置き換えますか？
 Printer:	ConfigWindow		プリンター：
 Select a printer	ConfigWindow		プリンターを選択
 No	PrintServerApp		いいえ
 Landscape	ConfigWindow		横
 There are no printers set up.	PrintServerApp		プリンターはインストールされてません。
-There already exists a printer you are going to create, but it's not usable at all! Replace?	PrintServerApp		この種類のプリンターは既にインストールされていますが、ご利用できません。置き換えますか？
 OK	PrintServerApp		Ok
 Print setup	ConfigWindow		印刷設定
 Would you like to make @ the default printer?	PrintServerApp		@ をデフォルトプリンターに設定しますか？

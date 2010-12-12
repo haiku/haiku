@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-bootman	2993174226
+1	ukrainian	x-vnd.Haiku-bootman	681536107
 The boot manager has been successfully installed on your system.	BootManagerController		Завантажувач успішно встановлений на Вашу систему.
 At least one partition must be selected!	BootManagerController		Принаймні один розділ слід вибрати!
 The old Master Boot Record could not be saved to %s	BootManagerController		Старий запис MBR не може бути збережений в %s .
@@ -61,3 +61,4 @@ After five seconds	DefaultPartitionPage		Після п'яти секунд
 Never	DefaultPartitionPage		Ніколи
 Immediately	DefaultPartitionPage		Негайно
 After three seconds	DefaultPartitionPage		Через три секунди
+The old Master Boot Record was successfully saved to %s.	BootManagerController		Старий запис MBR успішно 

@@ -1,0 +1,44 @@
+1	finnish	x-vnd.Haiku-ActivityMonitor	3957859986
+P-faults	DataSource		P-viat
+Media nodes	DataSource		Mediasolmut
+Raw clipboard size	DataSource		Raakaleikepöydän koko
+Threads	DataSource		Säikeet
+Add graph	ActivityWindow		Lisää graafi
+Teams	DataSource		Ryhmät
+Hide legend	ActivityView		Piilota merkin selitys
+Network send	DataSource		Verkon lähettämä
+CPU usage (combined)	DataSource		Suoritinkäyttö (yhdistetty)
+CPU	DataSource		Suoritin
+Used memory	DataSource		Käytetty muisti
+Cached memory	DataSource		Välimuistitettu muisti
+Apps	DataSource		Sovellukset
+Show legend	ActivityView		Näytä merkin selitys
+Settings	ActivityWindow		Asetukset
+Receiving	DataSource		Vastaanotetaan
+Settings…	ActivityWindow		Asetukset...
+OK	ActivityMonitor		Valmis
+Ports	DataSource		Portit
+Page faults	DataSource		Sivuvirheet
+Text clipboard size	DataSource		Tekstileikepöydän koko
+Sending	DataSource		Lähetetään
+Cache	DataSource		Välimuisti
+About ActivityMonitor…	ActivityWindow		Ohjelmasta AktiviteettiValvonta...
+TX	DataSource		TX
+Update time interval:	SettingsWindow		Päivitä aikaväli:
+Quit	ActivityWindow		Poistu
+Block cache memory	DataSource		Lohkovälimuisti
+Remove graph	ActivityView		Poista graafi
+about	ActivityMonitor		ohjelmasta
+RX	DataSource		RX
+CPU usage	DataSource		Suoritinkäyttö
+Sems	DataSource		Opastimet
+Running applications	DataSource		Suoritetaan sovelluksia
+Semaphores	DataSource		Opastimet
+Block cache	DataSource		Lohkovälimuisti
+Swap space	DataSource		Vaihda tila
+Swap	DataSource		Vaihda
+File	ActivityWindow		Tiedosto
+Additional items	ActivityView		Lisäkohteet
+Network receive	DataSource		Verkko vastaanota
+Memory	DataSource		Muisti
+ActivityMonitor\n\twritten by Axel Dörfler\n\tCopyright 2008, Haiku Inc.\n	ActivityMonitor		AktiviteettiValvonta\n\ttekijä: Axel Dörfler\n\tCopyright 2008, Haiku Inc.\n

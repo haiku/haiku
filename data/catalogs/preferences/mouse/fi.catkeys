@@ -1,5 +1,4 @@
-1	finnish	x-vnd.Haiku-Mouse	104106491
-Click to activate	SettingsView		Napsauta aktivoidaksesi
+1	finnish	x-vnd.Haiku-Mouse	3392409209
 Mouse type:	SettingsView		Hiirityyppi:
 Warp	SettingsView		Vääristymä
 2-Button	SettingsView		2-painike
@@ -22,3 +21,4 @@ Fast	SettingsView		Nopea
 Normal	SettingsView		Normaali
 Mouse	MouseWindow		Hiiri
 Slow	SettingsView		Hidas
+Click to focus and raise	SettingsView		Napsauta kohdistusta ja nostoa varten

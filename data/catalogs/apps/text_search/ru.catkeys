@@ -1,8 +1,7 @@
-1	russian	x-vnd.Haiku.TextSearch	3449010850          
+1	russian	x-vnd.Haiku.TextSearch	3384815827
 %s: Not enough room to escape the filename.	Grepper		%s: Недостаточно места для экранирования имени файла.
 Trim to selection	GrepWindow		Искать в выделенных
 Follow symbolic links	GrepWindow		Переходить по ссылкам
-Set target…	GrepWindow		Выбрать цель…
 Close	GrepWindow		Закрыть
 Cancel	GrepWindow		Стоп
 The unselected files will be removed from the list.	GrepWindow		Невыделенные файлы будут удалены из списка.
@@ -25,11 +24,10 @@ History	GrepWindow		История
 %s: There was a problem running grep.	Grepper		%s: Возникла ошибка при работе grep.
 New window	GrepWindow		Новое окно
 Please select the files you wish to keep searching.	GrepWindow		Пожалуйста, выберите файлы, в которых вы хотите продолжить поиск.
-TextSearch	GrepWindow		TextSearch
+TextSearch	GrepWindow		Текстовый поиск
 Quit	GrepWindow		Выход
 Show files in Tracker	GrepWindow		Показать файлы в Tracker
-About TextSearch…	GrepWindow		О программе…
+About TextSearch…	GrepWindow		О программе...
 Case-sensitive	GrepWindow		Учитывать регистр
 Text files only	GrepWindow		Только текстовые файлы
-Skip folders starting with a dot	GrepWindow		Не искать в папках, начинающихся с точки
 Show lines	GrepWindow		Показывать строки

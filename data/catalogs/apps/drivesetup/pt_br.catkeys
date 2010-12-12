@@ -1,5 +1,4 @@
-1	brazilian_portuguese	x-vnd.Haiku-DriveSetup	1611198290
-Are you sure you want to initialize the selected partition? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		Tem certeza que deseja inicializar a partição selecionada? Depois de inserir os parâmetros de inicialização, você poderá cancelar esta operação antes de escrever as mudanças de volta no disco rígido.
+1	brazilian_portuguese	x-vnd.Haiku-DriveSetup	1873447003
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Tem certeza que deseja aplicar todas as alterações agora?\n\nTodos os dados na partição selecionada serão perdidos de forma irrecuperável se continuar!
 Could not aquire partitioning information.	MainWindow		Não foi possível obter informações sobre a divisão em partições
 There's no space on the partition where a child partition could be created.	MainWindow		Não existe espaço suficiente na partição para criar uma partição dentro dela.
@@ -8,7 +7,6 @@ Select a partition from the list below.	DiskView		Selecione a partição a parti
 The selected disk is read-only.	MainWindow		O disco selecionado está marcado como somente leitura
 Failed to initialize the partition. No changes have been written to disk.	MainWindow		Não foi possível inicializar a partição. Nenhuma alteração foi escrita no disco.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Não foi possível apagar a partição. Nenhuma alteração foi escrita no disco.
-Are you sure you want to initialize the partition \"%s\"? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		Tem certeza que deseja inicializar a partição \"%s\"? Depois de inserir os parâmentros de inicilização, você poderá cancelar esta operação antes de escrever as mudanças de volta ao disco.
 There was an error acquiring the partition row.	MainWindow		Ocorreu um erro ao obter a lista de partições a partir do disco.
 You need to select a partition entry from the list.	MainWindow		Você precisa de selecionar uma partição da lista
 The currently selected partition does not have a parent partition.	MainWindow		A partição selecionada não tem uma partição principal.

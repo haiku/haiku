@@ -1,9 +1,7 @@
-1	portuguese	x-vnd.Haiku-NetworkStatus	535806690
+1	portuguese	x-vnd.Haiku-NetworkStatus	10200002
 NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		NetworkStatus opções:nt--deskbartadicionar replicante automaticamente à Deskbarn
 Broadcast information:\n	NetworkStatusView		Informação de difusão:n
 No link	NetworkStatusView		Sem ligação
-Install	NetworkStatus		Instalar
-Do you want NetworkStatus to live in the Deskbar?	NetworkStatus		Quer o NetworkSatus na Deskbar?
 Address information:\n	NetworkStatusView		Informação de endereço:n
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Falha ao iniciar o ... de rede.nnErro:
 NetworkStatus\n\twritten by %1 and Hugo Santos\n\t%2, Haiku, Inc.\n	NetworkStatusView		NetworkStatusntescrito por %1 e 
@@ -17,6 +15,5 @@ Configuring	NetworkStatusView		A configurar
 Address	NetworkStatusView		Endereço
 OK	NetworkStatusView		OK
 Open network preferences…	NetworkStatusView		Abrir preferências de rede...
-Don't	NetworkStatus		Não
 Quit	NetworkStatusView		Sair
 Netmask information:\n	NetworkStatusView		Informação de máscara de rede:n

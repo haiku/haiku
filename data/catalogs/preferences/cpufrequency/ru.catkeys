@@ -1,6 +1,6 @@
 1	russian	x-vnd.Haiku-CPUFrequencyPref	4060072235
-Ok	Status view		ОК
-CPU frequency status view	CPU Frequency View		Просмотр состояния частоты ЦП
+Ok	Status view		Ок
+CPU frequency status view	CPU Frequency View		Представление состояния частоты ЦП
 Set state	Status view		Выбрать состояние
 Defaults	Pref Window		По умолчанию
 Install replicant into Deskbar	CPU Frequency View		Установить репликант в Deskbar
@@ -12,9 +12,9 @@ Step up by CPU usage	Color Step View		Шаг вверх по производи�
 Dynamic stepping	CPU Frequency View		Динамическое изменение
 Stepping policy: 	CPU Frequency View		Настройка шага изменения частоты ЦП:
 Integration time [ms]: 	CPU Frequency View		Время интеграции [мс]:
-Open Speedstep preferences…	Status view		Настроить частоту процессора…
+Open Speedstep preferences…	Status view		Открыть настройки SpeedStep
 Revert	Pref Window		Вернуть
 Low energy	Status view		Экономия энергии
 Launching the CPU frequency preflet failed.\n\nError: 	Status view		Не удалось запустить настройки частоты ЦП.\n\nОшибка:
-CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPUFrequency\n\tразработал Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
+CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPUFrequency\n\tразработан Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
 CPU Frequency	Main window		Частота процессора 

@@ -1,4 +1,4 @@
-1	french	x-vnd.Be-PSRV	548014807
+1	french	x-vnd.Be-PSRV	2610534267
 Undefined	ConfigWindow		Indéfini
 Cancel	PrintServerApp		Annuler
 Page setup:	ConfigWindow		Réglages de page :
@@ -9,13 +9,11 @@ Would you like to set one up now?	PrintServerApp		Voulez-vous en installer un ma
 Portrait	ConfigWindow		Portrait
 All pages	ConfigWindow		Toutes les pages
 There is no default printer set up.	PrintServerApp		Aucune imprimante par défaut n'est définie.
-There already exists a printer you are going to create, but it's driver could not be found! Replace?	PrintServerApp		Il existe déjà une imprimante identique à celle que vous allez créer, sauf que son pilote n'a pas pu être trouvé ! Remplacer cette imprimante ?
 Printer:	ConfigWindow		Imprimante :
 Select a printer	ConfigWindow		Choisir une imprimante
 No	PrintServerApp		Non
 Landscape	ConfigWindow		Paysage
 There are no printers set up.	PrintServerApp		Aucune imprimante n'est installée.
-There already exists a printer you are going to create, but it's not usable at all! Replace?	PrintServerApp		Il existe déjà une imprimante identique à celle que vous allez créer, mais elle est inutilisable ! Remplacer cette imprimante ?
 OK	PrintServerApp		OK
 Print setup	ConfigWindow		Réglages d'impression
 Would you like to make @ the default printer?	PrintServerApp		Voudriez-vous faire de @, l'imprimante par défaut ?
@@ -29,6 +27,7 @@ B5	ConfigWindow	ISO 216 paper size	B5
 A0	ConfigWindow	ISO 216 paper size	A0
 Letter	ConfigWindow	ANSI A (letter), a North American paper size	Lettre
 A2	ConfigWindow	ISO 216 paper size	A2
+Show configuration window	PrintServerApp Scripting		Afficher la fenêtre de configuration
 A4	ConfigWindow	ISO 216 paper size	A4
 A1	ConfigWindow	ISO 216 paper size	A1
 A3	ConfigWindow	ISO 216 paper size	A3

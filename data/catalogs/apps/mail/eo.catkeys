@@ -1,0 +1,82 @@
+1	esperanto	x-vnd.Be-MAIL	327779163
+%d - Date	Mail		%d - Dato
+Attach attributes:	Mail		Aldoni atributojn:
+Inconsistency occurred in the undo/redo buffer.	Mail		Nekonsekvenco okazis en la malfara/refara bufro.
+An error occurred trying to save the attachment.	Mail		Eraro okazis dum la konservado de la kunsendaĵo.
+Copy to new	Mail		Kopii al novo
+Edit	Mail		Redakti
+Print	Mail		Printi
+New mail message	Mail		Nova mesaĝo
+Automatically mark mail as read:	Mail		Aŭtomate marki mesaĝojn kiel legitaj:
+Colored quotes:	Mail		Koloraj citaĵoj:
+Subject:	Mail		Temo:
+Reply to all	Mail		Respondi al ĉiuj
+Show icons & labels	Mail		Montri bildetojn kaj etikedojn
+Remove attachment	Mail		Forigi kunsendaĵon
+Button bar:	Mail		Butonaro:
+Beginner	Mail		Komencanto
+Don't save	Mail		Ne konservi
+Expert	Mail		Sperto
+Reply account:	Mail		Responda konto:
+Discard	Mail		Forĵeti
+Message	Mail		Mesaĝo
+Reply to sender	Mail		Respondi al sendinto
+There is no installed handler for URL links.	Mail		Neniu traktilo estas instalita pro URL-aj ligiloj.
+Signature	Mail		Subskribo
+Find again	Mail		Retrovi
+Bcc:	Mail		Blindkopio:
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Via ĉefa teksto enhavas %ld malkodeblajn signojn. Eble alia signaro pli bone taŭgus. Klaku al \"Sendi\" pro sendi ĝin malgraŭe (anstatŭa signo uziĝos pro la malkodeblaj), aŭ elektu Rezigni pro retroiri kaj ĝustigi tion.
+Signature:	Mail		Subskribo:
+Save changes to this signature?	Mail		Ĉu vi volas konservi la ŝanĝojn al la subskribo?
+Cc:	Mail		Kopio:
+Find	Mail		Trovi
+Preferences…	Mail		Agordoj…
+Undo	Mail		Malfari
+Leave as New	Mail		Lasi kiel Nova
+An error occurred trying to open this signature.	Mail		Eraro okazis dum la malfarmado de la subskribo.
+No file attributes, just plain data	Mail		Sen atributoj, nur kruda datumo
+Edit queries…	Mail		Redakti informmendojn…
+Paste	Mail		Elpoŝigi
+Save attachment…	Mail		Konservi kunsendaĵon…
+Include file attributes in attachments	Mail		Anigi dosierajn atributojn en kunsendaĵoj
+OK	Mail		Bone
+Send	Mail		Sendi
+Show icons only	Mail		Montri nur bildetojn
+Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		La forigado de kunsendaĵoj el plusendita mesaĝo ne jam realiĝis!\nTio ne jam ĝuste funkcios.
+Hide	Mail		Kaŝi
+Forward without attachments	Mail		Plusendi sen kunsendaĵoj
+Previous	Mail		Antaŭa
+Redo	Mail		Refari
+Add enclosure…	Mail		Aldoni kunsendaĵon…
+Print…	Mail		Printi…
+Warn unencodable:	Mail		Averti pri malkodigebleco:
+Quit	Mail		Eliri
+%n - Full name	Mail		%n - Kompleta nomo
+Read 	Mail		Legi
+Trash	Mail		Rubujo
+Default account:	Mail		Apriora konto:
+Size:	Mail		Grandeco:
+Account from mail	Mail		Konto de retpoŝto
+Edit signatures…	Mail		Redakti subskribojn…
+New	Mail		Nova
+Attachments: 	Mail		Kunsendaĵoj: 
+Set to %s	Mail		Ŝanĝi al %s
+Forward	Mail		Malantaŭen
+E-mail draft could not be saved!	Mail		Retpoŝta malneto ne eblas konserviĝi!
+To:	Mail		Al:
+Only files can be added as attachments.	Mail		Nur dosieroj eble esti aldonitaj kiel kunsendaĵoj.
+Previous message	Mail		Antaŭa mesaĝo
+Title:	Mail		Titolo:
+Find…	Mail		Trovi...
+Accounts…	Mail		Kontoj...
+Mail preferences	Mail		Poŝtaj agordoj
+Initial spell check mode:	Mail		Kontroli literumadon de la lanĉo:
+Leave same	Mail		Lasi same
+About Mail…	Mail		Pri Retpoŝto…
+Page setup…	Mail		Paĝa agordo…
+Revert	Mail		Malfari
+None	Mail		Neniu
+Copy link location	Mail		Kopii ligilan lokon en la poŝon
+Show header	Mail		Montri ĉapon
+%e - E-mail address	Mail		%e - Retpoŝta adreso
+Resend	Mail		Resendi

@@ -1,48 +1,17 @@
-1	swedish	x-vnd.Haiku-Locale	1225819117
-Day in month (2 digits)	TimeFormatSettings		dag i månad (2 siffror)
+1	swedish	x-vnd.Haiku-Locale	2023461026
 Available languages	Locale Preflet Window		Tillgängliga språk
-Day of week (name)	TimeFormatSettings		veckodag (namn)
-Separator:	TimeFormatSettings		Separerare:
-Year (4 digits)	TimeFormatSettings		År (4 siffror)
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Kan inte hitta listan över tillgängliga språk! Prefleten kan inte användas!
-Thousand separator: 	TimeFormatSettings		Tusentalsseparerare
-After	TimeFormatSettings		Efter
-Month name	TimeFormatSettings		månadsnamn
 Long format:	TimeFormatSettings		Långt datum:
 Currency	TimeFormatSettings		Valuta
-Before	TimeFormatSettings		Innan
-Year	TimeFormatSettings		År
-Day of week in month	TimeFormatSettings		veckodag i månad
 Short format:	TimeFormatSettings		Kort datum:
-Currency symbol:	TimeFormatSettings		Valutasymbol:
-Space	TimeFormatSettings		Mellanrum
 Language	Locale Preflet Window		Språk
-Month number	TimeFormatSettings		månadsnummer
-Year (2 digits)	TimeFormatSettings		År (2 siffror)
 Preferred languages	Locale Preflet Window		Föredragna språk
-Decimal separator: 	TimeFormatSettings		Decimalseparerare
-Symbol position	TimeFormatSettings		Symbolposition
-Day of week (short name)	TimeFormatSettings		veckodag (kortnamn)
 Numbers	TimeFormatSettings		Nummer
 24 hour	TimeFormatSettings		24 timmar
-(unknown format)	TimeFormatSettings		 (okänt format)
-Negative marker:	TimeFormatSettings		Negativmarkör:
-Day in month	TimeFormatSettings		dag i månad
 Defaults	Locale Preflet Window		Förval
-Separator	TimeFormatSettings		Separerare
-Country	Locale Preflet Window		Land
-Month number (2 digits)	TimeFormatSettings		månadsnummer (2 siffror)
 Revert	Locale Preflet Window		Återgå
-Negative marker	TimeFormatSettings		Negativmarkör
 OK	Locale Preflet Window		Ok
-Day of week	TimeFormatSettings		veckodag
-List separator: 	TimeFormatSettings		Listseparerare
 Time	TimeFormatSettings		Tid
 Date	TimeFormatSettings		Datum
 12 hour	TimeFormatSettings		12 timmar
 Locale	Locale Preflet		Lokalitet
-None	TimeFormatSettings		Ingen
-Example:	TimeFormatSettings		Exempel:
-Day	TimeFormatSettings		Dag
-Leading 0	TimeFormatSettings		Inledande 0
-Month	TimeFormatSettings		Månad

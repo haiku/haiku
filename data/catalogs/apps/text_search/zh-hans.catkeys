@@ -1,7 +1,6 @@
-1	simplified_chinese	x-vnd.Haiku.TextSearch	1190544059
+1	simplified_chinese	x-vnd.Haiku.TextSearch	1663180421
 %s: Not enough room to escape the filename.	Grepper		%s：
 Trim to selection	GrepWindow		缩减选项
-Set which files to search	GrepWindow		设置搜索
 Close	GrepWindow		关闭
 Cancel	GrepWindow		取消
 The unselected files will be removed from the list.	GrepWindow		列表中未选中的文件将被删除。
@@ -29,5 +28,4 @@ Show files in Tracker	GrepWindow		在Tracker中显示文件
 About TextSearch…	GrepWindow		关于文本搜索
 Case-sensitive	GrepWindow		大小写敏感
 Text files only	GrepWindow		仅文本文件
-Skip sub-folders starting with a dot	GrepWindow		忽略隐藏文件
 Show lines	GrepWindow		显示行

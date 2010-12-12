@@ -1,3 +1,34 @@
-1	esperanto	x-vnd.Haiku-About	1121052845
+1	esperanto	x-vnd.Haiku-About	2318986409
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (kaj lia NewOS kerno)\n
 %ld Processors:	AboutView		%ld Procesoroj:
+Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (projekta fundinto)\n\n
+The Haiku-Ports team\n	AboutView		La Haiku-Portantaro\n
+Website, marketing & documentation:\n	AboutView		Retejo, merkatiko kaj dokumentado:\n
+Revision	AboutView		Revizio
+Source Code: 	AboutView		Fonta Kodo: 
+Processor:	AboutView		Procesoro:
+Kernel:	AboutView		Kerno:
+Contributors:\n	AboutView		Kontribuantoj:\n
+Unknown	AboutView		Nekonata
+\n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n…kaj sendube aliaj, kiujn ni forgesis mencii (ni bedaŭras!)\n\n
+%.2f GHz	AboutView		%.2f GHz
+Memory:	AboutView		Memoro:
+Past maintainers:\n	AboutView		Vartintoj:\n
+\n\nSpecial thanks to:\n	AboutView		\n\nDankegon al:\n
+Licenses: 	AboutView		Permesiloj:
+\nCopyrights\n\n	AboutView		\nAŭtorrajtoj\n\n
+Current maintainers:\n	AboutView		Vartantoj:\n
+Time running:	AboutView		Ruldaŭro:
+The Haikuware team and their bounty program\n	AboutView		La Haikuware grupo kaj ilia premia programo\n
+About this system	AboutWindow		Pri la sistemo
+Version:	AboutView		Versio:
+%ld MHz	AboutView		%ld MHz
+[Click a license name to read the respective license.]\n\n	AboutView		[Alklaku la nomon de permesilo pro legi ĝin.]\n\n
+License: 	AboutView		Permesilo:
+Translations:\n	AboutView		Tradukaĵoj:\n
+... and the many people making donations!\n\n	AboutView		...kaj la multaj donacantoj!\n\n
+The BeGeistert team\n	AboutView		La grupo BeGeistert\n
+The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku and the Haiku logo are trademarks of Haiku, Inc.\n\n	AboutView		La aŭtorrajto de la Haiku kodo apartenas al Haiku, Inc. aŭ la respektivaj aŭtoroj, kie oni malimplice notis en la kodo. Haiku kaj la Haiku emblemo estas komerca marko de Haiku, Inc.\n\n
+GCC %d Hybrid	AboutView		GCC %d Hibrido
+%d MiB total	AboutView		%d MiB tute
+%d MiB used (%d%%)	AboutView		%d MiBajtoj uzate (%d%%)

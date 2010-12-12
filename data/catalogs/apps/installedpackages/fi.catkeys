@@ -1,0 +1,11 @@
+1	finnish	x-vnd.Haiku-InstalledPackages	3041446229
+No package selected.	UninstallView		Pakkausta ei ole valittu.
+Remove	UninstallView		Poista
+Installed packages	UninstallWindow		Asennetut pakkaukset
+Close	UninstallApplication		Sulje
+InstalledPackages	UninstallApplication		Pakkausasennukset
+BeOS legacy .pkg package removing application for Haiku.\n\nCopyright 2007,\nŁukasz 'Sil2100' Zemczak\n\nCopyright (c) 2007 Haiku, Inc.\n	UninstallApplication		BeOS legacy .pkg package removing application for Haiku.\n\nCopyright 2007,\nŁukasz 'Sil2100' Zemczak\n\nCopyright (c) 2007 Haiku, Inc.\n
+Package description	UninstallView		Pakkauskuvaus
+The package you selected has been successfully removed from your system.	UninstallView		Valitsemasi pakkauksen poistaminen järjestelmästäsi onnistui.
+OK	UninstallView		Valmis
+The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Valittua pakkausta ei poistettu järjestelmästäsi. Annettu asennettu pakkaustieto voi olla rikkonainen.

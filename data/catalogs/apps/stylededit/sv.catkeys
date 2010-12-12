@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-StyledEdit	1633540788
+1	swedish	x-vnd.Haiku-StyledEdit	3586851820
 OK	LoadAlert		Okej
 ???	LoadAlert		???
 Left	Menus		Vänster
@@ -6,7 +6,6 @@ Revert to the last version of \"%s\"? 	RevertToSavedAlert		Återgå till den sen
 Search backwards	FindandReplaceWindow		Sök baklänges
 Size	Menus		Storlek
 Save	QuitAlert		Spara
-Redo typing	Menus		Skriv om
 Replace same	Menus		Ersätt samma
 Can't Undo	Menus		Kan inte ångra
 Save	Menus		Spara
@@ -41,7 +40,6 @@ Find selection	Menus		Hitta val
 Find:	FindandReplaceWindow		Hitta:
 Error saving \"%s\":\n%s	SaveAlert		Kunde inte spara \"%s\":\n%s
 Replace	FindandReplaceWindow		Ersätt
-Undo typing	Menus		Ångra inmatning
 Find again	Menus		Sök igen
 Cancel	QuitAlert		Avbryt
 Find…	Menus		Hitta…

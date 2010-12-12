@@ -1,0 +1,27 @@
+1	esperanto	x-vnd.Haiku-bootman	232120639
+The boot manager has been successfully installed on your system.	BootManagerController		La praŝarga administrilo sukcese instaliĝis en la sistemo.
+At least one partition must be selected!	BootManagerController		Almenaŭ unu subdisko devas esti elektita.
+The old Master Boot Record could not be saved to %s	BootManagerController		La malnova ĉefa ŝargodosiero ne povis konserviĝi al %s
+The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		La malnova ĉefa ŝargodosiero (MBR) de la praŝarga aparato:\n\t%s\nnun konserviĝos al disko. Bonvolu elekti dosieron al kiu konservi la MBR.\n\nSe la instalado malsukcesas aŭ se vi estonte volas forigi la praŝargan administrilon, nur lanĉu la bootman programon kaj elektu la opcion 'Malinstali'.
+Select	FileSelectionPage	Button	Elekti
+Next	BootManagerController	Button	Sekva
+Previous	WizardView	Button	Antaŭa
+OK	BootManager		Bone
+Unknown	LegacyBootDrive	Text is shown for an unknown partition type	Nesciata
+Default Partition	DefaultPartitionPage	Title	Apriora Subdisko
+Error reading partition table	BootManagerController	Title	Eraro de la lego de la diskindekso
+About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Konservonte la praŝargan administrilon al la disko. Ĉu vi certas, ke vi volas daŭrigi?
+OK	BootManagerController	Button	Bone
+Backup Master Boot Record	BootManagerController	Title	Sekurkopiado de la Ĉefa Ŝargodosiero
+Haiku Boot Manager	BootManager	About text title	Praŝarga Administrilo de Haiku
+written by	BootManager		skribita per
+Copyright %year, Haiku Inc.\n	BootManager	Leave %year untranslated	Kopirajto %year, Haiku Inc.\n
+After two seconds	DefaultPartitionPage		Post du sekondoj
+Timeout: %s	DefaultPartitionPage		Tempolimo: %s
+After four seconds	DefaultPartitionPage		Post kvar sekondoj
+After one second	DefaultPartitionPage		Post unu sekondo
+After one minute	DefaultPartitionPage		Post unu minuto
+After five seconds	DefaultPartitionPage		Post kvin sekondoj
+Never	DefaultPartitionPage		Neniam
+Immediately	DefaultPartitionPage		Tuj
+After three seconds	DefaultPartitionPage		Post tri sekondoj

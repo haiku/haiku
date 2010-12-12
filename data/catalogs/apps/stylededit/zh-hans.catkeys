@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Haiku-StyledEdit	1187976595
+1	simplified_chinese	x-vnd.Haiku-StyledEdit	3141287627
 OK	LoadAlert		确定
 ???	LoadAlert		???
 Left	Menus		居左
@@ -6,7 +6,6 @@ Revert to the last version of \"%s\"? 	RevertToSavedAlert		恢复到最后一个
 Search backwards	FindandReplaceWindow		后台搜索
 Size	Menus		大小
 Save	QuitAlert		保存
-Redo typing	Menus		重复输入
 Replace same	Menus		替换相同的
 Can't Undo	Menus		无法撤销
 Save	Menus		保存
@@ -42,7 +41,6 @@ Find selection	Menus		搜索选中
 Find:	FindandReplaceWindow		查找：
 Error saving \"%s\":\n%s	SaveAlert		保存\"%s\"出错:\n%s
 Replace	FindandReplaceWindow		替换
-Undo typing	Menus		撤销输入
 Find again	Menus		再次查找
 Cancel	QuitAlert		取消
 Find…	Menus		查找…

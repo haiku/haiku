@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-StyledEdit	154881138
+1	german	x-vnd.Haiku-StyledEdit	2108192170
 OK	LoadAlert		OK
 ???	LoadAlert		???
 Left	Menus		Links
@@ -6,7 +6,6 @@ Revert to the last version of \"%s\"? 	RevertToSavedAlert		Letzte Version von \"
 Search backwards	FindandReplaceWindow		Rückwärts suchen
 Size	Menus		Größe
 Save	QuitAlert		Speichern
-Redo typing	Menus		Wiederholen: Eingabe
 Replace same	Menus		Erneut ersetzen
 Can't Undo	Menus		Rückgängig nicht möglich
 Save	Menus		Speichern
@@ -42,7 +41,6 @@ Find selection	Menus		Auswahl suchen
 Find:	FindandReplaceWindow		Suche:
 Error saving \"%s\":\n%s	SaveAlert		Fehler beim Speichern von "%s":\n%s
 Replace	FindandReplaceWindow		Ersetze
-Undo typing	Menus		Rückgängig: Eingabe
 Find again	Menus		Weitersuchen
 Cancel	QuitAlert		Abbrechen
 Find…	Menus		Suchen…

@@ -1,18 +1,16 @@
-1	polish	x-vnd.Haiku-Touchpad	3077633033
+1	polish	x-vnd.Haiku-Touchpad	1498191605
 Scrolling	TouchpadPrefView		Przewijanie
 Revert	TouchpadPrefView		Przywróć
 Two finger scrolling	TouchpadPrefView		Przewijanie dwoma palcami
 Defaults	TouchpadPrefView		Domyślne
 Slow	TouchpadPrefView		Wolno
-Horizontal scroll step size	TouchpadPrefView		Rozmiar kroku przewijania poziomego
 High	TouchpadPrefView		Wysoka
 Tap gesture	TouchpadPrefView		Gest dotyku
 Horizontal scrolling	TouchpadPrefView		Poziome przewijanie
-Wide	TouchpadPrefView		Szeroki
 Fast	TouchpadPrefView		Szybko
 Tap click sensitivity	TouchpadPrefView		Czułośc stuknięcia
 Scroll acceleration	TouchpadPrefView		Przyspieszenie przewijania
-Vertical scroll step size	TouchpadPrefView		Rozmiar kroku przewijania pionowego
 Off	TouchpadPrefView		Wyłącz
-Small	TouchpadPrefView		Mały
 Touchpad	TouchpadMain		Touchpad
+Horizontal scroll speed	TouchpadPrefView		Prędkość przewijania w poziomie
+Vertical scroll speed	TouchpadPrefView		Prędkość przewijania w pionie

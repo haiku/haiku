@@ -1,0 +1,28 @@
+1	esperanto	x-vnd.Haiku-DriveSetup	2637191485
+Delete	MainWindow		Forviŝi
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Ĉu vi estas certa, ke vi volas registri la ŝanĝojn al disko nun?\n\nĈiom da la datumo en la elektita subdisko nereigeble perdiĝos se vi faras tion!
+Rescan	MainWindow		Reskani
+OK	MainWindow		Bone
+<empty>	DiskView		<malplena>
+Partition name:	CreateParamsPanel		Subdiska nomo:
+Partition type:	CreateParamsPanel		Subdisktipo:
+Error: 	MainWindow	in any error alert	Eraro: 
+Partition %ld	DiskView		Subdisko %ld
+Mounted at	PartitionList		Muntita ĉe
+Write changes	MainWindow		Registri la ŝanĝojn
+Create…	MainWindow		Krei…
+Mount	MainWindow		Munti
+Create	CreateParamsPanel		Krei
+Device	DiskView		Aparato
+Disk	MainWindow		Disko
+Volume name	PartitionList		Volumnomo
+Continue	MainWindow		Daŭri
+Mount all	MainWindow		Munti ĉiujn
+Cancel	CreateParamsPanel		Nuligi
+End: %ld MB	Support		Fino: %ld MB
+Partition	MainWindow		Subdisko
+Size	PartitionList		Grandeco
+Partition size	CreateParamsPanel		Subdiska grandeco
+Unmount	MainWindow		Malmunti
+<empty>	PartitionList		<malplena>
+Cancel	InitParamsPanel		Nuligi

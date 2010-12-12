@@ -1,12 +1,21 @@
-1	french	x-vnd.Haiku-Mail	3191822430
+1	french	x-vnd.Haiku-Mail	3449555026
+Select account type	Config Views		Sélectionnez le type de compte
+Mail checking	Config Window		Vérification des mails
 Settings	Config Window		Réglages
 days	Config Window		jours
-Start mail services on startup	Config Window		Lancer le service de messagerie au démarrage
 Account name:	Config Views		Nom du compte :
 OK	Config Views		OK
+Revert	Config Window		Annuler
+Accounts	Config Window		Comptes
+Account type:	Config Views		Type de compte :
+Remove	Config Window		Supprimer
+Miscellaneous	Config Window		Divers
 hours	Config Window		heures
 Add	Config Window		Ajouter
-E-mail	Account		Courriel
+Send mail only	Config Views		Envoi des mails uniquement
+Return address:	Config Views		Adresse de réponse :
+never	Config Window		jamais
+Account settings	Config Views		Réglages du compte
 minutes	Config Window		minutes
 OK	Account		OK
 Apply	Config Window		Appliquer

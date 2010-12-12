@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Be-TSKB	2686533917
+1	finnish	x-vnd.Be-TSKB	34208151
 Applications	PreferencesWindow		Sovellukset
 Recent applications	BeMenu		Äskettäiset sovellukset
 Edit menu…	PreferencesWindow		Muokkaa valikkoa...
@@ -15,7 +15,6 @@ Show all	WindowMenu		Näytä kaikki
 No windows	WindowMenu		Ei ikkunoita
 Power off	BeMenu		Katkais virta
 Auto-raise	PreferencesWindow		Nosta automaattisesti
-Full date	PreferencesWindow		Koko päivämäärä
 Hide time	TimeView		Piilota aika
 Recent folders:	PreferencesWindow		Äskettäiset kansiot:
 Deskbar preferences…	BeMenu		Työpöytäpalkin asetukset...

@@ -1,48 +1,17 @@
-1	hungarian	x-vnd.Haiku-Locale	1225819117
-Day in month (2 digits)	TimeFormatSettings		Hónap napja (két számjeggyel)
+1	hungarian	x-vnd.Haiku-Locale	2023461026
 Available languages	Locale Preflet Window		Elérhető nyelvek
-Day of week (name)	TimeFormatSettings		A hét napja (név)
-Separator:	TimeFormatSettings		Elválasztó:
-Year (4 digits)	TimeFormatSettings		Év (négy számjeggyel)
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Nem található a nyelvi fájl! Sajnos így a beállítópanel nem használható!
-Thousand separator: 	TimeFormatSettings		Ezres elválasztó
-After	TimeFormatSettings		Utána
-Month name	TimeFormatSettings		Hónap neve
 Long format:	TimeFormatSettings		Hosszú alak:
 Currency	TimeFormatSettings		Pénznem
-Before	TimeFormatSettings		Elé
-Year	TimeFormatSettings		Év
-Day of week in month	TimeFormatSettings		A hét napja a hónapban
 Short format:	TimeFormatSettings		Rövid alak:
-Currency symbol:	TimeFormatSettings		Pénznem jele:
-Space	TimeFormatSettings		Szóköz
 Language	Locale Preflet Window		Nyelv
-Month number	TimeFormatSettings		Hónap száma
-Year (2 digits)	TimeFormatSettings		Év (két számjeggyel)
 Preferred languages	Locale Preflet Window		Előnyben részesített nyelvek
-Decimal separator: 	TimeFormatSettings		Tizedesjel
-Symbol position	TimeFormatSettings		Jel helye
-Day of week (short name)	TimeFormatSettings		A hét napja (rövid forma)
 Numbers	TimeFormatSettings		Számok
 24 hour	TimeFormatSettings		24-órás
-(unknown format)	TimeFormatSettings		 (ismeretlen alak)
-Negative marker:	TimeFormatSettings		Negatív előjel:
-Day in month	TimeFormatSettings		Hónap napja
 Defaults	Locale Preflet Window		Alapértelmezés
-Separator	TimeFormatSettings		Elválasztó
-Country	Locale Preflet Window		Ország
-Month number (2 digits)	TimeFormatSettings		Hónap száma (két számjeggyel)
 Revert	Locale Preflet Window		Visszaállítás
-Negative marker	TimeFormatSettings		Negatív előjel
 OK	Locale Preflet Window		Ok
-Day of week	TimeFormatSettings		A hét napja
-List separator: 	TimeFormatSettings		Listaelválasztó
 Time	TimeFormatSettings		Idő
 Date	TimeFormatSettings		Dátum
 12 hour	TimeFormatSettings		12-órás
 Locale	Locale Preflet		Nyelvi beállítások
-None	TimeFormatSettings		Semmi
-Example:	TimeFormatSettings		Példa:
-Day	TimeFormatSettings		Nap
-Leading 0	TimeFormatSettings		Vezető nullák
-Month	TimeFormatSettings		Hónap

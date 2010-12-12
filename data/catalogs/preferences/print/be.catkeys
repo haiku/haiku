@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Be-PRNT	634957092
+1	belarusian	x-vnd.Be-PRNT	980664982
 Waiting	JobListView		Чакае
 page	JobListView		старонка
 Cancel	AddPrinterDialog		Скасаваць
@@ -25,3 +25,5 @@ Print jobs: No printer selected	PrintersWindow		Заданні: Няма абр�
 Unknown status	JobListView		Статус невядомы
 Connected to:	AddPrinterDialog		Далучана да:
 Printer type:	AddPrinterDialog		Тып друкаркі:
+pending jobs.	PrinterListView		заданні ў працэсе.
+No printer found!	TransportMenu		Няма прынтэраў!

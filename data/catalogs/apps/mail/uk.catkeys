@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Be-MAIL	3027629068
+1	ukrainian	x-vnd.Be-MAIL	1685878103
 %d - Date	Mail		%d - Дата
 Attach attributes:	Mail		Додати атрибути:
 Inconsistency occurred in the undo/redo buffer.	Mail		Невідповідність У буфері відміни/заміни
@@ -52,6 +52,7 @@ Print…	Mail		Друкувати…
 Warn unencodable:	Mail		Увага нерозкодоване:
 Quit	Mail		Завершити
 %n - Full name	Mail		%n - Повне ім'я
+Read 	Mail		Читати
 Trash	Mail		Кошик
 Default account:	Mail		Аккаунт по замовчуванню:
 Size:	Mail		Розмір:
@@ -136,3 +137,8 @@ Select all	Mail		Виділити все
 An error occurred trying to save this signature.	Mail		Помилка при збереженні цього підпису.
 View	Mail		Вигляд
 Mail couldn't find its dictionary.	Mail		Пошта не може знайти цього словника.
+Mail\n\n	Mail		Пошта\n\n
+Written by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Автор Robert Polic.\nПокращення команди Dr. Zoidberg .\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n
+Text wrapping:	Mail		Обтікання тексту:
+File	Mail		Файл
+Mail	Mail		Пошта

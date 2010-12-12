@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-About	3104596334
+1	korean	x-vnd.Haiku-About	326778460
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (그리고 그가 개발한 NewOS 커널)\n
 %ld Processors:	AboutView		%ld 프로세서:
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (프로젝트 창시자)\n\n
@@ -27,7 +27,6 @@ Version:	AboutView		버젼:
 License: 	AboutView		라이센스: 
 Translations:\n	AboutView		번역자:\n
 ... and the many people making donations!\n\n	AboutView		...그리고 많은 사람들이 기부를 했습니다!\n\n
-Google & their Google Summer of Code program\n\n	AboutView		Google 과 Google Summer of Code 프로그램\n\n
 The BeGeistert team\n	AboutView		BeGeistert 팀\n
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku and the Haiku logo are trademarks of Haiku, Inc.\n\n	AboutView		Haiku 코드의 저작권은 Haiku 주식회사나 각각의 소스에 기록된 만든 이에게 있습니다. Haiku 와 Haiku 로고는 Haiku 주식회사의 등록 상표입니다.\n\n
 GCC %d Hybrid	AboutView		GCC %d 하이브리드

@@ -1,0 +1,56 @@
+1	esperanto	x-vnd.Haiku-BluetoothPrefs	912779521
+About Bluetooth…	Window		Pri Bluetooth…
+Handheld	Settings view		Poŝkomputilo
+Default inquiry time:	Settings view		Apriora informmenda tempo:
+Add device to list	Inquiry panel		Aldoni la aparaton al liston
+Starting scan...	Inquiry panel		Ekskanante...
+Show bluetooth console…	Window		Montri bluetooth-an konzolon…
+Smart phone	Settings view		Sprittelefono
+seconds	Inquiry panel		sekundoj
+Server	Window		Servilo
+Stop bluetooth services…	Window		Halti bluetooth-ajn servojn…
+Identify host as:	Settings view		Identigi la gastigon kiel:
+View	Window		Vido
+Refresh…	Remote devices		Reŝarĝi…
+Pair…	Remote devices		Parigi…
+Incoming connections policy:	Settings view		Reĝimo de enigantaj koneskadoj:
+From all devices	Settings view		El ĉiom da aparatoj
+Show name	Extended local device view		Montri la nomon
+Local devices found on system:	Settings view		Lokaj aparatoj trovitaj en la sistemo:
+Scanning completed.	Inquiry panel		La skanado finis.
+Remote devices	Window		Foraj aparatoj
+Remove	Remote devices		Forviŝi
+15 secs	Settings view		15 sekondoj
+Start bluetooth services…	Window		Eki bluetooth-ajn servojn…
+Policy...	Settings view		Reĝimo...
+61 secs	Settings view		61 sekondoj
+There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Neniu Bluetooth-a loka aparato estas registrita en la sistemo.
+Identify us as...	Settings view		Identigi nin kiel...
+Remaining 	Inquiry panel		Ankoraŭ
+As blocked	Remote devices		Kiel barata
+Pick LocalDevice...	Settings view		Elektu lokan aparaton...
+Defaults	Window		Aprioraj
+Inquiry	Inquiry panel		Informmendo
+Desktop	Settings view		Labortablo
+Revert	Window		Malfari
+Remote devices list…	Window		Foraparata listo…
+Laptop	Settings view		Tekkomputilo
+Retrieving name of 	Inquiry panel		Trovante la nomon de
+Bluetooth	Window		Bluetooth
+Discoverable	Extended local device view		Trovebla
+Service classes: 	Device View		Servaj klasoj:
+Connections & channels…	Window		Koneksadoj kaj kanaloj:
+Refresh LocalDevices…	Window		Reŝarĝi lokajn aparatojn…
+Settings	Window		Agordoj
+Only from trusted devices	Settings view		Nur el fidaj aparatoj
+Scanning progress	Inquiry panel		Skanada progreso
+Always ask	Settings view		Ĉiam demandi
+Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Certigu, ke la Bluetooth-aj ebloj de la fora aparato ŝaltiĝis. Klaku al 'Informmendo' pro ekskani. La tempo bezonata pro la ricevado de la nomojn ne estas sciata, sed tio ne devas daŭri pli da 3 sekondoj per aparato. Poste, vi eblos aldoni ilin al vian ĉefan liston, kie vi eblos parigi kun ili.
+Retrieving names...	Inquiry panel		Ricevante nomojn...
+Help	Window		Helpo
+Add…	Remote devices		Aldoni…
+Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Haiku-a Bluetooth-a sistemo, (ARCE)\n\nKreita per Oliver Ruiz Dorantes\n\nKun la helpo de:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nDankojn al tiuj, kiuj helpis...\n\nTransportado kaj donado de aparatoj:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nFonduse:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nKun flikaĵoj:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nPravado:\n\t- Petter H. Juliussen\nKiuj tute sciigi al mi:\n\t- la yellowTAB aro
+Server	Settings view		Servilo
+OK	main		Bone
+Disconnect	Remote devices		Malkonksi
+Authenticate	Extended local device view		Aŭtentokontroli

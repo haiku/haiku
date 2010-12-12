@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-StyledEdit	154881138
+1	lithuanian	x-vnd.Haiku-StyledEdit	2108192170
 OK	LoadAlert		Gerai
 ???	LoadAlert		???
 Left	Menus		Kairėn
@@ -6,7 +6,6 @@ Revert to the last version of \"%s\"? 	RevertToSavedAlert		Grįžti prie paskuti
 Search backwards	FindandReplaceWindow		Ieškoti viršun
 Size	Menus		Dydis
 Save	QuitAlert		Išsaugoti
-Redo typing	Menus		Grąžinti
 Replace same	Menus		Keisti vienodus
 Can't Undo	Menus		Neatšaukiama
 Save	Menus		Išsaugoti
@@ -42,7 +41,6 @@ Find selection	Menus		Rasti žymėtą
 Find:	FindandReplaceWindow		Rasti:
 Error saving \"%s\":\n%s	SaveAlert		Klaida išsaugojant „%s“:\n%s
 Replace	FindandReplaceWindow		Pakeisti
-Undo typing	Menus		Atšaukti
 Find again	Menus		Rasti dar
 Cancel	QuitAlert		Atsisakyti
 Find…	Menus		Rasti…

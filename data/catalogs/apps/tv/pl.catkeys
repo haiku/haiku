@@ -1,0 +1,30 @@
+1	polish	x-vnd.Haiku.TV	3791845041
+TV	MainWin		Telewizja
+Channel	MainWin		Kanał
+Settings…	MainWin		Ustawienia...
+Interface	MainWin		Interfejs
+Keep aspect ratio	MainWin		Utrzymaj proporcje
+Previous channel	MainWin		Poprzedni kanał
+Settings	MainWin		Ustawienia
+About %1…	MainWin	Parameter %1 is the name of the application.	O %1…
+No border	MainWin		Bez ramki
+Always on top	MainWin		Zawsze na wierzchu
+OK	MainWin		OK
+Quit	MainWin		Wyjdź
+Full screen	MainWin		Pełen ekran
+\nRevision 	MainWin		\nRewizja
+Debug	MainWin		Debuguj
+Scale to native size	MainWin		Zeskaluj do natywnego rozmiaru
+unknown	MainWin		nieznany
+Next channel	MainWin		Następny kanał
+Error, interface is busy:\n\n	MainWin		Błąd, zajęty interfejs:\n\n
+None	MainWin		Puste
+force 704 x 576, display aspect 4:3	MainWin		wymuś 704 x 576, proporcje 4:3
+DVB - Digital Video Broadcasting TV	MainWin		DVB - Digital Video Broadcasting TV
+force 544 x 576, display aspect 4:3	MainWin		wymuś 544 x 576, proporcje 4:3
+pixel aspect ratio	MainWin		Proporcje pikseli
+No menu	MainWin		Bez menu
+\nBuild 	MainWin		\nBuild
+Error, connecting to interface failed:\n\n	MainWin		Błąd, nie można podłączyć interfejsu:\n\n
+\nVersion 	MainWin		\nWersja
+force 720 x 576, display aspect 4:3	MainWin		wymuś 720 x 576, proporcje 4:3

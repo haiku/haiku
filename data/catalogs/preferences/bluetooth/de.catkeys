@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-BluetoothPrefs	455630337
+1	german	x-vnd.Haiku-BluetoothPrefs	3931795142
 About Bluetooth…	Window		Über Bluetooth…
 Handheld	Settings view		Handheld
 Default inquiry time:	Settings view		Suchdauer:
@@ -13,7 +13,6 @@ Identify host as:	Settings view		Agieren als:
 View	Window		Informationen
 Refresh…	Remote devices		Aktualisieren…
 Pair…	Remote devices		Pair…
-Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t & Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\n\t- Adrien Destugues\n\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Haiku bluetooth system, (ARCE)\n\nErstellt von Oliver Ruiz Dorantes.\n\nMit Unterstützung von:\n\t- Mika Lindqvist\n\t- Maksym Yevmenkin\n\nDank an die Helfer für...\n\ndie Bereitstellung von Hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t & Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nfinanzielle Unterstützung:\n\t- Karl vom Dorff (OSDrawer),\n\t- Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W.\n\nPatch-Beiträge:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynal Lesieur\n\t- Andreas Färber\n\t- Joer Meyer\n\Tests:\n\t- Petter H. Juliussen\n\t- Adrien Destugues\n\ndas Vermitteln des notwendigen Wissens:\n\t- Das yellowTAB team
 Incoming connections policy:	Settings view		Verbindungen annehmen:
 From all devices	Settings view		Alle
 Show name	Extended local device view		Namen anzeigen
@@ -51,5 +50,4 @@ Retrieving names...	Inquiry panel		Empfangen der Namen...
 Help	Window		Hilfe
 Add…	Remote devices		Hinzufügen…
 Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Haiku Bluetooth system, (ARCE)\n\nGeschrieben von Oliver Ruiz Dorantes\n\nUnterstützt durch:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nDanke an alle, die geholfen haben...\n\nVersand/Spende von Hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nFinanziell:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nMit Patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTest:\n\t- Petter H. Juliussen\nDas ganze Wissen bekam ich von:\n\t- yellowTAB Team
- seconds	Inquiry panel		Sekunden
 Server	Settings view		Server

@@ -1,18 +1,29 @@
-1	french	x-vnd.Haiku-Shortcuts	2748280357
+1	french	x-vnd.Haiku-Shortcuts	3911007696
+MoveMouse	ShortcutsSpec		BougeSouris
 OK	ShortcutsWindow		OK
 Cancel	ShortcutsWindow		Annuler
 Control	ShortcutsSpec	Name for modifier on keyboard	Contrôle
 Key	ShortcutsWindow		Touche
 Shortcuts\n\nBased on SpicyKeys for BeOS made by Jeremy Friesner.	ShortcutsApp		Raccourcis\n\nBasé sur SpicyKeys pour BeOS, écrit par Jeremy Friesner.
+MouseUp	ShortcutsSpec		SourisEnHaut
+Revert to saved	ShortcutsWindow		Revenir à la version enregistrée
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 Shortcuts	ShortcutsWindow		Raccourcis
+*MouseUp	ShortcutsWindow		*SourisEnHaut
 Window	ShortcutsSpec	Name for modifier on keyboard	Fenêtre
 Save	ShortcutsWindow		Enregistrer
+MouseDown	ShortcutsSpec		SourisEnBas
+MouseButton	ShortcutsSpec		BoutonSouris
+Add new shortcut	ShortcutsWindow		Ajouter un nouveau raccourci
 Save & apply	ShortcutsWindow		sauver et appliquer
 OK	ShortcutsApp		OK
+File	ShortcutsWindow		Fichier
 Quit	ShortcutsWindow		Quitter
+*MouseDown	ShortcutsWindow		*SourisEnBas
+Don't save	ShortcutsWindow		Ne pas enregistrer
 Application	ShortcutsWindow		Application
 Shift	ShortcutsSpec	Name for modifier on keyboard	Majuscule
+*Beep	ShortcutsWindow		*Bip
 Open	ShortcutsWindow		Ouvrir
 Select	ShortcutsWindow		Sélectionner
 About Shortcuts	ShortcutsWindow		À propos de Shortcuts

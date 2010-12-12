@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-ShowImage	2071534767
+1	japanese	x-vnd.Haiku-ShowImage	3986770096
 Use as background…	Menus		デスクトップの背景にする…
 5 seconds	Menus		５秒
 Slide delay	Menus		スライド間隔
@@ -11,7 +11,6 @@ Full screen	Menus		全画面表示
 Go to page	Menus		指定ページへ
 Zoom out	Menus		ズームアウト
 20 seconds	Menus		２０秒
-Invert colors	Menus		カラー反転
 3 seconds	Menus		３秒
 Rotate counterclockwise	Menus		反時計まわりに 90° 回転
 10 seconds	Menus		１０秒
@@ -22,33 +21,23 @@ Could not load image! Either the file or an image translator for it does not exi
 First page	Menus		最初のページ
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		「%s」の %d ページが変更されました。それでもファイルを閉じますか？
 About ShowImage…	Menus		ShowImage について…
-Open	Menus		開く
-OK	LoadAlerts		Ok
 Close	ClosePrompt		閉じる
-Height:	ResizerWindow		高さ：
 Undo	Menus		元に戻す
 Resize to (in 1/72 inches):	PrintOptionsWindow		リサイズ (1/72 インチ)：
-Apply	ResizerWindow		適用
-Keep original proportions	ResizerWindow		元の比率を維持
 9 seconds	Menus		９秒
 Flip left to right	Menus		左右反転
 Show caption in full screen mode	Menus		全画面表示モードでキャプションを表示
 DPI:	PrintOptionsWindow		解像度 (DPI)：
 Next file	Menus		次のファイル
 4 seconds	Menus		４秒
-Zoom to window	Menus		ウィンドウサイズに拡大
 Close document	ClosePrompt		ファイルを閉じる
-ShowImage	LoadAlerts		ShowImage
 Height: 	PrintOptionsWindow		高さ：
 Cancel	ClosePrompt		中止
-Resize…	Menus		リサイズ…
 Print options	PrintOptionsWindow		印刷オプション
-Width:	ResizerWindow		幅：
 ShowImage	AboutWindow		ShowImage
 7 seconds	Menus		７秒
 Last page	Menus		最後のページ
 Previous file	Menus		前のファイル
-Resize	ResizerWindow		リサイズ
 Slide show	Menus		スライドショー
 Fit image to page	PrintOptionsWindow		画像を用紙サイズにあわせる
 Flip top to bottom	Menus		上下反転
@@ -59,19 +48,15 @@ Rotate clockwise	Menus		時計まわりに 90° 回転
 Job setup	PrintOptionsWindow		ジョブ設定
 Original size	Menus		原寸に戻す
 Next page	Menus		次のページ
-Shrink to window	Menus		ウィンドウサイズに縮小
 OK	SaveToFile		Ok
 The file '%s' could not be written.	SaveToFile		画像ファイル「%s」を保存できませんでした。
 Progress monitor	ProgressWindow		進捗状況モニター
-Paste	Menus		貼り付け
 File	Menus		ファイル
 Page setup…	Menus		ページ設定…
 Print…	Menus		印刷…
 Quit	Menus		終了
-Clear	Menus		クリアー
 Edit	Menus		編集
 Close	Menus		閉じる
 Copy	Menus		コピー
-Cut	Menus		切り取り
 Select all	Menus		すべて選択
 Save as…	Menus		ファイル形式を選んで保存…

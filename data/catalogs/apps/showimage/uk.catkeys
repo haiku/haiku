@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-ShowImage	249555060
+1	ukrainian	x-vnd.Haiku-ShowImage	887077117
 Use as background…	Menus		Використати як фон…
 5 seconds	Menus		5 сек.
 Slide delay	Menus		Затримка слайда
@@ -11,7 +11,6 @@ Full screen	Menus		У повний екран
 Go to page	Menus		Перейти до сторінки
 Zoom out	Menus		Зменшити
 20 seconds	Menus		20 сек.
-Invert colors	Menus		Інвертувати кольори
 3 seconds	Menus		3 сек.
 Rotate counterclockwise	Menus		Обертати проти год. стрілки
 10 seconds	Menus		10 сек.
@@ -22,33 +21,23 @@ Could not load image! Either the file or an image translator for it does not exi
 First page	Menus		Перша сторінка
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Документ '%s' (сторінка %d) були змінені. Ви хочете закрити документ?
 About ShowImage…	Menus		 Про Переглядач зображень…
-Open	Menus		Відкрити
-OK	LoadAlerts		OK
 Close	ClosePrompt		Закрити
-Height:	ResizerWindow		Висота:
 Undo	Menus		Відмінити
 Resize to (in 1/72 inches):	PrintOptionsWindow		Змінити розмір (в 1/72 дюйма):
-Apply	ResizerWindow		Використати
-Keep original proportions	ResizerWindow		Зберегти оригінальні пропорції
 9 seconds	Menus		9 сек.
 Flip left to right	Menus		Пересунути горизонтально
 Show caption in full screen mode	Menus		Показати заголовок в повний екран
 DPI:	PrintOptionsWindow		Роздільча здатність(DPI):
 Next file	Menus		Наступний файл
 4 seconds	Menus		4 секунди
-Zoom to window	Menus		Збільшити вікно
 Close document	ClosePrompt		Закрити документ
-ShowImage	LoadAlerts		Показати малюнок
 Height: 	PrintOptionsWindow		Висота:
 Cancel	ClosePrompt		Відмінити
-Resize…	Menus		Зміна розміру ...
 Print options	PrintOptionsWindow		Параметри друку
-Width:	ResizerWindow		Ширина:
 ShowImage	AboutWindow		Переглядач зображень
 7 seconds	Menus		7 секунди
 Last page	Menus		Остання сторінка
 Previous file	Menus		Попереднє фото
-Resize	ResizerWindow		Зміна розміру
 Slide show	Menus		Слайдшоу
 Fit image to page	PrintOptionsWindow		Підігнати зображення під вікно
 Flip top to bottom	Menus		Відобразити зверху вниз
@@ -59,4 +48,21 @@ Rotate clockwise	Menus		Поворот за годинниковою стріл�
 Job setup	PrintOptionsWindow		Настройка завдання
 Original size	Menus		Оригінальний розмір
 Next page	Menus		Наступна сторінка
-Shrink to window	Menus		Згортання вікна
+OK	SaveToFile		Гаразд
+The file '%s' could not be written.	SaveToFile		Файл '%s' Не може бути записаний.
+File	Menus		Файл
+Page setup…	Menus		Налаштування сторінки…
+Print…	Menus		Друк...
+Quit	Menus		Вийти
+Edit	Menus		Редагувати
+Close	Menus		Закрити
+Copy	Menus		Копіювати
+Select all	Menus		Вибрати все
+Save as…	Menus		Зберегти як
+Open…	Menus		Відкрити...
+ShowImage	Menus		Переглядач
+Clear selection	Menus		Очистити вибір
+Selection Mode	Menus		Режим вибору
+Stretch to window	Menus		Розтягнути по вікну
+OK	Alerts		Гаразд
+Fit to window	Menus		Припасувати по вікну

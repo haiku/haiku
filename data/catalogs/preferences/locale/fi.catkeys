@@ -1,49 +1,25 @@
-1	finnish	x-vnd.Haiku-Locale	634081185
-Day in month (2 digits)	TimeFormatSettings		kuukaudenpäivä (2 merkkiä)
+1	finnish	x-vnd.Haiku-Locale	2295953467
 Available languages	Locale Preflet Window		Valittavat kielet
-Day of week (name)	TimeFormatSettings		viikonpäivä (nimi)
-Separator:	TimeFormatSettings		Erotin:
-Year (4 digits)	TimeFormatSettings		Vuosi (4 merkkiä)
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Valittavia kieliä ei löydy! Et voi käyttää tätä asetusohjelmaa!
-Thousand separator: 	TimeFormatSettings		Tuhaterotin
-After	TimeFormatSettings		Jälkeen
-Month name	TimeFormatSettings		kuukauden nimi
 Long format:	TimeFormatSettings		Pitkä muoto:
 Currency	TimeFormatSettings		Valuutta
-Before	TimeFormatSettings		Ennen
-Year	TimeFormatSettings		Vuosi
-Day of week in month	TimeFormatSettings		viikonpäivä kuukaudessa
 Short format:	TimeFormatSettings		Lyhyt muoto:
-Currency symbol:	TimeFormatSettings		Valuuttasymboli:
-Space	TimeFormatSettings		Väli
 Language	Locale Preflet Window		Kieli
-Month number	TimeFormatSettings		kuukauden numero
-Year (2 digits)	TimeFormatSettings		Vuosi (2 merkkiä)
 Preferred languages	Locale Preflet Window		Toivotut kielet
-Decimal separator: 	TimeFormatSettings		Desimaalierotin
-Symbol position	TimeFormatSettings		Symbolin paikka
-Day of week (short name)	TimeFormatSettings		viikonpäivä (lyhyt nimi)
 Numbers	TimeFormatSettings		Numerot
 24 hour	TimeFormatSettings		24 tuntia
-(unknown format)	TimeFormatSettings		 (tuntematon muoto)
-Negative marker:	TimeFormatSettings		Negatiivisuuden merkki:
-Day in month	TimeFormatSettings		kuukauden päivä
 Defaults	Locale Preflet Window		Oletukset
-Separator	TimeFormatSettings		Erotin
-Country	Locale Preflet Window		Maa
-Month number (2 digits)	TimeFormatSettings		kuukauden numero (2 merkkiä)
 Revert	Locale Preflet Window		Palauta
-Negative marker	TimeFormatSettings		Negatiivisuuden merkki
 OK	Locale Preflet Window		Valmis
-Day of week	TimeFormatSettings		viikonpäivä
-List separator: 	TimeFormatSettings		Listaerotin
 Time	TimeFormatSettings		Aika
 Date	TimeFormatSettings		Päivämäärä
 12 hour	TimeFormatSettings		12 tuntia
 Locale	Locale Preflet		Maa-asetus
-None	TimeFormatSettings		Ei mikään
-Example:	TimeFormatSettings		Esimerkki:
-Day	TimeFormatSettings		Päivä
-Leading 0	TimeFormatSettings		Alkava 0
-Month	TimeFormatSettings		Kuukausi
 already chosen	LanguageListView		jo valittu
+Negative:	TimeFormatSettings		Kielteinen:
+Use month/day-names from preferred language	TimeFormatSettings		Käytä ensisijaisen kielen kuukausi/päivä -nimiä
+Formatting	Locale Preflet Window		Muotoillaan
+Locale	Locale Preflet Window		Paikallisasetus
+Full format:	TimeFormatSettings		Koko muoto:
+Medium format:	TimeFormatSettings		Keskikokoinen muoto:
+Positive:	TimeFormatSettings		Myönteinen:

@@ -6,14 +6,14 @@ Stop	Main Window		Halti
 Cavern	Main Window		Kavo
 Volume:	Main Window		Laŭteco:
 Reverb:	Main Window		Eĥo:
-OK	Main Window		Daŭrigi
-MidiPlayer	Main Window		MIDI-a Legilo
+OK	Main Window		Bone
 Off	Main Window		Malŝaltita
 Dungeon	Main Window		Karcero
 Play	Main Window		Legi
 Garage	Main Window		Aŭtejo
 Closet	Main Window		Ĉambreto
-Drop MIDI file here	Scope View		Faligu MIDI-an dosieron ĉi tie
 Igor's lab	Main Window		La laboratorio de Igoro
 Scope	Main Window		Skopo
 Could not load song	Main Window		La kanto ne eblis ŝarĝiĝi.
+MidiPlayer	Main Window		MIDI-a Legilo
+Drop MIDI file here	Scope View		Faligu MIDI-an dosieron ĉi tie

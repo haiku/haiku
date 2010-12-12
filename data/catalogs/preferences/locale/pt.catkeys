@@ -1,49 +1,18 @@
-1	portuguese	x-vnd.Haiku-Locale	634081185
-Day in month (2 digits)	TimeFormatSettings		Dia do mês (2 dígitos)
+1	portuguese	x-vnd.Haiku-Locale	1431723094
 Available languages	Locale Preflet Window		Idiomas disponíveis
-Day of week (name)	TimeFormatSettings		Dia da semana (nome)
-Separator:	TimeFormatSettings		Separador:
-Year (4 digits)	TimeFormatSettings		Ano (4 dígitos)
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Não foi possível encontrar a lista de idiomas! Não pode usar este preflet!
-Thousand separator: 	TimeFormatSettings		Separador de milhares:
-After	TimeFormatSettings		Depois
-Month name	TimeFormatSettings		Nome do mês
 Long format:	TimeFormatSettings		Formato longo:
 Currency	TimeFormatSettings		Moeda
-Before	TimeFormatSettings		Antes
-Year	TimeFormatSettings		Ano
-Day of week in month	TimeFormatSettings		Dia da semana no mês
 Short format:	TimeFormatSettings		Formato curto:
-Currency symbol:	TimeFormatSettings		Símbolo da moeda:
-Space	TimeFormatSettings		Espaço
 Language	Locale Preflet Window		Idioma
-Month number	TimeFormatSettings		Número do mês
-Year (2 digits)	TimeFormatSettings		Ano (2 dígitos)
 Preferred languages	Locale Preflet Window		Idiomas preferidos
-Decimal separator: 	TimeFormatSettings		Separador decimal:
-Symbol position	TimeFormatSettings		Posição do símbolo
-Day of week (short name)	TimeFormatSettings		Dia da semana (nome pequeno)
 Numbers	TimeFormatSettings		Números
 24 hour	TimeFormatSettings		24 horas
-(unknown format)	TimeFormatSettings		(formato desconhecido)
-Negative marker:	TimeFormatSettings		Numeração negativa:
-Day in month	TimeFormatSettings		Dia do mês
 Defaults	Locale Preflet Window		Predefenições
-Separator	TimeFormatSettings		Separador
-Country	Locale Preflet Window		País
-Month number (2 digits)	TimeFormatSettings		Número do mês (2 dígitos)
 Revert	Locale Preflet Window		Reverter
-Negative marker	TimeFormatSettings		Símbolo de números negativos:
 OK	Locale Preflet Window		OK
-Day of week	TimeFormatSettings		Dia da semana
-List separator: 	TimeFormatSettings		Separador de lista
 Time	TimeFormatSettings		Hora
 Date	TimeFormatSettings		Data
 12 hour	TimeFormatSettings		12 horas
 Locale	Locale Preflet		Região
-None	TimeFormatSettings		Nenhum
-Example:	TimeFormatSettings		Exemplo:
-Day	TimeFormatSettings		Dia
-Leading 0	TimeFormatSettings		0 inicial
-Month	TimeFormatSettings		Mês
 already chosen	LanguageListView		escolhida

@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-StyledEdit	154881138
+1	korean	x-vnd.Haiku-StyledEdit	2108192170
 OK	LoadAlert		확인
 ???	LoadAlert		???
 Left	Menus		왼쪽
@@ -6,7 +6,6 @@ Revert to the last version of \"%s\"? 	RevertToSavedAlert		 \"%s\" 의 최근 �
 Search backwards	FindandReplaceWindow		거꾸로 찾기
 Size	Menus		크기
 Save	QuitAlert		저장
-Redo typing	Menus		다시 입력
 Replace same	Menus		다시 바꾸기
 Can't Undo	Menus		되돌릴 수 없음
 Save	Menus		저장
@@ -42,7 +41,6 @@ Find selection	Menus		선택된 부분에서 찾기
 Find:	FindandReplaceWindow		찾기:
 Error saving \"%s\":\n%s	SaveAlert		 \"%s\" 저장하는 중 에러 발생:\n%s
 Replace	FindandReplaceWindow		바꾸기
-Undo typing	Menus		타이핑 되돌리기
 Find again	Menus		다시 찾기
 Cancel	QuitAlert		취소
 Find…	Menus		찾기…

@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Be-PSRV	101881708
+1	portuguese	x-vnd.Be-PSRV	3878243268
 Undefined	ConfigWindow		Indefenido
 Cancel	PrintServerApp		Cancelar
 Page setup:	ConfigWindow		Configuração da página:
@@ -9,13 +9,11 @@ Would you like to set one up now?	PrintServerApp		Deseja configurar uma agora?
 Portrait	ConfigWindow		Vertical
 All pages	ConfigWindow		Todas as páginas
 There is no default printer set up.	PrintServerApp		Não existe nenhuma impressora predefenida.
-There already exists a printer you are going to create, but it's driver could not be found! Replace?	PrintServerApp		A impressora que está a criar já existe no sistema mas o respectivo driver não pôde ser encontrado! Substituir?
 Printer:	ConfigWindow		Impressora:
 Select a printer	ConfigWindow		Escolha uma impressora
 No	PrintServerApp		Não
 Landscape	ConfigWindow		Horizontal
 There are no printers set up.	PrintServerApp		Não existem impressoras configuradas.
-There already exists a printer you are going to create, but it's not usable at all! Replace?	PrintServerApp		A impressora que está a tentar criar já existe no sistema mas não pode ser usada. Substituir?
 OK	PrintServerApp		OK
 Print setup	ConfigWindow		Configuração de página
 Would you like to make @ the default printer?	PrintServerApp		Deseja tornar @ na impressora predefenida?

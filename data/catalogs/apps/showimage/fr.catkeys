@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-ShowImage	2071534767
+1	french	x-vnd.Haiku-ShowImage	2679963118
 Use as background…	Menus		Utiliser comme fond d'écran...
 5 seconds	Menus		5 secondes
 Slide delay	Menus		Délai de diaporama
@@ -11,7 +11,6 @@ Full screen	Menus		Plein écran
 Go to page	Menus		Aller à la page
 Zoom out	Menus		Zoom arrière
 20 seconds	Menus		20 secondes
-Invert colors	Menus		Inverser les couleurs
 3 seconds	Menus		3 secondes
 Rotate counterclockwise	Menus		Rotation antihoraire
 10 seconds	Menus		10 secondes
@@ -22,33 +21,23 @@ Could not load image! Either the file or an image translator for it does not exi
 First page	Menus		Première page
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Le document '%s' (page %d) a changé. Voulez-vous fermer le document ?
 About ShowImage…	Menus		A propos de ShowImage…
-Open	Menus		Ouvrir
-OK	LoadAlerts		OK
 Close	ClosePrompt		Fermer
-Height:	ResizerWindow		Hauteur :
 Undo	Menus		Annuler
 Resize to (in 1/72 inches):	PrintOptionsWindow		Redimensionner (en 1/72 pouces) :
-Apply	ResizerWindow		Appliquer
-Keep original proportions	ResizerWindow		Converser les proportions originales
 9 seconds	Menus		9 secondes
 Flip left to right	Menus		Mirroir vertical
 Show caption in full screen mode	Menus		Afficher les miniatures en mode plein écran
 DPI:	PrintOptionsWindow		PPP :
 Next file	Menus		Fichier suivant
 4 seconds	Menus		4 secondes
-Zoom to window	Menus		Zoomer à la taille de la fenêtre
 Close document	ClosePrompt		Fermer le document
-ShowImage	LoadAlerts		ShowImage
 Height: 	PrintOptionsWindow		Hauteur : 
 Cancel	ClosePrompt		Annuler
-Resize…	Menus		Redimensionner...
 Print options	PrintOptionsWindow		Options d'impression
-Width:	ResizerWindow		Largeur :
 ShowImage	AboutWindow		ShowImage
 7 seconds	Menus		7 secondes
 Last page	Menus		Dernière page
 Previous file	Menus		Fichier précédent
-Resize	ResizerWindow		Redimensionner
 Slide show	Menus		Diaporama
 Fit image to page	PrintOptionsWindow		Adapter l'image à la page
 Flip top to bottom	Menus		Mirroir horizontal
@@ -59,19 +48,22 @@ Rotate clockwise	Menus		Rotation horaire
 Job setup	PrintOptionsWindow		Définir la tâche
 Original size	Menus		Taille originale
 Next page	Menus		Page suivante
-Shrink to window	Menus		Adapter à la fenêtre
 OK	SaveToFile		OK
 The file '%s' could not be written.	SaveToFile		Le fichier « %s » ne peut pas être écrit.
 Progress monitor	ProgressWindow		Moniteur d'avancement
-Paste	Menus		Coller
 File	Menus		Fichier
 Page setup…	Menus		Mise en page…
 Print…	Menus		Imprimer…
 Quit	Menus		Quitter
-Clear	Menus		Nettoyer
 Edit	Menus		Editer
 Close	Menus		Fermer
 Copy	Menus		Copier
-Cut	Menus		Couper
 Select all	Menus		Selectionner tout
 Save as…	Menus		Enregistrer sous…
+Open…	Menus		Ouvrir…
+ShowImage	Menus		Visionneuse
+Clear selection	Menus		Effacer la sélection
+Selection Mode	Menus		Mode de sélection
+Stretch to window	Menus		Étirer à la fenêtre
+OK	Alerts		OK
+Fit to window	Menus		Ajuster à la fenêtre

@@ -1,4 +1,4 @@
-1	simplified_chinese	x-vnd.Be-MAIL	694686022
+1	simplified_chinese	x-vnd.Be-MAIL	1685878103
 %d - Date	Mail		%d - 日期
 Attach attributes:	Mail		附加属性:
 Inconsistency occurred in the undo/redo buffer.	Mail		缓冲区发生错误，撤销/重复操作无法执行.
@@ -141,3 +141,4 @@ Mail\n\n	Mail		邮件\n\n
 Written by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		编写者：Robert Polic。\n修改者：Dr. Zoidberg全体人员。\n\n版权所有 1991-2001 Be公司。\n版权所有 2005-2010 Haiku Inc.\n
 Text wrapping:	Mail		文本加密：
 File	Mail		文件
+Mail	Mail		邮件

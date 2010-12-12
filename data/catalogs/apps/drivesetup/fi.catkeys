@@ -1,6 +1,5 @@
-1	finnish	x-vnd.Haiku-DriveSetup	4234569363
+1	finnish	x-vnd.Haiku-DriveSetup	1943527736
 Delete	MainWindow		Poista
-Are you sure you want to initialize the selected partition? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		Oletko varma, että haluat alustaa valitun osion? Alustusparametrien kirjoittamisen jälkeen voit keskeyttää toiminnan juuri ennen muutosten kirjoittamista takaisin levylle.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat nyt kirjoittaa muutokset takaisin levylle?\n\nKaikki valitun osion tiedot katoavat palauttamattomasti, jos teet niin!
 Rescan	MainWindow		Etsi uudelleen
 OK	MainWindow		Valmis
@@ -18,7 +17,6 @@ The partition %s is already unmounted.	MainWindow		Osio %s on jo liitetty.
 Failed to initialize the partition. No changes have been written to disk.	MainWindow		Osion alustus epäonnistui. Levylle ei ole kirjoitettu mitään muutoksia.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Osion poistaminen epäonnistui. Mitään muutoksia ei ole kirjoitettu levylle.
 Partition type:	CreateParamsPanel		Osiotyyppi:
-Are you sure you want to initialize the partition \"%s\"? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		Oletko varma, että haluat alustaa osion \"%s\"? Alustusparametrien kirjoittamisen jälkeen voit keskeyttää toiminnan juuri ennen kuin muutokset kirjoitetaan levylle.
 Could not delete the selected partition.	MainWindow		Ei voitu poistaa valittua osiota.
 Error: 	MainWindow	in any error alert	Virhe: 
 Partition %ld	DiskView		Osio %ld
@@ -72,3 +70,7 @@ Device	PartitionList		Laite
 Cancel	MainWindow		Peru
 Cancel	InitParamsPanel		Peru
 %ld MiB	Support		%ld mebitavua
+DriveSetup	MainWindow		Levyasema-asetus
+Are you sure you want to initialize the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Oletko varma, että haluat alustaa osion \"%s\"? Sinulta kysytään uudelleen ennen kuin muutokset kirjoitetaan levylle.
+Are you sure you want to initialize the partition? You will be asked again before changes are written to the disk.	MainWindow		Oletko varma, että haluat alustaa osion? Sinulta kysytään uudelleen ennen kuin muutokset kirjoitetaan levylle.
+Parameters	PartitionList		Parametrit

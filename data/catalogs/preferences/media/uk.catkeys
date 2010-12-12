@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Media	2505372198
+1	ukrainian	x-vnd.Haiku-Media	243366818
 Show volume control on Deskbar	Media views		Показати регулятор гучності в Deskbar
 Audio input:	Media views		Вхід звуку:
 Restarting media services\nStarting media server…\n	Media Window		Перезапустити\nЗапуск Медіа Сервера…\n
@@ -32,3 +32,6 @@ Couldn't remove volume control in Deskbar: %s\n	Media Window		Неможливо
 Couldn't add volume control in Deskbar: %s\n	Media Window		Неможливо додати регулятор гучності в Deskbar: %s\n
 Media	Media Window		Медіа
 Channel:	Media views		Канал:
+Video settings	Media Window		Налаштування відео
+Audio mixer	Media Window		Аудіо міксер
+<none>	Media views		<немає>

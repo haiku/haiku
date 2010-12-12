@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Be-PRNT	4088995571
+1	finnish	x-vnd.Be-PRNT	980664982
 Waiting	JobListView		Odotetaan
 page	JobListView		sivu
 Cancel	AddPrinterDialog		Peru
@@ -26,3 +26,4 @@ Unknown status	JobListView		Tuntematon tila
 Connected to:	AddPrinterDialog		Yhdistetty kohteeseen:
 Printer type:	AddPrinterDialog		Tulostintyyppi:
 pending jobs.	PrinterListView		odottavat työt.
+No printer found!	TransportMenu		Tulostinta ei löytynyt!

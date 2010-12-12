@@ -1,3 +1,39 @@
-1	ukrainian	x-vnd.Be-TSKB	1884644663
+1	ukrainian	x-vnd.Be-TSKB	34208151
 Applications	PreferencesWindow		Додатки
 Recent applications	BeMenu		Недавні додатки
+Edit menu…	PreferencesWindow		Редагувати меню
+Recent documents:	PreferencesWindow		Недавні документи
+Recent folders	BeMenu		Недавні папки
+Sort running applications	PreferencesWindow		Сортувати додатки , що запущені
+Change time…	TimeView		Змінити час ...
+<Be folder is empty>	BeMenu		Папка Ве пуста
+Window	PreferencesWindow		Вікно
+Menu	PreferencesWindow		Меню
+Show seconds	PreferencesWindow		Показати секунди
+Always on top	PreferencesWindow		Завжди зверху
+Show all	WindowMenu		Показати все
+No windows	WindowMenu		Немає вікон
+Power off	BeMenu		Вимкнути
+Auto-raise	PreferencesWindow		Автовиклик
+Hide time	TimeView		Сховати час
+Recent folders:	PreferencesWindow		Недавні папки:
+Deskbar preferences…	BeMenu		Налаштування
+Show application expander	PreferencesWindow		Показувати додаток expander
+Close all	WindowMenu		Закрити все
+Deskbar preferences	PreferencesWindow		Налаштування Deskbar 
+Mount	BeMenu		Змонтувати
+Recent applications:	PreferencesWindow		Недавні додатки:
+Tracker always first	PreferencesWindow		Tracker завжди перший
+About Haiku…	BeMenu		Про Haiku…
+Show calendar…	TimeView		Показати календар…
+Restart system	BeMenu		Перезавантажити
+Find…	BeMenu		 	Знайти…
+Restart Tracker	BeMenu		Перезавантажити Tracker
+Show Time	Tray		Показати час
+Expand new applications	PreferencesWindow		Розпакувати нові додатки
+Clock	PreferencesWindow		Годинник
+Recent documents	BeMenu		Недавні документи
+Hide all	WindowMenu		Сховати все
+Shutdown…	BeMenu		Вимкнути
+Quit application	WindowMenu		Вийти з додатку
+Show replicants	BeMenu		Показати репліканти

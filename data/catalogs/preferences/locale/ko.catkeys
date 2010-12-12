@@ -1,48 +1,18 @@
-1	korean	x-vnd.Haiku-Locale	4147408647
-Day in month (2 digits)	TimeFormatSettings		한 달의 날짜 (2자리)
+1	korean	x-vnd.Haiku-Locale	1431723094
 Available languages	Locale Preflet Window		사용 가능한 언어
-Day of week (name)	TimeFormatSettings		요일 (이름)
-Separator:	TimeFormatSettings		분리자:
-Year (4 digits)	TimeFormatSettings		년 (4자리)
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		가능한 언어를 찾을 수 없습나더! 당신은  언어 속성을 사용할 수 없습니다!
-Thousand separator: 	TimeFormatSettings		천단위 구분자: 
-After	TimeFormatSettings		뒤
-Month name	TimeFormatSettings		달 이름
 Long format:	TimeFormatSettings		긴 형식:
 Currency	TimeFormatSettings		통화
-Before	TimeFormatSettings		앞
-Year	TimeFormatSettings		년
-Day of week in month	TimeFormatSettings		한달의 요일
 Short format:	TimeFormatSettings		짧은 형식:
-Currency symbol:	TimeFormatSettings		통화 단위:
-Space	TimeFormatSettings		공백
 Language	Locale Preflet Window		언어
-Month number	TimeFormatSettings		달 번호
-Year (2 digits)	TimeFormatSettings		년 (2 자리)
 Preferred languages	Locale Preflet Window		선호하는 언어
-Decimal separator: 	TimeFormatSettings		십단위 구분자: 
-Symbol position	TimeFormatSettings		심벌 위치
-Day of week (short name)	TimeFormatSettings		요일 (짧은 이름)
 Numbers	TimeFormatSettings		숫자
 24 hour	TimeFormatSettings		24 시간
-Negative marker:	TimeFormatSettings		부정 표시:
-Day in month	TimeFormatSettings		달의 날
 Defaults	Locale Preflet Window		기본설정
-Separator	TimeFormatSettings		분리자
-Country	Locale Preflet Window		나라
-Month number (2 digits)	TimeFormatSettings		달 번호 (2 글자)
 Revert	Locale Preflet Window		되돌리기
-Negative marker	TimeFormatSettings		부정 표시
 OK	Locale Preflet Window		확인
-Day of week	TimeFormatSettings		요일
-List separator: 	TimeFormatSettings		목록 구분자: 
 Time	TimeFormatSettings		시간
 Date	TimeFormatSettings		날짜
 12 hour	TimeFormatSettings		12 시간
 Locale	Locale Preflet		언어 설정
-None	TimeFormatSettings		없음
-Example:	TimeFormatSettings		예제:
-Day	TimeFormatSettings		일
-Leading 0	TimeFormatSettings		앞에 오는 0
-Month	TimeFormatSettings		월
 already chosen	LanguageListView		이미 선택됨

@@ -1,15 +1,15 @@
 1	polish	x-vnd.Haiku-Keymap	4175672673
-Tilde trigger	Keymap window		Spust tyldy
-Grave trigger	Keymap window		Spust ciężki
+Tilde trigger	Keymap window		Wywołanie tyldy
+Grave trigger	Keymap window		Wywołanie ciężkie
 Select dead keys	Keymap window		Wybierz martwe klawisze
 Quit	Keymap window		Zakończ
-Switch shortcut keys to Haiku mode	Keymap window		Zmień klawisze skrótów w tryb Haiku
-Circumflex trigger	Keymap window		Spust akcentu
-Diaeresis trigger	Keymap window		Spust diarezy
+Circumflex trigger	Keymap window		Wywołanie akcentu
+Diaeresis trigger	Keymap window		Wywołanie diarezy
 Open…	Keymap window		Otwórz…
 System:	Keymap window		System:
 Switch shortcut keys	Keymap window		Zmień klawisze skrótów
 User:	Keymap window		Użytkownik:
+Switch shortcut keys to Haiku mode	Keymap window		Zmień klawisze skrótów w tryb Haiku
 Keymap	Keymap window		Układ klawiatury
 Sample and clipboard:	Keymap window		Przykład i schowek:
 Layout	Keymap window		Układ
@@ -18,5 +18,5 @@ Revert	Keymap window		Przywróć
 Save as…	Keymap window		Zapisz jako…
 File	Keymap window		Plik
 (Current)	Keymap window		(Bieżący)
-Font	Keymap window		Czczionka
-Acute trigger	Keymap window		Spust ostry
+Font	Keymap window		Czcionka
+Acute trigger	Keymap window		Wywołanie ostre

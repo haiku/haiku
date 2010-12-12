@@ -1,5 +1,4 @@
-1	french	x-vnd.Haiku-Mouse	104106491
-Click to activate	SettingsView		Cliquer pour activer
+1	french	x-vnd.Haiku-Mouse	3392409209
 Mouse type:	SettingsView		Type de souris :
 Warp	SettingsView		Téléporter
 2-Button	SettingsView		2 boutons
@@ -22,3 +21,4 @@ Fast	SettingsView		Rapide
 Normal	SettingsView		Normal
 Mouse	MouseWindow		Souris
 Slow	SettingsView		Lent
+Click to focus and raise	SettingsView		Cliquer pour avoir le focus et passer au premier plan

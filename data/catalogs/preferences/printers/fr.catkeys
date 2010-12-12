@@ -1,0 +1,25 @@
+1	french	x-vnd.Be-PRNT	1513930032
+page	JobListView		page
+Cancel	AddPrinterDialog		Annuler
+Add printer	AddPrinterDialog		Ajouter une imprimante
+Printers	PrintersWindow		Imprimantes
+Default Printer	PrinterListView		Imprimante par défaut
+No pending jobs.	PrinterListView		Pas de travaux en suspens.
+pages	JobListView		pages
+Printer name:	AddPrinterDialog		Nom de l'imprimante :
+pending jobs.	PrinterListView		tâches en suspens.
+Restart job	PrintersWindow		Reprendre la tâche
+Add	AddPrinterDialog		Ajouter
+Make default	PrintersWindow		Utiliser par défaut
+Cancel job	PrintersWindow		Annuler la tâche
+1 pending job.	PrinterListView		1 tâche en suspens
+<pick one>	AddPrinterDialog		<choisir>
+Add …	PrintersWindow		Ajouter…
+Print jobs for 	PrintersWindow		Travaux d'impression pour
+Failed	JobListView		Échoué
+%.2f KB	JobListView		%.2f Ko
+Completed	JobListView		Terminé
+No printer found!	TransportMenu		Aucune imprimante trouvée !
+Print jobs: No printer selected	PrintersWindow		Travaux d'impression : Aucune imprimante sélectionnée
+Unknown status	JobListView		État inconnu
+Connected to:	AddPrinterDialog		Connecté à :

@@ -1,6 +1,5 @@
-1	german	x-vnd.Haiku-DriveSetup	4234569363
+1	german	x-vnd.Haiku-DriveSetup	201850780
 Delete	MainWindow		Löschen
-Are you sure you want to initialize the selected partition? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		Sind Sie sicher, dass Sie die gewählte Partition initialisieren möchten? Nach der Eingabe der Initialisierungsparameter kann die Aktion noch vor dem Schreiben der Änderungen auf das Medium abgebrochen werden.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Sind Sie sicher, dass sie die Änderungen jetzt auf das Speichermedium schreiben möchten?\n\nAlle Daten auf der gewählten Partition gehen dabei unwiderruflich verloren!
 Rescan	MainWindow		Neu einlesen
 OK	MainWindow		OK
@@ -18,7 +17,6 @@ The partition %s is already unmounted.	MainWindow		Die Partition %s ist bereits 
 Failed to initialize the partition. No changes have been written to disk.	MainWindow		Die Initialisierung der Parition ist fehlgeschlagen. Das Speichermedium blieb unverändert.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Das Löschen der Parition ist fehlgeschlagen. Das Speichermedium blieb unverändert.
 Partition type:	CreateParamsPanel		Partitionstyp:
-Are you sure you want to initialize the partition \"%s\"? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		Sind Sie sicher, dass die die Partition \"%s\" initialisieren möchten? Nach der Eingabe der Initialisierungsparameter können Sie diese Operation abbrechen, bevor Änderungen auf das Medium geschrieben werden.
 Could not delete the selected partition.	MainWindow		Die gewählte Partition konnte nicht gelöscht werden.
 Error: 	MainWindow	in any error alert	Fehler: 
 Partition %ld	DiskView		Partition %ld
