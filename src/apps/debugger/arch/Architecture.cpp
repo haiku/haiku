@@ -70,6 +70,9 @@ Architecture::InitRegisterRules(CfaContext& context) const
 		if (dwarfReg < 0 || dwarfReg > CountRegisters() - 1)
 			continue;
 
+		// TODO: on CPUs that have a return address register
+		// a default rule should be set up to use that to
+		// extract the instruction pointer
 		switch (registers[i].Type()) {
 			case REGISTER_TYPE_STACK_POINTER:
 			{
