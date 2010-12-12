@@ -22,6 +22,8 @@ public:
 						off_t size);
 					~DataStream();
 
+	status_t		FindBlock(off_t offset, off_t& block,
+						uint32 *_count = NULL);
 	status_t		Enlarge(Transaction& transaction, off_t& numBlocks);
 	status_t		Shrink(Transaction& transaction, off_t& numBlocks);
 
@@ -88,6 +90,7 @@ private:
 
 	off_t			fNumBlocks;
 	uint32			fRemovedBlocks;
+	off_t			fSize;
 };
 
 #endif	// DATASTREAM_H

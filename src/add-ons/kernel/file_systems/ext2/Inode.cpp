@@ -226,125 +226,8 @@ Inode::CheckPermissions(int accessMode) const
 status_t
 Inode::FindBlock(off_t offset, off_t& block, uint32 *_count)
 {
-	uint32 perBlock = fVolume->BlockSize() / 4;
-	uint32 perIndirectBlock = perBlock * perBlock;
-	uint32 index = offset >> fVolume->BlockShift();
-
-	if (offset >= Size()) {
-		TRACE("FindBlock: offset larger than inode size\n");
-		return B_ENTRY_NOT_FOUND;
-	}
-
-	// TODO: we could return the size of the sparse range, as this might be more
-	// than just a block
-
-	if (index < EXT2_DIRECT_BLOCKS) {
-		// direct blocks
-		block = B_LENDIAN_TO_HOST_INT32(Node().stream.direct[index]);
-		ASSERT(block != 0);
-		if (_count) {
-			*_count = 1;
-			uint32 nextBlock = block;
-			while (++index < EXT2_DIRECT_BLOCKS
-				&& Node().stream.direct[index] == ++nextBlock)
-				(*_count)++;
-		}
-	} else if ((index -= EXT2_DIRECT_BLOCKS) < perBlock) {
-		// indirect blocks
-		CachedBlock cached(fVolume);
-		uint32* indirectBlocks = (uint32*)cached.SetTo(B_LENDIAN_TO_HOST_INT32(
-			Node().stream.indirect));
-		if (indirectBlocks == NULL)
-			return B_IO_ERROR;
-
-		block = B_LENDIAN_TO_HOST_INT32(indirectBlocks[index]);
-		ASSERT(block != 0);
-		if (_count) {
-			*_count = 1;
-			uint32 nextBlock = block;
-			while (++index < perBlock
-				&& indirectBlocks[index] == ++nextBlock)
-				(*_count)++;
-		}
-	} else if ((index -= perBlock) < perIndirectBlock) {
-		// double indirect blocks
-		CachedBlock cached(fVolume);
-		uint32* indirectBlocks = (uint32*)cached.SetTo(B_LENDIAN_TO_HOST_INT32(
-			Node().stream.double_indirect));
-		if (indirectBlocks == NULL)
-			return B_IO_ERROR;
-
-		uint32 indirectIndex
-			= B_LENDIAN_TO_HOST_INT32(indirectBlocks[index / perBlock]);
-		if (indirectIndex == 0) {
-			// a sparse indirect block
-			block = 0;
-		} else {
-			indirectBlocks = (uint32*)cached.SetTo(indirectIndex);
-			if (indirectBlocks == NULL)
-				return B_IO_ERROR;
-
-			block = B_LENDIAN_TO_HOST_INT32(
-				indirectBlocks[index & (perBlock - 1)]);
-			if (_count) {
-				*_count = 1;
-				uint32 nextBlock = block;
-				while (((++index & (perBlock - 1)) != 0)
-					&& indirectBlocks[index & (perBlock - 1)] == ++nextBlock)
-					(*_count)++;
-			}
-		}
-		ASSERT(block != 0);
-	} else if ((index -= perIndirectBlock) / perBlock < perIndirectBlock) {
-		// triple indirect blocks
-		CachedBlock cached(fVolume);
-		uint32* indirectBlocks = (uint32*)cached.SetTo(B_LENDIAN_TO_HOST_INT32(
-			Node().stream.triple_indirect));
-		if (indirectBlocks == NULL)
-			return B_IO_ERROR;
-
-		uint32 indirectIndex
-			= B_LENDIAN_TO_HOST_INT32(indirectBlocks[index / perIndirectBlock]);
-		if (indirectIndex == 0) {
-			// a sparse indirect block
-			block = 0;
-		} else {
-			indirectBlocks = (uint32*)cached.SetTo(indirectIndex);
-			if (indirectBlocks == NULL)
-				return B_IO_ERROR;
-
-			indirectIndex = B_LENDIAN_TO_HOST_INT32(
-				indirectBlocks[(index / perBlock) & (perBlock - 1)]);
-			if (indirectIndex == 0) {
-				// a sparse indirect block
-				block = 0;
-			} else {
-				indirectBlocks = (uint32*)cached.SetTo(indirectIndex);
-				if (indirectBlocks == NULL)
-					return B_IO_ERROR;
-
-				block = B_LENDIAN_TO_HOST_INT32(
-					indirectBlocks[index & (perBlock - 1)]);
-				if (_count) {
-					*_count = 1;
-					uint32 nextBlock = block;
-					while (((++index & (perBlock - 1)) != 0)
-						&& indirectBlocks[index & (perBlock - 1)]
-							== ++nextBlock)
-						(*_count)++;
-				}
-			}
-		}
-		ASSERT(block != 0);
-	} else {
-		// Outside of the possible data stream
-		dprintf("ext2: block outside datastream!\n");
-		return B_ERROR;
-	}
-
-	TRACE("inode %Ld: FindBlock(offset %lld): %lld %ld\n", ID(), offset, block,
-		_count != NULL ? *_count : 1);
-	return B_OK;
+	DataStream stream(fVolume, &fNode.stream, Size());
+	return stream.FindBlock(offset, block, _count);
 }
 
 
@@ -525,7 +408,8 @@ Inode::InitDirectory(Transaction& transaction, Inode* parent)
 		return status;
 
 	off_t blockNum;
-	status = FindBlock(0, blockNum);
+	DataStream stream(fVolume, &fNode.stream, Size());
+	status = stream.FindBlock(0, blockNum);
 	if (status != B_OK)
 		return status;
 
