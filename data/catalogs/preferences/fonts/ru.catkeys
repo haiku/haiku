@@ -2,11 +2,11 @@
 Plain font:	Font view		Простой шрифт:
 Defaults	Main window		По умолчанию
 Fonts	Main window		Шрифты
-Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Шрифты\n\tCopyright 2004-2005, Haiku.\n\n
+Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Fonts\n\n\tCopyright 2004-2005, Haiku.\n\n
 Revert	Main window		Вернуть
 Size:	Font Selection view		Размер:
 Menu font:	Font view		Шрифт меню:
-Fixed font:	Font view		Моноширный шрифт:
+Fixed font:	Font view		Моноширинный шрифт:
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Съешь ещё этих мягких французских булок, да выпей же чаю.
 Bold font:	Font view		Жирный шрифт:
-OK	main		Ок
+OK	main		ОК

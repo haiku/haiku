@@ -70,7 +70,7 @@ Device	PartitionList		Прылада
 Cancel	MainWindow		Адмяніць
 Cancel	InitParamsPanel		Адмяніць
 %ld MiB	Support		%ld MiB
-DriveSetup	MainWindow		РазметкаДыску
+DriveSetup	MainWindow		Разметка Дыску
 Are you sure you want to initialize the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Сапраўды ініцыялізаваць падзел \"%s\"? У вас спытаюць яшчэ, перад тым як запісаць змены на дыск.
 Are you sure you want to initialize the partition? You will be asked again before changes are written to the disk.	MainWindow		Сапраўды ініцыялізаваць падзел? У вас спытаюць яшчэ, перад тым як запісаць змены на дыск.
 Parameters	PartitionList		Параметры

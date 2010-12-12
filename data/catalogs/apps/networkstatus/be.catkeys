@@ -1,7 +1,9 @@
-1	belarusian	x-vnd.Haiku-NetworkStatus	3623861088
+1	belarusian	x-vnd.Haiku-NetworkStatus	4149467776
 NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		Опцыі NetworkStatus:\n\t--deskbar\tдадаваць дупліканта да Deskbar аўтаматычна\n\t--help\t\tпаказаць гэты тэкст і выйсці\n
 Broadcast information:\n	NetworkStatusView		Інфармацыя пра вяшчанне:\n
 No link	NetworkStatusView		Няма спасылкі
+Install	NetworkStatus		Усталяваць
+Do you want NetworkStatus to live in the Deskbar?	NetworkStatus		Жадаеце змясціць NetworkStatus на Deskbar?
 Address information:\n	NetworkStatusView		Інфармацыя пра адрас:\n
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Не ўдалося запусціць сеткавыя наладкі.\n\nПамылка:
 NetworkStatus\n\twritten by %1 and Hugo Santos\n\t%2, Haiku, Inc.\n	NetworkStatusView		NetworkStatus\n\tаўтары: %1, Hugo Santos\n\t%2, Haiku, Inc.\n
@@ -15,6 +17,7 @@ Configuring	NetworkStatusView		Наладка
 Address	NetworkStatusView		Адрас
 OK	NetworkStatusView		ОК
 Open network preferences…	NetworkStatusView		Адкрыць наладкі сеткі...
+Don't	NetworkStatus		Не
 Quit	NetworkStatusView		Выйсці
 Netmask information:\n	NetworkStatusView		Інфармацыя пра маску сеткі:\n
 <no wireless networks found>	NetworkStatusView		<бесшнуравыя сеткі не знойдзеныя>

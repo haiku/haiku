@@ -1,13 +1,13 @@
 1	belarusian	x-vnd.Haiku-FileTypes	525617155
 Args only	Application Type Window		Толькі аргументы
 Add group	New File Type Window		Дадаць групу
-Remove	Application Type Window		Знішчыць
+Remove	Application Type Window		Выдаліць
 Select same type as	FileType Window		Пазначыць падобны тып як
-Remove icon	Icon View		Выдаліць значак
+Remove icon	Icon View		Выдаліць іконку
 Supported types	Application Type Window		Падтрымліваемыя тыпы
-Internal name:	New File Type Window		Унутране імя:
-New file type	New File Type Window		Стварыць новы тып
-Add icon…	Icon View		Дадаць значак…
+Internal name:	New File Type Window		Унутранае імя:
+New file type	New File Type Window		Новы тып файлаў
+Add icon…	Icon View		Дадаць іконку…
 Do you want to save the changes?	Application Type Window		Жадаеце захаваць змены?
 File type	FileType Window		Тып файла
 Could not change attributes	Attribute Window		Немагчыма змяніць атрыбуты
@@ -19,15 +19,15 @@ Cancel	Attribute Window		Скасаваць
 Multiple launch	Application Type Window		Запускаць некалькі адразу
 Group:	New File Type Window		Група:
 Done	Extension Window		Зроблена
-Could not open file	FileType Window		Немагчыма адркрыць файл
+Could not open file	FileType Window		Немагчыма адкрыць файл
 Preferred application	FileType Window		Пажаданая праграма
-Same as…	FileType Window		Таксама як…
+Same as…	FileType Window		Такая ж, як…
 File	Application Type Window		Файл
 Version:	Application Type Window		Версія:
 FileTypes request	FileTypes		запыт FileTypes
-Select…	FileType Window		Вылучыць…
+Select…	FileType Window		Выбраць…
 Development	Application Type Window		Распрацоўка
-Icon	FileType Window		Значак
+Icon	FileType Window		Іконка
 Special:	Attribute Window		Спецыяльны:
 Alpha	Application Type Window		Alpha
 Signature:	Application Type Window		Подпіс:
@@ -66,16 +66,16 @@ Gamma	Application Type Window		Gamma
 Default application	FileType Window		Прадвызначаная праграма
 Long description:	Application Type Window		Падрабязнае апісанне
 Version info	Application Type Window		Інфармацыя пра версію
-Center	Attribute Window	Attribute column alignment in Tracker	Цэнтар
+Center	Attribute Window	Attribute column alignment in Tracker	Цэнтр
 Short description:	Application Type Window		Кароткан апісанне
 File could not be opened	Preferred App Menu		Файля ня можа быць адчынены
 Could not change file extensions	Extension Window		Не ўдалося змяніць пашырэнні файлаў
-Edit icon…	Icon View		Рэдагаваць значак…
+Edit icon…	Icon View		Рэдагаваць іконку…
 Save into resource file…	Application Type Window		Захаваць у файл рэсурсаў…
-Left	Attribute Window	Attribute column alignment in Tracker	Левы
+Left	Attribute Window	Attribute column alignment in Tracker	Злева
 Visible	Attribute Window		Бачнае
 Could not install file type	New File Type Window		Немагчыма ўсталяваць тып файла
-Application type	Application Type Window		Тып Праграмы
+Application type	Application Type Window		Тып праграмы
 Application types…	FileTypes Window		Тыпы праграм…
 Recognition rule is not valid:\n\n	FileTypes Window		Правіла распазнання неправільнае:\n\n
 Show icons in list	FileTypes Window		Паказваць іконкі ў спісе

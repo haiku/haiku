@@ -14,7 +14,7 @@ Back	BootManagerController	Button	Назад
 Install boot menu	EntryPage	Title	Усталяваць меню запуску
 Choose this option to install a boot menu, allowing you to select which operating system to boot when you turn on your computer.	EntryPage		Абярыце гэты пункт каб усталяваць меню запуску, якое дазволіць вам абіраць пажаданую аперацыйную сістэму падчас запуску вашага кампутара.
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		Калі ласка, азначце файл, з якога будзе адноўлены MBR. Гэта файл, створаны пры першай ўстаноўцы менеджэра запуску.
-Unnamed %d	LegacyBootDrive	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Без назвы %d
+Unnamed %d	LegacyBootDrive	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Bez nazvy %d
 The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager needs 2 KB available space before the first partition.	BootManagerController		Табліца падзелаў першага дыска несумяшчальная з Менеджерам Запуску.\nМенеджэру Запуску неабходна 2KB свабоднага месца перад першым падзелам.
 Partition table not compatible	BootManagerController	Title	Табліца раздзелаў несумяшчальная
 The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Былі найдзеныя наступныя падзелы. Калі ласка, адзначце падзелы, якія будуць уключаны ў меню запуску. Вы таксама можаце ўказаць пажаданыя назвы падзелаў для меню.
@@ -30,7 +30,7 @@ The Master Boot Record could not be restored!	BootManagerController		Не ўда
 Partitions	PartitionsPage	Title	Падзелы
 Done	BootManagerController	Button	Зроблена
 Partitions	DefaultPartitionPage	Pop up menu title	Падзелы
-Uninstallation of boot menu failed	BootManagerController	Title	Памылка. Выдаленне меню запуску не удалося.
+Uninstallation of boot menu failed	BootManagerController	Title	Памылка. Выдаленне меню запуску не ўдалося.
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Гатовы запісаць наступнае меню запуску на ўстройства (%s). Калі ласка, праверце інфармацыю ніжэй перад тым, як працягваць.
 Installation of boot menu completed	BootManagerController	Title	Устаноўка меню запуску скончаная.
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Калі ласка, азначце файл, з якога будзе адноўлены MBR. Гэта файл, створаны пры першай ўстаноўцы менеджэра запуску.

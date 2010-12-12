@@ -1,17 +1,17 @@
 1	russian	x-vnd.Haiku-mount_server	1422362183
-Mount read-only	AutoMounter		Только для чтения
-Error mounting volume:\n\n%s	AutoMounter		Ошибка монтирования раздела:\n\n%s
-Unmount error	AutoMounter		Ошибка отмонтирования
-Mount warning	AutoMounter		Предупредждение при монтировании
-Mount read/write	AutoMounter		Для чтения/записи
-Mounting volume '%s'\n\n	AutoMounter		Монтирование раздела '%s'\n\n
+Mount read-only	AutoMounter		Только чтение
+Error mounting volume:\n\n%s	AutoMounter		Ошибка подключения раздела:\n\n%s
+Unmount error	AutoMounter		Ошибка отключения
+Mount warning	AutoMounter		Предупреждение при подключении
+Mount read/write	AutoMounter		Чтение и запись
+Mounting volume '%s'\n\n	AutoMounter		Подключение раздела '%s'\n\n
 Cancel	AutoMounter		Отмена
-Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Невозможно отмонтировать диск \"%s\":\n\t%s\n\nФорсировать отмонтирование?\n\nВнимание: если какое-либо приложение в данный момент записывает данные на этот раздел, то его отмонтирование может привести к потере данных.\n
-Could not unmount disk \"%s\":\n\t%s	AutoMounter		Невозможно смонтировать диск \"%s\":\n\t%s
-Mounting volume <unnamed volume>\n\n	AutoMounter		Монтируется раздел <безымянный раздел>\n\n
-OK	AutoMounter		Oк
-The file system on this volume is not the Haiku file system. It is strongly suggested to mount it in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Файловая система этого раздела не является файловой системой Haiku. Строго рекомендуется смонтировать его в режиме только для чтения. Это предотвратит возможную потерю данных из-за потенциальных ошибок в Haiku.
-Previous volumes mounted.	AutoMounter		Смонтированные ранее.
-Mount error	AutoMounter		Ошибка монтирования
-It is suggested to mount all additional Haiku volumes in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Советуем монтировать дополнительные разделы Haiku в режиме только для чтения. Это предотвратит возможную потерю данных из-за потенциальных ошибок в Haiku.
-Force unmount	AutoMounter		Форсировать отмонтирование
+Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Невозможно отключить диск \"%s\":\n\t%s\n\nОтключить принудительно?\n\nВнимание: если какое-либо приложение в данный момент записывает данные на этот раздел, то его отключение может привести к потере данных.\n
+Could not unmount disk \"%s\":\n\t%s	AutoMounter		Невозможно отключить диск \"%s\":\n\t%s
+Mounting volume <unnamed volume>\n\n	AutoMounter		Подключается раздел <безымянный раздел>\n\n
+OK	AutoMounter		ОК
+The file system on this volume is not the Haiku file system. It is strongly suggested to mount it in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Файловая система этого раздела не является файловой системой Haiku. Строго рекомендуется подключить его в режиме только для чтения. Это предотвратит возможную потерю данных из-за потенциальных ошибок в Haiku.
+Previous volumes mounted.	AutoMounter		Подключенные ранее.
+Mount error	AutoMounter		Ошибка подключения
+It is suggested to mount all additional Haiku volumes in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Рекомендуется подключать дополнительные разделы Haiku в режиме только для чтения. Это предотвратит возможную потерю данных из-за потенциальных ошибок в Haiku.
+Force unmount	AutoMounter		Отключить принудительно
