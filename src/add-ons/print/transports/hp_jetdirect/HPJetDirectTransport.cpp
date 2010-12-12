@@ -29,7 +29,8 @@ HPJetDirectPort::HPJetDirectPort(BDirectory* printer, BMessage *msg)
 {
 	BString address;
 
-	if (printer->ReadAttrString("transport_address", &address) < 0) {
+	if (printer->ReadAttrString("transport_address", &address) < 0
+		|| address.Length() == 0) {
 		SetupWindow *setup = new SetupWindow(printer);
 		if (setup->Go() == B_ERROR)
 			return;
