@@ -86,6 +86,13 @@ DebuggerImageDebugInfo::GetType(GlobalTypeCache* cache,
 }
 
 
+AddressSectionType
+DebuggerImageDebugInfo::GetAddressSectionType(target_addr_t address)
+{
+	return ADDRESS_SECTION_TYPE_UNKNOWN;
+}
+
+
 status_t
 DebuggerImageDebugInfo::CreateFrame(Image* image,
 	FunctionInstance* functionInstance, CpuState* cpuState,

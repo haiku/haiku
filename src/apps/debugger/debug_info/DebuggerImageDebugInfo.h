@@ -29,6 +29,7 @@ public:
 									BObjectList<FunctionDebugInfo>& functions);
 	virtual	status_t			GetType(GlobalTypeCache* cache,
 									const BString& name, Type*& _type);
+	virtual AddressSectionType	GetAddressSectionType(target_addr_t address);
 	virtual	status_t			CreateFrame(Image* image,
 									FunctionInstance* functionInstance,
 									CpuState* cpuState,

@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2010, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -87,6 +88,21 @@ ImageDebugInfo::GetType(GlobalTypeCache* cache, const BString& name,
 	}
 
 	return B_ENTRY_NOT_FOUND;
+}
+
+
+AddressSectionType
+ImageDebugInfo::GetAddressSectionType(target_addr_t address) const
+{
+	AddressSectionType type = ADDRESS_SECTION_TYPE_UNKNOWN;
+	for (int32 i = 0; SpecificImageDebugInfo* specificInfo
+			= fSpecificInfos.ItemAt(i); i++) {
+		type = specificInfo->GetAddressSectionType(address);
+		if (type != ADDRESS_SECTION_TYPE_UNKNOWN)
+			break;
+	}
+
+	return type;
 }
 
 

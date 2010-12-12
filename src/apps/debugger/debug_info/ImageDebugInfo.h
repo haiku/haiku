@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2010, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef IMAGE_DEBUG_INFO_H
@@ -11,6 +12,7 @@
 #include <ObjectList.h>
 #include <Referenceable.h>
 
+#include "AddressSectionTypes.h"
 #include "ImageInfo.h"
 #include "Types.h"
 
@@ -39,6 +41,8 @@ public:
 			status_t			GetType(GlobalTypeCache* cache,
 									const BString& name, Type*& _type);
 									// returns a reference
+			AddressSectionType	GetAddressSectionType(target_addr_t address)
+									const;
 
 			int32				CountFunctions() const;
 			FunctionInstance*	FunctionAt(int32 index) const;

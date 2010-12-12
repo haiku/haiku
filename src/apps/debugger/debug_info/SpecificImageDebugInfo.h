@@ -9,6 +9,7 @@
 #include <ObjectList.h>
 #include <Referenceable.h>
 
+#include "AddressSectionTypes.h"
 #include "Types.h"
 
 
@@ -43,6 +44,8 @@ public:
 	virtual	status_t			GetType(GlobalTypeCache* cache,
 									const BString& name, Type*& _type) = 0;
 									// returns a reference
+	virtual AddressSectionType	GetAddressSectionType(target_addr_t address)
+									= 0;
 
 	virtual	status_t			CreateFrame(Image* image,
 									FunctionInstance* functionInstance,

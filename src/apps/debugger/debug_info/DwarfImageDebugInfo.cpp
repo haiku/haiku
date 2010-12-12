@@ -429,6 +429,30 @@ DwarfImageDebugInfo::GetType(GlobalTypeCache* cache,
 }
 
 
+AddressSectionType
+DwarfImageDebugInfo::GetAddressSectionType(target_addr_t address)
+{
+	address -= fRelocationDelta;
+	ElfFile* file = fFile->GetElfFile();
+
+	ElfSection* section = file->GetSection(".text");
+	if (section != NULL && address >= section->LoadAddress()
+		&& address < section->LoadAddress() + section->Size()) {
+			file->PutSection(section);
+			return ADDRESS_SECTION_TYPE_FUNCTION;
+	}
+
+	section = file->GetSection(".plt");
+	if (section != NULL && address >= section->LoadAddress()
+		&& address < section->LoadAddress() + section->Size()) {
+			file->PutSection(section);
+			return ADDRESS_SECTION_TYPE_PLT;
+	}
+
+	return ADDRESS_SECTION_TYPE_UNKNOWN;
+}
+
+
 status_t
 DwarfImageDebugInfo::CreateFrame(Image* image,
 	FunctionInstance* functionInstance, CpuState* cpuState,

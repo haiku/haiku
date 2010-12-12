@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2010, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -589,6 +590,33 @@ ThreadHandler::_HandleSingleStepStep(CpuState* cpuState)
 			if (fStepStatement->ContainsAddress(cpuState->InstructionPointer())) {
 				_SingleStepThread(cpuState->InstructionPointer());
 				return true;
+			} else {
+				StackTrace* stackTrace = fThread->GetStackTrace();
+				Reference<StackTrace> stackTraceReference(stackTrace);
+
+				if (stackTrace == NULL && cpuState != NULL) {
+					if (fDebuggerInterface->GetArchitecture()->CreateStackTrace(
+							fThread->GetTeam(), this, cpuState, stackTrace) == B_OK) {
+						stackTraceReference.SetTo(stackTrace, true);
+					}
+				}
+
+				if (stackTrace != NULL) {
+					StackFrame *frame = stackTrace->FrameAt(0);
+					Image* image = frame->GetImage();
+					ImageDebugInfo* info = NULL;
+					if (GetImageDebugInfo(image, info) != B_OK)
+						return false;
+
+					Reference<ImageDebugInfo>(info, true);
+
+					if (info->GetAddressSectionType(
+						cpuState->InstructionPointer())
+						== ADDRESS_SECTION_TYPE_PLT) {
+						_SingleStepThread(cpuState->InstructionPointer());
+						return true;
+					}
+				}
 			}
 			return false;
 		}

@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2010, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef DWARF_IMAGE_DEBUG_INFO_H
@@ -10,6 +11,7 @@
 
 #include <util/OpenHashTable.h>
 
+#include "AddressSectionTypes.h"
 #include "ImageInfo.h"
 #include "SpecificImageDebugInfo.h"
 #include "Type.h"
@@ -50,6 +52,9 @@ public:
 									BObjectList<FunctionDebugInfo>& functions);
 	virtual	status_t			GetType(GlobalTypeCache* cache,
 									const BString& name, Type*& _type);
+
+	virtual AddressSectionType	GetAddressSectionType(target_addr_t address);
+
 	virtual	status_t			CreateFrame(Image* image,
 									FunctionInstance* functionInstance,
 									CpuState* cpuState,
