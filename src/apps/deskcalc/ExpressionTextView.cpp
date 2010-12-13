@@ -428,7 +428,8 @@ ExpressionTextView::SaveSettings(BMessage* archive) const
 	int32 count = fPreviousExpressions.CountItems();
 	for (int32 i = 0; i < count; i++) {
 		BString* item = (BString*)fPreviousExpressions.ItemAtFast(i);
-		status_t ret = archive->AddString("previous expression", item->String());
+		status_t ret = archive->AddString("previous expression",
+			item->String());
 		if (ret < B_OK)
 			return ret;
 	}

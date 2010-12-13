@@ -110,7 +110,8 @@ CalcApplication::_SaveSettings()
 	fCalcWindow->Unlock();
 
 	if (ret < B_OK) {
-		fprintf(stderr, "CalcApplication::_SaveSettings() - error from window: %s\n", strerror(ret));
+		fprintf(stderr, "CalcApplication::_SaveSettings() - error from window: "
+			"%s\n", strerror(ret));
 		return;
 	}
 
@@ -118,13 +119,15 @@ CalcApplication::_SaveSettings()
 	BFile prefsFile;
 	ret = _InitSettingsFile(&prefsFile, true);
 	if (ret < B_OK) {
-		fprintf(stderr, "CalcApplication::_SaveSettings() - error creating file: %s\n", strerror(ret));
+		fprintf(stderr, "CalcApplication::_SaveSettings() - "
+			"error creating file: %s\n", strerror(ret));
 		return;
 	}
 
 	ret = archive.Flatten(&prefsFile);
 	if (ret < B_OK) {
-		fprintf(stderr, "CalcApplication::_SaveSettings() - error flattening to file: %s\n", strerror(ret));
+		fprintf(stderr, "CalcApplication::_SaveSettings() - error flattening "
+			"to file: %s\n", strerror(ret));
 		return;
 	}
 }
