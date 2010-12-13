@@ -60,6 +60,8 @@ public:
 	// TeamMemory
 	virtual	ssize_t				ReadMemory(target_addr_t address, void* buffer,
 									size_t size);
+	virtual	ssize_t				WriteMemory(target_addr_t address,
+									void* buffer, size_t size);
 
 private:
 	struct DebugContext;

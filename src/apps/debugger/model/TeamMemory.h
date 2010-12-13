@@ -21,6 +21,8 @@ public:
 									size_t size) = 0;
 	virtual	status_t			ReadMemoryString(target_addr_t address,
 									size_t maxLength, BString& _string);
+	virtual ssize_t				WriteMemory(target_addr_t address,
+									void* buffer, size_t size) = 0;
 };
 
 
