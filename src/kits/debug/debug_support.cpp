@@ -1,5 +1,6 @@
 /*
  * Copyright 2005-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2010, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -214,6 +215,71 @@ debug_read_string(debug_context *context, const void *_address, char *buffer,
 	buffer[-1] = '\0';
 
 	return sumRead;
+}
+
+// debug_write_memory_partial
+ssize_t
+debug_write_memory_partial(debug_context *context, const void *address,
+	void *buffer, size_t size)
+{
+	if (!context)
+		return B_BAD_VALUE;
+
+	if (size == 0)
+		return 0;
+	if (size > B_MAX_READ_WRITE_MEMORY_SIZE)
+		size = B_MAX_READ_WRITE_MEMORY_SIZE;
+
+	// prepare the message
+	debug_nub_write_memory message;
+	message.reply_port = context->reply_port;
+	message.address = (void*)address;
+	message.size = size;
+
+	// send the message
+	debug_nub_write_memory_reply reply;
+	status_t error = send_debug_message(context, B_DEBUG_MESSAGE_WRITE_MEMORY,
+		&message, sizeof(message), &reply, sizeof(reply));
+
+	if (error != B_OK)
+		return error;
+	if (reply.error != B_OK)
+		return reply.error;
+
+	return reply.size;
+}
+
+// debug_write_memory
+ssize_t
+debug_write_memory(debug_context *context, const void *_address, void *_buffer,
+	size_t size)
+{
+	const char *address = (const char *)_address;
+	char *buffer = (char*)_buffer;
+
+	// check parameters
+	if (!context || !address || !buffer)
+		return B_BAD_VALUE;
+	if (size == 0)
+		return 0;
+
+	ssize_t sumWritten = 0;
+	while (size > 0) {
+		ssize_t bytesWritten = debug_write_memory_partial(context, address, buffer,
+			size);
+		if (bytesWritten < 0) {
+			if (sumWritten > 0)
+				return sumWritten;
+			return bytesWritten;
+		}
+
+		address += bytesWritten;
+		buffer += bytesWritten;
+		sumWritten += bytesWritten;
+		size -= bytesWritten;
+	}
+
+	return sumWritten;
 }
 
 // debug_get_cpu_state

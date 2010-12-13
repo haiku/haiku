@@ -33,6 +33,10 @@ ssize_t debug_read_memory(debug_context *context, const void *address,
 			void *buffer, size_t size);
 ssize_t debug_read_string(debug_context *context, const void *_address,
 			char *buffer, size_t size);
+ssize_t debug_write_memory_partial(debug_context *context, const void *address,
+			void *buffer, size_t size);
+ssize_t debug_write_memory(debug_context *context, const void *address,
+			void *buffer, size_t size);
 
 status_t debug_get_cpu_state(debug_context *context, thread_id thread,
 			debug_debugger_message *messageCode, debug_cpu_state *cpuState);
