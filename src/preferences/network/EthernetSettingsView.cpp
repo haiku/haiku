@@ -14,15 +14,6 @@
 
 #include "EthernetSettingsView.h"
 
-#include <arpa/inet.h>
-#include <net/if.h>
-#include <net/if_dl.h>
-#include <net/if_media.h>
-#include <net/if_types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/sockio.h>
-
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -42,6 +33,7 @@
 #include <GroupView.h>
 #include <MenuField.h>
 #include <MenuItem.h>
+#include <NetworkDevice.h>
 #include <NetworkInterface.h>
 #include <NetworkRoster.h>
 #include <Path.h>
@@ -55,6 +47,7 @@
 #include <AutoDeleter.h>
 
 #include "Settings.h"
+#include "WirelessNetworkMenuItem.h"
 
 
 static const uint32 kMsgApply = 'aply';
@@ -66,6 +59,7 @@ static const uint32 kMsgStaticMode = 'stcm';
 static const uint32 kMsgDHCPMode = 'dynm';
 static const uint32 kMsgDisabledMode = 'disa';
 static const uint32	kMsgChange = 'chng';
+static const uint32 kMsgJoinNetwork = 'join';
 
 
 static void
@@ -129,7 +123,7 @@ EthernetSettingsView::EthernetSettingsView()
 		deviceMenu->AddItem(item);
 	}
 
-	BPopUpMenu* modeMenu = new  BPopUpMenu("modes");
+	BPopUpMenu* modeMenu = new BPopUpMenu("modes");
 	modeMenu->AddItem(new BMenuItem(B_TRANSLATE("Static"),
 		new BMessage(kMsgStaticMode)));
 	modeMenu->AddItem(new BMenuItem(B_TRANSLATE("DHCP"),
@@ -138,13 +132,19 @@ EthernetSettingsView::EthernetSettingsView()
 	modeMenu->AddItem(new BMenuItem(B_TRANSLATE("Disabled"),
 		new BMessage(kMsgDisabledMode)));
 
+	BPopUpMenu* networkMenu = new BPopUpMenu("networks");
+
 	fDeviceMenuField = new BMenuField(B_TRANSLATE("Adapter:"), deviceMenu);
 	layout->AddItem(fDeviceMenuField->CreateLabelLayoutItem(), 0, 0);
 	layout->AddItem(fDeviceMenuField->CreateMenuBarLayoutItem(), 1, 0);
 
+	fNetworkMenuField = new BMenuField(B_TRANSLATE("Network:"), networkMenu);
+	layout->AddItem(fNetworkMenuField->CreateLabelLayoutItem(), 0, 1);
+	layout->AddItem(fNetworkMenuField->CreateMenuBarLayoutItem(), 1, 1);
+
 	fTypeMenuField = new BMenuField(B_TRANSLATE("Mode:"), modeMenu);
-	layout->AddItem(fTypeMenuField->CreateLabelLayoutItem(), 0, 1);
-	layout->AddItem(fTypeMenuField->CreateMenuBarLayoutItem(), 1, 1);
+	layout->AddItem(fTypeMenuField->CreateLabelLayoutItem(), 0, 2);
+	layout->AddItem(fTypeMenuField->CreateMenuBarLayoutItem(), 1, 2);
 
 	fIPTextControl = new BTextControl(B_TRANSLATE("IP address:"), "", NULL);
 	SetupTextControl(fIPTextControl);
@@ -154,44 +154,44 @@ EthernetSettingsView::EthernetSettingsView()
 		fIPTextControl->StringWidth("XXX.XXX.XXX.XXX") + inset,
 		B_SIZE_UNSET));
 
-	layout->AddItem(fIPTextControl->CreateLabelLayoutItem(), 0, 2);
-	layout->AddItem(layoutItem, 1, 2);
+	layout->AddItem(fIPTextControl->CreateLabelLayoutItem(), 0, 3);
+	layout->AddItem(layoutItem, 1, 3);
 
 	fNetMaskTextControl = new BTextControl(B_TRANSLATE("Netmask:"), "", NULL);
 	SetupTextControl(fNetMaskTextControl);
-	layout->AddItem(fNetMaskTextControl->CreateLabelLayoutItem(), 0, 3);
-	layout->AddItem(fNetMaskTextControl->CreateTextViewLayoutItem(), 1, 3);
+	layout->AddItem(fNetMaskTextControl->CreateLabelLayoutItem(), 0, 4);
+	layout->AddItem(fNetMaskTextControl->CreateTextViewLayoutItem(), 1, 4);
 
 	fGatewayTextControl = new BTextControl(B_TRANSLATE("Gateway:"), "", NULL);
 	SetupTextControl(fGatewayTextControl);
-	layout->AddItem(fGatewayTextControl->CreateLabelLayoutItem(), 0, 4);
-	layout->AddItem(fGatewayTextControl->CreateTextViewLayoutItem(), 1, 4);
+	layout->AddItem(fGatewayTextControl->CreateLabelLayoutItem(), 0, 5);
+	layout->AddItem(fGatewayTextControl->CreateTextViewLayoutItem(), 1, 5);
 
 	// TODO: Replace the DNS text controls by a BListView with add/remove
 	// functionality and so on...
 	fPrimaryDNSTextControl = new BTextControl(B_TRANSLATE("DNS #1:"), "",
 		NULL);
 	SetupTextControl(fPrimaryDNSTextControl);
-	layout->AddItem(fPrimaryDNSTextControl->CreateLabelLayoutItem(), 0, 5);
-	layout->AddItem(fPrimaryDNSTextControl->CreateTextViewLayoutItem(), 1, 5);
+	layout->AddItem(fPrimaryDNSTextControl->CreateLabelLayoutItem(), 0, 6);
+	layout->AddItem(fPrimaryDNSTextControl->CreateTextViewLayoutItem(), 1, 6);
 
 	fSecondaryDNSTextControl = new BTextControl(B_TRANSLATE("DNS #2:"), "",
 		NULL);
 	SetupTextControl(fSecondaryDNSTextControl);
-	layout->AddItem(fSecondaryDNSTextControl->CreateLabelLayoutItem(), 0, 6);
-	layout->AddItem(fSecondaryDNSTextControl->CreateTextViewLayoutItem(), 1, 6);
+	layout->AddItem(fSecondaryDNSTextControl->CreateLabelLayoutItem(), 0, 7);
+	layout->AddItem(fSecondaryDNSTextControl->CreateTextViewLayoutItem(), 1, 7);
 
 	fDomainTextControl = new BTextControl(B_TRANSLATE("Domain:"), "", NULL);
 	SetupTextControl(fDomainTextControl);
-	layout->AddItem(fDomainTextControl->CreateLabelLayoutItem(), 0, 7);
-	layout->AddItem(fDomainTextControl->CreateTextViewLayoutItem(), 1, 7);
+	layout->AddItem(fDomainTextControl->CreateLabelLayoutItem(), 0, 8);
+	layout->AddItem(fDomainTextControl->CreateTextViewLayoutItem(), 1, 8);
 
 	fErrorMessage = new BStringView("error", "");
 	fErrorMessage->SetAlignment(B_ALIGN_LEFT);
 	fErrorMessage->SetFont(be_bold_font);
 	fErrorMessage->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
-	layout->AddView(fErrorMessage, 1, 8);
+	layout->AddView(fErrorMessage, 1, 9);
 
 	// button group (TODO: move to window, but take care of
 	// enabling/disabling)
@@ -230,6 +230,7 @@ EthernetSettingsView::AttachedToWindow()
 	fSecondaryDNSTextControl->SetTarget(this);
 	fDomainTextControl->SetTarget(this);
 	fDeviceMenuField->Menu()->SetTargetForItems(this);
+	fNetworkMenuField->Menu()->SetTargetForItems(this);
 	fTypeMenuField->Menu()->SetTargetForItems(this);
 
 	// display settigs of first adapter on startup
@@ -254,7 +255,8 @@ EthernetSettingsView::MessageReceived(BMessage* message)
 			fApplyButton->SetEnabled(true);
 			fRevertButton->SetEnabled(true);
 			break;
-		case kMsgInfo: {
+		case kMsgInfo:
+		{
 		 	const char* name;
 			if (message->FindString("interface", &name) != B_OK)
 				break;
@@ -324,6 +326,53 @@ EthernetSettingsView::_ShowConfiguration(Settings* settings)
 	fPrimaryDNSTextControl->SetText("");
 	fSecondaryDNSTextControl->SetText("");
 	fDomainTextControl->SetText("");
+
+	// Show/hide networks menu
+	BNetworkDevice device(settings->Name());
+	if (fNetworkMenuField->IsHidden(fNetworkMenuField)
+		&& device.IsWireless()) {
+		fNetworkMenuField->Show();
+		Window()->InvalidateLayout();
+	} else if (!fNetworkMenuField->IsHidden(fNetworkMenuField)
+		&& !device.IsWireless()) {
+		fNetworkMenuField->Hide();
+		Window()->InvalidateLayout();
+	}
+
+	if (device.IsWireless()) {
+		// Rebuild network menu
+		BMenu* menu = fNetworkMenuField->Menu();
+		menu->RemoveItems(0, menu->CountItems(), true);
+
+		wireless_network network;
+		int32 count = 0;
+		uint32 cookie = 0;
+		while (device.GetNextNetwork(cookie, network) == B_OK) {
+			BMessage* message = new BMessage(kMsgJoinNetwork);
+			message->AddString("device", device.Name());
+			message->AddString("name", network.name);
+
+			BMenuItem* item = new WirelessNetworkMenuItem(network.name,
+				network.signal_strength,
+				(network.flags & B_NETWORK_IS_ENCRYPTED) != 0, message);
+			menu->AddItem(item);
+
+			count++;
+		}
+		if (count == 0) {
+			BMenuItem* item = new BMenuItem(
+				B_TRANSLATE("<no wireless networks found>"), NULL);
+			item->SetEnabled(false);
+			menu->AddItem(item);
+		} else {
+			BMenuItem* item = new BMenuItem(
+				B_TRANSLATE("Choose automatically"), NULL);
+			item->SetMarked(true);
+			menu->AddItem(item, 0);
+			menu->AddItem(new BSeparatorItem(), 1);
+		}
+		menu->SetTargetForItems(this);
+	}
 
 	bool enableControls = false;
 	fTypeMenuField->SetEnabled(settings != NULL);
@@ -495,6 +544,12 @@ EthernetSettingsView::_SaveAdaptersConfiguration()
 			fprintf(fp, "\t\taddress\t%s\n", settings->IP());
 			fprintf(fp, "\t\tgateway\t%s\n", settings->Gateway());
 			fprintf(fp, "\t\tmask\t%s\n", settings->Netmask());
+			if (!fNetworkMenuField->IsHidden(fNetworkMenuField)
+				&& !fNetworkMenuField->Menu()->ItemAt(0)->IsMarked()) {
+				BMenuItem* item = fNetworkMenuField->Menu()->FindMarked();
+				if (item != NULL)
+					fprintf(fp, "\t\tnetwork\t%s", item->Label());
+			}
 			fprintf(fp, "\t}\n");
 		}
 		fprintf(fp, "}\n\n");

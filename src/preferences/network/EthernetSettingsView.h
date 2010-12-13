@@ -55,6 +55,7 @@ private:
 					// TODO: buttons should be moved to window instead
 
 				BMenuField*		fDeviceMenuField;
+				BMenuField*		fNetworkMenuField;
 				BMenuField*		fTypeMenuField;
 				BTextControl*	fIPTextControl;
 				BTextControl*	fNetMaskTextControl;
