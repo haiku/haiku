@@ -45,6 +45,7 @@
 #include "NetworkStatus.h"
 #include "NetworkStatusIcons.h"
 #include "RadioView.h"
+#include "WirelessNetworkMenuItem.h"
 
 
 #undef B_TRANSLATE_CONTEXT
@@ -68,31 +69,6 @@ const uint32 kMsgJoinNetwork = 'join';
 
 const uint32 kMinIconWidth = 16;
 const uint32 kMinIconHeight = 16;
-
-
-class WirelessNetworkMenuItem : public BMenuItem {
-public:
-								WirelessNetworkMenuItem(const char* name,
-									int32 signalQuality, bool encrypted,
-									BMessage* message);
-	virtual						~WirelessNetworkMenuItem();
-
-			void				SetSignalQuality(int32 quality);
-			int32				SignalQuality() const
-									{ return fQuality; }
-			bool				IsEncrypted() const
-									{ return fIsEncrypted; }
-
-protected:
-	virtual	void				DrawContent();
-	virtual	void				Highlight(bool isHighlighted);
-	virtual	void				GetContentSize(float* width, float* height);
-			void				DrawRadioIcon();
-
-private:
-			int32				fQuality;
-			bool				fIsEncrypted;
-};
 
 
 class SocketOpener {
@@ -120,66 +96,6 @@ public:
 private:
 	int	fSocket;
 };
-
-
-// #pragma mark - WirelessNetworkMenuItem
-
-
-WirelessNetworkMenuItem::WirelessNetworkMenuItem(const char* name,
-	int32 signalQuality, bool encrypted, BMessage* message)
-	:
-	BMenuItem(name, message),
-	fQuality(signalQuality),
-	fIsEncrypted(encrypted)
-{
-}
-
-
-WirelessNetworkMenuItem::~WirelessNetworkMenuItem()
-{
-}
-
-
-void
-WirelessNetworkMenuItem::SetSignalQuality(int32 quality)
-{
-	fQuality = quality;
-}
-
-
-void
-WirelessNetworkMenuItem::DrawContent()
-{
-	DrawRadioIcon();
-	BMenuItem::DrawContent();
-}
-
-
-void
-WirelessNetworkMenuItem::Highlight(bool isHighlighted)
-{
-	BMenuItem::Highlight(isHighlighted);
-}
-
-
-void
-WirelessNetworkMenuItem::GetContentSize(float* width, float* height)
-{
-	BMenuItem::GetContentSize(width, height);
-	*width += *height + 4;
-}
-
-
-void
-WirelessNetworkMenuItem::DrawRadioIcon()
-{
-	BRect bounds = Frame();
-	bounds.left = bounds.right - 4 - bounds.Height();
-	bounds.right -= 4;
-	bounds.bottom -= 2;
-
-	RadioView::Draw(Menu(), bounds, fQuality, RadioView::DefaultMax());
-}
 
 
 //	#pragma mark -

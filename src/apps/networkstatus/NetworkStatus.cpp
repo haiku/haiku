@@ -66,9 +66,10 @@ our_image(image_info& image)
 
 
 NetworkStatus::NetworkStatus()
-	: BApplication(kSignature),
-	  fAutoInstallInDeskbar(false),
-	  fQuitImmediately(false)
+	:
+	BApplication(kSignature),
+	fAutoInstallInDeskbar(false),
+	fQuitImmediately(false)
 {
 }
 
