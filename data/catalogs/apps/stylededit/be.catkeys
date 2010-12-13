@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-StyledEdit	2108192170
+1	belarusian	x-vnd.Haiku-StyledEdit	3614078026
 OK	LoadAlert		Так
 ???	LoadAlert		???
 Left	Menus		Левы
@@ -21,11 +21,11 @@ Cancel	RevertToSavedAlert		Скасаваць
 Document	Menus		Дакумент
 Save changes to the document \"%s\"? 	QuitAlert		Захаваць адрэдагаваны дакумент \"%s\"? 
 Font	Menus		Шрыфт
-Replace all	FindandReplaceWindow		Замяняць агулам
+Replace all	FindandReplaceWindow		Замяняць усё
 Default	Open_and_SaveAsPanel		Прадвызначаны
-Cancel	FindandReplaceWindow		Скасаваць
+Cancel	FindandReplaceWindow		Адмена
 Error loading \"%s\":\n\tUnsupported format	LoadAlert		Немагчыма загрузіць \"%s\":\n\tГэты фармат не падтрымліваецца
-OK	RevertToSavedAlert		Так
+OK	RevertToSavedAlert		ОК
 Don't save	QuitAlert		Не захоўваць
 Align	Menus		Раўнаванне
 Color	Menus		Колер
@@ -47,12 +47,34 @@ Find…	Menus		Пошук…
 Error loading \"%s\":\n\t%s	LoadAlert		Немагчыма загрузіць \"%s\":\n\t%s
 Black	Menus		Чорны
 Untitled 	StyledEditWindow		Без назвы
-OK	SaveAlert		Так
+OK	SaveAlert		ОК
 Find	FindandReplaceWindow		Шукаць
 Encoding	Open_and_SaveAsPanel		Кадоўка
 Replace…	Menus		Замяняць…
 Right	Menus		Права
-Cancel	SaveAlert		Скасаваць
+Cancel	SaveAlert		Адмена
 Save	SaveAlert		Захаваць
 Don't save	SaveAlert		Не захоўваць
 This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Гэты файл пазначаны толькі для чытання. Захаваць змены ў дакумент \"%s\"? 
+Paste	Menus		Уставіць
+File	Menus		Файл
+Page setup…	Menus		Наладкі старонкі...
+Print…	Menus		Друкаваць...
+Quit	Menus		Выйсці
+Clear	Menus		Ачысціць
+Edit	Menus		Рэдагаваць
+Close	Menus		Закрыць
+Copy	Menus		Капіяваць
+Cut	Menus		Выразаць
+Select all	Menus		Абраць усё
+Save as…	Menus		Захаваць як...
+Lines:	Statistics		Радкоў:
+Document statistics	Statistics		Статыстыка дакументу
+Statistics…	Menus		Статыстыка...
+Words:	Statistics		Словаў:
+OK	Statistics		ОК
+Undo typing	QuitAlert		Адмяніць увод
+Characters:	Statistics		Знакаў:
+Redo typing	QuitAlert		Паўтарыць увод
+Italic	Menus		Нахілены
+Bold	Menus		Тлусты

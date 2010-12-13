@@ -1,21 +1,54 @@
-1	belarusian	x-vnd.Be-PSRV	3878243268
+1	belarusian	x-vnd.Be-PSRV	1761631281
 Undefined	ConfigWindow		Нявызначаны
-Cancel	PrintServerApp		Скасаваць
+Cancel	PrintServerApp		Адмена
 Page setup:	ConfigWindow		Наладкі старонкі:
 OK	ConfigWindow		Так
-Cancel	ConfigWindow		Скасаваць
+Cancel	ConfigWindow		Адмена
 Yes	PrintServerApp		Так
 Would you like to set one up now?	PrintServerApp		Жадаеце наладзіць яго зараз?
 Portrait	ConfigWindow		Партрэт
 All pages	ConfigWindow		Усе старонкі
-There is no default printer set up.	PrintServerApp		Прадвызначаная друкарка не прызначана.
-Printer:	ConfigWindow		Друкарка:
-Select a printer	ConfigWindow		Абраць друкарку
+There is no default printer set up.	PrintServerApp		Прынтэр па змоўчанню не прызначаны.
+Printer:	ConfigWindow		Прынтэр:
+Select a printer	ConfigWindow		Абраць прынтэр
 No	PrintServerApp		Не
 Landscape	ConfigWindow		Пейзаж
-There are no printers set up.	PrintServerApp		Няма друкарак.
+There are no printers set up.	PrintServerApp		Няма прынтэраў для ўсталёўкі.
 OK	PrintServerApp		Так
 Print setup	ConfigWindow		Наладкі друку
-Would you like to make @ the default printer?	PrintServerApp		Жадаеце зрабіць @ прадвызначанай друкаркай?
-Page setup	ConfigWindow		Налдакі старонкі
-Paper setup:	ConfigWindow		Налдкі паперы:
+Would you like to make @ the default printer?	PrintServerApp		Жадаеце зрабіць @ прадвызначаным прынтэрам?
+Page setup	ConfigWindow		Наладкі старонкі
+Paper setup:	ConfigWindow		Наладкі паперы:
+Return the number of available transports	PrintServerApp Scripting		Вярнуць колькасць даступных транспортаў
+Return the number of available printers	PrintServerApp Scripting		Вярнуць колькасць даступных прынтэраў
+Get currently available ports/devices	Transport Scripting		Вызначыць даступныя зараз порты/прылады
+Retrieve or select the active printer	PrintServerApp Scripting		Вызначыць або выбраць актыўны прынтэр
+Retrieve a specific printer	PrintServerApp Scripting		Вызначыць асабісты прынтэр
+Page %1 to %2	ConfigWindow		Старонкі з %1 па %2
+Get name of the printer add-on used for this printer	Printer Scripting		Вызначыць імя дапаўнення, ужытага для гэтага прынтэра
+Printer server	ConfigWindow		Сервер друку
+Page %1 to %2, %3 copies	ConfigWindow		Старонкі з %1 па %2, %3 копій
+Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Ledger
+A6	ConfigWindow	ISO 216 paper size	A6
+B5	ConfigWindow	ISO 216 paper size	B5
+A0	ConfigWindow	ISO 216 paper size	A0
+Letter	ConfigWindow	ANSI A (letter), a North American paper size	Letter
+A2	ConfigWindow	ISO 216 paper size	A2
+Show configuration window	PrintServerApp Scripting		Паказаць вакно канфігурацыі
+A4	ConfigWindow	ISO 216 paper size	A4
+Get comments about this printer	Printer Scripting		Атрымаць каментарыі да гэтага прынтэра
+Get the transport configuration for this printer	Printer Scripting		Атрымаць канфігурацыю транспорта для гэтага прынтэра
+Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	Legal
+Get name of the transport add-on used for this printer	Printer Scripting		Атрымаць імя транспорта, ужытага для гэтага прынтэра
+All pages, %1 copies	ConfigWindow		Усе старонкі, %1 копій
+Delete a specific printer	PrintServerApp Scripting		Выдаліць асабісты прынтэр
+Create a new printer	PrintServerApp Scripting		Стварыць новы прынтэр
+A1	ConfigWindow	ISO 216 paper size	A1
+Retrieve a specific transport	PrintServerApp Scripting		Вызначыць асабісты транспорт
+Get name of printer	Printer Scripting		Атрымаць імя прынтэра
+A3	ConfigWindow	ISO 216 paper size	A3
+Get name of transport	Transport Scripting		Атрымаць імя транспорта
+A5	ConfigWindow	ISO 216 paper size	A5
+Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Tabloid
+A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Прынтэр з гэтым імем ужо існуе, але яго драйвер не знойдзены! Замяніць?
+A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Прынтэр з гэтым імем ужо існуе, але наогул не функцыянуе! Замяніць?

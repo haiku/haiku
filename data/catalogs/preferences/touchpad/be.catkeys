@@ -1,0 +1,16 @@
+1	belarusian	x-vnd.Haiku-Touchpad	1498191605
+Scrolling	TouchpadPrefView		Пракрутка
+Revert	TouchpadPrefView		Вярнуць
+Two finger scrolling	TouchpadPrefView		Двухпальцавая пракрутка
+Defaults	TouchpadPrefView		Прадвызначаныя
+Slow	TouchpadPrefView		Павольна
+High	TouchpadPrefView		Высока
+Tap gesture	TouchpadPrefView		Жэсты тапаў
+Horizontal scrolling	TouchpadPrefView		Гарызантальная пракрутка
+Fast	TouchpadPrefView		Хутка
+Tap click sensitivity	TouchpadPrefView		Чуткасць тапу
+Scroll acceleration	TouchpadPrefView		Паскарэнне пракруткі
+Off	TouchpadPrefView		Выкл.
+Touchpad	TouchpadMain		Тачпад
+Horizontal scroll speed	TouchpadPrefView		Хуткасць гарызантальнай пракруткі
+Vertical scroll speed	TouchpadPrefView		Хуткасць вертыкальнай пракруткі

@@ -1,14 +1,14 @@
-1	belarusian	x-vnd.Be-PRNT	634957092
+1	belarusian	x-vnd.Be-PRNT	980664982
 Waiting	JobListView		Чакае
 page	JobListView		старонка
 Cancel	AddPrinterDialog		Скасаваць
-Add printer	AddPrinterDialog		Дадаць друкарку
-Printers	PrintersWindow		Друкаркі
-Default Printer	PrinterListView		Прадвызначаная друкарка
+Add printer	AddPrinterDialog		Дадаць прынтэр
+Printers	PrintersWindow		Прынтэры
+Default Printer	PrinterListView		Прадвызначаны прынтэр
 No pending jobs.	PrinterListView		Чарга заданняў пустая.
 pages	JobListView		старонак
 Processing	JobListView		Выконваецца
-Printer name:	AddPrinterDialog		Імя друкаркі:
+Printer name:	AddPrinterDialog		Імя прынтэру:
 Restart job	PrintersWindow		Перазапусціць заданне
 Add	AddPrinterDialog		Дадаць
 Make default	PrintersWindow		Зрабіць прадвызначаным
@@ -21,7 +21,9 @@ Print jobs for 	PrintersWindow		Заданні для
 Failed	JobListView		Няўдалы
 %.2f KB	JobListView		%.2f КБ
 Completed	JobListView		Завершана
-Print jobs: No printer selected	PrintersWindow		Заданні: Няма абранай друкаркі
+Print jobs: No printer selected	PrintersWindow		Заданні: Няма абранага прынтэру
 Unknown status	JobListView		Статус невядомы
 Connected to:	AddPrinterDialog		Далучана да:
-Printer type:	AddPrinterDialog		Тып друкаркі:
+Printer type:	AddPrinterDialog		Тып прынтэру:
+pending jobs.	PrinterListView		заданняў ў чарзе.
+No printer found!	TransportMenu		Няма прынтэраў!

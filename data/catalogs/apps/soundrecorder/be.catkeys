@@ -1,0 +1,38 @@
+1	belarusian	x-vnd.Haiku-SoundRecorder	1355572422
+Loop	RecorderWindow		Зацыкліць
+Cannot find default audio hardware	RecorderWindow		Немагчыма знайсці стандартную аўдыё апаратуру
+Cannot find the temporary file created to hold the new recording	RecorderWindow		Немагчыма знайсці часовы файл, створаны для захавання новага запісу
+Sample size: 	RecorderWindow		Памер сэмплу:
+Nothing to play	RecorderWindow		Няма чаго іграць
+Duration:	RecorderWindow		Працягласць:
+Some of the files don't appear to be audio files	RecorderWindow		Некаторыя з файлаў не падобныя да аўдыё файлаў
+File info	RecorderWindow		Інфа пра файл
+Drop files here	SoundListView		Кідайце файлы сюды
+Input	RecorderWindow		Уваход
+Stop	RecorderWindow		Стоп
+SoundRecorder	RecorderWindow		Гуказапіс
+Format: 	RecorderWindow		Фармат:
+Sound List	RecorderWindow		Спіс Гуку
+Compression:	RecorderWindow		Сціск:
+Rewind	RecorderWindow		Назад
+Sample rate: 	RecorderWindow		Частата дыскрэтызацыі
+Invalid audio files	RecorderWindow		Няправільныя аўдыё файлы
+seconds	RecorderWindow		секунд
+OK	RecorderWindow		ОК
+Cannot open the temporary file created to hold the new recording	RecorderWindow		Немагчыма адкрыць часовы файл, створаны для захавання новага запісу
+None of the files appear to be audio files	RecorderWindow		Ні адзін з файлаў не месціць аўдыё даных
+Input:	RecorderWindow		Уваход:
+Forward	RecorderWindow		Уперад
+Play	RecorderWindow		Іграць
+Channels: 	RecorderWindow		Каналы:
+bits	RecorderWindow		бітаў
+None	RecorderWindow		Няма
+Record	RecorderWindow		Запіс
+Cannot recognize this file as a media file	RecorderWindow		Немагчыма знайсці медыя даныя ў гэтым файле
+File name:	RecorderWindow		Імя файла:
+Cannot connect to the selected sound input	RecorderWindow		Немагчыма далучыцца да выбранага гукавага ўваходу
+Cannot get the file to play	RecorderWindow		Немагчыма прайграць файл
+Cannot record a sound that long	RecorderWindow		Немагчыма запісываць так доўга
+Cannot find an unused name to use for the new recording	RecorderWindow		Немагчыма знайсці неязанятае імя для новага запісу
+Save	RecorderWindow		Захаваць
+Cannot connect to media server	RecorderWindow		Немагчыма далучыцца да медыясервера

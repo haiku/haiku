@@ -1,86 +1,71 @@
 1	belarusian	x-vnd.Haiku-FileTypes	525617155
+Could not change attributes	Attribute Window		Немагчыма змяніць атрыбуты
 Args only	Application Type Window		Толькі аргументы
 Add group	New File Type Window		Дадаць групу
-Remove	Application Type Window		Выдаліць
-Select same type as	FileType Window		Пазначыць падобны тып як
-Remove icon	Icon View		Выдаліць іконку
-Supported types	Application Type Window		Падтрымліваемыя тыпы
-Internal name:	New File Type Window		Унутранае імя:
-New file type	New File Type Window		Новы тып файлаў
-Add icon…	Icon View		Дадаць іконку…
 Do you want to save the changes?	Application Type Window		Жадаеце захаваць змены?
 File type	FileType Window		Тып файла
-Could not change attributes	Attribute Window		Немагчыма змяніць атрыбуты
 OK	FileTypes		Так
 Save	Application Type Window		Захаваць
-Add	Extension Window		Дадаць
 Select same preferred application as	FileType Window		Вылучыць тую самую пажаданую праграму як і ў 
 Cancel	Attribute Window		Скасаваць
-Multiple launch	Application Type Window		Запускаць некалькі адразу
 Group:	New File Type Window		Група:
 Done	Extension Window		Зроблена
-Could not open file	FileType Window		Немагчыма адкрыць файл
 Preferred application	FileType Window		Пажаданая праграма
-Same as…	FileType Window		Такая ж, як…
-File	Application Type Window		Файл
 Version:	Application Type Window		Версія:
-FileTypes request	FileTypes		запыт FileTypes
-Select…	FileType Window		Выбраць…
-Development	Application Type Window		Распрацоўка
-Icon	FileType Window		Іконка
-Special:	Attribute Window		Спецыяльны:
-Alpha	Application Type Window		Alpha
-Signature:	Application Type Window		Подпіс:
-Quit, don't save	Application Type Window		Ігнараваць змены і выйсці
-Add…	Application Type Window		Дадаць…
 Select preferred application	FileType Window		Вылучыць пажаданую праграму
-Single launch	Application Type Window		Запуск па адной
 The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Праграма \"%s\" не падтрымлівае працу з гэтым тыпам файлаў.\nУсё роўна прызначыць яе пажаданай?
 Type:	Attribute Window		Тып:
-Done	Attribute Window		Зроблена
 Set Preferred Application	Preferred App Menu		Прызначыць Пажаданую Праграму
-Background app	Application Type Window		Фонавая праграма
 Add new group	New File Type Window		Дадаць новую групу
 Cancel	Application Type Window		Скасаваць
-Cancel	New File Type Window		Скасаваць
-Extension:	Extension Window		Пашырэнне:
 Add	Attribute Window		Дадаць
 Close	Application Type Window		Закрыць
-Golden master	Application Type Window		Залаты
 Could not open \"%s\":\n%s	FileTypes		Немагчыма адчыніць \"%s\":\n%s
 Alignment:	Attribute Window		Раўнаванне:
 Cancel	Extension Window		Скасаваць
-Application flags	Application Type Window		Флагі праграм
-Editable	Attribute Window	If Tracker allows to edit this attribute.	Можна рэдагаваць
 Width:	Attribute Window	Default column width in Tracker for this attribute.	Шырыня:
 Save request	Application Type Window		Захаваць запыт
 Beta	Application Type Window		Beta
 Attribute name:	Attribute Window		Імя атрыбута:
-Extension	Extension Window		Пашырэнне
 Add type	New File Type Window		Дадаць тып
 Internal name:	Attribute Window		Унутранае імя:
 Final	Application Type Window		Канчатковы
 Open file	FileTypes		Адчыніць Файл
-Exclusive launch	Application Type Window		Выбарны запуск
-Gamma	Application Type Window		Gamma
 Default application	FileType Window		Прадвызначаная праграма
-Long description:	Application Type Window		Падрабязнае апісанне
 Version info	Application Type Window		Інфармацыя пра версію
-Center	Attribute Window	Attribute column alignment in Tracker	Цэнтр
-Short description:	Application Type Window		Кароткан апісанне
 File could not be opened	Preferred App Menu		Файля ня можа быць адчынены
-Could not change file extensions	Extension Window		Не ўдалося змяніць пашырэнні файлаў
-Edit icon…	Icon View		Рэдагаваць іконку…
 Save into resource file…	Application Type Window		Захаваць у файл рэсурсаў…
-Left	Attribute Window	Attribute column alignment in Tracker	Злева
 Visible	Attribute Window		Бачнае
 Could not install file type	New File Type Window		Немагчыма ўсталяваць тып файла
+Remove	Application Type Window		Выдаліць
+Remove icon	Icon View		Выдаліць іконку
+New file type	New File Type Window		Новы тып файлаў
+Add icon…	Icon View		Дадаць іконку…
+Multiple launch	Application Type Window		Запускаць некалькі адразу
+Same as…	FileType Window		Такая ж, як…
+Select…	FileType Window		Выбраць…
+Alpha	Application Type Window		Alpha
+Single launch	Application Type Window		Запуск па адной
+Background app	Application Type Window		Фонавая праграма
+Extension:	Extension Window		Пашырэнне:
+Golden master	Application Type Window		Залаты
+Application flags	Application Type Window		Флагі праграм
+Editable	Attribute Window	If Tracker allows to edit this attribute.	Можна рэдагаваць
+Extension	Extension Window		Пашырэнне
+Exclusive launch	Application Type Window		Выбарны запуск
+Gamma	Application Type Window		Gamma
+Long description:	Application Type Window		Падрабязнае апісанне
+Center	Attribute Window	Attribute column alignment in Tracker	Цэнтр
+Short description:	Application Type Window		Кароткан апісанне
+Could not change file extensions	Extension Window		Не ўдалося змяніць пашырэнні файлаў
+Edit icon…	Icon View		Рэдагаваць іконку…
+Left	Attribute Window	Attribute column alignment in Tracker	Злева
 Application type	Application Type Window		Тып праграмы
 Application types…	FileTypes Window		Тыпы праграм…
 Recognition rule is not valid:\n\n	FileTypes Window		Правіла распазнання неправільнае:\n\n
 Show icons in list	FileTypes Window		Паказваць іконкі ў спісе
-Type name:	FileTypes Window		Імя тыпу:
 About FileTypes…	FileTypes Window		Пра FileTypes…
+Type name:	FileTypes Window		Імя тыпу:
 Choose type	Type List Window		Выбраць тып
 Rule:	FileTypes Window		Правіла:
 Multiple files from \"%s\" file type	FileType Window		Множныя файлы тыпу \"%s\"
@@ -124,7 +109,6 @@ Could not remove file type: %s\n	FileTypes Window		Не ўдалося выда�
 Cancel	Preferred App Menu		Адмена
 Cancel	FileTypes Window		Адмена
 Select preferred application	FileTypes Window		Выбраць пажаданую праграму
-FileTypes request	FileTypes Window		Запыт тыпу.
 (from super type)	FileTypes Window		(з галоўнага тыпу)
 Preferred application	FileTypes Window		Пажаданая праграма
 Attribute	Attribute Window		Атрыбут
@@ -132,3 +116,19 @@ Group name:	New File Type Window		Імя групы:
 Display as:	Attribute Window	Tracker offers different display modes for attributes.	Паказваць як:
 Right	Attribute Window	Attribute column alignment in Tracker	Справа
 %1 application type	Application Type Window		%1 тып праграмы
+FileTypes request	FileTypes Window		Запыт тыпу.
+Select same type as	FileType Window		Пазначыць падобны тып як
+Internal name:	New File Type Window		Унутране імя:
+Special:	Attribute Window		Спецыяльны:
+Add	Extension Window		Дадаць
+Could not open file	FileType Window		Немагчыма адркрыць файл
+File	Application Type Window		Файл
+FileTypes request	FileTypes		запыт FileTypes
+Development	Application Type Window		Распрацоўка
+Icon	FileType Window		Значак
+Cancel	New File Type Window		Скасаваць
+Done	Attribute Window		Зроблена
+Add…	Application Type Window		Дадаць…
+Signature:	Application Type Window		Подпіс:
+Quit, don't save	Application Type Window		Выйсьці, не захоўваць
+Supported types	Application Type Window		Падтрымліваемыя тыпы

@@ -1,0 +1,31 @@
+1	belarusian	x-vnd.Be-PRNT	407752036
+Waiting	JobListView		Чаканне
+page	JobListView		старонка
+Cancel	AddPrinterDialog		Адмена
+Add printer	AddPrinterDialog		Дадаць прынтэр
+Printers	PrintersWindow		Прынтэры
+Default Printer	PrinterListView		Прадвызначаны прынтэр
+No pending jobs.	PrinterListView		Няма заданняў у чарзе.
+pages	JobListView		старонкаў
+Processing	JobListView		Апрацоўка
+Printer name:	AddPrinterDialog		Імя прынтэра:
+pending jobs.	PrinterListView		заданні ў чарзе.
+Restart job	PrintersWindow		Пачаць нанова
+Add	AddPrinterDialog		Дадаць
+Make default	PrintersWindow		Зрабіць прадвызначаным
+Cancel job	PrintersWindow		Адмяніць заданне
+1 pending job.	PrinterListView		1 заданне ў чарзе.
+Remove	PrintersWindow		Выдаліць
+<pick one>	AddPrinterDialog		<выберыце адно>
+Add …	PrintersWindow		Дадаць ...
+Print jobs for 	PrintersWindow		Заданні друку для
+Failed	JobListView		Не ўдалося
+%.2f KB	JobListView		%.2f KB
+Completed	JobListView		Скончана
+No printer found!	TransportMenu		Прынтэры не знойдзены!
+Print jobs: No printer selected	PrintersWindow		Заданні друку: Не выбраны прынтэр
+Unknown status	JobListView		Невядомы стан
+Connected to:	AddPrinterDialog		Падключаны да:
+Printer type:	AddPrinterDialog		Тып прынтэру:
+Transport: %transport% %transport_address%	PrinterListView		Транспорт: %transport% %transport_address%
+Driver: %driver%	PrinterListView		Драйвер: %driver%
