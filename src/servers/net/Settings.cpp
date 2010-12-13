@@ -51,6 +51,13 @@ const static settings_template kInterfaceTemplate[] = {
 	{0, NULL, NULL}
 };
 
+const static settings_template kInterfacesTemplate[] = {
+	{B_MESSAGE_TYPE, "interface", kInterfaceTemplate},
+	{0, NULL, NULL}
+};
+
+// Network templates
+
 const static settings_template kNetworkTemplate[] = {
 	{B_STRING_TYPE, "name", NULL, true},
 	{B_STRING_TYPE, "mac", NULL},
@@ -61,8 +68,7 @@ const static settings_template kNetworkTemplate[] = {
 	{0, NULL, NULL}
 };
 
-const static settings_template kInterfacesTemplate[] = {
-	{B_MESSAGE_TYPE, "interface", kInterfaceTemplate},
+const static settings_template kNetworksTemplate[] = {
 	{B_MESSAGE_TYPE, "network", kNetworkTemplate},
 	{0, NULL, NULL}
 };
@@ -282,6 +288,12 @@ Settings::_Load(const char* name, uint32* _type)
 		if (status == B_OK && _type != NULL)
 			*_type = kMsgInterfaceSettingsUpdated;
 	}
+	if (name == NULL || !strcmp(name, "wireless_networks")) {
+		status = _ConvertFromDriverSettings("wireless_networks",
+			kNetworksTemplate, fNetworks);
+		if (status == B_OK && _type != NULL)
+			*_type = kMsgInterfaceSettingsUpdated;
+	}
 	if (name == NULL || !strcmp(name, "services")) {
 		status = _ConvertFromDriverSettings("services", kServicesTemplate,
 			fServices);
@@ -317,6 +329,8 @@ Settings::StartMonitoring(const BMessenger& target)
 	fListener = target;
 
 	status_t status = _StartWatching("interfaces", target);
+	if (status == B_OK)
+		status = _StartWatching("wireless_networks", target);
 	if (status == B_OK)
 		status = _StartWatching("services", target);
 
@@ -382,7 +396,7 @@ Settings::GetNextInterface(uint32& cookie, BMessage& interface)
 status_t
 Settings::GetNextNetwork(uint32& cookie, BMessage& network)
 {
-	status_t status = fInterfaces.FindMessage("network", cookie, &network);
+	status_t status = fNetworks.FindMessage("network", cookie, &network);
 	if (status != B_OK)
 		return status;
 

@@ -72,6 +72,7 @@ private:
 private:
 			BMessenger			fListener;
 			BMessage			fInterfaces;
+			BMessage			fNetworks;
 			BMessage			fServices;
 };
 
