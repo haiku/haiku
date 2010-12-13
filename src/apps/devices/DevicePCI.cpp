@@ -19,6 +19,7 @@ extern "C" {
 }
 
 
+
 DevicePCI::DevicePCI(Device* parent)
 	:
 	Device(parent),
@@ -94,11 +95,11 @@ DevicePCI::InitFromAttributes()
 		DeviceName << (devShort ? devShort : devFull);
 	}
 	
-	SetAttribute("Device name", DeviceName);
-	SetAttribute("Manufacturer", ManufacturerName);
-	SetAttribute("Driver used", "Not implemented");
-	SetAttribute("Device paths", "Not implemented");
-	SetAttribute("Class info", classInfo);
+	SetAttribute(B_TRANSLATE("Device name"), DeviceName);
+	SetAttribute(B_TRANSLATE("Manufacturer"), ManufacturerName);
+	SetAttribute(B_TRANSLATE("Driver used"), B_TRANSLATE("Not implemented"));
+	SetAttribute(B_TRANSLATE("Device paths"), B_TRANSLATE("Not implemented"));
+	SetAttribute(B_TRANSLATE("Class info"), classInfo);
 	fCategory = (Category)fClassBaseId;
 	BString outlineName;
 	outlineName << ManufacturerName << " " << DeviceName;

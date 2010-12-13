@@ -8,11 +8,9 @@
 
 
 #include "PropertyList.h"
-
 #include <ColumnTypes.h>
 
 //#include <stdio.h>
-
 
 PropertyRow::PropertyRow(const char* name, const char* value)
 	: BRow(),
@@ -49,10 +47,10 @@ PropertyList::PropertyList(const char* name)
 		B_NO_BORDER, true)
 {
 	BStringColumn* nameColumn;
-	AddColumn(nameColumn = new BStringColumn("Name", 150, 50, 500,
+	AddColumn(nameColumn = new BStringColumn(B_TRANSLATE("Name"), 150, 50, 500,
 			B_TRUNCATE_MIDDLE),
 		kNameColumn);
-	AddColumn(new BStringColumn("Value", 150, 50, 500, B_TRUNCATE_END),
+	AddColumn(new BStringColumn(B_TRANSLATE("Value"), 150, 50, 500, B_TRUNCATE_END),
 		kValueColumn);
 	SetSortColumn(nameColumn, false, true);
 }

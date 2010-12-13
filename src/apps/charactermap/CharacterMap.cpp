@@ -10,10 +10,13 @@
 
 #include <Alert.h>
 #include <Application.h>
+#include <Catalog.h>
 #include <TextView.h>
 
 #include "CharacterWindow.h"
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "CharacterMap"
 
 const char* kSignature = "application/x-vnd.Haiku-CharacterMap";
 
@@ -54,9 +57,10 @@ CharacterMap::MessageReceived(BMessage* message)
 void
 CharacterMap::AboutRequested()
 {
-	BAlert *alert = new BAlert("about", "CharacterMap\n"
+	BAlert *alert = new BAlert(B_TRANSLATE("about"), B_TRANSLATE(
+		"CharacterMap\n"
 		"\twritten by Axel Dörfler\n"
-		"\tCopyright 2009, Haiku, Inc.\n", "OK");
+		"\tCopyright 2009, Haiku, Inc.\n"), "OK");
 	BTextView *view = alert->TextView();
 	BFont font;
 

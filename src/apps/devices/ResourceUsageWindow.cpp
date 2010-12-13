@@ -16,6 +16,7 @@
 
 // Includes ------------------------------------------------------------------------------------------ //
 #include <Box.h>
+#include <Catalog.h>
 #include <Screen.h>
 #include <ScrollView.h>
 #include <stdio.h>
@@ -24,6 +25,9 @@
 
 #include "DevicesInfo.h"
 #include "DevicesWindows.h"
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "ResourceUsageWindow"
 
 class IRQDMAItem : public BListItem
 {
@@ -241,16 +245,16 @@ void ResourceUsageWindow::InitWindow(BList &list)
 	
 	BTab *tab = new BTab();
 	tabView->AddTab(IRQScrollView, tab);
-	tab->SetLabel("IRQ");
+	tab->SetLabel(B_TRANSLATE("IRQ"));
 	tab = new BTab();
 	tabView->AddTab(DMAScrollView, tab);
-	tab->SetLabel("DMA");
+	tab->SetLabel(B_TRANSLATE("DMA"));
 	tab = new BTab();
 	tabView->AddTab(IORangeScrollView, tab);
-	tab->SetLabel("IO Range");
+	tab->SetLabel(B_TRANSLATE("IO Range"));
 	tab = new BTab();
 	tabView->AddTab(memoryScrollView, tab);
-	tab->SetLabel("Memory Range");
+	tab->SetLabel(B_TRANSLATE("Memory Range"));
 	
 	{
 		uint32 mask = 1;

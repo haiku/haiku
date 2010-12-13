@@ -44,20 +44,20 @@ DeviceACPI::InitFromAttributes()
 
 	// Identify Predefined root namespaces (ACPI Spec 4.0a, p162)
 	if (rootACPIPath == "\\_SB_") {
-		outlineName = "ACPI System Bus";
+		outlineName = B_TRANSLATE("ACPI System Bus");
 	} else if (rootACPIPath == "\\_TZ_") {
-		outlineName = "ACPI Thermal Zone";
+		outlineName = B_TRANSLATE("ACPI Thermal Zone");
 	} else if (rootACPIPath == "\\_PR_.") {
 		// each CPU node is considered a root node
-		outlineName << "ACPI Processor Namespace '" << nodeACPIPath << "'";
+		outlineName << B_TRANSLATE("ACPI Processor Namespace '") << nodeACPIPath << "'";
 	} else if (rootACPIPath == "\\_SI_") {
-		outlineName = "ACPI System Indicator";
+		outlineName = B_TRANSLATE("ACPI System Indicator");
 	} else {
-		outlineName << "ACPI node '" << nodeACPIPath << "'";
+		outlineName << B_TRANSLATE("ACPI node '") << nodeACPIPath << "'";
 	}
 
-	SetAttribute("Device name", outlineName.String());
-	SetAttribute("Manufacturer", "Not implimented");
+	SetAttribute(B_TRANSLATE("Device name"), outlineName.String());
+	SetAttribute(B_TRANSLATE("Manufacturer"), B_TRANSLATE("Not implimented"));
 
 	SetText(outlineName.String());
 }

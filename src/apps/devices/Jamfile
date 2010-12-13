@@ -72,10 +72,21 @@ Application Devices :
 	Device.cpp
 	PropertyList.cpp
 	PropertyListPlain.cpp
-	: be libcolumnlistview.a tracker $(TARGET_LIBSUPC++) $(TARGET_LIBSTDC++)
+	: be libcolumnlistview.a tracker $(TARGET_LIBSUPC++) $(TARGET_LIBSTDC++) $(HAIKU_LOCALE_LIBS)
 	: Devices.rdef
 ;
 
 Includes [ FGristFiles DevicesInfo.cpp ] : [ FGristFiles isapnpids.h usbdevs.h
 	usbdevs_data.h ] ;
 Includes [ FGristFiles ConfigurationWindow.cpp ] : [ FGristFiles pcihdr.h ] ;
+
+DoCatalogs Devices :
+    x-vnd.Haiku-Devices
+    :
+	DevicesApplication.cpp
+	DevicesView.cpp
+	DevicePCI.h
+	DeviceACPI.h
+	Device.cpp
+	PropertyList.h
+;

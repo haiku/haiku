@@ -22,6 +22,7 @@
 #include <AppFileInfo.h>
 #include <Beep.h>
 #include <Bitmap.h>
+#include <Catalog.h> 
 #include <ControlLook.h>
 #include <Clipboard.h>
 #include <File.h>
@@ -41,6 +42,8 @@
 #include "CalcOptions.h"
 #include "ExpressionTextView.h"
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "CalcView"
 
 //const uint8 K_COLOR_OFFSET				= 32;
 const float kFontScaleY						= 0.4f;
@@ -682,12 +685,12 @@ CalcView::FrameResized(float width, float height)
 void
 CalcView::AboutRequested()
 {
-	BAlert* alert = new BAlert("about",
+	BAlert* alert = new BAlert(B_TRANSLATE("about"),B_TRANSLATE(
 		"DeskCalc v2.1.0\n\n"
 		"written by Timothy Wayper,\nStephan Aßmus and Ingo Weinhold\n\n"
-		B_UTF8_COPYRIGHT"1997, 1998 R3 Software Ltd.\n"
-		B_UTF8_COPYRIGHT"2006-2009 Haiku, Inc.\n\n"
-		"All Rights Reserved.", "OK");
+		B_UTF8_COPYRIGHT "1997, 1998 R3 Software Ltd.\n"
+		B_UTF8_COPYRIGHT "2006-2009 Haiku, Inc.\n\n"
+		"All Rights Reserved."), "OK");
 	alert->Go(NULL);
 }
 
@@ -1098,13 +1101,13 @@ void
 CalcView::_CreatePopUpMenu()
 {
 	// construct items
-	fAutoNumlockItem = new BMenuItem("Enable Num Lock on startup",
+	fAutoNumlockItem = new BMenuItem(B_TRANSLATE("Enable Num Lock on startup"),
 		new BMessage(MSG_OPTIONS_AUTO_NUM_LOCK));
-	fAudioFeedbackItem = new BMenuItem("Audio Feedback",
+	fAudioFeedbackItem = new BMenuItem(B_TRANSLATE("Audio Feedback"),
 		new BMessage(MSG_OPTIONS_AUDIO_FEEDBACK));
-	fShowKeypadItem = new BMenuItem("Show keypad",
+	fShowKeypadItem = new BMenuItem(B_TRANSLATE("Show keypad"),
 		new BMessage(MSG_OPTIONS_SHOW_KEYPAD));
-	fAboutItem = new BMenuItem("About DeskCalc" B_UTF8_ELLIPSIS,
+	fAboutItem = new BMenuItem(B_TRANSLATE("About DeskCalc" B_UTF8_ELLIPSIS),
 		new BMessage(B_ABOUT_REQUESTED));
 
 	// apply current settings

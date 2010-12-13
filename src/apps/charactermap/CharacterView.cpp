@@ -10,6 +10,7 @@
 #include <string.h>
 
 #include <Bitmap.h>
+#include <Catalog.h>
 #include <Clipboard.h>
 #include <LayoutUtils.h>
 #include <MenuItem.h>
@@ -19,6 +20,8 @@
 
 #include "UnicodeBlocks.h"
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "CharacterView"
 
 static const uint32 kMsgCopyAsEscapedString = 'cesc';
 
@@ -268,11 +271,11 @@ CharacterView::MouseDown(BPoint where)
 
 	BMessage* message =  new BMessage(B_COPY);
 	message->AddInt32("character", fCurrentCharacter);
-	menu->AddItem(new BMenuItem("Copy character", message, 'C'));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Copy character"), message, 'C'));
 
 	message =  new BMessage(kMsgCopyAsEscapedString);
 	message->AddInt32("character", fCurrentCharacter);
-	menu->AddItem(new BMenuItem("Copy as escaped byte string",
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Copy as escaped byte string"),
 		message, 'C', B_SHIFT_KEY));
 
 	menu->SetTargetForItems(this);

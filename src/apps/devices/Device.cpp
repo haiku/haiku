@@ -11,29 +11,33 @@
 
 #include <iostream>
 
+#include <Catalog.h>
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Device"
 
 // This list comes from the pciid list, except for the last one
 const char* kCategoryString[] = {
-	"Unclassified device", 					// 0x00
-	"Mass storage controller",				// 0x01
-	"Network controller",					// 0x02
-	"Display controller", 					// 0x03
-	"Multimedia controller", 				// 0x04
-	"Memory controller",  					// 0x05
-	"Bridge", 								// 0x06
-	"Communication controller",  			// 0x07
-	"Generic system peripheral",  			// 0x08
-	"Input device controller",  			// 0x09
-	"Docking station",  					// 0x0a
-	"Processor",  							// 0x0b
-	"Serial bus controller",  				// 0x0c
-	"Wireless controller",  				// 0x0d
-	"Intelligent controller",  				// 0x0e
-	"Satellite communications controller",  // 0x0f
-	"Encryption controller",  				// 0x10
-	"Signal processing controller",			// 0x11
-	"Computer",								// 0x12 (added later)
-	"ACPI controller"			// 0x13 (added later)
+	B_TRANSLATE("Unclassified device"), 					// 0x00
+	B_TRANSLATE("Mass storage controller"),				// 0x01
+	B_TRANSLATE("Network controller"),					// 0x02
+	B_TRANSLATE("Display controller"), 					// 0x03
+	B_TRANSLATE("Multimedia controller"), 				// 0x04
+	B_TRANSLATE("Memory controller"),  					// 0x05
+	B_TRANSLATE("Bridge"), 								// 0x06
+	B_TRANSLATE("Communication controller"),  			// 0x07
+	B_TRANSLATE("Generic system peripheral"),  			// 0x08
+	B_TRANSLATE("Input device controller"),  			// 0x09
+	B_TRANSLATE("Docking station"),  					// 0x0a
+	B_TRANSLATE("Processor"),  							// 0x0b
+	B_TRANSLATE("Serial bus controller"),  				// 0x0c
+	B_TRANSLATE("Wireless controller"),  				// 0x0d
+	B_TRANSLATE("Intelligent controller"),  				// 0x0e
+	B_TRANSLATE("Satellite communications controller"),  // 0x0f
+	B_TRANSLATE("Encryption controller"),  				// 0x10
+	B_TRANSLATE("Signal processing controller"),			// 0x11
+	B_TRANSLATE("Computer"),								// 0x12 (added later)
+	B_TRANSLATE("ACPI controller")			// 0x13 (added later)
 };
 
 
@@ -46,10 +50,10 @@ Device::Device(Device* physicalParent, BusType busType, Category category,
 	fCategory(category),
 	fPhysicalParent(physicalParent)
 {
-	SetAttribute("Device name", name);
-	SetAttribute("Manufacturer", manufacturer);
-	SetAttribute("Driver used", driverUsed);
-	SetAttribute("Device paths", devPathsPublished);
+	SetAttribute(B_TRANSLATE("Device name"), name);
+	SetAttribute(B_TRANSLATE("Manufacturer"), manufacturer);
+	SetAttribute(B_TRANSLATE("Driver used"), driverUsed);
+	SetAttribute(B_TRANSLATE("Device paths"), devPathsPublished);
 }
 
 
@@ -61,7 +65,7 @@ Device::~Device()
 void
 Device::SetAttribute(const BString& name, const BString& value)
 {
-	if (name == "Device name") {
+	if (name == B_TRANSLATE("Device name")) {
 		SetText(value.String());
 	}
 	fAttributeMap[name] = value;
@@ -72,8 +76,8 @@ Attributes
 Device::GetBasicAttributes()
 {
 	Attributes attributes;
-	attributes.push_back(Attribute("Device name:", GetName()));
-	attributes.push_back(Attribute("Manufacturer:", GetManufacturer()));
+	attributes.push_back(Attribute(B_TRANSLATE("Device name:"), GetName()));
+	attributes.push_back(Attribute(B_TRANSLATE("Manufacturer:"), GetManufacturer()));
 	return attributes;
 }
 
@@ -103,10 +107,10 @@ BString
 Device::GetBasicStrings()
 {
 	BString str;
-	str << "Device Name\t\t\t\t: " << GetName() << "\n";
-	str << "Manufacturer\t\t\t: " << GetManufacturer() << "\n";
-	str << "Driver used\t\t\t\t: " << GetDriverUsed() << "\n";
-	str << "Device paths\t: " << GetDevPathsPublished();
+	str << B_TRANSLATE("Device Name\t\t\t\t: ") << GetName() << "\n";
+	str << B_TRANSLATE("Manufacturer\t\t\t: ") << GetManufacturer() << "\n";
+	str << B_TRANSLATE("Driver used\t\t\t\t: ") << GetDriverUsed() << "\n";
+	str << B_TRANSLATE("Device paths\t: ") << GetDevPathsPublished();
 	return str;
 }
 

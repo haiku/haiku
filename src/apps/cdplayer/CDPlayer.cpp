@@ -19,6 +19,7 @@
 #include <BitmapStream.h>
 #include <Box.h>
 #include <Button.h>
+#include <Catalog.h> 
 #include <Debug.h>
 #include <Deskbar.h>
 #include <Dragger.h>
@@ -34,6 +35,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "CDPlayer"
 
 enum {
 	M_STOP = 'mstp',
@@ -81,9 +84,10 @@ CDPlayer::CDPlayer(BRect frame, const char *name, uint32 resizeMask,
 	BuildGUI();
 
 	if (fCDDrive.CountDrives() < 1) {
-		BAlert *alert = new BAlert("CDPlayer", "It appears that there are no CD"
+		BAlert *alert = new BAlert("CDPlayer", B_TRANSLATE(
+			"It appears that there are no CD"
 			" drives on your computer or there is no system software to "
-			"support one. Sorry.", "OK");
+			"support one. Sorry."), "OK");
 		alert->Go();
 	}
 
@@ -131,7 +135,7 @@ CDPlayer::BuildGUI()
 	r.bottom = 25;
 
 	float labelWidth, labelHeight;
-	fCDTitle = new BStringView(r, "CDTitle", "CD drive is empty",
+	fCDTitle = new BStringView(r, "CDTitle", B_TRANSLATE("CD drive is empty"),
 		B_FOLLOW_LEFT_RIGHT);
 	fCDTitle->GetPreferredSize(&labelWidth, &labelHeight);
 	fCDTitle->ResizeTo(r.Width(), labelHeight);
@@ -140,20 +144,21 @@ CDPlayer::BuildGUI()
 	r.bottom = r.top + labelHeight;
 	r.OffsetBy(0, r.Height() + 5);
 
-	fCurrentTrack = new BStringView(r, "TrackNumber", "", B_FOLLOW_LEFT_RIGHT);
+	fCurrentTrack = new BStringView(r, B_TRANSLATE("TrackNumber"),
+		 "", B_FOLLOW_LEFT_RIGHT);
 	box->AddChild(fCurrentTrack);
 
 	r.OffsetBy(0, r.Height() + 5);
 	r.right = r.left + (r.Width() / 2);
-	fTrackTime = new BStringView(r, "TrackTime", "Track: 88:88 / 88:88",
-		B_FOLLOW_LEFT_RIGHT);
+	fTrackTime = new BStringView(r, B_TRANSLATE("TrackTime"),
+		 "Track: 88:88 / 88:88", B_FOLLOW_LEFT_RIGHT);
 	fTrackTime->ResizeToPreferred();
 	fTrackTime->SetText("Track: --:-- / --:--");
 	box->AddChild(fTrackTime);
 
 	r.OffsetTo(fTrackTime->Frame().right + 5, r.top);
-	fDiscTime = new BStringView(r, "DiscTime", "Disc: 88:88 / 88:88",
-		B_FOLLOW_RIGHT);
+	fDiscTime = new BStringView(r, B_TRANSLATE("DiscTime"),
+		"Disc: 88:88 / 88:88", B_FOLLOW_RIGHT);
 	fDiscTime->ResizeToPreferred();
 	fDiscTime->SetText("Disc: --:-- / --:--");
 	box->AddChild(fDiscTime);
@@ -467,7 +472,7 @@ CDPlayer::_WatchCDState()
 			// Because we are changing play states, we will need to update
 			// the GUI
 			fCDData.SetDiscID(-1);
-			SetLabel(fCDTitle, "CD drive is empty");
+			SetLabel(fCDTitle, B_TRANSLATE("CD drive is empty"));
 
 			SetLabel(fCurrentTrack, "");
 			SetLabel(fTrackTime, "Track: --:-- / --:--");
@@ -523,7 +528,7 @@ CDPlayer::_WatchCDState()
 				display << " - " << fCDData.Album();
 				SetLabel(fCDTitle, display.String());
 			} else
-				SetLabel(fCDTitle, "Audio CD");
+				SetLabel(fCDTitle, B_TRANSLATE("Audio CD"));
 		}
 	}
 
@@ -612,8 +617,8 @@ CDPlayer::_WatchCDState()
 			trackTotal.GetMinutes(), trackTotal.GetSeconds());
 		SetLabel(fTrackTime, timeString);
 	} else {
-		SetLabel(fTrackTime, "Track: --:-- / --:--");
-		SetLabel(fDiscTime, "Disc: --:-- / --:--");
+		SetLabel(fTrackTime, B_TRANSLATE("Track: --:-- / --:--"));
+		SetLabel(fDiscTime, B_TRANSLATE("Disc: --:-- / --:--"));
 	}
 }
 

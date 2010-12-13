@@ -13,7 +13,10 @@
 #include <String.h>
 
 #include "Device.h"
+#include <Catalog.h>
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "PropertyList"
 
 struct Attribute;
 
@@ -40,7 +43,7 @@ private:
 
 class PropertyList : public BColumnListView {
 public:
-					PropertyList(const char* name = "Properties");
+					PropertyList(const char* name = B_TRANSLATE("Properties"));
 	virtual			~PropertyList();
 			void	RemoveAll();
 			void	AddAttributes(const Attributes& attributes);

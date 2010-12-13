@@ -11,6 +11,7 @@
 
 #include <Application.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <File.h>
 #include <FindDirectory.h>
 #include <GroupLayoutBuilder.h>
@@ -31,6 +32,8 @@
 #include "CharacterView.h"
 #include "UnicodeBlockView.h"
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "CharacterWindow"
 
 static const uint32 kMsgUnicodeBlockSelected = 'unbs';
 static const uint32 kMsgCharacterChanged = 'chch';
@@ -137,10 +140,10 @@ CharacterWindow::CharacterWindow()
 
 	BMenuBar* menuBar = new BMenuBar("menu");
 
-	fFilterControl = new BTextControl("Filter:", NULL, NULL);
+	fFilterControl = new BTextControl(B_TRANSLATE("Filter:"), NULL, NULL);
 	fFilterControl->SetModificationMessage(new BMessage(kMsgFilterChanged));
 
-	BButton* clearButton = new BButton("clear", "Clear",
+	BButton* clearButton = new BButton("clear", B_TRANSLATE("Clear"),
 		new BMessage(kMsgClearFilter));
 
 	fUnicodeBlockView = new UnicodeBlockView("unicodeBlocks");
@@ -187,7 +190,8 @@ CharacterWindow::CharacterWindow()
 	BScrollView* characterScroller = new BScrollView("characterScroller",
 		fCharacterView, 0, false, true);
 
-	fFontSizeSlider = new FontSizeSlider("fontSizeSlider", "Font size:",
+	fFontSizeSlider = new FontSizeSlider("fontSizeSlider",
+		B_TRANSLATE("Font size:"),
 		new BMessage(kMsgFontSizeChanged), kMinFontSize, kMaxFontSize);
 	fFontSizeSlider->SetValue(fontSize);
 
@@ -215,18 +219,19 @@ CharacterWindow::CharacterWindow()
 	BMenu* menu = new BMenu("File");
 	BMenuItem* item;
 
-	menu->AddItem(item = new BMenuItem("About CharacterMap" B_UTF8_ELLIPSIS,
-		new BMessage(B_ABOUT_REQUESTED)));
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("About CharacterMap"
+		 B_UTF8_ELLIPSIS), new BMessage(B_ABOUT_REQUESTED)));
 
 	menu->AddSeparatorItem();
 
-	menu->AddItem(new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED), 'Q'));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Quit"),
+		new BMessage(B_QUIT_REQUESTED), 'Q'));
 	menu->SetTargetForItems(this);
 	item->SetTarget(be_app);
 	menuBar->AddItem(menu);
 
 	menu = new BMenu("View");
-	menu->AddItem(item = new BMenuItem("Show private blocks",
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Show private blocks"),
 		new BMessage(kMsgPrivateBlocks)));
 	item->SetMarked(fCharacterView->IsShowingPrivateBlocks());
 // TODO: this feature is not yet supported by Haiku!
@@ -413,7 +418,7 @@ CharacterWindow::_OpenSettings(BFile& file, uint32 mode)
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
 		return B_ERROR;
 
-	path.Append("CharacterMap settings");
+	path.Append(B_TRANSLATE("CharacterMap settings"));
 
 	return file.SetTo(path.Path(), mode);
 }
