@@ -59,7 +59,7 @@ static const uint32 kMsgStaticMode = 'stcm';
 static const uint32 kMsgDHCPMode = 'dynm';
 static const uint32 kMsgDisabledMode = 'disa';
 static const uint32	kMsgChange = 'chng';
-static const uint32 kMsgJoinNetwork = 'join';
+static const uint32 kMsgNetwork = 'netw';
 
 
 static void
@@ -92,7 +92,8 @@ MatchPattern(const char* string, const char* pattern)
 
 
 EthernetSettingsView::EthernetSettingsView()
-	: BView("EthernetSettingsView", 0, NULL),
+	:
+	BView("EthernetSettingsView", 0, NULL),
 	fCurrentSettings(NULL)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -205,6 +206,7 @@ EthernetSettingsView::EthernetSettingsView()
 	buttonGroup->GroupLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
 
 	fApplyButton = new BButton(B_TRANSLATE("Apply"), new BMessage(kMsgApply));
+	fApplyButton->SetEnabled(false);
 	buttonGroup->GroupLayout()->AddView(fApplyButton);
 
 	rootLayout->AddView(controlsGroup);
@@ -251,6 +253,7 @@ EthernetSettingsView::MessageReceived(BMessage* message)
 		case kMsgStaticMode:
 		case kMsgDHCPMode:
 		case kMsgDisabledMode:
+		case kMsgNetwork:
 			_EnableTextControls(message->what == kMsgStaticMode);
 			fApplyButton->SetEnabled(true);
 			fRevertButton->SetEnabled(true);
@@ -348,13 +351,15 @@ EthernetSettingsView::_ShowConfiguration(Settings* settings)
 		int32 count = 0;
 		uint32 cookie = 0;
 		while (device.GetNextNetwork(cookie, network) == B_OK) {
-			BMessage* message = new BMessage(kMsgJoinNetwork);
+			BMessage* message = new BMessage(kMsgNetwork);
 			message->AddString("device", device.Name());
 			message->AddString("name", network.name);
 
 			BMenuItem* item = new WirelessNetworkMenuItem(network.name,
 				network.signal_strength,
 				(network.flags & B_NETWORK_IS_ENCRYPTED) != 0, message);
+			if (fCurrentSettings->WirelessNetwork() == network.name)
+				item->SetMarked(true);
 			menu->AddItem(item);
 
 			count++;
@@ -367,7 +372,8 @@ EthernetSettingsView::_ShowConfiguration(Settings* settings)
 		} else {
 			BMenuItem* item = new BMenuItem(
 				B_TRANSLATE("Choose automatically"), NULL);
-			item->SetMarked(true);
+			if (menu->FindMarked() == NULL)
+				item->SetMarked(true);
 			menu->AddItem(item, 0);
 			menu->AddItem(new BSeparatorItem(), 1);
 		}
@@ -377,40 +383,37 @@ EthernetSettingsView::_ShowConfiguration(Settings* settings)
 	bool enableControls = false;
 	fTypeMenuField->SetEnabled(settings != NULL);
 
-	if (settings) {
-		BMenuItem* item = fDeviceMenuField->Menu()->FindItem(
-			settings->Name());
-		if (item)
-			item->SetMarked(true);
+	BMenuItem* item = fDeviceMenuField->Menu()->FindItem(settings->Name());
+	if (item)
+		item->SetMarked(true);
 
-		fIPTextControl->SetText(settings->IP());
-		fGatewayTextControl->SetText(settings->Gateway());
-		fNetMaskTextControl->SetText(settings->Netmask());
+	fIPTextControl->SetText(settings->IP());
+	fGatewayTextControl->SetText(settings->Gateway());
+	fNetMaskTextControl->SetText(settings->Netmask());
 
-		enableControls = false;
+	enableControls = false;
 
-		if (settings->IsDisabled())
-			item = fTypeMenuField->Menu()->FindItem(B_TRANSLATE("Disabled"));
-		else if (settings->AutoConfigure() == true)
-			item = fTypeMenuField->Menu()->FindItem(B_TRANSLATE("DHCP"));
-		else {
-			item = fTypeMenuField->Menu()->FindItem(B_TRANSLATE("Static"));
-			enableControls = true;
-		}
-		if (item)
-			item->SetMarked(true);
-
-		if (settings->NameServers().CountItems() >= 2) {
-			fSecondaryDNSTextControl->SetText(
-				settings->NameServers().ItemAt(1)->String());
-		}
-
-		if (settings->NameServers().CountItems() >= 1) {
-			fPrimaryDNSTextControl->SetText(
-				settings->NameServers().ItemAt(0)->String());
-		}
-		fDomainTextControl->SetText(settings->Domain());
+	if (settings->IsDisabled())
+		item = fTypeMenuField->Menu()->FindItem(B_TRANSLATE("Disabled"));
+	else if (settings->AutoConfigure())
+		item = fTypeMenuField->Menu()->FindItem(B_TRANSLATE("DHCP"));
+	else {
+		item = fTypeMenuField->Menu()->FindItem(B_TRANSLATE("Static"));
+		enableControls = true;
 	}
+	if (item)
+		item->SetMarked(true);
+
+	if (settings->NameServers().CountItems() >= 2) {
+		fSecondaryDNSTextControl->SetText(
+			settings->NameServers().ItemAt(1)->String());
+	}
+
+	if (settings->NameServers().CountItems() >= 1) {
+		fPrimaryDNSTextControl->SetText(
+			settings->NameServers().ItemAt(0)->String());
+	}
+	fDomainTextControl->SetText(settings->Domain());
 
 	_EnableTextControls(enableControls);
 }
@@ -437,6 +440,16 @@ EthernetSettingsView::_ApplyControlsToConfiguration()
 	fCurrentSettings->SetIP(fIPTextControl->Text());
 	fCurrentSettings->SetNetmask(fNetMaskTextControl->Text());
 	fCurrentSettings->SetGateway(fGatewayTextControl->Text());
+
+	if (!fNetworkMenuField->IsHidden(fNetworkMenuField)) {
+		if (fNetworkMenuField->Menu()->ItemAt(0)->IsMarked()) {
+			fCurrentSettings->SetWirelessNetwork(NULL);
+		} else {
+			BMenuItem* item = fNetworkMenuField->Menu()->FindMarked();
+			if (item != NULL)
+				fCurrentSettings->SetWirelessNetwork(item->Label());
+		}
+	}
 
 	fCurrentSettings->SetAutoConfigure(
 		strcmp(fTypeMenuField->Menu()->FindMarked()->Label(),
@@ -521,7 +534,7 @@ EthernetSettingsView::_SaveAdaptersConfiguration()
 	for (int i = 0; i < fSettings.CountItems(); i++) {
 		Settings* settings = fSettings.ItemAt(i);
 
-		if (settings->AutoConfigure())
+		if (settings->AutoConfigure() && settings->WirelessNetwork() == "")
 			continue;
 
 		if (fp == NULL) {
@@ -538,19 +551,17 @@ EthernetSettingsView::_SaveAdaptersConfiguration()
 
 		if (settings->IsDisabled())
 			fprintf(fp, "\tdisabled\ttrue\n");
-		else {
+		else if (!settings->AutoConfigure()) {
 			fprintf(fp, "\taddress {\n");
 			fprintf(fp, "\t\tfamily\tinet\n");
 			fprintf(fp, "\t\taddress\t%s\n", settings->IP());
 			fprintf(fp, "\t\tgateway\t%s\n", settings->Gateway());
 			fprintf(fp, "\t\tmask\t%s\n", settings->Netmask());
-			if (!fNetworkMenuField->IsHidden(fNetworkMenuField)
-				&& !fNetworkMenuField->Menu()->ItemAt(0)->IsMarked()) {
-				BMenuItem* item = fNetworkMenuField->Menu()->FindMarked();
-				if (item != NULL)
-					fprintf(fp, "\t\tnetwork\t%s", item->Label());
-			}
 			fprintf(fp, "\t}\n");
+		}
+		if (settings->WirelessNetwork() != "") {
+			fprintf(fp, "\tnetwork\t%s\n",
+				settings->WirelessNetwork().String());
 		}
 		fprintf(fp, "}\n\n");
 	}

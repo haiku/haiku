@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2009 Haiku Inc. All rights reserved.
+ * Copyright 2004-2010 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -23,7 +23,9 @@
 #include <sys/sockio.h>
 #include <unistd.h>
 
+#include <driver_settings.h>
 #include <File.h>
+#include <FindDirectory.h>
 #include <Path.h>
 #include <String.h>
 
@@ -32,7 +34,7 @@
 
 Settings::Settings(const char* name)
 	:
-	fAuto(true), 
+	fAuto(true),
 	fDisabled(false),
 	fNameServers(5, true)
 {
@@ -148,8 +150,59 @@ Settings::ReadConfiguration()
 	if (ioctl(fSocket, SIOCGIFFLAGS, &request, sizeof(struct ifreq)) == 0)
 		flags = request.ifr_flags;
 
-	fAuto = (flags & IFF_AUTO_CONFIGURED) != 0;
+	fAuto = (flags & (IFF_AUTO_CONFIGURED | IFF_CONFIGURING)) != 0;
 	fDisabled = (flags & IFF_UP) == 0;
+
+	// Read wireless network from interfaces
+
+	fWirelessNetwork.SetTo(NULL);
+
+	BPath path;
+	find_directory(B_COMMON_SETTINGS_DIRECTORY, &path);
+	path.Append("network");
+	path.Append("interfaces");
+
+	void* handle = load_driver_settings(path.Path());
+	if (handle != NULL) {
+		const driver_settings* settings = get_driver_settings(handle);
+		if (settings != NULL) {
+			for (int32 i = 0; i < settings->parameter_count; i++) {
+				driver_parameter& top = settings->parameters[i];
+				if (!strcmp(top.name, "interface")) {
+					// The name of the interface can either be the value of
+					// the "interface" parameter, or a separate "name" parameter
+					const char* name = NULL;
+					if (top.value_count > 0) {
+						name = top.values[0];
+						if (fName != name)
+							continue;
+					}
+
+					// search "network" parameter
+					for (int32 j = 0; j < top.parameter_count; j++) {
+						driver_parameter& sub = top.parameters[j];
+						if (name == NULL && !strcmp(sub.name, "name")
+							&& sub.value_count > 0) {
+							name = sub.values[0];
+							if (fName != sub.values[0])
+								break;
+						}
+
+						if (!strcmp(sub.name, "network")
+							&& sub.value_count > 0) {
+							fWirelessNetwork.SetTo(sub.values[0]);
+							break;
+						}
+					}
+
+					// We found our interface
+					if (fName == name)
+						break;
+				}
+			}
+		}
+		unload_driver_settings(handle);
+	}
 
 	// read resolv.conf for the dns.
 	fNameServers.MakeEmpty();
