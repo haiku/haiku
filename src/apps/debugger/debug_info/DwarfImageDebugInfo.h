@@ -108,6 +108,10 @@ private:
 			DwarfFile*			fFile;
 			ElfSegment*			fTextSegment;
 			target_addr_t		fRelocationDelta;
+			target_addr_t		fTextSectionStart;
+			target_addr_t		fTextSectionEnd;
+			target_addr_t		fPLTSectionStart;
+			target_addr_t		fPLTSectionEnd;
 };
 
 

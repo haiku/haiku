@@ -220,7 +220,11 @@ DwarfImageDebugInfo::DwarfImageDebugInfo(const ImageInfo& imageInfo,
 	fTypeCache(typeCache),
 	fFile(file),
 	fTextSegment(NULL),
-	fRelocationDelta(0)
+	fRelocationDelta(0),
+	fTextSectionStart(0),
+	fTextSectionEnd(0),
+	fPLTSectionStart(0),
+	fPLTSectionEnd(0)
 {
 	fFile->AcquireReference();
 	fTypeCache->AcquireReference();
@@ -246,6 +250,18 @@ DwarfImageDebugInfo::Init()
 		return B_ENTRY_NOT_FOUND;
 
 	fRelocationDelta = fImageInfo.TextBase() - fTextSegment->LoadAddress();
+
+	ElfSection* section = fFile->GetElfFile()->FindSection(".text");
+	if (section != NULL) {
+		fTextSectionStart = section->LoadAddress() + fRelocationDelta;
+		fTextSectionEnd = fTextSectionStart + section->Size();
+	}
+
+	section = fFile->GetElfFile()->FindSection(".plt");
+	if (section != NULL) {
+		fPLTSectionStart = section->LoadAddress() + fRelocationDelta;
+		fPLTSectionEnd = fPLTSectionStart + section->Size();
+	}
 
 	return B_OK;
 }
@@ -432,22 +448,11 @@ DwarfImageDebugInfo::GetType(GlobalTypeCache* cache,
 AddressSectionType
 DwarfImageDebugInfo::GetAddressSectionType(target_addr_t address)
 {
-	address -= fRelocationDelta;
-	ElfFile* file = fFile->GetElfFile();
+	if (address >= fTextSectionStart && address < fTextSectionEnd) 
+		return ADDRESS_SECTION_TYPE_FUNCTION;
 
-	ElfSection* section = file->GetSection(".text");
-	if (section != NULL && address >= section->LoadAddress()
-		&& address < section->LoadAddress() + section->Size()) {
-			file->PutSection(section);
-			return ADDRESS_SECTION_TYPE_FUNCTION;
-	}
-
-	section = file->GetSection(".plt");
-	if (section != NULL && address >= section->LoadAddress()
-		&& address < section->LoadAddress() + section->Size()) {
-			file->PutSection(section);
-			return ADDRESS_SECTION_TYPE_PLT;
-	}
+ 	if (address >= fPLTSectionStart && address < fPLTSectionEnd)
+		return ADDRESS_SECTION_TYPE_PLT;
 
 	return ADDRESS_SECTION_TYPE_UNKNOWN;
 }

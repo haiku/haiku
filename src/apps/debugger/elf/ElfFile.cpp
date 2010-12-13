@@ -293,6 +293,19 @@ ElfFile::PutSection(ElfSection* section)
 }
 
 
+ElfSection*
+ElfFile::FindSection(const char* name) const
+{
+	for (SectionList::ConstIterator it = fSections.GetIterator();
+			ElfSection* section = it.Next();) {
+		if (strcmp(section->Name(), name) == 0)
+			return section;
+	}
+
+	return NULL;
+}
+
+
 ElfSegment*
 ElfFile::TextSegment() const
 {

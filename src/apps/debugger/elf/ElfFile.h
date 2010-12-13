@@ -33,6 +33,7 @@ public:
 
 			status_t			Load();
 			void				Unload();
+			bool				IsLoaded() const { return fLoadCount > 0; }
 
 private:
 			const char*			fName;
@@ -79,6 +80,7 @@ public:
 
 			ElfSection*			GetSection(const char* name);
 			void				PutSection(ElfSection* section);
+			ElfSection*			FindSection(const char* name) const;
 
 			ElfSegment*			TextSegment() const;
 			ElfSegment*			DataSegment() const;
