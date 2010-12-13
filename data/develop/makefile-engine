@@ -153,7 +153,7 @@ ifeq ($(CPU), ppc)
 	LOC_INCLUDES = $(foreach path, $(SRC_PATHS) $(LOCAL_INCLUDE_PATHS), $(addprefix -I, $(path)))
 	SYS_INCLUDES += -i-
 	SYS_INCLUDES += $(foreach path, $(SYSTEM_INCLUDE_PATHS), $(addprefix -i , $(path)))
-	
+
 	INCLUDES = $(LOC_INCLUDES) $(SYS_INCLUDES)
 endif
 endif
@@ -272,9 +272,9 @@ $(OBJ_DIR)/%.o : %.CPP
 
 # rules to compile resource definition files
 $(OBJ_DIR)/%.rsrc : %.rdef
-	cat $< | $(CC) -E $(INCLUDES) $(CFLAGS) - | grep -v '^#' | $(RESCOMP) -o "$@" -
+	cat $< | $(CC) -E $(INCLUDES) $(CFLAGS) - | grep -v '^#' | $(RESCOMP) -I $(dir $<) -o "$@" -
 $(OBJ_DIR)/%.rsrc : %.RDEF
-	cat $< | $(CC) -E $(INCLUDES) $(CFLAGS) - | grep -v '^#' | $(RESCOMP) -o "$@" -
+	cat $< | $(CC) -E $(INCLUDES) $(CFLAGS) - | grep -v '^#' | $(RESCOMP) -I $(dir $<) -o "$@" -
 
 #	rules to handle lex/flex and yacc/bison files
 
