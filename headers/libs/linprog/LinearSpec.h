@@ -15,10 +15,8 @@
 #include <SupportDefs.h>
 
 #include "Constraint.h"
-#include "OperatorType.h"
-#include "OptimizationType.h"
+#include "LinearProgrammingTypes.h"
 #include "PenaltyFunction.h"
-#include "ResultType.h"
 #include "Summand.h"
 #include "Variable.h"
 

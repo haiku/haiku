@@ -9,7 +9,6 @@
 #include "Row.h"
 
 #include "ALMLayout.h"
-#include "OperatorType.h"
 #include "Tab.h"
 
 #include <SupportDefs.h>

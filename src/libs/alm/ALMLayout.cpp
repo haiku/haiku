@@ -14,8 +14,6 @@
 
 #include "ViewLayoutItem.h"
 
-#include "ResultType.h"
-
 
 using namespace LinearProgramming;
 
@@ -706,10 +704,10 @@ BALMLayout::DerivedLayoutItems()
 	_SolveLayout();
 
 	// if new layout is infeasible, use previous layout
-	if (fSolver->Result() == INFEASIBLE)
+	if (fSolver->Result() == kInfeasible)
 		return;
 
-	if (fSolver->Result() != OPTIMAL) {
+	if (fSolver->Result() != kOptimal) {
 		fSolver->Save("failed-layout.txt");
 		printf("Could not solve the layout specification (%d). ",
 			fSolver->Result());
@@ -791,7 +789,7 @@ BALMLayout::_CreateLayoutItem(BView* view)
 void
 BALMLayout::_SolveLayout()
 {
-	// Try to solve the layout until the result is OPTIMAL or INFEASIBLE,
+	// Try to solve the layout until the result is kOptimal or kInfeasible,
 	// maximally 15 tries sometimes the solving algorithm encounters numerical
 	// problems (NUMFAILURE), and repeating the solving often helps to overcome
 	// them.
@@ -811,7 +809,7 @@ BALMLayout::_SolveLayout()
 				fSolver->Variables()->CountItems(),
 				fSolver->Constraints()->CountItems()));*/
 		}
-		if (result == OPTIMAL || result == INFEASIBLE)
+		if (result == kOptimal || result == kInfeasible)
 			break;
 	}
 	delete file;
@@ -834,9 +832,9 @@ BALMLayout::_CalculateMinSize()
 	_SolveLayout();
 	fSolver->SetObjectiveFunction(oldObjFunction);
 
-	if (fSolver->Result() == UNBOUNDED)
+	if (fSolver->Result() == kUnbounded)
 		return kMinSize;
-	if (fSolver->Result() != OPTIMAL) {
+	if (fSolver->Result() != kOptimal) {
 		fSolver->Save("failed-layout.txt");
 		printf("Could not solve the layout specification (%d). "
 			"Saved specification in file failed-layout.txt", fSolver->Result());
@@ -863,9 +861,9 @@ BALMLayout::_CalculateMaxSize()
 	_SolveLayout();
 	fSolver->SetObjectiveFunction(oldObjFunction);
 
-	if (fSolver->Result() == UNBOUNDED)
+	if (fSolver->Result() == kUnbounded)
 		return kMaxSize;
-	if (fSolver->Result() != OPTIMAL) {
+	if (fSolver->Result() != kOptimal) {
 		fSolver->Save("failed-layout.txt");
 		printf("Could not solve the layout specification (%d). "
 			"Saved specification in file failed-layout.txt", fSolver->Result());
@@ -885,7 +883,7 @@ BALMLayout::_CalculatePreferredSize()
 	_UpdateAreaConstraints();
 
 	_SolveLayout();
-	if (fSolver->Result() != OPTIMAL) {
+	if (fSolver->Result() != kOptimal) {
 		fSolver->Save("failed-layout.txt");
 		printf("Could not solve the layout specification (%d). "
 			"Saved specification in file failed-layout.txt", fSolver->Result());

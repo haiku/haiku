@@ -88,11 +88,11 @@ GroupCookie::DoGroupLayout(SATWindow* triggerWindow)
 	ResultType result;
 	for (int32 tries = 0; tries < 15; tries++) {
 		result = fSATGroup->GetLinearSpec()->Solve();
-		if (result == INFEASIBLE) {
+		if (result == kInfeasible) {
 			debug_printf("can't solve constraints!\n");
 			break;
 		}
-		if (result == OPTIMAL) {
+		if (result == kOptimal) {
 			fSATGroup->AdjustWindows(triggerWindow);
 			_UpdateWindowSize(frame);
 			break;

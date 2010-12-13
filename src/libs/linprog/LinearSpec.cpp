@@ -20,9 +20,9 @@
  */
 LinearSpec::LinearSpec()
 	:
-	fOptimization(MINIMIZE),
+	fOptimization(kMinimize),
 	fObjFunction(new(std::nothrow) SummandList()),
-	fResult(ERROR),
+	fResult(kError),
 	fObjectiveValue(NAN),
 	fSolvingTime(NAN)
 {
@@ -773,20 +773,20 @@ LinearSpec::GetString(BString& string) const
 		string << "\n";
 	}
 	string << "Result=";
-	if (fResult==-1)
-		string << "ERROR";
-	else if (fResult==0)
-		string << "OPTIMAL";
-	else if (fResult==1)
-		string << "SUBOPTIMAL";
-	else if (fResult==2)
-		string << "INFEASIBLE";
-	else if (fResult==3)
-		string << "UNBOUNDED";
-	else if (fResult==4)
-		string << "DEGENERATE";
-	else if (fResult==5)
-		string << "NUMFAILURE";
+	if (fResult == kError)
+		string << "kError";
+	else if (fResult == kOptimal)
+		string << "kOptimal";
+	else if (fResult == kSuboptimal)
+		string << "kSuboptimal";
+	else if (fResult == kInfeasible)
+		string << "kInfeasible";
+	else if (fResult == kUnbounded)
+		string << "kUnbounded";
+	else if (fResult == kDegenerate)
+		string << "kDegenerate";
+	else if (fResult == kNumFailure)
+		string << "kNumFailure";
 	else
 		string << fResult;
 	string << " SolvingTime=" << (float)fSolvingTime << "ms";

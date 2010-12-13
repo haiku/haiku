@@ -13,7 +13,7 @@
 #include <String.h>
 #include <SupportDefs.h>
 
-#include "OperatorType.h"
+#include "LinearProgrammingTypes.h"
 #include "Summand.h"
 #include "Variable.h"
 

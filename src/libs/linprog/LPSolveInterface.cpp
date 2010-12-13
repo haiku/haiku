@@ -1,3 +1,11 @@
+/*
+ * Copyright 2007-2008, Christof Lutteroth, lutteroth@cs.auckland.ac.nz
+ * Copyright 2007-2008, James Kim, jkim202@ec.auckland.ac.nz
+ * Copyright 2010, Clemens Zeidler <haiku@clemens-zeidler.de>
+ * Distributed under the terms of the MIT License.
+ */
+
+
 #include "LPSolveInterface.h"
 
 
@@ -160,7 +168,7 @@ LPSolveInterface::SetObjectiveFunction(int nElements, double* coefficients,
 bool
 LPSolveInterface::SetOptimization(OptimizationType value)
 {
-	if (value == LinearProgramming::MINIMIZE)
+	if (value == kMinimize)
 		set_minim(fLP);
 	else
 		set_maxim(fLP);

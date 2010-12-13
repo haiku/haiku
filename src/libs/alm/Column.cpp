@@ -9,7 +9,6 @@
 #include "Column.h"
 
 #include "ALMLayout.h"
-#include "OperatorType.h"
 #include "Tab.h"
 
 

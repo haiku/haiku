@@ -11,7 +11,6 @@
 
 #include "Constraint.h"
 #include "LinearSpec.h"
-#include "OperatorType.h"
 #include "Summand.h"
 #include "Variable.h"
 
