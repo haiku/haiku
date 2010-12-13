@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2009 Haiku Inc. All rights reserved.
+ * Copyright 2004-2010 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Author:
@@ -31,17 +31,13 @@ public:
 								EthernetSettingsView();
 		virtual					~EthernetSettingsView();
 
-		virtual	void			MessageReceived(BMessage* message);
+protected:
 		virtual	void			AttachedToWindow();
 		virtual	void			DetachedFromWindow();
-
-				void			SaveProfile(BString profileName);
-				void			LoadProfile(BString profileName);
+		virtual	void			MessageReceived(BMessage* message);
 
 private:
 				void			_GatherInterfaces();
-				bool			_PrepareRequest(struct ifreq& request,
-									const char* name);
 				void 			_ShowConfiguration(Settings* settings);
 				void			_EnableTextControls(bool enable);
 				void			_SaveConfiguration();

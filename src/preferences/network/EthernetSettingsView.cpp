@@ -13,41 +13,6 @@
 
 
 #include "EthernetSettingsView.h"
-#include "Settings.h"
-
-#include <Application.h>
-#include <Alert.h>
-#include <Box.h>
-#include <Button.h>
-#include <Catalog.h>
-#include <CheckBox.h>
-#include <File.h>
-#include <GridView.h>
-#include <GroupView.h>
-#include <LayoutItem.h>
-#include <Locale.h>
-#include <Slider.h>
-#include <SpaceLayoutItem.h>
-#include <StringView.h>
-#include <String.h>
-#include <PopUpMenu.h>
-#include <MenuItem.h>
-#include <MenuField.h>
-#include <TextControl.h>
-#include <Screen.h>
-#include <FindDirectory.h>
-#include <Path.h>
-#include <Volume.h>
-#include <VolumeRoster.h>
-
-#include <SupportDefs.h>
-
-#include <Directory.h>
-#include <FindDirectory.h>
-#include <fs_interface.h>
-#include <NetworkInterface.h>
-#include <NetworkRoster.h>
-#include <Path.h>
 
 #include <arpa/inet.h>
 #include <net/if.h>
@@ -64,11 +29,32 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <NetServer.h>
+#include <Alert.h>
+#include <Application.h>
+#include <Beep.h>
+#include <Box.h>
+#include <Button.h>
+#include <Catalog.h>
+#include <Directory.h>
+#include <File.h>
+#include <FindDirectory.h>
+#include <GridView.h>
+#include <GroupView.h>
+#include <MenuField.h>
+#include <MenuItem.h>
+#include <NetworkInterface.h>
+#include <NetworkRoster.h>
+#include <Path.h>
+#include <PopUpMenu.h>
+#include <Slider.h>
+#include <SpaceLayoutItem.h>
+#include <String.h>
+#include <StringView.h>
+#include <TextControl.h>
 
-#include <support/Beep.h>
+#include <AutoDeleter.h>
 
-#include "AutoDeleter.h"
+#include "Settings.h"
 
 
 static const uint32 kMsgApply = 'aply';
@@ -92,10 +78,24 @@ SetupTextControl(BTextControl *control)
 }
 
 
+static bool
+MatchPattern(const char* string, const char* pattern)
+{
+	regex_t compiled;
+	bool result = regcomp(&compiled, pattern, REG_NOSUB | REG_EXTENDED) == 0
+		&& regexec(&compiled, string, 0, NULL, 0) == 0;
+	regfree(&compiled);
+
+	return result;
+}
+
+
 //	#pragma mark -
+
 
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "EthernetSettingsView"
+
 
 EthernetSettingsView::EthernetSettingsView()
 	: BView("EthernetSettingsView", 0, NULL),
@@ -218,40 +218,6 @@ EthernetSettingsView::~EthernetSettingsView()
 }
 
 
-bool
-EthernetSettingsView::_PrepareRequest(struct ifreq& request, const char* name)
-{
-	// This function is used for talking direct to the stack.
-	// It's used by _ShowConfiguration.
-
-	if (strlen(name) > IF_NAMESIZE)
-		return false;
-
-	strcpy(request.ifr_name, name);
-	return true;
-}
-
-
-void
-EthernetSettingsView::_GatherInterfaces()
-{
-	// iterate over all interfaces and retrieve minimal status
-
-	fInterfaces.MakeEmpty();
-
-	BNetworkRoster& roster = BNetworkRoster::Default();
-	BNetworkInterface interface;
-	uint32 cookie = 0;
-
-	while (roster.GetNextInterface(&cookie, interface) == B_OK) {
-		if (strncmp(interface.Name(), "loop", 4) && interface.Name()[0]) {
-			fInterfaces.AddItem(new BString(interface.Name()));
-			fSettings.AddItem(new Settings(interface.Name()));
-		}
-	}
-}
-
-
 void
 EthernetSettingsView::AttachedToWindow()
 {
@@ -274,6 +240,75 @@ EthernetSettingsView::AttachedToWindow()
 void
 EthernetSettingsView::DetachedFromWindow()
 {
+}
+
+
+void
+EthernetSettingsView::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case kMsgStaticMode:
+		case kMsgDHCPMode:
+		case kMsgDisabledMode:
+			_EnableTextControls(message->what == kMsgStaticMode);
+			fApplyButton->SetEnabled(true);
+			fRevertButton->SetEnabled(true);
+			break;
+		case kMsgInfo: {
+		 	const char* name;
+			if (message->FindString("interface", &name) != B_OK)
+				break;
+			for (int32 i = 0; i < fSettings.CountItems(); i++) {
+				Settings* settings = fSettings.ItemAt(i);
+				if (strcmp(settings->Name(), name) == 0) {
+					_ShowConfiguration(settings);
+					break;
+				}
+			}
+			break;
+		}
+		case kMsgRevert:
+			_ShowConfiguration(fCurrentSettings);
+			fRevertButton->SetEnabled(false);
+			break;
+		case kMsgApply:
+			if (_ValidateControl(fIPTextControl)
+				&& _ValidateControl(fNetMaskTextControl)
+				&& (strlen(fGatewayTextControl->Text()) == 0
+					|| _ValidateControl(fGatewayTextControl))
+				&& (strlen(fPrimaryDNSTextControl->Text()) == 0
+					|| _ValidateControl(fPrimaryDNSTextControl))
+				&& (strlen(fSecondaryDNSTextControl->Text()) == 0
+					|| _ValidateControl(fSecondaryDNSTextControl)))
+				_SaveConfiguration();
+			break;
+		case kMsgChange:
+			fErrorMessage->SetText("");
+			fApplyButton->SetEnabled(true);
+			break;
+		default:
+			BView::MessageReceived(message);
+	}
+}
+
+
+void
+EthernetSettingsView::_GatherInterfaces()
+{
+	// iterate over all interfaces and retrieve minimal status
+
+	fInterfaces.MakeEmpty();
+
+	BNetworkRoster& roster = BNetworkRoster::Default();
+	BNetworkInterface interface;
+	uint32 cookie = 0;
+
+	while (roster.GetNextInterface(&cookie, interface) == B_OK) {
+		if (strncmp(interface.Name(), "loop", 4) && interface.Name()[0]) {
+			fInterfaces.AddItem(new BString(interface.Name()));
+			fSettings.AddItem(new Settings(interface.Name()));
+		}
+	}
 }
 
 
@@ -304,7 +339,7 @@ EthernetSettingsView::_ShowConfiguration(Settings* settings)
 		fNetMaskTextControl->SetText(settings->Netmask());
 
 		enableControls = false;
-		
+
 		if (settings->IsDisabled())
 			item = fTypeMenuField->Menu()->FindItem(B_TRANSLATE("Disabled"));
 		else if (settings->AutoConfigure() == true)
@@ -436,7 +471,7 @@ EthernetSettingsView::_SaveAdaptersConfiguration()
 	// append the settins of each non-autoconfiguring adapter
 	for (int i = 0; i < fSettings.CountItems(); i++) {
 		Settings* settings = fSettings.ItemAt(i);
-		
+
 		if (settings->AutoConfigure())
 			continue;
 
@@ -451,10 +486,10 @@ EthernetSettingsView::_SaveAdaptersConfiguration()
 
 		fprintf(fp, "interface %s {\n",
 			settings->Name());
-			
+
 		if (settings->IsDisabled())
 			fprintf(fp, "\tdisabled\ttrue\n");
-		else {	
+		else {
 			fprintf(fp, "\taddress {\n");
 			fprintf(fp, "\t\tfamily\tinet\n");
 			fprintf(fp, "\t\taddress\t%s\n", settings->IP());
@@ -477,37 +512,19 @@ EthernetSettingsView::_SaveAdaptersConfiguration()
 status_t
 EthernetSettingsView::_TriggerAutoConfig(const char* device)
 {
-	BMessenger networkServer(kNetServerSignature);
-	if (!networkServer.IsValid()) {
+	BNetworkInterface interface(device);
+	status_t status = interface.AutoConfigure(AF_INET);
+
+	if (status == B_BAD_PORT_ID) {
 		(new BAlert("error", B_TRANSLATE("The net_server needs to run for "
 			"the auto configuration!"), B_TRANSLATE("OK")))->Go();
-		return B_ERROR;
-	}
-
-	BMessage message(kMsgConfigureInterface);
-	message.AddString("device", device);
-	BMessage address;
-	address.AddString("family", "inet");
-	address.AddBool("auto_config", true);
-	message.AddMessage("address", &address);
-
-	BMessage reply;
-	status_t status = networkServer.SendMessage(&message, &reply);
-	if (status != B_OK) {
-		BString errorMessage(
-			B_TRANSLATE("Sending auto-config message failed: "));
-		errorMessage << strerror(status);
-		(new BAlert("error", errorMessage.String(), B_TRANSLATE("OK")))->Go();
-		return status;
-	} else if (reply.FindInt32("status", &status) == B_OK
-			&& status != B_OK) {
+	} else if (status != B_OK) {
 		BString errorMessage(B_TRANSLATE("Auto-configuring failed: "));
 		errorMessage << strerror(status);
 		(new BAlert("error", errorMessage.String(), "OK"))->Go();
-		return status;
 	}
 
-	return B_OK;
+	return status;
 }
 
 
@@ -523,18 +540,6 @@ EthernetSettingsView::_GetPath(const char* name, BPath& path)
 	if (name != NULL)
 		path.Append(name);
 	return B_OK;
-}
-
-
-bool
-MatchPattern(const char* string, const char* pattern)
-{
-	regex_t compiled;
-	bool result = regcomp(&compiled, pattern, REG_NOSUB | REG_EXTENDED) == 0
-		&& regexec(&compiled, string, 0, NULL, 0) == 0;
-	regfree(&compiled);
-
-	return result;
 }
 
 
@@ -555,53 +560,4 @@ EthernetSettingsView::_ValidateControl(BTextControl* control)
 		return false;
 	}
 	return true;
-}
-
-
-void
-EthernetSettingsView::MessageReceived(BMessage* message)
-{
-	switch (message->what) {
-		case kMsgStaticMode:
-		case kMsgDHCPMode:
-		case kMsgDisabledMode:
-			_EnableTextControls(message->what == kMsgStaticMode);
-			fApplyButton->SetEnabled(true);
-			fRevertButton->SetEnabled(true);
-			break;
-		case kMsgInfo: {
-		 	const char* name;
-			if (message->FindString("interface", &name) != B_OK)
-				break;
-			for (int32 i = 0; i < fSettings.CountItems(); i++) {
-				Settings* settings = fSettings.ItemAt(i);
-				if (strcmp(settings->Name(), name) == 0) {
-					_ShowConfiguration(settings);
-					break;
-				}
-			}
-			break;
-		}
-		case kMsgRevert:
-			_ShowConfiguration(fCurrentSettings);
-			fRevertButton->SetEnabled(false);
-			break;
-		case kMsgApply:
-			if (_ValidateControl(fIPTextControl)
-				&& _ValidateControl(fNetMaskTextControl)
-				&& (strlen(fGatewayTextControl->Text()) == 0
-					|| _ValidateControl(fGatewayTextControl))
-				&& (strlen(fPrimaryDNSTextControl->Text()) == 0
-					|| _ValidateControl(fPrimaryDNSTextControl))
-				&& (strlen(fSecondaryDNSTextControl->Text()) == 0
-					|| _ValidateControl(fSecondaryDNSTextControl)))
-				_SaveConfiguration();
-			break;
-		case kMsgChange:
-			fErrorMessage->SetText("");
-			fApplyButton->SetEnabled(true);
-			break;
-		default:
-			BView::MessageReceived(message);
-	}
 }
