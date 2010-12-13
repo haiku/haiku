@@ -82,6 +82,7 @@ private:
 			void				_StartServices();
 			void				_HandleDeviceMonitor(BMessage* message);
 
+			status_t			_AutoJoinNetwork(const char* name);
 			status_t			_JoinNetwork(const BMessage& message,
 									const char* name = NULL);
 			status_t			_LeaveNetwork(const BMessage& message);
@@ -465,12 +466,23 @@ NetServer::_ConfigureInterface(BMessage& message)
 		}
 	}
 
-	const char* networkName;
-	if (message.FindString("network", &networkName) != B_OK) {
-		status_t status = _JoinNetwork(message, networkName);
-		if (status != B_OK) {
-			fprintf(stderr, "%s: joining network \"%s\" failed: %s\n",
-				interface.Name(), networkName, strerror(status));
+	BNetworkDevice device(name);
+	if (device.IsWireless()) {
+		const char* networkName;
+		if (message.FindString("network", &networkName) != B_OK) {
+			// join configured network
+			status_t status = _JoinNetwork(message, networkName);
+			if (status != B_OK) {
+				fprintf(stderr, "%s: joining network \"%s\" failed: %s\n",
+					interface.Name(), networkName, strerror(status));
+			}
+		} else {
+			// auto select network to join
+			status_t status = _AutoJoinNetwork(name);
+			if (status != B_OK) {
+				fprintf(stderr, "%s: auto joining network failed: %s\n",
+					interface.Name(), strerror(status));
+			}
 		}
 	}
 
@@ -813,6 +825,56 @@ NetServer::_HandleDeviceMonitor(BMessage* message)
 		_ConfigureDevice(path);
 	else
 		_RemoveInterface(path);
+}
+
+
+status_t
+NetServer::_AutoJoinNetwork(const char* name)
+{
+	BNetworkDevice device(name);
+
+	BMessage message;
+	message.AddString("device", name);
+
+	// Choose among configured networks
+
+	uint32 cookie = 0;
+	BMessage networkMessage;
+	while (fSettings.GetNextNetwork(cookie, networkMessage) == B_OK) {
+		status_t status = B_ERROR;
+		wireless_network network;
+		const char* networkName;
+		BNetworkAddress link;
+
+		const char* mac;
+		if (networkMessage.FindString("mac", &mac) == B_OK) {
+			link.SetTo(AF_LINK, mac);
+			status = device.GetNetwork(link, network);
+		} else if (networkMessage.FindString("name", &networkName) == B_OK)
+			status = device.GetNetwork(networkName, network);
+
+		if (status == B_OK) {
+			status = _JoinNetwork(message, network.name);
+			if (status == B_OK)
+				return B_OK;
+		}
+	}
+
+	// None found, try them all
+
+	wireless_network network;
+	cookie = 0;
+	while (device.GetNextNetwork(cookie, network) == B_OK) {
+		if ((network.flags & B_NETWORK_IS_ENCRYPTED) == 0) {
+			status_t status = _JoinNetwork(message, network.name);
+			if (status == B_OK)
+				return status;
+		}
+
+		// TODO: once we have a password manager, use that
+	}
+
+	return B_ERROR;
 }
 
 
