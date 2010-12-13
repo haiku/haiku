@@ -18,7 +18,7 @@
 
 // This list comes from the pciid list, except for the last one
 const char* kCategoryString[] = {
-	B_TRANSLATE("Unclassified device"), 					// 0x00
+	B_TRANSLATE("Unclassified device"), 				// 0x00
 	B_TRANSLATE("Mass storage controller"),				// 0x01
 	B_TRANSLATE("Network controller"),					// 0x02
 	B_TRANSLATE("Display controller"), 					// 0x03
@@ -32,12 +32,12 @@ const char* kCategoryString[] = {
 	B_TRANSLATE("Processor"),  							// 0x0b
 	B_TRANSLATE("Serial bus controller"),  				// 0x0c
 	B_TRANSLATE("Wireless controller"),  				// 0x0d
-	B_TRANSLATE("Intelligent controller"),  				// 0x0e
-	B_TRANSLATE("Satellite communications controller"),  // 0x0f
+	B_TRANSLATE("Intelligent controller"),  			// 0x0e
+	B_TRANSLATE("Satellite communications controller"), // 0x0f
 	B_TRANSLATE("Encryption controller"),  				// 0x10
-	B_TRANSLATE("Signal processing controller"),			// 0x11
-	B_TRANSLATE("Computer"),								// 0x12 (added later)
-	B_TRANSLATE("ACPI controller")			// 0x13 (added later)
+	B_TRANSLATE("Signal processing controller"),		// 0x11
+	B_TRANSLATE("Computer"),							// 0x12 (added later)
+	B_TRANSLATE("ACPI controller")						// 0x13 (added later)
 };
 
 
@@ -77,7 +77,8 @@ Device::GetBasicAttributes()
 {
 	Attributes attributes;
 	attributes.push_back(Attribute(B_TRANSLATE("Device name:"), GetName()));
-	attributes.push_back(Attribute(B_TRANSLATE("Manufacturer:"), GetManufacturer()));
+	attributes.push_back(Attribute(B_TRANSLATE("Manufacturer:"),
+		GetManufacturer()));
 	return attributes;
 }
 

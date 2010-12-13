@@ -49,7 +49,8 @@ DeviceACPI::InitFromAttributes()
 		outlineName = B_TRANSLATE("ACPI Thermal Zone");
 	} else if (rootACPIPath == "\\_PR_.") {
 		// each CPU node is considered a root node
-		outlineName << B_TRANSLATE("ACPI Processor Namespace '") << nodeACPIPath << "'";
+		outlineName << B_TRANSLATE("ACPI Processor Namespace '")
+			<< nodeACPIPath << "'";
 	} else if (rootACPIPath == "\\_SI_") {
 		outlineName = B_TRANSLATE("ACPI System Indicator");
 	} else {

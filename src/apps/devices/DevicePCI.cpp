@@ -67,7 +67,8 @@ DevicePCI::InitFromAttributes()
 
 	// Fetch ClassInfo	
 	char classInfo[64];
-	get_class_info(fClassBaseId, fClassSubId, fClassApiId, classInfo, sizeof(classInfo));
+	get_class_info(fClassBaseId, fClassSubId, fClassApiId, classInfo,
+		sizeof(classInfo));
 	
 	// Fetch ManufacturerName
 	BString ManufacturerName;
@@ -86,7 +87,8 @@ DevicePCI::InitFromAttributes()
 	BString DeviceName;
 	const char *devShort;
 	const char *devFull;
-	get_device_info(fVendorId, fDeviceId, fSubsystemVendorId, fSubSystemId, &devShort, &devFull);
+	get_device_info(fVendorId, fDeviceId, fSubsystemVendorId, fSubSystemId,
+		&devShort, &devFull);
 	if (!devShort && !devFull) {
 		DeviceName << "Unknown";
 	} else if (devShort && devFull) {
