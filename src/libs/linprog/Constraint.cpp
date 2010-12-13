@@ -9,6 +9,7 @@
 #include "Constraint.h"
 
 #include <new>
+#include <stdio.h>
 
 #include "LinearSpec.h"
 #include "Variable.h"
@@ -321,11 +322,11 @@ Constraint::WriteXML(BFile* file)
 	file->Write(buffer, sprintf(buffer, "\t\t</leftside>\n"));
 
 	const char* op = "??";
-	if (fOp == OperatorType(EQ))
+	if (fOp == kEQ)
 		op = "EQ";
-	else if (fOp == OperatorType(LE))
+	else if (fOp == kLE)
 		op = "LE";
-	else if (fOp == OperatorType(GE))
+	else if (fOp == kGE)
 		op = "GE";
 
 	file->Write(buffer, sprintf(buffer, "\t\t<op>%s</op>\n", op));
@@ -406,9 +407,9 @@ Constraint::GetString(BString& string) const
 			s->Var()->GetString(string);
 			string << " ";
 		}
-		string << ((fOp == OperatorType(EQ)) ? "== "
-			: (fOp == OperatorType(GE)) ? ">= "
-			: (fOp == OperatorType(LE)) ? "<= "
+		string << ((fOp == kEQ) ? "== "
+			: (fOp == kGE) ? ">= "
+			: (fOp == kLE) ? "<= "
 			: "?? ");
 		string << (float)fRightSide;
 		string << " PenaltyPos=" << (float)PenaltyPos();

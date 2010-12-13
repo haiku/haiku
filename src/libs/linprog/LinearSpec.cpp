@@ -9,6 +9,9 @@
 #include "LinearSpec.h"
 
 #include <new>
+#include <stdio.h>
+
+#include "LPSolveInterface.h"
 
 
 /**
@@ -17,22 +20,13 @@
  */
 LinearSpec::LinearSpec()
 	:
-	fLpPresolved(NULL),
 	fOptimization(MINIMIZE),
 	fObjFunction(new(std::nothrow) SummandList()),
 	fResult(ERROR),
 	fObjectiveValue(NAN),
 	fSolvingTime(NAN)
 {
-	fLP = make_lp(0, 0);
-	if (fLP == NULL)
-		printf("Couldn't construct a new model.");
-
-	// minimize the objective functions, this is the default of lp_solve so we
-	// don't have to do it here:
-	// set_minim(fLP);
-
-	set_verbose(fLP, 1);
+	fSolver = new LPSolveInterface;
 }
 
 
@@ -43,7 +37,6 @@ LinearSpec::LinearSpec()
  */
 LinearSpec::~LinearSpec()
 {
-	_RemovePresolved();
 	for (int32 i = 0; i < fConstraints.CountItems(); i++)
 		delete (Constraint*)fConstraints.ItemAt(i);
 	for (int32 i = 0; i < fObjFunction->CountItems(); i++)
@@ -51,9 +44,8 @@ LinearSpec::~LinearSpec()
 	while (fVariables.CountItems() > 0)
 		RemoveVariable(fVariables.ItemAt(0));
 
-	delete_lp(fLP);
-
 	delete fObjFunction;
+	delete fSolver;
 }
 
 
@@ -83,17 +75,14 @@ LinearSpec::AddVariable(Variable* variable)
 	if (variable->IsValid())
 		return false;
 
-	double d = 0;
-	int i = 0;
-
 	if (!fVariables.AddItem(variable))
 		return false;
-	if (add_columnex(fLP, 0, &d, &i) == 0) {
+	if (!fSolver->AddVariable()) {
 		fVariables.RemoveItem(variable);
 		return false;
 	}
 
-	if (!SetRange(variable, variable->Min(), variable->Max())) {
+	if (!UpdateRange(variable)) {
 		RemoveVariable(variable, false);
 		return false;
 	}
@@ -110,7 +99,7 @@ LinearSpec::RemoveVariable(Variable* variable, bool deleteVariable)
 	if (index < 0)
 		return false;
 
-	if (!del_column(fLP, index))
+	if (!fSolver->RemoveVariable(index))
 		return false;
 	fVariables.RemoveItemAt(index - 1);
 	variable->fIsValid = false;
@@ -156,9 +145,12 @@ LinearSpec::IndexOf(const Variable* variable) const
 
 
 bool
-LinearSpec::SetRange(Variable* variable, double min, double max)
+LinearSpec::UpdateRange(Variable* variable)
 {
-	return set_bounds(fLP, IndexOf(variable), min, max);
+	if (!fSolver->SetVariableRange(IndexOf(variable), variable->Min(),
+		variable->Max()))
+		return false;
+	return true;
 }
 
 
@@ -180,7 +172,7 @@ LinearSpec::AddConstraint(Constraint* constraint)
 		varIndexes[nCoefficient] = s->Var()->Index();
 	}
 
-	if (penaltyNeg != INFINITY && penaltyNeg != 0. && op != OperatorType(LE)) {
+	if (penaltyNeg != INFINITY && penaltyNeg != 0. && op != LE) {
 		constraint->fDNegObjSummand
 			= new(std::nothrow) Summand(constraint->PenaltyNeg(),
 				AddVariable());
@@ -190,7 +182,7 @@ LinearSpec::AddConstraint(Constraint* constraint)
 		nCoefficient++;
 	}
 
-	if (penaltyPos != INFINITY && penaltyPos != 0. && op != OperatorType(GE)) {
+	if (penaltyPos != INFINITY && penaltyPos != 0. && op != GE) {
 		constraint->fDPosObjSummand
 			= new(std::nothrow) Summand(constraint->PenaltyPos(),
 				AddVariable());
@@ -200,10 +192,10 @@ LinearSpec::AddConstraint(Constraint* constraint)
 		nCoefficient++;
 	}
 
-	if (!add_constraintex(fLP, nCoefficient, &coeffs[0], &varIndexes[0],
-			(op == OperatorType(EQ) ? EQ : (op == OperatorType(GE)) ? GE
-				: LE), rightSide))
+	if (!fSolver->AddConstraint(nCoefficient, &coeffs[0], &varIndexes[0], op,
+		rightSide)) {
 		return false;
+	}
 
 	UpdateObjectiveFunction();
 	fConstraints.AddItem(constraint);
@@ -228,7 +220,7 @@ LinearSpec::RemoveConstraint(Constraint* constraint, bool deleteConstraint)
 		constraint->fDPosObjSummand = NULL;
 	}
 
-	del_constraint(fLP, constraint->Index());
+	fSolver->RemoveConstraint(constraint->Index());
 	fConstraints.RemoveItem(constraint);
 	constraint->fIsValid = false;
 
@@ -268,12 +260,11 @@ LinearSpec::UpdateLeftSide(Constraint* constraint)
 		i++;
 	}
 
-	if (!set_rowex(fLP, constraint->Index(), i, &coeffs[0],
+	if (!fSolver->SetLeftSide(constraint->Index(), i, &coeffs[0],
 		&varIndexes[0]))
 		return false;
 
 	UpdateObjectiveFunction();
-	_RemovePresolved();
 	return true;
 }
 
@@ -281,10 +272,8 @@ LinearSpec::UpdateLeftSide(Constraint* constraint)
 bool
 LinearSpec::UpdateRightSide(Constraint* constraint)
 {
-	if (!set_rh(fLP, constraint->Index(), constraint->RightSide()))
+	if (!fSolver->SetRightSide(constraint->Index(), constraint->RightSide()))
 		return false;
-
-	_RemovePresolved();
 	return true;
 }
 
@@ -292,13 +281,8 @@ LinearSpec::UpdateRightSide(Constraint* constraint)
 bool
 LinearSpec::UpdateOperator(Constraint* constraint)
 {
-	OperatorType op = constraint->Op();
-	if (!set_constr_type(fLP, constraint->Index(),
-		(op == OperatorType(EQ)) ? EQ : (op == OperatorType(GE)) ? GE
-			: LE))
+	if (!fSolver->SetOperator(constraint->Index(), constraint->Op()))
 		return false;
-
-	_RemovePresolved();
 	return true;
 }
 
@@ -613,10 +597,8 @@ LinearSpec::UpdateObjectiveFunction()
 		varIndexes[i] = current->Var()->Index();
 	}
 
-	if (!set_obj_fnex(fLP, size, &coeffs[0], &varIndexes[0]))
+	if (!fSolver->SetObjectiveFunction(size, &coeffs[0], &varIndexes[0]))
 		printf("Error in set_obj_fnex.\n");
-
-	_RemovePresolved();
 }
 
 
@@ -652,62 +634,7 @@ LinearSpec::_AddConstraint(SummandList* leftSide, OperatorType op,
 		delete constraint;
 		return NULL;
 	}
-	_RemovePresolved();
 	return constraint;
-}
-
-
-/**
- * Remove a cached presolved model, if existent.
- * This is automatically done each time after the model has been changed,
- * to avoid an old cached presolved model getting out of sync.
- */
-void
-LinearSpec::_RemovePresolved()
-{
-	if (fLpPresolved == NULL)
-		return;
-	delete_lp(fLpPresolved);
-	fLpPresolved = NULL;
-}
-
-
-/**
- * Creates and caches a simplified version of the linear programming problem,
- * where redundant rows, columns and constraints are removed,
- * if it has not been created before.
- * Then, the simplified problem is solved.
- *
- * @return the result of the solving attempt
- */
-ResultType
-LinearSpec::_Presolve()
-{
-	bigtime_t start, end;
-	start = system_time();
-
-	if (fLpPresolved == NULL) {
-		fLpPresolved = copy_lp(fLP);
-		set_presolve(fLpPresolved, PRESOLVE_ROWS | PRESOLVE_COLS
-			| PRESOLVE_LINDEP, get_presolveloops(fLpPresolved));
-	}
-
-	fResult = (ResultType)solve(fLpPresolved);
-	fObjectiveValue = get_objective(fLpPresolved);
-
-	if (fResult == OPTIMAL) {
-		int32 size = fVariables.CountItems();
-		for (int32 i = 0; i < size; i++) {
-			Variable* current = (Variable*)fVariables.ItemAt(i);
-			current->SetValue(get_var_primalresult(fLpPresolved,
-					get_Norig_rows(fLpPresolved) + current->Index()));
-		}
-	}
-
-	end = system_time();
-	fSolvingTime = (end - start) / 1000.0;
-
-	return fResult;
 }
 
 
@@ -720,27 +647,11 @@ LinearSpec::_Presolve()
 ResultType
 LinearSpec::Solve()
 {
-	if (fLpPresolved != NULL)
-		return _Presolve();
-
 	bigtime_t start, end;
 	start = system_time();
 
-	fResult = (ResultType)solve(fLP);
-	fObjectiveValue = get_objective(fLP);
-
-	if (fResult == OPTIMAL) {
-		int32 size = fVariables.CountItems();
-		double x[size];
-		if (!get_variables(fLP, &x[0]))
-			printf("Error in get_variables.\n");
-
-		int32 i = 0;
-		while (i < size) {
-			((Variable*)fVariables.ItemAt(i))->SetValue(x[i]);
-			i++;
-		}
-	}
+	fResult = fSolver->Solve(fVariables);
+	fObjectiveValue = fSolver->GetObjectiveValue();
 
 	end = system_time();
 	fSolvingTime = (end - start) / 1000.0;
@@ -755,11 +666,10 @@ LinearSpec::Solve()
  *
  * @param fname	the file name
  */
-void
+bool
 LinearSpec::Save(const char* fileName)
 {
-	// TODO: Constness should be fixed in liblpsolve API.
-	write_lp(fLP, const_cast<char*>(fileName));
+	return fSolver->SaveModel(fileName) == B_OK;
 }
 
 
@@ -786,10 +696,7 @@ void
 LinearSpec::SetOptimization(OptimizationType value)
 {
 	fOptimization = value;
-	if (fOptimization == MINIMIZE)
-		set_minim(fLP);
-	else
-		set_maxim(fLP);
+	fSolver->SetOptimization(value);
 }
 
 

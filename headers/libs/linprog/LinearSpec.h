@@ -22,10 +22,40 @@
 #include "Summand.h"
 #include "Variable.h"
 
-#include "lp_lib.h"
-
 
 namespace LinearProgramming {
+
+class SolverInterface {
+public:
+	virtual						~SolverInterface() {}
+
+	virtual ResultType			Solve(VariableList& variables) = 0;
+	virtual double				GetObjectiveValue() = 0;
+
+	virtual	bool				AddVariable() = 0;
+	virtual	bool				RemoveVariable(int variable) = 0;
+	virtual	bool				SetVariableRange(int variable, double min,
+									double max) = 0;
+
+	virtual	bool				AddConstraint(int nElements,
+									double* coefficients, int* variableIndices,
+									OperatorType op, double rightSide) = 0;
+	virtual	bool				RemoveConstraint(int constraint) = 0;
+	virtual	bool				SetLeftSide(int constraint, int nElements,
+									double* coefficients,
+									int* variableIndices) = 0;
+	virtual	bool				SetRightSide(int constraint, double value) = 0;
+	virtual	bool				SetOperator(int constraint,
+									OperatorType op) = 0;
+
+	virtual bool				SetObjectiveFunction(int nElements,
+									double* coefficients,
+									int* variableIndices) = 0;
+	virtual bool				SetOptimization(OptimizationType value) = 0;
+
+	virtual bool				SaveModel(const char* fileName) = 0;
+};
+
 
 /*!
  * Specification of a linear programming problem.
@@ -40,8 +70,7 @@ public:
 			bool				RemoveVariable(Variable* variable,
 									bool deleteVariable = true);
 			int32				IndexOf(const Variable* variable) const;
-			bool				SetRange(Variable* variable, double min,
-									double max);
+			bool				UpdateRange(Variable* variable);
 
 			bool				AddConstraint(Constraint* constraint);
 			bool				RemoveConstraint(Constraint* constraint,
@@ -97,7 +126,7 @@ public:
 			void				UpdateObjectiveFunction();
 
 			ResultType			Solve();
-			void				Save(const char* fileName);
+			bool				Save(const char* fileName);
 
 			int32				CountColumns() const;
 			OptimizationType	Optimization() const;
@@ -125,12 +154,8 @@ private:
 									OperatorType op, double rightSide,
 									double penaltyNeg, double penaltyPos);
 
-			ResultType			_Presolve();
-			void				_RemovePresolved();
-
-			lprec*				fLpPresolved;
 			OptimizationType	fOptimization;
-			lprec*				fLP;
+
 			SummandList*		fObjFunction;
 			VariableList		fVariables;
 			ConstraintList		fConstraints;
@@ -138,6 +163,7 @@ private:
 			double 				fObjectiveValue;
 			double 				fSolvingTime;
 
+			SolverInterface*	fSolver;
 };
 
 }	// namespace LinearProgramming

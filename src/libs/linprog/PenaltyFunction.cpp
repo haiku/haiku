@@ -4,12 +4,16 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "PenaltyFunction.h"
+
+#include <stdio.h>
+
 #include "Constraint.h"
-#include "Summand.h"
-#include "OperatorType.h"
-#include "Variable.h"
 #include "LinearSpec.h"
+#include "OperatorType.h"
+#include "Summand.h"
+#include "Variable.h"
 
 
 /**
@@ -34,14 +38,14 @@ PenaltyFunction::PenaltyFunction(LinearSpec* ls, Variable* var, BList* xs, BList
 	fConstraints = new BList(sizeGs + 1);
 	fObjFunctionSummands = new BList(sizeGs);
 		
-	fConstraints->AddItem(ls->AddConstraint(1.0, var, OperatorType(EQ), 
+	fConstraints->AddItem(ls->AddConstraint(1.0, var, kEQ, 
 		*(double*)(xs->ItemAt(0)), -*(double*)(gs->ItemAt(0)), 
 		*(double*)(gs->ItemAt(1))));
 	
 	for (int32 i = 1; i < sizeGs; i++) {
 		Variable* dPos = ls->AddVariable();
 			
-		fConstraints->AddItem(ls->AddConstraint(1.0, var, -1.0, dPos, OperatorType(LE), 
+		fConstraints->AddItem(ls->AddConstraint(1.0, var, -1.0, dPos, kLE, 
 			*(double*)(xs->ItemAt(i))));
 		
 		Summand* objSummand =  new Summand(*(double*)(gs->ItemAt(i + 1)) - *(double*)(gs->ItemAt(i)), dPos);

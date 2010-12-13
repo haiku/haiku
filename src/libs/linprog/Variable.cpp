@@ -135,7 +135,7 @@ Variable::SetRange(double min, double max)
 
 	fMin = min;
 	fMax = max;
-	fLS->SetRange(this, fMin, fMax);
+	fLS->UpdateRange(this);
 }
 
 
@@ -196,7 +196,7 @@ Variable::IsEqual(Variable* var)
 	if (!fIsValid)
 		return NULL;
 
-	return fLS->AddConstraint(1.0, this, -1.0, var, OperatorType(EQ), 0.0);
+	return fLS->AddConstraint(1.0, this, -1.0, var, kEQ, 0.0);
 }
 
 
@@ -212,7 +212,7 @@ Variable::IsSmallerOrEqual(Variable* var)
 	if (!fIsValid)
 		return NULL;
 
-	return fLS->AddConstraint(1.0, this, -1.0, var, OperatorType(LE), 0.0);
+	return fLS->AddConstraint(1.0, this, -1.0, var, kLE, 0.0);
 }
 
 
@@ -228,7 +228,7 @@ Variable::IsGreaterOrEqual(Variable* var)
 	if (!fIsValid)
 		return NULL;
 
-	return fLS->AddConstraint(-1.0, var, 1.0, this, OperatorType(GE), 0.0);
+	return fLS->AddConstraint(-1.0, var, 1.0, this, kGE, 0.0);
 }
 
 
@@ -238,7 +238,7 @@ Variable::IsEqual(Variable* var, double penaltyNeg, double penaltyPos)
 	if (!fIsValid)
 		return NULL;
 
-	return fLS->AddConstraint(1.0, this, -1.0, var, OperatorType(EQ), 0.0,
+	return fLS->AddConstraint(1.0, this, -1.0, var, kEQ, 0.0,
 		penaltyNeg, penaltyPos);
 }
 
@@ -249,8 +249,8 @@ Variable::IsSmallerOrEqual(Variable* var, double penaltyNeg, double penaltyPos)
 	if (!fIsValid)
 		return NULL;
 
-	return fLS->AddConstraint(1.0, this, -1.0, var, OperatorType(LE), 0.0,
-		penaltyNeg, penaltyPos);
+	return fLS->AddConstraint(1.0, this, -1.0, var, kLE, 0.0, penaltyNeg,
+		penaltyPos);
 }
 
 
@@ -260,8 +260,8 @@ Variable::IsGreaterOrEqual(Variable* var, double penaltyNeg, double penaltyPos)
 	if (!fIsValid)
 		return NULL;
 
-	return fLS->AddConstraint(-1.0, var, 1.0, this, OperatorType(GE), 0.0,
-		penaltyNeg, penaltyPos);
+	return fLS->AddConstraint(-1.0, var, 1.0, this, kGE, 0.0, penaltyNeg,
+		penaltyPos);
 }
 
 

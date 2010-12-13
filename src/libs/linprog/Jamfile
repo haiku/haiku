@@ -8,6 +8,7 @@ UsePrivateHeaders shared ;
 StaticLibrary liblinprog.a : 
 	Constraint.cpp
 	LinearSpec.cpp
+	LPSolveInterface.cpp
 	Summand.cpp
 	PenaltyFunction.cpp
 	Variable.cpp

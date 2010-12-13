@@ -14,7 +14,9 @@ namespace LinearProgramming {
  * Possible operators for linear constraints.
  */
 enum OperatorType {
-	EQ, LE, GE
+	kEQ,
+	kLE,
+	kGE
 };
 
 }	// namespace LinearProgramming

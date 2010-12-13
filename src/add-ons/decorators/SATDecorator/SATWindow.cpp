@@ -19,6 +19,7 @@
 
 
 using namespace BPrivate;
+using namespace LinearProgramming;
 
 
 const uint32 kExtentPenalty = 10;
@@ -163,27 +164,27 @@ GroupCookie::Init(SATGroup* group, WindowArea* area)
 
 	// create constraints
 	BRect frame = fSATWindow->CompleteWindowFrame();
-	fLeftConstraint = linearSpec->AddConstraint(1.0, fLeftBorder,
-		OperatorType(EQ), frame.left, 1, 1);
-	fTopConstraint  = linearSpec->AddConstraint(1.0, fTopBorder,
-		OperatorType(EQ), frame.top, 1, 1);
+	fLeftConstraint = linearSpec->AddConstraint(1.0, fLeftBorder, kEQ,
+		frame.left, 1, 1);
+	fTopConstraint  = linearSpec->AddConstraint(1.0, fTopBorder, kEQ,
+		frame.top, 1, 1);
 
 	int32 minWidth, maxWidth, minHeight, maxHeight;
 	fSATWindow->GetSizeLimits(&minWidth, &maxWidth, &minHeight,
 		&maxHeight);
 	fMinWidthConstraint = linearSpec->AddConstraint(1.0, fRightBorder, -1.0,
-		fLeftBorder, OperatorType(GE), minWidth);
+		fLeftBorder, kGE, minWidth);
 	fMinHeightConstraint = linearSpec->AddConstraint(1.0, fBottomBorder, -1.0,
-		fTopBorder, OperatorType(GE), minHeight);
+		fTopBorder, kGE, minHeight);
 
 	// The width and height constraints have higher penalties than the
 	// position constraints (left, top), so a window will keep its size
 	// unless explicitly resized.
 	fWidthConstraint = linearSpec->AddConstraint(-1.0, fLeftBorder, 1.0,
-		fRightBorder, OperatorType(EQ), frame.Width(), kExtentPenalty,
+		fRightBorder, kEQ, frame.Width(), kExtentPenalty,
 		kExtentPenalty);
 	fHeightConstraint = linearSpec->AddConstraint(-1.0, fTopBorder, 1.0,
-		fBottomBorder, OperatorType(EQ), frame.Height(), kExtentPenalty,
+		fBottomBorder, kEQ, frame.Height(), kExtentPenalty,
 		kExtentPenalty);
 
 	if (!fLeftConstraint || !fTopConstraint || !fMinWidthConstraint

@@ -17,6 +17,9 @@
 #include "ResultType.h"
 
 
+using namespace LinearProgramming;
+
+
 const BSize kUnsetSize(B_SIZE_UNSET, B_SIZE_UNSET);
 const BSize kMinSize(0, 0);
 const BSize kMaxSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED);

@@ -20,6 +20,7 @@
 #include "ALMLayout.h"
 
 
+using namespace LinearProgramming;
 using namespace std;
 
 
@@ -361,7 +362,7 @@ Area::SetContentAspectRatio(double ratio)
 		fContentAspectRatioC = NULL;
 	} else if (fContentAspectRatioC == NULL) {
 		fContentAspectRatioC = fLS->AddConstraint(-1.0, fLeft, 1.0, fRight,
-			ratio, fTop, -ratio, fBottom, OperatorType(EQ), 0.0);
+			ratio, fTop, -ratio, fBottom, kEQ, 0.0);
 		fConstraints.AddItem(fContentAspectRatioC);
 	} else {
 		fContentAspectRatioC->SetLeftSide(-1.0, fLeft, 1.0, fRight, ratio,
@@ -513,7 +514,7 @@ Constraint*
 Area::SetWidthAs(Area* area, float factor)
 {
 	return fLS->AddConstraint(-1.0, fLeft, 1.0, fRight, factor, area->Left(),
-		-factor, area->Right(), OperatorType(EQ), 0.0);
+		-factor, area->Right(), kEQ, 0.0);
 }
 
 
@@ -528,7 +529,7 @@ Constraint*
 Area::SetHeightAs(Area* area, float factor)
 {
 	return fLS->AddConstraint(-1.0, fTop, 1.0, fBottom, factor, area->Top(),
-		-factor, area->Bottom(), OperatorType(EQ), 0.0);
+		-factor, area->Bottom(), kEQ, 0.0);
 }
 
 
@@ -614,20 +615,18 @@ Area::_Init(LinearSpec* ls, XTab* left, YTab* top, XTab* right, YTab* bottom,
 	// adds the two essential constraints of the area that make sure that the
 	// left x-tab is really to the left of the right x-tab, and the top y-tab
 	// really above the bottom y-tab
-	fMinContentWidth = ls->AddConstraint(-1.0, fLeft, 1.0, fRight,
-		OperatorType(GE), 0);
-	fMinContentHeight = ls->AddConstraint(-1.0, fTop, 1.0, fBottom,
-		OperatorType(GE), 0);
+	fMinContentWidth = ls->AddConstraint(-1.0, fLeft, 1.0, fRight, kGE, 0);
+	fMinContentHeight = ls->AddConstraint(-1.0, fTop, 1.0, fBottom, kGE, 0);
 
 	fConstraints.AddItem(fMinContentWidth);
 	fConstraints.AddItem(fMinContentHeight);
 
 	fPreferredContentWidth = fLS->AddConstraint(-1.0, fLeft, 1.0, fRight, -1.0,
-		fScaleWidth, OperatorType(EQ), 0, fShrinkPenalties.Width(),
+		fScaleWidth, kEQ, 0, fShrinkPenalties.Width(),
 		fGrowPenalties.Width());
 
 	fPreferredContentHeight = fLS->AddConstraint(-1.0, fTop, 1.0, fBottom, -1.0,
-		fScaleHeight, OperatorType(EQ), 0, fShrinkPenalties.Height(),
+		fScaleHeight, kEQ, 0, fShrinkPenalties.Height(),
 		fGrowPenalties.Height());
 
 	fConstraints.AddItem(fPreferredContentWidth);
@@ -694,7 +693,7 @@ Area::_UpdateMaxSizeConstraint(BSize max)
 	if (alignment.Vertical() == B_ALIGN_USE_FULL_HEIGHT) {
 		if (fMaxContentHeight == NULL) {
 			fMaxContentHeight = fLS->AddConstraint(-1.0, fTop, 1.0, fBottom,
-				OperatorType(LE), max.Height());
+				kLE, max.Height());
 			fConstraints.AddItem(fMaxContentHeight);
 		} else
 			fMaxContentHeight->SetRightSide(max.Height());
@@ -707,8 +706,8 @@ Area::_UpdateMaxSizeConstraint(BSize max)
 
 	if (alignment.Horizontal() == B_ALIGN_USE_FULL_WIDTH) {
 		if (fMaxContentWidth == NULL) {
-			fMaxContentWidth = fLS->AddConstraint(-1.0, fLeft, 1.0, fRight,
-				OperatorType(LE), max.Width());
+			fMaxContentWidth = fLS->AddConstraint(-1.0, fLeft, 1.0, fRight, kLE,
+				max.Width());
 			fConstraints.AddItem(fMaxContentWidth);
 		} else
 			fMaxContentWidth->SetRightSide(max.Width());
