@@ -577,8 +577,8 @@ CDDBQuery::GetSites(bool (*eachFunc)(const char *site, int port, const char *lat
 		scanner = _GetToken(scanner, longitude);
 		description = scanner;
 
-		if (eachFunc(site.String(), sitePort, latitude.String(), longitude.String(),
-			description.String(), passThru))
+		if (eachFunc(site.String(), sitePort, latitude.String(),
+				longitude.String(),	description.String(), passThru))
 			break;
 	}
 	_Disconnect();
@@ -686,8 +686,8 @@ CDDBQuery::GetTrackTimes(const scsi_toc *toc, vector<CDAudioTime> &times)
 status_t
 CDDBQuery::_ReadFromServer(BString &data)
 {
-	// This function queries the given CDDB server for the existence of the disc's data and
-	// saves the data to file once obtained.
+	// This function queries the given CDDB server for the existence of the
+	// disc's data and saves the data to file once obtained.
 
 	// Query for the existence of the disc in the database
 	char idString[10];
@@ -696,7 +696,8 @@ CDDBQuery::_ReadFromServer(BString &data)
 
 	int32 trackCount = GetTrackCount(&fSCSIData);
 	BString offsetString = OffsetsToString(&fSCSIData);	
-	int32 discLength = (fCDData.DiscTime()->GetMinutes() * 60) + fCDData.DiscTime()->GetSeconds();
+	int32 discLength = (fCDData.DiscTime()->GetMinutes() * 60)
+		+ fCDData.DiscTime()->GetSeconds();
 
 	query << "cddb query " << idString << ' ' << trackCount << ' ' 
 			<< offsetString << ' ' << discLength << '\n';
@@ -717,29 +718,32 @@ CDDBQuery::_ReadFromServer(BString &data)
 
 	if (tmp.FindFirst("200") != 0) {
 		if (tmp.FindFirst("211") == 0) {
-			// A 211 means that the query was not exact. To make sure that we don't
-			// have a problem with this in the future, we will choose the first entry that
-			// the server returns. This may or may not be wise, but in my experience, the first
-			// one has been the right one.
+			// A 211 means that the query was not exact. To make sure that we
+			// don't have a problem with this in the future, we will choose the
+			// first entry that the server returns. This may or may not be wise,
+			// but in my experience, the first one has been the right one.
 
 			_ReadLine(tmp);
 
 			// Get the category from the what the server returned
 			_GetToken(tmp.String(), category);
 
-			// Now we will get the disc ID for the CD. We will need this when we query for
-			// the track name list. If we send the track name query with the real discID, nothing
-			// will be returned. However, if we send the one from the entry, we'll get the names
-			// and we can take these names attach them to the disc that we have.
+			// Now we will get the disc ID for the CD. We will need this when we
+			// query for the track name list. If we send the track name query
+			// with the real discID, nothing will be returned. However, if we
+			// send the one from the entry, we'll get the names and we can take
+			// these names attach them to the disc that we have.
 			_GetToken(tmp.String() + category.CountChars(), queryDiscID);
 
-			// This is to suck up any more search results that the server sends us.
+			// This is to suck up any more search results that the server sends
+			// us.
 			BString throwaway;
 			_ReadLine(throwaway);
 			while (throwaway.ByteAt(0) != '.')
 				_ReadLine(throwaway);
 		} else {
-			// We get here for any time the CDDB server does not recognize the CD, amongst other things
+			// We get here for any time the CDDB server does not recognize the
+			// CD, amongst other things
 			STRACE(("CDDB lookup error: %s\n", tmp.String()));
 			fCDData.SetGenre("misc");
 			return B_NAME_NOT_FOUND;
@@ -828,12 +832,15 @@ CDDBQuery::_ReadLine(BString &buffer)
 			break;
 
 
-		// This function is more work than it should have to be. FreeDB lookups can sometimes 
-		// be in a non-ASCII encoding, such as Latin-1 or UTF8. The problem lies in Be's implementation
-		// of BString, which does not support UTF8 string assignments. The Be Book says we have to
-		// flatten the string and adjust the character counts manually. Man, this *really* sucks.
+		// This function is more work than it should have to be. FreeDB lookups
+		// can sometimes  be in a non-ASCII encoding, such as Latin-1 or UTF8.
+		// The problem lies in Be's implementation of BString, which does not
+		// support UTF8 string assignments. The Be Book says we have to flatten
+		// the string and adjust the character counts manually. Man, this
+		// *really* sucks.
 		if (ch > 0x7f) 	{
-			// Obviously non-ASCII character detected. Let's see if it's Latin-1 or UTF8.
+			// Obviously non-ASCII character detected. Let's see if it's Latin-1
+			// or UTF8.
 			unsigned char *string, *stringindex;
 			int32 length = buffer.Length();
 
@@ -869,8 +876,10 @@ CDDBQuery::_ReadLine(BString &buffer)
 			destlen = 5;
 			memset(deststr, 0, 5);
 
-			if (convert_to_utf8(B_ISO1_CONVERSION, srcstr, &srclen, deststr, &destlen, &state) == B_OK) {
-				// We succeeded. Amazing. Now we hack the string into having the character
+			if (convert_to_utf8(B_ISO1_CONVERSION, srcstr, &srclen, deststr,
+					&destlen, &state) == B_OK) {
+				// We succeeded. Amazing. Now we hack the string into having the
+				// character
 				length = buffer.Length();
 
 				string = (unsigned char *)buffer.LockBuffer(length + 10);
@@ -884,7 +893,8 @@ CDDBQuery::_ReadLine(BString &buffer)
 
 				buffer.UnlockBuffer();
 			} else {
-				// well, we tried. Append the character to the string and live with it
+				// well, we tried. Append the character to the string and live
+				// with it
 				buffer += ch;
 			}
 		} else
@@ -914,7 +924,8 @@ CDDBQuery::_IdentifySelf()
 		hostname = "haiku";
 
 	BString tmp;
-	tmp << "cddb hello " << username << " " << hostname << " HaikuCDPlayer 1.0\n";
+	tmp << "cddb hello " << username << " " << hostname
+		<< " HaikuCDPlayer 1.0\n";
 
 	STRACE((">%s", tmp.String()));
 	if (fSocket.Send(tmp.String(), tmp.Length())==-1) {
@@ -931,8 +942,9 @@ CDDBQuery::_IdentifySelf()
 status_t
 CDDBQuery::_OpenContentFile(const int32 &discID)
 {
-	// Makes sure that the lookup has a valid file to work with for the CD content.
-	// Returns true if there is an existing file, false if a lookup is required.
+	// Makes sure that the lookup has a valid file to work with for the CD
+	// content. Returns true if there is an existing file, false if a lookup is
+	// required.
 
 	BFile file;
 	BString predicate;
@@ -962,8 +974,9 @@ CDDBQuery::_OpenContentFile(const int32 &discID)
 
 	status_t status = fCDData.Load(ref);
 	if (status == B_NO_INIT) {
-		// We receive this error when the Load() function couldn't load the track times
-		// This just means that we get it from the SCSI data given to us in SetToCD
+		// We receive this error when the Load() function couldn't load the
+		// track times This just means that we get it from the SCSI data given
+		// to us in SetToCD
 		vector<CDAudioTime> times;
 		GetTrackTimes(&fSCSIData,times);
 
@@ -995,9 +1008,9 @@ CDDBQuery::_QueryThread(void *owner)
 			query->_ParseData(data);
 			query->_WriteFile();
 		} else {
-			// We apparently couldn't connect to the server, so we'll need to handle
-			// creating tracknames. Note that we do not save to disk. This is because it should
-			// be up to the user what to do.
+			// We apparently couldn't connect to the server, so we'll need to
+			// handle creating tracknames. Note that we do not save to disk.
+			// This is because it should be up to the user what to do.
 			query->_SetDefaultInfo();
 		}
 	}
@@ -1061,9 +1074,10 @@ CDDBQuery::_SetDefaultInfo()
 void
 CDDBQuery::_ParseData(const BString &data)
 {
-	// Can't simply call MakeEmpty() because the thread is spawned when the discID kept in fCDData
-	// is not the same as what's in the drive and MakeEmpty invalidates *everything* in the object.
-	// Considering that we reassign everything here, simply emptying the track list should be sufficient
+	// Can't simply call MakeEmpty() because the thread is spawned when the
+	// discID kept in fCDData is not the same as what's in the drive and
+	// MakeEmpty invalidates *everything* in the object. Considering that we
+	// reassign everything here, simply emptying the track list should be sufficient
 	for (int16 i = fCDData.CountTracks(); i >= 0; i--)
 		fCDData.RemoveTrack(i);
 
@@ -1072,8 +1086,8 @@ CDDBQuery::_ParseData(const BString &data)
 	int32 trackCount = GetTrackCount(&fSCSIData);
 
 	if (data.CountChars() < 1) {
-		// This case occurs when the CDDB lookup fails. On these occasions, we need to generate
-		// the file ourselves. This is actually pretty easy.
+		// This case occurs when the CDDB lookup fails. On these occasions, we
+		// need to generate the file ourselves. This is actually pretty easy.
 		fCDData.SetArtist("Artist");
 		fCDData.SetAlbum("Audio CD");
 		fCDData.SetGenre("Misc");
@@ -1093,15 +1107,17 @@ CDDBQuery::_ParseData(const BString &data)
 
 	// TODO: This function is dog slow, but it works. Optimize.
 
-	// Ideally, the search should be done sequentially using GetLineFromString() and strchr().
-	// Order: genre(category), frame offsets, disc length, artist/album, track titles
+	// Ideally, the search should be done sequentially using GetLineFromString()
+	// and strchr(). Order: genre(category), frame offsets, disc length,
+	// artist/album, track titles
 
 	int32 pos;
 
 	pos = data.FindFirst("DYEAR=");
 	if (pos > 0) {
 		BString artist,album;
-		artist = album = GetLineFromString(data.String() + sizeof("DYEAR") + pos);
+		artist = album = GetLineFromString(data.String() + sizeof("DYEAR")
+			+ pos);
 
 		// TODO: finish, once I find an entry which actually has a year in it
 		BAlert *alert = new BAlert("SimplyVorbis", "DYEAR entry found\n", "OK");
@@ -1112,7 +1128,8 @@ CDDBQuery::_ParseData(const BString &data)
 	pos = data.FindFirst("DTITLE=");
 	if (pos > 0) {
 		BString artist,album;
-		artist = album = GetLineFromString(data.String() + sizeof("DTITLE") + pos);
+		artist = album = GetLineFromString(data.String() + sizeof("DTITLE")
+			+ pos);
 
 		pos = artist.FindFirst(" / ");
 		if (pos > 0)
@@ -1138,7 +1155,8 @@ CDDBQuery::_ParseData(const BString &data)
 			BString trackName = data.String() + pos + searchString.Length();
 			trackName.Truncate(trackName.FindFirst("\n"));
 
-			CDAudioTime tracktime = trackTimes[trackCount + 1] - trackTimes[trackCount];
+			CDAudioTime tracktime = trackTimes[trackCount + 1]
+				- trackTimes[trackCount];
 			fCDData.AddTrack(trackName.String(),tracktime);
 
 			trackCount++;

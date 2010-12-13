@@ -46,7 +46,8 @@ cddb_sum(int n)
 //	#pragma mark -
 
 
-CDAudioData::CDAudioData(const int32 &id, const int32 &count, const int32 &discLength)
+CDAudioData::CDAudioData(const int32 &id, const int32 &count,
+	const int32 &discLength)
 	:
 	fDiscId(id),
 	fTrackCount(count),
@@ -124,7 +125,8 @@ CDAudioTime::operator-(const CDAudioTime &from)
 {
 	CDAudioTime time;
 
-	int32 tsec = ((fMinutes * 60) + fSeconds) - ((from.fMinutes * 60) + from.fSeconds);
+	int32 tsec = ((fMinutes * 60) + fSeconds) - ((from.fMinutes * 60)
+		+ from.fSeconds);
 	if (tsec < 0) {
 		time.fMinutes = 0;
 		time.fSeconds = 0;

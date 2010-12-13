@@ -12,8 +12,8 @@ Application CDPlayer :
 	TwoStateDrawButton.cpp
 	VolumeSlider.cpp
 
-	: be $(TARGET_SELECT_UNAME_ETC_LIB) $(TARGET_NETAPI_LIB) $(TARGET_LIBSTDC++) $(HAIKU_LOCALE_LIBS)
-		translation textencoding
+	: be $(TARGET_SELECT_UNAME_ETC_LIB) $(TARGET_NETAPI_LIB) $(TARGET_LIBSTDC++)
+		$(HAIKU_LOCALE_LIBS) translation textencoding
 	: CDPlayer.rdef
 ;
 
