@@ -20,6 +20,9 @@
 #include "ALMLayout.h"
 
 
+using namespace LinearProgramming;
+
+
 class ViewsWindow : public BWindow {
 public:
 	ViewsWindow(BRect frame) 
@@ -78,7 +81,7 @@ public:
 		layout->AddItemToRight(BSpaceLayoutItem::CreateGlue(), layout->Right());
 
 		layout->Solver()->AddConstraint(2, layout->TopOf(menu1), -1,
-			layout->Bottom(), OperatorType(EQ), 0);
+			layout->Bottom(), OperatorType(kEQ), 0);
 
 		// test size limits
 		BSize min = layout->MinSize();
