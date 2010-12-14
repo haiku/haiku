@@ -54,6 +54,8 @@ BDebugMessageHandler::HandleDebugMessage(int32 messageCode,
 			return HandleThreadCreated(message.thread_created);
 		case B_DEBUGGER_MESSAGE_THREAD_DELETED:
 			return HandleThreadDeleted(message.thread_deleted);
+		case B_DEBUGGER_MESSAGE_THREAD_RENAMED:
+			return HandleThreadRenamed(message.thread_renamed);
 		case B_DEBUGGER_MESSAGE_IMAGE_CREATED:
 			return HandleImageCreated(message.image_created);
 		case B_DEBUGGER_MESSAGE_IMAGE_DELETED:
@@ -169,6 +171,23 @@ bool
 BDebugMessageHandler::HandleThreadCreated(const debug_thread_created& message)
 {
 	return UnhandledDebugMessage(B_DEBUGGER_MESSAGE_THREAD_CREATED,
+		(const debug_debugger_message_data&)message);
+}
+
+
+bool
+BDebugMessageHandler::HandleThreadRenamed(const debug_thread_renamed& message)
+{
+	return UnhandledDebugMessage(B_DEBUGGER_MESSAGE_THREAD_RENAMED,
+		(const debug_debugger_message_data&)message);
+}
+
+
+bool
+BDebugMessageHandler::HandleThreadPriorityChanged(
+	const debug_thread_priority_changed& message)
+{
+	return UnhandledDebugMessage(B_DEBUGGER_MESSAGE_THREAD_PRIORITY_CHANGED,
 		(const debug_debugger_message_data&)message);
 }
 

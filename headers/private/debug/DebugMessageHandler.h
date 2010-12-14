@@ -42,6 +42,11 @@ public:
 									const debug_team_exec& message);
 	virtual	bool				HandleThreadCreated(
 									const debug_thread_created& message);
+	virtual bool				HandleThreadRenamed(
+									const debug_thread_renamed& message);
+	virtual bool				HandleThreadPriorityChanged(
+									const debug_thread_priority_changed&
+										message);
 	virtual	bool				HandleThreadDeleted(
 									const debug_thread_deleted& message);
 	virtual	bool				HandleImageCreated(

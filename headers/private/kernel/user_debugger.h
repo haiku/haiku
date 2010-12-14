@@ -234,6 +234,8 @@ void user_debug_team_deleted(team_id teamID, port_id debuggerPort);
 void user_debug_team_exec();
 void user_debug_update_new_thread_flags(thread_id threadID);
 void user_debug_thread_created(thread_id threadID);
+void user_debug_thread_renamed(thread_id threadID, const char* name);
+void user_debug_thread_priority_changed(thread_id threadID, int32 priority);
 void user_debug_thread_deleted(team_id teamID, thread_id threadID);
 void user_debug_thread_exiting(struct thread* thread);
 void user_debug_image_created(const image_info *imageInfo);
