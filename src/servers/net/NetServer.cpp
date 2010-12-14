@@ -40,6 +40,7 @@
 #include <FindDirectory.h>
 
 #include <AutoDeleter.h>
+#include <WPASupplicant.h>
 
 #include "AutoconfigLooper.h"
 #include "Services.h"
@@ -855,6 +856,8 @@ NetServer::_AutoJoinNetwork(const char* name)
 
 		if (status == B_OK) {
 			status = _JoinNetwork(message, network.name);
+			printf("auto join network \"%s\": %s\n", network.name,
+				strerror(status));
 			if (status == B_OK)
 				return B_OK;
 		}
@@ -867,6 +870,8 @@ NetServer::_AutoJoinNetwork(const char* name)
 	while (device.GetNextNetwork(cookie, network) == B_OK) {
 		if ((network.flags & B_NETWORK_IS_ENCRYPTED) == 0) {
 			status_t status = _JoinNetwork(message, network.name);
+			printf("auto join open network \"%s\": %s\n", network.name,
+				strerror(status));
 			if (status == B_OK)
 				return status;
 		}
@@ -1016,9 +1021,28 @@ NetServer::_JoinNetwork(const BMessage& message, const char* name)
 		return B_OK;
 	}
 
-	// TODO: join via wpa_supplicant
+	// Join via wpa_supplicant
 
-	return B_ERROR;
+	status_t status = be_roster->Launch(kWPASupplicantSignature);
+	if (status != B_OK && status != B_ALREADY_RUNNING)
+		return status;
+
+	// TODO: listen to notifications from the supplicant!
+
+	BMessage join(kMsgWPAJoinNetwork);
+	status = join.AddString("device", deviceName);
+	if (status == B_OK)
+		status = join.AddString("name", network.name);
+	if (status == B_OK)
+		status = join.AddFlat("address", &network.address);
+
+	BMessenger wpaSupplicant(kWPASupplicantSignature);
+	BMessage reply;
+	status = wpaSupplicant.SendMessage(&join, &reply);
+	if (status != B_OK)
+		return status;
+
+	return reply.FindInt32("status");
 }
 
 
