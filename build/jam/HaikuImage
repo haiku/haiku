@@ -52,7 +52,7 @@ SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bootman bzip2
 	rc readlink ReadOnlyBootPrompt reindex release renice rlog rm rmattr
 	rmindex rmdir roster route
 	safemode screen_blanker screenmode screenshot sdiff setdecor settype
-	setversion setvolume setwep seq sha1sum shar shred shuf shutdown sleep sort
+	setversion setvolume seq sha1sum shar shred shuf shutdown sleep sort
 	spamdbm
 	split stat strace stty su sum sync sysinfo
 	tac tail tcpdump tcptester tee telnet telnetd test timeout top touch
