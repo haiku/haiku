@@ -884,6 +884,25 @@ TeamDebugger::_HandleDebuggerMessage(DebugEvent* event)
 			handled = _HandleThreadCreated(threadEvent);
 			break;
 		}
+		case B_DEBUGGER_MESSAGE_THREAD_RENAMED:
+		{
+			ThreadRenamedEvent* threadEvent
+				= dynamic_cast<ThreadRenamedEvent*>(event);
+			TRACE_EVENTS("B_DEBUGGER_MESSAGE_THREAD_RENAMED: thread: %ld "
+				"(\"%s\")\n",
+				threadEvent->RenamedThread(), threadEvent->NewName());
+			handled = _HandleThreadRenamed(threadEvent);
+			break;
+		}
+		case B_DEBUGGER_MESSAGE_THREAD_PRIORITY_CHANGED:
+		{
+			ThreadPriorityChangedEvent* threadEvent
+				= dynamic_cast<ThreadPriorityChangedEvent*>(event);
+			TRACE_EVENTS("B_DEBUGGER_MESSAGE_THREAD_PRIORITY_CHANGED: thread:"
+				" %ld\n", threadEvent->ChangedThread());
+			handled = _HandleThreadPriorityChanged(threadEvent);
+			break;
+		}
 		case B_DEBUGGER_MESSAGE_THREAD_DELETED:
 			TRACE_EVENTS("B_DEBUGGER_MESSAGE_THREAD_DELETED: thread: %ld\n",
 				event->Thread());
@@ -948,6 +967,29 @@ TeamDebugger::_HandleThreadCreated(ThreadCreatedEvent* event)
 			handler->Init();
 		}
 	}
+
+	return false;
+}
+
+
+bool
+TeamDebugger::_HandleThreadRenamed(ThreadRenamedEvent* event)
+{
+	AutoLocker< ::Team> locker(fTeam);
+
+	::Thread* thread = fTeam->ThreadByID(event->RenamedThread());
+
+	if (thread != NULL)
+		thread->SetName(event->NewName());
+
+	return false;
+}
+
+
+bool
+TeamDebugger::_HandleThreadPriorityChanged(ThreadPriorityChangedEvent*)
+{
+	// TODO: implement once we actually track thread priorities
 
 	return false;
 }

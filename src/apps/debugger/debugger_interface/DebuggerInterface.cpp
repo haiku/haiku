@@ -670,6 +670,17 @@ DebuggerInterface::_CreateDebugEvent(int32 messageCode,
 			event = new(std::nothrow) ThreadCreatedEvent(message.origin.team,
 				message.origin.thread, message.thread_created.new_thread);
 			break;
+		case B_DEBUGGER_MESSAGE_THREAD_RENAMED:
+			event = new(std::nothrow) ThreadRenamedEvent(message.origin.team,
+				message.origin.thread, message.thread_renamed.renamed_thread,
+				message.thread_renamed.name);
+			break;
+		case B_DEBUGGER_MESSAGE_THREAD_PRIORITY_CHANGED:
+			event = new(std::nothrow) ThreadPriorityChangedEvent(
+				message.origin.team, message.origin.thread,
+				message.thread_priority_changed.changed_thread,
+				message.thread_priority_changed.new_priority);
+			break;
 		case B_DEBUGGER_MESSAGE_THREAD_DELETED:
 			event = new(std::nothrow) ThreadDeletedEvent(message.origin.team,
 				message.origin.thread);

@@ -95,6 +95,10 @@ private:
 
 			bool				_HandleThreadCreated(
 									ThreadCreatedEvent* event);
+			bool				_HandleThreadRenamed(
+									ThreadRenamedEvent* event);
+			bool				_HandleThreadPriorityChanged(
+									ThreadPriorityChangedEvent* event);
 			bool				_HandleThreadDeleted(
 									ThreadDeletedEvent* event);
 			bool				_HandleImageCreated(

@@ -155,6 +155,32 @@ ThreadCreatedEvent::ThreadCreatedEvent(team_id team, thread_id thread,
 }
 
 
+// #pragma mark - ThreadRenamedEvent
+
+
+ThreadRenamedEvent::ThreadRenamedEvent(team_id team, thread_id thread,
+	thread_id renamedThread, const char* newName)
+	:
+	DebugEvent(B_DEBUGGER_MESSAGE_THREAD_RENAMED, team, thread),
+	fRenamedThread(renamedThread)
+{
+	strlcpy(fName, newName, sizeof(fName));
+}
+
+
+// #pragma mark - ThreadPriorityChangedEvent
+
+
+ThreadPriorityChangedEvent::ThreadPriorityChangedEvent(team_id team,
+	thread_id thread, thread_id changedThread, int32 newPriority)
+	:
+	DebugEvent(B_DEBUGGER_MESSAGE_THREAD_PRIORITY_CHANGED, team, thread),
+	fChangedThread(changedThread),
+	fNewPriority(newPriority)
+{
+}
+
+
 // #pragma mark - ThreadDeletedEvent
 
 
