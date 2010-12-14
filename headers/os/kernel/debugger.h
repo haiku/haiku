@@ -180,8 +180,6 @@ typedef enum {
 	B_DEBUGGER_MESSAGE_TEAM_DELETED,		// the debugged team is gone
 	B_DEBUGGER_MESSAGE_TEAM_EXEC,			// the debugged team executes exec()
 	B_DEBUGGER_MESSAGE_THREAD_CREATED,		// a thread has been created
-	B_DEBUGGER_MESSAGE_THREAD_RENAMED,		// a thread has been renamed
-	B_DEBUGGER_MESSAGE_THREAD_PRIORITY_CHANGED,	// a thread has had its priority altered
 	B_DEBUGGER_MESSAGE_THREAD_DELETED,		// a thread has been deleted
 	B_DEBUGGER_MESSAGE_IMAGE_CREATED,		// an image has been created
 	B_DEBUGGER_MESSAGE_IMAGE_DELETED,		// an image has been deleted
@@ -547,24 +545,8 @@ typedef struct {
 
 typedef struct {
 	debug_origin	origin;			// the thread that created the new thread
-	thread_id		new_thread;		// the newly created thread
+	team_id			new_thread;		// the newly created thread
 } debug_thread_created;
-
-// B_DEBUGGER_MESSAGE_THREAD_RENAMED
-
-typedef struct {
-	debug_origin	origin;
-	thread_id		renamed_thread;	// the thread whose name has changed
-	char			name[B_OS_NAME_LENGTH];
-} debug_thread_renamed;
-
-// B_DEBUGGER_MESSAGE_THREAD_PRIORITY_CHANGED
-
-typedef struct {
-	debug_origin	origin;
-	thread_id		changed_thread; // the thread whose priority has changed
-	int32			new_priority;	// the new priority
-} debug_thread_priority_changed;
 
 // B_DEBUGGER_MESSAGE_THREAD_DELETED
 
@@ -637,8 +619,6 @@ typedef union {
 	debug_team_deleted				team_deleted;
 	debug_team_exec					team_exec;
 	debug_thread_created			thread_created;
-	debug_thread_renamed			thread_renamed;
-	debug_thread_priority_changed	thread_priority_changed;
 	debug_thread_deleted			thread_deleted;
 	debug_image_created				image_created;
 	debug_image_deleted				image_deleted;

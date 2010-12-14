@@ -1078,48 +1078,6 @@ user_debug_thread_created(thread_id threadID)
 
 
 void
-user_debug_thread_renamed(thread_id threadID, const char *name)
-{
-	// check, if a debugger is installed and is interested in thread events
-	struct thread *thread = thread_get_current_thread();
-	int32 teamDebugFlags = atomic_get(&thread->team->debug_info.flags);
-	if (~teamDebugFlags
-		& (B_TEAM_DEBUG_DEBUGGER_INSTALLED | B_TEAM_DEBUG_THREADS)) {
-		return;
-	}
-
-	// prepare the message
-	debug_thread_renamed message;
-	message.renamed_thread = threadID;
-	strlcpy(message.name, name, sizeof(message.name));
-
-	thread_hit_debug_event(B_DEBUGGER_MESSAGE_THREAD_RENAMED, &message,
-		sizeof(message), true);
-}
-
-
-void
-user_debug_thread_priority_changed(thread_id threadID, int32 priority)
-{
-	// check, if a debugger is installed and is interested in thread events
-	struct thread *thread = thread_get_current_thread();
-	int32 teamDebugFlags = atomic_get(&thread->team->debug_info.flags);
-	if (~teamDebugFlags
-		& (B_TEAM_DEBUG_DEBUGGER_INSTALLED | B_TEAM_DEBUG_THREADS)) {
-		return;
-	}
-
-	// prepare the message
-	debug_thread_priority_changed message;
-	message.changed_thread = threadID;
-	message.new_priority = priority;
-
-	thread_hit_debug_event(B_DEBUGGER_MESSAGE_THREAD_PRIORITY_CHANGED, &message,
-		sizeof(message), true);
-}
-
-
-void
 user_debug_thread_deleted(team_id teamID, thread_id threadID)
 {
 	// Things are a bit complicated here, since this thread no longer belongs to

@@ -2559,9 +2559,6 @@ rename_thread(thread_id id, const char *name)
 	RELEASE_THREAD_LOCK();
 	restore_interrupts(state);
 
-	if (status == B_OK)
-		user_debug_thread_renamed(id, name);
-
 	return status;
 }
 
@@ -2603,8 +2600,6 @@ set_thread_priority(thread_id id, int32 priority)
 		oldPriority = thread->priority;
 		scheduler_set_thread_priority(thread, priority);
 	}
-
-	user_debug_thread_priority_changed(id, priority);
 
 	return oldPriority;
 }

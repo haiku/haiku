@@ -127,36 +127,6 @@ private:
 };
 
 
-class ThreadRenamedEvent : public DebugEvent {
-public:
-								ThreadRenamedEvent(team_id team,
-									thread_id thread, thread_id renamedThread,
-									const char* name);
-
-			thread_id			RenamedThread() const { return fRenamedThread; }
-			const char*			NewName() const	{ return fName; }
-
-private:
-			thread_id			fRenamedThread;
-			char				fName[B_OS_NAME_LENGTH];
-};
-
-
-class ThreadPriorityChangedEvent : public DebugEvent {
-public:
-								ThreadPriorityChangedEvent(team_id team,
-									thread_id thread, thread_id changedThread,
-									int32 newPriority);
-
-			thread_id			ChangedThread() const { return fChangedThread; }
-			int32				NewPriority() const	{ return fNewPriority; }
-
-private:
-			thread_id			fChangedThread;
-			int32				fNewPriority;
-};
-
-
 class ThreadDeletedEvent : public DebugEvent {
 public:
 								ThreadDeletedEvent(team_id team,
