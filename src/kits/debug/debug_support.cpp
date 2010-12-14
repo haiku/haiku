@@ -235,6 +235,7 @@ debug_write_memory_partial(debug_context *context, const void *address,
 	message.reply_port = context->reply_port;
 	message.address = (void*)address;
 	message.size = size;
+	memcpy(message.data, buffer, size);
 
 	// send the message
 	debug_nub_write_memory_reply reply;
