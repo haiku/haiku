@@ -37,7 +37,7 @@ class MediaConverterApp : public BApplication {
 			BEntry				_CreateOutputFile(BDirectory directory,
 									entry_ref* ref,
 									media_file_format* outputFormat);
-	
+
 	static	int32				_RunConvertEntry(void* castToMediaConverterApp);
 			void				_RunConvert();
 			status_t			_ConvertFile(BMediaFile* inFile,

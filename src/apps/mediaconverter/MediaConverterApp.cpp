@@ -10,6 +10,7 @@
 #include <string.h>
 
 #include <Alert.h>
+#include <fs_attr.h>
 #include <MediaFile.h>
 #include <MediaTrack.h>
 #include <Mime.h>
@@ -105,8 +106,10 @@ MediaConverterApp::RefsReceived(BMessage* msg)
 	// from Open dialog or drag & drop
 
 	while (msg->FindRef("refs", i++, &ref) == B_OK) {
+
 		uint32 flags = 0; // B_MEDIA_FILE_NO_READ_AHEAD
 		BMediaFile* file = new(std::nothrow) BMediaFile(&ref, flags);
+
 		if (file == NULL || file->InitCheck() != B_OK) {
 			errorFiles << ref.name << "\n";
 			errors++;
@@ -122,7 +125,7 @@ MediaConverterApp::RefsReceived(BMessage* msg)
 
 	if (errors) {
 		BString alertText;
-		alertText << errors << ((errors > 1) ? FILES : FILE)
+		alertText << errors << " " << ((errors > 1) ? FILES : FILE)
 				<< NOTRECOGNIZE << "\n";
 		alertText << errorFiles;
 		BAlert* alert = new BAlert(ERROR_LOAD_STRING, alertText.String(),
@@ -174,7 +177,6 @@ MediaConverterApp::SetStatusMessage(const char* message)
 
 
 // #pragma mark -
-
 
 BEntry
 MediaConverterApp::_CreateOutputFile(BDirectory directory,

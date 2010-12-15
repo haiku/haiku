@@ -270,25 +270,10 @@ MediaConverterWindow::DispatchMessage(BMessage *msg, BHandler *handler)
 void
 MediaConverterWindow::MessageReceived(BMessage* msg)
 {
-	status_t status;
-	entry_ref ref;
 	entry_ref inRef;
 
-	BString string, string2;
-
-    // TODO: For preview, launch the default file app instead of hardcoded
-    // MediaPlayer
-	BEntry entry("/boot/system/apps/MediaPlayer", true);
 	char buffer[40];
-	char buffer2[B_PATH_NAME_LENGTH];
-	const char* argv[3];
-	argv[0] = "-pos";
-	BMediaFile *inFile(NULL);
-	int32 srcIndex = 0;
-	BPath name;
-	BEntry inentry;
-	int32 value;
-	BRect ButtonRect;
+	BEntry inEntry;
 
 	switch (msg->what) {
 		#if B_BEOS_VERSION <= B_BEOS_VERSION_6
@@ -304,8 +289,7 @@ MediaConverterWindow::MessageReceived(BMessage* msg)
 			break;
 
 		case B_SIMPLE_DATA:
-			if (msg->WasDropped())
-			{
+			if (msg->WasDropped()) {
 				DetachCurrentMessage();
 				msg->what = B_REFS_RECEIVED;
 				BMessenger(be_app).SendMessage(msg);
@@ -336,66 +320,66 @@ MediaConverterWindow::MessageReceived(BMessage* msg)
 			break;
 
 		case CONVERSION_DONE_MESSAGE:
-			SetStatusMessage(fCancelling ? CONV_CANCEL_LABEL : CONV_COMPLETE_LABEL);
+		{
+			SetStatusMessage(fCancelling ? CONV_CANCEL_LABEL
+				: CONV_COMPLETE_LABEL);
 			fConverting = false;
 			fCancelling = false;
-			{
-				bool enable = CountSourceFiles() > 0;
-				SetEnabled(enable, enable);
-			}
+			bool enable = CountSourceFiles() > 0;
+			SetEnabled(enable, enable);
 			fConvertButton->SetLabel(CONVERT_LABEL);
-
-
 			break;
+		}
 
 		case OUTPUT_FOLDER_MESSAGE:
-		//	 Execute Save Panel
-			if (!fSaveFilePanel) {
-				BButton *SelectThisDir;
+			// Execute Save Panel
+			if (fSaveFilePanel == NULL) {
+				BButton* selectThisDir;
 
 				BMessage message(FOLDER_SELECT_MESSAGE);
 				fSaveFilePanel = new BFilePanel(B_OPEN_PANEL, NULL, NULL,
 					B_DIRECTORY_NODE, true, &message, NULL, false, true);
 				fSaveFilePanel->SetButtonLabel(B_DEFAULT_BUTTON, SELECT_LABEL);
-				fSaveFilePanel->Window()->SetTitle(SAVE_DIR_LABEL);
 				fSaveFilePanel->SetTarget(this);
 
 				fSaveFilePanel->Window()->Lock();
-				ButtonRect = fSaveFilePanel->Window()->ChildAt(0)->FindView("cancel button")->Frame();
-				ButtonRect.right  = ButtonRect.left - 20;
-				ButtonRect.left = ButtonRect.right - 130;
-				SelectThisDir = new BButton(ButtonRect, NULL, SELECT_DIR_LABEL,
-					new BMessage(SELECT_THIS_DIR_MESSAGE), B_FOLLOW_BOTTOM | B_FOLLOW_RIGHT);
-				SelectThisDir->SetTarget(this);
-				fSaveFilePanel->Window()->ChildAt(0)->AddChild(SelectThisDir);
+				fSaveFilePanel->Window()->SetTitle(SAVE_DIR_LABEL);
+				BRect buttonRect
+					= fSaveFilePanel->Window()->ChildAt(0)->FindView(
+						"cancel button")->Frame();
+				buttonRect.right  = buttonRect.left - 20;
+				buttonRect.left = buttonRect.right - 130;
+				selectThisDir = new BButton(buttonRect, NULL, SELECT_DIR_LABEL,
+					new BMessage(SELECT_THIS_DIR_MESSAGE),
+					B_FOLLOW_BOTTOM | B_FOLLOW_RIGHT);
+				selectThisDir->SetTarget(this);
+				fSaveFilePanel->Window()->ChildAt(0)->AddChild(selectThisDir);
 				fSaveFilePanel->Window()->Unlock();
 
-				BRefFilter *filter;
-				filter = new DirectoryFilter;
-				fSaveFilePanel->SetRefFilter(filter);
+				fSaveFilePanel->SetRefFilter(new DirectoryFilter);
 			}
 			fSaveFilePanel->Show();
 			break;
 
 		case FOLDER_SELECT_MESSAGE:
-		//	 "SELECT" Button at Save Panel Pushed
+			// "SELECT" Button at Save Panel Pushed
 			fSaveFilePanel->GetNextSelectedRef(&inRef);
-			inentry.SetTo(&inRef, true);
-			_SetOutputFolder(inentry);
+			inEntry.SetTo(&inRef, true);
+			_SetOutputFolder(inEntry);
 			fOutputDirSpecified = true;
 			break;
 
 		case SELECT_THIS_DIR_MESSAGE:
-		//	 "THIS DIR" Button at Save Panel Pushed
+			// "THIS DIR" Button at Save Panel Pushed
 			fSaveFilePanel->GetPanelDirectory(&inRef);
 			fSaveFilePanel->Hide();
-			inentry.SetTo(&inRef, true);
-			_SetOutputFolder(inentry);
+			inEntry.SetTo(&inRef, true);
+			_SetOutputFolder(inEntry);
 			fOutputDirSpecified = true;
 			break;
 
 		case OPEN_FILE_MESSAGE:
-		//	 Execute Open Panel
+			// Execute Open Panel
 			if (!fOpenFilePanel) {
 				fOpenFilePanel = new BFilePanel(B_OPEN_PANEL, NULL, NULL,
 					B_FILE_NODE, true, NULL, NULL, false, true);
@@ -405,7 +389,7 @@ MediaConverterWindow::MessageReceived(BMessage* msg)
 			break;
 
 		case B_REFS_RECEIVED:
-		//	Media Files Seleced by Open Panel
+			// Media Files Seleced by Open Panel
 			DetachCurrentMessage();
 			msg->what = B_REFS_RECEIVED;
 			BMessenger(be_app).SendMessage(msg);
@@ -414,7 +398,8 @@ MediaConverterWindow::MessageReceived(BMessage* msg)
 		case B_CANCEL:
 			break;
 
-		case DISP_ABOUT_MESSAGE: {
+		case DISP_ABOUT_MESSAGE:
+		{
 			(new BAlert(ABOUT_TITLE_LABEL B_UTF8_ELLIPSIS,
 					"MediaConverter\n"
 					VERSION"\n"
@@ -431,46 +416,67 @@ MediaConverterWindow::MessageReceived(BMessage* msg)
 			break;
 
 		case PREVIEW_MESSAGE:
-			entry.GetRef(&ref);
-			string = "";
-			string << fStartDurationTC->Text();
-			string << "000";
+		{
+			// Build the command line to launch the preview application.
+			// TODO: Launch the default app instead of hardcoded MediaPlayer!
+			int32 srcIndex = fListView->CurrentSelection();
+			BMediaFile* inFile = NULL;
+			status_t status = GetSourceFileAt(srcIndex, &inFile, &inRef);
 
-			strcpy(buffer, string.String());
-			argv[1] = buffer;
-			srcIndex = fListView->CurrentSelection();
-			status = GetSourceFileAt(srcIndex, &inFile, &inRef);
+			const char* argv[3];
+			BString startPosString;
+			BPath path;
+
 			if (status == B_OK) {
-				inentry.SetTo(&inRef);
-				inentry.GetPath(&name);
+				argv[0] = "-pos";
+					// NOTE: -pos argument is currently not supported by Haiku
+					// MediaPlayer.
+				startPosString << fStartDurationTC->Text();
+				startPosString << "000";
+				argv[1] = startPosString.String();
 
-				strcpy(buffer, string.String());
-
-				strcpy(buffer2, name.Path());
-				argv[2] = buffer2;
+				status = inEntry.SetTo(&inRef);
 			}
 
-			status = be_roster->Launch(&ref, 3, argv);
+			if (status == B_OK) {
+				status = inEntry.GetPath(&path);
+				if (status == B_OK)
+					argv[2] = path.Path();
+			}
 
-			if (status != B_OK) {
-				string2 << LAUNCH_ERROR << strerror(status);
-				(new BAlert("", string2.String(), OK_LABEL))->Go();
+			if (status == B_OK) {
+				status = be_roster->Launch(
+					"application/x-vnd.Haiku-MediaPlayer",
+					3, (char**)argv, NULL);
+			}
+
+			if (status != B_OK && status != B_ALREADY_RUNNING) {
+				BString errorString;
+				errorString << LAUNCH_ERROR << strerror(status);
+				(new BAlert("", errorString.String(), OK_LABEL))->Go();
 			}
 			break;
+		}
 
 		case VIDEO_QUALITY_CHANGED_MESSAGE:
-			msg->FindInt32("be:value",&value);
-			sprintf(buffer, VIDEO_QUALITY_LABEL, (int8)value);
+		{
+			int32 value;
+			msg->FindInt32("be:value", &value);
+			snprintf(buffer, sizeof(buffer), VIDEO_QUALITY_LABEL, (int8)value);
 			fVideoQualitySlider->SetLabel(buffer);
 			fVideoQuality = value;
 			break;
+		}
 
 		case AUDIO_QUALITY_CHANGED_MESSAGE:
-			msg->FindInt32("be:value",&value);
-			sprintf(buffer, AUDIO_QUALITY_LABEL, (int8)value);
+		{
+			int32 value;
+			msg->FindInt32("be:value", &value);
+			snprintf(buffer, sizeof(buffer), AUDIO_QUALITY_LABEL, (int8)value);
 			fAudioQualitySlider->SetLabel(buffer);
 			fAudioQuality = value;
 			break;
+		}
 
 		default:
 			BWindow::MessageReceived(msg);
@@ -756,7 +762,8 @@ MediaConverterWindow::SourceFileSelectionChanged()
 	fStartDurationTC->SetEnabled(enabled);
 	fEndDurationTC->SetEnabled(enabled);
 
-	fInfoView->Update(file, _ref);
+	if (enabled)
+		fInfoView->Update(file, _ref);
 
 	// HACK: get the fInfoView to update the duration "synchronously"
 	UpdateIfNeeded();
@@ -862,7 +869,8 @@ MediaConverterWindow::_UpdateLabels()
 
 	if (fVideoQualitySlider != NULL) {
 		char buffer[40];
-		sprintf(buffer, VIDEO_QUALITY_LABEL, (int8)fVideoQuality);
+		snprintf(buffer, sizeof(buffer), VIDEO_QUALITY_LABEL,
+			(int8)fVideoQuality);
 		fVideoQualitySlider->SetLabel(buffer);
 		fVideoQualitySlider->SetLimitLabels(SLIDER_LOW_LABEL,
 			SLIDER_HIGH_LABEL);
@@ -870,7 +878,8 @@ MediaConverterWindow::_UpdateLabels()
 
 	if (fAudioQualitySlider != NULL) {
 		char buffer[40];
-		sprintf(buffer, AUDIO_QUALITY_LABEL, (int8)fAudioQuality);
+		snprintf(buffer, sizeof(buffer), AUDIO_QUALITY_LABEL,
+			(int8)fAudioQuality);
 		fAudioQualitySlider->SetLabel(buffer);
 		fAudioQualitySlider->SetLimitLabels(SLIDER_LOW_LABEL,
 			SLIDER_HIGH_LABEL);
