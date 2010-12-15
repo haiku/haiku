@@ -6,6 +6,9 @@
 #define _FBSD_COMPAT_SYS_PRIV_H_
 
 
+#include <sys/cdefs.h>
+
+
 /*
  * 802.11-related privileges.
  */
@@ -25,6 +28,11 @@
 struct thread;
 
 
+__BEGIN_DECLS
+
 int	priv_check(struct thread*, int);
+
+__END_DECLS
+
 
 #endif /* _FBSD_COMPAT_SYS_PRIV_H_ */

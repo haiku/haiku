@@ -37,7 +37,7 @@ KernelStaticLibrary libfreebsd_network.a :
 	mbuf.c
 	mii.c
 	mutex.c
-	priv.c
+	priv.cpp
 	synch.c
 	taskqueue.c
 	unit.c
