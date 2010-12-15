@@ -25,17 +25,15 @@ class MediaFileListView;
 class StatusView;
 
 class MediaConverterWindow : public BWindow {
-	public:
+public:
 								MediaConverterWindow(BRect frame);
 	virtual						~MediaConverterWindow();
 
-	protected:
-//	virtual void				DispatchMessage(BMessage* message,
-//									BHandler* handler);
+protected:
 	virtual void				MessageReceived(BMessage* message);
 	virtual bool				QuitRequested();
 
-	public:
+public:
 			void				LanguageChanged();
 
 			void				BuildFormatMenu();
@@ -73,13 +71,14 @@ class MediaConverterWindow : public BWindow {
 
 			BDirectory			OutputDirectory() const;
 
-	private:
+private:
 			void				_UpdateLabels();
 			void				_UpdateBBoxLayoutInsets(BBox* box);
 			void				_CreateMenu();
 			void				_DestroyMenu();
 			void				_SetOutputFolder(BEntry entry);
 
+private:
 			BButton*			fConvertButton;
 
 			BButton*			fDestButton;

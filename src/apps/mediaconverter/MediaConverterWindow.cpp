@@ -1,8 +1,9 @@
 // Copyright 1999, Be Incorporated. All Rights Reserved.
 // Copyright 2000-2004, Jun Suzuki. All Rights Reserved.
-// Copyright 2007, Stephan Aßmus. All Rights Reserved.
+// Copyright 2007, 2010 Stephan Aßmus. All Rights Reserved.
 // Copyright 2010, Haiku, Inc. All Rights Reserved.
 // This file may be used under the terms of the Be Sample Code License.
+
 #include "MediaConverterWindow.h"
 
 #include <stdio.h>
@@ -134,13 +135,18 @@ MediaConverterWindow::MediaConverterWindow(BRect frame)
 	fInfoBox = new BBox(B_FANCY_BORDER, fInfoView);
 	fInfoBox->SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH,
 			B_ALIGN_USE_FULL_HEIGHT));
+	fInfoBox->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+
+	float padding = be_control_look->DefaultItemSpacing();
 
 	// Output format box
 	fOutputBox = new BBox(B_FANCY_BORDER, NULL);
-	float padding = be_control_look->DefaultItemSpacing();
 	BGridLayout* outputGrid = new BGridLayout(padding, padding);
 	fOutputBox->SetLayout(outputGrid);
 		// fOutputBox's layout is also adjusted in _UpdateLabels
+	outputGrid->SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH,
+			B_ALIGN_USE_FULL_HEIGHT));
+	fOutputBox->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
 
 	fFormatMenu = new BMenuField(NULL, FORMAT_LABEL, new BPopUpMenu(""));
 	fAudioMenu = new BMenuField(NULL, AUDIO_LABEL, new BPopUpMenu(""));
@@ -195,7 +201,7 @@ MediaConverterWindow::MediaConverterWindow(BRect frame)
 	// Status views
 	fStatus = new BStringView(NULL, NULL);
 	fStatus->SetExplicitAlignment(labelAlignment);
-	fFileStatus= new BStringView(NULL, NULL);
+	fFileStatus = new BStringView(NULL, NULL);
 	fFileStatus->SetExplicitAlignment(labelAlignment);
 
 	SetStatusMessage("");
@@ -204,17 +210,22 @@ MediaConverterWindow::MediaConverterWindow(BRect frame)
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.SetInsets(0, 0, 0, 0)
 		.Add(fMenuBar)
-		.AddGrid(padding, padding)
+		.AddSplit(B_HORIZONTAL, padding / 2)
 			.SetInsets(padding, padding, padding, padding)
-			.Add(fSourcesBox, 0, 0, 1, 2)
-			.Add(fInfoBox,	1, 0, 1, 1)
-			.Add(fOutputBox, 1, 1, 1, 1)
-			.AddGrid(padding, padding, 0, 2, 2, 1)
-				.SetInsets(0, 0, 0, 0)
-				.Add(fStatus, 0, 0)
-				.Add(fFileStatus, 0, 1)
-				.Add(fPreviewButton, 2, 0)
-				.Add(fConvertButton, 3, 0);
+			.Add(fSourcesBox, 0.4)
+			.AddGroup(B_VERTICAL, padding, 0.6)
+				.Add(fInfoBox)
+				.Add(fOutputBox)
+			.End()
+		.End()
+		.AddGrid(padding, padding)
+			.SetInsets(padding, 0, padding, padding)
+			.Add(fStatus, 0, 0)
+			.Add(fFileStatus, 0, 1)
+			.Add(fPreviewButton, 2, 0)
+			.Add(fConvertButton, 3, 0)
+		.End()
+	;
 }
 
 
@@ -226,24 +237,6 @@ MediaConverterWindow::~MediaConverterWindow()
 
 
 // #pragma mark -
-
-
-/*
-void
-MediaConverterWindow::DispatchMessage(BMessage *msg, BHandler *handler)
-{
-	if (msg->WasDropped() && msg->what == B_SIMPLE_DATA) {
-
-		printf("Dispatch 1\n");
-		DetachCurrentMessage();
-		msg->what = B_REFS_RECEIVED;
-		BMessenger(be_app).SendMessage(msg);
-		delete msg;
-	} else {
-		BWindow::DispatchMessage(msg, handler);
-	}
-}
-*/
 
 
 void
@@ -497,18 +490,18 @@ MediaConverterWindow::LanguageChanged()
 void
 MediaConverterWindow::BuildAudioVideoMenus()
 {
-	BMenu *menu = fAudioMenu->Menu();
-	BMenuItem *item;
+	BMenu* menu = fAudioMenu->Menu();
+	BMenuItem* item;
 	// clear out old audio codec menu items
-	while ((item = menu->RemoveItem((int32)0)) != NULL) {
+	while ((item = menu->RemoveItem(0L)) != NULL)
 		delete item;
-	}
 
 	bool separator = true;
 
 	// get selected file format
-	FileFormatMenuItem *ffmi = (FileFormatMenuItem*)fFormatMenu->Menu()->FindMarked();
-	media_file_format *mf_format = &(ffmi->fFileFormat);
+	FileFormatMenuItem* ffmi
+		= (FileFormatMenuItem*)fFormatMenu->Menu()->FindMarked();
+	media_file_format* mf_format = &(ffmi->fFileFormat);
 
 	media_format format, outfmt;
 	memset(&format, 0, sizeof(format));
@@ -519,7 +512,8 @@ MediaConverterWindow::BuildAudioVideoMenus()
 	// add available audio encoders to menu
 	format.type = B_MEDIA_RAW_AUDIO;
 	format.u.raw_audio = media_raw_audio_format::wildcard;
-	while (get_next_encoder(&cookie, mf_format, &format, &outfmt, &codec_info) == B_OK) {
+	while (get_next_encoder(&cookie, mf_format, &format, &outfmt, &codec_info)
+		== B_OK) {
 		if (separator) {
 			menu->AddItem(new BMenuItem("No audio",
 				new BMessage(AUDIO_CODEC_SELECT_MESSAGE)));
@@ -553,9 +547,8 @@ MediaConverterWindow::BuildAudioVideoMenus()
 
 	// clear out old video codec menu items
 	menu = fVideoMenu->Menu();
-	while ((item = menu->RemoveItem((int32)0)) != NULL) {
+	while ((item = menu->RemoveItem(0L)) != NULL)
 		delete item;
-	}
 
 	separator = true;
 
@@ -727,13 +720,8 @@ MediaConverterWindow::SourceFileSelectionChanged()
 {
 	int32 selected = fListView->CurrentSelection();
 	BMediaFile* file = NULL;
-	entry_ref* _ref = NULL;
 	entry_ref ref;
-	bool enabled = false;
-	if (GetSourceFileAt(selected, &file, &ref) == B_OK) {
-		_ref = &ref;
-		enabled = true;
-	}
+	bool enabled = GetSourceFileAt(selected, &file, &ref) == B_OK;
 
 	fPreviewButton->SetEnabled(enabled);
 	fVideoQualitySlider->SetEnabled(enabled);
@@ -741,16 +729,17 @@ MediaConverterWindow::SourceFileSelectionChanged()
 	fStartDurationTC->SetEnabled(enabled);
 	fEndDurationTC->SetEnabled(enabled);
 
-	if (enabled)
-		fInfoView->Update(file, _ref);
-
-	// HACK: get the fInfoView to update the duration "synchronously"
-	UpdateIfNeeded();
+	BString duration;
+	if (enabled) {
+		fInfoView->Update(file, &ref);
+		// HACK: get the fInfoView to update the duration "synchronously"
+		UpdateIfNeeded();
+		duration << fInfoView->Duration() / 1000;
+	} else
+		duration = "0";
 
 	// update duration text controls
 	fStartDurationTC->SetText("0");
-	BString duration;
-	duration << fInfoView->Duration() / 1000;
 	fEndDurationTC->SetText(duration.String());
 }
 
@@ -888,7 +877,7 @@ MediaConverterWindow::_UpdateBBoxLayoutInsets(BBox* box)
 {
 	BTwoDimensionalLayout* layout
 		= dynamic_cast<BTwoDimensionalLayout*>(box->GetLayout());
-	if (layout) {
+	if (layout != NULL) {
 		float padding = be_control_look->DefaultItemSpacing();
 		layout->SetInsets(padding, box->TopBorderOffset() + padding, padding,
 			padding);
