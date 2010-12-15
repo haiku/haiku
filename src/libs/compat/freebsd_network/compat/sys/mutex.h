@@ -44,7 +44,7 @@ mtx_lock(struct mtx* mutex)
 {
 	if (mutex->type == MTX_DEF) {
 		mutex_lock(&mutex->u.mutex.lock);
-		mutex->u.mutex.owner = thread_get_current_thread_id();
+		mutex->u.mutex.owner = find_thread(NULL);
 	} else if (mutex->type == MTX_RECURSE)
 		recursive_lock_lock(&mutex->u.recursive);
 }
@@ -73,12 +73,12 @@ static inline int
 mtx_owned(struct mtx* mutex)
 {
 	if (mutex->type == MTX_DEF)
-		return mutex->u.mutex.owner == thread_get_current_thread_id();
+		return mutex->u.mutex.owner == find_thread(NULL);
 	if (mutex->type == MTX_RECURSE) {
 #if KDEBUG
-		return mutex->u.recursive.lock.holder == thread_get_current_thread_id();
+		return mutex->u.recursive.lock.holder == find_thread(NULL);
 #else
-		return mutex->u.recursive.holder == thread_get_current_thread_id();
+		return mutex->u.recursive.holder == find_thread(NULL);
 #endif
 	}
 
