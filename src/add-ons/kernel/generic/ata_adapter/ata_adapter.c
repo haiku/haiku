@@ -245,7 +245,7 @@ ata_adapter_prepare_dma(ata_adapter_channel_info *channel,
 	prd_entry *prd = channel->prdt;
 	int i;
 
-	TRACE_DMA("ata_adapter: prepare_dma (%s) %u entrys:\n",
+	TRACE_DMA("ata_adapter: prepare_dma (%s) %lu entrys:\n",
 		writeToDevice ? "write" : "read", sgListCount);
 
 	for (i = sgListCount - 1, prd = channel->prdt; i >= 0; --i, ++prd, ++sgList) {
@@ -255,9 +255,12 @@ ata_adapter_prepare_dma(ata_adapter_channel_info *channel,
 		prd->count = B_HOST_TO_LENDIAN_INT16((uint16)sgList->size);
 		prd->EOT = i == 0;
 
-		TRACE_DMA("ata_adapter: %#" B_PRIxPHYSADDR ", %ld => 0x%08x, %d, %d\n",
-			sgList->address, sgList->size, prd->address, prd->count, prd->EOT);
-		SHOW_FLOW( 4, "%x, %x, %d", (int)prd->address, prd->count, prd->EOT);
+		TRACE_DMA("ata_adapter: %#" B_PRIxPHYSADDR ", %" B_PRIuPHYSADDR " => "
+			"%#010" B_PRIx32 ", %" B_PRIu16 ", %d\n",
+			sgList->address, sgList->size, 
+			prd->address, prd->count, prd->EOT);
+		SHOW_FLOW( 4, "%#010" B_PRIx32 ", %" B_PRIu16 ", %d", 
+			prd->address, prd->count, prd->EOT);
 	}
 
 	pci->write_io_32(device, channel->bus_master_base + ATA_BM_PRDT_ADDRESS,
