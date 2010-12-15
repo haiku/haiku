@@ -114,24 +114,8 @@ MediaConverterWindow::MediaConverterWindow(BRect frame)
 	fConverting(false),
 	fCancelling(false)
 {
-	char defaultdirectory[] = "/boot/home";
-	fOutputDir.SetTo(defaultdirectory);
-
-#if B_BEOS_VERSION >= 0x530 // 0x520 RC2 0x530 RC3
-	// load Locale files for ZETA
-	entry_ref mypath;
-	app_info info;
-
-	be_app->GetAppInfo(&info);
-	mypath = info.ref;
-
-	BPath path(&mypath);
-	path.GetParent(&path);
-	path.Append("Language/Dictionaries");
-	path.Append("MediaConverter");
-	be_locale.LoadLanguageFile(path.Path());
-
-#endif
+	const char* defaultDirectory = "/boot/home";
+	fOutputDir.SetTo(defaultDirectory);
 
 	fMenuBar = new BMenuBar("menubar");
 	_CreateMenu();
@@ -154,24 +138,19 @@ MediaConverterWindow::MediaConverterWindow(BRect frame)
 	// Output format box
 	fOutputBox = new BBox(B_FANCY_BORDER, NULL);
 	float padding = be_control_look->DefaultItemSpacing();
-	BGridLayout* ouputGrid = new BGridLayout(padding, padding);
-	fOutputBox->SetLayout(ouputGrid);
-	// fOutputBox's layout is also adjusted in _UpdateLabels
+	BGridLayout* outputGrid = new BGridLayout(padding, padding);
+	fOutputBox->SetLayout(outputGrid);
+		// fOutputBox's layout is also adjusted in _UpdateLabels
 
-	BPopUpMenu* popmenu = new BPopUpMenu("");
-	fFormatMenu = new BMenuField(NULL, FORMAT_LABEL, popmenu);
-
-	popmenu = new BPopUpMenu("");
-	fAudioMenu = new BMenuField(NULL, AUDIO_LABEL, popmenu);
-
-	popmenu = new BPopUpMenu("");
-	fVideoMenu = new BMenuField(NULL, VIDEO_LABEL, popmenu);
+	fFormatMenu = new BMenuField(NULL, FORMAT_LABEL, new BPopUpMenu(""));
+	fAudioMenu = new BMenuField(NULL, AUDIO_LABEL, new BPopUpMenu(""));
+	fVideoMenu = new BMenuField(NULL, VIDEO_LABEL, new BPopUpMenu(""));
 
 	// output folder
 	fDestButton = new BButton(OUTPUT_FOLDER_LABEL,
 		new BMessage(OUTPUT_FOLDER_MESSAGE));
 	BAlignment labelAlignment(be_control_look->DefaultLabelAlignment());
-	fOutputFolder = new BStringView(NULL, defaultdirectory);
+	fOutputFolder = new BStringView(NULL, defaultDirectory);
 	fOutputFolder->SetExplicitAlignment(labelAlignment);
 
 	// start/end duration
@@ -193,7 +172,7 @@ MediaConverterWindow::MediaConverterWindow(BRect frame)
 	fAudioQualitySlider->SetValue(fAudioQuality);
 	fAudioQualitySlider->SetEnabled(false);
 
-	BLayoutBuilder::Grid<>(ouputGrid)
+	BLayoutBuilder::Grid<>(outputGrid)
 		.SetInsets(padding, padding, padding, padding)
 		.AddMenuField(fFormatMenu, 0, 0)
 		.AddMenuField(fAudioMenu, 0, 1)
