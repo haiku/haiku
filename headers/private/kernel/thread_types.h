@@ -17,6 +17,7 @@
 #include <thread_defs.h>
 #include <timer.h>
 #include <user_debugger.h>
+#include <util/DoublyLinkedList.h>
 #include <util/list.h>
 
 
@@ -105,16 +106,6 @@ struct team_watcher {
 #define MAX_DEAD_THREADS	32
 	// this is a soft limit for the number of thread death entries in a team
 
-typedef struct team_dead_children team_dead_children;
-typedef struct team_job_control_children  team_job_control_children;
-typedef struct job_control_entry job_control_entry;
-
-
-#ifdef __cplusplus
-
-#include <condition_variable.h>
-#include <util/DoublyLinkedList.h>
-
 
 struct job_control_entry : DoublyLinkedListLinkImpl<job_control_entry> {
 	job_control_state	state;		// current team job control state
@@ -158,9 +149,6 @@ struct team_death_entry {
 };
 
 
-#endif	// __cplusplus
-
-
 struct free_user_thread {
 	struct free_user_thread*	next;
 	struct user_thread*			thread;
@@ -190,6 +178,8 @@ struct team {
 	struct list		dead_threads;
 	int				dead_threads_count;
 
+	// TODO: Remove the no longer necessary level of indirection for the
+	// following members.
 	team_dead_children *dead_children;
 	team_job_control_children *stopped_children;
 	team_job_control_children *continued_children;
