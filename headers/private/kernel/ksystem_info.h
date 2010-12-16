@@ -25,10 +25,10 @@ status_t _user_get_system_info(system_info *userInfo, size_t size);
 status_t _user_get_system_info_etc(int32 id, void *buffer,
 			size_t bufferSize);
 
-status_t _user_start_system_watching(int32 object, uint32 flags,
-			port_id port, int32 token);
-status_t _user_stop_system_watching(int32 object, uint32 flags,
-			port_id port, int32 token);
+status_t _user_start_watching_system(int32 object, uint32 flags, port_id port,
+			int32 token);
+status_t _user_stop_watching_system(int32 object, uint32 flags, port_id port,
+			int32 token);
 
 
 #ifdef __cplusplus

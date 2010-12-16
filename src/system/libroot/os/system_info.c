@@ -31,16 +31,16 @@ get_system_info_etc(int32 id, void *info, size_t size)
 
 
 status_t
-start_system_watching(int32 object, uint32 flags, port_id port, int32 token)
+start_watching_system(int32 object, uint32 flags, port_id port, int32 token)
 {
-	return _kern_start_system_watching(object, flags, port, token);
+	return _kern_start_watching_system(object, flags, port, token);
 }
 
 
 status_t
-stop_system_watching(int32 object, uint32 flags, port_id port, int32 token)
+stop_watching_system(int32 object, uint32 flags, port_id port, int32 token)
 {
-	return _kern_stop_system_watching(object, flags, port, token);
+	return _kern_stop_watching_system(object, flags, port, token);
 }
 
 

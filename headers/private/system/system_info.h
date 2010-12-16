@@ -65,9 +65,9 @@ extern "C" {
 
 status_t get_system_info_etc(int32 id, void* buffer, size_t bufferSize);
 
-status_t start_system_watching(int32 object, uint32 flags, port_id port,
+status_t start_watching_system(int32 object, uint32 flags, port_id port,
 			int32 token);
-status_t stop_system_watching(int32 object, uint32 flags, port_id port,
+status_t stop_watching_system(int32 object, uint32 flags, port_id port,
 			int32 token);
 
 

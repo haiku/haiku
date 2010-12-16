@@ -282,10 +282,11 @@ DebuggerInterface::Init()
 	if (fSystemWatchPort < 0)
 		return fSystemWatchPort;
 
-	error = start_system_watching(fTeamID, B_WATCH_SYSTEM_THREAD_PROPERTIES,
+	error = start_watching_system(fTeamID, B_WATCH_SYSTEM_THREAD_PROPERTIES,
 		fSystemWatchPort, 0);
 	if (error != B_OK)
 		return error;
+// TODO: Stop watching in Close()!
 
 	// create debug context pool
 	fDebugContextPool = new(std::nothrow) DebugContextPool(fTeamID, fNubPort);

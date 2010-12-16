@@ -524,7 +524,7 @@ _user_get_system_info_etc(int32 id, void* userInfo, size_t size)
 
 
 status_t
-_user_start_system_watching(int32 object, uint32 flags, port_id port,
+_user_start_watching_system(int32 object, uint32 flags, port_id port,
 	int32 token)
 {
 	return sSystemNotificationService.StartListening(object, flags, port,
@@ -533,7 +533,7 @@ _user_start_system_watching(int32 object, uint32 flags, port_id port,
 
 
 status_t
-_user_stop_system_watching(int32 object, uint32 flags, port_id port,
+_user_stop_watching_system(int32 object, uint32 flags, port_id port,
 	int32 token)
 {
 	return sSystemNotificationService.StopListening(object, flags, port, token);

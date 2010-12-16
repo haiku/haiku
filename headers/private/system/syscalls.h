@@ -174,9 +174,9 @@ extern status_t		_kern_get_team_usage_info(team_id team, int32 who,
 extern status_t		_kern_get_extended_team_info(team_id teamID, uint32 flags,
 						void* buffer, size_t size, size_t* _sizeNeeded);
 
-extern status_t		_kern_start_system_watching(int32 object, uint32 flags,
+extern status_t		_kern_start_watching_system(int32 object, uint32 flags,
 						port_id port, int32 token);
-extern status_t		_kern_stop_system_watching(int32 object, uint32 flags,
+extern status_t		_kern_stop_watching_system(int32 object, uint32 flags,
 						port_id port, int32 token);
 
 extern status_t		_kern_block_thread(uint32 flags, bigtime_t timeout);
