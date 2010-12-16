@@ -235,7 +235,7 @@ Playlist::MakeEmpty(bool deleteItems)
 		PlaylistItem* item = RemoveItem(i, false);
 		_NotifyItemRemoved(i);
 		if (deleteItems)
-			item->RemoveReference();
+			item->ReleaseReference();
 	}
 	SetCurrentItemIndex(-1);
 }

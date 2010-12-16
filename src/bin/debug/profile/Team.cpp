@@ -51,7 +51,7 @@ Team::~Team()
 		remove_team_debugger(fID);
 
 	for (int32 i = 0; Image* image = fImages.ItemAt(i); i++)
-		image->RemoveReference();
+		image->ReleaseReference();
 }
 
 
@@ -277,5 +277,5 @@ Team::_RemoveImage(int32 index, int32 event)
 	}
 
 	image->SetDeletionEvent(event);
-	image->RemoveReference();
+	image->ReleaseReference();
 }

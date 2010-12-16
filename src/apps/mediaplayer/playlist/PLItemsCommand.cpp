@@ -35,7 +35,7 @@ PLItemsCommand::_CleanUp(PlaylistItem**& items, int32 count, bool deleteItems)
 		return;
 	if (deleteItems) {
 		for (int32 i = 0; i < count; i++)
-			items[i]->RemoveReference();
+			items[i]->ReleaseReference();
 	}
 	delete[] items;
 	items = NULL;

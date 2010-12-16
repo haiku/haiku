@@ -16,10 +16,9 @@
 #endif
 
 
-BReferenceable::BReferenceable(bool deleteWhenUnreferenced)
+BReferenceable::BReferenceable()
 	:
-	fReferenceCount(1),
-	fDeleteWhenUnreferenced(deleteWhenUnreferenced)
+	fReferenceCount(1)
 {
 }
 
@@ -59,6 +58,5 @@ BReferenceable::FirstReferenceAcquired()
 void
 BReferenceable::LastReferenceReleased()
 {
-	if (fDeleteWhenUnreferenced)
-		delete this;
+	delete this;
 }

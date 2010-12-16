@@ -16,11 +16,11 @@ Image::Image(SharedImage* image, const image_info& info, team_id owner,
 	fCreationEvent(creationEvent),
 	fDeletionEvent(-1)
 {
-	fImage->AddReference();
+	fImage->AcquireReference();
 }
 
 
 Image::~Image()
 {
-	fImage->RemoveReference();
+	fImage->ReleaseReference();
 }

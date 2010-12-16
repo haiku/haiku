@@ -14,7 +14,7 @@ namespace BPrivate {
 template<typename Type> class WeakReferenceable;
 
 template<typename Type>
-class WeakPointer : public Referenceable {
+class WeakPointer : public BReferenceable {
 public:
 			Type*				Get();
 			bool				Put();
@@ -41,10 +41,10 @@ public:
 								WeakReferenceable(Type* object);
 								~WeakReferenceable();
 
-			void				AddReference()
+			void				AcquireReference()
 									{ fPointer->_GetUnchecked(); }
 
-			bool				RemoveReference()
+			bool				ReleaseReference()
 									{ return fPointer->Put(); }
 
 			int32				CountReferences() const
@@ -119,7 +119,7 @@ public:
 
 		if (pointer != NULL) {
 			fPointer = pointer;
-			fPointer->AddReference();
+			fPointer->AcquireReference();
 			fObject = pointer->Get();
 		}
 	}
@@ -131,7 +131,7 @@ public:
 				fPointer->Put();
 				fObject = NULL;
 			}
-			fPointer->RemoveReference();
+			fPointer->ReleaseReference();
 			fPointer = NULL;
 		}
 	}
@@ -287,7 +287,7 @@ template<typename Type>
 inline
 WeakReferenceable<Type>::~WeakReferenceable()
 {
-	fPointer->RemoveReference();
+	fPointer->ReleaseReference();
 }
 
 
@@ -295,7 +295,7 @@ template<typename Type>
 inline WeakPointer<Type>*
 WeakReferenceable<Type>::GetWeakPointer()
 {
-	fPointer->AddReference();
+	fPointer->AcquireReference();
 	return fPointer;
 }
 

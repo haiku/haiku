@@ -148,7 +148,7 @@ net_socket_private::RemoveFromParent()
 {
 	ASSERT(!is_in_socket_list && parent != NULL);
 
-	parent->RemoveReference();
+	parent->ReleaseReference();
 	parent = NULL;
 
 	mutex_lock(&sSocketLock);
@@ -157,7 +157,7 @@ net_socket_private::RemoveFromParent()
 
 	is_in_socket_list = true;
 
-	RemoveReference();
+	ReleaseReference();
 }
 
 
@@ -458,7 +458,7 @@ socket_free(net_socket* _socket)
 {
 	net_socket_private* socket = (net_socket_private*)_socket;
 	socket->first_info->free(socket->first_protocol);
-	socket->RemoveReference();
+	socket->ReleaseReference();
 }
 
 
@@ -674,7 +674,7 @@ socket_acquire(net_socket* _socket)
 	if (socket->CountReferences() == 0)
 		return false;
 
-	socket->AddReference();
+	socket->AcquireReference();
 	return true;
 }
 
@@ -683,7 +683,7 @@ bool
 socket_release(net_socket* _socket)
 {
 	net_socket_private* socket = (net_socket_private*)_socket;
-	return socket->RemoveReference();
+	return socket->ReleaseReference();
 }
 
 
@@ -739,7 +739,7 @@ socket_dequeue_connected(net_socket* _parent, net_socket** _socket)
 
 	net_socket_private* socket = parent->connected_children.RemoveHead();
 	if (socket != NULL) {
-		socket->AddReference();
+		socket->AcquireReference();
 		socket->RemoveFromParent();
 		parent->child_count--;
 		*_socket = socket;

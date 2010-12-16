@@ -8,7 +8,7 @@
 #include "SharedImage.h"
 
 
-class Image : public Referenceable {
+class Image : public BReferenceable {
 public:
 								Image(SharedImage* image,
 									const image_info& info, team_id owner,

@@ -113,7 +113,7 @@ public:
 	{
 		// release image references
 		for (ImageMap::iterator it = fImages.begin(); it != fImages.end(); ++it)
-			it->second->RemoveReference();
+			it->second->ReleaseReference();
 
 		if (fSummaryProfileResult != NULL)
 			fSummaryProfileResult->ReleaseReference();

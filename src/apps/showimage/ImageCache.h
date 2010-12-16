@@ -30,7 +30,7 @@ enum {
 };
 
 
-class BitmapOwner : public Referenceable {
+class BitmapOwner : public BReferenceable {
 public:
 								BitmapOwner(BBitmap* bitmap);
 	virtual						~BitmapOwner();

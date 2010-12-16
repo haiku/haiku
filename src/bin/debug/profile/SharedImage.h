@@ -45,7 +45,7 @@ struct SymbolComparator {
 };
 
 
-class SharedImage : public Referenceable {
+class SharedImage : public BReferenceable {
 public:
 								SharedImage();
 								~SharedImage();

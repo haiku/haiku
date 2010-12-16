@@ -920,7 +920,7 @@ ServerPicture::~ServerPicture()
 
 		delete fPictures;
 	}
-	
+
 	if (fPushed != NULL) {
 		fPushed->SetOwner(NULL);
 		fPushed->ReleaseReference();
@@ -938,7 +938,7 @@ ServerPicture::SetOwner(ServerApp* owner)
 	// May remove the last reference and then we will self-destruct right then.
 	// Setting fOwner to NULL would access free'd memory. If owner is another
 	// ServerApp, it's expected to already have a reference of course.
-	Reference<ServerPicture> _(this);
+	BReference<ServerPicture> _(this);
 
 	if (fOwner != NULL)
 		fOwner->RemovePicture(this);

@@ -38,7 +38,7 @@ FontCache::~FontCache()
 {
 	FontMap::Iterator iterator = fFontCacheEntries.GetIterator();
 	while (iterator.HasNext())
-		iterator.Next().value->RemoveReference();
+		iterator.Next().value->ReleaseReference();
 }
 
 // Default
@@ -62,7 +62,7 @@ FontCache::FontCacheEntryFor(const ServerFont& font)
 
 	if (entry) {
 		// the entry was already there
-		entry->AddReference();
+		entry->AcquireReference();
 //printf("FontCacheEntryFor(%ld): %p\n", font.GetFamilyAndStyle(), entry);
 		return entry;
 	}
@@ -95,7 +95,7 @@ FontCache::FontCacheEntryFor(const ServerFont& font)
 	}
 //printf("FontCacheEntryFor(%ld): %p (insert)\n", font.GetFamilyAndStyle(), entry);
 
-	entry->AddReference();
+	entry->AcquireReference();
 	return entry;
 }
 
@@ -107,7 +107,7 @@ FontCache::Recycle(FontCacheEntry* entry)
 	if (!entry)
 		return;
 	entry->UpdateUsage();
-	entry->RemoveReference();
+	entry->ReleaseReference();
 }
 
 static const int32 kMaxEntryCount = 30;
@@ -154,7 +154,7 @@ FontCache::_ConstrainEntryCount()
 	while (iterator.HasNext()) {
 		if (iterator.Next().value == leastUsedEntry) {
 			iterator.Remove();
-			leastUsedEntry->RemoveReference();
+			leastUsedEntry->ReleaseReference();
 			break;
 		}
 	}

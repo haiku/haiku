@@ -159,10 +159,10 @@ SingleMessagingTargetSet::Rewind()
 	Besides the flattened message it also stores the when the message was
 	created and when the delivery attempts shall time out.
 */
-class MessageDeliverer::Message : public Referenceable {
+class MessageDeliverer::Message : public BReferenceable {
 public:
 	Message(void *data, int32 dataSize, bigtime_t timeout)
-		: Referenceable(true),
+		: BReferenceable(),
 		  fData(data),
 		  fDataSize(dataSize),
 		  fCreationTime(system_time()),
@@ -243,13 +243,13 @@ public:
 		  fToken(token)
 	{
 		if (fMessage)
-			fMessage->AddReference();
+			fMessage->AcquireReference();
 	}
 
 	~TargetMessage()
 	{
 		if (fMessage)
-			fMessage->RemoveReference();
+			fMessage->ReleaseReference();
 	}
 
 	Message *GetMessage() const
@@ -653,7 +653,7 @@ MessageDeliverer::DeliverMessage(const void *messageData, int32 messageSize,
 		free(data);
 		return B_NO_MEMORY;
 	}
-	Reference<Message> _(message, true);
+	BReference<Message> _(message, true);
 
 	// add the message to the respective target ports
 	BAutolock locker(fLock);

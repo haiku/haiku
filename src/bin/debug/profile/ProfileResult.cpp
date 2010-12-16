@@ -32,13 +32,13 @@ ImageProfileResult::ImageProfileResult(SharedImage* image, image_id id)
 	fTotalHits(0),
 	fImageID(id)
 {
-	fImage->AddReference();
+	fImage->AcquireReference();
 }
 
 
 ImageProfileResult::~ImageProfileResult()
 {
-	fImage->RemoveReference();
+	fImage->ReleaseReference();
 }
 
 

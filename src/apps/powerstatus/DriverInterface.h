@@ -46,7 +46,7 @@ protected:
 };
 
 
-class PowerStatusDriverInterface : public Monitor, public Referenceable {
+class PowerStatusDriverInterface : public Monitor, public BReferenceable {
 public:
 						PowerStatusDriverInterface();
 						~PowerStatusDriverInterface();
