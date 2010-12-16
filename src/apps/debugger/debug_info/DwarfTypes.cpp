@@ -537,7 +537,7 @@ DwarfCompoundType::ResolveDataMemberLocation(DataMember* _member,
 		return B_OK;
 	}
 
-	Reference<ValueLocation> locationReference(location);
+	BReference<ValueLocation> locationReference(location);
 
 	// get the byte size
 	target_addr_t byteSize;
@@ -592,7 +592,7 @@ DwarfCompoundType::ResolveDataMemberLocation(DataMember* _member,
 	ValueLocation* bitFieldLocation = new(std::nothrow) ValueLocation;
 	if (bitFieldLocation == NULL)
 		return B_NO_MEMORY;
-	Reference<ValueLocation> bitFieldLocationReference(bitFieldLocation, true);
+	BReference<ValueLocation> bitFieldLocationReference(bitFieldLocation, true);
 
 	if (!bitFieldLocation->SetTo(*location, bitOffset, bitSize))
 		return B_NO_MEMORY;
@@ -641,7 +641,7 @@ DwarfCompoundType::_ResolveDataMemberLocation(DwarfType* memberType,
 		parentLocation.IsBigEndian());
 	if (location == NULL)
 		return B_NO_MEMORY;
-	Reference<ValueLocation> locationReference(location, true);
+	BReference<ValueLocation> locationReference(location, true);
 
 	switch (memberLocation->attributeClass) {
 		case ATTRIBUTE_CLASS_CONSTANT:
@@ -872,7 +872,7 @@ DwarfArrayType::ResolveElementLocation(const ArrayIndexPath& indexPath,
 		parentLocation.IsBigEndian());
 	if (location == NULL)
 		return B_NO_MEMORY;
-	Reference<ValueLocation> locationReference(location, true);
+	BReference<ValueLocation> locationReference(location, true);
 
 	// If we have a single memory piece location for the array, we compute the
 	// element's location by hand -- not uncommonly the array size isn't known.

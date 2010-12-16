@@ -58,14 +58,14 @@ SubWindow::SubWindow(SubWindowManager* manager, BRect frame, const char* title,
 	fSubWindowKey(NULL)
 
 {
-	fSubWindowManager->AddReference();
+	fSubWindowManager->AcquireReference();
 }
 
 
 SubWindow::~SubWindow()
 {
 	RemoveFromSubWindowManager();
-	fSubWindowManager->RemoveReference();
+	fSubWindowManager->ReleaseReference();
 }
 
 

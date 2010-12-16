@@ -16,7 +16,7 @@ class LocatableFile;
 class SpecificImageDebugInfo;
 
 
-class FunctionDebugInfo : public Referenceable {
+class FunctionDebugInfo : public BReferenceable {
 public:
 								FunctionDebugInfo();
 	virtual						~FunctionDebugInfo();

@@ -169,12 +169,12 @@ StackTraceView::SetStackTrace(StackTrace* stackTrace)
 		return;
 
 	if (fStackTrace != NULL)
-		fStackTrace->RemoveReference();
+		fStackTrace->ReleaseReference();
 
 	fStackTrace = stackTrace;
 
 	if (fStackTrace != NULL)
-		fStackTrace->AddReference();
+		fStackTrace->AcquireReference();
 
 	fFramesTableModel->SetStackTrace(fStackTrace);
 }

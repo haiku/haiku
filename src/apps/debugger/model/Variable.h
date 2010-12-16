@@ -16,7 +16,7 @@ class Type;
 class ValueLocation;
 
 
-class Variable : public Referenceable {
+class Variable : public BReferenceable {
 public:
 								Variable(ObjectID* id, const BString& name,
 									Type* type, ValueLocation* location);

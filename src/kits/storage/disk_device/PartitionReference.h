@@ -13,7 +13,7 @@
 namespace BPrivate {
 
 
-class PartitionReference : public Referenceable {
+class PartitionReference : public BReferenceable {
 public:
 								PartitionReference(partition_id id = -1,
 									int32 changeCounter = 0);

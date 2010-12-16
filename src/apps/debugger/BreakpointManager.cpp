@@ -248,7 +248,7 @@ BreakpointManager::InstallTemporaryBreakpoint(target_addr_t address,
 			return B_NO_MEMORY;
 	}
 
-	Reference<Breakpoint> breakpointReference(breakpoint);
+	BReference<Breakpoint> breakpointReference(breakpoint);
 
 	// add the client
 	status_t error;
@@ -298,7 +298,7 @@ BreakpointManager::UninstallTemporaryBreakpoint(target_addr_t address,
 		&& breakpoint->IsInstalled();
 
 	// if unused remove it
-	Reference<Breakpoint> breakpointReference(breakpoint);
+	BReference<Breakpoint> breakpointReference(breakpoint);
 	if (breakpoint->IsUnused())
 		fTeam->RemoveBreakpoint(breakpoint);
 

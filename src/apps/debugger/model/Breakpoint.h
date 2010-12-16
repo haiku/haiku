@@ -17,7 +17,7 @@ public:
 };
 
 
-class Breakpoint : public Referenceable {
+class Breakpoint : public BReferenceable {
 public:
 								Breakpoint(Image* image, target_addr_t address);
 								~Breakpoint();

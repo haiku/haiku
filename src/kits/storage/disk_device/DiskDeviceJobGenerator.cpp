@@ -84,7 +84,7 @@ struct DiskDeviceJobGenerator::PartitionRefInfo {
 	~PartitionRefInfo()
 	{
 		if (reference)
-			reference->RemoveReference();
+			reference->ReleaseReference();
 	}
 
 	BPartition*			partition;

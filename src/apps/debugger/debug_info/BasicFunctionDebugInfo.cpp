@@ -18,13 +18,13 @@ BasicFunctionDebugInfo::BasicFunctionDebugInfo(
 	fName(name),
 	fPrettyName(prettyName)
 {
-	fImageDebugInfo->AddReference();
+	fImageDebugInfo->AcquireReference();
 }
 
 
 BasicFunctionDebugInfo::~BasicFunctionDebugInfo()
 {
-	fImageDebugInfo->RemoveReference();
+	fImageDebugInfo->ReleaseReference();
 }
 
 

@@ -163,7 +163,7 @@ CompoundValueNode::~CompoundValueNode()
 	fType->ReleaseReference();
 
 	for (int32 i = 0; Child* child = fChildren.ItemAt(i); i++)
-		child->RemoveReference();
+		child->ReleaseReference();
 }
 
 

@@ -725,7 +725,7 @@ HeaderView::HeaderView()
  	fState(fDefaultState)
 {
  	HeaderModel* model = new(std::nothrow) HeaderModel;
- 	Reference<HeaderModel> modelReference(model, true);
+ 	BReference<HeaderModel> modelReference(model, true);
  	SetModel(model);
 
 	SetViewColor(B_TRANSPARENT_32_BIT);

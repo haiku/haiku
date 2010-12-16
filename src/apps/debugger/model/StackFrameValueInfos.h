@@ -17,7 +17,7 @@ class TypeComponentPath;
 class ValueLocation;
 
 
-class StackFrameValueInfos : public Referenceable {
+class StackFrameValueInfos : public BReferenceable {
 public:
 								StackFrameValueInfos();
 	virtual						~StackFrameValueInfos();

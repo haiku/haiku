@@ -96,7 +96,7 @@ Architecture::CreateStackTrace(Team* team,
 	ImageDebugInfoProvider* imageInfoProvider, CpuState* cpuState,
 	StackTrace*& _stackTrace)
 {
-	Reference<CpuState> cpuStateReference(cpuState);
+	BReference<CpuState> cpuStateReference(cpuState);
 
 	// create the object
 	StackTrace* stackTrace = new(std::nothrow) StackTrace;
@@ -115,14 +115,15 @@ Architecture::CreateStackTrace(Team* team,
 		// get the image for the instruction pointer
 		AutoLocker<Team> teamLocker(team);
 		Image* image = team->ImageByAddress(instructionPointer);
-		Reference<Image> imageReference(image);
+		BReference<Image> imageReference(image);
 		teamLocker.Unlock();
 
 		// get the image debug info
 		ImageDebugInfo* imageDebugInfo = NULL;
 		if (image != NULL)
 			imageInfoProvider->GetImageDebugInfo(image, imageDebugInfo);
-		Reference<ImageDebugInfo> imageDebugInfoReference(imageDebugInfo, true);
+		BReference<ImageDebugInfo> imageDebugInfoReference(imageDebugInfo,
+			true);
 
 		// get the function
 		teamLocker.Lock();
@@ -133,7 +134,7 @@ Architecture::CreateStackTrace(Team* team,
 			if (function != NULL)
 				functionDebugInfo = function->GetFunctionDebugInfo();
 		}
-		Reference<FunctionInstance> functionReference(function);
+		BReference<FunctionInstance> functionReference(function);
 		teamLocker.Unlock();
 
 		// If the CPU state's instruction pointer is actually the return address

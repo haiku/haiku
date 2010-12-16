@@ -50,7 +50,7 @@ class Type;
 class ValueLocation;
 
 
-class BaseType : public Referenceable {
+class BaseType : public BReferenceable {
 public:
 	virtual						~BaseType();
 
@@ -58,7 +58,7 @@ public:
 };
 
 
-class DataMember : public Referenceable {
+class DataMember : public BReferenceable {
 public:
 	virtual						~DataMember();
 
@@ -67,7 +67,7 @@ public:
 };
 
 
-class EnumeratorValue : public Referenceable {
+class EnumeratorValue : public BReferenceable {
 public:
 	virtual						~EnumeratorValue();
 
@@ -76,7 +76,7 @@ public:
 };
 
 
-class ArrayDimension : public Referenceable {
+class ArrayDimension : public BReferenceable {
 public:
 	virtual						~ArrayDimension();
 
@@ -87,7 +87,7 @@ public:
 };
 
 
-class FunctionParameter : public Referenceable {
+class FunctionParameter : public BReferenceable {
 public:
 	virtual						~FunctionParameter();
 
@@ -96,7 +96,7 @@ public:
 };
 
 
-class Type : public Referenceable {
+class Type : public BReferenceable {
 public:
 	virtual						~Type();
 

@@ -215,12 +215,12 @@ RegistersView::SetCpuState(CpuState* cpuState)
 		return;
 
 	if (fCpuState != NULL)
-		fCpuState->RemoveReference();
+		fCpuState->ReleaseReference();
 
 	fCpuState = cpuState;
 
 	if (fCpuState != NULL)
-		fCpuState->AddReference();
+		fCpuState->AcquireReference();
 
 	fRegisterTableModel->SetCpuState(fCpuState);
 }

@@ -65,7 +65,7 @@ ImageDebugInfo::FinishInit()
 		// FunctionInstance objects have references, now.
 		for (int32 k = 0; FunctionDebugInfo* function = functions.ItemAt(k);
 				k++) {
-			function->RemoveReference();
+			function->ReleaseReference();
 		}
 
 		if (error != B_OK)

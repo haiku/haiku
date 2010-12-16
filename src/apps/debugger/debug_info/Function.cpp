@@ -36,13 +36,13 @@ Function::SetSourceCode(FileSourceCode* source, function_source_state state)
 		return;
 
 	if (fSourceCode != NULL)
-		fSourceCode->RemoveReference();
+		fSourceCode->ReleaseReference();
 
 	fSourceCode = source;
 	fSourceCodeState = state;
 
 	if (fSourceCode != NULL) {
-		fSourceCode->AddReference();
+		fSourceCode->AcquireReference();
 
 		// unset all instances' source codes
 		fNotificationsDisabled++;

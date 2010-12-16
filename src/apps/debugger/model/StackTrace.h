@@ -10,7 +10,7 @@
 #include "StackFrame.h"
 
 
-class StackTrace : public Referenceable {
+class StackTrace : public BReferenceable {
 public:
 								StackTrace();
 	virtual						~StackTrace();

@@ -16,7 +16,7 @@
 class Register;
 
 
-class CpuState : public Referenceable {
+class CpuState : public BReferenceable {
 public:
 	virtual						~CpuState();
 

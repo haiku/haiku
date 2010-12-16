@@ -62,7 +62,7 @@ ThreadWindow::ThreadWindow(SubWindowManager* manager, Model* model,
 
 	fGeneralPage->SetModel(fModel, fThread);
 
-	fModel->AddReference();
+	fModel->AcquireReference();
 
 	// create a thread model loader
 	fThreadModelLoader = new ThreadModelLoader(fModel, fThread,
@@ -77,7 +77,7 @@ ThreadWindow::~ThreadWindow()
 
 	delete fThreadModel;
 
-	fModel->RemoveReference();
+	fModel->ReleaseReference();
 }
 
 

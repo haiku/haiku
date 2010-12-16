@@ -34,7 +34,7 @@ public:
 };
 
 
-class LocatableEntry : public Referenceable,
+class LocatableEntry : public BReferenceable,
 	public DoublyLinkedListLinkImpl<LocatableEntry> {
 public:
 								LocatableEntry(LocatableEntryOwner* owner,

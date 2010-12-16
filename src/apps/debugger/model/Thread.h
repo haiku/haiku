@@ -36,7 +36,7 @@ enum {
 };
 
 
-class Thread : public Referenceable, public DoublyLinkedListLinkImpl<Thread> {
+class Thread : public BReferenceable, public DoublyLinkedListLinkImpl<Thread> {
 public:
 								Thread(Team* team, thread_id threadID);
 								~Thread();

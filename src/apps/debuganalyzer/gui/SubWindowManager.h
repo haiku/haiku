@@ -14,7 +14,7 @@
 #include "SubWindow.h"
 
 
-class SubWindowManager : public Referenceable, public BLocker {
+class SubWindowManager : public BReferenceable, public BLocker {
 public:
 								SubWindowManager(BLooper* parent);
 	virtual						~SubWindowManager();

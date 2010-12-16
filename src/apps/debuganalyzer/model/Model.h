@@ -32,7 +32,7 @@ const char* thread_state_name(ThreadState state);
 const char* wait_object_type_name(uint32 type);
 
 
-class Model : public Referenceable {
+class Model : public BReferenceable {
 public:
 			struct creation_time_id;
 			struct type_and_object;

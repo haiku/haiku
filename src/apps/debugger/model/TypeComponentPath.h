@@ -110,7 +110,7 @@ struct TypeComponent {
 };
 
 
-class TypeComponentPath : public Referenceable {
+class TypeComponentPath : public BReferenceable {
 public:
 								TypeComponentPath();
 								TypeComponentPath(

@@ -11,7 +11,7 @@
 #include "TargetAddressRange.h"
 
 
-class TargetAddressRangeList : public Referenceable {
+class TargetAddressRangeList : public BReferenceable {
 public:
 								TargetAddressRangeList();
 								TargetAddressRangeList(

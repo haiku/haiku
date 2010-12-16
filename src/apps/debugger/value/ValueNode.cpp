@@ -157,7 +157,7 @@ ValueNodeChild::SetNode(ValueNode* node)
 		return;
 
 	ValueNode* oldNode = fNode;
-	Reference<ValueNode> oldNodeReference(oldNode, true);
+	BReference<ValueNode> oldNodeReference(oldNode, true);
 
 	if (fNode != NULL)
 		fNode->SetContainer(NULL);

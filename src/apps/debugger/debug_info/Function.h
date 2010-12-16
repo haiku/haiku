@@ -16,7 +16,7 @@
 class FileSourceCode;
 
 
-class Function : public Referenceable, private LocatableFile::Listener {
+class Function : public BReferenceable, private LocatableFile::Listener {
 public:
 	class Listener;
 

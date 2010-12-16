@@ -42,7 +42,7 @@ AbstractArrayValueNode::~AbstractArrayValueNode()
 
 	for (int32 i = 0; AbstractArrayValueNodeChild* child = fChildren.ItemAt(i);
 			i++) {
-		child->RemoveReference();
+		child->ReleaseReference();
 	}
 }
 

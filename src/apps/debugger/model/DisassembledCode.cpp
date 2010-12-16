@@ -42,7 +42,7 @@ DisassembledCode::DisassembledCode(SourceLanguage* language)
 DisassembledCode::~DisassembledCode()
 {
 	for (int32 i = 0; Statement* statement = fStatements.ItemAt(i); i++)
-		statement->RemoveReference();
+		statement->ReleaseReference();
 
 	fLanguage->ReleaseReference();
 }

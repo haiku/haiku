@@ -340,14 +340,14 @@ ArchitectureX86::CreateStackFrame(Image* image, FunctionDebugInfo* function,
 		= new(std::nothrow) NoOpStackFrameDebugInfo;
 	if (stackFrameDebugInfo == NULL)
 		return B_NO_MEMORY;
-	Reference<StackFrameDebugInfo> stackFrameDebugInfoReference(
+	BReference<StackFrameDebugInfo> stackFrameDebugInfoReference(
 		stackFrameDebugInfo, true);
 
 	StackFrame* frame = new(std::nothrow) StackFrame(frameType, cpuState,
 		framePointer, eip, stackFrameDebugInfo);
 	if (frame == NULL)
 		return B_NO_MEMORY;
-	Reference<StackFrame> frameReference(frame, true);
+	BReference<StackFrame> frameReference(frame, true);
 
 	status_t error = frame->Init();
 	if (error != B_OK)
@@ -498,7 +498,7 @@ ArchitectureX86::DisassembleCode(FunctionDebugInfo* function,
 		fAssemblyLanguage);
 	if (source == NULL)
 		return B_NO_MEMORY;
-	Reference<DisassembledCode> sourceReference(source, true);
+	BReference<DisassembledCode> sourceReference(source, true);
 
 	// init disassembler
 	DisassemblerX86 disassembler;

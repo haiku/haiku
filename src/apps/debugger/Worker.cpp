@@ -259,7 +259,7 @@ Worker::ScheduleJob(Job* job, JobListener* listener)
 	if (job == NULL)
 		return B_NO_MEMORY;
 
-	Reference<Job> jobReference(job, true);
+	BReference<Job> jobReference(job, true);
 	AutoLocker<Worker> locker(this);
 
 	if (fTerminating)

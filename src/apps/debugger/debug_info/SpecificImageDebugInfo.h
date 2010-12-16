@@ -32,7 +32,7 @@ class Type;
 class ValueLocation;
 
 
-class SpecificImageDebugInfo : public Referenceable {
+class SpecificImageDebugInfo : public BReferenceable {
 public:
 	virtual						~SpecificImageDebugInfo();
 

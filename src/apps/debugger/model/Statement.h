@@ -12,7 +12,7 @@
 #include "Types.h"
 
 
-class Statement : public Referenceable {
+class Statement : public BReferenceable {
 public:
 	virtual						~Statement();
 

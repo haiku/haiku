@@ -171,7 +171,7 @@ TypeComponentPath::CreateSubPath(int32 componentCount) const
 	TypeComponentPath* path = new(std::nothrow) TypeComponentPath;
 	if (path == NULL)
 		return NULL;
-	Reference<TypeComponentPath> pathReference(path, true);
+	BReference<TypeComponentPath> pathReference(path, true);
 
 	for (int32 i = 0; i < componentCount; i++) {
 		if (!path->AddComponent(*fComponents.ItemAt(i)))

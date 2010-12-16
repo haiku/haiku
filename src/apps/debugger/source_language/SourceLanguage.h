@@ -12,7 +12,7 @@
 class SyntaxHighlighter;
 
 
-class SourceLanguage : public Referenceable {
+class SourceLanguage : public BReferenceable {
 public:
 	virtual						~SourceLanguage();
 

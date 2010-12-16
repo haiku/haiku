@@ -21,7 +21,7 @@ public:
 
 
 
-class SourceFile : public Referenceable {
+class SourceFile : public BReferenceable {
 public:
 								SourceFile(SourceFileOwner* owner);
 								~SourceFile();

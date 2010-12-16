@@ -332,7 +332,7 @@ DwarfTypeFactory::CreateType(DIEType* typeEntry, DwarfType*& _type)
 	status_t error = _CreateTypeInternal(name, typeEntry, type);
 	if (error != B_OK)
 		return error;
-	Reference<DwarfType> typeReference(type, true);
+	BReference<DwarfType> typeReference(type, true);
 
 	// Insert the type into the cache. Re-check, as the type may already
 	// have been inserted (e.g. in the compound type case).
@@ -453,7 +453,7 @@ DwarfTypeFactory::_CreateCompoundType(const BString& name,
 		name, typeEntry);
 	if (type == NULL)
 		return B_NO_MEMORY;
-	Reference<DwarfCompoundType> typeReference(type, true);
+	BReference<DwarfCompoundType> typeReference(type, true);
 
 	// Already add the type at this pointer to the cache, since otherwise
 	// we could run into an infinite recursion when trying to create the types
@@ -487,7 +487,7 @@ printf("  -> failed to add type to cache\n");
 			DwarfType* memberType;
 			if (CreateType(memberEntry->GetType(), memberType) != B_OK)
 				continue;
-			Reference<DwarfType> memberTypeReference(memberType, true);
+			BReference<DwarfType> memberTypeReference(memberType, true);
 
 			// get the name
 			BString memberName;
@@ -496,7 +496,7 @@ printf("  -> failed to add type to cache\n");
 			// create and add the member object
 			DwarfDataMember* member = new(std::nothrow) DwarfDataMember(
 				memberEntry, memberName, memberType);
-			Reference<DwarfDataMember> memberReference(member, true);
+			BReference<DwarfDataMember> memberReference(member, true);
 			if (member == NULL || !type->AddDataMember(member)) {
 				cacheLocker.Lock();
 				fTypeCache->RemoveType(type);
@@ -525,12 +525,12 @@ printf("  -> failed to add type to cache\n");
 				DwarfType* baseType;
 				if (CreateType(inheritanceEntry->GetType(), baseType) != B_OK)
 					continue;
-				Reference<DwarfType> baseTypeReference(baseType, true);
+				BReference<DwarfType> baseTypeReference(baseType, true);
 
 				// create and add the inheritance object
 				DwarfInheritance* inheritance = new(std::nothrow)
 					DwarfInheritance(inheritanceEntry, baseType);
-				Reference<DwarfInheritance> inheritanceReference(inheritance,
+				BReference<DwarfInheritance> inheritanceReference(inheritance,
 					true);
 				if (inheritance == NULL || !type->AddInheritance(inheritance)) {
 					cacheLocker.Lock();
@@ -680,7 +680,7 @@ DwarfTypeFactory::_CreateAddressType(const BString& name,
 		if (baseType == NULL)
 			return B_NO_MEMORY;
 	}
-	Reference<Type> baseTypeReference(baseType, true);
+	BReference<Type> baseTypeReference(baseType, true);
 
 	DwarfAddressType* type = new(std::nothrow) DwarfAddressType(fTypeContext,
 		name, typeEntry, addressKind, baseType);
@@ -759,7 +759,7 @@ DwarfTypeFactory::_CreateModifiedType(const BString& name,
 	status_t error = CreateType(baseTypeEntry, baseType);
 	if (error != B_OK)
 		return error;
-	Reference<Type> baseTypeReference(baseType, true);
+	BReference<Type> baseTypeReference(baseType, true);
 
 	DwarfModifiedType* type = new(std::nothrow) DwarfModifiedType(fTypeContext,
 		name, typeEntry, modifiers, baseType);
@@ -786,7 +786,7 @@ DwarfTypeFactory::_CreateTypedefType(const BString& name,
 	error = CreateType(baseTypeEntry, baseType);
 	if (error != B_OK)
 		return error;
-	Reference<Type> baseTypeReference(baseType, true);
+	BReference<Type> baseTypeReference(baseType, true);
 
 	DwarfTypedefType* type = new(std::nothrow) DwarfTypedefType(fTypeContext,
 		name, typeEntry, baseType);
@@ -821,14 +821,14 @@ DwarfTypeFactory::_CreateArrayType(const BString& name,
 			name.String(), strerror(error));
 		return error;
 	}
-	Reference<Type> baseTypeReference(baseType, true);
+	BReference<Type> baseTypeReference(baseType, true);
 
 	// create the array type
 	DwarfArrayType* type = new(std::nothrow) DwarfArrayType(fTypeContext, name,
 		typeEntry, baseType);
 	if (type == NULL)
 		return B_NO_MEMORY;
-	Reference<DwarfType> typeReference(type, true);
+	BReference<DwarfType> typeReference(type, true);
 
 	// add the array dimensions
 	DIEArrayType* dimensionOwnerEntry = DwarfUtils::GetDIEByPredicate(
@@ -853,12 +853,12 @@ DwarfTypeFactory::_CreateArrayType(const BString& name,
 				strerror(error));
 			return error;
 		}
-		Reference<Type> dimensionTypeReference(dimensionType, true);
+		BReference<Type> dimensionTypeReference(dimensionType, true);
 
 		// create and add the array dimension object
 		DwarfArrayDimension* dimension
 			= new(std::nothrow) DwarfArrayDimension(dimensionType);
-		Reference<DwarfArrayDimension> dimensionReference(dimension, true);
+		BReference<DwarfArrayDimension> dimensionReference(dimension, true);
 		if (dimension == NULL || !type->AddDimension(dimension))
 			return B_NO_MEMORY;
 	}
@@ -882,14 +882,14 @@ DwarfTypeFactory::_CreateEnumerationType(const BString& name,
 		if (error != B_OK)
 			return error;
 	}
-	Reference<Type> baseTypeReference(baseType, true);
+	BReference<Type> baseTypeReference(baseType, true);
 
 	// create the enumeration type
 	DwarfEnumerationType* type = new(std::nothrow) DwarfEnumerationType(
 		fTypeContext, name, typeEntry, baseType);
 	if (type == NULL)
 		return B_NO_MEMORY;
-	Reference<DwarfEnumerationType> typeReference(type, true);
+	BReference<DwarfEnumerationType> typeReference(type, true);
 
 	// get the enumeration values
 	DIEEnumerationType* enumeratorOwnerEntry = DwarfUtils::GetDIEByPredicate(
@@ -922,7 +922,8 @@ DwarfTypeFactory::_CreateEnumerationType(const BString& name,
 			DwarfEnumeratorValue* enumValue
 				= new(std::nothrow) DwarfEnumeratorValue(enumeratorEntry,
 					enumeratorEntry->Name(), value);
-			Reference<DwarfEnumeratorValue> enumValueReference(enumValue, true);
+			BReference<DwarfEnumeratorValue> enumValueReference(enumValue,
+				true);
 			if (enumValue == NULL || !type->AddValue(enumValue))
 				return B_NO_MEMORY;
 		}
@@ -1046,7 +1047,7 @@ DwarfTypeFactory::_CreateSubrangeType(const BString& name,
 	}
 	if (error != B_OK)
 		return error;
-	Reference<Type> baseTypeReference(baseType, true);
+	BReference<Type> baseTypeReference(baseType, true);
 
 	// TODO: Support the thread scaling attribute!
 
@@ -1090,13 +1091,13 @@ DwarfTypeFactory::_CreateFunctionType(const BString& name,
 		if (error != B_OK)
 			return error;
 	}
-	Reference<Type> returnTypeReference(returnType, true);
+	BReference<Type> returnTypeReference(returnType, true);
 
 	DwarfFunctionType* type = new(std::nothrow) DwarfFunctionType(fTypeContext,
 		name, typeEntry, returnType);
 	if (type == NULL)
 		return B_NO_MEMORY;
-	Reference<DwarfType> typeReference(type, true);
+	BReference<DwarfType> typeReference(type, true);
 
 	// get the parameters
 	DIESubroutineType* parameterOwnerEntry = DwarfUtils::GetDIEByPredicate(
@@ -1125,7 +1126,7 @@ DwarfTypeFactory::_CreateFunctionType(const BString& name,
 				parameterType);
 			if (error != B_OK)
 				return error;
-			Reference<DwarfType> parameterTypeReference(parameterType, true);
+			BReference<DwarfType> parameterTypeReference(parameterType, true);
 
 			// get the name
 			BString parameterName;
@@ -1135,7 +1136,7 @@ DwarfTypeFactory::_CreateFunctionType(const BString& name,
 			DwarfFunctionParameter* parameter
 				= new(std::nothrow) DwarfFunctionParameter(parameterEntry,
 					parameterName, parameterType);
-			Reference<DwarfFunctionParameter> parameterReference(parameter,
+			BReference<DwarfFunctionParameter> parameterReference(parameter,
 				true);
 			if (parameter == NULL || !type->AddParameter(parameter))
 				return B_NO_MEMORY;
@@ -1171,7 +1172,7 @@ DwarfTypeFactory::_CreatePointerToMemberType(const BString& name,
 		containingType);
 	if (error != B_OK)
 		return error;
-	Reference<Type> containingTypeReference(containingType, true);
+	BReference<Type> containingTypeReference(containingType, true);
 
 	DwarfCompoundType* compoundContainingType
 		= dynamic_cast<DwarfCompoundType*>(containingType);
@@ -1186,7 +1187,7 @@ DwarfTypeFactory::_CreatePointerToMemberType(const BString& name,
 	error = CreateType(baseTypeOwnerEntry->GetType(), baseType);
 	if (error != B_OK)
 		return error;
-	Reference<Type> baseTypeReference(baseType, true);
+	BReference<Type> baseTypeReference(baseType, true);
 
 	// create the type object
 	DwarfPointerToMemberType* type = new(std::nothrow) DwarfPointerToMemberType(

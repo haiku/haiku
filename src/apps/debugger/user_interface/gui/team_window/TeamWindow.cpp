@@ -282,7 +282,7 @@ TeamWindow::MessageReceived(BMessage* message)
 			UserBreakpoint* breakpoint;
 			if (message->FindPointer("breakpoint", (void**)&breakpoint) != B_OK)
 				break;
-			Reference<UserBreakpoint> breakpointReference(breakpoint, true);
+			BReference<UserBreakpoint> breakpointReference(breakpoint, true);
 
 			_HandleUserBreakpointChanged(breakpoint);
 			break;
@@ -424,7 +424,7 @@ void
 TeamWindow::UserBreakpointChanged(const Team::UserBreakpointEvent& event)
 {
 	BMessage message(MSG_USER_BREAKPOINT_CHANGED);
-	Reference<UserBreakpoint> breakpointReference(event.GetBreakpoint());
+	BReference<UserBreakpoint> breakpointReference(event.GetBreakpoint());
 	if (message.AddPointer("breakpoint", event.GetBreakpoint()) == B_OK
 		&& PostMessage(&message) == B_OK) {
 		breakpointReference.Detach();
@@ -550,19 +550,19 @@ TeamWindow::_SetActiveThread(::Thread* thread)
 		return;
 
 	if (fActiveThread != NULL)
-		fActiveThread->RemoveReference();
+		fActiveThread->ReleaseReference();
 
 	fActiveThread = thread;
 
 	if (fActiveThread != NULL)
-		fActiveThread->AddReference();
+		fActiveThread->AcquireReference();
 
 	AutoLocker< ::Team> locker(fTeam);
 	_UpdateRunButtons();
 
 	StackTrace* stackTrace = fActiveThread != NULL
 		? fActiveThread->GetStackTrace() : NULL;
-	Reference<StackTrace> stackTraceReference(stackTrace);
+	BReference<StackTrace> stackTraceReference(stackTrace);
 		// hold a reference until we've set it
 
 	locker.Unlock();
@@ -581,17 +581,17 @@ TeamWindow::_SetActiveImage(Image* image)
 		return;
 
 	if (fActiveImage != NULL)
-		fActiveImage->RemoveReference();
+		fActiveImage->ReleaseReference();
 
 	fActiveImage = image;
 
 	AutoLocker< ::Team> locker(fTeam);
 
 	ImageDebugInfo* imageDebugInfo = NULL;
-	Reference<ImageDebugInfo> imageDebugInfoReference;
+	BReference<ImageDebugInfo> imageDebugInfoReference;
 
 	if (fActiveImage != NULL) {
-		fActiveImage->AddReference();
+		fActiveImage->AcquireReference();
 
 		imageDebugInfo = fActiveImage->GetImageDebugInfo();
 		imageDebugInfoReference.SetTo(imageDebugInfo);
@@ -615,12 +615,12 @@ TeamWindow::_SetActiveStackTrace(StackTrace* stackTrace)
 		return;
 
 	if (fActiveStackTrace != NULL)
-		fActiveStackTrace->RemoveReference();
+		fActiveStackTrace->ReleaseReference();
 
 	fActiveStackTrace = stackTrace;
 
 	if (fActiveStackTrace != NULL)
-		fActiveStackTrace->AddReference();
+		fActiveStackTrace->AcquireReference();
 
 	fStackTraceView->SetStackTrace(fActiveStackTrace);
 	fSourceView->SetStackTrace(fActiveStackTrace);
@@ -641,13 +641,13 @@ TeamWindow::_SetActiveStackFrame(StackFrame* frame)
 		fActiveStackFrame->RemoveListener(this);
 		locker.Unlock();
 
-		fActiveStackFrame->RemoveReference();
+		fActiveStackFrame->ReleaseReference();
 	}
 
 	fActiveStackFrame = frame;
 
 	if (fActiveStackFrame != NULL) {
-		fActiveStackFrame->AddReference();
+		fActiveStackFrame->AcquireReference();
 
 		AutoLocker< ::Team> locker(fTeam);
 		fActiveStackFrame->AddListener(this);
@@ -676,12 +676,12 @@ TeamWindow::_SetActiveBreakpoint(UserBreakpoint* breakpoint)
 		return;
 
 	if (fActiveBreakpoint != NULL)
-		fActiveBreakpoint->RemoveReference();
+		fActiveBreakpoint->ReleaseReference();
 
 	fActiveBreakpoint = breakpoint;
 
 	if (fActiveBreakpoint != NULL) {
-		fActiveBreakpoint->AddReference();
+		fActiveBreakpoint->AcquireReference();
 
 		// get the breakpoint's function (more exactly: some function instance)
 		AutoLocker< ::Team> locker(fTeam);
@@ -690,7 +690,8 @@ TeamWindow::_SetActiveBreakpoint(UserBreakpoint* breakpoint)
 			breakpoint->Location().GetFunctionID());
 		FunctionInstance* functionInstance = function != NULL
 			? function->FirstInstance() : NULL;
-		Reference<FunctionInstance> functionInstanceReference(functionInstance);
+		BReference<FunctionInstance> functionInstanceReference(
+			functionInstance);
 
 		locker.Unlock();
 
@@ -720,7 +721,7 @@ TeamWindow::_SetActiveFunction(FunctionInstance* functionInstance)
 
 	if (fActiveFunction != NULL) {
 		fActiveFunction->GetFunction()->RemoveListener(this);
-		fActiveFunction->RemoveReference();
+		fActiveFunction->ReleaseReference();
 	}
 
 	// to avoid listener feedback problems, first unset the active function and
@@ -737,10 +738,10 @@ TeamWindow::_SetActiveFunction(FunctionInstance* functionInstance)
 	locker.Lock();
 
 	SourceCode* sourceCode = NULL;
-	Reference<SourceCode> sourceCodeReference;
+	BReference<SourceCode> sourceCodeReference;
 
 	if (fActiveFunction != NULL) {
-		fActiveFunction->AddReference();
+		fActiveFunction->AcquireReference();
 		fActiveFunction->GetFunction()->AddListener(this);
 
 		Function* function = fActiveFunction->GetFunction();
@@ -771,12 +772,12 @@ TeamWindow::_SetActiveSourceCode(SourceCode* sourceCode)
 	}
 
 	if (fActiveSourceCode != NULL)
-		fActiveSourceCode->RemoveReference();
+		fActiveSourceCode->ReleaseReference();
 
 	fActiveSourceCode = sourceCode;
 
 	if (fActiveSourceCode != NULL)
-		fActiveSourceCode->AddReference();
+		fActiveSourceCode->AcquireReference();
 
 	fSourceView->SetSourceCode(fActiveSourceCode);
 
@@ -788,7 +789,7 @@ TeamWindow::_UpdateCpuState()
 {
 	// get the CPU state
 	CpuState* cpuState = NULL;
-	Reference<CpuState> cpuStateReference;
+	BReference<CpuState> cpuStateReference;
 		// hold a reference until the register view has one
 
 	if (fActiveThread != NULL) {
@@ -928,7 +929,7 @@ TeamWindow::_HandleStackTraceChanged(thread_id threadID)
 
 	StackTrace* stackTrace = fActiveThread != NULL
 		? fActiveThread->GetStackTrace() : NULL;
-	Reference<StackTrace> stackTraceReference(stackTrace);
+	BReference<StackTrace> stackTraceReference(stackTrace);
 		// hold a reference until the register view has one
 
 	locker.Unlock();
@@ -953,7 +954,7 @@ TeamWindow::_HandleImageDebugInfoChanged(image_id imageID)
 
 	TRACE_GUI("  image debug info: %p\n", imageDebugInfo);
 
-	Reference<ImageDebugInfo> imageDebugInfoReference(imageDebugInfo);
+	BReference<ImageDebugInfo> imageDebugInfoReference(imageDebugInfo);
 		// hold a reference until we've set it
 
 	locker.Unlock();
@@ -994,7 +995,7 @@ TeamWindow::_HandleSourceCodeChanged()
 			fSourcePathView->SetText("Source file unavailable.");
 	}
 
-	Reference<SourceCode> sourceCodeReference(sourceCode);
+	BReference<SourceCode> sourceCodeReference(sourceCode);
 
 	locker.Unlock();
 

@@ -73,7 +73,7 @@ private:
 typedef DoublyLinkedList<UserBreakpointInstance> UserBreakpointInstanceList;
 
 
-class UserBreakpoint : public Referenceable,
+class UserBreakpoint : public BReferenceable,
 	public DoublyLinkedListLinkImpl<UserBreakpoint> {
 public:
 								UserBreakpoint(

@@ -351,12 +351,12 @@ ImageFunctionsView::SetImageDebugInfo(ImageDebugInfo* imageDebugInfo)
 	TRACE_GUI("ImageFunctionsView::SetImageDebugInfo(%p)\n", imageDebugInfo);
 
 	if (fImageDebugInfo != NULL)
-		fImageDebugInfo->RemoveReference();
+		fImageDebugInfo->ReleaseReference();
 
 	fImageDebugInfo = imageDebugInfo;
 
 	if (fImageDebugInfo != NULL)
-		fImageDebugInfo->AddReference();
+		fImageDebugInfo->AcquireReference();
 
 	fFunctionsTableModel->SetImageDebugInfo(fImageDebugInfo);
 

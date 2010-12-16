@@ -70,7 +70,7 @@ ValueNodeContainer::RemoveChild(ValueNodeChild* child)
 		return;
 
 	child->SetContainer(NULL);
-	child->RemoveReference();
+	child->ReleaseReference();
 }
 
 
@@ -79,7 +79,7 @@ ValueNodeContainer::RemoveAllChildren()
 {
 	for (int32 i = 0; ValueNodeChild* child = ChildAt(i); i++) {
 		child->SetContainer(NULL);
-		child->RemoveReference();
+		child->ReleaseReference();
 	}
 
 	fChildren.MakeEmpty();

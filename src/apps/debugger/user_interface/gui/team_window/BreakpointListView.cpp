@@ -45,7 +45,7 @@ public:
 			for (int32 i = 0;
 				UserBreakpoint* breakpoint = fBreakpoints.ItemAt(i);
 				i++) {
-				breakpoint->RemoveReference();
+				breakpoint->ReleaseReference();
 			}
 			fBreakpoints.MakeEmpty();
 
@@ -69,7 +69,7 @@ public:
 			} else {
 				// TODO: Not particularly efficient!
 				fBreakpoints.RemoveItemAt(index);
-				oldBreakpoint->RemoveReference();
+				oldBreakpoint->ReleaseReference();
 				NotifyRowsRemoved(index, 1);
 			}
 		}
@@ -80,7 +80,7 @@ public:
 			if (!fBreakpoints.AddItem(newBreakpoint))
 				return false;
 
-			newBreakpoint->AddReference();
+			newBreakpoint->AcquireReference();
 			newBreakpoint = it.Next();
 		}
 

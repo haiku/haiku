@@ -68,7 +68,7 @@ private:
 };
 
 
-class VariablesView::ModelNode : public Referenceable {
+class VariablesView::ModelNode : public BReferenceable {
 public:
 	ModelNode(ModelNode* parent, ValueNodeChild* nodeChild,
 		bool isPresentationNode)
@@ -1404,13 +1404,13 @@ VariablesView::TreeTableCellMouseDown(TreeTable* table,
 	SettingsMenu* settingsMenu;
 	status_t error = node->GetValueHandler()->CreateTableCellValueSettingsMenu(
 		node->GetValue(), settings, settingsMenu);
-	Reference<SettingsMenu> settingsMenuReference(settingsMenu, true);
+	BReference<SettingsMenu> settingsMenuReference(settingsMenu, true);
 	if (error != B_OK)
 		return;
 
 	TableCellContextMenuTracker* tracker = new(std::nothrow)
 		TableCellContextMenuTracker(node, Looper(), this);
-	Reference<TableCellContextMenuTracker> trackerReference(tracker);
+	BReference<TableCellContextMenuTracker> trackerReference(tracker);
 	if (tracker == NULL || tracker->Init(settings, settingsMenu) != B_OK)
 		return;
 
@@ -1455,7 +1455,7 @@ VariablesView::_RequestNodeValue(ModelNode* node)
 	ValueNodeChild* nodeChild = node->NodeChild();
 	ValueNodeContainer* container = nodeChild->Container();
 
-	Reference<ValueNodeContainer> containerReference(container);
+	BReference<ValueNodeContainer> containerReference(container);
 	AutoLocker<ValueNodeContainer> containerLocker(container);
 
 	if (container == NULL || nodeChild->Container() != container)
@@ -1469,7 +1469,7 @@ VariablesView::_RequestNodeValue(ModelNode* node)
 		return;
 	}
 
-	Reference<ValueNode> valueNodeReference(valueNode);
+	BReference<ValueNode> valueNodeReference(valueNode);
 	containerLocker.Unlock();
 
 	// request resolution of the value
@@ -1503,13 +1503,13 @@ VariablesView::_SaveViewState() const
 	FunctionID* functionID = fStackFrame->Function()->GetFunctionID();
 	if (functionID == NULL)
 		return;
-	Reference<FunctionID> functionIDReference(functionID, true);
+	BReference<FunctionID> functionIDReference(functionID, true);
 
 	// create an empty view state
 	VariablesViewState* viewState = new(std::nothrow) VariablesViewState;
 	if (viewState == NULL)
 		return;
-	Reference<VariablesViewState> viewStateReference(viewState, true);
+	BReference<VariablesViewState> viewStateReference(viewState, true);
 
 	if (viewState->Init() != B_OK)
 		return;
@@ -1544,7 +1544,7 @@ VariablesView::_RestoreViewState()
 	FunctionID* functionID = fStackFrame->Function()->GetFunctionID();
 	if (functionID == NULL)
 		return;
-	Reference<FunctionID> functionIDReference(functionID, true);
+	BReference<FunctionID> functionIDReference(functionID, true);
 
 	// get the previous view state
 	VariablesViewState* viewState = fViewStateHistory->GetState(fThread->ID(),

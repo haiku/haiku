@@ -186,5 +186,5 @@ void
 ValueHandlerRoster::UnregisterHandler(ValueHandler* handler)
 {
 	if (fValueHandlers.RemoveItem(handler))
-		handler->RemoveReference();
+		handler->ReleaseReference();
 }

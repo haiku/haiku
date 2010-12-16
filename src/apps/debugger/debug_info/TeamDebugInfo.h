@@ -32,7 +32,7 @@ class SourceLocation;
 class SpecificTeamDebugInfo;
 
 
-class TeamDebugInfo : public Referenceable, public GlobalTypeLookup {
+class TeamDebugInfo : public BReferenceable, public GlobalTypeLookup {
 public:
 								TeamDebugInfo(
 									DebuggerInterface* debuggerInterface,

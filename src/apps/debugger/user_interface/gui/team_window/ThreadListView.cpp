@@ -46,7 +46,7 @@ public:
 	{
 		if (fTeam == NULL) {
 			for (int32 i = 0; Thread* thread = fThreads.ItemAt(i); i++)
-				thread->RemoveReference();
+				thread->ReleaseReference();
 			fThreads.MakeEmpty();
 
 			return true;
@@ -68,7 +68,7 @@ public:
 			} else {
 				// TODO: Not particularly efficient!
 				fThreads.RemoveItemAt(index);
-				oldThread->RemoveReference();
+				oldThread->ReleaseReference();
 				NotifyRowsRemoved(index, 1);
 			}
 		}
@@ -79,7 +79,7 @@ public:
 			if (!fThreads.AddItem(newThread))
 				return false;
 
-			newThread->AddReference();
+			newThread->AcquireReference();
 			newThread = it.Next();
 		}
 

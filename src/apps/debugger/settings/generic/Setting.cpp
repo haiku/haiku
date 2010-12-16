@@ -196,7 +196,7 @@ OptionsSettingImpl::AddOption(SettingsOption* option)
 	if (!fOptions.AddItem(option))
 		return false;
 
-	option->AddReference();
+	option->AcquireReference();
 	return true;
 }
 
@@ -207,7 +207,7 @@ OptionsSettingImpl::AddOption(const BString& id, const BString& name)
 	Option* option = new(std::nothrow) Option(id, name);
 	if (option == NULL)
 		return false;
-	Reference<Option> optionReference(option, true);
+	BReference<Option> optionReference(option, true);
 
 	return AddOption(option);
 }

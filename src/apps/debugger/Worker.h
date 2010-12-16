@@ -75,7 +75,7 @@ public:
 typedef DoublyLinkedList<Job> JobList;
 
 
-class Job : public Referenceable, public DoublyLinkedListLinkImpl<Job> {
+class Job : public BReferenceable, public DoublyLinkedListLinkImpl<Job> {
 public:
 								Job();
 	virtual						~Job();

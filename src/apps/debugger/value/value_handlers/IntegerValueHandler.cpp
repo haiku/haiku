@@ -160,14 +160,14 @@ IntegerValueHandler::GetTableCellValueRenderer(Value* _value,
 		= _CreateTableCellSettingsDescription(value);
 	if (settingsDescription == NULL)
 		return B_NO_MEMORY;
-	Reference<SettingsDescription> settingsDescriptionReference(
+	BReference<SettingsDescription> settingsDescriptionReference(
 		settingsDescription, true);
 
 	// create config
 	TableCellRendererConfig* config = new(std::nothrow) TableCellRendererConfig;
 	if (config == NULL)
 		return B_NO_MEMORY;
-	Reference<TableCellRendererConfig> configReference(config, true);
+	BReference<TableCellRendererConfig> configReference(config, true);
 
 	status_t error = config->Init(settingsDescription);
 	if (error != B_OK)
@@ -270,14 +270,14 @@ IntegerValueHandler::_CreateTableCellSettingsDescription(
 	SettingsDescription* description = new(std::nothrow) SettingsDescription;
 	if (description == NULL)
 		return NULL;
-	Reference<SettingsDescription> descriptionReference(description, true);
+	BReference<SettingsDescription> descriptionReference(description, true);
 
 	// integer format setting
 	OptionsSettingImpl* setting = new(std::nothrow) OptionsSettingImpl(
 		kFormatSettingID, "Format");
 	if (setting == NULL)
 		return NULL;
-	Reference<OptionsSettingImpl> settingReference(setting, true);
+	BReference<OptionsSettingImpl> settingReference(setting, true);
 
 	// add options
 	if (AddIntegerFormatSettingOptions(value, setting) != B_OK)

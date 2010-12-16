@@ -8,9 +8,10 @@
 
 // constructor
 PartitionReference::PartitionReference(partition_id id, int32 changeCounter)
-	: Referenceable(true),	// delete when unreferenced
-	  fID(id),
-	  fChangeCounter(changeCounter)
+	:
+	BReferenceable(),
+	fID(id),
+	fChangeCounter(changeCounter)
 {
 }
 

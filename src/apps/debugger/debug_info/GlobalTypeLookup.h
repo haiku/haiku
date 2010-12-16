@@ -23,7 +23,7 @@ enum global_type_cache_scope {
 };
 
 
-class GlobalTypeCache : public Referenceable {
+class GlobalTypeCache : public BReferenceable {
 public:
 								GlobalTypeCache();
 								~GlobalTypeCache();

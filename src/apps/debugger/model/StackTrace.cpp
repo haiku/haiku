@@ -14,7 +14,7 @@ StackTrace::StackTrace()
 StackTrace::~StackTrace()
 {
 	for (int32 i = 0; StackFrame* frame = FrameAt(i); i++)
-		frame->RemoveReference();
+		frame->ReleaseReference();
 }
 
 
@@ -24,7 +24,7 @@ StackTrace::AddFrame(StackFrame* frame)
 	if (fStackFrames.AddItem(frame))
 		return true;
 
-	frame->RemoveReference();
+	frame->ReleaseReference();
 	return false;
 }
 

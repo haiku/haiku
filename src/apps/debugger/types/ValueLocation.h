@@ -78,7 +78,7 @@ struct ValuePieceLocation {
 };
 
 
-class ValueLocation : public Referenceable {
+class ValueLocation : public BReferenceable {
 public:
 								ValueLocation();
 								ValueLocation(bool bigEndian);

@@ -159,11 +159,11 @@ DwarfStackFrameDebugInfo::Init()
 	DwarfTypeContext* typeContext = new(std::nothrow) DwarfTypeContext(
 		fTypeContext->GetArchitecture(), fTypeContext->ImageID(),
 		fTypeContext->File(), fTypeContext->GetCompilationUnit(), NULL, 0, 0,
-		fTypeContext->RelocationDelta(), fTypeContext->TargetInterface(), 
+		fTypeContext->RelocationDelta(), fTypeContext->TargetInterface(),
 		fTypeContext->FromDwarfRegisterMap());
 	if (typeContext == NULL)
 		return B_NO_MEMORY;
-	Reference<DwarfTypeContext> typeContextReference(typeContext, true);
+	BReference<DwarfTypeContext> typeContextReference(typeContext, true);
 
 	// create the type factory
 	fTypeFactory = new(std::nothrow) DwarfTypeFactory(typeContext, fTypeLookup,
@@ -191,7 +191,7 @@ DwarfStackFrameDebugInfo::CreateParameter(FunctionID* functionID,
 		functionID, name);
 	if (id == NULL)
 		return B_NO_MEMORY;
-	Reference<DwarfFunctionParameterID> idReference(id, true);
+	BReference<DwarfFunctionParameterID> idReference(id, true);
 
 	// create the variable
 	return _CreateVariable(id, name, _GetDIEType(parameterEntry),
@@ -226,7 +226,7 @@ DwarfStackFrameDebugInfo::CreateLocalVariable(FunctionID* functionID,
 		functionID, name, line, column);
 	if (id == NULL)
 		return B_NO_MEMORY;
-	Reference<DwarfLocalVariableID> idReference(id, true);
+	BReference<DwarfLocalVariableID> idReference(id, true);
 
 	// create the variable
 	return _CreateVariable(id, name, _GetDIEType(variableEntry),
@@ -247,14 +247,14 @@ DwarfStackFrameDebugInfo::_CreateVariable(ObjectID* id, const BString& name,
 	status_t error = fTypeFactory->CreateType(typeEntry, type);
 	if (error != B_OK)
 		return error;
-	Reference<DwarfType> typeReference(type, true);
+	BReference<DwarfType> typeReference(type, true);
 
 	// get the location, if possible
 	ValueLocation* location = new(std::nothrow) ValueLocation(
 		fTypeContext->GetArchitecture()->IsBigEndian());
 	if (location == NULL)
 		return B_NO_MEMORY;
-	Reference<ValueLocation> locationReference(location, true);
+	BReference<ValueLocation> locationReference(location, true);
 
 	if (locationDescription->IsValid()) {
 		status_t error = type->ResolveLocation(fTypeContext,

@@ -69,7 +69,7 @@ GetThreadStateJob::Do()
 {
 	CpuState* state = NULL;
 	status_t error = fDebuggerInterface->GetCpuState(fThread->ID(), state);
-	Reference<CpuState> reference(state, true);
+	BReference<CpuState> reference(state, true);
 
 	AutoLocker<Team> locker(fThread->GetTeam());
 
@@ -122,7 +122,7 @@ GetCpuStateJob::Do()
 	status_t error = fDebuggerInterface->GetCpuState(fThread->ID(), state);
 	if (error != B_OK)
 		return error;
-	Reference<CpuState> reference(state, true);
+	BReference<CpuState> reference(state, true);
 
 	AutoLocker<Team> locker(fThread->GetTeam());
 
@@ -180,7 +180,7 @@ GetStackTraceJob::Do()
 		fCpuState, stackTrace);
 	if (error != B_OK)
 		return error;
-	Reference<StackTrace> stackTraceReference(stackTrace, true);
+	BReference<StackTrace> stackTraceReference(stackTrace, true);
 
 	// set the stack trace, unless something has changed
 	AutoLocker<Team> locker(fThread->GetTeam());
@@ -483,10 +483,10 @@ ResolveValueNodeValueJob::_ResolveNodeValue()
 	// get the node child and parent node
 	AutoLocker<ValueNodeContainer> containerLocker(fContainer);
 	ValueNodeChild* nodeChild = fValueNode->NodeChild();
-	Reference<ValueNodeChild> nodeChildReference(nodeChild);
+	BReference<ValueNodeChild> nodeChildReference(nodeChild);
 
 	ValueNode* parentNode = nodeChild->Parent();
-	Reference<ValueNode> parentNodeReference(parentNode);
+	BReference<ValueNode> parentNodeReference(parentNode);
 
 	// Check whether the node child location has been resolved already
 	// (successfully).
@@ -542,8 +542,8 @@ ResolveValueNodeValueJob::_ResolveNodeValue()
 			"failed\n", fValueNode, fValueNode->Name().String());
 		return error;
 	}
-	Reference<ValueLocation> locationReference(location, true);
-	Reference<Value> valueReference(value, true);
+	BReference<ValueLocation> locationReference(location, true);
+	BReference<Value> valueReference(value, true);
 
 	// set location and value on the node
 	containerLocker.Lock();
@@ -565,7 +565,7 @@ ResolveValueNodeValueJob::_ResolveNodeChildLocation(ValueNodeChild* nodeChild)
 	ValueLoader valueLoader(fArchitecture, fDebuggerInterface, fCpuState);
 	ValueLocation* location = NULL;
 	status_t error = nodeChild->ResolveLocation(&valueLoader, location);
-	Reference<ValueLocation> locationReference(location, true);
+	BReference<ValueLocation> locationReference(location, true);
 
 	// set the location on the node child
 	AutoLocker<ValueNodeContainer> containerLocker(fContainer);

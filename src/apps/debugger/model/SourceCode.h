@@ -17,7 +17,7 @@ class SourceLocation;
 class Statement;
 
 
-class SourceCode : public Referenceable {
+class SourceCode : public BReferenceable {
 public:
 	virtual						~SourceCode();
 

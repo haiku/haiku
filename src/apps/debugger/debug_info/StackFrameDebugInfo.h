@@ -21,7 +21,7 @@ class Type;
 class ValueLocation;
 
 
-class StackFrameDebugInfo : public Referenceable {
+class StackFrameDebugInfo : public BReferenceable {
 public:
 								StackFrameDebugInfo();
 	virtual						~StackFrameDebugInfo();

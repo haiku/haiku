@@ -22,7 +22,7 @@ class Statement;
 class Worker;
 
 
-class ThreadHandler : public Referenceable, private ImageDebugInfoProvider,
+class ThreadHandler : public BReferenceable, private ImageDebugInfoProvider,
 	private BreakpointClient {
 public:
 								ThreadHandler(Thread* thread, Worker* worker,

@@ -599,7 +599,7 @@ SourceView::MarkerManager::_UpdateIPMarkers()
 					functionInstance, statement) != B_OK) {
 				continue;
 			}
-			Reference<Statement> statementReference(statement, true);
+			BReference<Statement> statementReference(statement, true);
 
 			int32 line = statement->StartSourceLocation().Line();
 			if (line < 0 || line >= fSourceCode->CountLines())
@@ -662,7 +662,7 @@ SourceView::MarkerManager::_UpdateBreakpointMarkers()
 					statement) != B_OK) {
 				continue;
 			}
-			Reference<Statement> statementReference(statement, true);
+			BReference<Statement> statementReference(statement, true);
 
 			int32 line = statement->StartSourceLocation().Line();
 			if (line < 0 || line >= fSourceCode->CountLines())
@@ -916,7 +916,7 @@ SourceView::MarkerView::MouseDown(BPoint where)
 			SourceLocation(line), statement) != B_OK) {
 		return;
 	}
-	Reference<Statement> statementReference(statement, true);
+	BReference<Statement> statementReference(statement, true);
 	if (statement->StartSourceLocation().Line() != line)
 		return;
 
@@ -1684,13 +1684,13 @@ SourceView::SetStackTrace(StackTrace* stackTrace)
 	if (fStackTrace != NULL) {
 		fMarkerManager->SetStackTrace(NULL);
 		fMarkerView->SetStackTrace(NULL);
-		fStackTrace->RemoveReference();
+		fStackTrace->ReleaseReference();
 	}
 
 	fStackTrace = stackTrace;
 
 	if (fStackTrace != NULL)
-		fStackTrace->AddReference();
+		fStackTrace->AcquireReference();
 
 	fMarkerManager->SetStackTrace(fStackTrace);
 	fMarkerView->SetStackTrace(fStackTrace);
@@ -1707,13 +1707,13 @@ SourceView::SetStackFrame(StackFrame* stackFrame)
 	if (fStackFrame != NULL) {
 		fMarkerManager->SetStackFrame(NULL);
 		fMarkerView->SetStackFrame(NULL);
-		fStackFrame->RemoveReference();
+		fStackFrame->ReleaseReference();
 	}
 
 	fStackFrame = stackFrame;
 
 	if (fStackFrame != NULL)
-		fStackFrame->AddReference();
+		fStackFrame->AcquireReference();
 
 	fMarkerManager->SetStackFrame(fStackFrame);
 	fMarkerView->SetStackFrame(fStackFrame);
@@ -1735,13 +1735,13 @@ SourceView::SetSourceCode(SourceCode* sourceCode)
 		fMarkerManager->SetSourceCode(NULL);
 		fTextView->SetSourceCode(NULL);
 		fMarkerView->SetSourceCode(NULL);
-		fSourceCode->RemoveReference();
+		fSourceCode->ReleaseReference();
 	}
 
 	fSourceCode = sourceCode;
 
 	if (fSourceCode != NULL)
-		fSourceCode->AddReference();
+		fSourceCode->AcquireReference();
 
 	fMarkerManager->SetSourceCode(fSourceCode);
 	fTextView->SetSourceCode(fSourceCode);
@@ -1778,7 +1778,7 @@ SourceView::ScrollToAddress(target_addr_t address)
 			statement) != B_OK) {
 		return false;
 	}
-	Reference<Statement> statementReference(statement, true);
+	BReference<Statement> statementReference(statement, true);
 
 	return ScrollToLine(statement->StartSourceLocation().Line());
 }

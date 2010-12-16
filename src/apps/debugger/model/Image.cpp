@@ -59,7 +59,7 @@ Image::SetImageDebugInfo(ImageDebugInfo* debugInfo,
 
 	if (fDebugInfo != NULL) {
 		fTeam->DebugInfo()->RemoveImageDebugInfo(fDebugInfo);
-		fDebugInfo->RemoveReference();
+		fDebugInfo->ReleaseReference();
 	}
 
 	fDebugInfo = debugInfo;
@@ -69,7 +69,7 @@ Image::SetImageDebugInfo(ImageDebugInfo* debugInfo,
 	if (fDebugInfo != NULL) {
 		error = fTeam->DebugInfo()->AddImageDebugInfo(fDebugInfo);
 		if (error == B_OK) {
-			fDebugInfo->AddReference();
+			fDebugInfo->AcquireReference();
 		} else {
 			fDebugInfo = NULL;
 			fDebugInfoState = IMAGE_DEBUG_INFO_UNAVAILABLE;

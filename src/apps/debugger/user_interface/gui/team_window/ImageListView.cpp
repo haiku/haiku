@@ -46,7 +46,7 @@ public:
 	{
 		if (fTeam == NULL) {
 			for (int32 i = 0; Image* image = fImages.ItemAt(i); i++)
-				image->RemoveReference();
+				image->ReleaseReference();
 			fImages.MakeEmpty();
 
 			return true;
@@ -66,7 +66,7 @@ public:
 			} else {
 				// TODO: Not particularly efficient!
 				fImages.RemoveItemAt(index);
-				oldImage->RemoveReference();
+				oldImage->ReleaseReference();
 				NotifyRowsRemoved(index, 1);
 			}
 		}
@@ -77,7 +77,7 @@ public:
 			if (!fImages.AddItem(newImage))
 				return false;
 
-			newImage->AddReference();
+			newImage->AcquireReference();
 			newImage = it.Next();
 		}
 
@@ -186,12 +186,12 @@ ImageListView::SetImage(Image* image)
 	TRACE_GUI("ImageListView::SetImage(%p)\n", image);
 
 	if (fImage != NULL)
-		fImage->RemoveReference();
+		fImage->ReleaseReference();
 
 	fImage = image;
 
 	if (fImage != NULL) {
-		fImage->AddReference();
+		fImage->AcquireReference();
 
 		for (int32 i = 0; Image* other = fImagesTableModel->ImageAt(i); i++) {
 			if (fImage == other) {

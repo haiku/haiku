@@ -240,7 +240,7 @@ DebuggerInterface::DebuggerInterface(team_id teamID)
 
 DebuggerInterface::~DebuggerInterface()
 {
-	fArchitecture->RemoveReference();
+	fArchitecture->ReleaseReference();
 
 	Close(false);
 
@@ -632,7 +632,7 @@ DebuggerInterface::_CreateDebugEvent(int32 messageCode,
 
 			event = new(std::nothrow) BreakpointHitEvent(message.origin.team,
 				message.origin.thread, state);
-			state->RemoveReference();
+			state->ReleaseReference();
 			break;
 		}
 		case B_DEBUGGER_MESSAGE_WATCHPOINT_HIT:
@@ -646,7 +646,7 @@ DebuggerInterface::_CreateDebugEvent(int32 messageCode,
 
 			event = new(std::nothrow) WatchpointHitEvent(message.origin.team,
 				message.origin.thread, state);
-			state->RemoveReference();
+			state->ReleaseReference();
 			break;
 		}
 		case B_DEBUGGER_MESSAGE_SINGLE_STEP:
@@ -660,7 +660,7 @@ DebuggerInterface::_CreateDebugEvent(int32 messageCode,
 
 			event = new(std::nothrow) SingleStepEvent(message.origin.team,
 				message.origin.thread, state);
-			state->RemoveReference();
+			state->ReleaseReference();
 			break;
 		}
 		case B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED:

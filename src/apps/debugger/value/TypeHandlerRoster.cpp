@@ -124,7 +124,7 @@ status_t
 TypeHandlerRoster::RegisterDefaultHandlers()
 {
 	TypeHandler* handler;
-	Reference<TypeHandler> handlerReference;
+	BReference<TypeHandler> handlerReference;
 
 	#undef REGISTER_HANDLER
 	#define REGISTER_HANDLER(name)								\
@@ -187,7 +187,7 @@ TypeHandlerRoster::CreateValueNode(ValueNodeChild* nodeChild, Type* type,
 		status_t error = FindTypeHandler(nodeChild, type, handler);
 		if (error == B_OK) {
 			// let the handler create the node
-			Reference<TypeHandler> handlerReference(handler, true);
+			BReference<TypeHandler> handlerReference(handler, true);
 			return handler->CreateValueNode(nodeChild, type, _node);
 		}
 
@@ -216,5 +216,5 @@ void
 TypeHandlerRoster::UnregisterHandler(TypeHandler* handler)
 {
 	if (fTypeHandlers.RemoveItem(handler))
-		handler->RemoveReference();
+		handler->ReleaseReference();
 }

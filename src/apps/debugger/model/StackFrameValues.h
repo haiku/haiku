@@ -15,7 +15,7 @@ class ObjectID;
 class TypeComponentPath;
 
 
-class StackFrameValues : public Referenceable {
+class StackFrameValues : public BReferenceable {
 public:
 								StackFrameValues();
 								StackFrameValues(const StackFrameValues& other);

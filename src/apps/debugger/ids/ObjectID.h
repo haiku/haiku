@@ -9,7 +9,7 @@
 #include <Referenceable.h>
 
 
-class ObjectID : public Referenceable {
+class ObjectID : public BReferenceable {
 public:
 								ObjectID();
 	virtual						~ObjectID();

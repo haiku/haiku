@@ -15,10 +15,10 @@ DiskDeviceJob::DiskDeviceJob(PartitionReference* partition,
 	  fChild(child)
 {
 	if (fPartition)
-		fPartition->AddReference();
+		fPartition->AcquireReference();
 
 	if (fChild)
-		fChild->AddReference();
+		fChild->AcquireReference();
 }
 
 
@@ -26,8 +26,8 @@ DiskDeviceJob::DiskDeviceJob(PartitionReference* partition,
 DiskDeviceJob::~DiskDeviceJob()
 {
 	if (fPartition)
-		fPartition->RemoveReference();
+		fPartition->ReleaseReference();
 
 	if (fChild)
-		fChild->RemoveReference();
+		fChild->ReleaseReference();
 }

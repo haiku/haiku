@@ -18,7 +18,7 @@ enum syntax_highlight_type {
 };
 
 
-class SyntaxHighlightSource : public Referenceable {
+class SyntaxHighlightSource : public BReferenceable {
 	virtual						~SyntaxHighlightSource();
 
 	virtual	int32				CountLines() const = 0;
@@ -41,7 +41,7 @@ class SyntaxHighlightInfo {
 };
 
 
-class SyntaxHighlighter : public Referenceable {
+class SyntaxHighlighter : public BReferenceable {
 public:
 	virtual						~SyntaxHighlighter();
 

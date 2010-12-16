@@ -31,7 +31,7 @@ class Team;
 class TeamMemory;
 
 
-class Architecture : public Referenceable {
+class Architecture : public BReferenceable {
 public:
 								Architecture(TeamMemory* teamMemory,
 									uint8 addressSize, bool bigEndian);

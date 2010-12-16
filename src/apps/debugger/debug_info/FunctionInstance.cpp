@@ -71,13 +71,13 @@ FunctionInstance::SetSourceCode(DisassembledCode* source,
 		return;
 
 	if (fSourceCode != NULL)
-		fSourceCode->RemoveReference();
+		fSourceCode->ReleaseReference();
 
 	fSourceCode = source;
 	fSourceCodeState = state;
 
 	if (fSourceCode != NULL)
-		fSourceCode->AddReference();
+		fSourceCode->AcquireReference();
 
 	if (fFunction != NULL)
 		fFunction->NotifySourceCodeChanged();

@@ -32,7 +32,7 @@ MoveJob::~MoveJob()
 {
 	if (fContents) {
 		for (int32 i = 0; i < fContentsCount; i++)
-			fContents[i]->RemoveReference();
+			fContents[i]->ReleaseReference();
 		delete[] fContents;
 	}
 }
@@ -49,7 +49,7 @@ MoveJob::Init(off_t offset, PartitionReference** contents, int32 contentsCount)
 	fContentsCount = contentsCount;
 	for (int32 i = 0; i < contentsCount; i++) {
 		fContents[i] = contents[i];
-		fContents[i]->AddReference();
+		fContents[i]->AcquireReference();
 	}
 
 	fOffset = offset;

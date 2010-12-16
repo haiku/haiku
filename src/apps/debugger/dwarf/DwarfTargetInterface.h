@@ -16,7 +16,7 @@ class CfaContext;
 class Register;
 
 
-class DwarfTargetInterface : public Referenceable {
+class DwarfTargetInterface : public BReferenceable {
 public:
 	virtual						~DwarfTargetInterface();
 

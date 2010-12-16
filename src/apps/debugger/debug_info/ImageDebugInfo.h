@@ -28,7 +28,7 @@ class SpecificImageDebugInfo;
 class Type;
 
 
-class ImageDebugInfo : public Referenceable {
+class ImageDebugInfo : public BReferenceable {
 public:
 								ImageDebugInfo(const ImageInfo& imageInfo);
 								~ImageDebugInfo();

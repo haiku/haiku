@@ -33,7 +33,7 @@ private:
 };
 
 
-class VariablesViewState : public Referenceable {
+class VariablesViewState : public BReferenceable {
 public:
 								VariablesViewState();
 	virtual						~VariablesViewState();

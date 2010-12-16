@@ -67,7 +67,7 @@ DwarfTeamDebugInfo::CreateImageDebugInfo(const ImageInfo& imageInfo,
 	status_t error = fManager->LoadFile(filePath, file);
 	if (error != B_OK)
 		return error;
-	Reference<DwarfFile> fileReference(file, true);
+	BReference<DwarfFile> fileReference(file, true);
 
 	error = fManager->FinishLoading();
 	if (error != B_OK)

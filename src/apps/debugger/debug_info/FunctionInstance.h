@@ -25,7 +25,7 @@ class FunctionID;
 class ImageDebugInfo;
 
 
-class FunctionInstance : public Referenceable,
+class FunctionInstance : public BReferenceable,
 	public DoublyLinkedListLinkImpl<FunctionInstance> {
 public:
 								FunctionInstance(ImageDebugInfo* imageDebugInfo,

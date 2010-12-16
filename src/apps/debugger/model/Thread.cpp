@@ -27,9 +27,9 @@ Thread::Thread(Team* team, thread_id threadID)
 Thread::~Thread()
 {
 	if (fCpuState != NULL)
-		fCpuState->RemoveReference();
+		fCpuState->ReleaseReference();
 	if (fStackTrace != NULL)
-		fStackTrace->RemoveReference();
+		fStackTrace->ReleaseReference();
 }
 
 
@@ -81,12 +81,12 @@ Thread::SetCpuState(CpuState* state)
 		return;
 
 	if (fCpuState != NULL)
-		fCpuState->RemoveReference();
+		fCpuState->ReleaseReference();
 
 	fCpuState = state;
 
 	if (fCpuState != NULL)
-		fCpuState->AddReference();
+		fCpuState->AcquireReference();
 
 	fTeam->NotifyThreadCpuStateChanged(this);
 }
@@ -99,12 +99,12 @@ Thread::SetStackTrace(StackTrace* trace)
 		return;
 
 	if (fStackTrace != NULL)
-		fStackTrace->RemoveReference();
+		fStackTrace->ReleaseReference();
 
 	fStackTrace = trace;
 
 	if (fStackTrace != NULL)
-		fStackTrace->AddReference();
+		fStackTrace->AcquireReference();
 
 	fTeam->NotifyThreadStackTraceChanged(this);
 }

@@ -9,7 +9,7 @@
 #include <Referenceable.h>
 
 
-class RegisterMap : public Referenceable {
+class RegisterMap : public BReferenceable {
 public:
 	virtual						~RegisterMap();
 

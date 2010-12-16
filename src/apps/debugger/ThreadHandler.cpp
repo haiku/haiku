@@ -211,8 +211,8 @@ ThreadHandler::HandleThreadAction(uint32 action)
 	// When stepping we need a stack trace. Save it before unsetting the state.
 	CpuState* cpuState = fThread->GetCpuState();
 	StackTrace* stackTrace = fThread->GetStackTrace();
-	Reference<CpuState> cpuStateReference(cpuState);
-	Reference<StackTrace> stackTraceReference(stackTrace);
+	BReference<CpuState> cpuStateReference(cpuState);
+	BReference<StackTrace> stackTraceReference(stackTrace);
 
 	// When continuing the thread update thread state before actually issuing
 	// the command, since we need to unlock.
@@ -380,7 +380,7 @@ ThreadHandler::GetImageDebugInfo(Image* image, ImageDebugInfo*& _info)
 
 	if (image->GetImageDebugInfo() != NULL) {
 		_info = image->GetImageDebugInfo();
-		_info->AddReference();
+		_info->AcquireReference();
 		return B_OK;
 	}
 
@@ -431,7 +431,7 @@ ThreadHandler::_GetStatementAtInstructionPointer(StackFrame* frame)
 //		Statement* statement = sourceCode->StatementAtAddress(
 //			frame->InstructionPointer());
 //		if (statement != NULL)
-//			statement->AddReference();
+//			statement->AcquireReference();
 //		return statement;
 //	}
 
@@ -522,7 +522,7 @@ ThreadHandler::_ClearContinuationState()
 	_UninstallTemporaryBreakpoint();
 
 	if (fStepStatement != NULL) {
-		fStepStatement->RemoveReference();
+		fStepStatement->ReleaseReference();
 		fStepStatement = NULL;
 	}
 
@@ -593,7 +593,7 @@ ThreadHandler::_HandleSingleStepStep(CpuState* cpuState)
 			}
 
 			StackTrace* stackTrace = fThread->GetStackTrace();
-			Reference<StackTrace> stackTraceReference(stackTrace);
+			BReference<StackTrace> stackTraceReference(stackTrace);
 
 			if (stackTrace == NULL && cpuState != NULL) {
 				if (fDebuggerInterface->GetArchitecture()->CreateStackTrace(
@@ -609,7 +609,7 @@ ThreadHandler::_HandleSingleStepStep(CpuState* cpuState)
 				if (GetImageDebugInfo(image, info) != B_OK)
 					return false;
 
-				Reference<ImageDebugInfo>(info, true);
+				BReference<ImageDebugInfo>(info, true);
 				if (info->GetAddressSectionType(
 						cpuState->InstructionPointer())
 						== ADDRESS_SECTION_TYPE_PLT) {

@@ -469,7 +469,7 @@ TeamDebugInfo::LoadSourceCode(LocatableFile* file, FileSourceCode*& _sourceCode)
 		->GetSourceLanguage(functionDebugInfo, language);
 	if (error != B_OK)
 		return error;
-	Reference<SourceLanguage> languageReference(language, true);
+	BReference<SourceLanguage> languageReference(language, true);
 
 	// no source code yet
 //	locker.Unlock();
@@ -489,7 +489,7 @@ TeamDebugInfo::LoadSourceCode(LocatableFile* file, FileSourceCode*& _sourceCode)
 	sourceFile->ReleaseReference();
 	if (sourceCode == NULL)
 		return B_NO_MEMORY;
-	Reference<FileSourceCode> sourceCodeReference(sourceCode, true);
+	BReference<FileSourceCode> sourceCodeReference(sourceCode, true);
 
 	error = sourceCode->Init();
 	if (error != B_OK)
@@ -673,7 +673,7 @@ TeamDebugInfo::FunctionByID(FunctionID* functionID) const
 			sourceFunctionID->SourceFilePath());
 		if (file == NULL)
 			return NULL;
-		Reference<LocatableFile> fileReference(file, true);
+		BReference<LocatableFile> fileReference(file, true);
 
 		if (SourceFileEntry* entry = fSourceFiles->Lookup(file))
 			return entry->FunctionByName(functionID->FunctionName());

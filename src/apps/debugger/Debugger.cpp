@@ -441,7 +441,7 @@ Debugger::_StartTeamDebugger(team_id teamID, thread_id threadID, bool stopInMain
 		fprintf(stderr, "Error: Out of memory!\n");
 		return NULL;
 	}
-	Reference<UserInterface> userInterfaceReference(userInterface, true);
+	BReference<UserInterface> userInterfaceReference(userInterface, true);
 
 	status_t error = B_NO_MEMORY;
 

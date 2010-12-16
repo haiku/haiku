@@ -26,7 +26,7 @@ class LocatableFile;
 class Team;
 
 
-class Image : public Referenceable, public DoublyLinkedListLinkImpl<Image> {
+class Image : public BReferenceable, public DoublyLinkedListLinkImpl<Image> {
 public:
 								Image(Team* team, const ImageInfo& imageInfo,
 									LocatableFile* imageFile);

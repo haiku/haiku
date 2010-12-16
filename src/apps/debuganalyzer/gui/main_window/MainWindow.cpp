@@ -73,9 +73,9 @@ MainWindow::~MainWindow()
 		fModelLoader->Delete();
 
 	if (fModel != NULL)
-		fModel->RemoveReference();
+		fModel->ReleaseReference();
 
-	fSubWindowManager->RemoveReference();
+	fSubWindowManager->ReleaseReference();
 }
 
 
@@ -90,7 +90,7 @@ printf("MSG_MODEL_LOADED_SUCCESSFULLY\n");
 			fModelLoader->Delete();
 			fModelLoader = NULL;
 			_SetModel(model);
-			model->RemoveReference();
+			model->ReleaseReference();
 			break;
 		}
 
@@ -196,12 +196,12 @@ void
 MainWindow::_SetModel(Model* model)
 {
 	if (fModel != NULL)
-		fModel->RemoveReference();
+		fModel->ReleaseReference();
 
 	fModel = model;
 
 	if (fModel != NULL)
-		fModel->AddReference();
+		fModel->AcquireReference();
 
 	fGeneralPage->SetModel(fModel);
 	fTeamsPage->SetModel(fModel);

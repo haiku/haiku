@@ -33,7 +33,7 @@ class TypeComponentPath;
 class Variable;
 
 
-class StackFrame : public Referenceable {
+class StackFrame : public BReferenceable {
 public:
 	class Listener;
 

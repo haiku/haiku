@@ -44,14 +44,14 @@ CpuStateEvent::CpuStateEvent(debug_debugger_message eventType, team_id team,
 	fCpuState(state)
 {
 	if (fCpuState != NULL)
-		fCpuState->AddReference();
+		fCpuState->AcquireReference();
 }
 
 
 CpuStateEvent::~CpuStateEvent()
 {
 	if (fCpuState != NULL)
-		fCpuState->RemoveReference();
+		fCpuState->ReleaseReference();
 }
 
 
