@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2010, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef DEBUGGER_INTERFACE_H
@@ -73,6 +74,7 @@ private:
 									const debug_debugger_message_data& message,
 									bool& _ignore, DebugEvent*& _event);
 
+			status_t			_GetNextDebuggerEvent(DebugEvent*& _event);
 			status_t			_GetNextSystemWatchEvent(DebugEvent*& _event);
 
 private:

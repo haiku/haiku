@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2010, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -319,9 +320,6 @@ status_t
 DebuggerInterface::GetNextDebugEvent(DebugEvent*& _event)
 {
 	while (true) {
-		debug_debugger_message_data message;
-		int32 messageCode;
-
 		object_wait_info infos[2];
 		infos[0].object = fDebuggerPort;
 		infos[0].type = B_OBJECT_TYPE_PORT;
@@ -338,35 +336,13 @@ DebuggerInterface::GetNextDebugEvent(DebugEvent*& _event)
 			return size;
 		}
 
-		if (infos[1].events & B_EVENT_READ)
+		if (infos[0].events & B_EVENT_READ)
+			return _GetNextDebuggerEvent(_event);
+		else if (infos[1].events & B_EVENT_READ)
 			return _GetNextSystemWatchEvent(_event);
-
-		size = read_port(fDebuggerPort, &messageCode, &message,
-			sizeof(message));
-		if (size < 0) {
-			if (size == B_INTERRUPTED)
-				continue;
-
-			return size;
-		}
-
-		if (message.origin.team != fTeamID)
-			continue;
-
-		bool ignore = false;
-		status_t error = _CreateDebugEvent(messageCode, message, ignore,
-			_event);
-		if (error != B_OK)
-			return error;
-
-		if (ignore) {
-			if (message.origin.thread >= 0 && message.origin.nub_port >= 0)
-				continue_thread(message.origin.nub_port, message.origin.thread);
-			continue;
-		}
-
-		return B_OK;
 	}
+
+	return B_OK;
 }
 
 
@@ -754,6 +730,43 @@ DebuggerInterface::_CreateDebugEvent(int32 messageCode,
 
 	_ignore = false;
 	_event = event;
+
+	return B_OK;
+}
+
+
+status_t
+DebuggerInterface::_GetNextDebuggerEvent(DebugEvent*& _event)
+{
+	while (true) {
+		debug_debugger_message_data message;
+		int32 messageCode;
+		ssize_t size = read_port(fDebuggerPort, &messageCode, &message,
+			sizeof(message));
+		if (size < 0) {
+			if (size == B_INTERRUPTED)
+				continue;
+
+			return size;
+		}
+
+		if (message.origin.team != fTeamID)
+			continue;
+
+		bool ignore = false;
+		status_t error = _CreateDebugEvent(messageCode, message, ignore,
+			_event);
+		if (error != B_OK)
+			return error;
+
+		if (ignore) {
+			if (message.origin.thread >= 0 && message.origin.nub_port >= 0)
+				continue_thread(message.origin.nub_port, message.origin.thread);
+			continue;
+		}
+
+		return B_OK;
+	}
 
 	return B_OK;
 }
