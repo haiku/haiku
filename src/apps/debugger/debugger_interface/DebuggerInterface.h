@@ -73,10 +73,13 @@ private:
 									const debug_debugger_message_data& message,
 									bool& _ignore, DebugEvent*& _event);
 
+			status_t			_GetNextSystemWatchEvent(DebugEvent*& _event);
+
 private:
 			team_id				fTeamID;
 			port_id				fDebuggerPort;
 			port_id				fNubPort;
+			port_id				fSystemWatchPort;
 			DebugContextPool*	fDebugContextPool;
 			Architecture*		fArchitecture;
 };

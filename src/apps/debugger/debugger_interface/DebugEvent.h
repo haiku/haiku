@@ -14,13 +14,21 @@
 class CpuState;
 
 
+// constants for synthetic events generated via the
+// start_system_watching() interface
+enum {
+	DEBUGGER_MESSAGE_THREAD_RENAMED				= 'dmtr',
+	DEBUGGER_MESSAGE_THREAD_PRIORITY_CHANGED	= 'dmpc'
+};
+
+
 class DebugEvent {
 public:
-								DebugEvent(debug_debugger_message eventType,
+								DebugEvent(int32 eventType,
 									team_id team, thread_id thread);
 	virtual						~DebugEvent();
 
-			debug_debugger_message EventType() const	{ return fEventType; }
+			int32 				EventType() const		{ return fEventType; }
 			team_id				Team() const			{ return fTeam; }
 			thread_id			Thread() const			{ return fThread; }
 
@@ -28,7 +36,7 @@ public:
 			void				SetThreadStopped(bool stopped);
 
 private:
-			debug_debugger_message fEventType;
+			int32 				fEventType;
 			team_id				fTeam;
 			thread_id			fThread;
 			bool				fThreadStopped;
@@ -124,6 +132,36 @@ public:
 
 private:
 			thread_id			fNewThread;
+};
+
+
+class ThreadRenamedEvent : public DebugEvent {
+public:
+								ThreadRenamedEvent(team_id team,
+									thread_id thread, thread_id renamedThread,
+									const char* name);
+
+			thread_id			RenamedThread() const { return fRenamedThread; }
+			const char*			NewName() const	{ return fName; }
+
+private:
+			thread_id			fRenamedThread;
+			char				fName[B_OS_NAME_LENGTH];
+};
+
+
+class ThreadPriorityChangedEvent : public DebugEvent {
+public:
+								ThreadPriorityChangedEvent(team_id team,
+									thread_id thread, thread_id changedThread,
+									int32 newPriority);
+
+			thread_id			ChangedThread() const { return fChangedThread; }
+			int32				NewPriority() const	{ return fNewPriority; }
+
+private:
+			thread_id			fChangedThread;
+			int32				fNewPriority;
 };
 
 
