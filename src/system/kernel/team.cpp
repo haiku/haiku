@@ -737,10 +737,10 @@ set_team_name(struct team* team, const char* name)
 static struct team*
 create_team_struct(const char* name, bool kernel)
 {
-	struct team* team = new(std::nothrow) struct team;
+	::team* team = new(std::nothrow) ::team;
 	if (team == NULL)
 		return NULL;
-	ObjectDeleter<struct team> teamDeleter(team);
+	ObjectDeleter< ::team> teamDeleter(team);
 
 	team->next = team->siblings_next = team->children = team->parent = NULL;
 	team->id = allocate_thread_id();
