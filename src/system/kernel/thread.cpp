@@ -97,16 +97,24 @@ public:
 	{
 	}
 
-	void Notify(uint32 eventCode, struct thread* thread)
+	void Notify(uint32 eventCode, team_id teamID, thread_id threadID,
+		struct thread* thread = NULL)
 	{
 		char eventBuffer[128];
 		KMessage event;
 		event.SetTo(eventBuffer, sizeof(eventBuffer), THREAD_MONITOR);
 		event.AddInt32("event", eventCode);
-		event.AddInt32("thread", thread->id);
-		event.AddPointer("threadStruct", thread);
+		event.AddInt32("team", teamID);
+		event.AddInt32("thread", threadID);
+		if (thread != NULL)
+			event.AddPointer("threadStruct", thread);
 
 		DefaultNotificationService::Notify(event, eventCode);
+	}
+
+	void Notify(uint32 eventCode, struct thread* thread)
+	{
+		return Notify(eventCode, thread->id, thread->team->id, thread);
 	}
 };
 
@@ -2533,33 +2541,34 @@ find_thread(const char *name)
 
 
 status_t
-rename_thread(thread_id id, const char *name)
+rename_thread(thread_id id, const char* name)
 {
-	struct thread *thread = thread_get_current_thread();
-	status_t status = B_BAD_THREAD_ID;
-	cpu_status state;
+	struct thread* thread = thread_get_current_thread();
 
 	if (name == NULL)
 		return B_BAD_VALUE;
 
-	state = disable_interrupts();
-	GRAB_THREAD_LOCK();
+	InterruptsSpinLocker locker(gThreadSpinlock);
 
-	if (thread->id != id)
+	if (thread->id != id) {
 		thread = thread_get_thread_struct_locked(id);
-
-	if (thread != NULL) {
-		if (thread->team == thread_get_current_thread()->team) {
-			strlcpy(thread->name, name, B_OS_NAME_LENGTH);
-			status = B_OK;
-		} else
-			status = B_NOT_ALLOWED;
+		if (thread == NULL)
+			return B_BAD_THREAD_ID;
+		if (thread->team != thread_get_current_thread()->team)
+			return B_NOT_ALLOWED;
 	}
 
-	RELEASE_THREAD_LOCK();
-	restore_interrupts(state);
+	strlcpy(thread->name, name, B_OS_NAME_LENGTH);
 
-	return status;
+	team_id teamID = thread->team->id;
+
+	locker.Unlock();
+
+	// notify listeners
+	sNotificationService.Notify(THREAD_NAME_CHANGED, teamID, id);
+		// don't pass the thread structure, as it's unsafe, if it isn't ours
+
+	return B_OK;
 }
 
 

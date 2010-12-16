@@ -25,9 +25,10 @@ struct thread_creation_attributes;
 
 
 // thread notifications
-#define THREAD_MONITOR	'_tm_'
-#define THREAD_ADDED	0x01
-#define THREAD_REMOVED	0x02
+#define THREAD_MONITOR		'_tm_'
+#define THREAD_ADDED		0x01
+#define THREAD_REMOVED		0x02
+#define THREAD_NAME_CHANGED	0x04
 
 
 #ifdef __cplusplus
