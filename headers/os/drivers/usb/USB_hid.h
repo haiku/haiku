@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2009, Haiku Inc. All Rights Reserved.
+ * Copyright 2004-2010, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _USB_HID_H
@@ -7,36 +7,120 @@
 
 
 #include <SupportDefs.h>
+#include <usb/USB_hid_page_alphanumeric_display.h>
+#include <usb/USB_hid_page_arcade.h>
+#include <usb/USB_hid_page_bar_code_scanner.h>
+#include <usb/USB_hid_page_battery_system.h>
+#include <usb/USB_hid_page_consumer.h>
+#include <usb/USB_hid_page_digitizers.h>
+#include <usb/USB_hid_page_game_controls.h>
+#include <usb/USB_hid_page_generic_desktop.h>
+#include <usb/USB_hid_page_generic_device_controls.h>
+#include <usb/USB_hid_page_keyboard.h>
+#include <usb/USB_hid_page_led.h>
+#include <usb/USB_hid_page_magnetic_stripe_reader.h>
+#include <usb/USB_hid_page_medical_instrument.h>
+#include <usb/USB_hid_page_pid.h>
+#include <usb/USB_hid_page_power_device.h>
+#include <usb/USB_hid_page_simulation.h>
+#include <usb/USB_hid_page_telephony.h>
+#include <usb/USB_hid_page_usb_monitor.h>
+#include <usb/USB_hid_page_vesa_virtual_controls.h>
+#include <usb/USB_hid_page_vr_controls.h>
+#include <usb/USB_hid_page_weighing_device.h>
 
 
-// (Partial) USB Class Definitions for HID Devices, version 1.11
-// Reference: http://www.usb.org/developers/devclass_docs/hid1_11.pdf
+/* References:
+ *
+ *		Device Class Definition for Human Interface Devices	(HID) Ver. 1.11
+ *		http://www.usb.org/developers/devclass_docs/hid1_11.pdf
+ *
+ *		HID Usage Tables Ver. 1.12
+ *		http://www.usb.org/developers/devclass_docs/Hut1_12.pdf
+ *
+ *		Device Class Definition for Physical Interface Deviced (PID) Ver. 1.0
+ *		http://www.usb.org/developers/devclass_docs/pid1_01.pdf
+ *
+ *		Universal Serial Bus Usage Tables for HID Power Devices Ver. 1.0
+ *		http://www.usb.org/developers/devclass_docs/pdcv10.pdf
+ *
+ *		HID Point of Sale Usage Tables Ver. 1.0
+ *		http://www.usb.org/developers/devclass_docs/pos1_02.pdf
+ *
+ *		USB Monitor Control Class Specification, Rev. 1.0
+ *		http://www.usb.org/developers/devclass_docs/usbmon10.pdf
+ *
+ *		Open Arcade Architecture Device (OAAD)
+ *		Data Format Specification Rev. 1.100
+ *		http://www.usb.org/developers/devclass_docs/oaaddataformatsv6.pdf
+ */
 
 #define USB_HID_DEVICE_CLASS 			0x03
 #define USB_HID_CLASS_VERSION			0x0100
 
 // HID Interface Subclasses
 enum {
-	USB_HID_INTERFACE_NO_SUBCLASS	= 0x00,	//  No Subclass
-	USB_HID_INTERFACE_BOOT_SUBCLASS			//	Boot Interface Subclass
+	B_USB_HID_INTERFACE_NO_SUBCLASS = 0x00,	//  No Subclass
+	B_USB_HID_INTERFACE_BOOT_SUBCLASS			//	Boot Interface Subclass
 };
 
 // HID Class-Specific descriptor subtypes
 enum {
-	USB_HID_DESCRIPTOR_HID			= 0x21,
-	USB_HID_DESCRIPTOR_REPORT,
-	USB_HID_DESCRIPTOR_PHYSICAL
+	B_USB_HID_DESCRIPTOR_HID = 0x21,
+	B_USB_HID_DESCRIPTOR_REPORT,
+	B_USB_HID_DESCRIPTOR_PHYSICAL
 };
 
 // HID Class-specific requests
 enum {
-	USB_REQUEST_HID_GET_REPORT		= 0x01,
-	USB_REQUEST_HID_GET_IDLE,
-	USB_REQUEST_HID_GET_PROTOCOL,
+	B_USB_REQUEST_HID_GET_REPORT = 0x01,
+	B_USB_REQUEST_HID_GET_IDLE,
+	B_USB_REQUEST_HID_GET_PROTOCOL,
 
-	USB_REQUEST_HID_SET_REPORT		= 0x09,
-	USB_REQUEST_HID_SET_IDLE,
-	USB_REQUEST_HID_SET_PROTOCOL
+	B_USB_REQUEST_HID_SET_REPORT = 0x09,
+	B_USB_REQUEST_HID_SET_IDLE,
+	B_USB_REQUEST_HID_SET_PROTOCOL
+};
+
+// HID Usage Pages
+enum {
+	B_HID_USAGE_PAGE_GENERIC_DESKTOP = 0x1,
+	B_HID_USAGE_PAGE_SIMULATION,
+	B_HID_USAGE_PAGE_VR,
+	B_HID_USAGE_PAGE_SPORT,
+	B_HID_USAGE_PAGE_GAME,
+	B_HID_USAGE_PAGE_GENERIC,
+	B_HID_USAGE_PAGE_KEYBOARD,
+	B_HID_USAGE_PAGE_LED,
+	B_HID_USAGE_PAGE_BUTTON,
+	B_HID_USAGE_PAGE_ORDINAL,
+	B_HID_USAGE_PAGE_TELEPHONY,
+	B_HID_USAGE_PAGE_CONSUMER,
+	B_HID_USAGE_PAGE_DIGITIZER,
+	
+	B_HID_USAGE_PAGE_PID = 0xf,
+	B_HID_USAGE_PAGE_UNICODE,
+	B_HID_USAGE_PAGE_ALPHANUM_DISPLAY = 0x14,
+	B_HID_USAGE_PAGE_MEDICAL = 0x40,
+
+	B_HID_USAGE_PAGE_USB_MONITOR = 0x80,  	// alt. B_HID_USAGE_PAGE_MONITOR_0,
+	B_HID_USAGE_PAGE_USB_ENUMERATED_VALUES,	// alt. B_HID_USAGE_PAGE_MONITOR_1,
+	B_HID_USAGE_PAGE_VESA_VIRTUAL_CONTROLS,	// alt. B_HID_USAGE_PAGE_MONITOR_2,
+	B_HID_USAGE_PAGE_MONITOR_3,
+	
+	B_HID_USAGE_PAGE_POWER_DEVICE = 0x84,	// alt. B_HID_USAGE_PAGE_POWER_0,
+	B_HID_USAGE_PAGE_BATTERY_SYSTEM,		// alt. B_HID_USAGE_PAGE_POWER_1,
+	B_HID_USAGE_PAGE_POWER_2,
+	B_HID_USAGE_PAGE_POWER_3,
+	
+	B_HID_USAGE_PAGE_BAR_CODE_SCANNER = 0x8c,
+	B_HID_USAGE_PAGE_WEIGHING_DEVICES,		// alt. B_HID_USAGE_PAGE_SCALE,
+	B_HID_USAGE_PAGE_MAGNETIC_STRIPE_READER,
+	B_HID_USAGE_PAGE_RESERVED_POS_PAGE,
+	B_HID_USAGE_PAGE_CAMERA_CONTROL,
+	B_HID_USAGE_PAGE_ARCADE,
+	
+	B_HID_USAGE_PAGE_MICROSOFT = 0xff00
 };
 
 typedef struct {
@@ -51,92 +135,5 @@ typedef struct {
 	} _PACKED descriptor_info [1];
 } _PACKED usb_hid_descriptor;
 
-
-/* Usage Pages/IDs */
-
-enum {
-	HID_USAGE_PAGE_GENERIC_DESKTOP = 0x1,
-	HID_USAGE_PAGE_SIMULATION,
-	HID_USAGE_PAGE_VR,
-	HID_USAGE_PAGE_SPORT,
-	HID_USAGE_PAGE_GAME,
-	HID_USAGE_PAGE_GENERIC,
-	HID_USAGE_PAGE_KEYBOARD,
-	HID_USAGE_PAGE_LED,
-	HID_USAGE_PAGE_BUTTON,
-	HID_USAGE_PAGE_ORDINAL,
-	HID_USAGE_PAGE_TELEPHONY,
-	HID_USAGE_PAGE_CONSUMER,
-	HID_USAGE_PAGE_DIGITIZER,
-	HID_USAGE_PAGE_PID = 0xf,
-	HID_USAGE_PAGE_UNICODE,
-	HID_USAGE_PAGE_ALPHANUM_DISPLAY = 0x14,
-	HID_USAGE_PAGE_MEDICAL = 0x40,
-	HID_USAGE_PAGE_MICROSOFT = 0xff00
-};
-
-/* Page 1: Generic Desktop */
-
-enum {
-	HID_USAGE_ID_POINTER = 0x1,
-	HID_USAGE_ID_MOUSE,
-	HID_USAGE_ID_JOYSTICK = 0x4,
-	HID_USAGE_ID_GAMEPAD,
-	HID_USAGE_ID_KEYBOARD,
-	HID_USAGE_ID_KEYPAD,
-	HID_USAGE_ID_MULTIAXIS = 0x8,
-
-	HID_USAGE_ID_X = 0x30,
-	HID_USAGE_ID_Y,
-	HID_USAGE_ID_Z,
-	HID_USAGE_ID_RX,
-	HID_USAGE_ID_RY,
-	HID_USAGE_ID_RZ,
-	HID_USAGE_ID_SLIDER,
-	HID_USAGE_ID_DIAL,
-	HID_USAGE_ID_WHEEL,
-	HID_USAGE_ID_HAT_SWITCH,
-	HID_USAGE_ID_COUNTED_BUFFER,
-	HID_USAGE_ID_BYTE_COUNT,
-	HID_USAGE_ID_MOTION_WAKEUP,
-	HID_USAGE_ID_START,
-	HID_USAGE_ID_SELECT,
-	HID_USAGE_ID_VX = 0x40,
-	HID_USAGE_ID_VY,
-	HID_USAGE_ID_VZ,
-	HID_USAGE_ID_VBRX,
-	HID_USAGE_ID_VBRY,
-	HID_USAGE_ID_VBRZ,
-	HID_USAGE_ID_VNO,
-	HID_USAGE_ID_FEATURE_NOTIFICATION
-};
-
-/* Page 2: Simulation */
-
-enum {
-	HID_USAGE_ID_RUDDER = 0xba,
-	HID_USAGE_ID_THROTTLE = 0xbb,
-};
-
-/* Page 7: Keyboard */
-
-enum {
-	HID_USAGE_ID_LEFT_CONTROL = 0xe0,
-	HID_USAGE_ID_LEFT_SHIFT,
-	HID_USAGE_ID_LEFT_ALT,
-	HID_USAGE_ID_LEFT_GUI,
-	HID_USAGE_ID_RIGHT_CONTROL,
-	HID_USAGE_ID_RIGHT_SHIFT,
-	HID_USAGE_ID_RIGHT_ALT,
-	HID_USAGE_ID_RIGHT_GUI
-};
-
-/* Page 8: LED */
-
-enum {
-	HID_USAGE_ID_LED_NUM_LOCK = 0x01,
-	HID_USAGE_ID_LED_CAPS_LOCK,
-	HID_USAGE_ID_LED_SCROLL_LOCK
-};
 
 #endif	// _USB_HID_H

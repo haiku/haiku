@@ -40,15 +40,15 @@ MouseDevice::MouseDevice(HIDReport *report, HIDReportItem *xAxis,
 		if (!item->HasData())
 			continue;
 
-		if (item->UsagePage() == HID_USAGE_PAGE_BUTTON
+		if (item->UsagePage() == B_HID_USAGE_PAGE_BUTTON
 			&& item->UsageID() - 1 < B_MAX_MOUSE_BUTTONS)
 			fButtons[buttonCount++] = item;
 	}
 
 	fButtons[buttonCount] = NULL;
 
-	fWheel = report->FindItem(HID_USAGE_PAGE_GENERIC_DESKTOP,
-		HID_USAGE_ID_WHEEL);
+	fWheel = report->FindItem(B_HID_USAGE_PAGE_GENERIC_DESKTOP,
+		B_HID_UID_GD_WHEEL);
 
 	TRACE("mouse device with %lu buttons and %swheel\n", buttonCount,
 		fWheel == NULL ? "no " : "");
@@ -60,13 +60,13 @@ ProtocolHandler *
 MouseDevice::AddHandler(HIDDevice *device, HIDReport *report)
 {
 	// try to find at least an x and y axis
-	HIDReportItem *xAxis = report->FindItem(HID_USAGE_PAGE_GENERIC_DESKTOP,
-		HID_USAGE_ID_X);
+	HIDReportItem *xAxis = report->FindItem(B_HID_USAGE_PAGE_GENERIC_DESKTOP,
+		B_HID_UID_GD_X);
 	if (xAxis == NULL)
 		return NULL;
 
-	HIDReportItem *yAxis = report->FindItem(HID_USAGE_PAGE_GENERIC_DESKTOP,
-		HID_USAGE_ID_Y);
+	HIDReportItem *yAxis = report->FindItem(B_HID_USAGE_PAGE_GENERIC_DESKTOP,
+		B_HID_UID_GD_Y);
 	if (yAxis == NULL)
 		return NULL;
 

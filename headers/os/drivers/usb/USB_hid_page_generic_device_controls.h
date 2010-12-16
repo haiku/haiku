@@ -1,0 +1,27 @@
+/*
+ * Copyright 2004-2010, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
+#ifndef _USB_HID_PAGE_GENERIC_DEVICE_CONTROLS_H
+#define _USB_HID_PAGE_GENERIC_DEVICE_CONTROLS_H
+
+
+/* Reference:
+ *		HID Usage Page 0x06: GENERIC DEVICE CONTROLS
+ *		HID Usage Tables Ver. 1.12
+ *		http://www.usb.org/developers/devclass_docs/Hut1_12.pdf
+ */
+
+// Usage IDs
+enum {
+	B_HID_UID_GDEV_BATTERY_STRENGTH = 0x20,
+	B_HID_UID_GDEV_WIRELESS_CHANNEL,
+	B_HID_UID_GDEV_WIRELESS_ID,
+	B_HID_UID_GDEV_DISCOVER_WIRELESS_CONTROL,
+	B_HID_UID_GDEV_SECURITY_CODE_CHARACTER_ENTERED,
+	B_HID_UID_GDEV_SECURITY_CODE_CHARACTER_ERASED,
+	B_HID_UID_GDEV_SECURITY_CODE_CLEARED
+};
+
+
+#endif // _USB_HID_PAGE_GENERIC_DEVICE_CONTROLS_H

@@ -73,9 +73,9 @@ KeyboardDevice::KeyboardDevice(HIDReport *inputReport, HIDReport *outputReport)
 		if (!item->HasData())
 			continue;
 
-		if (item->UsagePage() == HID_USAGE_PAGE_KEYBOARD
-			|| item->UsagePage() == HID_USAGE_PAGE_CONSUMER
-			|| item->UsagePage() == HID_USAGE_PAGE_BUTTON) {
+		if (item->UsagePage() == B_HID_USAGE_PAGE_KEYBOARD
+			|| item->UsagePage() == B_HID_USAGE_PAGE_CONSUMER
+			|| item->UsagePage() == B_HID_USAGE_PAGE_BUTTON) {
 			TRACE("keyboard item with usage %lx\n", item->UsageMinimum());
 
 			if (item->Array()) {
@@ -83,9 +83,9 @@ KeyboardDevice::KeyboardDevice(HIDReport *inputReport, HIDReport *outputReport)
 				if (fKeyCount < MAX_KEYS)
 					fKeys[fKeyCount++] = item;
 			} else {
-				if (item->UsagePage() == HID_USAGE_PAGE_KEYBOARD
-					&& item->UsageID() >= HID_USAGE_ID_LEFT_CONTROL
-					&& item->UsageID() <= HID_USAGE_ID_RIGHT_GUI) {
+				if (item->UsagePage() == B_HID_USAGE_PAGE_KEYBOARD
+					&& item->UsageID() >= B_HID_UID_KB_LEFT_CONTROL
+					&& item->UsageID() <= B_HID_UID_KB_RIGHT_GUI) {
 					// modifiers are generally implemented as bitmaps
 					if (fModifierCount < MAX_MODIFIERS)
 						fModifiers[fModifierCount++] = item;
@@ -118,15 +118,15 @@ KeyboardDevice::KeyboardDevice(HIDReport *inputReport, HIDReport *outputReport)
 
 			// the led item array is identity mapped with what we get from
 			// the input_server for the set-leds command
-			if (item->UsagePage() == HID_USAGE_PAGE_LED) {
+			if (item->UsagePage() == B_HID_USAGE_PAGE_LED) {
 				switch (item->UsageID()) {
-					case HID_USAGE_ID_LED_NUM_LOCK:
+					case B_HID_UID_LED_NUM_LOCK:
 						fLEDs[0] = item;
 						break;
-					case HID_USAGE_ID_LED_CAPS_LOCK:
+					case B_HID_UID_LED_CAPS_LOCK:
 						fLEDs[1] = item;
 						break;
-					case HID_USAGE_ID_LED_SCROLL_LOCK:
+					case B_HID_UID_LED_SCROLL_LOCK:
 						fLEDs[2] = item;
 						break;
 				}
@@ -165,12 +165,12 @@ KeyboardDevice::AddHandler(HIDDevice *device, HIDReport *input)
 		if (!item->HasData())
 			continue;
 
-		if (item->UsagePage() == HID_USAGE_PAGE_KEYBOARD
-			|| (item->UsagePage() == HID_USAGE_PAGE_CONSUMER && item->Array())
-			|| (item->UsagePage() == HID_USAGE_PAGE_BUTTON && item->Array())) {
+		if (item->UsagePage() == B_HID_USAGE_PAGE_KEYBOARD
+			|| (item->UsagePage() == B_HID_USAGE_PAGE_CONSUMER && item->Array())
+			|| (item->UsagePage() == B_HID_USAGE_PAGE_BUTTON && item->Array())) {
 			// found at least one item with a keyboard usage or with
 			// a consumer/button usage that is handled like a key
-			mayHaveOutput = item->UsagePage() == HID_USAGE_PAGE_KEYBOARD;
+			mayHaveOutput = item->UsagePage() == B_HID_USAGE_PAGE_KEYBOARD;
 			foundKeyboardUsage = true;
 			break;
 		}
@@ -190,7 +190,7 @@ KeyboardDevice::AddHandler(HIDDevice *device, HIDReport *input)
 
 			for (uint32 j = 0; j < output->CountItems(); j++) {
 				HIDReportItem *item = output->ItemAt(j);
-				if (item->UsagePage() == HID_USAGE_PAGE_LED) {
+				if (item->UsagePage() == B_HID_USAGE_PAGE_LED) {
 					foundOutputReport = true;
 					break;
 				}
@@ -405,7 +405,7 @@ KeyboardDevice::_ReadReport(bigtime_t timeout)
 
 		if (modifier->Extract() == B_OK && modifier->Valid()) {
 			modifiers |= (modifier->Data() & 1)
-				<< (modifier->UsageID() - HID_USAGE_ID_LEFT_CONTROL);
+				<< (modifier->UsageID() - B_HID_UID_KB_LEFT_CONTROL);
 		}
 	}
 
@@ -591,7 +591,7 @@ KeyboardDevice::_ReadReport(bigtime_t timeout)
 	bool phantomState = true;
 	for (size_t i = 0; i < fKeyCount; i++) {
 		if (fCurrentKeys[i] != 1
-			|| fKeys[i]->UsagePage() != HID_USAGE_PAGE_KEYBOARD) {
+			|| fKeys[i]->UsagePage() != B_HID_USAGE_PAGE_KEYBOARD) {
 			phantomState = false;
 			break;
 		}
@@ -613,7 +613,7 @@ KeyboardDevice::_ReadReport(bigtime_t timeout)
 	for (int32 twice = 0; twice < 2; twice++) {
 		for (size_t i = 0; i < fKeyCount; i++) {
 			if (current[i] == 0 || (current[i] == 1
-				&& fKeys[i]->UsagePage() == HID_USAGE_PAGE_KEYBOARD))
+				&& fKeys[i]->UsagePage() == B_HID_USAGE_PAGE_KEYBOARD))
 				continue;
 
 			bool found = false;
@@ -629,7 +629,7 @@ KeyboardDevice::_ReadReport(bigtime_t timeout)
 
 			// a change occured
 			uint32 key = 0;
-			if (fKeys[i]->UsagePage() == HID_USAGE_PAGE_KEYBOARD) {
+			if (fKeys[i]->UsagePage() == B_HID_USAGE_PAGE_KEYBOARD) {
 				if (current[i] < kKeyTableSize)
 					key = kKeyTable[current[i]];
 

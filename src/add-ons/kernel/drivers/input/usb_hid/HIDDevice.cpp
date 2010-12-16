@@ -49,7 +49,7 @@ HIDDevice::HIDDevice(usb_device device, const usb_configuration_info *config,
 	status_t result = gUSBModule->send_request(device,
 		USB_REQTYPE_INTERFACE_IN | USB_REQTYPE_STANDARD,
 		USB_REQUEST_GET_DESCRIPTOR,
-		USB_HID_DESCRIPTOR_HID << 8, interfaceIndex, descriptorLength,
+		B_USB_HID_DESCRIPTOR_HID << 8, interfaceIndex, descriptorLength,
 		hidDescriptor, &descriptorLength);
 
 	TRACE("get hid descriptor: result: 0x%08lx; length: %lu\n", result,
@@ -70,7 +70,7 @@ HIDDevice::HIDDevice(usb_device device, const usb_configuration_info *config,
 	result = gUSBModule->send_request(device,
 		USB_REQTYPE_INTERFACE_IN | USB_REQTYPE_STANDARD,
 		USB_REQUEST_GET_DESCRIPTOR,
-		USB_HID_DESCRIPTOR_REPORT << 8, interfaceIndex, descriptorLength,
+		B_USB_HID_DESCRIPTOR_REPORT << 8, interfaceIndex, descriptorLength,
 		reportDescriptor, &descriptorLength);
 
 	TRACE("get report descriptor: result: 0x%08lx; length: %lu\n", result,
@@ -215,7 +215,7 @@ HIDDevice::SendReport(HIDReport *report)
 	size_t actualLength;
 	return gUSBModule->send_request(fDevice,
 		USB_REQTYPE_INTERFACE_OUT | USB_REQTYPE_CLASS,
-		USB_REQUEST_HID_SET_REPORT, 0x200 | report->ID(), fInterfaceIndex,
+		B_USB_REQUEST_HID_SET_REPORT, 0x200 | report->ID(), fInterfaceIndex,
 		report->ReportSize(), report->CurrentReport(), &actualLength);
 }
 
