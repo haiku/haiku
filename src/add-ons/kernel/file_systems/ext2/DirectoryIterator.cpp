@@ -309,11 +309,13 @@ DirectoryIterator::FindEntry(const char* name, ino_t* _id)
 	ino_t id;
 
 	status_t status = B_OK;
+	size_t length = strlen(name);
 	while (status == B_OK) {
 		size_t nameLength = EXT2_NAME_LENGTH;
 		status = Get(buffer, &nameLength, &id);
 		if (status == B_OK) {
-			if (strncmp(name, buffer, nameLength) == 0) {
+			if (length == nameLength 
+				&& strncmp(name, buffer, nameLength) == 0) {
 				if (_id != NULL)
 					*_id = id;
 				return B_OK;
