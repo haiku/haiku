@@ -100,7 +100,35 @@ public:
 };
 
 
-static hash_table* sTeamHash = NULL;
+struct TeamHashDefinition {
+	typedef team_id		KeyType;
+	typedef	struct team	ValueType;
+
+	size_t HashKey(team_id key) const
+	{
+		return key;
+	}
+
+	size_t Hash(struct team* value) const
+	{
+		return HashKey(value->id);
+	}
+
+	bool Compare(team_id key, struct team* value) const
+	{
+		return value->id == key;
+	}
+
+	struct team*& GetLink(struct team* value) const
+	{
+		return value->next;
+	}
+};
+
+typedef BOpenHashTable<TeamHashDefinition> TeamHashTable;
+
+
+static TeamHashTable sTeamHash;
 static hash_table* sGroupHash = NULL;
 static struct team* sKernelTeam = NULL;
 
@@ -368,8 +396,6 @@ _dump_team_info(struct team* team)
 static int
 dump_team_info(int argc, char** argv)
 {
-	struct hash_iterator iterator;
-	struct team* team;
 	team_id id = -1;
 	bool found = false;
 
@@ -390,8 +416,8 @@ dump_team_info(int argc, char** argv)
 	}
 
 	// walk through the thread list, trying to match name or id
-	hash_open(sTeamHash, &iterator);
-	while ((team = (struct team*)hash_next(sTeamHash, &iterator)) != NULL) {
+	for (TeamHashTable::Iterator it = sTeamHash.GetIterator();
+		struct team* team = it.Next();) {
 		if ((team->name && strcmp(argv[1], team->name) == 0)
 			|| team->id == id) {
 			_dump_team_info(team);
@@ -399,7 +425,6 @@ dump_team_info(int argc, char** argv)
 			break;
 		}
 	}
-	hash_close(sTeamHash, &iterator, false);
 
 	if (!found)
 		kprintf("team \"%s\" (%ld) doesn't exist!\n", argv[1], id);
@@ -410,44 +435,14 @@ dump_team_info(int argc, char** argv)
 static int
 dump_teams(int argc, char** argv)
 {
-	struct hash_iterator iterator;
-	struct team* team;
-
 	kprintf("team           id  parent      name\n");
-	hash_open(sTeamHash, &iterator);
 
-	while ((team = (struct team*)hash_next(sTeamHash, &iterator)) != NULL) {
+	for (TeamHashTable::Iterator it = sTeamHash.GetIterator();
+		struct team* team = it.Next();) {
 		kprintf("%p%7ld  %p  %s\n", team, team->id, team->parent, team->name);
 	}
 
-	hash_close(sTeamHash, &iterator, false);
 	return 0;
-}
-
-
-static int
-team_struct_compare(void* _p, const void* _key)
-{
-	struct team* p = (struct team*)_p;
-	const struct team_key* key = (const struct team_key*)_key;
-
-	if (p->id == key->id)
-		return 0;
-
-	return 1;
-}
-
-
-static uint32
-team_struct_hash(void* _p, const void* _key, uint32 range)
-{
-	struct team* p = (struct team*)_p;
-	const struct team_key* key = (const struct team_key*)_key;
-
-	if (p != NULL)
-		return p->id % range;
-
-	return (uint32)key->id % range;
 }
 
 
@@ -742,10 +737,10 @@ set_team_name(struct team* team, const char* name)
 static struct team*
 create_team_struct(const char* name, bool kernel)
 {
-	struct team* team = (struct team*)malloc(sizeof(struct team));
+	struct team* team = new(std::nothrow) struct team;
 	if (team == NULL)
 		return NULL;
-	MemoryDeleter teamDeleter(team);
+	ObjectDeleter<struct team> teamDeleter(team);
 
 	team->next = team->siblings_next = team->children = team->parent = NULL;
 	team->id = allocate_thread_id();
@@ -840,6 +835,9 @@ create_team_struct(const char* name, bool kernel)
 static void
 delete_team_struct(struct team* team)
 {
+	// get rid of all associated data
+	team->PrepareForDeletion();
+
 	while (death_entry* threadDeathEntry = (death_entry*)list_remove_head_item(
 			&team->dead_threads)) {
 		free(threadDeathEntry);
@@ -860,7 +858,7 @@ delete_team_struct(struct team* team)
 	delete team->continued_children;
 	delete team->stopped_children;
 	delete team->dead_children;
-	free(team);
+	delete team;
 }
 
 
@@ -1206,7 +1204,7 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 	// inherit the parent's user/group
 	inherit_parent_user_and_group_locked(team, parent);
 
-	hash_insert(sTeamHash, team);
+	sTeamHash.InsertUnchecked(team);
 	insert_team_into_parent(parent, team);
 	insert_team_into_group(parent->group, team);
 	sUsedTeams++;
@@ -1331,7 +1329,7 @@ err1:
 
 	remove_team_from_group(team);
 	remove_team_from_parent(team->parent, team);
-	hash_remove(sTeamHash, team);
+	sTeamHash.RemoveUnchecked(team);
 
 	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
@@ -1546,7 +1544,7 @@ fork_team(void)
 	// Inherit the parent's user/group.
 	inherit_parent_user_and_group_locked(team, parentTeam);
 
-	hash_insert(sTeamHash, team);
+	sTeamHash.InsertUnchecked(team);
 	insert_team_into_parent(parentTeam, team);
 	insert_team_into_group(parentTeam->group, team);
 	sUsedTeams++;
@@ -1687,7 +1685,7 @@ err1:
 
 	remove_team_from_group(team);
 	remove_team_from_parent(parentTeam, team);
-	hash_remove(sTeamHash, team);
+	sTeamHash.RemoveUnchecked(team);
 
 	teamLocker.Unlock();
 
@@ -2058,8 +2056,9 @@ team_init(kernel_args* args)
 	struct process_group* group;
 
 	// create the team hash table
-	sTeamHash = hash_init(16, offsetof(struct team, next),
-		&team_struct_compare, &team_struct_hash);
+	new(&sTeamHash) TeamHashTable;
+	if (sTeamHash.Init(32) != B_OK)
+		panic("Failed to init team hash table!");
 
 	sGroupHash = hash_init(16, offsetof(struct process_group, next),
 		&process_group_compare, &process_group_hash);
@@ -2099,7 +2098,7 @@ team_init(kernel_args* args)
 		panic("could not create io_context for kernel team!\n");
 
 	// stick it in the team hash
-	hash_insert(sTeamHash, sKernelTeam);
+	sTeamHash.InsertUnchecked(sKernelTeam);
 
 	add_debugger_command_etc("team", &dump_team_info,
 		"Dump info about a particular team",
@@ -2138,18 +2137,13 @@ team_used_teams(void)
 struct team*
 team_iterate_through_teams(team_iterator_callback callback, void* cookie)
 {
-	struct hash_iterator iterator;
-	hash_open(sTeamHash, &iterator);
-
-	struct team* team;
-	while ((team = (struct team*)hash_next(sTeamHash, &iterator)) != NULL) {
+	for (TeamHashTable::Iterator it = sTeamHash.GetIterator();
+		struct team* team = it.Next();) {
 		if (callback(team, cookie))
-			break;
+			return team;
 	}
 
-	hash_close(sTeamHash, &iterator, false);
-
-	return team;
+	return NULL;
 }
 
 
@@ -2204,10 +2198,7 @@ team_is_valid(team_id id)
 struct team*
 team_get_team_struct_locked(team_id id)
 {
-	struct team_key key;
-	key.id = id;
-
-	return (struct team*)hash_lookup(sTeamHash, &key);
+	return sTeamHash.Lookup(id);
 }
 
 
@@ -2331,7 +2322,7 @@ team_remove_team(struct team* team)
 	// mutex_lock_threads_lock(<team related lock>), as used in the VFS code to
 	// lock another team's IO context.
 	GRAB_THREAD_LOCK();
-	hash_remove(sTeamHash, team);
+	sTeamHash.RemoveUnchecked(team);
 	RELEASE_THREAD_LOCK();
 	sUsedTeams--;
 
@@ -2822,6 +2813,127 @@ team_free_user_thread(struct thread* thread)
 	entry->thread = userThread;
 	entry->next = thread->team->free_user_threads;
 	thread->team->free_user_threads = entry;
+}
+
+
+//	#pragma mark - Associated data interface
+
+
+AssociatedData::AssociatedData()
+	:
+	fOwner(NULL)
+{
+}
+
+
+AssociatedData::~AssociatedData()
+{
+}
+
+
+void
+AssociatedData::OwnerDeleted(AssociatedDataOwner* owner)
+{
+}
+
+
+AssociatedDataOwner::AssociatedDataOwner()
+{
+	mutex_init(&fLock, "associated data owner");
+}
+
+
+AssociatedDataOwner::~AssociatedDataOwner()
+{
+	mutex_destroy(&fLock);
+}
+
+
+bool
+AssociatedDataOwner::AddData(AssociatedData* data)
+{
+	MutexLocker locker(fLock);
+
+	if (data->Owner() != NULL)
+		return false;
+
+	data->AcquireReference();
+	fList.Add(data);
+	data->SetOwner(this);
+
+	return true;
+}
+
+
+bool
+AssociatedDataOwner::RemoveData(AssociatedData* data)
+{
+	MutexLocker locker(fLock);
+
+	if (data->Owner() != this)
+		return false;
+
+	data->SetOwner(NULL);
+	fList.Remove(data);
+
+	locker.Unlock();
+
+	data->ReleaseReference();
+
+	return true;
+}
+
+
+void
+AssociatedDataOwner::PrepareForDeletion()
+{
+	MutexLocker locker(fLock);
+
+	// move all data to a temporary list and unset the owner
+	DataList list;
+	list.MoveFrom(&fList);
+
+	for (DataList::Iterator it = list.GetIterator();
+		AssociatedData* data = it.Next();) {
+		data->SetOwner(NULL);
+	}
+
+	locker.Unlock();
+
+	// call the notification hooks and release our references
+	while (AssociatedData* data = list.RemoveHead()) {
+		data->OwnerDeleted(this);
+		data->ReleaseReference();
+	}
+}
+
+
+/*!	Associates data with the current team.
+	When the team is deleted, the data object is notified.
+	The team acquires a reference to the object.
+
+	\param data The data object.
+	\return \c true on success, \c false otherwise. Fails only when the supplied
+		data object is already associated with another owner.
+*/
+bool
+team_associate_data(AssociatedData* data)
+{
+	return thread_get_current_thread()->team->AddData(data);
+}
+
+
+/*!	Dissociates data from the current team.
+	Balances an earlier call to team_associate_data().
+
+	\param data The data object.
+	\return \c true on success, \c false otherwise. Fails only when the data
+		object is not associated with the current team.
+*/
+bool
+team_dissociate_data(AssociatedData* data)
+{
+	return thread_get_current_thread()->team->RemoveData(data);
 }
 
 

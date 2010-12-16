@@ -10,8 +10,11 @@
 
 #ifndef _ASSEMBLER
 
+#include <Referenceable.h>
+
 #include <arch/thread_types.h>
 #include <condition_variable.h>
+#include <lock.h>
 #include <signal.h>
 #include <smp.h>
 #include <thread_defs.h>
@@ -58,6 +61,7 @@ typedef enum job_control_state {
 struct image;					// defined in image.c
 struct io_context;
 struct realtime_sem_context;	// defined in realtime_sem.cpp
+struct scheduler_thread_data;
 struct select_info;
 struct user_thread;				// defined in libroot/user_thread.h
 struct xsi_sem_context;			// defined in xsi_semaphore.cpp
@@ -154,9 +158,48 @@ struct free_user_thread {
 	struct user_thread*			thread;
 };
 
-struct scheduler_thread_data;
 
-struct team {
+class AssociatedDataOwner;
+
+class AssociatedData : public Referenceable,
+	public DoublyLinkedListLinkImpl<AssociatedData> {
+public:
+								AssociatedData();
+	virtual						~AssociatedData();
+
+			AssociatedDataOwner* Owner() const
+									{ return fOwner; }
+			void				SetOwner(AssociatedDataOwner* owner)
+									{ fOwner = owner; }
+
+	virtual	void				OwnerDeleted(AssociatedDataOwner* owner);
+
+private:
+			AssociatedDataOwner* fOwner;
+};
+
+
+class AssociatedDataOwner {
+public:
+								AssociatedDataOwner();
+								~AssociatedDataOwner();
+
+			bool				AddData(AssociatedData* data);
+			bool				RemoveData(AssociatedData* data);
+
+			void				PrepareForDeletion();
+
+private:
+			typedef DoublyLinkedList<AssociatedData> DataList;
+
+private:
+
+			mutex				fLock;
+			DataList			fList;
+};
+
+
+struct team : AssociatedDataOwner {
 	struct team		*next;			// next in hash
 	struct team		*siblings_next;
 	struct team		*parent;
