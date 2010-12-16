@@ -301,7 +301,7 @@ private:
 
 		// send the message
 		if (targetCount > 0)
-			_SendMessage(targets, targetCount, teamID, opcode);
+			_SendMessage(targets, targetCount, object, opcode);
 	}
 
 	void _AddTargets(ListenerList* listenerList, uint32 flags,
