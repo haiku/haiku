@@ -12,7 +12,7 @@ ServerConnectionProvider::ServerConnectionProvider(VolumeManager* volumeManager,
 	ExtendedServerInfo* serverInfo,
 	vnode_id connectionBrokenTarget)
 	:
-	BReferenceable(true),
+	BReferenceable(),
 	fLock("server connection provider"),
 	fVolumeManager(volumeManager),
 	fServerInfo(serverInfo),
@@ -20,7 +20,7 @@ ServerConnectionProvider::ServerConnectionProvider(VolumeManager* volumeManager,
 	fConnectionBrokenTarget(connectionBrokenTarget)
 {
 	if (fServerInfo)
-		fServerInfo->AddReference();
+		fServerInfo->AcquireReference();
 }
 
 // destructor
@@ -29,11 +29,11 @@ ServerConnectionProvider::~ServerConnectionProvider()
 	AutoLocker<Locker> _(fLock);
 	if (fServerConnection) {
 		fServerConnection->Close();
-		fServerConnection->RemoveReference();
+		fServerConnection->ReleaseReference();
 	}
 
 	if (fServerInfo)
-		fServerInfo->RemoveReference();
+		fServerInfo->ReleaseReference();
 }
 
 // Init
@@ -64,7 +64,7 @@ ServerConnectionProvider::GetServerConnection(
 	if (!fServerConnection->IsConnected())
 		return B_ERROR;
 
-	fServerConnection->AddReference();
+	fServerConnection->AcquireReference();
 	*serverConnection = fServerConnection;
 	return B_OK;
 }
@@ -79,7 +79,7 @@ ServerConnectionProvider::GetExistingServerConnection()
 	if (!fServerConnection || !fServerConnection->IsConnected())
 		return NULL;
 
-	fServerConnection->AddReference();
+	fServerConnection->AcquireReference();
 	return fServerConnection;
 }
 

@@ -10,7 +10,7 @@
 
 // constructor
 NodeMonitoringEvent::NodeMonitoringEvent()
-	: BReferenceable(true),
+	: BReferenceable(),
 	  time(system_time()),
 	  queryHandler(NULL),
 	  remotePort(-1),
@@ -22,7 +22,7 @@ NodeMonitoringEvent::NodeMonitoringEvent()
 NodeMonitoringEvent::~NodeMonitoringEvent()
 {
 	if (queryHandler)
-		queryHandler->RemoveReference();
+		queryHandler->ReleaseReference();
 }
 
 

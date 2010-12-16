@@ -90,7 +90,7 @@ UnixEndpoint::Uninit()
 		Close();
 	}
 
-	RemoveReference();
+	ReleaseReference();
 }
 
 
@@ -115,7 +115,7 @@ UnixEndpoint::Close()
 	TRACE("[%ld] %p->UnixEndpoint::Close()\n", find_thread(NULL), this);
 
 	UnixEndpointLocker locker(this);
-	
+
 	if (fState == UNIX_ENDPOINT_CONNECTED) {
 		UnixEndpointLocker peerLocker;
 		if (_LockConnectedEndpoints(locker, peerLocker) == B_OK) {
@@ -317,7 +317,7 @@ UnixEndpoint::Connect(const struct sockaddr *_address)
 	UnixEndpoint* listeningEndpoint = gAddressManager.Lookup(unixAddress);
 	if (listeningEndpoint == NULL)
 		RETURN_ERROR(ECONNREFUSED);
-	Reference<UnixEndpoint> peerReference(listeningEndpoint);
+	BReference<UnixEndpoint> peerReference(listeningEndpoint);
 	addressLocker.Unlock();
 
 	UnixEndpointLocker peerLocker(listeningEndpoint);
@@ -359,7 +359,7 @@ UnixEndpoint::Connect(const struct sockaddr *_address)
 
 	fPeerEndpoint = connectedEndpoint;
 	PeerAddress().SetTo(&connectedEndpoint->socket->address);
-	fPeerEndpoint->AddReference();
+	fPeerEndpoint->AcquireReference();
 	fReceiveFifo = fifo;
 
 	fCredentials.pid = getpid();
@@ -433,7 +433,7 @@ UnixEndpoint::Send(const iovec *vecs, size_t vecCount,
 
 	UnixEndpointLocker locker(this);
 
-	Reference<UnixEndpoint> peerReference;
+	BReference<UnixEndpoint> peerReference;
 	UnixEndpointLocker peerLocker;
 
 	status_t error = _LockConnectedEndpoints(locker, peerLocker);
@@ -445,7 +445,7 @@ UnixEndpoint::Send(const iovec *vecs, size_t vecCount,
 
 	// lock the peer's FIFO
 	UnixFifo* peerFifo = peerEndpoint->fReceiveFifo;
-	Reference<UnixFifo> _(peerFifo);
+	BReference<UnixFifo> _(peerFifo);
 	UnixFifoLocker fifoLocker(peerFifo);
 
 	// unlock endpoints
@@ -530,7 +530,7 @@ UnixEndpoint::Receive(const iovec *vecs, size_t vecCount,
 		RETURN_ERROR(ENOTCONN);
 
 	UnixEndpoint* peerEndpoint = fPeerEndpoint;
-	Reference<UnixEndpoint> peerReference(peerEndpoint);
+	BReference<UnixEndpoint> peerReference(peerEndpoint);
 
 	// Copy the peer address upfront. This way, if we read something, we don't
 	// get into a potential race with Close().
@@ -542,7 +542,7 @@ UnixEndpoint::Receive(const iovec *vecs, size_t vecCount,
 
 	// lock our FIFO
 	UnixFifo* fifo = fReceiveFifo;
-	Reference<UnixFifo> _(fifo);
+	BReference<UnixFifo> _(fifo);
 	UnixFifoLocker fifoLocker(fifo);
 
 	// unlock endpoint
@@ -742,7 +742,7 @@ UnixEndpoint::_Spawn(UnixEndpoint* connectingEndpoint,
 
 	fIsChild = true;
 	fPeerEndpoint = connectingEndpoint;
-	fPeerEndpoint->AddReference();
+	fPeerEndpoint->AcquireReference();
 
 	fReceiveFifo = fifo;
 
@@ -769,7 +769,7 @@ UnixEndpoint::_Disconnect()
 	gSocketModule->notify(socket, B_SELECT_WRITE, ECONNRESET);
 
 	// Unset the peer endpoint.
-	fPeerEndpoint->RemoveReference();
+	fPeerEndpoint->ReleaseReference();
 	fPeerEndpoint = NULL;
 
 	// We're officially disconnected.
@@ -788,7 +788,7 @@ UnixEndpoint::_LockConnectedEndpoints(UnixEndpointLocker& locker,
 
 	// We need to lock the peer, too. Get a reference -- we might need to
 	// unlock ourselves to get the locking order right.
-	Reference<UnixEndpoint> peerReference(fPeerEndpoint);
+	BReference<UnixEndpoint> peerReference(fPeerEndpoint);
 	UnixEndpoint* peerEndpoint = fPeerEndpoint;
 
 	if (fIsChild) {
@@ -852,7 +852,7 @@ void
 UnixEndpoint::_UnsetReceiveFifo()
 {
 	if (fReceiveFifo) {
-		fReceiveFifo->RemoveReference();
+		fReceiveFifo->ReleaseReference();
 		fReceiveFifo = NULL;
 	}
 }

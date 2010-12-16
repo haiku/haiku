@@ -147,7 +147,7 @@ VirtualVolume::AddChildVolume(Volume* volume)
 
 	// set the volume's parent volume
 	volume->SetParentVolume(this);
-	AddReference();
+	AcquireReference();
 
 	// send out a notification
 	vnode_id dirID = fRootNode->GetID();
@@ -290,7 +290,7 @@ VirtualVolume::ReadVNode(vnode_id vnid, char reenter, Node** node)
 	*node = fRootNode;
 
 	// add a volume reference for the node
-	AddReference();
+	AcquireReference();
 
 	return B_OK;
 }

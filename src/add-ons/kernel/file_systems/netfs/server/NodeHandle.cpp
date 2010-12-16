@@ -21,7 +21,7 @@
 
 // constructor
 NodeHandle::NodeHandle()
-	: BReferenceable(true),
+	: BReferenceable(),
 	  Lockable(),
 	  fCookie(-1),
 	  fNodeRef()

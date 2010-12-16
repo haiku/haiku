@@ -84,7 +84,7 @@ private:
 };
 
 
-class UnixFifo : public Referenceable {
+class UnixFifo : public BReferenceable {
 public:
 	UnixFifo(size_t capacity);
 	~UnixFifo();

@@ -38,7 +38,7 @@ public:
 		:
 		BHandler(),
 		QueryListener(),
-		BReferenceable(true),
+		BReferenceable(),
 		fListener(listener),
 		fQueryDomain(queryDomain),
 		fHandle(handle)
@@ -77,7 +77,7 @@ public:
 				}
 				if (event) {
 					event->queryHandler = this;
-					AddReference();
+					AcquireReference();
 					if (event->Init(message) == B_OK)
 						fListener->ProcessNodeMonitoringEvent(event);
 					else
@@ -98,7 +98,7 @@ public:
 			looper->Unlock();
 		}
 		handle->SetQueryListener(NULL);
-		RemoveReference();
+		ReleaseReference();
 	}
 
 private:
@@ -227,21 +227,21 @@ VolumeManager::~VolumeManager()
 	// entry created events
 	for (EntryCreatedEventMap::Iterator it = fEntryCreatedEvents->GetIterator();
 		 it.HasNext();) {
-		it.Next().value->RemoveReference();
+		it.Next().value->ReleaseReference();
 	}
 	delete fEntryCreatedEvents;
 
 	// entry removed events
 	for (EntryRemovedEventMap::Iterator it = fEntryRemovedEvents->GetIterator();
 		 it.HasNext();) {
-		it.Next().value->RemoveReference();
+		it.Next().value->ReleaseReference();
 	}
 	delete fEntryRemovedEvents;
 
 	// entry moved events
 	for (EntryMovedEventMap::Iterator it = fEntryMovedEvents->GetIterator();
 		 it.HasNext();) {
-		it.Next().value->RemoveReference();
+		it.Next().value->ReleaseReference();
 	}
 	delete fEntryMovedEvents;
 
@@ -249,7 +249,7 @@ VolumeManager::~VolumeManager()
 	for (NodeStatChangedEventMap::Iterator it
 			= fNodeStatChangedEvents->GetIterator();
 		 it.HasNext();) {
-		it.Next().value->RemoveReference();
+		it.Next().value->ReleaseReference();
 	}
 	delete fNodeStatChangedEvents;
 
@@ -257,7 +257,7 @@ VolumeManager::~VolumeManager()
 	for (NodeAttributeChangedEventMap::Iterator it
 			= fNodeAttributeChangedEvents->GetIterator();
 		 it.HasNext();) {
-		it.Next().value->RemoveReference();
+		it.Next().value->ReleaseReference();
 	}
 	delete fNodeAttributeChangedEvents;
 
@@ -1071,13 +1071,13 @@ VolumeManager::_EntryCreated(EntryCreatedEvent* event)
 		fEntryCreatedEvents->Remove(ref);
 		fRecentNodeMonitoringEvents.Remove(oldEvent);
 		notify = !_IsRecentEvent(oldEvent);
-		oldEvent->RemoveReference();
+		oldEvent->ReleaseReference();
 	}
 
 	// add the new event
 	if (fEntryCreatedEvents->Put(ref, event) == B_OK) {
 		fRecentNodeMonitoringEvents.Insert(event);
-		event->AddReference();
+		event->AcquireReference();
 	}
 
 	// if the directory is complete or at least has iterators attached to it,
@@ -1148,13 +1148,13 @@ VolumeManager::_EntryRemoved(EntryRemovedEvent* event, bool keepNode)
 		fEntryRemovedEvents->Remove(ref);
 		fRecentNodeMonitoringEvents.Remove(oldEvent);
 		notify = !_IsRecentEvent(oldEvent);
-		oldEvent->RemoveReference();
+		oldEvent->ReleaseReference();
 	}
 
 	// add the new event
 	if (fEntryRemovedEvents->Put(ref, event) == B_OK) {
 		fRecentNodeMonitoringEvents.Insert(event);
-		event->AddReference();
+		event->AcquireReference();
 	}
 
 	// remove the entry
@@ -1236,13 +1236,13 @@ VolumeManager::_EntryMoved(EntryMovedEvent* event)
 			fEntryMovedEvents->Remove(key);
 			fRecentNodeMonitoringEvents.Remove(oldEvent);
 			notify = !_IsRecentEvent(oldEvent);
-			oldEvent->RemoveReference();
+			oldEvent->ReleaseReference();
 		}
 
 		// add the new event
 		if (fEntryMovedEvents->Put(key, event) == B_OK) {
 			fRecentNodeMonitoringEvents.Insert(event);
-			event->AddReference();
+			event->AcquireReference();
 		}
 	}
 
@@ -1301,7 +1301,7 @@ VolumeManager::_EntryMoved(EntryMovedEvent* event)
 					if (event->fromName.GetLength() > 0)
 						removedEvent->name = event->fromName;
 					clientVolume->ProcessNodeMonitoringEvent(removedEvent);
-					removedEvent->RemoveReference();
+					removedEvent->ReleaseReference();
 				}
 			} else if (containsTo) {
 				// contains only the target directory: generate an
@@ -1316,7 +1316,7 @@ VolumeManager::_EntryMoved(EntryMovedEvent* event)
 				createdEvent->directoryID = event->toDirectoryID;
 				createdEvent->name = event->toName;
 				clientVolume->ProcessNodeMonitoringEvent(createdEvent);
-				createdEvent->RemoveReference();
+				createdEvent->ReleaseReference();
 			}
 		}
 	}
@@ -1341,13 +1341,13 @@ VolumeManager::_NodeStatChanged(StatChangedEvent* event)
 		fNodeStatChangedEvents->Remove(ref);
 		fRecentNodeMonitoringEvents.Remove(oldEvent);
 		notify = !_IsRecentEvent(oldEvent);
-		oldEvent->RemoveReference();
+		oldEvent->ReleaseReference();
 	}
 
 	// add the new event
 	if (fNodeStatChangedEvents->Put(ref, event) == B_OK) {
 		fRecentNodeMonitoringEvents.Insert(event);
-		event->AddReference();
+		event->AcquireReference();
 	}
 
 	if (notify) {
@@ -1384,13 +1384,13 @@ VolumeManager::_NodeAttributeChanged(AttributeChangedEvent* event)
 		fNodeAttributeChangedEvents->Remove(ref);
 		fRecentNodeMonitoringEvents.Remove(oldEvent);
 		notify = !_IsRecentEvent(oldEvent);
-		oldEvent->RemoveReference();
+		oldEvent->ReleaseReference();
 	}
 
 	// add the new event
 	if (fNodeAttributeChangedEvents->Put(ref, event) == B_OK) {
 		fRecentNodeMonitoringEvents.Insert(event);
-		event->AddReference();
+		event->AcquireReference();
 	}
 
 	// send notifications
@@ -1425,7 +1425,7 @@ VolumeManager::_VolumeMounted(VolumeMountedEvent* event)
 			if (_GenerateEntryRemovedEvent(entry, system_time(),
 					&event) == B_OK) {
 				_EntryRemoved(event, true);
-				event->RemoveReference();
+				event->ReleaseReference();
 			} else {
 				RemoveEntry(entry);
 				delete entry;
@@ -1471,7 +1471,7 @@ VolumeManager::_VolumeUnmounted(VolumeUnmountedEvent* event)
 				if (_GenerateEntryRemovedEvent(entry, event->time,
 						&removedEvent) == B_OK) {
 					_EntryRemoved(removedEvent, true);
-					removedEvent->RemoveReference();
+					removedEvent->ReleaseReference();
 				} else {
 					RemoveEntry(entry);
 					delete entry;
@@ -1590,7 +1590,7 @@ VolumeManager::_QueryEntryMoved(EntryMovedEvent* event)
 	removedEvent->opcode = B_ENTRY_REMOVED;
 	removedEvent->time = event->time;
 	removedEvent->queryHandler = event->queryHandler;
-	removedEvent->queryHandler->AddReference();
+	removedEvent->queryHandler->AcquireReference();
 	removedEvent->volumeID = event->volumeID;
 	removedEvent->directoryID = event->fromDirectoryID;
 	removedEvent->nodeVolumeID = event->volumeID;
@@ -1601,7 +1601,7 @@ VolumeManager::_QueryEntryMoved(EntryMovedEvent* event)
 	createdEvent->opcode = B_ENTRY_CREATED;
 	createdEvent->time = event->time;
 	createdEvent->queryHandler = event->queryHandler;
-	createdEvent->queryHandler->AddReference();
+	createdEvent->queryHandler->AcquireReference();
 	createdEvent->volumeID = event->volumeID;
 	createdEvent->directoryID = event->toDirectoryID;
 	createdEvent->nodeID = event->nodeID;
@@ -1609,9 +1609,9 @@ VolumeManager::_QueryEntryMoved(EntryMovedEvent* event)
 
 	// send them
 	_QueryEntryRemoved(removedEvent);
-	removedEvent->RemoveReference();
+	removedEvent->ReleaseReference();
 	_QueryEntryCreated(createdEvent);
-	createdEvent->RemoveReference();
+	createdEvent->ReleaseReference();
 }
 
 // _IsRecentEvent
@@ -1650,7 +1650,7 @@ VolumeManager::_GenerateEntryCreatedEvent(const entry_ref& ref, bigtime_t time,
 		*_event = event;
 	} else {
 		_EntryCreated(event);
-		event->RemoveReference();
+		event->ReleaseReference();
 	}
 
 	return B_OK;
@@ -1682,7 +1682,7 @@ VolumeManager::_GenerateEntryRemovedEvent(Entry* entry, bigtime_t time,
 		*_event = event;
 	} else {
 		_EntryRemoved(event, false);
-		event->RemoveReference();
+		event->ReleaseReference();
 	}
 
 	return B_OK;
@@ -1776,7 +1776,7 @@ VolumeManager::_NodeMonitoringProcessor()
 						break;
 				}
 			}
-			event->RemoveReference();
+			event->ReleaseReference();
 
 			// If there is another event available, get it as long as we
 			// have the VolumeManager lock.

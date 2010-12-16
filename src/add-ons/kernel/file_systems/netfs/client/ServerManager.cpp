@@ -55,7 +55,7 @@ public:
 		  fSuccess(false)
 	{
 		if (fServerInfo)
-			fServerInfo->AddReference();
+			fServerInfo->AcquireReference();
 	}
 
 	virtual ~ServerInfoTask()
@@ -68,7 +68,7 @@ public:
 				fServerManager->_AddingServerFailed(fServerInfo);
 		}
 		if (fServerInfo)
-			fServerInfo->RemoveReference();
+			fServerInfo->ReleaseReference();
 	}
 
 	status_t Init()
@@ -195,7 +195,7 @@ ServerManager::Uninit()
 	for (ServerInfoMap::Iterator it = fServerInfos->GetIterator();
 		 it.HasNext();) {
 		ExtendedServerInfo* serverInfo = it.Next().value;
-		serverInfo->RemoveReference();
+		serverInfo->ReleaseReference();
 	}
 	fServerInfos->Clear();
 }
@@ -219,7 +219,7 @@ ServerManager::GetServerInfo(const NetAddress& address)
 			&& serverInfo->GetState() != STATE_UPDATING)) {
 		return NULL;
 	}
-	serverInfo->AddReference();
+	serverInfo->AcquireReference();
 	return serverInfo;
 }
 
@@ -239,11 +239,11 @@ ServerManager::AddServer(const NetAddress& address)
 	if (!serverInfo)
 		return B_NO_MEMORY;
 	serverInfo->SetState(STATE_ADDING);
-	Reference<ExtendedServerInfo> serverInfoReference(serverInfo, true);
+	BReference<ExtendedServerInfo> serverInfoReference(serverInfo, true);
 	status_t error = fServerInfos->Put(address, serverInfo);
 	if (error != B_OK)
 		return error;
-	serverInfo->AddReference();
+	serverInfo->AcquireReference();
 
 	// create and execute the task -- it will do what is necessary
 	ServerInfoTask task(this, NULL, serverInfo);
@@ -269,7 +269,7 @@ ServerManager::RemoveServer(const NetAddress& address)
 	// trying to add/update it. We mark the info STATE_REMOVING, which will
 	// remove the info as soon as possible.
 	if (serverInfo->GetState() == STATE_READY) {
-		Reference<ExtendedServerInfo> _(serverInfo);
+		BReference<ExtendedServerInfo> _(serverInfo);
 		_RemoveServer(serverInfo);
 		locker.Unlock();
 		fListener->ServerRemoved(serverInfo);
@@ -366,14 +366,14 @@ ServerManager::_BroadcastListener()
 		if (!serverInfo)
 			return B_NO_MEMORY;
 		serverInfo->SetState(STATE_ADDING);
-		Reference<ExtendedServerInfo> serverInfoReference(serverInfo, true);
+		BReference<ExtendedServerInfo> serverInfoReference(serverInfo, true);
 		if (oldServerInfo) {
 			oldServerInfo->SetState(STATE_UPDATING);
 		} else {
 			status_t error = fServerInfos->Put(netAddress, serverInfo);
 			if (error != B_OK)
 				continue;
-			serverInfo->AddReference();
+			serverInfo->AcquireReference();
 		}
 
 		// create a task to add/update the server info
@@ -384,7 +384,7 @@ ServerManager::_BroadcastListener()
 				oldServerInfo->SetState(STATE_READY);
 			} else {
 				fServerInfos->Remove(serverInfo->GetAddress());
-				serverInfo->RemoveReference();
+				serverInfo->ReleaseReference();
 			}
 			continue;
 		}
@@ -484,26 +484,26 @@ ServerManager::_ServerUpdated(ExtendedServerInfo* serverInfo)
 	if (serverInfo != oldInfo) {
 		// check whether someone told us to remove the server in the meantime
 		if (oldInfo->GetState() == STATE_REMOVING) {
-			oldInfo->AddReference();
+			oldInfo->AcquireReference();
 			_RemoveServer(oldInfo);
 			if (fListener) {
 				locker.Unlock();
 				fListener->ServerRemoved(oldInfo);
 			}
-			oldInfo->RemoveReference();
+			oldInfo->ReleaseReference();
 			return;
 		}
 
 		// no, everything is fine: go on...
 		fServerInfos->Put(serverInfo->GetAddress(), serverInfo);
-		serverInfo->AddReference();
+		serverInfo->AcquireReference();
 		serverInfo->SetState(STATE_READY);
 		oldInfo->SetState(STATE_OBSOLETE);
 		if (fListener) {
 			locker.Unlock();
 			fListener->ServerUpdated(oldInfo, serverInfo);
 		}
-		oldInfo->RemoveReference();
+		oldInfo->ReleaseReference();
 	} else {
 		WARN("ServerManager::_ServerUpdated(%p): WARNING: Unexpected server "
 			"info.\n", serverInfo);
@@ -518,7 +518,7 @@ ServerManager::_AddingServerFailed(ExtendedServerInfo* serverInfo)
 	if (fServerInfos->Get(serverInfo->GetAddress()) == serverInfo) {
 		bool removing = (serverInfo->GetState() == STATE_REMOVING);
 		fServerInfos->Remove(serverInfo->GetAddress());
-		serverInfo->RemoveReference();
+		serverInfo->ReleaseReference();
 		serverInfo->SetState(STATE_OBSOLETE);
 
 		// notify the listener, if someone told us in the meantime to remove
@@ -542,13 +542,13 @@ ServerManager::_UpdatingServerFailed(ExtendedServerInfo* serverInfo)
 	if (serverInfo != oldInfo) {
 		// check whether someone told us to remove the server in the meantime
 		if (oldInfo->GetState() == STATE_REMOVING) {
-			oldInfo->AddReference();
+			oldInfo->AcquireReference();
 			_RemoveServer(oldInfo);
 			if (fListener) {
 				locker.Unlock();
 				fListener->ServerRemoved(oldInfo);
 			}
-			oldInfo->RemoveReference();
+			oldInfo->ReleaseReference();
 			serverInfo->SetState(STATE_OBSOLETE);
 			return;
 		}
@@ -575,7 +575,7 @@ ServerManager::_RemoveServer(ExtendedServerInfo* serverInfo)
 	if (oldInfo) {
 		fServerInfos->Remove(oldInfo->GetAddress());
 		oldInfo->SetState(STATE_OBSOLETE);
-		oldInfo->RemoveReference();
+		oldInfo->ReleaseReference();
 	}
 }
 

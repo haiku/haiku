@@ -96,7 +96,7 @@ UserMessagingListener::operator==(const NotificationListener& _other) const
 		&& other->Token() == Token();
 }
 
-class NotificationService : public Referenceable {
+class NotificationService : public BReferenceable {
 public:
 	virtual						~NotificationService();
 

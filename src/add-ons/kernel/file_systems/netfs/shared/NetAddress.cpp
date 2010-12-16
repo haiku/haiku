@@ -191,7 +191,7 @@ NetAddress::operator!=(const NetAddress& address) const
 class NetAddressResolver::Resolver : public BReferenceable {
 public:
 	Resolver()
-		: BReferenceable(false),
+		: BReferenceable(),
 		  fLock()
 	{
 	}
@@ -217,6 +217,12 @@ public:
 		return B_OK;
 	}
 
+protected:
+	virtual void LastReferenceReleased()
+	{
+		// don't delete
+	}
+
 private:
 	Locker	fLock;
 };
@@ -227,7 +233,7 @@ NetAddressResolver::NetAddressResolver()
 	_Lock();
 	// initialize static instance, if not done yet
 	if (sResolver) {
-		sResolver->AddReference();
+		sResolver->AcquireReference();
 		fResolver = sResolver;
 	} else {
 		sResolver = new(std::nothrow) Resolver;
@@ -247,7 +253,7 @@ NetAddressResolver::~NetAddressResolver()
 {
 	if (fResolver) {
 		_Lock();
-		if (sResolver->RemoveReference()) {
+		if (sResolver->ReleaseReference()) {
 			delete sResolver;
 			sResolver = NULL;
 		}

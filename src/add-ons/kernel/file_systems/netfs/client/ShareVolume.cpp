@@ -167,11 +167,11 @@ ShareVolume::ShareVolume(VolumeManager* volumeManager,
 {
 	fFlags = fVolumeManager->GetMountFlags();
 	if (fServerConnectionProvider)
-		fServerConnectionProvider->AddReference();
+		fServerConnectionProvider->AcquireReference();
 	if (fServerInfo)
-		fServerInfo->AddReference();
+		fServerInfo->AcquireReference();
 	if (fShareInfo)
-		fShareInfo->AddReference();
+		fShareInfo->AcquireReference();
 }
 
 // destructor
@@ -214,13 +214,13 @@ PRINT(("ShareVolume::~ShareVolume()\n"));
 	delete fRemoteNodeIDs;
 
 	if (fShareInfo)
-		fShareInfo->RemoveReference();
+		fShareInfo->ReleaseReference();
 	if (fServerInfo)
-		fServerInfo->RemoveReference();
+		fServerInfo->ReleaseReference();
 	if (fServerConnection)
-		fServerConnection->RemoveReference();
+		fServerConnection->ReleaseReference();
 	if (fServerConnectionProvider)
-		fServerConnectionProvider->RemoveReference();
+		fServerConnectionProvider->ReleaseReference();
 }
 
 // GetID
@@ -466,7 +466,7 @@ ShareVolume::ReadVNode(vnode_id vnid, char reenter, Node** _node)
 			*_node = node;
 
 			// add a volume reference for the node
-			AddReference();
+			AcquireReference();
 
 			return B_OK;
 		}
@@ -505,7 +505,7 @@ ShareVolume::ReadVNode(vnode_id vnid, char reenter, Node** _node)
 	*_node = node;
 
 	// add a volume reference for the node
-	AddReference();
+	AcquireReference();
 
 	return B_OK;
 }
@@ -2616,7 +2616,7 @@ ShareVolume::_RemoveEntry(ShareDirEntry* entry)
 		entry->GetName()));
 	entry->GetDirectory()->RemoveEntry(entry);
 	entry->GetNode()->RemoveReferringEntry(entry);
-	entry->RemoveReference();
+	entry->ReleaseReference();
 }
 
 // _IsObsoleteEntryInfo
@@ -3001,8 +3001,8 @@ ShareVolume::_MountShare()
 {
 	// get references to the server and share info
 	AutoLocker<Locker> locker(fLock);
-	Reference<ExtendedServerInfo> serverInfoReference(fServerInfo);
-	Reference<ExtendedShareInfo> shareInfoReference(fShareInfo);
+	BReference<ExtendedServerInfo> serverInfoReference(fServerInfo);
+	BReference<ExtendedShareInfo> shareInfoReference(fShareInfo);
 	ExtendedServerInfo* serverInfo = fServerInfo;
 	ExtendedShareInfo* shareInfo = fShareInfo;
 	locker.Unlock();

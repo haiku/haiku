@@ -23,7 +23,7 @@ UserSecurityContext::UserSecurityContext()
 UserSecurityContext::~UserSecurityContext()
 {
 	if (fUser)
-		fUser->RemoveReference();
+		fUser->ReleaseReference();
 
 	delete fPermissions;
 }
@@ -33,11 +33,11 @@ status_t
 UserSecurityContext::Init(User* user)
 {
 	if (fUser)
-		fUser->RemoveReference();
+		fUser->ReleaseReference();
 
 	fUser = user;
 	if (fUser)
-		fUser->AddReference();
+		fUser->AcquireReference();
 
 	delete fPermissions;
 	fPermissions = new(std::nothrow) PermissionMap;

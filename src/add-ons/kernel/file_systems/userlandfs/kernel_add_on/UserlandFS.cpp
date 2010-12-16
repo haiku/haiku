@@ -87,7 +87,7 @@ UserlandFS::RegisterFileSystem(const char* name, FileSystem** _fileSystem)
 		FileSystemLocker _(fFileSystems);
 		fileSystemInitializer = fFileSystems->Get(name);
 		if (fileSystemInitializer) {
-			fileSystemInitializer->AddReference();
+			fileSystemInitializer->AcquireReference();
 		} else {
 			fileSystemInitializer = new(nothrow) FileSystemInitializer(name);
 			if (!fileSystemInitializer)
@@ -164,7 +164,7 @@ UserlandFS::_UnregisterFileSystem(const char* name)
 		if (!fileSystemInitializer)
 			return B_BAD_VALUE;
 
-		deleteFS = fileSystemInitializer->RemoveReference();
+		deleteFS = fileSystemInitializer->ReleaseReference();
 		if (deleteFS)
 			fFileSystems->Remove(name);
 	}

@@ -6,7 +6,7 @@
 // constructor
 ExtendedShareInfo::ExtendedShareInfo()
 	:
-	BReferenceable(true),
+	BReferenceable(),
 	fShareName()
 {
 }
@@ -35,7 +35,7 @@ ExtendedShareInfo::GetShareName() const
 // constructor
 ExtendedServerInfo::ExtendedServerInfo(const NetAddress& address)
 	:
-	BReferenceable(true),
+	BReferenceable(),
 	fAddress(address),
 	fState(0)
 {
@@ -46,7 +46,7 @@ ExtendedServerInfo::~ExtendedServerInfo()
 {
 	int32 count = CountShares();
 	for (int32 i = 0; i < count; i++)
-		ShareInfoAt(i)->RemoveReference();
+		ShareInfoAt(i)->ReleaseReference();
 }
 
 // GetAddress

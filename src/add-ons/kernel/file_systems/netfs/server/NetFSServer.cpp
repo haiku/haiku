@@ -408,7 +408,7 @@ NetFSServer::MessageReceived(BMessage* message)
 					connection->UserRemoved(user);
 				}
 
-				user->RemoveReference();
+				user->ReleaseReference();
 			}
 
 			_SendReply(message, error);
@@ -446,7 +446,7 @@ NetFSServer::MessageReceived(BMessage* message)
 				_SendReply(message, B_ENTRY_NOT_FOUND);
 				break;
 			}
-			Reference<User> userReference(user, true);
+			BReference<User> userReference(user, true);
 
 			// get the statistics
 			BMessage statistics;
@@ -509,7 +509,7 @@ NetFSServer::MessageReceived(BMessage* message)
 					connection->ShareRemoved(share);
 				}
 
-				share->RemoveReference();
+				share->ReleaseReference();
 			}
 
 			if (error == B_OK)
@@ -552,7 +552,7 @@ NetFSServer::MessageReceived(BMessage* message)
 				_SendReply(message, B_ENTRY_NOT_FOUND);
 				break;
 			}
-			Reference<Share> shareReference(share, true);
+			BReference<Share> shareReference(share, true);
 
 			// get all users
 			BMessage allUsers;
@@ -572,7 +572,7 @@ NetFSServer::MessageReceived(BMessage* message)
 					// get the user's permissions
 					Permissions permissions = fSecurityContext
 						->GetNodePermissions(share->GetPath(), user);
-					user->RemoveReference();
+					user->ReleaseReference();
 
 					// add the user, if they have the permission to mount the
 					// share
@@ -616,7 +616,7 @@ NetFSServer::MessageReceived(BMessage* message)
 				_SendReply(message, B_ENTRY_NOT_FOUND);
 				break;
 			}
-			Reference<Share> shareReference(share, true);
+			BReference<Share> shareReference(share, true);
 
 			// get the statistics
 			BMessage statistics;
@@ -653,8 +653,8 @@ NetFSServer::MessageReceived(BMessage* message)
 			// get the share and the user
 			Share* share = fSecurityContext->FindShare(shareName);
 			User* user = fSecurityContext->FindUser(userName);
-			Reference<Share> shareReference(share);
-			Reference<User> userReference(user);
+			BReference<Share> shareReference(share);
+			BReference<User> userReference(user);
 			if (!share || !user) {
 				_SendReply(message, B_ENTRY_NOT_FOUND);
 				break;
@@ -699,8 +699,8 @@ NetFSServer::MessageReceived(BMessage* message)
 			// get the share and the user
 			Share* share = fSecurityContext->FindShare(shareName);
 			User* user = fSecurityContext->FindUser(userName);
-			Reference<Share> shareReference(share);
-			Reference<User> userReference(user);
+			BReference<Share> shareReference(share);
+			BReference<User> userReference(user);
 			if (!share || !user) {
 				_SendReply(message, B_ENTRY_NOT_FOUND);
 				break;
@@ -837,7 +837,7 @@ NetFSServer::_LoadSecurityContext(SecurityContext** _securityContext)
 			ERROR("ERROR: Failed to add share `%s'\n", shareName);
 			continue;
 		}
-		Reference<Share> shareReference(share, true);
+		BReference<Share> shareReference(share, true);
 		DriverParameter userParameter;
 		// iterate through the share users
 		for (DriverParameterIterator userIt
@@ -850,7 +850,7 @@ NetFSServer::_LoadSecurityContext(SecurityContext** _securityContext)
 				ERROR("ERROR: Undefined user `%s'.\n", userName);
 				continue;
 			}
-			Reference<User> userReference(user, true);
+			BReference<User> userReference(user, true);
 			DriverParameter permissionsParameter;
 			if (!userParameter.FindParameter("permissions",
 					&permissionsParameter)) {

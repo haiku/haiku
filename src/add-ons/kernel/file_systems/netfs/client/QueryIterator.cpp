@@ -5,7 +5,7 @@
 // constructor
 QueryIterator::QueryIterator(Volume* volume)
 	:
-	BReferenceable(false),
+	BReferenceable(),
 	fVolume(volume),
 	fParentIterator(NULL),
 	fVolumeLink()
@@ -46,6 +46,13 @@ QueryIterator::ReadQuery(struct dirent* buffer, size_t bufferSize, int32 count,
 	*countRead = 0;
 	*done = true;
 	return B_OK;
+}
+
+
+void
+QueryIterator::LastReferenceReleased()
+{
+	// don't delete
 }
 
 

@@ -30,7 +30,7 @@ struct net_device_interface;
 
 
 struct InterfaceAddress : DoublyLinkedListLinkImpl<InterfaceAddress>,
-		net_interface_address, Referenceable {
+		net_interface_address, BReferenceable {
 								InterfaceAddress();
 								InterfaceAddress(net_interface* interface,
 									net_domain* domain);
@@ -112,7 +112,7 @@ typedef BOpenHashTable<DatalinkHashDefinition, true, true> DatalinkTable;
 
 
 class Interface : public DoublyLinkedListLinkImpl<Interface>,
-		public net_interface, public Referenceable {
+		public net_interface, public BReferenceable {
 public:
 								Interface(const char* name,
 									net_device_interface* deviceInterface);

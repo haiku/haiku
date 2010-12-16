@@ -26,7 +26,7 @@
 // constructor
 FileSystemInitializer::FileSystemInitializer(const char* name)
 	:
-	Referenceable(false),
+	BReferenceable(),
 	fName(name),
 	fFileSystem(NULL)
 {
@@ -96,6 +96,13 @@ FileSystemInitializer::FirstTimeInit()
 	}
 
 	return B_OK;
+}
+
+
+void
+FileSystemInitializer::LastReferenceReleased()
+{
+	// don't delete
 }
 
 

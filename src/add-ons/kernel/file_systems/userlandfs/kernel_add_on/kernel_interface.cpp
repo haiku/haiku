@@ -125,7 +125,7 @@ userlandfs_unmount(fs_volume* fsVolume)
 	status_t error = volume->Unmount();
 	// The error code the FS's unmount hook returns is completely irrelevant to
 	// the VFS. It considers the volume unmounted in any case.
-	volume->RemoveReference();
+	volume->ReleaseReference();
 	UserlandFS::GetUserlandFS()->UnregisterFileSystem(fileSystem);
 
 	PRINT(("userlandfs_unmount() done: %lx\n", error));

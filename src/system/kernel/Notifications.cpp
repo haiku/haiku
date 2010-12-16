@@ -504,7 +504,7 @@ NotificationManager::RegisterService(NotificationService& service)
 
 	status_t status = fServiceHash.Insert(&service);
 	if (status == B_OK)
-		service.AddReference();
+		service.AcquireReference();
 
 	return status;
 }
@@ -515,7 +515,7 @@ NotificationManager::UnregisterService(NotificationService& service)
 {
 	MutexLocker _(fLock);
 	fServiceHash.Remove(&service);
-	service.RemoveReference();
+	service.ReleaseReference();
 }
 
 
@@ -541,7 +541,7 @@ NotificationManager::AddListener(const char* serviceName,
 	if (service == NULL)
 		return B_NAME_NOT_FOUND;
 
-	Reference<NotificationService> reference(service);
+	BReference<NotificationService> reference(service);
 	locker.Unlock();
 
 	return service->AddListener(eventSpecifier, listener);
@@ -570,7 +570,7 @@ NotificationManager::UpdateListener(const char* serviceName,
 	if (service == NULL)
 		return B_NAME_NOT_FOUND;
 
-	Reference<NotificationService> reference(service);
+	BReference<NotificationService> reference(service);
 	locker.Unlock();
 
 	return service->UpdateListener(eventSpecifier, listener);
@@ -586,7 +586,7 @@ NotificationManager::RemoveListener(const char* serviceName,
 	if (service == NULL)
 		return B_NAME_NOT_FOUND;
 
-	Reference<NotificationService> reference(service);
+	BReference<NotificationService> reference(service);
 	locker.Unlock();
 
 	return service->RemoveListener(eventSpecifier, listener);

@@ -50,7 +50,7 @@ static SystemProfiler* sProfiler = NULL;
 static struct system_profiler_parameters* sRecordedParameters = NULL;
 
 
-class SystemProfiler : public Referenceable, private NotificationListener,
+class SystemProfiler : public BReferenceable, private NotificationListener,
 	private SchedulerListener, private WaitObjectListener {
 public:
 								SystemProfiler(team_id team,
@@ -611,7 +611,7 @@ SystemProfiler::EventOccurred(NotificationService& service,
 					sProfiler = NULL;
 					locker.Unlock();
 
-					RemoveReference();
+					ReleaseReference();
 					return;
 				}
 
@@ -1474,7 +1474,7 @@ stop_system_profiler()
 	sProfiler = NULL;
 	locker.Unlock();
 
-	profiler->RemoveReference();
+	profiler->ReleaseReference();
 }
 
 
@@ -1558,7 +1558,7 @@ _user_system_profiler_next_buffer(size_t bytesRead, uint64* _droppedEvents)
 
 	// get a reference to the profiler
 	SystemProfiler* profiler = sProfiler;
-	Reference<SystemProfiler> reference(profiler);
+	BReference<SystemProfiler> reference(profiler);
 	locker.Unlock();
 
 	uint64 droppedEvents;
@@ -1584,7 +1584,7 @@ _user_system_profiler_stop()
 	sProfiler = NULL;
 	locker.Unlock();
 
-	profiler->RemoveReference();
+	profiler->ReleaseReference();
 
 	return B_OK;
 }

@@ -24,7 +24,7 @@ public:
 	~VolumePutter()
 	{
 		if (fVolume)
-			fVolume->RemoveReference();
+			fVolume->ReleaseReference();
 	}
 
 private:
@@ -906,7 +906,7 @@ KernelRequestHandler::_GetVolume(dev_t id, Volume** volume)
 			*volume = NULL;
 			return B_BAD_VALUE;
 		}
-		fVolume->AddReference();
+		fVolume->AcquireReference();
 		*volume = fVolume;
 		return B_OK;
 	}

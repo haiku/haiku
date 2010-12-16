@@ -38,7 +38,7 @@ typedef AutoLocker<UnixEndpoint> UnixEndpointLocker;
 
 
 class UnixEndpoint : public net_protocol, public ProtocolSocket,
-	public Referenceable {
+	public BReferenceable {
 public:
 	UnixEndpoint(net_socket* socket);
 	virtual ~UnixEndpoint();

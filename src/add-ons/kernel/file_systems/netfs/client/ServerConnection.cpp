@@ -24,7 +24,7 @@ struct ServerConnection::VolumeMap : HashMap<HashKey32<int32>, ShareVolume*> {
 ServerConnection::ServerConnection(VolumeManager* volumeManager,
 	ExtendedServerInfo* serverInfo)
 	:
-	BReferenceable(true),
+	BReferenceable(),
 	RequestHandler(),
 	fLock("server connection"),
 	fVolumeManager(volumeManager),
@@ -35,7 +35,7 @@ ServerConnection::ServerConnection(VolumeManager* volumeManager,
 	fConnected(false)
 {
 	if (fServerInfo)
-		fServerInfo->AddReference();
+		fServerInfo->AcquireReference();
 }
 
 // destructor
@@ -46,9 +46,9 @@ PRINT(("ServerConnection::~ServerConnection()\n"))
 	delete fConnection;
 	delete fVolumes;
 	if (fConnectionBrokenEvent)
-		fConnectionBrokenEvent->RemoveReference();
+		fConnectionBrokenEvent->ReleaseReference();
 	if (fServerInfo)
-		fServerInfo->RemoveReference();
+		fServerInfo->ReleaseReference();
 }
 
 // Init

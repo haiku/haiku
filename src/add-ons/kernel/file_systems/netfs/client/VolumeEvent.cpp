@@ -5,7 +5,7 @@
 // constructor
 VolumeEvent::VolumeEvent(uint32 type, vnode_id target)
 	:
-	BReferenceable(true),
+	BReferenceable(),
 	fType(type),
 	fTarget(target)
 {

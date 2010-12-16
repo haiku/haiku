@@ -54,7 +54,7 @@ public:
 
 		while (VolumeEvent* event = fEvents.First()) {
 			fEvents.Remove(event);
-			event->RemoveReference();
+			event->ReleaseReference();
 		}
 	}
 
@@ -67,7 +67,7 @@ public:
 		if (fCounterSem < 0)
 			return;
 		fEvents.Insert(event);
-		event->AddReference();
+		event->AcquireReference();
 		release_sem(fCounterSem);
 	}
 
@@ -208,7 +208,7 @@ VolumeManager::MountRootVolume(const char* device,
 		PutVolume(rootVolume);
 		return error;
 	}
-	rootVolume->AddReference();
+	rootVolume->AcquireReference();
 	*volume = rootVolume;
 
 	// run the event deliverer
@@ -283,7 +283,7 @@ VolumeManager::GetVolume(Volume* volume)
 	AutoLocker<Locker> _(this);
 	if (fVolumes->Contains(volume)) {
 // TODO: Any restrictions regarding volumes about to be removed?
-		volume->AddReference();
+		volume->AcquireReference();
 		return volume;
 	}
 	return NULL;
@@ -332,7 +332,7 @@ VolumeManager::PutVolume(Volume* volume)
 	// we unmount and delete it.
 	{
 		AutoLocker<Locker> locker(this);
-		if (volume->RemoveReference() && volume->IsRemoved()) {
+		if (volume->ReleaseReference() && volume->IsRemoved()) {
 PRINT(("VolumeManager::PutVolume(%p): Removed volume unreferenced. "
 "Unmounting...\n", volume));
 			// remove from volume set -- now noone can get a reference to it
@@ -400,7 +400,7 @@ VolumeManager::_EventDeliverer()
 			volume->HandleEvent(event);
 			PutVolume(volume);
 		}
-		event->RemoveReference();
+		event->ReleaseReference();
 	}
 	return 0;
 }

@@ -89,7 +89,7 @@ QueryManager::AddIterator(QueryIterator* iterator)
 	iteratorList->Insert(iterator);
 
 	// get a volume reference for the iterator
-	iterator->GetVolume()->AddReference();
+	iterator->GetVolume()->AcquireReference();
 
 	return B_OK;
 }
@@ -138,7 +138,7 @@ QueryManager::GetCurrentSubIterator(HierarchicalQueryIterator* iterator)
 	AutoLocker<Locker> _(fLock);
 	QueryIterator* subIterator = iterator->GetCurrentSubIterator();
 	if (subIterator)
-		subIterator->AddReference();
+		subIterator->AcquireReference();
 	return subIterator;
 }
 
@@ -172,7 +172,7 @@ QueryManager::PutIterator(QueryIterator* iterator)
 		return;
 
 	AutoLocker<Locker> locker(fLock);
-	if (iterator->RemoveReference()) {
+	if (iterator->ReleaseReference()) {
 		// last reference removed: remove the iterator
 
 		// remove its subiterators (if any)
@@ -250,7 +250,7 @@ QueryManager::VolumeUnmounting(Volume* volume)
 				iterator->GetParentIterator()->RemoveSubIterator(iterator);
 
 				// remove reference
-				if (iterator->RemoveReference()) {
+				if (iterator->ReleaseReference()) {
 					// no more reference: move to our local list
 					iteratorList->Remove(iterator);
 					iterators.Insert(iterator);

@@ -42,7 +42,7 @@ NodeHandleMap::AddNodeHandle(NodeHandle* handle)
 
 	status_t error = Put(handle->GetCookie(), handle);
 	if (error == B_OK)
-		handle->AddReference();
+		handle->AcquireReference();
 
 	return error;
 }
@@ -60,7 +60,7 @@ NodeHandleMap::RemoveNodeHandle(NodeHandle* handle)
 		return false;
 
 	Remove(handle->GetCookie());
-	handle->RemoveReference();
+	handle->ReleaseReference();
 	return true;
 }
 
@@ -81,7 +81,7 @@ NodeHandleMap::LockNodeHandle(int32 cookie, NodeHandle** _handle)
 		handle = Get(cookie);
 		if (!handle)
 			return B_ENTRY_NOT_FOUND;
-		handle->AddReference();
+		handle->AcquireReference();
 
 		// first attempt: we just try to lock the node handle, which will fail,
 		// if someone else has the lock at the momemt
@@ -109,7 +109,7 @@ NodeHandleMap::LockNodeHandle(int32 cookie, NodeHandle** _handle)
 	// wait for the lock
 	status_t error = lockerCandidate.Block();
 	if (error != B_OK) {
-		handle->RemoveReference();
+		handle->ReleaseReference();
 		return error;
 	}
 
@@ -130,7 +130,7 @@ NodeHandleMap::UnlockNodeHandle(NodeHandle* nodeHandle)
 		AutoLocker<Locker> _(this);
 
 		nodeHandle->Unlock();
-		nodeHandle->RemoveReference();
+		nodeHandle->ReleaseReference();
 	}
 }
 

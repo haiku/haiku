@@ -43,7 +43,7 @@ ClientVolume::~ClientVolume()
 	Unmount();
 
 	if (fShare)
-		fShare->RemoveReference();
+		fShare->ReleaseReference();
 
 	delete fNodeHandles;
 	delete fSecurityContext;
@@ -84,7 +84,7 @@ ClientVolume::Mount(UserSecurityContext* securityContext, Share* share)
 	securityContextDeleter.Detach();
 
 	fShare = share;
-	fShare->AddReference();
+	fShare->AcquireReference();
 	dev_t volumeID = share->GetVolumeID();
 	ino_t nodeID = share->GetNodeID();
 
@@ -400,7 +400,7 @@ ClientVolume::Open(Node* node, int openMode, FileHandle** _handle)
 	status_t error = node->Open(openMode, &handle);
 	if (error != B_OK)
 		return error;
-	Reference<NodeHandle> handleReference(handle, true);
+	BReference<NodeHandle> handleReference(handle, true);
 
 	// lock the handle
 	handle->Lock();
@@ -429,7 +429,7 @@ ClientVolume::OpenDir(Directory* directory, DirIterator** _iterator)
 	status_t error = directory->OpenDir(&iterator);
 	if (error != B_OK)
 		return error;
-	Reference<NodeHandle> handleReference(iterator, true);
+	BReference<NodeHandle> handleReference(iterator, true);
 
 	// lock the handle
 	iterator->Lock();
@@ -458,7 +458,7 @@ ClientVolume::OpenAttrDir(Node* node, AttrDirIterator** _iterator)
 	status_t error = node->OpenAttrDir(&iterator);
 	if (error != B_OK)
 		return error;
-	Reference<NodeHandle> handleReference(iterator, true);
+	BReference<NodeHandle> handleReference(iterator, true);
 
 	// lock the handle
 	iterator->Lock();

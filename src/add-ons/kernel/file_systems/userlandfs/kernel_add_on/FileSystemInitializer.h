@@ -20,7 +20,7 @@ using UserlandFSUtil::RequestPort;
 
 class FileSystem;
 
-class FileSystemInitializer : public LazyInitializable, public Referenceable {
+class FileSystemInitializer : public LazyInitializable, public BReferenceable {
 public:
 								FileSystemInitializer(const char* name);
 								~FileSystemInitializer();
@@ -29,6 +29,8 @@ public:
 
 protected:
 	virtual	status_t			FirstTimeInit();
+
+	virtual	void				LastReferenceReleased();
 
 private:
 			status_t			_Init(port_id port);

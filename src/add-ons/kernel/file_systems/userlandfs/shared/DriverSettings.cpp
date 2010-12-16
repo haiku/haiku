@@ -22,9 +22,9 @@ static const int32 kTrueValueStringCount
 // #pragma mark ----- DriverParameterIterator -----
 
 // Delegate
-class DriverParameterIterator::Delegate : public Referenceable {
+class DriverParameterIterator::Delegate : public BReferenceable {
 public:
-								Delegate() : Referenceable(true) {}
+								Delegate() : BReferenceable() {}
 	virtual						~Delegate() {}
 
 	virtual	Delegate*			Clone() const = 0;
@@ -94,10 +94,10 @@ void
 DriverParameterIterator::_SetTo(Delegate* delegate, bool addReference)
 {
 	if (fDelegate)
-		fDelegate->RemoveReference();
+		fDelegate->ReleaseReference();
 	fDelegate = delegate;
 	if (fDelegate && addReference)
-		fDelegate->AddReference();
+		fDelegate->AcquireReference();
 }
 
 

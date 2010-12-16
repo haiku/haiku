@@ -8,7 +8,7 @@
 ShareDirEntry::ShareDirEntry(ShareDir* directory, const char* name,
 	ShareNode* node)
 	:
-	BReferenceable(true),
+	BReferenceable(),
 	fDirectory(directory),
 	fName(name),
 	fNode(node),
@@ -344,7 +344,7 @@ void
 RemoteShareDirIterator::Clear()
 {
 	for (int32 i = 0; i < fCount; i++)
-		fEntries[i]->RemoveReference();
+		fEntries[i]->ReleaseReference();
 	fCount = 0;
 	fIndex = 0;
 	fDone = false;
@@ -359,7 +359,7 @@ RemoteShareDirIterator::AddEntry(ShareDirEntry* entry)
 		return false;
 
 	fEntries[fCount++] = entry;
-	entry->AddReference();
+	entry->AcquireReference();
 	return true;
 }
 

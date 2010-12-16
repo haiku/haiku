@@ -125,13 +125,13 @@ struct ClientConnection::VolumeNodeMonitoringEvent {
 		  event(event)
 	{
 		if (event)
-			event->AddReference();
+			event->AcquireReference();
 	}
 
 	~VolumeNodeMonitoringEvent()
 	{
 		if (event)
-			event->RemoveReference();
+			event->ReleaseReference();
 	}
 
 	int32					volumeID;
@@ -544,7 +544,7 @@ ClientConnection::VisitMountRequest(MountRequest* request)
 	AutoLocker<Locker> securityContextLocker(fSecurityContextLock);
 	const char* userName = request->user.GetString();
 	User* user = fUser;
-	Reference<User> userReference(user);
+	BReference<User> userReference(user);
 	bool noPermission = false;
 	if (result == B_OK && !user) {
 		if (userName) {
@@ -588,7 +588,7 @@ ClientConnection::VisitMountRequest(MountRequest* request)
 		} else
 			SET_ERROR(result, B_ENTRY_NOT_FOUND);
 	}
-	Reference<Share> shareReference(share, true);
+	BReference<Share> shareReference(share, true);
 
 	// mount the volume
 	MountReply reply;
@@ -2774,7 +2774,7 @@ ClientConnection::_GetVolume(int32 id)
 	ClientVolume* volume = fVolumes->Get(id);
 	if (!volume || volume->IsRemoved())
 		return NULL;
-	volume->AddReference();
+	volume->AcquireReference();
 	return volume;
 }
 
@@ -2789,7 +2789,7 @@ ClientConnection::_PutVolume(ClientVolume* volume)
 
 	// decrement reference counter and remove the volume, if 0
 	AutoLocker<VolumeMap> locker(fVolumes);
-	bool removed = (volume->RemoveReference() && volume->IsRemoved());
+	bool removed = (volume->ReleaseReference() && volume->IsRemoved());
 	if (removed)
 		fVolumes->Remove(volume->GetID());
 	locker.Unlock();
@@ -2818,7 +2818,7 @@ ClientConnection::_UnmountVolume(ClientVolume* volume)
 
 		event->opcode = B_DEVICE_UNMOUNTED;
 		_PushNodeMonitoringEvent(volume->GetID(), event);
-		event->RemoveReference();
+		event->ReleaseReference();
 	}
 }
 
@@ -3233,7 +3233,7 @@ ClientConnection::_OpenQuery(const char* queryString, uint32 flags,
 		flags, remotePort, remoteToken, &queryHandle);
 	if (error != B_OK)
 		return error;
-	Reference<QueryHandle> handleReference(queryHandle, true);
+	BReference<QueryHandle> handleReference(queryHandle, true);
 
 	// lock the handle
 	queryHandle->Lock();

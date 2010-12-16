@@ -27,16 +27,16 @@ ServerVolume::ServerVolume(VolumeManager* volumeManager,
 	  fServerInfo(serverInfo),
 	  fConnectionProvider(NULL)
 {
-	fServerInfo->AddReference();
+	fServerInfo->AcquireReference();
 }
 
 // destructor
 ServerVolume::~ServerVolume()
 {
 	if (fConnectionProvider)
-		fConnectionProvider->RemoveReference();
+		fConnectionProvider->ReleaseReference();
 	if (fServerInfo)
-		fServerInfo->RemoveReference();
+		fServerInfo->ReleaseReference();
 }
 
 // GetServerAddress
@@ -56,10 +56,10 @@ ServerVolume::SetServerInfo(ExtendedServerInfo* serverInfo)
 
 	// set the new info
 	fLock.Lock();
-	fServerInfo->RemoveReference();
+	fServerInfo->ReleaseReference();
 	fServerInfo = serverInfo;
-	fServerInfo->AddReference();
-	Reference<ExtendedServerInfo> newReference(fServerInfo);
+	fServerInfo->AcquireReference();
+	BReference<ExtendedServerInfo> newReference(fServerInfo);
 
 	// remove shares, that are no longer there
 

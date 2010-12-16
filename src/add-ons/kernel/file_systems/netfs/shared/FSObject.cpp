@@ -5,7 +5,7 @@
 // constructor
 FSObject::FSObject()
 	:
-	BReferenceable(false),
+	BReferenceable(),
 	fRemoved(false)
 {
 }
@@ -29,3 +29,9 @@ FSObject::IsRemoved() const
 	return fRemoved;
 }
 
+
+void
+FSObject::LastReferenceReleased()
+{
+	// don't delete
+}

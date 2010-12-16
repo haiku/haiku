@@ -382,7 +382,7 @@ FileSystem::Mount(fs_volume* fsVolume, const char* device, uint32 flags,
 		MutexLocker locker(fVolumeLock);
 		fVolumes.Remove(volume);
 		locker.Unlock();
-		volume->RemoveReference();
+		volume->ReleaseReference();
 		return error;
 	}
 
@@ -442,7 +442,7 @@ FileSystem::GetVolume(dev_t id)
 		 it++) {
 		 Volume* volume = *it;
 		 if (volume->GetID() == id) {
-		 	volume->AddReference();
+		 	volume->AcquireReference();
 		 	return volume;
 		 }
 	}

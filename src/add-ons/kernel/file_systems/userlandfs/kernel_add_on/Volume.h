@@ -32,7 +32,7 @@ using UserlandFSUtil::userlandfs_ioctl;
 
 class FileSystem;
 
-class Volume : public Referenceable {
+class Volume : public BReferenceable {
 public:
 								Volume(FileSystem* fileSystem,
 									fs_volume* fsVolume);

@@ -38,7 +38,7 @@ get_node_ref_for_path(const char* path, node_ref* ref)
 
 // constructor
 User::User()
-	: BReferenceable(true),
+	: BReferenceable(),
 	  BArchivable(),
 	  fName(),
 	  fPassword()
@@ -47,7 +47,7 @@ User::User()
 
 // constructor
 User::User(BMessage* archive)
-	: BReferenceable(true),
+	: BReferenceable(),
 	  BArchivable(archive),
 	  fName(),
 	  fPassword()
@@ -145,7 +145,7 @@ User::GetPassword() const
 
 // constructor
 Share::Share()
-	: BReferenceable(true),
+	: BReferenceable(),
 	  BArchivable(),
 	  fName(),
 	  fNodeRef(),
@@ -155,7 +155,7 @@ Share::Share()
 
 // constructor
 Share::Share(BMessage* archive)
-	: BReferenceable(true),
+	: BReferenceable(),
 	  BArchivable(archive),
 	  fName(),
 	  fNodeRef(),
@@ -436,7 +436,7 @@ SecurityContext::SecurityContext(BMessage* archive)
 		User* user = FindUser(userName);
 		if (!user)
 			return;
-		Reference<User> userReference(user, true);
+		BReference<User> userReference(user, true);
 		error = permissionsArchive.FindMessage(userName, &userArchive);
 		if (error != B_OK)
 			return;
@@ -464,13 +464,13 @@ SecurityContext::~SecurityContext()
 	// remove all user references
 	for (UserMap::Iterator it = fUsers->GetIterator(); it.HasNext();) {
 		User* user = it.Next().value;
-		user->RemoveReference();
+		user->ReleaseReference();
 	}
 
 	// remove all share references
 	for (ShareMap::Iterator it = fShares->GetIterator(); it.HasNext();) {
 		Share* share = it.Next().value;
-		share->RemoveReference();
+		share->ReleaseReference();
 	}
 
 	delete fUsers;
@@ -609,7 +609,7 @@ SecurityContext::AddUser(const char* name, const char* password, User** _user)
 	User* user = new(std::nothrow) User;
 	if (!user)
 		return B_NO_MEMORY;
-	Reference<User> userReference(user, true);
+	BReference<User> userReference(user, true);
 	status_t error = user->Init(name, password);
 	if (error != B_OK)
 		return error;
@@ -622,7 +622,7 @@ SecurityContext::AddUser(const char* name, const char* password, User** _user)
 	userReference.Detach();
 	if (_user) {
 		*_user = user;
-		user->AddReference();
+		user->AcquireReference();
 	}
 	return B_OK;
 }
@@ -642,13 +642,13 @@ SecurityContext::RemoveUser(const char* name, User** _user)
 	User* user = FindUser(name);
 	if (!user)
 		return B_ENTRY_NOT_FOUND;
-	Reference<User> userReference(user, true);
+	BReference<User> userReference(user, true);
 
 	// remove it
 	status_t error = RemoveUser(user);
 	if (error == B_OK && _user) {
 		*_user = user;
-		user->AddReference();
+		user->AcquireReference();
 	}
 
 	return error;
@@ -677,7 +677,7 @@ SecurityContext::RemoveUser(User* user)
 	}
 
 	// surrender our user reference
-	user->RemoveReference();
+	user->ReleaseReference();
 
 	return B_OK;
 }
@@ -694,7 +694,7 @@ SecurityContext::FindUser(const char* name)
 	ContextLocker _(this);
 	User* user = fUsers->Get(name);
 	if (user)
-		user->AddReference();
+		user->AcquireReference();
 	return user;
 }
 
@@ -713,7 +713,7 @@ SecurityContext::AuthenticateUser(const char* name, const char* password,
 	User* user = FindUser(name);
 	if (!user)
 		return B_PERMISSION_DENIED;
-	Reference<User> userReference(user, true);
+	BReference<User> userReference(user, true);
 
 	// check password
 	if (user->GetPassword()) {
@@ -773,7 +773,7 @@ SecurityContext::AddShare(const char* name, const node_ref& ref, Share** _share)
 	Share* share = new(std::nothrow) Share;
 	if (!share)
 		return B_NO_MEMORY;
-	Reference<Share> shareReference(share, true);
+	BReference<Share> shareReference(share, true);
 	status_t error = share->Init(name, ref);
 	if (error != B_OK)
 		return error;
@@ -786,7 +786,7 @@ SecurityContext::AddShare(const char* name, const node_ref& ref, Share** _share)
 	shareReference.Detach();
 	if (_share) {
 		*_share = share;
-		share->AddReference();
+		share->AcquireReference();
 	}
 	return B_OK;
 }
@@ -809,7 +809,7 @@ SecurityContext::AddShare(const char* name, const char* path, Share** _share)
 	Share* share = new(std::nothrow) Share;
 	if (!share)
 		return B_NO_MEMORY;
-	Reference<Share> shareReference(share, true);
+	BReference<Share> shareReference(share, true);
 	status_t error = share->Init(name, path);
 	if (error != B_OK)
 		return error;
@@ -822,7 +822,7 @@ SecurityContext::AddShare(const char* name, const char* path, Share** _share)
 	shareReference.Detach();
 	if (_share) {
 		*_share = share;
-		share->AddReference();
+		share->AcquireReference();
 	}
 	return B_OK;
 }
@@ -842,13 +842,13 @@ SecurityContext::RemoveShare(const char* name, Share** _share)
 	Share* share = FindShare(name);
 	if (!share)
 		return B_ENTRY_NOT_FOUND;
-	Reference<Share> shareReference(share, true);
+	BReference<Share> shareReference(share, true);
 
 	// remove it
 	status_t error = RemoveShare(share);
 	if (error == B_OK && _share) {
 		*_share = share;
-		share->AddReference();
+		share->AcquireReference();
 	}
 
 	return error;
@@ -869,7 +869,7 @@ SecurityContext::RemoveShare(Share* share)
 	fShares->Remove(share->GetName());
 
 	// surrender our share reference
-	share->RemoveReference();
+	share->ReleaseReference();
 
 	return B_OK;
 }
@@ -886,7 +886,7 @@ SecurityContext::FindShare(const char* name)
 	ContextLocker _(this);
 	Share* share = fShares->Get(name);
 	if (share)
-		share->AddReference();
+		share->AcquireReference();
 	return share;
 }
 

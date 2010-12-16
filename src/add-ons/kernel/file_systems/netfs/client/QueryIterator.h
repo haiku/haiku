@@ -29,6 +29,9 @@ public:
 			struct GetVolumeLink;
 			friend struct GetVolumeLink;
 
+protected:
+	virtual	void				LastReferenceReleased();
+
 private:
 			Volume*				fVolume;
 			HierarchicalQueryIterator* fParentIterator;

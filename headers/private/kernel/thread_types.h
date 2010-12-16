@@ -161,7 +161,7 @@ struct free_user_thread {
 
 class AssociatedDataOwner;
 
-class AssociatedData : public Referenceable,
+class AssociatedData : public BReferenceable,
 	public DoublyLinkedListLinkImpl<AssociatedData> {
 public:
 								AssociatedData();

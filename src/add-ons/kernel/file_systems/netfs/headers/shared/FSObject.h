@@ -13,6 +13,9 @@ public:
 			void				MarkRemoved();
 			bool				IsRemoved() const;
 
+protected:
+	virtual	void				LastReferenceReleased();
+
 private:
 			bool				fRemoved;
 };
