@@ -336,6 +336,10 @@ DebuggerInterface::GetNextDebugEvent(DebugEvent*& _event)
 			return size;
 		}
 
+		if (infos[0].events & B_EVENT_INVALID
+			|| infos[1].events & B_EVENT_INVALID)
+			return B_BAD_PORT_ID;
+
 		if (infos[0].events & B_EVENT_READ)
 			return _GetNextDebuggerEvent(_event);
 		else if (infos[1].events & B_EVENT_READ)
