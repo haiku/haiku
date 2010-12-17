@@ -36,8 +36,8 @@ BAboutWindow::BAboutWindow(const char *appName, int32 firstCopyrightYear,
 	if (gLocaleBackend == NULL)
 		LocaleBackend::LoadBackend();
 
-	const char* copyright = B_TRANSLATE_MARK("Copyright " B_UTF8_COPYRIGHT " %years% Haiku, Inc.\n\n");
-	const char* writtenBy = B_TRANSLATE_MARK("Written by:\n");
+	const char* copyright = B_TRANSLATE_MARK("Copyright " B_UTF8_COPYRIGHT " %years% Haiku, Inc.");
+	const char* writtenBy = B_TRANSLATE_MARK("Written by:");
 	if (gLocaleBackend) {
 		copyright = gLocaleBackend->GetString(copyright, "AboutWindow");
 		writtenBy = gLocaleBackend->GetString(writtenBy, "AboutWindow");
@@ -55,9 +55,11 @@ BAboutWindow::BAboutWindow(const char *appName, int32 firstCopyrightYear,
 
 	// Build the text to display
 	BString text(appName);
+	text << "\n\n";
 	text << copyright;
+	text << "\n\n";
 	text.ReplaceAll("%years%", copyrightYears.String());
-	text << writtenBy;
+	text << writtenBy << "\n";
 	for (int32 i = 0; authors[i]; i++) {
 		text << "    " << authors[i] << "\n";
 	}
@@ -81,7 +83,14 @@ BAboutWindow::~BAboutWindow()
 void
 BAboutWindow::Show()
 {
-	BAlert *alert = new BAlert("About" B_UTF8_ELLIPSIS, fText->String(), "Close");
+	const char* aboutTitle = B_TRANSLATE_MARK("About" B_UTF8_ELLIPSIS);
+	const char* closeLabel = B_TRANSLATE_MARK("Close");
+	if (gLocaleBackend) {
+		aboutTitle = gLocaleBackend->GetString(aboutTitle, "AboutWindow");
+		closeLabel = gLocaleBackend->GetString(closeLabel, "AboutWindow");
+	}
+
+	BAlert *alert = new BAlert(aboutTitle, fText->String(), closeLabel);
 	BTextView *view = alert->TextView();
 	BFont font;
 	view->SetStylable(true);
