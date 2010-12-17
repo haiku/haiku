@@ -231,7 +231,6 @@ DebuggerInterface::DebuggerInterface(team_id teamID)
 	fTeamID(teamID),
 	fDebuggerPort(-1),
 	fNubPort(-1),
-	fSystemWatchPort(-1),
 	fDebugContextPool(NULL),
 	fArchitecture(NULL)
 {
@@ -277,13 +276,8 @@ DebuggerInterface::Init()
 	if (fNubPort < 0)
 		return fNubPort;
 
-	snprintf(buffer, sizeof(buffer), "team %ld debug system watcher", fTeamID);
-	fSystemWatchPort = create_port(100, buffer);
-	if (fSystemWatchPort < 0)
-		return fSystemWatchPort;
-
 	error = start_watching_system(fTeamID, B_WATCH_SYSTEM_THREAD_PROPERTIES,
-		fSystemWatchPort, 0);
+		fDebuggerPort, 0);
 	if (error != B_OK)
 		return error;
 // TODO: Stop watching in Close()!
@@ -311,9 +305,6 @@ DebuggerInterface::Close(bool killTeam)
 
 	if (fDebuggerPort >= 0)
 		delete_port(fDebuggerPort);
-
-	if (fSystemWatchPort >= 0)
-		delete_port(fSystemWatchPort);
 }
 
 
@@ -321,15 +312,10 @@ status_t
 DebuggerInterface::GetNextDebugEvent(DebugEvent*& _event)
 {
 	while (true) {
-		object_wait_info infos[2];
-		infos[0].object = fDebuggerPort;
-		infos[0].type = B_OBJECT_TYPE_PORT;
-		infos[0].events = B_EVENT_READ;
-		infos[1].object = fSystemWatchPort;
-		infos[1].type = B_OBJECT_TYPE_PORT;
-		infos[1].events = B_EVENT_READ;
-
-		ssize_t size = wait_for_objects(infos, 2);
+		char buffer[1024];
+		int32 messageCode;
+		ssize_t size = read_port(fDebuggerPort, &messageCode, buffer,
+			sizeof(buffer));
 		if (size < 0) {
 			if (size == B_INTERRUPTED)
 				continue;
@@ -337,14 +323,33 @@ DebuggerInterface::GetNextDebugEvent(DebugEvent*& _event)
 			return size;
 		}
 
-		if (infos[0].events & B_EVENT_INVALID
-			|| infos[1].events & B_EVENT_INVALID)
-			return B_BAD_PORT_ID;
+		if (messageCode <= B_DEBUGGER_MESSAGE_HANDED_OVER) {
+			debug_debugger_message_data message;
+			memcpy(&message, buffer, size);
+			if (message.origin.team != fTeamID)
+				continue;
 
-		if (infos[0].events & B_EVENT_READ)
-			return _GetNextDebuggerEvent(_event);
-		else if (infos[1].events & B_EVENT_READ)
-			return _GetNextSystemWatchEvent(_event);
+			bool ignore = false;
+			status_t error = _CreateDebugEvent(messageCode, message, ignore,
+				_event);
+			if (error != B_OK)
+				return error;
+
+			if (ignore) {
+				if (message.origin.thread >= 0 && message.origin.nub_port >= 0)
+					continue_thread(message.origin.nub_port,
+						message.origin.thread);
+				continue;
+			}
+
+			return B_OK;
+		}
+
+		KMessage message;
+		size = message.SetTo(buffer);
+		if (size != B_OK)
+			return size;
+		return _GetNextSystemWatchEvent(_event, message);
 	}
 
 	return B_OK;
@@ -741,100 +746,45 @@ DebuggerInterface::_CreateDebugEvent(int32 messageCode,
 
 
 status_t
-DebuggerInterface::_GetNextDebuggerEvent(DebugEvent*& _event)
+DebuggerInterface::_GetNextSystemWatchEvent(DebugEvent*& _event,
+	KMessage& message)
 {
-	while (true) {
-		debug_debugger_message_data message;
-		int32 messageCode;
-		ssize_t size = read_port(fDebuggerPort, &messageCode, &message,
-			sizeof(message));
-		if (size < 0) {
-			if (size == B_INTERRUPTED)
-				continue;
+	status_t error = B_OK;
+	if (message.What() != B_SYSTEM_OBJECT_UPDATE)
+		return B_BAD_DATA;
 
-			return size;
-		}
+	int32 opcode = 0;
+	if (message.FindInt32("opcode", &opcode) != B_OK)
+		return B_BAD_DATA;
 
-		if (message.origin.team != fTeamID)
-			continue;
-
-		bool ignore = false;
-		status_t error = _CreateDebugEvent(messageCode, message, ignore,
-			_event);
-		if (error != B_OK)
-			return error;
-
-		if (ignore) {
-			if (message.origin.thread >= 0 && message.origin.nub_port >= 0)
-				continue_thread(message.origin.nub_port, message.origin.thread);
-			continue;
-		}
-
-		return B_OK;
-	}
-
-	return B_OK;
-}
-
-
-status_t
-DebuggerInterface::_GetNextSystemWatchEvent(DebugEvent*& _event)
-{
-	while (true) {
-		char buffer[1024];
-		int32 messageCode;
-		ssize_t bytesRead = read_port(fSystemWatchPort, &messageCode,
-			buffer, sizeof(buffer));
-
-		if (bytesRead < 0) {
-			if (bytesRead == B_INTERRUPTED)
-				continue;
-
-			return bytesRead;
-		}
-
-		KMessage message;
-		status_t error = message.SetTo((const void *)buffer, bytesRead);
-		if (error != B_OK)
-			return error;
-		if (message.What() != B_SYSTEM_OBJECT_UPDATE)
-			return B_BAD_DATA;
-
-		int32 opcode = 0;
-		if (message.FindInt32("opcode", &opcode) != B_OK)
-			return B_BAD_DATA;
-
-		DebugEvent* event = NULL;
-		switch (opcode)
+	DebugEvent* event = NULL;
+	switch (opcode)
+	{
+		case B_THREAD_NAME_CHANGED:
 		{
-			case B_THREAD_NAME_CHANGED:
-			{
-				int32 threadID = -1;
-				if (message.FindInt32("thread", &threadID) != B_OK)
-					break;
-
-				thread_info info;
-				error = get_thread_info(threadID, &info);
-				if (error != B_OK)
-					break;
-
-				event = new(std::nothrow) ThreadRenamedEvent(fTeamID,
-					threadID, threadID, info.name);
+			int32 threadID = -1;
+			if (message.FindInt32("thread", &threadID) != B_OK)
 				break;
-			}
 
-			default:
-			{
-				error = B_BAD_DATA;
+			thread_info info;
+			error = get_thread_info(threadID, &info);
+			if (error != B_OK)
 				break;
-			}
+
+			event = new(std::nothrow) ThreadRenamedEvent(fTeamID,
+				threadID, threadID, info.name);
+			break;
 		}
 
-		if (event != NULL)
-			_event = event;
-
-		return error;
+		default:
+		{
+			error = B_BAD_DATA;
+			break;
+		}
 	}
 
-	return B_OK;
+	if (event != NULL)
+		_event = event;
+
+	return error;
 }
