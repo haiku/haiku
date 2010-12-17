@@ -27,6 +27,10 @@
 #include <stdio.h>
 #include "MediaFormat.h"
 
+#define UINT64_C(c) (c ## ULL)
+extern "C" {
+  #include "avcodec.h"
+}
 
 void
 PrintFormat(const media_format &format)
@@ -51,8 +55,11 @@ GetHeaderFormatAc3Audio(media_format *out_format, const uint8 *header, size_t si
 
 	status_t status;
 	media_format_description desc;
-	desc.family = B_WAV_FORMAT_FAMILY;
-	desc.u.wav.codec = 0x2000;
+//	desc.family = B_WAV_FORMAT_FAMILY;
+//	desc.u.wav.codec = 0x2000;
+	desc.family = B_MISC_FORMAT_FAMILY;
+	desc.u.misc.file_format = 'ffmp';
+	desc.u.misc.codec = CODEC_ID_AC3;
 
 	BMediaFormats formats;	
 	status = formats.InitCheck();
@@ -103,9 +110,13 @@ GetHeaderFormatMpegAudio(media_format *out_format, const uint8 *header, size_t s
 
 	status_t status;
 	media_format_description desc;
-	desc.family = B_MPEG_FORMAT_FAMILY;
-	desc.u.mpeg.id = B_MPEG_2_AUDIO_LAYER_2;
-
+//	desc.family = B_MPEG_FORMAT_FAMILY;
+//	desc.u.mpeg.id = B_MPEG_2_AUDIO_LAYER_2;
+	desc.family = B_MISC_FORMAT_FAMILY;
+	desc.u.misc.file_format = 'ffmp';
+	desc.u.misc.codec = CODEC_ID_MP3;
+	
+	
 	BMediaFormats formats;	
 	status = formats.InitCheck();
 	if (status) {
@@ -133,8 +144,11 @@ GetHeaderFormatMpegVideo(media_format *out_format, const uint8 *header, size_t s
 
 	status_t status;
 	media_format_description desc;
-	desc.family = B_MPEG_FORMAT_FAMILY;
-	desc.u.mpeg.id = B_MPEG_2_VIDEO;
+//	desc.family = B_MPEG_FORMAT_FAMILY;
+//	desc.u.mpeg.id = B_MPEG_2_VIDEO;
+	desc.family = B_MISC_FORMAT_FAMILY;
+	desc.u.misc.file_format = 'ffmp';
+	desc.u.misc.codec = CODEC_ID_MPEG2VIDEO;
 
 	BMediaFormats formats;
 	status = formats.InitCheck();
