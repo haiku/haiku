@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2004-2007 Marcus Overhagen <marcus@overhagen.de>
+ * Copyright (c) 2004-2010 Marcus Overhagen <marcus@overhagen.de>
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -56,11 +56,20 @@ GetHeaderFormatAc3Audio(media_format *out_format, const uint8 *header, size_t si
 
 	BMediaFormats formats;	
 	status = formats.InitCheck();
-	if (status)
+	if (status) {
+		printf("formats.InitCheck failed, error %lu\n", status);
 		return status;
+	}
 	
-	return formats.GetFormatFor(desc, out_format);
+	status = formats.GetFormatFor(desc, out_format);
+	if (status) {
+		printf("formats.GetFormatFor failed, error %lu\n", status);
+		return status;
+	}
+	
+	return B_OK;
 }
+
 
 
 static status_t
@@ -99,12 +108,16 @@ GetHeaderFormatMpegAudio(media_format *out_format, const uint8 *header, size_t s
 
 	BMediaFormats formats;	
 	status = formats.InitCheck();
-	if (status)
+	if (status) {
+		printf("formats.InitCheck failed, error %lu\n", status);
 		return status;
+	}
 	
 	status = formats.GetFormatFor(desc, out_format);
-	if (status)
+	if (status) {
+		printf("formats.GetFormatFor failed, error %lu\n", status);
 		return status;
+	}
 
 	out_format->u.encoded_audio.output.frame_rate = 48000;
 	out_format->u.encoded_audio.output.channel_count = 2;
@@ -125,10 +138,18 @@ GetHeaderFormatMpegVideo(media_format *out_format, const uint8 *header, size_t s
 
 	BMediaFormats formats;
 	status = formats.InitCheck();
-	if (status)
+	if (status) {
+		printf("formats.InitCheck failed, error %lu\n", status);
 		return status;
+	}
 	
-	return formats.GetFormatFor(desc, out_format);
+	status = formats.GetFormatFor(desc, out_format);
+	if (status) {
+		printf("formats.GetFormatFor failed, error %lu\n", status);
+		return status;
+	}
+
+	return B_OK;
 }
 
 
@@ -170,4 +191,3 @@ GetHeaderFormat(media_format *out_format, const void *header, size_t size, int s
 	}
 	return status;
 }
-
