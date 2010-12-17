@@ -64,10 +64,13 @@ ActivityMonitor::AboutRequested()
 /*static*/ void
 ActivityMonitor::ShowAbout()
 {
-	BAlert *alert = new BAlert(B_TRANSLATE("about"),
-		B_TRANSLATE("ActivityMonitor\n"
-		"\twritten by Axel Dörfler\n"
-		"\tCopyright 2008, Haiku Inc.\n"), B_TRANSLATE("OK"));
+	BString	text;
+	text << kAppName << "\n"
+		<< B_TRANSLATE("\twritten by Axel Dörfler\n"
+		"\tCopyright 2008, Haiku Inc.\n");
+
+	BAlert *alert = new BAlert(B_TRANSLATE("About"),
+		text.String(), B_TRANSLATE("OK"));
 	BTextView *view = alert->TextView();
 	BFont font;
 
@@ -76,7 +79,7 @@ ActivityMonitor::ShowAbout()
 	view->GetFont(&font);
 	font.SetSize(18);
 	font.SetFace(B_BOLD_FACE);
-	view->SetFontAndColor(0, 15, &font);
+	view->SetFontAndColor(0, strlen(kAppName), &font);
 
 	alert->Go();
 }

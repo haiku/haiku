@@ -7,9 +7,15 @@
 
 
 #include <Application.h>
+#include <Catalog.h>
 
 class BMessage;
 class ActivityWindow;
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "ActivityWindow"
+
+static const char* kAppName = B_TRANSLATE_MARK("ActivityMonitor");
 
 
 class ActivityMonitor : public BApplication {
