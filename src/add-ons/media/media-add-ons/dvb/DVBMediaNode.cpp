@@ -2287,10 +2287,10 @@ DVBMediaNode::RefreshStateList()
 
 	const char *dir;
 	switch (fInterfaceType) {
-		case DVB_TYPE_DVB_C: dir = "/boot/home/config/settings/dvb/dvb-c channels"; break;
-		case DVB_TYPE_DVB_H: dir = "/boot/home/config/settings/dvb/dvb-h channels"; break;
-		case DVB_TYPE_DVB_S: dir = "/boot/home/config/settings/dvb/dvb-s channels"; break;
-		case DVB_TYPE_DVB_T: dir = "/boot/home/config/settings/dvb/dvb-t channels"; break;
+		case DVB_TYPE_DVB_C: dir = "/boot/home/config/settings/Media/dvb/dvb-c channels"; break;
+		case DVB_TYPE_DVB_H: dir = "/boot/home/config/settings/Media/dvb/dvb-h channels"; break;
+		case DVB_TYPE_DVB_S: dir = "/boot/home/config/settings/Media/dvb/dvb-s channels"; break;
+		case DVB_TYPE_DVB_T: dir = "/boot/home/config/settings/Media/dvb/dvb-t channels"; break;
 		default:
 			printf("DVBMediaNode::RefreshStateList unknown interface type\n");
 			return;
