@@ -611,6 +611,11 @@ CopyDirectoryToHaikuImage common data
 	: [ FDirName $(HAIKU_TOP) src libs print libgutenprint src xml ]
 	: gutenprint : -x .svn -x *.c -x Makefile.am -x Makefile.in ;
 
+# dvb channel settings
+CopyDirectoryToHaikuImage home config settings Media
+	: [ FDirName $(HAIKU_TOP) data settings media dvb ]
+	: dvb : -x .svn -x Jamfile ;
+
 # licenses
 CopyDirectoryToHaikuImage system data
 	: [ FDirName $(HAIKU_TOP) data system data licenses ]
