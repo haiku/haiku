@@ -7,13 +7,23 @@
  */
 
 #include <AboutWindow.h>
+
+#include <stdarg.h>
+#include <time.h>
+
 #include <Alert.h>
 #include <Font.h>
 #include <String.h>
 #include <TextView.h>
 
-#include <stdarg.h>
-#include <time.h>
+#include <Catalog.h>
+#include <LocaleBackend.h>
+using BPrivate::gLocaleBackend;
+using BPrivate::LocaleBackend;
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "AboutWindow"
 
 
 BAboutWindow::BAboutWindow(const char *appName, int32 firstCopyrightYear,
@@ -21,21 +31,37 @@ BAboutWindow::BAboutWindow(const char *appName, int32 firstCopyrightYear,
 {
 	fAppName = new BString(appName);
 
+	// we need to translate some strings, and in order to do so, we need
+	// to use the LocaleBackend to reache liblocale.so
+	if (gLocaleBackend == NULL)
+		LocaleBackend::LoadBackend();
+
+	const char* copyright = B_TRANSLATE_MARK("Copyright " B_UTF8_COPYRIGHT " %years% Haiku, Inc.\n\n");
+	const char* writtenBy = B_TRANSLATE_MARK("Written by:\n");
+	if (gLocaleBackend) {
+		copyright = gLocaleBackend->GetString(copyright, "AboutWindow");
+		writtenBy = gLocaleBackend->GetString(writtenBy, "AboutWindow");
+	}
+
 	// Get current year
 	time_t tp;
 	time(&tp);
 	char currentYear[5];
 	strftime(currentYear, 5, "%Y", localtime(&tp));
+	BString copyrightYears;
+	copyrightYears << firstCopyrightYear;
+	if (copyrightYears != currentYear)
+		copyrightYears << "-" << currentYear;
 
 	// Build the text to display
 	BString text(appName);
-	text << "\n\nCopyright " B_UTF8_COPYRIGHT " ";
-	text << firstCopyrightYear << "-" << currentYear << " Haiku, Inc.\n\n";
-	text << "Written by:\n";
+	text << copyright;
+	text.ReplaceAll("%years%", copyrightYears.String());
+	text << writtenBy;
 	for (int32 i = 0; authors[i]; i++) {
 		text << "    " << authors[i] << "\n";
 	}
-	
+
 	// The extra information is optional
 	if (extraInfo != NULL) {
 		text << "\n" << extraInfo << "\n";

@@ -65,10 +65,13 @@ StaticLibrary liblocalestub.a
 	;
 
 SEARCH on [ FGristFiles StringForSize.cpp ] += [ FDirName $(HAIKU_TOP) src kits shared ] ;
+SEARCH on [ FGristFiles AboutWindow.cpp ] += [ FDirName $(HAIKU_TOP) src kits shared ] ;
 SEARCH on [ FGristFiles ColorControl.cpp ] += [ FDirName $(HAIKU_TOP) src kits interface ] ;
 
-DoCatalogs liblocale.so :
-	system
-	: StringForSize.cpp
-	  ColorControl.cpp
+DoCatalogs liblocale.so
+	: system
+	:
+	AboutWindow.cpp
+	ColorControl.cpp
+	StringForSize.cpp
 	;
