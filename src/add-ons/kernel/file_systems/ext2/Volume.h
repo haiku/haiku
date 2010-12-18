@@ -48,7 +48,7 @@ public:
 									{ return fNumInodes; }
 			uint32				NumGroups() const
 									{ return fNumGroups; }
-			off_t				NumBlocks() const
+			fsblock_t			NumBlocks() const
 									{ return fSuperBlock.NumBlocks(
 										Has64bitFeature()); }
 			off_t				NumFreeBlocks() const
@@ -81,6 +81,9 @@ public:
 			bool				Has64bitFeature() const
 									{ return (fSuperBlock.CompatibleFeatures()
 										& EXT2_INCOMPATIBLE_FEATURE_64BIT) != 0; }
+			bool				HasExtentsFeature() const
+									{ return (fSuperBlock.IncompatibleFeatures()
+										& EXT2_INCOMPATIBLE_FEATURE_EXTENTS) != 0; }
 			uint8				DefaultHashVersion() const
 									{ return fSuperBlock.default_hash_version; }
 			bool				HugeFiles() const
@@ -100,10 +103,10 @@ public:
 
 			status_t			AllocateBlocks(Transaction& transaction,
 									uint32 minimum, uint32 maximum,
-									uint32& blockGroup, off_t& start,
+									uint32& blockGroup, fsblock_t& start,
 									uint32& length);
 			status_t			FreeBlocks(Transaction& transaction,
-									off_t start, uint32 length);
+									fsblock_t start, uint32 length);
 
 			status_t			LoadSuperBlock();
 			status_t			WriteSuperBlock(Transaction& transaction);

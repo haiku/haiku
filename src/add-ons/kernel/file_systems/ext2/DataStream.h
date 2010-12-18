@@ -8,6 +8,7 @@
 #ifndef DATASTREAM_H
 #define DATASTREAM_H
 
+
 #include "ext2.h"
 #include "Transaction.h"
 
@@ -22,7 +23,7 @@ public:
 						off_t size);
 					~DataStream();
 
-	status_t		FindBlock(off_t offset, off_t& block,
+	status_t		FindBlock(off_t offset, fsblock_t& block,
 						uint32 *_count = NULL);
 	status_t		Enlarge(Transaction& transaction, off_t& numBlocks);
 	status_t		Shrink(Transaction& transaction, off_t& numBlocks);
@@ -82,7 +83,7 @@ private:
 	uint32			fFirstBlock;
 
 	uint32			fAllocated;
-	off_t			fAllocatedPos;
+	fsblock_t		fAllocatedPos;
 	uint32			fWaiting;
 
 	uint32			fFreeStart;

@@ -10,6 +10,7 @@
 
 #include <lock.h>
 
+#include "ext2.h"
 #include "Transaction.h"
 
 
@@ -29,13 +30,13 @@ public:
 
 private:
 			status_t	_Allocate(Transaction& transaction,
-							uint32 prefferedBlockGroup, bool isDirectory,
+							uint32 preferredBlockGroup, bool isDirectory,
 							ino_t& id);
 			status_t	_MarkInBitmap(Transaction& transaction,
-							off_t bitmapBlock, uint32 blockGroup,
+							fsblock_t bitmapBlock, uint32 blockGroup,
 							uint32 numInodes, ino_t& id);
 			status_t	_UnmarkInBitmap(Transaction& transaction,
-							off_t bitmapBlock, uint32 numInodes, ino_t id);
+							fsblock_t bitmapBlock, uint32 numInodes, ino_t id);
 
 
 			Volume*		fVolume;

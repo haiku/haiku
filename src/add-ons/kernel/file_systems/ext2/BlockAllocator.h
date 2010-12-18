@@ -8,8 +8,10 @@
 #ifndef BLOCKALLOCATOR_H
 #define BLOCKALLOCATOR_H
 
+
 #include <lock.h>
 
+#include "ext2.h"
 #include "Transaction.h"
 
 
@@ -27,11 +29,11 @@ public:
 
 			status_t	AllocateBlocks(Transaction& transaction,
 							uint32 minimum, uint32 maximum, uint32& blockGroup,
-							off_t& start, uint32& length);
+							fsblock_t& start, uint32& length);
 			status_t	Allocate(Transaction& transaction, Inode* inode,
-							off_t numBlocks, uint32 minimum, off_t& start,
+							off_t numBlocks, uint32 minimum, fsblock_t& start,
 							uint32& length);
-			status_t	Free(Transaction& transaction, off_t start,
+			status_t	Free(Transaction& transaction, fsblock_t start,
 							uint32 length);
 
 			uint32		FreeBlocks();
@@ -45,9 +47,9 @@ protected:
 
 			AllocationBlockGroup* fGroups;
 			uint32		fBlocksPerGroup;
-			uint32		fNumBlocks;
+			fsblock_t	fNumBlocks;
 			uint32		fNumGroups;
-			uint32		fFirstBlock;
+			fsblock_t	fFirstBlock;
 };
 
 #endif	// BLOCKALLOCATOR_H

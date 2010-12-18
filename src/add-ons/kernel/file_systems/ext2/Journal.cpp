@@ -304,7 +304,7 @@ Journal::Unlock(Transaction* owner, bool success)
 
 
 status_t
-Journal::MapBlock(off_t logical, off_t& physical)
+Journal::MapBlock(off_t logical, fsblock_t& physical)
 {
 	TRACE("Journal::MapBlock()\n");
 	physical = logical;
@@ -402,7 +402,7 @@ Journal::_WritePartialTransactionToLog(JournalHeader* descriptorBlock,
 
 		logBlock = _WrapAroundLog(logBlock + 1);
 
-		off_t physicalBlock;
+		fsblock_t physicalBlock;
 		status = MapBlock(logBlock, physicalBlock);
 		if (status != B_OK)
 			return status;
@@ -434,7 +434,7 @@ Journal::_WritePartialTransactionToLog(JournalHeader* descriptorBlock,
 	--tag;
 	tag->SetLastTagFlag();
 	
-	off_t physicalBlock;
+	fsblock_t physicalBlock;
 	status = MapBlock(descriptorBlockPos, physicalBlock);
 	if (status != B_OK)
 		return status;
@@ -579,7 +579,7 @@ Journal::_WriteTransactionToLog()
 		// written. When it recovery reaches where the first commit should be 
 		// and doesn't find it, it considers it found the end of the log.
 
-		off_t physicalBlock;
+		fsblock_t physicalBlock;
 		status = MapBlock(logBlock, physicalBlock);
 		if (status != B_OK)
 			return status;
@@ -602,7 +602,7 @@ Journal::_WriteTransactionToLog()
 	}
 
 	// Transaction will enter the Commit state
-	off_t physicalBlock;
+	fsblock_t physicalBlock;
 	status = MapBlock(commitBlockPos, physicalBlock);
 	if (status != B_OK)
 		return status;
@@ -661,7 +661,7 @@ status_t
 Journal::_SaveSuperBlock()
 {
 	TRACE("Journal::_SaveSuperBlock()\n");
-	off_t physicalBlock;
+	fsblock_t physicalBlock;
 	status_t status = MapBlock(0, physicalBlock);
 	if (status != B_OK)
 		return status;
@@ -695,7 +695,7 @@ status_t
 Journal::_LoadSuperBlock()
 {
 	TRACE("Journal::_LoadSuperBlock()\n");
-	off_t superblockPos;
+	fsblock_t superblockPos;
 
 	status_t status = MapBlock(0, superblockPos);
 	if (status != B_OK)
@@ -842,7 +842,7 @@ Journal::_RecoverPassScan(uint32& lastCommitID)
 	JournalHeader* header;
 	uint32 nextCommitID = fFirstCommitID;
 	uint32 nextBlock = fLogStart;
-	off_t nextBlockPos;
+	fsblock_t nextBlockPos;
 
 	status_t status = MapBlock(nextBlock, nextBlockPos);
 	if (status != B_OK)
@@ -898,7 +898,7 @@ Journal::_RecoverPassRevoke(uint32 lastCommitID)
 	JournalHeader* header;
 	uint32 nextCommitID = fFirstCommitID;
 	uint32 nextBlock = fLogStart;
-	off_t nextBlockPos;
+	fsblock_t nextBlockPos;
 
 	status_t status = MapBlock(nextBlock, nextBlockPos);
 	if (status != B_OK)
@@ -960,7 +960,7 @@ Journal::_RecoverPassReplay(uint32 lastCommitID)
 
 	uint32 nextCommitID = fFirstCommitID;
 	uint32 nextBlock = fLogStart;
-	off_t nextBlockPos;
+	fsblock_t nextBlockPos;
 
 	status_t status = MapBlock(nextBlock, nextBlockPos);
 	if (status != B_OK)

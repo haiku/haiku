@@ -15,6 +15,11 @@
 
 //#define TRACE_EXT2
 
+
+typedef uint64 fileblock_t;		// file block number
+typedef uint64 fsblock_t;		// filesystem block number
+
+
 #define EXT2_SUPER_BLOCK_OFFSET	1024
 
 struct ext2_super_block {
@@ -213,7 +218,7 @@ struct ext2_block_group {
 	uint16	unused_inodes_high;
 	uint32	_reserved2[3];
 
-	uint64 BlockBitmap(bool has64bits) const
+	fsblock_t BlockBitmap(bool has64bits) const
 	{
 		uint64 block = B_LENDIAN_TO_HOST_INT32(block_bitmap);
 		if (has64bits)
@@ -221,7 +226,7 @@ struct ext2_block_group {
 				((uint64)B_LENDIAN_TO_HOST_INT32(block_bitmap_high) << 32);
 		return block;
 	}
-	uint64 InodeBitmap(bool has64bits) const
+	fsblock_t InodeBitmap(bool has64bits) const
 	{
 		uint64 bitmap = B_LENDIAN_TO_HOST_INT32(inode_bitmap);
 		if (has64bits)
@@ -296,6 +301,76 @@ struct ext2_data_stream {
 	uint32 triple_indirect;
 } _PACKED;
 
+#define EXT2_EXTENT_MAGIC			0xf30a
+
+struct ext2_extent_header {
+	uint16 magic;
+	uint16 num_entries;
+	uint16 max_entries;
+	uint16 depth;
+	uint32 generation;
+	bool IsValid() const
+	{
+		return B_LENDIAN_TO_HOST_INT16(magic) == EXT2_EXTENT_MAGIC;
+	}
+	uint16 NumEntries() const { return B_LENDIAN_TO_HOST_INT16(num_entries); }
+	uint16 MaxEntries() const { return B_LENDIAN_TO_HOST_INT16(max_entries); }
+	uint16 Depth() const { return B_LENDIAN_TO_HOST_INT16(depth); }
+	uint32 Generation() const { return B_LENDIAN_TO_HOST_INT32(generation); }
+	void SetNumEntries(uint16 num)
+		{ num_entries = B_HOST_TO_LENDIAN_INT16(num); }
+	void SetMaxEntries(uint16 max)
+		{ max_entries = B_HOST_TO_LENDIAN_INT16(max); }
+	void SetDepth(uint16 _depth)
+		{ depth = B_HOST_TO_LENDIAN_INT16(_depth); }
+	void SetGeneration(uint32 _generation)
+		{ generation = B_HOST_TO_LENDIAN_INT32(_generation); }
+} _PACKED;
+
+struct ext2_extent_index {
+	uint32 logical_block;
+	uint32 physical_block;
+	uint16 physical_block_high;
+	uint16 _reserved;
+	uint32 LogicalBlock() const
+		{ return B_LENDIAN_TO_HOST_INT32(logical_block); }
+	uint64 PhysicalBlock() const { return B_LENDIAN_TO_HOST_INT32(physical_block)
+		| ((uint64)B_LENDIAN_TO_HOST_INT16(physical_block_high) << 32); }
+	void SetLogicalBlock(uint32 block) {
+		logical_block = B_HOST_TO_LENDIAN_INT32(block); }
+	void SetPhysicalBlock(uint64 block) {
+		physical_block = B_HOST_TO_LENDIAN_INT32(block & 0xffffffff);
+		physical_block_high = B_HOST_TO_LENDIAN_INT16((block >> 32) & 0xffff); }
+} _PACKED;
+
+struct ext2_extent_entry {
+	uint32 logical_block;
+	uint16 length;
+	uint16 physical_block_high;
+	uint32 physical_block;
+	uint32 LogicalBlock() const
+		{ return B_LENDIAN_TO_HOST_INT32(logical_block); }
+	uint16 Length() const { return B_LENDIAN_TO_HOST_INT16(length) == 0x8000 
+		? 0x8000 : B_LENDIAN_TO_HOST_INT16(length) & 0x7fff; }
+	uint64 PhysicalBlock() const { return B_LENDIAN_TO_HOST_INT32(physical_block)
+		| ((uint64)B_LENDIAN_TO_HOST_INT16(physical_block_high) << 32); }
+	void SetLogicalBlock(uint32 block) {
+		logical_block = B_HOST_TO_LENDIAN_INT32(block); }
+	void SetLength(uint16 _length) {
+		length = B_HOST_TO_LENDIAN_INT16(_length) & 0x7fff; }
+	void SetPhysicalBlock(uint64 block) {
+		physical_block = B_HOST_TO_LENDIAN_INT32(block & 0xffffffff);
+		physical_block_high = B_HOST_TO_LENDIAN_INT16((block >> 32) & 0xffff); }
+} _PACKED;
+
+struct ext2_extent_stream {
+	ext2_extent_header extent_header;
+	union {
+		ext2_extent_entry extent_entries[4];
+		ext2_extent_index extent_index[4];
+	};
+} _PACKED;
+
 #define EXT2_INODE_NORMAL_SIZE		128
 
 struct ext2_inode {
@@ -314,6 +389,7 @@ struct ext2_inode {
 	union {
 		ext2_data_stream stream;
 		char symlink[EXT2_SHORT_SYMLINK_LENGTH];
+		ext2_extent_stream extent_stream;
 	};
 	uint32	generation;
 	uint32	file_access_control;
@@ -546,8 +622,17 @@ struct ext2_inode {
 #define EXT2_INODE_COMPRESSION_ERROR	0x00000800
 #define EXT2_INODE_BTREE				0x00001000
 #define EXT2_INODE_INDEXED				0x00001000
+#define EXT2_INODE_JOURNAL_DATA			0x00004000
+#define EXT2_INODE_NO_MERGE_TAIL		0x00008000
+#define EXT2_INODE_DIR_SYNCH			0x00010000
 #define EXT2_INODE_HUGE_FILE			0x00040000
 #define EXT2_INODE_EXTENTS				0x00080000
+
+#define EXT2_INODE_INHERITED (EXT2_INODE_SECURE_DELETION | EXT2_INODE_UNDELETE \
+	| EXT2_INODE_COMPRESSED | EXT2_INODE_SYNCHRONOUS | EXT2_INODE_IMMUTABLE \
+	| EXT2_INODE_APPEND_ONLY | EXT2_INODE_NO_DUMP | EXT2_INODE_NO_ACCESS_TIME \
+	| EXT2_INODE_DO_NOT_COMPRESS | EXT2_INODE_JOURNAL_DATA \
+	| EXT2_INODE_NO_MERGE_TAIL | EXT2_INODE_DIR_SYNCH)
 
 #define EXT2_NAME_LENGTH	255
 
@@ -679,6 +764,7 @@ struct file_cookie {
 	off_t		last_size;
 	int			open_mode;
 };
+
 
 #define EXT2_OPEN_MODE_USER_MASK		0x7fffffff
 

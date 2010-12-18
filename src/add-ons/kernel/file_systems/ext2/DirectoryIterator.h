@@ -6,6 +6,8 @@
 #define DIRECTORY_ITERATOR_H
 
 
+#include "ext2.h"
+
 #include <SupportDefs.h>
 
 #include "Transaction.h"
@@ -69,7 +71,7 @@ protected:
 
 	uint32				fNumBlocks;
 	uint32				fLogicalBlock;
-	off_t				fPhysicalBlock;
+	fsblock_t			fPhysicalBlock;
 	uint32				fDisplacement;
 	uint32				fPreviousDisplacement;
 

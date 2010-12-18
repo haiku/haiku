@@ -39,7 +39,7 @@ public:
 			status_t	ScanFreeRanges();
 			bool		IsFull() const;
 
-			status_t	Allocate(Transaction& transaction, uint32 start,
+			status_t	Allocate(Transaction& transaction, fsblock_t start,
 							uint32 length);
 			status_t	Free(Transaction& transaction, uint32 start,
 							uint32 length);
@@ -48,9 +48,9 @@ public:
 
 			uint32		NumBits() const;
 			uint32		FreeBits() const;
-			uint32		Start() const;
+			fsblock_t	Start() const;
 
-			uint32		LargestStart() const;
+			fsblock_t	LargestStart() const;
 			uint32		LargestLength() const;
 
 			// TransactionListener implementation
@@ -70,9 +70,9 @@ private:
 			mutex		fTransactionLock;
 			int32		fCurrentTransaction;
 
-			uint32		fStart;
+			fsblock_t	fStart;
 			uint32		fNumBits;
-			off_t		fBitmapBlock;
+			fsblock_t	fBitmapBlock;
 
 			uint32		fFreeBits;
 			uint32		fFirstFree;
@@ -122,6 +122,7 @@ AllocationBlockGroup::Initialize(Volume* volume, uint32 blockGroup,
 	fVolume = volume;
 	fBlockGroup = blockGroup;
 	fNumBits = numBits;
+	fStart = blockGroup * numBits + fVolume->FirstDataBlock();
 
 	status_t status = fVolume->GetBlockGroup(blockGroup, &fGroupDescriptor);
 	if (status != B_OK)
@@ -187,13 +188,17 @@ AllocationBlockGroup::IsFull() const
 
 
 status_t
-AllocationBlockGroup::Allocate(Transaction& transaction, uint32 start,
+AllocationBlockGroup::Allocate(Transaction& transaction, fsblock_t _start,
 	uint32 length)
 {
+	uint32 start = _start - fStart;
 	TRACE("AllocationBlockGroup::Allocate(%ld,%ld)\n", start, length);
+	if (length == 0)
+		return B_OK;
+
 	uint32 end = start + length;
 	if (end > fNumBits)
-		return B_BAD_DATA;
+		return B_BAD_VALUE;
 
 	_LockInTransaction(transaction);
 
@@ -263,9 +268,8 @@ AllocationBlockGroup::Free(Transaction& transaction, uint32 start,
 		return B_OK;
 
 	uint32 end = start + length;
-
 	if (end > fNumBits)
-		return B_BAD_DATA;
+		return B_BAD_VALUE;
 
 	_LockInTransaction(transaction);
 
@@ -342,17 +346,17 @@ AllocationBlockGroup::FreeBits() const
 }
 
 
-uint32
+fsblock_t
 AllocationBlockGroup::Start() const
 {
 	return fStart;
 }
 
 
-uint32
+fsblock_t
 AllocationBlockGroup::LargestStart() const
 {
-	return fLargestStart;
+	return fStart + fLargestStart;
 }
 
 
@@ -457,7 +461,7 @@ BlockAllocator::Initialize()
 	fNumBlocks = fVolume->NumBlocks();
 	
 	TRACE("BlockAllocator::Initialize(): blocks per group: %lu, block groups: "
-		"%lu, first block: %lu, num blocks: %lu\n", fBlocksPerGroup,
+		"%lu, first block: %llu, num blocks: %llu\n", fBlocksPerGroup,
 		fNumGroups, fFirstBlock, fNumBlocks);
 
 	fGroups = new(std::nothrow) AllocationBlockGroup[fNumGroups];
@@ -486,7 +490,7 @@ BlockAllocator::Initialize()
 
 status_t
 BlockAllocator::AllocateBlocks(Transaction& transaction, uint32 minimum,
-	uint32 maximum, uint32& blockGroup, off_t& start, uint32& length)
+	uint32 maximum, uint32& blockGroup, fsblock_t& start, uint32& length)
 {
 	TRACE("BlockAllocator::AllocateBlocks()\n");
 	MutexLocker lock(fLock);
@@ -496,7 +500,7 @@ BlockAllocator::AllocateBlocks(Transaction& transaction, uint32 minimum,
 		"max: %lu, block group: %lu, start: %llu, num groups: %lu\n",
 		transaction.ID(), minimum, maximum, blockGroup, start, fNumGroups);
 
-	off_t bestStart = 0;
+	fsblock_t bestStart = 0;
 	uint32 bestLength = 0;
 	uint32 bestGroup = 0;
 
@@ -567,10 +571,12 @@ BlockAllocator::AllocateBlocks(Transaction& transaction, uint32 minimum,
 
 status_t
 BlockAllocator::Allocate(Transaction& transaction, Inode* inode,
-	off_t numBlocks, uint32 minimum, off_t& start, uint32& allocated)
+	off_t numBlocks, uint32 minimum, fsblock_t& start, uint32& allocated)
 {
 	if (numBlocks <= 0)
 		return B_ERROR;
+	if (start > fNumBlocks)
+		return B_BAD_VALUE;
 
 	uint32 group = inode->ID() / fVolume->InodesPerGroup();
 	uint32 preferred = 0;
@@ -644,28 +650,32 @@ BlockAllocator::Allocate(Transaction& transaction, Inode* inode,
 
 
 status_t
-BlockAllocator::Free(Transaction& transaction, off_t start, uint32 length)
+BlockAllocator::Free(Transaction& transaction, fsblock_t start, uint32 length)
 {
 	TRACE("BlockAllocator::Free(%llu, %lu)\n", start, length);
 	MutexLocker lock(fLock);
 
 	if (start <= fFirstBlock) {
 		panic("Trying to free superblock!\n");
-		return B_BAD_DATA;
+		return B_BAD_VALUE;
 	}
 
 	if (length == 0)
 		return B_OK;
+	if (start > fNumBlocks || length > fNumBlocks)
+		return B_BAD_VALUE;
 
-	TRACE("BlockAllocator::Free(): first block: %lu, blocks per group: %lu\n", 
+	TRACE("BlockAllocator::Free(): first block: %llu, blocks per group: %lu\n", 
 		fFirstBlock, fBlocksPerGroup);
 
 	start -= fFirstBlock;
 	off_t end = start + length - 1;
 
 	uint32 group = start / fBlocksPerGroup;
-	if (group >= fNumGroups)
-		panic("BlockAllocator::Free() group %ld too big (fNumGroups %ld)\n", group, fNumGroups);
+	if (group >= fNumGroups) {
+		panic("BlockAllocator::Free() group %ld too big (fNumGroups %ld)\n",
+			group, fNumGroups);
+	}
 	uint32 lastGroup = end / fBlocksPerGroup;
 	start = start % fBlocksPerGroup;
 

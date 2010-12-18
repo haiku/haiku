@@ -11,6 +11,7 @@ KernelAddon ext2 :
 	Inode.cpp
 	Attribute.cpp
 	DirectoryIterator.cpp
+	ExtentStream.cpp
 	HTree.cpp
 	HTreeEntryIterator.cpp
 	RevokeManager.cpp

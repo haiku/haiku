@@ -517,7 +517,7 @@ DirectoryIterator::_SplitIndexedBlock(Transaction& transaction,
 		return B_NO_MEMORY;
 	ArrayDeleter<uint8> bufferDeleter(buffer);
 
-	off_t firstPhysicalBlock = 0;
+	fsblock_t firstPhysicalBlock = 0;
 
 	// Prepare block to hold the first half of the entries and fill the buffer
 	CachedBlock cachedFirst(fVolume);

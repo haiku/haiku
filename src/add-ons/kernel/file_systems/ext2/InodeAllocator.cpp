@@ -156,7 +156,7 @@ InodeAllocator::_Allocate(Transaction& transaction, uint32 preferredBlockGroup,
 
 
 status_t
-InodeAllocator::_MarkInBitmap(Transaction& transaction, off_t bitmapBlock,
+InodeAllocator::_MarkInBitmap(Transaction& transaction, fsblock_t bitmapBlock,
 	uint32 blockGroup, uint32 numInodes, ino_t& id)
 {
 	BitmapBlock inodeBitmap(fVolume, numInodes);
@@ -190,7 +190,7 @@ InodeAllocator::_MarkInBitmap(Transaction& transaction, off_t bitmapBlock,
 
 
 status_t
-InodeAllocator::_UnmarkInBitmap(Transaction& transaction, off_t bitmapBlock,
+InodeAllocator::_UnmarkInBitmap(Transaction& transaction, fsblock_t bitmapBlock,
 	uint32 numInodes, ino_t id)
 {
 	BitmapBlock inodeBitmap(fVolume, numInodes);

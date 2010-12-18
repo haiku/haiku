@@ -279,8 +279,10 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	DeviceOpener opener(deviceName, (flags & B_MOUNT_READ_ONLY) != 0
 		? O_RDONLY : O_RDWR);
 	fDevice = opener.Device();
-	if (fDevice < B_OK)
+	if (fDevice < B_OK) {
+		FATAL("Volume::Mount(): couldn't open device\n");
 		return fDevice;
+	}
 
 	if (opener.IsReadOnly())
 		fFlags |= VOLUME_READ_ONLY;
@@ -291,8 +293,10 @@ Volume::Mount(const char* deviceName, uint32 flags)
 
 	// read the super block
 	status_t status = Identify(fDevice, &fSuperBlock);
-	if (status != B_OK)
+	if (status != B_OK) {
+		FATAL("Volume::Mount(): Identify() failed\n");
 		return status;
+	}
 	
 	// check read-only features if mounting read-write
 	if (!IsReadOnly() && _UnsupportedReadOnlyFeatures(fSuperBlock) != 0)
@@ -300,7 +304,9 @@ Volume::Mount(const char* deviceName, uint32 flags)
 
 	// initialize short hands to the super block (to save byte swapping)
 	fBlockShift = fSuperBlock.BlockShift();
-	fBlockSize = 1UL << fSuperBlock.BlockShift();
+	if (fBlockShift < 10 || fBlockShift > 16)
+		return B_ERROR;
+	fBlockSize = 1UL << fBlockShift;
 	fFirstDataBlock = fSuperBlock.FirstDataBlock();
 
 	fFreeBlocks = fSuperBlock.FreeBlocks(Has64bitFeature());
@@ -338,7 +344,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	status = opener.GetSize(&diskSize);
 	if (status != B_OK)
 		return status;
-	if (diskSize < (NumBlocks() << BlockShift()))
+	if (diskSize < ((off_t)NumBlocks() << BlockShift()))
 		return B_BAD_VALUE;
 
 	fBlockCache = opener.InitCache(NumBlocks(), fBlockSize);
@@ -501,6 +507,7 @@ Volume::_UnsupportedIncompatibleFeatures(ext2_super_block& superBlock)
 	uint32 supportedIncompatible = EXT2_INCOMPATIBLE_FEATURE_FILE_TYPE
 		| EXT2_INCOMPATIBLE_FEATURE_RECOVER
 		| EXT2_INCOMPATIBLE_FEATURE_JOURNAL
+		| EXT2_INCOMPATIBLE_FEATURE_EXTENTS;
 		/*| EXT2_INCOMPATIBLE_FEATURE_META_GROUP*/;
 	uint32 unsupported = superBlock.IncompatibleFeatures() 
 		& ~supportedIncompatible;
@@ -742,7 +749,7 @@ Volume::FreeInode(Transaction& transaction, ino_t id, bool isDirectory)
 
 status_t
 Volume::AllocateBlocks(Transaction& transaction, uint32 minimum, uint32 maximum,
-	uint32& blockGroup, off_t& start, uint32& length)
+	uint32& blockGroup, fsblock_t& start, uint32& length)
 {
 	TRACE("Volume::AllocateBlocks()\n");
 	if (IsReadOnly())
@@ -764,7 +771,7 @@ Volume::AllocateBlocks(Transaction& transaction, uint32 minimum, uint32 maximum,
 
 
 status_t
-Volume::FreeBlocks(Transaction& transaction, off_t start, uint32 length)
+Volume::FreeBlocks(Transaction& transaction, fsblock_t start, uint32 length)
 {
 	TRACE("Volume::FreeBlocks(%llu, %lu)\n", start, length);
 	if (IsReadOnly())

@@ -189,7 +189,7 @@ HTreeEntryIterator::Lookup(uint32 hash, int indirections,
 
 	TRACE("HTreeEntryIterator::Lookup(): Creating a HTree entry iterator "
 		"starting at block: %lu, hash: 0x%lX\n", start->Block(), start->Hash());
-	off_t blockNum;
+	fsblock_t blockNum;
 	status_t status = fDirectory->FindBlock(start->Block() * fBlockSize,
 		blockNum);
 	if (status != B_OK)
@@ -322,7 +322,7 @@ HTreeEntryIterator::InsertEntry(Transaction& transaction, uint32 hash,
 		panic("Splitting a HTree node required, but isn't yet fully "
 			"supported\n");
 
-		off_t physicalBlock;
+		fsblock_t physicalBlock;
 		status_t status = fDirectory->FindBlock(newBlocksPos, physicalBlock);
 		if (status != B_OK)
 			return status;

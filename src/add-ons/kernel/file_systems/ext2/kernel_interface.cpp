@@ -407,11 +407,16 @@ ext2_get_file_map(fs_volume* _volume, fs_vnode* _node, off_t offset,
 	size_t index = 0, max = *_count;
 
 	while (true) {
-		off_t block;
+		fsblock_t block;
 		uint32 count = 1;
 		status_t status = inode->FindBlock(offset, block, &count);
 		if (status != B_OK)
 			return status;
+
+		if (block > volume->NumBlocks()) {
+			panic("ext2_get_file_map() found block %lld for offset %lld\n",
+				block, offset);
+		}
 
 		off_t blockOffset = block << volume->BlockShift();
 		uint32 blockLength = volume->BlockSize() * count;
@@ -506,7 +511,7 @@ ext2_ioctl(fs_volume* _volume, fs_vnode* _node, void* _cookie, uint32 cmd,
 			uint32 blocksPerGroup = volume->BlocksPerGroup();
 			uint32 blockSize  = volume->BlockSize();
 			uint32 firstBlock = volume->FirstDataBlock();
-			off_t start = 0;
+			fsblock_t start = 0;
 			uint32 group = 0;
 			uint32 length;
 
@@ -955,7 +960,7 @@ ext2_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
 			if (status != B_OK)
 				return B_IO_ERROR;
 
-			off_t blockNum;
+			fsblock_t blockNum;
 			status = parent->FindBlock(0, blockNum);
 			if (status != B_OK)
 				return status;

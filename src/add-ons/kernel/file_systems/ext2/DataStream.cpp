@@ -53,7 +53,7 @@ DataStream::~DataStream()
 
 
 status_t
-DataStream::FindBlock(off_t offset, off_t& block, uint32 *_count)
+DataStream::FindBlock(off_t offset, fsblock_t& block, uint32 *_count)
 {
 	uint32 index = offset >> fVolume->BlockShift();
 
@@ -377,8 +377,7 @@ DataStream::_GetBlock(Transaction& transaction, uint32& blockNum)
 	if (fAllocated == 0) {
 		uint32 blockGroup = (fAllocatedPos - fFirstBlock)
 			/ fVolume->BlocksPerGroup();
-		fAllocatedPos %= fVolume->BlocksPerGroup();
-
+		
 		status_t status = fVolume->AllocateBlocks(transaction, 1, fWaiting,
 			blockGroup, fAllocatedPos, fAllocated);
 		if (status != B_OK) {
@@ -387,7 +386,6 @@ DataStream::_GetBlock(Transaction& transaction, uint32& blockNum)
 		}
 
 		fWaiting -= fAllocated;
-		fAllocatedPos += fVolume->BlocksPerGroup() * blockGroup + fFirstBlock;
 
 		TRACE("DataStream::_GetBlock(): newAllocated: %lu, newpos: %llu,"
 			"newwaiting: %lu\n", fAllocated, fAllocatedPos, fWaiting);

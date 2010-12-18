@@ -53,7 +53,7 @@ private:
 			uint16				fCurrentEntry;
 
 			uint32				fBlockSize;
-			off_t				fBlockNum;
+			fsblock_t			fBlockNum;
 
 			HTreeEntryIterator*	fParent;
 			HTreeEntryIterator*	fChild;

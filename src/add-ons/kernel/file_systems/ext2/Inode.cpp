@@ -13,6 +13,7 @@
 #include "CachedBlock.h"
 #include "DataStream.h"
 #include "DirectoryIterator.h"
+#include "ExtentStream.h"
 #include "HTree.h"
 #include "Utility.h"
 
@@ -224,8 +225,12 @@ Inode::CheckPermissions(int accessMode) const
 
 
 status_t
-Inode::FindBlock(off_t offset, off_t& block, uint32 *_count)
+Inode::FindBlock(off_t offset, fsblock_t& block, uint32 *_count)
 {
+	if (Flags() & EXT2_INODE_EXTENTS) {
+		ExtentStream stream(fVolume, &fNode.extent_stream, Size());
+		return stream.FindBlock(offset, block, _count);
+	}
 	DataStream stream(fVolume, &fNode.stream, Size());
 	return stream.FindBlock(offset, block, _count);
 }
@@ -407,9 +412,14 @@ Inode::InitDirectory(Transaction& transaction, Inode* parent)
 	if (status != B_OK)
 		return status;
 
-	off_t blockNum;
-	DataStream stream(fVolume, &fNode.stream, Size());
-	status = stream.FindBlock(0, blockNum);
+	fsblock_t blockNum;
+	if (Flags() & EXT2_INODE_EXTENTS) {
+		ExtentStream stream(fVolume, &fNode.extent_stream, Size());
+		status = stream.FindBlock(0, blockNum);
+	} else {
+		DataStream stream(fVolume, &fNode.stream, Size());
+		status = stream.FindBlock(0, blockNum);
+	}
 	if (status != B_OK)
 		return status;
 
@@ -613,6 +623,14 @@ Inode::Create(Transaction& transaction, Inode* parent, const char* name,
 	inode->SetAccessTime(&timespec);
 	inode->SetCreationTime(&timespec);
 	inode->SetModificationTime(&timespec);
+	node.SetFlags(parent->Flags() & EXT2_INODE_INHERITED);
+	if (volume->HasExtentsFeature() 
+		&& (inode->IsDirectory() || inode->IsFile())) {
+		node.SetFlag(EXT2_INODE_EXTENTS);
+		ExtentStream stream(volume, &node.extent_stream, 0);
+		stream.Init();
+		ASSERT(stream.Check());
+	}
 
 	if (sizeof(ext2_inode) < volume->InodeSize())
 		node.SetExtraInodeSize(sizeof(ext2_inode) - EXT2_INODE_NORMAL_SIZE);
@@ -803,9 +821,14 @@ Inode::_EnlargeDataStream(Transaction& transaction, off_t size)
 	}
 
 	off_t end = size == 0 ? 0 : (size - 1) / fVolume->BlockSize() + 1;
-	DataStream stream(fVolume, &fNode.stream, oldSize);
-	stream.Enlarge(transaction, end);
-
+	if (Flags() & EXT2_INODE_EXTENTS) {
+		ExtentStream stream(fVolume, &fNode.extent_stream, Size());
+		stream.Enlarge(transaction, end);
+		ASSERT(stream.Check());
+	} else {
+		DataStream stream(fVolume, &fNode.stream, oldSize);
+		stream.Enlarge(transaction, end);
+	}
 	TRACE("Inode::_EnlargeDataStream(): Setting size to %lld\n", size);
 	fNode.SetSize(size);
 	TRACE("Inode::_EnlargeDataStream(): Setting allocated block count to %llu\n",
@@ -837,8 +860,14 @@ Inode::_ShrinkDataStream(Transaction& transaction, off_t size)
 	}
 
 	off_t end = size == 0 ? 0 : (size - 1) / fVolume->BlockSize() + 1;
-	DataStream stream(fVolume, &fNode.stream, oldSize);
-	stream.Shrink(transaction, end);
+	if (Flags() & EXT2_INODE_EXTENTS) {
+		ExtentStream stream(fVolume, &fNode.extent_stream, Size());
+		stream.Shrink(transaction, end);
+		ASSERT(stream.Check());
+	} else {
+		DataStream stream(fVolume, &fNode.stream, oldSize);
+		stream.Shrink(transaction, end);
+	}
 
 	fNode.SetSize(size);
 	return _SetNumBlocks(_NumBlocks() - end * (fVolume->BlockSize() / 512));
