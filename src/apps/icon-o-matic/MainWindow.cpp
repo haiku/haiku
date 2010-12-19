@@ -721,16 +721,15 @@ MainWindow::_CreateGUI(BRect bounds)
 	// scroll view around canvas view
 	canvasBounds.bottom += B_H_SCROLL_BAR_HEIGHT;
 	canvasBounds.right += B_V_SCROLL_BAR_WIDTH;
-	ScrollView* canvasScrollView
-		= new ScrollView(fCanvasView, SCROLL_VERTICAL | SCROLL_HORIZONTAL
-				| SCROLL_VISIBLE_RECT_IS_CHILD_BOUNDS,
-				canvasBounds, "canvas scroll view",
-				B_FOLLOW_NONE, B_WILL_DRAW | B_FRAME_EVENTS, B_NO_BORDER);
+	ScrollView* canvasScrollView = new ScrollView(fCanvasView, SCROLL_VERTICAL
+			| SCROLL_HORIZONTAL | SCROLL_VISIBLE_RECT_IS_CHILD_BOUNDS,
+		canvasBounds, "canvas scroll view", B_FOLLOW_NONE,
+		B_WILL_DRAW | B_FRAME_EVENTS, B_NO_BORDER);
 	layout->AddView(canvasScrollView, 1, 1);
 
 	// views along the top
 
-	BGroupLayout* styleGroup = new BGroupLayout(B_VERTICAL);
+	BGroupLayout* styleGroup = new BGroupLayout(B_VERTICAL, 0);
 	BView* styleGroupView = new BView("style group", 0, styleGroup);
 	topSide->AddView(styleGroupView);
 
