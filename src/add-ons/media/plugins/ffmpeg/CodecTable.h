@@ -8,6 +8,12 @@
 
 #include <MediaFormats.h>
 
+struct AVInputFamily {
+	media_format_family family;
+	const char *avname;
+};
+extern struct AVInputFamily gAVInputFamilies[];
+
 status_t build_decoder_formats(media_format** _formats, size_t* _count);
 
 
