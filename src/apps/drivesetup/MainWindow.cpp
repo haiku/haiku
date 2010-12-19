@@ -241,6 +241,7 @@ MainWindow::MainWindow(BRect frame)
 	fListView->SetSelectionMode(B_SINGLE_SELECTION_LIST);
 	fListView->SetSelectionMessage(new BMessage(MSG_PARTITION_ROW_SELECTED));
 	fListView->SetTarget(this);
+	fListView->MakeFocus(true);
 
 	status_t ret = fDDRoster.StartWatching(BMessenger(this));
 	if (ret != B_OK) {
