@@ -1,13 +1,10 @@
 /*
- * Copyright 2006, Haiku. All rights reserved.
- * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2006-2010, Stephan Aßmus <superstippi@gmx.de>.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
-
 #ifndef MAIN_WINDOW_H
 #define MAIN_WINDOW_H
+
 
 #include <Entry.h>
 #include <Window.h>
@@ -44,9 +41,9 @@ enum {
 	MSG_SET_ICON	= 'sicn',
 };
 
-class MainWindow : public BWindow,
-				   public Observer {
- public:
+
+class MainWindow : public BWindow, public Observer {
+public:
 								MainWindow(IconEditorApp* app,
 									Document* document,
 									const BMessage* settings);
@@ -56,9 +53,9 @@ class MainWindow : public BWindow,
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	bool				QuitRequested();
 	virtual	void				WorkspaceActivated(int32 workspace,
-												   bool active);
+									bool active);
 	virtual	void				WorkspacesChanged(uint32 oldWorkspaces,
-												  uint32 newWorkspaces);
+									uint32 newWorkspaces);
 
 	// Observer interface
 	virtual	void				ObjectChanged(const Observable* object);
@@ -70,47 +67,49 @@ class MainWindow : public BWindow,
 			void				StoreSettings(BMessage* archive);
 			void				RestoreSettings(const BMessage* archive);
 
- private:
+private:
 			void				_Init();
 			void				_CreateGUI(BRect frame);
 			BMenuBar*			_CreateMenuBar(BRect frame);
 
 			void				_ImproveScrollBarLayout(BView* target);
 
-	IconEditorApp*				fApp;
-	Document*					fDocument;
-	Icon*						fIcon;
-
-	BMenu*						fPathMenu;
-	BMenu*						fStyleMenu;
-	BMenu*						fShapeMenu;
-	BMenu*						fTransformerMenu;
-	BMenu*						fPropertyMenu;
-	BMenu*						fSwatchMenu;
-
-	BMenuItem*					fUndoMI;
-	BMenuItem*					fRedoMI;
-
-	CanvasView*					fCanvasView;
-	SwatchGroup*				fSwatchGroup;
-	StyleView*					fStyleView;
-
-	IconView*					fIconPreview16Folder;
-	IconView*					fIconPreview16Menu;
-	IconView*					fIconPreview32Folder;
-	IconView*					fIconPreview32Desktop;
-	IconView*					fIconPreview48;
-	IconView*					fIconPreview64;
-
-	PathListView*				fPathListView;
-	StyleListView*				fStyleListView;
-
-	ShapeListView*				fShapeListView;
-	TransformerListView*		fTransformerListView;
-	IconObjectListView*			fPropertyListView;
-
-	// TODO: for testing only...
-	MultipleManipulatorState*	fState;
+private:
+			IconEditorApp*		fApp;
+			Document*			fDocument;
+			Icon*				fIcon;
+		
+			BMenu*				fPathMenu;
+			BMenu*				fStyleMenu;
+			BMenu*				fShapeMenu;
+			BMenu*				fTransformerMenu;
+			BMenu*				fPropertyMenu;
+			BMenu*				fSwatchMenu;
+		
+			BMenuItem*			fUndoMI;
+			BMenuItem*			fRedoMI;
+		
+			CanvasView*			fCanvasView;
+			SwatchGroup*		fSwatchGroup;
+			StyleView*			fStyleView;
+		
+			IconView*			fIconPreview16Folder;
+			IconView*			fIconPreview16Menu;
+			IconView*			fIconPreview32Folder;
+			IconView*			fIconPreview32Desktop;
+			IconView*			fIconPreview48;
+			IconView*			fIconPreview64;
+		
+			PathListView*		fPathListView;
+			StyleListView*		fStyleListView;
+		
+			ShapeListView*		fShapeListView;
+			TransformerListView* fTransformerListView;
+			IconObjectListView*	fPropertyListView;
+		
+			// TODO: for testing only...
+			MultipleManipulatorState* fState;
 };
+
 
 #endif // MAIN_WINDOW_H

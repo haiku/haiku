@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2006-2010, Stephan Aßmus <superstippi@gmx.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -9,18 +9,15 @@
 #include <stdio.h>
 
 #include <Clipboard.h>
+#include <GridLayout.h>
+#include <GroupLayout.h>
+#include <GroupView.h>
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
 #include <Message.h>
 #include <Screen.h>
 #include <ScrollView.h>
-
-#ifdef __HAIKU__
-# include <GridLayout.h>
-# include <GroupLayout.h>
-# include <GroupView.h>
-#endif
 
 #include "support_ui.h"
 
@@ -63,6 +60,7 @@
 
 #include "StyledTextImporter.h"
 
+
 using std::nothrow;
 
 enum {
@@ -81,26 +79,23 @@ enum {
 	MSG_RENAME_OBJECT				= 'rnam',
 };
 
-// constructor
+
 MainWindow::MainWindow(IconEditorApp* app, Document* document,
 		const BMessage* settings)
-	: BWindow(BRect(50, 50, 900, 750), "Icon-O-Matic",
-#ifdef __HAIKU__
+	:
+	BWindow(BRect(50, 50, 900, 750), "Icon-O-Matic",
 		B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 			B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
-#else
-		B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL, B_ASYNCHRONOUS_CONTROLS),
-#endif
-	  fApp(app),
-	  fDocument(document),
-	  fIcon(NULL)
+	fApp(app),
+	fDocument(document),
+	fIcon(NULL)
 {
 	_Init();
 
 	RestoreSettings(settings);
 }
 
-// destructor
+
 MainWindow::~MainWindow()
 {
 	delete fState;
@@ -111,9 +106,10 @@ MainWindow::~MainWindow()
 	fDocument->CommandStack()->RemoveObserver(this);
 }
 
+
 // #pragma mark -
 
-// MessageReceived
+
 void
 MainWindow::MessageReceived(BMessage* message)
 {
@@ -368,7 +364,7 @@ case MSG_SHAPE_SELECTED: {
 	fDocument->WriteUnlock();
 }
 
-// QuitRequested
+
 bool
 MainWindow::QuitRequested()
 {
@@ -379,7 +375,7 @@ MainWindow::QuitRequested()
 	return false;
 }
 
-// WorkspaceActivated
+
 void
 MainWindow::WorkspaceActivated(int32 workspace, bool active)
 {
@@ -394,7 +390,7 @@ MainWindow::WorkspaceActivated(int32 workspace, bool active)
 	WorkspacesChanged(workspaces, workspaces);
 }
 
-// WorkspacesChanged
+
 void
 MainWindow::WorkspacesChanged(uint32 oldWorkspaces, uint32 newWorkspaces)
 {
@@ -415,9 +411,10 @@ MainWindow::WorkspacesChanged(uint32 oldWorkspaces, uint32 newWorkspaces)
 	fIconPreview64->SetIconBGColor(screen.DesktopColor());
 }
 
+
 // #pragma mark -
 
-// ObjectChanged
+
 void
 MainWindow::ObjectChanged(const Observable* object)
 {
@@ -448,9 +445,10 @@ MainWindow::ObjectChanged(const Observable* object)
 	Unlock();
 }
 
+
 // #pragma mark -
 
-// MakeEmpty
+
 void
 MainWindow::MakeEmpty()
 {
@@ -463,7 +461,7 @@ MainWindow::MakeEmpty()
 	fState->DeleteManipulators();
 }
 
-// SetIcon
+
 void
 MainWindow::SetIcon(Icon* icon)
 {
@@ -502,9 +500,10 @@ MainWindow::SetIcon(Icon* icon)
 		oldIcon->Release();
 }
 
+
 // #pragma mark -
 
-// StoreSettings
+
 void
 MainWindow::StoreSettings(BMessage* archive)
 {
@@ -517,7 +516,7 @@ MainWindow::StoreSettings(BMessage* archive)
 	}
 }
 
-// RestoreSettings
+
 void
 MainWindow::RestoreSettings(const BMessage* archive)
 {
@@ -532,9 +531,10 @@ MainWindow::RestoreSettings(const BMessage* archive)
 		fCanvasView->SetMouseFilterMode(mouseFilterMode);
 }
 
+
 // #pragma mark -
 
-// _Init
+
 void
 MainWindow::_Init()
 {
@@ -590,13 +590,11 @@ MainWindow::_Init()
 	AddShortcut('E', 0, new BMessage(MSG_RENAME_OBJECT));
 }
 
-// _CreateGUI
+
 void
 MainWindow::_CreateGUI(BRect bounds)
 {
 	const float splitWidth = 13 * be_plain_font->Size();
-
-#ifdef __HAIKU__
 
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 
@@ -619,15 +617,15 @@ MainWindow::_CreateGUI(BRect bounds)
 
 	// icon previews
 	fIconPreview16Folder = new IconView(BRect(0, 0, 15, 15),
-										"icon preview 16 folder");
+		"icon preview 16 folder");
 	fIconPreview16Menu = new IconView(BRect(0, 0, 15, 15),
-									  "icon preview 16 menu");
+		"icon preview 16 menu");
 	fIconPreview16Menu->SetLowColor(ui_color(B_MENU_BACKGROUND_COLOR));
 
 	fIconPreview32Folder = new IconView(BRect(0, 0, 31, 31),
-										"icon preview 32 folder");
+		"icon preview 32 folder");
 	fIconPreview32Desktop = new IconView(BRect(0, 0, 31, 31),
-										 "icon preview 32 desktop");
+		"icon preview 32 desktop");
 	fIconPreview32Desktop->SetLowColor(ui_color(B_DESKTOP_COLOR));
 
 //	fIconPreview48 = new IconView(bounds, "icon preview 48");
@@ -669,13 +667,10 @@ MainWindow::_CreateGUI(BRect bounds)
 	leftSideView->AddChild(menuBar);
 
 	fPathListView = new PathListView(BRect(0, 0, splitWidth, 100),
-									 "path list view",
-									 new BMessage(MSG_PATH_SELECTED), this);
+		"path list view", new BMessage(MSG_PATH_SELECTED), this);
 
 	BView* scrollView = new BScrollView("path list scroll view",
-										fPathListView,
-										B_FOLLOW_NONE, 0, false, true,
-										B_NO_BORDER);
+		fPathListView, B_FOLLOW_NONE, 0, false, true, B_NO_BORDER);
 	leftSideView->AddChild(scrollView);
 
 	// shape list view
@@ -684,12 +679,9 @@ MainWindow::_CreateGUI(BRect bounds)
 	leftSideView->AddChild(menuBar);
 
 	fShapeListView = new ShapeListView(BRect(0, 0, splitWidth, 100),
-									   "shape list view",
-									   new BMessage(MSG_SHAPE_SELECTED), this);
+		"shape list view", new BMessage(MSG_SHAPE_SELECTED), this);
 	scrollView = new BScrollView("shape list scroll view",
-								 fShapeListView,
-								 B_FOLLOW_NONE, 0, false, true,
-								 B_NO_BORDER);
+		fShapeListView, B_FOLLOW_NONE, 0, false, true, B_NO_BORDER);
 	leftSideView->AddChild(scrollView);
 
 	// transformer list view
@@ -698,11 +690,9 @@ MainWindow::_CreateGUI(BRect bounds)
 	leftSideView->AddChild(menuBar);
 
 	fTransformerListView = new TransformerListView(BRect(0, 0, splitWidth, 100),
-												   "transformer list view");
+		"transformer list view");
 	scrollView = new BScrollView("transformer list scroll view",
-								 fTransformerListView,
-								 B_FOLLOW_NONE, 0, false, true,
-								 B_NO_BORDER);
+		fTransformerListView, B_FOLLOW_NONE, 0, false, true, B_NO_BORDER);
 	leftSideView->AddChild(scrollView);
 
 	// property list view
@@ -750,12 +740,9 @@ MainWindow::_CreateGUI(BRect bounds)
 	styleGroup->AddView(menuBar);
 
 	fStyleListView = new StyleListView(BRect(0, 0, splitWidth, 100),
-									   "style list view",
-									   new BMessage(MSG_STYLE_SELECTED), this);
-	scrollView = new BScrollView("style list scroll view",
-								 fStyleListView,
-								 B_FOLLOW_NONE, 0, false, true,
-								 B_NO_BORDER);
+		"style list view", new BMessage(MSG_STYLE_SELECTED), this);
+	scrollView = new BScrollView("style list scroll view", fStyleListView,
+		B_FOLLOW_NONE, 0, false, true, B_NO_BORDER);
 	scrollView->SetExplicitMaxSize(BSize(splitWidth, B_SIZE_UNLIMITED));
 	styleGroup->AddView(scrollView);
 
@@ -781,234 +768,9 @@ MainWindow::_CreateGUI(BRect bounds)
 	// make sure the top side has fixed height
 	topSideView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED,
 		swatchGroupView->MinSize().height));
-
-#else // !__HAIKU__
-
-	BView* bg = new BView(bounds, "bg", B_FOLLOW_ALL, 0);
-	bg->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	AddChild(bg);
-
-	BRect menuFrame = bounds;
-	menuFrame.bottom = menuFrame.top + 15;
-	BMenuBar* menuBar = _CreateMenuBar(menuFrame);
-	bg->AddChild(menuBar);
-	float menuWidth;
-	float menuHeight;
-	menuBar->GetPreferredSize(&menuWidth, &menuHeight);
-	menuBar->ResizeTo(splitWidth - 1, menuHeight);
-	menuBar->SetResizingMode(B_FOLLOW_LEFT | B_FOLLOW_TOP);
-	
-	bounds.top = menuBar->Frame().bottom + 1;
-
-	// swatch group
-	fSwatchGroup = new SwatchGroup(bounds);
-		// SwatchGroup auto resizes itself
-	fSwatchGroup->MoveTo(bounds.right - fSwatchGroup->Bounds().Width(),
-						 bounds.top);
-	fSwatchGroup->SetResizingMode(B_FOLLOW_RIGHT | B_FOLLOW_TOP);
-
-	bounds.left = fSwatchGroup->Frame().left;
-	bounds.right = bg->Bounds().right;
-	bounds.top = bg->Bounds().top;
-	bounds.bottom = bounds.top + menuHeight;
-	menuBar = new BMenuBar(bounds, "swatches menu bar");
-	menuBar->AddItem(fSwatchMenu);
-	bg->AddChild(menuBar);
-	menuBar->ResizeTo(bounds.Width(), menuHeight);
-		// menu bars resize themselves to window width
-	menuBar->SetResizingMode(B_FOLLOW_RIGHT | B_FOLLOW_TOP);
-
-	// canvas view
-	bounds.left = splitWidth;
-	bounds.top = fSwatchGroup->Frame().bottom + 1;
-	bounds.right = bg->Bounds().right - B_V_SCROLL_BAR_WIDTH;
-	bounds.bottom = bg->Bounds().bottom - B_H_SCROLL_BAR_HEIGHT;
-	fCanvasView = new CanvasView(bounds);
-
-	// scroll view around canvas view
-	bounds.bottom += B_H_SCROLL_BAR_HEIGHT;
-	bounds.right += B_V_SCROLL_BAR_WIDTH;
-	ScrollView* canvasScrollView
-		= new ScrollView(fCanvasView, SCROLL_HORIZONTAL | SCROLL_VERTICAL
-			| SCROLL_VISIBLE_RECT_IS_CHILD_BOUNDS, bounds,
-			"canvas scroll view", B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS,
-			B_NO_BORDER);
-
-	// icon previews
-	bounds.left = 5;
-	bounds.top = fSwatchGroup->Frame().top + 5;
-	bounds.right = bounds.left + 15;
-	bounds.bottom = bounds.top + 15;
-	fIconPreview16Folder = new IconView(bounds, "icon preview 16 folder");
-
-	bounds.top = fIconPreview16Folder->Frame().bottom + 5;
-	bounds.bottom = bounds.top + 15;
-	fIconPreview16Menu = new IconView(bounds, "icon preview 16 menu");
-	fIconPreview16Menu->SetLowColor(ui_color(B_MENU_BACKGROUND_COLOR));
-
-	bounds.left = fIconPreview16Folder->Frame().right + 5;
-	bounds.top = fSwatchGroup->Frame().top + 5;
-	bounds.right = bounds.left + 31;
-	bounds.bottom = bounds.top + 31;
-	fIconPreview32Folder = new IconView(bounds, "icon preview 32 folder");
-
-	bounds.top = fIconPreview32Folder->Frame().bottom + 5;
-	bounds.bottom = bounds.top + 31;
-	fIconPreview32Desktop = new IconView(bounds, "icon preview 32 desktop");
-	fIconPreview32Desktop->SetLowColor(ui_color(B_DESKTOP_COLOR));
-
-//	bounds.OffsetBy(bounds.Width() + 6, 0);
-//	bounds.right = bounds.left + 47;
-//	bounds.bottom = bounds.top + 47;
-//	fIconPreview48 = new IconView(bounds, "icon preview 48");
-
-	bounds.left = fIconPreview32Folder->Frame().right + 5;
-	bounds.top = fSwatchGroup->Frame().top + 5;
-	bounds.right = bounds.left + 63;
-	bounds.bottom = bounds.top + 63;
-	fIconPreview64 = new IconView(bounds, "icon preview 64");
-	fIconPreview64->SetLowColor(ui_color(B_DESKTOP_COLOR));
-
-	// style list view
-	bounds.left = fCanvasView->Frame().left;
-	bounds.right = bounds.left + splitWidth;
-	bounds.top = bg->Bounds().top;
-	bounds.bottom = bounds.top + menuHeight;
-	menuBar = new BMenuBar(bounds, "style menu bar");
-	menuBar->AddItem(fStyleMenu);
-	bg->AddChild(menuBar);
-	menuBar->ResizeTo(bounds.Width(), menuHeight);
-		// menu bars resize themselves to window width
-	menuBar->SetResizingMode(B_FOLLOW_LEFT | B_FOLLOW_TOP);
-
-	bounds.right -= B_V_SCROLL_BAR_WIDTH + 1;
-	bounds.top = menuBar->Frame().bottom + 1;
-	bounds.bottom = fCanvasView->Frame().top - 1;
-
-	fStyleListView = new StyleListView(bounds, "style list view",
-									   new BMessage(MSG_STYLE_SELECTED), this);
-
-
-	// style view
-	bounds.left = menuBar->Frame().right + 1;
-	bounds.top = bg->Bounds().top;
-	bounds.right = fSwatchGroup->Frame().left - 1;
-	bounds.bottom = fCanvasView->Frame().top - 1;
-	fStyleView = new StyleView(bounds);
-	fStyleView->SetResizingMode(B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT);
-	bg->AddChild(fStyleView);
-
-	// path list view
-	bounds.left = 0;
-	bounds.right = fCanvasView->Frame().left - 1;
-	bounds.top = fCanvasView->Frame().top;
-	bounds.bottom = bounds.top + menuHeight;
-	menuBar = new BMenuBar(bounds, "path menu bar");
-	menuBar->AddItem(fPathMenu);
-	bg->AddChild(menuBar);
-	menuBar->ResizeTo(bounds.Width(), menuHeight);
-		// menu bars resize themselves to window width
-	menuBar->SetResizingMode(B_FOLLOW_LEFT | B_FOLLOW_TOP);
-
-	bounds.right -= B_V_SCROLL_BAR_WIDTH + 1;
-	bounds.top = menuBar->Frame().bottom + 1;
-	bounds.bottom = bounds.top + 130;
-
-	fPathListView = new PathListView(bounds, "path list view",
-									 new BMessage(MSG_PATH_SELECTED), this);
-
-
-	// shape list view
-	bounds.right += B_V_SCROLL_BAR_WIDTH + 1;
-	bounds.top = fPathListView->Frame().bottom + 1;
-	bounds.bottom = bounds.top + menuHeight;
-	menuBar = new BMenuBar(bounds, "shape menu bar");
-	menuBar->AddItem(fShapeMenu);
-	bg->AddChild(menuBar);
-	menuBar->ResizeTo(bounds.Width(), menuHeight);
-		// menu bars resize themselves to window width
-	menuBar->SetResizingMode(B_FOLLOW_LEFT | B_FOLLOW_TOP);
-
-	bounds.right -= B_V_SCROLL_BAR_WIDTH + 1;
-	bounds.top = menuBar->Frame().bottom + 1;
-	bounds.bottom = bounds.top + 130;
-
-	fShapeListView = new ShapeListView(bounds, "shape list view",
-									   new BMessage(MSG_SHAPE_SELECTED), this);
-
-	// transformer list view
-	bounds.right += B_V_SCROLL_BAR_WIDTH + 1;
-	bounds.top = fShapeListView->Frame().bottom + 1;
-	bounds.bottom = bounds.top + menuHeight;
-	menuBar = new BMenuBar(bounds, "transformer menu bar");
-	menuBar->AddItem(fTransformerMenu);
-	bg->AddChild(menuBar);
-	menuBar->ResizeTo(bounds.Width(), bounds.Height());
-		// menu bars resize themselves to window width
-	menuBar->SetResizingMode(B_FOLLOW_LEFT | B_FOLLOW_TOP);
-
-	bounds.right -= B_V_SCROLL_BAR_WIDTH + 1;
-	bounds.top = menuBar->Frame().bottom + 1;
-	bounds.bottom = bounds.top + 80;
-	fTransformerListView = new TransformerListView(bounds,
-												   "transformer list view");
-
-	// property list view
-	bounds.right += B_V_SCROLL_BAR_WIDTH + 1;
-	bounds.top = fTransformerListView->Frame().bottom + 1;
-	bounds.bottom = bounds.top + menuHeight;
-	menuBar = new BMenuBar(bounds, "property menu bar");
-	menuBar->AddItem(fPropertyMenu);
-	bg->AddChild(menuBar);
-	menuBar->ResizeTo(bounds.Width(), bounds.Height());
-		// menu bars resize themselves to window width
-	menuBar->SetResizingMode(B_FOLLOW_LEFT | B_FOLLOW_TOP);
-
-	fPropertyListView = new IconObjectListView();
-
-	bg->AddChild(fSwatchGroup);
-
-	bg->AddChild(fIconPreview16Folder);
-	bg->AddChild(fIconPreview16Menu);
-	bg->AddChild(fIconPreview32Folder);
-	bg->AddChild(fIconPreview32Desktop);
-//	bg->AddChild(fIconPreview48);
-	bg->AddChild(fIconPreview64);
-
-	bg->AddChild(new BScrollView("path list scroll view",
-								 fPathListView,
-								 B_FOLLOW_LEFT | B_FOLLOW_TOP,
-								 0, false, true,
-								 B_NO_BORDER));
-	bg->AddChild(new BScrollView("style list scroll view",
-								 fStyleListView,
-								 B_FOLLOW_LEFT | B_FOLLOW_TOP,
-								 0, false, true,
-								 B_NO_BORDER));
-	bg->AddChild(new BScrollView("shape list scroll view",
-								 fShapeListView,
-								 B_FOLLOW_LEFT | B_FOLLOW_TOP,
-								 0, false, true,
-								 B_NO_BORDER));
-	bg->AddChild(new BScrollView("transformer list scroll view",
-								 fTransformerListView,
-								 B_FOLLOW_LEFT | B_FOLLOW_TOP,
-								 0, false, true,
-								 B_NO_BORDER));
-
-	// scroll view around property list view
-	bounds.top = menuBar->Frame().bottom + 1;
-	bounds.bottom = bg->Bounds().bottom;
-	bg->AddChild(new ScrollView(fPropertyListView, SCROLL_VERTICAL,
-		bounds, "property scroll view", B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM,
-		B_WILL_DRAW | B_FRAME_EVENTS, B_PLAIN_BORDER, BORDER_RIGHT));
-
-
-	bg->AddChild(canvasScrollView);
-#endif // __HAIKU__
 }
 
-// _CreateMenuBar
+
 BMenuBar*
 MainWindow::_CreateMenuBar(BRect frame)
 {
@@ -1088,70 +850,7 @@ MainWindow::_CreateMenuBar(BRect frame)
 	return menuBar;
 }
 
-//// _CreateDefaultIcon
-//void
-//MainWindow::_CreateDefaultIcon()
-//{
-//	// add some stuff to an empty document (NOTE: for testing only)
-//	VectorPath* path = new VectorPath();
-//
-//	fDocument->Icon()->Paths()->AddPath(path);
-//
-//	Style* style1 = new Style();
-//	style1->SetName("Style White");
-//	style1->SetColor((rgb_color){ 255, 255, 255, 255 });
-//
-//	fDocument->Icon()->Styles()->AddStyle(style1);
-//
-//	Style* style2 = new Style();
-//	style2->SetName("Style Gradient");
-//	Gradient gradient(true);
-//	gradient.AddColor((rgb_color){ 255, 211, 6, 255 }, 0.0);
-//	gradient.AddColor((rgb_color){ 255, 238, 160, 255 }, 0.5);
-//	gradient.AddColor((rgb_color){ 208, 43, 92, 255 }, 1.0);
-//	style2->SetGradient(&gradient);
-//
-//	fDocument->Icon()->Styles()->AddStyle(style2);
-//
-//	Shape* shape = new Shape(style2);
-//	shape->Paths()->AddPath(path);
-//
-//	shape->SetName("Gradient");
-//	fDocument->Icon()->Shapes()->AddShape(shape);
-//
-//	shape = new Shape(style1);
-//	shape->Paths()->AddPath(path);
-//	StrokeTransformer* transformer
-//		= new StrokeTransformer(shape->VertexSource());
-//	transformer->width(5.0);
-//	shape->AddTransformer(transformer);
-//
-//	shape->SetName("Outline");
-//	fDocument->Icon()->Shapes()->AddShape(shape);
-//
-//	Style* style3 = new Style();
-//	style3->SetName("Style Red");
-//	style3->SetColor((rgb_color){ 255, 0, 169,200 });
-//
-//	fDocument->Icon()->Styles()->AddStyle(style3);
-//
-//	shape = new Shape(style3);
-//	shape->Paths()->AddPath(path);
-//	AffineTransformer* transformer2
-//		= new AffineTransformer(shape->VertexSource());
-//	*transformer2 *= agg::trans_affine_translation(10.0, 6.0);
-//	*transformer2 *= agg::trans_affine_rotation(0.2);
-//	*transformer2 *= agg::trans_affine_scaling(0.8, 0.6);
-//	shape->AddTransformer(transformer2);
-//
-//	shape->SetName("Transformed");
-//	fDocument->Icon()->Shapes()->AddShape(shape);
-//
-//	PathManipulator* pathManipulator = new PathManipulator(path);
-//	fState->AddManipulator(pathManipulator);
-//}
 
-// _ImproveScrollBarLayout
 void
 MainWindow::_ImproveScrollBarLayout(BView* target)
 {
