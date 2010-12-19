@@ -8,8 +8,8 @@
  */
 
 /*
- * CheckItOut: wraps URL mime types around command line apps
- * or other apps that don't handle them directly.
+ * CheckItOut: wraps SCM URL mime types around command line apps
+ * to check out sources in a user-friendly fashion.
  */
 #define DEBUG 1
 
