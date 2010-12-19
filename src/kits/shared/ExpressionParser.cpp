@@ -579,9 +579,13 @@ ExpressionParser::_ParseFunction(const Token& token)
 		return values[0].abs();
 	} else if (strcasecmp("acos", token.string.String()) == 0) {
 		_InitArguments(values, 1);
+		if (values[0] < -1 || values[0] > 1)
+			throw ParseException("out of domain", token.position);
 		return values[0].acos();
 	} else if (strcasecmp("asin", token.string.String()) == 0) {
 		_InitArguments(values, 1);
+		if (values[0] < -1 || values[0] > 1)
+			throw ParseException("out of domain", token.position);
 		return values[0].asin();
 	} else if (strcasecmp("atan", token.string.String()) == 0) {
 		_InitArguments(values, 1);
@@ -606,9 +610,13 @@ ExpressionParser::_ParseFunction(const Token& token)
 		return values[0].floor();
 	} else if (strcasecmp("ln", token.string.String()) == 0) {
 		_InitArguments(values, 1);
+		if (values[0] <= 0)
+			throw ParseException("out of domain", token.position);
 		return values[0].log();
 	} else if (strcasecmp("log", token.string.String()) == 0) {
 		_InitArguments(values, 1);
+		if (values[0] <= 0)
+			throw ParseException("out of domain", token.position);
 		return values[0].log10();
 	} else if (strcasecmp("pow", token.string.String()) == 0) {
 		_InitArguments(values, 2);
@@ -621,6 +629,8 @@ ExpressionParser::_ParseFunction(const Token& token)
 		return values[0].sinh();
 	} else if (strcasecmp("sqrt", token.string.String()) == 0) {
 		_InitArguments(values, 1);
+		if (values[0] < 0)
+			throw ParseException("out of domain", token.position);
 		return values[0].sqrt();
 	} else if (strcasecmp("tan", token.string.String()) == 0) {
 		_InitArguments(values, 1);
