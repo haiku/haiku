@@ -135,7 +135,11 @@ DriveSetup::_GetSettingsFile(BFile& file, bool forWriting) const
 
 	ret = file.SetTo(path.Path(), forWriting ? writeFlags : readFlags);
 	if (ret != B_OK) {
-		fprintf(stderr, "failed to init file: %s\n", strerror(ret));
+		if (forWriting) {
+			// Only inform of an error if the file was supposed to be written.
+			fprintf(stderr, "failed to init settings file: %s\n",
+				strerror(ret));
+		}
 		return ret;
 	}
 
