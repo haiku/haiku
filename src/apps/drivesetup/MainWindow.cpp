@@ -515,23 +515,22 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 	while (BMenuItem* item = fInitMenu->RemoveItem(0L))
 		delete item;
 
+	fCreateMI->SetEnabled(false);
+	fUnmountMI->SetEnabled(false);
+	fInitMenu->SetEnabled(false);
+
 	if (!disk) {
 		fFormatMI->SetEnabled(false);
 		fEjectMI->SetEnabled(false);
 		fSurfaceTestMI->SetEnabled(false);
-
-		fPartitionMenu->SetEnabled(false);
 	} else {
 //		fFormatMI->SetEnabled(true);
 		fFormatMI->SetEnabled(false);
 		fEjectMI->SetEnabled(disk->IsRemovableMedia());
 //		fSurfaceTestMI->SetEnabled(true);
 		fSurfaceTestMI->SetEnabled(false);
-		fCreateMI->SetEnabled(false);
 
 		// Create menu and items
-		fPartitionMenu->SetEnabled(true);
-
 		BPartition* parentPartition = NULL;
 		if (selectedPartition <= -2)
 			parentPartition = disk->FindDescendant(parentID);
@@ -601,10 +600,8 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 			}
 			fUnmountMI->SetEnabled(unMountable);
 		} else {
-			fInitMenu->SetEnabled(false);
 			fDeleteMI->SetEnabled(false);
 			fMountMI->SetEnabled(false);
-			fUnmountMI->SetEnabled(false);
 		}
 
 		if (prepared)
