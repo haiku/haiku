@@ -204,7 +204,7 @@ ext2_get_vnode(fs_volume* _volume, ino_t id, fs_vnode* _node, int* _type,
 		return B_NO_MEMORY;
 
 	status_t status = inode->InitCheck();
-	if (status < B_OK)
+	if (status != B_OK)
 		delete inode;
 
 	if (status == B_OK) {

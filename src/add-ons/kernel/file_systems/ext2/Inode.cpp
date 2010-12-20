@@ -643,6 +643,7 @@ Inode::Create(Transaction& transaction, Inode* parent, const char* name,
 		status = inode->InitDirectory(transaction, parent);
 		if (status != B_OK) {
 			ERROR("Inode::Create(): InitDirectory() failed\n");
+			delete inode;
 			return status;
 		}
 	}
@@ -670,8 +671,10 @@ Inode::Create(Transaction& transaction, Inode* parent, const char* name,
 
 	TRACE("Inode::Create(): Saving inode\n");
 	status = inode->WriteBack(transaction);
-	if (status != B_OK)
+	if (status != B_OK) {
+		delete inode;
 		return status;
+	}
 
 	TRACE("Inode::Create(): Creating vnode\n");
 

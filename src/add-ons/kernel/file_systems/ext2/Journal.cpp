@@ -118,7 +118,8 @@ Journal::Journal(Volume* fsVolume, Volume* jVolume)
 		if (fInitStatus == B_OK) {
 			fRevokeManager = revokeManager;
 			fInitStatus = _LoadSuperBlock();
-		}
+		} else
+			delete revokeManager;
 	}
 }
 

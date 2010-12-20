@@ -62,7 +62,8 @@ InodeJournal::InodeJournal(Inode* inode)
 				if (fInitStatus == B_OK) {
 					fRevokeManager = revokeManager;
 					fInitStatus = _LoadSuperBlock();
-				}
+				} else
+					delete revokeManager;
 			}
 		}
 	}
