@@ -36,6 +36,7 @@ Pipe::InitCommon(int8 deviceAddress, uint8 endpointAddress, usb_speed speed,
 	fSpeed = speed;
 	fDirection = direction;
 	fMaxPacketSize = maxPacketSize;
+	fInterval = interval;
 	fHubAddress = hubAddress;
 	fHubPort = hubPort;
 
