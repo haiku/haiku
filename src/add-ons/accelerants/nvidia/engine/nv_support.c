@@ -33,6 +33,7 @@ void nv_log(char *fmt, ...)
 
 	va_start(args,fmt);
 	vsprintf (buffer, fmt, args);
+	va_end(args);
 	fprintf(myhand, "%s", buffer);
 	fclose(myhand);
 }
