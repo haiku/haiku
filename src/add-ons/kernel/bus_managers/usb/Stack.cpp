@@ -21,6 +21,7 @@ Stack::Stack()
 	:	fExploreThread(-1),
 		fFirstExploreDone(false),
 		fStopThreads(false),
+		fAllocator(NULL),
 		fObjectIndex(1),
 		fObjectMaxCount(1024),
 		fObjectArray(NULL),
