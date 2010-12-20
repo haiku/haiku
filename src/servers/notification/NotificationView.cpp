@@ -270,7 +270,7 @@ NotificationView::Draw(BRect updateRect)
 		progRect.top = progRect.bottom - (kSmallPadding * 2) - fontHeight;
 		StrokeRect(progRect);
 
-		BRect barRect = progRect;		
+		BRect barRect = progRect;
 		barRect.InsetBy(1.0, 1.0);
 		barRect.right *= fProgress;
 		SetHighColor(ui_color(B_CONTROL_HIGHLIGHT_COLOR));
@@ -326,15 +326,14 @@ NotificationView::Draw(BRect updateRect)
 		iconRect.right = ix + iconSize;
 		iconRect.bottom = iy + iconSize;
 
-		DrawBitmapAsync(fBitmap, fBitmap->Bounds(),
-			iconRect, B_FILTER_BITMAP_BILINEAR);
+		DrawBitmapAsync(fBitmap, fBitmap->Bounds(),	iconRect);
 	}
 
 	// Draw content
 	LineInfoList::iterator lIt;
 	for (lIt = fLines.begin(); lIt != fLines.end(); lIt++) {
 		LineInfo *l = (*lIt);
-	
+
 		SetFont(&l->font);
 		DrawString(l->text.String(), l->text.Length(), l->location);
 	}
@@ -371,7 +370,7 @@ NotificationView::MouseDown(BPoint point)
 		{
 			BRect closeRect = Bounds().InsetByCopy(2,2);
 			closeRect.left = closeRect.right - kCloseSize;
-			closeRect.bottom = closeRect.top + kCloseSize;	
+			closeRect.bottom = closeRect.top + kCloseSize;
 
 			if (!closeRect.Contains(point)) {
 				entry_ref launchRef;
@@ -391,7 +390,7 @@ NotificationView::MouseDown(BPoint point)
 						useArgv = true;
 				}
 
-				if (fDetails->FindRef("onClickRef", &ref) == B_OK) {			
+				if (fDetails->FindRef("onClickRef", &ref) == B_OK) {
 					for (int32 i = 0; fDetails->FindRef("onClickRef", i, &ref) == B_OK; i++)
 						refMsg.AddRef("refs", &ref);
 
@@ -463,7 +462,7 @@ NotificationView::GetSupportedSuites(BMessage* msg)
 	msg->AddString("suites", "suite/x-vnd.Haiku-notification_server");
 	BPropertyInfo prop_info(message_prop_list);
 	msg->AddFlat("messages", &prop_info);
-	return BView::GetSupportedSuites(msg); 		
+	return BView::GetSupportedSuites(msg);
 }
 
 
