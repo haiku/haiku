@@ -176,7 +176,7 @@ PasswordWindow::MessageReceived(BMessage *message)
 				}
 				const char *salt = _SanitizeSalt(fPasswordControl->Text());
 				fSettings.SetPassword(crypt(fPasswordControl->Text(), salt));
-				delete salt;
+				delete[] salt;
 			} else {
 				fSettings.SetPassword("");
 			}
