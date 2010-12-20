@@ -70,6 +70,8 @@ copy_indexes(dev_t from, dev_t to, bool verbose)
 		} else if (verbose)
 			printf("\t%s\n", dirent->d_name);
 	}
+
+	fs_close_index_dir(indexes);
 }
 
 
