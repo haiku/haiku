@@ -39,10 +39,12 @@ LibbeLocaleBackend::GetString(const char* string, const char* context,
 	const char* comment)
 {
 	// The system catalog will not be there for non-localized apps.
-	if (systemCatalog)
-		return systemCatalog->GetString(string, context, comment);
-	else
-		return string;
+	if (systemCatalog) {
+		const char *translated = systemCatalog->GetString(string, context, comment);
+		if (translated)
+			return translated;
+	}
+	return string;
 }
 
 
