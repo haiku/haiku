@@ -12,10 +12,8 @@
 #include <Message.h>
 #include <Bitmap.h>
 #include <Window.h>
-#include <List.h>
 
 #include "IconRule.h"
-#include "IconItem.h"
 
 const int32 kEdgeOffset = 8;
 const int32 kBorderOffset = 1;
@@ -27,13 +25,11 @@ BIconRule::BIconRule(const char* name)
 	BView(name, B_WILL_DRAW),
 	fSelIndex(-1)
 {
-	fIcons = new BList();
 }
 
 
 BIconRule::~BIconRule()
 {
-	delete fIcons;
 }
 
 
@@ -115,7 +111,7 @@ BIconRule::Draw(BRect updateRect)
 
 	BRect itemFrame(kEdgeOffset, kBorderOffset, -1, kBorderOffset + 64);
 	for (int32 i = 0; i < count; i++) {
-		BIconItem* item = static_cast<BIconItem*>(fIcons->ItemAt(i));
+		BIconItem* item = fIcons.ItemAt(i);
 		float width = StringWidth(item->Label()) + StringWidth(" ") * 2;
 		if (width < 64.0f)
 			width = 64.0f;
@@ -154,26 +150,32 @@ BIconRule::AddIcon(const char* label, const BBitmap* icon)
 		item->Select();
 		fSelIndex = 0;
 	}
-	(void)fIcons->AddItem(item);
+	fIcons.AddItem(item);
 }
 
 
 void
 BIconRule::RemoveIconAt(int32 index)
 {
+	int32 count = fIcons.CountItems();
+	if (index < count && index >= (int32)0)
+		fIcons.RemoveItemAt((int32)index);
 }
 
 
 void
 BIconRule::RemoveAllIcons()
 {
+	int32 count = fIcons.CountItems();
+	for (int32 i = 0; i < count; i++)
+		fIcons.RemoveItemAt(i);
 }
 
 
 int32
 BIconRule::CountIcons() const
 {
-	return fIcons->CountItems();
+	return fIcons.CountItems();
 }
 
 
@@ -184,11 +186,11 @@ BIconRule::SlideToIcon(int32 index)
 	if ((index < 0) || (index > CountIcons() - 1))
 		return;
 
-	BIconItem* item = static_cast<BIconItem*>(fIcons->ItemAt(index));
+	BIconItem* item = fIcons.ItemAt(index);
 	if (item) {
 		// Deselect previously selected item
 		if (fSelIndex > -1) {
-			BIconItem* selItem = static_cast<BIconItem*>(fIcons->ItemAt(fSelIndex));
+			BIconItem* selItem = fIcons.ItemAt(fSelIndex);
 			selItem->Deselect();
 		}
 
@@ -225,7 +227,7 @@ int32
 BIconRule::IndexOf(BPoint point)
 {
 	int32 low = 0;
-	int32 high = fIcons->CountItems() - 1;
+	int32 high = fIcons.CountItems() - 1;
 	int32 mid = -1;
 	float frameLeft = -1.0f;
 	float frameRight = 1.0f;
@@ -233,7 +235,7 @@ BIconRule::IndexOf(BPoint point)
 	// Binary search the list
 	while (high >= low) {
 		mid = (low + high) / 2;
-		BIconItem* item = static_cast<BIconItem*>(fIcons->ItemAt(mid));
+		BIconItem* item = fIcons.ItemAt(mid);
 		frameLeft = item->Frame().left;
 		frameRight = item->Frame().right;
 		if (point.x < frameLeft)

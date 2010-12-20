@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src preferences notifications ;
 
+UsePrivateHeaders shared ;
+
 UsePrivateHeaders interface ;
 
 Application Notifications :

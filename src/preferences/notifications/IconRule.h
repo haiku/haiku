@@ -6,10 +6,14 @@
 #ifndef _ICON_RULE_H
 #define _ICON_RULE_H
 
+
 #include <Invoker.h>
+#include <ObjectList.h>
 #include <View.h>
 
-class BList;
+#include "IconItem.h"
+
+
 class BMessage;
 
 class BIconRule : public BView, public BInvoker {
@@ -44,7 +48,8 @@ public:
 	virtual	BSize		PreferredSize();
 
 private:
-			BList*		fIcons;
+			typedef BObjectList<BIconItem> IconItems;
+			IconItems	fIcons;
 			int32		fSelIndex;
 			BMessage*	fMessage;
 };
