@@ -27,6 +27,7 @@ static int8 sUnitExponent[16] = {
 
 HIDParser::HIDParser(HIDDevice *device)
 	:	fDevice(device),
+		fUsesReportIDs(false),
 		fReportCount(0),
 		fReports(NULL),
 		fRootCollection(NULL)
