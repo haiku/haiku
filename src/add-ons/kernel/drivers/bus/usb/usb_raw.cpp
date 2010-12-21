@@ -494,8 +494,8 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			}
 
 			uint8 length = MIN(firstTwoBytes[0], command->descriptor.length);
-			uint8 *buffer = (uint8 *)malloc(length);
-			if (!buffer) {
+			uint8 *descriptorBuffer = (uint8 *)malloc(length);
+			if (descriptorBuffer == NULL) {
 				command->descriptor.status = B_USB_RAW_STATUS_ABORTED;
 				command->descriptor.length = 0;
 				return B_NO_MEMORY;
@@ -503,19 +503,19 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 
 			if (gUSBModule->get_descriptor(device->device,
 				command->descriptor.type, command->descriptor.index,
-				command->descriptor.language_id, buffer, length,
+				command->descriptor.language_id, descriptorBuffer, length,
 				&actualLength) < B_OK
 				|| actualLength != length) {
 				command->descriptor.status = B_USB_RAW_STATUS_ABORTED;
 				command->descriptor.length = 0;
-				free(buffer);
+				free(descriptorBuffer);
 				return B_OK;
 			}
 
-			memcpy(command->descriptor.data, buffer, length);
+			memcpy(command->descriptor.data, descriptorBuffer, length);
 			command->descriptor.status = B_USB_RAW_STATUS_SUCCESS;
 			command->descriptor.length = length;
-			free(buffer);
+			free(descriptorBuffer);
 			return B_OK;
 		}
 
