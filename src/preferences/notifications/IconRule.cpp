@@ -23,6 +23,7 @@ const int32 kBorderOffset = 1;
 BIconRule::BIconRule(const char* name)
 	:
 	BView(name, B_WILL_DRAW),
+	fIcons(5, true),
 	fSelIndex(-1)
 {
 }
@@ -157,18 +158,14 @@ BIconRule::AddIcon(const char* label, const BBitmap* icon)
 void
 BIconRule::RemoveIconAt(int32 index)
 {
-	int32 count = fIcons.CountItems();
-	if (index < count && index >= (int32)0)
-		fIcons.RemoveItemAt((int32)index);
+	delete fIcons.RemoveItemAt(index);
 }
 
 
 void
 BIconRule::RemoveAllIcons()
 {
-	int32 count = fIcons.CountItems();
-	for (int32 i = 0; i < count; i++)
-		fIcons.RemoveItemAt(i);
+	fIcons.MakeEmpty();
 }
 
 
@@ -182,10 +179,6 @@ BIconRule::CountIcons() const
 void
 BIconRule::SlideToIcon(int32 index)
 {
-	// Ignore invalid items
-	if ((index < 0) || (index > CountIcons() - 1))
-		return;
-
 	BIconItem* item = fIcons.ItemAt(index);
 	if (item) {
 		// Deselect previously selected item
@@ -208,8 +201,6 @@ BIconRule::SlideToIcon(int32 index)
 void
 BIconRule::SlideToNext()
 {
-	if (fSelIndex + 1 < CountIcons() - 1)
-		return;
 	SlideToIcon(fSelIndex + 1);
 }
 
@@ -217,8 +208,6 @@ BIconRule::SlideToNext()
 void
 BIconRule::SlideToPrevious()
 {
-	if (fSelIndex <= 0)
-		return;
 	SlideToIcon(fSelIndex - 1);
 }
 
