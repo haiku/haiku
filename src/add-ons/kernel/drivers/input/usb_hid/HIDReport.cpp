@@ -109,7 +109,7 @@ HIDReport::AddMainItem(global_item_state &globalState,
 		if (fItemsUsed >= fItemsAllocated) {
 			fItemsAllocated += 10;
 			HIDReportItem **newItems = (HIDReportItem **)realloc(fItems,
-				sizeof(HIDReportItem **) * fItemsAllocated);
+				sizeof(HIDReportItem *) * fItemsAllocated);
 			if (newItems == NULL) {
 				TRACE_ALWAYS("no memory when growing report item list\n");
 				fItemsAllocated -= 10;
