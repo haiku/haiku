@@ -737,8 +737,9 @@ usb_disk_device_added(usb_device newDevice, void **cookie)
 	device->notify = create_sem(0, "usb_disk callback notify");
 	if (device->notify < B_OK) {
 		mutex_destroy(&device->lock);
+		status_t result = device->notify;
 		free(device);
-		return device->notify;
+		return result;
 	}
 
 	device->lun_count = usb_disk_get_max_lun(device) + 1;
