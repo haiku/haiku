@@ -31,7 +31,7 @@ typedef struct {
 	mutex				lock;
 	uint32				reference_count;
 
-	char				name[32];
+	char				name[64];
 	void				*link;
 
 	sem_id				notify;
@@ -61,12 +61,13 @@ usb_raw_device_added(usb_device newDevice, void **cookie)
 		return B_NO_MORE_SEMS;
 	}
 
-	char deviceName[32];
+	char deviceName[64];
 	memcpy(deviceName, &newDevice, sizeof(usb_device));
 	if (gUSBModule->usb_ioctl('DNAM', deviceName, sizeof(deviceName)) >= B_OK) {
-		sprintf(device->name, "bus/usb/%s", deviceName);
+		snprintf(device->name, sizeof(device->name), "bus/usb/%s", deviceName);
 	} else {
-		sprintf(device->name, "bus/usb/%08lx", newDevice);
+		snprintf(device->name, sizeof(device->name), "bus/usb/%08lx",
+			newDevice);
 	}
 
 	device->device = newDevice;
