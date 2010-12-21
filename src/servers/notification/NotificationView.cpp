@@ -321,12 +321,8 @@ NotificationView::Draw(BRect updateRect)
 			// Move icon up by half progress bar height if it's present
 			iy -= (progRect.Height() + kEdgePadding) / 2.0;
 
-		iconRect.left = ix;
-		iconRect.top = iy;
-		iconRect.right = ix + iconSize;
-		iconRect.bottom = iy + iconSize;
-
-		DrawBitmapAsync(fBitmap, fBitmap->Bounds(),	iconRect);
+		iconRect.Set(ix, iy, ix + iconSize - 1.0, iy + iconSize - 1.0);
+		DrawBitmapAsync(fBitmap, fBitmap->Bounds(), iconRect);
 	}
 
 	// Draw content
