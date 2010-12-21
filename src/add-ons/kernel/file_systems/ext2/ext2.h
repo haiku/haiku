@@ -196,6 +196,11 @@ struct ext2_super_block {
 
 #define EXT2_BLOCK_GROUP_NORMAL_SIZE			32
 
+// block group flags
+#define EXT2_BLOCK_GROUP_INODE_UNINIT	0x1
+#define EXT2_BLOCK_GROUP_BLOCK_UNINIT	0x2
+
+
 struct ext2_block_group {
 	uint32	block_bitmap;
 	uint32	inode_bitmap;
@@ -265,7 +270,8 @@ struct ext2_block_group {
 				((uint32)B_LENDIAN_TO_HOST_INT16(used_directories_high) << 16);
 		return dirs;
 	}
-
+	uint16 Flags() const { return B_LENDIAN_TO_HOST_INT16(flags); }
+	
 
 	void SetFreeBlocks(uint32 freeBlocks, bool has64bits)
 	{
@@ -287,6 +293,11 @@ struct ext2_block_group {
 		if (has64bits)
 			used_directories_high =
 				B_HOST_TO_LENDIAN_INT16(usedDirectories >> 16);
+	}
+
+	void SetFlags(uint16 newFlags)
+	{
+		flags = B_HOST_TO_LENDIAN_INT16(newFlags);
 	}
 } _PACKED;
 
