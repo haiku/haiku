@@ -45,7 +45,6 @@ private:
 			uint32				fClickCount;
 			bigtime_t			fLastClickTime;
 			bigtime_t			fClickSpeed;
-			uint32				fMaxButtons;
 };
 
 #endif // USB_MOUSE_DEVICE_H
