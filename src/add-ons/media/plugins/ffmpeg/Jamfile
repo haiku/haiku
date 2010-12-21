@@ -27,7 +27,9 @@ Addon ffmpeg :
 	gfx_conv_c_lookup.cpp
 	gfx_conv_mmx.cpp
  	gfx_util.cpp
- 	yuvrgb.nasm
+ 	yuvrgb_sse.nasm
+ 	yuvrgb_sse2.nasm
+ 	yuvrgb_ssse3.nasm
 	:
 	libavformat.a
 	libavcodec.a

@@ -29,6 +29,7 @@ resolve_colorspace(color_space colorSpace, PixelFormat pixelFormat, int width,
 
 	switch (colorSpace) {
 		case B_RGB32:
+			// Planar Formats
 			if (pixelFormat == PIX_FMT_YUV410P) {
 				TRACE("resolve_colorspace: gfx_conv_yuv410p_rgb32_c\n");
 				return gfx_conv_yuv410p_rgb32_c;
@@ -57,14 +58,32 @@ resolve_colorspace(color_space colorSpace, PixelFormat pixelFormat, int width,
 
 			if (pixelFormat == PIX_FMT_YUV422P
 				|| pixelFormat == PIX_FMT_YUVJ422P) {
-				if (cpu.HasSSE2() && width % 8 == 0)
+				if (cpu.HasSSE2() && width % 8 == 0) {
+					TRACE("resolve_colorspace: gfx_conv_yuv422p_RGB32_sse2\n");
 					return gfx_conv_yuv422p_rgba32_sse2;
-				else if (cpu.HasSSE1() && width % 4 == 0)
+				} else if (cpu.HasSSE1() && width % 4 == 0) {
+					TRACE("resolve_colorspace: gfx_conv_yuv422p_RGB32_sse\n");
 					return gfx_conv_yuv422p_rgba32_sse;
-				else
+				} else {
+					TRACE("resolve_colorspace: gfx_conv_YCbCr422p_RGB32_c\n");
 					return gfx_conv_YCbCr422_RGB32_c;
+				}
 			}
-
+			
+			// Packed Formats
+			if (pixelFormat == PIX_FMT_YUYV422) {
+				if (cpu.HasSSSE3() && width % 8 == 0) {
+					return gfx_conv_yuv422_rgba32_ssse3;
+				} else if (cpu.HasSSE2() && width % 8 == 0) {
+					return gfx_conv_yuv422_rgba32_sse2;
+				} else if (cpu.HasSSE1() && width % 4 == 0
+					&& height % 2 == 0) {
+					return gfx_conv_yuv422_rgba32_sse;
+				} else {
+					return gfx_conv_YCbCr422_RGB32_c;
+				}
+			}
+			
 			TRACE("resolve_colorspace: %s => B_RGB32: NULL\n",
 				pixfmt_to_string(pixelFormat));
 			return NULL;
