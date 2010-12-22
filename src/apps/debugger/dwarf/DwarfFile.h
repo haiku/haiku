@@ -116,8 +116,7 @@ private:
 									CIEAugmentation& cieAugmentation);
 			status_t			_ParseFrameInfoInstructions(
 									CompilationUnit* unit, CfaContext& context,
-									off_t instructionOffset,
-									off_t instructionSize);
+									DataReader& dataReader);
 
 			status_t			_ParsePublicTypesInfo();
 			status_t			_ParsePublicTypesInfo(DataReader& dataReader,

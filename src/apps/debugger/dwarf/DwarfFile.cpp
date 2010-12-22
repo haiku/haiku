@@ -672,8 +672,10 @@ DwarfFile::UnwindCallFrame(CompilationUnit* unit,
 				if (error != B_OK)
 					return error;
 
+				DataReader restrictedReader =
+					dataReader.RestrictedReader(remaining);
 				error = _ParseFrameInfoInstructions(unit, context,
-					dataReader.Offset(), remaining);
+					restrictedReader);
 				if (error != B_OK)
 					return error;
 
@@ -1604,22 +1606,15 @@ DwarfFile::_ParseCIE(CompilationUnit* unit, CfaContext& context,
 	if (remaining < 0)
 		return B_BAD_DATA;
 
-	return _ParseFrameInfoInstructions(unit, context,
-		cieOffset + dataReader.Offset(), remaining);
+	DataReader restrictedReader = dataReader.RestrictedReader(remaining);
+	return _ParseFrameInfoInstructions(unit, context, restrictedReader);
 }
 
 
 status_t
 DwarfFile::_ParseFrameInfoInstructions(CompilationUnit* unit,
-	CfaContext& context, off_t instructionOffset, off_t instructionSize)
+	CfaContext& context, DataReader& dataReader)
 {
-	if (instructionSize <= 0)
-		return B_OK;
-
-	DataReader dataReader(
-		(uint8*)fDebugFrameSection->Data() + instructionOffset,
-		instructionSize, unit->AddressSize());
-
 	while (dataReader.BytesRemaining() > 0) {
 		TRACE_CFI("    [%2lld]", dataReader.BytesRemaining());
 

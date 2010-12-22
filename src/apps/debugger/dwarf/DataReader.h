@@ -36,6 +36,21 @@ public:
 		fOverflow = false;
 	}
 
+	DataReader RestrictedReader()
+	{
+		return *this;
+	}
+
+	DataReader RestrictedReader(off_t maxLength)
+	{
+		return DataReader(fData, maxLength, fAddressSize);
+	}
+
+	DataReader RestrictedReader(off_t relativeOffset, off_t maxLength)
+	{
+		return DataReader(fData + relativeOffset, maxLength, fAddressSize);
+	}
+
 	bool HasData() const
 	{
 		return fSize > 0;
