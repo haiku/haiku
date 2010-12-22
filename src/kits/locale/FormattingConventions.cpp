@@ -216,6 +216,10 @@ BFormattingConventions::BFormattingConventions(
 
 
 BFormattingConventions::BFormattingConventions(const BMessage* archive)
+	:
+	fCachedUse24HourClock(CLOCK_HOURS_UNSET),
+	fExplicitUse24HourClock(CLOCK_HOURS_UNSET),
+	fUseStringsFromPreferredLanguage(false)
 {
 	BString conventionsID;
 	status_t status = archive->FindString("conventions", &conventionsID);
