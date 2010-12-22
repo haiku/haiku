@@ -127,23 +127,29 @@ BLanguage::GetNativeName(BString& name) const
 status_t
 BLanguage::GetName(BString& name, const BLanguage* displayLanguage) const
 {
+	status_t status = B_OK;
+
 	BString appLanguage;
 	if (displayLanguage == NULL) {
 		BMessage preferredLanguage;
-		BLocaleRoster::Default()->GetPreferredLanguages(&preferredLanguage);
-		preferredLanguage.FindString("language", 0, &appLanguage);
+		status = BLocaleRoster::Default()->GetPreferredLanguages(
+			&preferredLanguage);
+		if (status == B_OK)
+			status = preferredLanguage.FindString("language", 0, &appLanguage);
 	} else {
 		appLanguage = displayLanguage->Code();
 	}
 
-	UnicodeString string;
-	fICULocale->getDisplayName(Locale(appLanguage), string);
+	if (status == B_OK) {
+		UnicodeString string;
+		fICULocale->getDisplayName(Locale(appLanguage), string);
 
-	name.Truncate(0);
-	BStringByteSink converter(&name);
-	string.toUTF8(converter);
+		name.Truncate(0);
+		BStringByteSink converter(&name);
+		string.toUTF8(converter);
+	}
 
-	return B_OK;
+	return status;
 }
 
 
