@@ -80,22 +80,27 @@ BCountry::GetNativeName(BString& name) const
 status_t
 BCountry::GetName(BString& name, const BLanguage* displayLanguage) const
 {
+	status_t status = B_OK;
 	BString appLanguage;
 	if (displayLanguage == NULL) {
-		BMessage preferredLanguage;
-		BLocaleRoster::Default()->GetPreferredLanguages(&preferredLanguage);
-		preferredLanguage.FindString("language", 0, &appLanguage);
+		BMessage preferredLanguages;
+		status = BLocaleRoster::Default()->GetPreferredLanguages(
+			&preferredLanguages);
+		if (status == B_OK)
+			status = preferredLanguages.FindString("language", 0, &appLanguage);
 	} else {
 		appLanguage = displayLanguage->Code();
 	}
 
-	UnicodeString uString;
-	fICULocale->getDisplayName(Locale(appLanguage), uString);
-	name.Truncate(0);
-	BStringByteSink stringConverter(&name);
-	uString.toUTF8(stringConverter);
+	if (status == B_OK) {
+		UnicodeString uString;
+		fICULocale->getDisplayName(Locale(appLanguage), uString);
+		name.Truncate(0);
+		BStringByteSink stringConverter(&name);
+		uString.toUTF8(stringConverter);
+	}
 
-	return B_OK;
+	return status;
 }
 
 
