@@ -878,7 +878,7 @@ MutableLocaleRoster::UnloadCatalog(BCatalogAddOn* catalog)
 	status_t res = B_ERROR;
 	BCatalogAddOn* nextCatalog;
 
-	while (catalog) {
+	while (catalog != NULL) {
 		nextCatalog = catalog->Next();
 		int32 count = RosterData::Default()->fCatalogAddOnInfos.CountItems();
 		for (int32 i = 0; i < count; ++i) {
@@ -889,6 +889,7 @@ MutableLocaleRoster::UnloadCatalog(BCatalogAddOn* catalog)
 				delete catalog;
 				info->UnloadIfPossible();
 				res = B_OK;
+				break;
 			}
 		}
 		catalog = nextCatalog;
