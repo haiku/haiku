@@ -21,14 +21,14 @@ public:
 	void AttachedToWindow();
 	void DetachedFromWindow();
 	void Draw(BRect updateRect);
-	void ComputeLevels(void* data, size_t size, uint32 format);
+	void ComputeLevels(const void* data, size_t size, uint32 format);
 			
 private:
 	void _Run();
 	void _Quit();
 	static int32 _RenderLaunch(void *data);
 	void _RenderLoop();
-	template<typename T> T _ComputeNextLevel(void *data, 
+	template<typename T> T _ComputeNextLevel(const void *data, 
 		size_t size, uint32 format, int32 channel);
 	
 	thread_id fThreadId;

@@ -175,10 +175,10 @@ VUView::_RenderLoop()
 
 template<typename T>
 T 
-VUView::_ComputeNextLevel(void *data, size_t size, uint32 format, 
+VUView::_ComputeNextLevel(const void *data, size_t size, uint32 format, 
 	int32 channel)
 {
-	T* samp = (T*)data;
+	const T* samp = (const T*)data;
 	
 	// get the min and max values in the nibbling interval
 	// and set max to be the greater of the absolute value
@@ -199,7 +199,7 @@ VUView::_ComputeNextLevel(void *data, size_t size, uint32 format,
 
 
 void
-VUView::ComputeLevels(void* data, size_t size, uint32 format)
+VUView::ComputeLevels(const void* data, size_t size, uint32 format)
 {
 	for (int32 channel = 0; channel < fChannels; channel++) {
 		switch (format) {
