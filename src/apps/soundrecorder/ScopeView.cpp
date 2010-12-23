@@ -258,7 +258,7 @@ ScopeView::SetRightTime(bigtime_t timestamp)
 
 
 void
-ScopeView::RenderTrack(BMediaTrack *track, media_format &format)
+ScopeView::RenderTrack(BMediaTrack *track, const media_format &format)
 {
 	fMediaTrack = track;
 	fPlayFormat = format;
