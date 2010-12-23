@@ -115,7 +115,7 @@ enum {
 	B_JOYSTICK_DRIVER_BASE = 8200,	/* base for codes in joystick.h */
 	B_GRAPHIC_DRIVER_BASE = 8300,	/* base for codes in graphic_driver.h */
 
-	B_DEVICE_OP_CODES_END = 9999	/* end of Be-defined control id's */
+	B_DEVICE_OP_CODES_END = 9999	/* end of Be-defined control ids */
 };
 
 /* B_GET_GEOMETRY data structure */
