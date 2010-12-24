@@ -16,7 +16,9 @@
 #include <Application.h>
 #include <Box.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <Directory.h>
+#include <DurationFormat.h>
 #include <Entry.h>
 #include <File.h>
 #include <FindDirectory.h>
@@ -37,6 +39,8 @@
 #include "ScreenCornerSelector.h"
 #include "ScreenSaverItem.h"
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "ScreenSaver"
 
 const uint32 kPreviewMonitorGap = 16;
 const uint32 kMinSettingsWidth = 230;
@@ -148,7 +152,8 @@ static const int32 kTimeUnitCount
 TimeSlider::TimeSlider(BRect frame, const char* name, uint32 changedMessage,
 		uint32 updateMessage)
 	:
-	BSlider(frame, name, "30 seconds", new BMessage(changedMessage),
+	BSlider(frame, name, B_TRANSLATE("30 seconds"),
+		new BMessage(changedMessage),
 		0, kTimeUnitCount - 1, B_TRIANGLE_THUMB, B_FOLLOW_LEFT_RIGHT)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -206,33 +211,8 @@ TimeSlider::Time() const
 void
 TimeSlider::_TimeToString(bigtime_t useconds, BString& string)
 {
-	useconds /= 1000000LL;
-		// convert to seconds
-
-	string = "";
-
-	// hours
-	uint32 hours = useconds / 3600;
-	if (hours != 0)
-		string << hours << " hours";
-
-	useconds %= 3600;
-
-	// minutes
-	uint32 minutes = useconds / 60;
-	if (hours != 0)
-		string << " ";
-	if (minutes != 0)
-		string << minutes << " minutes";
-
-	useconds %= 60;
-
-	// seconds
-	uint32 seconds = useconds;
-	if (hours != 0 || minutes != 0)
-		string << " ";
-	if (seconds != 0)
-		string << seconds << " seconds";
+	BDurationFormat formatter;
+	formatter.Format(0, useconds, &string);
 }
 
 
@@ -272,7 +252,7 @@ ModulesView::ModulesView(BRect rect, const char* name,
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	fTestButton = new BButton(rect, "TestButton", "Test",
+	fTestButton = new BButton(rect, "TestButton", B_TRANSLATE("Test"),
 		new BMessage(kMsgTestSaver), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	float width, height;
 	fTestButton->GetPreferredSize(&width, &height);
@@ -282,8 +262,9 @@ ModulesView::ModulesView(BRect rect, const char* name,
 
 	rect = fTestButton->Frame();
 	rect.OffsetBy(fTestButton->Bounds().Width() + 8, 0);
-	fAddButton = new BButton(rect, "AddButton", "Add" B_UTF8_ELLIPSIS,
-		new BMessage(kMsgAddSaver), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
+	fAddButton = new BButton(rect, "AddButton",
+		B_TRANSLATE("Add" B_UTF8_ELLIPSIS), new BMessage(kMsgAddSaver),
+		B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	AddChild(fAddButton);
 
 	rect = Bounds().InsetByCopy(8 + kPreviewMonitorGap, 12);
@@ -309,7 +290,7 @@ ModulesView::ModulesView(BRect rect, const char* name,
 	rect.left = fAddButton->Frame().right + 8;
 	AddChild(fSettingsBox = new BBox(rect, "SettingsBox", B_FOLLOW_ALL,
 		B_WILL_DRAW));
-	fSettingsBox->SetLabel("Module settings");
+	fSettingsBox->SetLabel(B_TRANSLATE("Module settings"));
 
 	PopulateScreenSaverList();
 	fFilePanel = new BFilePanel();
@@ -370,7 +351,7 @@ ModulesView::MessageReceived(BMessage* message)
 			if (item == NULL)
 				break;
 
-			if (!strcmp(item->Text(), "Blackness"))
+			if (!strcmp(item->Text(), B_TRANSLATE("Blackness")))
 				fSettings.SetModuleName("");
 			else
 				fSettings.SetModuleName(item->Text());
@@ -455,7 +436,7 @@ ModulesView::PopulateScreenSaverList()
 	}
 
 	// Blackness is a built-in screen saver
-	fListView->AddItem(new ScreenSaverItem("Blackness", ""));
+	fListView->AddItem(new ScreenSaverItem(B_TRANSLATE("Blackness"), ""));
 
 	// Iterate over add-on directories, and add their files to the list view
 
@@ -483,7 +464,7 @@ ModulesView::PopulateScreenSaverList()
 
 			if (!strcmp(fSettings.ModuleName(), item->Text())
 				|| (!strcmp(fSettings.ModuleName(), "")
-					&& !strcmp(item->Text(), "Blackness")))
+					&& !strcmp(item->Text(), B_TRANSLATE("Blackness"))))
 				selectItem = item;
 		}
 	}
@@ -571,9 +552,10 @@ ModulesView::_OpenSaver()
 		// There are no settings at all, we add the module name here to
 		// let it look a bit better at least.
 		BPrivate::BuildScreenSaverDefaultSettingsView(fSettingsView,
-			fSettings.ModuleName()[0] ? fSettings.ModuleName() : "Blackness",
-			saver || !fSettings.ModuleName()[0]
-				? "No options available" : "Could not load screen saver");
+			fSettings.ModuleName()[0] ? fSettings.ModuleName() : 
+			B_TRANSLATE("Blackness"), saver || !fSettings.ModuleName()[0]
+				? B_TRANSLATE("No options available") :
+				B_TRANSLATE("Could not load screen saver"));
 	}
 
 	ScreenSaverWindow* window = dynamic_cast<ScreenSaverWindow*>(Window());
@@ -630,7 +612,7 @@ ModulesView::_OpenSaver()
 
 ScreenSaverWindow::ScreenSaverWindow()
 	:
-	BWindow(BRect(50, 50, 496, 375), "ScreenSaver",
+	BWindow(BRect(50, 50, 496, 375), B_TRANSLATE("ScreenSaver"),
 		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS)
 {
 	fSettings.Load();
@@ -651,7 +633,7 @@ ScreenSaverWindow::ScreenSaverWindow()
 	// Create the controls inside the tabs
 	rect = fTabView->ContainerView()->Bounds();
 	_SetupFadeTab(rect);
-	fModulesView = new ModulesView(rect, "Modules", fSettings);
+	fModulesView = new ModulesView(rect, B_TRANSLATE("Modules"), fSettings);
 
 	fTabView->AddTab(fFadeView);
 	fTabView->AddTab(fModulesView);
@@ -698,9 +680,10 @@ ScreenSaverWindow::~ScreenSaverWindow()
 void
 ScreenSaverWindow::_SetupFadeTab(BRect rect)
 {
-	fFadeView = new FadeView(rect, "Fade", fSettings);
+	fFadeView = new FadeView(rect, B_TRANSLATE("Fade"), fSettings);
 
-	float labelWidth = be_plain_font->StringWidth("Turn off screen") + 20.0f;
+	float labelWidth = be_plain_font->StringWidth(B_TRANSLATE("Turn off "
+		"screen")) + 20.0f;
 
 	font_height fontHeight;
 	be_plain_font->GetHeight(&fontHeight);
@@ -711,7 +694,8 @@ ScreenSaverWindow::_SetupFadeTab(BRect rect)
 		+ floorf(textHeight / 2);
 
 	fEnableCheckBox = new BCheckBox(BRect(0, 0, 1, 1), "EnableCheckBox",
-		"Enable screen saver", new BMessage(kMsgEnableScreenSaverBox));
+		B_TRANSLATE("Enable screen saver"),
+		new BMessage(kMsgEnableScreenSaverBox));
 	fEnableCheckBox->ResizeToPreferred();
 
 	rect.InsetBy(8, 8);
@@ -723,7 +707,8 @@ ScreenSaverWindow::_SetupFadeTab(BRect rect)
 	rect.left += radioButtonOffset;
 	rect.top = fEnableCheckBox->Bounds().bottom + 8.0f;
 	rect.right = box->Bounds().right - 8;
-	BStringView* stringView = new BStringView(rect, NULL, "Run module");
+	BStringView* stringView = new BStringView(rect, NULL,
+		B_TRANSLATE("Run module"));
 	stringView->ResizeToPreferred();
 	box->AddChild(stringView);
 
@@ -739,7 +724,7 @@ ScreenSaverWindow::_SetupFadeTab(BRect rect)
 	rect.left = 8;
 	rect.OffsetBy(0, fRunSlider->Bounds().Height() + 4.0f);
 	fTurnOffCheckBox = new BCheckBox(rect, "TurnOffScreenCheckBox",
-		"Turn off screen", new BMessage(kMsgTurnOffCheckBox));
+		B_TRANSLATE("Turn off screen"), new BMessage(kMsgTurnOffCheckBox));
 	fTurnOffCheckBox->ResizeToPreferred();
 	box->AddChild(fTurnOffCheckBox);
 
@@ -753,7 +738,7 @@ ScreenSaverWindow::_SetupFadeTab(BRect rect)
 	rect.left = 8;
 	rect.OffsetBy(0, fTurnOffSlider->Bounds().Height() + 4.0f);
 	fPasswordCheckBox = new BCheckBox(rect, "PasswordCheckbox",
-		"Password lock", new BMessage(kMsgPasswordCheckBox));
+		B_TRANSLATE("Password lock"), new BMessage(kMsgPasswordCheckBox));
 	fPasswordCheckBox->ResizeToPreferred();
 	box->AddChild(fPasswordCheckBox);
 
@@ -766,8 +751,8 @@ ScreenSaverWindow::_SetupFadeTab(BRect rect)
 	rect.OffsetBy(0, fTurnOffSlider->Bounds().Height() + 4.0f);
 	rect.left = rect.right;
 	fPasswordButton = new BButton(rect, "PasswordButton",
-		"Password" B_UTF8_ELLIPSIS, new BMessage(kMsgChangePassword),
-		B_FOLLOW_TOP | B_FOLLOW_RIGHT);
+		B_TRANSLATE("Password" B_UTF8_ELLIPSIS),
+		new BMessage(kMsgChangePassword), B_FOLLOW_TOP | B_FOLLOW_RIGHT);
 	fPasswordButton->ResizeToPreferred();
 	fPasswordButton->MoveBy(-fPasswordButton->Bounds().Width(), 0);
 	box->AddChild(fPasswordButton);
@@ -784,14 +769,14 @@ ScreenSaverWindow::_SetupFadeTab(BRect rect)
 		new BMessage(kMsgFadeCornerChanged), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM));
 
 	rect.OffsetBy(monitorWidth + 10, 0);
-	stringView = new BStringView(rect, NULL, "Fade now when",
+	stringView = new BStringView(rect, NULL, B_TRANSLATE("Fade now when"),
 		B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	stringView->ResizeToPreferred();
 	float maxWidth = stringView->Bounds().Width();
 	box->AddChild(stringView);
 
 	rect.OffsetBy(0, stringView->Bounds().Height());
-	stringView = new BStringView(rect, NULL, "mouse is here",
+	stringView = new BStringView(rect, NULL, B_TRANSLATE("mouse is here"),
 		B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	stringView->ResizeToPreferred();
 	if (maxWidth < stringView->Bounds().Width())
@@ -807,7 +792,7 @@ ScreenSaverWindow::_SetupFadeTab(BRect rect)
 		B_FOLLOW_LEFT | B_FOLLOW_BOTTOM));
 
 	rect.OffsetBy(monitorWidth + 10, 0);
-	stringView = new BStringView(rect, NULL,"Don't fade when",
+	stringView = new BStringView(rect, NULL,B_TRANSLATE("Don't fade when"),
 		B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	stringView->ResizeToPreferred();
 	if (maxWidth < stringView->Bounds().Width())
@@ -815,7 +800,7 @@ ScreenSaverWindow::_SetupFadeTab(BRect rect)
 	box->AddChild(stringView);
 
 	rect.OffsetBy(0, stringView->Bounds().Height());
-	stringView = new BStringView(rect, NULL, "mouse is here",
+	stringView = new BStringView(rect, NULL, B_TRANSLATE("mouse is here"),
 		B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	stringView->ResizeToPreferred();
 	if (maxWidth < stringView->Bounds().Width())

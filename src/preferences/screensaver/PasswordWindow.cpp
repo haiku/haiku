@@ -14,20 +14,24 @@
 #include <Alert.h>
 #include <Box.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <RadioButton.h>
 #include <Screen.h>
 #include <TextControl.h>
 
 #include <ctype.h>
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "ScreenSaver"
 
 const uint32 kMsgDone = 'done';
 const uint32 kMsgPasswordTypeChanged = 'pwtp';
 
 
 PasswordWindow::PasswordWindow(ScreenSaverSettings& settings) 
-	: BWindow(BRect(100, 100, 380, 249), "Password Window", B_MODAL_WINDOW_LOOK,
-		B_MODAL_APP_WINDOW_FEEL, B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE),
+	: BWindow(BRect(100, 100, 380, 249), B_TRANSLATE("Password Window"),
+		B_MODAL_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL, B_ASYNCHRONOUS_CONTROLS
+			| B_NOT_RESIZABLE),
 	fSettings(settings)
 {
 	_Setup();
@@ -52,7 +56,8 @@ PasswordWindow::_Setup()
 	AddChild(topView);
 
 	bounds.InsetBy(10.0, 10.0);
-	fUseNetwork = new BRadioButton(bounds, "useNetwork", "Use network password",
+	fUseNetwork = new BRadioButton(bounds, "useNetwork",
+		B_TRANSLATE("Use network password"),
 		new BMessage(kMsgPasswordTypeChanged), B_FOLLOW_NONE);
 	topView->AddChild(fUseNetwork);
 	fUseNetwork->ResizeToPreferred();
@@ -62,12 +67,14 @@ PasswordWindow::_Setup()
 	BBox *customBox = new BBox(bounds, "customBox", B_FOLLOW_NONE);
 	topView->AddChild(customBox);
 
-	fUseCustom = new BRadioButton(BRect(), "useCustom", "Use custom password",
+	fUseCustom = new BRadioButton(BRect(), "useCustom",
+		B_TRANSLATE("Use custom password"),
 		new BMessage(kMsgPasswordTypeChanged), B_FOLLOW_NONE);
 	customBox->SetLabel(fUseCustom);
 	fUseCustom->ResizeToPreferred();
 
-	fPasswordControl = new BTextControl(bounds, "passwordControl", "Password:", 
+	fPasswordControl = new BTextControl(bounds, "passwordControl",
+		B_TRANSLATE("Password:"), 
 		NULL, B_FOLLOW_NONE);
 	customBox->AddChild(fPasswordControl);
 	fPasswordControl->ResizeToPreferred();
@@ -76,7 +83,9 @@ PasswordWindow::_Setup()
 	
 	bounds.OffsetBy(0.0, fPasswordControl->Bounds().Height() + 5.0);
 	fConfirmControl = new BTextControl(bounds, "confirmControl", 
-		"Confirm password:", "VeryLongPasswordPossible", B_FOLLOW_NONE);
+		B_TRANSLATE("Confirm password:"),
+		"VeryLongPasswordPossible",
+		B_FOLLOW_NONE);
 	customBox->AddChild(fConfirmControl);
 	fConfirmControl->TextView()->HideTyping(true);
 	fConfirmControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
@@ -86,14 +95,16 @@ PasswordWindow::_Setup()
 	fPasswordControl->ResizeTo(width, height);
 	fConfirmControl->ResizeTo(width, height);
 	
-	float divider = be_plain_font->StringWidth("Confirm password:") + 5.0;
+	float divider = be_plain_font->StringWidth(B_TRANSLATE("Confirm password:"))
+		+ 5.0;
 	fConfirmControl->SetDivider(divider);
 	fPasswordControl->SetDivider(divider);
 	
 	customBox->ResizeTo(fConfirmControl->Frame().right + 10.0,
 		fConfirmControl->Frame().bottom + 10.0);
 	
-	BButton* button = new BButton(BRect(), "done", "Done", new BMessage(kMsgDone));
+	BButton* button = new BButton(BRect(), "done", B_TRANSLATE("Done"),
+		new BMessage(kMsgDone));
 	topView->AddChild(button);
 	button->ResizeToPreferred();
 
@@ -103,7 +114,8 @@ PasswordWindow::_Setup()
 	frame = button->Frame();
 	button->MakeDefault(true);
 
-	button = new BButton(frame, "cancel", "Cancel", new BMessage(B_CANCEL));
+	button = new BButton(frame, "cancel", B_TRANSLATE("Cancel"),
+		new BMessage(B_CANCEL));
 	topView->AddChild(button);
 	button->ResizeToPreferred();
 	button->MoveBy(-(button->Bounds().Width() + 10.0), 0.0);
@@ -170,7 +182,8 @@ PasswordWindow::MessageReceived(BMessage *message)
 			if (fUseCustom->Value()) {
 				if (strcmp(fPasswordControl->Text(), fConfirmControl->Text())) {
 					BAlert *alert = new BAlert("noMatch",
-						"Passwords don't match. Please try again.","OK");
+						B_TRANSLATE("Passwords don't match. Please try again."),
+						B_TRANSLATE("OK"));
 					alert->Go();
 					break;
 				}

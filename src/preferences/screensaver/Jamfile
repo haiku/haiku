@@ -19,7 +19,7 @@ Preference ScreenSaver :
 		# needed for some old/broken screen saver add-ons that do not
 		# link against libscreensaver.so
 
-	: tracker libscreensaver.so be $(TARGET_LIBSTDC++)
+	: tracker libscreensaver.so be $(TARGET_LIBSTDC++) $(HAIKU_LOCALE_LIBS)
 	: ScreenSaver.rdef 
 	;
 
@@ -30,3 +30,10 @@ SEARCH on [ FGristFiles
 Package haiku-screensaverkit-cvs :
 	ScreenSaver :
 	boot home Desktop haiku-screensaverkit ;
+
+DoCatalogs ScreenSaver :
+	x-vnd.Haiku-ScreenSaver
+	:
+	PasswordWindow.cpp
+	ScreenSaverWindow.cpp
+	;
