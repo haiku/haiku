@@ -18,6 +18,7 @@
 
 #include <Alert.h>
 #include <Application.h>
+#include <Catalog.h>
 #include <ControlLook.h>
 #include <Deskbar.h>
 #include <Dragger.h>
@@ -34,6 +35,10 @@
 #include "APMDriverInterface.h"
 #include "ExtendedInfoWindow.h"
 #include "PowerStatus.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "PowerStatus"
 
 
 extern "C" _EXPORT BView *instantiate_deskbar_item(void);
@@ -376,16 +381,16 @@ PowerStatusView::Update(bool force)
 
 				const char* state = NULL;
 				if ((fBatteryInfo.state & BATTERY_CHARGING) != 0)
-					state = "charging";
+					state = B_TRANSLATE("charging");
 				else if ((fBatteryInfo.state & BATTERY_DISCHARGING) != 0)
-					state = "discharging";
+					state = B_TRANSLATE("discharging");
 
 				if (state != NULL) {
 					snprintf(text + length, sizeof(text) - length, "\n%s",
 						state);
 				}
 			} else
-				strcpy(text, "no battery");
+				strcpy(text, B_TRANSLATE("no battery"));
 			SetToolTip(text);
 		}
 		if (width == 0) {
@@ -573,25 +578,27 @@ PowerStatusReplicant::MouseDown(BPoint point)
 	menu->SetFont(be_plain_font);
 
 	BMenuItem* item;
-	menu->AddItem(item = new BMenuItem("Show text label",
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Show text label"),
 		new BMessage(kMsgToggleLabel)));
 	if (fShowLabel)
 		item->SetMarked(true);
-	menu->AddItem(item = new BMenuItem("Show status icon",
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Show status icon"),
 		new BMessage(kMsgToggleStatusIcon)));
 	if (fShowStatusIcon)
 		item->SetMarked(true);
-	menu->AddItem(new BMenuItem(!fShowTime ? "Show time" : "Show percent",
+	menu->AddItem(new BMenuItem(!fShowTime ? B_TRANSLATE("Show time") :
+	B_TRANSLATE("Show percent"),
 		new BMessage(kMsgToggleTime)));
 
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem("Battery info" B_UTF8_ELLIPSIS,
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Battery info" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgToggleExtInfo)));
 
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem("About" B_UTF8_ELLIPSIS,
+	menu->AddItem(new BMenuItem(B_TRANSLATE("About" B_UTF8_ELLIPSIS),
 		new BMessage(B_ABOUT_REQUESTED)));
-	menu->AddItem(new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED)));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Quit"), 
+		new BMessage(B_QUIT_REQUESTED)));
 	menu->SetTargetForItems(this);
 
 	ConvertToScreen(&point);
@@ -602,9 +609,10 @@ PowerStatusReplicant::MouseDown(BPoint point)
 void
 PowerStatusReplicant::_AboutRequested()
 {
-	BAlert* alert = new BAlert("about", "PowerStatus\n"
-		"written by Axel Dörfler, Clemens Zeidler\n"
-		"Copyright 2006, Haiku, Inc.\n", "OK");
+	BAlert* alert = new BAlert(B_TRANSLATE("about"),
+		B_TRANSLATE("PowerStatus\n"
+			"written by Axel Dörfler, Clemens Zeidler\n"
+			"Copyright 2006, Haiku, Inc.\n"), B_TRANSLATE("OK"));
 	BTextView *view = alert->TextView();
 	BFont font;
 
@@ -627,7 +635,7 @@ PowerStatusReplicant::_Init()
 		delete fDriverInterface;
 		fDriverInterface = new APMDriverInterface;
 		if (fDriverInterface->Connect() != B_OK) {
-			fprintf(stderr, "No power interface found.\n");
+			fprintf(stderr, B_TRANSLATE("No power interface found.\n"));
 			_Quit();
 		}
 	}
@@ -660,7 +668,7 @@ PowerStatusReplicant::_GetSettings(BFile& file, int mode)
 	if (status != B_OK)
 		return status;
 
-	path.Append("PowerStatus settings");
+	path.Append(B_TRANSLATE("PowerStatus settings"));
 
 	return file.SetTo(path.Path(), mode);
 }

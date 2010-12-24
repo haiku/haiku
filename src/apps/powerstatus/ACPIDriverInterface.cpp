@@ -12,9 +12,14 @@
 #include <stdio.h>
 
 #include <Autolock.h>
+#include <Catalog.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <Path.h>
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "PowerStatus"
 
 
 RateBuffer::RateBuffer()
@@ -138,7 +143,7 @@ Battery::_Init()
 	if (fInitStatus != B_OK)
 		return;
 
-	printf("ACPI driver found\n");
+	printf(B_TRANSLATE("ACPI driver found\n"));
 
 }
 
@@ -157,7 +162,7 @@ const char* kDriverDir = "/dev/power";
 status_t
 ACPIDriverInterface::Connect()
 {
-	printf("ACPI connect\n");
+	printf(B_TRANSLATE("ACPI connect\n"));
 	return _FindDrivers(kDriverDir);
 }
 
@@ -240,7 +245,7 @@ ACPIDriverInterface::_FindDrivers(const char* path)
 		else {
 			int32 handler = open(path.Path(), O_RDWR);
 			if (handler >= 0) {
-				printf("try %s\n", path.Path());
+				printf(B_TRANSLATE("try %s\n"), path.Path());
 				Battery* battery = new Battery(handler);
 				if (battery->InitCheck() == B_OK) {
 					fDriverList.AddItem(battery);

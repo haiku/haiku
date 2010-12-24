@@ -10,8 +10,13 @@
 #include "ExtendedInfoWindow.h"
 
 #include <Box.h>
+#include <Catalog.h>
 #include <GroupView.h>
 #include <SpaceLayoutItem.h>
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "PowerStatus"
 
 
 const int kLineSpacing = 5;
@@ -111,13 +116,13 @@ BatteryInfoView::_FillStringList()
 	BString rateUnit;
 	switch (fBatteryExtendedInfo.power_unit) {
 		case 0:
-			powerUnit = " mWh";
-			rateUnit = " mW";
+			powerUnit = B_TRANSLATE(" mWh");
+			rateUnit = B_TRANSLATE(" mW");
 			break;
 
 		case 1:
-			powerUnit = " mAh";
-			rateUnit = " mA";
+			powerUnit = B_TRANSLATE(" mAh");
+			rateUnit = B_TRANSLATE(" mA");
 			break;
 	}
 
@@ -128,28 +133,28 @@ BatteryInfoView::_FillStringList()
 	fontString->font = be_bold_font;
 
 	if (fBatteryInfo.state & BATTERY_CHARGING)
-		fontString->string = "Battery charging";
+		fontString->string = B_TRANSLATE("Battery charging");
 	else if (fBatteryInfo.state & BATTERY_DISCHARGING)
-		fontString->string = "Battery discharging";
+		fontString->string = B_TRANSLATE("Battery discharging");
 	else if (fBatteryInfo.state & BATTERY_CRITICAL_STATE)
-		fontString->string = "Empty battery slot";
+		fontString->string = B_TRANSLATE("Empty battery slot");
 	else
-		fontString->string = "Battery unused";
+		fontString->string = B_TRANSLATE("Battery unused");
 
 	fontString = new FontString;
-	fontString->string = "Capacity: ";
+	fontString->string = B_TRANSLATE("Capacity: ");
 	fontString->string << fBatteryInfo.capacity;
 	fontString->string << powerUnit;
 	_AddToStringList(fontString);
 
 	fontString = new FontString;
-	fontString->string = "Last full charge: ";
+	fontString->string = B_TRANSLATE("Last full charge: ");
 	fontString->string << fBatteryInfo.full_capacity;
 	fontString->string << powerUnit;
 	_AddToStringList(fontString);
 
 	fontString = new FontString;
-	fontString->string = "Current rate: ";
+	fontString->string = B_TRANSLATE("Current rate: ");
 	fontString->string << fBatteryInfo.current_rate;
 	fontString->string << rateUnit;
 	_AddToStringList(fontString);
@@ -159,68 +164,68 @@ BatteryInfoView::_FillStringList()
 	_AddToStringList(fontString);
 
 	fontString = new FontString;
-	fontString->string = "Design capacity: ";
+	fontString->string = B_TRANSLATE("Design capacity: ");
 	fontString->string << fBatteryExtendedInfo.design_capacity;
 	fontString->string << powerUnit;
 	_AddToStringList(fontString);
 
 	fontString = new FontString;
-	fontString->string = "Technology: ";
+	fontString->string = B_TRANSLATE("Technology: ");
 	if (fBatteryExtendedInfo.technology == 0)
-		fontString->string << "non-rechargeable";
+		fontString->string << B_TRANSLATE("non-rechargeable");
 	else if (fBatteryExtendedInfo.technology == 1)
-		fontString->string << "rechargeable";
+		fontString->string << B_TRANSLATE("rechargeable");
 	else
 		fontString->string << "?";
 	_AddToStringList(fontString);
 
 	fontString = new FontString;
-	fontString->string = "Design voltage: ";
+	fontString->string = B_TRANSLATE("Design voltage: ");
 	fontString->string << fBatteryExtendedInfo.design_voltage;
-	fontString->string << " mV";
+	fontString->string << B_TRANSLATE(" mV");
 	_AddToStringList(fontString);
 
 	fontString = new FontString;
-	fontString->string = "Design capacity warning: ";
+	fontString->string = B_TRANSLATE("Design capacity warning: ");
 	fontString->string << fBatteryExtendedInfo.design_capacity_warning;
 	fontString->string << powerUnit;
 	_AddToStringList(fontString);
 
 	fontString = new FontString;
-	fontString->string = "Design capacity low warning: ";
+	fontString->string = B_TRANSLATE("Design capacity low warning: ");
 	fontString->string << fBatteryExtendedInfo.design_capacity_low;
 	fontString->string << powerUnit;
 	_AddToStringList(fontString);
 
 	fontString = new FontString;
-	fontString->string = "Capacity granularity 1: ";
+	fontString->string = B_TRANSLATE("Capacity granularity 1: ");
 	fontString->string << fBatteryExtendedInfo.capacity_granularity_1;
 	fontString->string << powerUnit;
 	_AddToStringList(fontString);
 
 	fontString = new FontString;
-	fontString->string = "Capacity granularity 2: ";
+	fontString->string = B_TRANSLATE("Capacity granularity 2: ");
 	fontString->string << fBatteryExtendedInfo.capacity_granularity_2;
 	fontString->string << powerUnit;
 	_AddToStringList(fontString);
 
 	fontString = new FontString;
-	fontString->string = "Model number: ";
+	fontString->string = B_TRANSLATE("Model number: ");
 	fontString->string << fBatteryExtendedInfo.model_number;
 	_AddToStringList(fontString);
 
 	fontString = new FontString;
-	fontString->string = "Serial number: ";
+	fontString->string = B_TRANSLATE("Serial number: ");
 	fontString->string << fBatteryExtendedInfo.serial_number;
 	_AddToStringList(fontString);
 
 	fontString = new FontString;
-	fontString->string = "Type: ";
+	fontString->string = B_TRANSLATE("Type: ");
 	fontString->string += fBatteryExtendedInfo.type;
 	_AddToStringList(fontString);
 
 	fontString = new FontString;
-	fontString->string = "OEM info: ";
+	fontString->string = B_TRANSLATE("OEM info: ");
 	fontString->string += fBatteryExtendedInfo.oem_info;
 	_AddToStringList(fontString);
 
@@ -325,7 +330,8 @@ ExtPowerStatusView::Update(bool force)
 
 ExtendedInfoWindow::ExtendedInfoWindow(PowerStatusDriverInterface* interface)
 	:
-	BWindow(BRect(100, 150, 500, 500), "Extended battery info", B_TITLED_WINDOW,
+	BWindow(BRect(100, 150, 500, 500), B_TRANSLATE("Extended battery info"),
+		B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AVOID_FRONT |
 		B_ASYNCHRONOUS_CONTROLS),
 	fDriverInterface(interface),
@@ -344,8 +350,8 @@ ExtendedInfoWindow::ExtendedInfoWindow(PowerStatusDriverInterface* interface)
 
 	BRect rect = Bounds();
 	rect.InsetBy(5, 5);
-	BBox *infoBox = new BBox(rect, "Power status box");
-	infoBox->SetLabel("Battery info");
+	BBox *infoBox = new BBox(rect, B_TRANSLATE("Power status box"));
+	infoBox->SetLabel(B_TRANSLATE("Battery info"));
 	BGroupLayout* infoLayout = new BGroupLayout(B_HORIZONTAL);
 	infoLayout->SetInsets(10, infoBox->TopBorderOffset() * 2 + 10, 10, 10);
 	infoLayout->SetSpacing(10);

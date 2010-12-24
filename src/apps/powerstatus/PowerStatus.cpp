@@ -12,12 +12,17 @@
 
 #include <Alert.h>
 #include <Application.h>
+#include <Catalog.h>
 #include <Deskbar.h>
 #include <Entry.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "PowerStatus"
 
 
 class PowerStatus : public BApplication {
@@ -80,9 +85,11 @@ PowerStatus::ReadyToRun()
 	}
 
 	if (isDeskbarRunning && !isInstalled) {		
-		BAlert* alert = new BAlert("", "You can run PowerStatus in a window "
-			"or install it in the Deskbar.", "Run in window",
-			"Install in Deskbar", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		BAlert* alert = new BAlert("", 
+			B_TRANSLATE("You can run PowerStatus in a window "
+			"or install it in the Deskbar."), B_TRANSLATE("Run in window"),
+			B_TRANSLATE("Install in Deskbar"), NULL, B_WIDTH_AS_USUAL,
+			B_WARNING_ALERT);
 		alert->SetShortcut(0, B_ESCAPE);
 
 		if (alert->Go()) {
