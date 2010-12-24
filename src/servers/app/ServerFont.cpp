@@ -452,7 +452,7 @@ class HasGlyphsConsumer {
 	bool ConsumeGlyph(int32 index, uint32 charCode, const GlyphCache* glyph,
 		FontCacheEntry* entry, double x, double y)
 	{
-		fHasArray[index] = glyph->glyph_index >= 0;
+		fHasArray[index] = glyph->glyph_index != 0;
 		return true;
 	}
 
