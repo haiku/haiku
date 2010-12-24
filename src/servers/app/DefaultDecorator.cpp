@@ -481,8 +481,6 @@ DefaultDecorator::_DoLayout()
 	if (hasTab) {
 		// make sure fTabOffset is within limits and apply it to
 		// the fTabRect
-		if (fTabOffset < 0)
-			fTabOffset = 0;
 		if (fTabLocation != 0.0
 			&& fTabOffset > (fRightBorder.right - fLeftBorder.left
 				- fTabRect.Width()))
