@@ -9,6 +9,7 @@
 
 #include <Alert.h>
 #include <Application.h>
+#include <Catalog.h>
 #include <GroupLayout.h>
 #include <Menu.h>
 #include <MenuItem.h>
@@ -24,6 +25,8 @@
 #include "PadView.h"
 
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "LaunchBox"
 MainWindow::MainWindow(const char* name, BRect frame, bool addDefaultButtons)
 	:
 	BWindow(frame, name, B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
@@ -94,9 +97,10 @@ MainWindow::QuitRequested()
 		be_app->PostMessage(B_QUIT_REQUESTED);
 		return false;
 	} else {
-		BAlert* alert = new BAlert("last chance", "Really close this pad?\n"
-			"(The pad will not be remembered.)",
-			"Close", "Cancel", NULL);
+		BAlert* alert = new BAlert(B_TRANSLATE("last chance"),
+			B_TRANSLATE("Really close this pad?\n"
+						"(The pad will not be remembered.)"),
+			B_TRANSLATE("Close"), B_TRANSLATE("Cancel"), NULL);
 		if (alert->Go() == 1)
 			return false;
 	}
@@ -127,24 +131,24 @@ MainWindow::MessageReceived(BMessage* message)
 						trackerMessage.AddRef("refs", button->Ref());
 						status_t ret = messenger.SendMessage(&trackerMessage);
 						if (ret < B_OK) {
-							errorMessage = "Failed to send 'open folder' "
-								"command to Tracker.\n\nError: ";
+							errorMessage = B_TRANSLATE("Failed to send "
+							"'open folder' command to Tracker.\n\nError: ");
 							errorMessage << strerror(ret);
 						} else
 							launchedByRef = true;
 					} else
-						errorMessage = "Failed to open folder - is Tracker "
-							"running?";
+						errorMessage = ("Failed to open folder - is Tracker "
+							"running?");
 				} else {
 					status_t ret = be_roster->Launch(button->Ref());
 					if (ret < B_OK && ret != B_ALREADY_RUNNING) {
-						errorMessage = "Failed to launch '";
+						errorMessage = B_TRANSLATE("Failed to launch '");
 						BPath path(button->Ref());
 						if (path.InitCheck() >= B_OK)
 							errorMessage << path.Path();
 						else
 							errorMessage << button->Ref()->name;
-						errorMessage << "'.\n\nError: ";
+						errorMessage << B_TRANSLATE("'.\n\nError: ");
 						errorMessage << strerror(ret);
 					} else
 						launchedByRef = true;
@@ -153,9 +157,10 @@ MainWindow::MessageReceived(BMessage* message)
 			if (!launchedByRef && button->AppSignature()) {
 				status_t ret = be_roster->Launch(button->AppSignature());
 				if (ret != B_OK && ret != B_ALREADY_RUNNING) {
-					errorMessage = "Failed to launch application with "
-						"signature '";
-					errorMessage << button->AppSignature() << "'.\n\nError: ";
+					errorMessage = B_TRANSLATE("Failed to launch application"
+					" with signature '");
+					errorMessage << button->AppSignature() <<
+						B_TRANSLATE("'.\n\nError: ");
 					errorMessage << strerror(ret);
 				} else {
 					// clear error message on success (might have been
@@ -163,12 +168,12 @@ MainWindow::MessageReceived(BMessage* message)
 					errorMessage = "";
 				}
 			} else if (!launchedByRef) {
-				errorMessage = "Failed to launch 'something', error in "
-					"Pad data.";
+				errorMessage = B_TRANSLATE("Failed to launch 'something',"
+					"error in Pad data.");
 			}
 			if (errorMessage.Length() > 0) {
 				BAlert* alert = new BAlert("error", errorMessage.String(),
-					"Bummer", NULL, NULL, B_WIDTH_FROM_WIDEST);
+					B_TRANSLATE("Bummer"), NULL, NULL, B_WIDTH_FROM_WIDEST);
 				alert->Go(NULL);
 			}
 			break;
@@ -207,7 +212,7 @@ MainWindow::MessageReceived(BMessage* message)
 					// message comes from pad view
 					entry_ref* ref = button->Ref();
 					if (ref) {
-						BString helper("Description for '");
+						BString helper(B_TRANSLATE("Description for '"));
 						helper << ref->name << "'";
 						make_sure_frame_is_on_screen(fNamePanelFrame, this);
 						new NamePanel(helper.String(), button->Description(),

@@ -6,12 +6,15 @@
 #include <stdio.h>
 
 #include <Button.h>
+#include <Catalog.h>
 #include <LayoutBuilder.h>
 #include <Screen.h>
 #include <TextControl.h>
 
 #include "NamePanel.h"
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "LaunchBox"
 enum {
 	MSG_PANEL_OK,
 	MSG_PANEL_CANCEL,
@@ -21,7 +24,7 @@ enum {
 NamePanel::NamePanel(const char* label, const char* text, BWindow* window,
 		BHandler* target, BMessage* message, BRect frame)
 	:
-	Panel(frame, "Name Panel",
+	Panel(frame, B_TRANSLATE("Name Panel"),
 		B_MODAL_WINDOW_LOOK, B_MODAL_SUBSET_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_NOT_V_RESIZABLE
 			| B_AUTO_UPDATE_SIZE_LIMITS),
@@ -29,8 +32,9 @@ NamePanel::NamePanel(const char* label, const char* text, BWindow* window,
 	fTarget(target),
 	fMessage(message)
 {
-	BButton* defaultButton = new BButton("OK", new BMessage(MSG_PANEL_OK));
-	BButton* cancelButton = new BButton("Cancel",
+	BButton* defaultButton = new BButton(B_TRANSLATE("OK"),
+		new BMessage(MSG_PANEL_OK));
+	BButton* cancelButton = new BButton(B_TRANSLATE("Cancel"),
 		new BMessage(MSG_PANEL_CANCEL));
 	fNameTC = new BTextControl(label, text, NULL);
 

@@ -8,6 +8,7 @@
 #include <stdio.h>
 
 #include <Application.h>
+#include <Catalog.h>
 #include <GroupLayout.h>
 #include <MenuItem.h>
 #include <Message.h>
@@ -18,6 +19,10 @@
 
 #include "LaunchButton.h"
 #include "MainWindow.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "LaunchBox"
 
 
 static bigtime_t sActivationDelay = 40000;
@@ -315,11 +320,11 @@ PadView::DisplayMenu(BPoint where, LaunchButton* button) const
 				break;
 		}
 	}
-	BPopUpMenu* menu = new BPopUpMenu("launch popup", false, false);
+	BPopUpMenu* menu = new BPopUpMenu(B_TRANSLATE("launch popup"), false, false);
 	// add button
 	BMessage* message = new BMessage(MSG_ADD_SLOT);
 	message->AddPointer("be:source", (void*)nearestButton);
-	BMenuItem* item = new BMenuItem("Add button here", message);
+	BMenuItem* item = new BMenuItem(B_TRANSLATE("Add button here"), message);
 	item->SetTarget(window);
 	menu->AddItem(item);
 	// button options
@@ -327,20 +332,21 @@ PadView::DisplayMenu(BPoint where, LaunchButton* button) const
 		// clear button
 		message = new BMessage(MSG_CLEAR_SLOT);
 		message->AddPointer("be:source", (void*)button);
-		item = new BMenuItem("Clear button", message);
+		item = new BMenuItem(B_TRANSLATE("Clear button"), message);
 		item->SetTarget(window);
 		menu->AddItem(item);
 		// remove button
 		message = new BMessage(MSG_REMOVE_SLOT);
 		message->AddPointer("be:source", (void*)button);
-		item = new BMenuItem("Remove button", message);
+		item = new BMenuItem(B_TRANSLATE("Remove button"), message);
 		item->SetTarget(window);
 		menu->AddItem(item);
 		// set button description
 		if (button->Ref()) {
 			message = new BMessage(MSG_SET_DESCRIPTION);
 			message->AddPointer("be:source", (void*)button);
-			item = new BMenuItem("Set description"B_UTF8_ELLIPSIS, message);
+			item = new BMenuItem(B_TRANSLATE("Set description"B_UTF8_ELLIPSIS),
+				message);
 			item->SetTarget(window);
 			menu->AddItem(item);
 		}
@@ -352,14 +358,14 @@ PadView::DisplayMenu(BPoint where, LaunchButton* button) const
 
 	const char* toggleLayoutLabel;
 	if (fButtonLayout->Orientation() == B_HORIZONTAL)
-		toggleLayoutLabel = "Vertical layout";
+		toggleLayoutLabel = B_TRANSLATE("Vertical layout");
 	else
-		toggleLayoutLabel = "Horizontal layout";
+		toggleLayoutLabel = B_TRANSLATE("Horizontal layout");
 	item = new BMenuItem(toggleLayoutLabel, new BMessage(MSG_TOGGLE_LAYOUT));
 	item->SetTarget(this);
 	settingsM->AddItem(item);
 
-	BMenu* iconSizeM = new BMenu("Icon size");
+	BMenu* iconSizeM = new BMenu(B_TRANSLATE("Icon size"));
 	for (uint32 i = 0; i < sizeof(kIconSizes) / sizeof(uint32); i++) {
 		uint32 iconSize = kIconSizes[i];
 		message = new BMessage(MSG_SET_ICON_SIZE);
@@ -373,24 +379,24 @@ PadView::DisplayMenu(BPoint where, LaunchButton* button) const
 	}
 	settingsM->AddItem(iconSizeM);
 
-	item = new BMenuItem("Ignore double-click",
+	item = new BMenuItem(B_TRANSLATE("Ignore double-click"),
 		new BMessage(MSG_SET_IGNORE_DOUBLECLICK));
 	item->SetTarget(this);
 	item->SetMarked(IgnoreDoubleClick());
 	settingsM->AddItem(item);
 
 	uint32 what = window->Look() == B_BORDERED_WINDOW_LOOK ? MSG_SHOW_BORDER : MSG_HIDE_BORDER;
-	item = new BMenuItem("Show window border", new BMessage(what));
+	item = new BMenuItem(B_TRANSLATE("Show window border"), new BMessage(what));
 	item->SetTarget(window);
 	item->SetMarked(what == MSG_HIDE_BORDER);
 	settingsM->AddItem(item);
 
-	item = new BMenuItem("Auto-raise", new BMessage(MSG_TOGGLE_AUTORAISE));
+	item = new BMenuItem(B_TRANSLATE("Auto-raise"), new BMessage(MSG_TOGGLE_AUTORAISE));
 	item->SetTarget(window);
 	item->SetMarked(window->AutoRaise());
 	settingsM->AddItem(item);
 
-	item = new BMenuItem("Show on all workspaces", new BMessage(MSG_SHOW_ON_ALL_WORKSPACES));
+	item = new BMenuItem(B_TRANSLATE("Show on all workspaces"), new BMessage(MSG_SHOW_ON_ALL_WORKSPACES));
 	item->SetTarget(window);
 	item->SetMarked(window->ShowOnAllWorkspaces());
 	settingsM->AddItem(item);
@@ -400,31 +406,31 @@ PadView::DisplayMenu(BPoint where, LaunchButton* button) const
 	menu->AddSeparatorItem();
 
 	// pad commands
-	BMenu* padM = new BMenu("Pad");
+	BMenu* padM = new BMenu(B_TRANSLATE("Pad"));
 	padM->SetFont(be_plain_font);
 	// new pad
-	item = new BMenuItem("New", new BMessage(MSG_ADD_WINDOW));
+	item = new BMenuItem(B_TRANSLATE("New"), new BMessage(MSG_ADD_WINDOW));
 	item->SetTarget(be_app);
 	padM->AddItem(item);
 	// new pad
-	item = new BMenuItem("Clone", new BMessage(MSG_ADD_WINDOW));
+	item = new BMenuItem(B_TRANSLATE("Clone"), new BMessage(MSG_ADD_WINDOW));
 	item->SetTarget(window);
 	padM->AddItem(item);
 	padM->AddSeparatorItem();
 	// close
-	item = new BMenuItem("Close", new BMessage(B_QUIT_REQUESTED));
+	item = new BMenuItem(B_TRANSLATE("Close"), new BMessage(B_QUIT_REQUESTED));
 	item->SetTarget(window);
 	padM->AddItem(item);
 	menu->AddItem(padM);
 	// app commands
-	BMenu* appM = new BMenu("LaunchBox");
+	BMenu* appM = new BMenu(B_TRANSLATE("LaunchBox"));
 	appM->SetFont(be_plain_font);
 	// about
-	item = new BMenuItem("About", new BMessage(B_ABOUT_REQUESTED));
+	item = new BMenuItem(B_TRANSLATE("About"), new BMessage(B_ABOUT_REQUESTED));
 	item->SetTarget(be_app);
 	appM->AddItem(item);
 	// quit
-	item = new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED));
+	item = new BMenuItem(B_TRANSLATE("Quit"), new BMessage(B_QUIT_REQUESTED));
 	item->SetTarget(be_app);
 	appM->AddItem(item);
 	menu->AddItem(appM);

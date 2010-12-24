@@ -13,6 +13,7 @@
 #include <AppDefs.h>
 #include <AppFileInfo.h>
 #include <Bitmap.h>
+#include <Catalog.h>
 #include <File.h>
 #include <Node.h>
 #include <NodeInfo.h>
@@ -23,10 +24,12 @@
 #include "PadView.h"
 #include "MainWindow.h"
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "LaunchBox"
 
 static const float kDragStartDist = 10.0;
 static const float kDragBitmapAlphaScale = 0.6;
-static const char* kEmptyHelpString = "You can drag an icon here.";
+static const char* kEmptyHelpString = B_TRANSLATE("You can drag an icon here.");
 
 
 bigtime_t
@@ -302,10 +305,12 @@ LaunchButton::SetTo(const entry_ref* ref)
 			if (info.GetSignature(mimeSig) == B_OK) {
 				SetTo(mimeSig, false);
 			} else {
-				fprintf(stderr, "no MIME signature for '%s'\n", fRef->name);
+				fprintf(stderr, B_TRANSLATE("no MIME signature for '%s'\n"),
+					fRef->name);
 			}
 		} else {
-			fprintf(stderr, "no BAppFileInfo for '%s'\n", fRef->name);
+			fprintf(stderr, B_TRANSLATE("no BAppFileInfo for '%s'\n"),
+			fRef->name);
 		}
 	} else {
 		fRef = NULL;

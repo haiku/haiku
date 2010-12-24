@@ -12,7 +12,17 @@ Application LaunchBox :
 	PadView.cpp
 	Panel.cpp
 	support.cpp
-	: be translation libshared.a $(TARGET_LIBSUPC++)
+	: be translation libshared.a $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
 	: LaunchBox.rdef
 ;
 
+DoCatalogs LaunchBox :
+	x-vnd.Haiku-LaunchBox
+	:
+	App.cpp
+	IconButton.cpp
+	LaunchButton.cpp
+	MainWindow.cpp
+	NamePanel.cpp
+	PadView.cpp
+;
