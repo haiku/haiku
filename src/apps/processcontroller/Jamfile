@@ -20,6 +20,16 @@ Application ProcessController :
 	ThreadBarMenu.cpp
 	ThreadBarMenuItem.cpp
 	Utilities.cpp
-	: be $(TARGET_LIBSUPC++)
+	: be $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
 	: ProcessController.rdef
-	;
+;
+
+DoCatalogs ProcessController :
+	x-vnd.Haiku-ProcessController
+	:
+	ProcessController.cpp
+	NoiseBarMenuItem.cpp
+	PCWorld.cpp
+	Preferences.cpp
+	PriorityMenu.cpp
+;

@@ -27,6 +27,7 @@
 
 #include <Alert.h>
 #include <Bitmap.h>
+#include <Catalog.h>
 #include <debugger.h>
 #include <Deskbar.h>
 #include <Directory.h>
@@ -54,6 +55,10 @@
 #include "TeamBarMenuItem.h"
 #include "ThreadBarMenu.h"
 #include "Utilities.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "ProcessController"
 
 
 const char* kDeskbarItemName = "ProcessController";
@@ -248,8 +253,11 @@ ProcessController::MessageReceived(BMessage *message)
 			break;
 
 		case 'QtTm':
-			if (message->FindInt32("team", &team) == B_OK)
-				resume_thread(spawn_thread(thread_quit_application, "Quit application", B_NORMAL_PRIORITY, (void*) team));
+			if (message->FindInt32("team", &team) == B_OK) {
+				resume_thread(spawn_thread(thread_quit_application,
+					B_TRANSLATE("Quit application"), B_NORMAL_PRIORITY,
+					(void*) team));
+			}
 			break;
 
 		case 'KlTm':
@@ -257,13 +265,20 @@ ProcessController::MessageReceived(BMessage *message)
 				info_pack infos;
 				if (get_team_info(team, &infos.team_info) == B_OK) {
 					get_team_name_and_icon(infos);
-					sprintf(question, "Do you really want to kill the team \"%s\"?", infos.team_name);
-					alert = new BAlert("", question, "Cancel", "Yes, kill this team!", NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+					sprintf(question,
+					B_TRANSLATE("Do you really want to kill the team \"%s\"?"),
+					infos.team_name);
+					alert = new BAlert("", question,
+					B_TRANSLATE("Cancel"), B_TRANSLATE("Yes, kill this team!"),
+					NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 					alert->SetShortcut(0, B_ESCAPE);
 					if (alert->Go())
 						kill_team(team);
 				} else {
-					alert = new BAlert("", "This team is already gone" B_UTF8_ELLIPSIS, "Ok!", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+					alert = new BAlert("", B_TRANSLATE("This team is already "
+					"gone"B_UTF8_ELLIPSIS),
+					B_TRANSLATE("Ok!"), NULL, NULL, B_WIDTH_AS_USUAL,
+						B_STOP_ALERT);
 					alert->Go();
 				}
 			}
@@ -274,12 +289,19 @@ ProcessController::MessageReceived(BMessage *message)
 				thread_info	thinfo;
 				if (get_thread_info(thread, &thinfo) == B_OK) {
 					#if DEBUG_THREADS
-					sprintf(question, "What do you want to do with the thread \"%s\"?", thinfo.name);
-					alert = new BAlert("", question, "Cancel", "Debug this thread!", "Kill this thread!", B_WIDTH_AS_USUAL, B_STOP_ALERT);
+					sprintf(question, B_TRANSLATE("What do you want to do "
+					"with the thread \"%s\"?"), thinfo.name);
+					alert = new BAlert("", question, B_TRANSLATE("Cancel"),
+					B_TRANSLATE("Debug this thread!"),
+					B_TRANSLATE("Kill this thread!"), B_WIDTH_AS_USUAL,
+					B_STOP_ALERT);
 					#define KILL 2
 					#else
-					sprintf(question, "Are you sure you want to kill the thread \"%s\"?", thinfo.name);
-					alert = new BAlert("", question, "Cancel", "Kill this thread!", NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+					sprintf(question, B_TRANSLATE("Are you sure you want "
+					"to kill the thread \"%s\"?"), thinfo.name);
+					alert = new BAlert("", question, B_TRANSLATE("Cancel"),
+					B_TRANSLATE("Kill this thread!"), NULL, B_WIDTH_AS_USUAL,
+					B_STOP_ALERT);
 					#define KILL 1
 					#endif
 					alert->SetShortcut(0, B_ESCAPE);
@@ -295,11 +317,14 @@ ProcessController::MessageReceived(BMessage *message)
 						else
 							param->sem = -1;
 						param->totalTime = thinfo.user_time+thinfo.kernel_time;
-						resume_thread(spawn_thread(thread_debug_thread, "Debug thread", B_NORMAL_PRIORITY, param));
+						resume_thread(spawn_thread(thread_debug_thread,
+						B_TRANSLATE("Debug thread"), B_NORMAL_PRIORITY, param));
 					}
 					#endif
 				} else {
-					alert = new BAlert("", "This thread is already gone" B_UTF8_ELLIPSIS, "Ok!", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+					alert = new BAlert("", B_TRANSLATE("This thread is "
+					"already gone"B_UTF8_ELLIPSIS), B_TRANSLATE("Ok!"),
+					NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 					alert->Go();
 				}
 			}
@@ -349,8 +374,10 @@ ProcessController::MessageReceived(BMessage *message)
 					}
 				}
 				if (last) {
-					alert = new BAlert("", "This is the last active processor...\nYou can't turn it off!",
-						"That's no Fun!", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+					alert = new BAlert("", B_TRANSLATE("This is the last "
+					"active processor...\nYou can't turn it off!"),
+						B_TRANSLATE("That's no Fun!"), NULL, NULL,
+						B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 					alert->Go();
 				} else
 					_kern_set_cpu_enabled(cpu, !_kern_cpu_enabled(cpu));
@@ -371,10 +398,12 @@ ProcessController::MessageReceived(BMessage *message)
 void
 ProcessController::AboutRequested()
 {
-	BAlert *alert = new BAlert("about", "ProcessController\n\n"
-		"Copyright 1997-2001,\n"
-		"Georges-Edouard Berenger.\n\n"
-		"Copyright " B_UTF8_COPYRIGHT " 2007 Haiku, Inc.\n", "OK");
+	BAlert *alert = new BAlert(B_TRANSLATE("about"),
+		B_TRANSLATE("ProcessController\n\n"
+					"Copyright 1997-2001,\n"
+					"Georges-Edouard Berenger.\n\n"
+					"Copyright "B_UTF8_COPYRIGHT" 2007 Haiku, Inc.\n"),
+		B_TRANSLATE("OK"));
 	BTextView *view = alert->TextView();
 	BFont font;
 
@@ -434,7 +463,8 @@ ProcessController::AttachedToWindow()
 	gKernelColorSelected = tint_color(gKernelColor, B_HIGHLIGHT_BACKGROUND_TINT);
 	gUserColor = tint_color(gKernelColor, B_LIGHTEN_2_TINT);
 	gUserColorSelected = tint_color(gUserColor, B_HIGHLIGHT_BACKGROUND_TINT);
-	gFrameColor = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_HIGHLIGHT_BACKGROUND_TINT);
+	gFrameColor = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+		B_HIGHLIGHT_BACKGROUND_TINT);
 	gFrameColorSelected = tint_color(gFrameColor, B_HIGHLIGHT_BACKGROUND_TINT);
 	gMenuBackColor = ui_color(B_MENU_BACKGROUND_COLOR);
 	gMenuBackColorSelected = ui_color(B_MENU_SELECTION_BACKGROUND_COLOR);
@@ -462,7 +492,8 @@ ProcessController::MouseDown(BPoint where)
 	ConvertToScreen (&param->clickToOpenRect);
 	param->top = where.y < BScreen(this->Window()).Frame().bottom-50;
 
-	gPopupThreadID = spawn_thread(thread_popup, "Popup holder thread",
+	gPopupThreadID = spawn_thread(thread_popup,
+	B_TRANSLATE("Popup holder thread"),
 		B_URGENT_DISPLAY_PRIORITY, param);
 	resume_thread(gPopupThreadID);
 }
@@ -496,12 +527,15 @@ ProcessController::DoDraw(bool force)
 	if (force) {
 		SetHighColor(frame_color);
 		StrokeRect(BRect(left - 1, top - 1, right, bottom + 1));
-		if (gCPUcount == 2)
-			StrokeLine(BPoint(left + barWidth, top), BPoint(left + barWidth, bottom));
+		if (gCPUcount == 2) {
+			StrokeLine(BPoint(left + barWidth, top), BPoint(left + barWidth,
+				bottom));
+		}
 	}
 	float leftMem = bounds.Width() - layout[gCPUcount].mem_width;
 	if (force)
-		StrokeRect(BRect(leftMem - 1, top - 1, leftMem + layout[gCPUcount].mem_width, bottom + 1));
+		StrokeRect(BRect(leftMem - 1, top - 1,
+			leftMem + layout[gCPUcount].mem_width, bottom + 1));
 
 	for (int x = 0; x < gCPUcount; x++) {
 		right = left + barWidth - 1;
@@ -522,7 +556,8 @@ ProcessController::DoDraw(bool force)
 			rgb_color fraction_color;
 			mix_colors(fraction_color, idle_color, active_color, rem);
 			SetHighColor(fraction_color);
-			StrokeLine(BPoint(left, bottom - barHeight), BPoint(right, bottom - barHeight));
+			StrokeLine(BPoint(left, bottom - barHeight), BPoint(right,
+				bottom - barHeight));
 		}
 		float active_bottom = bottom;
 		if (!force && previousLimit < bottom)
@@ -559,7 +594,8 @@ ProcessController::DoDraw(bool force)
 		rgb_color fraction_color;
 		mix_colors(fraction_color, idle_color, used_memory_color, rem);
 		SetHighColor(fraction_color);
-		StrokeLine(BPoint(leftMem, bottom - barHeight), BPoint(rightMem, bottom - barHeight));
+		StrokeLine(BPoint(leftMem, bottom - barHeight), BPoint(rightMem,
+			bottom - barHeight));
 	}
 	float usedBottom = bottom;
 //	if (!force && previousLimit < bottom)
@@ -622,7 +658,8 @@ thread_popup(void *arg)
 		if (get_next_team_info(&mcookie, &infos[m].team_info) == B_OK) {
 			infos[m].thread_info = new thread_info[infos[m].team_info.thread_count];
 			for (h = 0, hcookie = 0; h < infos[m].team_info.thread_count; h++) {
-				if (get_next_thread_info(infos[m].team_info.team, &hcookie, &infos[m].thread_info[h]) != B_OK)
+				if (get_next_thread_info(infos[m].team_info.team, &hcookie,
+						&infos[m].thread_info[h]) != B_OK)
 					infos[m].thread_info[h].thread = -1;
 			}
 			get_team_name_and_icon(infos[m], true);
@@ -632,20 +669,24 @@ thread_popup(void *arg)
 		}
 	}
 
-	BPopUpMenu* popup = new BPopUpMenu("Global Popup", false, false);
+	BPopUpMenu* popup = new BPopUpMenu(B_TRANSLATE("Global Popup"), false, false);
 	popup->SetFont(be_plain_font);
 
 	// Quit section
-	BMenu* QuitPopup = new QuitMenu("Quit an application", infos, systemInfo.used_teams);
+	BMenu* QuitPopup = new QuitMenu(B_TRANSLATE("Quit an application"),
+	infos, systemInfo.used_teams);
 	QuitPopup->SetFont(be_plain_font);
 	popup->AddItem(QuitPopup);
 
 	// Memory Usage section
-	MemoryBarMenu* MemoryPopup = new MemoryBarMenu("Memory usage", infos, systemInfo);
+	MemoryBarMenu* MemoryPopup = new MemoryBarMenu(B_TRANSLATE("Memory usage"),
+	infos, systemInfo);
 	int commitedMemory = int(systemInfo.used_pages * B_PAGE_SIZE / 1024);
 	for (m = 0; m < systemInfo.used_teams; m++) {
 		if (infos[m].team_info.team >= 0) {
-			MemoryBarMenuItem* memoryItem = new MemoryBarMenuItem(infos[m].team_name, infos[m].team_info.team, infos[m].team_icon, false, NULL);
+			MemoryBarMenuItem* memoryItem =
+				new MemoryBarMenuItem(infos[m].team_name,
+					infos[m].team_info.team, infos[m].team_icon, false, NULL);
 			MemoryPopup->AddItem(memoryItem);
 			memoryItem->UpdateSituation(commitedMemory);
 		}
@@ -654,13 +695,16 @@ thread_popup(void *arg)
 	addtopbottom(MemoryPopup);
 
 	// CPU Load section
-	TeamBarMenu* CPUPopup = new TeamBarMenu("Threads and CPU usage", infos, systemInfo.used_teams);
+	TeamBarMenu* CPUPopup = new TeamBarMenu(B_TRANSLATE("Threads and CPU "
+	"usage"), infos, systemInfo.used_teams);
 	for (m = 0; m < systemInfo.used_teams; m++) {
 		if (infos[m].team_info.team >= 0) {
-			ThreadBarMenu* TeamPopup = new ThreadBarMenu(infos[m].team_name, infos[m].team_info.team, infos[m].team_info.thread_count);
+			ThreadBarMenu* TeamPopup = new ThreadBarMenu(infos[m].team_name,
+				infos[m].team_info.team, infos[m].team_info.thread_count);
 			BMessage* kill_team = new BMessage('KlTm');
 			kill_team->AddInt32("team", infos[m].team_info.team);
-			TeamBarMenuItem* item = new TeamBarMenuItem(TeamPopup, kill_team, infos[m].team_info.team, infos[m].team_icon, false);
+			TeamBarMenuItem* item = new TeamBarMenuItem(TeamPopup, kill_team,
+				infos[m].team_info.team, infos[m].team_icon, false);
 			item->SetTarget(gPCView);
 			CPUPopup->AddItem(item);
 		}
@@ -673,9 +717,9 @@ thread_popup(void *arg)
 	if (gCPUcount > 1) {
 		for (int i = 0; i < gCPUcount; i++) {
 			char item_name[32];
-			sprintf (item_name, "Processor %d", i + 1);
+			sprintf (item_name, B_TRANSLATE("Processor %d"), i + 1);
 			BMessage* m = new BMessage ('CPU ');
-			m->AddInt32 ("cpu", i);
+			m->AddInt32 (B_TRANSLATE("cpu"), i);
 			item = new IconMenuItem (gPCView->fProcessorIcon, item_name, m);
 			if (_kern_cpu_enabled(i))
 				item->SetMarked (true);
@@ -686,24 +730,28 @@ thread_popup(void *arg)
 	}
 
 	if (!be_roster->IsRunning(kTrackerSig)) {
-		item = new IconMenuItem(gPCView->fTrackerIcon, "Restart Tracker", new BMessage('Trac'));
+		item = new IconMenuItem(gPCView->fTrackerIcon,
+		B_TRANSLATE("Restart Tracker"), new BMessage('Trac'));
 		item->SetTarget(gPCView);
 		addtopbottom(item);
 	}
 	if (!be_roster->IsRunning(kDeskbarSig)) {
-		item = new IconMenuItem(gPCView->fDeskbarIcon, "Restart Deskbar", new BMessage('Dbar'));
+		item = new IconMenuItem(gPCView->fDeskbarIcon,
+		B_TRANSLATE("Restart Deskbar"), new BMessage('Dbar'));
 		item->SetTarget(gPCView);
 		addtopbottom(item);
 	}
 
-	item = new IconMenuItem(gPCView->fTerminalIcon, "New Terminal", new BMessage('Term'));
+	item = new IconMenuItem(gPCView->fTerminalIcon,
+	B_TRANSLATE("New Terminal"), new BMessage('Term'));
 	item->SetTarget(gPCView);
 	addtopbottom(item);
 
 	addtopbottom(new BSeparatorItem());
 
 	if (be_roster->IsRunning(kDeskbarSig)) {
-		item = new BMenuItem("Live in the Deskbar", new BMessage('AlDb'));
+		item = new BMenuItem(B_TRANSLATE("Live in the Deskbar"),
+		new BMessage('AlDb'));
 		BDeskbar deskbar;
 		item->SetMarked(gInDeskbar || deskbar.HasItem(kDeskbarItemName));
 		item->SetTarget(gPCView);
@@ -711,7 +759,8 @@ thread_popup(void *arg)
 		addtopbottom(new BSeparatorItem ());
 	}
 
-	item = new IconMenuItem(gPCView->fProcessControllerIcon, "About ProcessController" B_UTF8_ELLIPSIS,
+	item = new IconMenuItem(gPCView->fProcessControllerIcon,
+	B_TRANSLATE("About ProcessController"B_UTF8_ELLIPSIS),
 		new BMessage(B_ABOUT_REQUESTED));
 	item->SetTarget(gPCView);
 	addtopbottom(item);
@@ -755,15 +804,17 @@ thread_debug_thread(void *arg)
 	thread_info	thinfo;
 	get_thread_info(param->thread, &thinfo);
 	char text[4096];
-	sprintf(text, "db %d", int(param->thread));
+	sprintf(text, B_TRANSLATE("db %d"), int(param->thread));
 	system(text);
-	if (param->sem >= 0 && thinfo.state == B_THREAD_WAITING && param->sem == thinfo.sem) {
+	if (param->sem >= 0 && thinfo.state == B_THREAD_WAITING && param->sem
+			== thinfo.sem) {
 		snooze(1000000);
 		get_thread_info(param->thread, &thinfo);
 		if (thinfo.state == B_THREAD_WAITING
 			&& param->sem == thinfo.sem
 			&& param->totalTime == thinfo.user_time + thinfo.kernel_time) {
-			// the thread has been waiting for this semaphore since the before the alert, not doing anything... Let's push it out of there!
+			// the thread has been waiting for this semaphore since the before
+			// the alert, not doing anything... Let's push it out of there!
 			sem_info sinfo;
 			thread_info thinfo;
 			info_pack infos;
@@ -771,28 +822,40 @@ thread_debug_thread(void *arg)
 			if (get_sem_info(param->sem, &sinfo) == B_OK
 				&& get_thread_info(param->thread, &thinfo) == B_OK
 				&& get_team_info(thinfo.team, &infos.team_info) == B_OK) {
-				sprintf (text, "This thread is waiting for the semaphore called \"%s\". As long as it waits for this semaphore, "
-					"you won't be able to debug that thread.\n", sinfo.name);
+				sprintf (text, B_TRANSLATE("This thread is waiting for the "
+					"semaphore called \"%s\". As long as it waits for this "
+					"semaphore, ")
+					B_TRANSLATE("you won't be able to debug that thread.\n"),
+						sinfo.name);
 				if (sinfo.team == thinfo.team)
-					strcat(text, "This semaphore belongs to the thread's team.\n\nShould I release this semaphore?\n");
+					strcat(text, B_TRANSLATE("This semaphore belongs to the "
+						"thread's team.\n\nShould I release this semaphore?\n"));
 				else {
 					get_team_name_and_icon(infos);
 					char moreText[1024];
-					sprintf(moreText, "\nWARNING! This semaphore belongs to the team \"%s\"!\n\nShould I release this semaphore anyway?\n",
+					sprintf(moreText, B_TRANSLATE("\nWARNING! This semaphore "
+						"belongs to the team \"%s\"!\n\nShould I release this "
+						"semaphore anyway?\n"),
 						infos.team_name);
 					strcat(text, moreText);
 				}
 
-				BAlert* alert = new BAlert("", text, "Cancel", "Release", NULL,
-					B_WIDTH_AS_USUAL, B_STOP_ALERT);
+				BAlert* alert = new BAlert("", text, B_TRANSLATE("Cancel"),
+					B_TRANSLATE("Release"), NULL, B_WIDTH_AS_USUAL,
+					B_STOP_ALERT);
 				alert->SetShortcut(0, B_ESCAPE);
 				if (alert->Go()) {
 					get_thread_info (param->thread, &thinfo);
-					if (thinfo.state == B_THREAD_WAITING && param->sem == thinfo.sem
-						&& param->totalTime == thinfo.user_time + thinfo.kernel_time)
+					if (thinfo.state == B_THREAD_WAITING && param->sem
+							== thinfo.sem
+						&& param->totalTime == thinfo.user_time
+							+ thinfo.kernel_time)
 						release_sem(param->sem);
 					else {
-						alert = new BAlert("", "The semaphore wasn't released, because it wasn't necessary anymore!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+						alert = new BAlert("", B_TRANSLATE("The semaphore "
+							"wasn't released, because it wasn't necessary "
+							"anymore!"), B_TRANSLATE("OK"), NULL, NULL,
+							B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 						alert->Go();
 					}
 				}

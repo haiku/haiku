@@ -19,13 +19,15 @@
 
 
 #include "NoiseBarMenuItem.h"
-
+#include "Catalog.h"
 #include "Colors.h"
 #include "ProcessController.h"
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "ProcessController"
 
 NoiseBarMenuItem::NoiseBarMenuItem()
-	: BMenuItem("Gone teams" B_UTF8_ELLIPSIS, NULL)
+	: BMenuItem(B_TRANSLATE("Gone teams"B_UTF8_ELLIPSIS), NULL)
 {
 	fBusyWaiting = -1;
 	fLost = -1;

@@ -21,11 +21,14 @@
 #include "PriorityMenu.h"
 #include "ProcessController.h"
 
+#include <Catalog.h>
 #include <MenuItem.h>
 #include <Window.h>
 
 #include <stdio.h>
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "ProcessController"
 
 PriorityMenu::PriorityMenu(thread_id thread, int32 priority)
 	: BMenu(B_EMPTY_STRING),
@@ -65,7 +68,7 @@ static PriorityRec	priorities[] = {
 	{"",	-1}
 };
 
-PriorityRec customPriority = { "Custom", 0 };
+PriorityRec customPriority = {"Custom", 0 };
 
 
 void
@@ -86,9 +89,9 @@ PriorityMenu::BuildMenu()
 			index--;
 		}
 		message = new BMessage('PrTh');
-		message->AddInt32("thread", fThreadID);
-		message->AddInt32("priority", priority->priority);
-		sprintf(name, "%s priority [%d]", priority->name, (int)priority->priority);
+		message->AddInt32(B_TRANSLATE("thread"), fThreadID);
+		message->AddInt32(B_TRANSLATE("priority"), priority->priority);
+		sprintf(name, B_TRANSLATE("%s priority [%d]"), priority->name, (int)priority->priority);
 		item = new BMenuItem(name, message);
 		item->SetTarget(gPCView);
 		if (fPriority == priority->priority)
