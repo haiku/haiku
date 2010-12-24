@@ -1868,9 +1868,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			fLink.Flush();
 
-			for (int32 i = 0; i < numStrings; i++) {
+			for (int32 i = 0; i < numStrings; i++)
 				free(stringArray[i]);
-			}
 			break;
 		}
 
@@ -2239,13 +2238,12 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 					}
 				} else
 					fLink.StartMessage(status);
-
-				delete[] escapements;
-				delete[] offsets;
 			} else
 				fLink.StartMessage(status);
 
 			delete[] charArray;
+			delete[] escapements;
+			delete[] offsets;
 			fLink.Flush();
 			break;
 		}
@@ -2406,8 +2404,11 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 					if (font.GetBoundingBoxes(charArray, numBytes,
 							rectArray, stringEscapement, mode, delta,
 							code == AS_GET_BOUNDINGBOXES_STRING) == B_OK) {
+
 						fLink.StartMessage(B_OK);
-						fLink.Attach(rectArray, sizeof(rectArray));
+						for (int32 i = 0; i < numChars; i++)
+							fLink.Attach<BRect>(rectArray[i]);
+
 						success = true;
 					}
 				}
