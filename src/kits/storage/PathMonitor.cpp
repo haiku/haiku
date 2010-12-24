@@ -211,7 +211,8 @@ PathHandler::PathHandler(const char* path, uint32 flags, BMessenger target,
 
 	TRACE("PathHandler: %s\n", path);
 
-	looper->Lock();
+	if (!looper->Lock())
+		debugger("PathHandler: failed to lock the looper");
 	looper->AddHandler(this);
 	looper->Unlock();
 
