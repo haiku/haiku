@@ -329,17 +329,16 @@ NetBootMethod::Init()
 
 	if (fBootVolume.FindInt32("net mask", (int32*)&netMask) != B_OK) {
 		// choose default netmask depending on the class of the address
-		in_addr_t net = htonl(clientIP);
-		if (IN_CLASSA(net)
-			|| (ntohl(net) >> IN_CLASSA_NSHIFT) == IN_LOOPBACKNET) {
+		if (IN_CLASSA(clientIP)
+			|| (clientIP >> IN_CLASSA_NSHIFT) == IN_LOOPBACKNET) {
 			// class A, or loopback
-			netMask = ntohl(IN_CLASSA_NET);
-		} else if (IN_CLASSB(net)) {
+			netMask = IN_CLASSA_NET;
+		} else if (IN_CLASSB(clientIP)) {
 			// class B
-			netMask = ntohl(IN_CLASSB_NET);
+			netMask = IN_CLASSB_NET;
 		} else {
 			// class C and rest
-			netMask = ntohl(IN_CLASSC_NET);
+			netMask = IN_CLASSC_NET;
 		}
 	}
 
