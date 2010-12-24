@@ -610,7 +610,7 @@ DesktopSettingsPrivate::WorkspacesRows() const
 void
 DesktopSettingsPrivate::SetWorkspacesMessage(int32 index, BMessage& message)
 {
-	if (index < 0 || index > kMaxWorkspaces)
+	if (index < 0 || index >= kMaxWorkspaces)
 		return;
 
 	fWorkspaceMessages[index] = message;
@@ -620,7 +620,7 @@ DesktopSettingsPrivate::SetWorkspacesMessage(int32 index, BMessage& message)
 const BMessage*
 DesktopSettingsPrivate::WorkspacesMessage(int32 index) const
 {
-	if (index < 0 || index > kMaxWorkspaces)
+	if (index < 0 || index >= kMaxWorkspaces)
 		return NULL;
 
 	return &fWorkspaceMessages[index];

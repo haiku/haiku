@@ -673,7 +673,7 @@ Desktop::SetScreenMode(int32 workspace, int32 id, const display_mode& mode,
 	if (workspace == B_CURRENT_WORKSPACE_INDEX)
 		workspace = fCurrentWorkspace;
 
-	if (workspace < 0 || workspace > kMaxWorkspaces)
+	if (workspace < 0 || workspace >= kMaxWorkspaces)
 		return B_BAD_VALUE;
 
 	Screen* screen = fVirtualScreen.ScreenByID(id);
@@ -742,7 +742,7 @@ Desktop::GetScreenMode(int32 workspace, int32 id, display_mode& mode)
 	if (workspace == B_CURRENT_WORKSPACE_INDEX)
 		workspace = fCurrentWorkspace;
 
-	if (workspace < 0 || workspace > kMaxWorkspaces)
+	if (workspace < 0 || workspace >= kMaxWorkspaces)
 		return B_BAD_VALUE;
 
 	if (workspace == fCurrentWorkspace) {
@@ -774,7 +774,7 @@ Desktop::GetScreenFrame(int32 workspace, int32 id, BRect& frame)
 	if (workspace == B_CURRENT_WORKSPACE_INDEX)
 		workspace = fCurrentWorkspace;
 
-	if (workspace < 0 || workspace > kMaxWorkspaces)
+	if (workspace < 0 || workspace >= kMaxWorkspaces)
 		return B_BAD_VALUE;
 
 	if (workspace == fCurrentWorkspace) {
