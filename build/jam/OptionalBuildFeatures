@@ -12,9 +12,9 @@ if [ IsOptionalHaikuImagePackageAdded OpenSSL ] {
 }
 
 if $(HAIKU_GCC_VERSION[1]) >= 4 {
-	HAIKU_OPENSSL_PACKAGE = openssl-1.0.0a-x86-gcc4-2010-11-12.zip ;
+	HAIKU_OPENSSL_PACKAGE = openssl-1.0.0c-x86-gcc4-2010-12-23.zip ;
 } else {
-	HAIKU_OPENSSL_PACKAGE = openssl-1.0.0a-x86-gcc2-2010-08-29.zip ;
+	HAIKU_OPENSSL_PACKAGE = openssl-1.0.0c-x86-gcc2-2010-12-23.zip ;
 }
 
 local baseURL = http://haiku-files.org/files/optional-packages ;
