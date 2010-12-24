@@ -13,10 +13,12 @@
 
 
 #include <Alert.h>
-
+#include <Catalog.h>
 
 #include <unistd.h>
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Time"
 
 const char* kAppSignature = "application/x-vnd.Haiku-Time";
 
@@ -44,9 +46,10 @@ TimeApplication::ReadyToRun()
 void
 TimeApplication::AboutRequested()
 {
-	BAlert* alert = new BAlert("about",
-		"Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\t"
-		"Julun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.", "OK");
+	BAlert* alert = new BAlert(B_TRANSLATE("about"),
+		B_TRANSLATE("Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\t"
+					"Julun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku."),
+		B_TRANSLATE("OK"));
 	alert->Go();
 }
 

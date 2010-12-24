@@ -17,14 +17,17 @@
 
 
 #include <Application.h>
+#include <Catalog.h>
 #include <Message.h>
 #include <Screen.h>
 #include <TabView.h>
 #include <Button.h>
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Time"
 
 TTimeWindow::TTimeWindow(BRect rect)
-	: BWindow(rect, "Time", B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
+	: BWindow(rect, B_TRANSLATE("Time"), B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
 {
 	_InitWindow();
 	_AlignWindow();
@@ -116,11 +119,11 @@ TTimeWindow::_InitWindow()
 
 	BTab* tab = new BTab();
 	tabView->AddTab(fDateTimeView, tab);
-	tab->SetLabel("Date & Time");
+	tab->SetLabel(B_TRANSLATE("Date & Time"));
 
 	tab = new BTab();
 	tabView->AddTab(fTimeZoneView, tab);
-	tab->SetLabel("Time zone");
+	tab->SetLabel(B_TRANSLATE("Time zone"));
 
 	fBaseView->AddChild(tabView);
 	tabView->ResizeBy(0.0, tabView->TabHeight());

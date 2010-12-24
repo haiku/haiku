@@ -20,6 +20,7 @@
 
 #include <AutoDeleter.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <Collator.h>
 #include <Country.h>
 #include <Directory.h>
@@ -49,6 +50,10 @@
 #include "TimeZoneListItem.h"
 #include "TZDisplay.h"
 #include "TimeWindow.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Time"
 
 
 using BPrivate::MutableLocaleRoster;
@@ -194,7 +199,8 @@ TimeZoneView::GetToolTipAt(BPoint point, BToolTip** _tip)
 	BString toolTip = item->Text();
 	toolTip << '\n' << item->TimeZone().ShortName() << " / "
 			<< item->TimeZone().ShortDaylightSavingName()
-			<< "\nNow: " << nowInTimeZone << " (" << dateInTimeZone << ')';
+			<< B_TRANSLATE("\nNow: ") << nowInTimeZone
+			<< " (" << dateInTimeZone << ')';
 
 	if (fToolTip != NULL)
 		fToolTip->ReleaseReference();
@@ -251,17 +257,20 @@ TimeZoneView::_InitView()
 	frameRight.top = frameLeft.top;
 
 	// Time Displays
-	fCurrent = new TTZDisplay(frameRight, "currentTime", "Current time:");
+	fCurrent = new TTZDisplay(frameRight, "currentTime",
+		B_TRANSLATE("Current time:"));
 	AddChild(fCurrent);
 	fCurrent->ResizeToPreferred();
 
 	frameRight.top = fCurrent->Frame().bottom + 10.0;
-	fPreview = new TTZDisplay(frameRight, "previewTime", "Preview time:");
+	fPreview = new TTZDisplay(frameRight, "previewTime",
+		B_TRANSLATE("Preview time:"));
 	AddChild(fPreview);
 	fPreview->ResizeToPreferred();
 
 	// set button
-	fSetZone = new BButton(frameRight, "setTimeZone", "Set time zone",
+	fSetZone = new BButton(frameRight, "setTimeZone",
+		B_TRANSLATE("Set time zone"),
 		new BMessage(H_SET_TIME_ZONE));
 	AddChild(fSetZone);
 	fSetZone->SetEnabled(false);
@@ -291,7 +300,7 @@ TimeZoneView::_BuildZoneMenu()
 	 */
 	typedef	std::map<BString, TimeZoneListItem*, TimeZoneItemLess> ZoneItemMap;
 	ZoneItemMap zoneMap;
-	const char* kOtherRegion = "<Other>";
+	const char* kOtherRegion = B_TRANSLATE("<Other>");
 	const char* kSupportedRegions[] = {
 		"Africa", "America", "Antarctica", "Arctic", "Asia", "Atlantic",
 		"Australia", "Europe", "Indian", "Pacific", kOtherRegion, NULL
@@ -327,7 +336,7 @@ TimeZoneView::_BuildZoneMenu()
 
 			BString region(zoneID, slashPos);
 
-			if (region == "Etc")
+			if (region == B_TRANSLATE("Etc"))
 				region = kOtherRegion;
 			else if (countryName.Length() == 0) {
 				// skip global timezones from other regions, we are just

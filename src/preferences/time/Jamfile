@@ -32,3 +32,10 @@ Preference Time
 	: Time.rdef
 	;
 
+DoCatalogs Time :
+	x-vnd.Haiku-Time
+	:
+	Time.cpp
+	TimeWindow.cpp
+	ZoneView.cpp
+	;
