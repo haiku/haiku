@@ -88,6 +88,8 @@ View::View(IntRect frame, IntPoint scrollingOffset, const char* name,
 	fViewColor((rgb_color){ 255, 255, 255, 255 }),
 	fDrawState(new (nothrow) DrawState),
 	fViewBitmap(NULL),
+	fBitmapResizingMode(0),
+	fBitmapOptions(0),
 
 	fResizeMode(resizeMode),
 	fFlags(flags),
@@ -1076,8 +1078,8 @@ View::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 		child->ParentResized(x, y, dirtyRegion);
 
 	// view bitmap
-
-	resize_frame(fBitmapDestination, fBitmapResizingMode, x, y);
+	if (fViewBitmap != NULL)
+		resize_frame(fBitmapDestination, fBitmapResizingMode, x, y);
 
 	// at this point, children are at their new locations,
 	// so we can rebuild the clipping
