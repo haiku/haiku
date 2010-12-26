@@ -41,6 +41,9 @@
 
 #define DRIVER_HASH_SIZE 16
 
+
+namespace LegacyDrivers {
+
 struct legacy_driver;
 
 class LegacyDevice : public AbstractModuleDevice,
@@ -213,6 +216,12 @@ public:
 	virtual void		EventOccurred(NotificationService& service,
 							const KMessage* event);
 };
+
+
+}	// namespace LegacyDrivers
+
+using namespace LegacyDrivers;
+
 
 static status_t unload_driver(legacy_driver *driver);
 static status_t load_driver(legacy_driver *driver);
