@@ -241,7 +241,7 @@ void
 edid_decode(edid1_info *edid, const edid1_raw *raw)
 {
 	int i;
-	memset(edid, 0, sizeof(edid));
+	memset(edid, 0, sizeof(edid1_info));
 
 	decode_vendor(&edid->vendor, &raw->vendor);
 	decode_version(&edid->version, &raw->version);
