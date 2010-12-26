@@ -87,7 +87,7 @@ PCApplication::ReadyToRun()
 	if (!deskbar.HasItem(kDeskbarItemName)) {
 		// We're not yet installed in the Deskbar, ask if we should
 		BAlert* alert = new BAlert("",
-			B_TRANSLATE("You can run PowerStatus in a window"
+			B_TRANSLATE("You can run ProcessController in a window"
 			" or install it in the Deskbar."), B_TRANSLATE("Run in window"),
 			B_TRANSLATE("Install in Deskbar"),
 			NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
