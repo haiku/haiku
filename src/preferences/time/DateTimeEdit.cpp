@@ -518,7 +518,7 @@ TDateEdit::DrawSection(uint32 index, bool hasFocus)
 void
 TDateEdit::DrawSeparator(uint32 index)
 {
-	if (index < 0 || index >= 2)
+	if (index >= 2)
 		return;
 
 	TSection* section = static_cast<TSection*>(fSectionList->ItemAt(index));
