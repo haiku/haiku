@@ -153,8 +153,6 @@ label:
 				int warn2 = IN_SOME;
 
 				pt = _fmt(Locale->c_fmt, t, pt, ptlim, warnp);
-				if (warn2 == IN_ALL)
-					warn2 = IN_THIS;
 				if (warn2 > *warnp)
 					*warnp = warn2;
 				}
