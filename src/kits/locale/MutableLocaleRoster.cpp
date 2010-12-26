@@ -814,7 +814,8 @@ MutableLocaleRoster::LoadCatalog(const char* signature, const char* language,
 					currCatalog = nextCatalog;
 				}
 			}
-			return catalog;
+			if (catalog != NULL)
+				return catalog;
 		}
 		info->UnloadIfPossible();
 	}
