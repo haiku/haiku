@@ -124,7 +124,7 @@ ICUCategoryData::_ConvertUnicodeStringToLocaleconvEntry(
 				result = B_ERROR;
 				break;
 		}
-		strcpy(destination, defaultValue);
+		strlcpy(destination, defaultValue, destinationSize);
 	}
 
 	return result;
