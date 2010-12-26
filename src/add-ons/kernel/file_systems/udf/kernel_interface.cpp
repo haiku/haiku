@@ -434,8 +434,10 @@ udf_read_dir(fs_volume *_volume, fs_vnode *vnode, void *cookie,
 	TRACE(("udf_read_dir: _volume = %p, vnode = %p, bufferSize = %ld\n",
 		_volume, vnode, bufferSize));
 
-	if (!_volume || !vnode || !cookie || !_num || bufferSize < sizeof(dirent))
+	if (!_volume || !vnode || !cookie || !_num
+			|| bufferSize < sizeof(struct dirent)) {
 		return B_BAD_VALUE;
+	}
 
 	Volume *volume = (Volume *)_volume->private_volume;
 	Icb *dir = (Icb *)vnode->private_node;
