@@ -434,7 +434,7 @@ BKeymap::operator==(const BKeymap& other) const
 {
 	return fCharsSize == other.fCharsSize
 		&& !memcmp(&fKeys, &other.fKeys, sizeof(fKeys))
-		&& !memcmp(fChars, other.fChars, sizeof(fChars));
+		&& !memcmp(fChars, other.fChars, fCharsSize);
 }
 
 
