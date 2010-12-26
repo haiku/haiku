@@ -76,8 +76,6 @@ protected:
 			int32				fFocus;
 			uint32				fSectionCount;
 			uint32				fHoldValue;
-
-			bool				fShowFocus;
 };
 
 

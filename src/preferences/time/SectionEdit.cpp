@@ -55,7 +55,8 @@ TSectionEdit::TSectionEdit(BRect frame, const char* name, uint32 sections)
 	BControl(frame, name, NULL, NULL, B_FOLLOW_NONE, B_NAVIGABLE | B_WILL_DRAW),
 	fSectionList(NULL),
 	fFocus(-1),
-	fSectionCount(sections)
+	fSectionCount(sections),
+	fHoldValue(0)
 {
 	InitView();
 }
@@ -204,10 +205,10 @@ void
 TSectionEdit::DrawBorder(const BRect& updateRect)
 {
 	BRect bounds(Bounds());
-	fShowFocus = (IsFocus() && Window() && Window()->IsActive());
+	bool showFocus = (IsFocus() && Window() && Window()->IsActive());
 
 	be_control_look->DrawBorder(this, bounds, updateRect, ViewColor(),
-		B_FANCY_BORDER, fShowFocus ? BControlLook::B_FOCUSED : 0);
+		B_FANCY_BORDER, showFocus ? BControlLook::B_FOCUSED : 0);
 
 	// draw up/down control
 
