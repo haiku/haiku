@@ -792,9 +792,6 @@ MutableLocaleRoster::LoadCatalog(const char* signature, const char* language,
 			// detect dependencies (parenthood) between languages (it
 			// traverses from "english_british_oxford" to "english_british"
 			// to "english"):
-			// TODO: use ICU facilities instead, so we can handle more
-			// complex things such as fr_FR@euro, or whatever, encodings
-			// and so on.
 			int32 pos;
 			BString langName(lang);
 			BCatalogAddOn* currCatalog = catalog;
