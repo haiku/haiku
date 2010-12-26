@@ -164,12 +164,13 @@ exit:
 }
 
 status_t
-fs_readdir( fs_volume *_vol, fs_vnode *_node, void *_cookie, struct dirent *buf, size_t bufsize, uint32 *num )
+fs_readdir(fs_volume *_vol, fs_vnode *_node, void *_cookie, struct dirent *buf,
+	size_t bufsize, uint32 *num)
 {
 	nspace		*ns = (nspace*)_vol->private_volume;
 	vnode		*node = (vnode*)_node->private_node;
 	dircookie	*cookie = (dircookie*)_cookie;
-	uint32 		nameLength = bufsize - sizeof(buf) + 1, realLen;
+	uint32 		nameLength = bufsize - sizeof(struct dirent), realLen;
 	int 		result = B_NO_ERROR;
 	ntfs_inode	*ni=NULL;
 	
@@ -196,11 +197,11 @@ fs_readdir( fs_volume *_vol, fs_vnode *_node, void *_cookie, struct dirent *buf,
 		
 	result = ntfs_readdir(ni, &cookie->pos, cookie, (ntfs_filldir_t)_ntfs_dirent_filler);		
 
-	realLen = nameLength>255?255:nameLength;
+	realLen = nameLength > 255 ? 255 : nameLength;
 	buf->d_dev = ns->id;
 	buf->d_ino = cookie->ino;	
-	memcpy(buf->d_name,cookie->name, realLen+1);
-	buf->d_reclen = sizeof(buf) + realLen - 1;
+	strlcpy(buf->d_name, cookie->name, realLen + 1);
+	buf->d_reclen = sizeof(struct dirent) + realLen;
 
 	if(result==0)
 		cookie->last = 1;
