@@ -32,8 +32,10 @@ LoadBackend()
 	typedef LocaleBackend* (*symbolType)();
 	symbolType createInstanceFunc
 		= (symbolType)dlsym(imageHandle, "CreateInstance");
-	if (createInstanceFunc == NULL)
+	if (createInstanceFunc == NULL) {
+		dlclose(imageHandle);
 		return;
+	}
 
 	gLocaleBackend = createInstanceFunc();
 }
