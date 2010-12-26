@@ -343,11 +343,11 @@ BShape::AddShape(const BShape* otherShape)
 	if (!AllocateOps(otherData->opCount) || !AllocatePts(otherData->ptCount))
 		return B_NO_MEMORY;
 
-	memcpy(data->opList + data->opCount * sizeof(uint32), otherData->opList,
+	memcpy(data->opList + data->opCount, otherData->opList,
 		otherData->opCount * sizeof(uint32));
 	data->opCount += otherData->opCount;
 
-	memcpy(data->ptList + data->ptCount * sizeof(BPoint), otherData->ptList,
+	memcpy(data->ptList + data->ptCount, otherData->ptList,
 		otherData->ptCount * sizeof(BPoint));
 	data->ptCount += otherData->ptCount;
 
