@@ -134,6 +134,7 @@ LanguageListItem::Update(BView* owner, const BFont* font)
 LanguageListView::LanguageListView(const char* name, list_view_type type)
 	:
 	BOutlineListView(name, type),
+	fDropIndex(-1),
 	fDeleteMessage(NULL),
 	fDragMessage(NULL)
 {
