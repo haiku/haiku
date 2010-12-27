@@ -246,7 +246,7 @@ PartitionListRow::PartitionListRow(BPartition* partition)
 		if (handle != NULL) {
 			bool active = get_driver_boolean_parameter(handle, "active", false, true);
 			if (active)
-				parameters += "Active";
+				parameters += B_TRANSLATE("Active");
 
 			delete_driver_settings(handle);
 		}
