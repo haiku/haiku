@@ -74,9 +74,6 @@ acpi_enumerate_child_devices(device_node* node, const char* root)
 
 	TRACE(("acpi_enumerate_child_devices: recursing from %s\n", root));
 
-	// get a reference on the parent
-	parent = gDeviceManager->get_parent_node(node);
-
 	while (get_next_entry(ACPI_TYPE_ANY, root, result,
 			sizeof(result), &counter) == B_OK) {
 		uint32 type = get_object_type(result);
