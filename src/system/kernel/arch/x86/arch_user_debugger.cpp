@@ -595,7 +595,7 @@ arch_set_debug_cpu_state(const debug_cpu_state *cpuState)
 			struct thread* thread = thread_get_current_thread();
 			InterruptsLocker locker;
 			memcpy(thread->arch_info.fpu_state, &cpuState->extended_registers,
-				sizeof(&cpuState->extended_registers));
+				sizeof(cpuState->extended_registers));
 			i386_fxrstor(thread->arch_info.fpu_state);
 		} else {
 			// TODO: Implement! We need to convert the format first.
@@ -641,7 +641,7 @@ arch_get_debug_cpu_state(debug_cpu_state *cpuState)
 			i386_fxsave(thread->arch_info.fpu_state);
 				// unlike fnsave, fxsave doesn't reinit the FPU state
 			memcpy(&cpuState->extended_registers, thread->arch_info.fpu_state,
-				sizeof(&cpuState->extended_registers));
+				sizeof(cpuState->extended_registers));
 		} else {
 			i386_fnsave(&cpuState->extended_registers);
 			i386_frstor(&cpuState->extended_registers);
