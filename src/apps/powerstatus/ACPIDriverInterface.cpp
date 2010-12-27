@@ -227,9 +227,9 @@ ACPIDriverInterface::_WatchPowerStatus()
 
 
 status_t
-ACPIDriverInterface::_FindDrivers(const char* path)
+ACPIDriverInterface::_FindDrivers(const char* dirpath)
 {
-	BDirectory dir(path);
+	BDirectory dir(dirpath);
 	BEntry entry;
 
 	status_t status = B_ERROR;

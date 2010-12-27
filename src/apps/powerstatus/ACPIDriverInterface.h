@@ -74,7 +74,7 @@ protected:
 	virtual status_t 		_ReadBatteryInfo();
 
 	virtual void			_WatchPowerStatus();
-	virtual status_t		_FindDrivers(const char* path);
+	virtual status_t		_FindDrivers(const char* dirpath);
 
 	BObjectList<Battery>	fDriverList;
 
