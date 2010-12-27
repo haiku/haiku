@@ -474,7 +474,7 @@ mmu_free(void *virtualAddress, size_t size)
 		address += B_PAGE_SIZE;
 	}
 
-	if (address + size == sNextVirtualAddress) {
+	if (address == sNextVirtualAddress) {
 		// we can actually reuse the virtual address space
 		sNextVirtualAddress -= size;
 	}
