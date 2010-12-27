@@ -70,7 +70,7 @@ acpi_find_table(const char* signature)
 		sNumEntries = (sAcpiRsdt->length
 			- sizeof(acpi_descriptor_header)) / 4;
 	}
-	
+
 	if (sNumEntries <= 0) {
 		TRACE(("acpi: root system description table is empty\n"));
 		return NULL;
@@ -89,12 +89,15 @@ acpi_find_table(const char* signature)
 		if (header == NULL
 			|| strncmp(header->signature, signature, 4) != 0) {
 			// not interesting for us
+			TRACE(("acpi: Looking for '%.4s'. Skipping '%.4s'\n",
+				signature, header != NULL ? header->signature : "null"));
+
 			if (header != NULL)
 				mmu_free(header, sizeof(acpi_descriptor_header));
-			TRACE(("acpi: Looking for '%.4s'. Skipping '%.4s'\n",
-				signature, header->signature));
+
 			continue;
 		}
+
 		TRACE(("acpi: Found '%.4s' @ %p\n", signature, pointer));
 		return header;
 	}
