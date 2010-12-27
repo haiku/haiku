@@ -54,7 +54,7 @@ dpc_thread(void *arg)
 		acquire_spinlock(&queue->lock);
 
 		dpc = queue->slots[queue->head];
-		queue->head = (queue->head++) % queue->size;
+		queue->head = (queue->head + 1) % queue->size;
 		queue->count--;
 
 		release_spinlock(&queue->lock);
@@ -67,7 +67,7 @@ dpc_thread(void *arg)
 	// Otherwise, resource could leaks...
 	while (queue->count--) {
 		dpc = queue->slots[queue->head];
-		queue->head = (queue->head++) % queue->size;
+		queue->head = (queue->head + 1) % queue->size;
 		dpc.function(dpc.arg);
 	}
 
