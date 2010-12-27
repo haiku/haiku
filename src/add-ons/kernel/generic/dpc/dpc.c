@@ -178,7 +178,7 @@ queue_dpc(void *handle, dpc_func function, void *arg)
 	else {
 		queue->slots[queue->tail].function = function;
 		queue->slots[queue->tail].arg      = arg;
-		queue->tail = (queue->tail++) % queue->size;
+		queue->tail = (queue->tail + 1) % queue->size;
 		queue->count++;
 	}
 
