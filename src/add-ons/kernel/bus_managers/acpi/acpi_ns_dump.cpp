@@ -18,8 +18,8 @@ class RingBuffer {
 public:
 	RingBuffer(size_t size = 1024);
 	~RingBuffer();	
-	ssize_t Read(void *buffer, size_t length);
-	ssize_t Write(const void *buffer, size_t length);
+	size_t Read(void *buffer, ssize_t length);
+	size_t Write(const void *buffer, ssize_t length);
 	size_t WritableAmount() const;
 	size_t ReadableAmount() const;
 
@@ -221,38 +221,29 @@ static status_t
 acpi_namespace_read(void *_cookie, off_t position, void *buf, size_t* num_bytes)
 {
 	acpi_ns_device_info *device = (acpi_ns_device_info *)_cookie;
-	size_t bytesRead = 0; 
-	size_t readable = 0;
-       
 	RingBuffer &ringBuffer = *device->buffer;
 
-	if (ringBuffer.Lock()) {
-		readable = ringBuffer.ReadableAmount();
-
-		if (readable <= 0) {
-			ringBuffer.Unlock();
-			status_t status = acquire_sem_etc(device->read_sem, 1, B_CAN_INTERRUPT, 0);
-			if (status == B_INTERRUPTED) {
-				*num_bytes = 0;
-				return status;
-			}
-			if (!ringBuffer.Lock()) {
-				*num_bytes = 0;
-				return B_ERROR;
-			}
-		}
-
-		bytesRead = ringBuffer.Read(buf, *num_bytes);
-		ringBuffer.Unlock();
-	}
-
-	if (bytesRead < 0) {
+	if (!ringBuffer.Lock()) {
 		*num_bytes = 0;
-		return bytesRead;
+		return B_ERROR;
 	}
 
-	*num_bytes = bytesRead;
-	
+	if (ringBuffer.ReadableAmount() == 0) {
+		ringBuffer.Unlock();
+		status_t status = acquire_sem_etc(device->read_sem, 1, B_CAN_INTERRUPT, 0);
+		if (status != B_OK) {
+			*num_bytes = 0;
+			return status;
+		}
+		if (!ringBuffer.Lock()) {
+			*num_bytes = 0;
+			return B_ERROR;
+		}
+	}
+
+	*num_bytes = ringBuffer.Read(buf, *num_bytes);
+	ringBuffer.Unlock();
+
 	return B_OK;
 }
 
@@ -388,15 +379,15 @@ RingBuffer::~RingBuffer()
 }
 
 
-ssize_t
-RingBuffer::Read(void *buffer, size_t size)
+size_t
+RingBuffer::Read(void *buffer, ssize_t size)
 {
 	return ring_buffer_read(fBuffer, (uint8*)buffer, size);
 }
 
 
-ssize_t
-RingBuffer::Write(const void *buffer, size_t size)
+size_t
+RingBuffer::Write(const void *buffer, ssize_t size)
 {
 	return ring_buffer_write(fBuffer, (uint8*)buffer, size);
 }
