@@ -862,7 +862,7 @@ KeyboardLayoutView::_GetKeyLabel(const Key* key, char* text, size_t textSize,
 				bool hasGlyphs;
 				fBaseFont.GetHasGlyphs(bytes, 1, &hasGlyphs);
 				if (hasGlyphs)
-					strlcpy(text, bytes, sizeof(text));
+					strlcpy(text, bytes, textSize);
 			}
 		}
 
