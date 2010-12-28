@@ -9,7 +9,8 @@ class UtilityBitmap;
 
 class BitmapDrawingEngine : public DrawingEngine {
 public:
-								BitmapDrawingEngine();
+								BitmapDrawingEngine(
+									color_space colorSpace = B_RGB32);
 virtual							~BitmapDrawingEngine();
 
 #if DEBUG
@@ -22,6 +23,7 @@ virtual							~BitmapDrawingEngine();
 									color_space space);
 
 private:
+			color_space			fColorSpace;
 			BitmapHWInterface*	fHWInterface;
 			UtilityBitmap*		fBitmap;
 			BRegion				fClipping;

@@ -4,8 +4,9 @@
 #include <new>
 
 
-BitmapDrawingEngine::BitmapDrawingEngine()
+BitmapDrawingEngine::BitmapDrawingEngine(color_space colorSpace)
 	:	DrawingEngine(),
+		fColorSpace(colorSpace),
 		fHWInterface(NULL),
 		fBitmap(NULL)
 {
@@ -62,7 +63,7 @@ BitmapDrawingEngine::SetSize(int32 newWidth, int32 newHeight)
 		return B_OK;
 
 	fBitmap = new(std::nothrow) UtilityBitmap(BRect(0, 0, newWidth - 1,
-		newHeight - 1), B_RGB32, 0);
+		newHeight - 1), fColorSpace, 0);
 	if (fBitmap == NULL)
 		return B_NO_MEMORY;
 
