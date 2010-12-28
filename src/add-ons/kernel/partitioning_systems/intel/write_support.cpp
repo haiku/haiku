@@ -2265,10 +2265,8 @@ ep_delete_child(int fd, partition_id partitionID, partition_id childID,
 
 	close(parentFD);
 
-	if (error != B_OK) {
-		delete logical;
+	if (error != B_OK)
 		return error;
-	}
 
 	// all changes applied
 	update_disk_device_job_progress(job, 1.0);
