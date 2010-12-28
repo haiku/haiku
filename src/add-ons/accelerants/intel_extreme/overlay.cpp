@@ -464,6 +464,7 @@ intel_get_overlay_constraints(const display_mode *mode,
 			break;
 		case B_YUV12:
 			constraints->view.width_alignment = 7;
+			break;
 		default:
 			return B_BAD_VALUE;
 	}
