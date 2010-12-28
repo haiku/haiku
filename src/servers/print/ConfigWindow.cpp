@@ -524,23 +524,23 @@ ConfigWindow::UpdateUI()
 					== B_OK && copies > 1) {
 					if (printRange) {
 						job = B_TRANSLATE("Page %1 to %2, %3 copies");
-						snprintf(number, sizeof(number) - 1, "%d", (int)first);
+						snprintf(number, sizeof(number), "%d", (int)first);
 						job.ReplaceFirst("%1", number);
-						snprintf(number, sizeof(number) - 1, "%d", (int)last);
+						snprintf(number, sizeof(number), "%d", (int)last);
 						job.ReplaceFirst("%2", number);
-						snprintf(number, sizeof(number) - 1, "%d", (int)copies);
+						snprintf(number, sizeof(number), "%d", (int)copies);
 						job.ReplaceFirst("%3", number);
 					} else {
 						job = B_TRANSLATE("All pages, %1 copies");
-						snprintf(number, sizeof(number) - 1, "%d", (int)copies);
+						snprintf(number, sizeof(number), "%d", (int)copies);
 						job.ReplaceFirst("%1", number);
 					}
 				} else {
 					if (printRange) {
 						job = B_TRANSLATE("Page %1 to %2");
-						snprintf(number, sizeof(number) - 1, "%d", (int)first);
+						snprintf(number, sizeof(number), "%d", (int)first);
 						job.ReplaceFirst("%1", number);
-						snprintf(number, sizeof(number) - 1, "%d", (int)last);
+						snprintf(number, sizeof(number), "%d", (int)last);
 						job.ReplaceFirst("%2", number);
 					} else
 						job = B_TRANSLATE("All pages");
