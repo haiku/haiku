@@ -412,6 +412,7 @@ Desktop::Desktop(uid_t userID, const char* targetScreen)
 	fSharedReadOnlyArea(-1),
 	fApplicationsLock("application list"),
 	fShutdownSemaphore(-1),
+	fShutdownCount(0),
 	fScreenLock("screen lock"),
 	fDirectScreenLock("direct screen lock"),
 	fDirectScreenTeam(-1),

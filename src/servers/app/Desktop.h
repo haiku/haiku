@@ -306,7 +306,6 @@ private:
 			DesktopSettingsPrivate*	fSettings;
 			port_id				fMessagePort;
 			::EventDispatcher	fEventDispatcher;
-			port_id				fInputPort;
 			area_id				fSharedReadOnlyArea;
 			server_read_only_memory* fServerReadOnlyMemory;
 
