@@ -228,7 +228,9 @@ MouseDevice::Start()
 	if (status < B_OK) {
 		LOG_ERR("%s: can't spawn/resume watching thread: %s\n",
 			fDeviceRef.name, strerror(status));
-		close(fDevice);
+		if (fDevice >= B_OK)
+			close(fDevice);
+
 		return status;
 	}
 
