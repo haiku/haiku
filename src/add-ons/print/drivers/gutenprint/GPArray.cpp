@@ -70,7 +70,7 @@ GPArray<TYPE>::Array()
 
 
 template<typename TYPE>
-TYPE ** const
+TYPE **
 GPArray<TYPE>::Array() const
 {
 	return fArray;

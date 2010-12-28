@@ -21,7 +21,7 @@ public:
 	int				Size() const;
 	void			DecreaseSize();
 	TYPE**			Array();
-	TYPE** const	Array() const;
+	TYPE**			Array() const;
 	bool			IsEmpty() const;
 
 private:
