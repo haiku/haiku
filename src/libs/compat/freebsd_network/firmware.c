@@ -47,7 +47,7 @@ const struct firmware*
 firmware_get(const char* fbsdFirmwareName)
 {
 	char*				fbsdFirmwareNameCopy = NULL;
-	int					fileDescriptor = 0;
+	int					fileDescriptor = -1;
 	struct firmware*	firmware = NULL;
 	int32				firmwareFileSize;
 	char*				firmwarePath = NULL;
@@ -75,6 +75,9 @@ firmware_get(const char* fbsdFirmwareName)
 		goto cleanup;
 
 	firmwareFileSize = lseek(fileDescriptor, 0, SEEK_END);
+	if (firmwareFileSize == -1)
+		goto cleanup;
+
 	lseek(fileDescriptor, 0, SEEK_SET);
 
 	fbsdFirmwareNameCopy = strndup(fbsdFirmwareName,
@@ -111,7 +114,7 @@ cleanup:
 		free(fbsdFirmwareNameCopy);
 	if (firmwarePath)
 		free(firmwarePath);
-	if (fileDescriptor)
+	if (fileDescriptor >= 0)
 		close(fileDescriptor);
 	return NULL;
 }
