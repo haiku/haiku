@@ -33,7 +33,7 @@ class CursorSet : public BMessage {
 		status_t		FindCursor(BCursorID which, BBitmap **cursor, BPoint *hotspot);
 		status_t		FindCursor(BCursorID which, ServerCursor **cursor) const;
 		void			SetName(const char *name);
-		const char		*GetName(void);
+		const char		*GetName();
 
 	private:
 		const char *_CursorWhichToString(BCursorID which) const;
