@@ -58,13 +58,16 @@ RemoteMessage::NextMessage(uint16& code)
 
 #ifndef CLIENT_COMPILE
 void
-RemoteMessage::AddBitmap(const ServerBitmap& bitmap)
+RemoteMessage::AddBitmap(const ServerBitmap& bitmap, bool minimal)
 {
 	Add(bitmap.Width());
 	Add(bitmap.Height());
 	Add(bitmap.BytesPerRow());
-	Add(bitmap.ColorSpace());
-	Add(bitmap.Flags());
+
+	if (!minimal) {
+		Add(bitmap.ColorSpace());
+		Add(bitmap.Flags());
+	}
 
 	uint32 bitsLength = bitmap.BitsLength();
 	Add(bitsLength);
@@ -279,17 +282,21 @@ RemoteMessage::ReadString(char** _string, size_t& _length)
 
 
 status_t
-RemoteMessage::ReadBitmap(BBitmap** _bitmap)
+RemoteMessage::ReadBitmap(BBitmap** _bitmap, bool minimal,
+	color_space colorSpace, uint32 flags)
 {
-	color_space colorSpace;
-	uint32 bitsLength, flags;
+	uint32 bitsLength;
 	int32 width, height, bytesPerRow;
 
 	Read(width);
 	Read(height);
 	Read(bytesPerRow);
-	Read(colorSpace);
-	Read(flags);
+
+	if (!minimal) {
+		Read(colorSpace);
+		Read(flags);
+	}
+
 	Read(bitsLength);
 
 	if (bitsLength > fDataLeft)
