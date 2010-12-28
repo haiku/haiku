@@ -18,6 +18,8 @@
 #include <String.h>
 #include <File.h>
 
+#include <new>
+
 
 /*!
 	\brief Constructor
@@ -99,13 +101,13 @@ CursorSet::AddCursor(BCursorID which, const BBitmap *cursor, const BPoint &hotsp
 	msg.AddString("class","bitmap");
 	msg.AddRect("_frame",cursor->Bounds());
 	msg.AddInt32("_cspace",cursor->ColorSpace());
-	
+
 	msg.AddInt32("_bmflags",0);
 	msg.AddInt32("_rowbytes",cursor->BytesPerRow());
 	msg.AddPoint("hotspot",hotspot);
 	msg.AddData("_data",B_RAW_TYPE,cursor->Bits(), cursor->BitsLength());
 	AddMessage(_CursorWhichToString(which),&msg);
-	
+
 	return B_OK;
 }
 
@@ -115,8 +117,8 @@ CursorSet::AddCursor(BCursorID which, const BBitmap *cursor, const BPoint &hotsp
 	\param which System cursor specifier defined in CursorSet.h
 	\param data R5 cursor data pointer
 	\return B_BAD_VALUE if data is NULL, otherwise B_OK
-	
-	When possible, it is better to use the BBitmap version of AddCursor because this 
+
+	When possible, it is better to use the BBitmap version of AddCursor because this
 	function must convert the R5 cursor data into a BBitmap
 */
 status_t
@@ -158,7 +160,7 @@ CursorSet::RemoveCursor(BCursorID which)
 	- \c B_BAD_VALUE: a NULL parameter was passed
 	- \c B_NAME_NOT_FOUND: The specified cursor does not exist in this set
 	- \c B_ERROR: An internal error occurred
-	
+
 	BBitmaps created by this function are the responsibility of the caller.
 */
 status_t
@@ -174,7 +176,7 @@ CursorSet::FindCursor(BCursorID which, BBitmap **cursor, BPoint *hotspot)
 	const void *buffer;
 	const char *tempstr;
 	int32 bufferLength;
-	BBitmap *bmp;
+	BBitmap *bitmap;
 	BPoint hotpt;
 
 	if (msg.FindString("class", &tempstr) != B_OK)
@@ -184,16 +186,25 @@ CursorSet::FindCursor(BCursorID which, BBitmap **cursor, BPoint *hotspot)
 		return B_ERROR;
 
 	if (strcmp(tempstr, "cursor") == 0) {
-		bmp = new BBitmap(msg.FindRect("_frame"),
+		bitmap = new(std::nothrow) BBitmap(msg.FindRect("_frame"),
 			(color_space)msg.FindInt32("_cspace"), true);
-		msg.FindData("_data", B_RAW_TYPE, (const void **)&buffer,
-			(ssize_t *)&bufferLength);
-		memcpy(bmp->Bits(), buffer, bufferLength);
+		if (bitmap == NULL)
+			return B_NO_MEMORY;
 
-		*cursor = bmp;
+		if (msg.FindData("_data", B_RAW_TYPE, (const void **)&buffer,
+				(ssize_t *)&bufferLength) != B_OK) {
+			delete bitmap;
+			return B_ERROR;
+		}
+
+		memcpy(bitmap->Bits(), buffer,
+			min_c(bufferLength, bitmap->BitsLength()));
+
+		*cursor = bitmap;
 		*hotspot = hotpt;
 		return B_OK;
 	}
+
 	return B_ERROR;
 }
 
@@ -207,7 +218,7 @@ CursorSet::FindCursor(BCursorID which, BBitmap **cursor, BPoint *hotspot)
 	- \c B_BAD_VALUE: a NULL parameter was passed
 	- \c B_NAME_NOT_FOUND: The specified cursor does not exist in this set
 	- \c B_ERROR: An internal error occurred
-	
+
 	BBitmaps created by this function are the responsibility of the caller.
 */
 status_t
@@ -227,14 +238,22 @@ CursorSet::FindCursor(BCursorID which, ServerCursor **_cursor) const
 		return B_ERROR;
 
 	if (strcmp(className, "cursor") == 0) {
-		ServerCursor *cursor = new ServerCursor(msg.FindRect("_frame"),
-			(color_space)msg.FindInt32("_cspace"), 0, hotspot);
+		ServerCursor *cursor = new(std::nothrow) ServerCursor(
+			msg.FindRect("_frame"), (color_space)msg.FindInt32("_cspace"), 0,
+			hotspot);
+		if (cursor == NULL)
+			return B_NO_MEMORY;
 
 		const void *buffer;
 		int32 bufferLength;
-		msg.FindData("_data",B_RAW_TYPE, (const void **)&buffer,
-			(ssize_t *)&bufferLength);
-		memcpy(cursor->Bits(), buffer, bufferLength);
+		if (msg.FindData("_data", B_RAW_TYPE, (const void **)&buffer,
+				(ssize_t *)&bufferLength) != B_OK) {
+			delete cursor;
+			return B_ERROR;
+		}
+
+		memcpy(cursor->Bits(), buffer,
+			min_c(bufferLength, (ssize_t)cursor->BitsLength()));
 
 		*_cursor = cursor;
 		return B_OK;
@@ -261,7 +280,7 @@ CursorSet::GetName(void)
 /*!
 	\brief Renames the cursor set
 	\param name new name of the set.
-	
+
 	This function will fail if given a NULL name
 */
 void
@@ -349,7 +368,7 @@ CursorSet::_CursorWhichToString(BCursorID which) const
 	\brief Creates a new BBitmap from R5 cursor data
 	\param data Pointer to data in the R5 cursor data format
 	\return NULL if data was NULL, otherwise a new BBitmap
-	
+
 	BBitmaps returned by this function are always in the RGBA32 color space
 */
 BBitmap *
@@ -361,7 +380,10 @@ CursorSet::_CursorDataToBitmap(uint8 *data)
 	// Now that we have all the setup, we're going to map (for now) the cursor
 	// to RGBA32. Eventually, there will be support for 16 and 8-bit depths
 	if (data) {
-	 	BBitmap *bmp = new BBitmap(BRect(0,0,15,15),B_RGBA32,0);
+		BBitmap *bmp = new(std::nothrow) BBitmap(BRect(0,0,15,15),B_RGBA32,0);
+		if (bmp == NULL)
+			return NULL;
+
 		uint32 black = 0xFF000000, white=0xFFFFFFFF, *bmppos;
 		uint16 *cursorpos, *maskpos, cursorflip, maskflip;
 		uint16 cursorval, maskval, powval;
@@ -370,7 +392,7 @@ CursorSet::_CursorDataToBitmap(uint8 *data)
 		_buffer=(uint8*)bmp->Bits();
 		cursorpos=(uint16*)(data+4);
 		maskpos=(uint16*)(data+36);
-		
+
 		// for each row in the cursor data
 		for (j = 0; j < 16; j++) {
 			bmppos = (uint32*)(_buffer+ (j*bmp->BytesPerRow()) );
@@ -388,10 +410,11 @@ CursorSet::_CursorDataToBitmap(uint8 *data)
 				powval = 1 << (15-i);
 				cursorval = cursorflip & powval;
 				maskval = maskflip & powval;
-				bmppos[i] = (cursorval != 0 ? black : white) 
+				bmppos[i] = (cursorval != 0 ? black : white)
 					& (maskval > 0 ? 0xFFFFFFFF : 0x00FFFFFF);
 			}
 		}
+
 		return bmp;
 	}
 
