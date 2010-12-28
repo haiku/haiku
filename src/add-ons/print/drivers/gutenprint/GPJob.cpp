@@ -78,6 +78,7 @@ GPJob::GPJob()
 	fConfiguration(NULL),
 	fHasPages(false),
 	fVariables(NULL),
+	fPrinter(NULL),
 	fBands(NULL),
 	fCachedBand(NULL),
 	fStatus(B_OK)
