@@ -85,6 +85,7 @@ main()
  */
 PrintServerApp::PrintServerApp(status_t* err)
 	: Inherited(PSRV_SIGNATURE_TYPE, err),
+	fDefaultPrinter(NULL),
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	fSelectedIcon(NULL),
 #else
