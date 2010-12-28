@@ -43,7 +43,7 @@
 	\brief Function for easy conversion of 16-bit colors to 32-bit
 	\param col Pointer to an rgb_color.
 	\param color RGB16 color
-	
+
 	This function will do nothing if passed a NULL 32-bit color.
 */
 void
@@ -51,9 +51,9 @@ SetRGBColor16(rgb_color *col,uint16 color)
 {
 	if(!col)
 		return;
-	
+
 	uint16 r16,g16,b16;
-	
+
 	// alpha's the easy part
 	col->alpha=0;
 
@@ -72,7 +72,7 @@ SetRGBColor16(rgb_color *col,uint16 color)
 	\param palette Array of 256 rgb_color objects
 	\param color Color to match
 	\return Index of the closest matching color
-	
+
 	Note that passing a NULL palette will always return 0 and passing an array of less
 	than 256 rgb_colors will cause a crash.
 */
@@ -108,7 +108,7 @@ FindClosestColor(const rgb_color *palette, rgb_color color)
 	\brief Constructs a RGBA15 color which best matches a given 32-bit color
 	\param color Color to match
 	\return The closest matching color's value
-	
+
 	Format is ARGB, 1:5:5:5
 */
 static uint16
@@ -133,7 +133,7 @@ FindClosestColor15(rgb_color color)
 	\brief Constructs a RGB16 color which best matches a given 32-bit color
 	\param color Color to match
 	\return The closest matching color's value
-	
+
 	Format is RGB, 5:6:5
 */
 static uint16
@@ -218,8 +218,10 @@ RGBColor::RGBColor(const RGBColor &color)
 {
 	fColor32 = color.fColor32;
 	fColor16 = color.fColor16;
+	fColor15 = color.fColor15;
 	fColor8 = color.fColor8;
 	fUpdate8 = color.fUpdate8;
+	fUpdate15 = color.fUpdate15;
 	fUpdate16 = color.fUpdate16;
 }
 
@@ -307,7 +309,7 @@ RGBColor::SetColor(uint8 r, uint8 g, uint8 b, uint8 a)
 	fColor32.blue = b;
 	fColor32.alpha = a;
 
-	fUpdate8 = fUpdate16 = true;
+	fUpdate8 = fUpdate15 = fUpdate16 = true;
 }
 
 
@@ -326,7 +328,7 @@ RGBColor::SetColor(int r, int g, int b, int a)
 	fColor32.blue = (uint8)b;
 	fColor32.alpha = (uint8)a;
 
-	fUpdate8 = fUpdate16 = true;
+	fUpdate8 = fUpdate15 = fUpdate16 = true;
 }
 
 #if 0
@@ -338,9 +340,10 @@ void
 RGBColor::SetColor(uint16 col16)
 {
 	fColor16 = col16;
-	SetRGBColor(&fColor32,col16);
+	SetRGBColor(&fColor32, col16);
 
 	fUpdate8 = true;
+	fUpdate15 = true;
 	fUpdate16 = false;
 }
 #endif
@@ -355,8 +358,9 @@ RGBColor::SetColor(uint8 col8)
 {
 	fColor8 = col8;
 	fColor32 = SystemPalette()[col8];
-	
+
 	fUpdate8 = false;
+	fUpdate15 = true;
 	fUpdate16 = true;
 }
 
@@ -369,7 +373,7 @@ void
 RGBColor::SetColor(const rgb_color &color)
 {
 	fColor32 = color;
-	fUpdate8 = fUpdate16 = true;
+	fUpdate8 = fUpdate15 = fUpdate16 = true;
 }
 
 
@@ -382,8 +386,10 @@ RGBColor::SetColor(const RGBColor &color)
 {
 	fColor32 = color.fColor32;
 	fColor16 = color.fColor16;
+	fColor15 = color.fColor15;
 	fColor8 = color.fColor8;
 	fUpdate8 = color.fUpdate8;
+	fUpdate15 = color.fUpdate15;
 	fUpdate16 = color.fUpdate16;
 }
 
@@ -397,8 +403,10 @@ RGBColor::operator=(const RGBColor &color)
 {
 	fColor32 = color.fColor32;
 	fColor16 = color.fColor16;
+	fColor15 = color.fColor15;
 	fColor8 = color.fColor8;
 	fUpdate8 = color.fUpdate8;
+	fUpdate15 = color.fUpdate15;
 	fUpdate16 = color.fUpdate16;
 
 	return *this;
@@ -413,7 +421,7 @@ const RGBColor&
 RGBColor::operator=(const rgb_color &color)
 {
 	fColor32 = color;
-	fUpdate8 = fUpdate16 = true;
+	fUpdate8 = fUpdate15 = fUpdate16 = true;
 
 	return *this;
 }
