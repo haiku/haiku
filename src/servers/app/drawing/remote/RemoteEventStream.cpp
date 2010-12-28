@@ -173,8 +173,10 @@ RemoteEventStream::EventReceived(RemoteMessage& message)
 			if (bytes == NULL)
 				break;
 
-			if (message.ReadList(bytes, numBytes) != B_OK)
+			if (message.ReadList(bytes, numBytes) != B_OK) {
+				free(bytes);
 				break;
+			}
 
 			for (int32 i = 0; i < numBytes; i++)
 				event->AddInt8("byte", (int8)bytes[i]);
@@ -191,6 +193,7 @@ RemoteEventStream::EventReceived(RemoteMessage& message)
 			if (message.Read(key) == B_OK)
 				event->AddInt32("key", key);
 
+			free(bytes);
 			break;
 		}
 
