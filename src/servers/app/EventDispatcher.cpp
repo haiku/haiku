@@ -242,6 +242,7 @@ EventDispatcher::EventDispatcher()
 	fNextLatestMouseMoved(NULL),
 	fLastButtons(0),
 	fLastUpdate(system_time()),
+	fDraggingMessage(false),
 	fDragBitmap(NULL),
 	fCursorLock("cursor loop lock"),
 	fHWInterface(NULL),
