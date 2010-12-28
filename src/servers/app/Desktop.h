@@ -301,7 +301,7 @@ private:
 	friend class LockedDesktopSettings;
 
 			uid_t				fUserID;
-			const char*			fTargetScreen;
+			char*				fTargetScreen;
 			::VirtualScreen		fVirtualScreen;
 			DesktopSettingsPrivate*	fSettings;
 			port_id				fMessagePort;

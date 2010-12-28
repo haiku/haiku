@@ -463,6 +463,8 @@ Desktop::~Desktop()
 	delete_area(fSharedReadOnlyArea);
 	delete_port(fMessagePort);
 	gFontManager->DetachUser(fUserID);
+
+	free(fTargetScreen);
 }
 
 
