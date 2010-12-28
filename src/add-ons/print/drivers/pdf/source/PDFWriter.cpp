@@ -1158,7 +1158,12 @@ uint8 *
 PDFWriter::CreateSoftMask(BRect src, int32 bytesPerRow, int32 pixelFormat,
 	int32 flags, void *data)
 {
+#if 1
+	// TODO: CreateSoftMask???
+	return NULL;
+#else
 	static bool errorReported = false;
+
 	uint8	*in;
 	uint8   *inRow;
 	int32	x, y;
@@ -1168,9 +1173,6 @@ PDFWriter::CreateSoftMask(BRect src, int32 bytesPerRow, int32 pixelFormat,
 	uint8	*out;
 	bool	alpha;
 	int32   bpp;
-
-// TODO: CreateSoftMask???
-	return NULL;
 
 	bpp = BytesPerPixel(pixelFormat);
 	if (bpp < 0)
@@ -1235,6 +1237,7 @@ PDFWriter::CreateSoftMask(BRect src, int32 bytesPerRow, int32 pixelFormat,
 		mask = NULL;
 	}
 	return mask;
+#endif
 }
 
 
