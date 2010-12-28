@@ -301,8 +301,8 @@ map_image(int fd, char const* path, image_t* image, bool fixed)
 
 		uint32 regionAddressSpecifier;
 		get_image_region_load_address(image, i,
-			loadAddress - image->regions[i - 1].vmstart, fixed,
-			loadAddress, regionAddressSpecifier);
+			i > 0 ? loadAddress - image->regions[i - 1].vmstart : loadAddress,
+			fixed, loadAddress, regionAddressSpecifier);
 		if (i == 0) {
 			reservedAddress = loadAddress;
 			addressSpecifier = regionAddressSpecifier;
@@ -333,8 +333,9 @@ map_image(int fd, char const* path, image_t* image, bool fixed)
 		snprintf(regionName, sizeof(regionName), "%s_seg%lu%s",
 			baseName, i, (image->regions[i].flags & RFLAG_RW) ? "rw" : "ro");
 
-		get_image_region_load_address(image, i, image->regions[i - 1].delta,
-			fixed, loadAddress, addressSpecifier);
+		get_image_region_load_address(image, i,
+			i > 0 ? image->regions[i - 1].delta : 0, fixed, loadAddress,
+			addressSpecifier);
 
 		// If the image position is arbitrary, we must let it point to the start
 		// of the reserved address range.
