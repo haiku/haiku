@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2010, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -28,7 +28,7 @@
 CursorSet::CursorSet(const char *name)
 	: BMessage()
 {
-	AddString("name", name ? name : "Untitled");
+	AddString("name", name != NULL ? name : "Untitled");
 }
 
 
@@ -44,7 +44,7 @@ CursorSet::CursorSet(const char *name)
 status_t
 CursorSet::Save(const char *path, int32 saveFlags)
 {
-	if (!path)
+	if (path == NULL)
 		return B_BAD_VALUE;
 
 	BFile file;
@@ -67,7 +67,7 @@ CursorSet::Save(const char *path, int32 saveFlags)
 status_t
 CursorSet::Load(const char *path)
 {
-	if (!path)
+	if (path == NULL)
 		return B_BAD_VALUE;
 
 	BFile file;
@@ -84,31 +84,34 @@ CursorSet::Load(const char *path)
 	\param which System cursor specifier defined in CursorSet.h
 	\param cursor BBitmap to represent the new cursor. Size should be 48x48 or less.
 	\param hotspot The recipient of the hotspot for the cursor
-	\return B_BAD_VALUE if cursor is NULL, otherwise B_OK
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_BAD_VALUE: cursor is NULL
+	- \c other value: See BMessage::AddMessage return codes.
 */
 status_t
-CursorSet::AddCursor(BCursorID which, const BBitmap *cursor, const BPoint &hotspot)
+CursorSet::AddCursor(BCursorID which, const BBitmap *cursor,
+	const BPoint &hotspot)
 {
-	if (!cursor)
+	if (cursor == NULL)
 		return B_BAD_VALUE;
 
 	// Remove the data if it exists already
 	RemoveData(_CursorWhichToString(which));
 
 	// Actually add the data to our set
-	BMessage msg((int32)which);
+	BMessage message((int32)which);
 
-	msg.AddString("class","bitmap");
-	msg.AddRect("_frame",cursor->Bounds());
-	msg.AddInt32("_cspace",cursor->ColorSpace());
+	message.AddString("class", "bitmap");
+	message.AddRect("_frame", cursor->Bounds());
+	message.AddInt32("_cspace", cursor->ColorSpace());
 
-	msg.AddInt32("_bmflags",0);
-	msg.AddInt32("_rowbytes",cursor->BytesPerRow());
-	msg.AddPoint("hotspot",hotspot);
-	msg.AddData("_data",B_RAW_TYPE,cursor->Bits(), cursor->BitsLength());
-	AddMessage(_CursorWhichToString(which),&msg);
+	message.AddInt32("_bmflags", 0);
+	message.AddInt32("_rowbytes", cursor->BytesPerRow());
+	message.AddPoint("hotspot", hotspot);
+	message.AddData("_data", B_RAW_TYPE, cursor->Bits(), cursor->BitsLength());
 
-	return B_OK;
+	return AddMessage(_CursorWhichToString(which), &message);
 }
 
 
@@ -126,16 +129,16 @@ CursorSet::AddCursor(BCursorID which, uint8 *data)
 {
 	// Convert cursor data to a bitmap because all cursors are internally stored
 	// as bitmaps
-	if (!data)
+	if (data == NULL)
 		return B_BAD_VALUE;
 
-	BBitmap *bmp = _CursorDataToBitmap(data);
-	BPoint pt(data[2],data[3]);
+	BBitmap *bitmap = _CursorDataToBitmap(data);
+	BPoint hotspot(data[2], data[3]);
 
-	status_t stat = AddCursor(which,bmp,pt);
+	status_t result = AddCursor(which, bitmap, hotspot);
 
-	delete bmp;
-	return stat;
+	delete bitmap;
+	return result;
 }
 
 
@@ -164,48 +167,43 @@ CursorSet::RemoveCursor(BCursorID which)
 	BBitmaps created by this function are the responsibility of the caller.
 */
 status_t
-CursorSet::FindCursor(BCursorID which, BBitmap **cursor, BPoint *hotspot)
+CursorSet::FindCursor(BCursorID which, BBitmap **_cursor, BPoint *_hotspot)
 {
-	if (!cursor || !hotspot)
+	if (_cursor == NULL || _hotspot == NULL)
 		return B_BAD_VALUE;
 
-	BMessage msg;
-	if (FindMessage(_CursorWhichToString(which), &msg) != B_OK)
+	BMessage message;
+	if (FindMessage(_CursorWhichToString(which), &message) != B_OK)
 		return B_NAME_NOT_FOUND;
 
-	const void *buffer;
-	const char *tempstr;
-	int32 bufferLength;
-	BBitmap *bitmap;
-	BPoint hotpt;
-
-	if (msg.FindString("class", &tempstr) != B_OK)
+	const char *className;
+	if (message.FindString("class", &className) != B_OK
+		|| strcmp(className, "cursor") != 0) {
 		return B_ERROR;
-
-	if (msg.FindPoint("hotspot", &hotpt) != B_OK)
-		return B_ERROR;
-
-	if (strcmp(tempstr, "cursor") == 0) {
-		bitmap = new(std::nothrow) BBitmap(msg.FindRect("_frame"),
-			(color_space)msg.FindInt32("_cspace"), true);
-		if (bitmap == NULL)
-			return B_NO_MEMORY;
-
-		if (msg.FindData("_data", B_RAW_TYPE, (const void **)&buffer,
-				(ssize_t *)&bufferLength) != B_OK) {
-			delete bitmap;
-			return B_ERROR;
-		}
-
-		memcpy(bitmap->Bits(), buffer,
-			min_c(bufferLength, bitmap->BitsLength()));
-
-		*cursor = bitmap;
-		*hotspot = hotpt;
-		return B_OK;
 	}
 
-	return B_ERROR;
+	BPoint hotspot;
+	if (message.FindPoint("hotspot", &hotspot) != B_OK)
+		return B_ERROR;
+
+	const void *buffer;
+	int32 bufferLength;
+	if (message.FindData("_data", B_RAW_TYPE, (const void **)&buffer,
+			(ssize_t *)&bufferLength) != B_OK) {
+		return B_ERROR;
+	}
+
+	BBitmap *bitmap = new(std::nothrow) BBitmap(message.FindRect("_frame"),
+		(color_space)message.FindInt32("_cspace"), true);
+	if (bitmap == NULL)
+		return B_NO_MEMORY;
+
+	memcpy(bitmap->Bits(), buffer,
+		min_c(bufferLength, bitmap->BitsLength()));
+
+	*_cursor = bitmap;
+	*_hotspot = hotspot;
+	return B_OK;
 }
 
 
@@ -224,41 +222,41 @@ CursorSet::FindCursor(BCursorID which, BBitmap **cursor, BPoint *hotspot)
 status_t
 CursorSet::FindCursor(BCursorID which, ServerCursor **_cursor) const
 {
-	BMessage msg;
-	if (FindMessage(_CursorWhichToString(which), &msg) != B_OK)
+	if (_cursor == NULL)
+		return B_BAD_VALUE;
+
+	BMessage message;
+	if (FindMessage(_CursorWhichToString(which), &message) != B_OK)
 		return B_NAME_NOT_FOUND;
 
 	const char *className;
-	BPoint hotspot;
-
-	if (msg.FindString("class", &className) != B_OK)
+	if (message.FindString("class", &className) != B_OK
+		|| strcmp(className, "cursor") != 0) {
 		return B_ERROR;
-
-	if (msg.FindPoint("hotspot", &hotspot) != B_OK)
-		return B_ERROR;
-
-	if (strcmp(className, "cursor") == 0) {
-		ServerCursor *cursor = new(std::nothrow) ServerCursor(
-			msg.FindRect("_frame"), (color_space)msg.FindInt32("_cspace"), 0,
-			hotspot);
-		if (cursor == NULL)
-			return B_NO_MEMORY;
-
-		const void *buffer;
-		int32 bufferLength;
-		if (msg.FindData("_data", B_RAW_TYPE, (const void **)&buffer,
-				(ssize_t *)&bufferLength) != B_OK) {
-			delete cursor;
-			return B_ERROR;
-		}
-
-		memcpy(cursor->Bits(), buffer,
-			min_c(bufferLength, (ssize_t)cursor->BitsLength()));
-
-		*_cursor = cursor;
-		return B_OK;
 	}
-	return B_ERROR;
+
+	BPoint hotspot;
+	if (message.FindPoint("hotspot", &hotspot) != B_OK)
+		return B_ERROR;
+
+	const void *buffer;
+	int32 bufferLength;
+	if (message.FindData("_data", B_RAW_TYPE, (const void **)&buffer,
+			(ssize_t *)&bufferLength) != B_OK) {
+		return B_ERROR;
+	}
+
+	ServerCursor *cursor = new(std::nothrow) ServerCursor(
+		message.FindRect("_frame"), (color_space)message.FindInt32("_cspace"),
+		0, hotspot);
+	if (cursor == NULL)
+		return B_NO_MEMORY;
+
+	memcpy(cursor->Bits(), buffer,
+		min_c(bufferLength, (ssize_t)cursor->BitsLength()));
+
+	*_cursor = cursor;
+	return B_OK;
 }
 
 
@@ -267,7 +265,7 @@ CursorSet::FindCursor(BCursorID which, ServerCursor **_cursor) const
 	\return The name of the set
 */
 const char *
-CursorSet::GetName(void)
+CursorSet::GetName()
 {
 	const char *name;
 	if (FindString("name", &name) == B_OK)
@@ -286,7 +284,7 @@ CursorSet::GetName(void)
 void
 CursorSet::SetName(const char *name)
 {
-	if (!name)
+	if (name == NULL)
 		return;
 
 	RemoveData("name");
@@ -375,48 +373,47 @@ BBitmap *
 CursorSet::_CursorDataToBitmap(uint8 *data)
 {
 	// 68-byte array used in R5 for holding cursors.
-	// This API has serious problems and should be deprecated(but supported) in R2
+	// This API has serious problems and should be deprecated (but supported)
+	// in R2
+
+	if (data == NULL)
+		return NULL;
 
 	// Now that we have all the setup, we're going to map (for now) the cursor
 	// to RGBA32. Eventually, there will be support for 16 and 8-bit depths
-	if (data) {
-		BBitmap *bmp = new(std::nothrow) BBitmap(BRect(0,0,15,15),B_RGBA32,0);
-		if (bmp == NULL)
-			return NULL;
+	BBitmap *bitmap
+		= new(std::nothrow) BBitmap(BRect(0,0,15,15), B_RGBA32, 0);
+	if (bitmap == NULL)
+		return NULL;
 
-		uint32 black = 0xFF000000, white=0xFFFFFFFF, *bmppos;
-		uint16 *cursorpos, *maskpos, cursorflip, maskflip;
-		uint16 cursorval, maskval, powval;
-		uint8 i, j, *_buffer;
+	const uint32 black = 0xff000000;
+	const uint32 white = 0xffffffff;
 
-		_buffer=(uint8*)bmp->Bits();
-		cursorpos=(uint16*)(data+4);
-		maskpos=(uint16*)(data+36);
+	uint8 *buffer = (uint8 *)bitmap->Bits();
+	uint16 *cursorPosition = (uint16 *)(data + 4);
+	uint16 *maskPosition = (uint16 *)(data + 36);
 
-		// for each row in the cursor data
-		for (j = 0; j < 16; j++) {
-			bmppos = (uint32*)(_buffer+ (j*bmp->BytesPerRow()) );
+	// for each row in the cursor data
+	for (uint8 y = 0; y < 16; y++) {
+		uint32 *bitmapPosition
+			= (uint32 *)(buffer + y * bitmap->BytesPerRow());
 
-			// On intel, our bytes end up swapped, so we must swap them back
-			cursorflip = (cursorpos[j] & 0xFF) << 8;
-			cursorflip |= (cursorpos[j] & 0xFF00) >> 8;
+		// TODO: use proper byteswap macros
+		// On intel, our bytes end up swapped, so we must swap them back
+		uint16 cursorFlip = (cursorPosition[y] & 0xff) << 8;
+		cursorFlip |= (cursorPosition[y] & 0xff00) >> 8;
 
-			maskflip = (maskpos[j] & 0xFF) << 8;
-			maskflip |= (maskpos[j] & 0xFF00) >> 8;
+		uint16 maskFlip = (maskPosition[y] & 0xff) << 8;
+		maskFlip |= (maskPosition[y] & 0xff00) >> 8;
 
-			// for each column in each row of cursor data
-			for (i = 0; i < 16; i++) {
-				// Get the values and dump them to the bitmap
-				powval = 1 << (15-i);
-				cursorval = cursorflip & powval;
-				maskval = maskflip & powval;
-				bmppos[i] = (cursorval != 0 ? black : white)
-					& (maskval > 0 ? 0xFFFFFFFF : 0x00FFFFFF);
-			}
+		// for each column in each row of cursor data
+		for (uint8 x = 0; x < 16; x++) {
+			// Get the values and dump them to the bitmap
+			uint16 bit = 1 << (15 - x);
+			bitmapPosition[x] = ((cursorFlip & bit) != 0 ? black : white)
+				& ((maskFlip & bit) != 0 ? 0xffffffff : 0x00ffffff);
 		}
-
-		return bmp;
 	}
 
-	return NULL;
+	return bitmap;
 }
