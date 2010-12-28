@@ -1776,7 +1776,7 @@ TRoster::_HandleGetRecentEntries(BMessage* request)
 	if (fileTypes) {
 		for (int i = 0; i < fileTypesCount; i++)
 			delete [] fileTypes[i];
-		delete fileTypes;
+		delete[] fileTypes;
 		fileTypes = NULL;
 	}
 	request->SendReply(&reply);
