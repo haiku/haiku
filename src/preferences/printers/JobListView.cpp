@@ -216,7 +216,8 @@ JobItem::Update()
 	off_t size;
 	if (node.GetSize(&size) == B_OK) {
 		char buffer[80];
-		sprintf(buffer, B_TRANSLATE("%.2f KB"), size / 1024.0);
+		snprintf(buffer, sizeof(buffer) - 1, B_TRANSLATE("%.2f KB"),
+			size / 1024.0);
 		fSize = buffer;
 	}
 
