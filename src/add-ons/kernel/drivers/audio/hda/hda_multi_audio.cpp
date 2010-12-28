@@ -826,7 +826,7 @@ set_mix(hda_audio_group* audioGroup, multi_mix_value_info * mmvi)
 static uint32
 default_buffer_length_for_rate(uint32 rate)
 {
-	// keep the latency about the same as 2048 frames per buffer at 44100 kHz
+	// keep the latency about the same as 2048 frames per buffer at 44100 Hz
 	switch (rate) {
 	case B_SR_8000:
 		return 512;
