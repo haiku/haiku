@@ -193,6 +193,7 @@ BitmapManager::CreateBitmap(ClientMemoryAllocator* allocator,
 		// indicate this is needed
 	} else {
 		// Allocation failed for buffer or bitmap list
+		free(buffer);
 		delete bitmap;
 		bitmap = NULL;
 	}
