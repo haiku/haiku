@@ -60,8 +60,6 @@ private:
 			void				_SetDefaults();
 
 			WindowList			fWindows;
-			Window*				fFront;
-			Window*				fFocus;
 
 			BObjectList<display_info> fDisplays;
 
