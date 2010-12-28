@@ -786,7 +786,6 @@ load_driver_settings(const char *driverName)
 #ifdef _KERNEL_MODE
 		mutex_unlock(&sLock);
 #endif
-		close(file);
 		return NULL;
 	}
 
