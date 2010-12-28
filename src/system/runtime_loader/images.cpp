@@ -301,7 +301,7 @@ map_image(int fd, char const* path, image_t* image, bool fixed)
 
 		uint32 regionAddressSpecifier;
 		get_image_region_load_address(image, i,
-			i > 0 ? loadAddress - image->regions[i - 1].vmstart : loadAddress,
+			i > 0 ? loadAddress - image->regions[i - 1].vmstart : 0,
 			fixed, loadAddress, regionAddressSpecifier);
 		if (i == 0) {
 			reservedAddress = loadAddress;
