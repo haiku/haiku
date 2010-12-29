@@ -16,6 +16,11 @@
 #include "Constants.h"
 
 #include <Alert.h>
+#include <Catalog.h>
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Screen"
 
 
 static const char* kAppSignature = "application/x-vnd.Be-SCRN";
@@ -32,8 +37,9 @@ ScreenApplication::ScreenApplication()
 void
 ScreenApplication::AboutRequested()
 {
-	BAlert *aboutAlert = new BAlert("About", "Screen preferences by the Haiku team",
-		"OK", NULL, NULL, B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_INFO_ALERT);
+	BAlert *aboutAlert = new BAlert(B_TRANSLATE("About"),
+		B_TRANSLATE("Screen preferences by the Haiku team"), B_TRANSLATE("OK"),
+		NULL, NULL, B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_INFO_ALERT);
 	aboutAlert->SetShortcut(0, B_OK);
 	aboutAlert->Go();
 }

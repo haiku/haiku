@@ -17,13 +17,18 @@
 #include <Alert.h>
 #include <Application.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <String.h>
 #include <StringView.h>
 #include <Window.h>
 
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Screen"
+
+
 RefreshWindow::RefreshWindow(BPoint position, float current, float min, float max)
-	: BWindow(BRect(0, 0, 300, 200), "Refresh Rate", B_MODAL_WINDOW,
+	: BWindow(BRect(0, 0, 300, 200), B_TRANSLATE("Refresh Rate"), B_MODAL_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS, B_ALL_WORKSPACES)
 {
 	min = ceilf(min);
@@ -35,7 +40,7 @@ RefreshWindow::RefreshWindow(BPoint position, float current, float min, float ma
 
 	BRect rect = Bounds().InsetByCopy(8, 8);
 	BStringView* stringView = new BStringView(rect, "info",
-		"Type or use the left and right arrow keys.");
+		B_TRANSLATE("Type or use the left and right arrow keys."));
 	stringView->ResizeToPreferred();
 	topView->AddChild(stringView);
 
@@ -48,15 +53,16 @@ RefreshWindow::RefreshWindow(BPoint position, float current, float min, float ma
 	fRefreshSlider->ResizeTo(rect.Width(), height);
 	topView->AddChild(fRefreshSlider);
 
-	BButton* doneButton = new BButton(rect, "DoneButton", "Done", 
+	BButton* doneButton = new BButton(rect, "DoneButton", B_TRANSLATE("Done"), 
 		new BMessage(BUTTON_DONE_MSG), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	doneButton->ResizeToPreferred();
 	doneButton->MoveTo(Bounds().Width() - doneButton->Bounds().Width() - 8,
 		Bounds().Height() - doneButton->Bounds().Height() - 8);
 	topView->AddChild(doneButton);
 
-	BButton* button = new BButton(doneButton->Frame(), "CancelButton", "Cancel", 
-		new BMessage(B_QUIT_REQUESTED), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+	BButton* button = new BButton(doneButton->Frame(), "CancelButton",
+		B_TRANSLATE("Cancel"), new BMessage(B_QUIT_REQUESTED),
+		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	button->ResizeToPreferred();
 	button->MoveBy(-button->Bounds().Width() - 10, 0);
 	topView->AddChild(button);

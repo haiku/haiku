@@ -15,6 +15,7 @@
 #include <Window.h>
 #include <Bitmap.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <StringView.h>
 #include <String.h>
 
@@ -23,6 +24,10 @@
 #include <Resources.h>
 #include <File.h>
 #include <Path.h>
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Screen"
 
 
 AlertView::AlertView(BRect frame, const char *name)
@@ -35,7 +40,7 @@ AlertView::AlertView(BRect frame, const char *name)
 
 	BRect rect(60, 8, 400, 36);
 	BStringView *stringView = new BStringView(rect, NULL,
-		"Do you wish to keep these settings?");
+		B_TRANSLATE("Do you wish to keep these settings?"));
 	stringView->SetFont(be_bold_font);
 	stringView->ResizeToPreferred();
 	AddChild(stringView);
@@ -47,12 +52,12 @@ AlertView::AlertView(BRect frame, const char *name)
 	fCountdownView->ResizeToPreferred();
 	AddChild(fCountdownView);
 
-	BButton* keepButton = new BButton(rect, "keep", "Keep",
+	BButton* keepButton = new BButton(rect, "keep", B_TRANSLATE("Keep"),
 		new BMessage(BUTTON_KEEP_MSG), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	keepButton->ResizeToPreferred();
 	AddChild(keepButton);
 
-	BButton* button = new BButton(rect, "undo", "Undo",
+	BButton* button = new BButton(rect, "undo", B_TRANSLATE("Undo"),
 		new BMessage(BUTTON_UNDO_MSG), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	button->ResizeToPreferred();
 	AddChild(button);
@@ -129,7 +134,8 @@ void
 AlertView::UpdateCountdownView()
 {
 	BString string;
-	string << "Settings will revert in " << fSeconds << " seconds.";
+	string << B_TRANSLATE("Settings will revert in %fSeconds seconds.");
+	string.ReplaceAll(%fSeconds, fSeconds);
 	fCountdownView->SetText(string.String());
 }
 

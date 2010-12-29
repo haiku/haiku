@@ -12,12 +12,17 @@
 #include "AlertView.h"
 #include "Constants.h"
 
+#include <Catalog.h>
 #include <Window.h>
 #include <Screen.h>
 
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Screen"
+
+
 AlertWindow::AlertWindow(BMessenger target)
-	: BWindow(BRect(100.0, 100.0, 400.0, 193.0), "Undo",
+	: BWindow(BRect(100.0, 100.0, 400.0, 193.0), B_TRANSLATE("Undo"),
 		B_MODAL_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE, B_ALL_WORKSPACES),
 	fTarget(target)

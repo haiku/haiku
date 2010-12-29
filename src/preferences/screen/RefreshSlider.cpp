@@ -12,6 +12,7 @@
 #include "RefreshSlider.h"
 #include "Constants.h"
 
+#include <Catalog.h>
 #include <String.h>
 #include <Window.h>
 
@@ -19,8 +20,12 @@
 #include <stdio.h>
 
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Screen"
+
+
 RefreshSlider::RefreshSlider(BRect frame, float min, float max, uint32 resizingMode)
-	: BSlider(frame, "Screen", "Refresh Rate:", 
+	: BSlider(frame, B_TRANSLATE("Screen"), B_TRANSLATE("Refresh Rate:"),
 		new BMessage(SLIDER_INVOKE_MSG), (int32)rintf(min * 10), (int32)rintf(max * 10),
 		B_BLOCK_THUMB, resizingMode),
 	fStatus(new (std::nothrow) char[32])
@@ -91,7 +96,7 @@ const char*
 RefreshSlider::UpdateText() const
 {
 	if (fStatus != NULL)
-		snprintf(fStatus, 32, "%.1f Hz", (float)Value() / 10);
+		snprintf(fStatus, 32, B_TRANSLATE("%.1f Hz"), (float)Value() / 10);
 
 	return fStatus;
 }

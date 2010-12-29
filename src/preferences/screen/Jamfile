@@ -20,7 +20,7 @@ Preference Screen :
 	ScreenSettings.cpp
 	ScreenWindow.cpp
 	Utility.cpp
-	: be $(TARGET_LIBSUPC++)
+	: be $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
 	: Screen.rdef
 	;
 
@@ -28,3 +28,14 @@ if $(TARGET_PLATFORM) = libbe_test {
 	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : Screen
 		: tests!apps ;
 }
+
+DoCatalogs Screen :
+	x-vnd.Haiku-Screen
+	:
+	AlertView.cpp
+	AlertWindow.cpp
+	RefreshSlider.cpp
+	RefreshWindow.cpp
+	ScreenApplication.cpp
+	ScreenWindow.cpp
+	;
