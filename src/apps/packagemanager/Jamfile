@@ -1,0 +1,15 @@
+SubDir HAIKU_TOP src apps packagemanager ;
+
+# UsePrivateHeaders shared interface ;
+# SubDirHdrs $(HAIKU_TOP) headers libs zlib ;
+
+#SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits interface ] ;
+
+Application PackageManager :
+	ApplicationView.cpp
+	ApplicationWindow.cpp
+	PackageManager.cpp
+	: be $(HAIKU_LOCALE_LIBS) translation $(TARGET_LIBSUPC++)
+	: PackageManager.rdef
+;
+

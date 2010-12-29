@@ -38,6 +38,7 @@ HaikuSubInclude midiplayer ;
 HaikuSubInclude networkstatus ;
 HaikuSubInclude overlayimage ;
 HaikuSubInclude packageinstaller ;
+HaikuSubInclude packagemanager ;
 HaikuSubInclude pairs ;
 HaikuSubInclude people ;
 HaikuSubInclude poorman ;
