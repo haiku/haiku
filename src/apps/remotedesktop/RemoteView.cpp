@@ -772,6 +772,35 @@ RemoteView::_DrawThread()
 				break;
 			}
 
+			case RP_DRAW_BITMAP_RECTS:
+			{
+				color_space colorSpace;
+				int32 rectCount;
+				uint32 flags, options;
+
+				message.Read(options);
+				message.Read(colorSpace);
+				message.Read(flags);
+				message.Read(rectCount);
+				for (int32 i = 0; i < rectCount; i++) {
+					BBitmap *bitmap;
+					BRect viewRect;
+
+					message.Read(viewRect);
+					if (message.ReadBitmap(&bitmap, true, colorSpace,
+							flags) != B_OK || bitmap == NULL) {
+						continue;
+					}
+
+					offscreen->DrawBitmap(bitmap, bitmap->Bounds(), viewRect,
+						options);
+					invalidRegion.Include(viewRect);
+					delete bitmap;
+				}
+
+				break;
+			}
+
 			case RP_STROKE_ARC:
 			case RP_FILL_ARC:
 			case RP_FILL_ARC_GRADIENT:
@@ -1229,7 +1258,7 @@ RemoteView::_DrawThread()
 		if (syncDrawing) {
 			offscreen->Sync();
 			Invalidate(&invalidRegion);
-		}			
+		}
 	}
 }
 
