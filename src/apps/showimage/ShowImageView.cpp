@@ -298,7 +298,7 @@ ShowImageView::_UpdateStatusText()
 
 	if (fHasSelection) {
 		char size[50];
-		sprintf(size, "(%.0fx%.0f)",
+		snprintf(size, sizeof(size), "(%.0fx%.0f)",
 			fSelectionBox.Bounds().Width() + 1.0,
 			fSelectionBox.Bounds().Height() + 1.0);
 
