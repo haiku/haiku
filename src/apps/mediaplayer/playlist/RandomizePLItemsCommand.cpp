@@ -10,8 +10,14 @@
 #include <stdlib.h>
 
 #include <Autolock.h>
+#include <Catalog.h>
+#include <Locale.h>
 
 #include "Playlist.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "MediaPlayer-RandomizePLItemsCmd"
 
 
 using std::nothrow;
@@ -93,7 +99,7 @@ RandomizePLItemsCommand::Undo()
 void
 RandomizePLItemsCommand::GetName(BString& name)
 {
-	name << "Randomize Entries";
+	name << B_TRANSLATE("Randomize Entries");
 }
 
 

@@ -9,8 +9,14 @@
 #include <stdio.h>
 
 #include <Autolock.h>
+#include <Catalog.h>
+#include <Locale.h>
 
 #include "Playlist.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "MediaPlayer-MovePLItemsCmd"
 
 
 using std::nothrow;
@@ -172,7 +178,7 @@ void
 MovePLItemsCommand::GetName(BString& name)
 {
 	if (fCount > 1)
-		name << "Move Entries";
+		name << B_TRANSLATE("Move Entries");
 	else
-		name << "Move Entry";
+		name << B_TRANSLATE("Move Entry");
 }

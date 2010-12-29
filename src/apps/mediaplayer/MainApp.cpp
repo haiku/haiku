@@ -24,8 +24,10 @@
 
 #include <Alert.h>
 #include <Autolock.h>
+#include <Catalog.h>
 #include <Entry.h>
 #include <FilePanel.h>
+#include <Locale.h>
 #include <MediaDefs.h>
 #include <MediaRoster.h>
 #include <MimeType.h>
@@ -43,8 +45,12 @@
 #include "SettingsWindow.h"
 
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "MediaPlayer-Main"
 
-static const char* kCurrentPlaylistFilename = "MediaPlayer Current Playlist";
+
+static const char* kCurrentPlaylistFilename = 
+	B_TRANSLATE("MediaPlayer Current Playlist");
 
 const char* kAppSig = "application/x-vnd.Haiku-MediaPlayer";
 
@@ -85,8 +91,9 @@ MainApp::MainApp()
 
 	if (!fMediaServerRunning || !fMediaAddOnServerRunning) {
 		BAlert* alert = new BAlert("start_media_server",
-			"It appears the media server is not running.\n"
-			"Would you like to start it ?", "Quit", "Start media server", NULL,
+			B_TRANSLATE("It appears the media server is not running.\n"
+			"Would you like to start it ?"), B_TRANSLATE("Quit"), 
+			B_TRANSLATE("Start media server"), NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		if (alert->Go() == 0) {
 			PostMessage(B_QUIT_REQUESTED);
@@ -404,8 +411,10 @@ MainApp::MessageReceived(BMessage* message)
 void
 MainApp::AboutRequested()
 {
-	BAlert* alert = new BAlert("about", NAME"\n\nWritten by Marcus Overhagen, "
-		"Stephan Aßmus and Frederik Modéen", "Thanks");
+	BAlert* alert = new BAlert("about", B_TRANSLATE(
+		NAME"\n\nWritten by Marcus Overhagen, "
+		"Stephan Aßmus and Frederik Modéen"), 
+		B_TRANSLATE("Thanks"));
 	alert->SetFeel(B_FLOATING_ALL_WINDOW_FEEL);
 		// Make sure it is on top of any player windows that may have the
 		// floating all window feel.
@@ -462,7 +471,7 @@ MainApp::_ShowOpenFilePanel(const BMessage* message)
 	}
 
 	_ShowFilePanel(fOpenFilePanel, M_OPEN_PANEL_RESULT, message,
-		"Open", "Open");
+		B_TRANSLATE("Open"), B_TRANSLATE("Open"));
 }
 
 
@@ -475,7 +484,7 @@ MainApp::_ShowSaveFilePanel(const BMessage* message)
 	}
 
 	_ShowFilePanel(fSaveFilePanel, M_SAVE_PANEL_RESULT, message,
-		"Save", "Save");
+		B_TRANSLATE("Save"), B_TRANSLATE("Save"));
 }
 
 

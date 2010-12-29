@@ -8,8 +8,14 @@
 #include <stdio.h>
 
 #include <Autolock.h>
+#include <Catalog.h>
+#include <Locale.h>
 
 #include "Playlist.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "MediaPlayer-CopyPLItemsCmd"
 
 
 using std::nothrow;
@@ -111,7 +117,7 @@ void
 CopyPLItemsCommand::GetName(BString& name)
 {
 	if (fCount > 1)
-		name << "Copy Entries";
+		name << B_TRANSLATE("Copy Entries");
 	else
-		name << "Copy Entry";
+		name << B_TRANSLATE("Copy Entry");
 }

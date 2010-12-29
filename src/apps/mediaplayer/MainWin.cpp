@@ -30,9 +30,11 @@
 #include <Alert.h>
 #include <Application.h>
 #include <Autolock.h>
+#include <Catalog.h>
 #include <Debug.h>
 #include <fs_attr.h>
 #include <Language.h>
+#include <Locale.h>
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
@@ -59,6 +61,8 @@
 #include "Settings.h"
 
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "MediaPlayer-Main"
 #define MIN_WIDTH 250
 
 
@@ -116,34 +120,43 @@ enum {
 
 
 static property_info sPropertyInfo[] = {
-	{ "Next", { B_EXECUTE_PROPERTY },
-		{ B_DIRECT_SPECIFIER, 0 }, "Skip to the next track.", 0
+	{ B_TRANSLATE("Next"), { B_EXECUTE_PROPERTY },
+		{ B_DIRECT_SPECIFIER, 0 }, 
+		B_TRANSLATE("Skip to the next track."), 0
 	},
-	{ "Prev", { B_EXECUTE_PROPERTY },
-		{ B_DIRECT_SPECIFIER, 0 }, "Skip to the previous track.", 0
+	{ B_TRANSLATE("Prev"), { B_EXECUTE_PROPERTY },
+		{ B_DIRECT_SPECIFIER, 0 }, 
+		B_TRANSLATE("Skip to the previous track."), 0
 	},
-	{ "Play", { B_EXECUTE_PROPERTY },
-		{ B_DIRECT_SPECIFIER, 0 }, "Start playing.", 0
+	{ B_TRANSLATE("Play"), { B_EXECUTE_PROPERTY },
+		{ B_DIRECT_SPECIFIER, 0 },
+		B_TRANSLATE("Start playing."), 0
 	},
-	{ "Stop", { B_EXECUTE_PROPERTY },
-		{ B_DIRECT_SPECIFIER, 0 }, "Stop playing.", 0
+	{ B_TRANSLATE("Stop"), { B_EXECUTE_PROPERTY },
+		{ B_DIRECT_SPECIFIER, 0 }, 
+		B_TRANSLATE("Stop playing."), 0
 	},
-	{ "Pause", { B_EXECUTE_PROPERTY },
-		{ B_DIRECT_SPECIFIER, 0 }, "Pause playback.", 0
+	{ B_TRANSLATE("Pause"), { B_EXECUTE_PROPERTY },
+		{ B_DIRECT_SPECIFIER, 0 },
+		B_TRANSLATE("Pause playback."), 0
 	},
-	{ "TogglePlaying", { B_EXECUTE_PROPERTY },
-		{ B_DIRECT_SPECIFIER, 0 }, "Toggle pause/play.", 0
+	{ B_TRANSLATE("TogglePlaying"), { B_EXECUTE_PROPERTY },
+		{ B_DIRECT_SPECIFIER, 0 }, 
+		B_TRANSLATE("Toggle pause/play."), 0
 	},
-	{ "Mute", { B_EXECUTE_PROPERTY },
-		{ B_DIRECT_SPECIFIER, 0 }, "Toggle mute.", 0
+	{ B_TRANSLATE("Mute"), { B_EXECUTE_PROPERTY },
+		{ B_DIRECT_SPECIFIER, 0 }, 
+		B_TRANSLATE("Toggle mute."), 0
 	},
-	{ "Volume", { B_GET_PROPERTY, B_SET_PROPERTY, 0 },
-		{ B_DIRECT_SPECIFIER, 0 }, "Gets/sets the volume (0.0-2.0).", 0,
+	{ B_TRANSLATE("Volume"), { B_GET_PROPERTY, B_SET_PROPERTY, 0 },
+		{ B_DIRECT_SPECIFIER, 0 }, 
+		B_TRANSLATE("Gets/sets the volume (0.0-2.0)."), 0,
 		{ B_FLOAT_TYPE }
 	},
-	{ "URI", { B_GET_PROPERTY, 0 },
+	{ B_TRANSLATE("URI"), { B_GET_PROPERTY, 0 },
 		{ B_DIRECT_SPECIFIER, 0 },
-		"Gets the URI of the currently playing item.", 0, { B_STRING_TYPE }
+		B_TRANSLATE("Gets the URI of the currently playing item."), 0, 
+		{ B_STRING_TYPE }
 	},
 	{ 0, { 0 }, { 0 }, 0, 0 }
 };
@@ -151,7 +164,7 @@ static property_info sPropertyInfo[] = {
 
 static const char* kRatingAttrName = "Media:Rating";
 
-static const char* kDisabledSeekMessage = "Drop files to play";
+static const char* kDisabledSeekMessage = B_TRANSLATE("Drop files to play");
 
 
 //#define printf(a...)
@@ -609,8 +622,9 @@ MainWin::MessageReceived(BMessage* msg)
 		}
 		case MSG_PLAYLIST_IMPORT_FAILED:
 		{
-			BAlert* alert = new BAlert("Nothing to Play", "None of the files "
-				"you wanted to play appear to be media files.", "OK");
+			BAlert* alert = new BAlert(B_TRANSLATE("Nothing to Play"), 
+				B_TRANSLATE("None of the files you wanted to play appear "
+				"to be media files."), B_TRANSLATE("OK"));
 			alert->Go();
 			fControls->SetDisabledString(kDisabledSeekMessage);
 			break;
@@ -741,8 +755,8 @@ MainWin::MessageReceived(BMessage* msg)
 			BMessage appMessage(M_SHOW_OPEN_PANEL);
 			appMessage.AddMessenger("target", target);
 			appMessage.AddMessage("message", &result);
-			appMessage.AddString("title", "Open Clips");
-			appMessage.AddString("label", "Open");
+			appMessage.AddString("title", B_TRANSLATE("Open Clips"));
+			appMessage.AddString("label", B_TRANSLATE("Open"));
 			be_app->PostMessage(&appMessage);
 			break;
 		}
@@ -1068,8 +1082,9 @@ MainWin::OpenPlaylistItem(const PlaylistItemRef& item)
 	if (ret != B_OK) {
 		fprintf(stderr, "MainWin::OpenPlaylistItem() - Failed to send message "
 			"to Controller.\n");
-		(new BAlert("error", NAME" encountered an internal error. "
-			"The file could not be opened.", "OK"))->Go();
+		(new BAlert(B_TRANSLATE("error"), 
+			B_TRANSLATE(NAME" encountered an internal error. "
+			"The file could not be opened."), B_TRANSLATE("OK")))->Go();
 		_PlaylistItemOpened(item, ret);
 	} else {
 		BString string;
@@ -1307,21 +1322,21 @@ MainWin::_PlaylistItemOpened(const PlaylistItemRef& item, status_t result)
 
 		if (allItemsFailed) {
 			// Display error if all files failed to play.
-			BString message;
-			message << "The file '";
-			message << item->Name();
-			message << "' could not be opened.\n\n";
+			BString message(B_TRANSLATE(
+				"The file'%filename' could not be opened.\n\n"));;
+			message.ReplaceAll("%filename", item->Name());
 
 			if (result == B_MEDIA_NO_HANDLER) {
 				// give a more detailed message for the most likely of all
 				// errors
-				message << "There is no decoder installed to handle the "
+				message << B_TRANSLATE(
+					"There is no decoder installed to handle the "
 					"file format, or the decoder has trouble with the "
-					"specific version of the format.";
+					"specific version of the format.");
 			} else {
-				message << "Error: " << strerror(result);
+				message << B_TRANSLATE("Error: ") << strerror(result);
 			}
-			(new BAlert("error", message.String(), "OK"))->Go();
+			(new BAlert("error", message.String(), B_TRANSLATE("OK")))->Go();
 			fControls->SetDisabledString(kDisabledSeekMessage);
 		} else {
 			// Just go to the next file and don't bother user (yet)
@@ -1404,21 +1419,23 @@ void
 MainWin::_CreateMenu()
 {
 	fFileMenu = new BMenu(NAME);
-	fPlaylistMenu = new BMenu("Playlist"B_UTF8_ELLIPSIS);
-	fAudioMenu = new BMenu("Audio");
-	fVideoMenu = new BMenu("Video");
-	fVideoAspectMenu = new BMenu("Aspect ratio");
-	fAudioTrackMenu = new BMenu("Track");
-	fVideoTrackMenu = new BMenu("Track");
-	fSubTitleTrackMenu = new BMenu("Subtitles");
-	fAttributesMenu = new BMenu("Attributes");
+	fPlaylistMenu = new BMenu(B_TRANSLATE("Playlist"B_UTF8_ELLIPSIS));
+	fAudioMenu = new BMenu(B_TRANSLATE("Audio"));
+	fVideoMenu = new BMenu(B_TRANSLATE("Video"));
+	fVideoAspectMenu = new BMenu(B_TRANSLATE("Aspect ratio"));
+	fAudioTrackMenu = new BMenu(B_TRANSLATE_WITH_CONTEXT("Track", 
+		"Audio Track Menu"));
+	fVideoTrackMenu = new BMenu(B_TRANSLATE_WITH_CONTEXT("Track", 
+		"Video Track Menu"));
+	fSubTitleTrackMenu = new BMenu(B_TRANSLATE("Subtitles"));
+	fAttributesMenu = new BMenu(B_TRANSLATE("Attributes"));
 
 	fMenuBar->AddItem(fFileMenu);
 	fMenuBar->AddItem(fAudioMenu);
 	fMenuBar->AddItem(fVideoMenu);
 	fMenuBar->AddItem(fAttributesMenu);
 
-	BMenuItem* item = new BMenuItem("New player"B_UTF8_ELLIPSIS,
+	BMenuItem* item = new BMenuItem(B_TRANSLATE("New player"B_UTF8_ELLIPSIS),
 		new BMessage(M_NEW_PLAYER), 'N');
 	fFileMenu->AddItem(item);
 	item->SetTarget(be_app);
@@ -1426,14 +1443,14 @@ MainWin::_CreateMenu()
 	// Add recent files to "Open File" entry as sub-menu.
 	BRecentFilesList recentFiles(10, false, NULL, kAppSig);
 	item = new BMenuItem(recentFiles.NewFileListMenu(
-		"Open file"B_UTF8_ELLIPSIS, NULL, NULL, this, 10, true, NULL, kAppSig),
-		new BMessage(M_FILE_OPEN));
+		B_TRANSLATE("Open file"B_UTF8_ELLIPSIS), NULL, NULL, this, 10, true,
+		NULL, kAppSig), new BMessage(M_FILE_OPEN));
 	item->SetShortcut('O', 0);
 	fFileMenu->AddItem(item);
 
 	fFileMenu->AddSeparatorItem();
 
-	fFileMenu->AddItem(new BMenuItem("File info"B_UTF8_ELLIPSIS,
+	fFileMenu->AddItem(new BMenuItem(B_TRANSLATE("File info"B_UTF8_ELLIPSIS),
 		new BMessage(M_FILE_INFO), 'I'));
 	fFileMenu->AddItem(fPlaylistMenu);
 	fPlaylistMenu->Superitem()->SetShortcut('P', B_COMMAND_KEY);
@@ -1441,28 +1458,30 @@ MainWin::_CreateMenu()
 
 	fFileMenu->AddSeparatorItem();
 
-	fNoInterfaceMenuItem = new BMenuItem("Hide interface",
+	fNoInterfaceMenuItem = new BMenuItem(B_TRANSLATE("Hide interface"),
 		new BMessage(M_TOGGLE_NO_INTERFACE), 'H');
 	fFileMenu->AddItem(fNoInterfaceMenuItem);
-	fFileMenu->AddItem(new BMenuItem("Always on top",
+	fFileMenu->AddItem(new BMenuItem(B_TRANSLATE("Always on top"),
 		new BMessage(M_TOGGLE_ALWAYS_ON_TOP), 'A'));
 
-	item = new BMenuItem("Settings"B_UTF8_ELLIPSIS,
+	item = new BMenuItem(B_TRANSLATE("Settings"B_UTF8_ELLIPSIS),
 		new BMessage(M_SETTINGS), 'S');
 	fFileMenu->AddItem(item);
 	item->SetTarget(be_app);
 
 	fFileMenu->AddSeparatorItem();
 
-	item = new BMenuItem("About " NAME B_UTF8_ELLIPSIS,
+	item = new BMenuItem(B_TRANSLATE("About " NAME B_UTF8_ELLIPSIS),
 		new BMessage(B_ABOUT_REQUESTED));
 	fFileMenu->AddItem(item);
 	item->SetTarget(be_app);
 
 	fFileMenu->AddSeparatorItem();
 
-	fFileMenu->AddItem(new BMenuItem("Close", new BMessage(M_FILE_CLOSE), 'W'));
-	fFileMenu->AddItem(new BMenuItem("Quit", new BMessage(M_FILE_QUIT), 'Q'));
+	fFileMenu->AddItem(new BMenuItem(B_TRANSLATE("Close"), 
+		new BMessage(M_FILE_CLOSE), 'W'));
+	fFileMenu->AddItem(new BMenuItem(B_TRANSLATE("Quit"), 
+		new BMessage(M_FILE_QUIT), 'Q'));
 
 	fPlaylistMenu->SetRadioMode(true);
 
@@ -1473,27 +1492,32 @@ MainWin::_CreateMenu()
 	fVideoMenu->AddSeparatorItem();
 	BMessage* resizeMessage = new BMessage(M_VIEW_SIZE);
 	resizeMessage->AddInt32("size", 50);
-	fVideoMenu->AddItem(new BMenuItem("50% scale", resizeMessage, '0'));
+	fVideoMenu->AddItem(new BMenuItem(
+		B_TRANSLATE("50% scale"), resizeMessage, '0'));
 
 	resizeMessage = new BMessage(M_VIEW_SIZE);
 	resizeMessage->AddInt32("size", 100);
-	fVideoMenu->AddItem(new BMenuItem("100% scale", resizeMessage, '1'));
+	fVideoMenu->AddItem(new BMenuItem(
+		B_TRANSLATE("100% scale"), resizeMessage, '1'));
 
 	resizeMessage = new BMessage(M_VIEW_SIZE);
 	resizeMessage->AddInt32("size", 200);
-	fVideoMenu->AddItem(new BMenuItem("200% scale", resizeMessage, '2'));
+	fVideoMenu->AddItem(new BMenuItem(
+		B_TRANSLATE("200% scale"), resizeMessage, '2'));
 
 	resizeMessage = new BMessage(M_VIEW_SIZE);
 	resizeMessage->AddInt32("size", 300);
-	fVideoMenu->AddItem(new BMenuItem("300% scale", resizeMessage, '3'));
+	fVideoMenu->AddItem(new BMenuItem(
+		B_TRANSLATE("300% scale"), resizeMessage, '3'));
 
 	resizeMessage = new BMessage(M_VIEW_SIZE);
 	resizeMessage->AddInt32("size", 400);
-	fVideoMenu->AddItem(new BMenuItem("400% scale", resizeMessage, '4'));
+	fVideoMenu->AddItem(new BMenuItem(
+		B_TRANSLATE("400% scale"), resizeMessage, '4'));
 
 	fVideoMenu->AddSeparatorItem();
 
-	fVideoMenu->AddItem(new BMenuItem("Full screen",
+	fVideoMenu->AddItem(new BMenuItem(B_TRANSLATE("Full screen"),
 		new BMessage(M_TOGGLE_FULLSCREEN), 'F'));
 
 	fVideoMenu->AddSeparatorItem();
@@ -1501,7 +1525,7 @@ MainWin::_CreateMenu()
 	_SetupVideoAspectItems(fVideoAspectMenu);
 	fVideoMenu->AddItem(fVideoAspectMenu);
 
-	fRatingMenu = new BMenu("Rating");
+	fRatingMenu = new BMenu(B_TRANSLATE("Rating"));
 	fAttributesMenu->AddItem(fRatingMenu);
 	for (int32 i = 1; i <= 10; i++) {
 		char label[16];
@@ -1532,12 +1556,12 @@ MainWin::_SetupVideoAspectItems(BMenu* menu)
 	// "Stream Settings" and "16 : 9" if the stream settings happen to
 	// be "16 : 9".
 
-	menu->AddItem(item = new BMenuItem("Stream settings",
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Stream settings"),
 		new BMessage(M_ASPECT_SAME_AS_SOURCE)));
 	item->SetMarked(widthAspect == fWidthAspect
 		&& heightAspect == fHeightAspect);
 
-	menu->AddItem(item = new BMenuItem("No aspect correction",
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("No aspect correction"),
 		new BMessage(M_ASPECT_NO_DISTORTION)));
 	item->SetMarked(width == fWidthAspect && height == fHeightAspect);
 
@@ -1558,10 +1582,10 @@ MainWin::_SetupVideoAspectItems(BMenu* menu)
 	menu->AddItem(item = new BMenuItem("1.75 : 1",
 		new BMessage(M_ASPECT_7_4)));
 	item->SetMarked(fWidthAspect == 7 && fHeightAspect == 4);
-	menu->AddItem(item = new BMenuItem("1.85 : 1 (American)",
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("1.85 : 1 (American)"),
 		new BMessage(M_ASPECT_37_20)));
 	item->SetMarked(fWidthAspect == 37 && fHeightAspect == 20);
-	menu->AddItem(item = new BMenuItem("2.35 : 1 (Cinemascope)",
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("2.35 : 1 (Cinemascope)"),
 		new BMessage(M_ASPECT_47_20)));
 	item->SetMarked(fWidthAspect == 47 && fHeightAspect == 20);
 }
@@ -1591,14 +1615,15 @@ MainWin::_SetupTrackMenus(BMenu* audioTrackMenu, BMenu* videoTrackMenu,
 				languageString = languageName.String();
 			snprintf(s, sizeof(s), "%s", languageString);
 		} else
-			snprintf(s, sizeof(s), "Track %d", i + 1);
+			snprintf(s, sizeof(s), B_TRANSLATE("Track %d"), i + 1);
 		BMenuItem* item = new BMenuItem(s,
 			new BMessage(M_SELECT_AUDIO_TRACK + i));
 		item->SetMarked(i == current);
 		audioTrackMenu->AddItem(item);
 	}
 	if (count == 0) {
-		audioTrackMenu->AddItem(new BMenuItem("none", new BMessage(M_DUMMY)));
+		audioTrackMenu->AddItem(new BMenuItem(B_TRANSLATE_WITH_CONTEXT("none",
+			"Audio track menu"), new BMessage(M_DUMMY)));
 		audioTrackMenu->ItemAt(0)->SetMarked(true);
 	}
 
@@ -1606,7 +1631,7 @@ MainWin::_SetupTrackMenus(BMenu* audioTrackMenu, BMenu* videoTrackMenu,
 	count = fController->VideoTrackCount();
 	current = fController->CurrentVideoTrack();
 	for (int i = 0; i < count; i++) {
-		snprintf(s, sizeof(s), "Track %d", i + 1);
+		snprintf(s, sizeof(s), B_TRANSLATE("Track %d"), i + 1);
 		BMenuItem* item = new BMenuItem(s,
 			new BMessage(M_SELECT_VIDEO_TRACK + i));
 		item->SetMarked(i == current);
@@ -1620,7 +1645,8 @@ MainWin::_SetupTrackMenus(BMenu* audioTrackMenu, BMenu* videoTrackMenu,
 	count = fController->SubTitleTrackCount();
 	if (count > 0) {
 		current = fController->CurrentSubTitleTrack();
-		BMenuItem* item = new BMenuItem("Off",
+		BMenuItem* item = new BMenuItem(
+			B_TRANSLATE_WITH_CONTEXT("Off", "Subtitles menu"),
 			new BMessage(M_SELECT_SUB_TITLE_TRACK - 1));
 		subTitleTrackMenu->AddItem(item);
 		item->SetMarked(current == -1);
@@ -1632,14 +1658,15 @@ MainWin::_SetupTrackMenus(BMenu* audioTrackMenu, BMenu* videoTrackMenu,
 			if (name != NULL)
 				snprintf(s, sizeof(s), "%s", name);
 			else
-				snprintf(s, sizeof(s), "Track %d", i + 1);
+				snprintf(s, sizeof(s), B_TRANSLATE("Track %d"), i + 1);
 			item = new BMenuItem(s,
 				new BMessage(M_SELECT_SUB_TITLE_TRACK + i));
 			item->SetMarked(i == current);
 			subTitleTrackMenu->AddItem(item);
 		}
 	} else {
-		subTitleTrackMenu->AddItem(new BMenuItem("none",
+		subTitleTrackMenu->AddItem(new BMenuItem(
+			B_TRANSLATE_WITH_CONTEXT("none", "Subtitles menu"),
 			new BMessage(M_DUMMY)));
 		subTitleTrackMenu->ItemAt(0)->SetMarked(true);
 	}
@@ -1978,18 +2005,18 @@ MainWin::_ShowContextMenu(const BPoint& screenPoint)
 	printf("Show context menu\n");
 	BPopUpMenu* menu = new BPopUpMenu("context menu", false, false);
 	BMenuItem* item;
-	menu->AddItem(item = new BMenuItem("Full screen",
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Full screen"),
 		new BMessage(M_TOGGLE_FULLSCREEN), 'F'));
 	item->SetMarked(fIsFullscreen);
 	item->SetEnabled(fHasVideo);
 
-	BMenu* aspectSubMenu = new BMenu("Aspect ratio");
+	BMenu* aspectSubMenu = new BMenu(B_TRANSLATE("Aspect ratio"));
 	_SetupVideoAspectItems(aspectSubMenu);
 	aspectSubMenu->SetTargetForItems(this);
 	menu->AddItem(item = new BMenuItem(aspectSubMenu));
 	item->SetEnabled(fHasVideo);
 
-	menu->AddItem(item = new BMenuItem("Hide interface",
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Hide interface"),
 		new BMessage(M_TOGGLE_NO_INTERFACE), 'H'));
 	item->SetMarked(fNoInterface);
 	item->SetEnabled(fHasVideo);
@@ -1997,9 +2024,9 @@ MainWin::_ShowContextMenu(const BPoint& screenPoint)
 	menu->AddSeparatorItem();
 
 	// Add track selector menus
-	BMenu* audioTrackMenu = new BMenu("Audio track");
-	BMenu* videoTrackMenu = new BMenu("Video track");
-	BMenu* subTitleTrackMenu = new BMenu("Subtitles");
+	BMenu* audioTrackMenu = new BMenu(B_TRANSLATE("Audio track"));
+	BMenu* videoTrackMenu = new BMenu(B_TRANSLATE("Video track"));
+	BMenu* subTitleTrackMenu = new BMenu(B_TRANSLATE("Subtitles"));
 	_SetupTrackMenus(audioTrackMenu, videoTrackMenu, subTitleTrackMenu);
 
 	audioTrackMenu->SetTargetForItems(this);
@@ -2016,7 +2043,7 @@ MainWin::_ShowContextMenu(const BPoint& screenPoint)
 	item->SetEnabled(fHasVideo);
 
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem("Quit", new BMessage(M_FILE_QUIT), 'Q'));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Quit"), new BMessage(M_FILE_QUIT), 'Q'));
 
 	menu->SetTargetForItems(this);
 	BRect rect(screenPoint.x - 5, screenPoint.y - 5, screenPoint.x + 5,

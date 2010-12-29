@@ -14,13 +14,20 @@
 #include <string.h>
 
 #include <Bitmap.h>
+#include <Catalog.h>
 #include <ControlLook.h>
+#include <Locale.h>
 #include <MenuItem.h>
 #include <Message.h>
 #include <MessageRunner.h>
 #include <Messenger.h>
 #include <PopUpMenu.h>
 #include <Window.h>
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "MediaPlayer-PeakView"
+
 
 using std::nothrow;
 
@@ -133,7 +140,7 @@ PeakView::MouseDown(BPoint where)
 	} else {
 		// Display context menu
 		BPopUpMenu* menu = new BPopUpMenu("peak context menu");
-		BMenuItem* item = new BMenuItem("Lock Peaks",
+		BMenuItem* item = new BMenuItem(B_TRANSLATE("Lock Peaks"),
 			new BMessage(MSG_LOCK_PEAKS));
 		item->SetMarked(fPeakLocked);
 		menu->AddItem(item);

@@ -10,9 +10,15 @@
 #include <stdio.h>
 
 #include <Autolock.h>
+#include <Catalog.h>
+#include <Locale.h>
 
 #include "Playlist.h"
 #include "PlaylistItem.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "MediaPlayer-ImportPLItemsCmd"
 
 
 using std::nothrow;
@@ -166,8 +172,8 @@ void
 ImportPLItemsCommand::GetName(BString& name)
 {
 	if (fNewCount > 1)
-		name << "Import Entries";
+		name << B_TRANSLATE("Import Entries");
 	else
-		name << "Import Entry";
+		name << B_TRANSLATE("Import Entry");
 }
 

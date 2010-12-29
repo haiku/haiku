@@ -14,15 +14,21 @@
 
 #include <Box.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <CheckBox.h>
 #include <GridLayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
+#include <Locale.h>
 #include <OptionPopUp.h>
 #include <SpaceLayoutItem.h>
 #include <String.h>
 #include <StringView.h>
 #include <RadioButton.h>
 #include <View.h>
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "MediaPlayer-SettingsWindow"
 
 
 enum {
@@ -41,7 +47,7 @@ enum {
 
 SettingsWindow::SettingsWindow(BRect frame)
  	:
- 	BWindow(frame, "MediaPlayer settings", B_FLOATING_WINDOW_LOOK,
+ 	BWindow(frame, B_TRANSLATE("MediaPlayer settings"), B_FLOATING_WINDOW_LOOK,
  		B_FLOATING_APP_WINDOW_FEEL,
  		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE
  			| B_AUTO_UPDATE_SIZE_LIMITS)
@@ -54,11 +60,11 @@ SettingsWindow::SettingsWindow(BRect frame)
 	buttonBox->SetLayout(buttonLayout);
 
 	BStringView* playModeLabel = new BStringView("stringViewPlayMode",
-		"Play mode");
+		B_TRANSLATE("Play mode"));
 	BStringView* viewOptionsLabel = new BStringView("stringViewViewOpions", 
-		"View options");
+		B_TRANSLATE("View options"));
 	BStringView* bgMoviesModeLabel = new BStringView("stringViewPlayBackg", 
-		"Play background clips at");
+		B_TRANSLATE("Play background clips at"));
 	BAlignment alignment(B_ALIGN_LEFT, B_ALIGN_VERTICAL_CENTER);
 	playModeLabel->SetExplicitAlignment(alignment);
 	playModeLabel->SetFont(be_bold_font);
@@ -68,60 +74,66 @@ SettingsWindow::SettingsWindow(BRect frame)
 	bgMoviesModeLabel->SetFont(be_bold_font);
 
 	fAutostartCB = new BCheckBox("chkboxAutostart", 
-		"Automatically start playing", new BMessage(M_SETTINGS_CHANGED));
+		B_TRANSLATE("Automatically start playing"), 
+		new BMessage(M_SETTINGS_CHANGED));
 
 	fCloseWindowMoviesCB = new BCheckBox("chkBoxCloseWindowMovies", 
-		"Close window when done playing movies",
+		B_TRANSLATE("Close window when done playing movies"),
 		new BMessage(M_SETTINGS_CHANGED));
 	fCloseWindowSoundsCB = new BCheckBox("chkBoxCloseWindowSounds", 
-		"Close window when done playing sounds",
+		B_TRANSLATE("Close window when done playing sounds"),
 		new BMessage(M_SETTINGS_CHANGED));
 
 	fLoopMoviesCB = new BCheckBox("chkBoxLoopMovie",
-		"Loop movies by default", new BMessage(M_SETTINGS_CHANGED));
+		B_TRANSLATE("Loop movies by default"),
+		new BMessage(M_SETTINGS_CHANGED));
 	fLoopSoundsCB = new BCheckBox("chkBoxLoopSounds",
-		"Loop sounds by default", new BMessage(M_SETTINGS_CHANGED));
+		B_TRANSLATE("Loop sounds by default"),
+		new BMessage(M_SETTINGS_CHANGED));
 
 	fUseOverlaysCB = new BCheckBox("chkBoxUseOverlays",
-		"Use hardware video overlays if available",
+		B_TRANSLATE("Use hardware video overlays if available"),
 		new BMessage(M_SETTINGS_CHANGED));
 	fScaleBilinearCB = new BCheckBox("chkBoxScaleBilinear",
-		"Scale movies smoothly (non-overlay mode)",
+		B_TRANSLATE("Scale movies smoothly (non-overlay mode)"),
 		new BMessage(M_SETTINGS_CHANGED));
 
 	fScaleFullscreenControlsCB = new BCheckBox("chkBoxScaleControls",
-		"Scale controls in full-screen mode",
+		B_TRANSLATE("Scale controls in full-screen mode"),
 		new BMessage(M_SETTINGS_CHANGED));
 
 	fSubtitleSizeOP = new BOptionPopUp("subtitleSize",
-		"Subtitle size", new BMessage(M_SETTINGS_CHANGED));
-	fSubtitleSizeOP->AddOption("Small", mpSettings::SUBTITLE_SIZE_SMALL);
-	fSubtitleSizeOP->AddOption("Medium", mpSettings::SUBTITLE_SIZE_MEDIUM);
-	fSubtitleSizeOP->AddOption("Large", mpSettings::SUBTITLE_SIZE_LARGE);
+		B_TRANSLATE("Subtitle size"), new BMessage(M_SETTINGS_CHANGED));
+	fSubtitleSizeOP->AddOption(
+		B_TRANSLATE("Small"), mpSettings::SUBTITLE_SIZE_SMALL);
+	fSubtitleSizeOP->AddOption(
+		B_TRANSLATE("Medium"), mpSettings::SUBTITLE_SIZE_MEDIUM);
+	fSubtitleSizeOP->AddOption(
+		B_TRANSLATE("Large"), mpSettings::SUBTITLE_SIZE_LARGE);
 
 	fSubtitlePlacementOP = new BOptionPopUp("subtitlePlacement",
-		"Subtitle placement", new BMessage(M_SETTINGS_CHANGED));
-	fSubtitlePlacementOP->AddOption("Bottom of video",
+		B_TRANSLATE("Subtitle placement"), new BMessage(M_SETTINGS_CHANGED));
+	fSubtitlePlacementOP->AddOption(B_TRANSLATE("Bottom of video"),
 		mpSettings::SUBTITLE_PLACEMENT_BOTTOM_OF_VIDEO);
-	fSubtitlePlacementOP->AddOption("Bottom of screen",
+	fSubtitlePlacementOP->AddOption(B_TRANSLATE("Bottom of screen"),
 		mpSettings::SUBTITLE_PLACEMENT_BOTTOM_OF_SCREEN);
 
 	fFullVolumeBGMoviesRB = new BRadioButton("rdbtnfullvolume",
-		"Full volume", new BMessage(M_SETTINGS_CHANGED));
+		B_TRANSLATE("Full volume"), new BMessage(M_SETTINGS_CHANGED));
 	
 	fHalfVolumeBGMoviesRB = new BRadioButton("rdbtnhalfvolume", 
-		"Low volume", new BMessage(M_SETTINGS_CHANGED));
+		B_TRANSLATE("Low volume"), new BMessage(M_SETTINGS_CHANGED));
 	
 	fMutedVolumeBGMoviesRB = new BRadioButton("rdbtnfullvolume",
-		"Muted", new BMessage(M_SETTINGS_CHANGED));
+		B_TRANSLATE("Muted"), new BMessage(M_SETTINGS_CHANGED));
 
-	fRevertB = new BButton("revert", "Revert", 
+	fRevertB = new BButton("revert", B_TRANSLATE("Revert"), 
 		new BMessage(M_SETTINGS_REVERT));
 
-	BButton* cancelButton = new BButton("cancel", "Cancel", 
+	BButton* cancelButton = new BButton("cancel", B_TRANSLATE("Cancel"), 
 		new BMessage(M_SETTINGS_CANCEL));
 
-	BButton* okButton = new BButton("ok", "OK",
+	BButton* okButton = new BButton("ok", B_TRANSLATE("OK"),
 		new BMessage(M_SETTINGS_SAVE));
 	okButton->MakeDefault(true);
 

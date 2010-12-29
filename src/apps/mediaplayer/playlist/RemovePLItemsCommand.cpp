@@ -10,8 +10,14 @@
 
 #include <Alert.h>
 #include <Autolock.h>
+#include <Catalog.h>
+#include <Locale.h>
 
 #include "Playlist.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "MediaPlayer-RemovePLItemsCmd"
 
 
 using std::nothrow;
@@ -106,13 +112,14 @@ RemovePLItemsCommand::Perform()
 			fMoveErrorShown = true;
 			BString message;
 			if (errorOnAllFiles)
-				message << "All ";
+				message << 
+					B_TRANSLATE("All files could not be moved into Trash.");
 			else
-				message << "Some ";
-			message << "files could not be moved into Trash.\n\n";
-			message << "Error: " << strerror(moveError);
-			(new BAlert("Move Into Trash Error", message.String(),
-				"OK", NULL, NULL, B_WIDTH_AS_USUAL,
+				message << 
+					B_TRANSLATE("Some files could not be moved into Trash.");
+			message << "\n\n" << B_TRANSLATE("Error: ") << strerror(moveError);
+			(new BAlert(B_TRANSLATE("Move Into Trash Error"), message.String(),
+				B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL,
 				B_WARNING_ALERT))->Go(NULL);
 		}
 	}
@@ -159,11 +166,17 @@ RemovePLItemsCommand::Undo()
 void
 RemovePLItemsCommand::GetName(BString& name)
 {
-	if (fCount > 1)
-		name << "Remove Entries";
+	if (fMoveFilesToTrash) {
+		if (fCount > 1)
+			name << B_TRANSLATE("Remove Entries into Trash");
+		else
+			name << B_TRANSLATE("Remove Entry into Trash");
+	}
 	else
-		name << "Remove Entry";
-
-	if (fMoveFilesToTrash)
-		name << " into Trash";
+	{	
+		if (fCount > 1)
+			name << B_TRANSLATE("Remove Entries");
+		else
+			name << B_TRANSLATE("Remove Entry");
+	}
 }

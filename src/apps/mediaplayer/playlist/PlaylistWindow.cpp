@@ -15,25 +15,31 @@
 #include <Alert.h>
 #include <Application.h>
 #include <Autolock.h>
+#include <Box.h>
+#include <Button.h>
+#include <Catalog.h>
 #include <Entry.h>
 #include <File.h>
-#include <Roster.h>
-#include <Path.h>
+#include <FilePanel.h>
+#include <Locale.h>
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
 #include <NodeInfo.h>
+#include <Path.h>
+#include <Roster.h>
 #include <ScrollBar.h>
 #include <ScrollView.h>
 #include <String.h>
-#include <Box.h>
-#include <Button.h>
-#include <FilePanel.h>
 
 #include "CommandStack.h"
 #include "MainApp.h"
 #include "PlaylistListView.h"
 #include "RWLocker.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "MediaPlayer-PlaylistWindow"
 
 
 // TODO:
@@ -64,8 +70,8 @@ enum {
 static void
 display_save_alert(const char* message)
 {
-	BAlert* alert = new BAlert("Save error", message, "OK", NULL, NULL,
-		B_WIDTH_AS_USUAL, B_STOP_ALERT);
+	BAlert* alert = new BAlert(B_TRANSLATE("Save error"), message, 
+		B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 	alert->Go(NULL);
 }
 
@@ -73,7 +79,7 @@ display_save_alert(const char* message)
 static void
 display_save_alert(status_t error)
 {
-	BString errorMessage("Saving the playlist failed.\n\nError: ");
+	BString errorMessage(B_TRANSLATE("Saving the playlist failed.\n\nError: "));
 	errorMessage << strerror(error);
 	display_save_alert(errorMessage.String());
 }
@@ -85,8 +91,8 @@ display_save_alert(status_t error)
 PlaylistWindow::PlaylistWindow(BRect frame, Playlist* playlist,
 		Controller* controller)
 	:
-	BWindow(frame, "Playlist", B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
-		B_ASYNCHRONOUS_CONTROLS),
+	BWindow(frame, B_TRANSLATE("Playlist"), B_DOCUMENT_WINDOW_LOOK,
+		B_NORMAL_WINDOW_FEEL, B_ASYNCHRONOUS_CONTROLS),
 	fPlaylist(playlist),
 	fLocker(new RWLocker("command stack lock")),
 	fCommandStack(new CommandStack(fLocker)),
@@ -188,8 +194,8 @@ PlaylistWindow::MessageReceived(BMessage* message)
 			BMessage appMessage(M_SHOW_OPEN_PANEL);
 			appMessage.AddMessenger("target", target);
 			appMessage.AddMessage("message", &result);
-			appMessage.AddString("title", "Open Playlist");
-			appMessage.AddString("label", "Open");
+			appMessage.AddString("title", B_TRANSLATE("Open Playlist"));
+			appMessage.AddString("label", B_TRANSLATE("Open"));
 			be_app->PostMessage(&appMessage);
 			break;
 		}
@@ -207,8 +213,8 @@ PlaylistWindow::MessageReceived(BMessage* message)
 			BMessage appMessage(M_SHOW_SAVE_PANEL);
 			appMessage.AddMessenger("target", target);
 			appMessage.AddMessage("message", &result);
-			appMessage.AddString("title", "Save Playlist");
-			appMessage.AddString("label", "Save");
+			appMessage.AddString("title", B_TRANSLATE("Save Playlist"));
+			appMessage.AddString("label", B_TRANSLATE("Save"));
 			be_app->PostMessage(&appMessage);
 			break;
 		}
@@ -250,34 +256,35 @@ PlaylistWindow::_CreateMenu(BRect& frame)
 {
 	frame.bottom = 15;
 	BMenuBar* menuBar = new BMenuBar(frame, "main menu");
-	BMenu* fileMenu = new BMenu("Playlist");
+	BMenu* fileMenu = new BMenu(B_TRANSLATE("Playlist"));
 	menuBar->AddItem(fileMenu);
-	fileMenu->AddItem(new BMenuItem("Open"B_UTF8_ELLIPSIS,
+	fileMenu->AddItem(new BMenuItem(B_TRANSLATE("Open"B_UTF8_ELLIPSIS),
 		new BMessage(M_PLAYLIST_OPEN), 'O'));
-	fileMenu->AddItem(new BMenuItem("Save as"B_UTF8_ELLIPSIS,
+	fileMenu->AddItem(new BMenuItem(B_TRANSLATE("Save as"B_UTF8_ELLIPSIS),
 		new BMessage(M_PLAYLIST_SAVE_AS), 'S', B_SHIFT_KEY));
 //	fileMenu->AddItem(new BMenuItem("Save",
 //		new BMessage(M_PLAYLIST_SAVE), 'S'));
 
 	fileMenu->AddSeparatorItem();
 
-	fileMenu->AddItem(new BMenuItem("Close",
+	fileMenu->AddItem(new BMenuItem(B_TRANSLATE("Close"),
 		new BMessage(B_QUIT_REQUESTED), 'W'));
 
-	BMenu* editMenu = new BMenu("Edit");
-	fUndoMI = new BMenuItem("Undo", new BMessage(B_UNDO), 'Z');
+	BMenu* editMenu = new BMenu(B_TRANSLATE("Edit"));
+	fUndoMI = new BMenuItem(B_TRANSLATE("Undo"), new BMessage(B_UNDO), 'Z');
 	editMenu->AddItem(fUndoMI);
-	fRedoMI = new BMenuItem("Redo", new BMessage(B_REDO), 'Z', B_SHIFT_KEY);
+	fRedoMI = new BMenuItem(B_TRANSLATE("Redo"), new BMessage(B_REDO), 'Z', 
+		B_SHIFT_KEY);
 	editMenu->AddItem(fRedoMI);
 	editMenu->AddSeparatorItem();
-	editMenu->AddItem(new BMenuItem("Randomize",
+	editMenu->AddItem(new BMenuItem(B_TRANSLATE("Randomize"),
 		new BMessage(M_PLAYLIST_RANDOMIZE), 'R'));
 	editMenu->AddSeparatorItem();
-	editMenu->AddItem(new BMenuItem("Remove (Del)",
+	editMenu->AddItem(new BMenuItem(B_TRANSLATE("Remove (Del)"),
 		new BMessage(M_PLAYLIST_REMOVE)/*, B_DELETE, 0*/));
-	editMenu->AddItem(new BMenuItem("Remove and put into Trash",
+	editMenu->AddItem(new BMenuItem(B_TRANSLATE("Remove and put into Trash"),
 		new BMessage(M_PLAYLIST_REMOVE_AND_PUT_INTO_TRASH), 'T'));
-	editMenu->AddItem(new BMenuItem("Remove all",
+	editMenu->AddItem(new BMenuItem(B_TRANSLATE("Remove all"),
 		new BMessage(M_PLAYLIST_EMPTY), 'N'));
 
 	menuBar->AddItem(editMenu);
@@ -297,20 +304,20 @@ PlaylistWindow::_ObjectChanged(const Notifier* object)
 {
 	if (object == fCommandStack) {
 		// relable Undo item and update enabled status
-		BString label("Undo");
+		BString label(B_TRANSLATE("Undo"));
 		fUndoMI->SetEnabled(fCommandStack->GetUndoName(label));
 		if (fUndoMI->IsEnabled())
 			fUndoMI->SetLabel(label.String());
 		else
-			fUndoMI->SetLabel("<nothing to undo>");
+			fUndoMI->SetLabel(B_TRANSLATE("<nothing to undo>"));
 
 		// relable Redo item and update enabled status
-		label.SetTo("Redo");
+		label.SetTo(B_TRANSLATE("Redo"));
 		fRedoMI->SetEnabled(fCommandStack->GetRedoName(label));
 		if (fRedoMI->IsEnabled())
 			fRedoMI->SetLabel(label.String());
 		else
-			fRedoMI->SetLabel("<nothing to redo>");
+			fRedoMI->SetLabel(B_TRANSLATE("<nothing to redo>"));
 	}
 }
 
@@ -322,8 +329,8 @@ PlaylistWindow::_SavePlaylist(const BMessage* message)
 	const char* name;
 	if (message->FindRef("directory", &ref) != B_OK
 		|| message->FindString("name", &name) != B_OK) {
-		display_save_alert("Internal error (malformed message). "
-			"Saving the playlist failed.");
+		display_save_alert(B_TRANSLATE("Internal error (malformed message). "
+			"Saving the playlist failed."));
 		return;
 	}
 
@@ -335,16 +342,16 @@ PlaylistWindow::_SavePlaylist(const BMessage* message)
 	if (origPath.InitCheck() != B_OK || tempPath.InitCheck() != B_OK
 		|| origPath.Append(name) != B_OK
 		|| tempPath.Append(tempName.String()) != B_OK) {
-		display_save_alert("Internal error (out of memory). "
-			"Saving the playlist failed.");
+		display_save_alert(B_TRANSLATE("Internal error (out of memory). "
+			"Saving the playlist failed."));
 		return;
 	}
 
 	BEntry origEntry(origPath.Path());
 	BEntry tempEntry(tempPath.Path());
 	if (origEntry.InitCheck() != B_OK || tempEntry.InitCheck() != B_OK) {
-		display_save_alert("Internal error (out of memory). "
-			"Saving the playlist failed.");
+		display_save_alert(B_TRANSLATE("Internal error (out of memory). "
+			"Saving the playlist failed."));
 		return;
 	}
 
@@ -392,7 +399,8 @@ PlaylistWindow::_SavePlaylist(BEntry& origEntry, BEntry& tempEntry,
 
 	BFile file(&tempEntry, B_CREATE_FILE | B_ERASE_FILE | B_WRITE_ONLY);
 	if (file.InitCheck() != B_OK) {
-		BString errorMessage("Saving the playlist failed:\n\nError: ");
+		BString errorMessage(B_TRANSLATE(
+			"Saving the playlist failed:\n\nError: "));
 		errorMessage << strerror(file.InitCheck());
 		display_save_alert(errorMessage.String());
 		return;
@@ -400,8 +408,8 @@ PlaylistWindow::_SavePlaylist(BEntry& origEntry, BEntry& tempEntry,
 
 	AutoLocker<Playlist> lock(fPlaylist);
 	if (!lock.IsLocked()) {
-		display_save_alert("Internal error (locking failed). "
-			"Saving the playlist failed.");
+		display_save_alert(B_TRANSLATE("Internal error (locking failed). "
+			"Saving the playlist failed."));
 		return;
 	}
 

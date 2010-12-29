@@ -7,6 +7,13 @@
 
 #include <stdio.h>
 
+#include <Catalog.h>
+#include <Locale.h>
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "MediaPlayer-PlaylistItem"
+
 
 PlaylistItem::Listener::Listener()
 {
@@ -55,7 +62,7 @@ PlaylistItem::Name() const
 {
 	BString name;
 	if (GetAttribute(ATTR_STRING_NAME, name) != B_OK)
-		name = "<unnamed>";
+		name = B_TRANSLATE_WITH_CONTEXT("<unnamed>", "PlaylistItem-name");
 	return name;
 }
 
@@ -65,7 +72,7 @@ PlaylistItem::Author() const
 {
 	BString author;
 	if (GetAttribute(ATTR_STRING_AUTHOR, author) != B_OK)
-		author = "<unknown>";
+		author = B_TRANSLATE_WITH_CONTEXT("<unknown>", "PlaylistItem-author");
 	return author;
 }
 
@@ -75,7 +82,7 @@ PlaylistItem::Album() const
 {
 	BString album;
 	if (GetAttribute(ATTR_STRING_ALBUM, album) != B_OK)
-		album = "<unknown>";
+		album = B_TRANSLATE_WITH_CONTEXT("<unknown>", "PlaylistItem-album");
 	return album;
 }
 
@@ -85,7 +92,7 @@ PlaylistItem::Title() const
 {
 	BString title;
 	if (GetAttribute(ATTR_STRING_TITLE, title) != B_OK)
-		title = "<untitled>";
+		title = B_TRANSLATE_WITH_CONTEXT("<untitled>", "PlaylistItem-title");
 	return title;
 }
 
