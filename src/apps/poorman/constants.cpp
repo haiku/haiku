@@ -1,6 +1,13 @@
 #include "constants.h"
 
+#include <Catalog.h>
 #include <InterfaceDefs.h>
+#include <Locale.h>
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "PoorMan"
+
 
 // ------------------------------------------------------
 // PoorMan Window
@@ -9,108 +16,111 @@ const char* STR_APP_SIG
 char* STR_APP_NAME
 	= (char*)"PoorMan";
 const char* STR_ERR_WEB_DIR
-	= "Please choose the folder to publish on the web.\n\n"
+	= B_TRANSLATE(
+	  "Please choose the folder to publish on the web.\n\n"
 	  "You can have PoorMan create a default \"public_html\" "
 	  "in your home folder.\n"
-	  "Or you select one of your own folders instead.";
+	  "Or you select one of your own folders instead.");
 const char* STR_ERR_CANT_START
-	= "Cannot start the server";
+	= B_TRANSLATE(
+	  "Cannot start the server");
 const char* STR_DIR_CREATED
-	= "A default web folder has been created "
+	= B_TRANSLATE(
+	  "A default web folder has been created "
 	  "at \"/boot/home/public_html.\"\nMake sure there is a HTML "
-	  "file named \"index.html\" in that folder.";
+	  "file named \"index.html\" in that folder.");
 
 const char* STR_MNU_FILE
-	= "File";
+	= B_TRANSLATE("File");
 const char* STR_MNU_FILE_SAVE_AS
-	= "Save console as" B_UTF8_ELLIPSIS;
+	= B_TRANSLATE("Save console as" B_UTF8_ELLIPSIS);
 const char* STR_MNU_FILE_SAVE_SELECTION
-	= "Save console selections as" B_UTF8_ELLIPSIS;
+	= B_TRANSLATE("Save console selections as" B_UTF8_ELLIPSIS);
 const char* STR_MNU_FILE_ABOUT
-	= "About PoorMan" B_UTF8_ELLIPSIS;
+	= B_TRANSLATE("About PoorMan" B_UTF8_ELLIPSIS);
 const char* STR_MNU_FILE_QUIT
-	= "Quit";
+	= B_TRANSLATE("Quit");
 const char* STR_MNU_EDIT
-	= "Edit";
+	= B_TRANSLATE("Edit");
 const char* STR_MNU_EDIT_COPY
-	= "Copy";
+	= B_TRANSLATE("Copy");
 const char* STR_MNU_EDIT_SELECT_ALL
-	= "Select all";
+	= B_TRANSLATE("Select all");
 const char* STR_MNU_EDIT_PREF
-	= "Settings" B_UTF8_ELLIPSIS;
+	= B_TRANSLATE("Settings" B_UTF8_ELLIPSIS);
 const char* STR_MNU_CTRL
-	= "Controls";
+	= B_TRANSLATE("Controls");
 const char* STR_MNU_CTRL_RUN_SERVER
-	= "Run server";
+	= B_TRANSLATE("Run server");
 const char* STR_MNU_CTRL_CLEAR_HIT_COUNTER
-	= "Clear hit counter";
+	= B_TRANSLATE("Clear hit counter");
 const char* STR_MNU_CTRL_CLEAR_CONSOLE
-	= "Clear console log";
+	= B_TRANSLATE("Clear console log");
 const char* STR_MNU_CTRL_CLEAR_LOG_FILE
-	= "Clear log file";
+	= B_TRANSLATE("Clear log file");
 
 const char* STR_FILEPANEL_SAVE_CONSOLE
-	= "Save log console";
+	= B_TRANSLATE("Save log console");
 const char* STR_FILEPANEL_SAVE_CONSOLE_SELECTION
-	= "Save log console selection";
+	= B_TRANSLATE("Save log console selection");
 const char* STR_TXT_VIEW
-	= "Logging view";
+	= B_TRANSLATE("Logging view");
 
 // ------------------------------------------------------
 // Preferences Window
 char* STR_WIN_NAME_PREF
-	= (char*)"PoorMan settings";
+	= (char*)B_TRANSLATE("PoorMan settings");
 
 const char* STR_SETTINGS_FILE_NAME
-	= "PoorMan settings";
+	= B_TRANSLATE("PoorMan settings");
 const char* STR_SETTINGS_NEW_FILE_NAME
-	= "OBOS PoorMan settings";
+	= B_TRANSLATE("OBOS PoorMan settings");
 const char* STR_DEFAULT_WEB_DIRECTORY
 	= "/boot/home/public_html";
 const char* STR_TAB_SITE
-	= "Site";
+	= B_TRANSLATE("Site");
 const char* STR_BBX_LOCATION
-	= "Website location";
+	= B_TRANSLATE("Website location");
 const char* STR_TXT_DIRECTORY
-	= "Web folder:";
+	= B_TRANSLATE("Web folder:");
 const char* STR_BTN_DIRECTORY
-	= "Select web folder";
+	= B_TRANSLATE("Select web folder");
 const char* STR_TXT_INDEX
-	= "Start page:";
+	= B_TRANSLATE("Start page:");
 const char* STR_BBX_OPTIONS
-	= "Website options";
+	= B_TRANSLATE("Website options");
 const char* STR_CBX_DIR_LIST
-	= "Send file listing if there's no start page";
+	= B_TRANSLATE("Send file listing if there's no start page");
 const char* STR_CBX_DIR_LIST_LABEL
-	= "Send file listing if there's no start page";
+	= B_TRANSLATE("Send file listing if there's no start page");
 const char* STR_FILEPANEL_SELECT_WEB_DIR
-	= "Select web folder";
+	= B_TRANSLATE("Select web folder");
 
 const char* STR_TAB_LOGGING
-	= "Logging";
+	= B_TRANSLATE("Logging");
 const char* STR_BBX_CONSOLE_LOGGING
-	= "Console logging";
+	= B_TRANSLATE("Console logging");
 const char* STR_CBX_LOG_CONSOLE
-	= "Log to console";
+	= B_TRANSLATE("Log to console");
 const char* STR_BBX_FILE_LOGGING
-	= "File logging";
+	= B_TRANSLATE("File logging");
 const char* STR_CBX_LOG_FILE
-	= "Log to file";
+	= B_TRANSLATE("Log to file");
 const char* STR_TXT_LOG_FILE_NAME
-	= "Log file name:";
+	= B_TRANSLATE("Log file name:");
 const char* STR_BTN_CREATE_LOG_FILE
-	= "Create log file";
+	= B_TRANSLATE("Create log file");
 const char* STR_FILEPANEL_CREATE_LOG_FILE
-	= "Create PoorMan log";
+	= B_TRANSLATE("Create PoorMan log");
 
 const char* STR_TAB_ADVANCED
-	= "Advanced";
+	= B_TRANSLATE("Advanced");
 const char* STR_BBX_CONNECTION
-	= "Connections";
+	= B_TRANSLATE("Connections");
 const char* STR_SLD_LABEL
-	= "Max. simultaneous connections:";
+	= B_TRANSLATE("Max. simultaneous connections:");
 char* STR_SLD_STATUS_LABEL
-	= (char*)"connections";
+	= (char*)B_TRANSLATE("connections");
 
 const char CMD_FILE_SAVE_AS
 	= 'S';
@@ -122,14 +132,15 @@ const char CMD_EDIT_SELECT_ALL
 	= 'A';
 
 const char* STR_ABOUT_TITLE
-	= "About PoorMan";
+	= B_TRANSLATE("About PoorMan");
 const char* STR_ABOUT_BUTTON
-	= "OK";
+	= B_TRANSLATE("OK");
 const char* STR_ABOUT_DESC
-	= "Poor Man's web server\n"
+	= B_TRANSLATE(
+	"Poor Man's web server\n"
 	"Copyright " B_UTF8_COPYRIGHT " 2004-2009 Haiku\n"
 	"All rights reserved.\n\n"
-	"Written by: Philip Harrison, Ma Jie";
+	"Written by: Philip Harrison, Ma Jie");
 
 // --------------------------------
 const rgb_color WHITE				= { 255, 255, 255, 255 };

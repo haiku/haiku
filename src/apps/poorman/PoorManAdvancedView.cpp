@@ -6,11 +6,18 @@
  */
 
 #include <Box.h>
+#include <Catalog.h>
+#include <Locale.h>
 
 #include "constants.h"
 #include "PoorManAdvancedView.h"
 #include "PoorManWindow.h"
 #include "PoorManApplication.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "PoorMan"
+
 
 PoorManAdvancedView::PoorManAdvancedView(BRect rect, const char *name)
 	: BView(rect, name, B_FOLLOW_ALL, B_WILL_DRAW)
@@ -28,7 +35,7 @@ PoorManAdvancedView::PoorManAdvancedView(BRect rect, const char *name)
 	maxRect.right -= 7.0;
 	maxRect.bottom -= 118.0;
 
-	BBox * connectionOptions = new BBox(maxRect, "Connections");
+	BBox * connectionOptions = new BBox(maxRect, B_TRANSLATE("Connections"));
 	connectionOptions->SetLabel(STR_BBX_CONNECTION);
 	AddChild(connectionOptions);
 

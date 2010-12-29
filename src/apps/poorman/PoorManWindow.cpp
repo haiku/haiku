@@ -13,18 +13,20 @@
 
 #include <Alert.h>
 #include <Box.h>
+#include <Catalog.h>
 #include <Directory.h>
 #include <File.h>
 #include <FindDirectory.h>
+#include <Locale.h>
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
+#include <OS.h>
 #include <Path.h>
 #include <ScrollBar.h>
 #include <ScrollView.h>
 #include <StringView.h>
 #include <TypeConstants.h>
-#include <OS.h>
 
 #include "PoorManApplication.h"
 #include "PoorManPreferencesWindow.h"
@@ -32,6 +34,12 @@
 #include "PoorManServer.h"
 #include "PoorManLogger.h"
 #include "constants.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "PoorMan"
+#define DATE_FORMAT B_SHORT_DATE_FORMAT
+#define TIME_FORMAT B_MEDIUM_TIME_FORMAT
 
 
 PoorManWindow::PoorManWindow(BRect frame)
@@ -96,7 +104,8 @@ PoorManWindow::PoorManWindow(BRect frame)
 	statusRect.bottom = statusRect.top + 15;
 	statusRect.right = statusRect.left + 100;	// make the width wide enough for the string to display
 		
-	statusView = new BStringView(statusRect, "Status View", "Status: Stopped");
+	statusView = new BStringView(statusRect, "Status View", 
+		B_TRANSLATE("Status: Stopped"));
 	bb->AddChild(statusView);
 	
 	// Directory String
@@ -107,7 +116,8 @@ PoorManWindow::PoorManWindow(BRect frame)
 	dirRect.left = statusRect.left;
 	dirRect.right -= 5;
 	
-	dirView = new BStringView(dirRect, "Dir View", "Directory: (none)", B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
+	dirView = new BStringView(dirRect, "Dir View", 
+		B_TRANSLATE("Directory: (none)"), B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 	bb->AddChild(dirView);
 	
 	// Hits String
@@ -118,7 +128,8 @@ PoorManWindow::PoorManWindow(BRect frame)
 	hitsRect.bottom = statusRect.bottom;
 	hitsRect.left = statusRect.right + 20;
 	
-	hitsView = new BStringView(hitsRect, "Hit View", "Hits: 0", B_FOLLOW_RIGHT | B_FOLLOW_TOP);
+	hitsView = new BStringView(hitsRect, "Hit View", B_TRANSLATE("Hits: 0"), 
+		B_FOLLOW_RIGHT | B_FOLLOW_TOP);
 	hitsView->SetAlignment(B_ALIGN_RIGHT);
 	bb->AddChild(hitsView);
 
@@ -298,9 +309,9 @@ PoorManWindow::MessageReceived(BMessage* message)
 			color = *static_cast<const rgb_color*>(pointer);
 		
 		if (time != -1) {
-			char timeString[26];
-			if (ctime_r(&time, timeString) != NULL) {
-				timeString[24] = '\0';
+			BString timeString;
+			if (BLocale::Default()->FormatDateTime(&timeString, time, 
+					DATE_FORMAT, TIME_FORMAT) == B_OK) {
 				line << '[' << timeString << "]: ";
 			}
 		}
@@ -376,21 +387,23 @@ PoorManWindow::QuitRequested()
 {
 	if (status) {
 		time_t now = time(NULL);
-		char line[] = "[Thu Jan  1 00:00:00 1970]: Shutting down.\n";
+		BString timeString;
+		BLocale::Default()->FormatDateTime(&timeString, now, 
+			DATE_FORMAT, TIME_FORMAT);
 		
-		ctime_r(&now, line + 1);
-		line[25] = ']';
-		line[26] = ' ';
+		BString line;
+		line << "[" << timeString << "]: " << B_TRANSLATE("Shutting down.") 
+			<< "\n";
 		
 		if (log_console_flag) {
 				loggingView->Insert(loggingView->TextLength(),
-					line, strlen(line));
+					line, line.Length());
 				loggingView->ScrollToOffset(loggingView->TextLength());
 		}
 		
 		if (log_file_flag) {
 			if (pthread_rwlock_rdlock(&fLogFileLock) == 0) {
-					fLogFile->Write(line, strlen(line));
+					fLogFile->Write(line, line.Length());
 					pthread_rwlock_unlock(&fLogFileLock);
 			}
 		}
@@ -521,7 +534,7 @@ PoorManWindow::BuildControlsMenu() const
 void 
 PoorManWindow::SetDirLabel(const char * name)
 {
-	BString dirPath("Directory: ");
+	BString dirPath(B_TRANSLATE("Directory: "));
 	dirPath.Append(name);
 	
 	if (Lock()) {
@@ -536,9 +549,9 @@ PoorManWindow::UpdateStatusLabelAndMenuItem()
 {
 	if (Lock()) {
 		if (status)
-			statusView->SetText("Status: Running");
+			statusView->SetText(B_TRANSLATE("Status: Running"));
 		else
-			statusView->SetText("Status: Stopped");
+			statusView->SetText(B_TRANSLATE("Status: Stopped"));
 		ControlsMenu->FindItem(STR_MNU_CTRL_RUN_SERVER)->SetMarked(status);
 		Unlock();
 	}
@@ -549,7 +562,7 @@ void
 PoorManWindow::UpdateHitsLabel()
 {
 	if (Lock()) {
-		sprintf(hitsLabel, "Hits: %lu", GetHits());
+		sprintf(hitsLabel, B_TRANSLATE("Hits: %lu"), GetHits());
 		hitsView->SetText(hitsLabel);
 		
 		Unlock();
@@ -607,9 +620,11 @@ PoorManWindow::SaveConsole(BMessage * message, bool selection)
 void
 PoorManWindow::DefaultSettings()
 {
-	BAlert* serverAlert = new BAlert("Error Server", STR_ERR_CANT_START, "OK");
-	BAlert* dirAlert = new BAlert("Error Dir", STR_ERR_WEB_DIR, 
-		"Cancel", "Select", "Default", B_WIDTH_AS_USUAL, B_OFFSET_SPACING);
+	BAlert* serverAlert = new BAlert(B_TRANSLATE("Error Server"), 
+		STR_ERR_CANT_START, B_TRANSLATE("OK"));
+	BAlert* dirAlert = new BAlert(B_TRANSLATE("Error Dir"), 
+		STR_ERR_WEB_DIR, B_TRANSLATE("Cancel"), B_TRANSLATE("Select"), 
+		B_TRANSLATE("Default"), B_WIDTH_AS_USUAL, B_OFFSET_SPACING);
 	dirAlert->SetShortcut(0, B_ESCAPE);
 	int32 buttonIndex = dirAlert->Go();
 
@@ -636,7 +651,8 @@ PoorManWindow::DefaultSettings()
 				break;
 			}
 			BAlert* dirCreatedAlert =
-				new BAlert("Dir Created", STR_DIR_CREATED, "OK");
+				new BAlert(B_TRANSLATE("Dir Created"), STR_DIR_CREATED, 
+					B_TRANSLATE("OK"));
 			dirCreatedAlert->Go();
 			SetWebDir(STR_DEFAULT_WEB_DIRECTORY);	
 			be_app->PostMessage(kStartServer);
@@ -767,14 +783,14 @@ PoorManWindow::StartServer()
 			dir_list_flag,
 			index_file_name.String());
 	
-	poorman_log("Starting up... ");
+	poorman_log(B_TRANSLATE("Starting up... "));
 	if (fServer->Run() != B_OK) {
 		return B_ERROR;
 	}
 
 	status = true;
 	UpdateStatusLabelAndMenuItem();
-	poorman_log("done.\n", false, INADDR_NONE, GREEN);
+	poorman_log(B_TRANSLATE("done.\n"), false, INADDR_NONE, GREEN);
 	
 	return B_OK;
 }
@@ -786,7 +802,7 @@ PoorManWindow::StopServer()
 	if (fServer == NULL)
 		return B_ERROR;
 	
-	poorman_log("Shutting down.\n");
+	poorman_log(B_TRANSLATE("Shutting down.\n"));
 	fServer->Stop();
 	status = false;
 	UpdateStatusLabelAndMenuItem();

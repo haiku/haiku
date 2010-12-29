@@ -5,16 +5,23 @@
  *	Version: 0.1
  */
 
-#include <Window.h>
 #include <Box.h>
-#include <Directory.h>
+#include <Catalog.h>
 #include <Debug.h>
+#include <Directory.h>
+#include <Locale.h>
+#include <Window.h>
 
 #include "constants.h"
 #include "PoorManWindow.h"
 #include "PoorManApplication.h"
 #include "PoorManPreferencesWindow.h"
 #include "PoorManServer.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "PoorMan"
+
 
 PoorManPreferencesWindow::PoorManPreferencesWindow(BRect frame, char * name)
 	: BWindow(frame, name, B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_NOT_RESIZABLE
@@ -43,20 +50,20 @@ PoorManPreferencesWindow::PoorManPreferencesWindow(BRect frame, char * name)
 	float buttonTop = 0.0f;
 	float buttonHeight = 26.0f;
 
-	float widthCancel = prefView->StringWidth("Cancel") + 24.0f;
-	float widthDone = prefView->StringWidth("Done") + 24.0f;
+	float widthCancel = prefView->StringWidth(B_TRANSLATE("Cancel")) + 24.0f;
+	float widthDone = prefView->StringWidth(B_TRANSLATE("Done")) + 24.0f;
 
 	float gap = 5.0f;
 
 	BRect button1(prefView->Bounds().Width() - 2 * gap - widthCancel
 		- widthDone, buttonTop, prefView->Bounds().Width() - 2 * gap - widthDone, 
 		buttonTop + buttonHeight);
-	cancelButton = new BButton(button1, "Cancel Button", "Cancel", 
+	cancelButton = new BButton(button1, "Cancel Button", B_TRANSLATE("Cancel"), 
 		new BMessage(MSG_PREF_BTN_CANCEL));
 
 	BRect button2(prefView->Bounds().Width() - gap - widthDone, buttonTop, 
 		prefView->Bounds().Width() - gap, buttonTop + buttonHeight);
-	doneButton = new BButton(button2, "Done Button", "Done", 
+	doneButton = new BButton(button2, "Done Button", B_TRANSLATE("Done"), 
 		new BMessage(MSG_PREF_BTN_DONE));
 
 	buttonView->AddChild(cancelButton);
@@ -105,14 +112,14 @@ PoorManPreferencesWindow::PoorManPreferencesWindow(BRect frame, char * name)
 		B_DIRECTORY_NODE, false, &message, NULL, true);
 
 	webDirFilePanel->SetPanelDirectory(new BDirectory("/boot/home/public_html"));
-	webDirFilePanel->SetButtonLabel(B_DEFAULT_BUTTON, "Select");
+	webDirFilePanel->SetButtonLabel(B_DEFAULT_BUTTON, B_TRANSLATE("Select"));
 	change_title = webDirFilePanel->Window();
 	change_title->SetTitle(STR_FILEPANEL_SELECT_WEB_DIR);
 
 	message.what = MSG_FILE_PANEL_CREATE_LOG_FILE;
 	logFilePanel = new BFilePanel(B_SAVE_PANEL, &messenger, NULL,
 		B_FILE_NODE, false, &message);
-	logFilePanel->SetButtonLabel(B_DEFAULT_BUTTON, "Create");
+	logFilePanel->SetButtonLabel(B_DEFAULT_BUTTON, B_TRANSLATE("Create"));
 	change_title = logFilePanel->Window();
 	change_title->SetTitle(STR_FILEPANEL_CREATE_LOG_FILE);
 }
