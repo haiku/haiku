@@ -5,12 +5,16 @@
 #include "MediaFileInfoView.h"
 
 #include <Alert.h>
+#include <Catalog.h>
 #include <ControlLook.h>
+#include <Locale.h>
 #include <MediaFile.h>
 #include <MediaTrack.h>
 #include <String.h>
 
-#include "Strings.h"
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "MediaConverter-FileInfo"
 
 
 const float kSpacing = 5.0f;
@@ -44,7 +48,7 @@ MediaFileInfoView::Draw(BRect /*update*/)
 	BPoint labelStart(kSpacing, fh.ascent + fh.leading + 1);
 
 	if (fMediaFile == NULL) {
-		DrawString(NO_FILE_LABEL, labelStart);
+		DrawString(B_TRANSLATE("No file selected"), labelStart);
 		return;
 	}
 
@@ -54,13 +58,13 @@ MediaFileInfoView::Draw(BRect /*update*/)
 	BPoint infoStart(labelStart.x + fMaxLabelWidth + kSpacing, labelStart.y);
 	
 	// draw labels
-	DrawString(AUDIO_INFO_LABEL, labelStart);
+	DrawString(B_TRANSLATE("Audio:"), labelStart);
 	labelStart.y += fLineHeight * 2;
 
-	DrawString(VIDEO_INFO_LABEL, labelStart);
+	DrawString(B_TRANSLATE("Video:"), labelStart);
 	labelStart.y += fLineHeight * 2;
 
-	DrawString(DURATION_LABEL, labelStart);
+	DrawString(B_TRANSLATE("Duration:"), labelStart);
 	labelStart.y += fLineHeight * 2;
 
 	// draw audio/video/duration info
@@ -125,11 +129,11 @@ MediaFileInfoView::SetFont(const BFont* font, uint32 mask)
 	bold.SetFace(B_BOLD_FACE);
 	fMaxLabelWidth = 0;
 
-	BString labels[] = {VIDEO_INFO_LABEL, DURATION_LABEL, AUDIO_INFO_LABEL};
+	BString labels[] = {B_TRANSLATE("Video:"), B_TRANSLATE("Duration:"), B_TRANSLATE("Audio:")};
 	int32 labelCount = sizeof(labels) / sizeof(BString);
 	fMaxLabelWidth = _MaxLineWidth(labels, labelCount, bold);
 
-	fNoFileLabelWidth = ceilf(bold.StringWidth(NO_FILE_LABEL));
+	fNoFileLabelWidth = ceilf(bold.StringWidth(B_TRANSLATE("No file selected")));
 	InvalidateLayout();
 }
 
@@ -155,11 +159,12 @@ MediaFileInfoView::Update(BMediaFile* file, entry_ref* ref)
 		fRef = *ref;
 		status_t ret = fInfo.LoadInfo(file);
 		if (ret != B_OK) {
-			BString error("An error has occurred reading the "
-				"file info.\n\nError : ");
+			BString error(B_TRANSLATE("An error has occurred reading the "
+				"file info.\n\nError : "));
 			error << strerror(ret);
-			BAlert* alert = new BAlert("File Error", error.String(),
-				"OK");
+			BAlert* alert = new BAlert(
+				B_TRANSLATE("File Error"), error.String(),
+				B_TRANSLATE("OK"));
 			alert->Go(NULL);
 		}
 	} else {
