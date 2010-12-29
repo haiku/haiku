@@ -13,6 +13,13 @@
 #include "RemoteHWInterface.h"
 #include "ServerFont.h"
 
+class BPoint;
+class BRect;
+class BRegion;
+
+class BitmapDrawingEngine;
+class ServerBitmap;
+
 class RemoteDrawingEngine : public DrawingEngine {
 public:
 								RemoteDrawingEngine(
@@ -99,18 +106,18 @@ public:
 									float yRadius, const BGradient& gradient);
 
 	virtual	void				DrawShape(const BRect& bounds,
-									int32 opCount, const uint32* opList, 
+									int32 opCount, const uint32* opList,
 									int32 pointCount, const BPoint* pointList,
 									bool filled,
 									const BPoint& viewToScreenOffset,
 									float viewScale);
 	virtual	void				FillShape(const BRect& bounds,
-							 		int32 opCount, const uint32* opList, 
+							 		int32 opCount, const uint32* opList,
 									int32 pointCount, const BPoint* pointList,
 									const BGradient& gradient,
 									const BPoint& viewToScreenOffset,
 									float viewScale);
-	
+
 	virtual	void				DrawTriangle(BPoint* points,
 									const BRect& bounds, bool filled);
 	virtual	void				FillTriangle(BPoint* points,
@@ -147,6 +154,11 @@ private:
 									RemoteMessage& message);
 
 			BRect				_BuildBounds(BPoint* points, int32 pointCount);
+		status_t				_ExtractBitmapRegions(ServerBitmap& bitmap,
+									uint32 options, const BRect& bitmapRect,
+									const BRect& viewRect, double xScale,
+									double yScale, BRegion& region,
+									UtilityBitmap**& bitmaps);
 
 			RemoteHWInterface*	fHWInterface;
 			uint32				fToken;
@@ -160,6 +172,8 @@ private:
 			BPoint				fDrawStringResult;
 			float				fStringWidthResult;
 			BBitmap*			fReadBitmapResult;
+
+		BitmapDrawingEngine*	fBitmapDrawingEngine;
 };
 
 #endif // REMOTE_DRAWING_ENGINE_H

@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Haiku, Inc.
+ * Copyright 2009-2010, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,6 +9,7 @@
 #include "RemoteDrawingEngine.h"
 #include "RemoteMessage.h"
 
+#include "BitmapDrawingEngine.h"
 #include "DrawState.h"
 
 #include <Bitmap.h>
@@ -24,7 +25,8 @@ RemoteDrawingEngine::RemoteDrawingEngine(RemoteHWInterface* interface)
 	fToken((uint32)this), // TODO: need to redo that for 64 bit
 	fExtendWidth(0),
 	fCallbackAdded(false),
-	fResultNotify(-1)
+	fResultNotify(-1),
+	fBitmapDrawingEngine(NULL)
 {
 	RemoteMessage message(NULL, fHWInterface->SendBuffer());
 	message.Start(RP_CREATE_STATE);
@@ -38,6 +40,8 @@ RemoteDrawingEngine::~RemoteDrawingEngine()
 	message.Start(RP_DELETE_STATE);
 	message.Add(fToken);
 	message.Flush();
+
+	delete fBitmapDrawingEngine;
 
 	if (fCallbackAdded)
 		fHWInterface->RemoveCallback(fToken);
@@ -288,47 +292,67 @@ void
 RemoteDrawingEngine::DrawBitmap(ServerBitmap* bitmap, const BRect& _bitmapRect,
 	const BRect& _viewRect, uint32 options)
 {
-	if (!fClippingRegion.Intersects(_viewRect))
-		return;
-
-	BRect viewRect = _viewRect;
 	BRect bitmapRect = _bitmapRect;
-	if (bitmapRect.IntegerWidth() == viewRect.IntegerWidth()
-		&& bitmapRect.IntegerHeight() == viewRect.IntegerHeight()) {
-		// unscaled bitmap we can chop off stuff we don't need
-		BRegion target(viewRect);
-		target.IntersectWith(&fClippingRegion);
-		BRect frame = target.Frame();
+	BRect viewRect = _viewRect;
+	double xScale = (bitmapRect.Width() + 1) / (viewRect.Width() + 1);
+	double yScale = (bitmapRect.Height() + 1) / (viewRect.Height() + 1);
 
-		if (frame != viewRect) {
-			BPoint offset = frame.LeftTop() - viewRect.LeftTop();
-			viewRect = frame;
-			bitmapRect = viewRect.OffsetToCopy(bitmapRect.LeftTop() + offset);
-		}
+	// constrain rect to passed bitmap bounds
+	// and transfer the changes to the viewRect with the right scale
+	BRect actualBitmapRect = bitmap->Bounds();
+	if (bitmapRect.left < actualBitmapRect.left) {
+		float diff = actualBitmapRect.left - bitmapRect.left;
+		viewRect.left += diff / xScale;
+		bitmapRect.left = actualBitmapRect.left;
+	}
+	if (bitmapRect.top < actualBitmapRect.top) {
+		float diff = actualBitmapRect.top - bitmapRect.top;
+		viewRect.top += diff / yScale;
+		bitmapRect.top = actualBitmapRect.top;
+	}
+	if (bitmapRect.right > actualBitmapRect.right) {
+		float diff = bitmapRect.right - actualBitmapRect.right;
+		viewRect.right -= diff / xScale;
+		bitmapRect.right = actualBitmapRect.right;
+	}
+	if (bitmapRect.bottom > actualBitmapRect.bottom) {
+		float diff = bitmapRect.bottom - actualBitmapRect.bottom;
+		viewRect.bottom -= diff / yScale;
+		bitmapRect.bottom = actualBitmapRect.bottom;
 	}
 
-	UtilityBitmap* other = NULL;
-	BRect bounds = bitmap->Bounds();
-	BRect newBounds;
-	newBounds.right
-		= min_c(bounds.IntegerWidth(), bitmapRect.IntegerWidth());
-	newBounds.bottom	
-		= min_c(bounds.IntegerHeight(), bitmapRect.IntegerHeight());
+	BRegion clippedRegion(viewRect);
+	clippedRegion.IntersectWith(&fClippingRegion);
 
-	if (newBounds.IntegerWidth() < bounds.IntegerWidth()
-		|| newBounds.IntegerHeight() < bounds.IntegerHeight()) {
+	int32 rectCount = clippedRegion.CountRects();
+	if (rectCount == 0)
+		return;
 
-		other = new(std::nothrow) UtilityBitmap(newBounds, bitmap->ColorSpace(),
-			bitmap->Flags());
-
-		if (other != NULL && other->ImportBits(bitmap->Bits(),
-				bitmap->BitsLength(), bitmap->BytesPerRow(),
-				bitmap->ColorSpace(), bitmapRect.LeftTop(), BPoint(0, 0),
-				newBounds.IntegerWidth() + 1,
-				newBounds.IntegerHeight() + 1) == B_OK) {
-			bitmapRect.OffsetTo(0, 0);
-			bitmap = other;
+	if (rectCount > 1 || (rectCount == 1 && clippedRegion.RectAt(0) != viewRect)
+		|| viewRect.Width() < bitmapRect.Width()
+		|| viewRect.Height() < bitmapRect.Height()) {
+		UtilityBitmap** bitmaps;
+		if (_ExtractBitmapRegions(*bitmap, options, bitmapRect, viewRect,
+				xScale, yScale, clippedRegion, bitmaps) != B_OK) {
+			return;
 		}
+
+		RemoteMessage message(NULL, fHWInterface->SendBuffer());
+		message.Start(RP_DRAW_BITMAP_RECTS);
+		message.Add(fToken);
+		message.Add(options);
+		message.Add(bitmap->ColorSpace());
+		message.Add(bitmap->Flags());
+		message.Add(rectCount);
+
+		for (int32 i = 0; i < rectCount; i++) {
+			message.Add(clippedRegion.RectAt(i));
+			message.AddBitmap(*bitmaps[i], true);
+			delete bitmaps[i];
+		}
+
+		free(bitmaps);
+		return;
 	}
 
 	// TODO: we may want to cache/checksum bitmaps
@@ -339,9 +363,6 @@ RemoteDrawingEngine::DrawBitmap(ServerBitmap* bitmap, const BRect& _bitmapRect,
 	message.Add(viewRect);
 	message.Add(options);
 	message.AddBitmap(*bitmap);
-
-	if (other != NULL)
-		delete other;
 }
 
 
@@ -971,4 +992,121 @@ RemoteDrawingEngine::_BuildBounds(BPoint* points, int32 pointCount)
 	}
 
 	return bounds;
+}
+
+
+status_t
+RemoteDrawingEngine::_ExtractBitmapRegions(ServerBitmap& bitmap, uint32 options,
+	const BRect& bitmapRect, const BRect& viewRect, double xScale,
+	double yScale, BRegion& region, UtilityBitmap**& bitmaps)
+{
+	int32 rectCount = region.CountRects();
+	bitmaps = (UtilityBitmap**)malloc(rectCount * sizeof(UtilityBitmap*));
+	if (bitmaps == NULL)
+		return B_NO_MEMORY;
+
+	for (int32 i = 0; i < rectCount; i++) {
+		BRect sourceRect = region.RectAt(i).OffsetByCopy(-viewRect.LeftTop());
+		int32 targetWidth = (int32)(sourceRect.Width() + 1.5);
+		int32 targetHeight = (int32)(sourceRect.Height() + 1.5);
+
+		if (xScale != 1.0) {
+			sourceRect.left = (int32)(sourceRect.left * xScale + 0.5);
+			sourceRect.right = (int32)(sourceRect.right * xScale + 0.5);
+			if (xScale < 1.0)
+				targetWidth = (int32)(sourceRect.Width() + 1.5);
+		}
+
+		if (yScale != 1.0) {
+			sourceRect.top = (int32)(sourceRect.top * yScale + 0.5);
+			sourceRect.bottom = (int32)(sourceRect.bottom * yScale + 0.5);
+			if (yScale < 1.0)
+				targetHeight = (int32)(sourceRect.Height() + 1.5);
+		}
+
+		sourceRect.OffsetBy(bitmapRect.LeftTop());
+			// sourceRect is now the part of the bitmap we want copied
+
+		status_t result = B_OK;
+		if ((xScale > 1.0 || yScale > 1.0)
+			&& (targetWidth * targetHeight < (int32)(sourceRect.Width() + 1.5)
+				* (int32)(sourceRect.Height() + 1.5))) {
+			// the target bitmap is smaller than the source, scale it locally
+			// and send over the smaller version to avoid sending any extra data
+			if (fBitmapDrawingEngine == NULL) {
+				fBitmapDrawingEngine
+					= new(std::nothrow) BitmapDrawingEngine(B_RGBA32);
+				if (fBitmapDrawingEngine == NULL)
+					result = B_NO_MEMORY;
+			}
+
+			if (result == B_OK) {
+				result = fBitmapDrawingEngine->SetSize(targetWidth,
+					targetHeight);
+			}
+
+			if (result == B_OK) {
+				fBitmapDrawingEngine->SetDrawingMode(B_OP_COPY);
+
+				switch (bitmap.ColorSpace()) {
+					case B_RGBA32:
+					case B_RGBA32_BIG:
+					case B_RGBA15:
+					case B_RGBA15_BIG:
+						break;
+
+					default:
+					{
+						// we need to clear the background if there may be
+						// transparency through transparent magic (we use
+						// B_OP_COPY when we draw alpha enabled bitmaps, so we
+						// don't need to clear there)
+						// TODO: this is not actually correct, as we're going to
+						// loose the transparency with the conversion to the
+						// original non-alpha colorspace happening in
+						// ExportToBitmap
+						rgb_color background = { 0, 0, 0, 0 };
+						fBitmapDrawingEngine->FillRect(
+							BRect(0, 0, targetWidth - 1, targetHeight -1),
+							background);
+						fBitmapDrawingEngine->SetDrawingMode(B_OP_OVER);
+						break;
+					}
+				}
+
+				fBitmapDrawingEngine->DrawBitmap(&bitmap, sourceRect,
+					BRect(0, 0, targetWidth - 1, targetHeight - 1), options);
+				bitmaps[i] = fBitmapDrawingEngine->ExportToBitmap(targetWidth,
+					targetHeight, bitmap.ColorSpace());
+				if (bitmaps[i] == NULL)
+					result = B_NO_MEMORY;
+			}
+		} else {
+			// source is smaller or equal target, extract the relevant rects
+			// directly without any scaling and conversion
+			targetWidth = (int32)(sourceRect.Width() + 1.5);
+			targetHeight = (int32)(sourceRect.Height() + 1.5);
+
+			bitmaps[i] = new(std::nothrow) UtilityBitmap(
+				BRect(0, 0, targetWidth - 1, targetHeight - 1),
+				bitmap.ColorSpace(), 0);
+			if (bitmaps[i] == NULL)
+				result = B_NO_MEMORY;
+
+			result = bitmaps[i]->ImportBits(bitmap.Bits(), bitmap.BitsLength(),
+				bitmap.BytesPerRow(), bitmap.ColorSpace(), sourceRect.LeftTop(),
+				BPoint(0, 0), targetWidth, targetHeight);
+			if (result != B_OK)
+				delete bitmaps[i];
+		}
+
+		if (result != B_OK) {
+			for (int32 j = 0; j < i; j++)
+				delete bitmaps[j];
+			free(bitmaps);
+			return result;
+		}
+	}
+
+	return B_OK;
 }
