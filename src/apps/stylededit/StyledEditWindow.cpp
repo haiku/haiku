@@ -7,6 +7,7 @@
  *		Andrew Bachmann
  *		Philippe Saint-Pierre
  *		Jonas Sundström
+ *		Ryan Leavengood
  */
 
 
@@ -1047,19 +1048,17 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 		new BMenuItem(B_TRANSLATE("Revert to saved" B_UTF8_ELLIPSIS),
 		new BMessage(MENU_REVERT)));
 	fRevertItem->SetEnabled(false);
-	menu->AddItem(menuItem = new BMenuItem(B_TRANSLATE("Close"),
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Close"),
 		new BMessage(MENU_CLOSE), 'W'));
 
 	menu->AddSeparatorItem();
-	menu->AddItem(menuItem = new BMenuItem(
-		B_TRANSLATE("Page setup" B_UTF8_ELLIPSIS),
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Page setup" B_UTF8_ELLIPSIS),
 		new BMessage(MENU_PAGESETUP)));
-	menu->AddItem(menuItem = new BMenuItem(
-		B_TRANSLATE("Print" B_UTF8_ELLIPSIS),
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Print" B_UTF8_ELLIPSIS),
 		new BMessage(MENU_PRINT), 'P'));
 
 	menu->AddSeparatorItem();
-	menu->AddItem(menuItem = new BMenuItem(B_TRANSLATE("Quit"),
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Quit"),
 		new BMessage(MENU_QUIT), 'Q'));
 
 	// Add the "Edit"-menu:
@@ -1095,16 +1094,15 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 	menuItem->SetTarget(fTextView);
 
 	menu->AddSeparatorItem();
-	menu->AddItem(menuItem = new BMenuItem(B_TRANSLATE("Find" B_UTF8_ELLIPSIS),
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Find" B_UTF8_ELLIPSIS),
 		new BMessage(MENU_FIND), 'F'));
 	menu->AddItem(fFindAgainItem= new BMenuItem(B_TRANSLATE("Find again"),
 		new BMessage(MENU_FIND_AGAIN), 'G'));
 	fFindAgainItem->SetEnabled(false);
 
-	menu->AddItem(menuItem = new BMenuItem(B_TRANSLATE("Find selection"),
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Find selection"),
 		new BMessage(MENU_FIND_SELECTION), 'H'));
-	menu->AddItem(menuItem = new BMenuItem(
-		B_TRANSLATE("Replace" B_UTF8_ELLIPSIS),
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Replace" B_UTF8_ELLIPSIS),
 		new BMessage(MENU_REPLACE), 'R'));
 	menu->AddItem(fReplaceSameItem = new BMenuItem(B_TRANSLATE("Replace same"),
 		new BMessage(MENU_REPLACE_SAME), 'T'));
@@ -1175,7 +1173,7 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 		if (get_font_family(i, &family) == B_OK) {
 			subMenu = new BMenu(family);
 			subMenu->SetRadioMode(true);
-			fFontMenu->AddItem(menuItem = new BMenuItem(subMenu,
+			fFontMenu->AddItem(new BMenuItem(subMenu,
 				new BMessage(FONT_FAMILY)));
 
 			int32 numStyles = count_font_styles(family);
@@ -1183,7 +1181,7 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 				font_style style;
 				uint32 flags;
 				if (get_font_style(family, j, &style, &flags) == B_OK) {
-					subMenu->AddItem(menuItem = new BMenuItem(style,
+					subMenu->AddItem(new BMenuItem(style,
 						new BMessage(FONT_STYLE)));
 				}
 			}
@@ -1218,8 +1216,7 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 	fWrapItem->SetShortcut('W', B_OPTION_KEY);
 
 	menu->AddSeparatorItem();
-	menu->AddItem(menuItem = new BMenuItem(
-		B_TRANSLATE("Statistics" B_UTF8_ELLIPSIS),
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Statistics" B_UTF8_ELLIPSIS),
 		new BMessage(SHOW_STATISTICS)));
 
 	fSavePanel = NULL;
