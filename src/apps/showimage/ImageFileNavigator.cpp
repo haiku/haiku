@@ -300,8 +300,10 @@ FolderNavigator::_BuildEntryList()
 	while (true) {
 		entry_ref* ref = new entry_ref();
 		status_t status = fFolder.GetNextRef(ref);
-		if (status != B_OK)
+		if (status != B_OK) {
+			delete ref;
 			break;
+		}
 
 		fEntries.AddItem(ref);
 	}
