@@ -225,7 +225,7 @@ PrintOptionsWindow::SetValue(BTextControl* text, float value)
 {
 	BMessage* msg;
 	char s[80];
-	sprintf(s, "%0.0f", value);
+	snprintf(s, sizeof(s), "%0.0f", value);
 	// prevent sending a notification when text is set
 	msg = new BMessage(*text->ModificationMessage());
 	text->SetModificationMessage(NULL);
