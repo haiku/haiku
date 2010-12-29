@@ -921,6 +921,12 @@ Scaler::Completed()
 ImageProcessor::ImageProcessor(enum operation op, BBitmap* image, BMessenger listener, uint32 what)
 	: Filter(image, listener, what)
 	, fOp(op)
+	, fBPP(0)
+	, fWidth(0)
+	, fHeight(0)
+	, fSrcBPR(0)
+	, fDestBPR(0)
+
 {
 }
 
