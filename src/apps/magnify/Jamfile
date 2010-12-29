@@ -6,8 +6,14 @@ AddSubDirSupportedPlatforms libbe_test ;
 
 Application Magnify : 
 	Magnify.cpp 
-	: be tracker game $(TARGET_LIBSUPC++)
+	: be tracker game $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
 	: Magnify.rdef
+;
+
+DoCatalogs Magnify : 
+	x-vnd.Haiku-Magnify 
+	: 
+	Magnify.cpp
 ;
 
 if $(TARGET_PLATFORM) = libbe_test {

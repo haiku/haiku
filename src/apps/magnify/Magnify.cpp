@@ -12,18 +12,20 @@
 
 #include <Alert.h>
 #include <Bitmap.h>
+#include <Catalog.h>
+#include <Clipboard.h>
 #include <Debug.h>
 #include <Directory.h>
 #include <File.h>
 #include <FindDirectory.h>
+#include <Locale.h>
 #include <MenuItem.h>
 #include <MenuField.h>
 #include <Path.h>
+#include <PopUpMenu.h>
 #include <Screen.h>
 #include <ScrollView.h>
 #include <TextView.h>
-#include <PopUpMenu.h>
-#include <Clipboard.h>
 #include <WindowScreen.h>
 
 #include <stdio.h>
@@ -32,6 +34,10 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/stat.h>
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Magnify-Main"
 
 
 const int32 msg_help = 'help';
@@ -126,46 +132,60 @@ BuildInfoMenu(BMenu *menu)
 {
 	BMenuItem* menuItem;
 
-	menuItem = new BMenuItem("About Magnify" B_UTF8_ELLIPSIS, new BMessage(B_ABOUT_REQUESTED));
+	menuItem = new BMenuItem(B_TRANSLATE("About Magnify" B_UTF8_ELLIPSIS),
+		new BMessage(B_ABOUT_REQUESTED));
 	menu->AddItem(menuItem);
-	menuItem = new BMenuItem("Help" B_UTF8_ELLIPSIS, new BMessage(msg_help));
+	menuItem = new BMenuItem(B_TRANSLATE("Help" B_UTF8_ELLIPSIS),
+		new BMessage(msg_help));
 	menu->AddItem(menuItem);
 	menu->AddSeparatorItem();
 
-	menuItem = new BMenuItem("Save image", new BMessage(msg_save),'S');
+	menuItem = new BMenuItem(B_TRANSLATE("Save image"),
+		new BMessage(msg_save),'S');
 	menu->AddItem(menuItem);
-//	menuItem = new BMenuItem("Save selection", new BMessage(msg_save),'S');
+//	menuItem = new BMenuItem(B_TRANSLATE("Save selection"), new BMessage(msg_save),'S');
 //	menu->AddItem(menuItem);
-	menuItem = new BMenuItem("Copy image", new BMessage(msg_copy_image),'C');
+	menuItem = new BMenuItem(B_TRANSLATE("Copy image"), 
+		new BMessage(msg_copy_image),'C');
 	menu->AddItem(menuItem);
 	menu->AddSeparatorItem();
 
-	menuItem = new BMenuItem("Hide/Show info", new BMessage(msg_show_info),'T');
+	menuItem = new BMenuItem(B_TRANSLATE("Hide/Show info"),
+		new BMessage(msg_show_info),'T');
 	menu->AddItem(menuItem);
-	menuItem = new BMenuItem("Add a crosshair", new BMessage(msg_add_cross_hair),'H');
+	menuItem = new BMenuItem(B_TRANSLATE("Add a crosshair"),
+		new BMessage(msg_add_cross_hair),'H');
 	menu->AddItem(menuItem);
-	menuItem = new BMenuItem("Remove a crosshair", new BMessage(msg_remove_cross_hair), 'H',
-		B_SHIFT_KEY);
+	menuItem = new BMenuItem(B_TRANSLATE("Remove a crosshair"),
+		new BMessage(msg_remove_cross_hair), 'H', B_SHIFT_KEY);
 	menu->AddItem(menuItem);
-	menuItem = new BMenuItem("Hide/Show grid", new BMessage(msg_toggle_grid),'G');
-	menu->AddItem(menuItem);
-	menu->AddSeparatorItem();
-
-	menuItem = new BMenuItem("Freeze/Unfreeze image", new BMessage(msg_freeze),'F');
-	menu->AddItem(menuItem);
-	menuItem = new BMenuItem("Stick coordinates", new BMessage(msg_stick), 'I');
+	menuItem = new BMenuItem(B_TRANSLATE("Hide/Show grid"),
+		new BMessage(msg_toggle_grid),'G');
 	menu->AddItem(menuItem);
 	menu->AddSeparatorItem();
 
-	menuItem = new BMenuItem("Make square", new BMessage(msg_make_square),'/');
+	menuItem = new BMenuItem(B_TRANSLATE("Freeze/Unfreeze image"),
+		new BMessage(msg_freeze),'F');
 	menu->AddItem(menuItem);
-	menuItem = new BMenuItem("Decrease window size", new BMessage(msg_shrink),'-');
+	menuItem = new BMenuItem(B_TRANSLATE("Stick coordinates"),
+		new BMessage(msg_stick), 'I');
 	menu->AddItem(menuItem);
-	menuItem = new BMenuItem("Increase window size", new BMessage(msg_grow),'+');
+	menu->AddSeparatorItem();
+
+	menuItem = new BMenuItem(B_TRANSLATE("Make square"),
+		new BMessage(msg_make_square),'/');
 	menu->AddItem(menuItem);
-	menuItem = new BMenuItem("Decrease pixel size", new BMessage(msg_shrink_pixel),',');
+	menuItem = new BMenuItem(B_TRANSLATE("Decrease window size"),
+		new BMessage(msg_shrink),'-');
 	menu->AddItem(menuItem);
-	menuItem = new BMenuItem("Increase pixel size", new BMessage(msg_grow_pixel),'.');
+	menuItem = new BMenuItem(B_TRANSLATE("Increase window size"),
+		new BMessage(msg_grow),'+');
+	menu->AddItem(menuItem);
+	menuItem = new BMenuItem(B_TRANSLATE("Decrease pixel size"),
+		new BMessage(msg_shrink_pixel),',');
+	menu->AddItem(menuItem);
+	menuItem = new BMenuItem(B_TRANSLATE("Increase pixel size"),
+		new BMessage(msg_grow_pixel),'.');
 	menu->AddItem(menuItem);
 }
 
@@ -207,8 +227,10 @@ TApp::ReadyToRun()
 void
 TApp::AboutRequested()
 {
-	(new BAlert("", "Magnify!\n\n" B_UTF8_COPYRIGHT "2002-2006 Haiku\n(C)1999 Be Inc.\n\n"
-		"Now with even more features and recompiled for Haiku.", "OK"))->Go();
+	(new BAlert("", B_TRANSLATE("Magnify!\n\n" B_UTF8_COPYRIGHT 
+		"2002-2006 Haiku\n(C)1999 Be Inc.\n\n"
+		"Now with even more features and recompiled for Haiku."), 
+		B_TRANSLATE("OK")))->Go();
 }
 
 
@@ -216,7 +238,9 @@ TApp::AboutRequested()
 
 
 TWindow::TWindow(int32 pixelCount)
-	: BWindow(BRect(0, 0, 0, 0), "Magnify", B_TITLED_WINDOW, B_OUTLINE_RESIZE)
+	:
+	BWindow(BRect(0, 0, 0, 0), B_TRANSLATE("Magnify"),
+		B_TITLED_WINDOW, B_OUTLINE_RESIZE)
 {
 	GetPrefs(pixelCount);
 
@@ -767,11 +791,15 @@ TWindow::PixelSize()
 }
 
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Magnify-Help"
+
+
 void
 TWindow::ShowHelp()
 {
-	BRect r(0, 0, 375, 240);
-	BWindow* w = new BWindow(r, "Magnify help", B_TITLED_WINDOW,
+	BRect r(0, 0, 450, 240);
+	BWindow* w = new BWindow(r, B_TRANSLATE("Magnify help"), B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_NOT_RESIZABLE);
 
 	r.right -= B_V_SCROLL_BAR_WIDTH;
@@ -785,50 +813,62 @@ TWindow::ShowHelp()
 	BScrollView* scroller = new BScrollView("", text, B_FOLLOW_ALL, 0, true, true);
 	w->AddChild(scroller);
 
-	text->Insert("General:\n");
-	text->Insert("  32 x 32 - the top left numbers are the number of visible\n");
-	text->Insert("    pixels (width x height)\n");
-	text->Insert("  8 pixels/pixel - represents the number of pixels that are\n");
-	text->Insert("    used to magnify a pixel\n");
-	text->Insert("  R:152 G:52 B:10 -  the RGB values for the pixel under\n");
-	text->Insert("    the red square\n");
+	text->Insert(B_TRANSLATE(
+		"General:\n"
+		"  32 x 32 - the top left numbers are the number of visible\n"
+		"    pixels (width x height)\n"
+		"  8 pixels/pixel - represents the number of pixels that are\n"
+		"    used to magnify a pixel\n"
+		"  R:152 G:52 B:10 -  the RGB values for the pixel under\n"
+		"    the red square\n"));
 	text->Insert("\n\n");
-	text->Insert("Copy/Save:\n");
-	text->Insert("  copy - copies the current image to the clipboard\n");
-	text->Insert("  save - prompts the user for a file to save to and writes out\n");
-	text->Insert("    the bits of the image\n");
+	text->Insert(B_TRANSLATE(
+		"Copy/Save:\n"
+		"  copy - copies the current image to the clipboard\n"
+		"  save - prompts the user for a file to save to and writes out\n"
+		"    the bits of the image\n"));
 	text->Insert("\n\n");
-	text->Insert("Info:\n");
-	text->Insert("  hide/show info - hides/shows all these new features\n");
-	text->Insert("    note: when showing, a red square will appear which signifies\n");
-	text->Insert("      which pixel's rgb values will be displayed\n");
-	text->Insert("  add/remove crosshairs - 2 crosshairs can be added (or removed)\n");
-	text->Insert("    to aid in the alignment and placement of objects.\n");
-	text->Insert("    The crosshairs are represented by blue squares and blue lines.\n");
-	text->Insert("  hide/show grid - hides/shows the grid that separates each pixel\n");
+	text->Insert(B_TRANSLATE(
+		"Info:\n"
+		"  hide/show info - hides/shows all these new features\n"
+		"    note: when showing, a red square will appear which signifies\n"
+		"      which pixel's rgb values will be displayed\n"
+		"  add/remove crosshairs - 2 crosshairs can be added (or removed)\n"
+		"    to aid in the alignment and placement of objects.\n"
+		"    The crosshairs are represented by blue squares and blue lines.\n"
+		"  hide/show grid - hides/shows the grid that separates each pixel\n"
+		));
 	text->Insert("\n\n");
-	text->Insert("  freeze - freezes/unfreezes magnification of whatever the\n");
-	text->Insert("    cursor is currently over\n");
+	text->Insert(B_TRANSLATE(
+		"  freeze - freezes/unfreezes magnification of whatever the\n"
+		"    cursor is currently over\n"));
 	text->Insert("\n\n");
-	text->Insert("Sizing/Resizing:\n");
-	text->Insert("  make square - sets the width and the height to the larger\n");
-	text->Insert("    of the two making a square image\n");
-	text->Insert("  increase/decrease window size - grows or shrinks the window\n");
-	text->Insert("    size by 4 pixels.\n");
-	text->Insert("    note: this window can also be resized to any size via the\n");
-	text->Insert("      resizing region of the window\n");
-	text->Insert("  increase/decrease pixel size - increases or decreases the number\n");
-	text->Insert("    of pixels used to magnify a 'real' pixel. Range is 1 to 16.\n");
+	text->Insert(B_TRANSLATE(
+		"Sizing/Resizing:\n"
+		"  make square - sets the width and the height to the larger\n"
+		"    of the two making a square image\n"
+		"  increase/decrease window size - grows or shrinks the window\n"
+		"    size by 4 pixels.\n"
+		"    note: this window can also be resized to any size via the\n"
+		"      resizing region of the window\n"
+		"  increase/decrease pixel size - increases or decreases the number\n"
+		"    of pixels used to magnify a 'real' pixel. Range is 1 to 16.\n"));
 	text->Insert("\n\n");
-	text->Insert("Navigation:\n");
-	text->Insert("  arrow keys - move the current selection (rgb indicator or crosshair)\n");
-	text->Insert("    around 1 pixel at a time\n");
-	text->Insert("  option-arrow key - moves the mouse location 1 pixel at a time\n");
-	text->Insert("  x marks the selection - the current selection has an 'x' in it\n");
+	text->Insert(B_TRANSLATE(
+		"Navigation:\n"
+		"  arrow keys - move the current selection "
+		"(rgb indicator or crosshair)\n"
+		"    around 1 pixel at a time\n"
+		"  option-arrow key - moves the mouse location 1 pixel at a time\n"
+		"  x marks the selection - the current selection has an 'x' in it\n"));
 
 	w->CenterOnScreen();
 	w->Show();
 }
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Magnify-Main"
 
 
 bool
@@ -891,14 +931,22 @@ TInfoView::Draw(BRect updateRect)
 
 	MovePenTo(10, fFontHeight + 5);
 
-	char str[64];
-	sprintf(str, "%li x %li  @ %li pixels/pixel", hPixelCount, vPixelCount,
-		pixelSize);
+	BString dimensionsInfo(
+		B_TRANSLATE("%width x %height  @ %pixelSize pixels/pixel"));
+	BString rep;
+	rep << hPixelCount;
+	dimensionsInfo.ReplaceAll("%width", rep);
+	rep = "";
+	rep << vPixelCount;
+	dimensionsInfo.ReplaceAll("%height", rep);
+	rep = "";
+	rep << pixelSize;
+	dimensionsInfo.ReplaceAll("%pixelSize", rep);
 	invalRect.Set(10, 5, 10 + StringWidth(fInfoStr), fFontHeight+7);
 	SetHighColor(ViewColor());
 	FillRect(invalRect);
 	SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
-	strcpy(fInfoStr, str);
+	strcpy(fInfoStr, dimensionsInfo);
 	DrawString(fInfoStr);
 
 	rgb_color c = { 0,0,0, 255 };
@@ -909,6 +957,7 @@ TInfoView::Draw(BRect updateRect)
 		index = s.IndexForColor(c);
 	}
 	MovePenTo(10, fFontHeight*2+5);
+	char str[64];
 	sprintf(str, "R: %i G: %i B: %i  (0x%x)",
 		c.red, c.green, c.blue, index);
 	invalRect.Set(10, fFontHeight+7, 10 + StringWidth(fRGBStr), fFontHeight*2+7);
@@ -1013,31 +1062,31 @@ TMenu::AttachedToWindow()
 	if (fMainWindow)
 		state = fMainWindow->IsActive();
 
-	BMenuItem* menuItem = FindItem("Hide/Show info");
+	BMenuItem* menuItem = FindItem(B_TRANSLATE("Hide/Show info"));
 	if (menuItem)
 		menuItem->SetEnabled(state);
-	menuItem = FindItem("Add a crosshair");
+	menuItem = FindItem(B_TRANSLATE("Add a crosshair"));
 	if (menuItem)
 		menuItem->SetEnabled(state);
-	menuItem = FindItem("Remove a crosshair");
+	menuItem = FindItem(B_TRANSLATE("Remove a crosshair"));
 	if (menuItem)
 		menuItem->SetEnabled(state);
-	menuItem = FindItem("Hide/Show grid");
+	menuItem = FindItem(B_TRANSLATE("Hide/Show grid"));
 	if (menuItem)
 		menuItem->SetEnabled(state);
-	menuItem = FindItem("Make square");
+	menuItem = FindItem(B_TRANSLATE("Make square"));
 	if (menuItem)
 		menuItem->SetEnabled(state);
-	menuItem = FindItem("Decrease window size");
+	menuItem = FindItem(B_TRANSLATE("Decrease window size"));
 	if (menuItem)
 		menuItem->SetEnabled(state);
-	menuItem = FindItem("Increase window size");
+	menuItem = FindItem(B_TRANSLATE("Increase window size"));
 	if (menuItem)
 		menuItem->SetEnabled(state);
-	menuItem = FindItem("Decrease pixel size");
+	menuItem = FindItem(B_TRANSLATE("Decrease pixel size"));
 	if (menuItem)
 		menuItem->SetEnabled(state);
-	menuItem = FindItem("Increase pixel size");
+	menuItem = FindItem(B_TRANSLATE("Increase pixel size"));
 	if (menuItem)
 		menuItem->SetEnabled(state);
 
@@ -1186,6 +1235,7 @@ TMagnify::KeyDown(const char *key, int32 numBytes)
 	}
 }
 
+
 void
 TMagnify::FrameResized(float newW, float newH)
 {
@@ -1239,7 +1289,7 @@ TMagnify::MouseDown(BPoint where)
 		if ((buttons & B_SECONDARY_MOUSE_BUTTON) || (modifiers & B_CONTROL_KEY)) {
 			// secondary button was clicked or control key was down, show menu and return
 
-			BPopUpMenu *menu = new BPopUpMenu("Info");
+			BPopUpMenu *menu = new BPopUpMenu(B_TRANSLATE("Info"));
 			menu->SetFont(be_plain_font);
 			BuildInfoMenu(menu);
 
@@ -1519,7 +1569,8 @@ TMagnify::CopyImage()
 
 	BMessage *message = be_clipboard->Data();
 	if (!message) {
-		printf("no clip msg\n");
+		printf(B_TRANSLATE_WITH_CONTEXT("no clip msg\n", 
+			"In console, when clipboard is empty after clicking Copy image"));
 		return;
 	}
 
@@ -1803,6 +1854,7 @@ TOSMagnify::TOSMagnify(BRect r, TMagnify* parent, color_space space)
 	InitObject();
 }
 
+
 TOSMagnify::~TOSMagnify()
 {
 	delete fPixel;
@@ -2054,20 +2106,28 @@ main(int argc, char* argv[])
 	int32 pixelCount = -1;
 
 	if (argc > 2) {
-		printf("usage: magnify [size] (magnify size * size pixels)\n");
+		printf(B_TRANSLATE_WITH_CONTEXT(
+			"usage: magnify [size] (magnify size * size pixels)\n", 
+			"Console"));
 		exit(1);
 	} else {
 		if (argc == 2) {
 			pixelCount = abs(atoi(argv[1]));
 
 			if ((pixelCount > 100) || (pixelCount < 4)) {
-				printf("usage: magnify [size] (magnify size * size pixels)\n");
-				printf("  size must be > 4 and a multiple of 4\n");
+				printf(B_TRANSLATE_WITH_CONTEXT(
+					"usage: magnify [size] (magnify size * size pixels)\n", 
+					"Console"));
+				printf(B_TRANSLATE_WITH_CONTEXT(
+					"  size must be > 4 and a multiple of 4\n", 
+					"Console"));
 				exit(1);
 			}
 
 			if (pixelCount % 4) {
-				printf("magnify: size must be a multiple of 4\n");
+				printf(B_TRANSLATE_WITH_CONTEXT(
+					"magnify: size must be a multiple of 4\n", 
+					"Console"));
 				exit(1);
 			}
 		}
