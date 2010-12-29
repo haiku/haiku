@@ -110,7 +110,7 @@ Cube :: Cube(const float half_extent)
 */
 Cube :: ~Cube()
 {
-	delete fGeometry;
+	delete [] fGeometry;
 }
 
 /*	FUNCTION:		Cube :: SetAngle
