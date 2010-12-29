@@ -7,6 +7,7 @@
  *		Pier Luigi Fiorini, pierluigi.fiorini@gmail.com
  */
 
+#include <Catalog.h>
 #include <Message.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
@@ -20,7 +21,10 @@
 #include "DisplayView.h"
 #include "NotificationsView.h"
 
-#define _T(str) (str)
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "PrefletView"
+
 
 const int32 kPageSelected = '_LCH';
 
@@ -32,9 +36,9 @@ PrefletView::PrefletView(SettingsHost* host)
 	// Page selector
 	fRule = new BIconRule("icon_rule");
 	fRule->SetSelectionMessage(new BMessage(kPageSelected));
-	fRule->AddIcon(_T("General"), NULL);
-	fRule->AddIcon(_T("Display"), NULL);
-	//fRule->AddIcon(_T("Notifications"), NULL);
+	fRule->AddIcon(B_TRANSLATE("General"), NULL);
+	fRule->AddIcon(B_TRANSLATE("Display"), NULL);
+	//fRule->AddIcon(B_TRANSLATE("Notifications"), NULL);
 
 	// View for card layout
 	fPagesView = new BView("pages", B_WILL_DRAW);

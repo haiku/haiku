@@ -11,11 +11,15 @@
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
 #include <Button.h>
+#include <Catalog.h>
 
 #include "PrefletWin.h"
 #include "PrefletView.h"
 
-#define _T(str) (str)
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "PrefletWin"
+
 
 const int32 kRevert = '_RVT';
 const int32 kSave = '_SAV';
@@ -23,16 +27,18 @@ const int32 kSave = '_SAV';
 
 PrefletWin::PrefletWin()
 	:
-	BWindow(BRect(0, 0, 1, 1), "Notifications", B_TITLED_WINDOW, B_NOT_ZOOMABLE
-		| B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
+	BWindow(BRect(0, 0, 1, 1), B_TRANSLATE("Notifications"), B_TITLED_WINDOW,
+		B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS
+		| B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	// Preflet container view
 	fMainView = new PrefletView(this);
 
 	// Save and revert buttons
-	fRevert = new BButton("revert", _T("Revert"), new BMessage(kRevert));
+	fRevert = new BButton("revert", B_TRANSLATE("Revert"),
+		new BMessage(kRevert));
 	fRevert->SetEnabled(false);
-	fSave = new BButton("save", _T("Save"), new BMessage(kSave));
+	fSave = new BButton("save", B_TRANSLATE("Save"), new BMessage(kSave));
 	fSave->SetEnabled(false);
 
 	// Calculate inset

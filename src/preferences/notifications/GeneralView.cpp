@@ -18,6 +18,7 @@
 #include <Alert.h>
 #include <Font.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <StringView.h>
 #include <TextControl.h>
 #include <CheckBox.h>
@@ -36,14 +37,14 @@
 #include "GeneralView.h"
 #include "SettingsHost.h"
 
-#define _T(str) (str)
-
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "GeneralView"
 const int32 kServer = '_TSR';
 
-const char* kStartServer = _T("Enable notifications");
-const char* kStopServer = _T("Disable notifications");
-const char* kStarted = _T("Events are notified");
-const char* kStopped = _T("Events are not notified");
+const char* kStartServer = B_TRANSLATE("Enable notifications");
+const char* kStopServer = B_TRANSLATE("Disable notifications");
+const char* kStarted = B_TRANSLATE("Events are notified");
+const char* kStopped = B_TRANSLATE("Events are not notified");
 
 
 GeneralView::GeneralView(SettingsHost* host)
@@ -71,13 +72,14 @@ GeneralView::GeneralView(SettingsHost* host)
 
 	// Autostart
 	fAutoStart = new BCheckBox("autostart",
-		_T("Enable notifications at startup"), new BMessage(kSettingChanged));
+		B_TRANSLATE("Enable notifications at startup"),
+		new BMessage(kSettingChanged));
 
 	// Display time
-	fTimeout = new BTextControl(_T("Hide notifications from screen after"), NULL,
-		new BMessage(kSettingChanged));
+	fTimeout = new BTextControl(B_TRANSLATE("Hide notifications from screen"
+		" after"), NULL, new BMessage(kSettingChanged));
 	BStringView* displayTimeLabel = new BStringView("dt_label",
-		_T("seconds of inactivity"));
+		B_TRANSLATE("seconds of inactivity");
 
 	// Default position
 	// TODO: Here will come a screen representation with the four corners clickable
@@ -129,11 +131,11 @@ GeneralView::MessageReceived(BMessage* msg)
 
 				// Check if server is available
 				if (!_CanFindServer(&ref)) {
-					BAlert* alert = new BAlert(_T("Notifications"),
-						_T("The notifications server cannot be found, "
-						   "this means your InfoPopper installation was not "
-						   "successfully completed."), _T("OK"), NULL,
-						NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+					BAlert* alert = new BAlert(B_TRANSLATE("Notifications"),
+						B_TRANSLATE("The notifications server cannot be"
+						" found, this means your InfoPopper installation was"
+						" not successfully completed."), B_TRANSLATE("OK"),
+						NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 					(void)alert->Go();
 					return;
 				}
@@ -146,20 +148,22 @@ GeneralView::MessageReceived(BMessage* msg)
 					status_t ret = B_ERROR;
 					BMessenger messenger(kNotificationServerSignature, team, &ret);
 					if (ret != B_OK) {
-						BAlert* alert = new BAlert(_T("Notifications"),
-							_T("Notifications cannot be stopped, because "
-							   "the server can't be reached."),
-							_T("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+						BAlert* alert = new BAlert(B_TRANSLATE(
+							"Notifications"), B_TRANSLATE("Notifications "
+							"cannot be stopped, because the server can't be"
+							" reached."), B_TRANSLATE("OK"), NULL, NULL,
+							B_WIDTH_AS_USUAL, B_STOP_ALERT);
 						(void)alert->Go();
 						return;
 					}
 
 					// Send quit message
 					if (messenger.SendMessage(new BMessage(B_QUIT_REQUESTED)) != B_OK) {
-						BAlert* alert = new BAlert(_T("Notifications"),
-							_T("Cannot disable notifications because the server "
-							   "can't be reached."), _T("OK"), NULL,
-							NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+						BAlert* alert = new BAlert(B_TRANSLATE(
+							"Notifications"), B_TRANSLATE("Cannot disable"
+							" notifications because the server can't be "
+							"reached."), B_TRANSLATE("OK"),
+							NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 						(void)alert->Go();
 						return;
 					}
@@ -170,11 +174,13 @@ GeneralView::MessageReceived(BMessage* msg)
 					// Start server
 					status_t err = be_roster->Launch(kNotificationServerSignature);
 					if (err != B_OK) {
-						BAlert* alert = new BAlert(_T("Notifications"),
-							_T("Cannot enable notifications because the server "
-							   "cannot be found.\nThis means your InfoPopper "
-							   "installation was not successfully completed."),
-							_T("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+						BAlert* alert = new BAlert(B_TRANSLATE(
+							"Notifications"), B_TRANSLATE("Cannot enable"
+							" notifications because the server cannot be "
+							"found.\nThis means your InfoPopper installation"
+							" was not successfully completed.")),
+							B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL,
+							B_STOP_ALERT);
 						(void)alert->Go();
 						return;
 					}
@@ -205,9 +211,9 @@ GeneralView::Load()
 
 	if (create_directory(path.Path(), 0755) != B_OK) {
 		BAlert* alert = new BAlert("",
-			_T("There was a problem saving the preferences.\n"
+			B_TRANSLATE("There was a problem saving the preferences.\n"
 				"It's possible you don't have write access to the "
-				"settings directory."), "OK", NULL, NULL,
+				"settings directory."), B_TRANSLATE("OK"), NULL, NULL,
 			B_WIDTH_AS_USUAL, B_STOP_ALERT);
 		(void)alert->Go();
 	}
@@ -261,9 +267,9 @@ GeneralView::Save()
 	ret = settings.Flatten(&file);
 	if (ret != B_OK) {
 		BAlert* alert = new BAlert("",
-			_T("An error is occurred saving the preferences.\n"
+			B_TRANSLATE("An error occurred saving the preferences.\n"
 				"It's possible you are running out of disk space."),
-			"OK", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+			B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 		(void)alert->Go();
 		return ret;
 	}
@@ -272,9 +278,9 @@ GeneralView::Save()
 	entry_ref ref;
 	if (!_CanFindServer(&ref)) {
 		BAlert* alert = new BAlert("",
-			_T("The notifications server cannot be found.\n"
+			B_TRANSLATE("The notifications server cannot be found.\n"
 			   "A possible cause is an installation not done correctly"),
-			"OK", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+			B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 		(void)alert->Go();
 		return B_ERROR;
 	}
@@ -286,8 +292,9 @@ GeneralView::Save()
 	ret = find_directory(B_USER_BOOT_DIRECTORY, &path, true);
 	if (ret != B_OK) {
 		BAlert* alert = new BAlert("",
-			_T("Can't save preferences, you probably don't have write "
-			   "access to the boot settings directory."), "OK", NULL, NULL,
+			B_TRANSLATE"Can't save preferences, you probably don't have "
+			"write access to the boot settings directory."), B_TRANSLATE("OK"),
+			NULL, NULL,
 			B_WIDTH_AS_USUAL, B_STOP_ALERT);
 		(void)alert->Go();
 		return ret;
@@ -305,8 +312,9 @@ GeneralView::Save()
 		if ((ret = directory.CreateSymLink(serverPath.Leaf(),
 			serverPath.Path(), NULL) != B_OK)) {
 			BAlert* alert = new BAlert("",
-				_T("Can't enable notifications at startup time, you probably don't have "
-				   "write permission to the boot settings directory."), "OK", NULL, NULL,
+				B_TRANSLATE("Can't enable notifications at startup time, "
+				"you probably don't have write permission to the boot settings"
+				" directory."), B_TRANSLATE("OK"), NULL, NULL,
 				B_WIDTH_AS_USUAL, B_STOP_ALERT);
 			(void)alert->Go();
 			return ret;

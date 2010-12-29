@@ -14,9 +14,19 @@ Application Notifications :
 	NotificationsView.cpp
 	IconRule.cpp
 	IconItem.cpp
-	: be translation libcolumnlistview.a libnotification.a $(TARGET_LIBSTDC++)
+	: be translation libcolumnlistview.a libnotification.a $(TARGET_LIBSTDC++) $(HAIKU_LOCALE_LIBS)
 	: Notifications.rdef
 ;
 
 Depends Notifications : libcolumnlistview.a ;
 Depends Notifications : libnotification.a ;
+
+DoCatalogs Notifications :
+	x-vnd.Haiku-Notifications
+	:
+	DisplayView.cpp
+	GeneralView.cpp
+	PrefletWin.cpp
+	PrefletView.cpp
+	NotificationsView.cpp
+	;

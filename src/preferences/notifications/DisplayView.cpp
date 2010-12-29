@@ -11,6 +11,7 @@
 #include <stdlib.h>
 
 #include <Alert.h>
+#include <Catalog.h>
 #include <Directory.h>
 #include <Message.h>
 #include <FindDirectory.h>
@@ -29,7 +30,9 @@
 #include "DisplayView.h"
 #include "SettingsHost.h"
 
-#define _T(str) (str)
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "DisplayView"
 
 
 DisplayView::DisplayView(SettingsHost* host)
@@ -37,26 +40,27 @@ DisplayView::DisplayView(SettingsHost* host)
 	SettingsPane("display", host)
 {
 	// Window width
-	fWindowWidth = new BTextControl(_T("Window width:"), NULL,
+	fWindowWidth = new BTextControl(B_TRANSLATE("Window width:"), NULL,
 		new BMessage(kSettingChanged));
 
 	// Icon size
 	fIconSize = new BMenu("iconSize");
-	fIconSize->AddItem(new BMenuItem(_T("Mini icon"),
+	fIconSize->AddItem(new BMenuItem(B_TRANSLATE("Mini icon"),
 		new BMessage(kSettingChanged)));
-	fIconSize->AddItem(new BMenuItem(_T("Large icon"),
+	fIconSize->AddItem(new BMenuItem(B_TRANSLATE("Large icon"),
 		new BMessage(kSettingChanged)));
 	fIconSize->SetLabelFromMarked(true);
-	fIconSizeField = new BMenuField(_T("Icon size:"), fIconSize);
+	fIconSizeField = new BMenuField(B_TRANSLATE("Icon size:"), fIconSize);
 
 	// Title position
 	fTitlePosition = new BMenu("titlePosition");
-	fTitlePosition->AddItem(new BMenuItem(_T("Above icon"),
+	fTitlePosition->AddItem(new BMenuItem(B_TRANSLATE("Above icon"),
 		new BMessage(kSettingChanged)));
-	fTitlePosition->AddItem(new BMenuItem(_T("Right of icon"),
+	fTitlePosition->AddItem(new BMenuItem(B_TRANSLATE("Right of icon"),
 		new BMessage(kSettingChanged)));
 	fTitlePosition->SetLabelFromMarked(true);
-	fTitlePositionField = new BMenuField(_T("Title position:"), fTitlePosition);
+	fTitlePositionField = new BMenuField(B_TRANSLATE("Title position:"),
+		fTitlePosition);
 
 	// Load settings
 	Load();
@@ -111,9 +115,9 @@ DisplayView::Load()
 
 	if (create_directory(path.Path(), 0755) != B_OK) {
 		BAlert* alert = new BAlert("",
-			_T("There was a problem saving the preferences.\n"
+			B_TRANSLATE("There was a problem saving the preferences.\n"
 				"It's possible you don't have write access to the "
-				"settings directory."), "OK", NULL, NULL,
+				"settings directory."), B_TRANSLATE("OK"), NULL, NULL,
 			B_WIDTH_AS_USUAL, B_STOP_ALERT);
 		(void)alert->Go();
 	}
@@ -205,9 +209,9 @@ DisplayView::Save()
 	status_t ret = settings.Flatten(&file);
 	if (ret != B_OK) {
 		BAlert* alert = new BAlert("",
-			_T("Can't save preferenes, you probably don't have write "
-				"access to the settings directory or the disk is full."), "OK", NULL, NULL,
-				B_WIDTH_AS_USUAL, B_STOP_ALERT);
+			B_TRANSLATE("Can't save preferenes, you probably don't have "
+				"write access to the settings directory or the disk is full."),
+				B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 		(void)alert->Go();
 		return ret;
 	}

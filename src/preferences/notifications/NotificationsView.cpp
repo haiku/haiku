@@ -8,6 +8,7 @@
  */
 
 #include <Alert.h>
+#include <Catalog.h>
 #include <Directory.h>
 #include <FindDirectory.h>
 #include <GroupLayout.h>
@@ -25,7 +26,8 @@
 
 #include "NotificationsView.h"
 
-#define _T(str) (str)
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "NotificationView"
 
 const float kEdgePadding = 5.0;
 const float kCLVTitlePadding = 8.0;
@@ -55,47 +57,47 @@ NotificationsView::NotificationsView()
 	BRect rect(0, 0, 100, 100);
 
 	// Search application field
-	fSearch = new BTextControl(_T("Search:"), NULL,
+	fSearch = new BTextControl(B_TRANSLATE("Search:"), NULL,
 		new BMessage(kSettingChanged));
 
 	// Applications list
-	fApplications = new BColumnListView(rect, _T("Applications"),
+	fApplications = new BColumnListView(rect, B_TRANSLATE("Applications"),
 		0, B_WILL_DRAW, B_FANCY_BORDER, true);
 	fApplications->SetSelectionMode(B_SINGLE_SELECTION_LIST);
 
-	fAppCol = new BStringColumn(_T("Application"), 200,
-		be_plain_font->StringWidth(_T("Application")) + (kCLVTitlePadding * 2),
-		rect.Width(), B_TRUNCATE_END, B_ALIGN_LEFT);
+	fAppCol = new BStringColumn(B_TRANSLATE("Application"), 200,
+		be_plain_font->StringWidth(B_TRANSLATE("Application")) + 
+		(kCLVTitlePadding * 2), rect.Width(), B_TRUNCATE_END, B_ALIGN_LEFT);
 	fApplications->AddColumn(fAppCol, kAppIndex);
 
-	fAppEnabledCol = new BStringColumn(_T("Enabled"), 10,
-		be_plain_font->StringWidth(_T("Enabled")) + (kCLVTitlePadding * 2),
-		rect.Width(), B_TRUNCATE_END, B_ALIGN_LEFT);
+	fAppEnabledCol = new BStringColumn(B_TRANSLATE("Enabled"), 10,
+		be_plain_font->StringWidth(B_TRANSLATE("Enabled")) + 
+		(kCLVTitlePadding * 2), rect.Width(), B_TRUNCATE_END, B_ALIGN_LEFT);
 	fApplications->AddColumn(fAppEnabledCol, kAppEnabledIndex);
 
 	// Notifications list
-	fNotifications = new BColumnListView(rect, _T("Notifications"),
+	fNotifications = new BColumnListView(rect, B_TRANSLATE("Notifications"),
 		0, B_WILL_DRAW, B_FANCY_BORDER, true);
 	fNotifications->SetSelectionMode(B_SINGLE_SELECTION_LIST);
 
-	fTitleCol = new BStringColumn(_T("Title"), 100,
-		be_plain_font->StringWidth(_T("Title")) + (kCLVTitlePadding * 2),
-		rect.Width(), B_TRUNCATE_END, B_ALIGN_LEFT);
+	fTitleCol = new BStringColumn(B_TRANSLATE("Title"), 100,
+		be_plain_font->StringWidth(B_TRANSLATE"Title")) +
+		(kCLVTitlePadding * 2), rect.Width(), B_TRUNCATE_END, B_ALIGN_LEFT);
 	fNotifications->AddColumn(fTitleCol, kTitleIndex);
 
-	fDateCol = new BDateColumn(_T("Last Received"), 100,
-		be_plain_font->StringWidth(_T("Last Received")) + (kCLVTitlePadding * 2),
-		rect.Width(), B_ALIGN_LEFT);
+	fDateCol = new BDateColumn(B_TRANSLATE("Last Received"), 100,
+		be_plain_font->StringWidth(B_TRANSLATE("Last Received")) +
+		(kCLVTitlePadding * 2), rect.Width(), B_ALIGN_LEFT);
 	fNotifications->AddColumn(fDateCol, kDateIndex);
 
-	fTypeCol = new BStringColumn(_T("Type"), 100,
-		be_plain_font->StringWidth(_T("Type")) + (kCLVTitlePadding * 2),
-		rect.Width(), B_TRUNCATE_END, B_ALIGN_LEFT);
+	fTypeCol = new BStringColumn(B_TRANSLATE("Type"), 100,
+		be_plain_font->StringWidth(B_TRANSLATE("Type")) +
+		(kCLVTitlePadding * 2), rect.Width(), B_TRUNCATE_END, B_ALIGN_LEFT);
 	fNotifications->AddColumn(fTypeCol, kTypeIndex);
 
-	fAllowCol = new BStringColumn(_T("Allowed"), 100,
-		be_plain_font->StringWidth(_T("Allowed")) + (kCLVTitlePadding * 2),
-		rect.Width(), B_TRUNCATE_END, B_ALIGN_LEFT);
+	fAllowCol = new BStringColumn(B_TRANSLATE("Allowed"), 100,
+		be_plain_font->StringWidth(B_TRANSLATE("Allowed")) +
+		(kCLVTitlePadding * 2), rect.Width(), B_TRUNCATE_END, B_ALIGN_LEFT);
 	fNotifications->AddColumn(fAllowCol, kAllowIndex);
 
 	// Load the applications list
@@ -177,9 +179,9 @@ NotificationsView::_LoadAppUsage()
 
 	if (create_directory(path.Path(), 0755) != B_OK) {
 		BAlert* alert = new BAlert("",
-			_T("There was a problem saving the preferences.\n"
+			B_TRANSLATE("There was a problem saving the preferences.\n"
 				"It's possible you don't have write access to the "
-				"settings directory."), "OK", NULL, NULL,
+				"settings directory."), B_TRANSLATE("OK"), NULL, NULL,
 			B_WIDTH_AS_USUAL, B_STOP_ALERT);
 		(void)alert->Go();
 		return B_ERROR;
@@ -247,24 +249,25 @@ NotificationsView::_Populate(AppUsage* usage)
 	for (int32 i = 0; i < size; i++) {
 		NotificationReceived* notification = usage->NotificationAt(i);
 		time_t updated = notification->LastReceived();
-		const char* allow = notification->Allowed() ? _T("Yes") : _T("No");
+		const char* allow = notification->Allowed() ? B_TRANSLATE("Yes")
+			: B_TRANSLATE("No");
 		const char* type = "";
 
 		switch (notification->Type()) {
 			case B_INFORMATION_NOTIFICATION:
-				type = _T("Information");
+				type = B_TRANSLATE("Information");
 				break;
 			case B_IMPORTANT_NOTIFICATION:
-				type = _T("Important");
+				type = B_TRANSLATE("Important");
 				break;
 			case B_ERROR_NOTIFICATION:
-				type = _T("Error");
+				type = B_TRANSLATE("Error");
 				break;
 			case B_PROGRESS_NOTIFICATION:
-				type = _T("Progress");
+				type = B_TRANSLATE("Progress");
 				break;
 			default:
-				type = _T("Unknown");
+				type = B_TRANSLATE("Unknown");
 		}
 
 		BRow* row = new BRow();
