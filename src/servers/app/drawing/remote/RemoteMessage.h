@@ -133,6 +133,7 @@ public:
 
 		void					Start(uint16 code);
 		status_t				Flush();
+		void					Cancel();
 
 		status_t				NextMessage(uint16& code);
 		uint16					Code() { return fCode; }

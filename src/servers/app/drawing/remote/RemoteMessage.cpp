@@ -56,6 +56,14 @@ RemoteMessage::NextMessage(uint16& code)
 }
 
 
+void
+RemoteMessage::Cancel()
+{
+	fAvailable += fWriteIndex;
+	fWriteIndex = 0;
+}
+
+
 #ifndef CLIENT_COMPILE
 void
 RemoteMessage::AddBitmap(const ServerBitmap& bitmap, bool minimal)
@@ -362,7 +370,7 @@ RemoteMessage::ReadFontState(BFont& font)
 	font.SetSpacing(spacing);
 	font.SetShear(shear);
 	font.SetRotation(rotation);
-	font.SetFalseBoldWidth(falseBoldWidth);	
+	font.SetFalseBoldWidth(falseBoldWidth);
 	font.SetSize(size);
 	font.SetFace(face);
 	return B_OK;
