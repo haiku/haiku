@@ -79,7 +79,7 @@ GeneralView::GeneralView(SettingsHost* host)
 	fTimeout = new BTextControl(B_TRANSLATE("Hide notifications from screen"
 		" after"), NULL, new BMessage(kSettingChanged));
 	BStringView* displayTimeLabel = new BStringView("dt_label",
-		B_TRANSLATE("seconds of inactivity");
+		B_TRANSLATE("seconds of inactivity"));
 
 	// Default position
 	// TODO: Here will come a screen representation with the four corners clickable
@@ -178,7 +178,7 @@ GeneralView::MessageReceived(BMessage* msg)
 							"Notifications"), B_TRANSLATE("Cannot enable"
 							" notifications because the server cannot be "
 							"found.\nThis means your InfoPopper installation"
-							" was not successfully completed.")),
+							" was not successfully completed."),
 							B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL,
 							B_STOP_ALERT);
 						(void)alert->Go();
@@ -292,7 +292,7 @@ GeneralView::Save()
 	ret = find_directory(B_USER_BOOT_DIRECTORY, &path, true);
 	if (ret != B_OK) {
 		BAlert* alert = new BAlert("",
-			B_TRANSLATE"Can't save preferences, you probably don't have "
+			B_TRANSLATE("Can't save preferences, you probably don't have "
 			"write access to the boot settings directory."), B_TRANSLATE("OK"),
 			NULL, NULL,
 			B_WIDTH_AS_USUAL, B_STOP_ALERT);

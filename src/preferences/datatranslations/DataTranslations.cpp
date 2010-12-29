@@ -105,7 +105,7 @@ DataTranslationsApplication::_NoTranslatorError(const char* name)
 	BString text(B_TRANSLATE("The item '"));
 	text << B_TRANSLATE("%name' does not appear to be a Translator and will"
 		" not be installed.");
-	text.ReplaceAll(%name, name);
+	text.ReplaceAll("%name", name);
 	BAlert* alert = new BAlert("", text.String(), B_TRANSLATE("Ok"));
 	alert->Go();
 }
@@ -153,10 +153,10 @@ DataTranslationsApplication::RefsReceived(BMessage* message)
 
 		if (target.Contains(ref.name)) {
 			BString string(B_TRANSLATE("An item named '"));
-			string << B_TRANSLATE("%ref.name' already exists in the "
+			string << B_TRANSLATE("%name already exists in the "
 				"Translators folder! Shall the existing translator be "
 				"overwritten?");
-			string.ReplaceAll(%ref.name, ref.name);
+			string.ReplaceAll("%name", ref.name);
 
 			BAlert* alert = new BAlert(B_TRANSLATE("DataTranslations - Note"),
 				string.String(), B_TRANSLATE("Cancel"),

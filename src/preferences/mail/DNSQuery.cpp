@@ -341,7 +341,7 @@ DNSQuery::GetMXRecords(BString serverName, BObjectList<mx_record>* mxList,
 	_ReadQueryHeader(receiBuffer, &receiHeader);
 	PRINT(B_TRANSLATE("Package contains :"));
 	PRINT(B_TRANSLATE("%d Questions, "), receiHeader.q_count);
-	PRINT(B_TRANSLATE("%d Answers,) ", receiHeader.ans_count);
+	PRINT(B_TRANSLATE("%d Answers, "), receiHeader.ans_count);
 	PRINT(B_TRANSLATE("%d Authoritative Servers, "), receiHeader.auth_count);
 	PRINT(B_TRANSLATE("%d Additional records\n"), receiHeader.add_count);
 

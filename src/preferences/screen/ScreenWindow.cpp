@@ -74,7 +74,7 @@ static const struct {
 	int32		bits_per_pixel;
 	const char*	label;
 } kColorSpaces[] = {
-	{ B_CMAP8, 8, B_TRANSATE("8 bits/pixel, 256 colors") },
+	{ B_CMAP8, 8, B_TRANSLATE("8 bits/pixel, 256 colors") },
 	{ B_RGB15, 15, B_TRANSLATE("15 bits/pixel, 32768 colors") },
 	{ B_RGB16, 16, B_TRANSLATE("16 bits/pixel, 65536 colors") },
 	{ B_RGB24, 24, B_TRANSLATE("24 bits/pixel, 16 Million colors") },
@@ -670,8 +670,8 @@ ScreenWindow::_UpdateRefreshControl()
 		if (!item->IsMarked())
 			item->SetMarked(true);
 
-		// "Other…" items only contains a refresh rate when active
-		fOtherRefresh->SetLabel(B_TRANSLATE("Other" B_UTF8_ELLIPSIS_);
+		// "Other" items only contains a refresh rate when active
+		fOtherRefresh->SetLabel(B_TRANSLATE("Other" B_UTF8_ELLIPSIS));
 		return;
 	}
 

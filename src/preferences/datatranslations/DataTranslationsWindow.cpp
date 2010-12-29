@@ -224,14 +224,14 @@ DataTranslationsWindow::_ShowInfoAlert(int32 id)
 
 	BString message;
 	message << B_TRANSLATE("Name: %name \nVersion: ");
-	message.ReplaceAll(%name, name);
+	message.ReplaceAll("%name", name);
 
 	// Convert the version number into a readable format
 	message << (int)B_TRANSLATION_MAJOR_VERSION(version)
 		<< '.' << (int)B_TRANSLATION_MINOR_VERSION(version)
 		<< '.' << (int)B_TRANSLATION_REVISION_VERSION(version);
 	message << B_TRANSLATE("\nInfo: %info\n\nPath:\n") << path.Path() << "\n";
-	message.ReplaceAll(%info, info);
+	message.ReplaceAll("%info", info);
 
 	BAlert* alert = new BAlert(B_TRANSLATE("info"), message.String(),
 		B_TRANSLATE("OK"));

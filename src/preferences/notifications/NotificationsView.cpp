@@ -81,7 +81,7 @@ NotificationsView::NotificationsView()
 	fNotifications->SetSelectionMode(B_SINGLE_SELECTION_LIST);
 
 	fTitleCol = new BStringColumn(B_TRANSLATE("Title"), 100,
-		be_plain_font->StringWidth(B_TRANSLATE"Title")) +
+		be_plain_font->StringWidth(B_TRANSLATE("Title")) +
 		(kCLVTitlePadding * 2), rect.Width(), B_TRUNCATE_END, B_ALIGN_LEFT);
 	fNotifications->AddColumn(fTitleCol, kTitleIndex);
 

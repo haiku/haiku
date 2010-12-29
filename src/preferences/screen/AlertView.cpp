@@ -134,8 +134,8 @@ void
 AlertView::UpdateCountdownView()
 {
 	BString string;
-	string << B_TRANSLATE("Settings will revert in %fSeconds seconds.");
-	string.ReplaceAll(%fSeconds, fSeconds);
+	string = B_TRANSLATE("Settings will revert in %seconds seconds.");
+	string.ReplaceFirst("%seconds", BString() << fSeconds);
 	fCountdownView->SetText(string.String());
 }
 

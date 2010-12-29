@@ -23,8 +23,8 @@ UsePrivateHeaders shared ;
 local sources =
 	Account.cpp
 	AutoConfig.cpp
-	AutoConfigWindow.cpp
 	AutoConfigView.cpp
+	AutoConfigWindow.cpp
 	CenterContainer.cpp
 	ConfigViews.cpp
 	ConfigWindow.cpp
@@ -54,7 +54,7 @@ DoCatalogs E-mail :
 	x-vnd.Haiku-Mail
 	:
 	Account.cpp
-	AutoConfiView.cpp
+	AutoConfigView.cpp
 	ConfigViews.cpp
 	ConfigWindow.cpp
 	DNSQuery.cpp

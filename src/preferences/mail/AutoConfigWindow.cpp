@@ -15,6 +15,10 @@
 #include <FindDirectory.h>
 
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "AutoConfigWindow"
+
+
 AutoConfigWindow::AutoConfigWindow(BRect rect, BWindow *parent)
 	:	BWindow(rect, B_TRANSLATE("Create new account"), B_TITLED_WINDOW_LOOK,
 				B_MODAL_APP_WINDOW_FEEL,
@@ -38,7 +42,7 @@ AutoConfigWindow::AutoConfigWindow(BRect rect, BWindow *parent)
 	buttonRect.top = buttonRect.bottom - buttonHeight;
 	buttonRect.left = buttonRect.right - 2 * buttonWidth - 5;
 	buttonRect.right = buttonRect.left + buttonWidth;
-	fBackButton = new BButton(buttonRect, "back", B_TRANSALATE("Back"),
+	fBackButton = new BButton(buttonRect, "back", B_TRANSLATE("Back"),
 								new BMessage(kBackMsg));
 	fBackButton->SetEnabled(false);
 	fRootView->AddChild(fBackButton);
