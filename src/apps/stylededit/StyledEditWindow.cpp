@@ -1317,7 +1317,7 @@ StyledEditWindow::_LoadFile(entry_ref* ref)
 		BEntry entry(ref, true);
 		char name[B_FILE_NAME_LENGTH];
 		if (entry.GetName(name) != B_OK)
-			strncpy(name, B_TRANSLATE("???"), sizeof(name));
+			strlcpy(name, B_TRANSLATE("???"), sizeof(name));
 
 		BString text;
 		if (status == B_BAD_TYPE)
