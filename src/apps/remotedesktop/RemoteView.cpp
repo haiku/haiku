@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Haiku, Inc.
+ * Copyright 2009-2010, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -20,6 +20,7 @@
 #include <Region.h>
 #include <Shape.h>
 #include <Window.h>
+#include <utf8_functions.h>
 
 #include <new>
 #include <stdio.h>
@@ -1225,6 +1226,46 @@ RemoteView::_DrawThread()
 				bounds.top -= height.ascent;
 				bounds.bottom += height.descent;
 				invalidRegion.Include(bounds);
+				break;
+			}
+
+			case RP_DRAW_STRING_WITH_OFFSETS:
+			{
+				size_t length;
+				char *string;
+				message.ReadString(&string, length);
+				int32 count = UTF8CountChars(string, length);
+
+				BPoint offsets[count];
+				if (message.ReadList(offsets, count) != B_OK) {
+					free(string);
+					continue;
+				}
+
+				offscreen->DrawString(string, offsets, count);
+
+				free(string);
+				reply.Start(RP_DRAW_STRING_RESULT);
+				reply.Add(token);
+				reply.Add(offscreen->PenLocation());
+				reply.Flush();
+
+				BFont font;
+				offscreen->GetFont(&font);
+
+				BRect boxes[count];
+				font.GetBoundingBoxesAsGlyphs(string, count, B_SCREEN_METRIC,
+					boxes);
+
+				font_height height;
+				offscreen->GetFontHeight(&height);
+
+				for (int32 i = 0; i < count; i++) {
+					// TODO: validate
+					boxes[i].OffsetBy(offsets[i] + BPoint(0, -height.ascent));
+					invalidRegion.Include(boxes[i]);
+				}
+
 				break;
 			}
 
