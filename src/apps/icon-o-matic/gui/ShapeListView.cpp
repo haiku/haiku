@@ -12,7 +12,9 @@
 #include <stdio.h>
 
 #include <Application.h>
+#include <Catalog.h>
 #include <ListItem.h>
+#include <Locale.h>
 #include <Menu.h>
 #include <MenuItem.h>
 #include <Message.h>
@@ -31,6 +33,11 @@
 #include "Selection.h"
 #include "Shape.h"
 #include "Util.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-ShapesList"
+
 
 using std::nothrow;
 
@@ -423,28 +430,31 @@ ShapeListView::SetMenu(BMenu* menu)
 		return;
 
 	BMessage* message = new BMessage(MSG_ADD_SHAPE);
-	fAddEmptyMI = new BMenuItem("Add empty", message);
+	fAddEmptyMI = new BMenuItem(B_TRANSLATE("Add empty"), message);
 
 	message = new BMessage(MSG_ADD_SHAPE);
 	message->AddBool("path", true);
-	fAddWidthPathMI = new BMenuItem("Add with path", message);
+	fAddWidthPathMI = new BMenuItem(B_TRANSLATE("Add with path"), message);
 
 	message = new BMessage(MSG_ADD_SHAPE);
 	message->AddBool("style", true);
-	fAddWidthStyleMI = new BMenuItem("Add with style", message);
+	fAddWidthStyleMI = new BMenuItem(B_TRANSLATE("Add with style"), message);
 
 	message = new BMessage(MSG_ADD_SHAPE);
 	message->AddBool("path", true);
 	message->AddBool("style", true);
-	fAddWidthPathAndStyleMI = new BMenuItem("Add with path & style", message);
+	fAddWidthPathAndStyleMI = new BMenuItem(
+		B_TRANSLATE("Add with path & style"), message);
 
-	fDuplicateMI = new BMenuItem("Duplicate", new BMessage(MSG_DUPLICATE));
-	fResetTransformationMI = new BMenuItem("Reset transformation",
+	fDuplicateMI = new BMenuItem(B_TRANSLATE("Duplicate"), 
+		new BMessage(MSG_DUPLICATE));
+	fResetTransformationMI = new BMenuItem(B_TRANSLATE("Reset transformation"),
 		new BMessage(MSG_RESET_TRANSFORMATION));
-	fFreezeTransformationMI = new BMenuItem("Freeze transformation",
+	fFreezeTransformationMI = new BMenuItem(
+		B_TRANSLATE("Freeze transformation"), 
 		new BMessage(MSG_FREEZE_TRANSFORMATION));
 
-	fRemoveMI = new BMenuItem("Remove", new BMessage(MSG_REMOVE));
+	fRemoveMI = new BMenuItem(B_TRANSLATE("Remove"), new BMessage(MSG_REMOVE));
 
 
 	fMenu->AddItem(fAddEmptyMI);

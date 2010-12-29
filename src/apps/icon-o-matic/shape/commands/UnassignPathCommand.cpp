@@ -8,9 +8,17 @@
 
 #include "UnassignPathCommand.h"
 
+#include <Catalog.h>
+#include <Locale.h>
+
 #include "PathContainer.h"
 #include "Shape.h"
 #include "VectorPath.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-UnassignPathCmd"
+
 
 // constructor
 UnassignPathCommand::UnassignPathCommand(Shape* shape,
@@ -62,5 +70,5 @@ UnassignPathCommand::Undo()
 void
 UnassignPathCommand::GetName(BString& name)
 {
-	name << "Unassign Path";
+	name << B_TRANSLATE("Unassign Path");
 }

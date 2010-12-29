@@ -10,10 +10,18 @@
 
 #include <stdio.h>
 
+#include <Catalog.h>
+#include <Locale.h>
+
 #include "CommonPropertyIDs.h"
 #include "IconObject.h"
 #include "Property.h"
 #include "PropertyObject.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-Properties"
+
 
 // constructor
 SetPropertiesCommand::SetPropertiesCommand(IconObject** objects,
@@ -75,15 +83,17 @@ SetPropertiesCommand::GetName(BString& name)
 {
 	if (fOldProperties->CountProperties() > 1) {
 		if (fObjectCount > 1)
-			name << "Multi Paste Properties";
+			name << B_TRANSLATE("Multi Paste Properties");
 		else
-			name << "Paste Properties";
+			name << B_TRANSLATE("Paste Properties");
 	} else {
 		BString property = name_for_id(
 			fOldProperties->PropertyAt(0)->Identifier());
 		if (fObjectCount > 1)
-			name << "Multi Set " << property;
+			name << B_TRANSLATE_WITH_CONTEXT("Multi Set ",
+				"Multi Set (property name)") << property;
 		else
-			name << "Set " << property;
+			name << B_TRANSLATE_WITH_CONTEXT("Set ", "Set (property name)")
+				 << property;
 	}
 }

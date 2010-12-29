@@ -8,8 +8,16 @@
 
 #include "AssignStyleCommand.h"
 
+#include <Catalog.h>
+#include <Locale.h>
+
 #include "Shape.h"
 #include "Style.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-AssignStyleCmd"
+
 
 // constructor
 AssignStyleCommand::AssignStyleCommand(Shape* shape,
@@ -63,7 +71,7 @@ AssignStyleCommand::Undo()
 void
 AssignStyleCommand::GetName(BString& name)
 {
-	name << "Assign Style";
+	name << B_TRANSLATE("Assign Style");
 	if (fNewStyle)
 		name << " \"" << fNewStyle->Name() << "\"";
 }

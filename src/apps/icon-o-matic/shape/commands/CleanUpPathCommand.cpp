@@ -10,7 +10,15 @@
 
 #include <stdio.h>
 
+#include <Catalog.h>
+#include <Locale.h>
+
 #include "VectorPath.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-CleanUpPathCmd"
+
 
 // constructor
 CleanUpPathCommand::CleanUpPathCommand(VectorPath* path)
@@ -48,5 +56,5 @@ CleanUpPathCommand::Undo()
 void
 CleanUpPathCommand::GetName(BString& name)
 {
-	name << "Clean Up Path";
+	name << B_TRANSLATE("Clean Up Path");
 }

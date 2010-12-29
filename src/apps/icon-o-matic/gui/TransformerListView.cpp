@@ -12,7 +12,9 @@
 #include <stdio.h>
 
 #include <Application.h>
+#include <Catalog.h>
 #include <ListItem.h>
+#include <Locale.h>
 #include <Menu.h>
 #include <MenuItem.h>
 #include <Mime.h>
@@ -27,6 +29,11 @@
 #include "TransformerFactory.h"
 #include "Observer.h"
 #include "Selection.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-TransformersList"
+
 
 using std::nothrow;
 
@@ -128,8 +135,10 @@ TransformerListView::Draw(BRect updateRect)
 		return;
 
 	// display helpful messages
-	const char* message1 = "Click on a shape above";
-	const char* message2 = "to attach transformers.";
+	const char* message1 = B_TRANSLATE_WITH_CONTEXT("Click on a shape above", 
+		"Empty transformers list - 1st line");
+	const char* message2 = B_TRANSLATE_WITH_CONTEXT("to attach transformers.",
+		"Empty transformers list - 2nd line");
 
 	SetHighColor(tint_color(LowColor(), B_DARKEN_2_TINT));
 	font_height fh;
@@ -370,14 +379,15 @@ TransformerListView::SetMenu(BMenu* menu)
 	if (fMenu == NULL)
 		return;
 
-	BMenu* addMenu = new BMenu("Add");
+	BMenu* addMenu = new BMenu(B_TRANSLATE("Add"));
 	int32 cookie = 0;
 	uint32 type;
 	BString name;
 	while (TransformerFactory::NextType(&cookie, &type, &name)) {
 		// TODO: Disable the "Transformation" and "Perspective" transformers
 		// since they are not very useful or even implemented at all.
-		if (name == "Transformation" || name == "Perspective")
+		if (name == B_TRANSLATE("Transformation") 
+			|| name == B_TRANSLATE("Perspective"))
 			continue;
 		// End of TODO.
 		BMessage* message = new BMessage(MSG_ADD_TRANSFORMER);

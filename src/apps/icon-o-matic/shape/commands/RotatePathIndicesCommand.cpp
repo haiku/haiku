@@ -7,7 +7,14 @@
 
 #include <stdio.h>
 
+#include <Catalog.h>
+#include <Locale.h>
+
 #include "VectorPath.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-RotatePathIndiciesCmd"
 
 
 RotatePathIndicesCommand::RotatePathIndicesCommand(VectorPath* path,
@@ -51,7 +58,7 @@ RotatePathIndicesCommand::Undo()
 void
 RotatePathIndicesCommand::GetName(BString& name)
 {
-	name << "Rotate Path Indices";
+	name << B_TRANSLATE("Rotate Path Indices");
 }
 
 

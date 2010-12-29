@@ -11,7 +11,15 @@
 #include <new>
 #include <stdio.h>
 
+#include <Catalog.h>
+#include <Locale.h>
+
 #include "VectorPath.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-RemovePointsCmd"
+
 
 using std::nothrow;
 
@@ -158,9 +166,9 @@ RemovePointsCommand::GetName(BString& name)
 //	else
 //		name << _GetString(REMOVE_CONTROL_POINT, "Remove Control Point");
 	if (fCount > 1)
-		name << "Remove Control Points";
+		name << B_TRANSLATE("Remove Control Points");
 	else
-		name << "Remove Control Point";
+		name << B_TRANSLATE("Remove Control Point");
 }
 
 // _Init

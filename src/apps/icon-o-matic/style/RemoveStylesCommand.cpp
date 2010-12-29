@@ -11,9 +11,17 @@
 #include <new>
 #include <stdio.h>
 
+#include <Catalog.h>
+#include <Locale.h>
+
 #include "StyleContainer.h"
 #include "Shape.h"
 #include "Style.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-RemoveStylesCmd"
+
 
 using std::nothrow;
 
@@ -132,7 +140,7 @@ void
 RemoveStylesCommand::GetName(BString& name)
 {
 	if (fCount > 1)
-		name << "Remove Styles";
+		name << B_TRANSLATE("Remove Styles");
 	else
-		name << "Remove Style";
+		name << B_TRANSLATE("Remove Style");
 }

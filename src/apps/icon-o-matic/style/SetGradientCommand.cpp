@@ -11,8 +11,16 @@
 #include <new>
 #include <stdio.h>
 
+#include <Catalog.h>
+#include <Locale.h>
+
 #include "GradientTransformable.h"
 #include "Style.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-SetGradientCmd"
+
 
 using std::nothrow;
 
@@ -93,7 +101,7 @@ SetGradientCommand::Undo()
 void
 SetGradientCommand::GetName(BString& name)
 {
-	name << _GetString(/*EDIT_GRADIENT*/0, "Edit Gradient");
+	name << B_TRANSLATE("Edit Gradient");
 }
 
 // CombineWithNext

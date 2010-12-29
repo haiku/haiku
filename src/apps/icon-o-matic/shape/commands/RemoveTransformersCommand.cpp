@@ -12,8 +12,16 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <Catalog.h>
+#include <Locale.h>
+
 #include "ShapeContainer.h"
 #include "Shape.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-RemoveTransformersCmd"
+
 
 using std::nothrow;
 
@@ -101,7 +109,7 @@ RemoveTransformersCommand::GetName(BString& name)
 //	else
 //		name << _GetString(MOVE_TRANSFORMER, "Move Transformer");
 	if (fCount > 1)
-		name << "Remove Transformers";
+		name << B_TRANSLATE("Remove Transformers");
 	else
-		name << "Remove Transformer";
+		name << B_TRANSLATE("Remove Transformer");
 }

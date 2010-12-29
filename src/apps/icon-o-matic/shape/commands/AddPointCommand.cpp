@@ -10,7 +10,15 @@
 
 #include <stdio.h>
 
+#include <Catalog.h>
+#include <Locale.h>
+
 #include "VectorPath.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-AddPointCmd"
+
 
 // constructor
 AddPointCommand::AddPointCommand(VectorPath* path,
@@ -96,5 +104,5 @@ void
 AddPointCommand::GetName(BString& name)
 {
 //	name << _GetString(ADD_CONTROL_POINT, "Add Control Point");
-	name << "Add Control Point";
+	name << B_TRANSLATE("Add Control Point");
 }

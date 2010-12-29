@@ -11,7 +11,15 @@
 #include <new>
 #include <stdio.h>
 
+#include <Catalog.h>
+#include <Locale.h>
+
 #include "VectorPath.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-SplitPointsCmd"
+
 
 using std::nothrow;
 
@@ -147,8 +155,8 @@ void
 SplitPointsCommand::GetName(BString& name)
 {
 	if (fCount > 1)
-		name << "Split Control Points";
+		name << B_TRANSLATE("Split Control Points");
 	else
-		name << "Split Control Point";
+		name << B_TRANSLATE("Split Control Point");
 }
 

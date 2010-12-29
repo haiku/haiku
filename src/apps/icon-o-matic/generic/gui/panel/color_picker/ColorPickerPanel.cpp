@@ -9,6 +9,8 @@
 #include <stdio.h>
 
 #include <Application.h>
+#include <Catalog.h>
+#include <Locale.h>
 
 #if LIB_LAYOUT
 #  include <MBorder.h>
@@ -24,6 +26,11 @@
 #include "support_ui.h"
 
 #include "ColorPickerView.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-ColorPicker"
+
 
 enum {
 	MSG_CANCEL					= 'cncl',
@@ -43,12 +50,13 @@ ColorPickerPanel::ColorPickerPanel(BRect frame, rgb_color color,
 	  fMessage(message),
 	  fTarget(target)
 {
-	SetTitle("Pick a color");
+	SetTitle(B_TRANSLATE("Pick a color"));
 
 	fColorPickerView = new ColorPickerView("color picker", color, mode);
 
 #if LIB_LAYOUT
-	MButton* defaultButton = new MButton("OK", new BMessage(MSG_DONE), this);
+	MButton* defaultButton = new MButton(B_TRANSLATE("OK"),
+		new BMessage(MSG_DONE), this);
 
 	// interface layout
 	BView* topView = new VGroup (
@@ -57,7 +65,8 @@ ColorPickerPanel::ColorPickerPanel(BRect frame, rgb_color color,
 			M_RAISED_BORDER, 5, "buttons",
 			new HGroup (
 				new Space(minimax(0.0, 0.0, 10000.0, 10000.0, 5.0)),
-				new MButton("Cancel", new BMessage(MSG_CANCEL), this),
+				new MButton(B_TRANSLATE("Cancel"), new BMessage(MSG_CANCEL), 
+					this),
 				new Space(minimax(5.0, 0.0, 10.0, 10000.0, 1.0)),
 				defaultButton,
 				new Space(minimax(2.0, 0.0, 2.0, 10000.0, 0.0)),
@@ -68,13 +77,13 @@ ColorPickerPanel::ColorPickerPanel(BRect frame, rgb_color color,
 	);
 #else // LIB_LAYOUT
 	frame = BRect(0, 0, 40, 15);
-	BButton* defaultButton = new BButton(frame, "ok button", "OK",
-										 new BMessage(MSG_DONE),
-										 B_FOLLOW_RIGHT | B_FOLLOW_TOP);
+	BButton* defaultButton = new BButton(frame, "ok button", 
+								B_TRANSLATE("OK"), new BMessage(MSG_DONE),
+								B_FOLLOW_RIGHT | B_FOLLOW_TOP);
 	defaultButton->ResizeToPreferred();
-	BButton* cancelButton = new BButton(frame, "cancel button", "Cancel",
-										new BMessage(MSG_CANCEL),
-										B_FOLLOW_RIGHT | B_FOLLOW_TOP);
+	BButton* cancelButton = new BButton(frame, "cancel button", 
+								B_TRANSLATE("Cancel"), new BMessage(MSG_CANCEL),
+								B_FOLLOW_RIGHT | B_FOLLOW_TOP);
 	cancelButton->ResizeToPreferred();
 
 	frame.bottom = frame.top + (defaultButton->Frame().Height() + 16);

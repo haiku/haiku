@@ -12,10 +12,18 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <Catalog.h>
+#include <Locale.h>
+
 #include "GradientTransformable.h"
 #include "Shape.h"
 #include "Style.h"
 #include "VectorPath.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-FreezeTransformationCmd"
+
 
 using std::nothrow;
 
@@ -111,9 +119,9 @@ void
 FreezeTransformationCommand::GetName(BString& name)
 {
 	if (fCount > 1)
-		name << "Freeze Shapes";
+		name << B_TRANSLATE("Freeze Shapes");
 	else
-		name << "Freeze Shape";
+		name << B_TRANSLATE("Freeze Shape");
 }
 
 // #pragma mark -

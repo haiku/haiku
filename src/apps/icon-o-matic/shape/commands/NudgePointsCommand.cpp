@@ -11,7 +11,15 @@
 #include <new>
 #include <stdio.h>
 
+#include <Catalog.h>
+#include <Locale.h>
+
 #include "VectorPath.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-NudgePointsCommand"
+
 
 using std::nothrow;
 
@@ -25,7 +33,8 @@ NudgePointsCommand::NudgePointsCommand(VectorPath* path,
 					   0.0,
 					   1.0,
 					   1.0,
-					   count > 1 ? "Nudge Control Points" : "Nudge Control Point",
+					   count > 1 ? B_TRANSLATE("Nudge Control Points") : 
+					   B_TRANSLATE("Nudge Control Point"),
 //					   count > 1 ? NUDGE_CONTROL_POINTS : NUDGE_CONTROL_POINT),
 					   -1),
 	  fPath(path),

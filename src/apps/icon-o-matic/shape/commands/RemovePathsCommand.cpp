@@ -11,9 +11,17 @@
 #include <new>
 #include <stdio.h>
 
+#include <Catalog.h>
+#include <Locale.h>
+
 #include "PathContainer.h"
 #include "Shape.h"
 #include "VectorPath.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-RemovePathsCmd"
+
 
 using std::nothrow;
 
@@ -122,7 +130,7 @@ void
 RemovePathsCommand::GetName(BString& name)
 {
 	if (fCount > 1)
-		name << "Remove Paths";
+		name << B_TRANSLATE("Remove Paths");
 	else
-		name << "Remove Path";
+		name << B_TRANSLATE("Remove Path");
 }

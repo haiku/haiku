@@ -11,7 +11,15 @@
 #include <new>
 #include <stdio.h>
 
+#include <Catalog.h>
+#include <Locale.h>
+
 #include "ChannelTransform.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-ResetTransformationCmd"
+
 
 using std::nothrow;
 
@@ -82,7 +90,7 @@ void
 ResetTransformationCommand::GetName(BString& name)
 {
 	if (fCount > 1)
-		name << "Reset Transformations";
+		name << B_TRANSLATE("Reset Transformations");
 	else
-		name << "Reset Transformation";
+		name << B_TRANSLATE("Reset Transformation");
 }

@@ -12,8 +12,16 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <Catalog.h>
+#include <Locale.h>
+
 #include "ShapeContainer.h"
 #include "Shape.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-RemoveShapesCmd"
+
 
 using std::nothrow;
 
@@ -99,7 +107,7 @@ RemoveShapesCommand::GetName(BString& name)
 //	else
 //		name << _GetString(MOVE_MODIFIER, "Move Shape");
 	if (fCount > 1)
-		name << "Remove Shapes";
+		name << B_TRANSLATE("Remove Shapes");
 	else
-		name << "Remove Shape";
+		name << B_TRANSLATE("Remove Shape");
 }

@@ -12,6 +12,14 @@
 
 #include <debugger.h>
 
+#include <Catalog.h>
+#include <Locale.h>
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-PropertyNames"
+
+
 // name_for_id
 const char*
 name_for_id(int32 id)
@@ -19,75 +27,75 @@ name_for_id(int32 id)
 	const char* name = NULL;
 	switch (id) {
 		case PROPERTY_NAME:
-			name = "Name";
+			name = B_TRANSLATE("Name");
 			break;
 
 		case PROPERTY_OPACITY:
-			name = "Opacity";
+			name = B_TRANSLATE("Opacity");
 			break;
 		case PROPERTY_COLOR:
-			name = "Color";
+			name = B_TRANSLATE("Color");
 			break;
 
 		case PROPERTY_WIDTH:
-			name = "Width";
+			name = B_TRANSLATE("Width");
 			break;
 		case PROPERTY_HEIGHT:
-			name = "Height";
+			name = B_TRANSLATE("Height");
 			break;
 
 		case PROPERTY_CAP_MODE:
-			name = "Caps";
+			name = B_TRANSLATE("Caps");
 			break;
 		case PROPERTY_JOIN_MODE:
-			name = "Joins";
+			name = B_TRANSLATE("Joins");
 			break;
 		case PROPERTY_MITER_LIMIT:
-			name = "Miter Limit";
+			name = B_TRANSLATE("Miter Limit");
 			break;
 		case PROPERTY_STROKE_SHORTEN:
-			name = "Shorten";
+			name = B_TRANSLATE("Shorten");
 			break;
 
 		case PROPERTY_CLOSED:
-			name = "Closed";
+			name = B_TRANSLATE("Closed");
 			break;
 		case PROPERTY_PATH:
-			name = "Path";
+			name = B_TRANSLATE("Path");
 			break;
 
 		case PROPERTY_HINTING:
-			name = "Rounding";
+			name = B_TRANSLATE("Rounding");
 			break;
 		case PROPERTY_MIN_VISIBILITY_SCALE:
-			name = "Min LOD";
+			name = B_TRANSLATE("Min LOD");
 			break;
 		case PROPERTY_MAX_VISIBILITY_SCALE:
-			name = "Max LOD";
+			name = B_TRANSLATE("Max LOD");
 			break;
 
 		case PROPERTY_TRANSLATION_X:
-			name = "Translation X";
+			name = B_TRANSLATE("Translation X");
 			break;
 		case PROPERTY_TRANSLATION_Y:
-			name = "Translation Y";
+			name = B_TRANSLATE("Translation Y");
 			break;
 		case PROPERTY_ROTATION:
-			name = "Rotation";
+			name = B_TRANSLATE("Rotation");
 			break;
 		case PROPERTY_SCALE_X:
-			name = "Scale X";
+			name = B_TRANSLATE("Scale X");
 			break;
 		case PROPERTY_SCALE_Y:
-			name = "Scale Y";
+			name = B_TRANSLATE("Scale Y");
 			break;
 
 		case PROPERTY_DETECT_ORIENTATION:
-			name = "Detect Orient.";
+			name = B_TRANSLATE("Detect Orient.");
 			break;
 
 		default:
-			name = "<unkown property>";
+			name = B_TRANSLATE("<unkown property>");
 			break;
 	}
 	return name;

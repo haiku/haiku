@@ -13,12 +13,14 @@
 #include <string.h>
 
 #include <Alert.h>
+#include <Catalog.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
 #include <FilePanel.h>
 #include <fs_attr.h>
 #include <IconEditorProtocol.h>
+#include <Locale.h>
 #include <Message.h>
 #include <Mime.h>
 
@@ -48,6 +50,11 @@
 #include "SourceExporter.h"
 #include "SVGExporter.h"
 #include "SVGImporter.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-Main"
+
 
 using std::nothrow;
 
@@ -284,8 +291,9 @@ IconEditorApp::_CheckSaveIcon(const BMessage* currentMessage)
 	if (fDocument->IsEmpty() || fDocument->CommandStack()->IsSaved())
 		return true;
 
-	BAlert* alert = new BAlert("save", "Save changes to current icon?",
-		"Discard", "Cancel", "Save");
+	BAlert* alert = new BAlert("save", 
+		B_TRANSLATE("Save changes to current icon?"), B_TRANSLATE("Discard"),
+		 B_TRANSLATE("Cancel"), B_TRANSLATE("Save"));
 	int32 choice = alert->Go();
 	switch (choice) {
 		case 0:
@@ -437,10 +445,14 @@ IconEditorApp::_Open(const entry_ref& ref, bool append)
 
 	if (ret < B_OK) {
 		// inform user of failure at this point
-		BString helper("Opening the document failed!");
-		helper << "\n\n" << "Error: " << strerror(ret);
-		BAlert* alert = new BAlert("bad news", helper.String(),
-								   "Bummer", NULL, NULL);
+		BString helper(B_TRANSLATE("Opening the document failed!"));
+		helper << "\n\n" << B_TRANSLATE("Error: ") << strerror(ret);
+		BAlert* alert = new BAlert(
+			B_TRANSLATE_WITH_CONTEXT("bad news", "Title of error alert"),
+			helper.String(), 
+			B_TRANSLATE_WITH_CONTEXT("Bummer", 
+				"Cancel button - error alert"),	
+			NULL, NULL);
 		// launch alert asynchronously
 		alert->Go(NULL);
 
@@ -520,10 +532,14 @@ IconEditorApp::_Open(const BMessenger& externalObserver, const uint8* data,
 
 		if (ret < B_OK) {
 			// inform user of failure at this point
-			BString helper("Opening the icon failed!");
-			helper << "\n\n" << "Error: " << strerror(ret);
-			BAlert* alert = new BAlert("bad news", helper.String(),
-									   "Bummer", NULL, NULL);
+			BString helper(B_TRANSLATE("Opening the icon failed!"));
+			helper << "\n\n" << B_TRANSLATE("Error: ") << strerror(ret);
+			BAlert* alert = new BAlert(
+				B_TRANSLATE_WITH_CONTEXT("bad news", "Title of error alert"),
+				helper.String(), 
+				B_TRANSLATE_WITH_CONTEXT("Bummer", 
+					"Cancel button - error alert"),	
+				NULL, NULL);
 			// launch alert asynchronously
 			alert->Go(NULL);
 

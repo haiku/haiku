@@ -299,7 +299,61 @@ Application Icon-O-Matic :
 	MainWindow.cpp
 	Util.cpp
 
-	: be tracker translation libshared.a libagg.a libexpat.a $(TARGET_LIBSTDC++)
+	: be tracker translation libshared.a libagg.a libexpat.a 
+		$(TARGET_LIBSTDC++) $(HAIKU_LOCALE_LIBS)
 
 	: Icon-O-Matic.rdef
+;
+
+DoCatalogs Icon-O-Matic : 
+	x-vnd.haiku-icon_o_matic
+	: 
+	MainWindow.cpp
+	IconEditorApp.cpp
+	SetPropertiesCommand.cpp
+	ColorPickerPanel.cpp
+	PropertyListView.cpp
+	CommonPropertyIDs.cpp
+	IconObjectListView.cpp
+	PathListView.cpp
+	SavePanel.cpp
+	ShapeListView.cpp
+	StyleListView.cpp
+	StyleView.cpp
+	TransformerListView.cpp
+	StyledTextImporter.cpp
+	SVGExporter.cpp
+	SVGImporter.cpp
+	Exporter.cpp
+	AddPathsCommand.cpp
+	AddPointCommand.cpp
+	AddShapesCommand.cpp
+	AddTransformersCommand.cpp
+	ChangePointCommand.cpp
+	CleanUpPathCommand.cpp
+	FlipPointsCommand.cpp
+	FreezeTransformationCommand.cpp
+	InsertPointCommand.cpp
+	MovePathsCommand.cpp
+	MoveShapesCommand.cpp
+	MoveTransformersCommand.cpp
+	NudgePointsCommand.cpp
+	PathCommand.cpp
+	RemovePathsCommand.cpp
+	RemovePointsCommand.cpp
+	RemoveShapesCommand.cpp
+	RemoveTransformersCommand.cpp
+	ReversePathCommand.cpp
+	RotatePathIndicesCommand.cpp
+	SplitPointsCommand.cpp
+	UnassignPathCommand.cpp
+	PathManipulator.cpp
+	AddStylesCommand.cpp
+	AssignStyleCommand.cpp
+	MoveStylesCommand.cpp
+	RemoveStylesCommand.cpp
+	SetColorCommand.cpp
+	SetGradientCommand.cpp
+	ResetTransformationCommand.cpp
+	TransformBoxStates.cpp
 ;

@@ -8,7 +8,9 @@
 #include <float.h>
 #include <stdio.h>
 
+#include <Catalog.h>
 #include <Cursor.h>
+#include <Locale.h>
 #include <Message.h>
 #include <MenuItem.h>
 #include <PopUpMenu.h>
@@ -34,10 +36,14 @@
 #include "SplitPointsCommand.h"
 #include "TransformPointsBox.h"
 
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-PathManipulator"
 #define POINT_EXTEND 3.0
 #define CONTROL_POINT_EXTEND 2.0
 #define INSERT_DIST_THRESHOLD 7.0
 #define MOVE_THRESHOLD 9.0
+
 
 enum {
 	UNDEFINED,
@@ -768,29 +774,29 @@ PathManipulator::ShowContextMenu(BPoint where)
 
 	if (fCurrentPathPoint < 0) {
 		message = new BMessage(B_SELECT_ALL);
-		item = new BMenuItem("Select All", message, 'A');
+		item = new BMenuItem(B_TRANSLATE("Select All"), message, 'A');
 		menu->AddItem(item);
 	
 		menu->AddSeparatorItem();
 	}
 
 	message = new BMessage(MSG_TRANSFORM);
-	item = new BMenuItem("Transform", message, 'T');
+	item = new BMenuItem(B_TRANSLATE("Transform"), message, 'T');
 	item->SetEnabled(hasSelection);
 	menu->AddItem(item);
 
 	message = new BMessage(MSG_SPLIT_POINTS);
-	item = new BMenuItem("Split", message);
+	item = new BMenuItem(B_TRANSLATE("Split"), message);
 	item->SetEnabled(hasSelection);
 	menu->AddItem(item);
 
 	message = new BMessage(MSG_FLIP_POINTS);
-	item = new BMenuItem("Flip", message);
+	item = new BMenuItem(B_TRANSLATE("Flip"), message);
 	item->SetEnabled(hasSelection);
 	menu->AddItem(item);
 
 	message = new BMessage(MSG_REMOVE_POINTS);
-	item = new BMenuItem("Remove", message);
+	item = new BMenuItem(B_TRANSLATE("Remove"), message);
 	item->SetEnabled(hasSelection);
 	menu->AddItem(item);
 

@@ -11,8 +11,16 @@
 #include <new>
 #include <stdio.h>
 
+#include <Catalog.h>
+#include <Locale.h>
+
 #include "ShapeContainer.h"
 #include "Shape.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-MoveShapesCommand"
+
 
 using std::nothrow;
 
@@ -151,7 +159,7 @@ MoveShapesCommand::GetName(BString& name)
 //	else
 //		name << _GetString(MOVE_MODIFIER, "Move Shape");
 	if (fCount > 1)
-		name << "Move Shapes";
+		name << B_TRANSLATE("Move Shapes");
 	else
-		name << "Move Shape";
+		name << B_TRANSLATE("Move Shape");
 }

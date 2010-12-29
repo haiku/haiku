@@ -12,8 +12,16 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <Catalog.h>
+#include <Locale.h>
+
 #include "PathContainer.h"
 #include "VectorPath.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-AddPathsCmd"
+
 
 using std::nothrow;
 
@@ -101,13 +109,13 @@ AddPathsCommand::GetName(BString& name)
 {
 	if (fOwnsPaths) {
 		if (fCount > 1)
-			name << "Add Paths";
+			name << B_TRANSLATE("Add Paths");
 		else
-			name << "Add Path";
+			name << B_TRANSLATE("Add Path");
 	} else {
 		if (fCount > 1)
-			name << "Assign Paths";
+			name << B_TRANSLATE("Assign Paths");
 		else
-			name << "Assign Path";
+			name << B_TRANSLATE("Assign Path");
 	}
 }

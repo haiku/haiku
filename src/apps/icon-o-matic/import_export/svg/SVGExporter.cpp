@@ -9,8 +9,10 @@
 #include <stdio.h>
 
 #include <Alert.h>
+#include <Catalog.h>
 #include <DataIO.h>
 #include <File.h>
+#include <Locale.h>
 #include <String.h>
 
 #include "support.h"
@@ -23,6 +25,11 @@
 #include "VectorPath.h"
 
 #include "SVGExporter.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-SVGExport"
+
 
 // write_line
 static status_t
@@ -148,14 +155,15 @@ SVGExporter::SetOriginalEntry(const entry_ref* ref)
 bool
 SVGExporter::_DisplayWarning() const
 {
-	BAlert* alert = new BAlert("warning",
-							   "Icon-O-Matic might not have "
+	BAlert* alert = new BAlert(B_TRANSLATE("warning"),
+							   B_TRANSLATE("Icon-O-Matic might not have "
 							   "interpreted all data from the SVG "
 							   "when it was loaded. "
 							   "By overwriting the original "
 							   "file, this information would now "
-							   "be lost.",
-							   "Cancel", "Overwrite");
+							   "be lost."),
+							   B_TRANSLATE("Cancel"), 
+							   B_TRANSLATE("Overwrite"));
 	return alert->Go() == 1;
 }
 

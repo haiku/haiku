@@ -13,7 +13,9 @@
 #include <stdio.h>
 
 #include <Alert.h>
+#include <Catalog.h>
 #include <File.h>
+#include <Locale.h>
 #include <Node.h>
 #include <NodeInfo.h>
 #include <Path.h>
@@ -23,6 +25,11 @@
 #include "CommandStack.h"
 #include "Document.h"
 #include "Icon.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-Exporter"
+
 
 using std::nothrow;
 
@@ -93,10 +100,12 @@ Exporter::_ExportThread()
 	status_t ret = _Export(fClonedIcon, &fRef);
 	if (ret < B_OK) {
 		// inform user of failure at this point
-		BString helper("Saving your document failed!");
-		helper << "\n\n" << "Error: " << strerror(ret);
-		BAlert* alert = new BAlert("bad news", helper.String(),
-								   "Bleep!", NULL, NULL);
+		BString helper(B_TRANSLATE("Saving your document failed!"));
+		helper << "\n\n" << B_TRANSLATE("Error: ") << strerror(ret);
+		BAlert* alert = new BAlert(B_TRANSLATE("bad news"), helper.String(),
+			B_TRANSLATE_WITH_CONTEXT("Bleep!", 
+				"Exporter - Continue in error dialog"), 
+			NULL, NULL);
 		// launch alert asynchronously
 		alert->Go(NULL);
 	} else {

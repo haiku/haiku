@@ -12,7 +12,9 @@
 #include <stdio.h>
 
 #include <Application.h>
+#include <Catalog.h>
 #include <ListItem.h>
+#include <Locale.h>
 #include <Menu.h>
 #include <MenuItem.h>
 #include <Message.h>
@@ -33,6 +35,11 @@
 #include "ShapeContainer.h"
 #include "Selection.h"
 #include "Util.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-StylesList"
+
 
 using std::nothrow;
 
@@ -592,21 +599,22 @@ StyleListView::SetMenu(BMenu* menu)
 	if (fMenu == NULL)
 		return;
 
-	fAddMI = new BMenuItem("Add", new BMessage(MSG_ADD));
+	fAddMI = new BMenuItem(B_TRANSLATE("Add"), new BMessage(MSG_ADD));
 	fMenu->AddItem(fAddMI);
 
 	fMenu->AddSeparatorItem();
 
-	fDuplicateMI = new BMenuItem("Duplicate", new BMessage(MSG_DUPLICATE));
+	fDuplicateMI = new BMenuItem(B_TRANSLATE("Duplicate"),
+		new BMessage(MSG_DUPLICATE));
 	fMenu->AddItem(fDuplicateMI);
 
-	fResetTransformationMI = new BMenuItem("Reset transformation",
+	fResetTransformationMI = new BMenuItem(B_TRANSLATE("Reset transformation"),
 		new BMessage(MSG_RESET_TRANSFORMATION));
 	fMenu->AddItem(fResetTransformationMI);
 
 	fMenu->AddSeparatorItem();
 
-	fRemoveMI = new BMenuItem("Remove", new BMessage(MSG_REMOVE));
+	fRemoveMI = new BMenuItem(B_TRANSLATE("Remove"), new BMessage(MSG_REMOVE));
 	fMenu->AddItem(fRemoveMI);
 
 	fMenu->SetTargetForItems(this);

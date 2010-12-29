@@ -11,10 +11,12 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <Catalog.h>
 #include <Clipboard.h>
 #ifdef __HAIKU__
 #  include <LayoutUtils.h>
 #endif
+#include <Locale.h>
 #include <Menu.h>
 #include <MenuItem.h>
 #include <Message.h>
@@ -28,6 +30,11 @@
 #include "Scrollable.h"
 #include "Scroller.h"
 #include "ScrollView.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-Properties"
+
 
 enum {
 	MSG_COPY_PROPERTIES		= 'cppr',
@@ -315,12 +322,15 @@ PropertyListView::SetMenu(BMenu* menu)
 	if (!fPropertyM)
 		return;
 
-	fSelectM = new BMenu("Select");
-	fSelectAllMI = new BMenuItem("All", new BMessage(MSG_SELECT_ALL));
+	fSelectM = new BMenu(B_TRANSLATE("Select"));
+	fSelectAllMI = new BMenuItem(B_TRANSLATE("All"), 
+		new BMessage(MSG_SELECT_ALL));
 	fSelectM->AddItem(fSelectAllMI);
-	fSelectNoneMI = new BMenuItem("None", new BMessage(MSG_SELECT_NONE));
+	fSelectNoneMI = new BMenuItem(B_TRANSLATE("None"),
+		new BMessage(MSG_SELECT_NONE));
 	fSelectM->AddItem(fSelectNoneMI);
-	fInvertSelectionMI = new BMenuItem("Invert selection", new BMessage(MSG_INVERT_SELECTION));
+	fInvertSelectionMI = new BMenuItem(B_TRANSLATE("Invert selection"),
+		new BMessage(MSG_INVERT_SELECTION));
 	fSelectM->AddItem(fInvertSelectionMI);
 	fSelectM->SetTargetForItems(this);
 
@@ -328,9 +338,11 @@ PropertyListView::SetMenu(BMenu* menu)
 
 	fPropertyM->AddSeparatorItem();
 
-	fCopyMI = new BMenuItem("Copy", new BMessage(MSG_COPY_PROPERTIES));
+	fCopyMI = new BMenuItem(B_TRANSLATE("Copy"), 
+		new BMessage(MSG_COPY_PROPERTIES));
 	fPropertyM->AddItem(fCopyMI);
-	fPasteMI = new BMenuItem("Paste", new BMessage(MSG_PASTE_PROPERTIES));
+	fPasteMI = new BMenuItem(B_TRANSLATE("Paste"), 
+		new BMessage(MSG_PASTE_PROPERTIES));
 	fPropertyM->AddItem(fPasteMI);
 
 	fPropertyM->SetTargetForItems(this);
@@ -728,10 +740,10 @@ PropertyListView::_CheckMenuStatus()
 //	LanguageManager* m = LanguageManager::Default();
 	if (IsEditingMultipleObjects())
 //		fPasteMI->SetLabel(m->GetString(MULTI_PASTE, "Multi paste"));
-		fPasteMI->SetLabel("Multi paste");
+		fPasteMI->SetLabel(B_TRANSLATE("Multi paste"));
 	else
 //		fPasteMI->SetLabel(m->GetString(PASTE, "Paste"));
-		fPasteMI->SetLabel("Paste");
+		fPasteMI->SetLabel(B_TRANSLATE("Paste"));
 
 	bool enableMenu = fPropertyObject;
 	if (fPropertyM->IsEnabled() != enableMenu)

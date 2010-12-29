@@ -10,7 +10,15 @@
 
 #include <stdio.h>
 
+#include <Catalog.h>
+#include <Locale.h>
+
 #include "VectorPath.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-PathCmd"
+
 
 // constructor
 PathCommand::PathCommand(VectorPath* path)
@@ -35,7 +43,7 @@ void
 PathCommand::GetName(BString& name)
 {
 
-	name << ("<modify path>");
+	name << B_TRANSLATE("<modify path>");
 }
 
 // _Select

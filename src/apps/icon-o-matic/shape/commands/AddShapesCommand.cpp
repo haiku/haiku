@@ -12,9 +12,17 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <Catalog.h>
+#include <Locale.h>
+
 #include "Selection.h"
 #include "ShapeContainer.h"
 #include "Shape.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-AddShapesCmd"
+
 
 using std::nothrow;
 
@@ -99,7 +107,7 @@ void
 AddShapesCommand::GetName(BString& name)
 {
 	if (fCount > 1)
-		name << "Add Shapes";
+		name << B_TRANSLATE("Add Shapes");
 	else
-		name << "Add Shape";
+		name << B_TRANSLATE("Add Shape");
 }

@@ -15,9 +15,11 @@
 #include <Alert.h>
 #include <Archivable.h>
 #include <ByteOrder.h>
+#include <Catalog.h>
 #include <DataIO.h>
 #include <File.h>
 #include <List.h>
+#include <Locale.h>
 #include <Message.h>
 #include <NodeInfo.h>
 #include <Shape.h>
@@ -32,8 +34,12 @@
 #include "StyleContainer.h"
 #include "VectorPath.h"
 
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-StyledTextImport"
 //#define CALLED() printf("%s()\n", __FUNCTION__);
 #define CALLED() do {} while (0)
+
 
 using std::nothrow;
 
@@ -247,9 +253,11 @@ StyledTextImporter::_Import(Icon* icon, const char *text, text_run_array *runs)
 
 	BString str(text);
 	if (str.Length() > 50) {
-		BAlert* alert = new BAlert("too big",
-			"The text you are trying to import is quite long, are you sure?",
-			"Yes", "No", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		BAlert* alert = new BAlert(B_TRANSLATE("too big"),
+			B_TRANSLATE("The text you are trying to import is quite long,"
+				"are you sure?"),
+			B_TRANSLATE("Yes"), B_TRANSLATE("No"), NULL, 
+			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		if (alert->Go())
 			return B_CANCELED;
 	}
@@ -365,7 +373,8 @@ StyledTextImporter::_AddStyle(Icon *icon, text_run *run)
 		return B_NO_MEMORY;
 	}
 	char name[30];
-	sprintf(name, "Color (#%02x%02x%02x)", color.red, color.green, color.blue);
+	sprintf(name, B_TRANSLATE("Color (#%02x%02x%02x)"),
+		color.red, color.green, color.blue);
 	style->SetName(name);
 
 	bool found = false;

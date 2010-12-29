@@ -11,8 +11,16 @@
 #include <new>
 #include <stdio.h>
 
+#include <Catalog.h>
+#include <Locale.h>
+
 #include "StyleContainer.h"
 #include "Style.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-MoveStylesCmd"
+
 
 using std::nothrow;
 
@@ -147,7 +155,7 @@ void
 MoveStylesCommand::GetName(BString& name)
 {
 	if (fCount > 1)
-		name << "Move Styles";
+		name << B_TRANSLATE("Move Styles");
 	else
-		name << "Move Style";
+		name << B_TRANSLATE("Move Style");
 }

@@ -15,6 +15,8 @@
 # include "GroupLayout.h"
 # include "SpaceLayoutItem.h"
 #endif
+#include <Catalog.h>
+#include <Locale.h>
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuField.h>
@@ -30,6 +32,10 @@
 #include "SetColorCommand.h"
 #include "SetGradientCommand.h"
 #include "Style.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-StyleTypes"
 
 
 using std::nothrow;
@@ -65,26 +71,26 @@ StyleView::StyleView(BRect frame)
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	// style type
-	BMenu* menu = new BPopUpMenu("<unavailable>");
+	BMenu* menu = new BPopUpMenu(B_TRANSLATE("<unavailable>"));
 	BMessage* message = new BMessage(MSG_SET_STYLE_TYPE);
 	message->AddInt32("type", STYLE_TYPE_COLOR);
-	menu->AddItem(new BMenuItem("Color", message));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Color"), message));
 	message = new BMessage(MSG_SET_STYLE_TYPE);
 	message->AddInt32("type", STYLE_TYPE_GRADIENT);
-	menu->AddItem(new BMenuItem("Gradient", message));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Gradient"), message));
 
 #ifdef __HAIKU__
 	BGridLayout* layout = new BGridLayout(5, 5);
 	SetLayout(layout);
 
-	fStyleType = new BMenuField( "Style type", menu, NULL);
+	fStyleType = new BMenuField(B_TRANSLATE("Style type"), menu, NULL);
 
 #else
 	frame.OffsetTo(B_ORIGIN);
 	frame.InsetBy(5, 5);
 	frame.bottom = frame.top + 15;
 
-	fStyleType = new BMenuField(frame, "style type", "Style type",
+	fStyleType = new BMenuField(frame, "style type", B_TRANSLATE("Style type"),
 		menu, true);
 	AddChild(fStyleType);
 
@@ -98,22 +104,22 @@ StyleView::StyleView(BRect frame)
 #endif // __HAIKU__
 
 	// gradient type
-	menu = new BPopUpMenu("<unavailable>");
+	menu = new BPopUpMenu(B_TRANSLATE("<unavailable>"));
 	message = new BMessage(MSG_SET_GRADIENT_TYPE);
 	message->AddInt32("type", GRADIENT_LINEAR);
-	menu->AddItem(new BMenuItem("Linear", message));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Linear"), message));
 	message = new BMessage(MSG_SET_GRADIENT_TYPE);
 	message->AddInt32("type", GRADIENT_CIRCULAR);
-	menu->AddItem(new BMenuItem("Radial", message));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Radial"), message));
 	message = new BMessage(MSG_SET_GRADIENT_TYPE);
 	message->AddInt32("type", GRADIENT_DIAMOND);
-	menu->AddItem(new BMenuItem("Diamond", message));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Diamond"), message));
 	message = new BMessage(MSG_SET_GRADIENT_TYPE);
 	message->AddInt32("type", GRADIENT_CONIC);
-	menu->AddItem(new BMenuItem("Conic", message));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Conic"), message));
 
 #if __HAIKU__
-	fGradientType = new BMenuField("Gradient type", menu, NULL);
+	fGradientType = new BMenuField(B_TRANSLATE("Gradient type"), menu, NULL);
 	fGradientControl = new GradientControl(new BMessage(MSG_SET_COLOR), this);
 
 	layout->AddItem(BSpaceLayoutItem::CreateVerticalStrut(3), 0, 0, 4);
@@ -132,8 +138,8 @@ StyleView::StyleView(BRect frame)
 
 #else // !__HAIKU__
 	frame.OffsetBy(0, fStyleType->Frame().Height() + 6);
-	fGradientType = new BMenuField(frame, "gradient type", "Gradient type",
-		menu, true);
+	fGradientType = new BMenuField(frame, "gradient type", 
+		B_TRANSLATE("Gradient type"), menu, true);
 	AddChild(fGradientType);
 
 	fGradientType->MenuBar()->GetPreferredSize(&width, &height);

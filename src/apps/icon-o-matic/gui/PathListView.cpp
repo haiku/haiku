@@ -12,7 +12,9 @@
 #include <stdio.h>
 
 #include <Application.h>
+#include <Catalog.h>
 #include <ListItem.h>
+#include <Locale.h>
 #include <Menu.h>
 #include <MenuItem.h>
 #include <Message.h>
@@ -33,6 +35,11 @@
 #include "UnassignPathCommand.h"
 #include "Util.h"
 #include "VectorPath.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-PathsList"
+
 
 using std::nothrow;
 
@@ -728,20 +735,26 @@ PathListView::SetMenu(BMenu* menu)
 	if (fMenu == NULL)
 		return;
 
-	fAddMI = new BMenuItem("Add", new BMessage(MSG_ADD));
-	fAddRectMI = new BMenuItem("Add rect", new BMessage(MSG_ADD_RECT));
-	fAddCircleMI = new BMenuItem("Add circle"/*B_UTF8_ELLIPSIS*/,
+	fAddMI = new BMenuItem(B_TRANSLATE("Add"),
+		new BMessage(MSG_ADD));
+	fAddRectMI = new BMenuItem(B_TRANSLATE("Add rect"), 
+		new BMessage(MSG_ADD_RECT));
+	fAddCircleMI = new BMenuItem(B_TRANSLATE("Add circle"/*B_UTF8_ELLIPSIS*/),
 		new BMessage(MSG_ADD_CIRCLE));
 //	fAddArcMI = new BMenuItem("Add arc"B_UTF8_ELLIPSIS,
 //		new BMessage(MSG_ADD_ARC));
-	fDuplicateMI = new BMenuItem("Duplicate", new BMessage(MSG_DUPLICATE));
-	fReverseMI = new BMenuItem("Reverse", new BMessage(MSG_REVERSE));
-	fCleanUpMI = new BMenuItem("Clean up", new BMessage(MSG_CLEAN_UP));
-	fRotateIndicesRightMI = new BMenuItem("Rotate indices right",
+	fDuplicateMI = new BMenuItem(B_TRANSLATE("Duplicate"), 
+		new BMessage(MSG_DUPLICATE));
+	fReverseMI = new BMenuItem(B_TRANSLATE("Reverse"),
+		new BMessage(MSG_REVERSE));
+	fCleanUpMI = new BMenuItem(B_TRANSLATE("Clean up"),
+		new BMessage(MSG_CLEAN_UP));
+	fRotateIndicesRightMI = new BMenuItem(B_TRANSLATE("Rotate indices right"),
 		new BMessage(MSG_ROTATE_INDICES_CCW), 'R');
-	fRotateIndicesLeftMI = new BMenuItem("Rotate indices left",
+	fRotateIndicesLeftMI = new BMenuItem(B_TRANSLATE("Rotate indices left"),
 		new BMessage(MSG_ROTATE_INDICES_CW), 'R', B_SHIFT_KEY);
-	fRemoveMI = new BMenuItem("Remove", new BMessage(MSG_REMOVE));
+	fRemoveMI = new BMenuItem(B_TRANSLATE("Remove"),
+		new BMessage(MSG_REMOVE));
 
 	fMenu->AddItem(fAddMI);
 	fMenu->AddItem(fAddRectMI);

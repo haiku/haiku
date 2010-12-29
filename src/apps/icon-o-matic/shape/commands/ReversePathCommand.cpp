@@ -10,7 +10,15 @@
 
 #include <stdio.h>
 
+#include <Catalog.h>
+#include <Locale.h>
+
 #include "VectorPath.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-ReversePathCmd"
+
 
 // constructor
 ReversePathCommand::ReversePathCommand(VectorPath* path)
@@ -43,5 +51,5 @@ ReversePathCommand::Undo()
 void
 ReversePathCommand::GetName(BString& name)
 {
-	name <<"Reverse Path";
+	name << B_TRANSLATE("Reverse Path");
 }

@@ -11,14 +11,20 @@
 #include <math.h>
 #include <stdio.h>
 
+#include <Catalog.h>
 #include <Cursor.h>
 #include <InterfaceDefs.h>
+#include <Locale.h>
 #include <View.h>
 
 #include "cursors.h"
 #include "support.h"
 
 #include "TransformBox.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-TransformationBoxStates"
 
 
 // constructor
@@ -42,7 +48,7 @@ DragState::SetOrigin(BPoint origin)
 const char*
 DragState::ActionName() const
 {
-	return "Transformation";
+	return B_TRANSLATE("Transformation");
 }
 
 
@@ -288,7 +294,7 @@ DragCornerState::UpdateViewCursor(BView* view, BPoint current) const
 const char*
 DragCornerState::ActionName() const
 {
-	return "Scale";
+	return B_TRANSLATE("Scale");
 }
 
 
@@ -456,7 +462,7 @@ DragSideState::UpdateViewCursor(BView* view, BPoint current) const
 const char*
 DragSideState::ActionName() const
 {
-	return "Scale";
+	return B_TRANSLATE("Scale");
 }
 
 
@@ -508,7 +514,7 @@ DragBoxState::UpdateViewCursor(BView* view, BPoint current) const
 const char*
 DragBoxState::ActionName() const
 {
-	return "Move";
+	return B_TRANSLATE("Move");
 }
 
 
@@ -597,7 +603,7 @@ RotateBoxState::UpdateViewCursor(BView* view, BPoint current) const
 const char*
 RotateBoxState::ActionName() const
 {
-	return "Rotate";
+	return B_TRANSLATE("Rotate");
 }
 
 
@@ -643,7 +649,7 @@ OffsetCenterState::UpdateViewCursor(BView* view, BPoint current) const
 const char*
 OffsetCenterState::ActionName() const
 {
-	return "Move Pivot";
+	return B_TRANSLATE("Move Pivot");
 }
 
 

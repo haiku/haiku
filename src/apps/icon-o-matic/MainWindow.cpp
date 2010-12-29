@@ -18,6 +18,8 @@
 #include <Message.h>
 #include <Screen.h>
 #include <ScrollView.h>
+#include <Catalog.h>
+#include <Locale.h>
 
 #include "support_ui.h"
 
@@ -59,6 +61,10 @@
 #include "VectorPath.h"
 
 #include "StyledTextImporter.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-Main"
 
 
 using std::nothrow;
@@ -130,7 +136,9 @@ MainWindow::MessageReceived(BMessage* message)
 			if (len != sizeof(rgb_color))
 				continue;
 			char name[30];
-			sprintf(name, "Color (#%02x%02x%02x)", 
+			sprintf(name, 
+				B_TRANSLATE_WITH_CONTEXT("Color (#%02x%02x%02x)", 
+					"Style name after dropping a color"), 
 				color->red, color->green, color->blue);
 			Style* style = new (nothrow) Style(*color);
 			style->SetName(name);
@@ -259,19 +267,25 @@ MainWindow::MessageReceived(BMessage* message)
 					commands[1] = pathCommand;
 					commands[2] = shapeCommand;
 					command = new CompoundCommand(commands, 3,
-										"Add shape with path & style", 0);
+						B_TRANSLATE_WITH_CONTEXT("Add shape with path & style",
+							"Icon-O-Matic-Menu-Shape"),
+						0);
 				} else if (styleCommand) {
 					Command** commands = new Command*[2];
 					commands[0] = styleCommand;
 					commands[1] = shapeCommand;
 					command = new CompoundCommand(commands, 2,
-										"Add shape with style", 0);
+						B_TRANSLATE_WITH_CONTEXT("Add shape with style",
+							"Icon-O-Matic-Menu-Shape"), 
+						0);
 				} else {
 					Command** commands = new Command*[2];
 					commands[0] = pathCommand;
 					commands[1] = shapeCommand;
 					command = new CompoundCommand(commands, 2,
-										"Add shape with path", 0);
+						B_TRANSLATE_WITH_CONTEXT("Add shape with path",
+							"Icon-O-Matic-Menu-Shape"), 
+						0);
 				}
 			} else {
 				command = shapeCommand;
@@ -426,20 +440,22 @@ MainWindow::ObjectChanged(const Observable* object)
 
 	if (object == fDocument->CommandStack()) {
 		// relable Undo item and update enabled status
-		BString label("Undo");
+		BString label(B_TRANSLATE("Undo"));
 		fUndoMI->SetEnabled(fDocument->CommandStack()->GetUndoName(label));
 		if (fUndoMI->IsEnabled())
 			fUndoMI->SetLabel(label.String());
 		else
-			fUndoMI->SetLabel("<nothing to undo>");
+			fUndoMI->SetLabel(B_TRANSLATE_WITH_CONTEXT("<nothing to undo>",
+				"Icon-O-Matic-Menu-Edit"));
 
 		// relable Redo item and update enabled status
-		label.SetTo("Redo");
+		label.SetTo(B_TRANSLATE("Redo"));
 		fRedoMI->SetEnabled(fDocument->CommandStack()->GetRedoName(label));
 		if (fRedoMI->IsEnabled())
 			fRedoMI->SetLabel(label.String());
 		else
-			fRedoMI->SetLabel("<nothing to redo>");
+			fRedoMI->SetLabel(B_TRANSLATE_WITH_CONTEXT("<nothing to redo>",
+				"Icon-O-Matic-Menu-Edit"));
 	}
 
 	Unlock();
@@ -769,52 +785,66 @@ MainWindow::_CreateGUI(BRect bounds)
 		swatchGroupView->MinSize().height));
 }
 
-
 BMenuBar*
 MainWindow::_CreateMenuBar(BRect frame)
 {
 	BMenuBar* menuBar = new BMenuBar(frame, "main menu");
 
-	BMenu* fileMenu = new BMenu("File");
-	BMenu* editMenu = new BMenu("Edit");
-	BMenu* settingsMenu = new BMenu("Options");
-	fPathMenu = new BMenu("Path");
-	fStyleMenu = new BMenu("Style");
-	fShapeMenu = new BMenu("Shape");
-	fTransformerMenu = new BMenu("Transformer");
-	fPropertyMenu = new BMenu("Properties");
-	fSwatchMenu = new BMenu("Swatches");
+
+	#undef B_TRANSLATE_CONTEXT
+	#define B_TRANSLATE_CONTEXT "Icon-O-Matic-Menus"
+	
+	
+	BMenu* fileMenu = new BMenu(B_TRANSLATE("File"));
+	BMenu* editMenu = new BMenu(B_TRANSLATE("Edit"));
+	BMenu* settingsMenu = new BMenu(B_TRANSLATE("Options"));
+	fPathMenu = new BMenu(B_TRANSLATE("Path"));
+	fStyleMenu = new BMenu(B_TRANSLATE("Style"));
+	fShapeMenu = new BMenu(B_TRANSLATE("Shape"));
+	fTransformerMenu = new BMenu(B_TRANSLATE("Transformer"));
+	fPropertyMenu = new BMenu(B_TRANSLATE("Properties"));
+	fSwatchMenu = new BMenu(B_TRANSLATE("Swatches"));
 
 	menuBar->AddItem(fileMenu);
 	menuBar->AddItem(editMenu);
 	menuBar->AddItem(settingsMenu);
 
+
 	// File
-	fileMenu->AddItem(new BMenuItem("New",
+	#undef B_TRANSLATE_CONTEXT
+	#define B_TRANSLATE_CONTEXT "Icon-O-Matic-Menu-File"
+	
+	
+	fileMenu->AddItem(new BMenuItem(B_TRANSLATE("New"),
 		new BMessage(MSG_NEW), 'N'));
-	fileMenu->AddItem(new BMenuItem("Open"B_UTF8_ELLIPSIS,
+	fileMenu->AddItem(new BMenuItem(B_TRANSLATE("Open"B_UTF8_ELLIPSIS),
 		new BMessage(MSG_OPEN), 'O'));
-	fileMenu->AddItem(new BMenuItem("Append"B_UTF8_ELLIPSIS,
+	fileMenu->AddItem(new BMenuItem(B_TRANSLATE("Append"B_UTF8_ELLIPSIS),
 		new BMessage(MSG_APPEND), 'O', B_SHIFT_KEY));
 	fileMenu->AddSeparatorItem();
-	fileMenu->AddItem(new BMenuItem("Save",
+	fileMenu->AddItem(new BMenuItem(B_TRANSLATE("Save"),
 		new BMessage(MSG_SAVE), 'S'));
-	fileMenu->AddItem(new BMenuItem("Save as"B_UTF8_ELLIPSIS,
+	fileMenu->AddItem(new BMenuItem(B_TRANSLATE("Save as"B_UTF8_ELLIPSIS),
 		new BMessage(MSG_SAVE_AS), 'S', B_SHIFT_KEY));
 	fileMenu->AddSeparatorItem();
-	fileMenu->AddItem(new BMenuItem("Export",
+	fileMenu->AddItem(new BMenuItem(B_TRANSLATE("Export"),
 		new BMessage(MSG_EXPORT), 'P'));
-	fileMenu->AddItem(new BMenuItem("Export as"B_UTF8_ELLIPSIS,
+	fileMenu->AddItem(new BMenuItem(B_TRANSLATE("Export as"B_UTF8_ELLIPSIS),
 		new BMessage(MSG_EXPORT_AS), 'P', B_SHIFT_KEY));
 	fileMenu->AddSeparatorItem();
-	fileMenu->AddItem(new BMenuItem("Quit",
+	fileMenu->AddItem(new BMenuItem(B_TRANSLATE("Quit"),
 		new BMessage(B_QUIT_REQUESTED), 'Q'));
 	fileMenu->SetTargetForItems(be_app);
 
+
 	// Edit
-	fUndoMI = new BMenuItem("<nothing to undo>",
+	#undef B_TRANSLATE_CONTEXT
+	#define B_TRANSLATE_CONTEXT "Icon-O-Matic-Menu-Edit"
+	
+	
+	fUndoMI = new BMenuItem(B_TRANSLATE("<nothing to undo>"),
 		new BMessage(MSG_UNDO), 'Z');
-	fRedoMI = new BMenuItem("<nothing to redo>",
+	fRedoMI = new BMenuItem(B_TRANSLATE("<nothing to redo>"),
 		new BMessage(MSG_REDO), 'Z', B_SHIFT_KEY);
 
 	fUndoMI->SetEnabled(false);
@@ -823,8 +853,13 @@ MainWindow::_CreateMenuBar(BRect frame)
 	editMenu->AddItem(fUndoMI);
 	editMenu->AddItem(fRedoMI);
 
+
 	// Settings
-	BMenu* filterModeMenu = new BMenu("Snap to grid");
+	#undef B_TRANSLATE_CONTEXT
+	#define B_TRANSLATE_CONTEXT "Icon-O-Matic-Menu-Settings"
+	
+	
+	BMenu* filterModeMenu = new BMenu(B_TRANSLATE("Snap to grid"));
 	BMessage* message = new BMessage(MSG_MOUSE_FILTER_MODE);
 	message->AddInt32("mode", SNAPPING_OFF);
 	filterModeMenu->AddItem(new BMenuItem("Off", message, '4'));

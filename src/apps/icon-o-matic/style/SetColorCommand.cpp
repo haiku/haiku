@@ -11,8 +11,16 @@
 #include <new>
 #include <stdio.h>
 
+#include <Catalog.h>
+#include <Locale.h>
+
 #include "GradientTransformable.h"
 #include "Style.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-SetColorCmd"
+
 
 using std::nothrow;
 
@@ -66,7 +74,7 @@ SetColorCommand::Undo()
 void
 SetColorCommand::GetName(BString& name)
 {
-	name << "Change Color";
+	name << B_TRANSLATE("Change Color");
 }
 
 // CombineWithNext

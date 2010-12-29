@@ -13,6 +13,8 @@
 
 #include <Alert.h>
 #include <Button.h>
+#include <Catalog.h>
+#include <Locale.h>
 #include <MenuBar.h>
 #include <MenuField.h>
 #include <PopUpMenu.h>
@@ -25,6 +27,11 @@
 #include "Exporter.h"
 #include "IconEditorApp.h"
 #include "Panel.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-SavePanel"
+
 
 enum {
 	MSG_FORMAT		= 'sfpf',
@@ -88,10 +95,12 @@ SavePanel::SavePanel(const char* name,
 	be_plain_font->GetHeight(&fh);
 	rect.bottom = rect.top + fh.ascent + fh.descent + 5.0;
 
-	fFormatMF = new BMenuField(rect, "format popup", "Format", fFormatM, true,
-							   B_FOLLOW_LEFT | B_FOLLOW_BOTTOM,
-							   B_WILL_DRAW | B_NAVIGABLE);
-	fFormatMF->SetDivider(be_plain_font->StringWidth("Format") + 7);
+	fFormatMF = new BMenuField(rect, "format popup", B_TRANSLATE("Format"),
+								fFormatM, true,	
+								B_FOLLOW_LEFT | B_FOLLOW_BOTTOM,
+								B_WILL_DRAW | B_NAVIGABLE);
+	fFormatMF->SetDivider(be_plain_font->StringWidth(
+		B_TRANSLATE("Format")) + 7);
 	fFormatMF->MenuBar()->ResizeToPreferred();
 	fFormatMF->ResizeToPreferred();
 
@@ -120,9 +129,11 @@ SavePanel::SavePanel(const char* name,
 	// Build the "Settings" button relative to the format menu
 	rect = cancel->Frame();
 	rect.OffsetTo(fFormatMF->Frame().right + 5.0, rect.top);
-	fSettingsB = new BButton(rect, "settings", "Settings"B_UTF8_ELLIPSIS,
+	fSettingsB = new BButton(rect, "settings", 
+							 B_TRANSLATE("Settings"B_UTF8_ELLIPSIS),
 							 new BMessage(MSG_SETTINGS),
-							 B_FOLLOW_LEFT | B_FOLLOW_BOTTOM, B_WILL_DRAW | B_NAVIGABLE);
+							 B_FOLLOW_LEFT | B_FOLLOW_BOTTOM,
+							 B_WILL_DRAW | B_NAVIGABLE);
 	fSettingsB->ResizeToPreferred();
 	background->AddChild(fSettingsB);
 	fSettingsB->SetTarget(this);
@@ -195,7 +206,7 @@ SavePanel::SetExportMode(bool exportMode)
 		fFormatMF->SetEnabled(true);
 		SetExportMode(fExportMode);
 		_EnableSettings();
-		helper << "Export Icon";
+		helper << B_TRANSLATE_WITH_CONTEXT("Export Icon", "Dialog title");
 	} else {
 		fExportMode = ExportMode();
 			// does not overwrite fExportMode in case we already were
@@ -204,7 +215,7 @@ SavePanel::SetExportMode(bool exportMode)
 
 		fFormatMF->SetEnabled(false);
 		fSettingsB->SetEnabled(false);
-		helper << "Save Icon";
+		helper << B_TRANSLATE_WITH_CONTEXT("Save Icon", "Dialog title");
 	}
 
 	window->Unlock();
@@ -372,51 +383,53 @@ SavePanel::_ExportSettings()
 void
 SavePanel::_BuildMenu()
 {
-	fFormatM = new BPopUpMenu("Format");
+	fFormatM = new BPopUpMenu(B_TRANSLATE("Format"));
 
-	fNativeMI = new SaveItem("Icon-O-Matic", new BMessage(MSG_FORMAT),
-							 EXPORT_MODE_MESSAGE);
+	fNativeMI = new SaveItem("Icon-O-Matic", 
+		new BMessage(MSG_FORMAT), EXPORT_MODE_MESSAGE);
 	fFormatM->AddItem(fNativeMI);
 	fNativeMI->SetEnabled(false);
 
 	fFormatM->AddSeparatorItem();
 
-	fHVIFMI = new SaveItem("HVIF", new BMessage(MSG_FORMAT),
-						   EXPORT_MODE_FLAT_ICON);
+	fHVIFMI = new SaveItem("HVIF", 
+		new BMessage(MSG_FORMAT), EXPORT_MODE_FLAT_ICON);
 	fFormatM->AddItem(fHVIFMI);
 
-	fRDefMI = new SaveItem("HVIF RDef", new BMessage(MSG_FORMAT),
-						   EXPORT_MODE_ICON_RDEF);
+	fRDefMI = new SaveItem("HVIF RDef", 
+		new BMessage(MSG_FORMAT), EXPORT_MODE_ICON_RDEF);
 	fFormatM->AddItem(fRDefMI);
 
-	fSourceMI = new SaveItem("HVIF Source Code", new BMessage(MSG_FORMAT),
-						   EXPORT_MODE_ICON_SOURCE);
+	fSourceMI = new SaveItem(B_TRANSLATE("HVIF Source Code"), 
+		new BMessage(MSG_FORMAT), EXPORT_MODE_ICON_SOURCE);
 	fFormatM->AddItem(fSourceMI);
 
 	fFormatM->AddSeparatorItem();
 
-	fSVGMI = new SaveItem("SVG", new BMessage(MSG_FORMAT),
-						  EXPORT_MODE_SVG);
+	fSVGMI = new SaveItem("SVG", 
+		new BMessage(MSG_FORMAT), EXPORT_MODE_SVG);
+					
 	fFormatM->AddItem(fSVGMI);
 
 	fFormatM->AddSeparatorItem();
 
-	fBitmapMI = new SaveItem("PNG", new BMessage(MSG_FORMAT),
-							 EXPORT_MODE_BITMAP);
+	fBitmapMI = new SaveItem("PNG",
+		new BMessage(MSG_FORMAT), EXPORT_MODE_BITMAP);
 	fFormatM->AddItem(fBitmapMI);
 
-	fBitmapSetMI = new SaveItem("PNG Set", new BMessage(MSG_FORMAT),
-								EXPORT_MODE_BITMAP_SET);
+	fBitmapSetMI = new SaveItem(B_TRANSLATE("PNG Set"), 
+		new BMessage(MSG_FORMAT), EXPORT_MODE_BITMAP_SET);
 	fFormatM->AddItem(fBitmapSetMI);
 
 	fFormatM->AddSeparatorItem();
 
-	fIconAttrMI = new SaveItem("BEOS:ICON Attribute", new BMessage(MSG_FORMAT),
-							   EXPORT_MODE_ICON_ATTR);
+	fIconAttrMI = new SaveItem(B_TRANSLATE("BEOS:ICON Attribute"), 
+		new BMessage(MSG_FORMAT), EXPORT_MODE_ICON_ATTR);
 	fFormatM->AddItem(fIconAttrMI);
 
-	fIconMimeAttrMI = new SaveItem("META:ICON Attribute", new BMessage(MSG_FORMAT),
-								   EXPORT_MODE_ICON_MIME_ATTR);
+	fIconMimeAttrMI = new SaveItem(B_TRANSLATE("META:ICON Attribute"),
+		new BMessage(MSG_FORMAT), EXPORT_MODE_ICON_MIME_ATTR);
+					
 	fFormatM->AddItem(fIconMimeAttrMI);
 
 

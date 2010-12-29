@@ -11,7 +11,15 @@
 #include <new>
 #include <stdio.h>
 
+#include <Catalog.h>
+#include <Locale.h>
+
 #include "VectorPath.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-ChangePointCmd"
+
 
 using std::nothrow;
 
@@ -118,5 +126,5 @@ void
 ChangePointCommand::GetName(BString& name)
 {
 //	name << _GetString(MODIFY_CONTROL_POINT, "Modify Control Point");
-	name << "Modify Control Point";
+	name << B_TRANSLATE("Modify Control Point");
 }

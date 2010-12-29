@@ -11,8 +11,16 @@
 #include <new>
 #include <stdio.h>
 
+#include <Catalog.h>
+#include <Locale.h>
+
 #include "PathContainer.h"
 #include "VectorPath.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-MovePathsCmd"
+
 
 using std::nothrow;
 
@@ -147,7 +155,7 @@ void
 MovePathsCommand::GetName(BString& name)
 {
 	if (fCount > 1)
-		name << "Move Paths";
+		name << B_TRANSLATE("Move Paths");
 	else
-		name << "Move Path";
+		name << B_TRANSLATE("Move Path");
 }

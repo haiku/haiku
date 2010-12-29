@@ -12,6 +12,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <Catalog.h>
+#include <Locale.h>
+
 #include "CommandStack.h"
 #include "CommonPropertyIDs.h"
 #include "IconObject.h"
@@ -20,6 +23,11 @@
 #include "PropertyObject.h"
 #include "Selection.h"
 #include "SetPropertiesCommand.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-PropertiesList"
+
 
 using std::nothrow;
 
@@ -51,9 +59,12 @@ IconObjectListView::Draw(BRect updateRect)
 		return;
 
 	// display helpful messages
-	const char* message1 = "Click on an object in";
-	const char* message2 = "any of the other lists to";
-	const char* message3 = "edit it's properties here.";
+	const char* message1 = B_TRANSLATE_WITH_CONTEXT(
+		"Click on an object in", "Empty property list - 1st line");
+	const char* message2 = B_TRANSLATE_WITH_CONTEXT(
+		"any of the other lists to", "Empty property list - 2nd line");
+	const char* message3 = B_TRANSLATE_WITH_CONTEXT(
+		"edit it's properties here.", "Empty property list - 3rd line");
 
 	SetHighColor(tint_color(LowColor(), B_DARKEN_2_TINT));
 	font_height fh;

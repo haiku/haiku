@@ -12,8 +12,16 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <Catalog.h>
+#include <Locale.h>
+
 #include "ShapeContainer.h"
 #include "Shape.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-AddTransformersCmd"
+
 
 using std::nothrow;
 
@@ -97,7 +105,7 @@ void
 AddTransformersCommand::GetName(BString& name)
 {
 	if (fCount > 1)
-		name << "Add Transformers";
+		name << B_TRANSLATE("Add Transformers");
 	else
-		name << "Add Transformer";
+		name << B_TRANSLATE("Add Transformer");
 }

@@ -9,12 +9,19 @@
 #include "SVGImporter.h"
 
 #include <Alert.h>
+#include <Catalog.h>
 #include <Entry.h>
 #include <File.h>
+#include <Locale.h>
 #include <Path.h>
 
 #include "DocumentBuilder.h"
 #include "SVGParser.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon-O-Matic-SVGImport"
+
 
 // constructor
 SVGImporter::SVGImporter()
@@ -67,11 +74,11 @@ SVGImporter::Import(Icon* icon, const entry_ref* ref)
 		ret = builder.GetIcon(icon, this, ref->name);
 	} catch(agg::svg::exception& e) {
 		char error[1024];
-		sprintf(error, "Failed to open the file '%s' as "
+		sprintf(error, B_TRANSLATE("Failed to open the file '%s' as "
 					   "an SVG document.\n\n"
-					   "Error: %s", ref->name, e.msg());
-		BAlert* alert = new BAlert("load error",
-								   error, "OK", NULL, NULL,
+					   "Error: %s"), ref->name, e.msg());
+		BAlert* alert = new BAlert(B_TRANSLATE("load error"),
+								   error, B_TRANSLATE("OK"), NULL, NULL,
 								   B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->Go(NULL);
 		ret = B_ERROR;
