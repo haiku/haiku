@@ -69,11 +69,11 @@ ProgressWindow::Start(BWindow* referenceWindow, bool center)
 	BScreen screen(referenceWindow);
 	if (!center) {
 		BMessage settings;
-		int32 borderWidth = 5;
-		if (GetDecoratorSettings(&settings) == B_OK) {
-			if (settings.FindInt32("border width", &borderWidth) != B_OK)
-				borderWidth = 5;
-		}
+		GetDecoratorSettings(&settings);
+
+		int32 borderWidth;
+		if (settings.FindInt32("border width", &borderWidth) != B_OK)
+			borderWidth = 5;
 
 		MoveTo(screen.Frame().left + borderWidth,
 			screen.Frame().bottom - Bounds().Height() - borderWidth);
