@@ -741,8 +741,8 @@ StyledEditWindow::SaveAs(BMessage* message)
 {
 	if (fSavePanel == NULL) {
 		entry_ref* directory = NULL;
+		entry_ref dirRef;
 		if (fSaveMessage != NULL) {
-			entry_ref dirRef;
 			if (fSaveMessage->FindRef("directory", &dirRef) == B_OK)
 				directory = &dirRef;
 		}
