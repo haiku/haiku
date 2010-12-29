@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2007, Haiku, Inc.
+ * Copyright 2003-2010, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -15,11 +15,6 @@
 #include <stdio.h>
 
 
-// If enabled, behaves like in BeOS R5, in that when you call
-// SelectOptionFor() or SetValue(), the selected item isn't marked, and
-// so SelectedOption() will return -1. This is broken, IMHO.
-#define BEHAVE_LIKE_R5 0
-
 const float kLabelSpace = 8.0;
 const float kWidthModifier = 25.0;
 const float kHeightModifier = 10.0;
@@ -33,11 +28,11 @@ const float kHeightModifier = 10.0;
 	\param resize Resizing flags. They will be passed to the base class.
 	\param flags View flags. They will be passed to the base class.
 */	
-BOptionPopUp::BOptionPopUp(BRect frame, const char *name, const char *label,
-		BMessage *message, uint32 resize, uint32 flags)
+BOptionPopUp::BOptionPopUp(BRect frame, const char* name, const char* label,
+		BMessage* message, uint32 resize, uint32 flags)
 	: BOptionControl(frame, name, label, message, resize, flags)
 {
-	BPopUpMenu *popUp = new BPopUpMenu(label, true, true);
+	BPopUpMenu* popUp = new BPopUpMenu(label, true, true);
 	fMenuField = new BMenuField(Bounds(), "_menu", label, popUp);
 	AddChild(fMenuField);
 }
@@ -53,11 +48,11 @@ BOptionPopUp::BOptionPopUp(BRect frame, const char *name, const char *label,
 	\param resize Resizing flags. They will be passed to the base class.
 	\param flags View flags. They will be passed to the base class.
 */
-BOptionPopUp::BOptionPopUp(BRect frame, const char *name, const char *label, 
-		BMessage *message, bool fixed, uint32 resize, uint32 flags)
+BOptionPopUp::BOptionPopUp(BRect frame, const char* name, const char* label, 
+		BMessage* message, bool fixed, uint32 resize, uint32 flags)
 	: BOptionControl(frame, name, label, message, resize, flags)
 {
-	BPopUpMenu *popUp = new BPopUpMenu(label, true, true);
+	BPopUpMenu* popUp = new BPopUpMenu(label, true, true);
 	fMenuField = new BMenuField(Bounds(), "_menu", label, popUp, fixed);
 	AddChild(fMenuField);
 }
@@ -71,7 +66,7 @@ BOptionPopUp::BOptionPopUp(const char* name, const char* label,
 	// doesn't get layoutted properly
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 	
-	BPopUpMenu *popUp = new BPopUpMenu(label, true, true);
+	BPopUpMenu* popUp = new BPopUpMenu(label, true, true);
 	fMenuField = new BMenuField("_menu", label, popUp);
 	AddChild(fMenuField);
 }
@@ -85,7 +80,7 @@ BOptionPopUp::~BOptionPopUp()
 /*! \brief Returns a pointer to the BMenuField used internally.
 	\return A Pointer to the BMenuField which the class uses internally.
 */
-BMenuField *
+BMenuField*
 BOptionPopUp::MenuField()
 {
 	return fMenuField;
@@ -102,13 +97,13 @@ BOptionPopUp::MenuField()
 			\c false otherwise.
 */ 
 bool
-BOptionPopUp::GetOptionAt(int32 index, const char **outName, int32 *outValue)
+BOptionPopUp::GetOptionAt(int32 index, const char** outName, int32* outValue)
 {
 	bool result = false;
-	BMenu *menu = fMenuField->Menu();
+	BMenu* menu = fMenuField->Menu();
 
 	if (menu != NULL) {
-		BMenuItem *item = menu->ItemAt(index);
+		BMenuItem* item = menu->ItemAt(index);
 		if (item != NULL) {
 			if (outName != NULL)
 				*outName = item->Label();
@@ -129,14 +124,9 @@ BOptionPopUp::GetOptionAt(int32 index, const char **outName, int32 *outValue)
 void
 BOptionPopUp::RemoveOptionAt(int32 index)
 {
-	BMenu *menu = fMenuField->Menu();
-	if (menu != NULL) {
-		BMenuItem *item = menu->ItemAt(index);
-		if (item != NULL) {
-			menu->RemoveItem(item);
-			delete item;
-		}
-	}		
+	BMenu* menu = fMenuField->Menu();
+	if (menu != NULL)
+		delete menu->RemoveItem(index);
 }
 
 
@@ -145,7 +135,7 @@ BOptionPopUp::RemoveOptionAt(int32 index)
 int32
 BOptionPopUp::CountOptions() const
 {
-	BMenu *menu = fMenuField->Menu();	
+	BMenu* menu = fMenuField->Menu();	
 	return (menu != NULL) ? menu->CountItems() : 0;
 }
 
@@ -159,9 +149,9 @@ BOptionPopUp::CountOptions() const
 		\c B_ERROR if something else happened.
 */
 status_t
-BOptionPopUp::AddOptionAt(const char *name, int32 value, int32 index)
+BOptionPopUp::AddOptionAt(const char* name, int32 value, int32 index)
 {
-	BMenu *menu = fMenuField->Menu();
+	BMenu* menu = fMenuField->Menu();
 	if (menu == NULL)
 		return B_ERROR;
 	
@@ -169,17 +159,21 @@ BOptionPopUp::AddOptionAt(const char *name, int32 value, int32 index)
 	if (index < 0 || index > numItems)
 		return B_BAD_VALUE;
 	
-	BMessage *message = MakeValueMessage(value);
+	BMessage* message = MakeValueMessage(value);
 	if (message == NULL)
 		return B_NO_MEMORY;
 	
-	BMenuItem *newItem = new BMenuItem(name, message);
+	BMenuItem* newItem = new BMenuItem(name, message);
 	if (newItem == NULL) {
 		delete message;
 		return B_NO_MEMORY;
 	}
 	
-	menu->AddItem(newItem, index);
+	if (!menu->AddItem(newItem, index)) {
+		delete newItem;
+		return B_NO_MEMORY;
+	}
+
 	newItem->SetTarget(this);
 	
 	// We didnt' have any items before, so select the newly added one
@@ -196,7 +190,7 @@ BOptionPopUp::AddOptionAt(const char *name, int32 value, int32 index)
 void
 BOptionPopUp::AllAttached()
 {
-	BMenu *menu = fMenuField->Menu();
+	BMenu* menu = fMenuField->Menu();
 	if (menu != NULL) {
 		float labelWidth = fMenuField->StringWidth(fMenuField->Label());
 		fMenuField->SetDivider(labelWidth + kLabelSpace);
@@ -206,7 +200,7 @@ BOptionPopUp::AllAttached()
 
 
 void
-BOptionPopUp::MessageReceived(BMessage *message)
+BOptionPopUp::MessageReceived(BMessage* message)
 {
 	BOptionControl::MessageReceived(message);
 }
@@ -216,12 +210,12 @@ BOptionPopUp::MessageReceived(BMessage *message)
 	\param text The new label of the control.
 */
 void
-BOptionPopUp::SetLabel(const char *text)
+BOptionPopUp::SetLabel(const char* text)
 {
 	BControl::SetLabel(text);
 	fMenuField->SetLabel(text);
 	// We are not sure the menu can keep the whole
-	// string as label, so we ask it what label it's got
+	// string as label, so we check against the current label
 	float newWidth = fMenuField->StringWidth(fMenuField->Label());
 	fMenuField->SetDivider(newWidth + kLabelSpace);
 }
@@ -235,23 +229,18 @@ void
 BOptionPopUp::SetValue(int32 value)
 {
 	BControl::SetValue(value);
-	BMenu *menu = fMenuField->Menu();
+	BMenu* menu = fMenuField->Menu();
 	if (menu == NULL)
 		return;
 
 	int32 numItems = menu->CountItems();
 	for (int32 i = 0; i < numItems; i++) {
-		BMenuItem *item = menu->ItemAt(i);
+		BMenuItem* item = menu->ItemAt(i);
 		if (item && item->Message()) {
 			int32 itemValue;
 			item->Message()->FindInt32("be:value", &itemValue);
 			if (itemValue == value) {
 				item->SetMarked(true);
-
-#if BEHAVE_LIKE_R5
-				item->SetMarked(false);
-#endif
-
 				break;
 			}
 		}
@@ -317,22 +306,22 @@ BOptionPopUp::ResizeToPreferred()
 	\return The index of the selected option.
 */
 int32
-BOptionPopUp::SelectedOption(const char **outName, int32 *outValue) const
+BOptionPopUp::SelectedOption(const char** outName, int32* outValue) const
 {
-	BMenu *menu = fMenuField->Menu();
-	if (menu != NULL) {
-		BMenuItem *marked = menu->FindMarked();
-		if (marked != NULL) {
-			if (outName != NULL)
-				*outName = marked->Label();
-			if (outValue != NULL)
-				marked->Message()->FindInt32("be:value", outValue);
-			
-			return menu->IndexOf(marked);
-		}
-	}
+	BMenu* menu = fMenuField->Menu();
+	if (menu == NULL)
+		return B_ERROR;
+
+	BMenuItem* marked = menu->FindMarked();
+	if (marked == NULL)
+		return -1;
+
+	if (outName != NULL)
+		*outName = marked->Label();
+	if (outValue != NULL)
+		marked->Message()->FindInt32("be:value", outValue);
 	
-	return B_ERROR;
+	return menu->IndexOf(marked);
 }
 
 
@@ -344,7 +333,7 @@ BOptionPopUp::BOptionPopUp()
 }
 
 
-BOptionPopUp::BOptionPopUp(const BOptionPopUp &clone)
+BOptionPopUp::BOptionPopUp(const BOptionPopUp& clone)
 	:
 	BOptionControl(clone.Frame(), "", "", clone.Message())
 {
@@ -352,7 +341,7 @@ BOptionPopUp::BOptionPopUp(const BOptionPopUp &clone)
 
 
 BOptionPopUp &
-BOptionPopUp::operator=(const BOptionPopUp & clone)
+BOptionPopUp::operator=(const BOptionPopUp& clone)
 {
 	return *this;
 }
