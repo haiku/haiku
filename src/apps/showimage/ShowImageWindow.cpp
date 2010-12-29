@@ -866,11 +866,11 @@ ShowImageWindow::MessageReceived(BMessage* message)
 
 		case MSG_DESKTOP_BACKGROUND:
 		{
-			BMessage message(B_REFS_RECEIVED);
-			message.AddRef("refs", fImageView->Image());
+			BMessage backgroundsMessage(B_REFS_RECEIVED);
+			backgroundsMessage.AddRef("refs", fImageView->Image());
 			// This is used in the Backgrounds code for scaled placement
-			message.AddInt32("placement", 'scpl');
-			be_roster->Launch("application/x-vnd.haiku-backgrounds", &message);
+			backgroundsMessage.AddInt32("placement", 'scpl');
+			be_roster->Launch("application/x-vnd.haiku-backgrounds", &backgroundsMessage);
 			break;
 		}
 
