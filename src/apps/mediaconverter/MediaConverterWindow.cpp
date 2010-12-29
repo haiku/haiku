@@ -13,9 +13,11 @@
 #include <Application.h>
 #include <Box.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <ControlLook.h>
 #include <FilePanel.h>
 #include <LayoutBuilder.h>
+#include <Locale.h>
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuField.h>
@@ -32,7 +34,11 @@
 #include "MediaFileInfoView.h"
 #include "MediaFileListView.h"
 #include "MessageConstants.h"
-#include "Strings.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "MediaConverter"
+#define VERSION "1.3.0"
 
 
 // #pragma mark - DirectoryFilter
@@ -148,12 +154,15 @@ MediaConverterWindow::MediaConverterWindow(BRect frame)
 			B_ALIGN_USE_FULL_HEIGHT));
 	fOutputBox->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
 
-	fFormatMenu = new BMenuField(NULL, FORMAT_LABEL, new BPopUpMenu(""));
-	fAudioMenu = new BMenuField(NULL, AUDIO_LABEL, new BPopUpMenu(""));
-	fVideoMenu = new BMenuField(NULL, VIDEO_LABEL, new BPopUpMenu(""));
+	fFormatMenu = new BMenuField(NULL, B_TRANSLATE("File format:"), 
+		new BPopUpMenu(""));
+	fAudioMenu = new BMenuField(NULL, B_TRANSLATE("Audio encoding:"), 
+		new BPopUpMenu(""));
+	fVideoMenu = new BMenuField(NULL, B_TRANSLATE("Video encoding:"), 
+		new BPopUpMenu(""));
 
 	// output folder
-	fDestButton = new BButton(OUTPUT_FOLDER_LABEL,
+	fDestButton = new BButton(B_TRANSLATE("Output folder"),
 		new BMessage(OUTPUT_FOLDER_MESSAGE));
 	BAlignment labelAlignment(be_control_look->DefaultLabelAlignment());
 	fOutputFolder = new BStringView(NULL, defaultDirectory);
@@ -191,11 +200,11 @@ MediaConverterWindow::MediaConverterWindow(BRect frame)
 		.Add(fAudioQualitySlider, 0, 7, 2, 1);
 
 	// buttons
-	fPreviewButton = new BButton(PREVIEW_BUTTON_LABEL,
+	fPreviewButton = new BButton(B_TRANSLATE("Preview"),
 		new BMessage(PREVIEW_MESSAGE));
 	fPreviewButton->SetEnabled(false);
 
-	fConvertButton = new BButton(CONVERT_LABEL,
+	fConvertButton = new BButton(B_TRANSLATE("Convert"),
 		new BMessage(CONVERT_BUTTON_MESSAGE));
 
 	// Status views
@@ -279,27 +288,27 @@ MediaConverterWindow::MessageReceived(BMessage* msg)
 
 		case CONVERT_BUTTON_MESSAGE:
 			if (!fConverting) {
-				fConvertButton->SetLabel(CANCEL_LABEL);
+				fConvertButton->SetLabel(B_TRANSLATE("Cancel"));
 				fConverting = true;
-				SetStatusMessage(CONVERT_LABEL);
+				SetStatusMessage(B_TRANSLATE("Convert"));
 				SetEnabled(false, true);
 				BMessenger(be_app).SendMessage(START_CONVERSION_MESSAGE);
 			} else if (!fCancelling) {
 				fCancelling = true;
-				SetStatusMessage(CANCELLING_LABEL B_UTF8_ELLIPSIS);
+				SetStatusMessage(B_TRANSLATE("Cancelling" B_UTF8_ELLIPSIS));
 				BMessenger(be_app).SendMessage(CANCEL_CONVERSION_MESSAGE);
 			}
 			break;
 
 		case CONVERSION_DONE_MESSAGE:
 		{
-			SetStatusMessage(fCancelling ? CONV_CANCEL_LABEL
-				: CONV_COMPLETE_LABEL);
+			SetStatusMessage(fCancelling ? B_TRANSLATE("Conversion cancelled")
+				: B_TRANSLATE("Conversion completed"));
 			fConverting = false;
 			fCancelling = false;
 			bool enable = CountSourceFiles() > 0;
 			SetEnabled(enable, enable);
-			fConvertButton->SetLabel(CONVERT_LABEL);
+			fConvertButton->SetLabel(B_TRANSLATE("Convert"));
 			break;
 		}
 
@@ -311,17 +320,20 @@ MediaConverterWindow::MessageReceived(BMessage* msg)
 				BMessage message(FOLDER_SELECT_MESSAGE);
 				fSaveFilePanel = new BFilePanel(B_OPEN_PANEL, NULL, NULL,
 					B_DIRECTORY_NODE, true, &message, NULL, false, true);
-				fSaveFilePanel->SetButtonLabel(B_DEFAULT_BUTTON, SELECT_LABEL);
+				fSaveFilePanel->SetButtonLabel(B_DEFAULT_BUTTON, 
+					B_TRANSLATE("Select"));
 				fSaveFilePanel->SetTarget(this);
 
 				fSaveFilePanel->Window()->Lock();
-				fSaveFilePanel->Window()->SetTitle(SAVE_DIR_LABEL);
+				fSaveFilePanel->Window()->SetTitle(
+					B_TRANSLATE("MediaConverter+:SaveDirectory"));
 				BRect buttonRect
 					= fSaveFilePanel->Window()->ChildAt(0)->FindView(
 						"cancel button")->Frame();
 				buttonRect.right  = buttonRect.left - 20;
 				buttonRect.left = buttonRect.right - 130;
-				selectThisDir = new BButton(buttonRect, NULL, SELECT_DIR_LABEL,
+				selectThisDir = new BButton(buttonRect, NULL, 
+					B_TRANSLATE("Select this folder"), 
 					new BMessage(SELECT_THIS_DIR_MESSAGE),
 					B_FOLLOW_BOTTOM | B_FOLLOW_RIGHT);
 				selectThisDir->SetTarget(this);
@@ -372,14 +384,15 @@ MediaConverterWindow::MessageReceived(BMessage* msg)
 
 		case DISP_ABOUT_MESSAGE:
 		{
-			(new BAlert(ABOUT_TITLE_LABEL B_UTF8_ELLIPSIS,
+			BString title(B_TRANSLATE("About" B_UTF8_ELLIPSIS));
+			(new BAlert(title,
 					"MediaConverter\n"
 					VERSION"\n"
 					B_UTF8_COPYRIGHT" 1999, Be Incorporated.\n"
 					B_UTF8_COPYRIGHT" 2000-2004 Jun Suzuki\n"
 					B_UTF8_COPYRIGHT" 2007 Stephan Aßmus\n"
 					B_UTF8_COPYRIGHT" 2010 Haiku, Inc.",
-					OK_LABEL))->Go();
+					B_TRANSLATE("OK")))->Go();
 			break;
 		}
 
@@ -424,8 +437,10 @@ MediaConverterWindow::MessageReceived(BMessage* msg)
 
 			if (status != B_OK && status != B_ALREADY_RUNNING) {
 				BString errorString;
-				errorString << LAUNCH_ERROR << strerror(status);
-				(new BAlert("", errorString.String(), OK_LABEL))->Go();
+				errorString << B_TRANSLATE("Error launching: ") << 
+					strerror(status);
+				(new BAlert("", errorString.String(), 
+					B_TRANSLATE("OK")))->Go();
 			}
 			break;
 		}
@@ -434,7 +449,8 @@ MediaConverterWindow::MessageReceived(BMessage* msg)
 		{
 			int32 value;
 			msg->FindInt32("be:value", &value);
-			snprintf(buffer, sizeof(buffer), VIDEO_QUALITY_LABEL, (int8)value);
+			snprintf(buffer, sizeof(buffer), 
+				B_TRANSLATE("Video quality: %3d%%"), (int8)value);
 			fVideoQualitySlider->SetLabel(buffer);
 			fVideoQuality = value;
 			break;
@@ -444,7 +460,8 @@ MediaConverterWindow::MessageReceived(BMessage* msg)
 		{
 			int32 value;
 			msg->FindInt32("be:value", &value);
-			snprintf(buffer, sizeof(buffer), AUDIO_QUALITY_LABEL, (int8)value);
+			snprintf(buffer, sizeof(buffer), 
+				B_TRANSLATE("Audio quality: %3d%%"), (int8)value);
 			fAudioQualitySlider->SetLabel(buffer);
 			fAudioQuality = value;
 			break;
@@ -464,7 +481,7 @@ MediaConverterWindow::QuitRequested()
 		return true;
 	} else if (!fCancelling) {
 		fCancelling = true;
-		SetStatusMessage(CANCELLING_LABEL);
+		SetStatusMessage(B_TRANSLATE("Cancelling"));
 		BMessenger(be_app).SendMessage(CANCEL_CONVERSION_MESSAGE);
 	}
 	return false;
@@ -515,7 +532,8 @@ MediaConverterWindow::BuildAudioVideoMenus()
 	while (get_next_encoder(&cookie, mf_format, &format, &outfmt, &codec_info)
 		== B_OK) {
 		if (separator) {
-			menu->AddItem(new BMenuItem("No audio",
+			menu->AddItem(new BMenuItem(
+				B_TRANSLATE_WITH_CONTEXT("No audio", "Audio codecs list"),
 				new BMessage(AUDIO_CODEC_SELECT_MESSAGE)));
 			menu->AddSeparatorItem();
 			separator = false;
@@ -538,7 +556,9 @@ MediaConverterWindow::BuildAudioVideoMenus()
 		item->SetMarked(true);
 		((BInvoker *)item)->Invoke();
 	} else {
-		item = new BMenuItem(NONE_LABEL, NULL);
+		item = new BMenuItem(
+			B_TRANSLATE_WITH_CONTEXT("None available", "Audio codecs"),
+			NULL);
 		menu->AddItem(item);
 		item->SetMarked(true);
 		fAudioMenu->SetEnabled(false);
@@ -568,7 +588,8 @@ MediaConverterWindow::BuildAudioVideoMenus()
 	cookie = 0;
 	while (get_next_encoder(&cookie, mf_format, &format, &outfmt, &codec_info) == B_OK) {
 		if (separator) {
-			menu->AddItem(new BMenuItem("No video",
+			menu->AddItem(new BMenuItem(
+				B_TRANSLATE_WITH_CONTEXT("No video", "Video codecs list"),
 				new BMessage(VIDEO_CODEC_SELECT_MESSAGE)));
 			menu->AddSeparatorItem();
 			separator = false;
@@ -586,7 +607,9 @@ MediaConverterWindow::BuildAudioVideoMenus()
 		item->SetMarked(true);
 		((BInvoker *)item)->Invoke();
 	} else {
-		item = new BMenuItem(NONE_LABEL, NULL);
+		item = new BMenuItem(
+			B_TRANSLATE_WITH_CONTEXT("None available", "Video codecs"), 
+			NULL);
 		menu->AddItem(item);
 		item->SetMarked(true);
 		fVideoMenu->SetEnabled(false);
@@ -814,61 +837,61 @@ void
 MediaConverterWindow::_UpdateLabels()
 {
 	if (fSourcesBox != NULL) {
-		fSourcesBox->SetLabel(SOURCE_BOX_LABEL);
+		fSourcesBox->SetLabel(B_TRANSLATE("Source files"));
 		_UpdateBBoxLayoutInsets(fSourcesBox);
 	}
 
 	if (fInfoBox != NULL)
-		fInfoBox->SetLabel(INFO_BOX_LABEL);
+		fInfoBox->SetLabel(B_TRANSLATE("File details"));
 
 	if (fOutputBox != NULL) {
-		fOutputBox->SetLabel(OUTPUT_BOX_LABEL);
+		fOutputBox->SetLabel(B_TRANSLATE("Output format"));
 		_UpdateBBoxLayoutInsets(fOutputBox);
 	}
 
 	if (fConvertButton != NULL)
-		fConvertButton->SetLabel(CONVERT_LABEL);
+		fConvertButton->SetLabel(B_TRANSLATE("Convert"));
 
 	if (fPreviewButton != NULL)
-		fPreviewButton->SetLabel(PREVIEW_BUTTON_LABEL);
+		fPreviewButton->SetLabel(B_TRANSLATE("Preview"));
 
 	if (fDestButton != NULL)
-		fDestButton->SetLabel(OUTPUT_FOLDER_LABEL);
+		fDestButton->SetLabel(B_TRANSLATE("Output folder"));
 
 	if (fVideoQualitySlider != NULL) {
 		char buffer[40];
-		snprintf(buffer, sizeof(buffer), VIDEO_QUALITY_LABEL,
+		snprintf(buffer, sizeof(buffer), B_TRANSLATE("Video quality: %3d%%"),
 			(int8)fVideoQuality);
 		fVideoQualitySlider->SetLabel(buffer);
-		fVideoQualitySlider->SetLimitLabels(SLIDER_LOW_LABEL,
-			SLIDER_HIGH_LABEL);
+		fVideoQualitySlider->SetLimitLabels(B_TRANSLATE("Low"), 
+			B_TRANSLATE("High"));
 	}
 
 	if (fAudioQualitySlider != NULL) {
 		char buffer[40];
-		snprintf(buffer, sizeof(buffer), AUDIO_QUALITY_LABEL,
+		snprintf(buffer, sizeof(buffer), B_TRANSLATE("Audio quality: %3d%%"),
 			(int8)fAudioQuality);
 		fAudioQualitySlider->SetLabel(buffer);
-		fAudioQualitySlider->SetLimitLabels(SLIDER_LOW_LABEL,
-			SLIDER_HIGH_LABEL);
+		fAudioQualitySlider->SetLimitLabels(B_TRANSLATE("Low"),
+			B_TRANSLATE("High"));
 	}
 
 	if (fStartDurationTC != NULL)
-		fStartDurationTC->SetLabel(START_LABEL);
+		fStartDurationTC->SetLabel(B_TRANSLATE("Start [ms]: "));
 
 	if (fEndDurationTC != NULL)
-		fEndDurationTC->SetLabel(END_LABEL);
+		fEndDurationTC->SetLabel(B_TRANSLATE("End   [ms]: "));
 
 	if (fFormatMenu != NULL)
-		fFormatMenu->SetLabel(FORMAT_LABEL);
+		fFormatMenu->SetLabel(B_TRANSLATE("File format:"));
 
 	if (fAudioMenu != NULL)
-		fAudioMenu->SetLabel(AUDIO_LABEL);
+		fAudioMenu->SetLabel(B_TRANSLATE("Audio encoding:"));
 
 	if (fVideoMenu != NULL)
-		fVideoMenu->SetLabel(VIDEO_LABEL);
+		fVideoMenu->SetLabel(B_TRANSLATE("Video encoding:"));
 
-	SetFileMessage(DROP_MEDIA_FILE_LABEL);
+	SetFileMessage(B_TRANSLATE("Drop media files onto this window"));
 }
 
 
@@ -903,17 +926,20 @@ MediaConverterWindow::_CreateMenu()
 	BMenuItem* item;
 	BMenu* menu;
 
-	menu = new BMenu(FILE_MENU_LABEL);
-	item = new BMenuItem(OPEN_MENU_LABEL B_UTF8_ELLIPSIS,
+	menu = new BMenu(B_TRANSLATE_WITH_CONTEXT("File", "Menu"));
+	item = new BMenuItem(B_TRANSLATE_WITH_CONTEXT(
+		"Open" B_UTF8_ELLIPSIS, "Menu"),
 		new BMessage(OPEN_FILE_MESSAGE), 'O');
 	menu->AddItem(item);
 	menu->AddSeparatorItem();
 
-	item = new BMenuItem(ABOUT_MENU_LABEL B_UTF8_ELLIPSIS,
+	item = new BMenuItem(B_TRANSLATE_WITH_CONTEXT(
+		"About MediaConverter" B_UTF8_ELLIPSIS, "Menu"),
 		new BMessage(DISP_ABOUT_MESSAGE));
 	menu->AddItem(item);
 	menu->AddSeparatorItem();
-	item = new BMenuItem(QUIT_MENU_LABEL, new BMessage(QUIT_MESSAGE), 'Q');
+	item = new BMenuItem(B_TRANSLATE_WITH_CONTEXT("Quit", "Menu"), 
+		new BMessage(QUIT_MESSAGE), 'Q');
 	menu->AddItem(item);
 
 	fMenuBar->AddItem(menu);

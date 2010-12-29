@@ -6,13 +6,17 @@
 
 #include <stdio.h>
 
+#include <Catalog.h>
+#include <Locale.h>
 #include <View.h>
 
-#include "Strings.h"
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "MediaConverter-EncoderWindow"
 
 
 MediaEncoderWindow::MediaEncoderWindow(BRect frame, BView* view)
-	: BWindow(frame, ENCODER_PARAMETERS, B_DOCUMENT_WINDOW_LOOK,
+	: BWindow(frame, B_TRANSLATE("Encoder parameters"), B_DOCUMENT_WINDOW_LOOK,
 		B_MODAL_APP_WINDOW_FEEL,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
 {
