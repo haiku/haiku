@@ -9,6 +9,13 @@ Preference DataTranslations :
 	IconView.cpp 
 	TranslatorListView.cpp
 
-	: be translation $(TARGET_LIBSUPC++)
+	: be translation $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
 	: DataTranslations.rdef
+	;
+
+DoCatalogs DataTranslations :
+	x-vnd.Haiku-DataTranslations
+	:
+	DataTranslations.cpp
+	DataTranslationsWindow.cpp
 	;

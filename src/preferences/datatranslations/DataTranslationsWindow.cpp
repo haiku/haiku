@@ -21,6 +21,7 @@
 #include <Bitmap.h>
 #include <Box.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <ControlLook.h>
 #include <LayoutBuilder.h>
 #include <ListView.h>
@@ -34,15 +35,19 @@
 #include <TranslatorRoster.h>
 
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "DataTranslations"
+
+
 const uint32 kMsgTranslatorInfo = 'trin';
 const uint32 kMsgSelectedTranslator = 'trsl';
 
 
 DataTranslationsWindow::DataTranslationsWindow()
 	:
-	BWindow(BRect(0, 0, 550, 350), "DataTranslations", B_TITLED_WINDOW,
-		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE
-			| B_AUTO_UPDATE_SIZE_LIMITS)
+	BWindow(BRect(0, 0, 550, 350), B_TRANSLATE("DataTranslations"),
+		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE
+		| B_NOT_RESIZABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	MoveTo(static_cast<DataTranslationsApplication *>(be_app)->WindowCorner());
 
@@ -171,11 +176,11 @@ DataTranslationsWindow::_SetupViews()
 			B_ALIGN_USE_FULL_HEIGHT));
 
 	// Add the translator icon view
-	fIconView = new IconView(BRect(0, 0, 31, 31), "Icon",
+	fIconView = new IconView(BRect(0, 0, 31, 31), B_TRANSLATE("Icon"),
 		B_FOLLOW_LEFT | B_FOLLOW_BOTTOM, B_WILL_DRAW | B_FRAME_EVENTS);
 
 	// Add the translator info button
-	BButton *button = new BButton("STD", "Info" B_UTF8_ELLIPSIS,
+	BButton *button = new BButton("STD", B_TRANSLATE("Info" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgTranslatorInfo), B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE);
 
 	// Populate the translators list view
@@ -218,16 +223,18 @@ DataTranslationsWindow::_ShowInfoAlert(int32 id)
 	_GetTranslatorInfo(id, name, info, version, path);
 
 	BString message;
-	message << "Name: " << name << "\nVersion: ";
+	message << B_TRANSLATE("Name: %name \nVersion: ");
+	message.ReplaceAll(%name, name);
 
 	// Convert the version number into a readable format
 	message << (int)B_TRANSLATION_MAJOR_VERSION(version)
 		<< '.' << (int)B_TRANSLATION_MINOR_VERSION(version)
 		<< '.' << (int)B_TRANSLATION_REVISION_VERSION(version);
-	message << "\nInfo: " << info <<
-		"\n\nPath:\n" << path.Path() << "\n";
+	message << B_TRANSLATE("\nInfo: %info\n\nPath:\n") << path.Path() << "\n";
+	message.ReplaceAll(%info, info);
 
-	BAlert* alert = new BAlert("info", message.String(), "OK");
+	BAlert* alert = new BAlert(B_TRANSLATE("info"), message.String(),
+		B_TRANSLATE("OK"));
 	BTextView *view = alert->TextView();
 	BFont font;
 
@@ -236,7 +243,8 @@ DataTranslationsWindow::_ShowInfoAlert(int32 id)
 	view->GetFont(&font);
 	font.SetFace(B_BOLD_FACE);
 
-	const char* labels[] = {"Name:", "Version:", "Info:", "Path:", NULL};
+	const char* labels[] = {B_TRANSLATE("Name:"), B_TRANSLATE("Version:"),
+		B_TRANSLATE("Info:"), B_TRANSLATE("Path:"), NULL};
 	for (int32 i = 0; labels[i]; i++) {
 		int32 index = message.FindFirst(labels[i]);
 		view->SetFontAndColor(index, index + strlen(labels[i]), &font);
@@ -256,12 +264,12 @@ DataTranslationsWindow::MessageReceived(BMessage *message)
 			if (selected < 0) {
 				// If no translator is selected, show a message explaining
 				// what the config panel is for
-				(new BAlert("Panel Info",
-					"Translation Settings\n\n"
+				(new BAlert(B_TRANSLATE("Panel Info"),
+					B_TRANSLATE("Translation Settings\n\n"
 					"Use this control panel to set values that various\n"
 					"translators use when no other settings are specified\n"
-					"in the application.",
-					"OK"))->Go();
+					"in the application."),
+					B_TRANSLATE("OK")))->Go();
 				break;
 			}
 
