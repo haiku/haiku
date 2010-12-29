@@ -5,7 +5,7 @@ local serverDir = [ FDirName $(HAIKU_TOP) src servers app drawing remote ] ;
 
 SubDirC++Flags $(defines) ;
 
-UsePrivateHeaders shared ;
+UsePrivateHeaders interface shared ;
 UseHeaders $(serverDir) ;
 
 Application RemoteDesktop :
