@@ -16,12 +16,14 @@
 #include <string.h>
 
 #include <Alert.h>
+#include <Catalog.h>
 #include <Clipboard.h>
 #include <ControlLook.h>
 #include <FilePanel.h>
 #include <FindDirectory.h>
 #include <Font.h>
 #include <LayoutBuilder.h>
+#include <Locale.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
 #include <NodeInfo.h>
@@ -35,6 +37,10 @@
 #include "PeopleView.h"
 
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "People"
+
+
 TPeopleWindow::TPeopleWindow(BRect frame, const char *title, entry_ref *ref)
 	:
 	BWindow(frame, title, B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE
@@ -45,37 +51,46 @@ TPeopleWindow::TPeopleWindow(BRect frame, const char *title, entry_ref *ref)
 	BMenuItem* item;
 
 	BMenuBar* menuBar = new BMenuBar("");
-	menu = new BMenu("File");
-	menu->AddItem(item = new BMenuItem("New person" B_UTF8_ELLIPSIS,
+	menu = new BMenu(B_TRANSLATE("File"));
+	menu->AddItem(item = new BMenuItem(
+		B_TRANSLATE("New person" B_UTF8_ELLIPSIS),
 		new BMessage(M_NEW), 'N'));
 	item->SetTarget(NULL, be_app);
-	menu->AddItem(new BMenuItem("Close", new BMessage(B_QUIT_REQUESTED), 'W'));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Close"),
+		new BMessage(B_QUIT_REQUESTED), 'W'));
 	menu->AddSeparatorItem();
-	menu->AddItem(fSave = new BMenuItem("Save", new BMessage(M_SAVE), 'S'));
+	menu->AddItem(fSave = new BMenuItem(B_TRANSLATE("Save"), 
+		new BMessage(M_SAVE), 'S'));
 	fSave->SetEnabled(FALSE);
-	menu->AddItem(new BMenuItem("Save as"B_UTF8_ELLIPSIS,
+	menu->AddItem(new BMenuItem(
+		B_TRANSLATE("Save as"B_UTF8_ELLIPSIS),
 		new BMessage(M_SAVE_AS)));
-	menu->AddItem(fRevert = new BMenuItem("Revert",
+	menu->AddItem(fRevert = new BMenuItem(B_TRANSLATE("Revert"),
 		new BMessage(M_REVERT), 'R'));
 	fRevert->SetEnabled(FALSE);
 	menu->AddSeparatorItem();
-	item = new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED), 'Q');
+	item = new BMenuItem(B_TRANSLATE("Quit"), 
+		new BMessage(B_QUIT_REQUESTED), 'Q');
 	item->SetTarget(NULL, be_app);
 	menu->AddItem(item);
 	menuBar->AddItem(menu);
 
-	menu = new BMenu("Edit");
-	menu->AddItem(fUndo = new BMenuItem("Undo", new BMessage(B_UNDO), 'Z'));
+	menu = new BMenu(B_TRANSLATE("Edit"));
+	menu->AddItem(fUndo = new BMenuItem(B_TRANSLATE("Undo"), 
+		new BMessage(B_UNDO), 'Z'));
 	fUndo->SetTarget(NULL, this);
 	fUndo->SetEnabled(false);
 	menu->AddSeparatorItem();
-	menu->AddItem(fCut = new BMenuItem("Cut", new BMessage(B_CUT), 'X'));
+	menu->AddItem(fCut = new BMenuItem(B_TRANSLATE("Cut"), 
+		new BMessage(B_CUT), 'X'));
 	fCut->SetTarget(NULL, this);
-	menu->AddItem(fCopy = new BMenuItem("Copy", new BMessage(B_COPY), 'C'));
+	menu->AddItem(fCopy = new BMenuItem(B_TRANSLATE("Copy"), 
+		new BMessage(B_COPY), 'C'));
 	fCopy->SetTarget(NULL, this);
-	menu->AddItem(fPaste = new BMenuItem("Paste", new BMessage(B_PASTE), 'V'));
+	menu->AddItem(fPaste = new BMenuItem(B_TRANSLATE("Paste"), 
+		new BMessage(B_PASTE), 'V'));
 	fPaste->SetTarget(NULL, this);
-	menu->AddItem(item = new BMenuItem("Select all",
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Select all"),
 		new BMessage(M_SELECT), 'A'));
 	item->SetTarget(NULL, this);
 	menuBar->AddItem(menu);
@@ -119,9 +134,9 @@ TPeopleWindow::MenusBeginning(void)
 	fUndo->SetEnabled(state != B_UNDO_UNAVAILABLE);
 
 	if (isRedo)
-		fUndo->SetLabel("Redo");
+		fUndo->SetLabel(B_TRANSLATE("Redo"));
 	else
-		fUndo->SetLabel("Undo");
+		fUndo->SetLabel(B_TRANSLATE("Undo"));
 
 	enabled = fView->TextSelected();
 	fCut->SetEnabled(enabled);
@@ -191,8 +206,8 @@ TPeopleWindow::MessageReceived(BMessage* msg)
 						fView->NewFile(fRef);
 					}
 					else {
-						sprintf(str, "Could not create %s.", name);
-						(new BAlert("", str, "Sorry"))->Go();
+						sprintf(str, B_TRANSLATE("Could not create %s."), name);
+						(new BAlert("", str, B_TRANSLATE("Sorry")))->Go();
 					}
 				}
 			}
@@ -279,8 +294,9 @@ TPeopleWindow::QuitRequested(void)
 	status_t result;
 
 	if (fView->CheckSave()) {
-		result = (new BAlert("", "Save changes before quitting?",
-							"Cancel", "Quit", "Save"))->Go();
+		result = (new BAlert("", B_TRANSLATE("Save changes before quitting?"),
+							B_TRANSLATE("Cancel"), B_TRANSLATE("Quit"), 
+							B_TRANSLATE("Save")))->Go();
 		if (result == 2) {
 			if (fRef)
 				fView->Save();

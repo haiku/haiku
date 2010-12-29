@@ -16,10 +16,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <Catalog.h>
 #include <fs_attr.h>
 #include <Box.h>
 #include <ControlLook.h>
 #include <GridLayout.h>
+#include <Locale.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <PopUpMenu.h>
@@ -28,6 +30,10 @@
 #include <Window.h>
 
 #include "TTextControl.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "People"
 
 
 TPeopleView::TPeopleView(const char* name, entry_ref *ref)
@@ -58,7 +64,7 @@ TPeopleView::AttachedToWindow(void)
 		const char *name = gFields[i].name;
 
 		if (i == F_NAME)
-			name = "Name";
+			name = B_TRANSLATE("Name");
 
 		char *text = NULL;
 		attr_info info;
@@ -202,7 +208,9 @@ TPeopleView::BuildGroupMenu(void)
 	}
 
 	if (!count) {
-		fGroups->AddItem(item = new BMenuItem("none", new BMessage(M_GROUP_MENU)));
+		fGroups->AddItem(item = new BMenuItem(
+			B_TRANSLATE_WITH_CONTEXT("none", "Groups list"), 
+			new BMessage(M_GROUP_MENU)));
 		item->SetEnabled(false);
 	}
 }

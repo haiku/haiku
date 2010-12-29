@@ -5,7 +5,14 @@ Application People : main.cpp
 	PeopleView.cpp
 	PeopleWindow.cpp 
 	TTextControl.cpp
-	: libbe.so libtracker.so $(TARGET_LIBSUPC++)
+	: libbe.so libtracker.so $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
 	: People.rdef
 	;
 
+DoCatalogs People : 
+	x-vnd.Be-PEPL
+	: 
+	PeopleApp.cpp
+	PeopleView.cpp
+	PeopleWindow.cpp
+;

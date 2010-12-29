@@ -11,15 +11,17 @@
  */
 
 
+#include <Alert.h>
 #include <Bitmap.h>
+#include <Catalog.h>
 #include <Directory.h>
+#include <FindDirectory.h>
+#include <fs_index.h>
+#include <Locale.h>
+#include <Path.h>
+#include <Screen.h>
 #include <Volume.h>
 #include <VolumeRoster.h>
-#include <Path.h>
-#include <FindDirectory.h>
-#include <Screen.h>
-#include <Alert.h>
-#include <fs_index.h>
 
 #include "PeopleApp.h"
 #include "PeopleWindow.h"
@@ -28,21 +30,25 @@
 #include <string.h>
 
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "People"
+
+
 struct people_field gFields[] = {
-	{ "META:name", 120, "Contact name" },
-	{ "META:nickname", 120, "Nickname" },
-	{ "META:company", 120, "Company" },
-	{ "META:address", 120, "Address" },
-	{ "META:city", 90, "City" },
-	{ "META:state", 50, "State" },
-	{ "META:zip", 50, "Zip" },
-	{ "META:country", 120, "Country" },
-	{ "META:hphone", 90, "Home phone" },
-	{ "META:wphone", 90, "Work phone" },
-	{ "META:fax", 90, "Fax" },
-	{ "META:email", 120, "E-mail" },
-	{ "META:url", 120, "URL" },
-	{ "META:group", 120, "Group" },
+	{ "META:name", 120, B_TRANSLATE("Contact name") },
+	{ "META:nickname", 120, B_TRANSLATE("Nickname") },
+	{ "META:company", 120, B_TRANSLATE("Company") },
+	{ "META:address", 120, B_TRANSLATE("Address") },
+	{ "META:city", 90, B_TRANSLATE("City") },
+	{ "META:state", 50, B_TRANSLATE("State") },
+	{ "META:zip", 50, B_TRANSLATE("Zip") },
+	{ "META:country", 120, B_TRANSLATE("Country") },
+	{ "META:hphone", 90, B_TRANSLATE("Home phone") },
+	{ "META:wphone", 90, B_TRANSLATE("Work phone") },
+	{ "META:fax", 90, B_TRANSLATE("Fax") },
+	{ "META:email", 120, B_TRANSLATE("E-mail") },
+	{ "META:url", 120, B_TRANSLATE("URL") },
+	{ "META:group", 120, B_TRANSLATE("Group") },
 	{ NULL, 0, NULL }
 };
 
@@ -107,8 +113,11 @@ TPeopleApp::TPeopleApp(void)
 	}
 	if (!valid) {
 		mime.Install();
-		mime.SetShortDescription("Person");
-		mime.SetLongDescription("Contact information for a person.");
+		mime.SetShortDescription(B_TRANSLATE_WITH_CONTEXT("Person", 
+			"Short mimetype description"));
+		mime.SetLongDescription(B_TRANSLATE_WITH_CONTEXT(
+			"Contact information for a person.", 
+			"Long mimetype description"));
 		mime.SetIcon(kPersonIcon, sizeof(kPersonIcon));
 		mime.SetPreferredApp(APP_SIG);
 
@@ -140,7 +149,7 @@ TPeopleApp::~TPeopleApp(void)
 void
 TPeopleApp::AboutRequested(void)
 {
-	(new BAlert("", "...by Robert Polic", "OK"))->Go();
+	(new BAlert("", "...by Robert Polic", B_TRANSLATE("OK")))->Go();
 }
 
 
@@ -230,7 +239,7 @@ TPeopleApp::NewWindow(entry_ref *ref)
 {
 	TPeopleWindow *window;
 
-	window = new TPeopleWindow(fPosition, "New person", ref);
+	window = new TPeopleWindow(fPosition, B_TRANSLATE("New person"), ref);
 	window->Show();
 	fWindowCount++;
 	fPosition.OffsetBy(20, 20);
