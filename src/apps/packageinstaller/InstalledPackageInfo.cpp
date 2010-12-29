@@ -72,6 +72,7 @@ InstalledPackageInfo::InstalledPackageInfo()
 	fStatus(B_NO_INIT),
 	fIsUpToDate(false),
 	fCreate(false),
+	fSpaceNeeded(0),
 	fInstalledItems(10)
 {
 }
@@ -82,6 +83,7 @@ InstalledPackageInfo::InstalledPackageInfo(const char *packageName,
 	:
 	fStatus(B_NO_INIT),
 	fIsUpToDate(false),
+	fSpaceNeeded(0),
 	fInstalledItems(10)
 {
 	SetTo(packageName, version, create);
