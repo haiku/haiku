@@ -1007,8 +1007,16 @@ RemoteView::_DrawThread()
 					archive.AddPoint("pts", point);
 				}
 
-				// the shape is in absolute coordinates
-				offscreen->MovePenTo(0, 0);
+				BPoint offset;
+				message.Read(offset);
+
+				float scale;
+				if (message.Read(scale) != B_OK)
+					continue;
+
+				offscreen->PushState();
+				offscreen->MovePenTo(offset);
+				offscreen->SetScale(scale);
 
 				BShape shape(&archive);
 				if (code == RP_STROKE_SHAPE) {
@@ -1018,13 +1026,16 @@ RemoteView::_DrawThread()
 					offscreen->FillShape(&shape, pattern);
 				else {
 					BGradient *gradient;
-					if (message.ReadGradient(&gradient) != B_OK)
+					if (message.ReadGradient(&gradient) != B_OK) {
+						offscreen->PopState();
 						continue;
+					}
 
 					offscreen->FillShape(&shape, *gradient);
 					delete gradient;
 				}
 
+				offscreen->PopState();
 				invalidRegion.Include(bounds);
 				break;
 			}

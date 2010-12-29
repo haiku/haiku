@@ -721,7 +721,8 @@ RemoteDrawingEngine::DrawShape(const BRect& bounds, int32 opCount,
 	message.AddList(opList, opCount);
 	message.Add(pointCount);
 	message.AddList(pointList, pointCount);
-	// TODO: viewToScreenOffset and viewScale
+	message.Add(viewToScreenOffset);
+	message.Add(viewScale);
 }
 
 
@@ -743,7 +744,8 @@ RemoteDrawingEngine::FillShape(const BRect& bounds, int32 opCount,
 	message.Add(pointCount);
 	message.AddList(pointList, pointCount);
 	message.AddGradient(gradient);
-	// TODO: viewToScreenOffset and viewScale
+	message.Add(viewToScreenOffset);
+	message.Add(viewScale);
 }
 
 
