@@ -15,6 +15,7 @@
 #include "AutoConfigWindow.h"
 
 #include <Application.h>
+#include <Catalog.h>
 #include <ListView.h>
 #include <ScrollView.h>
 #include <StringView.h>
@@ -163,21 +164,24 @@ class AboutTextView : public BTextView
 				}
 			}
 			// prepare version variety string
-			const char *varietyStrings[] = {"Development","Alpha","Beta","Gamma","Golden master","Final"};
+			const char *varietyStrings[] = {B_TRANSLATE("Development"),
+				B_TRANSLATE("Alpha"),B_TRANSLATE("Beta"),B_TRANSLATE("Gamma"),
+				B_TRANSLATE("Golden master"),B_TRANSLATE("Final")};
 			char varietyString[32];
 			strcpy(varietyString,varietyStrings[variety % 6]);
 			if (variety < 5)
 				sprintf(varietyString + strlen(varietyString),"/%li",internal);
 
 			char s[512];
-			sprintf(s,	"Mail Daemon Replacement\n\n"
+			sprintf(s,	B_TRANSLATE("Mail Daemon Replacement\n\n"
 						"by Haiku, Inc. All rights reserved.\n\n"
 						"Version %ld.%ld.%ld %s\n\n"
-						"See LICENSE file included in the installation package for more information.\n\n\n\n"
+						"See LICENSE file included in the installation package "
+						"for more information.\n\n\n\n"
 						"You can contact us at:\n"
 						"%s\n\n"
 						"Please submit bug reports using the %s\n\n"
-						"Project homepage at:\n%s",
+						"Project homepage at:\n%s"),
 						major,middle,minor,varietyString,
 						kEMail,kBugsitePretty,kWebsite);
 
@@ -251,8 +255,9 @@ class AboutTextView : public BTextView
 
 ConfigWindow::ConfigWindow()
 	:
-	BWindow(BRect(100.0, 100.0, 580.0, 540.0), "E-mail", B_TITLED_WINDOW,
-		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE),
+	BWindow(BRect(100.0, 100.0, 580.0, 540.0), B_TRANSLATE("E-mail"),
+		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE
+		| B_NOT_RESIZABLE),
 	fLastSelectedAccount(NULL),
 	fSaveSettings(false)
 {
@@ -779,8 +784,8 @@ ConfigWindow::RevertToLastSettings()
 				"\nThe general settings couldn't be reverted.\n\n"
 				"Error retrieving general settings:\n%s\n"),
 			strerror(status));
-		(new BAlert("Error", text, "OK", NULL, NULL, B_WIDTH_AS_USUAL,
-			B_WARNING_ALERT))->Go();
+		(new BAlert(B_TRANSLATE("Error"), text, B_TRANSLATE("OK"), NULL, NULL,
+			B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
 	}
 
 	// revert account data

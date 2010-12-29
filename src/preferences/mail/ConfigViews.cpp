@@ -290,7 +290,7 @@ ProtocolsConfigView::ProtocolsConfigView(BMailChain *chain, int32 index,
 	:
 	FilterConfigView(chain, index, msg, ref)
 {
-	BPopUpMenu *menu = new BPopUpMenu("Choose Protocol");
+	BPopUpMenu *menu = new BPopUpMenu(B_TRANSLATE("Choose Protocol"));
 
 	for (int i = 0; i < 2; i++) {
 		BPath path;
@@ -838,7 +838,7 @@ FiltersConfigView::MessageReceived(BMessage *msg)
 				fChain->RemoveFilter(from);
 
 				if (fChain->AddFilter(to, settings, ref) < B_OK) {
-					(new BAlert("E-mail",
+					(new BAlert(B_TRANSLATE("E-mail"),
 						B_TRANSLATE("The filter could not be moved. "
 							"Deleting filter."),
 						B_TRANSLATE("OK")))->Go();

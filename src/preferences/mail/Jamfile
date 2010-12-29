@@ -50,11 +50,15 @@ Preference E-mail
 	: e-mail.rdef
 ;
 
-DoCatalogs E-mail
-	: x-vnd.Haiku-Mail
-	: Account.cpp
-	  ConfigViews.cpp
-	  ConfigWindow.cpp
+DoCatalogs E-mail :
+	x-vnd.Haiku-Mail
+	:
+	Account.cpp
+	AutoConfiView.cpp
+	ConfigViews.cpp
+	ConfigWindow.cpp
+	DNSQuery.cpp
+	main.cpp
 ;
 
 Package haiku-maildaemon-cvs :

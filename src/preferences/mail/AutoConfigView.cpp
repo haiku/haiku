@@ -1,5 +1,6 @@
 #include "AutoConfigView.h"
 
+#include <Catalog.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <FindDirectory.h>
@@ -11,6 +12,10 @@
 #include <Window.h>
 
 #include <MailSettings.h>
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "E-Mail"
 
 
 AutoConfigView::AutoConfigView(BRect rect, AutoConfig &config)
@@ -25,15 +30,15 @@ AutoConfigView::AutoConfigView(BRect rect, AutoConfig &config)
 	// type view
 	BPopUpMenu *chainsPopUp = new BPopUpMenu(B_EMPTY_STRING);
 	const char *chainModes[] = {
-		"Receive mail only",
-		"Send mail only",
-		"Send and receive mail"};
+		B_TRANSLATE("Receive mail only"),
+		B_TRANSLATE("Send mail only"),
+		B_TRANSLATE("Send and receive mail")};
 	BMenuItem *item;
 	for (int32 i = 0; i < 3; i++)
 		chainsPopUp->AddItem(item = new BMenuItem(chainModes[i], NULL));
 
 	fTypeField = new BMenuField(BRect(topLeft, rightDown), NULL,
-									"Account Type:", chainsPopUp);
+									B_TRANSLATE("Account Type:"), chainsPopUp);
 	fTypeField->SetDivider(divider);
 	fTypeField->Menu()->ItemAt(2)->SetMarked(true);
 	//fAccount->SetType(2);
@@ -55,7 +60,7 @@ AutoConfigView::AutoConfigView(BRect rect, AutoConfig &config)
 	topLeft.y += stepSize;
 	rightDown.y += stepSize;
 	fEmailView = new BTextControl(BRect(topLeft, rightDown),
-									"email", "E-mail address:", "",
+									"email", B_TRANSLATE("E-mail address:"), "",
 									new BMessage(kEMailChangedMsg));
 	fEmailView->SetDivider(divider);
 	AddChild(fEmailView);
@@ -64,7 +69,7 @@ AutoConfigView::AutoConfigView(BRect rect, AutoConfig &config)
 	topLeft.y += stepSize;
 	rightDown.y += stepSize;
 	fLoginNameView = new BTextControl(BRect(topLeft, rightDown),
-									"login", "Login name:", "",
+									"login", B_TRANSLATE("Login name:"), "",
 									NULL);
 	fLoginNameView->SetDivider(divider);
 	AddChild(fLoginNameView);
@@ -73,7 +78,7 @@ AutoConfigView::AutoConfigView(BRect rect, AutoConfig &config)
 	topLeft.y += stepSize;
 	rightDown.y += stepSize;
 	fPasswordView = new BTextControl(BRect(topLeft, rightDown),
-									"password", "Password:", "",
+									"password", B_TRANSLATE("Password:"), "",
 									NULL);
 	fPasswordView->SetDivider(divider);
 	fPasswordView->TextView()->HideTyping(true);
@@ -83,7 +88,7 @@ AutoConfigView::AutoConfigView(BRect rect, AutoConfig &config)
 	topLeft.y += stepSize;
 	rightDown.y += stepSize;
 	fAccountNameView = new BTextControl(BRect(topLeft, rightDown),
-									"account", "Account name:", "",
+									"account", B_TRANSLATE("Account name:"), "",
 									NULL);
 	fAccountNameView->SetDivider(divider);
 	AddChild(fAccountNameView);
@@ -92,7 +97,7 @@ AutoConfigView::AutoConfigView(BRect rect, AutoConfig &config)
 	topLeft.y += stepSize;
 	rightDown.y += stepSize;
 	fNameView = new BTextControl(BRect(topLeft, rightDown),
-									"name", "Real name:", "",
+									"name", B_TRANSLATE("Real name:"), "",
 									NULL);
 	AddChild(fNameView);
 	fNameView->SetDivider(divider);
@@ -170,7 +175,7 @@ AutoConfigView::GetBasicAccountInfo(account_info &info)
 BMenuField*
 AutoConfigView::SetupProtokolView(BRect rect)
 {
-	BPopUpMenu *menu = new BPopUpMenu("Choose Protocol");
+	BPopUpMenu *menu = new BPopUpMenu(B_TRANSLATE("Choose Protocol"));
 
 	for (int i = 0; i < 2; i++) {
 		BPath path;
@@ -317,7 +322,7 @@ ServerSettingsView::ServerSettingsView(BRect rect, const account_info &info)
 	boxRect.bottom -= 5;
 
 	BBox *box = new BBox(boxRect);
-	box->SetLabel("Inbound");
+	box->SetLabel(B_TRANSLATE("Inbound"));
 	AddChild(box);
 
 	BString serverName;
@@ -327,7 +332,7 @@ ServerSettingsView::ServerSettingsView(BRect rect, const account_info &info)
 		serverName = info.providerInfo.pop_server;
 
 	fInboundNameView = new BTextControl(BRect(10, 20, rect.Width() - 20, 35),
-										"inbound", "Server Name:",
+										"inbound", B_TRANSLATE("Server Name:"),
 										serverName.String(),
 										new BMessage(kServerChangedMsg));
 	fInboundNameView->SetDivider(divider);
@@ -378,12 +383,12 @@ ServerSettingsView::ServerSettingsView(BRect rect, const account_info &info)
 	boxRect.top += 5;
 
 	box = new BBox(boxRect);
-	box->SetLabel("Outbound");
+	box->SetLabel(B_TRANSLATE("Outbound"));
 	AddChild(box);
 
 	serverName = info.providerInfo.smtp_server;
 	fOutboundNameView = new BTextControl(BRect(10, 20, rect.Width() - 20, 30),
-									"outbound", "Server name:",
+									"outbound", B_TRANSLATE("Server name:"),
 									serverName.String(),
 									new BMessage(kServerChangedMsg));
 	fOutboundNameView->SetDivider(divider);

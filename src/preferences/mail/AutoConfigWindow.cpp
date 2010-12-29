@@ -5,6 +5,7 @@
 
 #include <Alert.h>
 #include <Application.h>
+#include <Catalog.h>
 #include <MailSettings.h>
 #include <Message.h>
 
@@ -15,7 +16,7 @@
 
 
 AutoConfigWindow::AutoConfigWindow(BRect rect, BWindow *parent)
-	:	BWindow(rect, "Create new account", B_TITLED_WINDOW_LOOK,
+	:	BWindow(rect, B_TRANSLATE("Create new account"), B_TITLED_WINDOW_LOOK,
 				B_MODAL_APP_WINDOW_FEEL,
 			 	B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AVOID_FRONT,
 				B_ALL_WORKSPACES),
@@ -37,14 +38,14 @@ AutoConfigWindow::AutoConfigWindow(BRect rect, BWindow *parent)
 	buttonRect.top = buttonRect.bottom - buttonHeight;
 	buttonRect.left = buttonRect.right - 2 * buttonWidth - 5;
 	buttonRect.right = buttonRect.left + buttonWidth;
-	fBackButton = new BButton(buttonRect, "back", "Back",
+	fBackButton = new BButton(buttonRect, "back", B_TRANSALATE("Back"),
 								new BMessage(kBackMsg));
 	fBackButton->SetEnabled(false);
 	fRootView->AddChild(fBackButton);
 	
 	buttonRect.left+= 5 + buttonWidth;
 	buttonRect.right = buttonRect.left + buttonWidth;
-	fNextButton = new BButton(buttonRect, "ok", "OK", new BMessage(kOkMsg));
+	fNextButton = new BButton(buttonRect, "ok", B_TRANSLATE("OK"), new BMessage(kOkMsg));
 	fNextButton->MakeDefault(true);
 	fRootView->AddChild(fNextButton);
 	
@@ -53,7 +54,7 @@ AutoConfigWindow::AutoConfigWindow(BRect rect, BWindow *parent)
 	fBoxRect.bottom-= buttonHeight + 5;
 	
 	fMainView = new AutoConfigView(fBoxRect, fAutoConfig);
-	fMainView->SetLabel("Account settings");
+	fMainView->SetLabel(B_TRANSLATE("Account settings"));
 	fRootView->AddChild(fMainView);
 	
 	// Add a shortcut to close the window using Command-W
@@ -81,8 +82,8 @@ AutoConfigWindow::MessageReceived(BMessage* msg)
 				fMainView->GetBasicAccountInfo(fAccountInfo);
 				if (!fMainView->IsValidMailAddress(fAccountInfo.email)) {
 					invalidMailAlert = new BAlert("invalidMailAlert",
-													"Enter a valid e-mail address.",
-													"OK");
+								B_TRANSLATE("Enter a valid e-mail address."),
+								B_TRANSLATE("OK"));
 					invalidMailAlert->Go();
 					return;
 				}

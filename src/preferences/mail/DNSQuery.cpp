@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 #include <ByteOrder.h>
+#include <Catalog.h>
 #include <FindDirectory.h>
 #include <NetAddress.h>
 #include <NetEndpoint.h>
@@ -18,6 +19,8 @@
 #define PRINT(a...)
 #endif
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "E-Mail"
 static vint32 gID = 1;
 
 
@@ -167,8 +170,8 @@ DNSTools::GetDNSServers(BObjectList<BString>* serverList)
 
 	register FILE* fp = fopen(path.Path(), "r");
 	if (fp == NULL) {
-		fprintf(stderr, "failed to open '%s' to read nameservers: %s\n", 
-			path.Path(), strerror(errno));
+		fprintf(stderr, B_TRANSLATE("failed to open '%s' to read "
+			"nameservers: %s\n"), path.Path(), strerror(errno));
 		return B_ENTRY_NOT_FOUND;
 	}
 
@@ -283,7 +286,7 @@ DNSQuery::ReadDNSServer(in_addr* add)
 	if (firstDNS == NULL || inet_aton(firstDNS->String(), add) != 1)
 		return B_ERROR;
 
-	PRINT("dns server found: %s \n", firstDNS->String());
+	PRINT(B_TRANSLATE("dns server found: %s \n"), firstDNS->String());
 	return B_OK;
 }
 
@@ -309,7 +312,7 @@ DNSQuery::GetMXRecords(BString serverName, BObjectList<mx_record>* mxList,
 	buffer.AppendUint16(uint16(1));
 
 	// send the buffer
-	PRINT("send buffer\n");
+	PRINT(B_TRANSLATE("send buffer\n"));
 	BNetAddress netAddress(dnsAddress, 53);
 	BNetEndpoint netEndpoint(SOCK_DGRAM);
 	if (netEndpoint.InitCheck() != B_OK)
@@ -317,13 +320,13 @@ DNSQuery::GetMXRecords(BString serverName, BObjectList<mx_record>* mxList,
 
 	if (netEndpoint.Connect(netAddress) != B_OK)
 		return B_ERROR;
-	PRINT("Connected\n");
+	PRINT(B_TRANSLATE"Connected\n");
 
 #ifdef DEBUG
 	int32 bytesSend =
 #endif
 	netEndpoint.Send(buffer.Data(), buffer.Size());
-	PRINT("bytes send %i\n", int(bytesSend));
+	PRINT(B_TRANSLATE("bytes send %i\n"), int(bytesSend));
 
 	// receive buffer
 	BRawNetBuffer receiBuffer(512);
@@ -332,15 +335,15 @@ DNSQuery::GetMXRecords(BString serverName, BObjectList<mx_record>* mxList,
 	int32 bytesRecei =
 #endif
 	netEndpoint.ReceiveFrom(receiBuffer.Data(), 512, netAddress);
-	PRINT("bytes received %i\n", int(bytesRecei));
+	PRINT(B_TRANSLATE("bytes received %i\n"), int(bytesRecei));
 	dns_header receiHeader;
 
 	_ReadQueryHeader(receiBuffer, &receiHeader);
-	PRINT("Package contains :");
-	PRINT("%d Questions, ", receiHeader.q_count);
-	PRINT("%d Answers, ", receiHeader.ans_count);
-	PRINT("%d Authoritative Servers, ", receiHeader.auth_count);
-	PRINT("%d Additional records\n", receiHeader.add_count);
+	PRINT(B_TRANSLATE("Package contains :"));
+	PRINT(B_TRANSLATE("%d Questions, "), receiHeader.q_count);
+	PRINT(B_TRANSLATE("%d Answers,) ", receiHeader.ans_count);
+	PRINT(B_TRANSLATE("%d Authoritative Servers, "), receiHeader.auth_count);
+	PRINT(B_TRANSLATE("%d Additional records\n"), receiHeader.add_count);
 
 	// remove name and Question
 	BString dummyS;
@@ -356,7 +359,7 @@ DNSQuery::GetMXRecords(BString serverName, BObjectList<mx_record>* mxList,
 		if (rrHead.type == MX_RECORD) {
 			mx_record *mxRec = new mx_record;
 			_ReadMXRecord(receiBuffer, mxRec);
-			PRINT("MX record found pri %i, name %s\n",
+			PRINT(B_TRANSLATE("MX record found pri %i, name %s\n"),
 					mxRec->priority,
 					mxRec->serverName.String());
 			// Add mx record to the list
