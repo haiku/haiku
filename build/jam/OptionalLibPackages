@@ -295,7 +295,7 @@ if [ IsOptionalHaikuImagePackageAdded SDLLibs ] {
 			: $(baseURL)/lib/smjpeg-0.2.1-x86-gcc4-2010-10-30.zip ;
 		InstallOptionalHaikuImagePackage
 			smpeg-0.4.5-x86-gcc4-2010-10-29.zip
-			: $(baseURL)/lib/smpeg-0.4.5-x86-gcc4-2010-10-29.zip ;
+			: $(baseURL)/lib/smpeg-0.4.5-x86-gcc4-2010-10-30.zip ;
 	} else {
 		InstallOptionalHaikuImagePackage
 			libsdl-1.2-hg-x86-gcc2-2010-12-23.zip
