@@ -11,12 +11,14 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		fyskij
+ *		Francesco Franchina
+ *		Barrett
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>il Tracker</title>
+	<title>Il Tracker</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
@@ -43,150 +45,149 @@
 <span>
  «  <a href="teammonitor.html">Team Monitor</a> 
 ::  <a href="contents.html" class="uplink">Contenuti</a> 
-::  <a href="tracker-add-ons.html">Gli Add-On del Tracker</a>  »
+::  <a href="tracker-add-ons.html">Gli add-on del Tracker</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">La traduzione di questa pagina non è stata completata. Per questo motivo le parti non tradotte sono visibili in inglese.</div>
 
 
 <table class="index" id="index" summary="index">
-<tr class="heading"><td>Indice del file system</td></tr>
+<tr class="heading"><td>Indice</td></tr>
 <tr class="index"><td>
-	<a href="#mounting-volumes">Mounting volumes</a><br />
-	<a href="#navigating">Navigating</a><br />
-	<a href="#appearance">Appearance</a><br />
-	<a href="#tracker-preferences">Tracker preferences</a><br />
-	<a href="#working-with-files">Working with files</a><br />
-	<a href="#transaction-status">Transaction status</a>
+	<a href="#mounting-volumes">Montaggio di volumi</a><br />
+	<a href="#navigating">Navigazione</a><br />
+	<a href="#appearance">Aspetto</a><br />
+	<a href="#tracker-preferences">Preferenze del Tracker</a><br />
+	<a href="#working-with-files">Lavorare con i file</a><br />
+	<a href="#transaction-status">Stato di trasferimento</a>
 </td></tr>
 </table>
 
-<h1>il Tracker</h1>
+<h1>Il Tracker</h1>
 
-<p>The Tracker is the graphical interface to all your files. It lets you create new files and folders or find, launch or rename as well as copy or delete existing ones.</p>
-<p>Being an application like any other (the Desktop with its icons is really just a fullscreen window in the background), Tracker appears with its windows in the Deskbar and can be quit and restarted. The easiest way to quit and restart a crashed or frozen Tracker (or a wayward Deskbar) is to call the <a href="teammonitor.html">Team Monitor</a>.</p>
+<p>Il Tracker è l'interfaccia grafica che permette di visualizzare tutti i file e le cartelle, permette di crearli, copiarli ed eliminarli. Inoltre è possibile cercare, avviare e rinominare gli elementi esistenti.</p>
+<p>Essendo un'applicazione come le altre (il Desktop con le sue icone non è altro che una finestra massimizzata sullo sfondo), il Tracker  appare insieme alle sue finestre nella Deskbar e può essere terminato o riavviato. Il modo più semplice per terminare e riavviare il Tracker (o la più difficile Deskbar) è avviare il <a href="teammonitor.html">Team Monitor</a>.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="mounting-volumes" name="mounting-volumes">Mounting Volumes</a></h2>
-<p>In order to access a harddisk, CD, USB stick etc., you first have to mount the volume, that is, let the system know it's there. This is done with a right-click on the Desktop or an already mounted volume (like the boot disk) and choosing the volume from the <span class="menu">Mount</span> submenu. You find the same <span class="menu">Mount</span> menu in the Deskbar.</p>
+<a id="mounting-volumes" name="mounting-volumes">Montaggio di volumi</a></h2>
+<p>Per accedere ad Hard Disk, CD, penne USB, ecc., bisogna come prima cosa montare il volume, ovvero mettere il sistema a conoscenza della sua presenza. Per fare ciò è necessario fare click col tasto destro sul Desktop o su un volume già montato (come il disco di boot) e scegliere il volume dal sottomenù <span class="menu">Mount</span>. È possibile trovare lo stesso menù <span class="menu">Mount</span>  nella Deskbar.</p>
 <img src="images/tracker-images/mount-settings.png" alt="drill-down.png" />
-<p>There are also <span class="menu">Mount Settings</span> so you don't have to mount everything manually after every bootup.<br />
-The above settings will automatically mount any storage device you connect/insert and also mount all disks on bootup that were mounted previously.</p>
-<div class="box-warning">Before you disconnect e.g. a harddrive or USB stick, make sure you have successfully unmounted the volume. This guarantees that all data transfer has finished. Otherwise you may lose data or corrupt the disk!</div>
+<p>Ci sono anche delle <span class="menu">Mount Settings</span> così da non dover montare tutto manualmente dopo ogni accensione.<br />
+Le impostazioni visibili sopra monteranno automaticamente ogni dispositivo che viene connesso o inserito, in più monterà all'avvio tutti i dischi che erano montati nella sessione precedente.</p>
+<div class="box-warning">Prima di disconnettere (ad esempio) un Hard Disk o una penna USB, bisogna assicurarsi di aver smontato correttamente il volume. Questa pratica garantisce che il trasferimento di tutti i dati sia concluso. Altrimenti potrebbe verificarsi una perdita dei dati o il danneggiamento del dispositivo.</div>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="navigating" name="navigating">Navigating</a></h2>
-<p>By default, when you double-click a folder, Tracker opens a new window while leaving the parent window open. This can quickly lead to an overcrowded desktop.<br />
-You can prevent that by holding down the <span class="key">OPT</span> key, which automatically closes the parent window.<br />
-This is also true for keyboard navigation. For more on that, see topic <a href="keyboard-shortcuts.html">Shortcuts and key combinations</a>.</p>
-<p>Moving through your folders is one of Trackers main purposes, just like the file managers on other platforms. Haiku's Tracker has some unique features that will help you doing that efficiently.</p>
+<a id="navigating" name="navigating">Navigazione</a></h2>
+<p>Secondo le impostazioni base, quando si effettua un doppio-click su una cartella, il Tracker apre una nuova finestra pur lasciando aperta la finestra genitore. Questo può portare rapidamente ad avere un Desktop affollato.<br />
+Questo può essere evitato tenendo premuto il tasto <span class="key">OPT</span>, che chiuderà automaticamente la finestra genitore.<br />
+Questo è anche vero per la navigazione da tastiera. Per saperne di più, si veda <a href="keyboard-shortcuts.html">Scorciatoie e combinazioni di tasti</a>.</p>
+<p>Muoversi fra le cartelle è uno degli scopi principali del Traker, proprio come i file manager delle altre piattaforme. Il Tracker di Haiku possiede diverse caratteristiche che si riveleranno molto utili per poterlo fare efficientemente.</p>
 
 <h3>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a><a id="drill-down" name="drill-down">Drilling down the submenus</a></h3>
-<p>Instead of double-clicking your way down folder after folder, there's a better way to drill down:</p>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a><a id="drill-down" name="drill-down">Esplorazione dal sottomenù</a></h3>
+<p>Al posto di effettuare un doppio-click sulle cartelle, esiste un modo migliore per esplorarle:</p>
 <img src="images/tracker-images/drill-down.png" alt="drill-down.png" />
 <!-- screenshot needs updating to show /boot/system/documentation -->
-<p>Right-click onto a folder, and at the top of the usual context menu you'll find a submenu of the current folder that let's you navigate down a level. Just move down the hierarchy until you find the file or folder you're looking for and click on it to open it. The above shows the contents of the folder <span class="path">/boot/home/config/</span>.<br />
-If you do the above while dragging a file with you, it will be moved to where you eventually drop it.</p>
-<p>A similar method can be used from any Tracker window:</p>
+<p>Cliccando col tasto destro su una cartella, in cima al solito menù contestuale, si troverà un sottomenù della cartella corrente che permette di navigare all'interno del livello successivo. Basta muoversi lungo la gerarchia per trovare i file che si cercavano e cliccare per aprirli. L'immagine precedente mostra il contenuto della cartella <span class="path">/boot/home/config/</span>.<br />
+Se si fa ciò che è stato mostrato trascinando un file, il file sarà spostato nella posizione in cui è stato rilasciato.</p>
+<p>Un metodo simile può essere usato in qualsiasi finestra del Tracker:</p>
 <img src="images/tracker-images/window-drill-down.png" alt="window-drill-down.png" />
-<p>Click on the area in the lower left, where the number of items is listed, and you'll get submenus for every level above your current location. From there you can drill down through the folders as usual.</p>
-<p>Note, that the Desktop is always the topmost level as that is where Tracker shows mounted volumes. So, if you want to go to another disk, you first have to navigate to the top (Desktop) and cross over to your other disk from there.</p><br />
-<p>You'll get the same submenu-navigating when you drag a file over a folder. After a short while of hovering, a submenu pops up and you can drill down to your destination. If you initiated the drag with the right mousebutton, you can choose between copying, moving or linking the file when you release the mouse.</p>
+<p>Cliccando sull'area in basso a sinistra, dove è mostrato il numero degli elementi visualizzati, si otterrà un sottomenù per ogni livello superiore a quello corrente. Da li è possibile esplorare le cartelle come si è abituati.</p>
+<p>Si noti che il Desktop è sempre il livello più alto poiché è dove il Tracker visualizza i volumi montati. Pertanto, se ci si deve spostare in un altro disco, bisogna prima raggiungere il livello più alto (il Desktop), per poi cercare l'altro disco da li.</p><br />
+<p>Si visualizzerebbe lo stesso sottomenù di navigazione quando un file viene trascinato su una cartella. Tenendo per un attimo il mouse sulla cartella, apparirà un sottomenù che permetterà di esplorare la destinazione. Se si sta trascinando col tasto destro, sarà possibile decidere se copiare, spostare o creare un collegamento al file nel momento in cui verrà rilasciato il pulsante del mouse.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="type-ahead" name="type-ahead">Jumping to files with type-ahead</a></h3>
-<p>You may be familiar with the concept from file managers of other operating systems: typing the first few letters of a filename will jump to the first file matching these starting characters. Haiku took the idea a step further. If there isn't a file starting with those letters it will jump to the first file including the string anywhere in its name. And if there's nothing with the string in its filename, the attributes are searched next.</p>
+<a id="type-ahead" name="type-ahead">Salto a un file in base alle lettere iniziali</a></h3>
+<p>Potrebbe suonare familiare il concetto dei file manager degli altri sistemi operativi secondo il quale, digitando le prime lettere di un nome di file, il programma salterà al primo file le cui lettere iniziali corrispondono a quelle digitate. Haiku ha sviluppato ulteriormente quest'idea: se non esiste un file il cui nome comincia con i caratteri digitati, il programma salterà al primo file che include quei caratteri in qualsiasi punto del suo nome.</p>
 <img src="images/tracker-images/window-type-ahead.png" alt="window-type-ahead.png" />
-<p>In the above example, there are many files starting with "Haiku logo", rendering simpler approaches to typing ahead quite useless. In Haiku however, typing "web" jumps right to its first occurence in "Haiku logo - website". The characters you enter appear in the bottom left corner where you normally find the item count of all files in the folder. A second after entering a character, the display jumps back to normal and you're ready for a new type ahead search.</p>
+<p>Nell'esempio sopra, ci sono diversi file che cominciano con "Haiku logo", rendendo inutile il semplice approccio di digitare i primi caratteri. In Haiku tuttavia, digitando "web" si salterà proprio alla prima occorrenza in "Haiku logo - website". I caratteri digitati appaiono nell'angolo in basso a sinistra dove solitamente viene mostrato il numero di tutti i file presenti nella cartella. Un secondo dopo aver digitato un carattere, la visualizzazione torna normale ed è possibile effettuare un nuova ricerca in base alle lettere iniziali.</p>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="type-ahead-filter" name="type-ahead-filter">Type-ahead filtering</a></h3>
-<p>Instead of jumping to a file while typing, there's also the option to filter out all files not matching your type-ahead string. This can improve clarity dramatically, especially when dealing with crowded folders. By using <span class="key">SHIFT</span> <span class="key">SPACE</span> as delimiter, you can even filter on multiple strings.<br />
-Contrary to type-ahead jumping, the filtering will stick until you press <span class="key">ESC</span> or close the window (or leave the folder if you're using Single Window Navigation).<br />
-This type-ahead filtering is set in the <a href="#tracker-preferences.html">Tracker preferences</a>.</p>
+<a id="type-ahead-filter" name="type-ahead-filter">Filtraggio delle ricerche in base alle lettere iniziali</a></h3>
+<p>Invece di saltare a un file quando viene digitato qualcosa, esiste anche la possibilità di non visualizzare tutti i file che non corrispondono ai caratteri digitati. Questo può migliorare notevolmente la chiarezza, specialmente quando si ha a che fare con cartelle contenenti molti file. Usando <span class="key">SHIFT</span> <span class="key">SPACE</span> come delimitatore, è possibile filtrare i nomi anche in base a più stringhe.<br />
+Al contrario del salto in base alle lettere iniziali, l'operazione di filtraggio non terminerà finché non viene premuto il tasto <span class="key">ESC</span> o viene chiusa la finestra (o si cambia cartella mentre si sta usando la modalità Single Window Navigation).<br />
+Le impostazioni per il filtraggio in base al nome sono presenti nelle <a href="#tracker-preferences.html">Preferenze del Tracker</a>.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="appearance" name="appearance">Appearance</a></h2>
+<a id="appearance" name="appearance">Aspetto</a></h2>
 <img src="images/tracker-images/window-menu.png" alt="window-menu.png" />
-<p>Tracker windows offer three different viewing modes from the <span class="menu">Window</span> menu:</p>
+<p>La finestra del Tracker offre tre differenti metodi di visualizzazione selezionabili dal menù <span class="menu">Window</span>:</p>
 <ul>
-<li><p><b>Icon View</b> (<span class="key">ALT</span> <span class="key">1</span>) - Big icons, you can change the size from the submenu or in/decrease their size with <span class="key">ALT</span> <span class="key">+</span>/<span class="key">ALT</span> <span class="key">-</span>.</p></li>
-<li><p><b>Mini Icon View</b> (<span class="key">ALT</span> <span class="key">2</span>) - Small icons.</p></li>
-<li><p><b>List View</b> (<span class="key">ALT</span> <span class="key">3</span>) - A detailed list of your files enabling you to show/hide available <i>attributes</i>. (See topic <a href="attributes.html">Attributes</a>.)</p></li>
+<li><p><b>Icon View</b> (<span class="key">ALT</span> <span class="key">1</span>) - Con icone grandi, è possibile variarne la dimensione dal sottomenù oppure aumentarla o diminuirla con <span class="key">ALT</span> <span class="key">+</span>/<span class="key">ALT</span> <span class="key">-</span>.</p></li>
+<li><p><b>Mini Icon View</b> (<span class="key">ALT</span> <span class="key">2</span>) - Con icone piccole.</p></li>
+<li><p><b>List View</b> (<span class="key">ALT</span> <span class="key">3</span>) - Una lista dettagliata  dei file con la possibilità di mostrare o nascondere gli <i>attributi</i>. (Si veda il capitolo <a href="attributes.html">Attributi</a>.)</p></li>
 </ul>
-<p>The <span class="menu">Window</span> menu offers a number of other functions:</p>
+<p>Il menù <span class="menu">Window</span> presenta anche altre funzionalità:</p>
 <ul>
-<li><p><b>Resize Window</b> (<span class="key">ALT</span> <span class="key">Y</span>) - Resizes the window to its ideal size.</p></li>
-<li><p><b>Clean Up</b> (<span class="key">ALT</span> <span class="key">K</span>) - Aligns all icons to an invisible grid. Hold down <span class="key">SHIFT</span> and the menu becomes <span class="menu">Clean Up All</span> which additionally sorts all icons alphabetically.</p></li>
-<li><p><b>Select...</b> (<span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">A</span>) - Select files according to a <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expression">regular expression</a>.</p></li>
-<li><p><b>Close</b> (<span class="key">ALT</span> <span class="key">W</span>) - Closes the window. Hold down <span class="key">SHIFT</span> and the menu becomes <span class="menu">Close All</span> which closes every Tracker window.</p></li>
-<li><p><b>Close All in Workspace</b> (<span class="key">ALT</span> <span class="key">Q</span>) - Closes every Tracker window in the current workspace. A useful shortcut if you forgot to hold the <span class="key">OPT</span> key while clicking through folders and all those still open Tracker windows clutter your workspace.</p></li>
+<li><p><b>Resize Window</b> (<span class="key">ALT</span> <span class="key">Y</span>) - Ridimensiona la finestra alle sue dimensioni ideali.</p></li>
+<li><p><b>Clean Up</b> (<span class="key">ALT</span> <span class="key">K</span>) - Allinea tutte le icone a una griglia invisibile. Premendo <span class="key">SHIFT</span> il menù diventerà <span class="menu">Clean Up All</span> che, in aggiunta, ordinerà tutte le icone alfabeticamente.</p></li>
+<li><p><b>Select...</b> (<span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">A</span>) - Seleziona i file in base a una <a href="http://it.wikipedia.org/wiki/Espressione_regolare" class="external free" title="Wikipedia: Espressione regolare">espressione regolare</a>.</p></li>
+<li><p><b>Close</b> (<span class="key">ALT</span> <span class="key">W</span>) - Chiude la finestra. Premendo <span class="key">SHIFT</span> il menù diventerà <span class="menu">Close All</span> che chiuderà ogni finestra del Tracker.</p></li>
+<li><p><b>Close All in Workspace</b> (<span class="key">ALT</span> <span class="key">Q</span>) - Chiude ogni finestra del Tracker nello spazio di lavoro corrente. Questa è una scorciatoia utile nel caso ci si dimentichi di premere il tasto <span class="key">OPT</span> mentre si naviga tra le cartelle e tutte queste finestre del Tracker ingombrano lo spazio di lavoro.</p></li>
 </ul>
-<p>Sometimes you just want to rearrange a few icons without doing a complete <span class="menu">Clean Up</span> (<span class="key">ALT</span> <span class="key">K</span>). In that case, you select these icons and start to drag them to their new location. Before you drop them there, keep <span class="key">ALT</span> pressed. This will align the icons to the invisible grid.</p>
-<p>The rest of the functions are pretty self-explanatory, leaving the Tracker preferences.</p>
+<p>A volte potrebbe essere desiderato riordinare le icone senza fare un totale <span class="menu">Clean Up</span> (<span class="key">ALT</span> <span class="key">K</span>). In questo caso basta selezionare queste icone e trascinarle nella loro nuova posizione. Prima di rilasciarle li, bisogna tenere premuto il tasto <span class="key">ALT</span>: questo fa in modo che le icone si allineino alla griglia invisibile.</p>
+<p>A parte le preferenze del Tracker, il resto delle funzioni si spiega quasi da solo.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="tracker-preferences" name="tracker-preferences">Tracker preferences</a></h3>
-<p><span class="menu">Window | Preferences...</span> opens a panel that offers a number of settings that, where not obvious, should become clear once tried out. Since all settings are applied live, you'll immediately see the changes.
-<br />So, in short, the not so obvious settings:</p>
+<a id="tracker-preferences" name="tracker-preferences">Preferenze del Tracker</a></h3>
+<p><span class="menu">Window | Preferences...</span> apre un pannello che offre diverse impostazioni, le meno intuitive verranno capite semplicemente provandole. Dal momento che le impostazioni sono rese attive immediatamente, sarà possibile fin da subito osservare i cambiamenti.
+<br />Brevemente, le impostazioni meno intuitive sono:</p>
 <ul>
-<li><p><b>Desktop</b> - Decide if all mounted disks appear directly on the Desktop or in a window after clicking a single Disk icon sitting on the Desktop.</p></li>
-<li><p><b>Windows</b> - You can set <span class="menu">Single Window Navigation</span>, i.e. a double-clicked folder doesn't open in its own window, but inside the already open window instead, replacing the view of it's parent folder. This is not the same as clicking while holding the <span class="key">OPT</span> key, as described above, because you'll lose the per window saved position and size.
-<br /><br /></p>
+<li><p><b>Desktop</b> - Permette di scegliere se i dischi montati appariranno direttamente sul Desktop o in una finestra dopo aver cliccato l'icona del disco situata sul Desktop.</p></li>
+<li><p><b>Windows</b> - È possibile impostare <span class="menu">Single Window Navigation</span> cosicché, quando si apre una cartella, essa non venga aperta in una nuova finestra ma in quella già aperta. Questa non è la stessa cosa ottenuta premendo il tasto <span class="key">OPT</span> come descritto sopra, poiché si perderanno le impostazioni della finestra relative alla posizione e alla dimensione.<br /><br /></p>
 <img src="images/tracker-images/tracker-preferences-navigator.png" alt="tracker-preferences-navigator.png" />
-<p>Before you switch Tracker to Single Window Navigation mode, because that may feel more familiar to you, we recommend giving the menu based browsing a try first, as that may actually work much faster for you after getting used to. On the other hand, single window browsing offers a <i>Navigator</i> where you can enter or copy&amp;paste a path name and use back, forward and up buttons.</p> 
-<p>Activating <span class="menu">Type-ahead filtering</span> will filter the contents of a Tracker window while you type to only display the files matching your string in their name or any currently displayed attribute. See <a href="#type-ahead-filter">above</a>.</p></li>
-<li><p><b>Date and Time</b> - Set date and time formats.</p></li>
-<li><p><b>Trash</b> - Set the behavior when deleting a file.</p></li>
-<li><p><b>Volume Icons</b> - Set the color of an optional indicator of free space that's shown besides a disk's icon.</p></li>
+<p>Prima di assegnare al Tracker la modalità Single Window Navigation per il semplice fatto che risulti più familiare, si raccomanda di sperimentare l'uso dell'esplorazione tramite i menù in quanto, dopo essersi abituati, potrebbe portare a una velocizzazione del lavoro. Di contro, la modalità di visualizzazione a finestra singola offre  un <i>Navigator</i> nel quale è possibile inserire, copiare o incollare un percorso e permette di usare i bottoni avanti e indietro per la navigazione.</p>
+<p>Impostando il <span class="menu">Type-ahead filtering</span> il Tracker farà in modo da visualizzare solo i file filtrati, quelli il cui nome o attributi contengano al loro interno le stringhe digitate. Si veda <a href="#type-ahead-filter">sopra</a>.</p></li>
+<li><p><b>Date and Time</b> - Imposta il formato di data e ora.</p></li>
+<li><p><b>Trash</b> - Imposta il comportamento da tenere con i file eliminati.</p></li>
+<li><p><b>Volume Icons</b> - Imposta il colore dell'indicatore opzionale dello spazio libero mostrato vicino alle icone dei dischi.</p></li>
 </ul>
-<p>This panel, by the way, is also available as <span class="app">Tracker</span> from Deskbar's <span class="menu">Preferences</span>.</p>
+<p>Questo pannello è accessibile anche come <span class="app">Tracker</span> tra le <span class="menu">Preferences</span> della Deskbar.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="working-with-files" name="working-with-files">Working with files</a></h2>
-<p>When invoked on a selected file, most of the <span class="menu">File</span> menu commands are also offered in the context menu by right-clicking that file.</p>
-<p>As usual the commands are pretty clear.</p>
+<a id="working-with-files" name="working-with-files">Lavorare con i file</a></h2>
+<p>Mentre un file è selezionato, la maggior parte delle voci presenti nel menù <span class="menu">File</span> si possono ritrovare nel menù che appare cliccando sul file col tasto destro.</p>
+<p>Come sempre le voci sono piuttosto chiare.</p>
 <ul>
-<li><p><b>Find...</b> - Find a file or folder. See topic <a href="queries.html">Query</a> for more info.</p></li>
-<li><p><b>New</b> - Create a new folder or any other file based on a <i>template</i>.
+<li><p><b>Find...</b> - Cerca un file o una cartella. Si veda il capitolo <a href="queries.html">Query</a> per maggiori informazioni.</p></li>
+<li><p><b>New</b> - Crea una nuova cartella o un file basandosi su un <i>modello</i>.
 <br /><br /></p>
 <img src="images/tracker-images/new-menu.png" alt="new-menu.png" />
-<p>Choosing <span class="menu">Edit Templates...</span> opens the folder <span class="path">/boot/home/config/settings/Tracker/Tracker New Templates</span>. Creating a file in that folder will offer its filetype with the file's name and other attributes as template in the <span class="menu">New</span> menu. Here, there's a file "Text" with the filetype <tt>text/plain</tt>. See topic <a href="filetypes.html">Filetypes</a> for more info.</p></li>
-<li><p><b>Open With...</b> - A submenu offers all applications that can handle this filetype.
+<p>Selezionando <span class="menu">Edit Templates...</span> viene aperta la cartella <span class="path">/boot/home/config/settings/Tracker/Tracker New Templates</span>.
+Creando un file in questa cartella si renderà disponibile un modello con lo stesso nome, tipo di file e attributi nel menù <span class="menu">New</span>. Qui è visibile un file "Text" di tipo <tt>text/plain</tt>. Si veda il capitolo <a href="filetypes.html">Filetype</a> per maggiori informazioni.</p></li>
+<li><p><b>Open With...</b> - Un sottomenù che mostra tutte le applicazioni che supportano il tipo di file in questione.
 <br /><br /></p>
 <img src="images/tracker-images/open-with.png" alt="open-with.png" />
 
-<p>The preferred application that would open the file when double-clicked, is checkmarked. This submenu lists first those applications that can handle the exact filetype, in this case it's a text file, the type <tt>text/plain</tt>. Next come all applications that can handle that supertype in general, here <tt>text/*</tt>. Last in the list are those that can deal with any file. If you don't click on an app in the submenu, but on the <span class="menu">Open With...</span> entry instead, a panel opens:</p>
+<p>L'applicazione predefinita, quella con cui si aprirebbe il file se ci si effettuasse sopra un doppio-click, presenta un segno di spunta. Questo sottomenù mostra per prime le applicazioni che possono gestire il filetype <tt>text/plain</tt> trattandosi in questo caso di un file di testo. A seguire compaiono le applicazioni che ne possono gestire il supertipo in generale, qui <tt>text/*</tt>. Per ultime vengono mostrate le applicazioni che possono gestire ogni tipo di file. Se si clicca su <span class="menu">Open With...</span> invece di cliccare su una voce del sottomenù, si aprirà un pannello di opzioni:</p>
 <br /><br />
 <img src="images/tracker-images/open-with-preferred.png" alt="open-with-preferred" />
-<p>Here you'll again find the programs that were listed in the submenu. By selecting one and clicking the <span class="button">Open and Make Preferred</span> button, you changed the preferred application for every file of that filetype, here <tt>text/plain</tt>.</p></li>
+<p>Qui si troveranno nuovamente i programmi già elencati nel sottomenù. Selezionandone uno e cliccando sul bottone <span class="button">Open and Make Preferred</span>, si imposterà come preferita l'applicazione selezionata per tutti i file che con lo stesso filetype, qui <tt>text/plain</tt>.</p></li>
 <li><b>Get Info</b>
 <br /><br />
 <img src="images/tracker-images/get-info.png" alt="get-info" />
-<p>The panel presents info on the selected file and lets you set the default application and, after you expanded that part of the panel, permissions and owner. Clicking on the path will open it in a Tracker window.</p></li>
-<li><p><b>Edit Name</b>, <b>Duplicate</b> and <b>Move to Trash</b> - lets you rename or duplicate a file or put the selected file(s) to the trash.</p></li>
-<li><p><b>Move to</b>, <b>Copy to</b> and <b>Create Link</b> - lets you move, copy or link the selected file(s) using the submenu navigating method. Holding <span class="key">SHIFT</span> while invoking the menu offers the option to create a relative link.</p></li>
-<li><p><b>Cut</b>, <b>Copy</b> and <b>Paste</b> - lets you cut, copy and paste files using the clipboard. By holding <span class="key">SHIFT</span> while invoking the menu you can <b>Copy/Cut more</b> files, maybe from another folder that you can paste somewhere else later. Also, while holding <span class="key">SHIFT</span> you can paste the copied files in the clipboard as links.</p></li>
-<li><p><b>Identify</b> - will sniff out and set the type of files if they didn't have one before, e.g. if you transferred a file with <span class="cli">wget</span> which doesn't set a filetype itself. Holding <span class="key">SHIFT</span> while invoking the menu changes the item to <b>Force Identify</b> which identifies the filetype and corrects it if it was false before.</p></li>
-<li><p><b>Add-Ons</b> - offers you every generic Tracker add-on and those that can handle the selected file(s). See topic <a href="tracker-add-ons.html">Tracker Add-ons</a> for more information.</p></li>
+<p>Il pannello mostra informazioni sul file selezionato, permette di impostare l'applicazione predefinita con cui aprirlo e, dopo aver espanso la relativa sezione, ne compariranno anche i permessi e il proprietario. Cliccando sul percorso si aprirà il file in una finestra del Tracker.</p></li>
+<li><p><b>Edit Name</b>, <b>Duplicate</b> e <b>Move to Trash</b> - Permettono di rinominare, duplicare o spostare nel cestino i file selezionati.</p></li>
+<li><p><b>Move to</b>, <b>Copy to</b> e <b>Create Link</b> - Permettono di operare sui file selezionati spostandoli, copiandoli o creandone collegamenti usando il metodo della navigazione tramite sottomenù. Premendo <span class="key">SHIFT</span> mentre si apre il menù viene data l'opzione di creare un collegamento relativo.</p></li>
+<li><p><b>Cut</b>, <b>Copy</b> e <b>Paste</b> - Permettono di tagliare, copiare e incollare i file tramite la clipboard. Premendo <span class="key">SHIFT</span> mentre viene aperto il menù è possibile <b>Copiare o Incollare</b> più file, anche da un'altra cartella per incollarli in seguito altrove. Oppure, mentre viene premuto <span class="key">SHIFT</span> è possibile incollare i file copiati nella clipboard come link.</p></li>
+<li><p><b>Identify</b> - Determinerà e imposterà il filetype per i file che non ne hanno, ad esempio un file ottenuto attraverso <span class="cli">wget</span> non avrà impostato alcun filetype. Tenendo premuto <span class="key">SHIFT</span> mentre si apre il menù, la voce viene cambiata in <b>Force Identify</b> che identifica il filetype e corregge quello impostato precedentemente.</p></li>
+<li><p><b>Add-Ons</b> - Mostra tutti gli add-on del Tracker disponibili che possono aprire il file selezionato. Si legga il capitolo <a href="tracker-add-ons.html">Tracker Add-on</a> per maggiori informazioni.</p></li>
 </ul>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="transaction-status" name="transaction-status">Transaction status</a></h2>
-<p>When you copy, move or delete files, Tracker shows its progress with a status window. If you initiate more than one transaction, each job gets its own status display.</p>
+<a id="transaction-status" name="transaction-status">Stato delle operazioni</a></h2>
+<p>Mentre vengono copiati, spostati o cancellati dei file, il Tracker mostra lo stato di avanzamento in una apposita finestra. Se vengono iniziati più trasferimenti, ogni operazione mostrerà il proprio stato avanzamento.</p>
 <img src="images/tracker-images/transaction-status.png" alt="transaction-status.png" />
-<p>To the right are two buttons to pause or stop a transaction entirely. Sometimes it can be useful to temporarily pause a large transaction. For example, you may need to quickly launch a large application. Copying large amounts of data chokes your harddisk's IO bandwidth and thus delays your workflow.</p>
+<p>Sulla destra ci sono due pulsanti per sospendere o fermare un trasferimento. Nel caso si dovesse eseguire un'applicazione pesante, per esempio, potrebbe essere utile sospendere temporaneamente un trasferimento piuttosto lungo in quanto questi spostamenti consumano gran parte della disponibilità dell'HardDisk e ritardano l'esecuzione dell'intero sistema.</p>
 
 </div>
 </div>
@@ -195,7 +196,7 @@ This type-ahead filtering is set in the <a href="#tracker-preferences.html">Trac
 <div class="inner"><span>
  «  <a href="teammonitor.html">Team Monitor</a> 
 ::  <a href="contents.html" class="uplink">Contenuti</a> 
-::  <a href="tracker-add-ons.html">Gli Add-On del Tracker</a>  »
+::  <a href="tracker-add-ons.html">Gli add-on del Tracker</a>  »
 </span></div>
 </div>
 

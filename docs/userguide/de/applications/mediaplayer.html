@@ -4,11 +4,11 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2010, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Humdinger <humdingerb@gmail.com>
+ *		Szymon Barczak (Google Code-In student)
  * Translators:
  *		Matthias
  *
@@ -49,6 +49,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Solange die Übersetzung dieser Seite noch nicht ganz fertig ist, erscheint für die noch fehlenden Teile die englische Version.</div>
 
 <h2><img src="../../images/apps-images/mediaplayer-icon_64.png" alt="mediaplayer-icon_64.png" width="64" height="64" />MediaPlayer</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -57,11 +58,54 @@
 <tr><td>Einstellungen:</td><td></td><td><span class="path">~/config/settings/MediaPlayer</span></td></tr>
 </table>
 <p><br /></p>
-<p>Dieses Thema wurde noch nicht beschrieben. Wer daran arbeiten möchte, meldet sich bitte auf der <a href="http://www.freelists.org/list/haiku-doc">Documentation Mailingliste</a>.</p>
+<p>MediaPlayer is an application used for viewing multimedia files such as music or video files. It supports different formats.</p>
+
+<p><b>Interface</b></p>
+
+<p>MediaPlayer is easy-to-use because of its interface. There's no difference in interface while playing music or video.</p>
+
+<img src="../images/apps-images/mediaplayer.png" alt="mediaplayer.png" />
+
+<p>You can control playing media using a set of buttons - previous, play/pause, stop, next. Also, there is a progress bar, a volume controler and even an oscilloscope.</p>
+
+<div class="box-info">Once you play a video file, you can double right-click on the display to hide interface. Double left-click instead causes displaying video in full-screen mode.</div>
+
+<p><b>Playing media</b></p>
+
+<p>There are options especially useful while watching DVD video or other files which include different audio/video tracks or have subtitles included. You can change audio tracks from <span class="menu">Audio | Track</span> just as <span class="menu">Video | Track</span> for various video tracks. You can also make use of subtitles, MediaPlayer supports .srt format. All available subtitles are showed as options in <span class="menu">Video | Subtitles</span> menu. The player gets names for this positions from the filename, eg. videoclip.english.srt shows as "english" in the menu.</p>
+
+<img src="../images/apps-images/mediplayer-video_menu.png" alt="video-menu" />
+
+<p>You can change the scale by resizing the window or simply from the <span class="menu">Video</span> menu. There are 50%, 100%, 200%, 300% and 400% options. There is an option to change the player to full-screen mode or to change ratio of the display.</p>
+
+<p><b>Playlists</b></p>
+
+<p>MediaPlayer supports playlists. You can either select a few files in Tracker using <span class="key">ALT</span> and launched the application or add other files after launching the one using the drag and drop method. You can get to the playlist from menu - choose <span class="menu">MediaPlayer | Playlist</span> and the playlist window will pop-up.</p>
+
+<img src="../images/apps-images/mediaplayer-playlist.png" alt="playlist" />
+
+<p>You can save the current playlist or open one from the playlist window, of course. There is also a function that lets you to randomize your playlist. Use either <span class="menu">Edit | Randomize</span> menu position or <span class="key">ALT</span> <span class="key">R</span> shortcut. You can also both remove any file from playlist and remove it from playlist and put into Trash. This functions are available from <span class="menu">Edit</span> menu, too.</p>
+
+<p><b>Other options</b></p>
+
+<p>If you would like to rate a file, you can do this directly from MediaPlayer, too! Choose a rate from 1 to 10 from <span class="menu">Attributes | Rating</span> menu.</p>
+
+<p>MediaPlayer is also able to show you some information about the file you play. It is available from <span class="menu">MediaPlayer | File info... </span> menu.</p>
+
+<img src="../images/apps-images/mediplayer-settings.png" alt="settings" />
+
+<p>You can configure the application from <span class="menu">MediaPlayer | Settings</span>. There are some interesting options concerning looping playback, closing window when playback finishes, size and placement of subtitles or volume level while playing in the background.</p>
+
+<p><b>Shortcuts</b></p>
+
+<p>There are plenty of shortcuts for this application. <span class="key">SPACEBAR</span> is used to play/pause the playback. You can control the whole playback with one hand, because alternate keys are used - <span class="key">Z</span> to go to the previous track, <span class="key">X</span> to play, <span class="key">C</span> to pause and <span class="key">V</span> to go to the next track. Left/Right cursors are used to seek, they cause 10 seconds seeking while <span class="key">ALT</span> is pressed at the same time. Up and down cursors controls the volume and cause going to the previous/next track while <span class="key">ALT</span> is pressed.</p>
+
+<p><span class="key">ALT</span> <span class="key">F</span> activates full-screen mode, <span class="key">ALT</span> <span class="key">P</span> pops-up playlist window, <span class="key">ALT</span> <span class="key">I</span> shows file information, <span class="key">ALT</span> <span class="key">H</span> hides interface, <span class="key">ALT</span> <span class="key">A</span> causes MediaPlayer is always on top, <span class="key">ALT</span> <span class="key">S</span> moves you to the settings window and <span class="key">ALT</span> <span class="key">Q</span> quits the application.</p>
+
 
 </div>
 </div>
-<!--
+
 <div class="nav">
 <div class="inner"><span>
  «  <a href="mail.html">Mail</a> 
@@ -69,6 +113,6 @@
 ::  <a href="midiplayer.html">MidiPlayer</a>  »
 </span></div>
 </div>
--->
+
 </body>
 </html>

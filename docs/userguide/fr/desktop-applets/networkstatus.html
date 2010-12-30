@@ -8,7 +8,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Maciej Bałuta
+ *		Maciej Bałuta  (Google Code-In student)
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Loïc
@@ -58,20 +58,20 @@
 <tr><td>Localisation :</td><td></td><td><span class="path">/boot/system/apps/NetworkStatus</span></td></tr>
 <tr><td>Réglages :</td><td></td><td><i>aucun</i></td></tr>
 </table>
-<p>NetworkStatus shows the status of your network connections. If it's not yet running, launching the applet will ask if it should open in window mode or live in the Deskbar tray. In window mode you're able to resize the icon by resizing the window and use the <a href="../gui.html#replicants">Replicant</a> handle to drag it to the Desktop.<br />
-Wherever it's installed, it's operated via a right-click context menu.</p>
+<p>NetworkStatus shows the status of your network connections. If not yet running, launching the applet will ask if it should open in window mode or live in the Deskbar. In window mode you're able to resize the icon by resizing the window and use the <a href="../gui.html#replicants">Replicant</a> handle to drag it to the Desktop.<br />
+Wherever installed, it's operated via a right-click context menu.</p>
 <p><img src="../images/networkstatus-images/applet.png" alt="NetworkStatus applet" /><br />
-The first section contains network devices' names with their state. Below are wireless networks found by the first wireless adapter. You can <span class="menu">Open network preferences...</span> to change your <a href="../preferences/network.html">network configuration</a> or <span class="menu">Quit</span> the applet.</p>
-<p><img src="../images/networkstatus-images/status.png" alt="NetworkStatus - status of the interface" /><br />
-Clicking on a network device's name in the context menu shows its IP, broadcast and netmask addresses.</p>
+The first section contains all network devices' names and their state. Clicking on such an entry brings up a window showing its IP, broadcast and netmask address.<br />
+Below is a list of all wireless networks found by the first wireless adapter and an indicator of their signal strength.<br />
+Lastly, you can <span class="menu">Open network preferences...</span> to change your <a href="../preferences/network.html">network configuration</a> or <span class="menu">Quit</span> the applet.</p>
 
-<h2>Status icons</h2>
+<h2>Icônes d'état</h2>
 <table summary="status icons" border="0" cellspacing="0" cellpadding="2">
-	<tr><td><img src="../images/networkstatus-images/icon-ready.png" /></td><td style="width:15px;"></td><td>Ready</td><td>Link is established.</td></tr>
-	<tr><td><img src="../images/networkstatus-images/icon-connecting.png" /></td><td></td><td>Configuring</td><td>Connecting in progress.</td></tr>
-	<tr><td><img src="../images/networkstatus-images/icon-nosettings.png" /></td><td></td><td>No stateful configuration</td><td>Some settings are missing (check <a href="../preferences/network.html">IP configuration</a>).</td></tr>
-	<tr><td><img src="../images/networkstatus-images/icon-noconnection.png" /></td><td></td><td>No link</td><td>There is no physical connection (probably the network cable is not connected and wireless networks are unavailable).</td></tr>
-	<tr><td><img src="../images/networkstatus-images/icon-nodevices.png" /></td><td></td><td>-</td><td>There are no network adapters available (if you are sure that at least one is connected, there are probably no drivers yet).</td></tr>
+	<tr><td><img src="../images/networkstatus-images/icon-ready.png" /></td><td style="width:15px;"></td><td>Prêt</td><td>La connexion est établie.</td></tr>
+	<tr><td><img src="../images/networkstatus-images/icon-connecting.png" /></td><td></td><td>Configuration</td><td>Connexion en cours.</td></tr>
+	<tr><td><img src="../images/networkstatus-images/icon-nosettings.png" /></td><td></td><td>Pas de configuration utilisable</td><td>Certains paramètres sont manquants (Vérifiez la <a href="../preferences/network.html">configuration IP</a>).</td></tr>
+	<tr><td><img src="../images/networkstatus-images/icon-noconnection.png" /></td><td></td><td>Déconnecté</td><td>Il n'y a pas de connexion physique (Le câble réseau est probablement débranché, ou aucun réseau sans fil n'est disponible).</td></tr>
+	<tr><td><img src="../images/networkstatus-images/icon-nodevices.png" /></td><td></td><td>-</td><td>Aucun adaptateur réseau n'est disponible (Si vous êtes sûr qu'au moins adaptateur est connecté, il est probable qu'il n'existe pas encore de pilote).</td></tr>
 </table>
 
 </div>

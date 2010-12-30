@@ -9,6 +9,8 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		hiromu1996
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -46,23 +48,22 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h2><img src="../../images/prefs-images/virtualmemory-icon_64.png" alt="virtualmemory-icon_64.png" width="64" height="64" />VirtualMemory</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbarメニュー:</td><td style="width:15px;"></td><td><span class="menu">設定</span></td></tr>
+<tr><td>Deskbarメニュー:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
 <tr><td>場所:</td><td></td><td><span class="path">/boot/system/preferences/VirtualMemory</span></td></tr>
 <tr><td>設定ファイル:</td><td></td><td><span class="path">~/config/settings/kernel/drivers/virtual_memory</span><br />
-<span class="path">~/config/settings/VM_data</span> - Stores the panel's window position.</td></tr>
+<span class="path">~/config/settings/VM_data</span> - ここに設定が保存されます。</td></tr>
 </table>
-<p>Virtual memory let's the system swap out memory to harddisk, if the RAM can be used more sensibly for other things. So, even if you have lots of RAM, providing virtual memory is never a bad idea.</p>
+<p>Virtual memoryを設定すると、メモリが不足している場合にハードディスクにスワッピングすることができます。<br />RAMが大量に使用できる場合は、Virtual memoryを設定する必要はないでしょう。</p>
 <img src="../images/prefs-images/virtualmemory.png" alt="virtualmemory.png" />
-<p>You can set the size to even more than your physical memory size if needed. With today's huge harddisks, assigning the physical memory size shouldn't be a problem. Still, you can quickly adjust the size if your free space ever runs low. In that case you should also have a look at <a href="../applications/diskusage.html">DiskUsage</a> to find out what's eating up your diskspace.</p>
-<p>Normally, the swap file's written to your boot partition. If you often run into disk thrashing due to the virtual memory system swapping memory in and out, you can try to use a separate harddisk for you swap file. Simply another partition on the same harddisk with your system/data won't help.<br />
-Upgrading your RAM is of course the most effective way to go...</p>
+<p>必要に応じて、物理メモリより大きいサイズを設定することができます。<br />一般的なサイズのハードディスクでは、物理メモリのサイズだけ割り当てても問題ないでしょう。<br />空き領域が少なくなってきたなら、すぐに割当量を調節することができます。その場合は<a href="../applications/diskusage.html">DiskUsage</a>でハードディスクの使用率を確認するといいでしょう。</p>
+<p>通常はブートパーティションにスワップファイルが書きこまれます。<br />スワップインやスワップアウトによってよくハードディスクがスラッシング状態に陥ってしまうなら、スワップファイル用に別のハードディスクを使うこともできます。ただし、同じディスクにパーティションをつくってそこをスワップに使用しても、状態は改善されません。<br />
+RAMの量を増やすのが1番有効な方法であることをお忘れなく。</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="button">Defaults</span></td><td> </td><td>すべての設定をデフォルト値に戻します。</td></tr>
-<tr><td><span class="button">Revert</span></td><td> </td><td>brings back the settings that were active when you started the VirtualMemory preferences.</td></tr>
+<tr><td><span class="button">デフォルト</span></td><td> </td><td>すべての項目をデフォルト値に戻します。</td></tr>
+<tr><td><span class="button">元に戻す</span></td><td> </td><td>VirtualMemoryが起動された時点で有効だった設定に戻します。</td></tr>
 </table>
 
 </div>

@@ -11,13 +11,13 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		fyskij
- *		Barret
+ *		Barrett
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Indice del file system</title>
+	<title>Indice</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
@@ -51,17 +51,17 @@
 <div id="content">
 <div>
 
-<h1>Indice del file system</h1>
+<h1>Indice</h1>
 
 <p>Gli <a href="attributes.html">Attributi</a> e le <a href="queries.html">Query</a> sono fra le caratteristiche principali di Haiku.
 Mentre gli attributi sono utili di per se in quanto permettono di visualizzare delle informazioni aggiuntive, per poter effettuare delle query c'è bisogno che gli attributi vengano indicizzati.
-Essi vengono inseriti su una tabella di ricerca, che a sua volta consente delle query velocissime<br />
-L'indice è parte del filesystem ed è conservato su ogni volume/partizione separatamente.</p>
+Essi vengono inseriti su una tabella di ricerca, che a sua volta consente di eseguire delle query velocissime.<br />
+L'indice è parte del filesystem ed è conservato su ogni volume e su ogni partizione separatamente.</p>
 
 <h2>Comandi di indicizzazione dal Terminale</h2> 
 <p>Ci sono numerosi comandi per gestire l'indice:</p>
 <ul> 
-<li><b>lsindex</b> - Visualizza l'indice degli attributi sul volume/partizione in uso.<br />
+<li><b>lsindex</b> - Visualizza l'indice degli attributi sul volume o sulla partizione in uso.<br />
 Ci sono attributi che vengono indicizzati in modo predefinito:</li>
 </ul>
 <pre class="terminal"> ~ -&gt;lsindex 
@@ -105,47 +105,50 @@ name
 size 
 </pre>
 <ul>
-<li><b>mkindex</b> - Aggiunge un attributo all'indice del volume/partizione.</li>
+<li><b>mkindex</b> - Aggiunge un attributo all'indice del volume o della partizione.</li>
 </ul>
-<pre>Uso: mkindex [opzioni] &lt;attributo&gt; 
-Crea un nuovo indice per l'attributo specificato
+<pre>Usage: mkindex [options] &lt;attribute&gt; 
+Creates a new index for the specified attribute. 
  
-  -d, --volume=PERCORSO     un percorso sul volume a cui l'indice sarà aggiunto (di default il volume corrente)
-  -t, --type=TIPO       il tipo di attributo da indicizzare.
-                         Uno di "int", 
-                        "llong", "string", "float", o "double". 
-                        di default "string". 
-      --copy-from       percorso del volumeda cui copiare gli indici.
-  -v, --verbose          visualizza le informazioni circa l'indice da creare
-
+  -d, --volume=PATH     a path on the volume to which the index will be added, 
+                        defaults to current volume. 
+  -t, --type=TYPE       the type of the attribute being indexed.  One of "int", 
+                        "llong", "string", "float", or "double". 
+                        Defaults to "string". 
+      --copy-from       path to volume to copy the indexes from. 
+  -v, --verbose         print information about the index being created 
 </pre>
 <p>Solo i <b>nuovi</b> file con questo attributo verranno automaticamente indicizzati!<br />
 Successivamente, i file esistenti devono essere aggiunti manualmente copiandoli ed eliminando gli originali. Oppure puoi usare il comando <span class="cli">reindex</span>. 
 </p>
 <ul>
-<li><b>reindex</b> - Inserisce gli attributi dei file esistenti nel nuovo indice di di un volume / partizione. </li>
+<li><b>reindex</b> - Inserisce gli attributi dei file esistenti nel nuovo indice di un volume o di una partizione. </li>
 </ul>
-<pre>Uso: reindex [-rvf] attr &lt;lista di file a/o cartelle&gt; 
-  -r    Entra nelle cartelle ricorsivamente
-  -v    output dettagliato
-  -f    crea/aggiorna tutti gli indici dal volume di origine,
-        "attr" è la posizioni del volume di origine
+<pre>Usage: reindex [-rvf] attr &lt;list of filenames and/or directories&gt; 
+  -r    enter directories recursively
+  -v    verbose output
+  -f    create/update all indices from the source volume,
+        "attr" is the path to the source volume
 
 </pre>
 <ul>
-<li><b>rmindex</b> - Rimuove gli attributi da un indice di un volume/partizione.</li>
+<li><b>rmindex</b> - Rimuove un attributo dall'indice di un volume o di una partizione.</li>
 </ul>
-<pre>Usage: rmindex [OPZIONE]... NOME_INDICE 
+<pre>Usage: rmindex [OPTION]... INDEX_NAME 
  
-Rimuovo l'indice NOME_INDICE da un volume del disco.  Una volta fatto ciò, non sarà più possibile fare delle query per i file con l'attributo NOME_INDICE
-
-  -d, --volume=PERCORSO   il percorso del vuole da cui rimuovere l'indice
-  -h, --help              visualizza i comandi ed esce
-  -p, --pattern         NOME_INDICE come pattern 
-  -v, --verbose         visualizza le informazione circa l'indice che si sta rimuovendo 
- NOME_INDICE è il nome dell'attributo di un file. 
+Removes the index named INDEX_NAME from a disk volume.  Once this has been 
+done, it will no longer be possible to use the query system to search for 
+files with the INDEX_NAME attribute. 
  
-Se nessun volume è specificato, verrà usato il volume della cartella corrente.</pre>
+  -d, --volume=PATH     a path on the volume from which the index will be 
+                         removed 
+  -h, --help            display this help and exit 
+  -p, --pattern         INDEX_NAME is a pattern 
+  -v, --verbose         print information about the index being removed 
+ 
+INDEX_NAME is the name of a file attribute. 
+ 
+If no volume is specified, the volume of the current directory is assumed.</pre>
 
 </div>
 </div>

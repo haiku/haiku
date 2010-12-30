@@ -10,12 +10,14 @@
  * Authors:
  *		Daniel Marth
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Pengphei Han
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>List of commands</title>
+	<title>命令列表</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -50,295 +52,295 @@
 <div>
 <div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
 
-<h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />List of all commandline applications</h2>
+<h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />所有命令行程序列表</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Location:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin</span><br /><span class="path">/boot/common/bin</span><br /><span class="path">~/config/bin</span></td></tr>
+<tr><td>位置：</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin</span><br /><span class="path">/boot/common/bin</span><br /><span class="path">~/config/bin</span></td></tr>
 </table>
 <p><br /></p>
-<p>All commandline applications shipped with Haiku are in either <span class="path">/boot/system/bin</span> or <span class="path">/boot/common/bin</span>. Your own or additionally installed commandline apps should go in <span class="path">~/config/bin</span>. All these locations are part of the PATH variable and are therefore automatically found.<br />
-Here's a list of all commandline applications that are shipped with Haiku. Each with only a short description of what it does, for more detailed information on its usage execute the command with the parameter <tt>--help</tt>.</p>
+<p>所有与 Haiku 集成的命令行程序放置在 <span class="path">/boot/system/bin</span> 或者 <span class="path">/boot/common/bin</span>。您自己的或者附加安装的命令行程序应该放置于 <span class="path">~/config/bin</span>。所有这些位置是 PATH 变量的一部分，因此会自动被发现。<br />
+下面是与 Haiku 集成的所有命令行程序列表。每个程序都有一个简短的功能描述，关于用法的更多详细信息，请使用 <tt>--help</tt> 参数运行该命令。</p>
 <p><br /></p>
-<p>Index:   <a href="#A">A – E</a>   ::   <a href="#F"> F – J </a>   ::   <a href="#K"> K – O </a>   ::   <a href="#P"> P – S </a>   ::   <a href="#T"> T – Z </a></p>
+<p>索引:   <a href="#A">A – E</a>   ::   <a href="#F"> F – J </a>   ::   <a href="#K"> K – O </a>   ::   <a href="#P"> P – S </a>   ::   <a href="#T"> T – Z </a></p>
 <p><br /></p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
-<tr><td><tt>CortexAddOnHost</tt></td><td style="width:10px;"> </td><td>Starts service to monitor audio and video media add-ons in use. </td></tr>
-<tr><td><tt>ReadOnlyBootPrompt</tt></td><td> </td><td>Language setup. </td></tr>
-<tr><td><tt>[</tt></td><td> </td><td>Check file types and compare values. </td></tr>
+<tr><td><tt>CortexAddOnHost</tt></td><td style="width:10px;"> </td><td>开启音频和视频附加组件的管理服务。</td></tr>
+<tr><td><tt>ReadOnlyBootPrompt</tt></td><td> </td><td>语言设置。 </td></tr>
+<tr><td><tt>[</tt></td><td> </td><td>比较文件之后，返回其真/假值。</td></tr>
 <tr><td colspan="3"><a id="A" name="A"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>A</h2></a></td></tr>
-<tr><td><tt>addattr</tt></td><td> </td><td>Writes an attribute to a node, taking the type into account and converting the values accordingly. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>alert</tt></td><td> </td><td>Show a message box. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>arp</tt></td><td> </td><td>Manipulate the system ARP cache. </td></tr>
-<tr><td><tt>awk</tt></td><td> </td><td>See gawk.</td></tr>
-<tr><td><tt>base64</tt></td><td> </td><td>Base64 encode or decode to standard output. </td></tr>
-<tr><td><tt>basename</tt></td><td> </td><td>Strip directory and optionally suffix from filenames.</td></tr>
-<tr><td><tt>bash</tt></td><td> </td><td>Bourne-Again Shell</td></tr>
-<tr><td><tt>bc</tt></td><td> </td><td>An arbitrary precision calculator language.</td></tr>
-<tr><td><tt>beep</tt></td><td> </td><td>Ring a bell. </td></tr>
-<tr><td><tt>bootman</tt></td><td> </td><td>Install or uninstall boot-menu. </td></tr>
-<tr><td><tt>bunzip2</tt></td><td> </td><td>See bzip2.</td></tr>
-<tr><td><tt>bzip2</tt></td><td> </td><td>Block-sorting file compressor.</td></tr>
-<tr><td><tt>c++</tt></td><td> </td><td>C++-Compiler</td></tr>
-<tr><td><tt>cal</tt></td><td> </td><td>Display a calendar. </td></tr>
-<tr><td><tt>cat</tt></td><td> </td><td>Concatenate files and print on the standard output. </td></tr>
-<tr><td><tt>catattr</tt></td><td> </td><td>Show attributes of a node. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>cc</tt></td><td> </td><td>C-Compiler</td></tr>
-<tr><td><tt>checkfs</tt></td><td> </td><td>Check file system. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>checkitout</tt></td><td> </td><td>Wraps URL mime types around command line applications or other apps that don't handle them directly. </td></tr>
-<tr><td><tt>chgrp</tt></td><td> </td><td>Change group of files. </td></tr>
-<tr><td><tt>chmod</tt></td><td> </td><td>Change file mode bits. </td></tr>
-<tr><td><tt>chop</tt></td><td> </td><td>Split file into smaller files. </td></tr>
-<tr><td><tt>chown</tt></td><td> </td><td>Change the owner and group of files. </td></tr>
-<tr><td><tt>chroot</tt></td><td> </td><td>Run commands within specified root directory. </td></tr>
-<tr><td><tt>cksum</tt></td><td> </td><td>Print CRC checksum and byte counts of files. </td></tr>
-<tr><td><tt>clear</tt></td><td> </td><td>Clear the terminal window. </td></tr>
-<tr><td><tt>clockconfig</tt></td><td> </td><td>Configure clock. </td></tr>
-<tr><td><tt>cmp</tt></td><td> </td><td>Compare files byte by byte.</td></tr>
-<tr><td><tt>collectcatkeys </tt></td><td> </td><td>[Leftover from the move of locale-kit.]</td></tr>
-<tr><td><tt>comm</tt></td><td> </td><td>Compare sorted files line by line. </td></tr>
-<tr><td><tt>compress</tt></td><td> </td><td>Data compression program. </td></tr>
-<tr><td><tt>consoled</tt></td><td> </td><td>Console daemon </td></tr>
-<tr><td><tt>copyattr</tt></td><td> </td><td>Copies attributes from one or more files or directories, with all or a specified subset of their attributes, to another location. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>cp</tt></td><td> </td><td>Copy files and directories. </td></tr>
-<tr><td><tt>csplit</tt></td><td> </td><td>Output pieces of files separated by patterns to files and output byte counts of each piece to standard output.</td></tr>
-<tr><td><tt>ctags</tt></td><td> </td><td>Generate an index file for a variety of language objects found in files</td></tr>
-<tr><td><tt>cut</tt></td><td> </td><td>Remove sections from each line of files. </td></tr>
-<tr><td><tt>date</tt></td><td> </td><td>Display the current time in the given format or set the system date. </td></tr>
-<tr><td><tt>dc</tt></td><td> </td><td>Desk Calculator language.</td></tr>
-<tr><td><tt>dd</tt></td><td> </td><td>Copy a file, converting and formatting according operands. </td></tr>
-<tr><td><tt>desklink</tt></td><td> </td><td>Link items in Deskbar. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>df</tt></td><td> </td><td>Report file system disk space usage. </td></tr>
-<tr><td><tt>diff</tt></td><td> </td><td>Compare files line by line.</td></tr>
-<tr><td><tt>diff3</tt></td><td> </td><td>Compare three files line by line.</td></tr>
-<tr><td><tt>dircolors</tt></td><td> </td><td>Color setup for ls. </td></tr>
-<tr><td><tt>dirname</tt></td><td> </td><td>Print path with its trailing component removed. </td></tr>
-<tr><td><tt>draggers</tt></td><td> </td><td>Show/set draggers state. </td></tr>
-<tr><td><tt>driveinfo</tt></td><td> </td><td>Show hardware information. </td></tr>
-<tr><td><tt>dstcheck</tt></td><td> </td><td>Daylight Saving Time check. </td></tr>
-<tr><td><tt>du</tt></td><td> </td><td>Summarize disk usage of each file, recursively for directories. </td></tr>
-<tr><td><tt>dumpcatalog</tt></td><td> </td><td>[Leftover from the move of locale-kit.] </td></tr>
-<tr><td><tt>echo</tt></td><td> </td><td>Display a line of text.</td></tr>
-<tr><td><tt>egrep</tt></td><td> </td><td>See grep.</td></tr>
-<tr><td><tt>eject</tt></td><td> </td><td>Eject removable media. </td></tr>
-<tr><td><tt>env</tt></td><td> </td><td>Run a program in a modified environment. </td></tr>
-<tr><td><tt>error</tt></td><td> </td><td>Prints clear text error messages for given error numbers. </td></tr>
-<tr><td><tt>expand</tt></td><td> </td><td>Convert tabs in each file to spaces, writing to standard output. </td></tr>
-<tr><td><tt>expr</tt></td><td> </td><td>Print value of expression to standard output. </td></tr>
+<tr><td><tt>addattr</tt></td><td> </td><td>写入属性到文件，包括类型和相应值的转换。<a href="cli-apps.html">（Haiku 专用）</a></td></tr>
+<tr><td><tt>alert</tt></td><td> </td><td>显示一个消息对话框。<a href="cli-apps.html">（Haiku 专用）</a></td></tr>
+<tr><td><tt>arp</tt></td><td> </td><td>管理系统缓冲区。</td></tr>
+<tr><td><tt>awk</tt></td><td> </td><td>See <tt>gawk</tt>.</td></tr>
+<tr><td><tt>base64</tt></td><td> </td><td>标准输出的 Base64 编码或解码。</td></tr>
+<tr><td><tt>basename</tt></td><td> </td><td>从 /path/to/filename 字符串中去除目录和可选的文件名后缀。</td></tr>
+<tr><td><tt>bash</tt></td><td> </td><td>Bourne-Again Shell，使用广泛的 Shell 解释器。</td></tr>
+<tr><td><tt>bc</tt></td><td> </td><td>一个任意精度的计算机语言。</td></tr>
+<tr><td><tt>beep</tt></td><td> </td><td>响铃。 </td></tr>
+<tr><td><tt>bootman</tt></td><td> </td><td>安装或者卸载 引导菜单（boot-menu）。 </td></tr>
+<tr><td><tt>bunzip2</tt></td><td> </td><td>See <tt>bzip2</tt>.</td></tr>
+<tr><td><tt>bzip2</tt></td><td> </td><td>信息分块 文件压缩工具。</td></tr>
+<tr><td><tt>c++</tt></td><td> </td><td>C++ 编译器</td></tr>
+<tr><td><tt>cal</tt></td><td> </td><td>显示 计算器。 </td></tr>
+<tr><td><tt>cat</tt></td><td> </td><td>Concatenates files and prints to standard output. </td></tr>
+<tr><td><tt>catattr</tt></td><td> </td><td>打印文件属性的内容。 <a href="cli-apps.html">（Haiku 专用）</a></td></tr>
+<tr><td><tt>cc</tt></td><td> </td><td>C 编译器</td></tr>
+<tr><td><tt>checkfs</tt></td><td> </td><td>检查和修复文件系统。<a href="cli-apps.html">（Haiku 专用）</a></td></tr>
+<tr><td><tt>checkitout</tt></td><td> </td><td>使用版本库的网址（URL）检验源文件。</td></tr>
+<tr><td><tt>chgrp</tt></td><td> </td><td>修改文件组。 </td></tr>
+<tr><td><tt>chmod</tt></td><td> </td><td>修改文件的权限。 </td></tr>
+<tr><td><tt>chop</tt></td><td> </td><td>分割文件为小文件。</td></tr>
+<tr><td><tt>chown</tt></td><td> </td><td>修改文件的组和所有者。 </td></tr>
+<tr><td><tt>chroot</tt></td><td> </td><td>在指定根目录中运行命令。 </td></tr>
+<tr><td><tt>cksum</tt></td><td> </td><td>打印文件的 CRC校验码 和字节数。 </td></tr>
+<tr><td><tt>clear</tt></td><td> </td><td>清空终端窗口。 </td></tr>
+<tr><td><tt>clockconfig</tt></td><td> </td><td>打印时钟的配置。 </td></tr>
+<tr><td><tt>cmp</tt></td><td> </td><td>按字节比较文件。</td></tr>
+<tr><td><tt>collectcatkeys </tt></td><td> </td><td>[由本地化套件遗留的工具。]</td></tr>
+<tr><td><tt>comm</tt></td><td> </td><td>按行比较分选的文件。</td></tr>
+<tr><td><tt>compress</tt></td><td> </td><td>数据压缩程序。</td></tr>
+<tr><td><tt>consoled</tt></td><td> </td><td>控制台后台程序 </td></tr>
+<tr><td><tt>copyattr</tt></td><td> </td><td>复制一个或多个文件的所有属性或者子属性到其他或新文件。<a href="cli-apps.html">(Haiku 专用)</a></td></tr>
+<tr><td><tt>cp</tt></td><td> </td><td>复制文件和目录。 </td></tr>
+<tr><td><tt>csplit</tt></td><td> </td><td>使用指定模式分割文件。</td></tr>
+<tr><td><tt>ctags</tt></td><td> </td><td>为文件中的各种语言对象创建索引文件。</td></tr>
+<tr><td><tt>cut</tt></td><td> </td><td>打印文件的每行分段情况。</td></tr>
+<tr><td><tt>date</tt></td><td> </td><td>显示或者设置当前时间和日期。 </td></tr>
+<tr><td><tt>dc</tt></td><td> </td><td>桌面计算语言。</td></tr>
+<tr><td><tt>dd</tt></td><td> </td><td>复制格式化数据，根据操作数转换和格式化数据。</td></tr>
+<tr><td><tt>desklink</tt></td><td> </td><td>在桌面栏添加项目。 <a href="cli-apps.html">(Haiku 专用)</a></td></tr>
+<tr><td><tt>df</tt></td><td> </td><td>反馈挂载卷的空闲和已用空间。 </td></tr>
+<tr><td><tt>diff</tt></td><td> </td><td>按行比较文件。</td></tr>
+<tr><td><tt>diff3</tt></td><td> </td><td>按行比较3个文件。</td></tr>
+<tr><td><tt>dircolors</tt></td><td> </td><td>Color setup for <tt>ls</tt>. </td></tr>
+<tr><td><tt>dirname</tt></td><td> </td><td>从文件的路径字符串中找出文件名。</td></tr>
+<tr><td><tt>draggers</tt></td><td> </td><td>显示/设置 Replicants 的拖动状态。</td></tr>
+<tr><td><tt>driveinfo</tt></td><td> </td><td>显示硬件信息。 </td></tr>
+<tr><td><tt>dstcheck</tt></td><td> </td><td>在切换到公开保存时间时，显示使用的消息框。</td></tr>
+<tr><td><tt>du</tt></td><td> </td><td>总览每个文件和目录的磁盘使用情况。</td></tr>
+<tr><td><tt>dumpcatalog</tt></td><td> </td><td>[由本地化套件所遗留的工具] </td></tr>
+<tr><td><tt>echo</tt></td><td> </td><td>显示一行文本。</td></tr>
+<tr><td><tt>egrep</tt></td><td> </td><td>See <tt>grep</tt>.</td></tr>
+<tr><td><tt>eject</tt></td><td> </td><td>弹出 可移动媒体。</td></tr>
+<tr><td><tt>env</tt></td><td> </td><td>在改进环境中运行程序。</td></tr>
+<tr><td><tt>error</tt></td><td> </td><td>打印给定错误码的简明文本错误信息。 </td></tr>
+<tr><td><tt>expand</tt></td><td> </td><td>将缩进转换为空格。</td></tr>
+<tr><td><tt>expr</tt></td><td> </td><td>Prints the value of an expression.</td></tr>
 <tr><td colspan="3"><a id="F" name="F"><h2>F</h2></a></td></tr>
-<tr><td><tt>factor</tt></td><td> </td><td>Print the prime factors of each specified integer number. </td></tr>
-<tr><td><tt>false</tt></td><td> </td><td>Do nothing, unsuccessfully. </td></tr>
-<tr><td><tt>fdinfo</tt></td><td> </td><td>Shows info about the used file descriptors in the system. </td></tr>
-<tr><td><tt>ffm</tt></td><td> </td><td>Set if focus follows mouse. </td></tr>
-<tr><td><tt>fgrep</tt></td><td> </td><td>See grep.</td></tr>
-<tr><td><tt>filepanel</tt></td><td> </td><td>Display a load/save file panel. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>find</tt></td><td> </td><td>Search for files in a directory hierarchy.</td></tr>
-<tr><td><tt>finddir</tt></td><td> </td><td>Find directory using a constant. </td></tr>
-<tr><td><tt>fmt</tt></td><td> </td><td>Reformat each paragraph in the listed files, writing to standard output. </td></tr>
-<tr><td><tt>fold</tt></td><td> </td><td>Wrap input lines in each file, writing to standard output. </td></tr>
-<tr><td><tt>fortune</tt></td><td> </td><td>Print a random, hopefully interesting, adage. </td></tr>
-<tr><td><tt>frcode</tt></td><td> </td><td>Called by updatedb to compress the list of file names using front-compression.</td></tr>
-<tr><td><tt>freetype-config</tt></td><td> </td><td>Get FreeType compilation and linking information.</td></tr>
-<tr><td><tt>ftp</tt></td><td> </td><td>Internet file transfer program. </td></tr>
-<tr><td><tt>ftpd</tt></td><td> </td><td>FTP daemon</td></tr>
-<tr><td><tt>funzip</tt></td><td> </td><td>Extracts to stdout the gzip file or first zip entry of stdin or the given file.</td></tr>
-<tr><td><tt>fwcontrol</tt></td><td> </td><td>FireWire control program. </td></tr>
-<tr><td><tt>gawk</tt></td><td> </td><td>Pattern scanning and processing language. </td></tr>
-<tr><td><tt>gdb</tt></td><td> </td><td>GNU debugger. </td></tr>
-<tr><td><tt>getlimits</tt></td><td> </td><td>Output platform dependent limits in a format useful for shell scripts. </td></tr>
-<tr><td><tt>grep</tt></td><td> </td><td>Search for pattern.</td></tr>
-<tr><td><tt>groups</tt></td><td> </td><td>Print group memberships for each username. </td></tr>
-<tr><td><tt>gunzip</tt></td><td> </td><td>See gzip.</td></tr>
-<tr><td><tt>gzexe</tt></td><td> </td><td>Compress and decompress executables. </td></tr>
-<tr><td><tt>gzip</tt></td><td> </td><td>Compress files. </td></tr>
-<tr><td><tt>hd</tt></td><td> </td><td>Hexdump</td></tr>
-<tr><td><tt>head</tt></td><td> </td><td>Print the first ten lines of each file to standard output. </td></tr>
-<tr><td><tt>hey</tt></td><td> </td><td>A small scripting utility.</td></tr>
-<tr><td><tt>hostname</tt></td><td> </td><td>Print or set the hostname of the current system. </td></tr>
-<tr><td><tt>id</tt></td><td> </td><td>Print user and group information. </td></tr>
-<tr><td><tt>ident</tt></td><td> </td><td>Identify RCS keyword in files. </td></tr>
-<tr><td><tt>ifconfig</tt></td><td> </td><td>Configure a network interface. </td></tr>
-<tr><td><tt>install</tt></td><td> </td><td>Copy files into destination locations. </td></tr>
-<tr><td><tt>install-wifi-firmwares.sh</tt></td><td> </td><td>Install firmware for various wireless network cards. </td></tr>
-<tr><td><tt>installoptionalpackage</tt></td><td> </td><td>Temporary solution for installing optional packages. </td></tr>
-<tr><td><tt>installsound</tt></td><td> </td><td>Install a new named sound event in the sounds preferences panel. </td></tr>
-<tr><td><tt>iroster</tt></td><td> </td><td>List input devices. </td></tr>
-<tr><td><tt>isvolume</tt></td><td> </td><td>Get volume information. </td></tr>
-<tr><td><tt>join</tt></td><td> </td><td>For each pair of input lines with identical jon fields, write a line to standard output. </td></tr>
+<tr><td><tt>factor</tt></td><td> </td><td>打印显示整数中的素数（质数）。</td></tr>
+<tr><td><tt>false</tt></td><td> </td><td>没有任何动作，仅表明“不成功”，并且返回值“1”。</td></tr>
+<tr><td><tt>fdinfo</tt></td><td> </td><td>显示系统中已用文件的描述符信息。</td></tr>
+<tr><td><tt>ffm</tt></td><td> </td><td>设置焦点跟随鼠标。</td></tr>
+<tr><td><tt>fgrep</tt></td><td> </td><td>See <tt>grep</tt>.</td></tr>
+<tr><td><tt>filepanel</tt></td><td> </td><td>显示一个装载/保存文件面板。<a href="cli-apps.html">(Haiku 专用)</a></td></tr>
+<tr><td><tt>find</tt></td><td> </td><td>在目录层次搜索文件。</td></tr>
+<tr><td><tt>finddir</tt></td><td> </td><td>查找系统定义的指定目录。</td></tr>
+<tr><td><tt>fmt</tt></td><td> </td><td>重排文件的段落格式。</td></tr>
+<tr><td><tt>fold</tt></td><td> </td><td>隐藏文件的输入行。</td></tr>
+<tr><td><tt>fortune</tt></td><td> </td><td>打印一个随机，非常有趣的格言。</td></tr>
+<tr><td><tt>frcode</tt></td><td> </td><td>由 updatedb 调用，压缩文件名列表。</td></tr>
+<tr><td><tt>freetype-config</tt></td><td> </td><td>显示 FreeType 编辑和链接信息。</td></tr>
+<tr><td><tt>ftp</tt></td><td> </td><td>文件传输程序。</td></tr>
+<tr><td><tt>ftpd</tt></td><td> </td><td>FTP 后台程序。</td></tr>
+<tr><td><tt>funzip</tt></td><td> </td><td>提取压缩档的首个项目到标准输出。</td></tr>
+<tr><td><tt>fwcontrol</tt></td><td> </td><td>防火墙控制程序。</td></tr>
+<tr><td><tt>gawk</tt></td><td> </td><td>模式匹配和处理程序。 </td></tr>
+<tr><td><tt>gdb</tt></td><td> </td><td>GNU 调试器</td></tr>
+<tr><td><tt>getlimits</tt></td><td> </td><td>以有用的格式打印 Shell 脚本平台相关的限制。</td></tr>
+<tr><td><tt>grep</tt></td><td> </td><td>模式搜索。</td></tr>
+<tr><td><tt>groups</tt></td><td> </td><td>打印每个用户名的组别。</td></tr>
+<tr><td><tt>gunzip</tt></td><td> </td><td>See <tt>gzip</tt>.</td></tr>
+<tr><td><tt>gzexe</tt></td><td> </td><td>解/压缩可执行文件。</td></tr>
+<tr><td><tt>gzip</tt></td><td> </td><td>解/压缩文件。 </td></tr>
+<tr><td><tt>hd</tt></td><td> </td><td>十六进制码。</td></tr>
+<tr><td><tt>head</tt></td><td> </td><td>打印文件的首行。</td></tr>
+<tr><td><tt>hey</tt></td><td> </td><td>用于 GUI 应用程序脚本的小工具。</td></tr>
+<tr><td><tt>hostname</tt></td><td> </td><td>打印或设置系统主机名。 </td></tr>
+<tr><td><tt>id</tt></td><td> </td><td>打印用户和用户组信息。 </td></tr>
+<tr><td><tt>ident</tt></td><td> </td><td>识别文件中的 RCS 关键字。</td></tr>
+<tr><td><tt>ifconfig</tt></td><td> </td><td>配置网络接口。 </td></tr>
+<tr><td><tt>install</tt></td><td> </td><td>复制文件到目标路径，而不中断运行系统。</td></tr>
+<tr><td><tt>install-wifi-firmwares.sh</tt></td><td> </td><td>为不同的无线网卡安装防火墙。 </td></tr>
+<tr><td><tt>installoptionalpackage</tt></td><td> </td><td>安装可选包的临时解决方案。 </td></tr>
+<tr><td><tt>installsound</tt></td><td> </td><td>在 声音 首选项面板中安装新的声音事件。 </td></tr>
+<tr><td><tt>iroster</tt></td><td> </td><td>列出输入硬件设备。 </td></tr>
+<tr><td><tt>isvolume</tt></td><td> </td><td>获取一个挂载卷信息。</td></tr>
+<tr><td><tt>join</tt></td><td> </td><td>对于每对具有相同连接区域的输入行，写入一行至标准输出。 </td></tr>
 <tr><td colspan="3"><a id="K" name="K"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>K</h2></a></td></tr>
-<tr><td><tt>kernel_debugger</tt></td><td> </td><td>Enters the kernel debugger with the optional message. </td></tr>
-<tr><td><tt>keymap</tt></td><td> </td><td>Show and edit keymap. </td></tr>
-<tr><td><tt>kill</tt></td><td> </td><td>Send a signal to a process. </td></tr>
-<tr><td><tt>less</tt></td><td> </td><td>Show file with backward and forward movement. </td></tr>
-<tr><td><tt>lessecho</tt></td><td> </td><td>Echos its arguments on standard output. But any argument containing spaces is enclosed in quotes. </td></tr>
-<tr><td><tt>lesskey</tt></td><td> </td><td>Specify key binding for less. </td></tr>
-<tr><td><tt>link</tt></td><td> </td><td>Create a link to a file. </td></tr>
-<tr><td><tt>linkcatkeys</tt></td><td> </td><td>[Leftover from the move of locale-kit.] </td></tr>
-<tr><td><tt>listarea</tt></td><td> </td><td>Lists area info for all currently running teams. </td></tr>
-<tr><td><tt>listattr</tt></td><td> </td><td>List file attributes. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>listdev</tt></td><td> </td><td>Display devices in a user friendly way. </td></tr>
-<tr><td><tt>listimage</tt></td><td> </td><td>Lists image info for all currently running teams. </td></tr>
-<tr><td><tt>listport</tt></td><td> </td><td>Lists all open ports in the system organized by team. </td></tr>
-<tr><td><tt>listres</tt></td><td> </td><td>List resources of files. </td></tr>
-<tr><td><tt>listsem</tt></td><td> </td><td>List the semaphores allocated by the specified team. </td></tr>
-<tr><td><tt>listusb</tt></td><td> </td><td>List USB devices. </td></tr>
-<tr><td><tt>ln</tt></td><td> </td><td>Make links between files.</td></tr>
-<tr><td><tt>locate</tt></td><td> </td><td>Locate a file. </td></tr>
-<tr><td><tt>logger</tt></td><td> </td><td>Send a message to the system logging facility. </td></tr>
-<tr><td><tt>login</tt></td><td> </td><td>Begin session on the system. </td></tr>
-<tr><td><tt>logname</tt></td><td> </td><td>Print the name of the current user. </td></tr>
-<tr><td><tt>ls</tt></td><td> </td><td>List directory content. </td></tr>
-<tr><td><tt>lsindex</tt></td><td> </td><td>Display the indexed attributes on the current volume/partition.  <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>mail2mbox</tt></td><td> </td><td>Convert BeOS e-mail files into Unix mailbox files. </td></tr>
-<tr><td><tt>make</tt></td><td> </td><td>GNU make utility to maintain groups of programs.</td></tr>
-<tr><td><tt>makebootable</tt></td><td> </td><td>Makes the specified BFS partitions/devices bootable by writing boot code into the first two sectors. </td></tr>
-<tr><td><tt>mbox2mail</tt></td><td> </td><td>Convert Unix mailbox files into e-mail files for use with BeOS.. </td></tr>
-<tr><td><tt>md5sum</tt></td><td> </td><td>Print or check MD5 checksums.</td></tr>
-<tr><td><tt>merge</tt></td><td> </td><td>Three-way file merge. </td></tr>
-<tr><td><tt>message</tt></td><td> </td><td>Print a message. </td></tr>
-<tr><td><tt>mimeset</tt></td><td> </td><td>Set mimetype of a file. </td></tr>
-<tr><td><tt>mkdepend</tt></td><td> </td><td>Makefile dependency generator.</td></tr>
-<tr><td><tt>mkdir</tt></td><td> </td><td>Create directory. </td></tr>
-<tr><td><tt>mkdos</tt></td><td> </td><td>Initialize FAT16 or FAT32 partitions. </td></tr>
-<tr><td><tt>mkfifo</tt></td><td> </td><td>Create named pipes with the given names. </td></tr>
-<tr><td><tt>mkfs</tt></td><td> </td><td>Build a file system. </td></tr>
-<tr><td><tt>mkindex</tt></td><td> </td><td>Create a new index of the specified attribute.  <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>mktemp</tt></td><td> </td><td>Create a temporary file or directory, safely and print its name.</td></tr>
-<tr><td><tt>modifiers</tt></td><td> </td><td>Asserts (un)pressed modifier keys. </td></tr>
-<tr><td><tt>more</tt></td><td> </td><td>See less. </td></tr>
-<tr><td><tt>mount</tt></td><td> </td><td>Mount a file system. </td></tr>
-<tr><td><tt>mount_nfs</tt></td><td> </td><td>Mount NFS partition. </td></tr>
-<tr><td><tt>mountvolume</tt></td><td> </td><td>Mounts a volume if given. Lists info about mounted and mountable volumes and mounts/unnmounts volumes. </td></tr>
-<tr><td><tt>mv</tt></td><td> </td><td>Move file. </td></tr>
-<tr><td><tt>netcat</tt></td><td> </td><td>Utility to do anything involving TCP or UDP.</td></tr>
-<tr><td><tt>netstat</tt></td><td> </td><td>Print network connections, routing tables, interface statistics, masquerade connections and multicast memberships. </td></tr>
-<tr><td><tt>nl</tt></td><td> </td><td>Write each file to standard output with line numbers added. </td></tr>
-<tr><td><tt>nohup</tt></td><td> </td><td>Run command ignoring hangup signals. </td></tr>
-<tr><td><tt>nproc</tt></td><td> </td><td>Print the number of processing units available to the current process which may be less than the number of online processors.</td></tr>
-<tr><td><tt>od</tt></td><td> </td><td>Write an unambiguous representation, octal bytes per default of files to standard output. </td></tr>
-<tr><td><tt>open</tt></td><td> </td><td>Launches an application/document from the shell. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
+<tr><td><tt>kernel_debugger</tt></td><td> </td><td>进入内核调试器。</td></tr>
+<tr><td><tt>keymap</tt></td><td> </td><td>装载或者保存终端键盘映射。</td></tr>
+<tr><td><tt>kill</tt></td><td> </td><td>发送结束进程信号。 </td></tr>
+<tr><td><tt>less</tt></td><td> </td><td>查看文件。</td></tr>
+<tr><td><tt>lessecho</tt></td><td> </td><td>Echos its arguments and expands metacharacters, such as * and ? in filenames.</td></tr>
+<tr><td><tt>lesskey</tt></td><td> </td><td>捆绑于 less 的指定按键。</td></tr>
+<tr><td><tt>link</tt></td><td> </td><td>创建一个文件链接。 </td></tr>
+<tr><td><tt>linkcatkeys</tt></td><td> </td><td>[由本地化套件所遗留的工具] </td></tr>
+<tr><td><tt>listarea</tt></td><td> </td><td>列出所有当前运行组的区域信息。 </td></tr>
+<tr><td><tt>listattr</tt></td><td> </td><td>列出文件属性。 <a href="cli-apps.html">(Haiku 专用)</a></td></tr>
+<tr><td><tt>listdev</tt></td><td> </td><td>列出所有硬件设备。 </td></tr>
+<tr><td><tt>listimage</tt></td><td> </td><td>列出所有当前运行组的图像信息。</td></tr>
+<tr><td><tt>listport</tt></td><td> </td><td>以组的形式列出所有系统中的开放端口。 </td></tr>
+<tr><td><tt>listres</tt></td><td> </td><td>列出文件资源。</td></tr>
+<tr><td><tt>listsem</tt></td><td> </td><td>列出指定组所保留的信号。</td></tr>
+<tr><td><tt>listusb</tt></td><td> </td><td>列出 USB 硬件设备。 </td></tr>
+<tr><td><tt>ln</tt></td><td> </td><td>创建一个文件链接。</td></tr>
+<tr><td><tt>locate</tt></td><td> </td><td>定位一个文件。 </td></tr>
+<tr><td><tt>logger</tt></td><td> </td><td>发送系统日志消息。 </td></tr>
+<tr><td><tt>login</tt></td><td> </td><td>在系统上创建一个会话。</td></tr>
+<tr><td><tt>logname</tt></td><td> </td><td>打印当前用户的名称。 </td></tr>
+<tr><td><tt>ls</tt></td><td> </td><td>列出目录内容。 </td></tr>
+<tr><td><tt>lsindex</tt></td><td> </td><td>显示当前卷/分区的索引属性。 <a href="cli-apps.html">(Haiku 专用)</a></td></tr>
+<tr><td><tt>mail2mbox</tt></td><td> </td><td>转换 BeOS 电子邮件文件为 Unix 邮箱文件。 </td></tr>
+<tr><td><tt>make</tt></td><td> </td><td>GNU make 套件。</td></tr>
+<tr><td><tt>makebootable</tt></td><td> </td><td>通过写入引导代码到头部的两个扇区，创建指定的 BFS 分区/可引导设备。</td></tr>
+<tr><td><tt>mbox2mail</tt></td><td> </td><td>转换 Unix邮箱文件 为 BeOS电子邮件文件。</td></tr>
+<tr><td><tt>md5sum</tt></td><td> </td><td>打印或检验 MD5 校验码。</td></tr>
+<tr><td><tt>merge</tt></td><td> </td><td>三路文件合并。</td></tr>
+<tr><td><tt>message</tt></td><td> </td><td>打印一个平整的 BMessage 文件。</td></tr>
+<tr><td><tt>mimeset</tt></td><td> </td><td>设置文件的 mime 类型。 </td></tr>
+<tr><td><tt>mkdepend</tt></td><td> </td><td>Makefile 依赖关系产生器。</td></tr>
+<tr><td><tt>mkdir</tt></td><td> </td><td>创建一个目录。 </td></tr>
+<tr><td><tt>mkdos</tt></td><td> </td><td>初始化 FAT 分区。</td></tr>
+<tr><td><tt>mkfifo</tt></td><td> </td><td>创建已命名管道。 </td></tr>
+<tr><td><tt>mkfs</tt></td><td> </td><td>创建一个文件系统。</td></tr>
+<tr><td><tt>mkindex</tt></td><td> </td><td>创建针对某个属性的新索引。<a href="cli-apps.html">(Haiku 专用)</a></td></tr>
+<tr><td><tt>mktemp</tt></td><td> </td><td>安全创建一个临时文件或目录。</td></tr>
+<tr><td><tt>modifiers</tt></td><td> </td><td>打印当前（未）按下的辅助按键。</td></tr>
+<tr><td><tt>more</tt></td><td> </td><td>See <tt>less</tt>. </td></tr>
+<tr><td><tt>mount</tt></td><td> </td><td>挂载文件系统。 </td></tr>
+<tr><td><tt>mount_nfs</tt></td><td> </td><td>挂载 NFS 分区。 </td></tr>
+<tr><td><tt>mountvolume</tt></td><td> </td><td>根据名称挂载相应卷。</td></tr>
+<tr><td><tt>mv</tt></td><td> </td><td>移动/重命名文件。 </td></tr>
+<tr><td><tt>netcat</tt></td><td> </td><td>TCP 和 UDP 套件。</td></tr>
+<tr><td><tt>netstat</tt></td><td> </td><td>打印网络连接，路由表，接口统计信息，伪装连接以及组播成员等信息。</td></tr>
+<tr><td><tt>nl</tt></td><td> </td><td>Prints each file with line numbers added. </td></tr>
+<tr><td><tt>nohup</tt></td><td> </td><td>运行命令，而忽略挂起的信号。 </td></tr>
+<tr><td><tt>nproc</tt></td><td> </td><td>打印可用运算器的编号。</td></tr>
+<tr><td><tt>od</tt></td><td> </td><td>写入文件的清晰表述。</td></tr>
+<tr><td><tt>open</tt></td><td> </td><td>从 Shell 载入应用程序或者文档。 <a href="cli-apps.html">(Haiku 专用)</a></td></tr>
 <tr><td colspan="3"><a id="P" name="P"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>P</h2></a></td></tr>
-<tr><td><tt>passwd</tt></td><td> </td><td>Change user password. </td></tr>
-<tr><td><tt>paste</tt></td><td> </td><td>Write lines consisting of the sequentially corresponding lines from each file, separated by tabs to standard output.</td></tr>
-<tr><td><tt>patch</tt></td><td> </td><td>Apply a diff file to an original. </td></tr>
-<tr><td><tt>pathchk</tt></td><td> </td><td>Diagnose invalid or unportable file names. </td></tr>
-<tr><td><tt>pc</tt></td><td> </td><td>Programmer's calculator. </td></tr>
-<tr><td><tt>ping</tt></td><td> </td><td>Send ICMP-echo-request to network host. </td></tr>
-<tr><td><tt>play</tt></td><td> </td><td>Play tracks from device. </td></tr>
-<tr><td><tt>playfile</tt></td><td> </td><td>Play tracks from a file. </td></tr>
-<tr><td><tt>playsound</tt></td><td> </td><td>Play a sound. </td></tr>
-<tr><td><tt>playwav</tt></td><td> </td><td>Play WAV file. </td></tr>
-<tr><td><tt>pr</tt></td><td> </td><td>Paginate or columnate files for printing. </td></tr>
-<tr><td><tt>printenv</tt></td><td> </td><td>Print the values of the specified environment variables. </td></tr>
-<tr><td><tt>printf</tt></td><td> </td><td>Format and print data. </td></tr>
-<tr><td><tt>prio</tt></td><td> </td><td>Change priority of a process. </td></tr>
-<tr><td><tt>profile</tt></td><td> </td><td>Profiles threads. </td></tr>
-<tr><td><tt>ps</tt></td><td> </td><td>List running processes. </td></tr>
-<tr><td><tt>ptx</tt></td><td> </td><td>Output a permuted index, including context, of the words in the input files.</td></tr>
-<tr><td><tt>pwd</tt></td><td> </td><td>Print current directory. </td></tr>
-<tr><td><tt>query</tt></td><td> </td><td>A shell utility for somewhat emulating the Tracker's "Find by formula" functionality.  <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>quit</tt></td><td> </td><td>Quit application. </td></tr>
-<tr><td><tt>rc</tt></td><td> </td><td>Resource compiler. </td></tr>
-<tr><td><tt>readlink</tt></td><td> </td><td>Print value of a symbolic link or canonical file name. </td></tr>
-<tr><td><tt>reindex</tt></td><td> </td><td>Put the attributes of existing files into newly created index of a volume/partition. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>release</tt></td><td> </td><td>Release a semaphore. </td></tr>
-<tr><td><tt>renice</tt></td><td> </td><td>Alter priority of running process. </td></tr>
-<tr><td><tt>rlog</tt></td><td> </td><td>Print log messages and other information about RCS files.</td></tr>
-<tr><td><tt>rm</tt></td><td> </td><td>Remove files  and directories. </td></tr>
-<tr><td><tt>rmattr</tt></td><td> </td><td>Remove an attribute from a file.  <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>rmdir</tt></td><td> </td><td>Remove directory.</td></tr>
-<tr><td><tt>rmindex</tt></td><td> </td><td>Remove an attribute from the index of a volume/partition. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>roster</tt></td><td> </td><td>Print information about teams. </td></tr>
-<tr><td><tt>route</tt></td><td> </td><td>List and manipulate network routes. </td></tr>
-<tr><td><tt>safemode</tt></td><td> </td><td>Print if running in safemode. </td></tr>
-<tr><td><tt>screen_blanker</tt></td><td> </td><td>Blank screen. </td></tr>
-<tr><td><tt>screenmode</tt></td><td> </td><td>Sets the specified screen mode. </td></tr>
-<tr><td><tt>sdiff</tt></td><td> </td><td>Side-by-side merge of file differences</td></tr>
-<tr><td><tt>seq</tt></td><td> </td><td>Print numbers from FIRST to LAST, in steps of INCREMENT. </td></tr>
-<tr><td><tt>setdecor</tt></td><td> </td><td>List and change decor. </td></tr>
-<tr><td><tt>setgcc</tt></td><td> </td><td>Prints or sets the current gcc version. </td></tr>
-<tr><td><tt>settype</tt></td><td> </td><td>Sets the MIME type, signature, and/or preferred application of one or more files. </td></tr>
-<tr><td><tt>setversion</tt></td><td> </td><td>Show version of file. </td></tr>
-<tr><td><tt>setvolume</tt></td><td> </td><td>Set the volume. </td></tr>
-<tr><td><tt>setwep</tt></td><td> </td><td>Provides WEP encryption. </td></tr>
-<tr><td><tt>sh</tt></td><td> </td><td>See bash. </td></tr>
-<tr><td><tt>sha1sum</tt></td><td> </td><td>Print or check SHA1 checksums. </td></tr>
-<tr><td><tt>shar</tt></td><td> </td><td>Makes so-called shell archives out of many files.</td></tr>
-<tr><td><tt>shred</tt></td><td> </td><td>Overwrite the specified files repeatedly. </td></tr>
-<tr><td><tt>shuf</tt></td><td> </td><td>Write a random permutation of the input lines to standard output. </td></tr>
-<tr><td><tt>shutdown</tt></td><td> </td><td>Shutdown the computer. </td></tr>
-<tr><td><tt>sleep</tt></td><td> </td><td>Pause for a specified number of seconds. </td></tr>
-<tr><td><tt>sort</tt></td><td> </td><td>Write sorted concatenation of all files to standard output. </td></tr>
-<tr><td><tt>spamdbm</tt></td><td> </td><td>Classify e-mail messages as spam and regular genuine messages. </td></tr>
-<tr><td><tt>split</tt></td><td> </td><td>Output fixed-size pieces of input files to files with prefixes. </td></tr>
-<tr><td><tt>stat</tt></td><td> </td><td>Display file or file system status. </td></tr>
-<tr><td><tt>strace</tt></td><td> </td><td>Traces the syscalls of a thread or a team. </td></tr>
-<tr><td><tt>stty</tt></td><td> </td><td>Print or change terminal characteristics. </td></tr>
-<tr><td><tt>su</tt></td><td> </td><td>Change the effective user id and group. </td></tr>
-<tr><td><tt>sum</tt></td><td> </td><td>Print checksum and block counts for each file. </td></tr>
-<tr><td><tt>sync</tt></td><td> </td><td>Force changed blocks to disk, update the super block. </td></tr>
-<tr><td><tt>sysinfo</tt></td><td> </td><td>Show system info. </td></tr>
+<tr><td><tt>passwd</tt></td><td> </td><td>修改用户密码。 </td></tr>
+<tr><td><tt>paste</tt></td><td> </td><td>Prints lines consisting of the sequentially corresponding lines from each file, separated by tabs.</td></tr>
+<tr><td><tt>patch</tt></td><td> </td><td>应用修改文件到原文件。 </td></tr>
+<tr><td><tt>pathchk</tt></td><td> </td><td>判断无效或者不可移植的文件名。 </td></tr>
+<tr><td><tt>pc</tt></td><td> </td><td>程序员计算器。</td></tr>
+<tr><td><tt>ping</tt></td><td> </td><td>发送 ICMP回应请求 到网络主机。 </td></tr>
+<tr><td><tt>play</tt></td><td> </td><td>播放 CD 轨道。</td></tr>
+<tr><td><tt>playfile</tt></td><td> </td><td>播放音频文件。 </td></tr>
+<tr><td><tt>playsound</tt></td><td> </td><td>播放音频文件。</td></tr>
+<tr><td><tt>playwav</tt></td><td> </td><td>播放 WAV 文件。 </td></tr>
+<tr><td><tt>pr</tt></td><td> </td><td>为文件编制页码或者组合以便打印。 </td></tr>
+<tr><td><tt>printenv</tt></td><td> </td><td>打印环境变量的值。</td></tr>
+<tr><td><tt>printf</tt></td><td> </td><td>格式化打印数据。 </td></tr>
+<tr><td><tt>prio</tt></td><td> </td><td>修改进程的优先级。 </td></tr>
+<tr><td><tt>profile</tt></td><td> </td><td>线程配置文件。</td></tr>
+<tr><td><tt>ps</tt></td><td> </td><td>列出运行进程。 </td></tr>
+<tr><td><tt>ptx</tt></td><td> </td><td>输出输入文件中词语的排列索引，包括上下文。</td></tr>
+<tr><td><tt>pwd</tt></td><td> </td><td>打印当前目录。 </td></tr>
+<tr><td><tt>query</tt></td><td> </td><td>效仿 Tracker "Find by formula" 功能的Shell套件。  <a href="cli-apps.html">(Haiku 专用)</a></td></tr>
+<tr><td><tt>quit</tt></td><td> </td><td>退出应用程序。 </td></tr>
+<tr><td><tt>rc</tt></td><td> </td><td>资源编译器</td></tr>
+<tr><td><tt>readlink</tt></td><td> </td><td>打印符号链接目标路径。</td></tr>
+<tr><td><tt>reindex</tt></td><td> </td><td>把已存在文件的属性放置到新建的索引。 <a href="cli-apps.html">(Haiku 专用)</a></td></tr>
+<tr><td><tt>release</tt></td><td> </td><td>发布一个信号。</td></tr>
+<tr><td><tt>renice</tt></td><td> </td><td>修改运行进程的优先级。</td></tr>
+<tr><td><tt>rlog</tt></td><td> </td><td>打印日志消息或者其他有关 RCS 文件的信息。</td></tr>
+<tr><td><tt>rm</tt></td><td> </td><td>删除文件和目录。 </td></tr>
+<tr><td><tt>rmattr</tt></td><td> </td><td>删除文件属性。 <a href="cli-apps.html">(Haiku 专用)</a></td></tr>
+<tr><td><tt>rmdir</tt></td><td> </td><td>删除目录。</td></tr>
+<tr><td><tt>rmindex</tt></td><td> </td><td>删除属性索引。<a href="cli-apps.html">(Haiku 专用)</a></td></tr>
+<tr><td><tt>roster</tt></td><td> </td><td>打印运行组的信息。 </td></tr>
+<tr><td><tt>route</tt></td><td> </td><td>列出并修改网络路由。</td></tr>
+<tr><td><tt>safemode</tt></td><td> </td><td>检查系统是否运行于安全模式。 </td></tr>
+<tr><td><tt>screen_blanker</tt></td><td> </td><td>启动屏幕关闭。</td></tr>
+<tr><td><tt>screenmode</tt></td><td> </td><td>显示/设置屏幕模式。 </td></tr>
+<tr><td><tt>sdiff</tt></td><td> </td><td>显示或者并行合并文件。</td></tr>
+<tr><td><tt>seq</tt></td><td> </td><td>打印数字序列。</td></tr>
+<tr><td><tt>setdecor</tt></td><td> </td><td>显示/设置 装饰器。</td></tr>
+<tr><td><tt>setgcc</tt></td><td> </td><td>显示/设置使用的 gcc 版本。 </td></tr>
+<tr><td><tt>settype</tt></td><td> </td><td>设置文件的 MIME类型，署名以及首选程序。 </td></tr>
+<tr><td><tt>setversion</tt></td><td> </td><td>显示文件版本信息。</td></tr>
+<tr><td><tt>setvolume</tt></td><td> </td><td>设置系统音量。</td></tr>
+<tr><td><tt>setwep</tt></td><td> </td><td>为无线网络提供 WEP 加密。 </td></tr>
+<tr><td><tt>sh</tt></td><td> </td><td>See <tt>bash</tt>. </td></tr>
+<tr><td><tt>sha1sum</tt></td><td> </td><td>打印或检验 SHA1 校验码。 </td></tr>
+<tr><td><tt>shar</tt></td><td> </td><td>创建 Shell 文档。</td></tr>
+<tr><td><tt>shred</tt></td><td> </td><td>反复重写文件。</td></tr>
+<tr><td><tt>shuf</tt></td><td> </td><td>Prints a random permutation of the input lines.</td></tr>
+<tr><td><tt>shutdown</tt></td><td> </td><td>关闭计算机。 </td></tr>
+<tr><td><tt>sleep</tt></td><td> </td><td>暂停指定的秒数。 </td></tr>
+<tr><td><tt>sort</tt></td><td> </td><td>Prints a sorted concatenation of all files.</td></tr>
+<tr><td><tt>spamdbm</tt></td><td> </td><td>将电子邮件归为垃圾邮件或者有用邮件。</td></tr>
+<tr><td><tt>split</tt></td><td> </td><td>输出输入文件的固定长度片段到具有相应前缀的文件。</td></tr>
+<tr><td><tt>stat</tt></td><td> </td><td>显示文件或文件系统状态。 </td></tr>
+<tr><td><tt>strace</tt></td><td> </td><td>跟踪线程或者组的系统调用。 </td></tr>
+<tr><td><tt>stty</tt></td><td> </td><td>显示/设置终端特征 </td></tr>
+<tr><td><tt>su</tt></td><td> </td><td>修改有效地用户 ID 和组别。 </td></tr>
+<tr><td><tt>sum</tt></td><td> </td><td>打印每个文件的校验码和数据块数量。 </td></tr>
+<tr><td><tt>sync</tt></td><td> </td><td>强制写入修改磁盘数据块，更新超级块。</td></tr>
+<tr><td><tt>sysinfo</tt></td><td> </td><td>显示系统信息。 </td></tr>
 <tr><td colspan="3"><a id="T" name="T"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>T</h2></a></td></tr>
-<tr><td><tt>tac</tt></td><td> </td><td>Write each file to standard output, last line first. </td></tr>
-<tr><td><tt>tail</tt></td><td> </td><td>Print the last ten lines of each file to standard output. </td></tr>
-<tr><td><tt>tcpdump</tt></td><td> </td><td>Dump traffic on a network. </td></tr>
-<tr><td><tt>tcptester</tt></td><td> </td><td>[deprecated] </td></tr>
-<tr><td><tt>tee</tt></td><td> </td><td>Copy standard input to each file and also to standard output. </td></tr>
-<tr><td><tt>telnet</tt></td><td> </td><td>User interface to the telnet protocol. </td></tr>
-<tr><td><tt>telnetd</tt></td><td> </td><td>Telnet daemon. </td></tr>
-<tr><td><tt>test</tt></td><td> </td><td>Check file types and compare values. </td></tr>
-<tr><td><tt>timeout</tt></td><td> </td><td>Start command and kill it if still running after a specified number of seconds. </td></tr>
-<tr><td><tt>top</tt></td><td> </td><td>Display tasks. </td></tr>
-<tr><td><tt>touch</tt></td><td> </td><td>Change file timestamps. </td></tr>
-<tr><td><tt>tput</tt></td><td> </td><td>Initialize a terminal or query terminfo database. </td></tr>
-<tr><td><tt>tr</tt></td><td> </td><td>Translate, squeeze and/or delete characters from the standard input, writing to standard output.</td></tr>
-<tr><td><tt>traceroute</tt></td><td> </td><td>Print the route packets trace to network host.</td></tr>
-<tr><td><tt>translate</tt></td><td> </td><td>Translate app. </td></tr>
-<tr><td><tt>trash</tt></td><td> </td><td>Send files to trash or restore them. </td></tr>
-<tr><td><tt>true</tt></td><td> </td><td>Do nothing, successfully. </td></tr>
-<tr><td><tt>truncate</tt></td><td> </td><td>Shrink or extend the size of each file to the specified size. </td></tr>
-<tr><td><tt>tsort</tt></td><td> </td><td>Write totally ordered list consistent with the  partial ordering in file. </td></tr>
-<tr><td><tt>tty</tt></td><td> </td><td>Print the file name of the terminal connected to the standard output.</td></tr>
-<tr><td><tt>uname</tt></td><td> </td><td>Print certain system information. </td></tr>
-<tr><td><tt>unchop</tt></td><td> </td><td>Recreate a file previously split with chop. </td></tr>
-<tr><td><tt>unexpand</tt></td><td> </td><td>Convert blanks in each file to tabs, writing to standard output. </td></tr>
-<tr><td><tt>uniq</tt></td><td> </td><td>Filter adjacent matching lines from input writing to output. </td></tr>
-<tr><td><tt>unlink</tt></td><td> </td><td>Call the unlink function to remove the specified file. </td></tr>
-<tr><td><tt>unmount</tt></td><td> </td><td>Unmount partition. </td></tr>
-<tr><td><tt>unrar</tt></td><td> </td><td>Unrar file. </td></tr>
-<tr><td><tt>unshar</tt></td><td> </td><td>Unshar file. </td></tr>
-<tr><td><tt>untrash</tt></td><td> </td><td>See trash. </td></tr>
-<tr><td><tt>unzip</tt></td><td> </td><td>Unzip file. </td></tr>
-<tr><td><tt>unzipsfx</tt></td><td> </td><td>Extract files in list, except those specified.</td></tr>
-<tr><td><tt>updatedb</tt></td><td> </td><td>Update a database for locate. </td></tr>
-<tr><td><tt>uptime</tt></td><td> </td><td>Prints the current date and time, as well as the time elapsed since the system was started. </td></tr>
-<tr><td><tt>urlwrapper</tt></td><td> </td><td>Wrap URL mime types around command line or other apps that don't handle them directly. </td></tr>
-<tr><td><tt>useradd</tt></td><td> </td><td>Create new user. </td></tr>
-<tr><td><tt>uudecode</tt></td><td> </td><td>Create the specified file, decoding as you go. </td></tr>
-<tr><td><tt>uuencode</tt></td><td> </td><td>Encode a file so it can be mailed to a remote system. </td></tr>
-<tr><td><tt>vdir</tt></td><td> </td><td>List information about files. </td></tr>
-<tr><td><tt>version</tt></td><td> </td><td>Returns the version of a file. </td></tr>
-<tr><td><tt>vmstat</tt></td><td> </td><td>Print system info. </td></tr>
-<tr><td><tt>waitfor</tt></td><td> </td><td>Wait for process events. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
-<tr><td><tt>watch</tt></td><td> </td><td>Execute a program periodically. </td></tr>
-<tr><td><tt>wc</tt></td><td> </td><td>Print newline, word and byte counts for each file. </td></tr>
-<tr><td><tt>wget</tt></td><td> </td><td>The non-interactive network downloader. </td></tr>
-<tr><td><tt>which</tt></td><td> </td><td>Locate a command. </td></tr>
-<tr><td><tt>whoami</tt></td><td> </td><td>Print user name associated with the current effective user ID. </td></tr>
-<tr><td><tt>xargs</tt></td><td> </td><td>Build and execute command lines from standard input. </td></tr>
-<tr><td><tt>xres</tt></td><td> </td><td>List and manipulate resources. </td></tr>
-<tr><td><tt>yes</tt></td><td> </td><td>Output a string repeatedly until killed. </td></tr>
-<tr><td><tt>zcat</tt></td><td> </td><td>See gzip.</td></tr>
-<tr><td><tt>zcmp</tt></td><td> </td><td>See zdiff. </td></tr>
-<tr><td><tt>zdiff</tt></td><td> </td><td>Compare compressed files. </td></tr>
-<tr><td><tt>zforce</tt></td><td> </td><td>Force a '.gz' extension on all gzip files. </td></tr>
-<tr><td><tt>zgrep</tt></td><td> </td><td>Search possibly compressed files for a regular expression. </td></tr>
-<tr><td><tt>zip</tt></td><td> </td><td>Add or replace zipfile entries from list. </td></tr>
-<tr><td><tt>zipcloak</tt></td><td> </td><td>Encrypt all unencrypted entries in a zip file. </td></tr>
-<tr><td><tt>zipgrep</tt></td><td> </td><td>Searches the given zip members for a string or pattern. </td></tr>
-<tr><td><tt>zipinfo</tt></td><td> </td><td>See unzip.</td></tr>
-<tr><td><tt>zipnote</tt></td><td> </td><td>Write the comments in zipfile to stdout. </td></tr>
-<tr><td><tt>zipsplit</tt></td><td> </td><td>Split a zip file into smaller pieces. </td></tr>
-<tr><td><tt>zmore</tt></td><td> </td><td>Like 'more' but operate on the uncompressed contents of any compressed files.</td></tr>
-<tr><td><tt>znew</tt></td><td> </td><td>Recompress .Z files into .gz (gzip) files</td></tr>
+<tr><td><tt>tac</tt></td><td> </td><td>Concatenates and prints files, last line first. </td></tr>
+<tr><td><tt>tail</tt></td><td> </td><td>Prints the last ten lines of a file.</td></tr>
+<tr><td><tt>tcpdump</tt></td><td> </td><td>转储网络流量。</td></tr>
+<tr><td><tt>tcptester</tt></td><td> </td><td>[已弃用] </td></tr>
+<tr><td><tt>tee</tt></td><td> </td><td>写入或追加标准输入数据到文件。</td></tr>
+<tr><td><tt>telnet</tt></td><td> </td><td>telnet 用户界面。 </td></tr>
+<tr><td><tt>telnetd</tt></td><td> </td><td>Telnet 后台。</td></tr>
+<tr><td><tt>test</tt></td><td> </td><td>比较文件之后，返回其真/假值。</td></tr>
+<tr><td><tt>timeout</tt></td><td> </td><td>启动命令；在指定秒钟之后，如果仍在运行，则杀死它。</td></tr>
+<tr><td><tt>top</tt></td><td> </td><td>显示运行线程和CPU使用情况。</td></tr>
+<tr><td><tt>touch</tt></td><td> </td><td>修改文件的时间戳。</td></tr>
+<tr><td><tt>tput</tt></td><td> </td><td>初始化一个终端或者查询的终端信息数据库。 </td></tr>
+<tr><td><tt>tr</tt></td><td> </td><td>从标准输入中转换，压缩或者删除字符。</td></tr>
+<tr><td><tt>traceroute</tt></td><td> </td><td>打印截取自网络的路由包。</td></tr>
+<tr><td><tt>translate</tt></td><td> </td><td>使用 DataTranslators 转换文件格式。</td></tr>
+<tr><td><tt>trash</tt></td><td> </td><td>发送文件到回收站或者将其还原。 </td></tr>
+<tr><td><tt>true</tt></td><td> </td><td>无任何操作，仅表明“成功”，并返回值“0”。</td></tr>
+<tr><td><tt>truncate</tt></td><td> </td><td>缩减或者增加文件大小。</td></tr>
+<tr><td><tt>tsort</tt></td><td> </td><td>执行拓扑排列。</td></tr>
+<tr><td><tt>tty</tt></td><td> </td><td>打印连接到标准输出的终端文件名。</td></tr>
+<tr><td><tt>uname</tt></td><td> </td><td>打印出系统信息。 </td></tr>
+<tr><td><tt>unchop</tt></td><td> </td><td>Recreates a file previously split with <tt>chop</tt>. </td></tr>
+<tr><td><tt>unexpand</tt></td><td> </td><td>Converts spaces to tabs.</td></tr>
+<tr><td><tt>uniq</tt></td><td> </td><td>从标准输入中过滤临近的匹配行，并将其写入到标准输出。</td></tr>
+<tr><td><tt>unlink</tt></td><td> </td><td>调用 unlink 功能删除指定文件。 </td></tr>
+<tr><td><tt>unmount</tt></td><td> </td><td>卸载卷。</td></tr>
+<tr><td><tt>unrar</tt></td><td> </td><td>Expands a rar archive.</td></tr>
+<tr><td><tt>unshar</tt></td><td> </td><td>展开 shar 档案。</td></tr>
+<tr><td><tt>untrash</tt></td><td> </td><td>See <tt>trash</tt>. </td></tr>
+<tr><td><tt>unzip</tt></td><td> </td><td>展开 zip 档案。</td></tr>
+<tr><td><tt>unzipsfx</tt></td><td> </td><td>Used to make existing zip archives self-extracting.</td></tr>
+<tr><td><tt>updatedb</tt></td><td> </td><td>更新本地化数据库。</td></tr>
+<tr><td><tt>uptime</tt></td><td> </td><td>打印时间和日期，如系统启动后经过的时间。</td></tr>
+<tr><td><tt>urlwrapper</tt></td><td> </td><td>对命令行或其他程序等，隐藏 URL 的MIME类型。 </td></tr>
+<tr><td><tt>useradd</tt></td><td> </td><td>创建一个新用户。 </td></tr>
+<tr><td><tt>uudecode</tt></td><td> </td><td>解码未解码的文件。</td></tr>
+<tr><td><tt>uuencode</tt></td><td> </td><td>译码文件，使其可以发送到远程系统。 </td></tr>
+<tr><td><tt>vdir</tt></td><td> </td><td>列出文件信息。 </td></tr>
+<tr><td><tt>version</tt></td><td> </td><td>返回文件版本信息。 </td></tr>
+<tr><td><tt>vmstat</tt></td><td> </td><td>打印虚拟内存系统信息。</td></tr>
+<tr><td><tt>waitfor</tt></td><td> </td><td>等待直到某个线程出现。<a href="cli-apps.html">(Haiku 专用)</a></td></tr>
+<tr><td><tt>watch</tt></td><td> </td><td>按时运行某个程序。</td></tr>
+<tr><td><tt>wc</tt></td><td> </td><td>Prints the number of paragraphs, words and characters (bytes) of a file. </td></tr>
+<tr><td><tt>wget</tt></td><td> </td><td>Tool for downloading via HTTP, HTTPS or FTP</td></tr>
+<tr><td><tt>which</tt></td><td> </td><td>定位一个命令。 </td></tr>
+<tr><td><tt>whoami</tt></td><td> </td><td>打印关联于当前有效用户ID的用户名。 </td></tr>
+<tr><td><tt>xargs</tt></td><td> </td><td>从标准输入构建和运行命令行。 </td></tr>
+<tr><td><tt>xres</tt></td><td> </td><td>列出并操作资源。 </td></tr>
+<tr><td><tt>yes</tt></td><td> </td><td>重复打印字符串直到被进程被杀死。 </td></tr>
+<tr><td><tt>zcat</tt></td><td> </td><td>See <tt>gzip</tt>.</td></tr>
+<tr><td><tt>zcmp</tt></td><td> </td><td>See <tt>zdiff</tt>. </td></tr>
+<tr><td><tt>zdiff</tt></td><td> </td><td>比较压缩文件。 </td></tr>
+<tr><td><tt>zforce</tt></td><td> </td><td>强制 gzip 文件添加 '.gz' 后缀扩展名。 </td></tr>
+<tr><td><tt>zgrep</tt></td><td> </td><td>使用正则表达式查询可能的压缩文件。 </td></tr>
+<tr><td><tt>zip</tt></td><td> </td><td>添加或者替换 zip 档案中的项目。</td></tr>
+<tr><td><tt>zipcloak</tt></td><td> </td><td>加密 zip 档案中所有未加密的项目。 </td></tr>
+<tr><td><tt>zipgrep</tt></td><td> </td><td>在指定 zip 项目中查询字符串或者匹配模式。 </td></tr>
+<tr><td><tt>zipinfo</tt></td><td> </td><td>See <tt>unzip</tt>.</td></tr>
+<tr><td><tt>zipnote</tt></td><td> </td><td>打印 zip 档案中的注释。</td></tr>
+<tr><td><tt>zipsplit</tt></td><td> </td><td>分割 zip 档案为小的片段。 </td></tr>
+<tr><td><tt>zmore</tt></td><td> </td><td>Like <tt>more</tt> but operates on the uncompressed contents of any compressed file.</td></tr>
+<tr><td><tt>znew</tt></td><td> </td><td>重新压缩 .Z 文件为 .gz(gzip) 档案</td></tr>
 </table>
 </div>
 </div>

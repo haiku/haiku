@@ -4,11 +4,11 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2010, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Humdinger <humdingerb@gmail.com>
+ *		Szymon Barczak (Google Code-In student)
  * Translators:
  *		miguel~1.mx
  *
@@ -49,6 +49,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">La traducción de esta página no está completa aún. Hasta que esté, las partes sin terminar vienen en su inglés original.</div>
 
 <h2><img src="../../images/apps-images/showimage-icon_64.png" alt="showimage-icon_64.png" width="64" height="64" />ShowImage</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -57,12 +58,47 @@
 <tr><td>Configuración:</td><td></td><td><span class="path">~/config/settings/ShowImage_settings</span></td></tr>
 </table>
 <p><br /></p>
-<p>Todavía falta la documentación. Si desea trabajar en ella, por favor anúncielo en la <a href="http://www.freelists.org/list/haiku-doc">Lista de correo de documentación</a> para evitar duplicación.</p>
+<p>ShowImage is an application used for viewing images in various formats. Its funcionality is not limited only to viewing photos, it can also crop images, show slideshows, rotate and flip images.</p>
+
+<p>If you want to launch this application, simply double-click on some image on your computer.</p>
+
+<p><b>Browse photos</b></p>
+
+<p>You are not limited to viewing only the image you used to launch application. You can go both to previous or to next image from the folder using arrows on keybord. You can also zoom using either mouse scroll or shortcuts - <span class="key">ALT</span> <span class="key">+</span> for zooming in and <span class="key">ALT</span> <span class="key">-</span> for zooming out. High-quality zooming is set by default, but you can disable this function unchecking <span class="menu">View | High-quality zooming</span>. This function does very fast bilinear filtering.</p>
+
+<p>There is a possibility to simply zoom picture to the original size or to fit to the window size. Use <span class="menu">View</span> menu or shortcuts - <span class="key">ALT</span> <span class="key">1</span> to get back to the original size or <span class="key">ALT</span> <span class="key">0</span> to fit to the window size. From the same menu you can also enable stretching an image to the window.</p>
+
+<img src="../images/apps-images/showimage-tiff.png" alt="tiff" />
+
+<p>ShowImage does support multiple-page files, such as TIFF. It means you can turn pages while browsing any multiple-page image. Make use of <span class="menu">Browse</span> menu or use shortcuts (see screenshot above) for this function.</p>
+
+<p>To change mode to full-screen, simply choose <span class="key">ALT</span> <span class="key">ENTER</span> shortcut.</p>
+
+<p><b>Slide show</b></p>
+
+<p>You can run slideshow using menu, simply choose <span class="menu">View | Slide show</span>. There is an option for changing slide delay from 3 to 20 seconds. Default value is a 3 second delay, but you can change it from <span class="menu">View | Slide delay</span> menu.</p>
+
+<p><b>Flip and rotate images</b></p>
+
+<p>This function is also built-in. If you would like to rotate some image, choose proper position from <span class="menu">Image</span> menu or use shortcuts - <span class="key">ALT</span> <span class="key">R</span> will rorate your image clockwise and <span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">R</span> counterclockwise.</p>
+
+<p>You can also flip images. <span class="menu">Image | Flip left to right</span> will flip your image horizontally and <span class="menu">Image | Flip top to bottom</span> vertically.</p>
+
+<p><b>Set background</b></p>
+
+<p>You can set your desktop background directly from ShowImage. Just choose <span class="menu">Image | Use as background...</span> and Backgrounds preflet will pop-up.</p>
+
+<p><b>Drag and drop</b></p>
+
+<p>There is an option to select a piece of an image and create new image file from the selection. Simply press <span class="key">CTRL</span> or <span class="key">ALT</span> and select a fragment you would like to use as a new file and drag the selection to desktop. Also, you can change mode to selection mode, so you will be able to select parts of images using just a left mouse button. This option is available from <span class="menu">Edit | Selection Mode</span></p>
+
+<img src="../images/apps-images/showimage-drag_and_drop_selection.png" alt="showimage-drag_and_drop" />
+
+<div class="box-info">Once you use right mouse button to drag the selection, an image-format menu pops-up.</div>
 
 </div>
 </div>
 
-<!--
 <div class="nav">
 <div class="inner"><span>
  «  <a href="screenshot.html">Captura de pantalla</a> 
@@ -70,6 +106,6 @@
 ::  <a href="soundrecorder.html">Grabador de sonidos</a>  »
 </span></div>
 </div>
--->
+
 </body>
 </html>

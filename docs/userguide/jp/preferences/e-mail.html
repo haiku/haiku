@@ -54,8 +54,8 @@
 <tr class="heading"><td>目次</td></tr>
 <tr class="index"><td>
 	<a href="#creating">新しい電子メールアカウントの作成</a><br />
-	<a href="#incoming">受信する電子メールの設定</a><br />
-	<a href="#outgoing">送信する電子メールの設定</a><br />
+	<a href="#incoming">受信の設定</a><br />
+	<a href="#outgoing">送信の設定</a><br />
 	<a href="#filters">電子メールフィルタの設定</a><br />
 	<a href="#settings">Mailサービスの設定</a>
 </td></tr>
@@ -63,11 +63,11 @@
 
 <h2><img src="../../images/prefs-images/e-mail-icon_64.png" alt="e-mail-icon_64.png" width="64" height="64" />電子メール</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbarメニュー:</td><td style="width:15px;"></td><td><span class="menu">設定</span></td></tr>
+<tr><td>Deskbarメニュー:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
 <tr><td>場所:</td><td></td><td><span class="path">/boot/system/preferences/E-mail</span></td></tr>
 <tr><td>設定ファイル:</td><td></td><td><span class="path">~/config/settings/Mail/*</span></td></tr>
 </table>
-<p>Haikuは、Mailサービス(mail_daemon)を通じ定期的に電子メールを取得して、メールごとに単一のテキストファイルに保存するシステムを提供します。システムはメールを解析して、差出人、宛先、題名、未読(既読)といった必要な全てのヘッダ情報で属性を設定します。処理は直接あるいは各アプリケーションから要求できます。また、このシステムは全てのデータと構成を保ちつつ電子メールクライアントを切り替えることを容易にします。<br />
+<p>Haikuは、Mailサービス(mail_daemon)を通じ定期的に電子メールを取得して、メールごとに単一のテキストファイルに保存するシステムを提供します。システムはメールを解析して、差出人、宛先、題名、未読(既読)といった必要なすべてのヘッダ情報で属性を設定します。処理は直接あるいは各アプリケーションから要求できます。また、このシステムはすべてのデータと構成を保ちつつ電子メールクライアントを切り替えることを容易にします。<br />
 構成は電子メール設定パネルで行います。</p>
 
 <h2>
@@ -78,11 +78,11 @@
 <img src="../images/prefs-images/e-mail-new-account.png" alt="e-mail-new-account.png" />
 <p>初めに、 <i>Account Type</i>(アカウントの種類)を設定します。 <span class="menu">Receive Mail Only</span>(受信のみ)、 <span class="menu">Send Mail Only</span>(送信のみ)、最もよく使われる <span class="menu">Send and Receive Mail</span>(送受信)があります。 次に、メールを取得する方法として<span class="menu">POP3</span>か<span class="menu">IMAP</span>を選びます。</p>
 <p>それから<i>E-mail Address</i>(電子メールアドレス)、 <i>Login Name</i>(ログイン名)、 <i>Password</i>(パスワード)を入力して、 Haiku内で用いられる<i>Account Name</i>(アカウント名)と<i>Real Name</i>(本名)も決めてください。</p>
-<p>メジャーな電子メールプロバイダを利用している場合、Haikuは既にサーバのIPアドレスのような技術項目を全て保持しているので、他の情報は自動的に記入されます。それ以外の場合は、このガイドに従って先の電子メールアカウントの項目を埋めてください。</p>
+<p>メジャーな電子メールプロバイダを利用している場合、Haikuは既にサーバのIPアドレスのような技術項目をすべて保持しているので、他の情報は自動的に記入されます。それ以外の場合は、このガイドに従って先の電子メールアカウントの項目を埋めてください。</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="incoming" name="incoming">受信する電子メールの設定</a></h2>
+<a id="incoming" name="incoming">受信の設定</a></h2>
 <p>どのように電子メールを受信するか設定するには、アカウント名の下にある<span class="menu">Incoming</span>をクリックします。</p>
 <img src="../images/prefs-images/e-mail-in.png" alt="e-mail-in.png" />
 <p>ポップアップメニューからプロバイダーが利用するプロトコルを選びます。<span class="menu">IMAP</span>と<span class="menu">POP3</span>がサポートされています。</p>
@@ -97,7 +97,7 @@
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="outgoing" name="outgoing">送信する電子メールの設定</a></h2>
+<a id="outgoing" name="outgoing">送信の設定</a></h2>
 <p>どのように電子メールを送信するか設定するには、アカウント名の下にある<span class="menu">Outgoing</span>をクリックします。</p>
 <img src="../images/prefs-images/e-mail-out.png" alt="e-mail-out.png" />
 <p>受信メールと同様に、送信箱の<i>Location</i>(場所)を変更できます。(デフォルト: <span class="path">/boot/home/mail/out/</span>)</p>
@@ -114,9 +114,9 @@
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 Spamフィルタ</h3>
 <img src="../images/prefs-images/e-mail-filter-spam.png" alt="e-mail-filter-spam.png" />
-<p>spamフィルタは不要なスパムの判定に統計的手法を利用します。メールには0から1の評価値が付与され、ユーザーはスパムと通常のメールとの境界値を決めることができます。<br />
+<p>スパムフィルタは不要なスパムの判定に統計的手法を利用します。メールには0から1の評価値が付与され、ユーザーはスパムと通常のメールとの境界値を決めることができます。<br />
 評価値を受信メールの題名の先頭に追加することが可能です。<br />
-また、spamフィルタは全ての受信メールから学習することができます。もちろん、誤ってスパム判定されている偽陽性のメールを訂正しなくてはいけません。<span class="app">Mail</span>(メール)アプリケーションについての説明で詳しく知ることができるでしょう。</p>
+また、スパムフィルタはすべての受信メールから学習することができます。もちろん、誤ってスパム判定されている偽陽性のメールを仕分けて、スパムフィルタに学習させなくてはいけません。<span class="app">Mail</span>(メール)アプリケーションについての説明で詳しく知ることができるでしょう。</p>
 <p><span class="menu">Match Header</span> (マッチヘッダ)フィルタと併用することで、検出されたスパムメールを自動的に整理できます。</p>
 
 <h3>
@@ -153,7 +153,7 @@ Spamフィルタ</h3>
 	<tr><td><span class="menu">Spam/Genuine Estimate</span>(評価値)</td><td> </td>
 		<td>これはスパムフィルタが電子メールに付加する評価の数値です。これは科学的な記法で表記され、例えば1.065e-12は1.065を10の12乗で割った0.000000000001065を意味します。</td></tr>
 </table>
-<p>2番目のテキストフィールドには検索パターンを入力します。ここでは<a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expression" rel="nofollow">regular expression(正規表現)</a>が利用可能で、多少複雑になる場合があるものの高い柔軟性を提供しています。 リンク先を少し読めば、正規表現を利用する価値が充分にあり、また単純な検索パターンに関しては全く複雑にならないことが分かるでしょう。</p>
+<p>2番目のテキストフィールドには検索パターンを入力します。ここでは<a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expression" rel="nofollow">regular expression(正規表現)</a>が利用可能で、多少複雑になる場合があるものの高い柔軟性を提供しています。 リンク先を少し読めば、正規表現を利用する価値が充分にあり、また単純な検索パターンに関してはまったく複雑にならないことが分かるでしょう。</p>
 <p>その下のポップアップメニューで、パターンが一致した際の処理を選択します。メールの移動や削除、"Read(既読)"などメールのステータス変更、返信に用いる電子メールアドレスの設定ができます。</p>
 
 <h3>
@@ -165,7 +165,7 @@ Spamフィルタ</h3>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="settings" name="settings">Mailサービスの設定</a></h2>
-<p>受信及び送信メールサーバの設定が(おそらくフィルターの設定も)完了したので、実際の確認と取得の全てを行うMailサービスにジョブをどのように行うか知らせる必要があります。</p>
+<p>受信及び送信メールサーバの設定が(おそらくフィルターの設定も)完了したので、実際の確認と取得のすべてを行うMailサービスに、ジョブをどのように行うか知らせる必要があります。</p>
 <img src="../images/prefs-images/e-mail-settings.png" alt="e-mail-settings.png" />
 <p><i>Mail Checking</i>で アカウントのメールサーバに新着メールの問い合わせを行う間隔を指定します。<br />
 ダイヤルアップ接続を利用している場合、メールチェックのためだけに自動でダイヤルしてしまうのを防ぐため<span class="menu">Only When Dial-Up is Connected</span>と<span class="menu">Schedule Outgoing Mail When Dial-Up is Disconnected</span>を有効にするとよいでしょう。 </p>

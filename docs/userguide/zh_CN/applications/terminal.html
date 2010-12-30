@@ -49,14 +49,12 @@
 
 <div id="content">
 <div>
-<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
 
 <h2><img src="../../images/apps-images/terminal-icon_64.png" alt="terminal-icon_64.png" width="64" height="64" />终端</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>桌面栏：</td><td style="width:15px;"></td><td><span class="menu">应用程序</span></td></tr>
 <tr><td>位置：</td><td></td><td><span class="path">/boot/system/apps/Terminal</span></td></tr>
-<tr><td>设置：
-</td><td></td><td><span class="path">~/config/settings/Terminal</span><br />
+<tr><td>设置：</td><td></td><td><span class="path">~/config/settings/Terminal</span><br />
 <span class="path">~/.profile</span> - 添加或者覆盖默认的 <span class="path">/boot/system/etc/profile</span><br />
 <span class="path">~/.inputrc</span> - 添加或者覆盖默认的 <span class="path">/boot/system/etc/inputrc</span></td></tr>
 </table>
@@ -70,22 +68,27 @@
 <p>您可以根据需要打开任意数量的终端，可以简单的启动，或者从正在运行的终端中使用 <span class="key">ALT</span> <span class="key">N</span> 组合键来打开多个终端窗口。您也可以使用终端的标签视图方式，使用 <span class="key">ALT</span> <span class="key">T</span> 组合键打开新的终端标签。</p>
 <img src="../images/apps-images/terminal.png" alt="terminal.png" />
 <br />
-<p>Double-clicking into the emtpy part of the tab bar opens a new tab; onto a tab opens a dialog to rename its title. There are several %-designated variables that are explained with a tooltip when you hover the mouse over the text field.<br />
-By default, <tt>%1d: %p</tt>, a tab shows the current directory and, separated by a <tt>:</tt>, the name of the currently running process (or <tt>--</tt> if it's just bash running, probably idling). The screenshot above shows the first tab with a FTP session in the <span class="path">Desktop</span> folder and a second tab idling at <span class="path">home</span>.<br />
-Via <span class="menu">Edit|Window title...</span> the Terminal window's title can be edited in a similar way.</p>
-<p>Right-clicking a tab shows a context menu to <span class="menu">Close tab</span>, <span class="menu">Close other tabs</span> or, like double-clicking, <span class="menu">Edit tab title...</span>.</p>
+<p>双击标签栏的空白区域将打开一个新标签；双击标签将会打开一个对话框重命名标签标题。当您在文本域中悬停鼠标时，会有几个 %-指定变量 ，并且伴随着一个提示框，解释其含义。<br />
+
+默认情况下，<tt>%1d: %p</tt>，标签显示了当前目录和当前运行进程的名称，并且它们被 <tt>:</tt>所分隔（或者 <tt>--</tt>，如果它仅仅是一个运行的 bash ，或者空闲进程）。上面的屏幕截图中的第一个标签显示了 <span class="path">Desktop</span> 文件夹中的 FTP 会话，而第二个标签闲置于 <span class="path">home</span> 文件夹。<br />
+
+使用 <span class="menu">Edit|Window title...</span> 也可以以类似的方式编辑终端窗口的标题。</p>
+<p>右键点击标签将会出现一个右键菜单：<span class="menu">Close tab</span>，<span class="menu">Close other tabs</span> 或者，如双击，则显示 <span class="menu">Edit tab title...</span> 。</p>
 <p>终端的窗口和其他窗口一样可以调整尺寸，或者使用 <span class="menu">Settings | Window Size</span> 菜单中的预置尺寸。 <span class="key">ALT</span> <span class="key">ENTER</span> 组合键将会切换到全屏模式。</p>
 <p>调整的窗口尺寸和文字编码只有通过 <span class="menu">Settings | Save as default</span> 才可以进行保持不变。</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="settings" name="settings">设置</a></h2>
-<p><span class="menu">Settings | Settings...</span> opens a panel to configure the standard settings of a Terminal.</p>
+<p><span class="menu">Settings | Settings...</span> 打开一个面板，用于配置终端的标准设置。</p>
 <img src="../images/apps-images/terminal-settings.png" alt="terminal-settings.png" />
 <br />
-<p>It starts off with the "formulas" for naming tab and window titles. Again, tooltips show the available variables. Below that you set font type, font size and the different text and background colors. You can choose a pre-defined color schema like <span class="menu">Black on white</span> or <span class="menu">White on black</span> or create a <span class="menu">Custom</span> one using the color picker below.<br />
-Activate the checkbox to <span class="menu">Confirm exit if active programs exist</span> and you'll be warned when trying to close a Terminal window while an app is still being executed.<br />
-You can save different settings as separate profiles, which on double-click open an accordingly configured Terminal.<br />
-Pressing <span class="button">OK</span> will save the current settings as default.</p>
+<p>它以 "公式" 开始为标签和窗口标题进行命名。同时，提示框会显示可用的变量。在其下，您可以设置字体类型，字体大小和不同文本及其背景颜色。您可以选择一种预置的颜色方案，如 <span class="menu">Black on white</span> ， <span class="menu">White on black</span> 或者使用下面的颜色选择器 <span class="menu">自定义</span> 一种方案。<br />
+
+激活 <span class="menu">Confirm exit if active programs exist</span> 复选框，那么在程序运行过程中，尝试关闭终端窗口时，您将会获取一个警告。<br />
+
+您可以保存不同设置为独立的配置文件，当双击文件时将会打开相应配置的终端。<br />
+
+按下 <span class="button">OK</span> 将会保存当前设置为默认配置。</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>

@@ -12,6 +12,7 @@
  * Translators:
  *		keepeasy
  *		MichaelPeppers
+ *		Barrett
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -54,20 +55,20 @@
 
 <h1>Il Boot Loader</h1>
 
-<p>Il Boot Loader di Haiku può essere di aiuto quando hai problemi con l'hardware o vuoi scegliere quale installazione di Haiku far partire, se ne hai più di una (può essere da un CD di installazione o una penna USB).<br />
-Può tornare anche utile dopo che hai installato un componente software e che ti impedisce di caricare il sistema operativo. L'opzione <i>Disable user add-ons</i> (disabilita i componenti utente) che è discussa più avanti, farà partire Haiku senza caricare i componenti installati dall'utente, per esempio un driver.
+<p>Il Boot Loader di Haiku può essere di aiuto nel caso si verifichino problemi con l'hardware in uso, oppure quando si hanno più installazioni di Haiku e si vuole scegliere quale avviare (ad esempio un'installazione su CD o penna USB).<br />
+E' utile anche quando viene installato un software che impedisce l'avvio del sistema operativo e quindi impedisce la propria rimozione. L'opzione <i>Disable user add-ons</i> (disabilita i componenti utente, descritta successivamente), farà partire Haiku senza caricare i componenti installati dall'utente, ad esempio un driver.
 </p>
-<p>Per entrare nelle opzioni del Boot Loader, devi tener premuto il tasto <span class="key">SHIFT</span> prima dell'inizio del processo di boot di Haiku. Se c'è un boot manager installato puoi iniziare a tener premuto il tasto <span class="key">SHIFT</span> prima di selezionare Haiku. Se Haiku è l'unico sistema operativo presente nel computer, puoi iniziare a tener premuto il tasto mentre stai ancora vedendo i messaggi di boot dal BIOS.</p>
+<p>Per entrare nelle opzioni del Boot Loader di Haiku bisogna premere il tasto <span class="key">SHIFT</span> prima dell'inizio del processo di avvio. Se è presente un boot manager, è possibile cominciare a premere il tasto <span class="key">SHIFT</span> prima di selezionare la voce di Haiku. Altrimenti se Haiku è l'unico sistema operativo installato nella macchina, è sufficiente premere il tasto appena compaiono i messaggi di avvio del BIOS.</p>
 <p><br /></p>
-<p>Una volta che si è caricato, ti si presenteranno quattro menu:</p>
+<p>Una volta caricato, appariranno quattro menu:</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
-<tr><td><b>Select boot volume</b>  (seleziona il disco di avvio) </td><td> </td><td>Sceglie quale installazione di Haiku caricare.</td></tr>
-<tr><td><b>Select safe mode options</b> (seleziona le opzioni di modalità sicura)<br />
-</td><td> </td><td>Ci sono diverse opzioni da tentare in caso di problemi con l'hardware. Quando sposti la barra di selezione su un'opzione una breve descrizione compare in fondo alla schermata.
+<tr><td><b>Select boot volume</b>  (Seleziona il disco di avvio) </td><td> </td><td>Sceglie quale installazione avviare.</td></tr>
+<tr><td><b>Select safe mode options</b> (Seleziona le opzioni per la modalità sicura)<br />
+</td><td> </td><td>Ci sono diverse opzioni da tentare in caso di problemi con l'hardware. Quando la barra di selezione viene spostata su un'opzione compare una breve descrizione in fondo allo schermo.
 <p><i>-Safe mode </i>(modalità sicura)<br />
-<i>-Disable user add-ons</i> (disabilita le aggiunte utente)<br />
-<i>-Disable IDE-DMA</i> (disabilita i DMA dell'IDE)<br />
-<i>-Usa fail-safe video mode</i> (Usa le modalità video sicure)<br />
+<i>-Disable user add-ons</i> (disabilita gli add-on dell'utente)<br />
+<i>-Disable IDE-DMA</i> (disabilita l'IDE-DMA)<br />
+<i>-Usa fail-safe video mode</i> (Usa la modalità video sicura)<br />
 <i>-Disable IO-APIC</i> (Disabilita l'IO-APIC)<br />
 <i>-Disable LOCAL APIC</i> (Disabilita il LOCAL APIC)<br />
 <i>-Don't call the BIOS</i> (Non chiamare il BIOS)<br />
@@ -75,32 +76,32 @@ Può tornare anche utile dopo che hai installato un componente software e che ti
 <i>-Disable ACPI</i> (Disabilita l'ACPI)<br />
 </p></td></tr>
 <tr><td><b>Select debug options</b> (Seleziona le opzioni di debug)<br />
-</td><td> </td><td>Qui troverai molte opzioni per facilitare le operazioni di debug o ricevere importanti dettagli per un bug report. Come sopra, una breve spiegazione per ogni opzione è indicata in fondo alla schermata.
-<p><i>- Enable serial debug output</i> (abilita l'output di debug seriale)<br />
-<i>- Enable on screen debug output</i> (abilita l'output di debug sullo schermo)<br />
-<i>- Enable debug syslog</i> (abilita il syslog di debug)
+</td><td> </td><td>Qui è possibile trovare molte opzioni per facilitare il debug oppure ricevere dettagli per un bug report. Come prima, è indicata una breve spiegazione per ogni opzione in fondo allo schermo.
+<p><i>- Enable serial debug output</i> (Abilita l'output di debug via seriale)<br />
+<i>- Enable on screen debug output</i> (Abilita l'output di debug sullo schermo)<br />
+<i>- Enable debug syslog</i> (Abilita il syslog di debug)
 </p>
-<p>Se il "syslog di debug" è abilitato, un riavvio immediato dopo un crash mostra queste opzioni addizionali:</p>
-<p><i>- Display syslog from previous session</i> (mostra il syslog della sessione precedente)<br />
-<i>- Save syslog from previous session</i> (salva il syslog della sessione precedente)
+<p>Se il "syslog di debug" è abilitato, un riavvio immediato dopo un crash mostra queste opzioni:</p>
+<p><i>- Display syslog from previous session</i> (Mostra il syslog dell'ultima sessione)<br />
+<i>- Save syslog from previous session</i> (Salva il syslog dell'ultima sessione)
 </p></td></tr>
-<tr><td class="onelinetop"><b>Select fail safe video mode</b> (Seleziona modalità video sicure)</td><td> </td><td>Se devi attivare l'opzione <i>Use fail-safe video mode</i> (Seleziona modalità video sicure), puoi impostare la profondità di colore e la risoluzione video.</td></tr>
+<tr><td class="onelinetop"><b>Select fail safe video mode</b> (Seleziona la modalità video sicura)</td><td> </td><td>E' possibile attivare l'opzione <i>Use fail-safe video mode</i>, che permette di impostare la profondità di colore e la risoluzione.</td></tr>
 </table>
 <p><br /></p>
-<p>Dopo aver attivato una o più opzioni, puoi tornare tornare al menu principale e continuare il caricamento, che si presenterà con questa schermata di avvio:
+<p>Dopo aver attivato una o più opzioni, è possibile tornare al menu principale e avviare normalmente il sistema che si presenterà con questa schermata di avvio:
 </p>
 <img src="../images/bootloader-images/boot-screen.png" alt="boot-screen.png" />
 
-<p>Se tutto funziona nel modo corretto, si illumineranno una dopo l'altra le icone nella schermata.<br />
-Le diverse icone corrispondono approssimativamente a diverse fasi di caricamento dell'OS e sono:</p>
+<p>Se tutto funziona perfettamente, le icone nella schermata si illumineranno una dopo l'altra.<br />
+Le icone corrispondono grossomodo alle diverse fasi di caricamento dell'OS e sono:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
-	<tr><td><b>Atomo</b></td><td style="width:10px;"> </td><td>Inizializza i moduli.</td></tr>
-	<tr><td><b>La lente di  ingrandimento sul disco</b></td><td> </td><td>Crea il rootfs (<span class="path">/</span>) e monta devfs (<span class="path">/dev</span>).</td></tr>
-	<tr><td><b>Scheda elettronica</b></td><td> </td><td> Inizializza il device manager.</td></tr>
+	<tr><td><b>Atomo</b></td><td style="width:10px;"> </td><td>Inizializza i moduli del kernel.</td></tr>
+	<tr><td><b>La lente di  ingrandimento sul disco</b></td><td> </td><td>Crea "rootfs" (<span class="path">/</span>) e monta "devfs" (<span class="path">/dev</span>).</td></tr>
+	<tr><td><b>Scheda elettronica</b></td><td> </td><td> Inizializza il gestore delle periferiche.</td></tr>
 	<tr><td><b>Disco di avvio</b></td><td> </td><td>Monta il disco di boot.</td></tr>
 	<tr><td><b>Il chip</b></td><td> </td><td>Carica i moduli specifici della CPU.</td></tr>
 	<tr><td><b>La cartella</b></td><td> </td><td>Finisce di inizializzare il sottosistema.</td></tr>
-	<tr><td><b>Il razzo</b></td><td> </td><td>Inizia a caricare i boot scripts che fanno partire il sistema.</td></tr>
+	<tr><td><b>Il razzo</b></td><td> </td><td>Carica gli script di boot avviando il sistema.</td></tr>
 </table>
 
 </div>

@@ -9,6 +9,8 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		hiromu1996
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -47,15 +49,14 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 <h2><img src="../../images/prefs-images/screensaver-icon_64.png" alt="screensaver-icon_64.png" width="64" height="64" />ScreenSaver</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbarメニュー:</td><td style="width:15px;"></td><td><span class="menu">設定</span></td></tr>
+<tr><td>Deskbarメニュー:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
 <tr><td>場所:</td><td></td><td><span class="path">/boot/system/preferences/Screensaver</span></td></tr>
 <tr><td>設定ファイル:</td><td></td><td><span class="path">~/config/settings/ScreenSaver_settings</span></td></tr>
 </table>
 
-<p>The panel of the ScreenSaver preferences is split into two tabs:
+<p>この設定はFadeとModulesの2つのタブに分けられています。
 </p>
 
 <h2>
@@ -63,22 +64,21 @@
 <a name="fade" id="fade">Fade</a></h2>
 <img src="../images/prefs-images/screensaver-fade.png" alt="screensaver-fade.png" />
 <br />
-<p>The top checkbox enables/disables the screen saver.<br />
-With the slider below it, you control after how long an idle time the screen saver kicks in.
+<p>1つ目のチェックボックスでスクリーンセーバーを有効にするかを選択します。<br />
+その下のスライドバーでスクリーンセーバーが起動するまでの時間を変更できます。</p>
+<p>2つ目では一定時間経過後にディスプレイの電源を切るかを選択します。<br />
+チェックボックスが選択されているなら、横のスライドバーでディスプレイの電源が切られるまでの時間を設定できます。<br />
+3つ目ではパスワードロックをするかを選択できます。<br />
+パスワードロックが有効にされているなら、その横のスライドバーでパスワードロックをかけるまでの時間を設定できます。
 </p>
-<p>The next two sliders are only usable after you activated their checkboxes:<br />
-One slider determines after how many minutes the screen is powered off.<br />
-The other, after how many minutes you need a password to unlock your machine.
-</p>
-<p>By clicking into different corners of the two screens at the bottom, you tell the system when to immediately start the screen saver or when to prevent it from kicking in when you rest the mouse in the indicated corner. Click in the middle of the screens to disable that feature again.
-</p>
+<p>下部の画面のイラストをクリックすることで、どの角にマウスをおいたときにスクリーンセーバーを起動するかを設定できます。この機能を無効化したいときは、イラストの真ん中をクリックしてください。</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a name="modules" id="modules">Modules</a></h2>
 <img src="../images/prefs-images/screensaver-modules.png" alt="screensaver-modules.png" />
 <br />
-<p>The second tab shows a list of all installed screen saver modules and their individual settings. You can test your settings with the <span class="button">Test</span> button below the list and add modules with the <span class="button">Add...</span> button beside it. Other ways to install new screen savers is by a simple drag&amp;drop into the list. Of course, you can also copy/delete a module's file in its respective user folder, i.e. <span class="path">/boot/common/add-ons/screensavers/</span> or <span class="path">/boot/home/config/add-ons/screensavers/</span> (see topic <a href="../filesystem-layout.html">Filesystem layout</a>).
+<p>2つ目のタブには、インストールされたすべてのスクリーンセーバーのモジュールのリストとそれぞれの設定が表示されます。<span class="button">Test</span> ボタンで選択しているスクリーンセーバーを試すことができます。また、<span class="button">Add...</span>ボタンでモジュールの追加ができます。モジュールをリストにドラッグアンドドロップしても追加できます。もちろん、それぞれのユーザーのフォルダ(すなわち<span class="path">/boot/common/add-ons/screensavers/</span>、もしくは<span class="path">/boot/home/config/add-ons/screensavers/</span>)でモジュールのファイルのコピーや削除ができます。(<a href="../filesystem-layout.html">Filesystem layout</a>のトピックをご覧ください)
 </p>
 
 </div>

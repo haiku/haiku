@@ -11,7 +11,7 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Andrea
- *		Barret
+ *		Barrett
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -53,10 +53,10 @@
 
 <h1>La struttura del FileSystem di Haiku</h1>
 
-<p>Il filesystem di Haiku è molto trasparente, cerca di non usare mai nomi criptici per cartelle e file, per non lasciare l'utente nell'incertezza. Le cartelle ed i file, importanti per il corretto funzionamento del sistema sono protetti dalle modifiche accidentali mostrando uno dei seguenti avvertimenti:</p>
+<p>Il filesystem di Haiku è molto trasparente, per non confondere l'utente si cerca sempre di non assegnare nomi criptici per i file e per le cartelle di sistema. Le cartelle ed i file sono importanti per il corretto funzionamento del sistema e sono protetti dalle modifiche accidentali mostrando uno dei seguenti avvertimenti:</p>
 <img src="images/filesystem-layout-images/achtung-user.png" alt="achtung-user.png" /> 
 <img src="images/filesystem-layout-images/achtung-system.png" alt="achtung-system.png" />
-<p>Il secondo avvertimento compare qualora si provi a rinominare o cancellare qualcosa nella gerarchia del sistema. Il bottone "<span class="button">Do it</span>" diventerà cliccabile solamente tenendo premuto il tasto <span class="key">SHIFT</span></p>
+<p>Il secondo avvertimento compare qualora si provi a rinominare o a cancellare qualcosa nella gerarchia di sistema. Il bottone "<span class="button">Do it</span>" diventerà cliccabile solamente tenendo premuto il tasto <span class="key">SHIFT</span>.</p>
 <p>Generalmente, ci sono tre directory separate che partono dalla cartella principale del volume di avvio:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td><span class="path">/boot/system/</span></td><td> </td><td>appartiene al sistema. Non deve essere modificata!</td></tr>
@@ -66,12 +66,12 @@
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="system" name="system">La cartella del sistema - <span class="path">/boot/system/</span></a></h2>
-<p>Su BeOS, il predecessore di Haiku, questa cartella era chiamata <span class="path">/boot/beos/</span>. È possibile trovarla in qualche vecchia documentazione (ad esempio in quella originale come il BeBook).<br />
-Qualunque sia il suo nome, non se ne dovrebbe alterare il contenuto. Ogni aggiornamento di Haiku può aggiungere, rimuovere o sovrascrivere qualsiasi cosa all'interno della cartella. Se vuoi aggiungere funzionalità, magari altri Add-On del Tracker o traduzioni oppure un altro driver, bisognerà installare queste cose nella cartella <span class="path">/boot/home/</span> o se si suppone che sia disponibile per ogni utente, in <span class="path">/boot/common/</span>. Finché Haiku non sarà multi-utente, questa distinzione non avrà alcun effetto apparente, in quanto non c'è nessun utente con la cartella <i>home</i>. E' sensato imparare la corretta via fin dall'inizio nell'eventualità che ci sia il supporto per più utenti.</p>
-<p>Dunque, diciamo che se si volesse installare un nuovo translator per l'ultimo formato immagine, <b>non bisognerà </b> semplicemente copiarlo nella rispettiva cartella di sistema. Ricorda: Non modificarla!<br />
-Invece, bisogna collocarlo nella directory speculare sotto <span class="path">/boot/common/</span> oppure <span class="path">/boot/home/config/</span>.</p>
-<p>Nel nostro caso la posizione per i translator nella cartella del sistema è:</p>
+<a id="system" name="system">La cartella system - <span class="path">/boot/system/</span></a></h2>
+<p>Su BeOS, il predecessore di Haiku, questa cartella era chiamata <span class="path">/boot/beos/</span>. È possibile incontrarla leggendo della vecchia documetazione (ad esempio quella originale come il BeBook).<br />
+Non bisogna alterare il suo contenuto, qualunque sia il suo nome poiché ogni aggiornamento di Haiku potrebbe aggiungere, rimuovere o sovrascrivere qualsiasi cosa all'interno della cartella. Se si vogliono aggiungere funzionalità, magari altri Add-On del Tracker o dei Translator oppure un altro driver, bisognerà installare i file nella cartella <span class="path">/boot/home/</span> altrimenti se si vuole rendere disponibile il componente a tutti gli utenti, in <span class="path">/boot/common/</span>. Finché Haiku non sarà multi-utente, questa distinzione non avrà alcun effetto apparente, in quanto non c'è nessun utente con la cartella <i>home</i>. E' sensato invece imparare la via corretta fin dall'inizio nell'eventualità che ci sia il supporto per più utenti.</p>
+<p>Dunque, diciamo che se si volesse installare un nuovo translator per l'ultimo formato immagine, <b>non bisognerà </b> semplicemente copiarlo nella rispettiva cartella di sistema. Si faccia presente che non bisogna modificarla.<br />
+Invece, è consigliato collocarlo nella directory speculare sotto <span class="path">/boot/common/</span> oppure <span class="path">/boot/home/config/</span>.</p>
+<p>Nel nostro caso la posizione per i translator nella cartella di sistema è:</p>
 <p><span class="path">/boot/system/add-ons/Translators/</span></p>
 <p>Dunque la cartella speculare dell'utente è sia</p>
 <p><span class="path">/boot/home/config/add-ons/Translators/</span><br />
@@ -96,20 +96,20 @@ If you do want to know more about how things tick in Haiku, have a look at this 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="home" name="home">La cartella Home - <span class="path">/boot/home/</span></a></h2>
-<p>Questa cartella appartiene all'utente. Qui è possibile creare e cancellare file e cartelle come desideri. Comunque è consigliabile non toccare troppo la directory <span class="path">~/config/</span> e le sue sottocartelle. Si potrebbe ad esempio cancellare la cartella <span class="path">~/config/settings/</span> senza danneggiare il sistema operativo, ma chi è che vorrebbe perdere tutte le configurazioni e le impostazioni delle applicazioni? In ogni caso il sistema avvisa con gli allarmi citati in precedenza.</p>
+<p>Questa cartella appartiene all'utente. Qui è possibile creare e cancellare file e cartelle come desiderato. Comunque è consigliabile non toccare troppo la directory <span class="path">~/config/</span> e le sue sottocartelle. Si potrebbe ad esempio cancellare la cartella <span class="path">~/config/settings/</span> senza danneggiare il sistema operativo, ma chi è che vorrebbe perdere tutte le configurazioni e le impostazioni delle applicazioni? In ogni caso il sistema avvisa con gli allarmi citati in precedenza.</p>
 <p>Oltre alla directory <span class="path">~/config/add-ons/</span>,  che rispecchia la cartella add-on del sistema per i componenti aggiuntivi come descritto sopra, ci sono altre cartelle di interesse. (A proposito, la tilde ("<tt>~</tt>") è una scorciatoia per la cartella home, così non bisogna sempre scrivere "<span class="path">/boot/home/</span>" nel terminale.)</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="4">
 <tr><td><span class="path">~/mail</span></td><td style="width:10px;"> </td>
 <td>Qui vengono tenute di default le mail dell'utente.</td></tr>
 
 <tr><td><span class="path">~/queries</span></td><td style="width:10px;"> </td>
-<td>Le <a href="queries.html">Query</a> di default sono memorizzate temporaneamente in questa cartella per 7 giorni.</td></tr>
+<td>Le <a href="queries.html">Query</a>, di default, sono tempraneamente memorizzate in questa cartella per 7 giorni.</td></tr>
 
 <tr><td><span class="path">~/config/be/</span></td><td> </td>
 <td>Dall'eredità di BeOS, la cartella <span class="path">be</span> contiene ciò che è mostrato nel <a href="deskbar.html#deskbar-menu">menu della Deskbar</a>. E' possibile aggiungere e rimuovere elementi, mettendo file, cartelle, links o query dentro questa cartella.</td></tr>
 
 <tr><td><span class="path">~/config/bin/</span></td><td> </td>
-<td>La cartella<span class="path">/boot/system/bin/</span> tiene tutti i tuoi programmi a linea di comando.</td></tr>
+<td>La cartella<span class="path">/boot/system/bin/</span> contiene tutti i programmi a linea di comando.</td></tr>
 
 <tr><td><span class="path">~/config/boot/</span></td><td> </td>
 <td>Questa cartella è il luogo per gli <a href="bash-scripting.html#user-scripts">User Scripts</a> che sono eseguiti prima o dopo l'avvio o lo spegnimento del sistema.</td></tr>
@@ -134,9 +134,9 @@ If you do want to know more about how things tick in Haiku, have a look at this 
 
 <tr><td align="right"><span class="path">DefaultFolderTemplate/</span></td><td style="width:10px;"></td><td>Mostra e stabilisce tutte le proprietà e le dimensioni della finestra a proprio piacimento. Ogni nuova cartella che si crea lo userà come modello.</td></tr>
 
-<tr><td align="right"><span class="path">DefaultQueryTemplates/</span></td><td></td><td>Si può definire il layout di una "Query result window" per determinati tipi di file <a href="queries.html#result-window">Query: Le finestre dei risultati </a>.</td></tr>
+<tr><td align="right"><span class="path">DefaultQueryTemplates/</span></td><td></td><td>Si può definire il layout di una "Query result window" per determinati tipi di file <a href="queries.html#result-window">Query: La finestra dei risultati </a>.</td></tr>
 
-<tr><td align="right"><span class="path">Go/</span></td><td></td><td>Inserire qui i link alle tue directory preferite per renderle disponibili ad esempio nei pannelli aperti. Leggi il topic <a href="gui.html#favorites-recent">Interfaccia grafica di Haiku: Preferiti e cartelle recenti</a>.</td></tr>
+<tr><td align="right"><span class="path">Go/</span></td><td></td><td>Collocare qui i link alle directory preferite per renderle disponibili, ad esempio nei pannelli "apri" e "salva". Si veda il capitolo <a href="gui.html#favorites-recent">Interfaccia grafica di Haiku: Preferiti e cartelle recenti</a>.</td></tr>
 
 <tr><td align="right"><span class="path">Tracker New Template/</span></td><td></td><td>E' possibile aggiungere un template per ogni filetype che sarà poi disponibile tramite il menu del Tracker <span class="menu">File | Nuovo..</span>. Leggi il capitolo <a href="tracker.html#working-with-files">Tracker: Working with files</a>.</td></tr>
 </table>
