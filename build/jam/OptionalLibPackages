@@ -343,8 +343,8 @@ if [ IsOptionalHaikuImagePackageAdded XiphLibs ] {
 		Echo "No optional package XiphLibs available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage
-			flac-1.2.1-x86-gcc4-2010-10-30.zip
-			: $(baseURL)/lib/flac-1.2.1-x86-gcc4-2010-10-30.zip ;
+			flac-1.2.1-x86-gcc4-2010-10-31.zip
+			: $(baseURL)/lib/flac-1.2.1-x86-gcc4-2010-10-31.zip ;
 		InstallOptionalHaikuImagePackage
 			libao-1.0.0-x86-gcc4-2010-10-30.zip
 			: $(baseURL)/lib/libao-1.0.0-x86-gcc4-2010-10-30.zip ;
