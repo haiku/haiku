@@ -64,13 +64,13 @@ SourceFile::Init(const char* path)
 	}
 
 	if (st.st_size > kMaxSourceFileSize) {
-		close (fd);
+		close(fd);
 		return B_FILE_TOO_LARGE;
 	}
 	size_t fileSize = st.st_size;
 
 	if (fileSize == 0) {
-		close (fd);
+		close(fd);
 		return B_BAD_VALUE;
 	}
 
