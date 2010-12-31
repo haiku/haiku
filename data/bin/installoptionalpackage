@@ -571,7 +571,7 @@ function AddPackages()
 
 		for package in ${packagesToInstall} ; do
 			# output the "if [ IsOptionalHaikuImagePackageAdded..." code block
-			local regExp="if\ \[\ IsOptionalHaikuImagePackageAdded\ ${package}"
+			local regExp="if\ \[\ IsOptionalHaikuImagePackageAdded\ ${package}\ "
 			for inputFile in OptionalPackages OptionalLibPackages ; do
 				sed -n "/^$regExp/,/^\}/p" "${baseDir}/${inputFile}" >> ${tmpDir}/optpkg.jam
 			done
