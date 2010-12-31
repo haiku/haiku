@@ -361,8 +361,8 @@ if [ IsOptionalHaikuImagePackageAdded XiphLibs ] {
 			speex-1.2-git-x86-gcc4-2010-10-30.zip
 			: $(baseURL)/lib/speex-1.2-git-x86-gcc4-2010-10-30.zip ;
 		InstallOptionalHaikuImagePackage
-			vorbis-tools-1.4.0-x86-gcc4-2010-10-30.zip
-			: $(baseURL)/lib/vorbis-tools-1.4.0-x86-gcc4-2010-10-30.zip ;
+			vorbis-tools-1.4.0-x86-gcc4-2010-12-30.zip
+			: $(baseURL)/lib/vorbis-tools-1.4.0-x86-gcc4-2010-12-30.zip ;
 	} else {
 		InstallOptionalHaikuImagePackage
 			flac-1.2.1-x86-gcc2-2010-10-29.zip
