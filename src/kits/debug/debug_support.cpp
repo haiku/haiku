@@ -353,24 +353,30 @@ debug_create_symbol_lookup_context(team_id team,
 
 	// create the lookup context
 	debug_symbol_lookup_context *lookupContext
-		= new(nothrow) debug_symbol_lookup_context;
+		= new(std::nothrow) debug_symbol_lookup_context;
+	if (lookupContext == NULL)
+		return B_NO_MEMORY;
 	ObjectDeleter<debug_symbol_lookup_context> contextDeleter(lookupContext);
 
 	// create and init symbol lookup
-	SymbolLookup *lookup = new(nothrow) SymbolLookup(team);
-	if (!lookup)
+	SymbolLookup *lookup = new(std::nothrow) SymbolLookup(team);
+	if (lookup == NULL)
 		return B_NO_MEMORY;
+	ObjectDeleter<SymbolLookup> lookupDeleter(lookup);
 
-	status_t error = lookup->Init();
-	if (error != B_OK) {
-		delete lookup;
-		return error;
+	try {
+		status_t error = lookup->Init();
+		if (error != B_OK)
+			return error;
+	} catch (BPrivate::Debug::Exception exception) {
+		return exception.Error();
 	}
 
 	// everything went fine: return the result
 	lookupContext->lookup = lookup;
 	*_lookupContext = lookupContext;
 	contextDeleter.Detach();
+	lookupDeleter.Detach();
 
 	return B_OK;
 }
