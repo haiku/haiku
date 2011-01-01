@@ -364,10 +364,11 @@ SettingsWindow::MessageReceived(BMessage* message)
 				}
 			}
 
-			fSettings.SetSwapEnabled(value != 0);
-			if (value == 1 && fSettings.SwapSize() == 0)
-			{
-				off_t min, max;
+			bool enabled = value != 0;
+			fSettings.SetSwapEnabled(enabled);
+			if (enabled && fSettings.SwapSize() == 0) {
+				off_t min;
+				off_t max;
 				_GetSwapFileLimits(min, max);
 				fSettings.SetSwapSize(min);
 			}
