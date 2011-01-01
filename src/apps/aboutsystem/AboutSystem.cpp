@@ -114,14 +114,14 @@ static const Translation gTranslations[] =
 		"Matthias Spreiter\n"
 		"svend\n"
 	},
-	{ "hu",
-		"Zoltán Mizsei (miqlas)\n"
-		"Zoltán Szabó (Bird)\n"
-	},
 	{ "hi",
 		"Abhishek Arora\n"
 		"Jayneil Dalal\n"
 		"Atharva Lath\n"
+	},
+	{ "hu",
+		"Zoltán Mizsei (miqlas)\n"
+		"Zoltán Szabó (Bird)\n"
 	},
 	{ "it",
 		"Andrea Bernardi\n"
