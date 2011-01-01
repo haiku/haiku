@@ -365,6 +365,12 @@ SettingsWindow::MessageReceived(BMessage* message)
 			}
 
 			fSettings.SetSwapEnabled(value != 0);
+			if (value == 1 && fSettings.SwapSize() == 0)
+			{
+				off_t min, max;
+				_GetSwapFileLimits(min, max);
+				fSettings.SetSwapSize(min);
+			}
 			_Update();
 			break;
 		}
