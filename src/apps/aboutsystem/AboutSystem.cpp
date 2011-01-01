@@ -118,6 +118,11 @@ static const Translation gTranslations[] =
 		"Zoltán Mizsei (miqlas)\n"
 		"Zoltán Szabó (Bird)\n"
 	},
+	{ "hi",
+		"Abhishek Arora\n"
+		"Jayneil Dalal\n"
+		"Atharva Lath\n"
+	},
 	{ "it",
 		"Andrea Bernardi\n"
 	},
