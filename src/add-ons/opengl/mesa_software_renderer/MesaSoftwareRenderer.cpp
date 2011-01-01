@@ -52,7 +52,7 @@ extern "C" {
 #endif
 }
 
-extern const char * color_space_name(color_space space);
+extern const char* color_space_name(color_space space);
 
 // BeOS component ordering for B_RGBA32 bitmap format
 #if B_HOST_IS_LENDIAN
@@ -80,9 +80,9 @@ extern "C" {
 #define NAME(PREFIX) PREFIX##_RGBA32
 #define RB_TYPE GLubyte
 #define SPAN_VARS \
-	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
+	MesaSoftwareRenderer* mr = (MesaSoftwareRenderer*)ctx->DriverCtx;
 #define INIT_PIXEL_PTR(P, X, Y) \
-	GLubyte *P = ((GLubyte **) mr->GetRows())[Y] + (X) * 4
+	GLubyte* P = ((GLubyte**)mr->GetRows())[Y] + (X) * 4
 #define INC_PIXEL_PTR(P) P += 4
 #define STORE_PIXEL(DST, X, Y, VALUE) \
    DST[BE_RCOMP] = VALUE[RCOMP];  \
@@ -105,9 +105,9 @@ extern "C" {
 #define NAME(PREFIX) PREFIX##_RGB32
 #define RB_TYPE GLubyte
 #define SPAN_VARS \
-	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
+	MesaSoftwareRenderer* mr = (MesaSoftwareRenderer*)ctx->DriverCtx;
 #define INIT_PIXEL_PTR(P, X, Y) \
-	GLuint *P = (GLuint *)(((GLubyte **) mr->GetRows())[Y] + (X) * 4)
+	GLuint* P = (GLuint*)(((GLubyte**)mr->GetRows())[Y] + (X) * 4)
 #define INC_PIXEL_PTR(P) P += 1
 #define STORE_PIXEL(DST, X, Y, VALUE) \
 	*DST = ( ((VALUE[RCOMP]) << 16) | \
@@ -124,9 +124,9 @@ extern "C" {
 #define NAME(PREFIX) PREFIX##_RGB24
 #define RB_TYPE GLubyte
 #define SPAN_VARS \
-	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
+	MesaSoftwareRenderer* mr = (MesaSoftwareRenderer*)ctx->DriverCtx;
 #define INIT_PIXEL_PTR(P, X, Y) \
-	GLubyte *P = ((GLubyte **) mr->GetRows())[Y] + (X) * 3
+	GLubyte* P = ((GLubyte**)mr->GetRows())[Y] + (X) * 3
 #define INC_PIXEL_PTR(P) P += 3
 #define STORE_PIXEL(DST, X, Y, VALUE) \
 	DST[BE_RCOMP] = VALUE[RCOMP]; \
@@ -143,9 +143,9 @@ extern "C" {
 #define NAME(PREFIX) PREFIX##_RGB16
 #define RB_TYPE GLubyte
 #define SPAN_VARS \
-	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
+	MesaSoftwareRenderer* mr = (MesaSoftwareRenderer*)ctx->DriverCtx;
 #define INIT_PIXEL_PTR(P, X, Y) \
-	GLushort *P = (GLushort *) (((GLubyte **) mr->GetRows())[Y] + (X) * 2)
+	GLushort* P = (GLushort*)(((GLubyte**)mr->GetRows())[Y] + (X) * 2)
 #define INC_PIXEL_PTR(P) P += 1
 #define STORE_PIXEL(DST, X, Y, VALUE) \
 	*DST = ( (((VALUE[RCOMP]) & 0xf8) << 8) | \
@@ -162,9 +162,9 @@ extern "C" {
 #define NAME(PREFIX) PREFIX##_RGB15
 #define RB_TYPE GLubyte
 #define SPAN_VARS \
-        MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
+        MesaSoftwareRenderer* mr = (MesaSoftwareRenderer*)ctx->DriverCtx;
 #define INIT_PIXEL_PTR(P, X, Y) \
-	GLushort *P = (GLushort *) (((GLubyte **) mr->GetRows())[Y] + (X) * 2)
+	GLushort* P = (GLushort*)(((GLubyte**)mr->GetRows())[Y] + (X) * 2)
 #define INC_PIXEL_PTR(P) P += 1
 #define STORE_PIXEL(DST, X, Y, VALUE) \
 	*DST = ( (((VALUE[RCOMP]) & 0xf8) << 7) | \
@@ -181,10 +181,10 @@ extern "C" {
 #define NAME(PREFIX) PREFIX##_CMAP8
 #define RB_TYPE GLubyte
 #define SPAN_VARS \
-	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx; \
-	const color_map *colorMap = system_colors();
+	MesaSoftwareRenderer* mr = (MesaSoftwareRenderer*)ctx->DriverCtx; \
+	const color_map* colorMap = system_colors();
 #define INIT_PIXEL_PTR(P, X, Y) \
-	GLubyte *P = ((GLubyte **) mr->GetRows())[Y] + (X)
+	GLubyte* P = ((GLubyte**) mr->GetRows())[Y] + (X)
 #define INC_PIXEL_PTR(P) P += 1
 #define STORE_PIXEL(DST, X, Y, VALUE) \
 	*DST = colorMap->index_map[( (((VALUE[BCOMP]) ) >> 3) | \
@@ -450,7 +450,7 @@ MesaSoftwareRenderer::Draw(BRect updateRect)
 
 
 status_t
-MesaSoftwareRenderer::CopyPixelsOut(BPoint location, BBitmap *bitmap)
+MesaSoftwareRenderer::CopyPixelsOut(BPoint location, BBitmap* bitmap)
 {
 	CALLED();
 	color_space scs = fBitmap->ColorSpace();
@@ -469,15 +469,16 @@ MesaSoftwareRenderer::CopyPixelsOut(BPoint location, BBitmap *bitmap)
 	sr = sr & dr.OffsetBySelf(location);
 	dr = sr.OffsetByCopy(-location.x, -location.y);
 
-	uint8 *ps = (uint8 *) fBitmap->Bits();
-	uint8 *pd = (uint8 *) bitmap->Bits();
-	uint32 *s, *d;
+	uint8* ps = (uint8*) fBitmap->Bits();
+	uint8* pd = (uint8*) bitmap->Bits();
+	uint32* s,
+	uint32* d;
 	uint32 y;
-	for (y = (uint32) sr.top; y <= (uint32) sr.bottom; y++) {
-		s = (uint32 *)(ps + y * fBitmap->BytesPerRow());
+	for (y = (uint32) sr.top; y <= (uint32)sr.bottom; y++) {
+		s = (uint32*)(ps + y * fBitmap->BytesPerRow());
 		s += (uint32) sr.left;
 
-		d = (uint32 *)(pd + (y + (uint32)(dr.top - sr.top))
+		d = (uint32*)(pd + (y + (uint32)(dr.top - sr.top))
 			* bitmap->BytesPerRow());
 		d += (uint32) dr.left;
 
@@ -488,7 +489,7 @@ MesaSoftwareRenderer::CopyPixelsOut(BPoint location, BBitmap *bitmap)
 
 
 status_t
-MesaSoftwareRenderer::CopyPixelsIn(BBitmap *bitmap, BPoint location)
+MesaSoftwareRenderer::CopyPixelsIn(BBitmap* bitmap, BPoint location)
 {
 	CALLED();
 	color_space scs = bitmap->ColorSpace();
@@ -507,15 +508,16 @@ MesaSoftwareRenderer::CopyPixelsIn(BBitmap *bitmap, BPoint location)
 	sr = sr & dr.OffsetBySelf(location);
 	dr = sr.OffsetByCopy(-location.x, -location.y);
 
-	uint8 *ps = (uint8 *) bitmap->Bits();
-	uint8 *pd = (uint8 *) fBitmap->Bits();
-	uint32 *s, *d;
+	uint8* ps = (uint8*) bitmap->Bits();
+	uint8* pd = (uint8*) fBitmap->Bits();
+	uint32* s;
+	uint32* d;
 	uint32 y;
-	for (y = (uint32) sr.top; y <= (uint32) sr.bottom; y++) {
-		s = (uint32 *)(ps + y * bitmap->BytesPerRow());
+	for (y = (uint32) sr.top; y <= (uint32)sr.bottom; y++) {
+		s = (uint32*)(ps + y * bitmap->BytesPerRow());
 		s += (uint32) sr.left;
 
-		d = (uint32 *)(pd + (y + (uint32)(dr.top - sr.top))
+		d = (uint32*)(pd + (y + (uint32)(dr.top - sr.top))
 			* fBitmap->BytesPerRow());
 		d += (uint32) dr.left;
 
@@ -533,7 +535,7 @@ MesaSoftwareRenderer::EnableDirectMode(bool enabled)
 
 
 void
-MesaSoftwareRenderer::DirectConnected(direct_buffer_info *info)
+MesaSoftwareRenderer::DirectConnected(direct_buffer_info* info)
 {
 	// TODO: I'm not sure we need to do this: BGLView already
 	// keeps a local copy of the direct_buffer_info passed by
@@ -541,7 +543,7 @@ MesaSoftwareRenderer::DirectConnected(direct_buffer_info *info)
 	BAutolock lock(fInfoLocker);
 	if (info) {
 		if (!fInfo) {
-			fInfo = (direct_buffer_info *)malloc(DIRECT_BUFFER_INFO_AREA_SIZE);
+			fInfo = (direct_buffer_info*)malloc(DIRECT_BUFFER_INFO_AREA_SIZE);
 			if (!fInfo)
 				return;
 		}
@@ -550,7 +552,6 @@ MesaSoftwareRenderer::DirectConnected(direct_buffer_info *info)
 		free(fInfo);
 		fInfo = NULL;
 	}
-
 }
 
 
@@ -569,6 +570,7 @@ MesaSoftwareRenderer::_AllocateBitmap()
 	// allocate new size of back buffer bitmap
 	delete fBitmap;
 	fBitmap = NULL;
+
 	if (fWidth < 1 || fHeight < 1)
 		return;
 	BRect rect(0.0, 0.0, fWidth - 1, fHeight - 1);
@@ -591,16 +593,16 @@ MesaSoftwareRenderer::_AllocateBitmap()
 
 
 void
-MesaSoftwareRenderer::_Error(GLcontext *ctx)
+MesaSoftwareRenderer::_Error(GLcontext* ctx)
 {
-	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
+	MesaSoftwareRenderer* mr = (MesaSoftwareRenderer*)ctx->DriverCtx;
 	if (mr && mr->GLView())
-		mr->GLView()->ErrorCallback((unsigned long) ctx->ErrorValue);
+		mr->GLView()->ErrorCallback((unsigned long)ctx->ErrorValue);
 }
 
 
-const GLubyte *
-MesaSoftwareRenderer::_GetString(GLcontext *ctx, GLenum name)
+const GLubyte*
+MesaSoftwareRenderer::_GetString(GLcontext* ctx, GLenum name)
 {
 	switch (name) {
 		case GL_RENDERER: {
@@ -667,14 +669,14 @@ MesaSoftwareRenderer::_GetString(GLcontext *ctx, GLenum name)
 
 
 void
-MesaSoftwareRenderer::_Viewport(GLcontext *ctx, GLint x, GLint y, GLsizei w,
+MesaSoftwareRenderer::_Viewport(GLcontext* ctx, GLint x, GLint y, GLsizei w,
 	GLsizei h)
 {
 	CALLED();
 
-	GLframebuffer *draw = ctx->WinSysDrawBuffer;
-	GLframebuffer *read = ctx->WinSysReadBuffer;
-	struct msr_framebuffer *msr = msr_framebuffer(draw);
+	GLframebuffer* draw = ctx->WinSysDrawBuffer;
+	GLframebuffer* read = ctx->WinSysReadBuffer;
+	struct msr_framebuffer* msr = msr_framebuffer(draw);
 
 	_mesa_resize_framebuffer(ctx, draw, msr->Width, msr->Height);
 	_mesa_resize_framebuffer(ctx, read, msr->Width, msr->Height);
@@ -682,7 +684,7 @@ MesaSoftwareRenderer::_Viewport(GLcontext *ctx, GLint x, GLint y, GLsizei w,
 
 
 void
-MesaSoftwareRenderer::_UpdateState(GLcontext *ctx, GLuint new_state)
+MesaSoftwareRenderer::_UpdateState(GLcontext* ctx, GLuint new_state)
 {
 	if (!ctx)
 		return;
@@ -696,19 +698,19 @@ MesaSoftwareRenderer::_UpdateState(GLcontext *ctx, GLuint new_state)
 
 
 void
-MesaSoftwareRenderer::_ClearFront(GLcontext *ctx)
+MesaSoftwareRenderer::_ClearFront(GLcontext* ctx)
 {
 	CALLED();
 
-	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
-	BGLView *bglview = mr->GLView();
+	MesaSoftwareRenderer* mr = (MesaSoftwareRenderer*)ctx->DriverCtx;
+	BGLView* bglview = mr->GLView();
 	assert(bglview);
-	BBitmap *bitmap = mr->fBitmap;
+	BBitmap* bitmap = mr->fBitmap;
 	assert(bitmap);
-	GLuint *start = (GLuint *) bitmap->Bits();
+	GLuint* start = (GLuint*)bitmap->Bits();
 	size_t pixelSize = 0;
 	get_pixel_size_for(bitmap->ColorSpace(), &pixelSize, NULL, NULL);
-	const GLuint *clearPixelPtr = (const GLuint *) mr->fClearColor;
+	const GLuint* clearPixelPtr = (const GLuint*)mr->fClearColor;
 	const GLuint clearPixel = B_LENDIAN_TO_HOST_INT32(*clearPixelPtr);
 
 	int x = ctx->DrawBuffer->_Xmin;
@@ -757,7 +759,7 @@ MesaSoftwareRenderer::_BackRenderbufferStorage(GLcontext* ctx,
 	struct gl_renderbuffer* render, GLenum internalFormat,
 	GLuint width, GLuint height)
 {
-	struct msr_renderbuffer *mrb = msr_renderbuffer(render);
+	struct msr_renderbuffer* mrb = msr_renderbuffer(render);
 	_mesa_free(render->Data);
 	_FrontRenderbufferStorage(ctx, render, internalFormat, width, height);
 	render->Data = _mesa_malloc(mrb->Size);
@@ -766,10 +768,10 @@ MesaSoftwareRenderer::_BackRenderbufferStorage(GLcontext* ctx,
 
 
 void
-MesaSoftwareRenderer::_Flush(GLcontext *ctx)
+MesaSoftwareRenderer::_Flush(GLcontext* ctx)
 {
 	CALLED();
-	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
+	MesaSoftwareRenderer* mr = (MesaSoftwareRenderer*)ctx->DriverCtx;
 	if ((mr->fOptions & BGL_DOUBLE) == 0) {
 		mr->SwapBuffers();
 	}
@@ -862,6 +864,7 @@ MesaSoftwareRenderer::_CopyToDirect()
 		|| fInfo->window_bounds.right - fInfo->window_bounds.left
 			!= fBitmap->Bounds().IntegerWidth())
 		return;
+
 	uint8 bytesPerPixel = fInfo->bits_per_pixel / 8;
 	uint32 bytesPerRow = fBitmap->BytesPerRow();
 	for (uint32 i = 0; i < fInfo->clip_list_count; i++) {
@@ -869,9 +872,9 @@ MesaSoftwareRenderer::_CopyToDirect()
 		int32 height = clip->bottom - clip->top + 1;
 		int32 bytesWidth
 			= (clip->right - clip->left + 1) * bytesPerPixel;
-		uint8 *p = (uint8 *)fInfo->bits + clip->top
+		uint8* p = (uint8*)fInfo->bits + clip->top
 			* fInfo->bytes_per_row + clip->left * bytesPerPixel;
-		uint8 *b = (uint8 *)fBitmap->Bits()
+		uint8* b = (uint8*)fBitmap->Bits()
 			+ (clip->top - fInfo->window_bounds.top) * bytesPerRow
 			+ (clip->left - fInfo->window_bounds.left)
 				* bytesPerPixel;
