@@ -471,7 +471,7 @@ MesaSoftwareRenderer::CopyPixelsOut(BPoint location, BBitmap* bitmap)
 
 	uint8* ps = (uint8*) fBitmap->Bits();
 	uint8* pd = (uint8*) bitmap->Bits();
-	uint32* s,
+	uint32* s;
 	uint32* d;
 	uint32 y;
 	for (y = (uint32) sr.top; y <= (uint32)sr.bottom; y++) {
