@@ -33,6 +33,11 @@ public:
 			float				SplitterSize() const;
 			void				SetSplitterSize(float size);
 
+			float				ItemWeight(int32 index) const;
+			float				ItemWeight(BLayoutItem* item) const;
+			void				SetItemWeight(int32 index, float weight,
+									bool invalidateLayout);
+			void				SetItemWeight(BLayoutItem* item, float weight);
 
 			void				SetCollapsible(bool collapsible);
 			void				SetCollapsible(int32 index, bool collapsible);

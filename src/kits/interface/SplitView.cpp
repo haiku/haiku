@@ -95,6 +95,34 @@ BSplitView::SetSplitterSize(float size)
 }
 
 
+float
+BSplitView::ItemWeight(int32 index) const
+{
+	return fSplitLayout->ItemWeight(index);
+}
+
+
+float
+BSplitView::ItemWeight(BLayoutItem* item) const
+{
+	return fSplitLayout->ItemWeight(item);
+}
+
+
+void
+BSplitView::SetItemWeight(int32 index, float weight, bool invalidateLayout)
+{
+	fSplitLayout->SetItemWeight(index, weight, invalidateLayout);
+}
+
+
+void
+BSplitView::SetItemWeight(BLayoutItem* item, float weight)
+{
+	fSplitLayout->SetItemWeight(item, weight);
+}
+
+
 void
 BSplitView::SetCollapsible(bool collapsible)
 {
