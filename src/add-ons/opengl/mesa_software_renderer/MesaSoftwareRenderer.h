@@ -92,6 +92,7 @@ private:
 		static void				_DeleteBackBuffer(struct gl_renderbuffer* rb);
 
 		void					_AllocateBitmap();
+		void					_CopyToDirect();
 
 		BBitmap*				fBitmap;
 		bool					fDirectModeEnabled;

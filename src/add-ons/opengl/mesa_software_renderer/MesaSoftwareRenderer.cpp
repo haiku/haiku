@@ -430,37 +430,8 @@ MesaSoftwareRenderer::SwapBuffers(bool VSync)
 			GLView()->DrawBitmap(fBitmap, B_ORIGIN);
 			GLView()->UnlockLooper();
 		}
-		return;
-	}
-
-	BAutolock lock(fInfoLocker);
-
-	// check the bitmap size still matches the size
-	if (fInfo->window_bounds.bottom - fInfo->window_bounds.top
-		!= fBitmap->Bounds().IntegerHeight()
-		|| fInfo->window_bounds.right - fInfo->window_bounds.left
-			!= fBitmap->Bounds().IntegerWidth())
-		return;
-	uint8 bytesPerPixel = fInfo->bits_per_pixel / 8;
-	uint32 bytesPerRow = fBitmap->BytesPerRow();
-	for (uint32 i = 0; i < fInfo->clip_list_count; i++) {
-		clipping_rect *clip = &fInfo->clip_list[i];
-		int32 height = clip->bottom - clip->top + 1;
-		int32 bytesWidth
-			= (clip->right - clip->left + 1) * bytesPerPixel;
-		uint8 *p = (uint8 *)fInfo->bits + clip->top
-			* fInfo->bytes_per_row + clip->left * bytesPerPixel;
-		uint8 *b = (uint8 *)fBitmap->Bits()
-			+ (clip->top - fInfo->window_bounds.top) * bytesPerRow
-			+ (clip->left - fInfo->window_bounds.left)
-				* bytesPerPixel;
-
-		for (int y = 0; y < height; y++) {
-			memcpy(p, b, bytesWidth);
-			p += fInfo->bytes_per_row;
-			b += bytesPerRow;
-		}
-	}
+	} else
+		_CopyToDirect();
 
 	if (VSync) {
 		BScreen screen(GLView()->Window());
@@ -475,7 +446,6 @@ MesaSoftwareRenderer::Draw(BRect updateRect)
 	CALLED();
 	if (fBitmap && (!fDirectModeEnabled || (fInfo == NULL)))
 		GLView()->DrawBitmap(fBitmap, updateRect, updateRect);
-
 }
 
 
@@ -880,3 +850,36 @@ MesaSoftwareRenderer::_DeleteBackBuffer(struct gl_renderbuffer* rb)
 	_mesa_free(rb);
 }
 
+
+void
+MesaSoftwareRenderer::_CopyToDirect()
+{
+	BAutolock lock(fInfoLocker);
+
+	// check the bitmap size still matches the size
+	if (fInfo->window_bounds.bottom - fInfo->window_bounds.top
+		!= fBitmap->Bounds().IntegerHeight()
+		|| fInfo->window_bounds.right - fInfo->window_bounds.left
+			!= fBitmap->Bounds().IntegerWidth())
+		return;
+	uint8 bytesPerPixel = fInfo->bits_per_pixel / 8;
+	uint32 bytesPerRow = fBitmap->BytesPerRow();
+	for (uint32 i = 0; i < fInfo->clip_list_count; i++) {
+		clipping_rect *clip = &fInfo->clip_list[i];
+		int32 height = clip->bottom - clip->top + 1;
+		int32 bytesWidth
+			= (clip->right - clip->left + 1) * bytesPerPixel;
+		uint8 *p = (uint8 *)fInfo->bits + clip->top
+			* fInfo->bytes_per_row + clip->left * bytesPerPixel;
+		uint8 *b = (uint8 *)fBitmap->Bits()
+			+ (clip->top - fInfo->window_bounds.top) * bytesPerRow
+			+ (clip->left - fInfo->window_bounds.left)
+				* bytesPerPixel;
+
+		for (int y = 0; y < height; y++) {
+			memcpy(p, b, bytesWidth);
+			p += fInfo->bytes_per_row;
+			b += bytesPerRow;
+		}
+	}
+}
