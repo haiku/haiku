@@ -638,14 +638,14 @@ _IO_wfile_seekoff (fp, offset, dir, mode)
     {
       /* Offset relative to start of main get area. */
       _IO_off64_t rel_offset = (offset - fp->_offset
-				+ (fp->_IO_read_end - fp->_IO_read_base));
+				+ (fp->_IO_read_end - fp->_IO_buf_base));
       if (rel_offset >= 0)
 	{
 #if 0
 	  if (_IO_in_backup (fp))
 	    _IO_switch_to_main_get_area (fp);
 #endif
-	  if (rel_offset <= fp->_IO_read_end - fp->_IO_read_base)
+	  if (rel_offset <= fp->_IO_read_end - fp->_IO_buf_base)
 	    {
 	      enum __codecvt_result status;
 	      struct _IO_codecvt *cd = fp->_codecvt;

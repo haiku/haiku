@@ -1028,14 +1028,14 @@ _IO_new_file_seekoff (fp, offset, dir, mode)
     {
       /* Offset relative to start of main get area. */
       _IO_off64_t rel_offset = (offset - fp->_offset
-				+ (fp->_IO_read_end - fp->_IO_read_base));
+				+ (fp->_IO_read_end - fp->_IO_buf_base));
       if (rel_offset >= 0)
 	{
 #if 0
 	  if (_IO_in_backup (fp))
 	    _IO_switch_to_main_get_area (fp);
 #endif
-	  if (rel_offset <= fp->_IO_read_end - fp->_IO_read_base)
+	  if (rel_offset <= fp->_IO_read_end - fp->_IO_buf_base)
 	    {
 	      _IO_setg (fp, fp->_IO_buf_base, fp->_IO_buf_base + rel_offset,
 			fp->_IO_read_end);
