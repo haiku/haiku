@@ -113,7 +113,7 @@ BDeskWindow::BDeskWindow(LockingList<BWindow> *windowList)
 	BContainerWindow(windowList, 0, kPrivateDesktopWindowLook,
 		kPrivateDesktopWindowFeel, B_NOT_MOVABLE | B_WILL_ACCEPT_FIRST_CLICK
 			| B_NOT_ZOOMABLE | B_NOT_CLOSABLE | B_NOT_MINIMIZABLE
-			| B_ASYNCHRONOUS_CONTROLS, B_ALL_WORKSPACES),
+			| B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS, B_ALL_WORKSPACES),
 	fDeskShelf(0),
 	fTrashContextMenu(0),
 	fShouldUpdateAddonShortcuts(true)
