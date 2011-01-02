@@ -14,7 +14,7 @@ class BStringView;
 class BCheckBox;
 class BSlider;
 class BButton;
-
+class BMenuField;
 
 class SettingsWindow : public BWindow {
 	public:
@@ -33,7 +33,7 @@ class SettingsWindow : public BWindow {
 		BButton*		fDefaultsButton;
 		BButton*		fRevertButton;
 		BStringView*	fWarningStringView;
-
+		BMenuField*		fVolumeMenuField;
 		Settings		fSettings;
 };
 

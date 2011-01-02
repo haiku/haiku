@@ -127,7 +127,6 @@ SettingsWindow::SettingsWindow()
 	fSwapEnabledCheckBox = new BCheckBox("enable swap",
 		B_TRANSLATE("Enable virtual memory"),
 		new BMessage(kMsgSwapEnabledUpdate));
-	fSwapEnabledCheckBox->SetValue(fSettings.SwapEnabled());
 
 	BBox* box = new BBox("box", B_FOLLOW_LEFT_RIGHT);
 	box->SetLabel(fSwapEnabledCheckBox);
@@ -163,18 +162,14 @@ SettingsWindow::SettingsWindow()
 			item->SetMarked(true);
 	}
 
-	BMenuField* field = new BMenuField("devices", B_TRANSLATE("Use volume:"),
-		menu);
-	field->SetEnabled(false);
-
-	off_t minSize, maxSize;
-	_GetSwapFileLimits(minSize, maxSize);
-
-	fSizeSlider = new SizeSlider("size slider",
-		B_TRANSLATE("Requested swap file size:"),
-		new BMessage(kMsgSliderUpdate), minSize / kMegaByte, maxSize / kMegaByte,
-		B_WILL_DRAW | B_FRAME_EVENTS);
-	fSizeSlider->SetLimitLabels(B_TRANSLATE("999 MB"), B_TRANSLATE("999 MB"));
+	fVolumeMenuField = new BMenuField("devices", B_TRANSLATE("Use volume:"), menu);
+	
+	// When swap volume changing support is implemeneted, remove me:
+	fVolumeMenuField->SetEnabled(false);
+	
+	fSizeSlider = new SizeSlider("size slider", 
+		B_TRANSLATE("Requested swap file size:"), new BMessage(kMsgSliderUpdate),
+		0, 0, B_WILL_DRAW | B_FRAME_EVENTS);
 	fSizeSlider->SetViewColor(255, 0, 255);
 
 	fWarningStringView = new BStringView("", "");
@@ -191,7 +186,7 @@ SettingsWindow::SettingsWindow()
 			.AddGlue()
 		.End()
 		.AddGroup(B_HORIZONTAL)
-			.Add(field)
+			.Add(fVolumeMenuField)
 			.AddGlue()
 		.End()
 		.Add(fSizeSlider)
@@ -226,10 +221,9 @@ SettingsWindow::SettingsWindow()
 	BScreen screen;
 	BRect screenFrame = screen.Frame();
 
-	if (!screenFrame.Contains(fSettings.WindowPosition())) {
-		// move on screen, centered
+	if (!screenFrame.Contains(fSettings.WindowPosition()))
 		CenterOnScreen();
-	} else
+	else
 		MoveTo(fSettings.WindowPosition());
 }
 
@@ -239,11 +233,19 @@ SettingsWindow::~SettingsWindow()
 }
 
 
-	void
+void
 SettingsWindow::_Update()
 {
 	if ((fSwapEnabledCheckBox->Value() != 0) != fSettings.SwapEnabled())
 		fSwapEnabledCheckBox->SetValue(fSettings.SwapEnabled());
+		
+	if (fSizeSlider->IsEnabled() != fSettings.SwapEnabled())
+		fSizeSlider->SetEnabled(fSettings.SwapEnabled());
+	
+#ifdef SWAP_VOLUME_IMPLEMENTED	
+	if (fVolumeMenuField->IsEnabled() != fSettings.SwapEnabled())
+		fVolumeMenuField->SetEnabled(fSettings.SwapEnabled());
+#endif
 
 	off_t minSize, maxSize;
 	if (_GetSwapFileLimits(minSize, maxSize) == B_OK) {
@@ -251,7 +253,7 @@ SettingsWindow::_Update()
 		minLabel << byte_string(minSize);
 		maxLabel << byte_string(maxSize);
 		if (minLabel != fSizeSlider->MinLimitLabel()
-				|| maxLabel != fSizeSlider->MaxLimitLabel()) {
+			|| maxLabel != fSizeSlider->MaxLimitLabel()) {
 			fSizeSlider->SetLimitLabels(minLabel.String(), maxLabel.String());
 #ifdef __HAIKU__
 			fSizeSlider->SetLimits(minSize / kMegaByte, maxSize / kMegaByte);
@@ -260,11 +262,18 @@ SettingsWindow::_Update()
 
 		if (fSizeSlider->Value() != fSettings.SwapSize() / kMegaByte)
 			fSizeSlider->SetValue(fSettings.SwapSize() / kMegaByte);
-
-		fSizeSlider->SetEnabled(true);
 	} else {
-		fSizeSlider->SetValue(minSize);
+		// Not enough space on volume for a swap file. Make UI inoperable.
+		fWarningStringView->SetText(
+			B_TRANSLATE("Insufficient space for a swap file."));
+		fSwapEnabledCheckBox->SetEnabled(false);
 		fSizeSlider->SetEnabled(false);
+		// When swap volume is implemented, we'll want to keep the volume
+		// menu field enabled so the user can get around the space issue
+		// by selecting a different volume.
+#ifdef SWAP_VOLUME_IMPLEMENTED
+		fVolumeMenuField->SetEnabled(true);
+#endif
 	}
 
 	// ToDo: set volume
@@ -283,15 +292,13 @@ SettingsWindow::_Update()
 }
 
 
-	status_t
+status_t
 SettingsWindow::_GetSwapFileLimits(off_t& minSize, off_t& maxSize)
 {
-	// minimum size is an arbitrarily chosen MB
 	minSize = kMegaByte;
 
 	// maximum size is the free space on the current volume
 	// (minus some safety offset, depending on the disk size)
-
 	off_t freeSpace = fSettings.SwapVolume().FreeBytes();
 	off_t safetyFreeSpace = fSettings.SwapVolume().Capacity() / 100;
 	if (safetyFreeSpace > 1024 * kMegaByte)
@@ -299,7 +306,6 @@ SettingsWindow::_GetSwapFileLimits(off_t& minSize, off_t& maxSize)
 
 	// check if there already is a page file on this disk and
 	// adjust the free space accordingly
-
 	BPath path;
 	if (find_directory(B_COMMON_VAR_DIRECTORY, &path, false,
 			&fSettings.SwapVolume()) == B_OK) {
@@ -307,14 +313,18 @@ SettingsWindow::_GetSwapFileLimits(off_t& minSize, off_t& maxSize)
 		BEntry swap(path.Path());
 
 		off_t size;
-		if (swap.GetSize(&size) == B_OK)
+		if (swap.GetSize(&size) == B_OK) {
+			// If swap file exists, forget about safety space;
+			// disk may have filled after creation of swap file.
+			safetyFreeSpace = 0;
 			freeSpace += size;
+		}
 	}
 
 	maxSize = freeSpace - safetyFreeSpace;
-
 	if (maxSize < minSize) {
-		maxSize = minSize;
+		maxSize = 0;
+		minSize = 0;
 		return B_ERROR;
 	}
 
@@ -347,8 +357,8 @@ SettingsWindow::MessageReceived(BMessage* message)
 			if (value == 0) {
 				// print out warning, give the user the time to think about it :)
 				// ToDo: maybe we want to remove this possibility in the GUI
-				//	as Be did, but I thought a proper warning could be helpful
-				//	(for those that want to change that anyway)
+				// as Be did, but I thought a proper warning could be helpful
+				// (for those that want to change that anyway)
 				int32 choice = (new BAlert("VirtualMemory",
 					B_TRANSLATE(
 					"Disabling virtual memory will have unwanted effects on "
