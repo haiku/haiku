@@ -26,6 +26,7 @@ using namespace FATFS;
 
 Volume::Volume(boot::Partition *partition)
 	:
+	fCachedBlock(NULL),
 	fRoot(NULL)
 {
 	TRACE(("%s()\n", __FUNCTION__));
