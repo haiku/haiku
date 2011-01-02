@@ -174,7 +174,7 @@ load_modules(stage2_args *args, Directory *volume)
 
 	for (int32 i = 0; sPaths[i]; i++) {
 		char path[B_FILE_NAME_LENGTH];
-		sprintf(path, "%s/boot", sPaths[i]);
+		snprintf(path, sizeof(path), "%s/boot", sPaths[i]);
 
 		if (load_modules_from(volume, path) != B_OK)
 			failed++;
@@ -188,7 +188,7 @@ load_modules(stage2_args *args, Directory *volume)
 
 		for (int32 i = 0; paths[i]; i++) {
 			char path[B_FILE_NAME_LENGTH];
-			sprintf(path, "%s/%s", sPaths[0], paths[i]);
+			snprintf(path, sizeof(path), "%s/%s", sPaths[0], paths[i]);
 			load_modules_from(volume, path);
 		}
 	}
@@ -213,7 +213,7 @@ load_modules(stage2_args *args, Directory *volume)
 		//	as this piece will survive a more intelligent module
 		//	loading approach...
 		char path[B_FILE_NAME_LENGTH];
-		sprintf(path, "%s/%s", sPaths[0], "file_systems");
+		snprintf(path, sizeof(path), "%s/%s", sPaths[0], "file_systems");
 		load_modules_from(volume, path);
 	}
 
