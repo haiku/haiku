@@ -1,7 +1,8 @@
 /*
- * Copyright 2005, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
+ * Copyright 2005, ?.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
+
 
 #include <boot/FileMapDisk.h>
 #include <boot_item.h>
@@ -48,7 +49,7 @@ FileMapDisk::Init(Node *node/*, Partition *partition, FileMap *map, off_t imageS
 	fSocket = new(nothrow) UDPSocket;
 	if (!fSocket)
 		return B_NO_MEMORY;
-	
+
 	status_t error = fSocket->Bind(INADDR_ANY, 6666);
 	if (error != B_OK)
 		return error;
@@ -112,7 +113,7 @@ FileMapDisk::GetName(char *nameBuffer, size_t bufferSize) const
 
 	snprintf(nameBuffer, bufferSize, prefix);
 	if (bufferSize > strlen(prefix) && fNode)
-		return fNode->GetName(nameBuffer + strlen(prefix), 
+		return fNode->GetName(nameBuffer + strlen(prefix),
 			bufferSize - strlen(prefix));
 
 	return B_OK;
@@ -174,6 +175,7 @@ status_t
 FileMapDisk::RegisterFileMapBootItem()
 {
 	return B_ERROR;
+#if 0
 	struct file_map_boot_item *item;
 	item = (struct file_map_boot_item *)malloc(sizeof(struct file_map_boot_item));
 	item->num_runs = FMAP_MAX_RUNS;
@@ -184,6 +186,5 @@ FileMapDisk::RegisterFileMapBootItem()
 //	err = add_boot_item("file_map_disk", item, sizeof(struct file_map_boot_item));
 	err = B_ERROR;
 	return err;
+#endif
 }
-
-
