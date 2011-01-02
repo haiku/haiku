@@ -64,10 +64,12 @@ static void
 apply_boot_settings(void* kernelSettings, void* safemodeSettings)
 {
 #if B_HAIKU_PHYSICAL_BITS > 32
-	if (get_driver_boolean_parameter(kernelSettings, "4gb_memory_limit", false,
-			false)
-		|| get_driver_boolean_parameter(safemodeSettings,
-			B_SAFEMODE_4_GB_MEMORY_LIMIT, false, false)) {
+	if ((kernelSettings != NULL
+			&& get_driver_boolean_parameter(kernelSettings, "4gb_memory_limit",
+				false, false))
+		|| (safemodeSettings != NULL
+			&& get_driver_boolean_parameter(safemodeSettings,
+				B_SAFEMODE_4_GB_MEMORY_LIMIT, false, false))) {
 		ignore_physical_memory_ranges_beyond_4gb();
 	}
 #endif
