@@ -701,68 +701,6 @@ private:
 };
 
 
-// #pragma mark - State
-
-
-struct DefaultWindowBehaviour::HumdingerResizeState : State {
-	HumdingerResizeState(DefaultWindowBehaviour& behavior, BPoint where)
-		:
-		State(behavior),
-		fInitialMousePosition(where),
-		fJitterPhase(true)
-	{
-	}
-
-	virtual void EnterState(State* previousState)
-	{
-		fDesktop->SetManagementCursor(
-			fDesktop->GetCursorManager().GetCursor(B_CURSOR_ID_MOVE));
-	}
-
-	virtual void ExitState(State* nextState)
-	{
-		fBehavior._ResetResizeCursor();
-	}
-
-	virtual void MouseUp(BMessage* message, BPoint where)
-	{
-		// Leave the state, when the middle mouse button has been released.
-		int32 buttons = message->FindInt32("buttons");
-		if ((buttons & B_TERTIARY_MOUSE_BUTTON) == 0)
-			fBehavior._NextState(NULL);
-	}
-
-	virtual void MouseMoved(BMessage* message, BPoint where, bool isFake)
-	{
-		// ignore the initial movement
-		float dx = where.x - fInitialMousePosition.x;
-		float dy = where.y - fInitialMousePosition.y;
-		if (dx * dx + dy * dy < (fJitterPhase ? 16 : 64))
-			return;
-
-		// Enter the next phase, if we're still in the first one.
-		if (fJitterPhase) {
-			fInitialMousePosition = where;
-			fJitterPhase = false;
-			return;
-		}
-
-		// The mouse has moved far enough for us to take a guess in which
-		// direction.
-		int8 horizontal;
-		int8 vertical;
-		_ComputeResizeDirection(dx, dy, horizontal, vertical);
-
-		fBehavior._NextState(new (std::nothrow) ResizeBorderState(fBehavior,
-			where, horizontal, vertical));
-	}
-
-private:
-	BPoint	fInitialMousePosition;
-	bool	fJitterPhase;
-};
-
-
 // #pragma mark - DefaultWindowBehaviour
 
 
@@ -901,12 +839,6 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where,
 				default:
 					break;
 			}
-		} else if ((buttons & B_TERTIARY_MOUSE_BUTTON) != 0) {
-			// Middle-click anywhere on the window shall initiate
-			// humdinger-resize mode.
-			if (windowModifier && hitRegion != Decorator::REGION_NONE
-				&& (flags & B_NOT_RESIZABLE) == 0)
-				action = ACTION_HUMDINGER_RESIZE;
 		}
 	}
 
@@ -974,11 +906,6 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where,
 			_NextState(new (std::nothrow) ResizeBorderState(*this, where,
 				hitRegion));
 			STRACE_CLICK(("===> ACTION_RESIZE_BORDER\n"));
-			break;
-
-		case ACTION_HUMDINGER_RESIZE:
-			_NextState(new (std::nothrow) HumdingerResizeState(*this, where));
-			STRACE_CLICK(("===> ACTION_HUMDINGER_RESIZE\n"));
 			break;
 
 		default:

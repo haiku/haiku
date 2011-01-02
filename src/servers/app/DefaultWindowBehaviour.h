@@ -49,8 +49,7 @@ private:
 				ACTION_DRAG,
 				ACTION_SLIDE_TAB,
 				ACTION_RESIZE,
-				ACTION_RESIZE_BORDER,
-				ACTION_HUMDINGER_RESIZE
+				ACTION_RESIZE_BORDER
 			};
 
 			enum {
@@ -72,7 +71,6 @@ private:
 			struct ResizeBorderState;
 			struct DecoratorButtonState;
 			struct ManageWindowState;
-			struct HumdingerResizeState;
 
 			// to keep gcc 2 happy
 			friend struct State;
@@ -83,7 +81,6 @@ private:
 			friend struct ResizeBorderState;
 			friend struct DecoratorButtonState;
 			friend struct ManageWindowState;
-			friend struct HumdingerResizeState;
 
 private:
 			bool				_IsWindowModifier(int32 modifiers) const;
