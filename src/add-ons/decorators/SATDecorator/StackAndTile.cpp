@@ -92,7 +92,7 @@ StackAndTile::WindowAdded(Window* window)
 	if (!satWindow)
 		return;
 
-	ASSERT(fSATWindowMap.find(window) == fSATWindowMap.end());
+	ASSERT(fSATWindowMap.find(window) != fSATWindowMap.end());
 	fSATWindowMap[window] = satWindow;
 }
 

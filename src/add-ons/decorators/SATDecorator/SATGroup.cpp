@@ -994,12 +994,8 @@ SATGroup::_SplitGroupIfNecessary(WindowArea* removedArea)
 	bool ownGroupProcessed = false;
 	WindowAreaList newGroup;
 	while (_FindConnectedGroup(neighbourWindows, removedArea, newGroup)) {
-		STRACE_SAT("Connected group found; %i windows:\n",
+		STRACE_SAT("Connected group found; %i window(s)\n",
 			(int)newGroup.CountItems());
-		for (int i = 0; i < newGroup.CountItems(); i++) {
-			STRACE_SAT("\t%s\n", newGroup.ItemAt(i)->WindowList().ItemAt(0)
-				->GetWindow()->Title());
-		}
 
 		if (newGroup.CountItems() == 1
 			&& newGroup.ItemAt(0)->WindowList().CountItems() == 1) {
