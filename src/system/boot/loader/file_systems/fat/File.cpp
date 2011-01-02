@@ -41,7 +41,7 @@ File::~File()
 status_t
 File::InitCheck()
 {
-	if (!fStream.InitCheck() < B_OK)
+	if (fStream.InitCheck() != B_OK)
 		return fStream.InitCheck();
 
 	return B_OK;
