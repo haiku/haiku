@@ -7,6 +7,7 @@
 
 #include "load_driver_settings.h"
 
+#include <errno.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -29,7 +30,8 @@ load_driver_settings_file(Directory* directory, const char* name)
 		return fd;
 
 	struct stat stat;
-	fstat(fd, &stat);
+	if (fstat(fd, &stat) < 0)
+		return errno;
 
 	char* buffer = (char*)kernel_args_malloc(stat.st_size + 1);
 	if (buffer == NULL)
