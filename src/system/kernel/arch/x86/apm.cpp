@@ -107,14 +107,14 @@ call_apm_bios(bios_regs *regs)
 		  "=S" (regs->esi), "=m" (regs->flags)
 		: "a" (regs->eax), "b" (regs->ebx), "c" (regs->ecx)
 		: "memory", "edi", "cc");
-#else
-	return B_ERROR;
-#endif
 
 	if (regs->flags & CARRY_FLAG)
 		return B_ERROR;
 
 	return B_OK;
+#else
+	return B_ERROR;
+#endif
 }
 
 
