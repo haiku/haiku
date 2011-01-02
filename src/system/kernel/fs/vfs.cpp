@@ -6227,7 +6227,7 @@ common_rename(int fd, char* path, int newFD, char* newPath, bool kernel)
 		goto err2;
 	}
 
-	if (fromName[0] == '\0' || toName == '\0'
+	if (fromName[0] == '\0' || toName[0] == '\0'
 		|| !strcmp(fromName, ".") || !strcmp(fromName, "..")
 		|| !strcmp(toName, ".") || !strcmp(toName, "..")
 		|| (fromVnode == toVnode && !strcmp(fromName, toName))) {
