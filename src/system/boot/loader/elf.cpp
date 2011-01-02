@@ -13,6 +13,7 @@
 #include <elf32.h>
 #include <kernel.h>
 
+#include <errno.h>
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
@@ -422,7 +423,8 @@ elf_load_image(Directory *directory, const char *path)
 	// check if this file has already been loaded
 
 	struct stat stat;
-	fstat(fd, &stat);
+	if (fstat(fd, &stat) < 0)
+		return errno;
 
 	image = gKernelArgs.preloaded_images;
 	for (; image != NULL; image = image->next) {
