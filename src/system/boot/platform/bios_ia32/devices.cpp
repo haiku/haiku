@@ -541,7 +541,8 @@ add_block_devices(NodeList *devicesList, bool identifierMissing)
 
 BIOSDrive::BIOSDrive(uint8 driveID)
 	:
-	fDriveID(driveID)
+	fDriveID(driveID),
+	fSize(0)
 {
 	TRACE(("drive ID %u\n", driveID));
 
