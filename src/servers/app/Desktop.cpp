@@ -189,6 +189,8 @@ KeyboardFilter::Filter(BMessage* message, EventTarget** _target,
 			return B_SKIP_MESSAGE;
 		}
 
+		bool takeWindow = (modifiers & B_SHIFT_KEY) != 0
+			|| fDesktop->MouseEventWindow() != NULL;
 		if (key >= B_F1_KEY && key <= B_F12_KEY) {
 			// workspace change
 
@@ -201,8 +203,6 @@ KeyboardFilter::Filter(BMessage* message, EventTarget** _target,
 			{
 				STRACE(("Set Workspace %ld\n", key - 1));
 
-				bool takeWindow = (modifiers & B_SHIFT_KEY) != 0
-					|| fDesktop->MouseEventWindow() != NULL;
 				fDesktop->SetWorkspaceAsync(key - B_F1_KEY, takeWindow);
 				return B_SKIP_MESSAGE;
 			}
@@ -210,7 +210,7 @@ KeyboardFilter::Filter(BMessage* message, EventTarget** _target,
 			&& (modifiers & (B_COMMAND_KEY | B_CONTROL_KEY | B_OPTION_KEY))
 					== B_COMMAND_KEY) {
 			// switch to previous workspace (command + `)
-			fDesktop->SetWorkspaceAsync(-1, (modifiers & B_SHIFT_KEY) != 0);
+			fDesktop->SetWorkspaceAsync(-1, takeWindow);
 			return B_SKIP_MESSAGE;
 		}
 	}
