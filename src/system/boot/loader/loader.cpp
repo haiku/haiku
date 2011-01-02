@@ -134,6 +134,10 @@ load_module(Directory *volume, const char *name)
 			continue;
 
 		Directory *base = (Directory *)get_node_from(baseFD);
+		if (base == NULL) {
+			close(baseFD);
+			continue;
+		}
 
 		while (true) {
 			int fd = open_from(base, moduleName, O_RDONLY);
