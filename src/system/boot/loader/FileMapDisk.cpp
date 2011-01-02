@@ -26,6 +26,8 @@
 
 // constructor
 FileMapDisk::FileMapDisk()
+	:
+	fNode(NULL)
 {
 }
 
