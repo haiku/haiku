@@ -548,7 +548,7 @@ detect_cpu(int currentCPU)
 		dprintf("CPU %d: vendor '%s' model name '%s'\n",
 			currentCPU, cpu->arch.vendor_name, cpu->arch.model_name);
 	} else {
-		strcpy(cpu->arch.model_name, "unknown");
+		strlcpy(cpu->arch.model_name, "unknown", sizeof(cpu->arch.model_name));
 	}
 
 	// load feature bits
