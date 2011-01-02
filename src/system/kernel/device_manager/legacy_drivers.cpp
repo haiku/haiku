@@ -42,7 +42,7 @@
 #define DRIVER_HASH_SIZE 16
 
 
-namespace LegacyDrivers {
+namespace {
 
 struct legacy_driver;
 
@@ -218,9 +218,7 @@ public:
 };
 
 
-}	// namespace LegacyDrivers
-
-using namespace LegacyDrivers;
+}	// unnamed namespace
 
 
 static status_t unload_driver(legacy_driver *driver);
