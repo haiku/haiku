@@ -461,10 +461,10 @@ vesa_init(vbe_info_block *info, video_mode **_standardMode)
 				   modeInfo.num_banks));
 			TRACE(("	mask: r: %d %d g: %d %d b: %d %d dcmi: %d\n",
 				   modeInfo.red_mask_size, modeInfo.red_field_position,
-				   modeInfo.green_mask_size, modeInfo.green_field_position, 
+				   modeInfo.green_mask_size, modeInfo.green_field_position,
 				   modeInfo.blue_mask_size, modeInfo.blue_field_position,
 				   modeInfo.direct_color_mode_info));
-			
+
 			const uint32 requiredAttributes = MODE_ATTR_AVAILABLE
 				| MODE_ATTR_GRAPHICS_MODE | MODE_ATTR_COLOR_MODE
 				| MODE_ATTR_LINEAR_BUFFER;
@@ -808,8 +808,9 @@ platform_switch_to_logo(void)
 		gKernelArgs.frame_buffer.height = modeInfo.height;
 		gKernelArgs.frame_buffer.bytes_per_row = modeInfo.bytes_per_row;
 		gKernelArgs.frame_buffer.depth = modeInfo.bits_per_pixel;
-		gKernelArgs.frame_buffer.physical_buffer.size = modeInfo.bytes_per_row
-			* gKernelArgs.frame_buffer.height;
+		gKernelArgs.frame_buffer.physical_buffer.size
+			= (phys_size_t)modeInfo.bytes_per_row
+				* (phys_size_t)gKernelArgs.frame_buffer.height;
 		gKernelArgs.frame_buffer.physical_buffer.start = modeInfo.physical_base;
 	} else {
 fallback:
@@ -821,8 +822,8 @@ fallback:
 		gKernelArgs.frame_buffer.bytes_per_row = 80;
 		gKernelArgs.frame_buffer.depth = 4;
 		gKernelArgs.frame_buffer.physical_buffer.size
-			= gKernelArgs.frame_buffer.width
-			* gKernelArgs.frame_buffer.height / 2;
+			= (phys_size_t)gKernelArgs.frame_buffer.width
+				* (phys_size_t)gKernelArgs.frame_buffer.height / 2;
 		gKernelArgs.frame_buffer.physical_buffer.start = 0xa0000;
 	}
 
