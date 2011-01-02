@@ -663,8 +663,8 @@ video_mode_menu()
 	video_mode *mode = NULL;
 	while ((mode = (video_mode *)list_get_next_item(&sModeList, mode)) != NULL) {
 		char label[64];
-		sprintf(label, "%ux%u %u bit", mode->width, mode->height,
-			mode->bits_per_pixel);
+		snprintf(label, sizeof(label), "%ux%u %u bit", mode->width,
+			mode->height, mode->bits_per_pixel);
 
 		menu->AddItem(item = new(nothrow) MenuItem(label));
 		item->SetData(mode);
