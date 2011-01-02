@@ -137,7 +137,8 @@ extern status_t		_kern_wait_for_team(team_id team, status_t *_returnCode);
 extern thread_id	_kern_wait_for_child(thread_id child, uint32 flags,
 						int32 *_reason, status_t *_returnCode);
 extern status_t		_kern_exec(const char *path, const char* const* flatArgs,
-						size_t flatArgsSize, int32 argCount, int32 envCount);
+						size_t flatArgsSize, int32 argCount, int32 envCount,
+						mode_t umask);
 extern thread_id	_kern_fork(void);
 extern pid_t		_kern_process_info(pid_t process, int32 which);
 extern pid_t		_kern_setpgid(pid_t process, pid_t group);

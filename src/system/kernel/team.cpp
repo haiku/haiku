@@ -72,6 +72,7 @@ struct team_arg {
 	size_t	flat_args_size;
 	uint32	arg_count;
 	uint32	env_count;
+	mode_t	umask;
 	port_id	error_port;
 	uint32	error_token;
 };
@@ -975,8 +976,8 @@ free_team_arg(struct team_arg* teamArg)
 
 static status_t
 create_team_arg(struct team_arg** _teamArg, const char* path, char** flatArgs,
-	size_t flatArgsSize, int32 argCount, int32 envCount, port_id port,
-	uint32 token)
+	size_t flatArgsSize, int32 argCount, int32 envCount, mode_t umask,
+	port_id port, uint32 token)
 {
 	struct team_arg* teamArg = (struct team_arg*)malloc(sizeof(team_arg));
 	if (teamArg == NULL)
@@ -994,6 +995,7 @@ create_team_arg(struct team_arg** _teamArg, const char* path, char** flatArgs,
 	teamArg->flat_args_size = flatArgsSize;
 	teamArg->arg_count = argCount;
 	teamArg->env_count = envCount;
+	teamArg->umask = umask;
 	teamArg->error_port = port;
 	teamArg->error_token = token;
 
@@ -1091,6 +1093,7 @@ team_create_thread_start(void* args)
 				sizeof(port_id)) < B_OK
 		|| user_memcpy(&programArgs->error_token, &teamArgs->error_token,
 				sizeof(uint32)) < B_OK
+		|| user_memcpy(&programArgs->umask, &teamArgs->umask, sizeof(mode_t)) < B_OK
 		|| user_memcpy(userArgs, teamArgs->flat_args,
 				teamArgs->flat_args_size) < B_OK) {
 		// the team deletion process will clean this mess
@@ -1219,7 +1222,7 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 	update_set_id_user_and_group(team, path);
 
 	status = create_team_arg(&teamArgs, path, flatArgs, flatArgsSize, argCount,
-		envCount, errorPort, errorToken);
+		envCount, (mode_t)-1, errorPort, errorToken);
 	if (status != B_OK)
 		goto err1;
 
@@ -1348,7 +1351,7 @@ err0:
 */
 static status_t
 exec_team(const char* path, char**& _flatArgs, size_t flatArgsSize,
-	int32 argCount, int32 envCount)
+	int32 argCount, int32 envCount, mode_t umask)
 {
 	// NOTE: Since this function normally doesn't return, don't use automatic
 	// variables that need destruction in the function scope.
@@ -1402,7 +1405,7 @@ exec_team(const char* path, char**& _flatArgs, size_t flatArgsSize,
 		return status;
 
 	status = create_team_arg(&teamArgs, path, flatArgs, flatArgsSize, argCount,
-		envCount, -1, 0);
+		envCount, umask, -1, 0);
 	if (status != B_OK)
 		return status;
 
@@ -3288,7 +3291,7 @@ getsid(pid_t process)
 
 status_t
 _user_exec(const char* userPath, const char* const* userFlatArgs,
-	size_t flatArgsSize, int32 argCount, int32 envCount)
+	size_t flatArgsSize, int32 argCount, int32 envCount, mode_t umask)
 {
 	// NOTE: Since this function normally doesn't return, don't use automatic
 	// variables that need destruction in the function scope.
@@ -3305,7 +3308,7 @@ _user_exec(const char* userPath, const char* const* userFlatArgs,
 
 	if (error == B_OK) {
 		error = exec_team(path, flatArgs, _ALIGN(flatArgsSize), argCount,
-			envCount);
+			envCount, umask);
 			// this one only returns in case of error
 	}
 

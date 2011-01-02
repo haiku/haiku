@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <umask.h>
 #include <unistd.h>
 
 
@@ -103,7 +104,8 @@ do_exec(const char *path, char * const args[], char * const environment[],
 		environment, envCount, &flatArgs, &flatArgsSize);
 
 	if (status == B_OK) {
-		errno = _kern_exec(path, flatArgs, flatArgsSize, argCount, envCount);
+		errno = _kern_exec(path, flatArgs, flatArgsSize, argCount, envCount,
+			__gUmask);
 			// if this call returns, something definitely went wrong
 
 		free(flatArgs);

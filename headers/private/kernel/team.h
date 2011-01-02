@@ -76,7 +76,7 @@ status_t _user_kill_team(thread_id thread);
 thread_id _user_wait_for_child(thread_id child, uint32 flags, int32 *_reason,
 			status_t *_returnCode);
 status_t _user_exec(const char *path, const char* const* flatArgs,
-			size_t flatArgsSize, int32 argCount, int32 envCount);
+			size_t flatArgsSize, int32 argCount, int32 envCount, mode_t umask);
 thread_id _user_fork(void);
 team_id _user_get_current_team(void);
 pid_t _user_process_info(pid_t process, int32 which);

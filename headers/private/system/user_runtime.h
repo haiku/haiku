@@ -28,6 +28,7 @@ struct user_space_program_args {
 	int		env_count;
 	char	**args;
 	char	**env;
+	mode_t	umask;	// (mode_t)-1 means not set
 };
 
 #endif	/* KERNEL_USER_RUNTIME_H_ */
