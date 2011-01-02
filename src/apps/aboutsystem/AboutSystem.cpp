@@ -1051,6 +1051,7 @@ AboutView::_CreateCreditsView()
 		"Marius Middelthon\n"
 		"Marco Minutoli\n"
 		"Misza\n"
+		"Hamish Morrison\n"
 		"MrSiggler\n"
 		"Alan Murta\n"
 		"Raghuram Nagireddy\n"
