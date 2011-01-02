@@ -50,7 +50,8 @@ MenuItem::MenuItem(const char *label, Menu *subMenu)
 	fMenu(NULL),
 	fSubMenu(subMenu),
 	fData(NULL),
-	fHelpText(NULL)
+	fHelpText(NULL),
+	fShortcut(0)
 {
 	if (subMenu != NULL)
 		subMenu->fSuperItem = this;
