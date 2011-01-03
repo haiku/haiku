@@ -9,7 +9,7 @@
 #define USB_CDC_COMMUNICATION_INTERFACE_CLASS	0x02
 #define USB_CDC_CLASS_VERSION					0x0101
 
-enum { // Communication Interface Subclasses	
+enum { // Communication Interface Subclasses
 	USB_CDC_COMMUNICATION_INTERFACE_DLCM_SUBCLASS =	0x01,	// Direct Line Control Model
 	USB_CDC_COMMUNICATION_INTERFACE_ACM_SUBCLASS,			// Abstract Control Model
 	USB_CDC_COMMUNICATION_INTERFACE_TCM_SUBCLASS,			// Telephone Control Model
@@ -25,7 +25,60 @@ enum { // Communication Interface Class Control Protocols
 	USB_CDC_COMMUNICATION_INTERFACE_SPECIFIC_PROTOCOL = 0xff	// Vendor-specific protocol
 };
 
+
 #define USB_CDC_DATA_INTERFACE_CLASS			0x0a
+
+// Functional Descriptors (p32)
+
+enum { // Functional Descriptors Subtypes
+	USB_CDC_HEADER_FUNCTIONAL_DESCRIPTOR = 0x00,
+	USB_CDC_CM_FUNCTIONAL_DESCRIPTOR,
+	USB_CDC_ACM_FUNCTIONAL_DESCRIPTOR,
+	USB_CDC_UNION_FUNCTIONAL_DESCRIPTOR = 0x06
+};
+
+typedef struct usb_cdc_header_function_descriptor {
+	uint8	length;
+	uint8	descriptor_type;
+	uint8	descriptor_subtype;	// USB_CDC_HEADER_FUNCTIONAL_DESCRIPTOR
+	uint16	cdc_version;
+} _PACKED usb_cdc_header_function_descriptor;
+
+typedef struct usb_cdc_cm_functional_descriptor {
+	uint8	length;
+	uint8	descriptor_type;
+	uint8	descriptor_subtype;	// USB_CDC_CM_FUNCTIONAL_DESCRIPTOR
+	uint8	capabilities;
+	uint8	data_interface;
+} _PACKED usb_cdc_cm_functional_descriptor;
+
+enum { // Call Management Functional Descriptor capabilities bitmap
+	USB_CDC_CM_DOES_CALL_MANAGEMENT = 0x00,
+	USB_CDC_CM_OVER_DATA_INTERFACE	= 0x01
+};
+
+typedef struct usb_cdc_acm_functional_descriptor {
+	uint8	length;
+	uint8	descriptor_type;
+	uint8	descriptor_subtype;	// USB_CDC_ACM_FUNCTIONAL_DESCRIPTOR
+	uint8	capabilities;
+} _PACKED usb_cdc_acm_functional_descriptor;
+
+enum { // Abstract Control Model Functional Descriptor capabilities bitmap
+	USB_CDC_ACM_HAS_COMM_FEATURES 		= 0x00,
+	USB_CDC_ACM_HAS_LINE_CONTROL		= 0x01,
+	USB_CDC_ACM_HAS_SEND_BREAK			= 0x02,
+	USB_CDC_ACM_HAS_NETWORK_CONNECTION	= 0x04
+};
+
+typedef struct usb_cdc_union_functional_descriptor {
+	uint8	length;
+	uint8	descriptor_type;
+	uint8	descriptor_subtype;	// USB_CDC_UNION_FUNCTIONAL_DESCRIPTOR
+	uint8	master_interface;
+	uint8	slave_interfaces[1];
+} _PACKED usb_cdc_union_functional_descriptor;
+
 
 enum { // Management Element Requests (p62)
 	USB_CDC_SEND_ENCAPSULATED_COMMAND		= 0x00,
@@ -89,19 +142,19 @@ typedef struct {	// Line Coding Structure (for USB_CDC_SET/GET_LINE_CODING (p69)
 } _PACKED usb_cdc_line_coding;
 
 enum { // CDC stopbits values (for Line Coding Structure stopbits field)
-	USB_CDC_1_STOPBIT	= 0,
-	USB_CDC_1_5_STOPBITS,
-	USB_CDC_2_STOPBITS
+	USB_CDC_LINE_CODING_1_STOPBIT	= 0,
+	USB_CDC_LINE_CODING_1_5_STOPBITS,
+	USB_CDC_LINE_CODING_2_STOPBITS
 };
 
 enum { // CDC parity values (for Line Coding Structure parity field)
-	USB_CDC_NO_PARITY	= 0,
-	USB_CDC_ODD_PARITY,
-	USB_CDC_EVEN_PARITY,
-	USB_CDC_MARK_PARITY,
-	USB_CDC_SPACE_PARITY
+	USB_CDC_LINE_CODING_NO_PARITY	= 0,
+	USB_CDC_LINE_CODING_ODD_PARITY,
+	USB_CDC_LINE_CODING_EVEN_PARITY,
+	USB_CDC_LINE_CODING_MARK_PARITY,
+	USB_CDC_LINE_CODING_SPACE_PARITY
 };
-	
+
 enum { // CDC Control Signal bitmap (for CDC_SET_CONTROL_LINE_STATE request)
 	USB_CDC_CONTROL_SIGNAL_STATE_DTR		= 0x01,
 	USB_CDC_CONTROL_SIGNAL_STATE_RTS		= 0x02
@@ -126,7 +179,7 @@ enum { // CDC UART State bitmap (for USB_CDC_SERIAL_STATE notification)
 	USB_CDC_UART_STATE_DCD				= 0x01,
 	USB_CDC_UART_STATE_DSR				= 0x02,
 	USB_CDC_UART_STATE_BREAK			= 0x04,
-	USB_CDC_UART_STATE_RING				= 0x08,	
+	USB_CDC_UART_STATE_RING				= 0x08,
 	USB_CDC_UART_STATE_FRAMING_ERROR	= 0x10,
 	USB_CDC_UART_STATE_PARITY_ERROR		= 0x20,
 	USB_CDC_UART_STATE_OVERRUN_ERROR	= 0x40
