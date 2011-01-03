@@ -290,6 +290,43 @@ FontDemoView::MessageReceived(BMessage* msg)
 		{
 			if (msg->FindInt32("_mode", (int32 *)&fDrawingMode) == B_OK) {
 				Invalidate(/*&fBoxRegion*/);
+				switch (fDrawingMode) {
+					case B_OP_COPY:
+						printf("Drawing mode: B_OP_COPY\n");
+						break;
+					case B_OP_OVER:
+						printf("Drawing mode: B_OP_OVER\n");
+						break;
+					case B_OP_ERASE:
+						printf("Drawing mode: B_OP_ERASE\n");
+						break;
+					case B_OP_INVERT:
+						printf("Drawing mode: B_OP_INVERT\n");
+						break;
+					case B_OP_ADD:
+						printf("Drawing mode: B_OP_ADD\n");
+						break;
+					case B_OP_SUBTRACT:
+						printf("Drawing mode: B_OP_SUBTRACT\n");
+						break;
+					case B_OP_BLEND:
+						printf("Drawing mode: B_OP_BLEND\n");
+						break;
+ 					case B_OP_MIN:
+						printf("Drawing mode: B_OP_MIN\n");
+						break;
+					case B_OP_MAX:
+						printf("Drawing mode: B_OP_MAX\n");
+						break;
+					case B_OP_SELECT:
+						printf("Drawing mode: B_OP_SELECT\n");
+						break;
+					case B_OP_ALPHA:
+						printf("Drawing mode: B_OP_ALPHA\n");
+						break;
+					default:
+						printf("Drawing mode: %d\n", fDrawingMode);
+				}
 			}
 			break;
 		}

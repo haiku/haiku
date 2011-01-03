@@ -272,6 +272,10 @@ ControlView::MessageReceived(BMessage* msg)
 			BMessage msg(ALIASING_MSG);
 			msg.AddBool("_aliased", static_cast<bool>(fAliasingCheckBox->Value()));
 			fMessenger->SendMessage(&msg);
+			if (static_cast<bool>(fAliasingCheckBox->Value()) == true)
+				printf("Aliasing: true\n");
+			else
+				printf("Aliasing: false\n");
 			break;
 		}
 
@@ -280,6 +284,10 @@ ControlView::MessageReceived(BMessage* msg)
 			BMessage msg(BOUNDING_BOX_MSG);
 			msg.AddBool("_boundingbox", static_cast<bool>(fBoundingboxesCheckBox->Value()));
 			fMessenger->SendMessage(&msg);
+			if (static_cast<bool>(fBoundingboxesCheckBox->Value()))
+				printf("Bounding: true\n");
+			else
+				printf("Bounding: false\n");
 			break;
 		}
 
@@ -309,11 +317,13 @@ ControlView::MessageReceived(BMessage* msg)
 				delete fMessageRunner;
 				fMessageRunner = new BMessageRunner(this,
 					new BMessage(CYCLING_FONTS_UPDATE_MSG), 360000*2, -1);
+				printf("Cycle fonts enabled\n");
 			} else {
+				// Delete our MessageRunner and reset the style index
 				delete fMessageRunner;
 				fMessageRunner = NULL;
 				fFontStyleindex	= 0;
-				// Delete our MessageRunner and reset the style index
+				printf("Cycle fonts disabled\n");
 			}
 			break;
 		}
@@ -351,7 +361,7 @@ ControlView::MessageReceived(BMessage* msg)
 		 		if (newFontFamilyItem && newstyleitem) {
 		 			if (msg->AddString("_style", newstyleitem->Label()) != B_OK
 		 				|| msg->AddString("_family", newFontFamilyItem->Label()) != B_OK) {
-		 				printf("Failed to add _style or family to the message\n");
+		 				printf("Failed to add style or family to the message\n");
 		 				return;
 		 			}
 		 			printf("InstalledStyles(%ld), Font(%s), Style(%s)\n",
@@ -461,7 +471,17 @@ ControlView::_UpdateAndSendFamily(const BMessage* message)
 	font_style style;
 
 	if (message->FindString("_family", (const char **)&family) == B_OK) {
-		printf("Family:%s\n\n", family);
+		char* name;
+		type_code typeFound = 0;
+		int32 countFound = 0;
+		if (message->GetInfo(B_ANY_TYPE, 0, &name, &typeFound,
+				&countFound) == B_OK) {
+			if (typeFound == B_STRING_TYPE) {
+				BString string;
+				if (message->FindString(name, 0, &string) == B_OK)
+					printf("Family: %s\n", string.String());
+			}
+		}
 
 		BMenuItem* markedItem = fFontFamilyMenu->FindItem(family);
 		if (!markedItem)
@@ -512,6 +532,7 @@ ControlView::_UpdateAndSendStyle(const BMessage* message)
 				if (styleItem && !styleItem->IsMarked())
 					styleItem->SetMarked(true);
 			}
+			printf("Family: %s, Style: %s\n", family, style);
 		}
 
 		BString string;
