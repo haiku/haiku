@@ -307,7 +307,7 @@ TExpandoMenuBar::MouseDown(BPoint where)
 		message->FindInt32("modifiers", &modifiers);
 
 		if ((modifiers & B_COMMAND_KEY) != 0
-			&& (modifiers & B_OPTION_KEY) != 0
+			&& (modifiers & B_CONTROL_KEY) != 0
 			&& (modifiers & B_SHIFT_KEY) != 0) {
 			const BList* teams = item->Teams();
 			int32 teamCount = teams->CountItems();
