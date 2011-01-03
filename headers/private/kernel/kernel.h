@@ -9,16 +9,25 @@
 #define _KERNEL_KERNEL_H
 
 
+#include <config/types.h>
+
 #include <arch_kernel.h>
 #include <arch_config.h>
 
 
-/* Passed in buffers from user-space shouldn't point into the kernel */
-#define IS_USER_ADDRESS(x) \
-	((addr_t)(x) < KERNEL_BASE || (addr_t)(x) > KERNEL_TOP)
+// macro to check whether an address is in the kernel address space (avoid
+// always-true checks)
+#if KERNEL_BASE == 0
+#	define IS_KERNEL_ADDRESS(x)		((addr_t)(x) <= KERNEL_TOP)
+#elif KERNEL_TOP == __HAIKU_ADDR_MAX
+#	define IS_KERNEL_ADDRESS(x)		((addr_t)(x) >= KERNEL_BASE)
+#else
+#	define IS_KERNEL_ADDRESS(x) \
+		((addr_t)(x) >= KERNEL_BASE && (addr_t)(x) <= KERNEL_TOP)
+#endif
 
-#define IS_KERNEL_ADDRESS(x) \
-	((addr_t)(x) >= KERNEL_BASE && (addr_t)(x) <= KERNEL_TOP)
+// Buffers passed in from user-space shouldn't point into the kernel.
+#define IS_USER_ADDRESS(x)			(!IS_KERNEL_ADDRESS(x))
 
 #define DEBUG_KERNEL_STACKS
 	// Note, debugging kernel stacks doesn't really work yet. Since the
