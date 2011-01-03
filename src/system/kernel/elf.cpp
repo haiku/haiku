@@ -2405,7 +2405,7 @@ elf_add_memory_image_symbol(image_id id, const char* name, addr_t address,
 	// get the current string table size
 	size_t stringTableSize = 1;
 	if (image->num_debug_symbols > 0) {
-		for (uint32 i = image->num_debug_symbols - 1; i >= 0; i--) {
+		for (int32 i = image->num_debug_symbols - 1; i >= 0; i--) {
 			int32 nameIndex = image->debug_symbols[i].st_name;
 			if (nameIndex != 0) {
 				stringTableSize = nameIndex
