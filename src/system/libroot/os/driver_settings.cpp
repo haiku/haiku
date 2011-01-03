@@ -559,7 +559,7 @@ put_level_space(char **_buffer, size_t *_bufferSize, int32 level)
 }
 
 
-static bool
+static void
 put_parameter(char **_buffer, size_t *_bufferSize,
 	struct driver_parameter *parameter, int32 level, bool flat)
 {
@@ -594,8 +594,6 @@ put_parameter(char **_buffer, size_t *_bufferSize,
 			put_level_space(_buffer, _bufferSize, level);
 		put_chars(_buffer, _bufferSize, flat ? "}" : "}\n");
 	}
-
-	return *_bufferSize >= 0;
 }
 
 
