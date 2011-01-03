@@ -2524,7 +2524,7 @@ find_thread(const char *name)
 	while ((thread = (struct thread*)hash_next(sThreadHash, &iterator))
 			!= NULL) {
 		// Search through hash
-		if (thread->name != NULL && !strcmp(thread->name, name)) {
+		if (!strcmp(thread->name, name)) {
 			thread_id id = thread->id;
 
 			RELEASE_THREAD_LOCK();
