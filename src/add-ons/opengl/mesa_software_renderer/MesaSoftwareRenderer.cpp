@@ -418,7 +418,7 @@ void
 MesaSoftwareRenderer::SwapBuffers(bool VSync)
 {
 	CALLED();
-
+	
 	if (!fBitmap)
 		return;
 
@@ -430,8 +430,10 @@ MesaSoftwareRenderer::SwapBuffers(bool VSync)
 			GLView()->DrawBitmap(fBitmap, B_ORIGIN);
 			GLView()->UnlockLooper();
 		}
-	} else
+	} else {
+		// TODO: Here the BGLView needs to be drawlocked.		
 		_CopyToDirect();
+	}
 
 	if (VSync) {
 		BScreen screen(GLView()->Window());
@@ -773,6 +775,9 @@ MesaSoftwareRenderer::_Flush(GLcontext* ctx)
 	CALLED();
 	MesaSoftwareRenderer* mr = (MesaSoftwareRenderer*)ctx->DriverCtx;
 	if ((mr->fOptions & BGL_DOUBLE) == 0) {
+		// TODO: SwapBuffers() can call _CopyToDirect(), which should
+		// be always called with with the BGLView drawlocked.
+		// This is not always the case if called from here.
 		mr->SwapBuffers();
 	}
 }
