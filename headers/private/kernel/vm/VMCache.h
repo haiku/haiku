@@ -192,7 +192,7 @@ private:
 
 	inline	bool				_IsMergeable() const;
 
-			void				_MergeWithOnlyConsumer(bool consumerLocked);
+			void				_MergeWithOnlyConsumer();
 			void				_RemoveConsumer(VMCache* consumer);
 
 private:

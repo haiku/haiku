@@ -682,27 +682,28 @@ VMCache::Unlock(bool consumerLocked)
 	while (fRefCount == 1 && _IsMergeable()) {
 		VMCache* consumer = (VMCache*)list_get_first_item(&consumers);
 		if (consumerLocked) {
-			_MergeWithOnlyConsumer(true);
+			_MergeWithOnlyConsumer();
 		} else if (consumer->TryLock()) {
-			_MergeWithOnlyConsumer(false);
+			_MergeWithOnlyConsumer();
+			consumer->Unlock();
 		} else {
 			// Someone else has locked the consumer ATM. Unlock this cache and
 			// wait for the consumer lock. Increment the cache's ref count
 			// temporarily, so that no one else will try what we are doing or
 			// delete the cache.
 			fRefCount++;
-			bool consumerLocked = consumer->SwitchLock(&fLock);
+			bool consumerLockedTemp = consumer->SwitchLock(&fLock);
 			Lock();
 			fRefCount--;
 
-			if (consumerLocked) {
+			if (consumerLockedTemp) {
 				if (fRefCount == 1 && _IsMergeable()
 						&& consumer == list_get_first_item(&consumers)) {
-					_MergeWithOnlyConsumer(false);
-				} else {
-					// something changed, get rid of the consumer lock
-					consumer->Unlock();
+					// nothing has changed in the meantime -- merge
+					_MergeWithOnlyConsumer();
 				}
+
+				consumer->Unlock();
 			}
 		}
 	}
@@ -1359,10 +1360,10 @@ VMCache::_NotifyPageEvents(vm_page* page, uint32 events)
 
 /*!	Merges the given cache with its only consumer.
 	The caller must hold both the cache's and the consumer's lock. The method
-	will unlock the consumer lock.
+	does release neither lock.
 */
 void
-VMCache::_MergeWithOnlyConsumer(bool consumerLocked)
+VMCache::_MergeWithOnlyConsumer()
 {
 	VMCache* consumer = (VMCache*)list_remove_head_item(&consumers);
 
@@ -1392,9 +1393,6 @@ VMCache::_MergeWithOnlyConsumer(bool consumerLocked)
 	// Release the reference the cache's consumer owned. The consumer takes
 	// over the cache's ref to its source (if any) instead.
 	ReleaseRefLocked();
-
-	if (!consumerLocked)
-		consumer->Unlock();
 }
 
 
