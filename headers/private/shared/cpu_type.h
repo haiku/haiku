@@ -243,7 +243,6 @@ get_cpu_model_string(system_info *info)
 		case B_CPU_AMD_ATHLON_XP_MODEL_7:
 			return "Duron";
 		case B_CPU_AMD_ATHLON_64_MODEL_3:
-		case B_CPU_AMD_ATHLON_64_MODEL_4:
 		case B_CPU_AMD_ATHLON_64_MODEL_7:
 		case B_CPU_AMD_ATHLON_64_MODEL_8:
 		case B_CPU_AMD_ATHLON_64_MODEL_11:
@@ -255,6 +254,8 @@ get_cpu_model_string(system_info *info)
 			return "Opteron";
 		case B_CPU_AMD_PHENOM:
 			return "Phenom";
+		case B_CPU_AMD_PHENOM_II:
+			return "Phenom II";
 		case B_CPU_AMD_GEODE_LX:
 			return "Geode LX";
 
