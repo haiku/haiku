@@ -2246,17 +2246,18 @@ _user_kernel_debugger(const char *userMessage)
 void
 _user_debug_output(const char* userString)
 {
-	char string[512];
-	int32 length;
-
 	if (!sSerialDebugEnabled && !sSyslogOutputEnabled)
 		return;
 
 	if (!IS_USER_ADDRESS(userString))
 		return;
 
+	char string[512];
+	int32 length;
 	do {
 		length = user_strlcpy(string, userString, sizeof(string));
+		if (length <= 0)
+			break;
 		debug_puts(string, length);
 		userString += sizeof(string) - 1;
 	} while (length >= (ssize_t)sizeof(string));
