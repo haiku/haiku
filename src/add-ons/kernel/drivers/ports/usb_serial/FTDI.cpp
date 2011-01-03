@@ -28,8 +28,8 @@ FTDIDevice::AddDevice(const usb_configuration_info *config)
 		usb_interface_info *interface = config->interface[0].active;
 		for (size_t i = 0; i < interface->endpoint_count; i++) {
 			usb_endpoint_info *endpoint = &interface->endpoint[i];
-			if (endpoint->descr->attributes == USB_EP_ATTR_BULK) {
-				if (endpoint->descr->endpoint_address & USB_EP_ADDR_DIR_IN) {
+			if (endpoint->descr->attributes == USB_ENDPOINT_ATTR_BULK) {
+				if (endpoint->descr->endpoint_address & USB_ENDPOINT_ADDR_DIR_IN) {
 					SetReadPipe(endpoint->handle);
 					if (++pipesSet >= 3)
 						break;
@@ -77,7 +77,7 @@ FTDIDevice::ResetDevice()
 
 
 status_t
-FTDIDevice::SetLineCoding(usb_serial_line_coding *lineCoding)
+FTDIDevice::SetLineCoding(usb_cdc_line_coding *lineCoding)
 {
 	TRACE_FUNCALLS("> FTDIDevice::SetLineCoding(0x%08x, {%d, 0x%02x, 0x%02x, 0x%02x})\n",
 		this, lineCoding->speed, lineCoding->stopbits, lineCoding->parity,
@@ -137,8 +137,8 @@ FTDIDevice::SetLineCoding(usb_serial_line_coding *lineCoding)
 
 	int32 data = 0;
 	switch (lineCoding->stopbits) {
-		case LC_STOP_BIT_2: data = FTDI_SIO_SET_DATA_STOP_BITS_2; break;
-		case LC_STOP_BIT_1: data = FTDI_SIO_SET_DATA_STOP_BITS_1; break;
+		case USB_CDC_LINE_CODING_1_STOPBIT: data = FTDI_SIO_SET_DATA_STOP_BITS_2; break;
+		case USB_CDC_LINE_CODING_2_STOPBITS: data = FTDI_SIO_SET_DATA_STOP_BITS_1; break;
 		default:
 			TRACE_ALWAYS("= FTDIDevice::SetLineCoding(): Wrong stopbits param: %d\n",
 				lineCoding->stopbits);
@@ -146,9 +146,9 @@ FTDIDevice::SetLineCoding(usb_serial_line_coding *lineCoding)
 	}
 
 	switch (lineCoding->parity) {
-		case LC_PARITY_NONE: data |= FTDI_SIO_SET_DATA_PARITY_NONE; break;
-		case LC_PARITY_EVEN: data |= FTDI_SIO_SET_DATA_PARITY_EVEN; break;
-		case LC_PARITY_ODD:	data |= FTDI_SIO_SET_DATA_PARITY_ODD; break;
+		case USB_CDC_LINE_CODING_NO_PARITY: data |= FTDI_SIO_SET_DATA_PARITY_NONE; break;
+		case USB_CDC_LINE_CODING_EVEN_PARITY: data |= FTDI_SIO_SET_DATA_PARITY_EVEN; break;
+		case USB_CDC_LINE_CODING_ODD_PARITY:	data |= FTDI_SIO_SET_DATA_PARITY_ODD; break;
 		default:
 			TRACE_ALWAYS("= FTDIDevice::SetLineCoding(): Wrong parity param: %d\n",
 				lineCoding->parity);
@@ -183,7 +183,8 @@ FTDIDevice::SetControlLineState(uint16 state)
 	TRACE_FUNCALLS("> FTDIDevice::SetControlLineState(0x%08x, 0x%04x)\n", this, state);
 
 	int32 control;
-	control = (state & CLS_LINE_RTS) ? FTDI_SIO_SET_RTS_HIGH : FTDI_SIO_SET_RTS_LOW;
+	control = (state & USB_CDC_CONTROL_SIGNAL_STATE_RTS) ? FTDI_SIO_SET_RTS_HIGH
+		: FTDI_SIO_SET_RTS_LOW;
 
 	size_t length = 0;
 	status_t status = gUSBModule->send_request(Device(),
@@ -194,7 +195,9 @@ FTDIDevice::SetControlLineState(uint16 state)
 	if (status != B_OK)
 		TRACE_ALWAYS("= FTDIDevice::SetControlLineState(): control set request failed: 0x%08x\n", status);
 
-	control = (state & CLS_LINE_DTR) ? FTDI_SIO_SET_DTR_HIGH : FTDI_SIO_SET_DTR_LOW;
+	control = (state & USB_CDC_CONTROL_SIGNAL_STATE_DTR) ? FTDI_SIO_SET_DTR_HIGH
+		: FTDI_SIO_SET_DTR_LOW;
+
 	status = gUSBModule->send_request(Device(),
 		USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
 		FTDI_SIO_MODEM_CTRL, control,

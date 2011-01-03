@@ -26,26 +26,22 @@ KLSIDevice::AddDevice(const usb_configuration_info *config)
 		usb_interface_info *interface = config->interface[0].active;
 		for (size_t i = 0; i < interface->endpoint_count; i++) {
 			usb_endpoint_info *endpoint = &interface->endpoint[i];
-			if (endpoint->descr->attributes == USB_EP_ATTR_INTERRUPT) {
-				if (endpoint->descr->endpoint_address & USB_EP_ADDR_DIR_IN) {
+			if (endpoint->descr->attributes == USB_ENDPOINT_ATTR_INTERRUPT) {
+				if (endpoint->descr->endpoint_address & USB_ENDPOINT_ADDR_DIR_IN) {
 					SetControlPipe(endpoint->handle);
 					SetInterruptBufferSize(endpoint->descr->max_packet_size);
-					if (++pipesSet >= 3)
-						break;
 				}
-			} else if (endpoint->descr->attributes == USB_EP_ATTR_BULK) {
-				if (endpoint->descr->endpoint_address & USB_EP_ADDR_DIR_IN) {
+			} else if (endpoint->descr->attributes == USB_ENDPOINT_ATTR_BULK) {
+				if (endpoint->descr->endpoint_address & USB_ENDPOINT_ADDR_DIR_IN) {
 					SetReadBufferSize(ROUNDUP(endpoint->descr->max_packet_size, 16));
 					SetReadPipe(endpoint->handle);
-					if (++pipesSet >= 3)
-						break;
 				} else {
 					SetWriteBufferSize(ROUNDUP(endpoint->descr->max_packet_size, 16));
 					SetWritePipe(endpoint->handle);
-					if (++pipesSet >= 3)
-						break;
 				}
 			}
+			if (++pipesSet >= 3)
+				break;
 		}
 	}
 
@@ -64,15 +60,15 @@ KLSIDevice::ResetDevice()
 
 	size_t length = 0;
 	status_t status;
-	usb_serial_line_coding linecoding = { 9600, 1, 0, 8 };
+	usb_cdc_line_coding lineCoding = { 9600, 1, 0, 8 };
 	uint8 linestate[2];
 
-	status = SetLineCoding(&linecoding);
+	status = SetLineCoding(&lineCoding);
 	status = gUSBModule->send_request(Device(),
 		USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
 		KLSI_CONF_REQUEST,
 		KLSI_CONF_REQUEST_READ_ON, 0, 0, NULL, &length);
-	TRACE("= KLSIDevice::ResetDevice(): set conf read_on returns: 0x%08x\n", 
+	TRACE("= KLSIDevice::ResetDevice(): set conf read_on returns: 0x%08x\n",
 		status);
 
 	linestate[0] = 0xff;
@@ -80,7 +76,7 @@ KLSIDevice::ResetDevice()
 	length = 0;
 	status = gUSBModule->send_request(Device(),
 		USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_IN,
-		KLSI_POLL_REQUEST, 
+		KLSI_POLL_REQUEST,
 		0, 0, 2, linestate, &length);
 
 	TRACE_FUNCRET("< KLSIDevice::ResetDevice() returns: 0x%08x\n", status);
@@ -89,7 +85,7 @@ KLSIDevice::ResetDevice()
 
 
 status_t
-KLSIDevice::SetLineCoding(usb_serial_line_coding *lineCoding)
+KLSIDevice::SetLineCoding(usb_cdc_line_coding *lineCoding)
 {
 	TRACE_FUNCALLS("> KLSIDevice::SetLineCoding(0x%08x, {%d, 0x%02x, 0x%02x, 0x%02x})\n",
 		this, lineCoding->speed, lineCoding->stopbits, lineCoding->parity,

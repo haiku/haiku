@@ -40,17 +40,23 @@ usb_serial_device_added(usb_device device, void **cookie)
 	SerialDevice *serialDevice = SerialDevice::MakeDevice(device,
 		descriptor->vendor_id, descriptor->product_id);
 
-	const usb_configuration_info *configuration
-		= gUSBModule->get_nth_configuration(device, 0);
+	const usb_configuration_info *configuration;
+	for (int i = 0; i < descriptor->num_configurations; i++) {
+		configuration = gUSBModule->get_nth_configuration(device, 0);
+		if (!configuration)
+			continue;
 
-	if (!configuration)
-		return B_ERROR;
+		status = serialDevice->AddDevice(configuration);
+		if (status == B_OK)
+			// Found!
+			break;
+	}
 
-	status = serialDevice->AddDevice(configuration);
 	if (status < B_OK) {
 		delete serialDevice;
 		return status;
 	}
+
 
 	acquire_sem(gDriverLock);
 	for (int32 i = 0; i < DEVICES_COUNT; i++) {

@@ -144,16 +144,17 @@ SerialDevice::SetModes(struct termios *tios)
 	if (baudIndex > baudCount)
 		baudIndex = baudCount - 1;
 
-	usb_serial_line_coding lineCoding;
+	usb_cdc_line_coding lineCoding;
 	lineCoding.speed = baudRates[baudIndex];
-	lineCoding.stopbits = (tios->c_cflag & CSTOPB) ? LC_STOP_BIT_2 : LC_STOP_BIT_1;
+	lineCoding.stopbits = (tios->c_cflag & CSTOPB)
+		? USB_CDC_LINE_CODING_2_STOPBITS : USB_CDC_LINE_CODING_1_STOPBIT;
 
 	if (tios->c_cflag & PARENB) {
-		lineCoding.parity = LC_PARITY_EVEN;
+		lineCoding.parity = USB_CDC_LINE_CODING_EVEN_PARITY;
 		if (tios->c_cflag & PARODD)
-			lineCoding.parity = LC_PARITY_ODD;
+			lineCoding.parity = USB_CDC_LINE_CODING_ODD_PARITY;
 	} else
-		lineCoding.parity = LC_PARITY_NONE;
+		lineCoding.parity = USB_CDC_LINE_CODING_NO_PARITY;
 
 	lineCoding.databits = (tios->c_cflag & CS8) ? 8 : 7;
 
@@ -163,7 +164,7 @@ SerialDevice::SetModes(struct termios *tios)
 		SetControlLineState(newControl);
 	}
 
-	if (memcmp(&lineCoding, &fLineCoding, sizeof(usb_serial_line_coding)) != 0) {
+	if (memcmp(&lineCoding, &fLineCoding, sizeof(usb_cdc_line_coding)) != 0) {
 		fLineCoding.speed = lineCoding.speed;
 		fLineCoding.stopbits = lineCoding.stopbits;
 		fLineCoding.databits = lineCoding.databits;
@@ -191,7 +192,8 @@ SerialDevice::Service(struct tty *tty, uint32 op, void *buffer, size_t length)
 			gTTYModule->tty_hardware_signal(fTTYCookie, TTYHWDCD, enable);
 			gTTYModule->tty_hardware_signal(fTTYCookie, TTYHWCTS, enable);
 
-			fControlOut = enable ? CLS_LINE_DTR | CLS_LINE_RTS : 0;
+			fControlOut = enable ? USB_CDC_CONTROL_SIGNAL_STATE_DTR
+				| USB_CDC_CONTROL_SIGNAL_STATE_RTS : 0;
 			SetControlLineState(fControlOut);
 			return true;
 		}
@@ -205,7 +207,8 @@ SerialDevice::Service(struct tty *tty, uint32 op, void *buffer, size_t length)
 		case TTYGETSIGNALS:
 			TRACE("TTYGETSIGNALS\n");
 			gTTYModule->tty_hardware_signal(fTTYCookie, TTYHWDCD,
-				(fControlOut & (CLS_LINE_DTR | CLS_LINE_RTS)) != 0);
+				(fControlOut & (USB_CDC_CONTROL_SIGNAL_STATE_DTR
+					| USB_CDC_CONTROL_SIGNAL_STATE_RTS)) != 0);
 			gTTYModule->tty_hardware_signal(fTTYCookie, TTYHWCTS, !fInputStopped);
 			gTTYModule->tty_hardware_signal(fTTYCookie, TTYHWDSR, false);
 			gTTYModule->tty_hardware_signal(fTTYCookie, TTYHWRI, false);
@@ -220,7 +223,8 @@ SerialDevice::Service(struct tty *tty, uint32 op, void *buffer, size_t length)
 		case TTYSETRTS:
 		{
 			bool set = *(bool *)buffer;
-			uint8 bit = TTYSETDTR ? CLS_LINE_DTR : CLS_LINE_RTS;
+			uint8 bit = TTYSETDTR ? USB_CDC_CONTROL_SIGNAL_STATE_DTR
+				: USB_CDC_CONTROL_SIGNAL_STATE_RTS;
 			if (set)
 				fControlOut |= bit;
 			else
@@ -283,7 +287,8 @@ SerialDevice::Open(uint32 flags)
 
 	resume_thread(fDeviceThread);
 
-	fControlOut = CLS_LINE_DTR | CLS_LINE_RTS;
+	fControlOut = USB_CDC_CONTROL_SIGNAL_STATE_DTR
+		| USB_CDC_CONTROL_SIGNAL_STATE_RTS;
 	SetControlLineState(fControlOut);
 
 	status_t status = gUSBModule->queue_interrupt(fControlPipe,
@@ -475,7 +480,7 @@ SerialDevice::ResetDevice()
 
 
 status_t
-SerialDevice::SetLineCoding(usb_serial_line_coding *coding)
+SerialDevice::SetLineCoding(usb_cdc_line_coding *coding)
 {
 	// default implementation - does nothing
 	return B_OK;

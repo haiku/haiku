@@ -64,7 +64,7 @@ virtual	status_t				AddDevice(const usb_configuration_info *config);
 
 virtual	status_t				ResetDevice();
 
-virtual	status_t				SetLineCoding(usb_serial_line_coding *coding);
+virtual	status_t				SetLineCoding(usb_cdc_line_coding *coding);
 virtual	status_t				SetControlLineState(uint16 state);
 
 virtual	void					OnRead(char **buffer, size_t *numBytes);
@@ -102,7 +102,7 @@ static	void					InterruptCallbackFunction(void *cookie,
 		usb_pipe				fWritePipe;
 
 		/* line coding */
-		usb_serial_line_coding	fLineCoding;
+		usb_cdc_line_coding		fLineCoding;
 
 		/* data buffers */
 		area_id					fBufferArea;

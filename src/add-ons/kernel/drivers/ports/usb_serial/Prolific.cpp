@@ -36,8 +36,8 @@ ProlificDevice::AddDevice(const usb_configuration_info *config)
 		usb_interface_info *interface = config->interface[0].active;
 		for (size_t i = 0; i < interface->endpoint_count; i++) {
 			usb_endpoint_info *endpoint = &interface->endpoint[i];
-			if (endpoint->descr->attributes == USB_EP_ATTR_INTERRUPT) {
-				if (endpoint->descr->endpoint_address & USB_EP_ADDR_DIR_IN) {
+			if (endpoint->descr->attributes == USB_ENDPOINT_ATTR_INTERRUPT) {
+				if (endpoint->descr->endpoint_address & USB_ENDPOINT_ADDR_DIR_IN) {
 					SetControlPipe(endpoint->handle);
 					pipesSet++;
 				}
@@ -50,16 +50,14 @@ ProlificDevice::AddDevice(const usb_configuration_info *config)
 
 		for (size_t i = 0; i < interface->endpoint_count; i++) {
 			usb_endpoint_info *endpoint = &interface->endpoint[i];
-			if (endpoint->descr->attributes == USB_EP_ATTR_BULK) {
-				if (endpoint->descr->endpoint_address & USB_EP_ADDR_DIR_IN) {
+			if (endpoint->descr->attributes == USB_ENDPOINT_ATTR_BULK) {
+				if (endpoint->descr->endpoint_address & USB_ENDPOINT_ADDR_DIR_IN)
 					SetReadPipe(endpoint->handle);
-					if (++pipesSet >= 3)
-						break;
-				} else {
+				else
 					SetWritePipe(endpoint->handle);
-					if (++pipesSet >= 3)
-						break;
-				}
+
+				if (++pipesSet >= 3)
+					break;
 			}
 		}
 
