@@ -33,7 +33,7 @@
 
 BootManagerWindow::BootManagerWindow()
 	:
-	BWindow(BRect(100, 100, 500, 400), B_TRANSLATE_COMMENT("Boot Manager",
+	BWindow(BRect(100, 100, 500, 400), B_TRANSLATE_COMMENT("BootManager",
 		"Window Title"),
 		B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE)

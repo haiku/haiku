@@ -1,7 +1,7 @@
 /*
- * Copyright 2008, Haiku, Inc. All rights reserved.
+ * Copyright 2008-2010, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
- * 
+ *
  * Authors:
  *		Michael Pfeiffer <laplace@users.sourceforge.net>
  */
@@ -13,21 +13,22 @@
 
 #include "BootManagerController.h"
 
+
 class WizardView;
 
-class BootManagerWindow : public BWindow
-{
+
+class BootManagerWindow : public BWindow {
 public:
-	BootManagerWindow();
-	virtual ~BootManagerWindow();
+								BootManagerWindow();
+	virtual						~BootManagerWindow();
 
-	virtual void MessageReceived(BMessage* message);
-	virtual bool QuitRequested();
-	
+	virtual	void				MessageReceived(BMessage* message);
+	virtual	bool				QuitRequested();
+
 private:
-
-	BootManagerController fController;	
-	WizardView* fWizardView;
+			BootManagerController fController;
+			WizardView*			fWizardView;
 };
+
 
 #endif	// BOOT_MANAGER_WINDOW_H

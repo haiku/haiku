@@ -1,11 +1,12 @@
 /*
- * Copyright 2008-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2008-2010, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Michael Pfeiffer <laplace@users.sourceforge.net>
  * 		Axel Dörfler <axeld@pinc-software.de>
  */
+
 
 #include "BootManagerWindow.h"
 
@@ -20,21 +21,21 @@
 #define B_TRANSLATE_CONTEXT "BootManager"
 
 
-static const char* kSignature = "application/x-vnd.Haiku-bootman";
+static const char* kSignature = "application/x-vnd.Haiku-BootManager";
 
 
 class BootManager : public BApplication {
 public:
-	BootManager();
+								BootManager();
 
-	virtual void ReadyToRun();
-
-	virtual void AboutRequested();
+	virtual void				ReadyToRun();
+	virtual void				AboutRequested();
 };
 
 
 BootManager::BootManager()
-	: BApplication(kSignature)
+	:
+	BApplication(kSignature)
 {
 }
 
@@ -42,7 +43,7 @@ BootManager::BootManager()
 void
 BootManager::ReadyToRun()
 {
-	BootManagerWindow * window = new BootManagerWindow();
+	BootManagerWindow* window = new BootManagerWindow();
 	window->Show();
 }
 
@@ -51,16 +52,15 @@ void
 BootManager::AboutRequested()
 {
 	BString aboutText;
-	const char* title = B_TRANSLATE_COMMENT("Haiku Boot Manager",
-		"About text title");
-	aboutText <<
-		title << "\n\n" <<
-		B_TRANSLATE("written by") << "\n"
-		"\tDavid Dengg\n"
-		"\tMichael Pfeiffer\n"
-		"\n" <<
-		B_TRANSLATE_COMMENT("Copyright %year, Haiku Inc.\n",
-		"Leave %year untranslated");
+	const char* title = B_TRANSLATE_COMMENT("BootManager", "Application name");
+	aboutText << title << "\n\n"
+		<< B_TRANSLATE("written by")
+		<< "\n"
+			"\tDavid Dengg\n"
+			"\tMichael Pfeiffer\n"
+			"\n"
+		<< B_TRANSLATE_COMMENT("Copyright %year, Haiku Inc.\n",
+			"Leave %year untranslated");
 	aboutText.ReplaceLast("%year", "2008-2010");
 	BAlert *alert = new BAlert("about",
 		aboutText.String(), B_TRANSLATE("OK"));
