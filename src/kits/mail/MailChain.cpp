@@ -89,7 +89,7 @@ BMailChain::Load(BMessage* settings)
 	if (fSettingsCount != fAddonsCount)
 		return B_MISMATCHED_VALUES;
 
-	for (int i = 0;i < fSettingsCount;i++) {
+	for (int i = 0;i < fSettingsCount; i++) {
 		BMessage* filter = new BMessage();
 		entry_ref* ref = new entry_ref();
 		char* addon_path;
