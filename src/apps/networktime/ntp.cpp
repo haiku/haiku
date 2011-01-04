@@ -93,28 +93,13 @@ enum ntp_modes {
 };
 
 
-const uint32 kUTCtoGMT = 12 * 60 * 60;
-
-
-uint32
-seconds_system_difference(void)
-{
-	const uint32 kYear2000 = 3155713200UL;
-		// that many seconds from year 1900 to 2000.
-
-	struct tm tm;
-	memset(&tm, 0, sizeof(struct tm));
-	tm.tm_mday = 1;
-	tm.tm_year = 100;
-
-	return kYear2000 - mktime(&tm);
-}
+const uint32 kSecondsBetween1900And1970 = 2208988800UL;
 
 
 uint32
 seconds_since_1900(void)
 {
-	return seconds_system_difference() + real_time_clock();
+	return kSecondsBetween1900And1970 + real_time_clock();
 }
 
 
@@ -207,7 +192,7 @@ ntp_update_time(const char *hostname, Monitor *monitor)
 		return B_BAD_VALUE;
 	}
 
-	time_t now = message.transmit_timestamp.Integer() - seconds_system_difference() + kUTCtoGMT;
+	time_t now = message.transmit_timestamp.Integer() - kSecondsBetween1900And1970;
 
 	if (monitor) {
 		char buffer[64];
