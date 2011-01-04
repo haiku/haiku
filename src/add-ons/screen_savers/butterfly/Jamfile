@@ -1,0 +1,9 @@
+SubDir HAIKU_TOP src add-ons screen_savers butterfly ;
+
+UsePrivateHeaders screen_saver ;
+	# For BuildScreenSaverDefaultSettingsView
+
+ScreenSaver Butterfly :
+	Butterfly.cpp : 
+	be screensaver $(TARGET_LIBSUPC++) ;
+
