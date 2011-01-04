@@ -1123,7 +1123,7 @@ BDate::EasterSunday(int32 year)
 /*static*/ BDate
 BDate::AscensionDay(int32 year)
 {
-	BDate date = AscensionDay(year);
+	BDate date = EasterSunday(year);
 	date.AddDays(39);
 	return date;
 }
@@ -1135,7 +1135,7 @@ BDate::AscensionDay(int32 year)
 /*static*/ BDate
 BDate::PentecostDay(int32 year)
 {
-	BDate date = AscensionDay(year);
+	BDate date = EasterSunday(year);
 	date.AddDays(49);
 	return date;
 }
