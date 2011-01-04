@@ -11,6 +11,7 @@
 
 #include <Application.h>
 #include <Catalog.h>
+#include <LayoutBuilder.h>
 #include <Roster.h>
 #include <Screen.h>
 
@@ -29,16 +30,16 @@
 BootManagerWindow::BootManagerWindow()
 	:
 	BWindow(BRect(100, 100, 500, 400), B_TRANSLATE_COMMENT("BootManager",
-		"Window Title"),
-		B_TITLED_WINDOW,
-		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE)
+			"Window Title"), B_TITLED_WINDOW,
+		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	float minWidth, maxWidth, minHeight, maxHeight;
 	GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
 	SetSizeLimits(250, maxWidth, 250, maxHeight);
 
-	fWizardView = new WizardView(Bounds(), "wizard", B_FOLLOW_ALL);
-	AddChild(fWizardView);
+	fWizardView = new WizardView("wizard");
+	BLayoutBuilder::Group<>(this)
+		.Add(fWizardView);
 
 	fController.Initialize(fWizardView);
 

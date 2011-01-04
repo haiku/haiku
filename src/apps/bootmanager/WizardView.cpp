@@ -1,16 +1,19 @@
 /*
- * Copyright 2008-2010, Haiku, Inc. All rights reserved.
+ * Copyright 2008-2011, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Michael Pfeiffer <laplace@users.sourceforge.net>
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 
 
 #include "WizardView.h"
 
-#include <Box.h>
+#include <LayoutBuilder.h>
+#include <Button.h>
 #include <Catalog.h>
+#include <SeparatorView.h>
 
 #include "WizardPageView.h"
 
@@ -19,16 +22,9 @@
 #define B_TRANSLATE_CONTEXT "WizardView"
 
 
-static const float kSeparatorHeight = 2;
-static const float kSeparatorDistance = 5;
-static const float kBorderWidth = 10;
-static const float kBorderHeight = 5;
-
-
-WizardView::WizardView(BRect frame, const char* name, uint32 resizingMode)
+WizardView::WizardView(const char* name)
 	:
-	BView(frame, name, resizingMode, 0),
-	fSeparator(NULL),
+	BGroupView(name, B_VERTICAL),
 	fPrevious(NULL),
 	fNext(NULL),
 	fPage(NULL)
@@ -43,17 +39,6 @@ WizardView::~WizardView()
 }
 
 
-BRect
-WizardView::PageFrame()
-{
-	float left = kBorderWidth;
-	float right = Bounds().right - kBorderWidth;
-	float top = kBorderHeight;
-	float bottom = fSeparator->Frame().top - kSeparatorDistance - 1;
-	return BRect(left, top, right, bottom);
-}
-
-
 void
 WizardView::SetPage(WizardPageView* page)
 {
@@ -61,7 +46,7 @@ WizardView::SetPage(WizardPageView* page)
 		return;
 
 	if (fPage != NULL) {
-		RemoveChild(fPage);
+		fPageContainer->RemoveChild(fPage);
 		delete fPage;
 	}
 
@@ -69,10 +54,7 @@ WizardView::SetPage(WizardPageView* page)
 	if (page == NULL)
 		return;
 
-	BRect frame = PageFrame();
-	page->MoveTo(frame.left, frame.top);
-	page->ResizeTo(frame.Width()+1, frame.Height()+1);
-	AddChild(page);
+	fPageContainer->AddChild(page);
 }
 
 
@@ -102,19 +84,13 @@ void
 WizardView::SetPreviousButtonLabel(const char* text)
 {
 	fPrevious->SetLabel(text);
-	fPrevious->ResizeToPreferred();
 }
 
 
 void
 WizardView::SetNextButtonLabel(const char* text)
 {
-	BRect frame = fNext->Frame();
 	fNext->SetLabel(text);
-	fNext->ResizeToPreferred();
-	BRect newFrame = fNext->Frame();
-	fNext->MoveBy(frame.Width() - newFrame.Width(),
-		frame.Height() - newFrame.Height());
 }
 
 
@@ -134,39 +110,24 @@ WizardView::SetPreviousButtonHidden(bool hide)
 void
 WizardView::_BuildUI()
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
-	float width = Bounds().Width();
-	float height = Bounds().Height();
-
-	fSeparator = new BBox(BRect(kBorderWidth, 0,
-		width - 1 - kBorderWidth, kSeparatorHeight - 1),
-		"separator",
-		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM);
-	AddChild(fSeparator);
-
-	fPrevious = new BButton(BRect(0, 0, 100, 20), "previous",
+	fPageContainer = new BGroupView("page container");
+	fPageContainer->GroupLayout()->SetInsets(B_USE_DEFAULT_SPACING,
+		B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING);
+	fPrevious = new BButton("previous",
 		B_TRANSLATE_COMMENT("Previous", "Button"),
-		new BMessage(kMessagePrevious),
-		B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
-	AddChild(fPrevious);
-	fPrevious->ResizeToPreferred();
+		new BMessage(kMessagePrevious));
+	fNext = new BButton("next", B_TRANSLATE_COMMENT("Next", "Button"),
+		new BMessage(kMessageNext));
 
-	fNext = new BButton(BRect(0, 0, 100, 20), "next",
-		B_TRANSLATE_COMMENT("Next", "Button"),
-		new BMessage(kMessageNext),
-		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-	AddChild(fNext);
-	fNext->ResizeToPreferred();
-
-	// layout views
-	float buttonHeight = fPrevious->Bounds().Height();
-	float buttonTop = height - 1 - buttonHeight - kBorderHeight;
-	fPrevious->MoveTo(kBorderWidth, buttonTop);
-
-	fSeparator->MoveTo(kBorderWidth,
-		buttonTop - kSeparatorDistance - kSeparatorHeight);
-
-	fNext->MoveTo(width - fNext->Bounds().Width() - kBorderWidth - 1,
-		buttonTop);
+	BLayoutBuilder::Group<>(this)
+		.Add(fPageContainer)
+		.Add(new BSeparatorView(B_HORIZONTAL))
+		.AddGroup(B_HORIZONTAL)
+			.SetInsets(B_USE_DEFAULT_SPACING, 0,
+				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
+			.AddGlue()
+			.Add(fPrevious)
+			.Add(fNext)
+			.End()
+		.End();
 }

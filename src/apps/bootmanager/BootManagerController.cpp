@@ -224,7 +224,7 @@ WizardPageView*
 BootManagerController::CreatePage(int32 state, WizardView* wizard)
 {
 	WizardPageView* page = NULL;
-	BRect frame = wizard->PageFrame();
+	BRect frame(0, 0, 300, 300);
 
 	switch (state) {
 		case kStateEntry:

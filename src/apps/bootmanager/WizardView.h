@@ -9,12 +9,10 @@
 #define WIZARD_VIEW_H
 
 
-#include <Box.h>
-#include <Button.h>
-#include <View.h>
+#include <GroupView.h>
 
 
-class BTextView;
+class BButton;
 class WizardPageView;
 
 
@@ -22,13 +20,10 @@ const uint32 kMessageNext = 'next';
 const uint32 kMessagePrevious = 'prev';
 
 
-class WizardView : public BView {
+class WizardView : public BGroupView {
 public:
-								WizardView(BRect frame, const char* name,
-									uint32 resizingMode);
+								WizardView(const char* name);
 	virtual						~WizardView();
-
-	virtual	BRect				PageFrame();
 
 	virtual	void				SetPage(WizardPageView* page);
 
@@ -44,7 +39,7 @@ private:
 			void				_BuildUI();
 
 private:
-			BBox*				fSeparator;
+			BGroupView*			fPageContainer;
 			BButton*			fPrevious;
 			BButton*			fNext;
 
