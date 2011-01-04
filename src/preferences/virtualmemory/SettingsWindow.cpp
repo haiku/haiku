@@ -40,7 +40,7 @@ static const uint32 kMsgRevert = 'rvrt';
 static const uint32 kMsgSliderUpdate = 'slup';
 static const uint32 kMsgSwapEnabledUpdate = 'swen';
 static const uint32 kMsgVolumeSelected = 'vlsl';
-static const int64 kMegaByte = 1048576;
+static const int64 kMegaByte = 1024 * 1024;
 
 
 class SizeSlider : public BSlider {
@@ -112,7 +112,9 @@ SizeSlider::UpdateText() const
 class VolumeMenuItem : public BMenuItem {
 	public:
 		VolumeMenuItem(const char* label, BMessage* message, BVolume* volume);
-		virtual ~VolumeMenuItem();
+	    BVolume* Volume() { return fVolume; }
+
+	private:
 		BVolume* fVolume;
 };
 
@@ -122,11 +124,6 @@ VolumeMenuItem::VolumeMenuItem(const char* label, BMessage* message,
 	: BMenuItem(label, message)
 {
 	fVolume = volume;
-}
-
-
-VolumeMenuItem::~VolumeMenuItem()
-{
 }
 
 
@@ -239,8 +236,8 @@ SettingsWindow::SettingsWindow()
 	// Validate the volume specified in settings file
 	status_t result = fSettings.SwapVolume().InitCheck();
 
-	if (result == B_NO_INIT) {
-		int32 choice = (new BAlert("VirtualMemory",	B_TRANSLATE(
+	if (result != B_OK) {
+		int32 choice = (new BAlert("VirtualMemory", B_TRANSLATE(
 			"The swap volume specified in the settings file is invalid.\n"
 			"You can keep the current setting or switch to the "
 			"default swap volume."),
@@ -261,6 +258,73 @@ SettingsWindow::SettingsWindow()
 
 SettingsWindow::~SettingsWindow()
 {
+}
+
+
+void
+SettingsWindow::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case kMsgRevert:
+			fSettings.RevertSwapChanges();
+			_Update();
+			break;
+		case kMsgDefaults:
+			_SetSwapDefaults();
+			_Update();
+			break;
+		case kMsgSliderUpdate:
+			fSettings.SetSwapSize((off_t)fSizeSlider->Value() * kMegaByte);
+			_Update();
+			break;
+		case kMsgVolumeSelected:
+			fSettings.SetSwapVolume(*((VolumeMenuItem*)fVolumeMenuField->Menu()
+				->FindMarked())->Volume());
+			_Update();
+			break;
+		case kMsgSwapEnabledUpdate:
+		{
+			int32 value;
+			if (message->FindInt32("be:value", &value) != B_OK)
+				break;
+
+			if (value == 0) {
+				// print out warning, give the user the time to think about it :)
+				// ToDo: maybe we want to remove this possibility in the GUI
+				// as Be did, but I thought a proper warning could be helpful
+				// (for those that want to change that anyway)
+				int32 choice = (new BAlert("VirtualMemory",
+					B_TRANSLATE(
+					"Disabling virtual memory will have unwanted effects on "
+					"system stability once the memory is used up.\n"
+					"Virtual memory does not affect system performance "
+					"until this point is reached.\n\n"
+					"Are you really sure you want to turn it off?"),
+					B_TRANSLATE("Turn off"), B_TRANSLATE("Keep enabled"), NULL,
+					B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+				if (choice == 1) {
+					fSwapEnabledCheckBox->SetValue(1);
+					break;
+				}
+			}
+
+			fSettings.SetSwapEnabled(value != 0);
+			_Update();
+			break;
+		}
+
+		default:
+			BWindow::MessageReceived(message);
+	}
+}
+
+
+bool
+SettingsWindow::QuitRequested()
+{
+	fSettings.SetWindowPosition(Frame().LeftTop());
+	be_app->PostMessage(B_QUIT_REQUESTED);
+	return true;
 }
 
 
@@ -376,7 +440,7 @@ SettingsWindow::_GetSwapFileLimits(off_t& minSize, off_t& maxSize)
 
 
 void
-SettingsWindow::SetSwapDefaults()
+SettingsWindow::_SetSwapDefaults()
 {
 	fSettings.SetSwapEnabled(true);
 
@@ -396,72 +460,5 @@ SettingsWindow::SetSwapDefaults()
 		defaultSize = maxSize / 2;
 		
 	fSettings.SetSwapSize(defaultSize);
-}
-
-
-void
-SettingsWindow::MessageReceived(BMessage* message)
-{
-	switch (message->what) {
-		case kMsgRevert:
-			fSettings.RevertSwapChanges();
-			_Update();
-			break;
-		case kMsgDefaults:
-			SetSwapDefaults();
-			_Update();
-			break;
-		case kMsgSliderUpdate:
-			fSettings.SetSwapSize((off_t)fSizeSlider->Value() * kMegaByte);
-			_Update();
-			break;
-		case kMsgVolumeSelected:
-			fSettings.SetSwapVolume(*((VolumeMenuItem*)fVolumeMenuField->Menu()
-				->FindMarked())->fVolume);
-			_Update();
-			break;
-		case kMsgSwapEnabledUpdate:
-		{
-			int32 value;
-			if (message->FindInt32("be:value", &value) != B_OK)
-				break;
-
-			if (value == 0) {
-				// print out warning, give the user the time to think about it :)
-				// ToDo: maybe we want to remove this possibility in the GUI
-				// as Be did, but I thought a proper warning could be helpful
-				// (for those that want to change that anyway)
-				int32 choice = (new BAlert("VirtualMemory",
-					B_TRANSLATE(
-					"Disabling virtual memory will have unwanted effects on "
-					"system stability once the memory is used up.\n"
-					"Virtual memory does not affect system performance "
-					"until this point is reached.\n\n"
-					"Are you really sure you want to turn it off?"),
-					B_TRANSLATE("Turn off"), B_TRANSLATE("Keep enabled"), NULL,
-					B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
-				if (choice == 1) {
-					fSwapEnabledCheckBox->SetValue(1);
-					break;
-				}
-			}
-
-			fSettings.SetSwapEnabled(value != 0);
-			_Update();
-			break;
-		}
-
-		default:
-			BWindow::MessageReceived(message);
-	}
-}
-
-
-bool
-SettingsWindow::QuitRequested()
-{
-	fSettings.SetWindowPosition(Frame().LeftTop());
-	be_app->PostMessage(B_QUIT_REQUESTED);
-	return true;
 }
 

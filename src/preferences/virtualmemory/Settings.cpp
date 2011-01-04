@@ -22,27 +22,81 @@
 
 static const char* kWindowSettingsFile = "VM_data";
 static const char* kVirtualMemorySettings = "virtual_memory";
-static const int64 kMegaByte = 1048576;
+static const int64 kMegaByte = 1024 * 1024;
 
 
 Settings::Settings()
 	:
 	fPositionUpdated(false)
 {
-	ReadWindowSettings();
-	ReadSwapSettings();
+	_ReadWindowSettings();
+	_ReadSwapSettings();
 }
 
 
 Settings::~Settings()
 {
-	WriteWindowSettings();
-	WriteSwapSettings();
+	_WriteWindowSettings();
+	_WriteSwapSettings();
 }
 
 
 void
-Settings::ReadWindowSettings()
+Settings::SetWindowPosition(BPoint position)
+{
+	if (position == fWindowPosition)
+		return;
+
+	fWindowPosition = position;
+	fPositionUpdated = true;
+}
+
+
+void
+Settings::SetSwapEnabled(bool enabled)
+{
+	fSwapEnabled = enabled;
+}
+
+
+void
+Settings::SetSwapSize(off_t size)
+{
+	fSwapSize = size;
+}
+
+
+void 
+Settings::SetSwapVolume(BVolume &volume)
+{
+	if (volume.Device() == SwapVolume().Device()
+		|| volume.InitCheck() != B_OK)
+		return;
+
+	fSwapVolume.SetTo(volume.Device());
+}
+
+
+void
+Settings::RevertSwapChanges()
+{
+	fSwapEnabled = fInitialSwapEnabled;
+	fSwapSize = fInitialSwapSize;
+	fSwapVolume.SetTo(fInitialSwapVolume);
+}
+
+
+bool
+Settings::IsRevertible()
+{
+	return fSwapEnabled != fInitialSwapEnabled
+		|| fSwapSize != fInitialSwapSize
+		|| fSwapVolume.Device() != fInitialSwapVolume;
+}
+
+
+void
+Settings::_ReadWindowSettings()
 {
 	bool success = false;
 
@@ -61,7 +115,7 @@ Settings::ReadWindowSettings()
 
 
 void
-Settings::WriteWindowSettings()
+Settings::_WriteWindowSettings()
 {
 	if (!fPositionUpdated)
 		return;
@@ -79,18 +133,7 @@ Settings::WriteWindowSettings()
 
 
 void
-Settings::SetWindowPosition(BPoint position)
-{
-	if (position == fWindowPosition)
-		return;
-
-	fWindowPosition = position;
-	fPositionUpdated = true;
-}
-
-
-void
-Settings::ReadSwapSettings()
+Settings::_ReadSwapSettings()
 {
 	void* settings = load_driver_settings(kVirtualMemorySettings);
 	if (settings != NULL) {
@@ -122,7 +165,7 @@ Settings::ReadSwapSettings()
 #endif
 		unload_driver_settings(settings);
 	} else
-		SetSwapNull();
+		_SetSwapNull();
 
 #ifndef SWAP_VOLUME_IMPLEMENTED
 	BVolumeRoster volumeRoster;
@@ -136,7 +179,7 @@ Settings::ReadSwapSettings()
 
 
 void
-Settings::WriteSwapSettings()
+Settings::_WriteSwapSettings()
 {	
 	if (!IsRevertible())
 		return;
@@ -173,32 +216,7 @@ Settings::WriteSwapSettings()
 
 
 void
-Settings::SetSwapEnabled(bool enabled)
-{
-	fSwapEnabled = enabled;
-}
-
-
-void
-Settings::SetSwapSize(off_t size)
-{
-	fSwapSize = size;
-}
-
-
-void 
-Settings::SetSwapVolume(BVolume &volume)
-{
-	if (volume.Device() == SwapVolume().Device()
-		|| volume.InitCheck() != B_OK)
-		return;
-
-	fSwapVolume.SetTo(volume.Device());
-}
-
-
-void
-Settings::SetSwapNull()
+Settings::_SetSwapNull()
 {
 	SetSwapEnabled(false);
 	BVolumeRoster volumeRoster;
@@ -209,19 +227,3 @@ Settings::SetSwapNull()
 }
 
 
-void
-Settings::RevertSwapChanges()
-{
-	fSwapEnabled = fInitialSwapEnabled;
-	fSwapSize = fInitialSwapSize;
-	fSwapVolume.SetTo(fInitialSwapVolume);
-}
-
-
-bool
-Settings::IsRevertible()
-{
-	return fSwapEnabled != fInitialSwapEnabled
-		|| fSwapSize != fInitialSwapSize
-		|| fSwapVolume.Device() != fInitialSwapVolume;
-}

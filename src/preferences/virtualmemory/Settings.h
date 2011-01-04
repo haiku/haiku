@@ -29,12 +29,13 @@ class Settings {
 		bool IsRevertible();
 
 	private:
-		void SetSwapNull();
-		void ReadWindowSettings();
-		void WriteWindowSettings();
+		void _ReadWindowSettings();
+		void _WriteWindowSettings();
 
-		void ReadSwapSettings();
-		void WriteSwapSettings();
+		void _ReadSwapSettings();
+		void _WriteSwapSettings();
+
+		void _SetSwapNull();
 
 		BPoint		fWindowPosition;
 
