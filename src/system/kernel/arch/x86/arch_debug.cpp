@@ -287,7 +287,7 @@ print_demangled_call(const char* image, const char* symbol, addr_t args,
 		if (valueKnown && type == B_STRING_TYPE) {
 			if (value == 0)
 				kprintf(" \33[31m\"<NULL>\"\33[0m");
-			else if (debug_strlcpy(B_CURRENT_TEAM, buffer, (char*)value,
+			else if (debug_strlcpy(B_CURRENT_TEAM, buffer, (char*)(addr_t)value,
 					kBufferSize) < B_OK) {
 				kprintf(" \33[31m\"<???>\"\33[0m");
 			} else
