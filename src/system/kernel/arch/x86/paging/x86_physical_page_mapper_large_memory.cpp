@@ -568,7 +568,7 @@ status_t
 LargeMemoryPhysicalPageMapper::MemsetPhysical(phys_addr_t address, int value,
 	phys_size_t length)
 {
-	phys_addr_t pageOffset = address % B_PAGE_SIZE;
+	addr_t pageOffset = address % B_PAGE_SIZE;
 
 	struct thread* thread = thread_get_current_thread();
 	ThreadCPUPinner _(thread);
