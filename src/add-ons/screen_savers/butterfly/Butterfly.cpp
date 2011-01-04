@@ -4,13 +4,14 @@
  *
  * Authors:
  *		Geoffry Song, goffrie@gmail.com
+ *		Ryan Leavengood, leavengood@gmail.com
  */
 #include "Butterfly.h"
 
 #include <math.h>
 #include <stdlib.h>
-#include <sys/time.h>
 
+#include <OS.h>
 #include <View.h>
 
 #include <BuildScreenSaverDefaultSettingsView.h>
@@ -50,9 +51,10 @@ Butterfly::StartSaver(BView* view, bool preview)
 
 	SetTickSize(20000);
 
-	struct timeval tv;
-	gettimeofday(&tv, NULL);
-	fBase = tv.tv_usec * 0.01f;
+	// Set fBase to a random radian value scaled by 1000. The scaling produces
+	// more interesting results.
+	srand48(system_time());
+	fBase = drand48() * 2 * M_PI * 1000;
 
 	// calculate transformation
 	BRect bounds = view->Bounds();
