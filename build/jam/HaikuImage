@@ -27,7 +27,7 @@ if $(HAIKU_ATA_STACK) = 1 {
 	IDE_ONLY = "" ;
 }
 
-SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bootman bzip2
+SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bzip2
 	cal cat catattr checkfs checkitout chgrp chmod chop chown chroot cksum clear
 	clockconfig cmp collectcatkeys comm compress copyattr CortexAddOnHost cp
 	csplit ctags cut date dc dd desklink df diff diff3 dircolors dirname
@@ -63,11 +63,12 @@ SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bootman bzip2
 	zdiff zforce zgrep zip zipcloak <bin>zipgrep zipnote zipsplit zmore znew
 ;
 
-SYSTEM_APPS = AboutSystem ActivityMonitor CharacterMap CodyCam DeskCalc Devices
-	DiskProbe DiskUsage DriveSetup CDPlayer Expander Icon-O-Matic Installer
-	LaunchBox Magnify Mail MediaConverter MediaPlayer MidiPlayer NetworkStatus
-	PackageInstaller People PoorMan PowerStatus ProcessController Screenshot
-	ShowImage SoundRecorder StyledEdit Terminal TextSearch TV	Workspaces
+SYSTEM_APPS = AboutSystem ActivityMonitor BootManager CharacterMap CodyCam
+	DeskCalc Devices DiskProbe DiskUsage DriveSetup CDPlayer Expander
+	Icon-O-Matic Installer LaunchBox Magnify Mail MediaConverter MediaPlayer
+	MidiPlayer NetworkStatus PackageInstaller People PoorMan PowerStatus
+	ProcessController Screenshot ShowImage SoundRecorder StyledEdit Terminal
+	TextSearch TV Workspaces
 ;
 SYSTEM_PREFERENCES = Appearance Backgrounds CPUFrequency DataTranslations
 	<preference>Deskbar E-mail FileTypes Fonts Keyboard Keymap Locale Media
@@ -153,7 +154,7 @@ SYSTEM_ADD_ONS_PRINT =
 SYSTEM_ADD_ONS_PRINT_TRANSPORT = HP\ JetDirect IPP LPR Parallel\ Port
 	Print\ To\ File Serial\ Port USB\ Port
 ;
-SYSTEM_ADD_ONS_SCREENSAVERS = Butterfly DebugNow Flurry 
+SYSTEM_ADD_ONS_SCREENSAVERS = Butterfly DebugNow Flurry
 	$(HAIKU_INCLUDE_TRADEMARKS)Haiku Icons IFS Leaves Message Spider ;
 SYSTEM_ADD_ONS_DRIVERS_AUDIO = auich auvia echo3g emuxki hda ;
 SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD = ; #cmedia sis7018 usb_audio ;

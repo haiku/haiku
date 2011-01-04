@@ -111,7 +111,8 @@ ImageCache::RetrieveImage(const entry_ref& ref, int32 page,
 		entry->ref = ref;
 		entry->page = page;
 
-		if (fThreadCount < fMaxThreadCount) {
+		if (fThreadCount < fMaxThreadCount
+			|| (target != NULL && fThreadCount == fMaxThreadCount)) {
 			// start a new worker thread to load the image
 			thread_id thread = spawn_thread(&ImageCache::_QueueWorkerThread,
 				"image loader", B_LOW_PRIORITY, this);

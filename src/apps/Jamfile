@@ -5,7 +5,7 @@ HaikuSubInclude aboutsystem ;
 HaikuSubInclude activitymonitor ;
 HaikuSubInclude autoraise ;
 HaikuSubInclude bsnow ;
-HaikuSubInclude bootman ;
+HaikuSubInclude bootmanager ;
 HaikuSubInclude cdplayer ;
 HaikuSubInclude charactermap ;
 HaikuSubInclude clock ;

@@ -49,7 +49,8 @@
 #define B_TRANSLATE_CONTEXT "InstallerWindow"
 
 #define DRIVESETUP_SIG "application/x-vnd.Haiku-DriveSetup"
-#define BOOTMAN_SIG "application/x-vnd.Haiku-Bootman"
+#define BOOTMAN_SIG "application/x-vnd.Haiku-BootManager"
+
 
 const uint32 BEGIN_MESSAGE = 'iBGN';
 const uint32 SHOW_BOTTOM_MESSAGE = 'iSBT';
@@ -58,6 +59,7 @@ const uint32 LAUNCH_BOOTMAN = 'iWBM';
 const uint32 START_SCAN = 'iSSC';
 const uint32 PACKAGE_CHECKBOX = 'iPCB';
 const uint32 ENCOURAGE_DRIVESETUP = 'iENC';
+
 
 class LogoView : public BView {
 public:

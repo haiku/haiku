@@ -1,10 +1,10 @@
-/* 
- * Copyright 2008-2009, Haiku Inc. All rights reserved.
+/*
+ * Copyright 2008-2010, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  * 		Michael Pfeiffer <laplace@users.sourceforge.net>
- * 
+ *
  */
 
 resource(1, "BEOS:APP_FLAGS") (#'APPF') $"00000000";
@@ -67,7 +67,7 @@ resource vector_icon {
 	$"AA40FA7D0117810004"
 };
 
-resource(1, "BEOS:APP_SIG") (#'MIMS') "application/x-vnd.Haiku-bootman";
+resource(1, "BEOS:APP_SIG") (#'MIMS') "application/x-vnd.Haiku-BootManager";
 
 resource(1, "BEOS:FILE_TYPES") message { };
 
