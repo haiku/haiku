@@ -6,6 +6,8 @@
  *		Geoffry Song, goffrie@gmail.com
  *		Ryan Leavengood, leavengood@gmail.com
  */
+
+
 #include "Butterfly.h"
 
 #include <math.h>
@@ -24,8 +26,12 @@ instantiate_screen_saver(BMessage* archive, image_id imageId)
 }
 
 
+// #pragma mark -
+
+
 Butterfly::Butterfly(BMessage* archive, image_id imageId)
-	: BScreenSaver(archive, imageId)
+	:
+	BScreenSaver(archive, imageId)
 {
 }
 
@@ -76,7 +82,7 @@ Butterfly::Draw(BView* view, int32 frame)
 	if (frame == 1024) {
 		// calculate bounding box ( (-5.92,-5.92) to (5.92, 5.92) )
 		fBounds.Set(-5.92f * fScale + fTrans.x, -5.92f * fScale + fTrans.y,
-					5.92f * fScale + fTrans.x, 5.92f * fScale + fTrans.y);
+			5.92f * fScale + fTrans.x, 5.92f * fScale + fTrans.y);
 	}
 	if ((frame & 3) == 0) {
 		// fade out
@@ -86,7 +92,7 @@ Butterfly::Draw(BView* view, int32 frame)
 	// create a color from a hue of (fBase * 15) degrees
 	view->SetHighColor(_HueToColor(fBase * 15));
 	BPoint p = _Iterate();
-	
+
 	// cubic Hermite interpolation from fLast[1] to fLast[2]
 	// calculate tangents for a Catmull-Rom spline
 	//(these values need to be halved)
@@ -108,7 +114,7 @@ Butterfly::Draw(BView* view, int32 frame)
 }
 
 
-// convert from a hue in degrees to a fully saturated color
+//! Convert from a hue in degrees to a fully saturated color
 inline rgb_color
 Butterfly::_HueToColor(float hue)
 {

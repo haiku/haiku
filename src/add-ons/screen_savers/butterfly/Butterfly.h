@@ -14,26 +14,27 @@
 
 class Butterfly : public BScreenSaver {
 public:
-						Butterfly(BMessage* archive, image_id imageId);
+								Butterfly(BMessage* archive, image_id imageID);
 
-	virtual	void		StartConfig(BView* view);
-	virtual status_t	StartSaver(BView* view, bool preview);
-	virtual void		Draw(BView* view, int32 frame);
+	virtual	void				StartConfig(BView* view);
+	virtual status_t			StartSaver(BView* view, bool preview);
+	virtual void				Draw(BView* view, int32 frame);
+
+private:
+	inline	rgb_color			_HueToColor(float hue);
+	inline	BPoint				_Iterate();
 
 private:
 			// base value for calculating the curves on each iteration
-			float		fBase;
+			float				fBase;
 			// previously calculated points
-			BPoint		fLast[3];
+			BPoint				fLast[3];
 			// transformation from graph coordinates to view coordinates
-			float		fScale;
-			BPoint		fTrans;
+			float				fScale;
+			BPoint				fTrans;
 			// bounding box of drawn figure
-			BRect		fBounds;
-
-	inline	rgb_color	_HueToColor(float hue);
-	inline	BPoint		_Iterate();
+			BRect				fBounds;
 };
 
-#endif  // _BUTTERFLY_H_
 
+#endif  // _BUTTERFLY_H_
