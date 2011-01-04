@@ -84,10 +84,14 @@ elif [ $isImage ]; then
 		# Open the FIFOs such that they are ready for the fsShellCommand. This
 		# also makes sure that they remain open until this script exits. When we
 		# exit while the FS shell is still running and waiting for commands,
-		# closing of our file descriptors will break the pipes and the FS shell
+		# closing of our file descriptors will break the FIFOs and the FS shell
 		# will exit, too.
-		exec 3<$fromFSShellFifo 4>$toFSShellFifo 5<$toFSShellFifo \
-			6>$fromFSShellFifo
+		# Note: A bit of trickery is needed since opening one end blocks until
+		# someone opens the other end.
+		sleep 3<$fromFSShellFifo 1 &
+		exec 6>$fromFSShellFifo 3<$fromFSShellFifo
+		sleep 5<$toFSShellFifo 1 &
+		exec 4>$toFSShellFifo 5<$toFSShellFifo
 
 		# Remove the FIFO files again -- we have the open FDs, so they can
 		# still be used and this makes sure they won't hang around any further.
