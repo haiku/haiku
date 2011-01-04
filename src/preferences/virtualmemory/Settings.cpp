@@ -1,6 +1,7 @@
 /*
- * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
- * Distributed under the terms of the MIT License.
+ * Copyright 2010-2011, Hamish Morrison, hamish@lavabit.com
+ * Copyright 2005, Axel Dörfler, axeld@pinc-software.de
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 
@@ -21,12 +22,12 @@
 
 static const char* kWindowSettingsFile = "VM_data";
 static const char* kVirtualMemorySettings = "virtual_memory";
+static const int64 kMegaByte = 1048576;
 
 
 Settings::Settings()
 	:
-	fPositionUpdated(false),
-	fSwapUpdated(false)
+	fPositionUpdated(false)
 {
 	ReadWindowSettings();
 	ReadSwapSettings();
@@ -50,7 +51,6 @@ Settings::ReadWindowSettings()
 		path.Append(kWindowSettingsFile);
 		BFile file;
 		if (file.SetTo(path.Path(), B_READ_ONLY) == B_OK)
-			// Now read in the data
 			if (file.Read(&fWindowPosition, sizeof(BPoint)) == sizeof(BPoint))
 				success = true;
 	}
@@ -92,38 +92,42 @@ Settings::SetWindowPosition(BPoint position)
 void
 Settings::ReadSwapSettings()
 {
-	// read current swap settings from disk
-	void* settings = load_driver_settings("virtual_memory");
+	void* settings = load_driver_settings(kVirtualMemorySettings);
 	if (settings != NULL) {
-		fSwapEnabled = get_driver_boolean_parameter(settings, "vm", false, false);
-
-		const char* string = get_driver_parameter(settings, "swap_size", NULL, NULL);
-		fSwapSize = string ? atoll(string) : 0;
-
-		if (fSwapSize <= 0) {
-			fSwapEnabled = false;
-			fSwapSize = 0;
-		}
+		SetSwapEnabled(get_driver_boolean_parameter(settings, "vm", false, false));
+		const char* swapSize = get_driver_parameter(settings, "swap_size", NULL, NULL);
+		SetSwapSize(swapSize ? atoll(swapSize) : 0);
+		
+#ifdef SWAP_VOLUME_IMPLEMENTED
+		// we need to hang onto this one
+		fBadVolName = strdup(get_driver_parameter(settings, "swap_volume", NULL, NULL));
+		
+		BVolumeRoster volumeRoster;
+		BVolume temporaryVolume;
+		
+		if (fBadVolName != NULL) {
+			status_t result = volumeRoster.GetNextVolume(&temporaryVolume);
+			char volumeName[B_FILE_NAME_LENGTH];
+			while (result != B_BAD_VALUE) {
+				temporaryVolume.GetName(volumeName);
+				if (strcmp(volumeName, fBadVolName) == 0 
+					&& temporaryVolume.IsPersistent() && volumeName[0]) {
+					SetSwapVolume(temporaryVolume);
+					break;
+				}
+				result = volumeRoster.GetNextVolume(&temporaryVolume);
+			}
+		} else
+			volumeRoster.GetBootVolume(&fSwapVolume);
+#endif
 		unload_driver_settings(settings);
-	} else {
-		// settings are not available, try to find out what the kernel is up to
-		// ToDo: introduce a kernel call for this!
-		fSwapSize = 0;
+	} else
+		SetSwapNull();
 
-		BPath path;
-		if (find_directory(B_COMMON_VAR_DIRECTORY, &path) == B_OK) {
-			path.Append("swap");
-			BEntry swap(path.Path());
-			if (swap.GetSize(&fSwapSize) != B_OK)
-				fSwapSize = 0;
-		}
-
-		fSwapEnabled = fSwapSize != 0;
-	}
-
-	// ToDo: read those as well
+#ifndef SWAP_VOLUME_IMPLEMENTED
 	BVolumeRoster volumeRoster;
 	volumeRoster.GetBootVolume(&fSwapVolume);
+#endif
 
 	fInitialSwapEnabled = fSwapEnabled;
 	fInitialSwapSize = fSwapSize;
@@ -133,8 +137,8 @@ Settings::ReadSwapSettings()
 
 void
 Settings::WriteSwapSettings()
-{
-	if (!SwapChanged())
+{	
+	if (!IsRevertible())
 		return;
 
 	BPath path;
@@ -145,12 +149,24 @@ Settings::WriteSwapSettings()
 	path.Append(kVirtualMemorySettings);
 
 	BFile file;
-	if (file.SetTo(path.Path(), B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE) != B_OK)
+	if (file.SetTo(path.Path(), B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE)
+		!= B_OK)
 		return;
-
+	
 	char buffer[256];
+#ifdef SWAP_VOLUME_IMPLEMENTED
+	char volumeName[B_FILE_NAME_LENGTH] = {0};
+	if (SwapVolume().InitCheck() != B_NO_INIT)
+		SwapVolume().GetName(volumeName);
+	else if (fBadVolName)
+		strcpy(volumeName, fBadVolName);
+	snprintf(buffer, sizeof(buffer), "vm %s\nswap_size %Ld\nswap_volume %s\n",
+		SwapEnabled() ? "on" : "off", SwapSize(), 
+		volumeName[0] ? volumeName : NULL);
+#else
 	snprintf(buffer, sizeof(buffer), "vm %s\nswap_size %Ld\n",
 		fSwapEnabled ? "on" : "off", fSwapSize);
+#endif
 
 	file.Write(buffer, strlen(buffer));
 }
@@ -173,7 +189,7 @@ Settings::SetSwapSize(off_t size)
 void 
 Settings::SetSwapVolume(BVolume &volume)
 {
-	if (volume.Device() == fSwapVolume.Device()
+	if (volume.Device() == SwapVolume().Device()
 		|| volume.InitCheck() != B_OK)
 		return;
 
@@ -182,16 +198,14 @@ Settings::SetSwapVolume(BVolume &volume)
 
 
 void
-Settings::SetSwapDefaults()
+Settings::SetSwapNull()
 {
-	fSwapEnabled = true;
-
+	SetSwapEnabled(false);
 	BVolumeRoster volumeRoster;
-	volumeRoster.GetBootVolume(&fSwapVolume);
-
-	system_info info;
-	get_system_info(&info);
-	fSwapSize = (off_t)info.max_pages * B_PAGE_SIZE;
+	BVolume temporaryVolume;
+	volumeRoster.GetBootVolume(&temporaryVolume);
+	SetSwapVolume(temporaryVolume);
+	SetSwapSize(0);
 }
 
 
@@ -205,18 +219,9 @@ Settings::RevertSwapChanges()
 
 
 bool
-Settings::IsDefaultable()
-{
-	return fSwapEnabled != fInitialSwapEnabled
-		|| fSwapSize != fInitialSwapSize;
-}
-
-
-bool
-Settings::SwapChanged()
+Settings::IsRevertible()
 {
 	return fSwapEnabled != fInitialSwapEnabled
 		|| fSwapSize != fInitialSwapSize
 		|| fSwapVolume.Device() != fInitialSwapVolume;
 }
-

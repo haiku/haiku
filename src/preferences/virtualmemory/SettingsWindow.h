@@ -27,6 +27,7 @@ class SettingsWindow : public BWindow {
 	private:
 		void _Update();
 		status_t _GetSwapFileLimits(off_t& minSize, off_t& maxSize);
+		void SetSwapDefaults();
 
 		BCheckBox*		fSwapEnabledCheckBox;
 		BSlider*		fSizeSlider;
@@ -35,6 +36,8 @@ class SettingsWindow : public BWindow {
 		BStringView*	fWarningStringView;
 		BMenuField*		fVolumeMenuField;
 		Settings		fSettings;
+		
+		bool fLocked;
 };
 
 #endif	/* SETTINGS_WINDOW_H */

@@ -1,6 +1,7 @@
 /*
- * Copyright 2005-2009, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
- * Distributed under the terms of the MIT License.
+ * Copyright 2010-2011, Hamish Morrison, hamish@lavabit.com 
+ * Copyright 2005-2009, Axel Dörfler, axeld@pinc-software.de
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 
@@ -30,7 +31,6 @@
 
 #include <stdio.h>
 
-
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "SettingsWindow"
 
@@ -39,6 +39,8 @@ static const uint32 kMsgDefaults = 'dflt';
 static const uint32 kMsgRevert = 'rvrt';
 static const uint32 kMsgSliderUpdate = 'slup';
 static const uint32 kMsgSwapEnabledUpdate = 'swen';
+static const uint32 kMsgVolumeSelected = 'vlsl';
+static const int64 kMegaByte = 1048576;
 
 
 class SizeSlider : public BSlider {
@@ -54,10 +56,21 @@ class SizeSlider : public BSlider {
 };
 
 
-static const int64 kMegaByte = 1048576;
+SizeSlider::SizeSlider(const char* name, const char* label,
+	BMessage* message, int32 min, int32 max, uint32 flags)
+	: BSlider(name, label, message, min, max, B_HORIZONTAL, B_BLOCK_THUMB, flags)
+{
+	rgb_color color = ui_color(B_CONTROL_HIGHLIGHT_COLOR);
+	UseFillColor(true, &color);
+}
 
 
-const char *
+SizeSlider::~SizeSlider()
+{
+}
+
+
+const char*
 byte_string(int64 size)
 {
 	double value = 1. * size;
@@ -80,7 +93,7 @@ byte_string(int64 size)
 		} while (value >= 1024 && units[i + 1]);
 
 		off_t rounded = off_t(value * 100LL);
-		sprintf(string, "%g %s", rounded / 100.0,
+		snprintf(string, sizeof(string), "%g %s", rounded / 100.0,
 			B_TRANSLATE_NOCOLLECT(units[i]));
 	}
 
@@ -88,39 +101,42 @@ byte_string(int64 size)
 }
 
 
-//	#pragma mark -
-
-
-SizeSlider::SizeSlider(const char* name, const char* label,
-	BMessage* message, int32 min, int32 max, uint32 flags)
-	: BSlider(name, label, message, min, max, B_HORIZONTAL, B_BLOCK_THUMB, flags)
-{
-	rgb_color color = ui_color(B_CONTROL_HIGHLIGHT_COLOR);
-	UseFillColor(true, &color);
-}
-
-
-SizeSlider::~SizeSlider()
-{
-}
-
-
-const char *
+const char*
 SizeSlider::UpdateText() const
 {
 	fText = byte_string(Value() * kMegaByte);
-
 	return fText.String();
 }
 
 
-//	#pragma mark -
+class VolumeMenuItem : public BMenuItem {
+	public:
+		VolumeMenuItem(const char* label, BMessage* message, BVolume* volume);
+		virtual ~VolumeMenuItem();
+		BVolume* fVolume;
+};
+
+
+VolumeMenuItem::VolumeMenuItem(const char* label, BMessage* message,
+	BVolume* volume)
+	: BMenuItem(label, message)
+{
+	fVolume = volume;
+}
+
+
+VolumeMenuItem::~VolumeMenuItem()
+{
+}
 
 
 SettingsWindow::SettingsWindow()
-	: BWindow(BRect(0, 0, 269, 172), B_TRANSLATE("VirtualMemory"),
+	:
+	BWindow(BRect(0, 0, 269, 172), B_TRANSLATE("VirtualMemory"),
 		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS
-			| B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
+		| B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
+	fLocked(false)
+	
 {
 	BView* view = new BGroupView();
 
@@ -142,34 +158,29 @@ SettingsWindow::SettingsWindow()
 	string << byte_string(fSettings.SwapSize());
 	BStringView* swapfileView = new BStringView("current swap size", string.String());
 
-	BPopUpMenu* menu = new BPopUpMenu("volumes");
+	BPopUpMenu* menu = new BPopUpMenu("invalid");
 
 	// collect volumes
 	// TODO: listen to volume changes!
 	// TODO: accept dropped volumes
 
 	BVolumeRoster volumeRoster;
-	BVolume volume;
-	while (volumeRoster.GetNextVolume(&volume) == B_OK) {
-		char name[B_FILE_NAME_LENGTH];
-		if (!volume.IsPersistent() || volume.GetName(name) != B_OK || !name[0])
+	BVolume* volume = new BVolume();
+	char name[B_FILE_NAME_LENGTH];
+	while (volumeRoster.GetNextVolume(volume) == B_OK) {	
+		if (!volume->IsPersistent() || volume->GetName(name) != B_OK || !name[0])
 			continue;
-
-		BMenuItem* item = new BMenuItem(name, NULL);
+		VolumeMenuItem* item = new VolumeMenuItem(name, 
+			new BMessage(kMsgVolumeSelected), volume);
 		menu->AddItem(item);
-
-		if (volume.Device() == fSettings.SwapVolume().Device())
-			item->SetMarked(true);
+		volume = new BVolume();
 	}
 
-	fVolumeMenuField = new BMenuField("devices", B_TRANSLATE("Use volume:"), menu);
-	
-	// When swap volume changing support is implemeneted, remove me:
-	fVolumeMenuField->SetEnabled(false);
+	fVolumeMenuField = new BMenuField("volumes", B_TRANSLATE("Use volume:"), menu);
 	
 	fSizeSlider = new SizeSlider("size slider", 
 		B_TRANSLATE("Requested swap file size:"), new BMessage(kMsgSliderUpdate),
-		0, 0, B_WILL_DRAW | B_FRAME_EVENTS);
+		1, 1, B_WILL_DRAW | B_FRAME_EVENTS);
 	fSizeSlider->SetViewColor(255, 0, 255);
 
 	fWarningStringView = new BStringView("", "");
@@ -185,21 +196,22 @@ SettingsWindow::SettingsWindow()
 			.Add(swapfileView)
 			.AddGlue()
 		.End()
+#ifdef SWAP_VOLUME_IMPLEMENTED
 		.AddGroup(B_HORIZONTAL)
 			.Add(fVolumeMenuField)
 			.AddGlue()
 		.End()
+#else
+		.AddGlue()
+#endif
 		.Add(fSizeSlider)
 		.Add(fWarningStringView)
 		.SetInsets(10, 10, 10, 10)
 	);
 	box->AddChild(view);
 
-	// Add "Defaults" and "Revert" buttons
-
 	fDefaultsButton = new BButton("defaults", B_TRANSLATE("Defaults"),
 		new BMessage(kMsgDefaults));
-	fDefaultsButton->SetEnabled(fSettings.IsDefaultable());
 
 	fRevertButton = new BButton("revert", B_TRANSLATE("Revert"),
 		new BMessage(kMsgRevert));
@@ -216,15 +228,34 @@ SettingsWindow::SettingsWindow()
 		.SetInsets(10, 10, 10, 10)
 	);
 
-	_Update();
-
 	BScreen screen;
 	BRect screenFrame = screen.Frame();
-
 	if (!screenFrame.Contains(fSettings.WindowPosition()))
 		CenterOnScreen();
 	else
 		MoveTo(fSettings.WindowPosition());
+
+#ifdef SWAP_VOLUME_IMPLEMENTED
+	// Validate the volume specified in settings file
+	status_t result = fSettings.SwapVolume().InitCheck();
+
+	if (result == B_NO_INIT) {
+		int32 choice = (new BAlert("VirtualMemory",	B_TRANSLATE(
+			"The swap volume specified in the settings file is invalid.\n"
+			"You can keep the current setting or switch to the "
+			"default swap volume."),
+			B_TRANSLATE("Keep"), B_TRANSLATE("Switch"), NULL,
+			B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+		if (choice == 1) {
+			BVolumeRoster volumeRoster;
+			BVolume bootVolume;
+			volumeRoster.GetBootVolume(&bootVolume);
+			fSettings.SetSwapVolume(bootVolume);
+		}
+	}
+#endif
+
+	_Update();
 }
 
 
@@ -238,56 +269,68 @@ SettingsWindow::_Update()
 {
 	if ((fSwapEnabledCheckBox->Value() != 0) != fSettings.SwapEnabled())
 		fSwapEnabledCheckBox->SetValue(fSettings.SwapEnabled());
-		
-	if (fSizeSlider->IsEnabled() != fSettings.SwapEnabled())
-		fSizeSlider->SetEnabled(fSettings.SwapEnabled());
-	
+
 #ifdef SWAP_VOLUME_IMPLEMENTED	
 	if (fVolumeMenuField->IsEnabled() != fSettings.SwapEnabled())
 		fVolumeMenuField->SetEnabled(fSettings.SwapEnabled());
+	VolumeMenuItem* selectedVolumeItem =
+		(VolumeMenuItem*)fVolumeMenuField->Menu()->FindMarked();
+	if (selectedVolumeItem == NULL) {
+		VolumeMenuItem* currentVolumeItem;
+		int32 items = fVolumeMenuField->Menu()->CountItems();
+		for (int32 index = 0; index < items; ++index) {
+			currentVolumeItem = ((VolumeMenuItem*)fVolumeMenuField->Menu()->ItemAt(index));
+			if (*(currentVolumeItem->fVolume) == fSettings.SwapVolume()) {
+				currentVolumeItem->SetMarked(true);
+				break;
+			}
+		}
+	} else if (*selectedVolumeItem->fVolume != fSettings.SwapVolume()) {
+		VolumeMenuItem* currentVolumeItem;
+		int32 items = fVolumeMenuField->Menu()->CountItems();
+		for (int32 index = 0; index < items; ++index) {
+			currentVolumeItem = ((VolumeMenuItem*)fVolumeMenuField->Menu()->ItemAt(index));
+			if (*(currentVolumeItem->fVolume) == fSettings.SwapVolume()) {
+				currentVolumeItem->SetMarked(true);
+				break;
+			}
+		}
+	}
 #endif
 
+	fWarningStringView->SetText("");
+	fLocked = false;
+	
+	if (fSettings.IsRevertible())
+			fWarningStringView->SetText(
+				B_TRANSLATE("Changes will take effect on restart!"));
+	if (fRevertButton->IsEnabled() != fSettings.IsRevertible())
+		fRevertButton->SetEnabled(fSettings.IsRevertible());
+	
 	off_t minSize, maxSize;
 	if (_GetSwapFileLimits(minSize, maxSize) == B_OK) {
+		// round to nearest MB -- slider steps in whole MBs
+		(minSize >>= 20) <<= 20;
+		(maxSize >>= 20) <<= 20;
 		BString minLabel, maxLabel;
 		minLabel << byte_string(minSize);
 		maxLabel << byte_string(maxSize);
 		if (minLabel != fSizeSlider->MinLimitLabel()
 			|| maxLabel != fSizeSlider->MaxLimitLabel()) {
 			fSizeSlider->SetLimitLabels(minLabel.String(), maxLabel.String());
-#ifdef __HAIKU__
 			fSizeSlider->SetLimits(minSize / kMegaByte, maxSize / kMegaByte);
-#endif
 		}
-
-		if (fSizeSlider->Value() != fSettings.SwapSize() / kMegaByte)
-			fSizeSlider->SetValue(fSettings.SwapSize() / kMegaByte);
-	} else {
-		// Not enough space on volume for a swap file. Make UI inoperable.
+	} else if (fSettings.SwapEnabled()) {
 		fWarningStringView->SetText(
 			B_TRANSLATE("Insufficient space for a swap file."));
-		fSwapEnabledCheckBox->SetEnabled(false);
-		fSizeSlider->SetEnabled(false);
-		// When swap volume is implemented, we'll want to keep the volume
-		// menu field enabled so the user can get around the space issue
-		// by selecting a different volume.
-#ifdef SWAP_VOLUME_IMPLEMENTED
-		fVolumeMenuField->SetEnabled(true);
-#endif
+		fLocked = true;
 	}
-
-	// ToDo: set volume
-
-	fDefaultsButton->SetEnabled(fSettings.IsDefaultable());
-
-	bool changed = fSettings.SwapChanged();
-	if (fRevertButton->IsEnabled() != changed) {
-		fRevertButton->SetEnabled(changed);
-		if (changed)
-			fWarningStringView->SetText(
-				B_TRANSLATE("Changes will take effect on restart!"));
-		else
-			fWarningStringView->SetText("");
+	if (fSizeSlider->Value() != fSettings.SwapSize() / kMegaByte)
+		fSizeSlider->SetValue(fSettings.SwapSize() / kMegaByte);
+	if (fSizeSlider->IsEnabled() != fSettings.SwapEnabled() || fLocked)
+	{
+		fSizeSlider->SetEnabled(fSettings.SwapEnabled() && !fLocked);
+		fSettings.SetSwapSize((off_t)fSizeSlider->Value() * kMegaByte);
 	}
 }
 
@@ -308,7 +351,7 @@ SettingsWindow::_GetSwapFileLimits(off_t& minSize, off_t& maxSize)
 	// adjust the free space accordingly
 	BPath path;
 	if (find_directory(B_COMMON_VAR_DIRECTORY, &path, false,
-			&fSettings.SwapVolume()) == B_OK) {
+		&fSettings.SwapVolume()) == B_OK) {
 		path.Append("swap");
 		BEntry swap(path.Path());
 
@@ -333,6 +376,30 @@ SettingsWindow::_GetSwapFileLimits(off_t& minSize, off_t& maxSize)
 
 
 void
+SettingsWindow::SetSwapDefaults()
+{
+	fSettings.SetSwapEnabled(true);
+
+	BVolumeRoster volumeRoster;
+	BVolume temporaryVolume;
+	volumeRoster.GetBootVolume(&temporaryVolume);
+	fSettings.SetSwapVolume(temporaryVolume);
+
+	system_info info;
+	get_system_info(&info);
+	
+	off_t defaultSize = (off_t)info.max_pages * B_PAGE_SIZE;
+	off_t minSize, maxSize;
+	_GetSwapFileLimits(minSize, maxSize);
+	
+	if (defaultSize > maxSize / 2)
+		defaultSize = maxSize / 2;
+		
+	fSettings.SetSwapSize(defaultSize);
+}
+
+
+void
 SettingsWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
@@ -341,11 +408,16 @@ SettingsWindow::MessageReceived(BMessage* message)
 			_Update();
 			break;
 		case kMsgDefaults:
-			fSettings.SetSwapDefaults();
+			SetSwapDefaults();
 			_Update();
 			break;
 		case kMsgSliderUpdate:
 			fSettings.SetSwapSize((off_t)fSizeSlider->Value() * kMegaByte);
+			_Update();
+			break;
+		case kMsgVolumeSelected:
+			fSettings.SetSwapVolume(*((VolumeMenuItem*)fVolumeMenuField->Menu()
+				->FindMarked())->fVolume);
 			_Update();
 			break;
 		case kMsgSwapEnabledUpdate:
@@ -374,14 +446,7 @@ SettingsWindow::MessageReceived(BMessage* message)
 				}
 			}
 
-			bool enabled = value != 0;
-			fSettings.SetSwapEnabled(enabled);
-			if (enabled && fSettings.SwapSize() == 0) {
-				off_t min;
-				off_t max;
-				_GetSwapFileLimits(min, max);
-				fSettings.SetSwapSize(min);
-			}
+			fSettings.SetSwapEnabled(value != 0);
 			_Update();
 			break;
 		}
