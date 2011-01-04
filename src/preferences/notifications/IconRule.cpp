@@ -24,7 +24,8 @@ BIconRule::BIconRule(const char* name)
 	:
 	BView(name, B_WILL_DRAW),
 	fIcons(5, true),
-	fSelIndex(-1)
+	fSelIndex(-1),
+	fMessage(NULL)
 {
 }
 
