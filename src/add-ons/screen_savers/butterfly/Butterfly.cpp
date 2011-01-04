@@ -7,8 +7,8 @@
  */
 #include "Butterfly.h"
 
-#include <stdlib.h>
 #include <math.h>
+#include <stdlib.h>
 #include <sys/time.h>
 
 #include <View.h>
@@ -16,7 +16,7 @@
 #include <BuildScreenSaverDefaultSettingsView.h>
 
 
-const float kOneSixth = 0.1666666666666666666f; // 1/2 * 1/3
+const float kOneSixth = 0.5 * (1.0/3.0); // 1/2 * 1/3
 
 
 extern "C" BScreenSaver*
@@ -55,12 +55,12 @@ Butterfly::StartSaver(BView* view, bool preview)
 
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
-	fT = tv.tv_usec * 0.01f;
+	fBase = tv.tv_usec * 0.01;
 
 	// calculate transformation
 	BRect bounds = view->Bounds();
-	fScale = MIN(bounds.Width(), bounds.Height()) * 0.1f;
-	fTrans.Set(bounds.Width() * 0.5f, bounds.Height() * 0.5f);
+	fScale = MIN(bounds.Width(), bounds.Height()) * 0.1;
+	fTrans.Set(bounds.Width() * 0.5, bounds.Height() * 0.5);
 	fBounds = bounds;
 
 	fLast[0] = _Iterate();
@@ -84,8 +84,8 @@ Butterfly::Draw(BView* view, int32 frame)
 		view->SetHighColor(0, 0, 0, 4);
 		view->FillRect(fBounds);
 	}
-	// create a color from a hue of (fT * 15) degrees
-	view->SetHighColor(_HueToColor(fT * 15.f));
+	// create a color from a hue of (fBase * 15) degrees
+	view->SetHighColor(_HueToColor(fBase * 15.0));
 	BPoint p = _Iterate();
 	
 	// cubic Hermite interpolation from fLast[1] to fLast[2]
@@ -114,7 +114,7 @@ inline rgb_color
 Butterfly::_HueToColor(float hue)
 {
 	// convert from [0..360) to [0..1530)
-	int h = static_cast<int>(fmodf(hue, 360) * 4.25f);
+	int h = static_cast<int>(fmodf(hue, 360) * 4.25);
 	int x = 255 - abs(h % 510 - 255);
 
 	rgb_color result = {0, 0, 0, 255};
@@ -144,18 +144,17 @@ Butterfly::_HueToColor(float hue)
 inline BPoint
 Butterfly::_Iterate()
 {
-	float r = powf(2.718281828f, cosf(fT))
-		- 2.f * cosf(4.f * fT)
-		- powf(sinf(fT / 12.f), 5.f);
+	float r = powf(M_E, cosf(fBase)) - 2.0 * cosf(4.0 * fBase)
+		- powf(sinf(fBase / 12.0), 5.0);
 	// rotate and move it a bit
-	BPoint p(sinf(fT * 1.01f) * r + cosf(fT * 1.02f) * 0.2f,
-		cosf(fT * 1.01f) * r + sinf(fT * 1.02f) * 0.2f);
+	BPoint p(sinf(fBase * 1.01) * r + cosf(fBase * 1.02) * 0.2,
+		cosf(fBase * 1.01) * r + sinf(fBase * 1.02) * 0.2);
 	// transform to view coordinates
 	p.x *= fScale;
 	p.y *= fScale;
 	p += fTrans;
 	// move on
-	fT += 0.05f;
+	fBase += 0.05;
 	return p;
 }
 

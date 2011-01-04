@@ -21,7 +21,8 @@ public:
 	virtual void		Draw(BView* view, int32 frame);
 
 private:
-			float		fT;
+			// base value for calculating the curves on each iteration
+			float		fBase;
 			// previously calculated points
 			BPoint		fLast[3];
 			// transformation from graph coordinates to view coordinates
