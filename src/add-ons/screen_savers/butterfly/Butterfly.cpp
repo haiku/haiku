@@ -16,9 +16,6 @@
 #include <BuildScreenSaverDefaultSettingsView.h>
 
 
-const float kOneSixth = 0.5 * (1.0/3.0); // 1/2 * 1/3
-
-
 extern "C" BScreenSaver*
 instantiate_screen_saver(BMessage* archive, image_id imageId)
 {
@@ -55,12 +52,12 @@ Butterfly::StartSaver(BView* view, bool preview)
 
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
-	fBase = tv.tv_usec * 0.01;
+	fBase = tv.tv_usec * 0.01f;
 
 	// calculate transformation
 	BRect bounds = view->Bounds();
-	fScale = MIN(bounds.Width(), bounds.Height()) * 0.1;
-	fTrans.Set(bounds.Width() * 0.5, bounds.Height() * 0.5);
+	fScale = MIN(bounds.Width(), bounds.Height()) * 0.1f;
+	fTrans.Set(bounds.Width() * 0.5f, bounds.Height() * 0.5f);
 	fBounds = bounds;
 
 	fLast[0] = _Iterate();
@@ -76,8 +73,8 @@ Butterfly::Draw(BView* view, int32 frame)
 {
 	if (frame == 1024) {
 		// calculate bounding box ( (-5.92,-5.92) to (5.92, 5.92) )
-		fBounds.Set(-5.92 * fScale + fTrans.x, -5.92 * fScale + fTrans.y,
-					5.92 * fScale + fTrans.x, 5.92 * fScale + fTrans.y);
+		fBounds.Set(-5.92f * fScale + fTrans.x, -5.92f * fScale + fTrans.y,
+					5.92f * fScale + fTrans.x, 5.92f * fScale + fTrans.y);
 	}
 	if ((frame & 3) == 0) {
 		// fade out
@@ -85,7 +82,7 @@ Butterfly::Draw(BView* view, int32 frame)
 		view->FillRect(fBounds);
 	}
 	// create a color from a hue of (fBase * 15) degrees
-	view->SetHighColor(_HueToColor(fBase * 15.0));
+	view->SetHighColor(_HueToColor(fBase * 15));
 	BPoint p = _Iterate();
 	
 	// cubic Hermite interpolation from fLast[1] to fLast[2]
@@ -96,10 +93,10 @@ Butterfly::Draw(BView* view, int32 frame)
 
 	// draw Bezier from fLast[1] to fLast[2] with control points
 	// fLast[1] + m1/3, fLast[2] - m2/3
-	m1.x *= kOneSixth;
-	m1.y *= kOneSixth;
-	m2.x *= kOneSixth;
-	m2.y *= kOneSixth;
+	m1.x /= 6;
+	m1.y /= 6;
+	m2.x /= 6;
+	m2.y /= 6;
 	BPoint control[4] = { fLast[1], fLast[1] + m1, fLast[2] - m2, fLast[2] };
 	view->StrokeBezier(control);
 
@@ -114,7 +111,7 @@ inline rgb_color
 Butterfly::_HueToColor(float hue)
 {
 	// convert from [0..360) to [0..1530)
-	int h = static_cast<int>(fmodf(hue, 360) * 4.25);
+	int h = static_cast<int>(fmodf(hue, 360) * 4.25f);
 	int x = 255 - abs(h % 510 - 255);
 
 	rgb_color result = {0, 0, 0, 255};
@@ -144,17 +141,17 @@ Butterfly::_HueToColor(float hue)
 inline BPoint
 Butterfly::_Iterate()
 {
-	float r = powf(M_E, cosf(fBase)) - 2.0 * cosf(4.0 * fBase)
-		- powf(sinf(fBase / 12.0), 5.0);
+	float r = powf(M_E, cosf(fBase)) - 2 * cosf(4 * fBase)
+		- powf(sinf(fBase / 12), 5);
 	// rotate and move it a bit
-	BPoint p(sinf(fBase * 1.01) * r + cosf(fBase * 1.02) * 0.2,
-		cosf(fBase * 1.01) * r + sinf(fBase * 1.02) * 0.2);
+	BPoint p(sinf(fBase * 1.01f) * r + cosf(fBase * 1.02f) * 0.2f,
+		cosf(fBase * 1.01f) * r + sinf(fBase * 1.02f) * 0.2f);
 	// transform to view coordinates
 	p.x *= fScale;
 	p.y *= fScale;
 	p += fTrans;
 	// move on
-	fBase += 0.05;
+	fBase += 0.05f;
 	return p;
 }
 
