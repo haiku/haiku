@@ -599,7 +599,7 @@ LargeMemoryPhysicalPageMapper::MemcpyFromPhysical(void* _to, phys_addr_t from,
 	size_t length, bool user)
 {
 	uint8* to = (uint8*)_to;
-	phys_addr_t pageOffset = from % B_PAGE_SIZE;
+	addr_t pageOffset = from % B_PAGE_SIZE;
 
 	struct thread* thread = thread_get_current_thread();
 	ThreadCPUPinner _(thread);
@@ -639,7 +639,7 @@ LargeMemoryPhysicalPageMapper::MemcpyToPhysical(phys_addr_t to,
 	const void* _from, size_t length, bool user)
 {
 	const uint8* from = (const uint8*)_from;
-	phys_addr_t pageOffset = to % B_PAGE_SIZE;
+	addr_t pageOffset = to % B_PAGE_SIZE;
 
 	struct thread* thread = thread_get_current_thread();
 	ThreadCPUPinner _(thread);
