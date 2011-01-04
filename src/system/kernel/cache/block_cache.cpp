@@ -2091,7 +2091,7 @@ dump_cached_block(int argc, char** argv)
 		return 0;
 	}
 
-	dump_block_long((struct cached_block*)parse_expression(argv[1]));
+	dump_block_long((struct cached_block*)(addr_t)parse_expression(argv[1]));
 	return 0;
 }
 
@@ -2124,7 +2124,7 @@ dump_cache(int argc, char** argv)
 		return 0;
 	}
 
-	block_cache* cache = (struct block_cache*)parse_expression(argv[i]);
+	block_cache* cache = (struct block_cache*)(addr_t)parse_expression(argv[i]);
 	if (cache == NULL) {
 		kprintf("invalid cache address\n");
 		return 0;
@@ -2238,9 +2238,9 @@ dump_transaction(int argc, char** argv)
 	cache_transaction* transaction = NULL;
 
 	if (argc - i == 1) {
-		transaction = (cache_transaction*)parse_expression(argv[i]);
+		transaction = (cache_transaction*)(addr_t)parse_expression(argv[i]);
 	} else {
-		block_cache* cache = (block_cache*)parse_expression(argv[i]);
+		block_cache* cache = (block_cache*)(addr_t)parse_expression(argv[i]);
 		int32 id = parse_expression(argv[i + 1]);
 		transaction = lookup_transaction(cache, id);
 		if (transaction == NULL) {
