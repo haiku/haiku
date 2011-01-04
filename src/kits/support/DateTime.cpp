@@ -78,7 +78,7 @@ BTime::BTime(const BMessage* archive)
 {
 	if (archive == NULL)
 		return;
-	archive->FindInt64("mircoseconds", &fMicroseconds);
+	archive->FindInt64("microseconds", &fMicroseconds);
 }
 
 
@@ -102,7 +102,7 @@ BTime::Archive(BMessage* into) const
 {
 	if (into == NULL)
 		return B_BAD_VALUE;
-	return into->AddInt64("mircoseconds", fMicroseconds);
+	return into->AddInt64("microseconds", fMicroseconds);
 }
 
 
@@ -120,18 +120,18 @@ BTime::IsValid() const
 /*!
 	This is an overloaded member function, provided for convenience.
 */
-bool
-BTime::IsValid(const BTime& time) const
+/*static*/ bool
+BTime::IsValid(const BTime& time)
 {
-	return time.fMicroseconds > -1 && time.fMicroseconds < kMicrosecondsPerDay;
+	return time.IsValid();
 }
 
 
 /*!
 	This is an overloaded member function, provided for convenience.
 */
-bool
-BTime::IsValid(int32 hour, int32 minute, int32 second, int32 microsecond) const
+/*static*/ bool
+BTime::IsValid(int32 hour, int32 minute, int32 second, int32 microsecond)
 {
 	return BTime(hour, minute, second, microsecond).IsValid();
 }
@@ -205,8 +205,8 @@ BTime::SetTime(int32 hour, int32 minute, int32 second, int32 microsecond)
 
 
 /*!
-	Adds \c hours to the current time. If the passed value is negativ it will
-	become earlier. Note: The time will wrap if it passes midnight.
+	Adds \c hours to the current time. If the passed value is negative it
+	will become earlier. Note: The time will wrap if it passes midnight.
 */
 BTime&
 BTime::AddHours(int32 hours)
@@ -217,8 +217,8 @@ BTime::AddHours(int32 hours)
 
 
 /*!
-	Adds \c minutes to the current time. If the passed value is negativ it will
-	become earlier. Note: The time will wrap if it passes midnight.
+	Adds \c minutes to the current time. If the passed value is negative it
+	will become earlier. Note: The time will wrap if it passes midnight.
 */
 BTime&
 BTime::AddMinutes(int32 minutes)
@@ -229,8 +229,8 @@ BTime::AddMinutes(int32 minutes)
 
 
 /*!
-	Adds \c seconds to the current time. If the passed value is negativ it will
-	become earlier. Note: The time will wrap if it passes midnight.
+	Adds \c seconds to the current time. If the passed value is negative
+	it will become earlier. Note: The time will wrap if it passes midnight.
 */
 BTime&
 BTime::AddSeconds(int32 seconds)
@@ -241,8 +241,8 @@ BTime::AddSeconds(int32 seconds)
 
 
 /*!
-	Adds \c milliseconds to the current time. If the passed value is negativ it
-	will become earlier. Note: The time will wrap if it passes midnight.
+	Adds \c milliseconds to the current time. If the passed value is negative
+	it will become earlier. Note: The time will wrap if it passes midnight.
 */
 BTime&
 BTime::AddMilliseconds(int32 milliseconds)
@@ -253,8 +253,8 @@ BTime::AddMilliseconds(int32 milliseconds)
 
 
 /*!
-	Adds \c microseconds to the current time. If the passed value is negativ it
-	will become earlier. Note: The time will wrap if it passes midnight.
+	Adds \c microseconds to the current time. If the passed value is negative
+	it will become earlier. Note: The time will wrap if it passes midnight.
 */
 BTime&
 BTime::AddMicroseconds(int32 microseconds)
@@ -279,7 +279,8 @@ BTime::Hour() const
 int32
 BTime::Minute() const
 {
-	return int32(((_Microseconds() % kMicrosecondsPerHour)) / kMicrosecondsPerMinute);
+	return int32(((_Microseconds() % kMicrosecondsPerHour))
+		/ kMicrosecondsPerMinute);
 }
 
 
@@ -310,7 +311,7 @@ BTime::Millisecond() const
 int32
 BTime::Microsecond() const
 {
-	return int32(_Microseconds() % 1000000);
+	return int32(_Microseconds() % kMicrosecondsPerSecond);
 }
 
 
@@ -335,20 +336,21 @@ BTime::Difference(const BTime& time, diff_type type) const
 {
 	bigtime_t diff = time._Microseconds() - _Microseconds();
 	switch (type) {
-		case B_HOURS_DIFF: {
+		case B_HOURS_DIFF:
 			diff /= kMicrosecondsPerHour;
-		}	break;
-		case B_MINUTES_DIFF: {
+			break;
+		case B_MINUTES_DIFF:
 			diff /= kMicrosecondsPerMinute;
-		}	break;
-		case B_SECONDS_DIFF: {
+			break;
+		case B_SECONDS_DIFF:
 			diff /= kMicrosecondsPerSecond;
-		}	break;
-		case B_MILLISECONDS_DIFF: {
+			break;
+		case B_MILLISECONDS_DIFF:
 			diff /= 1000;
-		}	break;
+			break;
 		case B_MICROSECONDS_DIFF:
-		default:	break;
+		default:
+			break;
 	}
 	return diff;
 }
@@ -548,8 +550,8 @@ BDate::IsValid() const
 /*!
 	This is an overloaded member function, provided for convenience.
 */
-bool
-BDate::IsValid(const BDate& date) const
+/*static*/ bool
+BDate::IsValid(const BDate& date)
 {
 	return IsValid(date.fYear, date.fMonth, date.fDay);
 }
@@ -558,8 +560,8 @@ BDate::IsValid(const BDate& date) const
 /*!
 	This is an overloaded member function, provided for convenience.
 */
-bool
-BDate::IsValid(int32 year, int32 month, int32 day) const
+/*static*/ bool
+BDate::IsValid(int32 year, int32 month, int32 day)
 {
 	// no year 0 in Julian and nothing before 1.1.4713 BC
 	if (year == 0 || year < -4713)
@@ -644,7 +646,7 @@ BDate::SetDate(int32 year, int32 month, int32 day)
 	will be set to 0.
 */
 void
-BDate::GetDate(int32* year, int32* month, int32* day)
+BDate::GetDate(int32* year, int32* month, int32* day) const
 {
 	if (year)
 		*year = fYear;
@@ -856,11 +858,22 @@ BDate::DayOfYear() const
 
 
 /*!
+	Returns true if the year of this object is a leap year, otherwise false. If
+	the \c year passed is before 4713 BC, the result is undefined.
+*/
+bool
+BDate::IsLeapYear() const
+{
+	return IsLeapYear(fYear);
+}
+
+
+/*!
 	Returns true if the passed \c year is a leap year, otherwise false. If the
 	\c year passed is before 4713 BC, the result is undefined.
 */
-bool
-BDate::IsLeapYear(int32 year) const
+/*static*/ bool
+BDate::IsLeapYear(int32 year)
 {
 	if (year < 1582) {
 		if (year < 0)
@@ -1036,12 +1049,12 @@ BDate::DateToJulianDay() const
 }
 
 
-/*
+/*!
 	Converts the passed \c julianDay to an BDate. If the \c julianDay is negativ,
 	the function will return an invalid date. Because of the switch from Julian
 	calendar to Gregorian calendar the 4.10.1582 is followed by the 15.10.1582.
 */
-BDate
+/*static*/ BDate
 BDate::JulianDayToDate(int32 julianDay)
 {
 	BDate date;
@@ -1056,8 +1069,8 @@ BDate::JulianDayToDate(int32 julianDay)
 		int32 a = (db / 365 + 1) * 3 / 4;
 		int32 da = db - a * 365;
 		int32 m = (da * 5 + 308) / 153 - 2;
-		date.fYear = ((j / 146097) * 400 + c * 100 + (dc / 1461) * 4 + a) - 4800 +
-			(m + 2) / 12;
+		date.fYear = ((j / 146097) * 400 + c * 100 + (dc / 1461) * 4 + a)
+			- 4800 + (m + 2) / 12;
 		date.fMonth = (m + 2) % 12 + 1;
 		date.fDay = int32((da - (m + 4) * 153 / 5 + 122) + 1.5);
 	} else if (julianDay >= 0) {
@@ -1073,6 +1086,57 @@ BDate::JulianDayToDate(int32 julianDay)
 			year--;
 		date.fYear = year;
 	}
+	return date;
+}
+
+
+/*!
+	Returns the date for easter sunday for the \c year.
+*/
+/*static*/ BDate
+BDate::EasterSunday(int32 year)
+{
+	// http://bloggingabout.net/blogs/jschreuder/archive/2005/06/24/7019.aspx
+	int32 gold = year % 19;
+	int32 century = year / 100;
+	int32 h = (century - (int32)(century / 4)
+		- (int32)((century * 8 + 13) / 25) + 19 * gold + 15) % 30;
+	int32 i = h - (int32)(h / 28) * (1 - (int32)(h / 28)
+		* (int32)(29 / (h + 1)) * (int32)((21 - gold) / 11));
+
+	BDate date;
+	date.fDay = i - ((year + (int32)(year / 4) + i + 2 - century
+		+ (int32)(century / 4)) % 7) + 28;
+	date.fMonth = 3;
+	date.fYear = year;
+	if (date.fDay > 31) {
+		date.fMonth++;
+		date.fDay -= 31;
+	}
+	return date;
+}
+
+
+/*!
+	Returns the date for ascension day for the \c year.
+*/
+/*static*/ BDate
+BDate::AscensionDay(int32 year)
+{
+	BDate date = AscensionDay(year);
+	date.AddDays(39);
+	return date;
+}
+
+
+/*!
+	Returns the date for pentecost day for the \c year.
+*/
+/*static*/ BDate
+BDate::PentecostDay(int32 year)
+{
+	BDate date = AscensionDay(year);
+	date.AddDays(49);
 	return date;
 }
 
@@ -1108,7 +1172,8 @@ BDate::operator<(const BDate& date) const
 
 
 /*!
-	Returns true if this date is earlier than or equal to \c date, otherwise false.
+	Returns true if this date is earlier than or equal to \c date, otherwise
+	false.
 */
 bool
 BDate::operator<=(const BDate& date) const
@@ -1128,7 +1193,8 @@ BDate::operator>(const BDate& date) const
 
 
 /*!
-	Returns true if this date is later than or equal to \c date, otherwise false.
+	Returns true if this date is later than or equal to \c date, otherwise
+	false.
 */
 bool
 BDate::operator>=(const BDate& date) const
@@ -1156,7 +1222,7 @@ BDate::_SetDate(int32 year, int32 month, int32 day)
 
 
 int32
-BDate::_DaysInMonth(int32 year, int32 month) const
+BDate::_DaysInMonth(int32 year, int32 month)
 {
 	if (month == 2 && IsLeapYear(year))
 		return 29;
@@ -1169,7 +1235,7 @@ BDate::_DaysInMonth(int32 year, int32 month) const
 
 
 int32
-BDate::_DateToJulianDay(int32 _year, int32 month, int32 day) const
+BDate::_DateToJulianDay(int32 _year, int32 month, int32 day)
 {
 	if (IsValid(_year, month, day)) {
 		int32 year = _year;
@@ -1373,7 +1439,7 @@ BDateTime::Time_t() const
 	tm_struct.tm_mon = fDate.Month() - 1;
 	tm_struct.tm_mday = fDate.Day();
 
-	// set less 0 as we wan't use it
+	// set less 0 as we won't use it
 	tm_struct.tm_isdst = -1;
 
 	// return secs_since_jan1_1970 or -1 on error

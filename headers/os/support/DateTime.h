@@ -42,9 +42,9 @@ public:
 			status_t			Archive(BMessage* into) const;
 
 			bool				IsValid() const;
-			bool				IsValid(const BTime& time) const;
-			bool				IsValid(int32 hour, int32 minute, int32 second,
-									int32 microsecond = 0) const;
+	static	bool				IsValid(const BTime& time);
+	static	bool				IsValid(int32 hour, int32 minute, int32 second,
+									int32 microsecond = 0);
 
 	static	BTime				CurrentTime(time_type type);
 
@@ -98,9 +98,9 @@ public:
 			status_t			Archive(BMessage* into) const;
 
 			bool				IsValid() const;
-			bool				IsValid(const BDate& date) const;
-			bool				IsValid(int32 year, int32 month,
-									int32 day) const;
+	static	bool				IsValid(const BDate& date);
+	static	bool				IsValid(int32 year, int32 month,
+									int32 day);
 
 	static	BDate				CurrentDate(time_type type);
 
@@ -108,7 +108,8 @@ public:
 			bool				SetDate(const BDate& date);
 
 			bool				SetDate(int32 year, int32 month, int32 day);
-			void				GetDate(int32* year, int32* month, int32* day);
+			void				GetDate(int32* year, int32* month,
+									int32* day) const;
 
 			void				AddDays(int32 days);
 			void				AddYears(int32 years);
@@ -123,7 +124,8 @@ public:
 			int32				DayOfYear() const;
 
 			int32				WeekNumber() const;
-			bool				IsLeapYear(int32 year) const;
+			bool				IsLeapYear() const;
+	static	bool				IsLeapYear(int32 year);
 
 			int32				DaysInYear() const;
 			int32				DaysInMonth() const;
@@ -143,6 +145,10 @@ public:
 			int32				DateToJulianDay() const;
 	static	BDate				JulianDayToDate(int32 julianDay);
 
+	static	BDate				EasterSunday(int32 year);
+	static	BDate				AscensionDay(int32 year);
+	static	BDate				PentecostDay(int32 year);
+
 			bool				operator!=(const BDate& date) const;
 			bool				operator==(const BDate& date) const;
 
@@ -153,10 +159,10 @@ public:
 			bool				operator>=(const BDate& date) const;
 
 private:
-			int32				_DaysInMonth(int32 year, int32 month) const;
+	static	int32				_DaysInMonth(int32 year, int32 month);
 			bool				_SetDate(int32 year, int32 month, int32 day);
-			int32				_DateToJulianDay(int32 year, int32 month,
-									int32 day) const;
+	static	int32				_DateToJulianDay(int32 year, int32 month,
+									int32 day);
 
 private:
 			int32				fDay;
