@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Haiku, Inc. All rights reserved.
+ * Copyright 2008-2010, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,21 +9,23 @@
 
 #include "UninstallPage.h"
 
+#include <string.h>
 
 #include <Catalog.h>
-#include <Locale.h>
 #include <RadioButton.h>
 #include <TextView.h>
-
-#include <string.h>
 
 
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "UninstallPage"
 
 
+static const float kTextDistance = 10;
+
+
 UninstallPage::UninstallPage(BMessage* settings, BRect frame, const char* name)
-	: WizardPageView(settings, frame, name, B_FOLLOW_ALL,
+	:
+	WizardPageView(settings, frame, name, B_FOLLOW_ALL,
 		B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE)
 {
 	_BuildUI();
@@ -43,19 +45,16 @@ UninstallPage::FrameResized(float width, float height)
 }
 
 
-static const float kTextDistance = 10;
-
 void
 UninstallPage::_BuildUI()
 {
 	BRect rect(Bounds());
 
 	BString text;
-	text <<
-		B_TRANSLATE_COMMENT("Uninstall Boot Manager", "Title") << "\n\n" <<
-		B_TRANSLATE("Please locate the Master Boot Record (MBR) save file to "
-		"restore from. This is the file that was created when the "
-		"boot manager was first installed.");
+	text << B_TRANSLATE_COMMENT("Uninstall Boot Manager", "Title") << "\n\n"
+		<< B_TRANSLATE("Please locate the Master Boot Record (MBR) save file "
+			"to restore from. This is the file that was created when the "
+			"boot manager was first installed.");
 	fDescription = CreateDescription(rect, "description", text);
 
 	MakeHeading(fDescription);
@@ -70,4 +69,3 @@ UninstallPage::_Layout()
 {
 	LayoutDescriptionVertically(fDescription);
 }
-

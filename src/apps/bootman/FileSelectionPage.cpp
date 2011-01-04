@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Haiku, Inc. All rights reserved.
+ * Copyright 2008-2010, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,17 +9,15 @@
 
 #include "FileSelectionPage.h"
 
+#include <string.h>
 
 #include <Button.h>
 #include <Catalog.h>
-#include <Locale.h>
+#include <ControlLook.h>
 #include <Path.h>
 #include <RadioButton.h>
 #include <TextControl.h>
 #include <TextView.h>
-
-#include <string.h>
-#include <String.h>
 
 
 #undef B_TRANSLATE_CONTEXT
@@ -29,12 +27,13 @@
 const uint32 kMsgOpenFilePanel = 'open';
 
 
-FileSelectionPage::FileSelectionPage(BMessage* settings, BRect frame, const char* name,
-		const char* description, file_panel_mode mode)
-	: WizardPageView(settings, frame, name, B_FOLLOW_ALL,
-		B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE)
-	, fMode(mode)
-	, fFilePanel(NULL)
+FileSelectionPage::FileSelectionPage(BMessage* settings, BRect frame,
+	const char* name, const char* description, file_panel_mode mode)
+	:
+	WizardPageView(settings, frame, name, B_FOLLOW_ALL,
+		B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE),
+	fMode(mode),
+	fFilePanel(NULL)
 {
 	_BuildUI(description);
 }
@@ -87,12 +86,12 @@ FileSelectionPage::PageCompleted()
 }
 
 
-const float kTextDistance = 10;
 const float kFileButtonDistance = 10;
 
 void
 FileSelectionPage::_BuildUI(const char* description)
 {
+	const float kSpacing = be_control_look->DefaultItemSpacing();
 	BRect rect(Bounds());
 
 	fDescription = CreateDescription(rect, "description", description);
@@ -110,7 +109,7 @@ FileSelectionPage::_BuildUI(const char* description)
 	fSelect->ResizeToPreferred();
 
 	float selectLeft = rect.right - fSelect->Bounds().Width();
-	rect.right = selectLeft - kFileButtonDistance;
+	rect.right = selectLeft - kSpacing;
 	fFile = new BTextControl(rect, "file",
 		B_TRANSLATE_COMMENT("File:", "Text control label"),
 		file.String(), new BMessage());
@@ -127,10 +126,11 @@ FileSelectionPage::_BuildUI(const char* description)
 void
 FileSelectionPage::_Layout()
 {
+	const float kSpacing = be_control_look->DefaultItemSpacing();
 	LayoutDescriptionVertically(fDescription);
 
 	float left = fFile->Frame().left;
-	float top = fDescription->Frame().bottom + kTextDistance;
+	float top = fDescription->Frame().bottom + kSpacing;
 
 	// center "file" text field and "select" button vertically
 	float selectTop = top;
@@ -147,7 +147,7 @@ FileSelectionPage::_Layout()
 
 	fFile->MoveTo(left, fileTop);
 
-	float width = fSelect->Frame().left - kFileButtonDistance - left;
+	float width = fSelect->Frame().left - kSpacing - left;
 	fFile->ResizeTo(width, fileHeight);
 
 	left = fSelect->Frame().left;
@@ -172,11 +172,7 @@ FileSelectionPage::_OpenFilePanel()
 
 	BMessenger messenger(this);
 	fFilePanel = new BFilePanel(fMode, &messenger, directory,
-		B_FILE_NODE,
-		false,
-		NULL,
-		NULL,
-		true);
+		B_FILE_NODE, false, NULL, NULL, true);
 	if (fMode == B_SAVE_PANEL && file.Leaf() != NULL)
 		fFilePanel->SetSaveText(file.Leaf());
 	fFilePanel->Show();

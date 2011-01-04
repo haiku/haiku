@@ -1,7 +1,7 @@
 /*
- * Copyright 2008, Haiku, Inc. All rights reserved.
+ * Copyright 2008-2010, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
- * 
+ *
  * Authors:
  *		Michael Pfeiffer <laplace@users.sourceforge.net>
  */
@@ -9,17 +9,17 @@
 
 #include "WizardPageView.h"
 
-
-#include <TextView.h>
-
 #include <math.h>
 #include <string.h>
 
+#include <TextView.h>
 
-WizardPageView::WizardPageView(BMessage* settings, BRect frame, const char* name,
-	uint32 resizingMode, uint32 flags)
-	: BView(frame, name, resizingMode, flags)
-	, fSettings(settings)
+
+WizardPageView::WizardPageView(BMessage* settings, BRect frame,
+	const char* name, uint32 resizingMode, uint32 flags)
+	:
+	BView(frame, name, resizingMode, flags),
+	fSettings(settings)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
@@ -40,7 +40,7 @@ BTextView*
 WizardPageView::CreateDescription(BRect frame, const char* name,
 	const char* description)
 {
-	BTextView* view = new BTextView(frame, "text", 
+	BTextView* view = new BTextView(frame, "text",
 		frame.OffsetToCopy(0, 0),
 		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
 		B_WILL_DRAW | B_PULSE_NEEDED | B_FRAME_EVENTS);
@@ -72,10 +72,10 @@ void
 WizardPageView::LayoutDescriptionVertically(BTextView* view)
 {
 	view->SetTextRect(view->Bounds());
-	
+
 	float height = view->TextHeight(0, 32000);
 	float width = view->Bounds().Width();
-	
+
 	view->ResizeTo(width, height);
 	view->SetTextRect(view->Bounds());
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Haiku, Inc. All rights reserved.
+ * Copyright 2008-2010, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,11 +9,10 @@
 
 #include "WizardView.h"
 
-#include "WizardPageView.h"
-
 #include <Box.h>
 #include <Catalog.h>
-#include <Locale.h>
+
+#include "WizardPageView.h"
 
 
 #undef B_TRANSLATE_CONTEXT
@@ -27,11 +26,12 @@ static const float kBorderHeight = 5;
 
 
 WizardView::WizardView(BRect frame, const char* name, uint32 resizingMode)
-	: BView(frame, name, resizingMode, 0)
-	, fSeparator(NULL)
-	, fPrevious(NULL)
-	, fNext(NULL)
-	, fPage(NULL)
+	:
+	BView(frame, name, resizingMode, 0),
+	fSeparator(NULL),
+	fPrevious(NULL),
+	fNext(NULL),
+	fPage(NULL)
 {
 	_BuildUI();
 	SetPreviousButtonHidden(true);
@@ -164,7 +164,9 @@ WizardView::_BuildUI()
 	float buttonTop = height - 1 - buttonHeight - kBorderHeight;
 	fPrevious->MoveTo(kBorderWidth, buttonTop);
 
-	fSeparator->MoveTo(kBorderWidth, buttonTop - kSeparatorDistance - kSeparatorHeight);
+	fSeparator->MoveTo(kBorderWidth,
+		buttonTop - kSeparatorDistance - kSeparatorHeight);
 
-	fNext->MoveTo(width - fNext->Bounds().Width() - kBorderWidth - 1, buttonTop);
+	fNext->MoveTo(width - fNext->Bounds().Width() - kBorderWidth - 1,
+		buttonTop);
 }

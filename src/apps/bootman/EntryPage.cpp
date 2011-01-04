@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2008-2010, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,13 +9,12 @@
 
 #include "EntryPage.h"
 
+#include <string.h>
 
 #include <Catalog.h>
-#include <Locale.h>
+#include <ControlLook.h>
 #include <RadioButton.h>
 #include <TextView.h>
-
-#include <string.h>
 
 
 #undef B_TRANSLATE_CONTEXT
@@ -23,7 +22,8 @@
 
 
 EntryPage::EntryPage(BMessage* settings, BRect frame, const char* name)
-	: WizardPageView(settings, frame, name, B_FOLLOW_ALL,
+	:
+	WizardPageView(settings, frame, name, B_FOLLOW_ALL,
 		B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE)
 {
 	_BuildUI();
@@ -49,7 +49,6 @@ EntryPage::PageCompleted()
 	fSettings->ReplaceBool("install", fInstall->Value() != 0);
 }
 
-static const float kTextDistance = 10;
 
 void
 EntryPage::_BuildUI()
@@ -63,7 +62,8 @@ EntryPage::_BuildUI()
 	fInstall->ResizeToPreferred();
 
 	BRect textRect(rect);
-	textRect.left = fInstall->Frame().right + kTextDistance;
+	textRect.left = fInstall->Frame().right
+		+ be_control_look->DefaultItemSpacing();
 
 	BString text;
 	text <<

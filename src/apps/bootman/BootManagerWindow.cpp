@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Haiku, Inc. All rights reserved.
+ * Copyright 2008-2010, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,26 +9,21 @@
 
 #include "BootManagerWindow.h"
 
-#include "WizardView.h"
-
-#include "EntryPage.h"
-#include "PartitionsPage.h"
-#include "DefaultPartitionPage.h"
-
 #include <Application.h>
 #include <Catalog.h>
-#include <Locale.h>
 #include <Roster.h>
 #include <Screen.h>
 
-#include <math.h>
+#include <tracker_private.h>
 
-#include "tracker_private.h"
+#include "DefaultPartitionPage.h"
+#include "EntryPage.h"
+#include "PartitionsPage.h"
+#include "WizardView.h"
 
 
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "BootManagerWindow"
-
 
 
 BootManagerWindow::BootManagerWindow()

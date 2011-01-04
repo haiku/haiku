@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Haiku, Inc. All rights reserved.
+ * Copyright 2008-2010, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -39,13 +39,12 @@ enum {
 const int32 kTimeoutIndefinitely = -1;
 const int32 kDefaultTimeout = kTimeoutIndefinitely;
 
-typedef struct {
+struct TimeoutOption {
 	int32 timeout;
 	const char* label;
-} TimeoutOption;
+};
 
-static const TimeoutOption gTimeoutOptions[] =
-{
+static const TimeoutOption gTimeoutOptions[] = {
 	{ 0, B_TRANSLATE_MARK("Immediately")},
 	{ 1, B_TRANSLATE_MARK("After one second")},
 	{ 2, B_TRANSLATE_MARK("After two seconds")},
@@ -95,8 +94,13 @@ get_label_for_timeout(int32 timeout)
 }
 
 
-DefaultPartitionPage::DefaultPartitionPage(BMessage* settings, BRect frame, const char* name)
-	: WizardPageView(settings, frame, name, B_FOLLOW_ALL,
+// #pragma mark -
+
+
+DefaultPartitionPage::DefaultPartitionPage(BMessage* settings, BRect frame,
+	const char* name)
+	:
+	WizardPageView(settings, frame, name, B_FOLLOW_ALL,
 		B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE)
 {
 	_BuildUI();
@@ -129,34 +133,34 @@ DefaultPartitionPage::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
 		case kMsgPartition:
-			{
-				int32 index;
-				msg->FindInt32("index", &index);
-				fSettings->ReplaceInt32("defaultPartition", index);
-			}
+		{
+			int32 index;
+			msg->FindInt32("index", &index);
+			fSettings->ReplaceInt32("defaultPartition", index);
 			break;
+		}
 		case kMsgTimeout:
-			{
-				int32 sliderValue = fTimeoutSlider->Value();
-				int32 timeout = get_timeout_for_index(sliderValue);
-				fSettings->ReplaceInt32("timeout", timeout);
+		{
+			int32 sliderValue = fTimeoutSlider->Value();
+			int32 timeout = get_timeout_for_index(sliderValue);
+			fSettings->ReplaceInt32("timeout", timeout);
 
-				BString label;
-				_GetTimeoutLabel(timeout, label);
-				fTimeoutSlider->SetLabel(label.String());
-			}
+			BString label;
+			_GetTimeoutLabel(timeout, label);
+			fTimeoutSlider->SetLabel(label.String());
 			break;
+		}
+
 		default:
 			WizardPageView::MessageReceived(msg);
 	}
 }
 
 
-#define kTextDistance be_control_look->DefaultItemSpacing();
-
 void
 DefaultPartitionPage::_BuildUI()
 {
+	const float kTextDistance = be_control_look->DefaultItemSpacing();
 	BRect rect(Bounds());
 
 	BString text;
@@ -223,8 +227,7 @@ DefaultPartitionPage::_CreatePopUpMenu()
 		"Pop up menu title"));
 	BMessage message;
 	for (int32 i = 0; fSettings->FindMessage("partition", i, &message) == B_OK;
-		i ++) {
-
+			i++) {
 		bool show;
 		if (message.FindBool("show", &show) != B_OK || !show)
 			continue;
@@ -261,6 +264,7 @@ DefaultPartitionPage::_Layout()
 {
 	LayoutDescriptionVertically(fDescription);
 
+	const float kTextDistance = be_control_look->DefaultItemSpacing();
 	float left = fDefaultPartition->Frame().left;
 	float top = fDescription->Frame().bottom + kTextDistance;
 
@@ -269,4 +273,3 @@ DefaultPartitionPage::_Layout()
 
 	fTimeoutSlider->MoveTo(left, top);
 }
-

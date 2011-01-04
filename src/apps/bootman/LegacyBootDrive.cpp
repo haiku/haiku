@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Haiku, Inc. All rights reserved.
+ * Copyright 2008-2010, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,29 +9,17 @@
 
 #include "LegacyBootDrive.h"
 
+#include <new>
+#include <stdio.h>
 
 #include <Catalog.h>
-#include <Drivers.h>
+#include <DataIO.h>
 #include <DiskDevice.h>
 #include <DiskDeviceRoster.h>
 #include <DiskDeviceVisitor.h>
-#include <Locale.h>
+#include <File.h>
 #include <Partition.h>
 #include <Path.h>
-#include <String.h>
-
-#include <errno.h>
-#include <fcntl.h>
-#include <memory>
-#include <new>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-
-#include <ByteOrder.h>
-#include <DataIO.h>
-#include <File.h>
 #include <String.h>
 #include <UTF8.h>
 
@@ -44,29 +32,68 @@
 #define GET_FIRST_BIOS_DRIVE 1
 
 
-class Buffer : public BMallocIO
-{
-public:
-	Buffer() : BMallocIO() {}
-	bool WriteInt8(int8 value);
-	bool WriteInt16(int16 value);
-	bool WriteInt32(int32 value);
-	bool WriteInt64(int64 value);
-	bool WriteString(const char* value);
-	bool Align(int16 alignment);
-	bool Fill(int16 size, int8 fillByte);
+struct MasterBootRecord {
+	uint8 bootLoader[440];
+	uint8 diskSignature[4];
+	uint8 reserved[2];
+	uint8 partition[64];
+	uint8 signature[2];
 };
 
 
+class LittleEndianMallocIO : public BMallocIO {
+public:
+			bool				WriteInt8(int8 value);
+			bool				WriteInt16(int16 value);
+			bool				WriteInt32(int32 value);
+			bool				WriteInt64(int64 value);
+			bool				WriteString(const char* value);
+			bool				Align(int16 alignment);
+			bool				Fill(int16 size, int8 fillByte);
+};
+
+
+class PartitionRecorder : public BDiskDeviceVisitor {
+public:
+								PartitionRecorder(BMessage* settings,
+									int8 drive);
+
+	virtual	bool				Visit(BDiskDevice* device);
+	virtual	bool				Visit(BPartition* partition, int32 level);
+
+			bool				HasPartitions() const;
+			off_t				FirstOffset() const;
+
+private:
+			bool				_Record(BPartition* partition);
+
+private:
+			BMessage*			fSettings;
+			int8				fDrive;
+			int32				fIndex;
+			off_t				fFirstOffset;
+};
+
+
+static const uint32 kBlockSize = 512;
+static const uint32 kNumberOfBootLoaderBlocks = 4;
+	// The number of blocks required to store the
+	// MBR including the Haiku boot loader.
+
+static const uint32 kMBRSignature = 0xAA55;
+
+static const int32 kMaxBootMenuItemLength = 70;
+
+
 bool
-Buffer::WriteInt8(int8 value)
+LittleEndianMallocIO::WriteInt8(int8 value)
 {
 	return Write(&value, sizeof(value)) == sizeof(value);
 }
 
 
 bool
-Buffer::WriteInt16(int16 value)
+LittleEndianMallocIO::WriteInt16(int16 value)
 {
 	return WriteInt8(value & 0xff)
 		&& WriteInt8(value >> 8);
@@ -74,7 +101,7 @@ Buffer::WriteInt16(int16 value)
 
 
 bool
-Buffer::WriteInt32(int32 value)
+LittleEndianMallocIO::WriteInt32(int32 value)
 {
 	return WriteInt8(value & 0xff)
 		&& WriteInt8(value >> 8)
@@ -84,14 +111,14 @@ Buffer::WriteInt32(int32 value)
 
 
 bool
-Buffer::WriteInt64(int64 value)
+LittleEndianMallocIO::WriteInt64(int64 value)
 {
 	return WriteInt32(value) && WriteInt32(value >> 32);
 }
 
 
 bool
-Buffer::WriteString(const char* value)
+LittleEndianMallocIO::WriteString(const char* value)
 {
 	int len = strlen(value) + 1;
 	return WriteInt8(len)
@@ -100,7 +127,7 @@ Buffer::WriteString(const char* value)
 
 
 bool
-Buffer::Align(int16 alignment)
+LittleEndianMallocIO::Align(int16 alignment)
 {
 	if ((Position() % alignment) == 0)
 		return true;
@@ -109,7 +136,7 @@ Buffer::Align(int16 alignment)
 
 
 bool
-Buffer::Fill(int16 size, int8 fillByte)
+LittleEndianMallocIO::Fill(int16 size, int8 fillByte)
 {
 	for (int i = 0; i < size; i ++) {
 		if (!WriteInt8(fillByte))
@@ -119,32 +146,15 @@ Buffer::Fill(int16 size, int8 fillByte)
 }
 
 
-class PartitionRecorder : public BDiskDeviceVisitor
-{
-public:
-	PartitionRecorder(BMessage* settings, int8 drive);
-
-	virtual bool Visit(BDiskDevice* device);
-	virtual bool Visit(BPartition* partition, int32 level);
-
-	bool HasPartitions() const;
-	off_t FirstOffset() const;
-
-private:
-	bool _Record(BPartition* partition);
-
-	BMessage* fSettings;
-	int8 fDrive;
-	int32 fIndex;
-	off_t fFirstOffset;
-};
+// #pragma mark -
 
 
 PartitionRecorder::PartitionRecorder(BMessage* settings, int8 drive)
-	: fSettings(settings)
-	, fDrive(drive)
-	, fIndex(0)
-	, fFirstOffset(LONGLONG_MAX)
+	:
+	fSettings(settings),
+	fDrive(drive),
+	fIndex(0),
+	fFirstOffset(LONGLONG_MAX)
 {
 }
 
@@ -223,6 +233,9 @@ PartitionRecorder::_Record(BPartition* partition)
 
 	return false;
 }
+
+
+// #pragma mark -
 
 
 LegacyBootDrive::LegacyBootDrive()
@@ -323,21 +336,22 @@ LegacyBootDrive::WriteBootMenu(BMessage *settings)
 		return B_BAD_VALUE;
 	}
 
-	Buffer newBootLoader;
+	LittleEndianMallocIO newBootLoader;
 	ssize_t size = sizeof(kBootLoader);
 	if (newBootLoader.Write(kBootLoader, size) != size) {
 		close(fd);
 		return B_NO_MEMORY;
 	}
 
-	MasterBootRecord* newMBR = (MasterBootRecord*)newBootLoader.BMallocIO::Buffer();
+	MasterBootRecord* newMBR = (MasterBootRecord*)newBootLoader.Buffer();
 	_CopyPartitionTable(newMBR, &oldMBR);
 
 	int menuEntries = 0;
 	int defaultMenuEntry = 0;
 	BMessage partition;
 	int32 index;
-	for (index = 0; settings->FindMessage("partition", index, &partition) == B_OK; index ++) {
+	for (index = 0; settings->FindMessage("partition", index,
+			&partition) == B_OK; index ++) {
 		bool show;
 		partition.FindBool("show", &show);
 		if (!show)
@@ -351,8 +365,8 @@ LegacyBootDrive::WriteBootMenu(BMessage *settings)
 	newBootLoader.WriteInt16(defaultMenuEntry);
 	newBootLoader.WriteInt16(timeout);
 
-
-	for (index = 0; settings->FindMessage("partition", index, &partition) == B_OK; index ++) {
+	for (index = 0; settings->FindMessage("partition", index,
+			&partition) == B_OK; index ++) {
 		bool show;
 		BString name;
 		BString path;
@@ -381,7 +395,7 @@ LegacyBootDrive::WriteBootMenu(BMessage *settings)
 	}
 
 	lseek(fd, 0, SEEK_SET);
-	const uint8* buffer = (uint8*)newBootLoader.BMallocIO::Buffer();
+	const uint8* buffer = (const uint8*)newBootLoader.Buffer();
 	status_t status = _WriteBlocks(fd, buffer, newBootLoader.Position());
 	close(fd);
 	return status;
@@ -593,14 +607,14 @@ LegacyBootDrive::_CopyPartitionTable(MasterBootRecord* destination,
 		const MasterBootRecord* source)
 {
 	memcpy(destination->diskSignature, source->diskSignature,
-		sizeof(source->diskSignature) + sizeof(source->reserved) +
-		sizeof(source->partition));
+		sizeof(source->diskSignature) + sizeof(source->reserved)
+			+ sizeof(source->partition));
 }
 
 
 bool
 LegacyBootDrive::_IsValid(const MasterBootRecord* mbr)
 {
-	return  mbr->signature[0] == (kMBRSignature & 0xff) &&
-		mbr->signature[1] == (kMBRSignature >> 8);
+	return mbr->signature[0] == (kMBRSignature & 0xff)
+		&& mbr->signature[1] == (kMBRSignature >> 8);
 }

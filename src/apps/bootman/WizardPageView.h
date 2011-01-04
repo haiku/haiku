@@ -1,7 +1,7 @@
 /*
- * Copyright 2008, Haiku, Inc. All rights reserved.
+ * Copyright 2008-2010, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
- * 
+ *
  * Authors:
  *		Michael Pfeiffer <laplace@users.sourceforge.net>
  */
@@ -15,26 +15,28 @@
 #include <View.h>
 
 
-class WizardPageView : public BView
-{
+class WizardPageView : public BView {
 public:
-	WizardPageView(BMessage* settings, BRect frame, const char* name, 
-		uint32 resizingMode = B_FOLLOW_ALL, uint32 flags = B_WILL_DRAW);
-	virtual ~WizardPageView();
-	
-	virtual void PageCompleted();
+								WizardPageView(BMessage* settings, BRect frame,
+									const char* name,
+									uint32 resizingMode = B_FOLLOW_ALL,
+									uint32 flags = B_WILL_DRAW);
+	virtual						~WizardPageView();
 
-	virtual BTextView* CreateDescription(BRect frame, const char* name,
-		const char* description);
-	
-	virtual void MakeHeading(BTextView* view);
-	virtual void LayoutDescriptionVertically(BTextView* view);
+	virtual	void				PageCompleted();
 
-protected:
-	BMessage* fSettings;
+	virtual	BTextView*			CreateDescription(BRect frame, const char* name,
+									const char* description);
+
+	virtual	void				MakeHeading(BTextView* view);
+	virtual	void				LayoutDescriptionVertically(BTextView* view);
 
 private:
-	void _BuildUI();
+			void				_BuildUI();
+
+protected:
+			BMessage*			fSettings;
 };
+
 
 #endif	// WIZARD_PAGE_VIEW_H

@@ -1,7 +1,7 @@
 /*
- * Copyright 2008, Haiku, Inc. All rights reserved.
+ * Copyright 2008-2010, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
- * 
+ *
  * Authors:
  *		Michael Pfeiffer <laplace@users.sourceforge.net>
  */
@@ -14,20 +14,22 @@
 
 class BTextView;
 
-class DescriptionPage : public WizardPageView
-{
+class DescriptionPage : public WizardPageView {
 public:
-	DescriptionPage(BRect frame, const char* name, const char* description, bool hasHeading);
-	virtual ~DescriptionPage();
-	
-	virtual void FrameResized(float width, float height);
+								DescriptionPage(BRect frame, const char* name,
+									const char* description, bool hasHeading);
+	virtual						~DescriptionPage();
+
+	virtual	void				FrameResized(float width, float height);
 
 private:
+			void				_BuildUI(const char* description,
+									bool hasHeading);
+			void				_Layout();
 
-	void _BuildUI(const char* description, bool hasHeading);
-	void _Layout();
-	
-	BTextView* fDescription;
+private:
+			BTextView* fDescription;
 };
+
 
 #endif	// DESCRIPTION_PAGE_H

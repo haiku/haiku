@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Haiku, Inc. All rights reserved.
+ * Copyright 2008-2010, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -10,19 +10,17 @@
 
 #include "PartitionsPage.h"
 
+#include <stdio.h>
+#include <string.h>
 
 #include <Catalog.h>
 #include <CheckBox.h>
-#include <Locale.h>
+#include <ControlLook.h>
 #include <RadioButton.h>
 #include <ScrollView.h>
 #include <StringView.h>
 #include <TextControl.h>
 #include <TextView.h>
-
-#include <stdio.h>
-#include <string.h>
-#include <String.h>
 
 
 #undef B_TRANSLATE_CONTEXT
@@ -33,8 +31,10 @@ const uint32 kMessageShow = 'show';
 const uint32 kMessageName = 'name';
 
 
-PartitionsPage::PartitionsPage(BMessage* settings, BRect frame, const char* name)
-	: WizardPageView(settings, frame, name, B_FOLLOW_ALL,
+PartitionsPage::PartitionsPage(BMessage* settings, BRect frame,
+	const char* name)
+	:
+	WizardPageView(settings, frame, name, B_FOLLOW_ALL,
 		B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE)
 {
 	_BuildUI();
@@ -91,21 +91,19 @@ PartitionsPage::FrameResized(float width, float height)
 }
 
 
-static const float kTextDistance = 10;
-
 void
 PartitionsPage::_BuildUI()
 {
+	const float kTextDistance = be_control_look->DefaultItemSpacing();
 	BRect rect(Bounds());
 
 	BString text;
-	text <<
-		B_TRANSLATE_COMMENT("Partitions", "Title") << "\n\n" <<
-		B_TRANSLATE("The following partitions were detected. Please "
-		"check the box next to the partitions to be included "
-		"in the boot menu. You can also set the names of the "
-		"partitions as you would like them to appear in the "
-		"boot menu.");
+	text << B_TRANSLATE_COMMENT("Partitions", "Title") << "\n\n"
+		<< B_TRANSLATE("The following partitions were detected. Please "
+			"check the box next to the partitions to be included "
+			"in the boot menu. You can also set the names of the "
+			"partitions as you would like them to appear in the "
+			"boot menu.");
 	fDescription = CreateDescription(rect, "description", text);
 	MakeHeading(fDescription);
 	AddChild(fDescription);
@@ -116,13 +114,10 @@ PartitionsPage::_BuildUI()
 	rect.right -= B_V_SCROLL_BAR_WIDTH;
 	rect.bottom -= B_H_SCROLL_BAR_HEIGHT + 3;
 
-	fPartitions = new BView(rect, "partitions", B_FOLLOW_ALL,
-		B_WILL_DRAW);
+	fPartitions = new BView(rect, "partitions", B_FOLLOW_ALL, B_WILL_DRAW);
 
 	fPartitionsScrollView = new BScrollView("scrollView", fPartitions,
-		B_FOLLOW_ALL,
-		0,
-		true, true);
+		B_FOLLOW_ALL, 0, true, true);
 	fPartitionsScrollView->SetViewColor(ViewColor());
 	AddChild(fPartitionsScrollView);
 
@@ -137,6 +132,7 @@ PartitionsPage::_Layout()
 {
 	LayoutDescriptionVertically(fDescription);
 
+	const float kTextDistance = be_control_look->DefaultItemSpacing();
 	float left = fPartitionsScrollView->Frame().left;
 	float top = fDescription->Frame().bottom + kTextDistance;
 	fPartitionsScrollView->MoveTo(left, top);
@@ -171,10 +167,6 @@ PartitionsPage::_Layout()
 		proportion = viewHeight / fPartitionsHeight;
 	scrollbar->SetProportion(proportion);
 }
-
-
-const rgb_color kOddRowColor = {224, 255, 224};
-const rgb_color kEvenRowColor = {224, 224, 255};
 
 
 void
@@ -215,7 +207,8 @@ PartitionsPage::_FillPartitionsView(BView* view)
 	frame.right = frame.left + 65000;
 
 	BMessage message;
-	for (int32 i = 0; fSettings->FindMessage("partition", i, &message) == B_OK; i ++, rowNumber ++) {
+	for (int32 i = 0; fSettings->FindMessage("partition", i, &message) == B_OK;
+			i++, rowNumber++) {
 		// get partition data
 		bool show;
 		BString name;
@@ -230,7 +223,6 @@ PartitionsPage::_FillPartitionsView(BView* view)
 
 		// create row for partition data
 		BView* row = new BView(frame, "row", B_FOLLOW_TOP | B_FOLLOW_LEFT, 0);
-		row->SetViewColor(((rowNumber % 2) == 0) ? kEvenRowColor : kOddRowColor);
 		view->AddChild(row);
 		frame.OffsetBy(0, height + 1);
 
@@ -252,8 +244,8 @@ PartitionsPage::_FillPartitionsView(BView* view)
 
 		// name
 		rect.right = rect.left + nameWidth;
-		BTextControl* nameControl = new BTextControl(rect, "name", "", name.String(),
-			_CreateControlMessage(kMessageName, i));
+		BTextControl* nameControl = new BTextControl(rect, "name", "",
+			name.String(), _CreateControlMessage(kMessageName, i));
 		nameControl->SetDivider(0);
 		row->AddChild(nameControl);
 		rect.OffsetBy(nameWidth + kDistance, 0);
@@ -268,7 +260,8 @@ PartitionsPage::_FillPartitionsView(BView* view)
 		BString sizeText;
 		_CreateSizeText(size, &sizeText);
 		rect.right = rect.left + sizeWidth;
-		BStringView* sizeView = new BStringView(rect, "type", sizeText.String());
+		BStringView* sizeView = new BStringView(rect, "type",
+			sizeText.String());
 		sizeView->SetAlignment(B_ALIGN_RIGHT);
 		row->AddChild(sizeView);
 		rect.OffsetBy(sizeWidth + kDistance, 0);
@@ -279,7 +272,6 @@ PartitionsPage::_FillPartitionsView(BView* view)
 		row->AddChild(pathView);
 	}
 
-
 	fPartitionsWidth = totalWidth;
 	fPartitionsHeight = frame.top;
 }
@@ -287,7 +279,7 @@ PartitionsPage::_FillPartitionsView(BView* view)
 
 void
 PartitionsPage::_ComputeColumnWidths(int32& showWidth, int32& nameWidth,
-		int32& typeWidth, int32& sizeWidth, int32& pathWidth)
+	int32& typeWidth, int32& sizeWidth, int32& pathWidth)
 {
 	BCheckBox checkBox(BRect(0, 0, 100, 100), "show", "", new BMessage());
 	checkBox.ResizeToPreferred();
@@ -298,7 +290,8 @@ PartitionsPage::_ComputeColumnWidths(int32& showWidth, int32& nameWidth,
 	const int32 kStringViewInsets = 2;
 
 	BMessage message;
-	for (int32 i = 0; fSettings->FindMessage("partition", i, &message) == B_OK; i ++) {
+	for (int32 i = 0; fSettings->FindMessage("partition", i, &message) == B_OK;
+			i++) {
 		// get partition data
 		BString type;
 		BString path;
@@ -309,18 +302,18 @@ PartitionsPage::_ComputeColumnWidths(int32& showWidth, int32& nameWidth,
 		BString sizeText;
 		_CreateSizeText(size, &sizeText);
 
-		int32 width = (int32)ceil(be_plain_font->StringWidth(type.String())) +
-			kStringViewInsets;
+		int32 width = (int32)ceil(be_plain_font->StringWidth(type.String()))
+			+ kStringViewInsets;
 		if (typeWidth < width)
 			typeWidth = width;
 
-		width = (int32)ceil(be_plain_font->StringWidth(path.String())) +
-			kStringViewInsets;
+		width = (int32)ceil(be_plain_font->StringWidth(path.String()))
+			+ kStringViewInsets;
 		if (pathWidth < width)
 			pathWidth = width;
 
-		width = (int32)ceil(be_plain_font->StringWidth(sizeText.String())) +
-			kStringViewInsets;
+		width = (int32)ceil(be_plain_font->StringWidth(sizeText.String()))
+			+ kStringViewInsets;
 		if (sizeWidth < width)
 			sizeWidth = width;
 	}

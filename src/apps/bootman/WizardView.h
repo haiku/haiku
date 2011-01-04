@@ -1,7 +1,7 @@
 /*
- * Copyright 2008, Haiku, Inc. All rights reserved.
+ * Copyright 2008-2010, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
- * 
+ *
  * Authors:
  *		Michael Pfeiffer <laplace@users.sourceforge.net>
  */
@@ -22,32 +22,34 @@ const uint32 kMessageNext = 'next';
 const uint32 kMessagePrevious = 'prev';
 
 
-class WizardView : public BView
-{
+class WizardView : public BView {
 public:
-	WizardView(BRect frame, const char* name, uint32 resizingMode);
-	virtual ~WizardView();
+								WizardView(BRect frame, const char* name,
+									uint32 resizingMode);
+	virtual						~WizardView();
 
-	virtual BRect PageFrame();
+	virtual	BRect				PageFrame();
 
-	virtual void SetPage(WizardPageView* page);
-	
-	virtual void PageCompleted();
+	virtual	void				SetPage(WizardPageView* page);
 
-	virtual void SetPreviousButtonEnabled(bool enabled);
-	virtual void SetNextButtonEnabled(bool enabled);
-	virtual void SetPreviousButtonLabel(const char* text);
-	virtual void SetNextButtonLabel(const char* text);
-	virtual void SetPreviousButtonHidden(bool hide);
+	virtual	void				PageCompleted();
+
+	virtual	void				SetPreviousButtonEnabled(bool enabled);
+	virtual	void				SetNextButtonEnabled(bool enabled);
+	virtual	void				SetPreviousButtonLabel(const char* text);
+	virtual	void				SetNextButtonLabel(const char* text);
+	virtual	void				SetPreviousButtonHidden(bool hide);
 
 private:
-	void _BuildUI();
+			void				_BuildUI();
 
-	BBox* fSeparator;
-	BButton* fPrevious;
-	BButton* fNext;
-	
-	WizardPageView* fPage;
+private:
+			BBox*				fSeparator;
+			BButton*			fPrevious;
+			BButton*			fNext;
+
+			WizardPageView*		fPage;
 };
+
 
 #endif	// WIZARD_VIEW_H

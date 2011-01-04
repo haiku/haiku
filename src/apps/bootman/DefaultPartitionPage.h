@@ -1,7 +1,7 @@
 /*
- * Copyright 2008, Haiku, Inc. All rights reserved.
+ * Copyright 2008-2010, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
- * 
+ *
  * Authors:
  *		Michael Pfeiffer <laplace@users.sourceforge.net>
  */
@@ -20,27 +20,28 @@ class BSlider;
 class BTextView;
 
 
-class DefaultPartitionPage : public WizardPageView
-{
+class DefaultPartitionPage : public WizardPageView {
 public:
-	DefaultPartitionPage(BMessage* settings, BRect frame, const char* name);
-	virtual ~DefaultPartitionPage();
-	
-	virtual void FrameResized(float width, float height);
+								DefaultPartitionPage(BMessage* settings,
+									BRect frame, const char* name);
+	virtual						~DefaultPartitionPage();
 
-	virtual void AttachedToWindow();
-	virtual void MessageReceived(BMessage* msg);
+	virtual	void				FrameResized(float width, float height);
+
+	virtual	void				AttachedToWindow();
+	virtual	void				MessageReceived(BMessage* msg);
 
 private:
+			void				_BuildUI();
+			BPopUpMenu*			_CreatePopUpMenu();
+			void				_GetTimeoutLabel(int32 timeout, BString& label);
+			void				_Layout();
 
-	void _BuildUI();
-	BPopUpMenu* _CreatePopUpMenu();
-	void _GetTimeoutLabel(int32 timeout, BString& label);
-	void _Layout();
-	
-	BTextView* fDescription;
-	BMenuField* fDefaultPartition;
-	BSlider* fTimeoutSlider;
+private:
+			BTextView*			fDescription;
+			BMenuField*			fDefaultPartition;
+			BSlider*			fTimeoutSlider;
 };
+
 
 #endif	// DEFAULT_PARTITON_PAGE_H

@@ -1,7 +1,7 @@
 /*
- * Copyright 2008, Haiku, Inc. All rights reserved.
+ * Copyright 2008-2010, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
- * 
+ *
  * Authors:
  *		Michael Pfeiffer <laplace@users.sourceforge.net>
  */
@@ -12,21 +12,23 @@
 #include "WizardView.h"
 #include "WizardPageView.h"
 
+
 void
 WizardController::StateStack::MakeEmpty()
 {
-		StateStack* stack = this;
-		StateStack* next;
-		do {
-			next = stack->Next();
-			delete stack;
-			stack = next;
-		} while (next != NULL);
+	StateStack* stack = this;
+	StateStack* next;
+	do {
+		next = stack->Next();
+		delete stack;
+		stack = next;
+	} while (next != NULL);
 }
 
 
 WizardController::WizardController()
-	: fStack(NULL)
+	:
+	fStack(NULL)
 {
 }
 
@@ -53,14 +55,14 @@ void
 WizardController::Next(WizardView* wizard)
 {
 	wizard->PageCompleted();
-	
+
 	if (fStack == NULL)
 		return;
-	
+
 	int state = NextState(fStack->State());
 	if (state < 0)
 		return;
-				
+
 	_PushState(state);
 	_ShowPage(wizard);
 }

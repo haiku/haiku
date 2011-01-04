@@ -1,8 +1,10 @@
+#include <fcntl.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <fcntl.h>
 
-int main(int argc, char* argv[])
+
+int
+main(int argc, char* argv[])
 {
 	const char* application = argv[0];
 	if (argc != 3) {
@@ -11,13 +13,14 @@ int main(int argc, char* argv[])
 	}
 	const char* variableName = argv[1];
 	const char* fileName = argv[2];
-	
+
 	int fd = open(fileName, 0);
 	if (fd < 0) {
-		fprintf(stderr, "%s: Error opening file '%s'!\n", application, fileName);
+		fprintf(stderr, "%s: Error opening file '%s'!\n", application,
+			fileName);
 		return 1;
 	}
-	
+
 	const int kSize = 1024;
 	unsigned char buffer[kSize];
 	int size = read(fd, buffer, kSize);
@@ -43,6 +46,6 @@ int main(int argc, char* argv[])
 		size = read(fd, buffer, kSize);
 	}
 	printf("\n};\n");
-	
+
 	close(fd);
 }
