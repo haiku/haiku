@@ -1,103 +1,64 @@
 /*
- * Copyright 2005-2007, Ingo Weinhold, bonefish@cs.tu-berlin.de.
+ * Copyright 2005-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
-#include "fs_shell_command_unix.h"
 
 #include <errno.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <sys/socket.h>
-#include <sys/un.h>
 
 #include "fs_shell_command.h"
 
 
-static bool
-write_data(int fd, const void* _buffer, size_t toWrite)
-{
-	const char* buffer = (const char*)_buffer;
-
-	ssize_t bytesWritten;
-	do {
-		bytesWritten = write(fd, buffer, toWrite);
-		if (bytesWritten > 0) {
-			buffer += bytesWritten;
-			toWrite -= bytesWritten;
-		}
-	} while (toWrite > 0 && !(bytesWritten < 0 && errno != EINTR));
-
-	return (bytesWritten >= 0);
-}
+bool gUsesFifos = true;
 
 
 bool
-send_external_command(const char *command, int *result)
+send_external_command(const char* command, int* result)
 {
-	external_command_message message;
-	message.command_length = strlen(command);
-
-	// create a socket
-	int fd = socket(AF_UNIX, SOCK_STREAM, 0);
-	if (fd < 0) {
-		fprintf(stderr, "Error: Failed to open unix socket: %s\n",
+	// open the pipe to the FS shell
+	FILE* out = fdopen(4, "w");
+	if (out == NULL) {
+		fprintf(stderr, "Error: Failed to open command output: %s\n",
 			strerror(errno));
 		return false;
 	}
 
-	// connect to the fs_shell
-	sockaddr_un addr;
-	addr.sun_family = AF_UNIX;
-	strcpy(addr.sun_path, kFSShellCommandSocketAddress);
-	int addrLen = addr.sun_path + strlen(addr.sun_path) + 1 - (char*)&addr;
-	if (connect(fd, (sockaddr*)&addr, addrLen) < 0) {
-		fprintf(stderr, "Error: Failed to open connection to FS shell: %s\n",
+	// open the pipe from the FS shell
+	FILE* in = fdopen(3, "r");
+	if (in == NULL) {
+		fprintf(stderr, "Error: Failed to open command reply input: %s\n",
 			strerror(errno));
-		close(fd);
-		return false;
-	}
-	
-	// send the command message and the command
-	if (!write_data(fd, &message, sizeof(message))
-		|| !write_data(fd, command, message.command_length)) {
-		fprintf(stderr, "Error: Writing to fs_shell failed: %s\n",
-			strerror(errno));
-		close(fd);
 		return false;
 	}
 
-	// read the reply	
-	external_command_reply reply;
-	int toRead = sizeof(reply);
-	char *replyBuffer = (char*)&reply;
-	while (toRead > 0) {
-		int bytesRead = read(fd, replyBuffer, toRead);
-		if (bytesRead < 0) {
-			if (errno == EINTR) {
-				continue;
-			} else {
-				fprintf(stderr, "Error: Failed to read reply from fs_shell: "
-					"%s\n", strerror(errno));
-				close(fd);
-				return false;
-			}
-		}
-
-		if (bytesRead == 0) {
-			fprintf(stderr, "Error: Unexpected end of fs_shell reply. Was "
-				"still expecting %d bytes\n", toRead);
-			close(fd);
-			return false;
-		}
-		
-		replyBuffer += bytesRead;
-		toRead -= bytesRead;
+	// write the command
+	if (fputs(command, out) == EOF || fputc('\n', out) == EOF
+		|| fflush(out) == EOF) {
+		fprintf(stderr, "Error: Failed to write command to FS shell: %s\n",
+			strerror(errno));
+		return false;
 	}
-	close(fd);
 
-	*result = reply.error;
+	// read the reply
+	char buffer[16];
+	if (fgets(buffer, sizeof(buffer), in) == NULL) {
+		fprintf(stderr, "Error: Failed to get command reply: %s\n",
+			strerror(errno));
+		return false;
+	}
+
+	// parse the number
+	char* end;
+	*result = strtol(buffer, &end, 10);
+	if (end == buffer) {
+		fprintf(stderr, "Error: Read non-number command reply from FS shell: "
+			"\"%s\"\n", buffer);
+		return false;
+	}
+
 	return true;
 }
 

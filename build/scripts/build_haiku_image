@@ -72,6 +72,48 @@ if [ $isCD ]; then
 	mkdir=mkdir
 	rm=rm
 elif [ $isImage ]; then
+	# If FIFOs are used for the communication with the FS shell, prepare them.
+	if $fsShellCommand --uses-fifos; then
+		fifoBasePath=/tmp/build_haiku_image-$$-fifo
+		toFSShellFifo=${fifoBasePath}-to-shell
+		fromFSShellFifo=${fifoBasePath}-from-shell
+
+		rm -f $toFSShellFifo $fromFSShellFifo
+		mkfifo $toFSShellFifo $fromFSShellFifo
+
+		# Open the FIFOs such that they are ready for the fsShellCommand. This
+		# also makes sure that they remain open until this script exits. When we
+		# exit while the FS shell is still running and waiting for commands,
+		# closing of our file descriptors will break the pipes and the FS shell
+		# will exit, too.
+		exec 3<$fromFSShellFifo 4>$toFSShellFifo 5<$toFSShellFifo \
+			6>$fromFSShellFifo
+
+		# Remove the FIFO files again -- we have the open FDs, so they can
+		# still be used and this makes sure they won't hang around any further.
+		rm -f $toFSShellFifo $fromFSShellFifo
+
+		# Remap the fsShellCommand and bfsShell such that they don't inherit the
+		# wrong FDs. For both fsShellCommand and bfsShell FD 3 is the input from
+		# the respectively other program, FD 4 is the output to it.
+		actualFSShellCommand="$fsShellCommand"
+		actualBFSShell="$bfsShell"
+
+		fsShellCommandWrapper()
+		{
+			$actualFSShellCommand 5>&- 6>&- "$@"
+		}
+
+		bfsShellWrapper()
+		{
+			$actualBFSShell 3>&5 4<&6 "$@"
+		}
+
+		fsShellCommand=fsShellCommandWrapper
+		bfsShell=bfsShellWrapper
+	fi
+
+	# set up the other commands
 	sPrefix=:
 	tPrefix=/myfs/
 	cd="$fsShellCommand cd"
@@ -227,8 +269,16 @@ if [ $isImage ]; then
 			"$imageLabel" "block_size 2048"
 		$makebootable $imageOffsetFlags "$imagePath"
 	fi
+
 	$bfsShell -n $imageOffsetFlags "$imagePath" > /dev/null &
 	sleep 1
+
+	# Close FDs 5 and 6. Those represent the pipe ends that are used by the
+	# FS shell. Closing them in the shell process makes sure an unexpected death
+	# of the FS shell causes writing to/reading from the other ends to fail
+	# immediately.
+	exec 5>&- 6>&-
+
 	# bail out, if mounting fails
 	$cd .
 fi

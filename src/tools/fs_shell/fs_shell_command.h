@@ -6,6 +6,9 @@
 #define _FSSH_FS_SHELL_COMMAND_H
 
 
+extern bool gUsesFifos;
+
+
 bool	send_external_command(const char* command, int* result);
 
 

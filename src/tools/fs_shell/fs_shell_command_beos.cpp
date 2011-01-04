@@ -13,6 +13,9 @@
 #include "fs_shell_command.h"
 
 
+bool gUsesFifos = false;
+
+
 bool
 send_external_command(const char *command, int *result)
 {

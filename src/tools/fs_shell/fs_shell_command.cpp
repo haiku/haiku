@@ -54,6 +54,9 @@ main(int argc, const char *const *argv)
 		exit(1);
 	}
 
+	if (strcmp(argv[1], "--uses-fifos") == 0)
+		exit(gUsesFifos ? 0 : 1);
+
 	// prepare the command string
 	char command[102400];
 	prepare_command_string(argv + 1, argc - 1, command, sizeof(command));

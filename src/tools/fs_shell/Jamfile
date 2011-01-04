@@ -23,13 +23,14 @@ DEFINES += HAIKU_BUILD_COMPATIBILITY_H ;
 local fsShellCommandSources ;
 local externalCommandsSources ;
 local fsShellCommandLibs ;
-if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
+if $(HOST_PLATFORM_BEOS_COMPATIBLE) && $(HOST_PLATFORM) != haiku_host {
+	# BeOS compatible, but not Haiku -- use BeOS ports for communication
 	fsShellCommandSources = fs_shell_command_beos.cpp ;
 	externalCommandsSources = external_commands_beos.cpp ;
 } else {
+	# Unix or Haiku -- use FIFOs for communication
 	fsShellCommandSources = fs_shell_command_unix.cpp ;
 	externalCommandsSources = external_commands_unix.cpp ;
-	fsShellCommandLibs = $(HOST_NETWORK_LIBS) ;
 }
 
 local kernelEmulationSources =
