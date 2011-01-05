@@ -1,0 +1,48 @@
+1	belarusian	x-vnd.Haiku-Devices	1250375801
+Order by:	DevicesView		Парадкаваць па:
+ACPI controller	Device		Кантролер ACPI
+Memory controller	Device		Кантролер памяці
+Docking station	Device		Док-станцыя
+Computer	Device		Кампутар
+Detailed	DevicesView		Падрабязна
+Properties	PropertyList		Уласцівасці
+Category	DevicesView		Катэгорыя
+Quit	DevicesView		Выйсці
+Device paths	Device		Пуці прыладаў:
+Manufacturer\t\t\t: 	Device		Вытворца\t\t\t:
+Processor	Device		Працэсар
+ACPI Information	DeviceACPI		Інфармацыя ACPI
+Device Name\t\t\t\t: 	Device		Імя Прылады\t\t\t\t:
+Generic system peripheral	Device		Агульная перыферыя
+Display controller	Device		Кантролер экрану
+Mass storage controller	Device		Кантролер прылад захавання даных
+About Devices…	DevicesView		Пра Devices...
+Input device controller	Device		Кантролер прылад уводу
+Device paths\t: 	Device		Пуці прыладаў:
+Network controller	Device		Сеткавы кантролер
+Devices\n\twritten by Pieter Panman\n\n\tBased on listdev by Jérôme Duval\n\tand the previous Devices preference\n\tby Jérôme Duval and Sikosis\n\tCopyright 2009, Haiku, Inc.\n	DevicesApplication		Devices\n\t Аўтары: Pieter Panman\n\n\tЗаснавана на listdev (створаны Jérôme Duval)\n\tі папярэдніх канфігурацыях Devices \n\t(Jérôme Duval і Sikosis)\n\tCopyright 2009, Haiku, Inc.\n
+Driver used	Device		Ужыты драйвер
+Driver used\t\t\t\t: 	Device		Ужыты драйвер\t\t\t\t:
+Bus	DevicesView		Шына
+Communication controller	Device		Кантролер камунікацый
+Basic information	DevicesView		Асноўная інфармацыя
+PCI Information	DevicePCI		Інфармацыя PCI
+Manufacturer:	Device		Вытворца:
+Multimedia controller	Device		Кантролер мультымедыя
+Device name:	Device		Імя прылады:
+Report compatibility	DevicesView		Паведаміць аб сумяшчальнасці
+about	DevicesApplication		пра праграму
+Signal processing controller	Device		Кантролер апрацоўкі сігналаў
+Serial bus controller	Device		Кантролер серыйнай шыны
+Wireless controller	Device		Бесшнуравы кантролер
+Device name	Device		Імя прылады
+Manufacturer	Device		Вытворца
+Intelligent controller	Device		Інтэлектуальны кантролер
+Satellite communications controller	Device		Кантролер спадарожнікавай сувязі
+Bridge	Device		Мост
+Refresh devices	DevicesView		Абнавіць прылады
+Connection	DevicesView		Спалучэнне
+Generate system information	DevicesView		Сабраць інфармацыю аб сістэме
+Encryption controller	Device		Кантролер шыфравання
+Unclassified device	Device		Невызначаная прылада
+Devices	DevicesView		Прылады

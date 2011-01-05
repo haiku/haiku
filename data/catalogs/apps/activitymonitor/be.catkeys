@@ -1,0 +1,42 @@
+1	belarusian	x-vnd.Haiku-ActivityMonitor	657126014
+P-faults	DataSource		Памылкі старонак памяці
+Media nodes	DataSource		Медыя узлы
+Raw clipboard size	DataSource		Памер буферу даных
+Threads	DataSource		Патокі
+Add graph	ActivityWindow		Дадаць графік
+Teams	DataSource		Групы
+Hide legend	ActivityView		Схаваць легенду
+Network send	DataSource		Адпраўка па сетцы
+CPU usage (combined)	DataSource		Выкарыстанне ЦП (камбінавана)
+CPU	DataSource		ЦП
+Used memory	DataSource		Ужытая памяць
+Cached memory	DataSource		Кэшаваная памяць
+Apps	DataSource		Праграмы
+Show legend	ActivityView		Паказаць легенду
+Settings	ActivityWindow		Наладкі
+Receiving	DataSource		Атрыманне
+Settings…	ActivityWindow		Наладкі…
+Ports	DataSource		Парты
+Page faults	DataSource		Памылкі старонак памяці
+Text clipboard size	DataSource		Памер тэкставага буферу
+Sending	DataSource		Адпраўка
+Cache	DataSource		Кэш
+About ActivityMonitor…	ActivityWindow		Пра ActivityMonitor…
+TX	DataSource		TX
+Update time interval:	SettingsWindow		Інтэрвал часу абнаўлення:
+Quit	ActivityWindow		Выйсці
+Block cache memory	DataSource		Памяць блокавага кэшу
+Remove graph	ActivityView		Выдаліць графік
+RX	DataSource		RX
+CPU usage	DataSource		Выкарыстанне ЦП
+Sems	DataSource		Семафоры
+Running applications	DataSource		Запушчаныя праграмы
+Semaphores	DataSource		Семафоры
+Block cache	DataSource		Блокавы кэш
+Swap space	DataSource		Прастора свопу
+Swap	DataSource		Своп
+File	ActivityWindow		Файл
+Additional items	ActivityView		Дадатковыя элементы
+Network receive	DataSource		Атрыманне па сетцы
+Memory	DataSource		Памяць
+ActivityMonitor	ActivityWindow		ActivityMonitor
