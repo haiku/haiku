@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010, Haiku, Inc. All rights reserved.
+ * Copyright 2008-2011, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,6 +8,10 @@
 
 
 #include "TestBootDrive.h"
+
+#include <stdio.h>
+
+#include <String.h>
 
 
 TestBootDrive::TestBootDrive()
@@ -98,4 +102,5 @@ status_t
 TestBootDrive::GetDisplayText(const char* text, BString& displayText)
 {
 	displayText = text;
+	return B_OK;
 }

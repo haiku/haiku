@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010, Haiku, Inc. All rights reserved.
+ * Copyright 2008-2011, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -62,13 +62,13 @@ private:
 			bool				_SaveMBR();
 			bool				_RestoreMBR();
 
-			WizardPageView*		_CreateErrorEntryPage(BRect frame);
+			WizardPageView*		_CreateErrorEntryPage();
 			WizardPageView*		_CreateSaveMBRPage(BRect frame);
-			WizardPageView*		_CreateMBRSavedPage(BRect frame);
-			WizardPageView*		_CreateInstallSummaryPage(BRect frame);
-			WizardPageView*		_CreateInstalledPage(BRect frame);
+			WizardPageView*		_CreateMBRSavedPage();
+			WizardPageView*		_CreateInstallSummaryPage();
+			WizardPageView*		_CreateInstalledPage();
 			WizardPageView*		_CreateUninstallPage(BRect frame);
-			WizardPageView*		_CreateUninstalledPage(BRect frame);
+			WizardPageView*		_CreateUninstalledPage();
 
 			BMessage			fSettings;
 			BootDrive*			fBootDrive;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010, Haiku, Inc. All rights reserved.
+ * Copyright 2008-2011, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -12,37 +12,29 @@
 #include "WizardPageView.h"
 
 
+class BGridView;
 class BTextView;
 class BScrollView;
 
 
 class PartitionsPage : public WizardPageView {
 public:
-								PartitionsPage(BMessage* settings, BRect frame,
+								PartitionsPage(BMessage* settings,
 									const char* name);
 	virtual						~PartitionsPage();
 
 	virtual	void				PageCompleted();
 
-	virtual	void				FrameResized(float width, float height);
-
 private:
 			void				_BuildUI();
-			void				_Layout();
 			void				_FillPartitionsView(BView* view);
 			void				_CreateSizeText(int64 size, BString* text);
 			BMessage*			_CreateControlMessage(uint32 what,
 									int32 partitionIndex);
-			void				_ComputeColumnWidths(int32& showWidth,
-									int32& nameWidth, int32& typeWidth,
-									int32& sizeWidth, int32& pathWidth);
 
 private:
 			BTextView*			fDescription;
-			BView*				fPartitions;
-			BScrollView*		fPartitionsScrollView;
-			float				fPartitionsWidth;
-			float				fPartitionsHeight;
+			BGridView*			fPartitions;
 };
 
 

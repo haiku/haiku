@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010, Haiku, Inc. All rights reserved.
+ * Copyright 2008-2011, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -12,7 +12,7 @@
 #include <string.h>
 
 #include <Catalog.h>
-#include <ControlLook.h>
+#include <LayoutBuilder.h>
 #include <RadioButton.h>
 #include <TextView.h>
 
@@ -21,10 +21,9 @@
 #define B_TRANSLATE_CONTEXT "EntryPage"
 
 
-EntryPage::EntryPage(BMessage* settings, BRect frame, const char* name)
+EntryPage::EntryPage(BMessage* settings, const char* name)
 	:
-	WizardPageView(settings, frame, name, B_FOLLOW_ALL,
-		B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE)
+	WizardPageView(settings, name)
 {
 	_BuildUI();
 }
@@ -36,85 +35,56 @@ EntryPage::~EntryPage()
 
 
 void
-EntryPage::FrameResized(float width, float height)
-{
-	WizardPageView::FrameResized(width, height);
-	_Layout();
-}
-
-
-void
 EntryPage::PageCompleted()
 {
-	fSettings->ReplaceBool("install", fInstall->Value() != 0);
+	fSettings->ReplaceBool("install", fInstallButton->Value() != 0);
 }
 
 
 void
 EntryPage::_BuildUI()
 {
-	BRect rect(Bounds());
-
-	fInstall = new BRadioButton(rect, "install",
-		"",
-		new BMessage('null'));
-	AddChild(fInstall);
-	fInstall->ResizeToPreferred();
-
-	BRect textRect(rect);
-	textRect.left = fInstall->Frame().right
-		+ be_control_look->DefaultItemSpacing();
+	fInstallButton = new BRadioButton("install", NULL, NULL);
 
 	BString text;
-	text <<
-		B_TRANSLATE_COMMENT("Install boot menu", "Title") << "\n\n" <<
-		B_TRANSLATE("Choose this option to install a boot menu, "
-		"allowing you to select which operating "
-		"system to boot when you turn on your "
-		"computer.") << "\n";
-	fInstallText = CreateDescription(textRect, "installText", text);
+	text << B_TRANSLATE_COMMENT("Install boot menu", "Title") << "\n"
+		<< B_TRANSLATE("Choose this option to install a boot menu, "
+			"allowing you to select which operating "
+			"system to boot when you turn on your "
+			"computer.") << "\n";
+	fInstallText = CreateDescription("installText", text);
 	MakeHeading(fInstallText);
-	AddChild(fInstallText);
 
-	fUninstall = new BRadioButton(rect, "uninstall",
-		"",
-		new BMessage('null'));
-	AddChild(fUninstall);
-	fUninstall->ResizeToPreferred();
+	fUninstallButton = new BRadioButton("uninstall", NULL, NULL);
 
 	text.Truncate(0);
-	text <<
-		B_TRANSLATE_COMMENT("Uninstall boot menu", "Title") << "\n\n" <<
-		B_TRANSLATE("Choose this option to remove the boot menu "
-		"previously installed by this program.\n");
-	fUninstallText = CreateDescription(textRect, "uninstallText", text);
+	text << B_TRANSLATE_COMMENT("Uninstall boot menu", "Title") << "\n"
+		<< B_TRANSLATE("Choose this option to remove the boot menu "
+			"previously installed by this program.\n");
+	fUninstallText = CreateDescription("uninstallText", text);
 	MakeHeading(fUninstallText);
-	AddChild(fUninstallText);
 
-	bool install;
-	fSettings->FindBool("install", &install);
+	SetLayout(new BGroupLayout(B_VERTICAL));
 
-	if (install)
-		fInstall->SetValue(1);
+	BLayoutBuilder::Group<>((BGroupLayout*)GetLayout())
+		.AddGroup(B_HORIZONTAL, 0)
+			.AddGroup(B_VERTICAL, 0, 0)
+				.Add(fInstallButton)
+				.AddGlue()
+				.End()
+			.Add(fInstallText, 1)
+			.End()
+		.AddGroup(B_HORIZONTAL, 0)
+			.AddGroup(B_VERTICAL, 0, 0)
+				.Add(fUninstallButton)
+				.AddGlue()
+				.End()
+			.Add(fUninstallText)
+			.End()
+		.AddGlue();
+
+	if (fSettings->FindBool("install"))
+		fInstallButton->SetValue(1);
 	else
-		fUninstall->SetValue(1);
-
-	_Layout();
+		fUninstallButton->SetValue(1);
 }
-
-
-void
-EntryPage::_Layout()
-{
-	LayoutDescriptionVertically(fInstallText);
-
-	float left = fUninstall->Frame().left;
-	float top = fInstallText->Frame().bottom;
-	fUninstall->MoveTo(left, top);
-
-	left = fUninstallText->Frame().left;
-	fUninstallText->MoveTo(left, top);
-
-	LayoutDescriptionVertically(fUninstallText);
-}
-

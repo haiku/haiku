@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010, Haiku, Inc. All rights reserved.
+ * Copyright 2008-2011, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -18,22 +18,18 @@ class BTextView;
 
 class EntryPage : public WizardPageView {
 public:
-								EntryPage(BMessage* settings, BRect frame,
-									const char* name);
+								EntryPage(BMessage* settings, const char* name);
 	virtual						~EntryPage();
-
-	virtual	void				FrameResized(float width, float height);
 
 	virtual	void				PageCompleted();
 
 private:
 			void				_BuildUI();
-			void				_Layout();
 
 private:
-			BRadioButton*		fInstall;
+			BRadioButton*		fInstallButton;
 			BTextView*			fInstallText;
-			BRadioButton*		fUninstall;
+			BRadioButton*		fUninstallButton;
 			BTextView*			fUninstallText;
 };
 

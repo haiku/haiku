@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010, Haiku, Inc. All rights reserved.
+ * Copyright 2008-2011, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -16,19 +16,16 @@ class BTextView;
 
 class DescriptionPage : public WizardPageView {
 public:
-								DescriptionPage(BRect frame, const char* name,
+								DescriptionPage(const char* name,
 									const char* description, bool hasHeading);
 	virtual						~DescriptionPage();
-
-	virtual	void				FrameResized(float width, float height);
 
 private:
 			void				_BuildUI(const char* description,
 									bool hasHeading);
-			void				_Layout();
 
 private:
-			BTextView* fDescription;
+			BTextView*			fDescription;
 };
 
 

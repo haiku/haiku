@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010, Haiku, Inc. All rights reserved.
+ * Copyright 2008-2011, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -19,6 +19,15 @@ WizardPageView::WizardPageView(BMessage* settings, BRect frame,
 	const char* name, uint32 resizingMode, uint32 flags)
 	:
 	BView(frame, name, resizingMode, flags),
+	fSettings(settings)
+{
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+}
+
+
+WizardPageView::WizardPageView(BMessage* settings, const char* name)
+	:
+	BView(name, B_WILL_DRAW),
 	fSettings(settings)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -52,6 +61,19 @@ WizardPageView::CreateDescription(BRect frame, const char* name,
 }
 
 
+BTextView*
+WizardPageView::CreateDescription(const char* name,
+	const char* description)
+{
+	BTextView* view = new BTextView("text");
+	view->MakeEditable(false);
+	view->SetViewColor(ViewColor());
+	view->SetStylable(true);
+	view->SetText(description);
+	return view;
+}
+
+
 void
 WizardPageView::MakeHeading(BTextView* view)
 {
@@ -61,7 +83,6 @@ WizardPageView::MakeHeading(BTextView* view)
 		int indexFirstLineEnd = firstLineEnd - text;
 		BFont font;
 		view->GetFont(&font);
-		font.SetSize(ceil(font.Size() * 1.2));
 		font.SetFace(B_BOLD_FACE);
 		view->SetFontAndColor(0, indexFirstLineEnd, &font);
 	}

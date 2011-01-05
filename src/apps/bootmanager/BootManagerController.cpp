@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010, Haiku, Inc. All rights reserved.
+ * Copyright 2008-2011, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -224,15 +224,15 @@ WizardPageView*
 BootManagerController::CreatePage(int32 state, WizardView* wizard)
 {
 	WizardPageView* page = NULL;
-	BRect frame(0, 0, 300, 300);
+	BRect frame(0, 0, 300, 250);
 
 	switch (state) {
 		case kStateEntry:
-			page = new EntryPage(&fSettings, frame, "entry");
+			page = new EntryPage(&fSettings, "entry");
 			wizard->SetPreviousButtonHidden(true);
 			break;
 		case kStateErrorEntry:
-			page = _CreateErrorEntryPage(frame);
+			page = _CreateErrorEntryPage();
 			wizard->SetPreviousButtonHidden(true);
 			wizard->SetNextButtonLabel(B_TRANSLATE_COMMENT("Done", "Button"));
 			break;
@@ -241,21 +241,21 @@ BootManagerController::CreatePage(int32 state, WizardView* wizard)
 			wizard->SetPreviousButtonHidden(false);
 			break;
 		case kStateMBRSaved:
-			page = _CreateMBRSavedPage(frame);
+			page = _CreateMBRSavedPage();
 			break;
 		case kStatePartitions:
-			page = new PartitionsPage(&fSettings, frame, "partitions");
+			page = new PartitionsPage(&fSettings, "partitions");
 			wizard->SetPreviousButtonHidden(false);
 			break;
 		case kStateDefaultPartitions:
 			page = new DefaultPartitionPage(&fSettings, frame, "default");
 			break;
 		case kStateInstallSummary:
-			page = _CreateInstallSummaryPage(frame);
+			page = _CreateInstallSummaryPage();
 			wizard->SetNextButtonLabel(B_TRANSLATE_COMMENT("Next", "Button"));
 			break;
 		case kStateInstalled:
-			page = _CreateInstalledPage(frame);
+			page = _CreateInstalledPage();
 			wizard->SetNextButtonLabel(B_TRANSLATE_COMMENT("Done", "Button"));
 			break;
 		case kStateUninstall:
@@ -265,7 +265,7 @@ BootManagerController::CreatePage(int32 state, WizardView* wizard)
 			break;
 		case kStateUninstalled:
 			// TODO prevent overwriting MBR after clicking "Previous"
-			page = _CreateUninstalledPage(frame);
+			page = _CreateUninstalledPage();
 			wizard->SetNextButtonLabel(B_TRANSLATE_COMMENT("Done", "Button"));
 			break;
 	}
@@ -275,7 +275,7 @@ BootManagerController::CreatePage(int32 state, WizardView* wizard)
 
 
 WizardPageView*
-BootManagerController::_CreateErrorEntryPage(BRect frame)
+BootManagerController::_CreateErrorEntryPage()
 {
 	BString description;
 
@@ -293,7 +293,7 @@ BootManagerController::_CreateErrorEntryPage(BRect frame)
 				"table!");
 	}
 
-	return new DescriptionPage(frame, "errorEntry", description.String(), true);
+	return new DescriptionPage("errorEntry", description.String(), true);
 }
 
 
@@ -305,7 +305,7 @@ BootManagerController::_CreateSaveMBRPage(BRect frame)
 	fSettings.FindString("disk", &disk);
 
 	description << B_TRANSLATE_COMMENT("Backup Master Boot Record", "Title")
-		<< "\n\n" << B_TRANSLATE("The Master Boot Record (MBR) of the boot "
+		<< "\n" << B_TRANSLATE("The Master Boot Record (MBR) of the boot "
 			"device:\n"
 			"\t%s\n"
 			"will now be saved to disk. Please select a file to "
@@ -322,7 +322,7 @@ BootManagerController::_CreateSaveMBRPage(BRect frame)
 
 
 WizardPageView*
-BootManagerController::_CreateMBRSavedPage(BRect frame)
+BootManagerController::_CreateMBRSavedPage()
 {
 	BString description;
 	BString file;
@@ -330,29 +330,29 @@ BootManagerController::_CreateMBRSavedPage(BRect frame)
 
 	if (fSaveMBRStatus == B_OK) {
 		description << B_TRANSLATE_COMMENT("Old Master Boot Record saved",
-				"Title") << "\n\n"
+				"Title") << "\n"
 			<< B_TRANSLATE("The old Master Boot Record was successfully "
 				"saved to %s.") << "\n";
 	} else {
 		description << B_TRANSLATE_COMMENT("Old Master Boot Record Saved "
-				"failure", "Title") << "\n\n"
+				"failure", "Title") << "\n"
 			<< B_TRANSLATE("The old Master Boot Record could not be saved "
 				"to %s") << "\n";
 	}
 	description.ReplaceFirst("%s", file);
 
-	return new DescriptionPage(frame, "summary", description.String(), true);
+	return new DescriptionPage("summary", description.String(), true);
 }
 
 
 WizardPageView*
-BootManagerController::_CreateInstallSummaryPage(BRect frame)
+BootManagerController::_CreateInstallSummaryPage()
 {
 	BString description;
 	BString disk;
 	fSettings.FindString("disk", &disk);
 
-	description << B_TRANSLATE_COMMENT("Summary", "Title") << "\n\n"
+	description << B_TRANSLATE_COMMENT("Summary", "Title") << "\n"
 		<< B_TRANSLATE("About to write the following boot menu to the boot "
 			"disk (%s). Please verify the information below before continuing.")
 		<< "\n\n";
@@ -377,29 +377,29 @@ BootManagerController::_CreateInstallSummaryPage(BRect frame)
 			description << name << "\t(" << path << ")\n";
 	}
 
-	return new DescriptionPage(frame, "summary", description.String(), true);
+	return new DescriptionPage("summary", description.String(), true);
 }
 
 
 WizardPageView*
-BootManagerController::_CreateInstalledPage(BRect frame)
+BootManagerController::_CreateInstalledPage()
 {
 	BString description;
 
 	if (fWriteBootMenuStatus == B_OK) {
 		description << B_TRANSLATE_COMMENT("Installation of boot menu "
-				"completed", "Title") << "\n\n"
+				"completed", "Title") << "\n"
 			<< B_TRANSLATE("The boot manager has been successfully installed "
 				"on your system.");
 	} else {
 		description << B_TRANSLATE_COMMENT("Installation of boot menu failed",
-				"Title") << "\n\n"
+				"Title") << "\n"
 			<< B_TRANSLATE("An error occurred writing the boot menu. "
 				"The Master Boot Record might be destroyed, "
 				"you should restore the MBR now!");
 	}
 
-	return new DescriptionPage(frame, "done", description, true);
+	return new DescriptionPage("done", description, true);
 }
 
 
@@ -419,7 +419,7 @@ BootManagerController::_CreateUninstallPage(BRect frame)
 
 
 WizardPageView*
-BootManagerController::_CreateUninstalledPage(BRect frame)
+BootManagerController::_CreateUninstalledPage()
 {
 	BString description;
 	BString disk;
@@ -429,16 +429,16 @@ BootManagerController::_CreateUninstalledPage(BRect frame)
 
 	if (fRestoreMBRStatus == B_OK) {
 		description << B_TRANSLATE_COMMENT("Uninstallation of boot menu "
-				"completed", "Title") << "\n\n"
+				"completed", "Title") << "\n"
 			<< B_TRANSLATE("The Master Boot Record of the boot device "
 				"(%DISK) has been successfully restored from %FILE.");
 		description.ReplaceFirst("%DISK", disk);
 		description.ReplaceFirst("%FILE", file);
 	} else {
 		description << B_TRANSLATE_COMMENT("Uninstallation of boot menu "
-				"failed", "Title") << "\n\n"
+				"failed", "Title") << "\n"
 			<< B_TRANSLATE("The Master Boot Record could not be restored!");
 	}
 
-	return new DescriptionPage(frame, "summary", description.String(), true);
+	return new DescriptionPage("summary", description.String(), true);
 }

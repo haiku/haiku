@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010, Haiku, Inc. All rights reserved.
+ * Copyright 2008-2011, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -164,14 +164,13 @@ DefaultPartitionPage::_BuildUI()
 	BRect rect(Bounds());
 
 	BString text;
-	text <<
-		B_TRANSLATE_COMMENT("Default Partition", "Title") << "\n\n" <<
-		B_TRANSLATE("Please specify a default partition and a timeout.\n"
-		"The boot menu will load the default partition after "
-		"the timeout unless you select another partition. You "
-		"can also have the boot menu wait indefinitely for you "
-		"to select a partition.\n"
-		"Keep the 'ALT' key pressed to disable the timeout at boot time.");
+	text << B_TRANSLATE_COMMENT("Default Partition", "Title") << "\n"
+		<< B_TRANSLATE("Please specify a default partition and a timeout.\n"
+			"The boot menu will load the default partition after "
+			"the timeout unless you select another partition. You "
+			"can also have the boot menu wait indefinitely for you "
+			"to select a partition.\n"
+			"Keep the 'ALT' key pressed to disable the timeout at boot time.");
 
 	fDescription = CreateDescription(rect, "description", text);
 	MakeHeading(fDescription);
