@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010, Haiku, Inc. All rights reserved.
+ * Copyright 2008-2011, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,7 +7,7 @@
  */
 
 
-#include "LegacyBootDrive.h"
+#include "LegacyBootMenu.h"
 
 #include <new>
 #include <stdio.h>
@@ -27,7 +27,7 @@
 
 
 #undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "LegacyBootDrive"
+#define B_TRANSLATE_CONTEXT "LegacyBootMenu"
 #define USE_SECOND_DISK 0
 #define GET_FIRST_BIOS_DRIVE 1
 
@@ -238,18 +238,18 @@ PartitionRecorder::_Record(BPartition* partition)
 // #pragma mark -
 
 
-LegacyBootDrive::LegacyBootDrive()
+LegacyBootMenu::LegacyBootMenu()
 {
 }
 
 
-LegacyBootDrive::~LegacyBootDrive()
+LegacyBootMenu::~LegacyBootMenu()
 {
 }
 
 
 bool
-LegacyBootDrive::IsBootMenuInstalled(BMessage* settings)
+LegacyBootMenu::IsBootMenuInstalled(BMessage* settings)
 {
 	// TODO detect bootman
 	return false;
@@ -257,17 +257,18 @@ LegacyBootDrive::IsBootMenuInstalled(BMessage* settings)
 
 
 status_t
-LegacyBootDrive::ReadPartitions(BMessage *settings)
+LegacyBootMenu::ReadPartitions(BMessage *settings)
 {
+	status_t status = B_ERROR;
+
 	BDiskDeviceRoster diskDeviceRoster;
 	BDiskDevice device;
 	bool diskFound = false;
 	while (diskDeviceRoster.GetNextDevice(&device) == B_OK) {
-
 		BPath path;
 		status_t status = device.GetPath(&path);
 		if (status != B_OK)
-			return status;
+			continue;
 
 		// skip not from BIOS bootable drives
 		int8 drive;
@@ -281,33 +282,20 @@ LegacyBootDrive::ReadPartitions(BMessage *settings)
 			settings->AddString("disk", path.Path());
 			diskFound = true;
 
-			#if !USE_SECOND_DISK
-				// Enough space to write boot menu to drive?
-				// (ignored in test build)
-				off_t size = sizeof(kBootLoader);
-				if (!recorder.HasPartitions() || recorder.FirstOffset() < size)
-					return kErrorBootSectorTooSmall;
-
-				// TODO remove when booting from all drives works
-				break;
-			#endif
+			// Enough space to write boot menu to drive?
+			// (ignored in test build)
+			off_t size = sizeof(kBootLoader);
+			if (!recorder.HasPartitions() || recorder.FirstOffset() < size)
+				status = B_PARTITION_TOO_SMALL;
 		}
 	}
 
-	#if USE_SECOND_DISK
-		// for testing only write boot menu to second hdd
-		settings->ReplaceString("disk", "/dev/disk/ata/1/master/raw");
-	#endif
-
-	if (diskFound)
-		return B_OK;
-	else
-		return B_ERROR;
+	return diskFound ? B_OK : status;
 }
 
 
 status_t
-LegacyBootDrive::WriteBootMenu(BMessage *settings)
+LegacyBootMenu::WriteBootMenu(BMessage *settings)
 {
 	BString path;
 	if (settings->FindString("disk", &path) != B_OK)
@@ -375,7 +363,7 @@ LegacyBootDrive::WriteBootMenu(BMessage *settings)
 		partition.FindBool("show", &show);
 		partition.FindString("name", &name);
 		partition.FindString("path", &path);
-		// LegacyBootDrive specific data
+		// LegacyBootMenu specific data
 		partition.FindInt64("offset", &offset);
 		partition.FindInt8("drive", &drive);
 		if (!show)
@@ -403,7 +391,7 @@ LegacyBootDrive::WriteBootMenu(BMessage *settings)
 
 
 status_t
-LegacyBootDrive::SaveMasterBootRecord(BMessage* settings, BFile* file)
+LegacyBootMenu::SaveMasterBootRecord(BMessage* settings, BFile* file)
 {
 	BString path;
 
@@ -444,7 +432,7 @@ LegacyBootDrive::SaveMasterBootRecord(BMessage* settings, BFile* file)
 
 
 status_t
-LegacyBootDrive::RestoreMasterBootRecord(BMessage* settings, BFile* file)
+LegacyBootMenu::RestoreMasterBootRecord(BMessage* settings, BFile* file)
 {
 	BString path;
 	if (settings->FindString("disk", &path) != B_OK)
@@ -496,7 +484,7 @@ LegacyBootDrive::RestoreMasterBootRecord(BMessage* settings, BFile* file)
 
 
 status_t
-LegacyBootDrive::GetDisplayText(const char* text, BString& displayText)
+LegacyBootMenu::GetDisplayText(const char* text, BString& displayText)
 {
 	BString biosText;
 	if (!_ConvertToBIOSText(text, biosText)) {
@@ -524,7 +512,7 @@ LegacyBootDrive::GetDisplayText(const char* text, BString& displayText)
 
 
 bool
-LegacyBootDrive::_ConvertToBIOSText(const char* text, BString& biosText)
+LegacyBootMenu::_ConvertToBIOSText(const char* text, BString& biosText)
 {
 	// convert text in UTF-8 to 'code page 437'
 	int32 textLength = strlen(text);
@@ -550,7 +538,7 @@ LegacyBootDrive::_ConvertToBIOSText(const char* text, BString& biosText)
 
 
 bool
-LegacyBootDrive::_GetBiosDrive(const char* device, int8* drive)
+LegacyBootMenu::_GetBiosDrive(const char* device, int8* drive)
 {
 	#if !GET_FIRST_BIOS_DRIVE
 		int fd = open(device, O_RDONLY);
@@ -567,7 +555,7 @@ LegacyBootDrive::_GetBiosDrive(const char* device, int8* drive)
 
 
 status_t
-LegacyBootDrive::_ReadBlocks(int fd, uint8* buffer, size_t size)
+LegacyBootMenu::_ReadBlocks(int fd, uint8* buffer, size_t size)
 {
 	if (size % kBlockSize != 0) {
 		fprintf(stderr, "_ReadBlocks buffer size must be a multiple of %d\n",
@@ -585,7 +573,7 @@ LegacyBootDrive::_ReadBlocks(int fd, uint8* buffer, size_t size)
 
 
 status_t
-LegacyBootDrive::_WriteBlocks(int fd, const uint8* buffer, size_t size)
+LegacyBootMenu::_WriteBlocks(int fd, const uint8* buffer, size_t size)
 {
 	if (size % kBlockSize != 0) {
 		fprintf(stderr, "_WriteBlocks buffer size must be a multiple of %d\n",
@@ -603,7 +591,7 @@ LegacyBootDrive::_WriteBlocks(int fd, const uint8* buffer, size_t size)
 
 
 void
-LegacyBootDrive::_CopyPartitionTable(MasterBootRecord* destination,
+LegacyBootMenu::_CopyPartitionTable(MasterBootRecord* destination,
 		const MasterBootRecord* source)
 {
 	memcpy(destination->diskSignature, source->diskSignature,
@@ -613,7 +601,7 @@ LegacyBootDrive::_CopyPartitionTable(MasterBootRecord* destination,
 
 
 bool
-LegacyBootDrive::_IsValid(const MasterBootRecord* mbr)
+LegacyBootMenu::_IsValid(const MasterBootRecord* mbr)
 {
 	return mbr->signature[0] == (kMBRSignature & 0xff)
 		&& mbr->signature[1] == (kMBRSignature >> 8);

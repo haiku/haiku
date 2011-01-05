@@ -8,9 +8,9 @@ Application BootManager :
 	BootManagerWindow.cpp
 	DefaultPartitionPage.cpp
 	DescriptionPage.cpp
-	EntryPage.cpp
+	DrivesPage.cpp
 	FileSelectionPage.cpp
-	LegacyBootDrive.cpp
+	LegacyBootMenu.cpp
 	PartitionsPage.cpp
 #	TestBootDrive.cpp
 	UninstallPage.cpp

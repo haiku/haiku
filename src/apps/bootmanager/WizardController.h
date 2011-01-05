@@ -30,6 +30,8 @@ protected:
 	virtual	int32				NextState(int32 state) = 0;
 	virtual	WizardPageView*		CreatePage(int32 state, WizardView* wizard) = 0;
 
+			int32				CurrentState() const;
+
 private:
 	class StateStack {
 	public:

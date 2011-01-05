@@ -82,6 +82,16 @@ WizardController::Previous(WizardView* wizard)
 }
 
 
+int32
+WizardController::CurrentState() const
+{
+	if (fStack == NULL)
+		return -1;
+
+	return fStack->State();
+}
+
+
 void
 WizardController::_PushState(int32 state)
 {

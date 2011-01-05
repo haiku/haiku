@@ -15,10 +15,9 @@
 
 
 class BootDrive;
-
+class BootMenu;
 class WizardView;
 class WizardPageView;
-class BRect;
 
 
 /*	Remainder of Settings Message Format:
@@ -33,6 +32,8 @@ class BootManagerController : public WizardController {
 public:
 								BootManagerController();
 	virtual						~BootManagerController();
+
+	virtual	void				Previous(WizardView* wizard);
 
 protected:
 	virtual	int32				InitialState();
@@ -71,7 +72,7 @@ private:
 			WizardPageView*		_CreateUninstalledPage();
 
 			BMessage			fSettings;
-			BootDrive*			fBootDrive;
+			BootMenu*			fBootMenu;
 
 			status_t			fReadPartitionsStatus;
 			status_t			fWriteBootMenuStatus;

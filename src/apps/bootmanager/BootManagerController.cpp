@@ -20,9 +20,9 @@
 
 #include "DefaultPartitionPage.h"
 #include "DescriptionPage.h"
-#include "EntryPage.h"
+#include "DrivesPage.h"
 #include "FileSelectionPage.h"
-#include "LegacyBootDrive.h"
+#include "LegacyBootMenu.h"
 #include "PartitionsPage.h"
 #include "WizardView.h"
 
@@ -41,9 +41,9 @@
 BootManagerController::BootManagerController()
 {
 #if USE_TEST_BOOT_DRIVE
-	fBootDrive = new TestBootDrive();
+	fBootMenu = new TestBootDrive();
 #else
-	fBootDrive = new LegacyBootDrive();
+	fBootMenu = new LegacyBootMenu();
 #endif
 
 	// set defaults
@@ -65,12 +65,24 @@ BootManagerController::BootManagerController()
 		fSettings.AddString("file", "");
 	}
 
-	fReadPartitionsStatus = fBootDrive->ReadPartitions(&fSettings);
+	fReadPartitionsStatus = fBootMenu->ReadPartitions(&fSettings);
 }
 
 
 BootManagerController::~BootManagerController()
 {
+}
+
+
+void
+BootManagerController::Previous(WizardView* wizard)
+{
+	if (CurrentState() != kStateEntry)
+		WizardController::Previous(wizard);
+	else {
+		WizardController::Next(wizard);
+		fSettings.ReplaceBool("install", false);
+	}
 }
 
 
@@ -89,10 +101,8 @@ BootManagerController::NextState(int32 state)
 	switch (state) {
 		case kStateEntry:
 		{
-			bool install;
-			fSettings.FindBool("install", &install);
-			if (install) {
-				if (fBootDrive->IsBootMenuInstalled(&fSettings))
+			if (fSettings.FindBool("install")) {
+				if (fBootMenu->IsBootMenuInstalled(&fSettings))
 					return kStatePartitions;
 
 				return kStateSaveMBR;
@@ -176,7 +186,7 @@ BootManagerController::_WriteBootMenu()
 	if (alert->Go() == 1)
 		return false;
 
-	fWriteBootMenuStatus = fBootDrive->WriteBootMenu(&fSettings);
+	fWriteBootMenuStatus = fBootMenu->WriteBootMenu(&fSettings);
 	return true;
 }
 
@@ -187,7 +197,7 @@ BootManagerController::_SaveMBR()
 	BString path;
 	fSettings.FindString("file", &path);
 	BFile file(path.String(), B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
-	fSaveMBRStatus = fBootDrive->SaveMasterBootRecord(&fSettings, &file);
+	fSaveMBRStatus = fBootMenu->SaveMasterBootRecord(&fSettings, &file);
 	return true;
 }
 
@@ -215,7 +225,7 @@ BootManagerController::_RestoreMBR()
 		return false;
 
 	BFile file(path.String(), B_READ_ONLY);
-	fRestoreMBRStatus = fBootDrive->RestoreMasterBootRecord(&fSettings, &file);
+	fRestoreMBRStatus = fBootMenu->RestoreMasterBootRecord(&fSettings, &file);
 	return true;
 }
 
@@ -228,8 +238,7 @@ BootManagerController::CreatePage(int32 state, WizardView* wizard)
 
 	switch (state) {
 		case kStateEntry:
-			page = new EntryPage(&fSettings, "entry");
-			wizard->SetPreviousButtonHidden(true);
+			page = new DrivesPage(wizard, &fSettings, "drives");
 			break;
 		case kStateErrorEntry:
 			page = _CreateErrorEntryPage();
@@ -252,7 +261,6 @@ BootManagerController::CreatePage(int32 state, WizardView* wizard)
 			break;
 		case kStateInstallSummary:
 			page = _CreateInstallSummaryPage();
-			wizard->SetNextButtonLabel(B_TRANSLATE_COMMENT("Next", "Button"));
 			break;
 		case kStateInstalled:
 			page = _CreateInstalledPage();
@@ -261,7 +269,6 @@ BootManagerController::CreatePage(int32 state, WizardView* wizard)
 		case kStateUninstall:
 			page = _CreateUninstallPage(frame);
 			wizard->SetPreviousButtonHidden(false);
-			wizard->SetNextButtonLabel(B_TRANSLATE_COMMENT("Next", "Button"));
 			break;
 		case kStateUninstalled:
 			// TODO prevent overwriting MBR after clicking "Previous"
@@ -279,7 +286,7 @@ BootManagerController::_CreateErrorEntryPage()
 {
 	BString description;
 
-	if (fReadPartitionsStatus == kErrorBootSectorTooSmall) {
+	if (fReadPartitionsStatus == B_PARTITION_TOO_SMALL) {
 		description << B_TRANSLATE_COMMENT("Partition table not compatible",
 				"Title") << "\n\n"
 			<< B_TRANSLATE("The partition table of the first hard disk is not "
@@ -371,7 +378,7 @@ BootManagerController::_CreateInstallSummaryPage()
 		message.FindString("path", &path);
 
 		BString displayName;
-		if (fBootDrive->GetDisplayText(name.String(), displayName) == B_OK)
+		if (fBootMenu->GetDisplayText(name.String(), displayName) == B_OK)
 			description << displayName << "\t(" << path << ")\n";
 		else
 			description << name << "\t(" << path << ")\n";

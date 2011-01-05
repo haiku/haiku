@@ -1,15 +1,15 @@
 /*
- * Copyright 2008-2010, Haiku, Inc. All rights reserved.
+ * Copyright 2008-2011, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Michael Pfeiffer <laplace@users.sourceforge.net>
  */
-#ifndef LEGACY_BOOT_DRIVE_H
-#define LEGACY_BOOT_DRIVE_H
+#ifndef LEGACY_BOOT_MENU_H
+#define LEGACY_BOOT_MENU_H
 
 
-#include "BootDrive.h"
+#include "BootMenu.h"
 
 #include <SupportDefs.h>
 
@@ -17,10 +17,10 @@
 struct MasterBootRecord;
 
 
-class LegacyBootDrive : public BootDrive {
+class LegacyBootMenu : public BootMenu {
 public:
-								LegacyBootDrive();
-	virtual						~LegacyBootDrive();
+								LegacyBootMenu();
+	virtual						~LegacyBootMenu();
 
 	virtual	bool				IsBootMenuInstalled(BMessage* settings);
 	virtual	status_t			ReadPartitions(BMessage* settings);
@@ -46,4 +46,4 @@ private:
 };
 
 
-#endif	// LEGACY_BOOT_DRIVE_H
+#endif	// LEGACY_BOOT_MENU_H

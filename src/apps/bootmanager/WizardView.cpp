@@ -24,7 +24,7 @@
 
 WizardView::WizardView(const char* name)
 	:
-	BGroupView(name, B_VERTICAL),
+	BGroupView(name, B_VERTICAL, 0),
 	fPrevious(NULL),
 	fNext(NULL),
 	fPage(NULL)
@@ -63,6 +63,9 @@ WizardView::PageCompleted()
 {
 	if (fPage != NULL)
 		fPage->PageCompleted();
+
+	SetNextButtonLabel(B_TRANSLATE_COMMENT("Next", "Button"));
+	SetPreviousButtonLabel(B_TRANSLATE_COMMENT("Previous", "Button"));
 }
 
 
@@ -123,7 +126,7 @@ WizardView::_BuildUI()
 		.Add(fPageContainer)
 		.Add(new BSeparatorView(B_HORIZONTAL))
 		.AddGroup(B_HORIZONTAL)
-			.SetInsets(B_USE_DEFAULT_SPACING, 0,
+			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
 				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 			.AddGlue()
 			.Add(fPrevious)
