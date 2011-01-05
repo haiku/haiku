@@ -89,7 +89,12 @@ static const Translation gTranslations[] =
 	{ "bg",
 		"cssvb94\n"
 	},
+	{ "cs",
+		"Pavel Drotár\n"
+		"Matěj Kocián\n"
+	},
 	{ "nl",
+		"Floris Kint\n"
 		"Meanwhile\n"
 	},
 	{ "eo",
@@ -102,6 +107,7 @@ static const Translation gTranslations[] =
 	{ "fr",
 		"Jean-Loïc Charroud\n"
 		"Adrien Destugues (PulkoMandy)\n"
+		"Florent Revest\n"
 	},
 	{ "da",
 		"Brian Matzon\n"
@@ -125,21 +131,30 @@ static const Translation gTranslations[] =
 	},
 	{ "it",
 		"Andrea Bernardi\n"
+		"Dario Casalinuovo\n"
+		"Francesco Franchina\n"
+		"Lorenzo Frezza\n"
+		"Mometto Nicola\n"
 	},
 	{ "ja",
 		"Satoshi Eguchi\n"
+		"Shota Fukumori\n"
 		"Hironori Ichimiya\n"
 		"Jorge G. Mare (Koki)\n"
 		"Takashi Murai\n"
 		"SHINTA\n"
 		"Hiroyuki Tsutsumi\n"
+		"Hiromu Yakura\n"
 		"The JPBE.net user group\n"
 	},
 	{ "lt",
 		"Algirdas Buckus\n"
 	},
 	{ "pl",
+		"Szymon Barczak\n"
+		"Grzegorz Dąbrowski\n"
 		"Hubert Hareńczyk\n"
+		"Krzysztof Miemiec\n"
 		"Artur Wyszyński\n"
 	},
 	{ "pt",
@@ -154,11 +169,15 @@ static const Translation gTranslations[] =
 		"Eugene Katashov (mrNoisy)\n"
 		"Reznikov Sergei (Diver)\n"
 		"Michael Smirnov\n"
+		"Vladimir Vasilenko\n"
 	},
 	{ "es",
+		"Pedro Arregui\n"
 		"Nicolás C (CapitanPico)\n"
 		"Oscar Carballal (oscarcp)\n"
 		"Miguel Zúñiga González (miguel~1.mx)\n"
+		"Luis Gustavo Lira\n"
+		"Victor Madariaga\n"
 		"César Ortiz Pantoja (ccortiz)\n"
 	},
 	{ "sv",
