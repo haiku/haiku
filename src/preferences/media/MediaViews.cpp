@@ -12,248 +12,287 @@
 //  Created :    June 25, 2003
 //
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-
 #include "MediaViews.h"
 
+#include <AutoDeleter.h>
 #include <Box.h>
 #include <Button.h>
 #include <Catalog.h>
+#include <CheckBox.h>
 #include <Deskbar.h>
 #include <Entry.h>
-#include <GridView.h>
-#include <GroupView.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <MediaAddOn.h>
 #include <MediaRoster.h>
 #include <MenuField.h>
 #include <PopUpMenu.h>
-#include <SpaceLayoutItem.h>
 #include <String.h>
+#include <StringView.h>
 #include <TextView.h>
 
+#include <assert.h>
 #include <stdio.h>
+
+#include "MediaWindow.h"
 
 
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "Media views"
 
+#define MEDIA_DEFAULT_INPUT_CHANGE 'dich'
+#define MEDIA_DEFAULT_OUTPUT_CHANGE 'doch'
+#define MEDIA_SHOW_HIDE_VOLUME_CONTROL 'shvc'
 
-SettingsView::SettingsView (bool isVideo)
+
+SettingsView::SettingsView()
 	:
-	BView("SettingsView", B_WILL_DRAW | B_SUPPORTS_LAYOUT),
-	fIsVideo(isVideo)
+	BGridView(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING),
+	fRealtimeCheckBox(NULL),
+	fInputMenu(NULL),
+	fOutputMenu(NULL),
+	fRestartView(NULL)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
-	// create the default box
-
 	// input menu
 	fInputMenu = new BPopUpMenu(B_TRANSLATE("<none>"));
 	fInputMenu->SetLabelFromMarked(true);
-	BMenuField* inputMenuField = new BMenuField("inputMenuField",
-		fIsVideo ? B_TRANSLATE("Video input:")
-			: B_TRANSLATE("Audio input:"), fInputMenu, NULL);
 
-	// output menu
+	// input menu
 	fOutputMenu = new BPopUpMenu(B_TRANSLATE("<none>"));
 	fOutputMenu->SetLabelFromMarked(true);
-	BMenuField* outputMenuField = new BMenuField("outputMenuField",
-		fIsVideo ? B_TRANSLATE("Video output:")
-			: B_TRANSLATE("Audio output:"), fOutputMenu, NULL);
-
-	// channel menu (audio only)
-	BMenuField* channelMenuField = NULL;
-	if (!fIsVideo) {
-		fChannelMenu = new BPopUpMenu(B_TRANSLATE("<none>"));
-		fChannelMenu->SetLabelFromMarked(true);
-		channelMenuField = new BMenuField("channelMenuField",
-			B_TRANSLATE("Channel:"), fChannelMenu, NULL);
-		channelMenuField->SetDivider(StringWidth(B_TRANSLATE("Channel:"))+5);
-	}
-
-	BBox* defaultsBox = new BBox("defaults");
-	defaultsBox->SetLabel(fIsVideo ? B_TRANSLATE("Default nodes")
-		: B_TRANSLATE("Defaults"));
-
-	// put our menus in a BGridView in our BBox, this way, the BBox makes sure
-	// we have are not blocking the label.
-	BGridView* defaultsGridView = new BGridView();
-	defaultsBox->AddChild(defaultsGridView);
-
-	BGridLayout* defaultsGrid = defaultsGridView->GridLayout();
-	defaultsGrid->SetInsets(B_USE_DEFAULT_SPACING, 0, B_USE_DEFAULT_SPACING,
-		B_USE_DEFAULT_SPACING);
-
-	BLayoutItem* labelItem = inputMenuField->CreateLabelLayoutItem();
-	BLayoutItem* menuItem = inputMenuField->CreateMenuBarLayoutItem();
-	defaultsGrid->AddItem(labelItem, 0, 0, 1, 1);
-	defaultsGrid->AddItem(menuItem, 1, 0, 3, 1);
-
-	int32 outputMenuWidth = 3;
-	if (channelMenuField) {
-		outputMenuWidth = 1;
-		labelItem = channelMenuField->CreateLabelLayoutItem();
-		menuItem = channelMenuField->CreateMenuBarLayoutItem();
-		defaultsGrid->AddItem(labelItem, 2, 1, 1, 1);
-		defaultsGrid->AddItem(menuItem, 3, 1, 1, 1);
-	}
-
-	labelItem = outputMenuField->CreateLabelLayoutItem();
-	menuItem = outputMenuField->CreateMenuBarLayoutItem();
-	defaultsGrid->AddItem(labelItem, 0, 1, 1, 1);
-	defaultsGrid->AddItem(menuItem, 1, 1, outputMenuWidth, 1);
+}
 
 
-	rgb_color red_color = {222, 32, 33};
-	fRestartView = new BStringView("restartStringView",
-		B_TRANSLATE("Restart the media server to apply changes."));
-	fRestartView->SetHighColor(red_color);
-	defaultsBox->AddChild(fRestartView);
-	fRestartView->Hide();
-
+BBox*
+SettingsView::MakeRealtimeBox(const char* info, uint32 realtimeMask,
+	const char* checkBoxLabel)
+{
 	// create the realtime box
 	BBox* realtimeBox = new BBox("realtime");
 	realtimeBox->SetLabel(B_TRANSLATE("Real-time"));
 
-	BMessage* message = new BMessage(ML_ENABLE_REAL_TIME);
-	message->AddBool("isVideo", fIsVideo);
-	fRealtimeCheckBox = new BCheckBox("realtimeCheckBox",
-		fIsVideo ? B_TRANSLATE("Enable real-time video")
-			: B_TRANSLATE("Enable real-time audio"),
-		message);
+	BMessage* checkBoxMessage = new BMessage(ML_ENABLE_REAL_TIME);
+	checkBoxMessage->AddUInt32("flags", realtimeMask);
+	fRealtimeCheckBox = new BCheckBox("realtimeCheckBox", checkBoxLabel,
+		checkBoxMessage);
 
-	uint32 flags;
+	uint32 flags = 0;
 	BMediaRoster::Roster()->GetRealtimeFlags(&flags);
-	if (flags & (fIsVideo ? B_MEDIA_REALTIME_VIDEO : B_MEDIA_REALTIME_AUDIO))
+	if (flags & realtimeMask)
 		fRealtimeCheckBox->SetValue(B_CONTROL_ON);
 
 	BTextView* textView = new BTextView("stringView");
-	textView->Insert(fIsVideo ? B_TRANSLATE(
-		"Enabling real-time video allows system to "
-		"perform video operations as fast and smoothly as possible.  It "
-		"achieves optimum performance by using more RAM."
-		"\n\nOnly enable this feature if you need the lowest latency possible.")
-		: B_TRANSLATE(
-		"Enabling real-time audio allows system to record and play audio "
-		"as fast as possible.  It achieves this performance by using more"
-		" CPU and RAM.\n\nOnly enable this feature if you need the lowest"
-		" latency possible."));
-
+	textView->Insert(info);
 	textView->MakeEditable(false);
 	textView->MakeSelectable(false);
 	textView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	BGroupLayout* realtimeBoxLayout = new BGroupLayout(B_VERTICAL, 5);
-	realtimeBoxLayout->SetInsets(10,10,10,10);
-	realtimeBox->SetLayout(realtimeBoxLayout);
+	BGroupView* realtimeGroup = new BGroupView(B_VERTICAL);
+	BLayoutBuilder::Group<>(realtimeGroup)
+		.SetInsets(B_USE_DEFAULT_SPACING, 0, B_USE_DEFAULT_SPACING,
+			B_USE_DEFAULT_SPACING)
+		.Add(fRealtimeCheckBox)
+		.Add(textView);
 
-	realtimeBoxLayout->AddItem(BSpaceLayoutItem::CreateVerticalStrut(5));
-	realtimeBoxLayout->AddView(fRealtimeCheckBox);
-	realtimeBoxLayout->AddView(textView);
+	realtimeBox->AddChild(realtimeGroup);
+	return realtimeBox;
+}
 
-	// create the bottom line: volume in deskbar checkbox and restart button
-	BGroupView* bottomView = new BGroupView(B_HORIZONTAL);
-	BButton* restartButton = new BButton("restartButton",
+
+BStringView*
+SettingsView::MakeRestartMessageView()
+{
+	// note: this ought to display at the bottom of the default box...
+	fRestartView = new BStringView("restartStringView",
+		B_TRANSLATE("Restart the media server to apply changes."));
+	fRestartView->SetHighColor(ui_color(B_FAILURE_COLOR));
+		// not exactly failure, but sort of.
+	fRestartView->Hide();
+	fRestartView->SetExplicitAlignment(BAlignment(B_ALIGN_HORIZONTAL_CENTER,
+		B_ALIGN_VERTICAL_CENTER));
+	fRestartView->SetAlignment(B_ALIGN_HORIZONTAL_CENTER);
+	fRestartView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+	return fRestartView;
+}
+
+
+BButton*
+SettingsView::MakeRestartButton()
+{
+	return new BButton("restartButton",
 		B_TRANSLATE("Restart media services"),
 		new BMessage(ML_RESTART_MEDIA_SERVER));
+}
 
-	if (!fIsVideo) {
-		fVolumeCheckBox = new BCheckBox("volumeCheckBox",
-			B_TRANSLATE("Show volume control on Deskbar"),
-			new BMessage(ML_SHOW_VOLUME_CONTROL));
-		bottomView->GroupLayout()->AddView(fVolumeCheckBox);
-		if (BDeskbar().HasItem("MediaReplicant"))
-			fVolumeCheckBox->SetValue(B_CONTROL_ON);
-	}
-	else{
-		bottomView->GroupLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
-	}
-	bottomView->GroupLayout()->AddView(restartButton);
 
-	// compose all stuff
-	BGroupLayout* rootlayout = new BGroupLayout(B_VERTICAL, 5);
-	SetLayout(rootlayout);
 
-	rootlayout->AddView(defaultsBox);
-	rootlayout->AddView(realtimeBox);
-	rootlayout->AddView(bottomView);
+void
+SettingsView::AddInputNodes(NodeList& list)
+{
+	_EmptyMenu(fInputMenu);
+
+	BMessage message(MEDIA_DEFAULT_INPUT_CHANGE);
+	_PopulateMenu(fInputMenu, list, message);
 }
 
 
 void
-SettingsView::AddNodes(NodeList& list, bool isInput)
+SettingsView::AddOutputNodes(NodeList& list)
 {
-	BMenu* menu = isInput ? fInputMenu : fOutputMenu;
+	_EmptyMenu(fOutputMenu);
 
-	for (BMenuItem* item; (item = menu->RemoveItem((int32)0)) != NULL;)
-		delete item;
-
-	BMessage message(ML_DEFAULT_CHANGE);
-	message.AddBool("isVideo", fIsVideo);
-	message.AddBool("isInput", isInput);
-
-	for (int32 i = 0; i < list.CountItems(); i++) {
-		dormant_node_info* info = list.ItemAt(i);
-		menu->AddItem(new SettingsItem(info, new BMessage(message)));
-	}
+	BMessage message(MEDIA_DEFAULT_OUTPUT_CHANGE);
+	_PopulateMenu(fOutputMenu, list, message);
 }
 
 
 void
-SettingsView::SetDefault(dormant_node_info &info, bool isInput, int32 outputID)
+SettingsView::SetDefaultInput(const dormant_node_info* info)
 {
-	BMenu* menu = isInput ? fInputMenu : fOutputMenu;
+	_ClearMenuSelection(fInputMenu);
+	NodeMenuItem* item = _FindNodeItem(fInputMenu, info);
+	if (item)
+		item->SetMarked(true);
+}
 
-	for (int32 i = 0; i < menu->CountItems(); i++) {
-		SettingsItem* item = static_cast<SettingsItem*>(menu->ItemAt(i));
-		if (item->fInfo && item->fInfo->addon == info.addon
-			&& item->fInfo->flavor_id == info.flavor_id) {
-			item->SetMarked(true);
+
+void
+SettingsView::SetDefaultOutput(const dormant_node_info* info)
+{
+	_ClearMenuSelection(fOutputMenu);
+	NodeMenuItem* item = _FindNodeItem(fOutputMenu, info);
+	if (item)
+		item->SetMarked(true);
+}
+
+
+void
+SettingsView::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case MEDIA_DEFAULT_INPUT_CHANGE:
+		{
+			int32 index;
+			if (message->FindInt32("index", &index)!=B_OK)
+				break;
+			NodeMenuItem* item
+				= static_cast<NodeMenuItem*>(fInputMenu->ItemAt(index));
+			SetDefaultInput(item->NodeInfo());
+			RestartRequired(true);
+		}
+		case MEDIA_DEFAULT_OUTPUT_CHANGE:
+		{
+			int32 index;
+			if (message->FindInt32("index", &index)!=B_OK)
+				break;
+			NodeMenuItem* item
+				= static_cast<NodeMenuItem*>(fOutputMenu->ItemAt(index));
+			SetDefaultOutput(item->NodeInfo());
+			RestartRequired(true);
+		}
+		case ML_ENABLE_REAL_TIME:
+		{
+			uint32 flags = 0;
+			if (message->FindUInt32("flags", &flags) == B_OK)
+				_FlipRealtimeFlag(flags);
 			break;
 		}
 	}
+	BGridView::MessageReceived(message);
+}
 
-	if (!fIsVideo && !isInput && outputID >= 0) {
-		BMenuItem* item;
-		while ((item = fChannelMenu->RemoveItem((int32)0)) != NULL)
-			delete item;
 
-		BMediaRoster* roster = BMediaRoster::Roster();
-		media_node node;
-		media_node_id node_id;
-		status_t err;
-		if (roster->GetInstancesFor(info.addon, info.flavor_id,
-			&node_id) != B_OK) {
-			err = roster->InstantiateDormantNode(info, &node, 
-				B_FLAVOR_IS_GLOBAL);
-		} else {
-			err = roster->GetNodeFor(node_id, &node);
+void
+SettingsView::AttachedToWindow()
+{
+	BMessenger thisMessenger(this);
+	fInputMenu->SetTargetForItems(thisMessenger);
+	fOutputMenu->SetTargetForItems(thisMessenger);
+	fRealtimeCheckBox->SetTarget(thisMessenger);
+}
+
+
+void
+SettingsView::RestartRequired(bool required)
+{
+	if (required)
+		fRestartView->Show();
+	else
+		fRestartView->Hide();
+}
+
+
+MediaWindow*
+SettingsView::_MediaWindow() const
+{
+	return static_cast<MediaWindow*>(Window());
+}
+
+
+void
+SettingsView::_FlipRealtimeFlag(uint32 mask)
+{
+	// TODO: error codes
+	uint32 flags = 0;
+	BMediaRoster* roster = BMediaRoster::Roster();
+	roster->GetRealtimeFlags(&flags);
+	if (flags & mask)
+		flags &= ~mask;
+	else
+		flags |= mask;
+	roster->SetRealtimeFlags(flags);
+}
+
+
+void
+SettingsView::_EmptyMenu(BMenu* menu)
+{
+	while (menu->CountItems() > 0)
+		delete menu->RemoveItem((int32)0);
+}
+
+
+void
+SettingsView::_PopulateMenu(BMenu* menu, NodeList& nodes,
+	const BMessage& message)
+{
+	for (int32 i = 0; i < nodes.CountItems(); i++) {
+		dormant_node_info* info = nodes.ItemAt(i);
+		menu->AddItem(new NodeMenuItem(info, new BMessage(message)));
+	}
+
+	if (Window() != NULL)
+		menu->SetTargetForItems(BMessenger(this));
+}
+
+
+NodeMenuItem*
+SettingsView::_FindNodeItem(BMenu* menu, const dormant_node_info* nodeInfo)
+{
+	for (int32 i = 0; i < menu->CountItems(); i++) {
+		NodeMenuItem* item = static_cast<NodeMenuItem*>(menu->ItemAt(i));
+		const dormant_node_info* itemInfo = item->NodeInfo();
+		if (itemInfo && itemInfo->addon == nodeInfo->addon
+			&& itemInfo->flavor_id == nodeInfo->flavor_id) {
+			return item;
 		}
+	}
+	return NULL;
+}
 
-		if (err == B_OK) {
-			media_input inputs[16];
-			int32 inputCount = 16;
-			if (roster->GetAllInputsFor(node, inputs, 16, &inputCount)==B_OK) {
-				BMessage message(ML_DEFAULTOUTPUT_CHANGE);
 
-				for (int32 i = 0; i < inputCount; i++) {
-					media_input* input = new media_input();
-					memcpy(input, &inputs[i], sizeof(*input));
-					item = new Settings2Item(&info, input,
-						new BMessage(message));
-					fChannelMenu->AddItem(item);
-					if (inputs[i].destination.id == outputID)
-						item->SetMarked(true);
-				}
-			}
-		}
+void
+SettingsView::_ClearMenuSelection(BMenu* menu)
+{
+	for (int32 i = 0; i < menu->CountItems(); i++) {
+		BMenuItem* item = menu->ItemAt(i);
+		item->SetMarked(false);
 	}
 }
 
 
-SettingsItem::SettingsItem(dormant_node_info* info, BMessage* message,
-		char shortcut, uint32 modifiers)
+NodeMenuItem::NodeMenuItem(const dormant_node_info* info, BMessage* message,
+	char shortcut, uint32 modifiers)
 	:
 	BMenuItem(info->name, message, shortcut, modifiers),
 	fInfo(info)
@@ -263,7 +302,7 @@ SettingsItem::SettingsItem(dormant_node_info* info, BMessage* message,
 
 
 status_t
-SettingsItem::Invoke(BMessage* message)
+NodeMenuItem::Invoke(BMessage* message)
 {
 	if (IsMarked())
 		return B_OK;
@@ -271,27 +310,330 @@ SettingsItem::Invoke(BMessage* message)
 }
 
 
-Settings2Item::Settings2Item(dormant_node_info* info, media_input* input,
-		BMessage* message, char shortcut, uint32 modifiers)
+ChannelMenuItem::ChannelMenuItem(media_input* input, BMessage* message,
+	char shortcut, uint32 modifiers)
 	:
 	BMenuItem(input->name, message, shortcut, modifiers),
-	fInfo(info),
 	fInput(input)
 {
 }
 
 
-Settings2Item::~Settings2Item()
+ChannelMenuItem::~ChannelMenuItem()
 {
 	delete fInput;
 }
 
 
+int32
+ChannelMenuItem::DestinationID()
+{
+	return fInput->destination.id;
+}
+
+
+media_input*
+ChannelMenuItem::Input()
+{
+	return fInput;
+}
+
+
 status_t
-Settings2Item::Invoke(BMessage* message)
+ChannelMenuItem::Invoke(BMessage* message)
 {
 	if (IsMarked())
 		return B_OK;
 	return BMenuItem::Invoke(message);
 }
 
+
+AudioSettingsView::AudioSettingsView()
+{
+	BBox* defaultsBox = new BBox("defaults");
+	defaultsBox->SetLabel(B_TRANSLATE("Defaults"));
+	BGridView* defaultsGridView = new BGridView();
+	
+	BMenuField* inputMenuField = new BMenuField("inputMenuField",
+		B_TRANSLATE("Audio input:"), InputMenu(), NULL);
+
+	BMenuField* outputMenuField = new BMenuField("outputMenuField",
+		B_TRANSLATE("Audio output:"), OutputMenu(), NULL);
+
+	BLayoutBuilder::Grid<>(defaultsGridView)
+		.SetInsets(B_USE_DEFAULT_SPACING, 0, B_USE_DEFAULT_SPACING, 0)
+		.AddMenuField(inputMenuField, 0, 0, B_ALIGN_HORIZONTAL_UNSET, 1, 3, 1)
+		.AddMenuField(outputMenuField, 0, 1)
+		.AddMenuField(_MakeChannelMenu(), 2, 1)
+		.Add(MakeRestartMessageView(), 0, 2, 4, 1);
+
+	defaultsBox->AddChild(defaultsGridView);
+
+	const char* realtimeLabel = B_TRANSLATE("Enable real-time audio");
+	const char* realtimeInfo = B_TRANSLATE(
+		"Enabling real-time audio allows system to record and play audio "
+		"as fast as possible.  It achieves this performance by using more"
+		" CPU and RAM.\n\nOnly enable this feature if you need the lowest"
+		" latency possible.");
+
+
+	BLayoutBuilder::Grid<>(this)
+		.SetInsets(0, 0, 0, 0)
+		.Add(defaultsBox, 0, 0, 2, 1)
+		.Add(MakeRealtimeBox(realtimeInfo, B_MEDIA_REALTIME_AUDIO,
+			realtimeLabel), 0, 1, 2, 1)
+		.Add(_MakeVolumeCheckBox(),0, 2, 1, 1)
+		.Add(MakeRestartButton(), 1, 2, 1, 1)
+		.SetRowWeight(1, 10);
+}
+
+
+void
+AudioSettingsView::SetDefaultChannel(int32 channelID)
+{
+	for (int32 i = 0; i < fChannelMenu->CountItems(); i++) {
+		ChannelMenuItem* item = _ChannelMenuItemAt(i);
+		item->SetMarked(item->DestinationID() == channelID);
+	}
+}
+
+
+void
+AudioSettingsView::AttachedToWindow()
+{
+	SettingsView::AttachedToWindow();
+
+	BMessenger thisMessenger(this);
+	fChannelMenu->SetTargetForItems(thisMessenger);
+	fVolumeCheckBox->SetTarget(thisMessenger);
+}
+
+
+void
+AudioSettingsView::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case ML_DEFAULT_CHANNEL_CHANGED:
+			{
+				int32 index;
+				if (message->FindInt32("index", &index) != B_OK)
+					break;
+				ChannelMenuItem* item = _ChannelMenuItemAt(index);
+
+				if (item) {
+					BMediaRoster* roster = BMediaRoster::Roster();
+					roster->SetAudioOutput(*item->Input());
+					RestartRequired(true);
+				} else
+					fprintf(stderr, "ChannelMenuItem not found\n");
+			}
+			break;
+		case MEDIA_SHOW_HIDE_VOLUME_CONTROL:
+		{
+			if (fVolumeCheckBox->Value() == B_CONTROL_ON)
+				_ShowDeskbarVolumeControl();
+			else
+				_HideDeskbarVolumeControl();
+			break;
+		}
+
+		default:
+			SettingsView::MessageReceived(message);
+	}
+}
+
+
+void
+AudioSettingsView::SetDefaultInput(const dormant_node_info* info)
+{
+	SettingsView::SetDefaultInput(info);
+	_MediaWindow()->UpdateInputListItem(MediaListItem::AUDIO_TYPE, info);
+	BMediaRoster::Roster()->SetAudioInput(*info);
+}
+
+
+void
+AudioSettingsView::SetDefaultOutput(const dormant_node_info* info)
+{
+	SettingsView::SetDefaultOutput(info);
+	_MediaWindow()->UpdateOutputListItem(MediaListItem::AUDIO_TYPE, info);
+	_FillChannelMenu(info);
+	BMediaRoster::Roster()->SetAudioOutput(*info);
+}
+
+
+BMenuField*
+AudioSettingsView::_MakeChannelMenu()
+{
+	fChannelMenu = new BPopUpMenu(B_TRANSLATE("<none>"));
+	fChannelMenu->SetLabelFromMarked(true);
+	BMenuField* channelMenuField = new BMenuField("channelMenuField",
+		B_TRANSLATE("Channel:"), fChannelMenu, NULL);
+	return channelMenuField;
+}
+
+
+BCheckBox*
+AudioSettingsView::_MakeVolumeCheckBox()
+{
+	fVolumeCheckBox = new BCheckBox("volumeCheckBox",
+		B_TRANSLATE("Show volume control on Deskbar"),
+		new BMessage(MEDIA_SHOW_HIDE_VOLUME_CONTROL));
+
+	if (BDeskbar().HasItem("MediaReplicant"))
+		fVolumeCheckBox->SetValue(B_CONTROL_ON);
+
+	return fVolumeCheckBox;
+}
+
+
+void
+AudioSettingsView::_FillChannelMenu(const dormant_node_info* nodeInfo)
+{
+	_EmptyMenu(fChannelMenu);
+
+	BMediaRoster* roster = BMediaRoster::Roster();
+	media_node node;
+	media_node_id node_id;
+
+	status_t err = roster->GetInstancesFor(nodeInfo->addon,
+		nodeInfo->flavor_id, &node_id);
+	if (err != B_OK) {
+		err = roster->InstantiateDormantNode(*nodeInfo, &node,
+			B_FLAVOR_IS_GLOBAL);
+	} else {
+		err = roster->GetNodeFor(node_id, &node);
+	}
+
+	if (err == B_OK) {
+		int32 inputCount = 4;
+		media_input* inputs = new media_input[inputCount];
+		BPrivate::ArrayDeleter<media_input> inputDeleter(inputs);
+
+		while (true) {
+			int32 realInputCount = 0;
+			err = roster->GetAllInputsFor(node, inputs,
+				inputCount, &realInputCount);
+			if (realInputCount > inputCount) {
+				inputCount *= 2;
+				inputs = new media_input[inputCount];
+				inputDeleter.SetTo(inputs);
+			} else {
+				inputCount = realInputCount;
+				break;
+			}
+		}
+
+		if (err == B_OK) {
+			BMessage message(ML_DEFAULT_CHANNEL_CHANGED);
+
+			for (int32 i = 0; i < inputCount; i++) {
+				media_input* input = new media_input();
+				memcpy(input, &inputs[i], sizeof(*input));
+				ChannelMenuItem* channelItem = new ChannelMenuItem(input,
+					new BMessage(message));
+				fChannelMenu->AddItem(channelItem);
+
+				if (channelItem->DestinationID() == 0)
+					channelItem->SetMarked(true);
+			}
+		}
+	}
+
+	if (Window())
+		fChannelMenu->SetTargetForItems(BMessenger(this));
+}
+
+
+void
+AudioSettingsView::_ShowDeskbarVolumeControl()
+{
+	BDeskbar deskbar;
+	BEntry entry("/bin/desklink", true);
+	int32 id;
+	entry_ref ref;
+	status_t status = entry.GetRef(&ref);
+	if (status == B_OK)
+		status = deskbar.AddItem(&ref, &id);
+
+	if (status != B_OK) {
+		fprintf(stderr, B_TRANSLATE(
+			"Couldn't add volume control in Deskbar: %s\n"),
+			strerror(status));
+	}
+}
+
+
+void
+AudioSettingsView::_HideDeskbarVolumeControl()
+{
+	BDeskbar deskbar;
+	status_t status = deskbar.RemoveItem("MediaReplicant");
+	if (status != B_OK) {
+		fprintf(stderr, B_TRANSLATE(
+			"Couldn't remove volume control in Deskbar: %s\n"),
+			strerror(status));
+	}
+}
+
+
+ChannelMenuItem*
+AudioSettingsView::_ChannelMenuItemAt(int32 index)
+{
+	return static_cast<ChannelMenuItem*>(fChannelMenu->ItemAt(index));
+}
+
+
+VideoSettingsView::VideoSettingsView()
+{
+	BBox* defaultsBox = new BBox("defaults");
+	defaultsBox->SetLabel(B_TRANSLATE("Defaults"));
+	BGridView* defaultsGridView = new BGridView();
+	
+	BMenuField* inputMenuField = new BMenuField("inputMenuField",
+		B_TRANSLATE("Video input:"), InputMenu(), NULL);
+
+	BMenuField* outputMenuField = new BMenuField("outputMenuField",
+		B_TRANSLATE("Video output:"), OutputMenu(), NULL);
+
+	BLayoutBuilder::Grid<>(defaultsGridView)
+		.SetInsets(B_USE_DEFAULT_SPACING, 0, B_USE_DEFAULT_SPACING, 0)
+		.AddMenuField(inputMenuField, 0, 0)
+		.AddMenuField(outputMenuField, 0, 1)
+		.Add(MakeRestartMessageView(), 0, 2, 2, 1);
+
+	defaultsBox->AddChild(defaultsGridView);
+
+	const char* realtimeLabel = B_TRANSLATE("Enable real-time video");
+	const char*	realtimeInfo = B_TRANSLATE(
+		"Enabling real-time video allows system to "
+		"perform video operations as fast and smoothly as possible.  It "
+		"achieves optimum performance by using more RAM.\n\n"
+		"Only enable this feature if you need the lowest latency possible.");
+
+	BLayoutBuilder::Grid<>(this)
+		.SetInsets(0, 0, 0, 0)
+		.Add(defaultsBox, 0, 0, 2, 1)
+		.Add(MakeRealtimeBox(realtimeInfo, B_MEDIA_REALTIME_VIDEO,
+			realtimeLabel), 0, 1, 2, 1)
+		.Add(MakeRestartButton(), 1, 2, 1, 1)
+		.SetRowWeight(1, 10);
+}
+
+
+void
+VideoSettingsView::SetDefaultInput(const dormant_node_info* info)
+{
+	SettingsView::SetDefaultInput(info);
+	_MediaWindow()->UpdateInputListItem(MediaListItem::VIDEO_TYPE, info);
+	BMediaRoster::Roster()->SetVideoInput(*info);
+}
+
+
+void
+VideoSettingsView::SetDefaultOutput(const dormant_node_info* info)
+{
+	SettingsView::SetDefaultOutput(info);
+	_MediaWindow()->UpdateOutputListItem(MediaListItem::VIDEO_TYPE, info);
+	BMediaRoster::Roster()->SetVideoOutput(*info);
+}

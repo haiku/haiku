@@ -174,11 +174,10 @@ MediaListItem::Compare(const void* itemOne, const void* itemTwo)
 // #pragma mark - NodeListItem
 
 
-NodeListItem::NodeListItem(dormant_node_info* node, media_type type)
+NodeListItem::NodeListItem(const dormant_node_info* node, media_type type)
 	:
 	MediaListItem(),
 	fNodeInfo(node),
-	fIsAudioMixer(false),
 	fMediaType(type),
 	fIsDefaultInput(false),
 	fIsDefaultOutput(false)
@@ -189,19 +188,14 @@ NodeListItem::NodeListItem(dormant_node_info* node, media_type type)
 void
 NodeListItem::SetRenderParameters(MediaListItem::Renderer& renderer)
 {
+	MediaIcons::IconSet* iconSet = &Icons()->videoIcons;
+	if (fMediaType == MediaListItem::AUDIO_TYPE)
+		iconSet = &Icons()->audioIcons;
 
-	if (fIsAudioMixer) {
-		renderer.AddIcon(&Icons()->mixerIcon);
-	} else {
-		MediaIcons::IconSet* iconSet = &Icons()->videoIcons;
-		if (fMediaType == MediaListItem::AUDIO_TYPE)
-			iconSet = &Icons()->audioIcons;
-
-		if (fIsDefaultInput)
-			renderer.AddIcon(&iconSet->inputIcon);
-		if (fIsDefaultOutput)
-			renderer.AddIcon(&iconSet->outputIcon);
-	}
+	if (fIsDefaultInput)
+		renderer.AddIcon(&iconSet->inputIcon);
+	if (fIsDefaultOutput)
+		renderer.AddIcon(&iconSet->outputIcon);
 }
 
 
@@ -240,40 +234,55 @@ NodeListItem::AlterWindow(MediaWindow* window)
 }
 
 
+void
+NodeListItem::Accept(MediaListItem::Visitor& visitor)
+{
+	visitor.Visit(this);
+}
+
+
 int
 NodeListItem::CompareWith(MediaListItem* item)
 {
-	return item->CompareWith(this) * -1;
+	Comparator comparator(this);
+	item->Accept(comparator);
+	return comparator.result;
 }
 
 
-int
-NodeListItem::CompareWith(NodeListItem* item)
+NodeListItem::Comparator::Comparator(NodeListItem* compareOthersTo)
+	:
+	result(GREATER_THAN),
+	fTarget(compareOthersTo)
 {
-	if (fMediaType != item->fMediaType)
-		return fMediaType == AUDIO_TYPE ? GREATER_THAN : LESS_THAN;
-
-	if (fIsAudioMixer != item->fIsAudioMixer)
-		return fIsAudioMixer ? GREATER_THAN : LESS_THAN;
-
-	return strcmp(Label(), item->Label());
 }
 
 
-int
-NodeListItem::CompareWith(DeviceListItem* deviceItem)
+void
+NodeListItem::Comparator::Visit(NodeListItem* item)
 {
-	if (fMediaType != deviceItem->Type())
-		return fMediaType == AUDIO_TYPE ? GREATER_THAN : LESS_THAN;
+	result = GREATER_THAN;
+
+	if (fTarget->Type() != item->Type() && fTarget->Type() == VIDEO_TYPE)
+		result = LESS_THAN;
 	else
-		return LESS_THAN;
+		result = strcmp(fTarget->Label(), item->Label());
 }
 
 
-int
-NodeListItem::CompareWith(AudioMixerListItem* item)
+void
+NodeListItem::Comparator::Visit(DeviceListItem* item)
 {
-	return LESS_THAN;
+	result = LESS_THAN;
+	if (fTarget->Type() != item->Type() && fTarget->Type() == AUDIO_TYPE)
+		result = GREATER_THAN;
+}
+
+
+void
+NodeListItem::Comparator::Visit(AudioMixerListItem* item)
+{
+	result = LESS_THAN;
 }
 
 
@@ -290,35 +299,54 @@ DeviceListItem::DeviceListItem(const char* title,
 }
 
 
+void
+DeviceListItem::Accept(MediaListItem::Visitor& visitor)
+{
+	visitor.Visit(this);
+}
+
+
 int
 DeviceListItem::CompareWith(MediaListItem* item)
 {
-	return item->CompareWith(this) * -1;
+	Comparator comparator(this);
+	item->Accept(comparator);
+	return comparator.result;
 }
 
 
-int
-DeviceListItem::CompareWith(NodeListItem* item)
+DeviceListItem::Comparator::Comparator(DeviceListItem* compareOthersTo)
+	:
+	result(GREATER_THAN),
+	fTarget(compareOthersTo)
 {
-	// let NodeListItem do the work
-	return item->CompareWith(this) * -1;
 }
 
 
-int
-DeviceListItem::CompareWith(DeviceListItem* item)
+void
+DeviceListItem::Comparator::Visit(NodeListItem* item)
 {
-	if (fMediaType == MediaListItem::AUDIO_TYPE)
-		return GREATER_THAN;
-	return LESS_THAN;
+	result = GREATER_THAN;
+	if (fTarget->Type() != item->Type() && fTarget->Type() == AUDIO_TYPE)
+		result = LESS_THAN;
 }
 
 
-int
-DeviceListItem::CompareWith(AudioMixerListItem* item)
+void
+DeviceListItem::Comparator::Visit(DeviceListItem* item)
 {
-	// let AudioMixerListItem do the work too!
-	return item->CompareWith(this) * -1;
+	result = LESS_THAN;
+	if (fTarget->Type() == AUDIO_TYPE)
+		result = GREATER_THAN;
+}
+
+
+void
+DeviceListItem::Comparator::Visit(AudioMixerListItem* item)
+{
+	result = LESS_THAN;
+	if (fTarget->Type() == AUDIO_TYPE)
+		result = GREATER_THAN;
 }
 
 
@@ -358,33 +386,50 @@ AudioMixerListItem::AlterWindow(MediaWindow* window)
 }
 
 
+void
+AudioMixerListItem::Accept(MediaListItem::Visitor& visitor)
+{
+	visitor.Visit(this);
+}
+
+
 int
 AudioMixerListItem::CompareWith(MediaListItem* item)
 {
-	return item->CompareWith(this) * -1;
+	Comparator comparator(this);
+	item->Accept(comparator);
+	return comparator.result;
 }
 
 
-int
-AudioMixerListItem::CompareWith(NodeListItem* item)
+AudioMixerListItem::Comparator::Comparator(AudioMixerListItem* compareOthersTo)
+	:
+	result(0),
+	fTarget(compareOthersTo)
 {
-	return GREATER_THAN;
 }
 
 
-int
-AudioMixerListItem::CompareWith(DeviceListItem* item)
+void
+AudioMixerListItem::Comparator::Visit(NodeListItem* item)
 {
+	result = GREATER_THAN;
+}
+
+
+void
+AudioMixerListItem::Comparator::Visit(DeviceListItem* item)
+{
+	result = GREATER_THAN;
 	if (item->Type() == AUDIO_TYPE)
-		return LESS_THAN;
-	return GREATER_THAN;
+		result = LESS_THAN;
 }
 
 
-int
-AudioMixerListItem::CompareWith(AudioMixerListItem* item)
+void
+AudioMixerListItem::Comparator::Visit(AudioMixerListItem* item)
 {
-	return 0;
+	result = 0;
 }
 
 

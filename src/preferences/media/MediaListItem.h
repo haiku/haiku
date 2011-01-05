@@ -44,9 +44,6 @@ public:
 	virtual	void				Update(BView* owner, const BFont* font);
 	virtual	void				DrawItem(BView* owner, BRect frame,
 									bool complete = false);
-
-	// TODO: refactor and remove this:
-	virtual	dormant_node_info*	NodeInfo() = 0;
 	
 	virtual	const char*			Label() = 0;
 
@@ -54,16 +51,20 @@ public:
 	static	MediaIcons*			Icons() {return sIcons;}
 	static	void				SetIcons(MediaIcons* icons) {sIcons = icons;}
 
-	static	int					Compare(const void* itemOne,
-									const void* itemTwo);
+	struct Visitor {
+		virtual	void			Visit(AudioMixerListItem* item) = 0;
+		virtual	void			Visit(DeviceListItem* item) = 0;
+		virtual	void			Visit(NodeListItem* item) = 0;
+	};
 
-	// use double dispatch for comparison,
-	// returning item->CompareWith(this) * -1
+	virtual	void				Accept(Visitor& visitor) = 0;
+
+	// use the visitor pattern for comparison,
 	// -1 : < item; 0 : == item; 1 : > item
 	virtual	int					CompareWith(MediaListItem* item) = 0;
-	virtual	int					CompareWith(NodeListItem* item) = 0;
-	virtual	int					CompareWith(DeviceListItem* item) = 0;
-	virtual	int					CompareWith(AudioMixerListItem* item) = 0;
+
+	static	int					Compare(const void* itemOne,
+									const void* itemTwo);
 
 protected:
 			struct Renderer;
@@ -78,7 +79,7 @@ private:
 
 class NodeListItem : public MediaListItem {
 public:
-								NodeListItem(dormant_node_info* node,
+								NodeListItem(const dormant_node_info* node,
 									media_type type);
 
 			void				SetMediaType(MediaListItem::media_type type);
@@ -89,25 +90,32 @@ public:
 
 	virtual	void				AlterWindow(MediaWindow* window);
 
-	// TODO: refactor and remove this:
-	virtual	dormant_node_info*	NodeInfo(){return fNodeInfo;}
-
 	virtual	const char*			Label();
 			media_type			Type() {return fMediaType;}
 
-	virtual	int					CompareWith(MediaListItem* item);
+	virtual	void				Accept(MediaListItem::Visitor& visitor);
+
+	struct Comparator : public MediaListItem::Visitor {
+								Comparator(NodeListItem* compareOthersTo);
+		virtual	void			Visit(NodeListItem* item);
+		virtual	void			Visit(DeviceListItem* item);
+		virtual	void			Visit(AudioMixerListItem* item);
+
+				int				result;
+					// -1 : < item; 0 : == item; 1 : > item
+	private:
+				NodeListItem*	fTarget;
+	};
 
 	// -1 : < item; 0 : == item; 1 : > item
-	virtual	int					CompareWith(NodeListItem* item);
-	virtual	int					CompareWith(DeviceListItem* item);
-	virtual	int					CompareWith(AudioMixerListItem* item);
+	virtual	int					CompareWith(MediaListItem* item);
 
 private:
 
 	virtual void				SetRenderParameters(Renderer& renderer);
 
-			dormant_node_info*	fNodeInfo;
-			bool				fIsAudioMixer;
+			const dormant_node_info* fNodeInfo;
+
 			media_type			fMediaType;
 			bool				fIsDefaultInput;
 			bool				fIsDefaultOutput;
@@ -120,19 +128,24 @@ public:
 									MediaListItem::media_type type);
 
 			MediaListItem::media_type Type() {return fMediaType;}
-
-	// TODO: refactor and remove this:
-	virtual	dormant_node_info*	NodeInfo(){return NULL;}
 	virtual	const char*			Label() {return fTitle;}
-
 	virtual	void				AlterWindow(MediaWindow* window);
+	virtual	void				Accept(MediaListItem::Visitor& visitor);
 
-	virtual	int					CompareWith(MediaListItem* item);
+	struct Comparator : public MediaListItem::Visitor {
+								Comparator(DeviceListItem* compareOthersTo);
+		virtual	void			Visit(NodeListItem* item);
+		virtual	void			Visit(DeviceListItem* item);
+		virtual	void			Visit(AudioMixerListItem* item);
+
+				int				result;
+					// -1 : < item; 0 : == item; 1 : > item
+	private:
+				DeviceListItem*	fTarget;
+	};
 
 	// -1 : < item; 0 : == item; 1 : > item
-	virtual	int					CompareWith(NodeListItem* item);
-	virtual	int					CompareWith(DeviceListItem* item);
-	virtual	int					CompareWith(AudioMixerListItem* item);
+	virtual	int					CompareWith(MediaListItem* item);
 
 private:
 	virtual void				SetRenderParameters(Renderer& renderer);
@@ -146,19 +159,25 @@ class AudioMixerListItem : public MediaListItem {
 public:
 								AudioMixerListItem(const char* title);
 
-	// TODO: refactor and remove this:
-	virtual	dormant_node_info*	NodeInfo(){return NULL;}
 
 	virtual	const char*			Label() {return fTitle;}
-
 	virtual	void				AlterWindow(MediaWindow* window);
+	virtual	void				Accept(MediaListItem::Visitor& visitor);
 
-	virtual	int					CompareWith(MediaListItem* item);
+	struct Comparator : public MediaListItem::Visitor {
+								Comparator(AudioMixerListItem* compareOthersTo);
+		virtual	void			Visit(NodeListItem* item);
+		virtual	void			Visit(DeviceListItem* item);
+		virtual	void			Visit(AudioMixerListItem* item);
+
+				int				result;
+					// -1 : < item; 0 : == item; 1 : > item
+	private:
+				AudioMixerListItem* fTarget;
+	};
 
 	// -1 : < item; 0 : == item; 1 : > item
-	virtual	int					CompareWith(NodeListItem* item);
-	virtual	int					CompareWith(DeviceListItem* item);
-	virtual	int					CompareWith(AudioMixerListItem* item);
+	virtual	int					CompareWith(MediaListItem* item);
 
 private:
 	virtual void				SetRenderParameters(Renderer& renderer);

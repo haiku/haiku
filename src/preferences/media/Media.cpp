@@ -57,8 +57,8 @@ Media::Media()
 		}
 	}
 
-	fWindow = new MediaWindow(rect);
 	MediaListItem::SetIcons(&fIcons);
+	fWindow = new MediaWindow(rect);
 
 	be_roster->StartWatching(BMessenger(this));
 }

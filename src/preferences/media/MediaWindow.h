@@ -16,7 +16,6 @@
 #define __MEDIAWINDOWS_H__
 
 
-#include <Box.h>
 #include <ListView.h>
 #include <MediaAddOn.h>
 #include <ParameterWeb.h>
@@ -34,6 +33,7 @@
 #define SETTINGS_FILE "MediaPrefs Settings"
 
 
+class BCardLayout;
 class BSeparatorView;
 // struct dormant_node_info;
 
@@ -46,15 +46,21 @@ public:
     		status_t			InitCheck();
 
 	// methods to be called by MediaListItems...
-			void				SelectNode(dormant_node_info* node);
+			void				SelectNode(const dormant_node_info* node);
 			void				SelectAudioSettings(const char* title);
 			void				SelectVideoSettings(const char* title);
 			void				SelectAudioMixer(const char* title);
 
+	// methods to be called by SettingsViews...
+			void				UpdateInputListItem(
+									MediaListItem::media_type type,
+									const dormant_node_info* node);
+			void				UpdateOutputListItem(
+									MediaListItem::media_type type,
+									const dormant_node_info* node);
+
     virtual	bool 				QuitRequested();
     virtual	void				MessageReceived(BMessage* message);
-    virtual	void				FrameResized(float width, float height);
-
 
 private:
 
@@ -83,7 +89,7 @@ private:
 	struct SmartNode {
 								SmartNode(const BMessenger& notifyHandler);
 								~SmartNode();
-			void				SetTo(dormant_node_info* node);
+			void				SetTo(const dormant_node_info* node);
 			void				SetTo(const media_node& node);
 			bool				IsSet();
 								operator media_node();
@@ -94,12 +100,11 @@ private:
 			BMessenger			fMessenger;
 	};
 	
-			BBox*				fBox;
 			BListView*			fListView;
 			BSeparatorView*		fTitleView;
-			BView*				fContentView;
-			SettingsView*		fAudioView;
-			SettingsView*		fVideoView;
+			BCardLayout*		fContentLayout;
+			AudioSettingsView*	fAudioView;
+			VideoSettingsView*	fVideoView;
     			    
 			SmartNode			fCurrentNode;
 			BParameterWeb*		fParamWeb;
