@@ -145,10 +145,6 @@ public:
 			int32				DateToJulianDay() const;
 	static	BDate				JulianDayToDate(int32 julianDay);
 
-	static	BDate				EasterSunday(int32 year);
-	static	BDate				AscensionDay(int32 year);
-	static	BDate				PentecostDay(int32 year);
-
 			bool				operator!=(const BDate& date) const;
 			bool				operator==(const BDate& date) const;
 

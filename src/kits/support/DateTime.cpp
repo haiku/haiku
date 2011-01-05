@@ -1091,57 +1091,6 @@ BDate::JulianDayToDate(int32 julianDay)
 
 
 /*!
-	Returns the date for easter sunday for the \c year.
-*/
-/*static*/ BDate
-BDate::EasterSunday(int32 year)
-{
-	// http://bloggingabout.net/blogs/jschreuder/archive/2005/06/24/7019.aspx
-	int32 gold = year % 19;
-	int32 century = year / 100;
-	int32 h = (century - (int32)(century / 4)
-		- (int32)((century * 8 + 13) / 25) + 19 * gold + 15) % 30;
-	int32 i = h - (int32)(h / 28) * (1 - (int32)(h / 28)
-		* (int32)(29 / (h + 1)) * (int32)((21 - gold) / 11));
-
-	BDate date;
-	date.fDay = i - ((year + (int32)(year / 4) + i + 2 - century
-		+ (int32)(century / 4)) % 7) + 28;
-	date.fMonth = 3;
-	date.fYear = year;
-	if (date.fDay > 31) {
-		date.fMonth++;
-		date.fDay -= 31;
-	}
-	return date;
-}
-
-
-/*!
-	Returns the date for ascension day for the \c year.
-*/
-/*static*/ BDate
-BDate::AscensionDay(int32 year)
-{
-	BDate date = EasterSunday(year);
-	date.AddDays(39);
-	return date;
-}
-
-
-/*!
-	Returns the date for pentecost day for the \c year.
-*/
-/*static*/ BDate
-BDate::PentecostDay(int32 year)
-{
-	BDate date = EasterSunday(year);
-	date.AddDays(49);
-	return date;
-}
-
-
-/*!
 	Returns true if this date is different from \c date, otherwise false.
 */
 bool
