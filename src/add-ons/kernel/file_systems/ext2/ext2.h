@@ -60,7 +60,7 @@ struct ext2_super_block {
 	uint32	algorithm_usage_bitmap;
 	uint8	preallocated_blocks;
 	uint8	preallocated_directory_blocks;
-	uint16	_padding;
+	uint16	reserved_gdt_blocks;
 
 	// journaling ext3 support
 	uint8	journal_uuid[16];
@@ -127,6 +127,8 @@ struct ext2_super_block {
 		{ return B_LENDIAN_TO_HOST_INT32(read_only_features); }
 	uint32 IncompatibleFeatures() const
 		{ return B_LENDIAN_TO_HOST_INT32(incompatible_features); }
+	uint16 ReservedGDTBlocks() const
+		{ return B_LENDIAN_TO_HOST_INT16(reserved_gdt_blocks); }
 	ino_t  JournalInode() const
 		{ return B_LENDIAN_TO_HOST_INT32(journal_inode); }
 	ino_t  LastOrphan() const
@@ -383,6 +385,7 @@ struct ext2_extent_stream {
 } _PACKED;
 
 #define EXT2_INODE_NORMAL_SIZE		128
+#define EXT2_INODE_MAX_LINKS		65000
 
 struct ext2_inode {
 	uint16	mode;

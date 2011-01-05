@@ -54,8 +54,7 @@ HTree::HTree(Volume* volume, Inode* directory)
 	fRootEntry(NULL)
 {
 	fBlockSize = volume->BlockSize();
-	fIndexed = volume->IndexedDirectories()
-		&& (directory->Flags() & EXT2_INODE_INDEXED) != 0;
+	fIndexed = directory->IsIndexed();
 
 	ext2_super_block superBlock = volume->SuperBlock();
 	fHashSeed[0] = superBlock.HashSeed(0);

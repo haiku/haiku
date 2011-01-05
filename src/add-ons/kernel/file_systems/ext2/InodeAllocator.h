@@ -37,6 +37,9 @@ private:
 							uint32 numInodes, ino_t& id);
 			status_t	_UnmarkInBitmap(Transaction& transaction,
 							fsblock_t bitmapBlock, uint32 numInodes, ino_t id);
+			status_t	_InitGroup(Transaction& transaction,
+							ext2_block_group* group, fsblock_t bitmapBlock,
+							uint32 numInodes);
 
 
 			Volume*		fVolume;

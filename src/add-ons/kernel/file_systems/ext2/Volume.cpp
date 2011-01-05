@@ -1,4 +1,5 @@
 /*
+ * Copyright 2011, Jérôme Duval, korli@users.berlios.de.
  * Copyright 2008-2010, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
@@ -21,6 +22,7 @@
 #include <util/AutoLock.h>
 
 #include "CachedBlock.h"
+#include "CRCTable.h"
 #include "Inode.h"
 #include "InodeJournal.h"
 #include "NoJournal.h"
@@ -507,7 +509,8 @@ Volume::_UnsupportedIncompatibleFeatures(ext2_super_block& superBlock)
 	uint32 supportedIncompatible = EXT2_INCOMPATIBLE_FEATURE_FILE_TYPE
 		| EXT2_INCOMPATIBLE_FEATURE_RECOVER
 		| EXT2_INCOMPATIBLE_FEATURE_JOURNAL
-		| EXT2_INCOMPATIBLE_FEATURE_EXTENTS;
+		| EXT2_INCOMPATIBLE_FEATURE_EXTENTS
+		| EXT2_INCOMPATIBLE_FEATURE_FLEX_GROUP;
 		/*| EXT2_INCOMPATIBLE_FEATURE_META_GROUP*/;
 	uint32 unsupported = superBlock.IncompatibleFeatures() 
 		& ~supportedIncompatible;
@@ -527,7 +530,9 @@ Volume::_UnsupportedReadOnlyFeatures(ext2_super_block& superBlock)
 	uint32 supportedReadOnly = EXT2_READ_ONLY_FEATURE_SPARSE_SUPER
 		| EXT2_READ_ONLY_FEATURE_LARGE_FILE
 		| EXT2_READ_ONLY_FEATURE_HUGE_FILE
-		| EXT2_READ_ONLY_FEATURE_EXTRA_ISIZE;
+		| EXT2_READ_ONLY_FEATURE_EXTRA_ISIZE
+		| EXT2_READ_ONLY_FEATURE_DIR_NLINK
+		| EXT2_READ_ONLY_FEATURE_GDT_CSUM;
 	// TODO actually implement EXT2_READ_ONLY_FEATURE_SPARSE_SUPER when
 	// implementing superblock backup copies
 
@@ -553,6 +558,25 @@ Volume::_GroupDescriptorBlock(uint32 blockIndex)
 }
 
 
+uint16
+Volume::_GroupCheckSum(ext2_block_group *group, int32 index)
+{
+	uint16 checksum = 0;
+	if (HasChecksumFeature()) {
+		int32 number = B_HOST_TO_LENDIAN_INT32(index);
+		checksum = calculate_crc(0xffff, fSuperBlock.uuid,
+			sizeof(fSuperBlock.uuid));
+		checksum = calculate_crc(checksum, (uint8*)&number, sizeof(number));
+		checksum = calculate_crc(checksum, (uint8*)group, 30);
+		if (Has64bitFeature()) {
+			checksum = calculate_crc(checksum, (uint8*)group + 34, 
+				fGroupDescriptorSize - 34);
+		}
+	}
+	return checksum;
+}
+
+
 /*!	Makes the requested block group available.
 	The block groups are loaded on demand, but are kept in memory until the
 	volume is unmounted; therefore we don't use the block cache.
@@ -564,6 +588,7 @@ Volume::GetBlockGroup(int32 index, ext2_block_group** _group)
 		return B_BAD_VALUE;
 
 	int32 blockIndex = index / fGroupsPerBlock;
+	int32 blockOffset = index % fGroupsPerBlock;
 
 	MutexLocker _(fLock);
 
@@ -580,12 +605,16 @@ Volume::GetBlockGroup(int32 index, ext2_block_group** _group)
 		memcpy(fGroupBlocks[blockIndex], block, fBlockSize);
 
 		TRACE("group [%ld]: inode table %lld\n", index, ((ext2_block_group*)
-			(fGroupBlocks[blockIndex] + (index % fGroupsPerBlock) 
-			* fGroupDescriptorSize))->InodeTable(Has64bitFeature()));
+			(fGroupBlocks[blockIndex] + blockOffset 
+				* fGroupDescriptorSize))->InodeTable(Has64bitFeature()));
 	}
 
 	*_group = (ext2_block_group*)(fGroupBlocks[blockIndex]
-		+ (index % fGroupsPerBlock) * fGroupDescriptorSize);
+		+ blockOffset * fGroupDescriptorSize);
+	if (HasChecksumFeature() 
+		&& (*_group)->checksum != _GroupCheckSum(*_group, index)) {
+		return B_BAD_DATA;
+	}
 	return B_OK;
 }
 
@@ -599,11 +628,19 @@ Volume::WriteBlockGroup(Transaction& transaction, int32 index)
 	TRACE("Volume::WriteBlockGroup()\n");
 
 	int32 blockIndex = index / fGroupsPerBlock;
+	int32 blockOffset = index % fGroupsPerBlock;
 
 	MutexLocker _(fLock);
 
 	if (fGroupBlocks[blockIndex] == NULL)
 		return B_BAD_VALUE;
+
+	ext2_block_group *group = (ext2_block_group*)(fGroupBlocks[blockIndex]
+		+ blockOffset * fGroupDescriptorSize);
+	
+	group->checksum = _GroupCheckSum(group, index);
+	TRACE("Volume::WriteBlockGroup() checksum 0x%x for group %ld\n",
+		group->checksum, index);
 
 	CachedBlock cached(this);
 	uint8* block = cached.SetToWritable(transaction,
@@ -628,6 +665,20 @@ Volume::ActivateLargeFiles(Transaction& transaction)
 	
 	fSuperBlock.SetReadOnlyFeatures(fSuperBlock.ReadOnlyFeatures()
 		| EXT2_READ_ONLY_FEATURE_LARGE_FILE);
+	
+	return WriteSuperBlock(transaction);
+}
+
+
+status_t
+Volume::ActivateDirNLink(Transaction& transaction)
+{
+	if ((fSuperBlock.ReadOnlyFeatures() 
+		& EXT2_READ_ONLY_FEATURE_DIR_NLINK) != 0)
+		return B_OK;
+	
+	fSuperBlock.SetReadOnlyFeatures(fSuperBlock.ReadOnlyFeatures()
+		| EXT2_READ_ONLY_FEATURE_DIR_NLINK);
 	
 	return WriteSuperBlock(transaction);
 }

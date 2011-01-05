@@ -1,4 +1,5 @@
 /*
+ * Copyright 2011, Jérôme Duval, korli@users.berlios.de.
  * Copyright 2008-2010, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
@@ -76,20 +77,29 @@ public:
 			Journal*			GetJournal() { return fJournal; }
 
 			bool				IndexedDirectories() const
-									{ return (fSuperBlock.CompatibleFeatures()
-										& EXT2_FEATURE_DIRECTORY_INDEX) != 0; }
+								{ return (fSuperBlock.CompatibleFeatures()
+									& EXT2_FEATURE_DIRECTORY_INDEX) != 0; }
 			bool				Has64bitFeature() const
-									{ return (fSuperBlock.CompatibleFeatures()
-										& EXT2_INCOMPATIBLE_FEATURE_64BIT) != 0; }
+								{ return (fSuperBlock.CompatibleFeatures()
+									& EXT2_INCOMPATIBLE_FEATURE_64BIT) != 0; }
 			bool				HasExtentsFeature() const
-									{ return (fSuperBlock.IncompatibleFeatures()
-										& EXT2_INCOMPATIBLE_FEATURE_EXTENTS) != 0; }
+								{ return (fSuperBlock.IncompatibleFeatures()
+									& EXT2_INCOMPATIBLE_FEATURE_EXTENTS)
+									!= 0; }
+			bool				HasChecksumFeature() const
+								{ return (fSuperBlock.ReadOnlyFeatures()
+									& EXT2_READ_ONLY_FEATURE_GDT_CSUM) != 0; }
+			bool				HasMetaGroupFeature() const
+								{ return (fSuperBlock.IncompatibleFeatures()
+									& EXT2_INCOMPATIBLE_FEATURE_META_GROUP)
+									!= 0; }
 			uint8				DefaultHashVersion() const
-									{ return fSuperBlock.default_hash_version; }
+								{ return fSuperBlock.default_hash_version; }
 			bool				HugeFiles() const
-									{ return (fSuperBlock.ReadOnlyFeatures()
-										& EXT2_READ_ONLY_FEATURE_HUGE_FILE) != 0; }
+								{ return (fSuperBlock.ReadOnlyFeatures()
+									& EXT2_READ_ONLY_FEATURE_HUGE_FILE) != 0; }
 			status_t			ActivateLargeFiles(Transaction& transaction);
+			status_t			ActivateDirNLink(Transaction& transaction);
 
 			status_t			SaveOrphan(Transaction& transaction,
 									ino_t newID, ino_t &oldID);
@@ -131,6 +141,8 @@ private:
 			uint32				_GroupDescriptorBlock(uint32 blockIndex);
 			uint16				_GroupDescriptorSize() 
 									{ return fGroupDescriptorSize; }
+			uint16				_GroupCheckSum(ext2_block_group *group,
+									int32 index);
 
 private:
 			mutex				fLock;

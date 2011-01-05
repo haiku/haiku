@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Haiku Inc. All rights reserved.
+ * Copyright 2001-2011, Haiku Inc. All rights reserved.
  * This file may be used under the terms of the MIT License.
  *
  * Authors:
@@ -7,6 +7,7 @@
  */
 #ifndef EXTENTSTREAM_H
 #define EXTENTSTREAM_H
+
 
 #include "ext2.h"
 #include "Transaction.h"

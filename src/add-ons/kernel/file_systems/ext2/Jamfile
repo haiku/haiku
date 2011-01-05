@@ -23,6 +23,7 @@ KernelAddon ext2 :
 	BitmapBlock.cpp
 	BlockAllocator.cpp
 	InodeAllocator.cpp
+	CRCTable.cpp
 
 	kernel_interface.cpp
 ;

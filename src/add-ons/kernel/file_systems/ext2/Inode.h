@@ -1,4 +1,5 @@
 /*
+ * Copyright 2011, Jérôme Duval, korli@users.berlios.de.
  * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
@@ -50,6 +51,9 @@ public:
 			bool		IsDeleted() const { return fUnlinked; }
 			bool		HasExtraAttributes() const
 							{ return fHasExtraAttributes; }
+			bool		IsIndexed() const 
+						{ return fVolume->IndexedDirectories()
+							&& (Flags() & EXT2_INODE_INDEXED) != 0; }
 
 			mode_t		Mode() const { return fNode.Mode(); }
 			int32		Flags() const { return fNode.Flags(); }
@@ -75,6 +79,7 @@ public:
 							fHasExtraAttributes); }
 			void		SetAccessTime(const struct timespec *timespec)
 						{ fNode.SetAccessTime(timespec, fHasExtraAttributes); }
+			void		IncrementNumLinks(Transaction& transaction);
 
 			//::Volume* _Volume() const { return fVolume; }
 			Volume*		GetVolume() const { return fVolume; }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Haiku Inc. All rights reserved.
+ * Copyright 2001-2011, Haiku Inc. All rights reserved.
  * This file may be used under the terms of the MIT License.
  *
  * Authors:
@@ -36,7 +36,6 @@ public:
 			status_t	Initialize(Volume* volume, uint32 blockGroup,
 							uint32 numBits);
 
-			status_t	ScanFreeRanges();
 			bool		IsFull() const;
 
 			status_t	Allocate(Transaction& transaction, fsblock_t start,
@@ -58,9 +57,12 @@ public:
 			void		RemovedFromTransaction();
 
 private:
+			status_t	_ScanFreeRanges();
 			void		_AddFreeRange(uint32 start, uint32 length);
 			void		_LockInTransaction(Transaction& transaction);
-
+			status_t	_InitGroup(Transaction& transaction);
+			bool		_IsSparse();
+			uint32		_FirstFreeBlock();
 
 			Volume*		fVolume;
 			uint32		fBlockGroup;
@@ -130,7 +132,17 @@ AllocationBlockGroup::Initialize(Volume* volume, uint32 blockGroup,
 
 	fBitmapBlock = fGroupDescriptor->BlockBitmap(fVolume->Has64bitFeature());
 
-	status = ScanFreeRanges();
+	if (fGroupDescriptor->Flags() & EXT2_BLOCK_GROUP_BLOCK_UNINIT) {
+		fFreeBits = fGroupDescriptor->FreeBlocks(fVolume->Has64bitFeature());
+		fLargestLength = fFreeBits;
+		fLargestStart = _FirstFreeBlock();
+		TRACE("Group %ld is uninit\n", fBlockGroup);
+		return B_OK;
+	}
+	
+	status = _ScanFreeRanges();
+	if (status != B_OK)
+		return status;
 
 	if (fGroupDescriptor->FreeBlocks(fVolume->Has64bitFeature())
 		!= fFreeBits) {
@@ -152,14 +164,16 @@ AllocationBlockGroup::Initialize(Volume* volume, uint32 blockGroup,
 
 
 status_t
-AllocationBlockGroup::ScanFreeRanges()
+AllocationBlockGroup::_ScanFreeRanges()
 {
-	TRACE("AllocationBlockGroup::ScanFreeRanges()\n");
+	TRACE("AllocationBlockGroup::_ScanFreeRanges() for group %ld\n",
+		fBlockGroup);
 	BitmapBlock block(fVolume, fNumBits);
 
 	if (!block.SetTo(fBitmapBlock))
 		return B_ERROR;
 
+	fFreeBits = 0;
 	uint32 start = 0;
 	uint32 end = 0;
 
@@ -201,6 +215,7 @@ AllocationBlockGroup::Allocate(Transaction& transaction, fsblock_t _start,
 		return B_BAD_VALUE;
 
 	_LockInTransaction(transaction);
+	_InitGroup(transaction);
 
 	BitmapBlock block(fVolume, fNumBits);
 
@@ -252,6 +267,7 @@ AllocationBlockGroup::Allocate(Transaction& transaction, fsblock_t _start,
 
 	if (fLargestLength < fNumBits / 2)
 		block.FindLargestUnmarkedRange(fLargestStart, fLargestLength);
+	ASSERT(block.CheckUnmarked(fLargestStart, fLargestLength));
 
 	return B_OK;
 }
@@ -272,6 +288,8 @@ AllocationBlockGroup::Free(Transaction& transaction, uint32 start,
 		return B_BAD_VALUE;
 
 	_LockInTransaction(transaction);
+	if (fGroupDescriptor->Flags() & EXT2_BLOCK_GROUP_BLOCK_UNINIT)
+		panic("AllocationBlockGroup::Free() can't free blocks if uninit\n");
 
 	BitmapBlock block(fVolume, fNumBits);
 
@@ -399,6 +417,89 @@ AllocationBlockGroup::_LockInTransaction(Transaction& transaction)
 	}
 
 	mutex_unlock(&fLock);
+}
+
+
+status_t
+AllocationBlockGroup::_InitGroup(Transaction& transaction)
+{
+	TRACE("AllocationBlockGroup::_InitGroup()\n");
+	uint16 flags = fGroupDescriptor->Flags();
+	if ((flags & EXT2_BLOCK_GROUP_BLOCK_UNINIT) == 0)
+		return B_OK;
+
+	TRACE("AllocationBlockGroup::_InitGroup() initing\n");
+
+	BitmapBlock blockBitmap(fVolume, fNumBits);
+	if (!blockBitmap.SetToWritable(transaction, fBitmapBlock))
+		return B_ERROR;
+	blockBitmap.Mark(0, _FirstFreeBlock(), true);
+	blockBitmap.Unmark(0, fNumBits, true);
+	
+	fGroupDescriptor->SetFlags(flags & ~EXT2_BLOCK_GROUP_BLOCK_UNINIT);
+	fVolume->WriteBlockGroup(transaction, fBlockGroup);
+
+	status_t status = _ScanFreeRanges();
+	if (status != B_OK)
+		return status;
+
+	if (fGroupDescriptor->FreeBlocks(fVolume->Has64bitFeature())
+		!= fFreeBits) {
+		ERROR("AllocationBlockGroup(%lu,%lld)::_InitGroup(): Mismatch between "
+			"counted free blocks (%lu/%lu) and what is set on the group "
+			"descriptor (%lu)\n", fBlockGroup, fBitmapBlock, fFreeBits,
+			fNumBits, fGroupDescriptor->FreeBlocks(
+				fVolume->Has64bitFeature()));
+		return B_BAD_DATA;
+	}
+
+	TRACE("AllocationBlockGroup::_InitGroup() init OK\n");
+
+	return B_OK;
+}
+
+
+bool
+AllocationBlockGroup::_IsSparse()
+{
+	if (fBlockGroup <= 1)
+		return true;
+	if (fBlockGroup & 0x1)
+		return false;
+
+	uint32 i = fBlockGroup;
+	while (i % 7 == 0)
+		i /= 7;
+	if (i == 1)
+		return true;
+
+	i = fBlockGroup;
+	while (i % 5 == 0)
+		i /= 5;
+	if (i == 1)
+		return true;
+
+	i = fBlockGroup;
+	while (i % 3 == 0)
+		i /= 3;
+	if (i == 1)
+		return true;
+
+	return false;
+}
+
+
+uint32
+AllocationBlockGroup::_FirstFreeBlock()
+{
+	uint32 first = 1;
+	if (_IsSparse())
+		first = 0;
+	else if (!fVolume->HasMetaGroupFeature()) {
+		first += fVolume->SuperBlock().ReservedGDTBlocks();
+		first += fVolume->NumGroups();
+	}
+	return first;
 }
 
 

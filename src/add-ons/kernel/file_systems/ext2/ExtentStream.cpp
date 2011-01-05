@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Haiku Inc. All rights reserved.
+ * Copyright 2001-2011, Haiku Inc. All rights reserved.
  * This file may be used under the terms of the MIT License.
  *
  * Authors:
@@ -75,6 +75,41 @@ ExtentStream::FindBlock(off_t offset, fsblock_t& block, uint32 *_count)
 			stream->extent_index[i - 1].PhysicalBlock());
 		if (!stream->extent_header.IsValid())
 			panic("ExtentStream::FindBlock() invalid header\n");
+	}
+
+	if (stream->extent_header.NumEntries() > 7) {
+		// binary search when enough entries
+		int32 low = 0;
+		int32 high = stream->extent_header.NumEntries() - 1;
+		int32 middle = 0;
+		while (low <= high) {
+			middle = (high + low) / 2;
+			if (stream->extent_entries[middle].LogicalBlock() == index)
+				break;
+			if (stream->extent_entries[middle].LogicalBlock() < index)
+				low = middle + 1;
+			else
+				high = middle - 1;
+		}
+		if (stream->extent_entries[middle].LogicalBlock() > index)
+			middle--;
+		if (stream->extent_entries[middle].LogicalBlock() 
+			+  stream->extent_entries[middle].Length() > index) {
+			// sparse block
+			TRACE("FindBlock() sparse block index %lld at %ld\n", index,
+				stream->extent_entries[middle].LogicalBlock());
+			block = 0xffffffff;
+			return B_OK;
+		}
+
+		fileblock_t diff = index 
+			- stream->extent_entries[middle].LogicalBlock();
+		block = stream->extent_entries[middle].PhysicalBlock() + diff;
+		if (_count)
+			*_count = stream->extent_entries[middle].Length() - diff;
+		TRACE("FindBlock(offset %lld): %lld %ld\n", offset, 
+			block, _count != NULL ? *_count : 1);
+		return B_OK;
 	}
 
 	for (int32 i = 0; i < stream->extent_header.NumEntries(); i++) {

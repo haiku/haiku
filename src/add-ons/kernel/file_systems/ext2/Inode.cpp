@@ -1,4 +1,5 @@
 /*
+ * Copyright 2011, Jérôme Duval, korli@users.berlios.de.
  * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
@@ -440,7 +441,7 @@ Inode::InitDirectory(Transaction& transaction, Inode* parent)
 	root->dotdot_entry_name[0] = '.';
 	root->dotdot_entry_name[1] = '.';
 
-	parent->Node().SetNumLinks(parent->Node().NumLinks() + 1);
+	parent->IncrementNumLinks(transaction);
 
 	return parent->WriteBack(transaction);
 }
@@ -909,5 +910,17 @@ Inode::_SetNumBlocks(uint64 numBlocks)
 
 	fNode.SetNumBlocks64(numBlocks);
 	return B_OK;
+}
+
+
+void
+Inode::IncrementNumLinks(Transaction& transaction)
+{
+	fNode.SetNumLinks(fNode.NumLinks() + 1);
+	if (IsIndexed() && (fNode.NumLinks() >= EXT2_INODE_MAX_LINKS
+		|| fNode.NumLinks() == 2)) {
+		fNode.SetNumLinks(1);
+		fVolume->ActivateDirNLink(transaction);
+	}
 }
 

@@ -1,8 +1,9 @@
 /*
- * Copyright 2001-2010, Haiku Inc. All rights reserved.
+ * Copyright 2001-2011, Haiku Inc. All rights reserved.
  * This file may be used under the terms of the MIT License.
  *
  * Authors:
+ *		Jérôme Duval
  *		Janito V. Ferreira Filho
  */
 
@@ -44,7 +45,7 @@ InodeAllocator::New(Transaction& transaction, Inode* parent, int32 mode,
 	ino_t& id)
 {
 	// Apply allocation policy
-	uint32 preferredBlockGroup = parent == NULL ? parent->ID()
+	uint32 preferredBlockGroup = parent != NULL ? (parent->ID() - 1)
 		/ parent->GetVolume()->InodesPerGroup() : 0;
 	
 	return _Allocate(transaction, preferredBlockGroup, S_ISDIR(mode), id);
@@ -65,16 +66,20 @@ InodeAllocator::Free(Transaction& transaction, ino_t id, bool isDirectory)
 	if (status != B_OK)
 		return status;
 
+	if (group->Flags() & EXT2_BLOCK_GROUP_INODE_UNINIT)
+		panic("InodeAllocator::Free() can't free inodes if uninit\n");
+
 	if (blockGroup == fVolume->NumGroups() - 1)
 		numInodes = fVolume->NumInodes() - blockGroup * numInodes;
 
 	TRACE("InodeAllocator::Free(): Updating block group data\n");
 	group->SetFreeInodes(group->FreeInodes(fVolume->Has64bitFeature()) + 1,
 		fVolume->Has64bitFeature());
-	if (isDirectory)
+	if (isDirectory) {
 		group->SetUsedDirectories(
 			group->UsedDirectories(fVolume->Has64bitFeature()) - 1,
 			fVolume->Has64bitFeature());
+	}
 
 	status = fVolume->WriteBlockGroup(transaction, blockGroup);
 	if (status != B_OK)
@@ -104,6 +109,8 @@ InodeAllocator::_Allocate(Transaction& transaction, uint32 preferredBlockGroup,
 				return status;
 			}
 
+			fsblock_t block = group->InodeBitmap(fVolume->Has64bitFeature());
+			_InitGroup(transaction, group, block, fVolume->InodesPerGroup());
 			uint32 freeInodes = group->FreeInodes(fVolume->Has64bitFeature());
 			if (freeInodes != 0) {
 				TRACE("InodeAllocator::_Allocate() freeInodes %ld bitmap %lld\n",
@@ -118,8 +125,7 @@ InodeAllocator::_Allocate(Transaction& transaction, uint32 preferredBlockGroup,
 				if (status != B_OK)
 					return status;
 
-				return _MarkInBitmap(transaction, 
-					group->InodeBitmap(fVolume->Has64bitFeature()),
+				return _MarkInBitmap(transaction, block,
 					blockGroup, fVolume->InodesPerGroup(), id);
 			}
 		}
@@ -133,16 +139,27 @@ InodeAllocator::_Allocate(Transaction& transaction, uint32 preferredBlockGroup,
 				return status;
 			}
 
+			uint32 numInodes = fVolume->NumInodes() 
+				- blockGroup * fVolume->InodesPerGroup();
+			fsblock_t block = group->InodeBitmap(fVolume->Has64bitFeature());
+			_InitGroup(transaction, group, block, numInodes);
 			uint32 freeInodes = group->FreeInodes(fVolume->Has64bitFeature());
 			if (freeInodes != 0) {
 				TRACE("InodeAllocator::_Allocate() freeInodes %ld\n", freeInodes);
 				group->SetFreeInodes(freeInodes - 1,
 					fVolume->Has64bitFeature());
+				if (isDirectory) {
+					group->SetUsedDirectories(group->UsedDirectories(
+						fVolume->Has64bitFeature()) + 1,
+						fVolume->Has64bitFeature());
+				}
 
-				return _MarkInBitmap(transaction, 
-					group->InodeBitmap(fVolume->Has64bitFeature()),
-					blockGroup, fVolume->NumInodes()
-						- blockGroup * fVolume->InodesPerGroup(), id);
+				status = fVolume->WriteBlockGroup(transaction, blockGroup);
+				if (status != B_OK)
+					return status;
+
+				return _MarkInBitmap(transaction, block,
+					blockGroup, numInodes, id);
 			}
 		}
 
@@ -209,3 +226,23 @@ InodeAllocator::_UnmarkInBitmap(Transaction& transaction, fsblock_t bitmapBlock,
 
 	return B_OK;
 }
+
+
+status_t
+InodeAllocator::_InitGroup(Transaction& transaction, ext2_block_group* group,
+	fsblock_t bitmapBlock, uint32 numInodes)
+{
+	uint16 flags = group->Flags();
+	if ((flags & EXT2_BLOCK_GROUP_INODE_UNINIT) == 0)
+		return B_OK;
+
+	TRACE("InodeAllocator::_InitGroup() initing group\n");
+	BitmapBlock inodeBitmap(fVolume, numInodes);
+	if (!inodeBitmap.SetToWritable(transaction, bitmapBlock))
+		return B_ERROR;
+	inodeBitmap.Unmark(0, numInodes, true);
+	group->SetFlags(flags & ~EXT2_BLOCK_GROUP_INODE_UNINIT);
+
+	return B_OK;
+}
+
