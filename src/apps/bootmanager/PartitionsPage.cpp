@@ -180,8 +180,9 @@ PartitionsPage::_FillPartitionsView(BView* view)
 			.Add(nameControl, 1, rowNumber, 1, 2)
 			.Add(BSpaceLayoutItem::CreateHorizontalStrut(10), 2, rowNumber)
 			.Add(typeView, 3, rowNumber)
-			.Add(pathView, 3, ++rowNumber)
+			.Add(pathView, 3, rowNumber + 1)
 			.SetRowWeight(rowNumber, 1);
+		rowNumber++;
 	}
 }
 
