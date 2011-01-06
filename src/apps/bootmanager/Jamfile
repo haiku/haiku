@@ -2,21 +2,25 @@ SubDir HAIKU_TOP src apps bootmanager ;
 
 UsePrivateHeaders shared storage tracker ;
 
-Application BootManager :
+local cataloguedSources =
 	BootManager.cpp
 	BootManagerController.cpp
 	BootManagerWindow.cpp
 	DefaultPartitionPage.cpp
-	DescriptionPage.cpp
 	DrivesPage.cpp
 	FileSelectionPage.cpp
 	LegacyBootMenu.cpp
 	PartitionsPage.cpp
-#	TestBootDrive.cpp
 	UninstallPage.cpp
+	WizardView.cpp
+;
+
+Application BootManager :
+	$(cataloguedSources)
+	DescriptionPage.cpp
+#	TestBootDrive.cpp
 	WizardController.cpp
 	WizardPageView.cpp
-	WizardView.cpp
 	:
 	be
 	textencoding
@@ -30,14 +34,5 @@ Application BootManager :
 DoCatalogs BootManager :
 	x-vnd.Haiku-BootManager
 	:
-	BootManager.cpp
-	BootManagerController.cpp
-	BootManagerWindow.cpp
-	DefaultPartitionPage.cpp
-	DrivesPage.cpp
-	FileSelectionPage.cpp
-	LegacyBootMenu.cpp
-	PartitionsPage.cpp
-	UninstallPage.cpp
-	WizardView.cpp
+	$(cataloguedSources)
 ;
