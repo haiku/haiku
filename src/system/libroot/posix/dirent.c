@@ -279,7 +279,7 @@ telldir(DIR* dir)
 
 
 int
-dirfd(const DIR* dir)
+dirfd(DIR* dir)
 {
 	return dir->fd;
 }

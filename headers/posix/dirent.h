@@ -41,7 +41,7 @@ int				closedir(DIR* dir);
 void			rewinddir(DIR* dir);
 void 			seekdir(DIR* dir, long int position);
 long int		telldir(DIR* dir);
-int				dirfd(const DIR* dir);
+int				dirfd(DIR* dir);
 
 int				alphasort(const struct dirent** entry1,
 					const struct dirent** entry2);
