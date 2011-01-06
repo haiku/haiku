@@ -1111,7 +1111,7 @@ BTabView::MinSize()
 		size = _TabsMinSize();
 		BSize containerSize = fContainerView->MinSize();
 		containerSize.width += 2 * _BorderWidth();
-		containerSize.height += _BorderWidth();
+		containerSize.height += 2 * _BorderWidth();
 		if (containerSize.width > size.width)
 			size.width = containerSize.width;
 		size.height += containerSize.height;
@@ -1130,7 +1130,7 @@ BTabView::MaxSize()
 		size = _TabsMinSize();
 		BSize containerSize = fContainerView->MaxSize();
 		containerSize.width += 2 * _BorderWidth();
-		containerSize.height += _BorderWidth();
+		containerSize.height += 2 * _BorderWidth();
 		if (containerSize.width > size.width)
 			size.width = containerSize.width;
 		size.height += containerSize.height;
@@ -1149,7 +1149,7 @@ BTabView::PreferredSize()
 		size = _TabsMinSize();
 		BSize containerSize = fContainerView->PreferredSize();
 		containerSize.width += 2 * _BorderWidth();
-		containerSize.height += _BorderWidth();
+		containerSize.height += 2 * _BorderWidth();
 		if (containerSize.width > size.width)
 			size.width = containerSize.width;
 		size.height += containerSize.height;
@@ -1184,8 +1184,7 @@ BTabView::ResolveSpecifier(BMessage *message, int32 index,
 	if (propInfo.FindMatch(message, 0, specifier, what, property) >= B_OK)
 		return this;
 
-	return BView::ResolveSpecifier(message, index, specifier, what,
-		property);
+	return BView::ResolveSpecifier(message, index, specifier, what, property);
 }
 
 
@@ -1409,7 +1408,7 @@ BTabView::_InitContainerView(bool layouted)
 BSize
 BTabView::_TabsMinSize() const
 {
-	BSize size(0.0f, TabHeight() + 6.0f);
+	BSize size(0.0f, TabHeight());
 	int32 count = min_c(2, CountTabs());
 	for (int32 i = 0; i < count; i++) {
 		BRect frame = TabFrame(i);
