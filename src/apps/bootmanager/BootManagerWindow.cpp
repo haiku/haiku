@@ -18,7 +18,6 @@
 #include <tracker_private.h>
 
 #include "DefaultPartitionPage.h"
-#include "EntryPage.h"
 #include "PartitionsPage.h"
 #include "WizardView.h"
 
