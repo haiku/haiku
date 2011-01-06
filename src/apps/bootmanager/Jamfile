@@ -34,9 +34,9 @@ DoCatalogs BootManager :
 	BootManagerController.cpp
 	BootManagerWindow.cpp
 	DefaultPartitionPage.cpp
-	EntryPage.cpp
+	DrivesPage.cpp
 	FileSelectionPage.cpp
-	LegacyBootDrive.cpp
+	LegacyBootMenu.cpp
 	PartitionsPage.cpp
 	UninstallPage.cpp
 	WizardView.cpp
