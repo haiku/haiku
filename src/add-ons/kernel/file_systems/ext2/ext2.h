@@ -273,6 +273,14 @@ struct ext2_block_group {
 		return dirs;
 	}
 	uint16 Flags() const { return B_LENDIAN_TO_HOST_INT16(flags); }
+	uint32 UnusedInodes(bool has64bits) const
+	{
+		uint32 inodes = B_LENDIAN_TO_HOST_INT16(unused_inodes);
+		if (has64bits)
+			inodes |= 
+				((uint32)B_LENDIAN_TO_HOST_INT16(unused_inodes_high) << 16);
+		return inodes;
+	}
 	
 
 	void SetFreeBlocks(uint32 freeBlocks, bool has64bits)
@@ -300,6 +308,13 @@ struct ext2_block_group {
 	void SetFlags(uint16 newFlags)
 	{
 		flags = B_HOST_TO_LENDIAN_INT16(newFlags);
+	}
+
+	void SetUnusedInodes(uint32 unusedInodes, bool has64bits)
+	{
+		unused_inodes = B_HOST_TO_LENDIAN_INT16(unusedInodes) & 0xffff;
+		if (has64bits)
+			unused_inodes_high = B_HOST_TO_LENDIAN_INT16(unusedInodes >> 16);
 	}
 } _PACKED;
 

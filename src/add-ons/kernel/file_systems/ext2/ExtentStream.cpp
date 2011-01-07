@@ -93,8 +93,9 @@ ExtentStream::FindBlock(off_t offset, fsblock_t& block, uint32 *_count)
 		}
 		if (stream->extent_entries[middle].LogicalBlock() > index)
 			middle--;
-		if (stream->extent_entries[middle].LogicalBlock() 
-			+  stream->extent_entries[middle].Length() > index) {
+		fileblock_t diff = index 
+			- stream->extent_entries[middle].LogicalBlock();
+		if (diff > stream->extent_entries[middle].Length()) {
 			// sparse block
 			TRACE("FindBlock() sparse block index %lld at %ld\n", index,
 				stream->extent_entries[middle].LogicalBlock());
@@ -102,8 +103,6 @@ ExtentStream::FindBlock(off_t offset, fsblock_t& block, uint32 *_count)
 			return B_OK;
 		}
 
-		fileblock_t diff = index 
-			- stream->extent_entries[middle].LogicalBlock();
 		block = stream->extent_entries[middle].PhysicalBlock() + diff;
 		if (_count)
 			*_count = stream->extent_entries[middle].Length() - diff;

@@ -17,11 +17,14 @@
 #include "Volume.h"
 
 
+#undef ASSERT
 //#define TRACE_EXT2
 #ifdef TRACE_EXT2
 #	define TRACE(x...) dprintf("\33[34mext2:\33[0m " x)
+#	define ASSERT(x) { if (!(x)) kernel_debugger("ext2: assert failed: " #x "\n"); }
 #else
 #	define TRACE(x...) ;
+#	define ASSERT(x) ;
 #endif
 #define ERROR(x...) dprintf("\33[34mext2:\33[0m " x)
 
@@ -101,67 +104,15 @@ InodeAllocator::_Allocate(Transaction& transaction, uint32 preferredBlockGroup,
 
 	for (int i = 0; i < 2; ++i) {
 		for (; blockGroup < lastBlockGroup; ++blockGroup) {
-			ext2_block_group* group;
-
-			status_t status = fVolume->GetBlockGroup(blockGroup, &group);
-			if (status != B_OK) {
-				ERROR("InodeAllocator::_Allocate() GetBlockGroup() failed\n");
-				return status;
-			}
-
-			fsblock_t block = group->InodeBitmap(fVolume->Has64bitFeature());
-			_InitGroup(transaction, group, block, fVolume->InodesPerGroup());
-			uint32 freeInodes = group->FreeInodes(fVolume->Has64bitFeature());
-			if (freeInodes != 0) {
-				TRACE("InodeAllocator::_Allocate() freeInodes %ld bitmap %lld\n",
-					freeInodes, group->InodeBitmap(fVolume->Has64bitFeature()));
-				group->SetFreeInodes(freeInodes - 1, fVolume->Has64bitFeature());
-				if (isDirectory)
-					group->SetUsedDirectories(group->UsedDirectories(
-						fVolume->Has64bitFeature()) + 1,
-						fVolume->Has64bitFeature());
-
-				status = fVolume->WriteBlockGroup(transaction, blockGroup);
-				if (status != B_OK)
-					return status;
-
-				return _MarkInBitmap(transaction, block,
-					blockGroup, fVolume->InodesPerGroup(), id);
-			}
+			if (_AllocateInGroup(transaction, blockGroup,
+				isDirectory, id, fVolume->InodesPerGroup()) == B_OK)
+				return B_OK;
 		}
 
-		if (i == 0) {
-			ext2_block_group* group;
-
-			status_t status = fVolume->GetBlockGroup(blockGroup, &group);
-			if (status != B_OK) {
-				ERROR("InodeAllocator::_Allocate() GetBlockGroup() failed\n");
-				return status;
-			}
-
-			uint32 numInodes = fVolume->NumInodes() 
-				- blockGroup * fVolume->InodesPerGroup();
-			fsblock_t block = group->InodeBitmap(fVolume->Has64bitFeature());
-			_InitGroup(transaction, group, block, numInodes);
-			uint32 freeInodes = group->FreeInodes(fVolume->Has64bitFeature());
-			if (freeInodes != 0) {
-				TRACE("InodeAllocator::_Allocate() freeInodes %ld\n", freeInodes);
-				group->SetFreeInodes(freeInodes - 1,
-					fVolume->Has64bitFeature());
-				if (isDirectory) {
-					group->SetUsedDirectories(group->UsedDirectories(
-						fVolume->Has64bitFeature()) + 1,
-						fVolume->Has64bitFeature());
-				}
-
-				status = fVolume->WriteBlockGroup(transaction, blockGroup);
-				if (status != B_OK)
-					return status;
-
-				return _MarkInBitmap(transaction, block,
-					blockGroup, numInodes, id);
-			}
-		}
+		if (i == 0 && _AllocateInGroup(transaction, blockGroup,
+			isDirectory, id, fVolume->NumInodes() - blockGroup
+				* fVolume->InodesPerGroup()) == B_OK)
+			return B_OK;
 
 		blockGroup = 0;
 		lastBlockGroup = preferredBlockGroup;
@@ -173,8 +124,55 @@ InodeAllocator::_Allocate(Transaction& transaction, uint32 preferredBlockGroup,
 
 
 status_t
+InodeAllocator::_AllocateInGroup(Transaction& transaction, uint32 blockGroup,
+	bool isDirectory, ino_t& id, uint32 numInodes)
+{
+	ext2_block_group* group;
+	status_t status = fVolume->GetBlockGroup(blockGroup, &group);
+	if (status != B_OK) {
+		ERROR("InodeAllocator::_Allocate() GetBlockGroup() failed\n");
+		return status;
+	}
+
+	fsblock_t block = group->InodeBitmap(fVolume->Has64bitFeature());
+	_InitGroup(transaction, group, block, fVolume->InodesPerGroup());
+	uint32 freeInodes = group->FreeInodes(fVolume->Has64bitFeature());
+	if (freeInodes == 0)
+		return B_DEVICE_FULL;
+	TRACE("InodeAllocator::_Allocate() freeInodes %ld\n",
+		freeInodes);
+	group->SetFreeInodes(freeInodes - 1, fVolume->Has64bitFeature());
+	if (isDirectory) {
+		group->SetUsedDirectories(group->UsedDirectories(
+			fVolume->Has64bitFeature()) + 1,
+			fVolume->Has64bitFeature());
+	}
+	
+	uint32 pos = 0;
+	status = _MarkInBitmap(transaction, block, blockGroup, 
+		fVolume->InodesPerGroup(), pos);
+	if (status != B_OK)
+		return status;
+
+	if (fVolume->HasChecksumFeature() && pos > (fVolume->InodesPerGroup() - 1
+		- group->UnusedInodes(fVolume->Has64bitFeature()))) {
+		group->SetUnusedInodes(fVolume->InodesPerGroup() - 1 - pos,
+			fVolume->Has64bitFeature());
+	}
+
+	status = fVolume->WriteBlockGroup(transaction, blockGroup);
+	if (status != B_OK)
+		return status;
+
+	id = pos + blockGroup * fVolume->InodesPerGroup() + 1;
+
+	return status;
+}
+
+
+status_t
 InodeAllocator::_MarkInBitmap(Transaction& transaction, fsblock_t bitmapBlock,
-	uint32 blockGroup, uint32 numInodes, ino_t& id)
+	uint32 blockGroup, uint32 numInodes, uint32& pos)
 {
 	BitmapBlock inodeBitmap(fVolume, numInodes);
 
@@ -184,7 +182,7 @@ InodeAllocator::_MarkInBitmap(Transaction& transaction, fsblock_t bitmapBlock,
 		return B_IO_ERROR;
 	}
 
-	uint32 pos = 0;
+	pos = 0;
 	inodeBitmap.FindNextUnmarked(pos);
 
 	if (pos == inodeBitmap.NumBits()) {
@@ -200,8 +198,6 @@ InodeAllocator::_MarkInBitmap(Transaction& transaction, fsblock_t bitmapBlock,
 		return B_BAD_DATA;
 	}
 
-	id = pos + blockGroup * fVolume->InodesPerGroup() + 1;
-
 	return B_OK;
 }
 
@@ -213,13 +209,13 @@ InodeAllocator::_UnmarkInBitmap(Transaction& transaction, fsblock_t bitmapBlock,
 	BitmapBlock inodeBitmap(fVolume, numInodes);
 
 	if (!inodeBitmap.SetToWritable(transaction, bitmapBlock)) {
-		TRACE("Unable to open inode bitmap at block %llu\n", bitmapBlock);
+		ERROR("Unable to open inode bitmap at block %llu\n", bitmapBlock);
 		return B_IO_ERROR;
 	}
 
 	uint32 pos = (id - 1) % fVolume->InodesPerGroup();
 	if (!inodeBitmap.Unmark(pos, 1)) {
-		TRACE("Unable to unmark bit %lu in inode bitmap block %llu\n", pos,
+		ERROR("Unable to unmark bit %lu in inode bitmap block %llu\n", pos,
 			bitmapBlock);
 		return B_BAD_DATA;
 	}

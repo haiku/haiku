@@ -639,8 +639,10 @@ Volume::WriteBlockGroup(Transaction& transaction, int32 index)
 		+ blockOffset * fGroupDescriptorSize);
 	
 	group->checksum = _GroupCheckSum(group, index);
-	TRACE("Volume::WriteBlockGroup() checksum 0x%x for group %ld\n",
-		group->checksum, index);
+	TRACE("Volume::WriteBlockGroup() checksum 0x%x for group %ld "
+		"(free inodes %ld, unused %ld)\n", group->checksum, index,
+		group->FreeInodes(Has64bitFeature()),
+		group->UnusedInodes(Has64bitFeature()));
 
 	CachedBlock cached(this);
 	uint8* block = cached.SetToWritable(transaction,

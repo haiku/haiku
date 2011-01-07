@@ -32,9 +32,12 @@ private:
 			status_t	_Allocate(Transaction& transaction,
 							uint32 preferredBlockGroup, bool isDirectory,
 							ino_t& id);
+			status_t	_AllocateInGroup(Transaction& transaction,
+							uint32 blockGroup, bool isDirectory,
+							ino_t& id, uint32 numInodes);
 			status_t	_MarkInBitmap(Transaction& transaction,
 							fsblock_t bitmapBlock, uint32 blockGroup,
-							uint32 numInodes, ino_t& id);
+							uint32 numInodes, uint32& pos);
 			status_t	_UnmarkInBitmap(Transaction& transaction,
 							fsblock_t bitmapBlock, uint32 numInodes, ino_t id);
 			status_t	_InitGroup(Transaction& transaction,

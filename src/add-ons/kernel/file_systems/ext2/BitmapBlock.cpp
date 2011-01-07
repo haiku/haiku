@@ -422,6 +422,7 @@ BitmapBlock::FindNextMarked(uint32& pos)
 			index++;
 		} while (index < maxIndex && data[index] == 0);
 
+		bits = B_LENDIAN_TO_HOST_INT32(data[index]);
 		if (index >= maxIndex) {
 			maxBit = fNumBits & 0x1F;
 
@@ -432,10 +433,14 @@ BitmapBlock::FindNextMarked(uint32& pos)
 				pos = fNumBits;
 				return;
 			}
+			mask = (1 << maxBit) - 1;
+			if ((bits & mask) == 0) {
+				pos = fNumBits;
+				return;
+			}
 			maxBit++;
 		}
 
-		bits = B_LENDIAN_TO_HOST_INT32(data[index]);
 		bit = 0;
 	}
 
@@ -449,7 +454,7 @@ BitmapBlock::FindNextMarked(uint32& pos)
 	}
 
 	panic("Couldn't find marked bit inside an int32 which is different than "
-		"zero!?\n");
+		"zero!? (%lx)\n", bits);
 }
 
 
@@ -488,6 +493,7 @@ BitmapBlock::FindNextUnmarked(uint32& pos)
 			index++;
 		} while (index < maxIndex && data[index] == 0xFFFFFFFF);
 
+		bits = B_LENDIAN_TO_HOST_INT32(data[index]);
 		if (index >= maxIndex) {
 			maxBit = fNumBits & 0x1F;
 
@@ -498,12 +504,17 @@ BitmapBlock::FindNextUnmarked(uint32& pos)
 				pos = fNumBits;
 				return;
 			}
+			mask = (1 << maxBit) - 1;
+			if ((bits & mask) == mask) {
+				pos = fNumBits;
+				return;
+			}
 			maxBit++;
 		}
-		bits = B_LENDIAN_TO_HOST_INT32(data[index]);
 		bit = 0;
 	}
 
+	TRACE("BitmapBlock::FindNextUnmarked(): searching bit at pos %lu\n", bit);
 	for (; bit < maxBit; ++bit) {
 		// Find the unmarked bit
 		if ((bits >> bit & 1) == 0) {
@@ -513,7 +524,8 @@ BitmapBlock::FindNextUnmarked(uint32& pos)
 		}
 	}
 
-	panic("Couldn't find unmarked bit inside an int32 with value zero!?\n");
+	panic("Couldn't find unmarked bit inside an int32 with value zero!?"
+		" (0x%lx)\n", bits);
 }
 
 
