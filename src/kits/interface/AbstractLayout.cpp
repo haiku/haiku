@@ -422,18 +422,10 @@ BAbstractLayout::Archive(BMessage* into, bool deep) const
 status_t
 BAbstractLayout::AllUnarchived(const BMessage* from)
 {
-	if (Owner()) {
-		ViewProxy* proxy = dynamic_cast<ViewProxy*>(fExplicitData);
-		if (!proxy) {
-			delete fExplicitData;
-			proxy = new ViewProxy(Owner());
-		}
-		proxy->view = Owner();
-	} else {
-		fExplicitData = new DataProxy();
-		return fExplicitData->RestoreDataFromArchive(from);
-	}
-
+	status_t err = fExplicitData->RestoreDataFromArchive(from);
+	if (err != B_OK)
+		return err;
+		
 	return BLayout::AllUnarchived(from);
 }
 
