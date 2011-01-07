@@ -85,7 +85,6 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	UserlandFS				- aids native file system development (like FUSE)
 #	Vim						- Vi IMproved. Highly configurable text editor
 #	Vision					- powerful native IRC client
-#	VLC						- the multi media player with native interface
 #	WebPositive				- native, WebKit-based web browser
 #	Welcome					- introductory documentation to Haiku
 #	WifiFirmwareScriptData	- data files needed by install-wifi-firmwares.sh
@@ -1726,25 +1725,6 @@ if [ IsOptionalHaikuImagePackageAdded Vision ] {
 			: $(baseURL)/vision-908-x86-gcc2-2010-10-30.zip ;
 		AddSymlinkToHaikuImage home config be Applications
 			: /boot/apps/Vision/Vision ;
-	}
-}
-
-
-# VLC media player
-if [ IsOptionalHaikuImagePackageAdded VLC ] {
-	if $(TARGET_ARCH) != x86 {
-		Echo "No optional package VLC available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
-		Echo "No optional package VLC available for gcc4" ;
-	} else {
-		InstallOptionalHaikuImagePackage VLC-0.8.6d.zip
-			: $(baseURL)/vlc-0.8.6d-gcc2-2009-04-18.zip
-			: apps
-		;
-		AddSymlinkToHaikuImage home config be Applications
-			: "/boot/apps/vlc-0.8.6d/VLC media player" ;
-		AddSymlinkToHaikuImage common bin
-			: "/boot/apps/vlc-0.8.6d/VLC media player" : vlc ;
 	}
 }
 
