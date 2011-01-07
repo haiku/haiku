@@ -1563,20 +1563,9 @@ BMenu::_Track(int* action, long start)
 		fSuper->fState = MENU_STATE_TRACKING_SUBMENU;
 
 	BPoint location;
-	BPoint screenLocation;
 	uint32 buttons = 0;
-	bool openedUnderMouse = false;
 	if (LockLooper()) {
 		GetMouse(&location, &buttons);
-
-		// If the menu has opened underneath the mouse we will not invoke or return
-		// the selected item unless the mouse is moved. This only applies if there
-		// is no parent menu.
-		if (fSuper == NULL) {
-			screenLocation = ConvertToScreen(location);
-			openedUnderMouse = Window()->Frame().Contains(screenLocation);
-		}
-
 		UnlockLooper();
 	}
 
@@ -1589,7 +1578,7 @@ BMenu::_Track(int* action, long start)
 			break;
 
 		BMenuWindow* window = static_cast<BMenuWindow*>(Window());
-		screenLocation = ConvertToScreen(location);
+		BPoint screenLocation = ConvertToScreen(location);
 		if (window->CheckForScrolling(screenLocation)) {
 			UnlockLooper();
 			continue;
@@ -1601,8 +1590,7 @@ BMenu::_Track(int* action, long start)
 		// then if the menu is inside this menu,
 		// then if it's over a super menu.
 		bool overSub = _OverSubmenu(fSelected, screenLocation);
-		if (!openedUnderMouse)
-			item = _HitTestItems(location, B_ORIGIN);
+		item = _HitTestItems(location, B_ORIGIN);
 		if (overSub) {
 			navAreaRectAbove = BRect();
 			navAreaRectBelow = BRect();
@@ -1682,7 +1670,6 @@ BMenu::_Track(int* action, long start)
 					releasedOnce = true;
 				location = newLocation;
 				buttons = newButtons;
-				openedUnderMouse = false;
 			}
 
 			if (releasedOnce)

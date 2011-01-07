@@ -317,6 +317,19 @@ BMenuItem *
 BPopUpMenu::_Go(BPoint where, bool autoInvoke, bool startOpened,
 		BRect *_specialRect, bool async)
 {
+	// Force start opened. This is just better behavior.
+	startOpened = true;
+
+	BRect clickToOpenRect;
+
+	// If no click to open rect was provided make one around the opening
+	// point.
+	if (startOpened && _specialRect == NULL) {
+		clickToOpenRect.Set(where.x, where.y, where.x, where.y);
+		clickToOpenRect.InsetBy(-2, -2);
+		_specialRect = &clickToOpenRect;
+	}
+
 	if (fTrackThread >= B_OK) {
 		// we already have an active menu, wait for it to go away before
 		// spawning another
