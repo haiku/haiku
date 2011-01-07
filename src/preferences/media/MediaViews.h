@@ -26,6 +26,7 @@ class BButton;
 class BCheckBox;
 class BMenu;
 class BMenuField;
+class BString;
 class BStringView;
 
 class MediaWindow;
@@ -85,6 +86,7 @@ public:
 	virtual	void				AttachedToWindow();
 
 			void				RestartRequired(bool required);
+	virtual	BString				UnimplementedRealtimeError() = 0;
 
 protected:
 
@@ -130,6 +132,8 @@ public:
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	void				AttachedToWindow();
 
+	virtual	BString				UnimplementedRealtimeError();
+
 private:
 			BMenuField*			_MakeChannelMenu();
 			BCheckBox*			_MakeVolumeCheckBox();
@@ -153,6 +157,7 @@ public:
 	virtual	void				SetDefaultInput(const dormant_node_info* info);
 	virtual	void				SetDefaultOutput(const dormant_node_info* info);
 
+	virtual	BString				UnimplementedRealtimeError();
 };
 
 #endif

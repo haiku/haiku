@@ -14,6 +14,7 @@
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 #include "MediaViews.h"
 
+#include <Alert.h>
 #include <AutoDeleter.h>
 #include <Box.h>
 #include <Button.h>
@@ -232,6 +233,12 @@ SettingsView::_MediaWindow() const
 void
 SettingsView::_FlipRealtimeFlag(uint32 mask)
 {
+	fRealtimeCheckBox->SetValue(B_CONTROL_OFF);
+	BAlert* alert = new BAlert("realtime alert", UnimplementedRealtimeError(),
+		B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+	alert->Go();
+
+#if 0
 	// TODO: error codes
 	uint32 flags = 0;
 	BMediaRoster* roster = BMediaRoster::Roster();
@@ -241,6 +248,7 @@ SettingsView::_FlipRealtimeFlag(uint32 mask)
 	else
 		flags |= mask;
 	roster->SetRealtimeFlags(flags);
+#endif
 }
 
 
@@ -406,6 +414,13 @@ AudioSettingsView::AttachedToWindow()
 	BMessenger thisMessenger(this);
 	fChannelMenu->SetTargetForItems(thisMessenger);
 	fVolumeCheckBox->SetTarget(thisMessenger);
+}
+
+
+BString
+AudioSettingsView::UnimplementedRealtimeError()
+{
+	return B_TRANSLATE("Real-time audio is currently unimplemented in Haiku.");
 }
 
 
@@ -637,3 +652,11 @@ VideoSettingsView::SetDefaultOutput(const dormant_node_info* info)
 	_MediaWindow()->UpdateOutputListItem(MediaListItem::VIDEO_TYPE, info);
 	BMediaRoster::Roster()->SetVideoOutput(*info);
 }
+
+
+BString
+VideoSettingsView::UnimplementedRealtimeError()
+{
+	return B_TRANSLATE("Real-time video is currently unimplemented in Haiku.");
+}
+
