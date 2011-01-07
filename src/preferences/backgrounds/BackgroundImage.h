@@ -139,6 +139,10 @@ private:
 		// no public constructor, GetBackgroundImage factory function is
 		// used instead
 
+	float BRectRatio(BRect rect);
+	float BRectHorizontalOverlap(BRect hostRect, BRect resizedRect);
+	float BRectVerticalOverlap(BRect hostRect, BRect resizedRect);
+
 	bool fIsDesktop;
 	BNode fDefinedByNode;
 	BView* fView;

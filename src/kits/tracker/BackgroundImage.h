@@ -115,6 +115,10 @@ private:
 
 	void Add(BackgroundImageInfo *);
 
+	float BRectRatio(BRect rect);
+	float BRectHorizontalOverlap(BRect hostRect, BRect resizedRect);
+	float BRectVerticalOverlap(BRect hostRect, BRect resizedRect);
+
 	bool fIsDesktop;
 	BNode fDefinedByNode;
 	BView *fView;

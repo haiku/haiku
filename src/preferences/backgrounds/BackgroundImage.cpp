@@ -299,7 +299,18 @@ BackgroundImage::Show(BackgroundImageInfo* info, BView* view)
 			// else fall thru
 		case kScaledToFit:
 			if (fIsDesktop) {
-				destinationBitmapBounds = viewBounds;
+				if (BRectRatio(destinationBitmapBounds)
+					>= BRectRatio(viewBounds)) {
+					float overlap = BRectHorizontalOverlap(viewBounds,
+						destinationBitmapBounds);
+					destinationBitmapBounds.Set(-overlap, 0,
+						viewBounds.Width() + overlap, viewBounds.Height());
+				} else {
+					float overlap = BRectVerticalOverlap(viewBounds,
+						destinationBitmapBounds);
+					destinationBitmapBounds.Set(0, -overlap,
+						viewBounds.Width(), viewBounds.Height() + overlap);
+				}
 				followFlags = B_FOLLOW_ALL;
 				break;
 			}
@@ -331,6 +342,29 @@ BackgroundImage::Show(BackgroundImageInfo* info, BView* view)
 			fShowingBitmap->UnloadBitmap(fCacheMode);
 		fShowingBitmap = info;
 	}*/
+}
+
+
+float
+BackgroundImage::BRectRatio(BRect rect)
+{
+	return rect.Width() / rect.Height();
+}
+
+
+float
+BackgroundImage::BRectHorizontalOverlap(BRect hostRect, BRect resizedRect)
+{
+	return ((hostRect.Height() / resizedRect.Height() * resizedRect.Width())
+		- hostRect.Width()) / 2;
+}
+
+
+float
+BackgroundImage::BRectVerticalOverlap(BRect hostRect, BRect resizedRect)
+{
+	return ((hostRect.Width() / resizedRect.Width() * resizedRect.Height())
+		- hostRect.Height()) / 2;
 }
 
 
