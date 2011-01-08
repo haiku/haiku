@@ -33,6 +33,7 @@ DoCatalogs BootManager : x-vnd.Haiku-BootManager : $(cataloguedSources) ;
 rule AssembleYasmBin object : source
 {
 	SEARCH on $(source) = $(SUBDIR) ;
+	MakeLocateArch $(object) ;
 	Depends $(object) : $(source) ;
 }
 
