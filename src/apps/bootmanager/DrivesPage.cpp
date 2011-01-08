@@ -218,14 +218,15 @@ DrivesPage::DrivesPage(WizardView* wizardView, const BootMenuList& menus,
 		.Add(description, 0.5)
 		.Add(scrollView, 1);
 
+	fWizardView->SetPreviousButtonHidden(!any);
 	if (any) {
 		fWizardView->SetPreviousButtonLabel(
 			B_TRANSLATE_COMMENT("Uninstall", "Button"));
-		fWizardView->SetPreviousButtonHidden(false);
-		fWizardView->SetPreviousButtonEnabled(false);
-		fWizardView->SetPreviousButtonEnabled(false);
+		if (fDrivesView->CurrentSelection() == -1) {
+			fWizardView->SetPreviousButtonEnabled(false);
+			fWizardView->SetNextButtonEnabled(false);
+		}
 	} else {
-		fWizardView->SetPreviousButtonHidden(true);
 		fWizardView->SetNextButtonLabel(
 			B_TRANSLATE_COMMENT("Quit", "Button"));
 	}
@@ -278,6 +279,7 @@ DrivesPage::MessageReceived(BMessage* message)
 bool
 DrivesPage::_FillDrivesView(const BootMenuList& menus)
 {
+	const char* selected = fSettings->FindString("disk");
 	bool any = false;
 
 	BDiskDeviceRoster roster;
@@ -288,7 +290,9 @@ DrivesPage::_FillDrivesView(const BootMenuList& menus)
 			if (item->CanBeInstalled())
 				any = true;
 			fDrivesView->AddItem(item);
-			if (item->IsBootDrive()) {
+
+			if ((selected == NULL && item->IsBootDrive())
+				|| (selected != NULL && !strcmp(item->Path(), selected))) {
 				fDrivesView->Select(fDrivesView->CountItems() - 1);
 				_UpdateWizardButtons(item);
 			}
