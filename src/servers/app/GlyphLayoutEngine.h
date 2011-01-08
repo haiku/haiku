@@ -55,7 +55,7 @@ public:
 			fCacheEntry->WriteUnlock();
 		else
 			fCacheEntry->ReadUnlock();
-	
+
 		FontCache::Default()->Recycle(fCacheEntry);
 	}
 
@@ -275,22 +275,22 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 
 		const GlyphCache* glyph = entry->Glyph(charCode, fallbackEntry);
 		if (glyph == NULL) {
-			consumer.ConsumeEmptyGlyph(index, charCode, x, y);
-			continue;
+			consumer.ConsumeEmptyGlyph(index++, charCode, x, y);
+			advanceX = 0;
+			advanceY = 0;
 		} else {
-			if (!consumer.ConsumeGlyph(index, charCode, glyph, entry, x, y)) {
+			if (!consumer.ConsumeGlyph(index++, charCode, glyph, entry, x, y)) {
 				advanceX = 0;
 				advanceY = 0;
 				break;
 			}
+
+			// get next increment for pen position
+			advanceX = glyph->advance_x;
+			advanceY = glyph->advance_y;
 		}
 
-		// get next increment for pen position
-		advanceX = glyph->advance_x;
-		advanceY = glyph->advance_y;
-
 		lastCharCode = charCode;
-		index++;
 		if (utf8String - start + 1 > length)
 			break;
 	}
