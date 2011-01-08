@@ -52,37 +52,25 @@ PartitionsPage::~PartitionsPage()
 void
 PartitionsPage::PageCompleted()
 {
-	int32 i;
-	const int32 n = fPartitions->CountChildren();
-	for (i = 0; i < n; i ++) {
-		BView* row = fPartitions->ChildAt(i);
-		int32 j;
-		const int32 m = row->CountChildren();
-		for (j = 0; j < m; j ++) {
-			BView* child = row->ChildAt(j);
-			BControl* control = dynamic_cast<BControl*>(child);
-			if (control == NULL)
-				continue;
+	BGridLayout* layout = (BGridLayout*)fPartitions->GetLayout();
+	int32 index = 0;
 
-			int32 index;
-			BMessage* message = control->Message();
-			if (message == NULL || message->FindInt32("index", &index) != B_OK)
-				continue;
+	for (int32 row = 0; row < layout->CountRows(); row += 3, index++) {
+		BCheckBox* showBox
+			= dynamic_cast<BCheckBox*>(layout->ItemAt(0, row)->View());
+		BTextControl* nameControl
+			= dynamic_cast<BTextControl*>(layout->ItemAt(1, row)->View());
+		if (nameControl == NULL || showBox == NULL)
+			debugger("partitions page is broken");
 
-			BMessage partition;
-			if (fSettings->FindMessage("partition", index, &partition) != B_OK)
-				continue;
+		BMessage partition;
+		if (fSettings->FindMessage("partition", index, &partition) != B_OK)
+			continue;
 
-			if (kMessageShow == message->what) {
-				partition.ReplaceBool("show", control->Value() == 1);
-			} else if (kMessageName == message->what &&
-					dynamic_cast<BTextControl*>(control) != NULL) {
-				partition.ReplaceString("name",
-					((BTextControl*)control)->Text());
-			}
+		partition.ReplaceBool("show", showBox->Value() != 0);
+		partition.ReplaceString("name", nameControl->Text());
 
-			fSettings->ReplaceMessage("partition", index, &partition);
-		}
+		fSettings->ReplaceMessage("partition", index, &partition);
 	}
 }
 
@@ -154,6 +142,8 @@ PartitionsPage::_FillPartitionsView(BView* view)
 		// name
 		BTextControl* nameControl = new BTextControl("name", "",
 			name.String(), _CreateControlMessage(kMessageName, i));
+		nameControl->SetExplicitMinSize(BSize(StringWidth("WWWWWWWWWWWWWW"),
+			B_SIZE_UNSET));
 
 		// size
 		BString sizeText;
