@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2011, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -59,7 +59,7 @@ static const struct partition_type kPartitionTypes[] = {
 	{ 0x04, "FAT 16-bit (dos 3.0)", false },
 	{ 0x05, /*"Extended Partition"*/INTEL_EXTENDED_PARTITION_NAME, false },
 	{ 0x06, "FAT 16-bit (dos 3.31)", false },
-	{ 0x07, "OS/2 IFS, Windows NT, Advanced Unix", true },
+	{ 0x07, "Windows NT, OS/2", true },
 	{ 0x0b, "FAT 32-bit", false },
 	{ 0x0c, "FAT 32-bit, LBA-mapped", true },
 	{ 0x0d, "FAT 16-bit, LBA-mapped", false },
@@ -861,7 +861,7 @@ PartitionMap::Check(off_t sessionSize) const
 						"for different extended partitions!\n"));
 					result = false;
 					break;
-				} else if (is_inside_partitions(tableOffsets[i], 
+				} else if (is_inside_partitions(tableOffsets[i],
 						(const Partition**)byOffset, byOffsetCount)) {
 					TRACE(("intel: PartitionMap::Check(): a partition table "
 						"lies inside a non-extended partition!\n"));
