@@ -29,13 +29,6 @@
 #include "WizardView.h"
 
 
-#define USE_TEST_BOOT_DRIVE 0
-
-#if USE_TEST_BOOT_DRIVE
-#	include "TestBootDrive.h"
-#endif
-
-
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "BootManagerController"
 
@@ -45,10 +38,6 @@ BootManagerController::BootManagerController()
 	fBootDrive(NULL),
 	fBootMenu(NULL)
 {
-#if USE_TEST_BOOT_DRIVE
-	fBootMenu = new TestBootDrive();
-#endif
-
 	// set defaults
 	fSettings.AddBool("install", true);
 	fSettings.AddInt32("defaultPartition", 0);

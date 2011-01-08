@@ -31,6 +31,20 @@
 #include "BootLoader.h"
 
 
+/*
+	Note: for testing, the best way is to create a small file image, and
+	register it, for example via the "diskimage" tool (mountvolume might also
+	work).
+	You can then create partitions on it via DriveSetup, or simply copy an
+	existing drive to it, for example via:
+		$ dd if=/dev/disk/ata/0/master/raw of=test.image bs=1M count=10
+
+	It will automatically appear in BootManager once it is registered, and,
+	depending on its parition layout, you can then install the boot menu on
+	it, and directly test it via qemu.
+*/
+
+
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "LegacyBootMenu"
 
