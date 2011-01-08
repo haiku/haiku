@@ -173,6 +173,7 @@ struc	Locals
 	cursorX			resb	1
 	cursorY			resb	1
 	cursorShape		resw	1
+	biosDrive		resb	1
 endstruc
 
 cursorPosition		equ cursorX
@@ -257,7 +258,7 @@ stage1:
 	mov		sp, 0xFFFF - sizeof(Locals)		; Make stack empty
 	mov		bp, sp
 
-	mov		[bootDrive], dl					; Store boot drive
+	mov		[bp + biosDrive], dl			; Store boot drive
 	cld										; String operations increment index
 											; registers
 	CLEAR_SCREEN
@@ -283,7 +284,7 @@ stage1:
 
 	; Chain load rest of boot loader
 	mov		ah, EXTENDED_READ				; Load 3 more sectors
-	mov		dl, [bootDrive]
+	mov		dl, [bp + biosDrive]
 	mov		si, nextStageDAP
 	int		BIOS_DISK_SERVICES
 	jc		.error							; I/O error
@@ -298,7 +299,7 @@ stage1:
 	mov		ah, READ_CHAR
 	int		BIOS_KEYBOARD_SERVICES
 
-	mov		dl, [bootDrive]
+	mov		dl, [bp + biosDrive]
 	int		BIOS_REBOOT
 
 printStringStage1:
@@ -328,9 +329,6 @@ nextStageDAP:
 		at AddressPacket.offset,		dw		1
 	iend
 
-bootDrive:
-	db		0
-
 kTitle:
 	db		TITLE, 0x00
 kSelectOSMessage:
@@ -357,7 +355,7 @@ kMBRSignature:
 ; ======================= SECOND SECTOR ================================
 ; ======================================================================
 
-; Use code available in stage 1
+; Use code available in stage 2
 %define printstr printStringStage2
 
 %assign	TIMEOUT_OFF		0xffff
@@ -609,7 +607,7 @@ getSelectedBootLoaderAddress:
 	jz		.takeOverBootDrive
 	ret
 .takeOverBootDrive:
-	mov		dl, [bootDrive]
+	mov		dl, [bp + biosDrive]
 	mov		[si], dl
 	ret
 
