@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Axel Dörfler, axeld@pinc-software.de
  *		Michael Pfeiffer <laplace@users.sourceforge.net>
  */
 
@@ -10,6 +11,8 @@
 #include "LegacyBootMenu.h"
 
 #include <new>
+
+#include <errno.h>
 #include <stdio.h>
 
 #include <Catalog.h>
@@ -17,19 +20,19 @@
 #include <DiskDevice.h>
 #include <DiskDeviceRoster.h>
 #include <DiskDeviceVisitor.h>
+#include <Drivers.h>
 #include <File.h>
 #include <Partition.h>
 #include <Path.h>
 #include <String.h>
 #include <UTF8.h>
 
+#include "BootDrive.h"
 #include "BootLoader.h"
 
 
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "LegacyBootMenu"
-#define USE_SECOND_DISK 0
-#define GET_FIRST_BIOS_DRIVE 1
 
 
 struct MasterBootRecord {
@@ -53,10 +56,9 @@ public:
 };
 
 
-class PartitionRecorder : public BDiskDeviceVisitor {
+class PartitionVisitor : public BDiskDeviceVisitor {
 public:
-								PartitionRecorder(BMessage* settings,
-									int8 drive);
+								PartitionVisitor();
 
 	virtual	bool				Visit(BDiskDevice* device);
 	virtual	bool				Visit(BPartition* partition, int32 level);
@@ -65,13 +67,25 @@ public:
 			off_t				FirstOffset() const;
 
 private:
-			bool				_Record(BPartition* partition);
+			off_t				fFirstOffset;
+};
+
+
+class PartitionRecorder : public BDiskDeviceVisitor {
+public:
+								PartitionRecorder(BMessage& settings,
+									int8 biosDrive);
+
+	virtual	bool				Visit(BDiskDevice* device);
+	virtual	bool				Visit(BPartition* partition, int32 level);
+
+			bool				FoundPartitions() const;
 
 private:
-			BMessage*			fSettings;
-			int8				fDrive;
-			int32				fIndex;
-			off_t				fFirstOffset;
+			BMessage&			fSettings;
+			int32				fUnnamedIndex;
+			int8				fBIOSDrive;
+			bool				fFound;
 };
 
 
@@ -149,12 +163,53 @@ LittleEndianMallocIO::Fill(int16 size, int8 fillByte)
 // #pragma mark -
 
 
-PartitionRecorder::PartitionRecorder(BMessage* settings, int8 drive)
+PartitionVisitor::PartitionVisitor()
+	:
+	fFirstOffset(LONGLONG_MAX)
+{
+}
+
+
+bool
+PartitionVisitor::Visit(BDiskDevice* device)
+{
+	return false;
+}
+
+
+bool
+PartitionVisitor::Visit(BPartition* partition, int32 level)
+{
+	if (partition->Offset() < fFirstOffset)
+		fFirstOffset = partition->Offset();
+
+	return false;
+}
+
+
+bool
+PartitionVisitor::HasPartitions() const
+{
+	return fFirstOffset != LONGLONG_MAX;
+}
+
+
+off_t
+PartitionVisitor::FirstOffset() const
+{
+	return fFirstOffset;
+}
+
+
+// #pragma mark -
+
+
+PartitionRecorder::PartitionRecorder(BMessage& settings, int8 biosDrive)
 	:
 	fSettings(settings),
-	fDrive(drive),
-	fIndex(0),
-	fFirstOffset(LONGLONG_MAX)
+	fUnnamedIndex(0),
+	fBIOSDrive(biosDrive),
+	fFound(false)
 {
 }
 
@@ -169,27 +224,6 @@ PartitionRecorder::Visit(BDiskDevice* device)
 bool
 PartitionRecorder::Visit(BPartition* partition, int32 level)
 {
-	return _Record(partition);
-}
-
-
-bool
-PartitionRecorder::HasPartitions() const
-{
-	return fFirstOffset != LONGLONG_MAX;
-}
-
-
-off_t
-PartitionRecorder::FirstOffset() const
-{
-	return fFirstOffset;
-}
-
-
-bool
-PartitionRecorder::_Record(BPartition* partition)
-{
 	if (partition->ContainsPartitioningSystem())
 		return false;
 
@@ -199,9 +233,8 @@ PartitionRecorder::_Record(BPartition* partition)
 	BString buffer;
 	const char* name = partition->ContentName();
 	if (name == NULL) {
-		fIndex ++;
 		BString number;
-		number << fIndex;
+		number << ++fUnnamedIndex;
 		buffer << B_TRANSLATE_COMMENT("Unnamed %d",
 			"Default name of a partition whose name could not be read from "
 			"disk; characters in codepage 437 are allowed only");
@@ -220,18 +253,22 @@ PartitionRecorder::_Record(BPartition* partition)
 	message.AddString("name", name);
 	message.AddString("type", type);
 	message.AddString("path", partitionPath.Path());
-	message.AddInt8("drive", fDrive);
+	if (fBIOSDrive != 0)
+		message.AddInt8("drive", fBIOSDrive);
 	message.AddInt64("size", partition->Size());
-	// Specific data
-	off_t offset = partition->Offset();
-	message.AddInt64("offset", offset);
+	message.AddInt64("offset", partition->Offset());
 
-	fSettings->AddMessage("partition", &message);
-
-	if (offset < fFirstOffset)
-		fFirstOffset = offset;
+	fSettings.AddMessage("partition", &message);
+	fFound = true;
 
 	return false;
+}
+
+
+bool
+PartitionRecorder::FoundPartitions() const
+{
+	return fFound;
 }
 
 
@@ -249,67 +286,78 @@ LegacyBootMenu::~LegacyBootMenu()
 
 
 bool
-LegacyBootMenu::IsBootMenuInstalled(BMessage* settings)
+LegacyBootMenu::IsInstalled(const BootDrive& drive)
 {
-	// TODO detect bootman
+	// TODO: detect bootman
 	return false;
 }
 
 
 status_t
-LegacyBootMenu::ReadPartitions(BMessage *settings)
+LegacyBootMenu::CanBeInstalled(const BootDrive& drive)
+{
+	BDiskDevice device;
+	status_t status = drive.GetDiskDevice(device);
+	if (status != B_OK)
+		return status;
+
+	PartitionVisitor visitor;
+	device.VisitEachDescendant(&visitor);
+
+	// Enough space to write boot menu to drive?
+	if (!visitor.HasPartitions() || visitor.FirstOffset() < sizeof(kBootLoader))
+		return B_PARTITION_TOO_SMALL;
+
+	return B_OK;
+}
+
+
+status_t
+LegacyBootMenu::CollectPartitions(const BootDrive& drive, BMessage& settings)
 {
 	status_t status = B_ERROR;
 
+	// Remove previous partitions, if any
+	settings.RemoveName("partition");
+
 	BDiskDeviceRoster diskDeviceRoster;
 	BDiskDevice device;
-	bool diskFound = false;
+	bool partitionsFound = false;
+
 	while (diskDeviceRoster.GetNextDevice(&device) == B_OK) {
 		BPath path;
 		status_t status = device.GetPath(&path);
 		if (status != B_OK)
 			continue;
 
-		// skip not from BIOS bootable drives
-		int8 drive;
-		if (!_GetBiosDrive(path.Path(), &drive))
+		// Skip not from BIOS bootable drives that are not the target disk
+		int8 biosDrive = 0;
+		if (path != drive.Path()
+			&& _GetBIOSDrive(path.Path(), biosDrive) != B_OK)
 			continue;
 
-		PartitionRecorder recorder(settings, drive);
+		PartitionRecorder recorder(settings, biosDrive);
 		device.VisitEachDescendant(&recorder);
 
-		if (!diskFound) {
-			settings->AddString("disk", path.Path());
-			diskFound = true;
-
-			// Enough space to write boot menu to drive?
-			// (ignored in test build)
-			off_t size = sizeof(kBootLoader);
-			if (!recorder.HasPartitions() || recorder.FirstOffset() < size)
-				status = B_PARTITION_TOO_SMALL;
-		}
+		partitionsFound |= recorder.FoundPartitions();
 	}
 
-	return diskFound ? B_OK : status;
+	return partitionsFound ? B_OK : status;
 }
 
 
 status_t
-LegacyBootMenu::WriteBootMenu(BMessage *settings)
+LegacyBootMenu::Install(const BootDrive& drive, BMessage& settings)
 {
-	BString path;
-	if (settings->FindString("disk", &path) != B_OK)
-		return B_BAD_VALUE;
-
 	int32 defaultPartitionIndex;
-	if (settings->FindInt32("defaultPartition", &defaultPartitionIndex) != B_OK)
+	if (settings.FindInt32("defaultPartition", &defaultPartitionIndex) != B_OK)
 		return B_BAD_VALUE;
 
 	int32 timeout;
-	if (settings->FindInt32("timeout", &timeout) != B_OK)
+	if (settings.FindInt32("timeout", &timeout) != B_OK)
 		return B_BAD_VALUE;
 
-	int fd = open(path.String(), O_RDWR);
+	int fd = open(drive.Path(), O_RDWR);
 	if (fd < 0)
 		return B_IO_ERROR;
 
@@ -338,7 +386,7 @@ LegacyBootMenu::WriteBootMenu(BMessage *settings)
 	int defaultMenuEntry = 0;
 	BMessage partition;
 	int32 index;
-	for (index = 0; settings->FindMessage("partition", index,
+	for (index = 0; settings.FindMessage("partition", index,
 			&partition) == B_OK; index ++) {
 		bool show;
 		partition.FindBool("show", &show);
@@ -353,7 +401,7 @@ LegacyBootMenu::WriteBootMenu(BMessage *settings)
 	newBootLoader.WriteInt16(defaultMenuEntry);
 	newBootLoader.WriteInt16(timeout);
 
-	for (index = 0; settings->FindMessage("partition", index,
+	for (index = 0; settings.FindMessage("partition", index,
 			&partition) == B_OK; index ++) {
 		bool show;
 		BString name;
@@ -537,20 +585,16 @@ LegacyBootMenu::_ConvertToBIOSText(const char* text, BString& biosText)
 }
 
 
-bool
-LegacyBootMenu::_GetBiosDrive(const char* device, int8* drive)
+status_t
+LegacyBootMenu::_GetBIOSDrive(const char* device, int8& drive)
 {
-	#if !GET_FIRST_BIOS_DRIVE
-		int fd = open(device, O_RDONLY);
-		if (fd < 0)
-			return false;
-		bool isBootableDrive = ioctl(fd, B_GET_BIOS_DRIVE_ID, drive, 1) == B_OK;
-		close(fd);
-		return isBootableDrive;
-	#else
-		*drive = 0x80;
-		return true;
-	#endif
+	int fd = open(device, O_RDONLY);
+	if (fd < 0)
+		return errno;
+
+	status_t status = ioctl(fd, B_GET_BIOS_DRIVE_ID, drive, 1);
+	close(fd);
+	return status;
 }
 
 

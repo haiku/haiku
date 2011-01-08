@@ -64,8 +64,12 @@ WizardView::PageCompleted()
 	if (fPage != NULL)
 		fPage->PageCompleted();
 
+	// Restore initial state
 	SetNextButtonLabel(B_TRANSLATE_COMMENT("Next", "Button"));
 	SetPreviousButtonLabel(B_TRANSLATE_COMMENT("Previous", "Button"));
+	SetNextButtonEnabled(true);
+	SetPreviousButtonEnabled(true);
+	SetPreviousButtonHidden(false);
 }
 
 

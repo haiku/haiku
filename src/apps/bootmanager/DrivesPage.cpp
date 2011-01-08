@@ -31,7 +31,8 @@ const uint32 kMsgSelectionChanged = 'slch';
 
 class DriveItem : public BListItem {
 public:
-								DriveItem(const BDiskDevice& device);
+								DriveItem(const BDiskDevice& device,
+									const BootMenuList& menus);
 	virtual						~DriveItem();
 
 			bool				IsInstalled() const;
@@ -39,7 +40,6 @@ public:
 			bool				IsBootDrive() const;
 			const char*			Path() const { return fPath.Path(); }
 
-			BMessage&			Settings() { return fSettings; }
 			BootDrive*			Drive() { return fDrive; }
 
 protected:
@@ -48,7 +48,6 @@ protected:
 	virtual	void				Update(BView* owner, const BFont* font);
 
 private:
-			BMessage			fSettings;
 			BootDrive*			fDrive;
 			BString				fName;
 			BPath				fPath;
@@ -56,21 +55,28 @@ private:
 			float				fBaselineOffset;
 			float				fSecondBaselineOffset;
 			float				fSizeWidth;
+			status_t			fCanBeInstalled;
+			bool				fIsInstalled;
 };
 
 
-DriveItem::DriveItem(const BDiskDevice& device)
+DriveItem::DriveItem(const BDiskDevice& device, const BootMenuList& menus)
 	:
 	fBaselineOffset(0),
 	fSizeWidth(0)
 {
-	// TODO: retrieve disk name!
+	device.GetPath(&fPath);
 	if (device.Name() != NULL && device.Name()[0])
 		fName = device.Name();
+	else if (strstr(fPath.Path(), "usb") != NULL)
+		fName = B_TRANSLATE_COMMENT("USB Drive", "Default disk name");
 	else
 		fName = B_TRANSLATE_COMMENT("Hard Drive", "Default disk name");
 
-	device.GetPath(&fPath);
+	fDrive = new BootDrive(fPath.Path());
+
+	fIsInstalled = fDrive->InstalledMenu(menus) != NULL;
+	fCanBeInstalled = fDrive->CanMenuBeInstalled(menus);
 
 	char buffer[256];
 	fSize = string_for_size(device.Size(), buffer, sizeof(buffer));
@@ -85,21 +91,21 @@ DriveItem::~DriveItem()
 bool
 DriveItem::IsInstalled() const
 {
-	return true;
+	return fIsInstalled;
 }
 
 
 bool
 DriveItem::CanBeInstalled() const
 {
-	return true;
+	return fCanBeInstalled == B_OK;
 }
 
 
 bool
 DriveItem::IsBootDrive() const
 {
-	return true;
+	return fDrive->IsBootDrive();
 }
 
 
@@ -142,6 +148,14 @@ DriveItem::DrawItem(BView* owner, BRect frame, bool complete)
 	owner->MovePenTo(frame.left + 4, frame.top + fBaselineOffset);
 	owner->DrawString(fName.String());
 
+	if (fCanBeInstalled != B_OK) {
+		owner->SetHighColor(140, 0, 0);
+		owner->MovePenBy(fBaselineOffset, 0);
+		owner->DrawString(fCanBeInstalled == B_PARTITION_TOO_SMALL
+			? B_TRANSLATE_COMMENT("No space available!", "Cannot install")
+			: B_TRANSLATE_COMMENT("Cannot access!", "Cannot install"));
+	}
+
 	owner->PopState();
 }
 
@@ -177,8 +191,8 @@ DriveItem::Update(BView* owner, const BFont* font)
 // #pragma mark -
 
 
-DrivesPage::DrivesPage(WizardView* wizardView, BMessage* settings,
-	const char* name)
+DrivesPage::DrivesPage(WizardView* wizardView, const BootMenuList& menus,
+	BMessage* settings, const char* name)
 	:
 	WizardPageView(settings, name),
 	fWizardView(wizardView)
@@ -193,7 +207,7 @@ DrivesPage::DrivesPage(WizardView* wizardView, BMessage* settings,
 	fDrivesView = new BListView("drives");
 	fDrivesView->SetSelectionMessage(new BMessage(kMsgSelectionChanged));
 
-	bool any = _FillDrivesView();
+	bool any = _FillDrivesView(menus);
 
 	BScrollView* scrollView = new BScrollView("scrollView", fDrivesView, 0,
 		false, true);
@@ -208,6 +222,8 @@ DrivesPage::DrivesPage(WizardView* wizardView, BMessage* settings,
 		fWizardView->SetPreviousButtonLabel(
 			B_TRANSLATE_COMMENT("Uninstall", "Button"));
 		fWizardView->SetPreviousButtonHidden(false);
+		fWizardView->SetPreviousButtonEnabled(false);
+		fWizardView->SetPreviousButtonEnabled(false);
 	} else {
 		fWizardView->SetPreviousButtonHidden(true);
 		fWizardView->SetNextButtonLabel(
@@ -228,8 +244,6 @@ DrivesPage::PageCompleted()
 
 	if (fSettings->ReplaceString("disk", item->Path()) != B_OK)
 		fSettings->AddString("disk", item->Path());
-
-	fSettings->ReplaceBool("install", true);
 }
 
 
@@ -262,7 +276,7 @@ DrivesPage::MessageReceived(BMessage* message)
 	selects the boot drive.
 */
 bool
-DrivesPage::_FillDrivesView()
+DrivesPage::_FillDrivesView(const BootMenuList& menus)
 {
 	bool any = false;
 
@@ -270,7 +284,7 @@ DrivesPage::_FillDrivesView()
 	BDiskDevice device;
 	while (roster.GetNextDevice(&device) == B_OK) {
 		if (device.HasMedia() && !device.IsReadOnly()) {
-			DriveItem* item = new DriveItem(device);
+			DriveItem* item = new DriveItem(device, menus);
 			if (item->CanBeInstalled())
 				any = true;
 			fDrivesView->AddItem(item);

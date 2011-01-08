@@ -11,11 +11,13 @@
 
 #include <File.h>
 #include <Message.h>
+#include <ObjectList.h>
+
+
+class BootDrive;
 
 
 /*	Setting BMessage Format:
-
-	"disk" String (path to boot disk)
 
 	"partition" array of BMessage:
 		"show" bool (flag if entry should be added to boot menu)
@@ -31,9 +33,14 @@ public:
 								BootMenu() {}
 	virtual						~BootMenu() {}
 
-	virtual	bool				IsBootMenuInstalled(BMessage* settings) = 0;
-	virtual	status_t			ReadPartitions(BMessage* settings) = 0;
-	virtual	status_t			WriteBootMenu(BMessage* settings) = 0;
+	virtual	bool				IsInstalled(const BootDrive& drive) = 0;
+	virtual	status_t			CanBeInstalled(const BootDrive& drive) = 0;
+
+	virtual	status_t			CollectPartitions(const BootDrive& drive,
+									BMessage& settings) = 0;
+
+	virtual	status_t			Install(const BootDrive& drive,
+									BMessage& settings) = 0;
 	virtual	status_t			SaveMasterBootRecord(BMessage* settings,
 									BFile* file) = 0;
 	virtual	status_t			RestoreMasterBootRecord(BMessage* settings,
@@ -44,6 +51,8 @@ public:
 	virtual	status_t			GetDisplayText(const char* text,
 									BString& displayText) = 0;
 };
+
+typedef BObjectList<BootMenu> BootMenuList;
 
 
 #endif	// BOOT_MENU_H

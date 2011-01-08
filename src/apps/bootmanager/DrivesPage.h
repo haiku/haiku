@@ -6,6 +6,7 @@
 #define DRIVES_PAGE_H
 
 
+#include "BootMenu.h"
 #include "WizardPageView.h"
 
 
@@ -19,6 +20,7 @@ class WizardView;
 class DrivesPage : public WizardPageView {
 public:
 								DrivesPage(WizardView* wizardView,
+									const BootMenuList& menus,
 									BMessage* settings, const char* name);
 	virtual						~DrivesPage();
 
@@ -29,7 +31,7 @@ protected:
 			void				MessageReceived(BMessage* message);
 
 private:
-			bool				_FillDrivesView();
+			bool				_FillDrivesView(const BootMenuList& menus);
 			DriveItem*			_SelectedDriveItem();
 			void				_UpdateWizardButtons(DriveItem* item);
 

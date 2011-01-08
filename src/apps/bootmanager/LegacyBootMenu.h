@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Axel Dörfler, axeld@pinc-software.de
  *		Michael Pfeiffer <laplace@users.sourceforge.net>
  */
 #ifndef LEGACY_BOOT_MENU_H
@@ -22,9 +23,14 @@ public:
 								LegacyBootMenu();
 	virtual						~LegacyBootMenu();
 
-	virtual	bool				IsBootMenuInstalled(BMessage* settings);
-	virtual	status_t			ReadPartitions(BMessage* settings);
-	virtual	status_t			WriteBootMenu(BMessage* settings);
+	virtual	bool				IsInstalled(const BootDrive& drive);
+	virtual	status_t			CanBeInstalled(const BootDrive& drive);
+
+	virtual	status_t			CollectPartitions(const BootDrive& drive,
+									BMessage& settings);
+
+	virtual	status_t			Install(const BootDrive& drive,
+									BMessage& settings);
 	virtual	status_t			SaveMasterBootRecord(BMessage* settings,
 									BFile* file);
 	virtual	status_t			RestoreMasterBootRecord(BMessage* settings,
@@ -35,7 +41,8 @@ public:
 private:
 			bool				_ConvertToBIOSText(const char* text,
 									BString& biosText);
-			bool				_GetBiosDrive(const char* device, int8* drive);
+			status_t			_GetBIOSDrive(const char* device,
+									int8& drive);
 			status_t			_ReadBlocks(int fd, uint8* buffer, size_t size);
 			status_t			_WriteBlocks(int fd, const uint8* buffer,
 									size_t size);

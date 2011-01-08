@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Axel Dörfler, axeld@pinc-software.de
  *		Michael Pfeiffer <laplace@users.sourceforge.net>
  */
 
@@ -18,6 +19,7 @@
 #include <Path.h>
 #include <String.h>
 
+#include "BootDrive.h"
 #include "DefaultPartitionPage.h"
 #include "DescriptionPage.h"
 #include "DrivesPage.h"
@@ -39,11 +41,12 @@
 
 
 BootManagerController::BootManagerController()
+	:
+	fBootDrive(NULL),
+	fBootMenu(NULL)
 {
 #if USE_TEST_BOOT_DRIVE
 	fBootMenu = new TestBootDrive();
-#else
-	fBootMenu = new LegacyBootMenu();
 #endif
 
 	// set defaults
@@ -65,7 +68,8 @@ BootManagerController::BootManagerController()
 		fSettings.AddString("file", "");
 	}
 
-	fReadPartitionsStatus = fBootMenu->ReadPartitions(&fSettings);
+	// That's the only boot menu we support at the moment.
+	fBootMenus.AddItem(new LegacyBootMenu());
 }
 
 
@@ -80,8 +84,8 @@ BootManagerController::Previous(WizardView* wizard)
 	if (CurrentState() != kStateEntry)
 		WizardController::Previous(wizard);
 	else {
-		WizardController::Next(wizard);
 		fSettings.ReplaceBool("install", false);
+		WizardController::Next(wizard);
 	}
 }
 
@@ -89,9 +93,7 @@ BootManagerController::Previous(WizardView* wizard)
 int32
 BootManagerController::InitialState()
 {
-	if (fReadPartitionsStatus == B_OK)
-		return kStateEntry;
-	return kStateErrorEntry;
+	return kStateEntry;
 }
 
 
@@ -101,11 +103,29 @@ BootManagerController::NextState(int32 state)
 	switch (state) {
 		case kStateEntry:
 		{
-			if (fSettings.FindBool("install")) {
-				if (fBootMenu->IsBootMenuInstalled(&fSettings))
-					return kStatePartitions;
+			const char* path;
+			if (fSettings.FindString("disk", &path) != B_OK)
+				return kStateErrorEntry;
 
-				return kStateSaveMBR;
+			delete fBootDrive;
+
+			fBootDrive = new BootDrive(path);
+			fBootMenu = fBootDrive->InstalledMenu(fBootMenus);
+
+			if (fSettings.FindBool("install")) {
+				int32 nextState = fBootMenu != NULL
+					? kStatePartitions : kStateSaveMBR;
+
+				// TODO: call BootDrive::AddSupportedMenus() once we support
+				// more than one type of boot menu - we'll probably need a
+				// requester to choose from them then as well.
+				if (fBootMenu == NULL)
+					fBootMenu = fBootMenus.ItemAt(0);
+
+				fCollectPartitionsStatus = fBootMenu->CollectPartitions(
+					*fBootDrive, fSettings);
+
+				return nextState;
 			}
 
 			return kStateUninstall;
@@ -186,7 +206,7 @@ BootManagerController::_WriteBootMenu()
 	if (alert->Go() == 1)
 		return false;
 
-	fWriteBootMenuStatus = fBootMenu->WriteBootMenu(&fSettings);
+	fWriteBootMenuStatus = fBootMenu->Install(*fBootDrive, fSettings);
 	return true;
 }
 
@@ -238,7 +258,8 @@ BootManagerController::CreatePage(int32 state, WizardView* wizard)
 
 	switch (state) {
 		case kStateEntry:
-			page = new DrivesPage(wizard, &fSettings, "drives");
+			fSettings.ReplaceBool("install", true);
+			page = new DrivesPage(wizard, fBootMenus, &fSettings, "drives");
 			break;
 		case kStateErrorEntry:
 			page = _CreateErrorEntryPage();
@@ -286,7 +307,7 @@ BootManagerController::_CreateErrorEntryPage()
 {
 	BString description;
 
-	if (fReadPartitionsStatus == B_PARTITION_TOO_SMALL) {
+	if (fCollectPartitionsStatus == B_PARTITION_TOO_SMALL) {
 		description << B_TRANSLATE_COMMENT("Partition table not compatible",
 				"Title") << "\n\n"
 			<< B_TRANSLATE("The partition table of the first hard disk is not "

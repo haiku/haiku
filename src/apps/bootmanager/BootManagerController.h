@@ -13,9 +13,10 @@
 
 #include <Message.h>
 
+#include "BootMenu.h"
+
 
 class BootDrive;
-class BootMenu;
 class WizardView;
 class WizardPageView;
 
@@ -72,9 +73,11 @@ private:
 			WizardPageView*		_CreateUninstalledPage();
 
 			BMessage			fSettings;
+			BootMenuList		fBootMenus;
+			BootDrive*			fBootDrive;
 			BootMenu*			fBootMenu;
 
-			status_t			fReadPartitionsStatus;
+			status_t			fCollectPartitionsStatus;
 			status_t			fWriteBootMenuStatus;
 			status_t			fSaveMBRStatus;
 			status_t			fRestoreMBRStatus;

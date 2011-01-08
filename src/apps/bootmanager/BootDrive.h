@@ -6,21 +6,30 @@
 #define BOOT_DRIVE_H
 
 
-#include <File.h>
+#include <Path.h>
+
+#include "BootMenu.h"
+
+
+class BDiskDevice;
 
 
 class BootDrive {
 public:
-								BootDrive();
+								BootDrive(const char* path);
 	virtual						~BootDrive();
 
-			bool				IsBootMenuInstalled() const;
-			bool				CanBootMenuBeInstalled() const;
+			BootMenu*			InstalledMenu(
+									const BootMenuList& menus) const;
+			status_t			CanMenuBeInstalled(
+									const BootMenuList& menus) const;
+			void				AddSupportedMenus(const BootMenuList& from,
+									BootMenuList& to);
 
+			const char*			Path() const;
 			bool				IsBootDrive() const;
 
-			status_t			GetStream(BPositionIO* stream);
-			status_t			GetBIOSDrive(uint8* drive);
+			status_t			GetDiskDevice(BDiskDevice& device) const;
 
 private:
 			BPath				fPath;
