@@ -187,7 +187,7 @@ ExtentStream::Enlarge(Transaction& transaction, off_t& numBlocks)
 			TRACE("Enlarge() last %lld allocatedPos %lld\n",
 				last.PhysicalBlock() + last.Length(), fAllocatedPos);
 			if (last.PhysicalBlock() + last.Length() == fAllocatedPos
-				&& (last.Length() + allocated) <= 0xffff) {
+				&& (last.Length() + allocated) <= EXT2_EXTENT_MAX_LENGTH) {
 				if (stream != fStream) {
 					stream = (ext2_extent_stream *)cached.SetToWritable(
 						transaction, cached.BlockNumber());

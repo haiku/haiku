@@ -330,6 +330,7 @@ struct ext2_data_stream {
 } _PACKED;
 
 #define EXT2_EXTENT_MAGIC			0xf30a
+#define EXT2_EXTENT_MAX_LENGTH		0x8000
 
 struct ext2_extent_header {
 	uint16 magic;
