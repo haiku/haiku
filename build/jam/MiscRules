@@ -73,11 +73,15 @@ rule SubIncludeGPL
 
 rule MakeLocateCommonPlatform
 {
+	# The file is shared between all target platforms.
 	MakeLocate $(1) : $(COMMON_PLATFORM_LOCATE_TARGET) ;
 }
 
 rule MakeLocatePlatform
 {
+	# The file is specific for the target platform, but
+	# architecture independent. Usually the right rule for generated
+	# sources, though sometimes sources can be architecture specific.
 	local files = $(1) ;
 	local file ;
 	for file in $(files) {
@@ -91,6 +95,9 @@ rule MakeLocatePlatform
 
 rule MakeLocateArch
 {
+	# The file is platform+architecture specific, but is debug
+	# level independent. This is usually the right rule for generated
+	# architecture specific data or source files.
 	local files = $(1) ;
 	local file ;
 	for file in $(files) {
@@ -104,6 +111,8 @@ rule MakeLocateArch
 
 rule MakeLocateDebug
 {
+	# The file is platform+architecture+debug level specific.
+	# That's what should be used for compiled code.
 	local files = $(1) ;
 	local file ;
 	for file in $(files) {
