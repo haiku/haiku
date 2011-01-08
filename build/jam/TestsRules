@@ -23,7 +23,7 @@ rule UnitTestLib
 		Depends $(lib) :
 			 <tests!unittests>libbe_test.so ;
 	} else {
-		ObjectDefines $(2) : TEST_R5 ;
+		ObjectDefines $(2) : TEST_HAIKU TEST_OBOS ;
 	}
 
 	UseCppUnitObjectHeaders $(sources) ;
@@ -51,7 +51,7 @@ rule UnitTest
 		Depends $(target) :
 			 <tests!unittests>libbe_test.so ;
 	} else {
-		ObjectDefines $(2) : TEST_R5 ;
+		ObjectDefines $(2) : TEST_HAIKU TEST_OBOS ;
 	}
 
 	UseCppUnitObjectHeaders $(sources) ;
@@ -73,7 +73,7 @@ rule TestObjects
 	if $(TARGET_PLATFORM) = libbe_test {
 		ObjectDefines $(2) : TEST_HAIKU TEST_OBOS ;
 	} else {
-		ObjectDefines $(2) : TEST_R5 ;
+		ObjectDefines $(2) : TEST_HAIKU TEST_OBOS ;
 	}
 
 	UseCppUnitObjectHeaders $(sources) ;
