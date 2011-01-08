@@ -1,9 +1,10 @@
 /*
- * Copyright 2006-2010, Haiku, Inc. All rights reserved.
+ * Copyright 2006-2011, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_GRID_LAYOUT_H
 #define	_GRID_LAYOUT_H
+
 
 #include <TwoDimensionalLayout.h>
 
@@ -44,6 +45,8 @@ public:
 			float				MaxRowHeight(int32 row) const;
 			void				SetMaxRowHeight(int32 row, float height);
 
+			BLayoutItem*		ItemAt(int32 column, int32 row) const;
+
 	virtual	BLayoutItem*		AddView(BView* child);
 	virtual	BLayoutItem*		AddView(int32 index, BView* child);
 	virtual	BLayoutItem*		AddView(BView* child, int32 column, int32 row,
@@ -63,13 +66,13 @@ public:
 	virtual status_t			ItemUnarchived(const BMessage* from,
 									BLayoutItem* item, int32 index);
 
-protected:	
+protected:
 	virtual	bool				ItemAdded(BLayoutItem* item, int32 atIndex);
 	virtual	void				ItemRemoved(BLayoutItem* item, int32 fromIndex);
 
 	virtual	bool				HasMultiColumnItems();
 	virtual	bool				HasMultiRowItems();
-	
+
 	virtual	int32				InternalCountColumns();
 	virtual	int32				InternalCountRows();
 	virtual	void				GetColumnRowConstraints(
@@ -79,11 +82,11 @@ protected:
 	virtual	void				GetItemDimensions(BLayoutItem* item,
 									Dimensions* dimensions);
 
-private:	
+private:
 			class DummyLayoutItem;
 			class RowInfoArray;
 			struct ItemLayoutData;
-			
+
 			bool				_IsGridCellEmpty(int32 column, int32 row);
 			bool				_AreGridCellsEmpty(int32 column, int32 row,
 									int32 columnCount, int32 rowCount);
@@ -104,5 +107,6 @@ private:
 			int32				fMultiColumnItems;
 			int32				fMultiRowItems;
 };
+
 
 #endif	// _GRID_LAYOUT_H

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Haiku Inc.
+ * Copyright 2010-2011, Haiku Inc.
  * Copyright 2006, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -369,6 +369,17 @@ void
 BGridLayout::SetMaxRowHeight(int32 row, float height)
 {
 	fRowInfos->SetMaxSize(row, height);
+}
+
+
+BLayoutItem*
+BGridLayout::ItemAt(int32 column, int32 row) const
+{
+	if (column < 0 || column >= CountColumns()
+		|| row < 0 || row >= CountRows())
+		return NULL;
+
+	return fGrid[column][row];
 }
 
 
