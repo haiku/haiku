@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2011, Haiku, Inc. All Rights Reserved.
  * Copyright 2004-2005 yellowTAB GmbH. All Rights Reserverd.
  * Copyright 2006 Bernd Korz. All Rights Reserved
  * Distributed under the terms of the MIT License.
@@ -33,6 +33,7 @@
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
+#include <MessageRunner.h>
 #include <Path.h>
 #include <PrintJob.h>
 #include <RecentItems.h>
@@ -56,6 +57,9 @@
 // BMessage field names used in Save messages
 const char* kTypeField = "be:type";
 const char* kTranslatorField = "be:translator";
+
+const bigtime_t kDefaultSlideShowDelay = 3000000;
+	// 3 seconds
 
 
 // message constants
@@ -88,7 +92,8 @@ enum {
 	MSG_PREPARE_PRINT			= 'mPPT',
 	kMsgFitToWindow				= 'mFtW',
 	kMsgOriginalSize			= 'mOSZ',
-	kMsgStretchToWindow			= 'mStW'
+	kMsgStretchToWindow			= 'mStW',
+	kMsgNextSlide				= 'mNxS'
 };
 
 
@@ -120,14 +125,16 @@ ShowImageWindow::ShowImageWindow(const entry_ref& ref,
 	fBar(NULL),
 	fBrowseMenu(NULL),
 	fGoToPageMenu(NULL),
-	fSlideShowDelay(NULL),
+	fSlideShowDelayMenu(NULL),
 	fImageView(NULL),
 	fStatusView(NULL),
 	fProgressWindow(new ProgressWindow()),
 	fModified(false),
 	fFullScreen(false),
 	fShowCaption(true),
-	fPrintSettings(NULL)
+	fPrintSettings(NULL),
+	fSlideShowRunner(NULL),
+	fSlideShowDelay(kDefaultSlideShowDelay)
 {
 	_ApplySettings();
 
@@ -210,6 +217,8 @@ ShowImageWindow::~ShowImageWindow()
 {
 	fProgressWindow->Lock();
 	fProgressWindow->Quit();
+
+	_StopSlideShow();
 }
 
 
@@ -228,25 +237,23 @@ void
 ShowImageWindow::_BuildViewMenu(BMenu* menu, bool popupMenu)
 {
 	_AddItemMenu(menu, B_TRANSLATE("Slide show"), MSG_SLIDE_SHOW, 0, 0, this);
-	_MarkMenuItem(menu, MSG_SLIDE_SHOW, fImageView->SlideShowStarted());
+	_MarkMenuItem(menu, MSG_SLIDE_SHOW, fSlideShowRunner != NULL);
 	BMenu* delayMenu = new BMenu(B_TRANSLATE("Slide delay"));
-	if (fSlideShowDelay == NULL)
-		fSlideShowDelay = delayMenu;
+	if (fSlideShowDelayMenu == NULL)
+		fSlideShowDelayMenu = delayMenu;
 
 	delayMenu->SetRadioMode(true);
-	// Note: ShowImage loads images in window thread so it becomes unresponsive
-	//		 if slide show delay is too short! (Especially if loading the image
-	//		 takes as long as or longer than the slide show delay). Should load
-	//		 in background thread!
-	_AddDelayItem(delayMenu, B_TRANSLATE("3 seconds"), 3);
-	_AddDelayItem(delayMenu, B_TRANSLATE("4 seconds"), 4);
-	_AddDelayItem(delayMenu, B_TRANSLATE("5 seconds"), 5);
-	_AddDelayItem(delayMenu, B_TRANSLATE("6 seconds"), 6);
-	_AddDelayItem(delayMenu, B_TRANSLATE("7 seconds"), 7);
-	_AddDelayItem(delayMenu, B_TRANSLATE("8 seconds"), 8);
-	_AddDelayItem(delayMenu, B_TRANSLATE("9 seconds"), 9);
-	_AddDelayItem(delayMenu, B_TRANSLATE("10 seconds"), 10);
-	_AddDelayItem(delayMenu, B_TRANSLATE("20 seconds"), 20);
+
+	int32 kDelays[] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 20};
+	for (uint32 i = 0; i < sizeof(kDelays) / sizeof(kDelays[0]); i++) {
+		BString text(B_TRANSLATE_COMMENT("%SECONDS seconds",
+			"Don't translate %SECONDS"));
+		char seconds[32];
+		snprintf(seconds, sizeof(seconds), "%" B_PRIi32, kDelays[i]);
+		text.ReplaceFirst("%SECONDS", seconds);
+
+		_AddDelayItem(delayMenu, text.String(), kDelays[i] * 1000000LL);
+	}
 	menu->AddItem(delayMenu);
 
 	menu->AddSeparatorItem();
@@ -387,16 +394,15 @@ ShowImageWindow::_AddItemMenu(BMenu* menu, const char* label, uint32 what,
 
 
 BMenuItem*
-ShowImageWindow::_AddDelayItem(BMenu* menu, const char* label, float value)
+ShowImageWindow::_AddDelayItem(BMenu* menu, const char* label, bigtime_t delay)
 {
 	BMessage* message = new BMessage(MSG_SLIDE_SHOW_DELAY);
-	message->AddFloat("value", value);
+	message->AddInt64("delay", delay);
 
 	BMenuItem* item = new BMenuItem(label, message, 0);
 	item->SetTarget(this);
 
-	bool marked = fImageView->GetSlideShowDelay() == value;
-	if (marked)
+	if (delay == fSlideShowDelay)
 		item->SetMarked(true);
 
 	menu->AddItem(item);
@@ -479,16 +485,16 @@ ShowImageWindow::_MarkMenuItem(BMenu* menu, uint32 what, bool marked)
 
 
 void
-ShowImageWindow::_MarkSlideShowDelay(float value)
+ShowImageWindow::_MarkSlideShowDelay(bigtime_t delay)
 {
-	const int32 n = fSlideShowDelay->CountItems();
-	float v;
-	for (int32 i = 0; i < n; i ++) {
-		BMenuItem* item = fSlideShowDelay->ItemAt(i);
-		if (item) {
-			if (item->Message()->FindFloat("value", &v) == B_OK && v == value) {
-				if (!item->IsMarked())
-					item->SetMarked(true);
+	const int32 count = fSlideShowDelayMenu->CountItems();
+	for (int32 i = 0; i < count; i ++) {
+		BMenuItem* item = fSlideShowDelayMenu->ItemAt(i);
+		if (item != NULL) {
+			bigtime_t itemDelay;
+			if (item->Message()->FindInt64("delay", &itemDelay) == B_OK
+				&& itemDelay == delay) {
+				item->SetMarked(true);
 				return;
 			}
 		}
@@ -760,6 +766,7 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			break;
 
 		case MSG_FILE_NEXT:
+		case kMsgNextSlide:
 			if (_ClosePrompt() && fNavigator.NextFile())
 				_LoadImage();
 			break;
@@ -792,25 +799,36 @@ ShowImageWindow::MessageReceived(BMessage* message)
 		case MSG_SLIDE_SHOW:
 		{
 			BMenuItem* item = fBar->FindItem(message->what);
-			if (!item)
+			if (item == NULL)
 				break;
+
 			if (item->IsMarked()) {
 				item->SetMarked(false);
-				fImageView->StopSlideShow();
+				_StopSlideShow();
 			} else if (_ClosePrompt()) {
 				item->SetMarked(true);
-				fImageView->StartSlideShow();
+				_StartSlideShow();
 			}
+			break;
+		}
+
+		case kMsgStopSlideShow:
+		{
+			BMenuItem* item = fBar->FindItem(MSG_SLIDE_SHOW);
+			if (item != NULL)
+				item->SetMarked(false);
+
+			_StopSlideShow();
 			break;
 		}
 
 		case MSG_SLIDE_SHOW_DELAY:
 		{
-			float value;
-			if (message->FindFloat("value", &value) == B_OK) {
-				fImageView->SetSlideShowDelay(value);
+			bigtime_t delay;
+			if (message->FindInt64("delay", &delay) == B_OK) {
+				_SetSlideShowDelay(delay);
 				// in case message is sent from popup menu
-				_MarkSlideShowDelay(value);
+				_MarkSlideShowDelay(delay);
 			}
 			break;
 		}
@@ -1108,20 +1126,17 @@ ShowImageWindow::_ApplySettings()
 		fShowCaption = settings->GetBool("ShowCaption", fShowCaption);
 		fPrintOptions.SetBounds(BRect(0, 0, 1023, 767));
 
-		int32 op = settings->GetInt32("PO:Option", fPrintOptions.Option());
-		fPrintOptions.SetOption((enum PrintOptions::Option)op);
+		fSlideShowDelay = settings->GetTime("SlideShowDelay", fSlideShowDelay);
 
-		float f = settings->GetFloat("PO:ZoomFactor", fPrintOptions.ZoomFactor());
-		fPrintOptions.SetZoomFactor(f);
-
-		f = settings->GetFloat("PO:DPI", fPrintOptions.DPI());
-		fPrintOptions.SetDPI(f);
-
-		f = settings->GetFloat("PO:Width", fPrintOptions.Width());
-		fPrintOptions.SetWidth(f);
-
-		f = settings->GetFloat("PO:Height", fPrintOptions.Height());
-		fPrintOptions.SetHeight(f);
+		fPrintOptions.SetOption((enum PrintOptions::Option)settings->GetInt32(
+			"PO:Option", fPrintOptions.Option()));
+		fPrintOptions.SetZoomFactor(
+			settings->GetFloat("PO:ZoomFactor", fPrintOptions.ZoomFactor()));
+		fPrintOptions.SetDPI(settings->GetFloat("PO:DPI", fPrintOptions.DPI()));
+		fPrintOptions.SetWidth(
+			settings->GetFloat("PO:Width", fPrintOptions.Width()));
+		fPrintOptions.SetHeight(
+			settings->GetFloat("PO:Height", fPrintOptions.Height()));
 
 		settings->Unlock();
 	}
@@ -1245,6 +1260,45 @@ ShowImageWindow::_Print(BMessage* msg)
 		fImageView->SetScale(1.0);
 		printJob.SpoolPage();
 		printJob.CommitJob();
+	}
+}
+
+
+void
+ShowImageWindow::_SetSlideShowDelay(bigtime_t delay)
+{
+	if (fSlideShowDelay == delay)
+		return;
+
+	fSlideShowDelay = delay;
+
+	ShowImageSettings* settings = my_app->Settings();
+	if (settings->Lock()) {
+		settings->SetTime("SlideShowDelay", fSlideShowDelay);
+		settings->Unlock();
+	}
+
+	if (fSlideShowRunner != NULL)
+		_StartSlideShow();
+}
+
+
+void
+ShowImageWindow::_StartSlideShow()
+{
+	_StopSlideShow();
+
+	BMessage nextSlide(kMsgNextSlide);
+	fSlideShowRunner = new BMessageRunner(this, &nextSlide, fSlideShowDelay);
+}
+
+
+void
+ShowImageWindow::_StopSlideShow()
+{
+	if (fSlideShowRunner != NULL) {
+		delete fSlideShowRunner;
+		fSlideShowRunner = NULL;
 	}
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2010 Haiku Inc. All rights reserved.
+ * Copyright 2003-2011 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -15,15 +15,20 @@
 
 
 ShowImageSettings::ShowImageSettings()
+	:
+	fLock("settings lock"),
+	fUpdated(false)
 {
-	Load();
+	_Load();
 }
 
 
 ShowImageSettings::~ShowImageSettings()
 {
 	if (Lock()) {
-		Save();
+		if (fUpdated)
+			_Save();
+
 		Unlock();
 	}
 }
@@ -87,6 +92,17 @@ ShowImageSettings::GetRect(const char* name, BRect defaultValue)
 }
 
 
+bigtime_t
+ShowImageSettings::GetTime(const char* name, bigtime_t defaultValue)
+{
+	int64 value;
+	if (fSettings.FindInt64(name, &value) == B_OK)
+		return value;
+
+	return defaultValue;
+}
+
+
 const char*
 ShowImageSettings::GetString(const char* name, const char* defaultValue)
 {
@@ -105,6 +121,8 @@ ShowImageSettings::SetBool(const char* name, bool value)
 		fSettings.ReplaceBool(name, value);
 	else
 		fSettings.AddBool(name, value);
+
+	fUpdated = true;
 }
 
 
@@ -115,6 +133,8 @@ ShowImageSettings::SetInt32(const char* name, int32 value)
 		fSettings.ReplaceInt32(name, value);
 	else
 		fSettings.AddInt32(name, value);
+
+	fUpdated = true;
 }
 
 
@@ -125,6 +145,8 @@ ShowImageSettings::SetFloat(const char* name, float value)
 		fSettings.ReplaceFloat(name, value);
 	else
 		fSettings.AddFloat(name, value);
+
+	fUpdated = true;
 }
 
 
@@ -135,6 +157,18 @@ ShowImageSettings::SetRect(const char* name, BRect value)
 		fSettings.ReplaceRect(name, value);
 	else
 		fSettings.AddRect(name, value);
+
+	fUpdated = true;
+}
+
+
+void
+ShowImageSettings::SetTime(const char* name, bigtime_t value)
+{
+	if (fSettings.ReplaceInt64(name, value) != B_OK)
+		fSettings.AddInt64(name, value);
+
+	fUpdated = true;
 }
 
 
@@ -145,11 +179,13 @@ ShowImageSettings::SetString(const char* name, const char* value)
 		fSettings.ReplaceString(name, value);
 	else
 		fSettings.AddString(name, value);
+
+	fUpdated = true;
 }
 
 
 bool
-ShowImageSettings::OpenSettingsFile(BFile* file, bool forReading)
+ShowImageSettings::_OpenSettingsFile(BFile* file, bool forReading)
 {
 	BPath path;
 	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
@@ -164,18 +200,18 @@ ShowImageSettings::OpenSettingsFile(BFile* file, bool forReading)
 
 
 void
-ShowImageSettings::Load()
+ShowImageSettings::_Load()
 {
 	BFile file;
-	if (OpenSettingsFile(&file, true))
+	if (_OpenSettingsFile(&file, true))
 		fSettings.Unflatten(&file);
 }
 
 
 void
-ShowImageSettings::Save()
+ShowImageSettings::_Save()
 {
 	BFile file;
-	if (OpenSettingsFile(&file, false))
+	if (_OpenSettingsFile(&file, false))
 		fSettings.Flatten(&file);
 }

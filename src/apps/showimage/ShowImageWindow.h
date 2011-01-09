@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2011, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -21,6 +21,7 @@ class BFilePanel;
 class BMenu;
 class BMenuBar;
 class BMenuItem;
+class BMessageRunner;
 class ProgressWindow;
 class ShowImageView;
 class ShowImageStatusView;
@@ -36,6 +37,7 @@ enum {
 	MSG_FILE_PREV				= 'mFLP',
 	kMsgDeleteCurrentFile		= 'mDcF',
 	MSG_SLIDE_SHOW				= 'mSSW',
+	kMsgStopSlideShow			= 'msss',
 	MSG_EXIT_FULL_SCREEN		= 'mEFS'
 };
 
@@ -62,14 +64,14 @@ private:
 									const BHandler* target,
 									bool enabled = true);
 			BMenuItem*			_AddDelayItem(BMenu* menu, const char* label,
-									float value);
+									bigtime_t delay);
 
 			bool				_ToggleMenuItem(uint32 what);
 			void				_EnableMenuItem(BMenu* menu, uint32 what,
 									bool enable);
 			void				_MarkMenuItem(BMenu* menu, uint32 what,
 									bool marked);
-			void				_MarkSlideShowDelay(float value);
+			void				_MarkSlideShowDelay(bigtime_t delay);
 
 			void				_UpdateStatusText(const BMessage* message);
 			void				_LoadError(const entry_ref& ref);
@@ -87,13 +89,17 @@ private:
 			void				_PrepareForPrint();
 			void				_Print(BMessage* msg);
 
+			void				_SetSlideShowDelay(bigtime_t delay);
+			void				_StartSlideShow();
+			void				_StopSlideShow();
+
 private:
 			ImageFileNavigator	fNavigator;
 			BFilePanel*			fSavePanel;
 			BMenuBar*			fBar;
 			BMenu*				fBrowseMenu;
 			BMenu*				fGoToPageMenu;
-			BMenu*				fSlideShowDelay;
+			BMenu*				fSlideShowDelayMenu;
 			ShowImageView*		fImageView;
 			ShowImageStatusView* fStatusView;
 			ProgressWindow*		fProgressWindow;
@@ -105,6 +111,9 @@ private:
 			PrintOptions		fPrintOptions;
 
 			BString				fImageType;
+
+			BMessageRunner*		fSlideShowRunner;
+			bigtime_t			fSlideShowDelay;
 };
 
 

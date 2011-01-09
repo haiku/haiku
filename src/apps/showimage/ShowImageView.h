@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2011, Haiku, Inc. All Rights Reserved.
  * Copyright 2004-2005 yellowTAB GmbH. All Rights Reserverd.
  * Copyright 2006 Bernd Korz. All Rights Reserved
  * Distributed under the terms of the MIT License.
@@ -86,13 +86,6 @@ public:
 			void				ClearSelection();
 
 			void				CopySelectionToClipboard();
-
-			void				SetSlideShowDelay(float seconds);
-			float				GetSlideShowDelay() const
-									{ return fSlideShowDelay / 10.0; }
-			bool				SlideShowStarted() const { return fSlideShow; }
-			void				StartSlideShow();
-			void				StopSlideShow();
 
 			void				FitToBounds();
 			void				SetZoom(float zoom,
@@ -183,6 +176,7 @@ private:
 			void				_SettingsSetBool(const char* name, bool value);
 			void				_SetIcon(bool clear, icon_size which);
 			void				_ToggleSlideShow();
+			void				_StopSlideShow();
 			void				_ExitFullScreen();
 
 private:
@@ -213,12 +207,6 @@ private:
 			BRect				fCopyFromRect;
 				// the portion of the background bitmap the selection is made
 				// from
-
-			bool				fSlideShow;
-			int					fSlideShowDelay;
-				// in pulse rate units
-			int					fSlideShowCountDown;
-				// shows next image if it reaches zero
 
 			bool				fShowCaption;
 			BString				fCaption;
