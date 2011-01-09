@@ -43,6 +43,7 @@ protected:
 			const uint32*	fReadOnlyData;
 
 			uint32			fNumBits;
+			uint32			fMaxIndex;
 };
 
 #endif	// BITMAPBLOCK_H
