@@ -41,6 +41,7 @@
 
 
 static const char* kSignature = "application/x-vnd.Be-WORK";
+static const char* kScreenPrefletSignature = "application/x-vnd.Haiku-Screen";
 static const char* kOldSettingFile = "Workspace_data";
 static const char* kSettingsFile = "Workspaces_settings";
 
@@ -494,7 +495,7 @@ WorkspacesView::MessageReceived(BMessage* message)
 			break;
 
 		case kMsgChangeCount:
-			be_roster->Launch("application/x-vnd.Be-SCRN");
+			be_roster->Launch(kScreenPrefletSignature);
 			break;
 
 		default:

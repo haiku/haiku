@@ -1,5 +1,5 @@
 
-resource app_signature "application/x-vnd.Be-SCRN";
+resource app_signature "application/x-vnd.Haiku-Screen";
 
 resource app_flags B_SINGLE_LAUNCH;
 
