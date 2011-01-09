@@ -66,6 +66,8 @@ public:
 									entry_ref& ref, bool next, bool rewind);
 	virtual void				UpdateSelection(const entry_ref& ref);
 
+			bool				IsValid();
+
 private:
 			BMessenger			fTrackerMessenger;
 				// of the window that this was launched from
@@ -89,6 +91,26 @@ private:
 private:
 			BDirectory			fFolder;
 			BObjectList<entry_ref> fEntries;
+};
+
+
+// This class handles the case of the user closing the Tracker window after
+// opening ShowImage from that window.
+class AutoAdjustingNavigator : public Navigator {
+public:
+								AutoAdjustingNavigator(entry_ref& ref,
+									const BMessenger& trackerMessenger);
+	virtual						~AutoAdjustingNavigator();
+
+	virtual	bool				FindNextImage(const entry_ref& currentRef,
+									entry_ref& ref, bool next, bool rewind);
+	virtual void				UpdateSelection(const entry_ref& ref);
+
+private:
+			bool				_CheckForTracker(const entry_ref& ref);
+
+			TrackerNavigator*	fTrackerNavigator;
+			FolderNavigator*	fFolderNavigator;
 };
 
 
@@ -218,6 +240,13 @@ TrackerNavigator::UpdateSelection(const entry_ref& ref)
 }
 
 
+bool
+TrackerNavigator::IsValid()
+{
+	return fTrackerMessenger.IsValid();
+}
+
+
 // #pragma mark -
 
 
@@ -323,6 +352,78 @@ FolderNavigator::_CompareRefs(const entry_ref* refA, const entry_ref* refB)
 // #pragma mark -
 
 
+AutoAdjustingNavigator::AutoAdjustingNavigator(entry_ref& ref,
+	const BMessenger& trackerMessenger)
+	:
+	fTrackerNavigator(NULL),
+	fFolderNavigator(NULL)
+{
+	// TODO: allow selecting a folder from Tracker as well!
+	if (trackerMessenger.IsValid())
+		fTrackerNavigator = new TrackerNavigator(trackerMessenger);
+	else
+		fFolderNavigator = new FolderNavigator(ref);
+}
+
+
+AutoAdjustingNavigator::~AutoAdjustingNavigator()
+{
+	delete fTrackerNavigator;
+	delete fFolderNavigator;
+}
+
+
+bool
+AutoAdjustingNavigator::FindNextImage(const entry_ref& currentRef, entry_ref& nextRef,
+	bool next, bool rewind)
+{
+	if (_CheckForTracker(currentRef)) {
+		return fTrackerNavigator->FindNextImage(currentRef, nextRef, next, rewind);
+	}
+
+	if (fFolderNavigator != NULL)
+		return fFolderNavigator->FindNextImage(currentRef, nextRef, next, rewind);
+
+	return false;
+}
+
+
+void
+AutoAdjustingNavigator::UpdateSelection(const entry_ref& ref)
+{
+	if (_CheckForTracker(ref)) {
+		return fTrackerNavigator->UpdateSelection(ref);
+	}
+
+	if (fFolderNavigator != NULL)
+		return fFolderNavigator->UpdateSelection(ref);
+}
+
+
+bool
+AutoAdjustingNavigator::_CheckForTracker(const entry_ref& ref)
+{
+	if (fTrackerNavigator != NULL) {
+		if (fTrackerNavigator->IsValid())
+			return true;
+		else {
+			delete fTrackerNavigator;
+			fTrackerNavigator = NULL;
+
+			// If for some reason we already have one
+			delete fFolderNavigator;
+			entry_ref currentRef = ref;
+			fFolderNavigator = new FolderNavigator(currentRef);
+		}
+	}
+
+	return false;
+}
+
+
+// #pragma mark -
+
+
 ImageFileNavigator::ImageFileNavigator(const entry_ref& ref,
 	const BMessenger& trackerMessenger)
 	:
@@ -330,11 +431,7 @@ ImageFileNavigator::ImageFileNavigator(const entry_ref& ref,
 	fDocumentIndex(1),
 	fDocumentCount(1)
 {
-	// TODO: allow selecting a folder from Tracker as well!
-	if (trackerMessenger.IsValid())
-		fNavigator = new TrackerNavigator(trackerMessenger);
-	else
-		fNavigator = new FolderNavigator(fCurrentRef);
+	fNavigator = new AutoAdjustingNavigator(fCurrentRef, trackerMessenger);
 }
 
 
