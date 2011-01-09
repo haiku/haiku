@@ -86,6 +86,9 @@ typedef struct
 
 static const Translation gTranslations[] =
 {
+	{ "be",
+		"Michael Bulash\n"
+	},
 	{ "bg",
 		"cssvb94\n"
 	},
@@ -165,7 +168,7 @@ static const Translation gTranslations[] =
 	{ "ru",
 		"Tatyana Fursic (iceid)\n"
 		"StoroZ Gneva\n"
-		"Rustam Islamov (RISC aka HaikuBot)\n"
+		"Rodastahm Islamov (RISC)\n"
 		"Eugene Katashov (mrNoisy)\n"
 		"Reznikov Sergei (Diver)\n"
 		"Michael Smirnov\n"
@@ -1023,6 +1026,7 @@ AboutView::_CreateCreditsView()
 		"Andrea Anzani\n"
 		"Sean Bartell\n"
 		"Andre Braga\n"
+		"Michael Bulash\n"
 		"Bruce Cameron\n"
 		"Greg Crain\n"
 		"David Dengg\n"
