@@ -571,7 +571,7 @@ printAndHalt:
 	call	printstr
 	mov		ah, READ_CHAR
 	int		BIOS_KEYBOARD_SERVICES
-	mov		dl, 0x80
+	mov		dl, [bp + biosDrive]
 	int		BIOS_REBOOT
 
 ; Output:
