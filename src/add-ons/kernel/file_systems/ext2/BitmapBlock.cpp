@@ -410,7 +410,7 @@ BitmapBlock::FindNextMarked(uint32& pos)
 	TRACE("BitmapBlock::FindNextMarked(): index: %lu, bit: %lu, mask: %lX, "
 		"bits: %lX\n", index, bit, mask, bits);
 
-	bits = bits & ~mask;
+	bits &= ~mask;
 	uint32 maxBit = 32;
 
 	if (bits == 0) {
@@ -422,7 +422,6 @@ BitmapBlock::FindNextMarked(uint32& pos)
 			index++;
 		} while (index < maxIndex && data[index] == 0);
 
-		bits = B_LENDIAN_TO_HOST_INT32(data[index]);
 		if (index >= maxIndex) {
 			maxBit = fNumBits & 0x1F;
 
@@ -433,14 +432,15 @@ BitmapBlock::FindNextMarked(uint32& pos)
 				pos = fNumBits;
 				return;
 			}
+			bits = B_LENDIAN_TO_HOST_INT32(data[maxIndex]);
 			mask = (1 << maxBit) - 1;
 			if ((bits & mask) == 0) {
 				pos = fNumBits;
 				return;
 			}
 			maxBit++;
-		}
-
+		} else
+			bits = B_LENDIAN_TO_HOST_INT32(data[index]);
 		bit = 0;
 	}
 
@@ -493,7 +493,6 @@ BitmapBlock::FindNextUnmarked(uint32& pos)
 			index++;
 		} while (index < maxIndex && data[index] == 0xFFFFFFFF);
 
-		bits = B_LENDIAN_TO_HOST_INT32(data[index]);
 		if (index >= maxIndex) {
 			maxBit = fNumBits & 0x1F;
 
@@ -504,13 +503,15 @@ BitmapBlock::FindNextUnmarked(uint32& pos)
 				pos = fNumBits;
 				return;
 			}
+			bits = B_LENDIAN_TO_HOST_INT32(data[maxIndex]);
 			mask = (1 << maxBit) - 1;
 			if ((bits & mask) == mask) {
 				pos = fNumBits;
 				return;
 			}
 			maxBit++;
-		}
+		} else
+			bits = B_LENDIAN_TO_HOST_INT32(data[index]);
 		bit = 0;
 	}
 
