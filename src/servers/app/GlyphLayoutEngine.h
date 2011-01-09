@@ -97,6 +97,14 @@ public:
 									FontCacheReference* cacheReference = NULL);
 
 private:
+	static	bool				_WriteLockAndAcquireFallbackEntry(
+									FontCacheReference& cacheReference,
+									FontCacheEntry* entry,
+									const ServerFont& font,
+									const char* utf8String, int32 length,
+									FontCacheReference& fallbackCacheReference,
+									FontCacheEntry*& fallbackEntry);
+
 								GlyphLayoutEngine();
 	virtual						~GlyphLayoutEngine();
 };
@@ -189,52 +197,6 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 
 		if (entry == NULL)
 			return false;
-
-		// See if the entry already has the glyphs cached. Switch to a write
-		// lock if not.
-		bool needsWriteLock = !entry->HasGlyphs(utf8String, length);
-		if (needsWriteLock) {
-			// This also means we need the fallback font, since potentially,
-			// we have to obtain missing glyphs from it. We need to obtain
-			// the fallback font while we have not locked anything, since
-			// locking the FontManager with the write-lock held can obvisouly
-			// lead to a deadlock.
-
-			cacheReference.SetTo(NULL, false);
-			entry->ReadUnlock();
-
-			if (gFontManager->Lock()) {
-				// TODO: We always get the fallback glyphs from VL Gothic at the
-				// moment, but of course the fallback font should a) contain the
-				// missing glyphs at all and b) be similar to the original font.
-				// So there should be a mapping of some kind to know the most
-				// suitable fallback font.
-				FontStyle* fallbackStyle = gFontManager->GetStyleByIndex(
-					"VL Gothic", 0);
-				if (fallbackStyle != NULL) {
-					ServerFont fallbackFont(*fallbackStyle, font.Size());
-					gFontManager->Unlock();
-					// Force the write-lock on the fallback entry, since we
-					// don't transfer or copy GlyphCache objects from one cache
-					// to the other, but create new glyphs which are stored in
-					// "entry" in any case, which requires the write cache for
-					// sure (used FontEngine of fallbackEntry).
-					fallbackEntry = FontCacheEntryFor(fallbackFont, entry,
-						utf8String, length, fallbackCacheReference, true);
-					// NOTE: We don't care if fallbackEntry is NULL, fetching
-					// alternate glyphs will simply not work.
-				} else
-					gFontManager->Unlock();
-			}
-
-			if (!entry->WriteLock()) {
-				FontCache::Default()->Recycle(entry);
-				return false;
-			}
-
-			// Update the FontCacheReference, since the locking kind changed.
-			cacheReference.SetTo(entry, needsWriteLock);
-		}
 	} // else the entry was already used and is still locked
 
 	consumer.Start();
@@ -252,6 +214,7 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 	uint32 lastCharCode = 0;
 	uint32 charCode;
 	int32 index = 0;
+	bool writeLocked = false;
 	const char* start = utf8String;
 	while ((charCode = UTF8ToCharCode(&utf8String))) {
 
@@ -273,7 +236,22 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 				x += IsWhiteSpace(charCode) ? delta->space : delta->nonspace;
 		}
 
-		const GlyphCache* glyph = entry->Glyph(charCode, fallbackEntry);
+		const GlyphCache* glyph = entry->CachedGlyph(charCode);
+		if (glyph == NULL) {
+			// The glyph has not been cached yet, switch to a write lock,
+			// acquire the fallback entry and create the glyph. Note that
+			// the write lock will persist (in the cacheReference) so that
+			// we only have to do this switch once for the whole string.
+			if (!writeLocked) {
+				writeLocked = _WriteLockAndAcquireFallbackEntry(cacheReference,
+					entry, font, utf8String, length, fallbackCacheReference,
+					fallbackEntry);
+			}
+
+			if (writeLocked)
+				glyph = entry->CreateGlyph(charCode, fallbackEntry);
+		}
+
 		if (glyph == NULL) {
 			consumer.ConsumeEmptyGlyph(index++, charCode, x, y);
 			advanceX = 0;
@@ -308,6 +286,55 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 		_cacheReference->SetTo(entry, cacheReference.WriteLocked());
 		cacheReference.SetTo(NULL, false);
 	}
+	return true;
+}
+
+
+inline bool
+GlyphLayoutEngine::_WriteLockAndAcquireFallbackEntry(
+	FontCacheReference& cacheReference, FontCacheEntry* entry,
+	const ServerFont& font, const char* utf8String, int32 length,
+	FontCacheReference& fallbackCacheReference, FontCacheEntry*& fallbackEntry)
+{
+	// We need the fallback font, since potentially, we have to obtain missing
+	// glyphs from it. We need to obtain the fallback font while we have not
+	// locked anything, since locking the FontManager with the write-lock held
+	// can obvisouly lead to a deadlock.
+
+	cacheReference.SetTo(NULL, false);
+	entry->ReadUnlock();
+
+	if (gFontManager->Lock()) {
+		// TODO: We always get the fallback glyphs from VL Gothic at the
+		// moment, but of course the fallback font should a) contain the
+		// missing glyphs at all and b) be similar to the original font.
+		// So there should be a mapping of some kind to know the most
+		// suitable fallback font.
+		FontStyle* fallbackStyle = gFontManager->GetStyleByIndex(
+			"VL Gothic", 0);
+		if (fallbackStyle != NULL) {
+			ServerFont fallbackFont(*fallbackStyle, font.Size());
+			gFontManager->Unlock();
+			// Force the write-lock on the fallback entry, since we
+			// don't transfer or copy GlyphCache objects from one cache
+			// to the other, but create new glyphs which are stored in
+			// "entry" in any case, which requires the write cache for
+			// sure (used FontEngine of fallbackEntry).
+			fallbackEntry = FontCacheEntryFor(fallbackFont, entry,
+				utf8String, length, fallbackCacheReference, true);
+			// NOTE: We don't care if fallbackEntry is NULL, fetching
+			// alternate glyphs will simply not work.
+		} else
+			gFontManager->Unlock();
+	}
+
+	if (!entry->WriteLock()) {
+		FontCache::Default()->Recycle(entry);
+		return false;
+	}
+
+	// Update the FontCacheReference, since the locking kind changed.
+	cacheReference.SetTo(entry, true);
 	return true;
 }
 

@@ -256,7 +256,15 @@ render_as_zero_width(uint32 glyphCode)
 
 
 const GlyphCache*
-FontCacheEntry::Glyph(uint32 glyphCode, FontCacheEntry* fallbackEntry)
+FontCacheEntry::CachedGlyph(uint32 glyphCode)
+{
+	// Only requires a read lock.
+	return fGlyphCache->FindGlyph(glyphCode);
+}
+
+
+const GlyphCache*
+FontCacheEntry::CreateGlyph(uint32 glyphCode, FontCacheEntry* fallbackEntry)
 {
 	// We cache the glyph by the requested glyphCode. The FontEngine of this
 	// FontCacheEntry may not contain a glyph for the given code, in which case

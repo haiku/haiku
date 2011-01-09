@@ -146,6 +146,7 @@ public:
 		fRenderer.fRasterizer.reset();
 		fRenderer.fSubpixRasterizer.reset();
 	}
+
 	void Finish(double x, double y)
 	{
 		if (fVector) {
