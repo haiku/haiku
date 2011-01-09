@@ -8,6 +8,7 @@
 #ifndef BITMAPBLOCK_H
 #define BITMAPBLOCK_H
 
+
 #include "CachedBlock.h"
 
 
@@ -38,7 +39,9 @@ public:
 
 			uint32			NumBits() const { return fNumBits; }
 
-protected:
+private:
+			void			_FindNext(uint32& pos, bool marked);
+
 			uint32*			fData;
 			const uint32*	fReadOnlyData;
 

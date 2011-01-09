@@ -391,7 +391,21 @@ BitmapBlock::Unmark(uint32 start, uint32 length, bool force)
 void
 BitmapBlock::FindNextMarked(uint32& pos)
 {
-	TRACE("BitmapBlock::FindNextMarked(): pos: %lu\n", pos);
+	_FindNext(pos, true);
+}
+
+
+void
+BitmapBlock::FindNextUnmarked(uint32& pos)
+{
+	_FindNext(pos, false);
+}
+
+
+void
+BitmapBlock::_FindNext(uint32& pos, bool marked)
+{
+	TRACE("BitmapBlock::_FindNext(): pos: %lu\n", pos);
 
 	const uint32* data = fData == NULL ? fReadOnlyData : fData;
 	if (data == NULL)
@@ -409,15 +423,15 @@ BitmapBlock::FindNextMarked(uint32& pos)
 	uint32 mask = ~((1 << bit) - 1);
 	uint32 bits = B_LENDIAN_TO_HOST_INT32(data[index]);
 
-	TRACE("BitmapBlock::FindNextMarked(): index: %lu, bit: %lu, mask: %lX, "
+	TRACE("BitmapBlock::_FindNext(): index: %lu, bit: %lu, mask: %lX, "
 		"bits: %lX\n", index, bit, mask, bits);
 
 	bits &= mask;
-	if (bits == 0 && index < fMaxIndex) {
+	if (bits == (marked ? 0 : mask) && index < fMaxIndex) {
 		// Find a 32 bits block that has a marked bit
 		do {
 			index++;
-		} while (index < fMaxIndex && data[index] == 0);
+		} while (index < fMaxIndex && data[index] == (marked ? 0 : 0xFFFFFFFF));
 		bit = 0;
 		mask = 0xffffffff;
 	}
@@ -427,15 +441,15 @@ BitmapBlock::FindNextMarked(uint32& pos)
 
 		if (maxBit == 0) {
 			// Not found
-			TRACE("BitmapBlock::FindNextMarked(): reached end of block, "
+			TRACE("BitmapBlock::_FindNext(): reached end of block, "
 				"num bits: %lu\n", fNumBits);
 			pos = fNumBits;
 			return;
 		}
 		bits = B_LENDIAN_TO_HOST_INT32(data[fMaxIndex]);
 		mask &= (1 << maxBit) - 1;
-		if ((bits & mask) == 0) {
-			TRACE("BitmapBlock::FindNextMarked(): reached end of block, "
+		if ((bits & mask) == (marked ? 0 : mask)) {
+			TRACE("BitmapBlock::_FindNext(): reached end of block, "
 				"num bits: %lu\n", fNumBits);
 			pos = fNumBits;
 			return;
@@ -446,87 +460,14 @@ BitmapBlock::FindNextMarked(uint32& pos)
 
 	for (; bit < maxBit; ++bit) {
 		// Find the marked bit
-		if ((bits >> bit & 1) != 0) {
+		if ((bits >> bit & 1) != (marked ? 0U : 1U)) {
 			pos = index << 5 | bit;
-			TRACE("BitmapBlock::FindNextMarked(): found bit: %lu\n", pos);
+			TRACE("BitmapBlock::_FindNext(): found bit: %lu\n", pos);
 			return;
 		}
 	}
 
-	panic("Couldn't find marked bit inside an int32 which is different than "
-		"zero!? (%lx)\n", bits);
-}
-
-
-void
-BitmapBlock::FindNextUnmarked(uint32& pos)
-{
-	TRACE("BitmapBlock::FindNextUnmarked(): pos: %lu\n", pos);
-
-	const uint32* data = fData == NULL ? fReadOnlyData : fData;
-	if (data == NULL)
-		return;
-
-	if (pos >= fNumBits) {
-		pos = fNumBits;
-		return;
-	}
-
-	uint32 index = pos >> 5;
-	uint32 bit = pos & 0x1F;
-	uint32 maxBit = 32;
-
-	uint32 mask = ~((1 << bit) - 1);
-	uint32 bits = B_LENDIAN_TO_HOST_INT32(data[index]);
-
-	TRACE("BitmapBlock::FindNextUnmarked(): index: %lu, bit: %lu, mask: %lX, "
-		"bits: %lX\n", index, bit, mask, bits);
-
-	bits &= mask;
-
-	if (bits == mask && index < fMaxIndex) {
-		// Find a 32 bits block that has an unmarked bit
-		do {
-			index++;
-		} while (index < fMaxIndex && data[index] == 0xFFFFFFFF);
-		bit = 0;
-		mask = 0xffffffff;
-	}
-
-	if (index >= fMaxIndex) {
-		maxBit = fNumBits & 0x1F;
-
-		if (maxBit == 0) {
-			// Not found
-			TRACE("BitmapBlock::FindNextUnmarked(): reached end of block, "
-				"num bits: %lu\n", fNumBits);
-			pos = fNumBits;
-			return;
-		}
-		bits = B_LENDIAN_TO_HOST_INT32(data[fMaxIndex]);
-		mask &= (1 << maxBit) - 1;
-		if ((bits & mask) == mask) {
-			TRACE("BitmapBlock::FindNextUnmarked(): reached end of block, "
-				"num bits: %lu\n", fNumBits);
-			pos = fNumBits;
-			return;
-		}
-		maxBit++;
-	} else
-		bits = B_LENDIAN_TO_HOST_INT32(data[index]);
-
-	TRACE("BitmapBlock::FindNextUnmarked(): searching bit at pos %lu\n", bit);
-	for (; bit < maxBit; ++bit) {
-		// Find the unmarked bit
-		if ((bits >> bit & 1) == 0) {
-			pos = index << 5 | bit;
-			TRACE("BitmapBlock::FindNextUnmarked(): found bit: %lu\n", pos);
-			return;
-		}
-	}
-
-	panic("Couldn't find unmarked bit inside an int32 with value zero!?"
-		" (0x%lx)\n", bits);
+	panic("Couldn't find bit inside an uint32 (%lx)\n", bits);
 }
 
 
