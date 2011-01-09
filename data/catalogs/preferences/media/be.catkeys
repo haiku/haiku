@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Media	243366818
+1	belarusian	x-vnd.Haiku-Media	1588474509
 Show volume control on Deskbar	Media views		Усталяваць кіраванне гукам у Deskbar
 Audio input:	Media views		Гукавы ўваход:
 Restarting media services\nStarting media server…\n	Media Window		Запуск Медыя службаў наноў\nЗапуск Медыя Сервера…\n
@@ -11,7 +11,6 @@ Enable real-time audio	Media views		Задзейнічаць гук рэальн
 Quit	Media Window		Выйсці
 OK	Media Window		ОК
 Enabling real-time video allows system to perform video operations as fast and smoothly as possible.  It achieves optimum performance by using more RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Опцыя відэа рэальнага часу дазваляе сістэме карыстаць больш рэсурсаў цэнтральнага працэсара і аператыўнай памяці дзеля больш роўнага і мяккага выканання аперацый з відэаінфармацыяй.\n\nРэкамендуецца задзейнічаць гэтую магчымасць толькі ў самых неабходных выпадках.
-Default nodes	Media views		Прадвызначаныя вузлы
 Starting media server…	Media Window		Запускаецца медыясервер…
 Restart the media server to apply changes.	Media views		Перезапусціць медыясервер каб ужыць змены ў наладках.
 Done shutting down.	Media Window		Медыясервер спынены.
@@ -28,10 +27,13 @@ Ready for use…	Media Window		Гатовы да карыстання…
 Real-time	Media views		Рэальны час
 Restart media services	Media views		Перазапусціць медыясервер
 Enabling real-time audio allows system to record and play audio as fast as possible.  It achieves this performance by using more CPU and RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Опцыя гуку рэальнага часу дазваляе сістэме карыстаць больш рэсурсаў цэнтральнага працэсара і аператыўнай памяці дзеля больш роўнага і мяккага выканання аперацыяў з гукавай інфармацыяй.\n\nРэкамендуецца задзейнічаць гэтую магчымасьць толькі ў самых неабходных выпадках.
-Couldn't remove volume control in Deskbar: %s\n	Media Window		Немагчыма выдаліць кіраванне гукам з Deskbar : %s\n
-Couldn't add volume control in Deskbar: %s\n	Media Window		Немагчыма ўсталяваць кіраванне гукам у Deskbar: %s\n
 Media	Media Window		Медыя
 Channel:	Media views		Канал:
 Video settings	Media Window		Наладкі відэа
 Audio mixer	Media Window		Аўдыё мікшар
 <none>	Media views		<няма>
+Couldn't add volume control in Deskbar: %s\n	Media views		Не ўдалося дадаць элемент кіравання гучнасцю у Deskbar: %s\n
+OK	Media views		ОК
+Real-time audio is currently unimplemented in Haiku.	Media views		Аўдыё рэальнага часу пакуль не рэалізавана ў Haiku.
+Couldn't remove volume control in Deskbar: %s\n	Media views		Не ўдалося выдаліць элемент кіравання гучнасцю з Deskbar: %s\n
+Real-time video is currently unimplemented in Haiku.	Media views		Відэа рэальнага часу пакуль не рэалізавана ў Haiku.

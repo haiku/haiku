@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-DriveSetup	1943527736
+1	belarusian	x-vnd.Haiku-DriveSetup	2723551013
 Delete	MainWindow		Выдаліць
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Сапрўды жадаеце запісаць змены на дыск?\n\nУсе данные на абраным падзеле будуць беззваротна згублены!
 Rescan	MainWindow		Перасканіраваць
@@ -74,3 +74,4 @@ DriveSetup	MainWindow		Разметка Дыску
 Are you sure you want to initialize the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Сапраўды ініцыялізаваць падзел \"%s\"? У вас спытаюць яшчэ, перад тым як запісаць змены на дыск.
 Are you sure you want to initialize the partition? You will be asked again before changes are written to the disk.	MainWindow		Сапраўды ініцыялізаваць падзел? У вас спытаюць яшчэ, перад тым як запісаць змены на дыск.
 Parameters	PartitionList		Параметры
+Active	PartitionList		Актыўны
