@@ -1,0 +1,32 @@
+1	belarusian	x-vnd.Haiku-Magnify	1680541832
+no clip msg\n	In console, when clipboard is empty after clicking Copy image		буфер пусты
+Make square	Magnify-Main		Зрабіць квадратным
+Copy image	Magnify-Main		Капіяваць выяву
+Magnify help	Magnify-Help		Дапамога Magnify
+Magnify!\n\n©2002-2006 Haiku\n(C)1999 Be Inc.\n\nNow with even more features and recompiled for Haiku.	Magnify-Main		Magnify!\n\n©2002-2006 Haiku\n(C)1999 Be Inc.\n\nЦяпер яжчэ больш функцый і спецыяльна для Haiku.
+usage: magnify [size] (magnify size * size pixels)\n	Console		карыстанне: magnify [size] (павялічыць size * size пікселяў)\n
+Magnify	Magnify-Main		Magnify
+Stick coordinates	Magnify-Main		Прыляпіць каардынаты
+Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		Інфармацыя:\n 
+freeze - freezes/unfreezes magnification of whatever the\n    cursor is currently over\n	Magnify-Help		замарозіць - замарожвае/размарожвае павелічэнне вобласці, што\n зараз вакол курсора\n
+Hide/Show grid	Magnify-Main		Схаваць/Паказаць сетку
+magnify: size must be a multiple of 4\n	Console		magnify: памер павінен быць кратны 4\n
+Help…	Magnify-Main		Даведка...
+General:\n  32 x 32 - the top left numbers are the number of visible\n    pixels (width x height)\n  8 pixels/pixel - represents the number of pixels that are\n    used to magnify a pixel\n  R:152 G:52 B:10 -  the RGB values for the pixel under\n    the red square\n	Magnify-Help		Агульныя:\n 32 x32 - верхнія левыя лічбы - колькасць бачных\n пікселяў (шырыня x вышыня)\n 8 пікселяў на піксель - паказвае, колькі пікселяў\n выкарыстана, каб павялічыць адзін піксель\n R:152 G:52 B:10 - RGB значэнні пікселя пад чырвоным квадратам\n
+Sizing/Resizing:\n  make square - sets the width and the height to the larger\n    of the two making a square image\n  increase/decrease window size - grows or shrinks the window\n    size by 4 pixels.\n    note: this window can also be resized to any size via the\n      resizing region of the window\n  increase/decrease pixel size - increases or decreases the number\n    of pixels used to magnify a 'real' pixel. Range is 1 to 16.\n	Magnify-Help		Пазначэнне/Змяненне памеру:\n зрабіць квадратным - прызначае шырыню і вышыню па большаму з бакоў\n і стварае квадратную выяву\n павялічыць/паменшыць памер вакна - расцягвае або сціскае памер\n вакна на 4 пікселя.\n нататка:гэтае вакно таксама можна расцягнуць да любога памеру\n з дапамогай спецыяльнай вобласці ў вакне\n павялічыць/паменшыць памер пікселяў - павялічвае ці паменшвае\n колькасць пікселяў на рэальны піксель. Інтэрвал - з 1 да 16. \n
+Decrease pixel size	Magnify-Main		Паменшыць памер пікселяў
+%width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize пікселяў на піксель
+Info	Magnify-Main		Інфармацыя
+Remove a crosshair	Magnify-Main		Выдаліць перакрыжаванне
+About Magnify…	Magnify-Main		Пра Magnify…
+Freeze/Unfreeze image	Magnify-Main		Замарозіць/Размарозіць выяву
+Copy/Save:\n  copy - copies the current image to the clipboard\n  save - prompts the user for a file to save to and writes out\n    the bits of the image\n	Magnify-Help		Капіяванне/Захаванне:\n капіяваць - капіруе цякучую выяву у буфер\n захаваць - пытае у карыстача файл, у які захоўваць\n і запісвае туды выяву\n
+OK	Magnify-Main		ОК
+Hide/Show info	Magnify-Main		Схаваць/Паказаць інфармацыю
+Navigation:\n  arrow keys - move the current selection (rgb indicator or crosshair)\n    around 1 pixel at a time\n  option-arrow key - moves the mouse location 1 pixel at a time\n  x marks the selection - the current selection has an 'x' in it\n	Magnify-Help		Навігацыя:\n стрэлкі - перамясціць цякучае выдзяленне (індыкатар RGB або перакрыжаванне)\n на 1 піксель за раз\nапцыянальныя стрэлкі - перамяшчае курсор на 1 піксель за раз\n x пазначае выдяленне - цякучае выдзяленне мае 'x'\n
+Save image	Magnify-Main		Захаваць выяву
+Increase window size	Magnify-Main		Павялічыць памер вакна
+Decrease window size	Magnify-Main		Паменшыць памер вакна
+Increase pixel size	Magnify-Main		Павялічыць памер пікселяў
+size must be > 4 and a multiple of 4\n	Console		памер павінен быць больш за 4 і кратны 4\n
+Add a crosshair	Magnify-Main		Дадаць перакрыжаванне

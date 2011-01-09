@@ -14,7 +14,6 @@ Preferred application	FileType Window		Пажаданая праграма
 Version:	Application Type Window		Версія:
 Select preferred application	FileType Window		Вылучыць пажаданую праграму
 The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Праграма \"%s\" не падтрымлівае працу з гэтым тыпам файлаў.\nУсё роўна прызначыць яе пажаданай?
-Type:	Attribute Window		Тып:
 Set Preferred Application	Preferred App Menu		Прызначыць Пажаданую Праграму
 Add new group	New File Type Window		Дадаць новую групу
 Cancel	Application Type Window		Скасаваць
@@ -132,3 +131,4 @@ Add…	Application Type Window		Дадаць…
 Signature:	Application Type Window		Подпіс:
 Quit, don't save	Application Type Window		Выйсьці, не захоўваць
 Supported types	Application Type Window		Падтрымліваемыя тыпы
+Type:	Attribute Window		Тып:

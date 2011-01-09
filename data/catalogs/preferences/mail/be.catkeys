@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Mail	1416961282
+1	belarusian	x-vnd.Haiku-Mail	404309185
 Select account type	Config Views		Выбраць тып акаунту
 Mail checking	Config Window		Праверка пошты
 Settings	Config Window		Наладкі
@@ -46,3 +46,29 @@ Always	Config Window		Заўсёды
 Add filter	Config Views		Дадаць фільтр
 Outgoing mail filters	Config Views		Фільтры выходнай пошты
 \n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nСтварыце акаунт з дапамогай кнопкі Дадаць.\n\nВыдаліце акаунт кнопкай Выдаліць.\n\nВыберыце элемент у спісе, каб змяніць яго параметры.
+Inbound	E-Mail		Уваходныя
+Server Name:	E-Mail		Імя сервера:
+OK	Config Window		ОК
+E-mail address:	E-Mail		Адрас E-mail
+Account name:	E-Mail		Імя акаунта:
+Account Type:	E-Mail		Тып акаунта:
+Beta	Config Window		Бета
+Login name:	E-Mail		Імя карыстача:
+Password:	E-Mail		Пароль:
+E-mail	Config Views		E-mail
+Send mail only	E-Mail		Толькі адпраўляць пошту
+Alpha	Config Window		Альфа
+Send and receive mail	E-Mail		Адпрашляць і прымаць пошту
+Golden master	Config Window		Залаты
+Final	Config Window		Фінальная
+failed to open '%s' to read nameservers: %s\n	E-Mail		не ўдалося адкрыць '%s', каб прачытаць серверы імёнаў: %s\n
+Receive mail only	E-Mail		Толькі прымаць пошту
+Choose Protocol	Config Views		Выбраць пратакол
+Choose Protocol	E-Mail		Выбраць пратакол
+Outbound	E-Mail		Выходныя
+Gamma	Config Window		Гамма
+Real name:	E-Mail		Рэальнае імя:
+E-mail	Config Window		E-mail
+Mail Daemon Replacement\n\nby Haiku, Inc. All rights reserved.\n\nVersion %ld.%ld.%ld %s\n\nSee LICENSE file included in the installation package for more information.\n\n\n\nYou can contact us at:\n%s\n\nPlease submit bug reports using the %s\n\nProject homepage at:\n%s	Config Window		Mail Daemon Replacement\n\nby Haiku, Inc. All rights reserved.\n\nVersion %ld.%ld.%ld %s\n\nSee LICENSE file included in the installation package for more information.\n\n\n\nYou can contact us at:\n%s\n\nPlease submit bug reports using the %s\n\nProject homepage at:\n%s
+Development	Config Window		Распрацоўка
+Error	Config Window		Памылка
