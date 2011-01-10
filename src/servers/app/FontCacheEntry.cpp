@@ -43,6 +43,32 @@ BLocker FontCacheEntry::sUsageUpdateLock("FontCacheEntry usage lock");
 
 
 class FontCacheEntry::GlyphCachePool {
+	// This class needs to be defined before any inline functions, as otherwise
+	// gcc2 will barf in debug mode.
+	struct GlyphHashTableDefinition {
+		typedef uint32		KeyType;
+		typedef	GlyphCache	ValueType;
+
+		size_t HashKey(uint32 key) const
+		{
+			return key;
+		}
+
+		size_t Hash(GlyphCache* value) const
+		{
+			return value->glyph_index;
+		}
+
+		bool Compare(uint32 key, GlyphCache* value) const
+		{
+			return value->glyph_index == key;
+		}
+
+		GlyphCache*& GetLink(GlyphCache* value) const
+		{
+			return value->hash_link;
+		}
+	};
 public:
 	GlyphCachePool()
 	{
@@ -92,31 +118,6 @@ public:
 	}
 
 private:
-	struct GlyphHashTableDefinition {
-		typedef uint32		KeyType;
-		typedef	GlyphCache	ValueType;
-
-		size_t HashKey(uint32 key) const
-		{
-			return key;
-		}
-
-		size_t Hash(GlyphCache* value) const
-		{
-			return value->glyph_index;
-		}
-
-		bool Compare(uint32 key, GlyphCache* value) const
-		{
-			return value->glyph_index == key;
-		}
-
-		GlyphCache*& GetLink(GlyphCache* value) const
-		{
-			return value->hash_link;
-		}
-	};
-
 	typedef BOpenHashTable<GlyphHashTableDefinition> GlyphTable;
 
 	GlyphTable	fGlyphTable;
