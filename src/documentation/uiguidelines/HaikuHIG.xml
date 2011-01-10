@@ -77,7 +77,7 @@
 
 <para>Good software works a certain way because it is the best way to be done or close to it, not because the code was written in a certain way or because it was dictated by an underlying API. An example of this would be if a music composition program has an easily-reached maximum song size because the code monkey who wrote it used a 16-bit variable instead of a 32-bit one. While there are sometimes limitations that cannot be overcome, the actual code written and the architecture used when it was written should have as little effect as possible on what the user sees and works with when using your software.</para>
 </sect1>
- 
+
 <sect1>
 <title>Good Software Uses Graphical Controls Properly</title>
 
@@ -86,7 +86,7 @@
 
 <sect1>
 <title>Good Software has a Natural Layout to its Controls</title>
-	
+
 <para>Some tasks have a natural, logical workflow, and good programs are designed in a way that capitalizes on this workflow. When entering an address in the United States, the natural order is Name, Street and Number, City, State, and Zip Code. Following any other order would both frustrate the user and also lead to more mistakes in entering data. This also applies to the Tab navigation order of controls in a window. Generally speaking, this order should either be left-to-right, top-to-bottom or in a counter-clockwise circle, depending on how the controls themselves are placed and the expectations associated with the work to be done.</para>
 </sect1>
 
@@ -101,7 +101,7 @@
 
 <sect1>
 <title>Good Software Makes Errors Hard</title>
-	 
+
 <para>It has been said that nothing can be made foolproof because fools are so ingenious. Even so, make it tough for the user to make a mistake. If, for example, the user needs to enter in some text and certain characters are not allowed, then disable those characters for the text box it needs to be entered in instead of nagging the user with a message box. If resizing a window horizontally should not be done for some reason, don't let the user do it. Does your program require a selection from a list before the user clicks OK? Tell the user that -- nicely, of course -- and then disable the OK button until a selection is made. An even better solution would be to select a good default choice for the user and give him the option to change it. Build constraints into your application which prevent errors. This would be why 3.5" floppy disks have a notch in one side -- it can be inserted into a drive only one way. Constraints are also good for lazy developers because then their software crashes less and they don't need to write as much error-handling code.</para>
 </sect1>
 
@@ -128,7 +128,7 @@
 </chapter>
 
 <chapter id="chapter3">
-<title>Conventions of the Haiku Operating System</title>
+<title>Conventions of Haiku</title>
 
 <para>Just as a person generally doesn't go barging into a stranger's home and start redecorating and otherwise making himself at home merely because the owner does not own a shotgun, your program needs to have good manners in getting along with both the operating system and the other programs the user has installed on the system. Some of these are merely good coding practices meant to make your job easier and others are for ensuring that your program can be more easily maintained. None of them are difficult or much work, so there. Now you have no choice but to follow them. :D</para>
 
@@ -389,7 +389,7 @@ There are other possible ways, but these should be enough for you to get the ide
 	<seglistitem><seg>B_RAW_TYPE</seg><seg>_data</seg><seg>The raw image data</seg></seglistitem>
 	<seglistitem><seg>B_POINT_TYPE</seg><seg>be:location</seg><seg>The location from which the image data was copied. May be ignored.</seg>	</seglistitem>
 	</segmentedlist>
-	
+
 	</para>
 	</listitem>
 </varlistentry>
@@ -649,7 +649,7 @@ Choose Font and Size...
 <varlistentry><term>About &lt;app name here&gt;...  </term><listitem><para>Shows the About window. This is not a commonly-accessed item, so do not provide a keyboard shortcut for it.</para></listitem></varlistentry>
 
 <varlistentry><term>Options... (Command - ,) </term><listitem><para>Show the window which is used to customize options for your program. This can be a submenu if your program only has a couple of options.</para></listitem></varlistentry>
-	
+
 <varlistentry><term>Quit (Command + Q) </term><listitem><para>This should be the bottom item in the menu and a separator should go above it. Clicking on this item should close all windows and quit the program.</para></listitem></varlistentry>
 </variablelist>
 
