@@ -86,10 +86,14 @@ typedef struct
 
 static const Translation gTranslations[] =
 {
+	{ "ar",
+		"Khaled Berraoui (khallebal)\n"
+	},
 	{ "be",
 		"Michael Bulash\n"
 	},
 	{ "bg",
+		"Ognyan Valeri Angelov\n"
 		"cssvb94\n"
 	},
 	{ "cs",
@@ -128,6 +132,9 @@ static const Translation gTranslations[] =
 		"Jayneil Dalal\n"
 		"Atharva Lath\n"
 	},
+	{ "hr",
+		"zvacet\n"
+	},
 	{ "hu",
 		"Zoltán Mizsei (miqlas)\n"
 		"Zoltán Szabó (Bird)\n"
@@ -138,6 +145,7 @@ static const Translation gTranslations[] =
 		"Francesco Franchina\n"
 		"Lorenzo Frezza\n"
 		"Mometto Nicola\n"
+		"Michael Peppers\n"
 	},
 	{ "ja",
 		"Satoshi Eguchi\n"
@@ -165,6 +173,10 @@ static const Translation gTranslations[] =
 		"Vasco Costa (gluon)\n"
 		"Michael Vinícius de Oliveira (michaelvo)\n"
 	},
+	{ "ro",
+		"Victor Carbune\n"
+		"Florentina Mușat\n"
+	},
 	{ "ru",
 		"Tatyana Fursic (iceid)\n"
 		"StoroZ Gneva\n"
@@ -176,6 +188,7 @@ static const Translation gTranslations[] =
 	},
 	{ "es",
 		"Pedro Arregui\n"
+		"Zola Bridges\n"
 		"Nicolás C (CapitanPico)\n"
 		"Oscar Carballal (oscarcp)\n"
 		"Miguel Zúñiga González (miguel~1.mx)\n"
@@ -188,8 +201,12 @@ static const Translation gTranslations[] =
 		"Jimmy Olsson (phalax)\n"
 		"Victor Widell\n"
 	},
+	{ "tr",
+		"Aras Ergus\n"
+	},
 	{ "uk",
 		"Alex Rudyk (totish)\n"
+		"Oleg Varunok\n"
 	},
 	{ "zh",
 		"Pengfei Han (kurain)\n"
