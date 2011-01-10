@@ -12,5 +12,5 @@ Application OverlayImage :
 DoCatalogs OverlayImage :
 	x-vnd.Haiku-OverlayImage
 	:
-	OverlayWindow.cpp
+	OverlayView.cpp
 ;
