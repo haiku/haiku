@@ -313,6 +313,9 @@ DrivesPage::_SelectedDriveItem()
 void
 DrivesPage::_UpdateWizardButtons(DriveItem* item)
 {
+	if (item == NULL)
+		return;
+
 	fWizardView->SetPreviousButtonEnabled(
 		item->CanBeInstalled() && item->IsInstalled());
 	fWizardView->SetNextButtonEnabled(item->CanBeInstalled());
