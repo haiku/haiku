@@ -93,7 +93,7 @@ arch_thread_init(struct kernel_args *args)
 
 
 static struct iframe *
-find_previous_iframe(struct thread *thread, addr_t frame)
+find_previous_iframe(Thread *thread, addr_t frame)
 {
 	// iterate backwards through the stack frames, until we hit an iframe
 	while (frame >= thread->kernel_stack_base
@@ -161,7 +161,7 @@ i386_get_user_iframe(void)
 	The thread must not be running and the threads spinlock must be held.
 */
 struct iframe *
-i386_get_thread_user_iframe(struct thread *thread)
+i386_get_thread_user_iframe(Thread *thread)
 {
 	if (thread->state == B_THREAD_RUNNING)
 		return NULL;
@@ -190,7 +190,7 @@ i386_get_current_iframe(void)
 
 
 uint32
-x86_next_page_directory(struct thread *from, struct thread *to)
+x86_next_page_directory(Thread *from, Thread *to)
 {
 	VMAddressSpace* toAddressSpace = to->team->address_space;
 	if (from->team->address_space == toAddressSpace) {
@@ -214,7 +214,7 @@ set_fs_register(uint32 segment)
 
 
 static void
-set_tls_context(struct thread *thread)
+set_tls_context(Thread *thread)
 {
 	int entry = smp_get_current_cpu() + TLS_BASE_SEGMENT;
 
@@ -226,7 +226,7 @@ set_tls_context(struct thread *thread)
 void
 x86_restart_syscall(struct iframe* frame)
 {
-	struct thread* thread = thread_get_current_thread();
+	Thread* thread = thread_get_current_thread();
 
 	atomic_and(&thread->flags, ~THREAD_FLAGS_RESTART_SYSCALL);
 	atomic_or(&thread->flags, THREAD_FLAGS_SYSCALL_RESTARTED);
@@ -242,7 +242,7 @@ x86_restart_syscall(struct iframe* frame)
 
 
 static uint32 *
-get_signal_stack(struct thread *thread, struct iframe *frame, int signal)
+get_signal_stack(Thread *thread, struct iframe *frame, int signal)
 {
 	// use the alternate signal stack if we should and can
 	if (thread->signal_stack_enabled
@@ -262,14 +262,14 @@ get_signal_stack(struct thread *thread, struct iframe *frame, int signal)
 
 
 status_t
-arch_team_init_team_struct(struct team *p, bool kernel)
+arch_team_init_team_struct(Team *p, bool kernel)
 {
 	return B_OK;
 }
 
 
 status_t
-arch_thread_init_thread_struct(struct thread *thread)
+arch_thread_init_thread_struct(Thread *thread)
 {
 	// set up an initial state (stack & fpu)
 	memcpy(&thread->arch_info, &sInitialState, sizeof(struct arch_thread));
@@ -278,7 +278,7 @@ arch_thread_init_thread_struct(struct thread *thread)
 
 
 status_t
-arch_thread_init_kthread_stack(struct thread *t, int (*start_func)(void),
+arch_thread_init_kthread_stack(Thread *t, int (*start_func)(void),
 	void (*entry_func)(void), void (*exit_func)(void))
 {
 	addr_t *kstack = (addr_t *)t->kernel_stack_base;
@@ -338,7 +338,7 @@ arch_thread_init_kthread_stack(struct thread *t, int (*start_func)(void),
  */
 
 status_t
-arch_thread_init_tls(struct thread *thread)
+arch_thread_init_tls(Thread *thread)
 {
 	uint32 tls[TLS_USER_THREAD_SLOT + 1];
 
@@ -356,7 +356,7 @@ arch_thread_init_tls(struct thread *thread)
 
 
 void
-arch_thread_context_switch(struct thread *from, struct thread *to)
+arch_thread_context_switch(Thread *from, Thread *to)
 {
 	i386_set_tss_and_kstack(to->kernel_stack_top);
 	x86_set_syscall_stack(to->kernel_stack_top);
@@ -415,7 +415,7 @@ arch_thread_dump_info(void *info)
  */
 
 status_t
-arch_thread_enter_userspace(struct thread *t, addr_t entry, void *args1,
+arch_thread_enter_userspace(Thread *t, addr_t entry, void *args1,
 	void *args2)
 {
 	addr_t stackTop = t->user_stack_base + t->user_stack_size;
@@ -462,7 +462,7 @@ arch_thread_enter_userspace(struct thread *t, addr_t entry, void *args1,
 
 
 bool
-arch_on_signal_stack(struct thread *thread)
+arch_on_signal_stack(Thread *thread)
 {
 	struct iframe *frame = get_current_iframe();
 
@@ -473,7 +473,7 @@ arch_on_signal_stack(struct thread *thread)
 
 
 status_t
-arch_setup_signal_frame(struct thread *thread, struct sigaction *action,
+arch_setup_signal_frame(Thread *thread, struct sigaction *action,
 	int signal, int signalMask)
 {
 	struct iframe *frame = get_current_iframe();
@@ -559,7 +559,7 @@ arch_setup_signal_frame(struct thread *thread, struct sigaction *action,
 int64
 arch_restore_signal_frame(void)
 {
-	struct thread *thread = thread_get_current_thread();
+	Thread *thread = thread_get_current_thread();
 	struct iframe *frame = get_current_iframe();
 	int32 signalMask;
 	uint32 *userStack;
@@ -648,7 +648,7 @@ arch_store_fork_frame(struct arch_fork_arg *arg)
 void
 arch_restore_fork_frame(struct arch_fork_arg *arg)
 {
-	struct thread *thread = thread_get_current_thread();
+	Thread *thread = thread_get_current_thread();
 
 	disable_interrupts();
 
@@ -664,6 +664,6 @@ arch_restore_fork_frame(struct arch_fork_arg *arg)
 void
 arch_syscall_64_bit_return_value(void)
 {
-	struct thread* thread = thread_get_current_thread();
+	Thread* thread = thread_get_current_thread();
 	atomic_or(&thread->flags, THREAD_FLAGS_64_BIT_SYSCALL_RETURN);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -27,7 +27,7 @@
 
 
 static bool
-is_privileged(struct team* team)
+is_privileged(Team* team)
 {
 	// currently only the root user is privileged
 	return team->effective_uid == 0;
@@ -37,7 +37,7 @@ is_privileged(struct team* team)
 static status_t
 common_setregid(gid_t rgid, gid_t egid, bool setAllIfPrivileged, bool kernel)
 {
-	struct team* team = thread_get_current_thread()->team;
+	Team* team = thread_get_current_thread()->team;
 
 	InterruptsSpinLocker _(gTeamSpinlock);
 
@@ -100,7 +100,7 @@ common_setregid(gid_t rgid, gid_t egid, bool setAllIfPrivileged, bool kernel)
 static status_t
 common_setreuid(uid_t ruid, uid_t euid, bool setAllIfPrivileged, bool kernel)
 {
-	struct team* team = thread_get_current_thread()->team;
+	Team* team = thread_get_current_thread()->team;
 
 	InterruptsSpinLocker _(gTeamSpinlock);
 
@@ -163,7 +163,7 @@ common_setreuid(uid_t ruid, uid_t euid, bool setAllIfPrivileged, bool kernel)
 ssize_t
 common_getgroups(int groupCount, gid_t* groupList, bool kernel)
 {
-	struct team* team = thread_get_current_thread()->team;
+	Team* team = thread_get_current_thread()->team;
 
 	InterruptsSpinLocker _(gTeamSpinlock);
 
@@ -225,7 +225,7 @@ common_setgroups(int groupCount, const gid_t* groupList, bool kernel)
 
 	InterruptsSpinLocker locker(gTeamSpinlock);
 
-	struct team* team = thread_get_current_thread()->team;
+	Team* team = thread_get_current_thread()->team;
 
 	gid_t* toFree = team->supplementary_groups;
 	team->supplementary_groups = newGroups;
@@ -243,7 +243,7 @@ common_setgroups(int groupCount, const gid_t* groupList, bool kernel)
 
 
 void
-inherit_parent_user_and_group_locked(struct team* team, struct team* parent)
+inherit_parent_user_and_group_locked(Team* team, Team* parent)
 {
 	team->saved_set_uid = parent->saved_set_uid;
 	team->real_uid = parent->real_uid;
@@ -259,7 +259,7 @@ inherit_parent_user_and_group_locked(struct team* team, struct team* parent)
 
 
 void
-inherit_parent_user_and_group(struct team* team, struct team* parent)
+inherit_parent_user_and_group(Team* team, Team* parent)
 {
 	InterruptsSpinLocker _(gTeamSpinlock);
 	inherit_parent_user_and_group_locked(team, parent);
@@ -267,7 +267,7 @@ inherit_parent_user_and_group(struct team* team, struct team* parent)
 
 
 status_t
-update_set_id_user_and_group(struct team* team, const char* file)
+update_set_id_user_and_group(Team* team, const char* file)
 {
 	struct stat st;
 	status_t status = vfs_read_stat(-1, file, true, &st, false);
@@ -293,7 +293,7 @@ update_set_id_user_and_group(struct team* team, const char* file)
 gid_t
 _kern_getgid(bool effective)
 {
-	struct team* team = thread_get_current_thread()->team;
+	Team* team = thread_get_current_thread()->team;
 
 	return effective ? team->effective_gid : team->real_gid;
 }
@@ -302,7 +302,7 @@ _kern_getgid(bool effective)
 uid_t
 _kern_getuid(bool effective)
 {
-	struct team* team = thread_get_current_thread()->team;
+	Team* team = thread_get_current_thread()->team;
 
 	return effective ? team->effective_uid : team->real_uid;
 }
@@ -342,7 +342,7 @@ _kern_setgroups(int groupCount, const gid_t* groupList)
 gid_t
 _user_getgid(bool effective)
 {
-	struct team* team = thread_get_current_thread()->team;
+	Team* team = thread_get_current_thread()->team;
 
 	return effective ? team->effective_gid : team->real_gid;
 }
@@ -351,7 +351,7 @@ _user_getgid(bool effective)
 uid_t
 _user_getuid(bool effective)
 {
-	struct team* team = thread_get_current_thread()->team;
+	Team* team = thread_get_current_thread()->team;
 
 	return effective ? team->effective_uid : team->real_uid;
 }

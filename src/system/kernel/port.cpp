@@ -592,7 +592,7 @@ uninit_port_locked(struct port_entry& port)
 /*! This function delets all the ports that are owned by the passed team.
 */
 void
-delete_owned_ports(struct team* team)
+delete_owned_ports(Team* team)
 {
 	TRACE(("delete_owned_ports(owner = %ld)\n", team->id));
 
@@ -727,7 +727,7 @@ create_port(int32 queueLength, const char* name)
 	if (queueLength < 1 || queueLength > MAX_QUEUE_LENGTH)
 		return B_BAD_VALUE;
 
-	struct team* team = thread_get_current_thread()->team;
+	Team* team = thread_get_current_thread()->team;
 	if (team == NULL)
 		return B_BAD_TEAM_ID;
 
@@ -1405,7 +1405,7 @@ set_port_owner(port_id id, team_id newTeamID)
 
 	InterruptsSpinLocker teamLocker(gTeamSpinlock);
 
-	struct team* team = team_get_team_struct_locked(newTeamID);
+	Team* team = team_get_team_struct_locked(newTeamID);
 	if (team == NULL) {
 		T(OwnerChange(sPorts[slot], newTeamID, B_BAD_TEAM_ID));
 		return B_BAD_TEAM_ID;

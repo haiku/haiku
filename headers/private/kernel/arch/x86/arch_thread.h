@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2009, The Haiku Team. All rights reserved.
+ * Copyright 2002-2011, The Haiku Team. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2002, Travis Geiselbrecht. All rights reserved.
@@ -18,9 +18,9 @@ extern "C" {
 
 struct iframe *i386_get_user_iframe(void);
 struct iframe *i386_get_current_iframe(void);
-struct iframe *i386_get_thread_user_iframe(struct thread *thread);
+struct iframe *i386_get_thread_user_iframe(Thread *thread);
 
-uint32 x86_next_page_directory(struct thread *from, struct thread *to);
+uint32 x86_next_page_directory(Thread *from, Thread *to);
 
 void x86_restart_syscall(struct iframe* frame);
 
@@ -33,16 +33,16 @@ void arch_syscall_64_bit_return_value(void);
 
 
 static
-inline struct thread *
+inline Thread *
 arch_thread_get_current_thread(void)
 {
-	struct thread *t;
+	Thread *t;
 	read_dr3(t);
 	return t;
 }
 
 static inline void
-arch_thread_set_current_thread(struct thread *t)
+arch_thread_set_current_thread(Thread *t)
 {
 	write_dr3(t);
 }

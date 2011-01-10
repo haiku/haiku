@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2001-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -4386,7 +4386,7 @@ Volume::_SendRequest(RequestPort* port, RequestAllocator* allocator,
 	// fill in the caller info
 	KernelRequest* request = static_cast<KernelRequest*>(
 		allocator->GetRequest());
-	struct thread* thread = thread_get_current_thread();
+	Thread* thread = thread_get_current_thread();
 	request->team = thread->team->id;
 	request->thread = thread->id;
 	request->user = geteuid();

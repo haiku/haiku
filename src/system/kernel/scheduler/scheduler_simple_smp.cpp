@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002, Angelo Mottola, a.mottola@libero.it.
  * Distributed under the terms of the MIT License.
@@ -41,7 +41,7 @@ const bigtime_t kThreadQuantum = 3000;
 
 
 // The run queue. Holds the threads ready to run ordered by priority.
-static struct thread *sRunQueue = NULL;
+static Thread *sRunQueue = NULL;
 static int32 sCPUCount = 1;
 static int32 sNextCPUForSelection = 0;
 
@@ -62,7 +62,7 @@ _rand(void)
 static int
 dump_run_queue(int argc, char **argv)
 {
-	struct thread *thread;
+	Thread *thread;
 
 	thread = sRunQueue;
 	if (!thread)
@@ -81,7 +81,7 @@ dump_run_queue(int argc, char **argv)
 
 
 static int32
-select_cpu(int32 currentCPU, struct thread* thread, int32& targetPriority)
+select_cpu(int32 currentCPU, Thread* thread, int32& targetPriority)
 {
 	if (thread->pinned_to_cpu > 0) {
 		// the thread is pinned to a specific CPU
@@ -124,11 +124,11 @@ select_cpu(int32 currentCPU, struct thread* thread, int32& targetPriority)
 	Note: thread lock must be held when entering this function
 */
 static void
-enqueue_in_run_queue(struct thread *thread)
+enqueue_in_run_queue(Thread *thread)
 {
 	thread->state = thread->next_state = B_THREAD_READY;
 
-	struct thread *curr, *prev;
+	Thread *curr, *prev;
 	for (curr = sRunQueue, prev = NULL; curr
 			&& curr->priority >= thread->next_priority;
 			curr = curr->queue_next) {
@@ -185,7 +185,7 @@ enqueue_in_run_queue(struct thread *thread)
 	Note: thread lock must be held when entering this function
 */
 static void
-set_thread_priority(struct thread *thread, int32 priority)
+set_thread_priority(Thread *thread, int32 priority)
 {
 	if (priority == thread->priority)
 		return;
@@ -205,7 +205,7 @@ set_thread_priority(struct thread *thread, int32 priority)
 		thread);
 
 	// find thread in run queue
-	struct thread *item, *prev;
+	Thread *item, *prev;
 	for (item = sRunQueue, prev = NULL; item && item != thread;
 			item = item->queue_next) {
 		if (prev)
@@ -229,7 +229,7 @@ set_thread_priority(struct thread *thread, int32 priority)
 
 
 static bigtime_t
-estimate_max_scheduling_latency(struct thread* thread)
+estimate_max_scheduling_latency(Thread* thread)
 {
 	// TODO: This is probably meant to be called periodically to return the
 	// current estimate depending on the system usage; we return fixed estimates
@@ -245,7 +245,7 @@ estimate_max_scheduling_latency(struct thread* thread)
 
 
 static void
-context_switch(struct thread *fromThread, struct thread *toThread)
+context_switch(Thread *fromThread, Thread *toThread)
 {
 	if ((fromThread->flags & THREAD_FLAGS_DEBUGGER_INSTALLED) != 0)
 		user_debug_thread_unscheduled(fromThread);
@@ -284,8 +284,8 @@ reschedule_event(timer *unused)
 static void
 reschedule(void)
 {
-	struct thread *oldThread = thread_get_current_thread();
-	struct thread *nextThread, *prevThread;
+	Thread *oldThread = thread_get_current_thread();
+	Thread *nextThread, *prevThread;
 
 	// check whether we're only supposed to reschedule, if the current thread
 	// is idle
@@ -362,8 +362,8 @@ reschedule(void)
 					break;
 
 				// find next thread with lower priority
-				struct thread *lowerNextThread = nextThread->queue_next;
-				struct thread *lowerPrevThread = nextThread;
+				Thread *lowerNextThread = nextThread->queue_next;
+				Thread *lowerPrevThread = nextThread;
 				int32 priority = nextThread->priority;
 
 				while (lowerNextThread != NULL
@@ -457,21 +457,21 @@ reschedule(void)
 
 
 static void
-on_thread_create(struct thread* thread)
+on_thread_create(Thread* thread)
 {
 	// do nothing
 }
 
 
 static void
-on_thread_init(struct thread* thread)
+on_thread_init(Thread* thread)
 {
 	// do nothing
 }
 
 
 static void
-on_thread_destroy(struct thread* thread)
+on_thread_destroy(Thread* thread)
 {
 	// do nothing
 }

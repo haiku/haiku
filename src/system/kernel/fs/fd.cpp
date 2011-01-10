@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
@@ -477,7 +477,7 @@ dup_foreign_fd(team_id fromTeam, int fd, bool kernel)
 {
 	// get the I/O context for the team in question
 	InterruptsSpinLocker teamsLocker(gTeamSpinlock);
-	struct team* team = team_get_team_struct_locked(fromTeam);
+	Team* team = team_get_team_struct_locked(fromTeam);
 	if (team == NULL)
 		return B_BAD_TEAM_ID;
 

@@ -10,7 +10,9 @@
 
 #include <TypeConstants.h>
 
-#include <debug.h>
+#ifdef _KERNEL_MODE
+#	include <debug.h>
+#endif
 
 #include "demangle.h"
 

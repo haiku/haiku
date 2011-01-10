@@ -13,6 +13,8 @@
 
 #include <string.h>
 
+#include <algorithm>
+
 
 /** put request back in queue because of device/bus overflow */
 
@@ -177,7 +179,7 @@ finish_autosense(scsi_device_info *device)
 		int sense_len;
 
 		// we got sense data -> copy it to sense buffer
-		sense_len = min(SCSI_MAX_SENSE_SIZE,
+		sense_len = std::min((uint32)SCSI_MAX_SENSE_SIZE,
 			request->data_length - request->data_resid);
 
 		SHOW_FLOW(3, "Got sense: %d bytes", sense_len);

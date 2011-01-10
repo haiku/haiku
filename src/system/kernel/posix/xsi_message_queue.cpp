@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Haiku Inc. All rights reserved.
+ * Copyright 2008-2011, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -35,7 +35,7 @@
 
 // Queue for holding blocked threads
 struct queued_thread : DoublyLinkedListLinkImpl<queued_thread> {
-	queued_thread(struct thread *_thread, int32 _message_length)
+	queued_thread(Thread *_thread, int32 _message_length)
 		:
 		thread(_thread),
 		message_length(_message_length),
@@ -43,9 +43,9 @@ struct queued_thread : DoublyLinkedListLinkImpl<queued_thread> {
 	{
 	}
 
-	struct thread	*thread;
-	int32			message_length;
-	bool			queued;
+	Thread	*thread;
+	int32	message_length;
+	bool	queued;
 };
 
 typedef DoublyLinkedList<queued_thread> ThreadQueue;
@@ -119,7 +119,7 @@ public:
 	// Implemented after sXsiMessageCount is declared
 	~XsiMessageQueue();
 
-	status_t BlockAndUnlock(struct thread *thread, MutexLocker *queueLocker)
+	status_t BlockAndUnlock(Thread *thread, MutexLocker *queueLocker)
 	{
 		thread_prepare_to_block(thread, B_CAN_INTERRUPT,
 				THREAD_BLOCK_TYPE_OTHER, (void*)"xsi message queue");
@@ -758,7 +758,7 @@ _user_xsi_msgrcv(int messageQueueID, void *messagePointer,
 
 		if (message == NULL && !(messageFlags & IPC_NOWAIT)) {
 			// We are going to sleep
-			struct thread *thread = thread_get_current_thread();
+			Thread *thread = thread_get_current_thread();
 			queued_thread queueEntry(thread, messageSize);
 			messageQueue->Enqueue(&queueEntry, /* waitForMessage */ true);
 
@@ -865,7 +865,7 @@ _user_xsi_msgsnd(int messageQueueID, const void *messagePointer,
 
 		if (goToSleep && !(messageFlags & IPC_NOWAIT)) {
 			// We are going to sleep
-			struct thread *thread = thread_get_current_thread();
+			Thread *thread = thread_get_current_thread();
 			queued_thread queueEntry(thread, messageSize);
 			messageQueue->Enqueue(&queueEntry, /* waitForMessage */ false);
 

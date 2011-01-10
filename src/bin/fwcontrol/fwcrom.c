@@ -1,7 +1,7 @@
 /*-
  * Copyright (c) 2002-2003
  * 	Hidetoshi Shimokawa. All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -18,7 +18,7 @@
  * 4. Neither the name of the author nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -430,7 +430,7 @@ crom_add_entry(struct crom_chunk *chunk, int key, int val)
 		struct csrreg reg;
 		uint32_t i;
 	} foo;
-	
+
 	foo.reg.key = key;
 	foo.reg.val = val;
 	return (crom_add_quad(chunk, foo.i));
@@ -460,7 +460,7 @@ crom_add_chunk(struct crom_src *src, struct crom_chunk *parent,
 #define MAX_TEXT ((CROM_MAX_CHUNK_LEN + 1) * 4 - sizeof(struct csrtext))
 int
 crom_add_simple_text(struct crom_src *src, struct crom_chunk *parent,
-				struct crom_chunk *chunk, char *buf)
+				struct crom_chunk *chunk, const char *buf)
 {
 	struct csrtext *tl;
 	uint32_t *p;

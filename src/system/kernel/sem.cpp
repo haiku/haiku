@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -57,7 +57,7 @@
 
 
 struct queued_thread : DoublyLinkedListLinkImpl<queued_thread> {
-	queued_thread(struct thread *thread, int32 count)
+	queued_thread(Thread *thread, int32 count)
 		:
 		thread(thread),
 		count(count),
@@ -65,9 +65,9 @@ struct queued_thread : DoublyLinkedListLinkImpl<queued_thread> {
 	{
 	}
 
-	struct thread	*thread;
-	int32			count;
-	bool			queued;
+	Thread	*thread;
+	int32	count;
+	bool	queued;
 };
 
 typedef DoublyLinkedList<queued_thread> ThreadQueue;
@@ -82,7 +82,7 @@ struct sem_entry {
 									// count + acquisition count of all blocked
 									// threads
 			char*				name;
-			struct team*		owner;
+			Team*				owner;
 			select_info*		select_infos;
 			thread_id			last_acquirer;
 #if DEBUG_SEM_LAST_ACQUIRER
@@ -488,7 +488,7 @@ create_sem_etc(int32 count, const char* name, team_id owner)
 
 	strlcpy(tempName, name, nameLength);
 
-	struct team* team = NULL;
+	Team* team = NULL;
 	if (owner == team_get_kernel_team_id())
 		team = team_get_kernel_team();
 	else if (owner == team_get_current_team_id())
@@ -700,7 +700,7 @@ remove_thread_from_sem(queued_thread *entry, struct sem_entry *sem)
 /*!	This function deletes all semaphores belonging to a particular team.
 */
 void
-sem_delete_owned_sems(struct team* team)
+sem_delete_owned_sems(Team* team)
 {
 	struct list queue;
 
@@ -839,7 +839,7 @@ switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
 
 	if ((sSems[slot].u.used.count -= count) < 0) {
 		// we need to block
-		struct thread *thread = thread_get_current_thread();
+		Thread *thread = thread_get_current_thread();
 
 		TRACE(("switch_sem_etc(id = %ld): block name = %s, thread = %p,"
 			" name = %s\n", id, sSems[slot].u.used.name, thread, thread->name));
@@ -1125,7 +1125,7 @@ _get_next_sem_info(team_id teamID, int32 *_cookie, struct sem_info *info,
 
 	InterruptsSpinLocker locker(gTeamSpinlock);
 
-	struct team* team;
+	Team* team;
 	if (teamID == B_CURRENT_TEAM)
 		team = thread_get_current_thread()->team;
 	else
@@ -1185,7 +1185,7 @@ set_sem_owner(sem_id id, team_id newTeamID)
 
 	InterruptsSpinLocker teamLocker(gTeamSpinlock);
 
-	struct team* newTeam = team_get_team_struct_locked(newTeamID);
+	Team* newTeam = team_get_team_struct_locked(newTeamID);
 	if (newTeam == NULL)
 		return B_BAD_TEAM_ID;
 

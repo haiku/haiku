@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
@@ -28,13 +28,13 @@
 
 
 struct mutex_waiter {
-	struct thread*	thread;
+	Thread*			thread;
 	mutex_waiter*	next;		// next in queue
 	mutex_waiter*	last;		// last in queue (valid for the first in queue)
 };
 
 struct rw_lock_waiter {
-	struct thread*	thread;
+	Thread*			thread;
 	rw_lock_waiter*	next;		// next in queue
 	rw_lock_waiter*	last;		// last in queue (valid for the first in queue)
 	bool			writer;

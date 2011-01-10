@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Rene Gollent, rene@gollent.com.
- * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002, Angelo Mottola, a.mottola@libero.it.
  * Distributed under the terms of the MIT License.
@@ -42,9 +42,9 @@
 // TODO: consolidate this such that HT/SMT entities on the same physical core
 // share a queue, once we have the necessary API for retrieving the topology
 // information
-static struct thread* sRunQueue[B_MAX_CPU_COUNT];
+static Thread* sRunQueue[B_MAX_CPU_COUNT];
 static int32 sRunQueueSize[B_MAX_CPU_COUNT];
-static struct thread* sIdleThreads;
+static Thread* sIdleThreads;
 
 const int32 kMaxTrackingQuantums = 5;
 const bigtime_t kMinThreadQuantum = 3000;
@@ -105,7 +105,7 @@ _rand(void)
 static int
 dump_run_queue(int argc, char **argv)
 {
-	struct thread *thread = NULL;
+	Thread *thread = NULL;
 
 	for (int32 i = 0; i < smp_get_num_cpus(); i++) {
 		thread = sRunQueue[i];
@@ -148,7 +148,7 @@ affine_get_most_idle_cpu()
 	Note: thread lock must be held when entering this function
 */
 static void
-affine_enqueue_in_run_queue(struct thread *thread)
+affine_enqueue_in_run_queue(Thread *thread)
 {
 	int32 targetCPU = -1;
 	if (thread->pinned_to_cpu > 0)
@@ -164,7 +164,7 @@ affine_enqueue_in_run_queue(struct thread *thread)
 		thread->queue_next = sIdleThreads;
 		sIdleThreads = thread;
 	} else {
-		struct thread *curr, *prev;
+		Thread *curr, *prev;
 		for (curr = sRunQueue[targetCPU], prev = NULL; curr
 			&& curr->priority >= thread->next_priority;
 			curr = curr->queue_next) {
@@ -205,10 +205,10 @@ affine_enqueue_in_run_queue(struct thread *thread)
 
 /*!	Dequeues the thread after the given \a prevThread from the run queue.
 */
-static inline struct thread *
-dequeue_from_run_queue(struct thread *prevThread, int32 currentCPU)
+static inline Thread *
+dequeue_from_run_queue(Thread *prevThread, int32 currentCPU)
 {
-	struct thread *resultThread = NULL;
+	Thread *resultThread = NULL;
 	if (prevThread != NULL) {
 		resultThread = prevThread->queue_next;
 		prevThread->queue_next = resultThread->queue_next;
@@ -226,7 +226,7 @@ dequeue_from_run_queue(struct thread *prevThread, int32 currentCPU)
 /*!	Looks for a possible thread to grab/run from another CPU.
 	Note: thread lock must be held when entering this function
 */
-static struct thread *
+static Thread *
 steal_thread_from_other_cpus(int32 currentCPU)
 {
 	// look through the active CPUs - find the one
@@ -254,8 +254,8 @@ steal_thread_from_other_cpus(int32 currentCPU)
 	if (targetCPU < 0)
 		return NULL;
 
-	struct thread* nextThread = sRunQueue[targetCPU];
-	struct thread* prevThread = NULL;
+	Thread* nextThread = sRunQueue[targetCPU];
+	Thread* prevThread = NULL;
 
 	while (nextThread != NULL) {
 		// grab the highest priority non-pinned thread
@@ -277,7 +277,7 @@ steal_thread_from_other_cpus(int32 currentCPU)
 	Note: thread lock must be held when entering this function
 */
 static void
-affine_set_thread_priority(struct thread *thread, int32 priority)
+affine_set_thread_priority(Thread *thread, int32 priority)
 {
 	int32 targetCPU = -1;
 
@@ -299,7 +299,7 @@ affine_set_thread_priority(struct thread *thread, int32 priority)
 		thread);
 
 	// search run queues for the thread
-	struct thread *item = NULL, *prev = NULL;
+	Thread *item = NULL, *prev = NULL;
 	targetCPU = thread->scheduler_data->fLastQueue;
 
 	for (item = sRunQueue[targetCPU], prev = NULL; item && item != thread;
@@ -322,12 +322,12 @@ affine_set_thread_priority(struct thread *thread, int32 priority)
 
 
 static bigtime_t
-affine_estimate_max_scheduling_latency(struct thread* thread)
+affine_estimate_max_scheduling_latency(Thread* thread)
 {
 	// TODO: This is probably meant to be called periodically to return the
 	// current estimate depending on the system usage; we return fixed estimates
 	// per thread priority, though.
-	
+
 	if (thread->priority >= B_REAL_TIME_DISPLAY_PRIORITY)
 		return kMinThreadQuantum / 4;
 	if (thread->priority >= B_DISPLAY_PRIORITY)
@@ -340,7 +340,7 @@ affine_estimate_max_scheduling_latency(struct thread* thread)
 
 
 static void
-context_switch(struct thread *fromThread, struct thread *toThread)
+context_switch(Thread *fromThread, Thread *toThread)
 {
 	if ((fromThread->flags & THREAD_FLAGS_DEBUGGER_INSTALLED) != 0)
 		user_debug_thread_unscheduled(fromThread);
@@ -380,7 +380,7 @@ static void
 affine_reschedule(void)
 {
 	int32 currentCPU = smp_get_current_cpu();
-	struct thread *oldThread = thread_get_current_thread();
+	Thread *oldThread = thread_get_current_thread();
 
 	// check whether we're only supposed to reschedule, if the current thread
 	// is idle
@@ -393,7 +393,7 @@ affine_reschedule(void)
 		}
 	}
 
-	struct thread *nextThread, *prevThread;
+	Thread *nextThread, *prevThread;
 
 	TRACE(("reschedule(): cpu %ld, cur_thread = %ld\n", currentCPU, oldThread->id));
 
@@ -426,8 +426,8 @@ affine_reschedule(void)
 				break;
 
 			// find next thread with lower priority
-			struct thread *lowerNextThread = nextThread->queue_next;
-			struct thread *lowerPrevThread = nextThread;
+			Thread *lowerNextThread = nextThread->queue_next;
+			Thread *lowerPrevThread = nextThread;
 			int32 priority = nextThread->priority;
 
 			while (lowerNextThread != NULL
@@ -534,7 +534,7 @@ affine_reschedule(void)
 
 
 static void
-affine_on_thread_create(struct thread* thread)
+affine_on_thread_create(Thread* thread)
 {
 	thread->scheduler_data = new(std::nothrow) scheduler_thread_data();
 	if (thread->scheduler_data == NULL)
@@ -543,14 +543,14 @@ affine_on_thread_create(struct thread* thread)
 
 
 static void
-affine_on_thread_init(struct thread* thread)
+affine_on_thread_init(Thread* thread)
 {
 	((scheduler_thread_data *)(thread->scheduler_data))->Init();
 }
 
 
 static void
-affine_on_thread_destroy(struct thread* thread)
+affine_on_thread_destroy(Thread* thread)
 {
 	delete thread->scheduler_data;
 }

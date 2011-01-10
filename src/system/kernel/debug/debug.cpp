@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -139,7 +139,7 @@ static int32 sCurrentLine = 0;
 
 static debugger_demangle_module_info* sDemangleModule;
 
-static struct thread* sDebuggedThread;
+static Thread* sDebuggedThread;
 static vint32 sInDebugger = 0;
 static bool sPreviousDprintfState;
 static volatile bool sHandOverKDL = false;
@@ -818,11 +818,11 @@ kernel_debugger_loop(const char* messagePrefix, const char* message,
 	// thread we are running.
 	set_debug_variable("_cpu", sDebuggerOnCPU);
 
-	struct thread* thread = thread_get_current_thread();
+	Thread* thread = thread_get_current_thread();
 	if (thread == NULL) {
 		kprintf("Running on CPU %ld\n", sDebuggerOnCPU);
 	} else if (!debug_is_kernel_memory_accessible((addr_t)thread,
-			sizeof(struct thread), B_KERNEL_READ_AREA)) {
+			sizeof(Thread), B_KERNEL_READ_AREA)) {
 		kprintf("Running on CPU %ld\n", sDebuggerOnCPU);
 		kprintf("Current thread pointer is %p, which is an address we "
 			"can't read from.\n", thread);
@@ -840,7 +840,7 @@ kernel_debugger_loop(const char* messagePrefix, const char* message,
 			arch_debug_unset_current_thread();
 		} else if (thread->team != NULL) {
 			if (debug_is_kernel_memory_accessible((addr_t)thread->team,
-					sizeof(struct team), B_KERNEL_READ_AREA)) {
+					sizeof(Team), B_KERNEL_READ_AREA)) {
 				set_debug_variable("_team", (uint64)(addr_t)thread->team);
 				set_debug_variable("_teamID", thread->team->id);
 			} else {
@@ -2185,16 +2185,16 @@ debug_get_debug_registers(int32 cpu)
 }
 
 
-struct thread*
-debug_set_debugged_thread(struct thread* thread)
+Thread*
+debug_set_debugged_thread(Thread* thread)
 {
-	struct thread* previous = sDebuggedThread;
+	Thread* previous = sDebuggedThread;
 	sDebuggedThread = thread;
 	return previous;
 }
 
 
-struct thread*
+Thread*
 debug_get_debugged_thread()
 {
 	return sDebuggedThread != NULL
@@ -2212,7 +2212,7 @@ debug_is_debugged_team(team_id teamID)
 	if (teamID == B_CURRENT_TEAM)
 		return true;
 
-	struct thread* thread = debug_get_debugged_thread();
+	Thread* thread = debug_get_debugged_thread();
 	return thread != NULL && thread->team != NULL
 		&& thread->team->id == teamID;
 }

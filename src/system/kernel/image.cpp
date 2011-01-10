@@ -78,7 +78,7 @@ static ImageNotificationService sNotificationService;
 /*!	Registers an image with the specified team.
 */
 image_id
-register_image(struct team *team, image_info *_info, size_t size)
+register_image(Team *team, image_info *_info, size_t size)
 {
 	image_id id = atomic_add(&sNextImageID, 1);
 	struct image *image;
@@ -115,7 +115,7 @@ register_image(struct team *team, image_info *_info, size_t size)
 /*!	Unregisters an image from the specified team.
 */
 status_t
-unregister_image(struct team *team, image_id id)
+unregister_image(Team *team, image_id id)
 {
 	status_t status = B_ENTRY_NOT_FOUND;
 
@@ -148,7 +148,7 @@ unregister_image(struct team *team, image_id id)
 	The team lock must be held when you call this function.
 */
 int32
-count_images(struct team *team)
+count_images(Team *team)
 {
 	struct image *image = NULL;
 	int32 count = 0;
@@ -166,7 +166,7 @@ count_images(struct team *team)
 	with a team that has already been removed from the list (in thread_exit()).
 */
 status_t
-remove_images(struct team *team)
+remove_images(Team *team)
 {
 	struct image *image;
 
@@ -216,7 +216,7 @@ _get_next_image_info(team_id teamID, int32 *cookie, image_info *info,
 		return B_BAD_VALUE;
 
 	status_t status = B_ENTRY_NOT_FOUND;
-	struct team *team;
+	Team *team;
 	cpu_status state;
 
 	mutex_lock(&sImageMutex);
@@ -262,7 +262,7 @@ static int
 dump_images_list(int argc, char **argv)
 {
 	struct image *image = NULL;
-	struct team *team;
+	Team *team;
 
 	if (argc > 1) {
 		team_id id = strtol(argv[1], NULL, 0);
@@ -307,7 +307,7 @@ image_iterate_through_images(image_iterator_callback callback, void* cookie)
 
 
 status_t
-image_debug_lookup_user_symbol_address(struct team *team, addr_t address,
+image_debug_lookup_user_symbol_address(Team *team, addr_t address,
 	addr_t *_baseAddress, const char **_symbolName, const char **_imageName,
 	bool *_exactMatch)
 {
@@ -367,7 +367,7 @@ static void
 notify_loading_app(status_t result, bool suspend)
 {
 	cpu_status state;
-	struct team *team;
+	Team *team;
 
 	state = disable_interrupts();
 	GRAB_TEAM_LOCK();

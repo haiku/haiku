@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2010, Haiku Inc. All rights reserved.
+ * Copyright 2003-2011, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -103,7 +103,7 @@ ppc_exception_entry(int vector, struct iframe *iframe)
 			"srr0: %p\n", system_time(), vector, iframe, (void*)iframe->srr0);
 	}
 
-	struct thread *thread = thread_get_current_thread();
+	Thread *thread = thread_get_current_thread();
 
 	// push iframe
 	if (thread)
@@ -132,7 +132,7 @@ ppc_exception_entry(int vector, struct iframe *iframe)
 					iframe->r1 = cpu->fault_handler_stack_pointer;
 					break;
 				}
-				struct thread *thread = thread_get_current_thread();
+				Thread *thread = thread_get_current_thread();
 				if (thread && thread->fault_handler != 0) {
 					iframe->srr0 = thread->fault_handler;
 					break;

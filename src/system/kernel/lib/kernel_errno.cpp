@@ -16,7 +16,7 @@
 int *
 _errnop(void)
 {
-	struct thread *thread = thread_get_current_thread();
+	Thread *thread = thread_get_current_thread();
 
 	return &thread->kernel_errno;
 }

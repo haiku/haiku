@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2010-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -150,10 +150,10 @@ struct page_stats {
 
 struct PageReservationWaiter
 		: public DoublyLinkedListLinkImpl<PageReservationWaiter> {
-	struct thread*	thread;
-	uint32			dontTouch;		// reserve not to touch
-	uint32			missing;		// pages missing for the reservation
-	int32			threadPriority;
+	Thread*	thread;
+	uint32	dontTouch;		// reserve not to touch
+	uint32	missing;		// pages missing for the reservation
+	int32	threadPriority;
 
 	bool operator<(const PageReservationWaiter& other) const
 	{

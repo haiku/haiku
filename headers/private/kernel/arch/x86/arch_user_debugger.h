@@ -1,14 +1,15 @@
 /*
- * Copyright 2005-2009, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2005-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _KERNEL_ARCH_X86_USER_DEBUGGER_H
 #define _KERNEL_ARCH_X86_USER_DEBUGGER_H
 
+
 #define ARCH_INIT_USER_DEBUG x86_init_user_debug
 
 // number of breakpoints the CPU supports
-// Actually it supports 4, but DR3 is used to hold the struct thread*.
+// Actually it supports 4, but DR3 is used to hold the Thread*.
 #define X86_BREAKPOINT_COUNT	3
 
 // debug status register DR6
@@ -116,7 +117,6 @@ extern "C" {
 #endif
 
 struct iframe;
-struct thread;
 
 extern void x86_init_user_debug_at_kernel_exit(struct iframe *frame);
 extern void x86_exit_user_debug_at_kernel_entry();
@@ -136,5 +136,6 @@ extern void x86_init_user_debug();
 #define DEBUG_SOFTWARE_BREAKPOINT			kX86SoftwareBreakpoint
 #define DEBUG_SOFTWARE_BREAKPOINT_SIZE		1
 #define DEBUG_SHARED_BREAK_AND_WATCHPOINTS	1
+
 
 #endif	// _KERNEL_ARCH_X86_USER_DEBUGGER_H

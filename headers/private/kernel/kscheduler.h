@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2005-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
@@ -14,25 +14,24 @@
 
 
 struct scheduling_analysis;
-struct thread;
 struct SchedulerListener;
 
 
 struct scheduler_ops {
-	void (*enqueue_in_run_queue)(struct thread* thread);
+	void (*enqueue_in_run_queue)(Thread* thread);
 	void (*reschedule)(void);
-	void (*set_thread_priority)(struct thread* thread, int32 priority);
-	bigtime_t (*estimate_max_scheduling_latency)(struct thread* thread);
+	void (*set_thread_priority)(Thread* thread, int32 priority);
+	bigtime_t (*estimate_max_scheduling_latency)(Thread* thread);
 
-	void (*on_thread_create)(struct thread* thread);
+	void (*on_thread_create)(Thread* thread);
 		// called when the thread structure is first created -
 		// initialization of per-thread housekeeping data structures should
 		// be done here
-	void (*on_thread_init)(struct thread* thread);
+	void (*on_thread_init)(Thread* thread);
 		// called when a thread structure is initialized and made ready for
 		// use - should be used to reset the housekeeping data structures
 		// if needed
-	void (*on_thread_destroy)(struct thread* thread);
+	void (*on_thread_destroy)(Thread* thread);
 		// called when a thread structure is freed - freeing up any allocated
 		// mem on the scheduler's part should be done here
 

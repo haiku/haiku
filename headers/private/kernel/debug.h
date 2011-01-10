@@ -17,6 +17,22 @@
 #include "kernel_debug_config.h"
 
 
+// We need the BKernel::Thread type below (opaquely) in the exported C
+// functions below. Since this header is currently still included by plain C
+// code, we define a dummy type BKernel_Thread in C mode and a equally named
+// macro in C++ mode.
+#ifdef __cplusplus
+	namespace BKernel {
+		struct Thread;
+	}
+
+	using BKernel::Thread;
+#	define BKernel_Thread	Thread
+#else
+	typedef struct BKernel_Thread BKernel_Thread;
+#endif
+
+
 /*	KDEBUG
 	The kernel debug level.
 	Level 1 is usual asserts, > 1 should be used for very expensive runtime
@@ -180,8 +196,8 @@ extern status_t	debug_get_next_demangled_argument(uint32* _cookie,
 					const char* symbol, char* name, size_t nameSize,
 					int32* _type, size_t* _argumentLength);
 
-extern struct thread* debug_set_debugged_thread(struct thread* thread);
-extern struct thread* debug_get_debugged_thread();
+extern BKernel_Thread* debug_set_debugged_thread(BKernel_Thread* thread);
+extern BKernel_Thread* debug_get_debugged_thread();
 extern bool debug_is_debugged_team(team_id teamID);
 
 extern struct arch_debug_registers* debug_get_debug_registers(int32 cpu);
@@ -197,7 +213,7 @@ extern void		_user_debug_output(const char *userString);
 #ifdef __cplusplus
 
 struct DebuggedThreadSetter {
-	DebuggedThreadSetter(struct thread* thread)
+	DebuggedThreadSetter(Thread* thread)
 		:
 		fPreviousThread(debug_set_debugged_thread(thread))
 	{
@@ -209,7 +225,7 @@ struct DebuggedThreadSetter {
 	}
 
 private:
-	struct thread*	fPreviousThread;
+	Thread*	fPreviousThread;
 };
 
 

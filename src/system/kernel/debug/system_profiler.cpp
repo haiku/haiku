@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -59,7 +59,7 @@ public:
 										parameters);
 								~SystemProfiler();
 
-			team_id				Team() const	{ return fTeam; }
+			team_id				TeamID() const	{ return fTeam; }
 
 			status_t			Init();
 			status_t			NextBuffer(size_t bytesRead,
@@ -69,11 +69,10 @@ private:
     virtual	void				EventOccurred(NotificationService& service,
 									const KMessage* event);
 
-	virtual	void				ThreadEnqueuedInRunQueue(struct thread* thread);
-	virtual	void				ThreadRemovedFromRunQueue(
-									struct thread* thread);
-	virtual	void				ThreadScheduled(struct thread* oldThread,
-									struct thread* newThread);
+	virtual	void				ThreadEnqueuedInRunQueue(Thread* thread);
+	virtual	void				ThreadRemovedFromRunQueue(Thread* thread);
+	virtual	void				ThreadScheduled(Thread* oldThread,
+									Thread* newThread);
 
 	virtual	void				SemaphoreCreated(sem_id id,
 									const char* name);
@@ -82,12 +81,12 @@ private:
 	virtual	void				MutexInitialized(mutex* lock);
 	virtual	void				RWLockInitialized(rw_lock* lock);
 
-			bool				_TeamAdded(struct team* team);
-			bool				_TeamRemoved(struct team* team);
-			bool				_TeamExec(struct team* team);
+			bool				_TeamAdded(Team* team);
+			bool				_TeamRemoved(Team* team);
+			bool				_TeamExec(Team* team);
 
-			bool				_ThreadAdded(struct thread* thread);
-			bool				_ThreadRemoved(struct thread* thread);
+			bool				_ThreadAdded(Thread* thread);
+			bool				_ThreadRemoved(Thread* thread);
 
 			bool				_ImageAdded(struct image* image);
 			bool				_ImageRemoved(struct image* image);
@@ -109,9 +108,9 @@ private:
 	inline	void				_MaybeNotifyProfilerThreadLocked();
 	inline	void				_MaybeNotifyProfilerThread();
 
-	static	bool				_InitialTeamIterator(struct team* team,
+	static	bool				_InitialTeamIterator(Team* team,
 									void* cookie);
-	static	bool				_InitialThreadIterator(struct thread* thread,
+	static	bool				_InitialThreadIterator(Thread* thread,
 									void* cookie);
 	static	bool				_InitialImageIterator(struct image* image,
 									void* cookie);
@@ -200,11 +199,11 @@ private:
 			bool				fIONotificationsEnabled;
 			bool				fSchedulerNotificationsRequested;
 			bool				fWaitObjectNotificationsRequested;
-			struct thread* volatile fWaitingProfilerThread;
+			Thread* volatile	fWaitingProfilerThread;
 			bool				fProfilingActive;
 			bool				fReentered[B_MAX_CPU_COUNT];
 			CPUProfileData		fCPUData[B_MAX_CPU_COUNT];
-			struct thread**		fRunningThreads;
+			Thread**			fRunningThreads;
 			WaitObject*			fWaitObjectBuffer;
 			int32				fWaitObjectCount;
 			WaitObjectList		fUsedWaitObjects;
@@ -461,7 +460,7 @@ SystemProfiler::Init()
 	}
 
 	// threads
-	struct thread* runningThreads[B_MAX_CPU_COUNT];
+	Thread* runningThreads[B_MAX_CPU_COUNT];
 	memset(runningThreads, 0, sizeof(runningThreads));
 	fRunningThreads = runningThreads;
 
@@ -543,7 +542,7 @@ SystemProfiler::NextBuffer(size_t bytesRead, uint64* _droppedEvents)
 
 	// Wait until the buffer gets too full or an error or a timeout occurs.
 	while (true) {
-		struct thread* thread = thread_get_current_thread();
+		Thread* thread = thread_get_current_thread();
 		fWaitingProfilerThread = thread;
 
 		thread_prepare_to_block(thread, B_CAN_INTERRUPT,
@@ -591,8 +590,7 @@ SystemProfiler::EventOccurred(NotificationService& service,
 		if (!fTeamNotificationsEnabled)
 			return;
 
-		struct team* team = (struct team*)event->GetPointer("teamStruct",
-			NULL);
+		Team* team = (Team*)event->GetPointer("teamStruct", NULL);
 		if (team == NULL)
 			return;
 
@@ -626,8 +624,7 @@ SystemProfiler::EventOccurred(NotificationService& service,
 		if (!fThreadNotificationsEnabled)
 			return;
 
-		struct thread* thread = (struct thread*)event->GetPointer(
-			"threadStruct", NULL);
+		Thread* thread = (Thread*)event->GetPointer("threadStruct", NULL);
 		if (thread == NULL)
 			return;
 
@@ -703,7 +700,7 @@ SystemProfiler::EventOccurred(NotificationService& service,
 
 
 void
-SystemProfiler::ThreadEnqueuedInRunQueue(struct thread* thread)
+SystemProfiler::ThreadEnqueuedInRunQueue(Thread* thread)
 {
 	int cpu = smp_get_current_cpu();
 
@@ -734,7 +731,7 @@ SystemProfiler::ThreadEnqueuedInRunQueue(struct thread* thread)
 
 
 void
-SystemProfiler::ThreadRemovedFromRunQueue(struct thread* thread)
+SystemProfiler::ThreadRemovedFromRunQueue(Thread* thread)
 {
 	int cpu = smp_get_current_cpu();
 
@@ -760,8 +757,7 @@ SystemProfiler::ThreadRemovedFromRunQueue(struct thread* thread)
 
 
 void
-SystemProfiler::ThreadScheduled(struct thread* oldThread,
-	struct thread* newThread)
+SystemProfiler::ThreadScheduled(Thread* oldThread, Thread* newThread)
 {
 	int cpu = smp_get_current_cpu();
 
@@ -822,7 +818,7 @@ SystemProfiler::RWLockInitialized(rw_lock* lock)
 
 
 bool
-SystemProfiler::_TeamAdded(struct team* team)
+SystemProfiler::_TeamAdded(Team* team)
 {
 	size_t nameLen = strlen(team->name);
 	size_t argsLen = strlen(team->args);
@@ -848,7 +844,7 @@ SystemProfiler::_TeamAdded(struct team* team)
 
 
 bool
-SystemProfiler::_TeamRemoved(struct team* team)
+SystemProfiler::_TeamRemoved(Team* team)
 {
 	InterruptsSpinLocker locker(fLock);
 
@@ -867,7 +863,7 @@ SystemProfiler::_TeamRemoved(struct team* team)
 
 
 bool
-SystemProfiler::_TeamExec(struct team* team)
+SystemProfiler::_TeamExec(Team* team)
 {
 	size_t argsLen = strlen(team->args);
 
@@ -891,7 +887,7 @@ SystemProfiler::_TeamExec(struct team* team)
 
 
 bool
-SystemProfiler::_ThreadAdded(struct thread* thread)
+SystemProfiler::_ThreadAdded(Thread* thread)
 {
 	InterruptsSpinLocker locker(fLock);
 
@@ -912,7 +908,7 @@ SystemProfiler::_ThreadAdded(struct thread* thread)
 
 
 bool
-SystemProfiler::_ThreadRemoved(struct thread* thread)
+SystemProfiler::_ThreadRemoved(Thread* thread)
 {
 	InterruptsSpinLocker locker(fLock);
 
@@ -1241,7 +1237,7 @@ SystemProfiler::_WaitObjectUsed(addr_t object, uint32 type)
 
 
 /*static*/ bool
-SystemProfiler::_InitialTeamIterator(struct team* team, void* cookie)
+SystemProfiler::_InitialTeamIterator(Team* team, void* cookie)
 {
 	SystemProfiler* self = (SystemProfiler*)cookie;
 	return !self->_TeamAdded(team);
@@ -1249,7 +1245,7 @@ SystemProfiler::_InitialTeamIterator(struct team* team, void* cookie)
 
 
 /*static*/ bool
-SystemProfiler::_InitialThreadIterator(struct thread* thread, void* cookie)
+SystemProfiler::_InitialThreadIterator(Thread* thread, void* cookie)
 {
 	SystemProfiler* self = (SystemProfiler*)cookie;
 
@@ -1343,7 +1339,7 @@ SystemProfiler::_ScheduleTimer(int cpu)
 void
 SystemProfiler::_DoSample()
 {
-	struct thread* thread = thread_get_current_thread();
+	Thread* thread = thread_get_current_thread();
 	int cpu = thread->cpu->cpu_num;
 	CPUProfileData& cpuData = fCPUData[cpu];
 
@@ -1553,7 +1549,7 @@ _user_system_profiler_next_buffer(size_t bytesRead, uint64* _droppedEvents)
 	team_id team = thread_get_current_thread()->team->id;
 
 	InterruptsSpinLocker locker(sProfilerLock);
-	if (sProfiler == NULL || sProfiler->Team() != team)
+	if (sProfiler == NULL || sProfiler->TeamID() != team)
 		return B_BAD_VALUE;
 
 	// get a reference to the profiler
@@ -1577,7 +1573,7 @@ _user_system_profiler_stop()
 	team_id team = thread_get_current_thread()->team->id;
 
 	InterruptsSpinLocker locker(sProfilerLock);
-	if (sProfiler == NULL || sProfiler->Team() != team)
+	if (sProfiler == NULL || sProfiler->TeamID() != team)
 		return B_BAD_VALUE;
 
 	SystemProfiler* profiler = sProfiler;

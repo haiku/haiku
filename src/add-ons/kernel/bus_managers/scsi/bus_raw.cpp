@@ -32,7 +32,7 @@ scsi_bus_raw_init(void *driverCookie, void **_cookie)
 	device_node *parent;
 	bus_raw_info *bus;
 
-	bus = malloc(sizeof(*bus));
+	bus = (bus_raw_info*)malloc(sizeof(*bus));
 	if (bus == NULL)
 		return B_NO_MEMORY;
 
@@ -81,14 +81,15 @@ scsi_bus_raw_free(void *cookie)
 static status_t
 scsi_bus_raw_control(void *_cookie, uint32 op, void *data, size_t length)
 {
-	bus_raw_info *bus = _cookie;
+	bus_raw_info *bus = (bus_raw_info*)_cookie;
 
 	switch (op) {
 		case B_SCSI_BUS_RAW_RESET:
 			return bus->interface->reset_bus(bus->cookie);
 
 		case B_SCSI_BUS_RAW_PATH_INQUIRY:
-			return bus->interface->path_inquiry(bus->cookie, data);
+			return bus->interface->path_inquiry(bus->cookie,
+				(scsi_path_inquiry*)data);
 	}
 
 	return B_ERROR;

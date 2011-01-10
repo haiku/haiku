@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2007-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2003-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
@@ -68,7 +68,7 @@ public:
 			size_t				Read(void* buffer, size_t length);
 			ssize_t				UserWrite(const void* buffer, ssize_t length);
 			ssize_t				UserRead(void* buffer, ssize_t length);
-	
+
 			size_t				Readable() const;
 			size_t				Writable() const;
 
@@ -112,10 +112,10 @@ public:
 	}
 
 private:
-	spinlock			fLock;
-	struct thread*		fThread;
-	file_cookie*		fCookie;
-	volatile bool		fNotified;
+	spinlock		fLock;
+	Thread*			fThread;
+	file_cookie*	fCookie;
+	volatile bool	fNotified;
 };
 
 
@@ -156,9 +156,9 @@ public:
 									{ return fModificationTime; }
 			void				SetModificationTime(timespec modificationTime)
 									{ fModificationTime = modificationTime; }
-	
+
 			mutex*				RequestLock() { return &fRequestLock; }
-	
+
 			status_t			WriteDataToBuffer(const void* data,
 									size_t* _length, bool nonBlocking);
 			status_t			ReadDataFromBuffer(void* data, size_t* _length,
@@ -167,21 +167,21 @@ public:
 									{ return fBuffer.Readable(); }
 			size_t				BytesWritable() const
 									{ return fBuffer.Writable(); }
-	
+
 			void				AddReadRequest(ReadRequest& request);
 			void				RemoveReadRequest(ReadRequest& request);
 			status_t			WaitForReadRequest(ReadRequest& request);
-	
+
 			void				NotifyBytesRead(size_t bytes);
 			void				NotifyReadDone();
 			void				NotifyBytesWritten(size_t bytes);
 			void				NotifyEndClosed(bool writer);
-	
+
 			void				Open(int openMode);
 			void				Close(int openMode, file_cookie* cookie);
 			int32				ReaderCount() const { return fReaderCount; }
 			int32				WriterCount() const { return fWriterCount; }
-	
+
 			status_t			Select(uint8 event, selectsync* sync,
 									int openMode);
 			status_t			Deselect(uint8 event, selectsync* sync,
@@ -190,20 +190,20 @@ public:
 private:
 			timespec			fCreationTime;
 			timespec			fModificationTime;
-	
+
 			RingBuffer			fBuffer;
-	
+
 			ReadRequestList		fReadRequests;
 			WriteRequestList	fWriteRequests;
-	
+
 			mutex				fRequestLock;
-	
+
 			ConditionVariable	fWriteCondition;
-	
+
 			int32				fReaderCount;
 			int32				fWriterCount;
 			bool				fActive;
-	
+
 			select_sync_pool*	fReadSelectSyncPool;
 			select_sync_pool*	fWriteSelectSyncPool;
 };

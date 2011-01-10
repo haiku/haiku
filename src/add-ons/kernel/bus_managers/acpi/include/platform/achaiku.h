@@ -120,10 +120,10 @@
 #include "acgcc.h"
 
 
-#include <SupportDefs.h>
+#include <KernelExport.h>
 
 
-#include "lock.h"
+struct mutex;
 
 
 /* Host-dependent types and defines for user- and kernel-space ACPICA */
@@ -132,7 +132,7 @@
 #define ACPI_USE_STANDARD_HEADERS
 
 #define ACPI_MUTEX_TYPE				ACPI_OSL_MUTEX
-#define ACPI_MUTEX					mutex *
+#define ACPI_MUTEX					struct mutex *
 
 #define ACPI_USE_NATIVE_DIVIDE
 

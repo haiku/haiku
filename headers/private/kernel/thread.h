@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -35,10 +35,10 @@ struct thread_creation_attributes;
 extern "C" {
 #endif
 
-void thread_enqueue(struct thread *t, struct thread_queue *q);
-struct thread *thread_lookat_queue(struct thread_queue *q);
-struct thread *thread_dequeue(struct thread_queue *q);
-struct thread *thread_dequeue_id(struct thread_queue *q, thread_id id);
+void thread_enqueue(Thread *t, struct thread_queue *q);
+Thread *thread_lookat_queue(struct thread_queue *q);
+Thread *thread_dequeue(struct thread_queue *q);
+Thread *thread_dequeue_id(struct thread_queue *q, thread_id id);
 
 void thread_at_kernel_entry(bigtime_t now);
 	// called when the thread enters the kernel on behalf of the thread
@@ -54,32 +54,32 @@ void thread_exit(void);
 int32 thread_max_threads(void);
 int32 thread_used_threads(void);
 
-const char* thread_state_to_text(struct thread* thread, int32 state);
+const char* thread_state_to_text(Thread* thread, int32 state);
 
 int32 thread_get_io_priority(thread_id id);
 void thread_set_io_priority(int32 priority);
 
 #define thread_get_current_thread arch_thread_get_current_thread
 
-struct thread *thread_get_thread_struct(thread_id id);
-struct thread *thread_get_thread_struct_locked(thread_id id);
+Thread *thread_get_thread_struct(thread_id id);
+Thread *thread_get_thread_struct_locked(thread_id id);
 
 static thread_id thread_get_current_thread_id(void);
 static inline thread_id
 thread_get_current_thread_id(void)
 {
-	struct thread *thread = thread_get_current_thread();
+	Thread *thread = thread_get_current_thread();
 	return thread ? thread->id : 0;
 }
 
 static inline bool
-thread_is_idle_thread(struct thread *thread)
+thread_is_idle_thread(Thread *thread)
 {
 	return thread->entry == NULL;
 }
 
-typedef bool (*thread_iterator_callback)(struct thread* thread, void* cookie);
-struct thread* thread_iterate_through_threads(thread_iterator_callback callback,
+typedef bool (*thread_iterator_callback)(Thread* thread, void* cookie);
+Thread* thread_iterate_through_threads(thread_iterator_callback callback,
 	void* cookie);
 
 thread_id allocate_thread_id(void);
@@ -140,7 +140,7 @@ int _user_setrlimit(int resource, const struct rlimit * rlp);
 	Thread lock can be, but doesn't need to be held.
 */
 static inline bool
-thread_is_interrupted(struct thread* thread, uint32 flags)
+thread_is_interrupted(Thread* thread, uint32 flags)
 {
 	return ((flags & B_CAN_INTERRUPT)
 			&& (thread->sig_pending & ~thread->sig_block_mask) != 0)
@@ -150,7 +150,7 @@ thread_is_interrupted(struct thread* thread, uint32 flags)
 
 
 static inline bool
-thread_is_blocked(struct thread* thread)
+thread_is_blocked(Thread* thread)
 {
 	return thread->wait.status == 1;
 }
@@ -161,7 +161,7 @@ thread_is_blocked(struct thread* thread)
 	Thread lock can be, but doesn't need to be locked.
 */
 static inline void
-thread_prepare_to_block(struct thread* thread, uint32 flags, uint32 type,
+thread_prepare_to_block(Thread* thread, uint32 flags, uint32 type,
 	const void* object)
 {
 	thread->wait.flags = flags;
@@ -174,7 +174,7 @@ thread_prepare_to_block(struct thread* thread, uint32 flags, uint32 type,
 
 
 static inline status_t
-thread_block_locked(struct thread* thread)
+thread_block_locked(Thread* thread)
 {
 	if (thread->wait.status == 1) {
 		// check for signals, if interruptable
@@ -191,7 +191,7 @@ thread_block_locked(struct thread* thread)
 
 
 static inline void
-thread_unblock_locked(struct thread* thread, status_t status)
+thread_unblock_locked(Thread* thread, status_t status)
 {
 	if (atomic_test_and_set(&thread->wait.status, status, 1) != 1)
 		return;
@@ -203,7 +203,7 @@ thread_unblock_locked(struct thread* thread, status_t status)
 
 
 static inline status_t
-thread_interrupt(struct thread* thread, bool kill)
+thread_interrupt(Thread* thread, bool kill)
 {
 	if ((thread->wait.flags & B_CAN_INTERRUPT) != 0
 		|| (kill && (thread->wait.flags & B_KILL_CAN_INTERRUPT) != 0)) {
@@ -216,14 +216,14 @@ thread_interrupt(struct thread* thread, bool kill)
 
 
 static inline void
-thread_pin_to_current_cpu(struct thread* thread)
+thread_pin_to_current_cpu(Thread* thread)
 {
 	thread->pinned_to_cpu++;
 }
 
 
 static inline void
-thread_unpin_from_current_cpu(struct thread* thread)
+thread_unpin_from_current_cpu(Thread* thread)
 {
 	thread->pinned_to_cpu--;
 }

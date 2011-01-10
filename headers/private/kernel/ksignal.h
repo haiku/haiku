@@ -10,6 +10,13 @@
 #include <signal.h>
 
 
+namespace BKernel {
+	struct Thread;
+}
+
+using BKernel::Thread;
+
+
 #define KILL_SIGNALS	((1L << (SIGKILL - 1)) | (1L << (SIGKILLTHR - 1)))
 
 #define SIGNAL_TO_MASK(signal)	(1LL << (signal - 1))
@@ -24,7 +31,7 @@
 extern "C" {
 #endif
 
-extern bool handle_signals(struct thread *thread);
+extern bool handle_signals(Thread *thread);
 extern bool is_kill_signal_pending(void);
 extern int has_signals_pending(void *_thread);
 extern bool is_signal_blocked(int signal);

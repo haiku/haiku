@@ -536,7 +536,7 @@ vm86_fault_callback(addr_t address, addr_t faultAddress, bool isWrite)
 extern "C" status_t
 vm86_prepare(struct vm86_state *state, unsigned int ramSize)
 {
-	struct team *team = thread_get_current_thread()->team;
+	Team *team = thread_get_current_thread()->team;
 	status_t ret = B_OK;
 	area_id vectors;
 
@@ -603,7 +603,7 @@ error:
 extern "C" void
 vm86_cleanup(struct vm86_state *state)
 {
-	struct team *team = thread_get_current_thread()->team;
+	Team *team = thread_get_current_thread()->team;
 
 	if (state->bios_area > B_OK)
 		vm_delete_area(team->id, state->bios_area, true);
@@ -629,7 +629,7 @@ vm86_do_int(struct vm86_state *state, uint8 vec)
 {
 	int8 *ip;
 	int emuState = 0;
-	struct thread *thread = thread_get_current_thread();
+	Thread *thread = thread_get_current_thread();
 	status_t ret;
 
 	// prepare environment

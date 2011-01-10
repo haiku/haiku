@@ -1,9 +1,10 @@
 /*
- * Copyright 2008, Haiku Inc. All rights reserved.
+ * Copyright 2008-2011, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _KERNEL_SYSCALL_RESTART_H
 #define _KERNEL_SYSCALL_RESTART_H
+
 
 #include <OS.h>
 
@@ -20,7 +21,7 @@ syscall_restart_handle_timeout_pre(bigtime_t& timeout)
 {
 	// If restarted, get the timeout from the restart parameters. Otherwise
 	// convert relative timeout to an absolute one.
-	struct thread* thread = thread_get_current_thread();
+	Thread* thread = thread_get_current_thread();
 	if ((thread->flags & THREAD_FLAGS_SYSCALL_RESTARTED) != 0)
 		timeout = *(bigtime_t*)thread->syscall_restart.parameters;
 	else if (timeout >= 0) {
@@ -44,7 +45,7 @@ syscall_restart_handle_timeout_pre(uint32& flags, bigtime_t& timeout)
 	// convert relative timeout to an absolute one. Note that we preserve
 	// relative 0 us timeouts, so that the syscall can still decide whether to
 	// return B_WOULD_BLOCK instead of B_TIMED_OUT.
-	struct thread* thread = thread_get_current_thread();
+	Thread* thread = thread_get_current_thread();
 	if ((thread->flags & THREAD_FLAGS_SYSCALL_RESTARTED) != 0) {
 		timeout = *(bigtime_t*)thread->syscall_restart.parameters;
 		if (timeout > 0 && (flags & B_RELATIVE_TIMEOUT) != 0)
@@ -67,7 +68,7 @@ syscall_restart_handle_timeout_post(status_t error, bigtime_t timeout)
 {
 	if (error == B_INTERRUPTED) {
 		// interrupted -- store timeout and set flag for syscall restart
-		struct thread* thread = thread_get_current_thread();
+		Thread* thread = thread_get_current_thread();
 		*(bigtime_t*)thread->syscall_restart.parameters = timeout;
 		atomic_or(&thread->flags, THREAD_FLAGS_RESTART_SYSCALL);
 	}
@@ -81,7 +82,7 @@ syscall_restart_handle_post(status_t error)
 {
 	if (error == B_INTERRUPTED) {
 		// interrupted -- set flag for syscall restart
-		struct thread* thread = thread_get_current_thread();
+		Thread* thread = thread_get_current_thread();
 		atomic_or(&thread->flags, THREAD_FLAGS_RESTART_SYSCALL);
 	}
 
@@ -92,7 +93,7 @@ syscall_restart_handle_post(status_t error)
 static inline bool
 syscall_restart_is_restarted()
 {
-	struct thread* thread = thread_get_current_thread();
+	Thread* thread = thread_get_current_thread();
 
 	return (thread->flags & THREAD_FLAGS_SYSCALL) != 0
 		&& (thread->flags & THREAD_FLAGS_SYSCALL_RESTARTED) != 0;
@@ -114,8 +115,8 @@ struct SyscallFlagUnsetter {
 	}
 
 private:
-	struct thread*	fThread;
-	bool			fWasSyscall;
+	Thread*	fThread;
+	bool	fWasSyscall;
 };
 
 
@@ -147,8 +148,8 @@ struct SyscallRestartWrapper {
 	operator Type() const	{ return fResult; }
 
 private:
-	Type			fResult;
-	struct thread*	fThread;
+	Type	fResult;
+	Thread*	fThread;
 };
 
 

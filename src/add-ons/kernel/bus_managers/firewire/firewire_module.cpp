@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 JiSheng Zhang <jszhang3@gmail.com>. All rights reserved 
+ * Copyright (C) 2007 JiSheng Zhang <jszhang3@gmail.com>. All rights reserved
  * Distributed under the terms of the MIT license.
  *
  * Kernel driver for firewire
@@ -38,7 +38,7 @@ dpc_module_info *gDpc;
 struct supported_device{
 	uint16 vendor_id;
 	uint32 device_id;
-	char *name;
+	const char *name;
 };
 
 struct supported_device supported_devices[] = {
@@ -74,12 +74,12 @@ struct supported_device supported_devices[] = {
 };
 
 
-static int 
+static int
 find_device_name(pci_info *info)
 {
 	struct supported_device *device;
 	for (device = supported_devices; device->name; device++) {
-		if (info->vendor_id == device->vendor_id 
+		if (info->vendor_id == device->vendor_id
 			&& info->device_id == device->device_id >> 16) {
 			dprintf("%s\n", device->name);
 			return 1;
@@ -91,7 +91,7 @@ find_device_name(pci_info *info)
 
 #if 0
 static status_t
-fw_add_child(const char *childname, 
+fw_add_child(const char *childname,
 		const struct firewire_notify_hooks *hooks)
 {
 	status_t status;
@@ -102,7 +102,7 @@ fw_add_child(const char *childname,
 		if (status != B_OK)
 			return status;
 	}
-	
+
 	return B_OK;
 }
 
@@ -118,13 +118,13 @@ fw_remove_child(const char *childname)
 		if (status != B_OK)
 			return status;
 	}
-	
+
 	return B_OK;
 }
 #endif
 
 
-static int 
+static int
 fw_get_handle(int socket, struct firewire_softc **handle)
 {
 	if (handle == NULL)
@@ -147,16 +147,16 @@ fw_module_init(void)
 	fwohci_softc_t *fwohci_sc;
 	struct firewire_softc *fw_sc;
 
-	info = malloc(sizeof(pci_info));
+	info = (pci_info*)malloc(sizeof(pci_info));
 	if (!info)
 		return B_NO_MEMORY;
-	
+
 	if ((status = get_module(B_PCI_MODULE_NAME,(module_info **)&gPci)) != B_OK) {
 		TRACE("pci module unavailable\n");
 		free(info);
 		return status;
 	}
-	
+
 	if ((status = get_module(B_DPC_MODULE_NAME,(module_info **)&gDpc)) != B_OK) {
 		TRACE("pci module unavailable\n");
 		free(info);
@@ -175,15 +175,15 @@ fw_module_init(void)
 			dprintf( "vendor=%x, device=%x, revision = %x\n", info->vendor_id, info->device_id, info->revision);
 			pciInfo[found] = info;
 
-			fwohci_sc = malloc(sizeof(fwohci_softc_t));
+			fwohci_sc = (fwohci_softc_t*)malloc(sizeof(fwohci_softc_t));
 			if (!fwohci_sc) {
 				free(info);
 				goto err_outofmem;
 			}
 			memset(fwohci_sc, 0, sizeof(fwohci_softc_t));
 			gFwohci_softc[found] = fwohci_sc;
-			
-			fw_sc = malloc(sizeof(struct firewire_softc));
+
+			fw_sc = (firewire_softc*)malloc(sizeof(struct firewire_softc));
 			if (!fw_sc) {
 				free(info);
 				free(fwohci_sc);
@@ -192,9 +192,9 @@ fw_module_init(void)
 			memset(fw_sc, 0, sizeof(struct firewire_softc));
 			gFirewire_softc[found] = fw_sc;
 			gFirewire_softc[found+1] = NULL;
-			
+
 			found++;
-			info = malloc(sizeof(pci_info));
+			info = (pci_info*)malloc(sizeof(pci_info));
 			if (!info)
 				goto err_outofmem;
 
@@ -230,7 +230,7 @@ err_outofmem:
 	}
 	put_module(B_PCI_MODULE_NAME);
 	put_module(B_DPC_MODULE_NAME);
-	return B_ERROR;	
+	return B_ERROR;
 
 }
 
@@ -240,17 +240,17 @@ fw_module_uninit(void)
 	int i;
 
 	terminate_timer();
-	
+
 	for (i = 0; gFirewire_softc[i] != NULL; i++) {
 		fwohci_pci_detach(i);
 		free(gFirewire_softc[i]);
 		free(gFwohci_softc[i]);
 		free(pciInfo[i]);
 	}
-	
+
 	put_module(B_PCI_MODULE_NAME);
 	put_module(B_DPC_MODULE_NAME);
-	
+
 	return B_OK;
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2005-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -58,8 +58,7 @@ static timer sProfilingTimers[B_MAX_CPU_COUNT];
 	// on that CPU
 
 
-static void schedule_profiling_timer(struct thread* thread,
-	bigtime_t interval);
+static void schedule_profiling_timer(Thread* thread, bigtime_t interval);
 static int32 profiling_event(timer* unused);
 static status_t ensure_debugger_installed();
 static void get_team_debug_info(team_debug_info &teamDebugInfo);
@@ -131,7 +130,7 @@ debugger_write(port_id port, int32 code, const void *buffer, size_t bufferSize,
 	Interrupts must be disabled and the thread lock must be held.
 */
 static void
-update_thread_user_debug_flag(struct thread* thread)
+update_thread_user_debug_flag(Thread* thread)
 {
 	if ((atomic_get(&thread->debug_info.flags) & B_THREAD_DEBUG_STOP) != 0)
 		atomic_or(&thread->flags, THREAD_FLAGS_DEBUG_THREAD);
@@ -145,9 +144,9 @@ update_thread_user_debug_flag(struct thread* thread)
 	Interrupts must be disabled and the team lock must be held.
 */
 static void
-update_thread_breakpoints_flag(struct thread* thread)
+update_thread_breakpoints_flag(Thread* thread)
 {
-	struct team* team = thread->team;
+	Team* team = thread->team;
 
 	if (arch_has_breakpoints(&team->debug_info.arch_info))
 		atomic_or(&thread->flags, THREAD_FLAGS_BREAKPOINTS_DEFINED);
@@ -158,15 +157,14 @@ update_thread_breakpoints_flag(struct thread* thread)
 
 /*!	Updates the thread::flags THREAD_FLAGS_BREAKPOINTS_DEFINED bit of all
 	threads of the current team.
-	Interrupts must be disabled and the team lock must be held.
 */
 static void
 update_threads_breakpoints_flag()
 {
 	InterruptsSpinLocker _(gTeamSpinlock);
 
-	struct team* team = thread_get_current_thread()->team;
-	struct thread* thread = team->thread_list;
+	Team* team = thread_get_current_thread()->team;
+	Thread* thread = team->thread_list;
 
 	if (arch_has_breakpoints(&team->debug_info.arch_info)) {
 		for (; thread != NULL; thread = thread->team_next)
@@ -183,9 +181,9 @@ update_threads_breakpoints_flag()
 	Interrupts must be disabled and the team lock must be held.
 */
 static void
-update_thread_debugger_installed_flag(struct thread* thread)
+update_thread_debugger_installed_flag(Thread* thread)
 {
-	struct team* team = thread->team;
+	Team* team = thread->team;
 
 	if (atomic_get(&team->debug_info.flags) & B_TEAM_DEBUG_DEBUGGER_INSTALLED)
 		atomic_or(&thread->flags, THREAD_FLAGS_DEBUGGER_INSTALLED);
@@ -199,9 +197,9 @@ update_thread_debugger_installed_flag(struct thread* thread)
 	Interrupts must be disabled and the team lock must be held.
 */
 static void
-update_threads_debugger_installed_flag(struct team* team)
+update_threads_debugger_installed_flag(Team* team)
 {
-	struct thread* thread = team->thread_list;
+	Thread* thread = team->thread_list;
 
 	if (atomic_get(&team->debug_info.flags) & B_TEAM_DEBUG_DEBUGGER_INSTALLED) {
 		for (; thread != NULL; thread = thread->team_next)
@@ -366,7 +364,7 @@ destroy_thread_debug_info(struct thread_debug_info *info)
 
 static status_t
 prepare_debugger_change(team_id teamID, ConditionVariable& condition,
-	struct team*& team)
+	Team*& team)
 {
 	// We look up the team by ID, even in case of the current team, so we can be
 	// sure, that the team is not already dying.
@@ -409,7 +407,7 @@ prepare_debugger_change(team_id teamID, ConditionVariable& condition,
 
 
 static void
-prepare_debugger_change(struct team* team, ConditionVariable& condition)
+prepare_debugger_change(Team* team, ConditionVariable& condition)
 {
 	while (true) {
 		// check whether the condition is already set
@@ -435,7 +433,7 @@ prepare_debugger_change(struct team* team, ConditionVariable& condition)
 
 
 static void
-finish_debugger_change(struct team* team)
+finish_debugger_change(Team* team)
 {
 	// unset our condition variable and notify all threads waiting on it
 	InterruptsSpinLocker threadLocker(gThreadSpinlock);
@@ -451,8 +449,8 @@ finish_debugger_change(struct team* team)
 void
 user_debug_prepare_for_exec()
 {
-	struct thread *thread = thread_get_current_thread();
-	struct team *team = thread->team;
+	Thread *thread = thread_get_current_thread();
+	Team *team = thread->team;
 
 	// If a debugger is installed for the team and the thread debug stuff
 	// initialized, change the ownership of the debug port for the thread
@@ -481,8 +479,8 @@ user_debug_prepare_for_exec()
 void
 user_debug_finish_after_exec()
 {
-	struct thread *thread = thread_get_current_thread();
-	struct team *team = thread->team;
+	Thread *thread = thread_get_current_thread();
+	Team *team = thread->team;
 
 	// If a debugger is installed for the team and the thread debug stuff
 	// initialized for this thread, change the ownership of its debug port
@@ -519,7 +517,7 @@ init_user_debug()
 static void
 get_team_debug_info(team_debug_info &teamDebugInfo)
 {
-	struct thread *thread = thread_get_current_thread();
+	Thread *thread = thread_get_current_thread();
 
 	cpu_status state = disable_interrupts();
 	GRAB_TEAM_DEBUG_INFO_LOCK(thread->team->debug_info);
@@ -536,7 +534,7 @@ thread_hit_debug_event_internal(debug_debugger_message event,
 	const void *message, int32 size, bool requireDebugger, bool &restart)
 {
 	restart = false;
-	struct thread *thread = thread_get_current_thread();
+	Thread *thread = thread_get_current_thread();
 
 	TRACE(("thread_hit_debug_event(): thread: %ld, event: %lu, message: %p, "
 		"size: %ld\n", thread->id, (uint32)event, message, size));
@@ -795,7 +793,7 @@ thread_hit_debug_event(debug_debugger_message event, const void *message,
 	// Prepare to continue -- we install a debugger change condition, so no-one
 	// will change the debugger while we're playing with the breakpoint manager.
 	// TODO: Maybe better use ref-counting and a flag in the breakpoint manager.
-	struct team* team = thread_get_current_thread()->team;
+	Team* team = thread_get_current_thread()->team;
 	ConditionVariable debugChangeCondition;
 	prepare_debugger_change(team, debugChangeCondition);
 
@@ -819,7 +817,7 @@ thread_hit_serious_debug_event(debug_debugger_message event,
 	// ensure that a debugger is installed for this team
 	status_t error = ensure_debugger_installed();
 	if (error != B_OK) {
-		struct thread *thread = thread_get_current_thread();
+		Thread *thread = thread_get_current_thread();
 		dprintf("thread_hit_serious_debug_event(): Failed to install debugger: "
 			"thread: %ld: %s\n", thread->id, strerror(error));
 		return error;
@@ -834,7 +832,7 @@ void
 user_debug_pre_syscall(uint32 syscall, void *args)
 {
 	// check whether a debugger is installed
-	struct thread *thread = thread_get_current_thread();
+	Thread *thread = thread_get_current_thread();
 	int32 teamDebugFlags = atomic_get(&thread->team->debug_info.flags);
 	if (!(teamDebugFlags & B_TEAM_DEBUG_DEBUGGER_INSTALLED))
 		return;
@@ -866,7 +864,7 @@ user_debug_post_syscall(uint32 syscall, void *args, uint64 returnValue,
 	bigtime_t startTime)
 {
 	// check whether a debugger is installed
-	struct thread *thread = thread_get_current_thread();
+	Thread *thread = thread_get_current_thread();
 	int32 teamDebugFlags = atomic_get(&thread->team->debug_info.flags);
 	if (!(teamDebugFlags & B_TEAM_DEBUG_DEBUGGER_INSTALLED))
 		return;
@@ -933,7 +931,7 @@ bool
 user_debug_handle_signal(int signal, struct sigaction *handler, bool deadly)
 {
 	// check, if a debugger is installed and is interested in signals
-	struct thread *thread = thread_get_current_thread();
+	Thread *thread = thread_get_current_thread();
 	int32 teamDebugFlags = atomic_get(&thread->team->debug_info.flags);
 	if (~teamDebugFlags
 		& (B_TEAM_DEBUG_DEBUGGER_INSTALLED | B_TEAM_DEBUG_SIGNALS)) {
@@ -957,7 +955,7 @@ user_debug_stop_thread()
 {
 	// check whether this is actually an emulated single-step notification
 	InterruptsSpinLocker threadsLocker(gThreadSpinlock);
-	struct thread* thread = thread_get_current_thread();
+	Thread* thread = thread_get_current_thread();
 	bool singleStepped = false;
 	if ((atomic_and(&thread->debug_info.flags,
 				~B_THREAD_DEBUG_NOTIFY_SINGLE_STEP)
@@ -982,7 +980,7 @@ user_debug_team_created(team_id teamID)
 {
 	// check, if a debugger is installed and is interested in team creation
 	// events
-	struct thread *thread = thread_get_current_thread();
+	Thread *thread = thread_get_current_thread();
 	int32 teamDebugFlags = atomic_get(&thread->team->debug_info.flags);
 	if (~teamDebugFlags
 		& (B_TEAM_DEBUG_DEBUGGER_INSTALLED | B_TEAM_DEBUG_TEAM_CREATION)) {
@@ -1020,7 +1018,7 @@ user_debug_team_exec()
 {
 	// check, if a debugger is installed and is interested in team creation
 	// events
-	struct thread *thread = thread_get_current_thread();
+	Thread *thread = thread_get_current_thread();
 	int32 teamDebugFlags = atomic_get(&thread->team->debug_info.flags);
 	if (~teamDebugFlags
 		& (B_TEAM_DEBUG_DEBUGGER_INSTALLED | B_TEAM_DEBUG_TEAM_CREATION)) {
@@ -1047,7 +1045,7 @@ user_debug_update_new_thread_flags(thread_id threadID)
 	SpinLocker teamLocker(gTeamSpinlock);
 	SpinLocker threadLocker(gThreadSpinlock);
 
-	struct thread *thread = thread_get_thread_struct_locked(threadID);
+	Thread *thread = thread_get_thread_struct_locked(threadID);
 	if (!thread)
 		return;
 
@@ -1061,7 +1059,7 @@ void
 user_debug_thread_created(thread_id threadID)
 {
 	// check, if a debugger is installed and is interested in thread events
-	struct thread *thread = thread_get_current_thread();
+	Thread *thread = thread_get_current_thread();
 	int32 teamDebugFlags = atomic_get(&thread->team->debug_info.flags);
 	if (~teamDebugFlags
 		& (B_TEAM_DEBUG_DEBUGGER_INSTALLED | B_TEAM_DEBUG_THREADS)) {
@@ -1086,7 +1084,7 @@ user_debug_thread_deleted(team_id teamID, thread_id threadID)
 	// get the team debug flags and debugger port
 	InterruptsSpinLocker teamLocker(gTeamSpinlock);
 
-	struct team *team = team_get_team_struct_locked(teamID);
+	Team *team = team_get_team_struct_locked(teamID);
 	if (team == NULL)
 		return;
 
@@ -1144,12 +1142,12 @@ user_debug_thread_deleted(team_id teamID, thread_id threadID)
 
 
 void
-user_debug_thread_exiting(struct thread* thread)
+user_debug_thread_exiting(Thread* thread)
 {
 	InterruptsLocker interruptsLocker;
 	SpinLocker teamLocker(gTeamSpinlock);
 
-	struct team* team = thread->team;
+	Team* team = thread->team;
 
 	GRAB_TEAM_DEBUG_INFO_LOCK(team->debug_info);
 
@@ -1216,7 +1214,7 @@ void
 user_debug_image_created(const image_info *imageInfo)
 {
 	// check, if a debugger is installed and is interested in image events
-	struct thread *thread = thread_get_current_thread();
+	Thread *thread = thread_get_current_thread();
 	int32 teamDebugFlags = atomic_get(&thread->team->debug_info.flags);
 	if (~teamDebugFlags
 		& (B_TEAM_DEBUG_DEBUGGER_INSTALLED | B_TEAM_DEBUG_IMAGES)) {
@@ -1238,7 +1236,7 @@ void
 user_debug_image_deleted(const image_info *imageInfo)
 {
 	// check, if a debugger is installed and is interested in image events
-	struct thread *thread = thread_get_current_thread();
+	Thread *thread = thread_get_current_thread();
 	int32 teamDebugFlags = atomic_get(&thread->team->debug_info.flags);
 	if (~teamDebugFlags
 		& (B_TEAM_DEBUG_DEBUGGER_INSTALLED | B_TEAM_DEBUG_IMAGES)) {
@@ -1284,7 +1282,7 @@ void
 user_debug_single_stepped()
 {
 	// clear the single-step thread flag
-	struct thread* thread = thread_get_current_thread();
+	Thread* thread = thread_get_current_thread();
 	atomic_and(&thread->flags, ~(int32)THREAD_FLAGS_SINGLE_STEP);
 
 	// prepare the message
@@ -1297,7 +1295,7 @@ user_debug_single_stepped()
 
 
 static void
-schedule_profiling_timer(struct thread* thread, bigtime_t interval)
+schedule_profiling_timer(Thread* thread, bigtime_t interval)
 {
 	struct timer* timer = &sProfilingTimers[thread->cpu->cpu_num];
 	thread->debug_info.profile.installed_timer = timer;
@@ -1310,7 +1308,7 @@ schedule_profiling_timer(struct thread* thread, bigtime_t interval)
 static bool
 profiling_do_sample(bool& flushBuffer)
 {
-	struct thread* thread = thread_get_current_thread();
+	Thread* thread = thread_get_current_thread();
 	thread_debug_info& debugInfo = thread->debug_info;
 
 	if (debugInfo.profile.samples == NULL)
@@ -1387,7 +1385,7 @@ profiling_do_sample(bool& flushBuffer)
 static void
 profiling_buffer_full(void*)
 {
-	struct thread* thread = thread_get_current_thread();
+	Thread* thread = thread_get_current_thread();
 	thread_debug_info& debugInfo = thread->debug_info;
 
 	GRAB_THREAD_LOCK();
@@ -1438,7 +1436,7 @@ profiling_buffer_full(void*)
 static int32
 profiling_event(timer* /*unused*/)
 {
-	struct thread* thread = thread_get_current_thread();
+	Thread* thread = thread_get_current_thread();
 	thread_debug_info& debugInfo = thread->debug_info;
 
 	bool flushBuffer = false;
@@ -1461,7 +1459,7 @@ profiling_event(timer* /*unused*/)
 
 
 void
-user_debug_thread_unscheduled(struct thread* thread)
+user_debug_thread_unscheduled(Thread* thread)
 {
 	// if running, cancel the profiling timer
 	struct timer* timer = thread->debug_info.profile.installed_timer;
@@ -1478,7 +1476,7 @@ user_debug_thread_unscheduled(struct thread* thread)
 
 
 void
-user_debug_thread_scheduled(struct thread* thread)
+user_debug_thread_scheduled(Thread* thread)
 {
 	if (thread->debug_info.profile.samples != NULL
 		&& !thread->debug_info.profile.buffer_full) {
@@ -1494,7 +1492,7 @@ user_debug_thread_scheduled(struct thread* thread)
 		thus have a debug port).
 */
 static void
-broadcast_debugged_thread_message(struct thread *nubThread, int32 code,
+broadcast_debugged_thread_message(Thread *nubThread, int32 code,
 	const void *message, int32 size)
 {
 	// iterate through the threads
@@ -1508,8 +1506,7 @@ broadcast_debugged_thread_message(struct thread *nubThread, int32 code,
 
 		port_id threadDebugPort = -1;
 		thread_id threadID = -1;
-		struct thread *thread
-			= thread_get_thread_struct_locked(threadInfo.thread);
+		Thread *thread = thread_get_thread_struct_locked(threadInfo.thread);
 		if (thread && thread != nubThread && thread->team == nubThread->team
 			&& (thread->debug_info.flags & B_THREAD_DEBUG_INITIALIZED) != 0
 			&& (thread->debug_info.flags & B_THREAD_DEBUG_STOPPED) != 0) {
@@ -1534,7 +1531,7 @@ broadcast_debugged_thread_message(struct thread *nubThread, int32 code,
 
 
 static void
-nub_thread_cleanup(struct thread *nubThread)
+nub_thread_cleanup(Thread *nubThread)
 {
 	TRACE(("nub_thread_cleanup(%ld): debugger port: %ld\n", nubThread->id,
 		nubThread->team->debug_info.debugger_port));
@@ -1580,7 +1577,7 @@ nub_thread_cleanup(struct thread *nubThread)
  *		   a thread of the same team.
  */
 static status_t
-debug_nub_thread_get_thread_debug_port(struct thread *nubThread,
+debug_nub_thread_get_thread_debug_port(Thread *nubThread,
 	thread_id threadID, port_id &threadDebugPort)
 {
 	status_t result = B_OK;
@@ -1589,7 +1586,7 @@ debug_nub_thread_get_thread_debug_port(struct thread *nubThread,
 	cpu_status state = disable_interrupts();
 	GRAB_THREAD_LOCK();
 
-	struct thread *thread = thread_get_thread_struct_locked(threadID);
+	Thread *thread = thread_get_thread_struct_locked(threadID);
 	if (thread) {
 		if (thread->team != nubThread->team)
 			result = B_BAD_VALUE;
@@ -1613,7 +1610,7 @@ debug_nub_thread_get_thread_debug_port(struct thread *nubThread,
 static status_t
 debug_nub_thread(void *)
 {
-	struct thread *nubThread = thread_get_current_thread();
+	Thread *nubThread = thread_get_current_thread();
 
 	// check, if we're still the current nub thread and get our port
 	cpu_status state = disable_interrupts();
@@ -1755,7 +1752,7 @@ debug_nub_thread(void *)
 				TRACE(("nub thread %ld: B_DEBUG_MESSAGE_SET_TEAM_FLAGS: "
 					"flags: %lx\n", nubThread->id, flags));
 
-				struct team *team = thread_get_current_thread()->team;
+				Team *team = thread_get_current_thread()->team;
 
 				// set the flags
 				cpu_status state = disable_interrupts();
@@ -1785,8 +1782,7 @@ debug_nub_thread(void *)
 				cpu_status state = disable_interrupts();
 				GRAB_THREAD_LOCK();
 
-				struct thread *thread
-					= thread_get_thread_struct_locked(threadID);
+				Thread *thread = thread_get_thread_struct_locked(threadID);
 				if (thread
 					&& thread->team == thread_get_current_thread()->team) {
 					flags |= thread->debug_info.flags
@@ -2032,8 +2028,7 @@ debug_nub_thread(void *)
 				cpu_status state = disable_interrupts();
 				GRAB_THREAD_LOCK();
 
-				struct thread *thread
-					= thread_get_thread_struct_locked(threadID);
+				Thread *thread = thread_get_thread_struct_locked(threadID);
 				if (thread
 					&& thread->team == thread_get_current_thread()->team) {
 					thread_debug_info &threadDebugInfo = thread->debug_info;
@@ -2084,8 +2079,7 @@ debug_nub_thread(void *)
 				cpu_status state = disable_interrupts();
 				GRAB_THREAD_LOCK();
 
-				struct thread *thread
-					= thread_get_thread_struct_locked(threadID);
+				Thread *thread = thread_get_thread_struct_locked(threadID);
 				if (thread) {
 					ignore = thread->debug_info.ignore_signals;
 					ignoreOnce = thread->debug_info.ignore_signals_once;
@@ -2124,8 +2118,7 @@ debug_nub_thread(void *)
 				cpu_status state = disable_interrupts();
 				GRAB_THREAD_LOCK();
 
-				struct thread *thread
-					= thread_get_thread_struct_locked(threadID);
+				Thread *thread = thread_get_thread_struct_locked(threadID);
 				if (thread
 					&& thread->team != thread_get_current_thread()->team) {
 					thread = NULL;
@@ -2153,8 +2146,7 @@ debug_nub_thread(void *)
 				cpu_status state = disable_interrupts();
 				GRAB_THREAD_LOCK();
 
-				struct thread *thread
-					= thread_get_thread_struct_locked(threadID);
+				Thread *thread = thread_get_thread_struct_locked(threadID);
 				if (thread) {
 					if (thread->team != thread_get_current_thread()->team)
 						result = B_BAD_VALUE;
@@ -2189,7 +2181,7 @@ debug_nub_thread(void *)
 				TRACE(("nub thread %ld: B_DEBUG_MESSAGE_PREPARE_HANDOVER\n",
 					nubThread->id));
 
-				struct team *team = nubThread->team;
+				Team *team = nubThread->team;
 
 				// Acquire the debugger write lock. As soon as we have it and
 				// have set the B_TEAM_DEBUG_DEBUGGER_HANDOVER flag, no thread
@@ -2286,8 +2278,7 @@ debug_nub_thread(void *)
 					cpu_status state = disable_interrupts();
 					GRAB_THREAD_LOCK();
 
-					struct thread *thread
-						= thread_get_thread_struct_locked(threadID);
+					Thread *thread = thread_get_thread_struct_locked(threadID);
 					if (thread && thread->team == nubThread->team) {
 						thread_debug_info &threadDebugInfo = thread->debug_info;
 						if (threadDebugInfo.profile.samples == NULL) {
@@ -2361,8 +2352,7 @@ debug_nub_thread(void *)
 				cpu_status state = disable_interrupts();
 				GRAB_THREAD_LOCK();
 
-				struct thread *thread
-					= thread_get_thread_struct_locked(threadID);
+				Thread *thread = thread_get_thread_struct_locked(threadID);
 				if (thread && thread->team == nubThread->team) {
 					thread_debug_info &threadDebugInfo = thread->debug_info;
 					if (threadDebugInfo.profile.samples != NULL) {
@@ -2442,7 +2432,7 @@ debug_nub_thread(void *)
 	(including among other things formerly set break/watchpoints).
  */
 static void
-install_team_debugger_init_debug_infos(struct team *team, team_id debuggerTeam,
+install_team_debugger_init_debug_infos(Team *team, team_id debuggerTeam,
 	port_id debuggerPort, port_id nubPort, thread_id nubThread,
 	sem_id debuggerPortWriteLock, thread_id causingThread)
 {
@@ -2462,7 +2452,7 @@ install_team_debugger_init_debug_infos(struct team *team, team_id debuggerTeam,
 	// set the user debug flags and signal masks of all threads to the default
 	GRAB_THREAD_LOCK();
 
-	for (struct thread *thread = team->thread_list;
+	for (Thread *thread = team->thread_list;
 		 thread;
 		 thread = thread->team_next) {
 		if (thread->id == nubThread) {
@@ -2515,7 +2505,7 @@ install_team_debugger(team_id teamID, port_id debuggerPort,
 	}
 
 	// get the team
-	struct team* team;
+	Team* team;
 	ConditionVariable debugChangeCondition;
 	error = prepare_debugger_change(teamID, debugChangeCondition, team);
 	if (error != B_OK)
@@ -2777,7 +2767,7 @@ _user_debugger(const char *userMessage)
 int
 _user_disable_debugger(int state)
 {
-	struct team *team = thread_get_current_thread()->team;
+	Team *team = thread_get_current_thread()->team;
 
 	TRACE(("_user_disable_debugger(%d): team: %ld\n", state, team->id));
 
@@ -2832,7 +2822,7 @@ _user_install_team_debugger(team_id teamID, port_id debuggerPort)
 status_t
 _user_remove_team_debugger(team_id teamID)
 {
-	struct team* team;
+	Team* team;
 	ConditionVariable debugChangeCondition;
 	status_t error = prepare_debugger_change(teamID, debugChangeCondition,
 		team);
@@ -2880,7 +2870,7 @@ _user_debug_thread(thread_id threadID)
 	cpu_status state = disable_interrupts();
 	GRAB_THREAD_LOCK();
 
-	struct thread *thread = thread_get_thread_struct_locked(threadID);
+	Thread *thread = thread_get_thread_struct_locked(threadID);
 	if (!thread) {
 		// thread doesn't exist any longer
 		error = B_BAD_THREAD_ID;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2005-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -1774,7 +1774,7 @@ disconnect_mount_or_vnode_fds(struct fs_mount* mount,
 	while (true) {
 		struct io_context* context = NULL;
 		bool contextLocked = false;
-		struct team* team = NULL;
+		Team* team = NULL;
 		team_id lastTeamID;
 
 		cpu_status state = disable_interrupts();
@@ -3335,7 +3335,7 @@ dump_io_context(int argc, char** argv)
 		if (IS_KERNEL_ADDRESS(num))
 			context = (struct io_context*)num;
 		else {
-			struct team* team = team_get_team_struct_locked(num);
+			Team* team = team_get_team_struct_locked(num);
 			if (team == NULL) {
 				kprintf("could not find team with ID %ld\n", num);
 				return 0;
@@ -7817,7 +7817,7 @@ _kern_get_next_fd_info(team_id teamID, uint32* _cookie, fd_info* info,
 		return B_BAD_VALUE;
 
 	struct io_context* context = NULL;
-	struct team* team = NULL;
+	Team* team = NULL;
 
 	cpu_status state = disable_interrupts();
 	GRAB_TEAM_LOCK();

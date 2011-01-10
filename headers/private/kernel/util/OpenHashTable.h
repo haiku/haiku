@@ -401,7 +401,7 @@ protected:
 		return true;
 	}
 
-	void _Resize(ValueType** newTable, size_t newSize, void** oldTable = NULL)
+	void _Resize(ValueType** newTable, size_t newSize, void** _oldTable = NULL)
 	{
 		for (size_t i = 0; i < newSize; i++)
 			newTable[i] = NULL;
@@ -416,11 +416,12 @@ protected:
 				}
 			}
 
-			if (oldTable != NULL)
-				*oldTable = fTable;
+			if (_oldTable != NULL)
+				*_oldTable = fTable;
 			else
 				fAllocator.Free(fTable);
-		}
+		} else if (_oldTable != NULL)
+			*_oldTable = NULL;
 
 		fTableSize = newSize;
 		fTable = newTable;

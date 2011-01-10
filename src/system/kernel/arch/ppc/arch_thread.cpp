@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2010, Haiku Inc. All rights reserved.
+ * Copyright 2003-2011, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -56,7 +56,7 @@ ppc_pop_iframe(struct iframe_stack *stack)
 static struct iframe *
 ppc_get_current_iframe(void)
 {
-	struct thread *thread = thread_get_current_thread();
+	Thread *thread = thread_get_current_thread();
 
 	ASSERT(thread->arch_info.iframes.index >= 0);
 	return thread->arch_info.iframes.frames[thread->arch_info.iframes.index - 1];
@@ -72,7 +72,7 @@ ppc_get_current_iframe(void)
 struct iframe *
 ppc_get_user_iframe(void)
 {
-	struct thread *thread = thread_get_current_thread();
+	Thread *thread = thread_get_current_thread();
 	int i;
 
 	for (i = thread->arch_info.iframes.index - 1; i >= 0; i--) {
@@ -99,7 +99,7 @@ arch_thread_init(struct kernel_args *args)
 
 
 status_t
-arch_team_init_team_struct(struct team *team, bool kernel)
+arch_team_init_team_struct(Team *team, bool kernel)
 {
 	// Nothing to do. The structure is empty.
 	return B_OK;
@@ -107,7 +107,7 @@ arch_team_init_team_struct(struct team *team, bool kernel)
 
 
 status_t
-arch_thread_init_thread_struct(struct thread *thread)
+arch_thread_init_thread_struct(Thread *thread)
 {
 	// set up an initial state (stack & fpu)
 	memcpy(&thread->arch_info, &sInitialState, sizeof(struct arch_thread));
@@ -117,7 +117,7 @@ arch_thread_init_thread_struct(struct thread *thread)
 
 
 status_t
-arch_thread_init_kthread_stack(struct thread *t, int (*start_func)(void),
+arch_thread_init_kthread_stack(Thread *t, int (*start_func)(void),
 	void (*entry_func)(void), void (*exit_func)(void))
 {
 	addr_t *kstack = (addr_t *)t->kernel_stack_base;
@@ -160,7 +160,7 @@ arch_thread_init_kthread_stack(struct thread *t, int (*start_func)(void),
 
 
 status_t
-arch_thread_init_tls(struct thread *thread)
+arch_thread_init_tls(Thread *thread)
 {
 	// TODO: Implement!
 	return B_OK;
@@ -168,7 +168,7 @@ arch_thread_init_tls(struct thread *thread)
 
 
 void
-arch_thread_context_switch(struct thread *t_from, struct thread *t_to)
+arch_thread_context_switch(Thread *t_from, Thread *t_to)
 {
     // set the new kernel stack in the EAR register.
 	// this is used in the exception handler code to decide what kernel stack to
@@ -199,7 +199,7 @@ arch_thread_dump_info(void *info)
 
 
 status_t
-arch_thread_enter_userspace(struct thread *thread, addr_t entry, void *arg1, void *arg2)
+arch_thread_enter_userspace(Thread *thread, addr_t entry, void *arg1, void *arg2)
 {
 	panic("arch_thread_enter_uspace(): not yet implemented\n");
 	return B_ERROR;
@@ -207,14 +207,14 @@ arch_thread_enter_userspace(struct thread *thread, addr_t entry, void *arg1, voi
 
 
 bool
-arch_on_signal_stack(struct thread *thread)
+arch_on_signal_stack(Thread *thread)
 {
 	return false;
 }
 
 
 status_t
-arch_setup_signal_frame(struct thread *thread, struct sigaction *sa, int sig, int sigMask)
+arch_setup_signal_frame(Thread *thread, struct sigaction *sa, int sig, int sigMask)
 {
 	return B_ERROR;
 }

@@ -1000,7 +1000,7 @@ ATAChannel::_TransferPIOPhysical(ATARequest *request, addr_t physicalAddress,
 	// we must split up chunk into B_PAGE_SIZE blocks as we can map only
 	// one page into address space at once
 	while (length > 0) {
-		struct thread *thread = thread_get_current_thread();
+		Thread *thread = thread_get_current_thread();
 		thread_pin_to_current_cpu(thread);
 
 		void *handle;

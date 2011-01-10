@@ -22,7 +22,7 @@
 
 #ifndef _ASSEMBLER
 
-/* 68k has many different possible stack frames, differentiated by a 4 bit number, 
+/* 68k has many different possible stack frames, differentiated by a 4 bit number,
  * but they also depend on the cpu type.
  * cf. mint/sys/arch/check_exc.h
  */
@@ -283,7 +283,7 @@ struct iframe {
 	struct mc680x0_fp_control_regs fpc;
 	/* fpu state */
 	struct mc680x0_fpu_state fpu;
-	
+
 	/* data and address registers */
 	uint32 d[8];
 	uint32 a[7];
@@ -517,7 +517,7 @@ extern int arch_machine;
 	Use of (some) special purpose registers.
 	XXX: those regs aren't implemented/accessed the same way on different cpus...
 
-	SRP[63-32]: current struct thread*
+	SRP[63-32]: current Thread*
 	SRP[31-0] :
 	CAAR      : can we use it ??
 	MSP       :
@@ -526,7 +526,7 @@ extern int arch_machine;
 	SPRG0: per CPU physical address pointer to an ppc_cpu_exception_context
 	       structure
 	SPRG1: scratch
-	SPRG2: current struct thread*
+	SPRG2: current Thread*
 	SPRG3: TLS base pointer (only for userland threads)
 */
 

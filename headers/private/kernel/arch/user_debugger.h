@@ -1,9 +1,10 @@
 /*
- * Copyright 2005, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2005-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef KERNEL_ARCH_USER_DEBUGGER_H
 #define KERNEL_ARCH_USER_DEBUGGER_H
+
 
 #include "kernel_debug_config.h"
 
@@ -17,7 +18,7 @@ extern "C" {
 
 struct arch_team_debug_info;
 struct arch_thread_debug_info;
-struct thread;
+
 
 void arch_clear_team_debug_info(struct arch_team_debug_info *info);
 void arch_destroy_team_debug_info(struct arch_team_debug_info *info);

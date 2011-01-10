@@ -22,9 +22,9 @@ struct iframe *arm_get_user_iframe(void);
 
 /* as we won't support SMP on arm (yet?) we can use a global here */
 /*TODO SMP-ARMS are comming..*/
-extern struct thread *gCurrentThread;
+extern Thread *gCurrentThread;
 
-extern inline struct thread *
+extern inline Thread *
 arch_thread_get_current_thread(void)
 {
 	return gCurrentThread;
@@ -32,7 +32,7 @@ arch_thread_get_current_thread(void)
 
 
 extern inline void
-arch_thread_set_current_thread(struct thread *t)
+arch_thread_set_current_thread(Thread *t)
 {
 	gCurrentThread = t;
 }

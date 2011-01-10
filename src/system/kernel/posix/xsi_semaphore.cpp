@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Haiku Inc. All rights reserved.
+ * Copyright 2008-2011, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -35,7 +35,7 @@
 
 // Queue for holding blocked threads
 struct queued_thread : DoublyLinkedListLinkImpl<queued_thread> {
-	queued_thread(struct thread *thread, int32 count)
+	queued_thread(Thread *thread, int32 count)
 		:
 		thread(thread),
 		count(count),
@@ -43,9 +43,9 @@ struct queued_thread : DoublyLinkedListLinkImpl<queued_thread> {
 	{
 	}
 
-	struct thread	*thread;
-	int32			count;
-	bool			queued;
+	Thread	*thread;
+	int32	count;
+	bool	queued;
 };
 
 typedef DoublyLinkedList<queued_thread> ThreadQueue;
@@ -53,7 +53,7 @@ typedef DoublyLinkedList<queued_thread> ThreadQueue;
 class XsiSemaphoreSet;
 
 struct sem_undo : DoublyLinkedListLinkImpl<sem_undo> {
-	sem_undo(XsiSemaphoreSet *semaphoreSet, struct team *team, int16 *undoValues)
+	sem_undo(XsiSemaphoreSet *semaphoreSet, Team *team, int16 *undoValues)
 		:
 		semaphore_set(semaphoreSet),
 		team(team),
@@ -63,7 +63,7 @@ struct sem_undo : DoublyLinkedListLinkImpl<sem_undo> {
 
 	DoublyLinkedListLink<sem_undo>		team_link;
 	XsiSemaphoreSet						*semaphore_set;
-	struct team							*team;
+	Team								*team;
 	int16								*undo_values;
 };
 
@@ -136,7 +136,7 @@ public:
 		}
 	}
 
-	status_t BlockAndUnlock(struct thread *thread, MutexLocker *setLocker)
+	status_t BlockAndUnlock(Thread *thread, MutexLocker *setLocker)
 	{
 		thread_prepare_to_block(thread, B_CAN_INTERRUPT,
 			THREAD_BLOCK_TYPE_OTHER, (void*)"xsi semaphore");
@@ -278,7 +278,7 @@ public:
 
 	void ClearUndo(unsigned short semaphoreNumber)
 	{
-		struct team *team = thread_get_current_thread()->team;
+		Team *team = thread_get_current_thread()->team;
 		UndoList::Iterator iterator = fUndoList.GetIterator();
 		while (iterator.HasNext()) {
 			struct sem_undo *current = iterator.Next();
@@ -297,7 +297,7 @@ public:
 	{
 		// Clear all undo_values (POSIX semadj equivalent)
 		// of the calling team. This happens only on semctl SETALL.
-		struct team *team = thread_get_current_thread()->team;
+		Team *team = thread_get_current_thread()->team;
 		DoublyLinkedList<sem_undo>::Iterator iterator = fUndoList.GetIterator();
 		while (iterator.HasNext()) {
 			struct sem_undo *current = iterator.Next();
@@ -391,7 +391,7 @@ public:
 		// Look if there is already a record from the team caller
 		// for the same semaphore set
 		bool notFound = true;
-		struct team *team = thread_get_current_thread()->team;
+		Team *team = thread_get_current_thread()->team;
 		DoublyLinkedList<sem_undo>::Iterator iterator = fUndoList.GetIterator();
 		while (iterator.HasNext()) {
 			struct sem_undo *current = iterator.Next();
@@ -463,7 +463,7 @@ public:
 	void RevertUndo(short semaphoreNumber, short value)
 	{
 		// This can be called only when RecordUndo fails.
-		struct team *team = thread_get_current_thread()->team;
+		Team *team = thread_get_current_thread()->team;
 		DoublyLinkedList<sem_undo>::Iterator iterator = fUndoList.GetIterator();
 		while (iterator.HasNext()) {
 			struct sem_undo *current = iterator.Next();
@@ -676,7 +676,7 @@ xsi_sem_init()
 
 /*!	Function called on team exit to process any sem_undo requests */
 void
-xsi_sem_undo(struct team *team)
+xsi_sem_undo(Team *team)
 {
 	if (team->xsi_sem_context == NULL)
 		return;
@@ -1170,7 +1170,7 @@ _user_xsi_semop(int semaphoreID, struct sembuf *ops, size_t numOps)
 			if (operations[i].sem_op != 0)
 				waitOnZero = false;
 
-			struct thread *thread = thread_get_current_thread();
+			Thread *thread = thread_get_current_thread();
 			queued_thread queueEntry(thread, (int32)operations[i].sem_op);
 			semaphore->Enqueue(&queueEntry, waitOnZero);
 

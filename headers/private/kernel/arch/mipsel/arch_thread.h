@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2009, Haiku Inc. All rights reserved.
+ * Copyright 2003-2011, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -22,17 +22,17 @@ void mipsel_pop_iframe(struct iframe_stack* stack);
 struct iframe* mipsel_get_user_iframe(void);
 
 
-static inline struct thread* 
+static inline Thread*
 arch_thread_get_current_thread(void)
 {
 #warning IMPLEMENT arch_thread_get_current_thread
-    struct thread* t;
+    Thread* t;
     return t;
 }
 
 
 static inline void
-arch_thread_set_current_thread(struct thread* t)
+arch_thread_set_current_thread(Thread* t)
 {
 #warning IMPLEMENT arch_thread_set_current_thread
 }

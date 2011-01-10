@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -49,7 +49,7 @@ static mutex sCacheListLock = MUTEX_INITIALIZER("global VMCache list");
 
 
 struct VMCache::PageEventWaiter {
-	struct thread*		thread;
+	Thread*				thread;
 	PageEventWaiter*	next;
 	vm_page*			page;
 	uint32				events;

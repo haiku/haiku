@@ -44,7 +44,7 @@ void
 arch_update_thread_single_step()
 {
 	if (struct iframe* frame = m68k_get_user_iframe()) {
-		struct thread* thread = thread_get_current_thread();
+		Thread* thread = thread_get_current_thread();
 
 		// set/clear T1 in SR depending on if single stepping is desired
 		// T1 T0

@@ -23,7 +23,12 @@
 
 
 struct kernel_args;
-struct thread;
+
+namespace BKernel {
+	struct Thread;
+}
+
+using BKernel::Thread;
 
 
 /* CPU local data structure */
@@ -45,7 +50,7 @@ typedef struct cpu_ent {
 	addr_t			fault_handler_stack_pointer;
 	jmp_buf			fault_jump_buffer;
 
-	struct thread*	running_thread;
+	Thread*			running_thread;
 	bool			invoke_scheduler;
 	bool			invoke_scheduler_if_idle;
 	bool			disabled;

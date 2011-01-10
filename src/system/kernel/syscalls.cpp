@@ -521,22 +521,22 @@ public:
 			return fFilter->Filter(_entry, out);
 
 		if (const PreSyscall* entry = dynamic_cast<const PreSyscall*>(_entry)) {
-			_RemovePendingThread(entry->Thread());
+			_RemovePendingThread(entry->ThreadID());
 
 			bool accepted = fFilter->Filter(entry, out);
 			if (accepted)
-				_AddPendingThread(entry->Thread());
+				_AddPendingThread(entry->ThreadID());
 			return accepted;
 
 		} else if (const PostSyscall* entry
 				= dynamic_cast<const PostSyscall*>(_entry)) {
-			bool wasPending = _RemovePendingThread(entry->Thread());
+			bool wasPending = _RemovePendingThread(entry->ThreadID());
 
 			return wasPending || fFilter->Filter(entry, out);
 
 		} else if (const AbstractTraceEntry* entry
 				= dynamic_cast<const AbstractTraceEntry*>(_entry)) {
-			bool isPending = _IsPendingThread(entry->Thread());
+			bool isPending = _IsPendingThread(entry->ThreadID());
 
 			return isPending || fFilter->Filter(entry, out);
 

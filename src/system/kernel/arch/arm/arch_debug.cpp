@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2009, Haiku Inc. All rights reserved.
+ * Copyright 2003-2011, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -65,7 +65,7 @@ get_current_stack_frame()
 static status_t
 get_next_frame(addr_t framePointer, addr_t *next, addr_t *ip)
 {
-	struct thread *thread = thread_get_current_thread();
+	Thread *thread = thread_get_current_thread();
 	addr_t oldFaultHandler = thread->fault_handler;
 
 	// set fault handler, so that we can safely access user stacks
@@ -88,7 +88,7 @@ error:
 
 
 static void
-print_stack_frame(struct thread *thread, addr_t ip, addr_t framePointer,
+print_stack_frame(Thread *thread, addr_t ip, addr_t framePointer,
 	addr_t nextFramePointer)
 {
 	addr_t diff = nextFramePointer - framePointer;
@@ -128,7 +128,7 @@ stack_trace(int argc, char **argv)
 {
 	uint32 previousLocations[NUM_PREVIOUS_LOCATIONS];
 	struct iframe_stack *frameStack;
-	struct thread *thread;
+	Thread *thread;
 	addr_t framePointer;
 	int32 i, num = 0, last = 0;
 
@@ -234,7 +234,7 @@ arch_debug_save_registers(struct arch_debug_registers* registers)
 
 
 bool
-arch_debug_contains_call(struct thread *thread, const char *symbol,
+arch_debug_contains_call(Thread *thread, const char *symbol,
 	addr_t start, addr_t end)
 {
 	return false;

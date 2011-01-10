@@ -10,19 +10,19 @@ if $(DEBUG) = 0 {
 }
 
 KernelAddon scsi :
-	bus_raw.c
-	busses.c
-	ccb.c
-	device_scan.c
-	devices.c
+	bus_raw.cpp
+	busses.cpp
+	ccb.cpp
+	device_scan.cpp
+	devices.cpp
 	dma_buffer.cpp
-	dpc.c
+	dpc.cpp
 	emulation.cpp
-	queuing.c
-	scsi.c
-	scsi_io.c
-	scatter_gather.c
-	sim_interface.c
-	virtual_memory.c
+	queuing.cpp
+	scsi.cpp
+	scsi_io.cpp
+	scatter_gather.cpp
+	sim_interface.cpp
+	virtual_memory.cpp
 	;
 

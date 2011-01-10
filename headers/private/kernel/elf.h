@@ -20,7 +20,8 @@ struct kernel_args;
 extern "C" {
 #endif
 
-status_t elf_load_user_image(const char *path, struct team *team, int flags, addr_t *_entry);
+status_t elf_load_user_image(const char *path, Team *team, int flags,
+	addr_t *_entry);
 
 // these two might get public one day:
 image_id load_kernel_add_on(const char *path);
@@ -29,7 +30,7 @@ status_t unload_kernel_add_on(image_id id);
 status_t elf_debug_lookup_symbol_address(addr_t address, addr_t *_baseAddress,
 			const char **_symbolName, const char **_imageName,
 			bool *_exactMatch);
-status_t elf_debug_lookup_user_symbol_address(struct team* team, addr_t address,
+status_t elf_debug_lookup_user_symbol_address(Team* team, addr_t address,
 			addr_t *_baseAddress, const char **_symbolName,
 			const char **_imageName, bool *_exactMatch);
 addr_t elf_debug_lookup_symbol(const char* searchName);

@@ -91,7 +91,7 @@ scsi_controller_register_raw_device(void *_cookie)
 	pnp->get_attr_uint8(node, SCSI_BUS_PATH_ID_ITEM, &pathID, false);
 
 	// put that on heap to not overflow the limited kernel stack
-	name = malloc(PATH_MAX + 1);
+	name = (char*)malloc(PATH_MAX + 1);
 	if (name == NULL)
 		return B_NO_MEMORY;
 

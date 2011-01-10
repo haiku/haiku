@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Haiku Inc. All rights reserved.
+ * Copyright 2003-2011, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -20,9 +20,9 @@ void m68k_pop_iframe(struct iframe_stack *stack);
 struct iframe *m68k_get_user_iframe(void);
 
 /* as we won't support SMP on m68k (yet?) we can use a global here */
-extern struct thread *gCurrentThread;
+extern Thread *gCurrentThread;
 
-extern inline struct thread *
+extern inline Thread *
 arch_thread_get_current_thread(void)
 {
 	return gCurrentThread;
@@ -30,7 +30,7 @@ arch_thread_get_current_thread(void)
 
 
 extern inline void
-arch_thread_set_current_thread(struct thread *t)
+arch_thread_set_current_thread(Thread *t)
 {
 	gCurrentThread = t;
 }
@@ -38,17 +38,17 @@ arch_thread_set_current_thread(struct thread *t)
 #if 0
 /* this would only work on 030... */
 
-extern inline struct thread *
+extern inline Thread *
 arch_thread_get_current_thread(void)
 {
 	uint64 v = 0;
 	asm volatile("pmove %%srp,(%0)" : : "a"(&v));
-	return (struct thread *)(uint32)(v & 0xffffffff);
+	return (Thread *)(uint32)(v & 0xffffffff);
 }
 
 
 extern inline void
-arch_thread_set_current_thread(struct thread *t)
+arch_thread_set_current_thread(Thread *t)
 {
 	uint64 v;
 	asm volatile("pmove %%srp,(%0)\n" \

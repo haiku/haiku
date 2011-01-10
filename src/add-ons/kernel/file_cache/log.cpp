@@ -83,7 +83,7 @@ get_log_entry()
 	mutex_lock(&sLock);
 	cache_log *log = &sLogEntries[sCurrentEntry++];
 
-	struct thread *thread = thread_get_current_thread();
+	Thread *thread = thread_get_current_thread();
 	log->team = thread->team->id;
 	strlcpy(log->team_name, thread->name, B_OS_NAME_LENGTH);
 
@@ -167,7 +167,7 @@ log_node_launched(size_t argCount, char * const *args)
 	for (uint32 i = 0; i < argCount; i++) {
 		if  (i == 0) {
 			// cut off path from parent team name
-			struct team *team = thread_get_current_thread()->team;
+			Team *team = thread_get_current_thread()->team;
 			char name[B_OS_NAME_LENGTH];
 			cpu_status state;
 

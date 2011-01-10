@@ -1,7 +1,7 @@
 /* Realtek RTL8169 Family Driver
  * Copyright (C) 2004 Marcus Overhagen <marcus@overhagen.de>. All rights reserved.
  *
- * Permission to use, copy, modify and distribute this software and its 
+ * Permission to use, copy, modify and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
  * that the above copyright notice appear in all copies, and that both the
  * copyright notice and this permission notice appear in supporting documentation.
@@ -19,9 +19,18 @@
 #ifndef __UTIL_H
 #define __UTIL_H
 
+
+#include <sys/cdefs.h>
+
 #include <OS.h>
+
+
+__BEGIN_DECLS
 
 area_id alloc_mem(void **virt, void **phy, size_t size, uint32 protection, const char *name);
 area_id map_mem(void **virt, void *phy, size_t size, uint32 protection, const char *name);
+
+__END_DECLS
+
 
 #endif

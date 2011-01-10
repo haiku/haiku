@@ -5,12 +5,17 @@
 #ifndef _KERNEL_USERGROUP_H
 #define _KERNEL_USERGROUP_H
 
+
 #include <unistd.h>
 
 #include <SupportDefs.h>
 
 
-struct team;
+namespace BKernel {
+	struct Team;
+}
+
+using BKernel::Team;
 
 
 #ifdef __cplusplus
@@ -19,11 +24,9 @@ extern "C" {
 
 // kernel private functions
 
-void		inherit_parent_user_and_group(struct team* team,
-				struct team* parent);
-void		inherit_parent_user_and_group_locked(struct team* team,
-				struct team* parent);
-status_t	update_set_id_user_and_group(struct team* team, const char* file);
+void		inherit_parent_user_and_group(Team* team, Team* parent);
+void		inherit_parent_user_and_group_locked(Team* team, Team* parent);
+status_t	update_set_id_user_and_group(Team* team, const char* file);
 
 // syscalls
 

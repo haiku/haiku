@@ -19,7 +19,6 @@ struct generic_io_vec;
 struct kernel_args;
 struct ObjectCache;
 struct system_memory_info;
-struct team;
 struct VMAddressSpace;
 struct VMArea;
 struct VMCache;

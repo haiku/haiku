@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2010 Haiku Inc. All rights reserved.
+ * Copyright 2003-2011, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -71,7 +71,7 @@ arch_thread_init(struct kernel_args *args)
 
 
 status_t
-arch_team_init_team_struct(struct team *team, bool kernel)
+arch_team_init_team_struct(Team *team, bool kernel)
 {
 #warning IMPLEMENT arch_team_init_team_struct
 	return B_ERROR;
@@ -79,7 +79,7 @@ arch_team_init_team_struct(struct team *team, bool kernel)
 
 
 status_t
-arch_thread_init_thread_struct(struct thread *thread)
+arch_thread_init_thread_struct(Thread *thread)
 {
 #warning IMPLEMENT arch_thread_init_thread_struct
 	return B_ERROR;
@@ -87,7 +87,7 @@ arch_thread_init_thread_struct(struct thread *thread)
 
 
 status_t
-arch_thread_init_kthread_stack(struct thread *t, int (*start_func)(void),
+arch_thread_init_kthread_stack(Thread *t, int (*start_func)(void),
 	void (*entry_func)(void), void (*exit_func)(void))
 {
 #warning IMPLEMENT arch_thread_init_kthread_stack
@@ -96,7 +96,7 @@ arch_thread_init_kthread_stack(struct thread *t, int (*start_func)(void),
 
 
 status_t
-arch_thread_init_tls(struct thread *thread)
+arch_thread_init_tls(Thread *thread)
 {
 #warning IMPLEMENT arch_thread_init_tls
 	return B_ERROR;
@@ -104,7 +104,7 @@ arch_thread_init_tls(struct thread *thread)
 
 
 void
-arch_thread_context_switch(struct thread *from, struct thread *to)
+arch_thread_context_switch(Thread *from, Thread *to)
 {
 #warning IMPLEMENT arch_thread_context_switch
 }
@@ -118,7 +118,7 @@ arch_thread_dump_info(void *info)
 
 
 status_t
-arch_thread_enter_userspace(struct thread *thread, addr_t entry, void *arg1,
+arch_thread_enter_userspace(Thread *thread, addr_t entry, void *arg1,
 	void *arg2)
 {
 #warning IMPLEMENT arch_thread_enter_userspace
@@ -128,7 +128,7 @@ arch_thread_enter_userspace(struct thread *thread, addr_t entry, void *arg1,
 
 
 bool
-arch_on_signal_stack(struct thread *thread)
+arch_on_signal_stack(Thread *thread)
 {
 #warning IMPLEMENT arch_on_signal_stack
 	return false;
@@ -136,7 +136,7 @@ arch_on_signal_stack(struct thread *thread)
 
 
 status_t
-arch_setup_signal_frame(struct thread *thread, struct sigaction *sa, int sig,
+arch_setup_signal_frame(Thread *thread, struct sigaction *sa, int sig,
 	int sigMask)
 {
 #warning IMPLEMENT arch_setup_signal_frame
@@ -153,7 +153,7 @@ arch_restore_signal_frame(void)
 
 
 void
-arch_check_syscall_restart(struct thread *thread)
+arch_check_syscall_restart(Thread *thread)
 {
 #warning IMPLEMENT arch_check_syscall_restart
 }

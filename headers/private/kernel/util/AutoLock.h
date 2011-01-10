@@ -1,6 +1,6 @@
 /*
  * Copyright 2008-2009, Axel Dörfler, axeld@pinc-software.de.
- * Copyright 2005-2007, Ingo Weinhold, bonefish@users.sf.net. All rights reserved.
+ * Copyright 2005-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  *
  * Distributed under the terms of the MIT License.
  */
@@ -162,19 +162,19 @@ typedef AutoLocker<spinlock, InterruptsSpinLocking> InterruptsSpinLocker;
 
 class ThreadCPUPinLocking {
 public:
-	inline bool Lock(struct thread* thread)
+	inline bool Lock(Thread* thread)
 	{
 		thread_pin_to_current_cpu(thread);
 		return true;
 	}
 
-	inline void Unlock(struct thread* thread)
+	inline void Unlock(Thread* thread)
 	{
 		thread_unpin_from_current_cpu(thread);
 	}
 };
 
-typedef AutoLocker<struct thread, ThreadCPUPinLocking> ThreadCPUPinner;
+typedef AutoLocker<Thread, ThreadCPUPinLocking> ThreadCPUPinner;
 
 
 }	// namespace BPrivate

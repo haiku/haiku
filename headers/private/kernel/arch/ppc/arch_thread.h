@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Haiku Inc. All rights reserved.
+ * Copyright 2003-2011, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -20,17 +20,17 @@ void ppc_pop_iframe(struct iframe_stack *stack);
 struct iframe *ppc_get_user_iframe(void);
 
 
-static inline struct thread *
+static inline Thread *
 arch_thread_get_current_thread(void)
 {
-    struct thread *t;
+    Thread *t;
     asm volatile("mfsprg2 %0" : "=r"(t));
     return t;
 }
 
 
 static inline void
-arch_thread_set_current_thread(struct thread *t)
+arch_thread_set_current_thread(Thread *t)
 {
     asm volatile("mtsprg2 %0" : : "r"(t));
 }

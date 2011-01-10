@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
@@ -95,7 +95,7 @@ ARMVMTranslationMap::Flush()
 	if (fInvalidPagesCount <= 0)
 		return;
 
-	struct thread* thread = thread_get_current_thread();
+	Thread* thread = thread_get_current_thread();
 	thread_pin_to_current_cpu(thread);
 
 	if (fInvalidPagesCount > PAGE_INVALIDATE_CACHE_SIZE) {

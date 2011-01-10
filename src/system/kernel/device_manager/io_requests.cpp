@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -23,7 +23,8 @@ transfer_io_request_data(io_request* request, void* buffer, size_t size,
 	// lock the request buffer memory, if it is user memory
 	IOBuffer* ioBuffer = request->Buffer();
 	if (ioBuffer->IsUser() && !ioBuffer->IsMemoryLocked()) {
-		status_t error = ioBuffer->LockMemory(request->Team(), !writeToRequest);
+		status_t error = ioBuffer->LockMemory(request->TeamID(),
+			!writeToRequest);
 		if (error != B_OK)
 			return error;
 	}

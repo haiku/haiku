@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2010, Haiku Inc. All rights reserved.
+ * Copyright 2003-2011, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -176,7 +176,7 @@ m68k_exception_entry(struct iframe *iframe)
 			"pc: %p\n", system_time(), vector, iframe, (void*)iframe->cpu.pc);
 	}
 
-	struct thread *thread = thread_get_current_thread();
+	Thread *thread = thread_get_current_thread();
 
 	// push iframe
 	if (thread)

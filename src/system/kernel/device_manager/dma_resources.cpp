@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
@@ -453,7 +453,7 @@ DMAResource::TranslateNext(IORequest* request, IOOperation* operation,
 						< fRestrictions.max_segment_count) {
 					physical_entry entry;
 					uint32 count = 1;
-					get_memory_map_etc(request->Team(), (void*)base, size,
+					get_memory_map_etc(request->TeamID(), (void*)base, size,
 						&entry, &count);
 
 					vecs[segmentCount].base = entry.address;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
@@ -24,7 +24,7 @@ static void (*sRescheduleFunction)(void);
 static void
 scheduler_reschedule_no_op(void)
 {
-	struct thread* thread = thread_get_current_thread();
+	Thread* thread = thread_get_current_thread();
 	if (thread != NULL && thread->next_state != B_THREAD_READY)
 		panic("scheduler_reschedule_no_op() called in non-ready thread");
 }
@@ -108,7 +108,7 @@ _user_estimate_max_scheduling_latency(thread_id id)
 
 	InterruptsSpinLocker locker(gThreadSpinlock);
 
-	struct thread* thread = id < 0
+	Thread* thread = id < 0
 		? thread_get_current_thread() : thread_get_thread_struct_locked(id);
 	if (thread == NULL)
 		return 0;

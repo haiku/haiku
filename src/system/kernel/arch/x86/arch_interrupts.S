@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008, The Haiku Team. All rights reserved.
+ * Copyright 2002-2011, The Haiku Team. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -852,7 +852,7 @@ FUNCTION(x86_vm86_enter):
 	// get pointers
 	movl	32(%esp), %esi	// vm86 iframe
 	push	%esi			// ... store iframe addr for x86_vm86_return
-	movl	%dr3, %edi		// struct thread
+	movl	%dr3, %edi		// Thread*
 
 	// make sure eflags are in right shape
 	movl	VM86_IFRAME_flags(%esi), %eax

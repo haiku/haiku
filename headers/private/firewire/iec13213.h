@@ -30,10 +30,14 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * $FreeBSD: src/sys/dev/firewire/iec13213.h,v 1.14 2005/01/06 01:42:41 imp Exp $
  *
  */
+
+
+#include <sys/cdefs.h>
+
 
 #define	STATE_CLEAR	0x0000
 #define	STATE_SET	0x0004
@@ -161,7 +165,7 @@ struct csrtext {
 
 struct bus_info {
 #define	CSR_BUS_NAME_IEEE1394	0x31333934
-	uint32_t bus_name;	
+	uint32_t bus_name;
 #if BYTE_ORDER == BIG_ENDIAN
 	uint32_t irmc:1,		/* iso. resource manager capable */
 		 cmc:1,			/* cycle master capable */
@@ -209,6 +213,8 @@ struct crom_context {
 	struct crom_ptr stack[CROM_MAX_DEPTH];
 };
 
+__BEGIN_DECLS
+
 void crom_init_context(struct crom_context *, uint32_t *);
 struct csrreg *crom_get(struct crom_context *);
 void crom_next(struct crom_context *);
@@ -232,12 +238,12 @@ struct crom_src {
 
 struct crom_chunk {
 	STAILQ_ENTRY(crom_chunk) link;
-	struct crom_chunk *ref_chunk; 
-	int ref_index; 
+	struct crom_chunk *ref_chunk;
+	int ref_index;
 	int offset;
 	struct {
 		BIT16x2(crc_len, crc);
-		uint32_t buf[CROM_MAX_CHUNK_LEN]; 
+		uint32_t buf[CROM_MAX_CHUNK_LEN];
 	} data;
 };
 
@@ -246,6 +252,9 @@ extern int crom_add_entry(struct crom_chunk *, int, int);
 extern int crom_add_chunk(struct crom_src *src, struct crom_chunk *,
 					struct crom_chunk *, int);
 extern int crom_add_simple_text(struct crom_src *src, struct crom_chunk *,
-					struct crom_chunk *, char *);
+					struct crom_chunk *, const char *);
 extern int crom_load(struct crom_src *, uint32_t *, int);
+
 #endif
+
+__END_DECLS

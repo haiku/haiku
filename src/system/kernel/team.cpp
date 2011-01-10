@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -97,30 +97,30 @@ class TeamNotificationService : public DefaultNotificationService {
 public:
 							TeamNotificationService();
 
-			void			Notify(uint32 eventCode, struct team* team);
+			void			Notify(uint32 eventCode, Team* team);
 };
 
 
 struct TeamHashDefinition {
 	typedef team_id		KeyType;
-	typedef	struct team	ValueType;
+	typedef	Team		ValueType;
 
 	size_t HashKey(team_id key) const
 	{
 		return key;
 	}
 
-	size_t Hash(struct team* value) const
+	size_t Hash(Team* value) const
 	{
 		return HashKey(value->id);
 	}
 
-	bool Compare(team_id key, struct team* value) const
+	bool Compare(team_id key, Team* value) const
 	{
 		return value->id == key;
 	}
 
-	struct team*& GetLink(struct team* value) const
+	Team*& GetLink(Team* value) const
 	{
 		return value->next;
 	}
@@ -131,7 +131,7 @@ typedef BOpenHashTable<TeamHashDefinition> TeamHashTable;
 
 static TeamHashTable sTeamHash;
 static hash_table* sGroupHash = NULL;
-static struct team* sKernelTeam = NULL;
+static Team* sKernelTeam = NULL;
 
 // some arbitrary chosen limits - should probably depend on the available
 // memory (the limit is not yet enforced)
@@ -347,7 +347,7 @@ TeamNotificationService::TeamNotificationService()
 
 
 void
-TeamNotificationService::Notify(uint32 eventCode, struct team* team)
+TeamNotificationService::Notify(uint32 eventCode, Team* team)
 {
 	char eventBuffer[128];
 	KMessage event;
@@ -364,7 +364,7 @@ TeamNotificationService::Notify(uint32 eventCode, struct team* team)
 
 
 static void
-_dump_team_info(struct team* team)
+_dump_team_info(Team* team)
 {
 	kprintf("TEAM: %p\n", team);
 	kprintf("id:               %ld (%#lx)\n", team->id, team->id);
@@ -401,7 +401,7 @@ dump_team_info(int argc, char** argv)
 	bool found = false;
 
 	if (argc < 2) {
-		struct thread* thread = thread_get_current_thread();
+		Thread* thread = thread_get_current_thread();
 		if (thread != NULL && thread->team != NULL)
 			_dump_team_info(thread->team);
 		else
@@ -412,13 +412,13 @@ dump_team_info(int argc, char** argv)
 	id = strtoul(argv[1], NULL, 0);
 	if (IS_KERNEL_ADDRESS(id)) {
 		// semi-hack
-		_dump_team_info((struct team*)id);
+		_dump_team_info((Team*)id);
 		return 0;
 	}
 
 	// walk through the thread list, trying to match name or id
 	for (TeamHashTable::Iterator it = sTeamHash.GetIterator();
-		struct team* team = it.Next();) {
+		Team* team = it.Next();) {
 		if ((team->name && strcmp(argv[1], team->name) == 0)
 			|| team->id == id) {
 			_dump_team_info(team);
@@ -439,7 +439,7 @@ dump_teams(int argc, char** argv)
 	kprintf("team           id  parent      name\n");
 
 	for (TeamHashTable::Iterator it = sTeamHash.GetIterator();
-		struct team* team = it.Next();) {
+		Team* team = it.Next();) {
 		kprintf("%p%7ld  %p  %s\n", team, team->id, team->parent, team->name);
 	}
 
@@ -474,7 +474,7 @@ process_group_hash(void* _group, const void* _key, uint32 range)
 
 
 static void
-insert_team_into_parent(struct team* parent, struct team* team)
+insert_team_into_parent(Team* parent, Team* team)
 {
 	ASSERT(parent != NULL);
 
@@ -486,10 +486,10 @@ insert_team_into_parent(struct team* parent, struct team* team)
 
 /*!	Note: must have team lock held */
 static void
-remove_team_from_parent(struct team* parent, struct team* team)
+remove_team_from_parent(Team* parent, Team* team)
 {
-	struct team* child;
-	struct team* last = NULL;
+	Team* child;
+	Team* last = NULL;
 
 	for (child = parent->children; child != NULL;
 			child = child->siblings_next) {
@@ -511,9 +511,9 @@ remove_team_from_parent(struct team* parent, struct team* team)
 	Note: must have team lock held
 */
 static void
-reparent_children(struct team* team)
+reparent_children(Team* team)
 {
-	struct team* child;
+	Team* child;
 
 	while ((child = team->children) != NULL) {
 		// remove the child from the current proc and add to the parent
@@ -522,10 +522,10 @@ reparent_children(struct team* team)
 	}
 
 	// move job control entries too
-	sKernelTeam->stopped_children->entries.MoveFrom(
-		&team->stopped_children->entries);
-	sKernelTeam->continued_children->entries.MoveFrom(
-		&team->continued_children->entries);
+	sKernelTeam->stopped_children.entries.MoveFrom(
+		&team->stopped_children.entries);
+	sKernelTeam->continued_children.entries.MoveFrom(
+		&team->continued_children.entries);
 
 	// Note, we don't move the dead children entries. Those will be deleted
 	// when the team structure is deleted.
@@ -533,14 +533,14 @@ reparent_children(struct team* team)
 
 
 static bool
-is_session_leader(struct team* team)
+is_session_leader(Team* team)
 {
 	return team->session_id == team->id;
 }
 
 
 static bool
-is_process_group_leader(struct team* team)
+is_process_group_leader(Team* team)
 {
 	return team->group_id == team->id;
 }
@@ -643,7 +643,7 @@ insert_group_into_session(struct process_session* session,
 
 /*!	You must hold the team lock when calling this function. */
 static void
-insert_team_into_group(struct process_group* group, struct team* team)
+insert_team_into_group(struct process_group* group, Team* team)
 {
 	team->group = group;
 	team->group_id = group->id;
@@ -660,11 +660,11 @@ insert_team_into_group(struct process_group* group, struct team* team)
 	\param team the team that'll be removed from it's group
 */
 static void
-remove_team_from_group(struct team* team)
+remove_team_from_group(Team* team)
 {
 	struct process_group* group = team->group;
-	struct team* current;
-	struct team* last = NULL;
+	Team* current;
+	Team* last = NULL;
 
 	// the team must be in any team to let this function have any effect
 	if  (group == NULL)
@@ -726,7 +726,7 @@ create_process_session(pid_t id)
 
 
 static void
-set_team_name(struct team* team, const char* name)
+set_team_name(Team* team, const char* name)
 {
 	if (const char* lastSlash = strrchr(name, '/'))
 		name = lastSlash + 1;
@@ -735,13 +735,13 @@ set_team_name(struct team* team, const char* name)
 }
 
 
-static struct team*
+static Team*
 create_team_struct(const char* name, bool kernel)
 {
-	::team* team = new(std::nothrow) ::team;
+	Team* team = new(std::nothrow) Team;
 	if (team == NULL)
 		return NULL;
-	ObjectDeleter< ::team> teamDeleter(team);
+	ObjectDeleter<Team> teamDeleter(team);
 
 	team->next = team->siblings_next = team->children = team->parent = NULL;
 	team->id = allocate_thread_id();
@@ -775,28 +775,9 @@ create_team_struct(const char* name, bool kernel)
 	team->dead_threads_count = 0;
 
 	// dead children
-	team->dead_children = new(nothrow) team_dead_children;
-	if (team->dead_children == NULL)
-		return NULL;
-	ObjectDeleter<team_dead_children> deadChildrenDeleter(team->dead_children);
-
-	team->dead_children->count = 0;
-	team->dead_children->kernel_time = 0;
-	team->dead_children->user_time = 0;
-
-	// stopped children
-	team->stopped_children = new(nothrow) team_job_control_children;
-	if (team->stopped_children == NULL)
-		return NULL;
-	ObjectDeleter<team_job_control_children> stoppedChildrenDeleter(
-		team->stopped_children);
-
-	// continued children
-	team->continued_children = new(nothrow) team_job_control_children;
-	if (team->continued_children == NULL)
-		return NULL;
-	ObjectDeleter<team_job_control_children> continuedChildrenDeleter(
-		team->continued_children);
+	team->dead_children.count = 0;
+	team->dead_children.kernel_time = 0;
+	team->dead_children.user_time = 0;
 
 	// job control entry
 	team->job_control_entry = new(nothrow) job_control_entry;
@@ -819,14 +800,11 @@ create_team_struct(const char* name, bool kernel)
 		return NULL;
 
 	// publish dead/stopped/continued children condition vars
-	team->dead_children->condition_variable.Init(team->dead_children,
+	team->dead_children.condition_variable.Init(&team->dead_children,
 		"team children");
 
 	// keep all allocated structures
 	jobControlEntryDeleter.Detach();
-	continuedChildrenDeleter.Detach();
-	stoppedChildrenDeleter.Detach();
-	deadChildrenDeleter.Detach();
 	teamDeleter.Detach();
 
 	return team;
@@ -834,7 +812,7 @@ create_team_struct(const char* name, bool kernel)
 
 
 static void
-delete_team_struct(struct team* team)
+delete_team_struct(Team* team)
 {
 	// get rid of all associated data
 	team->PrepareForDeletion();
@@ -844,7 +822,7 @@ delete_team_struct(struct team* team)
 		free(threadDeathEntry);
 	}
 
-	while (job_control_entry* entry = team->dead_children->entries.RemoveHead())
+	while (job_control_entry* entry = team->dead_children.entries.RemoveHead())
 		delete entry;
 
 	while (free_user_thread* entry = team->free_user_threads) {
@@ -856,15 +834,12 @@ delete_team_struct(struct team* team)
 
 	delete team->job_control_entry;
 		// usually already NULL and transferred to the parent
-	delete team->continued_children;
-	delete team->stopped_children;
-	delete team->dead_children;
 	delete team;
 }
 
 
 static status_t
-create_team_user_data(struct team* team)
+create_team_user_data(Team* team)
 {
 	void* address;
 	size_t size = 4 * B_PAGE_SIZE;
@@ -888,7 +863,7 @@ create_team_user_data(struct team* team)
 
 
 static void
-delete_team_user_data(struct team* team)
+delete_team_user_data(Team* team)
 {
 	if (team->user_data_area >= 0) {
 		vm_delete_area(team->id, team->user_data_area, true);
@@ -1008,8 +983,8 @@ static int32
 team_create_thread_start(void* args)
 {
 	status_t err;
-	struct thread* thread;
-	struct team* team;
+	Thread* thread;
+	Team* team;
 	struct team_arg* teamArgs = (struct team_arg*)args;
 	const char* path;
 	addr_t entry;
@@ -1160,7 +1135,7 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 	port_id errorPort, uint32 errorToken)
 {
 	char** flatArgs = _flatArgs;
-	struct team* team;
+	Team* team;
 	const char* threadName;
 	thread_id thread;
 	status_t status;
@@ -1191,7 +1166,7 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
  	InterruptsSpinLocker teamLocker(gTeamSpinlock);
 
 	// get the parent team
-	struct team* parent;
+	Team* parent;
 
 	if (parentID == B_CURRENT_TEAM)
 		parent = thread_get_current_thread()->team;
@@ -1275,7 +1250,7 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 
 	// wait for the loader of the new team to finish its work
 	if ((flags & B_WAIT_TILL_LOADED) != 0) {
-		struct thread* mainThread;
+		Thread* mainThread;
 
 		state = disable_interrupts();
 		GRAB_THREAD_LOCK();
@@ -1356,12 +1331,12 @@ exec_team(const char* path, char**& _flatArgs, size_t flatArgsSize,
 	// NOTE: Since this function normally doesn't return, don't use automatic
 	// variables that need destruction in the function scope.
 	char** flatArgs = _flatArgs;
-	struct team* team = thread_get_current_thread()->team;
+	Team* team = thread_get_current_thread()->team;
 	struct team_arg* teamArgs;
 	const char* threadName;
 	status_t status = B_OK;
 	cpu_status state;
-	struct thread* thread;
+	Thread* thread;
 	thread_id nubThreadID = -1;
 
 	TRACE(("exec_team(path = \"%s\", argc = %ld, envCount = %ld): team %ld\n",
@@ -1484,7 +1459,7 @@ exec_team(const char* path, char**& _flatArgs, size_t flatArgsSize,
 static int32
 fork_team_thread_start(void* _args)
 {
-	struct thread* thread = thread_get_current_thread();
+	Thread* thread = thread_get_current_thread();
 	struct fork_arg* forkArgs = (struct fork_arg*)_args;
 
 	struct arch_fork_arg archArgs = forkArgs->arch_info;
@@ -1518,9 +1493,9 @@ fork_team_thread_start(void* _args)
 static thread_id
 fork_team(void)
 {
-	struct thread* parentThread = thread_get_current_thread();
-	struct team* parentTeam = parentThread->team;
-	struct team* team;
+	Thread* parentThread = thread_get_current_thread();
+	Team* parentTeam = parentThread->team;
+	Team* team;
 	struct fork_arg* forkArgs;
 	struct area_info info;
 	thread_id threadID;
@@ -1703,9 +1678,9 @@ err1:
 	Must be called with the team lock held.
 */
 static bool
-has_children_in_group(struct team* parent, pid_t groupID)
+has_children_in_group(Team* parent, pid_t groupID)
 {
-	struct team* team;
+	Team* team;
 
 	struct process_group* group = team_get_process_group_locked(
 		parent->group->session, groupID);
@@ -1722,9 +1697,9 @@ has_children_in_group(struct team* parent, pid_t groupID)
 
 
 static job_control_entry*
-get_job_control_entry(team_job_control_children* children, pid_t id)
+get_job_control_entry(team_job_control_children& children, pid_t id)
 {
-	for (JobControlEntryList::Iterator it = children->entries.GetIterator();
+	for (JobControlEntryList::Iterator it = children.entries.GetIterator();
 		 job_control_entry* entry = it.Next();) {
 
 		if (id > 0) {
@@ -1745,7 +1720,7 @@ get_job_control_entry(team_job_control_children* children, pid_t id)
 
 
 static job_control_entry*
-get_job_control_entry(struct team* team, pid_t id, uint32 flags)
+get_job_control_entry(Team* team, pid_t id, uint32 flags)
 {
 	job_control_entry* entry = get_job_control_entry(team->dead_children, id);
 
@@ -1781,7 +1756,7 @@ void
 job_control_entry::InitDeadState()
 {
 	if (team != NULL) {
-		struct thread* thread = team->main_thread;
+		Thread* thread = team->main_thread;
 		group_id = team->group_id;
 		this->thread = thread->id;
 		status = thread->exit.status;
@@ -1817,8 +1792,8 @@ static thread_id
 wait_for_child(pid_t child, uint32 flags, int32* _reason,
 	status_t* _returnCode)
 {
-	struct thread* thread = thread_get_current_thread();
-	struct team* team = thread->team;
+	Thread* thread = thread_get_current_thread();
+	Team* team = thread->team;
 	struct job_control_entry foundEntry;
 	struct job_control_entry* freeDeathEntry = NULL;
 	status_t status = B_OK;
@@ -1852,7 +1827,7 @@ wait_for_child(pid_t child, uint32 flags, int32* _reason,
 			} else if (child < -1) {
 				childrenExist = has_children_in_group(team, -child);
 			} else {
-				if (struct team* childTeam = team_get_team_struct_locked(child))
+				if (Team* childTeam = team_get_team_struct_locked(child))
 					childrenExist = childTeam->parent == team;
 			}
 
@@ -1869,8 +1844,8 @@ wait_for_child(pid_t child, uint32 flags, int32* _reason,
 			if (entry->state == JOB_CONTROL_STATE_DEAD) {
 				// The child is dead. Reap its death entry.
 				freeDeathEntry = entry;
-				team->dead_children->entries.Remove(entry);
-				team->dead_children->count--;
+				team->dead_children.entries.Remove(entry);
+				team->dead_children.count--;
 			} else {
 				// The child is well. Reset its job control state.
 				team_set_job_control_state(entry->team,
@@ -1883,7 +1858,7 @@ wait_for_child(pid_t child, uint32 flags, int32* _reason,
 		ConditionVariableEntry deadWaitEntry;
 
 		if (status == B_WOULD_BLOCK && (flags & WNOHANG) == 0)
-			team->dead_children->condition_variable.Add(&deadWaitEntry);
+			team->dead_children.condition_variable.Add(&deadWaitEntry);
 
 		locker.Unlock();
 
@@ -1973,7 +1948,7 @@ wait_for_child(pid_t child, uint32 flags, int32* _reason,
 	The team lock must be held when called.
 */
 static status_t
-fill_team_info(struct team* team, team_info* info, size_t size)
+fill_team_info(Team* team, team_info* info, size_t size)
 {
 	if (size != sizeof(team_info))
 		return B_BAD_VALUE;
@@ -2011,9 +1986,9 @@ update_orphaned_process_group(process_group* group, pid_t dyingProcess)
 	if (group->orphaned)
 		return true;
 
-	struct team* team = group->teams;
+	Team* team = group->teams;
 	while (team != NULL) {
-		struct team* parent = team->parent;
+		Team* parent = team->parent;
 		if (team->id != dyingProcess && parent != NULL
 			&& parent->id != dyingProcess
 			&& parent->group_id != group->id
@@ -2037,7 +2012,7 @@ process_group_has_stopped_processes(process_group* group)
 {
 	SpinLocker _(gThreadSpinlock);
 
-	struct team* team = group->teams;
+	Team* team = group->teams;
 	while (team != NULL) {
 		if (team->main_thread->state == B_THREAD_SUSPENDED)
 			return true;
@@ -2137,11 +2112,11 @@ team_used_teams(void)
 
 /*!	Iterates through the list of teams. The team spinlock must be held.
 */
-struct team*
+Team*
 team_iterate_through_teams(team_iterator_callback callback, void* cookie)
 {
 	for (TeamHashTable::Iterator it = sTeamHash.GetIterator();
-		struct team* team = it.Next();) {
+		Team* team = it.Next();) {
 		if (callback(team, cookie))
 			return team;
 	}
@@ -2154,7 +2129,7 @@ team_iterate_through_teams(team_iterator_callback callback, void* cookie)
 	You need to have the team lock held when calling this function.
 */
 job_control_entry*
-team_get_death_entry(struct team* team, thread_id child, bool* _deleteEntry)
+team_get_death_entry(Team* team, thread_id child, bool* _deleteEntry)
 {
 	if (child <= 0)
 		return NULL;
@@ -2164,8 +2139,8 @@ team_get_death_entry(struct team* team, thread_id child, bool* _deleteEntry)
 	if (entry) {
 		// remove the entry only, if the caller is the parent of the found team
 		if (team_get_current_team_id() == entry->thread) {
-			team->dead_children->entries.Remove(entry);
-			team->dead_children->count--;
+			team->dead_children.entries.Remove(entry);
+			team->dead_children.count--;
 			*_deleteEntry = true;
 		} else {
 			*_deleteEntry = false;
@@ -2180,7 +2155,7 @@ team_get_death_entry(struct team* team, thread_id child, bool* _deleteEntry)
 bool
 team_is_valid(team_id id)
 {
-	struct team* team;
+	Team* team;
 	cpu_status state;
 
 	if (id <= 0)
@@ -2198,7 +2173,7 @@ team_is_valid(team_id id)
 }
 
 
-struct team*
+Team*
 team_get_team_struct_locked(team_id id)
 {
 	return sTeamHash.Lookup(id);
@@ -2246,7 +2221,7 @@ team_delete_process_group(struct process_group* group)
 void
 team_set_controlling_tty(int32 ttyIndex)
 {
-	struct team* team = thread_get_current_thread()->team;
+	Team* team = thread_get_current_thread()->team;
 
 	InterruptsSpinLocker _(gTeamSpinlock);
 
@@ -2258,7 +2233,7 @@ team_set_controlling_tty(int32 ttyIndex)
 int32
 team_get_controlling_tty()
 {
-	struct team* team = thread_get_current_thread()->team;
+	Team* team = thread_get_current_thread()->team;
 
 	InterruptsSpinLocker _(gTeamSpinlock);
 
@@ -2269,8 +2244,8 @@ team_get_controlling_tty()
 status_t
 team_set_foreground_process_group(int32 ttyIndex, pid_t processGroupID)
 {
-	struct thread* thread = thread_get_current_thread();
-	struct team* team = thread->team;
+	Thread* thread = thread_get_current_thread();
+	Team* team = thread->team;
 
 	InterruptsSpinLocker locker(gTeamSpinlock);
 
@@ -2309,15 +2284,15 @@ team_set_foreground_process_group(int32 ttyIndex, pid_t processGroupID)
 	You must hold the team lock when you call this function.
 */
 void
-team_remove_team(struct team* team)
+team_remove_team(Team* team)
 {
-	struct team* parent = team->parent;
+	Team* parent = team->parent;
 
 	// remember how long this team lasted
-	parent->dead_children->kernel_time += team->dead_threads_kernel_time
-		+ team->dead_children->kernel_time;
-	parent->dead_children->user_time += team->dead_threads_user_time
-		+ team->dead_children->user_time;
+	parent->dead_children.kernel_time += team->dead_threads_kernel_time
+		+ team->dead_children.kernel_time;
+	parent->dead_children.user_time += team->dead_threads_user_time
+		+ team->dead_children.user_time;
 
 	// Also grab the thread spinlock while removing the team from the hash.
 	// This makes the following sequence safe: grab teams lock, lookup team,
@@ -2347,7 +2322,7 @@ team_remove_team(struct team* team)
 
 		// send SIGHUP + SIGCONT to all newly-orphaned process groups with
 		// stopped processes
-		struct team* child = team->children;
+		Team* child = team->children;
 		while (child != NULL) {
 			process_group* childGroup = child->group;
 			if (!childGroup->orphaned
@@ -2363,7 +2338,7 @@ team_remove_team(struct team* team)
 		}
 	} else {
 		// update "orphaned" flags of all children's process groups
-		struct team* child = team->children;
+		Team* child = team->children;
 		while (child != NULL) {
 			process_group* childGroup = child->group;
 			if (!childGroup->orphaned)
@@ -2398,7 +2373,7 @@ team_remove_team(struct team* team)
 		team_delete_team().
 */
 port_id
-team_shutdown_team(struct team* team, cpu_status& state)
+team_shutdown_team(Team* team, cpu_status& state)
 {
 	ASSERT(thread_get_current_thread() == team->main_thread);
 
@@ -2448,7 +2423,7 @@ team_shutdown_team(struct team* team, cpu_status& state)
 		team->death_entry = &deathEntry;
 		deathEntry.remaining_threads = 0;
 
-		struct thread* thread = team->thread_list;
+		Thread* thread = team->thread_list;
 		while (thread != NULL) {
 			if (thread != team->main_thread) {
 				send_signal_etc(thread->id, SIGKILLTHR,
@@ -2485,7 +2460,7 @@ team_shutdown_team(struct team* team, cpu_status& state)
 
 
 void
-team_delete_team(struct team* team, port_id debuggerPort)
+team_delete_team(Team* team, port_id debuggerPort)
 {
 	team_id teamID = team->id;
 
@@ -2550,7 +2525,7 @@ team_delete_team(struct team* team, port_id debuggerPort)
 }
 
 
-struct team*
+Team*
 team_get_kernel_team(void)
 {
 	return sKernelTeam;
@@ -2578,7 +2553,7 @@ status_t
 team_get_address_space(team_id id, VMAddressSpace** _addressSpace)
 {
 	cpu_status state;
-	struct team* team;
+	Team* team;
 	status_t status;
 
 	// ToDo: we need to do something about B_SYSTEM_TEAM vs. its real ID (1)
@@ -2612,7 +2587,7 @@ team_get_address_space(team_id id, VMAddressSpace** _addressSpace)
 	\a threadsLocked indicates whether the thread lock is being held, too.
 */
 void
-team_set_job_control_state(struct team* team, job_control_state newState,
+team_set_job_control_state(Team* team, job_control_state newState,
 	int signal, bool threadsLocked)
 {
 	if (team == NULL || team->job_control_entry == NULL)
@@ -2635,10 +2610,10 @@ team_set_job_control_state(struct team* team, job_control_state newState,
 			// can't get here
 			break;
 		case JOB_CONTROL_STATE_STOPPED:
-			team->parent->stopped_children->entries.Remove(entry);
+			team->parent->stopped_children.entries.Remove(entry);
 			break;
 		case JOB_CONTROL_STATE_CONTINUED:
-			team->parent->continued_children->entries.Remove(entry);
+			team->parent->continued_children.entries.Remove(entry);
 			break;
 	}
 
@@ -2652,20 +2627,20 @@ team_set_job_control_state(struct team* team, job_control_state newState,
 			// entry doesn't get into any list
 			break;
 		case JOB_CONTROL_STATE_DEAD:
-			childList = team->parent->dead_children;
-			team->parent->dead_children->count++;
+			childList = &team->parent->dead_children;
+			team->parent->dead_children.count++;
 			break;
 		case JOB_CONTROL_STATE_STOPPED:
-			childList = team->parent->stopped_children;
+			childList = &team->parent->stopped_children;
 			break;
 		case JOB_CONTROL_STATE_CONTINUED:
-			childList = team->parent->continued_children;
+			childList = &team->parent->continued_children;
 			break;
 	}
 
 	if (childList != NULL) {
 		childList->entries.Add(entry);
-		team->parent->dead_children->condition_variable.NotifyAll(
+		team->parent->dead_children.condition_variable.NotifyAll(
 			threadsLocked);
 	}
 }
@@ -2679,7 +2654,7 @@ status_t
 start_watching_team(team_id teamID, void (*hook)(team_id, void*), void* data)
 {
 	struct team_watcher* watcher;
-	struct team* team;
+	Team* team;
 	cpu_status state;
 
 	if (hook == NULL || teamID < B_OK)
@@ -2717,7 +2692,7 @@ status_t
 stop_watching_team(team_id teamID, void (*hook)(team_id, void*), void* data)
 {
 	struct team_watcher* watcher = NULL;
-	struct team* team;
+	Team* team;
 	cpu_status state;
 
 	if (hook == NULL || teamID < B_OK)
@@ -2755,7 +2730,7 @@ stop_watching_team(team_id teamID, void (*hook)(team_id, void*), void* data)
 /*!	The team lock must be held or the team must still be single threaded.
 */
 struct user_thread*
-team_allocate_user_thread(struct team* team)
+team_allocate_user_thread(Team* team)
 {
 	if (team->user_data == 0)
 		return NULL;
@@ -2792,7 +2767,7 @@ team_allocate_user_thread(struct team* team)
 /*!	The team lock must not be held. \a thread must be the current thread.
 */
 void
-team_free_user_thread(struct thread* thread)
+team_free_user_thread(Thread* thread)
 {
 	user_thread* userThread = thread->user_thread;
 	if (userThread == NULL)
@@ -3014,7 +2989,7 @@ load_image_etc(int32 argCount, const char* const* args,
 status_t
 wait_for_team(team_id id, status_t* _returnCode)
 {
-	struct team* team;
+	Team* team;
 	thread_id thread;
 	cpu_status state;
 
@@ -3044,7 +3019,7 @@ kill_team(team_id id)
 {
 	status_t status = B_OK;
 	thread_id threadID = -1;
-	struct team* team;
+	Team* team;
 	cpu_status state;
 
 	state = disable_interrupts();
@@ -3077,7 +3052,7 @@ _get_team_info(team_id id, team_info* info, size_t size)
 {
 	cpu_status state;
 	status_t status = B_OK;
-	struct team* team;
+	Team* team;
 
 	state = disable_interrupts();
 	GRAB_TEAM_LOCK();
@@ -3106,7 +3081,7 @@ status_t
 _get_next_team_info(int32* cookie, team_info* info, size_t size)
 {
 	status_t status = B_BAD_TEAM_ID;
-	struct team* team = NULL;
+	Team* team = NULL;
 	int32 slot = *cookie;
 	team_id lastTeamID;
 	cpu_status state;
@@ -3143,7 +3118,7 @@ _get_team_usage_info(team_id id, int32 who, team_usage_info* info, size_t size)
 {
 	bigtime_t kernelTime = 0, userTime = 0;
 	status_t status = B_OK;
-	struct team* team;
+	Team* team;
 	cpu_status state;
 
 	if (size != sizeof(team_usage_info)
@@ -3166,7 +3141,7 @@ _get_team_usage_info(team_id id, int32 who, team_usage_info* info, size_t size)
 	switch (who) {
 		case B_TEAM_USAGE_SELF:
 		{
-			struct thread* thread = team->thread_list;
+			Thread* thread = team->thread_list;
 
 			for (; thread != NULL; thread = thread->team_next) {
 				kernelTime += thread->kernel_time;
@@ -3180,9 +3155,9 @@ _get_team_usage_info(team_id id, int32 who, team_usage_info* info, size_t size)
 
 		case B_TEAM_USAGE_CHILDREN:
 		{
-			struct team* child = team->children;
+			Team* child = team->children;
 			for (; child != NULL; child = child->siblings_next) {
-				struct thread* thread = team->thread_list;
+				Thread* thread = team->thread_list;
 
 				for (; thread != NULL; thread = thread->team_next) {
 					kernelTime += thread->kernel_time;
@@ -3193,8 +3168,8 @@ _get_team_usage_info(team_id id, int32 who, team_usage_info* info, size_t size)
 				userTime += child->dead_threads_user_time;
 			}
 
-			kernelTime += team->dead_children->kernel_time;
-			userTime += team->dead_children->user_time;
+			kernelTime += team->dead_children.kernel_time;
+			userTime += team->dead_children.user_time;
 			break;
 		}
 	}
@@ -3222,7 +3197,7 @@ getpid(void)
 pid_t
 getppid(void)
 {
-	struct team* team = thread_get_current_thread()->team;
+	Team* team = thread_get_current_thread()->team;
 	cpu_status state;
 	pid_t parent;
 
@@ -3241,7 +3216,7 @@ getppid(void)
 pid_t
 getpgid(pid_t process)
 {
-	struct thread* thread;
+	Thread* thread;
 	pid_t result = -1;
 	cpu_status state;
 
@@ -3265,7 +3240,7 @@ getpgid(pid_t process)
 pid_t
 getsid(pid_t process)
 {
-	struct thread* thread;
+	Thread* thread;
 	pid_t result = -1;
 	cpu_status state;
 
@@ -3379,9 +3354,9 @@ _user_process_info(pid_t process, int32 which)
 pid_t
 _user_setpgid(pid_t processID, pid_t groupID)
 {
-	struct thread* thread = thread_get_current_thread();
-	struct team* currentTeam = thread->team;
-	struct team* team;
+	Thread* thread = thread_get_current_thread();
+	Team* currentTeam = thread->team;
+	Team* team;
 
 	if (groupID < 0)
 		return B_BAD_VALUE;
@@ -3484,13 +3459,13 @@ _user_setpgid(pid_t processID, pid_t groupID)
 				}
 
 				// the team's new group
-				struct team* parent = team->parent;
+				Team* parent = team->parent;
 				targetGroup->orphaned &= parent == NULL
 					|| parent->group == targetGroup
 					|| team->parent->session_id != team->session_id;
 
 				// children's groups
-				struct team* child = team->children;
+				Team* child = team->children;
 				while (child != NULL) {
 					child->group->orphaned = false;
 					update_orphaned_process_group(child->group, -1);
@@ -3506,7 +3481,7 @@ _user_setpgid(pid_t processID, pid_t groupID)
 	// Changing the process group might have changed the situation for a parent
 	// waiting in wait_for_child(). Hence we notify it.
 	if (status == B_OK)
-		team->parent->dead_children->condition_variable.NotifyAll(false);
+		team->parent->dead_children.condition_variable.NotifyAll(false);
 
 	locker.Unlock();
 
@@ -3524,7 +3499,7 @@ _user_setpgid(pid_t processID, pid_t groupID)
 pid_t
 _user_setsid(void)
 {
-	struct team* team = thread_get_current_thread()->team;
+	Team* team = thread_get_current_thread()->team;
 	struct process_session* session;
 	struct process_group* group;
 	cpu_status state;
@@ -3621,9 +3596,9 @@ _user_load_image(const char* const* userFlatArgs, size_t flatArgsSize,
 void
 _user_exit_team(status_t returnValue)
 {
-	struct thread* thread = thread_get_current_thread();
-	struct team* team = thread->team;
-	struct thread* mainThread = team->main_thread;
+	Thread* thread = thread_get_current_thread();
+	Team* team = thread->team;
+	Thread* mainThread = team->main_thread;
 
 	mainThread->exit.status = returnValue;
 	mainThread->exit.reason = THREAD_RETURN_EXIT;
@@ -3738,16 +3713,16 @@ _user_get_extended_team_info(team_id teamID, uint32 flags, void* buffer,
 
 	if ((flags & B_TEAM_INFO_BASIC) != 0) {
 		// allocate memory for a copy of the team struct
-		struct team* teamClone = new(std::nothrow) team;
+		Team* teamClone = new(std::nothrow) Team;
 		if (teamClone == NULL)
 			return B_NO_MEMORY;
-		ObjectDeleter<struct team> teamCloneDeleter(teamClone);
+		ObjectDeleter<Team> teamCloneDeleter(teamClone);
 
 		io_context* ioContext;
 		{
 			// get the team structure
 			InterruptsSpinLocker _(gTeamSpinlock);
-			struct team* team = teamID == B_CURRENT_TEAM
+			Team* team = teamID == B_CURRENT_TEAM
 				? thread_get_current_thread()->team
 				: team_get_team_struct_locked(teamID);
 			if (team == NULL)

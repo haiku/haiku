@@ -61,7 +61,7 @@ arch_get_debug_cpu_state(debug_cpu_state* cpuState)
 
 
 status_t
-arch_get_thread_debug_cpu_state(struct thread* thread,
+arch_get_thread_debug_cpu_state(Thread* thread,
 	debug_cpu_state* cpuState)
 {
 #warning IMPLEMENT arch_get_thread_debug_cpu_state

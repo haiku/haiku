@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -1332,7 +1332,7 @@ public:
 		return sLookup;
 	}
 
-	status_t Init(struct team* team)
+	status_t Init(Team* team)
 	{
 		// find the runtime loader debug area
 		VMArea* area;
@@ -1714,7 +1714,7 @@ symbol_found:
 	Note that the given team's address space must already be in effect.
 */
 status_t
-elf_debug_lookup_user_symbol_address(struct team* team, addr_t address,
+elf_debug_lookup_user_symbol_address(Team* team, addr_t address,
 	addr_t *_baseAddress, const char **_symbolName, const char **_imageName,
 	bool *_exactMatch)
 {
@@ -1773,8 +1773,7 @@ elf_debug_lookup_symbol(const char* searchName)
 
 
 status_t
-elf_load_user_image(const char *path, struct team *team, int flags,
-	addr_t *entry)
+elf_load_user_image(const char *path, Team *team, int flags, addr_t *entry)
 {
 	struct Elf32_Ehdr elfHeader;
 	struct Elf32_Phdr *programHeaders = NULL;

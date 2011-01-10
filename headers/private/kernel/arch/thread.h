@@ -17,18 +17,18 @@ extern "C" {
 #endif
 
 status_t arch_thread_init(struct kernel_args *args);
-status_t arch_team_init_team_struct(struct team *t, bool kernel);
-status_t arch_thread_init_thread_struct(struct thread *t);
-status_t arch_thread_init_tls(struct thread *thread);
-void arch_thread_context_switch(struct thread *t_from, struct thread *t_to);
-status_t arch_thread_init_kthread_stack(struct thread *t,
+status_t arch_team_init_team_struct(Team *t, bool kernel);
+status_t arch_thread_init_thread_struct(Thread *t);
+status_t arch_thread_init_tls(Thread *thread);
+void arch_thread_context_switch(Thread *t_from, Thread *t_to);
+status_t arch_thread_init_kthread_stack(Thread *t,
 	int (*start_func)(void), void (*entry_func)(void), void (*exit_func)(void));
 void arch_thread_dump_info(void *info);
-status_t arch_thread_enter_userspace(struct thread *t, addr_t entry,
+status_t arch_thread_enter_userspace(Thread *t, addr_t entry,
 	void *args1, void *args2);
 
-bool arch_on_signal_stack(struct thread *thread);
-status_t arch_setup_signal_frame(struct thread *t, struct sigaction *sa,
+bool arch_on_signal_stack(Thread *thread);
+status_t arch_setup_signal_frame(Thread *t, struct sigaction *sa,
 	int signal, int signalMask);
 int64 arch_restore_signal_frame(void);
 

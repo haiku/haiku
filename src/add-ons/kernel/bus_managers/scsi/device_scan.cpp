@@ -18,6 +18,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include <algorithm>
+
 
 /*! send TUR
 	result: true, if device answered
@@ -113,7 +115,8 @@ scsi_scan_get_inquiry(scsi_ccb *worker_req, scsi_res_inquiry *new_inquiry_data)
 			// unfortunately, ATAPI CD-ROM drives tend to tell that they have
 			// only minimal info (36 bytes), but still they return (valid!) 96 bytes -
 			// bad luck
-			if (min(cmd->allocation_length, new_inquiry_data->additional_length + 4)
+			if (std::min((int)cmd->allocation_length,
+						new_inquiry_data->additional_length + 4)
 					>= (int)offsetof(scsi_res_inquiry, version_descriptor[9])) {
 				int i, previousStandard = -1;
 
@@ -255,7 +258,7 @@ scsi_scan_bus(scsi_bus_info *bus)
 	// as this function is optional for SIM, we ignore its result
 	bus->interface->scan_bus(bus->sim_cookie);
 
-	for (target_id = 0; target_id < bus->max_target_count; ++target_id) {
+	for (target_id = 0; target_id < (int)bus->max_target_count; ++target_id) {
 		int lun;
 
 		SHOW_FLOW(3, "target: %d", target_id);

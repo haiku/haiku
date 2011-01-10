@@ -63,8 +63,7 @@ const char * const sigstr[NSIG] = {
 };
 
 
-static status_t deliver_signal(struct thread *thread, uint signal,
-	uint32 flags);
+static status_t deliver_signal(Thread *thread, uint signal, uint32 flags);
 
 
 
@@ -144,8 +143,7 @@ class SendSignal : public AbstractTraceEntry {
 
 class SigAction : public AbstractTraceEntry {
 	public:
-		SigAction(struct thread* thread, uint32 signal,
-			const struct sigaction* act)
+		SigAction(Thread* thread, uint32 signal, const struct sigaction* act)
 			:
 			fThread(thread->id),
 			fSignal(signal),
@@ -263,7 +261,7 @@ class SigSuspendDone : public AbstractTraceEntry {
 	Interrupts must be disabled and the thread lock must be held.
 */
 static void
-update_thread_signals_flag(struct thread* thread)
+update_thread_signals_flag(Thread* thread)
 {
 	sigset_t mask = ~atomic_get(&thread->sig_block_mask)
 		| thread->sig_temp_enabled;
@@ -284,7 +282,7 @@ update_current_thread_signals_flag()
 
 
 static bool
-notify_debugger(struct thread *thread, int signal, struct sigaction *handler,
+notify_debugger(Thread *thread, int signal, struct sigaction *handler,
 	bool deadly)
 {
 	uint64 signalMask = SIGNAL_TO_MASK(signal);
@@ -308,7 +306,7 @@ notify_debugger(struct thread *thread, int signal, struct sigaction *handler,
 	handler is prepared, or whatever the signal demands.
 */
 bool
-handle_signals(struct thread *thread)
+handle_signals(Thread *thread)
 {
 	uint32 signalMask = atomic_get(&thread->sig_pending)
 		& (~atomic_get(&thread->sig_block_mask) | thread->sig_temp_enabled);
@@ -425,7 +423,7 @@ handle_signals(struct thread *thread)
 						// send a SIGCHLD to the parent (if it does have
 						// SA_NOCLDSTOP defined)
 						SpinLocker _(gThreadSpinlock);
-						struct thread* parentThread
+						Thread* parentThread
 							= thread->team->parent->main_thread;
 						struct sigaction& parentHandler
 							= parentThread->sig_action[SIGCHLD - 1];
@@ -538,7 +536,7 @@ is_signal_blocked(int signal)
 	thread lock held.
 */
 static status_t
-deliver_signal(struct thread *thread, uint signal, uint32 flags)
+deliver_signal(Thread *thread, uint signal, uint32 flags)
 {
 	if (flags & B_CHECK_PERMISSION) {
 		// ToDo: introduce euid & uid fields to the team and check permission
@@ -560,7 +558,7 @@ deliver_signal(struct thread *thread, uint signal, uint32 flags)
 		case SIGKILL:
 		{
 			// Forward KILLTHR to the main thread of the team
-			struct thread *mainThread = thread->team->main_thread;
+			Thread *mainThread = thread->team->main_thread;
 			atomic_or(&mainThread->sig_pending, SIGNAL_TO_MASK(SIGKILLTHR));
 
 			// Wake up main thread
@@ -612,7 +610,7 @@ int
 send_signal_etc(pid_t id, uint signal, uint32 flags)
 {
 	status_t status = B_BAD_THREAD_ID;
-	struct thread *thread;
+	Thread *thread;
 	cpu_status state = 0;
 
 	if (signal < 0 || signal > MAX_SIGNO)
@@ -649,7 +647,7 @@ send_signal_etc(pid_t id, uint signal, uint32 flags)
 
 		group = team_get_process_group_locked(NULL, id);
 		if (group != NULL) {
-			struct team *team, *next;
+			Team *team, *next;
 
 			// Send a signal to all teams in this process group
 
@@ -700,7 +698,7 @@ send_signal(pid_t threadID, uint signal)
 int
 has_signals_pending(void *_thread)
 {
-	struct thread *thread = (struct thread *)_thread;
+	Thread *thread = (Thread *)_thread;
 	if (thread == NULL)
 		thread = thread_get_current_thread();
 
@@ -712,7 +710,7 @@ has_signals_pending(void *_thread)
 static int
 sigprocmask_internal(int how, const sigset_t *set, sigset_t *oldSet)
 {
-	struct thread *thread = thread_get_current_thread();
+	Thread *thread = thread_get_current_thread();
 	sigset_t oldMask = atomic_get(&thread->sig_block_mask);
 
 	if (set != NULL) {
@@ -756,7 +754,7 @@ static status_t
 sigaction_etc_internal(thread_id threadID, int signal, const struct sigaction *act,
 	struct sigaction *oldAction)
 {
-	struct thread *thread;
+	Thread *thread;
 	cpu_status state;
 	status_t error = B_OK;
 
@@ -831,8 +829,7 @@ alarm_event(timer *t)
 	// set_alarm().
 	// Since thread->alarm is this timer structure, we can just
 	// cast it back - ugly but it works for now
-	struct thread *thread = (struct thread *)((uint8 *)t
-		- offsetof(struct thread, alarm));
+	Thread *thread = (Thread *)((uint8 *)t - offsetof(Thread, alarm));
 		// ToDo: investigate adding one user parameter to the timer structure to fix this hack
 
 	TRACE(("alarm_event: thread = %p\n", thread));
@@ -850,7 +847,7 @@ alarm_event(timer *t)
 bigtime_t
 set_alarm(bigtime_t time, uint32 mode)
 {
-	struct thread *thread = thread_get_current_thread();
+	Thread *thread = thread_get_current_thread();
 	bigtime_t remainingTime = 0;
 
 	ASSERT(B_ONE_SHOT_RELATIVE_ALARM == B_ONE_SHOT_RELATIVE_TIMER);
@@ -882,7 +879,7 @@ sigwait_internal(const sigset_t *set, int *_signal)
 {
 	sigset_t requestedSignals = *set & BLOCKABLE_SIGNALS;
 
-	struct thread* thread = thread_get_current_thread();
+	Thread* thread = thread_get_current_thread();
 
 	while (true) {
 		sigset_t pendingSignals = atomic_get(&thread->sig_pending);
@@ -938,7 +935,7 @@ sigsuspend_internal(const sigset_t *mask)
 {
 	T(SigSuspend(*mask));
 
-	struct thread *thread = thread_get_current_thread();
+	Thread *thread = thread_get_current_thread();
 	sigset_t oldMask = atomic_get(&thread->sig_block_mask);
 
 	// Set the new block mask and block until interrupted.
@@ -975,7 +972,7 @@ sigsuspend(const sigset_t *mask)
 static status_t
 sigpending_internal(sigset_t *set)
 {
-	struct thread *thread = thread_get_current_thread();
+	Thread *thread = thread_get_current_thread();
 
 	if (set == NULL)
 		return B_BAD_VALUE;
@@ -1073,7 +1070,7 @@ _user_sigwait(const sigset_t *userSet, int *_userSignal)
 	status_t status = sigwait_internal(&set, &signal);
 	if (status == B_INTERRUPTED) {
 		// make sure we'll be restarted
-		struct thread* thread = thread_get_current_thread();
+		Thread* thread = thread_get_current_thread();
 		atomic_or(&thread->flags,
 			THREAD_FLAGS_ALWAYS_RESTART_SYSCALL | THREAD_FLAGS_RESTART_SYSCALL);
 		return status;
@@ -1120,7 +1117,7 @@ _user_sigpending(sigset_t *userSet)
 status_t
 _user_set_signal_stack(const stack_t *newUserStack, stack_t *oldUserStack)
 {
-	struct thread *thread = thread_get_current_thread();
+	Thread *thread = thread_get_current_thread();
 	struct stack_t newStack, oldStack;
 	bool onStack = false;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008, Ingo Weinhold, bonefish@cs.tu-berlin.de.
+ * Copyright 2007-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _KERNEL_CONDITION_VARIABLE_H
@@ -41,7 +41,7 @@ private:
 
 private:
 			ConditionVariable*	fVariable;
-			struct thread*		fThread;
+			Thread*				fThread;
 			status_t			fWaitStatus;
 
 			friend struct ConditionVariable;

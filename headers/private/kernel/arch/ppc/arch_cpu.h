@@ -206,7 +206,7 @@ enum ppc_processor_version {
 	SPRG0: per CPU physical address pointer to an ppc_cpu_exception_context
 	       structure
 	SPRG1: scratch
-	SPRG2: current struct thread*
+	SPRG2: current Thread*
 	SPRG3: TLS base pointer (only for userland threads)
 */
 

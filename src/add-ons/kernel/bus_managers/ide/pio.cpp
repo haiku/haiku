@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Haiku, Inc. All RightsReserved.
+ * Copyright 2004-2011, Haiku, Inc. All rights reserved.
  * Copyright 2002-2004, Thomas Kurschel. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -148,7 +148,7 @@ transfer_PIO_physcont(ide_device_info *device, addr_t physicalAddress,
 		void* handle;
 		int page_left, cur_len;
 		status_t err;
-		struct thread* thread = thread_get_current_thread();
+		Thread* thread = thread_get_current_thread();
 
 		SHOW_FLOW(4, "Transmitting to/from physical address %lx, %d bytes left",
 			physicalAddress, length);

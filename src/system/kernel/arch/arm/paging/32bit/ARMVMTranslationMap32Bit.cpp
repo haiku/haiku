@@ -1,6 +1,6 @@
 /*
  * Copyright 2010, Ithamar R. Adema, ithamar.adema@team-embedded.nl
- * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
@@ -184,7 +184,7 @@ ARMVMTranslationMap32Bit::Map(addr_t va, phys_addr_t pa, uint32 attributes,
 	}
 
 	// now, fill in the pentry
-	struct thread* thread = thread_get_current_thread();
+	Thread* thread = thread_get_current_thread();
 	ThreadCPUPinner pinner(thread);
 
 	page_table_entry* pt = (page_table_entry*)fPageMapper->GetPageTableAt(
@@ -229,7 +229,7 @@ ARMVMTranslationMap32Bit::Unmap(addr_t start, addr_t end)
 			continue;
 		}
 
-		struct thread* thread = thread_get_current_thread();
+		Thread* thread = thread_get_current_thread();
 		ThreadCPUPinner pinner(thread);
 
 		page_table_entry* pt = (page_table_entry*)fPageMapper->GetPageTableAt(
@@ -360,7 +360,7 @@ ARMVMTranslationMap32Bit::UnmapPages(VMArea* area, addr_t base, size_t size,
 			continue;
 		}
 
-		struct thread* thread = thread_get_current_thread();
+		Thread* thread = thread_get_current_thread();
 		ThreadCPUPinner pinner(thread);
 
 		page_table_entry* pt = (page_table_entry*)fPageMapper->GetPageTableAt(
@@ -570,7 +570,7 @@ ARMVMTranslationMap32Bit::Query(addr_t va, phys_addr_t *_physical,
 		return B_OK;
 	}
 
-	struct thread* thread = thread_get_current_thread();
+	Thread* thread = thread_get_current_thread();
 	ThreadCPUPinner pinner(thread);
 
 	page_table_entry* pt = (page_table_entry*)fPageMapper->GetPageTableAt(
@@ -675,7 +675,7 @@ ARMVMTranslationMap32Bit::Protect(addr_t start, addr_t end, uint32 attributes,
 			continue;
 		}
 
-		struct thread* thread = thread_get_current_thread();
+		Thread* thread = thread_get_current_thread();
 		ThreadCPUPinner pinner(thread);
 
 		page_table_entry* pt = (page_table_entry*)fPageMapper->GetPageTableAt(
@@ -736,7 +736,7 @@ ARMVMTranslationMap32Bit::ClearFlags(addr_t va, uint32 flags)
 #else
 	uint32 flagsToClear = 0;
 #endif
-	struct thread* thread = thread_get_current_thread();
+	Thread* thread = thread_get_current_thread();
 	ThreadCPUPinner pinner(thread);
 
 	page_table_entry* pt = (page_table_entry*)fPageMapper->GetPageTableAt(

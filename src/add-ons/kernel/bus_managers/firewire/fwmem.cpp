@@ -1,7 +1,7 @@
 /*-
  * Copyright (c) 2002-2003
  * 	Hidetoshi Shimokawa. All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -18,7 +18,7 @@
  * 4. Neither the name of the author nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -30,7 +30,7 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
- * 
+ *
  */
 
 #include <sys/param.h>
@@ -68,8 +68,8 @@ fwmem_xfer_req(
 	if (spd < 0)
 		xfer->send.spd = fwdev->speed;
 	else
-		xfer->send.spd = min(spd, fwdev->speed);
-	xfer->hand = hand;
+		xfer->send.spd = min_c(spd, fwdev->speed);
+	xfer->hand = (void (*)(fw_xfer*))hand;
 	xfer->sc = sc;
 	xfer->send.pay_len = slen;
 	xfer->recv.pay_len = rlen;
@@ -90,7 +90,7 @@ fwmem_read_quad(
 	struct fw_xfer *xfer;
 	struct fw_pkt *fp;
 
-	xfer = fwmem_xfer_req(fwdev, (void *)sc, spd, 0, 4, hand);
+	xfer = fwmem_xfer_req(fwdev, (char *)sc, spd, 0, 4, (void*)hand);
 	if (xfer == NULL) {
 		return NULL;
 	}
@@ -127,7 +127,7 @@ fwmem_write_quad(
 	struct fw_xfer *xfer;
 	struct fw_pkt *fp;
 
-	xfer = fwmem_xfer_req(fwdev, sc, spd, 0, 0, hand);
+	xfer = fwmem_xfer_req(fwdev, sc, spd, 0, 0, (void*)hand);
 	if (xfer == NULL)
 		return NULL;
 
@@ -163,8 +163,8 @@ fwmem_read_block(
 {
 	struct fw_xfer *xfer;
 	struct fw_pkt *fp;
-	
-	xfer = fwmem_xfer_req(fwdev, sc, spd, 0, roundup2(len, 4), hand);
+
+	xfer = fwmem_xfer_req(fwdev, sc, spd, 0, roundup2(len, 4), (void*)hand);
 	if (xfer == NULL)
 		return NULL;
 
@@ -176,7 +176,7 @@ fwmem_read_block(
 	fp->mode.rreqb.extcode = 0;
 
 	xfer->send.payload = NULL;
-	xfer->recv.payload = data;
+	xfer->recv.payload = (uint32_t*)data;
 
 	if (fwmem_debug)
 		printf("fwmem_read_block: %d %04x:%08x %d\n", fwdev->dst,
@@ -202,7 +202,7 @@ fwmem_write_block(
 	struct fw_xfer *xfer;
 	struct fw_pkt *fp;
 
-	xfer = fwmem_xfer_req(fwdev, sc, spd, len, 0, hand);
+	xfer = fwmem_xfer_req(fwdev, sc, spd, len, 0, (void*)hand);
 	if (xfer == NULL)
 		return NULL;
 
@@ -213,7 +213,7 @@ fwmem_write_block(
 	fp->mode.wreqb.len = len;
 	fp->mode.wreqb.extcode = 0;
 
-	xfer->send.payload = data;
+	xfer->send.payload = (uint32_t*)data;
 	xfer->recv.payload = NULL;
 
 	if (fwmem_debug)

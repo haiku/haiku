@@ -9,7 +9,13 @@
 
 
 struct image;
-struct team;
+
+namespace BKernel {
+	struct Team;
+}
+
+using BKernel::Team;
+
 
 #ifdef __cplusplus
 
@@ -35,16 +41,16 @@ struct image {
 extern "C" {
 #endif
 
-extern image_id register_image(struct team *team, image_info *info, size_t size);
-extern status_t unregister_image(struct team *team, image_id id);
-extern int32 count_images(struct team *team);
-extern status_t remove_images(struct team *team);
+extern image_id register_image(Team *team, image_info *info, size_t size);
+extern status_t unregister_image(Team *team, image_id id);
+extern int32 count_images(Team *team);
+extern status_t remove_images(Team *team);
 
 typedef bool (*image_iterator_callback)(struct image* image, void* cookie);
 struct image* image_iterate_through_images(image_iterator_callback callback,
 					void* cookie);
 
-extern status_t image_debug_lookup_user_symbol_address(struct team *team,
+extern status_t image_debug_lookup_user_symbol_address(Team *team,
 					addr_t address, addr_t *_baseAddress, const char **_symbolName,
 					const char **_imageName, bool *_exactMatch);
 extern status_t image_init(void);

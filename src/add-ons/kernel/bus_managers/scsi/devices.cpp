@@ -19,6 +19,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include <algorithm>
+
 
 /** free autosense request of device */
 
@@ -104,7 +106,7 @@ scsi_register_device(scsi_bus_info *bus, uchar target_id,
 	pnp->get_attr_uint32(bus->node, B_DMA_MAX_TRANSFER_BLOCKS, &orig_max_blocks,
 		true);
 
-	max_blocks = min(max_blocks, orig_max_blocks);
+	max_blocks = std::min(max_blocks, orig_max_blocks);
 
 	{
 		char vendor_ident[sizeof( inquiry_data->vendor_ident ) + 1];
@@ -291,7 +293,7 @@ scsi_init_device(device_node *node, void **cookie)
 		return B_NO_MEMORY;
 
 	// never mind if there is no path - it might be an emulated controller
-	path_id = -1;
+	path_id = (uint8)-1;
 
 	pnp->get_attr_uint8(node, SCSI_BUS_PATH_ID_ITEM, &path_id, true);
 

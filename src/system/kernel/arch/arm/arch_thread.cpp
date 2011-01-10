@@ -31,7 +31,7 @@
 // a new thread structure.
 static struct arch_thread sInitialState;
 
-struct thread *gCurrentThread;
+Thread *gCurrentThread;
 
 
 status_t
@@ -45,7 +45,7 @@ arch_thread_init(struct kernel_args *args)
 
 
 status_t
-arch_team_init_team_struct(struct team *team, bool kernel)
+arch_team_init_team_struct(Team *team, bool kernel)
 {
 	// Nothing to do. The structure is empty.
 	return B_OK;
@@ -53,7 +53,7 @@ arch_team_init_team_struct(struct team *team, bool kernel)
 
 
 status_t
-arch_thread_init_thread_struct(struct thread *thread)
+arch_thread_init_thread_struct(Thread *thread)
 {
 	// set up an initial state (stack & fpu)
 	memcpy(&thread->arch_info, &sInitialState, sizeof(struct arch_thread));
@@ -63,7 +63,7 @@ arch_thread_init_thread_struct(struct thread *thread)
 
 
 status_t
-arch_thread_init_kthread_stack(struct thread *t, int (*start_func)(void),
+arch_thread_init_kthread_stack(Thread *t, int (*start_func)(void),
 	void (*entry_func)(void), void (*exit_func)(void))
 {
 /*	addr_t *kstack = (addr_t *)t->kernel_stack_base;
@@ -107,7 +107,7 @@ arch_thread_init_kthread_stack(struct thread *t, int (*start_func)(void),
 
 
 status_t
-arch_thread_init_tls(struct thread *thread)
+arch_thread_init_tls(Thread *thread)
 {
 	// TODO: Implement!
 	return B_OK;
@@ -115,7 +115,7 @@ arch_thread_init_tls(struct thread *thread)
 
 
 void
-arch_thread_context_switch(struct thread *from, struct thread *to)
+arch_thread_context_switch(Thread *from, Thread *to)
 {
 /*	addr_t newPageDirectory;
 
@@ -141,7 +141,7 @@ arch_thread_dump_info(void *info)
 
 
 status_t
-arch_thread_enter_userspace(struct thread *thread, addr_t entry, void *arg1, void *arg2)
+arch_thread_enter_userspace(Thread *thread, addr_t entry, void *arg1, void *arg2)
 {
 	panic("arch_thread_enter_uspace(): not yet implemented\n");
 	return B_ERROR;
@@ -149,14 +149,14 @@ arch_thread_enter_userspace(struct thread *thread, addr_t entry, void *arg1, voi
 
 
 bool
-arch_on_signal_stack(struct thread *thread)
+arch_on_signal_stack(Thread *thread)
 {
 	return false;
 }
 
 
 status_t
-arch_setup_signal_frame(struct thread *thread, struct sigaction *sa, int sig, int sigMask)
+arch_setup_signal_frame(Thread *thread, struct sigaction *sa, int sig, int sigMask)
 {
 	return B_ERROR;
 }
@@ -170,7 +170,7 @@ arch_restore_signal_frame(void)
 
 
 void
-arch_check_syscall_restart(struct thread *thread)
+arch_check_syscall_restart(Thread *thread)
 {
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2009, Haiku Inc. All rights reserved.
+ * Copyright 2003-201, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -42,7 +42,7 @@ arch_debug_save_registers(struct arch_debug_registers* registers)
 
 
 bool
-arch_debug_contains_call(struct thread* thread, const char* symbol,
+arch_debug_contains_call(Thread* thread, const char* symbol,
 	addr_t start, addr_t end)
 {
 #warning IMPLEMENT arch_debug_contains_call

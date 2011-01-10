@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2008-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
@@ -739,7 +739,7 @@ TraceEntry::operator new(size_t size, const std::nothrow_t&) throw()
 
 AbstractTraceEntry::AbstractTraceEntry()
 {
-	struct thread* thread = thread_get_current_thread();
+	Thread* thread = thread_get_current_thread();
 	if (thread != NULL) {
 		fThread = thread->id;
 		if (thread->team)
@@ -886,7 +886,7 @@ public:
 	{
 		const AbstractTraceEntry* entry
 			= dynamic_cast<const AbstractTraceEntry*>(_entry);
-		return (entry != NULL && entry->Thread() == fThread);
+		return (entry != NULL && entry->ThreadID() == fThread);
 	}
 };
 
@@ -897,7 +897,7 @@ public:
 	{
 		const AbstractTraceEntry* entry
 			= dynamic_cast<const AbstractTraceEntry*>(_entry);
-		return (entry != NULL && entry->Team() == fTeam);
+		return (entry != NULL && entry->TeamID() == fTeam);
 	}
 };
 

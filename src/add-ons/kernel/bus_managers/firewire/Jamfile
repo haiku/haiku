@@ -3,20 +3,20 @@ SubDir HAIKU_TOP src add-ons kernel bus_managers firewire ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 UsePrivateHeaders firewire kernel ;
 
-SubDirCcFlags [ FDefines _KERNEL=1 ] ;
+DEFINES += _KERNEL=1 ;
 
 KernelAddon firewire :
 	util.c
-	timer.c
-	firewire_module.c
-	firewire.c
-	fwdma.c
-	fwmem.c
-	fwohci.c
-	fwohci_pci.c
+	timer.cpp
+	firewire_module.cpp
+	firewire.cpp
+	fwdma.cpp
+	fwmem.cpp
+	fwohci.cpp
+	fwohci_pci.cpp
 	fwcrom.c
 	;
 
 SEARCH on [ FGristFiles
-		fwcrom.c 
+		fwcrom.c
 	] = [ FDirName $(HAIKU_TOP) src bin fwcontrol ] ;

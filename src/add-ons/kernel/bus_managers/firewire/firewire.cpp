@@ -30,7 +30,7 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * $FreeBSD: src/sys/dev/firewire/firewire.c,v 1.100 2007/07/20 03:42:57 simokawa Exp $
  *
  */
@@ -76,15 +76,16 @@ static int32 fw_bus_probe_thread(void *);
 static void fw_vmaccess (struct fw_xfer *);
 #endif
 static int fw_bmr (struct firewire_comm *);
-static void fw_dump_hdr(struct fw_pkt *, char *);
+static void fw_dump_hdr(struct fw_pkt *, const char *);
 
 
-char *linkspeed[] = {
+extern const char *const linkspeed[];
+const char *const linkspeed[] = {
 	"S100", "S200", "S400", "S800",
 	"S1600", "S3200", "undef", "undef"
 };
 
-static char *tcode_str[] = {
+static const char *const tcode_str[] = {
 	"WREQQ", "WREQB", "WRES",   "undef",
 	"RREQQ", "RREQB", "RRESQ",  "RRESB",
 	"CYCS",  "LREQ",  "STREAM", "LRES",
@@ -192,7 +193,7 @@ fw_asyreq(struct firewire_comm *fc, int sub, struct fw_xfer *xfer)
 	if (len != xfer->send.pay_len){
 		printf("len(%d) != send.pay_len(%d) %s(%x)\n",
 		    len, xfer->send.pay_len, tcode_str[tcode], tcode);
-		return EINVAL; 
+		return EINVAL;
 	}
 
 	if(xferq->start == NULL){
@@ -325,7 +326,7 @@ firewire_xfer_timeout(void *arg)
 	fc->timeout(fc);
 
 	STAILQ_FOREACH_SAFE(xfer, &xfer_timeout, tlabel, txfer)
-		xfer->hand(xfer);	
+		xfer->hand(xfer);
 }
 
 #define WATCHDOG_HZ 10
@@ -354,7 +355,7 @@ firewire_watchdog(void *arg)
 
 #if 0//to do
 status_t
-firewire_add_child(struct firewire_softc *sc, const char *childname, 
+firewire_add_child(struct firewire_softc *sc, const char *childname,
 		struct firewire_notify_hooks *hooks)
 {
 	struct firewire_child_info *element, *info;
@@ -408,7 +409,7 @@ firewire_remove_child(struct firewire_softc *sc, const char *childname)
 				sc->fc->childList = NULL;//childList has only a node
 			else
 				temp->link = element->link;
-			
+
 			free(element);
 			return B_OK;
 		}
@@ -428,7 +429,7 @@ int
 firewire_attach(struct firewire_comm *fc, struct firewire_softc *sc)
 {
 	sc->fc = fc;
-	fc->status = FWBUSNOTREADY;
+	fc->status = (uint)FWBUSNOTREADY;
 
 //	unit = device_get_unit(dev);
 	if( fc->nisodma > FWMAXNDMA) fc->nisodma = FWMAXNDMA;
@@ -469,13 +470,13 @@ firewire_attach(struct firewire_comm *fc, struct firewire_softc *sc)
 
 //	callout_reset(&sc->fc->timeout_callout, hz,
 //			(void *)firewire_watchdog, (void *)sc->fc);
-	fc->timeout_callout = create_timer(firewire_watchdog, fc, 
+	fc->timeout_callout = create_timer(firewire_watchdog, fc,
 			hz/WATCHDOG_HZ, B_PERIODIC_TIMER);
 
 	/* create thread */
 //	kproc_create(fw_bus_probe_thread, (void *)fc, &fc->probe_thread,
 //		0, 0, "fw%d_probe", unit);
-	fc->probe_thread = spawn_kernel_thread(fw_bus_probe_thread, 
+	fc->probe_thread = spawn_kernel_thread(fw_bus_probe_thread,
 			"fw_probe", PROBE_THREAD_PRIORITY, fc);
 	if(fc->probe_thread < B_OK)
 		dprintf("can not Create bus probe thread\n");
@@ -494,7 +495,7 @@ firewire_attach(struct firewire_comm *fc, struct firewire_softc *sc)
 
 	/* bus_reset */
 	FW_GLOCK(fc);
-	fw_busreset(fc, FWBUSNOTREADY);
+	fw_busreset(fc, (uint)FWBUSNOTREADY);
 	FW_GUNLOCK(fc);
 	fc->ibr(fc);
 
@@ -514,7 +515,7 @@ firewire_detach(struct firewire_softc *sc)
 
 	fc = sc->fc;
 	mtx_lock(&fc->wait_lock);
-	fc->status = FWBUSDETACH;
+	fc->status = (uint)FWBUSDETACH;
 //	wakeup(fc);
 	release_sem(fc->Sem);
 /*	if (msleep(fc->probe_thread, &fc->wait_lock, PWAIT, "fwthr", hz * 60))
@@ -614,7 +615,7 @@ fw_drain_txq(struct firewire_comm *fc)
 	mtx_unlock(&fc->tlabel_lock);
 
 	STAILQ_FOREACH_SAFE(xfer, &xfer_drain, tlabel, txfer)
-		xfer->hand(xfer);	
+		xfer->hand(xfer);
 }
 
 static void
@@ -628,9 +629,9 @@ fw_reset_csr(struct firewire_comm *fc)
 	CSRARC(fc, NODE_IDS) = 0x3f;
 
 	CSRARC(fc, TOPO_MAP + 8) = 0;
-	fc->irm = -1;
+	fc->irm = (uint)-1;
 
-	fc->max_node = -1;
+	fc->max_node = (uint)-1;
 
 	for(i = 2; i < 0x100/4 - 2 ; i++){
 		CSRARC(fc, SPED_MAP + i * 4) = 0;
@@ -655,8 +656,8 @@ fw_reset_csr(struct firewire_comm *fc)
 	CSRARC(fc, CONF_ROM + 0xc) = 0;
 
 /* DV depend CSRs see blue book */
-	CSRARC(fc, oPCR) &= ~DV_BROADCAST_ON; 
-	CSRARC(fc, iPCR) &= ~DV_BROADCAST_ON; 
+	CSRARC(fc, oPCR) &= ~DV_BROADCAST_ON;
+	CSRARC(fc, iPCR) &= ~DV_BROADCAST_ON;
 
 	CSRARC(fc, STATE_CLEAR) &= ~(1 << 23 | 1 << 15 | 1 << 14 );
 	CSRARC(fc, STATE_SET) = CSRARC(fc, STATE_CLEAR);
@@ -714,7 +715,7 @@ fw_reset_crom(struct firewire_comm *fc)
 	crom_add_entry(root, CSRKEY_NCAP, 0x0083c0); /* XXX */
 	/* private company_id */
 	crom_add_entry(root, CSRKEY_VENDOR, CSRVAL_VENDOR_PRIVATE);
-#if 0 
+#if 0
 #ifdef __DragonFly__
 	crom_add_simple_text(src, root, &buf->vendor, "DragonFly Project");
 	crom_add_entry(root, CSRKEY_HW, __DragonFly_cc_version);
@@ -747,13 +748,13 @@ fw_busreset(struct firewire_comm *fc, uint32_t new_status)
 		delete_timer(fc->bmr_callout);
 	fc->status = new_status;
 	fw_reset_csr(fc);
-	
-	if (fc->status == FWBUSNOTREADY)
+
+	if ((int32)fc->status == FWBUSNOTREADY)
 		fw_init_crom(fc);
 
 	fw_reset_crom(fc);
 
-	
+
 /*	if (device_get_children(fc->bdev, &devlistp, &devcnt) == 0) {
 		for( i = 0 ; i < devcnt ; i++)
 			if (device_get_state(devlistp[i]) >= DS_ATTACHED)  {
@@ -763,7 +764,7 @@ fw_busreset(struct firewire_comm *fc, uint32_t new_status)
 			}
 		free(devlistp);
 	}*/
-	
+
 	while(element){
 //		fdc = &element->cookie.fd;
 		fdc = (struct firewire_dev_comm *)element->cookie;
@@ -775,20 +776,20 @@ fw_busreset(struct firewire_comm *fc, uint32_t new_status)
 	src = &fc->crom_src_buf->src;
         /*
          * If the old config rom needs to be overwritten,
-         * bump the businfo.generation indicator to 
+         * bump the businfo.generation indicator to
          * indicate that we need to be reprobed
          * See 1394a-2000 8.3.2.5.4 for more details.
          * generation starts at 2 and rolls over at 0xF
          * back to 2.
-         * 
+         *
          * A generation of 0 indicates a device
          * that is not 1394a-2000 compliant.
          * A generation of 1 indicates a device that
-         * does not change it's Bus Info Block or 
+         * does not change it's Bus Info Block or
          * Configuration ROM.
          */
 #define FW_MAX_GENERATION 0xF
-	newrom = malloc(CROMSIZE);
+	newrom = (uint32_t*)malloc(CROMSIZE);
 	memset(newrom, 0, CROMSIZE);
 	src = &fc->crom_src_buf->src;
 	crom_load(src, newrom, CROMSIZE);
@@ -827,7 +828,7 @@ void fw_init(struct firewire_comm *fc)
 
 	STAILQ_INIT(&fc->atq->q);
 	STAILQ_INIT(&fc->ats->q);
-	
+
 	fc->Sem = create_sem(0, "fc Sem");
 
 	for( i = 0 ; i < fc->nisodma ; i ++ ){
@@ -845,7 +846,7 @@ void fw_init(struct firewire_comm *fc)
 
 		STAILQ_INIT(&fc->it[i]->q);
 		STAILQ_INIT(&fc->ir[i]->q);
-		
+
 		snprintf(tempname, sizeof(tempname), "it%d ready sem", i);
 		fc->it[i]->Sem = create_sem(0, tempname);
 		snprintf(tempname, sizeof(tempname), "ir%d ready sem", i);
@@ -879,13 +880,13 @@ void fw_init(struct firewire_comm *fc)
 	CSRARC(fc, oMPR) = 0x3fff0001; /* # output channel = 1 */
 	CSRARC(fc, oPCR) = 0x8000007a;
 	for(i = 4 ; i < 0x7c/4 ; i+=4){
-		CSRARC(fc, i + oPCR) = 0x8000007a; 
+		CSRARC(fc, i + oPCR) = 0x8000007a;
 	}
- 
+
 	CSRARC(fc, iMPR) = 0x00ff0001; /* # input channel = 1 */
 	CSRARC(fc, iPCR) = 0x803f0000;
 	for(i = 4 ; i < 0x7c/4 ; i+=4){
-		CSRARC(fc, i + iPCR) = 0x0; 
+		CSRARC(fc, i + iPCR) = 0x0;
 	}
 #endif
 
@@ -1018,7 +1019,7 @@ fw_xferlist_add(struct fw_xferlist *q, int slen, int rlen, int n,
 		if (xfer == NULL)
 			return (n);
 		xfer->fc = fc;
-		xfer->sc = sc;
+		xfer->sc = (caddr_t)sc;
 		xfer->hand = hand;
 		s = splfw();
 		STAILQ_INSERT_TAIL(q, xfer, link);
@@ -1042,7 +1043,7 @@ fw_xferlist_remove(struct fw_xferlist *q)
  * dump packet header
  */
 static void
-fw_dump_hdr(struct fw_pkt *fp, char *prefix)
+fw_dump_hdr(struct fw_pkt *fp, const char *prefix)
 {
 	printf("%s: dst=0x%02x tl=0x%02x rt=%d tcode=0x%x pri=0x%x "
 	    "src=0x%03x\n", prefix,
@@ -1103,7 +1104,7 @@ fw_tl2xfer(struct firewire_comm *fc, int node, int tlabel, int tcode)
 
 	mtx_lock(&fc->tlabel_lock);
 	STAILQ_FOREACH(xfer, &fc->tlabels[tlabel], tlabel)
-		if(xfer->send.hdr.mode.hdr.dst == node) {
+		if((uint)xfer->send.hdr.mode.hdr.dst == (uint)node) {
 			mtx_unlock(&fc->tlabel_lock);
 			splx(s);
 			KASSERT(xfer->tl == tlabel,
@@ -1116,7 +1117,7 @@ fw_tl2xfer(struct firewire_comm *fc, int node, int tlabel, int tcode)
 				    tcode, req);
 				return(NULL);
 			}
-			
+
 			if (firewire_debug > 2)
 				printf("fw_tl2xfer: found tl=%d\n", tlabel);
 			return(xfer);
@@ -1136,7 +1137,7 @@ fw_xfer_alloc()
 {
 	struct fw_xfer *xfer;
 
-	xfer = malloc(sizeof(struct fw_xfer));
+	xfer = (fw_xfer*)malloc(sizeof(struct fw_xfer));
 	if (xfer == NULL)
 		return xfer;
 	memset(xfer, 0, sizeof(struct fw_xfer));
@@ -1166,7 +1167,7 @@ fw_xfer_alloc_buf(int send_len, int recv_len)
 			return(NULL);
 		}
 		memset(xfer->send.payload 0, send_len);*/
-		xfer->send.payArea = alloc_mem(&send_virt, &send_phy, 
+		xfer->send.payArea = alloc_mem(&send_virt, &send_phy,
 				send_len, 0, "firewire tx buf");
 		if (xfer->send.payArea < B_OK){
 			fw_xfer_free(xfer);
@@ -1183,7 +1184,7 @@ fw_xfer_alloc_buf(int send_len, int recv_len)
 			fw_xfer_free(xfer);
 			return(NULL);
 		}*/
-		xfer->recv.payArea = alloc_mem(&recv_virt, &recv_phy, 
+		xfer->recv.payArea = alloc_mem(&recv_virt, &recv_phy,
 				recv_len, 0, "firewire rx buf");
 		if (xfer->recv.payArea < B_OK){
 			if (xfer->send.payArea > B_OK){
@@ -1250,7 +1251,7 @@ fw_xfer_unload(struct fw_xfer* xfer)
 	xfer->resp = 0;
 }
 /*
- * To free IEEE1394 XFER structure. 
+ * To free IEEE1394 XFER structure.
  */
 void
 fw_xfer_free_buf( struct fw_xfer* xfer)
@@ -1301,7 +1302,7 @@ fw_asy_callback_free(struct fw_xfer *xfer)
 }
 
 /*
- * To configure PHY. 
+ * To configure PHY.
  */
 static void
 fw_phy_config(struct firewire_comm *fc, int root_node, int gap_count)
@@ -1334,7 +1335,7 @@ fw_phy_config(struct firewire_comm *fc, int root_node, int gap_count)
 }
 
 /*
- * Dump self ID. 
+ * Dump self ID.
  */
 static void
 fw_print_sid(uint32_t sid)
@@ -1367,7 +1368,7 @@ fw_print_sid(uint32_t sid)
 }
 
 /*
- * To receive self ID. 
+ * To receive self ID.
  */
 void fw_sidrcv(struct firewire_comm* fc, uint32_t *sid, u_int len)
 {
@@ -1394,9 +1395,9 @@ void fw_sidrcv(struct firewire_comm* fc, uint32_t *sid, u_int len)
 			continue;
 		}
 		*self_id = *((union fw_self_id *)sid);
-		fc->topology_map->crc_len++;
+		(void)(fc->topology_map->crc_len++);
 		if(self_id->p0.sequel == 0){
-			fc->topology_map->node_count ++;
+			(void)(fc->topology_map->node_count++);
 			c_port = 0;
 			if (firewire_debug)
 				fw_print_sid(sid[0]);
@@ -1411,10 +1412,10 @@ void fw_sidrcv(struct firewire_comm* fc, uint32_t *sid, u_int len)
 			for (j = 0; j < node; j ++) {
 				fc->speed_map->speed[j][node]
 					= fc->speed_map->speed[node][j]
-					= min(fc->speed_map->speed[j][j],
+					= min_c(fc->speed_map->speed[j][j],
 							self_id->p0.phy_speed);
 			}
-			if ((fc->irm == -1 || self_id->p0.phy_id > fc->irm) &&
+			if ((fc->irm == (u_int)-1 || self_id->p0.phy_id > fc->irm) &&
 			  (self_id->p0.link_active && self_id->p0.contender)) {
 				fc->irm = self_id->p0.phy_id;
 			}
@@ -1433,7 +1434,7 @@ void fw_sidrcv(struct firewire_comm* fc, uint32_t *sid, u_int len)
 		}
 		sid += 2;
 		self_id++;
-		fc->topology_map->self_id_count ++;
+		(void)(fc->topology_map->self_id_count++);
 	}
 	/* CRC */
 	fc->topology_map->crc = fw_crc16(
@@ -1455,11 +1456,11 @@ void fw_sidrcv(struct firewire_comm* fc, uint32_t *sid, u_int len)
 	fc->max_hop = fc->max_node - i_branch;
 	device_printf(fc->bdev, "%d nodes, maxhop <= %d %s irm(%d) %s\n",
 		fc->max_node + 1, fc->max_hop,
-		(fc->irm == -1) ? "Not IRM capable" : "cable IRM",
+		(fc->irm == (u_int)-1) ? "Not IRM capable" : "cable IRM",
 		fc->irm,
 		(fc->irm == fc->nodeid) ? " (me) " : "");
 
-	if (try_bmr && (fc->irm != -1) && (CSRARC(fc, BUS_MGR_ID) == 0x3f)) {
+	if (try_bmr && (fc->irm != (u_int)-1) && (CSRARC(fc, BUS_MGR_ID) == 0x3f)) {
 		if (fc->irm == fc->nodeid) {
 			fc->status = FWBUSMGRDONE;
 			CSRARC(fc, BUS_MGR_ID) = fc->set_bmr(fc, fc->irm);
@@ -1468,7 +1469,7 @@ void fw_sidrcv(struct firewire_comm* fc, uint32_t *sid, u_int len)
 			fc->status = FWBUSMGRELECT;
 //			callout_reset(&fc->bmr_callout, hz/8,
 //				(void *)fw_try_bmr, (void *)fc);
-			fc->bmr_callout = create_timer(fw_try_bmr, fc, 
+			fc->bmr_callout = create_timer(fw_try_bmr, fc,
 					hz/8, B_ONE_SHOT_RELATIVE_TIMER);
 		}
 	} else
@@ -1476,12 +1477,12 @@ void fw_sidrcv(struct firewire_comm* fc, uint32_t *sid, u_int len)
 
 //	callout_reset(&fc->busprobe_callout, hz/4,
 //			(void *)fw_bus_probe, (void *)fc);
-	fc->busprobe_callout = create_timer(fw_bus_probe, fc, 
+	fc->busprobe_callout = create_timer(fw_bus_probe, fc,
 			hz/4, B_ONE_SHOT_RELATIVE_TIMER);
 }
 
 /*
- * To probe devices on the IEEE1394 bus. 
+ * To probe devices on the IEEE1394 bus.
  */
 static void
 fw_bus_probe(void *arg)
@@ -1528,7 +1529,7 @@ fw_explore_read_quads(struct fw_device *fwdev, int offset,
 	int i, error;
 
 	for (i = 0; i < length; i ++, offset += sizeof(uint32_t)) {
-		xfer = fwmem_read_quad(fwdev, NULL, -1,
+		xfer = fwmem_read_quad(fwdev, NULL, (uint8_t)-1,
 		    0xffff, 0xf0000000 | offset, (void *)&tmp,
 		    fw_xferwake);
 		if (xfer == NULL)
@@ -1576,7 +1577,7 @@ fw_explore_csrblock(struct fw_device *fwdev, int offset, int recur)
 	if (recur == 0)
 		return (0);
 
-	for (i = 0; i < dir->crc_len; i ++, offset += sizeof(uint32_t)) {
+	for (i = 0; (uint)i < dir->crc_len; i ++, offset += sizeof(uint32_t)) {
 		if ((reg[i].key & CSRTYPE_MASK) == CSRTYPE_D)
 			recur = 1;
 		else if ((reg[i].key & CSRTYPE_MASK) == CSRTYPE_L)
@@ -1661,7 +1662,7 @@ fw_explore_node(struct fw_device *dfwdev)
 			break;
 	if (fwdev == NULL) {
 		/* new device */
-		fwdev = malloc(sizeof(struct fw_device));
+		fwdev = (fw_device*)malloc(sizeof(struct fw_device));
 		if (fwdev == NULL) {
 			device_printf(fc->bdev, "%s: node%d: no memory\n",
 				__func__, node);
@@ -1676,7 +1677,7 @@ fw_explore_node(struct fw_device *dfwdev)
 
 		/*
 		 * Pre-1394a-2000 didn't have link_spd in
-		 * the Bus Info block, so try and use the 
+		 * the Bus Info block, so try and use the
 		 * speed map value.
 		 * 1394a-2000 compliant devices only use
 		 * the Bus Info Block link spd value, so
@@ -1704,7 +1705,7 @@ fw_explore_node(struct fw_device *dfwdev)
 				fwdev->speed--;
 			} else
 				break;
-				
+
 		}
 		/* inesrt into sorted fwdev list */
 		pfwdev = NULL;
@@ -1767,7 +1768,7 @@ fw_find_self_id(struct firewire_comm *fc, int node)
 		s = &fc->topology_map->self_id[i];
 		if (s->p0.sequel)
 			continue;
-		if (s->p0.phy_id == node)
+		if ((int)s->p0.phy_id == node)
 			return s;
 	}
 	return 0;
@@ -1788,7 +1789,7 @@ fw_explore(struct firewire_comm *fc)
 	dfwdev.maxrec = 8; /* 512 */
 	dfwdev.status = FWDEVINIT;
 
-	for (node = 0; node <= fc->max_node; node ++) {
+	for (node = 0; (uint)node <= fc->max_node; node ++) {
 		/* We don't probe myself and linkdown nodes */
 		if (node == fc->nodeid) {
 			if (firewire_debug)
@@ -1839,7 +1840,7 @@ fw_bus_probe_thread(void *arg)
 
 	fc = (struct firewire_comm *)arg;
 	mtx_lock(&fc->wait_lock);
-	while (fc->status != FWBUSDETACH) {
+	while (fc->status != (uint32_t)FWBUSDETACH) {
 		if (fc->status == FWBUSEXPLORE) {
 			mtx_unlock(&fc->wait_lock);
 			fw_explore(fc);
@@ -1853,7 +1854,7 @@ fw_bus_probe_thread(void *arg)
 		mtx_unlock(&fc->wait_lock);
 		acquire_sem(fc->Sem);
 		mtx_lock(&fc->wait_lock);
-		
+
 	}
 	mtx_unlock(&fc->wait_lock);
 //	kproc_exit(0);
@@ -1909,7 +1910,7 @@ fw_attach_dev(struct firewire_comm *fc)
 		}
 		free(devlistp, M_TEMP);
 	}*/
-	
+
 	while(element){
 //		fdc = &element->cookie.fd;
 		fdc = (struct firewire_dev_comm *)element->cookie;
@@ -1971,7 +1972,7 @@ fw_rcv_copy(struct fw_rcv_buf *rb)
 	pkt = (struct fw_pkt *)rb->vec->iov_base;
 	tinfo = &rb->fc->tcode[pkt->mode.hdr.tcode];
 
-	/* Copy header */ 
+	/* Copy header */
 	p = (u_char *)&rb->xfer->recv.hdr;
 	bcopy(rb->vec->iov_base, p, tinfo->hdr_len);
 	rb->vec->iov_base = (u_char *)rb->vec->iov_base + tinfo->hdr_len;
@@ -2154,7 +2155,7 @@ fw_rcv(struct fw_rcv_buf *rb)
 			return;
 		}
 		len = 0;
-		for (i = 0; i < rb->nvec; i ++)
+		for (i = 0; (uint)i < rb->nvec; i ++)
 			len += rb->vec[i].iov_len;
 		rb->xfer = STAILQ_FIRST(&bind->xferlist);
 		if (rb->xfer == NULL) {
@@ -2181,7 +2182,7 @@ fw_rcv(struct fw_rcv_buf *rb)
 			printf("receive queue is full\n");
 			return;
 		}
-		/* XXX get xfer from xfer queue, we don't need copy for 
+		/* XXX get xfer from xfer queue, we don't need copy for
 			per packet mode */
 		rb->xfer = fw_xfer_alloc_buf(M_FWXFER, 0, /* XXX */
 						vec[0].iov_len);
@@ -2365,7 +2366,7 @@ fw_vmaccess(struct fw_xfer *xfer){
 /**/
 	return;
 }
-#endif 
+#endif
 
 /*
  * CRC16 check-sum for IEEE1394 register blocks.

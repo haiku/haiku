@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2005-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  *
  * Userland debugger support.
@@ -24,7 +24,13 @@
 struct BreakpointManager;
 struct ConditionVariable;
 struct function_profile_info;
-struct thread;
+
+namespace BKernel {
+	struct Thread;
+}
+
+using BKernel::Thread;
+
 
 // Team related debugging data.
 //
@@ -235,15 +241,15 @@ void user_debug_team_exec();
 void user_debug_update_new_thread_flags(thread_id threadID);
 void user_debug_thread_created(thread_id threadID);
 void user_debug_thread_deleted(team_id teamID, thread_id threadID);
-void user_debug_thread_exiting(struct thread* thread);
+void user_debug_thread_exiting(Thread* thread);
 void user_debug_image_created(const image_info *imageInfo);
 void user_debug_image_deleted(const image_info *imageInfo);
 void user_debug_breakpoint_hit(bool software);
 void user_debug_watchpoint_hit();
 void user_debug_single_stepped();
 
-void user_debug_thread_unscheduled(struct thread* thread);
-void user_debug_thread_scheduled(struct thread* thread);
+void user_debug_thread_unscheduled(Thread* thread);
+void user_debug_thread_scheduled(Thread* thread);
 
 
 // syscalls

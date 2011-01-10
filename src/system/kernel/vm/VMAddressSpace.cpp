@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -228,7 +228,7 @@ VMAddressSpace::GetKernel()
 /*static*/ team_id
 VMAddressSpace::CurrentID()
 {
-	struct thread* thread = thread_get_current_thread();
+	Thread* thread = thread_get_current_thread();
 
 	if (thread != NULL && thread->team->address_space != NULL)
 		return thread->team->id;
@@ -240,7 +240,7 @@ VMAddressSpace::CurrentID()
 /*static*/ VMAddressSpace*
 VMAddressSpace::GetCurrent()
 {
-	struct thread* thread = thread_get_current_thread();
+	Thread* thread = thread_get_current_thread();
 
 	if (thread != NULL) {
 		VMAddressSpace* addressSpace = thread->team->address_space;

@@ -1,9 +1,10 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef KERNEL_LISTENERS_H
 #define KERNEL_LISTENERS_H
+
 
 #include <KernelExport.h>
 
@@ -14,7 +15,6 @@
 struct ConditionVariable;
 struct mutex;
 struct rw_lock;
-struct thread;
 
 
 // scheduler listeners
@@ -24,11 +24,11 @@ struct SchedulerListener : DoublyLinkedListLinkImpl<SchedulerListener> {
 	virtual						~SchedulerListener();
 
 	virtual	void				ThreadEnqueuedInRunQueue(
-									struct thread* thread) = 0;
+									Thread* thread) = 0;
 	virtual	void				ThreadRemovedFromRunQueue(
-									struct thread* thread) = 0;
-	virtual	void				ThreadScheduled(struct thread* oldThread,
-									struct thread* newThread) = 0;
+									Thread* thread) = 0;
+	virtual	void				ThreadScheduled(Thread* oldThread,
+									Thread* newThread) = 0;
 };
 
 

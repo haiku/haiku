@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -94,7 +94,7 @@ get_next_frame_debugger(addr_t ebp, addr_t *_next, addr_t *_eip)
 
 
 static status_t
-lookup_symbol(struct thread* thread, addr_t address, addr_t *_baseAddress,
+lookup_symbol(Thread* thread, addr_t address, addr_t *_baseAddress,
 	const char **_symbolName, const char **_imageName, bool *_exactMatch)
 {
 	status_t status = B_ENTRY_NOT_FOUND;
@@ -307,7 +307,7 @@ print_demangled_call(const char* image, const char* symbol, addr_t args,
 
 
 static void
-print_stack_frame(struct thread *thread, addr_t eip, addr_t ebp, addr_t nextEbp,
+print_stack_frame(Thread *thread, addr_t eip, addr_t ebp, addr_t nextEbp,
 	int32 callIndex, bool demangle)
 {
 	const char *symbol, *image;
@@ -380,10 +380,10 @@ print_iframe(struct iframe *frame)
 
 
 static bool
-setup_for_thread(char *arg, struct thread **_thread, uint32 *_ebp,
+setup_for_thread(char *arg, Thread **_thread, uint32 *_ebp,
 	uint32 *_oldPageDirectory)
 {
-	struct thread *thread = NULL;
+	Thread *thread = NULL;
 
 	if (arg != NULL) {
 		thread_id id = strtoul(arg, NULL, 0);
@@ -442,7 +442,7 @@ is_double_fault_stack_address(int32 cpu, addr_t address)
 
 
 static bool
-is_kernel_stack_address(struct thread* thread, addr_t address)
+is_kernel_stack_address(Thread* thread, addr_t address)
 {
 	// We don't have a thread pointer in the early boot process, but then we are
 	// on the kernel stack for sure.
@@ -462,7 +462,7 @@ is_kernel_stack_address(struct thread* thread, addr_t address)
 
 
 static bool
-is_iframe(struct thread* thread, addr_t frame)
+is_iframe(Thread* thread, addr_t frame)
 {
 	if (!is_kernel_stack_address(thread, frame))
 		return false;
@@ -473,7 +473,7 @@ is_iframe(struct thread* thread, addr_t frame)
 
 
 static struct iframe *
-find_previous_iframe(struct thread *thread, addr_t frame)
+find_previous_iframe(Thread *thread, addr_t frame)
 {
 	// iterate backwards through the stack frames, until we hit an iframe
 	while (is_kernel_stack_address(thread, frame)) {
@@ -488,7 +488,7 @@ find_previous_iframe(struct thread *thread, addr_t frame)
 
 
 static struct iframe*
-get_previous_iframe(struct thread* thread, struct iframe* frame)
+get_previous_iframe(Thread* thread, struct iframe* frame)
 {
 	if (frame == NULL)
 		return NULL;
@@ -498,7 +498,7 @@ get_previous_iframe(struct thread* thread, struct iframe* frame)
 
 
 static struct iframe*
-get_current_iframe(struct thread* thread)
+get_current_iframe(Thread* thread)
 {
 	if (thread == thread_get_current_thread())
 		return i386_get_current_iframe();
@@ -602,7 +602,7 @@ stack_trace(int argc, char **argv)
 	}
 
 	uint32 previousLocations[NUM_PREVIOUS_LOCATIONS];
-	struct thread *thread = NULL;
+	Thread *thread = NULL;
 	uint32 oldPageDirectory = 0;
 	uint32 ebp = x86_read_ebp();
 	int32 num = 0, last = 0;
@@ -676,7 +676,7 @@ stack_trace(int argc, char **argv)
 
 
 static void
-print_call(struct thread *thread, addr_t eip, addr_t ebp, addr_t nextEbp,
+print_call(Thread *thread, addr_t eip, addr_t ebp, addr_t nextEbp,
 	int32 argCount)
 {
 	const char *symbol, *image;
@@ -756,7 +756,7 @@ show_call(int argc, char **argv)
 		return 0;
 	}
 
-	struct thread *thread = NULL;
+	Thread *thread = NULL;
 	uint32 oldPageDirectory = 0;
 	addr_t ebp = x86_read_ebp();
 	int32 argCount = 0;
@@ -848,7 +848,7 @@ dump_iframes(int argc, char **argv)
 		return 0;
 	}
 
-	struct thread *thread = NULL;
+	Thread *thread = NULL;
 
 	if (argc < 2) {
 		thread = thread_get_current_thread();
@@ -880,7 +880,7 @@ dump_iframes(int argc, char **argv)
 
 
 static bool
-is_calling(struct thread *thread, addr_t eip, const char *pattern,
+is_calling(Thread *thread, addr_t eip, const char *pattern,
 	addr_t start, addr_t end)
 {
 	if (pattern == NULL)
@@ -924,7 +924,7 @@ cmd_in_context(int argc, char** argv)
 		return 0;
 
 	// get the thread
-	struct thread* thread = thread_get_thread_struct_locked(threadID);
+	Thread* thread = thread_get_thread_struct_locked(threadID);
 	if (thread == NULL) {
 		kprintf("Could not find thread with ID \"%s\".\n", threadIDString);
 		return 0;
@@ -976,7 +976,7 @@ arch_debug_stack_trace(void)
 
 
 bool
-arch_debug_contains_call(struct thread *thread, const char *symbol,
+arch_debug_contains_call(Thread *thread, const char *symbol,
 	addr_t start, addr_t end)
 {
 	DebuggedThreadSetter threadSetter(thread);
@@ -1060,7 +1060,7 @@ arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
 	if (skipIframes > 0)
 		skipFrames = INT_MAX;
 
-	struct thread* thread = thread_get_current_thread();
+	Thread* thread = thread_get_current_thread();
 	int32 count = 0;
 	addr_t ebp = x86_read_ebp();
 	bool onKernelStack = true;

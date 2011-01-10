@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2004-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
@@ -232,7 +232,7 @@ IOSchedulerSimple::ScheduleRequest(IORequest* request)
 	// lock memory (via another thread or a dedicated call).
 
 	if (buffer->IsVirtual()) {
-		status_t status = buffer->LockMemory(request->Team(),
+		status_t status = buffer->LockMemory(request->TeamID(),
 			request->IsWrite());
 		if (status != B_OK) {
 			request->SetStatusAndNotify(status);
@@ -242,13 +242,13 @@ IOSchedulerSimple::ScheduleRequest(IORequest* request)
 
 	MutexLocker locker(fLock);
 
-	IORequestOwner* owner = _GetRequestOwner(request->Team(), request->Thread(),
-		true);
+	IORequestOwner* owner = _GetRequestOwner(request->TeamID(),
+		request->ThreadID(), true);
 	if (owner == NULL) {
 		panic("IOSchedulerSimple: Out of request owners!\n");
 		locker.Unlock();
 		if (buffer->IsVirtual())
-			buffer->UnlockMemory(request->Team(), request->IsWrite());
+			buffer->UnlockMemory(request->TeamID(), request->IsWrite());
 		request->SetStatusAndNotify(B_NO_MEMORY);
 		return B_NO_MEMORY;
 	}
@@ -257,7 +257,7 @@ IOSchedulerSimple::ScheduleRequest(IORequest* request)
 	request->SetOwner(owner);
 	owner->requests.Add(request);
 
-	int32 priority = thread_get_io_priority(request->Thread());
+	int32 priority = thread_get_io_priority(request->ThreadID());
 	if (priority >= 0)
 		owner->priority = priority;
 //dprintf("  request %p -> owner %p (thread %ld, active %d)\n", request, owner, owner->thread, wasActive);

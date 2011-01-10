@@ -25,13 +25,13 @@
 
 
 struct mutex_waiter {
-	struct thread*	thread;
+	Thread*			thread;
 	mutex_waiter*	next;		// next in queue
 	mutex_waiter*	last;		// last in queue (valid for the first in queue)
 };
 
 struct rw_lock_waiter {
-	struct thread*	thread;
+	Thread*			thread;
 	rw_lock_waiter*	next;		// next in queue
 	rw_lock_waiter*	last;		// last in queue (valid for the first in queue)
 	bool			writer;

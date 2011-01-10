@@ -1,10 +1,11 @@
 /*
- * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef KERNEL_SCHEDULER_TRACING_H
 #define KERNEL_SCHEDULER_TRACING_H
+
 
 #include <arch/debug.h>
 #include <cpu.h>
@@ -18,7 +19,7 @@ namespace SchedulerTracing {
 
 class SchedulerTraceEntry : public AbstractTraceEntry {
 public:
-	SchedulerTraceEntry(struct thread* thread)
+	SchedulerTraceEntry(Thread* thread)
 		:
 		fID(thread->id)
 	{
@@ -35,8 +36,7 @@ protected:
 
 class EnqueueThread : public SchedulerTraceEntry {
 public:
-	EnqueueThread(struct thread* thread, struct thread* previous,
-			struct thread* next)
+	EnqueueThread(Thread* thread, Thread* previous, Thread* next)
 		:
 		SchedulerTraceEntry(thread),
 		fPreviousID(-1),
@@ -66,7 +66,7 @@ private:
 
 class RemoveThread : public SchedulerTraceEntry {
 public:
-	RemoveThread(struct thread* thread)
+	RemoveThread(Thread* thread)
 		:
 		SchedulerTraceEntry(thread),
 		fPriority(thread->priority)
@@ -85,7 +85,7 @@ private:
 
 class ScheduleThread : public SchedulerTraceEntry {
 public:
-	ScheduleThread(struct thread* thread, struct thread* previous)
+	ScheduleThread(Thread* thread, Thread* previous)
 		:
 		SchedulerTraceEntry(thread),
 		fPreviousID(previous->id),

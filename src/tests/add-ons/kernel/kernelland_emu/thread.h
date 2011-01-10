@@ -8,20 +8,24 @@
 #include <OS.h>
 
 
-struct thread;
+namespace BKernel {
+	struct Thread;
+}
+
+using BKernel::Thread;
 
 
-static inline struct thread*
+static inline Thread*
 get_current_thread()
 {
-	return (struct thread*)find_thread(NULL);
+	return (Thread*)(addr_t)find_thread(NULL);
 }
 
 
 static inline thread_id
-get_thread_id(struct thread* thread)
+get_thread_id(Thread* thread)
 {
-	return (thread_id)thread;
+	return (thread_id)(addr_t)thread;
 }
 
 

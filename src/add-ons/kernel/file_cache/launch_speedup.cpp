@@ -685,7 +685,7 @@ status_t
 SessionGetter::New(const char *name, dev_t device, ino_t node,
 	Session **_session)
 {
-	struct thread *thread = thread_get_current_thread();
+	Thread *thread = thread_get_current_thread();
 	fSession = start_session(thread->team->id, device, node, name);
 
 	if (fSession != NULL) {

@@ -100,9 +100,9 @@ class AbstractTraceEntry : public TraceEntry {
 
 		virtual void AddDump(TraceOutput& out);
 
-		thread_id Thread() const { return fThread; }
-		thread_id Team() const { return fTeam; }
-		bigtime_t Time() const { return fTime; }
+		thread_id ThreadID() const	{ return fThread; }
+		thread_id TeamID() const	{ return fTeam; }
+		bigtime_t Time() const		{ return fTime; }
 
 	protected:
 		thread_id	fThread;

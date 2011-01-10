@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2011, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -698,7 +698,7 @@ uninit_timers(void)
 bool
 is_syscall(void)
 {
-	struct thread* thread = thread_get_current_thread();
+	Thread* thread = thread_get_current_thread();
 	return (thread->flags & THREAD_FLAGS_SYSCALL) != 0;
 }
 
@@ -713,7 +713,7 @@ is_restarted_syscall(void)
 void
 store_syscall_restart_timeout(bigtime_t timeout)
 {
-	struct thread* thread = thread_get_current_thread();
+	Thread* thread = thread_get_current_thread();
 	if ((thread->flags & THREAD_FLAGS_SYSCALL) != 0)
 		*(bigtime_t*)thread->syscall_restart.parameters = timeout;
 }
@@ -722,7 +722,7 @@ store_syscall_restart_timeout(bigtime_t timeout)
 bigtime_t
 restore_syscall_restart_timeout(void)
 {
-	struct thread* thread = thread_get_current_thread();
+	Thread* thread = thread_get_current_thread();
 	return *(bigtime_t*)thread->syscall_restart.parameters;
 }
 

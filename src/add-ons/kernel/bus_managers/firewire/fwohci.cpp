@@ -30,7 +30,7 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * $FreeBSD: src/sys/dev/firewire/fwohci.c,v 1.93 2007/06/08 09:04:30 simokawa Exp $
  *
  */
@@ -86,7 +86,7 @@ char fwohcicode[32][0x20]={
 	"Undef","ack data_err","ack type_err",""};
 
 #define MAX_SPEED 3
-extern char *linkspeed[];
+extern const char *const linkspeed[];
 uint32_t tagbit[4] = { 1 << 28, 1 << 29, 1 << 30, 1 << 31};
 
 static struct tcode_info tinfo[] = {
@@ -113,17 +113,17 @@ static struct tcode_info tinfo[] = {
 #define OHCI_READ_SIGMASK 0xffff0000
 
 static void fwohci_ibr (struct firewire_comm *);
-static void fwohci_db_init (struct fwohci_softc *, struct fwohci_dbch *);
-static void fwohci_db_free (struct fwohci_dbch *);
-static void fwohci_arcv (struct fwohci_softc *, struct fwohci_dbch *, int);
-static void fwohci_txd (struct fwohci_softc *, struct fwohci_dbch *);
+static void fwohci_db_init (struct fwohci_softc *, fwohci_softc::fwohci_dbch *);
+static void fwohci_db_free (fwohci_softc::fwohci_dbch *);
+static void fwohci_arcv (struct fwohci_softc *, fwohci_softc::fwohci_dbch *, int);
+static void fwohci_txd (struct fwohci_softc *, fwohci_softc::fwohci_dbch *);
 static void fwohci_start_atq (struct firewire_comm *);
 static void fwohci_start_ats (struct firewire_comm *);
-static void fwohci_start (struct fwohci_softc *, struct fwohci_dbch *);
+static void fwohci_start (struct fwohci_softc *, fwohci_softc::fwohci_dbch *);
 static uint32_t fwphy_wrdata ( struct fwohci_softc *, uint32_t, uint32_t);
 static uint32_t fwphy_rddata ( struct fwohci_softc *, uint32_t);
-static int fwohci_rx_enable (struct fwohci_softc *, struct fwohci_dbch *);
-static int fwohci_tx_enable (struct fwohci_softc *, struct fwohci_dbch *);
+static int fwohci_rx_enable (struct fwohci_softc *, fwohci_softc::fwohci_dbch *);
+static int fwohci_tx_enable (struct fwohci_softc *, fwohci_softc::fwohci_dbch *);
 static int fwohci_irx_enable (struct firewire_comm *, int);
 static int fwohci_irx_disable (struct firewire_comm *, int);
 #if BYTE_ORDER == BIG_ENDIAN
@@ -135,7 +135,7 @@ static void fwohci_timeout (void *);
 static void fwohci_set_intr (struct firewire_comm *, int);
 
 static inline void fwohci_set_rx_buf(struct fw_xferq *, struct fwohcidb_tr *, bus_addr_t dbuf[], int dsiz[]);
-static int fwohci_add_tx_buf (struct fwohci_dbch *, struct fwohcidb_tr *, int);
+static int fwohci_add_tx_buf (fwohci_softc::fwohci_dbch *, struct fwohcidb_tr *, int);
 static void	dump_db (struct fwohci_softc *, uint32_t);
 static void 	print_db (struct fwohcidb_tr *, struct fwohcidb *, uint32_t , uint32_t);
 static void	dump_dma (struct fwohci_softc *, uint32_t);
@@ -408,7 +408,7 @@ fwohci_probe_phy(struct fwohci_softc *sc)
 /*
  * probe PHY parameters
  * 0. to prove PHY version, whether compliance of 1394a.
- * 1. to probe maximum speed supported by the PHY and 
+ * 1. to probe maximum speed supported by the PHY and
  *    number of port supported by core-logic.
  *    It is not actually available port on your PC .
  */
@@ -438,7 +438,7 @@ fwohci_probe_phy(struct fwohci_softc *sc)
 				sc->fc.speed, MAX_SPEED);
 			sc->fc.speed = MAX_SPEED;
 		}
-		device_printf(dev, 
+		device_printf(dev,
 			"Phy 1394a available %s, %d ports.\n",
 			linkspeed[sc->fc.speed], sc->fc.nport);
 
@@ -450,7 +450,7 @@ fwohci_probe_phy(struct fwohci_softc *sc)
 		if (e1394a) {
 #endif
 			if (firewire_debug)
-				device_printf(dev, 
+				device_printf(dev,
 					"Enable 1394a Enhancements\n");
 			/* enable EAA EMC */
 			reg2 |= 0x03;
@@ -482,7 +482,7 @@ fwohci_reset(struct fwohci_softc *sc)
 	uint32_t reg, reg2;
 	struct fwohcidb_tr *db_tr;
 
-	/* Disable interrupts */ 
+	/* Disable interrupts */
 	OWRITE(sc, FWOHCI_INTMASKCLR, ~0);
 
 	/* Now stopping all DMA channels */
@@ -500,7 +500,7 @@ fwohci_reset(struct fwohci_softc *sc)
 	/* FLUSH FIFO and reset Transmitter/Reciever */
 	OWRITE(sc, OHCI_HCCCTL, OHCI_HCC_RESET);
 	if (firewire_debug)
-		device_printf(dev, 
+		device_printf(dev,
 			"resetting OHCI...");
 	i = 0;
 	while(OREAD(sc, OHCI_HCCCTL) & OHCI_HCC_RESET) {
@@ -523,7 +523,7 @@ fwohci_reset(struct fwohci_softc *sc)
 			linkspeed[speed], MAXREC(max_rec));
 	/* XXX fix max_rec */
 	sc->fc.maxrec = sc->fc.speed + 8;
-	if (max_rec != sc->fc.maxrec) {
+	if ((uint32_t)max_rec != sc->fc.maxrec) {
 		reg2 = (reg2 & 0xffff0fff) | (sc->fc.maxrec << 12);
 		device_printf(dev, "max_rec %d -> %d\n",
 				MAXREC(max_rec), MAXREC(sc->fc.maxrec));
@@ -563,11 +563,11 @@ fwohci_reset(struct fwohci_softc *sc)
 	sc->atrq.bottom = sc->atrq.top;
 	sc->atrs.bottom = sc->atrs.top;
 
-	for( i = 0, db_tr = sc->atrq.top; i < sc->atrq.ndb ;
+	for( i = 0, db_tr = sc->atrq.top; (uint)i < sc->atrq.ndb ;
 				i ++, db_tr = STAILQ_NEXT(db_tr, link)){
 		db_tr->xfer = NULL;
 	}
-	for( i = 0, db_tr = sc->atrs.top; i < sc->atrs.ndb ;
+	for( i = 0, db_tr = sc->atrs.top; (uint)i < sc->atrs.ndb ;
 				i ++, db_tr = STAILQ_NEXT(db_tr, link)){
 		db_tr->xfer = NULL;
 	}
@@ -575,7 +575,7 @@ fwohci_reset(struct fwohci_softc *sc)
 
 	/* Enable interrupts */
 	sc->intmask =  (OHCI_INT_ERR  | OHCI_INT_PHY_SID
-			| OHCI_INT_DMA_ATRQ | OHCI_INT_DMA_ATRS 
+			| OHCI_INT_DMA_ATRQ | OHCI_INT_DMA_ATRS
 			| OHCI_INT_DMA_PRRQ | OHCI_INT_DMA_PRRS
 			| OHCI_INT_PHY_BUS_R | OHCI_INT_PW_ERR);
 	sc->intmask |=  OHCI_INT_DMA_IR | OHCI_INT_DMA_IT;
@@ -700,17 +700,18 @@ fwohci_init(struct fwohci_softc *sc)
 		device_printf(dev, "dummy_dma alloc failed.");
 		return ENOMEM;
 	}*/
-	//crom_sid_Area means config rom and sid buf etc. 
+	//crom_sid_Area means config rom and sid buf etc.
 	sc->fc.crom_sid_Area = alloc_mem(&buf_virt, &buf_phy, CROMSIZE+OHCI_SIDSIZE+sizeof(uint32_t), 0, "fwohci config etc. buf");
 	if (sc->fc.crom_sid_Area < B_OK)
 		return B_NO_MEMORY;
-	sc->sid_buf = sc->sid_dma.v_addr = buf_virt;
+	sc->sid_buf = (uint32_t*)(sc->sid_dma.v_addr = buf_virt);
 	sc->sid_dma.bus_addr = (bus_addr_t)buf_phy;
-	sc->fc.config_rom = sc->crom_dma.v_addr = buf_virt + OHCI_SIDSIZE;
-	sc->crom_dma.bus_addr = (bus_addr_t)(buf_phy + OHCI_SIDSIZE);
-	sc->dummy_dma.v_addr = buf_virt + OHCI_SIDSIZE + CROMSIZE;
-	sc->dummy_dma.bus_addr = (bus_addr_t)(buf_phy + 
-			OHCI_SIDSIZE + CROMSIZE);
+	sc->fc.config_rom
+		= (uint32_t*)(sc->crom_dma.v_addr = (char*)buf_virt + OHCI_SIDSIZE);
+	sc->crom_dma.bus_addr = (bus_addr_t)buf_phy + OHCI_SIDSIZE;
+	sc->dummy_dma.v_addr = (char*)buf_virt + OHCI_SIDSIZE + CROMSIZE;
+	sc->dummy_dma.bus_addr = (bus_addr_t)buf_phy +
+			OHCI_SIDSIZE + CROMSIZE;
 
 	fwohci_db_init(sc, &sc->arrq);
 	if ((sc->arrq.flags & FWOHCI_DBCH_INIT) == 0)
@@ -818,7 +819,7 @@ fwohci_detach(struct fwohci_softc *sc)
 		taskqueue_drain(sc->fc.taskqueue, &sc->fc.task_timeout);
 		taskqueue_free(sc->fc.taskqueue);*/
 		gDpc->delete_dpc_queue(sc->fc.taskqueue);
-		
+
 		sc->fc.taskqueue = NULL;
 	}
 
@@ -830,9 +831,9 @@ fwohci_detach(struct fwohci_softc *sc)
 	int _cnt = _dbtr->dbcnt;					\
 	db = &_dbtr->db[ (_cnt > 2) ? (_cnt -1) : 0];			\
 } while (0)
-	
+
 static void
-fwohci_execute_db(void *arg,  struct send_recv *info)
+fwohci_execute_db(void *arg,  fw_xfer::send_recv *info)
 {
 	struct fwohcidb_tr *db_tr;
 	struct fwohcidb *db;
@@ -843,7 +844,7 @@ fwohci_execute_db(void *arg,  struct send_recv *info)
 
 	db_tr = (struct fwohcidb_tr *)arg;
 	db = &db_tr->db[db_tr->dbcnt];
-	
+
 	for (i = 0; i < j; i++) {
 		FWOHCI_DMA_WRITE(db->db.desc.addr, bus_addr);
 		FWOHCI_DMA_WRITE(db->db.desc.cmd, step);
@@ -869,7 +870,7 @@ fwohci_execute_db2(void *arg, bus_dma_segment_t *segs, int nseg,
 }*/
 
 static void
-fwohci_start(struct fwohci_softc *sc, struct fwohci_dbch *dbch)
+fwohci_start(struct fwohci_softc *sc, fwohci_softc::fwohci_dbch *dbch)
 {
 	int i, s;
 	int tcode, hdr_len, pl_off;
@@ -985,7 +986,7 @@ txloop:
 					m_copydata(xfer->mbuf, 0,
 						xfer->mbuf->m_pkthdr.len,
 						mtod(m0, caddr_t));
-					m0->m_len = m0->m_pkthdr.len = 
+					m0->m_len = m0->m_pkthdr.len =
 						xfer->mbuf->m_pkthdr.len;
 					m_freem(xfer->mbuf);
 					xfer->mbuf = m0;
@@ -998,7 +999,7 @@ txloop:
 			printf("dmamap_load: err=%d\n", err);
 		bus_dmamap_sync(dbch->dmat, db_tr->dma_map,
 						BUS_DMASYNC_PREWRITE);
-#endif 
+#endif
 #if 0 /* OHCI_OUTPUT_MODE == 0 */
 		for (i = 2; i < db_tr->dbcnt; i++)
 			FWOHCI_DMA_SET(db_tr->db[i].db.desc.cmd,
@@ -1074,7 +1075,7 @@ fwohci_start_ats(struct firewire_comm *fc)
 }
 
 void
-fwohci_txd(struct fwohci_softc *sc, struct fwohci_dbch *dbch)
+fwohci_txd(struct fwohci_softc *sc, fwohci_softc::fwohci_dbch *dbch)
 {
 	int s, ch, err = 0;
 	struct fwohcidb_tr *tr;
@@ -1103,7 +1104,7 @@ fwohci_txd(struct fwohci_softc *sc, struct fwohci_dbch *dbch)
 		LAST_DB(tr, db);
 		status = FWOHCI_DMA_READ(db->db.desc.res) >> OHCI_STATUS_SHIFT;
 		if(!(status & OHCI_CNTL_DMA_ACTIVE)){
-			if (fc->status != FWBUSINIT) 
+			if (fc->status != FWBUSINIT)
 				/* maybe out of order?? */
 				goto out;
 		}
@@ -1215,7 +1216,7 @@ out:
 }
 
 static void
-fwohci_db_free(struct fwohci_dbch *dbch)
+fwohci_db_free(fwohci_softc::fwohci_dbch *dbch)
 {
 	struct fwohcidb_tr *db_tr;
 //	int idb;
@@ -1248,7 +1249,7 @@ fwohci_db_free(struct fwohci_dbch *dbch)
 }
 
 static void
-fwohci_db_init(struct fwohci_softc *sc, struct fwohci_dbch *dbch)
+fwohci_db_init(struct fwohci_softc *sc, fwohci_softc::fwohci_dbch *dbch)
 {
 	int	idb;
 	struct fwohcidb_tr *db_tr;
@@ -1294,7 +1295,7 @@ fwohci_db_init(struct fwohci_softc *sc, struct fwohci_dbch *dbch)
 		return;
 	}
 	/* Attach DB to DMA ch. */
-	for(idb = 0 ; idb < dbch->ndb ; idb++){
+	for(idb = 0 ; (uint)idb < dbch->ndb ; idb++){
 		db_tr->dbcnt = 0;
 		db_tr->db = (struct fwohcidb *)fwdma_v_addr(dbch->am, idb);
 		db_tr->bus_addr = fwdma_bus_addr(dbch->am, idb);
@@ -1335,7 +1336,7 @@ fwohci_itx_disable(struct firewire_comm *fc, int dmach)
 {
 	struct fwohci_softc *sc = (struct fwohci_softc *)fc;
 
-	OWRITE(sc, OHCI_ITCTLCLR(dmach), 
+	OWRITE(sc, OHCI_ITCTLCLR(dmach),
 			OHCI_CNTL_DMA_RUN | OHCI_CNTL_CYCMATCH_S);
 	OWRITE(sc, OHCI_IT_MASKCLR, 1 << dmach);
 	OWRITE(sc, OHCI_IT_STATCLR, 1 << dmach);
@@ -1373,7 +1374,7 @@ fwohci_irx_post (struct firewire_comm *fc , uint32_t *qld)
 #endif
 
 static int
-fwohci_tx_enable(struct fwohci_softc *sc, struct fwohci_dbch *dbch)
+fwohci_tx_enable(struct fwohci_softc *sc, fwohci_softc::fwohci_dbch *dbch)
 {
 	int err = 0;
 	int idb, z, i, dmach = 0, ldesc;
@@ -1399,11 +1400,11 @@ fwohci_tx_enable(struct fwohci_softc *sc, struct fwohci_dbch *dbch)
 	if(dbch->xferq.flag & FWXFERQ_RUNNING)
 		return err;
 	dbch->xferq.flag |= FWXFERQ_RUNNING;
-	for( i = 0, dbch->bottom = dbch->top; i < (dbch->ndb - 1); i++){
+	for( i = 0, dbch->bottom = dbch->top; (uint)i < (dbch->ndb - 1); i++){
 		dbch->bottom = STAILQ_NEXT(dbch->bottom, link);
 	}
 	db_tr = dbch->top;
-	for (idb = 0; idb < dbch->ndb; idb ++) {
+	for (idb = 0; (uint)idb < dbch->ndb; idb ++) {
 		fwohci_add_tx_buf(dbch, db_tr, idb);
 		if(STAILQ_NEXT(db_tr, link) == NULL){
 			break;
@@ -1432,7 +1433,7 @@ fwohci_tx_enable(struct fwohci_softc *sc, struct fwohci_dbch *dbch)
 }
 
 static int
-fwohci_rx_enable(struct fwohci_softc *sc, struct fwohci_dbch *dbch)
+fwohci_rx_enable(struct fwohci_softc *sc, fwohci_softc::fwohci_dbch *dbch)
 {
 	int err = 0;
 	int idb, z, i, dmach = 0, ldesc;
@@ -1472,7 +1473,7 @@ fwohci_rx_enable(struct fwohci_softc *sc, struct fwohci_dbch *dbch)
 	}
 	dbch->xferq.flag |= FWXFERQ_RUNNING;
 	dbch->top = STAILQ_FIRST(&dbch->db_trq);
-	for( i = 0, dbch->bottom = dbch->top; i < (dbch->ndb - 1); i++){
+	for( i = 0, dbch->bottom = dbch->top; (uint)i < (dbch->ndb - 1); i++){
 		dbch->bottom = STAILQ_NEXT(dbch->bottom, link);
 	}
 	db_tr = dbch->top;
@@ -1480,14 +1481,14 @@ fwohci_rx_enable(struct fwohci_softc *sc, struct fwohci_dbch *dbch)
 	ir = &dbch->xferq;
 	if(ir->buf == NULL && (ir->flag & FWXFERQ_EXTBUF) == 0) {
 		if (dbch->Area <= 0) {
-			dbch->Area = alloc_mem(&buf_virt, &buf_phy, 
+			dbch->Area = alloc_mem(&buf_virt, &buf_phy,
 				ir->psize * dbch->ndb, 0, "fw rx Area");
 			if(dbch->Area < B_OK)
 				return(ENOMEM);
 		}
 	}
-	
-	for (idb = 0; idb < dbch->ndb; idb ++) {
+
+	for (idb = 0; (uint)idb < dbch->ndb; idb ++) {
 		//fwohci_add_rx_buf(dbch, db_tr, idb, &sc->dummy_dma);
 		if(ir->buf == NULL && (ir->flag & FWXFERQ_EXTBUF) == 0) {
 			db_tr->buf = (caddr_t)buf_virt;
@@ -1495,15 +1496,15 @@ fwohci_rx_enable(struct fwohci_softc *sc, struct fwohci_dbch *dbch)
 
 			db_tr->dbcnt = 1;
 			dsiz[0] = ir->psize;
-			buf_virt += ir->psize;
-			buf_phy += ir->psize;
+			buf_virt = (char*)buf_virt + ir->psize;
+			buf_phy = (char*)buf_phy + ir->psize;
 		} else {
 			db_tr->dbcnt = 0;
 			dsiz[db_tr->dbcnt] = sizeof(uint32_t);
 			dbuf[db_tr->dbcnt++] = sc->dummy_dma.bus_addr;
 			dsiz[db_tr->dbcnt] = ir->psize;
 			if (ir->buf != NULL) {
-				db_tr->buf = fwdma_v_addr(ir->buf, idb);
+				db_tr->buf = (char*)fwdma_v_addr(ir->buf, idb);
 				dbuf[db_tr->dbcnt] = fwdma_bus_addr(
 						ir->buf, idb);
 			}
@@ -1580,7 +1581,7 @@ fwohci_itxbuf_enable(struct firewire_comm *fc, int dmach)
 	struct fwohci_softc *sc = (struct fwohci_softc *)fc;
 	int err = 0;
 	unsigned short tag, ich;
-	struct fwohci_dbch *dbch;
+	fwohci_softc::fwohci_dbch *dbch;
 	int cycle_match, cycle_now, s, ldesc;
 	uint32_t stat;
 	struct fw_bulkxfer *first, *chunk, *prev;
@@ -1620,7 +1621,7 @@ fwohci_itxbuf_enable(struct firewire_comm *fc, int dmach)
 						OHCI_BRANCH_ALWAYS);
 #endif
 #if 0 /* if bulkxfer->npacket changes */
-			db[ldesc].db.desc.depend = db[0].db.desc.depend = 
+			db[ldesc].db.desc.depend = db[0].db.desc.depend =
 				((struct fwohcidb_tr *)
 				(chunk->start))->bus_addr | dbch->ndesc;
 #else
@@ -1687,7 +1688,7 @@ fwohci_itxbuf_enable(struct firewire_comm *fc, int dmach)
 			dump_db(sc, ITX_CH + dmach);
 		}
 	} else if ((stat & OHCI_CNTL_CYCMATCH_S) == 0) {
-		device_printf(sc->fc.dev, 
+		device_printf(sc->fc.dev,
 			"IT DMA underrun (0x%08x)\n", stat);
 		OWRITE(sc, OHCI_ITCTL(dmach), OHCI_CNTL_DMA_WAKE);
 	}
@@ -1702,7 +1703,7 @@ fwohci_irx_enable(struct firewire_comm *fc, int dmach)
 	int err = 0, s, ldesc;
 	unsigned short tag, ich;
 	uint32_t stat;
-	struct fwohci_dbch *dbch;
+	fwohci_softc::fwohci_dbch *dbch;
 //	struct fwohcidb_tr *db_tr;
 	struct fw_bulkxfer *first, *prev, *chunk;
 	struct fw_xferq *ir;
@@ -1807,19 +1808,19 @@ fwohci_stop(struct fwohci_softc *sc)
 	OWRITE(sc,  OHCI_ATQCTLCLR, OHCI_CNTL_DMA_RUN);
 	OWRITE(sc,  OHCI_ATSCTLCLR, OHCI_CNTL_DMA_RUN);
 
-	for( i = 0 ; i < sc->fc.nisodma ; i ++ ){
+	for( i = 0 ; i < (uint)sc->fc.nisodma ; i ++ ){
 		OWRITE(sc,  OHCI_IRCTLCLR(i), OHCI_CNTL_DMA_RUN);
 		OWRITE(sc,  OHCI_ITCTLCLR(i), OHCI_CNTL_DMA_RUN);
 	}
 
-#if 0 /* Let dcons(4) be accessed */  
+#if 0 /* Let dcons(4) be accessed */
 /* Stop interrupt */
 	OWRITE(sc, FWOHCI_INTMASKCLR,
 			OHCI_INT_EN | OHCI_INT_ERR | OHCI_INT_PHY_SID
 			| OHCI_INT_PHY_INT
-			| OHCI_INT_DMA_ATRQ | OHCI_INT_DMA_ATRS 
+			| OHCI_INT_DMA_ATRQ | OHCI_INT_DMA_ATRS
 			| OHCI_INT_DMA_PRRQ | OHCI_INT_DMA_PRRS
-			| OHCI_INT_DMA_ARRQ | OHCI_INT_DMA_ARRS 
+			| OHCI_INT_DMA_ARRQ | OHCI_INT_DMA_ARRS
 			| OHCI_INT_PHY_BUS_R);
 
 /* FLUSH FIFO and reset Transmitter/Reciever */
@@ -1857,7 +1858,7 @@ fwohci_dump_intr(struct fwohci_softc *sc, uint32_t stat)
 			stat & OHCI_INT_DMA_ARRQ  ? "DMA_ARRQ " :"",
 			stat & OHCI_INT_DMA_ATRS  ? "DMA_ATRS " :"",
 			stat & OHCI_INT_DMA_ATRQ  ? "DMA_ATRQ " :"",
-			stat, OREAD(sc, FWOHCI_INTMASK) 
+			stat, OREAD(sc, FWOHCI_INTMASK)
 		);
 }
 #endif
@@ -1872,7 +1873,7 @@ fwohci_intr_core(struct fwohci_softc *sc, uint32_t stat, int count)
 		fc->status = FWBUSRESET;
 		/* Disable bus reset interrupt until sid recv. */
 		OWRITE(sc, FWOHCI_INTMASKCLR,  OHCI_INT_PHY_BUS_R);
-	
+
 		device_printf(fc->dev, "%s: BUS reset\n", __func__);
 		OWRITE(sc, FWOHCI_INTMASKCLR,  OHCI_INT_CYC_LOST);
 		OWRITE(sc, OHCI_LNKCTLCLR, OHCI_CNTL_CYCSRC);
@@ -1884,7 +1885,7 @@ fwohci_intr_core(struct fwohci_softc *sc, uint32_t stat, int count)
 
 //		if (!kdb_active)
 //			taskqueue_enqueue(sc->fc.taskqueue, &sc->fwohci_task_busreset);
-		gDpc->queue_dpc(sc->fc.taskqueue, fwohci_task_busreset, sc);	
+		gDpc->queue_dpc(sc->fc.taskqueue, fwohci_task_busreset, sc);
 	}
 	if (stat & OHCI_INT_PHY_SID) {
 		/* Enable bus reset interrupt */
@@ -1904,7 +1905,7 @@ fwohci_intr_core(struct fwohci_softc *sc, uint32_t stat, int count)
 		OWRITE(sc, OHCI_ATRETRY, 1<<(13+16) | 0xfff);
 
 		/*
-		 * Checking whether the node is root or not. If root, turn on 
+		 * Checking whether the node is root or not. If root, turn on
 		 * cycle master.
 		 */
 		node_id = OREAD(sc, FWOHCI_NODEID);
@@ -1936,13 +1937,13 @@ fwohci_intr_core(struct fwohci_softc *sc, uint32_t stat, int count)
 
 //		if (!kdb_active)
 //			taskqueue_enqueue(sc->fc.taskqueue, &sc->fwohci_task_sid);
-		gDpc->queue_dpc(sc->fc.taskqueue, fwohci_task_sid, sc);	
+		gDpc->queue_dpc(sc->fc.taskqueue, fwohci_task_sid, sc);
 	}
 sidout:
 //	if ((stat & ~(OHCI_INT_PHY_BUS_R | OHCI_INT_PHY_SID)) && (!kdb_active))
 //		taskqueue_enqueue(sc->fc.taskqueue, &sc->fwohci_task_dma);
 	if ((stat & ~(OHCI_INT_PHY_BUS_R | OHCI_INT_PHY_SID)))
-		gDpc->queue_dpc(sc->fc.taskqueue, fwohci_task_dma, sc);	
+		gDpc->queue_dpc(sc->fc.taskqueue, fwohci_task_dma, sc);
 }
 
 static void
@@ -1954,13 +1955,13 @@ fwohci_intr_dma(struct fwohci_softc *sc, uint32_t stat, int count)
 
 	if (stat & OHCI_INT_DMA_IR) {
 		irstat = atomic_readandclear_int(&sc->irstat);
-		for(i = 0; i < fc->nisodma ; i++){
-			struct fwohci_dbch *dbch;
+		for(i = 0; i < (uint)fc->nisodma ; i++){
+			fwohci_softc::fwohci_dbch *dbch;
 
 			if((irstat & (1 << i)) != 0){
 				dbch = &sc->ir[i];
 				if ((dbch->xferq.flag & FWXFERQ_OPEN) == 0) {
-					device_printf(sc->fc.dev, 
+					device_printf(sc->fc.dev,
 						"dma(%d) not active\n", i);
 					continue;
 				}
@@ -1970,7 +1971,7 @@ fwohci_intr_dma(struct fwohci_softc *sc, uint32_t stat, int count)
 	}
 	if (stat & OHCI_INT_DMA_IT) {
 		itstat = atomic_readandclear_int(&sc->itstat);
-		for(i = 0; i < fc->nisodma ; i++){
+		for(i = 0; i < (uint)fc->nisodma ; i++){
 			if((itstat & (1 << i)) != 0){
 				fwohci_tbuf_update(sc, i);
 			}
@@ -2099,7 +2100,7 @@ fwohci_check_stat(struct fwohci_softc *sc)
 	FW_GLOCK_ASSERT(&sc->fc);
 	stat = OREAD(sc, FWOHCI_INTSTAT);
 	if (stat == 0xffffffff) {
-		device_printf(sc->fc.dev, 
+		device_printf(sc->fc.dev,
 			"device physically ejected?\n");
 		return (B_UNHANDLED_INTERRUPT);
 	}
@@ -2184,7 +2185,7 @@ fwohci_tbuf_update(struct fwohci_softc *sc, int dmach)
 		dump_db(sc, ITX_CH + dmach);
 	while ((chunk = STAILQ_FIRST(&it->stdma)) != NULL) {
 		db = ((struct fwohcidb_tr *)(chunk->end))->db;
-		stat = FWOHCI_DMA_READ(db[ldesc].db.desc.res) 
+		stat = FWOHCI_DMA_READ(db[ldesc].db.desc.res)
 				>> OHCI_STATUS_SHIFT;
 		db = ((struct fwohcidb_tr *)(chunk->start))->db;
 		/* timestamp */
@@ -2259,7 +2260,7 @@ fwohci_rbuf_update(struct fwohci_softc *sc, int dmach)
 			break;
 		default:
 			chunk->resp = EINVAL;
-			device_printf(fc->dev, 
+			device_printf(fc->dev,
 				"Isochronous receive err %02x(%s)\n",
 					stat, fwohcicode[stat & 0x1f]);
 		}
@@ -2271,7 +2272,7 @@ fwohci_rbuf_update(struct fwohci_softc *sc, int dmach)
 	if (w == 0)
 		return;
 
-	if (ir->flag & FWXFERQ_HANDLER) 
+	if (ir->flag & FWXFERQ_HANDLER)
 		ir->hand(ir);
 	else
 		wakeup(ir);
@@ -2301,8 +2302,8 @@ dump_dma(struct fwohci_softc *sc, uint32_t ch)
 
 	device_printf(sc->fc.dev, "ch %1x cntl:0x%08x cmd:0x%08x match:0x%08x\n",
 		ch,
-		cntl, 
-		cmd, 
+		cntl,
+		cmd,
 		match);
 	stat &= 0xffff ;
 	if (stat) {
@@ -2325,7 +2326,7 @@ dump_dma(struct fwohci_softc *sc, uint32_t ch)
 void
 dump_db(struct fwohci_softc *sc, uint32_t ch)
 {
-	struct fwohci_dbch *dbch;
+	fwohci_softc::fwohci_dbch *dbch;
 	struct fwohcidb_tr *cp = NULL, *pp, *np = NULL;
 	struct fwohcidb *curr = NULL, *prev, *next = NULL;
 	int idb, jdb;
@@ -2357,14 +2358,14 @@ dump_db(struct fwohci_softc *sc, uint32_t ch)
 	}
 	pp = dbch->top;
 	prev = pp->db;
-	for(idb = 0 ; idb < dbch->ndb ; idb ++ ){
+	for(idb = 0 ; (uint)idb < dbch->ndb ; idb ++ ){
 		cp = STAILQ_NEXT(pp, link);
 		if(cp == NULL){
 			curr = NULL;
 			goto outdb;
 		}
 		np = STAILQ_NEXT(cp, link);
-		for(jdb = 0 ; jdb < dbch->ndesc ; jdb ++ ){
+		for(jdb = 0 ; (uint)jdb < dbch->ndesc ; jdb ++ ){
 			if ((cmd  & 0xfffffff0) == cp->bus_addr) {
 				curr = cp->db;
 				if(np != NULL){
@@ -2425,7 +2426,7 @@ print_db(struct fwohcidb_tr *db_tr, struct fwohcidb *db,
 		"Depend",
 		"Stat",
 		"Cnt");
-	for( i = 0 ; i <= max ; i ++){
+	for( i = 0 ; (uint)i <= max ; i ++){
 		cmd = FWOHCI_DMA_READ(db[i].db.desc.cmd);
 		res = FWOHCI_DMA_READ(db[i].db.desc.res);
 		key = cmd & OHCI_KEY_MASK;
@@ -2456,7 +2457,7 @@ print_db(struct fwohcidb_tr *db_tr, struct fwohcidb *db,
 			printf(" Nostat\n");
 		}
 		if(key == OHCI_KEY_ST2 ){
-			printf("0x%08x 0x%08x 0x%08x 0x%08x\n", 
+			printf("0x%08x 0x%08x 0x%08x 0x%08x\n",
 				FWOHCI_DMA_READ(db[i+1].db.immed[0]),
 				FWOHCI_DMA_READ(db[i+1].db.immed[1]),
 				FWOHCI_DMA_READ(db[i+1].db.immed[2]),
@@ -2465,15 +2466,15 @@ print_db(struct fwohcidb_tr *db_tr, struct fwohcidb *db,
 		if(key == OHCI_KEY_DEVICE){
 			return;
 		}
-		if((cmd & OHCI_BRANCH_MASK) 
+		if((cmd & OHCI_BRANCH_MASK)
 				== OHCI_BRANCH_ALWAYS){
 			return;
 		}
-		if((cmd & OHCI_CMD_MASK) 
+		if((cmd & OHCI_CMD_MASK)
 				== OHCI_OUTPUT_LAST){
 			return;
 		}
-		if((cmd & OHCI_CMD_MASK) 
+		if((cmd & OHCI_CMD_MASK)
 				== OHCI_INPUT_LAST){
 			return;
 		}
@@ -2521,7 +2522,7 @@ void
 fwohci_txbufdb(struct fwohci_softc *sc, int dmach, struct fw_bulkxfer *bulkxfer)
 {
 	struct fwohcidb_tr *db_tr, *fdb_tr;
-	struct fwohci_dbch *dbch;
+	fwohci_softc::fwohci_dbch *dbch;
 	struct fwohcidb *db;
 	struct fw_pkt *fp;
 	struct fwohci_txpkthdr *ohcifp;
@@ -2538,7 +2539,7 @@ fwohci_txbufdb(struct fwohci_softc *sc, int dmach, struct fw_bulkxfer *bulkxfer)
 /*
 device_printf(sc->fc.dev, "DB %08x %08x %08x\n", bulkxfer, db_tr->bus_addr, fdb_tr->bus_addr);
 */
-	for (idb = 0; idb < dbch->xferq.bnpacket; idb ++) {
+	for (idb = 0; (uint)idb < dbch->xferq.bnpacket; idb ++) {
 		db = db_tr->db;
 		fp = (struct fw_pkt *)db_tr->buf;
 		ohcifp = (struct fwohci_txpkthdr *) db[1].db.immed;
@@ -2548,8 +2549,8 @@ device_printf(sc->fc.dev, "DB %08x %08x %08x\n", bulkxfer, db_tr->bus_addr, fdb_
 		ohcifp->mode.stream.chtag = chtag;
 		ohcifp->mode.stream.tcode = 0xa;
 #if BYTE_ORDER == BIG_ENDIAN
-		FWOHCI_DMA_WRITE(db[1].db.immed[0], db[1].db.immed[0]); 
-		FWOHCI_DMA_WRITE(db[1].db.immed[1], db[1].db.immed[1]); 
+		FWOHCI_DMA_WRITE(db[1].db.immed[0], db[1].db.immed[0]);
+		FWOHCI_DMA_WRITE(db[1].db.immed[1], db[1].db.immed[1]);
 #endif
 
 		FWOHCI_DMA_CLEAR(db[2].db.desc.cmd, OHCI_COUNT_MASK);
@@ -2586,7 +2587,7 @@ device_printf(sc->fc.dev, "DB %08x %3d %08x %08x\n", bulkxfer, bulkxfer->npacket
 }
 
 static int
-fwohci_add_tx_buf(struct fwohci_dbch *dbch, struct fwohcidb_tr *db_tr,
+fwohci_add_tx_buf(fwohci_softc::fwohci_dbch *dbch, struct fwohcidb_tr *db_tr,
 								int poffset)
 {
 	struct fwohcidb *db = db_tr->db;
@@ -2598,7 +2599,7 @@ fwohci_add_tx_buf(struct fwohci_dbch *dbch, struct fwohcidb_tr *db_tr,
 		err = EINVAL;
 		return err;
 	}
-	db_tr->buf = fwdma_v_addr(it->buf, poffset);
+	db_tr->buf = (char*)fwdma_v_addr(it->buf, poffset);
 	db_tr->dbcnt = 3;
 
 	FWOHCI_DMA_WRITE(db[0].db.desc.cmd,
@@ -2618,7 +2619,7 @@ fwohci_add_tx_buf(struct fwohci_dbch *dbch, struct fwohcidb_tr *db_tr,
 }
 
 static inline void
-fwohci_set_rx_buf(struct fw_xferq *ir, struct fwohcidb_tr *db_tr, 
+fwohci_set_rx_buf(struct fw_xferq *ir, struct fwohcidb_tr *db_tr,
 		bus_addr_t dbuf[], int dsiz[])
 {
 	int i, ldesc;
@@ -2689,7 +2690,7 @@ fwohci_arcv_swap(struct fw_pkt *fp, int len)
 }
 
 static int
-fwohci_get_plen(struct fwohci_softc *sc, struct fwohci_dbch *dbch, struct fw_pkt *fp)
+fwohci_get_plen(struct fwohci_softc *sc, fwohci_softc::fwohci_dbch *dbch, struct fw_pkt *fp)
 {
 	struct tcode_info *info;
 	int r;
@@ -2706,7 +2707,7 @@ fwohci_get_plen(struct fwohci_softc *sc, struct fwohci_dbch *dbch, struct fw_pkt
 		return (-1);
 	}
 
-	if (r > dbch->xferq.psize) {
+	if ((uint)r > dbch->xferq.psize) {
 		device_printf(sc->fc.dev, "Invalid packet length %d\n", r);
 		return (-1);
 		/* panic ? */
@@ -2716,7 +2717,7 @@ fwohci_get_plen(struct fwohci_softc *sc, struct fwohci_dbch *dbch, struct fw_pkt
 }
 
 static void
-fwohci_arcv_free_buf(struct fwohci_softc *sc, struct fwohci_dbch *dbch,
+fwohci_arcv_free_buf(struct fwohci_softc *sc, fwohci_softc::fwohci_dbch *dbch,
     struct fwohcidb_tr *db_tr, uint32_t off, int wake)
 {
 	struct fwohcidb *db = &db_tr->db[0];
@@ -2732,7 +2733,7 @@ fwohci_arcv_free_buf(struct fwohci_softc *sc, struct fwohci_dbch *dbch,
 }
 
 static void//to be done
-fwohci_arcv(struct fwohci_softc *sc, struct fwohci_dbch *dbch, int count)
+fwohci_arcv(struct fwohci_softc *sc, fwohci_softc::fwohci_dbch *dbch, int count)
 {
 	struct fwohcidb_tr *db_tr;
 	struct iovec vec[2];
@@ -2896,7 +2897,7 @@ fwohci_arcv(struct fwohci_softc *sc, struct fwohci_dbch *dbch, int count)
 
 				if ((vec[nvec-1].iov_len -=
 					sizeof(struct fwohci_trailer)) == 0)
-					nvec--; 
+					nvec--;
 				rb.fc = &sc->fc;
 				rb.vec = vec;
 				rb.nvec = nvec;

@@ -16,6 +16,8 @@
 #include <string.h>
 #include <iovec.h>
 
+#include <algorithm>
+
 
 static locked_pool_cookie temp_sg_pool;
 
@@ -27,7 +29,8 @@ fill_temp_sg(scsi_ccb *ccb)
 	scsi_bus_info *bus = ccb->bus;
 	uint32 dma_boundary = bus->dma_params.dma_boundary;
 	uint32 max_sg_block_size = bus->dma_params.max_sg_block_size;
-	uint32 max_sg_blocks = min(bus->dma_params.max_sg_blocks, MAX_TEMP_SG_FRAGMENTS);
+	uint32 max_sg_blocks = std::min(bus->dma_params.max_sg_blocks,
+		(uint32)MAX_TEMP_SG_FRAGMENTS);
 	iovec vec = {
 		ccb->data,
 		ccb->data_length
@@ -61,7 +64,7 @@ fill_temp_sg(scsi_ccb *ccb)
 			max_len = (dma_boundary + 1) -
 				(temp_sg[cur_idx].address & dma_boundary);
 			// restrict size per sg item
-			max_len = min(max_len, max_sg_block_size);
+			max_len = std::min(max_len, max_sg_block_size);
 
 			SHOW_FLOW(4, "addr=%#" B_PRIxPHYSADDR ", size=%x, max_len=%x, "
 				"idx=%d, num=%d", temp_sg[cur_idx].address,
@@ -106,7 +109,7 @@ create_temp_sg(scsi_ccb *ccb)
 
 	SHOW_FLOW(3, "ccb=%p, data=%p, data_length=%lu", ccb, ccb->data, ccb->data_length);
 
-	ccb->sg_list = temp_sg = locked_pool->alloc(temp_sg_pool);
+	ccb->sg_list = temp_sg = (physical_entry*)locked_pool->alloc(temp_sg_pool);
 	if (temp_sg == NULL) {
 		SHOW_ERROR0(2, "cannot allocate memory for IO request!");
 		return false;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2005-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -101,7 +101,7 @@ install_breakpoints(const arch_team_debug_info &teamInfo)
 	asm("movl %0, %%dr1" : : "r"(teamInfo.breakpoints[1].address));
 	asm("movl %0, %%dr2" : : "r"(teamInfo.breakpoints[2].address));
 //	asm("movl %0, %%dr3" : : "r"(teamInfo.breakpoints[3].address));
-		// DR3 is used to hold the current struct thread*.
+		// DR3 is used to hold the current Thread*.
 
 	// enable breakpoints
 	asm("movl %0, %%dr7" : : "r"(teamInfo.dr7));
@@ -207,7 +207,7 @@ set_breakpoint(void *address, uint32 type, uint32 length)
 	if (!address)
 		return B_BAD_VALUE;
 
-	struct thread *thread = thread_get_current_thread();
+	Thread *thread = thread_get_current_thread();
 
 	cpu_status state = disable_interrupts();
 	GRAB_TEAM_DEBUG_INFO_LOCK(thread->team->debug_info);
@@ -228,7 +228,7 @@ clear_breakpoint(void *address, bool watchpoint)
 	if (!address)
 		return B_BAD_VALUE;
 
-	struct thread *thread = thread_get_current_thread();
+	Thread *thread = thread_get_current_thread();
 
 	cpu_status state = disable_interrupts();
 	GRAB_TEAM_DEBUG_INFO_LOCK(thread->team->debug_info);
@@ -249,7 +249,7 @@ clear_breakpoint(void *address, bool watchpoint)
 static void
 install_breakpoints_per_cpu(void* /*cookie*/, int cpu)
 {
-	struct team* kernelTeam = team_get_kernel_team();
+	Team* kernelTeam = team_get_kernel_team();
 
 	GRAB_TEAM_DEBUG_INFO_LOCK(kernelTeam->debug_info);
 
@@ -265,7 +265,7 @@ set_kernel_breakpoint(void *address, uint32 type, uint32 length)
 	if (!address)
 		return B_BAD_VALUE;
 
-	struct team* kernelTeam = team_get_kernel_team();
+	Team* kernelTeam = team_get_kernel_team();
 
 	cpu_status state = disable_interrupts();
 	GRAB_TEAM_DEBUG_INFO_LOCK(kernelTeam->debug_info);
@@ -289,7 +289,7 @@ clear_kernel_breakpoint(void *address, bool watchpoint)
 	if (!address)
 		return B_BAD_VALUE;
 
-	struct team* kernelTeam = team_get_kernel_team();
+	Team* kernelTeam = team_get_kernel_team();
 
 	cpu_status state = disable_interrupts();
 	GRAB_TEAM_DEBUG_INFO_LOCK(kernelTeam->debug_info);
@@ -357,7 +357,7 @@ check_watch_point_parameters(void* address, uint32 type, int32 length,
 static int
 debugger_breakpoints(int argc, char** argv)
 {
-	struct team* kernelTeam = team_get_kernel_team();
+	Team* kernelTeam = team_get_kernel_team();
 	arch_team_debug_info& info = kernelTeam->debug_info.arch_info;
 
 	for (int32 i = 0; i < X86_BREAKPOINT_COUNT; i++) {
@@ -569,7 +569,7 @@ void
 arch_update_thread_single_step()
 {
 	if (struct iframe* frame = i386_get_user_iframe()) {
-		struct thread* thread = thread_get_current_thread();
+		Thread* thread = thread_get_current_thread();
 
 		// set/clear TF in EFLAGS depending on whether single stepping is
 		// desired
@@ -592,7 +592,7 @@ arch_set_debug_cpu_state(const debug_cpu_state *cpuState)
 			// guaranteed passed buffer, we use our thread's fpu_state field as
 			// temporary buffer. We need to disable interrupts to make use of
 			// it.
-			struct thread* thread = thread_get_current_thread();
+			Thread* thread = thread_get_current_thread();
 			InterruptsLocker locker;
 			memcpy(thread->arch_info.fpu_state, &cpuState->extended_registers,
 				sizeof(cpuState->extended_registers));
@@ -636,7 +636,7 @@ arch_get_debug_cpu_state(debug_cpu_state *cpuState)
 			// Since fxsave requires 16-byte alignment and this isn't guaranteed
 			// passed buffer, we use our thread's fpu_state field as temporary
 			// buffer. We need to disable interrupts to make use of it.
-			struct thread* thread = thread_get_current_thread();
+			Thread* thread = thread_get_current_thread();
 			InterruptsLocker locker;
 			i386_fxsave(thread->arch_info.fpu_state);
 				// unlike fnsave, fxsave doesn't reinit the FPU state
@@ -773,7 +773,7 @@ arch_clear_kernel_watchpoint(void *address)
 void
 x86_init_user_debug_at_kernel_exit(struct iframe *frame)
 {
-	struct thread *thread = thread_get_current_thread();
+	Thread *thread = thread_get_current_thread();
 
 	if (!(thread->flags & THREAD_FLAGS_BREAKPOINTS_DEFINED))
 		return;
@@ -802,7 +802,7 @@ x86_init_user_debug_at_kernel_exit(struct iframe *frame)
 void
 x86_exit_user_debug_at_kernel_entry()
 {
-	struct thread *thread = thread_get_current_thread();
+	Thread *thread = thread_get_current_thread();
 
 	// We need to save the current values of dr6 and dr7 in the CPU structure,
 	// since in case of a debug exception we might overwrite them before
@@ -821,7 +821,7 @@ x86_exit_user_debug_at_kernel_entry()
 	disable_breakpoints();
 
 	// install kernel breakpoints
-	struct team* kernelTeam = team_get_kernel_team();
+	Team* kernelTeam = team_get_kernel_team();
 	GRAB_TEAM_DEBUG_INFO_LOCK(kernelTeam->debug_info);
 	install_breakpoints(kernelTeam->debug_info.arch_info);
 	RELEASE_TEAM_DEBUG_INFO_LOCK(kernelTeam->debug_info);
@@ -838,7 +838,7 @@ x86_exit_user_debug_at_kernel_entry()
 void
 x86_handle_debug_exception(struct iframe *frame)
 {
-	struct thread* thread = thread_get_current_thread();
+	Thread* thread = thread_get_current_thread();
 
 	// Get dr6 and dr7. If the given iframe is a userland frame, the exception
 	// obviously occurred in userland. In that case

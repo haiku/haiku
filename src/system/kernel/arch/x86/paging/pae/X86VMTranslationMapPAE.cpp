@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -217,7 +217,7 @@ X86VMTranslationMapPAE::Map(addr_t virtualAddress, phys_addr_t physicalAddress,
 	}
 
 	// now, fill in the page table entry
-	struct thread* thread = thread_get_current_thread();
+	Thread* thread = thread_get_current_thread();
 	ThreadCPUPinner pinner(thread);
 
 	pae_page_table_entry* pageTable
@@ -265,7 +265,7 @@ X86VMTranslationMapPAE::Unmap(addr_t start, addr_t end)
 			continue;
 		}
 
-		struct thread* thread = thread_get_current_thread();
+		Thread* thread = thread_get_current_thread();
 		ThreadCPUPinner pinner(thread);
 
 		pae_page_table_entry* pageTable
@@ -398,7 +398,7 @@ X86VMTranslationMapPAE::UnmapPages(VMArea* area, addr_t base, size_t size,
 			continue;
 		}
 
-		struct thread* thread = thread_get_current_thread();
+		Thread* thread = thread_get_current_thread();
 		ThreadCPUPinner pinner(thread);
 
 		pae_page_table_entry* pageTable
@@ -613,7 +613,7 @@ X86VMTranslationMapPAE::Query(addr_t virtualAddress,
 	}
 
 	// get the page table entry
-	struct thread* thread = thread_get_current_thread();
+	Thread* thread = thread_get_current_thread();
 	ThreadCPUPinner pinner(thread);
 
 	pae_page_table_entry* pageTable
@@ -722,7 +722,7 @@ X86VMTranslationMapPAE::Protect(addr_t start, addr_t end, uint32 attributes,
 			continue;
 		}
 
-		struct thread* thread = thread_get_current_thread();
+		Thread* thread = thread_get_current_thread();
 		ThreadCPUPinner pinner(thread);
 
 		pae_page_table_entry* pageTable
@@ -785,7 +785,7 @@ X86VMTranslationMapPAE::ClearFlags(addr_t address, uint32 flags)
 	uint64 flagsToClear = ((flags & PAGE_MODIFIED) ? X86_PAE_PTE_DIRTY : 0)
 		| ((flags & PAGE_ACCESSED) ? X86_PAE_PTE_ACCESSED : 0);
 
-	struct thread* thread = thread_get_current_thread();
+	Thread* thread = thread_get_current_thread();
 	ThreadCPUPinner pinner(thread);
 
 	pae_page_table_entry* entry

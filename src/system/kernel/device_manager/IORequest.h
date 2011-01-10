@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
@@ -277,8 +277,8 @@ struct IORequest : IORequestChunk, DoublyLinkedListLinkImpl<IORequest> {
 
 			bool				IsWrite() const	{ return fIsWrite; }
 			bool				IsRead() const	{ return !fIsWrite; }
-			team_id				Team() const	{ return fTeam; }
-			thread_id			Thread() const	{ return fThread; }
+			team_id				TeamID() const		{ return fTeam; }
+			thread_id			ThreadID() const	{ return fThread; }
 			uint32				Flags() const	{ return fFlags; }
 
 			IOBuffer*			Buffer() const	{ return fBuffer; }

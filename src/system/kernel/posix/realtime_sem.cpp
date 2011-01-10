@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -814,7 +814,7 @@ private:
 static realtime_sem_context*
 get_current_team_context()
 {
-	struct team* team = thread_get_current_thread()->team;
+	Team* team = thread_get_current_thread()->team;
 
 	// get context
 	realtime_sem_context* context = atomic_pointer_get(

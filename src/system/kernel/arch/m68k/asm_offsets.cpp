@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2007-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -28,14 +28,14 @@
 void
 dummy()
 {
-	// struct thread
-	DEFINE_OFFSET_MACRO(THREAD, thread, kernel_time);
-	DEFINE_OFFSET_MACRO(THREAD, thread, user_time);
-	DEFINE_OFFSET_MACRO(THREAD, thread, last_time);
-	DEFINE_OFFSET_MACRO(THREAD, thread, in_kernel);
-	DEFINE_OFFSET_MACRO(THREAD, thread, flags);
-	DEFINE_OFFSET_MACRO(THREAD, thread, kernel_stack_top);
-	DEFINE_OFFSET_MACRO(THREAD, thread, fault_handler);
+	// struct Thread
+	DEFINE_OFFSET_MACRO(THREAD, Thread, kernel_time);
+	DEFINE_OFFSET_MACRO(THREAD, Thread, user_time);
+	DEFINE_OFFSET_MACRO(THREAD, Thread, last_time);
+	DEFINE_OFFSET_MACRO(THREAD, Thread, in_kernel);
+	DEFINE_OFFSET_MACRO(THREAD, Thread, flags);
+	DEFINE_OFFSET_MACRO(THREAD, Thread, kernel_stack_top);
+	DEFINE_OFFSET_MACRO(THREAD, Thread, fault_handler);
 
 	// struct iframe
 	DEFINE_OFFSET_MACRO(IFRAME, iframe, fp);

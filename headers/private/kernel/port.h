@@ -32,7 +32,7 @@ extern "C" {
 #endif
 
 status_t port_init(struct kernel_args *args);
-void delete_owned_ports(struct team* team);
+void delete_owned_ports(Team* team);
 int32 port_max_ports(void);
 int32 port_used_ports(void);
 

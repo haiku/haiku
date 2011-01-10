@@ -1,6 +1,6 @@
 /*
  * Copyright 2010, Clemens Zeidler, haiku@clemens-zeidler.de.
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -670,8 +670,8 @@ ioapic_init(kernel_args* args)
 		uint32 config = 0;
 		config |= irqDescriptor.polarity;
 		config |= irqDescriptor.interrupt_mode;
-		
-		int32 num = entry.source_index;		
+
+		int32 num = entry.source_index;
 		for (int a = 0; a < 16 && num == 0; a++) {
 			if (irqDescriptor.irq >> i & 0x01) {
 				num = a;
@@ -759,7 +759,7 @@ exception_name(int number, char *buffer, int32 bufferSize)
 static void
 invalid_exception(struct iframe* frame)
 {
-	struct thread* thread = thread_get_current_thread();
+	Thread* thread = thread_get_current_thread();
 	char name[32];
 	panic("unhandled trap 0x%lx (%s) at ip 0x%lx, thread %ld!\n",
 		frame->vector, exception_name(frame->vector, name, sizeof(name)),
@@ -836,7 +836,7 @@ unexpected_exception(struct iframe* frame)
 
 	if (IFRAME_IS_USER(frame)) {
 		struct sigaction action;
-		struct thread* thread = thread_get_current_thread();
+		Thread* thread = thread_get_current_thread();
 
 		enable_interrupts();
 
@@ -926,7 +926,7 @@ x86_page_fault_exception_double_fault(struct iframe* frame)
 static void
 page_fault_exception(struct iframe* frame)
 {
-	struct thread *thread = thread_get_current_thread();
+	Thread *thread = thread_get_current_thread();
 	uint32 cr2;
 	addr_t newip;
 
@@ -1011,7 +1011,7 @@ hardware_interrupt(struct iframe* frame)
 {
 	int32 vector = frame->vector - ARCH_INTERRUPT_BASE;
 	bool levelTriggered = false;
-	struct thread* thread = thread_get_current_thread();
+	Thread* thread = thread_get_current_thread();
 
 	if (sCurrentPIC->is_spurious_interrupt(vector)) {
 		TRACE(("got spurious interrupt at vector %ld\n", vector));

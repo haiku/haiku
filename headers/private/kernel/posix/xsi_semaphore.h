@@ -14,10 +14,17 @@
 #include <posix/xsi_semaphore_defs.h>
 
 
+namespace BKernel {
+	struct Team;
+}
+
+using BKernel::Team;
+
+
 __BEGIN_DECLS
 
 extern void xsi_sem_init();
-extern void xsi_sem_undo(struct team *team);
+extern void xsi_sem_undo(Team *team);
 
 /* user calls */
 int _user_xsi_semget(key_t key, int numberOfSemaphores, int flags);

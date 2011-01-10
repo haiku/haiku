@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
@@ -747,7 +747,7 @@ IORequest::Init(off_t offset, generic_size_t firstVecOffset,
 	fRelativeParentOffset = 0;
 	fTransferSize = 0;
 	fFlags = flags;
-	struct thread* thread = thread_get_current_thread();
+	Thread* thread = thread_get_current_thread();
 	fTeam = thread->team->id;
 	fThread = thread->id;
 	fIsWrite = write;

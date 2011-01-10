@@ -12,6 +12,6 @@ KernelAddon ps2 :
 	ps2_standard_mouse.c
 	ps2_synaptics.c
 	ps2_trackpoint.c
-	ps2_service.c
+	ps2_service.cpp
 	movement_maker.c
 	;

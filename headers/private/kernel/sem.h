@@ -22,7 +22,7 @@ extern "C" {
 #endif
 
 extern status_t haiku_sem_init(struct kernel_args *args);
-extern void sem_delete_owned_sems(struct team* team);
+extern void sem_delete_owned_sems(Team* team);
 extern int32 sem_used_sems(void);
 extern int32 sem_max_sems(void);
 
