@@ -31,13 +31,14 @@ protected:
 			void				MessageReceived(BMessage* message);
 
 private:
-			bool				_FillDrivesView(const BootMenuList& menus);
+			void				_FillDrivesView(const BootMenuList& menus);
 			DriveItem*			_SelectedDriveItem();
 			void				_UpdateWizardButtons(DriveItem* item);
 
 private:
 			WizardView*			fWizardView;
 			BListView*			fDrivesView;
+			bool				fHasInstallableItems;
 };
 
 

@@ -195,7 +195,8 @@ DrivesPage::DrivesPage(WizardView* wizardView, const BootMenuList& menus,
 	BMessage* settings, const char* name)
 	:
 	WizardPageView(settings, name),
-	fWizardView(wizardView)
+	fWizardView(wizardView),
+	fHasInstallableItems(false)
 {
 	BString text;
 	text << B_TRANSLATE_COMMENT("Drives", "Title") << "\n"
@@ -207,8 +208,6 @@ DrivesPage::DrivesPage(WizardView* wizardView, const BootMenuList& menus,
 	fDrivesView = new BListView("drives");
 	fDrivesView->SetSelectionMessage(new BMessage(kMsgSelectionChanged));
 
-	bool any = _FillDrivesView(menus);
-
 	BScrollView* scrollView = new BScrollView("scrollView", fDrivesView, 0,
 		false, true);
 
@@ -218,18 +217,8 @@ DrivesPage::DrivesPage(WizardView* wizardView, const BootMenuList& menus,
 		.Add(description, 0.5)
 		.Add(scrollView, 1);
 
-	fWizardView->SetPreviousButtonHidden(!any);
-	if (any) {
-		fWizardView->SetPreviousButtonLabel(
-			B_TRANSLATE_COMMENT("Uninstall", "Button"));
-		if (fDrivesView->CurrentSelection() == -1) {
-			fWizardView->SetPreviousButtonEnabled(false);
-			fWizardView->SetNextButtonEnabled(false);
-		}
-	} else {
-		fWizardView->SetNextButtonLabel(
-			B_TRANSLATE_COMMENT("Quit", "Button"));
-	}
+	_UpdateWizardButtons(NULL);
+	_FillDrivesView(menus);
 }
 
 
@@ -273,14 +262,14 @@ DrivesPage::MessageReceived(BMessage* message)
 
 
 /*!	Builds the list view items, and adds them to fDriveView.
-	Returns whether there were any possible install targets. Automatically
+	Sets the fHasInstallableItems member to indicate if there
+	are any possible install targets. Automatically
 	selects the boot drive.
 */
-bool
+void
 DrivesPage::_FillDrivesView(const BootMenuList& menus)
 {
 	const char* selected = fSettings->FindString("disk");
-	bool any = false;
 
 	BDiskDeviceRoster roster;
 	BDiskDevice device;
@@ -288,7 +277,7 @@ DrivesPage::_FillDrivesView(const BootMenuList& menus)
 		if (device.HasMedia() && !device.IsReadOnly()) {
 			DriveItem* item = new DriveItem(device, menus);
 			if (item->CanBeInstalled())
-				any = true;
+				fHasInstallableItems = true;
 			fDrivesView->AddItem(item);
 
 			if ((selected == NULL && item->IsBootDrive())
@@ -298,8 +287,6 @@ DrivesPage::_FillDrivesView(const BootMenuList& menus)
 			}
 		}
 	}
-
-	return any;
 }
 
 
@@ -313,8 +300,24 @@ DrivesPage::_SelectedDriveItem()
 void
 DrivesPage::_UpdateWizardButtons(DriveItem* item)
 {
-	if (item == NULL)
+	fWizardView->SetPreviousButtonHidden(!fHasInstallableItems);
+	if (fHasInstallableItems) {
+		fWizardView->SetPreviousButtonLabel(
+			B_TRANSLATE_COMMENT("Uninstall", "Button"));
+		if (fDrivesView->CurrentSelection() == -1) {
+			fWizardView->SetPreviousButtonEnabled(false);
+			fWizardView->SetNextButtonEnabled(false);
+		}
+	} else {
+		fWizardView->SetNextButtonLabel(
+			B_TRANSLATE_COMMENT("Quit", "Button"));
+	}
+
+	if (item == NULL) {
+		fWizardView->SetPreviousButtonEnabled(false);
+		fWizardView->SetNextButtonEnabled(false);
 		return;
+	}
 
 	fWizardView->SetPreviousButtonEnabled(
 		item->CanBeInstalled() && item->IsInstalled());
