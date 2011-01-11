@@ -341,6 +341,19 @@ MediaWindow::_FindNodeListItem(dormant_node_info* info)
 
 
 void
+MediaWindow::_UpdateListViewMinWidth()
+{
+	float width = 0;
+	for (int32 i = 0; i < fListView->CountItems(); i++) {
+		BListItem* item = fListView->ItemAt(i);
+		width = max_c(width, item->Width());
+	}
+	fListView->SetExplicitMinSize(BSize(width, B_SIZE_UNSET));
+	fListView->InvalidateLayout();
+}
+
+
+void
 MediaWindow::_AddNodeItems(NodeList &list, MediaListItem::media_type type)
 {
 	int32 count = list.CountItems();
@@ -365,16 +378,12 @@ MediaWindow::_EmptyNodeLists()
 void
 MediaWindow::InitWindow()
 {
-	const float scrollWidth = 9 * be_plain_font->Size() + 30;
-
 	fListView = new BListView("media_list_view");
 	fListView->SetSelectionMessage(new BMessage(ML_SELECTED_NODE));
 
-	// Add ScrollView to Media Menu
+	// Add ScrollView to Media Menu for pretty border
 	BScrollView* scrollView = new BScrollView("listscroller",
 		fListView, 0, false, false, B_FANCY_BORDER);
-	scrollView->SetExplicitMinSize(BSize(scrollWidth, B_SIZE_UNSET));
-	scrollView->SetExplicitMaxSize(BSize(scrollWidth, B_SIZE_UNSET));
 
 	// Create the Views
 	fTitleView = new BSeparatorView(B_HORIZONTAL, B_FANCY_BORDER);
@@ -455,7 +464,7 @@ MediaWindow::InitMedia(bool first)
 	}
 
 	while (fListView->CountItems() > 0)
-		delete static_cast<MediaListItem*>(fListView->RemoveItem((int32)0));
+		delete fListView->RemoveItem((int32)0);
 	_EmptyNodeLists();
 
 	// Grab Media Info
@@ -486,6 +495,7 @@ MediaWindow::InitMedia(bool first)
 	fListView->AddItem(mixer);
 
 	fListView->SortItems(&MediaListItem::Compare);
+	_UpdateListViewMinWidth();
 
 	// Set default nodes for our setting views
 	media_node default_node;

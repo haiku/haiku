@@ -74,6 +74,7 @@ private:
 			void				_AddNodeItems(NodeList &from,
 									MediaListItem::media_type type);
 			void				_EmptyNodeLists();
+			void				_UpdateListViewMinWidth();
 
 			NodeListItem*		_FindNodeListItem(dormant_node_info* info);
 			void				InitWindow();

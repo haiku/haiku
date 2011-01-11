@@ -119,6 +119,22 @@ struct MediaListItem::Renderer {
 		onto->SetLowColor(lowColor);
 	}
 
+	float ItemWidth()
+	{
+		float width = 4.0f;
+			// left margin
+
+		float iconSpace = MediaIcons::sBounds.Width() + 1.0f;
+		if (fDoubleInsets)
+			iconSpace *= 2.0f;
+		width += iconSpace;
+		width += 8.0f;
+			// space between icons and text
+	
+		width += be_plain_font->StringWidth(fTitle) + 3.0f;
+		return width;
+	}
+
 private:
 
 	const char*	fTitle;
@@ -147,6 +163,11 @@ MediaListItem::Update(BView* owner, const BFont* font)
 	if ((Height() < iconHeight + kITEM_MARGIN * 2)) {
 		SetHeight(iconHeight + kITEM_MARGIN * 2);
 	}
+
+	Renderer renderer;
+	renderer.SetTitle(Label());
+	SetRenderParameters(renderer);
+	SetWidth(renderer.ItemWidth());
 }
 
 
