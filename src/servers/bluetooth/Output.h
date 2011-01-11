@@ -1,4 +1,5 @@
 /*
+ * Copyright 2011 Hamish Morrison, hamish@lavabit.com
  * Copyright 2010 Oliver Ruiz Dorantes
  * Copyright 2010 Dan-Matei Epure, mateiepure@gmail.com
  * Copyright BeNet Team (Original Project)
@@ -7,28 +8,27 @@
 #ifndef _Output_h
 #define _Output_h
 
-#include <Window.h>
-#include <TextView.h>
-#include <ScrollBar.h>
 #include <Button.h>
+#include <LayoutBuilder.h>
+#include <ScrollView.h>
 #include <TabView.h>
+#include <TextView.h>
+#include <Window.h>
 
 const uint32 kMsgOutputReset	= 'outr';
 const uint32 kMsgOutputResetAll	= 'opra';
 
 
-class OutputView : public BView
+class OutputView : public BGroupView
 {
 public:
-	OutputView(BRect frame);
-	virtual void	FrameResized(float width, float height);
+	OutputView();
 
 	void			Add(const char* text)	{fTextView->Insert(text);}
 	void			Clear()					{fTextView->Delete(0, fTextView->TextLength());}
 
 private:
 	BTextView*		fTextView;
-	BScrollBar*		fScrollBar;
 };
 
 
@@ -67,8 +67,6 @@ private:
 	
 	BList*			fTabsList;
 	BList*			fOutputViewsList;
-	BRect			fBounds; 
-						// Bounds for tabs
 };
 
 
