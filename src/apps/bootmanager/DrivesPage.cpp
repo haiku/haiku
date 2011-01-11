@@ -304,27 +304,25 @@ DrivesPage::_UpdateWizardButtons(DriveItem* item)
 	if (fHasInstallableItems) {
 		fWizardView->SetPreviousButtonLabel(
 			B_TRANSLATE_COMMENT("Uninstall", "Button"));
-		if (fDrivesView->CurrentSelection() == -1) {
+		if (item == NULL) {
 			fWizardView->SetPreviousButtonEnabled(false);
 			fWizardView->SetNextButtonEnabled(false);
+		} else {
+			fWizardView->SetPreviousButtonEnabled(
+				item->CanBeInstalled() && item->IsInstalled());
+			fWizardView->SetNextButtonEnabled(item->CanBeInstalled());
+
+			fWizardView->SetNextButtonLabel(
+				item->IsInstalled() && item->CanBeInstalled()
+					? B_TRANSLATE_COMMENT("Update", "Button")
+					: B_TRANSLATE_COMMENT("Install", "Button"));
 		}
 	} else {
 		fWizardView->SetNextButtonLabel(
 			B_TRANSLATE_COMMENT("Quit", "Button"));
-	}
-
-	if (item == NULL) {
 		fWizardView->SetPreviousButtonEnabled(false);
 		fWizardView->SetNextButtonEnabled(false);
 		return;
 	}
 
-	fWizardView->SetPreviousButtonEnabled(
-		item->CanBeInstalled() && item->IsInstalled());
-	fWizardView->SetNextButtonEnabled(item->CanBeInstalled());
-
-	fWizardView->SetNextButtonLabel(
-		item->IsInstalled() && item->CanBeInstalled()
-			? B_TRANSLATE_COMMENT("Update", "Button")
-			: B_TRANSLATE_COMMENT("Install", "Button"));
 }
