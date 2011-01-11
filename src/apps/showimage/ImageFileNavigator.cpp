@@ -33,6 +33,7 @@
 
 #include "ProgressWindow.h"
 #include "ShowImageConstants.h"
+#include "Utilities.h"
 
 
 class Navigator {
@@ -344,8 +345,7 @@ FolderNavigator::_BuildEntryList()
 /*static*/ int
 FolderNavigator::_CompareRefs(const entry_ref* refA, const entry_ref* refB)
 {
-	// TODO: natural sorting? Collating via current locale?
-	return strcasecmp(refA->name, refB->name);
+	return BPrivate::NaturalCompare(refA->name, refB->name);
 }
 
 
