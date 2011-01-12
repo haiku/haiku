@@ -6,6 +6,7 @@
 
 #include "package.h"
 
+#include <dirent.h>
 #include <errno.h>
 #include <getopt.h>
 #include <stdio.h>
@@ -74,10 +75,30 @@ printf("Init(): %s\n", strerror(error));
 
 	// add files
 	for (int i = 0; i < fileNameCount; i++) {
-		error = packageWriter.AddEntry(fileNames[i]);
+		if (strcmp(fileNames[i], ".") == 0) {
+			DIR* dir = opendir (".");
+			if (dir == NULL) {
+				fprintf(stderr, "Error: Failed to opendir '.': %s\n",
+					strerror(errno));
+				return 1;
+			}
+			while (dirent* entry = readdir(dir)) {
+				if (strcmp(entry->d_name, ".") == 0
+					|| strcmp(entry->d_name, "..") == 0)
+					continue;
+				error = packageWriter.AddEntry(entry->d_name);
+printf("AddEntry(\"%s\"): %s\n", entry->d_name, strerror(error));
+				if (error != B_OK)
+					return 1;
+			}
+			closedir (dir);
+
+		} else {
+			error = packageWriter.AddEntry(fileNames[i]);
 printf("AddEntry(\"%s\"): %s\n", fileNames[i], strerror(error));
-		if (error != B_OK)
-			return 1;
+			if (error != B_OK)
+				return 1;
+		}
 	}
 
 	// write the package
