@@ -143,13 +143,16 @@ packagefs_unmount(fs_volume* fsVolume)
 static status_t
 packagefs_read_fs_info(fs_volume* fsVolume, struct fs_info* info)
 {
-	FUNCTION("volume: %p, info: %p\n", fsVolume->private_volume, info);
+	Volume* volume = (Volume*)fsVolume->private_volume;
+
+	FUNCTION("volume: %p, info: %p\n", volume, info);
 
 	info->flags = B_FS_IS_READONLY;
 	info->block_size = 4096;
 	info->io_size = kOptimalIOSize;
 	info->total_blocks = info->free_blocks = 1;
-	strlcpy(info->volume_name, "Package FS", sizeof(info->volume_name));
+	strlcpy(info->volume_name, volume->RootDirectory()->Name(),
+		sizeof(info->volume_name));
 	return B_OK;
 }
 

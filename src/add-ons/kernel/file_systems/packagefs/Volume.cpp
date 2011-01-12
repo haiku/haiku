@@ -343,25 +343,30 @@ Volume::Mount(const char* parameterString)
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
-	// create the root node
-	fRootDirectory = new(std::nothrow) Directory(kRootDirectoryID);
-	if (fRootDirectory == NULL)
-		RETURN_ERROR(B_NO_MEMORY);
-	fNodes.Insert(fRootDirectory);
-
-	const char* domain = NULL;
+	const char* packages = NULL;
+	const char* volumeName = "Package FS";
 	void* parameterHandle = parse_driver_settings_string(parameterString);
 	if (parameterHandle != NULL) {
-		domain = get_driver_parameter(parameterHandle, "packages", NULL, NULL);
+		packages
+			= get_driver_parameter(parameterHandle, "packages", NULL, NULL);
+		volumeName
+			= get_driver_parameter(parameterHandle, "volume-name", NULL, NULL);
 		delete_driver_settings(parameterHandle);
 	}
-	if (domain == NULL || domain[0] == '\0') {
+	if (packages == NULL || packages[0] == '\0') {
 		ERROR("need package folder ('packages' parameter)!\n");
 		RETURN_ERROR(B_BAD_VALUE);
 	}
 
+	// create the root node
+	fRootDirectory = new(std::nothrow) Directory(kRootDirectoryID);
+	if (fRootDirectory == NULL)
+		RETURN_ERROR(B_NO_MEMORY);
+	fRootDirectory->Init(NULL, volumeName);
+	fNodes.Insert(fRootDirectory);
+
 	// create default package domain
-	error = _AddInitialPackageDomain(domain);
+	error = _AddInitialPackageDomain(packages);
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
