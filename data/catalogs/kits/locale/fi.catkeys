@@ -1,4 +1,4 @@
-1	finnish	system	2677153267
+1	finnish	system	1624661606
 %3.2f GiB	StringForSize		%3.2f gibitavua
 %3.2f KiB	StringForSize		%3.2f kibitavua
 %d bytes	StringForSize		%d tavua
@@ -7,3 +7,7 @@
 Green:	ColorControl		Vihreä:
 Red:	ColorControl		Punainen:
 Blue:	ColorControl		Sininen:
+Close	AboutWindow		Sulje
+Written by:	AboutWindow		Tekijä:
+About…	AboutWindow		Ohjelmasta...
+Copyright © %years% Haiku, Inc.	AboutWindow		Copyright © %years% Haiku, Inc.

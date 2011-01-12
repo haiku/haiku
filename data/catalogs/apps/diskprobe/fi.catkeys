@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-DiskProbe	872627029
+1	finnish	x-vnd.Haiku-DiskProbe	679412978
 File offset: 	ProbeView		Tiedostosiirros: 
 DiskProbe	OpenWindow		Levykoestaja
 %ld (native)	ProbeView		%ld (kotoperäinen)
@@ -110,3 +110,26 @@ Grayscale	TypeEditors		Harmaasävy
 DiskProbe request	DiskProbe		Levykoestajapyyntö
 Type editor	ProbeView		Tyyppimuokkain
 Contents:	TypeEditors		Sisältö:
+Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than \"Font size\" and \"BlockSize\"	Kantaluku
+what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	mikä: '%.4s'\n\n
+Boolean	TypeEditors	This is the type of editor	Boolean
+Stop	ProbeView		Pysäytä
+Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Heksadesimaali
+Text	TypeEditors	This is the type of editor	Teksti
+Number	TypeEditors	This is the type of editor	Numero
+Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Desimaali
+String editor	TypeEditors		Merkkijonomuokkain
+View	ProbeView	This is the last menubar item \"File Edit Block View\"	Näkymä
+Boolean editor	TypeEditors		Boolean-muokkain
+none	ProbeView	No attributes	ei mitään
+BlockSize	ProbeView	A menu item, a shortened form from \"block size\". This is in the same menu windowthan \"Base\" and \"Font size\"	Lohkokoko
+Fit	ProbeView	Size of fonts, fits to available room	Sopii
+(native)	ProbeView		(kotoperäinen)
+Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Heksadesimaali
+Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Ei voitu lukea kuvatiedostoa
+Message	TypeEditors	This is the type of view	Viesti
+Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Ei voitu avata puskuria \"%s\":\n%s
+of 0x0	ProbeView	This is a part of \"Block 0xXXXX of 0x0026\" message. In languages without 'of' structure it can be replaced simply with '/'.	/ 0x0
+Image view	TypeEditors	Image means here a picture file, not a disk image.	Kuvanäkymä
+Image	TypeEditors	This is the type of view	Kuva
+About DiskProbe…	FileWindow		Ohjelmasta Levykoestaja...

@@ -68,13 +68,13 @@ Copy	Menus		Kopioi
 Cut	Menus		Leikkaa
 Select all	Menus		Valitse kaikki
 Save as…	Menus		Tallenna nimellä...
-Lines:	Statistics		Riviä:
+Lines:	Statistics		Rivejä:
 Document statistics	Statistics		Asiakirjan tilastot
 Statistics…	Menus		Tilastot...
 Words:	Statistics		Sanoja:
 OK	Statistics		Valmis
-Undo typing	QuitAlert		Perutaan kirjoitus
+Undo typing	QuitAlert		Peru kirjoitus
 Characters:	Statistics		Merkkejä:
 Redo typing	QuitAlert		Toista kirjoitus
-Italic	Menus		Kursivoitu
-Bold	Menus		Lihavoitu
+Italic	Menus		Kursivointi
+Bold	Menus		Lihavointi

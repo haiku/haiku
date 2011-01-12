@@ -1,6 +1,6 @@
 1	finnish	x-vnd.Haiku-About	2350236915
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (ja hänen NewOS-ytimensä)\n
-%ld Processors:	AboutView		%ld suoritinta:
+%ld Processors:	AboutView		%ld Suoritinta:
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (projektin perustaja)\n\n
 The Haiku-Ports team\n	AboutView		Haiku-Ports -ryhmä\n
 Website, marketing & documentation:\n	AboutView		Web-sivusto, markkinointi ja dokumentaatio:\n
@@ -10,15 +10,15 @@ Processor:	AboutView		Suoritin:
 Kernel:	AboutView		Ydin:
 Contributors:\n	AboutView		Avustajat:\n
 Unknown	AboutView		Tuntematon
-\n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… ja luultavasti vielä jotain muuta, jonka joku unohti mainita (anteeksi!)\n\n
+\n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… ja luultavasti vielä muutama lisää, jotka unohdimme mainita (anteeksi!)\n\n
 %.2f GHz	AboutView		%.2f GHz
 Memory:	AboutView		Muisti:
 Past maintainers:\n	AboutView		Entiset ylläpitäjät:\n
 \n\nSpecial thanks to:\n	AboutView		\n\nErityiskiitokset:\n
 Licenses: 	AboutView		Lisenssit: 
-\nCopyrights\n\n	AboutView		\nCopyright-oikeudet\n\n
+\nCopyrights\n\n	AboutView		\nTekijänoikeudet\n\n
 Current maintainers:\n	AboutView		Nykyiset ylläpitäjät:\n
-Time running:	AboutView		Aika kuluu:
+Time running:	AboutView		Käynnissäoloaika:
 The Haikuware team and their bounty program\n	AboutView		Haikuware-ryhmä ja heidän bounty-ohjelmansa\n
 About this system	AboutWindow		Tästä järjestelmästä
 Version:	AboutView		Versio:
@@ -28,11 +28,11 @@ License: 	AboutView		Lisenssi:
 Translations:\n	AboutView		Käännökset:\n
 ... and the many people making donations!\n\n	AboutView		... ja monet lahjoituksia tehneet ihmiset!\n\n
 The BeGeistert team\n	AboutView		BeGeistert-ryhmä\n
-The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku and the Haiku logo are trademarks of Haiku, Inc.\n\n	AboutView		Copyright-oikeus Haiku-koodiin on Haiku, Inc.-yrityksen tai lähdekoodissa ilmaistujen tekijöiden omaisuutta. Haiku ja Haiku-logo ovat Haiku, Inc. -yrityksen tavaramerkkejä\n\n
+The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku and the Haiku logo are trademarks of Haiku, Inc.\n\n	AboutView		Tekijänoikeus Haiku-koodiin on Haiku, Inc.-yrityksen tai lähdekoodissa ilmaistujen tekijöiden omaisuutta. Haiku ja Haiku-logo ovat Haiku, Inc. -yrityksen tavaramerkkejä\n\n
 GCC %d Hybrid	AboutView		GCC %d Hybridi
-%d MiB total	AboutView		%d MiB yhteensä
-%d MiB used (%d%%)	AboutView		%d MiT käytetty (%d%%)
-The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT licence%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		Haikulle uniikki koodi, erityisesti yhdin ja kaikki koodi, johon sovellukset linkitetään, jaellaan %MIT licence%-lisenssin ehtojen alla. Jotkut järjestelmäkirjastot sisältävät kolmannen osapuolen koodia, joka jaetaan LGPL-lisenssin alla. Löydät kolmannen osapuolen copyright-tiedot alta.\n\n
-%total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB yhteensä, %inaccessible MiB luoksepääsemätön
+%d MiB total	AboutView		%d mebitavua yhteensä
+%d MiB used (%d%%)	AboutView		%d mebitavua käytetty (%d%%)
+The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT licence%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		Haikulle uniikki koodi, erityisesti ydin ja kaikki koodi, johon sovellukset linkitetään, jaellaan %MIT licence%-lisenssin ehtojen alla. Jotkut järjestelmäkirjastot sisältävät kolmannen osapuolen koodia, joka jaetaan LGPL-lisenssin alla. Löydät kolmannen osapuolen tekijänoikeustiedot alta.\n\n
+%total MiB total, %inaccessible MiB inaccessible	AboutView		%total mebitavua yhteensä, %inaccessible mebitavua luoksepääsemätön
 Google & their Google Summer of Code program\n	AboutView		Google ja heidän Google Summer of Code -ohjelmansa
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Aucklandin yliopisto ja Christof Lutteroth\n\n

@@ -50,5 +50,5 @@ A3	ConfigWindow	ISO 216 paper size	A3
 Get name of transport	Transport Scripting		Hae siirron nimi
 A5	ConfigWindow	ISO 216 paper size	A5
 Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Tabloid-koko
-A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Tulostin tuolla nimellä on jo olemassa, mutta sen ajuria ei voitu löytää
+A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Tulostin tuolla nimellä on jo olemassa, mutta sen ajuria ei voitu löytää! Korvataanko?
 A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Tulostin tuolla nimellä on jo olemassa, mutta se ei ole ollenkaan käytettävissä! Korvataanko?

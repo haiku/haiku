@@ -12,7 +12,7 @@ Phone	DeviceClass		Puhelin
 Combo keyboard/pointing device	DeviceClass		Yhdistelmänäppäimistö/osoituslaite
 Controller	DeviceClass		Ohjain
 No service available	DeviceClass		Palvelu ei ole käytettävissä
-Wearable	DeviceClass	A wearable computer	Kannettava
+Wearable	DeviceClass	A wearable computer	Päälle puettava
 Handheld	DeviceClass		Kädessä pidettävä
 Invalid device class!\n	DeviceClass		Virheellinen laiteluokka
 Sensing device	DeviceClass		Tuntolaite

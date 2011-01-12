@@ -13,7 +13,7 @@ Show seconds	PreferencesWindow		Näytä sekunnit
 Always on top	PreferencesWindow		Aina päällimmäisenä
 Show all	WindowMenu		Näytä kaikki
 No windows	WindowMenu		Ei ikkunoita
-Power off	BeMenu		Katkais virta
+Power off	BeMenu		Katkaise virta
 Auto-raise	PreferencesWindow		Nosta automaattisesti
 Hide time	TimeView		Piilota aika
 Recent folders:	PreferencesWindow		Äskettäiset kansiot:
@@ -23,12 +23,12 @@ Close all	WindowMenu		Sulje kaikki
 Deskbar preferences	PreferencesWindow		Työpöytäpalkin asetukset
 Mount	BeMenu		Liitä
 Recent applications:	PreferencesWindow		Äskettäiset sovellukset:
-Tracker always first	PreferencesWindow		Jäljittäjä aina ensimmäisenä
+Tracker always first	PreferencesWindow		Seuraaja aina ensimmäisenä
 About Haiku…	BeMenu		Haikusta...
 Show calendar…	TimeView		Näytä kalenteri...
 Restart system	BeMenu		Käynnistä järjestelmä uudelleen
 Find…	BeMenu		Etsi...
-Restart Tracker	BeMenu		Käynnistä jäljittäjä uudelleen
+Restart Tracker	BeMenu		Käynnistä seuraaja uudelleen
 Show Time	Tray		Näytä aika
 Expand new applications	PreferencesWindow		Laajenna uudet sovellukset
 Clock	PreferencesWindow		Kello

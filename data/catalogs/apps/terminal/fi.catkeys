@@ -1,20 +1,6 @@
-1	finnish	x-vnd.Haiku-Terminal	1949672047
+1	finnish	x-vnd.Haiku-Terminal	1532342314
 Not found.	Terminal TermWindow		Ei löytynyt.
 Didn't find any available pseudo ttys.	Terminal Shell		Ei löytynyt yhtään käytettävissä olevaa vale-etäpäätettä.
 Switch Terminals	Terminal TermWindow		Vaihda pääteikkunoita
 Change directory	Terminal TermView		Vaihda hakemistoa
-OK	Terminal TermWindow		Valmis
-New Terminal	Terminal TermWindow		Uusi Pääteikkuna
-Terminal couldn't start the shell. Sorry.	Terminal TermApp		Pääteikkuna ei voinut valitettavasti käynnistää komentotulkkia.
-Text size	Terminal TermWindow		Tekstikoko
-Match case	Terminal FindWindow		Kirjainkoosta riippuva
-Quit	Terminal TermWindow		Poistu
-Use default shell	Terminal Shell		Käytä oletuskomentotulkkia
-Select all	Terminal TermWindow		Valitse kaikki
-Terminal	Terminal TermWindow		Pääteikkuna
-Save to file…	Terminal PrefWindow		Tallenna tiedostoon…
-Failed to init pseudo tty.	Terminal Shell		Vale-etäpäätteen alustaminen epäonnistui.
-OK	Terminal PrefWindow		Valmis
-Font:	Terminal AppearancePrefView		Kirjasintyyppi:
-Copy here	Terminal TermView		Kopioi tänne
-Copy	Terminal TermWindow		Kopioi
+Terminal\n\nwritten by Kazuho Okui and Takashi Murai\nupdated by Kian Duffy and others\n\nCopyright ©2003-2009, Haiku.\n	Terminal TermView		Pääteikkuna\n\ntekijät: Kazuho Okui ja Takashi Murai\npäivittänyt: Kian Duffy ja muut\n\nCopyright ©2003-2009, Haiku.\n

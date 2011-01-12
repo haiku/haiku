@@ -1,0 +1,48 @@
+1	finnish	x-vnd.Haiku-Devices	1250375801
+Order by:	DevicesView		Järjestys:
+ACPI controller	Device		ACPI-ohjain
+Memory controller	Device		Muistiohjain
+Docking station	Device		Telakka-asema
+Computer	Device		Tietokone
+Detailed	DevicesView		Yksityiskohdat
+Properties	PropertyList		Ominaisuudet
+Category	DevicesView		Luokka
+Quit	DevicesView		Poistu
+Device paths	Device		Laitepolut
+Manufacturer\t\t\t: 	Device		Valmistaja\t\t\t:
+Processor	Device		Suoritin
+ACPI Information	DeviceACPI		ACPI-tiedot
+Device Name\t\t\t\t: 	Device		Laitenimi\t\t\t\t:
+Generic system peripheral	Device		Yleinen järjestelmän oheislaite
+Display controller	Device		Näyttöohjain
+Mass storage controller	Device		Massamuistilaiteohjain
+About Devices…	DevicesView		Ohjelmasta Laitteet...
+Input device controller	Device		Syötelaiteohjain
+Device paths\t: 	Device		Laitepolut\t:
+Network controller	Device		Verkko-ohjain
+Devices\n\twritten by Pieter Panman\n\n\tBased on listdev by Jérôme Duval\n\tand the previous Devices preference\n\tby Jérôme Duval and Sikosis\n\tCopyright 2009, Haiku, Inc.\n	DevicesApplication		Laitteet\n\ttekijä: Pieter Panman\n\n\tPerustuu Jérôme Duvalin tekemään listdev-ohjelmaan\n\tja edelliseen Jérôme Duvalin  ja Sikosisin\n\tlaitepreferenssiin\n\tCopyright 2009, Haiku, Inc.\n
+Driver used	Device		Käytetty laite
+Driver used\t\t\t\t: 	Device		Käytetty laite\t\t\t\t:
+Bus	DevicesView		Väylä
+Communication controller	Device		Viestintäohjain
+Basic information	DevicesView		Perustiedot
+PCI Information	DevicePCI		PCI-tiedot
+Manufacturer:	Device		Valmistaja:
+Multimedia controller	Device		Multimediaohjain
+Device name:	Device		Laitenimi:
+Report compatibility	DevicesView		Ilmoita yhteensopivuudesta
+about	DevicesApplication		ohjelmasta
+Signal processing controller	Device		Signaalikäsittelyohjain
+Serial bus controller	Device		Sarjaväyläohjain
+Wireless controller	Device		Langaton ohjain
+Device name	Device		Laitenimi
+Manufacturer	Device		Valmistaja
+Intelligent controller	Device		Älyohjain
+Satellite communications controller	Device		Satelliittiviestintäohjain
+Bridge	Device		Silta
+Refresh devices	DevicesView		Virkistä laitteita
+Connection	DevicesView		Yhteys
+Generate system information	DevicesView		Tuota järjestelmätiedot
+Encryption controller	Device		Salausohjain
+Unclassified device	Device		Luokittelematon laite
+Devices	DevicesView		Laitteet

@@ -1,41 +1,32 @@
-1	finnish	x-vnd.Haiku-ShowImage	2679963118
+1	finnish	x-vnd.Haiku-ShowImage	1508862207
 Use as background…	Menus		Käytä taustana…
-5 seconds	Menus		5 sekuntia
 Slide delay	Menus		Diaviive
 Zoom in	Menus		Lähennä
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Asiakirja '%s' on muuttunut. Haluatko sulkea asiakirjan?
-8 seconds	Menus		8 sekuntia
 Previous page	Menus		Edellinen sivu
 View	Menus		Näkymä
 Full screen	Menus		Kokoruutu
 Go to page	Menus		Siirry sivulle
 Zoom out	Menus		Loitonna
-20 seconds	Menus		20 sekuntia
-3 seconds	Menus		3 sekuntia
 Rotate counterclockwise	Menus		Pyöritä vastapäivään
-10 seconds	Menus		10 sekuntia
 High-quality zooming	Menus		Korkealaatuinen rajaus
 Browse	Menus		Selaa
-6 seconds	Menus		6 sekuntia
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Ei voitu ladata kuvaa! Puuttuu joko tiedosto tai kuvakääntäjä sitä varten.
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Ei voitu ladata kuvaa! Puuttuu joko tiedosto tai kuvamuunnin sitä varten.
 First page	Menus		Ensimmäinen sivu
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Asiakirja '%s' (sivu %d) on muuttunut. Haluatko sulkea asiakirjan?
-About ShowImage…	Menus		ShowImage-ohjelmasta…
+About ShowImage…	Menus		Ohjelmasta Kuvankatselin…
 Close	ClosePrompt		Sulje
 Undo	Menus		Peru
 Resize to (in 1/72 inches):	PrintOptionsWindow		Skaalaa kokoon (1/72 tuumissa):
-9 seconds	Menus		9 sekuntia
 Flip left to right	Menus		Käännä ympäri vasemmalta oikealle
 Show caption in full screen mode	Menus		Näytä kuvateksti kokoruututilassa
 DPI:	PrintOptionsWindow		DPI:
 Next file	Menus		Seuraava tiedosto
-4 seconds	Menus		4 sekuntia
 Close document	ClosePrompt		Sulje asiakirja
 Height: 	PrintOptionsWindow		Korkeus: 
 Cancel	ClosePrompt		Peru
 Print options	PrintOptionsWindow		Tulostusvalitsimet
-ShowImage	AboutWindow		ShowImage
-7 seconds	Menus		7 sekuntia
+ShowImage	AboutWindow		Kuvankatselin
 Last page	Menus		Viimeinen sivu
 Previous file	Menus		Edellinen tiedosto
 Slide show	Menus		Diaesitys
@@ -67,3 +58,4 @@ Selection Mode	Menus		Valintatila
 Stretch to window	Menus		Venytä ikkunaan
 OK	Alerts		Valmis
 Fit to window	Menus		Sovita ikkunaan
+%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS sekuntia

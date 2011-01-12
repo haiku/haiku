@@ -1,0 +1,49 @@
+1	finnish	x-vnd.Haiku-LaunchBox	2687146141
+New	LaunchBox		Uusi
+Set description…	LaunchBox		Aseta kuvaus...
+IconButton::SetIcon() - error allocating bitmap: %s\n	LaunchBox		IconButton::SetIcon() - virhe varattaessa bittikarttatiedostoa: %s\n
+Vertical layout	LaunchBox		Pystysuora sijoittelu
+OK	LaunchBox		Valmis
+no BAppFileInfo for '%s'\n	LaunchBox		ei BAppFileInfo-määrittelyä kohteelle '%s'\n
+Pad 1	LaunchBox		Alusta 1
+last chance	LaunchBox		viimeinen mahdollisuus
+Quit	LaunchBox		Poistu
+IconButton::SetIcon() - path.InitCheck() failed: %s\n	LaunchBox		IconButton::SetIcon() - path.InitCheck() epäonnistui: %s\n
+Clear button	LaunchBox		Nollaa painike
+Failed to launch application with signature '	LaunchBox		Sovelluksen käynnistäminen epäonnistui allekirjoituksella '
+About	LaunchBox		Ohjelmasta
+Ignore double-click	LaunchBox		Ohita kaksoisnapsautukset
+Auto-raise	LaunchBox		Automaattisesti päällimmäinen
+IconButton::_MakeBitmaps() - error allocating local bitmaps\n	LaunchBox		IconButton::_MakeBitmaps() - virhe varattaessa paikallisia bittikarttatiedostoja\n
+Show on all workspaces	LaunchBox		Näytä kaikki työtilat
+Show window border	LaunchBox		Näytä ikkunaraja
+IconButton::SetIcon() - fileType is not valid: %s\n	LaunchBox		IconButton::SetIcon() - fileType ei ole kelvollinen: %s\n
+Pad 	LaunchBox		Alusta
+Icon size	LaunchBox		Kuvakekoko
+no MIME signature for '%s'\n	LaunchBox		ei MIME-allekirjoitusta kohteelle '%s'\n
+Bummer	LaunchBox		Valmis
+Cancel	LaunchBox		Peru
+Remove button	LaunchBox		Poista painike
+Description for '	LaunchBox		Kuvaus kohteelle '
+Horizontal layout	LaunchBox		Vaakasuora sijoittelu
+Name Panel	LaunchBox		Nimipaneeli
+Add button here	LaunchBox		Lisää painike tänne
+IconButton::_MakeBitmaps() - bitmap has unsupported colorspace\n	LaunchBox		IconButton::_MakeBitmaps() - bittikarttatiedossa on tukematon väritila\n
+Failed to launch '	LaunchBox		Epäonnistuttiin käynnistämään '
+IconButton::_MakeBitmaps() - bitmap is not valid\n	LaunchBox		IconButton::_MakeBitmaps() - bittikarttatiedosto ei ole kelvollinen\n
+IconButton::SetIcon() - be_app->GetAppInfo() failed: %s\n	LaunchBox		IconButton::SetIcon() - be_app->GetAppInfo() epäonnistui: %s\n
+Stephan Aßmus (aka stippi)	LaunchBox		Stephan Aßmus (alias stippi)
+Failed to launch 'something',error in Pad data.	LaunchBox		Epäonnistuttiin käynnistämään 'jotakin', virhe Alustatiedoissa.
+Close	LaunchBox		Sulje
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Epäonnistuttiin lähettämään 'avaa kansio'-komento Seuraajalle.\n\nVirhe: 
+IconButton::SetIcon() - path.Append() failed: %s\n	LaunchBox		IconButton::SetIcon() - path.Append() epäonnistui: %s\n
+IconButton::SetIcon() - path.GetParent() failed: %s\n	LaunchBox		IconButton::SetIcon() - path.GetParent() epäonnistui: %s\n
+You can drag an icon here.	LaunchBox		Voit raahata kuvakkeen tänne.
+Clone	LaunchBox		Klooni
+IconButton::SetIcon() - B_RGB32 bitmap is not valid\n	LaunchBox		IconButton::SetIcon() - B_RGB32 bittikarttatiedosto ei ole kelvollinen\n
+LaunchBox	LaunchBox		Käynnistyslaatikko
+launch popup	LaunchBox		käynnistysponnahdusikkuna
+Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Haluatko todella sulkea alustan?\n(Alustaa ei muisteta.)
+'.\n\nError: 	LaunchBox		'.\n\nVirhe: 
+IconButton::SetIcon() - B_CMAP8 bitmap is not valid\n	LaunchBox		IconButton::SetIcon() - B_CMAP8 bittikarttatiedosto ei ole kelvollinen\n
+IconButton::SetIcon() - fileType->GetIcon() failed: %s\n	LaunchBox		IconButton::SetIcon() - fileType->GetIcon() epäonnistui: %s\n

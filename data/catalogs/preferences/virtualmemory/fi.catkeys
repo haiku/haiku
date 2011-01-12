@@ -1,7 +1,7 @@
-1	finnish	x-vnd.Haiku-VirtualMemory	866260633
+1	finnish	x-vnd.Haiku-VirtualMemory	3110510347
 Turn off	SettingsWindow		Käännä pois päältä
 GB	SettingsWindow		Gt
-Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Virtuaalimuistin ottamisella pois käytöstä on odottamattomia vaikutuksia järjestelmän stabiilisuuteen silloin kun muistia on kerran käytetty.\nVirtuaalimuisti ei vaikuta järjestelmän suorituskykyyn kunnes tämä piste on saavutettu.\n\nOletko todella varma, että haluat ottaa sen pois päältä?
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Virtuaalimuistin ottamisella pois käytöstä on odottamattomia vaikutuksia järjestelmän stabiilisuuteen silloin kun muisti on kerran käytetty loppuun.\nVirtuaalimuisti ei vaikuta järjestelmän suorituskykyyn kunnes tämä piste on saavutettu.\n\nOletko todella varma, että haluat ottaa sen pois päältä?
 Requested swap file size:	SettingsWindow		Pyydetty virtuaalimuistitiedoston koko:
 Physical memory: 	SettingsWindow		Fyysista muistia: 
 Changes will take effect on restart!	SettingsWindow		Muutokset tulevat käyttöön uudelleenkäynnistyksen jälkeen!
@@ -10,11 +10,11 @@ KB	SettingsWindow		Kt
 Use volume:	SettingsWindow		Käytä taltiota:
 Keep enabled	SettingsWindow		Pidä käytössä
 Revert	SettingsWindow		Palauta
-999 MB	SettingsWindow		999 Mt
 Current swap file size: 	SettingsWindow		Nykyisen näennäismuistitiedoston koko: 
 VirtualMemory	SettingsWindow		VirtuaaliMuisti
 OK	VirtualMemoryApp		Valmis
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		VirtuaaliMuisti\n\ttekijä: Axel Dörfler\n\tCopyright 2005, Haiku.\n
-Enable virtual memory	SettingsWindow		Ota käyttöön virtuaalimuisti
+Enable virtual memory	SettingsWindow		Ota virtuaalimuisti käyttöön
 MB	SettingsWindow		Mt
 %Ld B	SettingsWindow		%Ld t
+Insufficient space for a swap file.	SettingsWindow		Näennäismuistitiedostolle ei ole riittävästi tilaa.

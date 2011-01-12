@@ -19,7 +19,7 @@ already chosen	LanguageListView		jo valittu
 Negative:	TimeFormatSettings		Kielteinen:
 Use month/day-names from preferred language	TimeFormatSettings		Käytä ensisijaisen kielen kuukausi/päivä -nimiä
 Formatting	Locale Preflet Window		Muotoillaan
-Locale	Locale Preflet Window		Paikallisasetus
-Full format:	TimeFormatSettings		Koko muoto:
+Locale	Locale Preflet Window		Maa-asetus
+Full format:	TimeFormatSettings		Kokonainen muoto:
 Medium format:	TimeFormatSettings		Keskikokoinen muoto:
 Positive:	TimeFormatSettings		Myönteinen:

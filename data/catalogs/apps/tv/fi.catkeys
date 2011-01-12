@@ -1,7 +1,7 @@
 1	finnish	x-vnd.Haiku.TV	3791845041
 TV	MainWin		TV
 Channel	MainWin		Kanava
-Settings…	MainWin		Asetukset
+Settings…	MainWin		Asetukset...
 Interface	MainWin		Käyttöliittymä
 Keep aspect ratio	MainWin		Säilytä kuvasuhde
 Previous channel	MainWin		Edellinen kanava

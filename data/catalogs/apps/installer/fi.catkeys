@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Installer	527470088
+1	finnish	x-vnd.Haiku-Installer	1390796678
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Asennusohjelma\n\ttekijä: Jérôme Duval ja Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Asennus valmis. Alkulataussektori kirjoitettiin kohteeseen '%s'. Jätä asennusohjelma painamalla Poistu-painiketta tai valitse uusi kohdetaltio toisen asennuksen suorittamiseksi.
 Quit	InstallerWindow		Poistu
@@ -20,14 +20,14 @@ Boot sector successfully written.	InstallProgress		Alkulataussektori kirjoitetti
 Performing installation.	InstallProgress		Suoritetaan asennus.
 scanning…	InstallerWindow		etsitään…
 Finishing Installation.	InstallProgress		Lopetetaan asennusta.
-README	InstallerApp		README
+README	InstallerApp		LUEMINUT
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Kohdelevyllä ei ehkä ole riittävästi tilaa. Yritä valita eri levy tai älä valitse valinnaisten alkioiden asentamista.
 Scanning for disks…	InstallerWindow		Etsitään levyjä…
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Levyä ei voitu liittää. Valitse eri levy.
 ?? of ??	InstallerWindow	Unknown progress	?? / ??
 Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Käynnistä Levyasema-asetukset -apuohjelma osioimaan\nkäytettävissä olevat kiintolevyt ja muut mediat.\nOsioita voidaan alustaa\nBe-tiedostojärjestelmään, jota tarvitaan Haiku-alkulataus-\nosioon.
 Show optional packages	InstallerWindow		Näytä valinnaiset pakkaukset
-No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Ei löytyny yhtään asentamiseen sopivaa osiota. Aseta osiot ja alusta vähintään yksi Be-tiedostojärjestelmään.
+No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Ei löytynyt yhtään asentamiseen sopivaa osiota. Aseta osiot ja alusta vähintään yksi Be-tiedostojärjestelmään.
 Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Valitse ponnahdusvalikosta levy, jolle haluat asentaa. Napsauta sitten \"Aloita\".
 Unknown Type	InstallProgress	Partition content type	Tuntematon tyyppi
 <none>	InstallerWindow	No partition available	<ei mitään>
@@ -45,14 +45,13 @@ Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	Ins
 Please choose target	InstallerWindow		Valitse kohde
 Begin	InstallerWindow		Aloita
 Write boot sector	InstallerWindow		Kirjoita alkulataussektori
-DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup, sovellus osioiden asetukseen, ei voitu käynnistää.
+DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Levyasema-asetukset, sovellus osioiden asetukseen, ei voitu käynnistää.
 No optional packages available.	PackagesView		Valinnaisia pakkauksia ei ole saatavilla.
 Additional disk space required: %s	InstallerWindow		Vaadittu lisälevytilaa: %s
 Cancel	InstallProgress		Peru
 Try installing anyway	InstallProgress		Yritä asentaa kaikesta huolimatta
 Are you sure you want to to stop the installation?	InstallerWindow		Oletko varma, että haluat pysäyttää asennuksen?
 Onto:	InstallerWindow		Kohteeseen:
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Kohdetaltio ei ole tyhjä. Oletko varma, että haluat asentaa siitä huolimatta?\n\nHuomaa: 'system'-kansio on oleva puhdas kopio lähdetaltiolta, kaikki muut kansiot yhdistetään, kun taas tiedostot ja linkit, jotka esiintyvät sekä lähde- että kohdetaltiolla korvataan lähdetaltion versiolla.
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Oletko varma, että haluat keskeyttää asennuksen ja käynnistää järjestelmän uudelleen?
 Restart system	InstallerWindow		Käynnistä järjestelmä uudelleen
 Quit	InstallerApp		Poistu
@@ -61,7 +60,6 @@ Continue	InstallerWindow	In alert after pressing Stop	Jatka
 OK	InstallerWindow		Valmis
 Cancel	InstallerWindow		Peru
 Additional disk space required: 0.0 KiB	InstallerWindow		Vaadittu lisälevytilaa: 0.0 kibitavua
-The mount point could not be retrieved.	InstallProgress		Liittämispistettä ei voitu noutaa.
 Bootman, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Bootman-ohjelmaa, Haikun alkulatausvalikon asetussovellusta, ei voitu käynnistää.
 Quit Boot Manager	InstallerWindow		Poistu Alkulataushallinnasta
 Quit Boot Manager and DriveSetup	InstallerWindow		Poistu Alkulataushallinnasta ja Levyasema-asetuksista
@@ -72,7 +70,6 @@ Running Boot Manager…\n\nClose Boot Manager to continue with the installation.
 Boot sector not written because of an internal error.	InstallProgress		Alkulataussektoria ei kirjoitettu sisäisen virheen vuoksi.
 Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Suoritetaan Alkulataushallinta ja Levyasema-asetukset…\n\nSulje molemmat sovellukset asennuksen jatkamiseksi.
 Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Sulje Alkulataushallintaikkuna ennen Asennusohjelmaikkunan sulkemista.
-Tools	InstallerWindow		Työkalut
 Stop	InstallerWindow		Pysäytä
 ???	InstallerWindow	Unknown currently copied item	???
 So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		Joten lisää muiden valikkorivien alapuolelle tiedoston loppuun joitakin seuraavanlaisia rivejä:\n\n
@@ -108,10 +105,7 @@ Finally, you have to update the boot menu by entering:\n\n	InstallerApp		Lopuksi
 If you have not created a partition yet, simply reboot, create the partition using whatever tool you feel most comfortable with, and reboot into Haiku to continue with the installation. You could for example use the GParted Live-CD, it can also resize existing partitions to make room.\n\n\n	InstallerApp		Jos et ole vielä luonut osiota, tee yksinkertaisesti alkukäynnistys, luo osio käyttäen mitä tahansa työkalua, jonka käyttämiseen olet tottunut ja alkukäynnistä Haiku uudelleen asennuksen jatkamiseksi. Voisit esimerkiksi käyttää GParted Live-CD -levyä osiointiin, se voi myös muokata olemassaolevien osioiden koko lisätilan tekemiseksi.\n\n\n
 With GRUB 2 the first logical partition always has the number \"5\", regardless of the number of primary partitions.\n\n	InstallerApp		GRUB 2 -ohjelmassa ensimmäinen looginen osio on aina numero \"5\" riippumatta ensisijaisten osioiden lukumäärästä.\n\n
 All hard disks start with \"hd\".\n	InstallerApp		Kaikki kiintolevynimet alkavat kirjaimilla \"hd\".\n
-3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" documentation, there is a link on the Desktop.\n\n	InstallerApp		3) Kun alkukäynnistät Haikun onnistuneesti ensimmäisen kerran, muista lue \"Tervetuloa\"-dokumentit. Niihin löytyy linkki työpöydältä.\n\n
+3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" documentation, there is a link on the Desktop.\n\n	InstallerApp		3) Kun alkukäynnistät Haikun onnistuneesti ensimmäisen kerran, muista lukea \"Tervetuloa\"-dokumentit. Niihin löytyy linkki työpöydältä.\n\n
 Configure your /boot/grub/menu.lst by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Aseta tiedosto /boot/grub/menu.lst käynnistämällä suosikkieditorisi Pääteikkunassa seuraavalla tavalla:\n\n
-NOTE: While the naming strategy for hard disks is still as described under 2.1) the naming scheme for partitions has changed.\n\n	InstallerApp		HUOMAA: Vaikka kiintolevyjen nimeämismenettely on yhä kuten kuvailtiin kohdassa 2.1) niin osioiden nimeämiskaavio on vaihtunut.\n\n
+NOTE: While the naming strategy for hard disks is still as described under 2.1) the naming scheme for partitions has changed.\n\n	InstallerApp		HUOMAA: Vaikka kiintolevyjen nimeämismenettely on yhä kuten kuvailtiin kohdassa 2.1) niin osioiden nimeämiskaava on vaihtunut.\n\n
 So below the heading that must not be edited, add something similar to these lines:\n\n	InstallerApp		Lisää alle sen otsakkeen alapuolelle, jota ei saa muokata, joitakin seuraavanlaisia rivejä:\n\n
-You can see the correct partition in GParted for example.\n\n\n	InstallerApp		Voit nähdä oikean osion esimerkiksi GParted-ohjelmassa.\n\n\n
-\ttitle\t\t\t\tHaiku\n	InstallerApp		\totsikko\t\t\t\tHaiku\n
-\tsudo <your favorite text editor> /etc/grub.d/40_custom\n\n	InstallerApp		\tsudo <suosikkieditorisi nimi> /etc/grub.d/40_custom\n\n
