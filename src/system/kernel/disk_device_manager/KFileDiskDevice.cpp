@@ -1,16 +1,21 @@
-// KFileDiskDevice.cpp
+/*
+ * Copyright 2003-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
+
+
+#include <KFileDiskDevice.h>
 
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
-#include <KernelExport.h>
-#include <Drivers.h>
 #include <devfs.h>
+#include <Drivers.h>
+#include <KernelExport.h>
 
 #include <KDiskDeviceUtils.h>
-#include <KFileDiskDevice.h>
 #include <KPath.h>
 
 
@@ -19,26 +24,27 @@
 #define DBG(x) x
 #define OUT dprintf
 
-static const char *kFileDevicesDir = "/dev/disk/virtual/files";
+
+static const char* kFileDevicesDir = "/dev/disk/virtual/files";
 
 
-// constructor
 KFileDiskDevice::KFileDiskDevice(partition_id id)
-	: KDiskDevice(id),
-	  fFilePath(NULL)
+	:
+	KDiskDevice(id),
+	fFilePath(NULL)
 {
 	SetDeviceFlags(DeviceFlags() | B_DISK_DEVICE_IS_FILE);
 }
 
-// destructor
+
 KFileDiskDevice::~KFileDiskDevice()
 {
 	Unset();
 }
 
-// SetTo
+
 status_t
-KFileDiskDevice::SetTo(const char *filePath, const char *devicePath)
+KFileDiskDevice::SetTo(const char* filePath, const char* devicePath)
 {
 	// check params
 	if (!filePath || strlen(filePath) > B_PATH_NAME_LENGTH
@@ -60,7 +66,7 @@ KFileDiskDevice::SetTo(const char *filePath, const char *devicePath)
 		return B_BAD_VALUE;
 	// create the device, if requested
 	KPath tmpDevicePath;
-	if (!devicePath) {
+	if (devicePath == NULL) {
 		// no device path: we shall create a new device entry
 		if (tmpDevicePath.InitCheck() != B_OK)
 			return tmpDevicePath.InitCheck();
@@ -101,7 +107,7 @@ KFileDiskDevice::SetTo(const char *filePath, const char *devicePath)
 	return B_OK;
 }
 
-// Unset
+
 void
 KFileDiskDevice::Unset()
 {
@@ -118,23 +124,23 @@ KFileDiskDevice::Unset()
 	fFilePath = NULL;
 }
 
-// InitCheck
+
 status_t
 KFileDiskDevice::InitCheck() const
 {
 	return KDiskDevice::InitCheck();
 }
 
-// FilePath
-const char *
+
+const char*
 KFileDiskDevice::FilePath() const
 {
 	return fFilePath;
 }
 
-// GetMediaStatus
+
 status_t
-KFileDiskDevice::GetMediaStatus(status_t *mediaStatus)
+KFileDiskDevice::GetMediaStatus(status_t* mediaStatus)
 {
 	// check the file
 	struct stat st;
@@ -145,9 +151,9 @@ KFileDiskDevice::GetMediaStatus(status_t *mediaStatus)
 	return B_OK;
 }
 
-// GetGeometry
+
 status_t
-KFileDiskDevice::GetGeometry(device_geometry *geometry)
+KFileDiskDevice::GetGeometry(device_geometry* geometry)
 {
 	// check the file
 	struct stat st;
@@ -177,25 +183,25 @@ KFileDiskDevice::GetGeometry(device_geometry *geometry)
 	return B_OK;
 }
 
-// _RegisterDevice
+
 status_t
-KFileDiskDevice::_RegisterDevice(const char *file, const char *device)
+KFileDiskDevice::_RegisterDevice(const char* file, const char* device)
 {
 	return devfs_publish_file_device(device + 5, file);
 		// we need to remove the "/dev/" part from the path
 }
 
-// _UnregisterDevice
+
 status_t
-KFileDiskDevice::_UnregisterDevice(const char *_device)
+KFileDiskDevice::_UnregisterDevice(const char* _device)
 {
 	return devfs_unpublish_file_device(_device + 5);
 		// we need to remove the "/dev/" part from the path
 }
 
-// _GetDirectoryPath
+
 status_t
-KFileDiskDevice::_GetDirectoryPath(partition_id id, KPath *path)
+KFileDiskDevice::_GetDirectoryPath(partition_id id, KPath* path)
 {
 	if (path == NULL)
 		return B_BAD_VALUE;
@@ -206,7 +212,7 @@ KFileDiskDevice::_GetDirectoryPath(partition_id id, KPath *path)
 	status_t error = path->SetPath(kFileDevicesDir);
 	if (error == B_OK) {
 		char idBuffer[12];
-		sprintf(idBuffer, "%ld", id);
+		snprintf(idBuffer, sizeof(idBuffer), "%ld", id);
 		error = path->Append(idBuffer);
 	}
 	return error;

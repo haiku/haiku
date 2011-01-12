@@ -1,8 +1,11 @@
 /*
+ * Copyright 2006-2011, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2003-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
+
+#include "KDiskDevice.h"
 
 #include <errno.h>
 #include <fcntl.h>
@@ -13,10 +16,10 @@
 #include <Drivers.h>
 
 #include "ddm_userland_interface.h"
-#include "KDiskDevice.h"
 #include "KDiskDeviceUtils.h"
 #include "KPath.h"
 #include "UserDataWriter.h"
+
 
 // debugging
 //#define DBG(x)
@@ -46,7 +49,7 @@ KDiskDevice::~KDiskDevice()
 
 
 status_t
-KDiskDevice::SetTo(const char *path)
+KDiskDevice::SetTo(const char* path)
 {
 	// check initialization and parameter
 	status_t error = InitCheck();
@@ -156,7 +159,7 @@ KDiskDevice::PublishDevice()
 	return B_OK;
 }
 
-// UnpublishDevice
+
 status_t
 KDiskDevice::UnpublishDevice()
 {
@@ -165,7 +168,7 @@ KDiskDevice::UnpublishDevice()
 	return B_OK;
 }
 
-// RepublishDevice
+
 status_t
 KDiskDevice::RepublishDevice()
 {
@@ -174,42 +177,42 @@ KDiskDevice::RepublishDevice()
 	return B_OK;
 }
 
-// SetDeviceFlags
+
 void
 KDiskDevice::SetDeviceFlags(uint32 flags)
 {
 	fDeviceData.flags = flags;
 }
 
-// DeviceFlags
+
 uint32
 KDiskDevice::DeviceFlags() const
 {
 	return fDeviceData.flags;
 }
 
-// IsReadOnlyMedia
+
 bool
 KDiskDevice::IsReadOnlyMedia() const
 {
 	return fDeviceData.geometry.read_only;
 }
 
-// IsWriteOnce
+
 bool
 KDiskDevice::IsWriteOnce() const
 {
 	return fDeviceData.geometry.write_once;
 }
 
-// IsRemovable
+
 bool
 KDiskDevice::IsRemovable() const
 {
 	return fDeviceData.geometry.removable;
 }
 
-// HasMedia
+
 bool
 KDiskDevice::HasMedia() const
 {
@@ -254,15 +257,14 @@ KDiskDevice::UpdateGeometry()
 }
 
 
-// SetPath
 status_t
-KDiskDevice::SetPath(const char *path)
+KDiskDevice::SetPath(const char* path)
 {
 	return set_string(fDeviceData.path, path);
 }
 
-// Path
-const char *
+
+const char*
 KDiskDevice::Path() const
 {
 	return fDeviceData.path;
@@ -270,7 +272,7 @@ KDiskDevice::Path() const
 
 
 status_t
-KDiskDevice::GetFileName(char *buffer, size_t size) const
+KDiskDevice::GetFileName(char* buffer, size_t size) const
 {
 	if (strlcpy(buffer, "raw", size) >= size)
 		return B_NAME_TOO_LONG;
@@ -278,9 +280,8 @@ KDiskDevice::GetFileName(char *buffer, size_t size) const
 }
 
 
-// GetPath
 status_t
-KDiskDevice::GetPath(KPath *path) const
+KDiskDevice::GetPath(KPath* path) const
 {
 	if (!path || path->InitCheck() != B_OK)
 		return B_BAD_VALUE;
@@ -289,51 +290,50 @@ KDiskDevice::GetPath(KPath *path) const
 	return path->SetPath(fDeviceData.path);
 }
 
-// SetFD
+
 void
 KDiskDevice::SetFD(int fd)
 {
 	fFD = fd;
 }
 
-// FD
+
 int
 KDiskDevice::FD() const
 {
 	return fFD;
 }
 
-// DeviceData
-disk_device_data *
+
+disk_device_data*
 KDiskDevice::DeviceData()
 {
 	return &fDeviceData;
 }
 
-// DeviceData
-const disk_device_data *
+
+const disk_device_data*
 KDiskDevice::DeviceData() const
 {
 	return &fDeviceData;
 }
 
 
-// WriteUserData
 void
-KDiskDevice::WriteUserData(UserDataWriter &writer, user_partition_data *data)
+KDiskDevice::WriteUserData(UserDataWriter& writer, user_partition_data* data)
 {
 	return KPartition::WriteUserData(writer, data);
 }
 
-// WriteUserData
+
 void
-KDiskDevice::WriteUserData(UserDataWriter &writer)
+KDiskDevice::WriteUserData(UserDataWriter& writer)
 {
-	KPartition *partition = this;
-	user_disk_device_data *data
+	KPartition* partition = this;
+	user_disk_device_data* data
 		= writer.AllocateDeviceData(partition->CountChildren());
-	char *path = writer.PlaceString(Path());
-	if (data) {
+	char* path = writer.PlaceString(Path());
+	if (data != NULL) {
 		data->device_flags = DeviceFlags();
 		data->path = path;
 		writer.AddRelocationEntry(&data->path);
@@ -342,7 +342,7 @@ KDiskDevice::WriteUserData(UserDataWriter &writer)
 		partition->WriteUserData(writer, NULL);
 }
 
-// Dump
+
 void
 KDiskDevice::Dump(bool deep, int32 level)
 {
@@ -353,9 +353,9 @@ KDiskDevice::Dump(bool deep, int32 level)
 		KPartition::Dump(deep, 0);
 }
 
-// GetMediaStatus
+
 status_t
-KDiskDevice::GetMediaStatus(status_t *mediaStatus)
+KDiskDevice::GetMediaStatus(status_t* mediaStatus)
 {
 	status_t error = B_OK;
 	if (ioctl(fFD, B_GET_MEDIA_STATUS, mediaStatus) != 0)
@@ -376,16 +376,16 @@ KDiskDevice::GetMediaStatus(status_t *mediaStatus)
 	return error;
 }
 
-// GetGeometry
+
 status_t
-KDiskDevice::GetGeometry(device_geometry *geometry)
+KDiskDevice::GetGeometry(device_geometry* geometry)
 {
 	if (ioctl(fFD, B_GET_GEOMETRY, geometry) != 0)
 		return errno;
 	return B_OK;
 }
 
-// _InitPartitionData
+
 void
 KDiskDevice::_InitPartitionData()
 {
@@ -429,4 +429,3 @@ KDiskDevice::_UpdateDeviceFlags()
 	if (fDeviceData.geometry.write_once)
 		SetDeviceFlags(DeviceFlags() | B_DISK_DEVICE_WRITE_ONCE);
 }
-
