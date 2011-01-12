@@ -276,7 +276,7 @@ PrintersWindow::_BuildGUI()
 	fPrintTestPage = new BButton(BRect(5,60,5,60), "print_test_page",
 		B_TRANSLATE("Print test page"), new BMessage(kMsgPrintTestPage),
 		B_FOLLOW_RIGHT);
-	printersBox->AddChild(fPrintTestPage);
+	// printersBox->AddChild(fPrintTestPage);
 	fPrintTestPage->ResizeToPreferred();
 
 	if (fPrintTestPage->Bounds().Width() > maxWidth)
