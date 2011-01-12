@@ -1,5 +1,5 @@
 /*
- *	Copyright (c) 2008, Haiku, Inc. All rights reserved.
+ *	Copyright (c) 2008-2011, Haiku, Inc. All rights reserved.
  *	Distributed under the terms of the MIT license.
  *
  *	Authors:
@@ -7,6 +7,7 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Philippe Saint-Pierre <stpere@gmail.com>
  *		David Powell <david@mad.scientist.com>
+ *		Philippe Houdoin
  */
 
 //! Haiku boot splash image generator/converter
@@ -17,6 +18,8 @@
 #include <stdarg.h>
 #include <stdint.h>
 #include <stdlib.h>
+
+#include <zlib.h>
 
 #include <ColorQuantizer.h>
 
@@ -41,6 +44,18 @@ error(const char *s, ...)
 }
 
 
+static void
+new_line_if_required()
+{
+	sOffset++;
+	if (sOffset % 12 == 0)
+		fprintf(sOutput, "\n\t");
+}
+
+
+// #pragma mark -
+
+
 class AutoFileCloser {
 public:
 	AutoFileCloser(FILE* file)
@@ -53,6 +68,93 @@ public:
 private:
 	FILE* fFile;
 };
+
+
+// #pragma mark -
+
+
+class ZlibCompressor {
+public:
+	ZlibCompressor(FILE* output);
+
+	int Compress(const void* data, int dataSize, int flush = Z_NO_FLUSH);
+	int Finish();
+
+private:
+	FILE* 		fOutput;
+	z_stream 	fStream;
+};
+
+
+ZlibCompressor::ZlibCompressor(FILE* output)
+	: fOutput(output)
+{
+	// prepare zlib stream
+
+	fStream.next_in = NULL;
+	fStream.avail_in = 0;
+	fStream.total_in = 0;
+	fStream.next_out = NULL;
+	fStream.avail_out = 0;
+	fStream.total_out = 0;
+	fStream.msg = 0;
+	fStream.state = 0;
+	fStream.zalloc = Z_NULL;
+	fStream.zfree = Z_NULL;
+	fStream.opaque = Z_NULL;
+	fStream.data_type = 0;
+	fStream.adler = 0;
+	fStream.reserved = 0;
+
+	int zlibError = deflateInit(&fStream, Z_BEST_COMPRESSION);
+	if (zlibError != Z_OK)
+		return;	// TODO: translate zlibError
+}
+
+
+int
+ZlibCompressor::Compress(const void* data, int dataSize, int flush)
+{
+	uint8 buffer[1024];
+
+	fStream.next_in = (Bytef*)data;
+	fStream.avail_in = dataSize;
+
+	int zlibError = Z_OK;
+
+	do {
+		fStream.next_out = (Bytef*)buffer;
+		fStream.avail_out = sizeof(buffer);
+
+		zlibError = deflate(&fStream, flush);
+		if (zlibError != Z_OK &&
+			(flush == Z_FINISH && zlibError != Z_STREAM_END))
+			return zlibError;
+
+		unsigned int outputSize = sizeof(buffer) - fStream.avail_out;
+		for (unsigned int i = 0; i < outputSize; i++) {
+			fprintf(fOutput, "%d, ", buffer[i]);
+			new_line_if_required();
+		}
+
+		if (zlibError == Z_STREAM_END)
+			break;
+
+	} while (fStream.avail_in > 0 || flush == Z_FINISH);
+
+	return zlibError;
+}
+
+
+int
+ZlibCompressor::Finish()
+{
+	Compress(NULL, 0, Z_FINISH);
+	return deflateEnd(&fStream);
+}
+
+
+// #pragma mark -
 
 
 static void
@@ -126,119 +228,23 @@ read_png(const char* filename, int& width, int& height, png_bytep*& rowPtrs,
 
 
 static void
-new_line_if_required()
-{
-	sOffset++;
-	if (sOffset % 12 == 0)
-		fprintf(sOutput, "\n\t");
-}
-
-
-static void
 write_24bit_image(const char* baseName, int width, int height, png_bytep* rowPtrs)
 {
 	fprintf(sOutput, "static const uint16 %sWidth = %d;\n", baseName, width);
 	fprintf(sOutput, "static const uint16 %sHeight = %d;\n", baseName, height);
 	fprintf(sOutput, "#ifndef __BOOTSPLASH_KERNEL__\n");
 
-	int buffer[128];
-	// buffer[0] stores count, buffer[1..127] holds the actual values
-
 	fprintf(sOutput, "static uint8 %s24BitCompressedImage[] = {\n\t",
 		baseName);
 
-	for (int c = 0; c < 3; c++) {
-		// for each component i.e. R, G, B ...
-		// NOTE : I don't care much about performance at this step,
-		// decoding however...
-		int currentValue = rowPtrs[0][c];
-		int count = 0;
+	ZlibCompressor zlib(sOutput);
 
-		// When bufferActive == true, we store the number rather than writing
-		// them directly; we use this to store numbers until we find a pair..
-		bool bufferActive = false;
+	for (int y = 0; y < height; y++)
+		zlib.Compress(rowPtrs[y], width * 3);
 
-		sOffset = 0;
+	zlib.Finish();
 
-		for (int y = 0; y < height; y++) {
-			png_byte* row = rowPtrs[y];
-			for (int x = c; x < width * 3; x += 3) {
-				if (row[x] == currentValue) {
-					if (bufferActive) {
-						bufferActive = false;
-						count = 2;
-						if (buffer[0] > 1) {
-							fprintf(sOutput, "%d, ",
-								128 + buffer[0] - 1);
-							new_line_if_required();
-							for (int i = 1; i < buffer[0] ; i++) {
-								fprintf(sOutput, "%d, ",
-									buffer[i]);
-								new_line_if_required();
-							}
-						}
-					} else {
-						count++;
-						if (count == 127) {
-							fprintf(sOutput, "127, ");
-							new_line_if_required();
-							fprintf(sOutput, "%d, ", currentValue);
-							new_line_if_required();
-							count = 0;
-						}
-					}
-				} else {
-					if (bufferActive) {
-						if (buffer[0] == 127) {
-							// we don't have enough room,
-							// flush the buffer
-							fprintf(sOutput, "%d, ",
-								128 + buffer[0] - 1);
-							new_line_if_required();
-							for (int i = 1; i < buffer[0]; i++) {
-								fprintf(sOutput, "%d, ", buffer[i]);
-								new_line_if_required();
-							}
-							buffer[0] = 0;
-						}
-					} else {
-						if (count > 0) {
-							fprintf(sOutput, "%d, ", count);
-							new_line_if_required();
-							fprintf(sOutput, "%d, ", currentValue);
-							new_line_if_required();
-						}
-						buffer[0] = 0;
-						bufferActive = true;
-					}
-					buffer[0]++;
-					buffer[buffer[0]] = row[x];
-					currentValue = row[x];
-				}
-			}
-		}
-		if (bufferActive) {
-			// I could have written 127 + buffer[0],
-			// but I think this is more readable...
-			fprintf(sOutput, "%d, ", 128 + buffer[0] - 1);
-			new_line_if_required();
-			for (int i = 1; i < buffer[0] ; i++) {
-				fprintf(sOutput, "%d, ", buffer[i]);
-				new_line_if_required();
-			}
-		} else {
-			fprintf(sOutput, "%d, %d, ", count, currentValue);
-			new_line_if_required();
-		}
-		// we put a terminating zero for the next byte that indicates
-		// a "count", just to indicate the end of the channel
-		fprintf(sOutput, "0");
-		if (c != 2)
-			fprintf(sOutput, ",");
-
-		fprintf(sOutput, "\n\t");
-	}
-	fprintf(sOutput, "};\n");
+	fprintf(sOutput, "\n};\n");
 	fprintf(sOutput, "#endif\n\n");
 }
 
@@ -252,92 +258,15 @@ write_8bit_image(const char* baseName, int width, int height, unsigned char** ro
 	fprintf(sOutput, "static uint8 %s8BitCompressedImage[] = {\n\t",
 		baseName);
 
-	// NOTE: I don't care much about performance at this step,
-	// decoding however...
-	unsigned char currentValue = rowPtrs[0][0];
-	int count = 0;
 
-	// When bufferActive == true, we store the number rather than writing
-	// them directly; we use this to store numbers until we find a pair..
-	bool bufferActive = false;
+	ZlibCompressor zlib(sOutput);
 
-	sOffset = 0;
-	for (int y = 0; y < height; y++) {
-		unsigned char* row = rowPtrs[y];
-		for (int x = 0; x < width; x++) {
-			if (row[x] == currentValue) {
-				if (bufferActive) {
-					bufferActive = false;
-					count = 2;
-					if (buffer[0] > 1) {
-						fprintf(sOutput, "%d, ",
-							128 + buffer[0] - 1);
-						new_line_if_required();
-						for (int i = 1; i < buffer[0] ; i++) {
-							fprintf(sOutput, "%d, ",
-								buffer[i]);
-							new_line_if_required();
-						}
-					}
-				} else {
-					count++;
-					if (count == 127) {
-						fprintf(sOutput, "127, ");
-						new_line_if_required();
-						fprintf(sOutput, "%d, ", currentValue);
-						new_line_if_required();
-						count = 0;
-					}
-				}
-			} else {
-				if (bufferActive) {
-					if (buffer[0] == 127) {
-						// we don't have enough room,
-						// flush the buffer
-						fprintf(sOutput, "%d, ",
-							128 + buffer[0] - 1);
-						new_line_if_required();
-						for (int i = 1; i < buffer[0]; i++) {
-							fprintf(sOutput, "%d, ", buffer[i]);
-							new_line_if_required();
-						}
-						buffer[0] = 0;
-					}
-				} else {
-					if (count > 0) {
-						fprintf(sOutput, "%d, ", count);
-						new_line_if_required();
-						fprintf(sOutput, "%d, ", currentValue);
-						new_line_if_required();
-					}
-					buffer[0] = 0;
-					bufferActive = true;
-				}
-				buffer[0]++;
-				buffer[buffer[0]] = row[x];
-				currentValue = row[x];
-			}
-		}
-	}
-	if (bufferActive) {
-		// I could have written 127 + buffer[0],
-		// but I think this is more readable...
-		fprintf(sOutput, "%d, ", 128 + buffer[0] - 1);
-		new_line_if_required();
-		for (int i = 1; i < buffer[0] ; i++) {
-			fprintf(sOutput, "%d, ", buffer[i]);
-			new_line_if_required();
-		}
-	} else {
-		fprintf(sOutput, "%d, %d, ", count, currentValue);
-		new_line_if_required();
-	}
-	// we put a terminating zero for the next byte that indicates
-	// a "count", to indicate the end
-	fprintf(sOutput, "0");
+	for (int y = 0; y < height; y++)
+		zlib.Compress(rowPtrs[y], width);
 
-	fprintf(sOutput, "\n\t");
-	fprintf(sOutput, "};\n\n");
+	zlib.Finish();
+
+	fprintf(sOutput, "\n};\n\n");
 }
 
 
