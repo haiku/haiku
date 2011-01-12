@@ -352,11 +352,11 @@ Volume::Mount(const char* parameterString)
 	const char* domain = NULL;
 	void* parameterHandle = parse_driver_settings_string(parameterString);
 	if (parameterHandle != NULL) {
-		domain = get_driver_parameter(parameterHandle, "domain", NULL, NULL);
+		domain = get_driver_parameter(parameterHandle, "packages", NULL, NULL);
 		delete_driver_settings(parameterHandle);
 	}
 	if (domain == NULL || domain[0] == '\0') {
-		ERROR("need package folder ('domain' parameter)!\n");
+		ERROR("need package folder ('packages' parameter)!\n");
 		RETURN_ERROR(B_BAD_VALUE);
 	}
 
