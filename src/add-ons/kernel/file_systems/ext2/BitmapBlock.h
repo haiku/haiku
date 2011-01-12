@@ -40,7 +40,10 @@ public:
 			uint32			NumBits() const { return fNumBits; }
 
 private:
+			bool			_Check(uint32 start, uint32 length, bool marked);
 			void			_FindNext(uint32& pos, bool marked);
+			bool			_Update(uint32 start, uint32 length, bool mark,
+								bool force);
 
 			uint32*			fData;
 			const uint32*	fReadOnlyData;
@@ -48,5 +51,48 @@ private:
 			uint32			fNumBits;
 			uint32			fMaxIndex;
 };
+
+
+inline bool
+BitmapBlock::CheckUnmarked(uint32 start, uint32 length)
+{
+	return _Check(start, length, false);
+}
+
+
+inline bool
+BitmapBlock::CheckMarked(uint32 start, uint32 length)
+{
+	return _Check(start, length, true);
+}
+
+
+inline bool
+BitmapBlock::Mark(uint32 start, uint32 length, bool force)
+{
+	return _Update(start, length, true, force);
+}
+
+
+inline bool
+BitmapBlock::Unmark(uint32 start, uint32 length, bool force)
+{
+	return _Update(start, length, false, force);
+}
+
+
+inline void
+BitmapBlock::FindNextMarked(uint32& pos)
+{
+	_FindNext(pos, true);
+}
+
+
+inline void
+BitmapBlock::FindNextUnmarked(uint32& pos)
+{
+	_FindNext(pos, false);
+}
+
 
 #endif	// BITMAPBLOCK_H
