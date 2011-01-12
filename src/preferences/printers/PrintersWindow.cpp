@@ -172,7 +172,7 @@ PrintersWindow::PrintTestPage(PrinterItem* printer)
 	printf("print job settings:\n");
 	settings->PrintToStream();
 
-	BRect pageRect = job.PrintableRect();
+	// BRect pageRect = job.PrintableRect();
 
 	job.BeginJob();
 
