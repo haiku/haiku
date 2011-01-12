@@ -25,26 +25,31 @@ struct SymbolLookupInfo {
 	uint32					hash;
 	uint32					flags;
 	const elf_version_info*	version;
+	Elf32_Sym*				requestingSymbol;
 
 	SymbolLookupInfo(const char* name, int32 type, uint32 hash,
-		const elf_version_info* version = NULL, uint32 flags = 0)
+		const elf_version_info* version = NULL, uint32 flags = 0,
+		Elf32_Sym* requestingSymbol = NULL)
 		:
 		name(name),
 		type(type),
 		hash(hash),
 		flags(flags),
-		version(version)
+		version(version),
+		requestingSymbol(requestingSymbol)
 	{
 	}
 
 	SymbolLookupInfo(const char* name, int32 type,
-		const elf_version_info* version = NULL, uint32 flags = 0)
+		const elf_version_info* version = NULL, uint32 flags = 0,
+		Elf32_Sym* requestingSymbol = NULL)
 		:
 		name(name),
 		type(type),
 		hash(elf_hash(name)),
 		flags(flags),
-		version(version)
+		version(version),
+		requestingSymbol(requestingSymbol)
 	{
 	}
 };

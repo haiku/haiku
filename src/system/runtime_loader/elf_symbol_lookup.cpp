@@ -109,7 +109,7 @@ find_symbol(image_t* image, const SymbolLookupInfo& lookupInfo)
 		Elf32_Sym* symbol = &image->syms[i];
 
 		if (symbol->st_shndx != SHN_UNDEF
-			&& ((ELF32_ST_BIND(symbol->st_info)== STB_GLOBAL)
+			&& ((ELF32_ST_BIND(symbol->st_info) == STB_GLOBAL)
 				|| (ELF32_ST_BIND(symbol->st_info) == STB_WEAK))
 			&& !strcmp(SYMNAME(image, symbol), lookupInfo.name)) {
 
@@ -300,13 +300,25 @@ find_undefined_symbol_beos(image_t* rootImage, image_t* image,
 {
 	// BeOS style symbol resolution: It is sufficient to check the image itself
 	// and its direct dependencies. The linker would have complained, if the
-	// symbol wasn't there.
+	// symbol wasn't there. First we check whether the requesting symbol is
+	// defined already -- then we can simply return it, since, due to symbolic
+	// linking, that's the one we'd find anyway.
+	if (Elf32_Sym* symbol = lookupInfo.requestingSymbol) {
+		if (symbol->st_shndx != SHN_UNDEF
+			&& ((ELF32_ST_BIND(symbol->st_info) == STB_GLOBAL)
+				|| (ELF32_ST_BIND(symbol->st_info) == STB_WEAK))) {
+			return symbol;
+		}
+	}
+
+	// lookup in image
 	Elf32_Sym* symbol = find_symbol(image, lookupInfo);
 	if (symbol != NULL) {
 		*foundInImage = image;
 		return symbol;
 	}
 
+	// lookup in dependencies
 	for (uint32 i = 0; i < image->num_needed; i++) {
 		if (image->needed[i]->dynamic_ptr) {
 			symbol = find_symbol(image->needed[i], lookupInfo);
@@ -479,7 +491,7 @@ resolve_symbol(image_t* rootImage, image_t* image, struct Elf32_Sym* sym,
 
 		// search the symbol
 		sharedSym = rootImage->find_undefined_symbol(rootImage, image,
-			SymbolLookupInfo(symName, type, versionInfo), &sharedImage);
+			SymbolLookupInfo(symName, type, versionInfo, 0, sym), &sharedImage);
 	}
 
 	enum {
