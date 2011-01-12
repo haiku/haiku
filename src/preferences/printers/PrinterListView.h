@@ -42,26 +42,26 @@ public:
 			bool				QuitRequested();
 
 			void				BuildPrinterList();
-			PrinterItem			*SelectedItem() const;
-			void				UpdateItem(PrinterItem *item);
+			PrinterItem*		SelectedItem() const;
+			void				UpdateItem(PrinterItem* item);
 
-			PrinterItem 		*ActivePrinter() const;
+			PrinterItem*		ActivePrinter() const;
 			void 				SetActivePrinter(PrinterItem* item);
 
 private:
 		typedef BListView Inherited;
 
-			void 				_AddPrinter(BDirectory &printer, bool calculateLayout);
+			void 				_AddPrinter(BDirectory& printer, bool calculateLayout);
 			void				_LayoutPrinterItems();
-			PrinterItem			*_FindItem(node_ref* node) const;
+			PrinterItem*		_FindItem(node_ref* node) const;
 
-			void				EntryCreated(node_ref *node,
-									entry_ref *entry);
-			void				EntryRemoved(node_ref *node);
-			void				AttributeChanged(node_ref *node);
+			void				EntryCreated(node_ref* node,
+									entry_ref* entry);
+			void				EntryRemoved(node_ref* node);
+			void				AttributeChanged(node_ref* node);
 
-			FolderWatcher 		*fFolder;
-			PrinterItem 		*fActivePrinter;
+			FolderWatcher*		fFolder;
+			PrinterItem*		fActivePrinter;
 			PrinterListLayoutData	fLayoutData;
 };
 
@@ -76,25 +76,29 @@ public:
 			void				GetColumnWidth(BView* view, float& leftColumn,
 									float& rightColumn);
 
-			void				DrawItem(BView *owner, BRect bounds,
+			void				DrawItem(BView* owner, BRect bounds,
 									bool complete);
-			void				Update(BView *owner, const BFont *font);
+			void				Update(BView* owner, const BFont* font);
 
-			bool				Remove(BListView *view);
+			bool				Remove(BListView* view);
 			bool				IsActivePrinter() const;
 			bool				HasPendingJobs() const;
 
-			const char 			*Name() const { return fName.String(); }
+			const char* 		Name() const { return fName.String(); }
+			const char*			Driver() const { return fDriverName.String(); }
+			const char*			Transport() const { return fTransport.String(); }
+			const char*			TransportAddress() const
+									{ return fTransportAddress.String(); }
 
-			SpoolFolder 		*Folder() const;
-			BDirectory 			*Node();
+			SpoolFolder* 		Folder() const;
+			BDirectory* 		Node();
 			void				UpdatePendingJobs();
 
 private:
-			void				_GetStringProperty(const char *propName,
-									BString &outString);
+			void				_GetStringProperty(const char* propName,
+									BString& outString);
 
-			SpoolFolder			*fFolder;
+			SpoolFolder*		fFolder;
 			BDirectory			fNode;
 			BString				fComments;
 			BString				fTransport;
@@ -104,8 +108,8 @@ private:
 			BString				fPendingJobs;
 			PrinterListLayoutData& fLayoutData;
 
-	static	BBitmap 			*sIcon;
-	static	BBitmap 			*sSelectedIcon;
+	static	BBitmap*			sIcon;
+	static	BBitmap*			sSelectedIcon;
 };
 
 #endif // _PRINTERS_LISTVIEW_H

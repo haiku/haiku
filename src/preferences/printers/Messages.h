@@ -21,5 +21,6 @@ const uint32 kMsgPrinterSelected    = 'PSel';
 const uint32 kMsgCancelJob          = 'CncJ';
 const uint32 kMsgRestartJob         = 'RstJ';
 const uint32 kMsgJobSelected        = 'JSel';
+const uint32 kMsgPrintTestPage		= 'PtPg';
 
 #endif // _MESSAGES_H

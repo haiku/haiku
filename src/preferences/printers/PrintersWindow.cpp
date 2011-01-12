@@ -1,13 +1,16 @@
 /*
- * Copyright 2001-2010, Haiku.
+ * Copyright 2001-2011, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Michael Pfeiffer
+ *		Philippe Houdoin
  */
 
 
 #include "PrintersWindow.h"
+
+#include <stdio.h>
 
 // BeOS API
 #include <Application.h>
@@ -16,6 +19,7 @@
 #include <FindDirectory.h>
 #include <ListView.h>
 #include <Locale.h>
+#include <PrintJob.h>
 #include <ScrollView.h>
 
 #include "pr_server.h"
@@ -38,7 +42,7 @@ PrintersWindow::PrintersWindow(BRect frame)
 	fSelectedPrinter(NULL),
 	fAddingPrinter(false)
 {
-	BuildGUI();
+	_BuildGUI();
 }
 
 
@@ -74,11 +78,11 @@ PrintersWindow::MessageReceived(BMessage* msg)
 				fSelectedPrinter = NULL;
 				fJobListView->SetSpoolFolder(NULL);
 			}
-			UpdateJobButtons();
-			UpdatePrinterButtons();
+			_UpdateJobButtons();
+			_UpdatePrinterButtons();
 			break;
 		}
-		
+
 		case kMsgAddPrinter:
 			if (!fAddingPrinter) {
 				fAddingPrinter = true;
@@ -97,7 +101,7 @@ PrintersWindow::MessageReceived(BMessage* msg)
 				fSelectedPrinter->Remove(fPrinterListView);
 			break;
 		}
-		
+
 		case kMsgMakeDefaultPrinter:
 		{
 			PrinterItem* printer = fPrinterListView->SelectedItem();
@@ -109,8 +113,16 @@ PrintersWindow::MessageReceived(BMessage* msg)
 				setActivePrinter.AddSpecifier("ActivePrinter");
 				setActivePrinter.AddString("data", printer->Name());
 				msgr.SendMessage(&setActivePrinter);
-				UpdatePrinterButtons();
+				_UpdatePrinterButtons();
 			}
+			break;
+		}
+
+		case kMsgPrintTestPage:
+		{
+			fSelectedPrinter = fPrinterListView->SelectedItem();
+			if (fSelectedPrinter)
+				PrintTestPage(fSelectedPrinter);
 			break;
 		}
 
@@ -123,7 +135,7 @@ PrintersWindow::MessageReceived(BMessage* msg)
 			break;
 
 		case kMsgJobSelected:
-			UpdateJobButtons();
+			_UpdateJobButtons();
 			break;
 
 		case B_PRINTER_CHANGED:
@@ -151,7 +163,66 @@ PrintersWindow::MessageReceived(BMessage* msg)
 
 
 void
-PrintersWindow::BuildGUI()
+PrintersWindow::PrintTestPage(PrinterItem* printer)
+{
+	BPrintJob job("TestPage");
+	job.ConfigPage();
+	BMessage* settings = job.Settings();
+
+	printf("print job settings:\n");
+	settings->PrintToStream();
+
+	BRect pageRect = job.PrintableRect();
+
+	job.BeginJob();
+
+	// TestPageView testPage(pageRect, printer);
+	// job.DrawView(testPage, pageRect, BPoint(0.0, 0.0));
+	job.SpoolPage();
+	if (!job.CanContinue())
+		return;
+
+	job.CommitJob();
+}
+
+
+void
+PrintersWindow::AddJob(SpoolFolder* folder, Job* job)
+{
+	if (_IsSelected(folder->Item()))
+		fJobListView->AddJob(job);
+	fPrinterListView->UpdateItem(folder->Item());
+	_UpdatePrinterButtons();
+}
+
+
+void
+PrintersWindow::RemoveJob(SpoolFolder* folder, Job* job)
+{
+	if (_IsSelected(folder->Item()))
+		fJobListView->RemoveJob(job);
+	fPrinterListView->UpdateItem(folder->Item());
+	_UpdatePrinterButtons();
+}
+
+
+void
+PrintersWindow::UpdateJob(SpoolFolder* folder, Job* job)
+{
+	if (_IsSelected(folder->Item())) {
+		fJobListView->UpdateJob(job);
+		_UpdateJobButtons();
+	}
+	fPrinterListView->UpdateItem(folder->Item());
+	_UpdatePrinterButtons();
+}
+
+
+// #pragma mark -
+
+
+void
+PrintersWindow::_BuildGUI()
 {
 	const float boxInset = 10.0;
 	BRect r(Bounds());
@@ -163,7 +234,7 @@ PrintersWindow::BuildGUI()
 	AddChild(backdrop);
 
 // ------------------------ Next, build the printers overview box
-	BBox* printersBox = new BBox(BRect(boxInset, boxInset, 
+	BBox* printersBox = new BBox(BRect(boxInset, boxInset,
 		r.Width() - boxInset, (r.Height()/2) - (boxInset/2)),
 		"printersBox", B_FOLLOW_ALL);
 	printersBox->SetFont(be_bold_font);
@@ -201,6 +272,17 @@ PrintersWindow::BuildGUI()
 	if (fMakeDefault->Bounds().Width() > maxWidth)
 		maxWidth = fMakeDefault->Bounds().Width();
 
+		// Print Test Page button
+	fPrintTestPage = new BButton(BRect(5,60,5,60), "print_test_page",
+		B_TRANSLATE("Print test page"), new BMessage(kMsgPrintTestPage),
+		B_FOLLOW_RIGHT);
+	printersBox->AddChild(fPrintTestPage);
+	fPrintTestPage->ResizeToPreferred();
+
+	if (fPrintTestPage->Bounds().Width() > maxWidth)
+		maxWidth = fPrintTestPage->Bounds().Width();
+
+
 		// Resize all buttons to maximum width and align them to the right
 	float xPos = printersBox->Bounds().Width() - boxInset - maxWidth;
 	addButton->MoveTo(xPos, boxInset + 8);
@@ -214,12 +296,19 @@ PrintersWindow::BuildGUI()
 		boxInset + fRemove->Bounds().Height() + boxInset + 8);
 	fMakeDefault->ResizeTo(maxWidth, fMakeDefault->Bounds().Height());
 
+	fPrintTestPage->MoveTo(xPos, boxInset + addButton->Bounds().Height() +
+		boxInset + fRemove->Bounds().Height() +
+		boxInset + fMakeDefault->Bounds().Height() + boxInset + 8);
+	fPrintTestPage->ResizeTo(maxWidth, fPrintTestPage->Bounds().Height());
+
+
 		// Disable all selection-based buttons
 	fRemove->SetEnabled(false);
 	fMakeDefault->SetEnabled(false);
+	fPrintTestPage->SetEnabled(false);
 
 		// Create listview with scroller
-	BRect listBounds(boxInset, boxInset + 8, 
+	BRect listBounds(boxInset, boxInset + 8,
 		fMakeDefault->Frame().left - boxInset - B_V_SCROLL_BAR_WIDTH,
 		printersBox->Bounds().Height()- boxInset - 3);
 	fPrinterListView = new PrinterListView(listBounds);
@@ -229,7 +318,7 @@ PrintersWindow::BuildGUI()
 
 // ------------------------ Lastly, build the jobs overview box
 	fJobsBox = new BBox(BRect(boxInset, r.Height() / 2 + boxInset / 2,
-		Bounds().Width() - 10, Bounds().Height() - boxInset), "jobsBox", 
+		Bounds().Width() - 10, Bounds().Height() - boxInset), "jobsBox",
 		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM);
 	fJobsBox->SetFont(be_bold_font);
 	fJobsBox->SetLabel(B_TRANSLATE("Print jobs: No printer selected"));
@@ -270,7 +359,7 @@ PrintersWindow::BuildGUI()
 	restartButton->SetEnabled(false);
 
 		// Create listview with scroller
-	listBounds = BRect(boxInset, boxInset + 8, 
+	listBounds = BRect(boxInset, boxInset + 8,
 		cancelButton->Frame().left - boxInset - B_V_SCROLL_BAR_WIDTH,
 		fJobsBox->Bounds().Height() - boxInset - 3);
 	fJobListView = new JobListView(listBounds);
@@ -289,55 +378,24 @@ PrintersWindow::BuildGUI()
 
 
 bool
-PrintersWindow::IsSelected(PrinterItem* printer)
+PrintersWindow::_IsSelected(PrinterItem* printer)
 {
 	return fSelectedPrinter && fSelectedPrinter == printer;
 }
 
 
 void
-PrintersWindow::AddJob(SpoolFolder* folder, Job* job)
-{
-	if (IsSelected(folder->Item()))
-		fJobListView->AddJob(job);
-	fPrinterListView->UpdateItem(folder->Item());
-	UpdatePrinterButtons();
-}
-
-
-void
-PrintersWindow::RemoveJob(SpoolFolder* folder, Job* job)
-{
-	if (IsSelected(folder->Item()))
-		fJobListView->RemoveJob(job);
-	fPrinterListView->UpdateItem(folder->Item());
-	UpdatePrinterButtons();
-}
-
-
-void
-PrintersWindow::UpdateJob(SpoolFolder* folder, Job* job)
-{
-	if (IsSelected(folder->Item())) {
-		fJobListView->UpdateJob(job);
-		UpdateJobButtons();
-	}
-	fPrinterListView->UpdateItem(folder->Item());
-	UpdatePrinterButtons();
-}
-
-
-void
-PrintersWindow::UpdatePrinterButtons()
+PrintersWindow::_UpdatePrinterButtons()
 {
 	PrinterItem* item = fPrinterListView->SelectedItem();
 	fRemove->SetEnabled(item && !item->HasPendingJobs());
 	fMakeDefault->SetEnabled(item && !item->IsActivePrinter());
+	fPrintTestPage->SetEnabled(item);
 }
 
 
 void
-PrintersWindow::UpdateJobButtons()
+PrintersWindow::_UpdateJobButtons()
 {
 	JobItem* item = fJobListView->SelectedItem();
 	if (item != NULL) {
@@ -349,3 +407,5 @@ PrintersWindow::UpdateJobButtons()
 		fRestart->SetEnabled(false);
 	}
 }
+
+
