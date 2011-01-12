@@ -4,12 +4,13 @@ SubDirC++Flags -D_BOOT_MODE -fno-rtti ;
 
 UsePrivateHeaders [ FDirName graphics common ] ;
 
+SubDirSysHdrs $(HAIKU_TOP) headers libs zlib ;
+
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;
 
 local genericPlatformSources =
 	text_menu.cpp
 	video_blit.cpp
-	video_rle.cpp
 	video_splash.cpp
 ;
 

@@ -2,6 +2,8 @@ SubDir HAIKU_TOP src system boot platform atari_m68k ;
 
 SubDirHdrs $(HAIKU_TOP) headers private kernel boot platform $(TARGET_BOOT_PLATFORM) ;
 
+SubDirSysHdrs $(HAIKU_TOP) headers libs zlib ;
+
 UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
 UsePrivateHeaders [ FDirName kernel platform $(TARGET_BOOT_PLATFORM) ] ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
@@ -23,7 +25,6 @@ local genericPlatformSources =
 	text_menu.cpp
 	video_blit.cpp
 	video_splash.cpp
-	video_rle.cpp
 ;
 
 
