@@ -15,6 +15,7 @@
 #include <new>
 
 #include <AppDefs.h>
+#include <driver_settings.h>
 #include <KernelExport.h>
 #include <NodeMonitor.h>
 
@@ -82,7 +83,6 @@ struct Volume::AddPackageDomainJob : Job {
 	virtual void Do()
 	{
 		fVolume->_AddPackageDomain(fDomain, true);
-		fDomain = NULL;
 	}
 
 private:
@@ -336,7 +336,7 @@ Volume::~Volume()
 
 
 status_t
-Volume::Mount()
+Volume::Mount(const char* parameterString)
 {
 	// init the node table
 	status_t error = fNodes.Init();
@@ -349,9 +349,19 @@ Volume::Mount()
 		RETURN_ERROR(B_NO_MEMORY);
 	fNodes.Insert(fRootDirectory);
 
-	// create default package domains
-// TODO: Get them from the mount parameters instead!
-	error = _AddInitialPackageDomain("/boot/common/packages");
+	const char* domain = NULL;
+	void* parameterHandle = parse_driver_settings_string(parameterString);
+	if (parameterHandle != NULL) {
+		domain = get_driver_parameter(parameterHandle, "domain", NULL, NULL);
+		delete_driver_settings(parameterHandle);
+	}
+	if (domain == NULL || domain[0] == '\0') {
+		ERROR("need package folder ('domain' parameter)!\n");
+		RETURN_ERROR(B_BAD_VALUE);
+	}
+
+	// create default package domain
+	error = _AddInitialPackageDomain(domain);
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
@@ -554,7 +564,11 @@ Volume::_AddPackageDomain(PackageDomain* domain, bool notify)
 			Package* package = it.Next();) {
 		error = _AddPackageContent(package, notify);
 		if (error != B_OK) {
-// TODO: Remove the already added packages!
+			for (it.Rewind(); Package* activePackage = it.Next();) {
+				if (activePackage == package)
+					break;
+				_RemovePackageContent(activePackage, NULL, notify);
+			}
 			return error;
 		}
 	}

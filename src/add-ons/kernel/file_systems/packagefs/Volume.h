@@ -36,7 +36,7 @@ public:
 			dev_t				ID() const			{ return fFSVolume->id; }
 			Directory*			RootDirectory() const { return fRootDirectory; }
 
-			status_t			Mount();
+			status_t			Mount(const char* parameterString);
 			void				Unmount();
 
 			Node*				FindNode(ino_t nodeID) const
