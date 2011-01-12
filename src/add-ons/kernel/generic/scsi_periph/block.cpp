@@ -1,9 +1,10 @@
 /*
- * Copyright 2004-2008, Haiku, Inc. All RightsReserved.
+ * Copyright 2004-2011, Haiku, Inc. All RightsReserved.
  * Copyright 2002-2003, Thomas Kurschel. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
  */
+
 
 //!	Handling of block device (currently, only a capacity check is provided)
 
@@ -51,13 +52,13 @@ periph_check_capacity(scsi_periph_device_info *device, scsi_ccb *request)
 		return B_DEV_MEDIA_CHANGED;
 	}
 
-	ACQUIRE_BEN(&device->mutex);
+	mutex_lock(&device->mutex);
 
 	if (res == B_OK && request->data_resid == 0) {
 		capacity = B_BENDIAN_TO_HOST_INT32(capacityResult.lba);
 
 		if (capacity == UINT_MAX) {
-			RELEASE_BEN(&device->mutex);
+			mutex_unlock(&device->mutex);
 			
 			scsi_cmd_read_capacity_long *cmd
 				= (scsi_cmd_read_capacity_long *)request->cdb;
@@ -73,7 +74,7 @@ periph_check_capacity(scsi_periph_device_info *device, scsi_ccb *request)
 
 			res = periph_safe_exec(device, request);
 
-			ACQUIRE_BEN(&device->mutex);
+			mutex_lock(&device->mutex);
 
 			if (res == B_OK && request->data_resid == 0) {
 				capacity = B_BENDIAN_TO_HOST_INT64(capacityLongResult.lba);
@@ -105,7 +106,7 @@ periph_check_capacity(scsi_periph_device_info *device, scsi_ccb *request)
 		return ERR_DEV_GENERAL;
 	}*/
 
-	RELEASE_BEN(&device->mutex);
+	mutex_unlock(&device->mutex);
 
 	SHOW_FLOW(3, "done (%s)", strerror(res));
 

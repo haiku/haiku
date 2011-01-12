@@ -1,20 +1,17 @@
 /*
- * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ * Copyright 2011, Haiku, Inc. All RightsReserved.
+ * Copyright 2002-03, Thomas Kurschel. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
-/*
-	Part of Open SCSI Peripheral Driver
 
-	Error handling
-*/
+//!	Error handling
 
 
 #include "scsi_periph_int.h"
 
 
-/** decode sense data and generate error code */
-
+/*! Decode sense data and generate error code. */
 static
 err_res check_sense(scsi_periph_device_info *device, scsi_ccb *request)
 {
@@ -86,9 +83,9 @@ err_res check_sense(scsi_periph_device_info *device, scsi_ccb *request)
 
 				case SCSIS_ASC_REMOVAL_REQUESTED:
 					SHOW_INFO0(2, "Removal requested");
-					ACQUIRE_BEN(&device->mutex);
+					mutex_lock(&device->mutex);
 					device->removal_requested = true;
-					RELEASE_BEN(&device->mutex);
+					mutex_unlock(&device->mutex);
 
 					return MK_ERROR(err_act_retry, B_DEV_MEDIA_CHANGE_REQUESTED);
 
@@ -207,8 +204,7 @@ err_res check_sense(scsi_periph_device_info *device, scsi_ccb *request)
 }
 
 
-/** check scsi status, using sense if available */
-
+/*!	Check scsi status, using sense if available. */
 static err_res
 check_scsi_status(scsi_periph_device_info *device, scsi_ccb *request)
 {
@@ -238,12 +234,11 @@ check_scsi_status(scsi_periph_device_info *device, scsi_ccb *request)
 }
 
 
-/**	check result of request
+/*!	Check result of request
  *	1. check SCSI subsystem problems
  *	2. if request hit device, check SCSI status
  *	3. if request got executed, check sense
  */
-
 err_res
 periph_check_error(scsi_periph_device_info *device, scsi_ccb *request)
 {

@@ -1,9 +1,10 @@
 /*
- * Copyright 2004-2008, Haiku, Inc. All RightsReserved.
+ * Copyright 2004-2011, Haiku, Inc. All RightsReserved.
  * Copyright 2002/03, Thomas Kurschel. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
  */
+
 
 //!	Basic handling of device.
 
@@ -52,26 +53,21 @@ periph_compose_device_name(device_node *node, const char *prefix)
 
 
 status_t
-periph_register_device(periph_device_cookie periph_device, scsi_periph_callbacks *callbacks,
-	scsi_device scsi_device, scsi_device_interface *scsi, device_node *node,
+periph_register_device(periph_device_cookie periph_device,
+	scsi_periph_callbacks *callbacks, scsi_device scsi_device,
+	scsi_device_interface *scsi, device_node *node,
 	bool removable, int preferredCcbSize, scsi_periph_device *driver)
 {
-	scsi_periph_device_info *device;
-	status_t res;
+	SHOW_FLOW0(3, "");
 
-	SHOW_FLOW0( 3, "" );
-
-	device = (scsi_periph_device_info *)malloc(sizeof(*device));
+	scsi_periph_device_info *device
+		= (scsi_periph_device_info *)malloc(sizeof(*device));
 	if (device == NULL)
 		return B_NO_MEMORY;
 
 	memset(device, 0, sizeof(*device));
 
-	if (INIT_BEN(&device->mutex, "SCSI_PERIPH") != B_OK) {
-		res = B_NO_MEMORY;
-		goto err1;
-	}
-
+	mutex_init(&device->mutex, "SCSI_PERIPH");
 	device->scsi_device = scsi_device;
 	device->scsi = scsi;
 	device->periph_device = periph_device;
@@ -87,9 +83,10 @@ periph_register_device(periph_device_cookie periph_device, scsi_periph_callbacks
 	device->rw10_enabled = true;
 
 	// launch sync daemon
-	res = register_kernel_daemon(periph_sync_queue_daemon, device, 60*10);
-	if (res != B_OK)
-		goto err2;
+	status_t status = register_kernel_daemon(periph_sync_queue_daemon, device,
+		60*10);
+	if (status != B_OK)
+		goto err1;
 
 	*driver = device;
 
@@ -97,11 +94,10 @@ periph_register_device(periph_device_cookie periph_device, scsi_periph_callbacks
 
 	return B_OK;
 
-err2:
-	DELETE_BEN(&device->mutex);
 err1:
+	mutex_destroy(&device->mutex);
 	free(device);
-	return res;
+	return status;
 }
 
 

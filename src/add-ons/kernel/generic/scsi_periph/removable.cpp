@@ -1,9 +1,10 @@
 /*
- * Copyright 2004-2007, Haiku, Inc. All RightsReserved.
+ * Copyright 2004-2011, Haiku, Inc. All RightsReserved.
  * Copyright 2002-2003, Thomas Kurschel. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
  */
+
 
 //!	Handling of removable media.
 
@@ -70,14 +71,14 @@ periph_media_changed_public(scsi_periph_device_info *device)
 {
 	scsi_periph_handle_info *handle;
 
-	ACQUIRE_BEN(&device->mutex);
+	mutex_lock(&device->mutex);
 
 	// when medium has changed, tell all handles	
 	// (this must be atomic for each handle!)
 	for (handle = device->handles; handle; handle = handle->next)
 		handle->pending_error = B_DEV_MEDIA_CHANGED;
 
-	RELEASE_BEN(&device->mutex);
+	mutex_unlock(&device->mutex);
 }
 
 
@@ -151,7 +152,7 @@ periph_get_media_status(scsi_periph_handle_info *handle)
 	err_res res;
 	status_t err;
 
-	ACQUIRE_BEN(&device->mutex);
+	mutex_lock(&device->mutex);
 
 	// removal requests are returned to exactly one handle
 	// (no real problem, as noone check medias status "by mistake")	
@@ -170,7 +171,7 @@ periph_get_media_status(scsi_periph_handle_info *handle)
 
 	SHOW_FLOW0( 3, "" );
 
-	RELEASE_BEN(&device->mutex);
+	mutex_unlock(&device->mutex);
 
 	// finally, ask the device itself
 		
@@ -187,7 +188,7 @@ periph_get_media_status(scsi_periph_handle_info *handle)
 	return res.error_code;	
 
 err:	
-	RELEASE_BEN(&device->mutex);
+	mutex_unlock(&device->mutex);
 	return err;
 }
 

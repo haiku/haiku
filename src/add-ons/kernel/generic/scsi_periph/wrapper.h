@@ -1,17 +1,10 @@
 #ifndef _WRAPPER_H
 #define _WRAPPER_H
 
+
 #include <KernelExport.h>
 #include <lock.h>
 
-
-// benaphores
-
-#define INIT_BEN(x, prefix)	(mutex_init_etc(x, prefix, MUTEX_FLAG_CLONE_NAME), \
-								B_OK)
-#define	DELETE_BEN(x)		mutex_destroy(x)
-#define ACQUIRE_BEN(x)		mutex_lock(x)
-#define RELEASE_BEN(x)		mutex_unlock(x)
 
 // debug output
 
@@ -87,4 +80,5 @@
 		dprintf( "%s%s: "format"\n", FUNC_NAME); DEBUG_WAIT_ERROR \
 	}} while( 0 )
 
-#endif	/* _BENAPHORE_H */
+
+#endif	/* _WRAPPER_H */
