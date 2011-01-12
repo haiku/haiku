@@ -344,7 +344,7 @@ Volume::Mount(const char* parameterString)
 		RETURN_ERROR(error);
 
 	const char* packages = NULL;
-	const char* volumeName = "Package FS";
+	const char* volumeName = NULL;
 	void* parameterHandle = parse_driver_settings_string(parameterString);
 	if (parameterHandle != NULL) {
 		packages
@@ -362,7 +362,7 @@ Volume::Mount(const char* parameterString)
 	fRootDirectory = new(std::nothrow) Directory(kRootDirectoryID);
 	if (fRootDirectory == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
-	fRootDirectory->Init(NULL, volumeName);
+	fRootDirectory->Init(NULL, volumeName != NULL ? volumeName : "Package FS");
 	fNodes.Insert(fRootDirectory);
 
 	// create default package domain

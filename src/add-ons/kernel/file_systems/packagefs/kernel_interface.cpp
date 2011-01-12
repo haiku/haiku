@@ -341,6 +341,7 @@ packagefs_read_stat(fs_volume* fsVolume, fs_vnode* fsNode, struct stat* st)
 	st->st_ctim = st->st_mtim;
 		// TODO: Perhaps manage a changed time (particularly for directories)?
 	st->st_crtim = st->st_mtim;
+	st->st_blocks = st->st_size / 512;
 
 	return B_OK;
 }
