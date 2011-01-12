@@ -307,6 +307,7 @@ find_undefined_symbol_beos(image_t* rootImage, image_t* image,
 		if (symbol->st_shndx != SHN_UNDEF
 			&& ((ELF32_ST_BIND(symbol->st_info) == STB_GLOBAL)
 				|| (ELF32_ST_BIND(symbol->st_info) == STB_WEAK))) {
+			*foundInImage = image;
 			return symbol;
 		}
 	}
