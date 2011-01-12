@@ -746,8 +746,8 @@ PackageWriter::_RegisterEntry(Entry* parent, const char* name,
 	size_t nameLength, bool isImplicit)
 {
 	// check the component name -- don't allow "." or ".."
-	if (*name == '.'
-		&& (nameLength == 1 || (nameLength == 2 && name[2] == '.'))) {
+	if (name[0] == '.'
+		&& (nameLength == 1 || (nameLength == 2 && name[1] == '.'))) {
 		fprintf(stderr, "Error: Invalid file name: \".\" and \"..\" "
 			"are not allowed as path components\n");
 		throw status_t(B_BAD_VALUE);
