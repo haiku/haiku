@@ -44,7 +44,7 @@ KernelLd boot_loader_$(TARGET_BOOT_PLATFORM) :
 	boot_tarfs.a
 	boot_fatfs.a
 
-	# needed by tarfs
+	# needed by tarfs and video_splash.cpp
 	boot_zlib.a
 
 	# libroot functions needed by the stage2 boot loader (compiled for the

@@ -21,7 +21,6 @@ local genericPlatformSources =
 	text_menu.cpp
 #	video_blit.cpp
 #	video_splash.cpp
-#	video_rle.cpp
 ;
 
 KernelMergeObject boot_platform_routerboard_mipsel.o :
