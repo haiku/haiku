@@ -358,8 +358,13 @@ Volume::Mount(const char* parameterString)
 		RETURN_ERROR(B_BAD_VALUE);
 	}
 
+	struct stat st;
+	if (stat(packages, &st) < 0)
+		RETURN_ERROR(B_ERROR);
+
 	// create the root node
-	fRootDirectory = new(std::nothrow) Directory(kRootDirectoryID);
+	fRootDirectory
+		= new(std::nothrow) ::RootDirectory(kRootDirectoryID, st.st_mtim);
 	if (fRootDirectory == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
 	fRootDirectory->Init(NULL, volumeName != NULL ? volumeName : "Package FS");

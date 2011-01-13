@@ -210,3 +210,18 @@ Directory::RemoveDirectoryIterator(DirectoryIterator* iterator)
 {
 	fIterators.Remove(iterator);
 }
+
+
+RootDirectory::RootDirectory(ino_t id, const timespec& modifiedTime)
+	:
+	Directory(id),
+	fModifiedTime(modifiedTime)
+{
+}
+
+
+timespec
+RootDirectory::ModifiedTime() const
+{
+	return fModifiedTime;
+}

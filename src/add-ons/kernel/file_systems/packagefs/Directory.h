@@ -10,7 +10,6 @@
 #include "PackageDirectory.h"
 
 
-
 struct DirectoryIterator : DoublyLinkedListLinkImpl<DirectoryIterator> {
 	Node*	node;
 
@@ -81,6 +80,18 @@ Directory::NextChild(Node* node) const
 {
 	return fChildList.GetNext(node);
 }
+
+
+class RootDirectory : public Directory {
+public:
+								RootDirectory(ino_t id,
+									const timespec& modifiedTime);
+
+	virtual	timespec			ModifiedTime() const;
+
+private:
+			timespec			fModifiedTime;
+};
 
 
 #endif	// DIRECTORY_H
