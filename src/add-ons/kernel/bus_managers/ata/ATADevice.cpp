@@ -370,6 +370,28 @@ ATADevice::GetRestrictions(bool *noAutoSense, uint32 *maxBlocks)
 
 
 status_t
+ATADevice::Control(uint32 opcode, void *buffer, size_t length)
+{
+	if (opcode == B_GET_DEVICE_NAME) {
+		// Swap words
+		char name[sizeof(fInfoBlock.model_number)];
+		memcpy(name, fInfoBlock.model_number, sizeof(name));
+		swap_words(name, sizeof(name));
+
+		// Remove trailing spaces
+		int32 nameLength = sizeof(name) - 2;
+		while (nameLength > 0 && name[nameLength - 1] == ' ')
+			nameLength--;
+
+		// TODO: make string prettier, ie. "WDC" -> "Western Digital", ...
+		return user_strlcpy((char*)buffer, name,
+			min_c((size_t)nameLength + 1, length)) >= 0 ? B_OK : B_BAD_ADDRESS;
+	}
+	return B_BAD_VALUE;
+}
+
+
+status_t
 ATADevice::Select()
 {
 	status_t err = fChannel->SelectDevice(fIndex);

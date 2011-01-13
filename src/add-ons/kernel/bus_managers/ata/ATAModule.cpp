@@ -157,8 +157,8 @@ static status_t
 ata_sim_control(scsi_sim_cookie cookie, uchar targetID, uint32 op, void *buffer,
 	size_t length)
 {
-	// TODO implement
-	return B_BAD_VALUE;
+	ATAChannel *channel = (ATAChannel *)cookie;
+	return channel->Control(targetID, op, buffer, length);
 }
 
 

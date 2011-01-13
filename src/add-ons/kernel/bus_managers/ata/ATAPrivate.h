@@ -76,6 +76,8 @@ public:
 			void				GetRestrictions(uint8 targetID, bool *isATAPI,
 									bool *noAutoSense, uint32 *maxBlocks);
 			status_t			ExecuteIO(scsi_ccb *ccb);
+			status_t			Control(uint8 targetID, uint32 op, void *buffer,
+									size_t length);
 
 			// ATA stuff
 			status_t			SelectDevice(uint8 index);
@@ -181,6 +183,7 @@ public:
 
 			void				GetRestrictions(bool *noAutoSense,
 									uint32 *maxBlocks);
+			status_t			Control(uint32 op, void *buffer, size_t length);
 
 	// ATA stuff
 	virtual	bool				IsATAPI() const { return false; }

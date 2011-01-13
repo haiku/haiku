@@ -397,6 +397,10 @@ KDiskDevice::_InitPartitionData()
 		* fDeviceData.geometry.cylinder_count
 		* fDeviceData.geometry.head_count;
 	fPartitionData.flags |= B_PARTITION_IS_DEVICE;
+
+	char name[B_FILE_NAME_LENGTH];
+	if (ioctl(fFD, B_GET_DEVICE_NAME, name, sizeof(name)) == B_OK)
+		fPartitionData.name = strdup(name);
 }
 
 

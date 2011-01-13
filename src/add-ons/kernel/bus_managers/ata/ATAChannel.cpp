@@ -339,6 +339,16 @@ ATAChannel::ExecuteIO(scsi_ccb *ccb)
 
 
 status_t
+ATAChannel::Control(uint8 targetID, uint32 opcode, void *buffer, size_t length)
+{
+	if (targetID < fDeviceCount && fDevices[targetID] != NULL)
+		return fDevices[targetID]->Control(opcode, buffer, length);
+
+	return B_BAD_VALUE;
+}
+
+
+status_t
 ATAChannel::SelectDevice(uint8 device)
 {
 	TRACE_FUNCTION("device: %u\n", device);

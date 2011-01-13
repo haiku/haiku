@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008, Haiku Inc. All Rights Reserved.
+ * Copyright 2002-2011, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _DRIVERS_DRIVERS_H
@@ -105,6 +105,7 @@ enum {
 	B_GET_PATH_FOR_DEVICE,			/* get the absolute path of the device */
 	B_GET_ICON_NAME,				/* get an icon name identifier */
 	B_GET_VECTOR_ICON,				/* retrieves the device's vector icon */
+	B_GET_DEVICE_NAME,				/* get name, string buffer */
 
 	B_GET_NEXT_OPEN_DEVICE = 1000,	/* obsolete, will be removed */
 	B_ADD_FIXED_DRIVER,				/* obsolete, will be removed */
@@ -171,5 +172,6 @@ typedef struct {
 #ifdef __cplusplus
 }
 #endif
+
 
 #endif /* _DRIVERS_DRIVERS_H */

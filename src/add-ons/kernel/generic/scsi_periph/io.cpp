@@ -1,6 +1,6 @@
 /*
- * Copyright 2004-2010, Haiku, Inc. All Rights Reserved.
- * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ * Copyright 2004-2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-03, Thomas Kurschel. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
  */
@@ -272,16 +272,48 @@ periph_ioctl(scsi_periph_handle_info *handle, int op, void *buffer,
 	size_t length)
 {
 	switch (op) {
-		case B_GET_MEDIA_STATUS: {
-			status_t res = B_OK;
+		case B_GET_MEDIA_STATUS:
+		{
+			status_t status = B_OK;
 
 			if (handle->device->removable)
-				res = periph_get_media_status(handle);
+				status = periph_get_media_status(handle);
 
-			SHOW_FLOW(2, "%s", strerror(res));
+			SHOW_FLOW(2, "%s", strerror(status));
 
-			*(status_t *)buffer = res;
+			*(status_t *)buffer = status;
 			return B_OK;
+		}
+
+		case B_GET_DEVICE_NAME:
+		{
+			// TODO: this should be written as an attribute to the node
+			// Try driver further up first
+			if (handle->device->scsi->ioctl != NULL) {
+				status_t status = handle->device->scsi->ioctl(
+					handle->device->scsi_device, op, buffer, length);
+				if (status == B_OK)
+					return B_OK;
+			}
+
+			// If that fails, get SCSI vendor/product
+			const char* vendor;
+			if (gDeviceManager->get_attr_string(handle->device->node,
+					SCSI_DEVICE_VENDOR_ITEM, &vendor, true) == B_OK) {
+				char name[B_FILE_NAME_LENGTH];
+				strlcpy(name, vendor, sizeof(name));
+
+				const char* product;
+				if (gDeviceManager->get_attr_string(handle->device->node,
+						SCSI_DEVICE_PRODUCT_ITEM, &product, true) == B_OK) {
+					strlcat(name, " ", sizeof(name));
+					strlcat(name, product, sizeof(name));
+				}
+
+				return user_strlcpy((char*)buffer, name, length) >= 0
+					? B_OK : B_BAD_ADDRESS;
+			}
+			return B_ERROR;
 		}
 
 		case B_SCSI_INQUIRY:
