@@ -10,6 +10,7 @@
 #define _KERNEL_ARCH_M68K_THREAD_H
 
 #include <arch/cpu.h>
+#include <arch/thread.h>
 
 #ifdef __cplusplus
 extern "C" {
