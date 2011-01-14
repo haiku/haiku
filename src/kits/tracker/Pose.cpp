@@ -52,6 +52,9 @@ int32
 CalcFreeSpace(BVolume *volume)
 {
 	off_t capacity = volume->Capacity();
+	if (capacity == 0)
+		return 100;
+
 	int32 percent = static_cast<int32>(volume->FreeBytes() / (capacity / 100));
 
 	// warn below 20 MB of free space (if this is less than 10% of free space)
