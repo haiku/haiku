@@ -21,15 +21,16 @@
 */
 
 
-OutputView::OutputView()
+OutputView::OutputView(const char* name)
 	:
-	BGroupView("OutputView", B_VERTICAL, B_WILL_DRAW)
+	BGroupView(name, B_VERTICAL, B_WILL_DRAW)
 {
 	rgb_color textColor = {255, 255, 255};
 	fTextView = new BTextView("Output", NULL, &textColor, B_WILL_DRAW);
 	fTextView->SetViewColor(0, 0, 100);
 	fTextView->MakeEditable(false);
-	BScrollView* scrollView = new BScrollView("ScrollView", fTextView, 0, false, true);
+	BScrollView* scrollView = new BScrollView("ScrollView", fTextView,
+		0, false, true);
 	
 	BLayoutBuilder::Group<>(this).Add(scrollView);
 }
@@ -41,10 +42,10 @@ Output* Output::sInstance = 0;
 
 Output::Output()
 	:
-	BWindow(BRect(200, 200, 800, 800), "Output", B_TITLED_WINDOW, B_NOT_ZOOMABLE)
+	BWindow(BRect(200, 200, 800, 800), "Output",
+		B_TITLED_WINDOW, B_NOT_ZOOMABLE)
 {
-	fTabsList = new BList(20);
-	fOutputViewsList = new BList(20);
+	fOutputViewsList = new BList();
 
 	fReset = new BButton("reset all", "Clear", 
 		new BMessage(kMsgOutputReset), B_WILL_DRAW);
@@ -54,8 +55,7 @@ Output::Output()
 	fTabView = new BTabView("tab_view", B_WIDTH_FROM_LABEL,
 		B_FULL_UPDATE_ON_RESIZE | B_WILL_DRAW | B_NAVIGABLE_JUMP);
 
-	fTabView->AddTab(fAll = new OutputView(), fAllTab = new BTab()); 
-	fAllTab->SetLabel("All");
+	fTabView->AddTab(fAll = new OutputView("All"));
 	
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 5)
 		.Add(fTabView)
@@ -74,18 +74,15 @@ Output::Output()
 
 
 void
-Output::AddTab(const char* text, int32 index) 
+Output::AddTab(const char* text, uint32 index)
 {
 	OutputView* customOutput;
-	BTab*		customTab;
 
 	Lock();
-	fTabView->AddTab(customOutput = new OutputView(), customTab = new BTab());
-	customTab->SetLabel(text);
+	fTabView->AddTab(customOutput = new OutputView(text));
 	fTabView->Invalidate();
 	Unlock();
 
-	fTabsList->AddItem(customTab, index);
 	fOutputViewsList->AddItem(customOutput, index);
 }
 
@@ -93,8 +90,6 @@ Output::AddTab(const char* text, int32 index)
 Output::~Output()
 {
 /*	BWindow::~BWindow();*/
-	
-	delete fTabsList;
 	delete fOutputViewsList;
 }
 
@@ -116,26 +111,24 @@ Output::QuitRequested()
 }
 
 
+OutputView*
+Output::_OutputViewForTab(int32 index)
+{
+	return (OutputView*)fTabView->TabAt(index)->View();
+}
+
+
 void
 Output::MessageReceived(BMessage* msg)
 {
 	switch(msg->what) {
 		case kMsgOutputReset:
-			for (int32 index = 0; index<fTabsList->CountItems(); index++) {
-				if (fTabsList->ItemAt(index) != NULL && ((BTab*)fTabsList
-					->ItemAt(index))->IsSelected())
-					((OutputView*)fOutputViewsList->ItemAt(index))->Clear();
-			}
+			_OutputViewForTab(fTabView->Selection())->Clear();
 			break;
 		case kMsgOutputResetAll:
-		{
-			fAll->Clear();
-			for (int32 index = 0; index<fTabsList->CountItems(); index++) {
-				if (fTabsList->ItemAt(index) != NULL )	
-					((OutputView*)fOutputViewsList->ItemAt(index))->Clear();	
-			}
+			for (int32 index = 0; index < fTabView->CountTabs(); ++index)
+				_OutputViewForTab(index)->Clear();
 			break;
-		}
 		default:
 			BWindow::MessageReceived(msg);
 			break;
@@ -173,21 +166,21 @@ void
 Output::Post(const char* text, uint32 index)
 {
 	Lock();
-	OutputView* view = (OutputView*) fOutputViewsList->ItemAt(index);
+	OutputView* view = (OutputView*)fOutputViewsList->ItemAt(index);
 
 	if (view != NULL)
-		Add(text, view);
+		_Add(text, view);
 	else
 		// Note that the view should be added before this!
 		// Dropping twice to the main
-		Add(text, fAll);
+		_Add(text, fAll);
 	
 	Unlock();
 }
 
 
 void
-Output::Add(const char* text, OutputView* view)
+Output::_Add(const char* text, OutputView* view)
 {	
 	view->Add(text);
 	fAll->Add(text);

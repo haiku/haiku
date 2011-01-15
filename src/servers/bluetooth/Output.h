@@ -22,7 +22,7 @@ const uint32 kMsgOutputResetAll	= 'opra';
 class OutputView : public BGroupView
 {
 public:
-	OutputView();
+	OutputView(const char* name);
 
 	void			Add(const char* text)	{fTextView->Insert(text);}
 	void			Clear()					{fTextView->Delete(0, fTextView->TextLength());}
@@ -43,7 +43,7 @@ public:
 	virtual void	MessageReceived(BMessage* msg);
 	virtual void	FrameMoved(BPoint point);
 
-	void			AddTab(const char* text, int32 index);
+	void			AddTab(const char* text, uint32 index);
 
 	void            Post(const char* text, uint32 index);
 	int				Postf(uint32 index, const char* format, ...);
@@ -51,7 +51,8 @@ public:
 private: 
 	// functions
 	Output();
-	void			Add(const char* text, OutputView* view);
+	void			_Add(const char* text, OutputView* view);
+	OutputView*		_OutputViewForTab(int32 index);
 
 private: 
 	// data
@@ -65,7 +66,6 @@ private:
 	
 	BTabView* 		fTabView;
 	
-	BList*			fTabsList;
 	BList*			fOutputViewsList;
 };
 
