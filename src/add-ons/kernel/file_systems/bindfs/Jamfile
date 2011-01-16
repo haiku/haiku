@@ -1,0 +1,23 @@
+SubDir HAIKU_TOP src add-ons kernel file_systems bindfs ;
+
+
+UsePrivateKernelHeaders ;
+# UsePrivateHeaders shared ;
+
+
+HAIKU_BIND_FS_SOURCES =
+	DebugSupport.cpp
+	kernel_interface.cpp
+	Node.cpp
+	Volume.cpp
+;
+
+
+KernelAddon bindfs
+	:
+	$(HAIKU_BIND_FS_SOURCES)
+	: $(HAIKU_STATIC_LIBSUPC++)
+;
+
+
+#HaikuSubInclude userland ;

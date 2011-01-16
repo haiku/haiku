@@ -87,6 +87,7 @@ status_t	vfs_entry_ref_to_vnode(dev_t mountID, ino_t directoryID,
 				const char *name, struct vnode **_vnode);
 void		vfs_vnode_to_node_ref(struct vnode *vnode, dev_t *_mountID,
 				ino_t *_vnodeID);
+struct fs_vnode* vfs_fsnode_for_vnode(struct vnode* vnode);
 
 int			vfs_open_vnode(struct vnode* vnode, int openMode, bool kernel);
 status_t	vfs_lookup_vnode(dev_t mountID, ino_t vnodeID,

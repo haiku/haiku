@@ -4101,6 +4101,18 @@ vfs_vnode_to_node_ref(struct vnode* vnode, dev_t* _mountID, ino_t* _vnodeID)
 
 
 /*!
+	Helper function abstracting the process of "converting" a given
+	vnode-pointer to a fs_vnode-pointer.
+	Currently only used in bindfs.
+*/
+extern "C" fs_vnode*
+vfs_fsnode_for_vnode(struct vnode* vnode)
+{
+	return vnode;
+}
+
+
+/*!
 	Calls fs_open() on the given vnode and returns a new
 	file descriptor for it
 */
