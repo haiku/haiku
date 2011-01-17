@@ -4,7 +4,7 @@
  *
  * Author:
  *		Andre Alves Garzia, andre@andregarzia.com
- * 		Fredrik Modéen  
+ * 		Fredrik Modéen
  */
 #ifndef NETWORK_WINDOW_H
 #define NETWORK_WINDOW_H
@@ -12,12 +12,13 @@
 
 #include <Window.h>
 
-#include "EthernetSettingsView.h"
+class Settings;
+class EthernetSettingsView;
 
 
 class NetworkWindow : public BWindow {
 public:
-					NetworkWindow(Setting* setting);
+					NetworkWindow(Settings* setting);
 	virtual			~NetworkWindow();
 	virtual bool	QuitRequested();
 	virtual void	MessageReceived(BMessage* mesage);

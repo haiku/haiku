@@ -61,14 +61,14 @@ InterfacesAddOn::CreateView(BRect *bounds)
 {
 	float w, h;
 	BRect r = *bounds;
-	
+
 #define H_MARGIN	10
 #define V_MARGIN	10
 #define SMALL_MARGIN	3
-	
+
 	if (r.Width() < 100 || r.Height() < 100)
 		r.Set(0, 0, 100, 100);
-		
+
 	ResizeTo(r.Width(), r.Height());
 
 	BRect rlv = r;
@@ -77,14 +77,14 @@ InterfacesAddOn::CreateView(BRect *bounds)
 	rlv.right -= B_V_SCROLL_BAR_WIDTH;
 	fListview = new InterfacesListView(rlv, "interfaces", B_FOLLOW_ALL_SIDES);
 	fListview->SetSelectionMessage(new BMessage(INTERFACE_SELECTED_MSG));
-	fListview->SetInvocationMessage(new BMessage(CONFIGURE_INTERFACE_MSG));	
-	AddChild(new BScrollView(NULL, fListview, B_FOLLOW_ALL_SIDES, B_WILL_DRAW 
+	fListview->SetInvocationMessage(new BMessage(CONFIGURE_INTERFACE_MSG));
+	AddChild(new BScrollView(NULL, fListview, B_FOLLOW_ALL_SIDES, B_WILL_DRAW
 			| B_FRAME_EVENTS, false, true));
-	
+
 	r.top = r.bottom - 60;
-	fConfigure = new BButton(r, "configure", "Configure" B_UTF8_ELLIPSIS, 
+	fConfigure = new BButton(r, "configure", "Configure" B_UTF8_ELLIPSIS,
 		new BMessage(CONFIGURE_INTERFACE_MSG), B_FOLLOW_BOTTOM | B_FOLLOW_LEFT);
-		
+
 	fConfigure->GetPreferredSize(&w, &h);
 	fConfigure->ResizeToPreferred();
 	fConfigure->SetEnabled(false);
@@ -99,7 +99,7 @@ InterfacesAddOn::CreateView(BRect *bounds)
 	fOnOff->Hide();
 	AddChild(fOnOff);
 
-	*bounds = Bounds();	
+	*bounds = Bounds();
 	return this;
 }
 
@@ -119,7 +119,7 @@ InterfacesAddOn::MessageReceived(BMessage* msg)
 {
 	int nr = fListview->CurrentSelection();
 	InterfaceListItem *item = NULL;
-	if(nr != -1) {		
+	if(nr != -1) {
 		item = dynamic_cast<InterfaceListItem*>(fListview->ItemAt(nr));
 	}
 
@@ -131,26 +131,26 @@ InterfacesAddOn::MessageReceived(BMessage* msg)
 			fOnOff->Hide();
 			break;
 		}
-		fOnOff->SetLabel(item->Enabled() ? "Disable" : "Enable");
-		fOnOff->Show();		
+		fOnOff->SetLabel(item->IsDisabled() ? "Enable" : "Disable");
+		fOnOff->Show();
 		break;
 	}
-		
+
 	case CONFIGURE_INTERFACE_MSG: {
 		if (!item)
 			break;
 
-		NetworkWindow* nw = new NetworkWindow(item->GetSetting());
+		NetworkWindow* nw = new NetworkWindow(item->GetSettings());
 		nw->Show();
 		break;
 	}
-		
+
 	case ONOFF_INTERFACE_MSG:
 		if (!item)
 			break;
-		
-		item->SetEnabled(!item->Enabled());
-		fOnOff->SetLabel(item->Enabled() ? "Disable" : "Enable");
+
+		item->SetDisabled(!item->IsDisabled());
+		fOnOff->SetLabel(item->IsDisabled() ? "Enable" : "Disable");
 		fListview->Invalidate();
 		break;
 

@@ -4,7 +4,7 @@
  *
  * Author:
  *		Andre Alves Garzia, andre@andregarzia.com
- * 		Fredrik Modéen  
+ * 		Fredrik Modéen
  */
 
 #include "NetworkWindow.h"
@@ -13,18 +13,19 @@
 #include <GroupLayout.h>
 
 #include "EthernetSettingsView.h"
+#include "Settings.h"
 
 
-NetworkWindow::NetworkWindow(Setting* setting)
+NetworkWindow::NetworkWindow(Settings* settings)
 	: BWindow(BRect(50, 50, 269, 302), "Network", B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE
 		| B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
-	fEthernetView = new EthernetSettingsView(setting);
+	fEthernetView = new EthernetSettingsView(); // settings);
 	GetLayout()->AddView(fEthernetView);
-	
-	SetTitle(setting->Name());
+
+	SetTitle(settings->Name());
 }
 
 

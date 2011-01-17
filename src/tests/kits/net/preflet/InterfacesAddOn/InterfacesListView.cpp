@@ -9,7 +9,6 @@
 
 
 #include "InterfacesListView.h"
-#include "Setting.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,42 +21,17 @@
 #include <sys/socket.h>
 #include <sys/sockio.h>
 
-#include <IconUtils.h>
 #include <File.h>
+#include <IconUtils.h>
+#include <net_notifications.h>
+#include <NetworkDevice.h>
+#include <NetworkInterface.h>
+#include <NetworkRoster.h>
 #include <Resources.h>
 
 #include <AutoDeleter.h>
-#include <net_notifications.h>
 
-
-
-class SocketOpener {
-public:
-	SocketOpener()
-	{
-		fSocket = socket(AF_INET, SOCK_DGRAM, 0);
-	}
-
-	~SocketOpener()
-	{
-		close(fSocket);
-	}
-
-	status_t InitCheck()
-	{
-		return fSocket >= 0 ? B_OK : B_ERROR;
-	}
-
-	operator int() const
-	{
-		return fSocket;
-	}
-
-private:
-	int	fSocket;
-};
-
-
+#include "Settings.h"
 
 
 // #pragma mark -
@@ -77,25 +51,30 @@ our_image(image_info& image)
 }
 
 
+// #pragma mark -
+
+
 InterfaceListItem::InterfaceListItem(const char* name)
-	: 
+	:
 	BListItem(0, false),
-	fIcon(NULL), 	
-	fSettings(new Setting(name))
+	fIcon(NULL)
 {
-	_InitIcon();
+	fInterface.SetTo(name);
+	_Init();
 }
 
 
 InterfaceListItem::~InterfaceListItem()
 {
 	delete fIcon;
+	delete fSettings;
 }
 
 
-void InterfaceListItem::Update(BView* owner, const BFont* font)
-{	
-	BListItem::Update(owner,font);	
+void
+InterfaceListItem::Update(BView* owner, const BFont* font)
+{
+	BListItem::Update(owner,font);
 	font_height height;
 	font->GetHeight(&height);
 
@@ -110,21 +89,21 @@ InterfaceListItem::DrawItem(BView* owner, BRect /*bounds*/, bool complete)
 	BListView* list = dynamic_cast<BListView*>(owner);
 	if (!list)
 		return;
-		
+
 	font_height height;
 	BFont font;
 	owner->GetFont(&font);
 	font.GetHeight(&height);
 	float fntheight = height.ascent+height.descent+height.leading;
 
-	BRect bounds = list->ItemFrame(list->IndexOf(this));		
-								
+	BRect bounds = list->ItemFrame(list->IndexOf(this));
+
 	rgb_color oldviewcolor = owner->ViewColor();
 	rgb_color oldlowcolor = owner->LowColor();
 	rgb_color oldcolor = owner->HighColor();
 
 	rgb_color color = oldviewcolor;
-	if ( IsSelected() ) 
+	if ( IsSelected() )
 		color = tint_color(color, B_HIGHLIGHT_BACKGROUND_TINT);
 
 	owner->SetViewColor( color );
@@ -140,35 +119,35 @@ InterfaceListItem::DrawItem(BView* owner, BRect /*bounds*/, bool complete)
 	BPoint namePt = iconPt + BPoint(32+8, fntheight);
 	BPoint driverPt = iconPt + BPoint(32+8, fntheight*2);
 	BPoint commentPt = iconPt + BPoint(32+8, fntheight*3);
-		
+
 	drawing_mode mode = owner->DrawingMode();
-	if (fSettings->Enabled())
-		owner->SetDrawingMode(B_OP_OVER);
-	else {
+	if (fSettings->IsDisabled()) {
 		owner->SetDrawingMode(B_OP_ALPHA);
 		owner->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_OVERLAY);
 		owner->SetHighColor(0, 0, 0, 32);
-	}
-	
+	} else
+		owner->SetDrawingMode(B_OP_OVER);
+
 	owner->DrawBitmapAsync(fIcon, iconPt);
 
-	if (!fSettings->Enabled())
+	if (fSettings->IsDisabled())
 		owner->SetHighColor(tint_color(oldcolor, B_LIGHTEN_1_TINT));
 
 	owner->SetFont(be_bold_font);
 	owner->DrawString(Name(), namePt);
 	owner->SetFont(be_plain_font);
 
-	if (fSettings->Enabled()) {
+	if (fSettings->IsDisabled())
+		owner->DrawString("Disabled.", driverPt);
+	else {
 		BString str("Enabled, IPv4 address: ");
 		str << fSettings->IP();
 		owner->DrawString(str.String(), driverPt);
-		if (fSettings->AutoConfigured())
+		if (fSettings->AutoConfigure())
 			owner->DrawString("DHCP enabled", commentPt);
 		else
 			owner->DrawString("DHCP disabled, use static IP address", commentPt);
-	} else 
-		owner->DrawString("Disabled.", driverPt);
+	}
 
 	owner->SetHighColor(oldcolor);
 	owner->SetDrawingMode(mode);
@@ -176,12 +155,16 @@ InterfaceListItem::DrawItem(BView* owner, BRect /*bounds*/, bool complete)
 
 
 void
-InterfaceListItem::_InitIcon()
+InterfaceListItem::_Init()
 {
+	fSettings = new Settings(Name());
+
+	// Init icon
 	BBitmap* icon = NULL;
-	
-	const char* mediaTypeName = "";
-	int media = fSettings->Media();
+
+	const char* mediaTypeName = NULL;
+
+	int media = fInterface.Media();
 	printf("%s media = 0x%x\n", Name(), media);
 	switch (IFM_TYPE(media)) {
 		case IFM_ETHER:
@@ -190,6 +173,14 @@ InterfaceListItem::_InitIcon()
 		case IFM_IEEE80211:
 			mediaTypeName = "wifi";
 			break;
+		default: {
+			BNetworkDevice device(Name());
+			if (device.IsWireless())
+				mediaTypeName = "wifi";
+			else if (device.IsEthernet())
+				mediaTypeName = "ether";
+			break;
+		}
 	}
 
 	image_info info;
@@ -207,12 +198,12 @@ InterfaceListItem::_InitIcon()
 	size_t size;
 	// Try specific interface icon?
 	const uint8* rawIcon = (const uint8*)resources.LoadResource(B_VECTOR_ICON_TYPE, Name(), &size);
-	if (!rawIcon)
+	if (rawIcon == NULL && mediaTypeName != NULL)
 		// Not found, try interface media type?
 		rawIcon = (const uint8*)resources.LoadResource(B_VECTOR_ICON_TYPE, mediaTypeName, &size);
-	if (!rawIcon)
+	if (rawIcon == NULL)
 		// Not found, try default interface icon?
-		rawIcon = (const uint8*)resources.LoadResource(B_VECTOR_ICON_TYPE, "wifi", &size);
+		rawIcon = (const uint8*)resources.LoadResource(B_VECTOR_ICON_TYPE, "ether", &size);
 
 	if (rawIcon) {
 		// Now build the bitmap
@@ -244,7 +235,7 @@ InterfacesListView::AttachedToWindow()
 	BListView::AttachedToWindow();
 
 	_InitList();
-	
+
 	start_watching_network(
 		B_WATCH_NETWORK_INTERFACE_CHANGES | B_WATCH_NETWORK_LINK_CHANGES, this);
 }
@@ -298,42 +289,16 @@ InterfacesListView::FindItem(const char* name)
 status_t
 InterfacesListView::_InitList()
 {
-	SocketOpener socket;
-	if (socket.InitCheck() != B_OK)
-		return B_ERROR;
+	BNetworkRoster& roster = BNetworkRoster::Default();
+	BNetworkInterface interface;
+	uint32 cookie = 0;
 
-	// iterate over all interfaces and retrieve minimal status
-	ifconf config;
-	config.ifc_len = sizeof(config.ifc_value);
-	if (ioctl(socket, SIOCGIFCOUNT, &config, sizeof(struct ifconf)) < 0)
-		return B_ERROR;
-
-	uint32 count = (uint32)config.ifc_value;
-	if (count == 0)
-		return B_ERROR;
-
-	void* buffer = malloc(count * sizeof(struct ifreq));
-	if (buffer == NULL)
-		return B_ERROR;
-
-	MemoryDeleter deleter(buffer);
-	
-	config.ifc_len = count * sizeof(struct ifreq);
-	config.ifc_buf = buffer;
-	if (ioctl(socket, SIOCGIFCONF, &config, sizeof(struct ifconf)) < 0)
-		return B_ERROR;
-
-	ifreq* interface = (ifreq*)buffer;
-	MakeEmpty();
-
-	for (uint32 i = 0; i < count; i++) {
-		if (strcmp(interface->ifr_name, "loop") != 0) {
-			AddItem(new InterfaceListItem(interface->ifr_name));
-	//		printf("Name = %s\n", interface->ifr_name);
+	while (roster.GetNextInterface(&cookie, interface) == B_OK) {
+		if (strncmp(interface.Name(), "loop", 4) && interface.Name()[0]) {
+			AddItem(new InterfaceListItem(interface.Name()));
 		}
-		interface = (ifreq*)((addr_t)interface + IF_NAMESIZE 
-			+ interface->ifr_addr.sa_len);
-	}	
+	}
+
 	return B_OK;
 }
 
@@ -345,17 +310,17 @@ InterfacesListView::_UpdateList()
 	return B_OK;
 }
 
-void 
+void
 InterfacesListView::_HandleNetworkMessage(BMessage* message)
 {
 	const char* name;
 	int32 opcode;
-	
+
 	message->PrintToStream();
-	
+
 	if (message->FindInt32("opcode", &opcode) != B_OK)
 		return;
-		
+
 	if (message->FindString("interface", &name) != B_OK
 		&& message->FindString("device", &name) != B_OK)
 		return;
@@ -370,14 +335,14 @@ InterfacesListView::_HandleNetworkMessage(BMessage* message)
 			if (item)
 				InvalidateItem(IndexOf(item));
 			break;
-		
+
 		case B_NETWORK_INTERFACE_ADDED:
 			if (item)
 				InvalidateItem(IndexOf(item));
 			else
 				AddItem(new InterfaceListItem(name));
 			break;
-			
+
 		case B_NETWORK_INTERFACE_REMOVED:
 			if (item) {
 				RemoveItem(item);
