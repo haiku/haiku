@@ -400,7 +400,7 @@ Services::_ToService(const BMessage& message, struct service*& service)
 	if (message.FindInt32("port", &servicePort) != B_OK) {
 		struct servent* servent = getservbyname(name, string);
 		if (servent != NULL)
-			servicePort = servent->s_port;
+			servicePort = ntohs(servent->s_port);
 		else
 			servicePort = -1;
 	}
