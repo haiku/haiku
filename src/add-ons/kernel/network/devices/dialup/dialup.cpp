@@ -53,7 +53,7 @@ struct dialup_device : net_device {
 	char			escape_string[8];
 	bigtime_t		escape_silence;
 	char			hangup_string[16];
-	bigtime_t		flag_timeout;
+	bigtime_t		tx_flag_timeout;
 	uint32			rx_accm;
 	uint32			tx_accm[8];
 };
@@ -226,8 +226,8 @@ dialup_init(const char* name, net_device** _device)
 	device->tx_flag_timeout = 1000000;
 
 	// default rx & tx Async-Control-Character-Map
-	memset(device->rx_accm, 0xFF, sizeof(device->rx_accm));
-	memset(device->tx_accm, 0xFF, sizeof(device->tx_accm));
+	memset(&device->rx_accm, 0xFF, sizeof(device->rx_accm));
+	memset(&device->tx_accm, 0xFF, sizeof(device->tx_accm));
 
 	*_device = device;
 	return B_OK;
@@ -401,8 +401,9 @@ dialup_send_data(net_device* _device, net_buffer* buffer)
 	// more than a second ago.
 	// Otherwise, the prior closing flag sequence is the open flag of this
 	// frame
-	if (device->flag_timeout
-		&& system_time() - device->last_closing_flag_sequence_time > device->flagt_timeout) {
+	if (device->tx_flag_timeout
+		&& system_time() - device->last_closing_flag_sequence_time
+			> device->tx_flag_timeout) {
 		packet[packetSize++] = HDLC_FLAG_SEQUENCE;
 	}
 
@@ -463,15 +464,17 @@ dialup_receive_data(net_device* _device, net_buffer** _buffer)
 	if (buffer == NULL)
 		return ENOBUFS;
 
+	status_t status;
 	ssize_t bytesRead;
-	uint8* data;
-	packet = (uint8*)malloc(2 + 2 * buffer->size);
+	uint8* data = NULL;
+	uint8* packet = (uint8*)malloc(2 + 2 * buffer->size);
 	if (packet == NULL) {
 		status = B_NO_MEMORY;
 		goto err;
 	}
 
-	status_t status = gBufferModule->append_size(buffer, device->mtu + HDLC_HEADER_LENGTH, &data);
+	status = gBufferModule->append_size(buffer,
+		device->mtu + HDLC_HEADER_LENGTH, (void**)&data);
 	if (status == B_OK && data == NULL) {
 		dprintf("scattered I/O is not yet supported by dialup device.\n");
 		status = B_NOT_SUPPORTED;
@@ -480,9 +483,10 @@ dialup_receive_data(net_device* _device, net_buffer** _buffer)
 		goto err;
 
 	while (true) {
-		bytesRead = read(device->fd, data, device->frame_size);
+		bytesRead = read(device->fd, data, device->mtu + HDLC_HEADER_LENGTH);
 		if (bytesRead < 0) {
-
+			// TODO
+		}
 	}
 
 	status = gBufferModule->trim(buffer, bytesRead);
@@ -495,10 +499,12 @@ dialup_receive_data(net_device* _device, net_buffer** _buffer)
 	device->stats.receive.packets++;
 
 	*_buffer = buffer;
-	return B_OK;
+	status = B_OK;
+	goto done;
 
 err:
 	gBufferModule->free(buffer);
+	device->stats.receive.errors++;
 
 done:
 	free(packet);
