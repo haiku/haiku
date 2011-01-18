@@ -53,6 +53,9 @@ struct dialup_device : net_device {
 	char			escape_string[8];
 	bigtime_t		escape_silence;
 	char			hangup_string[16];
+	bigtime_t		flag_timeout;
+	uint32			rx_accm;
+	uint32			tx_accm[8];
 };
 
 net_buffer_module_info* gBufferModule;
@@ -220,6 +223,12 @@ dialup_init(const char* name, net_device** _device)
 	strncpy(device->escape_string, "+++", sizeof(device->escape_string));
 	device->escape_silence = 1000000;
 
+	device->tx_flag_timeout = 1000000;
+
+	// default rx & tx Async-Control-Character-Map
+	memset(device->rx_accm, 0xFF, sizeof(device->rx_accm));
+	memset(device->tx_accm, 0xFF, sizeof(device->tx_accm));
+
 	*_device = device;
 	return B_OK;
 }
@@ -365,7 +374,6 @@ dialup_send_data(net_device* _device, net_buffer* buffer)
 	int packetSize = 0;
 	status_t status;
 	ssize_t bytesWritten;
-	bigtime_t now;
 
 	uint32 vectorCount = gBufferModule->count_iovecs(buffer);
 	if (vectorCount < 1) {
@@ -393,9 +401,10 @@ dialup_send_data(net_device* _device, net_buffer* buffer)
 	// more than a second ago.
 	// Otherwise, the prior closing flag sequence is the open flag of this
 	// frame
-	now = system_time();
-	if (now - device->last_closing_flag_sequence_time > 1000000)
+	if (device->flag_timeout
+		&& system_time() - device->last_closing_flag_sequence_time > device->flagt_timeout) {
 		packet[packetSize++] = HDLC_FLAG_SEQUENCE;
+	}
 
 	// encode frame data
 	ioVector = ioVectors;
@@ -450,7 +459,50 @@ dialup_receive_data(net_device* _device, net_buffer** _buffer)
 	if (device->fd == -1)
 		return B_FILE_ERROR;
 
-	return ENOBUFS;
+	net_buffer* buffer = gBufferModule->create(256);
+	if (buffer == NULL)
+		return ENOBUFS;
+
+	ssize_t bytesRead;
+	uint8* data;
+	packet = (uint8*)malloc(2 + 2 * buffer->size);
+	if (packet == NULL) {
+		status = B_NO_MEMORY;
+		goto err;
+	}
+
+	status_t status = gBufferModule->append_size(buffer, device->mtu + HDLC_HEADER_LENGTH, &data);
+	if (status == B_OK && data == NULL) {
+		dprintf("scattered I/O is not yet supported by dialup device.\n");
+		status = B_NOT_SUPPORTED;
+	}
+	if (status < B_OK)
+		goto err;
+
+	while (true) {
+		bytesRead = read(device->fd, data, device->frame_size);
+		if (bytesRead < 0) {
+
+	}
+
+	status = gBufferModule->trim(buffer, bytesRead);
+	if (status < B_OK) {
+		device->stats.receive.dropped++;
+		goto err;
+	}
+
+	device->stats.receive.bytes += bytesRead;
+	device->stats.receive.packets++;
+
+	*_buffer = buffer;
+	return B_OK;
+
+err:
+	gBufferModule->free(buffer);
+
+done:
+	free(packet);
+	return status;
 }
 
 
