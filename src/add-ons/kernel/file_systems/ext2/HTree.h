@@ -88,7 +88,7 @@ struct HTreeRoot {
 
 	HTreeCountLimit		count_limit[0];
 	
-	bool			IsValid() const;
+	bool				IsValid() const;
 		// Implemented in HTree.cpp
 } _PACKED;
 

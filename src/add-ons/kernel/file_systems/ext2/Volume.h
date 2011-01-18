@@ -34,7 +34,7 @@ public:
 			bool				IsValidSuperBlock();
 			bool				IsReadOnly() const
 									{ return (fFlags & VOLUME_READ_ONLY) != 0; }
-
+			mutex&				Lock();
 			bool				HasExtendedAttributes() const;
 
 			Inode*				RootNode() const { return fRootNode; }
@@ -44,6 +44,7 @@ public:
 									{ return fFSVolume ? fFSVolume->id : -1; }
 			fs_volume*			FSVolume() const { return fFSVolume; }
 			const char*			Name() const;
+			void				SetName(const char* name);
 
 			uint32				NumInodes() const
 									{ return fNumInodes; }
@@ -173,5 +174,12 @@ private:
 			void*				fBlockCache;
 			Inode*				fRootNode;
 };
+
+
+inline mutex&
+Volume::Lock()
+{
+	 return fLock;
+}
 
 #endif	// VOLUME_H

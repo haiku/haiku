@@ -266,6 +266,13 @@ Volume::Name() const
 }
 
 
+void
+Volume::SetName(const char* name)
+{
+	strlcpy(fSuperBlock.name, name, sizeof(fSuperBlock.name));
+}
+
+
 status_t
 Volume::Mount(const char* deviceName, uint32 flags)
 {

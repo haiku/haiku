@@ -178,6 +178,28 @@ ext2_read_fs_info(fs_volume* _volume, struct fs_info* info)
 
 
 static status_t
+ext2_write_fs_info(fs_volume* _volume, const struct fs_info* info, uint32 mask)
+{
+	Volume* volume = (Volume*)_volume->private_volume;
+
+	if (volume->IsReadOnly())
+		return B_READ_ONLY_DEVICE;
+
+	MutexLocker locker(volume->Lock());
+
+	status_t status = B_BAD_VALUE;
+
+	if (mask & FS_WRITE_FSINFO_NAME) {
+		Transaction transaction(volume->GetJournal());
+		volume->SetName(info->volume_name);
+		status = volume->WriteSuperBlock(transaction);
+		transaction.Done();
+	}
+	return status;
+}
+
+
+static status_t
 ext2_sync(fs_volume* _volume)
 {
 	Volume* volume = (Volume*)_volume->private_volume;
@@ -1629,7 +1651,7 @@ ext2_remove_attr(fs_volume* _volume, fs_vnode* vnode,
 fs_volume_ops gExt2VolumeOps = {
 	&ext2_unmount,
 	&ext2_read_fs_info,
-	NULL,	// write_fs_info()
+	&ext2_write_fs_info,
 	&ext2_sync,
 	&ext2_get_vnode,
 };
@@ -1717,7 +1739,8 @@ static file_system_module_info sExt2FileSystem = {
 
 	"ext2",						// short_name
 	"Ext2 File System",			// pretty_name
-	B_DISK_SYSTEM_SUPPORTS_WRITING,						// DDM flags
+	B_DISK_SYSTEM_SUPPORTS_WRITING
+		| B_DISK_SYSTEM_SUPPORTS_CONTENT_NAME,	// DDM flags
 
 	// scanning
 	ext2_identify_partition,

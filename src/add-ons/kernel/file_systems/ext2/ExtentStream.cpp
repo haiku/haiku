@@ -83,7 +83,7 @@ ExtentStream::FindBlock(off_t offset, fsblock_t& block, uint32 *_count)
 		int32 high = stream->extent_header.NumEntries() - 1;
 		int32 middle = 0;
 		while (low <= high) {
-			middle = (high + low) / 2;
+			middle = (high + low) >> 1;
 			if (stream->extent_entries[middle].LogicalBlock() == index)
 				break;
 			if (stream->extent_entries[middle].LogicalBlock() < index)
