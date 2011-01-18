@@ -133,7 +133,7 @@ TTimeWindow::_InitWindow()
 	rect.left = 10;
 	rect.top = rect.bottom - 10;
 
-	fRevertButton = new BButton(rect, "revert", "Revert",
+	fRevertButton = new BButton(rect, "revert", B_TRANSLATE("Revert"),
 		new BMessage(kMsgRevert), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM, B_WILL_DRAW);
 
 	fRevertButton->ResizeToPreferred();
