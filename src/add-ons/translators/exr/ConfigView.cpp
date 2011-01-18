@@ -9,14 +9,18 @@
 #include "ConfigView.h"
 #include "EXRTranslator.h"
 
-#include <StringView.h>
+#include <Catalog.h>
 #include <CheckBox.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
 #include <SpaceLayoutItem.h>
+#include <StringView.h>
 
 #include <stdio.h>
 #include <string.h>
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "ConfigView"
 
 
 ConfigView::ConfigView(uint32 flags)
@@ -24,11 +28,11 @@ ConfigView::ConfigView(uint32 flags)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	BStringView *fTitle = new BStringView("title", "EXR Images");
+	BStringView *fTitle = new BStringView("title", B_TRANSLATE("EXR Images"));
 	fTitle->SetFont(be_bold_font);
 
 	char version[256];
-	sprintf(version, "Version %d.%d.%d, %s",
+	sprintf(version, B_TRANSLATE("Version %d.%d.%d, %s"),
 		int(B_TRANSLATION_MAJOR_VERSION(EXR_TRANSLATOR_VERSION)),
 		int(B_TRANSLATION_MINOR_VERSION(EXR_TRANSLATOR_VERSION)),
 		int(B_TRANSLATION_REVISION_VERSION(EXR_TRANSLATOR_VERSION)),
@@ -39,13 +43,13 @@ ConfigView::ConfigView(uint32 flags)
 		B_UTF8_COPYRIGHT "2008 Haiku Inc.");
 
 	BStringView *fCopyright2 = new BStringView("copyright2",
-		"Based on OpenEXR (http://www.openexr.com)");
+		B_TRANSLATE("Based on OpenEXR (http://www.openexr.com)"));
 
 	BStringView *fCopyright3 = new BStringView("copyright3",
 		B_UTF8_COPYRIGHT "2006, Industrial Light & Magic,");
 
 	BStringView *fCopyright4 = new BStringView("copyright4",
-		"a division of Lucasfilm Entertainment Company Ltd");
+		B_TRANSLATE("a division of Lucasfilm Entertainment Company Ltd"));
 
 	// Build the layout
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
@@ -65,7 +69,8 @@ ConfigView::ConfigView(uint32 flags)
 
 	BFont font;
 	GetFont(&font);
-	SetExplicitPreferredSize(BSize((font.Size() * 400)/12, (font.Size() * 200)/12));
+	SetExplicitPreferredSize(BSize(font.Size() * 400 / 12,
+		font.Size() * 200 / 12));
 }
  
 

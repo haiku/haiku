@@ -18,6 +18,14 @@ Translator EXRTranslator :
 	: true
 ;
 
+DoCatalogs EXRTranslator :
+	x-vnd.Haiku-EXRTranslator
+	:
+	ConfigView.cpp
+	EXRTranslator.cpp
+	main.cpp
+;
+
 Package haiku-translationkit-cvs :
 	EXRTranslator :
 	boot home config add-ons Translators ;
