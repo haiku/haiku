@@ -6,7 +6,7 @@
 //
 // SGITranslator.cpp
 //
-// This BTranslator based object is for opening and writing 
+// This BTranslator based object is for opening and writing
 // SGI images.
 //
 //
@@ -15,18 +15,18 @@
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
 // to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-// and/or sell copies of the Software, and to permit persons to whom the 
+// the rights to use, copy, modify, merge, publish, distribute, sublicense,
+// and/or sell copies of the Software, and to permit persons to whom the
 // Software is furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included 
+// The above copyright notice and this permission notice shall be included
 // in all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 // OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 // THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
@@ -53,7 +53,7 @@
 using std::nothrow;
 
 // The input formats that this translator supports.
-translation_format gInputFormats[] = {
+static const translation_format sInputFormats[] = {
 	{
 		B_TRANSLATOR_BITMAP,
 		B_TRANSLATOR_BITMAP,
@@ -73,7 +73,7 @@ translation_format gInputFormats[] = {
 };
 
 // The output formats that this translator supports.
-translation_format gOutputFormats[] = {
+static const translation_format sOutputFormats[] = {
 	{
 		B_TRANSLATOR_BITMAP,
 		B_TRANSLATOR_BITMAP,
@@ -93,12 +93,17 @@ translation_format gOutputFormats[] = {
 };
 
 // Default settings for the Translator
-TranSetting gDefaultSettings[] = {
+static const TranSetting sDefaultSettings[] = {
 	{B_TRANSLATOR_EXT_HEADER_ONLY, TRAN_SETTING_BOOL, false},
 	{B_TRANSLATOR_EXT_DATA_ONLY, TRAN_SETTING_BOOL, false},
 	{SGI_SETTING_COMPRESSION, TRAN_SETTING_INT32, SGI_COMP_RLE}
 		// compression is set to RLE by default
 };
+
+const uint32 kNumInputFormats = sizeof(sInputFormats) / sizeof(translation_format);
+const uint32 kNumOutputFormats = sizeof(sOutputFormats) / sizeof(translation_format);
+const uint32 kNumDefaultSettings = sizeof(sDefaultSettings) / sizeof(TranSetting);
+
 
 // ---------------------------------------------------------------
 // make_nth_translator
@@ -149,10 +154,10 @@ SGITranslator::SGITranslator()
 	:
 	BaseTranslator("SGI images", "SGI image translator",
 		SGI_TRANSLATOR_VERSION,
-		gInputFormats, sizeof(gInputFormats) / sizeof(translation_format),
-		gOutputFormats, sizeof(gOutputFormats) / sizeof(translation_format),
+		sInputFormats, kNumInputFormats,
+		sOutputFormats, kNumOutputFormats,
 		"SGITranslator_Settings",
-		gDefaultSettings, sizeof(gDefaultSettings) / sizeof(TranSetting),
+		sDefaultSettings, kNumDefaultSettings,
 		B_TRANSLATOR_BITMAP, SGI_FORMAT)
 {
 }
@@ -183,7 +188,7 @@ identify_sgi_header(BPositionIO *inSource, translator_info *outInfo, uint32 outT
 	SGIImage* sgiImage = new(nothrow) SGIImage();
 	if (sgiImage)
 		status = sgiImage->SetTo(inSource);
-	
+
 	if (status >= B_OK) {
 		if (outInfo) {
 			outInfo->type = SGI_FORMAT;
@@ -206,7 +211,7 @@ identify_sgi_header(BPositionIO *inSource, translator_info *outInfo, uint32 outT
 
 	return status;
 }
-	
+
 // ---------------------------------------------------------------
 // DerivedIdentify
 //
@@ -304,7 +309,7 @@ SGITranslator::translate_from_bits(BPositionIO *inSource, uint32 outType,
 			// read one row at a time,
 			// convert to the correct format
 			// and write out the results
-	
+
 			// SGI Images store each channel separately
 			// a buffer is allocated big enough to hold all channels
 			// then the pointers are assigned with offsets into that buffer
@@ -402,7 +407,7 @@ SGITranslator::translate_from_bits(BPositionIO *inSource, uint32 outType,
 							// cannot be here
 							break;
 					} // switch (format)
-	
+
 					// for each channel, write a row buffer
 					for (uint32 z = 0; z < channelCount; z++) {
 						ret = sgiImage->WriteRow(rows[z], y, z);
@@ -411,13 +416,13 @@ printf("WriteRow() returned %s!\n", strerror(ret));
 							break;
 						}
 					}
-	
+
 				} // for (uint32 y = 0; y < height && ret >= B_OK; y++)
 				if (ret >= B_OK)
 					ret = B_OK;
 			} else // if (rows && rows[0] && rowBuffer)
 				ret = B_NO_MEMORY;
-	
+
 			delete[] rows[0];
 			delete[] rows;
 			delete[] rowBuffer;
@@ -437,7 +442,7 @@ SGITranslator::translate_from_sgi(BPositionIO *inSource, uint32 outType,
 	BPositionIO *outDestination)
 {
 	status_t ret = B_NO_TRANSLATOR;
-	
+
 	// if copying SGI_FORMAT to SGI_FORMAT
 	if (outType == SGI_FORMAT) {
 		translate_direct_copy(inSource, outDestination);
@@ -446,13 +451,13 @@ SGITranslator::translate_from_sgi(BPositionIO *inSource, uint32 outType,
 
 	// variables needing cleanup
 	SGIImage* sgiImage = NULL;
-	
+
 	ret = identify_sgi_header(inSource, NULL, outType, &sgiImage);
 
 	if (ret >= B_OK) {
 
 		bool bheaderonly = false, bdataonly = false;
-	
+
 		uint32 width = sgiImage->Width();
 		uint32 height = sgiImage->Height();
 		uint32 channelCount = sgiImage->CountChannels();
@@ -687,7 +692,7 @@ printf("error writing bits header: %s\n", strerror(ret));
 // Preconditions:
 //
 // Parameters:	inSource,	the data to be translated
-// 
+//
 //				inInfo,	hint about the data in inSource (not used)
 //
 //				ioExtension,	configuration options for the
@@ -727,7 +732,7 @@ SGITranslator::DerivedTranslate(BPositionIO *inSource,
 	else
 		// if BaseTranslator did not properly identify the data as
 		// bits or not bits
-		return B_NO_TRANSLATOR;		
+		return B_NO_TRANSLATOR;
 }
 
 BView *

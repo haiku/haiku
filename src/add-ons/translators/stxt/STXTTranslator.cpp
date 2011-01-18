@@ -32,7 +32,7 @@ using namespace std;
 #define DATA_BUFFER_SIZE 256
 
 // The input formats that this translator supports.
-translation_format gInputFormats[] = {
+static const translation_format sInputFormats[] = {
 	{
 		B_TRANSLATOR_TEXT,
 		B_TRANSLATOR_TEXT,
@@ -52,7 +52,7 @@ translation_format gInputFormats[] = {
 };
 
 // The output formats that this translator supports.
-translation_format gOutputFormats[] = {
+static const translation_format sOutputFormats[] = {
 	{
 		B_TRANSLATOR_TEXT,
 		B_TRANSLATOR_TEXT,
@@ -72,10 +72,14 @@ translation_format gOutputFormats[] = {
 };
 
 // Default settings for the Translator
-TranSetting gDefaultSettings[] = {
+static const TranSetting sDefaultSettings[] = {
 	{B_TRANSLATOR_EXT_HEADER_ONLY, TRAN_SETTING_BOOL, false},
 	{B_TRANSLATOR_EXT_DATA_ONLY, TRAN_SETTING_BOOL, false}
 };
+
+const uint32 kNumInputFormats = sizeof(sInputFormats) / sizeof(translation_format);
+const uint32 kNumOutputFormats = sizeof(sOutputFormats) / sizeof(translation_format);
+const uint32 kNumDefaultSettings = sizeof(sDefaultSettings) / sizeof(TranSetting);
 
 // ---------------------------------------------------------------
 // make_nth_translator
@@ -119,7 +123,7 @@ make_nth_translator(int32 n, image_id you, uint32 flags, ...)
  * Copyright (c) Ian F. Darwin 1986-1995.
  * Software written by Ian F. Darwin and others;
  * maintained 1995-present by Christos Zoulas and others.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -129,7 +133,7 @@ make_nth_translator(int32 n, image_id you, uint32 flags, ...)
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- *  
+ *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -149,12 +153,12 @@ make_nth_translator(int32 n, image_id you, uint32 flags, ...)
 		if (subtypeMimeSpecific != NULL) {
 			mimeType->SetTo(subtypeMimeSpecific);
 			if (mimeType->IsInstalled())
-				found = true;			
+				found = true;
 		}
 		if (!found && subtypeMimeGeneric != NULL) {
 			mimeType->SetTo(subtypeMimeGeneric);
 			if (mimeType->IsInstalled())
-				found = true;			
+				found = true;
 		}
 		if (!found)
 			mimeType->SetTo("text/plain");
@@ -195,7 +199,7 @@ file_ascmagic(const unsigned char *buf, size_t nbytes, BMimeType* mimeType,
 {
 	size_t i;
 	unsigned char *nbuf = NULL;
-	my_unichar *ubuf = NULL;	
+	my_unichar *ubuf = NULL;
 	size_t ulen;
 	struct names *p;
 	int rv = -1;
@@ -260,7 +264,7 @@ file_ascmagic(const unsigned char *buf, size_t nbytes, BMimeType* mimeType,
 	} else if (looks_latin1(buf, nbytes, ubuf, &ulen)) {
 		code = "ISO-8859";
 		type = "text";
-		encoding = "iso-8859-1"; 
+		encoding = "iso-8859-1";
 	} else if (looks_extended(buf, nbytes, ubuf, &ulen)) {
 		code = "Non-ISO extended-ASCII";
 		type = "text";
@@ -407,12 +411,12 @@ done:
 		if (subtypeMimeSpecific != NULL) {
 			mimeType->SetTo(subtypeMimeSpecific);
 			if (mimeType->IsInstalled())
-				found = true;			
+				found = true;
 		}
 		if (!found && subtypeMimeGeneric != NULL) {
 			mimeType->SetTo(subtypeMimeGeneric);
 			if (mimeType->IsInstalled())
-				found = true;			
+				found = true;
 		}
 		if (!found)
 			mimeType->SetTo("text/plain");
@@ -789,19 +793,19 @@ identify_stxt_header(const TranslatorStyledTextStreamHeader &header,
 {
 	const ssize_t ktxtsize = sizeof(TranslatorStyledTextTextHeader);
 	const ssize_t kstylsize = sizeof(TranslatorStyledTextStyleHeader);
-	
+
 	uint8 buffer[max(ktxtsize, kstylsize)];
-	
+
 	// Check the TEXT header
 	TranslatorStyledTextTextHeader txtheader;
 	if (inSource->Read(buffer, ktxtsize) != ktxtsize)
 		return B_NO_TRANSLATOR;
-		
+
 	memcpy(&txtheader, buffer, ktxtsize);
 	if (swap_data(B_UINT32_TYPE, &txtheader, ktxtsize,
 		B_SWAP_BENDIAN_TO_HOST) != B_OK)
 		return B_ERROR;
-		
+
 	if (txtheader.header.magic != 'TEXT'
 		|| txtheader.header.header_size != sizeof(TranslatorStyledTextTextHeader)
 		|| txtheader.charset != B_UNICODE_UTF8)
@@ -835,7 +839,7 @@ identify_stxt_header(const TranslatorStyledTextStreamHeader &header,
 			return B_ERROR;
 
 		if (stylheader.header.magic != 'STYL'
-			|| stylheader.header.header_size != 
+			|| stylheader.header.header_size !=
 				sizeof(TranslatorStyledTextStyleHeader))
 			return B_NO_TRANSLATOR;
 	}
@@ -943,10 +947,10 @@ translate_from_stxt(BPositionIO *inSource, BPositionIO *outDestination,
 {
 	if (inSource->Seek(0, SEEK_SET) != 0)
 		return B_ERROR;
-		
+
 	const ssize_t kstxtsize = sizeof(TranslatorStyledTextStreamHeader);
 	const ssize_t ktxtsize = sizeof(TranslatorStyledTextTextHeader);
-	
+
 	bool btoplain;
 	if (outType == B_TRANSLATOR_TEXT)
 		btoplain = true;
@@ -954,19 +958,19 @@ translate_from_stxt(BPositionIO *inSource, BPositionIO *outDestination,
 		btoplain = false;
 	else
 		return B_BAD_VALUE;
-	
+
 	uint8 buffer[READ_BUFFER_SIZE];
 	ssize_t nread = 0, nwritten = 0, nreed = 0, ntotalread = 0;
 
 	// skip to the actual text data when outputting a
 	// plain text file
 	if (btoplain) {
-		if (inSource->Seek(kstxtsize + ktxtsize, SEEK_CUR) != 
+		if (inSource->Seek(kstxtsize + ktxtsize, SEEK_CUR) !=
 			kstxtsize + ktxtsize)
 			return B_ERROR;
 	}
-	
-	// Read data from inSource 
+
+	// Read data from inSource
 	// When outputing B_TRANSLATOR_TEXT, the loop stops when all of
 	// the text data has been read and written.
 	// When outputting B_STYLED_TEXT_FORMAT, the loop stops when all
@@ -990,7 +994,7 @@ translate_from_stxt(BPositionIO *inSource, BPositionIO *outDestination,
 			nreed = READ_BUFFER_SIZE;
 		nread = inSource->Read(buffer, nreed);
 	}
-	
+
 	if (btoplain && static_cast<ssize_t>(txtheader.header.data_size) !=
 		ntotalread)
 		// If not all of the text data was able to be read...
@@ -1017,10 +1021,10 @@ translate_from_stxt(BPositionIO *inSource, BPositionIO *outDestination,
 //
 // Postconditions:
 //
-// Returns: 
+// Returns:
 //
 // B_ERROR, if there was an error writing to outDestination or
-// 	an error with converting the byte order 
+// 	an error with converting the byte order
 //
 // B_OK, if all went well
 // ---------------------------------------------------------------
@@ -1032,22 +1036,22 @@ output_headers(BPositionIO *outDestination, uint32 text_data_size)
 	status_t result;
 	TranslatorStyledTextStreamHeader stxtheader;
 	TranslatorStyledTextTextHeader txtheader;
-	
+
 	uint8 buffer[kHeadersSize];
-	
+
 	stxtheader.header.magic = 'STXT';
 	stxtheader.header.header_size = sizeof(TranslatorStyledTextStreamHeader);
 	stxtheader.header.data_size = 0;
 	stxtheader.version = 100;
 	memcpy(buffer, &stxtheader, stxtheader.header.header_size);
-	
+
 	txtheader.header.magic = 'TEXT';
 	txtheader.header.header_size = sizeof(TranslatorStyledTextTextHeader);
 	txtheader.header.data_size = text_data_size;
 	txtheader.charset = B_UNICODE_UTF8;
 	memcpy(buffer + stxtheader.header.header_size, &txtheader,
 		txtheader.header.header_size);
-	
+
 	// write out headers in Big Endian byte order
 	result = swap_data(B_UINT32_TYPE, buffer, kHeadersSize,
 		B_SWAP_HOST_TO_BENDIAN);
@@ -1059,7 +1063,7 @@ output_headers(BPositionIO *outDestination, uint32 text_data_size)
 		else
 			return B_OK;
 	}
-	
+
 	return result;
 }
 
@@ -1084,7 +1088,7 @@ output_headers(BPositionIO *outDestination, uint32 text_data_size)
 // Returns:
 //
 // B_ERROR, if there was an error writing to outDestination or
-// 	an error with converting the byte order 
+// 	an error with converting the byte order
 //
 // B_OK, if all went well
 // ---------------------------------------------------------------
@@ -1093,9 +1097,9 @@ output_styles(BPositionIO *outDestination, uint32 text_size,
 	uint8 *pflatRunArray, ssize_t data_size)
 {
 	const ssize_t kstylsize = sizeof(TranslatorStyledTextStyleHeader);
-	
+
 	uint8 buffer[kstylsize];
-	
+
 	// output STYL header
 	TranslatorStyledTextStyleHeader stylheader;
 	stylheader.header.magic = 'STYL';
@@ -1104,19 +1108,19 @@ output_styles(BPositionIO *outDestination, uint32 text_size,
 	stylheader.header.data_size = data_size;
 	stylheader.apply_offset = 0;
 	stylheader.apply_length = text_size;
-	
+
 	memcpy(buffer, &stylheader, kstylsize);
 	if (swap_data(B_UINT32_TYPE, buffer, kstylsize,
 		B_SWAP_HOST_TO_BENDIAN) != B_OK)
 		return B_ERROR;
 	if (outDestination->Write(buffer, kstylsize) != kstylsize)
 		return B_ERROR;
-		
+
 	// output actual style information
 	if (outDestination->Write(pflatRunArray,
 		data_size) != data_size)
 		return B_ERROR;
-	
+
 	return B_OK;
 }
 
@@ -1290,7 +1294,7 @@ translate_from_text(BPositionIO* source, const char* encoding, bool forceEncodin
 			return status;
 	}
 
-	// Read file attributes if outputting styled data 
+	// Read file attributes if outputting styled data
 	// and source is a BNode object
 
 	if (node == NULL)
@@ -1331,10 +1335,10 @@ translate_from_text(BPositionIO* source, const char* encoding, bool forceEncodin
 STXTTranslator::STXTTranslator()
 	: BaseTranslator("StyledEdit files", "StyledEdit files translator",
 		STXT_TRANSLATOR_VERSION,
-		gInputFormats, sizeof(gInputFormats) / sizeof(translation_format),
-		gOutputFormats, sizeof(gOutputFormats) / sizeof(translation_format),
+		sInputFormats, kNumInputFormats,
+		sOutputFormats, kNumOutputFormats,
 		"STXTTranslator_Settings",
-		gDefaultSettings, sizeof(gDefaultSettings) / sizeof(TranSetting),
+		sDefaultSettings, kNumDefaultSettings,
 		B_TRANSLATOR_TEXT, B_STYLED_TEXT_FORMAT)
 {
 }
@@ -1354,9 +1358,9 @@ STXTTranslator::Identify(BPositionIO *inSource,
 		outType = B_TRANSLATOR_TEXT;
 	if (outType != B_TRANSLATOR_TEXT && outType != B_STYLED_TEXT_FORMAT)
 		return B_NO_TRANSLATOR;
-		
+
 	const ssize_t kstxtsize = sizeof(TranslatorStyledTextStreamHeader);
-	
+
 	uint8 buffer[DATA_BUFFER_SIZE];
 	status_t nread = 0;
 	// Read in the header to determine

@@ -23,7 +23,7 @@
 using std::nothrow;
 
 // The input formats that this translator supports.
-translation_format gInputFormats[] = {
+static const translation_format sInputFormats[] = {
 	/*{
 		B_TRANSLATOR_BITMAP,
 		B_TRANSLATOR_BITMAP,
@@ -43,7 +43,7 @@ translation_format gInputFormats[] = {
 };
 
 // The output formats that this translator supports.
-translation_format gOutputFormats[] = {
+static const translation_format sOutputFormats[] = {
 	{
 		B_TRANSLATOR_BITMAP,
 		B_TRANSLATOR_BITMAP,
@@ -64,10 +64,14 @@ translation_format gOutputFormats[] = {
 
 
 // Default settings for the Translator
-TranSetting gDefaultSettings[] = {
+static const TranSetting sDefaultSettings[] = {
 	{ B_TRANSLATOR_EXT_HEADER_ONLY, TRAN_SETTING_BOOL, false },
 	{ B_TRANSLATOR_EXT_DATA_ONLY, TRAN_SETTING_BOOL, false }
 };
+
+const uint32 kNumInputFormats = sizeof(sInputFormats) / sizeof(translation_format);
+const uint32 kNumOutputFormats = sizeof(sOutputFormats) / sizeof(translation_format);
+const uint32 kNumDefaultSettings = sizeof(sDefaultSettings) / sizeof(TranSetting);
 
 
 BTranslator*
@@ -83,10 +87,10 @@ make_nth_translator(int32 n, image_id you, uint32 flags, ...)
 WonderBrushTranslator::WonderBrushTranslator()
 	: BaseTranslator("WonderBrush images", "WonderBrush image translator",
 		WBI_TRANSLATOR_VERSION,
-		gInputFormats, sizeof(gInputFormats) / sizeof(translation_format),
-		gOutputFormats, sizeof(gOutputFormats) / sizeof(translation_format),
+		sInputFormats, kNumInputFormats,
+		sOutputFormats, kNumOutputFormats,
 		"WBITranslator_Settings",
-		gDefaultSettings, sizeof(gDefaultSettings) / sizeof(TranSetting),
+		sDefaultSettings, kNumDefaultSettings,
 		B_TRANSLATOR_BITMAP, WBI_FORMAT)
 {
 #if GAMMA_BLEND
@@ -112,7 +116,7 @@ identify_wbi_header(BPositionIO* inSource, translator_info* outInfo,
 	WonderBrushImage* wbImage = new(nothrow) WonderBrushImage();
 	if (wbImage)
 		status = wbImage->SetTo(inSource);
-	
+
 	if (status >= B_OK) {
 		if (outInfo) {
 			outInfo->type = WBI_FORMAT;
@@ -137,7 +141,7 @@ identify_wbi_header(BPositionIO* inSource, translator_info* outInfo,
 
 	return status;
 }
-	
+
 
 status_t
 WonderBrushTranslator::DerivedIdentify(BPositionIO* inSource,
@@ -159,7 +163,7 @@ WonderBrushTranslator::DerivedTranslate(BPositionIO* inSource,
 	else
 		// if BaseTranslator did not properly identify the data as
 		// bits or not bits
-		return B_NO_TRANSLATOR;		
+		return B_NO_TRANSLATOR;
 }
 
 

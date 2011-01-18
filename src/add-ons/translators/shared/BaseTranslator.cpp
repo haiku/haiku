@@ -14,18 +14,18 @@
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
 // to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-// and/or sell copies of the Software, and to permit persons to whom the 
+// the rights to use, copy, modify, merge, publish, distribute, sublicense,
+// and/or sell copies of the Software, and to permit persons to whom the
 // Software is furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included 
+// The above copyright notice and this permission notice shall be included
 // in all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 // OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 // THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
@@ -59,7 +59,7 @@
 BaseTranslator::BaseTranslator(const char *name, const char *info,
 	const int32 version, const translation_format *inFormats,
 	int32 inCount, const translation_format *outFormats, int32 outCount,
-	const char *settingsFile, TranSetting *defaults, int32 defCount,
+	const char *settingsFile, const TranSetting *defaults, int32 defCount,
 	uint32 tranGroup, uint32 tranType)
 	:
 	BTranslator()
@@ -123,7 +123,7 @@ BaseTranslator::~BaseTranslator()
 // Postconditions:
 //
 // Returns: a const char * to the short name of the translator
-// ---------------------------------------------------------------	
+// ---------------------------------------------------------------
 const char *
 BaseTranslator::TranslatorName() const
 {
@@ -166,7 +166,7 @@ BaseTranslator::TranslatorInfo() const
 //
 // Returns:
 // ---------------------------------------------------------------
-int32 
+int32
 BaseTranslator::TranslatorVersion() const
 {
 	return fVersion;
@@ -213,7 +213,7 @@ BaseTranslator::InputFormats(int32 *out_count) const
 //
 // Returns: the array of output formats and the number of output
 // formats through the out_count parameter
-// ---------------------------------------------------------------	
+// ---------------------------------------------------------------
 const translation_format *
 BaseTranslator::OutputFormats(int32 *out_count) const
 {
@@ -229,7 +229,7 @@ BaseTranslator::OutputFormats(int32 *out_count) const
 // identify_bits_header
 //
 // Determines if the data in inSource is in the
-// B_TRANSLATOR_BITMAP ('bits') format. If it is, it returns 
+// B_TRANSLATOR_BITMAP ('bits') format. If it is, it returns
 // info about the data in inSource to outInfo and pheader.
 //
 // Preconditions:
@@ -259,7 +259,7 @@ BaseTranslator::OutputFormats(int32 *out_count) const
 // B_OK,	if the data looks like bits data and no errors were
 //			encountered
 // ---------------------------------------------------------------
-status_t 
+status_t
 BaseTranslator::identify_bits_header(BPositionIO *inSource,
 	translator_info *outInfo, TranslatorBitmap *pheader)
 {
@@ -270,12 +270,12 @@ BaseTranslator::identify_bits_header(BPositionIO *inSource,
 	if (inSource->Read(
 		(reinterpret_cast<uint8 *> (&header)), size) != size)
 		return B_NO_TRANSLATOR;
-		
+
 	// convert to host byte order
 	if (swap_data(B_UINT32_TYPE, &header, sizeof(TranslatorBitmap),
 		B_SWAP_BENDIAN_TO_HOST) != B_OK)
 		return B_ERROR;
-		
+
 	// check if header values are reasonable
 	if (header.colors != B_RGB32 &&
 		header.colors != B_RGB32_BIG &&
@@ -299,7 +299,7 @@ BaseTranslator::identify_bits_header(BPositionIO *inSource,
 		return B_NO_TRANSLATOR;
 	if (header.rowBytes * (header.bounds.Height() + 1) != header.dataSize)
 		return B_NO_TRANSLATOR;
-			
+
 	if (outInfo) {
 		outInfo->type = B_TRANSLATOR_BITMAP;
 		outInfo->group = B_TRANSLATOR_BITMAP;
@@ -307,7 +307,7 @@ BaseTranslator::identify_bits_header(BPositionIO *inSource,
 		outInfo->capability = 0.2;
 		strcpy(outInfo->name, B_TRANSLATE("Be Bitmap Format"));
 		strcpy(outInfo->MIME, "image/x-be-bitmap");
-		
+
 		// Look for quality / capability info in fInputFormats
 		for (int32 i = 0; i < fInputCount; i++) {
 			if (fInputFormats[i].type == B_TRANSLATOR_BITMAP &&
@@ -319,7 +319,7 @@ BaseTranslator::identify_bits_header(BPositionIO *inSource,
 			}
 		}
 	}
-	
+
 	if (pheader) {
 		pheader->magic = header.magic;
 		pheader->bounds = header.bounds;
@@ -327,7 +327,7 @@ BaseTranslator::identify_bits_header(BPositionIO *inSource,
 		pheader->colors = header.colors;
 		pheader->dataSize = header.dataSize;
 	}
-	
+
 	return B_OK;
 }
 
@@ -335,7 +335,7 @@ BaseTranslator::identify_bits_header(BPositionIO *inSource,
 // ---------------------------------------------------------------
 // BitsCheck
 //
-// Examines the input stream for B_TRANSLATOR_BITMAP format 
+// Examines the input stream for B_TRANSLATOR_BITMAP format
 // information and determines if BaseTranslator can handle
 // the translation entirely, if it must pass the task of
 // translation to the derived translator or if the stream cannot
@@ -382,7 +382,7 @@ BaseTranslator::BitsCheck(BPositionIO *inSource, BMessage *ioExtension,
 	// I won't have to convert the data read in to see whether or not
 	// it is a supported type
 	const uint32 kBitsMagic = B_HOST_TO_BENDIAN_INT32(B_TRANSLATOR_BITMAP);
-	
+
 	// Read in the magic number and determine if it
 	// is a supported type
 	uint8 ch[4];
@@ -391,11 +391,11 @@ BaseTranslator::BitsCheck(BPositionIO *inSource, BMessage *ioExtension,
 	inSource->Seek(-4, SEEK_CUR);
 		// seek backward becuase functions used after this one
 		// expect the stream to be at the beginning
-		
+
 	// Read settings from ioExtension
 	if (ioExtension && fSettings->LoadSettings(ioExtension) < B_OK)
 		return B_BAD_VALUE;
-	
+
 	uint32 sourceMagic;
 	memcpy(&sourceMagic, ch, sizeof(uint32));
 	if (sourceMagic == kBitsMagic)
@@ -516,13 +516,13 @@ BaseTranslator::translate_from_bits_to_bits(BPositionIO *inSource,
 {
 	TranslatorBitmap bitsHeader;
 	bool bheaderonly = false, bdataonly = false;
-		
+
 	status_t result;
 	result = identify_bits_header(inSource, NULL, &bitsHeader);
 	if (result != B_OK)
 		return result;
-	
-	// Translate B_TRANSLATOR_BITMAP to B_TRANSLATOR_BITMAP, easy enough :)	
+
+	// Translate B_TRANSLATOR_BITMAP to B_TRANSLATOR_BITMAP, easy enough :)
 	if (outType == B_TRANSLATOR_BITMAP) {
 		// write out bitsHeader (only if configured to)
 		if (bheaderonly || (!bheaderonly && !bdataonly)) {
@@ -533,9 +533,9 @@ BaseTranslator::translate_from_bits_to_bits(BPositionIO *inSource,
 				sizeof(TranslatorBitmap)) != sizeof(TranslatorBitmap))
 				return B_ERROR;
 		}
-		
+
 		// write out the data (only if configured to)
-		if (bdataonly || (!bheaderonly && !bdataonly)) {	
+		if (bdataonly || (!bheaderonly && !bdataonly)) {
 			uint8 buf[1024];
 			uint32 remaining = B_BENDIAN_TO_HOST_INT32(bitsHeader.dataSize);
 			ssize_t rd, writ;
@@ -547,7 +547,7 @@ BaseTranslator::translate_from_bits_to_bits(BPositionIO *inSource,
 				remaining -= static_cast<uint32>(writ);
 				rd = inSource->Read(buf, min(1024, remaining));
 			}
-		
+
 			if (remaining > 0)
 				return B_ERROR;
 			else
@@ -587,7 +587,7 @@ BaseTranslator::BitsTranslate(BPositionIO *inSource,
 // Preconditions:
 //
 // Parameters:	inSource,	the data to be translated
-// 
+//
 //				inInfo,	hint about the data in inSource (not used)
 //
 //				ioExtension,	configuration options for the
@@ -638,7 +638,7 @@ BaseTranslator::GetConfigurationMessage(BMessage *ioExtension)
 // MakeConfigurationView
 //
 // Makes a BView object for configuring / displaying info about
-// this translator. 
+// this translator.
 //
 // Preconditions:
 //

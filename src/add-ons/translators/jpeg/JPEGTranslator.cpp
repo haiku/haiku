@@ -55,8 +55,8 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 // Translation Kit required globals
-char gTranslatorName[] = "JPEG images";
-char gTranslatorInfo[] =
+static char sTranslatorName[] = "JPEG images";
+static char sTranslatorInfo[] =
 	"©2002-2003, Marcin Konicki\n"
 	"©2005-2007, Haiku\n"
 	"\n"
@@ -69,28 +69,26 @@ char gTranslatorInfo[] =
 	"With some colorspace conversion routines by Magnus Hellman\n"
 	"          http://www.bebits.com/app/802\n";
 
-int32 gTranslatorVersion = B_TRANSLATION_MAKE_VERSION(1, 2, 0);
+static const int32 sTranslatorVersion = B_TRANSLATION_MAKE_VERSION(1, 2, 0);
 
 // Define the formats we know how to read
-const translation_format gInputFormats[] = {
+static const translation_format sInputFormats[] = {
 	{ JPEG_FORMAT, B_TRANSLATOR_BITMAP, 0.5, 0.5,
 		JPEG_MIME_STRING, JPEG_DESCRIPTION },
 	{ B_TRANSLATOR_BITMAP, B_TRANSLATOR_BITMAP, 0.5, 0.5,
 		B_TRANSLATOR_BITMAP_MIME_STRING, B_TRANSLATOR_BITMAP_DESCRIPTION }
 };
-const int gInputFormatCount = sizeof(gInputFormats) / sizeof(translation_format);
 
 // Define the formats we know how to write
-const translation_format gOutputFormats[] = {
+static const translation_format sOutputFormats[] = {
 	{ JPEG_FORMAT, B_TRANSLATOR_BITMAP, 0.5, 0.5,
 		JPEG_MIME_STRING, JPEG_DESCRIPTION },
 	{ B_TRANSLATOR_BITMAP, B_TRANSLATOR_BITMAP, 0.5, 0.5,
 		B_TRANSLATOR_BITMAP_MIME_STRING, B_TRANSLATOR_BITMAP_DESCRIPTION }
 };
-const int gOutputFormatCount = sizeof(gOutputFormats) / sizeof(translation_format);
 
 
-TranSetting gSettings[] = {
+static const TranSetting sDefaultSettings[] = {
 	{JPEG_SET_SMOOTHING, TRAN_SETTING_INT32, 0},
 	{JPEG_SET_QUALITY, TRAN_SETTING_INT32, 95},
 	{JPEG_SET_PROGRESSIVE, TRAN_SETTING_BOOL, true},
@@ -101,7 +99,10 @@ TranSetting gSettings[] = {
 	{JPEG_SET_PHOTOSHOP_CMYK, TRAN_SETTING_BOOL, true},
 	{JPEG_SET_SHOWREADWARNING, TRAN_SETTING_BOOL, true}
 };
-const int gSettingsCount = sizeof(gSettings) / sizeof(TranSetting);
+
+const uint32 kNumInputFormats = sizeof(sInputFormats) / sizeof(translation_format);
+const uint32 kNumOutputFormats = sizeof(sOutputFormats) / sizeof(translation_format);
+const uint32 kNumDefaultSettings = sizeof(sDefaultSettings) / sizeof(TranSetting);
 
 
 namespace conversion {
@@ -658,19 +659,19 @@ TranslatorAboutView::TranslatorAboutView(const char* name)
 	BView(name, 0, new BGroupLayout(B_VERTICAL))
 {
 	BAlignment labelAlignment = BAlignment(B_ALIGN_LEFT, B_ALIGN_TOP);
-	BStringView* title = new BStringView("Title", gTranslatorName);
+	BStringView* title = new BStringView("Title", sTranslatorName);
 	title->SetFont(be_bold_font);
 	title->SetExplicitAlignment(labelAlignment);
 
 	char versionString[16];
-	sprintf(versionString, "v%d.%d.%d", (int)(gTranslatorVersion >> 8),
-		(int)((gTranslatorVersion >> 4) & 0xf), (int)(gTranslatorVersion & 0xf));
+	sprintf(versionString, "v%d.%d.%d", (int)(sTranslatorVersion >> 8),
+		(int)((sTranslatorVersion >> 4) & 0xf), (int)(sTranslatorVersion & 0xf));
 
 	BStringView* version = new BStringView("Version", versionString);
 	version->SetExplicitAlignment(labelAlignment);
 
 	BTextView* infoView = new BTextView("info");
-	infoView->SetText(gTranslatorInfo);
+	infoView->SetText(sTranslatorInfo);
 	infoView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	infoView->MakeEditable(false);
 
@@ -1293,11 +1294,12 @@ JPEGTranslator::Error(j_common_ptr cinfo, status_t error)
 
 
 JPEGTranslator::JPEGTranslator()
-	:
-	BaseTranslator(gTranslatorName, gTranslatorInfo, gTranslatorVersion,
-	gInputFormats, gInputFormatCount, gOutputFormats, gOutputFormatCount,
-	SETTINGS_FILE, gSettings, gSettingsCount,
-	B_TRANSLATOR_BITMAP, JPEG_FORMAT)
+	: BaseTranslator(sTranslatorName, sTranslatorInfo, sTranslatorVersion,
+		sInputFormats,  kNumInputFormats,
+		sOutputFormats, kNumOutputFormats,
+		SETTINGS_FILE,
+		sDefaultSettings, kNumDefaultSettings,
+		B_TRANSLATOR_BITMAP, JPEG_FORMAT)
 {}
 
 
@@ -1316,7 +1318,7 @@ main(int, char**)
 {
 	BApplication app("application/x-vnd.Haiku-JPEGTranslator");
 	JPEGTranslator* translator = new JPEGTranslator();
-	if (LaunchTranslatorWindow(translator, gTranslatorName) == B_OK)
+	if (LaunchTranslatorWindow(translator, sTranslatorName) == B_OK)
 		app.Run();
 
 	return 0;

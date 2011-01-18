@@ -50,8 +50,8 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define B_TRANSLATOR_BITMAP_MIME_STRING "image/x-be-bitmap"
 #define B_TRANSLATOR_BITMAP_DESCRIPTION "Be Bitmap Format (JPEG2000Translator)"
 
-const char gTranslatorName[] = "JPEG2000 images";
-const char gTranslatorInfo[] = "©2002-2003, Shard\n"
+static const char sTranslatorName[] = "JPEG2000 images";
+static const char sTranslatorInfo[] = "©2002-2003, Shard\n"
 	"©2005-2006, Haiku\n"
 	"\n"
 	"Based on JasPer library:\n"
@@ -63,34 +63,33 @@ const char gTranslatorInfo[] = "©2002-2003, Shard\n"
 	"ImageMagick's jp2 codec was used as \"tutorial\".\n"
 	"          http://www.imagemagick.org/\n";
 
-int32 gTranslatorVersion = B_TRANSLATION_MAKE_VERSION(1, 0, 0);
+static int32 sTranslatorVersion = B_TRANSLATION_MAKE_VERSION(1, 0, 0);
 
-translation_format gInputFormats[] = {
+static const translation_format sInputFormats[] = {
 	{ JP2_FORMAT, B_TRANSLATOR_BITMAP, 0.5, 0.5,
 		JP2_MIME_STRING, JP2_DESCRIPTION },
 	{ B_TRANSLATOR_BITMAP, B_TRANSLATOR_BITMAP, 0.5, 0.5,
 		B_TRANSLATOR_BITMAP_MIME_STRING, B_TRANSLATOR_BITMAP_DESCRIPTION },
 };
-const int gInputFormatCount =
-	sizeof(gInputFormats) / sizeof(translation_format);
 
-translation_format gOutputFormats[] = {
+static const translation_format sOutputFormats[] = {
 	{ JP2_FORMAT, B_TRANSLATOR_BITMAP, 0.5, 0.5,
 		JP2_MIME_STRING, JP2_DESCRIPTION },
 	{ B_TRANSLATOR_BITMAP, B_TRANSLATOR_BITMAP, 0.5, 0.5,
 		B_TRANSLATOR_BITMAP_MIME_STRING, B_TRANSLATOR_BITMAP_DESCRIPTION },
 };
-const int gOutputFormatCount =
-	 sizeof(gOutputFormats) / sizeof(translation_format);
 
 
-TranSetting gSettings[] = {
+static const TranSetting sDefaultSettings[] = {
 	{JP2_SET_QUALITY, TRAN_SETTING_INT32, 25},
 	{JP2_SET_JPC, TRAN_SETTING_BOOL, false},
 	{JP2_SET_GRAY1_AS_B_RGB24, TRAN_SETTING_BOOL, false},
 	{JP2_SET_GRAY8_AS_B_RGB32, TRAN_SETTING_BOOL, true}
 };
-const int gSettingsCount = sizeof(gSettings) / sizeof(TranSetting) ;
+
+const uint32 kNumInputFormats = sizeof(sInputFormats) / sizeof(translation_format);
+const uint32 kNumOutputFormats = sizeof(sOutputFormats) / sizeof(translation_format);
+const uint32 kNumDefaultSettings = sizeof(sDefaultSettings) / sizeof(TranSetting);
 
 
 namespace conversion{
@@ -492,7 +491,7 @@ static jas_stream_ops_t positionIOops = {
 };
 
 
-static jas_stream_t* 
+static jas_stream_t*
 jas_stream_positionIOopen(BPositionIO *positionIO)
 {
 	jas_stream_t* stream;
@@ -628,7 +627,7 @@ TranslatorWriteView::TranslatorWriteView(const char* name,
 		new BMessage(VIEW_MSG_SET_JPC));
 	if (fSettings->SetGetBool(JP2_SET_JPC))
 		fCodeStreamOnly->SetValue(B_CONTROL_ON);
-	
+
 	float padding = 10.0f;
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, padding)
 		.Add(fQualitySlider)
@@ -703,22 +702,22 @@ TranslatorAboutView::TranslatorAboutView(const char* name)
 	BView(name, 0, new BGroupLayout(B_VERTICAL))
 {
 	BAlignment labelAlignment = BAlignment(B_ALIGN_LEFT, B_ALIGN_TOP);
-	BStringView* title = new BStringView("Title", gTranslatorName);
+	BStringView* title = new BStringView("Title", sTranslatorName);
 	title->SetFont(be_bold_font);
 	title->SetExplicitAlignment(labelAlignment);
 
 	char versionString[16];
-	sprintf(versionString, "v%d.%d.%d", (int)(gTranslatorVersion >> 8),
-		(int)((gTranslatorVersion >> 4) & 0xf), (int)(gTranslatorVersion & 0xf));
+	sprintf(versionString, "v%d.%d.%d", (int)(sTranslatorVersion >> 8),
+		(int)((sTranslatorVersion >> 4) & 0xf), (int)(sTranslatorVersion & 0xf));
 
 	BStringView* version = new BStringView("Version", versionString);
 	version->SetExplicitAlignment(labelAlignment);
 
-	BTextView* infoView = new BTextView("info");	
-	infoView->SetText(gTranslatorInfo);
+	BTextView* infoView = new BTextView("info");
+	infoView->SetText(sTranslatorInfo);
 	infoView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	infoView->MakeEditable(false);
-	
+
 	float padding = 10.0f;
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, padding)
 		.Add(BGroupLayoutBuilder(B_HORIZONTAL, padding)
@@ -763,11 +762,12 @@ JP2Translator::NewConfigView(TranslatorSettings* settings)
 
 
 JP2Translator::JP2Translator()
-	:
-	BaseTranslator(gTranslatorName, gTranslatorInfo, gTranslatorVersion,
-		gInputFormats, gInputFormatCount,
-		gOutputFormats, gOutputFormatCount, JP2_SETTINGS_FILE,
-		gSettings, gSettingsCount, B_TRANSLATOR_BITMAP, JP2_FORMAT)
+	: BaseTranslator(sTranslatorName, sTranslatorInfo, sTranslatorVersion,
+		sInputFormats, kNumInputFormats,
+		sOutputFormats, kNumOutputFormats,
+		JP2_SETTINGS_FILE,
+		sDefaultSettings, kNumDefaultSettings,
+		B_TRANSLATOR_BITMAP, JP2_FORMAT)
 {
 }
 
@@ -1048,7 +1048,7 @@ JP2Translator::Compress(BPositionIO* in, BPositionIO* out)
 		(float)fSettings->SetGetInt32(JP2_SET_QUALITY) / 100.0);
 
 	if (jas_image_encode(image, outs, jas_image_strtofmt(
-			fSettings->SetGetBool(JP2_SET_JPC) ? 
+			fSettings->SetGetBool(JP2_SET_JPC) ?
 				(char*)"jpc" : (char*)"jp2"), opts)) {
 		return Error(outs, image, pixels,
 			out_color_components, in_scanline, err);
@@ -1287,7 +1287,7 @@ main()
 {
 	BApplication app("application/x-vnd.Haiku-JPEG2000Translator");
 	JP2Translator* translator = new JP2Translator();
-	if (LaunchTranslatorWindow(translator, gTranslatorName) == B_OK)
+	if (LaunchTranslatorWindow(translator, sTranslatorName) == B_OK)
 		app.Run();
 
 	return 0;

@@ -23,7 +23,7 @@ typedef struct my_hpgs_png_image_st {
 } my_hpgs_png_image;
 
 
-int 
+int
 my_pim_write(hpgs_image *_this, const char *filename)
 {
 	BPositionIO* target = ((my_hpgs_png_image *)_this)->target;
@@ -42,7 +42,7 @@ my_pim_write(hpgs_image *_this, const char *filename)
 
 
 // The input formats that this translator supports.
-translation_format sInputFormats[] = {
+static const translation_format sInputFormats[] = {
 	{
 		HPGS_IMAGE_FORMAT,
 		B_TRANSLATOR_BITMAP,
@@ -54,7 +54,7 @@ translation_format sInputFormats[] = {
 };
 
 // The output formats that this translator supports.
-translation_format sOutputFormats[] = {
+static const translation_format sOutputFormats[] = {
 	{
 		B_TRANSLATOR_BITMAP,
 		B_TRANSLATOR_BITMAP,
@@ -66,7 +66,7 @@ translation_format sOutputFormats[] = {
 };
 
 // Default settings for the Translator
-static TranSetting sDefaultSettings[] = {
+static const TranSetting sDefaultSettings[] = {
 	{B_TRANSLATOR_EXT_HEADER_ONLY, TRAN_SETTING_BOOL, false},
 	{B_TRANSLATOR_EXT_DATA_ONLY, TRAN_SETTING_BOOL, false}
 };
@@ -109,7 +109,7 @@ HPGSTranslator::DerivedIdentify(BPositionIO *stream,
 		return B_NO_TRANSLATOR;
 
 	hpgs_istream *istream = hpgs_new_wrapper_istream(stream);
-	
+
 	status_t err = B_OK;
 	int verbosity = 1;
 	hpgs_bool multipage = HPGS_FALSE;
@@ -126,7 +126,7 @@ HPGSTranslator::DerivedIdentify(BPositionIO *stream,
 		strcpy(info->MIME, "vector/x-hpgl2");
 	} else
 		err = B_NO_TRANSLATOR;
-	
+
 	free(reader);
 	free(size_dev);
 	hpgs_free_wrapper_istream(istream);
@@ -147,11 +147,11 @@ HPGSTranslator::DerivedTranslate(BPositionIO* source,
 
 	status_t err = B_OK;
 	hpgs_istream *istream = hpgs_new_wrapper_istream(source);
-		
+
 	TranslatorBitmap header;
 	ssize_t bytesWritten;
 	uint32 dataSize;
-	
+
 	double paper_angle = 180.0;
 	double paper_border = 0.0;
 	double paper_width = 0.0;
@@ -201,7 +201,7 @@ HPGSTranslator::DerivedTranslate(BPositionIO* source,
 	image->vtable->write = &my_pim_write;
 	image = (hpgs_image *)realloc(image, sizeof(my_hpgs_png_image));
 	((my_hpgs_png_image *)image)->target = target;
-	
+
 	pdv = hpgs_new_paint_device(image, NULL, &bbox, antialias);
 	hpgs_paint_device_set_image_interpolation(pdv, image_interpolation);
 	hpgs_paint_device_set_thin_alpha(pdv, thin_alpha);

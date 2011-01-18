@@ -19,7 +19,7 @@
 
 
 // The input formats that this translator supports.
-translation_format sInputFormats[] = {
+static const translation_format sInputFormats[] = {
 	{
 		RTF_TEXT_FORMAT,
 		B_TRANSLATOR_TEXT,
@@ -27,11 +27,11 @@ translation_format sInputFormats[] = {
 		RTF_IN_CAPABILITY,
 		"text/rtf",
 		"RichTextFormat file"
-	},
+	}
 };
 
 // The output formats that this translator supports.
-translation_format sOutputFormats[] = {
+static const translation_format sOutputFormats[] = {
 	{
 		B_TRANSLATOR_TEXT,
 		B_TRANSLATOR_TEXT,

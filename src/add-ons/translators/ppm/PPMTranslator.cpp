@@ -90,8 +90,8 @@ struct ppm_settings {
 	bool				write_ascii;
 	bool				settings_touched;
 };
-BLocker g_settings_lock("PPM settings lock");
-ppm_settings g_settings;
+static BLocker g_settings_lock("PPM settings lock");
+static ppm_settings g_settings;
 
 BPoint get_window_origin();
 void set_window_origin(BPoint pos);
@@ -485,10 +485,10 @@ public:
  				if (g_settings.write_ascii)
  					mAscii->SetValue(1);
  				mAscii->SetViewColor(ViewColor());
- 
+
  				// Build the layout
  				SetLayout(new BGroupLayout(B_HORIZONTAL));
- 
+
  				AddChild(BGroupLayoutBuilder(B_VERTICAL, 7)
  					.Add(mTitle)
  					.Add(mDetail)
@@ -504,7 +504,7 @@ public:
  					.AddGlue()
  					.SetInsets(5, 5, 5, 5)
  				);
- 
+
  				BFont font;
  				GetFont(&font);
  				SetExplicitPreferredSize(BSize((font.Size() * 350)/12, (font.Size() * 200)/12));
