@@ -180,6 +180,7 @@ SettingsView::MessageReceived(BMessage* message)
 				= static_cast<NodeMenuItem*>(fInputMenu->ItemAt(index));
 			SetDefaultInput(item->NodeInfo());
 			RestartRequired(true);
+			break;
 		}
 		case MEDIA_DEFAULT_OUTPUT_CHANGE:
 		{
@@ -190,6 +191,7 @@ SettingsView::MessageReceived(BMessage* message)
 				= static_cast<NodeMenuItem*>(fOutputMenu->ItemAt(index));
 			SetDefaultOutput(item->NodeInfo());
 			RestartRequired(true);
+			break;
 		}
 		case ML_ENABLE_REAL_TIME:
 		{
@@ -198,8 +200,9 @@ SettingsView::MessageReceived(BMessage* message)
 				_FlipRealtimeFlag(flags);
 			break;
 		}
+		default:
+			BGridView::MessageReceived(message);
 	}
-	BGridView::MessageReceived(message);
 }
 
 
