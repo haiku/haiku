@@ -12,10 +12,15 @@
 #include <time.h>
 
 #include <AffineTransform.h>
+#include <Catalog.h>
 #include <GradientLinear.h>
 #include <Shape.h>
 #include <Slider.h>
 #include <TextView.h>
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Leaves"
 
 
 // path data for the leaf shape
@@ -63,8 +68,8 @@ enum {
 
 
 extern "C" BScreenSaver*
-instantiate_screen_saver(BMessage* msg, image_id image) 
-{ 
+instantiate_screen_saver(BMessage* msg, image_id image)
+{
 	return new Leaves(msg, image);
 }
 
@@ -90,34 +95,37 @@ Leaves::Leaves(BMessage* archive, image_id id)
 }
 
 
-void 
+void
 Leaves::StartConfig(BView* view)
 {
 	BRect bounds = view->Bounds();
 	bounds.InsetBy(10, 10);
 	BRect frame(0, 0, bounds.Width(), 20);
 
-	fDropRateSlider = new BSlider(frame, "drop rate", "Drop rate:",
-		new BMessage(MSG_SET_DROP_RATE), kMinimumDropRate, kMaximumDropRate,
-		B_BLOCK_THUMB, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM);
+	fDropRateSlider = new BSlider(frame, "drop rate",
+		B_TRANSLATE("Drop rate:"), new BMessage(MSG_SET_DROP_RATE),
+		kMinimumDropRate, kMaximumDropRate,	B_BLOCK_THUMB,
+		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM);
 	fDropRateSlider->SetValue(fDropRate);
 	fDropRateSlider->ResizeToPreferred();
 	bounds.bottom -= fDropRateSlider->Bounds().Height() * 1.5;
 	fDropRateSlider->MoveTo(bounds.LeftBottom());
 	view->AddChild(fDropRateSlider);
 
-	fLeafSizeSlider = new BSlider(frame, "leaf size", "Leaf size:",
-		new BMessage(MSG_SET_LEAF_SIZE), kMinimumLeafSize, kMaximumLeafSize,
-		B_BLOCK_THUMB, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM);
+	fLeafSizeSlider = new BSlider(frame, "leaf size",
+		B_TRANSLATE("Leaf size:"), new BMessage(MSG_SET_LEAF_SIZE),
+		kMinimumLeafSize, kMaximumLeafSize,	B_BLOCK_THUMB,
+		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM);
 	fLeafSizeSlider->SetValue(fLeafSize);
 	fLeafSizeSlider->ResizeToPreferred();
 	bounds.bottom -= fLeafSizeSlider->Bounds().Height() * 1.5;
 	fLeafSizeSlider->MoveTo(bounds.LeftBottom());
 	view->AddChild(fLeafSizeSlider);
 
-	fSizeVariationSlider = new BSlider(frame, "variation", "Size variation:",
-		new BMessage(MSG_SET_SIZE_VARIATION), 0, kMaximumSizeVariation,
-		B_BLOCK_THUMB, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM);
+	fSizeVariationSlider = new BSlider(frame, "variation",
+		B_TRANSLATE("Size variation:"),	new BMessage(MSG_SET_SIZE_VARIATION),
+		0, kMaximumSizeVariation, B_BLOCK_THUMB,
+		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM);
 	fSizeVariationSlider->SetValue(fSizeVariation);
 	fSizeVariationSlider->ResizeToPreferred();
 	bounds.bottom -= fSizeVariationSlider->Bounds().Height() * 1.5;
@@ -127,8 +135,10 @@ Leaves::StartConfig(BView* view)
 	BTextView* textView = new BTextView(bounds, B_EMPTY_STRING,
 		bounds.OffsetToCopy(0., 0.), B_FOLLOW_ALL, B_WILL_DRAW);
 	textView->SetViewColor(view->ViewColor());
-	textView->Insert("Leaves\n\n"
-		"by Deyan Genovski, Geoffry Song\n\n");
+	BString text = "Leaves\n\n";
+	text << B_TRANSLATE("by Deyan Genovski, Geoffry Song");
+	text << "\n\n";
+	textView->Insert(text.String());
 	textView->SetStylable(true);
 	textView->SetFontAndColor(0, 6, be_bold_font);
 	textView->MakeEditable(false);
@@ -140,7 +150,7 @@ Leaves::StartConfig(BView* view)
 	fDropRateSlider->SetTarget(this);
 	fLeafSizeSlider->SetTarget(this);
 	fSizeVariationSlider->SetTarget(this);
-} 
+}
 
 
 status_t
