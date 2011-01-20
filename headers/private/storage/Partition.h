@@ -11,7 +11,6 @@
 #include <DiskDeviceDefs.h>
 #include <Messenger.h>
 #include <Mime.h>
-#include <ObjectList.h>
 
 
 class BBitmap;
