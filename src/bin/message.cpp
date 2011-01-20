@@ -7,14 +7,15 @@
 #include <Message.h>
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 
 int
 main(int argc, char *argv[])
 {
-	if (argc != 2) {
-		printf("usage: %s <flattened message file>\n", argv[0]);
+	if (argc < 2 || argc > 3) {
+		printf("usage: %s <flattened message file> [index]\n", argv[0]);
 		return 1;
 	}
 
@@ -24,13 +25,25 @@ main(int argc, char *argv[])
 		return 2;
 	}
 
-	BMessage message;
-	status_t result = message.Unflatten(&input);
-	if (result != B_OK) {
-		printf("failed to unflatten message: %s\n", strerror(result));
+	off_t fileSize;
+	status_t result;
+	if ((result = input.GetSize(&fileSize)) != B_OK) {
+		printf("cannot determine size of file \"%s\"\n", argv[1]);
 		return 3;
 	}
 
-	message.PrintToStream();
+	int index = argc > 2 ? atoi(argv[2]) : 0;
+
+	for (int i = 1; input.Position() < fileSize; ++i) {
+		BMessage message;
+		result = message.Unflatten(&input);
+		if (result != B_OK) {
+			printf("failed to unflatten message: %s\n", strerror(result));
+			return 4;
+		}
+		if (index == 0 || i == index)
+			message.PrintToStream();
+	}
+
 	return 0;
 }
