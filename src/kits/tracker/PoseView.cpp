@@ -68,6 +68,8 @@ All rights reserved.
 #include <Volume.h>
 #include <Window.h>
 
+#include <ObjectListPrivate.h>
+
 #include "Attributes.h"
 #include "AttributeStream.h"
 #include "AutoLock.h"
@@ -8743,7 +8745,7 @@ PoseCompareAddWidgetBinder(const BPose *p1, const BPose *p2, void *castToPoseVie
 }
 
 
-struct PoseComparator : public std::binary_function<const BPose *, 
+struct PoseComparator : public std::binary_function<const BPose *,
 	const BPose *, bool>
 {
 	PoseComparator(BPoseView *poseView): fPoseView(poseView) { }
@@ -8752,7 +8754,7 @@ struct PoseComparator : public std::binary_function<const BPose *,
 		return PoseCompareAddWidget(p1, p2, fPoseView) < 0;
 	}
 
-	BPoseView * fPoseView;	
+	BPoseView * fPoseView;
 };
 
 
@@ -8776,11 +8778,13 @@ BPoseView::SortPoses()
 	PRINT(("===================\n"));
 #endif
 
-	BPose **poses = reinterpret_cast<BPose **>(fPoseList->AsBList()->Items());
+	BPose **poses = reinterpret_cast<BPose **>(
+		PoseList::Private(fPoseList).AsBList()->Items());
 	std::stable_sort(poses, &poses[fPoseList->CountItems()], PoseComparator(this));
 	if (fFiltering) {
-		poses = reinterpret_cast<BPose **>(fFilteredPoseList->AsBList()->Items());
-		std::stable_sort(poses, &poses[fPoseList->CountItems()], 
+		poses = reinterpret_cast<BPose **>(
+			PoseList::Private(fFilteredPoseList).AsBList()->Items());
+		std::stable_sort(poses, &poses[fPoseList->CountItems()],
 			PoseComparator(this));
 	}
 }

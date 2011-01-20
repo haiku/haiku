@@ -25,6 +25,7 @@
 
 #include <LinkReceiver.h>
 #include <OffsetFile.h>
+#include <ObjectListPrivate.h>
 #include <PicturePlayer.h>
 #include <PictureProtocol.h>
 #include <PortLink.h>
@@ -1071,7 +1072,7 @@ ServerPicture::Play(View* view)
 		return;
 
 	BPrivate::PicturePlayer player(mallocIO->Buffer(),
-		mallocIO->BufferLength(), fPictures->AsBList());
+		mallocIO->BufferLength(), PictureList::Private(fPictures).AsBList());
 	player.Play(const_cast<void**>(kTableEntries),
 		sizeof(kTableEntries) / sizeof(void*), view);
 }

@@ -25,7 +25,7 @@ SEARCH on US-International.keymap += [ FDirName $(HAIKU_TOP) src data keymaps ] 
 
 AddResources input_server : input_server.rdef ;
 
-UsePrivateHeaders app input interface shared storage ;
+UsePrivateHeaders app input interface shared storage support ;
 UsePrivateSystemHeaders ;
 
 if $(TARGET_PLATFORM) != haiku {

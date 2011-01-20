@@ -14,6 +14,7 @@
 
 #include <AppServerLink.h>
 #include <MessagePrivate.h>
+#include <ObjectListPrivate.h>
 
 #include <Autolock.h>
 #include <Deskbar.h>
@@ -1729,7 +1730,7 @@ InputServer::_FilterEvent(BInputServerFilter* filter, EventList& events,
 
 		if (result == B_DISPATCH_MESSAGE) {
 			EventList addedEvents;
-			addedEvents.AsBList()->AddList(&newEvents);
+			EventList::Private(&addedEvents).AsBList()->AddList(&newEvents);
 			_SanitizeEvents(addedEvents);
 			// add the new events - but don't methodize them again
 			events.AddList(&addedEvents, index);

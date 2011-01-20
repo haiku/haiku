@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src kits tracker ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
-UsePrivateHeaders interface mount shared storage tracker ;
+UsePrivateHeaders interface mount shared storage support tracker ;
 
 UseLibraryHeaders icon ;
 
