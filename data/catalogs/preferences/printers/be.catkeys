@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Be-PRNT	407752036
+1	belarusian	x-vnd.Be-PRNT	3307681170
 Waiting	JobListView		Чаканне
 page	JobListView		старонка
 Cancel	AddPrinterDialog		Адмена
@@ -29,3 +29,8 @@ Connected to:	AddPrinterDialog		Падключаны да:
 Printer type:	AddPrinterDialog		Тып прынтэру:
 Transport: %transport% %transport_address%	PrinterListView		Транспорт: %transport% %transport_address%
 Driver: %driver%	PrinterListView		Драйвер: %driver%
+Print test page	PrintersWindow		Надрукаваць тэставую старонку
+Test Page	PrintersWindow		Тэставая старонка
+Driver: %driver%	TestPageView		Драйвер: %driver%
+Test Page for '%printer_name%'	TestPageView		Тэставая старонка для '%printer_name%'
+Transport: %transport% %transport_address%	TestPageView		Транспарт: %transport% %transport_address%

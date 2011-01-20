@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Time	2449772847
+1	belarusian	x-vnd.Haiku-Time	3034703977
 OK	Time		ОК
 Etc	Time		І г. д.
 \nNow: 	Time		\nЗараз:
@@ -11,3 +11,4 @@ Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhili
 <Other>	Time		<іншае>
 Current time:	Time		Сапраўдны час:
 Time zone	Time		Часавы пояс
+Revert	Time		Адвярнуць
