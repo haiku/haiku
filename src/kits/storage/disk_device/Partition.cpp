@@ -16,6 +16,7 @@
 #include <DiskSystem.h>
 #include <fs_volume.h>
 #include <Message.h>
+#include <ObjectList.h>
 #include <Partition.h>
 #include <PartitioningInfo.h>
 #include <Path.h>
