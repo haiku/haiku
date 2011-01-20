@@ -135,12 +135,15 @@ Leaves::StartConfig(BView* view)
 	BTextView* textView = new BTextView(bounds, B_EMPTY_STRING,
 		bounds.OffsetToCopy(0., 0.), B_FOLLOW_ALL, B_WILL_DRAW);
 	textView->SetViewColor(view->ViewColor());
-	BString text = "Leaves\n\n";
+	BString name = B_TRANSLATE("Leaves");
+	BString text = name;
+	text << "\n\n";
 	text << B_TRANSLATE("by Deyan Genovski, Geoffry Song");
 	text << "\n\n";
+
 	textView->Insert(text.String());
 	textView->SetStylable(true);
-	textView->SetFontAndColor(0, 6, be_bold_font);
+	textView->SetFontAndColor(0, name.Length(), be_bold_font);
 	textView->MakeEditable(false);
 	view->AddChild(textView);
 
