@@ -9,6 +9,7 @@ Preference Printers :
 	PrinterListView.cpp
 	JobListView.cpp
 	SpoolFolder.cpp
+	TestPageView.cpp
 	TransportMenu.cpp
 	Globals.cpp
 	:
@@ -28,6 +29,7 @@ DoCatalogs Printers :
 	JobListView.cpp
 	PrinterListView.cpp
 	PrintersWindow.cpp
+	TestPageView.cpp
 	TransportMenu.cpp
 ;
 

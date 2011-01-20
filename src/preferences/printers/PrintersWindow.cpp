@@ -28,6 +28,7 @@
 #include "JobListView.h"
 #include "Messages.h"
 #include "PrinterListView.h"
+#include "TestPageView.h"
 #include "SpoolFolder.h"
 
 
@@ -165,20 +166,39 @@ PrintersWindow::MessageReceived(BMessage* msg)
 void
 PrintersWindow::PrintTestPage(PrinterItem* printer)
 {
-	BPrintJob job("TestPage");
+	BPrintJob job(B_TRANSLATE("Test Page"));
 	job.ConfigPage();
+
+	// job.ConfigJob();
+
+	// enforce job config
 	BMessage* settings = job.Settings();
+	settings->AddInt32("copies", 1);
+	settings->AddInt32("first_page", 1);
+	settings->AddInt32("last_page", -1);
 
-	printf("print job settings:\n");
-	settings->PrintToStream();
+	settings = job.Settings();
 
-	// BRect pageRect = job.PrintableRect();
 
 	job.BeginJob();
 
-	// TestPageView testPage(pageRect, printer);
-	// job.DrawView(testPage, pageRect, BPoint(0.0, 0.0));
+
+	BRect pageRect = job.PrintableRect();
+	// BWindow* dummyWindow = new BWindow(pageRect, "dummy", B_TITLED_WINDOW, 0);
+	// dummyWindow->Show();
+	TestPageView* testPage = new TestPageView(pageRect, printer);
+	// views cannot be printed unless they're attached to a window
+	// just hide our test page...
+	testPage->Hide();
+	AddChild(testPage);
+	// dummyWindow->AddChild(testPage);
+
+	job.DrawView(testPage, pageRect, BPoint(0.0, 0.0));
 	job.SpoolPage();
+
+	RemoveChild(testPage);
+	delete testPage;
+
 	if (!job.CanContinue())
 		return;
 
@@ -276,7 +296,7 @@ PrintersWindow::_BuildGUI()
 	fPrintTestPage = new BButton(BRect(5,60,5,60), "print_test_page",
 		B_TRANSLATE("Print test page"), new BMessage(kMsgPrintTestPage),
 		B_FOLLOW_RIGHT);
-	// printersBox->AddChild(fPrintTestPage);
+	printersBox->AddChild(fPrintTestPage);
 	fPrintTestPage->ResizeToPreferred();
 
 	if (fPrintTestPage->Bounds().Width() > maxWidth)
