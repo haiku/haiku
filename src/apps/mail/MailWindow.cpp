@@ -1303,9 +1303,6 @@ TMailWindow::MessageReceived(BMessage *msg)
 					continue;
 
 				query.SetVolume(&volume);
-				// query.PushAttr("META:email");
-				// query.PushString(address);
-				// query.PushOp(B_EQ);
 				query.SetPredicate(arg);
 				query.Fetch();
 
