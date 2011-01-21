@@ -1,0 +1,19 @@
+SubDir HAIKU_TOP src kits package ;
+
+UsePrivateHeaders package ;
+
+SharedLibrary libpackage.so
+	:
+	ActivateRepositoryConfigJob.cpp
+	AddRepositoryRequest.cpp
+	Context.cpp
+	FetchFileJob.cpp
+	Job.cpp
+	JobQueue.cpp
+	RepositoryConfig.cpp
+	Request.cpp
+	Roster.cpp
+	TempEntryManager.cpp
+	:
+	be $(TARGET_LIBSTDC++)
+;

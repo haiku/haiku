@@ -7,9 +7,10 @@ SubInclude HAIKU_TOP src tests kits locale ;
 SubInclude HAIKU_TOP src tests kits media ;
 SubInclude HAIKU_TOP src tests kits midi ;
 SubInclude HAIKU_TOP src tests kits net ;
+SubInclude HAIKU_TOP src tests kits opengl ;
+SubInclude HAIKU_TOP src tests kits package ;
 SubInclude HAIKU_TOP src tests kits shared ;
 SubInclude HAIKU_TOP src tests kits storage ;
 SubInclude HAIKU_TOP src tests kits support ;
 SubInclude HAIKU_TOP src tests kits translation ;
-SubInclude HAIKU_TOP src tests kits opengl ;
 
