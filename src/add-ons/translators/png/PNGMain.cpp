@@ -33,9 +33,13 @@
 /*****************************************************************************/
 
 #include <Application.h>
+#include <Catalog.h>
 #include "PNGTranslator.h"
 #include "PNGView.h"
 #include "TranslatorWindow.h"
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "PNGTranslator"
 
 // ---------------------------------------------------------------
 // main
@@ -56,7 +60,8 @@ main()
 	BApplication app("application/x-vnd.Haiku-PNGTranslator");
 	status_t result;
 	result = LaunchTranslatorWindow(new PNGTranslator,
-		"PNG Settings", BRect(0, 0, PNG_VIEW_WIDTH, PNG_VIEW_HEIGHT));
+		B_TRANSLATE("PNG Settings"), BRect(0, 0, PNG_VIEW_WIDTH, 
+		PNG_VIEW_HEIGHT));
 	if (result == B_OK) {
 		app.Run();
 		return 0;

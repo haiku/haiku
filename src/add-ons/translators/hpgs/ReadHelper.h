@@ -90,7 +90,7 @@ positionio_read(void *ptr, size_t size, size_t nmemb, my_hpgs_istream *stream)
 	unsigned char *iptr = (unsigned char *)ptr;
 	size_t i = 0;
 	for (; i < nmemb; i++) {
-		if (size != stream->buffer->Read(iptr, size))
+		if (size != (size_t)stream->buffer->Read(iptr, size))
 			break;
 		iptr += size;
 	}

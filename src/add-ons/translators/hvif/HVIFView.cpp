@@ -9,6 +9,7 @@
 #include "HVIFView.h"
 #include "HVIFTranslator.h"
 
+#include <Catalog.h>
 #include <GroupLayoutBuilder.h>
 #include <String.h>
 #include <StringView.h>
@@ -16,6 +17,9 @@
 #include <stdio.h>
 
 #define HVIF_SETTING_RENDER_SIZE_CHANGED	'rsch'
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "HVIFView"
 
 
 HVIFView::HVIFView(const char* name, uint32 flags, TranslatorSettings *settings)
@@ -26,12 +30,13 @@ HVIFView::HVIFView(const char* name, uint32 flags, TranslatorSettings *settings)
 	BAlignment labelAlignment(B_ALIGN_LEFT, B_ALIGN_NO_VERTICAL);
 
 	BStringView* title= new BStringView("title",
-		"Native Haiku icon format translator");
+		B_TRANSLATE("Native Haiku icon format translator"));
 	title->SetFont(be_bold_font);
 	title->SetExplicitAlignment(labelAlignment);
 
 	char versionString[256];
-	snprintf(versionString, sizeof(versionString), "Version %d.%d.%d, %s",
+	snprintf(versionString, sizeof(versionString), 
+		B_TRANSLATE("Version %d.%d.%d, %s"),
 		int(B_TRANSLATION_MAJOR_VERSION(HVIF_TRANSLATOR_VERSION)),
 		int(B_TRANSLATION_MINOR_VERSION(HVIF_TRANSLATOR_VERSION)),
 		int(B_TRANSLATION_REVISION_VERSION(HVIF_TRANSLATOR_VERSION)),
@@ -45,8 +50,8 @@ HVIFView::HVIFView(const char* name, uint32 flags, TranslatorSettings *settings)
 
 
 	int32 renderSize = fSettings->SetGetInt32(HVIF_SETTING_RENDER_SIZE);
-	BString label = "Render size: ";
-	label << renderSize;
+	BString label = B_TRANSLATE("Render size:");
+	label << " " << renderSize;
 
 	fRenderSize = new BSlider("renderSize", label.String(),
 		NULL, 1, 32, B_HORIZONTAL);
@@ -101,8 +106,8 @@ HVIFView::MessageReceived(BMessage *message)
 			fSettings->SetGetInt32(HVIF_SETTING_RENDER_SIZE, &value);
 			fSettings->SaveSettings();
 
-			BString newLabel = "Render size: ";
-			newLabel << value;
+			BString newLabel = B_TRANSLATE("Render size:");
+			newLabel << " " << value;
 			fRenderSize->SetLabel(newLabel.String());
 			return;
 		}

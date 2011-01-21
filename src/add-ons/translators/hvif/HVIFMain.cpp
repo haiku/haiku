@@ -7,15 +7,19 @@
  */
 
 #include <Application.h>
+#include <Catalog.h>
 #include "HVIFTranslator.h"
 #include "TranslatorWindow.h"
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "HVIFMain"
 
 int
 main(int argc, char *argv[])
 {
 	BApplication application("application/x-vnd.Haiku.HVIFTranslator");
-	if (LaunchTranslatorWindow(new HVIFTranslator, "HVIF Settings",
-			BRect(0, 0, 250, 150)) != B_OK)
+	if (LaunchTranslatorWindow(new HVIFTranslator, 
+		B_TRANSLATE("HVIF Settings"), BRect(0, 0, 250, 150)) != B_OK)
 		return 1;
 
 	application.Run();

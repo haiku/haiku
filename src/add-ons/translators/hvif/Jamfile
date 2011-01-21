@@ -8,7 +8,16 @@ Translator HVIFTranslator :
 	HVIFMain.cpp
 	HVIFTranslator.cpp
 	HVIFView.cpp
-	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++)
+	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++) 
+$(HAIKU_LOCALE_LIBS)
 	$(HAIKU_LOCALE_LIBS)
 	: true
+;
+
+DoCatalogs HVIFTranslator :
+	x-vnd.Haiku-HVIFTranslator
+	:
+	HVIFMain.cpp
+	HVIFTranslator.cpp
+	HVIFView.cpp
 ;

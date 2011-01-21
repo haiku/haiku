@@ -10,6 +10,11 @@
 
 #include "TranslatorWindow.h"
 #include <Application.h>
+#include <Catalog.h>
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "main"
 
 
 int
@@ -18,7 +23,8 @@ main(int /*argc*/, char **/*argv*/)
 	BApplication app("application/x-vnd.Haiku-PCXTranslator");
 
 	status_t result;
-	result = LaunchTranslatorWindow(new PCXTranslator, "PCX Settings", BRect(0, 0, 225, 175));
+	result = LaunchTranslatorWindow(new PCXTranslator, 
+		B_TRANSLATE("PCX Settings"), BRect(0, 0, 225, 175));
 	if (result != B_OK)
 		return 1;
 

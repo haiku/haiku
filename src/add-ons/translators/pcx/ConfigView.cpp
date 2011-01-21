@@ -8,6 +8,7 @@
 #include "ConfigView.h"
 #include "PCXTranslator.h"
 
+#include <Catalog.h>
 #include <StringView.h>
 #include <CheckBox.h>
 
@@ -15,8 +16,12 @@
 #include <string.h>
 
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "ConfigView"
+
+
 ConfigView::ConfigView(const BRect &frame, uint32 resize, uint32 flags)
-	: BView(frame, "PCXTranslator Settings", resize, flags)
+	: BView(frame, B_TRANSLATE("PCXTranslator Settings"), resize, flags)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
@@ -25,14 +30,15 @@ ConfigView::ConfigView(const BRect &frame, uint32 resize, uint32 flags)
 	float height = fontHeight.descent + fontHeight.ascent + fontHeight.leading;
 
 	BRect rect(10, 10, 200, 10 + height);
-	BStringView *stringView = new BStringView(rect, "title", "PCX images");
+	BStringView *stringView = new BStringView(rect, "title", 
+		B_TRANSLATE("PCX images"));
 	stringView->SetFont(be_bold_font);
 	stringView->ResizeToPreferred();
 	AddChild(stringView);
 
 	rect.OffsetBy(0, height + 10);
 	char version[256];
-	sprintf(version, "Version %d.%d.%d, %s",
+	sprintf(version, B_TRANSLATE("Version %d.%d.%d, %s"),
 		int(B_TRANSLATION_MAJOR_VERSION(PCX_TRANSLATOR_VERSION)),
 		int(B_TRANSLATION_MINOR_VERSION(PCX_TRANSLATOR_VERSION)),
 		int(B_TRANSLATION_REVISION_VERSION(PCX_TRANSLATOR_VERSION)),

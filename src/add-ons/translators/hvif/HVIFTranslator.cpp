@@ -11,6 +11,7 @@
 
 #include <Bitmap.h>
 #include <BitmapStream.h>
+#include <Catalog.h>
 #include <IconUtils.h>
 
 #include <stdio.h>
@@ -20,6 +21,10 @@
 #define HVIF_FORMAT_CODE				'HVIF'
 #define HVIF_TRANSLATION_QUALITY		1.0
 #define HVIF_TRANSLATION_CAPABILITY		1.0
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "HVIFTranslator"
+
 
 static const translation_format sInputFormats[] = {
 	{
@@ -65,7 +70,8 @@ make_nth_translator(int32 n, image_id image, uint32 flags, ...)
 
 
 HVIFTranslator::HVIFTranslator()
-	: BaseTranslator("HVIF icons", "Native Haiku vector icon translator",
+	: BaseTranslator(B_TRANSLATE("HVIF icons"), 
+		B_TRANSLATE("Native Haiku vector icon translator"),
 		HVIF_TRANSLATOR_VERSION,
 		sInputFormats, kNumInputFormats,
 		sOutputFormats, kNumOutputFormats,
@@ -174,5 +180,6 @@ HVIFTranslator::DerivedTranslate(BPositionIO *inSource,
 BView *
 HVIFTranslator::NewConfigView(TranslatorSettings *settings)
 {
-	return new HVIFView("HVIFTranslator Settings", B_WILL_DRAW, settings);
+	return new HVIFView(B_TRANSLATE("HVIFTranslator Settings"), 
+		B_WILL_DRAW, settings);
 }

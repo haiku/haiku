@@ -49,4 +49,11 @@ Translator HPGSTranslator :
 	: true
 ;
 
+DoCatalogs HPGSTranslator :
+	x-vnd.Haiku-HPGSTranslator
+	:
+	ConfigView.cpp
+	HPGSTranslator.cpp
+;
+
 SEARCH on [ FGristFiles $(sources) ] = [ FDirName $(SUBDIR) lib ] ;

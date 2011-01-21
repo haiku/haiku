@@ -30,13 +30,21 @@
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
 
+
+#include "PNGTranslator.h"
+
 #include <stdio.h>
 #include <string.h>
+
+#include <Catalog.h>
 #include <OS.h>
 #define PNG_NO_PEDANTIC_WARNINGS
 #include <png.h>
-#include "PNGTranslator.h"
+
 #include "PNGView.h"
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "PNGTranslator"
 
 // The input formats that this translator supports.
 static const translation_format sInputFormats[] = {
@@ -185,7 +193,8 @@ pngcb_flush_data(png_structp ppng)
 // Returns:
 // ---------------------------------------------------------------
 PNGTranslator::PNGTranslator()
-	: BaseTranslator("PNG images", "PNG image translator",
+	: BaseTranslator(B_TRANSLATE("PNG images"), 
+		B_TRANSLATE("PNG image translator"),
 		PNG_TRANSLATOR_VERSION,
 		sInputFormats, kNumInputFormats,
 		sOutputFormats, kNumOutputFormats,
@@ -229,7 +238,7 @@ identify_png_header(BPositionIO *inSource, translator_info *outInfo)
 		outInfo->quality = PNG_IN_QUALITY;
 		outInfo->capability = PNG_IN_CAPABILITY;
 		strcpy(outInfo->MIME, "image/png");
-		strcpy(outInfo->name, "PNG image");
+		strcpy(outInfo->name, B_TRANSLATE("PNG image"));
 	}
 
 	return B_OK;
@@ -975,6 +984,7 @@ BView *
 PNGTranslator::NewConfigView(TranslatorSettings *settings)
 {
 	return new PNGView(BRect(0, 0, PNG_VIEW_WIDTH, PNG_VIEW_HEIGHT),
-		"PNGTranslator Settings", B_FOLLOW_ALL, B_WILL_DRAW, settings);
+		B_TRANSLATE("PNGTranslator Settings"), B_FOLLOW_ALL, 
+		B_WILL_DRAW, settings);
 }
 

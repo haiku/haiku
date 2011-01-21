@@ -14,9 +14,16 @@ Translator PNGTranslator :
 	PNGTranslator.cpp
 	PNGView.cpp
 
-	: be translation libpng.a z libtranslatorsutils.a $(TARGET_LIBSUPC++)
-	$(HAIKU_LOCALE_LIBS)
+	: be translation libpng.so z libtranslatorsutils.a $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
 	: true
+;
+
+DoCatalogs PNGTranslator :
+	x-vnd.Haiku-PNGTranslator
+	:
+	PNGMain.cpp
+	PNGTranslator.cpp
+	PNGView.cpp
 ;
 
 Package haiku-translationkit-cvs :

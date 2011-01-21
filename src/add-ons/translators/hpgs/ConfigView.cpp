@@ -8,15 +8,19 @@
 #include "ConfigView.h"
 #include "HPGSTranslator.h"
 
-#include <StringView.h>
+#include <Catalog.h>
 #include <CheckBox.h>
+#include <StringView.h>
 
 #include <stdio.h>
 #include <string.h>
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "ConfigView"
+
 
 ConfigView::ConfigView(const BRect &frame, uint32 resize, uint32 flags)
-	: BView(frame, "HPGSTranslator Settings", resize, flags)
+	: BView(frame, B_TRANSLATE("HPGSTranslator Settings"), resize, flags)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
@@ -25,14 +29,15 @@ ConfigView::ConfigView(const BRect &frame, uint32 resize, uint32 flags)
 	float height = fontHeight.descent + fontHeight.ascent + fontHeight.leading;
 
 	BRect rect(10, 10, 200, 10 + height);
-	BStringView *stringView = new BStringView(rect, "title", "HPGS images");
+	BStringView *stringView = new BStringView(rect, "title", 
+		B_TRANSLATE("HPGS images"));
 	stringView->SetFont(be_bold_font);
 	stringView->ResizeToPreferred();
 	AddChild(stringView);
 
 	rect.OffsetBy(0, height + 10);
 	char version[256];
-	sprintf(version, "Version %d.%d.%d, %s",
+	sprintf(version, B_TRANSLATE("Version %d.%d.%d, %s"),
 		int(B_TRANSLATION_MAJOR_VERSION(HPGS_TRANSLATOR_VERSION)),
 		int(B_TRANSLATION_MINOR_VERSION(HPGS_TRANSLATOR_VERSION)),
 		int(B_TRANSLATION_REVISION_VERSION(HPGS_TRANSLATOR_VERSION)),
@@ -45,17 +50,20 @@ ConfigView::ConfigView(const BRect &frame, uint32 resize, uint32 flags)
 	height = fontHeight.descent + fontHeight.ascent + fontHeight.leading;
 
 	rect.OffsetBy(0, height + 5);
-	stringView = new BStringView(rect, "copyright", B_UTF8_COPYRIGHT "2007 Haiku Inc.");
+	stringView = new BStringView(rect, "copyright", B_UTF8_COPYRIGHT 
+		"2007 Haiku Inc.");
 	stringView->ResizeToPreferred();
 	AddChild(stringView);
 
 	rect.OffsetBy(0, height + 10);
-	stringView = new BStringView(rect, "copyright2", "Based on HPGS (http://hpgs.berlios.de)");
+	stringView = new BStringView(rect, "copyright2", B_TRANSLATE("Based on "
+		"HPGS (http://hpgs.berlios.de)"));
 	stringView->ResizeToPreferred();
 	AddChild(stringView);
 
 	rect.OffsetBy(0, height + 5);
-	stringView = new BStringView(rect, "copyright3", B_UTF8_COPYRIGHT "2004-2006 ev-i Informationstechnologie GmbH");
+	stringView = new BStringView(rect, "copyright3", B_UTF8_COPYRIGHT
+		"2004-2006 ev-i Informationstechnologie GmbH");
 	stringView->ResizeToPreferred();
 	AddChild(stringView);
 }

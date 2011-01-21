@@ -12,6 +12,7 @@
 #include "PNGTranslator.h"
 
 #include <Alert.h>
+#include <Catalog.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <PopUpMenu.h>
@@ -22,6 +23,8 @@
 #define PNG_NO_PEDANTIC_WARNINGS
 #include <png.h>
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "PNGTranslator"
 
 PNGView::PNGView(const BRect &frame, const char *name, uint32 resizeMode,
 		uint32 flags, TranslatorSettings *settings)
@@ -35,7 +38,8 @@ PNGView::PNGView(const BRect &frame, const char *name, uint32 resizeMode,
 	float height = fontHeight.descent + fontHeight.ascent + fontHeight.leading;
 
 	BRect rect(10, 10, 200, 10 + height);
-	BStringView *stringView = new BStringView(rect, "title", "PNG image translator");
+	BStringView *stringView = new BStringView(rect, "title", 
+		B_TRANSLATE("PNG image translator"));
 	stringView->SetFont(be_bold_font);
 	stringView->ResizeToPreferred();
 	AddChild(stringView);
@@ -44,7 +48,7 @@ PNGView::PNGView(const BRect &frame, const char *name, uint32 resizeMode,
 
 	rect.OffsetBy(0, height + 10);
 	char version[256];
-	snprintf(version, sizeof(version), "Version %d.%d.%d, %s",
+	snprintf(version, sizeof(version), B_TRANSLATE("Version %d.%d.%d, %s"),
 		int(B_TRANSLATION_MAJOR_VERSION(PNG_TRANSLATOR_VERSION)),
 		int(B_TRANSLATION_MINOR_VERSION(PNG_TRANSLATOR_VERSION)),
 		int(B_TRANSLATION_REVISION_VERSION(PNG_TRANSLATOR_VERSION)),
@@ -60,14 +64,16 @@ PNGView::PNGView(const BRect &frame, const char *name, uint32 resizeMode,
 	height = fontHeight.descent + fontHeight.ascent + fontHeight.leading;
 
 	rect.OffsetBy(0, height + 5);
-	stringView = new BStringView(rect, "Copyright", B_UTF8_COPYRIGHT "2003-2006 Haiku Inc.");
+	stringView = new BStringView(rect, 
+		"Copyright", B_UTF8_COPYRIGHT "2003-2006 Haiku Inc.");
 	stringView->ResizeToPreferred();
 	AddChild(stringView);
 
 	// setup PNG interlace options
 
-	fInterlaceMenu = new BPopUpMenu("Interlace Option");
-	BMenuItem* item = new BMenuItem("None", _InterlaceMessage(PNG_INTERLACE_NONE));
+	fInterlaceMenu = new BPopUpMenu(B_TRANSLATE("Interlace Option"));
+	BMenuItem* item = new BMenuItem(B_TRANSLATE("None"), 
+		_InterlaceMessage(PNG_INTERLACE_NONE));
 	if (fSettings->SetGetInt32(PNG_SETTING_INTERLACE) == PNG_INTERLACE_NONE)
 		item->SetMarked(true);
 	fInterlaceMenu->AddItem(item);
@@ -78,8 +84,9 @@ PNGView::PNGView(const BRect &frame, const char *name, uint32 resizeMode,
 	fInterlaceMenu->AddItem(item);
 
 	rect.OffsetBy(0, stringView->Frame().Height() + 20.0f);
-	BMenuField* menuField = new BMenuField(rect, "PNG Interlace Menu",
-		"Interlacing type:", fInterlaceMenu);
+	BMenuField* menuField = new BMenuField(rect, 
+		B_TRANSLATE("PNG Interlace Menu"),
+		B_TRANSLATE("Interlacing type:"), fInterlaceMenu);
 	menuField->SetDivider(menuField->StringWidth(menuField->Label()) + 7.0f);
 	menuField->ResizeToPreferred();
 	AddChild(menuField);
@@ -87,7 +94,8 @@ PNGView::PNGView(const BRect &frame, const char *name, uint32 resizeMode,
 	rect.OffsetBy(0, height + 15);
 	rect.right = Bounds().right;
 	rect.bottom = Bounds().bottom;
-	fCopyrightView = new BTextView(rect, "PNG copyright", rect.OffsetToCopy(B_ORIGIN),
+	fCopyrightView = new BTextView(rect, "PNG copyright", 
+		rect.OffsetToCopy(B_ORIGIN),
 		B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS);
 	fCopyrightView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	fCopyrightView->SetLowColor(fCopyrightView->ViewColor());
@@ -101,7 +109,8 @@ PNGView::PNGView(const BRect &frame, const char *name, uint32 resizeMode,
 
 	if (maxWidth + 20 > Bounds().Width())
 		ResizeTo(maxWidth + 20, Bounds().Height());
-	if (Bounds().Height() < rect.top + stringView->Bounds().Height() * 3.0f + 8.0f)
+	if (Bounds().Height() < rect.top + stringView->Bounds().Height() 
+		* 3.0f + 8.0f)
 		ResizeTo(Bounds().Width(), rect.top + height * 3.0f + 8.0f);
 
 	fCopyrightView->SetTextRect(fCopyrightView->Bounds());

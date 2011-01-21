@@ -10,9 +10,16 @@ Translator PCXTranslator :
 	PCXTranslator.cpp
 	ConfigView.cpp
 	PCX.cpp
-	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++)
-	$(HAIKU_LOCALE_LIBS)
+	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
 	: true
+;
+
+DoCatalogs PCXTranslator :
+	x-vnd.Haiku-PCXTranslator
+	:
+	main.cpp
+	ConfigView.cpp
+	PCXTranslator.cpp
 ;
 
 Package haiku-translationkit-cvs :
