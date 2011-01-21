@@ -1283,21 +1283,32 @@ TMailWindow::MessageReceived(BMessage *msg)
 
 		case M_SAVE:
 		{
-			char *str;
-			if (msg->FindString("address", (const char **)&str) == B_NO_ERROR) {
-				char *arg = (char *)malloc(strlen("META:email ")
-					+ strlen(str) + 1);
-				BVolumeRoster volumeRoster;
-				BVolume volume;
-				volumeRoster.GetBootVolume(&volume);
+			const char* address;
+			if (msg->FindString("address", (const char**)&address) != B_NO_ERROR)
+				break;
 
-				BQuery query;
+			BVolumeRoster volumeRoster;
+			BVolume volume;
+			BQuery query;
+			BEntry entry;
+			bool foundEntry = false;
+
+			char* arg = (char*)malloc(strlen("META:email=")
+				+ strlen(address) + 1);
+			sprintf(arg, "META:email=%s", address);
+
+			// Search a Person file with this email address
+			while (volumeRoster.GetNextVolume(&volume) == B_NO_ERROR) {
+				if (!volume.KnowsQuery())
+					continue;
+
 				query.SetVolume(&volume);
-				sprintf(arg, "META:email=%s", str);
+				// query.PushAttr("META:email");
+				// query.PushString(address);
+				// query.PushOp(B_EQ);
 				query.SetPredicate(arg);
 				query.Fetch();
 
-				BEntry entry;
 				if (query.GetNextEntry(&entry) == B_NO_ERROR) {
 					BMessenger tracker("application/x-vnd.Be-TRAK");
 					if (tracker.IsValid()) {
@@ -1307,20 +1318,31 @@ TMailWindow::MessageReceived(BMessage *msg)
 						BMessage open(B_REFS_RECEIVED);
 						open.AddRef("refs", &ref);
 						tracker.SendMessage(&open);
+						foundEntry = true;
+						break;
 					}
-				} else {
-					sprintf(arg, "META:email %s", str);
-					status_t result = be_roster->Launch("application/x-person",
-						1, &arg);
-
-					if (result != B_NO_ERROR)
-						(new BAlert("",	B_TRANSLATE(
-							"Sorry, could not find an application that "
-							"supports the 'Person' data type."),
-							B_TRANSLATE("OK")))->Go();
 				}
-				free(arg);
+				// Try next volume, if any
+				query.Clear();
 			}
+
+			if (!foundEntry) {
+				// None found.
+				// Ask to open a new Person file with this address pre-filled
+
+				status_t result = be_roster->Launch("application/x-person",
+					1, &arg);
+
+				if (result != B_NO_ERROR) {
+					(new BAlert("",	B_TRANSLATE(
+						"Sorry, could not find an application that "
+						"supports the 'Person' data type."),
+						B_TRANSLATE("OK")))->Go();
+				}
+
+			}
+
+			free(arg);
 			break;
 		}
 
