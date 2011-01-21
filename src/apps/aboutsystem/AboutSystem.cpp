@@ -1062,6 +1062,7 @@ AboutView::_CreateCreditsView()
 		"Deyan Genovski\n"
 		"Pete Goodeve\n"
 		"Lucian Adrian Grijincu\n"
+		"Sean Healy\n"
 		"Matthijs Hollemans\n"
 		"Mathew Hounsell\n"
 		"Morgan Howe\n"
