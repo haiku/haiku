@@ -31,7 +31,6 @@ extern const char* kTerminalSig;
 extern const char* kPosPrefName;
 extern const char* kPreferencesFileName;
 
-extern const char* kPosPrefName;
 extern const char* kVersionName;
 extern const int kCurrentVersion;
 

@@ -55,10 +55,10 @@ const char* kSignature = "application/x-vnd.Haiku-ProcessController";
 const char* kTrackerSig = "application/x-vnd.Be-TRAK";
 const char* kDeskbarSig = "application/x-vnd.Be-TSKB";
 const char* kTerminalSig = "application/x-vnd.Haiku-Terminal";
-const char* kPreferencesFileName = B_TRANSLATE("ProcessController Prefs");
+const char* kPreferencesFileName = "ProcessController Prefs";
 
-const char*	kPosPrefName = B_TRANSLATE("Position");
-const char*	kVersionName = B_TRANSLATE("Version");
+const char*	kPosPrefName = "Position";
+const char*	kVersionName = "Version";
 const int kCurrentVersion = 311;
 
 thread_id id = 0;

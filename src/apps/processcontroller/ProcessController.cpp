@@ -492,8 +492,7 @@ ProcessController::MouseDown(BPoint where)
 	ConvertToScreen (&param->clickToOpenRect);
 	param->top = where.y < BScreen(this->Window()).Frame().bottom-50;
 
-	gPopupThreadID = spawn_thread(thread_popup,
-	B_TRANSLATE("Popup holder thread"),
+	gPopupThreadID = spawn_thread(thread_popup, "Popup holder thread",
 		B_URGENT_DISPLAY_PRIORITY, param);
 	resume_thread(gPopupThreadID);
 }
@@ -719,7 +718,7 @@ thread_popup(void *arg)
 			char item_name[32];
 			sprintf (item_name, B_TRANSLATE("Processor %d"), i + 1);
 			BMessage* m = new BMessage ('CPU ');
-			m->AddInt32 (B_TRANSLATE("cpu"), i);
+			m->AddInt32 ("cpu", i);
 			item = new IconMenuItem (gPCView->fProcessorIcon, item_name, m);
 			if (_kern_cpu_enabled(i))
 				item->SetMarked (true);
