@@ -307,26 +307,6 @@ TReplicantTray::AdjustPlacement()
 
 
 void
-TReplicantTray::Draw(BRect)
-{
-return;
-	rgb_color menuColor = ViewColor();
-	rgb_color vdark = tint_color(menuColor, B_DARKEN_3_TINT);
-	rgb_color light = tint_color(menuColor, B_LIGHTEN_2_TINT);
-
-	BRect frame(Bounds());
-
-	SetHighColor(light);
-	StrokeLine(frame.LeftBottom(), frame.RightBottom());
-	StrokeLine(frame.RightBottom(), frame.RightTop());
-
-	SetHighColor(vdark);
-	StrokeLine(frame.RightTop(), frame.LeftTop());
-	StrokeLine(frame.LeftTop(), frame.LeftBottom());
-}
-
-
-void
 TReplicantTray::MessageReceived(BMessage* message)
 {
 	switch (message->what) {

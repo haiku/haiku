@@ -79,7 +79,6 @@ public:
 
 	virtual void AttachedToWindow();
 	virtual void DetachedFromWindow();
-	virtual void Draw(BRect updateRect);
 	virtual void MouseDown(BPoint point);
 	virtual void MessageReceived(BMessage*);
 	virtual void GetPreferredSize(float*, float*);
@@ -144,7 +143,7 @@ private:
 	void RemoveItem(int32 id);
 
 	void MoveItem(entry_ref*, ino_t toDirectory);
-#endif		
+#endif
 
 	BPoint LocationForReplicant(int32 index, float width);
 	BShelf* Shelf() const;
@@ -160,7 +159,7 @@ private:
 	bool fMultiRowMode;
 	float fMinimumTrayWidth;
 
-	bool fAlignmentSupport;		
+	bool fAlignmentSupport;
 #ifdef DB_ADDONS
 	BList* fItemList;
 	uint64 fDeskbarSecurityCode;
@@ -181,7 +180,7 @@ enum {
 class TDragRegion : public BControl {
 public:
 	TDragRegion(TBarView*, BView*);
-	
+
 	virtual void AttachedToWindow();
 	virtual void GetPreferredSize(float*, float*);
 	virtual void Draw(BRect);
@@ -192,10 +191,10 @@ public:
 
 	void DrawDragRegion();
 	BRect DragRegion() const;
-	
-	bool SwitchModeForRect(BPoint mouse, BRect rect, 
+
+	bool SwitchModeForRect(BPoint mouse, BRect rect,
 		bool newVertical, bool newLeft, bool newTop, int32 newState);
-	
+
 	int32 DragRegionLocation() const;
 	void SetDragRegionLocation(int32);
 
