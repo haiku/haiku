@@ -364,7 +364,6 @@ BVariant::AddToMessage(BMessage& message, const char* fieldName) const
 		case B_BOOL_TYPE:
 			return message.AddBool(fieldName, fBool);
 		case B_INT8_TYPE:
-			return fInt8 != 0;
 			return message.AddInt8(fieldName, fInt8);
 		case B_UINT8_TYPE:
 			return message.AddUInt8(fieldName, fUInt8);
