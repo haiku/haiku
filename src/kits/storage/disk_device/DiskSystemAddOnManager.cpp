@@ -200,10 +200,11 @@ DiskSystemAddOnManager::PutAddOn(BDiskSystemAddOn* _addOn)
 			}
 			return;
 		}
+	}
 
 	for (int32 i = 0;
 		 AddOn* addOn = (AddOn*)fAddOnsToBeUnloaded.ItemAt(i); i++) {
-		if (_addOn == addOn->addOn)
+		if (_addOn == addOn->addOn) {
 			_PutAddOn(i);
 			return;
 		}
