@@ -356,38 +356,29 @@ BStatusWindow::CheckCanceledOrPaused(thread_id thread)
 
 	BStatusView* view = NULL;
 
-	for (;;) {
-
-		AutoLock<BWindow> lock(this);
-		// check if cancel or pause hit
-		for (int32 index = fViewList.CountItems() - 1; index >= 0; index--) {
-
-			view = fViewList.ItemAt(index);
-			if (view && view->Thread() == thread) {
-				isPaused = view->IsPaused();
-				wasCanceled = view->WasCanceled();
-				break;
-			}
-		}
-		lock.Unlock();
-
-		if (wasCanceled || !isPaused)
+	AutoLock<BWindow> lock(this);
+	// check if cancel or pause hit
+	for (int32 index = fViewList.CountItems() - 1; index >= 0; index--) {
+		view = fViewList.ItemAt(index);
+		if (view && view->Thread() == thread) {
+			isPaused = view->IsPaused();
+			wasCanceled = view->WasCanceled();
 			break;
-
-		if (isPaused && view != NULL) {
-			AutoLock<BWindow> lock(this);
-			// say we are paused
-			view->Invalidate();
-			lock.Unlock();
-
-			ASSERT(find_thread(NULL) == view->Thread());
-
-			// and suspend ourselves
-			// we will get resumend from BStatusView::MessageReceived
-			suspend_thread(view->Thread());
 		}
-		break;
+	}
 
+	if (wasCanceled || !isPaused)
+		return wasCanceled;
+
+	if (isPaused && view != NULL) {
+		// say we are paused
+		view->Invalidate();
+
+		ASSERT(find_thread(NULL) == view->Thread());
+
+		// and suspend ourselves
+		// we will get resumed from BStatusView::MessageReceived
+		suspend_thread(view->Thread());
 	}
 
 	return wasCanceled;
