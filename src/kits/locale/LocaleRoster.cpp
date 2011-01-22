@@ -335,7 +335,7 @@ BLocaleRoster::_GetCatalog(BCatalog* catalog, vint32* catalogInitStatus)
 	}
 
 	if (!found) {
-		log_team(LOG_DEBUG, "Catalog %x doesn't belong to any image !",
+		log_team(LOG_DEBUG, "Catalog %x doesn't belong to any image!",
 			catalog);
 		return catalog;
 	}
@@ -345,7 +345,7 @@ BLocaleRoster::_GetCatalog(BCatalog* catalog, vint32* catalogInitStatus)
 	char objectSignature[B_MIME_TYPE_LENGTH];
 	if (objectInfo.GetSignature(objectSignature) != B_OK) {
 		log_team(LOG_ERR, "File %s has no mimesignature, so it can't use"
-			"localization.", info.name);
+			" localization.", info.name);
 		return catalog;
 	}
 
