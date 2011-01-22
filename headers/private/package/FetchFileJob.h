@@ -21,7 +21,8 @@ class FetchFileJob : public Job {
 	typedef	Job					inherited;
 
 public:
-								FetchFileJob(const BString& title,
+								FetchFileJob(const Context& context,
+									const BString& title,
 									const BString& fileURL,
 									const BEntry& targetEntry);
 	virtual						~FetchFileJob();

@@ -41,9 +41,9 @@ Request::GetContext() const
 status_t
 Request::QueueJob(Job* job, JobQueue& jobQueue) const
 {
-	JobStateListener* defaultListener = fContext.DefaultJobStateListener();
-	if (defaultListener != NULL)
-		job->AddStateListener(defaultListener);
+	JobStateListener* listener = fContext.GetJobStateListener();
+	if (listener != NULL)
+		job->AddStateListener(listener);
 
 	return jobQueue.AddJob(job);
 }

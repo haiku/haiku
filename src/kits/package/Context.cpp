@@ -20,9 +20,15 @@ namespace Haiku {
 namespace Package {
 
 
-Context::Context()
+DecisionProvider::~DecisionProvider()
+{
+}
+
+
+Context::Context(DecisionProvider& decisionProvider)
 	:
-	fDefaultJobStateListener(NULL)
+	fDecisionProvider(decisionProvider),
+	fJobStateListener(NULL)
 {
 	BPath tempPath;
 	if (find_directory(B_COMMON_TEMP_DIRECTORY, &tempPath) != B_OK)
@@ -49,16 +55,23 @@ Context::GetTempEntryManager() const
 
 
 JobStateListener*
-Context::DefaultJobStateListener() const
+Context::GetJobStateListener() const
 {
-	return fDefaultJobStateListener;
+	return fJobStateListener;
 }
 
 
 void
-Context::SetDefaultJobStateListener(JobStateListener* listener)
+Context::SetJobStateListener(JobStateListener* listener)
 {
-	fDefaultJobStateListener = listener;
+	fJobStateListener = listener;
+}
+
+
+DecisionProvider&
+Context::GetDecisionProvider() const
+{
+	return fDecisionProvider;
 }
 
 

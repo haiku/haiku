@@ -5,6 +5,8 @@ UsePrivateHeaders shared support ;
 BinCommand pkgman :
 	command_add_repo.cpp
 	command_list_repos.cpp
+	MyDecisionProvider.cpp
+	MyJobStateListener.cpp
 	pkgman.cpp
 	:
 	package be

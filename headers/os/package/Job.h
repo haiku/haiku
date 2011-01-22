@@ -15,6 +15,7 @@ namespace Haiku {
 namespace Package {
 
 
+class Context;
 class Job;
 
 struct JobStateListener {
@@ -39,7 +40,8 @@ enum JobState {
 
 class Job {
 public:
-								Job(const BString& title);
+								Job(const Context& context,
+									const BString& title);
 	virtual						~Job();
 
 			status_t			InitCheck() const;
@@ -65,9 +67,11 @@ protected:
 
 			void				NotifyStateListeners();
 
+			const Context&		fContext;
 private:
 			status_t			fInitStatus;
 			BString				fTitle;
+
 			JobState			fState;
 			status_t			fResult;
 

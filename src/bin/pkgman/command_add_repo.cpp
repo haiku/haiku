@@ -15,13 +15,15 @@
 #include <package/Context.h>
 #include <package/JobQueue.h>
 
+#include "MyDecisionProvider.h"
+#include "MyJobStateListener.h"
 #include "pkgman.h"
 
 
-// TODO: internationalization!
-
-
 using namespace Haiku::Package;
+
+
+// TODO: internationalization!
 
 
 static const char* kCommandUsage =
@@ -37,25 +39,6 @@ print_command_usage_and_exit(bool error)
     fprintf(error ? stderr : stdout, kCommandUsage, kProgramName);
     exit(error ? 1 : 0);
 }
-
-
-struct Listener : public JobStateListener {
-	virtual	void JobStarted(Job* job)
-	{
-		printf("%s ...\n", job->Title().String());
-	}
-	virtual	void JobSucceeded(Job* job)
-	{
-	}
-	virtual	void JobFailed(Job* job)
-	{
-		DIE(job->Result(), "failed!");
-	}
-	virtual	void JobAborted(Job* job)
-	{
-		DIE(job->Result(), "aborted");
-	}
-};
 
 
 int
@@ -97,10 +80,12 @@ command_add_repo(int argc, const char* const* argv)
 	const char* const* repoURLs = argv + optind;
 	int urlCount = argc - optind;
 
-	Context context;
+	MyDecisionProvider decisionProvider;
+	Context context(decisionProvider);
+	MyJobStateListener listener;
+	context.SetJobStateListener(&listener);
+
 	status_t result;
-	Listener listener;
-	context.SetDefaultJobStateListener(&listener);
 	for (int i = 0; i < urlCount; ++i) {
 		AddRepositoryRequest request(context, repoURLs[i], asUserRepository);
 		JobQueue jobQueue;
@@ -111,7 +96,7 @@ command_add_repo(int argc, const char* const* argv)
 		while (Job* job = jobQueue.Pop()) {
 			result = job->Run();
 			delete job;
-			if (result == B_INTERRUPTED)
+			if (result == B_CANCELED)
 				break;
 		}
 	}

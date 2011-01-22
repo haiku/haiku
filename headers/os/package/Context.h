@@ -17,20 +17,37 @@ namespace Package {
 class JobStateListener;
 
 
+struct DecisionProvider {
+	virtual						~DecisionProvider();
+
+	virtual	bool				YesNoDecisionNeeded(const BString& description,
+									const BString& question,
+									const BString& yes, const BString& no,
+									const BString& defaultChoice) = 0;
+//	virtual	bool				ActionsAcceptanceDecisionNeeded(
+//									const BString& description,
+//									const BString& question) = 0;
+//	virtual	int32				ChoiceDecisionNeeded(
+//									const BString& question) = 0;
+};
+
+
 class Context {
 public:
-								Context();
+								Context(DecisionProvider& decisionProvider);
 								~Context();
 
 			TempEntryManager&	GetTempEntryManager() const;
 
-			JobStateListener*	DefaultJobStateListener() const;
-			void				SetDefaultJobStateListener(
-									JobStateListener* listener);
+			JobStateListener*	GetJobStateListener() const;
+			void				SetJobStateListener(JobStateListener* listener);
+
+			DecisionProvider&	GetDecisionProvider() const;
 
 private:
 	mutable	TempEntryManager	fTempEntryManager;
-			JobStateListener*	fDefaultJobStateListener;
+			DecisionProvider&	fDecisionProvider;
+			JobStateListener*	fJobStateListener;
 };
 
 

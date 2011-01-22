@@ -20,10 +20,10 @@ namespace Haiku {
 namespace Package {
 
 
-FetchFileJob::FetchFileJob(const BString& title, const BString& fileURL,
-	const BEntry& targetEntry)
+FetchFileJob::FetchFileJob(const Context& context, const BString& title,
+	const BString& fileURL, const BEntry& targetEntry)
 	:
-	inherited(title),
+	inherited(context, title),
 	fFileURL(fileURL),
 	fTargetEntry(targetEntry)
 {
@@ -50,7 +50,7 @@ FetchFileJob::Execute()
 	int cmdResult = system(cmd.String());
 	if (WIFSIGNALED(cmdResult)
 		&& (WTERMSIG(cmdResult) == SIGINT || WTERMSIG(cmdResult) == SIGQUIT)) {
-		return B_INTERRUPTED;
+		return B_CANCELED;
 	}
 
 	return cmdResult == 0 ? B_OK : B_ERROR;

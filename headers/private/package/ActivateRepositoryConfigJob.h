@@ -23,6 +23,7 @@ class ActivateRepositoryConfigJob : public Job {
 
 public:
 								ActivateRepositoryConfigJob(
+									const Context& context,
 									const BString& title,
 									const BEntry& archivedRepoConfigEntry,
 									const BDirectory& targetDirectory);

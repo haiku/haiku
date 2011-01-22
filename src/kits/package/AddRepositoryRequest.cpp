@@ -43,7 +43,7 @@ AddRepositoryRequest::CreateJobsToRun(JobQueue& jobQueue)
 {
 	BEntry tempEntry
 		= GetContext().GetTempEntryManager().Create("repoconfig-");
-	FetchFileJob* fetchJob = new (std::nothrow) FetchFileJob(
+	FetchFileJob* fetchJob = new (std::nothrow) FetchFileJob(GetContext(),
 		BString("Fetching repository-config from ") << fRepositoryURL,
 		fRepositoryURL, tempEntry);
 	if (fetchJob == NULL)
@@ -63,7 +63,7 @@ AddRepositoryRequest::CreateJobsToRun(JobQueue& jobQueue)
 		return result;
 	BDirectory targetDirectory(targetRepoConfigPath.Path());
 	ActivateRepositoryConfigJob* activateJob
-		= new (std::nothrow) ActivateRepositoryConfigJob(
+		= new (std::nothrow) ActivateRepositoryConfigJob(GetContext(),
 			BString("Activating repository-config from ") << fRepositoryURL,
 			tempEntry, targetDirectory);
 	if (activateJob == NULL)

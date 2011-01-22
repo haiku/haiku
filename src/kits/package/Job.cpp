@@ -11,6 +11,8 @@
 
 #include <Errors.h>
 
+#include <package/Context.h>
+
 
 namespace Haiku {
 
@@ -46,8 +48,9 @@ JobStateListener::JobAborted(Job* job)
 }
 
 
-Job::Job(const BString& title)
+Job::Job(const Context& context, const BString& title)
 	:
+	fContext(context),
 	fTitle(title),
 	fState(JOB_STATE_WAITING_TO_RUN)
 {
@@ -105,7 +108,7 @@ Job::Run()
 
 	fState = fResult == B_OK
 		? JOB_STATE_SUCCEEDED
-		: fResult == B_INTERRUPTED
+		: fResult == B_CANCELED
 			? JOB_STATE_ABORTED
 			: JOB_STATE_FAILED;
 	NotifyStateListeners();

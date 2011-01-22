@@ -13,7 +13,6 @@
 
 extern const char* kProgramName;
 
-
 #define DIE(result, msg...)											\
 do {																\
 	fprintf(stderr, "*** " msg);									\
