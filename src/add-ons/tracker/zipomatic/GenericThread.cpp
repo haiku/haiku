@@ -59,6 +59,7 @@ GenericThread::ThreadFunction()
 			}
 			
 			delete this;
+			return B_OK;
 		}
 
 		BeginUnit();
