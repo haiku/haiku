@@ -98,8 +98,8 @@ public:
 
 	bool getDoInput() const;
 	bool getDoOutput() const;
-	void setDoInput(bool doinput);
-	void setDoOutput(bool dooutput);
+	void setDoInput(bool doInput);
+	void setDoOutput(bool doOutput);
 
 	istream &getInputStream();
 	ostream &getOutputStream();

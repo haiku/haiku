@@ -116,14 +116,14 @@ ostream &HttpURLConnection::getOutputStream()
 	return __sock->getOutputStream();
 }
 
-void HttpURLConnection::setDoInput(bool doinput)
+void HttpURLConnection::setDoInput(bool doInput)
 {
-	doinput = doinput;
+	this->doInput = doInput;
 }
 
-void HttpURLConnection::setDoOutput(bool dooutput)
+void HttpURLConnection::setDoOutput(bool doOutput)
 {
-	dooutput = dooutput;
+	this->doOutput = doOutput;
 }
 
 void HttpURLConnection::connect()
