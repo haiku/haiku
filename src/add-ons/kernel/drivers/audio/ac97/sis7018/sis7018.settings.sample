@@ -1,0 +1,29 @@
+#
+# The sample sis7018 driver settings file
+#
+# Rename it to sis7018 and put into 
+# /boot/home/config/settings/kernel/drivers/
+# After restarting Media Services the new settings will works.
+
+## trace [on|off] - activate additional tracing.
+## default value: off
+
+trace on 
+
+## logfile [full path to private log file] 
+## default path value: /var/log/sis7018.log
+## if disabled - all output goes to syslog
+
+logfile /var/log/sis7018.log
+
+## reset_logfile [on|off] - truncate private log file on driver/system restart
+## default value: off
+##
+
+# reset_logfile off
+
+## add_timestamp  [on|off]  - add time of writing the string in private log file.
+## default value: on
+##
+
+# add_timestamp off

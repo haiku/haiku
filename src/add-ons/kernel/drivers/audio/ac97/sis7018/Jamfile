@@ -1,0 +1,18 @@
+SubDir HAIKU_TOP src add-ons kernel drivers audio ac97 sis7018 ;
+
+
+UsePrivateHeaders kernel media ;
+
+UsePrivateHeaders [ FDirName kernel util ] ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+
+KernelAddon sis7018 :
+	Driver.cpp
+	Device.cpp
+	Mixer.cpp
+	Settings.cpp
+	Stream.cpp
+	ac97.c
+	;
