@@ -4090,13 +4090,8 @@ fault_get_page(PageFaultContext& context)
 
 		lastCache = cache;
 
-		for (;;) {
-			page = cache->LookupPage(context.cacheOffset);
-			if (page == NULL || !page->busy) {
-				// Either there is no page or there is one and it is not busy.
-				break;
-			}
-
+		page = cache->LookupPage(context.cacheOffset);
+		if (page != NULL && page->busy) {
 			// page must be busy -- wait for it to become unbusy
 			context.UnlockAll(cache);
 			cache->ReleaseRefLocked();
