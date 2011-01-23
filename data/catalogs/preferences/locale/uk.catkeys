@@ -5,19 +5,19 @@ Long format:	TimeFormatSettings		Звичний  формат:
 Currency	TimeFormatSettings		Валюта
 Short format:	TimeFormatSettings		Скорочений формат:
 Language	Locale Preflet Window		Мова
-Preferred languages	Locale Preflet Window		Мови ,що переважають
+Preferred languages	Locale Preflet Window		Мови, що переважають
 Numbers	TimeFormatSettings		Номери
 24 hour	TimeFormatSettings		24 години
 Defaults	Locale Preflet Window		По замовчуванню
 Revert	Locale Preflet Window		Повернути
-OK	Locale Preflet Window		Ok
+OK	Locale Preflet Window		Гаразд
 Time	TimeFormatSettings		Час
 Date	TimeFormatSettings		Дата
 12 hour	TimeFormatSettings		12 годин
-Locale	Locale Preflet		Locale
+Locale	Locale Preflet		Локаль
 already chosen	LanguageListView		повністю закритий
 Negative:	TimeFormatSettings		Негатив:
-Use month/day-names from preferred language	TimeFormatSettings		Використовувати місяць/день для вибраної мови
+Use month/day-names from preferred language	TimeFormatSettings		Використовувати місяць/день імена для вибраної мови
 Formatting	Locale Preflet Window		Форматування
 Locale	Locale Preflet Window		Локаль
 Full format:	TimeFormatSettings		Повний формат:

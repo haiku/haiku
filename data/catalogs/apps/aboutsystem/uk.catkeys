@@ -1,8 +1,8 @@
-1	ukrainian	x-vnd.Haiku-About	1443838569
+1	ukrainian	x-vnd.Haiku-About	2350236915
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (і ядро його NewOS)\n
 %ld Processors:	AboutView		%ld Процесори:
-Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (засновник проекту)\n\n
-The Haiku-Ports team\n	AboutView		Команда Haiku-Ports\n
+Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (засновнику проекту)\n\n
+The Haiku-Ports team\n	AboutView		Команді Haiku-Ports\n
 Website, marketing & documentation:\n	AboutView		Сайт, маркетинг і документація:\n
 Revision	AboutView		Ревізія
 Source Code: 	AboutView		Код: 
@@ -12,20 +12,27 @@ Contributors:\n	AboutView		Співробітники:\n
 Unknown	AboutView		Невідомий
 \n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… і напевно багатьох інших, котрих ми забули згадати (Вибачте!)\n\n
 %.2f GHz	AboutView		%.2f GHz
-Memory:	AboutView		Пам'ять:
+Memory:	AboutView		Пам’ять:
 Past maintainers:\n	AboutView		Попередні розробники:\n
 \n\nSpecial thanks to:\n	AboutView		\n\nОсоблива вдячність:\n
 Licenses: 	AboutView		Ліцензії: 
 \nCopyrights\n\n	AboutView		\nАвторські права\n\n
 Current maintainers:\n	AboutView		Розробники:\n
 Time running:	AboutView		Час роботи:
-The Haikuware team and their bounty program\n	AboutView		Команда Haikuware з їхньою програмою заохочень\n
+The Haikuware team and their bounty program\n	AboutView		Команді Haikuware з їхньою програмою заохочень\n
 About this system	AboutWindow		Про цю систему
 Version:	AboutView		Версія:
 %ld MHz	AboutView		%ld MHz
 [Click a license name to read the respective license.]\n\n	AboutView		[Клікніть ім'я ліцензії для прочитання її.]\n\n
 License: 	AboutView		Ліцензія: 
 Translations:\n	AboutView		Переклади:\n
-... and the many people making donations!\n\n	AboutView		...і багато людей, що зробили внески!\n\n
-Google & their Google Summer of Code program\n\n	AboutView		Google і їхня програма Google Summer of Code\n\n
-The BeGeistert team\n	AboutView		Команда BeGeistert \n
+... and the many people making donations!\n\n	AboutView		...і багатьом людям, що зробили внески!\n\n
+The BeGeistert team\n	AboutView		Команді BeGeistert \n
+The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku and the Haiku logo are trademarks of Haiku, Inc.\n\n	AboutView		Авторські права на код Haiku є власністю Haiku, Inc., або поважних авторів про яких згадується в коді. Haiku і його лого є торговими марками Haiku, Inc.\n\n
+GCC %d Hybrid	AboutView		GCC %d гібрид
+%d MiB total	AboutView		%d MiB заг.
+%d MiB used (%d%%)	AboutView		%d MiB викор. (%d%%)
+The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT licence%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		Код що є унікальним для Haiku, особливо ядро і весь код, що додатки можуть використовувати, поширюються за умовами ліцензії %MIT%. Деякі системні бібліотеки містять другорядні частини коду під ліцензією LGPL. Ви можете знайти авторські права цих частин нижче.\n\n
+%total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB заг., %inaccessible MiB недоступно
+Google & their Google Summer of Code program\n	AboutView		Google і їхній програмі Google Summer of Code\n
+The University of Auckland and Christof Lutteroth\n\n	AboutView		Університету Окленда і Крістофу Люттерота\n\n

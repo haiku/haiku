@@ -1,41 +1,32 @@
-1	ukrainian	x-vnd.Haiku-ShowImage	887077117
+1	ukrainian	x-vnd.Haiku-ShowImage	1508862207
 Use as background…	Menus		Використати як фон…
-5 seconds	Menus		5 сек.
 Slide delay	Menus		Затримка слайда
 Zoom in	Menus		Збільшення
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Документ '%s' було змінено. Ви хочете закрити його?
-8 seconds	Menus		8 сек.
 Previous page	Menus		Попередня сторінка
 View	Menus		Вигляд
 Full screen	Menus		У повний екран
 Go to page	Menus		Перейти до сторінки
-Zoom out	Menus		Зменшити
-20 seconds	Menus		20 сек.
-3 seconds	Menus		3 сек.
+Zoom out	Menus		Зменьшення
 Rotate counterclockwise	Menus		Обертати проти год. стрілки
-10 seconds	Menus		10 сек.
 High-quality zooming	Menus		Високоякісне збільшення
 Browse	Menus		Переглянути
-6 seconds	Menus		6 сек.
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Неможливо завантажити зображення! Жодного файла або оброблювача зображень для нього не знайдено.
 First page	Menus		Перша сторінка
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Документ '%s' (сторінка %d) були змінені. Ви хочете закрити документ?
-About ShowImage…	Menus		 Про Переглядач зображень…
+About ShowImage…	Menus		Про Переглядач… 
 Close	ClosePrompt		Закрити
 Undo	Menus		Відмінити
 Resize to (in 1/72 inches):	PrintOptionsWindow		Змінити розмір (в 1/72 дюйма):
-9 seconds	Menus		9 сек.
 Flip left to right	Menus		Пересунути горизонтально
 Show caption in full screen mode	Menus		Показати заголовок в повний екран
 DPI:	PrintOptionsWindow		Роздільча здатність(DPI):
 Next file	Menus		Наступний файл
-4 seconds	Menus		4 секунди
 Close document	ClosePrompt		Закрити документ
 Height: 	PrintOptionsWindow		Висота:
 Cancel	ClosePrompt		Відмінити
 Print options	PrintOptionsWindow		Параметри друку
-ShowImage	AboutWindow		Переглядач зображень
-7 seconds	Menus		7 секунди
+ShowImage	AboutWindow		Переглядач 
 Last page	Menus		Остання сторінка
 Previous file	Menus		Попереднє фото
 Slide show	Menus		Слайдшоу
@@ -49,7 +40,8 @@ Job setup	PrintOptionsWindow		Настройка завдання
 Original size	Menus		Оригінальний розмір
 Next page	Menus		Наступна сторінка
 OK	SaveToFile		Гаразд
-The file '%s' could not be written.	SaveToFile		Файл '%s' Не може бути записаний.
+The file '%s' could not be written.	SaveToFile		Файл '%s' не може бути записаний.
+Progress monitor	ProgressWindow		Монітор ходу
 File	Menus		Файл
 Page setup…	Menus		Налаштування сторінки…
 Print…	Menus		Друк...
@@ -66,3 +58,4 @@ Selection Mode	Menus		Режим вибору
 Stretch to window	Menus		Розтягнути по вікну
 OK	Alerts		Гаразд
 Fit to window	Menus		Припасувати по вікну
+%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS секунд

@@ -1,0 +1,50 @@
+1	ukrainian	x-vnd.Haiku-PowerStatus	1564851502
+Design capacity low warning: 	PowerStatus		Попередження про зниження проектної ємності:
+Show percent	PowerStatus		Показати процент
+PowerStatus settings	PowerStatus		Настройки PowerStatus
+Design capacity: 	PowerStatus		Проектна ємність:
+mW	PowerStatus		mW
+about	PowerStatus		про
+Type: 	PowerStatus		Тип:
+non-rechargeable	PowerStatus		той що не може перезаряджатись
+Empty battery slot	PowerStatus		Слот підключення батареї пустий 
+mV	PowerStatus		mV
+Run in window	PowerStatus		Запустити у вікні
+ACPI connect\n	PowerStatus		ACPI під'єднано\n
+mWh	PowerStatus		mWh
+Battery info…	PowerStatus		Дані батареї…
+Show time	PowerStatus		Показати час
+Last full charge: 	PowerStatus		Остання повна зарядка:
+No power interface found.\n	PowerStatus		Не знайдено інтерфейсу живлення.\n
+Battery unused	PowerStatus		Батарея не використовується
+Extended battery info	PowerStatus		 	Розширені дані батареї
+try %s\n	PowerStatus		Використано %s\n
+mA	PowerStatus		mA
+Current rate: 	PowerStatus		Біжучий розряд:
+discharging	PowerStatus		розрядка
+Show text label	PowerStatus		Показати текстові мітки
+About…	PowerStatus		 	Про…
+Model number: 	PowerStatus		Номер моделі:
+Install in Deskbar	PowerStatus		Встановити в Deskbar
+mAh	PowerStatus		 	mAh
+Capacity: 	PowerStatus		 	Ємність:
+Battery discharging	PowerStatus		Батарея розряджена
+Serial number: 	PowerStatus		Серійний номер:
+Capacity granularity 1: 	PowerStatus		Градація ємності 1:
+OK	PowerStatus		Гаразд
+OEM info: 	PowerStatus		Дані OEM:
+Design voltage: 	PowerStatus		Проектна напруга:
+ACPI driver found\n	PowerStatus		Знайдено ACPI драйвер\n
+PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		PowerStatus\nавтори Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
+Battery charging	PowerStatus		Батарея заряджається
+Design capacity warning: 	PowerStatus		Попередження про проектну ємність:
+Battery info	PowerStatus		Дані батареї
+Quit	PowerStatus		 	Вийти
+rechargeable	PowerStatus		та що може перезаряджатись
+charging	PowerStatus		зарядка
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Ви можете запустити PowerStatus у вікні або встановити його у Deskbar
+Power status box	PowerStatus		Вікно стану живлення
+Show status icon	PowerStatus		Показати іконку стану
+Capacity granularity 2: 	PowerStatus		 	Градація ємності 2:
+Technology: 	PowerStatus		Технологія:
+no battery	PowerStatus		 	батарея відсутня

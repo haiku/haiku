@@ -1,0 +1,26 @@
+1	ukrainian	x-vnd.Haiku-DataTranslations	2482065199
+DataTranslations	DataTranslations		Перетворення даних
+Info…	DataTranslations		Інформація…
+about	DataTranslations		про
+Could not install 	DataTranslations		Неможливо встановити
+Cancel	DataTranslations		Відміна
+Name:	DataTranslations		І’мя:
+Panel Info	DataTranslations		Інформаційна Панель
+The item '	DataTranslations		 	Пункт '
+%name' does not appear to be a Translator and will not be installed.	DataTranslations		 %name» найймовірніше не є транслятором і не може бути встановленим.
+DataTranslations - Note	DataTranslations		Перетворення даних — Заувага
+Name: %name \nVersion: 	DataTranslations		Ім’я: %name \nВерсія:
+Overwrite	DataTranslations		Перезаписати
+Info:	DataTranslations		Інформація:
+info	DataTranslations		інформація
+%name already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		%name вже існує в папці трансляторів! Перезаписати існуючий транслятор?
+Path:	DataTranslations		Шлях:
+The new translator has been installed successfully.	DataTranslations		Новий транслятор був успішно встановлений.
+\nInfo: %info\n\nPath:\n	DataTranslations		\nІнформація: %info\n\nШлях:\n
+DataTranslations - Error	DataTranslations		Перетворення даних — Помилка
+OK	DataTranslations		Гаразд
+An item named '	DataTranslations		Елемент з іменем '
+Icon	DataTranslations		Іконка
+DataTranslations\n\twritten by Oliver Siebenmarck and others\n\tCopyright 2002-2010, Haiku Inc. All rights reserved.\n	DataTranslations		Перетворення даних\n\автори Oliver Siebenmarck і інші\n\tCopyright 2002–2010, Haiku Inc. All rights reserved.\n
+Version:	DataTranslations		Версія:
+Translation Settings\n\nUse this control panel to set values that various\ntranslators use when no other settings are specified\nin the application.	DataTranslations		Перетворення даних\n\nВикористовуйте цю панель для встановлення величин, що різні\nтранслятори використовують, коли невизначено інших настройок\nв додатку.

@@ -1,0 +1,49 @@
+1	ukrainian	x-vnd.Haiku-LaunchBox	2687146141
+New	LaunchBox		Новий
+Set description…	LaunchBox		Встановити Опис...
+IconButton::SetIcon() - error allocating bitmap: %s\n	LaunchBox		IconButton::SetIcon() - помилка розташування bitmap: %s\n
+Vertical layout	LaunchBox		Вертикальне розташування
+OK	LaunchBox		Гаразд
+no BAppFileInfo for '%s'\n	LaunchBox		Немає інформації про '%s'\n
+Pad 1	LaunchBox		Панель 1
+last chance	LaunchBox		остання спроба
+Quit	LaunchBox		Вийти
+IconButton::SetIcon() - path.InitCheck() failed: %s\n	LaunchBox		IconButton::SetIcon() - path.InitCheck() призупинено: %s\n
+Clear button	LaunchBox		Очистити кнопку
+Failed to launch application with signature '	LaunchBox		Не вдалося запустити додаток з підписом  '
+About	LaunchBox		Про
+Ignore double-click	LaunchBox		Ігнорувати подвійне натискання
+Auto-raise	LaunchBox		Автоматичне спливання
+IconButton::_MakeBitmaps() - error allocating local bitmaps\n	LaunchBox		IconButton::_MakeBitmaps() - помилка виділення растрового зображення\n
+Show on all workspaces	LaunchBox		Показати на всіх робочих просторах
+Show window border	LaunchBox		Показувати межі вікна
+IconButton::SetIcon() - fileType is not valid: %s\n	LaunchBox		IconButton::SetIcon() - fileНедопустимий тип : %s\n
+Pad 	LaunchBox		Панель
+Icon size	LaunchBox		Розмір Іконки
+no MIME signature for '%s'\n	LaunchBox		немає MIME підпису для '%s'\n
+Bummer	LaunchBox		Помилка
+Cancel	LaunchBox		Відміна
+Remove button	LaunchBox		Видалити кнопку
+Description for '	LaunchBox		Описання для 
+Horizontal layout	LaunchBox		Горизонтальне розташування
+Name Panel	LaunchBox		Панель назви
+Add button here	LaunchBox		Додати кнопку тут
+IconButton::_MakeBitmaps() - bitmap has unsupported colorspace\n	LaunchBox		IconButton::_MakeBitmaps() - растрове зображення не підтримує схему кольорів\n
+Failed to launch '	LaunchBox		Запуск призупинено '
+IconButton::_MakeBitmaps() - bitmap is not valid\n	LaunchBox		IconButton::_MakeBitmaps() - невідповідне растрове зображення\n
+IconButton::SetIcon() - be_app->GetAppInfo() failed: %s\n	LaunchBox		IconButton::SetIcon() - be_app->GetAppInfo() призупинено: %s\n
+Stephan Aßmus (aka stippi)	LaunchBox		Stephan Aßmus (ака stippi)
+Failed to launch 'something',error in Pad data.	LaunchBox		Невдалося запустити 'щось', помилка в даних  панелі.
+Close	LaunchBox		Закрити
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Призупинено команду "відкрити папку" для Tracker.\n\nПомилка:
+IconButton::SetIcon() - path.Append() failed: %s\n	LaunchBox		IconButton::SetIcon() - path.Append() призупинено: %s\n
+IconButton::SetIcon() - path.GetParent() failed: %s\n	LaunchBox		IconButton::SetIcon() - path.GetParent() призупинено: %s\n
+You can drag an icon here.	LaunchBox		Ви можете перемістити іконки сюди.
+Clone	LaunchBox		Клонувати
+IconButton::SetIcon() - B_RGB32 bitmap is not valid\n	LaunchBox		IconButton::SetIcon() - B_RGB32 невідповідність растрового зображення\n
+LaunchBox	LaunchBox		LaunchBox
+launch popup	LaunchBox		Увімкнути спливаючі повідомлення
+Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Дійсно закрити цю панель?\n(Вона не збережеться.)
+'.\n\nError: 	LaunchBox		'.\n\nПомилка:
+IconButton::SetIcon() - B_CMAP8 bitmap is not valid\n	LaunchBox		IconButton::SetIcon() - B_CMAP8 невідповідність растрового зображення\n
+IconButton::SetIcon() - fileType->GetIcon() failed: %s\n	LaunchBox		IconButton::SetIcon() - fileType->GetIcon() призупинено: %s\n

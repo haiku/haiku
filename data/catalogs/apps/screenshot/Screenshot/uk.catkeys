@@ -1,29 +1,26 @@
-1	ukrainian	x-vnd.Haiku-screenshot-cli	1091349652
-seconds	ScreenshotWindow		секунд(и)
-Options	ScreenshotWindow		Опції
-Desktop	ScreenshotWindow		Стіл
-Include window border	ScreenshotWindow		Включно з заголовком вікна
-Back to saving	ScreenshotWindow		Назад до збереження
-Select	ScreenshotWindow		Вибрати
+1	ukrainian	x-vnd.haiku-screenshot	166521589
+seconds	ScreenshotWindow		сек.
+Desktop	ScreenshotWindow		Робочий стіл
+Include window border	ScreenshotWindow		Включаючи межу вікна
+Select	ScreenshotWindow			Вибрати
 Capture active window	ScreenshotWindow		Захопити активне вікно
-Cancel	ScreenshotWindow		Відміна
-screenshot	ScreenshotWindow	!! Basename of screenshot files. !!	скріншот
-Name:	ScreenshotWindow		І'мя:
-screenshot1	ScreenshotWindow	!! Filename of first screenshot !!	скріншот1
-SomethingLongHere	ScreenshotWindow	!! length >= screenshot file name? !!	SomethingLongHere
-Save screenshot	ScreenshotWindow		Зберегти скріншот
-Capture entire screen	ScreenshotWindow		Захопити весь екран
-Choose folder	ScreenshotWindow		Вибрати папку
-Take screenshot	ScreenshotWindow		Зробити скріншот
+Cancel	ScreenshotWindow		Відмінити
+Name:	ScreenshotWindow		Ім'я:
+Choose folder	ScreenshotWindow		Виберіть папку
 Save	ScreenshotWindow		Зберегти
-Overwrite	ScreenshotWindow		Перезаписати
-Retake screenshot	ScreenshotWindow		Переробити скріншот
+overwrite	ScreenshotWindow		переписати
 Choose folder...	ScreenshotWindow		Виберіть папку...
-Please select	ScreenshotWindow		Виберіть будь-ласка
+Please select	ScreenshotWindow		Будь-ласка виберіть
 Save as:	ScreenshotWindow		Зберегти як:
+Copy to clipboard	ScreenshotWindow		Копіювати до буфера обміну
 Save in:	ScreenshotWindow		Зберегти в:
-Take screenshot after a delay of	ScreenshotWindow		Зробити скріншот після затримки в
-Artwork folder	ScreenshotWindow		Папка artwork
-Home folder	ScreenshotWindow		Домашня папка
-This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Такий файл вже існує.\n Ви впевнені, що хочете перезаписати його?
-Include mouse pointer	ScreenshotWindow		Включно з курсором
+screenshot	Screenshot	Base filename of screenshot files	знімок екрана
+New screenshot	ScreenshotWindow		Новий знімок
+Artwork folder	ScreenshotWindow		Папка Artwork
+Home folder	ScreenshotWindow		Папка Home
+Screenshot	ScreenshotWindow		Знімок екрана
+This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Цей файл цілковито присутній.\n Ви впевнені, що бажаєте переписати його?
+Settings…	ScreenshotWindow		Настройки…
+Delay:	ScreenshotWindow		Затримка:
+Include mouse pointer	ScreenshotWindow		Включаючи курсор
+Translator Settings	ScreenshotWindow		Настройки транслятора

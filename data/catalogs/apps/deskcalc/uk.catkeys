@@ -1,0 +1,8 @@
+1	ukrainian	x-vnd.Haiku-DeskCalc	2582056073
+DeskCalc_settings	CalcApplication		Налаштування DeskCalc
+About DeskCalc…	CalcView		Про DeskCalc…
+about	CalcView		про
+Show keypad	CalcView		Показати клавіатуру
+Enable Num Lock on startup	CalcView		Включати Num Lock при запуску
+DeskCalc v2.1.0\n\nwritten by Timothy Wayper,\nStephan Aßmus and Ingo Weinhold\n\n©1997, 1998 R3 Software Ltd.\n©2006-2009 Haiku, Inc.\n\nAll Rights Reserved.	CalcView		DeskCalc v2.1.0\n\nавтори Timothy Wayper,\nStephan Aßmus і Ingo Weinhold\n\n©1997, 1998 R3 Software Ltd.\n©2006–2009 Haiku, Inc.\n\nAll Rights Reserved.
+Audio Feedback	CalcView		Озвучка віддачі

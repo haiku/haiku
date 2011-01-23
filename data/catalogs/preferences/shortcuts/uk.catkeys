@@ -1,0 +1,56 @@
+1	ukrainian	x-vnd.Haiku-Shortcuts	1120793954
+Error, NULL state description?\n	ShortcutsSpec		Помилка,  NULL опису стану?\n
+MoveMouse	ShortcutsSpec		Переміщення мишки
+OK	ShortcutsWindow		Гаразд
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		не вдалося створити список горячих клавіш.
+Cancel	ShortcutsWindow		Відмінити
+InsertString	ShortcutsSpec		Вставити стрічку
+Append KeySet…	ShortcutsWindow		Додати список горячих клавіш…
+Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
+Key	ShortcutsWindow		Клавіша
+Open KeySet…	ShortcutsWindow		Відкрити список горячих клавіш…
+Shortcuts\n\nBased on SpicyKeys for BeOS made by Jeremy Friesner.	ShortcutsApp		Shortcuts\n\nБазований на SpicyKeys для BeOS розробленій  Jeremy Friesner.
+MouseUp	ShortcutsSpec		Мишку вгору
+Revert to saved	ShortcutsWindow		Повернутися до збереження
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
+Shortcuts	ShortcutsWindow		Горячі клавіші
+*InsertString \"Your Text Here\"	ShortcutsWindow		*Вставити Рядок \"Ваш текст тут\"
+*MouseUp	ShortcutsWindow		*Мишку вгору
+(Choose application with file requester)	ShortcutsWindow		(Виберіть програму з файлами запису)
+Window	ShortcutsSpec	Name for modifier on keyboard	Win Key
+*LaunchHandler text/html	ShortcutsWindow		*Запустити обробник текст/html
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Не вдалося відкрити список горячих клавіш
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Багато \"*Перемістити мишку до 100% 0\" \"*Кнопка мишки1\"
+SendMessage	ShortcutsSpec		Відправити повідомлення
+MoveMouseTo	ShortcutsSpec		Перемістити мишку до
+Save	ShortcutsWindow		Зберегти
+*MouseButton 1	ShortcutsWindow		*Кнопка мишки 1
+*MoveMouse +20 +0	ShortcutsWindow		*Переміщення мишку +20 +0
+MouseDown	ShortcutsSpec		Мишку вниз
+Remove selected shortcut	ShortcutsWindow		Видалити вибрану горячу клавішу
+MouseButton	ShortcutsSpec		Кнопка мишки
+Add new shortcut	ShortcutsWindow		Додати нову горячу клавішу
+Save & apply	ShortcutsWindow		Зберегти і використати
+OK	ShortcutsApp		Гаразд
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*Відправити повідомлення додатку/x-vnd.Be-TRAK 'Tfnd'
+Append	ShortcutsWindow		Сумістити
+File	ShortcutsWindow		Файл
+Beep	ShortcutsSpec		Сигнал
+Quit	ShortcutsWindow		Вийти
+*MouseDown	ShortcutsWindow		*Мишку вниз
+Don't save	ShortcutsWindow		Не зберігати
+Multi	ShortcutsSpec		Багато
+Application	ShortcutsWindow		Додаток
+Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
+*Beep	ShortcutsWindow		*Сигнал
+*MoveMouseTo 50% 50%	ShortcutsWindow		*Переміщення мишки в 50% 50%
+Save KeySet as…	ShortcutsWindow		Зберегти список як…
+Open	ShortcutsWindow		Відкрити
+Really quit without saving your changes?	ShortcutsWindow		Насправді вийди без збереження ваших змін?
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Ярлику невдалось розібрати ваш файл Ключів!
+Select	ShortcutsWindow		Вибрати
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Не вдалося зберегти ваш файл список горячих клавіш!
+About Shortcuts	ShortcutsWindow		Про Shortcuts
+Oh no	ShortcutsWindow		О ні
+About Shortcuts	ShortcutsApp		Про Shortcuts
+LaunchHandler	ShortcutsSpec		Запуск оброблювача

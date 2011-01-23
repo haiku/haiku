@@ -1,7 +1,7 @@
 1	ukrainian	x-vnd.Haiku-Appearance	3612090060
 Control highlight	Colors tab		Підсвітка елемента
 Control border	Colors tab		Межа елемента
-Antialiasing type:	AntialiasingSettingsView		Тип зглажування :
+Antialiasing type:	AntialiasingSettingsView		Тип зглажування:
 Shadow	Colors tab		Тінь
 On	AntialiasingSettingsView		Увімкнути
 Defaults	APRWindow		По замовчуванню
@@ -30,7 +30,7 @@ Colors	APRWindow		Кольори
 Control background	Colors tab		Тло елементу
 Inactive window tab	Colors tab		Заголовок неактивного вікна
 Reduce colored edges filter strength:	AntialiasingSettingsView		Зменшення сили фільтрації кольорових країв:
-Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Субпіксельне зглажування в комбінації з уточненням недоступне у цій зборці Haiku через можливі патентні проблеми. Для включення цієї можливості Вам необхідно зібрати Haiku самостійно з включенням особливих опцій у заголовку конфігурації FreeType.
+Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Субпіксельне зглажування в комбінації з уточненням недоступне у цій збірці Haiku через можливі патентні проблеми. Для включення цієї можливості Вам необхідно зібрати Haiku самостійно з включенням особливих опцій у заголовку конфігурації FreeType.
 Control text	Colors tab		Текст елементу
 Tooltip text	Colors tab		Текст підказки
 Menu item text	Colors tab		Текст пункта меню

@@ -1,0 +1,88 @@
+1	ukrainian	x-vnd.Haiku-Bluetooth	3550394259
+Display	DeviceClass		Дисплей
+Capturing	DeviceClass		Захоплення
+Printer	DeviceClass		Принтер
+Uncategorized	DeviceClass		Без рубрики
+1-17% utilized	DeviceClass		1–17% використано
+Positioning	DeviceClass		Позиціонування
+Rendering	DeviceClass		Рендерінг
+Phone	DeviceClass		Телефон
+17-33% utilized	DeviceClass		17–33% використано
+#ServerNotReady#Not Valid name	RemoteDevice		#Сервер не готовий#Не діюче і'мя
+Combo keyboard/pointing device	DeviceClass		Комбінована клавіатура/вказівний пристрій
+Controller	DeviceClass		Контролер
+No service available	DeviceClass		Немає доступних сервісів
+Wearable	DeviceClass	A wearable computer	Переносний Примітка: переносний комп'ютер
+Handheld	DeviceClass		Надолонний
+Invalid device class!\n	DeviceClass		Невірний клас приладу!\n
+Sensing device	DeviceClass		Чутливий елемент
+Computer	DeviceClass		Комп’ютер
+Cellular	DeviceClass		Стільниковий
+Microphone	DeviceClass		Мікрофон
+Unknown (reserved) minor device class	DeviceClass		Невідомий (зарезервований) незначний клас пристрою  
+Cordless	DeviceClass		Бездротовий
+Common ISDN access	DeviceClass		Загальний доступ ISDN
+83-99% utilized	DeviceClass		83–99% використано
+Scanner	DeviceClass		Сканер
+Game	DeviceClass		Гра
+Gamepad	DeviceClass		Геймпад
+(reserved)	DeviceClass		(зарезервовано)
+Desktop workstation	DeviceClass		Настільна робоча станція
+Audio/Video	DeviceClass		Аудіо/Відео
+Glasses	DeviceClass		Окуляри
+Keyboard	DeviceClass		Клавіатура
+Camera	DeviceClass		Камера
+Major class: 	DeviceClass		Основний клас:
+50-67% utilized	DeviceClass		50–67% використано
+Card reader	DeviceClass		Кардрідер
+Set-top box	DeviceClass		Телеприставка
+Helmet	DeviceClass		Шолом
+Laptop	DeviceClass		Ноутбук
+Car audio	DeviceClass		Автомобільна електроніка
+SIM card reader	DeviceClass		Читач SIM-карти 
+Headphones	DeviceClass		Навушники
+Information	DeviceClass		Інформація
+Remote control	DeviceClass		Віддалене управління
+Service classes: 	DeviceClass		Класи служби:
+Pager	DeviceClass	A small radio device to receive short text messages	Пейджер Примітка: невеликий радіо-пристрій отримує короткі текстові повідомлення
+Object transfer	DeviceClass		Об'єкт передачі
+Gaming/Toy	DeviceClass		Ігрові/іграшки
+Audio	DeviceClass		Аудіо
+Robot	DeviceClass		Робот
+Camcorder	DeviceClass		Відеокамера
+Digitizer tablet	DeviceClass		Кодувальний планшет
+Loudspeaker	DeviceClass		Гучномовець
+Joystick	DeviceClass		Джойстик
+LAN access	DeviceClass		Доступ до ЛВС
+Wrist watch	DeviceClass		Наручний годинник
+Minor class: 	DeviceClass		Малий клас:
+Networking	DeviceClass		Мережа
+Portable audio	DeviceClass		Портативне аудіо
+Device conforms to the headset profile	DeviceClass		Пристрій відповідає профілю гарнітури
+Hands-free	DeviceClass		Вільні руки
+#CommandFailed#Not Valid name	RemoteDevice		#Команду призупинено#Не діюче і'мя
+Vehicle	DeviceClass		Автомобіль
+Palm	DeviceClass	A palm-held device	Надолонний пристрій
+Video display and loudspeaker	DeviceClass		Відео дисплей і гучномовець
+Peripheral	DeviceClass		Периферійний
+#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError#Не діюче і'мя
+Wired modem or voice gateway	DeviceClass		Дротовий модем або голосовий шлюз
+Jacket	DeviceClass		Куртка
+Unspecified	DeviceClass		Невказаний
+Fully available	DeviceClass		Повністю доступний
+67-83% utilized	DeviceClass		67–83% використано
+Not implemented	RemoteDevice		Не реалізовано
+#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest#Не діюче і'мя
+Server	DeviceClass		Сервер
+Video conferencing	DeviceClass		Відеоконференцзв’язок
+Video camera	DeviceClass		Відеокамера
+HiFi audio device	DeviceClass		HiFi аудіо-пристрій
+Smart phone	DeviceClass		Смартфон
+Telephony	DeviceClass		Телефонія
+Doll/Action figure	DeviceClass		Ляльки/Дійові фігури
+VCR	DeviceClass		Відеомагнітофон
+Video monitor	DeviceClass		Відеомонітор
+Pointing device	DeviceClass		Вказівний пристрій
+Miscellaneous	DeviceClass		Різне
+33-50% utilized	DeviceClass		33-50% використано
+Imaging	DeviceClass		Зображення

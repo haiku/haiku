@@ -1,3 +1,4 @@
-1	ukrainian	x-vnd.mmu_man.filepanel	3658481023
+1	ukrainian	x-vnd.mmu_man.filepanel	2009190724
 display a load/save file panel\n	FilePanelApp		показати панель збереження/загрузки файлу\n
 options:\n	FilePanelApp		опції:\n
+%s not a valid option\n	FilePanelApp		%s not a valid option\n

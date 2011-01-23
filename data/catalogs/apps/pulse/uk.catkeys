@@ -1,0 +1,45 @@
+1	ukrainian	x-vnd.Haiku-Pulse	2756001860
+OK	PrefsWindow		Гаразд
+Quit	DeskbarPulseView		Вийти
+Pulse	PulseWindow		Pulse
+Mini mode	DeskbarPulseView		Міні режим
+Remove replicant	CPUButton		Видалити реплікант
+Active color	ConfigView		Колір активності
+Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Використання: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
+Fade colors	ConfigView		Кольори затихання
+OK	DeskbarPulseView		Гаразд
+Deskbar mode	PrefsWindow		Deskbar режим
+Normal mode	PrefsWindow		Норм. режим
+Defaults	PrefsWindow		По замовчуванню
+Normal mode	MiniPulseView		Норм. режим
+Deskbar	CPUButton		Deskbar
+Frame color	ConfigView		Колір рамки
+Mini mode	PrefsWindow		Міні режим
+OK	PulseApp		Гаразд
+Bar colors	ConfigView		Кольори основи
+Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	CPUButton		Pulse\n\nАвтори David Ramsey і Arve Hjønnevåg\n поправки Daniel Switkin
+Settings…	PulseView		Настройки…
+You can't disable the last active CPU.	PulseView		Неможливо усунути останній активний процесор.
+Info	CPUButton		Інформація
+OK	PulseView		Гаразд
+Remove(): %s	DeskbarPulseView		Видалити(): %s
+Deskbar menu	CPUButton		Меню Deskbar'a
+About Pulse…	PulseView		Про Pulse…
+Deskbar mode	MiniPulseView		Deskbar режим
+Quit	MiniPulseView		Вийти
+Pulse	NormalPulseView		Pulse
+Deskbar mode	NormalPulseView		Deskbar режим
+Width of icon:	ConfigView		Ширина іконки:
+Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	PulseWindow		Pulse\n\nАвтори David Ramsey і Arve Hjønnevåg\nПоправки Daniel Switkin
+You can't disable the last active CPU.	CPUButton		Неможливо усунути останній активний процесор.
+Normal mode	DeskbarPulseView		Норм. режим
+OK	CPUButton		Гаразд
+About Pulse…	CPUButton		Про Pulse…
+Mini mode	NormalPulseView		Міні режим
+Info	DeskbarPulseView		Інформація
+Pulse settings	PulseWindow		Настройки Pulse
+Idle color	ConfigView		Колір вільного
+Info	PulseWindow		Інформація
+Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	DeskbarPulseView		Pulse\n\nАвтори David Ramsey і Arve Hjønnevåg\nПоправки Daniel Switkin
+OK	PulseWindow		Гаразд
+CPU progress bar	NormalPulseView		Шкала активності процесора

@@ -1,0 +1,36 @@
+1	ukrainian	x-vnd.Be-PRNT	3307681170
+Waiting	JobListView		Очікування
+page	JobListView		стор.
+Cancel	AddPrinterDialog		Відмінити
+Add printer	AddPrinterDialog		Додати принтер
+Printers	PrintersWindow		Принтери
+Default Printer	PrinterListView		Принтер по замовчуванню
+No pending jobs.	PrinterListView		Немає черги завдань.
+pages	JobListView		Стор.
+Processing	JobListView		Виконання
+Printer name:	AddPrinterDialog		Ім'я принтера:
+pending jobs.	PrinterListView		черга завдань.
+Restart job	PrintersWindow		Перезапустити завдання
+Add	AddPrinterDialog		Додати
+Make default	PrintersWindow		Зробити по замовчуванню
+Cancel job	PrintersWindow		Відмінити завдання
+1 pending job.	PrinterListView		1 завдання в черзі.
+Remove	PrintersWindow		Видалити
+<pick one>	AddPrinterDialog		<виберіть>
+Add …	PrintersWindow		Додати …
+Print jobs for 	PrintersWindow		Завдання на друк для
+Failed	JobListView		Призупинено
+%.2f KB	JobListView		%.2f KB
+Completed	JobListView		Завершено
+No printer found!	TransportMenu		Принтера не знайдено!
+Print jobs: No printer selected	PrintersWindow		Завдання на друк: Принтера не знайдено
+Unknown status	JobListView		Стан невідомий
+Connected to:	AddPrinterDialog		Підключений до:
+Printer type:	AddPrinterDialog		Тип принтера:
+Transport: %transport% %transport_address%	PrinterListView		Транспорт: %transport% %transport_address%
+Driver: %driver%	PrinterListView		Драйвер: %driver%
+Print test page	PrintersWindow		Друк пробної  сторінки
+Test Page	PrintersWindow			Пробна сторінка
+Driver: %driver%	TestPageView			Драйвер: %driver%
+Test Page for '%printer_name%'	TestPageView		Пробна сторінка для '%printer_name%'
+Transport: %transport% %transport_address%	TestPageView		Транспорт: %transport% %transport_address%

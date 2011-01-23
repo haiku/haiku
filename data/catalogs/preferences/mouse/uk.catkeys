@@ -1,10 +1,10 @@
-1	ukrainian	x-vnd.Haiku-Mouse	524453314
+1	ukrainian	x-vnd.Haiku-Mouse	3392409209
 Mouse type:	SettingsView		Тип миші:
 Warp	SettingsView		Переміщення
 2-Button	SettingsView		Двухкнопочна
 Double-click test area	SettingsView		Область для перевірки подвійного кліку
 Revert	MouseWindow		Повернути
-...by Andrew Edward McCall	MouseApplication		...розробив Andrew Edward McCall
+...by Andrew Edward McCall	MouseApplication		...автор Andrew Edward McCall
 Mouse acceleration	SettingsView		Прискорення вказівника
 Click to focus	SettingsView		Клацніть для встановлення фокуса
 3-Button	SettingsView		Трикнопочна
@@ -15,9 +15,10 @@ Dig Deal	MouseApplication		Чудово
 1-Button	SettingsView		Однокнопочна
 Double-click speed	SettingsView		Швидкість подвійного кліку
 Defaults	MouseWindow		За замовчуванням
-Focus follows mouse	SettingsView		Фокус слідує за вказівником
-Accept first click	SettingsView		Приймати перше клік
+Focus follows mouse	SettingsView		Фокус слідкує за вказівником
+Accept first click	SettingsView		Сприймати перший клік
 Fast	SettingsView		Швидко
 Normal	SettingsView		Нормально
 Mouse	MouseWindow		Миша
 Slow	SettingsView		Повільно
+Click to focus and raise	SettingsView		 натиснути для фокусування і спливання

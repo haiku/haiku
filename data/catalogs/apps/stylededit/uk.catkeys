@@ -1,5 +1,5 @@
-1	ukrainian	x-vnd.Haiku-StyledEdit	1637113794
-OK	LoadAlert		OK
+1	ukrainian	x-vnd.Haiku-StyledEdit	3614078026
+OK	LoadAlert		Гаразд
 ???	LoadAlert		???
 Left	Menus		Вліво
 Revert to the last version of \"%s\"? 	RevertToSavedAlert		Повернутись до останньої версії \"%s\" ? 
@@ -25,8 +25,8 @@ Replace all	FindandReplaceWindow		Замінити все
 Default	Open_and_SaveAsPanel		По замовчуванню
 Cancel	FindandReplaceWindow		Відмінити
 Error loading \"%s\":\n\tUnsupported format	LoadAlert		Помилка при загрузці \"%s\":\n\tФормат не підтримується
-OK	RevertToSavedAlert		OK
-Don't save	QuitAlert		Не збережено
+OK	RevertToSavedAlert		Гаразд
+Don't save	QuitAlert		Не зберігати
 Align	Menus		Вирівняти
 Color	Menus		Колір
 Red	Menus		Червоний
@@ -52,6 +52,29 @@ Find	FindandReplaceWindow		Знайти
 Encoding	Open_and_SaveAsPanel		Кодування
 Replace…	Menus		Перемістити…
 Right	Menus		Вправо
+Cancel	SaveAlert		Відмінити
 Save	SaveAlert		Зберегти
-Don't save	SaveAlert		Не збережено
+Don't save	SaveAlert		Не зберігати
 This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Файл помічений, як такий, що є тільки для читання. Зберегти зміни в документі \"%s\"? 
+Paste	Menus		Вставити
+File	Menus		Файл
+Page setup…	Menus		Настройка друку…
+Print…	Menus		Друкувати…
+Quit	Menus		Вийти
+Clear	Menus		Очистити
+Edit	Menus		Редагувати
+Close	Menus		Закрити
+Copy	Menus		Копіювати
+Cut	Menus		Вирізати
+Select all	Menus		Вибрати все
+Save as…	Menus		Зберегти як…
+Lines:	Statistics		Стрічка:
+Document statistics	Statistics		Статистика документу
+Statistics…	Menus		Статистика…
+Words:	Statistics		Слова:
+OK	Statistics		Гаразд
+Undo typing	QuitAlert		Відміна друку
+Characters:	Statistics		Символи:
+Redo typing	QuitAlert		Поновлення друку
+Italic	Menus		Italic
+Bold	Menus		Bold

@@ -10,17 +10,17 @@ Error when expanding archive	ExpanderWindow		Помилка при розпак�
 Hide contents	ExpanderWindow		Сховати вміст
 Cancel	ExpanderWindow		Відмінити
 Continue	ExpanderWindow		Продовжити
-Expander	ExpanderWindow	!! Window Title !!	Expander
+Expander	ExpanderWindow	!! Window Title !!	Розпаковувач
 The destination folder does not exist.	ExpanderWindow		Цільова папка відсутня.
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Ви впевнені, що хочете зупинити розпаковку цього архіва? Розпакована величина може бути некомплектною.
 Select	DirectoryFilePanel		Вибрати
-Creating listing for 	ExpanderWindow		Створити список для 
-Settings	ExpanderMenu		Настройки
-Settings…	ExpanderMenu		Настройки…
+Creating listing for 	ExpanderWindow		Створення списку для
+Settings	ExpanderMenu		Налаштування
+Settings…	ExpanderMenu		Налаштування…
 Expander: Choose destination	DirectoryFilePanel		Expander: Виберіть ціль
 Show contents	ExpanderWindow		Показати вміст
-Expanding file 	ExpanderWindow		Розпакувати файл 
-The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Папка могла бути видалена, переіменована або не підтримується.
+Expanding file 	ExpanderWindow		Розпаковка
+The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Папка була переіменована, видалена або не\nпідтримується.
 The file doesn't exist	ExpanderWindow		Файл відсутній
 Stop	ExpanderMenu		Зупинити
 File	ExpanderMenu		Файл
@@ -28,12 +28,12 @@ Expand	ExpanderWindow		Розпакувати
 Close	ExpanderMenu		Закрити
 The destination is not a folder.	ExpanderWindow		Ціль не є папкою.
 About Expander…	ExpanderMenu		Про Expander…
-OK	About		OK
+OK	About		Гаразд
 Set source…	ExpanderMenu		Встановити джерело…
-Select '%s'	DirectoryFilePanel		Вибрати '%s'
+Select '%s'	DirectoryFilePanel		Вибрати «%s»
 Show contents	ExpanderMenu		Показати вміст
 Stop	ExpanderWindow		Зупинити
 Destination	ExpanderWindow		Ціль
-\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tАвтор Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nАвтори Be версії \nDominic, Hiroshi, Peter, Pavel і Robert\nПереклад Віктор Чумак aka 386sx\nn
-Expander	About		Expander
-is not supported	ExpanderWindow		Це не підтримується
+\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tАвтор Jérôme Duval\n\tCopyright 2004–2006, Haiku Inc.\n\nАвтори Be версії \nDominic, Hiroshi, Peter, Pavel і Robert\nПереклад Віктор Чумак aka 386sx\nn
+Expander	About		Розпаковувач
+is not supported	ExpanderWindow		не підтримується

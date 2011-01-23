@@ -1,0 +1,9 @@
+1	ukrainian	x-vnd.Haiku-CDPlayer	3499256712
+DiscTime	CDPlayer		Час диску
+Audio CD	CDPlayer		Аудіо CD
+It appears that there are no CD drives on your computer or there is no system software to support one. Sorry.	CDPlayer		Можливо, що CD-привід у вашому комп’ютері відсутній, або його не підтримує система. Вибачте.
+TrackTime	CDPlayer		Тривалість композиції
+TrackNumber	CDPlayer		Номер композиції
+Track: --:-- / --:--	CDPlayer		Композиція: --:-- / --:--
+Disc: --:-- / --:--	CDPlayer		Диск: --:-- / --:--
+CD drive is empty	CDPlayer		CD пристрій пустий

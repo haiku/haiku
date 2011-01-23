@@ -1,20 +1,20 @@
 1	ukrainian	x-vnd.Haiku-CPUFrequencyPref	4060072235
-Ok	Status view		OK
-CPU frequency status view	CPU Frequency View		 Частота ЦПУ
+Ok	Status view		Гаразд
+CPU frequency status view	CPU Frequency View		Статистика частоти ЦП
 Set state	Status view		Встановити стан
 Defaults	Pref Window		По замовчуванню
-Install replicant into Deskbar	CPU Frequency View		Встановити реплікант e Deskbar
-Quit	Status view		Завершити
+Install replicant into Deskbar	CPU Frequency View		Встановити реплікант в Deskbar
+Quit	Status view		Вийти
 High performance	Status view		Висока продуктивність
 Stepping policy	CPU Frequency View		Настройка кроку зміни частоти ЦП
 Dynamic performance	Status view		Динамічна продуктивність
-Step up by CPU usage	Color Step View		Крок вгору  по продуктивності процесора:
+Step up by CPU usage	Color Step View		Крок вгору по продуктивності ЦП:
 Dynamic stepping	CPU Frequency View		Динамічна зміна
 Stepping policy: 	CPU Frequency View		Настройка кроку зміни частоти ЦП:
-Integration time [ms]: 	CPU Frequency View		Час інтеграції [ms]:
+Integration time [ms]: 	CPU Frequency View		Час інтеграції [мс]:
 Open Speedstep preferences…	Status view		Відкриття покрокової настройки
 Revert	Pref Window		Повернути
 Low energy	Status view		Мале споживання
 Launching the CPU frequency preflet failed.\n\nError: 	Status view		Програму Частота процесора не вдалося запустити.\n\nПомилка:
-CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		Частота процесора\n\Автор Клеменс Зейдлер\n\tCopyright 2009, Haiku, Inc.\n\t Переклад Олекса Рудик aka totish\n
-CPU Frequency	Main window		Частота процесора
+CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		Частота процесора\n\Автор Клеменс Зейдлер\n\tCopyright 2009, Haiku, Inc.\n
+CPU Frequency	Main window		Частота ЦП

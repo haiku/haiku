@@ -1,13 +1,13 @@
 1	ukrainian	x-vnd.Be-MAIL	1685878103
 %d - Date	Mail		%d - Дата
 Attach attributes:	Mail		Додати атрибути:
-Inconsistency occurred in the undo/redo buffer.	Mail		Невідповідність У буфері відміни/заміни
+Inconsistency occurred in the undo/redo buffer.	Mail		Невідповідність у буфері відміни/заміни
 An error occurred trying to save the attachment.	Mail		Сталася помилка при збереженні вкладення.
 Copy to new	Mail		Копіювати до нового
 Edit	Mail		Редагувати
 Print	Mail		Друкувати
 New mail message	Mail		Новий лист
-Automatically mark mail as read:	Mail		Автоматично помітити як прочитане
+Automatically mark mail as read:	Mail		Автоматично помітити як прочитане:
 Colored quotes:	Mail		Забарвлення цитат:
 Subject:	Mail		Тема:
 Reply to all	Mail		Відповісти всім
@@ -15,7 +15,7 @@ Show icons & labels	Mail		Показати іконки і мітки
 Remove attachment	Mail		Видалити вкладення
 Button bar:	Mail		Панель кнопок:
 Beginner	Mail		Початківець
-Don't save	Mail		Не збережено
+Don't save	Mail		Не зберігати
 Expert	Mail		Експерт
 Reply account:	Mail		Аккаунт для відповіді
 Discard	Mail		Завершити
@@ -25,7 +25,7 @@ There is no installed handler for URL links.	Mail		Не встановлено �
 Signature	Mail		Підпис
 Find again	Mail		Повторний пошук
 Bcc:	Mail		Bcc:
-Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваш основний текст містить  %ld нерозкодованих символів. Можливо інше кодування спрацює краще? Виберіть Відправити якщо хочете  зробити це не зважаючи(нерозкодований символ буде замінено таким що ситуативно підходить), або натисніть Відмінити щоб п.овернутися назад і виправити ситуацію
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваш основний текст містить  %ld нерозкодованих символів. Можливо інше кодування спрацює краще? Виберіть Відправити якщо хочете  зробити це не зважаючи(нерозкодований символ буде замінено таким що ситуативно підходить), або натисніть Відмінити щоб п.овернутися назад і виправити ситуацію.
 Signature:	Mail		Підпис
 Save changes to this signature?	Mail		Зберегти зміни в цьому підписі?
 Cc:	Mail		Cc:
@@ -81,7 +81,7 @@ Show header	Mail		Показати заголовок
 %e - E-mail address	Mail		%e - поштова адреса
 Resend	Mail		Відіслати повторно
 Show raw message	Mail		Показати лист
-\\n - Newline	Mail		\\n - Нова лінія
+\\n - Newline	Mail		\\n - Нова стрічка
 Start now	Mail		Запустити зараз
 Close	Mail		Закрити
 The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		 Mail_daemon не запущено. Лист стоїть в черзі і буде відправлений після запуску демона.

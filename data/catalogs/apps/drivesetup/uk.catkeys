@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-DriveSetup	1943527736
+1	ukrainian	x-vnd.Haiku-DriveSetup	2723551013
 Delete	MainWindow		Видалити
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Ви впевнені, що бажаєте записати зміни на диск зараз?\n\nВсі дані на вибраному розділі будуть безповоротно втрачені!
 Rescan	MainWindow		Пересканувати
@@ -8,7 +8,7 @@ There's no space on the partition where a child partition could be created.	Main
 <empty>	DiskView		<пусто>
 Unable to find the selected partition by ID.	MainWindow		Неможливо знайти розділ за ID.
 Select a partition from the list below.	DiskView		Виберіть розділ зі списку нижче.
-No disk devices have been recognized.	DiskView		Нерозпізнано жодного дискового приладу.
+No disk devices have been recognized.	DiskView		Нерозпізнано жодного дискового пристрою
 The selected disk is read-only.	MainWindow		Вибраний диск тільки для читання.
 Partition name:	CreateParamsPanel		Ім'я розділу:
 Initialize	MainWindow		Ініціалізація
@@ -30,7 +30,7 @@ You need to select a partition entry from the list.	MainWindow		Ви повин�
 Format (not implemented)	MainWindow		Форматування(не підтримується)
 The currently selected partition does not have a parent partition.	MainWindow		Біжучий розділ не має батіківського розділу.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Ви впевнені, що бажаєте записати зміни на диск зараз?\n\nВсі дані на вибраному диску будуть безповоротно втрачені!
-Offset: %ld MB	Support		Нащадок: %ld MB
+Offset: %ld MB	Support		Початок: %ld MB
 Write changes	MainWindow		Записати зміни
 There was an error preparing the disk for modifications.	MainWindow		Сталася помилка при підготовці диску до змін.
 The partition %s is already mounted.	MainWindow		Розділ %s повністю підмонтований.
@@ -41,7 +41,7 @@ Disk system \"%s\"\" not found!	MainWindow		Системний диск \"%s\"\"
 Could not unmount partition %s.	MainWindow		Неможливо відмонтувати розділ %s.
 Mount	MainWindow		Змонтувати
 Create	CreateParamsPanel		Створити
-Device	DiskView		Прилад
+Device	DiskView		Пристрій
 Disk	MainWindow		Диск
 Volume name	PartitionList		Ім'я величини
 Continue	MainWindow		Продовжити
@@ -59,18 +59,19 @@ Validation of the given initialization parameters failed.	MainWindow		Обгру
 The selected partition does not contain a partitioning system.	MainWindow		Вибраний розділ не містить системної розмітки.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Ви впевнені що бажаєте записати зміни на диск зараз?\n\nВсі дані в розділі %s будуть безповоротно втрачені!
 The partition %s is currently mounted.	MainWindow		Розділ %s Повністю підмонтовано.
-Partition size	CreateParamsPanel		розмір розділу
+Partition size	CreateParamsPanel		Розмір розділу
 Surface test (not implemented)	MainWindow		Тест поверхні (не реалізовано)
 Creation of the partition has failed.	MainWindow		Створення розділу призупинено.
 The currently selected partition is not empty.	MainWindow		Біжучий вибраний розділ не є пустим.
 Unmount	MainWindow		Відмонтувати
 <empty>	PartitionList		<пусто>
 Initialize	InitParamsPanel		Ініціалізувати
-Device	PartitionList		Прилад
+Device	PartitionList		Пристрій
 Cancel	MainWindow		Відмінити
 Cancel	InitParamsPanel		Відмінити
 %ld MiB	Support		%ld MiB
 DriveSetup	MainWindow		DriveSetup
 Are you sure you want to initialize the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		 	Ви впевнені , що бажаєте ініціалізувати розділ \"%s\"? Ви повинні будете відповісти повторно при запису на диск.
-Are you sure you want to initialize the partition? You will be asked again before changes are written to the disk.	MainWindow		A? You will be asked again before changes are written to the disk.
+Are you sure you want to initialize the partition? You will be asked again before changes are written to the disk.	MainWindow		        Ви впевнені , що бажаєте ініціалізувати розділ? Ви повинні будете відповісти повторно при запису на диск.
 Parameters	PartitionList		Параметри
+Active	PartitionList		Активний

@@ -9,11 +9,11 @@ Reverb:	Main Window		Реверберація:
 OK	Main Window		OK
 Off	Main Window		Вимкнути
 Dungeon	Main Window		Підземелля
-Play	Main Window		Грати
+Play	Main Window		Відтворити
 Garage	Main Window		Гараж
 Closet	Main Window		Комірка
-Igor's lab	Main Window		Лабораторія
+Igor's lab	Main Window		Лабораторія Ігоря
 Scope	Main Window		Осциллограф
 Could not load song	Main Window		Не вдалося завантажити мелодію
 MidiPlayer	Main Window		MIDI-Плеєр
-Drop MIDI file here	Scope View		Перемістіть MIDI файл сюди
+Drop MIDI file here	Scope View		Перемістити MIDI файл сюди

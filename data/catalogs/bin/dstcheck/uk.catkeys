@@ -1,7 +1,7 @@
 1	ukrainian	x-vnd.Haiku-cmd-dstconfig	2552303152
-Ask me later	dstcheck		Спитати пізніше
-Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is	dstcheck		Увага!\n\nЧерез перехід з літнього часу, годинник вашого комп'ютера може бути зміщеним на годину.\nВін идумає що зараз
+Ask me later	dstcheck		Запитати мене пізніше
+Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is	dstcheck		Увага!\n\nЧерез перехід з літнього часу, годинник вашого комп’ютера може бути зміщеним на годину.\nВін думає, що зараз
 No	dstcheck		Ні
 Yes	dstcheck		Так
-Would you like to set the clock?	dstcheck		Ви бажаєте налаштувати годинник
-.\n\nIs this the correct time?	dstcheck		.\n\nIs Час правильний?
+Would you like to set the clock?	dstcheck		Ви бажаєте налаштувати годинник?
+.\n\nIs this the correct time?	dstcheck		.\n\nЦей час правильний?

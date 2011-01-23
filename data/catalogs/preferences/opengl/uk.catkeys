@@ -9,7 +9,7 @@ Attributes stack size:	Capabilities		Розмір стека атрибутів:
 OpenGL version:	InfoView		Версія OpenGL:
 Name stack size:	Capabilities		Розмір имені стека:
 Auxiliary buffer(s):	Capabilities		Допоміжний буфер(и):
-Max. recommended vertex elements:	Capabilities		Максимальна рекомендована кількість вершин:
+Max. recommended vertex elements:	Capabilities		Максимално рекомендована кількість вершин:
 GLU version:	InfoView		Версія GLU:
 Model stack size:	Capabilities		Розмір стека моделі:
 Projection stack size:	Capabilities		Розмір стека проекції:
@@ -21,6 +21,6 @@ Texture stack size:	Capabilities		Розмір стека текстури:
 Max. evaluators equation order:	Capabilities		Максимальний оціночний блок команд:
 Max. 3D texture size:	Capabilities		Максимальний розмір 3D текстури:
 Capabilities	Capabilities		Можливості
-Max. recommended index elements:	Capabilities		Максимальна рекомендована кількість індексів:
+Max. recommended index elements:	Capabilities		Максимальна рекомендована кількість елементів:
 Available	Extensions		Доступно
-Extensions	Extensions		Розширеня
+Extensions	Extensions		Розширення
