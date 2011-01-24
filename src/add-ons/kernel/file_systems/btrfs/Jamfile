@@ -1,0 +1,15 @@
+SubDir HAIKU_TOP src add-ons kernel file_systems btrfs ;
+
+UsePrivateHeaders [ FDirName kernel util ] ;
+UsePrivateHeaders shared storage ;
+UsePrivateKernelHeaders ;
+
+KernelAddon btrfs :
+	kernel_interface.cpp
+	BPlusTree.cpp
+	Chunk.cpp
+	CRCTable.cpp
+	DirectoryIterator.cpp
+	Inode.cpp
+	Volume.cpp
+;
