@@ -33,6 +33,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <Catalog.h>
 #include <GridLayoutBuilder.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
@@ -48,6 +49,9 @@
 #include "TranslatorSettings.h"
 
 #include "TIFFView.h"
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "TIFFView"
 
 // add_menu_item
 void
@@ -77,7 +81,8 @@ add_menu_item(BMenu* menu,
 //
 // Returns:
 // ---------------------------------------------------------------
-TIFFView::TIFFView(const char *name, uint32 flags, TranslatorSettings *settings)
+TIFFView::TIFFView(const char *name, uint32 flags, 
+	TranslatorSettings *settings)
 	:	BView(name, flags)
 {
 	fSettings = settings;
@@ -85,19 +90,19 @@ TIFFView::TIFFView(const char *name, uint32 flags, TranslatorSettings *settings)
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLowColor(ViewColor());
 
-	fTitle = new BStringView("title", "TIFF Image Translator");
+	fTitle = new BStringView("title", B_TRANSLATE("TIFF Image Translator"));
 	fTitle->SetFont(be_bold_font);
 
 	char detail[100];
-	sprintf(detail, "Version %d.%d.%d %s",
+	sprintf(detail, B_TRANSLATE("Version %d.%d.%d %s"),
 		static_cast<int>(B_TRANSLATION_MAJOR_VERSION(TIFF_TRANSLATOR_VERSION)),
 		static_cast<int>(B_TRANSLATION_MINOR_VERSION(TIFF_TRANSLATOR_VERSION)),
-		static_cast<int>(B_TRANSLATION_REVISION_VERSION(TIFF_TRANSLATOR_VERSION)),
-		__DATE__);
+		static_cast<int>(B_TRANSLATION_REVISION_VERSION(
+			TIFF_TRANSLATOR_VERSION)), __DATE__);
 	fDetail = new BStringView("detail", detail);
 
 	int16 i = 1;
-	fLibTIFF[0] = new BStringView(NULL, "TIFF Library:");
+	fLibTIFF[0] = new BStringView(NULL, B_TRANSLATE("TIFF Library:"));
 	char libtiff[] = TIFFLIB_VERSION_STR;
     char *tok = strtok(libtiff, "\n");
     while (i < 5 && tok) {
@@ -110,11 +115,15 @@ TIFFView::TIFFView(const char *name, uint32 flags, TranslatorSettings *settings)
 
 	uint32 currentCompression = fSettings->SetGetInt32(TIFF_SETTING_COMPRESSION);
 	// create the menu items with the various compression methods
-	add_menu_item(menu, COMPRESSION_NONE, "None", currentCompression);
+	add_menu_item(menu, COMPRESSION_NONE, B_TRANSLATE("None"), 
+		currentCompression);
 	menu->AddSeparatorItem();
-	add_menu_item(menu, COMPRESSION_PACKBITS, "RLE (Packbits)", currentCompression);
-	add_menu_item(menu, COMPRESSION_DEFLATE, "ZIP (Deflate)", currentCompression);
-	add_menu_item(menu, COMPRESSION_LZW, "LZW", currentCompression);
+	add_menu_item(menu, COMPRESSION_PACKBITS, B_TRANSLATE("RLE (Packbits)"), 
+		currentCompression);
+	add_menu_item(menu, COMPRESSION_DEFLATE, B_TRANSLATE("ZIP (Deflate)"), 
+		currentCompression);
+	add_menu_item(menu, COMPRESSION_LZW, B_TRANSLATE("LZW"), 
+		currentCompression);
 
 // TODO: the disabled compression modes are not configured in libTIFF
 //	menu->AddSeparatorItem();
@@ -122,7 +131,8 @@ TIFFView::TIFFView(const char *name, uint32 flags, TranslatorSettings *settings)
 // TODO ? - strip encoding is not implemented in libTIFF for this compression
 //	add_menu_item(menu, COMPRESSION_JP2000, "JPEG2000", currentCompression);
 
- 	fCompressionMF = new BMenuField("Use Compression:", menu, NULL);
+ 	fCompressionMF = new BMenuField(B_TRANSLATE("Use Compression:"), menu,
+		NULL);
  
  	// Build the layout
  	SetLayout(new BGroupLayout(B_VERTICAL));

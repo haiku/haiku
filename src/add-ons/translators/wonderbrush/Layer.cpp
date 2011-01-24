@@ -12,12 +12,17 @@
 #include <stdio.h>
 
 #include <Bitmap.h>
+#include <Catalog.h>
 #include <Message.h>
 
 #include "bitmap_compression.h"
 #include "blending.h"
 #include "lab_convert.h"
 #include "support.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Layer"
 
 
 // constructor

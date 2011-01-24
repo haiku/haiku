@@ -27,3 +27,11 @@ Translator WebPTranslator :
 	: true
 ;
 
+DoCatalogs WebPTranslator :
+	x-vnd.Haiku-WebPTranslator
+	:
+	main.cpp
+	ConfigView.cpp
+	WebPTranslator.cpp
+;
+

@@ -7,9 +7,15 @@
  */
 
 #include <Application.h>
+#include <Catalog.h>
 
 #include "WonderBrushTranslator.h"
 #include "TranslatorWindow.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "WonderBrushMain"
+
 
 int
 main()
@@ -17,7 +23,7 @@ main()
 	BApplication app("application/x-vnd.Haiku-WonderBrushTranslator");
 	status_t result;
 	result = LaunchTranslatorWindow(new WonderBrushTranslator,
-		"WBI Settings", BRect(0, 0, 225, 175));
+		B_TRANSLATE("WBI Settings"), BRect(0, 0, 225, 175));
 	if (result == B_OK) {
 		app.Run();
 		return 0;

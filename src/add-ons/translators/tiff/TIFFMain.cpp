@@ -33,8 +33,12 @@
 /*****************************************************************************/
 
 #include <Application.h>
+#include <Catalog.h>
 #include "TIFFTranslator.h"
 #include "TranslatorWindow.h"
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "TIFFMain"
 
 // ---------------------------------------------------------------
 // main
@@ -54,7 +58,8 @@ main()
 {
 	BApplication app("application/x-vnd.Haiku-TIFFTranslator");
 	status_t result;
-	result = LaunchTranslatorWindow(new TIFFTranslator, "TIFF Settings");
+	result = LaunchTranslatorWindow(new TIFFTranslator, 
+		B_TRANSLATE("TIFF Settings"));
 	if (result == B_OK) {
 		app.Run();
 		return 0;

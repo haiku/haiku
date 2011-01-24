@@ -26,6 +26,15 @@ Translator WonderBrushTranslator :
 	: true
 ;
 
+DoCatalogs WonderBrushTranslator :
+	x-vnd.Haiku-WonderBrushTranslator
+	:
+	Layer.cpp
+	WonderBrushMain.cpp
+	WonderBrushTranslator.cpp
+	WonderBrushView.cpp
+;
+
 Package haiku-translationkit-cvs :
 	WonderBrushTranslator :
 	boot home config add-ons Translators ;

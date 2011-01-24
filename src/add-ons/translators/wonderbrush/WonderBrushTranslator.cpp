@@ -13,12 +13,18 @@
 #include <string.h>
 
 #include <Bitmap.h>
+#include <Catalog.h>
 #include <OS.h>
 
 #include "blending.h"
 
 #include "WonderBrushImage.h"
 #include "WonderBrushView.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "WonderBrushTranslator"
+
 
 using std::nothrow;
 
@@ -69,9 +75,12 @@ static const TranSetting sDefaultSettings[] = {
 	{ B_TRANSLATOR_EXT_DATA_ONLY, TRAN_SETTING_BOOL, false }
 };
 
-const uint32 kNumInputFormats = sizeof(sInputFormats) / sizeof(translation_format);
-const uint32 kNumOutputFormats = sizeof(sOutputFormats) / sizeof(translation_format);
-const uint32 kNumDefaultSettings = sizeof(sDefaultSettings) / sizeof(TranSetting);
+const uint32 kNumInputFormats = sizeof(sInputFormats) / 
+	sizeof(translation_format);
+const uint32 kNumOutputFormats = sizeof(sOutputFormats) / 
+	sizeof(translation_format);
+const uint32 kNumDefaultSettings = sizeof(sDefaultSettings) / 
+	sizeof(TranSetting);
 
 
 BTranslator*
@@ -85,7 +94,8 @@ make_nth_translator(int32 n, image_id you, uint32 flags, ...)
 
 
 WonderBrushTranslator::WonderBrushTranslator()
-	: BaseTranslator("WonderBrush images", "WonderBrush image translator",
+	: BaseTranslator(B_TRANSLATE("WonderBrush images"), 
+		B_TRANSLATE("WonderBrush image translator"),
 		WBI_TRANSLATOR_VERSION,
 		sInputFormats, kNumInputFormats,
 		sOutputFormats, kNumOutputFormats,
@@ -124,7 +134,7 @@ identify_wbi_header(BPositionIO* inSource, translator_info* outInfo,
 			outInfo->quality = WBI_IN_QUALITY;
 			outInfo->capability = WBI_IN_CAPABILITY;
 			strcpy(outInfo->MIME, "image/x-wonderbrush");
-			strcpy(outInfo->name, "WonderBrush image");
+			strcpy(outInfo->name, B_TRANSLATE("WonderBrush image"));
 		}
 	} else {
 		delete wbImage;
@@ -170,8 +180,8 @@ WonderBrushTranslator::DerivedTranslate(BPositionIO* inSource,
 BView*
 WonderBrushTranslator::NewConfigView(TranslatorSettings* settings)
 {
-	return new WonderBrushView(BRect(0, 0, 225, 175), "WBI Settings",
-		B_FOLLOW_ALL, B_WILL_DRAW, settings);
+	return new WonderBrushView(BRect(0, 0, 225, 175), 
+		B_TRANSLATE("WBI Settings"), B_FOLLOW_ALL, B_WILL_DRAW, settings);
 }
 
 

@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <Catalog.h>
 #include <MenuBar.h>
 #include <MenuField.h>
 #include <MenuItem.h>
@@ -19,6 +20,11 @@
 
 #include "WonderBrushImage.h"
 #include "WonderBrushTranslator.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "WonderBrushView"
+
 
 const char* kAuthor = "Stephan Aßmus, <superstippi@gmx.de>";
 const char* kWBICopyright = "Copyright "B_UTF8_COPYRIGHT" 2006 Haiku Inc.";
@@ -129,7 +135,7 @@ WonderBrushView::Draw(BRect area)
 
 	BPoint offset(xbold, ybold);
 
-	const char* text = "WonderBrush image translator";
+	const char* text = B_TRANSLATE("WonderBrush image translator");
 	DrawString(text, offset);
 
 	SetFont(be_plain_font);
@@ -140,16 +146,16 @@ WonderBrushView::Draw(BRect area)
 	offset.y += yplain;
 
 	char detail[100];
-	sprintf(detail, "Version %d.%d.%d %s",
+	sprintf(detail, B_TRANSLATE("Version %d.%d.%d %s"),
 		static_cast<int>(B_TRANSLATION_MAJOR_VERSION(WBI_TRANSLATOR_VERSION)),
 		static_cast<int>(B_TRANSLATION_MINOR_VERSION(WBI_TRANSLATOR_VERSION)),
-		static_cast<int>(B_TRANSLATION_REVISION_VERSION(WBI_TRANSLATOR_VERSION)),
-		__DATE__);
+		static_cast<int>(B_TRANSLATION_REVISION_VERSION(
+			WBI_TRANSLATOR_VERSION)), __DATE__);
 	DrawString(detail, offset);
 
 	offset.y += 2 * ybold;
 
-	text = "written by:";
+	text = B_TRANSLATE("written by:");
 	DrawString(text, offset);
 	offset.y += ybold;
 

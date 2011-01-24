@@ -19,6 +19,14 @@ Translator TIFFTranslator :
 	: true
 ;
 
+DoCatalogs TIFFTranslator :
+	x-vnd.Haiku-TIFFTranslator
+	:
+	TIFFMain.cpp
+	TIFFTranslator.cpp
+	TIFFView.cpp
+;
+
 Package haiku-translationkit-cvs :
 	TIFFTranslator :
 	boot home config add-ons Translators ;
