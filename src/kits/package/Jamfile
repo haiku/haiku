@@ -1,19 +1,26 @@
 SubDir HAIKU_TOP src kits package ;
 
-UsePrivateHeaders package ;
+UsePrivateHeaders package shared ;
 
 SharedLibrary libpackage.so
 	:
+	ActivateRepositoryCacheJob.cpp
 	ActivateRepositoryConfigJob.cpp
 	AddRepositoryRequest.cpp
+	Attributes.cpp
+	ChecksumAccessors.cpp
 	Context.cpp
 	FetchFileJob.cpp
 	Job.cpp
 	JobQueue.cpp
+	RefreshRepositoryRequest.cpp
+	RepositoryCache.cpp
 	RepositoryConfig.cpp
+#	RepositoryHeader.cpp
 	Request.cpp
 	Roster.cpp
-	TempEntryManager.cpp
+	TempfileManager.cpp
+	ValidateChecksumJob.cpp
 	:
-	be $(TARGET_LIBSTDC++)
+	libshared.a be $(TARGET_LIBSTDC++)
 ;

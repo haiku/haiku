@@ -9,8 +9,6 @@
 
 #include <package/ActivateRepositoryConfigJob.h>
 
-#include <stdlib.h>
-
 #include <File.h>
 
 #include <package/Context.h>
@@ -21,13 +19,16 @@ namespace Haiku {
 
 namespace Package {
 
+namespace Private {
+
 
 ActivateRepositoryConfigJob::ActivateRepositoryConfigJob(const Context& context,
 	const BString& title, const BEntry& archivedRepoConfigEntry,
-	const BDirectory& targetDirectory)
+	const BString& repositoryBaseURL, const BDirectory& targetDirectory)
 	:
 	inherited(context, title),
 	fArchivedRepoConfigEntry(archivedRepoConfigEntry),
+	fRepositoryBaseURL(repositoryBaseURL),
 	fTargetDirectory(targetDirectory)
 {
 }
@@ -69,8 +70,13 @@ ActivateRepositoryConfigJob::Execute()
 		}
 	}
 
+	// inject the URL that was actually used and write the config file
+	repoConfig->SetURL(fRepositoryBaseURL);
 	if ((result = repoConfig->StoreAsConfigFile(fTargetEntry)) != B_OK)
 		return result;
+
+	// store name of activated repository as result
+	fRepositoryName = repoConfig->Name();
 
 	return B_OK;
 }
@@ -84,6 +90,15 @@ ActivateRepositoryConfigJob::Cleanup(status_t jobResult)
 		fTargetEntry.Remove();
 }
 
+
+const BString&
+ActivateRepositoryConfigJob::RepositoryName() const
+{
+	return fRepositoryName;
+}
+
+
+}	// namespace Private
 
 }	// namespace Package
 

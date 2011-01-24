@@ -1,9 +1,9 @@
 /*
- * Copyright 2011, Haiku, Inc.
+ * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>
  * Distributed under the terms of the MIT License.
  */
-#ifndef _HAIKU__PACKAGE__TEMP_ENTRY_MANAGER_H_
-#define _HAIKU__PACKAGE__TEMP_ENTRY_MANAGER_H_
+#ifndef _HAIKU__PACKAGE__PRIVATE__TEMPFILE_MANAGER_H_
+#define _HAIKU__PACKAGE__PRIVATE__TEMPFILE_MANAGER_H_
 
 
 #include <Directory.h>
@@ -16,11 +16,13 @@ namespace Haiku {
 
 namespace Package {
 
+namespace Private {
 
-class TempEntryManager {
+
+class TempfileManager {
 public:
-								TempEntryManager();
-								~TempEntryManager();
+								TempfileManager();
+								~TempfileManager();
 
 			void				SetBaseDirectory(const BDirectory& baseDir);
 
@@ -35,9 +37,11 @@ private:
 };
 
 
+}	// namespace Private
+
 }	// namespace Package
 
 }	// namespace Haiku
 
 
-#endif // _HAIKU__PACKAGE__TEMP_ENTRY_MANAGER_H_
+#endif // _HAIKU__PACKAGE__PRIVATE__TEMPFILE_MANAGER_H_

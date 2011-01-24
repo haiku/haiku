@@ -18,6 +18,7 @@ namespace Package {
 class Context;
 class Job;
 
+
 struct JobStateListener {
 	virtual						~JobStateListener();
 
@@ -51,6 +52,7 @@ public:
 			const BString&		Title() const;
 			JobState			State() const;
 			status_t			Result() const;
+			const BString&		ErrorString() const;
 
 			status_t			AddStateListener(JobStateListener* listener);
 			status_t			RemoveStateListener(
@@ -65,6 +67,8 @@ protected:
 	virtual	status_t			Execute() = 0;
 	virtual	void				Cleanup(status_t jobResult);
 
+			void				SetErrorString(const BString&);
+
 			void				NotifyStateListeners();
 
 			const Context&		fContext;
@@ -74,6 +78,7 @@ private:
 
 			JobState			fState;
 			status_t			fResult;
+			BString				fErrorString;
 
 	typedef	BObjectList<Job>	JobList;
 			JobList				fDependencies;

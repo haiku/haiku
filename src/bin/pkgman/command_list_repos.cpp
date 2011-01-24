@@ -43,48 +43,6 @@ print_command_usage_and_exit(bool error)
 }
 
 
-typedef BObjectList<RepositoryConfig> RepositoryConfigList;
-
-
-struct RepositoryConfigCollector : public RepositoryConfigVisitor {
-	RepositoryConfigCollector(RepositoryConfigList& _repositoryConfigList);
-
-	status_t operator()(const BEntry& entry);
-
-	RepositoryConfigList& repositoryConfigList;
-};
-
-
-RepositoryConfigCollector::RepositoryConfigCollector(
-	RepositoryConfigList& _repositoryConfigList)
-	:
-	repositoryConfigList(_repositoryConfigList)
-{
-}
-
-
-status_t
-RepositoryConfigCollector::operator()(const BEntry& entry)
-{
-	RepositoryConfig* repoConfig = new (std::nothrow) RepositoryConfig(entry);
-	if (repoConfig == NULL)
-		DIE(B_NO_MEMORY, "can't create repository-config object");
-
-	status_t result = repoConfig->InitCheck();
-	if (result != B_OK) {
-		BPath path;
-		entry.GetPath(&path);
-		WARN(result, "skipping repository-config '%s'", path.Path());
-		delete repoConfig;
-
-		return B_OK;
-			// let collector continue
-	}
-
-	return repositoryConfigList.AddItem(repoConfig) ? B_OK : B_NO_MEMORY;
-}
-
-
 int
 command_list_repos(int argc, const char* const* argv)
 {
@@ -121,24 +79,25 @@ command_list_repos(int argc, const char* const* argv)
 	if (argc != optind)
 		print_command_usage_and_exit(true);
 
+	BObjectList<BString> repositoryNames(20, true);
 	Roster roster;
-	RepositoryConfigList repositoryConfigs;
-	RepositoryConfigCollector repositoryConfigCollector(repositoryConfigs);
-	status_t result
-		= roster.VisitCommonRepositoryConfigs(repositoryConfigCollector);
-	if (result != B_OK && result != B_ENTRY_NOT_FOUND)
-		DIE(result, "can't collect common repository configs");
+	status_t result = roster.GetRepositoryNames(repositoryNames);
+	if (result != B_OK)
+		DIE(result, "can't collect repository names");
 
-	result = roster.VisitUserRepositoryConfigs(repositoryConfigCollector);
-	if (result != B_OK && result != B_ENTRY_NOT_FOUND)
-		DIE(result, "can't collect user's repository configs");
-
-	int32 count = repositoryConfigs.CountItems();
-	for (int32 i = 0; i < count; ++i) {
-		RepositoryConfig* repoConfig = repositoryConfigs.ItemAt(i);
+	for (int i = 0; i < repositoryNames.CountItems(); ++i) {
+		const BString& repoName = *(repositoryNames.ItemAt(i));
+		RepositoryConfig repoConfig;
+		result = roster.GetRepositoryConfig(repoName, &repoConfig);
+		if (result != B_OK) {
+			BPath path;
+			repoConfig.Entry().GetPath(&path);
+			WARN(result, "skipping repository-config '%s'", path.Path());
+			continue;
+		}
 		printf("    %s %s\n",
-			repoConfig->IsUserSpecific() ? "[User]" : "      ",
-			repoConfig->Name().String());
+			repoConfig.IsUserSpecific() ? "[User]" : "      ",
+			repoConfig.Name().String());
 	}
 
 	return 0;

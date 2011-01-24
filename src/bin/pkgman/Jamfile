@@ -1,10 +1,11 @@
 SubDir HAIKU_TOP src bin pkgman ;
 
-UsePrivateHeaders shared support ;
+UsePrivateHeaders support ;
 
 BinCommand pkgman :
 	command_add_repo.cpp
 	command_list_repos.cpp
+	command_refresh.cpp
 	MyDecisionProvider.cpp
 	MyJobStateListener.cpp
 	pkgman.cpp

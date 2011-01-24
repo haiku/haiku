@@ -11,7 +11,6 @@
 
 #include <package/Context.h>
 #include <package/Job.h>
-#include <package/JobQueue.h>
 
 
 namespace Haiku {
@@ -21,7 +20,8 @@ namespace Package {
 
 Request::Request(const Context& context)
 	:
-	fContext(context)
+	fContext(context),
+	fJobQueue()
 {
 }
 
@@ -31,21 +31,23 @@ Request::~Request()
 }
 
 
-const Context&
-Request::GetContext() const
+Job*
+Request::PopRunnableJob()
 {
-	return fContext;
+	return fJobQueue.Pop();
 }
 
 
 status_t
-Request::QueueJob(Job* job, JobQueue& jobQueue) const
+Request::QueueJob(Job* job)
 {
+	job->AddStateListener(this);
+
 	JobStateListener* listener = fContext.GetJobStateListener();
 	if (listener != NULL)
 		job->AddStateListener(listener);
 
-	return jobQueue.AddJob(job);
+	return fJobQueue.AddJob(job);
 }
 
 

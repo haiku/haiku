@@ -7,6 +7,7 @@
 
 
 #include <Archivable.h>
+#include <Entry.h>
 #include <String.h>
 
 
@@ -34,12 +35,16 @@ public:
 
 			status_t			StoreAsConfigFile(const BEntry& entry) const;
 
+			status_t			SetTo(const BEntry& entry);
+			status_t			SetTo(const BMessage* data);
 			status_t			InitCheck() const;
 
 			const BString&		Name() const;
 			const BString&		URL() const;
 			uint8				Priority() const;
 			bool				IsUserSpecific() const;
+
+			const BEntry&		Entry() const;
 
 			void				SetName(const BString& name);
 			void				SetURL(const BString& url);
@@ -49,21 +54,20 @@ public:
 public:
 	static	RepositoryConfig*	Instantiate(BMessage* data);
 
-	static	const uint8			kDefaultPriority = 50;
+	static	const uint8			kDefaultPriority;
 	static	const char*			kNameField;
 	static	const char*			kURLField;
 	static	const char*			kPriorityField;
 
 private:
-			status_t			_InitFrom(const BEntry& entry);
-			status_t			_InitFrom(const BMessage* data);
-
 			status_t			fInitStatus;
 
 			BString				fName;
 			BString				fURL;
 			uint8				fPriority;
 			bool				fIsUserSpecific;
+
+			BEntry				fEntry;
 };
 
 

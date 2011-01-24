@@ -2,23 +2,52 @@
  * Copyright 2011, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _REPOSITORY_H_
-#define _REPOSITORY_H_
+#ifndef _HAIKU__PACKAGE__REPOSITORY_CACHE_H_
+#define _HAIKU__PACKAGE__REPOSITORY_CACHE_H_
 
 
-#include <Archivable.h>
+#include <Entry.h>
+#include <String.h>
 
 
-class BMessage;
+class BEntry;
 
 
-class BRepository {
+namespace Haiku {
+
+namespace Package {
+
+
+//class RepositoryHeader;
+
+
+class RepositoryCache {
 public:
-								BRepository(const char* url);
+								RepositoryCache();
+								RepositoryCache(const BEntry& entry);
+	virtual						~RepositoryCache();
 
-public:
-	static	BArchivable*		Instantiate(BMessage* archive);
+			status_t			SetTo(const BEntry& entry);
+			status_t			InitCheck() const;
+
+//			const RepositoryHeader*	Header() const;
+			const BEntry&		Entry() const;
+			bool				IsUserSpecific() const;
+
+			void				SetIsUserSpecific(bool isUserSpecific);
+
+private:
+			status_t			fInitStatus;
+
+			BEntry				fEntry;
+//			RepositoryHeader*	fHeader;
+			bool				fIsUserSpecific;
 };
 
 
-#endif // _REPOSITORY_H_
+}	// namespace Package
+
+}	// namespace Haiku
+
+
+#endif // _HAIKU__PACKAGE__REPOSITORY_CACHE_H_

@@ -20,6 +20,8 @@ namespace Haiku {
 
 namespace Package {
 
+namespace Private {
+
 
 struct JobQueue::JobPriorityLess {
 	bool operator()(const Job* left, const Job* right) const;
@@ -149,6 +151,8 @@ JobQueue::_UpdateDependantJobsOf(Job* job)
 	}
 }
 
+
+}	// namespace Private
 
 }	// namespace Package
 

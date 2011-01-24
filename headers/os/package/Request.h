@@ -8,6 +8,8 @@
 
 #include <SupportDefs.h>
 
+#include <package/JobQueue.h>
+
 
 namespace Haiku {
 
@@ -15,23 +17,25 @@ namespace Package {
 
 
 class Context;
-class Job;
-class JobQueue;
+using Private::JobQueue;
 
 
-class Request {
+class Request : protected JobStateListener {
 public:
 								Request(const Context& context);
 	virtual						~Request();
 
-	virtual	status_t			CreateJobsToRun(JobQueue& jobQueue) = 0;
+	virtual	status_t			CreateInitialJobs() = 0;
 
-			const Context&		GetContext() const;
+			Job*				PopRunnableJob();
 
 protected:
-			status_t			QueueJob(Job* job, JobQueue& jobQueue) const;
-private:
+			status_t			QueueJob(Job* job);
+
 			const Context&		fContext;
+
+private:
+			JobQueue			fJobQueue;
 };
 
 

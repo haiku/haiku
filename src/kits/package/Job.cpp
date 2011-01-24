@@ -94,6 +94,20 @@ Job::Result() const
 }
 
 
+const BString&
+Job::ErrorString() const
+{
+	return fErrorString;
+}
+
+
+void
+Job::SetErrorString(const BString& error)
+{
+	fErrorString = error;
+}
+
+
 status_t
 Job::Run()
 {

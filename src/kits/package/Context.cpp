@@ -38,7 +38,7 @@ Context::Context(DecisionProvider& decisionProvider)
 	BString contextName = BString("pkgkit-context-") << find_thread(NULL);
 	BDirectory baseDirectory;
 	tempDirectory.CreateDirectory(contextName.String(), &baseDirectory);
-	fTempEntryManager.SetBaseDirectory(baseDirectory);
+	fTempfileManager.SetBaseDirectory(baseDirectory);
 }
 
 
@@ -47,10 +47,10 @@ Context::~Context()
 }
 
 
-TempEntryManager&
-Context::GetTempEntryManager() const
+TempfileManager&
+Context::GetTempfileManager() const
 {
-	return fTempEntryManager;
+	return fTempfileManager;
 }
 
 

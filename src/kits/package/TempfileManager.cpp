@@ -7,25 +7,27 @@
  */
 
 
-#include <package/TempEntryManager.h>
+#include <package/TempfileManager.h>
 
 
 namespace Haiku {
 
 namespace Package {
 
+namespace Private {
 
-const BString TempEntryManager::kDefaultName = "tmp-pkgkit-file-";
+
+const BString TempfileManager::kDefaultName = "tmp-pkgkit-file-";
 
 
-TempEntryManager::TempEntryManager()
+TempfileManager::TempfileManager()
 	:
 	fNextNumber(1)
 {
 }
 
 
-TempEntryManager::~TempEntryManager()
+TempfileManager::~TempfileManager()
 {
 	if (fBaseDirectory.InitCheck() != B_OK)
 		return;
@@ -41,20 +43,22 @@ TempEntryManager::~TempEntryManager()
 
 
 void
-TempEntryManager::SetBaseDirectory(const BDirectory& baseDirectory)
+TempfileManager::SetBaseDirectory(const BDirectory& baseDirectory)
 {
 	fBaseDirectory = baseDirectory;
 }
 
 
 BEntry
-TempEntryManager::Create(const BString& baseName)
+TempfileManager::Create(const BString& baseName)
 {
 	BString name = BString(baseName) << atomic_add(&fNextNumber, 1);
 
 	return BEntry(&fBaseDirectory, name.String());
 }
 
+
+}	// namespace Private
 
 }	// namespace Package
 

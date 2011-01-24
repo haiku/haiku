@@ -11,7 +11,6 @@
 #include <Errors.h>
 #include <SupportDefs.h>
 
-#include <package/AddRepositoryRequest.h>
 #include <package/Context.h>
 #include <package/RefreshRepositoryRequest.h>
 #include <package/Roster.h>
@@ -28,8 +27,8 @@ using namespace Haiku::Package;
 
 
 static const char* kCommandUsage =
-	"Usage: %s add-repo <repo-URL> [<repo-URL> ...]\n"
-	"Adds one or more repositories by downloading them from the given URL(s).\n"
+	"Usage: %s refresh [<repo-name> ...]\n"
+	"Refreshes all or just the given repositories.\n"
 	"\n"
 ;
 
@@ -43,14 +42,11 @@ print_command_usage_and_exit(bool error)
 
 
 int
-command_add_repo(int argc, const char* const* argv)
+command_refresh(int argc, const char* const* argv)
 {
-	bool asUserRepository = false;
-
 	while (true) {
 		static struct option sLongOptions[] = {
 			{ "help", no_argument, 0, 'h' },
-			{ "user", no_argument, 0, 'u' },
 			{ 0, 0, 0, 0 }
 		};
 
@@ -64,46 +60,48 @@ command_add_repo(int argc, const char* const* argv)
 				print_command_usage_and_exit(false);
 				break;
 
-			case 'u':
-				asUserRepository = true;
-				break;
-
 			default:
 				print_command_usage_and_exit(true);
 				break;
 		}
 	}
 
-	// The remaining arguments are repo URLs, i. e. at least one more argument.
-	if (argc < optind + 1)
-		print_command_usage_and_exit(true);
-
-	const char* const* repoURLs = argv + optind;
-	int urlCount = argc - optind;
+	// The remaining arguments are repo names.
+	const char* const* repoArgs = argv + optind;
+	int nameCount = argc - optind;
 
 	MyDecisionProvider decisionProvider;
 	Context context(decisionProvider);
 	MyJobStateListener listener;
 	context.SetJobStateListener(&listener);
 
-	status_t result;
-	for (int i = 0; i < urlCount; ++i) {
-		AddRepositoryRequest addRequest(context, repoURLs[i], asUserRepository);
-		result = addRequest.CreateInitialJobs();
+	BObjectList<BString> repositoryNames(20, true);
+
+	Roster roster;
+	if (nameCount == 0) {
+		status_t result = roster.GetRepositoryNames(repositoryNames);
 		if (result != B_OK)
-			DIE(result, "unable to create necessary jobs");
-
-		while (Job* job = addRequest.PopRunnableJob()) {
-			result = job->Run();
-			delete job;
-			if (result == B_CANCELED)
-				return 1;
+			DIE(result, "can't collect repository names");
+	} else {
+		for (int i = 0; i < nameCount; ++i) {
+			BString* repoName = new (std::nothrow) BString(repoArgs[i]);
+			if (repoName == NULL)
+				DIE(B_NO_MEMORY, "can't allocate repository name");
+			repositoryNames.AddItem(repoName);
 		}
+	}
 
-		BString repoName = addRequest.RepositoryName();
-		Roster roster;
+	status_t result;
+	for (int i = 0; i < repositoryNames.CountItems(); ++i) {
+		const BString& repoName = *(repositoryNames.ItemAt(i));
 		RepositoryConfig repoConfig;
-		roster.GetRepositoryConfig(repoName, &repoConfig);
+		result = roster.GetRepositoryConfig(repoName, &repoConfig);
+		if (result != B_OK) {
+			BPath path;
+			repoConfig.Entry().GetPath(&path);
+			WARN(result, "skipping repository-config '%s'", path.Path());
+			continue;
+		}
 		RefreshRepositoryRequest refreshRequest(context, repoConfig);
 		result = refreshRequest.CreateInitialJobs();
 		if (result != B_OK)
@@ -112,7 +110,7 @@ command_add_repo(int argc, const char* const* argv)
 		while (Job* job = refreshRequest.PopRunnableJob()) {
 			result = job->Run();
 			delete job;
-			if (result == B_CANCELED)
+			if (result != B_OK)
 				return 1;
 		}
 	}

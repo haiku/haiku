@@ -23,12 +23,16 @@ namespace Haiku {
 namespace Package {
 
 
+using namespace Private;
+
+
 AddRepositoryRequest::AddRepositoryRequest(const Context& context,
-	const BString& repositoryURL, bool asUserRepository)
+	const BString& repositoryBaseURL, bool asUserRepository)
 	:
 	inherited(context),
-	fRepositoryURL(repositoryURL),
-	fAsUserRepository(asUserRepository)
+	fRepositoryBaseURL(repositoryBaseURL),
+	fAsUserRepository(asUserRepository),
+	fActivateJob(NULL)
 {
 }
 
@@ -39,16 +43,16 @@ AddRepositoryRequest::~AddRepositoryRequest()
 
 
 status_t
-AddRepositoryRequest::CreateJobsToRun(JobQueue& jobQueue)
+AddRepositoryRequest::CreateInitialJobs()
 {
-	BEntry tempEntry
-		= GetContext().GetTempEntryManager().Create("repoconfig-");
-	FetchFileJob* fetchJob = new (std::nothrow) FetchFileJob(GetContext(),
-		BString("Fetching repository-config from ") << fRepositoryURL,
-		fRepositoryURL, tempEntry);
+	BEntry tempEntry = fContext.GetTempfileManager().Create("repoheader-");
+	BString repoHeaderURL = BString(fRepositoryBaseURL) << "/" << "repo.header";
+	FetchFileJob* fetchJob = new (std::nothrow) FetchFileJob(fContext,
+		BString("Fetching repository header from ") << fRepositoryBaseURL,
+		repoHeaderURL, tempEntry);
 	if (fetchJob == NULL)
 		return B_NO_MEMORY;
-	status_t result = QueueJob(fetchJob, jobQueue);
+	status_t result = QueueJob(fetchJob);
 	if (result != B_OK) {
 		delete fetchJob;
 		return result;
@@ -63,18 +67,34 @@ AddRepositoryRequest::CreateJobsToRun(JobQueue& jobQueue)
 		return result;
 	BDirectory targetDirectory(targetRepoConfigPath.Path());
 	ActivateRepositoryConfigJob* activateJob
-		= new (std::nothrow) ActivateRepositoryConfigJob(GetContext(),
-			BString("Activating repository-config from ") << fRepositoryURL,
-			tempEntry, targetDirectory);
+		= new (std::nothrow) ActivateRepositoryConfigJob(fContext,
+			BString("Activating repository config from ") << fRepositoryBaseURL,
+			tempEntry, fRepositoryBaseURL, targetDirectory);
 	if (activateJob == NULL)
 		return B_NO_MEMORY;
 	activateJob->AddDependency(fetchJob);
-	if ((result = QueueJob(activateJob, jobQueue)) != B_OK) {
+	if ((result = QueueJob(activateJob)) != B_OK) {
 		delete activateJob;
 		return result;
 	}
+	fActivateJob = activateJob;
 
 	return B_OK;
+}
+
+
+void
+AddRepositoryRequest::JobSucceeded(Job* job)
+{
+	if (job == fActivateJob)
+		fRepositoryName = fActivateJob->RepositoryName();
+}
+
+
+const BString&
+AddRepositoryRequest::RepositoryName() const
+{
+	return fRepositoryName;
 }
 
 

@@ -6,7 +6,7 @@
 #define _HAIKU__PACKAGE__CONTEXT_H_
 
 
-#include <package/TempEntryManager.h>
+#include <package/TempfileManager.h>
 
 
 namespace Haiku {
@@ -15,6 +15,7 @@ namespace Package {
 
 
 class JobStateListener;
+using Private::TempfileManager;
 
 
 struct DecisionProvider {
@@ -37,7 +38,7 @@ public:
 								Context(DecisionProvider& decisionProvider);
 								~Context();
 
-			TempEntryManager&	GetTempEntryManager() const;
+			TempfileManager&	GetTempfileManager() const;
 
 			JobStateListener*	GetJobStateListener() const;
 			void				SetJobStateListener(JobStateListener* listener);
@@ -45,7 +46,7 @@ public:
 			DecisionProvider&	GetDecisionProvider() const;
 
 private:
-	mutable	TempEntryManager	fTempEntryManager;
+	mutable	TempfileManager		fTempfileManager;
 			DecisionProvider&	fDecisionProvider;
 			JobStateListener*	fJobStateListener;
 };

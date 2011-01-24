@@ -17,20 +17,36 @@ namespace Haiku {
 namespace Package {
 
 
+namespace Private {
+	class ActivateRepositoryConfigJob;
+}
+using Private::ActivateRepositoryConfigJob;
+
+
 class AddRepositoryRequest : public Request {
 	typedef	Request				inherited;
 
 public:
 								AddRepositoryRequest(const Context& context,
-									const BString& repositoryURL,
+									const BString& repositoryBaseURL,
 									bool asUserRepository);
 	virtual						~AddRepositoryRequest();
 
-	virtual	status_t			CreateJobsToRun(JobQueue& jobQueue);
+	virtual	status_t			CreateInitialJobs();
+
+			const BString&		RepositoryName() const;
+
+protected:
+								// JobStateListener
+	virtual	void				JobSucceeded(Job* job);
 
 private:
-			BString				fRepositoryURL;
+			BString				fRepositoryBaseURL;
 			bool				fAsUserRepository;
+
+			ActivateRepositoryConfigJob*	fActivateJob;
+
+			BString				fRepositoryName;
 };
 
 

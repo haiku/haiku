@@ -1,9 +1,9 @@
 /*
- * Copyright 2011, Haiku, Inc.
+ * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>
  * Distributed under the terms of the MIT License.
  */
-#ifndef _HAIKU__PACKAGE__FETCH_FILE_JOB_H_
-#define _HAIKU__PACKAGE__FETCH_FILE_JOB_H_
+#ifndef _HAIKU__PACKAGE__PRIVATE__FETCH_FILE_JOB_H_
+#define _HAIKU__PACKAGE__PRIVATE__FETCH_FILE_JOB_H_
 
 
 #include <Entry.h>
@@ -15,6 +15,8 @@
 namespace Haiku {
 
 namespace Package {
+
+namespace Private {
 
 
 class FetchFileJob : public Job {
@@ -37,9 +39,11 @@ private:
 };
 
 
+}	// namespace Private
+
 }	// namespace Package
 
 }	// namespace Haiku
 
 
-#endif // _HAIKU__PACKAGE__FETCH_FILE_JOB_H_
+#endif // _HAIKU__PACKAGE__PRIVATE__FETCH_FILE_JOB_H_

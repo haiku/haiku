@@ -16,6 +16,8 @@ namespace Haiku {
 
 namespace Package {
 
+namespace Private {
+
 
 class JobQueue : public JobStateListener {
 public:
@@ -42,6 +44,8 @@ private:
 			JobPriorityQueue*	fQueuedJobs;
 };
 
+
+}	// namespace Private
 
 }	// namespace Package
 

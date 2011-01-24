@@ -29,6 +29,11 @@ MyJobStateListener::JobSucceeded(Job* job)
 void
 MyJobStateListener::JobFailed(Job* job)
 {
+	BString error = job->ErrorString();
+	if (error.Length() > 0) {
+		error.ReplaceAll("\n", "\n*** ");
+		fprintf(stderr, "%s", error.String());
+	}
 	DIE(job->Result(), "failed!");
 }
 

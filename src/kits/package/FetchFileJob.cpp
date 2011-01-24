@@ -19,6 +19,8 @@ namespace Haiku {
 
 namespace Package {
 
+namespace Private {
+
 
 FetchFileJob::FetchFileJob(const Context& context, const BString& title,
 	const BString& fileURL, const BEntry& targetEntry)
@@ -64,6 +66,8 @@ FetchFileJob::Cleanup(status_t jobResult)
 		fTargetEntry.Remove();
 }
 
+
+}	// namespace Private
 
 }	// namespace Package
 

@@ -24,11 +24,14 @@ static const char* kUsage =
 	"  add-repo <repo-base-url>\n"
 	"    Adds the repository with the given <repo-base-URL>.\n"
 	"\n"
+	"  drop-repo <repo-name>\n"
+	"    Drops the repository with the given <repo-name>.\n"
+	"\n"
 	"  list-repos\n"
 	"    Lists all repositories.\n"
 	"\n"
-	"  drop-repo <repo-name>\n"
-	"    Drops the repository with the given <repo-name>.\n"
+	"  refresh [<repo-name> ...]\n"
+	"    Refreshes all or just the given repositories.\n"
 	"\n"
 	"Common Options:\n"
 	"  -h, --help   - Print this usage info.\n"
@@ -50,14 +53,17 @@ main(int argc, const char* const* argv)
 		print_usage_and_exit(true);
 
 	const char* command = argv[1];
-	if (strcmp(command, "add-repo") == 0)
+	if (strcmp(command, "add-repo") == 0 || strcmp(command, "ar") == 0)
 		return command_add_repo(argc - 1, argv + 1);
 
 //	if (strcmp(command, "drop-repo") == 0)
 //		return command_drop_repo(argc - 1, argv + 1);
 
-	if (strcmp(command, "list-repos") == 0)
+	if (strcmp(command, "list-repos") == 0 || strcmp(command, "lr") == 0)
 		return command_list_repos(argc - 1, argv + 1);
+
+	if (strcmp(command, "refresh") == 0)
+		return command_refresh(argc - 1, argv + 1);
 
 //	if (strcmp(command, "search") == 0)
 //		return command_search(argc - 1, argv + 1);

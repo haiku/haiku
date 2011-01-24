@@ -15,7 +15,6 @@
 
 #include <Directory.h>
 #include <driver_settings.h>
-#include <Entry.h>
 #include <File.h>
 #include <FindDirectory.h>
 #include <Path.h>
@@ -26,6 +25,7 @@ namespace Haiku {
 namespace Package {
 
 
+const uint8 RepositoryConfig::kDefaultPriority	= 50;
 const char* RepositoryConfig::kNameField 		= "name";
 const char* RepositoryConfig::kURLField 		= "url";
 const char* RepositoryConfig::kPriorityField 	= "priority";
@@ -42,7 +42,7 @@ RepositoryConfig::RepositoryConfig()
 
 RepositoryConfig::RepositoryConfig(const BEntry& entry)
 {
-	fInitStatus = _InitFrom(entry);
+	SetTo(entry);
 }
 
 
@@ -50,7 +50,7 @@ RepositoryConfig::RepositoryConfig(BMessage* data)
 	:
 	inherited(data)
 {
-	fInitStatus = _InitFrom(data);
+	SetTo(data);
 }
 
 
@@ -109,7 +109,6 @@ RepositoryConfig::StoreAsConfigFile(const BEntry& entry) const
 
 	BString configString;
 	configString
-		<< "name=" << fName << "\n"
 		<< "url=" << fURL << "\n"
 		<< "priority=" << fPriority << "\n";
 
@@ -125,6 +124,91 @@ status_t
 RepositoryConfig::InitCheck() const
 {
 	return fInitStatus;
+}
+
+
+status_t
+RepositoryConfig::SetTo(const BEntry& entry)
+{
+	fEntry = entry;
+	fInitStatus = B_NO_INIT;
+
+	BFile file(&entry, B_READ_ONLY);
+	status_t result = file.InitCheck();
+	if (result != B_OK)
+		return result;
+
+	off_t size;
+	if ((result = file.GetSize(&size)) != B_OK)
+		return result;
+
+	BString configString;
+	char* buffer = configString.LockBuffer(size);
+	if (buffer == NULL)
+		return B_NO_MEMORY;
+
+	if ((result = file.Read(buffer, size)) < size)
+		return (result >= 0) ? B_IO_ERROR : result;
+
+	buffer[size] = '\0';
+	configString.UnlockBuffer(size);
+
+	void* settingsHandle = parse_driver_settings_string(configString.String());
+	if (settingsHandle == NULL)
+		return B_BAD_DATA;
+
+	const char* url = get_driver_parameter(settingsHandle, "url", NULL, NULL);
+	const char* priorityString
+		= get_driver_parameter(settingsHandle, "priority", NULL, NULL);
+
+	unload_driver_settings(settingsHandle);
+
+	if (url == NULL || *url == '\0')
+		return B_BAD_DATA;
+
+	char name[B_FILE_NAME_LENGTH];
+	if ((result = entry.GetName(name)) != B_OK)
+		return result;
+
+	fName = name;
+	fURL = url;
+	fPriority = priorityString == NULL
+		? kDefaultPriority : atoi(priorityString);
+
+	BPath userSettingsPath;
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &userSettingsPath) == B_OK) {
+		BDirectory userSettingsDir(userSettingsPath.Path());
+		fIsUserSpecific = userSettingsDir.Contains(&entry);
+	} else
+		fIsUserSpecific = false;
+
+	fInitStatus = B_OK;
+
+	return B_OK;
+}
+
+
+status_t
+RepositoryConfig::SetTo(const BMessage* data)
+{
+	fInitStatus = B_NO_INIT;
+
+	if (data == NULL)
+		return B_BAD_VALUE;
+
+	status_t result;
+	if ((result = data->FindString(kNameField, &fName)) != B_OK)
+		return result;
+	if ((result = data->FindString(kURLField, &fURL)) != B_OK)
+		return result;
+	if ((result = data->FindUInt8(kPriorityField, &fPriority)) != B_OK)
+		return result;
+
+	fIsUserSpecific = false;
+
+	fInitStatus = B_OK;
+
+	return B_OK;
 }
 
 
@@ -156,6 +240,13 @@ RepositoryConfig::IsUserSpecific() const
 }
 
 
+const BEntry&
+RepositoryConfig::Entry() const
+{
+	return fEntry;
+}
+
+
 void
 RepositoryConfig::SetName(const BString& name)
 {
@@ -181,78 +272,6 @@ void
 RepositoryConfig::SetIsUserSpecific(bool isUserSpecific)
 {
 	fIsUserSpecific = isUserSpecific;
-}
-
-
-status_t
-RepositoryConfig::_InitFrom(const BEntry& entry)
-{
-	BFile file(&entry, B_READ_ONLY);
-	status_t result = file.InitCheck();
-	if (result != B_OK)
-		return result;
-
-	off_t size;
-	if ((result = file.GetSize(&size)) != B_OK)
-		return result;
-
-	BString configString;
-	char* buffer = configString.LockBuffer(size);
-	if (buffer == NULL)
-		return B_NO_MEMORY;
-
-	if ((result = file.Read(buffer, size)) < size)
-		return (result >= 0) ? B_ERROR : result;
-
-	configString.UnlockBuffer(size);
-
-	void* settingsHandle = parse_driver_settings_string(configString.String());
-	if (settingsHandle == NULL)
-		return B_BAD_DATA;
-
-	const char* name = get_driver_parameter(settingsHandle, "name", NULL, NULL);
-	const char* url = get_driver_parameter(settingsHandle, "url", NULL, NULL);
-	const char* priorityString
-		= get_driver_parameter(settingsHandle, "priority", NULL, NULL);
-
-	unload_driver_settings(settingsHandle);
-
-	if (name == NULL || *name == '\0' || url == NULL || *url == '\0')
-		return B_BAD_DATA;
-
-	fName = name;
-	fURL = url;
-	fPriority = priorityString == NULL
-		? kDefaultPriority : atoi(priorityString);
-
-	BPath userSettingsPath;
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &userSettingsPath) == B_OK) {
-		BDirectory userSettingsDir(userSettingsPath.Path());
-		fIsUserSpecific = userSettingsDir.Contains(&entry);
-	} else
-		fIsUserSpecific = false;
-
-	return B_OK;
-}
-
-
-status_t
-RepositoryConfig::_InitFrom(const BMessage* data)
-{
-	if (data == NULL)
-		return B_BAD_VALUE;
-
-	status_t result;
-	if ((result = data->FindString(kNameField, &fName)) != B_OK)
-		return result;
-	if ((result = data->FindString(kURLField, &fURL)) != B_OK)
-		return result;
-	if ((result = data->FindUInt8(kPriorityField, &fPriority)) != B_OK)
-		return result;
-
-	fIsUserSpecific = false;
-
-	return B_OK;
 }
 
 

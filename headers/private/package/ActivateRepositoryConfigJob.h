@@ -1,9 +1,9 @@
 /*
- * Copyright 2011, Haiku, Inc.
+ * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>
  * Distributed under the terms of the MIT License.
  */
-#ifndef _HAIKU__PACKAGE__ACTIVATE_REPOSITORY_CONFIG_JOB_H_
-#define _HAIKU__PACKAGE__ACTIVATE_REPOSITORY_CONFIG_JOB_H_
+#ifndef _HAIKU__PACKAGE__PRIVATE__ACTIVATE_REPOSITORY_CONFIG_JOB_H_
+#define _HAIKU__PACKAGE__PRIVATE__ACTIVATE_REPOSITORY_CONFIG_JOB_H_
 
 
 #include <Directory.h>
@@ -17,6 +17,8 @@ namespace Haiku {
 
 namespace Package {
 
+namespace Private {
+
 
 class ActivateRepositoryConfigJob : public Job {
 	typedef	Job					inherited;
@@ -26,8 +28,11 @@ public:
 									const Context& context,
 									const BString& title,
 									const BEntry& archivedRepoConfigEntry,
+									const BString& repositoryBaseURL,
 									const BDirectory& targetDirectory);
 	virtual						~ActivateRepositoryConfigJob();
+
+			const BString&		RepositoryName() const;
 
 protected:
 	virtual	status_t			Execute();
@@ -35,14 +40,19 @@ protected:
 
 private:
 			BEntry				fArchivedRepoConfigEntry;
+			BString				fRepositoryBaseURL;
 			BDirectory			fTargetDirectory;
 			BEntry				fTargetEntry;
+
+			BString				fRepositoryName;
 };
 
+
+}	// namespace Private
 
 }	// namespace Package
 
 }	// namespace Haiku
 
 
-#endif // _HAIKU__PACKAGE__ACTIVATE_REPOSITORY_CONFIG_JOB_H_
+#endif // _HAIKU__PACKAGE__PRIVATE__ACTIVATE_REPOSITORY_CONFIG_JOB_H_
