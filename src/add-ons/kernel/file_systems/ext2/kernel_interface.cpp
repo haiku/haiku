@@ -119,7 +119,7 @@ static status_t
 ext2_mount(fs_volume* _volume, const char* device, uint32 flags,
 	const char* args, ino_t* _rootID)
 {
-	Volume* volume = new Volume(_volume);
+	Volume* volume = new(std::nothrow) Volume(_volume);
 	if (volume == NULL)
 		return B_NO_MEMORY;
 
@@ -221,7 +221,7 @@ ext2_get_vnode(fs_volume* _volume, ino_t id, fs_vnode* _node, int* _type,
 		return B_BAD_VALUE;
 	}
 
-	Inode* inode = new Inode(volume, id);
+	Inode* inode = new(std::nothrow) Inode(volume, id);
 	if (inode == NULL)
 		return B_NO_MEMORY;
 

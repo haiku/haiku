@@ -47,7 +47,7 @@ static uint16 kCrcTable[256] = {
 };
 
 
-/*! \brief Calculates the UDF crc checksum for the given byte stream.
+/*! \brief Calculates the EXT4 crc checksum for the given byte stream.
 
 	Based on crc code from UDF-2.50 6.5, as permitted.
 	This is reversed.
