@@ -51,6 +51,7 @@ typedef enum {
 	B_COMMON_MEDIA_NODES_DIRECTORY,
 	B_COMMON_SOUNDS_DIRECTORY,
 	B_COMMON_DATA_DIRECTORY,
+	B_COMMON_CACHE_DIRECTORY,
 
 	/* User directories. These are interpreted in the context
 	   of the user making the find_directory call. */

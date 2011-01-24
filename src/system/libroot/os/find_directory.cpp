@@ -80,6 +80,7 @@ static const char *kCommonDirectories[] = {
 	COMMON "/add-ons/media",
 	COMMON "/data/sounds",
 	COMMON "/data",
+	COMMON "/cache",						// B_COMMON_CACHE_DIRECTORY
 };
 
 /* User directories */
@@ -247,6 +248,7 @@ find_directory(directory_which which, dev_t device, bool createIt,
 		case B_COMMON_MEDIA_NODES_DIRECTORY:
 		case B_COMMON_SOUNDS_DIRECTORY:
 		case B_COMMON_DATA_DIRECTORY:
+		case B_COMMON_CACHE_DIRECTORY:
 			templatePath = kCommonDirectories[which - B_COMMON_DIRECTORY];
 			break;
 
