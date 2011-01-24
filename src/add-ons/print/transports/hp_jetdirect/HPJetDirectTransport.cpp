@@ -43,7 +43,7 @@ HPJetDirectPort::HPJetDirectPort(BDirectory* printer, BMessage *msg)
 
 	int32 index = address.FindLast(':');
 	if (index >= 0) {
-		fPort = atoi(address.String() + index);
+		fPort = atoi(address.String() + index + 1);
 		address.MoveInto(fHost, 0, index);
 	} else
 		fHost = address;
