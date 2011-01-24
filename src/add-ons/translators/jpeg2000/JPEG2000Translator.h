@@ -35,6 +35,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <Alert.h>
 #include <Application.h>
+#include <Catalog.h>
 #include <CheckBox.h>
 #include <FindDirectory.h>
 #include <Path.h>
@@ -52,13 +53,16 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libjasper/jasper.h"
 
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "JPEG2000Translator"
+
 // Settings
 #define JP2_SETTINGS_FILE	"JPEG2000Translator"
 
-#define JP2_SET_QUALITY "quality"
-#define JP2_SET_GRAY1_AS_B_RGB24 "24 from gray1"
-#define JP2_SET_GRAY8_AS_B_RGB32 "32 from gray8"
-#define JP2_SET_JPC "jpc"
+#define JP2_SET_QUALITY B_TRANSLATE_MARK("quality")
+#define JP2_SET_GRAY1_AS_B_RGB24 B_TRANSLATE_MARK("24 from gray1")
+#define JP2_SET_GRAY8_AS_B_RGB32 B_TRANSLATE_MARK("32 from gray8")
+#define JP2_SET_JPC B_TRANSLATE_MARK("jpc")
 
 // View messages
 #define VIEW_MSG_SET_QUALITY 'JSCQ'
@@ -67,11 +71,12 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define	VIEW_MSG_SET_GRAYASRGB32 'JSAC'
 
 // View labels
-#define VIEW_LABEL_QUALITY "Output quality"
-#define VIEW_LABEL_JPC "Output only codestream (.jpc)"
-#define VIEW_LABEL_GRAY1ASRGB24 "Write black-and-white images as RGB24"
-#define	VIEW_LABEL_GRAYASRGB32 "Read greyscale images as RGB32"
-
+#define VIEW_LABEL_QUALITY B_TRANSLATE_MARK("Output quality")
+#define VIEW_LABEL_JPC B_TRANSLATE_MARK("Output only codestream (.jpc)")
+#define VIEW_LABEL_GRAY1ASRGB24 \
+	B_TRANSLATE_MARK("Write black-and-white images as RGB24")
+#define	VIEW_LABEL_GRAYASRGB32 \
+	B_TRANSLATE_MARK("Read greyscale images as RGB32")
 
 
 /*!

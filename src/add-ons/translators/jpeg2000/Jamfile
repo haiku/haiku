@@ -74,6 +74,13 @@ Translator JPEG2000Translator :
 	: true
 ;
 
+DoCatalogs JPEG2000Translator :
+	x-vnd.Haiku-JPEG2000Translator
+	:
+	JPEG2000Translator.h
+	JPEG2000Translator.cpp
+;
+
 Package haiku-translationkit-cvs :
 	JPEG2000Translator :
 	boot home config add-ons Translators ;
