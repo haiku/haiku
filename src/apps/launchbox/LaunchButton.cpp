@@ -305,12 +305,10 @@ LaunchButton::SetTo(const entry_ref* ref)
 			if (info.GetSignature(mimeSig) == B_OK) {
 				SetTo(mimeSig, false);
 			} else {
-				fprintf(stderr, B_TRANSLATE("no MIME signature for '%s'\n"),
-					fRef->name);
+				fprintf(stderr, "no MIME signature for '%s'\n", fRef->name);
 			}
 		} else {
-			fprintf(stderr, B_TRANSLATE("no BAppFileInfo for '%s'\n"),
-			fRef->name);
+			fprintf(stderr, "no BAppFileInfo for '%s'\n", fRef->name);
 		}
 	} else {
 		fRef = NULL;

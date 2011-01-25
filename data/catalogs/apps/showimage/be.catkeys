@@ -1,22 +1,16 @@
-1	belarusian	x-vnd.Haiku-ShowImage	2679963118
+1	belarusian	x-vnd.Haiku-ShowImage	1508862207
 Use as background…	Menus		Ужыць як фон...
-5 seconds	Menus		5 секунд
 Slide delay	Menus		Затрымка слайду
 Zoom in	Menus		Павялічыць
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Дакумент '%s' зменены. Вы жадаеце яго закрыць?
-8 seconds	Menus		8 секунд
 Previous page	Menus		Папярэдняя старонка
 View	Menus		Від
 Full screen	Menus		Поўны экран
 Go to page	Menus		Перайсці да старонкі
 Zoom out	Menus		Паменшыць
-20 seconds	Menus		20 секунд
-3 seconds	Menus		3 секунды
 Rotate counterclockwise	Menus		Павярнуць супраць гадзіннікавай стрэлкі
-10 seconds	Menus		10 секунд
 High-quality zooming	Menus		Высокаякаснае павелічэнне
 Browse	Menus		Праглядзець
-6 seconds	Menus		6 секунд
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Немагчыма загрузіць выяву. Не існуе або сам файл, або канвертар для яго.
 First page	Menus		Першая старонка
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Дакумент '%s' (старонка %d) зменены. Вы жадаеце яго закрыць?
@@ -24,18 +18,15 @@ About ShowImage…	Menus		Пра ShowImage…
 Close	ClosePrompt		Закрыць
 Undo	Menus		Адмяніць
 Resize to (in 1/72 inches):	PrintOptionsWindow		Змяніць памер (у 1/72 дзюйма):
-9 seconds	Menus		9 секунд
 Flip left to right	Menus		Адлюстраваць злева направа
 Show caption in full screen mode	Menus		Паказваць меткі ў паўнаэкранным меню
 DPI:	PrintOptionsWindow		DPI:
 Next file	Menus		Наступны файл
-4 seconds	Menus		4 секунды
 Close document	ClosePrompt		Закрыць дакумент
 Height: 	PrintOptionsWindow		Вышыня:
 Cancel	ClosePrompt		Адмена
 Print options	PrintOptionsWindow		Опцыі друку
 ShowImage	AboutWindow		ShowImage
-7 seconds	Menus		7 секунд
 Last page	Menus		Апошняя старонка
 Previous file	Menus		Папярэдні файл
 Slide show	Menus		Слайд шоу
@@ -67,3 +58,4 @@ Selection Mode	Menus		Рэжым Выдзялення
 Stretch to window	Menus		Расцягнуць да вакна
 OK	Alerts		ОК
 Fit to window	Menus		Умясціць у вакно
+%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS сэкунд

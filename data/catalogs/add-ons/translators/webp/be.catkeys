@@ -1,0 +1,10 @@
+1	belarusian	x-vnd.Haiku-WebPTranslator	3502239072
+Version %d.%d.%d, %s	ConfigView		Версія %d.%d.%d, %s
+WebP Images	ConfigView		Выявы WebP
+WebP images	WebPTranslator		Выявы WebP
+WebPTranslator Settings	ConfigView		Наладкі канвертара выяваў WebP
+WebP Settings	main		Наладкі WebP
+WebP image	WebPTranslator		выява WebP
+stream GetSize(): %lld\n	WebPTranslator		паток GetSize(): %lld\n
+Based on libwebp v0.1	ConfigView		Грунтуецца на матэрыялах libwebp v0.1
+WebP image translator	WebPTranslator		Канвертар выяваў WebP

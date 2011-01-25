@@ -2,21 +2,15 @@
 Could not change attributes	Attribute Window		Немагчыма змяніць атрыбуты
 Args only	Application Type Window		Толькі аргументы
 Add group	New File Type Window		Дадаць групу
-Do you want to save the changes?	Application Type Window		Жадаеце захаваць змены?
-File type	FileType Window		Тып файла
 OK	FileTypes		Так
 Save	Application Type Window		Захаваць
 Select same preferred application as	FileType Window		Вылучыць тую самую пажаданую праграму як і ў 
-Cancel	Attribute Window		Скасаваць
 Group:	New File Type Window		Група:
-Done	Extension Window		Зроблена
 Preferred application	FileType Window		Пажаданая праграма
-Version:	Application Type Window		Версія:
 Select preferred application	FileType Window		Вылучыць пажаданую праграму
 The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Праграма \"%s\" не падтрымлівае працу з гэтым тыпам файлаў.\nУсё роўна прызначыць яе пажаданай?
 Set Preferred Application	Preferred App Menu		Прызначыць Пажаданую Праграму
 Add new group	New File Type Window		Дадаць новую групу
-Cancel	Application Type Window		Скасаваць
 Add	Attribute Window		Дадаць
 Close	Application Type Window		Закрыць
 Could not open \"%s\":\n%s	FileTypes		Немагчыма адчыніць \"%s\":\n%s
@@ -38,11 +32,9 @@ Visible	Attribute Window		Бачнае
 Could not install file type	New File Type Window		Немагчыма ўсталяваць тып файла
 Remove	Application Type Window		Выдаліць
 Remove icon	Icon View		Выдаліць іконку
-New file type	New File Type Window		Новы тып файлаў
 Add icon…	Icon View		Дадаць іконку…
 Multiple launch	Application Type Window		Запускаць некалькі адразу
 Same as…	FileType Window		Такая ж, як…
-Select…	FileType Window		Выбраць…
 Alpha	Application Type Window		Alpha
 Single launch	Application Type Window		Запуск па адной
 Background app	Application Type Window		Фонавая праграма
@@ -132,3 +124,11 @@ Signature:	Application Type Window		Подпіс:
 Quit, don't save	Application Type Window		Выйсьці, не захоўваць
 Supported types	Application Type Window		Падтрымліваемыя тыпы
 Type:	Attribute Window		Тып:
+Select…	FileType Window		Вылучыць…
+Cancel	Application Type Window		Скасаваць
+Cancel	Attribute Window		Скасаваць
+File type	FileType Window		Тып файла
+Do you want to save the changes?	Application Type Window		Жадаеце захаваць змены?
+New file type	New File Type Window		Стварыць новы тып
+Done	Extension Window		Зроблена
+Version:	Application Type Window		Версія:

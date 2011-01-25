@@ -387,17 +387,17 @@ IconButton::SetIcon(const char* pathToBitmap)
 					if (status == B_OK)
 						fileBitmap = BTranslationUtils::GetBitmap(path.Path());
 					else 
-						printf(B_TRANSLATE("IconButton::SetIcon() - "
-						"path.Append() failed: %s\n"), strerror(status));
+						printf("IconButton::SetIcon() - "
+						"path.Append() failed: %s\n", strerror(status));
 				} else
-					printf(B_TRANSLATE("IconButton::SetIcon() - "
-					"path.GetParent() failed: %s\n"), strerror(status));
+					printf("IconButton::SetIcon() - "
+					"path.GetParent() failed: %s\n", strerror(status));
 			} else
-				printf(B_TRANSLATE("IconButton::SetIcon() - "
-				"path.InitCheck() failed: %s\n"), strerror(status));
+				printf("IconButton::SetIcon() - "
+				"path.InitCheck() failed: %s\n", strerror(status));
 		} else
-			printf(B_TRANSLATE("IconButton::SetIcon() - "
-			"be_app->GetAppInfo() failed: %s\n"), strerror(status));
+			printf("IconButton::SetIcon() - "
+			"be_app->GetAppInfo() failed: %s\n", strerror(status));
 	} else
 		fileBitmap = BTranslationUtils::GetBitmap(pathToBitmap);
 	if (fileBitmap) {
@@ -440,18 +440,18 @@ IconButton::SetIcon(const BMimeType* fileType, bool small)
 					status = _MakeBitmaps(bitmap);
 					delete bitmap;
 				} else
-					printf(B_TRANSLATE("IconButton::SetIcon() - "
-					"B_RGB32 bitmap is not valid\n"));
+					printf("IconButton::SetIcon() - "
+					"B_RGB32 bitmap is not valid\n");
 			} else
-				printf(B_TRANSLATE("IconButton::SetIcon() - "
-				"fileType->GetIcon() failed: %s\n"), strerror(status));
+				printf("IconButton::SetIcon() - "
+				"fileType->GetIcon() failed: %s\n", strerror(status));
 		} else
-			printf(B_TRANSLATE("IconButton::SetIcon() - "
-			"B_CMAP8 bitmap is not valid\n"));
+			printf("IconButton::SetIcon() - "
+			"B_CMAP8 bitmap is not valid\n");
 		delete mimeBitmap;
 	} else
-		printf(B_TRANSLATE("IconButton::SetIcon() - "
-		"fileType is not valid: %s\n"), strerror(status));
+		printf("IconButton::SetIcon() - "
+		"fileType is not valid: %s\n", strerror(status));
 	return status;
 }
 
@@ -485,7 +485,7 @@ IconButton::SetIcon(const unsigned char* bitsFromQuickRes,
 					}
 					status = _MakeBitmaps(bitmap);
 				} else
-					printf(B_TRANSLATE("IconButton::SetIcon() - B_RGB32 bitmap is not valid\n"));
+					printf("IconButton::SetIcon() - B_RGB32 bitmap is not valid\n");
 				delete bitmap;
 			} else {
 				// native colorspace (32 bits)
@@ -509,8 +509,8 @@ IconButton::SetIcon(const unsigned char* bitsFromQuickRes,
 				status = _MakeBitmaps(quickResBitmap);
 			}
 		} else
-			printf(B_TRANSLATE("IconButton::SetIcon() - "
-			"error allocating bitmap: %s\n"), strerror(status));
+			printf("IconButton::SetIcon() - "
+			"error allocating bitmap: %s\n", strerror(status));
 		delete quickResBitmap;
 	}
 	return status;
@@ -759,20 +759,20 @@ IconButton::_MakeBitmaps(const BBitmap* bitmap)
 				}
 			// unsupported format
 			} else {
-				printf(B_TRANSLATE("IconButton::_MakeBitmaps() - "
-				"bitmap has unsupported colorspace\n"));
+				printf("IconButton::_MakeBitmaps() - "
+				"bitmap has unsupported colorspace\n");
 				status = B_MISMATCHED_VALUES;
 				_DeleteBitmaps();
 			}
 		} else {
-			printf(B_TRANSLATE("IconButton::_MakeBitmaps() - "
-			"error allocating local bitmaps\n"));
+			printf("IconButton::_MakeBitmaps() - "
+			"error allocating local bitmaps\n");
 			status = B_NO_MEMORY;
 			_DeleteBitmaps();
 		}
 	} else
-		printf(B_TRANSLATE("IconButton::_MakeBitmaps() - "
-		"bitmap is not valid\n"));
+		printf("IconButton::_MakeBitmaps() - "
+		"bitmap is not valid\n");
 	return status;
 }
 

@@ -1,8 +1,7 @@
-1	belarusian	x-vnd.Haiku-ProcessController	1726030203
+1	belarusian	x-vnd.Haiku-ProcessController	678001537
 Memory usage	ProcessController		Ужыванне памяці
 Do you really want to kill the team \"%s\"?	ProcessController		Сапраўды жадаеце знішчыць групу \"%s\"?
 Restart Deskbar	ProcessController		Перазапусціць Deskbar
-cpu	ProcessController		цп
 Debug thread	ProcessController		Адладжваць паток
 Your setting filecould not be saved!\n(%s)	ProcessController		Файл вашых наладак не захаваны!\n(%s)
 This team is already gone…	ProcessController		Гэтая група ўжо не існуе...
@@ -14,7 +13,6 @@ Processor %d	ProcessController		Працэсар %d
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
 ProcessController is already installed in Deskbar.	ProcessController		ProcessController ужо ўсталяваны ў Deskbar.
 This is the last active processor...\nYou can't turn it off!	ProcessController		Гэта апошні актыўны працэсар...\nВы не можаце яго выключыць!
-ProcessController Prefs	ProcessController		Наладкі ProcessController
 thread	ProcessController		паток
 Preferences	ProcessController		Наладкі
 %s priority [%d]	ProcessController		%s прыярытэт [%d]
@@ -32,15 +30,12 @@ Ok!	ProcessController		ОК!
 Quit an application	ProcessController		Закрыць праграму
 Install in Deskbar	ProcessController		Усталяваць у Deskbar
 ProcessController\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n	ProcessController		ProcessController\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n
-Popup holder thread	ProcessController		Паток апрацоўшчыка паведамленняў
 Threads and CPU usage	ProcessController		Патокі і ўжыванне ЦП
-Version	ProcessController		Версія
 Global Popup	ProcessController		Глабальнае паведамленне
 OK	ProcessController		ОК
 Damned!	ProcessController		Чорт!
 priority	ProcessController		прыярытэт
 Usage: %s [-deskbar]\n	ProcessController		Ужыванне: %s [-deskbar]\n
-Position	ProcessController		Пазіцыя
 Yes, kill this team!	ProcessController		Так, знішчыць гэтую групу!
 That's no Fun!	ProcessController		Гэта непрыкольна!
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Вы можаце запускаць ProcessController у вакне або ўсталяваць яго ў Deskbar.
