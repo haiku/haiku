@@ -2,24 +2,25 @@
  * Copyright 2011, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _HAIKU__PACKAGE__CONTEXT_H_
-#define _HAIKU__PACKAGE__CONTEXT_H_
+#ifndef _PACKAGE__CONTEXT_H_
+#define _PACKAGE__CONTEXT_H_
 
 
-#include <package/TempfileManager.h>
+#include <Entry.h>
+#include <String.h>
 
 
-namespace Haiku {
-
-namespace Package {
+namespace BPackageKit {
 
 
-class JobStateListener;
-using Private::TempfileManager;
+class BJobStateListener;
+namespace BPrivate {
+	class TempfileManager;
+}
 
 
-struct DecisionProvider {
-	virtual						~DecisionProvider();
+struct BDecisionProvider {
+	virtual						~BDecisionProvider();
 
 	virtual	bool				YesNoDecisionNeeded(const BString& description,
 									const BString& question,
@@ -33,28 +34,32 @@ struct DecisionProvider {
 };
 
 
-class Context {
+class BContext {
 public:
-								Context(DecisionProvider& decisionProvider);
-								~Context();
+								BContext(BDecisionProvider& decisionProvider,
+									BJobStateListener& jobStateListener);
+								~BContext();
 
-			TempfileManager&	GetTempfileManager() const;
+			status_t			InitCheck() const;
 
-			JobStateListener*	GetJobStateListener() const;
-			void				SetJobStateListener(JobStateListener* listener);
+			status_t			GetNewTempfile(const BString& baseName,
+									BEntry* entry) const;
 
-			DecisionProvider&	GetDecisionProvider() const;
+			BDecisionProvider&	DecisionProvider() const;
+			BJobStateListener&	JobStateListener() const;
 
 private:
-	mutable	TempfileManager		fTempfileManager;
-			DecisionProvider&	fDecisionProvider;
-			JobStateListener*	fJobStateListener;
+			status_t			_Initialize();
+
+			BDecisionProvider&	fDecisionProvider;
+			BJobStateListener&	fJobStateListener;
+			status_t			fInitStatus;
+
+	mutable	BPrivate::TempfileManager*	fTempfileManager;
 };
 
 
-}	// namespace Package
-
-}	// namespace Haiku
+}	// namespace BPackageKit
 
 
-#endif // _HAIKU__PACKAGE__CONTEXT_H_
+#endif // _PACKAGE__CONTEXT_H_

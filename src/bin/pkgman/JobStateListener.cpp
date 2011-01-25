@@ -6,28 +6,28 @@
 
 #include <stdio.h>
 
-#include "MyJobStateListener.h"
+#include "JobStateListener.h"
 #include "pkgman.h"
 
 
-using Haiku::Package::Job;
+using BPackageKit::BJob;
 
 
 void
-MyJobStateListener::JobStarted(Job* job)
+JobStateListener::JobStarted(BJob* job)
 {
 	printf("%s ...\n", job->Title().String());
 }
 
 
 void
-MyJobStateListener::JobSucceeded(Job* job)
+JobStateListener::JobSucceeded(BJob* job)
 {
 }
 
 
 void
-MyJobStateListener::JobFailed(Job* job)
+JobStateListener::JobFailed(BJob* job)
 {
 	BString error = job->ErrorString();
 	if (error.Length() > 0) {
@@ -39,7 +39,7 @@ MyJobStateListener::JobFailed(Job* job)
 
 
 void
-MyJobStateListener::JobAborted(Job* job)
+JobStateListener::JobAborted(BJob* job)
 {
 	DIE(job->Result(), "aborted");
 }

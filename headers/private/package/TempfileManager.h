@@ -2,8 +2,8 @@
  * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>
  * Distributed under the terms of the MIT License.
  */
-#ifndef _HAIKU__PACKAGE__PRIVATE__TEMPFILE_MANAGER_H_
-#define _HAIKU__PACKAGE__PRIVATE__TEMPFILE_MANAGER_H_
+#ifndef _PACKAGE__PRIVATE__TEMPFILE_MANAGER_H_
+#define _PACKAGE__PRIVATE__TEMPFILE_MANAGER_H_
 
 
 #include <Directory.h>
@@ -12,11 +12,9 @@
 #include <SupportDefs.h>
 
 
-namespace Haiku {
+namespace BPackageKit {
 
-namespace Package {
-
-namespace Private {
+namespace BPrivate {
 
 
 class TempfileManager {
@@ -37,11 +35,9 @@ private:
 };
 
 
-}	// namespace Private
+}	// namespace BPrivate
 
-}	// namespace Package
-
-}	// namespace Haiku
+}	// namespace BPackageKit
 
 
-#endif // _HAIKU__PACKAGE__PRIVATE__TEMPFILE_MANAGER_H_
+#endif // _PACKAGE__PRIVATE__TEMPFILE_MANAGER_H_

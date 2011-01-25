@@ -16,20 +16,23 @@
 #include <package/Job.h>
 
 
-namespace Haiku {
+namespace BPackageKit {
 
-namespace Package {
-
-namespace Private {
+namespace BPrivate {
 
 
 struct JobQueue::JobPriorityLess {
-	bool operator()(const Job* left, const Job* right) const;
+	bool operator()(const BJob* left, const BJob* right) const;
 };
 
 
+// sort jobs by:
+//     1. descending count of dependencies (only jobs without dependencies are
+//        runnable)
+//     2. job ticket number (order in which jobs were added to the queue)
+//
 bool
-JobQueue::JobPriorityLess::operator()(const Job* left, const Job* right) const
+JobQueue::JobPriorityLess::operator()(const BJob* left, const BJob* right) const
 {
 	int32 difference = left->CountDependencies() - right->CountDependencies();
 	if (difference < 0)
@@ -37,21 +40,21 @@ JobQueue::JobPriorityLess::operator()(const Job* left, const Job* right) const
 	if (difference > 0)
 		return false;
 
-	return left->Title() < right->Title();
+	return left->TicketNumber() < right->TicketNumber();
 };
 
 
 class JobQueue::JobPriorityQueue
-	: public std::set<Job*, JobPriorityLess> {
-
+	: public std::set<BJob*, JobPriorityLess> {
 };
 
 
 JobQueue::JobQueue()
 	:
 	fLock("job queue"),
-	fQueuedJobs(new (std::nothrow) JobPriorityQueue())
+	fNextTicketNumber(1)
 {
+	fInitStatus = _Init();
 }
 
 
@@ -61,7 +64,14 @@ JobQueue::~JobQueue()
 
 
 status_t
-JobQueue::AddJob(Job* job)
+JobQueue::InitCheck() const
+{
+	return fInitStatus;
+}
+
+
+status_t
+JobQueue::AddJob(BJob* job)
 {
 	if (fQueuedJobs == NULL)
 		return B_NO_INIT;
@@ -69,12 +79,14 @@ JobQueue::AddJob(Job* job)
 	BAutolock lock(&fLock);
 	if (lock.IsLocked()) {
 		try {
-			fQueuedJobs->insert(job);
+			if (!fQueuedJobs->insert(job).second)
+				return B_NAME_IN_USE;
 		} catch (const std::bad_alloc& e) {
 			return B_NO_MEMORY;
 		} catch (...) {
-			return B_NO_MEMORY;
+			return B_ERROR;
 		}
+		job->_SetTicketNumber(fNextTicketNumber++);
 		job->AddStateListener(this);
 	}
 
@@ -83,7 +95,7 @@ JobQueue::AddJob(Job* job)
 
 
 status_t
-JobQueue::RemoveJob(Job* job)
+JobQueue::RemoveJob(BJob* job)
 {
 	if (fQueuedJobs == NULL)
 		return B_NO_INIT;
@@ -91,10 +103,12 @@ JobQueue::RemoveJob(Job* job)
 	BAutolock lock(&fLock);
 	if (lock.IsLocked()) {
 		try {
-			fQueuedJobs->erase(job);
+			if (fQueuedJobs->erase(job) == 0)
+				return B_NAME_NOT_FOUND;
 		} catch (...) {
 			return B_ERROR;
 		}
+		job->_ClearTicketNumber();
 		job->RemoveStateListener(this);
 	}
 
@@ -103,20 +117,24 @@ JobQueue::RemoveJob(Job* job)
 
 
 void
-JobQueue::JobSucceeded(Job* job)
+JobQueue::JobSucceeded(BJob* job)
 {
-	_UpdateDependantJobsOf(job);
+	BAutolock lock(&fLock);
+	if (lock.IsLocked())
+		_RequeueDependantJobsOf(job);
 }
 
 
 void
-JobQueue::JobFailed(Job* job)
+JobQueue::JobFailed(BJob* job)
 {
-	_UpdateDependantJobsOf(job);
+	BAutolock lock(&fLock);
+	if (lock.IsLocked())
+		_RemoveDependantJobsOf(job);
 }
 
 
-Job*
+BJob*
 JobQueue::Pop()
 {
 	BAutolock lock(&fLock);
@@ -124,6 +142,23 @@ JobQueue::Pop()
 		JobPriorityQueue::iterator head = fQueuedJobs->begin();
 		if (head == fQueuedJobs->end())
 			return NULL;
+		while (!(*head)->IsRunnable()) {
+			// we need to wait until a job becomes runnable
+			status_t result;
+			do {
+				lock.Unlock();
+				result = acquire_sem(fHaveRunnableJobSem);
+				if (!lock.Lock())
+					return NULL;
+			} while (result == B_INTERRUPTED);
+			if (result != B_OK)
+				return NULL;
+
+			// fetch current head, it must be runnable now
+			head = fQueuedJobs->begin();
+			if (head == fQueuedJobs->end())
+				return NULL;
+		}
 		fQueuedJobs->erase(head);
 		return *head;
 	}
@@ -133,27 +168,78 @@ JobQueue::Pop()
 
 
 void
-JobQueue::_UpdateDependantJobsOf(Job* job)
+JobQueue::Close()
 {
+	if (fHaveRunnableJobSem < 0)
+		return;
+
 	BAutolock lock(&fLock);
 	if (lock.IsLocked()) {
-		while (Job* dependantJob = job->DependantJobAt(0)) {
-			try {
-				fQueuedJobs->erase(dependantJob);
-			} catch (...) {
+		delete_sem(fHaveRunnableJobSem);
+		fHaveRunnableJobSem = -1;
+
+		if (fQueuedJobs != NULL) {
+			// get rid of all jobs
+			for (JobPriorityQueue::iterator iter = fQueuedJobs->begin();
+				iter != fQueuedJobs->end(); ++iter) {
+				delete (*iter);
 			}
-			dependantJob->RemoveDependency(job);
-			try {
-				fQueuedJobs->insert(dependantJob);
-			} catch (...) {
-			}
+			fQueuedJobs->clear();
 		}
 	}
 }
 
 
-}	// namespace Private
+status_t
+JobQueue::_Init()
+{
+	status_t result = fLock.InitCheck();
+	if (result != B_OK)
+		return result;
 
-}	// namespace Package
+	fQueuedJobs = new (std::nothrow) JobPriorityQueue();
+	if (fQueuedJobs == NULL)
+		return B_NO_MEMORY;
 
-}	// namespace Haiku
+	fHaveRunnableJobSem = create_sem(0, "have runnable job");
+	if (fHaveRunnableJobSem < 0)
+		return fHaveRunnableJobSem;
+
+	return B_OK;
+}
+
+
+void
+JobQueue::_RequeueDependantJobsOf(BJob* job)
+{
+	while (BJob* dependantJob = job->DependantJobAt(0)) {
+		try {
+			fQueuedJobs->erase(dependantJob);
+		} catch (...) {
+		}
+		dependantJob->RemoveDependency(job);
+		try {
+			fQueuedJobs->insert(dependantJob);
+		} catch (...) {
+		}
+	}
+}
+
+
+void
+JobQueue::_RemoveDependantJobsOf(BJob* job)
+{
+	while (BJob* dependantJob = job->DependantJobAt(0)) {
+		try {
+			fQueuedJobs->erase(dependantJob);
+		} catch (...) {
+		}
+		_RemoveDependantJobsOf(dependantJob);
+		delete job;
+	}
+}
+
+
+}	// namespace BPrivate
+
+}	// namespace BPackageKit

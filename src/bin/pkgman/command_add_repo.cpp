@@ -14,14 +14,14 @@
 #include <package/AddRepositoryRequest.h>
 #include <package/Context.h>
 #include <package/RefreshRepositoryRequest.h>
-#include <package/Roster.h>
+#include <package/PackageRoster.h>
 
-#include "MyDecisionProvider.h"
-#include "MyJobStateListener.h"
+#include "DecisionProvider.h"
+#include "JobStateListener.h"
 #include "pkgman.h"
 
 
-using namespace Haiku::Package;
+using namespace BPackageKit;
 
 
 // TODO: internationalization!
@@ -81,35 +81,41 @@ command_add_repo(int argc, const char* const* argv)
 	const char* const* repoURLs = argv + optind;
 	int urlCount = argc - optind;
 
-	MyDecisionProvider decisionProvider;
-	Context context(decisionProvider);
-	MyJobStateListener listener;
-	context.SetJobStateListener(&listener);
+	DecisionProvider decisionProvider;
+	JobStateListener listener;
+	BContext context(decisionProvider, listener);
 
 	status_t result;
 	for (int i = 0; i < urlCount; ++i) {
 		AddRepositoryRequest addRequest(context, repoURLs[i], asUserRepository);
+		result = addRequest.InitCheck();
+		if (result != B_OK)
+			DIE(result, "unable to create request for adding repository");
 		result = addRequest.CreateInitialJobs();
 		if (result != B_OK)
 			DIE(result, "unable to create necessary jobs");
 
-		while (Job* job = addRequest.PopRunnableJob()) {
+		while (BJob* job = addRequest.PopRunnableJob()) {
 			result = job->Run();
 			delete job;
 			if (result == B_CANCELED)
 				return 1;
 		}
 
+		// now refresh the repo-cache of the new repository
 		BString repoName = addRequest.RepositoryName();
-		Roster roster;
-		RepositoryConfig repoConfig;
+		BPackageRoster roster;
+		BRepositoryConfig repoConfig;
 		roster.GetRepositoryConfig(repoName, &repoConfig);
-		RefreshRepositoryRequest refreshRequest(context, repoConfig);
+		BRefreshRepositoryRequest refreshRequest(context, repoConfig);
+		result = refreshRequest.InitCheck();
+		if (result != B_OK)
+			DIE(result, "unable to create request for refreshing repository");
 		result = refreshRequest.CreateInitialJobs();
 		if (result != B_OK)
 			DIE(result, "unable to create necessary jobs");
 
-		while (Job* job = refreshRequest.PopRunnableJob()) {
+		while (BJob* job = refreshRequest.PopRunnableJob()) {
 			result = job->Run();
 			delete job;
 			if (result == B_CANCELED)

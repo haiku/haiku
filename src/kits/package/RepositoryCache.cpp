@@ -19,12 +19,10 @@
 #include <Path.h>
 
 
-namespace Haiku {
-
-namespace Package {
+namespace BPackageKit {
 
 
-RepositoryCache::RepositoryCache()
+BRepositoryCache::BRepositoryCache()
 	:
 	fInitStatus(B_NO_INIT),
 	fIsUserSpecific(false)
@@ -32,47 +30,47 @@ RepositoryCache::RepositoryCache()
 }
 
 
-RepositoryCache::RepositoryCache(const BEntry& entry)
+BRepositoryCache::BRepositoryCache(const BEntry& entry)
 {
 	SetTo(entry);
 }
 
 
-RepositoryCache::~RepositoryCache()
+BRepositoryCache::~BRepositoryCache()
 {
 }
 
 
 status_t
-RepositoryCache::InitCheck() const
+BRepositoryCache::InitCheck() const
 {
 	return fInitStatus;
 }
 
 
 const BEntry&
-RepositoryCache::Entry() const
+BRepositoryCache::Entry() const
 {
 	return fEntry;
 }
 
 
 bool
-RepositoryCache::IsUserSpecific() const
+BRepositoryCache::IsUserSpecific() const
 {
 	return fIsUserSpecific;
 }
 
 
 void
-RepositoryCache::SetIsUserSpecific(bool isUserSpecific)
+BRepositoryCache::SetIsUserSpecific(bool isUserSpecific)
 {
 	fIsUserSpecific = isUserSpecific;
 }
 
 
 status_t
-RepositoryCache::SetTo(const BEntry& entry)
+BRepositoryCache::SetTo(const BEntry& entry)
 {
 	fEntry = entry;
 	fInitStatus = B_NO_INIT;
@@ -101,6 +99,4 @@ RepositoryCache::SetTo(const BEntry& entry)
 }
 
 
-}	// namespace Package
-
-}	// namespace Haiku
+}	// namespace BPackageKit

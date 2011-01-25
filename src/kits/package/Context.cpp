@@ -7,7 +7,10 @@
  */
 
 
+#include <new>
+
 #include <package/Context.h>
+#include <package/TempfileManager.h>
 
 #include <Directory.h>
 #include <FindDirectory.h>
@@ -15,66 +18,93 @@
 #include <Path.h>
 
 
-namespace Haiku {
-
-namespace Package {
+namespace BPackageKit {
 
 
-DecisionProvider::~DecisionProvider()
+using BPrivate::TempfileManager;
+
+
+BDecisionProvider::~BDecisionProvider()
 {
 }
 
 
-Context::Context(DecisionProvider& decisionProvider)
+BContext::BContext(BDecisionProvider& decisionProvider,
+	BJobStateListener& jobStateListener)
 	:
 	fDecisionProvider(decisionProvider),
-	fJobStateListener(NULL)
+	fJobStateListener(jobStateListener),
+	fTempfileManager(NULL)
 {
-	BPath tempPath;
-	if (find_directory(B_COMMON_TEMP_DIRECTORY, &tempPath) != B_OK)
-		tempPath.SetTo("/tmp");
-	BDirectory tempDirectory(tempPath.Path());
-
-	BString contextName = BString("pkgkit-context-") << find_thread(NULL);
-	BDirectory baseDirectory;
-	tempDirectory.CreateDirectory(contextName.String(), &baseDirectory);
-	fTempfileManager.SetBaseDirectory(baseDirectory);
+	fInitStatus = _Initialize();
 }
 
 
-Context::~Context()
+BContext::~BContext()
 {
+	delete fTempfileManager;
 }
 
 
-TempfileManager&
-Context::GetTempfileManager() const
+status_t
+BContext::InitCheck() const
 {
-	return fTempfileManager;
+	return fInitStatus;
 }
 
 
-JobStateListener*
-Context::GetJobStateListener() const
+status_t
+BContext::GetNewTempfile(const BString& baseName, BEntry* entry) const
+{
+	if (entry == NULL)
+		return B_BAD_VALUE;
+	if (fTempfileManager == NULL)
+		return B_NO_INIT;
+	*entry = fTempfileManager->Create(baseName);
+	return entry->InitCheck();
+}
+
+
+BJobStateListener&
+BContext::JobStateListener() const
 {
 	return fJobStateListener;
 }
 
 
-void
-Context::SetJobStateListener(JobStateListener* listener)
-{
-	fJobStateListener = listener;
-}
-
-
-DecisionProvider&
-Context::GetDecisionProvider() const
+BDecisionProvider&
+BContext::DecisionProvider() const
 {
 	return fDecisionProvider;
 }
 
 
-}	// namespace Package
+status_t
+BContext::_Initialize()
+{
+	fTempfileManager = new (std::nothrow) TempfileManager();
+	if (fTempfileManager == NULL)
+		return B_NO_MEMORY;
 
-}	// namespace Haiku
+	BPath tempPath;
+	status_t result = find_directory(B_COMMON_TEMP_DIRECTORY, &tempPath, true);
+	if (result != B_OK)
+		return result;
+	BDirectory tempDirectory(tempPath.Path());
+	if ((result = tempDirectory.InitCheck()) != B_OK)
+		return result;
+
+	BString contextName = BString("pkgkit-context-") << find_thread(NULL);
+	BDirectory baseDirectory;
+	result = tempDirectory.CreateDirectory(contextName.String(),
+		&baseDirectory);
+	if (result != B_OK)
+		return result;
+
+	fTempfileManager->SetBaseDirectory(baseDirectory);
+
+	return B_OK;
+}
+
+
+}	// namespace BPackageKit

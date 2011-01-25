@@ -2,8 +2,8 @@
  * Copyright 2011, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _HAIKU__PACKAGE__REPOSITORY_CACHE_H_
-#define _HAIKU__PACKAGE__REPOSITORY_CACHE_H_
+#ifndef _PACKAGE__REPOSITORY_CACHE_H_
+#define _PACKAGE__REPOSITORY_CACHE_H_
 
 
 #include <Entry.h>
@@ -13,19 +13,17 @@
 class BEntry;
 
 
-namespace Haiku {
-
-namespace Package {
+namespace BPackageKit {
 
 
 //class RepositoryHeader;
 
 
-class RepositoryCache {
+class BRepositoryCache {
 public:
-								RepositoryCache();
-								RepositoryCache(const BEntry& entry);
-	virtual						~RepositoryCache();
+								BRepositoryCache();
+								BRepositoryCache(const BEntry& entry);
+	virtual						~BRepositoryCache();
 
 			status_t			SetTo(const BEntry& entry);
 			status_t			InitCheck() const;
@@ -45,9 +43,7 @@ private:
 };
 
 
-}	// namespace Package
-
-}	// namespace Haiku
+}	// namespace BPackageKit
 
 
-#endif // _HAIKU__PACKAGE__REPOSITORY_CACHE_H_
+#endif // _PACKAGE__REPOSITORY_CACHE_H_

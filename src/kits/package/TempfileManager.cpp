@@ -10,11 +10,9 @@
 #include <package/TempfileManager.h>
 
 
-namespace Haiku {
+namespace BPackageKit {
 
-namespace Package {
-
-namespace Private {
+namespace BPrivate {
 
 
 const BString TempfileManager::kDefaultName = "tmp-pkgkit-file-";
@@ -58,8 +56,6 @@ TempfileManager::Create(const BString& baseName)
 }
 
 
-}	// namespace Private
+}	// namespace BPrivate
 
-}	// namespace Package
-
-}	// namespace Haiku
+}	// namespace BPackageKit

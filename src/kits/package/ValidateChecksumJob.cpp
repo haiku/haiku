@@ -14,14 +14,12 @@
 #include <package/Context.h>
 
 
-namespace Haiku {
+namespace BPackageKit {
 
-namespace Package {
-
-namespace Private {
+namespace BPrivate {
 
 
-ValidateChecksumJob::ValidateChecksumJob(const Context& context,
+ValidateChecksumJob::ValidateChecksumJob(const BContext& context,
 	const BString& title, ChecksumAccessor* expectedChecksumAccessor,
 	ChecksumAccessor* realChecksumAccessor, bool failIfChecksumsDontMatch)
 	:
@@ -79,8 +77,6 @@ ValidateChecksumJob::ChecksumsMatch() const
 }
 
 
-}	// namespace Private
+}	// namespace BPrivate
 
-}	// namespace Package
-
-}	// namespace Haiku
+}	// namespace BPackageKit

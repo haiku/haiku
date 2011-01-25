@@ -14,14 +14,12 @@
 #include <package/Context.h>
 
 
-namespace Haiku {
+namespace BPackageKit {
 
-namespace Package {
-
-namespace Private {
+namespace BPrivate {
 
 
-ActivateRepositoryCacheJob::ActivateRepositoryCacheJob(const Context& context,
+ActivateRepositoryCacheJob::ActivateRepositoryCacheJob(const BContext& context,
 	const BString& title, const BEntry& fetchedRepoCacheEntry,
 	const BString& repositoryName, const BDirectory& targetDirectory)
 	:
@@ -52,8 +50,6 @@ ActivateRepositoryCacheJob::Execute()
 }
 
 
-}	// namespace Private
+}	// namespace BPrivate
 
-}	// namespace Package
-
-}	// namespace Haiku
+}	// namespace BPackageKit

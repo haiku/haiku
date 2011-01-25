@@ -13,12 +13,12 @@ SharedLibrary libpackage.so
 	FetchFileJob.cpp
 	Job.cpp
 	JobQueue.cpp
+	PackageRoster.cpp
 	RefreshRepositoryRequest.cpp
 	RepositoryCache.cpp
 	RepositoryConfig.cpp
 #	RepositoryHeader.cpp
 	Request.cpp
-	Roster.cpp
 	TempfileManager.cpp
 	ValidateChecksumJob.cpp
 	:

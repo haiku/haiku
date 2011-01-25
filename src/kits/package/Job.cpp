@@ -14,45 +14,44 @@
 #include <package/Context.h>
 
 
-namespace Haiku {
-
-namespace Package {
+namespace BPackageKit {
 
 
-JobStateListener::~JobStateListener()
+BJobStateListener::~BJobStateListener()
 {
 }
 
 
 void
-JobStateListener::JobStarted(Job* job)
+BJobStateListener::JobStarted(BJob* job)
 {
 }
 
 
 void
-JobStateListener::JobSucceeded(Job* job)
+BJobStateListener::JobSucceeded(BJob* job)
 {
 }
 
 
 void
-JobStateListener::JobFailed(Job* job)
+BJobStateListener::JobFailed(BJob* job)
 {
 }
 
 
 void
-JobStateListener::JobAborted(Job* job)
+BJobStateListener::JobAborted(BJob* job)
 {
 }
 
 
-Job::Job(const Context& context, const BString& title)
+BJob::BJob(const BContext& context, const BString& title)
 	:
 	fContext(context),
 	fTitle(title),
-	fState(JOB_STATE_WAITING_TO_RUN)
+	fState(JOB_STATE_WAITING_TO_RUN),
+	fTicketNumber(0xFFFFFFFFUL)
 {
 	if (fTitle.Length() == 0)
 		fInitStatus = B_BAD_VALUE;
@@ -61,55 +60,76 @@ Job::Job(const Context& context, const BString& title)
 }
 
 
-Job::~Job()
+BJob::~BJob()
 {
 }
 
 
 status_t
-Job::InitCheck() const
+BJob::InitCheck() const
 {
 	return fInitStatus;
 }
 
 
 const BString&
-Job::Title() const
+BJob::Title() const
 {
 	return fTitle;
 }
 
 
-JobState
-Job::State() const
+BJobState
+BJob::State() const
 {
 	return fState;
 }
 
 
 status_t
-Job::Result() const
+BJob::Result() const
 {
 	return fResult;
 }
 
 
 const BString&
-Job::ErrorString() const
+BJob::ErrorString() const
 {
 	return fErrorString;
 }
 
 
+uint32
+BJob::TicketNumber() const
+{
+	return fTicketNumber;
+}
+
+
 void
-Job::SetErrorString(const BString& error)
+BJob::_SetTicketNumber(uint32 ticketNumber)
+{
+	fTicketNumber = ticketNumber;
+}
+
+
+void
+BJob::_ClearTicketNumber()
+{
+	fTicketNumber = 0xFFFFFFFFUL;
+}
+
+
+void
+BJob::SetErrorString(const BString& error)
 {
 	fErrorString = error;
 }
 
 
 status_t
-Job::Run()
+BJob::Run()
 {
 	if (fState != JOB_STATE_WAITING_TO_RUN)
 		return B_NOT_ALLOWED;
@@ -132,27 +152,27 @@ Job::Run()
 
 
 void
-Job::Cleanup(status_t /*jobResult*/)
+BJob::Cleanup(status_t /*jobResult*/)
 {
 }
 
 
 status_t
-Job::AddStateListener(JobStateListener* listener)
+BJob::AddStateListener(BJobStateListener* listener)
 {
 	return fStateListeners.AddItem(listener) ? B_OK : B_ERROR;
 }
 
 
 status_t
-Job::RemoveStateListener(JobStateListener* listener)
+BJob::RemoveStateListener(BJobStateListener* listener)
 {
 	return fStateListeners.RemoveItem(listener) ? B_OK : B_ERROR;
 }
 
 
 status_t
-Job::AddDependency(Job* job)
+BJob::AddDependency(BJob* job)
 {
 	if (fDependencies.HasItem(job))
 		return B_ERROR;
@@ -165,7 +185,7 @@ Job::AddDependency(Job* job)
 
 
 status_t
-Job::RemoveDependency(Job* job)
+BJob::RemoveDependency(BJob* job)
 {
 	if (!fDependencies.HasItem(job))
 		return B_ERROR;
@@ -177,26 +197,33 @@ Job::RemoveDependency(Job* job)
 }
 
 
+bool
+BJob::IsRunnable() const
+{
+	return fDependencies.IsEmpty();
+}
+
+
 int32
-Job::CountDependencies() const
+BJob::CountDependencies() const
 {
 	return fDependencies.CountItems();
 }
 
 
-Job*
-Job::DependantJobAt(int32 index) const
+BJob*
+BJob::DependantJobAt(int32 index) const
 {
 	return fDependantJobs.ItemAt(index);
 }
 
 
 void
-Job::NotifyStateListeners()
+BJob::NotifyStateListeners()
 {
 	int32 count = fStateListeners.CountItems();
 	for (int i = 0; i < count; ++i) {
-		JobStateListener* listener = fStateListeners.ItemAt(i);
+		BJobStateListener* listener = fStateListeners.ItemAt(i);
 		if (listener == NULL)
 			continue;
 		switch (fState) {
@@ -219,6 +246,4 @@ Job::NotifyStateListeners()
 }
 
 
-}	// namespace Package
-
-}	// namespace Haiku
+}	// namespace BPackageKit

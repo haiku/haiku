@@ -2,8 +2,8 @@
  * Copyright 2011, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _HAIKU__PACKAGE__ADD_REPOSITORY_REQUEST_H_
-#define _HAIKU__PACKAGE__ADD_REPOSITORY_REQUEST_H_
+#ifndef _PACKAGE__ADD_REPOSITORY_REQUEST_H_
+#define _PACKAGE__ADD_REPOSITORY_REQUEST_H_
 
 
 #include <String.h>
@@ -12,22 +12,20 @@
 #include <package/Request.h>
 
 
-namespace Haiku {
-
-namespace Package {
+namespace BPackageKit {
 
 
-namespace Private {
+namespace BPrivate {
 	class ActivateRepositoryConfigJob;
 }
-using Private::ActivateRepositoryConfigJob;
+using BPrivate::ActivateRepositoryConfigJob;
 
 
-class AddRepositoryRequest : public Request {
-	typedef	Request				inherited;
+class AddRepositoryRequest : public BRequest {
+	typedef	BRequest				inherited;
 
 public:
-								AddRepositoryRequest(const Context& context,
+								AddRepositoryRequest(const BContext& context,
 									const BString& repositoryBaseURL,
 									bool asUserRepository);
 	virtual						~AddRepositoryRequest();
@@ -37,8 +35,8 @@ public:
 			const BString&		RepositoryName() const;
 
 protected:
-								// JobStateListener
-	virtual	void				JobSucceeded(Job* job);
+								// BJobStateListener
+	virtual	void				JobSucceeded(BJob* job);
 
 private:
 			BString				fRepositoryBaseURL;
@@ -50,9 +48,7 @@ private:
 };
 
 
-}	// namespace Package
-
-}	// namespace Haiku
+}	// namespace BPackageKit
 
 
-#endif // _HAIKU__PACKAGE__ADD_REPOSITORY_REQUEST_H_
+#endif // _PACKAGE__ADD_REPOSITORY_REQUEST_H_

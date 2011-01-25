@@ -8,7 +8,7 @@
 #include <package/RepositoryConfig.h>
 
 
-using namespace Haiku::Package;
+using namespace BPackageKit;
 
 
 int
@@ -20,7 +20,7 @@ main(int argc, const char** argv)
 		return 1;
 	}
 
-	RepositoryConfig repoConfig(argv[1], argv[2], atoi(argv[3]));
+	BRepositoryConfig repoConfig(argv[1], argv[2], atoi(argv[3]));
 	status_t status = repoConfig.InitCheck();
 	if (status != B_OK) {
 		fprintf(stderr, "couldn't initialize repository-config\n");

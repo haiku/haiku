@@ -2,8 +2,8 @@
  * Copyright 2011, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _HAIKU__PACKAGE__REFRESH_REPOSITORY_REQUEST_H_
-#define _HAIKU__PACKAGE__REFRESH_REPOSITORY_REQUEST_H_
+#ifndef _PACKAGE__REFRESH_REPOSITORY_REQUEST_H_
+#define _PACKAGE__REFRESH_REPOSITORY_REQUEST_H_
 
 
 #include <Entry.h>
@@ -14,43 +14,41 @@
 #include <package/Request.h>
 
 
-namespace Haiku {
-
-namespace Package {
+namespace BPackageKit {
 
 
-namespace Private {
+namespace BPrivate {
 	class ValidateChecksumJob;
 }
-using Private::ValidateChecksumJob;
+using BPrivate::ValidateChecksumJob;
 
-class RefreshRepositoryRequest : public Request {
-	typedef	Request				inherited;
+
+class BRefreshRepositoryRequest : public BRequest {
+	typedef	BRequest				inherited;
 
 public:
-								RefreshRepositoryRequest(const Context& context,
-									const RepositoryConfig& repoConfig);
-	virtual						~RefreshRepositoryRequest();
+								BRefreshRepositoryRequest(
+									const BContext& context,
+									const BRepositoryConfig& repoConfig);
+	virtual						~BRefreshRepositoryRequest();
 
 	virtual	status_t			CreateInitialJobs();
 
 protected:
-								// JobStateListener
-	virtual	void				JobSucceeded(Job* job);
+								// BJobStateListener
+	virtual	void				JobSucceeded(BJob* job);
 
 private:
 			status_t			_FetchRepositoryCache();
 
 			BEntry				fFetchedChecksumFile;
-			RepositoryConfig	fRepoConfig;
+			BRepositoryConfig	fRepoConfig;
 
 			ValidateChecksumJob*	fValidateChecksumJob;
 };
 
 
-}	// namespace Package
-
-}	// namespace Haiku
+}	// namespace BPackageKit
 
 
-#endif // _HAIKU__PACKAGE__REFRESH_REPOSITORY_REQUEST_H_
+#endif // _PACKAGE__REFRESH_REPOSITORY_REQUEST_H_

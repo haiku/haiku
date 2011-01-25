@@ -7,7 +7,7 @@
  */
 
 
-#include <package/Roster.h>
+#include <package/PackageRoster.h>
 
 #include <errno.h>
 #include <sys/stat.h>
@@ -22,51 +22,49 @@
 #include <package/RepositoryConfig.h>
 
 
-namespace Haiku {
-
-namespace Package {
+namespace BPackageKit {
 
 
-Roster::Roster()
+BPackageRoster::BPackageRoster()
 {
 }
 
 
-Roster::~Roster()
+BPackageRoster::~BPackageRoster()
 {
 }
 
 
 status_t
-Roster::GetCommonRepositoryConfigPath(BPath* path, bool create) const
+BPackageRoster::GetCommonRepositoryConfigPath(BPath* path, bool create) const
 {
 	return _GetRepositoryPath(path, create, B_COMMON_SETTINGS_DIRECTORY);
 }
 
 
 status_t
-Roster::GetUserRepositoryConfigPath(BPath* path, bool create) const
+BPackageRoster::GetUserRepositoryConfigPath(BPath* path, bool create) const
 {
 	return _GetRepositoryPath(path, create, B_USER_SETTINGS_DIRECTORY);
 }
 
 
 status_t
-Roster::GetCommonRepositoryCachePath(BPath* path, bool create) const
+BPackageRoster::GetCommonRepositoryCachePath(BPath* path, bool create) const
 {
 	return _GetRepositoryPath(path, create, B_COMMON_CACHE_DIRECTORY);
 }
 
 
 status_t
-Roster::GetUserRepositoryCachePath(BPath* path, bool create) const
+BPackageRoster::GetUserRepositoryCachePath(BPath* path, bool create) const
 {
 	return _GetRepositoryPath(path, create, B_USER_CACHE_DIRECTORY);
 }
 
 
 status_t
-Roster::VisitCommonRepositoryConfigs(RepositoryConfigVisitor& visitor)
+BPackageRoster::VisitCommonRepositoryConfigs(BRepositoryConfigVisitor& visitor)
 {
 	BPath commonRepositoryConfigPath;
 	status_t result
@@ -79,7 +77,7 @@ Roster::VisitCommonRepositoryConfigs(RepositoryConfigVisitor& visitor)
 
 
 status_t
-Roster::VisitUserRepositoryConfigs(RepositoryConfigVisitor& visitor)
+BPackageRoster::VisitUserRepositoryConfigs(BRepositoryConfigVisitor& visitor)
 {
 	BPath userRepositoryConfigPath;
 	status_t result = GetUserRepositoryConfigPath(&userRepositoryConfigPath);
@@ -91,9 +89,9 @@ Roster::VisitUserRepositoryConfigs(RepositoryConfigVisitor& visitor)
 
 
 status_t
-Roster::GetRepositoryNames(BObjectList<BString>& names)
+BPackageRoster::GetRepositoryNames(BObjectList<BString>& names)
 {
-	struct RepositoryNameCollector : public RepositoryConfigVisitor {
+	struct RepositoryNameCollector : public BRepositoryConfigVisitor {
 		RepositoryNameCollector(BObjectList<BString>& _names)
 			: names(_names)
 		{
@@ -124,8 +122,8 @@ Roster::GetRepositoryNames(BObjectList<BString>& names)
 
 
 status_t
-Roster::GetRepositoryCache(const BString& name,
-	RepositoryCache* repositoryCache)
+BPackageRoster::GetRepositoryCache(const BString& name,
+	BRepositoryCache* repositoryCache)
 {
 	if (repositoryCache == NULL)
 		return B_BAD_VALUE;
@@ -151,8 +149,8 @@ Roster::GetRepositoryCache(const BString& name,
 
 
 status_t
-Roster::GetRepositoryConfig(const BString& name,
-	RepositoryConfig* repositoryConfig)
+BPackageRoster::GetRepositoryConfig(const BString& name,
+	BRepositoryConfig* repositoryConfig)
 {
 	if (repositoryConfig == NULL)
 		return B_BAD_VALUE;
@@ -178,7 +176,7 @@ Roster::GetRepositoryConfig(const BString& name,
 
 
 status_t
-Roster::_GetRepositoryPath(BPath* path, bool create,
+BPackageRoster::_GetRepositoryPath(BPath* path, bool create,
 	directory_which whichDir) const
 {
 	if (path == NULL)
@@ -203,8 +201,8 @@ Roster::_GetRepositoryPath(BPath* path, bool create,
 
 
 status_t
-Roster::_VisitRepositoryConfigs(const BPath& path,
-	RepositoryConfigVisitor& visitor)
+BPackageRoster::_VisitRepositoryConfigs(const BPath& path,
+	BRepositoryConfigVisitor& visitor)
 {
 	BDirectory directory(path.Path());
 	status_t result = directory.InitCheck();
@@ -223,6 +221,4 @@ Roster::_VisitRepositoryConfigs(const BPath& path,
 }
 
 
-}	// namespace Package
-
-}	// namespace Haiku
+}	// namespace BPackageKit

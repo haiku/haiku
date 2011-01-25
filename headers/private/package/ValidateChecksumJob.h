@@ -2,8 +2,8 @@
  * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>
  * Distributed under the terms of the MIT License.
  */
-#ifndef _HAIKU__PACKAGE__PRIVATE__VALIDATE_CHECKSUM_JOB_H_
-#define _HAIKU__PACKAGE__PRIVATE__VALIDATE_CHECKSUM_JOB_H_
+#ifndef _PACKAGE__PRIVATE__VALIDATE_CHECKSUM_JOB_H_
+#define _PACKAGE__PRIVATE__VALIDATE_CHECKSUM_JOB_H_
 
 
 #include <Directory.h>
@@ -14,19 +14,17 @@
 #include <package/Job.h>
 
 
-namespace Haiku {
+namespace BPackageKit {
 
-namespace Package {
-
-namespace Private {
+namespace BPrivate {
 
 
-class ValidateChecksumJob : public Job {
-	typedef	Job					inherited;
+class ValidateChecksumJob : public BJob {
+	typedef	BJob					inherited;
 
 public:
 								ValidateChecksumJob(
-									const Context& context,
+									const BContext& context,
 									const BString& title,
 									ChecksumAccessor* expectedChecksumAccessor,
 									ChecksumAccessor* realChecksumAccessor,
@@ -47,11 +45,9 @@ private:
 };
 
 
-}	// namespace Private
+}	// namespace BPrivate
 
-}	// namespace Package
-
-}	// namespace Haiku
+}	// namespace BPackageKit
 
 
-#endif // _HAIKU__PACKAGE__PRIVATE__VALIDATE_CHECKSUM_JOB_H_
+#endif // _PACKAGE__PRIVATE__VALIDATE_CHECKSUM_JOB_H_

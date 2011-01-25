@@ -2,8 +2,8 @@
  * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>
  * Distributed under the terms of the MIT License.
  */
-#ifndef _HAIKU__PACKAGE__PRIVATE__FETCH_FILE_JOB_H_
-#define _HAIKU__PACKAGE__PRIVATE__FETCH_FILE_JOB_H_
+#ifndef _PACKAGE__PRIVATE__FETCH_FILE_JOB_H_
+#define _PACKAGE__PRIVATE__FETCH_FILE_JOB_H_
 
 
 #include <Entry.h>
@@ -12,18 +12,16 @@
 #include <package/Job.h>
 
 
-namespace Haiku {
+namespace BPackageKit {
 
-namespace Package {
-
-namespace Private {
+namespace BPrivate {
 
 
-class FetchFileJob : public Job {
-	typedef	Job					inherited;
+class FetchFileJob : public BJob {
+	typedef	BJob					inherited;
 
 public:
-								FetchFileJob(const Context& context,
+								FetchFileJob(const BContext& context,
 									const BString& title,
 									const BString& fileURL,
 									const BEntry& targetEntry);
@@ -39,11 +37,9 @@ private:
 };
 
 
-}	// namespace Private
+}	// namespace BPrivate
 
-}	// namespace Package
-
-}	// namespace Haiku
+}	// namespace BPackageKit
 
 
-#endif // _HAIKU__PACKAGE__PRIVATE__FETCH_FILE_JOB_H_
+#endif // _PACKAGE__PRIVATE__FETCH_FILE_JOB_H_

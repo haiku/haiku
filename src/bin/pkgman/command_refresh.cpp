@@ -13,14 +13,14 @@
 
 #include <package/Context.h>
 #include <package/RefreshRepositoryRequest.h>
-#include <package/Roster.h>
+#include <package/PackageRoster.h>
 
-#include "MyDecisionProvider.h"
-#include "MyJobStateListener.h"
+#include "DecisionProvider.h"
+#include "JobStateListener.h"
 #include "pkgman.h"
 
 
-using namespace Haiku::Package;
+using namespace BPackageKit;
 
 
 // TODO: internationalization!
@@ -70,14 +70,13 @@ command_refresh(int argc, const char* const* argv)
 	const char* const* repoArgs = argv + optind;
 	int nameCount = argc - optind;
 
-	MyDecisionProvider decisionProvider;
-	Context context(decisionProvider);
-	MyJobStateListener listener;
-	context.SetJobStateListener(&listener);
+	DecisionProvider decisionProvider;
+	JobStateListener listener;
+	BContext context(decisionProvider, listener);
 
 	BObjectList<BString> repositoryNames(20, true);
 
-	Roster roster;
+	BPackageRoster roster;
 	if (nameCount == 0) {
 		status_t result = roster.GetRepositoryNames(repositoryNames);
 		if (result != B_OK)
@@ -94,7 +93,7 @@ command_refresh(int argc, const char* const* argv)
 	status_t result;
 	for (int i = 0; i < repositoryNames.CountItems(); ++i) {
 		const BString& repoName = *(repositoryNames.ItemAt(i));
-		RepositoryConfig repoConfig;
+		BRepositoryConfig repoConfig;
 		result = roster.GetRepositoryConfig(repoName, &repoConfig);
 		if (result != B_OK) {
 			BPath path;
@@ -102,12 +101,15 @@ command_refresh(int argc, const char* const* argv)
 			WARN(result, "skipping repository-config '%s'", path.Path());
 			continue;
 		}
-		RefreshRepositoryRequest refreshRequest(context, repoConfig);
+		BRefreshRepositoryRequest refreshRequest(context, repoConfig);
+		result = refreshRequest.InitCheck();
+		if (result != B_OK)
+			DIE(result, "unable to create request for refreshing repository");
 		result = refreshRequest.CreateInitialJobs();
 		if (result != B_OK)
 			DIE(result, "unable to create necessary jobs");
 
-		while (Job* job = refreshRequest.PopRunnableJob()) {
+		while (BJob* job = refreshRequest.PopRunnableJob()) {
 			result = job->Run();
 			delete job;
 			if (result != B_OK)

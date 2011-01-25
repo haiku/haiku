@@ -9,48 +9,57 @@
 
 #include <package/Request.h>
 
+#include <new>
+
 #include <package/Context.h>
-#include <package/Job.h>
+#include <package/JobQueue.h>
 
 
-namespace Haiku {
-
-namespace Package {
+namespace BPackageKit {
 
 
-Request::Request(const Context& context)
+BRequest::BRequest(const BContext& context)
 	:
 	fContext(context),
-	fJobQueue()
+	fJobQueue(new (std::nothrow) JobQueue())
 {
+	fInitStatus = fJobQueue == NULL ? B_NO_MEMORY : B_OK;
 }
 
 
-Request::~Request()
+BRequest::~BRequest()
 {
-}
-
-
-Job*
-Request::PopRunnableJob()
-{
-	return fJobQueue.Pop();
 }
 
 
 status_t
-Request::QueueJob(Job* job)
+BRequest::InitCheck() const
 {
-	job->AddStateListener(this);
-
-	JobStateListener* listener = fContext.GetJobStateListener();
-	if (listener != NULL)
-		job->AddStateListener(listener);
-
-	return fJobQueue.AddJob(job);
+	return fInitStatus;
 }
 
 
-}	// namespace Package
+BJob*
+BRequest::PopRunnableJob()
+{
+	if (fJobQueue == NULL)
+		return NULL;
 
-}	// namespace Haiku
+	return fJobQueue->Pop();
+}
+
+
+status_t
+BRequest::QueueJob(BJob* job)
+{
+	if (fJobQueue == NULL)
+		return B_NO_INIT;
+
+	job->AddStateListener(this);
+	job->AddStateListener(&fContext.JobStateListener());
+
+	return fJobQueue->AddJob(job);
+}
+
+
+}	// namespace BPackageKit

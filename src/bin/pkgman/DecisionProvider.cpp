@@ -7,11 +7,11 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "MyDecisionProvider.h"
+#include "DecisionProvider.h"
 
 
 bool
-MyDecisionProvider::YesNoDecisionNeeded(const BString& description,
+DecisionProvider::YesNoDecisionNeeded(const BString& description,
 	const BString& question, const BString& yes, const BString& no,
 	const BString& defaultChoice)
 {

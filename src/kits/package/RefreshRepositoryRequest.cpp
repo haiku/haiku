@@ -19,19 +19,17 @@
 #include <package/JobQueue.h>
 #include <package/RepositoryCache.h>
 #include <package/RepositoryConfig.h>
-#include <package/Roster.h>
+#include <package/PackageRoster.h>
 
 
-namespace Haiku {
-
-namespace Package {
+namespace BPackageKit {
 
 
-using namespace Private;
+using namespace BPrivate;
 
 
-RefreshRepositoryRequest::RefreshRepositoryRequest(const Context& context,
-	const RepositoryConfig& repoConfig)
+BRefreshRepositoryRequest::BRefreshRepositoryRequest(const BContext& context,
+	const BRepositoryConfig& repoConfig)
 	:
 	inherited(context),
 	fRepoConfig(repoConfig)
@@ -39,23 +37,26 @@ RefreshRepositoryRequest::RefreshRepositoryRequest(const Context& context,
 }
 
 
-RefreshRepositoryRequest::~RefreshRepositoryRequest()
+BRefreshRepositoryRequest::~BRefreshRepositoryRequest()
 {
 }
 
 
 status_t
-RefreshRepositoryRequest::CreateInitialJobs()
+BRefreshRepositoryRequest::CreateInitialJobs()
 {
-	Roster roster;
-	status_t result = fRepoConfig.InitCheck();
+	status_t result = InitCheck();
 	if (result != B_OK)
+		return B_NO_INIT;
+
+	if ((result = fRepoConfig.InitCheck()) != B_OK)
 		return result;
 
 	// fetch the current checksum and compare with our cache's checksum,
 	// if they differ, fetch the updated cache
-	fFetchedChecksumFile
-		= fContext.GetTempfileManager().Create("repochecksum-");
+	result = fContext.GetNewTempfile("repochecksum-", &fFetchedChecksumFile);
+	if (result != B_OK)
+		return result;
 	BString repoChecksumURL
 		= BString(fRepoConfig.URL()) << "/" << "repo.sha256";
 	FetchFileJob* fetchChecksumJob = new (std::nothrow) FetchFileJob(
@@ -69,7 +70,8 @@ RefreshRepositoryRequest::CreateInitialJobs()
 		return result;
 	}
 
-	RepositoryCache repoCache;
+	BRepositoryCache repoCache;
+	BPackageRoster roster;
 	roster.GetRepositoryCache(fRepoConfig.Name(), &repoCache);
 
 	ValidateChecksumJob* validateChecksumJob
@@ -94,7 +96,7 @@ RefreshRepositoryRequest::CreateInitialJobs()
 
 
 void
-RefreshRepositoryRequest::JobSucceeded(Job* job)
+BRefreshRepositoryRequest::JobSucceeded(BJob* job)
 {
 	if (job == fValidateChecksumJob
 		&& !fValidateChecksumJob->ChecksumsMatch()) {
@@ -107,21 +109,23 @@ RefreshRepositoryRequest::JobSucceeded(Job* job)
 
 
 status_t
-RefreshRepositoryRequest::_FetchRepositoryCache()
+BRefreshRepositoryRequest::_FetchRepositoryCache()
 {
 	// download repository cache and put it in either the common/user cache
 	// path, depending on where the corresponding repo-config lives
 
 	// job fetching the cache
-	BEntry tempRepoCache = fContext.GetTempfileManager().Create("repocache-");
+	BEntry tempRepoCache;
+	status_t result = fContext.GetNewTempfile("repocache-", &tempRepoCache);
+	if (result != B_OK)
+		return result;
 	BString repoCacheURL = BString(fRepoConfig.URL()) << "/" << "repo";
 	FetchFileJob* fetchCacheJob = new (std::nothrow) FetchFileJob(fContext,
 		BString("Fetching repository-cache from ") << fRepoConfig.URL(),
 		repoCacheURL, tempRepoCache);
 	if (fetchCacheJob == NULL)
 		return B_NO_MEMORY;
-	status_t result = QueueJob(fetchCacheJob);
-	if (result != B_OK) {
+	if ((result = QueueJob(fetchCacheJob)) != B_OK) {
 		delete fetchCacheJob;
 		return result;
 	}
@@ -143,7 +147,7 @@ RefreshRepositoryRequest::_FetchRepositoryCache()
 
 	// job activating the cache
 	BPath targetRepoCachePath;
-	Roster roster;
+	BPackageRoster roster;
 	result = fRepoConfig.IsUserSpecific()
 		? roster.GetUserRepositoryCachePath(&targetRepoCachePath, true)
 		: roster.GetCommonRepositoryCachePath(&targetRepoCachePath, true);
@@ -166,6 +170,4 @@ RefreshRepositoryRequest::_FetchRepositoryCache()
 }
 
 
-}	// namespace Package
-
-}	// namespace Haiku
+}	// namespace BPackageKit

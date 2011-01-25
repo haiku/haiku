@@ -15,16 +15,15 @@
 #include <package/RepositoryConfig.h>
 
 
-namespace Haiku {
+namespace BPackageKit {
 
-namespace Package {
-
-namespace Private {
+namespace BPrivate {
 
 
-ActivateRepositoryConfigJob::ActivateRepositoryConfigJob(const Context& context,
-	const BString& title, const BEntry& archivedRepoConfigEntry,
-	const BString& repositoryBaseURL, const BDirectory& targetDirectory)
+ActivateRepositoryConfigJob::ActivateRepositoryConfigJob(
+	const BContext& context, const BString& title,
+	const BEntry& archivedRepoConfigEntry, const BString& repositoryBaseURL,
+	const BDirectory& targetDirectory)
 	:
 	inherited(context, title),
 	fArchivedRepoConfigEntry(archivedRepoConfigEntry),
@@ -51,7 +50,7 @@ ActivateRepositoryConfigJob::Execute()
 	if ((result = archive.Unflatten(&archiveFile)) != B_OK)
 		return result;
 
-	RepositoryConfig* repoConfig = RepositoryConfig::Instantiate(&archive);
+	BRepositoryConfig* repoConfig = BRepositoryConfig::Instantiate(&archive);
 	if (repoConfig == NULL)
 		return B_BAD_DATA;
 	if ((result = repoConfig->InitCheck()) != B_OK)
@@ -62,7 +61,7 @@ ActivateRepositoryConfigJob::Execute()
 		BString description = BString("A repository configuration for ")
 			<< repoConfig->Name() << " already exists.";
 		BString question("overwrite?");
-		bool yes = fContext.GetDecisionProvider().YesNoDecisionNeeded(
+		bool yes = fContext.DecisionProvider().YesNoDecisionNeeded(
 			description, question, "yes", "no", "no");
 		if (!yes) {
 			fTargetEntry.Unset();
@@ -98,8 +97,6 @@ ActivateRepositoryConfigJob::RepositoryName() const
 }
 
 
-}	// namespace Private
+}	// namespace BPrivate
 
-}	// namespace Package
-
-}	// namespace Haiku
+}	// namespace BPackageKit

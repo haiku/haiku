@@ -2,46 +2,48 @@
  * Copyright 2011, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _HAIKU__PACKAGE__REQUEST_H_
-#define _HAIKU__PACKAGE__REQUEST_H_
+#ifndef _PACKAGE__REQUEST_H_
+#define _PACKAGE__REQUEST_H_
 
 
 #include <SupportDefs.h>
 
-#include <package/JobQueue.h>
+#include <package/Job.h>
 
 
-namespace Haiku {
-
-namespace Package {
+namespace BPackageKit {
 
 
-class Context;
-using Private::JobQueue;
+class BContext;
+namespace BPrivate {
+	class JobQueue;
+}
+using BPrivate::JobQueue;
 
 
-class Request : protected JobStateListener {
+class BRequest : protected BJobStateListener {
 public:
-								Request(const Context& context);
-	virtual						~Request();
+								BRequest(const BContext& context);
+	virtual						~BRequest();
+
+			status_t			InitCheck() const;
 
 	virtual	status_t			CreateInitialJobs() = 0;
 
-			Job*				PopRunnableJob();
+			BJob*				PopRunnableJob();
 
 protected:
-			status_t			QueueJob(Job* job);
+			status_t			QueueJob(BJob* job);
 
-			const Context&		fContext;
+			const BContext&		fContext;
 
 private:
-			JobQueue			fJobQueue;
+			status_t			fInitStatus;
+			JobQueue*			fJobQueue;
 };
 
 
-}	// namespace Package
-
-}	// namespace Haiku
+}	// namespace BPackageKit
 
 
-#endif // _HAIKU__PACKAGE__REQUEST_H_
+#endif // _PACKAGE__REQUEST_H_

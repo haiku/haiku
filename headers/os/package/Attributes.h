@@ -2,30 +2,26 @@
  * Copyright 2011, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _HAIKU__PACKAGE__ATTRIBUTES_H_
-#define _HAIKU__PACKAGE__ATTRIBUTES_H_
+#ifndef _PACKAGE__ATTRIBUTES_H_
+#define _PACKAGE__ATTRIBUTES_H_
 
 
-namespace Haiku {
-
-namespace Package {
+namespace BPackageKit {
 
 
 // attributes used in package and as file attribute, too
-extern const char* kNameAttribute;
-extern const char* kVendorAttribute;
-extern const char* kVersionAttribute;
+extern const char* kPackageNameAttribute;
+extern const char* kPackageVendorAttribute;
+extern const char* kPackageVersionAttribute;
 
 // attributes kept local to packages
-extern const char* kCopyrightAttribute;
-extern const char* kLicenseAttribute;
-extern const char* kProvidesAttribute;
-extern const char* kRequiresAttribute;
+extern const char* kPackageCopyrightAttribute;
+extern const char* kPackageLicenseAttribute;
+extern const char* kPackageProvidesAttribute;
+extern const char* kPackageRequiresAttribute;
 
 
-}	// namespace Package
-
-}	// namespace Haiku
+}	// namespace BPackageKit
 
 
-#endif // _HAIKU__PACKAGE__ATTRIBUTES_H_
+#endif // _PACKAGE__ATTRIBUTES_H_

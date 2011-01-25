@@ -15,18 +15,16 @@
 #include <package/ActivateRepositoryConfigJob.h>
 #include <package/FetchFileJob.h>
 #include <package/JobQueue.h>
-#include <package/Roster.h>
+#include <package/PackageRoster.h>
 
 
-namespace Haiku {
-
-namespace Package {
+namespace BPackageKit {
 
 
-using namespace Private;
+using namespace BPrivate;
 
 
-AddRepositoryRequest::AddRepositoryRequest(const Context& context,
+AddRepositoryRequest::AddRepositoryRequest(const BContext& context,
 	const BString& repositoryBaseURL, bool asUserRepository)
 	:
 	inherited(context),
@@ -45,20 +43,26 @@ AddRepositoryRequest::~AddRepositoryRequest()
 status_t
 AddRepositoryRequest::CreateInitialJobs()
 {
-	BEntry tempEntry = fContext.GetTempfileManager().Create("repoheader-");
+	status_t result = InitCheck();
+	if (result != B_OK)
+		return B_NO_INIT;
+
+	BEntry tempEntry;
+	result = fContext.GetNewTempfile("repoheader-", &tempEntry);
+	if (result != B_OK)
+		return result;
 	BString repoHeaderURL = BString(fRepositoryBaseURL) << "/" << "repo.header";
 	FetchFileJob* fetchJob = new (std::nothrow) FetchFileJob(fContext,
 		BString("Fetching repository header from ") << fRepositoryBaseURL,
 		repoHeaderURL, tempEntry);
 	if (fetchJob == NULL)
 		return B_NO_MEMORY;
-	status_t result = QueueJob(fetchJob);
-	if (result != B_OK) {
+	if ((result = QueueJob(fetchJob)) != B_OK) {
 		delete fetchJob;
 		return result;
 	}
 
-	Roster roster;
+	BPackageRoster roster;
 	BPath targetRepoConfigPath;
 	result = fAsUserRepository
 		? roster.GetUserRepositoryConfigPath(&targetRepoConfigPath, true)
@@ -84,7 +88,7 @@ AddRepositoryRequest::CreateInitialJobs()
 
 
 void
-AddRepositoryRequest::JobSucceeded(Job* job)
+AddRepositoryRequest::JobSucceeded(BJob* job)
 {
 	if (job == fActivateJob)
 		fRepositoryName = fActivateJob->RepositoryName();
@@ -98,6 +102,4 @@ AddRepositoryRequest::RepositoryName() const
 }
 
 
-}	// namespace Package
-
-}	// namespace Haiku
+}	// namespace BPackageKit

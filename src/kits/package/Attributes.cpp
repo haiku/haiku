@@ -10,24 +10,20 @@
 #include <package/Attributes.h>
 
 
-namespace Haiku {
-
-namespace Package {
+namespace BPackageKit {
 
 
 // attributes used in package and as file attribute, too
-const char* kNameAttribute			= "PKG:name";
-const char* kPlatformAttribute		= "PKG:platform";
-const char* kVendorAttribute		= "PKG:vendor";
-const char* kVersionAttribute		= "PKG:version";
+const char* kPackageNameAttribute		= "PKG:name";
+const char* kPackagePlatformAttribute	= "PKG:platform";
+const char* kPackageVendorAttribute		= "PKG:vendor";
+const char* kPackageVersionAttribute	= "PKG:version";
 
 // attributes kept local to packages
-const char* kCopyrightAttribute		= "PKG:copyright";
-const char* kLicenseAttribute		= "PKG:license";
-const char* kProvidesAttribute		= "PKG:provides";
-const char* kRequiresAttribute		= "PKG:requires";
+const char* kPackageCopyrightAttribute	= "PKG:copyright";
+const char* kPackageLicenseAttribute	= "PKG:license";
+const char* kPackageProvidesAttribute	= "PKG:provides";
+const char* kPackageRequiresAttribute	= "PKG:requires";
 
 
-}	// namespace Package
-
-}	// namespace Haiku
+}	// namespace BPackageKit

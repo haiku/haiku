@@ -6,8 +6,8 @@ BinCommand pkgman :
 	command_add_repo.cpp
 	command_list_repos.cpp
 	command_refresh.cpp
-	MyDecisionProvider.cpp
-	MyJobStateListener.cpp
+	DecisionProvider.cpp
+	JobStateListener.cpp
 	pkgman.cpp
 	:
 	package be

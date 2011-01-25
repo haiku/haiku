@@ -2,8 +2,8 @@
  * Copyright 2011, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _HAIKU__PACKAGE__REPOSITORY_CONFIG_H_
-#define _HAIKU__PACKAGE__REPOSITORY_CONFIG_H_
+#ifndef _PACKAGE__REPOSITORY_CONFIG_H_
+#define _PACKAGE__REPOSITORY_CONFIG_H_
 
 
 #include <Archivable.h>
@@ -14,22 +14,20 @@
 class BEntry;
 
 
-namespace Haiku {
-
-namespace Package {
+namespace BPackageKit {
 
 
-class RepositoryConfig : public BArchivable {
+class BRepositoryConfig : public BArchivable {
 	typedef	BArchivable			inherited;
 
 public:
-								RepositoryConfig();
-								RepositoryConfig(const BString& name,
+								BRepositoryConfig();
+								BRepositoryConfig(const BString& name,
 									const BString& url,
 									uint8 priority = kDefaultPriority);
-								RepositoryConfig(const BEntry& entry);
-								RepositoryConfig(BMessage* data);
-	virtual						~RepositoryConfig();
+								BRepositoryConfig(const BEntry& entry);
+								BRepositoryConfig(BMessage* data);
+	virtual						~BRepositoryConfig();
 
 	virtual	status_t			Archive(BMessage* data, bool deep = true) const;
 
@@ -52,7 +50,7 @@ public:
 			void				SetIsUserSpecific(bool isUserSpecific);
 
 public:
-	static	RepositoryConfig*	Instantiate(BMessage* data);
+	static	BRepositoryConfig*	Instantiate(BMessage* data);
 
 	static	const uint8			kDefaultPriority;
 	static	const char*			kNameField;
@@ -71,9 +69,7 @@ private:
 };
 
 
-}	// namespace Package
-
-}	// namespace Haiku
+}	// namespace BPackageKit
 
 
-#endif // _HAIKU__PACKAGE__REPOSITORY_CONFIG_H_
+#endif // _PACKAGE__REPOSITORY_CONFIG_H_

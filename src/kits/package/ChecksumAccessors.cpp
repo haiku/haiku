@@ -15,11 +15,9 @@
 #include <package/ChecksumAccessors.h>
 
 
-namespace Haiku {
+namespace BPackageKit {
 
-namespace Package {
-
-namespace Private {
+namespace BPrivate {
 
 
 #define NIBBLE_AS_HEX(nibble) \
@@ -129,8 +127,6 @@ GeneralFileChecksumAccessor::GetChecksum(BString& checksum) const
 }
 
 
-}	// namespace Private
+}	// namespace BPrivate
 
-}	// namespace Package
-
-}	// namespace Haiku
+}	// namespace BPackageKit

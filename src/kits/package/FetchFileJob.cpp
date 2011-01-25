@@ -15,14 +15,12 @@
 #include <Path.h>
 
 
-namespace Haiku {
+namespace BPackageKit {
 
-namespace Package {
-
-namespace Private {
+namespace BPrivate {
 
 
-FetchFileJob::FetchFileJob(const Context& context, const BString& title,
+FetchFileJob::FetchFileJob(const BContext& context, const BString& title,
 	const BString& fileURL, const BEntry& targetEntry)
 	:
 	inherited(context, title),
@@ -67,8 +65,6 @@ FetchFileJob::Cleanup(status_t jobResult)
 }
 
 
-}	// namespace Private
+}	// namespace BPrivate
 
-}	// namespace Package
-
-}	// namespace Haiku
+}	// namespace BPackageKit

@@ -20,18 +20,16 @@
 #include <Path.h>
 
 
-namespace Haiku {
-
-namespace Package {
+namespace BPackageKit {
 
 
-const uint8 RepositoryConfig::kDefaultPriority	= 50;
-const char* RepositoryConfig::kNameField 		= "name";
-const char* RepositoryConfig::kURLField 		= "url";
-const char* RepositoryConfig::kPriorityField 	= "priority";
+const uint8 BRepositoryConfig::kDefaultPriority	= 50;
+const char* BRepositoryConfig::kNameField 		= "name";
+const char* BRepositoryConfig::kURLField 		= "url";
+const char* BRepositoryConfig::kPriorityField 	= "priority";
 
 
-RepositoryConfig::RepositoryConfig()
+BRepositoryConfig::BRepositoryConfig()
 	:
 	fInitStatus(B_NO_INIT),
 	fPriority(kDefaultPriority),
@@ -40,13 +38,13 @@ RepositoryConfig::RepositoryConfig()
 }
 
 
-RepositoryConfig::RepositoryConfig(const BEntry& entry)
+BRepositoryConfig::BRepositoryConfig(const BEntry& entry)
 {
 	SetTo(entry);
 }
 
 
-RepositoryConfig::RepositoryConfig(BMessage* data)
+BRepositoryConfig::BRepositoryConfig(BMessage* data)
 	:
 	inherited(data)
 {
@@ -54,7 +52,7 @@ RepositoryConfig::RepositoryConfig(BMessage* data)
 }
 
 
-RepositoryConfig::RepositoryConfig(const BString& name, const BString& url,
+BRepositoryConfig::BRepositoryConfig(const BString& name, const BString& url,
 	uint8 priority)
 	:
 	fInitStatus(B_OK),
@@ -66,23 +64,23 @@ RepositoryConfig::RepositoryConfig(const BString& name, const BString& url,
 }
 
 
-RepositoryConfig::~RepositoryConfig()
+BRepositoryConfig::~BRepositoryConfig()
 {
 }
 
 
-/*static*/ RepositoryConfig*
-RepositoryConfig::Instantiate(BMessage* data)
+/*static*/ BRepositoryConfig*
+BRepositoryConfig::Instantiate(BMessage* data)
 {
-	if (validate_instantiation(data, "Haiku::Package::RepositoryConfig"))
-		return new (std::nothrow) RepositoryConfig(data);
+	if (validate_instantiation(data, "BPackageKit::BRepositoryConfig"))
+		return new (std::nothrow) BRepositoryConfig(data);
 
 	return NULL;
 }
 
 
 status_t
-RepositoryConfig::Archive(BMessage* data, bool deep) const
+BRepositoryConfig::Archive(BMessage* data, bool deep) const
 {
 	status_t result = inherited::Archive(data, deep);
 	if (result != B_OK)
@@ -100,7 +98,7 @@ RepositoryConfig::Archive(BMessage* data, bool deep) const
 
 
 status_t
-RepositoryConfig::StoreAsConfigFile(const BEntry& entry) const
+BRepositoryConfig::StoreAsConfigFile(const BEntry& entry) const
 {
 	BFile file(&entry, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
 	status_t result = file.InitCheck();
@@ -121,14 +119,14 @@ RepositoryConfig::StoreAsConfigFile(const BEntry& entry) const
 
 
 status_t
-RepositoryConfig::InitCheck() const
+BRepositoryConfig::InitCheck() const
 {
 	return fInitStatus;
 }
 
 
 status_t
-RepositoryConfig::SetTo(const BEntry& entry)
+BRepositoryConfig::SetTo(const BEntry& entry)
 {
 	fEntry = entry;
 	fInitStatus = B_NO_INIT;
@@ -189,7 +187,7 @@ RepositoryConfig::SetTo(const BEntry& entry)
 
 
 status_t
-RepositoryConfig::SetTo(const BMessage* data)
+BRepositoryConfig::SetTo(const BMessage* data)
 {
 	fInitStatus = B_NO_INIT;
 
@@ -213,68 +211,66 @@ RepositoryConfig::SetTo(const BMessage* data)
 
 
 const BString&
-RepositoryConfig::Name() const
+BRepositoryConfig::Name() const
 {
 	return fName;
 }
 
 
 const BString&
-RepositoryConfig::URL() const
+BRepositoryConfig::URL() const
 {
 	return fURL;
 }
 
 
 uint8
-RepositoryConfig::Priority() const
+BRepositoryConfig::Priority() const
 {
 	return fPriority;
 }
 
 
 bool
-RepositoryConfig::IsUserSpecific() const
+BRepositoryConfig::IsUserSpecific() const
 {
 	return fIsUserSpecific;
 }
 
 
 const BEntry&
-RepositoryConfig::Entry() const
+BRepositoryConfig::Entry() const
 {
 	return fEntry;
 }
 
 
 void
-RepositoryConfig::SetName(const BString& name)
+BRepositoryConfig::SetName(const BString& name)
 {
 	fName = name;
 }
 
 
 void
-RepositoryConfig::SetURL(const BString& url)
+BRepositoryConfig::SetURL(const BString& url)
 {
 	fURL = url;
 }
 
 
 void
-RepositoryConfig::SetPriority(uint8 priority)
+BRepositoryConfig::SetPriority(uint8 priority)
 {
 	fPriority = priority;
 }
 
 
 void
-RepositoryConfig::SetIsUserSpecific(bool isUserSpecific)
+BRepositoryConfig::SetIsUserSpecific(bool isUserSpecific)
 {
 	fIsUserSpecific = isUserSpecific;
 }
 
 
-}	// namespace Package
-
-}	// namespace Haiku
+}	// namespace BPackageKit

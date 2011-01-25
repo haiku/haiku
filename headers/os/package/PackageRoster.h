@@ -2,26 +2,23 @@
  * Copyright 2011, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _HAIKU__PACKAGE__ROSTER_H_
-#define _HAIKU__PACKAGE__ROSTER_H_
+#ifndef _PACKAGE__ROSTER_H_
+#define _PACKAGE__ROSTER_H_
 
 
 #include <Entry.h>
 #include <FindDirectory.h>
 #include <Path.h>
-#include <SupportDefs.h>
 
 
 template <class T> class BObjectList;
 
 
-namespace Haiku {
-
-namespace Package {
+namespace BPackageKit {
 
 
-struct RepositoryConfigVisitor {
-	virtual ~RepositoryConfigVisitor()
+struct BRepositoryConfigVisitor {
+	virtual ~BRepositoryConfigVisitor()
 	{
 	}
 
@@ -29,14 +26,14 @@ struct RepositoryConfigVisitor {
 };
 
 
-class RepositoryCache;
-class RepositoryConfig;
+class BRepositoryCache;
+class BRepositoryConfig;
 
 
-class Roster {
+class BPackageRoster {
 public:
-								Roster();
-								~Roster();
+								BPackageRoster();
+								~BPackageRoster();
 
 			status_t			GetCommonRepositoryCachePath(BPath* path,
 									bool create = false) const;
@@ -51,26 +48,24 @@ public:
 			status_t			GetRepositoryNames(BObjectList<BString>& names);
 
 			status_t			VisitCommonRepositoryConfigs(
-									RepositoryConfigVisitor& visitor);
+									BRepositoryConfigVisitor& visitor);
 			status_t			VisitUserRepositoryConfigs(
-									RepositoryConfigVisitor& visitor);
+									BRepositoryConfigVisitor& visitor);
 
 			status_t			GetRepositoryCache(const BString& name,
-									RepositoryCache* repositoryCache);
+									BRepositoryCache* repositoryCache);
 			status_t			GetRepositoryConfig(const BString& name,
-									RepositoryConfig* repositoryConfig);
+									BRepositoryConfig* repositoryConfig);
 private:
 			status_t			_GetRepositoryPath(BPath* path, bool create,
 									directory_which whichDir) const;
 			status_t			_VisitRepositoryConfigs(const BPath& path,
-									RepositoryConfigVisitor& visitor);
+									BRepositoryConfigVisitor& visitor);
 
 };
 
 
-}	// namespace Package
-
-}	// namespace Haiku
+}	// namespace BPackageKit
 
 
-#endif // _HAIKU__PACKAGE__ROSTER_H_
+#endif // _PACKAGE__ROSTER_H_

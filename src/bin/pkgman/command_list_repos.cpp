@@ -16,7 +16,7 @@
 #include <Path.h>
 
 #include <package/RepositoryConfig.h>
-#include <package/Roster.h>
+#include <package/PackageRoster.h>
 
 #include "pkgman.h"
 
@@ -24,7 +24,7 @@
 // TODO: internationalization!
 
 
-using namespace Haiku::Package;
+using namespace BPackageKit;
 
 
 static const char* kCommandUsage =
@@ -80,14 +80,14 @@ command_list_repos(int argc, const char* const* argv)
 		print_command_usage_and_exit(true);
 
 	BObjectList<BString> repositoryNames(20, true);
-	Roster roster;
+	BPackageRoster roster;
 	status_t result = roster.GetRepositoryNames(repositoryNames);
 	if (result != B_OK)
 		DIE(result, "can't collect repository names");
 
 	for (int i = 0; i < repositoryNames.CountItems(); ++i) {
 		const BString& repoName = *(repositoryNames.ItemAt(i));
-		RepositoryConfig repoConfig;
+		BRepositoryConfig repoConfig;
 		result = roster.GetRepositoryConfig(repoName, &repoConfig);
 		if (result != B_OK) {
 			BPath path;
