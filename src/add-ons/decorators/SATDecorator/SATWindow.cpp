@@ -57,6 +57,9 @@ GroupCookie::~GroupCookie()
 }
 
 
+const float kBigOffset = 5000;
+
+
 void
 GroupCookie::DoGroupLayout(SATWindow* triggerWindow)
 {
@@ -64,25 +67,25 @@ GroupCookie::DoGroupLayout(SATWindow* triggerWindow)
 		return;
 
 	BRect frame = triggerWindow->CompleteWindowFrame();
+	// Make it also work for solver which don't support negative variables
+	frame.OffsetBy(kBigOffset, kBigOffset);
 
 	// adjust window size soft constraints
 	fWidthConstraint->SetRightSide(frame.Width());
 	fHeightConstraint->SetRightSide(frame.Height());
 
+	LinearSpec* linearSpec = fSATGroup->GetLinearSpec();
+	fLeftConstraint = linearSpec->AddConstraint(1.0, fLeftBorder, kEQ,
+		frame.left);
+	fTopConstraint  = linearSpec->AddConstraint(1.0, fTopBorder, kEQ,
+		frame.top);
+
 	// adjust window position soft constraints
 	// (a bit more penalty for them so they take precedence)
-	fLeftConstraint->SetRightSide(frame.left);
-	fTopConstraint->SetRightSide(frame.top);
-
-	fWidthConstraint->SetPenaltyNeg(110);
-	fWidthConstraint->SetPenaltyPos(110);
-	fHeightConstraint->SetPenaltyNeg(110);
-	fHeightConstraint->SetPenaltyPos(110);
-
-	fLeftConstraint->SetPenaltyNeg(100);
-	fLeftConstraint->SetPenaltyPos(100);
-	fTopConstraint->SetPenaltyNeg(100);
-	fTopConstraint->SetPenaltyPos(100);
+	fWidthConstraint->SetPenaltyNeg(-1);
+	fWidthConstraint->SetPenaltyPos(-1);
+	fHeightConstraint->SetPenaltyNeg(-1);
+	fHeightConstraint->SetPenaltyPos(-1);
 
 	// After we set the new parameter solve and apply the new layout.
 	ResultType result;
@@ -105,10 +108,10 @@ GroupCookie::DoGroupLayout(SATWindow* triggerWindow)
 	fHeightConstraint->SetPenaltyNeg(kExtentPenalty);
 	fHeightConstraint->SetPenaltyPos(kExtentPenalty);
 
-	fLeftConstraint->SetPenaltyNeg(1);
-	fLeftConstraint->SetPenaltyPos(1);
-	fTopConstraint->SetPenaltyNeg(1);
-	fTopConstraint->SetPenaltyPos(1);
+	linearSpec->RemoveConstraint(fLeftConstraint);
+	fLeftConstraint = NULL;
+	linearSpec->RemoveConstraint(fTopConstraint);
+	fTopConstraint = NULL;
 }
 
 
@@ -119,14 +122,18 @@ GroupCookie::MoveWindow(int32 workspace)
 	Desktop* desktop = window->Desktop();
 
 	BRect frame = fSATWindow->CompleteWindowFrame();
-	desktop->MoveWindowBy(window, round(fLeftBorder->Value() - frame.left),
-		round(fTopBorder->Value() - frame.top), workspace);
+	BRect frameSAT(fLeftBorder->Value() - kBigOffset,
+		fTopBorder->Value() - kBigOffset, fRightBorder->Value() - kBigOffset,
+		fBottomBorder->Value() - kBigOffset);
+
+	desktop->MoveWindowBy(window, round(frameSAT.left - frame.left),
+		round(frameSAT.top - frame.top), workspace);
 
 	// Update frame to the new position
-	frame.OffsetBy(round(fLeftBorder->Value() - frame.left),
-		round(fTopBorder->Value() - frame.top));
-	desktop->ResizeWindowBy(window, round(fRightBorder->Value() - frame.right),
-		round(fBottomBorder->Value() - frame.bottom));
+	frame.OffsetBy(round(frameSAT.left - frame.left),
+		round(frameSAT.top - frame.top));
+	desktop->ResizeWindowBy(window, round(frameSAT.right - frame.right),
+		round(frameSAT.bottom - frame.bottom));
 
 	_UpdateWindowSize(frame);
 }
@@ -164,10 +171,6 @@ GroupCookie::Init(SATGroup* group, WindowArea* area)
 
 	// create constraints
 	BRect frame = fSATWindow->CompleteWindowFrame();
-	fLeftConstraint = linearSpec->AddConstraint(1.0, fLeftBorder, kEQ,
-		frame.left, 1, 1);
-	fTopConstraint  = linearSpec->AddConstraint(1.0, fTopBorder, kEQ,
-		frame.top, 1, 1);
 
 	int32 minWidth, maxWidth, minHeight, maxHeight;
 	fSATWindow->GetSizeLimits(&minWidth, &maxWidth, &minHeight,
@@ -187,7 +190,7 @@ GroupCookie::Init(SATGroup* group, WindowArea* area)
 		fBottomBorder, kEQ, frame.Height(), kExtentPenalty,
 		kExtentPenalty);
 
-	if (!fLeftConstraint || !fTopConstraint || !fMinWidthConstraint
+	if (!fMinWidthConstraint
 		|| !fMinHeightConstraint || !fWidthConstraint || !fHeightConstraint) {
 		// clean up
 		Uninit();
