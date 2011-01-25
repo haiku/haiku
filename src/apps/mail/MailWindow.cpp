@@ -3092,7 +3092,7 @@ TMailWindow::_BuildQueryString(BEntry* entry) const
 		{
 			int32 count = 1;
 			if (node.ReadAttr(kAttrQueryInitialNumAttrs, B_INT32_TYPE, 0,
-					(int32 *)&mode, sizeof(int32)) <= 0) {
+					(int32 *)&count, sizeof(int32)) <= 0) {
 				count = 1;
 			}
 
