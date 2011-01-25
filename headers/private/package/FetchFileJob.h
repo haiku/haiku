@@ -18,7 +18,7 @@ namespace BPrivate {
 
 
 class FetchFileJob : public BJob {
-	typedef	BJob					inherited;
+	typedef	BJob				inherited;
 
 public:
 								FetchFileJob(const BContext& context,

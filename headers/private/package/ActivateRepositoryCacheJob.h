@@ -19,7 +19,7 @@ namespace BPrivate {
 
 
 class ActivateRepositoryCacheJob : public BJob {
-	typedef	BJob					inherited;
+	typedef	BJob				inherited;
 
 public:
 								ActivateRepositoryCacheJob(

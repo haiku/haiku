@@ -9,8 +9,6 @@
 
 #include <package/RepositoryCache.h>
 
-#include <stdlib.h>
-
 #include <new>
 
 #include <Directory.h>
@@ -31,8 +29,10 @@ BRepositoryCache::BRepositoryCache()
 
 
 BRepositoryCache::BRepositoryCache(const BEntry& entry)
+	:
+	fIsUserSpecific(false)
 {
-	SetTo(entry);
+	fInitStatus = SetTo(entry);
 }
 
 
@@ -55,6 +55,13 @@ BRepositoryCache::Entry() const
 }
 
 
+const BRepositoryHeader&
+BRepositoryCache::Header() const
+{
+	return fHeader;
+}
+
+
 bool
 BRepositoryCache::IsUserSpecific() const
 {
@@ -73,7 +80,6 @@ status_t
 BRepositoryCache::SetTo(const BEntry& entry)
 {
 	fEntry = entry;
-	fInitStatus = B_NO_INIT;
 
 	BFile file(&entry, B_READ_ONLY);
 	status_t result = file.InitCheck();
@@ -84,7 +90,8 @@ BRepositoryCache::SetTo(const BEntry& entry)
 	if ((result = headerMsg.Unflatten(&file)) != B_OK)
 		return result;
 
-	// TODO: unarchive header and read packages
+	if ((result = fHeader.SetTo(&headerMsg)) != B_OK)
+		return result;
 
 	BPath userSettingsPath;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &userSettingsPath) == B_OK) {
@@ -93,10 +100,30 @@ BRepositoryCache::SetTo(const BEntry& entry)
 	} else
 		fIsUserSpecific = false;
 
-	fInitStatus = B_OK;
-
 	return B_OK;
 }
+
+
+//status_t
+//BRepositoryCache::_ReadPackageHeaders()
+//{
+////	if (fPackageHeaders != NULL)
+////		return B_OK;
+//
+//	BFile file(&fEntry, B_READ_ONLY);
+//	status_t result = file.InitCheck();
+//	if (result != B_OK)
+//		return result;
+//
+//	BMessage headerMsg;
+//	if ((result = headerMsg.Unflatten(&file)) != B_OK)
+//		return result;
+//
+//
+//	// TODO: read packages!
+//
+//	return B_OK;
+//}
 
 
 }	// namespace BPackageKit

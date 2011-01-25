@@ -5,7 +5,7 @@
 #include <Message.h>
 #include <String.h>
 
-#include <package/RepositoryConfig.h>
+#include <package/RepositoryHeader.h>
 
 
 using namespace BPackageKit;
@@ -20,22 +20,21 @@ main(int argc, const char** argv)
 		return 1;
 	}
 
-	BRepositoryConfig repoConfig(argv[1], argv[2], atoi(argv[3]));
-	status_t status = repoConfig.InitCheck();
-	if (status != B_OK) {
-		fprintf(stderr, "couldn't initialize repository-config\n");
-		return 1;
-	}
+	BRepositoryHeader repoHeader;
+	repoHeader.SetName(argv[1]);
+	repoHeader.SetOriginalBaseURL(argv[2]);
+	repoHeader.SetPriority(atoi(argv[3]));
 
-	BMessage repoConfigArchive;
-	if ((status = repoConfig.Archive(&repoConfigArchive)) != B_OK) {
-		fprintf(stderr, "couldn't archive repository-config\n");
+	BMessage repoHeaderArchive;
+	status_t result = repoHeader.Archive(&repoHeaderArchive);
+	if (result != B_OK) {
+		fprintf(stderr, "couldn't archive repository-header\n");
 		return 1;
 	}
 
 	BFile output(argv[1], B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
-	if ((status = repoConfigArchive.Flatten(&output)) != B_OK) {
-		fprintf(stderr, "couldn't flatten repository-config archive\n");
+	if ((result = repoHeaderArchive.Flatten(&output)) != B_OK) {
+		fprintf(stderr, "couldn't flatten repository-header archive\n");
 		return 1;
 	}
 
@@ -69,8 +68,8 @@ main(int argc, const char** argv)
 			}
 		}
 
-		status = pkg.Flatten(&output);
-		if (status != B_OK) {
+		result = pkg.Flatten(&output);
+		if (result != B_OK) {
 			fprintf(stderr, "couldn't flatten pkg message #%d\n", i + 1);
 			return 1;
 		}

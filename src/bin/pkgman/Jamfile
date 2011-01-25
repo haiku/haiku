@@ -4,6 +4,7 @@ UsePrivateHeaders support ;
 
 BinCommand pkgman :
 	command_add_repo.cpp
+	command_drop_repo.cpp
 	command_list_repos.cpp
 	command_refresh.cpp
 	DecisionProvider.cpp

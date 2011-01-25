@@ -20,7 +20,7 @@ namespace BPrivate {
 
 
 class ValidateChecksumJob : public BJob {
-	typedef	BJob					inherited;
+	typedef	BJob				inherited;
 
 public:
 								ValidateChecksumJob(

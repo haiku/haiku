@@ -19,13 +19,13 @@ namespace BPrivate {
 
 
 class ActivateRepositoryConfigJob : public BJob {
-	typedef	BJob					inherited;
+	typedef	BJob				inherited;
 
 public:
 								ActivateRepositoryConfigJob(
 									const BContext& context,
 									const BString& title,
-									const BEntry& archivedRepoConfigEntry,
+									const BEntry& archivedRepoHeaderEntry,
 									const BString& repositoryBaseURL,
 									const BDirectory& targetDirectory);
 	virtual						~ActivateRepositoryConfigJob();
@@ -37,7 +37,7 @@ protected:
 	virtual	void				Cleanup(status_t jobResult);
 
 private:
-			BEntry				fArchivedRepoConfigEntry;
+			BEntry				fArchivedRepoHeaderEntry;
 			BString				fRepositoryBaseURL;
 			BDirectory			fTargetDirectory;
 			BEntry				fTargetEntry;

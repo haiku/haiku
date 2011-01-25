@@ -6,62 +6,46 @@
 #define _PACKAGE__REPOSITORY_CONFIG_H_
 
 
-#include <Archivable.h>
 #include <Entry.h>
 #include <String.h>
-
-
-class BEntry;
 
 
 namespace BPackageKit {
 
 
-class BRepositoryConfig : public BArchivable {
-	typedef	BArchivable			inherited;
-
+class BRepositoryConfig {
 public:
 								BRepositoryConfig();
 								BRepositoryConfig(const BString& name,
-									const BString& url,
-									uint8 priority = kDefaultPriority);
+									const BString& url, uint8 priority);
 								BRepositoryConfig(const BEntry& entry);
-								BRepositoryConfig(BMessage* data);
 	virtual						~BRepositoryConfig();
 
-	virtual	status_t			Archive(BMessage* data, bool deep = true) const;
-
-			status_t			StoreAsConfigFile(const BEntry& entry) const;
+			status_t			Store(const BEntry& entry) const;
 
 			status_t			SetTo(const BEntry& entry);
-			status_t			SetTo(const BMessage* data);
 			status_t			InitCheck() const;
 
 			const BString&		Name() const;
-			const BString&		URL() const;
+			const BString&		BaseURL() const;
 			uint8				Priority() const;
 			bool				IsUserSpecific() const;
 
 			const BEntry&		Entry() const;
 
 			void				SetName(const BString& name);
-			void				SetURL(const BString& url);
+			void				SetBaseURL(const BString& url);
 			void				SetPriority(uint8 priority);
 			void				SetIsUserSpecific(bool isUserSpecific);
 
 public:
-	static	BRepositoryConfig*	Instantiate(BMessage* data);
-
-	static	const uint8			kDefaultPriority;
-	static	const char*			kNameField;
-	static	const char*			kURLField;
-	static	const char*			kPriorityField;
+	static	const uint8			kUnsetPriority = 0;
 
 private:
 			status_t			fInitStatus;
 
 			BString				fName;
-			BString				fURL;
+			BString				fBaseURL;
 			uint8				fPriority;
 			bool				fIsUserSpecific;
 

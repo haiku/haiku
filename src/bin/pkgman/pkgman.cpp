@@ -53,16 +53,16 @@ main(int argc, const char* const* argv)
 		print_usage_and_exit(true);
 
 	const char* command = argv[1];
-	if (strcmp(command, "add-repo") == 0 || strcmp(command, "ar") == 0)
+	if (strncmp(command, "add-r", 5) == 0)
 		return command_add_repo(argc - 1, argv + 1);
 
-//	if (strcmp(command, "drop-repo") == 0)
-//		return command_drop_repo(argc - 1, argv + 1);
+	if (strncmp(command, "drop-r", 6) == 0)
+		return command_drop_repo(argc - 1, argv + 1);
 
-	if (strcmp(command, "list-repos") == 0 || strcmp(command, "lr") == 0)
+	if (strncmp(command, "list-r", 6) == 0)
 		return command_list_repos(argc - 1, argv + 1);
 
-	if (strcmp(command, "refresh") == 0)
+	if (strncmp(command, "refr", 4) == 0)
 		return command_refresh(argc - 1, argv + 1);
 
 //	if (strcmp(command, "search") == 0)

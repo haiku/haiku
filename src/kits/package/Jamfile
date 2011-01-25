@@ -10,14 +10,16 @@ SharedLibrary libpackage.so
 	Attributes.cpp
 	ChecksumAccessors.cpp
 	Context.cpp
+	DropRepositoryRequest.cpp
 	FetchFileJob.cpp
 	Job.cpp
 	JobQueue.cpp
 	PackageRoster.cpp
 	RefreshRepositoryRequest.cpp
+	RemoveRepositoryJob.cpp
 	RepositoryCache.cpp
 	RepositoryConfig.cpp
-#	RepositoryHeader.cpp
+	RepositoryHeader.cpp
 	Request.cpp
 	TempfileManager.cpp
 	ValidateChecksumJob.cpp

@@ -23,16 +23,10 @@
 namespace BPackageKit {
 
 
-const uint8 BRepositoryConfig::kDefaultPriority	= 50;
-const char* BRepositoryConfig::kNameField 		= "name";
-const char* BRepositoryConfig::kURLField 		= "url";
-const char* BRepositoryConfig::kPriorityField 	= "priority";
-
-
 BRepositoryConfig::BRepositoryConfig()
 	:
 	fInitStatus(B_NO_INIT),
-	fPriority(kDefaultPriority),
+	fPriority(kUnsetPriority),
 	fIsUserSpecific(false)
 {
 }
@@ -44,20 +38,12 @@ BRepositoryConfig::BRepositoryConfig(const BEntry& entry)
 }
 
 
-BRepositoryConfig::BRepositoryConfig(BMessage* data)
-	:
-	inherited(data)
-{
-	SetTo(data);
-}
-
-
-BRepositoryConfig::BRepositoryConfig(const BString& name, const BString& url,
-	uint8 priority)
+BRepositoryConfig::BRepositoryConfig(const BString& name,
+	const BString& baseURL, uint8 priority)
 	:
 	fInitStatus(B_OK),
 	fName(name),
-	fURL(url),
+	fBaseURL(baseURL),
 	fPriority(priority),
 	fIsUserSpecific(false)
 {
@@ -69,36 +55,8 @@ BRepositoryConfig::~BRepositoryConfig()
 }
 
 
-/*static*/ BRepositoryConfig*
-BRepositoryConfig::Instantiate(BMessage* data)
-{
-	if (validate_instantiation(data, "BPackageKit::BRepositoryConfig"))
-		return new (std::nothrow) BRepositoryConfig(data);
-
-	return NULL;
-}
-
-
 status_t
-BRepositoryConfig::Archive(BMessage* data, bool deep) const
-{
-	status_t result = inherited::Archive(data, deep);
-	if (result != B_OK)
-		return result;
-
-	if ((result = data->AddString(kNameField, fName)) != B_OK)
-		return result;
-	if ((result = data->AddString(kURLField, fURL)) != B_OK)
-		return result;
-	if ((result = data->AddUInt8(kPriorityField, fPriority)) != B_OK)
-		return result;
-
-	return B_OK;
-}
-
-
-status_t
-BRepositoryConfig::StoreAsConfigFile(const BEntry& entry) const
+BRepositoryConfig::Store(const BEntry& entry) const
 {
 	BFile file(&entry, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
 	status_t result = file.InitCheck();
@@ -107,7 +65,7 @@ BRepositoryConfig::StoreAsConfigFile(const BEntry& entry) const
 
 	BString configString;
 	configString
-		<< "url=" << fURL << "\n"
+		<< "url=" << fBaseURL << "\n"
 		<< "priority=" << fPriority << "\n";
 
 	int32 size = configString.Length();
@@ -169,9 +127,9 @@ BRepositoryConfig::SetTo(const BEntry& entry)
 		return result;
 
 	fName = name;
-	fURL = url;
+	fBaseURL = url;
 	fPriority = priorityString == NULL
-		? kDefaultPriority : atoi(priorityString);
+		? kUnsetPriority : atoi(priorityString);
 
 	BPath userSettingsPath;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &userSettingsPath) == B_OK) {
@@ -179,30 +137,6 @@ BRepositoryConfig::SetTo(const BEntry& entry)
 		fIsUserSpecific = userSettingsDir.Contains(&entry);
 	} else
 		fIsUserSpecific = false;
-
-	fInitStatus = B_OK;
-
-	return B_OK;
-}
-
-
-status_t
-BRepositoryConfig::SetTo(const BMessage* data)
-{
-	fInitStatus = B_NO_INIT;
-
-	if (data == NULL)
-		return B_BAD_VALUE;
-
-	status_t result;
-	if ((result = data->FindString(kNameField, &fName)) != B_OK)
-		return result;
-	if ((result = data->FindString(kURLField, &fURL)) != B_OK)
-		return result;
-	if ((result = data->FindUInt8(kPriorityField, &fPriority)) != B_OK)
-		return result;
-
-	fIsUserSpecific = false;
 
 	fInitStatus = B_OK;
 
@@ -218,9 +152,9 @@ BRepositoryConfig::Name() const
 
 
 const BString&
-BRepositoryConfig::URL() const
+BRepositoryConfig::BaseURL() const
 {
-	return fURL;
+	return fBaseURL;
 }
 
 
@@ -253,9 +187,9 @@ BRepositoryConfig::SetName(const BString& name)
 
 
 void
-BRepositoryConfig::SetURL(const BString& url)
+BRepositoryConfig::SetBaseURL(const BString& baseURL)
 {
-	fURL = url;
+	fBaseURL = baseURL;
 }
 
 

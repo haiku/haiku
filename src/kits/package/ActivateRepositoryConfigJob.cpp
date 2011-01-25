@@ -10,9 +10,13 @@
 #include <package/ActivateRepositoryConfigJob.h>
 
 #include <File.h>
+#include <Message.h>
+
+#include <AutoDeleter.h>
 
 #include <package/Context.h>
 #include <package/RepositoryConfig.h>
+#include <package/RepositoryHeader.h>
 
 
 namespace BPackageKit {
@@ -22,11 +26,11 @@ namespace BPrivate {
 
 ActivateRepositoryConfigJob::ActivateRepositoryConfigJob(
 	const BContext& context, const BString& title,
-	const BEntry& archivedRepoConfigEntry, const BString& repositoryBaseURL,
+	const BEntry& archivedRepoHeaderEntry, const BString& repositoryBaseURL,
 	const BDirectory& targetDirectory)
 	:
 	inherited(context, title),
-	fArchivedRepoConfigEntry(archivedRepoConfigEntry),
+	fArchivedRepoHeaderEntry(archivedRepoHeaderEntry),
 	fRepositoryBaseURL(repositoryBaseURL),
 	fTargetDirectory(targetDirectory)
 {
@@ -41,7 +45,7 @@ ActivateRepositoryConfigJob::~ActivateRepositoryConfigJob()
 status_t
 ActivateRepositoryConfigJob::Execute()
 {
-	BFile archiveFile(&fArchivedRepoConfigEntry, B_READ_ONLY);
+	BFile archiveFile(&fArchivedRepoHeaderEntry, B_READ_ONLY);
 	status_t result = archiveFile.InitCheck();
 	if (result != B_OK)
 		return result;
@@ -50,16 +54,17 @@ ActivateRepositoryConfigJob::Execute()
 	if ((result = archive.Unflatten(&archiveFile)) != B_OK)
 		return result;
 
-	BRepositoryConfig* repoConfig = BRepositoryConfig::Instantiate(&archive);
-	if (repoConfig == NULL)
+	BRepositoryHeader* repoHeader = BRepositoryHeader::Instantiate(&archive);
+	if (repoHeader == NULL)
 		return B_BAD_DATA;
-	if ((result = repoConfig->InitCheck()) != B_OK)
+	ObjectDeleter<BRepositoryHeader> repoHeaderDeleter(repoHeader);
+	if ((result = repoHeader->InitCheck()) != B_OK)
 		return result;
 
-	fTargetEntry.SetTo(&fTargetDirectory, repoConfig->Name().String());
+	fTargetEntry.SetTo(&fTargetDirectory, repoHeader->Name().String());
 	if (fTargetEntry.Exists()) {
 		BString description = BString("A repository configuration for ")
-			<< repoConfig->Name() << " already exists.";
+			<< repoHeader->Name() << " already exists.";
 		BString question("overwrite?");
 		bool yes = fContext.DecisionProvider().YesNoDecisionNeeded(
 			description, question, "yes", "no", "no");
@@ -69,13 +74,17 @@ ActivateRepositoryConfigJob::Execute()
 		}
 	}
 
-	// inject the URL that was actually used and write the config file
-	repoConfig->SetURL(fRepositoryBaseURL);
-	if ((result = repoConfig->StoreAsConfigFile(fTargetEntry)) != B_OK)
+	// create and store the configuration (injecting the BaseURL that was
+	// actually used)
+	BRepositoryConfig repoConfig;
+	repoConfig.SetName(repoHeader->Name());
+	repoConfig.SetBaseURL(fRepositoryBaseURL);
+	repoConfig.SetPriority(repoHeader->Priority());
+	if ((result = repoConfig.Store(fTargetEntry)) != B_OK)
 		return result;
 
 	// store name of activated repository as result
-	fRepositoryName = repoConfig->Name();
+	fRepositoryName = repoConfig.Name();
 
 	return B_OK;
 }

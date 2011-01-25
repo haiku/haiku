@@ -9,8 +9,7 @@
 #include <Entry.h>
 #include <String.h>
 
-
-class BEntry;
+#include <package/RepositoryHeader.h>
 
 
 namespace BPackageKit {
@@ -28,7 +27,7 @@ public:
 			status_t			SetTo(const BEntry& entry);
 			status_t			InitCheck() const;
 
-//			const RepositoryHeader*	Header() const;
+			const BRepositoryHeader&	Header() const;
 			const BEntry&		Entry() const;
 			bool				IsUserSpecific() const;
 
@@ -38,7 +37,7 @@ private:
 			status_t			fInitStatus;
 
 			BEntry				fEntry;
-//			RepositoryHeader*	fHeader;
+			BRepositoryHeader	fHeader;
 			bool				fIsUserSpecific;
 };
 

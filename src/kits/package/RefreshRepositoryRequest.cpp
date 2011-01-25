@@ -58,10 +58,10 @@ BRefreshRepositoryRequest::CreateInitialJobs()
 	if (result != B_OK)
 		return result;
 	BString repoChecksumURL
-		= BString(fRepoConfig.URL()) << "/" << "repo.sha256";
+		= BString(fRepoConfig.BaseURL()) << "/" << "repo.sha256";
 	FetchFileJob* fetchChecksumJob = new (std::nothrow) FetchFileJob(
 		fContext,
-		BString("Fetching repository checksum from ") << fRepoConfig.URL(),
+		BString("Fetching repository checksum from ") << fRepoConfig.BaseURL(),
 		repoChecksumURL, fFetchedChecksumFile);
 	if (fetchChecksumJob == NULL)
 		return B_NO_MEMORY;
@@ -119,9 +119,9 @@ BRefreshRepositoryRequest::_FetchRepositoryCache()
 	status_t result = fContext.GetNewTempfile("repocache-", &tempRepoCache);
 	if (result != B_OK)
 		return result;
-	BString repoCacheURL = BString(fRepoConfig.URL()) << "/" << "repo";
+	BString repoCacheURL = BString(fRepoConfig.BaseURL()) << "/" << "repo";
 	FetchFileJob* fetchCacheJob = new (std::nothrow) FetchFileJob(fContext,
-		BString("Fetching repository-cache from ") << fRepoConfig.URL(),
+		BString("Fetching repository-cache from ") << fRepoConfig.BaseURL(),
 		repoCacheURL, tempRepoCache);
 	if (fetchCacheJob == NULL)
 		return B_NO_MEMORY;
