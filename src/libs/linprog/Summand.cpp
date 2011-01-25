@@ -57,6 +57,13 @@ Summand::SetVar(Variable* var)
 }
 
 
+int32
+Summand::VariableIndex()
+{
+	return fVar->Index();
+}
+
+
 /**
  * Destructor.
  */

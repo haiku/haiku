@@ -27,6 +27,7 @@ public:
 			Variable*			Var();
 			void				SetVar(Variable* var);
 
+			int32				VariableIndex();
 private:
 			double				fCoeff;
 			Variable*			fVar;

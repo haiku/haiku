@@ -599,18 +599,23 @@ Area::Area(BLayoutItem* item)
 /**
  * Initialize variables.
  */
+#if USE_SCALE_VARIABLE
 void
 Area::_Init(LinearSpec* ls, XTab* left, YTab* top, XTab* right, YTab* bottom,
 	Variable* scaleWidth, Variable* scaleHeight)
 {
+	fScaleWidth = scaleWidth;
+	fScaleHeight = scaleHeight;
+#else
+void
+Area::_Init(LinearSpec* ls, XTab* left, YTab* top, XTab* right, YTab* bottom)
+{
+#endif
 	fLS = ls;
 	fLeft = left;
 	fRight = right;
 	fTop = top;
 	fBottom = bottom;
-
-	fScaleWidth = scaleWidth;
-	fScaleHeight = scaleHeight;
 
 	// adds the two essential constraints of the area that make sure that the
 	// left x-tab is really to the left of the right x-tab, and the top y-tab
@@ -621,6 +626,7 @@ Area::_Init(LinearSpec* ls, XTab* left, YTab* top, XTab* right, YTab* bottom,
 	fConstraints.AddItem(fMinContentWidth);
 	fConstraints.AddItem(fMinContentHeight);
 
+#if USE_SCALE_VARIABLE
 	fPreferredContentWidth = fLS->AddConstraint(-1.0, fLeft, 1.0, fRight, -1.0,
 		fScaleWidth, kEQ, 0, fShrinkPenalties.Width(),
 		fGrowPenalties.Width());
@@ -628,18 +634,34 @@ Area::_Init(LinearSpec* ls, XTab* left, YTab* top, XTab* right, YTab* bottom,
 	fPreferredContentHeight = fLS->AddConstraint(-1.0, fTop, 1.0, fBottom, -1.0,
 		fScaleHeight, kEQ, 0, fShrinkPenalties.Height(),
 		fGrowPenalties.Height());
+#else
+	BSize preferredSize = fLayoutItem->PreferredSize();
+	fPreferredContentWidth = fLS->AddConstraint(-1.0, fLeft, 1.0, fRight, kEQ,
+		0, fShrinkPenalties.Width(), fGrowPenalties.Width());
+	_UpdatePreferredWidthConstraint(preferredSize);
+	fPreferredContentHeight = fLS->AddConstraint(-1.0, fTop, 1.0, fBottom, kEQ,
+		0, fShrinkPenalties.Height(), fGrowPenalties.Height());
+	_UpdatePreferredHeightConstraint(preferredSize);
+#endif
 
 	fConstraints.AddItem(fPreferredContentWidth);
 	fConstraints.AddItem(fPreferredContentHeight);
 }
 
 
+#if USE_SCALE_VARIABLE
 void
 Area::_Init(LinearSpec* ls, Row* row, Column* column, Variable* scaleWidth,
 	Variable* scaleHeight)
 {
 	_Init(ls, column->Left(), row->Top(), column->Right(), row->Bottom(),
 		scaleWidth, scaleHeight);
+#else
+void
+Area::_Init(LinearSpec* ls, Row* row, Column* column)
+{
+	_Init(ls, column->Left(), row->Top(), column->Right(), row->Bottom());
+#endif
 	fRow = row;
 	fColumn = column;
 }
@@ -723,22 +745,28 @@ Area::_UpdateMaxSizeConstraint(BSize max)
 void
 Area::_UpdatePreferredWidthConstraint(BSize& preferred)
 {
-	float width = 32000;
+	float width = 0;
 	if (preferred.width > 0)
 		width = preferred.Width() + LeftInset() + RightInset();
-	
+#if USE_SCALE_VARIABLE
 	fPreferredContentWidth->SetLeftSide(-1.0, fLeft, 1.0, fRight, -width,
 		fScaleWidth);
+#else
+	fPreferredContentWidth->SetRightSide(width);
+#endif
 }
 
 
 void
 Area::_UpdatePreferredHeightConstraint(BSize& preferred)
 {
-	float height = 32000;
+	float height = 0;
 	if (preferred.height > 0)
 		height = preferred.Height() + TopInset() + BottomInset();
-
+#if USE_SCALE_VARIABLE
 	fPreferredContentHeight->SetLeftSide(-1.0, fTop, 1.0, fBottom, -height,
 		fScaleHeight);
+#else
+	fPreferredContentHeight->SetRightSide(height);
+#endif
 }

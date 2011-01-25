@@ -34,11 +34,10 @@ int32
 Constraint::Index() const
 {
 	int32 i = fLS->Constraints().IndexOf(this);
-	if (i == -1) {
+	if (i == -1)
 		STRACE(("Constraint not part of fLS->Constraints()."));
-		return -1;
-	}
-	return i + 1;
+
+	return i;
 }
 
 
@@ -222,22 +221,7 @@ Constraint::SetPenaltyNeg(double value)
 {
 	fPenaltyNeg = value;
 
-	if (!fIsValid)
-		return;
-
-	if (fDNegObjSummand == NULL) {
-		fDNegObjSummand = new(std::nothrow) Summand(value, fLS->AddVariable());
-		fLS->ObjectiveFunction()->AddItem(fDNegObjSummand);
-		fLS->UpdateLeftSide(this);
-		fLS->UpdateObjectiveFunction();
-		return;
-	}
-
-	if (value == fDNegObjSummand->Coeff())
-		return;
-
-	fDNegObjSummand->SetCoeff(value);
-	fLS->UpdateObjectiveFunction();
+	fLS->UpdateLeftSide(this);
 }
 
 
@@ -263,22 +247,7 @@ Constraint::SetPenaltyPos(double value)
 {
 	fPenaltyPos = value;
 
-	if (!fIsValid)
-		return;
-
-	if (fDPosObjSummand == NULL) {
-		fDPosObjSummand = new(std::nothrow) Summand(value, fLS->AddVariable());
-		fLS->ObjectiveFunction()->AddItem(fDPosObjSummand);
-		fLS->UpdateLeftSide(this);
-		fLS->UpdateObjectiveFunction();
-		return;
-	}
-
-	if (value == fDPosObjSummand->Coeff())
-		return;
-
-	fDPosObjSummand->SetCoeff(value);
-	fLS->UpdateObjectiveFunction();
+	fLS->UpdateLeftSide(this);
 }
 
 
@@ -293,47 +262,6 @@ void
 Constraint::SetLabel(const char* label)
 {
 	fLabel = label;
-}
-
-
-void
-Constraint::WriteXML(BFile* file)
-{
-	if (!file->IsWritable())
-		return;
-
-	char buffer[200];
-
-	file->Write(buffer, sprintf(buffer, "\t<constraint>\n"));
-	file->Write(buffer, sprintf(buffer, "\t\t<leftside>\n"));
-
-	Summand* summand;
-	for (int32 i = 0; i < fLeftSide->CountItems(); i++) {
-		summand = (Summand*)fLeftSide->ItemAt(i);
-		file->Write(buffer, sprintf(buffer, "\t\t\t<summand>\n"));
-		file->Write(buffer, sprintf(buffer, "\t\t\t\t<coeff>%f</coeff>\n",
-			summand->Coeff()));
-		BString varStr = *(summand->Var());
-		file->Write(buffer, sprintf(buffer, "\t\t\t\t<var>%s</var>\n",
-			varStr.String()));
-		file->Write(buffer, sprintf(buffer, "\t\t\t</summand>\n"));
-	}
-
-	file->Write(buffer, sprintf(buffer, "\t\t</leftside>\n"));
-
-	const char* op = "??";
-	if (fOp == kEQ)
-		op = "EQ";
-	else if (fOp == kLE)
-		op = "LE";
-	else if (fOp == kGE)
-		op = "GE";
-
-	file->Write(buffer, sprintf(buffer, "\t\t<op>%s</op>\n", op));
-	file->Write(buffer, sprintf(buffer, "\t\t<rightside>%f</rightside>\n", fRightSide));
-	//~ file->Write(buffer, sprintf(buffer, "\t\t<penaltyneg>%s</penaltyneg>\n", PenaltyNeg()));
-	//~ file->Write(buffer, sprintf(buffer, "\t\t<penaltypos>%s</penaltypos>\n", PenaltyPos()));
-	file->Write(buffer, sprintf(buffer, "\t</constraint>\n"));
 }
 
 
@@ -362,6 +290,18 @@ Constraint::DPos() const
 	if (fDPosObjSummand == NULL)
 		return NULL;
 	return fDPosObjSummand->Var();
+}
+
+
+bool
+Constraint::IsSoft() const
+{
+	if (fPenaltyNeg > 0. && fOp != kLE)
+		return true;
+		
+	if (fPenaltyPos > 0. && fOp != kGE)
+		return true;
+	return false;
 }
 
 
@@ -404,7 +344,8 @@ Constraint::GetString(BString& string) const
 		for (int i = 0; i < fLeftSide->CountItems(); i++) {
 			Summand* s = static_cast<Summand*>(fLeftSide->ItemAt(i));
 			string << (float)s->Coeff() << "*";
-			s->Var()->GetString(string);
+			string << "x";
+			string << s->Var()->Index() - 1;
 			string << " ";
 		}
 		string << ((fOp == kEQ) ? "== "
@@ -416,6 +357,15 @@ Constraint::GetString(BString& string) const
 		string << " PenaltyNeg=" << (float)PenaltyNeg();
 	} else
 		string << "invalid";
+}
+
+
+void
+Constraint::PrintToStream()
+{
+	BString string;
+	GetString(string);
+	printf("%s\n", string.String());
 }
 
 

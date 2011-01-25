@@ -11,43 +11,57 @@
 #include "lp_lib.h"
 
 
-class LPSolveInterface : public LinearProgramming::SolverInterface {
+namespace LinearProgramming {
+
+
+class LPSolveInterface : public SolverInterface {
 public:
-								LPSolveInterface();
+								LPSolveInterface(LinearSpec* linearSpec);
 								~LPSolveInterface();
 
-			ResultType			Solve(VariableList& variables);
-			double				GetObjectiveValue();
+			ResultType			Solve();
 
-			bool				AddVariable();
-			bool				RemoveVariable(int variable);
-			bool				SetVariableRange(int variable, double min,
-									double max);
+			bool				VariableAdded(Variable* variable);
+			bool				VariableRemoved(Variable* variable);
+			bool				VariableRangeChanged(Variable* variable);
 
-			bool				AddConstraint(int nElements,
-									double* coefficients, int* variableIndices,
-									OperatorType op, double rightSide);
-			bool				RemoveConstraint(int constraint);
-			bool				SetLeftSide(int constraint, int nElements,
-									double* coefficients, int* variableIndices);
-			bool				SetRightSide(int constraint, double value);
-			bool				SetOperator(int constraint,
-									OperatorType op);
-
-			bool				SetObjectiveFunction(int nElements,
-									double* coefficients,
-									int* variableIndices);
-			bool				SetOptimization(OptimizationType value);
+			bool				ConstraintAdded(Constraint* constraint);
+			bool				ConstraintRemoved(Constraint* constraint);
+			bool				LeftSideChanged(Constraint* constraint);
+			bool				RightSideChanged(Constraint* constraint);
+			bool				OperatorChanged(Constraint* constraint);
 
 			bool				SaveModel(const char* fileName);
 
+			BSize				MinSize(Variable* width, Variable* height);
+			BSize				MaxSize(Variable* width, Variable* height);
+
+			bool				SetOptimization(OptimizationType value);
+			OptimizationType	Optimization() const;
+			bool				SetObjectiveFunction(int nElements,
+									double* coefficients,
+									int* variableIndices);
+			SummandList*		ObjectiveFunction();
+			double				GetObjectiveValue();
+			//! Caller takes ownership of the Summand's and the SummandList.
+			SummandList*		SwapObjectiveFunction(
+									SummandList* objFunction);
+			void				SetObjectiveFunction(SummandList* objFunction);
 private:
-			ResultType			_Presolve(VariableList& variables);
+			void				_UpdateObjectiveFunction();
+
+			ResultType			_Presolve(const VariableList& variables);
 			void				_RemovePresolved();
 
 			lprec*				fLpPresolved;
 			lprec*				fLP;
+
+			OptimizationType	fOptimization;
+			SummandList*		fObjFunction;
 };
+
+
+}	// namespace LinearProgramming
 
 
 #endif // LP_SOLVE_INTERFACE_H

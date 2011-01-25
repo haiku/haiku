@@ -20,6 +20,9 @@
 #include "Tab.h"
 
 
+#define USE_SCALE_VARIABLE 1
+
+
 class Constraint;
 
 
@@ -106,6 +109,7 @@ public:
 private:
 								Area(BLayoutItem* item);
 
+#if USE_SCALE_VARIABLE
 			void				_Init(LinearSpec* ls, XTab* left, YTab* top,
 									XTab* right, YTab* bottom,
 									Variable* scaleWidth,
@@ -113,6 +117,11 @@ private:
 			void				_Init(LinearSpec* ls, Row* row, Column* column,
 									Variable* scaleWidth,
 									Variable* scaleHeight);
+#else
+			void				_Init(LinearSpec* ls, XTab* left, YTab* top,
+									XTab* right, YTab* bottom);
+			void				_Init(LinearSpec* ls, Row* row, Column* column);
+#endif
 
 			void				_DoLayout();
 
@@ -152,9 +161,10 @@ private:
 			double				fContentAspectRatio;
 			Constraint*			fContentAspectRatioC;
 
+#if USE_SCALE_VARIABLE
 			Variable*			fScaleWidth;
 			Variable*			fScaleHeight;
-
+#endif
 public:
 	friend class		BALMLayout;
 

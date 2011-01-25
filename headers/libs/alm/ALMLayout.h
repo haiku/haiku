@@ -124,8 +124,6 @@ private:
 			/*! Add a view without initialize the Area. */
 			BLayoutItem*		_CreateLayoutItem(BView* view);
 
-			void				_SolveLayout();
-
 			void				_UpdateAreaConstraints();
 
 			BSize				_CalculateMinSize();
@@ -152,8 +150,10 @@ private:
 
 			Area*				fCurrentArea;
 
+#if USE_SCALE_VARIABLE
 			Variable*			fScaleWidth;
 			Variable*			fScaleHeight;
+#endif
 };
 
 }	// namespace BALM

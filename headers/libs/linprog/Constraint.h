@@ -27,7 +27,6 @@ class LinearSpec;
  * May render a specification infeasible.
  */
 class Constraint {
-
 public:
 			int32				Index() const;
 
@@ -57,24 +56,26 @@ public:
 			const char*			Label();
 			void				SetLabel(const char* label);
 
-			void				WriteXML(BFile* file);
-
 			Variable*			DNeg() const;
 			Variable*			DPos() const;
+
+			bool				IsSoft() const;
 
 			bool				IsValid();
 			void				Invalidate();
 
 								operator BString() const;
 			void				GetString(BString& string) const;
+			void				PrintToStream();
 
 								~Constraint();
 
 protected:
 								Constraint(LinearSpec* ls,
 									SummandList* summands, OperatorType op,
-									double rightSide, double penaltyNeg,
-									double penaltyPos);
+									double rightSide,
+									double penaltyNeg = -1,
+									double penaltyPos = -1);
 
 private:
 			LinearSpec*			fLS;
@@ -92,6 +93,7 @@ private:
 
 public:
 	friend class		LinearSpec;
+	friend class		LPSolveInterface;
 
 };
 

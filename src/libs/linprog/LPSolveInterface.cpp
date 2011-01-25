@@ -8,14 +8,20 @@
 
 #include "LPSolveInterface.h"
 
+#include <new>
+
 
 using namespace LinearProgramming;
 
 
-LPSolveInterface::LPSolveInterface()
+LPSolveInterface::LPSolveInterface(LinearSpec* linearSpec)
 	:
+	SolverInterface(linearSpec),
+
 	fLpPresolved(NULL),
-	fLP(NULL)
+	fLP(NULL),
+	fOptimization(kMinimize),
+	fObjFunction(new(std::nothrow) SummandList())
 {
 	fLP = make_lp(0, 0);
 	if (fLP == NULL)
@@ -33,41 +39,47 @@ LPSolveInterface::~LPSolveInterface()
 {
 	_RemovePresolved();
 	delete_lp(fLP);
+
+	for (int32 i = 0; i < fObjFunction->CountItems(); i++)
+		delete (Summand*)fObjFunction->ItemAt(i);
+	delete fObjFunction;
 }
 
 
 ResultType
-LPSolveInterface::Solve(VariableList& variables)
+LPSolveInterface::Solve()
 {
+	const VariableList& variables = fLinearSpec->Variables();
 	if (fLpPresolved != NULL)
 		return _Presolve(variables);
 
-	ResultType result = (ResultType)solve(fLP);
+	// Try to solve the layout until the result is kOptimal or kInfeasible,
+	// maximally 15 tries sometimes the solving algorithm encounters numerical
+	// problems (NUMFAILURE), and repeating the solving often helps to overcome
+	// them.
+	ResultType result = kInfeasible;
+	for (int32 tries = 0; tries < 15; tries++) {
+		result = (ResultType)solve(fLP);
 
-	if (result == OPTIMAL) {
-		int32 size = variables.CountItems();
-		double x[size];
-		if (!get_variables(fLP, &x[0]))
-			printf("Error in get_variables.\n");
+		if (result == OPTIMAL) {
+			int32 size = variables.CountItems();
+			double x[size];
+			if (!get_variables(fLP, &x[0]))
+				printf("Error in get_variables.\n");
 
-		for (int32 i = 0; i < size; i++)
-			variables.ItemAt(i)->SetValue(x[i]);
+			for (int32 i = 0; i < size; i++)
+				variables.ItemAt(i)->SetValue(x[i]);
+			break;
+		} else if (result == kInfeasible)
+			break;
 	}
+
 	return result;
 }
 
 
-double
-LPSolveInterface::GetObjectiveValue()
-{
-	if (fLpPresolved)
-		return get_objective(fLpPresolved);
-	return get_objective(fLP);
-}
-
-
 bool
-LPSolveInterface::AddVariable()
+LPSolveInterface::VariableAdded(Variable* variable)
 {
 	double d = 0;
 	int i = 0;
@@ -79,9 +91,9 @@ LPSolveInterface::AddVariable()
 
 
 bool
-LPSolveInterface::RemoveVariable(int variable)
+LPSolveInterface::VariableRemoved(Variable* variable)
 {
-	if (!del_column(fLP, variable))
+	if (!del_column(fLP, variable->Index() + 1))
 		return false;
 	_RemovePresolved();
 	return true;
@@ -89,9 +101,11 @@ LPSolveInterface::RemoveVariable(int variable)
 
 
 bool
-LPSolveInterface::SetVariableRange(int variable, double min, double max)
+LPSolveInterface::VariableRangeChanged(Variable* variable)
 {
-	if (!set_bounds(fLP, variable, min, max))
+	double min = variable->Min();
+	double max = variable->Max();
+	if (!set_bounds(fLP, variable->Index() + 1, min, max))
 		return false;
 	_RemovePresolved();
 	return true;
@@ -99,22 +113,144 @@ LPSolveInterface::SetVariableRange(int variable, double min, double max)
 
 
 bool
-LPSolveInterface::AddConstraint(int nElements, double* coefficients,
-	int* variableIndices, OperatorType op, double rightSide)
+LPSolveInterface::ConstraintAdded(Constraint* constraint)
 {
-	if (!add_constraintex(fLP, nElements, coefficients, variableIndices,
+	OperatorType op = constraint->Op();
+	SummandList* summands = constraint->LeftSide();
+
+	double coeffs[summands->CountItems() + 2];
+	int variableIndices[summands->CountItems() + 2];
+	int32 nCoefficient = 0;
+	for (; nCoefficient < summands->CountItems(); nCoefficient++) {
+		Summand* s = summands->ItemAt(nCoefficient);
+		coeffs[nCoefficient] = s->Coeff();
+		variableIndices[nCoefficient] = s->Var()->Index() + 1;
+	}
+
+	double penaltyNeg = constraint->PenaltyNeg();
+	if (penaltyNeg > 0. && op != kLE) {
+		constraint->fDNegObjSummand = new(std::nothrow) Summand(
+			constraint->PenaltyNeg(), fLinearSpec->AddVariable());
+		fObjFunction->AddItem(constraint->fDNegObjSummand);
+		variableIndices[nCoefficient]
+			= constraint->fDNegObjSummand->Var()->Index() + 1;
+		coeffs[nCoefficient] = 1.0;
+		nCoefficient++;
+	}
+
+	double penaltyPos = constraint->PenaltyPos();
+	if (penaltyPos > 0. && op != kGE) {
+		constraint->fDPosObjSummand = new(std::nothrow) Summand(
+			constraint->PenaltyPos(), fLinearSpec->AddVariable());
+		fObjFunction->AddItem(constraint->fDPosObjSummand);
+		variableIndices[nCoefficient]
+			= constraint->fDPosObjSummand->Var()->Index() + 1;
+		coeffs[nCoefficient] = -1.0;
+		nCoefficient++;
+	}
+
+	double rightSide = constraint->RightSide();
+	if (!add_constraintex(fLP, nCoefficient, coeffs, variableIndices,
 		(op == kEQ ? EQ : (op == kGE) ? GE : LE), rightSide)) {
 		return false;
 	}
+
+	_UpdateObjectiveFunction();
 	_RemovePresolved();
 	return true;
 }
 
 
 bool
-LPSolveInterface::RemoveConstraint(int constraint)
+LPSolveInterface::ConstraintRemoved(Constraint* constraint)
 {
-	if (!del_constraint(fLP, constraint))
+	if (constraint->fDNegObjSummand) {
+		fObjFunction->RemoveItem(constraint->fDNegObjSummand);
+		delete constraint->fDNegObjSummand->Var();
+		delete constraint->fDNegObjSummand;
+		constraint->fDNegObjSummand = NULL;
+	}
+	if (constraint->fDPosObjSummand) {
+		fObjFunction->RemoveItem(constraint->fDPosObjSummand);
+		delete constraint->fDPosObjSummand->Var();
+		delete constraint->fDPosObjSummand;
+		constraint->fDPosObjSummand = NULL;
+	}
+
+	if (!del_constraint(fLP, constraint->Index() + 1))
+		return false;
+	_UpdateObjectiveFunction();
+	_RemovePresolved();
+	return true;
+}
+
+
+bool
+LPSolveInterface::LeftSideChanged(Constraint* constraint)
+{
+	if (!constraint->IsValid())
+		return false;
+
+	int32 index = constraint->Index() + 1;
+	if (index <= 0)
+		return false;
+
+	SummandList* leftSide = constraint->LeftSide();
+	OperatorType op = constraint->Op();
+
+	double coeffs[leftSide->CountItems() + 2];
+	int variableIndices[leftSide->CountItems() + 2];
+	int32 i;
+	for (i = 0; i < leftSide->CountItems(); i++) {
+		Summand* s = leftSide->ItemAt(i);
+		coeffs[i] = s->Coeff();
+		variableIndices[i] = s->Var()->Index() + 1;
+	}
+
+	double penaltyNeg = constraint->PenaltyNeg();
+	if (penaltyNeg > 0. && op != kLE) {
+		if (!constraint->fDNegObjSummand) {
+			constraint->fDNegObjSummand = new(std::nothrow) Summand(
+				constraint->PenaltyNeg(), fLinearSpec->AddVariable());
+			fObjFunction->AddItem(constraint->fDNegObjSummand);
+		}
+		variableIndices[i] = constraint->fDNegObjSummand->Var()->Index() + 1;
+		coeffs[i] = 1.0;
+		i++;
+	} else {
+		fObjFunction->RemoveItem(constraint->fDNegObjSummand);
+		delete constraint->fDNegObjSummand;
+		constraint->fDNegObjSummand = NULL;
+	}
+
+	double penaltyPos = constraint->PenaltyPos();
+	if (penaltyPos > 0. && op != kGE) {
+		if (constraint->fDPosObjSummand == NULL) {
+			constraint->fDPosObjSummand = new(std::nothrow) Summand(penaltyPos,
+				fLinearSpec->AddVariable());
+			fObjFunction->AddItem(constraint->fDPosObjSummand);
+		}
+		variableIndices[i] = constraint->fDPosObjSummand->Var()->Index() + 1;
+		coeffs[i] = -1.0;
+		i++;
+	} else {
+		fObjFunction->RemoveItem(constraint->fDPosObjSummand);
+		delete constraint->fDPosObjSummand;
+		constraint->fDPosObjSummand = NULL;
+	}
+
+	if (!set_rowex(fLP, index, i, coeffs, variableIndices))
+		return false;
+	_UpdateObjectiveFunction();
+	_RemovePresolved();
+	return true;
+}
+
+
+bool
+LPSolveInterface::RightSideChanged(Constraint* constraint)
+{
+	if (!set_rh(fLP, constraint->Index() + 1, constraint->RightSide()))
 		return false;
 	_RemovePresolved();
 	return true;
@@ -122,31 +258,14 @@ LPSolveInterface::RemoveConstraint(int constraint)
 
 
 bool
-LPSolveInterface::SetLeftSide(int constraint, int nElements,
-	double* coefficients, int* variableIndices)
+LPSolveInterface::OperatorChanged(Constraint* constraint)
 {
-	if (!set_rowex(fLP, constraint, nElements, coefficients, variableIndices))
+	int32 index = constraint->Index() + 1;
+	if (index <= 0)
 		return false;
-	_RemovePresolved();
-	return true;
-}
 
-
-bool
-LPSolveInterface::SetRightSide(int constraint, double value)
-{
-	if (!set_rh(fLP, constraint, value))
-		return false;
-	_RemovePresolved();
-	return true;
-}
-
-
-bool
-LPSolveInterface::SetOperator(int constraint, OperatorType op)
-{
-	if (!set_constr_type(fLP, constraint, op == kEQ) ? EQ : (op == kGE) ? GE
-		: LE) {
+	OperatorType op = constraint->Op();
+	if (!set_constr_type(fLP, index, op == kEQ) ? EQ : (op == kGE) ? GE : LE) {
 		return false;
 	}
 	_RemovePresolved();
@@ -168,11 +287,25 @@ LPSolveInterface::SetObjectiveFunction(int nElements, double* coefficients,
 bool
 LPSolveInterface::SetOptimization(OptimizationType value)
 {
-	if (value == kMinimize)
+	fOptimization = value;
+	if (fOptimization == kMinimize)
 		set_minim(fLP);
 	else
 		set_maxim(fLP);
 	return true;
+}
+
+
+/**
+ * Gets the current optimization.
+ * The default is minimization.
+ *
+ * @return the current optimization
+ */
+OptimizationType
+LPSolveInterface::Optimization() const
+{
+	return fOptimization;
 }
 
 
@@ -183,6 +316,120 @@ LPSolveInterface::SaveModel(const char* fileName)
 	if (!write_lp(fLP, const_cast<char*>(fileName)))
 		return false;
 	return true;
+}
+
+
+BSize
+LPSolveInterface::MinSize(Variable* width, Variable* height)
+{
+	SummandList* newObjFunction = new(std::nothrow) SummandList(2);
+	newObjFunction->AddItem(new(std::nothrow) Summand(1.0, width));
+	newObjFunction->AddItem(new(std::nothrow) Summand(1.0, height));
+	SummandList* oldObjFunction = SwapObjectiveFunction(newObjFunction);
+
+	ResultType result = Solve();
+
+	SetObjectiveFunction(oldObjFunction);
+
+	if (result == kUnbounded)
+		return kMinSize;
+	if (result != kOptimal)
+		printf("Could not solve the layout specification (%d). ", result);
+
+	return BSize(width->Value(), height->Value());
+}
+
+
+BSize
+LPSolveInterface::MaxSize(Variable* width, Variable* height)
+{
+	SummandList* newObjFunction = new(std::nothrow) SummandList(2);
+	newObjFunction->AddItem(new(std::nothrow) Summand(-1.0, width));
+	newObjFunction->AddItem(new(std::nothrow) Summand(-1.0, height));
+	SummandList* oldObjFunction = SwapObjectiveFunction(
+		newObjFunction);
+
+	ResultType result = Solve();
+
+	SetObjectiveFunction(oldObjFunction);
+
+	if (result == kUnbounded)
+		return kMinSize;
+	if (result != kOptimal)
+		printf("Could not solve the layout specification (%d). ", result);
+
+	return BSize(width->Value(), height->Value());
+}
+
+
+SummandList*
+LPSolveInterface::SwapObjectiveFunction(SummandList* objFunction)
+{
+	SummandList* list = fObjFunction;
+	fObjFunction = objFunction;
+	_UpdateObjectiveFunction();
+	return list;
+}
+
+
+/**
+ * Sets a new objective function.
+ *
+ * @param summands	SummandList containing the objective function's summands
+ */
+void
+LPSolveInterface::SetObjectiveFunction(SummandList* objFunction)
+{
+	for (int32 i = 0; i < fObjFunction->CountItems(); i++)
+		delete (Summand*)fObjFunction->ItemAt(i);
+	delete fObjFunction;
+
+	fObjFunction = objFunction;
+	_UpdateObjectiveFunction();
+}
+
+
+/**
+ * Gets the objective function.
+ *
+ * @return SummandList containing the objective function's summands
+ */
+SummandList*
+LPSolveInterface::ObjectiveFunction()
+{
+	return fObjFunction;
+}
+
+
+double
+LPSolveInterface::GetObjectiveValue()
+{
+	if (fLpPresolved)
+		return get_objective(fLpPresolved);
+	return get_objective(fLP);
+}
+
+
+
+/**
+ * Updates the internal representation of the objective function.
+ * Must be called whenever the summands of the objective function are changed.
+ */
+void
+LPSolveInterface::_UpdateObjectiveFunction()
+{
+	int32 size = fObjFunction->CountItems();
+	double coeffs[size];
+	int varIndexes[size];
+	Summand* current;
+	for (int32 i = 0; i < size; i++) {
+		current = (Summand*)fObjFunction->ItemAt(i);
+		coeffs[i] = current->Coeff();
+		varIndexes[i] = current->Var()->Index() + 1;
+	}
+
+	if (!SetObjectiveFunction(size, &coeffs[0], &varIndexes[0]))
+		printf("Error in set_obj_fnex.\n");
 }
 
 
@@ -210,7 +457,7 @@ LPSolveInterface::_RemovePresolved()
  * @return the result of the solving attempt
  */
 ResultType
-LPSolveInterface::_Presolve(VariableList& variables)
+LPSolveInterface::_Presolve(const VariableList& variables)
 {
 	if (fLpPresolved == NULL) {
 		fLpPresolved = copy_lp(fLP);
@@ -225,7 +472,7 @@ LPSolveInterface::_Presolve(VariableList& variables)
 		for (int32 i = 0; i < size; i++) {
 			Variable* current = variables.ItemAt(i);
 			current->SetValue(get_var_primalresult(fLpPresolved,
-				get_Norig_rows(fLpPresolved) + current->Index()));
+				get_Norig_rows(fLpPresolved) + current->Index() + 1));
 		}
 	}
 
