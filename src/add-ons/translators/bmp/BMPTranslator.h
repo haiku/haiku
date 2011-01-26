@@ -29,13 +29,16 @@
 #ifndef BMP_TRANSLATOR_H
 #define BMP_TRANSLATOR_H
 
+#include <ByteOrder.h>
+#include <Catalog.h>
+#include <DataIO.h>
+#include <GraphicsDefs.h>
+#include <InterfaceDefs.h>
+#include <Locale.h>
 #include <Translator.h>
 #include <TranslatorFormats.h>
 #include <TranslationDefs.h>
-#include <GraphicsDefs.h>
-#include <InterfaceDefs.h>
-#include <DataIO.h>
-#include <ByteOrder.h>
+
 #include "BaseTranslator.h"
 
 #define BMP_NO_COMPRESS 0

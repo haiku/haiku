@@ -35,11 +35,14 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "exif_parser.h"
 
 #include <Alignment.h>
+#include <Catalog.h>
 #include <GridLayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
 #include <TabView.h>
 #include <TextView.h>
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "JPEGTranslator"
 
 #define MARKER_EXIF	0xe1
 
@@ -514,14 +517,14 @@ TranslatorWriteView::TranslatorWriteView(const char* name,
 		new BMessage(VIEW_MSG_SET_QUALITY), 0, 100);
 	fQualitySlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fQualitySlider->SetHashMarkCount(10);
-	fQualitySlider->SetLimitLabels("Low", "High");
+	fQualitySlider->SetLimitLabels(B_TRANSLATE("Low"), B_TRANSLATE("High"));
 	fQualitySlider->SetValue(fSettings->SetGetInt32(JPEG_SET_QUALITY, NULL));
 
 	fSmoothingSlider = new SSlider("smoothing", VIEW_LABEL_SMOOTHING,
 		new BMessage(VIEW_MSG_SET_SMOOTHING), 0, 100);
 	fSmoothingSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fSmoothingSlider->SetHashMarkCount(10);
-	fSmoothingSlider->SetLimitLabels("None", "High");
+	fSmoothingSlider->SetLimitLabels(B_TRANSLATE("None"), B_TRANSLATE("High"));
 	fSmoothingSlider->SetValue(
 		fSettings->SetGetInt32(JPEG_SET_SMOOTHING, NULL));
 
@@ -785,8 +788,8 @@ JPEGTranslator::DerivedTranslate(BPositionIO* inSource,
 				&longJumpBuffer);
 		}
 	} catch (...) {
-		fprintf(stderr, "libjpeg encoutered a critical error "
-			"(caught C++ exception).\n");
+		fprintf(stderr, B_TRANSLATE("libjpeg encountered a critical error "
+			"(caught C++ exception).\n"));
 		return B_ERROR;
 	}
 
@@ -939,7 +942,8 @@ JPEGTranslator::Compress(BPositionIO* in, BPositionIO* out,
 			break;
 
 		default:
-			fprintf(stderr, "Wrong type: Color space not implemented.\n");
+			fprintf(stderr, 
+				B_TRANSLATE("Wrong type: Color space not implemented.\n"));
 			return B_ERROR;
 	}
 	out_row_bytes = jpg_input_components * width;
@@ -1093,7 +1097,8 @@ JPEGTranslator::Decompress(BPositionIO* in, BPositionIO* out,
 	if (cinfo.out_color_space != JCS_RGB) {
 		switch (cinfo.out_color_space) {
 			case JCS_UNKNOWN:		/* error/unspecified */
-				fprintf(stderr, "From Type: Jpeg uses unknown color type\n");
+				fprintf(stderr, 
+					B_TRANSLATE("From Type: Jpeg uses unknown color type\n"));
 				break;
 			case JCS_GRAYSCALE:		/* monochrome */
 				// Check if user wants to read only as RGB32 or not
@@ -1125,7 +1130,9 @@ JPEGTranslator::Decompress(BPositionIO* in, BPositionIO* out,
 					converter = convert_from_CMYK_to_32;
 				break;
 			default:
-				fprintf(stderr, "From Type: Jpeg uses hmm... i don't know really :(\n");
+				fprintf(stderr, 
+					B_TRANSLATE("From Type: Jpeg uses hmm... i don't know "
+					"really :(\n"));
 				break;
 		}
 	}

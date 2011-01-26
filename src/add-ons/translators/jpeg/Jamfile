@@ -21,6 +21,14 @@ Translator JPEGTranslator :
 	: true
 ;
 
+DoCatalogs JPEGTranslator :
+	x-vnd.Haiku-JPEGTranslator
+	:
+	JPEGTranslator.cpp
+	exif_parser.cpp
+	be_jerror.cpp
+;
+
 Package haiku-translationkit-cvs :
 	JPEGTranslator :
 	boot home config add-ons Translators ;

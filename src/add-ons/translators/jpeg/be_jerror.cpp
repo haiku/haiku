@@ -39,6 +39,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Be headers
 #include <Alert.h>
+#include <Catalog.h>
 #include <stdio.h>
 
 // JPEG headers
@@ -50,6 +51,8 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "JPEGTranslator.h"
 #include "TranslatorSettings.h"
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "be_jerror"
 
 // Since Translator doesn't use it's own error table, we can use error_mgr's
 // variables to store some usefull data.
@@ -68,7 +71,7 @@ be_error_exit (j_common_ptr cinfo)
 	/* Create the message */
 	(*cinfo->err->format_message) (cinfo, buffer);
 
-	fprintf(stderr, "JPEG Library Error: %s\n", buffer);
+	fprintf(stderr, B_TRANSLATE("JPEG Library Error: %s\n"), buffer);
 
 	jmp_buf longJumpBuffer;
 	memcpy(&longJumpBuffer, &(cinfo->err->long_jump_buffer), sizeof(jmp_buf));
@@ -97,7 +100,7 @@ be_output_message (j_common_ptr cinfo)
 	/* If it's compressing or decompressing and user turned messages on */
 	if (!cinfo->is_decompressor || cinfo->err->ShowReadWarnings) {
 		/* show warning message */
-		fprintf(stderr, "JPEG Library Warning: %s\n", buffer);
+		fprintf(stderr, B_TRANSLATE("JPEG Library Warning: %s\n"), buffer);
 	}
 }
 

@@ -14,8 +14,15 @@ Translator BMPTranslator :
 	: true
 ;
 
+DoCatalogs BMPTranslator :
+	x-vnd.Haiku-BMPTranslator
+	:
+	BMPMain.cpp
+	BMPTranslator.cpp
+	BMPView.cpp
+;
+
 Package haiku-translationkit-cvs :
 	BMPTranslator :
 	boot home config add-ons Translators ;
-
 

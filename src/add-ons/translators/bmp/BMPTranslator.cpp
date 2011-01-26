@@ -7,7 +7,6 @@
  */
 
 #include "BMPTranslator.h"
-#include "BMPView.h"
 
 #include <algorithm>
 #include <new>
@@ -15,14 +14,23 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <Catalog.h>
+
+#include "BMPView.h"
+
 
 using std::nothrow;
 using std::min;
+
 
 //#define INFO(x) printf(x);
 #define INFO(x)
 //#define ERROR(x) printf(x);
 #define ERROR(x)
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "BMPTranslator"
+
 
 // The input formats that this translator supports.
 static const translation_format sInputFormats[] = {
@@ -121,7 +129,8 @@ make_nth_translator(int32 n, image_id you, uint32 flags, ...)
 // Returns:
 // ---------------------------------------------------------------
 BMPTranslator::BMPTranslator()
-	: BaseTranslator("BMP images", "BMP image translator",
+	: BaseTranslator(B_TRANSLATE("BMP images"),
+		B_TRANSLATE("BMP image translator"),
 		BMP_TRANSLATOR_VERSION,
 		sInputFormats, kNumInputFormats,
 		sOutputFormats, kNumOutputFormats,
@@ -362,7 +371,9 @@ identify_bmp_header(BPositionIO *inSource, translator_info *outInfo,
 			outInfo->group = B_TRANSLATOR_BITMAP;
 			outInfo->quality = BMP_IN_QUALITY;
 			outInfo->capability = BMP_IN_CAPABILITY;
-			sprintf(outInfo->name, "BMP image (MS format, %d bits",
+			sprintf(outInfo->name, 
+				B_TRANSLATE_COMMENT("BMP image (MS format, %d bits", 
+				"Ignore missing closing round bracket"), 
 				msheader.bitsperpixel);
 			if (msheader.compression)
 				strcat(outInfo->name, ", RLE)");
@@ -431,8 +442,8 @@ identify_bmp_header(BPositionIO *inSource, translator_info *outInfo,
 			outInfo->group = B_TRANSLATOR_BITMAP;
 			outInfo->quality = BMP_IN_QUALITY;
 			outInfo->capability = BMP_IN_CAPABILITY;
-			sprintf(outInfo->name, "BMP image (OS/2 format, %d bits)",
-				os2header.bitsperpixel);
+			sprintf(outInfo->name, B_TRANSLATE("BMP image (OS/2 format, "
+				"%d bits)"), os2header.bitsperpixel);
 			strcpy(outInfo->MIME, "image/x-bmp");
 		}
 		if (pfileheader && pmsheader) {
@@ -1889,6 +1900,7 @@ BMPTranslator::DerivedTranslate(BPositionIO *inSource,
 BView *
 BMPTranslator::NewConfigView(TranslatorSettings *settings)
 {
-	return new BMPView(BRect(0, 0, 225, 175), "BMPTranslator Settings",
-		B_FOLLOW_ALL, B_WILL_DRAW, settings);
+	return new BMPView(BRect(0, 0, 225, 175), 
+		B_TRANSLATE("BMPTranslator Settings"), B_FOLLOW_ALL, B_WILL_DRAW, 
+		settings);
 }
