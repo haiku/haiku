@@ -30,7 +30,7 @@ The destination is not a folder.	ExpanderWindow		Kohde ei ole kansio.
 About Expander…	ExpanderMenu		Laajentajasta…
 OK	About		Valmis
 Set source…	ExpanderMenu		Aseta lähde…
-Select '%s'	DirectoryFilePanel		Valitse '%s'
+Select '%s'	DirectoryFilePanel		Valitse ’%s’
 Show contents	ExpanderMenu		Näytä sisällöt
 Stop	ExpanderWindow		Pysäytä
 Destination	ExpanderWindow		Kohde

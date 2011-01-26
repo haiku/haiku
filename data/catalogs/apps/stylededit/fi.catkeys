@@ -2,7 +2,7 @@
 OK	LoadAlert		Valmis
 ???	LoadAlert		???
 Left	Menus		Vasen
-Revert to the last version of \"%s\"? 	RevertToSavedAlert		Palauta viimeinen \"%s\"-versio? 
+Revert to the last version of \"%s\"? 	RevertToSavedAlert		Palauta viimeinen ”%s”-versio? 
 Search backwards	FindandReplaceWindow		Etsi taaksepäin
 Size	Menus		Koko
 Save	QuitAlert		Tallenna
@@ -10,7 +10,7 @@ Replace same	Menus		Korvaa sama
 Can't Undo	Menus		Ei voi perua
 Save	Menus		Tallenna
 Replace with:	FindandReplaceWindow		Korvaa sisällöllä:
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Ei voi palauttaa, tiedostoa ei löytynyt: \"%s\".
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Ei voi palauttaa, tiedostoa ei löytynyt: ”%s”.
 Case-sensitive	FindandReplaceWindow		Kirjainkoosta riippuva
 Green	Menus		Vihreä
 Revert to saved…	Menus		Palauta tallennettuun…
@@ -19,12 +19,12 @@ Replace in all windows	FindandReplaceWindow		Korvaa kaikissa ikkunoissa
 Wrap lines	Menus		Rivitä
 Cancel	RevertToSavedAlert		Peru
 Document	Menus		Asiakirja
-Save changes to the document \"%s\"? 	QuitAlert		Tallenna muutokset asiakirjaan \"%s\"? 
+Save changes to the document \"%s\"? 	QuitAlert		Tallenna muutokset asiakirjaan ”%s”? 
 Font	Menus		Kirjasin
 Replace all	FindandReplaceWindow		Korvaa kaikki
 Default	Open_and_SaveAsPanel		Oletus
 Cancel	FindandReplaceWindow		Peru
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Virhe ladattaessa \"%s\":\n\tTukematon muoto
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Virhe ladattaessa ”%s”:\n\tTukematon muoto
 OK	RevertToSavedAlert		Valmis
 Don't save	QuitAlert		Älä tallenna
 Align	Menus		Tasaa
@@ -39,12 +39,12 @@ New	Menus		Uusi
 Wrap-around search	FindandReplaceWindow		Kierrätä haku alkuun
 Find selection	Menus		Hakuvalinta
 Find:	FindandReplaceWindow		Haku:
-Error saving \"%s\":\n%s	SaveAlert		Virhe tallennettaessa \"%s\":\n%s
+Error saving \"%s\":\n%s	SaveAlert		Virhe tallennettaessa ”%s”:\n%s
 Replace	FindandReplaceWindow		Korvaa
 Find again	Menus		Hae uudelleen
 Cancel	QuitAlert		Peru
 Find…	Menus		Hae…
-Error loading \"%s\":\n\t%s	LoadAlert		Virhe ladattaessa \"%s\":\n\t%s
+Error loading \"%s\":\n\t%s	LoadAlert		Virhe ladattaessa ”%s”:\n\t%s
 Black	Menus		Musta
 Untitled 	StyledEditWindow		Otsikoton 
 OK	SaveAlert		Valmis
@@ -55,7 +55,7 @@ Right	Menus		Oikea
 Cancel	SaveAlert		Peru
 Save	SaveAlert		Tallenna
 Don't save	SaveAlert		Älä tallenna
-This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Tämä tiedosto on merkitty kirjoitussuojatuksi. Tallennetaanko muutokset asiakirjaan \"%s\"? 
+This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Tämä tiedosto on merkitty kirjoitussuojatuksi. Tallennetaanko muutokset asiakirjaan ”%s”? 
 Paste	Menus		Liitä
 File	Menus		Tiedosto
 Page setup…	Menus		Sivuasetus...

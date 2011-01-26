@@ -14,13 +14,13 @@ MouseUp	ShortcutsSpec		HiiriYlös
 Revert to saved	ShortcutsWindow		Palauta tallennettuun
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt-painike
 Shortcuts	ShortcutsWindow		Pikanäppäimet
-*InsertString \"Your Text Here\"	ShortcutsWindow		*Lisää merkkijono \"Tekstisi tänne\"
+*InsertString \"Your Text Here\"	ShortcutsWindow		*Lisää merkkijono ”Tekstisi tänne”
 *MouseUp	ShortcutsWindow		*HiiriYlös
 (Choose application with file requester)	ShortcutsWindow		(Valitse sovellus tiedostohakijalla)
 Window	ShortcutsSpec	Name for modifier on keyboard	Ikkuna
 *LaunchHandler text/html	ShortcutsWindow		*Käynnistyskäsittelijä text/html
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Pikanäppäimet-ohjelma ei kyennyt avaamaan KeySet-tiedostoa!
-*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Moni \"*SiirräHiiriKohteeseen 100% 0\" \"*Hiiripainike 1\"
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Moni ”*SiirräHiiriKohteeseen 100% 0” ”*Hiiripainike 1”
 SendMessage	ShortcutsSpec		LähetäViesti
 MoveMouseTo	ShortcutsSpec		SiirräHiiriKohteeseen
 Save	ShortcutsWindow		Tallenna
@@ -32,7 +32,7 @@ MouseButton	ShortcutsSpec		HiiriPainike
 Add new shortcut	ShortcutsWindow		Lisää uusi pikanäppäin
 Save & apply	ShortcutsWindow		Tallenna ja sovella
 OK	ShortcutsApp		Valmis
-*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*LähetäViesti application/x-vnd.Be-TRAK 'Tfnd'
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*LähetäViesti application/x-vnd.Be-TRAK ’Tfnd’
 Append	ShortcutsWindow		Liitä
 File	ShortcutsWindow		Tiedosto
 Beep	ShortcutsSpec		Piip

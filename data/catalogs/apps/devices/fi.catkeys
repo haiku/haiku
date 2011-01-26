@@ -20,7 +20,7 @@ About Devices…	DevicesView		Ohjelmasta Laitteet...
 Input device controller	Device		Syötelaiteohjain
 Device paths\t: 	Device		Laitepolut\t:
 Network controller	Device		Verkko-ohjain
-Devices\n\twritten by Pieter Panman\n\n\tBased on listdev by Jérôme Duval\n\tand the previous Devices preference\n\tby Jérôme Duval and Sikosis\n\tCopyright 2009, Haiku, Inc.\n	DevicesApplication		Laitteet\n\ttekijä: Pieter Panman\n\n\tPerustuu Jérôme Duvalin tekemään listdev-ohjelmaan\n\tja edelliseen Jérôme Duvalin  ja Sikosisin\n\tlaitepreferenssiin\n\tCopyright 2009, Haiku, Inc.\n
+Devices\n\twritten by Pieter Panman\n\n\tBased on listdev by Jérôme Duval\n\tand the previous Devices preference\n\tby Jérôme Duval and Sikosis\n\tCopyright 2009, Haiku, Inc.\n	DevicesApplication		Laitteet\n\ttekijä: Pieter Panman\n\n\tPerustuu Jérôme Duvalin tekemään listdev-ohjelmaan\n\tja edelliseen Jérôme Duvalin ja Sikosisin\n\tlaitepreferenssiin\n\tCopyright 2009, Haiku, Inc.\n
 Driver used	Device		Käytetty laite
 Driver used\t\t\t\t: 	Device		Käytetty laite\t\t\t\t:
 Bus	DevicesView		Väylä

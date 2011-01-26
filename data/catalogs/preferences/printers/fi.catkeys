@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Be-PRNT	407752036
+1	finnish	x-vnd.Be-PRNT	3307681170
 Waiting	JobListView		Odotetaan
 page	JobListView		sivu
 Cancel	AddPrinterDialog		Peru
@@ -29,3 +29,8 @@ Connected to:	AddPrinterDialog		Yhdistetty kohteeseen:
 Printer type:	AddPrinterDialog		Tulostintyyppi:
 Transport: %transport% %transport_address%	PrinterListView		Siirto: %transport% %transport_address%
 Driver: %driver%	PrinterListView		Ajuri: %driver%
+Print test page	PrintersWindow		Tulosta testisivu
+Test Page	PrintersWindow		Testisivu
+Driver: %driver%	TestPageView		Ajuri: %driver%
+Test Page for '%printer_name%'	TestPageView		Testisivu tulostimelle ’%printer_name%’
+Transport: %transport% %transport_address%	TestPageView		Siirto: %transport% %transport_address%

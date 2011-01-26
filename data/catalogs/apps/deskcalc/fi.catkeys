@@ -3,6 +3,6 @@ DeskCalc_settings	CalcApplication		Työpöytälaskina_setukset
 About DeskCalc…	CalcView		Ohjelmasta Työpöytälaskin...
 about	CalcView		ohjelmasta
 Show keypad	CalcView		Näytä näppäimistö
-Enable Num Lock on startup	CalcView		Ota käyttöön \"Num Lock\"-asetukset käynnistettäessä
+Enable Num Lock on startup	CalcView		Ota käyttöön ”Num Lock”-asetukset käynnistettäessä
 DeskCalc v2.1.0\n\nwritten by Timothy Wayper,\nStephan Aßmus and Ingo Weinhold\n\n©1997, 1998 R3 Software Ltd.\n©2006-2009 Haiku, Inc.\n\nAll Rights Reserved.	CalcView		Työpöytälaskin v2.1.0\n\ntekijä: Timothy Wayper,\nStephan Aßmus ja Ingo Weinhold\n\n©1997, 1998 R3 Software Ltd.\n©2006-2009 Haiku, Inc.\n\nAll Rights Reserved.
-Audio Feedback	CalcView		Audiopalaute
+Audio Feedback	CalcView		Äänipalaute

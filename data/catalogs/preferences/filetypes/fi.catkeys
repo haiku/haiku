@@ -21,7 +21,7 @@ Group:	New File Type Window		Ryhmä:
 Done	Extension Window		Valmis
 Could not open file	FileType Window		Ei voitu avata tiedostoa
 Preferred application	FileType Window		Ensisijainen sovellus
-Same as…	FileType Window		Sama nimellä…
+Same as…	FileType Window		Sama kuin…
 File	Application Type Window		Tiedosto
 Version:	Application Type Window		Versio:
 FileTypes request	FileTypes		Tiedostotyyppien pyyntö
@@ -35,7 +35,7 @@ Quit, don't save	Application Type Window		Poistu, älä tallenna
 Add…	Application Type Window		Lisää…
 Select preferred application	FileType Window		Valitse ensisijainen sovellus
 Single launch	Application Type Window		Yksittäiskäynnistys
-The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Sovellus \"%s\" ei tue tätä tiedostotyyppiä.\nOletko varma, että haluat silti asettaa sen?
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Sovellus ”%s” ei tue tätä tiedostotyyppiä.\nOletko varma, että haluat silti asettaa sen?
 Type:	Attribute Window		Tyyppi:
 Done	Attribute Window		Valmis
 Set Preferred Application	Preferred App Menu		Aseta ensisijainen sovellus
@@ -47,7 +47,7 @@ Extension:	Extension Window		Tiedostotarkennin:
 Add	Attribute Window		Lisää
 Close	Application Type Window		Sulje
 Golden master	Application Type Window		Golden master -viitemalli
-Could not open \"%s\":\n%s	FileTypes		Ei voitu avata \"%s\":\n%s
+Could not open \"%s\":\n%s	FileTypes		Ei voitu avata tiedostoa ”%s”:\n%s
 Alignment:	Attribute Window		Tasaus:
 Cancel	Extension Window		Peru
 Application flags	Application Type Window		Sovellusliput
@@ -83,7 +83,7 @@ Type name:	FileTypes Window		Tyyppinimi:
 About FileTypes…	FileTypes Window		Tiedostotyypit-ohjelmasta…
 Choose type	Type List Window		Valitse tyyppi
 Rule:	FileTypes Window		Sääntö:
-Multiple files from \"%s\" file type	FileType Window		Useita tiedostoja \"%s\"-tiedostotyypistä
+Multiple files from \"%s\" file type	FileType Window		Useita tiedostoja ”%s”-tiedostotyypistä
 Could not retrieve preferred application of this file	Preferred App Menu		Ei voitu noutaa tämän tiedoston ensisijaista sovellusta
 Extensions:	FileTypes Window		Tiedostotarkentimet:
 Select same preferred application as	FileTypes Window		Valitse sama ensisijainen sovellus nimellä
@@ -119,7 +119,7 @@ Description	FileTypes Window		Kuvaus
 None	FileTypes Window		Ei mikään
 Remove	FileTypes Window		Poista
 This file type already exists	New File Type Window		Tämä tiedostotyyppi on jo olemassa
-Same as…	FileTypes Window		Sama nimellä…
+Same as…	FileTypes Window		Sama kuin…
 Could not remove file type: %s\n	FileTypes Window		Ei voitu poistaa tiedostotyyppiä: %s\n
 Cancel	Preferred App Menu		Peru
 Cancel	FileTypes Window		Peru

@@ -45,7 +45,7 @@ Could not create outbound chain.	Account		Ei voitu luoda lähtevää ketjua.
 Always	Config Window		Aina
 Add filter	Config Views		Lisää suodatin
 Outgoing mail filters	Config Views		Lähtevän postin suodattimet
-\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nLuo uusi tili Lisää-painikkeella.\n\nPoista tili Poista-painikkella valitusta kohdasta.\n\nValitse kohde luettelosta sen asetusten muuttamiseksi.
+\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nLuo uusi tili ”Lisää”-painikkeella.\n\nPoista tili ”Poista”-painikkella valitusta kohdasta.\n\nValitse kohde luettelosta sen asetusten muuttamiseksi.
 Inbound	E-Mail		Tuleva
 Server Name:	E-Mail		Palvelinnimi:
 OK	Config Window		Valmis
@@ -61,7 +61,7 @@ Alpha	Config Window		Alfa
 Send and receive mail	E-Mail		Lähetä ja vastaanota postia
 Golden master	Config Window		Golden master
 Final	Config Window		Lopullinen
-failed to open '%s' to read nameservers: %s\n	E-Mail		epäonnistuttiin avaamaan '%s' nimipalvelimien lukemiseksi: %s\n
+failed to open '%s' to read nameservers: %s\n	E-Mail		epäonnistuttiin avaamaan ’%s’ nimipalvelimien lukemiseksi: %s\n
 Receive mail only	E-Mail		Vastaanota vain postia
 Choose Protocol	Config Views		Valitse yhteyskäytäntö
 Choose Protocol	E-Mail		Valitse yhteyskäytäntö

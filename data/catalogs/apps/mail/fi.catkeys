@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Be-MAIL	2559822410
+1	finnish	x-vnd.Be-MAIL	1685878103
 %d - Date	Mail		%d - Päivämäärä
 Attach attributes:	Mail		Liittämisattribuutit:
 Inconsistency occurred in the undo/redo buffer.	Mail		Tapahtui epäjohdonmukaisuutta puskurin perumisen/uudelleentekemisen yhteydessä.
@@ -30,7 +30,7 @@ Signature:	Mail		Allekirjoitus:
 Save changes to this signature?	Mail		Tallenna muutokset tähän allekirjoitukseen?
 Cc:	Mail		Kopio:
 Find	Mail		Haku
-Preferences…	Mail		Etuoikeudet…
+Preferences…	Mail		Asetukset…
 Undo	Mail		Peru
 Leave as New	Mail		Jätä uutena
 An error occurred trying to open this signature.	Mail		Tapahtui virhe yritettäessä avata tätä allekirjoitusta.
@@ -39,7 +39,106 @@ Edit queries…	Mail		Muokkaa kyselyjä…
 Paste	Mail		Liitä
 Save attachment…	Mail		Tallenna liite…
 Include file attributes in attachments	Mail		Sisällytä tiedostoattribuutit liitteisiin
+OK	Mail		Valmis
+Send	Mail		Lähetä
+Show icons only	Mail		Näytä vain kuvakkeet
+Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Liitteiden poistamista edelleenlähetyksistä ei ole vielä toteutettu!\nSe ei toimi vielä oikein.
+Hide	Mail		Piilota
+Forward without attachments	Mail		Lähetä edelleen ilman liitteitä
+Previous	Mail		Edellinen
+Redo	Mail		Tee uudelleen
+Add enclosure…	Mail		Lisää liite…
+Print…	Mail		Tulosta…
+Warn unencodable:	Mail		Varoita koodaamattomista:
+Quit	Mail		Poistu
+%n - Full name	Mail		%n - Koko nimi
+Read 	Mail		Luettu
+Trash	Mail		Roskakori
+Default account:	Mail		Oletustili:
+Size:	Mail		Koko:
+Account from mail	Mail		Tili sähköpostiviestistä
+Edit signatures…	Mail		Muokkaa allekirjoituksia…
+New	Mail		Uusi
+Attachments: 	Mail		Liitteet: 
+Set to %s	Mail		Aseta vastaanottaja %s
+Forward	Mail		Toimittaa eteenpäin
+E-mail draft could not be saved!	Mail		Sähköpostiviestiluonnosta ei voitu tallentaa!
+To:	Mail		Vastaanottaja:
+Only files can be added as attachments.	Mail		Vain tiedostoja voidaan lisätä liitteiksi.
+Previous message	Mail		Edellinen viesti
+Title:	Mail		Otsikko:
+Find…	Mail		Hae…
+Accounts…	Mail		Tilit…
+Mail preferences	Mail		Sähköpostietusijaisuudet
+Initial spell check mode:	Mail		Alustava oikolukutila:
+Leave same	Mail		Jätä samaksi
+About Mail…	Mail		Mail-ohjelmasta…
+Page setup…	Mail		Sivuasetukset…
+Revert	Mail		Palauta
+None	Mail		Ei mikään
+Copy link location	Mail		Kopioi linkkisijainti
+Show header	Mail		Näytä otsake
+%e - E-mail address	Mail		%e - Sähköpostiosoite
+Resend	Mail		Lähetä uudelleen
+Show raw message	Mail		Näytä  raakaviesti
+\\n - Newline	Mail		\\n - Rivinvaihto
+Start now	Mail		Aloita nyt
+Close	Mail		Sulje
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Taustaprosessi mail_daemon ei ole toiminnassa. Viesti asetetaan jonoon ja lähetetään kun taustaprosessi mail_daemon käynnistyy.
+Really delete this signature? This cannot be undone.	Mail		Haluatko todella poistaa allekirjoituksen? Tätä ei voida perua.
+Open	Mail		Avaa
+Quote	Mail		Lainaus
+Add	Mail		Lisää
+Next message	Mail		Seuraava viesti
+User interface	Mail		Käyttäjäliitäntä
+Cancel	Mail		Peru
+Send message	Mail		Lähetä viesti
+Remove enclosure	Mail		Poista liite
+Account:	Mail		Tili:
+Decoding:	Mail		Koodauksen purku:
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Valitettavasti ei voitu löytää sovellusta, joka tukee ’Person’-datatyyppiä.
+Do you wish to send this message before closing?	Mail		Haluatko lähettää tämän viestin ennen sulkemista?
+Delete	Mail		Poista
+Leave as '%s'	Mail		Jätä nimellä ’%s’
+Copy	Mail		Kopioi
+Reply preamble:	Mail		Vastauksen esipuhe:
+Signatures	Mail		Allekirjoitukset
+Next	Mail		Seuraava
+Set to…	Mail		Aseta kohteeseen…
+Use default account	Mail		Käytä oletustiliä
+Sorry	Mail		Valitan
+Encoding:	Mail		Koodaus:
+Font:	Mail		Kirjasintyyppi:
+Save address	Mail		Tallenna osoite
+Queries	Mail		Kyselyt
+Do you wish to save this message as a draft before closing?	Mail		Haluatko tallentaa tämän viestin luonnoksena ennen sulkemista?
+Save	Mail		Tallenna
+Random	Mail		Satunnainen
+Close and 	Mail		Sulje ja 
+Save as draft	Mail		Tallenna luonnoksena
+The mail_daemon could not be started:\n\t	Mail		Taustaprosessi mail_daemon ei voinut käynnistyä:\n\t
+Open attachment	Mail		Avaa liite
+Reply	Mail		Vastaa
+From:	Mail		Lähettäjä:
+Couldn't open this signature. Sorry.	Mail		Ei voitu avata tätä allekirjoitusta.
+Open draft	Mail		Avaa luonnos
+Cut	Mail		Leikkaa
+Check spelling	Mail		Oikolue
+Set to Saved	Mail		Aseta tallennettuihin
+Open this link	Mail		Avaa tämä linkki
+Auto signature:	Mail		Automaattinen allekirjoitus:
+Add signature	Mail		Lisää allekirjoitus
+Need Tracker to move items to trash	Mail		Tarvitsee Seuraajaa siirtämään viestit roskakoriin
+Mailing	Mail		Postitus
+Unread	Mail		Lukematon
+Remove quote	Mail		Poista lainaus
+Move to trash	Mail		Siirrä roskakoriin
+Select all	Mail		Valitse kaikki
+An error occurred trying to save this signature.	Mail		Tapahtui virhe yritettäessä tallentaa tämä allekirjoitus.
 View	Mail		Näkymä
+Mail couldn't find its dictionary.	Mail		Sähköposti ei löytänyt hakemistoaan.
 Mail\n\n	Mail		Sähköposti\n\n
 Written by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Tekijä: Robert Polic.\nOhjelman laajennus: Tri Zoidbergin ryhmä.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n
+Text wrapping:	Mail		Tekstin vieritys:
+File	Mail		Tiedosto
 Mail	Mail		Sähköposti

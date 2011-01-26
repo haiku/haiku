@@ -105,8 +105,8 @@ Color	Icon-O-Matic-StyleTypes		Väri
 Settings…	Icon-O-Matic-SavePanel		Asetukset...
 Remove	Icon-O-Matic-PathManipulator		Poista
 Radial	Icon-O-Matic-StyleTypes		Säteettäinen
-Add shape with path & style	Icon-O-Matic-Menu-Shape		Lisää hahmo polulla ja tyylillä
 Perspective	Icon-O-Matic-TransformersList		Perspektiivi
+Add shape with path & style	Icon-O-Matic-Menu-Shape		Lisää hahmo polulla ja tyylillä
 Gradient	Icon-O-Matic-StyleTypes		Kaltevuus
 Min LOD	Icon-O-Matic-PropertyNames		Minimi LOD
 BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:ICON -attribuutti
@@ -135,7 +135,7 @@ Error: 	Icon-O-Matic-Exporter		Virhe:
 Add Transformers	Icon-O-Matic-AddTransformersCmd		Lisää muuntimet
 Diamond	Icon-O-Matic-StyleTypes		Vinoneliö
 Path	Icon-O-Matic-PropertyNames		Polku
-Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Tiedoston '%s' avaaminen SVG-asiakirjana epäonnistui.\n\nVirhe: %s
+Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Tiedoston ’%s’ avaaminen SVG-asiakirjana epäonnistui.\n\nVirhe: %s
 Swatches	Icon-O-Matic-Menus		Palaset
 Cancel	Icon-O-Matic-Main		Peru
 <unavailable>	Icon-O-Matic-StyleTypes		<ei ole käytettävissä>

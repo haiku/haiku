@@ -57,7 +57,7 @@ Cannot set the time source for the video window	CodyCam		Ei voida asettaa aikal�
 Stop video	CodyCam		Pysäytä video
 Locking the window\n	VideoConsumer.cpp		Lukitaan ikkuna\n
 File %s; Line %ld # %s	SettingsHandler		Tiedosto %s; Rivi %ld # %s
-Couldn't find requested directory on server	VideoConsumer.cpp		Ei voitu löytää pyydettyä hakemistoa palvelimelta
+Couldn't find requested directory on server	VideoConsumer.cpp		Ei kyetty löytämään pyydettyä hakemistoa palvelimelta
 Renaming…	VideoConsumer.cpp		Nimetään uudelleen…
 Local	CodyCam		Paikallinen
 Error setting type of output file	VideoConsumer.cpp		Virhe asetettaessa tulostetiedoston tyyppiä
@@ -76,7 +76,7 @@ Error getting initial latency for the capture node	CodyCam		Virhe haettaessa alk
 Send to…	CodyCam		Lähetä kohteeseen…
 on or off expected	Settings	Do not translate 'on' and 'off'	odotettiin on tai off
 Quit	CodyCam		Poistu
-cmd: '%s'\n	FtpClient		komento: '%s'\n
+cmd: '%s'\n	FtpClient		komento: ’%s’\n
 Never	CodyCam		Ei koskaan
 CodyCam	CodyCam		CodyCam
 Cannot create a video window	CodyCam		Ei voida luoda video-ikkunaa
@@ -93,5 +93,5 @@ Cannot seek time source!	CodyCam		Ei voida etsiä aikalähdettä!
 File	CodyCam		Tiedosto
 Image Format Menu	CodyCam		Kuvamuotovalikko
 Every 30 minutes	CodyCam		Joka 30. minuutti
-reply: '%s'\n	SftpClient		vastaus: '%s'\n
+reply: '%s'\n	SftpClient		vastaus: ’%s’\n
 Start video	CodyCam		Käynnistä video

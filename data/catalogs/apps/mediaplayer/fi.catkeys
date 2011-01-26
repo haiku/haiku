@@ -1,10 +1,10 @@
-1	finnish	x-vnd.Haiku-MediaPlayer	3131349015
+1	finnish	x-vnd.Haiku-MediaPlayer	1983120721
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerikkalainen)
 Stream settings	MediaPlayer-Main		Virta-asetukset
 Close window when done playing movies	MediaPlayer-SettingsWindow		Sulje ikkuna, kun elokuvat on näytetty
 <unknown>	PlaylistItem-album		<tuntematon>
 Remove (Del)	MediaPlayer-PlaylistWindow		Poista (Del)
-The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Tiedostoa '%filename' ei voitu avata.\n\n
+The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Tiedostoa ’%filename’ ei voitu avata.\n\n
 Save Playlist	MediaPlayer-PlaylistWindow		Tallenna soittoluettelo
 error	MediaPlayer-Main		virhe
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Mikään tiedostoista, jotka olisit halunnut soittaa, ei näytä olevan mediatiedostoja.
@@ -106,7 +106,7 @@ Subtitle placement	MediaPlayer-SettingsWindow		Aliotsikon sijainti
 Small	MediaPlayer-SettingsWindow		Pieni
 Randomize	MediaPlayer-PlaylistWindow		Satunnaista
 Off	Subtitles menu		Pois päältä
-Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Satunnaita kappaleita
+Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Satunnaista kappaleita
 Revert	MediaPlayer-SettingsWindow		Käänteinen
 Edit	MediaPlayer-PlaylistWindow		Muokkaa
 Subtitle size	MediaPlayer-SettingsWindow		Aliotsikon koko
@@ -131,3 +131,10 @@ Save	MediaPlayer-PlaylistWindow		Tallenna
 Full screen	MediaPlayer-Main		Kokoruutunäyttö
 Open file…	MediaPlayer-Main		Avaa tiedosto...
 300% scale	MediaPlayer-Main		300 % skaala
+Bottom of screen	MediaPlayer-SettingsWindow		Näytön alareuna
+Save error	MediaPlayer-PlaylistWindow		Tallenna virhe
+Play background clips at	MediaPlayer-SettingsWindow		Soita taustavideoleikkeitä osoitteessa
+Rating	MediaPlayer-Main		Aset arvosana
+Playlist	MediaPlayer-PlaylistWindow		Soittoluettelo
+Lock Peaks	MediaPlayer-PeakView		Lukitse huiput
+Low volume	MediaPlayer-SettingsWindow		Alenna äänenvoimakkuutta

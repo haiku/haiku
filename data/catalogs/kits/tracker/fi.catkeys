@@ -59,7 +59,6 @@ Mount	ContainerWindow		Liitä
 Mount	DeskWindow		Liitä
 contains	FindPanel		sisältää
 parent folder	NavMenu		Ylemmän tason kansio
-If you %action the settings folder, Haiku may not behave properly! Are you sure you want to do this? To %action the settings folder anyway, click \"Do it\".	FSUtils		Jos suoritat toiminnon %action asetuskansiolle, Haiku ei ehkä toimi oikein! Oletko varma, että haluat tehdä tämän? Jos kaikesta huolimatta haluat suorittaa toiminnon %action asetuskansiolle, napsauta painiketta \"Tee se\".
 OK	WidgetAttributeText		Valmis
 Icon view	VolumeWindow		Kuvakenäkymä
 Desktop	Model		Työpöytä
@@ -78,7 +77,6 @@ Show shared volumes on Desktop	SettingsView		Näytä jaetut taltiot työpöydäl
 Paste links	ContainerWindow		Liitä linkit
 Name	OpenWithWindow		Nimi
 File	ContainerWindow		Tiedosto
-Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Ei voitu avata asiakirjaa \"%document\", koska sovellus \"%app\" on roskakorissa.
 Delete	ContainerWindow		Poista
 32 x 32	ContainerWindow		32 x 32
 Handles any %type	OpenWithWindow		Käsittelee mitä tahansa %type-tyyppiä
@@ -148,13 +146,11 @@ Defaults	TrackerSettingsWindow		Oletukset
 Mini icon view	ContainerWindow		Minikuvakenäkymä
 OK	TrackerInitialState		Valmis
 Add-ons	ContainerWindow		Lisäosat
-Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Ei voitu avata kohdetta \"%name\". Tiedosto on virheellisesti merkitty suoritettavaksi tiedostoksi.
 New folder	FSUtils		Uusi kansio
 Cut	ContainerWindow		Leikkaa
 Remove	FindPanel		Poista
 Desktop	TrackerSettingsWindow		Työpöytä
 New Query	FindPanel		Uusi kysely
-Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Linkki \"%name\" kohteeseen:
 Mount settings…	VolumeWindow		Liittämisasetukset...
 Select…	VolumeWindow		Valitse...
 All disks	FindPanel		Kaikki levyt
@@ -206,11 +202,9 @@ Show folder location in title tab	SettingsView		Näytä kansion sijainti otsikko
 Create relative link here	ContainerWindow		Luo suhteellinen linkki tähän
 matches regular expression	SelectionWindow		täsmää säännöllisen lausekkeen kanssa
 Mount settings…	SettingsView		Liittämisasetukset...
-Could not open \"%name\" (%error). 	FSUtils		Ei voitu avata kohdetta \"%name\" (%error)
 Edit name	InfoWindow		Muokkaa nimeä
 Paste	ContainerWindow		Liitä
 Modified:	InfoWindow		Muokattu:
-Error moving \"%name\".	FSUtils		Virhe siirrettäessä kohdetta \"%name\".
 40 x 40	ContainerWindow		40 x 40
 Cancel	ContainerWindow		Peru
 Trash	TrackerSettingsWindow		Roskakori
@@ -225,26 +219,20 @@ Disk mount settings	AutoMounterSettings		Levyn liittämisasetukset
 Unknown	WidgetAttributeText		Tuntematon
 Recalculate folder size	InfoWindow		Laske kansion koko uudelleen
 There was an error writing the attribute.	WidgetAttributeText		Attribuutin kirjoittamisessa tapahtui virhe.
-Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Ei voitu avata asiakirjaa \"%document\" (Symboli puuttu: %symbol).\n
 Creating links: 	StatusWindow		Luodaan linkit:
-There was an error deleting \"%name\":\n\t%error	FSUtils		Kohdetta \"%name\" poistettaessa tapahtui virhe:\n\t%error
 Paste	FilePanelPriv		Liitä
 Copy more	ContainerWindow		Kopioi lisää
 OK	PoseView		Valmis
 New folder	TemplatesMenu		Uusi kansio
 Move here	ContainerWindow		Siirrä tänne
 File	FilePanelPriv		Tiedosto
-Error moving \"%name\"	FSUtils		Virhe siirrettäessä kohdetta \"%name\"
 Cancel	WidgetAttributeText		Peru
 copying	FSUtils		kopioidaan
 Show Disks icon	SettingsView		Näytä levyjen kuvake
 Mount	VolumeWindow		Liitä
-Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Virhe kopioitaessa kansiota \"%name\":\n\t%error\n\nHaluaisitko jatkaa?
 Previously mounted disks	AutoMounterSettings		Aiemmin liitetyt levyt
 Create a Query template	FindPanel		Luo kyselymallinne
-Could not find an application to open \"%name\" (%error). 	FSUtils		Ei voitu löytää sovellusta avattavaksi \"%name\" (%error).
 All files and folders	FindPanel		Kaikki tiedostot ja kansiot
-Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		Ei voitu avata asiakirjaa \"%document\" (Puuttuvat kirjastot: %library).\n
 Query name:	FindPanel		Kyselynimi:
 Permissions	ContainerWindow		Käyttöoikeudet
 moving	FSUtils		siirretään
@@ -257,18 +245,14 @@ Identify	ContainerWindow		Tunnista
 Warning space color	SettingsView		Varoitustilaväri
 Eject when unmounting	AutoMounterSettings		Poista laitteesta irrotettaessa
 You must have at least one attribute showing.	PoseView		Sinulla on oltava vähintään yksi attribuutti näytettäväksi.
-If you %action the home folder, Haiku may not behave properly! Are you sure you want to do this? To %action the home anyway, click \"Do it\".	FSUtils		Jos suoritat toiminnon %action kotikansiossa, Haiku ei ehkä käyttäydy oikein! Oletko varma, että haluat ehdä tämän? Jos kuitenkin haluat tehdä toiminnon %action kotikansiossa, napsauta painiketta \"Tee se\".
 Error %error loading Add-On %name.	ContainerWindow		Virher %error ladattaessa lisäosaa %name.
-Cannot unmount the boot volume \"%name\".	FSUtils		Et voi irrottaa alkukäynnistystaltiota \"%name\".
 Open with…	ContainerWindow		Avaa sovelluksella...
 for %num files	InfoWindow		%num tiedostolle
 Make active printer	ContainerWindow		Tee aktiivinen tulostin
 On	FindPanel		Kohteessa
-Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Attribuuttia 'Character' ei voi tallentaa monitavuiseen kirjoitusmerkkiin.
 You cannot copy or move the root directory.	FSUtils		Et voi kopioida tai siirtää root-hakemistoon.
 Clean up	DeskWindow		Tyhjennä
 Link to:	InfoWindow		Linkitä kohteeseen:
-Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Ei voitu avata asiakirjaa \"%document\" sovelluksella \"%app\" (Puuttuvat kirjastot: %library). \n
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Et voi korvata kansiota tai symbolista linkkiä tiedostoon.
 Show space bars on volumes	SettingsView		Näytä tilapalkit taltioissa
 Resize to fit	ContainerWindow		Muuta koko sopimaan
@@ -278,8 +262,6 @@ Create %s clipping	PoseView		Luo %s leikkausta
 Save as Query template:	FindPanel		Tallenna kyselymallinteena
 Clean up	VolumeWindow		Tyhjennä
 Edit templates…	TemplatesMenu		Muokkaa mallinteita...
-An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Kohde nimeltä \"%name\" on jo olemassa tässä kansiossa. Haluaisitko korvata sen symbolisella linkillä, jota olet luomassa?
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Ei voitu avata asiakirjaa \"%document\" sovelluksella \"%app\" (%error). 
 (Finish: %time - %finishtime seconds left)	StatusWindow		(Loppuminen: %time - %finishtime sekuntia jäljellä)
 Sorry, saving more than one item is not allowed.	FilePanelPriv		Useamman kuin yhden kohteen tallentaminen ei ole sallittua.
 Searching for disks to mount…	StatusWindow		Etsitään liitettäviä levyjä...
@@ -297,30 +279,22 @@ Invert selection	QueryContainerWindow		Käänteinen valinta
 1 item	CountView		1 kohde
 Open parent	ContainerWindow		Avaa päätaso
 Force identify	ContainerWindow		Pakota tunnistus
-If you %action the system folder or its contents, you won't be able to boot Haiku! Are you sure you want to do this? To %action the system folder or its contents anyway, hold down the Shift key and click \"Do it\".	FSUtils		Jos suoritat toiminnon %action järjestelmäkansiolle tai sen sisällölle, et kykene enää alkulataamaan Haikua! Oletko varma, että haluat tehdä tämän? Jos kuitenkin haluat suorittaa toiminnon %action järjestelmäkansiolle tai sen sisällölle, pidä alhaalla vaihtonäppäin ja napsauta painiketta \"Tee se\".
-Error in regular expression:\n\n'%errstring'	PoseView		Virhe säännöllisessä lausekkeessa:\n\n'%errstring'
 calculating…	InfoWindow		lasketaan...
 Untitled bitmap	PoseView		Otsikoton bittikarttatiedosto
 of %items	StatusWindow		/ %items
-The application \"%appname\" does not support the type of document you are about to open. Are you sure you want to proceed? If you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Sovellus \"%appname\" ei tue sen tyyppistä asiakirjaa, jota olet avaamassa. Oletko varma, että haluat jatkaa? Jos tiedät, että sovellus tukee dokumenttityyppiä, sinun pitäisi ottaa yhteyttä sovelluksen julkaisijaan ja pyytää heitä päivittämään dokumenttisi tyyppi tuettujen tyyppien luetteloon.
 Preparing to restore items…	StatusWindow		Valmistaudutaan palauttamaan kohteita...
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Joitakin valittuja kohteita ei voi siirtää roskakoriin. Haluaisitko sen sijaan poistaa ne? (Tätä toimintoa ei voi palauttaa.)
 Resize to fit	VolumeWindow		Muunna koko sopimaan
-Could not find application \"%appname\"	OpenWithWindow		Ei voitu löytää sovellusta \"%appname\"
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Valittua kohdetta ei voida siirtää roskakoriin. Haluaisitko sen sijaan poistaa sen? (Tätä toimintoa ei voida palauttaa.)
 Invert	SelectionWindow		Käänteinen
 Save Query as template…	FindPanel		Tallenna kysely mallinteena...
 Find	FindPanel		Haku
-Error creating link to \"%name\".	FSUtils		Virhe luotaessa linkkiä kohteeseen \"%name\".
 \nShould this be fixed?	FSUtils		\nPitäisikö tämä korjata?
 Proceed	FSUtils		Jatketaan
 The mount server could not be contacted.	AutoMounterSettings		Liittämispalvelimeen ei saatu yhteyttä.
-The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Tiedosto \"%name\" on jo olemassa määritellyssä kansiossa. Haluatko korvata sen?
 Only the boot disk	AutoMounterSettings		Vain alkulatauslevy
 Outline selection rectangle only	SettingsView		Vain ääriviivavalintaruutu
-If you %action the config folder, Haiku may not behave properly! Are you sure you want to do this? To %action the config folder anyway, click \"Do it\".	FSUtils		Jos suoritat toiminnon %action config-kansiolle, Haiku ei ehkä toimi oikein! Oletko varma, että haluat tehdä tämän? Jos kuitenkin haluat tehdä toiminnon %action config-kansiolle, napsauta painiketta \"Tee se\".
 Copy layout	ContainerWindow		Kopioi sijoittelu
-Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Ei voitu avata asiakirjaa \"%document\" sovelluksella \"%app\" (Puuttuva symboli: %symbol). \n
 The target disk does not support creating links.	FSUtils		Kohdelevy ei tue linkkien luomista.
 starts with	SelectionWindow		alkaa kohteella
 Preparing to delete items…	StatusWindow		Valmistaudutaan poistamaan kohteita...
@@ -331,7 +305,6 @@ Paused: click to resume or stop	StatusWindow		Keskeytetty: napsauta painiketta r
 Preferred for %type	OpenWithWindow		Ensisijainen tyypille %type
 Clean up all	ContainerWindow		Tyhjennä kaikki
 Read	FilePermissionsView		Lue
-You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Sinun on pudotettava kohteet \"Levyt\"-ikkunan yhdelle levykuvakkeelle.
 \n\t(%Ld bytes, 	FSUtils		\n\t(%Ld tavua, 
 You can't move or copy items to read-only volumes.	FSUtils		Et voi siirtää tai kopioida kohteita kirjoitussuojatuille taltioille.
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Määritelty nimi on jo käytössä kansionimenä. Valitse toinen nimi.
@@ -345,7 +318,6 @@ Handles any file	OpenWithWindow		Käsittelee kaikkia tiedostoja
 32 x 32	DeskWindow		32 x 32
 Used space color	SettingsView		Käytetyn tilan väri
 multiple disks	FindPanel		useita levyjä
-You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Sinun on pudottava kohteet yhteen \"Levyt\"-ikkunan levykuvakkeista.
 Untitled clipping	PoseView		Otsikoton leikkaus
 Don't automount	AutoMounterSettings		Älä liitä automaattisesti
 To: %dir	StatusWindow		Kohteeseen: %dir
@@ -357,17 +329,14 @@ Open selection with:	OpenWithWindow		Avaa valinta sovelluksella:
 Preparing to create links…	StatusWindow		Valmistaudutaan luomaan linkkejä...
 Show navigator	SettingsView		Näytä navigaattori
 List folders first	SettingsView		Luettele kansiot ensin
-Error moving \"%name\" to Trash. (%error)	FSUtils		Virhe siirrettäessä kohdetta \"%name\" roskakoriin. (%error)
 You can't replace a folder with one of its sub-folders.	FSUtils		Et voi korvata kansiota yhdellä sen alikansioista.
 <No recent items>	FavoritesMenu		<Ei nykyisiä kohteita>
 Preferences…	ContainerWindow		Asetukset...
 Open and make preferred	OpenWithWindow		Avaa ja tee ensisijaiseksi
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Oletko varma, että haluat poistaa valitut kohteet? Tätä toimintoa ei voi palauttaa.
 Add-ons	DeskWindow		Lisäosat
-If you %action the mime settings, Haiku may not behave properly! Are you sure you want to do this? To %action the mime settings anyway, click \"Do it\".	FSUtils		Jos suoritat toiminnon %action mime-asetuksille, Haiku ei ehkä toimi oikein! Oletko varma, että haluat tehdä tämän? Jos kuitenkin haluat suorittaa toiminnon %action mime-asetuksille, napsauta painiketta \"Tee se\".
 Select…	DeskWindow		Valitse...
 Files cannot be moved or deleted from a read-only volume.	PoseView		Tiedostoja ei voi siirtää tai poistaa kirjoitussuojatulta taltiolta.
-There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Kohteen \"%name\" korvaaminen epäonnistui. Kohde ei ehkä ole avattu tai se on varattu.
 You cannot put the Trash, home or Desktop directory into the trash.	FSUtils		Et voi laittaa roskakoria, kotihakemistoa tai työpöytähakemistoa roskakoriin.
 Owner	FilePermissionsView		Omistaja
 There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Tallentaminen haluamaasi kansioon epäonnistui. Kokeile jotain toista kansiota.
@@ -377,7 +346,6 @@ Skip	FSUtils		Ohita
 Preferred for file	OpenWithWindow		Ensisijainen tiedostolle
 Go to parent	FilePanelPriv		Siirry ylätasolle
 Paste layout	ContainerWindow		Liitä sijoittelu
-Could not update permissions of file \"%name\". %error	FSUtils		Ei voitu päivittää tiedoston \"%name\" käyttöoikeuksia. %error
 There was an error resolving the link.	Tracker		Virhe linkin ratkaisemisessa.
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 You can't move or copy the trash.	FSUtils		Et voi siirtää tai kopioida roskakoriin.
@@ -403,7 +371,6 @@ Create a Query	FindPanel		Lue kysely
 Automatic disk mounting	AutoMounterSettings		Automaattinen levyliittäminen
 Original name	ContainerWindow		Alkuperäinen nimi
 Find	FSUtils		Etsi
-Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Virhe kopioitaessa tiedostoa \"%name\":\n\t%error\n\nHaluaisitko jatkaa?
 Single window navigation	SettingsView		Yksittäisikkunanavigointi
 Relation	OpenWithWindow		Suhde
 %num items	CountView		%num kohdetta
@@ -425,7 +392,6 @@ Sorry, could not create a new folder.	FSUtils		Ei voitu luoda uutta kansiota.
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Et voi tallentaa asioita järjestelmäsi root-kansioon.
 MiB	WidgetAttributeText		mebitavua
 (Finish: %time - Over %finishtime hours left)	StatusWindow		(Loppuminen: %time - Yli %finishtime tuntia jäljellä)
-An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Kohde nimellä \"%name\" on jo olemassa tässä kansiossa, ja saattaa sisältää\nsamannimisiä kohteita. Haluaisitko korvata ne kansiossa, johon %verb?
 You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		Yrität korvata kohdetta:\n\t%name%dest\nkohteella:\n\t%name%src\n\nHaluaisitko korvata sen sillä, jota %movemode?
 by formula	FindPanel		kaavoittain
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Tässä kansiossa on jo joitakin kohteita, joilla on samat nimet kuin kohteilla, jotka %verb.\n \nHaluaisitko korvata ne niillä kohteilla, jotka %verb vai haluatko kysymyskehotteen jokaiselle?
@@ -433,3 +399,37 @@ by name	FindPanel		nimittäin
 (Finish: %time)	StatusWindow		(Loppuu klo: %time)
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used käytetty -- %free vapaana)
 by attribute	FindPanel		attribuutettain
+If you %action the home folder, Haiku may not behave properly! Are you sure you want to do this? To %action the home anyway, click \"Do it\".	FSUtils		Jos suoritat toiminnon %action kotikansiossa, Haiku ei ehkä käyttäydy oikein! Oletko varma, että haluat ehdä tämän? Jos kuitenkin haluat tehdä toiminnon %action kotikansiossa, napsauta painiketta ”Tee se”.
+Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Ei voitu avata asiakirjaa ”%document”, koska sovellus ”%app” on roskakorissa.
+Cannot unmount the boot volume \"%name\".	FSUtils		Et voi irrottaa alkukäynnistystaltiota ”%name”.
+Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Attribuuttia ’Character’ ei voi tallentaa monitavuiseen kirjoitusmerkkiin.
+Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Ei voitu avata asiakirjaa ”%document” sovelluksella ”%app” (Puuttuvat kirjastot: %library). \n
+Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Ei voitu avata kohdetta ”%name”. Tiedosto on virheellisesti merkitty suoritettavaksi tiedostoksi.
+An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Kohde nimeltä ”%name” on jo olemassa tässä kansiossa. Haluaisitko korvata sen symbolisella linkillä, jota olet luomassa?
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Ei voitu avata asiakirjaa ”%document” sovelluksella ”%app” (%error). 
+An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Kohde nimellä ”%name” on jo olemassa tässä kansiossa, ja saattaa sisältää\nsamannimisiä kohteita. Haluaisitko korvata ne kansiossa, johon %verb?
+Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Linkki ”%name” kohteeseen:
+If you %action the system folder or its contents, you won't be able to boot Haiku! Are you sure you want to do this? To %action the system folder or its contents anyway, hold down the Shift key and click \"Do it\".	FSUtils		Jos suoritat toiminnon %action järjestelmäkansiolle tai sen sisällölle, et kykene enää alkulataamaan Haikua! Oletko varma, että haluat tehdä tämän? Jos kuitenkin haluat suorittaa toiminnon %action järjestelmäkansiolle tai sen sisällölle, pidä alhaalla vaihtonäppäin ja napsauta painiketta ”Tee se”.
+The application \"%appname\" does not support the type of document you are about to open. Are you sure you want to proceed? If you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Sovellus ”%appname” ei tue sen tyyppistä asiakirjaa, jota olet avaamassa. Oletko varma, että haluat jatkaa? Jos tiedät, että sovellus tukee dokumenttityyppiä, sinun pitäisi ottaa yhteyttä sovelluksen julkaisijaan ja pyytää heitä päivittämään dokumenttisi tyyppi tuettujen tyyppien luetteloon.
+Error in regular expression:\n\n'%errstring'	PoseView		Virhe säännöllisessä lausekkeessa:\n\n’%errstring’
+Could not find application \"%appname\"	OpenWithWindow		Ei voitu löytää sovellusta ”%appname”
+Error creating link to \"%name\".	FSUtils		Virhe luotaessa linkkiä kohteeseen ”%name”.
+Could not open \"%name\" (%error). 	FSUtils		Ei voitu avata kohdetta ”%name” (%error)
+Error moving \"%name\".	FSUtils		Virhe siirrettäessä kohdetta ”%name”.
+The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Tiedosto ”%name” on jo olemassa määritellyssä kansiossa. Haluatko korvata sen?
+If you %action the config folder, Haiku may not behave properly! Are you sure you want to do this? To %action the config folder anyway, click \"Do it\".	FSUtils		Jos suoritat toiminnon %action config-kansiolle, Haiku ei ehkä toimi oikein! Oletko varma, että haluat tehdä tämän? Jos kuitenkin haluat tehdä toiminnon %action config-kansiolle, napsauta painiketta ”Tee se”.
+Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Ei voitu avata asiakirjaa ”%document” sovelluksella ”%app” (Puuttuva symboli: %symbol). \n
+Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Ei voitu avata asiakirjaa ”%document” (Symboli puuttu: %symbol).\n
+There was an error deleting \"%name\":\n\t%error	FSUtils		Kohdetta ”%name” poistettaessa tapahtui virhe:\n\t%error
+Error moving \"%name\"	FSUtils		Virhe siirrettäessä kohdetta ”%name”
+You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Sinun on pudotettava kohteet ”Levyt”-ikkunan yhdelle levykuvakkeelle.
+Could not find an application to open \"%name\" (%error). 	FSUtils		Ei voitu löytää sovellusta avattavaksi ”%name” (%error).
+Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Virhe kopioitaessa kansiota ”%name”:\n\t%error\n\nHaluaisitko jatkaa?
+Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		Ei voitu avata asiakirjaa ”%document” (Puuttuvat kirjastot: %library).\n
+You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Sinun on pudottava kohteet yhteen ”Levyt”-ikkunan levykuvakkeista.
+Error moving \"%name\" to Trash. (%error)	FSUtils		Virhe siirrettäessä kohdetta ”%name” roskakoriin. (%error)
+If you %action the mime settings, Haiku may not behave properly! Are you sure you want to do this? To %action the mime settings anyway, click \"Do it\".	FSUtils		Jos suoritat toiminnon %action mime-asetuksille, Haiku ei ehkä toimi oikein! Oletko varma, että haluat tehdä tämän? Jos kuitenkin haluat suorittaa toiminnon %action mime-asetuksille, napsauta painiketta ”Tee se”.
+There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Kohteen ”%name” korvaaminen epäonnistui. Kohde ei ehkä ole avattu tai se on varattu.
+Could not update permissions of file \"%name\". %error	FSUtils		Ei voitu päivittää tiedoston ”%name” käyttöoikeuksia. %error
+Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Virhe kopioitaessa tiedostoa ”%name”:\n\t%error\n\nHaluaisitko jatkaa?
+If you %action the settings folder, Haiku may not behave properly! Are you sure you want to do this? To %action the settings folder anyway, click \"Do it\".	FSUtils		Jos suoritat toiminnon %action asetuskansiolle, Haiku ei ehkä toimi oikein! Oletko varma, että haluat tehdä tämän? Jos kaikesta huolimatta haluat suorittaa toiminnon %action asetuskansiolle, napsauta painiketta ”Tee se”.

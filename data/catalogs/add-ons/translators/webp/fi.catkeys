@@ -1,0 +1,10 @@
+1	finnish	x-vnd.Haiku-WebPTranslator	3502239072
+Version %d.%d.%d, %s	ConfigView		Versio %d.%d.%d, %s
+WebP Images	ConfigView		WebP-kuvat
+WebP images	WebPTranslator		WebP-kuvat
+WebPTranslator Settings	ConfigView		WebP-muunninasetukset
+WebP Settings	main		WebP-asetukset
+WebP image	WebPTranslator		WebP-kuva
+stream GetSize(): %lld\n	WebPTranslator		virta GetSize(): %lld\n
+Based on libwebp v0.1	ConfigView		Perustuu kirjastoon libwebp v0.1
+WebP image translator	WebPTranslator		WebP-kuvamuunnin

@@ -6,8 +6,8 @@ Could not install 	DataTranslations		Ei voitu asentaa
 Cancel	DataTranslations		Peru
 Name:	DataTranslations		Nimi:
 Panel Info	DataTranslations		Paneelitiedot
-The item '	DataTranslations		Kohde '
-%name' does not appear to be a Translator and will not be installed.	DataTranslations		%name' ei näytä olevan Tietomuunnin ja sitä ei asenneta.
+The item '	DataTranslations		Kohde ’
+%name' does not appear to be a Translator and will not be installed.	DataTranslations		%name’ ei näytä olevan Tietomuunnin ja sitä ei asenneta.
 DataTranslations - Note	DataTranslations		Tietomuunnokset - Ilmoitus
 Name: %name \nVersion: 	DataTranslations		Nimi: %name \nVersio: 
 Overwrite	DataTranslations		Korvaa
@@ -19,7 +19,7 @@ The new translator has been installed successfully.	DataTranslations		Uusi tieto
 \nInfo: %info\n\nPath:\n	DataTranslations		\nTiedot: %info\n\nPolku:\n
 DataTranslations - Error	DataTranslations		Tietomuunnokset - Virhe
 OK	DataTranslations		Valmis
-An item named '	DataTranslations		Kohde nimeltä '
+An item named '	DataTranslations		Kohde nimeltä ’
 Icon	DataTranslations		Kuvake
 DataTranslations\n\twritten by Oliver Siebenmarck and others\n\tCopyright 2002-2010, Haiku Inc. All rights reserved.\n	DataTranslations		Tietomuunnokset\n\ttekijä: Oliver Siebenmarck ja muut\n\tCopyright 2002-2010, Haiku Inc. All rights reserved.\n
 Version:	DataTranslations		Versio:

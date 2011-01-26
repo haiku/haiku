@@ -2,7 +2,7 @@
 Use as background…	Menus		Käytä taustana…
 Slide delay	Menus		Diaviive
 Zoom in	Menus		Lähennä
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Asiakirja '%s' on muuttunut. Haluatko sulkea asiakirjan?
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Asiakirja ’%s’ on muuttunut. Haluatko sulkea asiakirjan?
 Previous page	Menus		Edellinen sivu
 View	Menus		Näkymä
 Full screen	Menus		Kokoruutu
@@ -13,7 +13,7 @@ High-quality zooming	Menus		Korkealaatuinen rajaus
 Browse	Menus		Selaa
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Ei voitu ladata kuvaa! Puuttuu joko tiedosto tai kuvamuunnin sitä varten.
 First page	Menus		Ensimmäinen sivu
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Asiakirja '%s' (sivu %d) on muuttunut. Haluatko sulkea asiakirjan?
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Asiakirja ’%s’ (sivu %d) on muuttunut. Haluatko sulkea asiakirjan?
 About ShowImage…	Menus		Ohjelmasta Kuvankatselin…
 Close	ClosePrompt		Sulje
 Undo	Menus		Peru
@@ -40,7 +40,7 @@ Job setup	PrintOptionsWindow		Työasetukset
 Original size	Menus		Alkuperäiskoko
 Next page	Menus		Seuraava sivu
 OK	SaveToFile		Valmis
-The file '%s' could not be written.	SaveToFile		Tiedostoa '%s' ei voitu kirjoittaa.
+The file '%s' could not be written.	SaveToFile		Tiedostoa ’%s’ ei voitu kirjoittaa.
 Progress monitor	ProgressWindow		Edistymisvalvonta
 File	Menus		Tiedosto
 Page setup…	Menus		Sivuasetus...
