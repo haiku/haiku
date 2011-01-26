@@ -89,8 +89,8 @@ struct btrfs_stripe {
 	uint64	device_id;
 	uint64	offset;
 	uint8	device_uuid[16];
-	uint64	DeviceID() { return B_LENDIAN_TO_HOST_INT64(device_id); }
-	uint64	Offset() { return B_LENDIAN_TO_HOST_INT64(offset); }
+	uint64	DeviceID() const { return B_LENDIAN_TO_HOST_INT64(device_id); }
+	uint64	Offset() const { return B_LENDIAN_TO_HOST_INT64(offset); }
 } _PACKED;
 
 struct btrfs_chunk {
@@ -163,7 +163,7 @@ struct btrfs_super_block {
 	uint64	incompat_flags;
 	uint16	checksum_type;
 	uint8	root_level;
-	uint8	chunck_root_level;
+	uint8	chunk_root_level;
 	uint8	log_root_level;
 	struct btrfs_device device;
 	char	label[256];
@@ -184,7 +184,7 @@ struct btrfs_super_block {
 		return B_LENDIAN_TO_HOST_INT64(chunk_root); }
 	uint64 LogRoot() const {
 		return B_LENDIAN_TO_HOST_INT64(log_root); }
-	uint8 ChunkRootLevel() { return chunck_root_level; }
+	uint8 ChunkRootLevel() const { return chunk_root_level; }
 } _PACKED;
 
 struct btrfs_inode {
