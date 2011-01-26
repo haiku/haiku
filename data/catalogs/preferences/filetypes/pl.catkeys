@@ -19,8 +19,8 @@ Cancel	Attribute Window		Anuluj
 Multiple launch	Application Type Window		Wiele uruchomień
 Group:	New File Type Window		Grupa:
 Done	Extension Window		Gotowe
-Could not open file	FileType Window		Nie można otworzyć pliku
 Preferred application	FileType Window		Preferowana aplikacja
+Could not open file	FileType Window		Nie można otworzyć pliku
 Same as…	FileType Window		Takie same jak…
 File	Application Type Window		Plik
 Version:	Application Type Window		Wersja:
@@ -35,8 +35,8 @@ Quit, don't save	Application Type Window		Wyjdź i nie zapisuj
 Add…	Application Type Window		Dodaj…
 Select preferred application	FileType Window		Wybierz preferowaną aplikację
 Single launch	Application Type Window		Pojedyncze uruchomienie
-The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Program \"%s\" nie obsługuje tego typu plików.\nCzy chcesz go ustawić mimo to?
 Type:	Attribute Window		Typ:
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Program \"%s\" nie obsługuje tego typu plików.\nCzy chcesz go ustawić mimo to?
 Done	Attribute Window		Gotowe
 Set Preferred Application	Preferred App Menu		Ustaw preferowaną aplikację
 Background app	Application Type Window		Aplikacja działająca w tle
@@ -50,8 +50,8 @@ Golden master	Application Type Window		Golden master
 Could not open \"%s\":\n%s	FileTypes		Nie można otworzyć \"%s\":\n%s
 Alignment:	Attribute Window		Wyrównanie:
 Cancel	Extension Window		Anuluj
-Application flags	Application Type Window		Flagi aplikacji
 Editable	Attribute Window	If Tracker allows to edit this attribute.	Modyfikowalne
+Application flags	Application Type Window		Flagi aplikacji
 Width:	Attribute Window	Default column width in Tracker for this attribute.	Szerokość:
 Save request	Application Type Window		Zapisz żądanie
 Beta	Application Type Window		Beta
@@ -113,8 +113,8 @@ New resource file…	FileTypes Window		Nowy plik zasobów...
 Icon	FileTypes Window		Ikona
 Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Usuwanie supertypu nie może być cofnięte.\nWszystkie typy plików które należą do supertypu zostaną utracone!\n\nCzy na pewno chcsz to zrobić? Aby usunąć całą grupę, przytrzymaj klawisz Shift i naciśnij \"Usuń\".
 Internal name:	FileTypes Window		Wewnętrzna nazwa:
-File recognition	FileTypes Window		Rozpoznawanie pliku
 Cancel	Type List Window		Anuluj
+File recognition	FileTypes Window		Rozpoznawanie pliku
 Description	FileTypes Window		Opis
 None	FileTypes Window		Brak
 Remove	FileTypes Window		Usuń
@@ -130,5 +130,5 @@ Preferred application	FileTypes Window		Preferowana aplikacja
 Attribute	Attribute Window		Atrybut
 Group name:	New File Type Window		Nazwa grupy:
 Display as:	Attribute Window	Tracker offers different display modes for attributes.	Wyświetl jako:
-Right	Attribute Window	Attribute column alignment in Tracker	Do prawej
 %1 application type	Application Type Window		%1 typ aplikacji
+Right	Attribute Window	Attribute column alignment in Tracker	Do prawej

@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Terminal	1348393487
+1	polish	x-vnd.Haiku-Terminal	3038436492
 Not found.	Terminal TermWindow		Nie znaleziono.
 Didn't find any available pseudo ttys.	Terminal Shell		Nie znaleziono żadnych dostępnych pseudo terminali.
 Switch Terminals	Terminal TermWindow		Przełącz Terminal
@@ -7,6 +7,7 @@ OK	Terminal TermWindow		OK
 New Terminal	Terminal TermWindow		Nowy Terminal
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal nie może uruchomić shella. Przepraszamy.
 Text size	Terminal TermWindow		Rozmiar tekstu
+Match case	Terminal FindWindow		Dopasuj wielkość liter
 Quit	Terminal TermWindow		Wyjdź
 Use default shell	Terminal Shell		Użyj domyślnego shella
 Select all	Terminal TermWindow		Zaznacz wszystko
@@ -30,7 +31,7 @@ Appearance	Terminal PrefWindow		Wygląd
 Use selection	Terminal FindWindow		Użyj zaznaczenia
 Size:	Terminal AppearancePrefView		Rozmiar:
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Nie można wykonać \"%command\":\n\t%error
-Full screen	Terminal TermWindow		Pełen ekran
+Full screen	Terminal TermWindow		Pełny ekran
 Page setup…	Terminal TermWindow		Ustawienia strony...
 OK	Terminal TermView		OK
 Insert path	Terminal TermView		Wstaw ścieżkę

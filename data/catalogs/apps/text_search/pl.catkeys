@@ -1,4 +1,5 @@
-1	polish	x-vnd.Haiku.TextSearch	2895782387
+1	polish	x-vnd.Haiku.TextSearch	3449010850
+%s: Not enough room to escape the filename.	Grepper		%s: Nie wystarczająca ilość miejsca do zaeskejpowania nazwy pliku.
 Trim to selection	GrepWindow		Zredukuj do zawartości
 Follow symbolic links	GrepWindow		Podążaj za linkami symbolicznymi
 Close	GrepWindow		Zamknij
@@ -12,6 +13,7 @@ Settings	GrepWindow		Ustawienia
 Select all	GrepWindow		Zaznacz wszystko
 OK	GrepWindow		OK
 %APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME nie mógł otworzyć jednego lub więcej folderów.
+Escape search text	GrepWindow		Wyszukiwanie znaków wyjścia
 Search	GrepWindow		Szukaj
 Open selection	GrepWindow		Otwarte zaznaczenie
 Look in sub-folders	GrepWindow		Szukaj w sub-folderach

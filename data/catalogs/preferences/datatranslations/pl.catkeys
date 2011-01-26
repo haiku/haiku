@@ -1,0 +1,26 @@
+1	polish	x-vnd.Haiku-DataTranslations	2482065199
+DataTranslations	DataTranslations		DataTranslations
+Info…	DataTranslations		Informacje…
+about	DataTranslations		O programie
+Could not install 	DataTranslations		Nie można było zainstalować
+Cancel	DataTranslations		Anuluj
+Name:	DataTranslations		Nazwa:
+Panel Info	DataTranslations		Panel informacyjny
+The item '	DataTranslations		Nie wygląda na to, że '
+%name' does not appear to be a Translator and will not be installed.	DataTranslations		%name' nie jest prawidłowym Translatorem, przez co nie zostanie zainstalowany.
+DataTranslations - Note	DataTranslations		DataTranslations - uwaga
+Name: %name \nVersion: 	DataTranslations		Nazwa: %name \nWersja:
+Overwrite	DataTranslations		Nadpisz
+Info:	DataTranslations		Informacje:
+info	DataTranslations		informacja
+%name already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		 istnieje już plik o nazwie %name! Czy powinien on zostać nadpisany?
+Path:	DataTranslations		Ścieżka:
+The new translator has been installed successfully.	DataTranslations		Nowy translator został prawidłowo zainstalowany.
+\nInfo: %info\n\nPath:\n	DataTranslations		\nInformacje: %info\n\nŚcieżka:\n
+DataTranslations - Error	DataTranslations		DataTranslations - Błąd
+OK	DataTranslations		OK
+An item named '	DataTranslations		W folderze Translatorów
+Icon	DataTranslations		Ikona
+DataTranslations\n\twritten by Oliver Siebenmarck and others\n\tCopyright 2002-2010, Haiku Inc. All rights reserved.\n	DataTranslations		DataTranslations\n\tnapisane przez: Oliver Siebenmarck i inni\n\tCopyright 2002-2010, Haiku Inc. Wszelkie prawa zastrzeżone.\n
+Version:	DataTranslations		Wersja:
+Translation Settings\n\nUse this control panel to set values that various\ntranslators use when no other settings are specified\nin the application.	DataTranslations		Ustawienia translacji\n\nUżyj tego panelu, żeby ustawić wartości, których różne\ntranslatory używają, gdy w aplikacji\nnie ma zdefiniowanych innych ustawień.

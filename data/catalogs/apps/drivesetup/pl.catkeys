@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-DriveSetup	1943527736
+1	polish	x-vnd.Haiku-DriveSetup	2723551013
 Delete	MainWindow		Usuń
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Na pewno chcesz zapisać zmiany na dysk?\n\nWszystkie dane na wybranej partycji bedą bezpowrotnie utracone!
 Rescan	MainWindow		Przeskanuj
@@ -74,3 +74,4 @@ DriveSetup	MainWindow		DriveSetup
 Are you sure you want to initialize the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Czy na pewno chcesz zainicjalizować partycję \"%s\"? Zostaniesz spytany ponownie zanim zmiany zostaną zapisane na dysk twardy.
 Are you sure you want to initialize the partition? You will be asked again before changes are written to the disk.	MainWindow		Czy jesteś pewien decyzji o zainicjalizowaniu partycji? Zostaniesz spytany ponownie zanim zmiany zostaną zapisane na dysk twardy.
 Parameters	PartitionList		Parametry
+Active	PartitionList		Aktywny

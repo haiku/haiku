@@ -9,6 +9,6 @@ New	PairsWindow		Nowy
 Intermediate (6x6)	PairsWindow		Średni (6x6)
 Quit	PairsWindow		Zamknij
 OK	PairsView		OK
-Pairs	PairsWindow		Pary
+Pairs	PairsWindow		Pairs
 Pairs\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYou completed the game in %s clicks.\n	PairsWindow		Pairs\n\twórca Ralf Schülke\n\tPrawa autorskie 2008-2010, Haiku Inc.\n\nZakończyłeś grę z wynikiem %s kliknięć.\n
-Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		Pary nie znalazły wystarczająco dużo ikon wektorowych w systemie; potrzeba co najmniej %d.
+Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		Pairs nie znalazły wystarczająco dużo ikon wektorowych w systemie; potrzeba co najmniej %d.

@@ -1,0 +1,41 @@
+1	polish	x-vnd.Haiku-ProcessController	678001537
+Memory usage	ProcessController		Użycie pamięci
+Do you really want to kill the team \"%s\"?	ProcessController		Czy na pewno chcesz zakończyć zespół \"%s\"?
+Restart Deskbar	ProcessController		Zrestartuj Deskbar
+Debug thread	ProcessController		Debuguj wątek
+Your setting filecould not be saved!\n(%s)	ProcessController		Twój plik konfiguracyjny nie mógł zostać zapisany!\n(%s)
+This team is already gone…	ProcessController		Ten zespół nie jest już obecny...
+Error saving file	ProcessController		Błąd przy zapisywaniu pliku
+This thread is already gone…	ProcessController		Ten wątek nie jest już obecny...
+Cancel	ProcessController		Anuluj
+Run in window	ProcessController		Uruchom w oknie
+Processor %d	ProcessController		Procesor %d
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
+ProcessController is already installed in Deskbar.	ProcessController		ProcessController jest już zainstalowany w Deskbarze.
+This is the last active processor...\nYou can't turn it off!	ProcessController		To jest ostatni aktywny procesor...\nNie możesz go wyłączyć!
+thread	ProcessController		wątek
+Preferences	ProcessController		Ustawienia
+%s priority [%d]	ProcessController		%s priorytet [%d]
+Quit application	ProcessController		Zakończ aplikację
+What do you want to do with the thread \"%s\"?	ProcessController		Co chcesz zrobić z wątkiem \"%s\"?
+about	ProcessController		o
+Gone teams…	ProcessController		Brakujące zespoły...
+Restart Tracker	ProcessController		Zrestartuj Trackera
+Live in the Deskbar	ProcessController		Na bieżąco w Deskbarze
+Kill this thread!	ProcessController		Zakończ ten wątek!
+Debug this thread!	ProcessController		Debuguj ten wątek!
+New Terminal	ProcessController		Nowy terminal
+About ProcessController…	ProcessController		O ProcessController...
+Ok!	ProcessController		Ok!
+Quit an application	ProcessController		Wyjdź z aplikacji
+Install in Deskbar	ProcessController		Zainstaluj w Deskbarze
+ProcessController\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n	ProcessController		ProcessController\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n
+Threads and CPU usage	ProcessController		Wątki oraz użycie CPU
+Global Popup	ProcessController		Globalny popup
+OK	ProcessController		OK
+Damned!	ProcessController		Cholera!
+priority	ProcessController		priorytet
+Usage: %s [-deskbar]\n	ProcessController		Użycie: %s [-deskbar]\n
+Yes, kill this team!	ProcessController		Tak, zakończ ten zespół!
+That's no Fun!	ProcessController		To nie zabawa!
+You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Możesz uruchomić ProcessController w oknie lub zainstalować go w Deskbarze.

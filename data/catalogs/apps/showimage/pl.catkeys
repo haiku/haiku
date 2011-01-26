@@ -1,22 +1,16 @@
-1	polish	x-vnd.Haiku-ShowImage	2679963118
+1	polish	x-vnd.Haiku-ShowImage	1508862207
 Use as background…	Menus		Użyj jako tapety...
-5 seconds	Menus		5 sekund
 Slide delay	Menus		Opóźnienie
 Zoom in	Menus		Przybliż
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Dokument '%s' został zmieniony. Czy chcesz go zamknąć?
-8 seconds	Menus		8 sekund
 Previous page	Menus		Poprzednia strona
 View	Menus		Widok
 Full screen	Menus		Pełny ekran
 Go to page	Menus		Idź do strony
 Zoom out	Menus		Oddal
-20 seconds	Menus		20 sekund
-3 seconds	Menus		3 sekundy
 Rotate counterclockwise	Menus		Obróć przeciwnie do ruchu wskazówek zegara
-10 seconds	Menus		10 sekund
 High-quality zooming	Menus		Zbliżenie wysokiej jakości
 Browse	Menus		Przeglądaj
-6 seconds	Menus		6 sekund
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Nie można załadować obrazu! Prawdopodobnie niepoprawny plik lub nie istnieje translator.
 First page	Menus		Pierwsza strona
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokument '%s' (strona %d) został zmieniony. Czy chcesz go zamknąć?
@@ -24,18 +18,15 @@ About ShowImage…	Menus		O Przeglądarce Obrazów…
 Close	ClosePrompt		Zamknij
 Undo	Menus		Cofnij
 Resize to (in 1/72 inches):	PrintOptionsWindow		Ustaw rozmiar (w 1/72 cala):
-9 seconds	Menus		9 sekund
 Flip left to right	Menus		Odbij z lewej na prawą
 Show caption in full screen mode	Menus		Pokaż podpis w trybie pełnoekranowym
 DPI:	PrintOptionsWindow		DPI:
 Next file	Menus		Następny plik
-4 seconds	Menus		4 sekundy
 Close document	ClosePrompt		Zamknij dokument
 Height: 	PrintOptionsWindow		Wysokość: 
 Cancel	ClosePrompt		Anuluj
 Print options	PrintOptionsWindow		Ustawienia wydruku
 ShowImage	AboutWindow		Przeglądarka obrazów
-7 seconds	Menus		7 sekund
 Last page	Menus		Ostatnia strona
 Previous file	Menus		Poprzedni plik
 Slide show	Menus		Pokaż z opóźnieniem
@@ -61,9 +52,10 @@ Copy	Menus		Kopiuj
 Select all	Menus		Zaznacz wszystko
 Save as…	Menus		Zapisz jako...
 Open…	Menus		Otwórz...
-ShowImage	Menus		PrzaglądarkaObrazów
+ShowImage	Menus		Przaglądarka Obrazów
 Clear selection	Menus		Wyczyść zaznaczenie
 Selection Mode	Menus		Tryb zaznaczania
 Stretch to window	Menus		Rozciągnij do okna
 OK	Alerts		OK
 Fit to window	Menus		Wpasuj w okno
+%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS sekund

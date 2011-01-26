@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Mail	1416961282
+1	polish	x-vnd.Haiku-Mail	2852433271
 Select account type	Config Views		Wybierz typ konta
 Mail checking	Config Window		Sprawdzanie wiadomości
 Settings	Config Window		Ustawienia
@@ -46,3 +46,22 @@ Always	Config Window		Zawsze
 Add filter	Config Views		Dodaj filtr
 Outgoing mail filters	Config Views		Fltry poczty wychodzącej
 \n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nUtwórz nowe konto naciskając przycisk Dodaj.\n\nUsuń konto za pomocą przycisku Usuń po zaznaczeniu elementu.
+Server Name:	E-Mail		Nazwa serwera:
+OK	Config Window		OK
+E-mail address:	E-Mail		Adres e-mail:
+Account name:	E-Mail		Nazwa konta:
+Account Type:	E-Mail		Typ konta:
+Beta	Config Window		Beta
+Login name:	E-Mail		Login:
+Password:	E-Mail		Hasło:
+E-mail	Config Views		E-mail
+Send mail only	E-Mail		Tylko wysyłanie
+Alpha	Config Window		Alpha
+Send and receive mail	E-Mail		Wysyłanie i odbieranie
+Receive mail only	E-Mail		Tylko odbieranie
+Choose Protocol	Config Views		Wybierz protokół
+Choose Protocol	E-Mail		Wybierz protokół
+Real name:	E-Mail		Prawdziwe imię:
+E-mail	Config Window		E-mail
+Mail Daemon Replacement\n\nby Haiku, Inc. All rights reserved.\n\nVersion %ld.%ld.%ld %s\n\nSee LICENSE file included in the installation package for more information.\n\n\n\nYou can contact us at:\n%s\n\nPlease submit bug reports using the %s\n\nProject homepage at:\n%s	Config Window		Zamiennik Daemona Poczty\n\nprzez Haiku, Inc. Wszelkie prawa zastrzeżone.\n\nWersja %ld.%ld.%ld %s\n\nŻeby uzyskać więcej informacji, zobacz plik LICENSE zawarty w paczce instalacyjnej.\n\n\n\nMożesz się z nami skontaktować pod:\n%s\n\nRaporty błędów prosimy wysyłać używając %s\n\nStrona domowa projektu:\n%s
+Error	Config Window		Błąd

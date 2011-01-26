@@ -5,7 +5,7 @@ Cancel	AddPrinterDialog		Anuluj
 Add printer	AddPrinterDialog		Dodaj drukarkę
 Printers	PrintersWindow		Drukarki
 Default Printer	PrinterListView		Domyślna drukarka
-No pending jobs.	PrinterListView		Brak aktywnych zadań
+No pending jobs.	PrinterListView		Brak oczekujących zadań.
 pages	JobListView		strony
 Processing	JobListView		W toku
 Printer name:	AddPrinterDialog		Nazwa drukarki:

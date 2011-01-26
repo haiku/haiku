@@ -1,0 +1,48 @@
+1	polish	x-vnd.Haiku-Devices	1250375801
+Order by:	DevicesView		Sortuj według:
+ACPI controller	Device		Kontroler ACPI
+Memory controller	Device		Kontroler pamięci
+Docking station	Device		Stacja dokująca
+Computer	Device		Komputer
+Detailed	DevicesView		Szczegółowy
+Properties	PropertyList		Właściwości
+Category	DevicesView		Kategoria
+Quit	DevicesView		Wyjdź
+Device paths	Device		Ścieżki do urządzeń
+Manufacturer\t\t\t: 	Device		Producent\t\t\t: 
+Processor	Device		Procesor
+ACPI Information	DeviceACPI		Informacja o ACPI
+Device Name\t\t\t\t: 	Device		Nazwa Urządzenia\t\t\t\t: 
+Generic system peripheral	Device		Generyczne urządzenie peryferyjne
+Display controller	Device		Kontroler ekranu
+Mass storage controller	Device		Kontroler pamięci masowej
+About Devices…	DevicesView		O Devices...
+Input device controller	Device		Kontroler urządzenia wejścia
+Device paths\t: 	Device		Ścieżki do urządzeń\t: 
+Network controller	Device		Kontroler sieci
+Devices\n\twritten by Pieter Panman\n\n\tBased on listdev by Jérôme Duval\n\tand the previous Devices preference\n\tby Jérôme Duval and Sikosis\n\tCopyright 2009, Haiku, Inc.\n	DevicesApplication		Devices\n\tautorstwa Pietera Panmana\n\n\tOparte na listdev autorstwa Jérômea Duvala\n\toraz poprzedniiej wersji Devices\n\tautostwa Jérôme Duval i Sikosis\n\tCopyright 2009, Haiku, Inc.\n
+Driver used	Device		Użyty sterownik
+Driver used\t\t\t\t: 	Device		Użyty sterownik\t\t\t\t: 
+Bus	DevicesView		Magistrala
+Communication controller	Device		Kontroler komunikacji
+Basic information	DevicesView		Podstawowe informacje
+PCI Information	DevicePCI		Informacje o PCI
+Manufacturer:	Device		Producent:
+Multimedia controller	Device		Kontroler multimediów
+Device name:	Device		Nazwa urządzenia:
+Report compatibility	DevicesView		Raport zgodności
+about	DevicesApplication		o
+Signal processing controller	Device		Kontroler przetwarzania sygnałów
+Serial bus controller	Device		Kontroler magistrali szeregowej
+Wireless controller	Device		Kontroler łączy bezprzewodowych
+Device name	Device		Nazwa urządzenia
+Manufacturer	Device		Producent
+Intelligent controller	Device		Inteligentny kontroler
+Satellite communications controller	Device		Kontroler komunikacji satelitarnej
+Bridge	Device		Most
+Refresh devices	DevicesView		Odśwież urządzenia
+Connection	DevicesView		Połączenie
+Generate system information	DevicesView		Wygeneruj informacje o systemie
+Encryption controller	Device		Kontroler szyfrowania
+Unclassified device	Device		Nieznane urządzenie
+Devices	DevicesView		Urządzenia

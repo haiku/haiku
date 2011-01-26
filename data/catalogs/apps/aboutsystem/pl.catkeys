@@ -34,5 +34,5 @@ GCC %d Hybrid	AboutView		GCC %d Hybrid
 %d MiB used (%d%%)	AboutView		%d MiB użyte (%d%%)
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT licence%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		Kod unikalny dla projektu Haiku, w szczególności jądro systemu oraz kod źródłowy, do którego odwołują się aplikacje systemowe, jest udostępniany na licencji %MIT licence%. Część bibliotek systemowych zawiera kod źródłowy stron trzecich, dystrybuowany na zasadach licencji LGPL. Prawa autorskie do kodu stron trzecich możesz znaleźć na liście poniżej.\n\n
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB ogółem, %inaccessible MiB nieosiągalne
-Google & their Google Summer of Code program\n	AboutView		Google oraz programu Google Summer of Code
+Google & their Google Summer of Code program\n	AboutView		Google oraz programu Google Summer of Code\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Uniwersytetu w Auckland oraz Christofa Lutterotha
