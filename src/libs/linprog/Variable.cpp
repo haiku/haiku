@@ -295,9 +295,26 @@ Variable::Variable(LinearSpec* ls)
 	fMin(-20000),
 	fMax(20000),
 	fLabel(NULL),
-	fIsValid(false)
+	fIsValid(false),
+	fReferenceCount(0)
 {
 
+}
+
+
+int32
+Variable::AddReference()
+{
+	fReferenceCount++;
+	return fReferenceCount;
+}
+
+
+int32
+Variable::RemoveReference()
+{
+	fReferenceCount--;
+	return fReferenceCount;
 }
 
 

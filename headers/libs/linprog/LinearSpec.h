@@ -148,6 +148,7 @@ private:
 									double penaltyNeg, double penaltyPos);
 
 			VariableList		fVariables;
+			VariableList		fUsedVariables;
 			ConstraintList		fConstraints;
 			ResultType			fResult;
 			bigtime_t 			fSolvingTime;

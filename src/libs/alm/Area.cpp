@@ -635,14 +635,15 @@ Area::_Init(LinearSpec* ls, XTab* left, YTab* top, XTab* right, YTab* bottom)
 		fScaleHeight, kEQ, 0, fShrinkPenalties.Height(),
 		fGrowPenalties.Height());
 #else
-	BSize preferredSize = fLayoutItem->PreferredSize();
 	fPreferredContentWidth = fLS->AddConstraint(-1.0, fLeft, 1.0, fRight, kEQ,
 		0, fShrinkPenalties.Width(), fGrowPenalties.Width());
-	_UpdatePreferredWidthConstraint(preferredSize);
 	fPreferredContentHeight = fLS->AddConstraint(-1.0, fTop, 1.0, fBottom, kEQ,
 		0, fShrinkPenalties.Height(), fGrowPenalties.Height());
-	_UpdatePreferredHeightConstraint(preferredSize);
 #endif
+
+	BSize preferredSize = fLayoutItem->PreferredSize();
+	_UpdatePreferredWidthConstraint(preferredSize);
+	_UpdatePreferredHeightConstraint(preferredSize);
 
 	fConstraints.AddItem(fPreferredContentWidth);
 	fConstraints.AddItem(fPreferredContentHeight);

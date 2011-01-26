@@ -71,6 +71,9 @@ public:
 			BSize				MaxSize(Variable* width, Variable* height);
 
 public:
+			void				_RemoveSoftConstraint(ConstraintList& list);
+			void				_AddSoftConstraint(const ConstraintList& list);
+
 	const	VariableList&		fVariables;
 	const	ConstraintList&		fConstraints;
 

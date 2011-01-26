@@ -58,6 +58,9 @@ public:
 protected:
 								Variable(LinearSpec* ls);
 
+			//! returns the ref count
+			int32				AddReference();
+			int32				RemoveReference();
 private:
 			LinearSpec*			fLS;
 
@@ -68,6 +71,7 @@ private:
 
 			bool				fIsValid;
 
+			int32				fReferenceCount;
 public:
 	friend class		LinearSpec;
 };

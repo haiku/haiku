@@ -149,7 +149,7 @@ LinearSpec::RemoveVariable(Variable* variable, bool deleteVariable)
 int32
 LinearSpec::IndexOf(const Variable* variable) const
 {
-	return fVariables.IndexOf(variable);
+	return fUsedVariables.IndexOf(variable);
 }
 
 
@@ -168,10 +168,20 @@ LinearSpec::AddConstraint(Constraint* constraint)
 	if (!fConstraints.AddItem(constraint))
 		return false;
 
+	// ref count the used variables
+	SummandList* leftSide = constraint->LeftSide();
+	for (int i = 0; i < leftSide->CountItems(); i++) {
+		Variable* var = leftSide->ItemAt(i)->Var();
+		if (var->AddReference() == 1)
+			fUsedVariables.AddItem(var);
+	}
+
 	if (!fSolver->ConstraintAdded(constraint)) {
-		fConstraints.RemoveItem(constraint);
+		RemoveConstraint(constraint, false);
 		return false;
 	}
+
+	constraint->fIsValid = true;
 	return true;
 }
 
@@ -182,6 +192,13 @@ LinearSpec::RemoveConstraint(Constraint* constraint, bool deleteConstraint)
 	fSolver->ConstraintRemoved(constraint);
 	fConstraints.RemoveItem(constraint);
 	constraint->fIsValid = false;
+
+	SummandList* leftSide = constraint->LeftSide();
+	for (int i = 0; i < leftSide->CountItems(); i++) {
+		Variable* var = leftSide->ItemAt(i)->Var();
+		if (var->RemoveReference() == 0)
+			fUsedVariables.RemoveItem(var);
+	}
 
 	if (deleteConstraint)
 		delete constraint;
@@ -559,7 +576,7 @@ LinearSpec::Constraints() const
 const VariableList&
 LinearSpec::Variables() const
 {
-	return fVariables;
+	return fUsedVariables;
 }
 
 

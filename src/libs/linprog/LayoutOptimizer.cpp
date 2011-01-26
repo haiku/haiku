@@ -914,7 +914,6 @@ LayoutOptimizer::_SolveSubProblem(const double* d, int am, double* p)
 	negate_vector(pz, zn);
 
 	// fTemp2 = Ztrans * G * Z
-	//multiply_optimization_matrix_matrix(Z, an, zn, fTemp1);
 	multiply_matrices(fG, Z, fTemp1, zm, fVariableCount, zn);
 	multiply_matrices(fZtrans, fTemp1, fTemp2, zn, zm, zn);
 

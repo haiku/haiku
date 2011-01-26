@@ -504,6 +504,9 @@ ActiveSetSolver::SaveModel(const char* fileName)
 BSize
 ActiveSetSolver::MinSize(Variable* width, Variable* height)
 {
+	ConstraintList softConstraints;
+	_RemoveSoftConstraint(softConstraints);
+
 	Constraint* heightConstraint = fLinearSpec->AddConstraint(1, height,
 		kEQ, 0, 5, 5);
 	Constraint* widthConstraint = fLinearSpec->AddConstraint(1, width,
@@ -511,6 +514,8 @@ ActiveSetSolver::MinSize(Variable* width, Variable* height)
 	ResultType result = Solve();
 	fLinearSpec->RemoveConstraint(heightConstraint);
 	fLinearSpec->RemoveConstraint(widthConstraint);
+
+	_AddSoftConstraint(softConstraints);
 
 	if (result == kUnbounded)
 		return kMinSize;
@@ -524,6 +529,9 @@ ActiveSetSolver::MinSize(Variable* width, Variable* height)
 BSize
 ActiveSetSolver::MaxSize(Variable* width, Variable* height)
 {
+	ConstraintList softConstraints;
+	_RemoveSoftConstraint(softConstraints);
+
 	const double kHugeValue = 32000;
 	Constraint* heightConstraint = fLinearSpec->AddConstraint(1, height,
 		kEQ, kHugeValue, 5, 5);
@@ -533,10 +541,40 @@ ActiveSetSolver::MaxSize(Variable* width, Variable* height)
 	fLinearSpec->RemoveConstraint(heightConstraint);
 	fLinearSpec->RemoveConstraint(widthConstraint);
 
+	_AddSoftConstraint(softConstraints);
+
 	if (result == kUnbounded)
-		return kMinSize;
+		return kMaxSize;
 	if (result != kOptimal)
 		printf("Could not solve the layout specification (%d). ", result);
 
 	return BSize(width->Value(), height->Value());
 }
+
+
+void
+ActiveSetSolver::_RemoveSoftConstraint(ConstraintList& list)
+{
+	ConstraintList allConstraints = fLinearSpec->Constraints();
+	for (int i = 0; i < allConstraints.CountItems(); i++) {
+		Constraint* constraint = allConstraints.ItemAt(i);
+		if (!constraint->IsSoft())
+			continue;
+
+		if (fLinearSpec->RemoveConstraint(constraint, false) == true)
+			list.AddItem(constraint);
+	}
+}
+
+
+void
+ActiveSetSolver::_AddSoftConstraint(const ConstraintList& list)
+{
+	for (int i = 0; i < list.CountItems(); i++) {
+		Constraint* constraint = list.ItemAt(i);
+		// at least don't leak it
+		if (fLinearSpec->AddConstraint(constraint) == false)
+			delete constraint;
+	}
+}
+
