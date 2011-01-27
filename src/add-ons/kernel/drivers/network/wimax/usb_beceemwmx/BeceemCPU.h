@@ -3,8 +3,6 @@
  *	Copyright (c) 2010 Alexander von Gluck <kallisti5@unixzen.com>
  *	Distributed under the terms of the MIT license.
  *
- *	Based on GPL code developed by: Beceem Communications Pvt. Ltd
- *
  *	Description: Wrangle Beceem CPU control calls
  */
 

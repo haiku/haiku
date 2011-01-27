@@ -1,7 +1,7 @@
 /*
  *	Beceem WiMax USB Driver.
  *	Copyright (c) 2010 Alexander von Gluck <kallisti5@unixzen.com>
- *	Distributed under the terms of the MIT license.
+ *	Distributed under the terms of the GNU General Public License.
  *
  *	Based on GPL code developed by: Beceem Communications Pvt. Ltd
  *

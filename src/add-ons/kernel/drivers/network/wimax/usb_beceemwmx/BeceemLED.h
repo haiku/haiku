@@ -42,7 +42,7 @@ typedef enum _LEDColors{
 	BLUE_LED = 2,
 	YELLOW_LED = 3,
 	GREEN_LED = 4
-} LEDColors;                            /*Enumerated values of different LED types*/
+} LEDColors;
 
 #endif	// _USB_BECEEM_LED_H
 
