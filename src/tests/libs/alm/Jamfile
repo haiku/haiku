@@ -39,3 +39,15 @@ Application ALMOperator :
 	:
 	be liblpsolve55.so be libalm.so $(TARGET_LIBSTDC++)
 ;
+
+Application ALMThreeButtons :
+	ThreeButtons.cpp
+	:
+	be liblpsolve55.so be libalm.so $(TARGET_LIBSTDC++)
+;
+
+Application ALMComplexButtons :
+	ComplexButtons.cpp
+	:
+	be liblpsolve55.so be libalm.so $(TARGET_LIBSTDC++)
+;

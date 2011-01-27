@@ -47,7 +47,12 @@ public:
 		layout->AddView(button4, layout->Left(), y3, layout->Right(),
 			layout->Bottom());
 		button4->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT,
-			B_ALIGN_BOTTOM));	
+			B_ALIGN_BOTTOM));
+
+		// test size limits
+		BSize min = layout->MinSize();
+		BSize max = layout->MaxSize();
+		SetSizeLimits(min.Width(), max.Width(), min.Height(), max.Height());
 	}
 	
 private:
