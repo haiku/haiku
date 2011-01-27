@@ -8,8 +8,10 @@
 
 #include <util/DoublyLinkedList.h>
 
-#include "PackageData.h"
+#include <package/hpkg/PackageData.h>
 
+
+using BPackageKit::BHaikuPackage::BPrivate::PackageData;
 
 class PackageNode;
 

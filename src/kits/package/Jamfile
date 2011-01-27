@@ -1,6 +1,32 @@
 SubDir HAIKU_TOP src kits package ;
 
-UsePrivateHeaders package shared ;
+UseLibraryHeaders zlib ;
+
+UsePrivateHeaders
+	kernel
+	shared ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package hpkg ] ;
+
+HPKG_SOURCES =
+	BlockBufferCache.cpp
+	BufferCache.cpp
+	DataOutput.cpp
+	DataReader.cpp
+	ErrorOutput.cpp
+	PackageData.cpp
+	PackageDataReader.cpp
+	PackageEntry.cpp
+	PackageEntryAttribute.cpp
+	PackageReader.cpp
+	PackageWriter.cpp
+	Strings.cpp
+
+	# compression
+	ZlibCompressionBase.cpp
+	ZlibCompressor.cpp
+	ZlibDecompressor.cpp
+	;
 
 SharedLibrary libpackage.so
 	:
@@ -14,6 +40,7 @@ SharedLibrary libpackage.so
 	FetchFileJob.cpp
 	Job.cpp
 	JobQueue.cpp
+	PackageInfo.cpp
 	PackageRoster.cpp
 	RefreshRepositoryRequest.cpp
 	RemoveRepositoryJob.cpp
@@ -23,6 +50,8 @@ SharedLibrary libpackage.so
 	Request.cpp
 	TempfileManager.cpp
 	ValidateChecksumJob.cpp
+
+	$(HPKG_SOURCES)
 	:
-	libshared.a be $(TARGET_LIBSTDC++)
+	libshared.a be z $(TARGET_LIBSTDC++)
 ;

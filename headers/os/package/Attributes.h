@@ -15,8 +15,9 @@ extern const char* kPackageVendorAttribute;
 extern const char* kPackageVersionAttribute;
 
 // attributes kept local to packages
-extern const char* kPackageCopyrightAttribute;
-extern const char* kPackageLicenseAttribute;
+extern const char* kPackageCopyrightsAttribute;
+extern const char* kPackageLicensesAttribute;
+extern const char* kPackagePackagerAttribute;
 extern const char* kPackageProvidesAttribute;
 extern const char* kPackageRequiresAttribute;
 

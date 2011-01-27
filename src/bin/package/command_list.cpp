@@ -4,8 +4,6 @@
  */
 
 
-#include "package.h"
-
 #include <ctype.h>
 #include <errno.h>
 #include <getopt.h>
@@ -13,11 +11,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <package/hpkg/PackageEntry.h>
+#include <package/hpkg/PackageEntryAttribute.h>
+#include <package/hpkg/PackageReader.h>
+
 #include "package.h"
-#include "PackageEntry.h"
-#include "PackageEntryAttribute.h"
-#include "PackageReader.h"
 #include "StandardErrorOutput.h"
+
+
+using namespace BPackageKit::BHaikuPackage::BPrivate;
 
 
 struct PackageContentListHandler : PackageContentHandler {

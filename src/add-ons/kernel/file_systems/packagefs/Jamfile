@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src add-ons kernel file_systems packagefs ;
 
 UseLibraryHeaders zlib ;
 UsePrivateKernelHeaders ;
-UsePrivateHeaders haiku_package shared ;
+UsePrivateHeaders shared ;
 
 DEFINES += B_ENABLE_INCOMPLETE_POSIX_AT_SUPPORT ;
 	# TODO: Remove when it is complete!
@@ -46,8 +46,7 @@ HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES =
 ;
 
 
-SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src bin package ] ;
-SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src bin package compression ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package hpkg ] ;
 
 
 KernelAddon packagefs

@@ -13,15 +13,16 @@
 namespace BPackageKit {
 
 
-// attributes used in package and as file attribute, too
+// attributes used in package and as BFS-attribute
 const char* kPackageNameAttribute		= "PKG:name";
 const char* kPackagePlatformAttribute	= "PKG:platform";
 const char* kPackageVendorAttribute		= "PKG:vendor";
 const char* kPackageVersionAttribute	= "PKG:version";
 
 // attributes kept local to packages
-const char* kPackageCopyrightAttribute	= "PKG:copyright";
-const char* kPackageLicenseAttribute	= "PKG:license";
+const char* kPackageCopyrightsAttribute	= "PKG:copyrights";
+const char* kPackageLicensesAttribute	= "PKG:licenses";
+const char* kPackagePackagerAttribute	= "PKG:packager";
 const char* kPackageProvidesAttribute	= "PKG:provides";
 const char* kPackageRequiresAttribute	= "PKG:requires";
 

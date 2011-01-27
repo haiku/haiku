@@ -11,13 +11,16 @@
 
 #include <fs_cache.h>
 
-#include "DataOutput.h"
-#include "DataReader.h"
-#include "PackageDataReader.h"
+#include <package/hpkg/DataOutput.h>
+#include <package/hpkg/DataReader.h>
+#include <package/hpkg/PackageDataReader.h>
 
 #include "DebugSupport.h"
 #include "GlobalFactory.h"
 #include "Package.h"
+
+
+using namespace BPackageKit::BHaikuPackage::BPrivate;
 
 
 // #pragma mark - DataAccessor

@@ -6,7 +6,10 @@
 #define STANDARD_ERROR_OUTPUT_H
 
 
-#include "ErrorOutput.h"
+#include <package/hpkg/ErrorOutput.h>
+
+
+using BPackageKit::BHaikuPackage::BPrivate::ErrorOutput;
 
 
 class StandardErrorOutput : public ErrorOutput {

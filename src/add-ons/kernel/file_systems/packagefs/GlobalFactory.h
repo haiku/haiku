@@ -6,8 +6,13 @@
 #define GLOBAL_FACTORY_H
 
 
+#include <package/hpkg/haiku_package.h>
+#include <package/hpkg/PackageDataReader.h>
+
 #include "BlockBufferCacheKernel.h"
-#include "PackageDataReader.h"
+
+
+using namespace BPackageKit::BHaikuPackage::BPrivate;
 
 
 class GlobalFactory {

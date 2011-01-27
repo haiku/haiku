@@ -23,11 +23,11 @@
 
 #include <Notifications.h>
 
-#include "ErrorOutput.h"
-#include "FDCloser.h"
-#include "PackageEntry.h"
-#include "PackageEntryAttribute.h"
-#include "PackageReader.h"
+#include <package/hpkg/ErrorOutput.h>
+#include <package/hpkg/FDCloser.h>
+#include <package/hpkg/PackageEntry.h>
+#include <package/hpkg/PackageEntryAttribute.h>
+#include <package/hpkg/PackageReader.h>
 
 #include "DebugSupport.h"
 #include "Directory.h"
@@ -36,6 +36,9 @@
 #include "PackageDirectory.h"
 #include "PackageFile.h"
 #include "PackageSymlink.h"
+
+
+using namespace BPackageKit::BHaikuPackage::BPrivate;
 
 
 // node ID of the root directory
@@ -625,6 +628,9 @@ Volume::_AddPackageContent(Package* package, bool notify)
 {
 	for (PackageNodeList::Iterator it = package->Nodes().GetIterator();
 			PackageNode* node = it.Next();) {
+		// skip over ".PackageInfo" file, it isn't part of the package content
+		if (strcmp(node->Name(), B_HPKG_PACKAGE_INFO_FILE_NAME) == 0)
+			continue;
 		status_t error = _AddPackageContentRootNode(package, node, notify);
 		if (error != B_OK) {
 			_RemovePackageContent(package, node, notify);
@@ -644,6 +650,10 @@ Volume::_RemovePackageContent(Package* package, PackageNode* endNode,
 	while (node != NULL) {
 		if (node == endNode)
 			break;
+
+		// skip over ".PackageInfo" file, it isn't part of the package content
+		if (strcmp(node->Name(), B_HPKG_PACKAGE_INFO_FILE_NAME) == 0)
+			continue;
 
 		PackageNode* nextNode = package->Nodes().GetNext(node);
 		_RemovePackageContentRootNode(package, node, NULL, notify);

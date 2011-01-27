@@ -2,8 +2,8 @@
  * Copyright 2011, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _PACKAGE__ROSTER_H_
-#define _PACKAGE__ROSTER_H_
+#ifndef _PACKAGE__PACKAGE_ROSTER_H_
+#define _PACKAGE__PACKAGE_ROSTER_H_
 
 
 #include <Entry.h>
@@ -68,4 +68,4 @@ private:
 }	// namespace BPackageKit
 
 
-#endif // _PACKAGE__ROSTER_H_
+#endif // _PACKAGE__PACKAGE_ROSTER_H_

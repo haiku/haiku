@@ -4,8 +4,6 @@
  */
 
 
-#include "package.h"
-
 #include <ctype.h>
 #include <fcntl.h>
 #include <errno.h>
@@ -23,14 +21,18 @@
 
 #include <AutoDeleter.h>
 
-#include "BlockBufferCache.h"
-#include "FDCloser.h"
+#include <package/hpkg/BlockBufferCache.h>
+#include <package/hpkg/FDCloser.h>
+#include <package/hpkg/PackageDataReader.h>
+#include <package/hpkg/PackageEntry.h>
+#include <package/hpkg/PackageEntryAttribute.h>
+#include <package/hpkg/PackageReader.h>
+
 #include "package.h"
-#include "PackageDataReader.h"
-#include "PackageEntry.h"
-#include "PackageEntryAttribute.h"
-#include "PackageReader.h"
 #include "StandardErrorOutput.h"
+
+
+using namespace BPackageKit::BHaikuPackage::BPrivate;
 
 
 struct PackageContentExtractHandler : PackageContentHandler {

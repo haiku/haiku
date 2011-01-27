@@ -8,7 +8,10 @@
 
 #include <util/AutoLock.h>
 
-#include "BlockBufferCache.h"
+#include <package/hpkg/BlockBufferCache.h>
+
+
+using BPackageKit::BHaikuPackage::BPrivate::BlockBufferCache;
 
 
 class BlockBufferCacheKernel : public BlockBufferCache {

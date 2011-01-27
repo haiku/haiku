@@ -103,8 +103,10 @@ BRepositoryConfig::SetTo(const BEntry& entry)
 	if (buffer == NULL)
 		return B_NO_MEMORY;
 
-	if ((result = file.Read(buffer, size)) < size)
+	if ((result = file.Read(buffer, size)) < size) {
+		configString.UnlockBuffer(0);
 		return (result >= 0) ? B_IO_ERROR : result;
+	}
 
 	buffer[size] = '\0';
 	configString.UnlockBuffer(size);

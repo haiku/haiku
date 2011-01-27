@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "PackageWriter.h"
+#include <package/hpkg/PackageWriter.h>
 
 
 extern const char* __progname;

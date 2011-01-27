@@ -6,9 +6,12 @@
 #define PACKAGE_FILE_H
 
 
-#include "PackageData.h"
+#include <package/hpkg/PackageData.h>
 
 #include "PackageLeafNode.h"
+
+
+using BPackageKit::BHaikuPackage::BPrivate::PackageData;
 
 
 class PackageFile : public PackageLeafNode {
