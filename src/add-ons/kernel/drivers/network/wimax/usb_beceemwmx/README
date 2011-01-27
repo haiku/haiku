@@ -1,0 +1,29 @@
+USB Driver for Beceem WiMAX devices
+====================================================
+Realeased under the MIT license for Haiku
+2010 Alexander von Gluck
+
+This driver requires a Beceem firmware/vendor configuration
+
+The firmware is binary code pushed to the device and is 
+a requirement to operate.
+
+The vendor config is a binary configuration file provided
+by the device vendor (Ubee, ZTE, Sierra,etc) to tell the
+device about it's internal configuration.
+
+Obtaining the Firmware / Vendor configuration
+=========================================================
+The driver will gracefully search the following directory
+for it's needed binary files:
+/boot/system/data/firmware/macxvi200/
+
+macxvi200.bin
+macvi.cfg
+
+These needed files can be obtained by installing the vendor
+provided drivers onto a windows system and checking in
+system32/drivers
+
+*Warning*
+The license of the binary files is currently unknown.

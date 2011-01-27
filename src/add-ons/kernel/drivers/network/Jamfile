@@ -36,3 +36,5 @@ SubIncludeGPL HAIKU_TOP src add-ons kernel drivers network bcm570x ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network atheros813x ;
 
 SubInclude HAIKU_TOP src add-ons kernel drivers network wlan ;
+
+SubInclude HAIKU_TOP src add-ons kernel drivers network wimax ;

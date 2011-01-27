@@ -1,0 +1,33 @@
+##
+##	USB Beceem driver
+##	Distributed under the terms of the MIT license.
+##	
+
+## trace [on|off] - activate additional tracing.
+## default value: off
+
+trace on 
+
+## logfile [full path to private log file] 
+## default path value: /var/log/usb_beceem.log
+## if disabled - all output goes to syslog
+
+logfile /var/log/usb_beceem.log
+
+## reset_logfile [on|off] - truncate private log file on driver/system restart
+## default value: off
+##
+
+reset_logfile on
+
+## add_timestamp  [on|off]  - add time of writing the string in private log file.
+## default value: on
+##
+
+# add_timestamp off
+
+## trace_flow [on|off] - activate data flow tracing. Statistic about of 
+##                       transferred data amount and media state.
+## default value: off
+
+# trace_flow on
