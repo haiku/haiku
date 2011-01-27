@@ -79,7 +79,7 @@ endif
 	endif
 
 #	set the linker and linker flags
-	LD			:= gcc
+	LD			?= gcc
 	LDFLAGS		+= $(DEBUG)
 
 #	SETTING: set linker flags for each binary type
