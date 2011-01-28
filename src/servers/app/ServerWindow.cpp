@@ -2782,7 +2782,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 			DTRACE(("ServerWindow %s: Message AS_DRAW_STRING_WITH_OFFSETS, View: %s "
 				"-> %s\n", Title(), fCurrentView->Name(), string));
 
-			for (int32 i = 0; i < stringLength; i++)
+			for (int32 i = 0; i < glyphCount; i++)
 				fCurrentView->ConvertToScreenForDrawing(&locations[i]);
 
 			BPoint penLocation = drawingEngine->DrawString(string,
