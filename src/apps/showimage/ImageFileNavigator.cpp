@@ -26,6 +26,7 @@
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
+#include <NaturalCompare.h>
 #include <ObjectList.h>
 #include <TranslatorRoster.h>
 
@@ -33,7 +34,6 @@
 
 #include "ProgressWindow.h"
 #include "ShowImageConstants.h"
-#include "Utilities.h"
 
 
 class Navigator {
