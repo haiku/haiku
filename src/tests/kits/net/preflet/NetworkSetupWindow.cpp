@@ -35,10 +35,6 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 			B_TRANSLATE("Profile:"), profilesPopup);
 	profilesMenuField->SetFont(be_bold_font);
 
-	BButton *button = new BButton("manage_profiles",
-			B_TRANSLATE("Manage profiles" B_UTF8_ELLIPSIS),
-			new BMessage(MANAGE_PROFILES_MSG));
-
 	// ---- Settings section
 
 	fPanel = new BTabView("showview_box");
@@ -69,7 +65,6 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 		.AddGroup(B_HORIZONTAL, 5)
 			.Add(profilesMenuField)
 			.AddGlue()
-			.Add(button)
 		.End()
 		.Add(fPanel)
 		.Add(bottomDivider)
@@ -197,6 +192,8 @@ NetworkSetupWindow::_BuildProfilesMenu(BMenu* menu, int32 msg_what)
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem(B_TRANSLATE("New" B_UTF8_ELLIPSIS),
 		new BMessage(NEW_PROFILE_MSG)));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Manage" B_UTF8_ELLIPSIS),
+		new BMessage(MANAGE_PROFILES_MSG)));
 
 	if (strlen(current_profile)) {
 		item = menu->FindItem(current_profile);
@@ -223,7 +220,7 @@ NetworkSetupWindow::_BuildShowTabView(int32 msg_what)
 	if (!search_paths)
 		return;
 
-	fMinAddonViewRect.Set(0, 0, 200, 200);	// Minimum size
+	fMinAddonViewRect.Set(0, 0, 350, 200);	// Minimum size
 
 	search_paths = strdup(search_paths);
 	char* next_path_token;

@@ -101,30 +101,24 @@ InterfaceListItem::DrawItem(BView* owner, BRect /*bounds*/, bool complete)
 
 	BRect bounds = list->ItemFrame(list->IndexOf(this));
 
-	rgb_color oldviewcolor = owner->ViewColor();
-	rgb_color oldlowcolor = owner->LowColor();
-	rgb_color oldcolor = owner->HighColor();
+	rgb_color black= { 0,0,0,255 };
 
-	rgb_color color = oldviewcolor;
-	if ( IsSelected() )
-		color = tint_color(color, B_HIGHLIGHT_BACKGROUND_TINT);
+	if ( IsSelected() || complete ) {
+        if (IsSelected()) {
+            owner->SetHighColor(tint_color(owner->ViewColor() , B_HIGHLIGHT_BACKGROUND_TINT));
+        } else {
+            owner->SetHighColor(owner->LowColor());
+		}
 
-	owner->SetViewColor( color );
-	owner->SetHighColor( color );
-	owner->SetLowColor( color );
-	owner->FillRect(bounds);
-
-	owner->SetViewColor( oldviewcolor);
-	owner->SetLowColor( oldlowcolor );
-	owner->SetHighColor( oldcolor );
+		owner->FillRect(bounds);
+	}
 
 	BPoint iconPt = bounds.LeftTop() + BPoint(4,4);
 	BPoint namePt = BPoint(32+12, fFirstlineOffset);
-	BPoint driverPt = BPoint(32+12, fSecondlineOffset);
-	BPoint commentPt = BPoint(32+12, fThirdlineOffset);
+	BPoint v4addrPt = BPoint(32+12, fSecondlineOffset);
+	BPoint v6addrPt = BPoint(32+12, fThirdlineOffset);
 
-	drawing_mode mode = owner->DrawingMode();
-	if (fSettings->IsDisabled()) {
+	if ( fSettings->IsDisabled() ) {
 		owner->SetDrawingMode(B_OP_ALPHA);
 		owner->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_OVERLAY);
 		owner->SetHighColor(0, 0, 0, 32);
@@ -133,27 +127,31 @@ InterfaceListItem::DrawItem(BView* owner, BRect /*bounds*/, bool complete)
 
 	owner->DrawBitmapAsync(fIcon, iconPt);
 
-	if (fSettings->IsDisabled())
-		owner->SetHighColor(tint_color(oldcolor, B_LIGHTEN_1_TINT));
-
+	if ( fSettings->IsDisabled() )
+        owner->SetHighColor(tint_color(black, B_LIGHTEN_1_TINT));
+	else
+        owner->SetHighColor(black);
+		
 	owner->SetFont(be_bold_font);
 	owner->DrawString(Name(), namePt);
 	owner->SetFont(be_plain_font);
 
 	if (fSettings->IsDisabled())
-		owner->DrawString("Disabled.", driverPt);
+		owner->DrawString("Disabled", v4addrPt);
 	else {
-		BString str("Enabled, IPv4 address: ");
-		str << fSettings->IP();
-		owner->DrawString(str.String(), driverPt);
-		if (fSettings->AutoConfigure())
-			owner->DrawString("DHCP enabled", commentPt);
+		BString v4str("IPv4: ");
+		v4str << fSettings->IP();
+		v4str << " (";
+		if ( fSettings->AutoConfigure() )
+			v4str << "DHCP";
 		else
-			owner->DrawString("DHCP disabled, use static IP address", commentPt);
-	}
+			v4str << "manual";
+		v4str << ")";
+		owner->DrawString(v4str.String(), v4addrPt);
 
-	owner->SetHighColor(oldcolor);
-	owner->SetDrawingMode(mode);
+		owner->DrawString("IPv6: none (auto)", v6addrPt);
+			// TODO : where will we keep this?
+	}
 
 	owner->PopState();
 }
