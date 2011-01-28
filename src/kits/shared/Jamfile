@@ -20,6 +20,7 @@ StaticLibrary libshared.a :
 	DragTrackingFilter.cpp
 	HashString.cpp
 	Keymap.cpp
+	NaturalCompare.cpp
 	QueryFile.cpp
 	RWLockManager.cpp
 	SHA256.cpp
