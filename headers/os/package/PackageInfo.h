@@ -18,12 +18,12 @@ namespace BPackageKit {
 
 enum BPackageInfoIndex {
 	B_PACKAGE_INFO_NAME = 0,
-	B_PACKAGE_INFO_SUMMARY,			// single line, 72 chars max
+	B_PACKAGE_INFO_SUMMARY,			// single line, 70 chars max
 	B_PACKAGE_INFO_DESCRIPTION,		// multiple lines possible
 	B_PACKAGE_INFO_VENDOR,			// e.g. "Haiku Project"
 	B_PACKAGE_INFO_PACKAGER,		// e-mail address preferred
 	B_PACKAGE_INFO_ARCHITECTURE,
-	B_PACKAGE_INFO_VERSION,
+	B_PACKAGE_INFO_VERSION,			// <major>[.<minor>[.<micro>]]
 	B_PACKAGE_INFO_COPYRIGHTS,		// list
 	B_PACKAGE_INFO_LICENSES,		// list
 	B_PACKAGE_INFO_PROVIDES,		// list
@@ -34,7 +34,7 @@ enum BPackageInfoIndex {
 
 
 enum BPackageArchitecture {
-	B_PACKAGE_ARCHITECTURE_NONE = 0,
+	B_PACKAGE_ARCHITECTURE_ANY = 0,
 	B_PACKAGE_ARCHITECTURE_X86,
 	B_PACKAGE_ARCHITECTURE_X86_GCC2,
 	//
@@ -44,29 +44,76 @@ enum BPackageArchitecture {
 
 class BPackageVersion {
 public:
-			void				MakeEmpty() {}
+								BPackageVersion();
+								BPackageVersion(const BString& major,
+									const BString& minor, const BString& micro,
+									uint8 release);
+
+			status_t			InitCheck() const;
+
+			void				GetVersionString(BString& string) const;
+
+			void				SetTo(const BString& major,
+									const BString& minor, const BString& micro,
+									uint8 release);
+			void				Clear();
+
+			int					Compare(const BPackageVersion& other) const;
+									// does a natural compare over major, minor
+									// and micro, finally comparing release
+
+private:
+			BString				fMajor;
+			BString				fMinor;
+			BString				fMicro;
+			uint8				fRelease;
 };
 
 
 class BPackageProvision {
 public:
-			int					Compare(const BPackageProvision& other) const
-			{
-				return fX.Compare(other.fX);
-			}
+								BPackageProvision();
+								BPackageProvision(const BString& name,
+									const BPackageVersion& version
+										= BPackageVersion());
+
+			status_t			InitCheck() const;
+
+			void				GetProvisionString(BString& string) const;
+
+			void				SetTo(const BString& name,
+									const BPackageVersion& version
+										= BPackageVersion());
+			void				Clear();
+
 private:
-			BString fX;
+			BString				fName;
+			BPackageVersion		fVersion;
 };
 
 
 class BPackageRequirement {
 public:
-			int					Compare(const BPackageRequirement& other) const
-			{
-				return fX.Compare(other.fX);
-			}
+								BPackageRequirement();
+								BPackageRequirement(const BString& name,
+									const BString& _operator = "",
+									const BPackageVersion& version
+										= BPackageVersion());
+
+			status_t			InitCheck() const;
+
+			void				GetRequirementString(BString& string) const;
+
+			void				SetTo(const BString& name,
+									const BString& _operator = "",
+									const BPackageVersion& version
+										= BPackageVersion());
+			void				Clear();
+
 private:
-			BString fX;
+			BString				fName;
+			BString				fOperator;
+			BPackageVersion		fVersion;
 };
 
 
@@ -126,29 +173,27 @@ public:
 
 			void				ClearCopyrights();
 			status_t			AddCopyright(const BString& copyright);
-			status_t			RemoveCopyright(const BString& copyright);
 
 			void				ClearLicenses();
 			status_t			AddLicense(const BString& license);
-			status_t			RemoveLicense(const BString& license);
 
 			void				ClearProvisions();
 			status_t			AddProvision(
-									const BPackageProvision& provision);
-			status_t			RemoveProvision(
 									const BPackageProvision& provision);
 
 			void				ClearRequirements();
 			status_t			AddRequirement(
 									const BPackageRequirement& requirement);
-			status_t			RemoveRequirement(
-									const BPackageRequirement& requirement);
 
-			void				MakeEmpty();
+			void				Clear();
 
 public:
 	static	status_t			GetElementName(
 									BPackageInfoIndex index,
+									const char** name);
+
+	static	status_t			GetArchitectureName(
+									BPackageArchitecture arch,
 									const char** name);
 
 private:

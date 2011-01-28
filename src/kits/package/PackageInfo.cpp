@@ -1,4 +1,3 @@
-#include <stdio.h>
 /*
  * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>
  * Distributed under the terms of the MIT License.
@@ -16,6 +15,11 @@
 #include <File.h>
 #include <Entry.h>
 #include <String.h>
+
+#include <NaturalCompare.h>
+
+
+using BPrivate::NaturalCompare;
 
 
 namespace BPackageKit {
@@ -37,7 +41,6 @@ enum TokenType {
 	TOKEN_OPEN_BRACKET,
 	TOKEN_CLOSE_BRACKET,
 	TOKEN_COMMA,
-	TOKEN_SEMICOLON,
 	TOKEN_COLON,
 	//
 	TOKEN_EOF,
@@ -73,16 +76,24 @@ private:
 			struct Token;
 
 			Token				_NextToken();
+			void				_RewindTo(const Token& token);
+
 			void				_ParseStringValue(BString* value);
 			void				_ParseArchitectureValue(
 									BPackageArchitecture* value);
+			void				_ParseVersionValue(BPackageVersion* value,
+									bool releaseIsOptional);
+			void				_ParseStringList(BObjectList<BString>* value);
+			void				_ParseProvisionList(
+									BObjectList<BPackageProvision>* value);
+			void				_ParseRequirementList(
+									BObjectList<BPackageRequirement>* value);
+
 			void				_Parse(BPackageInfo* packageInfo);
 
 private:
 			ParseErrorListener*	fListener;
-
 			const char*			fPos;
-			int					fCurrentLine;
 };
 
 
@@ -140,8 +151,7 @@ BPackageInfo::ParseErrorListener::~ParseErrorListener()
 BPackageInfo::Parser::Parser(ParseErrorListener* listener)
 	:
 	fListener(listener),
-	fPos(NULL),
-	fCurrentLine(0)
+	fPos(NULL)
 {
 }
 
@@ -154,7 +164,6 @@ BPackageInfo::Parser::Parse(const BString& packageInfoString,
 		return B_BAD_VALUE;
 
 	fPos = packageInfoString.String();
-	fCurrentLine = 1;
 
 	try {
 		_Parse(packageInfo);
@@ -164,7 +173,7 @@ BPackageInfo::Parser::Parse(const BString& packageInfoString,
 			int line = 1;
 			int column;
 			int32 offset = error.pos - packageInfoString.String();
-			int32 newlinePos = packageInfoString.FindLast('\n', offset);
+			int32 newlinePos = packageInfoString.FindLast('\n', offset - 1);
 			if (newlinePos < 0)
 				column = offset;
 			else {
@@ -178,6 +187,10 @@ BPackageInfo::Parser::Parse(const BString& packageInfoString,
 			fListener->OnError(error.message, line, column);
 		}
 		return B_BAD_DATA;
+	} catch (const std::bad_alloc& e) {
+		if (fListener != NULL)
+			fListener->OnError("out of memory", 0, 0);
+		return B_NO_MEMORY;
 	}
 
 	return B_OK;
@@ -188,20 +201,15 @@ BPackageInfo::Parser::Token
 BPackageInfo::Parser::_NextToken()
 {
 	// eat any whitespace or comments
-printf("1: %p\n", fPos);
 	bool inComment = false;
 	while ((inComment && *fPos != '\0') || isspace(*fPos) || *fPos == '#') {
-printf("1b: %p\n", fPos);
 		if (*fPos == '#')
 			inComment = true;
-		else if (*fPos == '\n') {
+		else if (*fPos == '\n')
 			inComment = false;
-			fCurrentLine++;
-		}
 		fPos++;
 	}
 
-printf("2: %p\n", fPos);
 	const char* tokenPos = fPos;
 	switch (*fPos) {
 		case '\0':
@@ -215,10 +223,6 @@ printf("2: %p\n", fPos);
 			fPos++;
 			return Token(TOKEN_COMMA, tokenPos);
 
-		case ';':
-			fPos++;
-			return Token(TOKEN_SEMICOLON, tokenPos);
-
 		case '[':
 			fPos++;
 			return Token(TOKEN_OPEN_BRACKET, tokenPos);
@@ -231,22 +235,22 @@ printf("2: %p\n", fPos);
 			fPos++;
 			if (*fPos == '=') {
 				fPos++;
-				return Token(TOKEN_OPERATOR_LESS_EQUAL, tokenPos);
+				return Token(TOKEN_OPERATOR_LESS_EQUAL, tokenPos, 2);
 			}
-			return Token(TOKEN_OPERATOR_LESS, tokenPos);
+			return Token(TOKEN_OPERATOR_LESS, tokenPos, 1);
 
 		case '=':
 			fPos++;
 			if (*fPos == '=') {
 				fPos++;
-				return Token(TOKEN_OPERATOR_EQUAL, tokenPos);
+				return Token(TOKEN_OPERATOR_EQUAL, tokenPos, 2);
 			}
-			return Token(TOKEN_OPERATOR_ASSIGN, tokenPos);
+			return Token(TOKEN_OPERATOR_ASSIGN, tokenPos, 1);
 
 		case '!':
 			if (fPos[1] == '=') {
 				fPos += 2;
-				return Token(TOKEN_OPERATOR_NOT_EQUAL, tokenPos);
+				return Token(TOKEN_OPERATOR_NOT_EQUAL, tokenPos, 2);
 			}
 			break;
 
@@ -254,9 +258,9 @@ printf("2: %p\n", fPos);
 			fPos++;
 			if (*fPos == '=') {
 				fPos++;
-				return Token(TOKEN_OPERATOR_GREATER_EQUAL, tokenPos);
+				return Token(TOKEN_OPERATOR_GREATER_EQUAL, tokenPos, 2);
 			}
-			return Token(TOKEN_OPERATOR_GREATER, tokenPos);
+			return Token(TOKEN_OPERATOR_GREATER, tokenPos, 1);
 
 		case '"':
 		{
@@ -269,8 +273,6 @@ printf("2: %p\n", fPos);
 					lastWasEscape = false;
 				else if (*fPos == '\\')
 					lastWasEscape = true;
-				else if (*fPos == '\n')
-					fCurrentLine++;
 				fPos++;
 			}
 			if (*fPos != '"')
@@ -294,6 +296,13 @@ printf("2: %p\n", fPos);
 
 	BString error = BString("unknown token '") << *fPos << "' encountered";
 	throw ParseError(error.String(), fPos);
+}
+
+
+void
+BPackageInfo::Parser::_RewindTo(const Token& token)
+{
+	fPos = token.pos;
 }
 
 
@@ -333,6 +342,165 @@ BPackageInfo::Parser::_ParseArchitectureValue(BPackageArchitecture* value)
 
 
 void
+BPackageInfo::Parser::_ParseVersionValue(BPackageVersion* value,
+	bool releaseIsOptional)
+{
+	Token word = _NextToken();
+	if (word.type != TOKEN_WORD)
+		throw ParseError("expected word (a version)", word.pos);
+
+	uint8 release = 0;
+	int32 lastDashPos = word.text.FindLast('-');
+	if (lastDashPos < 0) {
+		if (!releaseIsOptional) {
+			throw ParseError("expected release number (-<number> suffix)",
+				word.pos + word.text.Length());
+		}
+	} else {
+		int number = atoi(word.text.String() + lastDashPos + 1);
+		if (number <= 0 || number > 99) {
+			throw ParseError("release number must be from 1-99",
+				word.pos + word.text.Length());
+		}
+		release = number;
+		word.text.Truncate(lastDashPos);
+	}
+
+	BString major;
+	BString minor;
+	BString micro;
+	int32 firstDotPos = word.text.FindFirst('.');
+	if (firstDotPos < 0)
+		major = word.text;
+	else {
+		word.text.CopyInto(major, 0, firstDotPos);
+		int32 secondDotPos = word.text.FindFirst('.', firstDotPos + 1);
+		if (secondDotPos == firstDotPos + 1)
+			throw ParseError("expected minor version", word.pos + secondDotPos);
+
+		if (secondDotPos < 0)
+			word.text.CopyInto(minor, firstDotPos + 1, word.text.Length());
+		else {
+			word.text.CopyInto(minor, firstDotPos + 1,
+				secondDotPos - firstDotPos + 1);
+			word.text.CopyInto(micro, secondDotPos + 1, word.text.Length());
+		}
+	}
+
+	value->SetTo(major, minor, micro, release);
+}
+
+
+void
+BPackageInfo::Parser::_ParseStringList(BObjectList<BString>* value)
+{
+	Token openBracket = _NextToken();
+	if (openBracket.type != TOKEN_OPEN_BRACKET)
+		throw ParseError("expected start of list ('[')", openBracket.pos);
+
+	bool needComma = false;
+	while (true) {
+		Token token = _NextToken();
+		if (token.type == TOKEN_CLOSE_BRACKET)
+			return;
+
+		if (needComma) {
+			if (token.type != TOKEN_COMMA)
+				throw ParseError("expected comma", token.pos);
+			token = _NextToken();
+		} else
+			needComma = true;
+
+		if (token.type != TOKEN_QUOTED_STRING && token.type != TOKEN_WORD)
+			throw ParseError("expected quoted-string or word", token.pos);
+
+		value->AddItem(new BString(token.text));
+	}
+}
+
+
+void
+BPackageInfo::Parser::_ParseProvisionList(BObjectList<BPackageProvision>* value)
+{
+	Token openBracket = _NextToken();
+	if (openBracket.type != TOKEN_OPEN_BRACKET)
+		throw ParseError("expected start of list ('[')", openBracket.pos);
+
+	bool needComma = false;
+	while (true) {
+		Token name = _NextToken();
+		if (name.type == TOKEN_CLOSE_BRACKET)
+			return;
+
+		if (needComma) {
+			if (name.type != TOKEN_COMMA)
+				throw ParseError("expected comma", name.pos);
+			name = _NextToken();
+		} else
+			needComma = true;
+
+		if (name.type != TOKEN_WORD)
+			throw ParseError("expected word (a provision name)", name.pos);
+
+		BPackageVersion version;
+		Token op = _NextToken();
+		if (op.type == TOKEN_OPERATOR_ASSIGN)
+			_ParseVersionValue(&version, true);
+		else if (op.type == TOKEN_COMMA || op.type == TOKEN_CLOSE_BRACKET)
+			_RewindTo(op);
+		else
+			throw ParseError("expected '=', comma or ']'", op.pos);
+
+		value->AddItem(new BPackageProvision(name.text, version));
+	}
+}
+
+
+void
+BPackageInfo::Parser::_ParseRequirementList(
+	BObjectList<BPackageRequirement>* value)
+{
+	Token openBracket = _NextToken();
+	if (openBracket.type != TOKEN_OPEN_BRACKET)
+		throw ParseError("expected start of list ('[')", openBracket.pos);
+
+	bool needComma = false;
+	while (true) {
+		Token name = _NextToken();
+		if (name.type == TOKEN_CLOSE_BRACKET)
+			return;
+
+		if (needComma) {
+			if (name.type != TOKEN_COMMA)
+				throw ParseError("expected comma", name.pos);
+			name = _NextToken();
+		} else
+			needComma = true;
+
+		if (name.type != TOKEN_WORD)
+			throw ParseError("expected word (a requirement name)", name.pos);
+
+		BPackageVersion version;
+		Token op = _NextToken();
+		if (op.type == TOKEN_OPERATOR_LESS
+			|| op.type == TOKEN_OPERATOR_LESS_EQUAL
+			|| op.type == TOKEN_OPERATOR_EQUAL
+			|| op.type == TOKEN_OPERATOR_GREATER_EQUAL
+			|| op.type == TOKEN_OPERATOR_GREATER)
+			_ParseVersionValue(&version, true);
+		else if (op.type == TOKEN_COMMA || op.type == TOKEN_CLOSE_BRACKET)
+			_RewindTo(op);
+		else {
+			throw ParseError(
+				"expected '<', '<=', '==', '>=', '>', comma or ']'", op.pos);
+		}
+
+		value->AddItem(new BPackageRequirement(name.text, op.text, version));
+	}
+}
+
+
+void
 BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 {
 	bool seen[B_PACKAGE_INFO_ENUM_COUNT];
@@ -343,11 +511,11 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 
 	while (Token t = _NextToken()) {
 		if (t.type != TOKEN_WORD)
-			throw ParseError("expected word [a variable name]", t.pos);
+			throw ParseError("expected word (a variable name)", t.pos);
 
 		Token opAssign = _NextToken();
 		if (opAssign.type != TOKEN_OPERATOR_ASSIGN) {
-			throw ParseError("expected assignment operator ['=']",
+			throw ParseError("expected assignment operator ('=')",
 				opAssign.pos);
 		}
 
@@ -417,75 +585,70 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 			_ParseArchitectureValue(&architecture);
 			packageInfo->SetArchitecture(architecture);
 			seen[B_PACKAGE_INFO_ARCHITECTURE] = true;
-		}
-//		} else if (t.text.ICompare(names[B_PACKAGE_INFO_VERSION]) == 0) {
-//			if (seen[B_PACKAGE_INFO_VERSION]) {
-//				BString error = BString(names[B_PACKAGE_INFO_VERSION])
-//					<< " already seen!";
-//				throw ParseError(error, t.pos);
-//			}
-//
-//			BPackageVersion version;
-//			_ParseVersionValue(&version);
-//			packageInfo->SetVersion(version);
-//			seen[B_PACKAGE_INFO_VERSION] = true;
-//		} else if (t.text.ICompare(names[B_PACKAGE_INFO_COPYRIGHTS]) == 0) {
-//			if (seen[B_PACKAGE_INFO_COPYRIGHTS]) {
-//				BString error = BString(names[B_PACKAGE_INFO_COPYRIGHTS])
-//					<< " already seen!";
-//				throw ParseError(error, t.pos);
-//			}
-//
-//			BObjectList<BString> copyrights;
-//			_ParseStringList(&copyrights);
-//			int count = copyrights.CountItems();
-//			for (int i = 0; i < count; ++i)
-//				packageInfo->AddCopyright(*(copyrights.ItemAt(i)));
-//			seen[B_PACKAGE_INFO_COPYRIGHTS] = true;
-//		} else if (t.text.ICompare(names[B_PACKAGE_INFO_LICENSES]) == 0) {
-//			if (seen[B_PACKAGE_INFO_LICENSES]) {
-//				BString error = BString(names[B_PACKAGE_INFO_LICENSES])
-//					<< " already seen!";
-//				throw ParseError(error, t.pos);
-//			}
-//
-//			BObjectList<BString> licenses;
-//			_ParseStringList(&licenses);
-//			int count = licenses.CountItems();
-//			for (int i = 0; i < count; ++i)
-//				packageInfo->AddLicense(*(licenses.ItemAt(i)));
-//			seen[B_PACKAGE_INFO_LICENSES] = true;
-//		} else if (t.text.ICompare(names[B_PACKAGE_INFO_PROVIDES]) == 0) {
-//			if (seen[B_PACKAGE_INFO_PROVIDES]) {
-//				BString error = BString(names[B_PACKAGE_INFO_PROVIDES])
-//					<< " already seen!";
-//				throw ParseError(error, t.pos);
-//			}
-//
-//			BObjectList<BPackageProvision> provisions;
-//			_ParseProvisionList(&provisions);
-//			int count = provisions.CountItems();
-//			for (int i = 0; i < count; ++i)
-//				packageInfo->AddProvision(*(provisions.ItemAt(i)));
-//			seen[B_PACKAGE_INFO_PROVIDES] = true;
-//		} else if (t.text.ICompare(names[B_PACKAGE_INFO_REQUIRES]) == 0) {
-//			if (seen[B_PACKAGE_INFO_REQUIRES]) {
-//				BString error = BString(names[B_PACKAGE_INFO_REQUIRES])
-//					<< " already seen!";
-//				throw ParseError(error, t.pos);
-//			}
-//
-//			BObjectList<BPackageRequirement> requirements;
-//			_ParseRequirementList(&requirements);
-//			int count = requirements.CountItems();
-//			for (int i = 0; i < count; ++i)
-//				packageInfo->AddRequirement(*(requirements.ItemAt(i)));
-//			seen[B_PACKAGE_INFO_REQUIRES] = true;
-//		}
+		} else if (t.text.ICompare(names[B_PACKAGE_INFO_VERSION]) == 0) {
+			if (seen[B_PACKAGE_INFO_VERSION]) {
+				BString error = BString(names[B_PACKAGE_INFO_VERSION])
+					<< " already seen!";
+				throw ParseError(error, t.pos);
+			}
 
-		Token semicolon = _NextToken();
-		if (semicolon.type != TOKEN_SEMICOLON)
-			throw ParseError("expected semicolon [';']", semicolon.pos);
+			BPackageVersion version;
+			_ParseVersionValue(&version, false);
+			packageInfo->SetVersion(version);
+			seen[B_PACKAGE_INFO_VERSION] = true;
+		} else if (t.text.ICompare(names[B_PACKAGE_INFO_COPYRIGHTS]) == 0) {
+			if (seen[B_PACKAGE_INFO_COPYRIGHTS]) {
+				BString error = BString(names[B_PACKAGE_INFO_COPYRIGHTS])
+					<< " already seen!";
+				throw ParseError(error, t.pos);
+			}
+
+			BObjectList<BString> copyrights;
+			_ParseStringList(&copyrights);
+			int count = copyrights.CountItems();
+			for (int i = 0; i < count; ++i)
+				packageInfo->AddCopyright(*(copyrights.ItemAt(i)));
+			seen[B_PACKAGE_INFO_COPYRIGHTS] = true;
+		} else if (t.text.ICompare(names[B_PACKAGE_INFO_LICENSES]) == 0) {
+			if (seen[B_PACKAGE_INFO_LICENSES]) {
+				BString error = BString(names[B_PACKAGE_INFO_LICENSES])
+					<< " already seen!";
+				throw ParseError(error, t.pos);
+			}
+
+			BObjectList<BString> licenses;
+			_ParseStringList(&licenses);
+			int count = licenses.CountItems();
+			for (int i = 0; i < count; ++i)
+				packageInfo->AddLicense(*(licenses.ItemAt(i)));
+			seen[B_PACKAGE_INFO_LICENSES] = true;
+		} else if (t.text.ICompare(names[B_PACKAGE_INFO_PROVIDES]) == 0) {
+			if (seen[B_PACKAGE_INFO_PROVIDES]) {
+				BString error = BString(names[B_PACKAGE_INFO_PROVIDES])
+					<< " already seen!";
+				throw ParseError(error, t.pos);
+			}
+
+			BObjectList<BPackageProvision> provisions;
+			_ParseProvisionList(&provisions);
+			int count = provisions.CountItems();
+			for (int i = 0; i < count; ++i)
+				packageInfo->AddProvision(*(provisions.ItemAt(i)));
+			seen[B_PACKAGE_INFO_PROVIDES] = true;
+		} else if (t.text.ICompare(names[B_PACKAGE_INFO_REQUIRES]) == 0) {
+			if (seen[B_PACKAGE_INFO_REQUIRES]) {
+				BString error = BString(names[B_PACKAGE_INFO_REQUIRES])
+					<< " already seen!";
+				throw ParseError(error, t.pos);
+			}
+
+			BObjectList<BPackageRequirement> requirements;
+			_ParseRequirementList(&requirements);
+			int count = requirements.CountItems();
+			for (int i = 0; i < count; ++i)
+				packageInfo->AddRequirement(*(requirements.ItemAt(i)));
+			seen[B_PACKAGE_INFO_REQUIRES] = true;
+		}
 	}
 
 	for (int i = 0; i < B_PACKAGE_INFO_ENUM_COUNT; ++i) {
@@ -494,6 +657,197 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 			throw ParseError(error, fPos);
 		}
 	}
+}
+
+
+BPackageVersion::BPackageVersion()
+{
+}
+
+
+BPackageVersion::BPackageVersion(const BString& major, const BString& minor,
+	const BString& micro, uint8 release)
+	:
+	fMajor(major),
+	fMinor(minor),
+	fMicro(micro),
+	fRelease(release)
+{
+}
+
+
+status_t
+BPackageVersion::InitCheck() const
+{
+	return fMajor.Length() > 0 ? B_OK : B_NO_INIT;
+}
+
+
+int
+BPackageVersion::Compare(const BPackageVersion& other) const
+{
+	int majorDiff = NaturalCompare(fMajor.String(), other.fMajor.String());
+	if (majorDiff != 0)
+		return majorDiff;
+
+	int minorDiff = NaturalCompare(fMinor.String(), other.fMinor.String());
+	if (minorDiff != 0)
+		return minorDiff;
+
+	int microDiff = NaturalCompare(fMicro.String(), other.fMicro.String());
+	if (microDiff != 0)
+		return microDiff;
+
+	return (int)fRelease - (int)other.fRelease;
+}
+
+
+void
+BPackageVersion::GetVersionString(BString& string) const
+{
+	string = fMajor;
+
+	if (fMinor.Length() > 0) {
+		string << '.' << fMinor;
+		if (fMicro.Length() > 0)
+			string << '.' << fMicro;
+	}
+
+	if (fRelease > 0)
+		string << '-' << fRelease;
+}
+
+
+void
+BPackageVersion::SetTo(const BString& major, const BString& minor,
+	const BString& micro, uint8 release)
+{
+	fMajor = major;
+	fMinor = minor;
+	fMicro = micro;
+	fRelease = release;
+}
+
+
+void
+BPackageVersion::Clear()
+{
+	fMajor.Truncate(0);
+	fMinor.Truncate(0);
+	fMicro.Truncate(0);
+	fRelease = 0;
+}
+
+
+BPackageProvision::BPackageProvision()
+{
+}
+
+
+BPackageProvision::BPackageProvision(const BString& name,
+	const BPackageVersion& version)
+	:
+	fName(name),
+	fVersion(version)
+{
+}
+
+
+status_t
+BPackageProvision::InitCheck() const
+{
+	return fName.Length() > 0 ? B_OK : B_NO_INIT;
+}
+
+
+void
+BPackageProvision::GetProvisionString(BString& string) const
+{
+	string = fName;
+
+	if (fVersion.InitCheck() == B_OK) {
+		string << '=';
+		fVersion.GetVersionString(string);
+	}
+}
+
+
+void
+BPackageProvision::SetTo(const BString& name, const BPackageVersion& version)
+{
+	fName = name;
+	fVersion = version;
+}
+
+
+void
+BPackageProvision::Clear()
+{
+	fName.Truncate(0);
+	fVersion.Clear();
+}
+
+
+BPackageRequirement::BPackageRequirement()
+{
+}
+
+
+BPackageRequirement::BPackageRequirement(const BString& name,
+	const BString& _operator, const BPackageVersion& version)
+	:
+	fName(name),
+	fOperator(_operator),
+	fVersion(version)
+{
+}
+
+
+status_t
+BPackageRequirement::InitCheck() const
+{
+	if (fName.Length() == 0)
+		return B_NO_INIT;
+
+	// either both or none of operator and version must be set
+	if (fOperator.Length() == 0 && fVersion.InitCheck() == B_OK)
+		return B_NO_INIT;
+
+	if (fOperator.Length() > 0 && fVersion.InitCheck() != B_OK)
+		return B_NO_INIT;
+
+	return B_OK;
+}
+
+
+void
+BPackageRequirement::GetRequirementString(BString& string) const
+{
+	string = fName;
+
+	if (fVersion.InitCheck() == B_OK) {
+		string << fOperator;
+		fVersion.GetVersionString(string);
+	}
+}
+
+
+void
+BPackageRequirement::SetTo(const BString& name, const BString& _operator,
+	const BPackageVersion& version)
+{
+	fName = name;
+	fOperator = _operator;
+	fVersion = version;
+}
+
+
+void
+BPackageRequirement::Clear()
+{
+	fName.Truncate(0);
+	fOperator.Truncate(0);
+	fVersion.Clear();
 }
 
 
@@ -514,7 +868,7 @@ const char* BPackageInfo::kElementNames[B_PACKAGE_INFO_ENUM_COUNT] = {
 
 const char*
 BPackageInfo::kArchitectureNames[B_PACKAGE_ARCHITECTURE_ENUM_COUNT] = {
-	"no_arch",
+	"any",
 	"x86",
 	"x86_gcc2",
 };
@@ -522,7 +876,7 @@ BPackageInfo::kArchitectureNames[B_PACKAGE_ARCHITECTURE_ENUM_COUNT] = {
 
 BPackageInfo::BPackageInfo()
 	:
-	fArchitecture(B_PACKAGE_ARCHITECTURE_NONE),
+	fArchitecture(B_PACKAGE_ARCHITECTURE_ENUM_COUNT),
 	fCopyrights(5, true),
 	fLicenses(5, true),
 	fProvisions(20, true),
@@ -573,7 +927,7 @@ status_t
 BPackageInfo::ReadFromConfigString(const BString& packageInfoString,
 	ParseErrorListener* listener)
 {
-	MakeEmpty();
+	Clear();
 
 	Parser parser(listener);
 	return parser.Parse(packageInfoString, this);
@@ -583,7 +937,15 @@ BPackageInfo::ReadFromConfigString(const BString& packageInfoString,
 status_t
 BPackageInfo::InitCheck() const
 {
-	// TODO
+	if (fName.Length() == 0 || fSummary.Length() == 0
+		|| fDescription.Length() == 0 || fVendor.Length() == 0
+		|| fPackager.Length() == 0
+		|| fArchitecture == B_PACKAGE_ARCHITECTURE_ENUM_COUNT
+		|| fVersion.InitCheck() != B_OK
+		|| fCopyrights.IsEmpty() || fLicenses.IsEmpty()
+		|| fProvisions.IsEmpty() || fRequirements.IsEmpty())
+		return B_NO_INIT;
+
 	return B_OK;
 }
 
@@ -732,21 +1094,6 @@ BPackageInfo::AddCopyright(const BString& copyright)
 }
 
 
-status_t
-BPackageInfo::RemoveCopyright(const BString& copyright)
-{
-	int32 count = fCopyrights.CountItems();
-	for (int i = 0; i < count; ++i) {
-		if (fCopyrights.ItemAt(i)->Compare(copyright) == 0) {
-			delete fCopyrights.RemoveItemAt(i);
-			return B_OK;
-		}
-	}
-
-	return B_NAME_NOT_FOUND;
-}
-
-
 void
 BPackageInfo::ClearLicenses()
 {
@@ -762,55 +1109,6 @@ BPackageInfo::AddLicense(const BString& license)
 		return B_NO_MEMORY;
 
 	return fLicenses.AddItem(newLicense) ? B_OK : B_ERROR;
-}
-
-
-status_t
-BPackageInfo::RemoveLicense(const BString& license)
-{
-	int32 count = fLicenses.CountItems();
-	for (int i = 0; i < count; ++i) {
-		if (fLicenses.ItemAt(i)->Compare(license) == 0) {
-			delete fLicenses.RemoveItemAt(i);
-			return B_OK;
-		}
-	}
-
-	return B_NAME_NOT_FOUND;
-}
-
-
-void
-BPackageInfo::ClearRequirements()
-{
-	fRequirements.MakeEmpty();
-}
-
-
-status_t
-BPackageInfo::AddRequirement(const BPackageRequirement& requirement)
-{
-	BPackageRequirement* newRequirement
-		= new (std::nothrow) BPackageRequirement(requirement);
-	if (newRequirement == NULL)
-		return B_NO_MEMORY;
-
-	return fRequirements.AddItem(newRequirement) ? B_OK : B_ERROR;
-}
-
-
-status_t
-BPackageInfo::RemoveRequirement(const BPackageRequirement& requirement)
-{
-	int32 count = fRequirements.CountItems();
-	for (int i = 0; i < count; ++i) {
-		if (fRequirements.ItemAt(i)->Compare(requirement)) {
-			delete fRequirements.RemoveItemAt(i);
-			return B_OK;
-		}
-	}
-
-	return B_NAME_NOT_FOUND;
 }
 
 
@@ -833,31 +1131,35 @@ BPackageInfo::AddProvision(const BPackageProvision& provision)
 }
 
 
-status_t
-BPackageInfo::RemoveProvision(const BPackageProvision& provision)
+void
+BPackageInfo::ClearRequirements()
 {
-	int32 count = fProvisions.CountItems();
-	for (int i = 0; i < count; ++i) {
-		if (fProvisions.ItemAt(i)->Compare(provision) == 0) {
-			delete fProvisions.RemoveItemAt(i);
-			return B_OK;
-		}
-	}
+	fRequirements.MakeEmpty();
+}
 
-	return B_NAME_NOT_FOUND;
+
+status_t
+BPackageInfo::AddRequirement(const BPackageRequirement& requirement)
+{
+	BPackageRequirement* newRequirement
+		= new (std::nothrow) BPackageRequirement(requirement);
+	if (newRequirement == NULL)
+		return B_NO_MEMORY;
+
+	return fRequirements.AddItem(newRequirement) ? B_OK : B_ERROR;
 }
 
 
 void
-BPackageInfo::MakeEmpty()
+BPackageInfo::Clear()
 {
 	fName.Truncate(0);
 	fSummary.Truncate(0);
 	fDescription.Truncate(0);
 	fVendor.Truncate(0);
 	fPackager.Truncate(0);
-	fVersion.MakeEmpty();
-	fArchitecture = B_PACKAGE_ARCHITECTURE_NONE;
+	fVersion.Clear();
+	fArchitecture = B_PACKAGE_ARCHITECTURE_ENUM_COUNT;
 	fCopyrights.MakeEmpty();
 	fLicenses.MakeEmpty();
 	fRequirements.MakeEmpty();
@@ -872,6 +1174,18 @@ BPackageInfo::GetElementName(BPackageInfoIndex index, const char** name)
 		return B_BAD_VALUE;
 
 	*name = kElementNames[index];
+
+	return B_OK;
+}
+
+
+/*static*/ status_t
+BPackageInfo::GetArchitectureName(BPackageArchitecture arch, const char** name)
+{
+	if (arch < 0 || arch >= B_PACKAGE_ARCHITECTURE_ENUM_COUNT || name == NULL)
+		return B_BAD_VALUE;
+
+	*name = kArchitectureNames[arch];
 
 	return B_OK;
 }
