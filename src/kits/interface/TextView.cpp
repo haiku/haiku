@@ -34,9 +34,11 @@
 #include <Debug.h>
 #include <Entry.h>
 #include <Input.h>
+#include <LayoutBuilder.h>
 #include <LayoutUtils.h>
 #include <MessageRunner.h>
 #include <Path.h>
+#include <PopUpMenu.h>
 #include <PropertyInfo.h>
 #include <Region.h>
 #include <ScrollBar.h>
@@ -52,8 +54,21 @@
 #include "UndoBuffer.h"
 #include "WidthBuffer.h"
 
+#include <Catalog.h>
+#include <LocaleBackend.h>
+
 
 using namespace std;
+using BPrivate::gLocaleBackend;
+using BPrivate::LocaleBackend;
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "TextView"
+
+
+#define TRANSLATE(str) gLocaleBackend->GetString(B_TRANSLATE_MARK(str), \
+		"TextView")
 
 #undef TRACE
 #undef CALLED
@@ -558,18 +573,23 @@ BTextView::MouseDown(BPoint where)
 
 	_StopMouseTracking();
 
+	int32 modifiers = 0;
+	uint32 buttons;
+	BMessage *currentMessage = Window()->CurrentMessage();
+	if (currentMessage != NULL) {
+		currentMessage->FindInt32("modifiers", &modifiers);
+		currentMessage->FindInt32("buttons", (int32 *)&buttons);
+	}
+
+	if (buttons == B_SECONDARY_MOUSE_BUTTON) {
+		_ShowContextMenu(where);
+		return;
+	}
+
 	BMessenger messenger(this);
 	fTrackingMouse = new (nothrow) TextTrackState(messenger);
 	if (fTrackingMouse == NULL)
 		return;
-
-	int32 modifiers = 0;
-	//uint32 buttons;
-	BMessage *currentMessage = Window()->CurrentMessage();
-	if (currentMessage != NULL) {
-		currentMessage->FindInt32("modifiers", &modifiers);
-		//currentMessage->FindInt32("buttons", (int32 *)&buttons);
-	}
 
 	fTrackingMouse->clickOffset = OffsetAt(where);
 	fTrackingMouse->shiftDown = modifiers & B_SHIFT_KEY;
@@ -3238,6 +3258,11 @@ BTextView::_InitObject(BRect textRect, const BFont *initialFont,
 	fLastClickOffset = -1;
 
 	SetDoesUndo(true);
+
+	// We need to translate some strings, and in order to do so, we need
+	// to use the LocaleBackend to reach liblocale.so
+	if (gLocaleBackend == NULL)
+		LocaleBackend::LoadBackend();
 }
 
 
@@ -5538,6 +5563,44 @@ BTextView::_NullStyleHeight() const
 	return ceilf(fontHeight.ascent + fontHeight.descent + 1);
 }
 
+
+void
+BTextView::_ShowContextMenu(BPoint where)
+{
+	bool isRedo;
+	undo_state state = UndoState(&isRedo);
+	bool isUndo = state != B_UNDO_UNAVAILABLE && !isRedo;
+
+	int32 start;
+	int32 finish;
+	GetSelection(&start, &finish);
+	
+	bool canEdit = IsEditable();
+	int32 length = TextLength();
+
+	BPopUpMenu *menu = new BPopUpMenu(B_EMPTY_STRING, false, false);
+
+	BLayoutBuilder::Menu<>(menu)
+		.AddItem(TRANSLATE("Undo"), B_UNDO/*, 'Z'*/)
+			.SetEnabled(canEdit && isUndo)
+		.AddItem(TRANSLATE("Redo"), B_UNDO/*, 'Z', B_SHIFT_KEY*/)
+			.SetEnabled(canEdit && isRedo)
+		.AddSeparator()
+		.AddItem(TRANSLATE("Cut"), B_CUT, 'X')
+			.SetEnabled(canEdit && start != finish)
+		.AddItem(TRANSLATE("Copy"), B_COPY, 'C')
+			.SetEnabled(start != finish)
+		.AddItem(TRANSLATE("Paste"), B_PASTE, 'V')
+			.SetEnabled(canEdit && be_clipboard->SystemCount() > 0)
+		.AddSeparator()
+		.AddItem(TRANSLATE("Select All"), B_SELECT_ALL, 'A')
+			.SetEnabled(!(start == 0 && finish == length))
+	;
+
+	menu->SetTargetForItems(this);
+	ConvertToScreen(&where);
+	menu->Go(where, true, true,	true);
+}
 
 // #pragma mark - BTextView::TextTrackState
 

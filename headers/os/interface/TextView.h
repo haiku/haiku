@@ -357,6 +357,10 @@ private:
 
 			void				_PerformAutoScrolling();
 			void				_UpdateScrollbars();
+			void				_ScrollBy(float horizontalStep,
+									float verticalStep);
+			void				_ScrollTo(float x, float y);
+
 			void				_AutoResize(bool doRedraw = true);
 
 			void				_NewOffscreen(float padding = 0.0);
@@ -405,9 +409,7 @@ private:
 
 			float				_NullStyleHeight() const;
 
-			void				_ScrollBy(float horizontalStep,
-									float verticalStep);
-			void				_ScrollTo(float x, float y);
+			void				_ShowContextMenu(BPoint where);
 
 private:
 			BPrivate::TextGapBuffer*	fText;
