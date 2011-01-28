@@ -1518,7 +1518,7 @@ MainWin::_CreateMenu()
 	fVideoMenu->AddSeparatorItem();
 
 	fVideoMenu->AddItem(new BMenuItem(B_TRANSLATE("Full screen"),
-		new BMessage(M_TOGGLE_FULLSCREEN), 'F'));
+		new BMessage(M_TOGGLE_FULLSCREEN), B_ENTER));
 
 	fVideoMenu->AddSeparatorItem();
 
@@ -2006,19 +2006,24 @@ MainWin::_ShowContextMenu(const BPoint& screenPoint)
 	BPopUpMenu* menu = new BPopUpMenu("context menu", false, false);
 	BMenuItem* item;
 	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Full screen"),
-		new BMessage(M_TOGGLE_FULLSCREEN), 'F'));
+		new BMessage(M_TOGGLE_FULLSCREEN), B_ENTER));
 	item->SetMarked(fIsFullscreen);
-	item->SetEnabled(fHasVideo);
-
-	BMenu* aspectSubMenu = new BMenu(B_TRANSLATE("Aspect ratio"));
-	_SetupVideoAspectItems(aspectSubMenu);
-	aspectSubMenu->SetTargetForItems(this);
-	menu->AddItem(item = new BMenuItem(aspectSubMenu));
 	item->SetEnabled(fHasVideo);
 
 	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Hide interface"),
 		new BMessage(M_TOGGLE_NO_INTERFACE), 'H'));
 	item->SetMarked(fNoInterface);
+	item->SetEnabled(fHasVideo && !fIsFullscreen);
+	
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Always on top"),
+		new BMessage(M_TOGGLE_ALWAYS_ON_TOP), 'A'));
+	item->SetMarked(fAlwaysOnTop);
+	item->SetEnabled(fHasVideo);
+	
+	BMenu* aspectSubMenu = new BMenu(B_TRANSLATE("Aspect ratio"));
+	_SetupVideoAspectItems(aspectSubMenu);
+	aspectSubMenu->SetTargetForItems(this);
+	menu->AddItem(item = new BMenuItem(aspectSubMenu));
 	item->SetEnabled(fHasVideo);
 
 	menu->AddSeparatorItem();
