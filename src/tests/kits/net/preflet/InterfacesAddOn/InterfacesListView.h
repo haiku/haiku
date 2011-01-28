@@ -44,6 +44,10 @@ private:
 	BBitmap* 				fIcon;
 	BNetworkInterface		fInterface;
 	Settings*				fSettings;
+	float					fFirstlineOffset;
+	float					fSecondlineOffset;
+	float					fThirdlineOffset;
+	float					fStateWidth;
 };
 
 

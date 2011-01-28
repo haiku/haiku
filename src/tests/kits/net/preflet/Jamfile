@@ -1,11 +1,12 @@
 SubDir HAIKU_TOP src tests kits net preflet ;
 
-SimpleTest NetworkSetup :
+Preference NetworkSetup :
 	NetworkSetup.cpp
 	NetworkSetupWindow.cpp
 	NetworkSetupProfile.cpp
 	NetworkSetupAddOn.cpp
 	: be root $(TARGET_LIBSTDC++) $(HAIKU_LOCALE_LIBS)
+	: NetworkSetup.rdef
 ;
 
 SubInclude HAIKU_TOP src tests kits net preflet InterfacesAddOn ;

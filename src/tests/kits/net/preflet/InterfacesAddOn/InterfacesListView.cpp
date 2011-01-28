@@ -1,10 +1,11 @@
 /*
- * Copyright 2004-2009 Haiku Inc. All rights reserved.
+ * Copyright 2004-2011 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Philippe Houdoin
  * 		Fredrik Modéen
+ *		Alexander von Gluck IV, <kallisti5@unixzen.com>
  */
 
 
@@ -78,8 +79,14 @@ InterfaceListItem::Update(BView* owner, const BFont* font)
 	font_height height;
 	font->GetHeight(&height);
 
-	// TODO: take into account icon height, if he's taller...
-	SetHeight((height.ascent+height.descent+height.leading) * 3.0 + 8);
+	float lineHeight = ceilf(height.ascent) + ceilf(height.descent)
+		+ ceilf(height.leading);
+
+	fFirstlineOffset = 2 + ceilf(height.ascent + height.leading / 2);
+	fSecondlineOffset = fFirstlineOffset + lineHeight;
+	fThirdlineOffset = fFirstlineOffset + (lineHeight * 2);
+
+	SetHeight(3 * lineHeight + 4);
 }
 
 
@@ -90,11 +97,7 @@ InterfaceListItem::DrawItem(BView* owner, BRect /*bounds*/, bool complete)
 	if (!list)
 		return;
 
-	font_height height;
-	BFont font;
-	owner->GetFont(&font);
-	font.GetHeight(&height);
-	float fntheight = height.ascent+height.descent+height.leading;
+	owner->PushState();
 
 	BRect bounds = list->ItemFrame(list->IndexOf(this));
 
@@ -116,9 +119,9 @@ InterfaceListItem::DrawItem(BView* owner, BRect /*bounds*/, bool complete)
 	owner->SetHighColor( oldcolor );
 
 	BPoint iconPt = bounds.LeftTop() + BPoint(4,4);
-	BPoint namePt = iconPt + BPoint(32+8, fntheight);
-	BPoint driverPt = iconPt + BPoint(32+8, fntheight*2);
-	BPoint commentPt = iconPt + BPoint(32+8, fntheight*3);
+	BPoint namePt = BPoint(32+12, fFirstlineOffset);
+	BPoint driverPt = BPoint(32+12, fSecondlineOffset);
+	BPoint commentPt = BPoint(32+12, fThirdlineOffset);
 
 	drawing_mode mode = owner->DrawingMode();
 	if (fSettings->IsDisabled()) {
@@ -151,6 +154,8 @@ InterfaceListItem::DrawItem(BView* owner, BRect /*bounds*/, bool complete)
 
 	owner->SetHighColor(oldcolor);
 	owner->SetDrawingMode(mode);
+
+	owner->PopState();
 }
 
 

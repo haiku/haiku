@@ -27,9 +27,6 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 	BWindow(BRect(100, 100, 300, 300), title, B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
-	BBox *topDivider = new BBox(B_EMPTY_STRING);
-	topDivider->SetBorder(B_PLAIN_BORDER);
-
 	// ---- Profiles section
 	BMenu *profilesPopup = new BPopUpMenu("<none>");
 	_BuildProfilesMenu(profilesPopup, SELECT_PROFILE_MSG);
@@ -74,7 +71,6 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 			.AddGlue()
 			.Add(button)
 		.End()
-		.Add(topDivider)
 		.Add(fPanel)
 		.Add(bottomDivider)
 		.AddGroup(B_HORIZONTAL, 5)
@@ -87,7 +83,6 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 
 	_BuildShowTabView(SHOW_MSG);
 
-	topDivider->SetExplicitMaxSize(BSize(B_SIZE_UNSET, 1));
 	bottomDivider->SetExplicitMaxSize(BSize(B_SIZE_UNSET, 1));
 	fPanel->SetExplicitMinSize(BSize(fMinAddonViewRect.Width(),
 			fMinAddonViewRect.Height()));
@@ -118,10 +113,6 @@ NetworkSetupWindow::MessageReceived(BMessage*	msg)
 
 	case NEW_PROFILE_MSG:
 		break;
-
-	case DELETE_PROFILE_MSG: {
-		break;
-	}
 
 	case SELECT_PROFILE_MSG: {
 		BPath name;
@@ -206,8 +197,6 @@ NetworkSetupWindow::_BuildProfilesMenu(BMenu* menu, int32 msg_what)
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem(B_TRANSLATE("New" B_UTF8_ELLIPSIS),
 		new BMessage(NEW_PROFILE_MSG)));
-	menu->AddItem(new BMenuItem(B_TRANSLATE("Delete"),
-		new BMessage(DELETE_PROFILE_MSG)));
 
 	if (strlen(current_profile)) {
 		item = menu->FindItem(current_profile);
