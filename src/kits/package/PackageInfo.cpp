@@ -14,12 +14,6 @@
 
 #include <File.h>
 #include <Entry.h>
-#include <String.h>
-
-#include <NaturalCompare.h>
-
-
-using BPrivate::NaturalCompare;
 
 
 namespace BPackageKit {
@@ -41,7 +35,6 @@ enum TokenType {
 	TOKEN_OPEN_BRACKET,
 	TOKEN_CLOSE_BRACKET,
 	TOKEN_COMMA,
-	TOKEN_COLON,
 	//
 	TOKEN_EOF,
 };
@@ -83,11 +76,13 @@ private:
 									BPackageArchitecture* value);
 			void				_ParseVersionValue(BPackageVersion* value,
 									bool releaseIsOptional);
-			void				_ParseStringList(BObjectList<BString>* value);
-			void				_ParseProvisionList(
-									BObjectList<BPackageProvision>* value);
-			void				_ParseRequirementList(
-									BObjectList<BPackageRequirement>* value);
+			void				_ParseStringList(BObjectList<BString>* value,
+									bool allowQuotedStrings = true);
+			void				_ParseResolvableList(
+									BObjectList<BPackageResolvable>* value);
+			void				_ParseResolvableExprList(
+									BObjectList<BPackageResolvableExpression>*
+										value);
 
 			void				_Parse(BPackageInfo* packageInfo);
 
@@ -215,10 +210,6 @@ BPackageInfo::Parser::_NextToken()
 		case '\0':
 			return Token(TOKEN_EOF, fPos);
 
-		case ':':
-			fPos++;
-			return Token(TOKEN_COLON, tokenPos);
-
 		case ',':
 			fPos++;
 			return Token(TOKEN_COMMA, tokenPos);
@@ -285,7 +276,7 @@ BPackageInfo::Parser::_NextToken()
 		{
 			const char* start = fPos;
 			while (isalnum(*fPos) || *fPos == '.' || *fPos == '-'
-				|| *fPos == '_') {
+				|| *fPos == '_' || *fPos == ':') {
 				fPos++;
 			}
 			if (fPos == start)
@@ -392,7 +383,8 @@ BPackageInfo::Parser::_ParseVersionValue(BPackageVersion* value,
 
 
 void
-BPackageInfo::Parser::_ParseStringList(BObjectList<BString>* value)
+BPackageInfo::Parser::_ParseStringList(BObjectList<BString>* value, bool
+	allowQuotedStrings)
 {
 	Token openBracket = _NextToken();
 	if (openBracket.type != TOKEN_OPEN_BRACKET)
@@ -411,8 +403,13 @@ BPackageInfo::Parser::_ParseStringList(BObjectList<BString>* value)
 		} else
 			needComma = true;
 
-		if (token.type != TOKEN_QUOTED_STRING && token.type != TOKEN_WORD)
-			throw ParseError("expected quoted-string or word", token.pos);
+		if (allowQuotedStrings) {
+			if (token.type != TOKEN_QUOTED_STRING && token.type != TOKEN_WORD)
+				throw ParseError("expected quoted-string or word", token.pos);
+		} else {
+			if (token.type != TOKEN_WORD)
+				throw ParseError("expected word", token.pos);
+		}
 
 		value->AddItem(new BString(token.text));
 	}
@@ -420,7 +417,8 @@ BPackageInfo::Parser::_ParseStringList(BObjectList<BString>* value)
 
 
 void
-BPackageInfo::Parser::_ParseProvisionList(BObjectList<BPackageProvision>* value)
+BPackageInfo::Parser::_ParseResolvableList(
+	BObjectList<BPackageResolvable>* value)
 {
 	Token openBracket = _NextToken();
 	if (openBracket.type != TOKEN_OPEN_BRACKET)
@@ -428,19 +426,42 @@ BPackageInfo::Parser::_ParseProvisionList(BObjectList<BPackageProvision>* value)
 
 	bool needComma = false;
 	while (true) {
-		Token name = _NextToken();
-		if (name.type == TOKEN_CLOSE_BRACKET)
+		BPackageResolvableType type = B_PACKAGE_RESOLVABLE_TYPE_DEFAULT;
+
+		Token word = _NextToken();
+		if (word.type == TOKEN_CLOSE_BRACKET)
 			return;
 
 		if (needComma) {
-			if (name.type != TOKEN_COMMA)
-				throw ParseError("expected comma", name.pos);
-			name = _NextToken();
+			if (word.type != TOKEN_COMMA)
+				throw ParseError("expected comma", word.pos);
+			word = _NextToken();
 		} else
 			needComma = true;
 
-		if (name.type != TOKEN_WORD)
-			throw ParseError("expected word (a provision name)", name.pos);
+		if (word.type != TOKEN_WORD)
+			throw ParseError("expected word (a resolvable name)", word.pos);
+
+		int32 colonPos = word.text.FindFirst(':');
+		if (colonPos >= 0) {
+			BString typeName(word.text, colonPos);
+			for (int i = 0; i < B_PACKAGE_RESOLVABLE_TYPE_ENUM_COUNT; ++i) {
+				if (typeName.ICompare(BPackageResolvable::kTypeNames[i]) == 0) {
+					type = (BPackageResolvableType)i;
+					break;
+				}
+			}
+			if (type == B_PACKAGE_RESOLVABLE_TYPE_DEFAULT) {
+				BString error("resolvable type (<type>:) must be one of [");
+				for (int i = 1; i < B_PACKAGE_RESOLVABLE_TYPE_ENUM_COUNT; ++i) {
+					if (i > 1)
+						error << ",";
+					error << BPackageResolvable::kTypeNames[i];
+				}
+				error << "]";
+				throw ParseError(error, word.pos);
+			}
+		}
 
 		BPackageVersion version;
 		Token op = _NextToken();
@@ -451,14 +472,14 @@ BPackageInfo::Parser::_ParseProvisionList(BObjectList<BPackageProvision>* value)
 		else
 			throw ParseError("expected '=', comma or ']'", op.pos);
 
-		value->AddItem(new BPackageProvision(name.text, version));
+		value->AddItem(new BPackageResolvable(word.text, type, version));
 	}
 }
 
 
 void
-BPackageInfo::Parser::_ParseRequirementList(
-	BObjectList<BPackageRequirement>* value)
+BPackageInfo::Parser::_ParseResolvableExprList(
+	BObjectList<BPackageResolvableExpression>* value)
 {
 	Token openBracket = _NextToken();
 	if (openBracket.type != TOKEN_OPEN_BRACKET)
@@ -478,7 +499,7 @@ BPackageInfo::Parser::_ParseRequirementList(
 			needComma = true;
 
 		if (name.type != TOKEN_WORD)
-			throw ParseError("expected word (a requirement name)", name.pos);
+			throw ParseError("expected word (a resolvable name)", name.pos);
 
 		BPackageVersion version;
 		Token op = _NextToken();
@@ -495,7 +516,8 @@ BPackageInfo::Parser::_ParseRequirementList(
 				"expected '<', '<=', '==', '>=', '>', comma or ']'", op.pos);
 		}
 
-		value->AddItem(new BPackageRequirement(name.text, op.text, version));
+		value->AddItem(
+			new BPackageResolvableExpression(name.text, op.text, version));
 	}
 }
 
@@ -539,6 +561,8 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 
 			BString summary;
 			_ParseStringValue(&summary);
+			if (summary.FindFirst('\n') >= 0)
+				throw ParseError("the summary contains linebreaks", t.pos);
 			packageInfo->SetSummary(summary);
 			seen[B_PACKAGE_INFO_SUMMARY] = true;
 		} else if (t.text.ICompare(names[B_PACKAGE_INFO_DESCRIPTION]) == 0) {
@@ -603,11 +627,11 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 				throw ParseError(error, t.pos);
 			}
 
-			BObjectList<BString> copyrights;
-			_ParseStringList(&copyrights);
-			int count = copyrights.CountItems();
+			BObjectList<BString> copyrightList;
+			_ParseStringList(&copyrightList);
+			int count = copyrightList.CountItems();
 			for (int i = 0; i < count; ++i)
-				packageInfo->AddCopyright(*(copyrights.ItemAt(i)));
+				packageInfo->AddCopyright(*(copyrightList.ItemAt(i)));
 			seen[B_PACKAGE_INFO_COPYRIGHTS] = true;
 		} else if (t.text.ICompare(names[B_PACKAGE_INFO_LICENSES]) == 0) {
 			if (seen[B_PACKAGE_INFO_LICENSES]) {
@@ -616,11 +640,11 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 				throw ParseError(error, t.pos);
 			}
 
-			BObjectList<BString> licenses;
-			_ParseStringList(&licenses);
-			int count = licenses.CountItems();
+			BObjectList<BString> licenseList;
+			_ParseStringList(&licenseList);
+			int count = licenseList.CountItems();
 			for (int i = 0; i < count; ++i)
-				packageInfo->AddLicense(*(licenses.ItemAt(i)));
+				packageInfo->AddLicense(*(licenseList.ItemAt(i)));
 			seen[B_PACKAGE_INFO_LICENSES] = true;
 		} else if (t.text.ICompare(names[B_PACKAGE_INFO_PROVIDES]) == 0) {
 			if (seen[B_PACKAGE_INFO_PROVIDES]) {
@@ -629,11 +653,11 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 				throw ParseError(error, t.pos);
 			}
 
-			BObjectList<BPackageProvision> provisions;
-			_ParseProvisionList(&provisions);
-			int count = provisions.CountItems();
+			BObjectList<BPackageResolvable> providesList;
+			_ParseResolvableList(&providesList);
+			int count = providesList.CountItems();
 			for (int i = 0; i < count; ++i)
-				packageInfo->AddProvision(*(provisions.ItemAt(i)));
+				packageInfo->AddProvides(*(providesList.ItemAt(i)));
 			seen[B_PACKAGE_INFO_PROVIDES] = true;
 		} else if (t.text.ICompare(names[B_PACKAGE_INFO_REQUIRES]) == 0) {
 			if (seen[B_PACKAGE_INFO_REQUIRES]) {
@@ -642,212 +666,74 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 				throw ParseError(error, t.pos);
 			}
 
-			BObjectList<BPackageRequirement> requirements;
-			_ParseRequirementList(&requirements);
-			int count = requirements.CountItems();
+			BObjectList<BPackageResolvableExpression> requiresList;
+			_ParseResolvableExprList(&requiresList);
+			int count = requiresList.CountItems();
 			for (int i = 0; i < count; ++i)
-				packageInfo->AddRequirement(*(requirements.ItemAt(i)));
+				packageInfo->AddRequires(*(requiresList.ItemAt(i)));
 			seen[B_PACKAGE_INFO_REQUIRES] = true;
+		} else if (t.text.ICompare(names[B_PACKAGE_INFO_SUPPLEMENTS]) == 0) {
+			if (seen[B_PACKAGE_INFO_SUPPLEMENTS]) {
+				BString error = BString(names[B_PACKAGE_INFO_SUPPLEMENTS])
+					<< " already seen!";
+				throw ParseError(error, t.pos);
+			}
+
+			BObjectList<BPackageResolvableExpression> supplementsList;
+			_ParseResolvableExprList(&supplementsList);
+			int count = supplementsList.CountItems();
+			for (int i = 0; i < count; ++i)
+				packageInfo->AddRequires(*(supplementsList.ItemAt(i)));
+			seen[B_PACKAGE_INFO_SUPPLEMENTS] = true;
+		} else if (t.text.ICompare(names[B_PACKAGE_INFO_CONFLICTS]) == 0) {
+			if (seen[B_PACKAGE_INFO_CONFLICTS]) {
+				BString error = BString(names[B_PACKAGE_INFO_CONFLICTS])
+					<< " already seen!";
+				throw ParseError(error, t.pos);
+			}
+
+			BObjectList<BPackageResolvableExpression> conflictsList;
+			_ParseResolvableExprList(&conflictsList);
+			int count = conflictsList.CountItems();
+			for (int i = 0; i < count; ++i)
+				packageInfo->AddRequires(*(conflictsList.ItemAt(i)));
+			seen[B_PACKAGE_INFO_CONFLICTS] = true;
+		} else if (t.text.ICompare(names[B_PACKAGE_INFO_FRESHENS]) == 0) {
+			if (seen[B_PACKAGE_INFO_FRESHENS]) {
+				BString error = BString(names[B_PACKAGE_INFO_FRESHENS])
+					<< " already seen!";
+				throw ParseError(error, t.pos);
+			}
+
+			BObjectList<BPackageResolvableExpression> freshensList;
+			_ParseResolvableExprList(&freshensList);
+			int count = freshensList.CountItems();
+			for (int i = 0; i < count; ++i)
+				packageInfo->AddRequires(*(freshensList.ItemAt(i)));
+			seen[B_PACKAGE_INFO_FRESHENS] = true;
+		} else if (t.text.ICompare(names[B_PACKAGE_INFO_REPLACES]) == 0) {
+			if (seen[B_PACKAGE_INFO_REPLACES]) {
+				BString error = BString(names[B_PACKAGE_INFO_REPLACES])
+					<< " already seen!";
+				throw ParseError(error, t.pos);
+			}
+
+			BObjectList<BString> replacesList;
+			_ParseStringList(&replacesList, false);
+			int count = replacesList.CountItems();
+			for (int i = 0; i < count; ++i)
+				packageInfo->AddRequires(*(replacesList.ItemAt(i)));
+			seen[B_PACKAGE_INFO_REPLACES] = true;
 		}
 	}
 
-	for (int i = 0; i < B_PACKAGE_INFO_ENUM_COUNT; ++i) {
+	// everything up to and including 'provides' is mandatory
+	for (int i = 0; i <= B_PACKAGE_INFO_PROVIDES; ++i) {
 		if (!seen[i]) {
 			BString error = BString(names[i]) << " is not being set anywhere!";
 			throw ParseError(error, fPos);
 		}
 	}
-}
-
-
-BPackageVersion::BPackageVersion()
-{
-}
-
-
-BPackageVersion::BPackageVersion(const BString& major, const BString& minor,
-	const BString& micro, uint8 release)
-	:
-	fMajor(major),
-	fMinor(minor),
-	fMicro(micro),
-	fRelease(release)
-{
-}
-
-
-status_t
-BPackageVersion::InitCheck() const
-{
-	return fMajor.Length() > 0 ? B_OK : B_NO_INIT;
-}
-
-
-int
-BPackageVersion::Compare(const BPackageVersion& other) const
-{
-	int majorDiff = NaturalCompare(fMajor.String(), other.fMajor.String());
-	if (majorDiff != 0)
-		return majorDiff;
-
-	int minorDiff = NaturalCompare(fMinor.String(), other.fMinor.String());
-	if (minorDiff != 0)
-		return minorDiff;
-
-	int microDiff = NaturalCompare(fMicro.String(), other.fMicro.String());
-	if (microDiff != 0)
-		return microDiff;
-
-	return (int)fRelease - (int)other.fRelease;
-}
-
-
-void
-BPackageVersion::GetVersionString(BString& string) const
-{
-	string = fMajor;
-
-	if (fMinor.Length() > 0) {
-		string << '.' << fMinor;
-		if (fMicro.Length() > 0)
-			string << '.' << fMicro;
-	}
-
-	if (fRelease > 0)
-		string << '-' << fRelease;
-}
-
-
-void
-BPackageVersion::SetTo(const BString& major, const BString& minor,
-	const BString& micro, uint8 release)
-{
-	fMajor = major;
-	fMinor = minor;
-	fMicro = micro;
-	fRelease = release;
-}
-
-
-void
-BPackageVersion::Clear()
-{
-	fMajor.Truncate(0);
-	fMinor.Truncate(0);
-	fMicro.Truncate(0);
-	fRelease = 0;
-}
-
-
-BPackageProvision::BPackageProvision()
-{
-}
-
-
-BPackageProvision::BPackageProvision(const BString& name,
-	const BPackageVersion& version)
-	:
-	fName(name),
-	fVersion(version)
-{
-}
-
-
-status_t
-BPackageProvision::InitCheck() const
-{
-	return fName.Length() > 0 ? B_OK : B_NO_INIT;
-}
-
-
-void
-BPackageProvision::GetProvisionString(BString& string) const
-{
-	string = fName;
-
-	if (fVersion.InitCheck() == B_OK) {
-		string << '=';
-		fVersion.GetVersionString(string);
-	}
-}
-
-
-void
-BPackageProvision::SetTo(const BString& name, const BPackageVersion& version)
-{
-	fName = name;
-	fVersion = version;
-}
-
-
-void
-BPackageProvision::Clear()
-{
-	fName.Truncate(0);
-	fVersion.Clear();
-}
-
-
-BPackageRequirement::BPackageRequirement()
-{
-}
-
-
-BPackageRequirement::BPackageRequirement(const BString& name,
-	const BString& _operator, const BPackageVersion& version)
-	:
-	fName(name),
-	fOperator(_operator),
-	fVersion(version)
-{
-}
-
-
-status_t
-BPackageRequirement::InitCheck() const
-{
-	if (fName.Length() == 0)
-		return B_NO_INIT;
-
-	// either both or none of operator and version must be set
-	if (fOperator.Length() == 0 && fVersion.InitCheck() == B_OK)
-		return B_NO_INIT;
-
-	if (fOperator.Length() > 0 && fVersion.InitCheck() != B_OK)
-		return B_NO_INIT;
-
-	return B_OK;
-}
-
-
-void
-BPackageRequirement::GetRequirementString(BString& string) const
-{
-	string = fName;
-
-	if (fVersion.InitCheck() == B_OK) {
-		string << fOperator;
-		fVersion.GetVersionString(string);
-	}
-}
-
-
-void
-BPackageRequirement::SetTo(const BString& name, const BString& _operator,
-	const BPackageVersion& version)
-{
-	fName = name;
-	fOperator = _operator;
-	fVersion = version;
-}
-
-
-void
-BPackageRequirement::Clear()
-{
-	fName.Truncate(0);
-	fOperator.Truncate(0);
-	fVersion.Clear();
 }
 
 
@@ -863,6 +749,10 @@ const char* BPackageInfo::kElementNames[B_PACKAGE_INFO_ENUM_COUNT] = {
 	"licenses",
 	"provides",
 	"requires",
+	"conflicts",
+	"supplements",
+	"replaces",
+	"freshens",
 };
 
 
@@ -877,10 +767,14 @@ BPackageInfo::kArchitectureNames[B_PACKAGE_ARCHITECTURE_ENUM_COUNT] = {
 BPackageInfo::BPackageInfo()
 	:
 	fArchitecture(B_PACKAGE_ARCHITECTURE_ENUM_COUNT),
-	fCopyrights(5, true),
-	fLicenses(5, true),
-	fProvisions(20, true),
-	fRequirements(20, true)
+	fCopyrightList(5, true),
+	fLicenseList(5, true),
+	fProvidesList(20, true),
+	fRequiresList(20, true),
+	fSupplementsList(20, true),
+	fConflictsList(5, true),
+	fFreshensList(5, true),
+	fReplacesList(5, true)
 {
 }
 
@@ -942,8 +836,8 @@ BPackageInfo::InitCheck() const
 		|| fPackager.Length() == 0
 		|| fArchitecture == B_PACKAGE_ARCHITECTURE_ENUM_COUNT
 		|| fVersion.InitCheck() != B_OK
-		|| fCopyrights.IsEmpty() || fLicenses.IsEmpty()
-		|| fProvisions.IsEmpty() || fRequirements.IsEmpty())
+		|| fCopyrightList.IsEmpty() || fLicenseList.IsEmpty()
+		|| fProvidesList.IsEmpty())
 		return B_NO_INIT;
 
 	return B_OK;
@@ -1000,30 +894,58 @@ BPackageInfo::Version() const
 
 
 const BObjectList<BString>&
-BPackageInfo::Copyrights() const
+BPackageInfo::CopyrightList() const
 {
-	return fCopyrights;
+	return fCopyrightList;
 }
 
 
 const BObjectList<BString>&
-BPackageInfo::Licenses() const
+BPackageInfo::LicenseList() const
 {
-	return fLicenses;
+	return fLicenseList;
 }
 
 
-const BObjectList<BPackageRequirement>&
-BPackageInfo::Requirements() const
+const BObjectList<BPackageResolvable>&
+BPackageInfo::ProvidesList() const
 {
-	return fRequirements;
+	return fProvidesList;
 }
 
 
-const BObjectList<BPackageProvision>&
-BPackageInfo::Provisions() const
+const BObjectList<BPackageResolvableExpression>&
+BPackageInfo::RequiresList() const
 {
-	return fProvisions;
+	return fRequiresList;
+}
+
+
+const BObjectList<BPackageResolvableExpression>&
+BPackageInfo::SupplementsList() const
+{
+	return fSupplementsList;
+}
+
+
+const BObjectList<BPackageResolvableExpression>&
+BPackageInfo::ConflictsList() const
+{
+	return fConflictsList;
+}
+
+
+const BObjectList<BPackageResolvableExpression>&
+BPackageInfo::FreshensList() const
+{
+	return fFreshensList;
+}
+
+
+const BObjectList<BString>&
+BPackageInfo::ReplacesList() const
+{
+	return fReplacesList;
 }
 
 
@@ -1077,9 +999,9 @@ BPackageInfo::SetArchitecture(BPackageArchitecture architecture)
 
 
 void
-BPackageInfo::ClearCopyrights()
+BPackageInfo::ClearCopyrightList()
 {
-	fCopyrights.MakeEmpty();
+	fCopyrightList.MakeEmpty();
 }
 
 
@@ -1090,14 +1012,14 @@ BPackageInfo::AddCopyright(const BString& copyright)
 	if (newCopyright == NULL)
 		return B_NO_MEMORY;
 
-	return fCopyrights.AddItem(newCopyright) ? B_OK : B_ERROR;
+	return fCopyrightList.AddItem(newCopyright) ? B_OK : B_ERROR;
 }
 
 
 void
-BPackageInfo::ClearLicenses()
+BPackageInfo::ClearLicenseList()
 {
-	fLicenses.MakeEmpty();
+	fLicenseList.MakeEmpty();
 }
 
 
@@ -1108,45 +1030,120 @@ BPackageInfo::AddLicense(const BString& license)
 	if (newLicense == NULL)
 		return B_NO_MEMORY;
 
-	return fLicenses.AddItem(newLicense) ? B_OK : B_ERROR;
+	return fLicenseList.AddItem(newLicense) ? B_OK : B_ERROR;
 }
 
 
 void
-BPackageInfo::ClearProvisions()
+BPackageInfo::ClearProvidesList()
 {
-	fProvisions.MakeEmpty();
+	fProvidesList.MakeEmpty();
 }
 
 
 status_t
-BPackageInfo::AddProvision(const BPackageProvision& provision)
+BPackageInfo::AddProvides(const BPackageResolvable& provides)
 {
-	BPackageProvision* newProvision
-		= new (std::nothrow) BPackageProvision(provision);
-	if (newProvision == NULL)
+	BPackageResolvable* newProvides
+		= new (std::nothrow) BPackageResolvable(provides);
+	if (newProvides == NULL)
 		return B_NO_MEMORY;
 
-	return fProvisions.AddItem(newProvision) ? B_OK : B_ERROR;
+	return fProvidesList.AddItem(newProvides) ? B_OK : B_ERROR;
 }
 
 
 void
-BPackageInfo::ClearRequirements()
+BPackageInfo::ClearRequiresList()
 {
-	fRequirements.MakeEmpty();
+	fRequiresList.MakeEmpty();
 }
 
 
 status_t
-BPackageInfo::AddRequirement(const BPackageRequirement& requirement)
+BPackageInfo::AddRequires(const BPackageResolvableExpression& requires)
 {
-	BPackageRequirement* newRequirement
-		= new (std::nothrow) BPackageRequirement(requirement);
-	if (newRequirement == NULL)
+	BPackageResolvableExpression* newRequires
+		= new (std::nothrow) BPackageResolvableExpression(requires);
+	if (newRequires == NULL)
 		return B_NO_MEMORY;
 
-	return fRequirements.AddItem(newRequirement) ? B_OK : B_ERROR;
+	return fRequiresList.AddItem(newRequires) ? B_OK : B_ERROR;
+}
+
+
+void
+BPackageInfo::ClearSupplementsList()
+{
+	fSupplementsList.MakeEmpty();
+}
+
+
+status_t
+BPackageInfo::AddSupplements(const BPackageResolvableExpression& supplements)
+{
+	BPackageResolvableExpression* newSupplements
+		= new (std::nothrow) BPackageResolvableExpression(supplements);
+	if (newSupplements == NULL)
+		return B_NO_MEMORY;
+
+	return fSupplementsList.AddItem(newSupplements) ? B_OK : B_ERROR;
+}
+
+
+void
+BPackageInfo::ClearConflictsList()
+{
+	fConflictsList.MakeEmpty();
+}
+
+
+status_t
+BPackageInfo::AddConflicts(const BPackageResolvableExpression& conflicts)
+{
+	BPackageResolvableExpression* newConflicts
+		= new (std::nothrow) BPackageResolvableExpression(conflicts);
+	if (newConflicts == NULL)
+		return B_NO_MEMORY;
+
+	return fConflictsList.AddItem(newConflicts) ? B_OK : B_ERROR;
+}
+
+
+void
+BPackageInfo::ClearFreshensList()
+{
+	fFreshensList.MakeEmpty();
+}
+
+
+status_t
+BPackageInfo::AddFreshens(const BPackageResolvableExpression& freshens)
+{
+	BPackageResolvableExpression* newFreshens
+		= new (std::nothrow) BPackageResolvableExpression(freshens);
+	if (newFreshens == NULL)
+		return B_NO_MEMORY;
+
+	return fFreshensList.AddItem(newFreshens) ? B_OK : B_ERROR;
+}
+
+
+void
+BPackageInfo::ClearReplacesList()
+{
+	fReplacesList.MakeEmpty();
+}
+
+
+status_t
+BPackageInfo::AddReplaces(const BString& replaces)
+{
+	BString* newReplaces = new (std::nothrow) BString(replaces);
+	if (newReplaces == NULL)
+		return B_NO_MEMORY;
+
+	return fReplacesList.AddItem(newReplaces) ? B_OK : B_ERROR;
 }
 
 
@@ -1160,34 +1157,14 @@ BPackageInfo::Clear()
 	fPackager.Truncate(0);
 	fVersion.Clear();
 	fArchitecture = B_PACKAGE_ARCHITECTURE_ENUM_COUNT;
-	fCopyrights.MakeEmpty();
-	fLicenses.MakeEmpty();
-	fRequirements.MakeEmpty();
-	fProvisions.MakeEmpty();
-}
-
-
-/*static*/ status_t
-BPackageInfo::GetElementName(BPackageInfoIndex index, const char** name)
-{
-	if (index < 0 || index >= B_PACKAGE_INFO_ENUM_COUNT || name == NULL)
-		return B_BAD_VALUE;
-
-	*name = kElementNames[index];
-
-	return B_OK;
-}
-
-
-/*static*/ status_t
-BPackageInfo::GetArchitectureName(BPackageArchitecture arch, const char** name)
-{
-	if (arch < 0 || arch >= B_PACKAGE_ARCHITECTURE_ENUM_COUNT || name == NULL)
-		return B_BAD_VALUE;
-
-	*name = kArchitectureNames[arch];
-
-	return B_OK;
+	fCopyrightList.MakeEmpty();
+	fLicenseList.MakeEmpty();
+	fRequiresList.MakeEmpty();
+	fProvidesList.MakeEmpty();
+	fSupplementsList.MakeEmpty();
+	fConflictsList.MakeEmpty();
+	fFreshensList.MakeEmpty();
+	fReplacesList.MakeEmpty();
 }
 
 

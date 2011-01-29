@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>
+ * Copyright 2011, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _PACKAGE__PACKAGE_INFO_H_
@@ -8,6 +8,10 @@
 
 #include <ObjectList.h>
 #include <String.h>
+
+#include <package/PackageResolvable.h>
+#include <package/PackageResolvableExpression.h>
+#include <package/PackageVersion.h>
 
 
 class BEntry;
@@ -18,16 +22,28 @@ namespace BPackageKit {
 
 enum BPackageInfoIndex {
 	B_PACKAGE_INFO_NAME = 0,
-	B_PACKAGE_INFO_SUMMARY,			// single line, 70 chars max
-	B_PACKAGE_INFO_DESCRIPTION,		// multiple lines possible
-	B_PACKAGE_INFO_VENDOR,			// e.g. "Haiku Project"
-	B_PACKAGE_INFO_PACKAGER,		// e-mail address preferred
+	B_PACKAGE_INFO_SUMMARY,		// single line
+	B_PACKAGE_INFO_DESCRIPTION,	// multiple lines possible
+	B_PACKAGE_INFO_VENDOR,		// e.g. "Haiku Project"
+	B_PACKAGE_INFO_PACKAGER,	// e-mail address preferred
 	B_PACKAGE_INFO_ARCHITECTURE,
-	B_PACKAGE_INFO_VERSION,			// <major>[.<minor>[.<micro>]]
-	B_PACKAGE_INFO_COPYRIGHTS,		// list
-	B_PACKAGE_INFO_LICENSES,		// list
-	B_PACKAGE_INFO_PROVIDES,		// list
-	B_PACKAGE_INFO_REQUIRES,		// list
+	B_PACKAGE_INFO_VERSION,		// <major>[.<minor>[.<micro>]]
+	B_PACKAGE_INFO_COPYRIGHTS,	// list
+	B_PACKAGE_INFO_LICENSES,	// list
+	B_PACKAGE_INFO_PROVIDES,	// list of resolvables this package provides,
+								// each optionally giving a version
+	B_PACKAGE_INFO_REQUIRES,	// list of resolvables required by this package,
+								// each optionally specifying a version relation
+								// (e.g. libssl.so >= 0.9.8)
+	B_PACKAGE_INFO_SUPPLEMENTS,	// list of resolvables that are supplemented
+								// by this package, i.e. this package marks
+								// itself as an extension to other packages
+	B_PACKAGE_INFO_CONFLICTS,	// list of resolvables that inhibit installation
+								// of this package
+	B_PACKAGE_INFO_REPLACES,	// list of resolvables that this package
+								// will replace (upon update)
+	B_PACKAGE_INFO_FRESHENS,	// list of resolvables that this package
+								// contains a patch for
 	//
 	B_PACKAGE_INFO_ENUM_COUNT,
 };
@@ -39,81 +55,6 @@ enum BPackageArchitecture {
 	B_PACKAGE_ARCHITECTURE_X86_GCC2,
 	//
 	B_PACKAGE_ARCHITECTURE_ENUM_COUNT,
-};
-
-
-class BPackageVersion {
-public:
-								BPackageVersion();
-								BPackageVersion(const BString& major,
-									const BString& minor, const BString& micro,
-									uint8 release);
-
-			status_t			InitCheck() const;
-
-			void				GetVersionString(BString& string) const;
-
-			void				SetTo(const BString& major,
-									const BString& minor, const BString& micro,
-									uint8 release);
-			void				Clear();
-
-			int					Compare(const BPackageVersion& other) const;
-									// does a natural compare over major, minor
-									// and micro, finally comparing release
-
-private:
-			BString				fMajor;
-			BString				fMinor;
-			BString				fMicro;
-			uint8				fRelease;
-};
-
-
-class BPackageProvision {
-public:
-								BPackageProvision();
-								BPackageProvision(const BString& name,
-									const BPackageVersion& version
-										= BPackageVersion());
-
-			status_t			InitCheck() const;
-
-			void				GetProvisionString(BString& string) const;
-
-			void				SetTo(const BString& name,
-									const BPackageVersion& version
-										= BPackageVersion());
-			void				Clear();
-
-private:
-			BString				fName;
-			BPackageVersion		fVersion;
-};
-
-
-class BPackageRequirement {
-public:
-								BPackageRequirement();
-								BPackageRequirement(const BString& name,
-									const BString& _operator = "",
-									const BPackageVersion& version
-										= BPackageVersion());
-
-			status_t			InitCheck() const;
-
-			void				GetRequirementString(BString& string) const;
-
-			void				SetTo(const BString& name,
-									const BString& _operator = "",
-									const BPackageVersion& version
-										= BPackageVersion());
-			void				Clear();
-
-private:
-			BString				fName;
-			BString				fOperator;
-			BPackageVersion		fVersion;
 };
 
 
@@ -154,11 +95,19 @@ public:
 
 			const BPackageVersion&	Version() const;
 
-			const BObjectList<BString>&	Copyrights() const;
-			const BObjectList<BString>&	Licenses() const;
+			const BObjectList<BString>&	CopyrightList() const;
+			const BObjectList<BString>&	LicenseList() const;
 
-			const BObjectList<BPackageRequirement>&	Requirements() const;
-			const BObjectList<BPackageProvision>&	Provisions() const;
+			const BObjectList<BPackageResolvable>&	ProvidesList() const;
+			const BObjectList<BPackageResolvableExpression>&
+								RequiresList() const;
+			const BObjectList<BPackageResolvableExpression>&
+								SupplementsList() const;
+			const BObjectList<BPackageResolvableExpression>&
+								ConflictsList() const;
+			const BObjectList<BPackageResolvableExpression>&
+								FreshensList() const;
+			const BObjectList<BString>&	ReplacesList() const;
 
 			void				SetName(const BString& name);
 			void				SetSummary(const BString& summary);
@@ -171,37 +120,42 @@ public:
 
 			void				SetVersion(const BPackageVersion& version);
 
-			void				ClearCopyrights();
+			void				ClearCopyrightList();
 			status_t			AddCopyright(const BString& copyright);
 
-			void				ClearLicenses();
+			void				ClearLicenseList();
 			status_t			AddLicense(const BString& license);
 
-			void				ClearProvisions();
-			status_t			AddProvision(
-									const BPackageProvision& provision);
+			void				ClearProvidesList();
+			status_t			AddProvides(const BPackageResolvable& provides);
 
-			void				ClearRequirements();
-			status_t			AddRequirement(
-									const BPackageRequirement& requirement);
+			void				ClearRequiresList();
+			status_t			AddRequires(
+									const BPackageResolvableExpression& expr);
+
+			void				ClearSupplementsList();
+			status_t			AddSupplements(
+									const BPackageResolvableExpression& expr);
+
+			void				ClearConflictsList();
+			status_t			AddConflicts(
+									const BPackageResolvableExpression& expr);
+
+			void				ClearFreshensList();
+			status_t			AddFreshens(
+									const BPackageResolvableExpression& expr);
+
+			void				ClearReplacesList();
+			status_t			AddReplaces(const BString& replaces);
 
 			void				Clear();
 
 public:
-	static	status_t			GetElementName(
-									BPackageInfoIndex index,
-									const char** name);
-
-	static	status_t			GetArchitectureName(
-									BPackageArchitecture arch,
-									const char** name);
+	static	const char*			kElementNames[];
+	static	const char*			kArchitectureNames[];
 
 private:
 			class Parser;
-	friend	class Parser;
-
-	static	const char*			kElementNames[];
-	static	const char*			kArchitectureNames[];
 
 private:
 			BString				fName;
@@ -214,11 +168,19 @@ private:
 
 			BPackageVersion		fVersion;
 
-			BObjectList<BString>	fCopyrights;
-			BObjectList<BString>	fLicenses;
+			BObjectList<BString>	fCopyrightList;
+			BObjectList<BString>	fLicenseList;
 
-			BObjectList<BPackageProvision>	fProvisions;
-			BObjectList<BPackageRequirement>	fRequirements;
+			BObjectList<BPackageResolvable>	fProvidesList;
+
+			BObjectList<BPackageResolvableExpression>	fRequiresList;
+			BObjectList<BPackageResolvableExpression>	fSupplementsList;
+
+			BObjectList<BPackageResolvableExpression>	fConflictsList;
+
+			BObjectList<BPackageResolvableExpression>	fFreshensList;
+
+			BObjectList<BString>	fReplacesList;
 };
 
 

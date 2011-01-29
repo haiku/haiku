@@ -1,0 +1,78 @@
+/*
+ * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>
+ * Distributed under the terms of the MIT License.
+ */
+
+
+#include <package/PackageResolvable.h>
+
+
+namespace BPackageKit {
+
+
+const char*
+BPackageResolvable::kTypeNames[B_PACKAGE_RESOLVABLE_TYPE_ENUM_COUNT] = {
+	"",
+	"lib",
+	"cmd",
+	"app",
+	"add_on",
+};
+
+
+BPackageResolvable::BPackageResolvable()
+	:
+	fType(B_PACKAGE_RESOLVABLE_TYPE_DEFAULT)
+{
+}
+
+
+BPackageResolvable::BPackageResolvable(const BString& name,
+	BPackageResolvableType type, const BPackageVersion& version)
+	:
+	fName(name),
+	fType(type),
+	fVersion(version)
+{
+}
+
+
+status_t
+BPackageResolvable::InitCheck() const
+{
+	return fName.Length() > 0 ? B_OK : B_NO_INIT;
+}
+
+
+void
+BPackageResolvable::GetAsString(BString& string) const
+{
+	// the type is part of the name
+	string = fName;
+
+	if (fVersion.InitCheck() == B_OK) {
+		string << '=';
+		fVersion.GetAsString(string);
+	}
+}
+
+
+void
+BPackageResolvable::SetTo(const BString& name, BPackageResolvableType type,
+	const BPackageVersion& version)
+{
+	fName = name;
+	fType = type;
+	fVersion = version;
+}
+
+
+void
+BPackageResolvable::Clear()
+{
+	fName.Truncate(0);
+	fVersion.Clear();
+}
+
+
+}	// namespace BPackageKit

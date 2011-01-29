@@ -41,7 +41,10 @@ SharedLibrary libpackage.so
 	Job.cpp
 	JobQueue.cpp
 	PackageInfo.cpp
+	PackageResolvable.cpp
+	PackageResolvableExpression.cpp
 	PackageRoster.cpp
+	PackageVersion.cpp
 	RefreshRepositoryRequest.cpp
 	RemoveRepositoryJob.cpp
 	RepositoryCache.cpp
