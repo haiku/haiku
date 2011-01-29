@@ -5,7 +5,7 @@
  * Authors:
  *		Philippe Houdoin
  * 		Fredrik Modéen
- *		Alexander von Gluck IV, <kallisti5@unixzen.com>
+ *		Alexander von Gluck IV, kallisti5@unixzen.com
  */
 
 
@@ -75,7 +75,7 @@ InterfaceListItem::~InterfaceListItem()
 void
 InterfaceListItem::Update(BView* owner, const BFont* font)
 {
-	BListItem::Update(owner,font);
+	BListItem::Update(owner, font);
 	font_height height;
 	font->GetHeight(&height);
 
@@ -101,24 +101,25 @@ InterfaceListItem::DrawItem(BView* owner, BRect /*bounds*/, bool complete)
 
 	BRect bounds = list->ItemFrame(list->IndexOf(this));
 
-	rgb_color black= { 0,0,0,255 };
+	rgb_color black = {0, 0, 0, 255};
 
-	if ( IsSelected() || complete ) {
-        if (IsSelected()) {
-            owner->SetHighColor(tint_color(owner->ViewColor() , B_HIGHLIGHT_BACKGROUND_TINT));
-        } else {
-            owner->SetHighColor(owner->LowColor());
-		}
+	if (IsSelected() || complete) {
+		if (IsSelected()) {
+			owner->SetHighColor(tint_color(owner->ViewColor(),
+				B_HIGHLIGHT_BACKGROUND_TINT));
+	} else {
+		owner->SetHighColor(owner->LowColor());
+	}
 
 		owner->FillRect(bounds);
 	}
 
-	BPoint iconPt = bounds.LeftTop() + BPoint(4,4);
-	BPoint namePt = BPoint(32+12, fFirstlineOffset);
-	BPoint v4addrPt = BPoint(32+12, fSecondlineOffset);
-	BPoint v6addrPt = BPoint(32+12, fThirdlineOffset);
+	BPoint iconPt = bounds.LeftTop() + BPoint(4, 4);
+	BPoint namePt(32 + 12, fFirstlineOffset);
+	BPoint v4addrPt(32 + 12, fSecondlineOffset);
+	BPoint v6addrPt(32 + 12, fThirdlineOffset);
 
-	if ( fSettings->IsDisabled() ) {
+	if (fSettings->IsDisabled()) {
 		owner->SetDrawingMode(B_OP_ALPHA);
 		owner->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_OVERLAY);
 		owner->SetHighColor(0, 0, 0, 32);
@@ -127,11 +128,11 @@ InterfaceListItem::DrawItem(BView* owner, BRect /*bounds*/, bool complete)
 
 	owner->DrawBitmapAsync(fIcon, iconPt);
 
-	if ( fSettings->IsDisabled() )
-        owner->SetHighColor(tint_color(black, B_LIGHTEN_1_TINT));
+	if (fSettings->IsDisabled())
+		owner->SetHighColor(tint_color(black, B_LIGHTEN_1_TINT));
 	else
-        owner->SetHighColor(black);
-		
+		owner->SetHighColor(black);
+
 	owner->SetFont(be_bold_font);
 	owner->DrawString(Name(), namePt);
 	owner->SetFont(be_plain_font);
@@ -142,7 +143,7 @@ InterfaceListItem::DrawItem(BView* owner, BRect /*bounds*/, bool complete)
 		BString v4str("IPv4: ");
 		v4str << fSettings->IP();
 		v4str << " (";
-		if ( fSettings->AutoConfigure() )
+		if (fSettings->AutoConfigure())
 			v4str << "DHCP";
 		else
 			v4str << "manual";
@@ -200,13 +201,17 @@ InterfaceListItem::_Init()
 
 	size_t size;
 	// Try specific interface icon?
-	const uint8* rawIcon = (const uint8*)resources.LoadResource(B_VECTOR_ICON_TYPE, Name(), &size);
+	const uint8* rawIcon = (const uint8*)resources.LoadResource(
+		B_VECTOR_ICON_TYPE, Name(), &size);
+
 	if (rawIcon == NULL && mediaTypeName != NULL)
 		// Not found, try interface media type?
-		rawIcon = (const uint8*)resources.LoadResource(B_VECTOR_ICON_TYPE, mediaTypeName, &size);
+		rawIcon = (const uint8*)resources.LoadResource(
+			B_VECTOR_ICON_TYPE, mediaTypeName, &size);
 	if (rawIcon == NULL)
 		// Not found, try default interface icon?
-		rawIcon = (const uint8*)resources.LoadResource(B_VECTOR_ICON_TYPE, "ether", &size);
+		rawIcon = (const uint8*)resources.LoadResource(
+			B_VECTOR_ICON_TYPE, "ether", &size);
 
 	if (rawIcon) {
 		// Now build the bitmap
@@ -217,6 +222,7 @@ InterfaceListItem::_Init()
 			delete icon;
 	}
 }
+
 
 // #pragma mark -
 
@@ -313,6 +319,7 @@ InterfacesListView::_UpdateList()
 	return B_OK;
 }
 
+
 void
 InterfacesListView::_HandleNetworkMessage(BMessage* message)
 {
@@ -354,3 +361,4 @@ InterfacesListView::_HandleNetworkMessage(BMessage* message)
 			break;
 	}
 }
+

@@ -92,8 +92,9 @@ InterfacesAddOn::CreateView(BRect *bounds)
 
 	r.left += w + SMALL_MARGIN;
 
-	fOnOff = new BButton(r, "onoff", "Disable", new BMessage(ONOFF_INTERFACE_MSG),
-					B_FOLLOW_BOTTOM | B_FOLLOW_LEFT);
+	fOnOff = new BButton(r, "onoff", "Disable",
+				new BMessage(ONOFF_INTERFACE_MSG),
+				B_FOLLOW_BOTTOM | B_FOLLOW_LEFT);
 	fOnOff->GetPreferredSize(&w, &h);
 	fOnOff->ResizeToPreferred();
 	fOnOff->Hide();
@@ -119,7 +120,7 @@ InterfacesAddOn::MessageReceived(BMessage* msg)
 {
 	int nr = fListview->CurrentSelection();
 	InterfaceListItem *item = NULL;
-	if(nr != -1) {
+	if (nr != -1) {
 		item = dynamic_cast<InterfaceListItem*>(fListview->ItemAt(nr));
 	}
 
