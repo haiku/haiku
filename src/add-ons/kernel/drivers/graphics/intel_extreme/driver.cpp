@@ -59,6 +59,9 @@ const struct supported_device {
 
 	{0x2e32, INTEL_TYPE_GM45, "GMA_X4500_VGA"},
 	{0x2a42, INTEL_TYPE_GM45, "GM45"},
+
+	{0xa001, INTEL_TYPE_IGDG, "Atom_Dx10"},
+	{0xa011, INTEL_TYPE_IGDGM, "Atom_N4x0"},
 };
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;

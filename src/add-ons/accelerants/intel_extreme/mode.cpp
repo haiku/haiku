@@ -234,13 +234,22 @@ get_pll_limits(pll_limits &limits)
 	// tested
 
 	if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_G4x)) {
-		// single LVDS output
-		// NOTE: not sure these will work with CRT displays
+		// TODO: support LVDS output limits as well
 		static const pll_limits kLimits = {
 			// p, p1, p2, high,   n,   m, m1, m2
-			{ 28,  2, 14, false,  1, 104, 17,  5},	// min
-			{112,  8,  0, true,   3, 138, 23, 11},	// max
-			200000, 1750000, 3500000
+			{ 10,  1, 10, false,  1, 104, 17,  5},	// min
+			{ 30,  3, 10, true,   4, 138, 23, 11},	// max
+			270000, 1750000, 3500000
+		};
+		limits = kLimits;
+	} else if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_IGD)) {
+		// TODO: support LVDS output limits as well
+		// m1 is reserved and must be 0
+		static const pll_limits kLimits = {
+			// p, p1, p2, high,   n,   m, m1,  m2
+			{  5,  1, 10, false,  3,   2,  0,   2},	// min
+			{ 80,  8,  5, true,   6, 256,  0, 256},	// max
+			200000, 1700000, 3500000
 		};
 		limits = kLimits;
 	} else if (gInfo->shared_info->device_type.InFamily(INTEL_TYPE_9xx)) {
@@ -323,9 +332,10 @@ compute_pll_divisors(const display_mode &current, pll_divisors& divisors,
 	float best = requestedPixelClock;
 	pll_divisors bestDivisors;
 
+	bool is_igd = gInfo->shared_info->device_type.InGroup(INTEL_TYPE_IGD);
 	for (divisors.m1 = limits.min.m1; divisors.m1 <= limits.max.m1; divisors.m1++) {
-		for (divisors.m2 = limits.min.m2; divisors.m2 < divisors.m1
-				&& divisors.m2 <= limits.max.m2; divisors.m2++) {
+		for (divisors.m2 = limits.min.m2; divisors.m2 <= limits.max.m2
+				&& ((divisors.m2 < divisors.m1) || is_igd); divisors.m2++) {
 			for (divisors.n = limits.min.n; divisors.n <= limits.max.n;
 					divisors.n++) {
 				for (divisors.post1 = limits.min.post1;
@@ -397,19 +407,32 @@ retrieve_current_mode(display_mode& mode, uint32 pllRegister)
 	}
 
 	pll_divisors divisors;
-	divisors.m1 = (pllDivisor & DISPLAY_PLL_M1_DIVISOR_MASK)
-		>> DISPLAY_PLL_M1_DIVISOR_SHIFT;
-	divisors.m2 = (pllDivisor & DISPLAY_PLL_M2_DIVISOR_MASK)
-		>> DISPLAY_PLL_M2_DIVISOR_SHIFT;
-	divisors.n = (pllDivisor & DISPLAY_PLL_N_DIVISOR_MASK)
-		>> DISPLAY_PLL_N_DIVISOR_SHIFT;
+	if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_IGD)) {
+		divisors.m1 = 0;
+		divisors.m2 = (pllDivisor & DISPLAY_PLL_IGD_M2_DIVISOR_MASK)
+			>> DISPLAY_PLL_M2_DIVISOR_SHIFT;
+		divisors.n = ((pllDivisor & DISPLAY_PLL_IGD_N_DIVISOR_MASK)
+			>> DISPLAY_PLL_N_DIVISOR_SHIFT) - 1;
+	} else {
+		divisors.m1 = (pllDivisor & DISPLAY_PLL_M1_DIVISOR_MASK)
+			>> DISPLAY_PLL_M1_DIVISOR_SHIFT;
+		divisors.m2 = (pllDivisor & DISPLAY_PLL_M2_DIVISOR_MASK)
+			>> DISPLAY_PLL_M2_DIVISOR_SHIFT;
+		divisors.n = (pllDivisor & DISPLAY_PLL_N_DIVISOR_MASK)
+			>> DISPLAY_PLL_N_DIVISOR_SHIFT;		
+	}
 
 	pll_limits limits;
 	get_pll_limits(limits);
 
 	if (gInfo->shared_info->device_type.InFamily(INTEL_TYPE_9xx)) {
-		divisors.post1 = (pll & DISPLAY_PLL_9xx_POST1_DIVISOR_MASK)
-			>> DISPLAY_PLL_POST1_DIVISOR_SHIFT;
+		if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_IGD)) {
+			divisors.post1 = (pll & DISPLAY_PLL_IGD_POST1_DIVISOR_MASK)
+				>> DISPLAY_PLL_IGD_POST1_DIVISOR_SHIFT;			
+		} else {
+			divisors.post1 = (pll & DISPLAY_PLL_9xx_POST1_DIVISOR_MASK)
+				>> DISPLAY_PLL_POST1_DIVISOR_SHIFT;
+		}
 
 		if (pllRegister == INTEL_DISPLAY_B_PLL
 			&& !gInfo->shared_info->device_type.InGroup(INTEL_TYPE_96x)) {
@@ -725,7 +748,11 @@ if (first) {
 		}
 
 		// Compute bitmask from p1 value
-		dpll |= (1 << (divisors.post1 - 1)) << DISPLAY_PLL_POST1_DIVISOR_SHIFT;
+		if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_IGD)) {
+			dpll |= (1 << (divisors.post1 - 1)) << DISPLAY_PLL_IGD_POST1_DIVISOR_SHIFT;
+		} else {
+			dpll |= (1 << (divisors.post1 - 1)) << DISPLAY_PLL_POST1_DIVISOR_SHIFT;
+		}
 		switch (divisors.post2) {
 			case 5:
 			case 7:
@@ -739,13 +766,21 @@ if (first) {
 			// (I don't know how to detect that)
 
 		if ((dpll & DISPLAY_PLL_ENABLED) != 0) {
-			write32(INTEL_DISPLAY_B_PLL_DIVISOR_0,
-				(((divisors.n - 2) << DISPLAY_PLL_N_DIVISOR_SHIFT)
-					& DISPLAY_PLL_N_DIVISOR_MASK)
-				| (((divisors.m1 - 2) << DISPLAY_PLL_M1_DIVISOR_SHIFT)
-					& DISPLAY_PLL_M1_DIVISOR_MASK)
-				| (((divisors.m2 - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT)
-					& DISPLAY_PLL_M2_DIVISOR_MASK));
+			if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_IGD)) {
+				write32(INTEL_DISPLAY_B_PLL_DIVISOR_0,
+					(((1 << divisors.n) << DISPLAY_PLL_N_DIVISOR_SHIFT)
+						& DISPLAY_PLL_IGD_N_DIVISOR_MASK)
+					| (((divisors.m2 - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT)
+						& DISPLAY_PLL_IGD_M2_DIVISOR_MASK));
+			} else {
+				write32(INTEL_DISPLAY_B_PLL_DIVISOR_0,
+					(((divisors.n - 2) << DISPLAY_PLL_N_DIVISOR_SHIFT)
+						& DISPLAY_PLL_N_DIVISOR_MASK)
+					| (((divisors.m1 - 2) << DISPLAY_PLL_M1_DIVISOR_SHIFT)
+						& DISPLAY_PLL_M1_DIVISOR_MASK)
+					| (((divisors.m2 - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT)
+						& DISPLAY_PLL_M2_DIVISOR_MASK));				
+			}
 			write32(INTEL_DISPLAY_B_PLL, dpll & ~DISPLAY_PLL_ENABLED);
 			read32(INTEL_DISPLAY_B_PLL);
 			spin(150);
@@ -771,13 +806,21 @@ if (first) {
 		write32(INTEL_DISPLAY_LVDS_PORT, lvds);
 		read32(INTEL_DISPLAY_LVDS_PORT);
 
-		write32(INTEL_DISPLAY_B_PLL_DIVISOR_0,
-			(((divisors.n - 2) << DISPLAY_PLL_N_DIVISOR_SHIFT)
-				& DISPLAY_PLL_N_DIVISOR_MASK)
-			| (((divisors.m1 - 2) << DISPLAY_PLL_M1_DIVISOR_SHIFT)
-				& DISPLAY_PLL_M1_DIVISOR_MASK)
-			| (((divisors.m2 - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT)
-				& DISPLAY_PLL_M2_DIVISOR_MASK));
+		if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_IGD)) {
+			write32(INTEL_DISPLAY_B_PLL_DIVISOR_0,
+				(((1 << divisors.n) << DISPLAY_PLL_N_DIVISOR_SHIFT)
+					& DISPLAY_PLL_IGD_N_DIVISOR_MASK)
+				| (((divisors.m2 - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT)
+					& DISPLAY_PLL_IGD_M2_DIVISOR_MASK));
+		} else {
+			write32(INTEL_DISPLAY_B_PLL_DIVISOR_0,
+				(((divisors.n - 2) << DISPLAY_PLL_N_DIVISOR_SHIFT)
+					& DISPLAY_PLL_N_DIVISOR_MASK)
+				| (((divisors.m1 - 2) << DISPLAY_PLL_M1_DIVISOR_SHIFT)
+					& DISPLAY_PLL_M1_DIVISOR_MASK)
+				| (((divisors.m2 - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT)
+					& DISPLAY_PLL_M2_DIVISOR_MASK));	
+		}
 
 		write32(INTEL_DISPLAY_B_PLL, dpll);
 		read32(INTEL_DISPLAY_B_PLL);
@@ -904,21 +947,35 @@ if (first) {
 		pll_divisors divisors;
 		compute_pll_divisors(target, divisors, false);
 
-		write32(INTEL_DISPLAY_A_PLL_DIVISOR_0,
-			(((divisors.n - 2) << DISPLAY_PLL_N_DIVISOR_SHIFT)
-				& DISPLAY_PLL_N_DIVISOR_MASK)
-			| (((divisors.m1 - 2) << DISPLAY_PLL_M1_DIVISOR_SHIFT)
-				& DISPLAY_PLL_M1_DIVISOR_MASK)
-			| (((divisors.m2 - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT)
-				& DISPLAY_PLL_M2_DIVISOR_MASK));
+		if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_IGD)) {
+			write32(INTEL_DISPLAY_A_PLL_DIVISOR_0,
+				(((1 << divisors.n) << DISPLAY_PLL_N_DIVISOR_SHIFT)
+					& DISPLAY_PLL_IGD_N_DIVISOR_MASK)
+				| (((divisors.m2 - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT)
+					& DISPLAY_PLL_IGD_M2_DIVISOR_MASK));
+		} else {
+			write32(INTEL_DISPLAY_A_PLL_DIVISOR_0,
+				(((divisors.n - 2) << DISPLAY_PLL_N_DIVISOR_SHIFT)
+					& DISPLAY_PLL_N_DIVISOR_MASK)
+				| (((divisors.m1 - 2) << DISPLAY_PLL_M1_DIVISOR_SHIFT)
+					& DISPLAY_PLL_M1_DIVISOR_MASK)
+				| (((divisors.m2 - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT)
+					& DISPLAY_PLL_M2_DIVISOR_MASK));
+		}
 
 		uint32 pll = DISPLAY_PLL_ENABLED | DISPLAY_PLL_NO_VGA_CONTROL;
 		if (gInfo->shared_info->device_type.InFamily(INTEL_TYPE_9xx)) {
-			pll |= ((1 << (divisors.post1 - 1))
-					<< DISPLAY_PLL_POST1_DIVISOR_SHIFT)
-				& DISPLAY_PLL_9xx_POST1_DIVISOR_MASK;
-//			pll |= ((divisors.post1 - 1) << DISPLAY_PLL_POST1_DIVISOR_SHIFT)
-//				& DISPLAY_PLL_9xx_POST1_DIVISOR_MASK;
+			if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_IGD)) {
+				pll |= ((1 << (divisors.post1 - 1))
+						<< DISPLAY_PLL_IGD_POST1_DIVISOR_SHIFT)
+					& DISPLAY_PLL_IGD_POST1_DIVISOR_MASK;
+			} else {
+				pll |= ((1 << (divisors.post1 - 1))
+						<< DISPLAY_PLL_POST1_DIVISOR_SHIFT)
+					& DISPLAY_PLL_9xx_POST1_DIVISOR_MASK;
+//				pll |= ((divisors.post1 - 1) << DISPLAY_PLL_POST1_DIVISOR_SHIFT)
+//					& DISPLAY_PLL_9xx_POST1_DIVISOR_MASK;
+			}
 			if (divisors.post2_high)
 				pll |= DISPLAY_PLL_DIVIDE_HIGH;
 

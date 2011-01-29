@@ -71,6 +71,9 @@ const struct supported_device {
 
 	{0x2e30, 0x2e32, INTEL_TYPE_GM45, "GMA_X4500_VGA"},
 	{0x2a40, 0x2a42, INTEL_TYPE_GM45, "GM45"},
+	
+	{0xa000, 0xa001, INTEL_TYPE_IGDG, "Atom_Dx10"},
+	{0xa010, 0xa011, INTEL_TYPE_IGDGM, "Atom_N4x0"},
 };
 
 struct intel_info {
@@ -140,7 +143,8 @@ determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 				gttSize = 512 << 10;
 				break;
 		}
-	} else if (info.type == INTEL_TYPE_G33) {
+	} else if (info.type == INTEL_TYPE_G33
+	           || (info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_IGD) {
 		switch (memoryConfig & G33_GTT_MASK) {
 			case G33_GTT_1M:
 				gttSize = 1 << 20;
