@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009,2011, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _PACKAGE__HPKG__BUFFER_CACHE_H_

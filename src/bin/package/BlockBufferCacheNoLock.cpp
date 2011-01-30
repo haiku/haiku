@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>
  * Distributed under the terms of the MIT License.
  */
 
