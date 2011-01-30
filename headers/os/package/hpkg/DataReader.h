@@ -2,8 +2,8 @@
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef DATA_READER_H
-#define DATA_READER_H
+#ifndef _PACKAGE__HPKG__DATA_READER_H_
+#define _PACKAGE__HPKG__DATA_READER_H_
 
 
 #include <SupportDefs.h>
@@ -11,23 +11,21 @@
 
 namespace BPackageKit {
 
-namespace BHaikuPackage {
-
-namespace BPrivate {
+namespace BHPKG {
 
 
-class DataReader {
+class BDataReader {
 public:
-	virtual						~DataReader();
+	virtual						~BDataReader();
 
 	virtual	status_t			ReadData(off_t offset, void* buffer,
 									size_t size) = 0;
 };
 
 
-class FDDataReader : public DataReader {
+class BFDDataReader : public BDataReader {
 public:
-								FDDataReader(int fd);
+								BFDDataReader(int fd);
 
 	virtual	status_t			ReadData(off_t offset, void* buffer,
 									size_t size);
@@ -37,9 +35,9 @@ private:
 };
 
 
-class AttributeDataReader : public DataReader {
+class BAttributeDataReader : public BDataReader {
 public:
-								AttributeDataReader(int fd,
+								BAttributeDataReader(int fd,
 									const char* attribute, uint32 type);
 
 	virtual	status_t			ReadData(off_t offset, void* buffer,
@@ -52,9 +50,9 @@ private:
 };
 
 
-class BufferDataReader : public DataReader {
+class BBufferDataReader : public BDataReader {
 public:
-								BufferDataReader(const void* data, size_t size);
+								BBufferDataReader(const void* data, size_t size);
 
 	virtual	status_t			ReadData(off_t offset, void* buffer,
 									size_t size);
@@ -65,11 +63,9 @@ private:
 };
 
 
-}	// namespace BPrivate
-
-}	// namespace BHaikuPackage
+}	// namespace BHPKG
 
 }	// namespace BPackageKit
 
 
-#endif	// DATA_READER_H
+#endif	// _PACKAGE__HPKG__DATA_READER_H_

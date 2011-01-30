@@ -11,6 +11,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <package/hpkg/HPKGDefs.h>
+#include <package/hpkg/PackageAttributeValue.h>
+#include <package/hpkg/PackageContentHandler.h>
 #include <package/hpkg/PackageEntry.h>
 #include <package/hpkg/PackageEntryAttribute.h>
 #include <package/hpkg/PackageReader.h>
@@ -19,10 +22,10 @@
 #include "StandardErrorOutput.h"
 
 
-using namespace BPackageKit::BHaikuPackage::BPrivate;
+using namespace BPackageKit::BHPKG;
 
 
-struct PackageContentDumpHandler : LowLevelPackageContentHandler {
+struct PackageContentDumpHandler : BLowLevelPackageContentHandler {
 	PackageContentDumpHandler()
 		:
 		fLevel(0),
@@ -32,7 +35,7 @@ struct PackageContentDumpHandler : LowLevelPackageContentHandler {
 	}
 
 	virtual status_t HandleAttribute(const char* attributeName,
-		const PackageAttributeValue& value, void* parentToken, void*& _token)
+		const BPackageAttributeValue& value, void* parentToken, void*& _token)
 	{
 		if (fErrorOccurred)
 			return B_OK;
@@ -47,7 +50,7 @@ struct PackageContentDumpHandler : LowLevelPackageContentHandler {
 	}
 
 	virtual status_t HandleAttributeDone(const char* attributeName,
-		const PackageAttributeValue& value, void* token)
+		const BPackageAttributeValue& value, void* token)
 	{
 		if (fErrorOccurred)
 			return B_OK;
@@ -67,7 +70,7 @@ struct PackageContentDumpHandler : LowLevelPackageContentHandler {
 	}
 
 private:
-	void _PrintValue(const PackageAttributeValue& value)
+	void _PrintValue(const BPackageAttributeValue& value)
 	{
 		switch (value.type) {
 			case B_HPKG_ATTRIBUTE_TYPE_INT:
@@ -139,7 +142,7 @@ command_dump(int argc, const char* const* argv)
 
 	// open package
 	StandardErrorOutput errorOutput;
-	PackageReader packageReader(&errorOutput);
+	BPackageReader packageReader(&errorOutput);
 	status_t error = packageReader.Init(packageFileName);
 printf("Init(): %s\n", strerror(error));
 	if (error != B_OK)

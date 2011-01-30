@@ -13,6 +13,7 @@
 
 #include <package/hpkg/haiku_package.h>
 #include <package/hpkg/BufferCache.h>
+#include <package/hpkg/CachedBuffer.h>
 #include <package/hpkg/DataOutput.h>
 #include <package/hpkg/PackageData.h>
 #include <package/hpkg/ZlibDecompressor.h>
@@ -20,9 +21,10 @@
 
 namespace BPackageKit {
 
-namespace BHaikuPackage {
+namespace BHPKG {
 
-namespace BPrivate {
+
+using namespace BPrivate;
 
 
 // minimum/maximum zlib chunk size we consider sane
@@ -36,25 +38,25 @@ static const size_t kUncompressedReaderBufferSize
 	= B_HPKG_DEFAULT_DATA_CHUNK_SIZE_ZLIB;
 
 
-// #pragma mark - PackageDataReader
+// #pragma mark - BPackageDataReader
 
 
-PackageDataReader::PackageDataReader(DataReader* dataReader)
+BPackageDataReader::BPackageDataReader(BDataReader* dataReader)
 	:
 	fDataReader(dataReader)
 {
 }
 
 
-PackageDataReader::~PackageDataReader()
+BPackageDataReader::~BPackageDataReader()
 {
 }
 
 
 status_t
-PackageDataReader::ReadData(off_t offset, void* buffer, size_t size)
+BPackageDataReader::ReadData(off_t offset, void* buffer, size_t size)
 {
-	BufferDataOutput output(buffer, size);
+	BBufferDataOutput output(buffer, size);
 	return ReadDataToOutput(offset, size, &output);
 }
 
@@ -62,17 +64,17 @@ PackageDataReader::ReadData(off_t offset, void* buffer, size_t size)
 // #pragma mark - UncompressedPackageDataReader
 
 
-class UncompressedPackageDataReader : public PackageDataReader {
+class UncompressedPackageDataReader : public BPackageDataReader {
 public:
-	UncompressedPackageDataReader(DataReader* dataReader,
-		BufferCache* bufferCache)
+	UncompressedPackageDataReader(BDataReader* dataReader,
+		BBufferCache* bufferCache)
 		:
-		PackageDataReader(dataReader),
+		BPackageDataReader(dataReader),
 		fBufferCache(bufferCache)
 	{
 	}
 
-	status_t Init(const PackageData& data)
+	status_t Init(const BPackageData& data)
 	{
 		fOffset = data.Offset();
 		fSize = data.UncompressedSize();
@@ -105,7 +107,7 @@ public:
 	}
 
 	virtual status_t ReadDataToOutput(off_t offset, size_t size,
-		DataOutput* output)
+		BDataOutput* output)
 	{
 		if (size == 0)
 			return B_OK;
@@ -144,7 +146,7 @@ public:
 	}
 
 private:
-	BufferCache*	fBufferCache;
+	BBufferCache*	fBufferCache;
 	uint64			fOffset;
 	uint64			fSize;
 };
@@ -153,11 +155,11 @@ private:
 // #pragma mark - ZlibPackageDataReader
 
 
-class ZlibPackageDataReader : public PackageDataReader {
+class ZlibPackageDataReader : public BPackageDataReader {
 public:
-	ZlibPackageDataReader(DataReader* dataReader, BufferCache* bufferCache)
+	ZlibPackageDataReader(BDataReader* dataReader, BBufferCache* bufferCache)
 		:
-		PackageDataReader(dataReader),
+		BPackageDataReader(dataReader),
 		fBufferCache(bufferCache),
 		fUncompressBuffer(NULL),
 		fOffsetTable(NULL)
@@ -171,7 +173,7 @@ public:
 		fBufferCache->PutBuffer(&fUncompressBuffer);
 	}
 
-	status_t Init(const PackageData& data)
+	status_t Init(const BPackageData& data)
 	{
 		fOffset = data.Offset();
 		fCompressedSize = data.CompressedSize();
@@ -222,7 +224,7 @@ public:
 	}
 
 	virtual status_t ReadDataToOutput(off_t offset, size_t size,
-		DataOutput* output)
+		BDataOutput* output)
 	{
 		// check offset and size
 		if (size == 0)
@@ -398,7 +400,7 @@ private:
 	}
 
 private:
-	BufferCache*	fBufferCache;
+	BBufferCache*	fBufferCache;
 	CachedBuffer*	fUncompressBuffer;
 	int64			fUncompressedChunk;
 
@@ -414,10 +416,10 @@ private:
 };
 
 
-// #pragma mark - PackageDataReaderFactory
+// #pragma mark - BPackageDataReaderFactory
 
 
-PackageDataReaderFactory::PackageDataReaderFactory(BufferCache* bufferCache)
+BPackageDataReaderFactory::BPackageDataReaderFactory(BBufferCache* bufferCache)
 	:
 	fBufferCache(bufferCache)
 {
@@ -425,10 +427,10 @@ PackageDataReaderFactory::PackageDataReaderFactory(BufferCache* bufferCache)
 
 
 status_t
-PackageDataReaderFactory::CreatePackageDataReader(DataReader* dataReader,
-	const PackageData& data, PackageDataReader*& _reader)
+BPackageDataReaderFactory::CreatePackageDataReader(BDataReader* dataReader,
+	const BPackageData& data, BPackageDataReader*& _reader)
 {
-	PackageDataReader* reader;
+	BPackageDataReader* reader;
 
 	switch (data.Compression()) {
 		case B_HPKG_COMPRESSION_NONE:
@@ -457,8 +459,6 @@ PackageDataReaderFactory::CreatePackageDataReader(DataReader* dataReader,
 }
 
 
-}	// namespace BPrivate
-
-}	// namespace BHaikuPackage
+}	// namespace BHPKG
 
 }	// namespace BPackageKit

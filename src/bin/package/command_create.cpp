@@ -14,14 +14,14 @@
 #include <Entry.h>
 
 #include <package/PackageInfo.h>
-#include <package/hpkg/haiku_package.h>
+#include <package/hpkg/HPKGDefs.h>
 #include <package/hpkg/PackageWriter.h>
 
 #include "package.h"
 
 
 using BPackageKit::BPackageInfo;
-using BPackageKit::BHaikuPackage::BPrivate::PackageWriter;
+using BPackageKit::BHPKG::BPackageWriter;
 
 
 int
@@ -65,7 +65,7 @@ command_create(int argc, const char* const* argv)
 	int fileNameCount = argc - optind;
 
 	// create package
-	PackageWriter packageWriter;
+	BPackageWriter packageWriter;
 	status_t error = packageWriter.Init(packageFileName);
 printf("Init(): %s\n", strerror(error));
 	if (error != B_OK)

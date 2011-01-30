@@ -2,8 +2,8 @@
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef PACKAGE_WRITER_H
-#define PACKAGE_WRITER_H
+#ifndef _PACKAGE__HPKG__PRIVATE__PACKAGE_WRITER_IMPL_H_
+#define _PACKAGE__HPKG__PRIVATE__PACKAGE_WRITER_IMPL_H_
 
 
 #include <util/DoublyLinkedList.h>
@@ -14,23 +14,25 @@
 
 namespace BPackageKit {
 
-namespace BHaikuPackage {
+
+class BPackageInfo;
+
+
+namespace BHPKG {
+
+
+class BDataReader;
+
 
 namespace BPrivate {
 
 
-class DataReader;
 struct hpkg_header;
 
-namespace BPackageKit {
-	class BPackageInfo;
-}
-
-
-class PackageWriter {
+class PackageWriterImpl {
 public:
-								PackageWriter();
-								~PackageWriter();
+								PackageWriterImpl();
+								~PackageWriterImpl();
 
 			status_t			Init(const char* fileName);
 			status_t			AddEntry(const char* fileName);
@@ -104,10 +106,10 @@ private:
 			AttributeType*		_GetAttributeType(const char* attributeName,
 									uint8 type);
 
-			status_t			_AddData(DataReader& dataReader, off_t size);
-			status_t			_WriteUncompressedData(DataReader& dataReader,
+			status_t			_AddData(BDataReader& dataReader, off_t size);
+			status_t			_WriteUncompressedData(BDataReader& dataReader,
 									off_t size, uint64 writeOffset);
-			status_t			_WriteZlibCompressedData(DataReader& dataReader,
+			status_t			_WriteZlibCompressedData(BDataReader& dataReader,
 									off_t size, uint64 writeOffset,
 									uint64& _compressedSize);
 
@@ -134,9 +136,9 @@ private:
 
 }	// namespace BPrivate
 
-}	// namespace BHaikuPackage
+}	// namespace BHPKG
 
 }	// namespace BPackageKit
 
 
-#endif	// PACKAGE_WRITER_H
+#endif	// _PACKAGE__HPKG__PRIVATE__PACKAGE_WRITER_IMPL_H_

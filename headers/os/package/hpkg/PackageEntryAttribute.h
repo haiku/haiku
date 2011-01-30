@@ -2,8 +2,8 @@
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef PACKAGE_ENTRY_ATTRIBUTE_H
-#define PACKAGE_ENTRY_ATTRIBUTE_H
+#ifndef _PACKAGE__HPKG__PACKAGE_ENTRY_ATTRIBUTE_H_
+#define _PACKAGE__HPKG__PACKAGE_ENTRY_ATTRIBUTE_H_
 
 
 #include <package/hpkg/PackageData.h>
@@ -11,34 +11,30 @@
 
 namespace BPackageKit {
 
-namespace BHaikuPackage {
-
-namespace BPrivate {
+namespace BHPKG {
 
 
-class PackageEntryAttribute {
+class BPackageEntryAttribute {
 public:
-								PackageEntryAttribute(const char* name);
+								BPackageEntryAttribute(const char* name);
 
 			const char*			Name() const			{ return fName; }
 			uint32				Type() const			{ return fType; }
 
-			PackageData&		Data()	{ return fData; }
+			BPackageData&		Data()	{ return fData; }
 
 			void				SetType(uint32 type)	{ fType = type; }
 
 private:
 			const char*			fName;
 			uint32				fType;
-			PackageData			fData;
+			BPackageData			fData;
 };
 
 
-}	// namespace BPrivate
-
-}	// namespace BHaikuPackage
+}	// namespace BHPKG
 
 }	// namespace BPackageKit
 
 
-#endif	// PACKAGE_ENTRY_ATTRIBUTE_H
+#endif	// _PACKAGE__HPKG__PACKAGE_ENTRY_ATTRIBUTE_H_

@@ -2,8 +2,8 @@
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef PACKAGE_ENTRY_H
-#define PACKAGE_ENTRY_H
+#ifndef _PACKAGE__HPKG__PACKAGE_ENTRY_H_
+#define _PACKAGE__HPKG__PACKAGE_ENTRY_H_
 
 
 #include <sys/stat.h>
@@ -13,17 +13,15 @@
 
 namespace BPackageKit {
 
-namespace BHaikuPackage {
-
-namespace BPrivate {
+namespace BHPKG {
 
 
-class PackageEntry {
+class BPackageEntry {
 public:
-								PackageEntry(PackageEntry* parent,
+								BPackageEntry(BPackageEntry* parent,
 									const char* name);
 
-			const PackageEntry*	Parent() const		{ return fParent; }
+			const BPackageEntry*	Parent() const		{ return fParent; }
 			const char*			Name() const		{ return fName; }
 			void*				UserToken() const	{ return fUserToken; }
 
@@ -36,7 +34,7 @@ public:
 			const timespec&		CreationTime() const
 									{ return fCreationTime; }
 
-			PackageData&		Data()	{ return fData; }
+			BPackageData&		Data()	{ return fData; }
 
 			const char*			SymlinkPath() const	{ return fSymlinkPath; }
 
@@ -62,37 +60,35 @@ public:
 			void				SetSymlinkPath(const char* path)
 									{ fSymlinkPath = path; }
 private:
-			PackageEntry*		fParent;
+			BPackageEntry*		fParent;
 			const char*			fName;
 			void*				fUserToken;
 			mode_t				fMode;
 			timespec			fAccessTime;
 			timespec			fModifiedTime;
 			timespec			fCreationTime;
-			PackageData			fData;
+			BPackageData			fData;
 			const char*			fSymlinkPath;
 };
 
 
 inline void
-PackageEntry::SetType(uint32 type)
+BPackageEntry::SetType(uint32 type)
 {
 	fMode = (fMode & ~(uint32)S_IFMT) | (type & S_IFMT);
 }
 
 
 inline void
-PackageEntry::SetPermissions(uint32 permissions)
+BPackageEntry::SetPermissions(uint32 permissions)
 {
 	fMode = (fMode & ~(uint32)ALLPERMS) | (permissions & ALLPERMS);
 }
 
 
-}	// namespace BPrivate
-
-}	// namespace BHaikuPackage
+}	// namespace BHPKG
 
 }	// namespace BPackageKit
 
 
-#endif	// PACKAGE_ENTRY_H
+#endif	// _PACKAGE__HPKG__PACKAGE_ENTRY_H_

@@ -6,15 +6,18 @@
 #define BLOCK_BUFFER_CACHE_KERNEL_H
 
 
-#include <util/AutoLock.h>
+#include <lock.h>
 
-#include <package/hpkg/BlockBufferCache.h>
-
-
-using BPackageKit::BHaikuPackage::BPrivate::BlockBufferCache;
+#include <package/hpkg/BlockBufferCacheImpl.h>
+#include <package/hpkg/BufferCache.h>
 
 
-class BlockBufferCacheKernel : public BlockBufferCache {
+using BPackageKit::BHPKG::BBufferCacheLockable;
+using BPackageKit::BHPKG::BPrivate::BlockBufferCacheImpl;
+
+
+class BlockBufferCacheKernel
+	: public BlockBufferCacheImpl, BBufferCacheLockable {
 public:
 								BlockBufferCacheKernel(size_t blockSize,
 									uint32 maxCachedBlocks);

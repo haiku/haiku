@@ -2,15 +2,13 @@
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef FD_CLOSER_H
-#define FD_CLOSER_H
+#ifndef _PACKAGE__HPKG__FD_CLOSER_H_
+#define _PACKAGE__HPKG__FD_CLOSER_H_
 
 
 namespace BPackageKit {
 
-namespace BHaikuPackage {
-
-namespace BPrivate {
+namespace BHPKG {
 
 
 struct FDCloser {
@@ -31,11 +29,9 @@ private:
 };
 
 
-}	// namespace BPrivate
-
-}	// namespace BHaikuPackage
+}	// namespace BHPKG
 
 }	// namespace BPackageKit
 
 
-#endif	// FD_CLOSER_H
+#endif	// _PACKAGE__HPKG__FD_CLOSER_H_

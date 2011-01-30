@@ -11,18 +11,16 @@
 
 namespace BPackageKit {
 
-namespace BHaikuPackage {
-
-namespace BPrivate {
+namespace BHPKG {
 
 
-ErrorOutput::~ErrorOutput()
+BErrorOutput::~BErrorOutput()
 {
 }
 
 
 void
-ErrorOutput::PrintError(const char* format, ...)
+BErrorOutput::PrintError(const char* format, ...)
 {
 	va_list args;
 	va_start(args, format);
@@ -31,8 +29,6 @@ ErrorOutput::PrintError(const char* format, ...)
 }
 
 
-}	// namespace BPrivate
-
-}	// namespace BHaikuPackage
+}	// namespace BHPKG
 
 }	// namespace BPackageKit

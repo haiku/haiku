@@ -9,7 +9,7 @@
 
 namespace BPackageKit {
 
-namespace BHaikuPackage {
+namespace BHPKG {
 
 namespace BPrivate {
 
@@ -36,6 +36,6 @@ hash_string(const char* string)
 
 }	// namespace BPrivate
 
-}	// namespace BHaikuPackage
+}	// namespace BHPKG
 
 }	// namespace BPackageKit

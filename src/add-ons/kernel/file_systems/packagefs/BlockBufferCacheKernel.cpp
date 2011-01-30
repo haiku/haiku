@@ -10,7 +10,7 @@
 BlockBufferCacheKernel::BlockBufferCacheKernel(size_t blockSize,
 	uint32 maxCachedBlocks)
 	:
-	BlockBufferCache(blockSize, maxCachedBlocks)
+	BlockBufferCacheImpl(blockSize, maxCachedBlocks, this)
 {
 	mutex_init(&fLock, "BlockBufferCache");
 }

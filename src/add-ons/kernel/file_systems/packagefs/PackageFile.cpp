@@ -10,6 +10,7 @@
 #include <new>
 
 #include <fs_cache.h>
+#include <util/AutoLock.h>
 
 #include <package/hpkg/DataOutput.h>
 #include <package/hpkg/DataReader.h>
@@ -20,13 +21,13 @@
 #include "Package.h"
 
 
-using namespace BPackageKit::BHaikuPackage::BPrivate;
+using namespace BPackageKit::BHPKG;
 
 
 // #pragma mark - DataAccessor
 
 
-struct PackageFile::IORequestOutput : DataOutput {
+struct PackageFile::IORequestOutput : BDataOutput {
 public:
 	IORequestOutput(io_request* request)
 		:
@@ -45,7 +46,7 @@ private:
 
 
 struct PackageFile::DataAccessor {
-	DataAccessor(PackageData* data)
+	DataAccessor(BPackageData* data)
 		:
 		fData(data),
 		fDataReader(NULL),
@@ -65,17 +66,17 @@ struct PackageFile::DataAccessor {
 
 	status_t Init(dev_t deviceID, ino_t nodeID, int fd)
 	{
-		// create a DataReader for the compressed data
+		// create a BDataReader for the compressed data
 		if (fData->IsEncodedInline()) {
-			fDataReader = new(std::nothrow) BufferDataReader(
+			fDataReader = new(std::nothrow) BBufferDataReader(
 				fData->InlineData(), fData->CompressedSize());
 		} else
-			fDataReader = new(std::nothrow) FDDataReader(fd);
+			fDataReader = new(std::nothrow) BFDDataReader(fd);
 
 		if (fDataReader == NULL)
 			RETURN_ERROR(B_NO_MEMORY);
 
-		// create a PackageDataReader
+		// create a BPackageDataReader
 		status_t error = GlobalFactory::Default()->CreatePackageDataReader(
 			fDataReader, *fData, fReader);
 		if (error != B_OK)
@@ -125,9 +126,9 @@ struct PackageFile::DataAccessor {
 
 private:
 	mutex				fLock;
-	PackageData*		fData;
-	DataReader*			fDataReader;
-	PackageDataReader*	fReader;
+	BPackageData*		fData;
+	BDataReader*			fDataReader;
+	BPackageDataReader*	fReader;
 	void*				fFileCache;
 };
 
@@ -135,7 +136,7 @@ private:
 // #pragma mark - PackageFile
 
 
-PackageFile::PackageFile(Package* package, mode_t mode, const PackageData& data)
+PackageFile::PackageFile(Package* package, mode_t mode, const BPackageData& data)
 	:
 	PackageLeafNode(package, mode),
 	fData(data),

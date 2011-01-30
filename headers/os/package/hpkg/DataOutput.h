@@ -2,8 +2,8 @@
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef DATA_OUTPUT_H
-#define DATA_OUTPUT_H
+#ifndef _PACKAGE__HPKG__DATA_OUTPUT_H_
+#define _PACKAGE__HPKG__DATA_OUTPUT_H_
 
 
 #include <SupportDefs.h>
@@ -11,22 +11,20 @@
 
 namespace BPackageKit {
 
-namespace BHaikuPackage {
-
-namespace BPrivate {
+namespace BHPKG {
 
 
-class DataOutput {
+class BDataOutput {
 public:
-	virtual						~DataOutput();
+	virtual						~BDataOutput();
 
 	virtual	status_t			WriteData(const void* buffer, size_t size) = 0;
 };
 
 
-class BufferDataOutput : public DataOutput {
+class BBufferDataOutput : public BDataOutput {
 public:
-								BufferDataOutput(void* buffer, size_t size);
+								BBufferDataOutput(void* buffer, size_t size);
 
 			size_t				BytesWritten() const { return fBytesWritten; }
 
@@ -39,11 +37,9 @@ private:
 };
 
 
-}	// namespace BPrivate
-
-}	// namespace BHaikuPackage
+}	// namespace BHPKG
 
 }	// namespace BPackageKit
 
 
-#endif	// DATA_OUTPUT_H
+#endif	// _PACKAGE__HPKG__DATA_OUTPUT_H_

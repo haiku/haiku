@@ -25,6 +25,10 @@
 #include "Volume.h"
 
 
+using BPackageKit::BHPKG::BBufferDataReader;
+using BPackageKit::BHPKG::BFDDataReader;
+
+
 static const uint32 kOptimalIOSize = 64 * 1024;
 
 
@@ -939,16 +943,16 @@ packagefs_free_attr_cookie(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie)
 
 
 static status_t
-read_package_data(const PackageData& data, DataReader* dataReader, off_t offset,
+read_package_data(const BPackageData& data, BDataReader* dataReader, off_t offset,
 	void* buffer, size_t* bufferSize)
 {
-	// create a PackageDataReader
-	PackageDataReader* reader;
+	// create a BPackageDataReader
+	BPackageDataReader* reader;
 	status_t error = GlobalFactory::Default()->CreatePackageDataReader(
 		dataReader, data, reader);
 	if (error != B_OK)
 		RETURN_ERROR(error);
-	ObjectDeleter<PackageDataReader> readerDeleter(reader);
+	ObjectDeleter<BPackageDataReader> readerDeleter(reader);
 
 	// check the offset
 	if (offset < 0 || (uint64)offset > data.UncompressedSize())
@@ -983,10 +987,10 @@ packagefs_read_attr(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie,
 	TOUCH(volume);
 	TOUCH(node);
 
-	const PackageData& data = cookie->attribute->Data();
+	const BPackageData& data = cookie->attribute->Data();
 	if (data.IsEncodedInline()) {
 		// inline data
-		BufferDataReader dataReader(data.InlineData(), data.CompressedSize());
+		BBufferDataReader dataReader(data.InlineData(), data.CompressedSize());
 		return read_package_data(data, &dataReader, offset, buffer, bufferSize);
 	}
 
@@ -996,7 +1000,7 @@ packagefs_read_attr(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie,
 		RETURN_ERROR(fd);
 	PackageCloser packageCloser(cookie->package);
 
-	FDDataReader dataReader(fd);
+	BFDDataReader dataReader(fd);
 	return read_package_data(data, &dataReader, offset, buffer, bufferSize);
 }
 

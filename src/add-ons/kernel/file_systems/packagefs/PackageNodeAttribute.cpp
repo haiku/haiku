@@ -11,7 +11,7 @@
 
 
 PackageNodeAttribute::PackageNodeAttribute(PackageNode* parent, uint32 type,
-	const PackageData& data)
+	const BPackageData& data)
 	:
 	fData(data),
 	fParent(parent),

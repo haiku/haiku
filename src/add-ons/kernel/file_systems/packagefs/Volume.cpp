@@ -27,7 +27,7 @@
 #include <package/hpkg/FDCloser.h>
 #include <package/hpkg/PackageEntry.h>
 #include <package/hpkg/PackageEntryAttribute.h>
-#include <package/hpkg/PackageReader.h>
+#include <package/hpkg/PackageReaderImpl.h>
 
 #include "DebugSupport.h"
 #include "Directory.h"
@@ -38,7 +38,8 @@
 #include "PackageSymlink.h"
 
 
-using namespace BPackageKit::BHaikuPackage::BPrivate;
+using namespace BPackageKit::BHPKG;
+using BPackageKit::BHPKG::BPrivate::PackageReaderImpl;
 
 
 // node ID of the root directory
@@ -131,7 +132,7 @@ private:
 // #pragma mark - PackageLoaderErrorOutput
 
 
-struct Volume::PackageLoaderErrorOutput : ErrorOutput {
+struct Volume::PackageLoaderErrorOutput : BErrorOutput {
 	PackageLoaderErrorOutput(Package* package)
 		:
 		fPackage(package)
@@ -151,7 +152,7 @@ private:
 // #pragma mark - PackageLoaderContentHandler
 
 
-struct Volume::PackageLoaderContentHandler : PackageContentHandler {
+struct Volume::PackageLoaderContentHandler : BPackageContentHandler {
 	PackageLoaderContentHandler(Package* package)
 		:
 		fPackage(package),
@@ -164,7 +165,7 @@ struct Volume::PackageLoaderContentHandler : PackageContentHandler {
 		return B_OK;
 	}
 
-	virtual status_t HandleEntry(PackageEntry* entry)
+	virtual status_t HandleEntry(BPackageEntry* entry)
 	{
 		if (fErrorOccurred)
 			return B_OK;
@@ -228,8 +229,8 @@ struct Volume::PackageLoaderContentHandler : PackageContentHandler {
 		return B_OK;
 	}
 
-	virtual status_t HandleEntryAttribute(PackageEntry* entry,
-		PackageEntryAttribute* attribute)
+	virtual status_t HandleEntryAttribute(BPackageEntry* entry,
+		BPackageEntryAttribute* attribute)
 	{
 		if (fErrorOccurred)
 			return B_OK;
@@ -252,7 +253,7 @@ struct Volume::PackageLoaderContentHandler : PackageContentHandler {
 		return B_OK;
 	}
 
-	virtual status_t HandleEntryDone(PackageEntry* entry)
+	virtual status_t HandleEntryDone(BPackageEntry* entry)
 	{
 		return B_OK;
 	}
@@ -604,7 +605,7 @@ Volume::_LoadPackage(Package* package)
 
 	// initialize package reader
 	PackageLoaderErrorOutput errorOutput(package);
-	PackageReader packageReader(&errorOutput);
+	PackageReaderImpl packageReader(&errorOutput);
 	status_t error = packageReader.Init(fd, false);
 	if (error != B_OK)
 		return error;

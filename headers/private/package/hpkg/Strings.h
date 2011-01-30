@@ -2,8 +2,8 @@
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef STRINGS_H
-#define STRINGS_H
+#ifndef _PACKAGE__HPKG__PRIVATE__STRINGS_H_
+#define _PACKAGE__HPKG__PRIVATE__STRINGS_H_
 
 
 #include <util/OpenHashTable.h>
@@ -11,7 +11,7 @@
 
 namespace BPackageKit {
 
-namespace BHaikuPackage {
+namespace BHPKG {
 
 namespace BPrivate {
 
@@ -88,9 +88,9 @@ struct CachedStringUsageGreater {
 
 }	// namespace BPrivate
 
-}	// namespace BHaikuPackage
+}	// namespace BHPKG
 
 }	// namespace BPackageKit
 
 
-#endif	// STRINGS_H
+#endif	// _PACKAGE__HPKG__PRIVATE__STRINGS_H_

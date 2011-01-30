@@ -6,45 +6,22 @@
 
 #include <package/hpkg/BufferCache.h>
 
-#include <stdlib.h>
-
 
 namespace BPackageKit {
 
-namespace BHaikuPackage {
-
-namespace BPrivate {
+namespace BHPKG {
 
 
-// #pragma mark - CachedBuffer
-
-
-CachedBuffer::CachedBuffer(size_t size)
-	:
-	fOwner(NULL),
-	fBuffer(malloc(size)),
-	fSize(size),
-	fCached(false)
+BBufferCache::~BBufferCache()
 {
 }
 
 
-CachedBuffer::~CachedBuffer()
-{
-	free(fBuffer);
-}
-
-
-// #pragma mark - BufferCache
-
-
-BufferCache::~BufferCache()
+BBufferCacheLockable::~BBufferCacheLockable()
 {
 }
 
 
-}	// namespace BPrivate
-
-}	// namespace BHaikuPackage
+}	// namespace BHPKG
 
 }	// namespace BPackageKit

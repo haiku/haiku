@@ -10,16 +10,21 @@ SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package hpkg ] ;
 
 HPKG_SOURCES =
 	BlockBufferCache.cpp
+	BlockBufferCacheImpl.cpp
 	BufferCache.cpp
+	CachedBuffer.cpp
 	DataOutput.cpp
 	DataReader.cpp
 	ErrorOutput.cpp
+	PackageContentHandler.cpp
 	PackageData.cpp
 	PackageDataReader.cpp
 	PackageEntry.cpp
 	PackageEntryAttribute.cpp
 	PackageReader.cpp
+	PackageReaderImpl.cpp
 	PackageWriter.cpp
+	PackageWriterImpl.cpp
 	Strings.cpp
 
 	# compression

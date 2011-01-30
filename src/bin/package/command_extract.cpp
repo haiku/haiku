@@ -21,21 +21,22 @@
 
 #include <AutoDeleter.h>
 
-#include <package/hpkg/BlockBufferCache.h>
 #include <package/hpkg/FDCloser.h>
+#include <package/hpkg/PackageContentHandler.h>
 #include <package/hpkg/PackageDataReader.h>
 #include <package/hpkg/PackageEntry.h>
 #include <package/hpkg/PackageEntryAttribute.h>
 #include <package/hpkg/PackageReader.h>
 
+#include "BlockBufferCacheNoLock.h"
 #include "package.h"
 #include "StandardErrorOutput.h"
 
 
-using namespace BPackageKit::BHaikuPackage::BPrivate;
+using namespace BPackageKit::BHPKG;
 
 
-struct PackageContentExtractHandler : PackageContentHandler {
+struct PackageContentExtractHandler : BPackageContentHandler {
 	PackageContentExtractHandler(int packageFileFD)
 		:
 		fBufferCache(B_HPKG_DEFAULT_DATA_CHUNK_SIZE_ZLIB, 2),
@@ -65,7 +66,7 @@ struct PackageContentExtractHandler : PackageContentHandler {
 		return B_OK;
 	}
 
-	virtual status_t HandleEntry(PackageEntry* entry)
+	virtual status_t HandleEntry(BPackageEntry* entry)
 	{
 		// create a token
 		Token* token = new(std::nothrow) Token;
@@ -124,9 +125,9 @@ struct PackageContentExtractHandler : PackageContentHandler {
 
 			// write data
 			status_t error;
-			const PackageData& data = entry->Data();
+			const BPackageData& data = entry->Data();
 			if (data.IsEncodedInline()) {
-				BufferDataReader dataReader(data.InlineData(),
+				BBufferDataReader dataReader(data.InlineData(),
 					data.CompressedSize());
 				error = _ExtractFileData(&dataReader, data, fd);
 			} else
@@ -183,8 +184,8 @@ struct PackageContentExtractHandler : PackageContentHandler {
 		return B_OK;
 	}
 
-	virtual status_t HandleEntryAttribute(PackageEntry* entry,
-		PackageEntryAttribute* attribute)
+	virtual status_t HandleEntryAttribute(BPackageEntry* entry,
+		BPackageEntryAttribute* attribute)
 	{
 		int entryFD = ((Token*)entry->UserToken())->fd;
 
@@ -201,9 +202,9 @@ struct PackageContentExtractHandler : PackageContentHandler {
 
 		// write data
 		status_t error;
-		const PackageData& data = attribute->Data();
+		const BPackageData& data = attribute->Data();
 		if (data.IsEncodedInline()) {
-			BufferDataReader dataReader(data.InlineData(),
+			BBufferDataReader dataReader(data.InlineData(),
 				data.CompressedSize());
 			error = _ExtractFileData(&dataReader, data, fd);
 		} else
@@ -215,7 +216,7 @@ struct PackageContentExtractHandler : PackageContentHandler {
 		return B_OK;
 	}
 
-	virtual status_t HandleEntryDone(PackageEntry* entry)
+	virtual status_t HandleEntryDone(BPackageEntry* entry)
 	{
 		if (Token* token = (Token*)entry->UserToken()) {
 			delete token;
@@ -248,16 +249,16 @@ private:
 	};
 
 private:
-	status_t _ExtractFileData(DataReader* dataReader, const PackageData& data,
+	status_t _ExtractFileData(BDataReader* dataReader, const BPackageData& data,
 		int fd)
 	{
-		// create a PackageDataReader
-		PackageDataReader* reader;
-		status_t error = PackageDataReaderFactory(&fBufferCache)
+		// create a BPackageDataReader
+		BPackageDataReader* reader;
+		status_t error = BPackageDataReaderFactory(&fBufferCache)
 			.CreatePackageDataReader(dataReader, data, reader);
 		if (error != B_OK)
 			return error;
-		ObjectDeleter<PackageDataReader> readerDeleter(reader);
+		ObjectDeleter<BPackageDataReader> readerDeleter(reader);
 
 		// write the data
 		off_t bytesRemaining = data.UncompressedSize();
@@ -293,7 +294,7 @@ private:
 
 private:
 	BlockBufferCacheNoLock	fBufferCache;
-	FDDataReader			fPackageFileReader;
+	BFDDataReader			fPackageFileReader;
 	void*					fDataBuffer;
 	size_t					fDataBufferSize;
 	bool					fErrorOccurred;
@@ -339,7 +340,7 @@ command_extract(int argc, const char* const* argv)
 
 	// open package
 	StandardErrorOutput errorOutput;
-	PackageReader packageReader(&errorOutput);
+	BPackageReader packageReader(&errorOutput);
 	status_t error = packageReader.Init(packageFileName);
 printf("Init(): %s\n", strerror(error));
 	if (error != B_OK)

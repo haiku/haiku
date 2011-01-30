@@ -11,13 +11,13 @@
 #include "PackageLeafNode.h"
 
 
-using BPackageKit::BHaikuPackage::BPrivate::PackageData;
+using BPackageKit::BHPKG::BPackageData;
 
 
 class PackageFile : public PackageLeafNode {
 public:
 								PackageFile(Package* package, mode_t mode,
-									const PackageData& data);
+									const BPackageData& data);
 	virtual						~PackageFile();
 
 	virtual	status_t			VFSInit(dev_t deviceID, ino_t nodeID);
@@ -34,7 +34,7 @@ private:
 			struct DataAccessor;
 
 private:
-			PackageData			fData;
+			BPackageData		fData;
 			DataAccessor*		fDataAccessor;
 };
 

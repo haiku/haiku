@@ -2,8 +2,8 @@
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef ZLIB_COMPRESSOR_H
-#define ZLIB_COMPRESSOR_H
+#ifndef _PACKAGE__HPKG__PRIVATE__ZLIB_COMPRESSOR_H_
+#define _PACKAGE__HPKG__PRIVATE__ZLIB_COMPRESSOR_H_
 
 
 #include <zlib.h>
@@ -13,17 +13,18 @@
 
 namespace BPackageKit {
 
-namespace BHaikuPackage {
+namespace BHPKG {
+
+
+class BDataOutput;
+
 
 namespace BPrivate {
 
 
-class DataOutput;
-
-
 class ZlibCompressor : public ZlibCompressionBase {
 public:
-								ZlibCompressor(DataOutput* output);
+								ZlibCompressor(BDataOutput* output);
 								~ZlibCompressor();
 
 			status_t			Init();
@@ -37,16 +38,16 @@ public:
 
 private:
 			z_stream			fStream;
-			DataOutput*			fOutput;
+			BDataOutput*		fOutput;
 			bool				fStreamInitialized;
 };
 
 
 }	// namespace BPrivate
 
-}	// namespace BHaikuPackage
+}	// namespace BHPKG
 
 }	// namespace BPackageKit
 
 
-#endif	// ZLIB_COMPRESSOR_H
+#endif	// _PACKAGE__HPKG__PRIVATE__ZLIB_COMPRESSOR_H_

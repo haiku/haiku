@@ -6,13 +6,17 @@
 #define GLOBAL_FACTORY_H
 
 
-#include <package/hpkg/haiku_package.h>
+#include <package/hpkg/HPKGDefs.h>
 #include <package/hpkg/PackageDataReader.h>
 
 #include "BlockBufferCacheKernel.h"
 
 
-using namespace BPackageKit::BHaikuPackage::BPrivate;
+using BPackageKit::BHPKG::BDataReader;
+using BPackageKit::BHPKG::BPackageData;
+using BPackageKit::BHPKG::BPackageDataReader;
+using BPackageKit::BHPKG::BPackageDataReaderFactory;
+using BPackageKit::BHPKG::B_HPKG_DEFAULT_DATA_CHUNK_SIZE_ZLIB;
 
 
 class GlobalFactory {
@@ -25,9 +29,9 @@ public:
 	static	void				DeleteDefault();
 	static	GlobalFactory*		Default();
 
-			status_t			CreatePackageDataReader(DataReader* dataReader,
-									const PackageData& data,
-									PackageDataReader*& _reader);
+			status_t			CreatePackageDataReader(BDataReader* dataReader,
+									const BPackageData& data,
+									BPackageDataReader*& _reader);
 
 private:
 			status_t			_Init();
@@ -36,7 +40,7 @@ private:
 	static	GlobalFactory*		sDefaultInstance;
 
 			BlockBufferCacheKernel fBufferCache;
-			PackageDataReaderFactory fPackageDataReaderFactory;
+			BPackageDataReaderFactory fPackageDataReaderFactory;
 };
 
 #endif	// GLOBAL_FACTORY_H

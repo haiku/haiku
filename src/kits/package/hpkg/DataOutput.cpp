@@ -11,23 +11,21 @@
 
 namespace BPackageKit {
 
-namespace BHaikuPackage {
-
-namespace BPrivate {
+namespace BHPKG {
 
 
-// #pragma mark - DataOutput
+// #pragma mark - BDataOutput
 
 
-DataOutput::~DataOutput()
+BDataOutput::~BDataOutput()
 {
 }
 
 
-// #pragma mark - BufferDataOutput
+// #pragma mark - BBufferDataOutput
 
 
-BufferDataOutput::BufferDataOutput(void* buffer, size_t size)
+BBufferDataOutput::BBufferDataOutput(void* buffer, size_t size)
 	:
 	fBuffer(buffer),
 	fSize(size),
@@ -37,7 +35,7 @@ BufferDataOutput::BufferDataOutput(void* buffer, size_t size)
 
 
 status_t
-BufferDataOutput::WriteData(const void* buffer, size_t size)
+BBufferDataOutput::WriteData(const void* buffer, size_t size)
 {
 	if (size == 0)
 		return B_OK;
@@ -51,8 +49,6 @@ BufferDataOutput::WriteData(const void* buffer, size_t size)
 }
 
 
-}	// namespace BPrivate
-
-}	// namespace BHaikuPackage
+}	// namespace BHPKG
 
 }	// namespace BPackageKit

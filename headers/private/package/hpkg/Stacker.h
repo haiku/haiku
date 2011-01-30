@@ -2,13 +2,13 @@
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef STACKER_H
-#define STACKER_H
+#ifndef _PACKAGE__HPKG__PRIVATE__STACKER_H_
+#define _PACKAGE__HPKG__PRIVATE__STACKER_H_
 
 
 namespace BPackageKit {
 
-namespace BHaikuPackage {
+namespace BHPKG {
 
 namespace BPrivate {
 
@@ -46,9 +46,9 @@ private:
 
 }	// namespace BPrivate
 
-}	// namespace BHaikuPackage
+}	// namespace BHPKG
 
 }	// namespace BPackageKit
 
 
-#endif	// STACKER_H
+#endif	// _PACKAGE__HPKG__PRIVATE__STACKER_H_

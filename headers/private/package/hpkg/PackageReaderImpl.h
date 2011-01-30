@@ -2,8 +2,8 @@
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef PACKAGE_READER_H
-#define PACKAGE_READER_H
+#ifndef _PACKAGE__HPKG__PRIVATE__PACKAGE_READER_IMPL_H_
+#define _PACKAGE__HPKG__PRIVATE__PACKAGE_READER_IMPL_H_
 
 
 #include <SupportDefs.h>
@@ -11,59 +11,34 @@
 #include <util/SinglyLinkedList.h>
 
 #include <package/hpkg/PackageAttributeValue.h>
+#include <package/hpkg/PackageContentHandler.h>
+#include <package/hpkg/PackageReader.h>
 
 
 namespace BPackageKit {
 
-namespace BHaikuPackage {
+namespace BHPKG {
+
+
+class BPackageEntry;
+class BPackageEntryAttribute;
+class BErrorOutput;
+
 
 namespace BPrivate {
 
 
-class ErrorOutput;
-class PackageEntry;
-class PackageEntryAttribute;
-
-
-class LowLevelPackageContentHandler {
+class PackageReaderImpl {
 public:
-	virtual						~LowLevelPackageContentHandler();
-
-	virtual	status_t			HandleAttribute(const char* attributeName,
-									const PackageAttributeValue& value,
-									void* parentToken, void*& _token) = 0;
-	virtual	status_t			HandleAttributeDone(const char* attributeName,
-									const PackageAttributeValue& value,
-									void* token) = 0;
-
-	virtual	void				HandleErrorOccurred() = 0;
-};
-
-
-class PackageContentHandler {
-public:
-	virtual						~PackageContentHandler();
-
-	virtual	status_t			HandleEntry(PackageEntry* entry) = 0;
-	virtual	status_t			HandleEntryAttribute(PackageEntry* entry,
-									PackageEntryAttribute* attribute) = 0;
-	virtual	status_t			HandleEntryDone(PackageEntry* entry) = 0;
-
-	virtual	void				HandleErrorOccurred() = 0;
-};
-
-
-class PackageReader {
-public:
-								PackageReader(ErrorOutput* errorOutput);
-								~PackageReader();
+								PackageReaderImpl(
+									BErrorOutput* errorOutput);
+								~PackageReaderImpl();
 
 			status_t			Init(const char* fileName);
 			status_t			Init(int fd, bool keepFD);
 			status_t			ParseContent(
-									PackageContentHandler* contentHandler);
-			status_t			ParseContent(
-									LowLevelPackageContentHandler*
+									BPackageContentHandler* contentHandler);
+			status_t			ParseContent(BLowLevelPackageContentHandler*
 										contentHandler);
 
 			int					PackageFileFD()	{ return fFD; }
@@ -81,7 +56,7 @@ private:
 			struct PackageAttributeHandler;
 			struct PackageContentListHandler;
 
-			typedef PackageAttributeValue AttributeValue;
+			typedef BPackageAttributeValue AttributeValue;
 			typedef SinglyLinkedList<AttributeHandler> AttributeHandlerList;
 
 private:
@@ -128,7 +103,7 @@ private:
 	inline	AttributeHandler*	_PopAttributeHandler();
 
 private:
-			ErrorOutput*		fErrorOutput;
+			BErrorOutput*	fErrorOutput;
 			int					fFD;
 			bool				fOwnsFD;
 
@@ -164,7 +139,7 @@ private:
 
 template<typename Type>
 status_t
-PackageReader::_Read(Type& _value)
+PackageReaderImpl::_Read(Type& _value)
 {
 	return _ReadTOCBuffer(&_value, sizeof(Type));
 }
@@ -172,9 +147,9 @@ PackageReader::_Read(Type& _value)
 
 }	// namespace BPrivate
 
-}	// namespace BHaikuPackage
+}	// namespace BHPKG
 
 }	// namespace BPackageKit
 
 
-#endif	// PACKAGE_READER_H
+#endif	// _PACKAGE__HPKG__PRIVATE__PACKAGE_READER_IMPL_H_

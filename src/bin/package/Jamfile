@@ -6,6 +6,7 @@ DEFINES += B_ENABLE_INCOMPLETE_POSIX_AT_SUPPORT ;
 	# TODO: Remove when it is complete!
 
 BinCommand package :
+	BlockBufferCacheNoLock.cpp
 	command_create.cpp
 	command_dump.cpp
 	command_extract.cpp

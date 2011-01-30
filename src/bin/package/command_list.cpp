@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <package/hpkg/PackageContentHandler.h>
 #include <package/hpkg/PackageEntry.h>
 #include <package/hpkg/PackageEntryAttribute.h>
 #include <package/hpkg/PackageReader.h>
@@ -19,10 +20,10 @@
 #include "StandardErrorOutput.h"
 
 
-using namespace BPackageKit::BHaikuPackage::BPrivate;
+using namespace BPackageKit::BHPKG;
 
 
-struct PackageContentListHandler : PackageContentHandler {
+struct PackageContentListHandler : BPackageContentHandler {
 	PackageContentListHandler(bool listAttributes)
 		:
 		fLevel(0),
@@ -30,7 +31,7 @@ struct PackageContentListHandler : PackageContentHandler {
 	{
 	}
 
-	virtual status_t HandleEntry(PackageEntry* entry)
+	virtual status_t HandleEntry(BPackageEntry* entry)
 	{
 		fLevel++;
 
@@ -74,8 +75,8 @@ struct PackageContentListHandler : PackageContentHandler {
 		return B_OK;
 	}
 
-	virtual status_t HandleEntryAttribute(PackageEntry* entry,
-		PackageEntryAttribute* attribute)
+	virtual status_t HandleEntryAttribute(BPackageEntry* entry,
+		BPackageEntryAttribute* attribute)
 	{
 		if (!fListAttribute)
 			return B_OK;
@@ -97,7 +98,7 @@ struct PackageContentListHandler : PackageContentHandler {
 		return B_OK;
 	}
 
-	virtual status_t HandleEntryDone(PackageEntry* entry)
+	virtual status_t HandleEntryDone(BPackageEntry* entry)
 	{
 		fLevel--;
 		return B_OK;
@@ -167,7 +168,7 @@ command_list(int argc, const char* const* argv)
 
 	// open package
 	StandardErrorOutput errorOutput;
-	PackageReader packageReader(&errorOutput);
+	BPackageReader packageReader(&errorOutput);
 	status_t error = packageReader.Init(packageFileName);
 printf("Init(): %s\n", strerror(error));
 	if (error != B_OK)

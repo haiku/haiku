@@ -15,23 +15,21 @@
 
 namespace BPackageKit {
 
-namespace BHaikuPackage {
-
-namespace BPrivate {
+namespace BHPKG {
 
 
-// #pragma mark - DataReader
+// #pragma mark - BDataReader
 
 
-DataReader::~DataReader()
+BDataReader::~BDataReader()
 {
 }
 
 
-// #pragma mark - FDDataReader
+// #pragma mark - BFDDataReader
 
 
-FDDataReader::FDDataReader(int fd)
+BFDDataReader::BFDDataReader(int fd)
 	:
 	fFD(fd)
 {
@@ -39,7 +37,7 @@ FDDataReader::FDDataReader(int fd)
 
 
 status_t
-FDDataReader::ReadData(off_t offset, void* buffer, size_t size)
+BFDDataReader::ReadData(off_t offset, void* buffer, size_t size)
 {
 	ssize_t bytesRead = pread(fFD, buffer, size, offset);
 	if (bytesRead < 0)
@@ -48,10 +46,10 @@ FDDataReader::ReadData(off_t offset, void* buffer, size_t size)
 }
 
 
-// #pragma mark - AttributeDataReader
+// #pragma mark - BAttributeDataReader
 
 
-AttributeDataReader::AttributeDataReader(int fd, const char* attribute,
+BAttributeDataReader::BAttributeDataReader(int fd, const char* attribute,
 	uint32 type)
 	:
 	fFD(fd),
@@ -62,7 +60,7 @@ AttributeDataReader::AttributeDataReader(int fd, const char* attribute,
 
 
 status_t
-AttributeDataReader::ReadData(off_t offset, void* buffer, size_t size)
+BAttributeDataReader::ReadData(off_t offset, void* buffer, size_t size)
 {
 	ssize_t bytesRead = fs_read_attr(fFD, fAttribute, fType, offset, buffer,
 		size);
@@ -72,10 +70,10 @@ AttributeDataReader::ReadData(off_t offset, void* buffer, size_t size)
 }
 
 
-// #pragma mark - BufferDataReader
+// #pragma mark - BBufferDataReader
 
 
-BufferDataReader::BufferDataReader(const void* data, size_t size)
+BBufferDataReader::BBufferDataReader(const void* data, size_t size)
 	:
 	fData(data),
 	fSize(size)
@@ -84,7 +82,7 @@ BufferDataReader::BufferDataReader(const void* data, size_t size)
 
 
 status_t
-BufferDataReader::ReadData(off_t offset, void* buffer, size_t size)
+BBufferDataReader::ReadData(off_t offset, void* buffer, size_t size)
 {
 	if (size == 0)
 		return B_OK;
@@ -100,8 +98,6 @@ BufferDataReader::ReadData(off_t offset, void* buffer, size_t size)
 }
 
 
-}	// namespace BPrivate
-
-}	// namespace BHaikuPackage
+}	// namespace BHPKG
 
 }	// namespace BPackageKit

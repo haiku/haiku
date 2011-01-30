@@ -9,12 +9,10 @@
 
 namespace BPackageKit {
 
-namespace BHaikuPackage {
-
-namespace BPrivate {
+namespace BHPKG {
 
 
-PackageEntry::PackageEntry(PackageEntry* parent, const char* name)
+BPackageEntry::BPackageEntry(BPackageEntry* parent, const char* name)
 	:
 	fParent(parent),
 	fName(name),
@@ -31,8 +29,6 @@ PackageEntry::PackageEntry(PackageEntry* parent, const char* name)
 }
 
 
-}	// namespace BPrivate
-
-}	// namespace BHaikuPackage
+}	// namespace BHPKG
 
 }	// namespace BPackageKit

@@ -13,7 +13,7 @@
 
 namespace BPackageKit {
 
-namespace BHaikuPackage {
+namespace BHPKG {
 
 namespace BPrivate {
 
@@ -49,6 +49,6 @@ ZlibCompressionBase::TranslateZlibError(int error)
 
 }	// namespace BPrivate
 
-}	// namespace BHaikuPackage
+}	// namespace BHPKG
 
 }	// namespace BPackageKit

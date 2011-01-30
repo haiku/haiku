@@ -29,16 +29,18 @@ HAIKU_PACKAGE_FS_SOURCES =
 ;
 
 HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES =
-	BlockBufferCache.cpp
+	BlockBufferCacheImpl.cpp
 	BufferCache.cpp
+	CachedBuffer.cpp
 	DataOutput.cpp
 	DataReader.cpp
 	ErrorOutput.cpp
-	PackageEntryAttribute.cpp
+	PackageContentHandler.cpp
 	PackageData.cpp
 	PackageDataReader.cpp
 	PackageEntry.cpp
-	PackageReader.cpp
+	PackageEntryAttribute.cpp
+	PackageReaderImpl.cpp
 
 	# compression
 	ZlibCompressionBase.cpp

@@ -2,16 +2,18 @@
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _HAIKU_PACKAGE_H
-#define _HAIKU_PACKAGE_H
+#ifndef _PACKAGE__HPKG__PRIVATE__HAIKU_PACKAGE_H_
+#define _PACKAGE__HPKG__PRIVATE__HAIKU_PACKAGE_H_
 
 
 #include <SupportDefs.h>
 
+#include <package/hpkg/HPKGDefs.h>
+
 
 namespace BPackageKit {
 
-namespace BHaikuPackage {
+namespace BHPKG {
 
 namespace BPrivate {
 
@@ -40,50 +42,10 @@ struct hpkg_header {
 };
 
 
-// magic, version
-enum {
-	B_HPKG_MAGIC	= 'hpkg',
-	B_HPKG_VERSION	= 1
-};
-
-
 // compression types
 enum {
 	B_HPKG_COMPRESSION_NONE	= 0,
 	B_HPKG_COMPRESSION_ZLIB	= 1
-};
-
-
-// attribute types
-enum {
-	// types
-	B_HPKG_ATTRIBUTE_TYPE_INVALID			= 0,
-	B_HPKG_ATTRIBUTE_TYPE_INT				= 1,
-	B_HPKG_ATTRIBUTE_TYPE_UINT				= 2,
-	B_HPKG_ATTRIBUTE_TYPE_STRING			= 3,
-	B_HPKG_ATTRIBUTE_TYPE_RAW				= 4
-};
-
-
-// attribute encodings
-enum {
-	// signed/unsigned int encodings
-	B_HPKG_ATTRIBUTE_ENCODING_INT_8_BIT		= 0,
-	B_HPKG_ATTRIBUTE_ENCODING_INT_16_BIT	= 1,
-	B_HPKG_ATTRIBUTE_ENCODING_INT_32_BIT	= 2,
-	B_HPKG_ATTRIBUTE_ENCODING_INT_64_BIT	= 3,
-
-	// string encodings
-	B_HPKG_ATTRIBUTE_ENCODING_STRING_INLINE	= 0,
-		// null-terminated string
-	B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE	= 1,
-		// unsigned LEB128 index into string table
-
-	// raw data encodings
-	B_HPKG_ATTRIBUTE_ENCODING_RAW_INLINE	= 0,
-		// unsigned LEB128 size, raw bytes
-	B_HPKG_ATTRIBUTE_ENCODING_RAW_HEAP		= 1
-		// unsigned LEB128 size, unsigned LEB128 offset into the heap
 };
 
 
@@ -143,15 +105,6 @@ enum {
 };
 
 
-// maximum number of bytes of data to be encoded inline; more will be allocated
-// on the heap
-#define B_HPKG_MAX_INLINE_DATA_SIZE	8
-
-
-// name of file containing package information (in package's root folder)
-#define B_HPKG_PACKAGE_INFO_FILE_NAME	".PackageInfo"
-
-
 // default values
 enum {
 	B_HPKG_DEFAULT_FILE_TYPE				= B_HPKG_FILE_TYPE_FILE,
@@ -159,15 +112,14 @@ enum {
 	B_HPKG_DEFAULT_DIRECTORY_PERMISSIONS	= 0755,
 	B_HPKG_DEFAULT_SYMLINK_PERMISSIONS		= 0777,
 	B_HPKG_DEFAULT_DATA_COMPRESSION			= B_HPKG_COMPRESSION_NONE,
-	B_HPKG_DEFAULT_DATA_CHUNK_SIZE_ZLIB		= 64 * 1024
 };
 
 
 }	// namespace BPrivate
 
-}	// namespace BHaikuPackage
+}	// namespace BHPKG
 
 }	// namespace BPackageKit
 
 
-#endif	// _HAIKU_PACKAGE_H
+#endif	// _PACKAGE__HPKG__PRIVATE__HAIKU_PACKAGE_H_

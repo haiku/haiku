@@ -14,7 +14,7 @@
 
 namespace BPackageKit {
 
-namespace BHaikuPackage {
+namespace BHPKG {
 
 namespace BPrivate {
 
@@ -22,7 +22,7 @@ namespace BPrivate {
 static const size_t kOutputBufferSize = 1024;
 
 
-ZlibCompressor::ZlibCompressor(DataOutput* output)
+ZlibCompressor::ZlibCompressor(BDataOutput* output)
 	:
 	fOutput(output),
 	fStreamInitialized(false)
@@ -180,6 +180,6 @@ ZlibCompressor::CompressSingleBuffer(const void* input, size_t inputSize,
 
 }	// namespace BPrivate
 
-}	// namespace BHaikuPackage
+}	// namespace BHPKG
 
 }	// namespace BPackageKit

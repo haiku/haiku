@@ -11,7 +11,7 @@
 #include <io_requests.h>
 
 
-class PackageData;
+class BPackageData;
 
 
 class PackageLeafNode : public PackageNode {

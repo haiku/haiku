@@ -2,23 +2,21 @@
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef PACKAGE_DATA_H
-#define PACKAGE_DATA_H
+#ifndef _PACKAGE__HPKG__PACKAGE_DATA_H_
+#define _PACKAGE__HPKG__PACKAGE_DATA_H_
 
 
-#include <package/hpkg/haiku_package.h>
+#include <package/hpkg/HPKGDefs.h>
 
 
 namespace BPackageKit {
 
-namespace BHaikuPackage {
-
-namespace BPrivate {
+namespace BHPKG {
 
 
-class PackageData {
+class BPackageData {
 public:
-								PackageData();
+								BPackageData();
 
 			uint64				CompressedSize() const
 									{ return fCompressedSize; }
@@ -56,11 +54,9 @@ private:
 };
 
 
-}	// namespace BPrivate
-
-}	// namespace BHaikuPackage
+}	// namespace BHPKG
 
 }	// namespace BPackageKit
 
 
-#endif	// PACKAGE_DATA_H
+#endif	// _PACKAGE__HPKG__PACKAGE_DATA_H_

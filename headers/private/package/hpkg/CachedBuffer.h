@@ -2,18 +2,20 @@
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _PACKAGE__HPKG__BUFFER_CACHE_H_
-#define _PACKAGE__HPKG__BUFFER_CACHE_H_
+#ifndef _PACKAGE__HPKG__PRIVATE__BUFFER_CACHE_H_
+#define _PACKAGE__HPKG__PRIVATE__BUFFER_CACHE_H_
 
 
 #include <stddef.h>
 
 #include <util/DoublyLinkedList.h>
 
+#include <package/hpkg/BufferCache.h>
+
 
 namespace BPackageKit {
 
-namespace BHaikuPackage {
+namespace BHPKG {
 
 namespace BPrivate {
 
@@ -43,26 +45,9 @@ private:
 };
 
 
-class BufferCache {
-public:
-	virtual						~BufferCache();
-
-	virtual	CachedBuffer*		GetBuffer(size_t size,
-									CachedBuffer** owner = NULL,
-									bool* _newBuffer = NULL) = 0;
-	virtual	void				PutBufferAndCache(CachedBuffer** owner) = 0;
-									// caller is buffer owner and wants the
-									// buffer cached, if possible
-	virtual	void				PutBuffer(CachedBuffer** owner) = 0;
-									// puts the buffer for good, owner might
-									// have called PutBufferAndCache() before
-									// and might not own a buffer anymore
-};
-
-
 class CachedBufferPutter {
 public:
-	CachedBufferPutter(BufferCache* cache, CachedBuffer** owner)
+	CachedBufferPutter(BBufferCache* cache, CachedBuffer** owner)
 		:
 		fCache(cache),
 		fOwner(owner),
@@ -70,7 +55,7 @@ public:
 	{
 	}
 
-	CachedBufferPutter(BufferCache* cache, CachedBuffer* buffer)
+	CachedBufferPutter(BBufferCache* cache, CachedBuffer* buffer)
 		:
 		fCache(cache),
 		fOwner(NULL),
@@ -89,7 +74,7 @@ public:
 	}
 
 private:
-	BufferCache*	fCache;
+	BBufferCache*	fCache;
 	CachedBuffer**	fOwner;
 	CachedBuffer*	fBuffer;
 };
@@ -97,9 +82,9 @@ private:
 
 }	// namespace BPrivate
 
-}	// namespace BHaikuPackage
+}	// namespace BHPKG
 
 }	// namespace BPackageKit
 
 
-#endif	// _PACKAGE__HPKG__BUFFER_CACHE_H_
+#endif	// _PACKAGE__HPKG__PRIVATE__BUFFER_CACHE_H_

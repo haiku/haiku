@@ -9,10 +9,10 @@
 #include <package/hpkg/ErrorOutput.h>
 
 
-using BPackageKit::BHaikuPackage::BPrivate::ErrorOutput;
+using BPackageKit::BHPKG::BErrorOutput;
 
 
-class StandardErrorOutput : public ErrorOutput {
+class StandardErrorOutput : public BErrorOutput {
 	virtual	void				PrintErrorVarArgs(const char* format,
 									va_list args);
 };

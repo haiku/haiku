@@ -8,15 +8,18 @@
 
 #include <string.h>
 
+#include <package/hpkg/haiku_package.h>
+
 
 namespace BPackageKit {
 
-namespace BHaikuPackage {
-
-namespace BPrivate {
+namespace BHPKG {
 
 
-PackageData::PackageData()
+using namespace BPrivate;
+
+
+BPackageData::BPackageData()
 	:
 	fCompressedSize(0),
 	fUncompressedSize(0),
@@ -28,7 +31,7 @@ PackageData::PackageData()
 
 
 void
-PackageData::SetData(uint64 size, uint64 offset)
+BPackageData::SetData(uint64 size, uint64 offset)
 {
 	fUncompressedSize = fCompressedSize = size;
 	fOffset = offset;
@@ -37,7 +40,7 @@ PackageData::SetData(uint64 size, uint64 offset)
 
 
 void
-PackageData::SetData(uint8 size, const void* data)
+BPackageData::SetData(uint8 size, const void* data)
 {
 	fUncompressedSize = fCompressedSize = size;
 	if (size > 0)
@@ -46,8 +49,6 @@ PackageData::SetData(uint8 size, const void* data)
 }
 
 
-}	// namespace BPrivate
-
-}	// namespace BHaikuPackage
+}	// namespace BHPKG
 
 }	// namespace BPackageKit

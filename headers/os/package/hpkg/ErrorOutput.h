@@ -2,8 +2,8 @@
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef ERROR_OUTPUT_H
-#define ERROR_OUTPUT_H
+#ifndef _PACKAGE__HPKG__ERROR_OUTPUT_H_
+#define _PACKAGE__HPKG__ERROR_OUTPUT_H_
 
 
 #include <stdarg.h>
@@ -13,14 +13,12 @@
 
 namespace BPackageKit {
 
-namespace BHaikuPackage {
-
-namespace BPrivate {
+namespace BHPKG {
 
 
-class ErrorOutput {
+class BErrorOutput {
 public:
-	virtual						~ErrorOutput();
+	virtual						~BErrorOutput();
 
 	virtual	void				PrintErrorVarArgs(const char* format,
 									va_list args) = 0;
@@ -28,11 +26,9 @@ public:
 };
 
 
-}	// namespace BPrivate
-
-}	// namespace BHaikuPackage
+}	// namespace BHPKG
 
 }	// namespace BPackageKit
 
 
-#endif	// ERROR_OUTPUT_H
+#endif	// _PACKAGE__HPKG__PACKAGE_OUTPUT_H_
