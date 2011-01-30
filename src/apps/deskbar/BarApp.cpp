@@ -334,6 +334,10 @@ TBarApp::MessageReceived(BMessage* message)
 			ShowPreferencesWindow();
 			break;
 
+		case kStateChanged:
+			fPreferencesWindow->PostMessage(kStateChanged);
+			break;
+
 		case kShowBeMenu:
 			if (fBarWindow->Lock()) {
 				fBarWindow->ShowBeMenu();

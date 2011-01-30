@@ -242,6 +242,10 @@ PreferencesWindow::MessageReceived(BMessage* message)
 			be_app->PostMessage(message);
 			break;
 
+		case kStateChanged:
+			_EnableDisableDependentItems();
+			break;
+
 		default:
 			BWindow::MessageReceived(message);
 			break;
@@ -275,10 +279,15 @@ PreferencesWindow::_UpdateRecentCounts()
 void
 PreferencesWindow::_EnableDisableDependentItems()
 {
-	if (fAppsShowExpanders->Value())
-		fAppsExpandNew->SetEnabled(true);
-	else
+	TBarApp* barApp = static_cast<TBarApp*>(be_app);
+	if (barApp->BarView()->Vertical()
+		&& barApp->BarView()->Expando()) {
+		fAppsShowExpanders->SetEnabled(true);
+		fAppsExpandNew->SetEnabled(fAppsShowExpanders->Value());
+	} else {
+		fAppsShowExpanders->SetEnabled(false);
 		fAppsExpandNew->SetEnabled(false);
+	}
 
 	if (fMenuRecentDocuments->Value())
 		fMenuRecentDocumentCount->SetEnabled(true);
