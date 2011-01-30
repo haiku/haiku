@@ -28,6 +28,8 @@ get_nth_addon(image_id image, int index)
 
 
 // #pragma mark -
+
+
 ServicesAddOn::ServicesAddOn(image_id image)
 	:
 	NetworkSetupAddOn(image)
@@ -45,13 +47,13 @@ ServicesAddOn::CreateView(BRect* bounds)
 	BRect rlv = r.InsetByCopy(2, 2);
 	rlv.right -= B_V_SCROLL_BAR_WIDTH;
 	fServicesListView = new BListView(rlv, "system_services",
-						B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES);
+		B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES);
 
 	BScrollView* sv = new BScrollView( "system_services_scrollview",
-						fServicesListView, B_FOLLOW_ALL_SIDES,
-						B_WILL_DRAW | B_FRAME_EVENTS, false, true);
+		fServicesListView, B_FOLLOW_ALL_SIDES,
+		B_WILL_DRAW | B_FRAME_EVENTS, false, true);
 
-	if (ParseInetd() == B_ERROR)
+	if (ParseInetd() != B_OK)
 		ParseXinetd();
 
 	*bounds = r;
@@ -64,12 +66,12 @@ ServicesAddOn::ParseInetd()
 {
 	FILE *f = fopen("/etc/inetd.conf", "r");
 	if (f) {
-		char line[1024], *l;
+		char line[1024], *linePtr;
 		char *token;
 
 		while (fgets(line, sizeof(line), f)) {
-			l = line;
-			if (! *l)
+			linePtr = line;
+			if (! *linePtr)
 				continue;
 
 			if (line[0] == '#') {
@@ -78,7 +80,7 @@ ServicesAddOn::ParseInetd()
 					line[1] == '\r')
 					// skip comments
 					continue;
-				l++;	// jump the disable/comment service mark
+				linePtr++;	// jump the disable/comment service mark
 			}
 
 			BString label;
@@ -103,19 +105,20 @@ ServicesAddOn::ParseXinetd()
 {
 	FILE *f = fopen("/boot/common/settings/network/services", "r");
 	if (f) {
-		char line[1024], *l;
+		char line[1024], *linePtr;
 		char *token;
 		char *loc;
 
 		while (fgets(line, sizeof(line), f)) {
-			l = line;
+			linePtr = line;
 
-			if (! *l)
+			if (! *linePtr)
 				continue;
 
-			if (line[0] == '#' || line[0] == '\n')
+			if (line[0] == '#' || line[0] == '\n') {
+				// Skip commented out lines
 				continue;
-					// Skip commented out lines
+			}
 
 			loc = strstr(l, "service ");
 
