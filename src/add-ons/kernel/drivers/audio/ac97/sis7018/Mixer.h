@@ -35,6 +35,8 @@ public:
 		uint32		InputFormats() { return fInputFormats; }
 		uint32		OutputFormats() { return fOutputFormats; }
 
+		void 		SetOutputRate(uint32 rate);
+
 private:
 		void		_ReadSupportedFormats();
 		bool		_WaitPortReady(uint8 reg, uint32 mask, uint32* result = NULL);
@@ -57,6 +59,7 @@ static	void		_WriteAC97(void* cookie, uint8 reg, uint16 data);
 		uint32		fMaskRD;
 		uint32		fMaskWD;
 
+		bool		fHasVRA;
 		uint32		fInputRates;
 		uint32		fOutputRates;
 		uint32		fInputFormats;

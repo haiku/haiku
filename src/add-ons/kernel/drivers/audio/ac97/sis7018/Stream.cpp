@@ -213,6 +213,9 @@ Stream::GetBuffers(uint32& Flags, int32& BuffersCount, int32& ChannelsCount,
 status_t
 Stream::Start()
 {
+	if (!fIsInput)
+		fDevice->Mixer().SetOutputRate(fFormat.cvsr);
+
 	uint32 CSO = 0;
 	uint32 LBA = uint32(fBuffersPhysAddress) & 0x3fffffff;
 	uint32 ESO = ((fBufferSamplesCount * 2) - 1) & 0xffff;
@@ -290,6 +293,7 @@ Stream::Start()
 
 	// start current channel
 	fDevice->WritePCI32(_UseBankB() ? RegStartB : RegStartA, 1 << _HWVoice());
+	fIsActive = true;
 
 	fDevice->Unlock(cst);
 
@@ -297,8 +301,6 @@ Stream::Start()
 		fIsInput ? "Rec" : "Play", CSO, LBA, ESO, Delta, FMControlEtc,
 			ControlEtc, ChIntReg);
 	
-	fIsActive = true;
-
 	return B_OK;
 }
 
@@ -306,11 +308,15 @@ Stream::Start()
 status_t
 Stream::Stop()
 {
+	if (!fIsActive)
+		return B_OK;
+
 	cpu_status cst = fDevice->Lock();
 
 	// stop current channel
 	fDevice->WritePCI32(_UseBankB() ? RegStopB : RegStopA, 1 << _HWVoice());
-
+	fIsActive = false;
+	
 	if (_HWId() == ALi5451 && fIsInput) {
 		uint32 reg = fDevice->ReadPCI32(RegALiDigiMixer);
 		fDevice->WritePCI32(RegALiDigiMixer, reg & ~(1 << _HWVoice()));
@@ -319,8 +325,6 @@ Stream::Stop()
 	fDevice->Unlock(cst);
 
 	TRACE("%s:OK\n", fIsInput ? "Rec" : "Play");
-	
-	fIsActive = false;
 	
 	fBufferCycle = fIsInput ? 1 : 0;
 	

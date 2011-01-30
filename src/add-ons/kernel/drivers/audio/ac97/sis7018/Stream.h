@@ -35,6 +35,7 @@ public:
 		void				ExchangeBuffers(bigtime_t& RealTime,
 											bigtime_t& FramesCount,
 											int32& BufferCycle);
+
 		void				GetFormat(multi_format_info *Format);
 		status_t			SetFormat(_multi_format& format,
 											uint32 formats, uint32 rates);

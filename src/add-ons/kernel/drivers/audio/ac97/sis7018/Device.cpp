@@ -175,7 +175,6 @@ Device::Open(uint32 flags)
 		ERROR("Error of starting playback stream:%#010x\n", status);
 	}
 
-
 	return B_OK;
 }
 

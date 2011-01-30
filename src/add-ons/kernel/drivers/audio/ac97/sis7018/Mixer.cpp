@@ -26,6 +26,7 @@ Mixer::Mixer(Device *device)
 		fMaskRW(1 << 15),
 		fMaskRD(1 << 15),
 		fMaskWD(1 << 15),
+		fHasVRA(false),
 		fInputRates(0),
 		fOutputRates(0),
 		fInputFormats(0),
@@ -69,6 +70,25 @@ Mixer::Init()
 void
 Mixer::_ReadSupportedFormats()
 {
+	fInputRates = B_SR_48000;
+	fOutputRates = 0;
+	fInputFormats = B_FMT_16BIT;
+	fOutputFormats = B_FMT_16BIT;
+
+	uint16 extId = ac97_reg_cached_read(fAC97Dev, AC97_EXTENDED_ID);
+	uint16 extCtrl = ac97_reg_cached_read(fAC97Dev, AC97_EXTENDED_STAT_CTRL);
+	TRACE("Ext.ID:%#010x %#010x\n", extId, extCtrl);
+
+	fHasVRA = ((extId & EXID_VRA) == EXID_VRA);
+	if (!fHasVRA) {
+		fOutputRates = B_SR_8000 | B_SR_11025 | B_SR_12000
+						| B_SR_16000 | B_SR_22050 | B_SR_24000
+						| B_SR_32000 | B_SR_44100 | B_SR_48000;
+		TRACE("VRA is not supported. Assume all rates are ok:%#010x\n",
+					fOutputRates);
+		return;
+	}
+
 	struct _Cap {
 		ac97_capability	fCap;
 		uint32			fRate;
@@ -89,9 +109,12 @@ Mixer::_ReadSupportedFormats()
 			fOutputRates |= caps[i].fRate;
 	}
 
-	fInputRates = B_SR_48000;
-	fInputFormats = B_FMT_16BIT;
-	fOutputFormats = B_FMT_16BIT;
+	if(fOutputRates == 0) {
+		ERROR("Output rates are not guessed. Force to 48 kHz.\n");
+		fOutputRates = B_SR_48000;
+	}
+	
+	TRACE("Output rates are:%#010x\n", fOutputRates);
 }
 
 
@@ -192,6 +215,28 @@ Mixer::_WriteAC97(uint8 reg, uint16 data)
 	}
 	
 	fDevice->Unlock(cp);
+}
+
+
+void
+Mixer::SetOutputRate(uint32 outputRate)
+{
+	if (!fHasVRA)
+		return;
+
+	uint32 rate = 0;
+	if (!ac97_get_rate(fAC97Dev, AC97_PCM_FRONT_DAC_RATE, &rate)) {
+		ERROR("Failed to read PCM Front DAC Rate. Force to %d.\n", outputRate);
+	} else
+	if (rate == outputRate) {
+		TRACE("AC97 PCM Front DAC rate not set to %d\n", outputRate);
+		return;
+	}
+
+	if (!ac97_set_rate(fAC97Dev, AC97_PCM_FRONT_DAC_RATE, rate))
+		ERROR("Failed to set AC97 PCM Front DAC rate\n");
+	else
+		TRACE("AC97 PCM Front DAC rate set to %d\n", outputRate);
 }
 
 

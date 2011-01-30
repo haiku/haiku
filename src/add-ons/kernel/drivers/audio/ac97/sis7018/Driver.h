@@ -16,7 +16,7 @@
 #define MAX_DEVICES	3
 
 
-const char* const kVersion = "ver.2.0.0";
+const char* const kVersion = "2.0.2";
 
 extern pci_module_info *gPCI;
 

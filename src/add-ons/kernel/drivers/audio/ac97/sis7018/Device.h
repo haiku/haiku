@@ -57,6 +57,8 @@ public:
 static	int32				InterruptHandler(void *interruptParam);
 		void				SignalReadyBuffers();
 
+		class Mixer&		Mixer() { return fMixer; }
+		
 		cpu_status			Lock();
 		void				Unlock(cpu_status st);
 
@@ -90,7 +92,7 @@ private:
 		int32				fInterruptsNest;
 		sem_id				fBuffersReadySem;
 
-		Mixer				fMixer;
+		class Mixer			fMixer;
 		Stream				fPlaybackStream;
 		Stream				fRecordStream;
 };
