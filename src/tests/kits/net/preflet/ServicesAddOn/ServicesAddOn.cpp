@@ -84,7 +84,7 @@ ServicesAddOn::ParseInetd()
 			}
 
 			BString label;
-			token = strtok(l, " \t");	// service name
+			token = strtok(linePtr, " \t");	// service name
 			label << token;
 			token = strtok(NULL, " \t");	// type
 			label << " (" << token << ")";
@@ -120,7 +120,7 @@ ServicesAddOn::ParseXinetd()
 				continue;
 			}
 
-			loc = strstr(l, "service ");
+			loc = strstr(linePtr, "service ");
 
 			if (loc) {
 				BString label;
