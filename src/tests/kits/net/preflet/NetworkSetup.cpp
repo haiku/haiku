@@ -19,6 +19,7 @@
 
 #define APPLICATION_SIGNATURE	"application/x-vnd." SOFTWARE_EDITOR "-" NAME
 
+
 class Application : public BApplication
 {
 	public:

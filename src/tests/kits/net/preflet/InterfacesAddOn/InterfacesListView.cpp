@@ -94,6 +94,8 @@ void
 InterfaceListItem::DrawItem(BView* owner, BRect /*bounds*/, bool complete)
 {
 	BListView* list = dynamic_cast<BListView*>(owner);
+	BString interfaceState;
+
 	if (!list)
 		return;
 
@@ -105,41 +107,60 @@ InterfaceListItem::DrawItem(BView* owner, BRect /*bounds*/, bool complete)
 
 	if (IsSelected() || complete) {
 		if (IsSelected()) {
-			owner->SetHighColor(tint_color(owner->ViewColor(),
+			list->SetHighColor(tint_color(list->ViewColor(),
 				B_HIGHLIGHT_BACKGROUND_TINT));
-	} else {
-		owner->SetHighColor(owner->LowColor());
-	}
+		} else {
+			list->SetHighColor(list->LowColor());
+		}
 
-		owner->FillRect(bounds);
+		list->FillRect(bounds);
 	}
-
-	BPoint iconPt = bounds.LeftTop() + BPoint(4, 4);
-	BPoint namePt(32 + 12, fFirstlineOffset);
-	BPoint v4addrPt(32 + 12, fSecondlineOffset);
-	BPoint v6addrPt(32 + 12, fThirdlineOffset);
 
 	if (fSettings->IsDisabled()) {
-		owner->SetDrawingMode(B_OP_ALPHA);
-		owner->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_OVERLAY);
-		owner->SetHighColor(0, 0, 0, 32);
+		interfaceState << "disabled";
+	} else if ( !fSettings->IP() && fSettings->AutoConfigure()) {
+		interfaceState << "connecting" B_UTF8_ELLIPSIS;
+	} else { /*if (fSettings->IsConnected()) {*/
+		interfaceState << "connected";
+	}
+
+	// Set the initial bounds of item contents
+	BPoint iconPt = bounds.LeftTop();
+	BPoint namePt = bounds.LeftTop();
+	BPoint v4addrPt = bounds.LeftTop();
+	BPoint v6addrPt = bounds.LeftTop();
+	BPoint statePt = bounds.RightTop();
+
+	iconPt += BPoint(4, 4);
+	statePt += BPoint(0, fFirstlineOffset);
+	namePt += BPoint(32 + 12, fFirstlineOffset);
+	v4addrPt += BPoint(32 + 12, fSecondlineOffset);
+	v6addrPt += BPoint(32 + 12, fThirdlineOffset);
+
+	statePt
+		-= BPoint(be_plain_font->StringWidth(interfaceState.String()), 0);
+
+	if (fSettings->IsDisabled()) {
+		list->SetDrawingMode(B_OP_ALPHA);
+		list->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_OVERLAY);
+		list->SetHighColor(0, 0, 0, 32);
 	} else
-		owner->SetDrawingMode(B_OP_OVER);
+		list->SetDrawingMode(B_OP_OVER);
 
-	owner->DrawBitmapAsync(fIcon, iconPt);
+	list->DrawBitmapAsync(fIcon, iconPt);
 
 	if (fSettings->IsDisabled())
-		owner->SetHighColor(tint_color(black, B_LIGHTEN_1_TINT));
+		list->SetHighColor(tint_color(black, B_LIGHTEN_1_TINT));
 	else
-		owner->SetHighColor(black);
+		list->SetHighColor(black);
 
-	owner->SetFont(be_bold_font);
-	owner->DrawString(Name(), namePt);
-	owner->SetFont(be_plain_font);
+	list->SetFont(be_bold_font);
+	list->DrawString(Name(), namePt);
+	list->SetFont(be_plain_font);
 
-	if (fSettings->IsDisabled())
-		owner->DrawString("Disabled", v4addrPt);
-	else {
+	list->DrawString(interfaceState, statePt);
+
+	if (!fSettings->IsDisabled()) {
 		BString v4str("IPv4: ");
 		v4str << fSettings->IP();
 		v4str << " (";
@@ -148,9 +169,9 @@ InterfaceListItem::DrawItem(BView* owner, BRect /*bounds*/, bool complete)
 		else
 			v4str << "manual";
 		v4str << ")";
-		owner->DrawString(v4str.String(), v4addrPt);
+		list->DrawString(v4str.String(), v4addrPt);
 
-		owner->DrawString("IPv6: none (auto)", v6addrPt);
+		list->DrawString("IPv6: none (auto)", v6addrPt);
 			// TODO : where will we keep this?
 	}
 
