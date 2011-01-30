@@ -1,0 +1,13 @@
+1	belarusian	x-vnd.Haiku-ICOTranslator	2249394933
+Cursor	ICOTranslator		Курсор
+Version %d.%d.%d, %s	ConfigView		Версія %d.%d.%d, %s
+Windows %s %ld bit image	ICOTranslator		Выява Windows %s %ld біт
+Windows icon images	ConfigView		Выявы значкаў Windows
+pixel in either direction.	ConfigView		пікселаў у кожным напрамку
+Valid icon sizes are 16, 32, or 48	ConfigView		Стандартныя памеры значкаў 16, 32 або 48
+Enforce valid icon sizes	ConfigView		Выкарыстоўваць стандартныя памеры
+Windows icon translator	ICOTranslator		Канвертар значкаў Windows
+Write 32 bit images on true color input	ConfigView		Запісать выявы ў 32 біт поўны колер
+Icon	ICOTranslator		Значак
+ICOTranslator Settings	ConfigView		Наладкі канвертара ICO
+Windows icon images	ICOTranslator		Выявы значкаў Windows

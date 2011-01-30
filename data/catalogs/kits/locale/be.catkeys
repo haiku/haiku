@@ -1,4 +1,4 @@
-1	belarusian	system	1624661606
+1	belarusian	system	2686335505
 %3.2f GiB	StringForSize		%3.2f ГіБ
 %3.2f KiB	StringForSize		%3.2f КіБ
 %d bytes	StringForSize		%d байтаў
@@ -11,3 +11,9 @@ Close	AboutWindow		Закрыць
 Written by:	AboutWindow		Аўтар(ы):
 About…	AboutWindow		Пра прагарму...
 Copyright © %years% Haiku, Inc.	AboutWindow		Copyright © %years% Haiku, Inc.
+Cut	TextView		Выразаць
+Copy	TextView		Капіяваць
+Paste	TextView		Уставіць
+Redo	TextView		Зрабіць наноў
+Select All	TextView		Пазначыць ўсё
+Undo	TextView		Адвярнуць

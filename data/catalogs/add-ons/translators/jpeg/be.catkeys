@@ -1,0 +1,15 @@
+1	belarusian	x-vnd.Haiku-JPEGTranslator	2665676859
+libjpeg encountered a critical error (caught C++ exception).\n	JPEGTranslator		libjpeg атрымала крытычную памылку (C++ exception).\n
+JPEG Library Error: %s\n	be_jerror		Памылка бібліятэкі JPEG: %s\n
+ISO	exit_parser		ISO
+Low	JPEGTranslator		Нізкая
+ExposureTime	exit_parser		Час экспазіцыі
+Orientation	exit_parser		Арыентацыя
+None	JPEGTranslator		Адсутнічае
+From Type: Jpeg uses unknown color type\n	JPEGTranslator		Зыходны тып: Jpeg выкарыстоўвае невядомы тып колеру.\n
+High	JPEGTranslator		Ныйвышэйшая
+Wrong type: Color space not implemented.\n	JPEGTranslator		Няправільны тып: Палета колераў не падтрымана.\n
+Model	exit_parser		Мадэль
+JPEG Library Warning: %s\n	be_jerror		Папярэджанне бібліятэкі JPEG: %s\n
+Maker	exit_parser		Маркер
+From Type: Jpeg uses hmm... i don't know really :(\n	JPEGTranslator		Зыходны тып: Jpeg выкарыстоўвае невядомы фармат.\n
