@@ -109,7 +109,7 @@ Mixer::_ReadSupportedFormats()
 			fOutputRates |= caps[i].fRate;
 	}
 
-	if(fOutputRates == 0) {
+	if (fOutputRates == 0) {
 		ERROR("Output rates are not guessed. Force to 48 kHz.\n");
 		fOutputRates = B_SR_48000;
 	}
