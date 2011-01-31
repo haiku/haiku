@@ -16,6 +16,8 @@
 #include <NodeMonitor.h>
 #include <util/AutoLock.h>
 
+#include "Attribute.h"
+#include "AttributeIterator.h"
 #include "btrfs.h"
 #include "DirectoryIterator.h"
 #include "Inode.h"
@@ -291,7 +293,6 @@ btrfs_get_file_map(fs_volume* _volume, fs_vnode* _node, off_t offset,
 	size_t size, struct file_io_vec* vecs, size_t* _count)
 {
 	TRACE("btrfs_get_file_map()\n");
-	Volume* volume = (Volume*)_volume->private_volume;
 	Inode* inode = (Inode*)_node->private_node;
 	size_t index = 0, max = *_count;
 
@@ -563,6 +564,177 @@ btrfs_free_dir_cookie(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 }
 
 
+static status_t
+btrfs_open_attr_dir(fs_volume *_volume, fs_vnode *_node, void **_cookie)
+{
+	Inode* inode = (Inode*)_node->private_node;
+	TRACE("%s()\n", __FUNCTION__);
+
+	// on directories too ?
+	if (!inode->IsFile())
+		return EINVAL;
+
+	AttributeIterator* iterator = new(std::nothrow) AttributeIterator(inode);
+	if (iterator == NULL || iterator->InitCheck() != B_OK) {
+		delete iterator;
+		return B_NO_MEMORY;
+	}
+
+	*_cookie = iterator;
+	return B_OK;
+}
+
+
+static status_t
+btrfs_close_attr_dir(fs_volume* _volume, fs_vnode* _node, void* cookie)
+{
+	TRACE("%s()\n", __FUNCTION__);
+	return B_OK;
+}
+
+
+static status_t
+btrfs_free_attr_dir_cookie(fs_volume* _volume, fs_vnode* _node, void* _cookie)
+{
+	TRACE("%s()\n", __FUNCTION__);
+	delete (AttributeIterator*)_cookie;
+	return B_OK;
+}
+
+
+static status_t
+btrfs_read_attr_dir(fs_volume* _volume, fs_vnode* _node,
+				void* _cookie, struct dirent* dirent, size_t bufferSize,
+				uint32* _num)
+{
+	TRACE("%s()\n", __FUNCTION__);
+	AttributeIterator* iterator = (AttributeIterator*)_cookie;
+
+	size_t length = bufferSize;
+	status_t status = iterator->GetNext(dirent->d_name, &length);
+	if (status == B_ENTRY_NOT_FOUND) {
+		*_num = 0;
+		return B_OK;
+	} else if (status != B_OK)
+		return status;
+
+	Volume* volume = (Volume*)_volume->private_volume;
+	dirent->d_dev = volume->ID();
+	dirent->d_reclen = sizeof(struct dirent) + length;
+	*_num = 1;
+
+	return B_OK;
+}
+
+
+static status_t
+btrfs_rewind_attr_dir(fs_volume* _volume, fs_vnode* _node, void* _cookie)
+{
+	DirectoryIterator* iterator = (DirectoryIterator*)_cookie;
+	return iterator->Rewind();
+}
+
+
+	/* attribute operations */
+static status_t
+btrfs_create_attr(fs_volume* _volume, fs_vnode* _node,
+	const char* name, uint32 type, int openMode, void** _cookie)
+{
+	return EROFS;
+}
+
+
+static status_t
+btrfs_open_attr(fs_volume* _volume, fs_vnode* _node, const char* name,
+	int openMode, void** _cookie)
+{
+	TRACE("%s()\n", __FUNCTION__);
+
+	Inode* inode = (Inode*)_node->private_node;
+	Attribute attribute(inode);
+
+	return attribute.Open(name, openMode, (attr_cookie**)_cookie);
+}
+
+
+static status_t
+btrfs_close_attr(fs_volume* _volume, fs_vnode* _node,
+	void* cookie)
+{
+	return B_OK;
+}
+
+
+static status_t
+btrfs_free_attr_cookie(fs_volume* _volume, fs_vnode* _node,
+	void* cookie)
+{
+	delete (attr_cookie*)cookie;
+	return B_OK;
+}
+
+
+static status_t
+btrfs_read_attr(fs_volume* _volume, fs_vnode* _node, void* _cookie,
+	off_t pos, void* buffer, size_t* _length)
+{
+	TRACE("%s()\n", __FUNCTION__);
+
+	attr_cookie* cookie = (attr_cookie*)_cookie;
+	Inode* inode = (Inode*)_node->private_node;
+
+	Attribute attribute(inode, cookie);
+
+	return attribute.Read(cookie, pos, (uint8*)buffer, _length);
+}
+
+
+static status_t
+btrfs_write_attr(fs_volume* _volume, fs_vnode* _node, void* cookie,
+	off_t pos, const void* buffer, size_t* length)
+{
+	return EROFS;
+}
+
+
+
+static status_t
+btrfs_read_attr_stat(fs_volume* _volume, fs_vnode* _node,
+	void* _cookie, struct stat* stat)
+{
+	attr_cookie* cookie = (attr_cookie*)_cookie;
+	Inode* inode = (Inode*)_node->private_node;
+
+	Attribute attribute(inode, cookie);
+
+	return attribute.Stat(*stat);
+}
+
+
+static status_t
+btrfs_write_attr_stat(fs_volume* _volume, fs_vnode* _node,
+	void* cookie, const struct stat* stat, int statMask)
+{
+	return EROFS;
+}
+
+
+static status_t
+btrfs_rename_attr(fs_volume* _volume, fs_vnode* fromVnode,
+	const char* fromName, fs_vnode* toVnode, const char* toName)
+{
+	return EROFS;
+}
+
+
+static status_t
+btrfs_remove_attr(fs_volume* _volume, fs_vnode* vnode,
+	const char* name)
+{
+	return EROFS;
+}
+
+
 fs_volume_ops gBtrfsVolumeOps = {
 	&btrfs_unmount,
 	&btrfs_read_fs_info,
@@ -625,23 +797,23 @@ fs_vnode_ops gBtrfsVnodeOps = {
 	&btrfs_rewind_dir,
 
 	/* attribute directory operations */
-	NULL, 	// fs_open_attr_dir,
-	NULL,	// fs_close_attr_dir,
-	NULL,	// fs_free_attr_dir_cookie,
-	NULL,	// fs_read_attr_dir,
-	NULL,	// fs_rewind_attr_dir,
+	&btrfs_open_attr_dir,
+	&btrfs_close_attr_dir,
+	&btrfs_free_attr_dir_cookie,
+	&btrfs_read_attr_dir,
+	&btrfs_rewind_attr_dir,
 
 	/* attribute operations */
-	NULL,	// fs_create_attr,
-	NULL,	// fs_open_attr,
-	NULL,	// fs_close_attr,
-	NULL,	// fs_free_attr_cookie,
-	NULL,	// fs_read_attr,
-	NULL,	// fs_write_attr,
-	NULL,	// fs_read_attr_stat,
-	NULL,	// fs_write_attr_stat,
-	NULL,	// fs_rename_attr,
-	NULL,	// fs_remove_attr,
+	&btrfs_create_attr,
+	&btrfs_open_attr,
+	&btrfs_close_attr,
+	&btrfs_free_attr_cookie,
+	&btrfs_read_attr,
+	&btrfs_write_attr,
+	&btrfs_read_attr_stat,
+	&btrfs_write_attr_stat,
+	&btrfs_rename_attr,
+	&btrfs_remove_attr,
 };
 
 

@@ -6,6 +6,8 @@ UsePrivateKernelHeaders ;
 
 KernelAddon btrfs :
 	kernel_interface.cpp
+	Attribute.cpp
+	AttributeIterator.cpp
 	BPlusTree.cpp
 	Chunk.cpp
 	CRCTable.cpp
