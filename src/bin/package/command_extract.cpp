@@ -21,7 +21,6 @@
 
 #include <AutoDeleter.h>
 
-#include <package/hpkg/FDCloser.h>
 #include <package/hpkg/PackageContentHandler.h>
 #include <package/hpkg/PackageDataReader.h>
 #include <package/hpkg/PackageEntry.h>
@@ -198,7 +197,6 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 					strerror(errno));
 				return errno;
 		}
-		FDCloser fdCloser(fd);
 
 		// write data
 		status_t error;
@@ -210,10 +208,9 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 		} else
 			error = _ExtractFileData(&fPackageFileReader, data, fd);
 
-		if (error != B_OK)
-			return error;
+		close(fd);
 
-		return B_OK;
+		return error;
 	}
 
 	virtual status_t HandleEntryDone(BPackageEntry* entry)
