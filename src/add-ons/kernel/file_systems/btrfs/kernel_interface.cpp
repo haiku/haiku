@@ -155,7 +155,7 @@ btrfs_read_fs_info(fs_volume* _volume, struct fs_info* info)
 	Volume* volume = (Volume*)_volume->private_volume;
 
 	// File system flags
-	info->flags = B_FS_IS_PERSISTENT
+	info->flags = B_FS_IS_PERSISTENT | B_FS_HAS_ATTR
 		| (volume->IsReadOnly() ? B_FS_IS_READONLY : 0);
 	info->io_size = BTRFS_IO_SIZE;
 	info->block_size = volume->BlockSize();
