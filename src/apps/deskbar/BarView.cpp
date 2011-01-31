@@ -442,10 +442,8 @@ TBarView::ChangeState(int32 state, bool vertical, bool left, bool top)
 
 	// Send a message to the preferences window to let it know to enable
 	// or disabled preference items
-	if (stateChanged || vertSwap) {
-		BMessage message(kStateChanged);
-		be_app->PostMessage(&message);
-	}
+	if (stateChanged || vertSwap)
+		be_app->PostMessage(kStateChanged);
 
 	BRect screenFrame = (BScreen(Window())).Frame();
 
