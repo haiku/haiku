@@ -1,4 +1,4 @@
-1	finnish	system	1624661606
+1	finnish	system	2686335505
 %3.2f GiB	StringForSize		%3.2f gibitavua
 %3.2f KiB	StringForSize		%3.2f kibitavua
 %d bytes	StringForSize		%d tavua
@@ -11,3 +11,9 @@ Close	AboutWindow		Sulje
 Written by:	AboutWindow		Tekijä:
 About…	AboutWindow		Ohjelmasta...
 Copyright © %years% Haiku, Inc.	AboutWindow		Copyright © %years% Haiku, Inc.
+Cut	TextView		Leikkaa
+Copy	TextView		Kopioi
+Paste	TextView		Liitä
+Redo	TextView		Tee uudelleen
+Select All	TextView		Valitse kaikki
+Undo	TextView		Peru

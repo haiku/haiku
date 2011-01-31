@@ -1,7 +1,7 @@
 1	finnish	x-vnd.Haiku-Appearance	3612090060
 Control highlight	Colors tab		Kontrollin korostus
 Control border	Colors tab		Kontrollin reuna
-Antialiasing type:	AntialiasingSettingsView		Reunanpehmennystapa :
+Antialiasing type:	AntialiasingSettingsView		Reunanpehmennystapa:
 Shadow	Colors tab		Varjo
 On	AntialiasingSettingsView		Päällä
 Defaults	APRWindow		Oletusasetukset
@@ -30,7 +30,7 @@ Colors	APRWindow		Värit
 Control background	Colors tab		Kontrollin tausta
 Inactive window tab	Colors tab		Epäaktiivisen ikkunakahvan väri
 Reduce colored edges filter strength:	AntialiasingSettingsView		Vähennä värillisten reunojen suodatuksen vahvuutta:
-Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Alipikselipohjainen reunanpehmennys ei ole saatavilla tässä Haiku versiossa patenttisyiden takia. Ominaisuuden saaminen käyttöön vaatii Haikun uudelleenkääntämistä ja eräiden optioiden aktivoimista libfreetype:n määrittelytiedostoissa.
+Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Alipikselipohjainen reunanpehmennys yhdistettynä kirjoitusmerkkiviimeistelyyn ei ole saatavilla tässä Haiku-versiossa patenttisyiden takia. Ominaisuuden saaminen käyttöön vaatii Haikun uudelleenkääntämistä ja eräiden optioiden aktivoimista libfreetype:n määrittelytiedostoissa.
 Control text	Colors tab		Kontrollin teksti
 Tooltip text	Colors tab		Työkaluvinkin teksti
 Menu item text	Colors tab		Valikkovalinnan teksti
@@ -38,6 +38,6 @@ LCD subpixel	AntialiasingSettingsView		LCD alipikseli
 Selected menu item border	Colors tab		Valitun valikkovalinnan reuna
 Strong	AntialiasingSettingsView		Vahva
 Panel text	Colors tab		Paneelin teksti
-Monospaced fonts only	AntialiasingSettingsView		Vain monospace fontti
+Monospaced fonts only	AntialiasingSettingsView		Vain monospace-kirjasimet
 Antialiasing menu	AntialiasingSettingsView		Reunanpehmennysvalikko
-Glyph hinting:	AntialiasingSettingsView		Merkin vinkkaus :
+Glyph hinting:	AntialiasingSettingsView		Kirjoitusmerkin viimeistely:

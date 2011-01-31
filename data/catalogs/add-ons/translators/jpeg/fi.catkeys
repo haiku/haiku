@@ -1,0 +1,15 @@
+1	finnish	x-vnd.Haiku-JPEGTranslator	2665676859
+libjpeg encountered a critical error (caught C++ exception).\n	JPEGTranslator		libjpeg kohtasi kriittisen virheen (siepattu C++-poikkeus).\n
+JPEG Library Error: %s\n	be_jerror		JPEG-kirjastovirhe: %s\n
+ISO	exit_parser		ISO
+Low	JPEGTranslator		Alhainen
+ExposureTime	exit_parser		Valotusaika
+Orientation	exit_parser		Suuntaus
+None	JPEGTranslator		Ei mikään
+From Type: Jpeg uses unknown color type\n	JPEGTranslator		Tyypistä: Jpeg käyttää tuntematonta värityyppiä\n
+High	JPEGTranslator		Korkea
+Wrong type: Color space not implemented.\n	JPEGTranslator		Väärä tyyppi: Väritila ei ole toteutettu.\n
+Model	exit_parser		Malli
+JPEG Library Warning: %s\n	be_jerror		JPEG-kirjastovaroitus: %s\n
+Maker	exit_parser		Tekijä
+From Type: Jpeg uses hmm... i don't know really :(\n	JPEGTranslator		Tyypistä: Jpeg käyttää hmm... en todella tiedä :(\n

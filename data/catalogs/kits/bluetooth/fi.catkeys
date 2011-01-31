@@ -5,7 +5,7 @@ Printer	DeviceClass		Tulostin
 Uncategorized	DeviceClass		Luokittelematon
 1-17% utilized	DeviceClass		1-17% käytetty hyödyksi
 Positioning	DeviceClass		Sijoittelu
-Rendering	DeviceClass		Renderointi
+Rendering	DeviceClass		Renderöidään
 Phone	DeviceClass		Puhelin
 17-33% utilized	DeviceClass		17-33% käytetty hyödyksi
 #ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady#Ei ole kelvollinen nimi
@@ -13,7 +13,7 @@ Combo keyboard/pointing device	DeviceClass		Yhdistelmänäppäimistö/osoituslai
 Controller	DeviceClass		Ohjain
 No service available	DeviceClass		Palvelu ei ole käytettävissä
 Wearable	DeviceClass	A wearable computer	Päälle puettava
-Handheld	DeviceClass		Kädessä pidettävä
+Handheld	DeviceClass		Kämmenlaite
 Invalid device class!\n	DeviceClass		Virheellinen laiteluokka
 Sensing device	DeviceClass		Tuntolaite
 Computer	DeviceClass		Tietokone

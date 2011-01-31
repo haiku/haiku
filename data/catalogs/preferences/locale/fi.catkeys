@@ -16,10 +16,10 @@ Date	TimeFormatSettings		Päivämäärä
 12 hour	TimeFormatSettings		12 tuntia
 Locale	Locale Preflet		Maa-asetus
 already chosen	LanguageListView		jo valittu
-Negative:	TimeFormatSettings		Kielteinen:
+Negative:	TimeFormatSettings		Negatiivinen:
 Use month/day-names from preferred language	TimeFormatSettings		Käytä ensisijaisen kielen kuukausi/päivä -nimiä
 Formatting	Locale Preflet Window		Muotoillaan
 Locale	Locale Preflet Window		Maa-asetus
 Full format:	TimeFormatSettings		Kokonainen muoto:
 Medium format:	TimeFormatSettings		Keskikokoinen muoto:
-Positive:	TimeFormatSettings		Myönteinen:
+Positive:	TimeFormatSettings		Positiivinen:
