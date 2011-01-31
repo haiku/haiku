@@ -4526,7 +4526,8 @@ BPoseView::HandleDropCommon(BMessage *message, Model *targetModel, BPose *target
 		poseView->ResetPosePlacementHint();
 	}
 
-	if (srcWindow == containerWindow && DragSelectionContains(targetPose, message)) {
+	if (srcWindow == containerWindow && DragSelectionContains(targetPose,
+		message)) {
 		// drop on self
 		targetModel = NULL;
 	}
@@ -4534,7 +4535,7 @@ BPoseView::HandleDropCommon(BMessage *message, Model *targetModel, BPose *target
 	bool wasHandled = false;
 	bool ignoreTypes = (modifiers() & B_CONTROL_KEY) != 0;
 
-	if (targetModel) {
+	if (targetModel && containerWindow != NULL) {
 		// TODO: pick files to drop/launch on a case by case basis
 		if (targetModel->IsDirectory()) {
 			MoveSelectionInto(targetModel, srcWindow, containerWindow, buttons, dropPt,
