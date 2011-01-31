@@ -19,6 +19,7 @@
 #include <new>
 
 #include <ByteOrder.h>
+#include <Entry.h>
 #include <fs_attr.h>
 
 #include <AutoDeleter.h>
@@ -301,7 +302,6 @@ struct PackageWriterImpl::Entry : DoublyLinkedListLinkImpl<Entry> {
 		fNameLength(nameLength),
 		fIsImplicit(isImplicit)
 	{
-printf("%p->Entry::Entry(\"%s\", %lu, %d)\n", this, name, nameLength, isImplicit);
 	}
 
 	~Entry()
@@ -431,10 +431,11 @@ struct PackageWriterImpl::DummyDataWriter : DataWriter {
 
 
 struct PackageWriterImpl::FDDataWriter : DataWriter {
-	FDDataWriter(int fd, off_t offset)
+	FDDataWriter(int fd, off_t offset, BPackageWriterListener* listener)
 		:
 		fFD(fd),
-		fOffset(offset)
+		fOffset(offset),
+		fListener(listener)
 	{
 	}
 
@@ -442,13 +443,15 @@ struct PackageWriterImpl::FDDataWriter : DataWriter {
 	{
 		ssize_t bytesWritten = pwrite(fFD, buffer, size, fOffset);
 		if (bytesWritten < 0) {
-			fprintf(stderr, "_WriteBuffer(%p, %lu) failed to write data: %s\n",
+			fListener->PrintError(
+				"_WriteBuffer(%p, %lu) failed to write data: %s\n",
 				buffer, size, strerror(errno));
 			return errno;
 		}
 		if ((size_t)bytesWritten != size) {
-			fprintf(stderr, "_WriteBuffer(%p, %lu) failed to write all data\n",
-				buffer, size);
+			fListener->PrintError(
+				"_WriteBuffer(%p, %lu) failed to write all data\n", buffer,
+				size);
 			return B_ERROR;
 		}
 
@@ -463,9 +466,29 @@ struct PackageWriterImpl::FDDataWriter : DataWriter {
 	}
 
 private:
-	int		fFD;
-	off_t	fOffset;
+	int						fFD;
+	off_t					fOffset;
+	BPackageWriterListener* fListener;
 };
+
+
+struct PackageWriterImpl::SubPathAdder {
+	SubPathAdder(char* pathBuffer, const char* subPath)
+		: fOriginalPathEnd(pathBuffer + strlen(pathBuffer))
+	{
+		strcat(pathBuffer, "/");
+		strcat(pathBuffer, subPath);
+	}
+
+	~SubPathAdder()
+	{
+		*fOriginalPathEnd = '\0';
+	}
+private:
+	char* fOriginalPathEnd;
+};
+
+
 
 
 struct PackageWriterImpl::ZlibDataWriter : DataWriter, private BDataOutput {
@@ -542,8 +565,9 @@ PackageWriterImpl::_AddAttribute(const char* attributeName, Type value)
 // #pragma mark - PackageWriterImpl
 
 
-PackageWriterImpl::PackageWriterImpl()
+PackageWriterImpl::PackageWriterImpl(BPackageWriterListener* listener)
 	:
+	fListener(listener),
 	fFileName(NULL),
 	fFD(-1),
 	fFinished(false),
@@ -600,7 +624,7 @@ PackageWriterImpl::Init(const char* fileName)
 	} catch (status_t error) {
 		return error;
 	} catch (std::bad_alloc) {
-		fprintf(stderr, "Out of memory!\n");
+		fListener->PrintError("Out of memory!\n");
 		return B_NO_MEMORY;
 	}
 }
@@ -610,11 +634,29 @@ status_t
 PackageWriterImpl::AddEntry(const char* fileName)
 {
 	try {
+		// if it's ".PackageInfo", parse it
+		if (strcmp(fileName, B_HPKG_PACKAGE_INFO_FILE_NAME) == 0) {
+			struct ErrorListener : public BPackageInfo::ParseErrorListener {
+				ErrorListener(BPackageWriterListener* _listener)
+					: listener(_listener) {}
+				virtual void OnError(const BString& msg, int line, int col) {
+					listener->PrintError("Parse error in %s(%d:%d) -> %s\n",
+						B_HPKG_PACKAGE_INFO_FILE_NAME, line, col, msg.String());
+				}
+				BPackageWriterListener* listener;
+			} errorListener(fListener);
+			BEntry packageInfoEntry(fileName);
+			status_t result = fPackageInfo.ReadFromConfigFile(packageInfoEntry,
+				&errorListener);
+			if (result != B_OK || (result = fPackageInfo.InitCheck()) != B_OK)
+				return result;
+		}
+
 		return _RegisterEntry(fileName);
 	} catch (status_t error) {
 		return error;
 	} catch (std::bad_alloc) {
-		fprintf(stderr, "Out of memory!\n");
+		fListener->PrintError("Out of memory!\n");
 		return B_NO_MEMORY;
 	}
 }
@@ -624,11 +666,16 @@ status_t
 PackageWriterImpl::Finish()
 {
 	try {
+		if (fPackageInfo.InitCheck() != B_OK) {
+			fListener->PrintError("No package-info file found (%s)!\n",
+				B_HPKG_PACKAGE_INFO_FILE_NAME);
+			return B_BAD_DATA;
+		}
 		return _Finish();
 	} catch (status_t error) {
 		return error;
 	} catch (std::bad_alloc) {
-		fprintf(stderr, "Out of memory!\n");
+		fListener->PrintError("Out of memory!\n");
 		return B_NO_MEMORY;
 	}
 }
@@ -659,7 +706,7 @@ PackageWriterImpl::_Init(const char* fileName)
 	fFD = open(fileName, O_WRONLY | O_CREAT | O_TRUNC,
 		S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 	if (fFD < 0) {
-		fprintf(stderr, "Error: Failed to open package file \"%s\": %s\n",
+		fListener->PrintError("Failed to open package file \"%s\": %s\n",
 			fileName, strerror(errno));
 		return errno;
 	}
@@ -680,11 +727,12 @@ PackageWriterImpl::_Finish()
 	// write entries
 	for (EntryList::ConstIterator it = fRootEntry->ChildIterator();
 			Entry* entry = it.Next();) {
-		_AddEntry(AT_FDCWD, entry, entry->Name());
+		char pathBuffer[B_PATH_NAME_LENGTH];
+		pathBuffer[0] = '\0';
+		_AddEntry(AT_FDCWD, entry, entry->Name(), pathBuffer);
 	}
 
-printf("header size:             %lu\n", sizeof(hpkg_header));
-printf("heap size:               %lld\n", fHeapEnd - sizeof(hpkg_header));
+	off_t heapSize = fHeapEnd - sizeof(hpkg_header);
 
 	hpkg_header header;
 
@@ -693,7 +741,11 @@ printf("heap size:               %lld\n", fHeapEnd - sizeof(hpkg_header));
 	_WritePackageAttributes(header);
 
 	off_t totalSize = fHeapEnd;
-printf("total size:              %lld\n", totalSize);
+
+	fListener->OnPackageSizeInfo(sizeof(hpkg_header), heapSize,
+		B_BENDIAN_TO_HOST_INT64(header.toc_length_compressed),
+		B_BENDIAN_TO_HOST_INT32(header.attributes_length_compressed),
+		totalSize);
 
 	// prepare the header
 
@@ -716,7 +768,7 @@ status_t
 PackageWriterImpl::_RegisterEntry(const char* fileName)
 {
 	if (*fileName == '\0') {
-		fprintf(stderr, "Error: Invalid empty file name\n");
+		fListener->PrintError("Invalid empty file name\n");
 		return B_BAD_VALUE;
 	}
 
@@ -758,7 +810,7 @@ PackageWriterImpl::_RegisterEntry(Entry* parent, const char* name,
 	// check the component name -- don't allow "." or ".."
 	if (name[0] == '.'
 		&& (nameLength == 1 || (nameLength == 2 && name[1] == '.'))) {
-		fprintf(stderr, "Error: Invalid file name: \".\" and \"..\" "
+		fListener->PrintError("Invalid file name: \".\" and \"..\" "
 			"are not allowed as path components\n");
 		throw status_t(B_BAD_VALUE);
 	}
@@ -787,7 +839,7 @@ PackageWriterImpl::_WriteTOC(hpkg_header& header)
 {
 	// prepare the writer (zlib writer on top of a file writer)
 	off_t startOffset = fHeapEnd;
-	FDDataWriter realWriter(fFD, startOffset);
+	FDDataWriter realWriter(fFD, startOffset, fListener);
 	ZlibDataWriter zlibWriter(&realWriter);
 	fDataWriter = &zlibWriter;
 	zlibWriter.Init();
@@ -805,11 +857,11 @@ PackageWriterImpl::_WriteTOC(hpkg_header& header)
 	fHeapEnd = realWriter.Offset();
 	fDataWriter = NULL;
 
-printf("attributes types size:   %llu\n", uncompressedAttributeTypesSize);
-printf("cached strings size:     %llu\n", uncompressedStringsSize);
-printf("TOC main size:           %llu\n", uncompressedMainSize);
 	off_t endOffset = fHeapEnd;
-printf("total TOC size:          %llu (%llu)\n", endOffset - startOffset, zlibWriter.BytesWritten());
+
+	fListener->OnTOCSizeInfo(uncompressedAttributeTypesSize,
+		uncompressedStringsSize, uncompressedMainSize,
+		zlibWriter.BytesWritten());
 
 	// update the header
 
@@ -956,7 +1008,7 @@ PackageWriterImpl::_WritePackageAttributes(hpkg_header& header)
 {
 	// write the package attributes
 	off_t startOffset = fHeapEnd;
-	FDDataWriter realWriter(fFD, startOffset);
+	FDDataWriter realWriter(fFD, startOffset, fListener);
 	fDataWriter = &realWriter;
 
 	_Write<uint8>(0);
@@ -966,7 +1018,7 @@ PackageWriterImpl::_WritePackageAttributes(hpkg_header& header)
 
 	off_t endOffset = fHeapEnd;
 
-printf("package attributes size: %lld\n", endOffset - startOffset);
+	fListener->OnPackageAttributesSizeInfo(endOffset - startOffset);
 
 	// update the header
 	header.attributes_compression = B_HOST_TO_BENDIAN_INT32(
@@ -1008,7 +1060,7 @@ PackageWriterImpl::_WriteAttributeValue(const AttributeValue& value,
 					break;
 				default:
 				{
-					fprintf(stderr, "_WriteAttributeValue(): invalid "
+					fListener->PrintError("_WriteAttributeValue(): invalid "
 						"encoding %d for int value type %d\n", encoding,
 						value.type);
 					throw status_t(B_BAD_VALUE);
@@ -1038,7 +1090,7 @@ PackageWriterImpl::_WriteAttributeValue(const AttributeValue& value,
 		}
 
 		default:
-			fprintf(stderr, "_WriteAttributeValue(): invalid value type: "
+			fListener->PrintError("_WriteAttributeValue(): invalid value type: "
 				"%d\n", value.type);
 			throw status_t(B_BAD_VALUE);
 	}
@@ -1065,30 +1117,37 @@ PackageWriterImpl::_WriteBuffer(const void* buffer, size_t size, off_t offset)
 {
 	ssize_t bytesWritten = pwrite(fFD, buffer, size, offset);
 	if (bytesWritten < 0) {
-		fprintf(stderr, "_WriteBuffer(%p, %lu) failed to write data: %s\n",
-			buffer, size, strerror(errno));
+		fListener->PrintError(
+			"_WriteBuffer(%p, %lu) failed to write data: %s\n", buffer, size,
+			strerror(errno));
 		throw status_t(errno);
 	}
 	if ((size_t)bytesWritten != size) {
-		fprintf(stderr, "_WriteBuffer(%p, %lu) failed to write all data\n",
-			buffer, size);
+		fListener->PrintError(
+			"_WriteBuffer(%p, %lu) failed to write all data\n", buffer, size);
 		throw status_t(B_ERROR);
 	}
 }
 
 
 void
-PackageWriterImpl::_AddEntry(int dirFD, Entry* entry, const char* fileName)
+PackageWriterImpl::_AddEntry(int dirFD, Entry* entry, const char* fileName,
+	char* pathBuffer)
 {
-printf("PackageWriter::_AddEntry(%d, %p, \"%s\")\n", dirFD, entry, fileName);
 	bool isImplicitEntry = entry != NULL && entry->IsImplicit();
+
+	SubPathAdder pathAdder(pathBuffer, fileName);
+	if (!isImplicitEntry) {
+		fListener->OnEntryAdded(pathBuffer + 1);
+			// pathBuffer + 1 in order to skip leading slash
+	}
 
 	// open the node
 	int fd = openat(dirFD, fileName,
 		O_RDONLY | (isImplicitEntry ? 0 : O_NOTRAVERSE));
 	if (fd < 0) {
-		fprintf(stderr, "Error: Failed to open entry \"%s\": %s\n",
-			fileName, strerror(errno));
+		fListener->PrintError("Failed to open entry \"%s\": %s\n", fileName,
+			strerror(errno));
 		throw status_t(errno);
 	}
 	FileDescriptorCloser fdCloser(fd);
@@ -1096,14 +1155,14 @@ printf("PackageWriter::_AddEntry(%d, %p, \"%s\")\n", dirFD, entry, fileName);
 	// stat the node
 	struct stat st;
 	if (fstat(fd, &st) < 0) {
-		fprintf(stderr, "Error: Failed to fstat() file \"%s\": %s\n",
-			fileName, strerror(errno));
+		fListener->PrintError("Failed to fstat() file \"%s\": %s\n", fileName,
+			strerror(errno));
 		throw status_t(errno);
 	}
 
 	// implicit entries must be directories
 	if (isImplicitEntry && !S_ISDIR(st.st_mode)) {
-		fprintf(stderr, "Error: Non-leaf path component \"%s\" is not a "
+		fListener->PrintError("Non-leaf path component \"%s\" is not a "
 			"directory\n", fileName);
 		throw status_t(B_BAD_VALUE);
 	}
@@ -1122,7 +1181,7 @@ printf("PackageWriter::_AddEntry(%d, %p, \"%s\")\n", dirFD, entry, fileName);
 		defaultPermissions = B_HPKG_DEFAULT_DIRECTORY_PERMISSIONS;
 	} else {
 		// unsupported node type
-		fprintf(stderr, "Error: Unsupported node type, entry: \"%s\"\n",
+		fListener->PrintError("Unsupported node type, entry: \"%s\"\n",
 			fileName);
 		throw status_t(B_UNSUPPORTED);
 	}
@@ -1159,7 +1218,7 @@ printf("PackageWriter::_AddEntry(%d, %p, \"%s\")\n", dirFD, entry, fileName);
 		ssize_t bytesRead = readlinkat(dirFD, fileName, path,
 			B_PATH_NAME_LENGTH);
 		if (bytesRead < 0) {
-			fprintf(stderr, "Error: Failed to read symlink \"%s\": %s\n",
+			fListener->PrintError("Failed to read symlink \"%s\": %s\n",
 				fileName, strerror(errno));
 			throw status_t(errno);
 		}
@@ -1175,9 +1234,9 @@ printf("PackageWriter::_AddEntry(%d, %p, \"%s\")\n", dirFD, entry, fileName);
 		while (dirent* entry = readdir(attrDir)) {
 			attr_info attrInfo;
 			if (fs_stat_attr(fd, entry->d_name, &attrInfo) < 0) {
-				fprintf(stderr, "Error: Failed to stat attribute \"%s\" of "
-					"file \"%s\": %s\n", entry->d_name, fileName,
-					strerror(errno));
+				fListener->PrintError(
+					"Failed to stat attribute \"%s\" of file \"%s\": %s\n",
+					entry->d_name, fileName, strerror(errno));
 				throw status_t(errno);
 			}
 
@@ -1205,21 +1264,22 @@ printf("PackageWriter::_AddEntry(%d, %p, \"%s\")\n", dirFD, entry, fileName);
 			// this is an implicit entry -- just add it's children
 			for (EntryList::ConstIterator it = entry->ChildIterator();
 					Entry* child = it.Next();) {
-				_AddEntry(fd, child, child->Name());
+				_AddEntry(fd, child, child->Name(), pathBuffer);
 			}
 		} else {
 			// we need to clone the directory FD for fdopendir()
 			int clonedFD = dup(fd);
 			if (clonedFD < 0) {
-				fprintf(stderr, "Error: Failed to dup() directory FD: %s\n",
-					strerror(errno));
+				fListener->PrintError(
+					"Failed to dup() directory FD: %s\n", strerror(errno));
 				throw status_t(errno);
 			}
 
 			DIR* dir = fdopendir(clonedFD);
 			if (dir == NULL) {
-				fprintf(stderr, "Error: Failed to open directory \"%s\": %s\n",
-					fileName, strerror(errno));
+				fListener->PrintError(
+					"Failed to open directory \"%s\": %s\n", fileName,
+					strerror(errno));
 				close(clonedFD);
 				throw status_t(errno);
 			}
@@ -1232,7 +1292,7 @@ printf("PackageWriter::_AddEntry(%d, %p, \"%s\")\n", dirFD, entry, fileName);
 					continue;
 				}
 
-				_AddEntry(fd, NULL, entry->d_name);
+				_AddEntry(fd, NULL, entry->d_name, pathBuffer);
 			}
 		}
 	}
@@ -1332,8 +1392,7 @@ PackageWriterImpl::_AddData(BDataReader& dataReader, off_t size)
 		uint8 buffer[B_HPKG_MAX_INLINE_DATA_SIZE];
 		status_t error = dataReader.ReadData(0, buffer, size);
 		if (error != B_OK) {
-			fprintf(stderr, "Error: Failed to read data: %s\n",
-				strerror(error));
+			fListener->PrintError("Failed to read data: %s\n", strerror(error));
 			return error;
 		}
 
@@ -1388,20 +1447,19 @@ PackageWriterImpl::_WriteUncompressedData(BDataReader& dataReader, off_t size,
 		size_t toCopy = std::min(remainingSize, (off_t)fDataBufferSize);
 		status_t error = dataReader.ReadData(readOffset, fDataBuffer, toCopy);
 		if (error != B_OK) {
-			fprintf(stderr, "Error: Failed to read data: %s\n",
-				strerror(error));
+			fListener->PrintError("Failed to read data: %s\n", strerror(error));
 			return error;
 		}
 
 		// write to heap
 		ssize_t bytesWritten = pwrite(fFD, fDataBuffer, toCopy, writeOffset);
 		if (bytesWritten < 0) {
-			fprintf(stderr, "Error: Failed to write data: %s\n",
+			fListener->PrintError("Failed to write data: %s\n",
 				strerror(errno));
 			return errno;
 		}
 		if ((size_t)bytesWritten != toCopy) {
-			fprintf(stderr, "Error: Failed to write all data\n");
+			fListener->PrintError("Failed to write all data\n");
 			return B_ERROR;
 		}
 
@@ -1450,8 +1508,7 @@ PackageWriterImpl::_WriteZlibCompressedData(BDataReader& dataReader, off_t size,
 		size_t toCopy = std::min(remainingSize, (off_t)chunkSize);
 		status_t error = dataReader.ReadData(readOffset, inputBuffer, toCopy);
 		if (error != B_OK) {
-			fprintf(stderr, "Error: Failed to read data: %s\n",
-				strerror(error));
+			fListener->PrintError("Failed to read data: %s\n", strerror(error));
 			return error;
 		}
 
@@ -1483,12 +1540,12 @@ PackageWriterImpl::_WriteZlibCompressedData(BDataReader& dataReader, off_t size,
 		ssize_t bytesWritten = pwrite(fFD, writeBuffer, bytesToWrite,
 			writeOffset);
 		if (bytesWritten < 0) {
-			fprintf(stderr, "Error: Failed to write data: %s\n",
+			fListener->PrintError("Failed to write data: %s\n",
 				strerror(errno));
 			return errno;
 		}
 		if ((size_t)bytesWritten != bytesToWrite) {
-			fprintf(stderr, "Error: Failed to write all data\n");
+			fListener->PrintError("Failed to write all data\n");
 			return B_ERROR;
 		}
 
@@ -1504,12 +1561,12 @@ PackageWriterImpl::_WriteZlibCompressedData(BDataReader& dataReader, off_t size,
 		ssize_t bytesWritten = pwrite(fFD, offsetTable, bytesToWrite,
 			offsetTableOffset);
 		if (bytesWritten < 0) {
-			fprintf(stderr, "Error: Failed to write data: %s\n",
+			fListener->PrintError("Failed to write data: %s\n",
 				strerror(errno));
 			return errno;
 		}
 		if ((size_t)bytesWritten != bytesToWrite) {
-			fprintf(stderr, "Error: Failed to write all data\n");
+			fListener->PrintError("Failed to write all data\n");
 			return B_ERROR;
 		}
 	}

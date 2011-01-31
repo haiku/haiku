@@ -9,19 +9,19 @@
 #include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h>
 
+#include <package/PackageInfo.h>
+#include <package/hpkg/PackageWriter.h>
 #include <package/hpkg/Strings.h>
 
 
 namespace BPackageKit {
 
 
-class BPackageInfo;
-
-
 namespace BHPKG {
 
 
 class BDataReader;
+class BErrorOutput;
 
 
 namespace BPrivate {
@@ -31,7 +31,8 @@ struct hpkg_header;
 
 class PackageWriterImpl {
 public:
-								PackageWriterImpl();
+								PackageWriterImpl(
+									BPackageWriterListener* listener);
 								~PackageWriterImpl();
 
 			status_t			Init(const char* fileName);
@@ -49,6 +50,7 @@ private:
 			struct DataWriter;
 			struct DummyDataWriter;
 			struct FDDataWriter;
+			struct SubPathAdder;
 			struct ZlibDataWriter;
 
 			typedef BOpenHashTable<AttributeTypeHashDefinition>
@@ -86,7 +88,7 @@ private:
 									off_t offset);
 
 			void				_AddEntry(int dirFD, Entry* entry,
-									const char* fileName);
+									const char* fileName, char* pathBuffer);
 
 			Attribute*			_AddAttribute(const char* attributeName,
 									const AttributeValue& value);
@@ -114,6 +116,8 @@ private:
 									uint64& _compressedSize);
 
 private:
+			BPackageWriterListener*	fListener;
+
 			const char*			fFileName;
 			int					fFD;
 			bool				fFinished;
@@ -121,6 +125,8 @@ private:
 			off_t				fHeapEnd;
 			void*				fDataBuffer;
 			size_t				fDataBufferSize;
+
+			BPackageInfo		fPackageInfo;
 
 			DataWriter*			fDataWriter;
 

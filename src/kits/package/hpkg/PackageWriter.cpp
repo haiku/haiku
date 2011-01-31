@@ -16,9 +16,9 @@ namespace BPackageKit {
 namespace BHPKG {
 
 
-BPackageWriter::BPackageWriter()
+BPackageWriter::BPackageWriter(BPackageWriterListener* listener)
 	:
-	fImpl(new (std::nothrow) PackageWriterImpl())
+	fImpl(new (std::nothrow) PackageWriterImpl(listener))
 {
 }
 
