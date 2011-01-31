@@ -38,7 +38,8 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 	_BuildProfilesMenu(profilesPopup, SELECT_PROFILE_MSG);
 
 	BMenuField *profilesMenuField = new BMenuField("profiles_menu",
-			B_TRANSLATE("Profile:"), profilesPopup);
+		B_TRANSLATE("Profile:"), profilesPopup);
+
 	profilesMenuField->SetFont(be_bold_font);
 
 	// ---- Settings section
@@ -49,16 +50,11 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 	BBox *bottomDivider = new BBox(B_EMPTY_STRING);
 	bottomDivider->SetBorder(B_PLAIN_BORDER);
 
-	BCheckBox *dontTouchCheckBox = new BCheckBox("dont_touch",
-			B_TRANSLATE("Prevent unwanted changes"),
-			new BMessage(DONT_TOUCH_MSG));
-	dontTouchCheckBox->SetValue(B_CONTROL_ON);
-
-	fApplyNowButton = new BButton("apply_now", B_TRANSLATE("Apply Now"),
-			new BMessage(APPLY_NOW_MSG));
+	fApplyButton = new BButton("apply", B_TRANSLATE("Apply"),
+		new BMessage(APPLY_NOW_MSG));
 
 	fRevertButton = new BButton("revert", B_TRANSLATE("Revert"),
-			new BMessage(REVERT_MSG));
+		new BMessage(REVERT_MSG));
 	fRevertButton->SetEnabled(false);
 
 	// Enable boxes resizing modes
@@ -75,9 +71,8 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 		.Add(fPanel)
 		.Add(bottomDivider)
 		.AddGroup(B_HORIZONTAL, 5)
-			.Add(dontTouchCheckBox)
 			.Add(fRevertButton)
-			.Add(fApplyNowButton)
+			.Add(fApplyButton)
 		.End()
 		.SetInsets(10, 10, 10, 10)
 	);
@@ -86,7 +81,7 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 
 	bottomDivider->SetExplicitMaxSize(BSize(B_SIZE_UNSET, 1));
 	fPanel->SetExplicitMinSize(BSize(fMinAddonViewRect.Width(),
-			fMinAddonViewRect.Height()));
+		fMinAddonViewRect.Height()));
 
 	fAddonView = NULL;
 
@@ -129,7 +124,7 @@ NetworkSetupWindow::MessageReceived(BMessage*	msg)
 		is_default = (strcmp(name.Leaf(), "default") == 0);
 		is_current = (strcmp(name.Leaf(), "current") == 0);
 
-		fApplyNowButton->SetEnabled(!is_current);
+		fApplyButton->SetEnabled(!is_current);
 		break;
 	}
 
@@ -139,7 +134,7 @@ NetworkSetupWindow::MessageReceived(BMessage*	msg)
 
 		fAddonView = NULL;
 		if (msg->FindPointer("addon_view", (void **) &fAddonView) != B_OK)
-				break;
+			break;
 
 		fPanel->AddChild(fAddonView);
 		fAddonView->ResizeTo(fPanel->Bounds().Width(),
@@ -284,7 +279,7 @@ NetworkSetupWindow::_BuildShowTabView(int32 msg_what)
 					msg->AddPointer("addon_view", addon_view);
 
 					BTab *tab = new BTab;
-					fPanel->AddTab(addon_view,tab);
+					fPanel->AddTab(addon_view, tab);
 					tab->SetLabel(addon->Name());
 					n++;
 				}

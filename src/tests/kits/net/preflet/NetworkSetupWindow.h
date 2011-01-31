@@ -45,7 +45,7 @@ class NetworkSetupWindow : public BWindow
 	
 		BButton*	fHelpButton;
 		BButton*	fRevertButton;
-		BButton*	fApplyNowButton;
+		BButton*	fApplyButton;
 
 		BTabView*	fPanel;
 		BView*		fAddonView;
