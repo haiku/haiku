@@ -24,7 +24,6 @@
 #include <Notifications.h>
 
 #include <package/hpkg/ErrorOutput.h>
-#include <package/hpkg/FDCloser.h>
 #include <package/hpkg/PackageEntry.h>
 #include <package/hpkg/PackageEntryAttribute.h>
 #include <package/hpkg/PackageReaderImpl.h>

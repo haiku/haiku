@@ -94,17 +94,6 @@ printf("Init(): %s\n", strerror(error));
 					|| strcmp(entry->d_name, "..") == 0)
 					continue;
 
-if (strcmp(entry->d_name, B_HPKG_PACKAGE_INFO_FILE_NAME) == 0) {
-	printf("parsing %s ...\n", entry->d_name);
-	struct ErrorListener : public BPackageInfo::ParseErrorListener {
-		virtual void OnError(const BString& msg, int line, int col) {
-			printf("*** parse error (%d:%d) -> %s\n", line, col, msg.String());
-		}
-	} errorListener;
-	BEntry packageInfoEntry(entry->d_name);
-	BPackageInfo packageInfo;
-	packageInfo.ReadFromConfigFile(packageInfoEntry, &errorListener);
-}
 				error = packageWriter.AddEntry(entry->d_name);
 printf("AddEntry(\"%s\"): %s\n", entry->d_name, strerror(error));
 				if (error != B_OK)

@@ -27,9 +27,11 @@
 
 #include <package/hpkg/DataOutput.h>
 #include <package/hpkg/DataReader.h>
-#include <package/hpkg/FDCloser.h>
 #include <package/hpkg/Stacker.h>
 #include <package/hpkg/ZlibCompressor.h>
+
+
+using BPrivate::FileDescriptorCloser;
 
 
 namespace BPackageKit {
@@ -1089,7 +1091,7 @@ printf("PackageWriter::_AddEntry(%d, %p, \"%s\")\n", dirFD, entry, fileName);
 			fileName, strerror(errno));
 		throw status_t(errno);
 	}
-	FDCloser fdCloser(fd);
+	FileDescriptorCloser fdCloser(fd);
 
 	// stat the node
 	struct stat st;
