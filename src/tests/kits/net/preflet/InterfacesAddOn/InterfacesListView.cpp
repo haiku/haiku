@@ -292,7 +292,7 @@ InterfaceListItem::_PopulateBitmaps(const char* mediaType) {
 		B_VECTOR_ICON_TYPE, "pending", &iconSize);
 
 	if (HVIFPending) {
-		fIconOffline = new BBitmap(BRect(0, 0, 31, 31), 0, B_RGBA32);
+		fIconPending = new BBitmap(BRect(0, 0, 31, 31), 0, B_RGBA32);
 		BIconUtils::GetVectorIcon(HVIFPending, iconSize, fIconPending);
 	}
 
