@@ -373,7 +373,7 @@ BPackageInfo::Parser::_ParseVersionValue(BPackageVersion* value,
 			word.text.CopyInto(minor, firstDotPos + 1, word.text.Length());
 		else {
 			word.text.CopyInto(minor, firstDotPos + 1,
-				secondDotPos - firstDotPos + 1);
+				secondDotPos - (firstDotPos + 1));
 			word.text.CopyInto(micro, secondDotPos + 1, word.text.Length());
 		}
 	}
