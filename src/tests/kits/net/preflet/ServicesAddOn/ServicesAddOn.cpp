@@ -95,8 +95,9 @@ ServicesAddOn::ParseInetd()
 		}
 		fclose(f);
 		return B_OK;
-	} else
-		return B_ERROR;
+	}
+
+	return B_ERROR;
 }
 
 
@@ -133,6 +134,7 @@ ServicesAddOn::ParseXinetd()
 		}
 		fclose(f);
 		return B_OK;
-	} else
-		return B_ERROR;
+	}
+
+	return B_ERROR;
 }
