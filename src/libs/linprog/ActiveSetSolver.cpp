@@ -369,7 +369,7 @@ ActiveSetSolver::Solve()
 		system.B(rowIndex) = constraint->RightSide();
 		for (int32 sIndex = 0; sIndex < leftSide->CountItems(); sIndex++ ) {
 			Summand* summand = leftSide->ItemAt(sIndex);
-			int32 coefficient = summand->Coeff();
+			double coefficient = summand->Coeff();
 			system.A(rowIndex, summand->VariableIndex()) = coefficient;
 		}
 		if (constraint->Op() == kLE) {

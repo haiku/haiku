@@ -498,6 +498,7 @@ typedef BPrivate::AutoDeleter<double*, MatrixDelete> MatrixDeleter;
 LayoutOptimizer::LayoutOptimizer(const ConstraintList& list,
 	int32 variableCount)
 	:
+	fVariableCount(0),
 	fTemp1(NULL),
 	fTemp2(NULL),
 	fZtrans(NULL),
@@ -693,7 +694,7 @@ TRACE_ONLY(
 	ConstraintList activeConstraints(constraintCount);
 
 	for (int32 i = 0; i < constraintCount; i++) {
-		Constraint* constraint = (Constraint*)fConstraints.ItemAt(i);
+		Constraint* constraint = fConstraints.ItemAt(i);
 		if (constraint->IsSoft())
 			continue;
 		double actualValue = _ActualValue(constraint, x);
@@ -739,6 +740,8 @@ TRACE_ONLY(
 
 		for (int32 i = 0; i < activeCount; i++) {
 			Constraint* constraint = activeConstraints.ItemAt(i);
+			if (constraint->IsSoft())
+				continue;
 			SummandList* summands = constraint->LeftSide();
 			for (int32 s = 0; s < summands->CountItems(); s++) {
 				Summand* summand = summands->ItemAt(s);
@@ -811,8 +814,7 @@ TRACE_ONLY(
 			index = 0;
 			for (int i = 0; i < activeCount; i++) {
 				if (independentRows[i]) {
-					Constraint* constraint
-						= (Constraint*)activeConstraints.ItemAt(i);
+					Constraint* constraint = activeConstraints.ItemAt(i);
 					if (constraint->Op() != LinearProgramming::kEQ) {
 						if (lambda[index] < minLambda) {
 							minLambda = lambda[index];
@@ -838,7 +840,7 @@ TRACE_ONLY(
 			int barrier = -1;
 			// if alpha_k < 1, add a barrier constraint to W^k
 			for (int32 i = 0; i < constraintCount; i++) {
-				Constraint* constraint = (Constraint*)fConstraints.ItemAt(i);
+				Constraint* constraint = fConstraints.ItemAt(i);
 				if (activeConstraints.HasItem(constraint))
 					continue;
 
