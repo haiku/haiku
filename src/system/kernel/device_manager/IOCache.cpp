@@ -381,7 +381,14 @@ IOCache::_TransferRequestLine(IORequest* request, off_t lineOffset,
 				missingPages, false, isVIP);
 			if (error != B_OK) {
 				_DiscardPages(firstMissing - firstPageOffset, missingPages);
-				return error;
+
+				dprintf("IOCache: falling back to uncached transfer, offset %"
+					B_PRIiOFF ", length %" B_PRIuSIZE "\n", requestOffset,
+					requestLength);
+
+				// Try again using an uncached transfer
+				return _TransferRequestLineUncached(request, lineOffset,
+					requestOffset, requestLength);
 			}
 		}
 	}
