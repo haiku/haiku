@@ -23,7 +23,6 @@
 #include <Alert.h>
 
 
-
 NetworkSetupAddOn*
 get_nth_addon(image_id image, int index)
 {
@@ -79,7 +78,7 @@ InterfacesAddOn::CreateView(BRect *bounds)
 	fListview->SetSelectionMessage(new BMessage(INTERFACE_SELECTED_MSG));
 	fListview->SetInvocationMessage(new BMessage(CONFIGURE_INTERFACE_MSG));
 	AddChild(new BScrollView(NULL, fListview, B_FOLLOW_ALL_SIDES, B_WILL_DRAW
-			| B_FRAME_EVENTS, false, true));
+		| B_FRAME_EVENTS, false, true));
 
 	r.top = r.bottom - 60;
 	fConfigure = new BButton(r, "configure", "Configure" B_UTF8_ELLIPSIS,
@@ -93,8 +92,8 @@ InterfacesAddOn::CreateView(BRect *bounds)
 	r.left += w + SMALL_MARGIN;
 
 	fOnOff = new BButton(r, "onoff", "Disable",
-				new BMessage(ONOFF_INTERFACE_MSG),
-				B_FOLLOW_BOTTOM | B_FOLLOW_LEFT);
+		new BMessage(ONOFF_INTERFACE_MSG),
+		B_FOLLOW_BOTTOM | B_FOLLOW_LEFT);
 	fOnOff->GetPreferredSize(&w, &h);
 	fOnOff->ResizeToPreferred();
 	fOnOff->Hide();
