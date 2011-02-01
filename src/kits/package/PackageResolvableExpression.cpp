@@ -42,15 +42,36 @@ BPackageResolvableExpression::InitCheck() const
 }
 
 
-void
-BPackageResolvableExpression::GetAsString(BString& string) const
+const BString&
+BPackageResolvableExpression::Name() const
 {
-	string = fName;
+	return fName;
+}
 
-	if (fVersion.InitCheck() == B_OK) {
-		string << fOperator;
-		fVersion.GetAsString(string);
-	}
+
+const BString&
+BPackageResolvableExpression::Operator() const
+{
+	return fOperator;
+}
+
+
+const BPackageVersion&
+BPackageResolvableExpression::Version() const
+{
+	return fVersion;
+}
+
+
+BString
+BPackageResolvableExpression::AsString() const
+{
+	BString string = fName;
+
+	if (fVersion.InitCheck() == B_OK)
+		string << fOperator << fVersion.AsString();
+
+	return string;
 }
 
 

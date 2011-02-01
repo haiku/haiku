@@ -44,16 +44,37 @@ BPackageResolvable::InitCheck() const
 }
 
 
-void
-BPackageResolvable::GetAsString(BString& string) const
+const BString&
+BPackageResolvable::Name() const
+{
+	return fName;
+}
+
+
+BPackageResolvableType
+BPackageResolvable::Type() const
+{
+	return fType;
+}
+
+
+const BPackageVersion&
+BPackageResolvable::Version() const
+{
+	return fVersion;
+}
+
+
+BString
+BPackageResolvable::AsString() const
 {
 	// the type is part of the name
-	string = fName;
+	BString string = fName;
 
-	if (fVersion.InitCheck() == B_OK) {
-		string << '=';
-		fVersion.GetAsString(string);
-	}
+	if (fVersion.InitCheck() == B_OK)
+		string << '=' << fVersion.AsString();
+
+	return string;
 }
 
 

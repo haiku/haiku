@@ -21,7 +21,12 @@ public:
 
 			status_t			InitCheck() const;
 
-			void				GetAsString(BString& string) const;
+			const BString&		Major() const;
+			const BString&		Minor() const;
+			const BString&		Micro() const;
+			uint8				Release() const;
+
+			BString				AsString() const;
 
 			void				SetTo(const BString& major,
 									const BString& minor, const BString& micro,

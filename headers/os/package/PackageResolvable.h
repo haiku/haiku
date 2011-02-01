@@ -61,7 +61,7 @@ public:
 			BPackageResolvableType	Type() const;
 			const BPackageVersion& Version() const;
 
-			void				GetAsString(BString& string) const;
+			BString				AsString() const;
 
 			void				SetTo(const BString& name,
 									BPackageResolvableType type

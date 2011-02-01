@@ -38,6 +38,34 @@ BPackageVersion::InitCheck() const
 }
 
 
+const BString&
+BPackageVersion::Major() const
+{
+	return fMajor;
+}
+
+
+const BString&
+BPackageVersion::Minor() const
+{
+	return fMinor;
+}
+
+
+const BString&
+BPackageVersion::Micro() const
+{
+	return fMicro;
+}
+
+
+uint8
+BPackageVersion::Release() const
+{
+	return fRelease;
+}
+
+
 int
 BPackageVersion::Compare(const BPackageVersion& other) const
 {
@@ -57,10 +85,10 @@ BPackageVersion::Compare(const BPackageVersion& other) const
 }
 
 
-void
-BPackageVersion::GetAsString(BString& string) const
+BString
+BPackageVersion::AsString() const
 {
-	string = fMajor;
+	BString string = fMajor;
 
 	if (fMinor.Length() > 0) {
 		string << '.' << fMinor;
@@ -70,6 +98,8 @@ BPackageVersion::GetAsString(BString& string) const
 
 	if (fRelease > 0)
 		string << '-' << fRelease;
+
+	return string;
 }
 
 
