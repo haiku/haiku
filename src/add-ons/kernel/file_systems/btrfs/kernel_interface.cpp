@@ -630,7 +630,7 @@ btrfs_read_attr_dir(fs_volume* _volume, fs_vnode* _node,
 static status_t
 btrfs_rewind_attr_dir(fs_volume* _volume, fs_vnode* _node, void* _cookie)
 {
-	DirectoryIterator* iterator = (DirectoryIterator*)_cookie;
+	AttributeIterator* iterator = (AttributeIterator*)_cookie;
 	return iterator->Rewind();
 }
 
