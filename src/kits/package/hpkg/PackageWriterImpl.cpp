@@ -1011,8 +1011,98 @@ PackageWriterImpl::_WritePackageAttributes(hpkg_header& header)
 	FDDataWriter realWriter(fFD, startOffset, fListener);
 	fDataWriter = &realWriter;
 
+	// name
+	_WriteUnsignedLEB128(B_HPKG_PACKAGE_ATTRIBUTE_TAG_COMPOSE(
+		B_HPKG_PACKAGE_ATTRIBUTE_NAME, B_HPKG_ATTRIBUTE_TYPE_STRING,
+		B_HPKG_ATTRIBUTE_ENCODING_STRING_INLINE, 0));
+	_WriteString(fPackageInfo.Name().String());
+
+	// summary
+	_WriteUnsignedLEB128(B_HPKG_PACKAGE_ATTRIBUTE_TAG_COMPOSE(
+		B_HPKG_PACKAGE_ATTRIBUTE_SUMMARY, B_HPKG_ATTRIBUTE_TYPE_STRING,
+		B_HPKG_ATTRIBUTE_ENCODING_STRING_INLINE, 0));
+	_WriteString(fPackageInfo.Summary().String());
+
+	// description
+	_WriteUnsignedLEB128(B_HPKG_PACKAGE_ATTRIBUTE_TAG_COMPOSE(
+		B_HPKG_PACKAGE_ATTRIBUTE_DESCRIPTION, B_HPKG_ATTRIBUTE_TYPE_STRING,
+		B_HPKG_ATTRIBUTE_ENCODING_STRING_INLINE, 0));
+	_WriteString(fPackageInfo.Description().String());
+
+	// vendor
+	_WriteUnsignedLEB128(B_HPKG_PACKAGE_ATTRIBUTE_TAG_COMPOSE(
+		B_HPKG_PACKAGE_ATTRIBUTE_VENDOR, B_HPKG_ATTRIBUTE_TYPE_STRING,
+		B_HPKG_ATTRIBUTE_ENCODING_STRING_INLINE, 0));
+	_WriteString(fPackageInfo.Vendor().String());
+
+	// packager
+	_WriteUnsignedLEB128(B_HPKG_PACKAGE_ATTRIBUTE_TAG_COMPOSE(
+		B_HPKG_PACKAGE_ATTRIBUTE_PACKAGER, B_HPKG_ATTRIBUTE_TYPE_STRING,
+		B_HPKG_ATTRIBUTE_ENCODING_STRING_INLINE, 0));
+	_WriteString(fPackageInfo.Packager().String());
+
+	// architecture
+	_WriteUnsignedLEB128(B_HPKG_PACKAGE_ATTRIBUTE_TAG_COMPOSE(
+		B_HPKG_PACKAGE_ATTRIBUTE_ARCHITECTURE, B_HPKG_ATTRIBUTE_TYPE_UINT,
+		B_HPKG_ATTRIBUTE_ENCODING_INT_8_BIT, 0));
+	_Write<uint8>(fPackageInfo.Architecture());
+
+	// version
+	_WritePackageVersion(fPackageInfo.Version());
+
+	// copyright list
+	const BObjectList<BString>& copyrightList = fPackageInfo.CopyrightList();
+	for (int i = 0; i < copyrightList.CountItems(); ++i) {
+		_WriteUnsignedLEB128(B_HPKG_PACKAGE_ATTRIBUTE_TAG_COMPOSE(
+			B_HPKG_PACKAGE_ATTRIBUTE_COPYRIGHT, B_HPKG_ATTRIBUTE_TYPE_STRING,
+			B_HPKG_ATTRIBUTE_ENCODING_STRING_INLINE, 0));
+		_WriteString(copyrightList.ItemAt(i)->String());
+	}
+
+	// license list
+	const BObjectList<BString>& licenseList = fPackageInfo.LicenseList();
+	for (int i = 0; i < licenseList.CountItems(); ++i) {
+		_WriteUnsignedLEB128(B_HPKG_PACKAGE_ATTRIBUTE_TAG_COMPOSE(
+			B_HPKG_PACKAGE_ATTRIBUTE_LICENSE, B_HPKG_ATTRIBUTE_TYPE_STRING,
+			B_HPKG_ATTRIBUTE_ENCODING_STRING_INLINE, 0));
+		_WriteString(licenseList.ItemAt(i)->String());
+	}
+
+	const BObjectList<BPackageResolvable>& providesList
+		= fPackageInfo.ProvidesList();
+	for (int i = 0; i < providesList.CountItems(); ++i) {
+		BPackageResolvable* resolvable = providesList.ItemAt(i);
+		bool hasVersion = resolvable->Version().InitCheck() == B_OK;
+		_WriteUnsignedLEB128(B_HPKG_PACKAGE_ATTRIBUTE_TAG_COMPOSE(
+			B_HPKG_PACKAGE_ATTRIBUTE_PROVIDES_TYPE, B_HPKG_ATTRIBUTE_TYPE_UINT,
+			B_HPKG_ATTRIBUTE_ENCODING_INT_8_BIT, hasVersion ? 1 : 0));
+		_Write<uint8>(fPackageInfo.Architecture());
+		_WriteUnsignedLEB128(B_HPKG_PACKAGE_ATTRIBUTE_TAG_COMPOSE(
+			B_HPKG_PACKAGE_ATTRIBUTE_PROVIDES, B_HPKG_ATTRIBUTE_TYPE_STRING,
+			B_HPKG_ATTRIBUTE_ENCODING_STRING_INLINE, 1));
+		_WriteString(resolvable->AsString().String());
+		if (hasVersion) {
+			_WritePackageVersion(resolvable->Version());
+			_Write<uint8>(0);
+		}
+	}
+
+	const BObjectList<BPackageResolvableExpression>& requiresList
+		= fPackageInfo.RequiresList();
+	for (int i = 0; i < requiresList.CountItems(); ++i) {
+		BPackageResolvableExpression* resolvableExpr = requiresList.ItemAt(i);
+		bool hasVersion = resolvableExpr->Version().InitCheck() == B_OK;
+		_WriteUnsignedLEB128(B_HPKG_PACKAGE_ATTRIBUTE_TAG_COMPOSE(
+			B_HPKG_PACKAGE_ATTRIBUTE_REQUIRES, B_HPKG_ATTRIBUTE_TYPE_STRING,
+			B_HPKG_ATTRIBUTE_ENCODING_STRING_INLINE, hasVersion));
+		_WriteString(resolvableExpr->AsString().String());
+		if (hasVersion) {
+			_WritePackageVersion(resolvableExpr->Version());
+			_Write<uint8>(0);
+		}
+	}
+
 	_Write<uint8>(0);
-		// TODO: Write them for real!
 	fHeapEnd = realWriter.Offset();
 	fDataWriter = NULL;
 
@@ -1028,6 +1118,28 @@ PackageWriterImpl::_WritePackageAttributes(hpkg_header& header)
 	header.attributes_length_uncompressed
 		= header.attributes_length_compressed;
 		// TODO: Support compression!
+}
+
+
+void
+PackageWriterImpl::_WritePackageVersion(const BPackageVersion& version)
+{
+	_WriteUnsignedLEB128(B_HPKG_PACKAGE_ATTRIBUTE_TAG_COMPOSE(
+		B_HPKG_PACKAGE_ATTRIBUTE_VERSION_MAJOR, B_HPKG_ATTRIBUTE_TYPE_STRING,
+		B_HPKG_ATTRIBUTE_ENCODING_STRING_INLINE, 0));
+	_WriteString(version.Major());
+	_WriteUnsignedLEB128(B_HPKG_PACKAGE_ATTRIBUTE_TAG_COMPOSE(
+		B_HPKG_PACKAGE_ATTRIBUTE_VERSION_MINOR, B_HPKG_ATTRIBUTE_TYPE_STRING,
+		B_HPKG_ATTRIBUTE_ENCODING_STRING_INLINE, 0));
+	_WriteString(version.Minor());
+	_WriteUnsignedLEB128(B_HPKG_PACKAGE_ATTRIBUTE_TAG_COMPOSE(
+		B_HPKG_PACKAGE_ATTRIBUTE_VERSION_MICRO, B_HPKG_ATTRIBUTE_TYPE_STRING,
+		B_HPKG_ATTRIBUTE_ENCODING_STRING_INLINE, 0));
+	_WriteString(version.Micro());
+	_WriteUnsignedLEB128(B_HPKG_PACKAGE_ATTRIBUTE_TAG_COMPOSE(
+		B_HPKG_PACKAGE_ATTRIBUTE_VERSION_RELEASE, B_HPKG_ATTRIBUTE_TYPE_UINT,
+		B_HPKG_ATTRIBUTE_ENCODING_INT_8_BIT, 0));
+	_Write<uint8>(version.Release());
 }
 
 

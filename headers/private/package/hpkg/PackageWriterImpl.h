@@ -16,7 +16,6 @@
 
 namespace BPackageKit {
 
-
 namespace BHPKG {
 
 
@@ -80,6 +79,9 @@ private:
 									uint8 encoding);
 			void				_WriteUnsignedLEB128(uint64 value);
 	inline	void				_WriteString(const char* string);
+
+			void				_WritePackageVersion(
+									const BPackageVersion& version);
 
 	template<typename Type>
 	inline	void				_Write(const Type& value);
