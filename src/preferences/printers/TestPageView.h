@@ -15,12 +15,13 @@ class PrinterItem;
 
 class TestPageView : public BView {
 public:
-						TestPageView(BRect rect, PrinterItem* printer);
+							TestPageView(BRect rect, PrinterItem* printer);
 
-	void				Draw(BRect rect);
+		void				AttachedToWindow();
+		void				DrawAfterChildren(BRect rect);
 
 private:
-	PrinterItem*	fPrinter;
+		PrinterItem*		fPrinter;
 };
 
 #endif

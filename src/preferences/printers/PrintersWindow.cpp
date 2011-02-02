@@ -17,6 +17,7 @@
 #include <Button.h>
 #include <Catalog.h>
 #include <FindDirectory.h>
+#include <Layout.h>
 #include <ListView.h>
 #include <Locale.h>
 #include <PrintJob.h>
@@ -171,33 +172,34 @@ PrintersWindow::PrintTestPage(PrinterItem* printer)
 
 	// job.ConfigJob();
 
-	// enforce job config
 	BMessage* settings = job.Settings();
+	if (settings == NULL)
+		return;
+
+	// enforce job config properties
 	settings->AddInt32("copies", 1);
 	settings->AddInt32("first_page", 1);
 	settings->AddInt32("last_page", -1);
 
-	settings = job.Settings();
-
-
 	job.BeginJob();
 
-
+	BRect paperRect = job.PaperRect();
 	BRect pageRect = job.PrintableRect();
-	// BWindow* dummyWindow = new BWindow(pageRect, "dummy", B_TITLED_WINDOW, 0);
-	// dummyWindow->Show();
 	TestPageView* testPage = new TestPageView(pageRect, printer);
-	// views cannot be printed unless they're attached to a window
-	// just hide our test page...
-	testPage->Hide();
-	AddChild(testPage);
-	// dummyWindow->AddChild(testPage);
 
-	job.DrawView(testPage, pageRect, BPoint(0.0, 0.0));
+	BWindow* dummyWindow = new BWindow(paperRect.OffsetByCopy(40, 40),
+		B_TRANSLATE("Test Page"), B_TITLED_WINDOW, 0);
+		// B_NOT_RESIZABLE | B_NOT_ZOOMABLE);
+	// dummyWindow->Show();
+	dummyWindow->AddChild(testPage);
+
+	if (testPage->LockLooper()) {
+		job.DrawView(testPage, testPage->Bounds(), B_ORIGIN);
+		testPage->UnlockLooper();
+	}
 	job.SpoolPage();
 
-	RemoveChild(testPage);
-	delete testPage;
+	delete dummyWindow;
 
 	if (!job.CanContinue())
 		return;
