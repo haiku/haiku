@@ -1,11 +1,11 @@
 /*
+ * Copyright 2011, Jérôme Duval, korli@users.berlios.de.
  * Copyright 2009, Ithamar Adema, <ithamar.adema@team-embedded.nl>.
  * Distributed under the terms of the MIT License.
  */
 
 
 #include "UVCCamDevice.h"
-#include "USB_video.h"
 
 #include <stdio.h>
 
@@ -37,52 +37,66 @@ usb_webcam_support_descriptor kSupportedDevices[] = {
 };
 
 /* Table 2-1 Compression Formats of USB Video Payload Uncompressed */
-uint8 yuy2_guid = {0x59, 0x55, 0x59, 0x32, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00,
-	0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71};
-uint8 nv12_guid = {0x4e, 0x56, 0x31, 0x32, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00,
-	0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71};
+usbvc_guid kYUY2Guid = {0x59, 0x55, 0x59, 0x32, 0x00, 0x00, 0x10, 0x00, 0x80,
+	0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71};
+usbvc_guid kNV12Guid = {0x4e, 0x56, 0x31, 0x32, 0x00, 0x00, 0x10, 0x00, 0x80,
+	0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71};
 
 static void
-print_guid(const uint8* buf)
+print_guid(const usbvc_guid guid)
 {
-	printf("%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x",
-		buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6], buf[7],
-		buf[8], buf[9], buf[10], buf[11], buf[12], buf[13], buf[14], buf[15]);
+	printf("%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:"
+		"%02x:%02x:%02x", guid[0], guid[1], guid[2], guid[3], guid[4], guid[5],
+		guid[6], guid[7], guid[8], guid[9], guid[10], guid[11], guid[12],
+		guid[13], guid[14], guid[15]);
 }
 
 
 UVCCamDevice::UVCCamDevice(CamDeviceAddon &_addon, BUSBDevice* _device)
 	: CamDevice(_addon, _device)
 {
-	const BUSBConfiguration* uc;
-	const BUSBInterface* ui;
-	usb_descriptor *generic;
-	uint32 cfg, intf, di;
+	const BUSBConfiguration* config;
+	const BUSBInterface* interface;
+	usb_descriptor* generic;
 	uint8 buffer[1024];
 
 	generic = (usb_descriptor *)buffer;
 
-	for (cfg=0; cfg < _device->CountConfigurations(); cfg++) {
-		uc = _device->ConfigurationAt(cfg);
-		for (intf=0; intf < uc->CountInterfaces(); intf++) {
-			ui = uc->InterfaceAt(intf);
+	for (uint32 i = 0; i < _device->CountConfigurations(); i++) {
+		config = _device->ConfigurationAt(i);
+		for (uint32 j = 0; j < config->CountInterfaces(); j++) {
+			interface = config->InterfaceAt(j);
 
-			if (ui->Class() == CC_VIDEO && ui->Subclass() == SC_VIDEOCONTROL) {
-				printf("UVCCamDevice: (%lu,%lu): Found Video Control interface.\n", cfg, intf);
+			if (interface->Class() == CC_VIDEO && interface->Subclass()
+				== SC_VIDEOCONTROL) {
+				printf("UVCCamDevice: (%lu,%lu): Found Video Control "
+					"interface.\n", i, j);
 
 				// look for class specific interface descriptors and parse them
-				for (di=0; ui->OtherDescriptorAt(di,generic,sizeof(buffer)) == B_OK; ++di)
-					if (generic->generic.descriptor_type == (USB_REQTYPE_CLASS | USB_DESCRIPTOR_INTERFACE))
-						ParseVideoControl(buffer, generic->generic.length);
+				for (uint32 k = 0; interface->OtherDescriptorAt(k, generic,
+					sizeof(buffer)) == B_OK; k++) {
+					if (generic->generic.descriptor_type == (USB_REQTYPE_CLASS
+						| USB_DESCRIPTOR_INTERFACE)) {
+						ParseVideoControl((const usbvc_class_descriptor*)generic,
+							generic->generic.length);
+					}
+				}
 
 				fInitStatus = B_OK;
-			} else if (ui->Class() == CC_VIDEO && ui->Subclass() == SC_VIDEOSTREAMING) {
-				printf("UVCCamDevice: (%lu,%lu): Found Video Control interface.\n", cfg, intf);
+			} else if (interface->Class() == CC_VIDEO && interface->Subclass()
+				== SC_VIDEOSTREAMING) {
+				printf("UVCCamDevice: (%lu,%lu): Found Video Control interface.\n",
+					i, j);
 
 				// look for class specific interface descriptors and parse them
-				for (di=0; ui->OtherDescriptorAt(di,generic,sizeof(buffer)) == B_OK; ++di)
-					if (generic->generic.descriptor_type == (USB_REQTYPE_CLASS | USB_DESCRIPTOR_INTERFACE))
-						ParseVideoStreaming(buffer, generic->generic.length);
+				for (uint32 k = 0; interface->OtherDescriptorAt(k, generic,
+					sizeof(buffer)) == B_OK; k++) {
+					if (generic->generic.descriptor_type == (USB_REQTYPE_CLASS
+						| USB_DESCRIPTOR_INTERFACE)) {
+						ParseVideoStreaming((const usbvc_class_descriptor*)generic,
+							generic->generic.length);
+					}
+				}
 			}
 		}
 	}
@@ -90,72 +104,112 @@ UVCCamDevice::UVCCamDevice(CamDeviceAddon &_addon, BUSBDevice* _device)
 
 
 void
-UVCCamDevice::ParseVideoStreaming(const uint8* buffer, size_t len)
+UVCCamDevice::ParseVideoStreaming(const usbvc_class_descriptor* _descriptor,
+	size_t len)
 {
-	int c, i, sz;
-
-	switch(buffer[2]) {
+	switch(_descriptor->descriptorSubtype) {
 		case VS_INPUT_HEADER:
-			c = buffer[3];
-			printf("VS_INPUT_HEADER:\t#fmts=%d,ept=0x%x\n", c, buffer[6]);
-			if (buffer[7] & 1) printf("\tDynamic Format Change supported\n");
-			printf("\toutput terminal id=%d\n", buffer[8]);
-			printf("\tstill capture method=%d\n", buffer[9]);
-			if (buffer[10])
-				printf("\ttrigger button fixed to still capture=%s\n", buffer[11] ? "no" : "yes");
-			sz = buffer[12];
-			for (i=0; i < c; i++) {
+		{
+			const usbvc_input_header_descriptor* descriptor =
+				(const usbvc_input_header_descriptor*)_descriptor;
+			printf("VS_INPUT_HEADER:\t#fmts=%d,ept=0x%x\n", descriptor->numFormats,
+				descriptor->endpointAddress);
+			if (descriptor->info & 1)
+				printf("\tDynamic Format Change supported\n");
+			printf("\toutput terminal id=%d\n", descriptor->terminalLink);
+			printf("\tstill capture method=%d\n", descriptor->stillCaptureMethod);
+			if (descriptor->triggerSupport) {
+				printf("\ttrigger button fixed to still capture=%s\n",
+					descriptor->triggerUsage ? "no" : "yes");
+			}
+			const uint8 *controls = descriptor->controls;
+			for (uint8 i = 0; i < descriptor->numFormats; i++,
+				controls += descriptor->controlSize) {
 				printf("\tfmt%d: %s %s %s %s - %s %s\n", i,
-					(buffer[13+(sz*i)] & 1) ? "wKeyFrameRate" : "",
-					(buffer[13+(sz*i)] & 2) ? "wPFrameRate" : "",
-					(buffer[13+(sz*i)] & 4) ? "wCompQuality" : "",
-					(buffer[13+(sz*i)] & 8) ? "wCompWindowSize" : "",
-					(buffer[13+(sz*i)] & 16) ? "<Generate Key Frame>" : "",
-					(buffer[13+(sz*i)] & 32) ? "<Update Frame Segment>" : "");
+					(*controls & 1) ? "wKeyFrameRate" : "",
+					(*controls & 2) ? "wPFrameRate" : "",
+					(*controls & 4) ? "wCompQuality" : "",
+					(*controls & 8) ? "wCompWindowSize" : "",
+					(*controls & 16) ? "<Generate Key Frame>" : "",
+					(*controls & 32) ? "<Update Frame Segment>" : "");
 			}
 			break;
+		}
 		case VS_FORMAT_UNCOMPRESSED:
-			c = buffer[4];
-			printf("VS_FORMAT_UNCOMPRESSED:\tbFormatIdx=%d,#frmdesc=%d,guid=", buffer[3], c);
-			print_guid(buffer+5);
-			printf("\n\t#bpp=%d,optfrmidx=%d,aspRX=%d,aspRY=%d\n", buffer[21], buffer[22], 
-				buffer[23], buffer[24]);
+		{		
+			const usbvc_format_descriptor* descriptor =
+				(const usbvc_format_descriptor*)_descriptor;
+			printf("VS_FORMAT_UNCOMPRESSED:\tbFormatIdx=%d,#frmdesc=%d,guid=",
+				descriptor->formatIndex, descriptor->numFrameDescriptors);
+			print_guid(descriptor->uncompressed.format);
+			printf("\n\t#bpp=%d,optfrmidx=%d,aspRX=%d,aspRY=%d\n",
+				descriptor->uncompressed.bytesPerPixel,
+				descriptor->uncompressed.defaultFrameIndex,
+				descriptor->uncompressed.aspectRatioX,
+				descriptor->uncompressed.aspectRatioY);
 			printf("\tbmInterlaceFlags:\n");
-			if (buffer[25] & 1) printf("\tInterlaced stream or variable\n");
-			printf("\t%d fields per frame\n", (buffer[25] & 2) ? 1 : 2);
-			if (buffer[25] & 4) printf("\tField 1 first\n");
+			if (descriptor->uncompressed.interlaceFlags & 1)
+				printf("\tInterlaced stream or variable\n");
+			printf("\t%d fields per frame\n",
+				(descriptor->uncompressed.interlaceFlags & 2) ? 1 : 2);
+			if (descriptor->uncompressed.interlaceFlags & 4)
+				printf("\tField 1 first\n");
 			printf("\tField Pattern: ");
-			switch((buffer[25] & 0x30) >> 4) {
+			switch((descriptor->uncompressed.interlaceFlags & 0x30) >> 4) {
 				case 0: printf("Field 1 only\n"); break;
 				case 1: printf("Field 2 only\n"); break;
 				case 2: printf("Regular pattern of fields 1 and 2\n"); break;
 				case 3: printf("Random pattern of fields 1 and 2\n"); break;
 			}
-			if (buffer[26]) printf("\tRestrict duplication\n"); break;
+			if (descriptor->uncompressed.copyProtect)
+				printf("\tRestrict duplication\n");
 			break;
+		}
+		case VS_FRAME_MJPEG:
+			printf("VS_FRAME_MJPEG:");	// fall through
 		case VS_FRAME_UNCOMPRESSED:
-			printf("VS_FRAME_UNCOMPRESSED:\tbFrameIdx=%d,stillsupported=%s,fixedfrmrate=%s\n",
-				buffer[3], (buffer[4]&1)?"yes":"no", (buffer[4]&2)?"yes":"no");
+		{
+			if (_descriptor->descriptorSubtype == VS_FRAME_UNCOMPRESSED)
+				printf("VS_FRAME_UNCOMPRESSED:");
+			const usbvc_frame_descriptor* descriptor =
+				(const usbvc_frame_descriptor*)_descriptor;
+			printf("\tbFrameIdx=%d,stillsupported=%s,"
+				"fixedframerate=%s\n", descriptor->frameIndex,
+				(descriptor->capabilities & 1) ? "yes" : "no",
+				(descriptor->capabilities & 2) ? "yes" : "no");
 			printf("\twidth=%u,height=%u,min/max bitrate=%lu/%lu, maxbuf=%lu\n",
-				*(uint16*)(buffer+5), *(uint16*)(buffer+7),
-				*(uint32*)(buffer+9), *(uint32*)(buffer+13),
-				*(uint32*)(buffer+17));
-			printf("\tframe interval: %lu, #intervals(0=cont): %d\n", *(uint32*)(buffer+21), buffer[25]);
-			//TODO print interval table
+				descriptor->width, descriptor->height,
+				descriptor->minBitRate, descriptor->maxBitRate,
+				descriptor->maxVideoFrameBufferSize);
+			printf("\tdefault frame interval: %lu, #intervals(0=cont): %d\n", 
+				descriptor->defaultFrameInterval, descriptor->frameIntervalType);
+			if (descriptor->frameIntervalType == 0) {
+				printf("min/max frame interval=%lu/%lu, step=%lu\n",
+					descriptor->continuous.minFrameInterval,
+					descriptor->continuous.maxFrameInterval,
+					descriptor->continuous.frameIntervalStep);
+			} else for (uint8 i = 0; i < descriptor->frameIntervalType; i++) {
+				printf("discrete frame interval: %lu\n",
+					descriptor->discreteFrameIntervals[i]);
+			}
 			break;
+		}
 		case VS_COLORFORMAT:
+		{
+			const usbvc_color_matching_descriptor* descriptor =
+				(const usbvc_color_matching_descriptor*)_descriptor;
 			printf("VS_COLORFORMAT:\n\tbColorPrimaries: ");
-			switch(buffer[3]) {
+			switch(descriptor->colorPrimaries) {
 				case 0: printf("Unspecified\n"); break;
 				case 1: printf("BT.709,sRGB\n"); break;
 				case 2: printf("BT.470-2(M)\n"); break;
 				case 3: printf("BT.470-2(B,G)\n"); break;
 				case 4: printf("SMPTE 170M\n"); break;
 				case 5: printf("SMPTE 240M\n"); break;
-				default: printf("Invalid (%d)\n", buffer[3]);
+				default: printf("Invalid (%d)\n", descriptor->colorPrimaries);
 			}
 			printf("\tbTransferCharacteristics: ");
-			switch(buffer[4]) {
+			switch(descriptor->transferCharacteristics) {
 				case 0: printf("Unspecified\n"); break;
 				case 1: printf("BT.709\n"); break;
 				case 2: printf("BT.470-2(M)\n"); break;
@@ -164,32 +218,87 @@ UVCCamDevice::ParseVideoStreaming(const uint8* buffer, size_t len)
 				case 5: printf("SMPTE 240M\n"); break;
 				case 6: printf("Linear (V=Lc)\n"); break;
 				case 7: printf("sRGB\n"); break;
-				default: printf("Invalid (%d)\n", buffer[4]);
+				default: printf("Invalid (%d)\n",
+					descriptor->transferCharacteristics);
 			}
 			printf("\tbMatrixCoefficients: ");
-			switch(buffer[5]) {
+			switch(descriptor->matrixCoefficients) {
 				case 0: printf("Unspecified\n"); break;
 				case 1: printf("BT.709\n"); break;
 				case 2: printf("FCC\n"); break;
 				case 3: printf("BT.470-2(B,G)\n"); break;
 				case 4: printf("SMPTE 170M (BT.601)\n"); break;
 				case 5: printf("SMPTE 240M\n"); break;
-				default: printf("Invalid (%d)\n", buffer[5]);
+				default: printf("Invalid (%d)\n", descriptor->matrixCoefficients);
 			}
 			break;
-
+		}
 		case VS_OUTPUT_HEADER:
-			printf("VS_OUTPUT_HEADER:\t\n");
+		{
+			const usbvc_output_header_descriptor* descriptor =
+				(const usbvc_output_header_descriptor*)_descriptor;
+			printf("VS_OUTPUT_HEADER:\t#fmts=%d,ept=0x%x\n",
+				descriptor->numFormats, descriptor->endpointAddress);
+			printf("\toutput terminal id=%d\n", descriptor->terminalLink);
+			const uint8 *controls = descriptor->controls;
+			for (uint8 i = 0; i < descriptor->numFormats; i++,
+				controls += descriptor->controlSize) {
+				printf("\tfmt%d: %s %s %s %s\n", i,
+					(*controls & 1) ? "wKeyFrameRate" : "",
+					(*controls & 2) ? "wPFrameRate" : "",
+					(*controls & 4) ? "wCompQuality" : "",
+					(*controls & 8) ? "wCompWindowSize" : "");
+			}
 			break;
+		}
 		case VS_STILL_IMAGE_FRAME:
-			printf("VS_STILL_IMAGE_FRAME:\t\n");
+		{
+			const usbvc_still_image_frame_descriptor* descriptor =
+				(const usbvc_still_image_frame_descriptor*)_descriptor;
+			printf("VS_STILL_IMAGE_FRAME:\t#imageSizes=%d,compressions=%d,"
+				"ept=0x%x\n", descriptor->numImageSizePatterns,
+				descriptor->NumCompressionPatterns(),
+				descriptor->endpointAddress);
+			for (uint8 i = 0; i < descriptor->numImageSizePatterns; i++) {
+				printf("imageSize%d: %dx%d\n", i,
+					descriptor->imageSizePatterns[i].width,
+					descriptor->imageSizePatterns[i].height);
+			}
+			for (uint8 i = 0; i < descriptor->NumCompressionPatterns(); i++) {
+				printf("compression%d: %d\n", i,
+					descriptor->CompressionPatterns()[i]);
+			}
 			break;
+		}
 		case VS_FORMAT_MJPEG:
-			printf("VS_FORMAT_MJPEG:\t\n");
+		{		
+			const usbvc_format_descriptor* descriptor =
+				(const usbvc_format_descriptor*)_descriptor;
+			printf("VS_FORMAT_MJPEG:\tbFormatIdx=%d,#frmdesc=%d\n",
+				descriptor->formatIndex, descriptor->numFrameDescriptors);
+			printf("\t#flgs=%d,optfrmidx=%d,aspRX=%d,aspRY=%d\n",
+				descriptor->mjpeg.flags,
+				descriptor->mjpeg.defaultFrameIndex,
+				descriptor->mjpeg.aspectRatioX,
+				descriptor->mjpeg.aspectRatioY);
+			printf("\tbmInterlaceFlags:\n");
+			if (descriptor->mjpeg.interlaceFlags & 1)
+				printf("\tInterlaced stream or variable\n");
+			printf("\t%d fields per frame\n",
+				(descriptor->mjpeg.interlaceFlags & 2) ? 1 : 2);
+			if (descriptor->mjpeg.interlaceFlags & 4)
+				printf("\tField 1 first\n");
+			printf("\tField Pattern: ");
+			switch((descriptor->mjpeg.interlaceFlags & 0x30) >> 4) {
+				case 0: printf("Field 1 only\n"); break;
+				case 1: printf("Field 2 only\n"); break;
+				case 2: printf("Regular pattern of fields 1 and 2\n"); break;
+				case 3: printf("Random pattern of fields 1 and 2\n"); break;
+			}
+			if (descriptor->mjpeg.copyProtect)
+				printf("\tRestrict duplication\n");
 			break;
-		case VS_FRAME_MJPEG:
-			printf("VS_FRAME_MJPEG:\t\n");
-			break;
+		}
 		case VS_FORMAT_MPEG2TS:
 			printf("VS_FORMAT_MPEG2TS:\t\n");
 			break;
@@ -206,94 +315,148 @@ UVCCamDevice::ParseVideoStreaming(const uint8* buffer, size_t len)
 			printf("VS_FORMAT_STREAM_BASED:\t\n");
 			break;
 		default:
-			printf("INVALID STREAM UNIT TYPE=%d!\n", buffer[2]);
+			printf("INVALID STREAM UNIT TYPE=%d!\n",
+				_descriptor->descriptorSubtype);
 	}
 }
 
 
 void
-UVCCamDevice::ParseVideoControl(const uint8* buffer, size_t len)
+UVCCamDevice::ParseVideoControl(const usbvc_class_descriptor* _descriptor,
+	size_t len)
 {
-	int c, i;
-
-	switch(buffer[2]) {
+	switch(_descriptor->descriptorSubtype) {
 		case VC_HEADER:
-			printf("VC_HEADER:\tUVC v%04x, clk %lu Hz\n", *(uint16*)(buffer+3), *(uint32*)(buffer+7));
-			c = (len >= 12) ? buffer[11] : 0;
-			for (i=0; i < c; i++)
-				printf("\tStreaming Interface %d\n", buffer[12+i]);
+		{
+			const usbvc_interface_header_descriptor* descriptor =
+				(const usbvc_interface_header_descriptor*)_descriptor;
+			printf("VC_HEADER:\tUVC v%04x, clk %lu Hz\n", descriptor->version,
+				descriptor->clockFrequency);
+			for (uint8 i = 0; i < descriptor->numInterfacesNumbers; i++) {
+				printf("\tStreaming Interface %d\n",
+					descriptor->interfaceNumbers[i]);
+			}
 			break;
-
+		}
 		case VC_INPUT_TERMINAL:
-			printf("VC_INPUT_TERMINAL:\tid=%d,type=%04x,associated terminal=%d\n", buffer[3], *(uint16*)(buffer+4), buffer[6]);
-			printf("\tDesc: %s\n", fDevice->DecodeStringDescriptor(buffer[7]));
+		{
+			const usbvc_input_terminal_descriptor* descriptor =
+				(const usbvc_input_terminal_descriptor*)_descriptor;
+			printf("VC_INPUT_TERMINAL:\tid=%d,type=%04x,associated terminal="
+				"%d\n", descriptor->terminalID, descriptor->terminalType,
+				descriptor->associatedTerminal);
+			printf("\tDesc: %s\n",
+				fDevice->DecodeStringDescriptor(descriptor->terminal));
 			break;
-
+		}
 		case VC_OUTPUT_TERMINAL:
-			printf("VC_OUTPUT_TERMINAL:\tid=%d,type=%04x,associated terminal=%d, src id=%d\n", buffer[3], *(uint16*)(buffer+4), buffer[6], buffer[7]);
-			printf("\tDesc: %s\n", fDevice->DecodeStringDescriptor(buffer[8]));
+		{
+			const usbvc_output_terminal_descriptor* descriptor =
+				(const usbvc_output_terminal_descriptor*)_descriptor;
+			printf("VC_OUTPUT_TERMINAL:\tid=%d,type=%04x,associated terminal="
+				"%d, src id=%d\n", descriptor->terminalID,
+				descriptor->terminalType, descriptor->associatedTerminal,
+				descriptor->sourceID);
+			printf("\tDesc: %s\n",
+				fDevice->DecodeStringDescriptor(descriptor->terminal));
 			break;
-
+		}
 		case VC_SELECTOR_UNIT:
-			printf("VC_SELECTOR_UNIT:\tid=%d,#pins=%d\n", buffer[3], buffer[4]);
+		{
+			const usbvc_selector_unit_descriptor* descriptor =
+				(const usbvc_selector_unit_descriptor*)_descriptor;
+			printf("VC_SELECTOR_UNIT:\tid=%d,#pins=%d\n",
+				descriptor->unitID, descriptor->numInputPins);
 			printf("\t");
-			for (i=0; i < buffer[4]; i++)
-				printf("%d ", buffer[5+i]);
+			for (uint8 i = 0; i < descriptor->numInputPins; i++)
+				printf("%d ", descriptor->sourceID[i]);
 			printf("\n");
-			printf("\tDesc: %s\n", fDevice->DecodeStringDescriptor(buffer[5+buffer[4]]));
+			printf("\tDesc: %s\n",
+				fDevice->DecodeStringDescriptor(descriptor->Selector()));
 			break;
-
+		}
 		case VC_PROCESSING_UNIT:
-			printf("VC_PROCESSING_UNIT:\tid=%d,src id=%d, digmul=%d\n", buffer[3], buffer[4], *(uint16*)(buffer+5));
-			c = buffer[7];
-			printf("\tbControlSize=%d\n", c);
-			if (c >= 1) {
-				if (buffer[8] & 1) printf("\tBrightness\n");
-				if (buffer[8] & 2) printf("\tContrast\n");
-				if (buffer[8] & 4) printf("\tHue\n");
-				if (buffer[8] & 8) printf("\tSaturation\n");
-				if (buffer[8] & 16) printf("\tSharpness\n");
-				if (buffer[8] & 32) printf("\tGamma\n");
-				if (buffer[8] & 64) printf("\tWhite Balance Temperature\n");
-				if (buffer[8] & 128) printf("\tWhite Balance Component\n");
+		{
+			const usbvc_processing_unit_descriptor* descriptor =
+				(const usbvc_processing_unit_descriptor*)_descriptor;
+			printf("VC_PROCESSING_UNIT:\tid=%d,src id=%d, digmul=%d\n",
+				descriptor->unitID, descriptor->sourceID,
+				descriptor->maxMultiplier);
+			printf("\tbControlSize=%d\n", descriptor->controlSize);
+			if (descriptor->controlSize >= 1) {
+				if (descriptor->controls[0] & 1)
+					printf("\tBrightness\n");
+				if (descriptor->controls[0] & 2)
+					printf("\tContrast\n");
+				if (descriptor->controls[0] & 4)
+					printf("\tHue\n");
+				if (descriptor->controls[0] & 8)
+					printf("\tSaturation\n");
+				if (descriptor->controls[0] & 16)
+					printf("\tSharpness\n");
+				if (descriptor->controls[0] & 32)
+					printf("\tGamma\n");
+				if (descriptor->controls[0] & 64)
+					printf("\tWhite Balance Temperature\n");
+				if (descriptor->controls[0] & 128)
+					printf("\tWhite Balance Component\n");
 			}
-			if (c >= 2) {
-				if (buffer[9] & 1) printf("\tBacklight Compensation\n");
-				if (buffer[9] & 2) printf("\tGain\n");
-				if (buffer[9] & 4) printf("\tPower Line Frequency\n");
-				if (buffer[9] & 8) printf("\t[AUTO] Hue\n");
-				if (buffer[9] & 16) printf("\t[AUTO] White Balance Temperature\n");
-				if (buffer[9] & 32) printf("\t[AUTO] White Balance Component\n");
-				if (buffer[9] & 64) printf("\tDigital Multiplier\n");
-				if (buffer[9] & 128) printf("\tDigital Multiplier Limit\n");
+			if (descriptor->controlSize >= 2) {
+				if (descriptor->controls[1] & 1)
+					printf("\tBacklight Compensation\n");
+				if (descriptor->controls[1] & 2)
+					printf("\tGain\n");
+				if (descriptor->controls[1] & 4)
+					printf("\tPower Line Frequency\n");
+				if (descriptor->controls[1] & 8)
+					printf("\t[AUTO] Hue\n");
+				if (descriptor->controls[1] & 16)
+					printf("\t[AUTO] White Balance Temperature\n");
+				if (descriptor->controls[1] & 32)
+					printf("\t[AUTO] White Balance Component\n");
+				if (descriptor->controls[1] & 64)
+					printf("\tDigital Multiplier\n");
+				if (descriptor->controls[1] & 128)
+					printf("\tDigital Multiplier Limit\n");
 			}
-			if (c >= 3) {
-				if (buffer[10] & 1) printf("\tAnalog Video Standard\n");
-				if (buffer[10] & 2) printf("\tAnalog Video Lock Status\n");
+			if (descriptor->controlSize >= 3) {
+				if (descriptor->controls[2] & 1)
+					printf("\tAnalog Video Standard\n");
+				if (descriptor->controls[2] & 2)
+					printf("\tAnalog Video Lock Status\n");
 			}
-			printf("\tDesc: %s\n", fDevice->DecodeStringDescriptor(buffer[8+c]));
-			i=buffer[9+c];
-			if (i & 2)  printf("\tNTSC  525/60\n");
-			if (i & 4)  printf("\tPAL   625/50\n");
-			if (i & 8)  printf("\tSECAM 625/50\n");
-			if (i & 16) printf("\tNTSC  625/50\n");
-			if (i & 32) printf("\tPAL   525/60\n");
+			printf("\tDesc: %s\n",
+				fDevice->DecodeStringDescriptor(descriptor->Processing()));
+			if (descriptor->VideoStandards() & 2)
+				printf("\tNTSC  525/60\n");
+			if (descriptor->VideoStandards() & 4)
+				printf("\tPAL   625/50\n");
+			if (descriptor->VideoStandards() & 8)
+				printf("\tSECAM 625/50\n");
+			if (descriptor->VideoStandards() & 16)
+				printf("\tNTSC  625/50\n");
+			if (descriptor->VideoStandards() & 32)
+				printf("\tPAL   525/60\n");
 			break;
-
+		}
 		case VC_EXTENSION_UNIT:
-			printf("VC_EXTENSION_UNIT:\tid=%d, guid=", buffer[3]);
-			print_guid(buffer+4);
-			printf("\n\t#ctrls=%d, #pins=%d\n", buffer[20], buffer[21]);
-			c = buffer[21];
+		{
+			const usbvc_extension_unit_descriptor* descriptor =
+				(const usbvc_extension_unit_descriptor*)_descriptor;
+			printf("VC_EXTENSION_UNIT:\tid=%d, guid=", descriptor->unitID);
+			print_guid(descriptor->guidExtensionCode);
+			printf("\n\t#ctrls=%d, #pins=%d\n", descriptor->numControls,
+				descriptor->numInputPins);
 			printf("\t");
-			for (i=0; i < c; i++)
-				printf("%d ", buffer[22+i]);
+			for (uint8 i = 0; i < descriptor->numInputPins; i++)
+				printf("%d ", descriptor->sourceID[i]);
 			printf("\n");
-			printf("\tDesc: %s\n", fDevice->DecodeStringDescriptor(buffer[23+c+buffer[22+c]]));
+			printf("\tDesc: %s\n",
+				fDevice->DecodeStringDescriptor(descriptor->Extension()));
 			break;
-
+		}
 		default:
-			printf("Unknown control %d\n", buffer[2]);
+			printf("Unknown control %d\n", _descriptor->descriptorSubtype);
 	}
 }
 
