@@ -46,7 +46,7 @@ public:
 			BPackageResolvableOperator	Operator() const;
 			const BPackageVersion& Version() const;
 
-			BString				AsString() const;
+			BString				ToString() const;
 
 			void				SetTo(const BString& name,
 									BPackageResolvableOperator _op

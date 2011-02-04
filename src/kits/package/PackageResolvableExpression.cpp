@@ -78,12 +78,12 @@ BPackageResolvableExpression::Version() const
 
 
 BString
-BPackageResolvableExpression::AsString() const
+BPackageResolvableExpression::ToString() const
 {
 	BString string = fName;
 
 	if (fVersion.InitCheck() == B_OK)
-		string << fOperator << fVersion.AsString();
+		string << fOperator << fVersion.ToString();
 
 	return string;
 }

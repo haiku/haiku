@@ -26,7 +26,7 @@ public:
 			const BString&		Micro() const;
 			uint8				Release() const;
 
-			BString				AsString() const;
+			BString				ToString() const;
 
 			void				SetTo(const BString& major,
 									const BString& minor, const BString& micro,

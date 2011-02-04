@@ -86,7 +86,7 @@ BPackageVersion::Compare(const BPackageVersion& other) const
 
 
 BString
-BPackageVersion::AsString() const
+BPackageVersion::ToString() const
 {
 	BString string = fMajor;
 

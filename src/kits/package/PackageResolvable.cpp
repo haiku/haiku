@@ -66,13 +66,13 @@ BPackageResolvable::Version() const
 
 
 BString
-BPackageResolvable::AsString() const
+BPackageResolvable::ToString() const
 {
 	// the type is part of the name
 	BString string = fName;
 
 	if (fVersion.InitCheck() == B_OK)
-		string << '=' << fVersion.AsString();
+		string << '=' << fVersion.ToString();
 
 	return string;
 }
