@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>
  * Distributed under the terms of the MIT License.
  */
 
@@ -615,9 +616,9 @@ PackageReaderImpl::PackageReaderImpl(BErrorOutput* errorOutput)
 	fErrorOutput(errorOutput),
 	fFD(-1),
 	fOwnsFD(false),
-	fInPackageAttributes(false),
-	fTOCSection(NULL),
-	fPackageAttributesSection(NULL),
+	fTOCSection("TOC"),
+	fPackageAttributesSection("package attributes section"),
+	fCurrentSection(NULL),
 	fAttributeTypes(NULL),
 	fStrings(NULL),
 	fScratchBuffer(NULL),
@@ -634,8 +635,6 @@ PackageReaderImpl::~PackageReaderImpl()
 	delete[] fScratchBuffer;
 	delete[] fStrings;
 	delete[] fAttributeTypes;
-	delete[] fTOCSection;
-	delete[] fPackageAttributesSection;
 }
 
 
@@ -708,30 +707,28 @@ PackageReaderImpl::Init(int fd, bool keepFD)
 	}
 
 	// package attributes length and compression
-	fPackageAttributesCompression
+	fPackageAttributesSection.compression
 		= B_BENDIAN_TO_HOST_INT32(header.attributes_compression);
-	fPackageAttributesCompressedLength
+	fPackageAttributesSection.compressedLength
 		= B_BENDIAN_TO_HOST_INT32(header.attributes_length_compressed);
-	fPackageAttributesUncompressedLength
+	fPackageAttributesSection.uncompressedLength
 		= B_BENDIAN_TO_HOST_INT32(header.attributes_length_uncompressed);
 
 	if (const char* errorString = _CheckCompression(
-			fPackageAttributesCompression, fPackageAttributesCompressedLength,
-			fPackageAttributesUncompressedLength)) {
+		fPackageAttributesSection)) {
 		fErrorOutput->PrintError("Error: Invalid package file: package "
 			"attributes section: %s\n", errorString);
 		return B_BAD_DATA;
 	}
 
 	// TOC length and compression
-	fTOCCompression = B_BENDIAN_TO_HOST_INT32(header.toc_compression);
-	fTOCCompressedLength
+	fTOCSection.compression = B_BENDIAN_TO_HOST_INT32(header.toc_compression);
+	fTOCSection.compressedLength
 		= B_BENDIAN_TO_HOST_INT64(header.toc_length_compressed);
-	fTOCUncompressedLength
+	fTOCSection.uncompressedLength
 		= B_BENDIAN_TO_HOST_INT64(header.toc_length_uncompressed);
 
-	if (const char* errorString = _CheckCompression(fTOCCompression,
-			fTOCCompressedLength, fTOCUncompressedLength)) {
+	if (const char* errorString = _CheckCompression(fTOCSection)) {
 		fErrorOutput->PrintError("Error: Invalid package file: TOC section: "
 			"%s\n", errorString);
 		return B_BAD_DATA;
@@ -745,8 +742,9 @@ PackageReaderImpl::Init(int fd, bool keepFD)
 	fTOCStringsLength = B_BENDIAN_TO_HOST_INT64(header.toc_strings_length);
 	fTOCStringsCount = B_BENDIAN_TO_HOST_INT64(header.toc_strings_count);
 
-	if (fTOCAttributeTypesLength > fTOCUncompressedLength
-		|| fTOCStringsLength > fTOCUncompressedLength - fTOCAttributeTypesLength
+	if (fTOCAttributeTypesLength > fTOCSection.uncompressedLength
+		|| fTOCStringsLength
+			> fTOCSection.uncompressedLength - fTOCAttributeTypesLength
 		|| fTOCAttributeTypesCount > fTOCAttributeTypesLength
 		|| fTOCStringsCount > fTOCStringsLength) {
 		fErrorOutput->PrintError("Error: Invalid package file: Invalid TOC "
@@ -755,35 +753,38 @@ PackageReaderImpl::Init(int fd, bool keepFD)
 	}
 
 	// check whether the sections fit together
-	if (fPackageAttributesCompressedLength > fTotalSize
-		|| fTOCCompressedLength
-			> fTotalSize - fPackageAttributesCompressedLength
+	if (fPackageAttributesSection.compressedLength > fTotalSize
+		|| fTOCSection.compressedLength
+			> fTotalSize - fPackageAttributesSection.compressedLength
 		|| fHeapOffset
-			> fTotalSize - fPackageAttributesCompressedLength
-				- fTOCCompressedLength) {
+			> fTotalSize - fPackageAttributesSection.compressedLength
+				- fTOCSection.compressedLength) {
 		fErrorOutput->PrintError("Error: Invalid package file: The sum of the "
 			"sections sizes is greater than the package size\n");
 		return B_BAD_DATA;
 	}
 
-	fPackageAttributesOffset = fTotalSize - fPackageAttributesCompressedLength;
-	fTOCSectionOffset = fPackageAttributesOffset - fTOCCompressedLength;
-	fHeapSize = fTOCSectionOffset - fHeapOffset;
+	fPackageAttributesSection.offset
+		= fTotalSize - fPackageAttributesSection.compressedLength;
+	fTOCSection.offset = fPackageAttributesSection.offset
+		- fTOCSection.compressedLength;
+	fHeapSize = fTOCSection.offset - fHeapOffset;
 
 	// TOC size sanity check
-	if (fTOCUncompressedLength > kMaxTOCSize) {
+	if (fTOCSection.uncompressedLength > kMaxTOCSize) {
 		fErrorOutput->PrintError("Error: Package file TOC section size "
 			"is %llu bytes. This is beyond the reader's sanity limit\n",
-			fTOCUncompressedLength);
+			fTOCSection.uncompressedLength);
 		return B_UNSUPPORTED;
 	}
 
 	// package attributes size sanity check
-	if (fPackageAttributesUncompressedLength > kMaxPackageAttributesSize) {
+	if (fPackageAttributesSection.uncompressedLength
+			> kMaxPackageAttributesSize) {
 		fErrorOutput->PrintError(
 			"Error: Package file package attributes section size "
 			"is %llu bytes. This is beyond the reader's sanity limit\n",
-			fPackageAttributesUncompressedLength);
+			fPackageAttributesSection.uncompressedLength);
 		return B_UNSUPPORTED;
 	}
 
@@ -796,44 +797,42 @@ PackageReaderImpl::Init(int fd, bool keepFD)
 	fScratchBufferSize = kScratchBufferSize;
 
 	// read in the complete TOC
-	fTOCSection = new(std::nothrow) uint8[fTOCUncompressedLength];
-	if (fTOCSection == NULL) {
+	fTOCSection.data
+		= new(std::nothrow) uint8[fTOCSection.uncompressedLength];
+	if (fTOCSection.data == NULL) {
 		fErrorOutput->PrintError("Error: Out of memory!\n");
 		return B_NO_MEMORY;
 	}
-	error = _ReadCompressedBuffer(fTOCSectionOffset, fTOCSection,
-		fTOCCompressedLength, fTOCUncompressedLength, fTOCCompression);
+	error = _ReadCompressedBuffer(fTOCSection);
 	if (error != B_OK)
 		return error;
 
 	// read in the complete package attributes section
-	fPackageAttributesSection
-		= new(std::nothrow) uint8[fPackageAttributesUncompressedLength];
-	if (fPackageAttributesSection == NULL) {
+	fPackageAttributesSection.data
+		= new(std::nothrow) uint8[fPackageAttributesSection.uncompressedLength];
+	if (fPackageAttributesSection.data == NULL) {
 		fErrorOutput->PrintError("Error: Out of memory!\n");
 		return B_NO_MEMORY;
 	}
-	error = _ReadCompressedBuffer(fPackageAttributesOffset,
-		fPackageAttributesSection, fPackageAttributesCompressedLength,
-		fPackageAttributesUncompressedLength, fPackageAttributesCompression);
+	error = _ReadCompressedBuffer(fPackageAttributesSection);
 	if (error != B_OK)
 		return error;
 
 	// start parsing the TOC
-	fInPackageAttributes = false;
-	fCurrentTOCOffset = 0;
+	fCurrentSection = &fTOCSection;
+	fCurrentSection->currentOffset = 0;
 
 	// attribute types
 	error = _ParseTOCAttributeTypes();
 	if (error != B_OK)
 		return error;
-	fCurrentTOCOffset += fTOCAttributeTypesLength;
+	fCurrentSection->currentOffset += fTOCAttributeTypesLength;
 
 	// strings
 	error = _ParseTOCStrings();
 	if (error != B_OK)
 		return error;
-	fCurrentTOCOffset += fTOCStringsLength;
+	fCurrentSection->currentOffset += fTOCStringsLength;
 
 	return B_OK;
 }
@@ -849,8 +848,8 @@ PackageReaderImpl::ParseContent(BPackageContentHandler* contentHandler)
 	if (result != B_OK)
 		return result;
 
-	fInPackageAttributes = true;
-	fCurrentPackageAttributesOffset = 0;
+	fCurrentSection = &fPackageAttributesSection;
+	fCurrentSection->currentOffset = 0;
 
 	return _ParsePackageAttributes(&context);
 }
@@ -866,19 +865,18 @@ PackageReaderImpl::ParseContent(BLowLevelPackageContentHandler* contentHandler)
 
 
 const char*
-PackageReaderImpl::_CheckCompression(uint32 compression, uint64 compressedLength,
-	uint64 uncompressedLength) const
+PackageReaderImpl::_CheckCompression(const SectionInfo& section) const
 {
-	switch (compression) {
+	switch (section.compression) {
 		case B_HPKG_COMPRESSION_NONE:
-			if (compressedLength != uncompressedLength) {
+			if (section.compressedLength != section.uncompressedLength) {
 				return "Uncompressed, but compressed and uncompressed length "
 					"don't match";
 			}
 			return NULL;
 
 		case B_HPKG_COMPRESSION_ZLIB:
-			if (compressedLength >= uncompressedLength) {
+			if (section.compressedLength >= section.uncompressedLength) {
 				return "Compressed, but compressed length is not less than "
 					"uncompressed length";
 			}
@@ -902,7 +900,7 @@ PackageReaderImpl::_ParseTOCAttributeTypes()
 	}
 
 	// parse the section and fill the table
-	uint8* position = fTOCSection + fCurrentTOCOffset;
+	uint8* position = fTOCSection.data + fTOCSection.currentOffset;
 	uint8* sectionEnd = position + fTOCAttributeTypesLength;
 	uint32 index = 0;
 	while (true) {
@@ -959,7 +957,7 @@ PackageReaderImpl::_ParseTOCStrings()
 	}
 
 	// parse the section and fill the table
-	char* position = (char*)fTOCSection + fCurrentTOCOffset;
+	char* position = (char*)fTOCSection.data + fTOCSection.currentOffset;
 	char* sectionEnd = position + fTOCStringsLength;
 	uint32 index = 0;
 	while (true) {
@@ -1005,7 +1003,7 @@ PackageReaderImpl::_ParseContent(AttributeHandlerContext* context,
 	AttributeHandler* rootAttributeHandler)
 {
 	// parse the TOC
-	fCurrentTOCOffset = fTOCAttributeTypesLength + fTOCStringsLength;
+	fTOCSection.currentOffset = fTOCAttributeTypesLength + fTOCStringsLength;
 
 	// prepare attribute handler context
 	context->heapOffset = fHeapOffset;
@@ -1019,9 +1017,10 @@ PackageReaderImpl::_ParseContent(AttributeHandlerContext* context,
 
 	status_t error = _ParseAttributeTree(context);
 	if (error == B_OK) {
-		if (fCurrentTOCOffset < fTOCUncompressedLength) {
+		if (fTOCSection.currentOffset < fTOCSection.uncompressedLength) {
 			fErrorOutput->PrintError("Error: %llu excess byte(s) in TOC "
-				"section\n", fTOCUncompressedLength - fCurrentTOCOffset);
+				"section\n",
+				fTOCSection.uncompressedLength - fTOCSection.currentOffset);
 			error = B_BAD_DATA;
 		}
 	}
@@ -1615,36 +1614,17 @@ PackageReaderImpl::_ReadUnsignedLEB128(uint64& _value)
 status_t
 PackageReaderImpl::_ReadString(const char*& _string, size_t* _stringLength)
 {
-	if (fInPackageAttributes) {
-		const char* string = (const char*)fPackageAttributesSection
-			+ fCurrentPackageAttributesOffset;
-		size_t stringLength = strnlen(string,
-			fPackageAttributesUncompressedLength
-				- fCurrentPackageAttributesOffset);
-
-		if (stringLength == fPackageAttributesUncompressedLength
-				- fCurrentPackageAttributesOffset) {
-			fErrorOutput->PrintError(
-				"_ReadString(): string extends beyond package attributes "
-				"section end\n");
-			return B_BAD_DATA;
-		}
-
-		_string = string;
-		if (_stringLength != NULL)
-			*_stringLength = stringLength;
-
-		fCurrentPackageAttributesOffset += stringLength + 1;
-		return B_OK;
-	}
-
-	const char* string = (const char*)fTOCSection + fCurrentTOCOffset;
+	const char* string
+		= (const char*)fCurrentSection->data + fCurrentSection->currentOffset;
 	size_t stringLength = strnlen(string,
-		fTOCUncompressedLength - fCurrentTOCOffset);
+		fCurrentSection->uncompressedLength - fCurrentSection->currentOffset);
 
-	if (stringLength == fTOCUncompressedLength - fCurrentTOCOffset) {
-		fErrorOutput->PrintError("_ReadString(): string extends beyond TOC "
-			"end\n");
+	if (stringLength
+		== fCurrentSection->uncompressedLength
+			- fCurrentSection->currentOffset) {
+		fErrorOutput->PrintError(
+			"_ReadString(): string extends beyond %s end\n",
+			fCurrentSection->name);
 		return B_BAD_DATA;
 	}
 
@@ -1652,7 +1632,7 @@ PackageReaderImpl::_ReadString(const char*& _string, size_t* _stringLength)
 	if (_stringLength != NULL)
 		*_stringLength = stringLength;
 
-	fCurrentTOCOffset += stringLength + 1;
+	fCurrentSection->currentOffset += stringLength + 1;
 	return B_OK;
 }
 
@@ -1660,47 +1640,31 @@ PackageReaderImpl::_ReadString(const char*& _string, size_t* _stringLength)
 status_t
 PackageReaderImpl::_GetTOCBuffer(size_t size, const void*& _buffer)
 {
-	if (size > fTOCUncompressedLength - fCurrentTOCOffset) {
+	if (size > fTOCSection.uncompressedLength - fTOCSection.currentOffset) {
 		fErrorOutput->PrintError("_GetTOCBuffer(%lu): read beyond TOC end\n",
 			size);
 		return B_BAD_DATA;
 	}
 
-	_buffer = fTOCSection + fCurrentTOCOffset;
-	fCurrentTOCOffset += size;
+	_buffer = fTOCSection.data + fTOCSection.currentOffset;
+	fTOCSection.currentOffset += size;
 	return B_OK;
 }
 
 
 status_t
-PackageReaderImpl::_ReadTOCBuffer(void* buffer, size_t size)
+PackageReaderImpl::_ReadSectionBuffer(void* buffer, size_t size)
 {
-	if (size > fTOCUncompressedLength - fCurrentTOCOffset) {
-		fErrorOutput->PrintError("_ReadTOCBuffer(%lu): read beyond TOC end\n",
-			size);
+	if (size > fCurrentSection->uncompressedLength
+			- fCurrentSection->currentOffset) {
+		fErrorOutput->PrintError("_ReadBuffer(%lu): read beyond %s end\n",
+			size, fCurrentSection->name);
 		return B_BAD_DATA;
 	}
 
-	memcpy(buffer, fTOCSection + fCurrentTOCOffset, size);
-	fCurrentTOCOffset += size;
-	return B_OK;
-}
-
-
-status_t
-PackageReaderImpl::_ReadPackageAttributesBuffer(void* buffer, size_t size)
-{
-	if (size > fPackageAttributesUncompressedLength
-		- fCurrentPackageAttributesOffset) {
-		fErrorOutput->PrintError(
-			"_ReadPackageAttributesBuffer(%lu): read beyond section end\n",
-			size);
-		return B_BAD_DATA;
-	}
-
-	memcpy(buffer, fPackageAttributesSection + fCurrentPackageAttributesOffset,
+	memcpy(buffer, fCurrentSection->data + fCurrentSection->currentOffset,
 		size);
-	fCurrentPackageAttributesOffset += size;
+	fCurrentSection->currentOffset += size;
 	return B_OK;
 }
 
@@ -1725,17 +1689,20 @@ PackageReaderImpl::_ReadBuffer(off_t offset, void* buffer, size_t size)
 
 
 status_t
-PackageReaderImpl::_ReadCompressedBuffer(off_t offset, void* buffer,
-	size_t compressedSize, size_t uncompressedSize, uint32 compression)
+PackageReaderImpl::_ReadCompressedBuffer(const SectionInfo& section)
 {
-	switch (compression) {
+	uint32 compressedSize = section.compressedLength;
+	uint64 offset = section.offset;
+
+	switch (section.compression) {
 		case B_HPKG_COMPRESSION_NONE:
-			return _ReadBuffer(offset, buffer, compressedSize);
+			return _ReadBuffer(offset, section.data, compressedSize);
 
 		case B_HPKG_COMPRESSION_ZLIB:
 		{
 			// init the decompressor
-			BBufferDataOutput bufferOutput(buffer, uncompressedSize);
+			BBufferDataOutput bufferOutput(section.data,
+				section.uncompressedLength);
 			ZlibDecompressor decompressor(&bufferOutput);
 			status_t error = decompressor.Init();
 			if (error != B_OK)
@@ -1762,7 +1729,7 @@ PackageReaderImpl::_ReadCompressedBuffer(off_t offset, void* buffer,
 				return error;
 
 			// verify that all data have been read
-			if (bufferOutput.BytesWritten() != uncompressedSize) {
+			if (bufferOutput.BytesWritten() != section.uncompressedLength) {
 				fErrorOutput->PrintError("Error: Missing bytes in uncompressed "
 					"buffer!\n");
 				return B_BAD_DATA;

@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>
  * Distributed under the terms of the MIT License.
  */
 #ifndef _PACKAGE__HPKG__PRIVATE__PACKAGE_READER_IMPL_H_
@@ -57,15 +58,36 @@ private:
 			struct PackageAttributeHandler;
 			struct PackageContentListHandler;
 
+			struct SectionInfo {
+				uint32			compression;
+				uint32			compressedLength;
+				uint32			uncompressedLength;
+				uint8*			data;
+				uint64			offset;
+				uint64			currentOffset;
+				const char*		name;
+
+				SectionInfo(const char* _name)
+					:
+					data(NULL),
+					name(_name)
+				{
+				}
+
+				~SectionInfo()
+				{
+					delete[] data;
+				}
+			};
+
 			typedef BPackageAttributeValue AttributeValue;
 			typedef SinglyLinkedList<AttributeHandler> AttributeHandlerList;
 
 private:
 			status_t			_Init(const char* fileName);
 
-			const char*			_CheckCompression(uint32 compression,
-									uint64 compressedLength,
-									uint64 uncompressedLength) const;
+			const char*			_CheckCompression(
+									const SectionInfo& section) const;
 
 			status_t			_ParseTOCAttributeTypes();
 			status_t			_ParseTOCStrings();
@@ -106,17 +128,12 @@ private:
 
 			status_t			_GetTOCBuffer(size_t size,
 									const void*& _buffer);
-			status_t			_ReadTOCBuffer(void* buffer, size_t size);
-
-			status_t			_ReadPackageAttributesBuffer(void* buffer,
-									size_t size);
+			status_t			_ReadSectionBuffer(void* buffer, size_t size);
 
 			status_t			_ReadBuffer(off_t offset, void* buffer,
 									size_t size);
-			status_t			_ReadCompressedBuffer(off_t offset,
-									void* buffer, size_t compressedSize,
-									size_t uncompressedSize,
-									uint32 compression);
+			status_t			_ReadCompressedBuffer(
+									const SectionInfo& section);
 
 	static	int8				_GetStandardIndex(const AttributeType* type);
 
@@ -134,27 +151,14 @@ private:
 			uint64				fHeapOffset;
 			uint64				fHeapSize;
 
-			uint32				fTOCCompression;
-			uint64				fTOCCompressedLength;
-			uint64				fTOCUncompressedLength;
-			uint64				fTOCSectionOffset;
 			uint64				fTOCAttributeTypesLength;
 			uint64				fTOCAttributeTypesCount;
 			uint64				fTOCStringsLength;
 			uint64				fTOCStringsCount;
 
-			bool				fInPackageAttributes;
-
-			uint32				fPackageAttributesCompression;
-			uint32				fPackageAttributesCompressedLength;
-			uint32				fPackageAttributesUncompressedLength;
-			uint64				fPackageAttributesOffset;
-
-			uint8*				fTOCSection;
-			uint64				fCurrentTOCOffset;
-
-			uint8*				fPackageAttributesSection;
-			uint64				fCurrentPackageAttributesOffset;
+			SectionInfo			fTOCSection;
+			SectionInfo			fPackageAttributesSection;
+			SectionInfo*		fCurrentSection;
 
 			AttributeTypeReference* fAttributeTypes;
 			char**				fStrings;
@@ -170,9 +174,7 @@ template<typename Type>
 status_t
 PackageReaderImpl::_Read(Type& _value)
 {
-	return fInPackageAttributes
-		? _ReadPackageAttributesBuffer(&_value, sizeof(Type))
-		: _ReadTOCBuffer(&_value, sizeof(Type));
+	return _ReadSectionBuffer(&_value, sizeof(Type));
 }
 
 
