@@ -58,7 +58,7 @@ our_image(image_info& image)
 int
 netmaskbitcount(const char* buf)
 {
-	return(__builtin_popcount(inet_addr(buf)));
+	return(PopCount(inet_addr(buf)));
 }
 
 
@@ -233,10 +233,10 @@ InterfaceListItem::_Init()
 void
 InterfaceListItem::_PopulateBitmaps(const char* mediaType) {
 
-	const uint8*	HVIFInterfaceIcon;
-	const uint8*	HVIFOffline;
-	const uint8*	HVIFPending;
-	const uint8*	HVIFOnline;
+	const uint8*	interfaceHVIF;
+	const uint8*	offlineHVIF;
+	const uint8*	pendingHVIF;
+	const uint8*	onlineHVIF;
 
 	BBitmap*		interfaceBitmap = NULL;
 
@@ -257,22 +257,22 @@ InterfaceListItem::_PopulateBitmaps(const char* mediaType) {
 	size_t iconSize;
 
 	// Try specific interface icon?
-	HVIFInterfaceIcon = (const uint8*)addonResources.LoadResource(
+	interfaceHVIF = (const uint8*)addonResources.LoadResource(
 		B_VECTOR_ICON_TYPE, Name(), &iconSize);
 
-	if (HVIFInterfaceIcon == NULL && mediaType != NULL)
+	if (interfaceHVIF == NULL && mediaType != NULL)
 		// Not found, try interface media type?
-		HVIFInterfaceIcon = (const uint8*)addonResources.LoadResource(
+		interfaceHVIF = (const uint8*)addonResources.LoadResource(
 			B_VECTOR_ICON_TYPE, mediaType, &iconSize);
-	if (HVIFInterfaceIcon == NULL)
+	if (interfaceHVIF == NULL)
 		// Not found, try default interface icon?
-		HVIFInterfaceIcon = (const uint8*)addonResources.LoadResource(
+		interfaceHVIF = (const uint8*)addonResources.LoadResource(
 			B_VECTOR_ICON_TYPE, "ether", &iconSize);
 
-	if (HVIFInterfaceIcon) {
+	if (interfaceHVIF) {
 		// Now build the bitmap
 		interfaceBitmap = new BBitmap(BRect(0, 0, 31, 31), 0, B_RGBA32);
-		if (BIconUtils::GetVectorIcon(HVIFInterfaceIcon,
+		if (BIconUtils::GetVectorIcon(interfaceHVIF,
 			iconSize, interfaceBitmap) == B_OK)
 			fIcon = interfaceBitmap;
 		else
@@ -280,28 +280,28 @@ InterfaceListItem::_PopulateBitmaps(const char* mediaType) {
 	}
 
 	// Load possible state icons
-	HVIFOffline = (const uint8*)addonResources.LoadResource(
+	offlineHVIF = (const uint8*)addonResources.LoadResource(
 		B_VECTOR_ICON_TYPE, "offline", &iconSize);
 
-	if (HVIFOffline) {
+	if (offlineHVIF) {
 		fIconOffline = new BBitmap(BRect(0, 0, 31, 31), 0, B_RGBA32);
-		BIconUtils::GetVectorIcon(HVIFOffline, iconSize, fIconOffline);
+		BIconUtils::GetVectorIcon(offlineHVIF, iconSize, fIconOffline);
 	}
 
-	HVIFPending = (const uint8*)addonResources.LoadResource(
+	pendingHVIF = (const uint8*)addonResources.LoadResource(
 		B_VECTOR_ICON_TYPE, "pending", &iconSize);
 
-	if (HVIFPending) {
+	if (pendingHVIF) {
 		fIconPending = new BBitmap(BRect(0, 0, 31, 31), 0, B_RGBA32);
-		BIconUtils::GetVectorIcon(HVIFPending, iconSize, fIconPending);
+		BIconUtils::GetVectorIcon(pendingHVIF, iconSize, fIconPending);
 	}
 
-	HVIFOnline = (const uint8*)addonResources.LoadResource(
+	onlineHVIF = (const uint8*)addonResources.LoadResource(
 		B_VECTOR_ICON_TYPE, "online", &iconSize);
 
-	if (HVIFOnline) {
+	if (onlineHVIF) {
 		fIconOnline = new BBitmap(BRect(0, 0, 31, 31), 0, B_RGBA32);
-		BIconUtils::GetVectorIcon(HVIFOnline, iconSize, fIconOnline);
+		BIconUtils::GetVectorIcon(onlineHVIF, iconSize, fIconOnline);
 	}
 
 
