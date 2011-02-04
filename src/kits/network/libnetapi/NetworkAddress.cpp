@@ -17,6 +17,26 @@
 #include <sys/sockio.h>
 
 
+/* The GCC builtin below only exists in > GCC 3.4
+ * Benefits include faster execution time as the builtin
+ * uses a bitcounting cpu instruction if it exists
+ */
+#if __GNUC__ >= 4
+#	define BitCount(buffer) __builtin_popcount(buffer)
+#else
+ssize_t BitCount(uint32 buf)
+{
+	ssize_t result = 0;
+	for (uint8 i = 32; i > 0; i--) {
+		if ((buf & (1 << (i - 1))) == 0)
+			break;
+		result++;
+	}
+	return result;
+}
+#endif
+
+
 static uint8
 from_hex(char hex)
 {
@@ -763,21 +783,15 @@ BNetworkAddress::PrefixLength() const
 		{
 			sockaddr_in& mask = (sockaddr_in&)fAddress;
 
-			ssize_t result = 0;
 			uint32 hostMask = ntohl(mask.sin_addr.s_addr);
-			for (uint8 i = 32; i > 0; i--) {
-				if ((hostMask & (1 << (i - 1))) == 0)
-					break;
-				result++;
-			}
-
-			return result;
+			return BitCount(hostMask);
 		}
 
 		case AF_INET6:
 		{
 			sockaddr_in6& mask = (sockaddr_in6&)fAddress;
 
+			// TODO : see if we can use the optimized BitCount for this
 			ssize_t result = 0;
 			for (uint8 i = 0; i < sizeof(in6_addr); i++) {
 				for (uint8 j = 0; j < 8; j++) {
