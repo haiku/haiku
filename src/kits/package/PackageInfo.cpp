@@ -506,6 +506,7 @@ BPackageInfo::Parser::_ParseResolvableExprList(
 		if (op.type == TOKEN_OPERATOR_LESS
 			|| op.type == TOKEN_OPERATOR_LESS_EQUAL
 			|| op.type == TOKEN_OPERATOR_EQUAL
+			|| op.type == TOKEN_OPERATOR_NOT_EQUAL
 			|| op.type == TOKEN_OPERATOR_GREATER_EQUAL
 			|| op.type == TOKEN_OPERATOR_GREATER)
 			_ParseVersionValue(&version, true);
@@ -513,11 +514,15 @@ BPackageInfo::Parser::_ParseResolvableExprList(
 			_RewindTo(op);
 		else {
 			throw ParseError(
-				"expected '<', '<=', '==', '>=', '>', comma or ']'", op.pos);
+				"expected '<', '<=', '==', '!=', '>=', '>', comma or ']'",
+				op.pos);
 		}
 
-		value->AddItem(
-			new BPackageResolvableExpression(name.text, op.text, version));
+		BPackageResolvableOperator resolvableOperator
+			= (BPackageResolvableOperator)(op.type - TOKEN_OPERATOR_LESS);
+
+		value->AddItem(new BPackageResolvableExpression(name.text,
+			resolvableOperator, version));
 	}
 }
 
@@ -683,7 +688,7 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 			_ParseResolvableExprList(&supplementsList);
 			int count = supplementsList.CountItems();
 			for (int i = 0; i < count; ++i)
-				packageInfo->AddRequires(*(supplementsList.ItemAt(i)));
+				packageInfo->AddSupplements(*(supplementsList.ItemAt(i)));
 			seen[B_PACKAGE_INFO_SUPPLEMENTS] = true;
 		} else if (t.text.ICompare(names[B_PACKAGE_INFO_CONFLICTS]) == 0) {
 			if (seen[B_PACKAGE_INFO_CONFLICTS]) {
@@ -696,7 +701,7 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 			_ParseResolvableExprList(&conflictsList);
 			int count = conflictsList.CountItems();
 			for (int i = 0; i < count; ++i)
-				packageInfo->AddRequires(*(conflictsList.ItemAt(i)));
+				packageInfo->AddConflicts(*(conflictsList.ItemAt(i)));
 			seen[B_PACKAGE_INFO_CONFLICTS] = true;
 		} else if (t.text.ICompare(names[B_PACKAGE_INFO_FRESHENS]) == 0) {
 			if (seen[B_PACKAGE_INFO_FRESHENS]) {
@@ -709,7 +714,7 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 			_ParseResolvableExprList(&freshensList);
 			int count = freshensList.CountItems();
 			for (int i = 0; i < count; ++i)
-				packageInfo->AddRequires(*(freshensList.ItemAt(i)));
+				packageInfo->AddFreshens(*(freshensList.ItemAt(i)));
 			seen[B_PACKAGE_INFO_FRESHENS] = true;
 		} else if (t.text.ICompare(names[B_PACKAGE_INFO_REPLACES]) == 0) {
 			if (seen[B_PACKAGE_INFO_REPLACES]) {
@@ -722,7 +727,7 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 			_ParseStringList(&replacesList, false);
 			int count = replacesList.CountItems();
 			for (int i = 0; i < count; ++i)
-				packageInfo->AddRequires(*(replacesList.ItemAt(i)));
+				packageInfo->AddReplaces(*(replacesList.ItemAt(i)));
 			seen[B_PACKAGE_INFO_REPLACES] = true;
 		}
 	}
@@ -749,10 +754,10 @@ const char* BPackageInfo::kElementNames[B_PACKAGE_INFO_ENUM_COUNT] = {
 	"licenses",
 	"provides",
 	"requires",
-	"conflicts",
 	"supplements",
-	"replaces",
+	"conflicts",
 	"freshens",
+	"replaces",
 };
 
 

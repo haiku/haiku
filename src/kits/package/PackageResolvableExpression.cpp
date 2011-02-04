@@ -10,13 +10,27 @@
 namespace BPackageKit {
 
 
+const char*
+BPackageResolvableExpression
+::kOperatorNames[B_PACKAGE_RESOLVABLE_OP_ENUM_COUNT] = {
+	"<",
+	"<=",
+	"==",
+	"!=",
+	">=",
+	">",
+};
+
+
 BPackageResolvableExpression::BPackageResolvableExpression()
+	:
+	fOperator(B_PACKAGE_RESOLVABLE_OP_ENUM_COUNT)
 {
 }
 
 
 BPackageResolvableExpression::BPackageResolvableExpression(const BString& name,
-	const BString& _operator, const BPackageVersion& version)
+	BPackageResolvableOperator _operator, const BPackageVersion& version)
 	:
 	fName(name),
 	fOperator(_operator),
@@ -32,10 +46,10 @@ BPackageResolvableExpression::InitCheck() const
 		return B_NO_INIT;
 
 	// either both or none of operator and version must be set
-	if (fOperator.Length() == 0 && fVersion.InitCheck() == B_OK)
-		return B_NO_INIT;
-
-	if (fOperator.Length() > 0 && fVersion.InitCheck() != B_OK)
+	if ((fOperator == B_PACKAGE_RESOLVABLE_OP_ENUM_COUNT
+			&& fVersion.InitCheck() == B_OK)
+		|| (fOperator >= 0 && fOperator < B_PACKAGE_RESOLVABLE_OP_ENUM_COUNT
+			&& fVersion.InitCheck() != B_OK))
 		return B_NO_INIT;
 
 	return B_OK;
@@ -49,7 +63,7 @@ BPackageResolvableExpression::Name() const
 }
 
 
-const BString&
+BPackageResolvableOperator
 BPackageResolvableExpression::Operator() const
 {
 	return fOperator;
@@ -77,7 +91,7 @@ BPackageResolvableExpression::AsString() const
 
 void
 BPackageResolvableExpression::SetTo(const BString& name,
-	const BString& _operator, const BPackageVersion& version)
+	BPackageResolvableOperator _operator, const BPackageVersion& version)
 {
 	fName = name;
 	fOperator = _operator;
@@ -89,7 +103,7 @@ void
 BPackageResolvableExpression::Clear()
 {
 	fName.Truncate(0);
-	fOperator.Truncate(0);
+	fOperator = B_PACKAGE_RESOLVABLE_OP_ENUM_COUNT;
 	fVersion.Clear();
 }
 

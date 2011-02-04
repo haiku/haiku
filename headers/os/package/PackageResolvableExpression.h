@@ -8,6 +8,7 @@
 
 #include <String.h>
 
+#include <package/PackageResolvableOperator.h>
 #include <package/PackageVersion.h>
 
 
@@ -34,27 +35,32 @@ public:
 								BPackageResolvableExpression();
 								BPackageResolvableExpression(
 									const BString& name,
-									const BString& _operator = "",
+									BPackageResolvableOperator _op
+										= B_PACKAGE_RESOLVABLE_OP_ENUM_COUNT,
 									const BPackageVersion& version
 										= BPackageVersion());
 
 			status_t			InitCheck() const;
 
 			const BString&		Name() const;
-			const BString&		Operator() const;
+			BPackageResolvableOperator	Operator() const;
 			const BPackageVersion& Version() const;
 
 			BString				AsString() const;
 
 			void				SetTo(const BString& name,
-									const BString& _operator = "",
+									BPackageResolvableOperator _op
+										= B_PACKAGE_RESOLVABLE_OP_ENUM_COUNT,
 									const BPackageVersion& version
 										= BPackageVersion());
 			void				Clear();
 
+public:
+	static	const char*			kOperatorNames[];
+
 private:
 			BString				fName;
-			BString				fOperator;
+			BPackageResolvableOperator	fOperator;
 			BPackageVersion		fVersion;
 };
 
