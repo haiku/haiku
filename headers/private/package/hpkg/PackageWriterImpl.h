@@ -82,6 +82,10 @@ private:
 
 			void				_WritePackageVersion(
 									const BPackageVersion& version);
+			void				_WritePackageResolvableExpressionList(
+									const BObjectList<
+										BPackageResolvableExpression>& list,
+									uint8 id);
 
 	template<typename Type>
 	inline	void				_Write(const Type& value);

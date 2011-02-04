@@ -1,0 +1,26 @@
+/*
+ * Copyright 2011, Haiku, Inc.
+ * Distributed under the terms of the MIT License.
+ */
+#ifndef _PACKAGE__PACKAGE_RESOLVABLE_TYPE_H_
+#define _PACKAGE__PACKAGE_RESOLVABLE_TYPE_H_
+
+
+namespace BPackageKit {
+
+
+enum BPackageResolvableType {
+	B_PACKAGE_RESOLVABLE_TYPE_DEFAULT = 0,
+	B_PACKAGE_RESOLVABLE_TYPE_LIBRARY,
+	B_PACKAGE_RESOLVABLE_TYPE_COMMAND,
+	B_PACKAGE_RESOLVABLE_TYPE_APPLICATION,
+	B_PACKAGE_RESOLVABLE_TYPE_ADD_ON,
+	//
+	B_PACKAGE_RESOLVABLE_TYPE_ENUM_COUNT,
+};
+
+
+}	// namespace BPackageKit
+
+
+#endif	// _PACKAGE__PACKAGE_RESOLVABLE_TYPE_H_

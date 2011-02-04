@@ -14,13 +14,17 @@
 #include <package/hpkg/PackageContentHandler.h>
 #include <package/hpkg/PackageEntry.h>
 #include <package/hpkg/PackageEntryAttribute.h>
+#include <package/hpkg/PackageInfoAttributeValue.h>
 #include <package/hpkg/PackageReader.h>
+
+#include <package/PackageInfo.h>
 
 #include "package.h"
 #include "StandardErrorOutput.h"
 
 
 using namespace BPackageKit::BHPKG;
+using namespace BPackageKit;
 
 
 struct PackageContentListHandler : BPackageContentHandler {
@@ -104,6 +108,114 @@ struct PackageContentListHandler : BPackageContentHandler {
 		return B_OK;
 	}
 
+	virtual status_t HandlePackageAttribute(
+		const BPackageInfoAttributeValue& value)
+	{
+		switch (value.attributeIndex) {
+			case B_PACKAGE_INFO_NAME:
+				printf("package-attributes:\n");
+				printf("\tname: %s\n", value.string);
+				break;
+
+			case B_PACKAGE_INFO_SUMMARY:
+				printf("\tsummary: %s\n", value.string);
+				break;
+
+			case B_PACKAGE_INFO_DESCRIPTION:
+				printf("\tdescription: %s\n", value.string);
+				break;
+
+			case B_PACKAGE_INFO_VENDOR:
+				printf("\tvendor: %s\n", value.string);
+				break;
+
+			case B_PACKAGE_INFO_PACKAGER:
+				printf("\tpackager: %s\n", value.string);
+				break;
+
+			case B_PACKAGE_INFO_ARCHITECTURE:
+				printf("\tarchitecure: %s\n",
+					BPackageInfo::kArchitectureNames[value.unsignedInt]);
+				break;
+
+			case B_PACKAGE_INFO_VERSION:
+				printf("\tversion: %s.%s.%s-%d\n", value.version.major,
+					value.version.minor, value.version.micro,
+					value.version.release);
+				break;
+
+			case B_PACKAGE_INFO_COPYRIGHTS:
+				printf("\tcopyright: %s\n", value.string);
+				break;
+
+			case B_PACKAGE_INFO_LICENSES:
+				printf("\tlicense: %s\n", value.string);
+				break;
+
+			case B_PACKAGE_INFO_PROVIDES:
+				printf("\tprovides: %s", value.resolvable.name);
+				if (value.resolvable.haveVersion) {
+					printf(" = ");
+					_PrintPackageVersion(value.resolvable.version);
+				}
+				printf("\n");
+				break;
+
+			case B_PACKAGE_INFO_REQUIRES:
+				printf("\trequires: %s", value.resolvableExpression.name);
+				if (value.resolvableExpression.haveOpAndVersion) {
+					printf(" %s ", BPackageResolvableExpression::kOperatorNames[
+							value.resolvableExpression.op]);
+					_PrintPackageVersion(value.resolvableExpression.version);
+				}
+				printf("\n");
+				break;
+
+			case B_PACKAGE_INFO_SUPPLEMENTS:
+				printf("\tsupplements: %s", value.resolvableExpression.name);
+				if (value.resolvableExpression.haveOpAndVersion) {
+					printf(" %s ", BPackageResolvableExpression::kOperatorNames[
+							value.resolvableExpression.op]);
+					_PrintPackageVersion(value.resolvableExpression.version);
+				}
+				printf("\n");
+				break;
+
+			case B_PACKAGE_INFO_CONFLICTS:
+				printf("\tconflicts: %s", value.resolvableExpression.name);
+				if (value.resolvableExpression.haveOpAndVersion) {
+					printf(" %s ", BPackageResolvableExpression::kOperatorNames[
+							value.resolvableExpression.op]);
+					_PrintPackageVersion(value.resolvableExpression.version);
+				}
+				printf("\n");
+				break;
+
+			case B_PACKAGE_INFO_FRESHENS:
+				printf("\tfreshens: %s", value.resolvableExpression.name);
+				if (value.resolvableExpression.haveOpAndVersion) {
+					printf(" %s ", BPackageResolvableExpression::kOperatorNames[
+							value.resolvableExpression.op]);
+					_PrintPackageVersion(value.resolvableExpression.version);
+				}
+				printf("\n");
+				break;
+
+			case B_PACKAGE_INFO_REPLACES:
+				printf("\treplaces: %s\n", value.string);
+				break;
+
+			default:
+				printf(
+					"*** Invalid package attribute section: unexpected "
+					"package attribute index %d encountered\n",
+					value.attributeIndex);
+				return B_BAD_DATA;
+		}
+
+		return B_OK;
+	}
+
 	virtual void HandleErrorOccurred()
 	{
 	}
@@ -121,6 +233,17 @@ private:
 
 		buffer[3] = '\0';
 		return buffer;
+	}
+
+	static void _PrintPackageVersion(const BPackageVersionData& version)
+	{
+		printf("%s", version.major);
+		if (version.minor != NULL && version.minor[0] != '\0')
+			printf(".%s", version.minor);
+		if (version.micro != NULL && version.micro[0] != '\0')
+			printf(".%s", version.micro);
+		if (version.release > 0)
+			printf("-%d", version.release);
 	}
 
 private:

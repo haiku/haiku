@@ -17,6 +17,7 @@ namespace BHPKG {
 class BPackageAttributeValue;
 class BPackageEntry;
 class BPackageEntryAttribute;
+class BPackageInfoAttributeValue;
 
 
 class BLowLevelPackageContentHandler {
@@ -42,6 +43,10 @@ public:
 	virtual	status_t			HandleEntryAttribute(BPackageEntry* entry,
 									BPackageEntryAttribute* attribute) = 0;
 	virtual	status_t			HandleEntryDone(BPackageEntry* entry) = 0;
+
+	virtual	status_t			HandlePackageAttribute(
+									const BPackageInfoAttributeValue& value
+									) = 0;
 
 	virtual	void				HandleErrorOccurred() = 0;
 };

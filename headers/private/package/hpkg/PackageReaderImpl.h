@@ -12,6 +12,7 @@
 
 #include <package/hpkg/PackageAttributeValue.h>
 #include <package/hpkg/PackageContentHandler.h>
+#include <package/hpkg/PackageInfoAttributeValue.h>
 #include <package/hpkg/PackageReader.h>
 
 
@@ -74,6 +75,25 @@ private:
 			status_t			_ParseAttributeTree(
 									AttributeHandlerContext* context);
 
+			status_t			_ParsePackageAttributes(
+									AttributeHandlerContext* context);
+			status_t			_ParsePackageVersion(
+									BPackageVersionData& _version,
+									const char* major = NULL);
+			status_t			_ParsePackageProvides(
+									BPackageResolvableData& _resolvable,
+									BPackageResolvableType providesType);
+			status_t			_ParsePackageResolvableExpression(
+									BPackageResolvableExpressionData&
+										_resolvableExpression,
+									const char* resolvableName,
+									bool hasChildren);
+
+			status_t			_ReadPackageAttribute(uint8& _id,
+									AttributeValue& _value,
+									bool* _hasChildren = NULL,
+									uint64* _tag = NULL);
+
 			status_t			_ReadAttributeValue(uint8 type, uint8 encoding,
 									AttributeValue& _value);
 
@@ -87,6 +107,9 @@ private:
 			status_t			_GetTOCBuffer(size_t size,
 									const void*& _buffer);
 			status_t			_ReadTOCBuffer(void* buffer, size_t size);
+
+			status_t			_ReadPackageAttributesBuffer(void* buffer,
+									size_t size);
 
 			status_t			_ReadBuffer(off_t offset, void* buffer,
 									size_t size);
@@ -103,7 +126,7 @@ private:
 	inline	AttributeHandler*	_PopAttributeHandler();
 
 private:
-			BErrorOutput*	fErrorOutput;
+			BErrorOutput*		fErrorOutput;
 			int					fFD;
 			bool				fOwnsFD;
 
@@ -120,6 +143,8 @@ private:
 			uint64				fTOCStringsLength;
 			uint64				fTOCStringsCount;
 
+			bool				fInPackageAttributes;
+
 			uint32				fPackageAttributesCompression;
 			uint32				fPackageAttributesCompressedLength;
 			uint32				fPackageAttributesUncompressedLength;
@@ -127,6 +152,10 @@ private:
 
 			uint8*				fTOCSection;
 			uint64				fCurrentTOCOffset;
+
+			uint8*				fPackageAttributesSection;
+			uint64				fCurrentPackageAttributesOffset;
+
 			AttributeTypeReference* fAttributeTypes;
 			char**				fStrings;
 
@@ -141,7 +170,9 @@ template<typename Type>
 status_t
 PackageReaderImpl::_Read(Type& _value)
 {
-	return _ReadTOCBuffer(&_value, sizeof(Type));
+	return fInPackageAttributes
+		? _ReadPackageAttributesBuffer(&_value, sizeof(Type))
+		: _ReadTOCBuffer(&_value, sizeof(Type));
 }
 
 

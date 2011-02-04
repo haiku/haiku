@@ -1068,6 +1068,7 @@ PackageWriterImpl::_WritePackageAttributes(hpkg_header& header)
 		_WriteString(licenseList.ItemAt(i)->String());
 	}
 
+	// provides list
 	const BObjectList<BPackageResolvable>& providesList
 		= fPackageInfo.ProvidesList();
 	for (int i = 0; i < providesList.CountItems(); ++i) {
@@ -1075,31 +1076,41 @@ PackageWriterImpl::_WritePackageAttributes(hpkg_header& header)
 		bool hasVersion = resolvable->Version().InitCheck() == B_OK;
 		_WriteUnsignedLEB128(B_HPKG_PACKAGE_ATTRIBUTE_TAG_COMPOSE(
 			B_HPKG_PACKAGE_ATTRIBUTE_PROVIDES_TYPE, B_HPKG_ATTRIBUTE_TYPE_UINT,
-			B_HPKG_ATTRIBUTE_ENCODING_INT_8_BIT, hasVersion ? 1 : 0));
-		_Write<uint8>(fPackageInfo.Architecture());
+			B_HPKG_ATTRIBUTE_ENCODING_INT_8_BIT, 0));
+		_Write<uint8>((uint8)resolvable->Type());
 		_WriteUnsignedLEB128(B_HPKG_PACKAGE_ATTRIBUTE_TAG_COMPOSE(
 			B_HPKG_PACKAGE_ATTRIBUTE_PROVIDES, B_HPKG_ATTRIBUTE_TYPE_STRING,
-			B_HPKG_ATTRIBUTE_ENCODING_STRING_INLINE, 1));
-		_WriteString(resolvable->AsString().String());
+			B_HPKG_ATTRIBUTE_ENCODING_STRING_INLINE, hasVersion));
+		_WriteString(resolvable->Name().String());
 		if (hasVersion) {
 			_WritePackageVersion(resolvable->Version());
 			_Write<uint8>(0);
 		}
 	}
 
-	const BObjectList<BPackageResolvableExpression>& requiresList
-		= fPackageInfo.RequiresList();
-	for (int i = 0; i < requiresList.CountItems(); ++i) {
-		BPackageResolvableExpression* resolvableExpr = requiresList.ItemAt(i);
-		bool hasVersion = resolvableExpr->Version().InitCheck() == B_OK;
+	// requires list
+	_WritePackageResolvableExpressionList(fPackageInfo.RequiresList(),
+		B_HPKG_PACKAGE_ATTRIBUTE_REQUIRES);
+
+	// supplements list
+	_WritePackageResolvableExpressionList(fPackageInfo.SupplementsList(),
+		B_HPKG_PACKAGE_ATTRIBUTE_SUPPLEMENTS);
+
+	// conflicts list
+	_WritePackageResolvableExpressionList(fPackageInfo.ConflictsList(),
+		B_HPKG_PACKAGE_ATTRIBUTE_CONFLICTS);
+
+	// freshens list
+	_WritePackageResolvableExpressionList(fPackageInfo.FreshensList(),
+		B_HPKG_PACKAGE_ATTRIBUTE_FRESHENS);
+
+	// replaces list
+	const BObjectList<BString>& replacesList = fPackageInfo.ReplacesList();
+	for (int i = 0; i < replacesList.CountItems(); ++i) {
 		_WriteUnsignedLEB128(B_HPKG_PACKAGE_ATTRIBUTE_TAG_COMPOSE(
-			B_HPKG_PACKAGE_ATTRIBUTE_REQUIRES, B_HPKG_ATTRIBUTE_TYPE_STRING,
-			B_HPKG_ATTRIBUTE_ENCODING_STRING_INLINE, hasVersion));
-		_WriteString(resolvableExpr->AsString().String());
-		if (hasVersion) {
-			_WritePackageVersion(resolvableExpr->Version());
-			_Write<uint8>(0);
-		}
+			B_HPKG_PACKAGE_ATTRIBUTE_REPLACES, B_HPKG_ATTRIBUTE_TYPE_STRING,
+			B_HPKG_ATTRIBUTE_ENCODING_STRING_INLINE, 0));
+		_WriteString(replacesList.ItemAt(i)->String());
 	}
 
 	_Write<uint8>(0);
@@ -1140,6 +1151,30 @@ PackageWriterImpl::_WritePackageVersion(const BPackageVersion& version)
 		B_HPKG_PACKAGE_ATTRIBUTE_VERSION_RELEASE, B_HPKG_ATTRIBUTE_TYPE_UINT,
 		B_HPKG_ATTRIBUTE_ENCODING_INT_8_BIT, 0));
 	_Write<uint8>(version.Release());
+}
+
+
+void
+PackageWriterImpl::_WritePackageResolvableExpressionList(
+	const BObjectList<BPackageResolvableExpression>& list, uint8 id)
+{
+	for (int i = 0; i < list.CountItems(); ++i) {
+		BPackageResolvableExpression* resolvableExpr = list.ItemAt(i);
+		bool hasVersion = resolvableExpr->Version().InitCheck() == B_OK;
+		_WriteUnsignedLEB128(B_HPKG_PACKAGE_ATTRIBUTE_TAG_COMPOSE(
+			id, B_HPKG_ATTRIBUTE_TYPE_STRING,
+			B_HPKG_ATTRIBUTE_ENCODING_STRING_INLINE, hasVersion));
+		_WriteString(resolvableExpr->Name().String());
+		if (hasVersion) {
+			_WriteUnsignedLEB128(B_HPKG_PACKAGE_ATTRIBUTE_TAG_COMPOSE(
+				B_HPKG_PACKAGE_ATTRIBUTE_RESOLVABLE_OPERATOR,
+				B_HPKG_ATTRIBUTE_TYPE_UINT, B_HPKG_ATTRIBUTE_ENCODING_INT_8_BIT,
+				0));
+			_Write<uint8>(resolvableExpr->Operator());
+			_WritePackageVersion(resolvableExpr->Version());
+			_Write<uint8>(0);
+		}
+	}
 }
 
 
