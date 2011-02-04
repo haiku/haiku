@@ -6,7 +6,7 @@ SubDirSysHdrs [ FDirName $(SUBDIR) libjasper ] ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 	#for BaseTranslator.h and friends
-
+	
 # Exclude unwanted formats
 CCFLAGS += -DEXCLUDE_MIF_SUPPORT
 	-DEXCLUDE_PNM_SUPPORT
@@ -61,6 +61,8 @@ local jasper_files =
 	;
 
 ObjectCcFlags [ FGristFiles $(jasper_files:S=$(SUFOBJ)) ] : -w ;
+
+AddResources JPEG2000Translator : JPEG2000Translator.rdef ;
 
 Translator JPEG2000Translator :
 

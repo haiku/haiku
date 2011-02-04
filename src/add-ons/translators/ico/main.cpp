@@ -11,13 +11,11 @@
 #include "ICO.h"
 #include "TranslatorWindow.h"
 
-
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "main"
 
-
 int
-main(int /*argc*/, char **/*argv*/)
+main(int /*argc*/, char ** /*argv*/)
 {
 	BApplication app("application/x-vnd.Haiku-ICOTranslator");
 

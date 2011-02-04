@@ -33,6 +33,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <Catalog.h>
 #include <GroupLayoutBuilder.h>
 #include <MenuBar.h>
 #include <MenuField.h>
@@ -48,6 +49,9 @@
 #include "SGIView.h"
 
 const char* author = "Stephan Aßmus, <stippi@yellowbites.com>";
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "SGIView"
 
 // add_menu_item
 void
@@ -83,11 +87,13 @@ SGIView::SGIView(const char* name, uint32 flags, TranslatorSettings* settings)
 {
 	BPopUpMenu* menu = new BPopUpMenu("pick compression");
 
-	uint32 currentCompression = fSettings->SetGetInt32(SGI_SETTING_COMPRESSION);
+	uint32 currentCompression = 
+		fSettings->SetGetInt32(SGI_SETTING_COMPRESSION);
 	// create the menu items with the various compression methods
-	add_menu_item(menu, SGI_COMP_NONE, "None", currentCompression);
+	add_menu_item(menu, SGI_COMP_NONE, B_TRANSLATE("None"), 
+		currentCompression);
 //	menu->AddSeparatorItem();
-	add_menu_item(menu, SGI_COMP_RLE, "RLE", currentCompression);
+	add_menu_item(menu, SGI_COMP_RLE, B_TRANSLATE("RLE"), currentCompression);
 
 // DON'T turn this on, it's so slow that I didn't wait long enough
 // the one time I tested this. So I don't know if the code even works.
@@ -97,27 +103,29 @@ SGIView::SGIView(const char* name, uint32 flags, TranslatorSettings* settings)
 
 //	add_menu_item(menu, SGI_COMP_ARLE, "Agressive RLE", currentCompression);
 
-	fCompressionMF = new BMenuField("compression", "Use compression:", menu);
+	fCompressionMF = new BMenuField("compression", 
+		B_TRANSLATE("Use compression:"), menu);
 
 	BAlignment labelAlignment(B_ALIGN_LEFT, B_ALIGN_NO_VERTICAL);
 
-	BStringView* titleView = new BStringView("title", "SGI image translator");
+	BStringView* titleView = new BStringView("title", 
+		B_TRANSLATE("SGI image translator"));
 	titleView->SetFont(be_bold_font);
 	titleView->SetExplicitAlignment(labelAlignment);
 
 	char detail[100];
-	sprintf(detail, "Version %d.%d.%d %s",
+	sprintf(detail, B_TRANSLATE("Version %d.%d.%d %s"),
 		static_cast<int>(B_TRANSLATION_MAJOR_VERSION(SGI_TRANSLATOR_VERSION)),
 		static_cast<int>(B_TRANSLATION_MINOR_VERSION(SGI_TRANSLATOR_VERSION)),
-		static_cast<int>(B_TRANSLATION_REVISION_VERSION(SGI_TRANSLATOR_VERSION)),
-		__DATE__);
+		static_cast<int>(B_TRANSLATION_REVISION_VERSION(
+			SGI_TRANSLATOR_VERSION)), __DATE__);
 	BStringView* detailView = new BStringView("details", detail);
 	detailView->SetExplicitAlignment(labelAlignment);
 
 	BTextView* infoView = new BTextView("info");
-	infoView->SetText(BString("written by:\n")
+	infoView->SetText(BString(B_TRANSLATE("written by:\n"))
 			.Append(author)
-			.Append("\n\nbased on GIMP SGI plugin v1.5:\n")
+			.Append(B_TRANSLATE("\n\nbased on GIMP SGI plugin v1.5:\n"))
 			.Append(kSGICopyright).String());
 	infoView->SetExplicitAlignment(labelAlignment);
 	infoView->SetWordWrap(false);

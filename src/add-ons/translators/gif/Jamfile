@@ -2,6 +2,8 @@ SubDir HAIKU_TOP src add-ons translators gif ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+AddResources GIFTranslator : GIFTranslator.rdef ;
+
 Translator GIFTranslator :
 	# Main Source
 	GIFTranslator.cpp
@@ -19,6 +21,14 @@ Translator GIFTranslator :
 	be translation $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
 	: true
 ;
+
+DoCatalogs GIFTranslator :
+	x-vnd.Haiku-GIFTranslator
+	:
+	GIFTranslator.cpp
+	GIFView.cpp
+;
+
 
 Package haiku-translationkit-cvs :
 	GIFTranslator :

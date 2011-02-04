@@ -4,6 +4,8 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
+AddResources PCXTranslator : PCXTranslator.rdef ;
+
 Translator PCXTranslator :
 	# PCXTranslator classes
 	main.cpp

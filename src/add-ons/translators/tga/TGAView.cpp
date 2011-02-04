@@ -29,6 +29,7 @@
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
 
+#include <Catalog.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
 #include <SpaceLayoutItem.h>
@@ -36,9 +37,11 @@
 #include <stdio.h>
 #include <string.h>
 
-
 #include "TGAView.h"
 #include "TGATranslator.h"
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "TGAView"
 
 
 TGAView::TGAView(const char *name, uint32 flags, TranslatorSettings *settings)
@@ -53,22 +56,22 @@ TGAView::TGAView(const char *name, uint32 flags, TranslatorSettings *settings)
  	fTitle->SetFont(be_bold_font);
  
  	char detail[100];
- 	sprintf(detail, "Version %d.%d.%d %s",
+ 	sprintf(detail, B_TRANSLATE("Version %d.%d.%d %s"),
  		static_cast<int>(B_TRANSLATION_MAJOR_VERSION(TGA_TRANSLATOR_VERSION)),
  		static_cast<int>(B_TRANSLATION_MINOR_VERSION(TGA_TRANSLATOR_VERSION)),
- 		static_cast<int>(B_TRANSLATION_REVISION_VERSION(TGA_TRANSLATOR_VERSION)),
- 		__DATE__);
+ 		static_cast<int>(B_TRANSLATION_REVISION_VERSION(
+ 			TGA_TRANSLATOR_VERSION)), __DATE__);
  	fDetail = new BStringView("detail", detail);
  	fWrittenBy = new BStringView("writtenby",
- 		"Written by the Haiku Translation Kit Team");
+ 		B_TRANSLATE("Written by the Haiku Translation Kit Team"));
  
- 	fpchkIgnoreAlpha = new BCheckBox("Ignore TGA alpha channel",
+ 	fpchkIgnoreAlpha = new BCheckBox(B_TRANSLATE("Ignore TGA alpha channel"),
 		new BMessage(CHANGE_IGNORE_ALPHA));
  	int32 val = (fSettings->SetGetBool(TGA_SETTING_IGNORE_ALPHA)) ? 1 : 0;
  	fpchkIgnoreAlpha->SetValue(val);
  	fpchkIgnoreAlpha->SetViewColor(ViewColor());
  	
- 	fpchkRLE = new BCheckBox("Save with RLE Compression",
+ 	fpchkRLE = new BCheckBox(B_TRANSLATE("Save with RLE Compression"),
 		new BMessage(CHANGE_RLE));
  	val = (fSettings->SetGetBool(TGA_SETTING_RLE)) ? 1 : 0;
  	fpchkRLE->SetValue(val);

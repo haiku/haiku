@@ -1,0 +1,15 @@
+/*
+ * JPEG2000Translator.rdef
+ */
+
+resource app_signature "application/x-vnd.Haiku-JPEG2000Translator";
+
+resource app_version {
+	major  = 1,
+	middle = 0,
+	minor  = 0,
+	variety = 0,
+	internal = 0,
+	short_info = "1.0.0",
+	long_info = "Haiku JPEG2000Translator Add-Ons."
+};

@@ -4,15 +4,23 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
+AddResources SGITranslator : SGITranslator.rdef ; 
+
 Translator SGITranslator :
 	SGIImage.cpp
 	SGIMain.cpp
 	SGITranslator.cpp
 	SGIView.cpp
-
-	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++)
-	$(HAIKU_LOCALE_LIBS)
+	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
 	: true
+;
+
+DoCatalogs SGITranslator :
+	x-vnd.Haiku-SGITranslator
+	:
+	SGIMain.cpp
+	SGITranslator.cpp
+	SGIView.cpp
 ;
 
 Package haiku-translationkit-cvs :

@@ -5,6 +5,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 SubDirHdrs [ FDirName $(SUBDIR) webp ] ;
 
+AddResources WebPTranslator : WebPTranslator.rdef ;
 
 Translator WebPTranslator :
 

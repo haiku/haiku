@@ -28,8 +28,13 @@
 /*****************************************************************************/
 
 #include <Application.h>
+#include <Catalog.h>
+
 #include "TGATranslator.h"
 #include "TranslatorWindow.h"
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "TGAMain"
 
 // ---------------------------------------------------------------
 // main
@@ -49,7 +54,8 @@ main()
 {
 	BApplication app("application/x-vnd.Haiku-TGATranslator");
 	status_t result;
-	result = LaunchTranslatorWindow(new TGATranslator, "TGA Settings");
+	result = LaunchTranslatorWindow(new TGATranslator, 
+		B_TRANSLATE("TGA Settings"));
 	if (result == B_OK) {
 		app.Run();
 		return 0;

@@ -1,0 +1,15 @@
+/*
+ * RTFTranslator.rdef
+ */
+
+resource app_signature "application/x-vnd.Haiku-RTFTranslator";
+
+resource app_version {
+	major  = 0,
+	middle = 6,
+	minor  = 0,
+	variety = 0,
+	internal = 0,
+	short_info = "0.6.0",
+	long_info = "Haiku RTFTranslator Add-Ons."
+};

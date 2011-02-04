@@ -1,0 +1,15 @@
+/*
+ * RAWTranslator.rdef
+ */
+
+resource app_signature "application/x-vnd.Haiku-RAWTranslator";
+
+resource app_version {
+	major  = 0,
+	middle = 5,
+	minor  = 0,
+	variety = 0,
+	internal = 0,
+	short_info = "0.5.0",
+	long_info = "Haiku RAWTranslator Add-Ons."
+};

@@ -6,8 +6,10 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <syslog.h>
 
 #include <Application.h>
+#include <Catalog.h>
 #include <FileIO.h>
 #include <TranslatorRoster.h>
 
@@ -16,6 +18,9 @@
 #include "convert.h"
 #include "RTF.h"
 #include "RTFTranslator.h"
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "main"
 
 
 int
@@ -30,8 +35,9 @@ main(int argc, char** argv)
 			BFile input;
 			status_t status = input.SetTo(argv[i], B_READ_ONLY);
 			if (status != B_OK) {
-				fprintf(stderr, "Could not open file \"%s\": %s\n", argv[i],
-					strerror(status));
+				syslog(LOG_ERR,
+						"RTFTranslator:Could not open file \"%s\": %s\n",
+											argv[i], strerror(status));
 				result = 1;
 				continue;
 			}
@@ -41,8 +47,9 @@ main(int argc, char** argv)
 
 			status = parser.Parse(header);
 			if (status != B_OK) {
-				fprintf(stderr, "Could not convert file \"%s\": %s\n", argv[i],
-					strerror(status));
+				syslog(LOG_ERR,
+						"RTFTranslator:Could not convert file \"%s\": %s\n", 
+											argv[i], strerror(status));
 				result = 1;
 				continue;
 			}
@@ -56,8 +63,8 @@ main(int argc, char** argv)
 	BApplication app("application/x-vnd.Haiku-RTFTranslator");
 
 	status_t result;
-	result = LaunchTranslatorWindow(new RTFTranslator, "RTF Settings",
-		BRect(0, 0, 225, 175));
+	result = LaunchTranslatorWindow(new RTFTranslator, 
+		B_TRANSLATE("RTF Settings"), BRect(0, 0, 225, 175));
 	if (result != B_OK)
 		return 1;
 

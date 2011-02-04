@@ -59,10 +59,10 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Settings
 #define JP2_SETTINGS_FILE	"JPEG2000Translator"
 
-#define JP2_SET_QUALITY B_TRANSLATE_MARK("quality")
-#define JP2_SET_GRAY1_AS_B_RGB24 B_TRANSLATE_MARK("24 from gray1")
-#define JP2_SET_GRAY8_AS_B_RGB32 B_TRANSLATE_MARK("32 from gray8")
-#define JP2_SET_JPC B_TRANSLATE_MARK("jpc")
+#define JP2_SET_QUALITY "quality"
+#define JP2_SET_GRAY1_AS_B_RGB24 "24 from gray1"
+#define JP2_SET_GRAY8_AS_B_RGB32 "32 from gray8"
+#define JP2_SET_JPC "jpc"
 
 // View messages
 #define VIEW_MSG_SET_QUALITY 'JSCQ'

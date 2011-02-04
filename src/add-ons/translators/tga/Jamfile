@@ -4,13 +4,22 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
+AddResources TGATranslator : TGATranslator.rdef ;
+
 Translator TGATranslator :
 	TGAMain.cpp
 	TGATranslator.cpp
 	TGAView.cpp
-	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++)
-	$(HAIKU_LOCALE_LIBS)
+	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
 	: true
+;
+
+DoCatalogs TGATranslator :
+	x-vnd.Haiku-TGATranslator
+	:
+	TGAMain.cpp
+	TGATranslator.cpp
+	TGAView.cpp
 ;
 
 Package haiku-translationkit-cvs :

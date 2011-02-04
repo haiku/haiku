@@ -3,15 +3,20 @@
 	This file may be used under the terms of the Be Sample Code License.
 */
 
+#include <Alert.h>
+#include <Application.h>
+#include <Catalog.h>
+#include <GroupLayout.h>
+#include <Screen.h>
 #include <TranslatorAddOn.h>
 #include <View.h>
 #include <Window.h>
-#include <Application.h>
-#include <Alert.h>
-#include <Screen.h>
-#include <GroupLayout.h>
+
 
 #include <stdio.h>
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "PPMMain"
 
 
 BPoint get_window_origin();
@@ -22,7 +27,7 @@ class PPMWindow :
 {
 public:
 	PPMWindow(BRect area) :
-		BWindow(area, "PPM Settings", B_TITLED_WINDOW,
+		BWindow(area, B_TRANSLATE("PPM Settings"), B_TITLED_WINDOW,
 			B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 		{
 			SetLayout(new BGroupLayout(B_HORIZONTAL));
@@ -43,7 +48,9 @@ main()
 	BView * v = NULL;
 	BRect r(0, 0, 1, 1);
 	if (MakeConfig(NULL, &v, &r)) {
-		BAlert * err = new BAlert("Error", "Something is wrong with the PPMTranslator!", "OK");
+		BAlert * err = new BAlert("Error", 
+			B_TRANSLATE("Something is wrong with the PPMTranslator!"), 
+			B_TRANSLATE("OK"));
 		err->Go();
 		return 1;
 	}

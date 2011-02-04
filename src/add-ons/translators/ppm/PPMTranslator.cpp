@@ -8,32 +8,36 @@
 /*	does not buffer data. We should wrap a buffering thing around	*/
 /*	the input or output when they are in ASCII mode.				*/
 
-#include <TranslatorAddOn.h>
-#include <TranslationKit.h>
-#include <ByteOrder.h>
-#include <Message.h>
-#include <Screen.h>
-#include <Locker.h>
-#include <FindDirectory.h>
-#include <Path.h>
-#include <PopUpMenu.h>
-#include <MenuField.h>
-#include <MenuItem.h>
-#include <CheckBox.h>
 #include <Bitmap.h>
-#include <StringView.h>
+#include <ByteOrder.h>
+#include <Catalog.h>
+#include <CheckBox.h>
+#include <FindDirectory.h>
 #include <GridLayoutBuilder.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
+#include <Locker.h>
+#include <MenuField.h>
+#include <MenuItem.h>
+#include <Message.h>
+#include <Path.h>
+#include <PopUpMenu.h>
+#include <Screen.h>
 #include <SpaceLayoutItem.h>
+#include <StringView.h>
+#include <TranslatorAddOn.h>
+#include <TranslationKit.h>
 
 #include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <syslog.h>
 
 #include "colorspace.h"
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "PPMTranslator"
 
 #if DEBUG
  #define dprintf(x) printf x
@@ -43,10 +47,10 @@
 
 
 #if !defined(_PR3_COMPATIBLE_)	/* R4 headers? Else we need to define these constants. */
- #define B_CMY24 ((color_space)0xC001) /* C[7:0]  M[7:0]  Y[7:0]                       No gray removal done            */
- #define B_CMY32 ((color_space)0xC002) /* C[7:0]  M[7:0]  Y[7:0]  X[7:0]       No gray removal done            */
- #define B_CMYA32 ((color_space)0xE002) /* C[7:0]  M[7:0]  Y[7:0]  A[7:0]       No gray removal done            */
- #define B_CMYK32 ((color_space)0xC003) /* C[7:0]  M[7:0]  Y[7:0]  K[7:0]                                       */
+ #define B_CMY24 ((color_space)0xC001) /* C[7:0]  M[7:0]  Y[7:0]          No gray removal done */
+ #define B_CMY32 ((color_space)0xC002) /* C[7:0]  M[7:0]  Y[7:0]  X[7:0]  No gray removal done */
+ #define B_CMYA32 ((color_space)0xE002) /* C[7:0]  M[7:0]  Y[7:0]  A[7:0] No gray removal done */
+ #define B_CMYK32 ((color_space)0xC003) /* C[7:0]  M[7:0]  Y[7:0]  K[7:0]                      */
 #endif
 
 #define PPM_TRANSLATOR_VERSION 0x100
@@ -59,7 +63,7 @@ int32 translatorVersion = PPM_TRANSLATOR_VERSION;
 	// Minor: next 4 bits
 	// Major: highest 24 bits
 
-/*	Be reserves all codes with non-lowecase letters in them.	*/
+/*	Be reserves all codes with non-lowercase letters in them.	*/
 /*	Luckily, there is already a reserved code for PPM. If you	*/
 /*	make up your own for a new type, use lower-case letters.	*/
 #define PPM_TYPE 'PPM '
@@ -150,7 +154,8 @@ public:
 							continue;
 						}
 						if (sscanf(ptr, "%31[a-zA-Z_0-9] =", name) != 1) {
-							fprintf(stderr, "unknown PPMTranslator settings line: %s", line);
+							syslog(LOG_ERR, "unknown PPMTranslator "
+												"settings line: %s", line);
 						}
 						else {
 							if (!strcmp(name, "color_space")) {
@@ -158,8 +163,10 @@ public:
 									ptr++;
 								}
 								ptr++;
-								if (sscanf(ptr, "%d", (int*)&g_settings.out_space) != 1) {
-									fprintf(stderr, "illegal color space in PPMTranslator settings: %s", ptr);
+								if (sscanf(ptr, "%d", 
+									(int*)&g_settings.out_space) != 1) {
+									syslog(LOG_ERR, "illegal color space "
+										"in PPMTranslator settings: %s", ptr);
 								}
 							}
 							else if (!strcmp(name, "window_pos")) {
@@ -167,8 +174,11 @@ public:
 									ptr++;
 								}
 								ptr++;
-								if (sscanf(ptr, "%f,%f", &g_settings.window_pos.x, &g_settings.window_pos.y) != 2) {
-									fprintf(stderr, "illegal window position in PPMTranslator settings: %s", ptr);
+								if (sscanf(ptr, "%f,%f", 
+									&g_settings.window_pos.x, 
+									&g_settings.window_pos.y) != 2) {
+									syslog(LOG_ERR, "illegal window position "
+										"in PPMTranslator settings: %s", ptr);
 								}
 							}
 							else if (!strcmp(name, "write_ascii")) {
@@ -178,14 +188,16 @@ public:
 								ptr++;
 								int ascii = g_settings.write_ascii;
 								if (sscanf(ptr, "%d", &ascii) != 1) {
-									fprintf(stderr, "illegal write_ascii value in PPMTranslator settings: %s", ptr);
+									syslog(LOG_ERR, "illegal write_ascii value "
+										"in PPMTranslator settings: %s", ptr);
 								}
 								else {
 									g_settings.write_ascii = ascii;
 								}
 							}
 							else {
-								fprintf(stderr, "unknown PPMTranslator setting: %s", line);
+								syslog(LOG_ERR,
+									"unknown PPMTranslator setting: %s", line);
 							}
 						}
 					}
@@ -208,7 +220,8 @@ public:
 							static_cast<int>((translatorVersion >> 4) & 0xf),
 							static_cast<int>(translatorVersion & 0xf));
 						fprintf(f, "color_space = %d\n", g_settings.out_space);
-						fprintf(f, "window_pos = %g,%g\n", g_settings.window_pos.x, g_settings.window_pos.y);
+						fprintf(f, "window_pos = %g,%g\n", g_settings.window_pos.x,
+															g_settings.window_pos.y);
 						fprintf(f, "write_ascii = %d\n", g_settings.write_ascii ? 1 : 0);
 						fclose(f);
 					}
@@ -267,14 +280,14 @@ Identify(	/*	required	*/
 		outInfo->type = PPM_TYPE;
 		outInfo->quality = 0.3;		/* no alpha, etc */
 		outInfo->capability = 0.8;	/* we're pretty good at PPM reading, though */
-		strcpy(outInfo->name, "PPM image");
+		strcpy(outInfo->name, B_TRANSLATE("PPM image"));
 		strcpy(outInfo->MIME, "image/x-portable-pixmap");
 	}
 	else {
 		outInfo->type = B_TRANSLATOR_BITMAP;
 		outInfo->quality = 0.4;		/* B_TRANSLATOR_BITMAP can do alpha, at least */
 		outInfo->capability = 0.8;	/* and we might not know many variations thereof */
-		strcpy(outInfo->name, "Be Bitmap Format (PPMTranslator)");
+		strcpy(outInfo->name, B_TRANSLATE("Be Bitmap Format (PPMTranslator)"));
 		strcpy(outInfo->MIME, "image/x-be-bitmap");	/* this is the MIME type of B_TRANSLATOR_BITMAP */
 	}
 	return B_OK;
@@ -442,46 +455,66 @@ public:
 				SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 				SetLowColor(ViewColor());
 
-				mTitle = new BStringView("title", "PPM Image Translator");
+				mTitle = new BStringView("title", 
+					B_TRANSLATE("PPM Image Translator"));
 				mTitle->SetFont(be_bold_font);
 
 				char detail[100];
 				int ver = static_cast<int>(translatorVersion);
-				sprintf(detail, "Version %d.%d.%d %s", ver >> 8, ((ver >> 4) & 0xf),
+				sprintf(detail, B_TRANSLATE("Version %d.%d.%d %s"), ver >> 8, 
+					((ver >> 4) & 0xf),
 					(ver & 0xf), __DATE__);
 				mDetail = new BStringView("detail", detail);
 
 				mBasedOn = new BStringView("basedOn",
-					"Based on PPMTranslator sample code");
+					B_TRANSLATE("Based on PPMTranslator sample code"));
 
 				mCopyright = new BStringView("copyright",
-					"Sample code copyright 1999, Be Incorporated");
+					B_TRANSLATE("Sample code copyright 1999, Be Incorporated"));
 
 				mMenu = new BPopUpMenu("Color Space");
-				mMenu->AddItem(new BMenuItem("None", CSMessage(B_NO_COLOR_SPACE)));
-				mMenu->AddItem(new BMenuItem("RGB 8:8:8 32 bits", CSMessage(B_RGB32)));
-				mMenu->AddItem(new BMenuItem("RGBA 8:8:8:8 32 bits", CSMessage(B_RGBA32)));
-				mMenu->AddItem(new BMenuItem("RGB 5:5:5 16 bits", CSMessage(B_RGB15)));
-				mMenu->AddItem(new BMenuItem("RGBA 5:5:5:1 16 bits", CSMessage(B_RGBA15)));
-				mMenu->AddItem(new BMenuItem("RGB 5:6:5 16 bits", CSMessage(B_RGB16)));
-				mMenu->AddItem(new BMenuItem("System palette 8 bits", CSMessage(B_CMAP8)));
+				mMenu->AddItem(new BMenuItem(B_TRANSLATE("None"), 
+					CSMessage(B_NO_COLOR_SPACE)));
+				mMenu->AddItem(new BMenuItem(B_TRANSLATE("RGB 8:8:8 32 bits"), 
+					CSMessage(B_RGB32)));
+				mMenu->AddItem(new BMenuItem(B_TRANSLATE("RGBA 8:8:8:8 32 "
+					"bits"), CSMessage(B_RGBA32)));
+				mMenu->AddItem(new BMenuItem(B_TRANSLATE("RGB 5:5:5 16 bits"), 
+					CSMessage(B_RGB15)));
+				mMenu->AddItem(new BMenuItem(B_TRANSLATE("RGBA 5:5:5:1 16 "
+					"bits"), CSMessage(B_RGBA15)));
+				mMenu->AddItem(new BMenuItem(B_TRANSLATE("RGB 5:6:5 16 bits"), 
+					CSMessage(B_RGB16)));
+				mMenu->AddItem(new BMenuItem(B_TRANSLATE("System palette 8 "
+					"bits"), CSMessage(B_CMAP8)));
 				mMenu->AddSeparatorItem();
-				mMenu->AddItem(new BMenuItem("Grayscale 8 bits", CSMessage(B_GRAY8)));
-				mMenu->AddItem(new BMenuItem("Bitmap 1 bit", CSMessage(B_GRAY1)));
-				mMenu->AddItem(new BMenuItem("CMY 8:8:8 32 bits", CSMessage(B_CMY32)));
-				mMenu->AddItem(new BMenuItem("CMYA 8:8:8:8 32 bits", CSMessage(B_CMYA32)));
-				mMenu->AddItem(new BMenuItem("CMYK 8:8:8:8 32 bits", CSMessage(B_CMYK32)));
+				mMenu->AddItem(new BMenuItem(B_TRANSLATE("Grayscale 8 bits"), 
+					CSMessage(B_GRAY8)));
+				mMenu->AddItem(new BMenuItem(B_TRANSLATE("Bitmap 1 bit"), 
+					CSMessage(B_GRAY1)));
+				mMenu->AddItem(new BMenuItem(B_TRANSLATE("CMY 8:8:8 32 bits"), 
+					CSMessage(B_CMY32)));
+				mMenu->AddItem(new BMenuItem(B_TRANSLATE("CMYA 8:8:8:8 32 "
+					"bits"), CSMessage(B_CMYA32)));
+				mMenu->AddItem(new BMenuItem(B_TRANSLATE("CMYK 8:8:8:8 32 "
+					"bits"), CSMessage(B_CMYK32)));
 				mMenu->AddSeparatorItem();
-				mMenu->AddItem(new BMenuItem("RGB 8:8:8 32 bits big-endian", CSMessage(B_RGB32_BIG)));
-				mMenu->AddItem(new BMenuItem("RGBA 8:8:8:8 32 bits big-endian", CSMessage(B_RGBA32_BIG)));
-				mMenu->AddItem(new BMenuItem("RGB 5:5:5 16 bits big-endian", CSMessage(B_RGB15_BIG)));
-				mMenu->AddItem(new BMenuItem("RGBA 5:5:5:1 16 bits big-endian", CSMessage(B_RGBA15_BIG)));
-				mMenu->AddItem(new BMenuItem("RGB 5:6:5 16 bits big-endian", CSMessage(B_RGB16)));
- 				mField = new BMenuField("Input Color Space", mMenu, NULL);
+				mMenu->AddItem(new BMenuItem(B_TRANSLATE("RGB 8:8:8 32 bits "
+					"big-endian"), CSMessage(B_RGB32_BIG)));
+				mMenu->AddItem(new BMenuItem(B_TRANSLATE("RGBA 8:8:8:8 32 "
+					"bits big-endian"), CSMessage(B_RGBA32_BIG)));
+				mMenu->AddItem(new BMenuItem(B_TRANSLATE("RGB 5:5:5 16 bits "
+					"big-endian"), CSMessage(B_RGB15_BIG)));
+				mMenu->AddItem(new BMenuItem(B_TRANSLATE("RGBA 5:5:5:1 16 "
+					"bits big-endian"), CSMessage(B_RGBA15_BIG)));
+				mMenu->AddItem(new BMenuItem(B_TRANSLATE("RGB 5:6:5 16 bits "
+					"big-endian"), CSMessage(B_RGB16)));
+ 				mField = new BMenuField(B_TRANSLATE("Input Color Space"), 
+ 					mMenu, NULL);
  				mField->SetViewColor(ViewColor());
  				SelectColorSpace(g_settings.out_space);
  				BMessage * msg = new BMessage(CHANGE_ASCII);
- 				mAscii = new BCheckBox("Write ASCII", msg);
+ 				mAscii = new BCheckBox(B_TRANSLATE("Write ASCII"), msg);
  				if (g_settings.write_ascii)
  					mAscii->SetValue(1);
  				mAscii->SetViewColor(ViewColor());
@@ -616,7 +649,8 @@ MakeConfig(	/*	optional	*/
 	BView * * outView,
 	BRect * outExtent)
 {
-	PPMView * v = new PPMView("PPMTranslator Settings", B_WILL_DRAW);
+	PPMView * v = new PPMView(B_TRANSLATE("PPMTranslator Settings"), 
+		B_WILL_DRAW);
 	*outView = v;
 	v->ResizeTo(v->ExplicitPreferredSize());;
 	*outExtent = v->Bounds();
@@ -639,7 +673,7 @@ GetConfigMessage(	/*	optional	*/
 #if defined(_PR3_COMPATIBLE_)
 	const char * name = B_TRANSLATOR_EXT_BITMAP_COLOR_SPACE;
 #else
-	const char * name = "bits/space";
+	const char * name = B_TRANSLATE_MARK("bits/space");
 #endif
 	g_settings_lock.Lock();
 	(void)ioExtension->RemoveName(name);

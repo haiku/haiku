@@ -71,7 +71,7 @@ ConfigView::ConfigView()
 	AddChild(stringView);
 
 	stringView = new BStringView("valid2", 
-		B_TRANSLATE("pixel in either direction."));
+		B_TRANSLATE("pixels in either direction."));
 	stringView->SetExplicitAlignment(leftAlignment);
 	AddChild(stringView);
 

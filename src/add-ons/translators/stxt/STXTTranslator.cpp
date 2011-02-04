@@ -11,6 +11,7 @@
 #include "STXTTranslator.h"
 #include "STXTView.h"
 
+#include <Catalog.h>
 #include <CharacterSet.h>
 #include <CharacterSetRoster.h>
 #include <MimeType.h>
@@ -27,6 +28,8 @@
 using namespace BPrivate;
 using namespace std;
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "STXTTranslator"
 
 #define READ_BUFFER_SIZE 32768
 #define DATA_BUFFER_SIZE 256
@@ -857,7 +860,7 @@ identify_stxt_header(const TranslatorStyledTextStreamHeader &header,
 	outInfo->group = B_TRANSLATOR_TEXT;
 	outInfo->quality = STXT_IN_QUALITY;
 	outInfo->capability = STXT_IN_CAPABILITY;
-	strcpy(outInfo->name, "Be styled text file");
+	strcpy(outInfo->name, B_TRANSLATE("Be styled text file"));
 	strcpy(outInfo->MIME, "text/x-vnd.Be-stxt");
 
 	return B_OK;
@@ -904,7 +907,8 @@ identify_text(uint8* data, int32 bytesRead, BPositionIO* source,
 	if (type.GetLongDescription(description) == B_OK)
 		strlcpy(outInfo->name, description, sizeof(outInfo->name));
 	else
-		strlcpy(outInfo->name, "Plain text file", sizeof(outInfo->name));
+		strlcpy(outInfo->name, B_TRANSLATE("Plain text file"), 
+			sizeof(outInfo->name));
 
 	//strlcpy(outInfo->MIME, type.Type(), sizeof(outInfo->MIME));
 	strcpy(outInfo->MIME, "text/plain");
@@ -1333,7 +1337,8 @@ translate_from_text(BPositionIO* source, const char* encoding, bool forceEncodin
 
 
 STXTTranslator::STXTTranslator()
-	: BaseTranslator("StyledEdit files", "StyledEdit files translator",
+	: BaseTranslator(B_TRANSLATE("StyledEdit files"), 
+		B_TRANSLATE("StyledEdit files translator"),
 		STXT_TRANSLATOR_VERSION,
 		sInputFormats, kNumInputFormats,
 		sOutputFormats, kNumOutputFormats,
@@ -1455,7 +1460,8 @@ STXTTranslator::Translate(BPositionIO* source, const translator_info* info,
 BView *
 STXTTranslator::NewConfigView(TranslatorSettings *settings)
 {
-	return new STXTView(BRect(0, 0, 225, 175), "STXTTranslator Settings",
+	return new STXTView(BRect(0, 0, 225, 175), 
+		B_TRANSLATE("STXTTranslator Settings"),
 		B_FOLLOW_ALL, B_WILL_DRAW, settings);
 }
 

@@ -7,6 +7,8 @@ SubDirSysHdrs [ FDirName $(SUBDIR) openexr imath ] ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
+AddResources EXRTranslator : EXRTranslator.rdef ;
+
 Translator EXRTranslator :
 	main.cpp
 	ConfigView.cpp

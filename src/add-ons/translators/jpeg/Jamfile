@@ -10,6 +10,8 @@ SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
 UseLibraryHeaders jpeg ;
 
+AddResources JPEGTranslator : JPEGTranslator.rdef ;
+
 Translator JPEGTranslator :
 	be_jdatadst.cpp
 	be_jdatasrc.cpp
@@ -24,6 +26,7 @@ Translator JPEGTranslator :
 DoCatalogs JPEGTranslator :
 	x-vnd.Haiku-JPEGTranslator
 	:
+	JPEGTranslator.h
 	JPEGTranslator.cpp
 	exif_parser.cpp
 	be_jerror.cpp

@@ -34,6 +34,8 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TranslatorWindow.h"
 #include "exif_parser.h"
 
+#include <syslog.h>
+
 #include <Alignment.h>
 #include <Catalog.h>
 #include <GridLayoutBuilder.h>
@@ -662,7 +664,9 @@ TranslatorAboutView::TranslatorAboutView(const char* name)
 	BView(name, 0, new BGroupLayout(B_VERTICAL))
 {
 	BAlignment labelAlignment = BAlignment(B_ALIGN_LEFT, B_ALIGN_TOP);
-	BStringView* title = new BStringView("Title", sTranslatorName);
+	BString str1(sTranslatorName);
+	str1.ReplaceFirst("JPEG images", B_TRANSLATE("JPEG images"));
+	BStringView* title = new BStringView("Title", str1.String());
 	title->SetFont(be_bold_font);
 	title->SetExplicitAlignment(labelAlignment);
 
@@ -674,7 +678,17 @@ TranslatorAboutView::TranslatorAboutView(const char* name)
 	version->SetExplicitAlignment(labelAlignment);
 
 	BTextView* infoView = new BTextView("info");
-	infoView->SetText(sTranslatorInfo);
+	BString str2(sTranslatorInfo);
+	str2.ReplaceFirst("Based on IJG library ©  1994-2009, Thomas G. Lane, "
+		"Guido Vollbeding.\n", B_TRANSLATE("Based on IJG library ©  1994-2009, "
+		"Thomas G. Lane, Guido Vollbeding.\n"));
+	str2.ReplaceFirst("with \"lossless\" encoding support patch by Ken "
+		"Murchison\n", B_TRANSLATE("with \"lossless\" encoding support patch "
+		"by Ken Murchison\n"));
+	str2.ReplaceFirst("With some colorspace conversion routines by Magnus "
+		"Hellman\n", B_TRANSLATE("With some colorspace conversion routines by "
+		"Magnus Hellman\n"));
+	infoView->SetText(str2.String());
 	infoView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	infoView->MakeEditable(false);
 
@@ -695,9 +709,9 @@ TranslatorView::TranslatorView(const char* name, TranslatorSettings* settings)
 	:
 	BTabView(name)
 {
-	AddTab(new TranslatorWriteView("Write", settings->Acquire()));
-	AddTab(new TranslatorReadView("Read", settings->Acquire()));
-	AddTab(new TranslatorAboutView("About"));
+	AddTab(new TranslatorWriteView(B_TRANSLATE("Write"), settings->Acquire()));
+	AddTab(new TranslatorReadView(B_TRANSLATE("Read"), settings->Acquire()));
+	AddTab(new TranslatorAboutView(B_TRANSLATE("About")));
 
 	settings->Release();
 
@@ -788,8 +802,8 @@ JPEGTranslator::DerivedTranslate(BPositionIO* inSource,
 				&longJumpBuffer);
 		}
 	} catch (...) {
-		fprintf(stderr, B_TRANSLATE("libjpeg encountered a critical error "
-			"(caught C++ exception).\n"));
+		syslog(LOG_ERR, "libjpeg encountered a critical error (caught C++ "
+			"exception).\n");
 		return B_ERROR;
 	}
 
@@ -942,8 +956,7 @@ JPEGTranslator::Compress(BPositionIO* in, BPositionIO* out,
 			break;
 
 		default:
-			fprintf(stderr, 
-				B_TRANSLATE("Wrong type: Color space not implemented.\n"));
+			syslog(LOG_ERR, "Wrong type: Color space not implemented.\n");
 			return B_ERROR;
 	}
 	out_row_bytes = jpg_input_components * width;
@@ -1097,8 +1110,7 @@ JPEGTranslator::Decompress(BPositionIO* in, BPositionIO* out,
 	if (cinfo.out_color_space != JCS_RGB) {
 		switch (cinfo.out_color_space) {
 			case JCS_UNKNOWN:		/* error/unspecified */
-				fprintf(stderr, 
-					B_TRANSLATE("From Type: Jpeg uses unknown color type\n"));
+				syslog(LOG_ERR, "From Type: Jpeg uses unknown color type\n");
 				break;
 			case JCS_GRAYSCALE:		/* monochrome */
 				// Check if user wants to read only as RGB32 or not
@@ -1130,9 +1142,8 @@ JPEGTranslator::Decompress(BPositionIO* in, BPositionIO* out,
 					converter = convert_from_CMYK_to_32;
 				break;
 			default:
-				fprintf(stderr, 
-					B_TRANSLATE("From Type: Jpeg uses hmm... i don't know "
-					"really :(\n"));
+				syslog(LOG_ERR,
+						"From Type: Jpeg uses hmm... i don't know really :(\n");
 				break;
 		}
 	}
@@ -1279,7 +1290,10 @@ JPEGTranslator::PopulateInfoFromFormat(translator_info* info,
 			info->group = formats[i].group;
 			info->quality = formats[i].quality;
 			info->capability = formats[i].capability;
-			strcpy(info->name, formats[i].name);
+			BString str1(formats[i].name);
+			str1.ReplaceFirst("Be Bitmap Format (JPEGTranslator)", 
+				B_TRANSLATE("Be Bitmap Format (JPEGTranslator)"));
+			strncpy(info->name, str1.String(), sizeof(info->name));
 			strcpy(info->MIME,  formats[i].MIME);
 			return B_OK;
 		}

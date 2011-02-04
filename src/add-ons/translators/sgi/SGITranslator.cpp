@@ -43,7 +43,9 @@
 #include <new>
 #include <stdio.h>
 #include <string.h>
+#include <syslog.h>
 
+#include <Catalog.h>
 #include <OS.h>
 
 #include "SGIImage.h"
@@ -51,6 +53,10 @@
 #include "SGIView.h"
 
 using std::nothrow;
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "SGITranslator"
+
 
 // The input formats that this translator supports.
 static const translation_format sInputFormats[] = {
@@ -152,7 +158,8 @@ make_nth_translator(int32 n, image_id you, uint32 flags, ...)
 // ---------------------------------------------------------------
 SGITranslator::SGITranslator()
 	:
-	BaseTranslator("SGI images", "SGI image translator",
+	BaseTranslator(B_TRANSLATE("SGI images"), 
+		B_TRANSLATE("SGI image translator"),
 		SGI_TRANSLATOR_VERSION,
 		sInputFormats, kNumInputFormats,
 		sOutputFormats, kNumOutputFormats,
@@ -196,7 +203,7 @@ identify_sgi_header(BPositionIO *inSource, translator_info *outInfo, uint32 outT
 			outInfo->quality = SGI_IN_QUALITY;
 			outInfo->capability = SGI_IN_CAPABILITY;
 			strcpy(outInfo->MIME, "image/sgi");
-			strcpy(outInfo->name, "SGI image");
+			strcpy(outInfo->name, B_TRANSLATE("SGI image"));
 		}
 	} else {
 		delete sgiImage;
@@ -412,7 +419,8 @@ SGITranslator::translate_from_bits(BPositionIO *inSource, uint32 outType,
 					for (uint32 z = 0; z < channelCount; z++) {
 						ret = sgiImage->WriteRow(rows[z], y, z);
 						if (ret < B_OK) {
-printf("WriteRow() returned %s!\n", strerror(ret));
+							syslog(LOG_ERR,
+								"WriteRow() returned %s!\n"), strerror(ret);
 							break;
 						}
 					}
@@ -498,10 +506,11 @@ SGITranslator::translate_from_sgi(BPositionIO *inSource, uint32 outType,
 				sizeof(TranslatorBitmap), B_SWAP_HOST_TO_BENDIAN)) < B_OK) {
 				return ret;
 			} else
-				ret = outDestination->Write(&bitsHeader, sizeof(TranslatorBitmap));
+				ret = outDestination->Write(&bitsHeader, 
+					sizeof(TranslatorBitmap));
 		}
-if (ret < B_OK)
-printf("error writing bits header: %s\n", strerror(ret));
+		if (ret < B_OK)
+			syslog(LOG_ERR, "error writing bits header: %s\n", strerror(ret));
 		if (ret >= B_OK && !bheaderonly) {
 			// read one row at a time,
 			// convert to the correct format
@@ -738,5 +747,6 @@ SGITranslator::DerivedTranslate(BPositionIO *inSource,
 BView *
 SGITranslator::NewConfigView(TranslatorSettings *settings)
 {
-	return new SGIView("SGITranslator Settings", B_WILL_DRAW, settings);
+	return new SGIView(B_TRANSLATE("SGITranslator Settings"), B_WILL_DRAW, 
+		settings);
 }

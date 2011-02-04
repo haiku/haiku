@@ -6,6 +6,8 @@ UseLibraryHeaders tiff zlib ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
+AddResources TIFFTranslator : TIFFTranslator.rdef ;
+
 Translator TIFFTranslator : 
 	# [ FGristFiles $(tiff_files:S=$(SUFOBJ)) ]
 

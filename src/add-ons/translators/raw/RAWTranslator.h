@@ -8,14 +8,14 @@
 
 #include "BaseTranslator.h"
 
-#include <Translator.h>
-#include <TranslatorFormats.h>
-#include <TranslationDefs.h>
-#include <GraphicsDefs.h>
-#include <InterfaceDefs.h>
+#include <ByteOrder.h>
 #include <DataIO.h>
 #include <File.h>
-#include <ByteOrder.h>
+#include <GraphicsDefs.h>
+#include <InterfaceDefs.h>
+#include <TranslationDefs.h>
+#include <Translator.h>
+#include <TranslatorFormats.h>
 
 
 #define RAW_TRANSLATOR_VERSION B_TRANSLATION_MAKE_VERSION(0, 5, 0)

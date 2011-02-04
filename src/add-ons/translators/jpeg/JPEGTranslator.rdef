@@ -1,0 +1,15 @@
+/*
+ * JPEGTranslator.rdef
+ */
+
+resource app_signature "application/x-vnd.Haiku-JPEGTranslator";
+
+resource app_version {
+	major  = 1,
+	middle = 2,
+	minor  = 0,
+	variety = 0,
+	internal = 0,
+	short_info = "1.2.0",
+	long_info = "Haiku JPEGTranslator Add-Ons."
+};

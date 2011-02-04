@@ -2,10 +2,19 @@ SubDir HAIKU_TOP src add-ons translators ppm ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+AddResources PPMTranslator : PPMTranslator.rdef ;
+
 Translator PPMTranslator
 	: PPMMain.cpp PPMTranslator.cpp colorspace.cpp
-	: be translation $(TARGET_LIBSUPC++)
+	: be translation $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
 	: true
+;
+
+DoCatalogs PPMTranslator :
+	x-vnd.Haiku-PPMTranslator
+	:
+	PPMMain.cpp
+	PPMTranslator.cpp
 ;
 
 Package haiku-translationkit-cvs :

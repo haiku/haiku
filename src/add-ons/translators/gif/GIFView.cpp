@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <Catalog.h>
 #include <GridLayoutBuilder.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
@@ -29,6 +30,10 @@
 #include "SavePalette.h"
 
 #include "GIFView.h"
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "GIFView"
+
 
 extern int32 translatorVersion;
 extern char translatorName[];
@@ -43,25 +48,31 @@ GIFView::GIFView(const char *name)
 	title->SetFont(be_bold_font);
 
 	char version_string[100];
-	sprintf(version_string, "v%d.%d.%d %s", (int)(translatorVersion >> 8), (int)((translatorVersion >> 4) & 0xf),
-		(int)(translatorVersion & 0xf), __DATE__);
+	sprintf(version_string, "v%d.%d.%d %s", (int)(translatorVersion >> 8), 
+		(int)((translatorVersion >> 4) & 0xf), (int)(translatorVersion & 0xf), 
+		__DATE__);
 	BStringView *version = new BStringView("Version", version_string);
 
 	const char *copyrightString = "©2003 Daniel Switkin, software@switkin.com";
 	BStringView *copyright = new BStringView("Copyright", copyrightString);
 
 	// menu fields (Palette & Colors)
-	fWebSafeMI = new BMenuItem("Websafe", new BMessage(GV_WEB_SAFE), 0, 0);
-	fBeOSSystemMI = new BMenuItem("BeOS system", new BMessage(GV_BEOS_SYSTEM), 0, 0);
-	fGreyScaleMI = new BMenuItem("Greyscale", new BMessage(GV_GREYSCALE), 0, 0);
-	fOptimalMI = new BMenuItem("Optimal", new BMessage(GV_OPTIMAL), 0, 0);
+	fWebSafeMI = new BMenuItem(B_TRANSLATE("Websafe"), 
+		new BMessage(GV_WEB_SAFE), 0, 0);
+	fBeOSSystemMI = new BMenuItem(B_TRANSLATE("BeOS system"), 
+		new BMessage(GV_BEOS_SYSTEM), 0, 0);
+	fGreyScaleMI = new BMenuItem(B_TRANSLATE("Greyscale"), 
+		new BMessage(GV_GREYSCALE), 0, 0);
+	fOptimalMI = new BMenuItem(B_TRANSLATE("Optimal"), 
+		new BMessage(GV_OPTIMAL), 0, 0);
 	fPaletteM = new BPopUpMenu("PalettePopUpMenu", true, true, B_ITEMS_IN_COLUMN);
 	fPaletteM->AddItem(fWebSafeMI);
 	fPaletteM->AddItem(fBeOSSystemMI);
 	fPaletteM->AddItem(fGreyScaleMI);
 	fPaletteM->AddItem(fOptimalMI);
 
-	fColorCountM = new BPopUpMenu("ColorCountPopUpMenu", true, true, B_ITEMS_IN_COLUMN);
+	fColorCountM = new BPopUpMenu("ColorCountPopUpMenu", true, true, 
+		B_ITEMS_IN_COLUMN);
 	int32 count = 2;
 	for (int32 i = 0; i < 8; i++) {
 		BMessage* message = new BMessage(GV_SET_COLOR_COUNT);
@@ -74,25 +85,26 @@ GIFView::GIFView(const char *name)
 	}
 	fColorCount256MI = fColorCountMI[7];
 
- 	fPaletteMF = new BMenuField("Palette", fPaletteM, NULL);
+ 	fPaletteMF = new BMenuField(B_TRANSLATE("Palette"), fPaletteM, NULL);
  
- 	fColorCountMF = new BMenuField("Colors", fColorCountM, NULL);
+ 	fColorCountMF = new BMenuField(B_TRANSLATE("Colors"), fColorCountM, NULL);
  
  	// check boxes
- 	fUseDitheringCB = new BCheckBox("Use dithering",
+ 	fUseDitheringCB = new BCheckBox(B_TRANSLATE("Use dithering"),
  		new BMessage(GV_USE_DITHERING));
  
- 	fInterlacedCB = new BCheckBox("Write interlaced images",
+ 	fInterlacedCB = new BCheckBox(B_TRANSLATE("Write interlaced images"),
  		new BMessage(GV_INTERLACED));
  
- 	fUseTransparentCB = new BCheckBox("Write transparent images",
+ 	fUseTransparentCB = new BCheckBox(B_TRANSLATE("Write transparent images"),
  		new BMessage(GV_USE_TRANSPARENT));
  
  	// radio buttons
- 	fUseTransparentAutoRB = new BRadioButton("Automatic (from alpha channel)",
+ 	fUseTransparentAutoRB = new BRadioButton(
+ 		B_TRANSLATE("Automatic (from alpha channel)"),
  		new BMessage(GV_USE_TRANSPARENT_AUTO));
  
- 	fUseTransparentColorRB = new BRadioButton("Use RGB color",
+ 	fUseTransparentColorRB = new BRadioButton(B_TRANSLATE("Use RGB color"),
  		new BMessage(GV_USE_TRANSPARENT_COLOR));
  
  	fTransparentRedTC = new BTextControl("", "0", new BMessage(GV_TRANSPARENT_RED));

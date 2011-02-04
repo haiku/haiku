@@ -9,10 +9,13 @@
 #include "RTF.h"
 #include "convert.h"
 
+#include <Catalog.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "RTFTranslator"
 
 #define READ_BUFFER_SIZE 2048
 #define DATA_BUFFER_SIZE 64
@@ -54,10 +57,11 @@ static const translation_format sOutputFormats[] = {
 RTFTranslator::RTFTranslator()
 {
 	char info[256];
-	sprintf(info, "Rich Text Format translator v%d.%d.%d %s",
-		int(B_TRANSLATION_MAJOR_VERSION(RTF_TRANSLATOR_VERSION)),
-		int(B_TRANSLATION_MINOR_VERSION(RTF_TRANSLATOR_VERSION)),
-		int(B_TRANSLATION_REVISION_VERSION(RTF_TRANSLATOR_VERSION)),
+	sprintf(info, B_TRANSLATE("Rich Text Format translator v%d.%d.%d %s"),
+		static_cast<int>(B_TRANSLATION_MAJOR_VERSION(RTF_TRANSLATOR_VERSION)),
+		static_cast<int>(B_TRANSLATION_MINOR_VERSION(RTF_TRANSLATOR_VERSION)),
+		static_cast<int>(B_TRANSLATION_REVISION_VERSION(
+			RTF_TRANSLATOR_VERSION)),
 		__DATE__);
 
 	fInfo = strdup(info);
@@ -73,14 +77,14 @@ RTFTranslator::~RTFTranslator()
 const char *
 RTFTranslator::TranslatorName() const
 {
-	return "RTF text files";
+	return B_TRANSLATE("RTF text files");
 }
 
 
 const char *
 RTFTranslator::TranslatorInfo() const
 {
-	return "Rich Text Format Translator";
+	return B_TRANSLATE("Rich Text Format Translator");
 }
 
 
@@ -131,7 +135,7 @@ RTFTranslator::Identify(BPositionIO *stream,
 	info->group = B_TRANSLATOR_TEXT;
 	info->quality = RTF_IN_QUALITY;
 	info->capability = RTF_IN_CAPABILITY;
-	strcpy(info->name, "RichTextFormat file");
+	strcpy(info->name, B_TRANSLATE("RichTextFormat file"));
 	strcpy(info->MIME, "text/rtf");
 
 	return B_OK;
@@ -168,7 +172,8 @@ RTFTranslator::Translate(BPositionIO *source,
 
 
 status_t
-RTFTranslator::MakeConfigurationView(BMessage *ioExtension, BView **_view, BRect *_extent)
+RTFTranslator::MakeConfigurationView(BMessage *ioExtension, BView **_view, 
+	BRect *_extent)
 {
 	if (_view == NULL || _extent == NULL)
 		return B_BAD_VALUE;

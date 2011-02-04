@@ -1,0 +1,15 @@
+/*
+ * WebPTranslator.rdef
+ */
+
+resource app_signature "application/x-vnd.Haiku-WebPTranslator";
+
+resource app_version {
+	major  = 0,
+	middle = 1,
+	minor  = 0,
+	variety = 0,
+	internal = 0,
+	short_info = "0.1.0",
+	long_info = "Haiku WebPTranslator Add-Ons."
+};

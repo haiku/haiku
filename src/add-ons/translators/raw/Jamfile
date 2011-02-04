@@ -4,15 +4,26 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
+AddResources RAWTranslator : RAWTranslator.rdef ;
+
 Translator RAWTranslator :
 	# RawTranslator classes
 	main.cpp
 	RAWTranslator.cpp
 	ConfigView.cpp
 	RAW.cpp
-	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++)
+	: be locale translation libtranslatorsutils.a 
+$(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
 	$(HAIKU_LOCALE_LIBS)
 	: true
+;
+
+DoCatalogs RAWTranslator :
+	x-vnd.Haiku-RAWTranslator
+	:
+	RAWTranslator.cpp
+	ConfigView.cpp
+	main.cpp
 ;
 
 Package haiku-translationkit-cvs :

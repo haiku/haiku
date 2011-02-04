@@ -18,6 +18,7 @@
 #include "GIFSave.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <syslog.h>
 
 const int gs_pass_starts_at[] = {0, 4, 2, 1, 0};
 const int gs_increment_pass_by[] = {8, 8, 4, 2, 0};
@@ -38,7 +39,7 @@ GIFSave::GIFSave(BBitmap *bitmap, BPositionIO *output)
 {
 	color_space cs = bitmap->ColorSpace();
     if (cs != B_RGB32 && cs != B_RGBA32 && cs != B_RGB32_BIG && cs != B_RGBA32_BIG) {
-    	if (debug) printf("GIFSave::GIFSave() - Unknown color space\n");
+    	if (debug) syslog(LOG_ERR, "GIFSave::GIFSave() - Unknown color space\n");
     	fatalerror = true;
     	return;
     }
@@ -56,10 +57,13 @@ GIFSave::GIFSave(BBitmap *bitmap, BPositionIO *output)
 	
 	width = bitmap->Bounds().IntegerWidth() + 1;
 	height = bitmap->Bounds().IntegerHeight() + 1;
-	if (debug) printf("GIFSave::GIFSave() - Image dimensions are %d by %d\n", width, height);
+	if (debug)
+	   syslog(LOG_ERR, "GIFSave::GIFSave() - Image dimensions are %d by %d\n",
+					width, height);
 	
 	if (prefs->usedithering) {
-		if (debug) printf("GIFSave::GIFSave() - Using dithering\n");
+		if (debug)
+		   syslog(LOG_ERR, "GIFSave::GIFSave() - Using dithering\n");
 		red_error = new int32[width + 2];
 		red_error = &red_error[1]; // Allow index of -1 too
 		green_error = new int32[width + 2];
@@ -74,25 +78,27 @@ GIFSave::GIFSave(BBitmap *bitmap, BPositionIO *output)
 			blue_error[x] = 0;
 		}
 	} else {
-		if (debug) printf("GIFSave::GIFSave() - Not using dithering\n");
+		if (debug)
+		   syslog(LOG_ERR, "GIFSave::GIFSave() - Not using dithering\n");
 	}
 	
 	if (debug) {
-		if (prefs->interlaced) printf("GIFSave::GIFSave() - Interlaced, ");
-		else printf("GIFSave::GIFSave() - Not interlaced, ");
+		if (prefs->interlaced)
+		   syslog(LOG_ERR, "GIFSave::GIFSave() - Interlaced, ");
+		else syslog(LOG_ERR, "GIFSave::GIFSave() - Not interlaced, ");
 		switch (prefs->palettemode) {
 			case WEB_SAFE_PALETTE:
-				printf("web safe palette\n");
+				syslog(LOG_ERR, "web safe palette\n");
 				break;
 			case BEOS_SYSTEM_PALETTE:
-				printf("BeOS system palette\n");
+				syslog(LOG_ERR, "BeOS system palette\n");
 				break;
 			case GREYSCALE_PALETTE:
-				printf("greyscale palette\n");
+				syslog(LOG_ERR, "greyscale palette\n");
 				break;
 			case OPTIMAL_PALETTE:
 			default:
-				printf("optimal palette\n");
+				syslog(LOG_ERR, "optimal palette\n");
 				break;
 		}
 	}
@@ -101,34 +107,36 @@ GIFSave::GIFSave(BBitmap *bitmap, BPositionIO *output)
 		if (prefs->usetransparentauto) {
 			palette->PrepareForAutoTransparency();
 			if (debug)
-				printf("GIFSave::GIFSave() - Using transparent index %d\n", palette->TransparentIndex());
+				syslog(LOG_ERR, "GIFSave::GIFSave() - Using transparent index %d\n", 
+					palette->TransparentIndex());
 		} else {
 			palette->SetTransparentColor((uint8)prefs->transparentred,
 									     (uint8)prefs->transparentgreen,
 									     (uint8)prefs->transparentblue);
 			if (debug) {
-				printf("GIFSave::GIFSave() - Found transparent color %d,%d,%d at index %d\n",
-					   prefs->transparentred, prefs->transparentgreen, prefs->transparentblue,
-					   palette->TransparentIndex());
+				syslog(LOG_ERR, "GIFSave::GIFSave() - Found transparent color %d,%d,%d "
+					"at index %d\n", prefs->transparentred, 
+					prefs->transparentgreen, prefs->transparentblue,
+					palette->TransparentIndex());
 			}
 		}
 	} else {
 		if (debug)
-			printf("GIFSave::GIFSave() - Not using transparency\n");
+			syslog(LOG_ERR, "GIFSave::GIFSave() - Not using transparency\n");
 	}
 
 	this->output = output;
 	this->bitmap = bitmap;
 	WriteGIFHeader();
-	if (debug) printf("GIFSave::GIFSave() - Wrote gif header\n");
+	if (debug) syslog(LOG_ERR, "GIFSave::GIFSave() - Wrote gif header\n");
 		
 	hash = new SFHash(1 << 16);
 	WriteGIFControlBlock();
-	if (debug) printf("GIFSave::GIFSave() - Wrote gif control block\n");
+	if (debug) syslog(LOG_ERR, "GIFSave::GIFSave() - Wrote gif control block\n");
 	WriteGIFImageHeader();
-	if (debug) printf("GIFSave::GIFSave() - Wrote gif image header\n");
+	if (debug) syslog(LOG_ERR, "GIFSave::GIFSave() - Wrote gif image header\n");
 	WriteGIFImageData();
-	if (debug) printf("GIFSave::GIFSave() - Wrote gif image data\n");
+	if (debug) syslog(LOG_ERR, "GIFSave::GIFSave() - Wrote gif image data\n");
 	
 	if (prefs->usedithering) {
 		delete [] &red_error[-1];

@@ -9,6 +9,7 @@
 #include "TranslatorWindow.h"
 
 #include <Application.h>
+#include <Catalog.h>
 
 #define TEST_MODE 0
 #define SHOW_MODE 1
@@ -24,6 +25,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "RAWTranslator main"
 
 int
 main(int argc, char **argv)
@@ -63,11 +66,10 @@ main(int argc, char **argv)
 			printf("software: %s\n", meta.software);
 			printf("flash used: %g\n", meta.flash_used);
 			printf("ISO speed: %g\n", meta.iso_speed);
-			printf("shutter: ");
 			if (meta.shutter >= 1)
-				printf("%g sec\n", meta.shutter);
+				printf("shutter: %g sec\n", meta.shutter);
 			else
-				printf("1/%g sec\n", 1 / meta.shutter);
+				printf("shutter: 1/%g sec\n", 1 / meta.shutter);
 			printf("aperture: %g\n", meta.aperture);
 			printf("focal length: %g mm\n", meta.focal_length);
 			printf("pixel aspect: %g\n", meta.pixel_aspect);
@@ -116,8 +118,9 @@ main(int argc, char **argv)
 						status = output.DetachBitmap(&bitmap);
 					if (status == B_OK) {
 						BWindow* window = new BWindow(BRect(0, 0, 1, 1),
-							"RAW", B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS
-							| B_NOT_RESIZABLE | B_AUTO_UPDATE_SIZE_LIMITS);
+							B_TRANSLATE("RAW"), B_TITLED_WINDOW, 
+							B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE | 
+							B_AUTO_UPDATE_SIZE_LIMITS);
 						BView* view = new BView(window->Bounds(), NULL,
 							B_WILL_DRAW, B_FOLLOW_NONE);
 						window->AddChild(view);
@@ -140,7 +143,8 @@ main(int argc, char **argv)
 	}
 #endif
 
-	status_t status = LaunchTranslatorWindow(new RAWTranslator, "RAW Settings");
+	status_t status = LaunchTranslatorWindow(new RAWTranslator, 
+		B_TRANSLATE("RAW Settings"));
 	if (status != B_OK)
 		return 1;
 

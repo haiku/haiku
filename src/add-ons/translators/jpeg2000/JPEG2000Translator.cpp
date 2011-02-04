@@ -35,6 +35,8 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "jpc_cs.h"
 #include "TranslatorWindow.h"
 
+#include <syslog.h>
+
 #include <GroupLayoutBuilder.h>
 #include <TabView.h>
 #include <TextView.h>
@@ -705,8 +707,9 @@ TranslatorAboutView::TranslatorAboutView(const char* name)
 	BView(name, 0, new BGroupLayout(B_VERTICAL))
 {
 	BAlignment labelAlignment = BAlignment(B_ALIGN_LEFT, B_ALIGN_TOP);
-	BStringView* title = new BStringView("Title", sTranslatorName);
-	title->SetText(B_TRANSLATE_MARK("JPEG2000 images"));
+	BString str1(sTranslatorName);
+	str1.ReplaceFirst("JPEG2000 images", B_TRANSLATE("JPEG2000 images"));
+	BStringView* title = new BStringView("Title", str1.String());
 	title->SetFont(be_bold_font);
 	title->SetExplicitAlignment(labelAlignment);
 
@@ -1003,7 +1006,7 @@ JP2Translator::Compress(BPositionIO* in, BPositionIO* out)
 			break;
 
 		default:
-			fprintf(stderr, B_TRANSLATE("Unknown color space.\n"));
+			syslog(LOG_ERR, "Unknown color space.\n");
 			return B_ERROR;
 	}
 
@@ -1124,8 +1127,8 @@ JP2Translator::Decompress(BPositionIO* in, BPositionIO* out)
 				out_color_space = B_RGBA32;
 				converter = read_rgba32;
 			} else {
-				fprintf(stderr, B_TRANSLATE("Other than RGB with 3 or 4 color "
-					"components not implemented.\n"));
+				syslog(LOG_ERR, "Other than RGB with 3 or 4 color "
+					"components not implemented.\n");
 				return Error(ins, image, NULL, 0, NULL, B_ERROR);
 			}
 			break;
@@ -1141,13 +1144,12 @@ JP2Translator::Decompress(BPositionIO* in, BPositionIO* out)
 			}
 			break;
 		case JAS_IMAGE_CS_YCBCR:
-			fprintf(stderr, B_TRANSLATE("Color space YCBCR not implemented "
-				"yet.\n"));
+			syslog(LOG_ERR, "Color space YCBCR not implemented yet.\n");
 			return Error(ins, image, NULL, 0, NULL, B_ERROR);
 			break;
 		case JAS_IMAGE_CS_UNKNOWN:
 		default:
-			fprintf(stderr, B_TRANSLATE("Color space unknown. \n"));
+			syslog(LOG_ERR, "Color space unknown. \n");
 			return Error(ins, image, NULL, 0, NULL, B_ERROR);
 			break;
 	}
@@ -1314,8 +1316,7 @@ main()
 {
 	BApplication app("application/x-vnd.Haiku-JPEG2000Translator");
 	JP2Translator* translator = new JP2Translator();
-	if (LaunchTranslatorWindow(translator, B_TRANSLATE("JPEG2000 images")
-		/*sTranslatorName*/) == B_OK)
+	if (LaunchTranslatorWindow(translator, sTranslatorName) == B_OK)
 		app.Run();
 
 	return 0;

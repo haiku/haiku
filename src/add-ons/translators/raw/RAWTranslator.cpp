@@ -8,6 +8,7 @@
 #include "ConfigView.h"
 #include "RAW.h"
 
+#include <Catalog.h>
 #include <BufferIO.h>
 #include <Messenger.h>
 #include <TranslatorRoster.h>
@@ -15,6 +16,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "RAWTranslator"
 
 
 class FreeAllocation {
@@ -44,6 +48,7 @@ const char* kDocumentCount = "/documentCount";
 const char* kDocumentIndex = "/documentIndex";
 const char* kProgressMonitor = "/progressMonitor";
 const char* kProgressMessage = "/progressMessage";
+
 
 // The input formats that this translator supports.
 static const translation_format sInputFormats[] = {
@@ -87,12 +92,15 @@ const uint32 kNumInputFormats = sizeof(sInputFormats) / sizeof(translation_forma
 const uint32 kNumOutputFormats = sizeof(sOutputFormats) / sizeof(translation_format);
 const uint32 kNumDefaultSettings = sizeof(sDefaultSettings) / sizeof(TranSetting);
 
+const char* kShortName1 = B_TRANSLATE_MARK("RAW images");
+const char* kShortInfo1 = B_TRANSLATE_MARK("RAW image translator");
+
 
 //	#pragma mark -
 
 
 RAWTranslator::RAWTranslator()
-	: BaseTranslator("RAW images", "RAW image translator",
+	: BaseTranslator(kShortName1, kShortInfo1,
 		RAW_TRANSLATOR_VERSION,
 		sInputFormats, kNumInputFormats,
 		sOutputFormats, kNumOutputFormats,
@@ -156,7 +164,9 @@ RAWTranslator::DerivedIdentify(BPositionIO *stream,
 	info->group = B_TRANSLATOR_BITMAP;
 	info->quality = RAW_IN_QUALITY;
 	info->capability = RAW_IN_CAPABILITY;
-	snprintf(info->name, sizeof(info->name), "%s RAW image", meta.manufacturer);
+	snprintf(info->name, sizeof(info->name), 
+		B_TRANSLATE_COMMENT("%s RAW image", "Parameter (%s) is the name of "
+		"the manufacturer (like \"Canon\")"), meta.manufacturer);
 	strcpy(info->MIME, "image/x-vnd.photo-raw");
 
 	return B_OK;

@@ -7,13 +7,17 @@
 #include "ConfigView.h"
 #include "RTFTranslator.h"
 
+#include <Catalog.h>
 #include <StringView.h>
 
 #include <stdio.h>
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "ConfigView"
+
 
 ConfigView::ConfigView(const BRect &frame, uint32 resize, uint32 flags)
-	: BView(frame, "RTF-Translator Settings", resize, flags)
+	: BView(frame, B_TRANSLATE("RTF-Translator Settings"), resize, flags)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
@@ -22,7 +26,8 @@ ConfigView::ConfigView(const BRect &frame, uint32 resize, uint32 flags)
 	float height = fontHeight.descent + fontHeight.ascent + fontHeight.leading;
 
 	BRect rect(10, 10, 200, 10 + height);
-	BStringView *stringView = new BStringView(rect, "title", "Rich Text Format (RTF) files");
+	BStringView *stringView = new BStringView(rect, "title", 
+		B_TRANSLATE("Rich Text Format (RTF) files"));
 	stringView->SetFont(be_bold_font);
 	stringView->ResizeToPreferred();
 	AddChild(stringView);
@@ -31,11 +36,11 @@ ConfigView::ConfigView(const BRect &frame, uint32 resize, uint32 flags)
 
 	rect.OffsetBy(0, height + 10);
 	char version[256];
-	snprintf(version, sizeof(version), "Version %d.%d.%d, %s",
-		int(B_TRANSLATION_MAJOR_VERSION(RTF_TRANSLATOR_VERSION)),
-		int(B_TRANSLATION_MINOR_VERSION(RTF_TRANSLATOR_VERSION)),
-		int(B_TRANSLATION_REVISION_VERSION(RTF_TRANSLATOR_VERSION)),
-		__DATE__);
+	snprintf(version, sizeof(version), B_TRANSLATE("Version %d.%d.%d, %s"),
+		static_cast<int>(B_TRANSLATION_MAJOR_VERSION(RTF_TRANSLATOR_VERSION)),
+		static_cast<int>(B_TRANSLATION_MINOR_VERSION(RTF_TRANSLATOR_VERSION)),
+		static_cast<int>(B_TRANSLATION_REVISION_VERSION(
+			RTF_TRANSLATOR_VERSION)), __DATE__);
 	stringView = new BStringView(rect, "version", version);
 	stringView->ResizeToPreferred();
 	AddChild(stringView);
@@ -47,7 +52,8 @@ ConfigView::ConfigView(const BRect &frame, uint32 resize, uint32 flags)
 	height = fontHeight.descent + fontHeight.ascent + fontHeight.leading;
 
 	rect.OffsetBy(0, height + 5);
-	stringView = new BStringView(rect, "Copyright", B_UTF8_COPYRIGHT "2004-2006 Haiku Inc.");
+	stringView = new BStringView(rect, 
+		"Copyright", B_UTF8_COPYRIGHT "2004-2006 Haiku Inc.");
 	stringView->ResizeToPreferred();
 	AddChild(stringView);
 

@@ -8,25 +8,31 @@
 #include "ConfigView.h"
 #include "RAWTranslator.h"
 
-#include <StringView.h>
+#include <Catalog.h>
 #include <CheckBox.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
+#include <StringView.h>
 
 #include <stdio.h>
 #include <string.h>
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "ConfigView"
+
+const char* kShortName2 = B_TRANSLATE_MARK("RAWTranslator Settings");
+
 
 ConfigView::ConfigView(uint32 flags)
-	: BView("RAWTranslator Settings", flags)
+	: BView(kShortName2, flags)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	BStringView *fTitle = new BStringView("title", "RAW Images");
+	BStringView *fTitle = new BStringView("title", B_TRANSLATE("RAW Images"));
 	fTitle->SetFont(be_bold_font);
 
 	char version[256];
-	sprintf(version, "Version %d.%d.%d, %s",
+	sprintf(version, B_TRANSLATE("Version %d.%d.%d, %s"),
 		int(B_TRANSLATION_MAJOR_VERSION(RAW_TRANSLATOR_VERSION)),
 		int(B_TRANSLATION_MINOR_VERSION(RAW_TRANSLATOR_VERSION)),
 		int(B_TRANSLATION_REVISION_VERSION(RAW_TRANSLATOR_VERSION)),
@@ -37,7 +43,7 @@ ConfigView::ConfigView(uint32 flags)
 		B_UTF8_COPYRIGHT "2007-2009 Haiku Inc.");
 
 	BStringView *fCopyright2 = new BStringView("copyright2",
-		"Based on Dave Coffin's dcraw 8.63");
+		B_TRANSLATE("Based on Dave Coffin's dcraw 8.63"));
 
 	BStringView *fCopyright3 = new BStringView("copyright3",
 		B_UTF8_COPYRIGHT "1997-2007 Dave Coffin");

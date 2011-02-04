@@ -4,13 +4,14 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
+AddResources BMPTranslator : BMPTranslator.rdef ;
+
 Translator BMPTranslator :
 	BMPMain.cpp
 	BMPTranslator.cpp
 	BMPView.cpp
-
-	: be translation libtranslatorsutils.a $(HAIKU_LOCALE_LIBS)
-	$(TARGET_LIBSUPC++)
+	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++)
+	$(HAIKU_LOCALE_LIBS)
 	: true
 ;
 

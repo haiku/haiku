@@ -19,6 +19,7 @@
 #include <InterfaceDefs.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <syslog.h>
 
 extern bool debug;
 
@@ -40,7 +41,8 @@ GIFLoad::GIFLoad(BPositionIO *input, BPositionIO *output)
 	}
 	
 	if (debug)
-		printf("GIFLoad::GIFLoad() - Image dimensions are %d x %d\n", fWidth, fHeight);
+		syslog(LOG_ERR, "GIFLoad::GIFLoad() - Image dimensions are %d x %d\n",
+				fWidth, fHeight);
 	
 	unsigned char c;
 	if (fInput->Read(&c, 1) < 1) {
@@ -51,11 +53,12 @@ GIFLoad::GIFLoad(BPositionIO *input, BPositionIO *output)
 		if (c == 0x2c) {
 			if ((!ReadGIFImageHeader()) || (!ReadGIFImageData())) {
 				if (debug) 
-					printf("GIFLoad::GIFLoad() - A fatal error occurred\n");
+					syslog(LOG_ERR, "GIFLoad::GIFLoad() - A fatal error occurred\n");
 				fatalerror = true;
 			} else {
 				if (debug) 
-					printf("GIFLoad::GIFLoad() - Found a single image and leaving\n");
+					syslog(LOG_ERR, "GIFLoad::GIFLoad() - Found a single image and "
+						"leaving\n");
 			}
 			free(fScanLine);
 			fScanLine = NULL;
@@ -99,7 +102,7 @@ GIFLoad::GIFLoad(BPositionIO *input, BPositionIO *output)
 		}
 	}
 	if (debug)
-		printf("GIFLoad::GIFLoad() - Done\n");
+		syslog(LOG_ERR, "GIFLoad::GIFLoad() - Done\n");
 }
 
 
@@ -117,7 +120,8 @@ GIFLoad::ReadGIFHeader()
 	if (header[10] & GIF_LOCALCOLORMAP) {
 		fPalette->size_in_bits = (header[10] & 0x07) + 1;
 		if (debug)
-			printf("GIFLoad::ReadGIFHeader() - Found %d bit global palette\n", fPalette->size_in_bits);
+			syslog(LOG_ERR, "GIFLoad::ReadGIFHeader() - Found %d bit global palette\n", 
+				fPalette->size_in_bits);
 		int s = 1 << fPalette->size_in_bits;
 		fPalette->size = s;
 
@@ -131,8 +135,8 @@ GIFLoad::ReadGIFHeader()
 	} else { // Install BeOS system palette in case local palette isn't present
 		color_map *map = (color_map *)system_colors();
 		for (int x = 0; x < 256; x++) {
-			fPalette->SetColor(x, map->color_list[x].red, map->color_list[x].green,
-				map->color_list[x].blue);
+			fPalette->SetColor(x, map->color_list[x].red, 
+				map->color_list[x].green, map->color_list[x].blue);
 		}
 		fPalette->size = 256;
 		fPalette->size_in_bits = 8;
@@ -169,7 +173,8 @@ GIFLoad::ReadGIFControlBlock()
 		fPalette->usetransparent = true;
 		fPalette->transparentindex = data[4];
 		if (debug)
-			printf("GIFLoad::ReadGIFControlBlock() - Transparency active, using palette index %d\n", data[4]);
+			syslog(LOG_ERR, "GIFLoad::ReadGIFControlBlock() - Transparency active, "
+				"using palette index %d\n", data[4]);
 	}
 	return true;
 }
@@ -178,7 +183,7 @@ GIFLoad::ReadGIFControlBlock()
 bool 
 GIFLoad::ReadGIFCommentBlock() 
 {
-	if (debug) printf("GIFLoad::ReadGIFCommentBlock() - Found:\n");
+	if (debug) syslog(LOG_ERR, "GIFLoad::ReadGIFCommentBlock() - Found:\n");
 	unsigned char length;
 	char comment_data[256];
 	do {
@@ -188,10 +193,10 @@ GIFLoad::ReadGIFCommentBlock()
 			return false;
 		comment_data[length] = 0x00;
 		if (debug)
-			printf("%s", comment_data);
+			syslog(LOG_ERR, "%s", comment_data);
 	} while (length != 0x00);
 	if (debug)
-		printf("\n");
+		syslog(LOG_ERR, "\n");
 	return true;
 }
 
@@ -200,7 +205,7 @@ bool
 GIFLoad::ReadGIFUnknownBlock(unsigned char c) 
 {
 	if (debug)
-		printf("GIFLoad::ReadGIFUnknownBlock() - Found: %d\n", c);
+		syslog(LOG_ERR, "GIFLoad::ReadGIFUnknownBlock() - Found: %d\n", c);
 	unsigned char length;
 	do {
 		if (fInput->Read(&length, 1) < 1)
@@ -222,15 +227,17 @@ GIFLoad::ReadGIFImageHeader()
 	int localHeight = data[6] + (data[7] << 8);
 	if (fWidth != localWidth || fHeight != localHeight) {
 		if (debug)
-			printf("GIFLoad::ReadGIFImageHeader() - Local dimensions do not match global, setting to %d x %d\n",
-			localWidth, localHeight);
+			syslog(LOG_ERR, "GIFLoad::ReadGIFImageHeader() - Local dimensions do not "
+				"match global, setting to %d x %d\n", localWidth, localHeight);
 		fWidth = localWidth;
 		fHeight = localHeight;
 	}
 	
 	fScanLine = (uint32 *)malloc(fWidth * 4);
 	if (fScanLine == NULL) {
-		if (debug) printf("GIFLoad::ReadGIFImageHeader() - Could not allocate scanline\n");
+		if (debug)
+			syslog(LOG_ERR, "GIFLoad::ReadGIFImageHeader() - Could not allocate "
+				"scanline\n");
 		return false;
 	}
 		
@@ -253,8 +260,8 @@ GIFLoad::ReadGIFImageHeader()
 		int s = 1 << fPalette->size_in_bits;
 		fPalette->size = s;
 		if (debug)
-			printf("GIFLoad::ReadGIFImageHeader() - Found %d bit local palette\n",
-				fPalette->size_in_bits);
+			syslog(LOG_ERR, "GIFLoad::ReadGIFImageHeader() - Found %d bit local "
+				"palette\n", fPalette->size_in_bits);
 		
 		unsigned char lp[256 * 3];
 		if (fInput->Read(lp, s * 3) < s * 3)
@@ -267,9 +274,10 @@ GIFLoad::ReadGIFImageHeader()
 	fInterlaced = data[8] & GIF_INTERLACED;
 	if (debug) {
 		if (fInterlaced)
-			printf("GIFLoad::ReadGIFImageHeader() - Image is interlaced\n");
+			syslog(LOG_ERR, "GIFLoad::ReadGIFImageHeader() - Image is interlaced\n");
 		else
-			printf("GIFLoad::ReadGIFImageHeader() - Image is not interlaced\n");
+			syslog(LOG_ERR, "GIFLoad::ReadGIFImageHeader() - Image is not "
+				"interlaced\n");
 	}
 	return true;
 }
@@ -287,17 +295,19 @@ GIFLoad::ReadGIFImageData()
 			return false;
 	} else if (cs > fPalette->size_in_bits) {
 		if (debug)
-			printf("GIFLoad::ReadGIFImageData() - Code_size should be %d, not %d, allowing it\n", fCodeSize, cs);
+			syslog(LOG_ERR, "GIFLoad::ReadGIFImageData() - Code_size should be %d, not "
+				"%d, allowing it\n", fCodeSize, cs);
 		if (!InitFrame(cs))
 			return false;
 	} else if (cs < fPalette->size_in_bits) {
 		if (debug)
-			printf("GIFLoad::ReadGIFImageData() - Code_size should be %d, not %d\n", fCodeSize, cs);
+			syslog(LOG_ERR, "GIFLoad::ReadGIFImageData() - Code_size should be %d, not "
+				"%d\n", fCodeSize, cs);
 		return false;
 	}
 	
 	if (debug)
-		printf("GIFLoad::ReadGIFImageData() - Starting LZW\n");
+		syslog(LOG_ERR, "GIFLoad::ReadGIFImageData() - Starting LZW\n");
 	
 	while ((fNewCode = NextCode()) != -1 && fNewCode != fEndCode) {
 		if (fNewCode == fClearCode) {
@@ -308,7 +318,8 @@ GIFLoad::ReadGIFImageData()
 			if (!OutputColor(fOldCode, 1)) goto bad_end;
 			if (fNewCode == -1 || fNewCode == fEndCode) {
 				if (debug)
-					printf("GIFLoad::ReadGIFImageData() - Premature fEndCode or error\n");
+					syslog(LOG_ERR, "GIFLoad::ReadGIFImageData() - Premature fEndCode "
+						"or error\n");
 				goto bad_end;
 			}
 			continue;
@@ -373,12 +384,12 @@ GIFLoad::ReadGIFImageData()
 	if (fNewCode == -1)
 		return false;
 	if (debug)
-		printf("GIFLoad::ReadGIFImageData() - Done\n");
+		syslog(LOG_ERR, "GIFLoad::ReadGIFImageData() - Done\n");
 	return true;
 	
 bad_end:
 	if (debug)
-		printf("GIFLoad::ReadGIFImageData() - Reached a bad end\n");
+		syslog(LOG_ERR, "GIFLoad::ReadGIFImageData() - Reached a bad end\n");
 	MemblockDeleteAll();
 	return false;
 }
@@ -391,7 +402,8 @@ GIFLoad::NextCode()
 		if (fByteCount == 0) {
 			if (fInput->Read(&fByteCount, 1) < 1) return -1;
 			if (fByteCount == 0) return fEndCode;
-			if (fInput->Read(fByteBuffer + (255 - fByteCount), fByteCount) < fByteCount) return -1;
+			if (fInput->Read(fByteBuffer + (255 - fByteCount), 
+				fByteCount) < fByteCount) return -1;
 		}
 		fBitBuffer |= (unsigned int)fByteBuffer[255 - fByteCount] << fBitCount;
 		fByteCount--;

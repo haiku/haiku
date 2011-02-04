@@ -30,9 +30,15 @@
 
 #include <string.h>
 #include <stdio.h>
+
+#include <Catalog.h>
+
 #include "TGATranslator.h"
 #include "TGAView.h"
 #include "StreamBuffer.h"
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "TGATranslator"
 
 // The input formats that this translator supports.
 static const translation_format sInputFormats[] = {
@@ -136,7 +142,8 @@ make_nth_translator(int32 n, image_id you, uint32 flags, ...)
 // Returns:
 // ---------------------------------------------------------------
 TGATranslator::TGATranslator()
-	: BaseTranslator("TGA images", "TGA image translator",
+	: BaseTranslator(B_TRANSLATE("TGA images"), 
+		B_TRANSLATE("TGA image translator"),
 		TGA_TRANSLATOR_VERSION,
 		sInputFormats, kNumInputFormats,
 		sOutputFormats, kNumOutputFormats,
@@ -385,29 +392,40 @@ identify_tga_header(BPositionIO *inSource, translator_info *outInfo,
 		outInfo->group = B_TRANSLATOR_BITMAP;
 		outInfo->quality = TGA_IN_QUALITY;
 		outInfo->capability = TGA_IN_CAPABILITY;
-		sprintf(outInfo->name, "Targa image (%d bits",
-			imagespec.depth);
 		switch (fileheader.imagetype) {
 			case TGA_NOCOMP_COLORMAP:
-				strcat(outInfo->name, " colormap");
+				snprintf(outInfo->name, sizeof(outInfo->name), 
+					B_TRANSLATE("Targa image (%d bits colormap)"), 
+					imagespec.depth);
 				break;
 			case TGA_NOCOMP_TRUECOLOR:
-				strcat(outInfo->name, " truecolor");
-				break;
-			case TGA_NOCOMP_BW:
-				strcat(outInfo->name, " gray");
+				snprintf(outInfo->name, sizeof(outInfo->name), 
+					B_TRANSLATE("Targa image (%d bits truecolor)"), 
+					imagespec.depth);
 				break;
 			case TGA_RLE_COLORMAP:
-				strcat(outInfo->name, " RLE colormap");
+				snprintf(outInfo->name, sizeof(outInfo->name), 
+					B_TRANSLATE("Targa image (%d bits RLE colormap)"), 
+					imagespec.depth);
 				break;
 			case TGA_RLE_TRUECOLOR:
-				strcat(outInfo->name, " RLE truecolor");
+				snprintf(outInfo->name, sizeof(outInfo->name), 
+					B_TRANSLATE("Targa image (%d bits RLE truecolor)"), 
+					imagespec.depth);
 				break;
 			case TGA_RLE_BW:
-				strcat(outInfo->name, " RLE gray");
+				snprintf(outInfo->name, sizeof(outInfo->name), 
+					B_TRANSLATE("Targa image (%d bits RLE gray)"), 
+					imagespec.depth);
 				break;
+			case TGA_NOCOMP_BW:
+			default:
+				snprintf(outInfo->name, sizeof(outInfo->name), 
+					B_TRANSLATE("Targa image (%d bits gray)"), 
+					imagespec.depth);
+				break;
+
 		}
-		strcat(outInfo->name, ")");
 		strcpy(outInfo->MIME, "image/x-targa");
 	}
 
@@ -2196,6 +2214,7 @@ TGATranslator::DerivedTranslate(BPositionIO *inSource,
 BView *
 TGATranslator::NewConfigView(TranslatorSettings *settings)
 {
-	return new TGAView("TGATranslator Settings", B_WILL_DRAW, settings);
+	return new TGAView(B_TRANSLATE("TGATranslator Settings"), 
+		B_WILL_DRAW, settings);
 }
 

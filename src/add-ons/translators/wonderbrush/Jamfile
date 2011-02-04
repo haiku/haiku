@@ -8,6 +8,8 @@ SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons translators wonderbrush sup
 UseLibraryHeaders zlib ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
+AddResources WonderBrushTranslator : WonderBrushTranslator.rdef ;
+
 Translator WonderBrushTranslator :
 	Canvas.cpp
 	Layer.cpp

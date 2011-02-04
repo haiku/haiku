@@ -1,0 +1,15 @@
+/*
+ * GIFTranslator.rdef
+ */
+
+resource app_signature "application/x-vnd.Haiku-GIFTranslator";
+
+resource app_version {
+	major  = 1,
+	middle = 4,
+	minor  = 0,
+	variety = 0,
+	internal = 0,
+	short_info = "1.4.0",
+	long_info = "Haiku GIFTranslator Add-Ons."
+};

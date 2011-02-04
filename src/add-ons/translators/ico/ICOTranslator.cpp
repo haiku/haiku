@@ -6,6 +6,7 @@
 
 #include "ICOTranslator.h"
 
+#include <Catalog.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

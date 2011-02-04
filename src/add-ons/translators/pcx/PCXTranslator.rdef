@@ -1,0 +1,15 @@
+/*
+ * PCXTranslator.rdef
+ */
+
+resource app_signature "application/x-vnd.Haiku-PCXTranslator";
+
+resource app_version {
+	major  = 0,
+	middle = 3,
+	minor  = 0,
+	variety = 0,
+	internal = 0,
+	short_info = "0.3.0",
+	long_info = "Haiku PCXTranslator Add-Ons."
+};

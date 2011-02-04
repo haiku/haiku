@@ -35,8 +35,12 @@
 /*****************************************************************************/
 
 #include <Application.h>
+#include <Catalog.h>
 #include "SGITranslator.h"
 #include "TranslatorWindow.h"
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "SGIMain"
 
 // ---------------------------------------------------------------
 // main
@@ -57,7 +61,7 @@ main()
 	BApplication app("application/x-vnd.Haiku-SGITranslator");
 	status_t result;
 	result = LaunchTranslatorWindow(new SGITranslator,
-		"SGI Settings", BRect(0, 0, 225, 175));
+		B_TRANSLATE("SGI Settings"), BRect(0, 0, 225, 175));
 	if (result == B_OK) {
 		app.Run();
 		return 0;

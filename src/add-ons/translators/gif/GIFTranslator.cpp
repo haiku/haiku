@@ -18,19 +18,28 @@
 #include "GIFView.h"
 #include "GIFSave.h"
 #include "GIFLoad.h"
+
+
 #include <ByteOrder.h>
-#include <TypeConstants.h>
+#include <Catalog.h>
 #include <DataIO.h>
+#include <InterfaceDefs.h>
+#include <TypeConstants.h>
 #include <TranslatorAddOn.h>
 #include <TranslatorFormats.h>
-#include <InterfaceDefs.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <syslog.h>
 
 #ifndef GIF_TYPE
 #define GIF_TYPE 'GIF '
 #endif
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "GIFTranslator"
+
 
 // This global will be externed in other files - set once here
 // for the entire translator
@@ -45,14 +54,18 @@ char translatorInfo[] = "GIF image translator v1.4";
 int32 translatorVersion = 0x140;
 
 translation_format inputFormats[] = {
-	{ GIF_TYPE, B_TRANSLATOR_BITMAP, 0.8, 0.8, "image/gif", "GIF image" },
-	{ B_TRANSLATOR_BITMAP, B_TRANSLATOR_BITMAP, 0.3, 0.3, "image/x-be-bitmap", "Be Bitmap Format (GIFTranslator)" },
+	{ GIF_TYPE, B_TRANSLATOR_BITMAP, 0.8, 0.8, "image/gif", 
+		"GIF image" },
+	{ B_TRANSLATOR_BITMAP, B_TRANSLATOR_BITMAP, 0.3, 0.3, "image/x-be-bitmap", 
+		"Be Bitmap Format (GIFTranslator)" },
 	{ 0 }
 };
 
 translation_format outputFormats[] = {
-	{ GIF_TYPE, B_TRANSLATOR_BITMAP, 0.8, 0.8, "image/gif", "GIF image" },
-	{ B_TRANSLATOR_BITMAP, B_TRANSLATOR_BITMAP, 0.3, 0.3, "image/x-be-bitmap", "Be Bitmap Format (GIFTranslator)" },
+	{ GIF_TYPE, B_TRANSLATOR_BITMAP, 0.8, 0.8, "image/gif", 
+		"GIF image" },
+	{ B_TRANSLATOR_BITMAP, B_TRANSLATOR_BITMAP, 0.3, 0.3, "image/x-be-bitmap", 
+		"Be Bitmap Format (GIFTranslator)" },
 	{ 0 }
 };
 
@@ -79,15 +92,18 @@ DetermineType(BPositionIO *source, bool *is_gif)
 	if (source->Read(header, 6) != 6) return false;
 	header[6] = 0x00;
 
-	if (strcmp((char *)header, "GIF87a") != 0 && strcmp((char *)header, "GIF89a") != 0) {
+	if (strcmp((char *)header, "GIF87a") != 0 && strcmp((char *)header, 
+		"GIF89a") != 0) {
 		*is_gif = false;
-		int32 magic = (header[0] << 24) + (header[1] << 16) + (header[2] << 8) + header[3];
+		int32 magic = (header[0] << 24) + (header[1] << 16) + (header[2] << 8) 
+			+ header[3];
 		if (magic != B_TRANSLATOR_BITMAP) return false;
 		source->Seek(5 * 4 - 2, SEEK_CUR);
 		color_space cs;
 		if (source->Read(&cs, 4) != 4) return false;
 		cs = (color_space)B_BENDIAN_TO_HOST_INT32(cs);
-		if (cs != B_RGB32 && cs != B_RGBA32 && cs != B_RGB32_BIG && cs != B_RGBA32_BIG) return false;
+		if (cs != B_RGB32 && cs != B_RGBA32 && cs != B_RGB32_BIG && cs 
+			!= B_RGBA32_BIG) return false;
 	}
 
 	source->Seek(0, SEEK_SET);
@@ -141,7 +157,8 @@ Identify(BPositionIO *inSource, const translation_format *inFormat,
 	if ((debug_text != NULL) && (atoi(debug_text) != 0)) debug = true;
 
 	if (outType == 0) outType = B_TRANSLATOR_BITMAP;
-	if (outType != GIF_TYPE && outType != B_TRANSLATOR_BITMAP) return B_NO_TRANSLATOR;
+	if (outType != GIF_TYPE && outType != B_TRANSLATOR_BITMAP) 
+		return B_NO_TRANSLATOR;
 
 	bool is_gif;
 	if (!DetermineType(inSource, &is_gif)) return B_NO_TRANSLATOR;
@@ -153,14 +170,14 @@ Identify(BPositionIO *inSource, const translation_format *inFormat,
 		outInfo->type = GIF_TYPE;
 		outInfo->quality = 0.8;
 		outInfo->capability = 0.8;
-		strcpy(outInfo->name, "GIF image");
+		strcpy(outInfo->name, B_TRANSLATE("GIF image"));
 		strcpy(outInfo->MIME, "image/gif");
 	}
 	else {
 		outInfo->type = B_TRANSLATOR_BITMAP;
 		outInfo->quality = 0.3;
 		outInfo->capability = 0.3;
-		strcpy(outInfo->name, "Be Bitmap Format (GIFTranslator)");
+		strcpy(outInfo->name, B_TRANSLATE("Be Bitmap Format (GIFTranslator)"));
 		strcpy(outInfo->MIME, "image/x-be-bitmap");
 	}
 	return B_OK;
@@ -213,7 +230,7 @@ Translate(BPositionIO *inSource, const translator_info *inInfo,
 
 	if (debug) {
 		now = system_time() - now;
-		printf("Translate() - Translation took %Ld microseconds\n", now);
+		syslog(LOG_ERR, "Translate() - Translation took %Ld microseconds\n", now);
 	}
 	return B_OK;
 }
@@ -223,7 +240,7 @@ GIFTranslator::GIFTranslator()
 	: BApplication("application/x-vnd.Haiku-GIFTranslator")
 {
 	BRect rect(100, 100, 339, 339);
-	gifwindow = new GIFWindow(rect, "GIF Settings");
+	gifwindow = new GIFWindow(rect, B_TRANSLATE("GIF Settings"));
 	gifwindow->Show();
 }
 

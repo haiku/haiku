@@ -33,8 +33,12 @@
 /*****************************************************************************/
 
 #include <Application.h>
+#include <Catalog.h>
 #include "STXTTranslator.h"
 #include "TranslatorWindow.h"
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "STXTMain"
 
 // ---------------------------------------------------------------
 // main
@@ -55,7 +59,7 @@ main()
 	BApplication app("application/x-vnd.Haiku-STXTTranslator");
 	status_t result;
 	result = LaunchTranslatorWindow(new STXTTranslator,
-		"STXT Settings", BRect(0, 0, 225, 175));
+		B_TRANSLATE("STXT Settings"), BRect(0, 0, 225, 175));
 	if (result == B_OK) {
 		app.Run();
 		return 0;

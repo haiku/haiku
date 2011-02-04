@@ -8,6 +8,8 @@ UseHeaders [ FDirName $(HAIKU_TOP) src servers registrar ] ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
+AddResources STXTTranslator : STXTTranslator.rdef ;
+
 Translator STXTTranslator :
 	STXTMain.cpp
 	STXTTranslator.cpp
@@ -17,6 +19,14 @@ Translator STXTTranslator :
 	: true
 ;
 
+DoCatalogs STXTTranslator :
+	x-vnd.Haiku-STXTTranslator
+	:
+	STXTMain.cpp
+	STXTTranslator.cpp
+	STXTView.cpp
+;
+	
 #Package haiku-translationkit-cvs :
 #	STXTTranslator :
 #	boot home config add-ons Translators ;

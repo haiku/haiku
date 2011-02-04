@@ -4,6 +4,8 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
+AddResources ICOTranslator : ICOTranslator.rdef ;
+
 Translator ICOTranslator :
 	# ICOTranslator classes
 	main.cpp
@@ -18,6 +20,7 @@ Translator ICOTranslator :
 DoCatalogs ICOTranslator :
 	x-vnd.Haiku-ICOTranslator
 	:
+	main.cpp
 	ConfigView.cpp
 	ICOTranslator.cpp
 ;

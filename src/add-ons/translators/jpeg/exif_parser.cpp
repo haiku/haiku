@@ -6,6 +6,7 @@
 
 #include "exif_parser.h"
 
+#include <Catalog.h>
 #include <ctype.h>
 #include <set>
 #include <stdio.h>
