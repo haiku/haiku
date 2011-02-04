@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>
  * Distributed under the terms of the MIT License.
  */
 
@@ -1006,10 +1007,12 @@ PackageWriterImpl::_WriteAttributeChildren(Attribute* attribute)
 void
 PackageWriterImpl::_WritePackageAttributes(hpkg_header& header)
 {
-	// write the package attributes
+	// write the package attributes (zlib writer on top of a file writer)
 	off_t startOffset = fHeapEnd;
 	FDDataWriter realWriter(fFD, startOffset, fListener);
-	fDataWriter = &realWriter;
+	ZlibDataWriter zlibWriter(&realWriter);
+	fDataWriter = &zlibWriter;
+	zlibWriter.Init();
 
 	// name
 	_WriteUnsignedLEB128(B_HPKG_PACKAGE_ATTRIBUTE_TAG_COMPOSE(
@@ -1114,21 +1117,22 @@ PackageWriterImpl::_WritePackageAttributes(hpkg_header& header)
 	}
 
 	_Write<uint8>(0);
+
+	zlibWriter.Finish();
 	fHeapEnd = realWriter.Offset();
 	fDataWriter = NULL;
 
 	off_t endOffset = fHeapEnd;
 
-	fListener->OnPackageAttributesSizeInfo(endOffset - startOffset);
+	fListener->OnPackageAttributesSizeInfo(zlibWriter.BytesWritten());
 
 	// update the header
-	header.attributes_compression = B_HOST_TO_BENDIAN_INT32(
-		B_HPKG_COMPRESSION_NONE);
+	header.attributes_compression
+		= B_HOST_TO_BENDIAN_INT32(B_HPKG_COMPRESSION_ZLIB);
 	header.attributes_length_compressed
 		= B_HOST_TO_BENDIAN_INT32(endOffset - startOffset);
 	header.attributes_length_uncompressed
-		= header.attributes_length_compressed;
-		// TODO: Support compression!
+		= B_HOST_TO_BENDIAN_INT32(zlibWriter.BytesWritten());
 }
 
 
