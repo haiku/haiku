@@ -1,0 +1,9 @@
+1	belarusian	x-vnd.Haiku-RAWTranslator	2919758153
+RAWTranslator Settings	ConfigView		Наладкі канвертара RAW
+Version %d.%d.%d, %s	ConfigView		Версія %d.%d.%d, %s
+RAW Images	ConfigView		Выявы RAW
+RAW image translator	RAWTranslator		Канвертар выяваў RAW
+RAW Settings	RAWTranslator main		Наладкі RAW
+RAW images	RAWTranslator		Выявы RAW
+%s RAW image	RAWTranslator	Parameter (%s) is the name of the manufacturer (like \"Canon\")	Выява RAW у фармаце %s 
+Based on Dave Coffin's dcraw 8.63	ConfigView		Грунтуецца на праекце dcraw 8.63 ад Dave Coffin.

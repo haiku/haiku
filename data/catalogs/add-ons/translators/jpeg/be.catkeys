@@ -1,15 +1,28 @@
-1	belarusian	x-vnd.Haiku-JPEGTranslator	2665676859
-libjpeg encountered a critical error (caught C++ exception).\n	JPEGTranslator		libjpeg атрымала крытычную памылку (C++ exception).\n
+1	belarusian	x-vnd.Haiku-JPEGTranslator	1834097482
 JPEG Library Error: %s\n	be_jerror		Памылка бібліятэкі JPEG: %s\n
 ISO	exit_parser		ISO
 Low	JPEGTranslator		Нізкая
 ExposureTime	exit_parser		Час экспазіцыі
 Orientation	exit_parser		Арыентацыя
 None	JPEGTranslator		Адсутнічае
-From Type: Jpeg uses unknown color type\n	JPEGTranslator		Зыходны тып: Jpeg выкарыстоўвае невядомы тып колеру.\n
 High	JPEGTranslator		Ныйвышэйшая
-Wrong type: Color space not implemented.\n	JPEGTranslator		Няправільны тып: Палета колераў не падтрымана.\n
 Model	exit_parser		Мадэль
 JPEG Library Warning: %s\n	be_jerror		Папярэджанне бібліятэкі JPEG: %s\n
 Maker	exit_parser		Маркер
-From Type: Jpeg uses hmm... i don't know really :(\n	JPEGTranslator		Зыходны тып: Jpeg выкарыстоўвае невядомы фармат.\n
+Output quality	JPEGTranslator		Якасьць выніку
+with \"lossless\" encoding support patch by Ken Murchison\n	JPEGTranslator		з падтрымкай \"безстратнага\" кадавання (дададзена Ken Murchison)\n
+JPEG images	JPEGTranslator		Выявы JPEG
+Prevent colors 'washing out'	JPEGTranslator		Прадухіляць страту 'насычанасці' колераў
+Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Выкарыстоўваць код CMYK 0 для 100% ахопа чарніламі
+About	JPEGTranslator		Пра праграму
+With some colorspace conversion routines by Magnus Hellman\n	JPEGTranslator		Выкарыстоўваць мэтады пераўтварэнняў колераў (распрацаваныя Magnus Hellman)\n
+Make file smaller (sligthtly worse quality)	JPEGTranslator		Зрабіць файл меншым (магчыма страта якасці)
+Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Фармат бітмапу BeOS (канвертар JPEG)
+Show warning messages	JPEGTranslator		Паказваць папярэджанні
+Output smoothing strength	JPEGTranslator		Інтэнсыўнасць згладжвання
+Based on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n	JPEGTranslator		Грунтуецца на праекце IJG library © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n
+Write	JPEGTranslator		Запісаць
+Write black-and-white images as RGB24	JPEGTranslator		Запісваць чорна-белыя выявы як RGB24
+Read greyscale images as RGB32	JPEGTranslator		Чытаць выявы з шэрай палетай як RGB32
+Read	JPEGTranslator		Прачытаць
+Use progressive compression	JPEGTranslator		Выкарыстоўваць "прагрэсіўны" сціск
