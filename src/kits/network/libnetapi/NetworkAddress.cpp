@@ -21,14 +21,15 @@
  * Benefits include faster execution time as the builtin
  * uses a bitcounting cpu instruction if it exists
  */
-#if __GNUC__ >= 4
-#	define BitCount(buffer) __builtin_popcount(buffer)
+#if __GNUC__ > 3
+#	define addr_bitcount(bitfield) __builtin_popcount(bitfield)
 #else
-ssize_t BitCount(uint32 buf)
+static ssize_t
+addr_bitcount(uint32 bitfield)
 {
 	ssize_t result = 0;
 	for (uint8 i = 32; i > 0; i--) {
-		if ((buf & (1 << (i - 1))) == 0)
+		if ((bitfield & (1 << (i - 1))) == 0)
 			break;
 		result++;
 	}
@@ -784,14 +785,14 @@ BNetworkAddress::PrefixLength() const
 			sockaddr_in& mask = (sockaddr_in&)fAddress;
 
 			uint32 hostMask = ntohl(mask.sin_addr.s_addr);
-			return BitCount(hostMask);
+			return addr_bitcount(hostMask);
 		}
 
 		case AF_INET6:
 		{
 			sockaddr_in6& mask = (sockaddr_in6&)fAddress;
 
-			// TODO : see if we can use the optimized BitCount for this
+			// TODO : see if we can use the optimized addr_bitcount for this
 			ssize_t result = 0;
 			for (uint8 i = 0; i < sizeof(in6_addr); i++) {
 				for (uint8 j = 0; j < 8; j++) {
