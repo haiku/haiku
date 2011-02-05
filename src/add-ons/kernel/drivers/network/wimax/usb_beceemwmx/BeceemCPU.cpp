@@ -14,6 +14,7 @@
 
 #include "Driver.h"
 
+
 BeceemCPU::BeceemCPU()
 {
 	TRACE("Debug: Load CPU handler\n");
@@ -32,9 +33,9 @@ BeceemCPU::CPUInit(WIMAX_DEVICE* swmxdevice)
 status_t
 BeceemCPU::CPURun()
 {
-	unsigned int value = 0;
+	unsigned int clkReg = 0;
 
-	if (BizarroReadRegister(CLOCK_RESET_CNTRL_REG_1, sizeof(value), &value)
+	if (BizarroReadRegister(CLOCK_RESET_CNTRL_REG_1, sizeof(clkReg), &clkReg)
 			!= B_OK) {
 
 		TRACE_ALWAYS("Error: Read of clock reset reg failure\n");
@@ -42,12 +43,12 @@ BeceemCPU::CPURun()
 	}
 
 	if (pwmxdevice->CPUFlashBoot) {
-		value&=(~(1<<30));
+		clkReg &= (~(1<<30));
 	} else {
-		value |=(1<<30);
+		clkReg |= (1<<30);
 	}
 
-	if (BizarroWriteRegister(CLOCK_RESET_CNTRL_REG_1, sizeof(value), &value)
+	if (BizarroWriteRegister(CLOCK_RESET_CNTRL_REG_1, sizeof(clkReg), &clkReg)
 			!= B_OK) {
 
 		TRACE_ALWAYS("Error: Write of clock reset reg failure\n");

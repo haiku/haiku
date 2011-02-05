@@ -31,6 +31,7 @@
 
 mutex gUSBLock;
 
+
 // auto-release helper class
 class USBSmartLock {
 	public:
@@ -375,7 +376,8 @@ BeceemDevice::Read(uint8 *buffer, size_t *numBytes)
 	}
 
 	// Safely tidy up after a major device hiccup
-	if (fStatusRead != B_OK && fStatusRead != B_CANCELED && !pwmxdevice->driverHalt) {
+	if (fStatusRead != B_OK && fStatusRead != B_CANCELED
+		&& !pwmxdevice->driverHalt) {
 		TRACE_ALWAYS("Error: Device status error:%#010x\n", fStatusRead);
 		result = gUSBModule->clear_feature(fReadEndpoint,
 			USB_FEATURE_ENDPOINT_HALT);
@@ -431,13 +433,15 @@ BeceemDevice::Write(const uint8 *buffer, size_t *numBytes)
 	}
 
 	if (!fHasConnection) {
-		TRACE_ALWAYS("Error writing %d bytes to device while WiMAX connection down.\n",
+		TRACE_ALWAYS("Error writing %d bytes to device"
+			" while WiMAX connection down.\n",
 			numBytesToWrite);
 		return B_ERROR;
 	}
 
 	if (fTXBufferFull) {
-		TRACE_ALWAYS("Error writing %d bytes to device while TX buffer full.\n",
+		TRACE_ALWAYS("Error writing %d bytes to device"
+			" while TX buffer full.\n",
 			numBytesToWrite);
 		return B_ERROR;
 	}
@@ -476,7 +480,8 @@ BeceemDevice::Write(const uint8 *buffer, size_t *numBytes)
 			USB_FEATURE_ENDPOINT_HALT);
 
 		if (result != B_OK) {
-			TRACE_ALWAYS("Error during clearing of HALT state:%#010x\n", result);
+			TRACE_ALWAYS("Error during clearing of HALT state:"
+				" %#010x\n", result);
 			return result;
 		}
 	}
@@ -652,7 +657,7 @@ BeceemDevice::SetupDevice(bool deviceReplugged)
 	{
 		BizarroReadRegister(SYS_CFG, sizeof(value), &value);
 		pwmxdevice->syscfgBefFw		=	value;
-			if((value & 0x60)== 0)
+			if ((value & 0x60)== 0)
 			{
 				TRACE("Debug: CPU is FlashBoot\n");
 				pwmxdevice->CPUFlashBoot = true;
@@ -683,18 +688,21 @@ BeceemDevice::SetupDevice(bool deviceReplugged)
 	// Each bcm chip has a custom binary config
 	// telling the device about itself (how it was designed)
 	if (PushConfig(CONF_BEGIN_ADDR) != B_OK) {
-		TRACE_ALWAYS("Vendor configuration push failed, aborting device setup.\n");
+		TRACE_ALWAYS("Vendor configuration push failed."
+			" Aborting device setup.\n");
 		return B_ERROR;
 	}
 
 	// Set up GPIO (nvmVer 5+ is double sized)
 	if (pwmxdevice->nvmVerMajor < 5) {
 		TRACE("Debug: VerMajor < 5 PARAM pointer\n");
-		NVMRead(GPIO_PARAM_POINTER, 2, (unsigned int*)&pwmxdevice->hwParamPtr);
+		NVMRead(GPIO_PARAM_POINTER, 2,
+			(unsigned int*)&pwmxdevice->hwParamPtr);
 		pwmxdevice->hwParamPtr = ntohs(pwmxdevice->hwParamPtr);
 	} else {
 		TRACE("Debug: VerMajor 5+ PARAM pointer\n");
-		NVMRead(GPIO_PARAM_POINTER_MAP5, 4, (unsigned int*)&pwmxdevice->hwParamPtr);
+		NVMRead(GPIO_PARAM_POINTER_MAP5, 4,
+			(unsigned int*)&pwmxdevice->hwParamPtr);
 		// TODO : NVM : validate v5+ nvm params a-la ValidateDSDParamsChecksum
 		pwmxdevice->hwParamPtr = ntohl(pwmxdevice->hwParamPtr);
 	}
@@ -749,13 +757,14 @@ BeceemDevice::SetupDevice(bool deviceReplugged)
 				address.ebyte[3], address.ebyte[4], address.ebyte[5]);
 
 	if (deviceReplugged) {
-		// this might be the same device that was replugged - read the MAC address
-		// (which should be at the same index) to make sure
+		// this might be the same device that was replugged - read the
+		// mac address (which should be at the same index) to make sure
 		if (memcmp(&address, &fMACAddress, sizeof(address)) != 0) {
 			TRACE_ALWAYS("Cannot replace device with MAC address:"
 				"%02x:%02x:%02x:%02x:%02x:%02x\n",
-				fMACAddress.ebyte[0], fMACAddress.ebyte[1], fMACAddress.ebyte[2], 
-				fMACAddress.ebyte[3], fMACAddress.ebyte[4], fMACAddress.ebyte[5]);
+				fMACAddress.ebyte[0], fMACAddress.ebyte[1],
+				fMACAddress.ebyte[2], fMACAddress.ebyte[3],
+				fMACAddress.ebyte[4], fMACAddress.ebyte[5]);
 			return B_BAD_VALUE; // is not the same
 		}
 	} else
@@ -769,8 +778,9 @@ BeceemDevice::SetupDevice(bool deviceReplugged)
 
 
 	// TODO : Preserve stability
-	// Things will break past this point until things are more complete
-	// Prevent completion of device initilization to preseve system stability.
+	// Things will break past this point until the ethernet interface is more
+	// complete. Prevent completion of device initilization to preseve system
+	// and network stack stability.
 
 	#if 1
 	TRACE_ALWAYS("A Beceem WiMax device was attached, "
@@ -833,12 +843,14 @@ BeceemDevice::_SetupEndpoints()
 		= gUSBModule->get_nth_configuration(fDevice, 0);
 
 	if (config == NULL) {
-		TRACE_ALWAYS("Error: Failed to get USB device configuration.\n");
+		TRACE_ALWAYS("Error: Failed to get USB"
+			" device configuration.\n");
 		return B_ERROR;
 	}
 
 	if (config->interface_count <= 0) {
-		TRACE_ALWAYS("Error: No interfaces found in USB device configuration\n");
+		TRACE_ALWAYS("Error: No interfaces found"
+			" in USB device configuration\n");
 		return B_ERROR;
 	}
 
@@ -871,8 +883,8 @@ BeceemDevice::_SetupEndpoints()
 				== USB_ENDPOINT_ADDR_DIR_OUT)
 				writeEndpoint = ep;
 			else
-				TRACE_ALWAYS("Warning: BULK USB Endpoint %d (%#04x) is unknown.\n",
-					ep, epd->attributes);
+				TRACE_ALWAYS("Warning: BULK USB Endpoint"
+					" %d (%#04x) is unknown.\n", ep, epd->attributes);
 		} else if ((epd->attributes & USB_ENDPOINT_ATTR_MASK)
 			== USB_ENDPOINT_ATTR_ISOCHRONOUS) {
 			// Isochronous endpoint
@@ -968,11 +980,12 @@ BeceemDevice::_NotifyCallback(void *cookie, int32 status, void *data,
 	}
 
 	if (status != B_OK) {
-		TRACE_ALWAYS("Device status error:%#010x\n", status);
+		TRACE_ALWAYS("Device status error :%#010x\n", status);
 		status_t result = gUSBModule->clear_feature(device->fNotifyEndpoint,
-													USB_FEATURE_ENDPOINT_HALT);
+			USB_FEATURE_ENDPOINT_HALT);
 		if (result != B_OK)
-			TRACE_ALWAYS("Error during clearing of HALT state:%#010x.\n", result);
+			TRACE_ALWAYS("Error during clearing of HALT state:"
+				" %#010x.\n", result);
 	}
 
 	// parse data in overriden class
@@ -1029,47 +1042,80 @@ BeceemDevice::LoadConfig()
 
 	if (file_size != sizeof(VENDORCFG))
 	{
-		TRACE_ALWAYS("Error: Size mismatch in vendor configuration structure!\n");
+		TRACE_ALWAYS("Error: Size mismatch in vendor configuration struct!\n");
 		close(fh);
 		free(buffer);
 		return B_ERROR;
 	} else {
-		TRACE_ALWAYS("Info: Found valid vendor configuration %ld bytes long.\n", file_size);
+		TRACE_ALWAYS("Info: Found valid vendor configuration"
+			" %ld bytes long.\n", file_size);
 	}
 
-	// we copy the configuration into our fancy struct to know what the device knows
+	// we copy the configuration into our struct to know what the device knows
 	memcpy(&pwmxdevice->vendorcfg, buffer, sizeof(VENDORCFG));
 
-	TRACE("Debug: Vendor Config: Config File Version is 0x%x\n", pwmxdevice->vendorcfg.m_u32CfgVersion);
-	TRACE("Debug: Vendor Config: Center Frequency is 0x%x\n", pwmxdevice->vendorcfg.m_u32CenterFrequency);
-	TRACE("Debug: Vendor Config: Band A Scan = 0x%x\n", pwmxdevice->vendorcfg.m_u32BandAScan);
-	TRACE("Debug: Vendor Config: Band B Scan = 0x%x\n", pwmxdevice->vendorcfg.m_u32BandBScan);
-	TRACE("Debug: Vendor Config: Band C Scan = 0x%x\n", pwmxdevice->vendorcfg.m_u32BandCScan);
-	TRACE("Debug: Vendor Config: PHS Enable = 0x%x\n", pwmxdevice->vendorcfg.m_u32PHSEnable);
-	TRACE("Debug: Vendor Config: Handoff Enable = 0x%x\n", pwmxdevice->vendorcfg.m_u32HoEnable);
-	TRACE("Debug: Vendor Config: HO Reserved1 = 0x%x\n", pwmxdevice->vendorcfg.m_u32HoReserved1);
-	TRACE("Debug: Vendor Config: HO Reserved2 = 0x%x\n", pwmxdevice->vendorcfg.m_u32HoReserved2);
-	TRACE("Debug: Vendor Config: MIMO Enable = 0x%x\n", pwmxdevice->vendorcfg.m_u32MimoEnable);
-	TRACE("Debug: Vendor Config: PKMv2 Enable = 0x%x\n", pwmxdevice->vendorcfg.m_u32SecurityEnable);
-	TRACE("Debug: Vendor Config: Power Saving Modes Enable = 0x%x\n", pwmxdevice->vendorcfg.m_u32PowerSavingModesEnable);
-	TRACE("Debug: Vendor Config: Power Saving Mode Options = 0x%x\n", pwmxdevice->vendorcfg.m_u32PowerSavingModeOptions);
-	TRACE("Debug: Vendor Config: ARQ Enable = 0x%x\n", pwmxdevice->vendorcfg.m_u32ArqEnable);
-	TRACE("Debug: Vendor Config: Harq Enable = 0x%x\n", pwmxdevice->vendorcfg.m_u32HarqEnable);
-	TRACE("Debug: Vendor Config: EEPROM Flag = 0x%x\n", pwmxdevice->vendorcfg.m_u32EEPROMFlag);
-	TRACE("Debug: Vendor Config: Customize = 0x%x\n", pwmxdevice->vendorcfg.m_u32Customize);
-	TRACE("Debug: Vendor Config: Bandwidth = 0x%x\n", pwmxdevice->vendorcfg.m_u32ConfigBW);
-	TRACE("Debug: Vendor Config: RadioParameter = 0x%x\n", pwmxdevice->vendorcfg.m_u32RadioParameter);
-	TRACE("Debug: Vendor Config: HostDrvrConfig1 is 0x%x\n", pwmxdevice->vendorcfg.HostDrvrConfig1);
-	TRACE("Debug: Vendor Config: HostDrvrConfig2 is 0x%x\n", pwmxdevice->vendorcfg.HostDrvrConfig2);
-	TRACE("Debug: Vendor Config: HostDrvrConfig3 is 0x%x\n", pwmxdevice->vendorcfg.HostDrvrConfig3);
-	TRACE("Debug: Vendor Config: HostDrvrConfig4 is 0x%x\n", pwmxdevice->vendorcfg.HostDrvrConfig4);
-	TRACE("Debug: Vendor Config: HostDrvrConfig5 is 0x%x\n", pwmxdevice->vendorcfg.HostDrvrConfig5);
-	TRACE("Debug: Vendor Config: HostDrvrConfig6 is 0x%x\n", pwmxdevice->vendorcfg.HostDrvrConfig6);
+	DumpConfig();
 
 	close(fh);
 	free(buffer);
 
 	return B_OK;
+}
+
+
+void
+BeceemDevice::DumpConfig()
+{
+	TRACE("Debug: Vendor Config: Config File Version is 0x%x\n",
+		pwmxdevice->vendorcfg.m_u32CfgVersion);
+	TRACE("Debug: Vendor Config: Center Frequency is 0x%x\n",
+		pwmxdevice->vendorcfg.m_u32CenterFrequency);
+	TRACE("Debug: Vendor Config: Band A Scan = 0x%x\n",
+		pwmxdevice->vendorcfg.m_u32BandAScan);
+	TRACE("Debug: Vendor Config: Band B Scan = 0x%x\n",
+		pwmxdevice->vendorcfg.m_u32BandBScan);
+	TRACE("Debug: Vendor Config: Band C Scan = 0x%x\n",
+		pwmxdevice->vendorcfg.m_u32BandCScan);
+	TRACE("Debug: Vendor Config: PHS Enable = 0x%x\n",
+		pwmxdevice->vendorcfg.m_u32PHSEnable);
+	TRACE("Debug: Vendor Config: Handoff Enable = 0x%x\n",
+		pwmxdevice->vendorcfg.m_u32HoEnable);
+	TRACE("Debug: Vendor Config: HO Reserved1 = 0x%x\n",
+		pwmxdevice->vendorcfg.m_u32HoReserved1);
+	TRACE("Debug: Vendor Config: HO Reserved2 = 0x%x\n",
+		pwmxdevice->vendorcfg.m_u32HoReserved2);
+	TRACE("Debug: Vendor Config: MIMO Enable = 0x%x\n",
+		pwmxdevice->vendorcfg.m_u32MimoEnable);
+	TRACE("Debug: Vendor Config: PKMv2 Enable = 0x%x\n",
+		pwmxdevice->vendorcfg.m_u32SecurityEnable);
+	TRACE("Debug: Vendor Config: Power Saving Modes Enable = 0x%x\n",
+		pwmxdevice->vendorcfg.m_u32PowerSavingModesEnable);
+	TRACE("Debug: Vendor Config: Power Saving Mode Options = 0x%x\n",
+		pwmxdevice->vendorcfg.m_u32PowerSavingModeOptions);
+	TRACE("Debug: Vendor Config: ARQ Enable = 0x%x\n",
+		pwmxdevice->vendorcfg.m_u32ArqEnable);
+	TRACE("Debug: Vendor Config: Harq Enable = 0x%x\n",
+		pwmxdevice->vendorcfg.m_u32HarqEnable);
+	TRACE("Debug: Vendor Config: EEPROM Flag = 0x%x\n",
+		pwmxdevice->vendorcfg.m_u32EEPROMFlag);
+	TRACE("Debug: Vendor Config: Customize = 0x%x\n",
+		pwmxdevice->vendorcfg.m_u32Customize);
+	TRACE("Debug: Vendor Config: Bandwidth = 0x%x\n",
+		pwmxdevice->vendorcfg.m_u32ConfigBW);
+	TRACE("Debug: Vendor Config: RadioParameter = 0x%x\n",
+		pwmxdevice->vendorcfg.m_u32RadioParameter);
+	TRACE("Debug: Vendor Config: HostDrvrConfig1 is 0x%x\n",
+		pwmxdevice->vendorcfg.HostDrvrConfig1);
+	TRACE("Debug: Vendor Config: HostDrvrConfig2 is 0x%x\n",
+		pwmxdevice->vendorcfg.HostDrvrConfig2);
+	TRACE("Debug: Vendor Config: HostDrvrConfig3 is 0x%x\n",
+		pwmxdevice->vendorcfg.HostDrvrConfig3);
+	TRACE("Debug: Vendor Config: HostDrvrConfig4 is 0x%x\n",
+		pwmxdevice->vendorcfg.HostDrvrConfig4);
+	TRACE("Debug: Vendor Config: HostDrvrConfig5 is 0x%x\n",
+		pwmxdevice->vendorcfg.HostDrvrConfig5);
+	TRACE("Debug: Vendor Config: HostDrvrConfig6 is 0x%x\n",
+		pwmxdevice->vendorcfg.HostDrvrConfig6);
 }
 
 
