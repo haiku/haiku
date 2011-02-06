@@ -72,7 +72,7 @@ char* STR_WIN_NAME_PREF
 	= (char*)B_TRANSLATE("PoorMan settings");
 
 const char* STR_SETTINGS_FILE_NAME
-	= B_TRANSLATE("PoorMan settings");
+	= "PoorMan settings";
 const char* STR_SETTINGS_NEW_FILE_NAME
 	= B_TRANSLATE("OBOS PoorMan settings");
 const char* STR_DEFAULT_WEB_DIRECTORY

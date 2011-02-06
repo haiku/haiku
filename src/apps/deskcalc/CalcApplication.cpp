@@ -25,7 +25,7 @@
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "CalcApplication"
 
-static const char* kSettingsFileName	= B_TRANSLATE("DeskCalc_settings");
+static const char* kSettingsFileName	= "DeskCalc_settings";
 const char* kAppSig				= "application/x-vnd.Haiku-DeskCalc";
 
 static const float kDefaultWindowWidth	= 220.0;
