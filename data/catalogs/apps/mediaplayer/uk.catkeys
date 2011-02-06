@@ -12,7 +12,7 @@ Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Збереж�
 New player…	MediaPlayer-Main		Новий плейер...
 100% scale	MediaPlayer-Main		Масштаб 100%
 Close	MediaPlayer-Main		Закрити
-Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Деякі файли не можуть бути переміщені в корзину
+Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Деякі файли не можуть бути переміщені в кошик
 MediaPlayer Current Playlist	MediaPlayer-Main		Поточний список відтворення МедіаПлейера
 Open	MediaPlayer-Main		Відкрити
 Next	MediaPlayer-Main		Наступний
@@ -22,14 +22,14 @@ Track %d	MediaPlayer-Main		Трек %d
 Medium	MediaPlayer-SettingsWindow		Середній
 Close	MediaPlayer-PlaylistWindow		Закрити
 Toggle mute.	MediaPlayer-Main		Вимкнути звук.
-Open…	MediaPlayer-PlaylistWindow		 	Відкрити…
+Open…	MediaPlayer-PlaylistWindow		 Відкрити…
 Undo	MediaPlayer-PlaylistWindow		Скасувати
-File info…	MediaPlayer-Main		 	Інформація про файл…
+File info…	MediaPlayer-Main		 Інформація про файл…
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		Використати апаратне відеонакладення Якщо доступне
 Pause playback.	MediaPlayer-Main		Пауза відтворення.
 Remove Entry	MediaPlayer-RemovePLItemsCmd		Видалити запис
 MediaPlayer encountered an internal error. The file could not be opened.	MediaPlayer-Main		У Медіа плейера виникла внутрішня помилка. Цей файл не може бути відкритий
-Drop files to play	MediaPlayer-Main		Скинути файл для відтворення
+Drop files to play	MediaPlayer-Main		Скинути файли для відтворення
 Full volume	MediaPlayer-SettingsWindow		Повна гучність
 TogglePlaying	MediaPlayer-Main		Перемикання в програмі
 Cancel	MediaPlayer-SettingsWindow		Відмінити
@@ -82,14 +82,14 @@ Track	Audio Track Menu		Трек
 Skip to the next track.	MediaPlayer-Main		Пропустити до наступного треку
 <nothing to redo>	MediaPlayer-PlaylistWindow		<нічого для відміни>
 Play	MediaPlayer-Main		Відтворити
-Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Знищити записи в корзині
+Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Знищити записи в кошику
 200% scale	MediaPlayer-Main		Масштаб 200% 
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Схоже медіа сервер не працює.\nБажаєте запустити його ?
 Aspect ratio	MediaPlayer-Main		Співідношення сторін
 Error: 	MediaPlayer-Main		Помилка:
 Large	MediaPlayer-SettingsWindow		Великий
 Bottom of video	MediaPlayer-SettingsWindow		Нижня частина відео
-Remove and put into Trash	MediaPlayer-PlaylistWindow		Видалити  і перемістити  в корзину
+Remove and put into Trash	MediaPlayer-PlaylistWindow		Видалити  і перемістити  в кошик
 About MediaPlayer…	MediaPlayer-Main		Про Медіа Плейер...
 Stop	MediaPlayer-Main		Зупинити
 Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Внутрішня помилка (закінчилась память). Збереження списку відтворення призупинено.

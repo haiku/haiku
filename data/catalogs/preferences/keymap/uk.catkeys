@@ -1,7 +1,7 @@
 1	ukrainian	x-vnd.Haiku-Keymap	4175672673
 Tilde trigger	Keymap window		Тільда
 Grave trigger	Keymap window		Апостроф
-Select dead keys	Keymap window		Модифікатори
+Select dead keys	Keymap window		Вибрати модифікатор
 Quit	Keymap window		Вихід
 Circumflex trigger	Keymap window		Ціркумфлекс
 Diaeresis trigger	Keymap window		Діарезіс

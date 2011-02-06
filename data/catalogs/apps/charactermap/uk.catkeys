@@ -1,7 +1,4 @@
 1	ukrainian	x-vnd.Haiku-CharacterMap	2969711351
-Tibetan	UnicodeBlocks		Тибетська
-Muscial symbols	UnicodeBlocks		Muscial символи
-Phags-pa	UnicodeBlocks		Фагс-па
 Enclosed alphanumerics	UnicodeBlocks		Закриті літери, цифри
 Basic Latin	UnicodeBlocks		Проста латинська
 Latin-1 supplement	UnicodeBlocks		Латинська-1 додаток
@@ -120,18 +117,21 @@ Myanmar	UnicodeBlocks		М'янми
 Latin extended D	UnicodeBlocks		Розширена латиниця D
 Byzantine musical symbols	UnicodeBlocks		Візантійські музичні символи
 Oriya	UnicodeBlocks		Орія
+Tibetan	UnicodeBlocks		Тибетська
 Ancient Greek numbers	UnicodeBlocks		Давньогрецькі числа
 Vai	UnicodeBlocks		Ваі
 Yi Radicals	UnicodeBlocks		Ї Радикали
 Cyrillic extended B	UnicodeBlocks		Розширення кирилиці B
 Quit	CharacterWindow		Вихід
 Braille patterns	UnicodeBlocks		Матриці Брайля 
+Muscial symbols	UnicodeBlocks		Muscial символи
 New Tai Lue	UnicodeBlocks		Нові Тай Лю
 Runic	UnicodeBlocks		Рунічний
 Miscellaneous mathematical symbols B	UnicodeBlocks		Різні математичні символи B
 Cuneiform numbers and punctuation	UnicodeBlocks		Клинописні цифри і знаки пунктуації
 Private use area	UnicodeBlocks		Приватна область використання
 CJK unified ideographs extension B	UnicodeBlocks		CJK єдиного розширення ієрогліфів B
+Phags-pa	UnicodeBlocks		Фагс-па
 Kangxi radicals	UnicodeBlocks		Радикали Кангксі 
 Dingbats	UnicodeBlocks		Декоративні
 Tai Xuan Jing symbols	UnicodeBlocks		Символи Тай Сюань Цзин

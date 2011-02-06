@@ -14,7 +14,7 @@ SoundRecorder	RecorderWindow		SoundRecorder
 Format: 	RecorderWindow		Format:
 Sound List	RecorderWindow		Звуколист
 Compression:	RecorderWindow		Компресія:
-Rewind	RecorderWindow		Переміна
+Rewind	RecorderWindow		Перемотка
 Sample rate: 	RecorderWindow		Темп зразка:
 Invalid audio files	RecorderWindow		Неправильні аудіо файли
 seconds	RecorderWindow		сек.

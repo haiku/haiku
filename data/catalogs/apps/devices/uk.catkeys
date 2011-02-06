@@ -6,7 +6,7 @@ Docking station	Device		Док-станція
 Computer	Device		Комп’ютер
 Detailed	DevicesView		Докладно
 Properties	PropertyList		Властивості
-Category	DevicesView		Категорія
+Category	DevicesView		Категорії
 Quit	DevicesView		Вийти
 Device paths	Device		Шляхи пристрою
 Manufacturer\t\t\t: 	Device		Виробник\t\t\t:
@@ -41,7 +41,7 @@ Intelligent controller	Device		Інтелектуальний контролер
 Satellite communications controller	Device		Контроллер супутникового зв’язку
 Bridge	Device		Міст
 Refresh devices	DevicesView		Оновлення пристроїв
-Connection	DevicesView		Підключення
+Connection	DevicesView		Підключенню
 Generate system information	DevicesView		Створення системної інформації
 Encryption controller	Device		Контроллер шифрування 
 Unclassified device	Device		Некласифіковані пристрої

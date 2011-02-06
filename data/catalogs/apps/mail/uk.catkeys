@@ -1,7 +1,7 @@
 1	ukrainian	x-vnd.Be-MAIL	1685878103
 %d - Date	Mail		%d - Дата
 Attach attributes:	Mail		Додати атрибути:
-Inconsistency occurred in the undo/redo buffer.	Mail		Невідповідність у буфері відміни/заміни
+Inconsistency occurred in the undo/redo buffer.	Mail		Невідповідність у буфері відміни/заміни.
 An error occurred trying to save the attachment.	Mail		Сталася помилка при збереженні вкладення.
 Copy to new	Mail		Копіювати до нового
 Edit	Mail		Редагувати
@@ -17,7 +17,7 @@ Button bar:	Mail		Панель кнопок:
 Beginner	Mail		Початківець
 Don't save	Mail		Не зберігати
 Expert	Mail		Експерт
-Reply account:	Mail		Аккаунт для відповіді
+Reply account:	Mail		Аккаунт для відповіді:
 Discard	Mail		Завершити
 Message	Mail		Повідомлення
 Reply to sender	Mail		Відповісти відправникові
@@ -32,14 +32,14 @@ Cc:	Mail		Cc:
 Find	Mail		Знайти
 Preferences…	Mail		Настройки…
 Undo	Mail		Відмінити
-Leave as New	Mail		Зберегти як нове
+Leave as New	Mail		Зберегти як новий
 An error occurred trying to open this signature.	Mail		Помилка при спробі відкрити цей підпис.
 No file attributes, just plain data	Mail		Жодних атрибутів,тільки чисті дані
 Edit queries…	Mail		Редагувати запити…
 Paste	Mail		Вставити
 Save attachment…	Mail		Зберегти вкладення…
 Include file attributes in attachments	Mail		Включити файлові атрибути у вкладеннях
-OK	Mail		OK
+OK	Mail		Гаразд
 Send	Mail		Відіслати
 Show icons only	Mail		Показувати тільки іконки
 Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Видалення вкладень з листа що пересилається не підтримується!\nЦе не працюватиме правильно.
@@ -52,14 +52,14 @@ Print…	Mail		Друкувати…
 Warn unencodable:	Mail		Увага нерозкодоване:
 Quit	Mail		Завершити
 %n - Full name	Mail		%n - Повне ім'я
-Read 	Mail		Читати
+Read 	Mail		 Читати 
 Trash	Mail		Кошик
 Default account:	Mail		Аккаунт по замовчуванню:
 Size:	Mail		Розмір:
 Account from mail	Mail		Аккаунт для пошти
 Edit signatures…	Mail		Редагувати підписи…
 New	Mail		Новий
-Attachments: 	Mail		Вкладення: 
+Attachments: 	Mail		Вкладення:  
 Set to %s	Mail		Встановити в %s
 Forward	Mail		Переслати
 E-mail draft could not be saved!	Mail		Чорновик листа не збережено!
@@ -75,7 +75,7 @@ Leave same	Mail		Зберегти саме це
 About Mail…	Mail		Про Пошту…
 Page setup…	Mail		Налаштувати сторінку…
 Revert	Mail		Повернути
-None	Mail		Не вибрано
+None	Mail		Жоден
 Copy link location	Mail		Скопіювати розміщення посилання
 Show header	Mail		Показати заголовок
 %e - E-mail address	Mail		%e - поштова адреса
@@ -114,7 +114,7 @@ Queries	Mail		Запити
 Do you wish to save this message as a draft before closing?	Mail		Бажаєте зберегти цей лист як чорновик перед закриттям?
 Save	Mail		Зберегти
 Random	Mail		Випадковий
-Close and 	Mail		Закрити і
+Close and 	Mail		Закрити і 
 Save as draft	Mail		Зберегти як чорновик
 The mail_daemon could not be started:\n\t	Mail		 Mail_daemon не запущено:\n\t
 Open attachment	Mail		Відкрити вкладення

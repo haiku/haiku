@@ -1,5 +1,5 @@
 1	ukrainian	x-vnd.Haiku.PoorMan	1464122332
-Website location	PoorMan		Місце знаходження сайту
+Website location	PoorMan		Розташування сайту
 Error Server	PoorMan		Помилка сервера
 Settings…	PoorMan		Налаштування...
 Create PoorMan log	PoorMan		Створити логи  PoorMan
@@ -10,9 +10,9 @@ Default	PoorMan		По замовчуванню
 Save log console selection	PoorMan		Зберегти логи вибраної консолі
 Run server	PoorMan		Запустити сервер
 About PoorMan	PoorMan		Про PoorMan
-PoorMan settings	PoorMan		Налаштування PoorMan 
+PoorMan settings	PoorMan		Настройки PoorMan
 Clear hit counter	PoorMan		Очистити лічильник пошуку
-Poor Man's web server\nCopyright © 2004-2009 Haiku\nAll rights reserved.\n\nWritten by: Philip Harrison, Ma Jie	PoorMan		 	Веб - сервер Poor Man\nCopyright © 2004-2009 Haiku\nAll rights reserved.\n\nАвтори: Philip Harrison, Ma Jie
+Poor Man's web server\nCopyright © 2004-2009 Haiku\nAll rights reserved.\n\nWritten by: Philip Harrison, Ma Jie	PoorMan		Веб - сервер Poor Man\nCopyright © 2004-2009 Haiku\nAll rights reserved.\n\nАвтори: Philip Harrison, Ma Jie
 Copy	PoorMan		Копіювати
 Max. simultaneous connections:	PoorMan		Максимально одночасних підключень:
 Start page:	PoorMan		Запустити сторінку:
@@ -34,7 +34,7 @@ Edit	PoorMan		Редагувати
 Create log file	PoorMan		Очистити  логфайл 
 Log To Console	PoorMan		Лог в консоль
 Directory: (none)	PoorMan		Директорія: (жодна)
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Будь-ласка виберіть директорію щоб опублікувати в інтернеті.\n\n  PoorMan  може створити директорію по замовчуванню \"public_html\" у вашій домашній директорії.\nАбо ви вибере одну з своїх власних директорій.
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Будь-ласка виберіть директорію щоб опублікувати в інтернеті.\n\nPoorMan може створити директорію по замовчуванню \"public_html\" у вашій домашній директорії.\nАбо ви вибере одну з своїх власних директорій.
 connections	PoorMan		підє'днання
 Status: Running	PoorMan		Стан: Запущений
 Controls	PoorMan		Органи управління
@@ -47,10 +47,10 @@ Save console selections as…	PoorMan		Зберегти вибране конс�
 Select web folder	PoorMan		Зберегти веб каталог
 Logging view	PoorMan		Перегляд реєстрації
 Logging	PoorMan		Реєстрація
-A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Стандартна веб директорія була створена в \"/boot/home/public_html.\"\n Перевірте чи присутній файл HTML під назвою \"index.html\" в цій директорії
+A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Стандартна веб директорія була створена в \"/boot/home/public_html.\"\n Перевірте чи присутній файл HTML під назвою \"index.html\" в цій директорії.
 Clear log file	PoorMan		Очистити лог файл
 Log file name:	PoorMan		Ім'я лог файлу:
-Directory: 	PoorMan		Директорія
+Directory: 	PoorMan		 	Каталог:
 About PoorMan…	PoorMan		Про PoorMan...
 Done	PoorMan		Виконано
 Starting up... 	PoorMan		Запускаєтся...

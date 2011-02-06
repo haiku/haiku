@@ -7,7 +7,7 @@ On	AntialiasingSettingsView		Увімкнути
 Defaults	APRWindow		По замовчуванню
 Grayscale	AntialiasingSettingsView		Відтінки сірого
 Shine	Colors tab		Сяйво
-Off	AntialiasingSettingsView		Вимкнути
+Off	AntialiasingSettingsView		Слабе
 Success	Colors tab		Успіх
 Inactive window tab text	Colors tab		Текст заголовку неактивного вікна
 Failure	Colors tab		Невдача
@@ -36,8 +36,8 @@ Tooltip text	Colors tab		Текст підказки
 Menu item text	Colors tab		Текст пункта меню
 LCD subpixel	AntialiasingSettingsView		Субпіксельне зглажування
 Selected menu item border	Colors tab		Рамка виділеного пункту меню
-Strong	AntialiasingSettingsView		Сильний
+Strong	AntialiasingSettingsView		Сильне
 Panel text	Colors tab		Текст панелі
 Monospaced fonts only	AntialiasingSettingsView		Тільки моноширинні шрифти
-Antialiasing menu	AntialiasingSettingsView		Зглажування меню
+Antialiasing menu	AntialiasingSettingsView		Меню зглажування
 Glyph hinting:	AntialiasingSettingsView		Уточнення :

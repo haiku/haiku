@@ -23,7 +23,7 @@ Gone teams…	ProcessController		Запущені потоки…
 Restart Tracker	ProcessController		Перезапустити Tracker
 Live in the Deskbar	ProcessController		Поселити в Deskbar
 Kill this thread!	ProcessController		Вбити цю нитку!
-Debug this thread!	ProcessController		Відладнати цей потік!
+Debug this thread!	ProcessController		Відладнати цю нитку!
 New Terminal	ProcessController		Новий Terminal
 About ProcessController…	ProcessController		Про ProcessController…
 Ok!	ProcessController		Гаразд!

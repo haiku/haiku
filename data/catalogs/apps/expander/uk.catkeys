@@ -4,7 +4,7 @@ Set destination…	ExpanderMenu		Встановити ціль…
 File expanded	ExpanderWindow		Файл розпаковано
 The destination is read only.	ExpanderWindow		Ціль тільки для читання.
 Expander: Open	ExpanderWindow		Expander: Відкрити
-Select current	DirectoryFilePanel		Вибрати біжучий
+Select current	DirectoryFilePanel		Вибрати поточний
 Source	ExpanderWindow		Джерело
 Error when expanding archive	ExpanderWindow		Помилка при розпаковці архіва
 Hide contents	ExpanderWindow		Сховати вміст
@@ -12,14 +12,14 @@ Cancel	ExpanderWindow		Відмінити
 Continue	ExpanderWindow		Продовжити
 Expander	ExpanderWindow	!! Window Title !!	Розпаковувач
 The destination folder does not exist.	ExpanderWindow		Цільова папка відсутня.
-Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Ви впевнені, що хочете зупинити розпаковку цього архіва? Розпакована величина може бути некомплектною.
+Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Ви впевнені, що хочете зупинити розпаковку цього архіва? Розпаковка елементів може бути неповною.
 Select	DirectoryFilePanel		Вибрати
 Creating listing for 	ExpanderWindow		Створення списку для
 Settings	ExpanderMenu		Налаштування
 Settings…	ExpanderMenu		Налаштування…
 Expander: Choose destination	DirectoryFilePanel		Expander: Виберіть ціль
 Show contents	ExpanderWindow		Показати вміст
-Expanding file 	ExpanderWindow		Розпаковка
+Expanding file 	ExpanderWindow		Розтиск 
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Папка була переіменована, видалена або не\nпідтримується.
 The file doesn't exist	ExpanderWindow		Файл відсутній
 Stop	ExpanderMenu		Зупинити

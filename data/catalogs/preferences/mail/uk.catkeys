@@ -9,7 +9,7 @@ Start mail services on startup	Config Window		Запускати поштови�
 Receive mail only	Config Views		Тільки при отриманні пошти
 Account name:	Config Views		Ім'я аккаунта:
 OK	Config Views		Гаразд
-The filter could not be moved. Deleting filter.	Config Views		Фільтр неможливо запустити. Видалити його.
+The filter could not be moved. Deleting filter.	Config Views		Фільтр неможливо перемістити. Видалення фільтра.
 Revert	Config Window		Повернути
 Accounts	Config Window		Аккаунти
 Account type:	Config Views		Тип аккаунту:
@@ -25,12 +25,12 @@ E-mail	Account		E-mail
 Unnamed	Account		Неназваний
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nОсновні налаштування неможливо повернути.\n\nПомилка при відновленні налаштувань:\n%s\n
 Send and receive mail	Config Views		При відправці і отриманні пошти
-Real name:	Config Views		Справжнє ім'я
-· Outgoing	Account		Вихідна
+Real name:	Config Views		Справжнє ім'я:
+· Outgoing	Account		· Вихідні
 Return address:	Config Views		Зворотня адреса:
-· E-mail filters	Account		Поштові фільтри
-· Incoming	Account		Вхідна
-Edit mailbox menu…	Config Window		Редагувати поштове меню
+· E-mail filters	Account		 · Фільтри E-mail 
+· Incoming	Account		· Вхідні
+Edit mailbox menu…	Config Window		Редагувати почтове меню…
 Remove	Config Views		Видалити
 Could not create inbound chain.	Account		Неможливо створити ланцюг вхідних
 Check every	Config Window		Перевіряти кожне

@@ -6,10 +6,10 @@ Could not install 	DataTranslations		Неможливо встановити
 Cancel	DataTranslations		Відміна
 Name:	DataTranslations		І’мя:
 Panel Info	DataTranslations		Інформаційна Панель
-The item '	DataTranslations		 	Пункт '
-%name' does not appear to be a Translator and will not be installed.	DataTranslations		 %name» найймовірніше не є транслятором і не може бути встановленим.
+The item '	DataTranslations		Елемент '
+%name' does not appear to be a Translator and will not be installed.	DataTranslations		%name' найймовірніше не є транслятором і не може бути встановленим.
 DataTranslations - Note	DataTranslations		Перетворення даних — Заувага
-Name: %name \nVersion: 	DataTranslations		Ім’я: %name \nВерсія:
+Name: %name \nVersion: 	DataTranslations		Ім’я: %name \nВерсія: 
 Overwrite	DataTranslations		Перезаписати
 Info:	DataTranslations		Інформація:
 info	DataTranslations		інформація

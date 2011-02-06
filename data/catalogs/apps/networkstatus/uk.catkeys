@@ -12,10 +12,10 @@ Ready	NetworkStatusView		Готово
 NetworkStatus	NetworkStatusWindow		Стан мережі
 No stateful configuration	NetworkStatusView		Немає стабільної конфігурації
 Configuring	NetworkStatusView		Конфігурування
-Address	NetworkStatusView		 	Адреса
-OK	NetworkStatusView		 	Гаразд
+Address	NetworkStatusView		 Адреса
+OK	NetworkStatusView		 Гаразд
 Open network preferences…	NetworkStatusView		Відкрити настройки мережі…
-Quit	NetworkStatusView		 	Вийти
+Quit	NetworkStatusView		 Вийти
 Netmask information:\n	NetworkStatusView		Інформація про нетмаску:\n
 <no wireless networks found>	NetworkStatusView		<Бездротова мережа не знайдена>
 Run in window	NetworkStatus		Запустити у вікні

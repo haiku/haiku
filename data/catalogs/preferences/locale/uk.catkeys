@@ -17,7 +17,7 @@ Date	TimeFormatSettings		Дата
 Locale	Locale Preflet		Локаль
 already chosen	LanguageListView		повністю закритий
 Negative:	TimeFormatSettings		Негатив:
-Use month/day-names from preferred language	TimeFormatSettings		Використовувати місяць/день імена для вибраної мови
+Use month/day-names from preferred language	TimeFormatSettings		Використовувати назви місяця/дня  для вибраної мови
 Formatting	Locale Preflet Window		Форматування
 Locale	Locale Preflet Window		Локаль
 Full format:	TimeFormatSettings		Повний формат:

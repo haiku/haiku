@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Be-PRNT	3307681170
+1	ukrainian	x-vnd.Be-PRNT	1563474157
 Waiting	JobListView		Очікування
 page	JobListView		стор.
 Cancel	AddPrinterDialog		Відмінити
@@ -31,6 +31,13 @@ Transport: %transport% %transport_address%	PrinterListView		Транспорт: 
 Driver: %driver%	PrinterListView		Драйвер: %driver%
 Print test page	PrintersWindow		Друк пробної  сторінки
 Test Page	PrintersWindow			Пробна сторінка
-Driver: %driver%	TestPageView			Драйвер: %driver%
-Test Page for '%printer_name%'	TestPageView		Пробна сторінка для '%printer_name%'
 Transport: %transport% %transport_address%	TestPageView		Транспорт: %transport% %transport_address%
+Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Принтер: %printer_name%\nДрайвер: %driver%\n
+Test Page	TestPageView		Пробна сторінка
+Green	TestPageView		Зелений
+Red	TestPageView		Червоний
+Black	TestPageView		Чорний
+Yellow	TestPageView		Жовтий
+Blue	TestPageView		Синій
+Magenta	TestPageView		Магента
+Cyan	TestPageView		Циан

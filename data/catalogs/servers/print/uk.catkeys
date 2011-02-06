@@ -2,7 +2,7 @@
 Undefined	ConfigWindow		Невизначений
 Cancel	PrintServerApp		Відмінити
 Page setup:	ConfigWindow		Настройка сторінки:
-OK	ConfigWindow		OK
+OK	ConfigWindow		Гаразд
 Cancel	ConfigWindow		Відмінити
 Yes	PrintServerApp		Так
 Would you like to set one up now?	PrintServerApp		Бажаєте встановити його зараз?
@@ -14,7 +14,7 @@ Select a printer	ConfigWindow		Вибрати принтер
 No	PrintServerApp		Ні
 Landscape	ConfigWindow		Альбом
 There are no printers set up.	PrintServerApp		Принтер не встановлено.
-OK	PrintServerApp		OK
+OK	PrintServerApp		Гаразд
 Print setup	ConfigWindow		Настройка друку
 Would you like to make @ the default printer?	PrintServerApp		Бажаєте зробити @ принтером по замовчуванню?
 Page setup	ConfigWindow		Настройка друку

@@ -7,9 +7,9 @@ Magnify!\n\n©2002-2006 Haiku\n(C)1999 Be Inc.\n\nNow with even more features an
 usage: magnify [size] (magnify size * size pixels)\n	Console		Використання:  	Magnify [розмір] (Розмір збільшення * розмір пікселів)\n
 Magnify	Magnify-Main		 	Magnify 
 Stick coordinates	Magnify-Main		Вісь кординат
-Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		Інформація:\n hide/show info - сховати/показати всі нові можливості\n заувага: при показі, появится червона площа яка означає\n скільки пікселів rgb буде показано\n add/remove crosshairs - 2 перехрестя може бути додано (або знято)\n для надання допомоги у вирівнюванні чи розташуванні об'єктів .\n Перехрестки позначені синіми квадратами і лініями.\n hide/show grid - приховати/показати сітку, яка відокремлює кожен піксель\n
+Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		Інформація:\n hide/show info - сховати/показати всі нові можливості\n заувага: при показі, з'явиться червона площа яка означає\n скільки пікселів rgb буде показано\n add/remove crosshairs - 2 перехрестя може бути додано (або знято)\n для надання допомоги у вирівнюванні чи розташуванні об'єктів .\n Перехрестки позначені синіми квадратами і лініями.\n hide/show grid - приховати/показати сітку, яка відокремлює кожен піксель\n
 freeze - freezes/unfreezes magnification of whatever the\n    cursor is currently over\n	Magnify-Help		Замороження - заморозити/розморозити будь-яке збільшення незалежно\n від положення курсора\n
-Hide/Show grid	Magnify-Main		Приховати/Показати сітку
+Hide/Show grid	Magnify-Main		приховати/показати сітку
 magnify: size must be a multiple of 4\n	Console		збільшення: Розмір має бути кратним кратним 4\n
 Help…	Magnify-Main		Допомога...
 General:\n  32 x 32 - the top left numbers are the number of visible\n    pixels (width x height)\n  8 pixels/pixel - represents the number of pixels that are\n    used to magnify a pixel\n  R:152 G:52 B:10 -  the RGB values for the pixel under\n    the red square\n	Magnify-Help		Основне:\n 32 x 32 - Верхнє ліве число кількість видимих\n пікселів (ширина x висота)\n 8 pixels/pixel  - являє собою кількість пікселів які\n використовуются для збільшення пікселів\n R:152 G:52 B:10 - Значення RGB для пікселів під\n червоною площею\n
@@ -19,11 +19,11 @@ Decrease pixel size	Magnify-Main		Зменшити розмір пікселів
 Info	Magnify-Main		Інформація
 Remove a crosshair	Magnify-Main		Зняти перехрестя
 About Magnify…	Magnify-Main		Про Magnify...
-Freeze/Unfreeze image	Magnify-Main		Заморозити/Відморозити зображення
+Freeze/Unfreeze image	Magnify-Main		заморозити/відморозити зображення
 Copy/Save:\n  copy - copies the current image to the clipboard\n  save - prompts the user for a file to save to and writes out\n    the bits of the image\n	Magnify-Help		Копіювати/зберегти:\n copy - копіює поточне зображення в буфер обміну\n save - запитує у користувача файл який потрібно зберегти і записує його\n біти зображення\n
 OK	Magnify-Main		Гаразд
-Hide/Show info	Magnify-Main		Приховати/Показати Інформацію
-Navigation:\n  arrow keys - move the current selection (rgb indicator or crosshair)\n    around 1 pixel at a time\n  option-arrow key - moves the mouse location 1 pixel at a time\n  x marks the selection - the current selection has an 'x' in it\n	Magnify-Help		Навігація:\n стрілочки - Переміщують курсор вибору (rgb індикатора або перехрестя)\n довкола 1 пікселя за раз\n опція стрілочки - переміщає курсор 1 піксель за раз\n x зробіть вибір - поточний вибір має 'x' в собі\n
+Hide/Show info	Magnify-Main		приховати/показати Інформацію
+Navigation:\n  arrow keys - move the current selection (rgb indicator or crosshair)\n    around 1 pixel at a time\n  option-arrow key - moves the mouse location 1 pixel at a time\n  x marks the selection - the current selection has an 'x' in it\n	Magnify-Help		Навігація:\n стрілочки - переміщують курсор вибору (rgb індикатора або перехрестя)\n довкола 1 пікселя за раз\n опція стрілочки - переміщає курсор 1 піксель за раз\n x зробіть вибір - поточний вибір має 'x' в собі\n
 Save image	Magnify-Main		Зберегти зображення
 Increase window size	Magnify-Main		Збільшити розмір вікна
 Decrease window size	Magnify-Main		Зменшити розмір вікна

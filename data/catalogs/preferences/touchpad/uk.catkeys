@@ -4,13 +4,13 @@ Revert	TouchpadPrefView		Повернути
 Two finger scrolling	TouchpadPrefView		Прокрутка двома пальцями
 Defaults	TouchpadPrefView		За замовчуванням
 Slow	TouchpadPrefView		Повільно
-High	TouchpadPrefView		Високий
+High	TouchpadPrefView		Висока
 Tap gesture	TouchpadPrefView		Дотик з легким ударом і переміщенням
 Horizontal scrolling	TouchpadPrefView		Горизонтальна прокрутка
-Fast	TouchpadPrefView		Швидкий
+Fast	TouchpadPrefView		Швидко
 Tap click sensitivity	TouchpadPrefView		Чутливість до дотику
 Scroll acceleration	TouchpadPrefView		Прискорення прокрутки
-Off	TouchpadPrefView		Вимкнути
+Off	TouchpadPrefView		Низька
 Touchpad	TouchpadMain		Тачпад
 Horizontal scroll speed	TouchpadPrefView		Швидкість горизонтальної прокрутки
 Vertical scroll speed	TouchpadPrefView		Швидкість вертикальної прокрутки

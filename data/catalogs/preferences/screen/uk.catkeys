@@ -15,9 +15,9 @@ Done	Screen		Готово
 Set background…	Screen		Встановити тло…
 Undo	Screen		Скасувати
 if needed	Screen		якщо потрібно
-Screen preferences by the Haiku team	Screen		Настройки Screen  від командиHaiku 
+Screen preferences by the Haiku team	Screen		Настройки Screen  від команди Haiku 
 OK	Screen		Гаразд
-Workspaces	Screen		Робоче місце
+Workspaces	Screen		Робочі простори
 The screen mode could not be set:\n\t%s\n	Screen		Режим екрану не може бути встановлений:\n\t%s\n
 no	Screen		ні
 Could not write VESA mode settings file:\n\t	Screen		Не вдалося записати файл настройок режиму VESA :\n\t
@@ -26,7 +26,7 @@ Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximu
 Keep	Screen		Зберегти
 Unknown mode	Screen		Невідомий режим
 UseLaptopPanel	Screen		Використовувати панель ноутбука
-CombineDisplays	Screen		Дисплеї
+CombineDisplays	Screen		Обє'днати дисплеї
 disable	Screen		Вимкнути
 resolution	Screen		роздільча здатність
 Columns:	Screen		Стовбці:
@@ -34,10 +34,10 @@ SwapDisplays	Screen		Поміняти дисплеї
 All workspaces	Screen		Всі робочі простори
 always	Screen		завжди
 32 bits/pixel, 16 Million colors	Screen		32біт/піксель, 16 мільйонів кольорів
-Current workspace	Screen		Поточне робоче місце
+Current workspace	Screen		Поточний робочий простір
 About	Screen		Про
 24 bits/pixel, 16 Million colors	Screen		24біт/піксель, 16 міліонів кольорів
-horizontally	Screen		Горизонтальне
+horizontally	Screen		горизонтально
 bits/pixel	Screen		бітів/піксель
 Other…	Screen		Інше...
 Cancel	Screen		Відміна
@@ -46,9 +46,9 @@ Settings will revert in %seconds seconds.	Screen		Настройки будут�
 Refresh Rate:	Screen		Частота обновлення:
 Do you wish to keep these settings?	Screen		Ви бажаєте зберегти ці налаштування?
 TVStandard	Screen		ТВ Стандарт
-Rows:	Screen		Рядки
-vertically	Screen		Вертикально
-Resolution:	Screen		Розширення:
+Rows:	Screen		Стрічки:
+vertically	Screen		вертикально
+Resolution:	Screen		Роздільча здатність:
 Screen	Screen		Екран
 %.1f Hz	Screen		%.1f Hz
 8 bits/pixel, 256 colors	Screen		8 біт/піксель, 256 кольорів

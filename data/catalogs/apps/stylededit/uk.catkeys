@@ -32,8 +32,8 @@ Color	Menus		Колір
 Red	Menus		Червоний
 Open…	Menus		Відкрити…
 Center	Menus		Центр
-Blue	Menus		Голубий
-Cyan	Menus		Циан
+Blue	Menus		Синій
+Cyan	Menus		Голубий
 Magenta	Menus		Фіолетовий
 New	Menus		Новий
 Wrap-around search	FindandReplaceWindow		Шукати по всьому документу
@@ -47,7 +47,7 @@ Find…	Menus		Знайти…
 Error loading \"%s\":\n\t%s	LoadAlert		Помилка загрузки "%s":\n\t%s
 Black	Menus		Чорний
 Untitled 	StyledEditWindow		Неназваний
-OK	SaveAlert		OK
+OK	SaveAlert		Гаразд
 Find	FindandReplaceWindow		Знайти
 Encoding	Open_and_SaveAsPanel		Кодування
 Replace…	Menus		Перемістити…

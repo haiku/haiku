@@ -1,6 +1,6 @@
 1	ukrainian	x-vnd.Haiku.TextSearch	3449010850
-%s: Not enough room to escape the filename.	Grepper		%s: Не достатньо місця для відміни імені файлу
-Trim to selection	GrepWindow		Обрізати, щоб вибрати
+%s: Not enough room to escape the filename.	Grepper		%s: Недостатньо місця для відміни імені файлу
+Trim to selection	GrepWindow		Обрізати для вибору
 Follow symbolic links	GrepWindow		Дотримуйтесь символічних посилань
 Close	GrepWindow		Закрити
 Cancel	GrepWindow		Відмінити
@@ -32,4 +32,4 @@ Case-sensitive	GrepWindow		З урахуванням регістру
 Text files only	GrepWindow		Тільки текстові файли
 Show lines	GrepWindow		Показати лінії
 Set target…	GrepWindow		Встановити ціль...
-Skip folders starting with a dot	GrepWindow		Пропустити папки що починаються з точки
+Skip folders starting with a dot	GrepWindow		Пропустити папки, що починаються з точки

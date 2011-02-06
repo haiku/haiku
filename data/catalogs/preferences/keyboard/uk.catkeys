@@ -6,7 +6,7 @@ Defaults	KeyboardWindow		По замовчуванню
 Key repeat rate	KeyboardView		Швидкість повтору клавіші
 Revert	KeyboardWindow		Повернути
 Delay until key repeat	KeyboardView		Затримка при повторі
-OK	KeyboardApplication		OK
+OK	KeyboardApplication		Гаразд
 Fast	KeyboardView		Швидко
 Slow	KeyboardView		Повільно
 Something has gone wrong!	KeyboardApplication		Щось не вийшло!

@@ -1,10 +1,10 @@
 1	ukrainian	x-vnd.Haiku-BootManager	238743420
 The boot manager has been successfully installed on your system.	BootManagerController		 	Завантажувач успішно встановлений на Вашу систему.
-After two seconds	DefaultPartitionPage		 	Після двох секунд
+After two seconds	DefaultPartitionPage		Після 2 секунд
 Uninstall Boot Manager	UninstallPage	Title	Видалити Завантажувач
 At least one partition must be selected!	BootManagerController		Принаймні один розділ треба вибрати!
-The old Master Boot Record could not be saved to %s	BootManagerController		 	Старий МВR не було збережено %s
-Restore MBR	BootManagerController	Button	Відновити MBR
+The old Master Boot Record could not be saved to %s	BootManagerController		Старий MBR не було збережено до %s
+Restore MBR	BootManagerController	Button	Відновлення MBR
 Hard Drive	DrivesPage	Default disk name	Жорсткий диск
 The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		Основний загрузочний запис (MBR) загрузочного пристрою:\n\t%s\nзараз буде збережено на диск. Виберіть файл для збереження MBR.\n\nКоли під час встановлення щось піде не так 
 або Ви бажатимете видалити бутменю  просто запустіть програму завантажувача і виберіть опцію 'Uninstall'.
@@ -15,30 +15,30 @@ BootManager	BootManagerWindow	Window Title	Завантажувач
 Timeout: %s	DefaultPartitionPage		Затримка: %s
 Select	FileSelectionPage	Button	Вибрати
 Uninstall boot manager	BootManagerController	Title	Видалити завантажувач
-After four seconds	DefaultPartitionPage		 	Після чотирьох секунд
+After four seconds	DefaultPartitionPage		Після 4 секунд
 Uninstallation of boot menu failed	BootManagerController	Title	Видалення бутменю призупинено
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		Будь-ласка виберіть файл з якого відновлюватиметься MBR. Це файл, що було створено при першому встановленні завантажувача .
-Next	WizardView	Button	 	Наступний
+Next	WizardView	Button	Наступне
 Uninstallation of boot menu completed	BootManagerController	Title	Видалення бутменю завершене
 Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Виберіть пристрій на який треба встановити або з якого треба видалити завантажувач.
 Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		Визначте розділ по замовчуванню і затримку.\nБутменю загрузить розділ по замовчуванню після затримки, якщо Ви не вкажете іншого розділу. Ви також можете встановити невизначене очікування для вибраного   Вами розділу.\nУтримуйте клавішу 'ALT' для невілювання затримки під час завантаження.
-After one second	DefaultPartitionPage		 	Після однієї секунди
+After one second	DefaultPartitionPage		Після 1 секунди
 The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager needs 2 KB available space before the first partition.	BootManagerController		Таблиця розділів першого жорсткого диску несумісна з Завантажувачем.\nЗавантажувач потребує 2 KB вільного простору до першого розділу.
 The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		 	Були знайдені наступні розділи. Відмітьте які з них треба включити до загрузочного меню. Ви також можете обрати імена розділів за вашим смаком, які буде видно при відображення бутменю на екрані.
-After one minute	DefaultPartitionPage		 	Після однієї хвилини
+After one minute	DefaultPartitionPage		Після 1 хвилини
 The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		 	Основний загрузочний запис пристрою (%DISK) був успішно відновлений з %FILE.
 Write boot menu	BootManagerController	Button	Записати бутменю
 The Master Boot Record could not be restored!	BootManagerController		Основний загрузочний запис неможливо відновити!
 Uninstall	DrivesPage	Button	Видалити
 Default Partition	DefaultPartitionPage	Title	Розділ по замовчуванню
-After five seconds	DefaultPartitionPage		 	Після п'яти секунд
-Back	BootManagerController	Button	 	Назад
+After five seconds	DefaultPartitionPage		Після 5 секунд
+Back	BootManagerController	Button	Назад
 Installation of boot menu completed	BootManagerController	Title	Встановлення бутменю завершене
-Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Неназваний %d
+Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	 	Unnamed %d
 File:	FileSelectionPage	Text control label	Файл:
-Previous	WizardView	Button	Попередній
+Previous	WizardView	Button	Попереднє
 BootManager	BootManager	Application name	Завантажувач
-Install	DrivesPage	Button	 	Встановити
+Install	DrivesPage	Button	Встановити
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Про запис бутменю до загрузочного диску (%s). Перевірте інформацію перед продовженням.
 Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Невідомий
 Update	DrivesPage	Button	Обновити
@@ -47,24 +47,24 @@ Old Master Boot Record Saved failure	BootManagerController	Title	Збереже�
 Drives	DrivesPage	Title	Пристрої
 Never	DefaultPartitionPage		Ніколи
 Partition table not compatible	BootManagerController	Title	Таблиця розділів несумісна
-Old Master Boot Record saved	BootManagerController	Title	Старий MBR збережено
+Old Master Boot Record saved	BootManagerController	Title	Збереження старого MBR
 written by	BootManager		автор
 Boot Manager is unable to read the partition table!	BootManagerController		Завантажувач не зміг прочитати таблицю розділів!
 Error reading partition table	BootManagerController	Title	Помилка при читанні таблиці розділів
-OK	BootManager		  	Гаразд
-Copyright %year, Haiku Inc.\n	BootManager	Leave %year untranslated	Copyright %рік, Haiku Inc.\n
+OK	BootManager		Гаразд
+Copyright %year, Haiku Inc.\n	BootManager	Leave %year untranslated	Copyright %year, Haiku Inc.\n
 Installation of boot menu failed	BootManagerController	Title	Встановлення бутменю призупинено
 Backup Master Boot Record	BootManagerController	Title	Відновлення основного загрузочного запису
-Quit	DrivesPage	Button	 	Вийти
+Quit	DrivesPage	Button	Вийти
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Про запис бутменю на диск. Ви дійсно бажаєте продовжити?
 The old Master Boot Record was successfully saved to %s.	BootManagerController		Старий MBR успішно збережено в %s.
 Default Partition:	DefaultPartitionPage	Menu field label	Розділ по замовчуванню:
 Partitions	DefaultPartitionPage	Pop up menu title	Розділи
 Summary	BootManagerController	Title	Підсумок
 OK	BootManagerController	Button	Гаразд
-Immediately	DefaultPartitionPage		 	невідкладно
+Immediately	DefaultPartitionPage		Невідкладно
 Done	BootManagerController	Button	Зроблено
-After three seconds	DefaultPartitionPage		 	Після трьох секунд
+After three seconds	DefaultPartitionPage		Після 3 секунд
 USB Drive	DrivesPage	Default disk name	Пристрій USB
 Cannot access!	DrivesPage	Cannot install	В доступі заборонено!
 No space available!	DrivesPage	Cannot install	Немає наявного простору!

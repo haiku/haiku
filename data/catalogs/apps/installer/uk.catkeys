@@ -1,34 +1,34 @@
 1	ukrainian	x-vnd.Haiku-Installer	527470088
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Встановлювач\n\tАвтори Jérôme Duval і Stephan Aßmus\n\tCopyright 2005–2010, Haiku.\n\n
-Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Встановлення завершене. Завантажувальний сектор записано до «%s». Натисніть Вихід щоб покинути Встановлювач або виберіть інший цільовий розділ для виконання другого встановлення.
+Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Встановлення завершене. Завантажувальний сектор записано до '%s'. Натисніть Вихід щоб покинути Встановлювач або виберіть інший цільовий том для виконання другого встановлення.
 Quit	InstallerWindow		Вийти
 Stop	InstallerWindow	In alert after pressing Stop	Зупинити
-Installation completed. Boot sector has been written to '%s'. Press Quit to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Встановлення завершене. Завантажувальний сектор записано до «%s». Натисніть Вихід для перезавантаження комп’ютера або виберіть новий цільовий розділ для виконання іншого встановлення.
+Installation completed. Boot sector has been written to '%s'. Press Quit to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Встановлення завершене. Завантажувальний сектор записано до '%s'. Натисніть Вихід для перезавантаження комп’ютера або виберіть новий цільовий том для виконання іншого встановлення.
 Install progress:  	InstallerWindow		Хід встановлення:  
 Starting Installation.	InstallProgress		Початок встановлення.
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Ви впевнені що, хочете встановлювати на поточний загрузочний диск? Встановлювач перезавантажить машину, якщо ви продовжите.
 OK	InstallProgress		Гаразд
-Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Виберіть джерело і цільовий диск з випадаючого меню. Тоді клікніть «Почати».
+Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Виберіть джерело і цільовий диск з випадаючого меню. Тоді клікніть \"Почати\".
 Install from:	InstallerWindow		Встановити з:
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld з %2ld
 Installer	InstallerWindow		Встановлювач
 Continue	InstallerApp		Продовжити
-Write boot sector to '%s'	InstallerWindow		Записати загрузочний сектор до «%s»
+Write boot sector to '%s'	InstallerWindow		Записати загрузочний сектор до '%s'
 Collecting copy information.	InstallProgress		Збір інформації для копіювання.
-Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Виберіть диск джерело з випадаючого меню. Тоді клікніть «Почати».
+Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Виберіть диск джерело з випадаючого меню. Тоді клікніть \"Почати\".
 Boot sector successfully written.	InstallProgress		Завантажувальний сектор успішно записаний.
 Performing installation.	InstallProgress		Виконується встановлення.
 scanning…	InstallerWindow		сканування…
 Finishing Installation.	InstallProgress		Завершення встановлення.
 README	InstallerApp		ПРОЧИТАЙ
-The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Поточний диск має недостатньо місця. Виберіть інший диск або не встановлюйте необов’язкові пакети.
+The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Поточний диск має недостатньо місця. Виберіть інший диск або не встановлюйте необов’язкові елементи.
 Scanning for disks…	InstallerWindow		Сканування дисків…
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Диск неможливо підмонтувати. Виберіть інший.
 ?? of ??	InstallerWindow	Unknown progress	?? з ??
 Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Запустіть утиліту DriveSetup для розбиття\nдоступних вінчестерів і пристроїв.\nРозділи будуть зініціалізовані у \nBe File System необхідній для завантаження розділу з Haiku\n
 Show optional packages	InstallerWindow		Показати необовя’зкові пакети
 No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Не знайдено жодного розділу, що підходить для встановлення. Перевстановіть розділи або зініціалізуйте один з них в Be File System.
-Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Виберіть диск для встановлення з випадаючого меню. Тоді клікніть «Почати».
+Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Виберіть диск для встановлення з випадаючого меню. Тоді клікніть \"Почати\".
 Unknown Type	InstallProgress	Partition content type	Невідомий тип
 <none>	InstallerWindow	No partition available	<немає>
 Installation canceled.	InstallProgress		Встановлення призупинено.
@@ -78,7 +78,7 @@ Stop	InstallerWindow		Зупинено
 So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		Так позаду інших пунктів меню, що вказані зверху файлу просто додайте щось схоже на ці рядки:\n\n
 \t}\n\n	InstallerApp		\t}\n\n
 Newer versions of GRUB use an extra configuration file to add custom entries to the boot menu. To add them to the top, you have to create/edit a file by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Найновіші версії GRUB використовують спеціальний конфігураційний файл, щоб додати   пункти до бутменю. Для додавання у список досить створити/редагувати файл у вашому улюбленому текстовому редакторі запустивши його з Terminal'у, наприклад, так:\n\n
-Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		Там ви можете закоментувати рядок «GRUB_HIDDEN_TIMEOUT=0» помістивши «#» перед ним, з метою появи меню завантаження.\n\n
+Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		Там ви можете закоментувати рядок  \"GRUB_HIDDEN_TIMEOUT=0\" помістивши  \"#\" перед ним, з метою появи меню завантаження.\n\n
 With GRUB it's: (hdN,n)\n\n	InstallerApp		В GRUB це є: (hdN,n)\n\n
 \tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n
 This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Це лише альфа-версія, тому є ризик втрати важливих даних. Частіше робіть бекап! Ви маєте бути уважні.\n\n\n
@@ -88,7 +88,7 @@ This is alpha-quality software! It means there is a high risk of losing importan
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		ВАЖЛИВА ІНФОРМАЦІЯ ПЕРЕД ВСТАНОВЛЕННЯМ HAIKU\n\n
 2.1) GRUB 1\n	InstallerApp		2.1) GRUB 1\n
 Welcome to the Haiku Installer!\n\n	InstallerApp		Вітаємо у Встановлювачі Haiku!\n\n
-The first logical partition always has the number \"4\", regardless of the number of primary partitions.\n\n	InstallerApp		Перший логічний розділ завжди має номер «4», не зважаючи на кількість первинних розділів.\n\n
+The first logical partition always has the number \"4\", regardless of the number of primary partitions.\n\n	InstallerApp		Перший логічний розділ завжди має номер \"4\", не зважаючи на кількість первинних розділів.\n\n
 GRUB's naming scheme is still: (hdN,n)\n\n	InstallerApp		Схема іменування в GRUB залишилась така: (hdN,n)\n\n
 \tsudo <your favorite text editor> /boot/grub/menu.lst\n\n	InstallerApp		\tsudo <ваш улюблений текстовий редактор> /boot/grub/menu.lst\n\n
 \tsudo <your favorite text editor> /etc/default/grub\n\n	InstallerApp		\tsudo <ваш улюблений текстовий редактор> /etc/default/grub\n\n
@@ -97,18 +97,18 @@ GRUB's naming scheme is still: (hdN,n)\n\n	InstallerApp		Схема іменув
 Additionally you have to edit another file to actually display the boot menu:\n\n	InstallerApp		Додатково доведеться змінити ще один файл, щоб з’явилося меню завантаження:\n\n
 \t\tset root=(hd0,7)\n	InstallerApp		\t\tset root=(hd0,7)\n
 You'll note that GRUB uses a different naming strategy for hard drives than Linux.\n\n	InstallerApp		Слід зауважити , що GRUB використовує інший спосіб іменування жорстких дисків ніж Linux.\n\n
-\"n\" is the partition number, also starting with \"0\".\n	InstallerApp		«n» є номер розділу, завжди починається з «0».\n
-\"n\" is the partition number, which for GRUB 2 starts with \"1\"\n	InstallerApp		«n» є номер розділу, який для GRUB 2 починається з «1»\n
-\"N\" is the hard disk number, starting with \"0\".\n	InstallerApp		«N» номер жорсткого диску, що починається з «0».\n
+\"n\" is the partition number, also starting with \"0\".\n	InstallerApp		\"n\" є номер розділу, завжди починається з \"0\".\n
+\"n\" is the partition number, which for GRUB 2 starts with \"1\"\n	InstallerApp		 \"n\" є номер розділу, який для GRUB 2 починається з \"1\"\n
+\"N\" is the hard disk number, starting with \"0\".\n	InstallerApp		\"N\" номер жорсткого диску, що починається з \"0\".\n
 \trootnoverify\t\t(hd0,6)\n	InstallerApp		\trootnoverify\t\t(hd0,6)\n
 Have fun and thanks a lot for trying out Haiku! We hope you like it!	InstallerApp		Насолоджуйтесь і дякуємо за спробу використання Haiku! Маємо надію що вона вам сподобається!
 1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1) Якщо ви встановлюєте Haiku на реальному залізі (не в середині емулятора) рекомендується розбити жорсткий диск на розділи заздалегідь. Встановлювач і утиліта DriveSetup здатні до ініціалізації присутніх розділів у рідній файловій системі Haiku, але опції зміни існуючих розділів протестовані недостатньо і ми не рекомендуємо їх поки що до використання.\n
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2) Встановлювач сам зробить розділ Haiku загрузочним, але він не робить жодних кроків для інтеграції Haiku в меню завантаження. Якщо Ви маєте встановлений GRUB, то можете додати Haiku до його меню завантаження. В залежності від версії GRUB, це робиться по різному.\n\n\n
 Finally, you have to update the boot menu by entering:\n\n	InstallerApp		Врешті, Ви повинні оновити меню завантаження набравши:\n\n
 If you have not created a partition yet, simply reboot, create the partition using whatever tool you feel most comfortable with, and reboot into Haiku to continue with the installation. You could for example use the GParted Live-CD, it can also resize existing partitions to make room.\n\n\n	InstallerApp		Якщо Ви досі не створили розділ, перезавантажтесь, створіть його за допомогою звичної Вам програми, завантажтесь в Haiku для продовження інсталяції. Для прикладу використайте GParted Live-CD, Який також може змінити розміри присутніх розділів.\n\n\n
-With GRUB 2 the first logical partition always has the number \"5\", regardless of the number of primary partitions.\n\n	InstallerApp		У GRUB 2 перший логічний розділ завжди має номер «5», в незалежності від кількості первинних розділів.\n\n
-All hard disks start with \"hd\".\n	InstallerApp		Всі жорсткі диски починаються з «hd».\n
-3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" documentation, there is a link on the Desktop.\n\n	InstallerApp		3) Коли Ви успішно зануритесь у Haiku почніть з прочитання документації «Welcome» , її лінк Ви знайдете на робочому столі.\n\n
+With GRUB 2 the first logical partition always has the number \"5\", regardless of the number of primary partitions.\n\n	InstallerApp		У GRUB 2 перший логічний розділ завжди має номер \"5\", в незалежності від кількості первинних розділів.\n\n
+All hard disks start with \"hd\".\n	InstallerApp		Всі жорсткі диски починаються з \"hd\".\n
+3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" documentation, there is a link on the Desktop.\n\n	InstallerApp		3) Коли Ви успішно зануритесь у Haiku почніть з прочитання документації \"Welcome\" , її лінк Ви знайдете на робочому столі.\n\n
 Configure your /boot/grub/menu.lst by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Зконфігуруйте /boot/grub/menu.lst запустивши свій улюблений редактор з Terminal’у ось так:\n\n
 NOTE: While the naming strategy for hard disks is still as described under 2.1) the naming scheme for partitions has changed.\n\n	InstallerApp		Заувага: Хоча принцип іменування жорстких дисків такий самий, як описано в п. 2.1 іменування розділів змінилося.\n\n
 So below the heading that must not be edited, add something similar to these lines:\n\n	InstallerApp		Тому під заголовком, котрий редагувати не можна, додайте щось на кшталт:\n\n

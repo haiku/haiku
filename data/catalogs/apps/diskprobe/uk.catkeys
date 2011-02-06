@@ -61,12 +61,12 @@ DiskProbe request	ProbeView		Запит DiskProbe
 32 bit unsigned size:	TypeEditors		32-х бітний беззнаковий розмір
 Flattened bitmap	TypeEditors		Плаский образ
 Open file…	FileWindow		Відкрити файл…
-Next	ProbeView		Наступний
+Next	ProbeView		Наступне
 Close	FileWindow		Закрити
 Attribute: 	ProbeView		Атрибут:
 Remove from file	AttributeWindow		Видалити для файлу
 Don't save	ProbeView		Не зберігати
-Previous	ProbeView		Попередній
+Previous	ProbeView		Попереднє
 64 bit signed value:	TypeEditors		64-х бітне знакове значення
 Icon	TypeEditors		Іконка
 Block: 	ProbeView		Блок:
@@ -87,7 +87,7 @@ Print…	ProbeView		Друк.…
 Block %Ld (0x%Lx)	ProbeView		Блок %Ld (0x%Lx)
 Could not open file \"%s\": %s\n	DiskProbe		Неможливо відкрити файл \"%s\": %s\n
 Select all	ProbeView		Вибрати все
-Probe file…	OpenWindow		Перевірка файлу…
+Probe file…	OpenWindow		Перевірити файл…
 Icon view	TypeEditors		У вигляді іконки
 Bookmarks	ProbeView		Закладки
 Mode:	FindWindow		Режим:

@@ -7,7 +7,7 @@ Renderer name:	InfoView		Назва рендера:
 Vendor name:	InfoView		Ім'я постачальника:
 Attributes stack size:	Capabilities		Розмір стека атрибутів:
 OpenGL version:	InfoView		Версія OpenGL:
-Name stack size:	Capabilities		Розмір имені стека:
+Name stack size:	Capabilities		Розмір імені стека:
 Auxiliary buffer(s):	Capabilities		Допоміжний буфер(и):
 Max. recommended vertex elements:	Capabilities		Максимално рекомендована кількість вершин:
 GLU version:	InfoView		Версія GLU:

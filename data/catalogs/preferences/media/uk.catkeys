@@ -6,7 +6,7 @@ Video input:	Media views		Вхід відео:
 Waiting for media_server to quit.	Media Window		Зачекайте  на вихід з Медіа Сервера.
 Defaults	Media views		По замовчуванню
 Stopping media server…	Media Window		Зупинка Медіа Сервера…
-Video output:	Media views		Вихід Відео:
+Video output:	Media views		Вивід відео:
 Enable real-time audio	Media views		Режим реального часу для звуку
 Quit	Media Window		Вихід
 OK	Media Window		Гаразд
@@ -19,7 +19,7 @@ Telling media_addon_server to quit.	Media Window		Сказати медіасе�
 Enable real-time video	Media views		Режим реального часу для відео
 This hardware has no controls.	Media Window		Це залізо не регулюється.
 Restarting media services\nShutting down media server\n	Media Window		Перезапуск медіа сервісів\nЗакриття Медіа Сервера\n
-Audio output:	Media views		Вихід аудіо:
+Audio output:	Media views		Вивід аудіо:
 Start media server	Media Window		Запуск Медіа Сервера
 Audio settings	Media Window		Настройки звуку
 Could not connect to the media server.\nWould you like to start it ?	Media Window		Медіа сервер не запущено\n Зробити це?\n

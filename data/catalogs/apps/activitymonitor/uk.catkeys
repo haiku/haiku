@@ -3,7 +3,7 @@ P-faults	DataSource		Р-помилки
 Media nodes	DataSource		Мультимедійні вузли
 Raw clipboard size	DataSource		Розмір буфера обміну
 Threads	DataSource		Потоки
-Add graph	ActivityWindow		Додати графа
+Add graph	ActivityWindow		Додати графік
 Teams	DataSource		Команди
 Hide legend	ActivityView		Сховати легенду
 Network send	DataSource		Відправлено по мережі
@@ -14,7 +14,7 @@ Cached memory	DataSource		Кешована  пам'ять
 Apps	DataSource		Додатки
 Show legend	ActivityView		Показати легенду
 Settings	ActivityWindow		Налаштування
-Receiving	DataSource		Отримано
+Receiving	DataSource		Отримання
 Settings…	ActivityWindow		Налаштування…
 Ports	DataSource		Порти
 Page faults	DataSource		Помилки на сторінці
@@ -23,20 +23,20 @@ Sending	DataSource		Відправка
 Cache	DataSource		Кеш
 About ActivityMonitor…	ActivityWindow		Про ActivityMonitor…
 TX	DataSource		TX
-Update time interval:	SettingsWindow		Частота обновлення
+Update time interval:	SettingsWindow		Інтервал часу поновлення:
 Quit	ActivityWindow		Вийти
-Block cache memory	DataSource		 Пам'ять кеш блоку
-Remove graph	ActivityView		Видалити графа
+Block cache memory	DataSource		Блок кеш пам'яті
+Remove graph	ActivityView		Видалити графік
 RX	DataSource		RX
 CPU usage	DataSource		Використання CPU 
 Sems	DataSource		Сімс
 Running applications	DataSource		Запущені додатки
 Semaphores	DataSource		Семафори
-Block cache	DataSource		Блок кешу
+Block cache	DataSource		Кеш блоку
 Swap space	DataSource		Розмір підкачки
 Swap	DataSource		Підкачка
 File	ActivityWindow		Файл
-Additional items	ActivityView		Придатки
+Additional items	ActivityView		Додаткові елементи
 Network receive	DataSource		Отримано по мережі
 Memory	DataSource		Пам'ять
-ActivityMonitor	ActivityWindow		Монітор Активності
+ActivityMonitor	ActivityWindow		ActivityMonitor

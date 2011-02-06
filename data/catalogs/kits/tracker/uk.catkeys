@@ -1,81 +1,71 @@
-1	ukrainian	x-vnd.Haiku-libtracker	170427688
+1	ukrainian	x-vnd.Haiku-libtracker	171995635
 OK	WidgetAttributeText		Гаразд
 Icon view	VolumeWindow		У вигляді іконок
 Add-ons	FilePanelPriv		Додатки
 Desktop	Model		Робочий стіл
+Identify	ContainerWindow		Визначити
+Warning space color	SettingsView		Колір області повідомлень
 Close	VolumeWindow		Закрити
 Open	OpenWithWindow		Відкрити
 Tracker status	StatusWindow		Стан Tracker'a 
 Eject when unmounting	AutoMounterSettings		Виштовхнути після відмонтування
 Window	ContainerWindow		Вікно
+Decrease size	ContainerWindow		Зменшити розмір
 Mini icon view	VolumeWindow		У вигляді міні іконок
+You must have at least one attribute showing.	PoseView		Ви повинні мати у списку хоча б один атрибут.
 Permissions	InfoWindow		Дозволи
 Invert selection	VolumeWindow		Обернути виділення
 Recent documents	FavoritesMenu		Недавні документи
 Modified	QueryPoseView		Змінений
 Created	ContainerWindow		Cтворений
 If you %action the home folder, Haiku may not behave properly! Are you sure you want to do this? To %action the home anyway, click \"Do it\".	FSUtils		Якщо Ви %action папку home, Haiku може працювати неправильно! Ви впевнені, що бажаєте цього? для %action home будь-що, клікніть \"Зробити це\".
+Error %error loading Add-On %name.	ContainerWindow		Помилка  %error при завантаженні додатку %name.
 contains	SelectionWindow		вміст
-Show shared volumes on Desktop	SettingsView		Покажіть сховані величини на робочому столі
+Sorry, you can't save things at the root of your system.	FilePanelPriv		Прикро, Ви не можете нічого зберігати в кореневому каталозі системи.
+Show shared volumes on Desktop	SettingsView		Показати сховані томи на робочому столі
 Paste links	ContainerWindow		Вставити посилання
 Name	OpenWithWindow		Ім'я
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Неможливо відкрити \"%document\" бо додаток \"%app\" є у Кошику.
 File	ContainerWindow		Файл
+Handles any %type	OpenWithWindow		Працює з будь-яким %type
 Delete	ContainerWindow		Видалити
 32 x 32	ContainerWindow		32 x 32
-Open with…	ContainerWindow		Відкрити у…
-Add	FindPanel		Додати
-Empty Trash	InfoWindow		Очистити Кошик
-Cut more	ContainerWindow		Вирізати більше
-Deleting: 	StatusWindow		Видалення:
-Cancel	FSClipBoard		Відмінити
-%capacity (%used used -- %free free)	InfoWindow		%capacity (%used викор. -- %free вільно)
-Mount	ContainerWindow		Підмонтувати
-Mount	DeskWindow		Підмонтувати
-rename	InfoWindow		переіменувати
-Open	FilePanelPriv		Відкрити
-Relation	OpenWithWindow		Відношення
-Identify	ContainerWindow		Визначити
-Warning space color	SettingsView		Колір області повідомлень
-Decrease size	ContainerWindow		Зменшити розмір
-You must have at least one attribute showing.	PoseView		Ви мусите мати у списку хоча б один атрибут.
-Error %error loading Add-On %name.	ContainerWindow		Помилка  %error при завантаженні додатку %name.
-Sorry, you can't save things at the root of your system.	FilePanelPriv		Прикро, Ви не можете нічого зберігати в кореневому каталозі системи.
-Handles any %type	OpenWithWindow		Працює з будь-яким %type
 Cannot unmount the boot volume \"%name\".	FSUtils		Неможливо відмонтувати загрузочний том \"%name\".
-(Finish: %time - Over %finishtime hours left)	StatusWindow		(фініш: %time - Понад%finishtime Годин лишилось)
+Open with…	ContainerWindow		Відкрити у…
+(Finish: %time - Over %finishtime hours left)	StatusWindow		(Фініш: %time - понад%finishtime годин залишилось)
 Write	FilePermissionsView		Запис
 for %num files	InfoWindow		для %num файлів
-Modified	PoseView		Зміна
+Modified	PoseView		Змінений
 Make active printer	ContainerWindow		Зробити принтер активним
 Create link here	ContainerWindow		Створити посилання тут
+Moving: 	StatusWindow		Переміщення:
 before	FindPanel		до
-On	FindPanel		Включено
+On	FindPanel		На
 MiB	WidgetAttributeText		MiB
 greater than	FindPanel		Більше ніж
 Delete	PoseView		Видалити
 Select all	ContainerWindow		Вибрати все
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Прикро, атрибут 'Символ' не може містити багатобайтовій знак.
-Clean up	DeskWindow		Вичистити
+Clean up	DeskWindow		Очистити
 You cannot copy or move the root directory.	FSUtils		Ви не можете копіювати або переміщувати кореневий каталог.
 Invert selection	FilePanelPriv		Інвертувати виділення
 save text	FilePanelPriv		зберегти текст
-Select all	FilePanelPriv		Зберегти все
-Link to:	InfoWindow		Посилання :
+Select all	FilePanelPriv		Вибрати все
+Link to:	InfoWindow		Посилання на:
 Location	ContainerWindow		Розташування
 Location	QueryPoseView		Розташування
 Icon view	ContainerWindow		У вигляді іконок
 Size	QueryPoseView		Розмір
-Emptying Trash… 	StatusWindow		Очистити корзину...
-Close all in workspace	ContainerWindow		Закрити всі робочі місця
-Empty Trash	ContainerWindow		Очистити корзину
-Name = %name	FindPanel	FindResultTitle	Імя = %name
+Emptying Trash… 	StatusWindow		Очистити Кошик...
+Close all in workspace	ContainerWindow		Закрити всі робочі простори
+Empty Trash	ContainerWindow		Очистити Кошик
+Name = %name	FindPanel	FindResultTitle	Ім'я = %name
 Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Ви впевнені що бажаєте копіювати або перемістити вибрані речі до цієї папки?
 Does not handle file	OpenWithWindow		Не працює з файлом
 Mount server error	AutoMounterSettings		Монтування помилка сервера
 Do it	FSUtils		Зробити це
 Search	FindPanel		Пошук
-Preparing to empty Trash…	StatusWindow		Підготовка до очищення корзини...
+Preparing to empty Trash…	StatusWindow		Підготовка до очищення Кошика...
 Disks	Model		Диски
 Create link	ContainerWindow		Створити посилання
 Decrease size	DeskWindow		Зменшити розмір
@@ -96,18 +86,19 @@ Select all	VolumeWindow		Вибрати все
 Opens with:	InfoWindow		Відкрити за допомогою:
 Open	ContainerWindow		Відкрити
 (%SizeProcessed of %TotalSize, %BytesPerSecond/s)	StatusWindow		%SizeProcessed з %TotalSize, %BytesPerSecond/s)
-Error calculating folder size.	InfoWindow		Помилка при обчисленні розміру папки.
+Error calculating folder size.	InfoWindow		Помилка при обчисленні розміру. папки.
 New folder	FilePanelPriv		Нова папка
 %name info	InfoWindow	InfoWindow Title	%name інформація
 Favorites	FavoritesMenu		Вибране
 Add-ons	VolumeWindow		Додатки
+Sorry, you can't copy items to the Trash.	PoseView		 	Вибачте, Ви не можете копіювати елементи до Кошика.
 List view	VolumeWindow		У вигляді списку
 matches wildcard expression	SelectionWindow		співпадає з підставленими виразами
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Ви не можете замінити папку або символічне посилання реальним файлом.
 Show space bars on volumes	SettingsView		Показувати діаграми місця на томах
 Invert selection	ContainerWindow		Інвертувати вибране
 Increase size	DeskWindow		Збільшити розмір
-Resize to fit	ContainerWindow		Змінити розмір щоб влізлось
+Resize to fit	ContainerWindow		Припасувати
 %Ld bytes	WidgetAttributeText		%Ld байтів
 Add printer…	ContainerWindow		Додати принтер...
 Open	VolumeWindow		Відкрити
@@ -115,14 +106,18 @@ New folder	ContainerWindow		Нова папка
 Kind	ContainerWindow		Вид
 Select…	ContainerWindow		Вибрати...
 Copy to	ContainerWindow		Копіювати до
-Move to Trash	ContainerWindow		Перемістити до корзини
+Move to Trash	ContainerWindow		Перемістити до Кошика
 Move to	ContainerWindow		Перемістити до
 Create %s clipping	PoseView		Створити %s вирізку
+Set new link target	InfoWindow		Призначити нове посилання об'єкту
 Save as Query template:	FindPanel		Зберегти як шаблону запиту:
 Cancel	FSUtils		Відмінити
+Edit name	ContainerWindow		Редагувати ім'я
+Show volumes on Desktop	SettingsView		Показувати томи на робочому столі
 KiB	WidgetAttributeText		KiB
 Defaults	TrackerSettingsWindow		По замовчуванню
 %num items	CountView		%num елементів
+Mini icon view	ContainerWindow		у вигляді міні іконок
 Clean up	VolumeWindow		Очистити
 OK	TrackerInitialState		Гаразд
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Не вдалося відкрити \"%name\". Файл помилково позначений як виконуваний
@@ -132,17 +127,17 @@ An item named \"%name\" already exists in this folder. Would you like to replace
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Вибачте, недостатньо вільного місця в томі призначення, щоб скопіювати виділене.
 Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Не вдалося відкрити \"%document\" за допомогою додатку\"%app\" (%error).
 (Finish: %time - %finishtime seconds left)	StatusWindow		(Фініш: %time - %finishtime секунд залишилось)
-Sorry, saving more than one item is not allowed.	FilePanelPriv		Вибачти, збереження більше одної речі заборонено.
-Searching for disks to mount…	StatusWindow		Пошук диску для монтування...
+Sorry, saving more than one item is not allowed.	FilePanelPriv		Вибачте, збереження більше одного елемента заборонено.
+Searching for disks to mount…	StatusWindow		Пошук дисків для монтування...
 New folder	FSUtils		Нова папка
 Free space color	SettingsView		Колір вільного місця
 Cut	ContainerWindow		Вирізати
 Remove	FindPanel		Видалити
-Resize to fit	QueryContainerWindow		Змініти розмір щоб влізлося
+Resize to fit	QueryContainerWindow		Припасувати
 Desktop	TrackerSettingsWindow		Робочий стіл
 Sorry, you can't copy items to the Trash.	FSClipBoard		Вибачте, ви не можете копіювати елементи в корзину.
 by attribute	FindPanel		за атрибутом
-Disk mounting during boot	AutoMounterSettings		Диск установки підчас завантаження
+Disk mounting during boot	AutoMounterSettings		Диск що монтується під час завантаження
 New Query	FindPanel		Новий запит
 (Finish: %time - %finishtime minutes left)	StatusWindow		(фініш: %time - %finishtime хвилин залишилось)
 Preparing to move items…	StatusWindow		Підготовка до переміщення елементів...
@@ -150,15 +145,15 @@ You cannot replace a file with a folder or a symbolic link.	FSUtils		Ви не �
 Unmount	InfoWindow		Відмонтувати
 no supporting apps	OpenWithWindow		немає підтримки додатків
 That name is already taken. Please type another one.	InfoWindow		Ім'я вже зайняте. Будь-ласка спробуйте інше.
-Sorry, you can't create links in the Trash.	PoseView		Вибачте, Dи не можете створювати посилання в корзині.
+Sorry, you can't create links in the Trash.	PoseView		Вибачте, Ви не можете створювати посилання в Кошику.
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Елемент з ім'ям \"%name\"  вже існує в цій папці, і може містити\nелементи з одинаковою назвою. Чи хочети ви замінити їх елементами котрі Ви
-Link \"%name\" to:	InfoWindow	File dialog title for new sym link	посилання \"%name\" до:
+Link \"%name\" to:	InfoWindow	File dialog title for new sym link	посилання \"%name\" на:
 Mount settings…	VolumeWindow		Налаштування монтування...
 Select…	VolumeWindow		Вибрати...
 All disks	FindPanel			Всі диски
 Revert	TrackerSettingsWindow		Повернути
 Invert selection	QueryContainerWindow		Інвертувати вибране
-Execute	FilePermissionsView		Виконувати
+Execute	FilePermissionsView		Виконати
 Size	FindPanel		Розмір
 1 item	CountView		1 елемент
 Open parent	ContainerWindow		Відкрити батьківський
@@ -171,17 +166,17 @@ Location	OpenWithWindow		Розташування
 Force identify	ContainerWindow		Ідентифікувати примусово
 Duplicate	ContainerWindow		Дублювати
 New folder%ld	FSUtils		Нова папка%ld
+Outline selection rectangle only	SettingsView		Outline selection rectangle only
+If you %action the system folder or its contents, you won't be able to boot Haiku! Are you sure you want to do this? To %action the system folder or its contents anyway, hold down the Shift key and click \"Do it\".	FSUtils		Якщо Ви %action системну папку і її вміст, Ви не зможете запустити Haiku! Ви впевнені, що бажаєте цього? Для щоб %action все одно, утримуючи клавішу Shift  натисніть \"Зроби це\".
 Select all	DeskWindow		Вибрати все
 OK	InfoWindow		Гаразд
 Replace	FSUtils		Замінити
-Outline selection rectangle only	SettingsView		Outline selection rectangle only
-If you %action the system folder or its contents, you won't be able to boot Haiku! Are you sure you want to do this? To %action the system folder or its contents anyway, hold down the Shift key and click \"Do it\".	FSUtils		Якщо Ви %action системну папку і її вміст, Ви не зможете запустити Haiku! Ви впевнені, що бажаєте цього? Для щоб %action все одно, утримуючи клавішу Shift  натисніть \"Зроби це\".
 You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		Ви намагаєтесь замінити елемент:\n\t%name%dest\nелементом:\n\t%name%src\n\n Хочете ви замінити його тим який ви %movemode?
 Mini icon view	DeskWindow		У вигляді міні іконок
 Error in regular expression:\n\n'%errstring'	PoseView		Помилка у регулярному виразі:\n\n'%errstring'
 Mount all	MountMenu		Монтувати все
 calculating…	InfoWindow		розрахунок...
-Unmount	VolumeWindow		Відключити
+Unmount	VolumeWindow		Відмонтувати
 Edit name	VolumeWindow		Редагувати ім'я
 Mount all disks now	AutoMounterSettings		Монтувати всі диски зараз
 Untitled bitmap	PoseView		Неназваний бітмап
@@ -197,11 +192,11 @@ Replace other file	WidgetAttributeText		Замінити інший файл
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Деякі з вибраних елементів не можуть бути переміщені до корзини. Можливо ви хочете видалити їх все одно? (Операція необоротна.)
 You cannot create a link to the root directory.	FSUtils		Ви не можете створювати посилання на кореневий каталог.
 48 x 48	ContainerWindow		48 x 48
-Resize to fit	VolumeWindow		Змінити, щоб вмістилось
-Could not find application \"%appname\"	OpenWithWindow		Невдалось найти програму \"%appname\"
-The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Деякі з вибраних елементів не можуть бути переміщені до корзини. Ви хочете видалити їх все одно? ( Операція необоротна.)
+Resize to fit	VolumeWindow		Припасувати
+Could not find application \"%appname\"	OpenWithWindow		Невдалось знайти програму \"%appname\"
+The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Деякі з вибраних елементів не можуть бути переміщені Кошик . Ви хочете видалити їх все одно? ( Операція необоротна.)
 Invert	SelectionWindow		Інвертувати
-Save Query as template…	FindPanel		Зберегти запит як шаблон
+Save Query as template…	FindPanel		Зберегти запит як шаблон…
 Find	FindPanel		Знайти
 Get info	ContainerWindow		Отриматити інформацію
 Error creating link to \"%name\".	FSUtils		Помилка створення посилання до \"%name\".
@@ -213,7 +208,7 @@ by formula	FindPanel		за формулою
 Name	PoseView		Ім'я
 Group	FilePermissionsView		Група
 Version:	InfoWindow		Версія:
-Created:	InfoWindow		Створено:
+Created:	InfoWindow		Створений:
 \nShould this be fixed?	FSUtils		\nЧи треба це виправити?
 Copying: 	StatusWindow		Копіювання:
 Capacity:	InfoWindow		Ємність:
@@ -221,9 +216,9 @@ Delete	FilePanelPriv		Видалити
 Save	FindPanel		Зберегти
 copy	FSUtils	filename copy	копія
 Temporary	FindPanel		Тимчасовий
-Preparing to copy items…	StatusWindow		Підготовка до копіювання елементів...
-Default application	InfoWindow		Додаток по замовчуванню
 Version	OpenWithWindow		Версія
+Default application	InfoWindow		Додаток по замовчуванню
+Preparing to copy items…	StatusWindow		Підготовка до копіювання елементів...
 Show folder location in title tab	SettingsView			Показати розташування папки в заголовку
 Proceed	FSUtils		Продовжити
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Деякі елементи  вже існують в цій папці з одинаковими іменами %verb.\n \nВи хочете замінити їх %verb або записати для кожного з них окремо?
@@ -233,43 +228,43 @@ Error deleting items	FSUtils		Помилка при видаленні елем�
 Create relative link here	ContainerWindow		Створити відносне посилання тут
 matches regular expression	SelectionWindow		збігається з регулярним виразом
 Mount settings…	SettingsView		Налаштування монтування...
-Edit name	InfoWindow		Редактувати імя
-Could not open \"%name\" (%error). 	FSUtils		Не вдалось відкрити \"%name\" (%error).
+Edit name	InfoWindow		Редагувати ім'я
+Could not open \"%name\" (%error). 	FSUtils		Не вдалося відкрити \"%name\" (%error).
 Paste	ContainerWindow		Вставити
-Modified:	InfoWindow		Змінити:
+Modified:	InfoWindow		Змінений:
 Error moving \"%name\".	FSUtils		Помилка переміщення\"%name\".
 TiB	WidgetAttributeText		TiB
 40 x 40	ContainerWindow		40 x 40
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Файл \"%name\" вже існує в цій папці. Ви хочете його замінити?
-Only the boot disk	AutoMounterSettings		Тільки загрузочний диск
-Trash	TrackerSettingsWindow		Корзина
-Unmount	ContainerWindow		Відключити
-If you %action the config folder, Haiku may not behave properly! Are you sure you want to do this? To %action the config folder anyway, click \"Do it\".	FSUtils		Якщо ви %action папку  config , Haiku може вести себе неправильно! Ви впевнені що  бажаєте цього? Зробити це %action в папці настройок, Натисніть \"Do it\".
-Copy layout	ContainerWindow		Копіювати макета
 Cancel	ContainerWindow		Відмінити
+Only the boot disk	AutoMounterSettings		Тільки загрузочний диск
+Trash	TrackerSettingsWindow		Кошик
+Unmount	ContainerWindow		Відмонтувати
+If you %action the config folder, Haiku may not behave properly! Are you sure you want to do this? To %action the config folder anyway, click \"Do it\".	FSUtils		Якщо ви %action папку  config , Haiku може вести себе неправильно! Ви впевнені що  бажаєте цього? Зробити це %action в папці настройок, Натисніть \"Do it\".
+Copy layout	ContainerWindow		Копіювати макет
 label too long	PoseView		Мітка занадто довга
 Cancel	Tracker		Відмінити
-Sorry, you cannot edit that attribute.	WidgetAttributeText		Вибачти, ви неможете змінювати ці атрибути.
+Sorry, you cannot edit that attribute.	WidgetAttributeText		Вибачти, ви не можете змінювати ці атрибути.
 Name	ContainerWindow		Ім'я
 Disk mount settings	AutoMounterSettings		Налаштування монтування дисків
 48 x 48	DeskWindow		48 x 48
 OK	OpenWithWindow		Гаразд
 Add current folder	FilePanelPriv		Додати поточну папку
-Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Невдалось відкрити \"%document\" Програмою \"%app\" (Відсутній символ: %symbol). \n
-The target disk does not support creating links.	FSUtils		Цільовий диск не підтримує створення посилання.
+Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Невдалося відкрити \"%document\" додатком \"%app\" (Відсутній символ: %symbol). \n
+The target disk does not support creating links.	FSUtils		Цільовий диск не підтримує створення посилань.
 starts with	SelectionWindow		починається з
-Preparing to delete items…	StatusWindow		Підготовка до видалення обєктів
+Preparing to delete items…	StatusWindow		Підготовка до видалення елементів…
 Enable type-ahead filtering	SettingsView		Включити випереджаючу фільтрацію
 (Finish: %time - Over %finishtime days left)	StatusWindow		(Фініш: %time - Понад %finishtime днів лишилось)
-Would you like to find a suitable application to open the file?	FSUtils		Чи хотіли би ви знайти підходящий додаток для відкритя цього файлу?
-There was an error writing the attribute.	WidgetAttributeText		Сталася помилка при записі атрибуту
+Would you like to find a suitable application to open the file?	FSUtils		Чи хотіли би ви знайти прийнятний додаток для відкриття цього файлу?
+There was an error writing the attribute.	WidgetAttributeText		Сталася помилка при записі атрибуту.
 Recalculate folder size	InfoWindow		Перерахувати розмір папки
 Unknown	WidgetAttributeText		Невідомий
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Не вдалося відкрити \"%document\" (Очікується символ: %symbol). \n
 by name	FindPanel		по імені
-Creating links: 	StatusWindow		Створення посилання:
+Creating links: 	StatusWindow		Створення посилань:
 Paused: click to resume or stop	StatusWindow		Зупинено: натисніть щоб відновити або зупинити
-Preferred for %type	OpenWithWindow		 Приорітетний для %type
+Preferred for %type	OpenWithWindow		 Бажаний для %type
 GiB	WidgetAttributeText		GiB
 There was an error deleting \"%name\":\n\t%error	FSUtils		Виникла помилка при видаленні \"%name\":\n\t%error
 Paste	FilePanelPriv		Вставити
@@ -280,12 +275,12 @@ Clean up all	ContainerWindow		Очистити все
 New folder	TemplatesMenu		Нова папка
 Move here	ContainerWindow		Перемістити сюди
 File	FilePanelPriv		Файл
-You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Ви мусите опустити елемент на одну з іконок диску у вікні\"Disks\" .
 Error moving \"%name\"	FSUtils		Помилка переміщення \"%name\"
+You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Ви повинні опустити елемент на одну з іконок диску у вікні\"Disks\" .
 Cancel	WidgetAttributeText		Відмінити
 Could not find an application to open \"%name\" (%error). 	FSUtils		Не вдалося знайти додаток для відкриття \"%name\" (%error).
 Create a Query template	FindPanel		Створення шаблонів запиту
-Previously mounted disks	AutoMounterSettings		Раніше підключені диски
+Previously mounted disks	AutoMounterSettings		Раніше підмонтовані диски
 %Ld B	WidgetAttributeText		%Ld B
 copying	FSUtils		копіювання
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Помилка копіювання папки \"%name\":\n\t%error\n\nВи хочете продовжити?
@@ -301,16 +296,16 @@ The Tracker must be running to see Info windows.	PoseView		Для перегля
 Other	FilePermissionsView		Інший
 Query name:	FindPanel		Ім'я запиту:
 Permissions	ContainerWindow		Дозволи
-moving	FSUtils		Переміщення
-Identify	InfoWindow		Визначити
+moving	FSUtils		переміщення
+Identify	InfoWindow		визначити
 Recent folders	ContainerWindow		Недавні папки
 Close all	ContainerWindow		Закрити все
-Include trash	FindPanel		Включаючи  корзину
+Include trash	FindPanel		Включаючи  Кошик
 Query template	FindPanel		Шаблон запиту
 Open %name with:	OpenWithWindow		Відкрити %name за допомогою:
 Empty folder	NavMenu		Пуста папка
-Copy here	ContainerWindow		Копіювати сюда
-Move to Trash	FilePanelPriv		Перемістити до корзини
+Copy here	ContainerWindow		Копіювати сюди
+Move to Trash	FilePanelPriv		Перемістити до Кошика
 Current folder	ContainerWindow		Поточна папка
 (Finish: %time)	StatusWindow		(Фініш: %time)
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Зазначене ім'я вже використовується в якості імені папки. Будь ласка, виберіть інше ім'я.
@@ -318,9 +313,124 @@ Clean up	ContainerWindow		Очистити
 after	FindPanel		після
 Select…	QueryContainerWindow		Вибрати...
 link	FSUtils	filename link	Посилання
-Moving: 	StatusWindow		Переміщення:
-Sorry, you can't copy items to the Trash.	PoseView		 	Вибачте, Ви не можете копіювати елементи до корзини.
-Edit name	ContainerWindow		Редагувати ім'я
-Show volumes on Desktop	SettingsView		Показувати томи на робочому столі
-Set new link target	InfoWindow		Призначити нове посилання об'єкту
-Mini icon view	ContainerWindow		у вигляді міні іконок
+At %func \nfind_directory() failed. \nReason: %error	TrackerInitialState		В %func \nfind_directory() призупинено. \nПричина: %error
+The specified name is illegal. Please choose another name.	FilePanelPriv		Зазначене імя є недопустимим. Будь ласка виберіть інше імя.
+You can't move a folder into itself or any of its own sub-folders.	FSUtils		Ви не можете перемістити папку в себе або в будь яку з її вкладених папок
+List view	ContainerWindow		У вигляді списку
+Handles any file	OpenWithWindow		Обробляє будь-який файл
+Get info	FilePanelPriv		Отриматити інформацію
+32 x 32	DeskWindow		32 x 32
+Cancel	FilePanelPriv		Відмінити
+Disks	DirMenu		Диски
+New folder %ld	FSUtils		Нова папка %ld
+All BeOS disks	AutoMounterSettings		Всі диски BeOS
+Used space color	SettingsView		Колір області використання
+Sorry, could not create a new folder.	FSUtils		Вибачте, не вдалося створити нову папку
+multiple disks	FindPanel		Помножити диски
+Done	AutoMounterSettings		Готово
+You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Ви повинні кинути елемент на будь-яку з іконок диску ву вікні\"Disks\" .
+Untitled clipping	PoseView		Неназвана вирізка
+Don't automount	AutoMounterSettings		Не автомонтувати
+Save	FilePanelPriv		Зберегти
+To: %dir	StatusWindow		До: %dir
+Window	FilePanelPriv		Вікно
+Find…	VolumeWindow		 	Знайти…
+Edit name	FilePanelPriv		Редагувати ім'я
+Size:	InfoWindow		 	Розмір:
+Empty folder	SlowContextPopup		Порожня папка
+Open selection with:	OpenWithWindow		Відкрити вибране з допомогою:
+(%bytes bytes)	InfoWindow		(%bytes байтів)
+Preparing to create links…	StatusWindow		Підготовка до створення посилань...
+Show navigator	SettingsView		Показати навігатор
+List folders first	SettingsView		Список папок спочатку
+Get info	VolumeWindow		Отриматити інформацію
+Name	SelectionWindow		Ім'я
+Trash	Model		Кошик
+Favorites	FilePanelPriv		 	Вибрані
+Name	QueryPoseView		Ім'я
+Delete	FSUtils		Видалити
+Modified	FindPanel		Змінений
+Error moving \"%name\" to Trash. (%error)	FSUtils		Помилка переміщення \"%name\" до Кошика. (%error)
+You can't replace a folder with one of its sub-folders.	FSUtils		Ви не можете замінити папку однією з вкладених папок.
+<No recent items>	FavoritesMenu		<Немає недавніх елементів>
+Preferences…	ContainerWindow		Настройки…
+Move	PoseView		Перемістити
+Open and make preferred	OpenWithWindow		Відкрити і зробити бажаним
+Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Ви впевнені що хочете видалити вибрані елементи? Ця операція необоротна
+Add-ons	DeskWindow		 	Додатки
+Name	FindPanel		 	Ім'я
+And	FindPanel		 	І
+Select…	DeskWindow		Вибрати…
+If you %action the mime settings, Haiku may not behave properly! Are you sure you want to do this? To %action the mime settings anyway, click \"Do it\".	FSUtils		Якщи ви %action налаштування mime, Haiku може поводитися неправильно! Ви впевнені що хочете зробити це? Для того щоб%action настройки mime все одно, натисніть \"Зроби це\".
+Copy	FilePanelPriv		Копіювати
+Icon view	DeskWindow		У вигляді іконок
+Select all	QueryContainerWindow		Вибрати все
+Files cannot be moved or deleted from a read-only volume.	PoseView		Неможливо видалити або перемістити файл з тому тільки для читання.
+There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Виникла проблема при спробі перемістити \"%name\". Елемент може бути відкритим або зайнятим.
+You cannot put the Trash, home or Desktop directory into the trash.	FSUtils		 	Ви не можете покласти Кошик, home або Робочий стіл в кошик.
+Owner	FilePermissionsView		Власник
+There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Виникла проблема збереження у визначену папку. Будь-ласка спробуйте іншу.
+Restore	ContainerWindow		Відновити
+Restoring: 	StatusWindow		Відновлення:
+Skip	FSUtils		Пропустити
+Settings…	MountMenu		Налаштування...
+Error emptying Trash!	FSUtils		Помилка очистки Кошика!
+Recent folders	FavoritesMenu		Недавні папки
+Close	ContainerWindow		Закрити
+Preferred for file	OpenWithWindow		Бажаний  для файлу
+Go to parent	FilePanelPriv		Йти до батьківського
+Cancel	OpenWithWindow		Відмінити
+That name is too long. Please type another one.	InfoWindow		Ім'я занадто велике. Спробуйте інше.
+OK	FSUtils		Гаразд
+Paste layout	ContainerWindow		Вставити макет
+Select	InfoWindow		Вибрати
+Could not update permissions of file \"%name\". %error	FSUtils		Не вдалося обновити дозволи файлу \"%name\". %error
+Select…	FilePanelPriv		Вибрати...
+Don't move files to Trash	SettingsView		Не переміщайте файли до Кошика
+There was an error resolving the link.	Tracker		Виникла проблема відтворення посилання.
+%BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
+You can't move or copy the trash.	FSUtils		Ви не можете копіювати або переміщати Кошик.
+ends with	SelectionWindow		закінчити з
+Volume icons	TrackerSettingsWindow		Іконки томів
+That name is already taken. Please type another one.	WidgetAttributeText		Ім'я вже зайняте. Спробуйте інше.
+Close	QueryContainerWindow		Закрити
+Formula %formula	FindPanel	FindResultTitle	Формула %formula
+Kind:	InfoWindow		Вид:
+starts with	FindPanel		Почати з
+Increase size	ContainerWindow		Збільшити розмір
+is	FindPanel		є
+Attributes	ContainerWindow		Атрибути
+Handles %type	OpenWithWindow		Не працює з %type
+ends with	FindPanel		закінчити з
+New	ContainerWindow		Новий
+Name matches wildcard expression:###	SelectionWindow		Ім'я відповідає символам вираження:###
+less than	FindPanel		менше ніж
+64 x 64	DeskWindow		64 x 64
+Modified	ContainerWindow		Змінений
+Edit Query template	FindPanel		Редагувати запит шаблону
+Prompt	FSUtils		Підказка
+Edit query	ContainerWindow		Редагувати запит
+Find…	ContainerWindow		Знайти...
+Create a Query	FindPanel		Створити запит
+Move to Trash	FSUtils		Перемістити до Кошика
+Automatic disk mounting	AutoMounterSettings		Автоматичне монтування диску
+Original name	ContainerWindow		Справжнє ім'я
+Find	FSUtils		Знайти
+Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Помилка копіювання файлу \"%name\":\n\t%error\n\nЧи хочете ви продовжити?
+Ask before delete	SettingsView		Спитати перед видаленням
+Single window navigation	SettingsView		Одновіконна навігація
+If you %action the settings folder, Haiku may not behave properly! Are you sure you want to do this? To %action the settings folder anyway, click \"Do it\".	FSUtils		Якщо ви %action директорію настройок, Haiku може поводитися неправильно! Ви впевнені що хочете це зробити? Для того щоб %action все одно, натисніть \"Зроби це\".
+move	FSUtils		перемістити
+parent folder	NavMenu		батьківська папка
+contains	FindPanel		містить
+Relation	OpenWithWindow		Відношення
+Open	FilePanelPriv		Відкрити
+rename	InfoWindow		переіменувати
+Mount	DeskWindow		Підмонтувати
+Mount	ContainerWindow		Підмонтувати
+%capacity (%used used -- %free free)	InfoWindow		%capacity (%used викор. -- %free вільно)
+Cancel	FSClipBoard		Відмінити
+Cut more	ContainerWindow		Вирізати ще
+Deleting: 	StatusWindow		Видалення:
+Empty Trash	InfoWindow		Очистити Кошик
+Add	FindPanel		Додати
