@@ -2269,6 +2269,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 			fCurrentView->ConvertToScreenForDrawing(&rect);
 			fCurrentView->ConvertToScreenForDrawing(gradient);
 			drawingEngine->FillRect(rect, *gradient);
+			delete gradient;
 			break;
 		}
 		case AS_VIEW_DRAW_BITMAP:
@@ -2341,6 +2342,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 			fCurrentView->ConvertToScreenForDrawing(&r);
 			fCurrentView->ConvertToScreenForDrawing(gradient);
 			drawingEngine->FillArc(r, angle, span, *gradient);
+			delete gradient;
 			break;
 		}
 		case AS_STROKE_BEZIER:
@@ -2376,6 +2378,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 				break;
 			fCurrentView->ConvertToScreenForDrawing(gradient);
 			drawingEngine->FillBezier(pts, *gradient);
+			delete gradient;
 			break;
 		}
 		case AS_STROKE_ELLIPSE:
@@ -2405,6 +2408,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 			fCurrentView->ConvertToScreenForDrawing(&rect);
 			fCurrentView->ConvertToScreenForDrawing(gradient);
 			drawingEngine->FillEllipse(rect, *gradient);
+			delete gradient;
 			break;
 		}
 		case AS_STROKE_ROUNDRECT:
@@ -2441,6 +2445,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 			fCurrentView->ConvertToScreenForDrawing(&rect);
 			fCurrentView->ConvertToScreenForDrawing(gradient);
 			drawingEngine->FillRoundRect(rect, xrad, yrad, *gradient);
+			delete gradient;
 			break;
 		}
 		case AS_STROKE_TRIANGLE:
@@ -2482,6 +2487,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 			fCurrentView->ConvertToScreenForDrawing(&rect);
 			fCurrentView->ConvertToScreenForDrawing(gradient);
 			drawingEngine->FillTriangle(pts, rect, *gradient);
+			delete gradient;
 			break;
 		}
 		case AS_STROKE_POLYGON:
@@ -2524,8 +2530,8 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 
 			BPoint* pointList = new(nothrow) BPoint[pointCount];
 			BGradient* gradient;
-			if (link.Read(pointList, pointCount * sizeof(BPoint)) >= B_OK
-				&& link.ReadGradient(&gradient) >= B_OK) {
+			if (link.Read(pointList, pointCount * sizeof(BPoint)) == B_OK
+				&& link.ReadGradient(&gradient) == B_OK) {
 				for (int32 i = 0; i < pointCount; i++)
 					fCurrentView->ConvertToScreenForDrawing(&pointList[i]);
 				fCurrentView->ConvertToScreenForDrawing(&polyFrame);
@@ -2533,6 +2539,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 
 				drawingEngine->FillPolygon(pointList, pointCount,
 					polyFrame, *gradient, isClosed && pointCount > 2);
+				delete gradient;
 			}
 			delete[] pointList;
 			break;
@@ -2590,9 +2597,9 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 			uint32* opList = new(nothrow) uint32[opCount];
 			BPoint* ptList = new(nothrow) BPoint[ptCount];
 			BGradient* gradient;
-			if (link.Read(opList, opCount * sizeof(uint32)) >= B_OK
-				&& link.Read(ptList, ptCount * sizeof(BPoint)) >= B_OK
-				&& link.ReadGradient(&gradient) >= B_OK) {
+			if (link.Read(opList, opCount * sizeof(uint32)) == B_OK
+				&& link.Read(ptList, ptCount * sizeof(BPoint)) == B_OK
+				&& link.ReadGradient(&gradient) == B_OK) {
 
 				// this might seem a bit weird, but under R5, the shapes
 				// are always offset by the current pen location
@@ -2606,6 +2613,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 				drawingEngine->FillShape(shapeFrame, opCount, opList,
 					ptCount, ptList, *gradient, screenOffset,
 					fCurrentView->Scale());
+				delete gradient;
 			}
 
 			delete[] opList;
@@ -2640,6 +2648,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 			fCurrentView->ConvertToScreenForDrawing(&region);
 			fCurrentView->ConvertToScreenForDrawing(gradient);
 			drawingEngine->FillRegion(region, *gradient);
+			delete gradient;
 			break;
 		}
 		case AS_STROKE_LINEARRAY:
