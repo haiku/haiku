@@ -1,15 +1,28 @@
-1	finnish	x-vnd.Haiku-JPEGTranslator	2665676859
-libjpeg encountered a critical error (caught C++ exception).\n	JPEGTranslator		libjpeg kohtasi kriittisen virheen (siepattu C++-poikkeus).\n
+1	finnish	x-vnd.Haiku-JPEGTranslator	1834097482
 JPEG Library Error: %s\n	be_jerror		JPEG-kirjastovirhe: %s\n
 ISO	exit_parser		ISO
 Low	JPEGTranslator		Alhainen
 ExposureTime	exit_parser		Valotusaika
 Orientation	exit_parser		Suuntaus
 None	JPEGTranslator		Ei mikään
-From Type: Jpeg uses unknown color type\n	JPEGTranslator		Tyypistä: Jpeg käyttää tuntematonta värityyppiä\n
 High	JPEGTranslator		Korkea
-Wrong type: Color space not implemented.\n	JPEGTranslator		Väärä tyyppi: Väritila ei ole toteutettu.\n
 Model	exit_parser		Malli
 JPEG Library Warning: %s\n	be_jerror		JPEG-kirjastovaroitus: %s\n
 Maker	exit_parser		Tekijä
-From Type: Jpeg uses hmm... i don't know really :(\n	JPEGTranslator		Tyypistä: Jpeg käyttää hmm... en todella tiedä :(\n
+Output quality	JPEGTranslator		Tulostuslaatu
+with \"lossless\" encoding support patch by Ken Murchison\n	JPEGTranslator		Ken Murchisonin ”häviötön”-koodaustukikorjauksella\n
+JPEG images	JPEGTranslator		JPEG-kuvat
+Prevent colors 'washing out'	JPEGTranslator		Estää värejä ’huuhtoutumasta pois’
+Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Käytä CMYK-koodia mustepeitolla 0...100 %
+About	JPEGTranslator		Ohjelmasta
+With some colorspace conversion routines by Magnus Hellman\n	JPEGTranslator		Joillakin Magnus Hellmanin väritilamuunnosrutiineilla\n
+Make file smaller (sligthtly worse quality)	JPEGTranslator		Tee tiedosto pienemmäksi (lievästi huononnettu laatu)
+Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Be-bittikarttamuoto (JPEG-muunnin)
+Show warning messages	JPEGTranslator		Näytä varoitussanomat
+Output smoothing strength	JPEGTranslator		Tulostuskiillotusvoimakkuus
+Based on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n	JPEGTranslator		Perustuu IJG-kirjastoon © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n
+Write	JPEGTranslator		Kirjoita
+Write black-and-white images as RGB24	JPEGTranslator		Kirjoita mustavalkoisia kuvia RGB24-väreinä
+Read greyscale images as RGB32	JPEGTranslator		Lue harmaaskaalavärejä RGB32-väreinä
+Read	JPEGTranslator		Lue
+Use progressive compression	JPEGTranslator		Käytä progressiivista tiivistystä

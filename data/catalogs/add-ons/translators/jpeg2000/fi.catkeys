@@ -1,9 +1,6 @@
-1	finnish	x-vnd.Haiku-JPEG2000Translator	965699950
-32 from gray8	JPEG2000Translator		32 väritilasta gray8
-Color space YCBCR not implemented yet.\n	JPEG2000Translator		Väritilaa YCBCR ei ole vielä toteutettu.\n
+1	finnish	x-vnd.Haiku-JPEG2000Translator	496980629
 Write	JPEG2000Translator		Kirjoita
 JPEG2000 images	JPEG2000Translator		JPEG2000-kuvat
-Color space unknown. \n	JPEG2000Translator		Tuntematon väritila. \n
 Based on JasPer library:	JPEG2000Translator		Perustuu JasPer-kirjastoon:
 Output only codestream (.jpc)	JPEG2000Translator		Tulosta vain koodivirta (.jpc)
 Write black-and-white images as RGB24	JPEG2000Translator		Kirjoita mustavalkoiset kuvat RGB24-kuvina
@@ -12,13 +9,8 @@ Output quality	JPEG2000Translator		Tulostuslaatu
 Read	JPEG2000Translator		Lue
 1999-2000, Image Power, Inc. and	JPEG2000Translator		1999-2000, Image Power, Inc. ja
 ImageMagick's jp2 codec was used as \"tutorial\".	JPEG2000Translator		ImageMagick:n jp2-koodekkia käytettiin ”tutorial”-oppikurssina.
-quality	JPEG2000Translator		laatu
 Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Be-bittikarttamuoto (JPEG2000-muunnin)
-Other than RGB with 3 or 4 color components not implemented.\n	JPEG2000Translator		Muita kuin RGB kolmella tai neljällä värikomponentilla ei ole toteutettu.\n
-24 from gray1	JPEG2000Translator		24 väritilasta gray1
 Low	JPEG2000Translator		Matala
-jpc	JPEG2000Translator		jpc
-Unknown color space.\n	JPEG2000Translator		Tuntematon väritila.\n
 About	JPEG2000Translator		Ohjelmasta
 High	JPEG2000Translator		Korkea
 Read greyscale images as RGB32	JPEG2000Translator		Lue harmaaväriskaalakuvat RGB32-kuvina
