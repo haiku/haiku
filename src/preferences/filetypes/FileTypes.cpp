@@ -122,6 +122,8 @@ Settings::_SetDefaults()
 	fMessage.AddRect("app_types_frame", BRect(100.0f, 100.0f, 540.0f, 480.0f));
 	fMessage.AddBool("show_icons", true);
 	fMessage.AddBool("show_rule", false);
+	fMessage.AddFloat("left_split_weight", 0.2);
+	fMessage.AddFloat("right_split_weight", 0.8);
 }
 
 
@@ -155,6 +157,12 @@ Settings::UpdateFrom(BMessage *message)
 	bool showRule;
 	if (message->FindBool("show_rule", &showRule) == B_OK)
 		fMessage.ReplaceBool("show_rule", showRule);
+
+	float splitWeight;
+	if (message->FindFloat("left_split_weight", &splitWeight) == B_OK)
+		fMessage.ReplaceFloat("left_split_weight", splitWeight);
+	if (message->FindFloat("right_split_weight", &splitWeight) == B_OK)
+		fMessage.ReplaceFloat("right_split_weight", splitWeight);
 
 	fUpdated = true;
 }

@@ -16,6 +16,7 @@ class BListView;
 class BMenuField;
 class BMimeType;
 class BOutlineListView;
+class BSplitView;
 class BTextControl;
 
 class AttributeListView;
@@ -46,6 +47,8 @@ class FileTypesWindow : public BWindow {
 
 	private:
 		BMimeType		fCurrentType;
+
+		BSplitView*		fMainSplitView;
 
 		MimeTypeListView* fTypeListView;
 		BButton*		fRemoveTypeButton;

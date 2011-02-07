@@ -501,31 +501,44 @@ FileTypesWindow::FileTypesWindow(const BMessage& settings)
 		.SetInsets(padding, padding, padding, padding)
 		.View());
 
+	fMainSplitView = new BSplitView(B_HORIZONTAL, floorf(padding / 2));
+
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.SetInsets(0, 0, 0, 0)
 		.Add(menuBar)
-		.AddGroup(B_HORIZONTAL, padding)
+		.AddGroup(B_HORIZONTAL, 0)
 			.SetInsets(padding, padding, padding, padding)
-			.AddGroup(B_VERTICAL, padding)
-				.Add(typeListScrollView)
-				.AddGroup(B_HORIZONTAL, padding)
-					.Add(addTypeButton)
-					.Add(fRemoveTypeButton)
-					.AddGlue()
+			.AddSplit(fMainSplitView)
+				.AddGroup(B_VERTICAL, padding)
+					.Add(typeListScrollView)
+					.AddGroup(B_HORIZONTAL, padding)
+						.Add(addTypeButton)
+						.Add(fRemoveTypeButton)
+						.AddGlue()
+						.End()
 					.End()
-				.End()
-			// Right side
-			.AddGroup(B_VERTICAL, padding)
-				.AddGroup(B_HORIZONTAL, padding)
-					.Add(fIconBox, 1)
-					.Add(fRecognitionBox, 3)
-					.End()
-				.Add(fDescriptionBox)
-				.Add(fPreferredBox)
-				.Add(fAttributeBox, 5);
+				// Right side
+				.AddGroup(B_VERTICAL, padding)
+					.AddGroup(B_HORIZONTAL, padding)
+						.Add(fIconBox, 1)
+						.Add(fRecognitionBox, 3)
+						.End()
+					.Add(fDescriptionBox)
+					.Add(fPreferredBox)
+					.Add(fAttributeBox, 5);
 
 	_SetType(NULL);
 	_ShowSnifferRule(showRule);
+
+	float leftWeight;
+	float rightWeight;
+	if (settings.FindFloat("left_split_weight", &leftWeight) != B_OK
+		|| settings.FindFloat("right_split_weight", &rightWeight) != B_OK) {
+		leftWeight = 0.2;
+		rightWeight = 1.0 - leftWeight;
+	}
+	fMainSplitView->SetItemWeight(0, leftWeight, false);
+	fMainSplitView->SetItemWeight(1, rightWeight, true);
 
 	BMimeType::StartWatching(this);
 }
@@ -1055,8 +1068,9 @@ FileTypesWindow::MessageReceived(BMessage* message)
 
 				if (which == B_MIME_TYPE_DELETED
 					|| which == B_SUPPORTED_TYPES_CHANGED
-					|| which == B_PREFERRED_APP_CHANGED)
+					|| which == B_PREFERRED_APP_CHANGED) {
 					_UpdatePreferredApps(&fCurrentType);
+				}
 			}
 			break;
 		}
@@ -1072,6 +1086,8 @@ FileTypesWindow::QuitRequested()
 {
 	BMessage update(kMsgSettingsChanged);
 	update.AddRect("file_types_frame", Frame());
+	update.AddFloat("left_split_weight", fMainSplitView->ItemWeight(0L));
+	update.AddFloat("right_split_weight", fMainSplitView->ItemWeight(1));
 	be_app_messenger.SendMessage(&update);
 
 	be_app->PostMessage(kMsgTypesWindowClosed);
