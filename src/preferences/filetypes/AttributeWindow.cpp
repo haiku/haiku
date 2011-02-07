@@ -43,20 +43,6 @@ const uint32 kMsgAlignmentChosen = 'alnc';
 const uint32 kMsgAccept = 'acpt';
 
 
-static int
-compare_attributes(const void* _a, const void* _b)
-{
-	AttributeItem* a = *(AttributeItem **)_a;
-	AttributeItem* b = *(AttributeItem **)_b;
-
-	int compare = strcasecmp(a->PublicName(), b->PublicName());
-	if (compare != 0)
-		return compare;
-
-	return strcmp(a->Name(), b->Name());
-}
-
-
 static bool
 compare_display_as(const char* a, const char* b)
 {
@@ -444,7 +430,6 @@ AttributeWindow::MessageReceived(BMessage* message)
 				BList list;
 
 				const char* newAttribute = fAttributeControl->Text();
-				list.AddItem(_NewItemFromCurrent());
 
 				const char* attribute;
 				for (int32 i = 0; attributes.FindString("attr:name", i,
@@ -460,7 +445,7 @@ AttributeWindow::MessageReceived(BMessage* message)
 						list.AddItem(item);
 				}
 
-				list.SortItems(compare_attributes);
+				list.AddItem(_NewItemFromCurrent());
 
 				// Copy them to a new message (their memory is still part of the
 				// original BMessage)
@@ -483,9 +468,10 @@ AttributeWindow::MessageReceived(BMessage* message)
 				status = fMimeType.SetAttrInfo(&newAttributes);
 			}
 
-			if (status != B_OK)
+			if (status != B_OK) {
 				error_alert(B_TRANSLATE("Could not change attributes"),
 					status);
+			}
 
 			PostMessage(B_QUIT_REQUESTED);
 			break;
