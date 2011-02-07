@@ -8,6 +8,8 @@
 
 #include <stdio.h>
 
+#include <ObjectList.h>
+
 
 const struct type_map kTypeMap[] = {
 	{"String",			B_STRING_TYPE},
@@ -269,7 +271,15 @@ AttributeListView::_DeleteItems()
 void
 AttributeListView::SetTo(BMimeType* type)
 {
-	_DeleteItems();
+	AttributeItem selectedItem;
+	if (CurrentSelection(0) >= 0)
+		selectedItem = *(AttributeItem*)ItemAt(CurrentSelection(0));
+
+	// Remove the current items but remember them for now. Also remember
+	// the currently selected item.
+	BObjectList<AttributeItem> previousItems(CountItems(), true);
+	while (AttributeItem* item = (AttributeItem*)RemoveItem(0L))
+		previousItems.AddItem(item);
 
 	// fill it again
 
@@ -282,8 +292,62 @@ AttributeListView::SetTo(BMimeType* type)
 
 	AttributeItem* item;
 	int32 i = 0;
-	while ((item = create_attribute_item(attributes, i++)) != NULL) {
+	while ((item = create_attribute_item(attributes, i++)) != NULL)
 		AddItem(item);
+
+	// Maybe all the items are the same, except for one item. That
+	// attribute probably just got added. We should select it so the user
+	// can better follow what's going on. The problem we are solving by
+	// doing it this way is that updates to the MIME database are very
+	// asynchronous. Most likely we have created the new attribute ourselves,
+	// but the notification comes so late, we can't know for sure.
+	if (CountItems() == previousItems.CountItems() + 1) {
+		// First try to make sure that every previous item is there again.
+		bool allPreviousItemsFound = true;
+		for (i = previousItems.CountItems() - 1; i >= 0; i--) {
+			bool previousItemFound = false;
+			for (int32 j = CountItems() - 1; j >= 0; j--) {
+				item = (AttributeItem*)ItemAt(j);
+				if (*item == *previousItems.ItemAt(i)) {
+					previousItemFound = true;
+					break;
+				}
+			}
+			if (!previousItemFound) {
+				allPreviousItemsFound = false;
+				break;
+			}
+		}
+		if (allPreviousItemsFound) {
+			for (i = CountItems() - 1; i >= 0; i--) {
+				item = (AttributeItem*)ItemAt(i);
+				bool foundNewItem = false;
+				for (int32 j = previousItems.CountItems() - 1; j >= 0; j--) {
+					if (*item != *previousItems.ItemAt(j)) {
+						foundNewItem = true;
+						break;
+					}
+				}
+				if (foundNewItem) {
+					Select(i);
+					ScrollToSelection();
+					break;
+				}
+			}
+		}
+	} else {
+		// Try to re-selected a previously selected item, if it's the exact
+		// same attribute. This helps not loosing the selection, since changes
+		// to the model are followed by completely rebuilding the list all the
+		// time.
+		for (i = CountItems() - 1; i >= 0; i--) {
+			item = (AttributeItem*)ItemAt(i);
+			if (*item == selectedItem) {
+				Select(i);
+				ScrollToSelection();
+				break;
+			}
+		}
 	}
 }
 
