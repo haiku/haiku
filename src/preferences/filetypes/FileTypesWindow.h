@@ -44,6 +44,7 @@ class FileTypesWindow : public BWindow {
 		void _UpdatePreferredApps(BMimeType* type);
 		void _UpdateIcon(BMimeType* type);
 		void _SetType(BMimeType* type, int32 forceUpdate = 0);
+		void _MoveUpAttributeIndex(int32 index);
 
 	private:
 		BMimeType		fCurrentType;
@@ -77,6 +78,8 @@ class FileTypesWindow : public BWindow {
 		AttributeListView* fAttributeListView;
 		BButton*		fAddAttributeButton;
 		BButton*		fRemoveAttributeButton;
+		BButton*		fMoveUpAttributeButton;
+		BButton*		fMoveDownAttributeButton;
 
 		BWindow*		fNewTypeWindow;
 };

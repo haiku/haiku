@@ -66,6 +66,8 @@ const uint32 kMsgAttributeSelected = 'atrs';
 const uint32 kMsgAttributeInvoked = 'atri';
 const uint32 kMsgAddAttribute = 'aatr';
 const uint32 kMsgRemoveAttribute = 'ratr';
+const uint32 kMsgMoveUpAttribute = 'muat';
+const uint32 kMsgMoveDownAttribute = 'mdat';
 
 const uint32 kMsgPreferredAppChosen = 'papc';
 const uint32 kMsgSelectPreferredApp = 'slpa';
@@ -79,6 +81,19 @@ const uint32 kMsgDescriptionEntered = 'dsce';
 
 const uint32 kMsgToggleIcons = 'tgic';
 const uint32 kMsgToggleRule = 'tgrl';
+
+
+static const char* kAttributeNames[] = {
+	"attr:public_name",
+	"attr:name",
+	"attr:type",
+	"attr:editable",
+	"attr:viewable",
+	"attr:extra",
+	"attr:alignment",
+	"attr:width",
+	"attr:display_as"
+};
 
 
 class TypeIconView : public IconView {
@@ -484,6 +499,17 @@ FileTypesWindow::FileTypesWindow(const BMessage& settings)
 
 	fRemoveAttributeButton = new BButton("remove attr", B_TRANSLATE("Remove"),
 		new BMessage(kMsgRemoveAttribute));
+	fRemoveAttributeButton->SetExplicitMaxSize(
+		BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+
+	fMoveUpAttributeButton = new BButton("move up attr", B_TRANSLATE("Move up"),
+		new BMessage(kMsgMoveUpAttribute));
+	fMoveUpAttributeButton->SetExplicitMaxSize(
+		BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+	fMoveDownAttributeButton = new BButton("move down attr",
+		B_TRANSLATE("Move down"), new BMessage(kMsgMoveDownAttribute));
+	fMoveDownAttributeButton->SetExplicitMaxSize(
+		BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
 	fAttributeListView = new AttributeListView("listview attr");
 	fAttributeListView->SetSelectionMessage(
@@ -494,12 +520,18 @@ FileTypesWindow::FileTypesWindow(const BMessage& settings)
 	BScrollView* attributesScroller = new BScrollView("scrollview attr",
 		fAttributeListView, B_FRAME_EVENTS | B_WILL_DRAW, false, true);
 
-	fAttributeBox->AddChild(BGridLayoutBuilder(padding, padding / 2)
-		.Add(attributesScroller, 0, 0, 2, 3)
-		.Add(fAddAttributeButton, 2, 0)
-		.Add(fRemoveAttributeButton, 2, 1)
+	fAttributeBox->AddChild(BGroupLayoutBuilder(B_HORIZONTAL, padding)
+		.Add(attributesScroller, 1.0f)
+		.AddGroup(B_VERTICAL, padding / 2, 0.0f)
+			.Add(fAddAttributeButton)
+			.Add(fRemoveAttributeButton)
+			.AddStrut(padding)
+			.Add(fMoveUpAttributeButton)
+			.Add(fMoveDownAttributeButton)
+			.AddGlue()
+		.End()
 		.SetInsets(padding, padding, padding, padding)
-		.View());
+		.TopView());
 
 	fMainSplitView = new BSplitView(B_HORIZONTAL, floorf(padding / 2));
 
@@ -726,6 +758,66 @@ FileTypesWindow::_SetType(BMimeType* type, int32 forceUpdate)
 
 	fAddAttributeButton->SetEnabled(enabled);
 	fRemoveAttributeButton->SetEnabled(false);
+	fMoveUpAttributeButton->SetEnabled(false);
+	fMoveDownAttributeButton->SetEnabled(false);
+}
+
+
+void
+FileTypesWindow::_MoveUpAttributeIndex(int32 index)
+{
+	BMessage attributes;
+	if (fCurrentType.GetAttrInfo(&attributes) != B_OK)
+		return;
+
+	// Iterate over all known attribute fields, and for each field,
+	// iterate over all fields of the same name and build a copy
+	// of the attributes message with the field at the given index swapped
+	// with the previous field.
+	BMessage resortedAttributes;
+	for (uint32 i = 0; i <
+			sizeof(kAttributeNames) / sizeof(kAttributeNames[0]);
+			i++) {
+
+		type_code type;
+		int32 count;
+		bool isFixedSize;
+		if (attributes.GetInfo(kAttributeNames[i], &type, &count,
+				&isFixedSize) != B_OK) {
+			// Apparently the message does not contain this name,
+			// so just ignore this attribute name.
+			// NOTE: This shows that the attribute description is
+			// too fragile. It would have been better to pack each
+			// attribute description into a separate BMessage. 
+			continue;
+		}
+
+		for (int32 j = 0; j < count; j++) {
+			const void* data;
+			ssize_t size;
+			int32 originalIndex;
+			if (j == index - 1)
+				originalIndex = j + 1;
+			else if (j == index)
+				originalIndex = j - 1;
+			else
+				originalIndex = j; 
+			attributes.FindData(kAttributeNames[i], type,
+				originalIndex, &data, &size);
+			if (j == 0) {
+				resortedAttributes.AddData(kAttributeNames[i], type,
+					data, size, isFixedSize);
+			} else {
+				resortedAttributes.AddData(kAttributeNames[i], type,
+					data, size);
+			}
+		}
+	}
+
+	// Setting it directly on the type will trigger an update of the GUI as
+	// well. TODO: FileTypes is heavily descructive, it should use an
+	// Undo/Redo stack.
+	fCurrentType.SetAttrInfo(&resortedAttributes);
 }
 
 
@@ -989,6 +1081,9 @@ FileTypesWindow::MessageReceived(BMessage* message)
 				AttributeItem* item
 					= (AttributeItem*)fAttributeListView->ItemAt(index);
 				fRemoveAttributeButton->SetEnabled(item != NULL);
+				fMoveUpAttributeButton->SetEnabled(index > 0);
+				fMoveDownAttributeButton->SetEnabled(index >= 0
+					&& index < fAttributeListView->CountItems() - 1);
 			}
 			break;
 		}
@@ -1030,12 +1125,6 @@ FileTypesWindow::MessageReceived(BMessage* message)
 
 			BMessage attributes;
 			if (fCurrentType.GetAttrInfo(&attributes) == B_OK) {
-				const char* kAttributeNames[] = {
-					"attr:public_name", "attr:name", "attr:type",
-					"attr:editable", "attr:viewable", "attr:extra",
-					"attr:alignment", "attr:width", "attr:display_as"
-				};
-
 				for (uint32 i = 0; i <
 						sizeof(kAttributeNames) / sizeof(kAttributeNames[0]);
 						i++) {
@@ -1044,6 +1133,28 @@ FileTypesWindow::MessageReceived(BMessage* message)
 
 				fCurrentType.SetAttrInfo(&attributes);
 			}
+			break;
+		}
+
+		case kMsgMoveUpAttribute:
+		{
+			int32 index = fAttributeListView->CurrentSelection();
+			if (index < 1 || fCurrentType.Type() == NULL)
+				break;
+
+			_MoveUpAttributeIndex(index);
+			break;
+		}
+
+		case kMsgMoveDownAttribute:
+		{
+			int32 index = fAttributeListView->CurrentSelection();
+			if (index < 0 || index == fAttributeListView->CountItems() - 1
+				|| fCurrentType.Type() == NULL) {
+				break;
+			}
+
+			_MoveUpAttributeIndex(index + 1);
 			break;
 		}
 
