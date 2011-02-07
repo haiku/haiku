@@ -6,6 +6,8 @@
 #define _PACKAGE__HPKG__PRIVATE__STRINGS_H_
 
 
+#include <new>
+
 #include <util/OpenHashTable.h>
 
 
@@ -83,6 +85,15 @@ struct CachedStringUsageGreater {
 	{
 		return a->usageCount > b->usageCount;
 	}
+};
+
+
+struct StringCache : public CachedStringTable {
+	StringCache();
+	~StringCache();
+
+	CachedString* Get(const char* value);
+
 };
 
 

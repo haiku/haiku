@@ -63,12 +63,14 @@ public:
 			uncompressedTOCSize);
 	}
 
-	virtual void OnPackageAttributesSizeInfo(uint32 uncompressedSize)
+	virtual void OnPackageAttributesSizeInfo(uint32 stringCount,
+		uint32 uncompressedSize)
 	{
 		if (fQuiet || !fVerbose)
 			return;
 
 		printf("----- Package Attribute Info -----\n");
+		printf("string count:            %10ld\n", stringCount);
 		printf("package attributes size: %10ld (uncompressed)\n",
 			uncompressedSize);
 	}

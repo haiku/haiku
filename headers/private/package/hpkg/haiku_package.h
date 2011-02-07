@@ -29,6 +29,8 @@ struct hpkg_header {
 	uint32	attributes_compression;
 	uint32	attributes_length_compressed;
 	uint32	attributes_length_uncompressed;
+	uint32	attributes_strings_length;
+	uint32	attributes_strings_count;
 
 	// TOC section
 	uint32	toc_compression;

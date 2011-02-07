@@ -65,17 +65,22 @@ private:
 				uint8*			data;
 				uint64			offset;
 				uint64			currentOffset;
+				uint64			stringsLength;
+				uint64			stringsCount;
+				char**			strings;
 				const char*		name;
 
 				SectionInfo(const char* _name)
 					:
 					data(NULL),
+					strings(NULL),
 					name(_name)
 				{
 				}
 
 				~SectionInfo()
 				{
+					delete[] strings;
 					delete[] data;
 				}
 			};
@@ -90,7 +95,8 @@ private:
 									const SectionInfo& section) const;
 
 			status_t			_ParseTOCAttributeTypes();
-			status_t			_ParseTOCStrings();
+
+			status_t			_ParseStrings();
 
 			status_t			_ParseContent(AttributeHandlerContext* context,
 									AttributeHandler* rootAttributeHandler);
@@ -153,15 +159,12 @@ private:
 
 			uint64				fTOCAttributeTypesLength;
 			uint64				fTOCAttributeTypesCount;
-			uint64				fTOCStringsLength;
-			uint64				fTOCStringsCount;
 
 			SectionInfo			fTOCSection;
 			SectionInfo			fPackageAttributesSection;
 			SectionInfo*		fCurrentSection;
 
 			AttributeTypeReference* fAttributeTypes;
-			char**				fStrings;
 
 			AttributeHandlerList* fAttributeHandlerStack;
 

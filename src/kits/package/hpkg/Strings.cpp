@@ -34,6 +34,42 @@ hash_string(const char* string)
 }
 
 
+StringCache::StringCache()
+{
+}
+
+
+StringCache::~StringCache()
+{
+	CachedString* cachedString = Clear(true);
+	while (cachedString != NULL) {
+		CachedString* next = cachedString->next;
+		delete cachedString;
+		cachedString = next;
+	}
+}
+
+
+CachedString*
+StringCache::Get(const char* value)
+{
+	CachedString* string = Lookup(value);
+	if (string != NULL) {
+		string->usageCount++;
+		return string;
+	}
+
+	string = new CachedString;
+	if (!string->Init(value)) {
+		delete string;
+		throw std::bad_alloc();
+	}
+
+	Insert(string);
+	return string;
+}
+
+
 }	// namespace BPrivate
 
 }	// namespace BHPKG

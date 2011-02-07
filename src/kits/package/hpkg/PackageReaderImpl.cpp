@@ -620,7 +620,6 @@ PackageReaderImpl::PackageReaderImpl(BErrorOutput* errorOutput)
 	fPackageAttributesSection("package attributes section"),
 	fCurrentSection(NULL),
 	fAttributeTypes(NULL),
-	fStrings(NULL),
 	fScratchBuffer(NULL),
 	fScratchBufferSize(0)
 {
@@ -633,7 +632,6 @@ PackageReaderImpl::~PackageReaderImpl()
 		close(fFD);
 
 	delete[] fScratchBuffer;
-	delete[] fStrings;
 	delete[] fAttributeTypes;
 }
 
@@ -713,6 +711,10 @@ PackageReaderImpl::Init(int fd, bool keepFD)
 		= B_BENDIAN_TO_HOST_INT32(header.attributes_length_compressed);
 	fPackageAttributesSection.uncompressedLength
 		= B_BENDIAN_TO_HOST_INT32(header.attributes_length_uncompressed);
+	fPackageAttributesSection.stringsLength
+		= B_BENDIAN_TO_HOST_INT32(header.attributes_strings_length);
+	fPackageAttributesSection.stringsCount
+		= B_BENDIAN_TO_HOST_INT32(header.attributes_strings_count);
 
 	if (const char* errorString = _CheckCompression(
 		fPackageAttributesSection)) {
@@ -739,14 +741,16 @@ PackageReaderImpl::Init(int fd, bool keepFD)
 		= B_BENDIAN_TO_HOST_INT64(header.toc_attribute_types_length);
 	fTOCAttributeTypesCount
 		= B_BENDIAN_TO_HOST_INT64(header.toc_attribute_types_count);
-	fTOCStringsLength = B_BENDIAN_TO_HOST_INT64(header.toc_strings_length);
-	fTOCStringsCount = B_BENDIAN_TO_HOST_INT64(header.toc_strings_count);
+	fTOCSection.stringsLength
+		= B_BENDIAN_TO_HOST_INT64(header.toc_strings_length);
+	fTOCSection.stringsCount
+		= B_BENDIAN_TO_HOST_INT64(header.toc_strings_count);
 
 	if (fTOCAttributeTypesLength > fTOCSection.uncompressedLength
-		|| fTOCStringsLength
+		|| fTOCSection.stringsLength
 			> fTOCSection.uncompressedLength - fTOCAttributeTypesLength
 		|| fTOCAttributeTypesCount > fTOCAttributeTypesLength
-		|| fTOCStringsCount > fTOCStringsLength) {
+		|| fTOCSection.stringsCount > fTOCSection.stringsLength) {
 		fErrorOutput->PrintError("Error: Invalid package file: Invalid TOC "
 			"subsections description\n");
 		return B_BAD_DATA;
@@ -829,10 +833,10 @@ PackageReaderImpl::Init(int fd, bool keepFD)
 	fCurrentSection->currentOffset += fTOCAttributeTypesLength;
 
 	// strings
-	error = _ParseTOCStrings();
+	error = _ParseStrings();
 	if (error != B_OK)
 		return error;
-	fCurrentSection->currentOffset += fTOCStringsLength;
+	fCurrentSection->currentOffset += fCurrentSection->stringsLength;
 
 	return B_OK;
 }
@@ -850,6 +854,12 @@ PackageReaderImpl::ParseContent(BPackageContentHandler* contentHandler)
 
 	fCurrentSection = &fPackageAttributesSection;
 	fCurrentSection->currentOffset = 0;
+
+	// strings
+	status_t error = _ParseStrings();
+	if (error != B_OK)
+		return error;
+	fCurrentSection->currentOffset += fCurrentSection->stringsLength;
 
 	return _ParsePackageAttributes(&context);
 }
@@ -916,7 +926,6 @@ PackageReaderImpl::_ParseTOCAttributeTypes()
 			if (position + 1 != sectionEnd) {
 				fErrorOutput->PrintError("Error: Excess bytes in TOC attribute "
 					"types section\n");
-TRACE("position: %p, sectionEnd: %p\n", position, sectionEnd);
 				return B_BAD_DATA;
 			}
 
@@ -941,28 +950,30 @@ TRACE("position: %p, sectionEnd: %p\n", position, sectionEnd);
 		fAttributeTypes[index].type = type;
 		fAttributeTypes[index].standardIndex = _GetStandardIndex(type);
 		index++;
-TRACE("type: %u, \"%s\"\n", type->type, type->name);
 	}
 }
 
 
 status_t
-PackageReaderImpl::_ParseTOCStrings()
+PackageReaderImpl::_ParseStrings()
 {
 	// allocate table
-	fStrings = new(std::nothrow) char*[fTOCStringsCount];
-	if (fStrings == NULL) {
+	fCurrentSection->strings
+		= new(std::nothrow) char*[fCurrentSection->stringsCount];
+	if (fCurrentSection->strings == NULL) {
 		fErrorOutput->PrintError("Error: Out of memory!\n");
 		return B_NO_MEMORY;
 	}
 
 	// parse the section and fill the table
-	char* position = (char*)fTOCSection.data + fTOCSection.currentOffset;
-	char* sectionEnd = position + fTOCStringsLength;
+	char* position
+		= (char*)fCurrentSection->data + fCurrentSection->currentOffset;
+	char* sectionEnd = position + fCurrentSection->stringsLength;
 	uint32 index = 0;
 	while (true) {
 		if (position >= sectionEnd) {
-			fErrorOutput->PrintError("Error: Malformed TOC strings section\n");
+			fErrorOutput->PrintError("Error: Malformed %s strings section\n",
+				fCurrentSection->name);
 			return B_BAD_DATA;
 		}
 
@@ -970,29 +981,31 @@ PackageReaderImpl::_ParseTOCStrings()
 
 		if (stringLength == 0) {
 			if (position + 1 != sectionEnd) {
-				fErrorOutput->PrintError("Error: Excess bytes in TOC strings "
-					"section\n");
-TRACE("position: %p, sectionEnd: %p\n", position, sectionEnd);
+				fErrorOutput->PrintError(
+					"Error: %ld excess bytes in %s strings section\n",
+					sectionEnd - (position + 1), fCurrentSection->name);
 				return B_BAD_DATA;
 			}
 
-			if (index != fTOCStringsCount) {
-				fErrorOutput->PrintError("Error: Invalid TOC strings section: "
-					"Less strings than specified in the header\n");
+			if (index != fCurrentSection->stringsCount) {
+				fErrorOutput->PrintError("Error: Invalid %s strings section: "
+					"Less strings (%lld) than specified in the header (%lld)\n",
+					fCurrentSection->name, index,
+					fCurrentSection->stringsCount);
 				return B_BAD_DATA;
 			}
 
 			return B_OK;
 		}
 
-		if (index >= fTOCStringsCount) {
-			fErrorOutput->PrintError("Error: Invalid TOC strings section: "
-				"More strings than specified in the header\n");
+		if (index >= fCurrentSection->stringsCount) {
+			fErrorOutput->PrintError("Error: Invalid %s strings section: "
+				"More strings (%lld) than specified in the header (%lld)\n",
+				fCurrentSection->name, index, fCurrentSection->stringsCount);
 			return B_BAD_DATA;
 		}
 
-		fStrings[index++] = position;
-TRACE("string: \"%s\"\n", position);
+		fCurrentSection->strings[index++] = position;
 		position += stringLength + 1;
 	}
 }
@@ -1003,7 +1016,8 @@ PackageReaderImpl::_ParseContent(AttributeHandlerContext* context,
 	AttributeHandler* rootAttributeHandler)
 {
 	// parse the TOC
-	fTOCSection.currentOffset = fTOCAttributeTypesLength + fTOCStringsLength;
+	fTOCSection.currentOffset = fTOCAttributeTypesLength
+		+ fTOCSection.stringsLength;
 
 	// prepare attribute handler context
 	context->heapOffset = fHeapOffset;
@@ -1491,9 +1505,9 @@ PackageReaderImpl::_ReadAttributeValue(uint8 type, uint8 encoding,
 				}
 				default:
 				{
-					fErrorOutput->PrintError("Error: Invalid TOC section: "
-						"invalid encoding %d for int value type %d\n", encoding,
-						type);
+					fErrorOutput->PrintError("Error: Invalid %s section: "
+						"invalid encoding %d for int value type %d\n",
+						fCurrentSection->name, encoding, type);
 					return B_BAD_VALUE;
 				}
 			}
@@ -1517,13 +1531,15 @@ PackageReaderImpl::_ReadAttributeValue(uint8 type, uint8 encoding,
 				if (error != B_OK)
 					return error;
 
-				if (index > fTOCStringsCount) {
-					fErrorOutput->PrintError("Error: Invalid TOC section: "
-						"string reference out of bounds\n");
+				if (index > fCurrentSection->stringsCount) {
+					fErrorOutput->PrintError("Error: Invalid %s section: "
+						"string reference (%lld) out of bounds (%lld)\n",
+						fCurrentSection->name, index,
+						fCurrentSection->stringsCount);
 					return B_BAD_DATA;
 				}
 
-				_value.SetTo(fStrings[index]);
+				_value.SetTo(fCurrentSection->strings[index]);
 			} else if (encoding == B_HPKG_ATTRIBUTE_ENCODING_STRING_INLINE) {
 				const char* string;
 				status_t error = _ReadString(string);
@@ -1532,8 +1548,8 @@ PackageReaderImpl::_ReadAttributeValue(uint8 type, uint8 encoding,
 
 				_value.SetTo(string);
 			} else {
-				fErrorOutput->PrintError("Error: Invalid TOC section: invalid "
-					"string encoding (%u)\n", encoding);
+				fErrorOutput->PrintError("Error: Invalid %s section: invalid "
+					"string encoding (%u)\n", fCurrentSection->name, encoding);
 				return B_BAD_DATA;
 			}
 
@@ -1554,16 +1570,16 @@ PackageReaderImpl::_ReadAttributeValue(uint8 type, uint8 encoding,
 					return error;
 
 				if (offset > fHeapSize || size > fHeapSize - offset) {
-					fErrorOutput->PrintError("Error: Invalid TOC section: "
-						"invalid data reference\n");
+					fErrorOutput->PrintError("Error: Invalid %s section: "
+						"invalid data reference\n", fCurrentSection->name);
 					return B_BAD_DATA;
 				}
 
 				_value.SetToData(size, fHeapOffset + offset);
 			} else if (encoding == B_HPKG_ATTRIBUTE_ENCODING_RAW_INLINE) {
 				if (size > B_HPKG_MAX_INLINE_DATA_SIZE) {
-					fErrorOutput->PrintError("Error: Invalid TOC section: "
-						"inline data too long\n");
+					fErrorOutput->PrintError("Error: Invalid %s section: "
+						"inline data too long\n", fCurrentSection->name);
 					return B_BAD_DATA;
 				}
 
@@ -1573,8 +1589,8 @@ PackageReaderImpl::_ReadAttributeValue(uint8 type, uint8 encoding,
 					return error;
 				_value.SetToData(size, buffer);
 			} else {
-				fErrorOutput->PrintError("Error: Invalid TOC section: invalid "
-					"raw encoding (%u)\n", encoding);
+				fErrorOutput->PrintError("Error: Invalid %s section: invalid "
+					"raw encoding (%u)\n", fCurrentSection->name, encoding);
 				return B_BAD_DATA;
 			}
 
@@ -1582,8 +1598,8 @@ PackageReaderImpl::_ReadAttributeValue(uint8 type, uint8 encoding,
 		}
 
 		default:
-			fErrorOutput->PrintError("Error: Invalid TOC section: invalid "
-				"value type: %d\n", type);
+			fErrorOutput->PrintError("Error: Invalid %s section: invalid "
+				"value type: %d\n", fCurrentSection->name, type);
 			return B_BAD_DATA;
 	}
 }
