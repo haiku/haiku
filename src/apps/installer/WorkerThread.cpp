@@ -659,12 +659,6 @@ TargetVisitor::Visit(BPartition *partition, int32 level)
 	char label[255];
 	char menuLabel[255];
 	make_partition_label(partition, label, menuLabel, !isValidTarget);
-
-	printf("Partion: \"%s\" : isValidTarget = %s isBootPartition = %s\n",
-		menuLabel, isValidTarget ? "true" : "false",
-		isBootPartition ? "true" : "false");
-
-
 	PartitionMenuItem* item = new PartitionMenuItem(partition->ContentName(),
 		label, menuLabel, new BMessage(TARGET_PARTITION), partition->ID());
 
