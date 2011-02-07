@@ -63,6 +63,8 @@ class BMessage {
 							int32 *countFound = NULL) const;
 		status_t		GetInfo(const char *name, type_code *typeFound,
 							bool *fixedSize) const;
+		status_t		GetInfo(const char *name, type_code *typeFound,
+							int32 *countFound, bool *fixedSize) const;
 
 		int32			CountNames(type_code type) const;
 		bool			IsEmpty() const;
