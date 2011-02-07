@@ -1,14 +1,15 @@
-//--------------------------------------------------------------------
-//	
-//	PeopleView.cpp
-//
-//	Written by: Robert Polic
-//	
-//--------------------------------------------------------------------
 /*
-	Copyright 1999, Be Incorporated.   All Rights Reserved.
-	This file may be used under the terms of the Be Sample Code License.
-*/
+ * Copyright 2010, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT license.
+ *
+ * Authors:
+ *		Robert Polic
+ *		Stephan Aßmus <superstippi@gmx.de>
+ *
+ * Copyright 1999, Be Incorporated.   All Rights Reserved.
+ * This file may be used under the terms of the Be Sample Code License.
+ */
+
 
 #include "PeopleView.h"
 
@@ -29,88 +30,77 @@
 #include <VolumeRoster.h>
 #include <Window.h>
 
-#include "TTextControl.h"
+#include "AttributeTextControl.h"
 
 
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "People"
 
 
-TPeopleView::TPeopleView(const char* name, entry_ref *ref)
+TPeopleView::TPeopleView(const char* name, const char* categoryAttribute,
+		const entry_ref *ref)
 	:
-	BGridView()
+	BGridView(),
+	fControls(20, false),
+	fCategoryAttribute(categoryAttribute)
 {
 	SetName(name);
 	if (ref)
 		fFile = new BFile(ref, O_RDWR);
 	else
 		fFile = NULL;
+
+	float spacing = be_control_look->DefaultItemSpacing();
+	GridLayout()->SetInsets(spacing, spacing, spacing, spacing);
 }
 
 
-TPeopleView::~TPeopleView(void)
+TPeopleView::~TPeopleView()
 {
 	delete fFile;
 }
 
 
 void
-TPeopleView::AttachedToWindow(void)
+TPeopleView::AddAttribute(const char* label, const char* attribute)
 {
+	// TODO: We could check if this attribute has already been added.
+
+	AttributeTextControl* control = new AttributeTextControl(label, attribute);
+	fControls.AddItem(control);
+
 	BGridLayout* layout = GridLayout();
+	int32 row = layout->CountRows();
 
-	int32 row = 0;
-	for (int32 i = 0; gFields[i].attribute; i++, row++) {
-		const char *name = gFields[i].name;
+	if (fCategoryAttribute == attribute) {
+		// Special case the category attribute. The Group popup field will
+		// be added as the label instead.
+		fGroups = new BPopUpMenu(label);
+		fGroups->SetRadioMode(false);
+		BuildGroupMenu();
 
-		if (i == F_NAME)
-			name = B_TRANSLATE("Name");
+		BMenuField* field = new BMenuField("", "", fGroups);
+		field->SetEnabled(true);
+		layout->AddView(field, 0, row);
 
-		char *text = NULL;
-		attr_info info;
-		if (fFile && fFile->GetAttrInfo(gFields[i].attribute, &info) == B_OK) {
-			text = (char *)calloc(info.size, 1);
-			fFile->ReadAttr(gFields[i].attribute, B_STRING_TYPE,
-				0, text, info.size);
-		}
-
-		fField[i] = new TTextControl(name, text);
-		free(text);
-
-		int32 labelColumn = 0;
-		int32 textViewColumn = 1;
-		int32 textViewWidth = 3;
-		if (i == F_STATE)
-			textViewWidth = 1;
-		else if (i == F_ZIP) {
-			row--;
-			labelColumn = 2;
-			textViewColumn = 3;
-			textViewWidth = 1;
-		}
-		
-		if (i != F_GROUP) {
-			layout->AddItem(fField[i]->CreateLabelLayoutItem(),
-				labelColumn, row, 1, 1);
-			layout->AddItem(fField[i]->CreateTextViewLayoutItem(),
-				textViewColumn, row, textViewWidth, 1);
-		} else {
-			fField[i]->SetLabel("");
-			layout->AddView(fField[i], textViewColumn, row, textViewWidth, 1);
-		}
+		control->SetLabel("");
+		layout->AddView(control, 1, row);
+	} else {
+		layout->AddItem(control->CreateLabelLayoutItem(), 0, row);
+		layout->AddItem(control->CreateTextViewLayoutItem(), 1, row);
 	}
 
-	fGroups = new BPopUpMenu(gFields[F_GROUP].name);
-	fGroups->SetRadioMode(false);
-	BMenuField *field = new BMenuField("", "", fGroups);
-	field->SetEnabled(true);
-	layout->AddView(field, 0, --row);
+	SetAttribute(attribute, true);
+}
 
-	float spacing = be_control_look->DefaultItemSpacing();
-	layout->SetSpacing(spacing, spacing);
-		// TODO: remove this after #5614 is fixed
-	layout->SetInsets(spacing, spacing, spacing, spacing);
-	fField[F_NAME]->MakeFocus();
+
+void
+TPeopleView::MakeFocus(bool focus)
+{
+	if (focus && fControls.CountItems() > 0)
+		fControls.ItemAt(0)->MakeFocus();
+	else
+		BView::MakeFocus(focus);
 }
 
 
@@ -123,25 +113,34 @@ TPeopleView::MessageReceived(BMessage* msg)
 			break;
 
 		case M_REVERT:
-			for (int32 loop = 0; loop < F_END; loop++)
-				fField[loop]->Revert();
+			for (int32 i = fControls.CountItems() - 1; i >= 0; i--)
+				fControls.ItemAt(i)->Revert();
 			break;
 
 		case M_SELECT:
-			for (int32 loop = 0; loop < F_END; loop++) {
-				BTextView* text = fField[loop]->TextView();
+			for (int32 i = fControls.CountItems() - 1; i >= 0; i--) {
+				BTextView* text = fControls.ItemAt(i)->TextView();
 				if (text->IsFocus()) {
 					text->Select(0, text->TextLength());
 					break;
 				}
 			}
-			break;		
+			break;
+
+		case M_GROUP_MENU:
+		{
+			const char* name = NULL;
+			if (msg->FindString("group", &name) == B_OK)
+				SetAttribute(fCategoryAttribute, name, false);
+			break;
+		}
+
 	}
 }
 
 
 void
-TPeopleView::BuildGroupMenu(void)
+TPeopleView::BuildGroupMenu()
 {
 	BMenuItem* item;
 	while ((item = fGroups->ItemAt(0)) != NULL) {
@@ -149,7 +148,6 @@ TPeopleView::BuildGroupMenu(void)
 		delete item;
 	}
 
-	const char *groupAttribute = gFields[F_GROUP].attribute;
 	int32 count = 0;
 
 	BVolumeRoster volumeRoster;
@@ -159,7 +157,7 @@ TPeopleView::BuildGroupMenu(void)
 		query.SetVolume(&volume);
 
 		char buffer[256];
-		sprintf(buffer, "%s=*", groupAttribute);
+		snprintf(buffer, sizeof(buffer), "%s=*", fCategoryAttribute.String());
 		query.SetPredicate(buffer);
 		query.Fetch();
 
@@ -169,13 +167,15 @@ TPeopleView::BuildGroupMenu(void)
 			attr_info info;
 
 			if (file.InitCheck() == B_OK
-				&& file.GetAttrInfo(groupAttribute, &info) == B_OK
+				&& file.GetAttrInfo(fCategoryAttribute, &info) == B_OK
 				&& info.size > 1) {
 				if (info.size > sizeof(buffer))
 					info.size = sizeof(buffer);
 
-				if (file.ReadAttr(groupAttribute, B_STRING_TYPE, 0, buffer, info.size) < B_OK)
+				if (file.ReadAttr(fCategoryAttribute.String(), B_STRING_TYPE,
+						0, buffer, info.size) < 0) {
 					continue;
+				}
 
 				const char *text = buffer;
 				while (true) {
@@ -207,39 +207,19 @@ TPeopleView::BuildGroupMenu(void)
 		}
 	}
 
-	if (!count) {
+	if (count == 0) {
 		fGroups->AddItem(item = new BMenuItem(
 			B_TRANSLATE_WITH_CONTEXT("none", "Groups list"), 
 			new BMessage(M_GROUP_MENU)));
 		item->SetEnabled(false);
 	}
-}
 
-
-bool
-TPeopleView::CheckSave(void)
-{
-	for (int32 loop = 0; loop < F_END; loop++) {
-		if (fField[loop]->Changed())
-			return true;
-	}
-
-	return false;
-}
-
-
-const char*
-TPeopleView::GetField(int32 index)
-{
-	if (index < F_END)
-		return fField[index]->Text();
-
-	return NULL;
+	fGroups->SetTargetForItems(this);
 }
 
 
 void
-TPeopleView::NewFile(entry_ref *ref)
+TPeopleView::CreateFile(const entry_ref* ref)
 {
 	delete fFile;
 	fFile = new BFile(ref, B_READ_WRITE);
@@ -247,68 +227,107 @@ TPeopleView::NewFile(entry_ref *ref)
 }
 
 
-void
-TPeopleView::Save(void)
+bool
+TPeopleView::IsSaved() const
 {
-	for (int32 i = 0; gFields[i].attribute; i++) {
-		const char *text = fField[i]->Text();
-		fFile->WriteAttr(gFields[i].attribute, B_STRING_TYPE, 0, text, strlen(text) + 1);
-		fField[i]->Update();
+	for (int32 i = fControls.CountItems() - 1; i >= 0; i--) {
+		if (fControls.ItemAt(i)->HasChanged())
+			return false;
 	}
+
+	return true;
 }
 
 
 void
-TPeopleView::SetField(int32 index, bool update)
+TPeopleView::Save()
 {
-	char *text = NULL;
-	attr_info info;
-	if (fFile && fFile->GetAttrInfo(gFields[index].attribute, &info) == B_OK) {
-		text = (char *)calloc(info.size, 1);
-		fFile->ReadAttr(gFields[index].attribute, B_STRING_TYPE, 0, text,
-			info.size);
+	int32 count = fControls.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		AttributeTextControl* control = fControls.ItemAt(i);
+		const char* value = control->Text();
+		fFile->WriteAttr(control->Attribute().String(), B_STRING_TYPE, 0,
+			value, strlen(value) + 1);
+		control->Update();
 	}
+}
 
-	SetField(index, text, update);
+
+const char*
+TPeopleView::AttributeValue(const char* attribute) const
+{
+	for (int32 i = fControls.CountItems() - 1; i >= 0; i--) {
+		if (fControls.ItemAt(i)->Attribute() == attribute)
+			return fControls.ItemAt(i)->Text();
+	}
 	
-	free(text);
+	return "";
 }
 
 
 void
-TPeopleView::SetField(int32 index, char *data, bool update)
+TPeopleView::SetAttribute(const char* attribute, bool update)
 {
-	Window()->Lock();
+	char* value = NULL;
+	attr_info info;
+	if (fFile != NULL && fFile->GetAttrInfo(attribute, &info) == B_OK) {
+		value = (char*)calloc(info.size, 1);
+		fFile->ReadAttr(attribute, B_STRING_TYPE, 0, value, info.size);
+	}
+
+	SetAttribute(attribute, value, update);
+
+	free(value);
+}
+
+
+void
+TPeopleView::SetAttribute(const char* attribute, const char* value,
+	bool update)
+{
+	if (!LockLooper())
+		return;
+
+	AttributeTextControl* control = NULL;
+	for (int32 i = fControls.CountItems() - 1; i >= 0; i--) {
+		if (fControls.ItemAt(i)->Attribute() == attribute) {
+			control = fControls.ItemAt(i);
+			break;
+		}
+	}
+
+	if (control == NULL)
+		return;
 
 	if (update) {
-		fField[index]->SetText(data);
-		fField[index]->Update();
+		control->SetText(value);
+		control->Update();
 	} else {
-		BTextView* text = fField[index]->TextView();
+		BTextView* text = control->TextView();
 
 		int32 start, end;
 		text->GetSelection(&start, &end);
 		if (start != end) {
 			text->Delete();
-			text->Insert(data);
+			text->Insert(value);
 		} else if ((end = text->TextLength())) {
 			text->Select(end, end);
 			text->Insert(",");
-			text->Insert(data);
+			text->Insert(value);
 			text->Select(text->TextLength(), text->TextLength());
 		} else
-			fField[index]->SetText(data);
+			control->SetText(value);
 	}
 
-	Window()->Unlock();
+	UnlockLooper();
 }
 
 
 bool
-TPeopleView::TextSelected(void)
+TPeopleView::IsTextSelected() const
 {
-	for (int32 loop = 0; loop < F_END; loop++) {
-		BTextView* text = fField[loop]->TextView();
+	for (int32 i = fControls.CountItems() - 1; i >= 0; i--) {
+		BTextView* text = fControls.ItemAt(i)->TextView();
 
 		int32 start, end;
 		text->GetSelection(&start, &end);

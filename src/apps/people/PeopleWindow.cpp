@@ -1,14 +1,14 @@
-//--------------------------------------------------------------------
-//	
-//	PeopleWindow.cpp
-//
-//	Written by: Robert Polic
-//	
-//--------------------------------------------------------------------
 /*
-	Copyright 1999, Be Incorporated.   All Rights Reserved.
-	This file may be used under the terms of the Be Sample Code License.
-*/
+ * Copyright 2005-2010, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT license.
+ *
+ * Authors:
+ *		Robert Polic
+ *		Stephan Aßmus <superstippi@gmx.de>
+ *
+ * Copyright 1999, Be Incorporated.   All Rights Reserved.
+ * This file may be used under the terms of the Be Sample Code License.
+ */
 
 #include "PeopleWindow.h"
 
@@ -41,11 +41,14 @@
 #define B_TRANSLATE_CONTEXT "People"
 
 
-TPeopleWindow::TPeopleWindow(BRect frame, const char *title, entry_ref *ref)
+TPeopleWindow::TPeopleWindow(BRect frame, const char* title,
+		const char* nameAttribute, const char* categoryAttribute,
+		const entry_ref* ref)
 	:
 	BWindow(frame, title, B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE
 		| B_AUTO_UPDATE_SIZE_LIMITS),
-	fPanel(NULL)
+	fPanel(NULL),
+	fNameAttribute(nameAttribute)
 {
 	BMenu* menu;
 	BMenuItem* item;
@@ -55,7 +58,7 @@ TPeopleWindow::TPeopleWindow(BRect frame, const char *title, entry_ref *ref)
 	menu->AddItem(item = new BMenuItem(
 		B_TRANSLATE("New person" B_UTF8_ELLIPSIS),
 		new BMessage(M_NEW), 'N'));
-	item->SetTarget(NULL, be_app);
+	item->SetTarget(be_app);
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Close"),
 		new BMessage(B_QUIT_REQUESTED), 'W'));
 	menu->AddSeparatorItem();
@@ -71,66 +74,59 @@ TPeopleWindow::TPeopleWindow(BRect frame, const char *title, entry_ref *ref)
 	menu->AddSeparatorItem();
 	item = new BMenuItem(B_TRANSLATE("Quit"), 
 		new BMessage(B_QUIT_REQUESTED), 'Q');
-	item->SetTarget(NULL, be_app);
+	item->SetTarget(be_app);
 	menu->AddItem(item);
 	menuBar->AddItem(menu);
 
 	menu = new BMenu(B_TRANSLATE("Edit"));
 	menu->AddItem(fUndo = new BMenuItem(B_TRANSLATE("Undo"), 
 		new BMessage(B_UNDO), 'Z'));
-	fUndo->SetTarget(NULL, this);
 	fUndo->SetEnabled(false);
 	menu->AddSeparatorItem();
 	menu->AddItem(fCut = new BMenuItem(B_TRANSLATE("Cut"), 
 		new BMessage(B_CUT), 'X'));
-	fCut->SetTarget(NULL, this);
 	menu->AddItem(fCopy = new BMenuItem(B_TRANSLATE("Copy"), 
 		new BMessage(B_COPY), 'C'));
-	fCopy->SetTarget(NULL, this);
 	menu->AddItem(fPaste = new BMenuItem(B_TRANSLATE("Paste"), 
 		new BMessage(B_PASTE), 'V'));
-	fPaste->SetTarget(NULL, this);
-	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Select all"),
-		new BMessage(M_SELECT), 'A'));
-	item->SetTarget(NULL, this);
+	BMenuItem* selectAllItem = new BMenuItem(B_TRANSLATE("Select all"),
+		new BMessage(M_SELECT), 'A');
+	menu->AddItem(selectAllItem);
 	menuBar->AddItem(menu);
 
-	if (ref) {
-		fRef = new entry_ref(*ref);
+	if (ref != NULL) {
 		SetTitle(ref->name);
-		WatchChanges(true);
+		_SetToRef(new entry_ref(*ref));
 	} else
-		fRef = NULL;
+		_SetToRef(NULL);
 
-	fView = new TPeopleView("PeopleView", fRef);
+	fView = new TPeopleView("PeopleView", categoryAttribute, fRef);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.SetInsets(0, 0, 0, 0)
 		.Add(menuBar)
 		.Add(fView);
+
+	fRevert->SetTarget(fView);
+	selectAllItem->SetTarget(fView);
 }
 
 
-TPeopleWindow::~TPeopleWindow(void)
+TPeopleWindow::~TPeopleWindow()
 {
-	if (fRef)
-		WatchChanges(false);
-
-	delete fRef;
+	_SetToRef(NULL);
 }
 
 
 void
-TPeopleWindow::MenusBeginning(void)
+TPeopleWindow::MenusBeginning()
 {
-	bool enabled;
-	bool isRedo;
-
-	enabled = fView->CheckSave();
+	bool enabled = !fView->IsSaved();
 	fSave->SetEnabled(enabled);
 	fRevert->SetEnabled(enabled);
 
-	undo_state state = ((BTextView *)CurrentFocus())->UndoState(&isRedo);
+	bool isRedo = false;
+	undo_state state = ((BTextView*)CurrentFocus())->UndoState(&isRedo);
 	fUndo->SetEnabled(state != B_UNDO_UNAVAILABLE);
 
 	if (isRedo)
@@ -138,7 +134,7 @@ TPeopleWindow::MenusBeginning(void)
 	else
 		fUndo->SetLabel(B_TRANSLATE("Undo"));
 
-	enabled = fView->TextSelected();
+	enabled = fView->IsTextSelected();
 	fCut->SetEnabled(enabled);
 	fCopy->SetEnabled(enabled);
 
@@ -154,7 +150,6 @@ void
 TPeopleWindow::MessageReceived(BMessage* msg)
 {
 	char			str[256];
-	entry_ref		dir;
 	BDirectory		directory;
 	BEntry			entry;
 	BFile			file;
@@ -166,6 +161,7 @@ TPeopleWindow::MessageReceived(BMessage* msg)
 				SaveAs();
 				break;
 			}
+			// supposed to fall through
 		case M_REVERT:
 		case M_SELECT:
 			fView->MessageReceived(msg);
@@ -175,16 +171,11 @@ TPeopleWindow::MessageReceived(BMessage* msg)
 			SaveAs();
 			break;
 
-		case M_GROUP_MENU:
-		{
-			char *name = NULL;
-			msg->FindString("group", (const char **)&name);
-			fView->SetField(F_GROUP, name, FALSE);
-			break;
-		}
 		case B_SAVE_REQUESTED:
-			if (msg->FindRef("directory", &dir) == B_NO_ERROR) {
-				const char *name = NULL;
+		{
+			entry_ref dir;
+			if (msg->FindRef("directory", &dir) == B_OK) {
+				const char* name = NULL;
 				msg->FindString("name", &name);
 				directory.SetTo(&dir);
 				if (directory.InitCheck() == B_NO_ERROR) {
@@ -196,14 +187,9 @@ TPeopleWindow::MessageReceived(BMessage* msg)
 
 						directory.FindEntry(name, &entry);
 						entry.GetRef(&dir);
-						if (fRef) {
-							WatchChanges(false);
-							delete fRef;
-						}
-						fRef = new entry_ref(dir);
-						WatchChanges(true);
+						_SetToRef(new entry_ref(dir));
 						SetTitle(fRef->name);
-						fView->NewFile(fRef);
+						fView->CreateFile(fRef);
 					}
 					else {
 						sprintf(str, B_TRANSLATE("Could not create %s."), name);
@@ -212,18 +198,15 @@ TPeopleWindow::MessageReceived(BMessage* msg)
 				}
 			}
 			break;
-			
+		}
+	
 		case B_NODE_MONITOR:
 		{
 			int32 opcode;
 			if (msg->FindInt32("opcode", &opcode) == B_OK) {
 				switch (opcode) {
 					case B_ENTRY_REMOVED:
-						// We lost our file. Close the window by quiting its
-						// looper.
-						delete fRef;
-						fRef = NULL;
-						
+						// We lost our file. Close the window.
 						PostMessage(B_QUIT_REQUESTED);
 						break;
 					
@@ -244,7 +227,6 @@ TPeopleWindow::MessageReceived(BMessage* msg)
 						delete fRef;
 						fRef = new entry_ref(device, directory, name.String()); 
 						
-						
 						// And our window title.
 						SetTitle(name);
 
@@ -255,11 +237,8 @@ TPeopleWindow::MessageReceived(BMessage* msg)
 							&volume);
 						BPath folder(fRef);
 						folder.GetParent(&folder);
-						if (folder == trash) {
-							delete fRef;
-							fRef = NULL;
+						if (folder == trash)
 							PostMessage(B_QUIT_REQUESTED);
-						}
 
 						break;
 					}
@@ -268,13 +247,8 @@ TPeopleWindow::MessageReceived(BMessage* msg)
 					{
 						// An attribute was updated.
 						BString attr;
-						if (msg->FindString("attr", &attr) == B_OK) {
-							for (int32 i = 0; gFields[i].attribute; i++) {
-								if (attr == gFields[i].attribute) {
-									fView->SetField(i, true);
-								}
-							}
-						}
+						if (msg->FindString("attr", &attr) == B_OK)
+							fView->SetAttribute(attr.String(), true);
 						break;
 					}							
 				}
@@ -289,11 +263,11 @@ TPeopleWindow::MessageReceived(BMessage* msg)
 
 
 bool
-TPeopleWindow::QuitRequested(void)
+TPeopleWindow::QuitRequested()
 {
 	status_t result;
 
-	if (fView->CheckSave()) {
+	if (!fView->IsSaved()) {
 		result = (new BAlert("", B_TRANSLATE("Save changes before quitting?"),
 							B_TRANSLATE("Cancel"), B_TRANSLATE("Quit"), 
 							B_TRANSLATE("Save")))->Go();
@@ -322,9 +296,68 @@ TPeopleWindow::QuitRequested(void)
 
 
 void
-TPeopleWindow::DefaultName(char *name)
+TPeopleWindow::Show()
 {
-	strncpy(name, fView->GetField(F_NAME), B_FILE_NAME_LENGTH);
+	fView->MakeFocus();
+	BWindow::Show();
+}
+
+
+void
+TPeopleWindow::AddAttribute(const char* label, const char* attribute)
+{
+	fView->AddAttribute(label, attribute);
+}
+
+
+void
+TPeopleWindow::SaveAs()
+{
+	char name[B_FILE_NAME_LENGTH];
+	_GetDefaultFileName(name);
+
+	if (fPanel == NULL) {
+		BMessenger target(this);
+		fPanel = new BFilePanel(B_SAVE_PANEL, &target);
+
+		BPath path;
+		find_directory(B_USER_DIRECTORY, &path, true);
+
+		BDirectory dir;
+		dir.SetTo(path.Path());
+
+		BEntry entry;
+		if (dir.FindEntry("people", &entry) == B_OK
+			|| (dir.CreateDirectory("people", &dir) == B_OK
+					&& dir.GetEntry(&entry) == B_OK)) {
+			fPanel->SetPanelDirectory(&entry);
+		}
+	}
+
+	if (fPanel->Window()->Lock()) {
+		fPanel->SetSaveText(name);
+		if (fPanel->Window()->IsHidden())
+			fPanel->Window()->Show();
+		else
+			fPanel->Window()->Activate();
+		fPanel->Window()->Unlock();
+	}	
+}
+
+
+bool
+TPeopleWindow::RefersPersonFile(const entry_ref& ref) const
+{
+	if (fRef == NULL)
+		return false;
+	return *fRef == ref;
+}
+
+
+void
+TPeopleWindow::_GetDefaultFileName(char* name)
+{
+	strncpy(name, fView->AttributeValue(fNameAttribute), B_FILE_NAME_LENGTH);
 	while (*name) {
 		if (*name == '/')
 			*name = '-';
@@ -334,52 +367,21 @@ TPeopleWindow::DefaultName(char *name)
 
 
 void
-TPeopleWindow::SetField(int32 index, char *text)
+TPeopleWindow::_SetToRef(entry_ref* ref)
 {
-	fView->SetField(index, text, true);
+	if (fRef != NULL) {
+		_WatchChanges(false);
+		delete fRef;
+	}
+
+	fRef = ref;
+
+	_WatchChanges(true);
 }
 
 
 void
-TPeopleWindow::SaveAs(void)
-{
-	char		name[B_FILE_NAME_LENGTH];
-	BDirectory	dir;
-	BEntry		entry;
-	BMessenger	window(this);
-	BPath		path;
-
-	DefaultName(name);
-	if (!fPanel) {
-		fPanel = new BFilePanel(B_SAVE_PANEL, &window);
-		fPanel->SetSaveText(name);
-		find_directory(B_USER_DIRECTORY, &path, true);
-		dir.SetTo(path.Path());
-		if (dir.FindEntry("people", &entry) == B_NO_ERROR)
-			fPanel->SetPanelDirectory(&entry);
-		else if (dir.CreateDirectory("people", &dir) == B_NO_ERROR) {
-			dir.GetEntry(&entry);
-			fPanel->SetPanelDirectory(&entry);
-		}
-	}
-	else if (fPanel->Window()->Lock()) {
-		if (!fPanel->Window()->IsHidden())
-			fPanel->Window()->Activate();
-		else
-			fPanel->SetSaveText(name);
-		fPanel->Window()->Unlock();
-	}
-
-	if (fPanel->Window()->Lock()) {
-		if (fPanel->Window()->IsHidden())
-			fPanel->Window()->Show();
-		fPanel->Window()->Unlock();
-	}	
-}
-
-
-void
-TPeopleWindow::WatchChanges(bool enable)
+TPeopleWindow::_WatchChanges(bool enable)
 {
 	if (fRef == NULL)
 		return;

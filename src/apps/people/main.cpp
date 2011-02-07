@@ -1,24 +1,19 @@
-//--------------------------------------------------------------------
-//	
-//	main.cpp
-//
-//	Written by: Robert Polic
-//	
-//--------------------------------------------------------------------
 /*
-	Copyright 1999, Be Incorporated.   All Rights Reserved.
-	This file may be used under the terms of the Be Sample Code License.
-*/
+ * Copyright 1999, Be Incorporated. All Rights Reserved.
+ * This file may be used under the terms of the Be Sample Code License.
+ *
+ *	Authors:
+ *		Robert Polic
+ */
+
 
 #include "PeopleApp.h"
 
-int main(void)
+
+int
+main(int, char**)
 {	
-	TPeopleApp	*app;
-
-	app = new TPeopleApp();
-	app->Run();
-
-	delete app;
+	TPeopleApp app;
+	app.Run();
 	return B_NO_ERROR;
 }

@@ -1,51 +1,39 @@
-//--------------------------------------------------------------------
-//	
-//	PeopleApp.h
-//
-//	Written by: Robert Polic
-//	
-//--------------------------------------------------------------------
 /*
-	Copyright 1999, Be Incorporated.   All Rights Reserved.
-	This file may be used under the terms of the Be Sample Code License.
-*/
-
-#ifndef PEOPLEAPP_H
-#define PEOPLEAPP_H
+ * Copyright 2005-2010, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT license.
+ *
+ * Authors:
+ *		Robert Polic
+ *		Stephan Aßmus <superstippi@gmx.de>
+ *
+ * Copyright 1999, Be Incorporated.   All Rights Reserved.
+ * This file may be used under the terms of the Be Sample Code License.
+ */
+#ifndef PEOPLE_APP_H
+#define PEOPLE_APP_H
 
 
 #include <Application.h>
-
-class BFile;
+#include <ObjectList.h>
+#include <String.h>
 
 
 #define	B_PERSON_MIMETYPE	"application/x-person"
 #define APP_SIG				"application/x-vnd.Be-PEPL"
 
-struct people_field {
-	const char*	attribute;
-	int32		width;
-	const char*	name;
-};
-extern people_field gFields[];
 
-enum messages{
-	M_NEW = 128, M_SAVE, M_SAVE_AS, M_REVERT,
-	M_UNDO, M_SELECT, M_GROUP_MENU, M_WINDOW_QUITS
-};
+class BFile;
 
-enum fields {
-	F_NAME = 0, F_NICKNAME, F_COMPANY, F_ADDRESS,
-	F_CITY, F_STATE, F_ZIP, F_COUNTRY, F_HPHONE,
-	F_WPHONE, F_FAX, F_EMAIL, F_URL, F_GROUP, F_END
+enum {
+	M_NEW			= 'newp',
+	M_SAVE_AS		= 'svas',
+	M_WINDOW_QUITS	= 'wndq'
 };
 
 class TPeopleWindow;
 
-//====================================================================
-
 class TPeopleApp : public BApplication {
-	public:
+public:
 								TPeopleApp();
 		virtual 				~TPeopleApp();
 
@@ -54,17 +42,26 @@ class TPeopleApp : public BApplication {
 		virtual void			MessageReceived(BMessage*);
 		virtual void			RefsReceived(BMessage*);
 		virtual void			ReadyToRun();
-				TPeopleWindow*	FindWindow(entry_ref);
-				TPeopleWindow*	NewWindow(entry_ref* = NULL);
 
+private:
+				TPeopleWindow*	_FindWindow(const entry_ref&) const;
+				TPeopleWindow*	_NewWindow(entry_ref* = NULL);
+				void			_AddAttributes(TPeopleWindow* window) const;
+				void			_SavePreferences(BMessage* message) const;
+
+private:
 				BFile*			fPrefs;
-
-	private:
-				void			SavePreferences(BMessage* message);
-
 				uint32			fWindowCount;
 				BRect			fPosition;
+
+				struct Attribute {
+					BString		attribute;
+					int32		width;
+					BString		name;
+				};
+
+				BObjectList<Attribute> fAttributes;
 };
 
-#endif /* PEOPLEAPP_H */
+#endif // PEOPLE_APP_H
 

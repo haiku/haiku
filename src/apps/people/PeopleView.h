@@ -1,48 +1,69 @@
-//--------------------------------------------------------------------
-//	
-//	PeopleView.h
-//
-//	Written by: Robert Polic
-//	
-//--------------------------------------------------------------------
 /*
-	Copyright 1999, Be Incorporated.   All Rights Reserved.
-	This file may be used under the terms of the Be Sample Code License.
-*/
+ * Copyright 2010, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT license.
+ *
+ * Authors:
+ *		Robert Polic
+ *		Stephan Aßmus <superstippi@gmx.de>
+ *
+ * Copyright 1999, Be Incorporated.   All Rights Reserved.
+ * This file may be used under the terms of the Be Sample Code License.
+ */
+#ifndef PEOPLE_VIEW_H
+#define PEOPLE_VIEW_H
 
-#ifndef PEOPLEVIEW_H
-#define PEOPLEVIEW_H
-
-#include "PeopleApp.h"
 
 #include <GridView.h>
+#include <ObjectList.h>
+#include <String.h>
 
 
+class AttributeTextControl;
+class BFile;
 class BPopUpMenu;
-class TTextControl;
+
+enum {
+	M_SAVE			= 'save',
+	M_REVERT		= 'rvrt',
+	M_SELECT		= 'slct',
+	M_GROUP_MENU	= 'grmn',
+};
 
 
 class TPeopleView : public BGridView {
-	public:
-		TPeopleView(const char* name, entry_ref* ref);
-		~TPeopleView(void);
+public:
+								TPeopleView(const char* name,
+									const char* categoryAttribute,
+									const entry_ref* ref);
+	virtual						~TPeopleView();
 
-		virtual	void	AttachedToWindow(void);
-		virtual void	MessageReceived(BMessage*);
-		void			BuildGroupMenu(void);
-		bool			CheckSave(void);
-		const char*		GetField(int32);
-		void			NewFile(entry_ref*);
-		void			Save(void);
-		void			SetField(int32, bool);
-		void			SetField(int32, char*, bool);
-		bool			TextSelected(void);
+	virtual	void				MakeFocus(bool focus = true);
+	virtual	void				MessageReceived(BMessage* message);
 
-	private:
-		BFile			*fFile;
-		BPopUpMenu		*fGroups;
-		TTextControl	*fField[F_END];
+			void				AddAttribute(const char* label,
+									const char* attribute);
 
+			void				BuildGroupMenu();
+
+			void				CreateFile(const entry_ref* ref);
+
+			bool				IsSaved() const;
+			void				Save();
+
+			const char*			AttributeValue(const char* attribute) const;
+			void				SetAttribute(const char* attribute, bool update);
+			void				SetAttribute(const char* attribute,
+									const char* value, bool update);
+
+			bool				IsTextSelected() const;
+
+private:
+			BFile*				fFile;
+			BPopUpMenu*			fGroups;
+			typedef BObjectList<AttributeTextControl> AttributeList;
+			AttributeList		fControls;
+
+			BString				fCategoryAttribute;
 };
 
-#endif /* PEOPLEVIEW_H */
+#endif // PEOPLE_VIEW_H
