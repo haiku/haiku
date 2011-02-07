@@ -35,7 +35,19 @@ const struct supported_device {
 	int32		type;
 	const char*	name;
 } kSupportedDevices[] = {
-	{0x9612, 0, "HD 3200"}
+	{0x9540, 0, "Radeon HD 4550"},	/*RV710*/
+	{0x954f, 0, "Radeon HD 4350"},	/*RV710*/
+	{0x9610, 0, "Radeon HD 3200"},	/*RS780, IGP*/
+	{0x9611, 0, "Radeon 3100"},		/*RS780, IGP*/
+	{0x9612, 0, "Radeon HD 3200"},	/*RS780, IGP*/
+	{0x9613, 0, "Radeon 3100"},		/*RS780, IGP*/
+	{0x9614, 0, "Radeon 3300"},		/*RS780, IGP*/
+	{0x9615, 0, "Radeon 3200"},		/*RS780, IGP*/
+	{0x9616, 0, "Radeon 3000"},		/*RS780, IGP*/
+	{0x9710, 0, "Radeon HD 4200"},	/*RS880, IGP*/
+	{0x9711, 0, "Radeon 4100"},		/*RS880, IGP*/
+	{0x9714, 0, "Radeon HD 4290"},	/*RS880, IGP*/
+	{0x9715, 0, "Radeon HD 4250"}	/*RS880, IGP*/
 };
 
 
@@ -142,8 +154,8 @@ init_driver(void)
 
 		char name[64];
 		sprintf(name, "graphics/radeon_hd_%02x%02x%02x",
-			 info->bus, info->device,
-			 info->function);
+			info->bus, info->device,
+			info->function);
 
 		gDeviceNames[found] = strdup(name);
 		if (gDeviceNames[found] == NULL)
