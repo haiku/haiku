@@ -71,7 +71,7 @@ resource(6, "META:ATTR_INFO") message(233) {
 	"attr:width" = 30,
 	"attr:width" = 40,
 	"attr:width" = 30,
-	"attr:width" = 15,
+	"attr:width" = 60,
 	"attr:width" = 60,
 	"attr:width" = 50,
 	"attr:alignment" = 0,
@@ -91,7 +91,7 @@ resource(6, "META:ATTR_INFO") message(233) {
 	"attr:display_as" = "",
 	"attr:display_as" = "",
 	"attr:display_as" = "",
-	"attr:display_as" = "",
+	"attr:display_as" = "rating",
 	"attr:display_as" = "duration",
 	"attr:display_as" = "",
 	"type" = "audio"

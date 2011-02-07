@@ -9,6 +9,50 @@ resource(3, "META:S:DESC") #'MSDC' "Image file";
 
 resource(4, "META:PREF_APP") #'MSIG' "application/x-vnd.Haiku-ShowImage";
 
+resource(6, "META:ATTR_INFO") message(233) {
+	"attr:name" = "Media:Width",
+	"attr:name" = "Media:Height",
+	"attr:name" = "Media:Year",
+	"attr:name" = "Media:Comment",
+	"attr:name" = "Media:Rating",
+	"attr:public_name" = "Width",
+	"attr:public_name" = "Height",
+	"attr:public_name" = "Year",
+	"attr:public_name" = "Comment",
+	"attr:public_name" = "Rating",
+	"attr:type" = 'LONG',
+	"attr:type" = 'LONG',
+	"attr:type" = 'LONG',
+	"attr:type" = 'CSTR',
+	"attr:type" = 'LONG',
+	"attr:viewable" = true,
+	"attr:viewable" = true,
+	"attr:viewable" = true,
+	"attr:viewable" = true,
+	"attr:viewable" = true,
+	"attr:editable" = true,
+	"attr:editable" = true,
+	"attr:editable" = true,
+	"attr:editable" = true,
+	"attr:editable" = true,
+	"attr:width" = 60,
+	"attr:width" = 60,
+	"attr:width" = 60,
+	"attr:width" = 120,
+	"attr:width" = 60,
+	"attr:alignment" = 1,
+	"attr:alignment" = 1,
+	"attr:alignment" = 0,
+	"attr:alignment" = 0,
+	"attr:alignment" = 0,
+	"attr:display_as" = "",
+	"attr:display_as" = "",
+	"attr:display_as" = "",
+	"attr:display_as" = "",
+	"attr:display_as" = "rating",
+	"type" = "image"
+};
+
 resource(5, "META:ICON") #'VICN' array {
 	$"6E6369660502000603399E0F3D9C0ABF82B23B84A94B88504870C900A5B1FFBC"
 	$"EAF1FFFFB3B8FF0501020106023E49240000000000003CAAAA4940004A3000FF"
