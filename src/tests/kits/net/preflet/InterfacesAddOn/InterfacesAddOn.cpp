@@ -10,6 +10,7 @@
  * 		Fredrik Modéen
  *		Hugo Santos
  *		Philippe Saint-Pierre
+ *		Alexander von Gluck, kallisti5@unixzen.com
  */
 
 
@@ -19,8 +20,10 @@
 
 #include <stdio.h>
 
-#include <ScrollView.h>
 #include <Alert.h>
+#include <GroupLayout.h>
+#include <GroupLayoutBuilder.h>
+#include <ScrollView.h>
 
 
 NetworkSetupAddOn*
@@ -58,46 +61,40 @@ InterfacesAddOn::Name()
 BView*
 InterfacesAddOn::CreateView(BRect *bounds)
 {
-	float w, h;
-	BRect r = *bounds;
+	BRect intViewRect = *bounds;
 
-#define H_MARGIN	10
-#define V_MARGIN	10
-#define SMALL_MARGIN	3
-
-	if (r.Width() < 100 || r.Height() < 100)
-		r.Set(0, 0, 100, 100);
-
-	ResizeTo(r.Width(), r.Height());
-
-	BRect rlv = r;
-	rlv.bottom -= 72;
-	rlv.InsetBy(2, 2);
-	rlv.right -= B_V_SCROLL_BAR_WIDTH;
-	fListview = new InterfacesListView(rlv, "interfaces", B_FOLLOW_ALL_SIDES);
+	// Construct the ListView
+	fListview = new InterfacesListView(intViewRect,
+		"interfaces", B_FOLLOW_ALL_SIDES);
 	fListview->SetSelectionMessage(new BMessage(INTERFACE_SELECTED_MSG));
 	fListview->SetInvocationMessage(new BMessage(CONFIGURE_INTERFACE_MSG));
-	AddChild(new BScrollView(NULL, fListview, B_FOLLOW_ALL_SIDES, B_WILL_DRAW
-		| B_FRAME_EVENTS, false, true));
 
-	r.top = r.bottom - 60;
-	fConfigure = new BButton(r, "configure", "Configure" B_UTF8_ELLIPSIS,
-		new BMessage(CONFIGURE_INTERFACE_MSG), B_FOLLOW_BOTTOM | B_FOLLOW_LEFT);
+	BScrollView* scrollView = new BScrollView(NULL, fListview,
+		B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS, false, true);
 
-	fConfigure->GetPreferredSize(&w, &h);
-	fConfigure->ResizeToPreferred();
+	// Construct the BButtons
+	fConfigure = new BButton(intViewRect, "configure",
+		"Configure" B_UTF8_ELLIPSIS, new BMessage(CONFIGURE_INTERFACE_MSG));
+
 	fConfigure->SetEnabled(false);
-	AddChild(fConfigure);
 
-	r.left += w + SMALL_MARGIN;
+	fOnOff = new BButton(intViewRect, "onoff", "Disable",
+		new BMessage(ONOFF_INTERFACE_MSG));
 
-	fOnOff = new BButton(r, "onoff", "Disable",
-		new BMessage(ONOFF_INTERFACE_MSG),
-		B_FOLLOW_BOTTOM | B_FOLLOW_LEFT);
-	fOnOff->GetPreferredSize(&w, &h);
-	fOnOff->ResizeToPreferred();
 	fOnOff->Hide();
-	AddChild(fOnOff);
+
+	// Build the layout
+	SetLayout(new BGroupLayout(B_VERTICAL));
+
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
+		.Add(scrollView)
+		.AddGroup(B_HORIZONTAL, 5)
+			.Add(fConfigure)
+			.Add(fOnOff)
+			.AddGlue()
+		.End()
+		.SetInsets(10, 10, 10, 10)
+	);
 
 	*bounds = Bounds();
 	return this;

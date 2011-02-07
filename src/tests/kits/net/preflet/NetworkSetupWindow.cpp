@@ -71,6 +71,7 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 		.Add(fPanel)
 		.Add(bottomDivider)
 		.AddGroup(B_HORIZONTAL, 5)
+			.AddGlue()
 			.Add(fRevertButton)
 			.Add(fApplyButton)
 		.End()
@@ -221,7 +222,7 @@ NetworkSetupWindow::_BuildShowTabView(int32 msg_what)
 	if (!search_paths)
 		return;
 
-	fMinAddonViewRect.Set(0, 0, 350, 200);	// Minimum size
+	fMinAddonViewRect.Set(0, 0, 375, 225);	// Minimum size
 
 	search_paths = strdup(search_paths);
 	char* next_path_token;
