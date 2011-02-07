@@ -42,116 +42,108 @@ struct hpkg_header {
 };
 
 
-// compression types
-enum {
-	B_HPKG_COMPRESSION_NONE	= 0,
-	B_HPKG_COMPRESSION_ZLIB	= 1
+// header
+struct hpkg_repo_header {
+	uint32	magic;							// "hpkr"
+	uint16	header_size;
+	uint16	version;
+	uint64	total_size;
+
+	// package attributes section
+	uint32	attributes_compression;
+	uint32	attributes_length_compressed;
+	uint32	attributes_length_uncompressed;
+
+	uint64	attributes_strings_length;
+	uint64	attributes_strings_count;
 };
 
 
 // attribute tag arithmetics
-#define B_HPKG_ATTRIBUTE_TAG_COMPOSE(index, encoding, hasChildren)	\
+#define HPKG_ATTRIBUTE_TAG_COMPOSE(index, encoding, hasChildren)	\
 	(((uint64(index) << 3) | uint64(encoding) << 1					\
 		| ((hasChildren) ? 1 : 0)) + 1)
-#define B_HPKG_ATTRIBUTE_TAG_INDEX(tag)			(uint64((tag) - 1) >> 3)
-#define B_HPKG_ATTRIBUTE_TAG_ENCODING(tag)		((uint64((tag) - 1) >> 1) & 0x3)
-#define B_HPKG_ATTRIBUTE_TAG_HAS_CHILDREN(tag)	((uint64((tag) - 1) & 0x1) != 0)
+#define HPKG_ATTRIBUTE_TAG_INDEX(tag)			(uint64((tag) - 1) >> 3)
+#define HPKG_ATTRIBUTE_TAG_ENCODING(tag)		((uint64((tag) - 1) >> 1) & 0x3)
+#define HPKG_ATTRIBUTE_TAG_HAS_CHILDREN(tag)	((uint64((tag) - 1) & 0x1) != 0)
 
 // package attribute tag arithmetics
-#define B_HPKG_PACKAGE_ATTRIBUTE_TAG_COMPOSE(id, type, encoding, hasChildren) \
-	(((uint16(encoding) << 9) | (((hasChildren) ? 1 : 0) << 8)				  \
+#define HPKG_PACKAGE_ATTRIBUTE_TAG_COMPOSE(id, type, encoding, hasChildren) \
+	(((uint16(encoding) << 9) | (((hasChildren) ? 1 : 0) << 8)				\
 		| (uint16(type) << 5) | (uint16(id))) + 1)
-#define B_HPKG_PACKAGE_ATTRIBUTE_TAG_ENCODING(tag)		\
+#define HPKG_PACKAGE_ATTRIBUTE_TAG_ENCODING(tag)		\
 	((uint16((tag) - 1) >> 9) & 0x3)
-#define B_HPKG_PACKAGE_ATTRIBUTE_TAG_HAS_CHILDREN(tag)	\
+#define HPKG_PACKAGE_ATTRIBUTE_TAG_HAS_CHILDREN(tag)	\
 	(((uint16((tag) - 1) >> 8) & 0x1) != 0)
-#define B_HPKG_PACKAGE_ATTRIBUTE_TAG_TYPE(tag)			\
+#define HPKG_PACKAGE_ATTRIBUTE_TAG_TYPE(tag)			\
 	((uint16((tag) - 1) >> 5) & 0x7)
-#define B_HPKG_PACKAGE_ATTRIBUTE_TAG_ID(tag)			\
+#define HPKG_PACKAGE_ATTRIBUTE_TAG_ID(tag)				\
 	(uint16((tag) - 1) & 0x1f)
 
 
 // standard attribute names
-#define B_HPKG_ATTRIBUTE_NAME_DIRECTORY_ENTRY		"dir:entry"
+#define HPKG_ATTRIBUTE_NAME_DIRECTORY_ENTRY		"dir:entry"
 	// path/entry name (string)
-#define B_HPKG_ATTRIBUTE_NAME_FILE_TYPE				"file:type"
+#define HPKG_ATTRIBUTE_NAME_FILE_TYPE			"file:type"
 	// file type (uint)
-#define B_HPKG_ATTRIBUTE_NAME_FILE_PERMISSIONS		"file:permissions"
+#define HPKG_ATTRIBUTE_NAME_FILE_PERMISSIONS	"file:permissions"
 	// file permissions (uint)
-#define B_HPKG_ATTRIBUTE_NAME_FILE_USER				"file:user"
+#define HPKG_ATTRIBUTE_NAME_FILE_USER			"file:user"
 	// file user (string)
-#define B_HPKG_ATTRIBUTE_NAME_FILE_GROUP			"file:group"
+#define HPKG_ATTRIBUTE_NAME_FILE_GROUP			"file:group"
 	// file group (string)
-#define B_HPKG_ATTRIBUTE_NAME_FILE_ATIME			"file:atime"
+#define HPKG_ATTRIBUTE_NAME_FILE_ATIME			"file:atime"
 	// file access time in seconds (uint)
-#define B_HPKG_ATTRIBUTE_NAME_FILE_MTIME			"file:mtime"
+#define HPKG_ATTRIBUTE_NAME_FILE_MTIME			"file:mtime"
 	// file modification time in seconds (uint)
-#define B_HPKG_ATTRIBUTE_NAME_FILE_CRTIME			"file:crtime"
+#define HPKG_ATTRIBUTE_NAME_FILE_CRTIME			"file:crtime"
 	// file creation time in seconds (uint)
-#define B_HPKG_ATTRIBUTE_NAME_FILE_ATIME_NANOS		"file:atime:nanos"
+#define HPKG_ATTRIBUTE_NAME_FILE_ATIME_NANOS	"file:atime:nanos"
 	// file access time nanoseconds fraction (uint)
-#define B_HPKG_ATTRIBUTE_NAME_FILE_MTIME_NANOS		"file:mtime:nanos"
+#define HPKG_ATTRIBUTE_NAME_FILE_MTIME_NANOS	"file:mtime:nanos"
 	// file modification time nanoseconds fraction (uint)
-#define B_HPKG_ATTRIBUTE_NAME_FILE_CRTIM_NANOS		"file:crtime:nanos"
+#define HPKG_ATTRIBUTE_NAME_FILE_CRTIM_NANOS	"file:crtime:nanos"
 	// file creation time nanoseconds fraction (uint)
-#define B_HPKG_ATTRIBUTE_NAME_FILE_ATTRIBUTE		"file:attribute"
+#define HPKG_ATTRIBUTE_NAME_FILE_ATTRIBUTE		"file:attribute"
 	// file attribute (string)
-#define B_HPKG_ATTRIBUTE_NAME_FILE_ATTRIBUTE_TYPE	"file:attribute:type"
+#define HPKG_ATTRIBUTE_NAME_FILE_ATTRIBUTE_TYPE	"file:attribute:type"
 	// file attribute type (uint)
-#define B_HPKG_ATTRIBUTE_NAME_DATA					"data"
+#define HPKG_ATTRIBUTE_NAME_DATA				"data"
 	// (file/attribute) data (raw)
-#define B_HPKG_ATTRIBUTE_NAME_DATA_COMPRESSION		"data:compression"
+#define HPKG_ATTRIBUTE_NAME_DATA_COMPRESSION	"data:compression"
 	// (file/attribute) data compression (uint, default: none)
-#define B_HPKG_ATTRIBUTE_NAME_DATA_SIZE				"data:size"
+#define HPKG_ATTRIBUTE_NAME_DATA_SIZE			"data:size"
 	// (file/attribute) uncompressed data size (uint)
-#define B_HPKG_ATTRIBUTE_NAME_DATA_CHUNK_SIZE		"data:chunk_size"
+#define HPKG_ATTRIBUTE_NAME_DATA_CHUNK_SIZE		"data:chunk_size"
 	// the size of compressed (file/attribute) data chunks (uint)
-#define B_HPKG_ATTRIBUTE_NAME_SYMLINK_PATH			"symlink:path"
+#define HPKG_ATTRIBUTE_NAME_SYMLINK_PATH		"symlink:path"
 	// symlink path (string)
 
 
-// file types (B_HPKG_ATTRIBUTE_NAME_FILE_TYPE)
-enum {
-	B_HPKG_FILE_TYPE_FILE		= 0,
-	B_HPKG_FILE_TYPE_DIRECTORY	= 1,
-	B_HPKG_FILE_TYPE_SYMLINK	= 2
-};
-
-
-// default values
-enum {
-	B_HPKG_DEFAULT_FILE_TYPE				= B_HPKG_FILE_TYPE_FILE,
-	B_HPKG_DEFAULT_FILE_PERMISSIONS			= 0644,
-	B_HPKG_DEFAULT_DIRECTORY_PERMISSIONS	= 0755,
-	B_HPKG_DEFAULT_SYMLINK_PERMISSIONS		= 0777,
-	B_HPKG_DEFAULT_DATA_COMPRESSION			= B_HPKG_COMPRESSION_NONE,
-};
-
-
 // package attribute IDs
-enum BHPKGPackageAttributeID {
-	B_HPKG_PACKAGE_ATTRIBUTE_NAME = 0,
-	B_HPKG_PACKAGE_ATTRIBUTE_SUMMARY,
-	B_HPKG_PACKAGE_ATTRIBUTE_DESCRIPTION,
-	B_HPKG_PACKAGE_ATTRIBUTE_VENDOR,
-	B_HPKG_PACKAGE_ATTRIBUTE_PACKAGER,
-	B_HPKG_PACKAGE_ATTRIBUTE_ARCHITECTURE,
-	B_HPKG_PACKAGE_ATTRIBUTE_VERSION_MAJOR,
-	B_HPKG_PACKAGE_ATTRIBUTE_VERSION_MINOR,
-	B_HPKG_PACKAGE_ATTRIBUTE_VERSION_MICRO,
-	B_HPKG_PACKAGE_ATTRIBUTE_VERSION_RELEASE,
-	B_HPKG_PACKAGE_ATTRIBUTE_COPYRIGHT,
-	B_HPKG_PACKAGE_ATTRIBUTE_LICENSE,
-	B_HPKG_PACKAGE_ATTRIBUTE_PROVIDES,
-	B_HPKG_PACKAGE_ATTRIBUTE_PROVIDES_TYPE,
-	B_HPKG_PACKAGE_ATTRIBUTE_REQUIRES,
-	B_HPKG_PACKAGE_ATTRIBUTE_SUPPLEMENTS,
-	B_HPKG_PACKAGE_ATTRIBUTE_CONFLICTS,
-	B_HPKG_PACKAGE_ATTRIBUTE_FRESHENS,
-	B_HPKG_PACKAGE_ATTRIBUTE_REPLACES,
-	B_HPKG_PACKAGE_ATTRIBUTE_RESOLVABLE_OPERATOR,
+enum HPKGPackageAttributeID {
+	HPKG_PACKAGE_ATTRIBUTE_NAME = 0,
+	HPKG_PACKAGE_ATTRIBUTE_SUMMARY,
+	HPKG_PACKAGE_ATTRIBUTE_DESCRIPTION,
+	HPKG_PACKAGE_ATTRIBUTE_VENDOR,
+	HPKG_PACKAGE_ATTRIBUTE_PACKAGER,
+	HPKG_PACKAGE_ATTRIBUTE_ARCHITECTURE,
+	HPKG_PACKAGE_ATTRIBUTE_VERSION_MAJOR,
+	HPKG_PACKAGE_ATTRIBUTE_VERSION_MINOR,
+	HPKG_PACKAGE_ATTRIBUTE_VERSION_MICRO,
+	HPKG_PACKAGE_ATTRIBUTE_VERSION_RELEASE,
+	HPKG_PACKAGE_ATTRIBUTE_COPYRIGHT,
+	HPKG_PACKAGE_ATTRIBUTE_LICENSE,
+	HPKG_PACKAGE_ATTRIBUTE_PROVIDES,
+	HPKG_PACKAGE_ATTRIBUTE_PROVIDES_TYPE,
+	HPKG_PACKAGE_ATTRIBUTE_REQUIRES,
+	HPKG_PACKAGE_ATTRIBUTE_SUPPLEMENTS,
+	HPKG_PACKAGE_ATTRIBUTE_CONFLICTS,
+	HPKG_PACKAGE_ATTRIBUTE_FRESHENS,
+	HPKG_PACKAGE_ATTRIBUTE_REPLACES,
+	HPKG_PACKAGE_ATTRIBUTE_RESOLVABLE_OPERATOR,
 	//
-	B_HPKG_PACKAGE_ATTRIBUTE_ENUM_COUNT,
+	HPKG_PACKAGE_ATTRIBUTE_ENUM_COUNT,
 };
 
 

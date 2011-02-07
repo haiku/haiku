@@ -80,7 +80,7 @@ struct standard_attribute_index_entry {
 
 #undef MAKE_ATTRIBUTE_INDEX_ENTRY
 #define MAKE_ATTRIBUTE_INDEX_ENTRY(name, type)	\
-	{ B_HPKG_ATTRIBUTE_NAME_##name, B_HPKG_ATTRIBUTE_TYPE_##type, \
+	{ HPKG_ATTRIBUTE_NAME_##name, B_HPKG_ATTRIBUTE_TYPE_##type, \
 		ATTRIBUTE_INDEX_##name }
 
 static const standard_attribute_index_entry kStandardAttributeIndices[] = {
@@ -1063,7 +1063,7 @@ PackageReaderImpl::_ParseAttributeTree(AttributeHandlerContext* context)
 		}
 
 		// get the type
-		uint64 typeIndex = B_HPKG_ATTRIBUTE_TAG_INDEX(tag);
+		uint64 typeIndex = HPKG_ATTRIBUTE_TAG_INDEX(tag);
 		if (typeIndex >= fTOCAttributeTypesCount) {
 			fErrorOutput->PrintError("Error: Invalid TOC section: "
 				"Invalid attribute type index\n");
@@ -1074,11 +1074,11 @@ PackageReaderImpl::_ParseAttributeTree(AttributeHandlerContext* context)
 		// get the value
 		AttributeValue value;
 		error = _ReadAttributeValue(type->type->type,
-			B_HPKG_ATTRIBUTE_TAG_ENCODING(tag), value);
+			HPKG_ATTRIBUTE_TAG_ENCODING(tag), value);
 		if (error != B_OK)
 			return error;
 
-		bool hasChildren = B_HPKG_ATTRIBUTE_TAG_HAS_CHILDREN(tag);
+		bool hasChildren = HPKG_ATTRIBUTE_TAG_HAS_CHILDREN(tag);
 		AttributeHandler* childHandler = NULL;
 		error = _CurrentAttributeHandler()->HandleChildAttribute(context,
 			type->type, type->standardIndex, value,
@@ -1124,31 +1124,31 @@ PackageReaderImpl::_ParsePackageAttributes(AttributeHandlerContext* context)
 			return B_OK;
 
 		switch (id) {
-			case B_HPKG_PACKAGE_ATTRIBUTE_NAME:
+			case HPKG_PACKAGE_ATTRIBUTE_NAME:
 				handlerValue.SetTo(B_PACKAGE_INFO_NAME, attributeValue.string);
 				break;
 
-			case B_HPKG_PACKAGE_ATTRIBUTE_SUMMARY:
+			case HPKG_PACKAGE_ATTRIBUTE_SUMMARY:
 				handlerValue.SetTo(B_PACKAGE_INFO_SUMMARY,
 					attributeValue.string);
 				break;
 
-			case B_HPKG_PACKAGE_ATTRIBUTE_DESCRIPTION:
+			case HPKG_PACKAGE_ATTRIBUTE_DESCRIPTION:
 				handlerValue.SetTo(B_PACKAGE_INFO_DESCRIPTION,
 					attributeValue.string);
 				break;
 
-			case B_HPKG_PACKAGE_ATTRIBUTE_VENDOR:
+			case HPKG_PACKAGE_ATTRIBUTE_VENDOR:
 				handlerValue.SetTo(B_PACKAGE_INFO_VENDOR,
 					attributeValue.string);
 				break;
 
-			case B_HPKG_PACKAGE_ATTRIBUTE_PACKAGER:
+			case HPKG_PACKAGE_ATTRIBUTE_PACKAGER:
 				handlerValue.SetTo(B_PACKAGE_INFO_PACKAGER,
 					attributeValue.string);
 				break;
 
-			case B_HPKG_PACKAGE_ATTRIBUTE_ARCHITECTURE:
+			case HPKG_PACKAGE_ATTRIBUTE_ARCHITECTURE:
 				if (attributeValue.unsignedInt
 						>= B_PACKAGE_ARCHITECTURE_ENUM_COUNT) {
 					fErrorOutput->PrintError(
@@ -1161,7 +1161,7 @@ PackageReaderImpl::_ParsePackageAttributes(AttributeHandlerContext* context)
 					(uint8)attributeValue.unsignedInt);
 				break;
 
-			case B_HPKG_PACKAGE_ATTRIBUTE_VERSION_MAJOR:
+			case HPKG_PACKAGE_ATTRIBUTE_VERSION_MAJOR:
 				error = _ParsePackageVersion(handlerValue.version,
 					attributeValue.string);
 				if (error != B_OK)
@@ -1169,17 +1169,17 @@ PackageReaderImpl::_ParsePackageAttributes(AttributeHandlerContext* context)
 				handlerValue.attributeIndex = B_PACKAGE_INFO_VERSION;
 				break;
 
-			case B_HPKG_PACKAGE_ATTRIBUTE_COPYRIGHT:
+			case HPKG_PACKAGE_ATTRIBUTE_COPYRIGHT:
 				handlerValue.SetTo(B_PACKAGE_INFO_COPYRIGHTS,
 					attributeValue.string);
 				break;
 
-			case B_HPKG_PACKAGE_ATTRIBUTE_LICENSE:
+			case HPKG_PACKAGE_ATTRIBUTE_LICENSE:
 				handlerValue.SetTo(B_PACKAGE_INFO_LICENSES,
 					attributeValue.string);
 				break;
 
-			case B_HPKG_PACKAGE_ATTRIBUTE_PROVIDES_TYPE:
+			case HPKG_PACKAGE_ATTRIBUTE_PROVIDES_TYPE:
 				error = _ParsePackageProvides(handlerValue.resolvable,
 					(BPackageResolvableType)attributeValue.unsignedInt);
 				if (error != B_OK)
@@ -1187,7 +1187,7 @@ PackageReaderImpl::_ParsePackageAttributes(AttributeHandlerContext* context)
 				handlerValue.attributeIndex = B_PACKAGE_INFO_PROVIDES;
 				break;
 
-			case B_HPKG_PACKAGE_ATTRIBUTE_REQUIRES:
+			case HPKG_PACKAGE_ATTRIBUTE_REQUIRES:
 				error = _ParsePackageResolvableExpression(
 					handlerValue.resolvableExpression, attributeValue.string,
 					hasChildren);
@@ -1196,7 +1196,7 @@ PackageReaderImpl::_ParsePackageAttributes(AttributeHandlerContext* context)
 				handlerValue.attributeIndex = B_PACKAGE_INFO_REQUIRES;
 				break;
 
-			case B_HPKG_PACKAGE_ATTRIBUTE_SUPPLEMENTS:
+			case HPKG_PACKAGE_ATTRIBUTE_SUPPLEMENTS:
 				error = _ParsePackageResolvableExpression(
 					handlerValue.resolvableExpression, attributeValue.string,
 					hasChildren);
@@ -1205,7 +1205,7 @@ PackageReaderImpl::_ParsePackageAttributes(AttributeHandlerContext* context)
 				handlerValue.attributeIndex = B_PACKAGE_INFO_SUPPLEMENTS;
 				break;
 
-			case B_HPKG_PACKAGE_ATTRIBUTE_CONFLICTS:
+			case HPKG_PACKAGE_ATTRIBUTE_CONFLICTS:
 				error = _ParsePackageResolvableExpression(
 					handlerValue.resolvableExpression, attributeValue.string,
 					hasChildren);
@@ -1214,7 +1214,7 @@ PackageReaderImpl::_ParsePackageAttributes(AttributeHandlerContext* context)
 				handlerValue.attributeIndex = B_PACKAGE_INFO_CONFLICTS;
 				break;
 
-			case B_HPKG_PACKAGE_ATTRIBUTE_FRESHENS:
+			case HPKG_PACKAGE_ATTRIBUTE_FRESHENS:
 				error = _ParsePackageResolvableExpression(
 					handlerValue.resolvableExpression, attributeValue.string,
 					hasChildren);
@@ -1223,7 +1223,7 @@ PackageReaderImpl::_ParsePackageAttributes(AttributeHandlerContext* context)
 				handlerValue.attributeIndex = B_PACKAGE_INFO_FRESHENS;
 				break;
 
-			case B_HPKG_PACKAGE_ATTRIBUTE_REPLACES:
+			case HPKG_PACKAGE_ATTRIBUTE_REPLACES:
 				handlerValue.SetTo(B_PACKAGE_INFO_REPLACES,
 					attributeValue.string);
 				break;
@@ -1261,7 +1261,7 @@ PackageReaderImpl::_ParsePackageVersion(BPackageVersionData& _version,
 		error = _ReadPackageAttribute(id, value);
 		if (error != B_OK)
 			return error;
-		if (id != B_HPKG_PACKAGE_ATTRIBUTE_VERSION_MAJOR) {
+		if (id != HPKG_PACKAGE_ATTRIBUTE_VERSION_MAJOR) {
 			fErrorOutput->PrintError("Error: Invalid package attribute section:"
 				" Invalid package version, expected major\n");
 			return B_BAD_DATA;
@@ -1274,7 +1274,7 @@ PackageReaderImpl::_ParsePackageVersion(BPackageVersionData& _version,
 	error = _ReadPackageAttribute(id, value);
 	if (error != B_OK)
 		return error;
-	if (id != B_HPKG_PACKAGE_ATTRIBUTE_VERSION_MINOR) {
+	if (id != HPKG_PACKAGE_ATTRIBUTE_VERSION_MINOR) {
 		fErrorOutput->PrintError("Error: Invalid package attribute section:"
 			" Invalid package version, expected minor\n");
 		return B_BAD_DATA;
@@ -1285,7 +1285,7 @@ PackageReaderImpl::_ParsePackageVersion(BPackageVersionData& _version,
 	error = _ReadPackageAttribute(id, value);
 	if (error != B_OK)
 		return error;
-	if (id != B_HPKG_PACKAGE_ATTRIBUTE_VERSION_MICRO) {
+	if (id != HPKG_PACKAGE_ATTRIBUTE_VERSION_MICRO) {
 		fErrorOutput->PrintError("Error: Invalid package attribute section:"
 			" Invalid package version, expected micro\n");
 		return B_BAD_DATA;
@@ -1296,7 +1296,7 @@ PackageReaderImpl::_ParsePackageVersion(BPackageVersionData& _version,
 	error = _ReadPackageAttribute(id, value);
 	if (error != B_OK)
 		return error;
-	if (id != B_HPKG_PACKAGE_ATTRIBUTE_VERSION_RELEASE) {
+	if (id != HPKG_PACKAGE_ATTRIBUTE_VERSION_RELEASE) {
 		fErrorOutput->PrintError("Error: Invalid package attribute section:"
 			" Invalid package version, expected release\n");
 		return B_BAD_DATA;
@@ -1327,7 +1327,7 @@ PackageReaderImpl::_ParsePackageProvides(BPackageResolvableData& _resolvable,
 	status_t error = _ReadPackageAttribute(id, value, &hasChildren);
 	if (error != B_OK)
 		return error;
-	if (id != B_HPKG_PACKAGE_ATTRIBUTE_PROVIDES) {
+	if (id != HPKG_PACKAGE_ATTRIBUTE_PROVIDES) {
 		fErrorOutput->PrintError("Error: Invalid package attribute section: "
 			"Invalid package provides, expected name of resolvable\n");
 		return B_BAD_DATA;
@@ -1372,7 +1372,7 @@ PackageReaderImpl::_ParsePackageResolvableExpression(
 		status_t error = _ReadPackageAttribute(id, value);
 		if (error != B_OK)
 			return error;
-		if (id != B_HPKG_PACKAGE_ATTRIBUTE_RESOLVABLE_OPERATOR) {
+		if (id != HPKG_PACKAGE_ATTRIBUTE_RESOLVABLE_OPERATOR) {
 			fErrorOutput->PrintError("Error: Invalid package attribute section:"
 				" Invalid package resolvable expression, expected operator\n");
 			return B_BAD_DATA;
@@ -1419,7 +1419,7 @@ PackageReaderImpl::_ReadPackageAttribute(uint8& _id, AttributeValue& _value,
 
 	if (tag != 0) {
 		// get the type
-		uint16 type = B_HPKG_PACKAGE_ATTRIBUTE_TAG_TYPE(tag);
+		uint16 type = HPKG_PACKAGE_ATTRIBUTE_TAG_TYPE(tag);
 		if (type >= B_HPKG_ATTRIBUTE_TYPE_ENUM_COUNT) {
 			fErrorOutput->PrintError("Error: Invalid package attribute "
 				"section: attribute type %d not supported!\n", type);
@@ -1428,12 +1428,12 @@ PackageReaderImpl::_ReadPackageAttribute(uint8& _id, AttributeValue& _value,
 
 		// get the value
 		error = _ReadAttributeValue(type,
-			B_HPKG_PACKAGE_ATTRIBUTE_TAG_ENCODING(tag), _value);
+			HPKG_PACKAGE_ATTRIBUTE_TAG_ENCODING(tag), _value);
 		if (error != B_OK)
 			return error;
 
-		_id = B_HPKG_PACKAGE_ATTRIBUTE_TAG_ID(tag);
-		if (_id >= B_HPKG_PACKAGE_ATTRIBUTE_ENUM_COUNT) {
+		_id = HPKG_PACKAGE_ATTRIBUTE_TAG_ID(tag);
+		if (_id >= HPKG_PACKAGE_ATTRIBUTE_ENUM_COUNT) {
 			fErrorOutput->PrintError("Error: Invalid package attribute section: "
 				"attribute id %d not supported!\n", _id);
 			return B_BAD_DATA;
@@ -1441,7 +1441,7 @@ PackageReaderImpl::_ReadPackageAttribute(uint8& _id, AttributeValue& _value,
 	}
 
 	if (_hasChildren != NULL)
-		*_hasChildren = B_HPKG_PACKAGE_ATTRIBUTE_TAG_HAS_CHILDREN(tag);
+		*_hasChildren = HPKG_PACKAGE_ATTRIBUTE_TAG_HAS_CHILDREN(tag);
 	if (_tag != NULL)
 		*_tag = tag;
 

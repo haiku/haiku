@@ -14,10 +14,13 @@ namespace BPackageKit {
 namespace BHPKG {
 
 
-// magic, version
+// magic & version of package and repository files
 enum {
 	B_HPKG_MAGIC	= 'hpkg',
-	B_HPKG_VERSION	= 1
+	B_HPKG_VERSION	= 1,
+	//
+	B_HPKG_REPO_MAGIC	= 'hpkr',
+	B_HPKG_REPO_VERSION	= 1
 };
 
 
@@ -92,9 +95,28 @@ enum BPackageAttributeID {
 };
 
 
-// TODO: make this accessible via a function
+// compression types
+enum {
+	B_HPKG_COMPRESSION_NONE	= 0,
+	B_HPKG_COMPRESSION_ZLIB	= 1
+};
+
+
+// file types (HPKG_ATTRIBUTE_NAME_FILE_TYPE)
+enum {
+	B_HPKG_FILE_TYPE_FILE		= 0,
+	B_HPKG_FILE_TYPE_DIRECTORY	= 1,
+	B_HPKG_FILE_TYPE_SYMLINK	= 2
+};
+
+
 // default values
 enum {
+	B_HPKG_DEFAULT_FILE_TYPE				= B_HPKG_FILE_TYPE_FILE,
+	B_HPKG_DEFAULT_FILE_PERMISSIONS			= 0644,
+	B_HPKG_DEFAULT_DIRECTORY_PERMISSIONS	= 0755,
+	B_HPKG_DEFAULT_SYMLINK_PERMISSIONS		= 0777,
+	B_HPKG_DEFAULT_DATA_COMPRESSION			= B_HPKG_COMPRESSION_NONE,
 	B_HPKG_DEFAULT_DATA_CHUNK_SIZE_ZLIB		= 64 * 1024
 };
 
