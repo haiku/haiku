@@ -218,7 +218,8 @@ WriterImplBase::AbstractDataWriter::BytesWritten() const
 
 
 inline void
-WriterImplBase::AbstractDataWriter::WriteDataThrows(const void* buffer, size_t size)
+WriterImplBase::AbstractDataWriter::WriteDataThrows(const void* buffer,
+	size_t size)
 {
 	status_t error = WriteDataNoThrow(buffer, size);
 	if (error != B_OK)
