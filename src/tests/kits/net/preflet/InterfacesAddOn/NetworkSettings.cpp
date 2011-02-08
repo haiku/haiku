@@ -35,7 +35,8 @@
 
 NetworkSettings::NetworkSettings(const char* name)
 	:
-	fAuto(true),
+	fIPv4Auto(true),
+	fIPv6Auto(true),
 	fDisabled(false),
 	fNameServers(5, true)
 {
@@ -55,49 +56,26 @@ NetworkSettings::~NetworkSettings()
 }
 
 
-bool
-NetworkSettings::_PrepareRequest(struct ifreq& request)
-{
-	// This function is used for talking direct to the stack.
-	// It´s used by _ShowConfiguration.
-
-	const char* name = fName.String();
-
-	if (strlen(name) > IF_NAMESIZE)
-		return false;
-
-	strcpy(request.ifr_name, name);
-	return true;
-}
-
-
 void
 NetworkSettings::ReadConfiguration()
 {
-	ifreq request;
+	BNetworkInterface fNetworkInterface(fName);
 
-	if (!_PrepareRequest(request))
-		return;
+	int32 zeroAddrV4 = fNetworkInterface.FindFirstAddress(AF_INET);
+	int32 zeroAddrV6 = fNetworkInterface.FindFirstAddress(AF_INET6);
 
-	// Obtain IPv4 address.
-	if (ioctl(fSocket4, SIOCGIFADDR, &request, sizeof(request)) < 0)
-		return;
-	fIPv4Addr = *(sockaddr_in *)&request.ifr_addr;
+	BNetworkInterfaceAddress netIntAddr4;
+	BNetworkInterfaceAddress netIntAddr6;
 
-	// Obtain IPv4 netmask
-	if (ioctl(fSocket4, SIOCGIFNETMASK, &request, sizeof(request)) < 0)
-		return;
-	fIPv4Mask = *(sockaddr_in *)&request.ifr_mask;
+	if (fNetworkInterface.GetAddressAt(zeroAddrV4, netIntAddr4) == B_OK) {
+		fIPv4Addr = netIntAddr4.Address();
+		fIPv4Mask = netIntAddr4.Mask();
+	}
 
-	// Obtain IPv6 address.
-	if (ioctl(fSocket6, SIOCGIFADDR, &request, sizeof(request)) < 0)
-		return;
-	fIPv6Addr = *(sockaddr_in6 *)&request.ifr_addr;
-
-	// Obtain IPv6 netmask
-	if (ioctl(fSocket6, SIOCGIFNETMASK, &request, sizeof(request)) < 0)
-		return;
-	fIPv6Mask = *(sockaddr_in6 *)&request.ifr_mask;
+	if (fNetworkInterface.GetAddressAt(zeroAddrV6, netIntAddr6) == B_OK) {
+		fIPv6Addr = netIntAddr6.Address();
+		fIPv6Mask = netIntAddr6.Mask();
+	}
 
 	// Obtain gateway
 	ifconf config;
@@ -143,12 +121,19 @@ NetworkSettings::ReadConfiguration()
 			+ sizeof(route_entry) + addressSize);
 	}
 
-	uint32 flags = 0;
-	if (ioctl(fSocket4, SIOCGIFFLAGS, &request, sizeof(request)) == 0)
-		flags = request.ifr_flags;
+	// Obtain selfconfiguration options
 
-	fAuto = (flags & (IFF_AUTO_CONFIGURED | IFF_CONFIGURING)) != 0;
-	fDisabled = (flags & IFF_UP) == 0;
+	// TODO : This needs to be determined by the protocol flags
+	// instead of the interface flag... protocol flags don't seem
+	// to be complete yet. (netIntAddr4.Flags() and netIntAddr6.Flags())
+
+	fIPv4Auto = (fNetworkInterface.Flags()
+		& (IFF_AUTO_CONFIGURED | IFF_CONFIGURING)) != 0;
+
+	fIPv6Auto = (fNetworkInterface.Flags()
+		& (IFF_AUTO_CONFIGURED | IFF_CONFIGURING)) != 0;
+
+	fDisabled = (fNetworkInterface.Flags() & IFF_UP) == 0;
 
 	// Read wireless network from interfaces
 
@@ -218,7 +203,7 @@ NetworkSettings::ReadConfiguration()
 
 
 BNetworkAddress
-NetworkSettings::GetAddr(int family)
+NetworkSettings::IPAddr(int family)
 {
 	if (family == AF_INET6)
 		return fIPv6Addr;
@@ -228,7 +213,7 @@ NetworkSettings::GetAddr(int family)
 
 
 const char*
-NetworkSettings::GetIP(int family)
+NetworkSettings::IP(int family)
 {
 	if (family == AF_INET6)
 		return fIPv6Addr.ToString();
@@ -238,7 +223,7 @@ NetworkSettings::GetIP(int family)
 
 
 const char*
-NetworkSettings::GetNetmask(int family)
+NetworkSettings::Netmask(int family)
 {
 	if (family == AF_INET6)
 		return fIPv6Mask.ToString();
@@ -248,7 +233,7 @@ NetworkSettings::GetNetmask(int family)
 
 
 int32
-NetworkSettings::GetPrefixLen(int family)
+NetworkSettings::PrefixLen(int family)
 {
 	if (family == AF_INET6)
 		return fIPv6Mask.PrefixLength();

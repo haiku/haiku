@@ -95,8 +95,8 @@ InterfaceListItem::DrawItem(BView* owner, BRect /*bounds*/, bool complete)
 {
 	BListView* list = dynamic_cast<BListView*>(owner);
 
-	BNetworkAddress	addrIPv4 = fSettings->GetAddr(AF_INET);
-	BNetworkAddress	addrIPv6 = fSettings->GetAddr(AF_INET6);
+	BNetworkAddress	addrIPv4 = fSettings->IPAddr(AF_INET);
+	BNetworkAddress	addrIPv6 = fSettings->IPAddr(AF_INET6);
 
 	if (!list)
 		return;

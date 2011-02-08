@@ -5,6 +5,7 @@
  * Authors:
  *		Andre Alves Garzia, andre@andregarzia.com
  *		Vegard Wærp, vegarwa@online.no
+ *		Alexander von Gluck, kallisti5@unixzen.com
  */
 #ifndef SETTINGS_H
 #define SETTINGS_H
@@ -36,16 +37,16 @@ public:
 //			void				SetWirelessNetwork(const char* name)
 //									{ fWirelessNetwork.SetTo(name); }
 
-			BNetworkAddress		GetAddr(int family);
+			BNetworkAddress		IPAddr(int family);
 
-			const char*			GetIP(int family);
-			const char*			GetNetmask(int family);
-			int32				GetPrefixLen(int family);
+			const char*			IP(int family);
+			const char*			Netmask(int family);
+			int32				PrefixLen(int family);
 
 			const char*			Gateway()  { return fGateway.String(); }
 			const char*			Name()  { return fName.String(); }
 			const char*			Domain() { return fDomain.String(); }
-			bool				AutoConfigure() { return fAuto; }
+			bool				AutoConfigure() { return fIPv4Auto; }
 			bool				IsDisabled() { return fDisabled; }
 			const BString&		WirelessNetwork() { return fWirelessNetwork; }
 
@@ -54,10 +55,13 @@ public:
 			void				ReadConfiguration();
 
 private:
-			bool				_PrepareRequest(struct ifreq& request);
-
 			int					fSocket4;
 			int					fSocket6;
+
+			BNetworkInterface	fNetworkInterface;
+
+			bool				fIPv4Auto;
+			bool				fIPv6Auto;
 
 			BNetworkAddress		fIPv4Addr;
 			BNetworkAddress		fIPv4Mask;
@@ -67,7 +71,6 @@ private:
 			BString				fGateway;
 			BString				fName;
 			BString				fDomain;
-			bool				fAuto;
 			bool				fDisabled;
 			BObjectList<BString> fNameServers;
 			BString				fWirelessNetwork;
