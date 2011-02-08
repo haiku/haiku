@@ -532,7 +532,7 @@ Area::SetHeightAs(Area* area, float factor)
 		-factor, area->Bottom(), kEQ, 0.0);
 }
 
-#include <stdio.h>
+
 void
 Area::InvalidateSizeConstraints()
 {
