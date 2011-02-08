@@ -16,7 +16,7 @@
 
 
 using namespace LinearProgramming;
-using namespace BPrivate::Layout;
+//using namespace BPrivate::Layout;
 
 
 template<typename Type>
@@ -275,7 +275,7 @@ ActiveSetSolver::ActiveSetSolver(LinearSpec* linearSpec)
 	:
 	SolverInterface(linearSpec),
 
-	fVariables(linearSpec->Variables()),
+	fVariables(linearSpec->UsedVariables()),
 	fConstraints(linearSpec->Constraints())
 {
 

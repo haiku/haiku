@@ -106,7 +106,7 @@ negate_vector(double* x, int n)
 
 // allocate_matrix
 double**
-BPrivate::Layout::allocate_matrix(int m, int n)
+allocate_matrix(int m, int n)
 {
 	double** matrix = new(nothrow) double*[m];
 	if (!matrix)
@@ -128,7 +128,7 @@ BPrivate::Layout::allocate_matrix(int m, int n)
 
 // free_matrix
 void
-BPrivate::Layout::free_matrix(double** matrix)
+free_matrix(double** matrix)
 {
 	if (matrix) {
 		delete[] *matrix;
@@ -185,7 +185,7 @@ transpose_matrix(const double* const* A, double** Atrans, int m, int n)
 
 // zero_matrix
 void
-BPrivate::Layout::zero_matrix(double** A, int m, int n)
+zero_matrix(double** A, int m, int n)
 {
 	for (int i = 0; i < m; i++) {
 		for (int k = 0; k < n; k++)
@@ -196,7 +196,7 @@ BPrivate::Layout::zero_matrix(double** A, int m, int n)
 
 // copy_matrix
 void
-BPrivate::Layout::copy_matrix(const double* const* A, double** B, int m, int n)
+copy_matrix(const double* const* A, double** B, int m, int n)
 {
 	for (int i = 0; i < m; i++) {
 		for (int k = 0; k < n; k++)
@@ -261,7 +261,7 @@ swap(Type& a, Type& b)
 
 
 bool
-BPrivate::Layout::solve(double** a, int n, double* b)
+solve(double** a, int n, double* b)
 {
 	// index array for row permutation
 	// Note: We could eliminate it, if we would permutate the row pointers of a.
@@ -320,7 +320,7 @@ BPrivate::Layout::solve(double** a, int n, double* b)
 
 
 int
-BPrivate::Layout::compute_dependencies(double** a, int m, int n,
+compute_dependencies(double** a, int m, int n,
 	bool* independent)
 {
 	// index array for row permutation
@@ -383,7 +383,7 @@ BPrivate::Layout::compute_dependencies(double** a, int m, int n,
 
 // remove_linearly_dependent_rows
 int
-BPrivate::Layout::remove_linearly_dependent_rows(double** A, double** temp,
+remove_linearly_dependent_rows(double** A, double** temp,
 	bool* independentRows, int m, int n)
 {
 	// copy to temp
@@ -485,7 +485,7 @@ qr_decomposition(double** a, int m, int n, double* d, double** q)
 struct MatrixDelete {
 	inline void operator()(double** matrix)
 	{
-		BPrivate::Layout::free_matrix(matrix);
+		free_matrix(matrix);
 	}
 };
 typedef BPrivate::AutoDeleter<double*, MatrixDelete> MatrixDeleter;
@@ -521,8 +521,8 @@ LayoutOptimizer::~LayoutOptimizer()
 bool
 LayoutOptimizer::SetConstraints(const ConstraintList& list, int32 variableCount)
 {
-	fConstraints = list;
-	int32 constraintCount = fConstraints.CountItems();
+	fConstraints = (ConstraintList*)&list;
+	int32 constraintCount = fConstraints->CountItems();
 
 	if (fVariableCount != variableCount) {
 		_MakeEmpty();
@@ -532,8 +532,8 @@ LayoutOptimizer::SetConstraints(const ConstraintList& list, int32 variableCount)
 	zero_matrix(fSoftConstraints, constraintCount, fVariableCount);
 	double rightSide[constraintCount];
 	// set up soft constraint matrix
-	for (int32 c = 0; c < fConstraints.CountItems(); c++) {
-		Constraint* constraint = fConstraints.ItemAt(c);
+	for (int32 c = 0; c < fConstraints->CountItems(); c++) {
+		Constraint* constraint = fConstraints->ItemAt(c);
 		if (!constraint->IsSoft()) {
 			rightSide[c] = 0;
 			continue;
@@ -644,7 +644,7 @@ LayoutOptimizer::Solve(double* values)
 	if (values == NULL)
 		return false;
 
-	int32 constraintCount = fConstraints.CountItems();
+	int32 constraintCount = fConstraints->CountItems();
 
 	// allocate the active constraint matrix and its transposed matrix
 	fActiveMatrix = allocate_matrix(constraintCount, fVariableCount);
@@ -663,13 +663,13 @@ LayoutOptimizer::Solve(double* values)
 bool
 LayoutOptimizer::_Solve(double* values)
 {
-	int32 constraintCount = fConstraints.CountItems();
+	int32 constraintCount = fConstraints->CountItems();
 
 TRACE_ONLY(
 	TRACE("constraints:\n");
 	for (int32 i = 0; i < constraintCount; i++) {
 		TRACE(" %-2ld:  ", i);
-		fConstraints.ItemAt(i)->PrintToStream();
+		fConstraints->ItemAt(i)->PrintToStream();
 	}
 )
 
@@ -694,7 +694,7 @@ TRACE_ONLY(
 	ConstraintList activeConstraints(constraintCount);
 
 	for (int32 i = 0; i < constraintCount; i++) {
-		Constraint* constraint = fConstraints.ItemAt(i);
+		Constraint* constraint = fConstraints->ItemAt(i);
 		if (constraint->IsSoft())
 			continue;
 		double actualValue = _ActualValue(constraint, x);
@@ -840,7 +840,7 @@ TRACE_ONLY(
 			int barrier = -1;
 			// if alpha_k < 1, add a barrier constraint to W^k
 			for (int32 i = 0; i < constraintCount; i++) {
-				Constraint* constraint = fConstraints.ItemAt(i);
+				Constraint* constraint = fConstraints->ItemAt(i);
 				if (activeConstraints.HasItem(constraint))
 					continue;
 
@@ -860,7 +860,7 @@ TRACE_ONLY(
 			TRACE("alpha: %f, barrier: %d\n", alpha, barrier);
 
 			if (alpha < 1)
-				activeConstraints.AddItem(fConstraints.ItemAt(barrier));
+				activeConstraints.AddItem(fConstraints->ItemAt(barrier));
 
 			// x += p * alpha;
 			add_vectors_scaled(x, p, alpha, fVariableCount);

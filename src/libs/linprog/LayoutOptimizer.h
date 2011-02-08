@@ -14,10 +14,6 @@
 static const double kEqualsEpsilon = 0.000001;
 
 
-namespace BPrivate {
-namespace Layout {
-
-
 double** allocate_matrix(int m, int n);
 void free_matrix(double** matrix);
 void copy_matrix(const double* const* A, double** B, int m, int n);
@@ -56,7 +52,7 @@ private:
 
 
 			int32				fVariableCount;
-			ConstraintList		fConstraints;
+			ConstraintList*		fConstraints;
 
 			double**			fTemp1;
 			double**			fTemp2;
@@ -68,11 +64,6 @@ private:
 			double**			fG;
 			double*				fDesired;
 };
-
-}	// namespace Layout
-}	// namespace BPrivate
-
-using BPrivate::Layout::LayoutOptimizer;
 
 
 inline bool
