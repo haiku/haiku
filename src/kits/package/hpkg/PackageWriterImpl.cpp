@@ -20,8 +20,11 @@
 #include <new>
 
 #include <ByteOrder.h>
+#include <Directory.h>
 #include <Entry.h>
+#include <FindDirectory.h>
 #include <fs_attr.h>
+#include <Path.h>
 
 #include <AutoDeleter.h>
 
@@ -350,12 +353,11 @@ PackageWriterImpl::AddEntry(const char* fileName)
 				BPackageWriterListener* listener;
 			} errorListener(fListener);
 			BEntry packageInfoEntry(fileName);
-			BPackageInfo packageInfo;
-			status_t result = packageInfo.ReadFromConfigFile(packageInfoEntry,
+			status_t result = fPackageInfo.ReadFromConfigFile(packageInfoEntry,
 				&errorListener);
-			if (result != B_OK || (result = packageInfo.InitCheck()) != B_OK)
+			if (result != B_OK || (result = fPackageInfo.InitCheck()) != B_OK)
 				return result;
-			RegisterPackageInfo(PackageAttributes(), packageInfo);
+			RegisterPackageInfo(PackageAttributes(), fPackageInfo);
 		}
 
 		return _RegisterEntry(fileName);
@@ -372,11 +374,16 @@ status_t
 PackageWriterImpl::Finish()
 {
 	try {
-		if (PackageAttributes().IsEmpty()) {
+		if (fPackageInfo.InitCheck() != B_OK) {
 			fListener->PrintError("No package-info file found (%s)!\n",
 				B_HPKG_PACKAGE_INFO_FILE_NAME);
 			return B_BAD_DATA;
 		}
+
+		status_t result = _CheckLicenses();
+		if (result != B_OK)
+			return result;
+
 		return _Finish();
 	} catch (status_t error) {
 		return error;
@@ -413,6 +420,44 @@ PackageWriterImpl::_Init(const char* fileName)
 
 	fHeapOffset = fHeapEnd = sizeof(hpkg_header);
 	fTopAttribute = fRootAttribute;
+
+	return B_OK;
+}
+
+
+status_t
+PackageWriterImpl::_CheckLicenses()
+{
+	BPath systemLicensePath;
+	status_t result
+		= find_directory(B_SYSTEM_DATA_DIRECTORY, &systemLicensePath);
+	if (result != B_OK) {
+		fListener->PrintError("unable to find system data path!\n");
+		return result;
+	}
+	if ((result = systemLicensePath.Append("licenses")) != B_OK) {
+		fListener->PrintError("unable to append to system data path!\n");
+		return result;
+	}
+
+	BDirectory systemLicenseDir(systemLicensePath.Path());
+	BDirectory packageLicenseDir("./data/licenses");
+
+	const BObjectList<BString>& licenseList = fPackageInfo.LicenseList();
+	for (int i = 0; i < licenseList.CountItems(); ++i) {
+		const BString& licenseName = *licenseList.ItemAt(i);
+		BEntry license;
+		if (systemLicenseDir.FindEntry(licenseName.String(), &license) == B_OK)
+			continue;
+
+		// license is not a system license, so it must be contained in package
+		if (packageLicenseDir.FindEntry(licenseName.String(),
+				&license) != B_OK) {
+			fListener->PrintError("License '%s' isn't contained in package!\n",
+				licenseName.String());
+			return B_BAD_DATA;
+		}
+	}
 
 	return B_OK;
 }

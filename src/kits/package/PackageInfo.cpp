@@ -72,6 +72,7 @@ private:
 			void				_RewindTo(const Token& token);
 
 			void				_ParseStringValue(BString* value);
+			uint32				_ParseFlags();
 			void				_ParseArchitectureValue(
 									BPackageArchitecture* value);
 			void				_ParseVersionValue(BPackageVersion* value,
@@ -416,6 +417,45 @@ BPackageInfo::Parser::_ParseStringList(BObjectList<BString>* value, bool
 }
 
 
+uint32
+BPackageInfo::Parser::_ParseFlags()
+{
+	uint32 flags = 0;
+
+	Token openBracket = _NextToken();
+	if (openBracket.type != TOKEN_OPEN_BRACKET)
+		throw ParseError("expected start of list ('[')", openBracket.pos);
+
+	bool needComma = false;
+	while (true) {
+		Token token = _NextToken();
+		if (token.type == TOKEN_CLOSE_BRACKET)
+			break;
+
+		if (needComma) {
+			if (token.type != TOKEN_COMMA)
+				throw ParseError("expected comma", token.pos);
+			token = _NextToken();
+		} else
+			needComma = true;
+
+		if (token.type != TOKEN_WORD)
+			throw ParseError("expected word (a flag)", token.pos);
+
+		if (token.text.ICompare("approve_license") == 0)
+			flags |= B_PACKAGE_FLAG_APPROVE_LICENSE;
+		else if (token.text.ICompare("system_package") == 0)
+			flags |= B_PACKAGE_FLAG_SYSTEM_PACKAGE;
+		else {
+			throw ParseError("expected 'approve_license' or 'system_package'",
+				token.pos);
+		}
+	}
+
+	return flags;
+}
+
+
 void
 BPackageInfo::Parser::_ParseResolvableList(
 	BObjectList<BPackageResolvable>* value)
@@ -729,6 +769,16 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 			for (int i = 0; i < count; ++i)
 				packageInfo->AddReplaces(*(replacesList.ItemAt(i)));
 			seen[B_PACKAGE_INFO_REPLACES] = true;
+		} else if (t.text.ICompare(names[B_PACKAGE_INFO_FLAGS])
+				== 0) {
+			if (seen[B_PACKAGE_INFO_FLAGS]) {
+				BString error = BString(names[B_PACKAGE_INFO_FLAGS])
+					<< " already seen!";
+				throw ParseError(error, t.pos);
+			}
+
+			packageInfo->SetFlags(_ParseFlags());
+			seen[B_PACKAGE_INFO_FLAGS] = true;
 		}
 	}
 
@@ -758,6 +808,7 @@ const char* BPackageInfo::kElementNames[B_PACKAGE_INFO_ENUM_COUNT] = {
 	"conflicts",
 	"freshens",
 	"replaces",
+	"flags",
 };
 
 
@@ -771,6 +822,7 @@ BPackageInfo::kArchitectureNames[B_PACKAGE_ARCHITECTURE_ENUM_COUNT] = {
 
 BPackageInfo::BPackageInfo()
 	:
+	fFlags(0),
 	fArchitecture(B_PACKAGE_ARCHITECTURE_ENUM_COUNT),
 	fCopyrightList(5, true),
 	fLicenseList(5, true),
@@ -884,6 +936,13 @@ BPackageInfo::Packager() const
 }
 
 
+uint32
+BPackageInfo::Flags() const
+{
+	return fFlags;
+}
+
+
 BPackageArchitecture
 BPackageInfo::Architecture() const
 {
@@ -993,6 +1052,13 @@ void
 BPackageInfo::SetVersion(const BPackageVersion& version)
 {
 	fVersion = version;
+}
+
+
+void
+BPackageInfo::SetFlags(uint32 flags)
+{
+	fFlags = flags;
 }
 
 

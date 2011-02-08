@@ -34,8 +34,7 @@ public:
 									uint64 uncompressedStringsSize,
 									uint64 uncompressedMainSize,
 									uint64 uncompressedTOCSize) = 0;
-	virtual void				OnPackageAttributesSizeInfo(
-									uint32 stringCount,
+	virtual void				OnPackageAttributesSizeInfo(uint32 stringCount,
 									uint32 uncompressedSize) = 0;
 	virtual void				OnPackageSizeInfo(uint32 headerSize,
 									uint64 heapSize, uint64 tocSize,

@@ -10,6 +10,7 @@
 #include <String.h>
 
 #include <package/PackageArchitecture.h>
+#include <package/PackageFlags.h>
 #include <package/PackageInfoAttributes.h>
 #include <package/PackageResolvable.h>
 #include <package/PackageResolvableExpression.h>
@@ -55,6 +56,8 @@ public:
 			const BString&		Vendor() const;
 			const BString&		Packager() const;
 
+			uint32				Flags() const;
+
 			BPackageArchitecture	Architecture() const;
 
 			const BPackageVersion&	Version() const;
@@ -78,6 +81,8 @@ public:
 			void				SetDescription(const BString& description);
 			void				SetVendor(const BString& vendor);
 			void				SetPackager(const BString& packager);
+
+			void				SetFlags(uint32 flags);
 
 			void				SetArchitecture(
 									BPackageArchitecture architecture);
@@ -127,6 +132,8 @@ private:
 			BString				fDescription;
 			BString				fVendor;
 			BString				fPackager;
+
+			uint32				fFlags;
 
 			BPackageArchitecture	fArchitecture;
 

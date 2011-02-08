@@ -61,6 +61,8 @@ private:
 									const char* name, size_t nameLength,
 									bool isImplicit);
 
+			status_t			_CheckLicenses();
+
 			void				_WriteTOC(hpkg_header& header);
 			int32				_WriteTOCSections(uint64& _attributeTypesSize,
 									uint64& _stringsSize, uint64& _mainSize);
@@ -114,6 +116,8 @@ private:
 
 			StringCache			fStringCache;
 			AttributeTypeTable*	fAttributeTypes;
+
+			BPackageInfo		fPackageInfo;
 };
 
 

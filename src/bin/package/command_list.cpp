@@ -133,6 +133,16 @@ struct PackageContentListHandler : BPackageContentHandler {
 				printf("\tpackager: %s\n", value.string);
 				break;
 
+			case B_PACKAGE_INFO_FLAGS:
+				if (value.unsignedInt == 0)
+					break;
+				printf("\tflags:\n");
+				if ((value.unsignedInt & B_PACKAGE_FLAG_APPROVE_LICENSE) != 0)
+					printf("\t\tapprove_license\n");
+				if ((value.unsignedInt & B_PACKAGE_FLAG_SYSTEM_PACKAGE) != 0)
+					printf("\t\tsystem_package\n");
+				break;
+
 			case B_PACKAGE_INFO_ARCHITECTURE:
 				printf("\tarchitecure: %s\n",
 					BPackageInfo::kArchitectureNames[value.unsignedInt]);

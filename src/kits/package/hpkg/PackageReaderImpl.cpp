@@ -1162,6 +1162,11 @@ PackageReaderImpl::_ParsePackageAttributes(AttributeHandlerContext* context)
 					attributeValue.string);
 				break;
 
+			case HPKG_PACKAGE_ATTRIBUTE_FLAGS:
+				handlerValue.SetTo(B_PACKAGE_INFO_FLAGS,
+					(uint32)attributeValue.unsignedInt);
+				break;
+
 			case HPKG_PACKAGE_ATTRIBUTE_ARCHITECTURE:
 				if (attributeValue.unsignedInt
 						>= B_PACKAGE_ARCHITECTURE_ENUM_COUNT) {

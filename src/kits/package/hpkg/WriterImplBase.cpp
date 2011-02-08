@@ -391,12 +391,19 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 	packager->string = fPackageStringCache.Get(packageInfo.Packager().String());
 	attributeList.Add(packager);
 
+	// flags
+	PackageAttribute* flags = new PackageAttribute(
+		HPKG_PACKAGE_ATTRIBUTE_FLAGS, B_HPKG_ATTRIBUTE_TYPE_UINT,
+		B_HPKG_ATTRIBUTE_ENCODING_INT_32_BIT);
+	flags->unsignedInt = packageInfo.Flags();
+	attributeList.Add(flags);
+
 	// architecture
 	PackageAttribute* architecture = new PackageAttribute(
 		HPKG_PACKAGE_ATTRIBUTE_ARCHITECTURE, B_HPKG_ATTRIBUTE_TYPE_UINT,
 		B_HPKG_ATTRIBUTE_ENCODING_INT_8_BIT);
 	architecture->unsignedInt = packageInfo.Architecture();
-	attributeList.Add(packager);
+	attributeList.Add(architecture);
 
 	// version
 	RegisterPackageVersion(attributeList, packageInfo.Version());

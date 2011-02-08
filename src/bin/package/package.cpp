@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>
  * Distributed under the terms of the MIT License.
  */
 
@@ -24,11 +25,10 @@ static const char* kUsage =
 	"Creates, inspects, or extracts a Haiku package.\n"
 	"\n"
 	"Commands:\n"
-	"  create [ <options> ] <package> <file> ...\n"
-	"    Creates package file <package> from a list of files.\n"
+	"  create [ <options> ] <package>\n"
+	"    Creates package file <package> from contents of current directory.\n"
 	"\n"
-	"    -C <dir>    - Change to directory <dir> before interpreting the file\n"
-	"                  names <file>.\n"
+	"    -C <dir>    - Change to directory <dir> before starting.\n"
 	"\n"
 	"  dump [ <options> ] <package>\n"
 	"    Dumps the TOC section of package file <package>. For debugging only.\n"

@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>
  * Distributed under the terms of the MIT License.
  */
 
@@ -52,7 +53,7 @@ public:
 		if (fQuiet || !fVerbose)
 			return;
 
-		printf("----- TOC Info -----\n");
+		printf("----- TOC Info -----------------------------------\n");
 		printf("attribute types size:    %10llu (uncompressed)\n",
 			uncompressedAttributeTypesSize);
 		printf("cached strings size:     %10llu (uncompressed)\n",
@@ -69,9 +70,9 @@ public:
 		if (fQuiet || !fVerbose)
 			return;
 
-		printf("----- Package Attribute Info -----\n");
-		printf("string count:            %10ld\n", stringCount);
-		printf("package attributes size: %10ld (uncompressed)\n",
+		printf("----- Package Attribute Info ---------------------\n");
+		printf("string count:            %10lu\n", stringCount);
+		printf("package attributes size: %10lu (uncompressed)\n",
 			uncompressedSize);
 	}
 
@@ -81,12 +82,12 @@ public:
 		if (fQuiet)
 			return;
 
-		printf("----- Package Info -----\n");
+		printf("----- Package Info ----------------\n");
 		printf("header size:             %10lu\n", headerSize);
-		printf("heap size:               %10lld\n", heapSize);
-		printf("TOC size:                %10lld\n", tocSize);
-		printf("package attributes size: %10ld\n", packageAttributesSize);
-		printf("total size:              %10lld\n", totalSize);
+		printf("heap size:               %10llu\n", heapSize);
+		printf("TOC size:                %10llu\n", tocSize);
+		printf("package attributes size: %10lu\n", packageAttributesSize);
+		printf("total size:              %10llu\n", totalSize);
 
 	}
 
@@ -139,14 +140,11 @@ command_create(int argc, const char* const* argv)
 		}
 	}
 
-	// The remaining arguments are the package file and the list of files to
-	// include, i.e. at least two more arguments.
-	if (optind + 2 > argc)
+	// The remaining arguments is the package file, i.e. one more argument.
+	if (optind + 1 != argc)
 		print_usage_and_exit(true);
 
 	const char* packageFileName = argv[optind++];
-	const char* const* fileNames = argv + optind;
-	int fileNameCount = argc - optind;
 
 	// create package
 	PackageWriterListener listener(verbose, quiet);
@@ -164,32 +162,22 @@ command_create(int argc, const char* const* argv)
 		}
 	}
 
-	// add files
-	for (int i = 0; i < fileNameCount; i++) {
-		if (strcmp(fileNames[i], ".") == 0) {
-			DIR* dir = opendir(".");
-			if (dir == NULL) {
-				listener.PrintError("Error: Failed to opendir '.': %s\n",
-					strerror(errno));
-				return 1;
-			}
-			while (dirent* entry = readdir(dir)) {
-				if (strcmp(entry->d_name, ".") == 0
-					|| strcmp(entry->d_name, "..") == 0)
-					continue;
-
-				result = packageWriter.AddEntry(entry->d_name);
-				if (result != B_OK)
-					return 1;
-			}
-			closedir(dir);
-
-		} else {
-			result = packageWriter.AddEntry(fileNames[i]);
-			if (result != B_OK)
-				return 1;
-		}
+	// add all files of current directory
+	DIR* dir = opendir(".");
+	if (dir == NULL) {
+		listener.PrintError("Error: Failed to opendir '.': %s\n",
+			strerror(errno));
+		return 1;
 	}
+	while (dirent* entry = readdir(dir)) {
+		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+			continue;
+
+		result = packageWriter.AddEntry(entry->d_name);
+		if (result != B_OK)
+			return 1;
+	}
+	closedir(dir);
 
 	// write the package
 	result = packageWriter.Finish();
