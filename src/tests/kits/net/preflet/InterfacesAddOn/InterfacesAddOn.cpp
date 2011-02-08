@@ -16,7 +16,6 @@
 
 #include "InterfacesAddOn.h"
 #include "InterfacesListView.h"
-#include "NetworkWindow.h"
 
 #include <stdio.h>
 
@@ -137,8 +136,8 @@ InterfacesAddOn::MessageReceived(BMessage* msg)
 		if (!item)
 			break;
 
-		NetworkWindow* nw = new NetworkWindow(item->GetSettings());
-		nw->Show();
+		//NetworkWindow* nw = new NetworkWindow(item->GetSettings());
+		//nw->Show();
 		break;
 	}
 

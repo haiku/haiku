@@ -24,7 +24,7 @@
 #include <NetworkInterface.h>
 #include <String.h>
 
-#include "Settings.h"
+#include "NetworkSettings.h"
 
 
 /* GCC 3.4 and onward have a built-in "population count"
@@ -64,7 +64,7 @@ public:
 										return fSettings->IsDisabled();}
 	inline	void				SetDisabled(bool disable) {
 										fSettings->SetDisabled(disable);}
-	inline	Settings*			GetSettings() {return fSettings;}
+	inline	NetworkSettings*	GetSettings() {return fSettings;}
 
 private:
 			void 				_Init();
@@ -75,8 +75,12 @@ private:
 			BBitmap*			fIconPending;
 			BBitmap*			fIconOnline;
 
+			NetworkSettings*	fSettings;
+				// Interface configuration
+
 			BNetworkInterface	fInterface;
-			Settings*			fSettings;
+				// Hardware Interface
+
 			float				fFirstlineOffset;
 			float				fSecondlineOffset;
 			float				fThirdlineOffset;

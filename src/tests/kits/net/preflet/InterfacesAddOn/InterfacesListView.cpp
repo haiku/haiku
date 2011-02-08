@@ -32,7 +32,7 @@
 
 #include <AutoDeleter.h>
 
-#include "Settings.h"
+#include "NetworkSettings.h"
 
 
 // #pragma mark -
@@ -192,7 +192,6 @@ InterfaceListItem::DrawItem(BView* owner, BRect /*bounds*/, bool complete)
 		list->DrawString(v4str.String(), v4addrPt);
 
 		list->DrawString("IPv6: none (auto)", v6addrPt);
-			// TODO : where will we keep this?
 	}
 
 	owner->PopState();
@@ -202,11 +201,12 @@ InterfaceListItem::DrawItem(BView* owner, BRect /*bounds*/, bool complete)
 void
 InterfaceListItem::_Init()
 {
-	fSettings = new Settings(Name());
+	fSettings = new NetworkSettings(Name());
 
 	const char*	mediaTypeName = NULL;
 
 	int media = fInterface.Media();
+
 	printf("%s media = 0x%x\n", Name(), media);
 	switch (IFM_TYPE(media)) {
 		case IFM_ETHER:

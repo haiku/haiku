@@ -13,10 +13,10 @@
 #include <GroupLayout.h>
 
 #include "EthernetSettingsView.h"
-#include "Settings.h"
+#include "NetworkSettings.h"
 
 
-NetworkWindow::NetworkWindow(Settings* settings)
+NetworkWindow::NetworkWindow(NetworkSettings* settings)
 	: BWindow(BRect(50, 50, 269, 302), "Network", B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE
 		| B_AUTO_UPDATE_SIZE_LIMITS)
