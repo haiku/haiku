@@ -6,11 +6,9 @@
 #define _PACKAGE__HPKG__PRIVATE__REPOSITORY_WRITER_IMPL_H_
 
 
-#include <util/DoublyLinkedList.h>
-#include <util/OpenHashTable.h>
+#include <Entry.h>
 
-#include <package/PackageInfo.h>
-#include <package/hpkg/Strings.h>
+#include <package/hpkg/RepositoryWriter.h>
 #include <package/hpkg/WriterImplBase.h>
 
 
@@ -35,17 +33,19 @@ public:
 								~RepositoryWriterImpl();
 
 			status_t			Init(const char* fileName);
-			status_t			AddPackage(const BPackageInfo& packageInfo);
+			status_t			AddPackage(const BEntry& packageEntry);
 			status_t			Finish();
 
 private:
 			status_t			_Init(const char* fileName);
-			status_t			_AddPackage(const BPackageInfo& packageInfo);
+			status_t			_AddPackage(const BEntry& packageEntry);
 			status_t			_Finish();
+
+			off_t				_WritePackageAttributes(
+									hpkg_repo_header& header);
 
 private:
 			BRepositoryWriterListener*	fListener;
-
 };
 
 

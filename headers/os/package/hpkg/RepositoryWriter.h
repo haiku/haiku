@@ -6,12 +6,17 @@
 #define _PACKAGE__HPKG__REPOSITORY_WRITER_H_
 
 
-#include <SupportDefs.h>
-
 #include <package/hpkg/ErrorOutput.h>
 
 
+class BEntry;
+
+
 namespace BPackageKit {
+
+
+class BPackageInfo;
+
 
 namespace BHPKG {
 
@@ -30,7 +35,7 @@ public:
 	virtual	void				OnPackageAdded(
 									const BPackageInfo& packageInfo) = 0;
 
-	virtual void				OnPackageAttributesSizeInfo(
+	virtual void				OnPackageAttributesSizeInfo(uint32 stringCount,
 									uint32 uncompressedSize) = 0;
 	virtual void				OnRepositorySizeInfo(uint32 headerSize,
 									uint32 packageAttributesSize,
@@ -46,7 +51,7 @@ public:
 								~BRepositoryWriter();
 
 			status_t			Init(const char* fileName);
-			status_t			AddPackage(const BPackageInfo& packageInfo);
+			status_t			AddPackage(const BEntry& packageEntry);
 			status_t			Finish();
 
 private:

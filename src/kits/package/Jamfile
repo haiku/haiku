@@ -25,6 +25,7 @@ HPKG_SOURCES =
 	PackageReaderImpl.cpp
 	PackageWriter.cpp
 	PackageWriterImpl.cpp
+	RepositoryWriterImpl.cpp
 	Strings.cpp
 	WriterImplBase.cpp
 

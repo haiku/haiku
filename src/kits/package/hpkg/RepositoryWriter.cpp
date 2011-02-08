@@ -40,12 +40,12 @@ BRepositoryWriter::Init(const char* fileName)
 
 
 status_t
-BRepositoryWriter::AddPackage(const BPackageInfo& packageInfo)
+BRepositoryWriter::AddPackage(const BEntry& packageEntry)
 {
 	if (fImpl == NULL)
 		return B_NO_INIT;
 
-	return fImpl->AddPackage(packageInfo);
+	return fImpl->AddPackage(packageEntry);
 }
 
 
