@@ -27,29 +27,6 @@
 #include "NetworkSettings.h"
 
 
-/* GCC 3.4 and onward have a built-in "population count"
- * feature that takes advantage of a cpu instruction
- */
-// TODO : remove when access to BNetworkAddress is complete
-#if __GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 4)
-#	define PopCount(buffer) __builtin_popcount(buffer)
-#else
-	/* On < GCC 3.4 we do it the old fashon way */
-	int PopCount(unsigned buf)
-	{
-		buf = buf - ((buf >> 1) & 0x55555555);
-		buf = (buf & 0x33333333) + ((buf >> 2) & 0x33333333);
-		buf = (buf + (buf >> 4)) & 0x0F0F0F0F;
-		buf = buf + (buf >> 8);
-		buf = buf + (buf >> 16);
-	    return buf & 0x0000003F;
-	}
-#endif
-
-
-int netmaskbitcount(const char* buf);
-
-
 class InterfaceListItem : public BListItem {
 public:
 								InterfaceListItem(const char* name);

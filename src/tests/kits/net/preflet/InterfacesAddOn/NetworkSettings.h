@@ -10,6 +10,8 @@
 #define SETTINGS_H
 
 
+#include <NetworkDevice.h>
+#include <NetworkInterface.h>
 #include <ObjectList.h>
 #include <String.h>
 
@@ -19,24 +21,28 @@ public:
 								NetworkSettings(const char* name);
 	virtual						~NetworkSettings();
 
-			void				SetIP(const BString& ip)
-									{ fIP = ip; }
-			void				SetGateway(const BString& ip)
-									{ fGateway = ip; }
-			void				SetNetmask(const BString& ip)
-									{ fNetmask = ip; }
-			void				SetDomain(const BString& domain)
-									{ fDomain = domain; }
-			void				SetAutoConfigure(bool autoConfigure)
-									{ fAuto = autoConfigure; }
+//			void				SetIP(const BString& ip)
+//									{ fIP = ip; }
+//			void				SetGateway(const BString& ip)
+//									{ fGateway = ip; }
+//			void				SetNetmask(const BString& ip)
+//									{ fNetmask = ip; }
+//			void				SetDomain(const BString& domain)
+//									{ fDomain = domain; }
+//			void				SetAutoConfigure(bool autoConfigure)
+//									{ fAuto = autoConfigure; }
 			void				SetDisabled(bool disabled)
 									{ fDisabled = disabled; }
-			void				SetWirelessNetwork(const char* name)
-									{ fWirelessNetwork.SetTo(name); }
+//			void				SetWirelessNetwork(const char* name)
+//									{ fWirelessNetwork.SetTo(name); }
 
-			const char*			IP()  { return fIP.String(); }
+			BNetworkAddress		GetAddr(int family);
+
+			const char*			GetIP(int family);
+			const char*			GetNetmask(int family);
+			int32				GetPrefixLen(int family);
+
 			const char*			Gateway()  { return fGateway.String(); }
-			const char*			Netmask()  { return fNetmask.String(); }
 			const char*			Name()  { return fName.String(); }
 			const char*			Domain() { return fDomain.String(); }
 			bool				AutoConfigure() { return fAuto; }
@@ -50,12 +56,17 @@ public:
 private:
 			bool				_PrepareRequest(struct ifreq& request);
 
-			BString				fIP;
+			int					fSocket4;
+			int					fSocket6;
+
+			BNetworkAddress		fIPv4Addr;
+			BNetworkAddress		fIPv4Mask;
+			BNetworkAddress		fIPv6Addr;
+			BNetworkAddress		fIPv6Mask;
+
 			BString				fGateway;
-			BString				fNetmask;
 			BString				fName;
 			BString				fDomain;
-			int					fSocket;
 			bool				fAuto;
 			bool				fDisabled;
 			BObjectList<BString> fNameServers;

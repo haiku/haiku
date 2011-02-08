@@ -52,16 +52,6 @@ our_image(image_info& image)
 }
 
 
-/* Takes the provided ip-style netmask and converts
- * it to an unsigned int, then counts the binary 1's
- */
-int
-netmaskbitcount(const char* buf)
-{
-	return(PopCount(inet_addr(buf)));
-}
-
-
 // #pragma mark -
 
 
@@ -107,6 +97,9 @@ InterfaceListItem::DrawItem(BView* owner, BRect /*bounds*/, bool complete)
 	BBitmap*	stateIcon(NULL);
 	BString		interfaceState;
 
+	BNetworkAddress	addrIPv4 = fSettings->GetAddr(AF_INET);
+	BNetworkAddress	addrIPv6 = fSettings->GetAddr(AF_INET6);
+
 	if (!list)
 		return;
 
@@ -133,7 +126,8 @@ InterfaceListItem::DrawItem(BView* owner, BRect /*bounds*/, bool complete)
 	} else if (!fInterface.HasLink()) {
 		interfaceState << "no link";
 		stateIcon = fIconOffline;
-	} else if (!fSettings->IP() && fSettings->AutoConfigure()) {
+	} else if (addrIPv4.IsEmpty() && addrIPv6.IsEmpty()
+		&& fSettings->AutoConfigure()) {
 		interfaceState << "connecting" B_UTF8_ELLIPSIS;
 		stateIcon = fIconPending;
 	} else {
@@ -179,19 +173,28 @@ InterfaceListItem::DrawItem(BView* owner, BRect /*bounds*/, bool complete)
 	list->DrawString(interfaceState, statePt);
 
 	if (!fSettings->IsDisabled()) {
+		// Render IPv4 Address
 		BString v4str("IPv4: ");
-		v4str << fSettings->IP();
-		v4str << " /";
-		v4str << netmaskbitcount(fSettings->Netmask());
-		v4str << " (";
+
+		if (addrIPv4.IsEmpty())
+			v4str << "none";
+		else {
+			v4str << addrIPv4.ToString();
+		}
+
 		if (fSettings->AutoConfigure())
-			v4str << "DHCP";
+			v4str << " (DHCP)";
 		else
-			v4str << "manual";
-		v4str << ")";
+			v4str << " (manual)";
+
 		list->DrawString(v4str.String(), v4addrPt);
 
-		list->DrawString("IPv6: none (auto)", v6addrPt);
+		// Render IPv6 Address (if present)
+		if (!addrIPv6.IsEmpty()) {
+			BString v6str("IPv6: ");
+			v6str << addrIPv6.ToString();
+			list->DrawString(v6str, v6addrPt);
+		}
 	}
 
 	owner->PopState();

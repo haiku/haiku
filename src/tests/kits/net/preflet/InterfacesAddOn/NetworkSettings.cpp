@@ -1,11 +1,12 @@
 /*
- * Copyright 2004-2010 Haiku Inc. All rights reserved.
+ * Copyright 2004-2011 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Andre Alves Garzia, andre@andregarzia.com
  *		Axel Dörfler, axeld@pinc-software.de.
  *		Vegard Wærp, vegarwa@online.no
+ *		Alexander von Gluck, kallisti5@unixzen.com
  */
 
 
@@ -38,7 +39,8 @@ NetworkSettings::NetworkSettings(const char* name)
 	fDisabled(false),
 	fNameServers(5, true)
 {
-	fSocket = socket(AF_INET, SOCK_DGRAM, 0);
+	fSocket4 = socket(AF_INET, SOCK_DGRAM, 0);
+	fSocket6 = socket(AF_INET6, SOCK_DGRAM, 0);
 
 	fName = name;
 
@@ -48,7 +50,8 @@ NetworkSettings::NetworkSettings(const char* name)
 
 NetworkSettings::~NetworkSettings()
 {
-	close(fSocket);
+	close(fSocket4);
+	close(fSocket6);
 }
 
 
@@ -71,45 +74,39 @@ NetworkSettings::_PrepareRequest(struct ifreq& request)
 void
 NetworkSettings::ReadConfiguration()
 {
-	ifreq request;
-	if (!_PrepareRequest(request))
+	ifreq			ifReq;
+	sockaddr_in*	inetAddress = NULL;
+
+	if (!_PrepareRequest(ifReq))
 		return;
 
-	BString text = "dummy";
-	char address[32];
-	sockaddr_in* inetAddress = NULL;
-
-	// Obtain IP.
-	if (ioctl(fSocket, SIOCGIFADDR, &request, sizeof(request)) < 0)
+	// Obtain IPv4 address.
+	if (ioctl(fSocket4, SIOCGIFADDR, &ifReq, sizeof(ifReq)) < 0)
 		return;
+	fIPv4Addr = *((sockaddr_in *)(&(ifReq.ifr_addr)));
 
-	inetAddress = (sockaddr_in*)&request.ifr_addr;
-	if (inet_ntop(AF_INET, &inetAddress->sin_addr, address,
-			sizeof(address)) == NULL) {
+	// Obtain IPv4 netmask
+	if (ioctl(fSocket4, SIOCGIFNETMASK, &ifReq, sizeof(ifReq)) < 0)
 		return;
-	}
+	fIPv4Mask = *((sockaddr_in *)(&(ifReq.ifr_mask)));
 
-	fIP = address;
-
-	// Obtain netmask.
-	if (ioctl(fSocket, SIOCGIFNETMASK, &request, sizeof(request)) < 0)
+	// Obtain IPv6 address.
+	if (ioctl(fSocket6, SIOCGIFADDR, &ifReq, sizeof(ifReq)) < 0)
 		return;
+	fIPv6Addr = *((sockaddr_in6 *)(&(ifReq.ifr_addr)));
 
-	inetAddress = (sockaddr_in*)&request.ifr_mask;
-	if (inet_ntop(AF_INET, &inetAddress->sin_addr, address,
-			sizeof(address)) == NULL) {
+	// Obtain IPv6 netmask
+	if (ioctl(fSocket6, SIOCGIFNETMASK, &ifReq, sizeof(ifReq)) < 0)
 		return;
-	}
-
-	fNetmask = address;
+	fIPv6Mask = *((sockaddr_in6 *)(&(ifReq.ifr_mask)));
 
 	// Obtain gateway
-	ifconf config;
-	config.ifc_len = sizeof(config.ifc_value);
-	if (ioctl(fSocket, SIOCGRTSIZE, &config, sizeof(struct ifconf)) < 0)
+	ifconf ifCfg;
+	ifCfg.ifc_len = sizeof(ifCfg.ifc_value);
+	if (ioctl(fSocket4, SIOCGRTSIZE, &ifCfg, sizeof(ifCfg)) < 0)
 		return;
 
-	uint32 size = (uint32)config.ifc_value;
+	uint32 size = (uint32)ifCfg.ifc_value;
 	if (size == 0)
 		return;
 
@@ -118,10 +115,10 @@ NetworkSettings::ReadConfiguration()
 		return;
 
 	MemoryDeleter bufferDeleter(buffer);
-	config.ifc_len = size;
-	config.ifc_buf = buffer;
+	ifCfg.ifc_len = size;
+	ifCfg.ifc_buf = buffer;
 
-	if (ioctl(fSocket, SIOCGRTTABLE, &config, sizeof(struct ifconf)) < 0)
+	if (ioctl(fSocket4, SIOCGRTTABLE, &ifCfg, sizeof(ifCfg)) < 0)
 		return;
 
 	ifreq* interface = (ifreq*)buffer;
@@ -148,8 +145,8 @@ NetworkSettings::ReadConfiguration()
 	}
 
 	uint32 flags = 0;
-	if (ioctl(fSocket, SIOCGIFFLAGS, &request, sizeof(struct ifreq)) == 0)
-		flags = request.ifr_flags;
+	if (ioctl(fSocket4, SIOCGIFFLAGS, &ifReq, sizeof(ifReq)) == 0)
+		flags = ifReq.ifr_flags;
 
 	fAuto = (flags & (IFF_AUTO_CONFIGURED | IFF_CONFIGURING)) != 0;
 	fDisabled = (flags & IFF_UP) == 0;
@@ -219,3 +216,44 @@ NetworkSettings::ReadConfiguration()
 		fDomain = state->dnsrch[0];
 	}
 }
+
+
+BNetworkAddress
+NetworkSettings::GetAddr(int family)
+{
+	if (family == AF_INET6)
+		return fIPv6Addr;
+
+	return fIPv4Addr;
+}
+
+
+const char*
+NetworkSettings::GetIP(int family)
+{
+	if (family == AF_INET6)
+		return fIPv6Addr.ToString();
+
+	return fIPv4Addr.ToString();
+}
+
+
+const char*
+NetworkSettings::GetNetmask(int family)
+{
+	if (family == AF_INET6)
+		return fIPv6Mask.ToString();
+
+	return fIPv4Mask.ToString();
+}
+
+
+int32
+NetworkSettings::GetPrefixLen(int family)
+{
+	if (family == AF_INET6)
+		return fIPv6Mask.PrefixLength();
+
+	return fIPv4Mask.PrefixLength();
+}
+
