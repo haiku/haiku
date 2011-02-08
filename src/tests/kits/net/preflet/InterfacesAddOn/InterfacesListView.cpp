@@ -93,9 +93,7 @@ InterfaceListItem::Update(BView* owner, const BFont* font)
 void
 InterfaceListItem::DrawItem(BView* owner, BRect /*bounds*/, bool complete)
 {
-	BListView*	list = dynamic_cast<BListView*>(owner);
-	BBitmap*	stateIcon(NULL);
-	BString		interfaceState;
+	BListView* list = dynamic_cast<BListView*>(owner);
 
 	BNetworkAddress	addrIPv4 = fSettings->GetAddr(AF_INET);
 	BNetworkAddress	addrIPv6 = fSettings->GetAddr(AF_INET6);
@@ -119,6 +117,9 @@ InterfaceListItem::DrawItem(BView* owner, BRect /*bounds*/, bool complete)
 
 		list->FillRect(bounds);
 	}
+
+	BString interfaceState;
+	BBitmap* stateIcon(NULL);
 
 	if (fSettings->IsDisabled()) {
 		interfaceState << "disabled";
@@ -206,7 +207,7 @@ InterfaceListItem::_Init()
 {
 	fSettings = new NetworkSettings(Name());
 
-	const char*	mediaTypeName = NULL;
+	const char* mediaTypeName = NULL;
 
 	int media = fInterface.Media();
 
@@ -236,12 +237,12 @@ InterfaceListItem::_Init()
 void
 InterfaceListItem::_PopulateBitmaps(const char* mediaType) {
 
-	const uint8*	interfaceHVIF;
-	const uint8*	offlineHVIF;
-	const uint8*	pendingHVIF;
-	const uint8*	onlineHVIF;
+	const uint8* interfaceHVIF;
+	const uint8* offlineHVIF;
+	const uint8* pendingHVIF;
+	const uint8* onlineHVIF;
 
-	BBitmap*		interfaceBitmap = NULL;
+	BBitmap* interfaceBitmap = NULL;
 
 	/* Load interface icons */
 	image_info info;

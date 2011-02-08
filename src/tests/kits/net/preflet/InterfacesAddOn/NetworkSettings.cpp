@@ -74,39 +74,38 @@ NetworkSettings::_PrepareRequest(struct ifreq& request)
 void
 NetworkSettings::ReadConfiguration()
 {
-	ifreq			ifReq;
-	sockaddr_in*	inetAddress = NULL;
+	ifreq request;
 
-	if (!_PrepareRequest(ifReq))
+	if (!_PrepareRequest(request))
 		return;
 
 	// Obtain IPv4 address.
-	if (ioctl(fSocket4, SIOCGIFADDR, &ifReq, sizeof(ifReq)) < 0)
+	if (ioctl(fSocket4, SIOCGIFADDR, &request, sizeof(request)) < 0)
 		return;
-	fIPv4Addr = *((sockaddr_in *)(&(ifReq.ifr_addr)));
+	fIPv4Addr = *(sockaddr_in *)&request.ifr_addr;
 
 	// Obtain IPv4 netmask
-	if (ioctl(fSocket4, SIOCGIFNETMASK, &ifReq, sizeof(ifReq)) < 0)
+	if (ioctl(fSocket4, SIOCGIFNETMASK, &request, sizeof(request)) < 0)
 		return;
-	fIPv4Mask = *((sockaddr_in *)(&(ifReq.ifr_mask)));
+	fIPv4Mask = *(sockaddr_in *)&request.ifr_mask;
 
 	// Obtain IPv6 address.
-	if (ioctl(fSocket6, SIOCGIFADDR, &ifReq, sizeof(ifReq)) < 0)
+	if (ioctl(fSocket6, SIOCGIFADDR, &request, sizeof(request)) < 0)
 		return;
-	fIPv6Addr = *((sockaddr_in6 *)(&(ifReq.ifr_addr)));
+	fIPv6Addr = *(sockaddr_in6 *)&request.ifr_addr;
 
 	// Obtain IPv6 netmask
-	if (ioctl(fSocket6, SIOCGIFNETMASK, &ifReq, sizeof(ifReq)) < 0)
+	if (ioctl(fSocket6, SIOCGIFNETMASK, &request, sizeof(request)) < 0)
 		return;
-	fIPv6Mask = *((sockaddr_in6 *)(&(ifReq.ifr_mask)));
+	fIPv6Mask = *(sockaddr_in6 *)&request.ifr_mask;
 
 	// Obtain gateway
-	ifconf ifCfg;
-	ifCfg.ifc_len = sizeof(ifCfg.ifc_value);
-	if (ioctl(fSocket4, SIOCGRTSIZE, &ifCfg, sizeof(ifCfg)) < 0)
+	ifconf config;
+	config.ifc_len = sizeof(config.ifc_value);
+	if (ioctl(fSocket4, SIOCGRTSIZE, &config, sizeof(config)) < 0)
 		return;
 
-	uint32 size = (uint32)ifCfg.ifc_value;
+	uint32 size = (uint32)config.ifc_value;
 	if (size == 0)
 		return;
 
@@ -115,10 +114,10 @@ NetworkSettings::ReadConfiguration()
 		return;
 
 	MemoryDeleter bufferDeleter(buffer);
-	ifCfg.ifc_len = size;
-	ifCfg.ifc_buf = buffer;
+	config.ifc_len = size;
+	config.ifc_buf = buffer;
 
-	if (ioctl(fSocket4, SIOCGRTTABLE, &ifCfg, sizeof(ifCfg)) < 0)
+	if (ioctl(fSocket4, SIOCGRTTABLE, &config, sizeof(config)) < 0)
 		return;
 
 	ifreq* interface = (ifreq*)buffer;
@@ -128,7 +127,7 @@ NetworkSettings::ReadConfiguration()
 		route_entry& route = interface->ifr_route;
 
 		if ((route.flags & RTF_GATEWAY) != 0) {
-			inetAddress = (sockaddr_in*)route.gateway;
+			sockaddr_in* inetAddress = (sockaddr_in*)route.gateway;
 			fGateway = inet_ntoa(inetAddress->sin_addr);
 		}
 
@@ -145,8 +144,8 @@ NetworkSettings::ReadConfiguration()
 	}
 
 	uint32 flags = 0;
-	if (ioctl(fSocket4, SIOCGIFFLAGS, &ifReq, sizeof(ifReq)) == 0)
-		flags = ifReq.ifr_flags;
+	if (ioctl(fSocket4, SIOCGIFFLAGS, &request, sizeof(request)) == 0)
+		flags = request.ifr_flags;
 
 	fAuto = (flags & (IFF_AUTO_CONFIGURED | IFF_CONFIGURING)) != 0;
 	fDisabled = (flags & IFF_UP) == 0;
