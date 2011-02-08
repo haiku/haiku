@@ -73,7 +73,7 @@ getset_register(int argc, char **argv)
 	if (set)
 		value = parse_expression(argv[2]);
 
-	kprintf("radeon_extreme register %#lx\n", reg);
+	kprintf("radeon_hd register %#lx\n", reg);
 
 	radeon_info &info = *gDeviceInfo[0];
 	uint32 oldValue = read32(info.registers + reg);

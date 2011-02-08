@@ -96,7 +96,7 @@ radeon_hd_init(radeon_info &info)
 void
 radeon_hd_uninit(radeon_info &info)
 {
-	TRACE((DEVICE_NAME ": radeon_extreme_uninit()\n"));
+	TRACE((DEVICE_NAME ": radeon_hd_uninit()\n"));
 
 	delete_area(info.shared_area);
 	delete_area(info.registers_area);

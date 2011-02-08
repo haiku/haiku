@@ -132,7 +132,7 @@ init_driver(void)
 		return status;
 	}
 
-	mutex_init(&gLock, "intel extreme ksync");
+	mutex_init(&gLock, "radeon hd ksync");
 
 	// find devices
 
