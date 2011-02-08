@@ -291,6 +291,8 @@ PackageWriterImpl::PackageWriterImpl(BPackageWriterListener* listener)
 	:
 	WriterImplBase(listener),
 	fListener(listener),
+	fDataBuffer(NULL),
+	fDataBufferSize(2 * B_HPKG_DEFAULT_DATA_CHUNK_SIZE_ZLIB),
 	fRootEntry(NULL),
 	fRootAttribute(NULL),
 	fTopAttribute(NULL),
@@ -315,12 +317,6 @@ PackageWriterImpl::~PackageWriterImpl()
 	delete fRootEntry;
 
 	free(fDataBuffer);
-
-	if (fFD >= 0)
-		close(fFD);
-
-	if (!fFinished && fFileName != NULL)
-		unlink(fFileName);
 }
 
 
@@ -359,7 +355,7 @@ PackageWriterImpl::AddEntry(const char* fileName)
 				&errorListener);
 			if (result != B_OK || (result = packageInfo.InitCheck()) != B_OK)
 				return result;
-			_RegisterPackageInfo(fPackageAttributes, packageInfo);
+			RegisterPackageInfo(PackageAttributes(), packageInfo);
 		}
 
 		return _RegisterEntry(fileName);
@@ -376,7 +372,7 @@ status_t
 PackageWriterImpl::Finish()
 {
 	try {
-		if (fPackageAttributes.IsEmpty()) {
+		if (PackageAttributes().IsEmpty()) {
 			fListener->PrintError("No package-info file found (%s)!\n",
 				B_HPKG_PACKAGE_INFO_FILE_NAME);
 			return B_BAD_DATA;
@@ -397,6 +393,11 @@ PackageWriterImpl::_Init(const char* fileName)
 	status_t result = WriterImplBase::Init(fileName, "package");
 	if (result != B_OK)
 		return result;
+
+	// allocate data buffer
+	fDataBuffer = malloc(fDataBufferSize);
+	if (fDataBuffer == NULL)
+		throw std::bad_alloc();
 
 	if (fStringCache.Init() != B_OK)
 		throw std::bad_alloc();
@@ -455,7 +456,7 @@ PackageWriterImpl::_Finish()
 	// write the header
 	WriteBuffer(&header, sizeof(hpkg_header), 0);
 
-	fFinished = true;
+	SetFinished(true);
 	return B_OK;
 }
 
@@ -531,194 +532,13 @@ PackageWriterImpl::_RegisterEntry(Entry* parent, const char* name,
 
 
 void
-PackageWriterImpl::_RegisterPackageInfo(PackageAttributeList& attributeList,
-	const BPackageInfo& packageInfo)
-{
-	// name
-	PackageAttribute* name = new PackageAttribute(HPKG_PACKAGE_ATTRIBUTE_NAME,
-		B_HPKG_ATTRIBUTE_TYPE_STRING, B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-	name->string = fPackageStringCache.Get(packageInfo.Name().String());
-	attributeList.Add(name);
-
-	// summary
-	PackageAttribute* summary = new PackageAttribute(
-		HPKG_PACKAGE_ATTRIBUTE_SUMMARY, B_HPKG_ATTRIBUTE_TYPE_STRING,
-		B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-	summary->string = fPackageStringCache.Get(packageInfo.Summary().String());
-	attributeList.Add(summary);
-
-	// description
-	PackageAttribute* description = new PackageAttribute(
-		HPKG_PACKAGE_ATTRIBUTE_DESCRIPTION, B_HPKG_ATTRIBUTE_TYPE_STRING,
-		B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-	description->string
-		= fPackageStringCache.Get(packageInfo.Description().String());
-	attributeList.Add(description);
-
-	// vendor
-	PackageAttribute* vendor = new PackageAttribute(
-		HPKG_PACKAGE_ATTRIBUTE_VENDOR, B_HPKG_ATTRIBUTE_TYPE_STRING,
-		B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-	vendor->string = fPackageStringCache.Get(packageInfo.Vendor().String());
-	attributeList.Add(vendor);
-
-	// packager
-	PackageAttribute* packager = new PackageAttribute(
-		HPKG_PACKAGE_ATTRIBUTE_PACKAGER, B_HPKG_ATTRIBUTE_TYPE_STRING,
-		B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-	packager->string = fPackageStringCache.Get(packageInfo.Packager().String());
-	attributeList.Add(packager);
-
-	// architecture
-	PackageAttribute* architecture = new PackageAttribute(
-		HPKG_PACKAGE_ATTRIBUTE_ARCHITECTURE, B_HPKG_ATTRIBUTE_TYPE_UINT,
-		B_HPKG_ATTRIBUTE_ENCODING_INT_8_BIT);
-	architecture->unsignedInt = packageInfo.Architecture();
-	attributeList.Add(packager);
-
-	// version
-	_RegisterPackageVersion(attributeList, packageInfo.Version());
-
-	// copyright list
-	const BObjectList<BString>& copyrightList = packageInfo.CopyrightList();
-	for (int i = 0; i < copyrightList.CountItems(); ++i) {
-		PackageAttribute* copyright = new PackageAttribute(
-			HPKG_PACKAGE_ATTRIBUTE_COPYRIGHT, B_HPKG_ATTRIBUTE_TYPE_STRING,
-			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-		copyright->string
-			= fPackageStringCache.Get(copyrightList.ItemAt(i)->String());
-		attributeList.Add(copyright);
-	}
-
-	// license list
-	const BObjectList<BString>& licenseList = packageInfo.LicenseList();
-	for (int i = 0; i < licenseList.CountItems(); ++i) {
-		PackageAttribute* license = new PackageAttribute(
-			HPKG_PACKAGE_ATTRIBUTE_LICENSE, B_HPKG_ATTRIBUTE_TYPE_STRING,
-			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-		license->string
-			= fPackageStringCache.Get(licenseList.ItemAt(i)->String());
-		attributeList.Add(license);
-	}
-
-	// provides list
-	const BObjectList<BPackageResolvable>& providesList
-		= packageInfo.ProvidesList();
-	for (int i = 0; i < providesList.CountItems(); ++i) {
-		BPackageResolvable* resolvable = providesList.ItemAt(i);
-		bool hasVersion = resolvable->Version().InitCheck() == B_OK;
-
-		PackageAttribute* providesType = new PackageAttribute(
-			HPKG_PACKAGE_ATTRIBUTE_PROVIDES_TYPE, B_HPKG_ATTRIBUTE_TYPE_UINT,
-			B_HPKG_ATTRIBUTE_ENCODING_INT_8_BIT);
-		providesType->unsignedInt = resolvable->Type();
-		attributeList.Add(providesType);
-
-		PackageAttribute* provides = new PackageAttribute(
-			HPKG_PACKAGE_ATTRIBUTE_PROVIDES, B_HPKG_ATTRIBUTE_TYPE_STRING,
-			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-		provides->string = fPackageStringCache.Get(resolvable->Name().String());
-		attributeList.Add(provides);
-
-		if (hasVersion)
-			_RegisterPackageVersion(provides->children, resolvable->Version());
-	}
-
-	// requires list
-	_RegisterPackageResolvableExpressionList(attributeList,
-		packageInfo.RequiresList(), HPKG_PACKAGE_ATTRIBUTE_REQUIRES);
-
-	// supplements list
-	_RegisterPackageResolvableExpressionList(attributeList,
-		packageInfo.SupplementsList(), HPKG_PACKAGE_ATTRIBUTE_SUPPLEMENTS);
-
-	// conflicts list
-	_RegisterPackageResolvableExpressionList(attributeList,
-		packageInfo.ConflictsList(), HPKG_PACKAGE_ATTRIBUTE_CONFLICTS);
-
-	// freshens list
-	_RegisterPackageResolvableExpressionList(attributeList,
-		packageInfo.FreshensList(), HPKG_PACKAGE_ATTRIBUTE_FRESHENS);
-
-	// replaces list
-	const BObjectList<BString>& replacesList = packageInfo.ReplacesList();
-	for (int i = 0; i < replacesList.CountItems(); ++i) {
-		PackageAttribute* replaces = new PackageAttribute(
-			HPKG_PACKAGE_ATTRIBUTE_REPLACES, B_HPKG_ATTRIBUTE_TYPE_STRING,
-			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-		replaces->string
-			= fPackageStringCache.Get(replacesList.ItemAt(i)->String());
-		attributeList.Add(replaces);
-	}
-}
-
-
-void
-PackageWriterImpl::_RegisterPackageVersion(PackageAttributeList& attributeList,
-	const BPackageVersion& version)
-{
-	PackageAttribute* versionMajor = new PackageAttribute(
-		HPKG_PACKAGE_ATTRIBUTE_VERSION_MAJOR, B_HPKG_ATTRIBUTE_TYPE_STRING,
-		B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-	versionMajor->string = fPackageStringCache.Get(version.Major().String());
-	attributeList.Add(versionMajor);
-
-	PackageAttribute* versionMinor = new PackageAttribute(
-		HPKG_PACKAGE_ATTRIBUTE_VERSION_MINOR, B_HPKG_ATTRIBUTE_TYPE_STRING,
-		B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-	versionMinor->string = fPackageStringCache.Get(version.Minor().String());
-	attributeList.Add(versionMinor);
-
-	PackageAttribute* versionMicro = new PackageAttribute(
-		HPKG_PACKAGE_ATTRIBUTE_VERSION_MICRO, B_HPKG_ATTRIBUTE_TYPE_STRING,
-		B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-	versionMicro->string = fPackageStringCache.Get(version.Micro().String());
-	attributeList.Add(versionMicro);
-
-	PackageAttribute* versionRelease = new PackageAttribute(
-		HPKG_PACKAGE_ATTRIBUTE_VERSION_RELEASE, B_HPKG_ATTRIBUTE_TYPE_UINT,
-		B_HPKG_ATTRIBUTE_ENCODING_INT_8_BIT);
-	versionRelease->unsignedInt = version.Release();
-	attributeList.Add(versionRelease);
-}
-
-
-void
-PackageWriterImpl::_RegisterPackageResolvableExpressionList(
-	PackageAttributeList& attributeList,
-	const BObjectList<BPackageResolvableExpression>& expressionList, uint8 id)
-{
-	for (int i = 0; i < expressionList.CountItems(); ++i) {
-		BPackageResolvableExpression* resolvableExpr = expressionList.ItemAt(i);
-		bool hasVersion = resolvableExpr->Version().InitCheck() == B_OK;
-
-		PackageAttribute* name = new PackageAttribute(
-			(HPKGPackageAttributeID)id, B_HPKG_ATTRIBUTE_TYPE_STRING,
-			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-		name->string = fPackageStringCache.Get(resolvableExpr->Name().String());
-		attributeList.Add(name);
-
-		if (hasVersion) {
-			PackageAttribute* op = new PackageAttribute(
-				HPKG_PACKAGE_ATTRIBUTE_RESOLVABLE_OPERATOR,
-				B_HPKG_ATTRIBUTE_TYPE_UINT,
-				B_HPKG_ATTRIBUTE_ENCODING_INT_8_BIT);
-			op->unsignedInt = resolvableExpr->Operator();
-			name->children.Add(op);
-			_RegisterPackageVersion(name->children, resolvableExpr->Version());
-		}
-	}
-}
-
-
-void
 PackageWriterImpl::_WriteTOC(hpkg_header& header)
 {
 	// prepare the writer (zlib writer on top of a file writer)
 	off_t startOffset = fHeapEnd;
-	FDDataWriter realWriter(fFD, startOffset, fListener);
+	FDDataWriter realWriter(FD(), startOffset, fListener);
 	ZlibDataWriter zlibWriter(&realWriter);
-	fDataWriter = &zlibWriter;
+	SetDataWriter(&zlibWriter);
 	zlibWriter.Init();
 
 	// write the sections
@@ -732,7 +552,7 @@ PackageWriterImpl::_WriteTOC(hpkg_header& header)
 	// finish the writer
 	zlibWriter.Finish();
 	fHeapEnd = realWriter.Offset();
-	fDataWriter = NULL;
+	SetDataWriter(NULL);
 
 	off_t endOffset = fHeapEnd;
 
@@ -765,20 +585,20 @@ PackageWriterImpl::_WriteTOCSections(uint64& _attributeTypesSize,
 	uint64& _stringsSize, uint64& _mainSize)
 {
 	// write the attribute type abbreviations
-	uint64 attributeTypesOffset = fDataWriter->BytesWritten();
+	uint64 attributeTypesOffset = DataWriter()->BytesWritten();
 	_WriteAttributeTypes();
 
 	// write the cached strings
-	uint64 cachedStringsOffset = fDataWriter->BytesWritten();
+	uint64 cachedStringsOffset = DataWriter()->BytesWritten();
 	int32 cachedStringsWritten = WriteCachedStrings(fStringCache, 2);
 
 	// write the main TOC section
-	uint64 mainOffset = fDataWriter->BytesWritten();
+	uint64 mainOffset = DataWriter()->BytesWritten();
 	_WriteAttributeChildren(fRootAttribute);
 
 	_attributeTypesSize = cachedStringsOffset - attributeTypesOffset;
 	_stringsSize = mainOffset - cachedStringsOffset;
-	_mainSize = fDataWriter->BytesWritten() - mainOffset;
+	_mainSize = DataWriter()->BytesWritten() - mainOffset;
 
 	return cachedStringsWritten;
 }
@@ -845,21 +665,19 @@ PackageWriterImpl::_WritePackageAttributes(hpkg_header& header)
 {
 	// write the package attributes (zlib writer on top of a file writer)
 	off_t startOffset = fHeapEnd;
-	FDDataWriter realWriter(fFD, startOffset, fListener);
+	FDDataWriter realWriter(FD(), startOffset, fListener);
 	ZlibDataWriter zlibWriter(&realWriter);
-	fDataWriter = &zlibWriter;
+	SetDataWriter(&zlibWriter);
 	zlibWriter.Init();
 
-	// write the cached strings
-	uint32 stringsCount = WriteCachedStrings(fPackageStringCache, 2);
-
-	// write package attributes tree
-	off_t attributesOffset = startOffset + fDataWriter->BytesWritten();
-	WritePackageAttributes(fPackageAttributes);
+	// write cached strings and package attributes tree
+	uint32 stringsLengthUncompressed;
+	uint32 stringsCount = WritePackageAttributes(PackageAttributes(),
+		stringsLengthUncompressed);
 
 	zlibWriter.Finish();
 	fHeapEnd = realWriter.Offset();
-	fDataWriter = NULL;
+	SetDataWriter(NULL);
 
 	off_t endOffset = fHeapEnd;
 
@@ -873,10 +691,9 @@ PackageWriterImpl::_WritePackageAttributes(hpkg_header& header)
 		= B_HOST_TO_BENDIAN_INT32(endOffset - startOffset);
 	header.attributes_length_uncompressed
 		= B_HOST_TO_BENDIAN_INT32(zlibWriter.BytesWritten());
-	header.attributes_strings_count
-		= B_HOST_TO_BENDIAN_INT32(stringsCount);
+	header.attributes_strings_count = B_HOST_TO_BENDIAN_INT32(stringsCount);
 	header.attributes_strings_length
-		= B_HOST_TO_BENDIAN_INT32(attributesOffset - startOffset);
+		= B_HOST_TO_BENDIAN_INT32(stringsLengthUncompressed);
 }
 
 
@@ -1182,7 +999,7 @@ PackageWriterImpl::_WriteUncompressedData(BDataReader& dataReader, off_t size,
 		}
 
 		// write to heap
-		ssize_t bytesWritten = pwrite(fFD, fDataBuffer, toCopy, writeOffset);
+		ssize_t bytesWritten = pwrite(FD(), fDataBuffer, toCopy, writeOffset);
 		if (bytesWritten < 0) {
 			fListener->PrintError("Failed to write data: %s\n",
 				strerror(errno));
@@ -1267,7 +1084,7 @@ PackageWriterImpl::_WriteZlibCompressedData(BDataReader& dataReader, off_t size,
 			offsetTable[chunkIndex - 1] = writeOffset - dataOffset;
 
 		// write to heap
-		ssize_t bytesWritten = pwrite(fFD, writeBuffer, bytesToWrite,
+		ssize_t bytesWritten = pwrite(FD(), writeBuffer, bytesToWrite,
 			writeOffset);
 		if (bytesWritten < 0) {
 			fListener->PrintError("Failed to write data: %s\n",
@@ -1288,7 +1105,7 @@ PackageWriterImpl::_WriteZlibCompressedData(BDataReader& dataReader, off_t size,
 	// write the offset table
 	if (chunkCount > 1) {
 		size_t bytesToWrite = (chunkCount - 1) * sizeof(uint64);
-		ssize_t bytesWritten = pwrite(fFD, offsetTable, bytesToWrite,
+		ssize_t bytesWritten = pwrite(FD(), offsetTable, bytesToWrite,
 			offsetTableOffset);
 		if (bytesWritten < 0) {
 			fListener->PrintError("Failed to write data: %s\n",

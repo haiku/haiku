@@ -176,17 +176,17 @@ WriterImplBase::AttributeValue::_ApplicableIntEncoding(uint64 value)
 }
 
 
-// #pragma mark - DataWriter
+// #pragma mark - AbstractDataWriter
 
 
-WriterImplBase::DataWriter::DataWriter()
+WriterImplBase::AbstractDataWriter::AbstractDataWriter()
 	:
 	fBytesWritten(0)
 {
 }
 
 
-WriterImplBase::DataWriter::~DataWriter()
+WriterImplBase::AbstractDataWriter::~AbstractDataWriter()
 {
 }
 
@@ -230,7 +230,7 @@ WriterImplBase::FDDataWriter::WriteDataNoThrow(const void* buffer, size_t size)
 // #pragma mark - ZlibDataWriter
 
 
-WriterImplBase::ZlibDataWriter::ZlibDataWriter(DataWriter* dataWriter)
+WriterImplBase::ZlibDataWriter::ZlibDataWriter(AbstractDataWriter* dataWriter)
 	:
 	fDataWriter(dataWriter),
 	fCompressor(this)
@@ -316,8 +316,6 @@ WriterImplBase::WriterImplBase(BErrorOutput* errorOutput)
 	fFileName(NULL),
 	fFD(-1),
 	fFinished(false),
-	fDataBuffer(NULL),
-	fDataBufferSize(2 * B_HPKG_DEFAULT_DATA_CHUNK_SIZE_ZLIB),
 	fDataWriter(NULL)
 {
 }
@@ -339,11 +337,6 @@ WriterImplBase::Init(const char* fileName, const char* type)
 	if (fPackageStringCache.Init() != B_OK)
 		throw std::bad_alloc();
 
-	// allocate data buffer
-	fDataBuffer = malloc(fDataBufferSize);
-	if (fDataBuffer == NULL)
-		throw std::bad_alloc();
-
 	// open file
 	fFD = open(fileName, O_WRONLY | O_CREAT | O_TRUNC,
 		S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
@@ -356,6 +349,187 @@ WriterImplBase::Init(const char* fileName, const char* type)
 	fFileName = fileName;
 
 	return B_OK;
+}
+
+
+void
+WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
+	const BPackageInfo& packageInfo)
+{
+	// name
+	PackageAttribute* name = new PackageAttribute(HPKG_PACKAGE_ATTRIBUTE_NAME,
+		B_HPKG_ATTRIBUTE_TYPE_STRING, B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
+	name->string = fPackageStringCache.Get(packageInfo.Name().String());
+	attributeList.Add(name);
+
+	// summary
+	PackageAttribute* summary = new PackageAttribute(
+		HPKG_PACKAGE_ATTRIBUTE_SUMMARY, B_HPKG_ATTRIBUTE_TYPE_STRING,
+		B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
+	summary->string = fPackageStringCache.Get(packageInfo.Summary().String());
+	attributeList.Add(summary);
+
+	// description
+	PackageAttribute* description = new PackageAttribute(
+		HPKG_PACKAGE_ATTRIBUTE_DESCRIPTION, B_HPKG_ATTRIBUTE_TYPE_STRING,
+		B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
+	description->string
+		= fPackageStringCache.Get(packageInfo.Description().String());
+	attributeList.Add(description);
+
+	// vendor
+	PackageAttribute* vendor = new PackageAttribute(
+		HPKG_PACKAGE_ATTRIBUTE_VENDOR, B_HPKG_ATTRIBUTE_TYPE_STRING,
+		B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
+	vendor->string = fPackageStringCache.Get(packageInfo.Vendor().String());
+	attributeList.Add(vendor);
+
+	// packager
+	PackageAttribute* packager = new PackageAttribute(
+		HPKG_PACKAGE_ATTRIBUTE_PACKAGER, B_HPKG_ATTRIBUTE_TYPE_STRING,
+		B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
+	packager->string = fPackageStringCache.Get(packageInfo.Packager().String());
+	attributeList.Add(packager);
+
+	// architecture
+	PackageAttribute* architecture = new PackageAttribute(
+		HPKG_PACKAGE_ATTRIBUTE_ARCHITECTURE, B_HPKG_ATTRIBUTE_TYPE_UINT,
+		B_HPKG_ATTRIBUTE_ENCODING_INT_8_BIT);
+	architecture->unsignedInt = packageInfo.Architecture();
+	attributeList.Add(packager);
+
+	// version
+	RegisterPackageVersion(attributeList, packageInfo.Version());
+
+	// copyright list
+	const BObjectList<BString>& copyrightList = packageInfo.CopyrightList();
+	for (int i = 0; i < copyrightList.CountItems(); ++i) {
+		PackageAttribute* copyright = new PackageAttribute(
+			HPKG_PACKAGE_ATTRIBUTE_COPYRIGHT, B_HPKG_ATTRIBUTE_TYPE_STRING,
+			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
+		copyright->string
+			= fPackageStringCache.Get(copyrightList.ItemAt(i)->String());
+		attributeList.Add(copyright);
+	}
+
+	// license list
+	const BObjectList<BString>& licenseList = packageInfo.LicenseList();
+	for (int i = 0; i < licenseList.CountItems(); ++i) {
+		PackageAttribute* license = new PackageAttribute(
+			HPKG_PACKAGE_ATTRIBUTE_LICENSE, B_HPKG_ATTRIBUTE_TYPE_STRING,
+			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
+		license->string
+			= fPackageStringCache.Get(licenseList.ItemAt(i)->String());
+		attributeList.Add(license);
+	}
+
+	// provides list
+	const BObjectList<BPackageResolvable>& providesList
+		= packageInfo.ProvidesList();
+	for (int i = 0; i < providesList.CountItems(); ++i) {
+		BPackageResolvable* resolvable = providesList.ItemAt(i);
+		bool hasVersion = resolvable->Version().InitCheck() == B_OK;
+
+		PackageAttribute* providesType = new PackageAttribute(
+			HPKG_PACKAGE_ATTRIBUTE_PROVIDES_TYPE, B_HPKG_ATTRIBUTE_TYPE_UINT,
+			B_HPKG_ATTRIBUTE_ENCODING_INT_8_BIT);
+		providesType->unsignedInt = resolvable->Type();
+		attributeList.Add(providesType);
+
+		PackageAttribute* provides = new PackageAttribute(
+			HPKG_PACKAGE_ATTRIBUTE_PROVIDES, B_HPKG_ATTRIBUTE_TYPE_STRING,
+			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
+		provides->string = fPackageStringCache.Get(resolvable->Name().String());
+		attributeList.Add(provides);
+
+		if (hasVersion)
+			RegisterPackageVersion(provides->children, resolvable->Version());
+	}
+
+	// requires list
+	RegisterPackageResolvableExpressionList(attributeList,
+		packageInfo.RequiresList(), HPKG_PACKAGE_ATTRIBUTE_REQUIRES);
+
+	// supplements list
+	RegisterPackageResolvableExpressionList(attributeList,
+		packageInfo.SupplementsList(), HPKG_PACKAGE_ATTRIBUTE_SUPPLEMENTS);
+
+	// conflicts list
+	RegisterPackageResolvableExpressionList(attributeList,
+		packageInfo.ConflictsList(), HPKG_PACKAGE_ATTRIBUTE_CONFLICTS);
+
+	// freshens list
+	RegisterPackageResolvableExpressionList(attributeList,
+		packageInfo.FreshensList(), HPKG_PACKAGE_ATTRIBUTE_FRESHENS);
+
+	// replaces list
+	const BObjectList<BString>& replacesList = packageInfo.ReplacesList();
+	for (int i = 0; i < replacesList.CountItems(); ++i) {
+		PackageAttribute* replaces = new PackageAttribute(
+			HPKG_PACKAGE_ATTRIBUTE_REPLACES, B_HPKG_ATTRIBUTE_TYPE_STRING,
+			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
+		replaces->string
+			= fPackageStringCache.Get(replacesList.ItemAt(i)->String());
+		attributeList.Add(replaces);
+	}
+}
+
+
+void
+WriterImplBase::RegisterPackageVersion(PackageAttributeList& attributeList,
+	const BPackageVersion& version)
+{
+	PackageAttribute* versionMajor = new PackageAttribute(
+		HPKG_PACKAGE_ATTRIBUTE_VERSION_MAJOR, B_HPKG_ATTRIBUTE_TYPE_STRING,
+		B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
+	versionMajor->string = fPackageStringCache.Get(version.Major().String());
+	attributeList.Add(versionMajor);
+
+	PackageAttribute* versionMinor = new PackageAttribute(
+		HPKG_PACKAGE_ATTRIBUTE_VERSION_MINOR, B_HPKG_ATTRIBUTE_TYPE_STRING,
+		B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
+	versionMinor->string = fPackageStringCache.Get(version.Minor().String());
+	attributeList.Add(versionMinor);
+
+	PackageAttribute* versionMicro = new PackageAttribute(
+		HPKG_PACKAGE_ATTRIBUTE_VERSION_MICRO, B_HPKG_ATTRIBUTE_TYPE_STRING,
+		B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
+	versionMicro->string = fPackageStringCache.Get(version.Micro().String());
+	attributeList.Add(versionMicro);
+
+	PackageAttribute* versionRelease = new PackageAttribute(
+		HPKG_PACKAGE_ATTRIBUTE_VERSION_RELEASE, B_HPKG_ATTRIBUTE_TYPE_UINT,
+		B_HPKG_ATTRIBUTE_ENCODING_INT_8_BIT);
+	versionRelease->unsignedInt = version.Release();
+	attributeList.Add(versionRelease);
+}
+
+
+void
+WriterImplBase::RegisterPackageResolvableExpressionList(
+	PackageAttributeList& attributeList,
+	const BObjectList<BPackageResolvableExpression>& expressionList, uint8 id)
+{
+	for (int i = 0; i < expressionList.CountItems(); ++i) {
+		BPackageResolvableExpression* resolvableExpr = expressionList.ItemAt(i);
+		bool hasVersion = resolvableExpr->Version().InitCheck() == B_OK;
+
+		PackageAttribute* name = new PackageAttribute(
+			(HPKGPackageAttributeID)id, B_HPKG_ATTRIBUTE_TYPE_STRING,
+			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
+		name->string = fPackageStringCache.Get(resolvableExpr->Name().String());
+		attributeList.Add(name);
+
+		if (hasVersion) {
+			PackageAttribute* op = new PackageAttribute(
+				HPKG_PACKAGE_ATTRIBUTE_RESOLVABLE_OPERATOR,
+				B_HPKG_ATTRIBUTE_TYPE_UINT,
+				B_HPKG_ATTRIBUTE_ENCODING_INT_8_BIT);
+			op->unsignedInt = resolvableExpr->Operator();
+			name->children.Add(op);
+			RegisterPackageVersion(name->children, resolvableExpr->Version());
+		}
+	}
 }
 
 
@@ -403,28 +577,18 @@ WriterImplBase::WriteCachedStrings(const StringCache& cache,
 }
 
 
-void
+int32
 WriterImplBase::WritePackageAttributes(
-	const PackageAttributeList& packageAttributes)
+	const PackageAttributeList& packageAttributes,
+	uint32& _stringsLengthUncompressed)
 {
-	DoublyLinkedList<PackageAttribute>::ConstIterator it
-		= packageAttributes.GetIterator();
-	while (PackageAttribute* attribute = it.Next()) {
-		uint8 encoding = attribute->ApplicableEncoding();
+	// write the cached strings
+	uint32 stringsCount = WriteCachedStrings(fPackageStringCache, 2);
+	_stringsLengthUncompressed = DataWriter()->BytesWritten();
 
-		// write tag
-		WriteUnsignedLEB128(HPKG_PACKAGE_ATTRIBUTE_TAG_COMPOSE(
-			attribute->id, attribute->type, encoding,
-			!attribute->children.IsEmpty()));
+	_WritePackageAttributes(packageAttributes);
 
-		// write value
-		WriteAttributeValue(*attribute, encoding);
-
-		if (!attribute->children.IsEmpty())
-			WritePackageAttributes(attribute->children);
-	}
-
-	WriteUnsignedLEB128(0);
+	return stringsCount;
 }
 
 
@@ -523,6 +687,31 @@ WriterImplBase::WriteBuffer(const void* buffer, size_t size, off_t offset)
 			"WriteBuffer(%p, %lu) failed to write all data\n", buffer, size);
 		throw status_t(B_ERROR);
 	}
+}
+
+
+void
+WriterImplBase::_WritePackageAttributes(
+	const PackageAttributeList& packageAttributes)
+{
+	DoublyLinkedList<PackageAttribute>::ConstIterator it
+		= packageAttributes.GetIterator();
+	while (PackageAttribute* attribute = it.Next()) {
+		uint8 encoding = attribute->ApplicableEncoding();
+
+		// write tag
+		WriteUnsignedLEB128(HPKG_PACKAGE_ATTRIBUTE_TAG_COMPOSE(
+			attribute->id, attribute->type, encoding,
+			!attribute->children.IsEmpty()));
+
+		// write value
+		WriteAttributeValue(*attribute, encoding);
+
+		if (!attribute->children.IsEmpty())
+			_WritePackageAttributes(attribute->children);
+	}
+
+	WriteUnsignedLEB128(0);
 }
 
 

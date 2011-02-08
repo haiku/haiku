@@ -93,9 +93,9 @@ protected:
 			};
 
 
-			struct DataWriter {
-				DataWriter();
-				virtual ~DataWriter();
+			struct AbstractDataWriter {
+				AbstractDataWriter();
+				virtual ~AbstractDataWriter();
 
 				uint64 BytesWritten() const;
 
@@ -109,7 +109,7 @@ protected:
 			};
 
 
-			struct FDDataWriter : DataWriter {
+			struct FDDataWriter : AbstractDataWriter {
 				FDDataWriter(int fd, off_t offset, BErrorOutput* errorOutput);
 
 				virtual status_t WriteDataNoThrow(const void* buffer,
@@ -124,8 +124,8 @@ protected:
 			};
 
 
-			struct ZlibDataWriter : DataWriter, private BDataOutput {
-				ZlibDataWriter(DataWriter* dataWriter);
+			struct ZlibDataWriter : AbstractDataWriter, private BDataOutput {
+				ZlibDataWriter(AbstractDataWriter* dataWriter);
 
 				void Init();
 
@@ -139,8 +139,8 @@ protected:
 				virtual status_t WriteData(const void* buffer, size_t size);
 
 			private:
-				DataWriter*		fDataWriter;
-				ZlibCompressor	fCompressor;
+				AbstractDataWriter*	fDataWriter;
+				ZlibCompressor		fCompressor;
 			};
 
 
@@ -149,11 +149,24 @@ protected:
 protected:
 			status_t			Init(const char* fileName, const char* type);
 
+			void				RegisterPackageInfo(
+									PackageAttributeList& attributeList,
+									const BPackageInfo& packageInfo);
+			void				RegisterPackageVersion(
+									PackageAttributeList& attributeList,
+									const BPackageVersion& version);
+			void				RegisterPackageResolvableExpressionList(
+									PackageAttributeList& attributeList,
+									const BObjectList<
+										BPackageResolvableExpression>& list,
+									uint8 id);
+
 			int32				WriteCachedStrings(const StringCache& cache,
 									uint32 minUsageCount);
 
-			void				WritePackageAttributes(
-									const PackageAttributeList& attributes);
+			int32				WritePackageAttributes(
+									const PackageAttributeList& attributes,
+									uint32& _stringsLengthUncompressed);
 			void				WritePackageVersion(
 									const BPackageVersion& version);
 			void				WritePackageResolvableExpressionList(
@@ -172,30 +185,40 @@ protected:
 			void				WriteBuffer(const void* buffer, size_t size,
 									off_t offset);
 
-protected:
+			int					FD() const;
+			AbstractDataWriter*	DataWriter() const;
+			const PackageAttributeList&	PackageAttributes() const;
+			PackageAttributeList&	PackageAttributes();
+
+			void				SetDataWriter(AbstractDataWriter* dataWriter);
+			void				SetFinished(bool finished);
+
+private:
+			void				_WritePackageAttributes(
+									const PackageAttributeList& attributes);
+
+private:
 			BErrorOutput*		fErrorOutput;
 			const char*			fFileName;
 			int					fFD;
 			bool				fFinished;
-			void*				fDataBuffer;
-			const size_t		fDataBufferSize;
 
-			DataWriter*			fDataWriter;
+			AbstractDataWriter*	fDataWriter;
 
 			StringCache			fPackageStringCache;
-			DoublyLinkedList<PackageAttribute>	fPackageAttributes;
+			PackageAttributeList	fPackageAttributes;
 };
 
 
 inline uint64
-WriterImplBase::DataWriter::BytesWritten() const
+WriterImplBase::AbstractDataWriter::BytesWritten() const
 {
 	return fBytesWritten;
 }
 
 
 inline void
-WriterImplBase::DataWriter::WriteDataThrows(const void* buffer, size_t size)
+WriterImplBase::AbstractDataWriter::WriteDataThrows(const void* buffer, size_t size)
 {
 	status_t error = WriteDataNoThrow(buffer, size);
 	if (error != B_OK)
@@ -221,6 +244,48 @@ inline void
 WriterImplBase::WriteString(const char* string)
 {
 	fDataWriter->WriteDataThrows(string, strlen(string) + 1);
+}
+
+
+inline int
+WriterImplBase::FD() const
+{
+	return fFD;
+}
+
+
+inline WriterImplBase::AbstractDataWriter*
+WriterImplBase::DataWriter() const
+{
+	return fDataWriter;
+}
+
+
+inline void
+WriterImplBase::SetDataWriter(AbstractDataWriter* dataWriter)
+{
+	fDataWriter = dataWriter;
+}
+
+
+inline const WriterImplBase::PackageAttributeList&
+WriterImplBase::PackageAttributes() const
+{
+	return fPackageAttributes;
+}
+
+
+inline WriterImplBase::PackageAttributeList&
+WriterImplBase::PackageAttributes()
+{
+	return fPackageAttributes;
+}
+
+
+inline void
+WriterImplBase::SetFinished(bool finished)
+{
+	fFinished = finished;
 }
 
 
