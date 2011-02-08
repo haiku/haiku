@@ -72,6 +72,7 @@ public:
 			bool				RemoveVariable(Variable* variable,
 									bool deleteVariable = true);
 			int32				IndexOf(const Variable* variable) const;
+			int32				GlobalIndexOf(const Variable* variable) const;
 			bool				UpdateRange(Variable* variable);
 
 			bool				AddConstraint(Constraint* constraint);
@@ -132,7 +133,8 @@ public:
 			void				GetString(BString& string) const;
 
 	const	ConstraintList&		Constraints() const;
-	const	VariableList&		Variables() const;
+	const	VariableList&		UsedVariables() const;
+	const	VariableList&		AllVariables() const;
 
 protected:
 	friend class Constraint;

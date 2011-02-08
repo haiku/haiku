@@ -94,17 +94,17 @@ LinearSpec::AddVariable(Variable* variable)
 
 	if (!fVariables.AddItem(variable))
 		return false;
+
 	if (!fSolver->VariableAdded(variable)) {
 		fVariables.RemoveItem(variable);
 		return false;
 	}
+	variable->fIsValid = true;
 
 	if (!UpdateRange(variable)) {
 		RemoveVariable(variable, false);
 		return false;
 	}
-
-	variable->fIsValid = true;
 	return true;
 }
 
@@ -150,6 +150,13 @@ int32
 LinearSpec::IndexOf(const Variable* variable) const
 {
 	return fUsedVariables.IndexOf(variable);
+}
+
+
+int32
+LinearSpec::GlobalIndexOf(const Variable* variable) const
+{
+	return fVariables.IndexOf(variable);
 }
 
 
@@ -574,9 +581,16 @@ LinearSpec::Constraints() const
 
 
 const VariableList&
-LinearSpec::Variables() const
+LinearSpec::UsedVariables() const
 {
 	return fUsedVariables;
+}
+
+
+const VariableList&
+LinearSpec::AllVariables() const
+{
+	return fVariables;
 }
 
 

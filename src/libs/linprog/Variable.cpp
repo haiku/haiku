@@ -37,6 +37,13 @@ Variable::Index() const
 }
 
 
+int32
+Variable::GlobalIndex() const
+{
+	return fLS->GlobalIndexOf(this);
+}
+
+
 /**
  * Gets the current linear specification.
  *

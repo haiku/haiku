@@ -20,7 +20,7 @@
 #include "Tab.h"
 
 
-#define USE_SCALE_VARIABLE 1
+#define USE_SCALE_VARIABLE 0
 
 
 class Constraint;
@@ -131,7 +131,7 @@ private:
 									BSize& preferred);
 			void				_UpdatePreferredHeightConstraint(
 									BSize& preferred);
-
+			void				_SetupPreferredConstraints();
 private:
 			BLayoutItem*		fLayoutItem;
 

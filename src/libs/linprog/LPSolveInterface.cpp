@@ -49,7 +49,7 @@ LPSolveInterface::~LPSolveInterface()
 ResultType
 LPSolveInterface::Solve()
 {
-	const VariableList& variables = fLinearSpec->Variables();
+	const VariableList& variables = fLinearSpec->AllVariables();
 	if (fLpPresolved != NULL)
 		return _Presolve(variables);
 
@@ -69,6 +69,7 @@ LPSolveInterface::Solve()
 
 			for (int32 i = 0; i < size; i++)
 				variables.ItemAt(i)->SetValue(x[i]);
+
 			break;
 		} else if (result == kInfeasible)
 			break;
@@ -93,7 +94,7 @@ LPSolveInterface::VariableAdded(Variable* variable)
 bool
 LPSolveInterface::VariableRemoved(Variable* variable)
 {
-	if (!del_column(fLP, variable->Index() + 1))
+	if (!del_column(fLP, variable->GlobalIndex() + 1))
 		return false;
 	_RemovePresolved();
 	return true;
@@ -105,7 +106,7 @@ LPSolveInterface::VariableRangeChanged(Variable* variable)
 {
 	double min = variable->Min();
 	double max = variable->Max();
-	if (!set_bounds(fLP, variable->Index() + 1, min, max))
+	if (!set_bounds(fLP, variable->GlobalIndex() + 1, min, max))
 		return false;
 	_RemovePresolved();
 	return true;
@@ -124,7 +125,7 @@ LPSolveInterface::ConstraintAdded(Constraint* constraint)
 	for (; nCoefficient < summands->CountItems(); nCoefficient++) {
 		Summand* s = summands->ItemAt(nCoefficient);
 		coeffs[nCoefficient] = s->Coeff();
-		variableIndices[nCoefficient] = s->Var()->Index() + 1;
+		variableIndices[nCoefficient] = s->Var()->GlobalIndex() + 1;
 	}
 
 	double penaltyNeg = constraint->PenaltyNeg();
@@ -133,7 +134,7 @@ LPSolveInterface::ConstraintAdded(Constraint* constraint)
 			constraint->PenaltyNeg(), fLinearSpec->AddVariable());
 		fObjFunction->AddItem(constraint->fDNegObjSummand);
 		variableIndices[nCoefficient]
-			= constraint->fDNegObjSummand->Var()->Index() + 1;
+			= constraint->fDNegObjSummand->Var()->GlobalIndex() + 1;
 		coeffs[nCoefficient] = 1.0;
 		nCoefficient++;
 	}
@@ -144,7 +145,7 @@ LPSolveInterface::ConstraintAdded(Constraint* constraint)
 			constraint->PenaltyPos(), fLinearSpec->AddVariable());
 		fObjFunction->AddItem(constraint->fDPosObjSummand);
 		variableIndices[nCoefficient]
-			= constraint->fDPosObjSummand->Var()->Index() + 1;
+			= constraint->fDPosObjSummand->Var()->GlobalIndex() + 1;
 		coeffs[nCoefficient] = -1.0;
 		nCoefficient++;
 	}
@@ -204,7 +205,7 @@ LPSolveInterface::LeftSideChanged(Constraint* constraint)
 	for (i = 0; i < leftSide->CountItems(); i++) {
 		Summand* s = leftSide->ItemAt(i);
 		coeffs[i] = s->Coeff();
-		variableIndices[i] = s->Var()->Index() + 1;
+		variableIndices[i] = s->Var()->GlobalIndex() + 1;
 	}
 
 	double penaltyNeg = constraint->PenaltyNeg();
@@ -214,7 +215,7 @@ LPSolveInterface::LeftSideChanged(Constraint* constraint)
 				constraint->PenaltyNeg(), fLinearSpec->AddVariable());
 			fObjFunction->AddItem(constraint->fDNegObjSummand);
 		}
-		variableIndices[i] = constraint->fDNegObjSummand->Var()->Index() + 1;
+		variableIndices[i] = constraint->fDNegObjSummand->Var()->GlobalIndex() + 1;
 		coeffs[i] = 1.0;
 		i++;
 	} else {
@@ -230,7 +231,7 @@ LPSolveInterface::LeftSideChanged(Constraint* constraint)
 				fLinearSpec->AddVariable());
 			fObjFunction->AddItem(constraint->fDPosObjSummand);
 		}
-		variableIndices[i] = constraint->fDPosObjSummand->Var()->Index() + 1;
+		variableIndices[i] = constraint->fDPosObjSummand->Var()->GlobalIndex() + 1;
 		coeffs[i] = -1.0;
 		i++;
 	} else {
@@ -425,7 +426,7 @@ LPSolveInterface::_UpdateObjectiveFunction()
 	for (int32 i = 0; i < size; i++) {
 		current = (Summand*)fObjFunction->ItemAt(i);
 		coeffs[i] = current->Coeff();
-		varIndexes[i] = current->Var()->Index() + 1;
+		varIndexes[i] = current->Var()->GlobalIndex() + 1;
 	}
 
 	if (!SetObjectiveFunction(size, &coeffs[0], &varIndexes[0]))
@@ -472,7 +473,7 @@ LPSolveInterface::_Presolve(const VariableList& variables)
 		for (int32 i = 0; i < size; i++) {
 			Variable* current = variables.ItemAt(i);
 			current->SetValue(get_var_primalresult(fLpPresolved,
-				get_Norig_rows(fLpPresolved) + current->Index() + 1));
+				get_Norig_rows(fLpPresolved) + current->GlobalIndex() + 1));
 		}
 	}
 

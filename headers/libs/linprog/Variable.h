@@ -22,6 +22,7 @@ class Summand;
 class Variable {
 public:
 			int32				Index() const;
+			int32				GlobalIndex() const;
 			LinearSpec*			LS() const;
 			double				Value() const;
 			void				SetValue(double value);
