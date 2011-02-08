@@ -532,7 +532,7 @@ Area::SetHeightAs(Area* area, float factor)
 		-factor, area->Bottom(), kEQ, 0.0);
 }
 
-
+#include <stdio.h>
 void
 Area::InvalidateSizeConstraints()
 {
@@ -626,20 +626,7 @@ Area::_Init(LinearSpec* ls, XTab* left, YTab* top, XTab* right, YTab* bottom)
 	fConstraints.AddItem(fMinContentWidth);
 	fConstraints.AddItem(fMinContentHeight);
 
-#if USE_SCALE_VARIABLE
-	fPreferredContentWidth = fLS->AddConstraint(-1.0, fLeft, 1.0, fRight, -1.0,
-		fScaleWidth, kEQ, 0, fShrinkPenalties.Width(),
-		fGrowPenalties.Width());
-
-	fPreferredContentHeight = fLS->AddConstraint(-1.0, fTop, 1.0, fBottom, -1.0,
-		fScaleHeight, kEQ, 0, fShrinkPenalties.Height(),
-		fGrowPenalties.Height());
-#else
-	fPreferredContentWidth = fLS->AddConstraint(-1.0, fLeft, 1.0, fRight, kEQ,
-		0, fShrinkPenalties.Width(), fGrowPenalties.Width());
-	fPreferredContentHeight = fLS->AddConstraint(-1.0, fTop, 1.0, fBottom, kEQ,
-		0, fShrinkPenalties.Height(), fGrowPenalties.Height());
-#endif
+	_SetupPreferredConstraints();
 
 	BSize preferredSize = fLayoutItem->PreferredSize();
 	_UpdatePreferredWidthConstraint(preferredSize);
@@ -746,9 +733,18 @@ Area::_UpdateMaxSizeConstraint(BSize max)
 void
 Area::_UpdatePreferredWidthConstraint(BSize& preferred)
 {
+	if (preferred.width == -1) {
+		delete fPreferredContentWidth;
+		fPreferredContentWidth = NULL;
+		return;
+	}
+
 	float width = 0;
 	if (preferred.width > 0)
-		width = preferred.Width() + LeftInset() + RightInset();
+		width = preferred.width + LeftInset() + RightInset();
+
+	_SetupPreferredConstraints();
+
 #if USE_SCALE_VARIABLE
 	fPreferredContentWidth->SetLeftSide(-1.0, fLeft, 1.0, fRight, -width,
 		fScaleWidth);
@@ -761,13 +757,48 @@ Area::_UpdatePreferredWidthConstraint(BSize& preferred)
 void
 Area::_UpdatePreferredHeightConstraint(BSize& preferred)
 {
+	if (preferred.height == -1) {
+		delete fPreferredContentHeight;
+		fPreferredContentHeight = NULL;
+		return;
+	}
+
 	float height = 0;
 	if (preferred.height > 0)
-		height = preferred.Height() + TopInset() + BottomInset();
+		height = preferred.height + TopInset() + BottomInset();
+
+	_SetupPreferredConstraints();
 #if USE_SCALE_VARIABLE
 	fPreferredContentHeight->SetLeftSide(-1.0, fTop, 1.0, fBottom, -height,
 		fScaleHeight);
 #else
 	fPreferredContentHeight->SetRightSide(height);
+#endif
+}
+
+
+void
+Area::_SetupPreferredConstraints()
+{
+#if USE_SCALE_VARIABLE
+	if (!fPreferredContentWidth) {
+		fPreferredContentWidth = fLS->AddConstraint(-1.0, fLeft, 1.0, fRight,
+			-1.0, fScaleWidth, kEQ, 0, fShrinkPenalties.Width(),
+			fGrowPenalties.Width());
+	}
+	if (!fPreferredContentHeight) {
+		fPreferredContentHeight = fLS->AddConstraint(-1.0, fTop, 1.0, fBottom,
+			-1.0, fScaleHeight, kEQ, 0, fShrinkPenalties.Height(),
+			fGrowPenalties.Height());
+	}
+#else
+	if (!fPreferredContentWidth) {
+		fPreferredContentWidth = fLS->AddConstraint(-1.0, fLeft, 1.0, fRight,
+			kEQ, 0, fShrinkPenalties.Width(), fGrowPenalties.Width());
+	}
+	if (!fPreferredContentHeight) {
+		fPreferredContentHeight = fLS->AddConstraint(-1.0, fTop, 1.0, fBottom,
+			kEQ, 0, fShrinkPenalties.Height(), fGrowPenalties.Height());
+	}
 #endif
 }
