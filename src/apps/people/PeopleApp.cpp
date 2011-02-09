@@ -100,9 +100,7 @@ TPeopleApp::TPeopleApp()
 	// person mime type from the hard-coded default attributes.
 
 	bool valid = false;
-	BMimeType mime;
-	mime.SetType(B_PERSON_MIMETYPE);
-
+	BMimeType mime(B_PERSON_MIMETYPE);
 	if (mime.IsInstalled()) {
 		BMessage info;
 		if (mime.GetAttrInfo(&info) == B_NO_ERROR) {
@@ -145,10 +143,10 @@ TPeopleApp::TPeopleApp()
 	}
 	if (!valid) {
 		mime.Install();
-		mime.SetShortDescription(B_TRANSLATE_WITH_CONTEXT("Person", 
+		mime.SetShortDescription(B_TRANSLATE_WITH_CONTEXT("Person",
 			"Short mimetype description"));
 		mime.SetLongDescription(B_TRANSLATE_WITH_CONTEXT(
-			"Contact information for a person.", 
+			"Contact information for a person.",
 			"Long mimetype description"));
 		mime.SetIcon(kPersonIcon, sizeof(kPersonIcon));
 		mime.SetPreferredApp(APP_SIG);
@@ -340,7 +338,7 @@ TPeopleApp::_SavePreferences(BMessage* message) const
 	BPoint leftTop = frame.LeftTop();
 
 	if (fPrefs != NULL) {
-		fPrefs->Seek(0, 0);	
+		fPrefs->Seek(0, 0);
 		fPrefs->Write(&leftTop, sizeof(BPoint));
 	}
 }
