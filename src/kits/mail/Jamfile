@@ -12,6 +12,7 @@ SubDirC++Flags -D_BUILDING_mail=1 ;
 UsePrivateHeaders textencoding ;
 
 SharedLibrary libmail.so :
+	c_mail_api.cpp
 	crypt.cpp
 	des.c
 	FileConfigView.cpp
