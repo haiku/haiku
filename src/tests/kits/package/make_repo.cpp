@@ -5,7 +5,7 @@
 #include <Message.h>
 #include <String.h>
 
-#include <package/RepositoryHeader.h>
+#include <package/RepositoryInfo.h>
 
 
 using namespace BPackageKit;
@@ -20,20 +20,20 @@ main(int argc, const char** argv)
 		return 1;
 	}
 
-	BRepositoryHeader repoHeader;
-	repoHeader.SetName(argv[1]);
-	repoHeader.SetOriginalBaseURL(argv[2]);
-	repoHeader.SetPriority(atoi(argv[3]));
+	BRepositoryInfo repoInfo;
+	repoInfo.SetName(argv[1]);
+	repoInfo.SetOriginalBaseURL(argv[2]);
+	repoInfo.SetPriority(atoi(argv[3]));
 
-	BMessage repoHeaderArchive;
-	status_t result = repoHeader.Archive(&repoHeaderArchive);
+	BMessage repoInfoArchive;
+	status_t result = repoInfo.Archive(&repoInfoArchive);
 	if (result != B_OK) {
 		fprintf(stderr, "couldn't archive repository-header\n");
 		return 1;
 	}
 
 	BFile output(argv[1], B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
-	if ((result = repoHeaderArchive.Flatten(&output)) != B_OK) {
+	if ((result = repoInfoArchive.Flatten(&output)) != B_OK) {
 		fprintf(stderr, "couldn't flatten repository-header archive\n");
 		return 1;
 	}

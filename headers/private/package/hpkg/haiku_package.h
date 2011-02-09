@@ -51,6 +51,9 @@ struct hpkg_repo_header {
 	uint16	version;
 	uint64	total_size;
 
+	// repository header
+	uint32	repository_header_length;
+
 	// package attributes section
 	uint32	attributes_compression;
 	uint32	attributes_length_compressed;

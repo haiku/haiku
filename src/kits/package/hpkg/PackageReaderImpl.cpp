@@ -1134,8 +1134,10 @@ PackageReaderImpl::_ParsePackageAttributes(AttributeHandlerContext* context)
 		if (error != B_OK)
 			return error;
 
-		if (tag == 0)
-			return B_OK;
+		if (tag == 0) {
+			return
+				context->packageContentHandler->HandlePackageAttributesDone();
+		}
 
 		switch (id) {
 			case HPKG_PACKAGE_ATTRIBUTE_NAME:

@@ -16,6 +16,7 @@ namespace BPackageKit {
 
 
 class BPackageInfo;
+class BRepositoryInfo;
 
 
 namespace BHPKG {
@@ -38,6 +39,8 @@ public:
 	virtual void				OnPackageAttributesSizeInfo(uint32 stringCount,
 									uint32 uncompressedSize) = 0;
 	virtual void				OnRepositorySizeInfo(uint32 headerSize,
+									uint32 repositoryInfoLength,
+									uint32 packageCount,
 									uint32 packageAttributesSize,
 									uint64 totalSize) = 0;
 };
@@ -47,7 +50,8 @@ class BRepositoryWriter {
 public:
 public:
 								BRepositoryWriter(
-									BRepositoryWriterListener* listener);
+									BRepositoryWriterListener* listener,
+									const BRepositoryInfo* repositoryInfo);
 								~BRepositoryWriter();
 
 			status_t			Init(const char* fileName);

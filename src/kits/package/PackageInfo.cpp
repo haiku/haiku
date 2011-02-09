@@ -809,6 +809,7 @@ const char* BPackageInfo::kElementNames[B_PACKAGE_INFO_ENUM_COUNT] = {
 	"freshens",
 	"replaces",
 	"flags",
+	"checksum",		// not being parsed, computed externally
 };
 
 
@@ -936,6 +937,13 @@ BPackageInfo::Packager() const
 }
 
 
+const BString&
+BPackageInfo::Checksum() const
+{
+	return fChecksum;
+}
+
+
 uint32
 BPackageInfo::Flags() const
 {
@@ -1045,6 +1053,13 @@ void
 BPackageInfo::SetPackager(const BString& packager)
 {
 	fPackager = packager;
+}
+
+
+void
+BPackageInfo::SetChecksum(const BString& checksum)
+{
+	fChecksum = checksum;
 }
 
 
@@ -1226,8 +1241,10 @@ BPackageInfo::Clear()
 	fDescription.Truncate(0);
 	fVendor.Truncate(0);
 	fPackager.Truncate(0);
-	fVersion.Clear();
+	fChecksum.Truncate(0);
+	fFlags = 0;
 	fArchitecture = B_PACKAGE_ARCHITECTURE_ENUM_COUNT;
+	fVersion.Clear();
 	fCopyrightList.MakeEmpty();
 	fLicenseList.MakeEmpty();
 	fRequiresList.MakeEmpty();
@@ -1238,5 +1255,18 @@ BPackageInfo::Clear()
 	fReplacesList.MakeEmpty();
 }
 
+
+/*static*/ status_t
+BPackageInfo::GetArchitectureByName(const BString& name,
+	BPackageArchitecture& _architecture)
+{
+	for (int i = 0; i < B_PACKAGE_ARCHITECTURE_ENUM_COUNT; ++i) {
+		if (name.ICompare(kArchitectureNames[i]) == 0) {
+			_architecture = (BPackageArchitecture)i;
+			return B_OK;
+		}
+	}
+	return B_NAME_NOT_FOUND;
+}
 
 }	// namespace BPackageKit

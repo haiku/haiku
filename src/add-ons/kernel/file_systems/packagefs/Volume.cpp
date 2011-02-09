@@ -264,6 +264,12 @@ struct Volume::PackageLoaderContentHandler : BPackageContentHandler {
 		return B_OK;
 	}
 
+	virtual status_t HandlePackageAttributesDone()
+	{
+		// TODO!
+		return B_OK;
+	}
+
 	virtual void HandleErrorOccurred()
 	{
 		fErrorOccurred = true;

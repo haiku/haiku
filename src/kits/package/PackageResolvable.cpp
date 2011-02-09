@@ -6,6 +6,8 @@
 
 #include <package/PackageResolvable.h>
 
+#include <package/hpkg/PackageInfoAttributeValue.h>
+
 
 namespace BPackageKit {
 
@@ -23,6 +25,15 @@ BPackageResolvable::kTypeNames[B_PACKAGE_RESOLVABLE_TYPE_ENUM_COUNT] = {
 BPackageResolvable::BPackageResolvable()
 	:
 	fType(B_PACKAGE_RESOLVABLE_TYPE_DEFAULT)
+{
+}
+
+
+BPackageResolvable::BPackageResolvable(const BPackageResolvableData& data)
+	:
+	fName(data.name),
+	fType(data.type),
+	fVersion(data.version)
 {
 }
 

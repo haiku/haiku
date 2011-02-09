@@ -6,6 +6,8 @@
 
 #include <package/PackageResolvableExpression.h>
 
+#include <package/hpkg/PackageInfoAttributeValue.h>
+
 
 namespace BPackageKit {
 
@@ -29,6 +31,16 @@ BPackageResolvableExpression::BPackageResolvableExpression()
 }
 
 
+BPackageResolvableExpression::BPackageResolvableExpression(
+	const BPackageResolvableExpressionData& data)
+	:
+	fName(data.name),
+	fOperator(data.op),
+	fVersion(data.version)
+{
+}
+
+
 BPackageResolvableExpression::BPackageResolvableExpression(const BString& name,
 	BPackageResolvableOperator _operator, const BPackageVersion& version)
 	:
@@ -46,10 +58,8 @@ BPackageResolvableExpression::InitCheck() const
 		return B_NO_INIT;
 
 	// either both or none of operator and version must be set
-	if ((fOperator == B_PACKAGE_RESOLVABLE_OP_ENUM_COUNT
-			&& fVersion.InitCheck() == B_OK)
-		|| (fOperator >= 0 && fOperator < B_PACKAGE_RESOLVABLE_OP_ENUM_COUNT
-			&& fVersion.InitCheck() != B_OK))
+	if ((fOperator >= 0 && fOperator < B_PACKAGE_RESOLVABLE_OP_ENUM_COUNT)
+		!= (fVersion.InitCheck() == B_OK))
 		return B_NO_INIT;
 
 	return B_OK;

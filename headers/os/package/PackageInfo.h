@@ -55,6 +55,7 @@ public:
 			const BString&		Description() const;
 			const BString&		Vendor() const;
 			const BString&		Packager() const;
+			const BString&		Checksum() const;
 
 			uint32				Flags() const;
 
@@ -81,6 +82,7 @@ public:
 			void				SetDescription(const BString& description);
 			void				SetVendor(const BString& vendor);
 			void				SetPackager(const BString& packager);
+			void				SetChecksum(const BString& checksum);
 
 			void				SetFlags(uint32 flags);
 
@@ -120,6 +122,9 @@ public:
 			void				Clear();
 
 public:
+	static	status_t			GetArchitectureByName(const BString& name,
+									BPackageArchitecture& _architecture);
+
 	static	const char*			kElementNames[];
 	static	const char*			kArchitectureNames[];
 
@@ -152,6 +157,8 @@ private:
 			BObjectList<BPackageResolvableExpression>	fFreshensList;
 
 			BObjectList<BString>	fReplacesList;
+
+			BString				fChecksum;
 };
 
 

@@ -12,9 +12,17 @@
 namespace BPackageKit {
 
 
+namespace BHPKG {
+	class BPackageVersionData;
+}
+using BHPKG::BPackageVersionData;
+
+
 class BPackageVersion {
 public:
 								BPackageVersion();
+								BPackageVersion(
+									const BPackageVersionData& data);
 								BPackageVersion(const BString& major,
 									const BString& minor, const BString& micro,
 									uint8 release);

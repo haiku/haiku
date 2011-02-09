@@ -9,13 +9,10 @@
 #include <Entry.h>
 #include <String.h>
 
-#include <package/RepositoryHeader.h>
+#include <package/RepositoryInfo.h>
 
 
 namespace BPackageKit {
-
-
-//class RepositoryHeader;
 
 
 class BRepositoryCache {
@@ -27,7 +24,7 @@ public:
 			status_t			SetTo(const BEntry& entry);
 			status_t			InitCheck() const;
 
-			const BRepositoryHeader&	Header() const;
+			const BRepositoryInfo&	Info() const;
 			const BEntry&		Entry() const;
 			bool				IsUserSpecific() const;
 
@@ -37,7 +34,7 @@ private:
 			status_t			fInitStatus;
 
 			BEntry				fEntry;
-			BRepositoryHeader	fHeader;
+			BRepositoryInfo		fInfo;
 			bool				fIsUserSpecific;
 };
 

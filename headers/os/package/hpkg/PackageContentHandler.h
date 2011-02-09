@@ -47,6 +47,7 @@ public:
 	virtual	status_t			HandlePackageAttribute(
 									const BPackageInfoAttributeValue& value
 									) = 0;
+	virtual	status_t			HandlePackageAttributesDone() = 0;
 
 	virtual	void				HandleErrorOccurred() = 0;
 };

@@ -34,6 +34,7 @@ enum BPackageInfoAttributeIndex {
 	B_PACKAGE_INFO_REPLACES,	// list of resolvables that this package
 								// will replace (upon update)
 	B_PACKAGE_INFO_FLAGS,
+	B_PACKAGE_INFO_CHECKSUM,	// sha256-checksum
 	//
 	B_PACKAGE_INFO_ENUM_COUNT,
 };

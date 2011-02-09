@@ -25,6 +25,7 @@ HPKG_SOURCES =
 	PackageReaderImpl.cpp
 	PackageWriter.cpp
 	PackageWriterImpl.cpp
+	RepositoryWriter.cpp
 	RepositoryWriterImpl.cpp
 	Strings.cpp
 	WriterImplBase.cpp
@@ -56,7 +57,7 @@ SharedLibrary libpackage.so
 	RemoveRepositoryJob.cpp
 	RepositoryCache.cpp
 	RepositoryConfig.cpp
-	RepositoryHeader.cpp
+	RepositoryInfo.cpp
 	Request.cpp
 	TempfileManager.cpp
 	ValidateChecksumJob.cpp

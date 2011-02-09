@@ -9,6 +9,7 @@
 #include <new>
 
 #include <package/hpkg/RepositoryWriterImpl.h>
+#include <package/RepositoryInfo.h>
 
 
 namespace BPackageKit {
@@ -16,9 +17,10 @@ namespace BPackageKit {
 namespace BHPKG {
 
 
-BRepositoryWriter::BRepositoryWriter(BRepositoryWriterListener* listener)
+BRepositoryWriter::BRepositoryWriter(BRepositoryWriterListener* listener,
+	const BRepositoryInfo* repositoryInfo)
 	:
-	fImpl(new (std::nothrow) RepositoryWriterImpl(listener))
+	fImpl(new (std::nothrow) RepositoryWriterImpl(listener, repositoryInfo))
 {
 }
 

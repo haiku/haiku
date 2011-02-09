@@ -88,7 +88,7 @@ public:
 		printf("TOC size:                %10llu\n", tocSize);
 		printf("package attributes size: %10lu\n", packageAttributesSize);
 		printf("total size:              %10llu\n", totalSize);
-
+		printf("-----------------------------------\n");
 	}
 
 private:

@@ -25,7 +25,7 @@ public:
 								ActivateRepositoryConfigJob(
 									const BContext& context,
 									const BString& title,
-									const BEntry& archivedRepoHeaderEntry,
+									const BEntry& archivedRepoInfoEntry,
 									const BString& repositoryBaseURL,
 									const BDirectory& targetDirectory);
 	virtual						~ActivateRepositoryConfigJob();
@@ -37,7 +37,7 @@ protected:
 	virtual	void				Cleanup(status_t jobResult);
 
 private:
-			BEntry				fArchivedRepoHeaderEntry;
+			BEntry				fArchivedRepoInfoEntry;
 			BString				fRepositoryBaseURL;
 			BDirectory			fTargetDirectory;
 			BEntry				fTargetEntry;

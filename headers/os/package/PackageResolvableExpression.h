@@ -15,6 +15,12 @@
 namespace BPackageKit {
 
 
+namespace BHPKG {
+	class BPackageResolvableExpressionData;
+}
+using BHPKG::BPackageResolvableExpressionData;
+
+
 /*
  * Expresses a constraint on a specific resolvable, either just a name
  * or a name plus a relational operator and a version.
@@ -33,6 +39,9 @@ namespace BPackageKit {
 class BPackageResolvableExpression {
 public:
 								BPackageResolvableExpression();
+								BPackageResolvableExpression(
+									const BPackageResolvableExpressionData& data
+									);
 								BPackageResolvableExpression(
 									const BString& name,
 									BPackageResolvableOperator _op

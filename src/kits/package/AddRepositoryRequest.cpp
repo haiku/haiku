@@ -48,13 +48,13 @@ AddRepositoryRequest::CreateInitialJobs()
 		return B_NO_INIT;
 
 	BEntry tempEntry;
-	result = fContext.GetNewTempfile("repoheader-", &tempEntry);
+	result = fContext.GetNewTempfile("repoinfo-", &tempEntry);
 	if (result != B_OK)
 		return result;
-	BString repoHeaderURL = BString(fRepositoryBaseURL) << "/" << "repo.header";
+	BString repoInfoURL = BString(fRepositoryBaseURL) << "/" << "repo.info";
 	FetchFileJob* fetchJob = new (std::nothrow) FetchFileJob(fContext,
-		BString("Fetching repository header from ") << fRepositoryBaseURL,
-		repoHeaderURL, tempEntry);
+		BString("Fetching repository info from ") << fRepositoryBaseURL,
+		repoInfoURL, tempEntry);
 	if (fetchJob == NULL)
 		return B_NO_MEMORY;
 	if ((result = QueueJob(fetchJob)) != B_OK) {

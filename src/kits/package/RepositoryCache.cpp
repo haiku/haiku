@@ -55,10 +55,10 @@ BRepositoryCache::Entry() const
 }
 
 
-const BRepositoryHeader&
-BRepositoryCache::Header() const
+const BRepositoryInfo&
+BRepositoryCache::Info() const
 {
-	return fHeader;
+	return fInfo;
 }
 
 
@@ -90,7 +90,7 @@ BRepositoryCache::SetTo(const BEntry& entry)
 	if ((result = headerMsg.Unflatten(&file)) != B_OK)
 		return result;
 
-	if ((result = fHeader.SetTo(&headerMsg)) != B_OK)
+	if ((result = fInfo.SetTo(&headerMsg)) != B_OK)
 		return result;
 
 	BPath userSettingsPath;

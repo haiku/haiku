@@ -8,6 +8,8 @@
 
 #include <NaturalCompare.h>
 
+#include <package/hpkg/PackageInfoAttributeValue.h>
+
 
 using BPrivate::NaturalCompare;
 
@@ -16,6 +18,16 @@ namespace BPackageKit {
 
 
 BPackageVersion::BPackageVersion()
+{
+}
+
+
+BPackageVersion::BPackageVersion(const BPackageVersionData& data)
+	:
+	fMajor(data.major),
+	fMinor(data.minor),
+	fMicro(data.micro),
+	fRelease(data.release)
 {
 }
 

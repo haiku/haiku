@@ -229,6 +229,11 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 		return B_OK;
 	}
 
+	virtual status_t HandlePackageAttributesDone()
+	{
+		return B_OK;
+	}
+
 	virtual void HandleErrorOccurred()
 	{
 		fErrorOccurred = true;

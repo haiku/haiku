@@ -15,6 +15,12 @@
 namespace BPackageKit {
 
 
+namespace BHPKG {
+	class BPackageResolvableData;
+}
+using BHPKG::BPackageResolvableData;
+
+
 /*
  * Defines a resolvable (something other packages can depend upon).
  * Each resolvable is defined as a name (with an optional type prefix)
@@ -39,6 +45,8 @@ namespace BPackageKit {
 class BPackageResolvable {
 public:
 								BPackageResolvable();
+								BPackageResolvable(
+									const BPackageResolvableData& data);
 								BPackageResolvable(const BString& name,
 									BPackageResolvableType type
 										= B_PACKAGE_RESOLVABLE_TYPE_DEFAULT,
