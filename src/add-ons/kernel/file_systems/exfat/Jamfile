@@ -1,0 +1,14 @@
+SubDir HAIKU_TOP src add-ons kernel file_systems exfat ;
+
+UsePrivateHeaders [ FDirName kernel util ] ;
+UsePrivateHeaders shared storage ;
+UsePrivateKernelHeaders ;
+
+KernelAddon exfat :
+	DataStream.cpp
+	DirectoryIterator.cpp
+	encodings.cpp
+	Inode.cpp
+	kernel_interface.cpp
+	Volume.cpp
+;
