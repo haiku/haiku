@@ -319,7 +319,7 @@ IMAPInboundProtocol::Connect(const char* server, const char* username,
 
 	statusMessage = "Connect to: ";
 	statusMessage += username;
-	SetTotalItems(4);
+	SetTotalItems(5);
 	ReportProgress(0, 1, statusMessage);
 
 	status_t status = fIMAPMailbox.Connect(server, username, password, useSSL,
@@ -356,6 +356,7 @@ IMAPInboundProtocol::Connect(const char* server, const char* username,
 		return status;
 	}
 
+	ReportProgress(0, 1, "Read local message list");
 	status = fStorage.WaitForDatabaseReaded();
 	if (status != B_OK) {
 		ShowError("Can't read database");
