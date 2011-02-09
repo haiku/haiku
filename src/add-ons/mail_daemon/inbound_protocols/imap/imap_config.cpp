@@ -1,44 +1,64 @@
 /*
- * Copyright 2007-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2001-2011, Haiku, Inc. All rights reserved.
  * Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
+ * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  *
  * Distributed under the terms of the MIT License.
  */
 
-//!	config view for the IMAP protocol add-on
 
+#include <Button.h>
 #include <TextControl.h>
 
+#include <FileConfigView.h>
 #include <ProtocolConfigView.h>
 #include <MailAddon.h>
 
 #include <MDRLanguage.h>
+#include "IMAPFolderConfig.h"
+
+
+const uint32 kMsgOpenIMAPFolder = '&OIF';
 
 
 class IMAPConfig : public BMailProtocolConfigView {
 public:
-							IMAPConfig(BMessage *archive);
-	virtual					~IMAPConfig();
-	virtual	status_t		Archive(BMessage *into, bool deep = true) const;
-	virtual void			GetPreferredSize(float *width, float *height);
+								IMAPConfig(MailAddonSettings& settings,
+									BMailAccountSettings& accountSettings);
+	virtual						~IMAPConfig();
+	virtual	status_t			Archive(BMessage *into, bool deep = true) const;
+	virtual	void				GetPreferredSize(float *width, float *height);
+
+	virtual	void				MessageReceived(BMessage* message);
+	virtual void				AttachedToWindow();
+
+private:
+			BMailFileConfigView*	fFileView;
+			BButton*			fIMAPFolderButton;
+			MailAddonSettings&	fAddonSettings;
 };
 
 
-IMAPConfig::IMAPConfig(BMessage *archive)
-	: BMailProtocolConfigView(B_MAIL_PROTOCOL_HAS_USERNAME
+IMAPConfig::IMAPConfig(MailAddonSettings& settings,
+	BMailAccountSettings& accountSettings)
+	:
+	BMailProtocolConfigView(B_MAIL_PROTOCOL_HAS_USERNAME
 		| B_MAIL_PROTOCOL_HAS_PASSWORD | B_MAIL_PROTOCOL_HAS_HOSTNAME
 		| B_MAIL_PROTOCOL_CAN_LEAVE_MAIL_ON_SERVER
+		| B_MAIL_PROTOCOL_PARTIAL_DOWNLOAD
 #ifdef USE_SSL
 	 	| B_MAIL_PROTOCOL_HAS_FLAVORS
 #endif
-	 )
+	 ),
+
+	 fAddonSettings(settings)
 {
 #ifdef USE_SSL
 		AddFlavor("No encryption");
 		AddFlavor("SSL");
 #endif
 
-	SetTo(archive);
+	SetTo(settings);
 
 	((BControl *)(FindView("leave_mail_remote")))->SetValue(B_CONTROL_ON);
 	((BControl *)(FindView("leave_mail_remote")))->Hide();
@@ -46,42 +66,79 @@ IMAPConfig::IMAPConfig(BMessage *archive)
 	BRect frame = FindView("delete_remote_when_local")->Frame();
 
 	((BControl *)(FindView("delete_remote_when_local")))->SetEnabled(true);
-	((BControl *)(FindView("delete_remote_when_local")))->MoveBy(0,-25);
+	((BControl *)(FindView("delete_remote_when_local")))->MoveBy(0, -25);
 
 
-	frame.right -= 10;// FindView("pass")->Frame().right;
-	/*frame.top += 10;
-	frame.bottom += 10;*/
+	fIMAPFolderButton = new BButton(frame, "IMAP Folders", "IMAP Folders",
+		new BMessage(kMsgOpenIMAPFolder));
+	AddChild(fIMAPFolderButton);
 
-	BTextControl *folder = new BTextControl(frame,"root","Top mailbox folder: ","",NULL);
-	folder->SetDivider(be_plain_font->StringWidth("Top mailbox folder: "));
+	frame.right -= 10;
 
-	if (archive->HasString("root"))
-		folder->SetText(archive->FindString("root"));
-
-	AddChild(folder);
+	BString defaultFolder = "/boot/home/mail/";
+	defaultFolder += accountSettings.Name();
+	fFileView =  new BMailFileConfigView("Destination:", "destination",
+		false, defaultFolder);
+	fFileView->SetTo(&settings.Settings(), NULL);
+	AddChild(fFileView);
+	fFileView->MoveBy(0, frame.bottom + 5);
 
 	ResizeToPreferred();
 }
 
-IMAPConfig::~IMAPConfig() {}
 
-status_t IMAPConfig::Archive(BMessage *into, bool deep) const {
-	BMailProtocolConfigView::Archive(into,deep);
+IMAPConfig::~IMAPConfig()
+{
 
-	if (into->ReplaceString("root",((BTextControl *)(FindView("root")))->Text()) != B_OK)
-		into->AddString("root",((BTextControl *)(FindView("root")))->Text());
-
-	into->PrintToStream();
-
-	return B_OK;
 }
 
-void IMAPConfig::GetPreferredSize(float *width, float *height) {
+
+status_t
+IMAPConfig::Archive(BMessage *into, bool deep) const
+{
+	fFileView->Archive(into, deep);
+	return BMailProtocolConfigView::Archive(into, deep);
+}
+
+
+void
+IMAPConfig::GetPreferredSize(float *width, float *height)
+{
 	BMailProtocolConfigView::GetPreferredSize(width,height);
 	*height -= 20;
 }
 
-BView* instantiate_config_panel(BMessage *settings,BMessage *) {
-	return new IMAPConfig(settings);
+
+void
+IMAPConfig::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+	case kMsgOpenIMAPFolder:
+	{
+		BMessage settings;
+		Archive(&settings);
+		BWindow* window = new FolderConfigWindow(Window()->Frame(),
+			settings);
+		window->Show();
+		break;
+	}
+
+	default:
+		BMailProtocolConfigView::MessageReceived(message);		
+	}
+}
+
+
+void
+IMAPConfig::AttachedToWindow()
+{
+	fIMAPFolderButton->SetTarget(this);
+}
+
+
+BView*
+instantiate_config_panel(MailAddonSettings& settings,
+	BMailAccountSettings& accountSettings)
+{
+	return new IMAPConfig(settings, accountSettings);
 }
