@@ -7,14 +7,14 @@ if $(TARGET_PLATFORM) != haiku {
 }
 
 UsePublicHeaders [ FDirName add-ons mail_daemon ] ;
-UsePrivateHeaders mail ;
+UsePrivateHeaders mail shared ;
 
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
 
 local sources =
+	ConfigView.cpp
 	MessageIO.cpp
 	pop3.cpp
-	SimpleMailProtocol.cpp
 	md5c.c
 ;
 

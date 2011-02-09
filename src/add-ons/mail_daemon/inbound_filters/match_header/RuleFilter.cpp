@@ -4,25 +4,30 @@
 */
 
 
-#include <Node.h>
-#include <String.h>
+#include "RuleFilter.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "RuleFilter.h"
+#include <Directory.h>
+#include <fs_attr.h>
+#include <Node.h>
+#include <String.h>
 
-//class StatusView;
+#include <MailProtocol.h>
 
-RuleFilter::RuleFilter(BMessage *settings) : BMailFilter(settings) {
+
+RuleFilter::RuleFilter(MailProtocol& protocol, AddonSettings* addonSettings)
+	:
+	MailFilter(protocol, addonSettings)
+{
+	const BMessage* settings = &addonSettings->Settings();
 	// attribute is adapted to our "capitalize-each-word-in-the-header" policy
-	BString attr;
-	settings->FindString("attribute",&attr);
-	attr.CapitalizeEachWord();
-	attribute = strdup(attr.String());
+	settings->FindString("attribute", &fAttribute);
+	fAttribute.CapitalizeEachWord();
 
 	BString regex;
-	settings->FindString("regex",&regex);
+	settings->FindString("regex", &regex);
 	
 	int32 index = regex.FindFirst("REGEX:");
 	if (index == B_ERROR || index > 0)
@@ -30,75 +35,75 @@ RuleFilter::RuleFilter(BMessage *settings) : BMailFilter(settings) {
 	else
 		regex.RemoveFirst("REGEX:");
 		
-	matcher.SetPattern(regex.String(),false);
+	fMatcher.SetPattern(regex, false);
 	
-	settings->FindString("argument",&arg);
-	settings->FindInt32("do_what",(long *)&do_what);
-	if (do_what == Z_SET_REPLY)
-		settings->FindInt32("argument",&chain_id);
+	settings->FindString("argument",&fArg);
+	settings->FindInt32("do_what",(long *)&fDoWhat);
+	if (fDoWhat == Z_SET_REPLY)
+		settings->FindInt32("argument", &fReplyAccount);
 }
 
-RuleFilter::~RuleFilter()
+
+void
+RuleFilter::HeaderFetched(const entry_ref& ref, BFile* file)
 {
-	if (attribute)
-		free((void *)attribute);
-}
+	if (fAttribute == "")
+		return; //----That field doesn't exist? NO match
 
-status_t RuleFilter::InitCheck(BString* out_message) {
-	return B_OK;
-}
+	attr_info info;
+	if (file->GetAttrInfo("Subject", &info) != B_OK
+		|| info.type != B_STRING_TYPE)
+		return;
 
-status_t RuleFilter::ProcessMailMessage
-(
-	BPositionIO** , BEntry* entry,
-	BMessage* io_headers, BPath* io_folder, const char* 
-) {
-	const char *data;
-	if (!attribute)
-		return B_OK; //----That field doesn't exist? NO match
-	
-	if (io_headers->FindString(attribute,&data) < B_OK) { //--Maybe the capitalization was wrong?
-		BString capped(attribute);
-		capped.CapitalizeEachWord(); //----Enfore capitalization
-		if (io_headers->FindString(capped.String(),&data) < B_OK) //----This time it's *really* not there
-			return B_OK; //---No match
+	char* buffer = new char[info.size];
+	if (file->ReadAttr(fAttribute, B_STRING_TYPE, 0, buffer, info.size) < 0) {
+		delete[] buffer;
+		return;
 	}
+	BString data = buffer;
+	delete[] buffer;
+
+	if (!fMatcher.Match(data))
+		return; //-----There wasn't an error. We're just not supposed to do anything
 	
-	if (data == NULL) //--- How would this happen? No idea
-		return B_OK;
-	
-	if (!matcher.Match(data))
-		return B_OK; //-----There wasn't an error. We're just not supposed to do anything
-	
-	switch (do_what) {
+	switch (fDoWhat) {
 		case Z_MOVE_TO:
-			if (io_headers->ReplaceString("DESTINATION",arg) != B_OK)
-				io_headers->AddString("DESTINATION",arg);
+		{
+			BDirectory dir(fArg);
+			fMailProtocol.Looper()->TriggerFileMove(ref, dir);
 			break;
+		}
 		case Z_TRASH:
-			return B_MAIL_DISCARD;
-		case Z_FLAG:
-			{
-			BString string = arg;
-			BNode(entry).WriteAttrString("MAIL:filter_flags",&string);
-			}
+			// TODO trash!?
+			fMailProtocol.Looper()->TriggerFileDeletion(ref);
 			break;
+
+		case Z_FLAG:
+			file->WriteAttrString("MAIL:filter_flags", &fArg);
+			break;
+
 		case Z_SET_REPLY:
-			BNode(entry).WriteAttr("MAIL:reply_with",B_INT32_TYPE,0,&chain_id,4);
+			file->WriteAttr("MAIL:reply_with", B_INT32_TYPE, 0, &fReplyAccount,
+				4);
 			break;
 		case Z_SET_READ:
-			if (io_headers->ReplaceString("STATUS", "Read") != B_OK)
-				io_headers->AddString("STATUS", "Read");
-			break;			
+		{
+			InboundProtocol& protocol = (InboundProtocol&)fMailProtocol;
+			protocol.MarkMessageAsRead(ref, true);
+			break;
+		}
 		default:
-			fprintf(stderr,"Unknown do_what: 0x%04x!\n",do_what);
+			fprintf(stderr,"Unknown do_what: 0x%04x!\n", fDoWhat);
 	}
 	
-	return B_OK;
+	return;
 }
 
-status_t descriptive_name(BMessage *settings, char *buffer) {
-	const char *attribute = NULL;
+
+BString
+descriptive_name()
+{
+	/*const char *attribute = NULL;
 	settings->FindString("attribute",&attribute);
 	const char *regex = NULL;
 	settings->FindString("regex",&regex);
@@ -117,10 +122,13 @@ status_t descriptive_name(BMessage *settings, char *buffer) {
 
 	sprintf(buffer + strlen(buffer), " against \"%s\"", reg);
 
-	return B_OK;
+	return B_OK;*/
+	return "Rule filter";
 }
 
-BMailFilter* instantiate_mailfilter(BMessage* settings,BMailChainRunner *)
+
+MailFilter*
+instantiate_mailfilter(MailProtocol& protocol, AddonSettings* settings)
 {
-	return new RuleFilter(settings);
+	return new RuleFilter(protocol, settings);
 }

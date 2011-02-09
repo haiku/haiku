@@ -134,11 +134,11 @@ static const float kPlainFontSizeScale = 0.9;
 
 THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 		BEmailMessage *mail, bool resending, uint32 defaultCharacterSet,
-		uint32 defaultChain)
+		int32 defaultAccount)
 	: BBox(rect, "m_header", B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW, B_NO_BORDER),
 	fAccountMenu(NULL),
 	fEncodingMenu(NULL),
-	fChain(defaultChain),
+	fAccountID(defaultAccount),
 	fAccountTo(NULL),
 	fAccount(NULL),
 	fBcc(NULL),
@@ -318,46 +318,43 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 
 		fAccountMenu = new BPopUpMenu(B_EMPTY_STRING);
 
-		BList chains;
-		if (GetOutboundMailChains(&chains) >= B_OK) {
-			bool marked = false;
-			for (int32 i = 0; i < chains.CountItems(); i++) {
-				BMailChain *chain = (BMailChain *)chains.ItemAt(i);
-				BString name = chain->Name();
-				if ((msg = chain->MetaData()) != NULL) {
-					name << ":   " << msg->FindString("real_name")
-						 << "  <" << msg->FindString("reply_to") << ">";
-				}
-				BMenuItem *item = new BMenuItem(name.String(),
-					msg = new BMessage(kMsgFrom));
+		BMailAccounts accounts;
+		bool marked = false;
+		for (int32 i = 0; i < accounts.CountAccounts(); i++) {
+			BMailAccountSettings* account = accounts.AccountAt(i);
+			BString name = account->Name();
+			name << ":   " << account->RealName() << "  <"
+				<< account->ReturnAddress() << ">";
 
-				msg->AddInt32("id", chain->ID());
+			msg = new BMessage(kMsgFrom);
+			BMenuItem *item = new BMenuItem(name, msg);
 
-				if (defaultChain == chain->ID()) {
-					item->SetMarked(true);
-					marked = true;
-				}
-				fAccountMenu->AddItem(item);
-				delete chain;
+			msg->AddInt32("id", account->AccountID());
+
+			if (defaultAccount == account->AccountID()) {
+				item->SetMarked(true);
+				marked = true;
 			}
-
-			if (!marked) {
-				BMenuItem *item = fAccountMenu->ItemAt(0);
-				if (item != NULL) {
-					item->SetMarked(true);
-					fChain = item->Message()->FindInt32("id");
-				} else {
-					fAccountMenu->AddItem(item = new BMenuItem("<none>",NULL));
-					item->SetEnabled(false);
-					fChain = ~0UL;
-				}
-				// default chain is invalid, set to marked
-				// TODO: do this differently, no casting and knowledge
-				// of TMailApp here....
-				if (TMailApp* app = dynamic_cast<TMailApp*>(be_app))
-					app->SetDefaultChain(fChain);
-			}
+			fAccountMenu->AddItem(item);
 		}
+
+		if (!marked) {
+			BMenuItem *item = fAccountMenu->ItemAt(0);
+			if (item != NULL) {
+				item->SetMarked(true);
+				fAccountID = item->Message()->FindInt32("id");
+			} else {
+				fAccountMenu->AddItem(item = new BMenuItem("<none>",NULL));
+				item->SetEnabled(false);
+				fAccountID = ~0UL;
+			}
+			// default account is invalid, set to marked
+			// TODO: do this differently, no casting and knowledge
+			// of TMailApp here....
+			if (TMailApp* app = dynamic_cast<TMailApp*>(be_app))
+				app->SetDefaultAccount(fAccountID);
+		}
+
 		r.Set(SEPARATOR_MARGIN, y - 2,
 			  field->Frame().left - SEPARATOR_MARGIN, y + menuFieldHeight);
 		field = new BMenuField(r, "account", B_TRANSLATE("From:"),
@@ -370,7 +367,7 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 		y += controlHeight;
 	} else {
 		// To: account
-		bool account = count_pop_accounts() > 0;
+		bool account = BMailAccounts().CountAccounts() > 0;
 
 		r.Set(SEPARATOR_MARGIN, y,
 			  windowRect.Width() - SEPARATOR_MARGIN, y + menuFieldHeight);
@@ -641,9 +638,9 @@ THeaderView::MessageReceived(BMessage *msg)
 			if (msg->FindPointer("source", (void **)&item) >= B_OK)
 				item->SetMarked(true);
 
-			uint32 chain;
-			if (msg->FindInt32("id",(int32 *)&chain) >= B_OK)
-				fChain = chain;
+			int32 account;
+			if (msg->FindInt32("id",(int32 *)&account) >= B_OK)
+				fAccountID = account;
 			break;
 		}
 

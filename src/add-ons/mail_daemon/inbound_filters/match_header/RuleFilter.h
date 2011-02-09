@@ -21,24 +21,20 @@ typedef enum {
 	Z_SET_READ
 } z_mail_action_flags;
 
-class RuleFilter : public BMailFilter {
-	public:
-							RuleFilter(BMessage *settings);
-		virtual				~RuleFilter();
-					
-		virtual status_t	InitCheck(BString* out_message = NULL);
-		
-		virtual status_t ProcessMailMessage(BPositionIO** io_message,
-											   BEntry* io_entry,
-											   BMessage* io_headers,
-											   BPath* io_folder,
-											   const char* io_uid);
-	private:
-		StringMatcher		matcher;
-		const char*			attribute;
-		const char*			arg;
-		int32				chain_id;
-		z_mail_action_flags	do_what;
+
+class RuleFilter : public MailFilter {
+public:
+								RuleFilter(MailProtocol& protocol,
+									AddonSettings* settings);
+			void				HeaderFetched(const entry_ref& ref,
+									BFile* file);
+
+private:
+			StringMatcher		fMatcher;
+			BString				fAttribute;
+			BString				fArg;
+			int32				fReplyAccount;
+			z_mail_action_flags	fDoWhat;
 };
 
 #endif	/* ZOIDBERG_RULE_FILTER_H */

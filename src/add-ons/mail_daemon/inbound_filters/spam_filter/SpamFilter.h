@@ -1,3 +1,9 @@
+/*
+ * Copyright 2002-2011, Haiku, Inc. All rights reserved.
+ * Copyright 2002 Alexander G. M. Smith.
+ * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef AGMS_BAYESIAN_SPAM_FILTER_H
 #define AGMS_BAYESIAN_SPAM_FILTER_H
 /******************************************************************************
@@ -76,29 +82,35 @@
 #include <MailAddon.h>
 
 
-class AGMSBayesianSpamFilter : public BMailFilter {
-	public:
-		AGMSBayesianSpamFilter (BMessage *settings);
-		virtual ~AGMSBayesianSpamFilter ();
+class AGMSBayesianSpamFilter : public MailFilter {
+public:
+								AGMSBayesianSpamFilter(MailProtocol& protocol,
+									AddonSettings* settings);
+								~AGMSBayesianSpamFilter();
 
-		virtual status_t InitCheck (BString* out_message = NULL);
+			void				HeaderFetched(const entry_ref& ref, BFile* file);
+			void				BodyFetched(const entry_ref& ref, BFile* file);
 
-		virtual status_t ProcessMailMessage (BPositionIO** io_message,
-			BEntry* io_entry,
-			BMessage* io_headers,
-			BPath* io_folder,
-			const char* io_uid);
+private:
+			status_t			_CheckForSpam(BFile* file);
+			//! if the server is not running start it
+			status_t			_CheckForSpamServer();
+			status_t			_GetTokenizeMode();
+			status_t			_GetSpamRatio(const char* data, off_t dataSize,
+									float& ratio);
+			status_t			_TrainServer(const char* data, off_t dataSize,
+									float spamRatio);
+			status_t			_AddSpamToSubject(BNode* file, float spamRatio);
 
-	private:
-		bool fAddSpamToSubject;
-		bool fAutoTraining;
-		float fGenuineCutoffRatio;
-		bool fHeaderOnly;
-		int fLaunchAttemptCount;
-		BMessenger fMessengerToServer;
-		bool fNoWordsMeansSpam;
-		bool fQuitServerWhenFinished;
-		float fSpamCutoffRatio;
+			bool				fAddSpamToSubject;
+			bool				fAutoTraining;
+			float				fGenuineCutoffRatio;
+			bool				fHeaderOnly;
+			int					fLaunchAttemptCount;
+			BMessenger			fMessengerToServer;
+			bool				fNoWordsMeansSpam;
+			bool				fQuitServerWhenFinished;
+			float				fSpamCutoffRatio;
 };
 
 #endif	/* AGMS_BAYESIAN_SPAM_FILTER_H */

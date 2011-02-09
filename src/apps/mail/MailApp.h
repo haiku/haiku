@@ -83,8 +83,8 @@ class TMailApp : public BApplication {
 				uint8			ShowButtonBar();
 				bool			WarnAboutUnencodableCharacters();
 				bool			StartWithSpellCheckOn();
-				void			SetDefaultChain(uint32 chain);
-				uint32			DefaultChain();
+				void			SetDefaultAccount(int32 account);
+				int32			DefaultAccount();
 				int32			UseAccountFrom();
 				uint32			MailCharacterSet();
 				bool			ShowSpamGUI() const
@@ -125,7 +125,7 @@ class TMailApp : public BApplication {
 				bool			fWarnAboutUnencodableCharacters;
 				bool			fStartWithSpellCheckOn;
 				bool			fShowSpamGUI;
-				uint32			fDefaultChain;
+				int32			fDefaultAccount;
 				int32			fUseAccountFrom;
 				uint32			fMailCharacterSet;
 				BFont			fContentFont;

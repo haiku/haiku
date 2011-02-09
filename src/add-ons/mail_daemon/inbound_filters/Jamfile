@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src add-ons mail_daemon inbound_filters ;
 
-SubInclude HAIKU_TOP src add-ons mail_daemon inbound_filters r5_filter ;
 SubInclude HAIKU_TOP src add-ons mail_daemon inbound_filters match_header ;
+SubInclude HAIKU_TOP src add-ons mail_daemon inbound_filters notifier ;
 SubInclude HAIKU_TOP src add-ons mail_daemon inbound_filters spam_filter ;
 

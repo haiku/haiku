@@ -1,3 +1,8 @@
+/*
+ * Copyright 2007-2011, Haiku, Inc. All rights reserved.
+ * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef AUTO_CONFIG_H
 #define AUTO_CONFIG_H
 

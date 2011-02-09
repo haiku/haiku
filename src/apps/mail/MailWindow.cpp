@@ -529,7 +529,7 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 			// Use preferences setting for composing mail.
 		: B_MAIL_NULL_CONVERSION,
 			// Default is automatic selection for reading mail.
-		fApp->DefaultChain());
+		fApp->DefaultAccount());
 
 	r = Frame();
 	r.OffsetTo(0, 0);
@@ -834,18 +834,29 @@ void
 TMailWindow::SetCurrentMessageRead(bool read)
 {
 	BNode node(fRef);
-	if (node.InitCheck() == B_NO_ERROR) {
-		BString status;
-		if (ReadAttrString(&node, B_MAIL_ATTR_STATUS, &status) == B_NO_ERROR) {
-			if (read && !status.ICompare("New")) {
-				node.RemoveAttr(B_MAIL_ATTR_STATUS);
-				WriteAttrString(&node, B_MAIL_ATTR_STATUS, "Read");
-			}
-			if (!read && !status.ICompare("Read")) {
-				node.RemoveAttr(B_MAIL_ATTR_STATUS);
-				WriteAttrString(&node, B_MAIL_ATTR_STATUS, "New");
-			}
-		}
+	status_t status = node.InitCheck();
+	if (status != B_OK)
+		return;
+
+	int32 account;
+	if (node.ReadAttr("MAIL:account", B_INT32_TYPE, 0, &account,
+		sizeof(account)) < 0)
+		account = -1;
+
+	BString mailStatus;
+	status = ReadAttrString(&node, B_MAIL_ATTR_STATUS, &mailStatus);
+	if (status != B_OK)
+		return;
+
+	if (read && !mailStatus.ICompare("New")) {
+		node.RemoveAttr(B_MAIL_ATTR_STATUS);
+		WriteAttrString(&node, B_MAIL_ATTR_STATUS, "Read");
+		BMailDaemon::MarkAsRead(account, *fRef, true);
+	}
+	if (!read && !mailStatus.ICompare("Read")) {
+		node.RemoveAttr(B_MAIL_ATTR_STATUS);
+		WriteAttrString(&node, B_MAIL_ATTR_STATUS, "New");
+		BMailDaemon::MarkAsRead(account, *fRef, false);
 	}
 }
 
@@ -1843,14 +1854,14 @@ TMailWindow::Forward(entry_ref *ref, TMailWindow *window,
 	// set mail account
 
 	if (useAccountFrom == ACCOUNT_FROM_MAIL) {
-		fHeaderView->fChain = fMail->Account();
+		fHeaderView->fAccountID = fMail->Account();
 
 		BMenu *menu = fHeaderView->fAccountMenu;
 		for (int32 i = menu->CountItems(); i-- > 0;) {
 			BMenuItem *item = menu->ItemAt(i);
 			BMessage *msg;
 			if (item && (msg = item->Message()) != NULL
-				&& msg->FindInt32("id") == fHeaderView->fChain)
+				&& msg->FindInt32("id") == fHeaderView->fAccountID)
 				item->SetMarked(true);
 		}
 	}
@@ -2085,25 +2096,26 @@ TMailWindow::Reply(entry_ref *ref, TMailWindow *window, uint32 type)
 	fHeaderView->fCc->SetText(fMail->CC());
 	fHeaderView->fSubject->SetText(fMail->Subject());
 
-	int32 chainID;
+	int32 accountID;
 	BFile file(window->fRef, B_READ_ONLY);
-	if (file.ReadAttr("MAIL:reply_with", B_INT32_TYPE, 0, &chainID, 4) < B_OK)
-		chainID = -1;
+	if (file.ReadAttr("MAIL:reply_with", B_INT32_TYPE, 0, &accountID,
+		sizeof(int32)) != B_OK)
+		accountID = -1;
 
 	// set mail account
 
-	if ((useAccountFrom == ACCOUNT_FROM_MAIL) || (chainID > -1)) {
+	if ((useAccountFrom == ACCOUNT_FROM_MAIL) || (accountID > -1)) {
 		if (useAccountFrom == ACCOUNT_FROM_MAIL)
-			fHeaderView->fChain = fMail->Account();
+			fHeaderView->fAccountID = fMail->Account();
 		else
-			fHeaderView->fChain = chainID;
+			fHeaderView->fAccountID = accountID;
 
 		BMenu *menu = fHeaderView->fAccountMenu;
 		for (int32 i = menu->CountItems(); i-- > 0;) {
 			BMenuItem *item = menu->ItemAt(i);
 			BMessage *msg;
 			if (item && (msg = item->Message()) != NULL
-				&& msg->FindInt32("id") == fHeaderView->fChain)
+				&& msg->FindInt32("id") == fHeaderView->fAccountID)
 				item->SetMarked(true);
 		}
 	}
@@ -2360,8 +2372,8 @@ TMailWindow::Send(bool now)
 			mail.SetTo(fHeaderView->fTo->Text(), characterSetToUse,
 				encodingForHeaders);
 
-			if (fHeaderView->fChain != ~0L)
-				mail.SendViaAccount(fHeaderView->fChain);
+			if (fHeaderView->fAccountID != ~0L)
+				mail.SendViaAccount(fHeaderView->fAccountID);
 
 			result = mail.Send(now);
 		}
@@ -2428,8 +2440,8 @@ TMailWindow::Send(bool now)
 				fMail->Attach(item->Ref(), fApp->AttachAttributes());
 			}
 		}
-		if (fHeaderView->fChain != ~0L)
-			fMail->SendViaAccount(fHeaderView->fChain);
+		if (fHeaderView->fAccountID != ~0L)
+			fMail->SendViaAccount(fHeaderView->fAccountID);
 
 		result = fMail->Send(now);
 

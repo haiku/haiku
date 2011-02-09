@@ -1,3 +1,9 @@
+/*
+ * Copyright 2002-2011, Haiku, Inc. All rights reserved.
+ * Copyright 2002 Alexander G. M. Smith.
+ * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
+ * Distributed under the terms of the MIT License.
+ */
 /******************************************************************************
  * $Id: SpamFilter.cpp 29284 2009-02-22 13:45:40Z bga $
  *
@@ -129,21 +135,25 @@ static const char *kAGMSBayesBeepUncertainName = "SpamFilter-Uncertain";
 static const char *kServerSignature = "application/x-vnd.agmsmith.spamdbm";
 
 
-AGMSBayesianSpamFilter::AGMSBayesianSpamFilter (BMessage *settings)
-	:	BMailFilter (settings),
-		fAddSpamToSubject (false),
-		fAutoTraining (true),
-		fGenuineCutoffRatio (0.01f),
-		fHeaderOnly (false),
-		fLaunchAttemptCount (0),
-		fNoWordsMeansSpam (true),
-		fQuitServerWhenFinished (false),
-		fSpamCutoffRatio (0.99f)
+AGMSBayesianSpamFilter::AGMSBayesianSpamFilter(MailProtocol& protocol,
+	AddonSettings* addonSettings)
+	:
+	MailFilter(protocol, addonSettings),
+
+	fAddSpamToSubject(false),
+	fAutoTraining(true),
+	fGenuineCutoffRatio(0.01f),
+	fHeaderOnly(false),
+	fLaunchAttemptCount(0),
+	fNoWordsMeansSpam(true),
+	fQuitServerWhenFinished(false),
+	fSpamCutoffRatio(0.99f)
 {
 	bool		tempBool;
 	float		tempFloat;
 	BMessenger	tempMessenger;
 
+	const BMessage* settings = &addonSettings->Settings();
 	if (settings != NULL) {
 		if (settings->FindBool ("AddMarkerToSubject", &tempBool) == B_OK)
 			fAddSpamToSubject = tempBool;
@@ -163,282 +173,83 @@ AGMSBayesianSpamFilter::AGMSBayesianSpamFilter (BMessage *settings)
 
 AGMSBayesianSpamFilter::~AGMSBayesianSpamFilter ()
 {
-	BMessage quitMessage (B_QUIT_REQUESTED);
-
 	if (fQuitServerWhenFinished && fMessengerToServer.IsValid ())
-		fMessengerToServer.SendMessage (&quitMessage);
+		fMessengerToServer.SendMessage(B_QUIT_REQUESTED);
 }
 
 
-status_t
-AGMSBayesianSpamFilter::InitCheck (BString* out_message)
+void
+AGMSBayesianSpamFilter::HeaderFetched(const entry_ref& ref, BFile* file)
 {
-	if (out_message != NULL)
-		out_message->SetTo (
-			"SpamFilter::InitCheck is never called!");
-	return B_OK;
+	_CheckForSpam(file);
 }
 
 
-status_t
-AGMSBayesianSpamFilter::ProcessMailMessage (
-	BPositionIO** io_message,
-	BEntry* io_entry,
-	BMessage* io_headers,
-	BPath* io_folder,
-	const char* io_uid)
+void
+AGMSBayesianSpamFilter::BodyFetched(const entry_ref& ref, BFile* file)
 {
-	ssize_t		 amountRead;
-	attr_info	 attributeInfo;
-	const char	*classificationString;
-	off_t		 dataSize;
-	BPositionIO	*dataStreamPntr = *io_message;
-	status_t	 errorCode = B_OK;
-	int32        headerLength;
-	BString      headerString;
-	BString		 newSubjectString;
-	BNode        nodeForOutputFile;
-	bool		 nodeForOutputFileInitialised = false;
-	const char	*oldSubjectStringPntr;
-	char         percentageString [30];
-	BMessage	 replyMessage;
-	BMessage	 scriptingMessage;
-	team_id		 serverTeam;
-	float		 spamRatio;
-	char		*stringBuffer = NULL;
-	char         tempChar;
-	status_t     tempErrorCode;
-	const char  *tokenizeModeStringPntr;
-
-	// Set up a BNode to the final output file so that we can write custom
-	// attributes to it.  Non-custom attributes are stored separately in
-	// io_headers.
-
-	if (io_entry != NULL && B_OK == nodeForOutputFile.SetTo (io_entry))
-		nodeForOutputFileInitialised = true;
-
-	// Get a connection to the spam database server.  Launch if needed, should
-	// only need it once, unless another e-mail thread shuts down the server
-	// inbetween messages.  This code used to be in InitCheck, but apparently
-	// that isn't called.
-
-	printf("Checking for Spam Server.\n");
-	if (fLaunchAttemptCount == 0 || !fMessengerToServer.IsValid ()) {
-		if (fLaunchAttemptCount > 3)
-			goto ErrorExit; // Don't try to start the server too many times.
-		fLaunchAttemptCount++;
-
-		// Make sure the server is running.
-		if (!be_roster->IsRunning (kServerSignature)) {
-			errorCode = be_roster->Launch (kServerSignature);
-			if (errorCode != B_OK) {
-				BPath path;
-				entry_ref ref;
-				directory_which places[] = {B_COMMON_BIN_DIRECTORY,B_BEOS_BIN_DIRECTORY};
-				for (int32 i = 0; i < 2; i++) {
-					find_directory(places[i],&path);
-					path.Append("spamdbm");
-					if (!BEntry(path.Path()).Exists())
-						continue;
-					get_ref_for_path(path.Path(),&ref);
-					if ((errorCode =  be_roster->Launch (&ref)) == B_OK)
-						break;
-				}
-				if (errorCode != B_OK)
-					goto ErrorExit;
-			}
-		}
-
-		// Set up the messenger to the database server.
-		serverTeam = be_roster->TeamFor (kServerSignature);
-		if (serverTeam < 0)
-			goto ErrorExit;
-		fMessengerToServer =
-			BMessenger (kServerSignature, serverTeam, &errorCode);
-		if (!fMessengerToServer.IsValid ())
-			goto ErrorExit;
-
-		// Check if the server is running in headers only mode.  If so, we only
-		// need to download the header rather than the entire message.
-		scriptingMessage.MakeEmpty ();
-		scriptingMessage.what = B_GET_PROPERTY;
-		scriptingMessage.AddSpecifier ("TokenizeMode");
-		replyMessage.MakeEmpty ();
-		if ((errorCode = fMessengerToServer.SendMessage (&scriptingMessage,
-			&replyMessage)) != B_OK)
-			goto ErrorExit;
-		if ((errorCode = replyMessage.FindInt32 ("error", &tempErrorCode))
-			!= B_OK)
-			goto ErrorExit;
-		if ((errorCode = tempErrorCode) != B_OK)
-			goto ErrorExit;
-		if ((errorCode = replyMessage.FindString ("result",
-			&tokenizeModeStringPntr)) != B_OK)
-			goto ErrorExit;
-		fHeaderOnly = (tokenizeModeStringPntr != NULL
-			&& strcmp (tokenizeModeStringPntr, "JustHeader") == 0);
-	}
+	if (fHeaderOnly)
+		return;
 
 	// See if the message has already been classified.  Happens for messages
 	// which are partially downloaded when you have auto-training on.  Could
 	// untrain the partial part before training on the complete message, but we
 	// don't know how big it was, so instead just ignore the message.
+	attr_info attributeInfo;
+	if (file->GetAttrInfo ("MAIL:classification", &attributeInfo) == B_OK)
+		return;
 
-	if (nodeForOutputFileInitialised) {
-		if (nodeForOutputFile.GetAttrInfo ("MAIL:classification",
-			&attributeInfo) == B_OK)
-			return B_OK;
+	_CheckForSpam(file);
+}
+
+
+status_t
+AGMSBayesianSpamFilter::_CheckForSpam(BFile* file)
+{
+	// Get a connection to the spam database server.  Launch if needed, should
+	// only need it once, unless another e-mail thread shuts down the server
+	// inbetween messages.  This code used to be in InitCheck, but apparently
+	// that isn't called.
+	printf("Checking for Spam Server.\n");
+	if (fLaunchAttemptCount == 0 || !fMessengerToServer.IsValid ()) {
+		if (_GetTokenizeMode() != B_OK)
+			return B_ERROR;
 	}
 
-	// Copy the message to a string so that we can pass it to the spam database
-	// (the even messier alternative is a temporary file).  Do it in a fashion
-	// which allows NUL bytes in the string.  This method of course limits the
-	// message size to a few hundred megabytes.  If we're using header mode,
-	// only read the header rather than the full message.
+	off_t dataSize;
+	file->GetSize(&dataSize);
+	char* stringBuffer = new char[dataSize + 1];
+	file->Read(stringBuffer, dataSize);
+	stringBuffer[dataSize] = 0; // Add an end of string NUL, just in case.
 
-	if (fHeaderOnly) {
-		// Read just the header, it ends with an empty CRLF line.
-		dataStreamPntr->Seek (0, SEEK_SET);
-		while ((errorCode = dataStreamPntr->Read (&tempChar, 1)) == 1) {
-			headerString.Append (tempChar, 1);
-			headerLength = headerString.Length();
-			if (headerLength >= 4 && strcmp (headerString.String() +
-				headerLength - 4, "\r\n\r\n") == 0)
-				break;
-		}
-		if (errorCode < 0)
-			goto ErrorExit;
-
-		dataSize = headerString.Length();
-		stringBuffer = new char [dataSize + 1];
-		memcpy (stringBuffer, headerString.String(), dataSize);
-		stringBuffer[dataSize] = 0;
-	} else {
-		// Read the whole file.  The seek to the end may take a while since
-		// that triggers downloading of the entire message (and caching in a
-		// slave file - see the MessageIO class).
-		dataSize = dataStreamPntr->Seek (0, SEEK_END);
-		if (dataSize <= 0)
-			goto ErrorExit;
-
-		try {
-			stringBuffer = new char [dataSize + 1];
-		} catch (...) {
-			errorCode = ENOMEM;
-			goto ErrorExit;
-		}
-
-		dataStreamPntr->Seek (0, SEEK_SET);
-		amountRead = dataStreamPntr->Read (stringBuffer, dataSize);
-		if (amountRead != dataSize)
-			goto ErrorExit;
-		stringBuffer[dataSize] = 0; // Add an end of string NUL, just in case.
-	}
-
-	// Send off a scripting command to the database server, asking it to
-	// evaluate the string for spaminess.  Note that it can return ENOMSG
-	// when there are no words (a good indicator of spam which is pure HTML
-	// if you are using plain text only tokenization), so we could use that
-	// as a spam marker too.  Code copied for the reevaluate stuff below.
-
-	scriptingMessage.MakeEmpty ();
-	scriptingMessage.what = B_SET_PROPERTY;
-	scriptingMessage.AddSpecifier ("EvaluateString");
-	errorCode = scriptingMessage.AddData ("data", B_STRING_TYPE,
-		stringBuffer, dataSize + 1, false /* fixed size */);
-	if (errorCode != B_OK)
-		goto ErrorExit;
-	replyMessage.MakeEmpty ();
-	errorCode = fMessengerToServer.SendMessage (&scriptingMessage,
-		&replyMessage);
-	if (errorCode != B_OK
-		|| replyMessage.FindInt32 ("error", &errorCode) != B_OK)
-		goto ErrorExit; // Unable to read the return code.
-	if (errorCode == ENOMSG && fNoWordsMeansSpam)
-		spamRatio = fSpamCutoffRatio; // Yes, no words and that means spam.
-	else if (errorCode != B_OK
-		|| replyMessage.FindFloat ("result", &spamRatio) != B_OK)
-		goto ErrorExit; // Classification failed in one of many ways.
-
+	float spamRatio;
+	if (_GetSpamRatio(stringBuffer, dataSize, spamRatio) != B_OK)
+		return B_ERROR;
+	
 	// If we are auto-training, feed back the message to the server as a
-	// training example (don't train if it is uncertain).  Also redo the
-	// evaluation after training.
-
-	if (fAutoTraining) {
-		if (spamRatio >= fSpamCutoffRatio || spamRatio < fGenuineCutoffRatio) {
-			scriptingMessage.MakeEmpty ();
-			scriptingMessage.what = B_SET_PROPERTY;
-			scriptingMessage.AddSpecifier ((spamRatio >= fSpamCutoffRatio)
-				? "SpamString" : "GenuineString");
-			errorCode = scriptingMessage.AddData ("data", B_STRING_TYPE,
-				stringBuffer, dataSize + 1, false /* fixed size */);
-			if (errorCode != B_OK)
-				goto ErrorExit;
-			replyMessage.MakeEmpty ();
-			errorCode = fMessengerToServer.SendMessage (&scriptingMessage,
-				&replyMessage);
-			if (errorCode != B_OK
-				|| replyMessage.FindInt32 ("error", &errorCode) != B_OK)
-				goto ErrorExit; // Unable to read the return code.
-			if (errorCode != B_OK)
-				goto ErrorExit; // Failed to set a good example.
-		}
-
-		// Note the kind of example made so that the user doesn't reclassify
-		// the message twice (the spam server looks for this attribute).
-
-		classificationString =
-			(spamRatio >= fSpamCutoffRatio)
-			? "Spam"
-			: ((spamRatio < fGenuineCutoffRatio) ? "Genuine" : "Uncertain");
-		if (nodeForOutputFileInitialised)
-			nodeForOutputFile.WriteAttr ("MAIL:classification", B_STRING_TYPE,
-				0 /* offset */, classificationString,
-				strlen (classificationString) + 1);
-
-		// Now that the database has changed due to training, recompute the
-		// spam ratio.  Hopefully it will have become more extreme in the
-		// correct direction (not switched from being spam to being genuine).
-		// Code copied from above.
-
-		scriptingMessage.MakeEmpty ();
-		scriptingMessage.what = B_SET_PROPERTY;
-		scriptingMessage.AddSpecifier ("EvaluateString");
-		errorCode = scriptingMessage.AddData ("data", B_STRING_TYPE,
-			stringBuffer, dataSize + 1, false /* fixed size */);
-		if (errorCode != B_OK)
-			goto ErrorExit;
-		replyMessage.MakeEmpty ();
-		errorCode = fMessengerToServer.SendMessage (&scriptingMessage,
-			&replyMessage);
-		if (errorCode != B_OK
-			|| replyMessage.FindInt32 ("error", &errorCode) != B_OK)
-			goto ErrorExit; // Unable to read the return code.
-		if (errorCode == ENOMSG && fNoWordsMeansSpam)
-			spamRatio = fSpamCutoffRatio; // Yes, no words and that means spam.
-		else if (errorCode != B_OK
-			|| replyMessage.FindFloat ("result", &spamRatio) != B_OK)
-			goto ErrorExit; // Classification failed in one of many ways.
+	// training example (don't train if it is uncertain).
+	if (fAutoTraining && (spamRatio >= fSpamCutoffRatio
+		|| spamRatio < fGenuineCutoffRatio)) {
+			_TrainServer(stringBuffer, dataSize, spamRatio);
 	}
+
+	delete[] stringBuffer;
+
+	// write attributes
+	const char *classificationString;
+	classificationString = (spamRatio >= fSpamCutoffRatio) ? "Spam"
+		: ((spamRatio < fGenuineCutoffRatio) ? "Genuine" : "Uncertain");
+	file->WriteAttr("MAIL:classification", B_STRING_TYPE, 0 /* offset */,
+		classificationString, strlen(classificationString) + 1);
 
 	// Store the spam ratio in an attribute called MAIL:ratio_spam,
 	// attached to the eventual output file.
-
-	if (nodeForOutputFileInitialised)
-		nodeForOutputFile.WriteAttr ("MAIL:ratio_spam",
-			B_FLOAT_TYPE, 0 /* offset */, &spamRatio, sizeof (spamRatio));
+	file->WriteAttr("MAIL:ratio_spam", B_FLOAT_TYPE, 0 /* offset */, &spamRatio,
+		sizeof(spamRatio));
 
 	// Also add it to the subject, if requested.
-
-	if (fAddSpamToSubject
-		&& spamRatio >= fSpamCutoffRatio
-		&& io_headers->FindString ("Subject", &oldSubjectStringPntr) == B_OK) {
-		newSubjectString.SetTo ("[Spam ");
-		sprintf (percentageString, "%05.2f", spamRatio * 100.0);
-		newSubjectString << percentageString << "%] ";
-		newSubjectString << oldSubjectStringPntr;
-		io_headers->ReplaceString ("Subject", newSubjectString);
-	}
+	if (fAddSpamToSubject && spamRatio >= fSpamCutoffRatio)
+		_AddSpamToSubject(file, spamRatio);
 
 	// Beep using different sounds for spam and genuine, as Jeremy Friesner
 	// nudged me to get around to implementing.  And add uncertain to that, as
@@ -446,59 +257,181 @@ AGMSBayesianSpamFilter::ProcessMailMessage (
 	// can turn it off in the system sound preferences.
 
 	if (spamRatio >= fSpamCutoffRatio) {
-		system_beep (kAGMSBayesBeepSpamName);
+		system_beep(kAGMSBayesBeepSpamName);
 	} else if (spamRatio < fGenuineCutoffRatio) {
-		system_beep (kAGMSBayesBeepGenuineName);
+		system_beep(kAGMSBayesBeepGenuineName);
 	} else {
-		system_beep (kAGMSBayesBeepUncertainName);
+		system_beep(kAGMSBayesBeepUncertainName);
 	}
 
 	return B_OK;
-
-ErrorExit:
-	fprintf (stderr, "Error exit from "
-		"SpamFilter::ProcessMailMessage, code maybe %ld (%s).\n",
-		errorCode, strerror (errorCode));
-	delete [] stringBuffer;
-	return B_OK; // Not MD_ERROR so the message doesn't get left on server.
 }
 
 
 status_t
-descriptive_name (
-	BMessage *settings,
-	char *buffer)
+AGMSBayesianSpamFilter::_CheckForSpamServer()
 {
-	bool		addMarker = false;
-	bool		autoTraining = true;
-	float		cutoffRatio = 0.99f;
-	bool		tempBool;
-	float		tempFloat;
+	// Make sure the server is running.
+	if (be_roster->IsRunning (kServerSignature))
+		return B_OK;
 
-	if (settings != NULL) {
-		if (settings->FindBool ("AddMarkerToSubject", &tempBool) == B_OK)
-			addMarker = tempBool;
-		if (settings->FindBool ("AutoTraining", &tempBool) == B_OK)
-			autoTraining = tempBool;
-		if (settings->FindFloat ("SpamCutoffRatio", &tempFloat) == B_OK)
-			cutoffRatio = tempFloat;
+	status_t errorCode = be_roster->Launch (kServerSignature);
+	if (errorCode == B_OK)
+		return errorCode;
+
+	BPath path;
+	entry_ref ref;
+	directory_which places[] = {B_COMMON_BIN_DIRECTORY,B_BEOS_BIN_DIRECTORY};
+	for (int32 i = 0; i < 2; i++) {
+		find_directory(places[i],&path);
+		path.Append("spamdbm");
+		if (!BEntry(path.Path()).Exists())
+			continue;
+		get_ref_for_path(path.Path(),&ref);
+		if ((errorCode =  be_roster->Launch(&ref)) == B_OK)
+			break;
 	}
 
-	sprintf (buffer, "Spam >= %05.3f", (double) cutoffRatio);
-	if (addMarker)
-		strcat (buffer, ", Mark subject");
-	if (autoTraining)
-		strcat (buffer, ", Self-training");
-	strcat (buffer, ".");
+	return errorCode;
+}
+
+
+status_t
+AGMSBayesianSpamFilter::_GetTokenizeMode()
+{
+	if (fLaunchAttemptCount > 3)
+		return B_ERROR; // Don't try to start the server too many times.
+	fLaunchAttemptCount++;
+
+	// Make sure the server is running.
+	status_t errorCode = _CheckForSpamServer();
+	if (errorCode != B_OK)
+		return errorCode;
+
+	// Set up the messenger to the database server.
+	fMessengerToServer = BMessenger(kServerSignature);
+	if (!fMessengerToServer.IsValid ())
+		return B_ERROR;
+
+	// Check if the server is running in headers only mode.  If so, we only
+	// need to download the header rather than the entire message.
+	BMessage scriptingMessage(B_GET_PROPERTY);
+	scriptingMessage.AddSpecifier("TokenizeMode");
+	BMessage replyMessage;
+	if ((errorCode = fMessengerToServer.SendMessage (&scriptingMessage,
+		&replyMessage)) != B_OK)
+		return errorCode;
+	status_t tempErrorCode;
+	if ((errorCode = replyMessage.FindInt32 ("error", &tempErrorCode))
+		!= B_OK)
+		return errorCode;
+	if ((errorCode = tempErrorCode) != B_OK)
+		return errorCode;
+
+	const char  *tokenizeModeStringPntr;
+	if ((errorCode = replyMessage.FindString ("result",
+		&tokenizeModeStringPntr)) != B_OK)
+		return errorCode;
+	fHeaderOnly = (tokenizeModeStringPntr != NULL
+		&& strcmp (tokenizeModeStringPntr, "JustHeader") == 0);
+	return B_OK;
+}
+
+
+status_t
+AGMSBayesianSpamFilter::_GetSpamRatio(const char* stringBuffer, off_t dataSize,
+	float& ratio)
+{
+	// Send off a scripting command to the database server, asking it to
+	// evaluate the string for spaminess.  Note that it can return ENOMSG
+	// when there are no words (a good indicator of spam which is pure HTML
+	// if you are using plain text only tokenization), so we could use that
+	// as a spam marker too.  Code copied for the reevaluate stuff below.
+
+	BMessage scriptingMessage(B_SET_PROPERTY);
+	scriptingMessage.AddSpecifier("EvaluateString");
+	status_t errorCode = scriptingMessage.AddData("data", B_STRING_TYPE,
+		stringBuffer, dataSize + 1, false /* fixed size */);
+	if (errorCode != B_OK)
+		return errorCode;
+	BMessage replyMessage;
+	errorCode = fMessengerToServer.SendMessage(&scriptingMessage,
+		&replyMessage);
+	if (errorCode != B_OK
+		|| replyMessage.FindInt32("error", &errorCode) != B_OK)
+		return errorCode; // Unable to read the return code.
+	if (errorCode == ENOMSG && fNoWordsMeansSpam)
+		ratio = fSpamCutoffRatio; // Yes, no words and that means spam.
+	else if (errorCode != B_OK
+		|| replyMessage.FindFloat("result", &ratio) != B_OK)
+		return errorCode; // Classification failed in one of many ways.
+
+	return errorCode;
+}
+
+
+status_t
+AGMSBayesianSpamFilter::_TrainServer(const char* stringBuffer, off_t dataSize,
+	float spamRatio)
+{
+	BMessage scriptingMessage(B_SET_PROPERTY);
+	scriptingMessage.AddSpecifier((spamRatio >= fSpamCutoffRatio)
+		? "SpamString" : "GenuineString");
+	status_t errorCode = scriptingMessage.AddData ("data", B_STRING_TYPE,
+		stringBuffer, dataSize + 1, false /* fixed size */);
+	if (errorCode != B_OK)
+		return errorCode;
+	BMessage replyMessage;
+	errorCode = fMessengerToServer.SendMessage (&scriptingMessage,
+		&replyMessage);
+	if (errorCode != B_OK)
+		return errorCode;
+	errorCode = replyMessage.FindInt32("error", &errorCode);
+
+	return errorCode;
+}
+
+
+status_t
+AGMSBayesianSpamFilter::_AddSpamToSubject(BNode* file, float spamRatio)
+{
+	attr_info info;
+	if (file->GetAttrInfo("Subject", &info) != B_OK)
+		return B_ERROR;
+	if (info.type != B_STRING_TYPE)
+		return B_ERROR;
+
+	char* buffer = new char[info.size];
+	if (file->ReadAttr("Subject", B_STRING_TYPE, 0, buffer, info.size) < 0) {
+		delete[] buffer;
+		return B_ERROR;
+	}
+                     
+	BString newSubjectString;
+	newSubjectString.SetTo("[Spam ");
+	char percentageString[30];
+	sprintf(percentageString, "%05.2f", spamRatio * 100.0);
+	newSubjectString << percentageString << "%] ";
+	newSubjectString << buffer;
+	delete[] buffer;
+
+	if (file->WriteAttr("Subject", B_STRING_TYPE, 0, newSubjectString.String(),
+		newSubjectString.Length()) < 0)
+		return B_ERROR;
 
 	return B_OK;
 }
 
 
-BMailFilter *
-instantiate_mailfilter (
-	BMessage *settings,
-	BMailChainRunner *)
+BString
+descriptive_name()
 {
-	return new AGMSBayesianSpamFilter (settings);
+	return "Spam Filter (AGMS Bayesian)";
+}
+
+
+MailFilter*
+instantiate_mailfilter(MailProtocol& protocol, AddonSettings* settings)
+{
+	return new AGMSBayesianSpamFilter(protocol, settings);
 }

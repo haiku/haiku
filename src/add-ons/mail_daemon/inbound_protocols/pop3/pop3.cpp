@@ -1,6 +1,7 @@
 /*
- * Copyright 2007-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2011, Haiku, Inc. All rights reserved.
  * Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
+ * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  *
  * Distributed under the terms of the MIT License.
  */
@@ -17,11 +18,8 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-#ifndef HAIKU_TARGET_PLATFORM_BEOS
-	// These headers don't exist in BeOS R5.
-#	include <arpa/inet.h>
-#	include <sys/select.h>
-#endif
+#include <arpa/inet.h>
+#include <sys/select.h>
 
 #if USE_SSL
 #	include <openssl/ssl.h>
@@ -31,14 +29,18 @@
 #	include "md5.h"
 #endif
 
-#include <DataIO.h>
 #include <Alert.h>
+#include <fs_attr.h>
 #include <Debug.h>
+#include <Directory.h>
+#include <Path.h>
+#include <String.h>
+#include <VolumeRoster.h>
+#include <Query.h>
 
-#include <status.h>
-#include <StringList.h>
-#include <ProtocolConfigView.h>
-#include <ChainRunner.h>
+#include "crypt.h"
+#include "MailSettings.h"
+#include "MessageIO.h"
 
 #include <MDRLanguage.h>
 
@@ -46,19 +48,55 @@
 #define CRLF	"\r\n"
 
 
-POP3Protocol::POP3Protocol(BMessage *settings, BMailChainRunner *status)
-	: SimpleMailProtocol(settings,status),
+POP3Protocol::POP3Protocol(BMailAccountSettings* settings)
+	:
+	InboundProtocol(settings),
 	fNumMessages(-1),
 	fMailDropSize(0)
 {
+	printf("POP3Protocol::POP3Protocol(BMailAccountSettings* settings)\n");
+	fSettings = fAccountSettings.InboundSettings().Settings();
 #ifdef USE_SSL
-	fUseSSL = (settings->FindInt32("flavor") == 1);
+	fUseSSL = (fSettings.FindInt32("flavor") == 1);
 #endif
-	Init();
+
+	if (fSettings.FindString("destination", &fDestinationDir) != B_OK)
+		fDestinationDir = "/boot/home/mail/in";
+
+	create_directory(fDestinationDir, 0777);
+
+	fFetchBodyLimit = 0;
+	if (fSettings.HasInt32("partial_download_limit"))
+		fFetchBodyLimit = fSettings.FindInt32("partial_download_limit");
 }
 
 
 POP3Protocol::~POP3Protocol()
+{
+	Disconnect();
+}
+
+
+status_t
+POP3Protocol::Connect()
+{
+	status_t error = Open(fSettings.FindString("server"), fSettings.FindInt32("port"),
+				fSettings.FindInt32("flavor"));
+	if (error != B_OK)
+		return error;
+
+	char* password = get_passwd(&fSettings, "cpasswd");
+
+	error = Login(fSettings.FindString("username"), password,
+		fSettings.FindInt32("auth_method"));
+	delete[] password;
+
+	return error;
+}
+
+
+status_t
+POP3Protocol::Disconnect()
 {
 #ifdef USE_SSL
 	if (!fUseSSL || fSSL)
@@ -79,13 +117,186 @@ POP3Protocol::~POP3Protocol()
 #else
 	closesocket(fSocket);
 #endif
+	return B_OK;
+}
+
+
+status_t
+POP3Protocol::SyncMessages()
+{
+	// create directory if not exist
+	create_directory(fDestinationDir, 0777);
+
+	printf("POP3Protocol::SyncMessages()\n");
+	_ReadManifest();
+
+	SetTotalItems(2);
+	ReportProgress(0, 1, "Connect to server...");
+	status_t error = Connect();
+	if (error < B_OK) {
+		ResetProgress();
+		return error;
+	}
+
+	ReportProgress(0, 1, MDR_DIALECT_CHOICE("Getting UniqueIDs...",
+		"固有のIDを取得中..."));
+	error = _UniqueIDs();
+	if (error < B_OK) {
+		ResetProgress();
+		return error;
+	}
+
+	int32	num_messages;
+
+	BStringList toDownload;
+	fManifest.NotHere(fUniqueIDs, &toDownload);
+
+	num_messages = toDownload.CountItems();
+	if (num_messages == 0) {
+		CheckForDeletedMessages();
+		ResetProgress();
+		return B_OK;
+	}
+
+	ResetProgress();
+	SetTotalItems(toDownload.CountItems());
+
+	printf("POP3 to download: %i\n", (int)toDownload.CountItems());
+	for (int32 i = 0; i < toDownload.CountItems(); i++) {
+		const char* uid = toDownload.ItemAt(i);
+		int32 toRetrieve = fUniqueIDs.IndexOf(uid);
+
+		if (toRetrieve < 0) {
+			error = B_NAME_NOT_FOUND;
+			break;
+		}
+
+		BPath path(fDestinationDir);
+		BString fileName = "Downloading file... uid: ";
+		fileName += uid;
+		path.Append(fileName);
+		BEntry entry(path.Path());
+		BFile file(&entry, B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
+		error = file.InitCheck();
+		if (error != B_OK)
+			break;;
+		BMailMessageIO mailIO(this, &file, toRetrieve);
+
+		entry_ref ref;
+		entry.GetRef(&ref);
+		int32 size = MessageSize(toRetrieve);
+		if (fFetchBodyLimit < 0 || size <= fFetchBodyLimit) {
+			error = mailIO.Seek(0, SEEK_END);
+			if (error < 0)
+				break;
+			NotifyHeaderFetched(ref, &file);
+			NotifyBodyFetched(ref, &file);
+		} else {
+			int32 dummy;
+			error = mailIO.ReadAt(0, &dummy, 1);
+			if (error < 0)
+				break;
+			NotifyHeaderFetched(ref, &file);
+		}
+
+		if (file.WriteAttr("MAIL:unique_id", B_STRING_TYPE, 0, uid,
+			strlen(uid)) < 0) {
+			error = B_ERROR;
+		}
+
+		file.WriteAttr("MAIL:size", B_INT32_TYPE, 0, &size, sizeof(int32));
+
+		MarkMessageAsRead(ref, false);
+
+		// save manifest in case we get disturbed
+		fManifest += uid;
+		_WriteManifest();
+	}
+
+	ResetProgress();
+
+	CheckForDeletedMessages();
+	Disconnect();
+	return error;
+}
+
+
+status_t
+POP3Protocol::FetchBody(const entry_ref& ref)
+{
+	status_t error = Connect();
+	if (error < B_OK)
+		return error;
+
+	error = _UniqueIDs();
+	if (error < B_OK)
+		return error;
+
+	
+	BFile file(&ref, B_READ_WRITE);
+	status_t status = file.InitCheck();
+	if (status != B_OK)
+		return status;
+
+	char uidString[256];
+	BNode node(&ref);
+	if (node.ReadAttr("MAIL:unique_id", B_STRING_TYPE, 0, uidString, 256) < 0)
+		return B_ERROR;
+
+	int32 toRetrieve = fUniqueIDs.IndexOf(uidString);
+	if (toRetrieve < 0)
+		return B_NAME_NOT_FOUND;
+
+	// TODO: get rid of this BMailMessageIO!
+	// read header
+	BMailMessageIO io(this, &file, toRetrieve);
+	int32 dummy;
+	status = io.ReadAt(0, &dummy, 1);
+	if (status < 0)
+		return status;
+
+	// read body
+	status = io.Seek(0, SEEK_END);
+	if (status < 0)
+		return status;
+
+	NotifyBodyFetched(ref, &file);
+
+	Disconnect();
+	return B_OK;
+}
+
+
+status_t
+POP3Protocol::DeleteMessage(const entry_ref& ref)
+{
+	status_t error = Connect();
+	if (error < B_OK)
+		return error;
+
+	error = _UniqueIDs();
+	if (error < B_OK)
+		return error;
+
+#if DEBUG
+	printf("DeleteMessage: ID is %d\n", (int)unique_ids->IndexOf(uid));
+		// What should we use for int32 instead of %d?
+#endif
+	char uidString[256];
+	BNode node(&ref);
+	if (node.ReadAttr("MAIL:unique_id", B_STRING_TYPE, 0, uidString, 256) < 0)
+		return B_ERROR;
+	Delete(fUniqueIDs.IndexOf(uidString));
+
+	Disconnect();
+	return B_OK;
 }
 
 
 status_t
 POP3Protocol::Open(const char *server, int port, int)
 {
-	runner->ReportProgress(0, 0, MDR_DIALECT_CHOICE("Connecting to POP3 server...",
+	ReportProgress(0, 0, MDR_DIALECT_CHOICE("Connecting to POP3 server...",
 		"POP3サーバに接続しています..."));
 
 	if (port <= 0) {
@@ -115,7 +326,7 @@ POP3Protocol::Open(const char *server, int port, int)
 	if (hostIP == 0) {
 		error_msg << MDR_DIALECT_CHOICE(": Connection refused or host not found",
 			": ：接続が拒否されたかサーバーが見つかりません");
-		runner->ShowError(error_msg.String());
+		ShowError(error_msg.String());
 
 		return B_NAME_NOT_FOUND;
 	}
@@ -140,12 +351,12 @@ POP3Protocol::Open(const char *server, int port, int)
 #endif
 			fSocket = -1;
 			error_msg << ": " << strerror(errno);
-			runner->ShowError(error_msg.String());
+			ShowError(error_msg.String());
 			return errno;
 		}
 	} else {
 		error_msg << ": Could not allocate socket.";
-		runner->ShowError(error_msg.String());
+		ShowError(error_msg.String());
 		return B_ERROR;
 	}
 
@@ -166,18 +377,17 @@ POP3Protocol::Open(const char *server, int port, int)
 		if (SSL_connect(fSSL) <= 0) {
 			BString error;
 			error << "Could not connect to POP3 server "
-				<< settings->FindString("server");
+				<< fSettings.FindString("server");
 			if (port != 995)
 				error << ":" << port;
 			error << ". (SSL connection error)";
-			runner->ShowError(error.String());
+			ShowError(error.String());
 			SSL_CTX_free(fSSLContext);
 #ifndef HAIKU_TARGET_PLATFORM_BEOS
 			close(fSocket);
 #else
 			closesocket(fSocket);
 #endif
-			runner->Stop(true);
 			return B_ERROR;
 		}
 	}
@@ -204,7 +414,7 @@ POP3Protocol::Open(const char *server, int port, int)
 #endif
 		fSocket = -1;
 		error_msg << ": " << strerror(err);
-		runner->ShowError(error_msg.String());
+		ShowError(error_msg.String());
 		return B_ERROR;
 	}
 
@@ -215,7 +425,7 @@ POP3Protocol::Open(const char *server, int port, int)
 		} else
 			error_msg << ": No reply.\n";
 
-		runner->ShowError(error_msg.String());
+		ShowError(error_msg.String());
 		return B_ERROR;
 	}
 
@@ -236,7 +446,7 @@ POP3Protocol::Login(const char *uid, const char *password, int method)
 	if (method == 1) {	//APOP
 		int32 index = fLog.FindFirst("<");
 		if(index != B_ERROR) {
-			runner->ReportProgress(0, 0, MDR_DIALECT_CHOICE(
+			ReportProgress(0, 0, MDR_DIALECT_CHOICE(
 				"Sending APOP authentication...", "APOP認証情報を送信中..."));
 			int32 end = fLog.FindFirst(">",index);
 			BString timestamp("");
@@ -254,7 +464,7 @@ POP3Protocol::Login(const char *uid, const char *password, int method)
 			if (err != B_OK) {
 				error_msg << MDR_DIALECT_CHOICE(". The server said:\n",
 					"サーバのメッセージです\n") << fLog;
-				runner->ShowError(error_msg.String());
+				ShowError(error_msg.String());
 				return err;
 			}
 
@@ -262,11 +472,11 @@ POP3Protocol::Login(const char *uid, const char *password, int method)
 		} else {
 			error_msg << MDR_DIALECT_CHOICE(": The server does not support APOP.",
 				"サーバはAPOPをサポートしていません");
-			runner->ShowError(error_msg.String());
+			ShowError(error_msg.String());
 			return B_NOT_ALLOWED;
 		}
 	}
-	runner->ReportProgress(0, 0, MDR_DIALECT_CHOICE("Sending username...",
+	ReportProgress(0, 0, MDR_DIALECT_CHOICE("Sending username...",
 		"ユーザーID送信中..."));
 
 	BString cmd = "USER ";
@@ -277,11 +487,11 @@ POP3Protocol::Login(const char *uid, const char *password, int method)
 	if (err != B_OK) {
 		error_msg << MDR_DIALECT_CHOICE(". The server said:\n",
 			"サーバのメッセージです\n") << fLog;
-		runner->ShowError(error_msg.String());
+		ShowError(error_msg.String());
 		return err;
 	}
 
-	runner->ReportProgress(0, 0, MDR_DIALECT_CHOICE("Sending password...",
+	ReportProgress(0, 0, MDR_DIALECT_CHOICE("Sending password...",
 		"パスワード送信中..."));
 	cmd = "PASS ";
 	cmd += password;
@@ -291,7 +501,7 @@ POP3Protocol::Login(const char *uid, const char *password, int method)
 	if (err != B_OK) {
 		error_msg << MDR_DIALECT_CHOICE(". The server said:\n",
 			"サーバのメッセージです\n") << fLog;
-		runner->ShowError(error_msg.String());
+		ShowError(error_msg.String());
 		return err;
 	}
 
@@ -302,7 +512,7 @@ POP3Protocol::Login(const char *uid, const char *password, int method)
 status_t
 POP3Protocol::Stat()
 {
-	runner->ReportProgress(0, 0, MDR_DIALECT_CHOICE("Getting mailbox size...",
+	ReportProgress(0, 0, MDR_DIALECT_CHOICE("Getting mailbox size...",
 		"メールボックスのサイズを取得しています..."));
 
 	if (SendCommand("STAT" CRLF) < B_OK)
@@ -339,6 +549,57 @@ POP3Protocol::MailDropSize()
 }
 
 
+void
+POP3Protocol::CheckForDeletedMessages()
+{
+	{
+		//---Delete things from the manifest no longer on the server
+		BStringList temp;
+		fManifest.NotThere(fUniqueIDs, &temp);
+		fManifest -= temp;
+	}
+
+	if (!fSettings.FindBool("delete_remote_when_local")
+		|| fManifest.CountItems() == 0)
+		return;
+
+	BStringList to_delete;
+
+	BStringList query_contents;
+	BVolumeRoster volumes;
+	BVolume volume;
+
+	while (volumes.GetNextVolume(&volume) == B_OK) {
+		BQuery fido;
+		entry_ref entry;
+
+		fido.SetVolume(&volume);
+		fido.PushAttr("MAIL:account");
+		fido.PushInt32(fAccountSettings.AccountID());
+		fido.PushOp(B_EQ);
+
+		fido.Fetch();
+
+		BString uid;
+		while (fido.GetNextRef(&entry) == B_OK) {
+			BNode(&entry).ReadAttrString("MAIL:unique_id", &uid);
+			query_contents.AddItem(uid.String());
+		}
+	}
+	query_contents.NotHere(fManifest, &to_delete);
+
+	for (int32 i = 0; i < to_delete.CountItems(); i++) {
+		printf("delete mail on server uid %s\n", to_delete[i]);
+		Delete(fUniqueIDs.IndexOf(to_delete[i]));
+	}
+
+	//*(unique_ids) -= to_delete; --- This line causes bad things to
+	// happen (POP3 client uses the wrong indices to retrieve
+	// messages).  Without it, bad things don't happen.
+	fManifest -= to_delete;
+}
+
+
 status_t
 POP3Protocol::Retrieve(int32 message, BPositionIO *write_to)
 {
@@ -346,7 +607,7 @@ POP3Protocol::Retrieve(int32 message, BPositionIO *write_to)
 	BString cmd;
 	cmd << "RETR " << message + 1 << CRLF;
 	returnCode = RetrieveInternal(cmd.String(), message, write_to, true);
-	runner->ReportProgress(0 /* bytes */, 1 /* messages */);
+	ReportProgress(0 /* bytes */, 1 /* messages */);
 
 	if (returnCode == B_OK) { // Some debug code.
 		int32 message_len = MessageSize(message);
@@ -421,7 +682,6 @@ POP3Protocol::RetrieveInternal(const char *command, int32 message,
 		if (result == 0) {
 			// No data available, even after waiting a minute.
 			fLog = "POP3 timeout - no data received after a long wait.";
-			runner->Stop(true);
 			return B_ERROR;
 		}
 		if (amountToReceive > bufSize - 1 - amountInBuffer)
@@ -499,60 +759,18 @@ POP3Protocol::RetrieveInternal(const char *command, int32 message,
 			if (amountInBuffer > 4) {
 				write_to->Write(buf, amountInBuffer - 4);
 				if (post_progress)
-					runner->ReportProgress(amountInBuffer - 4,0);
+					ReportProgress(amountInBuffer - 4,0);
 				memmove (buf, buf + amountInBuffer - 4, 4);
 				amountInBuffer = 4;
 			}
 		} else { // Dump everything - end of message or flushing the whole buffer.
 			write_to->Write(buf, amountInBuffer);
 			if (post_progress)
-				runner->ReportProgress(amountInBuffer,0);
+				ReportProgress(amountInBuffer,0);
 			amountInBuffer = 0;
 		}
 	}
 	return B_OK;
-}
-
-
-status_t
-POP3Protocol::UniqueIDs()
-{
-	status_t ret = B_OK;
-	runner->ReportProgress(0, 0, MDR_DIALECT_CHOICE("Getting UniqueIDs...",
-		"固有のIDを取得中..."));
-
-	ret = SendCommand("UIDL" CRLF);
-	if (ret != B_OK)
-		return ret;
-
-	BString result;
-	int32 uid_offset;
-	while (ReceiveLine(result) > 0) {
-		if (result.ByteAt(0) == '.')
-			break;
-
-		uid_offset = result.FindFirst(' ') + 1;
-		result.Remove(0,uid_offset);
-		unique_ids->AddItem(result.String());
-	}
-
-	if (SendCommand("LIST" CRLF) != B_OK)
-		return B_ERROR;
-
-	int32 b;
-	while (ReceiveLine(result) > 0) {
-		if (result.ByteAt(0) == '.')
-			break;
-
-		b = result.FindLast(" ");
-		if (b >= 0)
-			b = atol(&(result.String()[b]));
-		else
-			b = 0;
-		fSizes.AddItem((void *)(b));
-	}
-
-	return ret;
 }
 
 
@@ -744,36 +962,125 @@ POP3Protocol::MD5Digest(unsigned char *in, char *asciiDigest)
 }
 
 
+status_t
+POP3Protocol::_UniqueIDs()
+{
+	fUniqueIDs.MakeEmpty();
+
+	status_t ret = B_OK;
+
+	ret = SendCommand("UIDL" CRLF);
+	if (ret != B_OK)
+		return ret;
+
+	BString result;
+	int32 uid_offset;
+	while (ReceiveLine(result) > 0) {
+		if (result.ByteAt(0) == '.')
+			break;
+
+		uid_offset = result.FindFirst(' ') + 1;
+		result.Remove(0,uid_offset);
+		fUniqueIDs.AddItem(result.String());
+	}
+
+	if (SendCommand("LIST" CRLF) != B_OK)
+		return B_ERROR;
+
+	int32 b;
+	while (ReceiveLine(result) > 0) {
+		if (result.ByteAt(0) == '.')
+			break;
+
+		b = result.FindLast(" ");
+		if (b >= 0)
+			b = atol(&(result.String()[b]));
+		else
+			b = 0;
+		fSizes.AddItem((void *)(b));
+	}
+
+	return ret;
+}
+
+
+void
+POP3Protocol::_ReadManifest()
+{
+	fManifest.MakeEmpty();
+	BString attr_name = "MAIL:";
+	attr_name << fAccountSettings.AccountID() << ":manifest";
+	//--- In case someone puts multiple accounts in the same directory
+
+	BNode node(fDestinationDir);
+	if (node.InitCheck() != B_OK)
+		return;
+
+	// We already have a directory so we can try to read metadata
+	// from it. Note that it is normal for this directory not to
+	// be found on the first run as it will be later created by
+	// the INBOX system filter.
+	attr_info info;
+	/*status_t status = node.GetAttrInfo(attr_name.String(), &info);
+	printf("read manifest3 status %i\n", (int)status);
+	status = node.GetAttrInfo(attr_name.String(), &info);
+	printf("read manifest3 status2 %i\n", (int)status);*/
+	if (node.GetAttrInfo(attr_name.String(), &info) != B_OK)
+		return;
+
+	void* flatmanifest = malloc(info.size);
+	node.ReadAttr(attr_name.String(), fManifest.TypeCode(), 0,
+		flatmanifest, info.size);
+	fManifest.Unflatten(fManifest.TypeCode(), flatmanifest, info.size);
+	free(flatmanifest);
+}
+
+
+void
+POP3Protocol::_WriteManifest()
+{
+	BString attr_name = "MAIL:";
+	attr_name << fAccountSettings.AccountID() << ":manifest";
+		//--- In case someone puts multiple accounts in the same directory
+	BNode node(fDestinationDir);
+	if (node.InitCheck() != B_OK) {
+		ShowError("Error while saving account manifest: cannot use "
+			"destination directory.");
+		return;
+	}
+
+	node.RemoveAttr(attr_name.String());
+	ssize_t manifestsize = fManifest.FlattenedSize();
+	void* flatmanifest = malloc(manifestsize);
+	fManifest.Flatten(flatmanifest, manifestsize);
+	status_t err = node.WriteAttr(attr_name.String(),
+		fManifest.TypeCode(), 0, flatmanifest, manifestsize);
+	if (err < 0) {
+		BString error = "Error while saving account manifest: ";
+		error << strerror(err);
+			printf("moep error\n");
+		ShowError(error.String());
+	}
+
+	free(flatmanifest);
+}
+
+
 //	#pragma mark -
 
 
-BMailFilter *
-instantiate_mailfilter(BMessage *settings, BMailChainRunner *runner)
+InboundProtocol*
+instantiate_inbound_protocol(BMailAccountSettings* settings)
 {
-	return new POP3Protocol(settings,runner);
+	return new POP3Protocol(settings);
 }
 
 
-BView*
-instantiate_config_panel(BMessage *settings, BMessage *)
+status_t
+pop3_smtp_auth(BMailAccountSettings* settings)
 {
-	BMailProtocolConfigView *view = new BMailProtocolConfigView(
-		B_MAIL_PROTOCOL_HAS_USERNAME | B_MAIL_PROTOCOL_HAS_AUTH_METHODS
-		| B_MAIL_PROTOCOL_HAS_PASSWORD | B_MAIL_PROTOCOL_HAS_HOSTNAME
-		| B_MAIL_PROTOCOL_CAN_LEAVE_MAIL_ON_SERVER
-#if USE_SSL
-		| B_MAIL_PROTOCOL_HAS_FLAVORS
-#endif
-		);
-	view->AddAuthMethod("Plain text");
-	view->AddAuthMethod("APOP");
-
-#if USE_SSL
-	view->AddFlavor("No encryption");
-	view->AddFlavor("SSL");
-#endif
-
-	view->SetTo(settings);
-	return view;
+	POP3Protocol protocol(settings);
+	protocol.Connect();
+	protocol.Disconnect();
+	return B_OK;
 }
-

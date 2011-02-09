@@ -40,7 +40,7 @@ ConfigView::ConfigView()
 }
 
 
-void ConfigView::SetTo(BMessage *archive)
+void ConfigView::SetTo(const BMessage *archive)
 {
 	if (BMailFileConfigView *control = (BMailFileConfigView *)FindView("fortune_file"))
 		control->SetTo(archive,NULL);

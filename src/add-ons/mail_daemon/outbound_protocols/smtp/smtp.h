@@ -1,16 +1,20 @@
 /*
- * Copyright 2007-2008, Haiku Inc. All Rights Reserved.
+ * Copyright 2007-2011, Haiku Inc. All Rights Reserved.
  * Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
+ * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  *
  * Distributed under the terms of the MIT License.
  */
-#ifndef ZOIDBERG_SMTP_H
-#define ZOIDBERG_SMTP_H
+#ifndef SMTP_H
+#define SMTP_H
 
 
 #include <String.h>
 
 #include <MailAddon.h>
+#include <MailProtocol.h>
+#include <MailSettings.h>
+
 
 #ifdef USE_SSL
 #	include <openssl/ssl.h>
@@ -18,32 +22,35 @@
 #endif
 
 
-class SMTPProtocol : public BMailFilter {
-	public:
-		SMTPProtocol(BMessage *message, BMailChainRunner *runner);
-		~SMTPProtocol();
+class SMTPProtocol : public OutboundProtocol {
+public:
+								SMTPProtocol(BMailAccountSettings* settings);
+								~SMTPProtocol();
 
-		virtual status_t InitCheck(BString *verbose);
-		virtual status_t ProcessMailMessage(BPositionIO **io_message, BEntry *io_entry,
-			BMessage *io_headers, BPath *io_folder, const char *io_uid);
+			status_t			Connect();
+			void				Disconnect();
 
-		//----Perfectly good holdovers from the old days
-		status_t Open(const char *server, int port, bool esmtp);
-		status_t Login(const char *uid, const char *password);
-		void Close();
-		status_t Send(const char *to, const char *from, BPositionIO *message);
+			status_t			SendMessages(const std::vector<entry_ref>&
+									mails, size_t totalBytes);
 
-		int32 ReceiveResponse(BString &line);
-		status_t SendCommand(const char *cmd);
+			//----Perfectly good holdovers from the old days
+			status_t			Open(const char *server, int port, bool esmtp);
+			void				Close();
+			status_t			Login(const char *uid, const char *password);
+			status_t			Send(const char *to, const char *from,
+									BPositionIO *message);
 
-	private:
-		status_t POP3Authentication();
+			int32				ReceiveResponse(BString &line);
+			status_t			SendCommand(const char *cmd);
 
-		int _fd;
-		BString fLog;
-		BMessage *fSettings;
-		BMailChainRunner *runner;
-		int32 fAuthType;
+private:
+			status_t			_SendMessage(const entry_ref& mail);
+			status_t			_POP3Authentication();
+
+			int					fSocket;
+			BString				fLog;
+			BMessage			fSettingsMessage;
+			int32				fAuthType;
 
 #ifdef USE_SSL
 		SSL_CTX *ctx;
@@ -54,8 +61,9 @@ class SMTPProtocol : public BMailFilter {
 		bool use_STARTTLS;
 #endif
 
-		status_t fStatus;
-		BString fServerName;		// required for DIGEST-MD5
+			status_t			fStatus;
+			BString				fServerName;	// required for DIGEST-MD5
 };
 
-#endif	/* ZOIDBERG_SMTP_H */
+
+#endif // SMTP_H

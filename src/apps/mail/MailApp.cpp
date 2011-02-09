@@ -341,7 +341,7 @@ TMailApp::MessageReceived(BMessage *msg)
 						fPrefsWindowPos.y, fPrefsWindowPos.x + PREF_WIDTH,
 						fPrefsWindowPos.y + PREF_HEIGHT),
 						&fContentFont, NULL, &fWrapMode, &fAttachAttributes,
-						&fColoredQuotes, &fDefaultChain, &fUseAccountFrom,
+						&fColoredQuotes, &fDefaultAccount, &fUseAccountFrom,
 						&fReplyPreamble, &fSignature, &fMailCharacterSet,
 						&fWarnAboutUnencodableCharacters,
 						&fStartWithSpellCheckOn, &fAutoMarkRead,
@@ -696,6 +696,7 @@ TMailApp::_CheckForSpamFilterExistence()
 
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
 		return;
+	// TODO use new settings
 	path.Append("Mail/chains/inbound");
 	if (inChainDir.SetTo(path.Path()) != B_OK)
 		return;
@@ -874,11 +875,11 @@ TMailApp::LoadOldSettings()
 status_t
 TMailApp::SaveSettings()
 {
-	BMailSettings chainSettings;
+	BMailSettings accountSettings;
 
-	if (fDefaultChain != ~0UL) {
-		chainSettings.SetDefaultOutboundChainID(fDefaultChain);
-		chainSettings.Save();
+	if (fDefaultAccount != ~0L) {
+		accountSettings.SetDefaultOutboundAccount(fDefaultAccount);
+		accountSettings.Save();
 	}
 
 	BPath path;
@@ -939,8 +940,8 @@ TMailApp::SaveSettings()
 status_t
 TMailApp::LoadSettings()
 {
-	BMailSettings chainSettings;
-	fDefaultChain = chainSettings.DefaultOutboundChainID();
+	BMailSettings accountSettings;
+	fDefaultAccount = accountSettings.DefaultOutboundAccount();
 
 	BPath path;
 	status_t status = GetSettingsPath(path);
@@ -1208,18 +1209,18 @@ TMailApp::StartWithSpellCheckOn()
 
 
 void
-TMailApp::SetDefaultChain(uint32 chain)
+TMailApp::SetDefaultAccount(int32 account)
 {
 	BAutolock _(this);
-	fDefaultChain = chain;
+	fDefaultAccount = account;
 }
 
 
-uint32
-TMailApp::DefaultChain()
+int32
+TMailApp::DefaultAccount()
 {
 	BAutolock _(this);
-	return fDefaultChain;
+	return fDefaultAccount;
 }
 
 

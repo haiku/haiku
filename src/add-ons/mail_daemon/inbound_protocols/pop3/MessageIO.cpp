@@ -13,19 +13,21 @@
 #include <string.h>
 
 #include "MessageIO.h"
-#include "SimpleMailProtocol.h"
 
-BMailMessageIO::BMailMessageIO(SimpleMailProtocol *protocol, BPositionIO *dump_to, int32 seq_id) :
+
+BMailMessageIO::BMailMessageIO(POP3Protocol* protocol, BPositionIO *dump_to,
+	int32 seq_id) :
 	slave(dump_to),
 	message_id(seq_id),
-	network(protocol),
+	fProtocol(protocol),
 	size(0),
 	state(READ_HEADER_NEXT) {
 		//-----do nothing, and do it well-----
 	}
 
 
-ssize_t	BMailMessageIO::ReadAt(off_t pos, void *buffer, size_t amountToRead) {
+ssize_t
+BMailMessageIO::ReadAt(off_t pos, void* buffer, size_t amountToRead) {
 	status_t errorCode;
 	char     lastBytes [5];
 	off_t    old_pos = slave->Position();
@@ -44,14 +46,14 @@ ssize_t	BMailMessageIO::ReadAt(off_t pos, void *buffer, size_t amountToRead) {
 			case READ_HEADER_NEXT:
 				slave->SetSize(0); // Truncate the file.
 				slave->Seek(0,SEEK_SET);
-				errorCode = network->GetHeader(message_id,slave);
+				errorCode = fProtocol->GetHeader(message_id, slave);
 				if (errorCode < 0)
 					return errorCode;
 				// See if it already ends in a blank line, if not, add enough
 				// end-of-lines to give a blank line.
-				slave->Seek (-4, SEEK_END);
+				slave->Seek(-4, SEEK_END);
 				strcpy (lastBytes, "xxxx");
-				slave->Read (lastBytes, 4);
+				slave->Read(lastBytes, 4);
 				if (strcmp (lastBytes, "\r\n\r\n") != 0) {
 					if (strcmp (lastBytes + 2, "\r\n") == 0)
 						slave->Write("\r\n", 2);
@@ -71,7 +73,7 @@ ssize_t	BMailMessageIO::ReadAt(off_t pos, void *buffer, size_t amountToRead) {
 			case READ_BODY_NEXT:
 				slave->SetSize(0); // Truncate the file.
 				slave->Seek(0,SEEK_SET);
-				errorCode = network->Retrieve(message_id,slave);
+				errorCode = fProtocol->Retrieve(message_id, slave);
 				if (errorCode < 0)
 					return errorCode;
 				state = ALL_READING_DONE;
@@ -90,14 +92,14 @@ ssize_t	BMailMessageIO::ReadAt(off_t pos, void *buffer, size_t amountToRead) {
 	else
 		slave->Seek (0, SEEK_END);
 
-	return slave->ReadAt(pos,buffer,amountToRead);
+	return slave->ReadAt(pos, buffer, amountToRead);
 }
 
 
-ssize_t	BMailMessageIO::WriteAt(off_t pos, const void *buffer, size_t amountToWrite) {
+ssize_t	BMailMessageIO::WriteAt(off_t pos, const void* buffer, size_t amountToWrite) {
 	ssize_t return_val;
 
-	return_val = slave->WriteAt(pos,buffer,amountToWrite);
+	return_val = slave->WriteAt(pos, buffer, amountToWrite);
 	ResetSize();
 
 	return return_val;
@@ -133,6 +135,6 @@ void BMailMessageIO::ResetSize(void) {
 }
 
 BMailMessageIO::~BMailMessageIO() {
-	delete slave;
+
 }
 

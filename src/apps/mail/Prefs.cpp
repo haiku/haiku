@@ -96,7 +96,7 @@ add_menu_to_layout(BMenuField* menu, BGridLayout* layout, int32& row)
 
 
 TPrefsWindow::TPrefsWindow(BRect rect, BFont* font, int32* level, bool* wrap,
-	bool* attachAttributes, bool* cquotes, uint32* account, int32* replyTo,
+	bool* attachAttributes, bool* cquotes, int32* account, int32* replyTo,
 	char** preamble, char** sig, uint32* encoding, bool* warnUnencodable,
 	bool* spellCheckStartOn, bool* autoMarkRead, uint8* buttonBar)
 	:
@@ -140,7 +140,7 @@ TPrefsWindow::TPrefsWindow(BRect rect, BFont* font, int32* level, bool* wrap,
 	fSpellCheckStartOn(*fNewSpellCheckStartOn),
 
 	fNewAutoMarkRead(autoMarkRead),
-	fAutoMarkRead(*fNewAutoMarkRead)
+	fAutoMarkRead(true)
 {
 	strcpy(fSignature, *fNewSignature);
 
@@ -622,31 +622,30 @@ TPrefsWindow::_BuildLevelMenu(int32 level)
 
 
 BPopUpMenu*
-TPrefsWindow::_BuildAccountMenu(uint32 account)
+TPrefsWindow::_BuildAccountMenu(int32 account)
 {
 	BPopUpMenu* menu = new BPopUpMenu("");
 	BMenuItem* item;
 
 	//menu->SetRadioMode(true);
-	BList chains;
-	if (GetOutboundMailChains(&chains) < B_OK) {
+	BMailAccounts accounts;
+	if (accounts.CountAccounts()) {
 		menu->AddItem(item = new BMenuItem("<no account found>", NULL));
 		item->SetEnabled(false);
 		return menu;
 	}
 
 	BMessage* msg;
-	for (int32 i = 0; i < chains.CountItems(); i++) {
-		BMailChain* chain = (BMailChain*)chains.ItemAt(i);
-		item = new BMenuItem(chain->Name(), msg = new BMessage(P_ACCOUNT));
+	for (int32 i = 0; i < accounts.CountAccounts(); i++) {
+		BMailAccountSettings* settings = accounts.AccountAt(i);
+		item = new BMenuItem(settings->Name(), msg = new BMessage(P_ACCOUNT));
 
-		msg->AddInt32("id",chain->ID());
+		msg->AddInt32("id", settings->AccountID());
 
-		if (account == chain->ID())
+		if (account == settings->AccountID())
 			item->SetMarked(true);
 
 		menu->AddItem(item);
-		delete chain;
 	}
 	return menu;
 }

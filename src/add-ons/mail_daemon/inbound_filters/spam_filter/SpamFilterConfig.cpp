@@ -97,7 +97,7 @@ static const char *kServerSignature = "application/x-vnd.agmsmith.spamdbm";
 
 class AGMSBayesianSpamFilterConfig : public BView {
 	public:
-		AGMSBayesianSpamFilterConfig (BMessage *settings);
+		AGMSBayesianSpamFilterConfig (const BMessage *settings);
 
 		virtual	void MessageReceived (BMessage *msg);
 		virtual	void AttachedToWindow ();
@@ -128,7 +128,8 @@ class AGMSBayesianSpamFilterConfig : public BView {
 };
 
 
-AGMSBayesianSpamFilterConfig::AGMSBayesianSpamFilterConfig (BMessage *settings)
+AGMSBayesianSpamFilterConfig::AGMSBayesianSpamFilterConfig(
+	const BMessage *settings)
 	:	BView (BRect (0,0,260,130), "spamfilter_config",
 			B_FOLLOW_LEFT | B_FOLLOW_TOP, 0),
 		fAddSpamToSubject (false),
@@ -421,8 +422,8 @@ ErrorExit:
 }
 
 
-BView *
-instantiate_config_panel (BMessage *settings, BMessage *metadata)
+BView*
+instantiate_filter_config_panel(AddonSettings& settings)
 {
-	return new AGMSBayesianSpamFilterConfig (settings);
+	return new AGMSBayesianSpamFilterConfig(&settings.Settings());
 }

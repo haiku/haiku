@@ -21,6 +21,8 @@
 
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "E-Mail"
+
+
 static vint32 gID = 1;
 
 
@@ -320,7 +322,7 @@ DNSQuery::GetMXRecords(BString serverName, BObjectList<mx_record>* mxList,
 
 	if (netEndpoint.Connect(netAddress) != B_OK)
 		return B_ERROR;
-	PRINT(B_TRANSLATE"Connected\n");
+	PRINT(B_TRANSLATE("Connected\n"));
 
 #ifdef DEBUG
 	int32 bytesSend =

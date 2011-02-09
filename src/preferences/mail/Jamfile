@@ -1,10 +1,5 @@
 SubDir HAIKU_TOP src preferences mail ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
-if $(TARGET_PLATFORM) != haiku {
-	UsePublicHeaders mail ;
-}
 
 UsePublicHeaders [ FDirName add-ons mail_daemon ] ;
 UsePrivateHeaders mail ;
@@ -14,56 +9,35 @@ SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
 # for BObjectList.h
 UsePrivateHeaders shared ;
 
-# TODO(bga): E-mail preferences does not really need to link against the
-# OpenSSL libraries. Remove this after problems with the runtime loader are
-# sorted up. Details here:
-#
-# http://www.freelists.org/post/haiku-development/Runtime-loader-problem
 
 local sources =
-	Account.cpp
 	AutoConfig.cpp
 	AutoConfigView.cpp
 	AutoConfigWindow.cpp
 	CenterContainer.cpp
 	ConfigViews.cpp
 	ConfigWindow.cpp
+	FilterAddonList.cpp
 	DNSQuery.cpp
+	FilterConfigView.cpp
 	main.cpp
 ;
 
-if $(HAIKU_OPENSSL_ENABLED) {
-	SubDirC++Flags -DUSE_SSL ;
-	SubDirSysHdrs $(HAIKU_OPENSSL_HEADERS) ;
-	Includes [ FGristFiles $(sources) ] : $(HAIKU_OPENSSL_HEADERS_DEPENDENCY) ;
-		# Dependency needed to trigger downloading/unzipping the package before
-		# compiling the files.
-	SetupFeatureObjectsDir ssl ;
-} else {
-	SetupFeatureObjectsDir no-ssl ;
-}
 
 Preference E-mail
-	: $(sources)
-	: be libmail.so $(HAIKU_NETWORK_LIBS) $(TARGET_NETAPI_LIB)
-		$(HAIKU_OPENSSL_LIBS) $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
+	:
+	$(sources)
+	:
+	be libmail.so $(HAIKU_NETWORK_LIBS) $(TARGET_NETAPI_LIB) $(TARGET_LIBSTDC++)
+	$(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
 	: e-mail.rdef
 ;
 
-DoCatalogs E-mail :
-	x-vnd.Haiku-Mail
-	:
-	Account.cpp
-	AutoConfigView.cpp
-	ConfigViews.cpp
-	ConfigWindow.cpp
-	DNSQuery.cpp
-	main.cpp
+DoCatalogs E-mail
+	: x-vnd.Haiku-Mail
+	: ConfigViews.cpp
+	  ConfigWindow.cpp
 ;
 
-Package haiku-maildaemon-cvs :
-	E-mail :
-	boot beos preferences
-;
 
 SubInclude HAIKU_TOP src preferences mail ProviderInfo ;

@@ -25,7 +25,7 @@ const uint32 kMsgActionSetRead = 'arge';
 
 class RuleFilterConfig : public BView {
 	public:
-		RuleFilterConfig(BMessage *settings);
+		RuleFilterConfig(const BMessage *settings);
 
 		virtual	void MessageReceived(BMessage *msg);
 		virtual	void AttachedToWindow();
@@ -42,7 +42,11 @@ class RuleFilterConfig : public BView {
 
 #include <stdio.h>
 
-RuleFilterConfig::RuleFilterConfig(BMessage *settings) : BView(BRect(0,0,260,85),"rulefilter_config", B_FOLLOW_LEFT | B_FOLLOW_TOP, 0), menu(NULL) {
+RuleFilterConfig::RuleFilterConfig(const BMessage *settings)
+	:
+	BView(BRect(0,0,260,85),"rulefilter_config", B_FOLLOW_LEFT | B_FOLLOW_TOP,
+		0), menu(NULL)
+{
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	attr = new BTextControl(BRect(5,5,100,20),"attr",MDR_DIALECT_CHOICE ("If","条件:"),MDR_DIALECT_CHOICE ("header (e.g. Subject)","ヘッダ(例えばSubject)"),NULL);
 	attr->SetDivider(be_plain_font->StringWidth(MDR_DIALECT_CHOICE ("If ","条件: "))+ 4);
@@ -63,8 +67,7 @@ RuleFilterConfig::RuleFilterConfig(BMessage *settings) : BView(BRect(0,0,260,85)
 		arg->SetText(settings->FindString("argument"));
 
 	outbound = new BPopUpMenu(MDR_DIALECT_CHOICE ("<Choose account>","<アカウントを選択>"));
-	BList list;
-	GetOutboundMailChains(&list);
+
 	if (settings->HasInt32("do_what"))
 		staging = settings->FindInt32("do_what");
 	else
@@ -74,14 +77,18 @@ RuleFilterConfig::RuleFilterConfig(BMessage *settings) : BView(BRect(0,0,260,85)
 	else
 		chain = -1;
 	printf("Chain: %ld\n",chain);
-	for (int32 i = 0; i < list.CountItems(); i++) {
-		BMenuItem *item = new BMenuItem(((BMailChain *)(list.ItemAt(i)))->Name(), new BMessage(((BMailChain *)(list.ItemAt(i)))->ID()));
-		outbound->AddItem(item);
-		if (((BMailChain *)(list.ItemAt(i)))->ID() == (unsigned)chain)
-			item->SetMarked(true);
-		delete (BMailChain *)(list.ItemAt(i));
-	}
 
+	BMailAccounts accounts;
+	for (int32 i = 0; i < accounts.CountAccounts(); i++) {
+		BMailAccountSettings* account = accounts.AccountAt(i);
+		if (!account->HasOutbound())
+			continue;
+		BMenuItem *item = new BMenuItem(account->Name(),
+			new BMessage(account->AccountID()));
+		outbound->AddItem(item);
+		if (account->AccountID() == chain)
+			item->SetMarked(true);
+	}
 }
 
 
@@ -118,10 +125,9 @@ status_t RuleFilterConfig::Archive(BMessage *into, bool deep) const {
 	into->AddInt32("do_what",menu->IndexOf(menu->FindMarked()));
 	into->AddString("attribute",attr->Text());
 	into->AddString("regex",regex->Text());
-	if (into->FindInt32("do_what") == 3) {
-		printf("foo!");
-		into->AddInt32("argument",outbound->FindMarked()->Message()->what);
-	} else
+	if (into->FindInt32("do_what") == 3)
+		into->AddInt32("argument", outbound->FindMarked()->Message()->what);
+	else
 		into->AddString("argument",arg->Text());
 
 	return B_OK;
@@ -171,6 +177,8 @@ void RuleFilterConfig::GetPreferredSize(float *width, float *height) {
 	*height = 55;
 }
 
-BView* instantiate_config_panel(BMessage *settings,BMessage *metadata) {
-	return new RuleFilterConfig(settings);
+
+BView* instantiate_filter_config_panel(AddonSettings& settings)
+{
+	return new RuleFilterConfig(&settings.Settings());
 }

@@ -1,17 +1,13 @@
 SubDir HAIKU_TOP src add-ons mail_daemon outbound_protocols smtp ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
-if $(TARGET_PLATFORM) != haiku {
-	UsePublicHeaders mail ;
-}
 
 UsePublicHeaders [ FDirName add-ons mail_daemon ] ;
-UsePrivateHeaders mail ;
+UsePrivateHeaders mail shared ;
 
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
 
 local sources =
+	ConfigView.cpp
 	smtp.cpp
 	md5c.c
 ;
@@ -32,9 +28,4 @@ Addon SMTP
 	: $(sources)
 	: be libmail.so $(TARGET_NETWORK_LIBS) $(TARGET_LIBSTDC++)
 		$(HAIKU_OPENSSL_LIBS)
-;
-
-Package haiku-maildaemon-cvs :
-	SMTP :
-	boot home config add-ons mail_daemon outbound_protocols
 ;

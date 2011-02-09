@@ -1,3 +1,10 @@
+/*
+ * Copyright 2007-2011, Haiku, Inc. All rights reserved.
+ * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
+ * Distributed under the terms of the MIT License.
+ */
+
+
 #include "AutoConfigWindow.h"
 
 #include "AutoConfig.h"
@@ -6,32 +13,33 @@
 #include <Alert.h>
 #include <Application.h>
 #include <Catalog.h>
+#include <Directory.h>
+#include <File.h>
+#include <FindDirectory.h>
 #include <MailSettings.h>
 #include <Message.h>
-
-#include <File.h>
 #include <Path.h>
-#include <Directory.h>
-#include <FindDirectory.h>
+
+#include <crypt.h>
 
 
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "AutoConfigWindow"
 
 
-AutoConfigWindow::AutoConfigWindow(BRect rect, BWindow *parent)
-	:	BWindow(rect, B_TRANSLATE("Create new account"), B_TITLED_WINDOW_LOOK,
-				B_MODAL_APP_WINDOW_FEEL,
-			 	B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AVOID_FRONT,
-				B_ALL_WORKSPACES),
-		fParentWindow(parent),
-		fAccount(NULL),
-		fMainConfigState(true),
-		fServerConfigState(false),
-		fAutoConfigServer(true)
+AutoConfigWindow::AutoConfigWindow(BRect rect, ConfigWindow *parent)
+	:
+	BWindow(rect, "Create new account", B_TITLED_WINDOW_LOOK,
+		B_MODAL_APP_WINDOW_FEEL,
+		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AVOID_FRONT, B_ALL_WORKSPACES),
+	fParentWindow(parent),
+	fAccount(NULL),
+	fMainConfigState(true),
+	fServerConfigState(false),
+	fAutoConfigServer(true)
 {
 	fRootView = new BView(Bounds(), "root auto config view",
-								B_FOLLOW_ALL_SIDES, B_NAVIGABLE);
+		B_FOLLOW_ALL_SIDES, B_NAVIGABLE);
 	fRootView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(fRootView);
 	
@@ -86,14 +94,14 @@ AutoConfigWindow::MessageReceived(BMessage* msg)
 				fMainView->GetBasicAccountInfo(fAccountInfo);
 				if (!fMainView->IsValidMailAddress(fAccountInfo.email)) {
 					invalidMailAlert = new BAlert("invalidMailAlert",
-								B_TRANSLATE("Enter a valid e-mail address."),
-								B_TRANSLATE("OK"));
+						"Enter a valid e-mail address.", "OK");
 					invalidMailAlert->Go();
 					return;
 				}
 				if (fAutoConfigServer) {
-					status = fAutoConfig.GetInfoFromMailAddress(fAccountInfo.email.String(),
-																&(fAccountInfo.providerInfo));
+					status = fAutoConfig.GetInfoFromMailAddress(
+						fAccountInfo.email.String(),
+						&(fAccountInfo.providerInfo));
 				}
 				if(status == B_OK){
 					fParentWindow->Lock();
@@ -154,61 +162,57 @@ AutoConfigWindow::QuitRequested(void)
 }
 
 
-
-
-Account*
+BMailAccountSettings*
 AutoConfigWindow::GenerateBasicAccount()
 {
 	if(!fAccount) {
-		fAccount = Accounts::NewAccount();
-		fAccount->SetType(fAccountInfo.type);
-		fAccount->SetName(fAccountInfo.accountName.String());
-		fAccount->SetRealName(fAccountInfo.name.String());
-		fAccount->SetReturnAddress(fAccountInfo.email.String());
-				
-		BString inServerName;
-		int32 authType = 0;
-		int32 ssl = 0;
-		if (fAccountInfo.inboundType == IMAP) {
-			inServerName = fAccountInfo.providerInfo.imap_server;
-			ssl = fAccountInfo.providerInfo.ssl_imap;
-		} else {
-			inServerName = fAccountInfo.providerInfo.pop_server;
-			authType = fAccountInfo.providerInfo.authentification_pop;
-			ssl = fAccountInfo.providerInfo.ssl_pop;
-		}
-		if (fAccountInfo.type == INBOUND_TYPE
-				|| fAccountInfo.type == IN_AND_OUTBOUND_TYPE) {
-			BMailChain *inbound = fAccount->Inbound();
-			if (inbound != NULL) {
-				BMessage inboundArchive;
-				inboundArchive.AddString("server", inServerName);
-				inboundArchive.AddInt32("auth_method", authType);
-				inboundArchive.AddInt32("flavor", ssl);
-				inboundArchive.AddString("username", fAccountInfo.loginName);
-				inboundArchive.AddString("password", fAccountInfo.password);
-				inboundArchive.AddBool("leave_mail_on_server", true);
-				inboundArchive.AddBool("delete_remote_when_local", true);
-				inbound->SetFilter(0, inboundArchive, fAccountInfo.inboundProtocol);
-			}
-		}
-
-		if (fAccountInfo.type == OUTBOUND_TYPE
-				|| fAccountInfo.type == IN_AND_OUTBOUND_TYPE) {
-			BMailChain *outbound = fAccount->Outbound();
-			if (outbound != NULL) {
-				BMessage outboundArchive;
-				outboundArchive.AddString("server",
-											fAccountInfo.providerInfo.smtp_server);
-				outboundArchive.AddString("username", fAccountInfo.loginName);
-				outboundArchive.AddString("password", fAccountInfo.password);
-				outboundArchive.AddInt32("auth_method",
-											fAccountInfo.providerInfo.authentification_smtp);
-				outboundArchive.AddInt32("flavor", fAccountInfo.providerInfo.ssl_smtp);
-				outbound->SetFilter(1, outboundArchive,
-										fAccountInfo.outboundProtocol);
-			}
-		}
+		fParentWindow->Lock();
+		fAccount = fParentWindow->AddAccount();
+		fParentWindow->Unlock();
 	}
+
+	fAccount->SetName(fAccountInfo.accountName.String());
+	fAccount->SetRealName(fAccountInfo.name.String());
+	fAccount->SetReturnAddress(fAccountInfo.email.String());
+
+	BMessage& inboundArchive = fAccount->InboundSettings().EditSettings();
+	inboundArchive.MakeEmpty();
+	BString inServerName;
+	int32 authType = 0;
+	int32 ssl = 0;
+	if (fAccountInfo.inboundType == IMAP) {
+		inServerName = fAccountInfo.providerInfo.imap_server;
+		ssl = fAccountInfo.providerInfo.ssl_imap;
+		fAccount->SetInboundAddon("IMAP");
+	} else {
+		inServerName = fAccountInfo.providerInfo.pop_server;
+		authType = fAccountInfo.providerInfo.authentification_pop;
+		ssl = fAccountInfo.providerInfo.ssl_pop;
+		fAccount->SetInboundAddon("POP3");
+	}
+	inboundArchive.AddString("server", inServerName);
+	inboundArchive.AddInt32("auth_method", authType);
+	inboundArchive.AddInt32("flavor", ssl);
+	inboundArchive.AddString("username", fAccountInfo.loginName);
+	set_passwd(&inboundArchive, "cpasswd", fAccountInfo.password);
+	inboundArchive.AddBool("leave_mail_on_server", true);
+	inboundArchive.AddBool("delete_remote_when_local", true);
+
+	BMessage& outboundArchive = fAccount->OutboundSettings().EditSettings();
+	outboundArchive.MakeEmpty();
+	fAccount->SetOutboundAddon("SMTP");
+	outboundArchive.AddString("server",
+		fAccountInfo.providerInfo.smtp_server);
+	outboundArchive.AddString("username", fAccountInfo.loginName);
+	set_passwd(&outboundArchive, "cpasswd", fAccountInfo.password);
+	outboundArchive.AddInt32("auth_method",
+		fAccountInfo.providerInfo.authentification_smtp);
+	outboundArchive.AddInt32("flavor",
+		fAccountInfo.providerInfo.ssl_smtp);
+
+	fParentWindow->Lock();
+	fParentWindow->AccountUpdated(fAccount);
+	fParentWindow->Unlock();
+
 	return fAccount;
 }

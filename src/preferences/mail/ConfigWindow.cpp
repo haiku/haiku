@@ -7,12 +7,9 @@
 
 
 //! main E-Mail config window
-
-
-#include "ConfigWindow.h"
-#include "CenterContainer.h"
-#include "Account.h"
-#include "AutoConfigWindow.h"
+#include <new>
+#include <stdio.h>
+#include <string.h>
 
 #include <Application.h>
 #include <Catalog.h>
@@ -45,14 +42,12 @@
 #include <Catalog.h>
 #include <Locale.h>
 
+#include <MailDaemon.h>
 #include <MailSettings.h>
 
-#include <new>
-#include <stdio.h>
-#include <string.h>
-
-#include <MDRLanguage.h>
-
+#include "AutoConfigWindow.h"
+#include "ConfigWindow.h"
+#include "CenterContainer.h"
 
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "Config Window"
@@ -81,10 +76,61 @@ const uint32 kMsgShowStatusWindowChanged = 'shst';
 const uint32 kMsgStatusLookChanged = 'lkch';
 const uint32 kMsgStatusWorkspaceChanged = 'wsch';
 
-const uint32 kMsgApplySettings = 'apst';
 const uint32 kMsgSaveSettings = 'svst';
 const uint32 kMsgRevertSettings = 'rvst';
 const uint32 kMsgCancelSettings = 'cnst';
+
+
+
+AccountItem::AccountItem(const char* label, BMailAccountSettings* account,
+	item_types type)
+	:
+	BStringItem(label),
+	fAccount(account),
+	fType(type),
+	fConfigPanel(NULL)
+{
+}
+
+
+void
+AccountItem::Update(BView* owner, const BFont* font)
+{
+	if (fType == ACCOUNT_ITEM)
+		font = be_bold_font;
+
+	BStringItem::Update(owner,font);
+}
+
+
+void
+AccountItem::DrawItem(BView* owner, BRect rect, bool complete)
+{
+	owner->PushState();
+	if (fType == ACCOUNT_ITEM)
+		owner->SetFont(be_bold_font);
+
+	BStringItem::DrawItem(owner, rect, complete);
+	owner->PopState();
+}
+
+
+void
+AccountItem::SetConfigPanel(BView* panel)
+{
+	fConfigPanel = panel;
+}
+
+
+BView*
+AccountItem::ConfigPanel()
+{
+	return fConfigPanel;
+}
+
+
+//	#pragma mark -
+
 
 class AccountsListView : public BListView {
 	public:
@@ -312,9 +358,10 @@ ConfigWindow::ConfigWindow()
 	rect = view->Bounds();
 	rect.left = fAccountsListView->Frame().right + B_V_SCROLL_BAR_WIDTH + 16;
 	rect.right -= 10;
-	view->AddChild(fConfigView = new CenterContainer(rect));
+	fConfigView = new CenterContainer(rect);
+	view->AddChild(fConfigView);
 
-	MakeHowToView();
+	_MakeHowToView();
 
 	// general settings
 
@@ -457,7 +504,7 @@ ConfigWindow::ConfigWindow()
 	revertButton->MoveTo(saveButton->Frame().left - 25 - w, rect.top);
 	top->AddChild(revertButton);
 
-	LoadSettings();
+	_LoadSettings();
 		// this will also move our window to the stored position
 
 	fAccountsListView->SetSelectionMessage(new BMessage(kMsgAccountSelected));
@@ -467,37 +514,16 @@ ConfigWindow::ConfigWindow()
 
 ConfigWindow::~ConfigWindow()
 {
+	while (fAccounts.CountItems() > 0)
+		_RemoveAccount(fAccounts.ItemAt(0));
+	for (int32 i = 0; i < fToDeleteAccounts.CountItems(); i++)
+		delete fToDeleteAccounts.ItemAt(i);
 }
 
 
 void
-ConfigWindow::MakeHowToView()
+ConfigWindow::_MakeHowToView()
 {
-#ifndef HAIKU_TARGET_PLATFORM_HAIKU
-	BResources *resources = BApplication::AppResources();
-	if (resources) {
-		size_t length;
-		char *buffer = (char *)resources->FindResource(B_LARGE_ICON_TYPE, 101,
-			&length);
-		if (buffer) {
-			BBitmap *bitmap = new (nothrow) BBitmap(BRect(0, 0, 63, 63),
-				B_CMAP8);
-			if (bitmap && bitmap->InitCheck() == B_OK) {
-				// copy and enlarge a 32x32 8-bit bitmap
-				char *bits = (char *)bitmap->Bits();
-				for (int32 i = 0, j = -64; i < (int32)length; i++) {
-					if ((i % 32) == 0)
-						j += 64;
-
-					char *b = bits + (i << 1) + j;
-					b[0] = b[1] = b[64] = b[65] = buffer[i];
-				}
-				fConfigView->AddChild(new BitmapView(bitmap));
-			} else
-				delete bitmap;
-		}
-	}
-#else
 	app_info info;
 	if (be_app->GetAppInfo(&info) == B_OK) {
 		BFile appFile(&info.ref, B_READ_ONLY);
@@ -511,7 +537,6 @@ ConfigWindow::MakeHowToView()
 				delete bitmap;
 		}
 	}
-#endif // HAIKU_TARGET_PLATFORM_HAIKU
 
 	BRect rect = fConfigView->Bounds();
 	BTextView *text = new BTextView(rect, NULL, rect, B_FOLLOW_NONE,
@@ -531,19 +556,23 @@ ConfigWindow::MakeHowToView()
 
 	fConfigView->AddChild(text);
 
-	static_cast<CenterContainer *>(fConfigView)->Layout();
+	fConfigView->Layout();
 }
 
 
 void
-ConfigWindow::LoadSettings()
+ConfigWindow::_LoadSettings()
 {
-	Accounts::Delete();
-	Accounts::Create(fAccountsListView, fConfigView);
+	// load accounts
+	for (int i = 0; i < fAccounts.CountItems(); i++)
+		delete fAccounts.ItemAt(i);
+	fAccounts.MakeEmpty();
+
+	_LoadAccounts();
 
 	// load in general settings
 	BMailSettings settings;
-	status_t status = SetToGeneralSettings(&settings);
+	status_t status = _SetToGeneralSettings(&settings);
 	if (status == B_OK) {
 		// move own window
 		MoveTo(settings.ConfigWindowFrame().LeftTop());
@@ -567,10 +596,45 @@ ConfigWindow::LoadSettings()
 
 
 void
-ConfigWindow::SaveSettings()
+ConfigWindow::_LoadAccounts()
 {
-	// remove config views
-	((CenterContainer *)fConfigView)->DeleteChildren();
+	BMailAccounts accounts;
+	for (int32 i = 0; i < accounts.CountAccounts(); i++)
+		fAccounts.AddItem(new BMailAccountSettings(*accounts.AccountAt(i)));
+
+	for (int i = 0; i < fAccounts.CountItems(); i++) {
+		BMailAccountSettings* account = fAccounts.ItemAt(i);
+		_AddAccountToView(account);
+	}
+}
+
+
+void
+ConfigWindow::_SaveSettings()
+{
+	// remove config views (trigger view archive)
+	fConfigView->DeleteChildren();
+
+	// collect changed accounts
+	BMessage changedAccounts(kMsgAccountsChanged);
+	for (int32 i = 0; i < fAccounts.CountItems(); i++) {
+		BMailAccountSettings* account = fAccounts.ItemAt(i);
+		if (account && account->HasBeenModified())
+			changedAccounts.AddInt32("account", account->AccountID());
+	}
+	for (int32 i = 0; i < fToDeleteAccounts.CountItems(); i++) {
+		BMailAccountSettings* account = fToDeleteAccounts.ItemAt(i);
+		changedAccounts.AddInt32("account", account->AccountID());
+	}
+
+	// cleanup account directory
+	for (int32 i = 0; i < fToDeleteAccounts.CountItems(); i++) {
+		BMailAccountSettings* account = fToDeleteAccounts.ItemAt(i);
+		BEntry entry(account->AccountFile());
+		entry.Remove();
+		delete account;
+	}
+	fToDeleteAccounts.MakeEmpty();
 
 	/*** save general settings ***/
 
@@ -618,8 +682,18 @@ ConfigWindow::SaveSettings()
 
 	/*** save accounts ***/
 
-	if (fSaveSettings)
-		Accounts::Save();
+	if (fSaveSettings) {
+		for (int i = 0; i < fAccounts.CountItems(); i++)
+			fAccounts.ItemAt(i)->Save();
+	}
+
+	BMessenger messenger("application/x-vnd.Be-POST");
+	if (messenger.IsValid()) {
+		// server should reload general settings
+		messenger.SendMessage(kMsgSettingsUpdated);
+		// notify server about changed accounts
+		messenger.SendMessage(&changedAccounts);
+	}
 
 	// start the mail_daemon if auto start was selected
 	if (fSaveSettings && fAutoStartCheckBox->Value() == B_CONTROL_ON
@@ -633,9 +707,7 @@ ConfigWindow::SaveSettings()
 bool
 ConfigWindow::QuitRequested()
 {
-	SaveSettings();
-
-	Accounts::Delete();
+	_SaveSettings();
 
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return true;
@@ -655,15 +727,16 @@ ConfigWindow::MessageReceived(BMessage *msg)
 			int32 index;
 			if (msg->FindInt32("index", &index) != B_OK || index < 0) {
 				// deselect current item
-				((CenterContainer *)fConfigView)->DeleteChildren();
-				MakeHowToView();
+				fConfigView->DeleteChildren();
+				_MakeHowToView();
 				break;
 			}
 			AccountItem *item = (AccountItem *)fAccountsListView->ItemAt(index);
 			if (item)
-				item->account->Selected(item->type);
+				_AccountSelected(item);
 			break;
 		}
+
 		case kMsgAddAccount:
 		{
 			frame = Frame();
@@ -674,6 +747,7 @@ ConfigWindow::MessageReceived(BMessage *msg)
 			autoConfigWindow->Show();
 			break;
 		}
+
 		case kMsgRemoveAccount:
 		{
 			int32 index = fAccountsListView->CurrentSelection();
@@ -681,8 +755,8 @@ ConfigWindow::MessageReceived(BMessage *msg)
 				AccountItem *item = (AccountItem *)fAccountsListView->ItemAt(
 					index);
 				if (item != NULL) {
-					item->account->Remove(item->type);
-					MakeHowToView();
+					_RemoveAccount(item->GetAccount());
+					_MakeHowToView();
 				}
 			}
 			break;
@@ -706,12 +780,14 @@ ConfigWindow::MessageReceived(BMessage *msg)
 		}
 
 		case kMsgRevertSettings:
-			RevertToLastSettings();
+			_RevertToLastSettings();
 			break;
+
 		case kMsgSaveSettings:
 			fSaveSettings = true;
-			SaveSettings();
-			MakeHowToView();
+			_SaveSettings();
+			AccountUpdated(fLastSelectedAccount);
+			_MakeHowToView();
 			break;
 
 		default:
@@ -721,8 +797,38 @@ ConfigWindow::MessageReceived(BMessage *msg)
 }
 
 
+BMailAccountSettings*
+ConfigWindow::AddAccount()
+{
+	BMailAccountSettings* account = new BMailAccountSettings;
+	if (!account)
+		return NULL;
+	fAccounts.AddItem(account);
+	_AddAccountToView(account);
+	return account;
+}
+
+
+void
+ConfigWindow::AccountUpdated(BMailAccountSettings* account)
+{
+	if (account == NULL)
+		return;
+
+	for (int i = 0; i < fAccountsListView->CountItems(); i++) {
+		AccountItem* item = (AccountItem*)fAccountsListView->ItemAt(i);
+		if (item->GetAccount() == account) {
+			if (item->GetType() == ACCOUNT_ITEM) {
+				item->SetText(account->Name());
+				fAccountsListView->Invalidate();
+			}
+		}
+	}
+}
+
+
 status_t
-ConfigWindow::SetToGeneralSettings(BMailSettings *settings)
+ConfigWindow::_SetToGeneralSettings(BMailSettings *settings)
 {
 	if (!settings)
 		return B_BAD_VALUE;
@@ -760,16 +866,22 @@ ConfigWindow::SetToGeneralSettings(BMailSettings *settings)
 
 	fAutoStartCheckBox->SetValue(settings->DaemonAutoStarts());
 
-	if (BMenuItem *item
-			= fStatusModeField->Menu()->ItemAt(settings->ShowStatusWindow()))
+	int32 showStatusIndex = settings->ShowStatusWindow();
+	BMenuItem *item = fStatusModeField->Menu()->ItemAt(showStatusIndex);
+	if (item) {
 		item->SetMarked(true);
+		// send live update to the server by simulating a menu click
+		BMessage msg(kMsgShowStatusWindowChanged);
+		msg.AddInt32("ShowStatusWindow", showStatusIndex);
+		PostMessage(&msg);
+	}
 
 	return B_OK;
 }
 
 
 void
-ConfigWindow::RevertToLastSettings()
+ConfigWindow::_RevertToLastSettings()
 {
 	// revert general settings
 	BMailSettings settings;
@@ -777,7 +889,7 @@ ConfigWindow::RevertToLastSettings()
 	// restore status window look
 	settings.SetStatusWindowLook(settings.StatusWindowLook());
 
-	status_t status = SetToGeneralSettings(&settings);
+	status_t status = _SetToGeneralSettings(&settings);
 	if (status != B_OK) {
 		char text[256];
 		sprintf(text, B_TRANSLATE(
@@ -791,11 +903,108 @@ ConfigWindow::RevertToLastSettings()
 	// revert account data
 
 	if (fAccountsListView->CurrentSelection() != -1)
-		((CenterContainer *)fConfigView)->DeleteChildren();
+		fConfigView->DeleteChildren();
 
-	Accounts::Delete();
-	Accounts::Create(fAccountsListView,fConfigView);
+	for (int32 i = 0; i < fAccounts.CountItems(); i++) {
+		BMailAccountSettings* account = fAccounts.ItemAt(i);
+		_RemoveAccountFromListView(account);
+		delete account;
+	}
+	fAccounts.MakeEmpty();
+	_LoadAccounts();
 
 	if (fConfigView->CountChildren() == 0)
-		MakeHowToView();
+		_MakeHowToView();
+}
+
+
+void
+ConfigWindow::_AddAccountToView(BMailAccountSettings* account)
+{
+	BString label;
+	label << account->Name();
+
+	AccountItem* item;
+	item = new AccountItem(label, account, ACCOUNT_ITEM);
+	fAccountsListView->AddItem(item);
+
+	item = new AccountItem(B_TRANSLATE("   · Incoming"), account, INBOUND_ITEM);
+	fAccountsListView->AddItem(item);
+
+	item = new AccountItem(B_TRANSLATE("   · Outgoing"), account,
+		OUTBOUND_ITEM);
+	fAccountsListView->AddItem(item);
+
+	item = new AccountItem(B_TRANSLATE("   · E-mail filters"), account,
+		FILTER_ITEM);
+	fAccountsListView->AddItem(item);
+}
+
+
+void
+ConfigWindow::_RemoveAccount(BMailAccountSettings* account)
+{
+	_RemoveAccountFromListView(account);
+	fAccounts.RemoveItem(account);
+	fToDeleteAccounts.AddItem(account);
+}
+
+
+void
+ConfigWindow::_RemoveAccountFromListView(BMailAccountSettings* account)
+{
+	for (int i = 0; i < fAccountsListView->CountItems(); i++) {
+		AccountItem* item = (AccountItem*)fAccountsListView->ItemAt(i);
+		if (item->GetAccount() == account) {
+			fAccountsListView->RemoveItem(i);
+			fConfigView->RemoveChild(item->ConfigPanel());
+			delete item;
+			i--;
+		}
+	}
+}
+
+
+void
+ConfigWindow::_AccountSelected(AccountItem* item)
+{
+	AccountUpdated(fLastSelectedAccount);
+
+	BMailAccountSettings* account = item->GetAccount();
+	fLastSelectedAccount = account;
+
+	fConfigView->Hide();
+	fConfigView->DeleteChildren();
+
+	BView* view = NULL;
+	switch (item->GetType()) {
+		case ACCOUNT_ITEM:
+			view = new AccountConfigView(fConfigView->Bounds(), account);
+			break;
+
+		case INBOUND_ITEM:
+		{
+			view = new InProtocolsConfigView(account);
+			break;
+		}
+
+		case OUTBOUND_ITEM:
+		{
+			view = new OutProtocolsConfigView(account);
+			break;
+		}
+
+		case FILTER_ITEM:
+		{
+			view = new FiltersConfigView(fConfigView->Bounds(), *account);
+			break;
+		}
+	}
+	if (view) {
+		item->SetConfigPanel(view);
+		fConfigView->AddChild(view);
+	}
+
+	fConfigView->Layout();
+	fConfigView->Show();
 }

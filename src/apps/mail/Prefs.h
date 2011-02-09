@@ -63,7 +63,7 @@ public:
 								TPrefsWindow(BRect rect, BFont* font,
 									int32* level, bool* warp,
 									bool* attachAttributes, bool* cquotes,
-									uint32* account, int32* replyTo,
+									int32* account, int32* replyTo,
 									char** preamble, char** sig,
 									uint32* encoding, bool* warnUnencodable,
 									bool* spellCheckStartOn,
@@ -75,7 +75,7 @@ public:
 private:
 			BPopUpMenu*			_BuildFontMenu(BFont*);
 			BPopUpMenu*			_BuildLevelMenu(int32);
-			BPopUpMenu*			_BuildAccountMenu(uint32);
+			BPopUpMenu*			_BuildAccountMenu(int32);
 			BPopUpMenu*			_BuildReplyToMenu(int32);
 			BMenu*				_BuildReplyPreambleMenu();
 			BPopUpMenu*			_BuildSignatureMenu(char*);
@@ -103,8 +103,8 @@ private:
 			uint8				fButtonBar;
 			bool*				fNewColoredQuotes;
 			bool				fColoredQuotes;
-			uint32*				fNewAccount;
-			uint32				fAccount;
+			int32*				fNewAccount;
+			int32				fAccount;
 			int32*				fNewReplyTo;
 			int32				fReplyTo;
 

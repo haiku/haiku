@@ -1,6 +1,7 @@
 /*
- * Copyright 2007-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2011, Haiku, Inc. All rights reserved.
  * Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
+ * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  *
  * Distributed under the terms of the MIT License.
  */
@@ -12,6 +13,7 @@
 #include <Alert.h>
 #include <TextControl.h>
 #include <Entry.h>
+#include <File.h>
 #include <Path.h>
 #include <MenuField.h>
 
@@ -22,16 +24,13 @@
 #include <netdb.h>
 #include <sys/time.h>
 #include <sys/socket.h>
-#ifndef HAIKU_TARGET_PLATFORM_BEOS // These headers don't exist in BeOS R5.
-#	include <arpa/inet.h>
-#	include <sys/select.h>
-#endif
+#include <arpa/inet.h>
+#include <sys/select.h>
 
-#include <status.h>
 #include <ProtocolConfigView.h>
 #include <mail_encoding.h>
 #include <MailSettings.h>
-#include <ChainRunner.h>
+#include <NodeMessage.h>
 #include <crypt.h>
 #include <unistd.h>
 
@@ -50,6 +49,7 @@
 #define CRLF "\r\n"
 #define SMTP_RESPONSE_SIZE 8192
 
+//#define DEBUG
 #ifdef DEBUG
 #	define D(x) x
 #	define bug printf
@@ -242,34 +242,48 @@ enum AuthType {
 };
 
 
-SMTPProtocol::SMTPProtocol(BMessage *message, BMailChainRunner *run)
-	: BMailFilter(message),
-	fSettings(message),
-	runner(run),
+SMTPProtocol::SMTPProtocol(BMailAccountSettings* settings)
+	:
+	OutboundProtocol(settings),
 	fAuthType(0)
 {
+	fSettingsMessage = settings->OutboundSettings().Settings();
+}
+
+
+SMTPProtocol::~SMTPProtocol()
+{
+
+}
+
+
+status_t
+SMTPProtocol::Connect()
+{
 	BString error_msg;
-	int32 authMethod = fSettings->FindInt32("auth_method");
+	int32 authMethod = fSettingsMessage.FindInt32("auth_method");
+
+	status_t status = B_ERROR;
 
 	if (authMethod == 2) {
 		// POP3 authentication is handled here instead of SMTPProtocol::Login()
 		// because some servers obviously don't like establishing the connection
 		// to the SMTP server first...
-		fStatus = POP3Authentication();
-		if (fStatus < B_OK) {
+		status_t status = _POP3Authentication();
+		if (status < B_OK) {
 			error_msg << MDR_DIALECT_CHOICE ("POP3 authentication failed. The server said:\n","POP3認証に失敗しました\n") << fLog;
-			runner->ShowError(error_msg.String());
-                        runner->Stop(true);
-			return;
+			ShowError(error_msg.String());
+			return status;
 		}
 	}
 
-	fStatus = Open(fSettings->FindString("server"), fSettings->FindInt32("port"), authMethod == 1);
-	if (fStatus < B_OK) {
-		error_msg << MDR_DIALECT_CHOICE ("Error while opening connection to ","接続中にエラーが発生しました") << fSettings->FindString("server");
+	status = Open(fSettingsMessage.FindString("server"),
+		fSettingsMessage.FindInt32("port"), authMethod == 1);
+	if (status < B_OK) {
+		error_msg << MDR_DIALECT_CHOICE ("Error while opening connection to ","接続中にエラーが発生しました") << fSettingsMessage.FindString("server");
 
-		if (fSettings->FindInt32("port") > 0)
-			error_msg << ":" << fSettings->FindInt32("port");
+		if (fSettingsMessage.FindInt32("port") > 0)
+			error_msg << ":" << fSettingsMessage.FindInt32("port");
 
 		// << strerror(err) - BNetEndpoint sucks, we can't use this;
 		if (fLog.Length() > 0)
@@ -277,74 +291,62 @@ SMTPProtocol::SMTPProtocol(BMessage *message, BMailChainRunner *run)
 		else
 			error_msg << MDR_DIALECT_CHOICE (": Connection refused or host not found.","；接続が拒否されたかサーバーが見つかりません");
 
-		runner->ShowError(error_msg.String());
-                runner->Stop(true);
-		return;
+		ShowError(error_msg.String());
+
+		return status;
 	}
 
-	const char *password = fSettings->FindString("password");
-	char *passwd = get_passwd(fSettings, "cpasswd");
-	if (passwd)
-		password = passwd;
+	const char* password = get_passwd(&fSettingsMessage, "cpasswd");
+	status = Login(fSettingsMessage.FindString("username"), password);
+	delete[] password;
 
-	fStatus = Login(fSettings->FindString("username"), password);
-	delete passwd;
-
-	if (fStatus < B_OK) {
+	if (status != B_OK) {
 		//-----This is a really cool kind of error message. How can we make it work for POP3?
-		error_msg << MDR_DIALECT_CHOICE ("Error while logging in to ","ログイン中にエラーが発生しました\n") << fSettings->FindString("server")
+		error_msg << MDR_DIALECT_CHOICE ("Error while logging in to ","ログイン中にエラーが発生しました\n") << fSettingsMessage.FindString("server")
 			<< MDR_DIALECT_CHOICE (". The server said:\n","サーバーエラー\n") << fLog;
-		runner->ShowError(error_msg.String());
-                runner->Stop(true);
+		ShowError(error_msg.String());
 	}
+	return B_OK;
 }
 
 
-SMTPProtocol::~SMTPProtocol()
+void
+SMTPProtocol::Disconnect()
 {
 	Close();
 }
 
 
-// Check for errors?
-status_t
-SMTPProtocol::InitCheck(BString *verbose)
-{
-	if (verbose != NULL && fStatus < B_OK) {
-		*verbose << MDR_DIALECT_CHOICE ("Error while fetching mail from ","受信中にエラーが発生しました") << fSettings->FindString("server")
-			<< ": " << strerror(fStatus);
-	}
-	return fStatus;
-}
-
-
 // Process EMail to be sent
 
+
 status_t
-SMTPProtocol::ProcessMailMessage(BPositionIO **io_message, BEntry */*io_entry*/,
-	BMessage *io_headers, BPath */*io_folder*/, const char */*io_uid*/)
+SMTPProtocol::SendMessages(const std::vector<entry_ref>& mails,
+	size_t totalBytes)
 {
-	const char *from = io_headers->FindString("MAIL:from");
-	const char *to = io_headers->FindString("MAIL:recipients");
-	if (!to)
-		to = io_headers->FindString("MAIL:to");
+	status_t status = Connect();
+	if (status != B_OK)
+		return status;
 
-	if (to == NULL || from == NULL)
-		fLog = "Invalid message headers";
+	for (unsigned int i = 0; i < mails.size(); i++) {
+		status = _SendMessage(mails[i]);
 
-	if (to && from && Send(to, from, *io_message) == B_OK) {
-		runner->ReportProgress(0, 1);
-		return B_OK;
+		if (status != B_OK) {
+			BString error;
+			error << "An error occurred while sending the message " <<
+				mails[i].name << ":\n" << fLog;
+			ShowError(error.String());
+
+			ResetProgress();
+			break;
+		}
+		off_t size = 0;
+		const entry_ref& ref = mails[i];
+		BNode(&ref).GetSize(&size);
+		ReportProgress(size, 1);
 	}
 
-	BString error;
-	MDR_DIALECT_CHOICE (
-		error << "An error occurred while sending the message " << io_headers->FindString("MAIL:subject") << " to " << to << ":\n" << fLog;,
-		error << io_headers->FindString("MAIL:subject") << "を" << to << "\nへ送信中にエラーが発生しました：\n" << fLog;
-	)
-
-	runner->ShowError(error.String());
-	runner->ReportProgress(0, 1);
+	Disconnect();
 	return B_ERROR;
 }
 
@@ -354,21 +356,21 @@ SMTPProtocol::ProcessMailMessage(BPositionIO **io_message, BEntry */*io_entry*/,
 status_t
 SMTPProtocol::Open(const char *address, int port, bool esmtp)
 {
-	runner->ReportProgress(0, 0, MDR_DIALECT_CHOICE ("Connecting to server...","接続中..."));
+	ReportProgress(0, 0, MDR_DIALECT_CHOICE ("Connecting to server...","接続中..."));
 
-        #ifdef USE_SSL
-		use_ssl = (fSettings->FindInt32("flavor") == 1);
-		use_STARTTLS = (fSettings->FindInt32("flavor") == 2);
+	#ifdef USE_SSL
+		use_ssl = (fSettingsMessage.FindInt32("flavor") == 1);
+		use_STARTTLS = (fSettingsMessage.FindInt32("flavor") == 2);
 		ssl = NULL;
 		ctx = NULL;
 	#endif
 
-        if (port <= 0)
-		#ifdef USE_SSL
-			port = use_ssl ? 465 : 25;
-		#else
-			port = 25;
-		#endif
+	if (port <= 0)
+	#ifdef USE_SSL
+		port = use_ssl ? 465 : 25;
+	#else
+		port = 25;
+	#endif
 
 	uint32 hostIP = inet_addr(address);  // first see if we can parse it as a numeric address
 	if ((hostIP == 0)||(hostIP == (uint32)-1)) {
@@ -380,24 +382,24 @@ SMTPProtocol::Open(const char *address, int port, bool esmtp)
 		return EHOSTUNREACH;
 
 #ifndef HAIKU_TARGET_PLATFORM_BEOS
-	_fd = socket(AF_INET, SOCK_STREAM, 0);
+	fSocket = socket(AF_INET, SOCK_STREAM, 0);
 #else
-	_fd = socket(AF_INET, 2, 0);
+	fSocket = socket(AF_INET, 2, 0);
 #endif
-	if (_fd >= 0) {
+	if (fSocket >= 0) {
 		struct sockaddr_in saAddr;
 		memset(&saAddr, 0, sizeof(saAddr));
 		saAddr.sin_family      = AF_INET;
 		saAddr.sin_port        = htons(port);
 		saAddr.sin_addr.s_addr = hostIP;
-		int result = connect(_fd, (struct sockaddr *) &saAddr, sizeof(saAddr));
+		int result = connect(fSocket, (struct sockaddr *) &saAddr, sizeof(saAddr));
 		if (result < 0) {
 #ifndef HAIKU_TARGET_PLATFORM_BEOS
-			close(_fd);
+			close(fSocket);
 #else
-			closesocket(_fd);
+			closesocket(fSocket);
 #endif
-			_fd = -1;
+			fSocket = -1;
 			return errno;
 		}
 	} else {
@@ -415,25 +417,24 @@ SMTPProtocol::Open(const char *address, int port, bool esmtp)
 
     	ctx = SSL_CTX_new(SSLv23_method());
     	ssl = SSL_new(ctx);
-    	sbio=BIO_new_socket(_fd,BIO_NOCLOSE);
+    	sbio=BIO_new_socket(fSocket,BIO_NOCLOSE);
     	SSL_set_bio(ssl,sbio,sbio);
 
     	if (SSL_connect(ssl) <= 0) {
     		BString error;
-			error << "Could not connect to SMTP server " << fSettings->FindString("server");
+			error << "Could not connect to SMTP server " << fSettingsMessage.FindString("server");
 			if (port != 465)
 				error << ":" << port;
 			error << ". (SSL connection error)";
-			runner->ShowError(error.String());
+			ShowError(error.String());
 			SSL_CTX_free(ctx);
 			#ifndef HAIKU_TARGET_PLATFORM_BEOS
-				close(_fd);
+				close(fSocket);
 			#else
-				closesocket(_fd);
+				closesocket(fSocket);
 			#endif
-                        _fd = -1;
-			runner->Stop(true);
-			return B_OK;
+                        fSocket = -1;
+			return B_ERROR;
 		}
 	}
 
@@ -485,7 +486,7 @@ SMTPProtocol::Open(const char *address, int port, bool esmtp)
 			use_ssl = true;
 			ctx = SSL_CTX_new(TLSv1_method());
     		ssl = SSL_new(ctx);
-    		sbio = BIO_new_socket(_fd,BIO_NOCLOSE);
+    		sbio = BIO_new_socket(fSocket,BIO_NOCLOSE);
     		BIO_set_nbio(sbio, 0);
     		SSL_set_bio(ssl, sbio, sbio);
     		SSL_set_connect_state(ssl);
@@ -532,74 +533,58 @@ SMTPProtocol::Open(const char *address, int port, bool esmtp)
 
 
 status_t
-SMTPProtocol::POP3Authentication()
+SMTPProtocol::_SendMessage(const entry_ref& mail)
 {
-	// find the POP3 filter of the other chain - identify by name...
-	BList chains;
-	if (GetInboundMailChains(&chains) < B_OK) {
-		fLog = "Cannot get inbound chains";
+	// open read write to be able to manipulate in MessageReadyToSend hook
+	BFile file(&mail, B_READ_WRITE);
+	status_t status = file.InitCheck();
+	if (status != B_OK)
+		return status;
+
+	BMessage header;
+	file >> header;
+
+	const char *from = header.FindString("MAIL:from");
+	const char *to = header.FindString("MAIL:recipients");
+	if (!to)
+		to = header.FindString("MAIL:to");
+
+	if (to == NULL || from == NULL) {
+		fLog = "Invalid message headers";
 		return B_ERROR;
 	}
 
-	BMailChainRunner *parent = runner;
-	BMailChain *chain = NULL;
-	for (int i = chains.CountItems(); i-- > 0;)
-	{
-		chain = (BMailChain *)chains.ItemAt(i);
-		if (chain != NULL && !strcmp(chain->Name(), parent->Chain()->Name()))
-			break;
-		chain = NULL;
+	NotifyMessageReadyToSend(mail, &file);
+	status = Send(to, from, &file);
+	if (status != B_OK)
+		return status;
+	NotifyMessageSent(mail, &file);
+	return B_OK;
+}
+
+
+status_t
+SMTPProtocol::_POP3Authentication()
+{
+	const entry_ref& entry = fAccountSettings.InboundPath();
+	if (strcmp(entry.name, "POP3") != 0)
+		return B_ERROR;
+
+	status_t (*pop3_smtp_auth)(BMailAccountSettings*);
+
+	BPath path(&entry);
+	image_id image = load_add_on(path.Path());
+	if (image < 0)
+		return B_ERROR;
+	if (get_image_symbol(image, "pop3_smtp_auth",
+		B_SYMBOL_TYPE_TEXT, (void **)&pop3_smtp_auth) != B_OK) {
+		unload_add_on(image);
+		image = -1;
+		return B_ERROR;
 	}
-	if (chain != NULL)
-	{
-		// found mail chain! let's check for the POP3 protocol
-		BMessage msg;
-		entry_ref ref;
-		if (chain->GetFilter(0, &msg, &ref) >= B_OK)
-		{
-			BPath path(&ref);
-			if (path.InitCheck() >= B_OK && !strcmp(path.Leaf(), "POP3"))
-			{
-				// protocol matches, go execute it!
-
-				image_id image = load_add_on(path.Path());
-
-				fLog = "Cannot load POP3 add-on";
-				if (image >= B_OK)
-				{
-					BMailFilter *(* instantiate)(BMessage *, BMailChainRunner *);
-					status_t status = get_image_symbol(image, "instantiate_mailfilter",
-						B_SYMBOL_TYPE_TEXT, (void **)&instantiate);
-					if (status >= B_OK)
-					{
-						msg.AddInt32("chain", chain->ID());
-						msg.AddBool("login_and_do_nothing_else_of_any_importance",true);
-
-						// instantiating and deleting should be enough
-						BMailFilter *filter = (*instantiate)(&msg, runner);
-						delete filter;
-					}
-					else
-						fLog = "Cannot run POP3 add-on, symbol not found";
-
-					unload_add_on(image);
-					return status;
-				}
-			}
-		}
-		else
-			fLog = "Could not get inbound protocol";
-	}
-	else
-		fLog = "Cannot find inbound chain";
-
-	for (int i = chains.CountItems(); i-- > 0;)
-	{
-		chain = (BMailChain *)chains.ItemAt(i);
-		delete chain;
-	}
-
-	return B_ERROR;
+	status_t status = (*pop3_smtp_auth)(&fAccountSettings);
+	unload_add_on(image);
+	return status;
 }
 
 
@@ -816,18 +801,14 @@ SMTPProtocol::Close()
         }
 #endif
 
-#ifndef HAIKU_TARGET_PLATFORM_BEOS
-	close(_fd);
-#else
-	closesocket(_fd);
-#endif
+	close(fSocket);
 }
 
 
 /** Send mail */
 
 status_t
-SMTPProtocol::Send(const char *to, const char *from, BPositionIO *message)
+SMTPProtocol::Send(const char* to, const char* from, BPositionIO *message)
 {
 	BString cmd = from;
 	cmd.Remove(0, cmd.FindFirst("\" <") + 2);
@@ -911,12 +892,12 @@ SMTPProtocol::Send(const char *to, const char *from, BPositionIO *message)
                                         }
                                 } else
                         #endif
-				if (send (_fd,data, i + 3,0) < 0) {
+				if (send (fSocket,data, i + 3,0) < 0) {
 					amountUnread = 0; // Stop when an error happens.
 					bufferLen = 0;
 					break;
 				}
-				runner->ReportProgress (i + 2 /* Don't include the double period here */,0);
+				ReportProgress (i + 2 /* Don't include the double period here */,0);
 				// Move the data over in the buffer, but leave the period there
 				// so it gets sent a second time.
 				memmove(data, data + (i + 2), bufferLen - (i + 2));
@@ -933,8 +914,8 @@ SMTPProtocol::Send(const char *to, const char *from, BPositionIO *message)
                                             SSL_write(ssl,data,bufferLen);
                                     else
                             #endif
-					send (_fd,data, bufferLen,0);
-					runner->ReportProgress (bufferLen,0);
+					send (fSocket,data, bufferLen,0);
+					ReportProgress (bufferLen,0);
 					if (bufferLen >= 2)
 						messageEndedWithCRLF = (data[bufferLen-2] == '\r' &&
 							data[bufferLen-1] == '\n');
@@ -951,9 +932,9 @@ SMTPProtocol::Send(const char *to, const char *from, BPositionIO *message)
                                         break;
                             } else
                         #endif
-				if (send (_fd,data, bufferLen - 3,0) < 0)
+				if (send (fSocket,data, bufferLen - 3,0) < 0)
 					break; // Stop when an error happens.
-				runner->ReportProgress (bufferLen - 3,0);
+				ReportProgress (bufferLen - 3,0);
 				memmove (data, data + bufferLen - 3, 3);
 				bufferLen = 3;
 			}
@@ -996,7 +977,7 @@ SMTPProtocol::ReceiveResponse(BString &out)
 	FD_ZERO(&fds);
 
 	/* Set the socket in the mask. */
-	FD_SET(_fd, &fds);
+	FD_SET(fSocket, &fds);
         int result = -1;
 #ifdef USE_SSL
         if ((use_ssl) && (SSL_pending(ssl)))
@@ -1014,7 +995,7 @@ SMTPProtocol::ReceiveResponse(BString &out)
 				r = SSL_read(ssl,buf,SMTP_RESPONSE_SIZE - 1);
 			else
 		  #endif
-			r = recv(_fd,buf, SMTP_RESPONSE_SIZE - 1,0);
+			r = recv(fSocket,buf, SMTP_RESPONSE_SIZE - 1,0);
 			if (r <= 0)
 				break;
 
@@ -1055,9 +1036,8 @@ SMTPProtocol::SendCommand(const char *cmd)
                     return B_ERROR;
 	} else
 #endif
-	if (send(_fd,cmd, ::strlen(cmd),0) < 0)
+	if (send(fSocket,cmd, ::strlen(cmd),0) < 0)
 		return B_ERROR;
-
 	fLog = "";
 
 	// Receive
@@ -1073,7 +1053,6 @@ SMTPProtocol::SendCommand(const char *cmd)
 		{
 			int32 num = atol(fLog.String());
 			D(bug("ReplyNumber: %ld\n", num));
-
 			if (num >= 500)
 				return B_ERROR;
 
@@ -1086,54 +1065,8 @@ SMTPProtocol::SendCommand(const char *cmd)
 
 
 // Instantiate hook
-BMailFilter *
-instantiate_mailfilter(BMessage *settings, BMailChainRunner *status)
+OutboundProtocol*
+instantiate_outbound_protocol(BMailAccountSettings* settings)
 {
-	return new SMTPProtocol(settings, status);
-}
-
-
-// Configuration interface
-BView *
-instantiate_config_panel(BMessage *settings, BMessage *)
-{
-	#ifdef USE_SSL
-	BMailProtocolConfigView *view = new BMailProtocolConfigView(B_MAIL_PROTOCOL_HAS_AUTH_METHODS |
-																B_MAIL_PROTOCOL_HAS_USERNAME |
-																B_MAIL_PROTOCOL_HAS_PASSWORD |
-																B_MAIL_PROTOCOL_HAS_HOSTNAME |
-																B_MAIL_PROTOCOL_HAS_FLAVORS);
-	view->AddFlavor("Unencrypted");
-	view->AddFlavor("SSL");
-	view->AddFlavor("STARTTLS");
-	#else
-	BMailProtocolConfigView *view = new BMailProtocolConfigView(B_MAIL_PROTOCOL_HAS_AUTH_METHODS |
-																B_MAIL_PROTOCOL_HAS_USERNAME |
-																B_MAIL_PROTOCOL_HAS_PASSWORD |
-																B_MAIL_PROTOCOL_HAS_HOSTNAME);
-	#endif
-
-	view->AddAuthMethod(MDR_DIALECT_CHOICE ("None","無し"), false);
-	view->AddAuthMethod(MDR_DIALECT_CHOICE ("ESMTP","ESMTP"));
-	view->AddAuthMethod(MDR_DIALECT_CHOICE ("POP3 before SMTP","送信前に受信する"), false);
-
-	BTextControl *control = (BTextControl *)(view->FindView("host"));
-	control->SetLabel(MDR_DIALECT_CHOICE ("SMTP server: ","SMTPサーバ: "));
-
-	// Reset the dividers after changing one
-	float widestLabel=0;
-	for (int32 i = view->CountChildren(); i-- > 0;) {
-		if(BTextControl *text = dynamic_cast<BTextControl *>(view->ChildAt(i)))
-			widestLabel = MAX(widestLabel,text->StringWidth(text->Label()) + 5);
-	}
-	for (int32 i = view->CountChildren(); i-- > 0;) {
-		if(BTextControl *text = dynamic_cast<BTextControl *>(view->ChildAt(i)))
-			text->SetDivider(widestLabel);
-	}
-
-	BMenuField *field = (BMenuField *)(view->FindView("auth_method"));
-	field->SetDivider(widestLabel);
-	view->SetTo(settings);
-
-	return view;
+	return new SMTPProtocol(settings);
 }

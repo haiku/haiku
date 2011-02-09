@@ -5,7 +5,8 @@
 
 
 #include "CenterContainer.h"
-#include <stdio.h>
+
+#include <ObjectList.h>
 
 
 CenterContainer::CenterContainer(BRect rect,bool centerHoriz)
@@ -87,12 +88,18 @@ void CenterContainer::SetSpacing(float spacing)
 
 void CenterContainer::DeleteChildren()
 {
+	// there happens some magic in DetachedFromWindow and therefore all views
+	// have to exist so delete them later...
+	// TODO: maybe rethink this
+	BObjectList<BView> temp;
 	// remove all child views
 	for (int32 i = CountChildren();i-- > 0;)
 	{
 		BView *view = ChildAt(i);
-		if (RemoveChild(view))
-			delete view;
+		temp.AddItem(view);
+		RemoveChild(view);
 	}
+	for (int32 i = 0; i < temp.CountItems(); i++)
+		delete temp.ItemAt(i);
 }
 

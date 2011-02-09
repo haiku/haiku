@@ -84,7 +84,7 @@ public:
 							THeaderView(BRect, BRect, bool incoming,
 								BEmailMessage *mail, bool resending,
 								uint32 defaultCharacterSet,
-								uint32 defaultChain);
+								int32 defaultAccount);
 
 	virtual	void			MessageReceived(BMessage*);
 	virtual	void			AttachedToWindow();
@@ -92,7 +92,7 @@ public:
 
 			BPopUpMenu*		fAccountMenu;
 			BPopUpMenu*		fEncodingMenu;
-			int32			fChain;
+			int32			fAccountID;
 			TTextControl*	fAccountTo;
 			TTextControl*	fAccount;
 			TTextControl*	fBcc;
