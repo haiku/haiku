@@ -10,6 +10,7 @@
 #include "MailProtocol.h"
 
 #include <Handler.h>
+#include <Locker.h>
 #include <Message.h>
 
 #include "MailSettings.h"

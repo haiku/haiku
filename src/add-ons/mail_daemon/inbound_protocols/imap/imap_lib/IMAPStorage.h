@@ -12,7 +12,7 @@
 #include <string.h>
 
 #include <File.h>
-#include <Locker.h>
+#include <kernel/OS.h>
 #include <Path.h>
 #include <String.h>
 
@@ -45,6 +45,9 @@ public:
 				kHeaderDownloaded = 0x01,
 				kBodyDownloaded = 0x02
 			};
+
+								IMAPStorage();
+								~IMAPStorage();
 
 			void				SetTo(const char* dir);
 
@@ -88,7 +91,7 @@ private:
 
 			BPath				fMailboxPath;
 
-			BLocker				fLoadDatabaseLock;
+			sem_id				fLoadDatabaseLock;
 			MailEntryMap		fMailEntryMap;
 };
 

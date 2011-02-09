@@ -40,6 +40,7 @@ IMAPMailboxSync::Sync(IMAPStorage& storage, IMAPMailbox& mailbox)
 				found = true;
 				if (mailEntry.flags != minMessage.flags)
 					storage.SetFlags(mailEntry.uid, minMessage.flags);
+				break;
 			}
 		}
 		if (!found)
@@ -109,6 +110,18 @@ ReadDirThreadFunction(void *data)
 }
 
 
+IMAPStorage::IMAPStorage()
+{
+	fLoadDatabaseLock = create_sem(1, "sync lock");
+}
+
+
+IMAPStorage::~IMAPStorage()
+{
+	delete_sem(fLoadDatabaseLock);
+}
+
+
 void
 IMAPStorage::SetTo(const char* dir)
 {
@@ -129,10 +142,10 @@ IMAPStorage::StartReadDatabase()
 		return id;
 
 	// will be unlocked from thread
-	fLoadDatabaseLock.Lock();
+	acquire_sem(fLoadDatabaseLock);
 	status = resume_thread(id);
 	if (status != B_OK)
-		fLoadDatabaseLock.Unlock();
+		release_sem(fLoadDatabaseLock);
 	return status;
 }
 
@@ -141,9 +154,9 @@ status_t
 IMAPStorage::WaitForDatabaseReaded()
 {
 	// just wait for thread
-	if (!fLoadDatabaseLock.Lock())
+	if (acquire_sem(fLoadDatabaseLock) != B_OK)
 		return B_ERROR;
-	fLoadDatabaseLock.Unlock();
+	release_sem(fLoadDatabaseLock);
 	return B_OK;
 }
 
@@ -440,7 +453,7 @@ IMAPStorage::_ReadFilesThread()
 		fMailEntryMap[entry.uid] = entry;
 	}
 
-	fLoadDatabaseLock.Unlock();
+	release_sem(fLoadDatabaseLock);
 	return B_OK;
 }
 
