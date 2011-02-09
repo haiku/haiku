@@ -44,14 +44,8 @@ send_queued_mail(void)
 _EXPORT int32
 count_pop_accounts(void)
 {
-	BPath path;
-	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY,&path);
-	if (status < B_OK)
-		return 0;
-
-	path.Append("Mail/chains/inbound");
-	BDirectory dir(path.Path());
-	return dir.CountEntries();
+	BMailAccounts accounts;
+	return accounts.CountAccounts();
 }
 
 
