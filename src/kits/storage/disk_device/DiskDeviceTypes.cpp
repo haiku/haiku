@@ -36,6 +36,7 @@ const char *kPartitionTypeVMDK			= VMDK_PARTITION_NAME;
 const char *kPartitionTypeAmigaFFS		= AMIGA_FFS_NAME;
 const char *kPartitionTypeBFS			= BFS_NAME;
 const char *kPartitionTypeBTRFS			= BTRFS_NAME;
+const char *kPartitionTypeEXFAT			= EXFAT_FS_NAME;
 const char *kPartitionTypeEXT2			= EXT2_FS_NAME;
 const char *kPartitionTypeEXT3			= EXT3_FS_NAME;
 const char *kPartitionTypeFAT12			= FAT12_FS_NAME;

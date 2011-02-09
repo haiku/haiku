@@ -91,6 +91,7 @@ static const struct partition_type kPartitionTypes[] = {
 static const struct partition_type kPartitionContentTypes[] = {
 #ifndef _USER_MODE
 	{ 0x01, kPartitionTypeFAT12 },
+	{ 0x07, kPartitionTypeEXFAT },
 	{ 0x0c, kPartitionTypeFAT32 },
 	{ 0x0f, kPartitionTypeIntelExtended },
 	{ 0x83, kPartitionTypeBTRFS },

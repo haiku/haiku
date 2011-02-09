@@ -62,6 +62,7 @@ class Partition : public Node, public partition_data {
 #define kPartitionTypeBFS		"BFS Filesystem"
 #define kPartitionTypeAmigaFFS	"AmigaFFS Filesystem"
 #define kPartitionTypeBTRFS		"BTRFS Filesystem"
+#define kPartitionTypeEXFAT		"exFAT Filesystem"
 #define kPartitionTypeEXT2		"EXT2 Filesystem"
 #define kPartitionTypeEXT3		"EXT3 Filesystem"
 #define kPartitionTypeFAT12		"FAT12 Filesystem"

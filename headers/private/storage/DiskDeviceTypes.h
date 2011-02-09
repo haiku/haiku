@@ -29,6 +29,7 @@ extern const char *kPartitionTypeVMDK;
 extern const char *kPartitionTypeAmigaFFS;
 extern const char *kPartitionTypeBFS;
 extern const char *kPartitionTypeBTRFS;
+extern const char *kPartitionTypeEXFAT;
 extern const char *kPartitionTypeEXT2;
 extern const char *kPartitionTypeEXT3;
 extern const char *kPartitionTypeFAT12;
