@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010, Haiku, Inc. All rights reserved.
+ * Copyright 2005-2011, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -14,7 +14,13 @@
 
 #include <string.h>
 #include <malloc.h>
+
 #include <Font.h>
+#include <Catalog.h>
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "People"
 
 
 AttributeTextControl::AttributeTextControl(const char* label,
@@ -25,7 +31,8 @@ AttributeTextControl::AttributeTextControl(const char* label,
 	fOriginalValue()
 {
 	if (label != NULL && label[0] != 0)
-		SetLabel(BString(label).Append(":"));
+		SetLabel(BString(B_TRANSLATE("%attribute_label:"))
+			.ReplaceFirst("%attribute_label", label));
 	SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 }
 

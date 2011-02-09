@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010, Haiku, Inc. All rights reserved.
+ * Copyright 2005-2011, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -8,8 +8,8 @@
  * Copyright 1999, Be Incorporated.   All Rights Reserved.
  * This file may be used under the terms of the Be Sample Code License.
  */
-#ifndef TEXT_CONTROL_H
-#define TEXT_CONTROL_H
+#ifndef ATTRIBUTE_TEXT_CONTROL_H
+#define ATTRIBUTE_TEXT_CONTROL_H
 
 #include <String.h>
 #include <TextControl.h>
@@ -33,4 +33,4 @@ private:
 			BString				fOriginalValue;
 };
 
-#endif // TEXT_CONTROL_H
+#endif // ATTRIBUTE_TEXT_CONTROL_H
