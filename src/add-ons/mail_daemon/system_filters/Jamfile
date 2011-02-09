@@ -1,7 +1,0 @@
-SubDir HAIKU_TOP src add-ons mail_daemon system_filters ;
-
-SubInclude HAIKU_TOP src add-ons mail_daemon system_filters inbox ;
-SubInclude HAIKU_TOP src add-ons mail_daemon system_filters notifier ;
-SubInclude HAIKU_TOP src add-ons mail_daemon system_filters outbox ;
-SubInclude HAIKU_TOP src add-ons mail_daemon system_filters parser ;
-
