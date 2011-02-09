@@ -25,8 +25,6 @@
 status_t
 IMAPMailboxSync::Sync(IMAPStorage& storage, IMAPMailbox& mailbox)
 {
-	storage.WaitForDatabaseReaded();
-
 	const MailEntryMap& files = storage.GetFiles();
 	const MinMessageList& messages = mailbox.GetMessageList();
 
@@ -151,7 +149,7 @@ IMAPStorage::StartReadDatabase()
 
 
 status_t
-IMAPStorage::WaitForDatabaseReaded()
+IMAPStorage::WaitForDatabaseRead()
 {
 	// just wait for thread
 	if (acquire_sem(fLoadDatabaseLock) != B_OK)

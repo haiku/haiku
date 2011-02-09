@@ -337,7 +337,7 @@ IMAPInboundProtocol::Connect(const char* server, const char* username,
 	fStorage.StartReadDatabase();
 	status = fIMAPMailbox.SelectMailbox(fMailboxName);
 	if (status != B_OK) {
-		fStorage.WaitForDatabaseReaded();
+		fStorage.WaitForDatabaseRead();
 		statusMessage = "Failed to select mailbox (";
 		statusMessage += fMailboxName;
 		statusMessage += "): ";
@@ -350,14 +350,14 @@ IMAPInboundProtocol::Connect(const char* server, const char* username,
 	ReportProgress(0, 1, "Fetch message list");
 	status = fIMAPMailbox.Sync();
 	if (status != B_OK) {
-		fStorage.WaitForDatabaseReaded();
+		fStorage.WaitForDatabaseRead();
 		ShowError("Failed to sync mailbox");
 		ResetProgress();
 		return status;
 	}
 
 	ReportProgress(0, 1, "Read local message list");
-	status = fStorage.WaitForDatabaseReaded();
+	status = fStorage.WaitForDatabaseRead();
 	if (status != B_OK) {
 		ShowError("Can't read database");
 		ResetProgress();

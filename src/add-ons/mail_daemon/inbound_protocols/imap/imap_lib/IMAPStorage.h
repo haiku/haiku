@@ -52,7 +52,7 @@ public:
 			void				SetTo(const char* dir);
 
 			status_t			StartReadDatabase();
-			status_t			WaitForDatabaseReaded();
+			status_t			WaitForDatabaseRead();
 
 			status_t			AddNewMessage(int32 uid, int32 flags,
 									BPositionIO** file = NULL);
