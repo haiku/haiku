@@ -13,79 +13,85 @@
 
 #include <string.h>
 
-_EXPORT status_t
-BMailDaemon::CheckMail(bool send_queued_mail,const char *account)
+
+status_t
+BMailDaemon::CheckMail(int32 accountID)
 {
 	BMessenger daemon("application/x-vnd.Be-POST");
 	if (!daemon.IsValid())
 		return B_MAIL_NO_DAEMON;
 
-	BMessage message(send_queued_mail ? 'mbth' : 'mnow');
-	if (account != NULL) {
-		BList list;
-
-		GetInboundMailChains(&list);
-		for (int32 i = list.CountItems();i-- > 0;) {
-			BMailChain *chain = (BMailChain *)list.ItemAt(i);
-			
-			if (!strcmp(chain->Name(),account))
-				message.AddInt32("chain",chain->ID());
-			
-			delete chain;
-		}
-		
-		if (send_queued_mail) {
-			list.MakeEmpty();
-			GetOutboundMailChains(&list);
-			for (int32 i = list.CountItems();i-- > 0;) {
-				BMailChain *chain = (BMailChain *)list.ItemAt(i);
-				
-				if (!strcmp(chain->Name(),account))
-					message.AddInt32("chain",chain->ID());
-				
-				delete chain;
-			}
-		}
-	}
-	daemon.SendMessage(&message);
-
-	return B_OK;
+	BMessage message(kMsgCheckMessage);
+	message.AddInt32("account", accountID);
+	return daemon.SendMessage(&message);
 }
 
 
-_EXPORT status_t BMailDaemon::SendQueuedMail() {
+status_t
+BMailDaemon::CheckAndSendQueuedMail(int32 accountID)
+{
+	BMessenger daemon("application/x-vnd.Be-POST");
+	if (!daemon.IsValid())
+		return B_MAIL_NO_DAEMON;
+
+	BMessage message(kMsgCheckAndSend);
+	message.AddInt32("account", accountID);
+	return daemon.SendMessage(&message);
+}
+
+
+status_t
+BMailDaemon::SendQueuedMail()
+{
 	BMessenger daemon("application/x-vnd.Be-POST");
 	if (!daemon.IsValid())
 		return B_MAIL_NO_DAEMON;
 	
-	daemon.SendMessage('msnd');
-		
-	return B_OK;
+	return daemon.SendMessage(kMsgSendMessages);
 }
 
-_EXPORT int32 BMailDaemon::CountNewMessages(bool wait_for_fetch_completion) {
+
+int32
+BMailDaemon::CountNewMessages(bool wait_for_fetch_completion)
+{
 	BMessenger daemon("application/x-vnd.Be-POST");
 	if (!daemon.IsValid())
 		return B_MAIL_NO_DAEMON;
-	
+
 	BMessage reply;
-	BMessage first('mnum');
-	
+	BMessage first(kMsgCountNewMessages);
+
 	if (wait_for_fetch_completion)
 		first.AddBool("wait_for_fetch_done",true);
 		
-	daemon.SendMessage(&first,&reply);	
+	daemon.SendMessage(&first, &reply);	
 		
 	return reply.FindInt32("num_new_messages");
 }
 
-_EXPORT status_t BMailDaemon::Quit() {
+
+status_t
+BMailDaemon::MarkAsRead(int32 account, const entry_ref& ref, bool read)
+{
+	BMessenger daemon("application/x-vnd.Be-POST");
+	if (!daemon.IsValid())
+		return B_MAIL_NO_DAEMON;
+
+	BMessage message(kMsgMarkMessageAsRead);
+	message.AddInt32("account", account);
+	message.AddRef("ref", &ref);
+	message.AddBool("read", read);
+
+	return daemon.SendMessage(&message);	
+}
+
+
+status_t
+BMailDaemon::Quit()
+{
 	BMessenger daemon("application/x-vnd.Be-POST");
 	if (!daemon.IsValid())
 		return B_MAIL_NO_DAEMON;
 	
-	daemon.SendMessage(B_QUIT_REQUESTED);
-		
-	return B_OK;
+	return daemon.SendMessage(B_QUIT_REQUESTED);
 }
-

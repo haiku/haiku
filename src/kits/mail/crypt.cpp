@@ -13,7 +13,7 @@
 static const char key[PASSWORD_LENGTH + 1] = "Dr. Zoidberg Enterprises, BeMail";
 
 
-_EXPORT char *get_passwd(BMessage *msg,const char *name)
+_EXPORT char *get_passwd(const BMessage *msg,const char *name)
 {
 	char *encryptedPassword;
 	ssize_t length;

@@ -9,7 +9,7 @@
 #define PASSWORD_LENGTH 32
 
 
-char *get_passwd(BMessage *msg,const char *name);
+char *get_passwd(const BMessage *msg,const char *name);
 bool set_passwd(BMessage *msg,const char *name,const char *password);
 
 void passwd_crypt(char *in,char *out,int length);

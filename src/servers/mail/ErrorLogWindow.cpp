@@ -53,14 +53,18 @@ class ErrorPanel : public BView {
 
 
 ErrorLogWindow::ErrorLogWindow(BRect rect, const char *name, window_type type)
-	: BWindow(rect, name, type,
-		B_NO_WORKSPACE_ACTIVATION | B_NOT_MINIMIZABLE | B_ASYNCHRONOUS_CONTROLS)
+	:
+	BWindow(rect, name, type, B_NO_WORKSPACE_ACTIVATION | B_NOT_MINIMIZABLE
+		| B_ASYNCHRONOUS_CONTROLS),
+	fIsRunning(false)
 {
 	rect = Bounds();
 	rect.right -= B_V_SCROLL_BAR_WIDTH;
 	
 	view = new ErrorPanel(rect);
 	AddChild(new BScrollView("ErrorScroller", view, B_FOLLOW_ALL_SIDES, 0, false, true));
+	Show();
+	Hide();
 }
 
 
@@ -68,6 +72,12 @@ void
 ErrorLogWindow::AddError(alert_type type, const char *message, const char *tag, bool timestamp)
 {
 	ErrorPanel *panel = (ErrorPanel *)view;
+
+	// first call?
+	if (!fIsRunning) {
+		fIsRunning = true;
+		Show();
+	}
 
 	Lock();
 
@@ -101,8 +111,11 @@ ErrorLogWindow::QuitRequested()
 {
 	Hide();
 
-	while (view->CountChildren() != 0)
-		view->RemoveChild(view->ChildAt(0));
+	while (view->CountChildren() != 0) {
+		BView* child = view->ChildAt(0);
+		view->RemoveChild(child);
+		delete child;
+	}
 
 	ErrorPanel *panel = (ErrorPanel *)(view);
 	panel->add_next_at = 0;
@@ -135,7 +148,13 @@ ErrorLogWindow::FrameResized(float newWidth, float newHeight)
 //	#pragma mark -
 
 
-Error::Error(BRect rect,alert_type atype,const char *tag,const char *message,bool timestamp,rgb_color bkg) : BView(rect,"error",B_FOLLOW_LEFT | B_FOLLOW_RIGHT | B_FOLLOW_TOP,B_NAVIGABLE | B_WILL_DRAW | B_FRAME_EVENTS), type(atype) {
+Error::Error(BRect rect, alert_type atype, const char *tag, const char *message,
+	bool timestamp,rgb_color bkg)
+	:
+	BView(rect,"error",B_FOLLOW_LEFT | B_FOLLOW_RIGHT
+		| B_FOLLOW_TOP,B_NAVIGABLE | B_WILL_DRAW | B_FRAME_EVENTS),
+	type(atype)
+{
 	SetViewColor(bkg);
 	SetLowColor(bkg);
 	
@@ -148,16 +167,21 @@ Error::Error(BRect rect,alert_type atype,const char *tag,const char *message,boo
 	BString msgString(message);
 	msgString.RemoveAll("\r");
 	
-	BTextView *view = new BTextView(BRect(20,0,rect.Width(),rect.Height()),"error_display",BRect(0,3,rect.Width() - 20 - 3,LONG_MAX),B_FOLLOW_ALL_SIDES);
+	BTextView *view = new BTextView(BRect(20, 0, rect.Width(), rect.Height()),
+		"error_display", BRect(0,3,rect.Width() - 20 - 3, LONG_MAX),
+		B_FOLLOW_ALL_SIDES);
 	view->SetLowColor(bkg);
 	view->SetViewColor(bkg);
 	view->SetText(msgString.String());
 	view->MakeSelectable(true);
 	view->SetStylable(true);
 	view->MakeEditable(false);
-	
-	if (tag != NULL)
-		view->Insert(0,tag,strlen(tag),&array);
+
+	if (tag != NULL) {
+		BString tagString(tag);
+		tagString += " ";
+		view->Insert(0, tagString.String(), tagString.Length(), &array);
+	}
 	
 	if (timestamp) {
 		array.runs[0].color = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),B_DARKEN_2_TINT);

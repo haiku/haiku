@@ -524,10 +524,8 @@ AddFilesToHaikuHybridImage system add-ons locale catalogs
 AddFilesToHaikuImage system add-ons mail_daemon inbound_protocols : POP3 IMAP ;
 AddFilesToHaikuImage system add-ons mail_daemon outbound_protocols : SMTP ;
 AddFilesToHaikuImage system add-ons mail_daemon inbound_filters
-	: Match\ Header Spam\ Filter R5\ Daemon\ Filter ;
+	: MatchHeader SpamFilter NewMailNotification ;
 AddFilesToHaikuImage system add-ons mail_daemon outbound_filters : Fortune ;
-AddFilesToHaikuImage system add-ons mail_daemon system_filters
-	: Inbox New\ mail\ notification Outbox Message\ Parser ;
 AddFilesToHaikuImage system add-ons media : $(SYSTEM_ADD_ONS_MEDIA) ;
 AddFilesToHaikuImage system add-ons media plugins
 	: $(SYSTEM_ADD_ONS_MEDIA_PLUGINS) ;

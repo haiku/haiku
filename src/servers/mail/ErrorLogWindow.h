@@ -5,7 +5,7 @@
 #include <Alert.h>
 
 class ErrorLogWindow : public BWindow {
-	public:
+public:
 		ErrorLogWindow(BRect rect, const char *name, window_type type);
 		
 		void AddError(alert_type type,const char *message,const char *tag = NULL,bool timestamp = true);
@@ -13,8 +13,9 @@ class ErrorLogWindow : public BWindow {
 		bool QuitRequested();
 		void FrameResized(float new_width, float new_height);
 	
-	private:
+private:
 		BView *view;
+		bool	fIsRunning;
 };
 
 #endif // ZOIDBERG_MAIL_ERRORLOGWINDOW_H

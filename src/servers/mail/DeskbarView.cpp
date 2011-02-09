@@ -222,10 +222,10 @@ DeskbarView::MessageReceived(BMessage* message)
 		case MD_CHECK_SEND_NOW:
 			// also happens in DeskbarView::MouseUp() with
 			// B_TERTIARY_MOUSE_BUTTON pressed
-			BMailDaemon::CheckMail(true);
+			BMailDaemon::CheckAndSendQueuedMail();
 			break;
 		case MD_CHECK_FOR_MAILS:
-			BMailDaemon::CheckMail(false,message->FindString("account"));
+			BMailDaemon::CheckMail(message->FindInt32("account"));
 			break;
 		case MD_SEND_MAILS:
 			BMailDaemon::SendQueuedMail();
@@ -365,7 +365,7 @@ DeskbarView::MouseUp(BPoint pos)
 	}
 
 	if (fLastButtons & B_TERTIARY_MOUSE_BUTTON)
-		BMailDaemon::CheckMail(true);
+		BMailDaemon::CheckMail();
 }
 
 
@@ -556,32 +556,30 @@ DeskbarView::_BuildMenu()
 		item->SetEnabled(false);
 	}
 
-	BList list;
-	GetInboundMailChains(&list);
-
+	BMailAccounts accounts;
 	if (modifiers() & B_SHIFT_KEY) {
-		BMenu *chainMenu = new BMenu(
+		BMenu *accountMenu = new BMenu(
 			MDR_DIALECT_CHOICE ("Check for mails only","R) メール受信のみ"));
 		BFont font;
 		menu->GetFont(&font);
-		chainMenu->SetFont(&font);
+		accountMenu->SetFont(&font);
 
-		for (int32 i = 0; i < list.CountItems(); i++) {
-			BMailChain* chain = (BMailChain*)list.ItemAt(i);
+		for (int32 i = 0; i < accounts.CountAccounts(); i++) {
+			BMailAccountSettings* account = accounts.AccountAt(i);
 
 			BMessage* message = new BMessage(MD_CHECK_FOR_MAILS);
-			message->AddString("account", chain->Name());
+			message->AddInt32("account", account->AccountID());
 
-			chainMenu->AddItem(new BMenuItem(chain->Name(), message));
-			delete chain;
+			accountMenu->AddItem(new BMenuItem(account->Name(), message));
 		}
-		if (list.IsEmpty()) {
+		if (accounts.CountAccounts() == 0) {
 			item = new BMenuItem("<no accounts>", NULL);
 			item->SetEnabled(false);
-			chainMenu->AddItem(item);
+			accountMenu->AddItem(item);
 		}
-		chainMenu->SetTargetForItems(this);
-		menu->AddItem(new BMenuItem(chainMenu, new BMessage(MD_CHECK_FOR_MAILS)));
+		accountMenu->SetTargetForItems(this);
+		menu->AddItem(new BMenuItem(accountMenu,
+			new BMessage(MD_CHECK_FOR_MAILS)));
 
 		// Not used:
 		// menu->AddItem(new BMenuItem(MDR_DIALECT_CHOICE (
@@ -593,7 +591,7 @@ DeskbarView::_BuildMenu()
 		menu->AddItem(item = new BMenuItem(
 			MDR_DIALECT_CHOICE ("Check for mail now", "C) メールチェック"),
 			new BMessage(MD_CHECK_SEND_NOW)));
-		if (list.IsEmpty())
+		if (accounts.CountAccounts() == 0)
 			item->SetEnabled(false);
 	}
 

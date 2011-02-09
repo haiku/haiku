@@ -42,8 +42,8 @@ class BMailFileConfigView : public BFileControl
 	public:
 		BMailFileConfigView(const char *label,const char *name,bool useMeta = false,const char *defaultPath = NULL,uint32 flavors = B_DIRECTORY_NODE);
 
-		void SetTo(BMessage *archive,BMessage *metadata);
-		virtual	status_t Archive(BMessage *into,bool deep = true) const;
+		void SetTo(const BMessage *archive, BMessage *metadata);
+		virtual	status_t Archive(BMessage *into, bool deep = true) const;
 
 	private:
 		BMessage	*fMeta;

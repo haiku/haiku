@@ -18,450 +18,714 @@
 #include <NodeInfo.h>
 #include <NodeMonitor.h>
 #include <Path.h>
+#include <Roster.h>
 #include <String.h>
 #include <StringList.h>
 #include <VolumeRoster.h>
 
 #include <MDRLanguage.h>
 
-class BMailProtocol;
-
+#include <MailAddon.h>
 #include <MailProtocol.h>
-#include <ChainRunner.h>
-#include <status.h>
+#include <MailSettings.h>
 
-namespace {
+#include "HaikuMailFormatFilter.h"
 
-class ManifestAdder : public BMailChainCallback {
-	public:
-		ManifestAdder(BStringList *list,BStringList **list2, const char *id) : manifest(list), uids_on_disk(list2), uid(id) {}
-		virtual void Callback(status_t result) {
-			if (result == B_OK) {
-				(*manifest) += uid;
-				if (*uids_on_disk != NULL)
-					(**uids_on_disk) += uid;
-			}
-		}
 
-	private:
-		BStringList *manifest,**uids_on_disk;
-		const char *uid;
-};
+using std::map;
 
-class MessageDeletion : public BMailChainCallback {
-	public:
-		MessageDeletion(BMailProtocol *home, const char *uid, BEntry *io_entry, bool delete_anyway);
-		virtual void Callback(status_t result);
 
-	private:
-		BMailProtocol *us;
-		bool always;
-		const char *message_id;
-		BEntry *entry;
-};
-
-} // unnamed namspace
-
-inline void
-BMailProtocol::error_alert(const char *process, status_t error)
-{
-	BString string;
-	MDR_DIALECT_CHOICE (
-		string << "Error while " << process << ": " << strerror(error);
-		runner->ShowError(string.String());
-	,
-		string << process << "中にエラーが発生しました: " << strerror(error);
-		runner->ShowError(string.String());
-	)
-}
-
-
-namespace {
-
-
-class DeleteHandler : public BHandler {
-	public:
-		DeleteHandler(BMailProtocol *a)
-			: us(a)
-		{
-		}
-
-		void MessageReceived(BMessage *msg)
-		{
-			if ((msg->what == 'DELE') && (us->InitCheck() == B_OK)) {
-				us->CheckForDeletedMessages();
-				Looper()->RemoveHandler(this);
-				delete this;
-			}
-		}
-
-	private:
-		BMailProtocol *us;
-};
-
-
-class TrashMonitor : public BHandler {
-	public:
-		TrashMonitor(BMailProtocol *a, int32 chain_id)
-			: us(a), messages_for_us(0), id(chain_id)
-		{
-		}
-
-		~TrashMonitor()
-		{
-			stop_watching(this);
-		}
-
-		void MessageReceived(BMessage *msg)
-		{
-			if (msg->what == 'INIT') {
-				BVolumeRoster volumes;
-				BVolume volume;
-				while (volumes.GetNextVolume(&volume) == B_OK) {
-					BPath trashPath;
-					if (find_directory(B_TRASH_DIRECTORY, &trashPath,
-						false, &volume) == B_OK) {
-						// watch this trash directory
-						BNode node(trashPath.Path());
-						node_ref to_watch;
-						node.GetNodeRef(&to_watch);
-						watch_node(&to_watch, B_WATCH_DIRECTORY, this);
-					}
-				}
-				// Also watch for new volume
-				watch_node(NULL, B_WATCH_MOUNT, this);
-				return;
-			}
-
-			if (msg->what != B_NODE_MONITOR || (us->InitCheck() != B_OK))
-				return;
-
-		 	int32 opcode;
-			if (msg->FindInt32("opcode",&opcode) < B_OK)
-				return;
-
-			if (opcode == B_DEVICE_MOUNTED) {
-				dev_t device;
-				if (msg->FindInt32("new device", &device) != B_OK)
-					return;
-				BVolume volume(device);
-				BPath trashPath;
-				if (find_directory(B_TRASH_DIRECTORY, &trashPath,
-					false, &volume) == B_OK) {
-					// watch also this new volume's trash directory
-					BNode node(trashPath.Path());
-					node_ref to_watch;
-					node.GetNodeRef(&to_watch);
-					watch_node(&to_watch, B_WATCH_DIRECTORY, this);
-				}
-				return;
-			}
-
-			if (opcode == B_ENTRY_MOVED) {
-				entry_ref ref;
-				const char* name;
-				msg->FindInt64("to directory", &ref.directory);
-				msg->FindInt32("device", &ref.device);
-				msg->FindString("name", &name);
-				ref.set_name(name);
-
-				BNode node(&ref);
-				int32 chain;
-
-				// check it's a mail
-				if (node.ReadAttr("MAIL:chain",B_INT32_TYPE,0,&chain,sizeof(chain)) < B_OK)
-					return;
-
-				// check it's a mail for us
-				if (chain != id)
-					return;
-
-				// check if it was moved to trash
-				bool moved_to_trash = false;
-				BPath trashPath;
-				BEntry entry(&ref);
-				BVolume volume(ref.device);
-				if (find_directory(B_TRASH_DIRECTORY, &trashPath,
-						false, &volume) == B_OK) {
-					BDirectory trash(trashPath.Path());
-					moved_to_trash = trash.Contains(&entry);
-				}
-
-				messages_for_us += (moved_to_trash) ? 1 : -1;
-				if (messages_for_us < 0) {
-					// Guard against weirdness
-					messages_for_us = 0;
-					return;
-				}
-			}
-
-			if (opcode != B_ENTRY_REMOVED)
-				return;
-
-			// Check if this (trash) entry removal made one trash now empty
-
-			bool someTrashIsEmpty = false;
-			BVolumeRoster volumes;
-			BVolume volume;
-			while (volumes.GetNextVolume(&volume) == B_OK) {
-				BPath trashPath;
-				if (find_directory(B_TRASH_DIRECTORY, &trashPath,
-					false, &volume) != B_OK) {
-					continue;
-				}
-				BDirectory trash(trashPath.Path());
-				if (trash.CountEntries() == 0) {
-					someTrashIsEmpty = true;
-					break;
-				}
-			}
-
-		 	if (someTrashIsEmpty) {
-		 		// One trash is empty, check for deleted messages
-		 		if (messages_for_us > 0)
-					us->CheckForDeletedMessages();
-
-				messages_for_us = 0;
-			}
-		}
-
-	private:
-		BMailProtocol *us;
-		int32 messages_for_us;
-		int32 id;
-};
-
-} // unnamed namespace
-
-
-// #pragma mark BMailProtocol
-
-
-BMailProtocol::BMailProtocol(BMessage *settings, BMailChainRunner *run)
-	: BMailFilter(settings),
-	runner(run), trash_monitor(NULL), uids_on_disk(NULL)
-{
-	unique_ids = new BStringList;
-	BMailProtocol::settings = settings;
-
-	manifest = new BStringList;
-
-	{
-		BString attr_name = "MAIL:";
-		attr_name << runner->Chain()->ID() << ":manifest"; //--- In case someone puts multiple accounts in the same directory
-
-		if (runner->Chain()->MetaData()->HasString("path")) {
-			BNode node(runner->Chain()->MetaData()->FindString("path"));
-			if (node.InitCheck() >= B_OK) {
-				// We already have a directory so we can try to read metadata
-				// from it. Note that it is normal for this directory not to
-				// be found on the first run as it will be later created by
-				// the INBOX system filter.
-				attr_info info;
-				if (node.GetAttrInfo(attr_name.String(),&info) < B_OK) {
-					if (runner->Chain()->MetaData()->FindFlat("manifest", manifest) == B_OK) {
-						runner->Chain()->MetaData()->RemoveName("manifest");
-						runner->Chain()->Save(); //--- Not having this code made an earlier version of MDR delete all my *(&(*& mail
-					}
-				} else {
-					void *flatmanifest = malloc(info.size);
-					node.ReadAttr(attr_name.String(),manifest->TypeCode(),0,flatmanifest,info.size);
-					manifest->Unflatten(manifest->TypeCode(),flatmanifest,info.size);
-					free(flatmanifest);
-				}
-			}
-		} else runner->ShowError("Error while reading account manifest: no destination directory exists.");
-	}
-
-	uids_on_disk = new BStringList;
-	BVolumeRoster volumes;
-	BVolume volume;
-	while (volumes.GetNextVolume(&volume) == B_OK) {
-		BQuery fido;
-		entry_ref entry;
-
-		fido.SetVolume(&volume);
-		fido.PushAttr("MAIL:chain");
-		fido.PushInt32(settings->FindInt32("chain"));
-		fido.PushOp(B_EQ);
-		fido.PushAttr("MAIL:pending_chain");
-		fido.PushInt32(settings->FindInt32("chain"));
-		fido.PushOp(B_EQ);
-		fido.PushOp(B_OR);
-		if (!settings->FindBool("leave_mail_on_server")) {
-			fido.PushAttr("BEOS:type");
-			fido.PushString("text/x-partial-email");
-			fido.PushOp(B_EQ);
-			fido.PushOp(B_AND);
-		}
-		fido.Fetch();
-
-		BString uid;
-		while (fido.GetNextRef(&entry) == B_OK) {
-			BNode(&entry).ReadAttrString("MAIL:unique_id",&uid);
-			uids_on_disk->AddItem(uid.String());
-		}
-	}
-
-	(*manifest) |= (*uids_on_disk);
-
-	if (!settings->FindBool("login_and_do_nothing_else_of_any_importance")) {
-		DeleteHandler *h = new DeleteHandler(this);
-		runner->AddHandler(h);
-		runner->PostMessage('DELE',h);
-
-		trash_monitor = new TrashMonitor(this,runner->Chain()->ID());
-		runner->AddHandler(trash_monitor);
-		runner->PostMessage('INIT',trash_monitor);
-	}
-}
-
-
-BMailProtocol::~BMailProtocol()
-{
-	if (manifest != NULL) {
-		BMessage *meta_data = runner->Chain()->MetaData();
-		meta_data->RemoveName("manifest");
-		BString attr_name = "MAIL:";
-		attr_name << runner->Chain()->ID() << ":manifest"; //--- In case someone puts multiple accounts in the same directory
-		if (meta_data->HasString("path")) {
-			BNode node(meta_data->FindString("path"));
-			if (node.InitCheck() >= B_OK) {
-				node.RemoveAttr(attr_name.String());
-				ssize_t manifestsize = manifest->FlattenedSize();
-				void *flatmanifest = malloc(manifestsize);
-				manifest->Flatten(flatmanifest,manifestsize);
-				if (status_t err = node.WriteAttr(attr_name.String(),manifest->TypeCode(),0,flatmanifest,manifestsize) < B_OK) {
-					BString error = "Error while saving account manifest: ";
-					error << strerror(err);
-					runner->ShowError(error.String());
-				}
-				free(flatmanifest);
-			} else runner->ShowError("Error while saving account manifest: cannot use destination directory.");
-		} else runner->ShowError("Error while saving account manifest: no destination directory exists.");
-	}
-	delete unique_ids;
-	delete manifest;
-	delete trash_monitor;
-	delete uids_on_disk;
-}
-
-
-#define dump_stringlist(a) printf("BStringList %s:\n",#a); \
-							for (int32 i = 0; i < (a)->CountItems(); i++)\
-								puts((a)->ItemAt(i)); \
-							puts("Done\n");
-
-status_t
-BMailProtocol::ProcessMailMessage(BPositionIO **io_message, BEntry *io_entry,
-	BMessage *io_headers, BPath *io_folder, const char *io_uid)
-{
-	status_t error;
-
-	if (io_uid == NULL)
-		return B_ERROR;
-
-	error = GetMessage(io_uid, io_message, io_headers, io_folder);
-	if (error < B_OK) {
-		if (error != B_MAIL_END_FETCH) {
-			MDR_DIALECT_CHOICE (
-				error_alert("getting a message",error);,
-				error_alert("新しいメッセージヲ取得中にエラーが発生しました",error);
-			);
-		}
-		return B_MAIL_END_FETCH;
-	}
-
-	runner->RegisterMessageCallback(new ManifestAdder(manifest, &uids_on_disk, io_uid));
-	runner->RegisterMessageCallback(new MessageDeletion(this, io_uid, io_entry, !settings->FindBool("leave_mail_on_server")));
-
-	return B_OK;
-}
-
-void BMailProtocol::CheckForDeletedMessages() {
-	{
-		//---Delete things from the manifest no longer on the server
-		BStringList temp;
-		manifest->NotThere(*unique_ids, &temp);
-		(*manifest) -= temp;
-	}
-
-	if (((settings->FindBool("delete_remote_when_local")) || !(settings->FindBool("leave_mail_on_server"))) && (manifest->CountItems() > 0)) {
-		BStringList to_delete;
-
-		if (uids_on_disk == NULL) {
-			BStringList query_contents;
-			BVolumeRoster volumes;
-			BVolume volume;
-
-			while (volumes.GetNextVolume(&volume) == B_OK) {
-				BQuery fido;
-				entry_ref entry;
-
-				fido.SetVolume(&volume);
-				fido.PushAttr("MAIL:chain");
-				fido.PushInt32(settings->FindInt32("chain"));
-				fido.PushOp(B_EQ);
-				fido.PushAttr("MAIL:pending_chain");
-				fido.PushInt32(settings->FindInt32("chain"));
-				fido.PushOp(B_EQ);
-				fido.PushOp(B_OR);
-				fido.Fetch();
-
-				BString uid;
-				while (fido.GetNextRef(&entry) == B_OK) {
-					BNode(&entry).ReadAttrString("MAIL:unique_id",&uid);
-					query_contents.AddItem(uid.String());
-				}
-			}
-
-			query_contents.NotHere(*manifest,&to_delete);
-		} else {
-			uids_on_disk->NotHere(*manifest,&to_delete);
-			delete uids_on_disk;
-			uids_on_disk = NULL;
-		}
-
-		for (int32 i = 0; i < to_delete.CountItems(); i++)
-			DeleteMessage(to_delete[i]);
-
-		//*(unique_ids) -= to_delete; --- This line causes bad things to
-		// happen (POP3 client uses the wrong indices to retrieve
-		// messages).  Without it, bad things don't happen.
-		*(manifest) -= to_delete;
-	}
-}
-
-void BMailProtocol::_ReservedProtocol1() {}
-void BMailProtocol::_ReservedProtocol2() {}
-void BMailProtocol::_ReservedProtocol3() {}
-void BMailProtocol::_ReservedProtocol4() {}
-void BMailProtocol::_ReservedProtocol5() {}
-
-
-//	#pragma mark -
-
-
-MessageDeletion::MessageDeletion(BMailProtocol *home, const char *uid,
-	BEntry *io_entry, bool delete_anyway)
+MailFilter::MailFilter(MailProtocol& protocol, AddonSettings* settings)
 	:
-	us(home),
-	always(delete_anyway),
-	message_id(uid), entry(io_entry)
+	fMailProtocol(protocol),
+	fAddonSettings(settings)
 {
+
+}
+
+
+MailFilter::~MailFilter()
+{
+	
 }
 
 
 void
-MessageDeletion::Callback(status_t result)
+MailFilter::HeaderFetched(const entry_ref& ref, BFile* file)
 {
-	#if DEBUG
-	 printf("Deleting %s\n", message_id);
-	#endif
-	BNode node(entry);
-	BNodeInfo info(&node);
-	char type[255];
-	info.GetType(type);
-	if ((always && strcmp(B_MAIL_TYPE,type) == 0) || result == B_MAIL_DISCARD)
-		us->DeleteMessage(message_id);
+
+}
+
+
+void
+MailFilter::BodyFetched(const entry_ref& ref, BFile* file)
+{
+
+}
+
+
+void
+MailFilter::MailboxSynced(status_t status)
+{
+
+}
+
+
+void
+MailFilter::MessageReadyToSend(const entry_ref& ref, BFile* file)
+{
+
+}
+
+
+void
+MailFilter::MessageSent(const entry_ref& ref, BFile* file)
+{
+
+}
+
+
+MailProtocol::MailProtocol(BMailAccountSettings* settings)
+	:
+	fMailNotifier(NULL),
+	fProtocolThread(NULL)
+{
+	fAccountSettings = *settings;
+
+	AddFilter(new HaikuMailFormatFilter(*this, settings));
+}
+
+
+MailProtocol::~MailProtocol()
+{
+	delete fMailNotifier;
+
+	for (int i = 0; i < fFilterList.CountItems(); i++)
+		delete fFilterList.ItemAt(i);
+
+	map<entry_ref, image_id>::iterator it = fFilterImages.begin();
+	for (; it != fFilterImages.end(); it++)
+		unload_add_on(it->second);
+}
+
+
+BMailAccountSettings&
+MailProtocol::AccountSettings()
+{
+	return fAccountSettings;
+}
+
+
+void
+MailProtocol::SetProtocolThread(MailProtocolThread* protocolThread)
+{
+	if (fProtocolThread) {
+		fProtocolThread->Lock();
+		for (int i = 0; i < fHandlerList.CountItems(); i++)
+			fProtocolThread->RemoveHandler(fHandlerList.ItemAt(i));
+		fProtocolThread->Unlock();
+	}
+
+	fProtocolThread = protocolThread;
+
+	if (!fProtocolThread)
+		return;
+
+	fProtocolThread->Lock();
+	for (int i = 0; i < fHandlerList.CountItems(); i++)
+		fProtocolThread->AddHandler(fHandlerList.ItemAt(i));
+	fProtocolThread->Unlock();
+
+	AddedToLooper();
+}
+
+
+MailProtocolThread*
+MailProtocol::Looper()
+{
+	return fProtocolThread;
+}
+
+
+bool
+MailProtocol::AddHandler(BHandler* handler)
+{
+	if (!fHandlerList.AddItem(handler))
+		return false;
+	if (fProtocolThread) {
+		fProtocolThread->Lock();
+		fProtocolThread->AddHandler(handler);
+		fProtocolThread->Unlock();
+	}
+	return true;
+}
+
+
+bool
+MailProtocol::RemoveHandler(BHandler* handler)
+{
+	if (!fHandlerList.RemoveItem(handler))
+		return false;
+	if (fProtocolThread) {
+		fProtocolThread->Lock();
+		fProtocolThread->RemoveHandler(handler);
+		fProtocolThread->Unlock();
+	}
+	return true;
+}
+
+
+void
+MailProtocol::SetMailNotifier(MailNotifier* mailNotifier)
+{
+	delete fMailNotifier;
+	fMailNotifier = mailNotifier;
+}
+
+
+void
+MailProtocol::ShowError(const char* error)
+{
+	if (fMailNotifier)
+		fMailNotifier->ShowError(error);
+}
+
+
+void
+MailProtocol::ShowMessage(const char* message)
+{
+	if (fMailNotifier)
+		fMailNotifier->ShowMessage(message);
+}
+
+
+void
+MailProtocol::SetTotalItems(int32 items)
+{
+	if (fMailNotifier)
+		fMailNotifier->SetTotalItems(items);
+}
+
+
+void
+MailProtocol::SetTotalItemsSize(int32 size)
+{
+	if (fMailNotifier)
+		fMailNotifier->SetTotalItemsSize(size);
+}
+
+
+void
+MailProtocol::ReportProgress(int bytes, int messages, const char* message)
+{
+	if (fMailNotifier)
+		fMailNotifier->ReportProgress(bytes, messages, message);
+}
+
+
+void
+MailProtocol::ResetProgress(const char* message)
+{
+	if (fMailNotifier)
+		fMailNotifier->ResetProgress(message);
+}
+
+
+bool
+MailProtocol::AddFilter(MailFilter* filter)
+{
+	return fFilterList.AddItem(filter);
+}
+
+
+int32
+MailProtocol::CountFilter()
+{
+	return fFilterList.CountItems();
+}
+
+
+MailFilter*
+MailProtocol::FilterAt(int32 index)
+{
+	return fFilterList.ItemAt(index);
+}
+
+
+MailFilter*
+MailProtocol::RemoveFilter(int32 index)
+{
+	return fFilterList.RemoveItemAt(index);
+}
+
+
+bool
+MailProtocol::RemoveFilter(MailFilter* filter)
+{
+	return fFilterList.RemoveItem(filter);
+}
+
+
+void
+MailProtocol::NotifyNewMessagesToFetch(int32 nMessages)
+{
+	ResetProgress();
+	SetTotalItems(nMessages);
+}
+
+
+void
+MailProtocol::NotifyHeaderFetched(const entry_ref& ref, BFile* data)
+{
+	for (int i = 0; i < fFilterList.CountItems(); i++)
+		fFilterList.ItemAt(i)->HeaderFetched(ref, data);
+
+	ReportProgress(0, 1);
+}
+
+
+void
+MailProtocol::NotifyBodyFetched(const entry_ref& ref, BFile* data)
+{
+	for (int i = 0; i < fFilterList.CountItems(); i++)
+		fFilterList.ItemAt(i)->BodyFetched(ref, data);
+}
+
+
+void
+MailProtocol::NotifyMessageReadyToSend(const entry_ref& ref, BFile* data)
+{
+	for (int i = 0; i < fFilterList.CountItems(); i++)
+		fFilterList.ItemAt(i)->MessageReadyToSend(ref, data);
+}
+
+
+void
+MailProtocol::NotifyMessageSent(const entry_ref& ref, BFile* data)
+{
+	for (int i = 0; i < fFilterList.CountItems(); i++)
+		fFilterList.ItemAt(i)->MessageSent(ref, data);
+}
+
+
+status_t
+MailProtocol::MoveMessage(const entry_ref& ref, BDirectory& dir)
+{
+	BEntry entry(&ref);
+	return entry.MoveTo(&dir);
+}
+
+
+status_t
+MailProtocol::DeleteMessage(const entry_ref& ref)
+{
+	BEntry entry(&ref);
+	return entry.Remove();
+}
+
+
+void
+MailProtocol::FileRenamed(const entry_ref& from, const entry_ref& to)
+{
+
+}
+
+
+void
+MailProtocol::FileDeleted(const node_ref& node)
+{
+
+}
+
+
+void
+MailProtocol::LoadFilters(MailAddonSettings& settings)
+{
+	for (int i = 0; i < settings.CountFilterSettings(); i++) {
+		AddonSettings* filterSettings = settings.FilterSettingsAt(i);
+		MailFilter* filter = _LoadFilter(filterSettings);
+		if (!filter)
+			continue;
+		AddFilter(filter);
+	}
+}
+
+
+MailFilter*
+MailProtocol::_LoadFilter(AddonSettings* filterSettings)
+{
+	const entry_ref& ref = filterSettings->AddonRef();
+	map<entry_ref, image_id>::iterator it = fFilterImages.find(ref);
+	image_id image;
+	if (it != fFilterImages.end())
+		image = it->second;
+	else {
+		BEntry entry(&ref);
+		BPath path(&entry);
+		image = load_add_on(path.Path());
+	}
+	if (image < 0)
+		return NULL;
+
+	MailFilter* (*instantiate_mailfilter)(MailProtocol& protocol,
+		AddonSettings* settings);
+	if (get_image_symbol(image, "instantiate_mailfilter",
+		B_SYMBOL_TYPE_TEXT, (void **)&instantiate_mailfilter)
+			!= B_OK) {
+		unload_add_on(image);
+		return NULL;
+	}
+
+	fFilterImages[ref] = image;
+	return (*instantiate_mailfilter)(*this, filterSettings);
+}
+
+
+InboundProtocol::InboundProtocol(BMailAccountSettings* settings)
+	:
+	MailProtocol(settings)
+{
+	LoadFilters(fAccountSettings.InboundSettings());
+}
+
+
+InboundProtocol::~InboundProtocol()
+{
+	
+}
+
+
+status_t
+InboundProtocol::AppendMessage(const entry_ref& ref)
+{
+	return false;
+}
+
+
+status_t
+InboundProtocol::MarkMessageAsRead(const entry_ref& ref, bool read)
+{
+	BNode node(&ref);
+	BString statusString = (read == true) ? "Read" : "New";
+	if (node.WriteAttr("MAIL:status", B_STRING_TYPE, 0, statusString.String(),
+		statusString.Length()) < 0)
+		return B_ERROR;
+	return B_OK;
+}
+
+
+OutboundProtocol::OutboundProtocol(BMailAccountSettings* settings)
+	:
+	MailProtocol(settings)
+{
+	LoadFilters(fAccountSettings.OutboundSettings());
+}
+
+
+OutboundProtocol::~OutboundProtocol()
+{
+	
+}
+
+
+const uint32 kMsgMoveFile = '&MoF';
+const uint32 kMsgDeleteFile = '&DeF';
+const uint32 kMsgFileRenamed = '&FiR';
+const uint32 kMsgFileDeleted = '&FDe';
+const uint32 kMsgInit = '&Ini';
+
+
+MailProtocolThread::MailProtocolThread(MailProtocol* protocol)
+	:
+	fMailProtocol(protocol)
+{
+	PostMessage(kMsgInit);
+}
+
+
+void
+MailProtocolThread::SetStopNow()
+{
+	fMailProtocol->SetStopNow();
+}
+
+
+void
+MailProtocolThread::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+	case kMsgInit:
+		fMailProtocol->SetProtocolThread(this);
+		break;
+
+	case kMsgMoveFile:
+	{
+		entry_ref file;
+		message->FindRef("file", &file);
+		entry_ref dir;
+		message->FindRef("directory", &dir);
+		BDirectory directory(&dir);
+		fMailProtocol->MoveMessage(file, directory);
+		break;
+	}
+
+	case kMsgDeleteFile:
+	{
+		entry_ref file;
+		message->FindRef("file", &file);
+		fMailProtocol->DeleteMessage(file);
+		break;
+	}
+
+	case kMsgFileRenamed:
+	{
+		entry_ref from;
+		message->FindRef("from", &from);
+		entry_ref to;
+		message->FindRef("to", &to);
+		fMailProtocol->FileRenamed(from, to);
+	}
+
+	case kMsgFileDeleted:
+	{
+		node_ref node;
+		message->FindInt32("device",&node.device);
+		message->FindInt64("node", &node.node);
+		fMailProtocol->FileDeleted(node);
+	}
+
+	default:
+		BLooper::MessageReceived(message);
+	}
+}
+
+
+void
+MailProtocolThread::TriggerFileMove(const entry_ref& ref, BDirectory& dir)
+{
+	BMessage message(kMsgMoveFile);
+	message.AddRef("file", &ref);
+	BEntry entry;
+	dir.GetEntry(&entry);
+	entry_ref dirRef;
+	entry.GetRef(&dirRef);
+	message.AddRef("directory", &dirRef);
+	PostMessage(&message);
+}
+
+
+void
+MailProtocolThread::TriggerFileDeletion(const entry_ref& ref)
+{
+	BMessage message(kMsgDeleteFile);
+	message.AddRef("file", &ref);
+	PostMessage(&message);
+}
+
+
+void
+MailProtocolThread::TriggerFileRenamed(const entry_ref& from,
+	const entry_ref& to)
+{
+	BMessage message(kMsgFileRenamed);
+	message.AddRef("from", &from);
+	message.AddRef("to", &to);
+	PostMessage(&message);
+}
+
+
+void
+MailProtocolThread::TriggerFileDeleted(const node_ref& node)
+{
+	BMessage message(kMsgFileDeleted);
+	message.AddInt32("device", node.device);
+	message.AddInt64("node", node.node);
+	PostMessage(&message);
+}
+
+
+const uint32 kMsgSyncMessages = '&SyM';
+const uint32 kMsgFetchBody = '&FeB';
+const uint32 kMsgMarkMessageAsRead = '&MaR';
+const uint32 kMsgDeleteMessage = '&DeM';
+const uint32 kMsgAppendMessage = '&ApM';
+
+
+InboundProtocolThread::InboundProtocolThread(InboundProtocol* protocol)
+	:
+	MailProtocolThread(protocol),
+	fProtocol(protocol)
+{
+
+}
+
+
+InboundProtocolThread::~InboundProtocolThread()
+{
+	fProtocol->SetProtocolThread(NULL);
+}
+
+
+void
+InboundProtocolThread::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+	case kMsgSyncMessages:
+	{
+		status_t status = fProtocol->SyncMessages();
+		_NotiyMailboxSynced(status);
+		break;
+	}
+
+	case kMsgFetchBody:
+	{
+		entry_ref ref;
+		message->FindRef("ref", &ref);
+		status_t status = fProtocol->FetchBody(ref);
+		if (status != B_OK || !message->FindBool("launch"))
+			break;
+		BMessage argv(B_ARGV_RECEIVED);
+		BPath path(&ref);
+		argv.AddString("argv", "E-mail");
+		argv.AddString("argv", path.Path());
+		argv.AddInt32("argc", 2);
+		be_roster->Launch("text/x-email", &argv);
+		break;
+	}
+
+	case kMsgMarkMessageAsRead:
+	{
+		entry_ref ref;
+		message->FindRef("ref", &ref);
+		bool read = message->FindBool("read");
+		fProtocol->MarkMessageAsRead(ref, read);
+		break;
+	}
+
+	case kMsgDeleteMessage:
+	{
+		entry_ref ref;
+		message->FindRef("ref", &ref);
+		fProtocol->DeleteMessage(ref);
+		break;
+	}
+
+	case kMsgAppendMessage:
+	{
+		entry_ref ref;
+		message->FindRef("ref", &ref);
+		fProtocol->AppendMessage(ref);
+		break;
+	}
+
+	default:
+		MailProtocolThread::MessageReceived(message);
+	}
+}
+
+
+void
+InboundProtocolThread::SyncMessages()
+{
+	PostMessage(kMsgSyncMessages);
+}
+
+
+void
+InboundProtocolThread::FetchBody(const entry_ref& ref, bool launch)
+{
+	BMessage message(kMsgFetchBody);
+	message.AddRef("ref", &ref);
+	message.AddBool("launch", launch);
+	PostMessage(&message);
+}
+
+
+void
+InboundProtocolThread::MarkMessageAsRead(const entry_ref& ref, bool read)
+{
+	BMessage message(kMsgMarkMessageAsRead);
+	message.AddRef("ref", &ref);
+	message.AddBool("read", read);
+	PostMessage(&message);
+}
+
+
+void
+InboundProtocolThread::DeleteMessage(const entry_ref& ref)
+{
+	BMessage message(kMsgDeleteMessage);
+	message.AddRef("ref", &ref);
+	PostMessage(&message);
+}
+
+
+void
+InboundProtocolThread::AppendMessage(const entry_ref& ref)
+{
+	BMessage message(kMsgAppendMessage);
+	message.AddRef("ref", &ref);
+	PostMessage(&message);
+}
+
+
+void
+InboundProtocolThread::_NotiyMailboxSynced(status_t status)
+{
+	for (int i = 0; i < fProtocol->CountFilter(); i++)
+		fProtocol->FilterAt(i)->MailboxSynced(status);
+}
+
+
+const uint32 kMsgSendMessage = '&SeM';
+
+
+OutboundProtocolThread::OutboundProtocolThread(OutboundProtocol* protocol)
+	:
+	MailProtocolThread(protocol),
+	fProtocol(protocol)
+{
+
+}
+
+
+OutboundProtocolThread::~OutboundProtocolThread()
+{
+	fProtocol->SetProtocolThread(NULL);
+}
+
+
+void
+OutboundProtocolThread::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+	case kMsgSendMessage:
+	{
+		std::vector<entry_ref> mails;
+		for (int32 i = 0; ;i++) {
+			entry_ref ref;
+			if (message->FindRef("ref", i, &ref) != B_OK)
+				break;
+			mails.push_back(ref);
+		}
+		size_t size = message->FindInt32("size");
+		fProtocol->SendMessages(mails, size);
+		break;
+	}
+
+	default:
+		MailProtocolThread::MessageReceived(message);
+	}
+}
+
+
+void
+OutboundProtocolThread::SendMessages(const std::vector<entry_ref>& mails,
+	size_t totalBytes)
+{
+	BMessage message(kMsgSendMessage);
+	for (unsigned int i = 0; i < mails.size(); i++)
+		message.AddRef("ref", &mails[i]);
+	message.AddInt32("size", totalBytes);
+	PostMessage(&message);
 }

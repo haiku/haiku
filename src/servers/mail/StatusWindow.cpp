@@ -9,7 +9,8 @@
 //! The status window while fetching/sending mails
 
 
-#include "status.h"
+#include "StatusWindow.h"
+
 #include "MailSettings.h"
 
 #include <MDRLanguage.h>
@@ -36,9 +37,10 @@
 static BLocker sLock;
 
 
-BMailStatusWindow::BMailStatusWindow(BRect rect, const char *name,
+MailStatusWindow::MailStatusWindow(BRect rect, const char *name,
 		uint32 showMode)
-	: BWindow(rect, name, B_MODAL_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
+	:
+	BWindow(rect, name, B_MODAL_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 		B_NOT_CLOSABLE | B_NO_WORKSPACE_ACTIVATION | B_NOT_V_RESIZABLE
 			| B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_AVOID_FRONT),
 	fShowMode(showMode),
@@ -118,10 +120,8 @@ BMailStatusWindow::BMailStatusWindow(BRect rect, const char *name,
 	fFrame = Frame();
 
 	BPath path;
-	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
+	status_t status = BMailAccounts::AccountsPath(path);
 	if (status == B_OK) {
-		path.Append("Mail/chains/inbound");
-		create_directory(path.Path(), 0755);
 		BDirectory chainDirectory(path.Path());
 		if (chainDirectory.GetNodeRef(&fChainDirectory) == B_OK) {
 			// Watch this directory for changes
@@ -137,10 +137,10 @@ BMailStatusWindow::BMailStatusWindow(BRect rect, const char *name,
 }
 
 
-BMailStatusWindow::~BMailStatusWindow()
+MailStatusWindow::~MailStatusWindow()
 {
 	// remove all status_views, so we don't accidentally delete them
-	while (BMailStatusView *status_view = (BMailStatusView *)fStatusViews.RemoveItem(0L))
+	while (MailStatusView *status_view = (MailStatusView *)fStatusViews.RemoveItem(0L))
 		RemoveView(status_view);
 
 	BMailSettings general;
@@ -157,19 +157,23 @@ BMailStatusWindow::~BMailStatusWindow()
 
 //! Activate the "Check Now" button only if there are inbound accounts
 void
-BMailStatusWindow::_CheckChains()
+MailStatusWindow::_CheckChains()
 {
-	BDirectory directory(&fChainDirectory);
+	bool hasInbound = false;
+	BMailAccounts accounts;
+	for (int32 i = 0; i < accounts.CountAccounts(); i++) {
+		if (accounts.AccountAt(i)->HasInbound()) {
+			hasInbound = true;
+			break;
+		}
+	}
 
-	entry_ref ref;
-	bool isEmpty = directory.GetNextRef(&ref) != B_OK;
-
-	fCheckNowButton->SetEnabled(!isEmpty);
+	fCheckNowButton->SetEnabled(hasInbound);
 }
 
 
 void
-BMailStatusWindow::FrameMoved(BPoint /*origin*/)
+MailStatusWindow::FrameMoved(BPoint /*origin*/)
 {
 	if (fLastWorkspace == current_workspace())
 		fFrame = Frame();
@@ -177,7 +181,7 @@ BMailStatusWindow::FrameMoved(BPoint /*origin*/)
 
 
 void
-BMailStatusWindow::WorkspaceActivated(int32 workspace, bool active)
+MailStatusWindow::WorkspaceActivated(int32 workspace, bool active)
 {
 	if (!active)
 		return;
@@ -195,7 +199,7 @@ BMailStatusWindow::WorkspaceActivated(int32 workspace, bool active)
 
 
 void
-BMailStatusWindow::MessageReceived(BMessage *msg)
+MailStatusWindow::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
 		case 'lkch':
@@ -232,7 +236,7 @@ BMailStatusWindow::MessageReceived(BMessage *msg)
 
 
 void
-BMailStatusWindow::SetDefaultMessage(const BString &message)
+MailStatusWindow::SetDefaultMessage(const BString &message)
 {
 	if (Lock()) {
 		fMessageView->SetText(message.String());
@@ -241,8 +245,8 @@ BMailStatusWindow::SetDefaultMessage(const BString &message)
 }
 
 
-BMailStatusView *
-BMailStatusWindow::NewStatusView(const char *description, bool upstream)
+MailStatusView *
+MailStatusWindow::NewStatusView(const char *description, bool upstream)
 {
 	if (!Lock())
 		return NULL;
@@ -250,7 +254,7 @@ BMailStatusWindow::NewStatusView(const char *description, bool upstream)
 	BRect rect = Bounds();
 	rect.top = fStatusViews.CountItems() * (fMinHeight + 1);
 	rect.bottom = rect.top + fMinHeight;
-	BMailStatusView *status = new BMailStatusView(rect, description, upstream);
+	MailStatusView *status = new MailStatusView(rect, description, upstream);
 	status->window = this;
 
 	Unlock();
@@ -259,7 +263,7 @@ BMailStatusWindow::NewStatusView(const char *description, bool upstream)
 
 
 void
-BMailStatusWindow::ActuallyAddStatusView(BMailStatusView *status)
+MailStatusWindow::ActuallyAddStatusView(MailStatusView *status)
 {
 	if (!Lock())
 		return;
@@ -307,7 +311,7 @@ BMailStatusWindow::ActuallyAddStatusView(BMailStatusView *status)
 
 
 void
-BMailStatusWindow::RemoveView(BMailStatusView *view)
+MailStatusWindow::RemoveView(MailStatusView *view)
 {
 	if (!view || !Lock())
 		return;
@@ -324,7 +328,7 @@ BMailStatusWindow::RemoveView(BMailStatusView *view)
 
 	fStatusViews.RemoveItem((void *)view);
 	if (RemoveChild(view)) {
-		while ((view = (BMailStatusView *)fStatusViews.ItemAt(i++)) != NULL)
+		while ((view = (MailStatusView *)fStatusViews.ItemAt(i++)) != NULL)
 			view->MoveBy(0, -fMinHeight - 1);
 
 		// the view will be deleted in the ChainRunner
@@ -360,14 +364,14 @@ BMailStatusWindow::RemoveView(BMailStatusView *view)
 
 
 int32
-BMailStatusWindow::CountVisibleItems()
+MailStatusWindow::CountVisibleItems()
 {
 	if (fShowMode != B_MAIL_SHOW_STATUS_WINDOW_WHEN_SENDING)
 		return fStatusViews.CountItems();
 
 	int32 count = 0;
 	for (int32 i = fStatusViews.CountItems(); i-- > 0;) {
-		BMailStatusView *view = (BMailStatusView *)fStatusViews.ItemAt(i);
+		MailStatusView *view = (MailStatusView *)fStatusViews.ItemAt(i);
 		if (view->is_upstream)
 			count++;
 	}
@@ -376,14 +380,14 @@ BMailStatusWindow::CountVisibleItems()
 
 
 bool
-BMailStatusWindow::HasItems(void)
+MailStatusWindow::HasItems(void)
 {
 	return CountVisibleItems() > 0;
 }
 
 
 void
-BMailStatusWindow::SetShowCriterion(uint32 when)
+MailStatusWindow::SetShowCriterion(uint32 when)
 {
 	if (!Lock())
 		return;
@@ -403,7 +407,7 @@ BMailStatusWindow::SetShowCriterion(uint32 when)
 
 
 void
-BMailStatusWindow::SetBorderStyle(int32 look)
+MailStatusWindow::SetBorderStyle(int32 look)
 {
 	switch (look) {
 		case B_MAIL_STATUS_LOOK_TITLED:
@@ -429,12 +433,12 @@ BMailStatusWindow::SetBorderStyle(int32 look)
 //	#pragma mark -
 //------------------------------------------------
 //
-// BMailStatusView
+// MailStatusView
 //
 //------------------------------------------------
 
 
-BMailStatusView::BMailStatusView(BRect rect, const char *description,bool upstream)
+MailStatusView::MailStatusView(BRect rect, const char *description,bool upstream)
 		  : BBox(rect, description, B_FOLLOW_LEFT_RIGHT,
 		  		 B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP,
 		  		 B_PLAIN_BORDER)
@@ -454,16 +458,18 @@ BMailStatusView::BMailStatusView(BRect rect, const char *description,bool upstre
 	total_items = 0;
 	pre_text[0] = 0;
 	is_upstream = upstream;
+
+	by_bytes = false;
 }
 
 
-BMailStatusView::~BMailStatusView()
+MailStatusView::~MailStatusView()
 {
 }
 
 
 void
-BMailStatusView::AddProgress(int32 how_much)
+MailStatusView::AddProgress(int32 how_much)
 {
 	AddSelfToWindow();
 
@@ -484,7 +490,7 @@ BMailStatusView::AddProgress(int32 how_much)
 
 
 void
-BMailStatusView::SetMessage(const char *msg)
+MailStatusView::SetMessage(const char *msg)
 {
 	AddSelfToWindow();
 
@@ -496,31 +502,34 @@ BMailStatusView::SetMessage(const char *msg)
 
 
 void
-BMailStatusView::Reset(bool hide)
+MailStatusView::Reset(bool hide)
 {
-	if (LockLooper()) {
-		char old[255];
-		if ((pre_text[0] == 0) && !hide)
-			strcpy(pre_text, status->TrailingText());
-		if (hide)
-			pre_text[0] = 0;
+	if (!LockLooper())
+		return;
 
-		strcpy(old,status->Label());
-		status->Reset(old);
-		status->SetTrailingText(pre_text);
-		status->Draw(status->Bounds());
+	char old[255];
+	if ((pre_text[0] == 0) && !hide)
+		strcpy(pre_text, status->TrailingText());
+	if (hide)
 		pre_text[0] = 0;
-		total_items = 0;
-		items_now = 0;
-		UnlockLooper();
-	}
+
+	strcpy(old,status->Label());
+	status->Reset(old);
+	status->SetTrailingText(pre_text);
+	status->Draw(status->Bounds());
+	pre_text[0] = 0;
+	total_items = 0;
+	items_now = 0;
+
+	UnlockLooper();
+
 	if (hide && Window())
 		window->RemoveView(this);
 }
 
 
 void
-BMailStatusView::SetMaximum(int32 max_bytes)
+MailStatusView::SetMaximum(int32 max_bytes)
 {
 	AddSelfToWindow();
 
@@ -538,22 +547,24 @@ BMailStatusView::SetMaximum(int32 max_bytes)
 
 
 void
-BMailStatusView::SetTotalItems(int32 items)
+MailStatusView::SetTotalItems(int32 items)
 {
 	AddSelfToWindow();
 	total_items = items;
+	if (!by_bytes)
+		SetMaximum(-1);
 }
 
 
 int32
-BMailStatusView::CountTotalItems()
+MailStatusView::CountTotalItems()
 {
 	return total_items;
 }
 
 
 void
-BMailStatusView::AddItem(void)
+MailStatusView::AddItem(void)
 {
 	AddSelfToWindow();
 	items_now++;
@@ -564,7 +575,7 @@ BMailStatusView::AddItem(void)
 
 
 void
-BMailStatusView::AddSelfToWindow()
+MailStatusView::AddSelfToWindow()
 {
 	if (Window() != NULL)
 		return;

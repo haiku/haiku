@@ -145,7 +145,7 @@ BMailFileConfigView::BMailFileConfigView(const char *label,const char *name,bool
 }
 
 
-void BMailFileConfigView::SetTo(BMessage *archive, BMessage *meta)
+void BMailFileConfigView::SetTo(const BMessage *archive, BMessage *meta)
 {
 	fMeta = meta;
 	BString path = (fUseMeta ? meta : archive)->FindString(fName);

@@ -24,6 +24,89 @@ class _EXPORT BMailProtocolConfigView;
 #include "ProtocolConfigView.h"
 
 
+const char* kPartialDownloadLimit = "partial_download_limit";
+
+
+BodyDownloadConfig::BodyDownloadConfig()
+	:
+	BView(BRect(0,0,50,50), "body_config", B_FOLLOW_ALL_SIDES, 0)
+{
+	const char *partial_text = MDR_DIALECT_CHOICE (
+		"Partially download messages larger than",
+		"部分ダウンロードする");
+
+	BRect r(0, 0, 280, 15);
+	fPartialBox = new BCheckBox(r, "size_if", partial_text,
+		new BMessage('SIZF'));
+	fPartialBox->ResizeToPreferred();
+
+	r = fPartialBox->Frame();
+	r.OffsetBy(17,r.Height() + 1);
+	r.right = r.left + be_plain_font->StringWidth("0000") + 10;
+	fSizeBox = new BTextControl(r, "size", "", "", NULL);
+
+	r.OffsetBy(r.Width() + 5,0);
+	fBytesLabel = new BStringView(r, "kb", "KB");
+	AddChild(fBytesLabel);
+	fSizeBox->SetDivider(0);
+
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	AddChild(fPartialBox);
+	AddChild(fSizeBox);
+	ResizeToPreferred();
+}
+
+
+void
+BodyDownloadConfig::SetTo(MailAddonSettings& addonSettings)
+{
+	const BMessage* settings = &addonSettings.Settings();
+
+	if (settings->HasInt32(kPartialDownloadLimit)) {
+		BString kb;
+		kb << int32(settings->FindInt32(kPartialDownloadLimit)/1024);
+		fSizeBox->SetText(kb.String());
+		fPartialBox->SetValue(B_CONTROL_ON);
+	} else
+		fSizeBox->SetEnabled(true);
+}
+
+
+void
+BodyDownloadConfig::MessageReceived(BMessage *msg)
+{
+	if (msg->what != 'SIZF')
+		return BView::MessageReceived(msg);
+	fSizeBox->SetEnabled(fPartialBox->Value());
+}
+
+
+void
+BodyDownloadConfig::AttachedToWindow()
+{
+	fPartialBox->SetTarget(this);
+	fPartialBox->ResizeToPreferred();
+}
+
+
+void
+BodyDownloadConfig::GetPreferredSize(float *width, float *height)
+{
+	*height = fSizeBox->Frame().bottom + 5;
+	*width = 200;
+}
+
+
+status_t
+BodyDownloadConfig::Archive(BMessage* into, bool) const
+{
+	into->RemoveName(kPartialDownloadLimit);
+	if (fPartialBox->Value())
+		into->AddInt32(kPartialDownloadLimit, atoi(fSizeBox->Text()) * 1024);
+	return B_OK;
+}
+
+
 namespace {
 
 //--------------------Support functions and #defines---------------
@@ -48,7 +131,7 @@ TextControl(BView *parent,const char *name)
 
 
 BTextControl *
-AddTextField (BRect &rect, const char *name, const char *label) 
+AddTextField(BRect &rect, const char *name, const char *label) 
 {
 	BTextControl *text_control = new BTextControl(rect,name,label,"",NULL,B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 //	text_control->SetDivider(be_plain_font->StringWidth(label));
@@ -104,7 +187,9 @@ FindWidestLabel(BView *view)
 //----------------Real code----------------------
 BMailProtocolConfigView::BMailProtocolConfigView(uint32 options_mask) 
 	:
-	BView (BRect(0,0,100,20), "protocol_config_view", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW) 
+	BView (BRect(0,0,100,20), "protocol_config_view", B_FOLLOW_LEFT
+		| B_FOLLOW_TOP, B_WILL_DRAW),
+	fBodyDownloadConfig(NULL)
 {
 	BRect rect(5,5,245,25);
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -147,6 +232,12 @@ BMailProtocolConfigView::BMailProtocolConfigView(uint32 options_mask)
 		AddChild(box);
 	}
 
+	if (options_mask & B_MAIL_PROTOCOL_PARTIAL_DOWNLOAD) {
+		fBodyDownloadConfig = new BodyDownloadConfig();
+		fBodyDownloadConfig->MoveBy(0, rect.bottom + 5);
+		AddChild(fBodyDownloadConfig);
+	}
+
 	// resize views
 	float height;
 	GetPreferredSize(&width,&height);		
@@ -165,21 +256,23 @@ BMailProtocolConfigView::~BMailProtocolConfigView()
 
 
 void 
-BMailProtocolConfigView::SetTo(BMessage *archive) 
+BMailProtocolConfigView::SetTo(MailAddonSettings& settings)
 {
+ 	const BMessage* archive = &settings.Settings();
+
 	BString host = archive->FindString("server");
 	if (archive->HasInt32("port"))
 		host << ':' << archive->FindInt32("port");
 
-	SetTextControl(this,"host",host.String());
-	SetTextControl(this,"user",archive->FindString("username"));
+	SetTextControl(this,"host", host.String());
+	SetTextControl(this,"user", archive->FindString("username"));
 
-	char *password = get_passwd(archive,"cpasswd");
+	char *password = get_passwd(archive, "cpasswd");
 	if (password) {
-		SetTextControl(this,"pass",password);
+		SetTextControl(this,"pass", password);
 		delete[] password;
 	} else
-		SetTextControl(this,"pass",archive->FindString("password"));
+		SetTextControl(this,"pass", archive->FindString("password"));
 	
 	if (archive->HasInt32("flavor")) {
 		BMenuField *menu = (BMenuField *)(FindView("flavor"));
@@ -216,6 +309,9 @@ BMailProtocolConfigView::SetTo(BMessage *archive)
 		else
 			box->SetEnabled(false);
 	}
+
+	if (fBodyDownloadConfig)
+		fBodyDownloadConfig->SetTo(settings);
 }
 
 
@@ -286,7 +382,7 @@ BMailProtocolConfigView::MessageReceived(BMessage *msg)
 
 
 status_t 
-BMailProtocolConfigView::Archive(BMessage *into, bool) const 
+BMailProtocolConfigView::Archive(BMessage *into, bool deep) const 
 {
 	const char *host = TextControl((BView *)this,"host");
 	int32 port = -1;
@@ -348,7 +444,9 @@ BMailProtocolConfigView::Archive(BMessage *into, bool) const
 		if (into->ReplaceBool("delete_remote_when_local",false) != B_OK)
 			into->AddBool("delete_remote_when_local",false);
 	}
-		
+
+	if (fBodyDownloadConfig)
+		fBodyDownloadConfig->Archive(into, deep);
 	return B_OK;
 }
 
@@ -365,5 +463,11 @@ BMailProtocolConfigView::GetPreferredSize(float *width, float *height)
 		minWidth = 250;
 	*width = minWidth + 10;
 	*height = (CountChildren() * sItemHeight) + 5;
+
+	if (fBodyDownloadConfig) {
+		float bodyW, bodyH;
+		fBodyDownloadConfig->GetPreferredSize(&bodyW, &bodyH);
+		*height+= bodyH;
+	}
 }
 

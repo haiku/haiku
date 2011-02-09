@@ -17,8 +17,12 @@ AddResources mail_daemon : mail_daemon.rdef DeskbarViewIcons.rdef ;
 
 Server mail_daemon :
 	DeskbarView.cpp
+	ErrorLogWindow.cpp
 	LEDAnimation.cpp
+	MailDaemon.cpp
 	main.cpp
+	Notifier.cpp
+	StatusWindow.cpp
 ;
 
 LinkAgainst mail_daemon : be libmail.so tracker $(TARGET_LIBSTDC++) $(TARGET_NETWORK_LIBS) ;

@@ -72,6 +72,8 @@ ssize_t readfoldedline(BPositionIO &in, char **buffer, size_t *buflen);
 //   start with a buffer of size *buflen
 
 status_t parse_header(BMessage &headers, BPositionIO &input);
+status_t extract_from_header(const BString& header, const BString& field,
+	BString& target);
 
 void extract_address(BString &address);
 	// retrieves the mail address only from an address header formatted field

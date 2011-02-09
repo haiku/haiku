@@ -25,117 +25,9 @@
 #include <stdlib.h>
 
 
-class BMailSettings;
-
 namespace MailInternal {
 	status_t WriteMessageFile(const BMessage& archive, const BPath& path,
 		const char* name);
-}
-
-
-//	#pragma mark - Chain methods
-
-
-// TODO!
-BMailChain*
-NewMailChain()
-{
-	// attempted solution: use time(NULL) and hope it's unique. Is there a better idea?
-	// note that two chains in two second is quite possible. how to fix this?
-	// maybe we could | in some bigtime_t as well. hrrm...
-
-	// This is to fix a problem with generating the correct id for chains.
-	// Basically if the chains dir does not exist, the first time you create
-	// an account both the inbound and outbound chains will be called 0.
-	create_directory("/boot/home/config/settings/Mail/chains",0777);	
-
-	BPath path;
-	find_directory(B_USER_SETTINGS_DIRECTORY, &path);
-	path.Append("Mail/chains");
-	BDirectory chain_dir(path.Path());
-	BDirectory outbound_dir(&chain_dir,"outbound"), inbound_dir(&chain_dir,"inbound");
-
-	// TODO(bga): A better way to do all this anyway is to write the chain
-	// information to the settings message (a new field would be added).
-
-	// Lock Chain directory to avoid concurrent access.
-        chain_dir.Lock();
-
-	int32 id = -1; //-----When inc'ed, we start with 0----
-	chain_dir.ReadAttr("last_issued_chain_id",B_INT32_TYPE,0,&id,sizeof(id));
-
-	BString string_id;
-
-	do {
-		id++;
-		string_id = "";
-		string_id << id;
-	} while ((outbound_dir.Contains(string_id.String()))
-		|| (inbound_dir.Contains(string_id.String())));
-
-	chain_dir.WriteAttr("last_issued_chain_id",B_INT32_TYPE,0,&id,sizeof(id));
-
-	return new BMailChain(id);
-}
-
-
-BMailChain*
-GetMailChain(uint32 id)
-{
-	return new BMailChain(id);
-}
-
-
-status_t
-GetInboundMailChains(BList *list)
-{
-	BPath path;
-	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
-	if (status != B_OK) {
-		fprintf(stderr, "Couldn't find user settings directory: %s\n",
-			strerror(status));
-		return status;
-	}
-
-	path.Append("Mail/chains/inbound");
-	BDirectory chainDirectory(path.Path());
-	entry_ref ref;
-
-	while (chainDirectory.GetNextRef(&ref) == B_OK) {
-		char *end;
-		uint32 id = strtoul(ref.name, &end, 10);
-
-		if (!end || *end == '\0')
-			list->AddItem((void*)new BMailChain(id));
-	}
-
-	return B_OK;
-}
-
-
-status_t
-GetOutboundMailChains(BList *list)
-{
-	BPath path;
-	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
-	if (status != B_OK) {
-		fprintf(stderr, "Couldn't find user settings directory: %s\n",
-			strerror(status));
-		return status;
-	}
-
-	path.Append("Mail/chains/outbound");
-	BDirectory chainDirectory(path.Path());
-	entry_ref ref;
-
-	while (chainDirectory.GetNextRef(&ref) == B_OK) {
-		char *end;
-		uint32 id = strtoul(ref.name, &end, 10);
-		if (!end || *end == '\0')
-			list->AddItem((void*)new BMailChain(id));
-	}
-
-	return B_OK;
 }
 
 
@@ -398,16 +290,555 @@ BMailSettings::SetSendOnlyIfPPPUp(bool yes)
 }
 
 
-uint32
-BMailSettings::DefaultOutboundChainID()
+int32
+BMailSettings::DefaultOutboundAccount()
 {
-	return fData.FindInt32("DefaultOutboundChainID");
+	return fData.FindInt32("DefaultOutboundAccount");
 }
 
 
 void
-BMailSettings::SetDefaultOutboundChainID(uint32 to)
+BMailSettings::SetDefaultOutboundAccount(int32 to)
 {
-	if (fData.ReplaceInt32("DefaultOutboundChainID",to))
-		fData.AddInt32("DefaultOutboundChainID",to);
+	if (fData.ReplaceInt32("DefaultOutboundAccount",to))
+		fData.AddInt32("DefaultOutboundAccount",to);
+}
+
+
+BMailAccounts::BMailAccounts()
+{
+	BPath path;
+	status_t status = AccountsPath(path);
+	if (status != B_OK)
+		return;
+
+	BDirectory dir(path.Path());
+	if (dir.InitCheck() != B_OK)
+		return;
+	BEntry entry;
+	while (dir.GetNextEntry(&entry) != B_ENTRY_NOT_FOUND) {
+		BMailAccountSettings* account = new BMailAccountSettings(entry);
+		if (account->InitCheck() != B_OK)
+			continue;
+		fAccounts.AddItem(account);
+	}
+}
+
+
+status_t
+BMailAccounts::AccountsPath(BPath& path)
+{
+	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
+	if (status != B_OK)
+		return status;
+	return path.Append("Mail/accounts");
+}
+
+
+BMailAccounts::~BMailAccounts()
+{
+	for (int i = 0; i < fAccounts.CountItems(); i++)
+		delete fAccounts.ItemAt(i);
+}
+
+
+int32
+BMailAccounts::CountAccounts()
+{
+	return fAccounts.CountItems();
+}
+
+
+BMailAccountSettings*
+BMailAccounts::AccountAt(int32 index)
+{
+	return fAccounts.ItemAt(index);
+}
+
+
+BMailAccountSettings*
+BMailAccounts::AccountByID(int32 id)
+{
+	for (int i = 0; i < fAccounts.CountItems(); i++) {
+		BMailAccountSettings* account = fAccounts.ItemAt(i);
+		if (account->AccountID() == id)
+			return account;
+	}
+	return NULL;
+}
+
+
+BMailAccountSettings*
+BMailAccounts::AccountByName(const char* name)
+{
+	for (int i = 0; i < fAccounts.CountItems(); i++) {
+		BMailAccountSettings* account = fAccounts.ItemAt(i);
+		if (strcmp(account->Name(), name) == 0)
+			return account;
+	}
+	return NULL;
+}
+
+
+using std::vector;
+
+
+AddonSettings::AddonSettings()
+	:
+	fModified(false)
+{
+
+}
+
+
+bool
+AddonSettings::Load(const BMessage& message)
+{
+	if (message.FindRef("ref", &fAddonRef) != B_OK)
+		return false;
+	if (message.FindMessage("settings", &fSettings) != B_OK)
+		return false;
+	fModified = false;
+	return true;
+}
+
+
+bool
+AddonSettings::Save(BMessage& message)
+{
+	message.AddRef("ref", &fAddonRef);
+	message.AddMessage("settings", &fSettings);
+	fModified = false;
+	return true;
+}
+
+
+void
+AddonSettings::SetAddonRef(const entry_ref& ref)
+{
+	fAddonRef = ref;
+}
+
+
+const entry_ref&
+AddonSettings::AddonRef() const
+{
+	return fAddonRef;
+}
+
+
+const BMessage&
+AddonSettings::Settings() const
+{
+	return fSettings;
+}
+
+
+BMessage&
+AddonSettings::EditSettings()
+{
+	fModified = true;
+	return fSettings;
+}
+
+
+bool
+AddonSettings::HasBeenModified()
+{
+	return fModified;
+}
+
+
+bool
+MailAddonSettings::Load(const BMessage& message)
+{
+	if (!AddonSettings::Load(message))
+		return false;
+
+	type_code typeFound;
+	int32 countFound;
+	message.GetInfo("filters", &typeFound, &countFound);
+	if (typeFound != B_MESSAGE_TYPE)
+		return false;
+
+	for (int i = 0; i < countFound; i++) {
+		int32 index = AddFilterSettings();
+		AddonSettings& filterSettings = fFiltersSettings[index];
+		BMessage filterMessage;
+		message.FindMessage("filters", i, &filterMessage);
+		if (!filterSettings.Load(filterMessage))
+			RemoveFilterSettings(index);
+	}
+	return true;
+}
+
+
+bool
+MailAddonSettings::Save(BMessage& message)
+{
+	if (!AddonSettings::Save(message))
+		return false;
+
+	for (int i = 0; i < CountFilterSettings(); i++) {
+		BMessage filter;
+		AddonSettings& filterSettings = fFiltersSettings[i];
+		filterSettings.Save(filter);
+		message.AddMessage("filters", &filter);
+	}
+	return true;
+}
+
+
+int32
+MailAddonSettings::CountFilterSettings()
+{
+	return fFiltersSettings.size();
+}
+
+
+int32
+MailAddonSettings::AddFilterSettings(const entry_ref* ref)
+{
+	AddonSettings filterSettings;
+	if (ref != NULL)
+		filterSettings.SetAddonRef(*ref);
+	fFiltersSettings.push_back(filterSettings);
+	return fFiltersSettings.size() - 1;
+}
+
+
+bool
+MailAddonSettings::RemoveFilterSettings(int32 index)
+{
+	fFiltersSettings.erase(fFiltersSettings.begin() + index);
+	return true;
+}
+
+
+bool
+MailAddonSettings::MoveFilterSettings(int32 from, int32 to)
+{
+	if (from < 0 || from >= (int32)fFiltersSettings.size() || to < 0
+		|| to >= (int32)fFiltersSettings.size())
+		return false;
+	AddonSettings fromSettings = fFiltersSettings[from];
+	fFiltersSettings.erase(fFiltersSettings.begin() + from);
+	if (to == (int32)fFiltersSettings.size())
+		fFiltersSettings.push_back(fromSettings);
+	else {
+		std::vector<AddonSettings>::iterator it = fFiltersSettings.begin() + to;
+		fFiltersSettings.insert(it, fromSettings);
+	}
+	return true;
+}
+
+
+AddonSettings*
+MailAddonSettings::FilterSettingsAt(int32 index)
+{
+	if (index < 0 || index >= (int32)fFiltersSettings.size())
+		return NULL;
+	return &fFiltersSettings[index];
+}
+
+
+bool
+MailAddonSettings::HasBeenModified()
+{
+	if (AddonSettings::HasBeenModified())
+		return true;
+	for (unsigned int i = 0; i < fFiltersSettings.size(); i++) {
+		if (fFiltersSettings[i].HasBeenModified())
+			return true;
+	}
+	return false;
+}
+
+
+//	#pragma mark -
+
+
+BMailAccountSettings::BMailAccountSettings()
+	:
+	fStatus(B_OK),
+	fModified(true)
+{
+	fAccountID = real_time_clock();
+}
+
+
+BMailAccountSettings::BMailAccountSettings(BEntry account)
+	:
+	fAccountFile(account),
+	fModified(false)
+{
+	fStatus = Reload();
+}
+
+
+BMailAccountSettings::~BMailAccountSettings()
+{
+
+}
+
+
+void
+BMailAccountSettings::SetAccountID(int32 id)
+{
+	fModified = true;
+	fAccountID = id;
+}
+
+
+int32
+BMailAccountSettings::AccountID()
+{
+	return fAccountID;
+}
+
+
+void
+BMailAccountSettings::SetName(const char* name)
+{
+	fModified = true;
+	fAccountName = name;
+}
+
+
+const char*
+BMailAccountSettings::Name() const
+{
+	return fAccountName;
+}
+
+
+void
+BMailAccountSettings::SetRealName(const char* realName)
+{
+	fModified = true;
+	fRealName = realName;
+}
+
+
+const char*
+BMailAccountSettings::RealName() const
+{
+	return fRealName;
+}
+
+
+void
+BMailAccountSettings::SetReturnAddress(const char* returnAddress)
+{
+	fModified = true;
+	fReturnAdress = returnAddress;
+}
+
+
+const char*
+BMailAccountSettings::ReturnAddress() const
+{
+	return fReturnAdress;
+}
+
+
+bool
+BMailAccountSettings::SetInboundAddon(const char* name)
+{
+	BPath path;
+	status_t status = find_directory(B_BEOS_ADDONS_DIRECTORY, &path);
+	if (status != B_OK)
+		return false;
+	path.Append("mail_daemon");
+	path.Append("inbound_protocols");
+	path.Append(name);
+	entry_ref ref;
+	get_ref_for_path(path.Path(), &ref);
+	fInboundSettings.SetAddonRef(ref);
+
+	fModified = true;
+	return true;
+}
+
+
+bool
+BMailAccountSettings::SetOutboundAddon(const char* name)
+{
+	BPath path;
+	status_t status = find_directory(B_BEOS_ADDONS_DIRECTORY, &path);
+	if (status != B_OK)
+		return false;
+	path.Append("mail_daemon");
+	path.Append("outbound_protocols");
+	path.Append(name);
+	entry_ref ref;
+	get_ref_for_path(path.Path(), &ref);
+	fOutboundSettings.SetAddonRef(ref);
+
+	fModified = true;
+	return true;
+}
+
+
+const entry_ref&
+BMailAccountSettings::InboundPath() const
+{
+	return fInboundSettings.AddonRef();
+}
+
+
+const entry_ref&
+BMailAccountSettings::OutboundPath() const
+{
+	return fOutboundSettings.AddonRef();
+}
+
+
+MailAddonSettings&
+BMailAccountSettings::InboundSettings()
+{
+	return fInboundSettings;
+}
+
+
+MailAddonSettings&
+BMailAccountSettings::OutboundSettings()
+{
+	return fOutboundSettings;
+}
+
+
+bool
+BMailAccountSettings::HasInbound()
+{
+	return BEntry(&fInboundSettings.AddonRef()).Exists();
+}
+
+
+bool
+BMailAccountSettings::HasOutbound()
+{
+	return BEntry(&fOutboundSettings.AddonRef()).Exists();
+}
+
+
+status_t
+BMailAccountSettings::Reload()
+{
+	BFile file(&fAccountFile, B_READ_ONLY);
+	status_t status = file.InitCheck();
+	if (status != B_OK)
+		return status;
+	BMessage settings;
+	settings.Unflatten(&file);
+
+	int32 id;
+	if (settings.FindInt32("id", &id) == B_OK)
+		fAccountID = id;
+	settings.FindString("name", &fAccountName);
+	settings.FindString("real_name", &fRealName);
+	settings.FindString("return_address", &fReturnAdress);
+
+	BMessage inboundSettings;
+	settings.FindMessage("inbound", &inboundSettings);
+	fInboundSettings.Load(inboundSettings);
+	BMessage outboundSettings;
+	settings.FindMessage("outbound", &outboundSettings);
+	fOutboundSettings.Load(outboundSettings);
+
+	fModified = false;
+	return B_OK;
+}
+
+
+status_t
+BMailAccountSettings::Save()
+{
+	fModified = false;
+
+	BMessage settings;
+	settings.AddInt32("id", fAccountID);
+	settings.AddString("name", fAccountName);
+	settings.AddString("real_name", fRealName);
+	settings.AddString("return_address", fReturnAdress);
+
+	BMessage inboundSettings;
+	fInboundSettings.Save(inboundSettings);
+	settings.AddMessage("inbound", &inboundSettings);
+	BMessage outboundSettings;
+	fOutboundSettings.Save(outboundSettings);
+	settings.AddMessage("outbound", &outboundSettings);
+
+	BEntry oldEntry = fAccountFile;
+	status_t status = _CreateAccountFile();
+	if (status != B_OK)
+		return status;
+	oldEntry.Remove();
+
+	BPath path;
+	fAccountFile.GetPath(&path);
+
+	BFile file(&fAccountFile, B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
+	status = file.InitCheck();
+	if (status != B_OK)
+		return status;
+	return settings.Flatten(&file);
+}
+
+
+status_t
+BMailAccountSettings::Delete()
+{
+	return fAccountFile.Remove();
+}
+
+
+bool
+BMailAccountSettings::HasBeenModified()
+{
+	if (fInboundSettings.HasBeenModified())
+		return true;
+	if (fOutboundSettings.HasBeenModified())
+		return true;
+	return fModified;
+}
+
+
+const BEntry&
+BMailAccountSettings::AccountFile()
+{
+	return fAccountFile;
+}
+
+
+status_t
+BMailAccountSettings::_CreateAccountFile()
+{
+	BPath path;
+	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
+	if (status != B_OK)
+		return status;
+	path.Append("Mail/accounts");
+	create_directory(path.Path(), 777);
+
+	BString fileName = fAccountName;
+	if (fileName == "")
+		fileName << fAccountID;	
+	for (int i = 0; ; i++) {
+		BString testFileName = fileName;
+		if (i != 0) {
+			testFileName += "_";
+			testFileName << i;
+		}
+		BPath testPath(path);
+		testPath.Append(testFileName);
+		BEntry testEntry(testPath.Path());
+		if (!testEntry.Exists()) {
+			fileName = testFileName;
+			break;	
+		}
+	}
+
+	path.Append(fileName);
+	return fAccountFile.SetTo(path.Path());
 }

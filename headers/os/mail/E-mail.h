@@ -92,27 +92,6 @@ typedef struct {
 } mail_notification;
 
 
-// #pragma mark - global functions
-
-
-int32 count_pop_accounts(void);
-status_t get_pop_account(mail_pop_account*, int32 index = 0);
-status_t set_pop_account(mail_pop_account*, int32 index = 0,
-	bool save = true);
-status_t get_smtp_host(char*);
-status_t set_smtp_host(char*, bool save = true);
-status_t get_mail_notification(mail_notification*);
-status_t set_mail_notification(mail_notification*, bool save = true);
-
-status_t check_for_mail(int32* incoming_count = NULL);
-status_t send_queued_mail(void);
-status_t forward_mail(entry_ref*, const char* recipients, bool now = true);
-
-ssize_t	decode_base64(char* out, char* in, off_t length,
-	bool replace_cr = false);
-ssize_t	encode_base64(char* out, char* in, off_t length);
-
-
 // #pragma mark - BMailMessage
 
 class BMailMessage {

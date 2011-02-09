@@ -1,16 +1,24 @@
-#ifndef ZOIDBERG_MAIL_SETTINGS_H
-#define ZOIDBERG_MAIL_SETTINGS_H
-/* Settings - the mail daemon's settings
-**
-** Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
-*/
+/*
+ * Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
+ * Copyright 2011 Clemens Zeidler.
+ * Distributed under the terms of the MIT License.
+ */
+#ifndef MAIL_SETTINGS_H
+#define MAIL_SETTINGS_H
 
+
+#include <vector>
 
 #include <Archivable.h>
+#include <Entry.h>
 #include <List.h>
 #include <Message.h>
+#include <ObjectList.h>
+#include <String.h>
+
 
 class BPath;
+
 
 typedef enum
 {
@@ -19,6 +27,7 @@ typedef enum
 	B_MAIL_SHOW_STATUS_WINDOW_WHEN_ACTIVE	= 2,
 	B_MAIL_SHOW_STATUS_WINDOW_ALWAYS        = 3
 } b_mail_status_window_option;
+
 
 typedef enum
 {
@@ -29,126 +38,170 @@ typedef enum
 	B_MAIL_STATUS_LOOK_NO_BORDER             = 4
 } b_mail_status_window_look;
 
-typedef enum {
-	inbound,
-	outbound
-} b_mail_chain_direction;
-
-class BMailStatusWindow;
-class BMailChain;
-
-BMailChain* NewMailChain();
-BMailChain* GetMailChain(uint32 id);
-
-status_t GetOutboundMailChains(BList* list);
-status_t GetInboundMailChains(BList* list);
-
-
-class BMailChain : public BArchivable {
-public:
-	BMailChain(uint32 id);
-	BMailChain(BMessage*);
-	virtual ~BMailChain();
-	
-	virtual status_t Archive(BMessage*, bool) const;
-	static BArchivable* Instantiate(BMessage*);
-	
-	status_t Save(bigtime_t timeout = B_INFINITE_TIMEOUT);
-	status_t Delete() const;
-	status_t Reload();
-	status_t InitCheck() const;
-	
-	uint32 ID() const;
-	
-	b_mail_chain_direction ChainDirection() const;
-	void SetChainDirection(b_mail_chain_direction);
-	
-	const char* Name() const;
-	status_t SetName(const char*);
-	
-	BMessage* MetaData() const;
-	
-	// "Filter" below refers to the settings message for a MailFilter
-	int32 CountFilters() const;
-	status_t GetFilter(int32 index, BMessage* out_settings, entry_ref* addon = NULL) const;
-	status_t SetFilter(int32 index, const BMessage&, const entry_ref&);
-	
-	status_t AddFilter(const BMessage&, const entry_ref&); // at end
-	status_t AddFilter(int32 index, const BMessage&, const entry_ref&);
-	status_t RemoveFilter(int32 index);
-	
-	void RunChain(BMailStatusWindow* window,
-		bool async = true,
-		bool save_when_done = true,
-		bool delete_when_done = false);
-	
-  private:
-	status_t GetPath(BPath& path) const;
-	status_t Load(BMessage*);
-	
-	int32 fId;
-	char fName[B_FILE_NAME_LENGTH];
-	BMessage* fMetaData;
-	
-	status_t fStatus;
-
-  	b_mail_chain_direction fDirection;
-
-	int32 fSettingsCount;
-	int32 fAddonsCount;
-	BList fFilterSettings;
-	BList fFilterAddons;
-	
-	uint32 _reserved[5];
-};
-
 
 class BMailSettings {
-  public:
-	BMailSettings();
-	~BMailSettings();
-	
-	status_t Save(bigtime_t timeout = B_INFINITE_TIMEOUT);
-	status_t Reload();
-	status_t InitCheck() const;
-	
-	// Global settings
-	int32 WindowFollowsCorner();
-	void SetWindowFollowsCorner(int32 which_corner);
-	
-	uint32 ShowStatusWindow();
-	void SetShowStatusWindow(uint32 mode);
-	
-	bool DaemonAutoStarts();
-	void SetDaemonAutoStarts(bool does_it);
+public:
+								BMailSettings();
+								~BMailSettings();
 
-	void SetConfigWindowFrame(BRect frame);
-	BRect ConfigWindowFrame();
+			status_t			Save(bigtime_t timeout = B_INFINITE_TIMEOUT);
+			status_t			Reload();
+			status_t			InitCheck() const;
 
-	void SetStatusWindowFrame(BRect frame);
-	BRect StatusWindowFrame();
+			// Global settings
+			int32				WindowFollowsCorner();
+			void				SetWindowFollowsCorner(int32 which_corner);
 
-	int32 StatusWindowWorkspaces();
-	void SetStatusWindowWorkspaces(int32 workspaces);
+			uint32				ShowStatusWindow();
+			void				SetShowStatusWindow(uint32 mode);
+			
+			bool				DaemonAutoStarts();
+			void				SetDaemonAutoStarts(bool does_it);
 
-	int32 StatusWindowLook();
-	void SetStatusWindowLook(int32 look);
-	
-	bigtime_t AutoCheckInterval();
-	void SetAutoCheckInterval(bigtime_t);
-	
-	bool CheckOnlyIfPPPUp();
-	void SetCheckOnlyIfPPPUp(bool yes);
-	
-	bool SendOnlyIfPPPUp();
-	void SetSendOnlyIfPPPUp(bool yes);
-	
-	uint32 DefaultOutboundChainID();
-	void SetDefaultOutboundChainID(uint32 to);
+			void				SetConfigWindowFrame(BRect frame);
+			BRect				ConfigWindowFrame();
 
-  private:
-	BMessage fData;
-	uint32 _reserved[4];
+			void				SetStatusWindowFrame(BRect frame);
+			BRect				StatusWindowFrame();
+
+			int32				StatusWindowWorkspaces();
+			void				SetStatusWindowWorkspaces(int32 workspaces);
+
+			int32				StatusWindowLook();
+			void				SetStatusWindowLook(int32 look);
+
+			bigtime_t			AutoCheckInterval();
+			void				SetAutoCheckInterval(bigtime_t);
+
+			bool				CheckOnlyIfPPPUp();
+			void				SetCheckOnlyIfPPPUp(bool yes);
+
+			bool				SendOnlyIfPPPUp();
+			void				SetSendOnlyIfPPPUp(bool yes);
+
+			int32				DefaultOutboundAccount();
+			void				SetDefaultOutboundAccount(int32 to);
+
+private:
+			BMessage			fData;
+			uint32				_reserved[4];
 };
+
+
+class AddonSettings
+{
+public:
+								AddonSettings();
+
+			bool				Load(const BMessage& message);
+			bool				Save(BMessage& message);
+
+			void				SetAddonRef(const entry_ref& ref);
+	const	entry_ref&			AddonRef() const;
+
+	const	BMessage&			Settings() const;
+			BMessage&			EditSettings();
+
+			bool				HasBeenModified();
+private:
+			BMessage			fSettings;
+			entry_ref			fAddonRef;
+
+			bool				fModified;
+};
+
+
+class MailAddonSettings : public AddonSettings
+{
+public:
+			bool				Load(const BMessage& message);
+			bool				Save(BMessage& message);
+
+			int32				CountFilterSettings();
+			int32				AddFilterSettings(const entry_ref* ref = NULL);
+			bool				RemoveFilterSettings(int32 index);
+			bool				MoveFilterSettings(int32 from, int32 to);
+			AddonSettings*		FilterSettingsAt(int32 index);
+
+			bool				HasBeenModified();
+private:
+			std::vector<AddonSettings>	fFiltersSettings;
+};
+
+
+class BMailAccountSettings
+{
+	public:
+								BMailAccountSettings();
+								BMailAccountSettings(BEntry account);
+								~BMailAccountSettings();
+
+			status_t			InitCheck() { return fStatus; }
+
+			void				SetAccountID(int32 id);
+			int32				AccountID();
+
+			void				SetName(const char* name);
+	const	char*				Name() const;
+
+			void				SetRealName(const char* realName);
+	const	char*				RealName() const;
+
+			void				SetReturnAddress(const char* returnAddress);
+	const	char*				ReturnAddress() const;
+
+			bool				SetInboundAddon(const char* name);
+			bool				SetOutboundAddon(const char* name);
+	const	entry_ref&			InboundPath() const;
+	const	entry_ref&			OutboundPath() const;
+
+			MailAddonSettings&	InboundSettings();
+			MailAddonSettings&	OutboundSettings();
+
+			bool				HasInbound();
+			bool				HasOutbound();
+
+			status_t			Reload();
+			status_t			Save();
+			status_t			Delete();
+
+			bool				HasBeenModified();
+
+	const	BEntry&				AccountFile();
+private:
+			status_t			_CreateAccountFile();
+
+			status_t			fStatus;
+			BEntry				fAccountFile;
+
+			int32				fAccountID;
+
+			BString				fAccountName;
+			BString				fRealName;
+			BString				fReturnAdress;
+
+			MailAddonSettings	fInboundSettings;
+			MailAddonSettings	fOutboundSettings;
+
+			bool				fModified;
+};
+
+
+class BMailAccounts {
+public:
+								BMailAccounts();
+								~BMailAccounts();
+
+	static	status_t			AccountsPath(BPath& path);
+
+			int32				CountAccounts();
+			BMailAccountSettings*	AccountAt(int32 index);
+
+			BMailAccountSettings*	AccountByID(int32 id);
+			BMailAccountSettings*	AccountByName(const char* name);
+private:
+			BObjectList<BMailAccountSettings>	fAccounts;
+};
+
 
 #endif	/* ZOIDBERG_MAIL_SETTINGS_H */

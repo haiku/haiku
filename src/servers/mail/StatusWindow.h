@@ -16,19 +16,19 @@
 
 class BStatusBar;
 class BStringView;
-class BMailStatusView;
+class MailStatusView;
 
-class BMailStatusWindow : public BWindow {
+class MailStatusWindow : public BWindow {
 	public:
-		BMailStatusWindow(BRect rect, const char *name, uint32 showMode);
-		~BMailStatusWindow();
+		MailStatusWindow(BRect rect, const char *name, uint32 showMode);
+		~MailStatusWindow();
 
 		virtual	void FrameMoved(BPoint origin);
 		virtual void WorkspaceActivated(int32 workspace, bool active);
 		virtual void MessageReceived(BMessage *msg);
 
-		BMailStatusView *NewStatusView(const char *description, bool upstream);
-		void	RemoveView(BMailStatusView *view);
+		MailStatusView *NewStatusView(const char *description, bool upstream);
+		void	RemoveView(MailStatusView *view);
 		int32	CountVisibleItems();
 
 		bool	HasItems(void);
@@ -36,11 +36,11 @@ class BMailStatusWindow : public BWindow {
 		void	SetDefaultMessage(const BString &message);
 
 	private:
-		friend class BMailStatusView;
+		friend class MailStatusView;
 
 		void	_CheckChains();
 		void	SetBorderStyle(int32 look);
-		void	ActuallyAddStatusView(BMailStatusView *status);
+		void	ActuallyAddStatusView(MailStatusView *status);
 
 		node_ref	fChainDirectory;
 		BButton*	fCheckNowButton;
@@ -57,26 +57,27 @@ class BMailStatusWindow : public BWindow {
 		uint32		_reserved[5];
 };
 
-class BMailStatusView : public BBox {
-	public:
-				void	AddProgress(int32 how_much);
-				void	SetMessage(const char *msg);
-				void	SetMaximum(int32 max_bytes);
-				int32	CountTotalItems();
-				void	SetTotalItems(int32 items);
-				void	AddItem(void);
-				void	Reset(bool hide = true);
-		
-		virtual			~BMailStatusView();
+class MailStatusView : public BBox {
+public:
+								~MailStatusView();
 
-	private:
-		friend class	BMailStatusWindow;
+			void				AddProgress(int32 how_much);
+			void				SetMessage(const char *msg);
+			void				SetMaximum(int32 max_bytes);
+			int32				CountTotalItems();
+			void				SetTotalItems(int32 items);
+			void				AddItem(void);
+			void				Reset(bool hide = true);
+			int32				ItemsNow() { return items_now; }
+
+private:
+		friend class	MailStatusWindow;
 		
-						BMailStatusView(BRect rect,const char *description,bool upstream);
+						MailStatusView(BRect rect,const char *description,bool upstream);
 				void	AddSelfToWindow();
 		
 		BStatusBar		*status;
-		BMailStatusWindow	*window;
+		MailStatusWindow	*window;
 		int32			items_now;
 		int32			total_items;
 		bool			is_upstream;

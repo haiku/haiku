@@ -1376,6 +1376,56 @@ parse_header(BMessage &headers, BPositionIO &input)
 }
 
 
+_EXPORT status_t
+extract_from_header(const BString& header, const BString& field,
+	BString& target)
+{
+	int32 headerLength = header.Length();
+	int32 fieldEndPos = 0;
+	while (true) {
+		int32 pos = header.IFindFirst(field, fieldEndPos);
+		if (pos < 0)
+			return B_BAD_VALUE;
+		fieldEndPos = pos + field.Length();
+		
+		if (pos != 0 && header.ByteAt(pos - 1) != '\n')
+			continue;
+		if (header.ByteAt(fieldEndPos) == ':')
+			break;
+	}
+	fieldEndPos++;
+
+	int32 crPos = fieldEndPos;
+	while (true) {
+		fieldEndPos = crPos;
+		crPos = header.FindFirst('\n', crPos);
+		if (crPos < 0)
+			crPos = headerLength;
+		BString temp;
+		header.CopyInto(temp, fieldEndPos, crPos - fieldEndPos);
+		if (header.ByteAt(crPos - 1) == '\r') {
+			temp.Truncate(temp.Length() - 1);
+			temp += " ";
+		}
+		target += temp;
+		crPos++;
+		if (crPos >= headerLength)
+			break;
+		char nextByte = header.ByteAt(crPos);
+		if (nextByte != ' ' && nextByte != '\t')
+			break;
+		crPos++;
+	}
+
+	size_t bufferSize = target.Length();
+	char* buffer = target.LockBuffer(bufferSize);
+	size_t length = rfc2047_to_utf8(&buffer, &bufferSize, bufferSize);
+	target.UnlockBuffer(length);
+
+	return B_OK;
+}
+
+
 _EXPORT void
 extract_address(BString &address)
 {

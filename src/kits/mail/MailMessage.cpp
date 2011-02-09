@@ -65,7 +65,7 @@ BEmailMessage::BEmailMessage(BPositionIO *file, bool own, uint32 defaultCharSet)
 	_text_body(NULL)
 {
 	BMailSettings settings;
-	_chain_id = settings.DefaultOutboundChainID();
+	_account_id = settings.DefaultOutboundAccount();
 
 	if (own)
 		fData = file;
@@ -75,16 +75,16 @@ BEmailMessage::BEmailMessage(BPositionIO *file, bool own, uint32 defaultCharSet)
 }
 
 
-BEmailMessage::BEmailMessage(entry_ref *ref, uint32 defaultCharSet)
+BEmailMessage::BEmailMessage(const entry_ref *ref, uint32 defaultCharSet)
 	:
-	BMailContainer (defaultCharSet),
+	BMailContainer(defaultCharSet),
 	_bcc(NULL),
 	_num_components(0),
 	_body(NULL),
 	_text_body(NULL)
 {
 	BMailSettings settings;
-	_chain_id = settings.DefaultOutboundChainID();
+	_account_id = settings.DefaultOutboundAccount();
 
 	fData = new BFile();
 	_status = static_cast<BFile *>(fData)->SetTo(ref,B_READ_ONLY);
@@ -126,7 +126,11 @@ BEmailMessage::ReplyMessage(mail_reply_to_mode replyTo, bool accountFromMail,
 		get_address_list(list, To(), extract_address);
 
 		// Filter out the sender
-		BString sender = BMailChain(Account()).MetaData()->FindString("reply_to");
+		BMailAccounts accounts;
+		BMailAccountSettings* account = accounts.AccountByID(Account());
+		BString sender;
+		if (account)
+			sender = account->ReturnAddress();
 		extract_address(sender);
 
 		BString cc;
@@ -391,52 +395,42 @@ BEmailMessage::SendViaAccountFrom(BEmailMessage *message)
 		return;
 	}
 
-	BList chains;
-	GetOutboundMailChains(&chains);
-	for (int32 i = chains.CountItems();i-- > 0;) {
-		BMailChain *chain = (BMailChain *)chains.ItemAt(i);
-		if (!strcmp(chain->Name(), name))
-			SendViaAccount(chain->ID());
-
-		delete chain;
-	}
+	SendViaAccount(name);
 }
 
 
 void
 BEmailMessage::SendViaAccount(const char *account_name)
 {
-	BList chains;
-	GetOutboundMailChains(&chains);
-
-	for (int32 i = 0; i < chains.CountItems(); i++) {
-		if (strcmp(((BMailChain *)(chains.ItemAt(i)))->Name(),account_name) == 0) {
-			SendViaAccount(((BMailChain *)(chains.ItemAt(i)))->ID());
-			break;
-		}
-	}
-
-	while (chains.CountItems() > 0)
-		delete (BMailChain *)chains.RemoveItem(0L);
+	BMailAccounts accounts;
+	BMailAccountSettings* account = accounts.AccountByName(account_name);
+	if (!account)
+		return;
+	SendViaAccount(account->AccountID());
 }
 
 
 void
-BEmailMessage::SendViaAccount(int32 chain_id)
+BEmailMessage::SendViaAccount(int32 account)
 {
-	_chain_id = chain_id;
+	_account_id = account;
 
-	BMailChain chain(_chain_id);
+	BMailAccounts accounts;
+	BMailAccountSettings* accountSettings = accounts.AccountByID(_account_id);
+
 	BString from;
-	from << '\"' << chain.MetaData()->FindString("real_name") << "\" <" << chain.MetaData()->FindString("reply_to") << '>';
-	SetFrom(from.String());
+	if (accountSettings) {
+		from << '\"' << accountSettings->RealName() << "\" <"
+			<< accountSettings->ReturnAddress() << '>';
+	}
+	SetFrom(from);
 }
 
 
 int32
 BEmailMessage::Account() const
 {
-	return _chain_id;
+	return _account_id;
 }
 
 
@@ -650,7 +644,7 @@ status_t
 BEmailMessage::SetToRFC822(BPositionIO *mail_file, size_t length, bool parse_now)
 {
 	if (BFile *file = dynamic_cast<BFile *>(mail_file))
-		file->ReadAttr("MAIL:chain",B_INT32_TYPE,0,&_chain_id,sizeof(_chain_id));
+		file->ReadAttr("MAIL:account",B_INT32_TYPE,0,&_account_id,sizeof(_account_id));
 
 	mail_file->Seek(0,SEEK_END);
 	length = mail_file->Position();
@@ -711,7 +705,7 @@ BEmailMessage::RenderToRFC822(BPositionIO *file)
 
 	if (From() == NULL) {
 		// set the "From:" string
-		SendViaAccount(_chain_id);
+		SendViaAccount(_account_id);
 	}
 
 	BList recipientList;
@@ -807,14 +801,19 @@ BEmailMessage::RenderToRFC822(BPositionIO *file)
 		attributed->WriteAttrString(B_MAIL_ATTR_STATUS,&attr);
 		attr = "1.0";
 		attributed->WriteAttrString(B_MAIL_ATTR_MIME,&attr);
-		attr = BMailChain(_chain_id).Name();
+		BMailAccounts accounts;
+		BMailAccountSettings* account =  accounts.AccountByID(_account_id);
+		if (account)
+			attr = account->Name();
+		else
+			attr = "";
 		attributed->WriteAttrString(B_MAIL_ATTR_ACCOUNT,&attr);
 
 		attributed->WriteAttr(B_MAIL_ATTR_WHEN,B_TIME_TYPE,0,&creationTime,sizeof(int32));
 		int32 flags = B_MAIL_PENDING | B_MAIL_SAVE;
 		attributed->WriteAttr(B_MAIL_ATTR_FLAGS,B_INT32_TYPE,0,&flags,sizeof(int32));
 
-		attributed->WriteAttr("MAIL:chain",B_INT32_TYPE,0,&_chain_id,sizeof(int32));
+		attributed->WriteAttr("MAIL:account",B_INT32_TYPE,0,&_account_id,sizeof(int32));
 	}
 
 	return B_OK;
@@ -902,15 +901,19 @@ BEmailMessage::RenderTo(BDirectory *dir, BEntry *msg)
 status_t
 BEmailMessage::Send(bool send_now)
 {
-	BMailChain *via = new BMailChain(_chain_id);
-	if ((via->InitCheck() != B_OK) || (via->ChainDirection() != outbound)) {
-		delete via;
-		via = new BMailChain(BMailSettings().DefaultOutboundChainID());
-		SendViaAccount(via->ID());
+	BMailAccounts accounts;
+	BMailAccountSettings* account = accounts.AccountByID(_account_id);
+	if (!account || !account->HasOutbound()) {
+		account = accounts.AccountByID(
+			BMailSettings().DefaultOutboundAccount());
+		if (!account)
+			return B_ERROR;
+		SendViaAccount(account->AccountID());
 	}
 
 	BString path;
-	if (via->MetaData()->FindString("path", &path) != B_OK) {
+	if (account->OutboundSettings().Settings().FindString("path", &path)
+		!= B_OK) {
 		BPath defaultMailOutPath;
 		if (find_directory(B_USER_DIRECTORY, &defaultMailOutPath) != B_OK
 			|| defaultMailOutPath.Append("mail/out") != B_OK)
@@ -925,7 +928,6 @@ BEmailMessage::Send(bool send_now)
 	BEntry message;
 
 	status_t status = RenderTo(&directory, &message);
-	delete via;
 	if (status >= B_OK && send_now) {
 		BMailSettings settings_file;
 		if (settings_file.SendOnlyIfPPPUp()) {
@@ -955,7 +957,7 @@ BEmailMessage::Send(bool send_now)
 			return B_MAIL_NO_DAEMON;
 
 		BMessage msg('msnd');
-		msg.AddInt32("chain",_chain_id);
+		msg.AddInt32("account",_account_id);
 		BPath path;
 		message.GetPath(&path);
 		msg.AddString("message_path",path.Path());
