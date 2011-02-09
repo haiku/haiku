@@ -161,10 +161,7 @@ EditListView::MouseDown(BPoint where)
 	BListView::MouseDown(where);
 
 	int32 index = IndexOf(where);
-	BListItem* item = ItemAt(index);
-	if (item == NULL)
-		return;
-	EditableListItem* handler = dynamic_cast<EditableListItem*>(item);
+	EditableListItem* handler = dynamic_cast<EditableListItem*>(ItemAt(index));
 	if (handler == NULL)
 		return;
 
@@ -184,10 +181,7 @@ EditListView::MouseUp(BPoint where)
 	}
 
 	int32 index = IndexOf(where);
-	BListItem* item = ItemAt(index);
-	if (item == NULL)
-		return;
-	EditableListItem* handler = dynamic_cast<EditableListItem*>(item);
+	EditableListItem* handler = dynamic_cast<EditableListItem*>(ItemAt(index));
 	if (handler == NULL)
 		return;
 
