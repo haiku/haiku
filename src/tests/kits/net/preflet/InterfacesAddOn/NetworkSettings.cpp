@@ -67,12 +67,14 @@ NetworkSettings::ReadConfiguration()
 	BNetworkInterfaceAddress netIntAddr4;
 	BNetworkInterfaceAddress netIntAddr6;
 
-	if (fNetworkInterface.GetAddressAt(zeroAddrV4, netIntAddr4) == B_OK) {
+	if (zeroAddrV4 != errno) {
+		fNetworkInterface.GetAddressAt(zeroAddrV4, netIntAddr4);
 		fIPv4Addr = netIntAddr4.Address();
 		fIPv4Mask = netIntAddr4.Mask();
 	}
 
-	if (fNetworkInterface.GetAddressAt(zeroAddrV6, netIntAddr6) == B_OK) {
+	if (zeroAddrV6 != errno) {
+		fNetworkInterface.GetAddressAt(zeroAddrV6, netIntAddr6);
 		fIPv6Addr = netIntAddr6.Address();
 		fIPv6Mask = netIntAddr6.Mask();
 	}
