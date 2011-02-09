@@ -21,6 +21,7 @@
 #include <String.h>
 #include <View.h>
 
+#include "MailAddon.h"
 #include "MailProtocol.h"
 #include "MailSettings.h"
 #include <StringList.h>
@@ -88,11 +89,7 @@ private:
 };
 
 
-extern "C" InboundProtocol* instantiate_inbound_protocol(
-	BMailAccountSettings* settings);
-
 extern "C" status_t pop3_smtp_auth(BMessage& settings);
 
-extern "C" BView* instantiate_config_panel(MailAddonSettings& settings);
 
 #endif	/* POP3_H */
