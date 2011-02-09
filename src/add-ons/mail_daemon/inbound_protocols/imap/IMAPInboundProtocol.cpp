@@ -84,18 +84,18 @@ IMAPMailboxThread::MessageReceived(BMessage* message)
 	status_t status = B_ERROR;
 
 	switch (message->what) {
-	case kMsgStartWatching:
-		status = fIMAPMailbox.StartWatchingMailbox();
-		if (status != B_OK)
-			fProtocol.Disconnect();
+		case kMsgStartWatching:
+			status = fIMAPMailbox.StartWatchingMailbox();
+			if (status != B_OK)
+				fProtocol.Disconnect();
 
-		fLock.Lock();
-		fIsWatching = false;
-		fLock.Unlock();
-		break;
+			fLock.Lock();
+			fIsWatching = false;
+			fLock.Unlock();
+			break;
 
-	default:
-		BLooper::MessageReceived(message);
+		default:
+			BLooper::MessageReceived(message);
 	}
 }
 

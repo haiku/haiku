@@ -79,7 +79,7 @@ CheckBoxItem::DrawItem(BView* owner, BRect itemRect, bool drawEverything)
 		return;
 
 	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
-    uint32 flags = 0;
+	uint32 flags = 0;
 	if (fMouseDown)
 		flags |= BControlLook::B_CLICKED;
 	if (fChecked)
@@ -162,10 +162,10 @@ EditListView::MouseDown(BPoint where)
 
 	int32 index = IndexOf(where);
 	BListItem* item = ItemAt(index);
-	if (!item)
+	if (item == NULL)
 		return;
 	EditableListItem* handler = dynamic_cast<EditableListItem*>(item);
-	if (!handler)
+	if (handler == NULL)
 		return;
 
 	fLastMouseDown = handler;
@@ -185,10 +185,10 @@ EditListView::MouseUp(BPoint where)
 
 	int32 index = IndexOf(where);
 	BListItem* item = ItemAt(index);
-	if (!item)
+	if (item == NULL)
 		return;
 	EditableListItem* handler = dynamic_cast<EditableListItem*>(item);
-	if (!handler)
+	if (handler == NULL)
 		return;
 
 	handler->MouseUp(where);
@@ -276,17 +276,17 @@ void
 FolderConfigWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-	case kMsgInit:
-		_LoadFolders();
-		break;
+		case kMsgInit:
+			_LoadFolders();
+			break;
 
-	case kMsgApplyButton:
-		_ApplyChanges();
-		PostMessage(B_QUIT_REQUESTED);
-		break;
+		case kMsgApplyButton:
+			_ApplyChanges();
+			PostMessage(B_QUIT_REQUESTED);
+			break;
 
-	default:
-		BWindow::MessageReceived(message);
+		default:
+			BWindow::MessageReceived(message);
 	}
 }
 
@@ -335,8 +335,7 @@ FolderConfigWindow::_ApplyChanges()
 	for (unsigned int i = 0; i < fFolderList.size(); i++) {
 		FolderInfo& info = fFolderList[i];
 		CheckBoxItem* item = (CheckBoxItem*)fFolderListView->ItemAt(i);
-		if ((info.subscribed && !item->Checked())
-			|| (!info.subscribed && item->Checked())) {
+		if ((info.subscribed != item->Checked())) {
 			haveChanges = true;
 			break;
 		}
