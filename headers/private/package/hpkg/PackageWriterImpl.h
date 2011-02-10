@@ -30,6 +30,8 @@ namespace BPrivate {
 struct hpkg_header;
 
 class PackageWriterImpl : public WriterImplBase {
+	typedef	WriterImplBase		inherited;
+
 public:
 								PackageWriterImpl(
 									BPackageWriterListener* listener);

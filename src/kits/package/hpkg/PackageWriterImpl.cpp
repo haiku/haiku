@@ -292,7 +292,7 @@ PackageWriterImpl::_AddAttribute(const char* attributeName, Type value)
 
 PackageWriterImpl::PackageWriterImpl(BPackageWriterListener* listener)
 	:
-	WriterImplBase(listener),
+	inherited(listener),
 	fListener(listener),
 	fDataBuffer(NULL),
 	fDataBufferSize(2 * B_HPKG_DEFAULT_DATA_CHUNK_SIZE_ZLIB),
@@ -397,7 +397,7 @@ PackageWriterImpl::Finish()
 status_t
 PackageWriterImpl::_Init(const char* fileName)
 {
-	status_t result = WriterImplBase::Init(fileName, "package");
+	status_t result = inherited::Init(fileName, "package");
 	if (result != B_OK)
 		return result;
 

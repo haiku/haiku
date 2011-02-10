@@ -32,6 +32,8 @@ struct hpkg_header;
 
 class RepositoryWriterImpl
 	: public WriterImplBase, private BPackageContentHandler {
+	typedef	WriterImplBase		inherited;
+
 public:
 								RepositoryWriterImpl(
 									BRepositoryWriterListener* listener,

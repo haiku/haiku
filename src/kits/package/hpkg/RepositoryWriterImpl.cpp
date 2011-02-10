@@ -38,7 +38,7 @@ struct RepositoryWriterImpl::PackageNameSet : public std::set<BString> {
 RepositoryWriterImpl::RepositoryWriterImpl(BRepositoryWriterListener* listener,
 	const BRepositoryInfo* repositoryInfo)
 	:
-	WriterImplBase(listener),
+	inherited(listener),
 	fListener(listener),
 	fRepositoryInfo(repositoryInfo),
 	fPackageCount(0),
@@ -136,10 +136,8 @@ RepositoryWriterImpl::HandlePackageAttribute(
 			break;
 
 		case B_PACKAGE_INFO_VENDOR:
-		{
 			fPackageInfo.SetVendor(value.string);
 			break;
-		}
 
 		case B_PACKAGE_INFO_PACKAGER:
 			fPackageInfo.SetPackager(value.string);
@@ -150,11 +148,9 @@ RepositoryWriterImpl::HandlePackageAttribute(
 			break;
 
 		case B_PACKAGE_INFO_ARCHITECTURE:
-		{
 			fPackageInfo.SetArchitecture(
 				(BPackageArchitecture)value.unsignedInt);
 			break;
-		}
 
 		case B_PACKAGE_INFO_VERSION:
 			fPackageInfo.SetVersion(value.version);
@@ -222,7 +218,7 @@ RepositoryWriterImpl::HandleErrorOccurred()
 status_t
 RepositoryWriterImpl::_Init(const char* fileName)
 {
-	return WriterImplBase::Init(fileName, "repository");
+	return inherited::Init(fileName, "repository");
 }
 
 
@@ -293,6 +289,8 @@ RepositoryWriterImpl::_AddPackage(const BEntry& packageEntry)
 		return result;
 	}
 	fPackageInfo.SetChecksum(checksum);
+
+
 
 	return packageReader.ParseContent(this);
 }
