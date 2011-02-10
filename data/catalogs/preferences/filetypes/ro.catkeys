@@ -1,0 +1,133 @@
+1	romanian	x-vnd.Haiku-FileTypes	3850952074
+Args only	Application Type Window		Doar arg
+Add group	New File Type Window		Adaugă grup
+Remove	Application Type Window		Elimină
+Select same type as	FileType Window		Selectează același tip ca
+Remove icon	Icon View		Elimină pictogramă
+Supported types	Application Type Window		Tipuri suportate
+Internal name:	New File Type Window		Nume intern:
+New file type	New File Type Window		Tip de fișier nou:
+Add icon…	Icon View		Adaugă pictogramă...
+Do you want to save the changes?	Application Type Window		Doriți să salvați modificările?
+File type	FileType Window		Tip de fișier
+Could not change attributes	Attribute Window		Nu s-au putut modifica atributele
+OK	FileTypes		Bine
+Save	Application Type Window		Salvează
+Add	Extension Window		Adaugă
+Select same preferred application as	FileType Window		Selectează acceași aplicație preferată ca
+Cancel	Attribute Window		Anulează
+Multiple launch	Application Type Window		Pornire multiplă
+Group:	New File Type Window		Grup:
+Done	Extension Window		Gata
+Could not open file	FileType Window		Nu s-a putut deschide fișierul
+Preferred application	FileType Window		Aplicația preferată
+Same as…	FileType Window		La fel ca...
+File	Application Type Window		Fișier
+Version:	Application Type Window		Versiune:
+FileTypes request	FileTypes		Cerere TipuriFișier
+Select…	FileType Window		Selectează...
+Development	Application Type Window		Dezvoltare
+Icon	FileType Window		Pictogramă
+Special:	Attribute Window		Special:
+Alpha	Application Type Window		Alfa
+Signature:	Application Type Window		Semnătură:
+Quit, don't save	Application Type Window		Părăsește, nu salva
+Add…	Application Type Window		Adaugă...
+Select preferred application	FileType Window		Selectează aplicația preferată
+Single launch	Application Type Window		Pornire unică
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Aplicația \„%s\” nu suportă acest tip de fișier.\nSigur doriți să o configurați oricum?
+Type:	Attribute Window		Tip:
+Done	Attribute Window		Gata
+Set Preferred Application	Preferred App Menu		Configurează aplicație preferată
+Background app	Application Type Window		Aplicație de fundal
+Add new group	New File Type Window		Adaugă grup nou
+Cancel	Application Type Window		Anulează
+Cancel	New File Type Window		Anulează
+Extension:	Extension Window		Extensie:
+Add	Attribute Window		Adaugă
+Close	Application Type Window		Închide
+Golden master	Application Type Window		Principal
+Could not open \"%s\":\n%s	FileTypes		Nu s-a putut deschide \„%s\”:\n%s
+Alignment:	Attribute Window		Aliniere:
+Cancel	Extension Window		Anulează
+Application flags	Application Type Window		Indicatoare de aplicație
+Editable	Attribute Window	If Tracker allows to edit this attribute.	Modificabil
+Width:	Attribute Window	Default column width in Tracker for this attribute.	Lățime:
+Save request	Application Type Window		Salvează cerere
+Beta	Application Type Window		Beta
+Attribute name:	Attribute Window		Nume atribut:
+Extension	Extension Window		Extensie:
+Add type	New File Type Window		Adaugă tip
+Internal name:	Attribute Window		Nume intern:
+Final	Application Type Window		Final
+Open file	FileTypes		Deschide fișier
+Exclusive launch	Application Type Window		Pornire exclusivă
+Gamma	Application Type Window		Gama
+Default application	FileType Window		Aplicație implicită
+Long description:	Application Type Window		Descriere lungă:
+Version info	Application Type Window		Info versiune
+Center	Attribute Window	Attribute column alignment in Tracker	Centru
+Short description:	Application Type Window		Descriere scurtă:
+File could not be opened	Preferred App Menu		Fișierul nu a putut fi deschis
+Could not change file extensions	Extension Window		Nu s-au putut modifica extensiile fișierului
+Edit icon…	Icon View		Editează pictogramă...
+Save into resource file…	Application Type Window		Salvează în fișierul resursă...
+Left	Attribute Window	Attribute column alignment in Tracker	Stânga
+Visible	Attribute Window		Vizibil
+Could not install file type	New File Type Window		Nu s-a putut instala tipul de fișier
+Application type	Application Type Window		Tip de aplicație
+Application types…	FileTypes Window		Tipuri de aplicații...
+Recognition rule is not valid:\n\n	FileTypes Window		Regula de recunoaștere nu este validă:\n\n
+Show icons in list	FileTypes Window		Afișează pictograme în listă
+Type name:	FileTypes Window		Nume tip:
+About FileTypes…	FileTypes Window		Despre TipuriFișier...
+Choose type	Type List Window		Alege tip
+Rule:	FileTypes Window		Regulă:
+Multiple files from \"%s\" file type	FileType Window		Fișiere multiple de la tipul de fișier \„%s\”
+Could not retrieve preferred application of this file	Preferred App Menu		Nu s-a putut obține aplicația preferată a acestui fișier
+Extensions:	FileTypes Window		Extensii:
+Select same preferred application as	FileTypes Window		Selectează aceeași aplicație preferată ca
+Could not retrieve application signature	Preferred App Menu		Nu s-a putut obține semnătura aplicației
+Icon	Application Type Window		Pictogramă
+Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Eliminarea unui tip de fișier nu este reversibilă.\nSigur doriți să îl eliminați?
+(from application)	FileTypes Window		(de la aplicație)
+Could not set preferred application	FileTypes Window		Nu s-a putut stabili aplicația preferată)
+Done	Type List Window		Gata
+Show recognition rule	FileTypes Window		Afișează regula de recunoaștere
+FileTypes request	Preferred App Menu		Cerere TipuriFișier
+Description:	FileTypes Window		Descriere:
+File	FileTypes Window		Fișier
+Select…	FileTypes Window		Selectează...
+FileTypes	FileTypes Window		TipuriFișier
+Open…	FileTypes Window		Deschide...
+FileTypes	FileTypes		TipuriFișier
+Extra attributes	FileTypes Window		Atribute suplimentare
+\twritten by Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n	FileTypes		\tscris de Axel Dörfler\n\tDrepturi de autor 2006-2007, Haiku.\n
+Add…	FileTypes Window		Adaugă...
+[Multiple files] file types	FileType Window		[Fișiere multiple] tipuri de fișiere
+Quit	FileTypes Window		Părăsește
+%s file type	FileType Window		tip de fișier %s
+no icon	FileTypes Window		fără pictogramă
+Settings	FileTypes Window		Configurări
+New resource file…	FileTypes Window		Fișier resursă nou...
+Icon	FileTypes Window		Pictogramă
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Eliminarea unui tip super nu este reversibilă.\nToate tipurile de fișier care aparțin acestui tip super vor fi pierdute!\n\nSigur doriți să faceți acest lucru? Pentru a elimina un grup întreg, mențineți apăsată tasta Shift și apăsați pe \„Elimină\”.
+Internal name:	FileTypes Window		Nume intern:
+File recognition	FileTypes Window		Recunoaștere fișier
+Cancel	Type List Window		Anulează
+Description	FileTypes Window		Descriere
+None	FileTypes Window		Nimic
+Remove	FileTypes Window		Elimină
+This file type already exists	New File Type Window		Acest tip de fișier există deja
+Same as…	FileTypes Window		La fel ca...
+Could not remove file type: %s\n	FileTypes Window		Nu s-a putut elimina tipul de fișier: %s\n
+Cancel	Preferred App Menu		Anulează
+Cancel	FileTypes Window		Anulează
+Select preferred application	FileTypes Window		Selectează aplicația preferată
+FileTypes request	FileTypes Window		Cerere TipuriFișier
+(from super type)	FileTypes Window		(de la tipul super)
+Preferred application	FileTypes Window		Aplicație preferată
+Attribute	Attribute Window		Atribut
+Group name:	New File Type Window		Nume grup:
+Display as:	Attribute Window	Tracker offers different display modes for attributes.	Afișează ca:
+%1 application type	Application Type Window		tip de aplicație %1

@@ -1,0 +1,41 @@
+1	romanian	x-vnd.Haiku-ProcessController	678001537
+Memory usage	ProcessController		Utilizarea memoriei
+Do you really want to kill the team \"%s\"?	ProcessController		Doriți să terminați forțat echipa „%s”?
+Restart Deskbar	ProcessController		Repornește bara de desktop
+Debug thread	ProcessController		Depanează firul de execuție
+Your setting filecould not be saved!\n(%s)	ProcessController		Fișierul dumneavoastră de configurări nu a putut fi salvat!\n(%s)
+This team is already gone…	ProcessController		Această echipă este plecată deja...
+Error saving file	ProcessController		Eroare la salvarea fișierului
+This thread is already gone…	ProcessController		Acest fir de execuție este plecat deja...
+Cancel	ProcessController		Anulează
+Run in window	ProcessController		Pornește în fereastră
+Processor %d	ProcessController		Procesor %d
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
+ProcessController is already installed in Deskbar.	ProcessController		ControlerProces este instalat deja pe bara de desktop.
+This is the last active processor...\nYou can't turn it off!	ProcessController		Acesta este ultimul procesor activ...\nNu puteți să îl opriți!
+thread	ProcessController		fir de execuție
+Preferences	ProcessController		Preferințe
+%s priority [%d]	ProcessController		%s prioritate [%d]
+Quit application	ProcessController		Părăsește aplicația
+What do you want to do with the thread \"%s\"?	ProcessController		Ce doriți să faceți cu firul de execuție „%s”?
+about	ProcessController		despre
+Gone teams…	ProcessController		Echipe plecate...
+Restart Tracker	ProcessController		Repornește Tracker
+Live in the Deskbar	ProcessController		Activ pe bara de desktop
+Kill this thread!	ProcessController		Termină forțat acest fir de execuție!
+Debug this thread!	ProcessController		Depanează acest fir de execuție!
+New Terminal	ProcessController		Terminal nou
+About ProcessController…	ProcessController		Despre ControlerProces
+Ok!	ProcessController		OK!
+Quit an application	ProcessController		Părăsește o aplicație
+Install in Deskbar	ProcessController		Instalează pe bara de desktop
+ProcessController\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n	ProcessController		ControlerProces\n\nDrepturi de autor 1997-2001,\nGeorges-Edouard Berenger.\n\nDrepturi de autor © 2007 Haiku, Inc.\n
+Threads and CPU usage	ProcessController		Utilizare fire de execuție și procesor
+Global Popup	ProcessController		Popup global
+OK	ProcessController		OK
+Damned!	ProcessController		Aiurea!
+priority	ProcessController		prioritate
+Usage: %s [-deskbar]\n	ProcessController		Utilizare: %s [-deskbar]\n
+Yes, kill this team!	ProcessController		Da, termină forțat această echipă!
+That's no Fun!	ProcessController		Nu e amuzant!
+You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Puteți să rulați ControlerProces într-o fereastră sau să îl instalați pe bara de desktop.

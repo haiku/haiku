@@ -1,0 +1,20 @@
+1	romanian	x-vnd.Haiku-VirtualMemory	3110510347
+Turn off	SettingsWindow		Oprește
+GB	SettingsWindow		GiB
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Dezactivarea memoriei virtuale va avea efecte nedorite asupra stabilității sistemului odată ce memoria este utilizată.\nMemoria virtuală nu afectează perfomanța sistemului până la atingerea acestui punct.\n\nSigur doriți să o opriți?
+Requested swap file size:	SettingsWindow		Dimensiunea fișierului swap cerut:
+Physical memory: 	SettingsWindow		Memorie fizică:
+Changes will take effect on restart!	SettingsWindow		Modificările vor avea efect după repornire!
+Defaults	SettingsWindow		Implicite
+KB	SettingsWindow		KiB
+Use volume:	SettingsWindow		Utilizează volum:
+Keep enabled	SettingsWindow		Menține activat
+Revert	SettingsWindow		Revenire
+Current swap file size: 	SettingsWindow		Dimensiunea fișierului swap curent:
+VirtualMemory	SettingsWindow		MemorieVirtuală
+OK	VirtualMemoryApp		OK
+VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		MemorieVirtuală\n\tscris de Axel Dörfler\n\tCopyright 2005, Haiku.\n
+Enable virtual memory	SettingsWindow		Activează memoria virtuală
+MB	SettingsWindow		MiB
+%Ld B	SettingsWindow		%Ld B
+Insufficient space for a swap file.	SettingsWindow		Spațiu insuficient pentru un fișier swap.

@@ -1,0 +1,144 @@
+1	romanian	x-vnd.Be-MAIL	1685878103
+%d - Date	Mail		%d - Dată
+Attach attributes:	Mail		Atașează atribute:
+Inconsistency occurred in the undo/redo buffer.	Mail		A apărut o inconsecvență în preîncărcarea refă/repetă.
+An error occurred trying to save the attachment.	Mail		A apărut o eroare când s-a încercat salvarea atașamentului.
+Copy to new	Mail		Copiază la nou
+Edit	Mail		Editează
+Print	Mail		Tipărește
+New mail message	Mail		Mesaj email nou
+Automatically mark mail as read:	Mail		Marchează automat mailul ca citit:
+Colored quotes:	Mail		Citate colorate:
+Subject:	Mail		Subiect:
+Reply to all	Mail		Răspunde la toate
+Show icons & labels	Mail		Afișează pictograme & etichete
+Remove attachment	Mail		Elimină atașament
+Button bar:	Mail		Bară de butoane:
+Beginner	Mail		Începător
+Don't save	Mail		Nu salva
+Expert	Mail		Expert
+Reply account:	Mail		Cont de răspuns:
+Discard	Mail		Ignoră
+Message	Mail		Mesaj
+Reply to sender	Mail		Răspunde la expeditor
+There is no installed handler for URL links.	Mail		Nu există un operator instalat pentru legături URL.
+Signature	Mail		Semnătură
+Find again	Mail		Găsește din nou
+Bcc:	Mail		Bcc:
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Textul dumneavoastră principal conține caractere %ld care nu se pot coda. Este posibil ca un set diferit de caractere să funcționeze mai bine? Apăsați pe Trimite pentru a fi trimis oricum (un caracter de substituție va fi utilizat în locul celor care nu se pot coda), sau alegeți Anulează pentru a merge înapoi să îl reparați.
+Signature:	Mail		Semnătură:
+Save changes to this signature?	Mail		Se salvează modificările la această semnătură?
+Cc:	Mail		Cc:
+Find	Mail		Găsește
+Preferences…	Mail		Preferințe...
+Undo	Mail		Refă
+Leave as New	Mail		Menține ca nou
+An error occurred trying to open this signature.	Mail		A apărut o eroare când s-a încercat deschiderea acestei semnături.
+No file attributes, just plain data	Mail		Nu există atribute de fișier, doar date simple
+Edit queries…	Mail		Editează interogări
+Paste	Mail		Lipește
+Save attachment…	Mail		Salvează atașament...
+Include file attributes in attachments	Mail		Include atributele de fișier în atașamente
+OK	Mail		Bine
+Send	Mail		Trimite
+Show icons only	Mail		Afișează doar pictogramele
+Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Eliminarea atașamentelor de la un mail trimis mai departe nu este încă implementată!\nNu va funcționa corect încă.
+Hide	Mail		Ascunde
+Forward without attachments	Mail		Trimite mai departe fără atașamente
+Previous	Mail		Precedent
+Redo	Mail		Repetă
+Add enclosure…	Mail		Adaugă contur...
+Print…	Mail		Tipărește
+Warn unencodable:	Mail		Avertisment care nu se poate coda:
+Quit	Mail		Părăsește
+%n - Full name	Mail		%n - Nume complet
+Read 	Mail		Citit
+Trash	Mail		Gunoi
+Default account:	Mail		Cont implicit:
+Size:	Mail		Dimensiune:
+Account from mail	Mail		Cont de la mail
+Edit signatures…	Mail		Editează semnături...
+New	Mail		Nou
+Attachments: 	Mail		Atașamente:
+Set to %s	Mail		Stabilește la %s
+Forward	Mail		Trimite mai departe
+E-mail draft could not be saved!	Mail		Ciorna email nu a putut fi salvată!
+To:	Mail		Către:
+Only files can be added as attachments.	Mail		Numai fișierele pot fi adăugate ca atașamente.
+Previous message	Mail		Mesajul precedent
+Title:	Mail		Titlu:
+Find…	Mail		Găsește...
+Accounts…	Mail		Conturi...
+Mail preferences	Mail		Preferințe email
+Initial spell check mode:	Mail		Mod de corectare ortografică inițială:
+Leave same	Mail		Menține la fel
+About Mail…	Mail		Despre Mail...
+Page setup…	Mail		Configurare pagină...
+Revert	Mail		Revenire
+None	Mail		Nimic
+Copy link location	Mail		Copiază locația legăturii
+Show header	Mail		Afișează antet
+%e - E-mail address	Mail		%e - Adresă email
+Resend	Mail		Retrimite
+Show raw message	Mail		Afișează mesaj brut
+\\n - Newline	Mail		\\n - Linie nouă
+Start now	Mail		Pornește acum
+Close	Mail		Închide
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Mail_serviciu nu rulează. Mesajul stă la rând și va fi trimis când mail_serviciu este pornit.
+Really delete this signature? This cannot be undone.	Mail		Sigur ștergeți această semnătură? Această operație nu este reversibilă.
+Open	Mail		Deschide
+Quote	Mail		Citat
+Add	Mail		Adaugă
+Next message	Mail		Mesajul următor
+User interface	Mail		Interfață cu utilizatorul
+Cancel	Mail		Anulează
+Send message	Mail		Trimite mesaj
+Remove enclosure	Mail		Elimină contur
+Account:	Mail		Cont:
+Decoding:	Mail		Decodare:
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Îmi pare rău, nu s-a putut găsi o aplicație care suportă tipul de date „Persoană”.
+Do you wish to send this message before closing?	Mail		Doriți să trimiteți acest mesaj înainte de închidere?
+Delete	Mail		Șterge
+Leave as '%s'	Mail		Menține ca „%s”
+Copy	Mail		Copiază
+Reply preamble:	Mail		Prefață de răspuns:
+Signatures	Mail		Semnături
+Next	Mail		Următorul
+Set to…	Mail		Stabilește la...
+Use default account	Mail		Utilizează contul implicit
+Sorry	Mail		Îmi pare rău
+Encoding:	Mail		Codare
+Font:	Mail		Font:
+Save address	Mail		Salvează adresa
+Queries	Mail		Interogări
+Do you wish to save this message as a draft before closing?	Mail		Doriți să salvați acest mesaj ca o ciornă înainte de închidere?
+Save	Mail		Salvează
+Random	Mail		Aleator
+Close and 	Mail		Închide și
+Save as draft	Mail		Salvează ca ciornă
+The mail_daemon could not be started:\n\t	Mail		Mail_serviciu nu a putut fi pornit:\n\t
+Open attachment	Mail		Deschide atașament
+Reply	Mail		Răspuns
+From:	Mail		De la:
+Couldn't open this signature. Sorry.	Mail		Nu s-a putut deschide acestă semnătură. Îmi pare rău.
+Open draft	Mail		Deschide ciornă
+Cut	Mail		Taie
+Check spelling	Mail		Verifică ortografia
+Set to Saved	Mail		Stabilește la salvat
+Open this link	Mail		Deschide această legătură
+Auto signature:	Mail		Semnătură auto:
+Add signature	Mail		Adaugă semnătură
+Need Tracker to move items to trash	Mail		Este necesar ca Trackerul să mute elementele la gunoi
+Mailing	Mail		Poștă electronică
+Unread	Mail		Necitit
+Remove quote	Mail		Elimină citat
+Move to trash	Mail		Mută la gunoi
+Select all	Mail		Selectează tot
+An error occurred trying to save this signature.	Mail		A apărut o eroare când s-a încercat salvarea acestei semnături.
+View	Mail		Vizualizare
+Mail couldn't find its dictionary.	Mail		Mail nu a putut găsi dicționarul.
+Mail\n\n	Mail		Mail\n\n
+Written by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Scris de Robert Polic.\nÎmbunătățit de echipa Dr. Zoidberg.\n\nDrepturi de autor 1991-2001, Be Incorporated.\nDrepturi de autor 2005-2010 Haiku, Inc.\n
+Text wrapping:	Mail		Încadrare text:
+File	Mail		Fișier
+Mail	Mail		Mail

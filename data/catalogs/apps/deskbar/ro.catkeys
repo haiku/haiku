@@ -1,3 +1,39 @@
-1	romanian	x-vnd.Be-TSKB	1884644663
+1	romanian	x-vnd.Be-TSKB	34208151
 Applications	PreferencesWindow		Aplicații
 Recent applications	BeMenu		Aplicații recente
+Edit menu…	PreferencesWindow		Editează meniu...
+Recent documents:	PreferencesWindow		Documente recente:
+Recent folders	BeMenu		Dosare recente
+Sort running applications	PreferencesWindow		Sortează aplicațiile pornite
+Change time…	TimeView		Modifică oră...
+<Be folder is empty>	BeMenu		<Dosarul Be este vid>
+Window	PreferencesWindow		Fereastră
+Menu	PreferencesWindow		Meniu
+Show seconds	PreferencesWindow		Afișează secundele
+Always on top	PreferencesWindow		Întotdeauna deasupra
+Show all	WindowMenu		Afișează tot
+No windows	WindowMenu		Fără ferestre
+Power off	BeMenu		Oprește
+Auto-raise	PreferencesWindow		Auto-montează
+Hide time	TimeView		Ascunde oră
+Recent folders:	PreferencesWindow		Dosare recente:
+Deskbar preferences…	BeMenu		Preferințe bară de desktop...
+Show application expander	PreferencesWindow		Afișează extensorul de aplicație
+Close all	WindowMenu		Închide tot
+Deskbar preferences	PreferencesWindow		Preferințe bară de desktop
+Mount	BeMenu		Montează
+Recent applications:	PreferencesWindow		Aplicații recente:
+Tracker always first	PreferencesWindow		Trackerul întotdeauna primul
+About Haiku…	BeMenu		Despre Haiku...
+Show calendar…	TimeView		Afișează calendar...
+Restart system	BeMenu		Repornește sistem
+Find…	BeMenu		Găsește...
+Restart Tracker	BeMenu		Repornește Tracker
+Show Time	Tray		Afișează ora
+Expand new applications	PreferencesWindow		Extinde aplicații noi
+Clock	PreferencesWindow		Ceas
+Recent documents	BeMenu		Documente recente
+Hide all	WindowMenu		Ascunde tot
+Shutdown…	BeMenu		Oprește...
+Quit application	WindowMenu		Părăsește aplicația
+Show replicants	BeMenu		Afișează replicanți

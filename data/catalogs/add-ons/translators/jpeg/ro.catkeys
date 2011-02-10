@@ -1,0 +1,28 @@
+1	romanian	x-vnd.Haiku-JPEGTranslator	1834097482
+JPEG Library Error: %s\n	be_jerror		Eroare bibliotecă JPEG: %s\n
+ISO	exit_parser		ISO
+Low	JPEGTranslator		Jos
+ExposureTime	exit_parser		TimpExpunere
+Orientation	exit_parser		Orientare
+None	JPEGTranslator		Nimic
+High	JPEGTranslator		Sus
+Model	exit_parser		Model
+JPEG Library Warning: %s\n	be_jerror		Avertisment bibliotecă JPEG: %s\n
+Maker	exit_parser		Fabricant
+Output quality	JPEGTranslator		Calitatea rezultatului
+with \"lossless\" encoding support patch by Ken Murchison\n	JPEGTranslator		cu patch de suport pentru codare „fără pierderi” de Ken Murchinson\n
+JPEG images	JPEGTranslator		Imagini JPEG
+Prevent colors 'washing out'	JPEGTranslator		Previne „spălarea” culorilor
+Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Utilizează codul CMYK cu 0 pentru acoperire 100% cu cerneală
+About	JPEGTranslator		Despre
+With some colorspace conversion routines by Magnus Hellman\n	JPEGTranslator		Cu practică de conversie a spațiului de culoare de Magnus Hellman\n
+Make file smaller (sligthtly worse quality)	JPEGTranslator		Micșorează fișierul (calitate mai scăzută)
+Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Format imagine Be (TraducătorJPEG)
+Show warning messages	JPEGTranslator		Afișează mesajele de avertisment
+Output smoothing strength	JPEGTranslator		Produce putere de netezire
+Based on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n	JPEGTranslator		Bazat pe biblioteca IJG © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n
+Write	JPEGTranslator		Scrie
+Write black-and-white images as RGB24	JPEGTranslator		Scrie imaginile alb-negru ca RGB24
+Read greyscale images as RGB32	JPEGTranslator		Citește imaginile cu scală de gri ca RGB32
+Read	JPEGTranslator		Citește
+Use progressive compression	JPEGTranslator		Utilizează compresie progresivă

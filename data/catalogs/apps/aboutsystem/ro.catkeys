@@ -1,0 +1,38 @@
+1	romanian	x-vnd.Haiku-About	2350236915
+Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (și nucleul său NewOS)\n
+%ld Processors:	AboutView		%ld procesoare:
+Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (fondator proiect)\n\n
+The Haiku-Ports team\n	AboutView		Echipa Haiku-Ports\n
+Website, marketing & documentation:\n	AboutView		Site web, marketing & documentație:\n
+Revision	AboutView		Revizie
+Source Code: 	AboutView		Cod sursă:
+Processor:	AboutView		Procesor:
+Kernel:	AboutView		Nucleu:
+Contributors:\n	AboutView		Contribuitori:\n
+Unknown	AboutView		Necunoscut
+\n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… și probabil unii pe care am uitat să îi menționăm (scuze!)\n\n
+%.2f GHz	AboutView		%.2f GHz
+Memory:	AboutView		Memorie:
+Past maintainers:\n	AboutView		Responsabili anteriori:\n
+\n\nSpecial thanks to:\n	AboutView		\n\nMulțumiri speciale pentru:\n
+Licenses: 	AboutView		Licențe: 
+\nCopyrights\n\n	AboutView		\nDrepturi de autor\n\n
+Current maintainers:\n	AboutView		Responsabili curenți:\n
+Time running:	AboutView		Rulează de:
+The Haikuware team and their bounty program\n	AboutView		Echipa Haikuware și programul lor de recompense\n
+About this system	AboutWindow		Despre acest sistem
+Version:	AboutView		Versiune:
+%ld MHz	AboutView		%ld MHz
+[Click a license name to read the respective license.]\n\n	AboutView		[Click pe un nume pentru a citi respectiva licență.]\n\n
+License: 	AboutView		Licență:
+Translations:\n	AboutView		Traduceri:\n
+... and the many people making donations!\n\n	AboutView		... și tuturor celor care donează!\n\n
+The BeGeistert team\n	AboutView		Echipa BeGeistert\n
+The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku and the Haiku logo are trademarks of Haiku, Inc.\n\n	AboutView		Drepturile de autor asupra codulului sursă Haiku sunt proprietatea Haiku, Inc. sau autorilor respectivi acolo unde este menționat în mod expres. Haiku și însemnele acestuia sunt mărci comerciale ale Haiku, Inc.\n\n
+GCC %d Hybrid	AboutView		GCC %d Hibrid
+%d MiB total	AboutView		%d MiB total
+%d MiB used (%d%%)	AboutView		%d MiB utilizați (%d%%)
+The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT licence%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		Codul sursă care este unic pentru Haiku, în special nucleul și întreg codul sursă utilizat de acesta, este distribuit utilizând termenii descriși de %MIT licence%. O parte din bibliotecile sistemului conțin cod sursă provenind de la terți distribuit sub licența LGPL. Puteți găsi mai jos mențiunile referitoare la drepturile de autor asupra codulului sursă provenit de la terți.\n\n
+%total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB total, %inaccessible MiB inaccesibil
+Google & their Google Summer of Code program\n	AboutView		Google & programul Google Summer of Code\n
+The University of Auckland and Christof Lutteroth\n\n	AboutView		Universitatea Auckland și Christof Lutteroth\n\n

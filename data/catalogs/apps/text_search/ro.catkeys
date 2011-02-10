@@ -1,0 +1,31 @@
+1	romanian	x-vnd.Haiku.TextSearch	2162210365
+Trim to selection	GrepWindow		Potrivește la selecție
+Follow symbolic links	GrepWindow		Urmărește legăturile simbolice
+Close	GrepWindow		Închide
+Cancel	GrepWindow		Anulează
+The unselected files will be removed from the list.	GrepWindow		Fișierele neselectate vor fi eliminate din listă.
+Please select the files you wish to have selected for you in Tracker.	GrepWindow		Selectați fișierele pe care le doriți selectate pentru dumneavoastră în Tracker.
+Open files in Pe	GrepWindow		Deschide fișiere în Pe
+Copy text to clipboard	GrepWindow		Copiază text la clipboard
+Settings	GrepWindow		Configurări
+Select all	GrepWindow		Selectează tot
+OK	GrepWindow		OK
+Escape search text	GrepWindow		Tastați textul de căutat
+Search	GrepWindow		Caută
+Open selection	GrepWindow		Deschide selecție
+Look in sub-folders	GrepWindow		Caută în subdosare
+Actions	GrepWindow		Acțiuni
+File	GrepWindow		Fișier
+Encoding	GrepWindow		Codare
+History	GrepWindow		Istoric
+New window	GrepWindow		Fereastră nouă
+Please select the files you wish to keep searching.	GrepWindow		Selectați fișierele pe care doriți să le căutați în continuare.
+TextSearch	GrepWindow		CăutareText
+Quit	GrepWindow		Părăsește
+Show files in Tracker	GrepWindow		Afișează fișiere în Agentul de urmărire
+About TextSearch…	GrepWindow		Despre CăutareText...
+Case-sensitive	GrepWindow		Sensibil la majuscule
+Text files only	GrepWindow		Numai fișiere text
+Show lines	GrepWindow		Afișează linii
+Set target…	GrepWindow		Configurează destinație...
+Skip folders starting with a dot	GrepWindow		Omite dosarele care încep cu un punct

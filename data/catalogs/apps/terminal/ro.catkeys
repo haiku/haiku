@@ -1,0 +1,93 @@
+1	romanian	x-vnd.Haiku-Terminal	1844959750
+Not found.	Terminal TermWindow		Nu a fost găsit.
+Switch Terminals	Terminal TermWindow		Comută terminale
+Change directory	Terminal TermView		Modifică dosar
+OK	Terminal TermWindow		OK
+New Terminal	Terminal TermWindow		Terminal nou
+Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminalul nu a putut porni shell. Îmi pare rău.
+Text size	Terminal TermWindow		Dimensiune text
+Match case	Terminal FindWindow		Potrivire caz
+Quit	Terminal TermWindow		Părăsește
+Use default shell	Terminal Shell		Utilizează shell implicit
+Select all	Terminal TermWindow		Selectează tot
+Terminal	Terminal TermWindow		Terminal
+Save to file…	Terminal PrefWindow		Salvează în fișier...
+OK	Terminal PrefWindow		OK
+Font:	Terminal AppearancePrefView		Font:
+Copy here	Terminal TermView		Copiază aici
+Copy	Terminal TermWindow		Copiază
+could not set session leader.	Terminal Shell		nu s-a putut configura conducătorul de sesiune.
+Print cancelled.	Terminal TermWindow		Tipărire anulată.
+Increase	Terminal TermWindow		Mărește
+Settings	Terminal TermWindow		Configurări
+Window size	Terminal TermWindow		Dimensiune fereastră
+Terminal settings	Terminal PrefWindow		Configurări terminal
+Find	Terminal FindWindow		Găsește
+Appearance	Terminal PrefWindow		Aspect
+Use selection	Terminal FindWindow		Utilizează selecție
+Size:	Terminal AppearancePrefView		Dimensiune:
+Full screen	Terminal TermWindow		Ecran complet
+Page setup…	Terminal TermWindow		Configurări pagină...
+OK	Terminal TermView		OK
+Insert path	Terminal TermView		Inserează cale
+No search string was entered.	Terminal TermWindow		Nu s-a introdus un șir de căutat.
+Don't save	Terminal PrefWindow		Nu salva
+Match word	Terminal FindWindow		Potrivire cuvânt
+Nothing is selected.	Terminal TermWindow		Nimic nu este selectat.
+Text not found.	Terminal TermWindow		Nu s-a găsit textul.
+Find…	Terminal TermWindow		Caută...
+Move here	Terminal TermView		Mută aici
+Secondary mouse button drop menu	Terminal TermView		Meniu de selecție pentru butonul stâng al mausului
+Error!	Terminal getString		Eroare!
+New tab	Terminal TermWindow		Tab nou
+Decrease	Terminal TermWindow		Micșorează
+Create link here	Terminal TermView		Creează legătură aici
+failed set terminal interface (TERMIOS).	Terminal Shell		a eșuat configurarea interfeței de terminal (TERMIOS).
+Clear all	Terminal TermWindow		Eliberează tot
+Text encoding	Terminal TermWindow		Codificare text
+size	Terminal TermView		dimensiune
+Save as default	Terminal TermWindow		Salvează ca implicit
+Settings…	Terminal TermWindow		Configurări...
+Abort	Terminal Shell		Renunță
+mismatch handshake.	Terminal Shell		conectare nepotrivită.
+Color:	Terminal AppearancePrefView		Culoare:
+Print	Terminal TermWindow		Tipărește
+Use text:	Terminal FindWindow		Utilizează text:
+Cancel	Terminal TermWindow		Anulează
+OK	Terminal TermApp		OK
+Find failed	Terminal TermWindow		Găsește eșuat
+Search forward	Terminal FindWindow		Caută înainte
+Find previous	Terminal TermWindow		Găsește precedent
+About Terminal…	Terminal TermWindow		Despre Terminal...
+Find next	Terminal TermWindow		Găsește următorul
+Close active tab	Terminal TermWindow		Închide tabul activ
+Paste	Terminal TermWindow		Lipește
+Save changes to this settings panel?	Terminal PrefWindow		Salvați modificările la acest panou de configurări?
+Cancel	Terminal PrefWindow		Anulează
+Save	Terminal PrefWindow		Salvează
+Cancel	Terminal TermView		Anulează
+Color schema:	Terminal AppearancePrefView		Schemă de culoare:
+Confirm exit if active programs exist	Terminal AppearancePrefView		Confirmă ieșirea dacă există programe active
+Edit	Terminal TermWindow		Editează
+Shell 	Terminal TermWindow		Shell
+Close tab	Terminal TermWindow		Închide tab
+Window title:	Terminal AppearancePrefView		Titlu fereastră:
+Really close?	Terminal TermWindow		Sigur închideți?
+Tab title:	Terminal AppearancePrefView		Titlu tab:
+Window title…	Terminal TermWindow		Titlu fereastră...
+Set window title	Terminal TermWindow		Configurează titlu fereastră
+Close other tabs	Terminal TermWindow		Închide alte taburi
+Close	Terminal TermWindow		Închide
+Close window	Terminal TermWindow		Închide fereastră
+Edit tab title…	Terminal TermWindow		Editează titlu tab...
+Tab title:	Terminal TermWindow		Titlu tab:
+Custom	Terminal colors schema		Personalizat
+Black on White	Terminal colors schema		Negru pe alb
+Cancel	Terminal SetTitleWindow		Anulează
+Selected text	Terminal AppearancePrefView		Text selectat
+OK	Terminal SetTitleWindow		OK
+Background	Terminal AppearancePrefView		Fundal
+White on Black	Terminal colors schema		Alb pe negru
+Selected background	Terminal AppearancePrefView		Fundal selectat
+Text	Terminal AppearancePrefView		Text
+Use default	Terminal SetTitleWindow		Utilizează implicit

@@ -1,0 +1,40 @@
+1	romanian	x-vnd.Haiku-ActivityMonitor	969149635
+P-faults	DataSource		Defecțiuni de tip P
+Media nodes	DataSource		Noduri media
+Raw clipboard size	DataSource		Dimensiune brută clipboard
+Threads	DataSource		Fire de execuție
+Add graph	ActivityWindow		Adaugă grafic
+Teams	DataSource		Echipe
+Hide legend	ActivityView		Ascunde legenda
+Network send	DataSource		Trimite în rețea 
+CPU usage (combined)	DataSource		Utilizare procesor (combinat)
+CPU	DataSource		Procesor
+Used memory	DataSource		Memorie utilizată
+Cached memory	DataSource		Memorie stocată temporar
+Apps	DataSource		Aplicații
+Show legend	ActivityView		Arată legenda
+Settings	ActivityWindow		Configurări
+Receiving	DataSource		Primire
+Settings…	ActivityWindow		Configurări...
+Ports	DataSource		Porturi
+Text clipboard size	DataSource		Dimensiune text clipboard
+Sending	DataSource		Trimitere
+Cache	DataSource		Cache
+About ActivityMonitor…	ActivityWindow		Despre ActivitateMonitor...
+TX	DataSource		Transmisie
+Update time interval:	SettingsWindow		Actualizează intervalul de timp:
+Quit	ActivityWindow		Părăsește
+Block cache memory	DataSource		Blochează memoria tampon
+Remove graph	ActivityView		Elimină grafic
+RX	DataSource		Recepție
+CPU usage	DataSource		Utilizare procesor
+Sems	DataSource		Semaf
+Running applications	DataSource		Aplicații care rulează
+Semaphores	DataSource		Semafoare
+Block cache	DataSource		Blochează cache
+Swap space	DataSource		Spaţiu swap
+Swap	DataSource		Swap
+File	ActivityWindow		Fișier
+Additional items	ActivityView		Elemente adiționale
+Network receive	DataSource		Recepție rețea
+Memory	DataSource		Memorie

@@ -1,0 +1,50 @@
+1	romanian	x-vnd.Haiku-Shortcuts	2589740342
+MoveMouse	ShortcutsSpec		MutăMaus
+OK	ShortcutsWindow		OK
+Cancel	ShortcutsWindow		Anulează
+InsertString	ShortcutsSpec		InsereazăȘir
+Append KeySet…	ShortcutsWindow		Adăugare set de taste...
+Control	ShortcutsSpec	Name for modifier on keyboard	Control
+Key	ShortcutsWindow		Tastă
+Open KeySet…	ShortcutsWindow		Deschide set de taste...
+MouseUp	ShortcutsSpec		MausSus
+Revert to saved	ShortcutsWindow		Revenire la salvat
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
+Shortcuts	ShortcutsWindow		Scurtături
+*InsertString \"Your Text Here\"	ShortcutsWindow		*InsereazăȘir "Textul dumneavoastră aici"
+*MouseUp	ShortcutsWindow		*MauSus
+(Choose application with file requester)	ShortcutsWindow		(Selectează aplicație cu solicitantul de fișier)
+Window	ShortcutsSpec	Name for modifier on keyboard	Fereastră
+*LaunchHandler text/html	ShortcutsWindow		*OperatorLansare text/html
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Scurtături nu a putut deschide fișierul dumneavoastră set de taste!
+SendMessage	ShortcutsSpec		TrimiteMesaj
+MoveMouseTo	ShortcutsSpec		MutăMausLa
+Save	ShortcutsWindow		Salvează
+*MouseButton 1	ShortcutsWindow		*ButonMaus 1
+MouseDown	ShortcutsSpec		MausJos
+Remove selected shortcut	ShortcutsWindow		Elimină scurtătura selectată
+MouseButton	ShortcutsSpec		ButonMaus
+Add new shortcut	ShortcutsWindow		Adaugă scurtătură nouă
+Save & apply	ShortcutsWindow		Salvează & aplică
+OK	ShortcutsApp		OK
+Append	ShortcutsWindow		Adaugă
+File	ShortcutsWindow		Fișier
+Beep	ShortcutsSpec		Bip
+Quit	ShortcutsWindow		Părăsește
+*MouseDown	ShortcutsWindow		*MausJos
+Don't save	ShortcutsWindow		Nu salva
+Multi	ShortcutsSpec		Multi
+Application	ShortcutsWindow		Aplicație
+Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
+*Beep	ShortcutsWindow		*Bip
+*MoveMouseTo 50% 50%	ShortcutsWindow		*MutăMausLa 50% 50%
+Save KeySet as…	ShortcutsWindow		Salvează set de taste ca...
+Open	ShortcutsWindow		Deschide
+Really quit without saving your changes?	ShortcutsWindow		Sigur doriți să închideți fără a salva modificările?
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Scurtături nu a putut analiza fișierul dumneavoastră set de taste!
+Select	ShortcutsWindow		Selectează
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Scurtături nu a putut salva fișierul dumneavoastră set de taste!
+About Shortcuts	ShortcutsWindow		Despre Scurtături
+Oh no	ShortcutsWindow		Oh nu
+About Shortcuts	ShortcutsApp		Despre Scurtături
+LaunchHandler	ShortcutsSpec		OperatorLansare

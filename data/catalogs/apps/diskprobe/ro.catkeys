@@ -1,0 +1,128 @@
+1	romanian	x-vnd.Haiku-DiskProbe	284975751
+File offset: 	ProbeView		Decalaj fișier:
+DiskProbe	OpenWindow		TestareDisc
+%ld (native)	ProbeView		%ld (nativ)
+Find again	ProbeView		Găsește din nou
+Text	FindWindow		Text
+Find…	ProbeView		Găsește...
+Case sensitive	FindWindow		Sensibil la majuscule
+Cancel	OpenWindow		Anulează
+Close	AttributeWindow		Închide
+File	ProbeView		Fișier
+Attribute	ProbeView		Atribut
+Floating-point value:	TypeEditors		Valoare cu virgulă mobilă
+16 bit	TypeEditors		16 bit
+Attributes	ProbeView		Atribute
+Device offset: 	ProbeView		Decalaj dispozitiv:
+Selection	ProbeView		Selecție
+File	FileWindow		Fișier
+OK	DiskProbe		Bine
+Paste	ProbeView		Lipește
+PNG format	TypeEditors		Format PNG
+Font size	ProbeView		Mărime font
+Attribute type: 	ProbeView		Tip atribut:
+Attribute	AttributeWindow		Atribut
+8 bit signed value:	TypeEditors		valoare întreagă 8 bit:
+Number:	TypeEditors		Număr:
+Save	ProbeView		Salvează
+Number editor	TypeEditors		Editor de număr
+No type editor available	AttributeWindow		Niciun editor de tip disponibil
+Double precision floating-point value:	TypeEditors		Valoare cu virgulă mobilă cu precizie dublă:
+Device: 	ProbeView		Dispozitiv:
+Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Doriți să eliminați atributul \„%s\” de la fișierul \„%s\”?\n\nNu puteți să refaceți această acțiune.
+Block	ProbeView		Bloc
+Back	ProbeView		Înapoi
+Device	ProbeView		Dispozitiv
+Unknown type	TypeEditors		Tip necunoscut
+Block 0x%Lx	ProbeView		Bloc 0x%Lx
+Quit	FileWindow		Părăsește
+Undo	ProbeView		Refă
+Close	ProbeView		Închide
+16 bit signed value:	TypeEditors		valoare întreagă 16 bit:
+64 bit signed offset:	TypeEditors		decalaj întreg 64 bit:
+Copy	ProbeView		Copiază
+Boolean value:	TypeEditors		Valoare logică:
+32 bit size or status:	TypeEditors		stare sau dimensiune 32 bit:
+8 bit palette	TypeEditors		paletă de 8 bit
+Probe device	OpenWindow		Testează dispozitiv
+Unknown format	TypeEditors		Format necunoscut
+MIME type:	TypeEditors		Tip MIME:
+Page setup…	ProbeView		Configurare pagină...
+New…	FileWindow		Nou...
+DiskProbe request	AttributeWindow		Cerere TestareDisc
+Save changes before closing?	ProbeView		Salvați modificările înainte de a închide?
+Type editor	AttributeWindow		Editor de tip
+Native: 0x%0*Lx	ProbeView		Nativ: 0x%0*Lx
+Raw editor	AttributeWindow		Editor brut
+Message View	TypeEditors		Vizualizare mesaj
+DiskProbe request	ProbeView		Cerere TestareDisc
+32 bit unsigned size:	TypeEditors		dimensiune naturală 32 bit:
+Flattened bitmap	TypeEditors		Hartă de biți teșită
+Open file…	FileWindow		Deschide fișier...
+Next	ProbeView		Următor
+Close	FileWindow		Închide
+Attribute: 	ProbeView		Atribut:
+Remove from file	AttributeWindow		Elimină din fișier
+Don't save	ProbeView		Nu salva
+Previous	ProbeView		Precedent
+64 bit signed value:	TypeEditors		valoare întreagă 64 bit:
+Icon	TypeEditors		Pictogramă
+Block: 	ProbeView		Bloc:
+Examine device:	OpenWindow		Examinează dispozitiv:
+Offset: 	ProbeView		Decalaj:
+OK	ProbeView		Bine
+Add	ProbeView		Adaugă
+Edit	ProbeView		Editează
+Native: %Ld (0x%0*Lx)	ProbeView		Nativ: %Ld (0x%0*Lx)
+Cancel	AttributeWindow		Anulează
+Type editor not supported	ProbeView		Editorul de tip nu este suportat
+MIME type editor	TypeEditors		Editor tip MIME
+Swapped: %Ld (0x%0*Lx)	ProbeView		Interschimbat: %Ld (0x%0*Lx)
+Find	FindWindow		Găsește
+Remove	AttributeWindow		Elimină
+Print…	ProbeView		Tipărește...
+Block %Ld (0x%Lx)	ProbeView		Bloc %Ld (0x%Lx)
+Could not open file \"%s\": %s\n	DiskProbe		Nu s-a putut deschide fișierul \„%s\”: %s\n
+Select all	ProbeView		Selectează tot
+Probe file…	OpenWindow		Testează fișier...
+Icon view	TypeEditors		Vizualizare pictogramă
+Bookmarks	ProbeView		Semne de carte
+Mode:	FindWindow		Mod:
+15 bit	TypeEditors		15 bit
+Open device	FileWindow		Deschide dispozitiv
+Could not find search string.	ProbeView		Nu s-a putut găsi șirul căutat.
+Attribute offset: 	ProbeView		Decalaj atribut:
+Redo	ProbeView		Repetă
+File: 	ProbeView		Fișier:
+of 	ProbeView		de
+DiskProbe\n\twritten by Axel Dörfler\n\tCopyright 2004-2007, Haiku.\n\nOriginal Be version by Robert Polic\n	DiskProbe		TestareDisc\n\tscris de Axel Dörfler\n\tDrepturi de autor 2004-2007, Haiku.\n\nVersiune originală Be de Robert Polic\n
+32 bit	TypeEditors		32 bit
+Cancel	ProbeView		Anulează
+Swapped: 0x%0*Lx	ProbeView		Interschimbat: 0x%0*Lx
+Grayscale	TypeEditors		Scală de gri
+DiskProbe request	DiskProbe		Cerere TestareDisc
+Type editor	ProbeView		Editor de tip
+Contents:	TypeEditors		Conținuturi:
+Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than \"Font size\" and \"BlockSize\"	Bază
+what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	ce: „%.4s”\n\n
+Boolean	TypeEditors	This is the type of editor	Logic
+Stop	ProbeView		Oprește
+Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hex
+Text	TypeEditors	This is the type of editor	Text
+Number	TypeEditors	This is the type of editor	Număr
+Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Zecimal
+String editor	TypeEditors		Editor de șir
+View	ProbeView	This is the last menubar item \"File Edit Block View\"	Vizualizare
+Boolean editor	TypeEditors		Editor logic
+none	ProbeView	No attributes	nimic
+BlockSize	ProbeView	A menu item, a shortened form from \"block size\". This is in the same menu windowthan \"Base\" and \"Font size\"	DimensiuneBloc
+Fit	ProbeView	Size of fonts, fits to available room	Potrivește
+(native)	ProbeView		(nativ)
+Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hexazecimal
+Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Nu s-a putut citi mesajul
+Message	TypeEditors	This is the type of view	Mesaj
+Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Nu s-a putut deschide \„%s\”:\n%s
+of 0x0	ProbeView	This is a part of \"Block 0xXXXX of 0x0026\" message. In languages without 'of' structure it can be replaced simply with '/'.	de 0x0
+Image view	TypeEditors	Image means here a picture file, not a disk image.	Vizualizare imagine
+Image	TypeEditors	This is the type of view	Imagine
+About DiskProbe…	FileWindow		Despre TestareDisc...

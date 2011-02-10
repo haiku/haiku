@@ -1,0 +1,30 @@
+1	romanian	x-vnd.Haiku-Magnify	2509541325
+no clip msg\n	In console, when clipboard is empty after clicking Copy image		niciun clip msg\n
+Make square	Magnify-Main		Alcătuiește pătrat
+Copy image	Magnify-Main		Copiază imagine
+Magnify help	Magnify-Help		Ajutor lupă
+Magnify!\n\n©2002-2006 Haiku\n(C)1999 Be Inc.\n\nNow with even more features and recompiled for Haiku.	Magnify-Main		Lupă!\n\n©2002-2006 Haiku\n(C)1999 Be Inc.\n\nAcum cu mai multe caracteristici și recompilat pentru Haiku.
+usage: magnify [size] (magnify size * size pixels)\n	Console		utilizare: 
+Magnify	Magnify-Main		Lupă
+Stick coordinates	Magnify-Main		Lipește coordonate
+Hide/Show grid	Magnify-Main		Ascunde/Afișează grilă
+magnify: size must be a multiple of 4\n	Console		lupă: dimensiunea trebuie să fie multiplu de 4\n
+Help…	Magnify-Main		Ajutor...
+General:\n  32 x 32 - the top left numbers are the number of visible\n    pixels (width x height)\n  8 pixels/pixel - represents the number of pixels that are\n    used to magnify a pixel\n  R:152 G:52 B:10 -  the RGB values for the pixel under\n    the red square\n	Magnify-Help		General:\n 32 x 32 - numerele din stânga sus sunt numărul de pixeli\nvizibili (lățime x înălțime) 8 pixeli/pixel - reprezintă numărul de pixeli care sunt utilizați\n pentru a mări un pixel\n R:152 G:52 B:10 - valorile RGB pentru pixelul de sub\n pătratul roșu\n
+Sizing/Resizing:\n  make square - sets the width and the height to the larger\n    of the two making a square image\n  increase/decrease window size - grows or shrinks the window\n    size by 4 pixels.\n    note: this window can also be resized to any size via the\n      resizing region of the window\n  increase/decrease pixel size - increases or decreases the number\n    of pixels used to magnify a 'real' pixel. Range is 1 to 16.\n	Magnify-Help		Dimensionare/Redimensionare:\nalcătuiește pătrat - configură lățimea și înălțimea la cea mai largă\n dintre ele alcătuind o imagine pătrată\n mărește/micșorează dimensiunea ferestrei - mărește sau micșorează dimensiunea\nferestrei cu 4 pixeli.\nnotă: această fereastră poate fi de asemenea redimensionată la orice mărime prin regiunea\nde redimensionare a ferestrei\nmărește/micșorează dimensiunea pixelului - mărește sau micșorează numărul\ndepixeli utilizați pentru a mări un pixel „real”. Intervalul este de la 1 la 16.\n
+Decrease pixel size	Magnify-Main		Micșorează dimensiune pixel
+%width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize pixels/pixel
+Info	Magnify-Main		Info
+Remove a crosshair	Magnify-Main		Elimină un reticul
+About Magnify…	Magnify-Main		Despre Lupă...
+Freeze/Unfreeze image	Magnify-Main		Îngheață/Dezgheață imagine
+Copy/Save:\n  copy - copies the current image to the clipboard\n  save - prompts the user for a file to save to and writes out\n    the bits of the image\n	Magnify-Help		Copiază/Salvează:\n copiază - copiază imaginea curentă la clipboard\n salvează - anunță utilizatorul pentru salvarea unui fișier și scrie\nbiții imaginii\n
+OK	Magnify-Main		Bine
+Hide/Show info	Magnify-Main		Ascunde/Afișează info
+Navigation:\n  arrow keys - move the current selection (rgb indicator or crosshair)\n    around 1 pixel at a time\n  option-arrow key - moves the mouse location 1 pixel at a time\n  x marks the selection - the current selection has an 'x' in it\n	Magnify-Help		Navigare:\ntaste cu săgeți - mută selecția curentă (indicator rgb sau reticul)\n în jur de 1 pixel o dată\n opțiune-tastă cu săgeată - mută locația mausului cu 1 pixel o dată\n x marchează selecția - selecția curentă conține un „x”\n
+Save image	Magnify-Main		Salvează imagine
+Increase window size	Magnify-Main		Mărește dimensiune fereastră
+Decrease window size	Magnify-Main		Micșorează dimensiune fereastră
+Increase pixel size	Magnify-Main		Mărește dimensiune pixel
+size must be > 4 and a multiple of 4\n	Console		dimensiunea trebuie să fie > 4 și un multiplu de 4\n
+Add a crosshair	Magnify-Main		Adaugă un reticul

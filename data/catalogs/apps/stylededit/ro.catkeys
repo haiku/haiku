@@ -1,0 +1,71 @@
+1	romanian	x-vnd.Haiku-StyledEdit	391800387
+OK	LoadAlert		OK
+???	LoadAlert		???
+Left	Menus		Stânga
+Search backwards	FindandReplaceWindow		Caută înapoi 
+Size	Menus		Dimensiune
+Save	QuitAlert		Salvează
+Replace same	Menus		Înlocuiește același
+Can't Undo	Menus		Nu se poate reface
+Save	Menus		Salvează
+Replace with:	FindandReplaceWindow		Înlocuiește cu:
+Case-sensitive	FindandReplaceWindow		Sensibil la majuscule
+Green	Menus		Verde
+Revert to saved…	Menus		Revenire la salvat...
+Yellow	Menus		Galben
+Replace in all windows	FindandReplaceWindow		Înlocuiește în toate ferestrele
+Wrap lines	Menus		Încadrează linii
+Cancel	RevertToSavedAlert		Anulează
+Document	Menus		Document
+Font	Menus		Font
+Replace all	FindandReplaceWindow		Înlocuiește tot
+Default	Open_and_SaveAsPanel		Implicit
+Cancel	FindandReplaceWindow		Anulează
+OK	RevertToSavedAlert		OK
+Don't save	QuitAlert		Nu salva
+Align	Menus		Aliniază
+Color	Menus		Culoare
+Red	Menus		Roșu
+Open…	Menus		Deschide...
+Center	Menus		Centru
+Blue	Menus		Albastru
+Cyan	Menus		Cyan
+Magenta	Menus		Magenta
+New	Menus		Nou
+Wrap-around search	FindandReplaceWindow		Căutare încadrează împrejur
+Find selection	Menus		Găsește selecție
+Find:	FindandReplaceWindow		Găsește:
+Replace	FindandReplaceWindow		Înlocuiește
+Find again	Menus		Găsește din nou
+Cancel	QuitAlert		Anulează
+Find…	Menus		Găsește...
+Black	Menus		Negru
+Untitled 	StyledEditWindow		Fără titlu
+OK	SaveAlert		OK
+Find	FindandReplaceWindow		Găsește
+Encoding	Open_and_SaveAsPanel		Codare
+Replace…	Menus		Înlocuiește...
+Right	Menus		Dreapta
+Cancel	SaveAlert		Anulează
+Save	SaveAlert		Salvează
+Don't save	SaveAlert		Nu salva
+Paste	Menus		Lipește
+Print…	Menus		Tipărește...
+Quit	Menus		Părăsește
+Clear	Menus		Eliberează
+Edit	Menus		Editează
+Close	Menus		Închide
+Copy	Menus		Copiază
+Cut	Menus		Taie
+Select all	Menus		Selectează tot
+Save as…	Menus		Salvează ca...
+Lines:	Statistics		Linii:
+Document statistics	Statistics		Statistici document
+Statistics…	Menus		Statistici...
+Words:	Statistics		Cuvinte:
+OK	Statistics		OK
+Undo typing	QuitAlert		Refă tastarea
+Characters:	Statistics		Caractere:
+Redo typing	QuitAlert		Repetă tastarea
+Italic	Menus		Cursiv
+Bold	Menus		Aldin

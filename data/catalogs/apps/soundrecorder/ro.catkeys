@@ -1,0 +1,38 @@
+1	romanian	x-vnd.Haiku-SoundRecorder	1355572422
+Loop	RecorderWindow		Buclă
+Cannot find default audio hardware	RecorderWindow		Nu se poate găsi harware-ul audio implicit
+Cannot find the temporary file created to hold the new recording	RecorderWindow		Nu se poate găsi fișierul temporar creat pentru a păstra înregistrarea nouă
+Sample size: 	RecorderWindow		Dimensiune mostră:
+Nothing to play	RecorderWindow		Nimic de redat
+Duration:	RecorderWindow		Durată:
+Some of the files don't appear to be audio files	RecorderWindow		Unele fișiere nu par a fi niște fișiere audio
+File info	RecorderWindow		Info fișier
+Drop files here	SoundListView		Plasați fișiere aici
+Input	RecorderWindow		Intrare
+Stop	RecorderWindow		Oprește
+SoundRecorder	RecorderWindow		InscriptorSunet
+Format: 	RecorderWindow		Format:
+Sound List	RecorderWindow		Listă de sunet
+Compression:	RecorderWindow		Compresie:
+Rewind	RecorderWindow		Derulează înapoi
+Sample rate: 	RecorderWindow		Rată monstră:
+Invalid audio files	RecorderWindow		Fișiere audio nevalide
+seconds	RecorderWindow		secunde
+OK	RecorderWindow		Bine
+Cannot open the temporary file created to hold the new recording	RecorderWindow		Nu se poate deschide fișierul temporar creat pentru a păstra înregistrarea nouă
+None of the files appear to be audio files	RecorderWindow		Niciunul dintre fișiere nu pare a fi din fișierele audio 
+Input:	RecorderWindow		Intrare:
+Forward	RecorderWindow		Înainte
+Play	RecorderWindow		Redă
+Channels: 	RecorderWindow		Canale:
+bits	RecorderWindow		biți
+None	RecorderWindow		Nimic
+Record	RecorderWindow		Înregistrează
+Cannot recognize this file as a media file	RecorderWindow		Nu se poate recunoaște acest fișier ca fiind un fișier media
+File name:	RecorderWindow		Nume de fișier:
+Cannot connect to the selected sound input	RecorderWindow		Nu se poate conecta la intrarea de sunet selectată
+Cannot get the file to play	RecorderWindow		Nu se poate reda fișierul
+Cannot record a sound that long	RecorderWindow		Nu se poate înregistra un sunet atât de lung
+Cannot find an unused name to use for the new recording	RecorderWindow		Nu se poate găsi un nume neutilizat pentru înregistrarea nouă
+Save	RecorderWindow		Salvează
+Cannot connect to media server	RecorderWindow		Nu se poate conecta la serverul media

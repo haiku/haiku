@@ -1,0 +1,16 @@
+1	romanian	x-vnd.Haiku-Touchpad	1498191605
+Scrolling	TouchpadPrefView		Derulare
+Revert	TouchpadPrefView		Revenire
+Two finger scrolling	TouchpadPrefView		Derulare cu două degete
+Defaults	TouchpadPrefView		Implicite
+Slow	TouchpadPrefView		Încet
+High	TouchpadPrefView		Înalt
+Tap gesture	TouchpadPrefView		Gest de atingere
+Horizontal scrolling	TouchpadPrefView		Derulare orizontală
+Fast	TouchpadPrefView		Repede
+Tap click sensitivity	TouchpadPrefView		Sensibilitatea la clic
+Scroll acceleration	TouchpadPrefView		Accelerarea derulării
+Off	TouchpadPrefView		Oprit
+Touchpad	TouchpadMain		Touchpad
+Horizontal scroll speed	TouchpadPrefView		Viteză derulare orizontală
+Vertical scroll speed	TouchpadPrefView		Viteză derulare verticală

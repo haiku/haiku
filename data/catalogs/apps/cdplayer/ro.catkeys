@@ -1,0 +1,9 @@
+1	romanian	x-vnd.Haiku-CDPlayer	3499256712
+DiscTime	CDPlayer		DuratăDisc
+Audio CD	CDPlayer		CD audio
+It appears that there are no CD drives on your computer or there is no system software to support one. Sorry.	CDPlayer		Se pare că nu există unități CD în calculatorul dumneavoastră sau nu există un sistem software pentru a suporta una.
+TrackTime	CDPlayer		DuratăPistă
+TrackNumber	CDPlayer		NumărPistă
+Track: --:-- / --:--	CDPlayer		Pistă: --:-- / --:--
+Disc: --:-- / --:--	CDPlayer		Disc: --:-- / --:--
+CD drive is empty	CDPlayer		Unitatea CD este vidă

@@ -1,0 +1,45 @@
+1	romanian	x-vnd.Haiku-PowerStatus	2281622680
+Design capacity low warning: 	PowerStatus		Avertisment de capacitate redusă model:
+Show percent	PowerStatus		Afișează procentaj
+PowerStatus settings	PowerStatus		Configurări StareConsum
+Design capacity: 	PowerStatus		Capacitate model:
+mW	PowerStatus		mW
+about	PowerStatus		despre
+Type: 	PowerStatus		Tip:
+non-rechargeable	PowerStatus		nu este reîncărcabilă
+Empty battery slot	PowerStatus		Fantă liberă de baterie
+mV	PowerStatus		mV
+Run in window	PowerStatus		Rulează în fereastră
+mWh	PowerStatus		mWh
+Battery info…	PowerStatus		Info baterie...
+Show time	PowerStatus		Afișează oră
+Last full charge: 	PowerStatus		Ultima încărcate completă:
+Battery unused	PowerStatus		Baterie neutilizată
+Extended battery info	PowerStatus		Info extins baterie
+mA	PowerStatus		mA
+Current rate: 	PowerStatus		Cotă curentă:
+discharging	PowerStatus		se descarcă
+Show text label	PowerStatus		Afișează etichetă text
+About…	PowerStatus		Despre...
+Model number: 	PowerStatus		Numărul modelului:
+Install in Deskbar	PowerStatus		Instalează pe bara de desktop
+mAh	PowerStatus		mAh
+Capacity: 	PowerStatus		Capacitate:
+Battery discharging	PowerStatus		Se descarcă bateria
+Serial number: 	PowerStatus		Număr de serie:
+Capacity granularity 1: 	PowerStatus		Capacitate de granulozitate 1:
+OK	PowerStatus		OK
+OEM info: 	PowerStatus		Info OEM:
+Design voltage: 	PowerStatus		Voltaj model:
+Battery charging	PowerStatus		Se încarcă bateria
+Design capacity warning: 	PowerStatus		Avertisment capacitate model:
+Battery info	PowerStatus		Info baterie
+Quit	PowerStatus		Părăsește
+rechargeable	PowerStatus		reîncărcabilă
+charging	PowerStatus		se încarcă
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Puteți să rulați StareConsum într-o ferestră sau să îl instalați pe bara de desktop.
+Power status box	PowerStatus		Casetă stare consum
+Show status icon	PowerStatus		Afișează pictogramă de stare
+Capacity granularity 2: 	PowerStatus		Capacitate de granulozitate 2:
+Technology: 	PowerStatus		Tehnologie:
+no battery	PowerStatus		fără baterie

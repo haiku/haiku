@@ -1,0 +1,56 @@
+1	romanian	x-vnd.Haiku-BluetoothPrefs	912779521
+About Bluetooth…	Window		Despre Bluetooth...
+Handheld	Settings view		Calculator de buzunar
+Default inquiry time:	Settings view		Timp implicit de întrebare:
+Add device to list	Inquiry panel		Adaugă dispozitiv la listă
+Starting scan...	Inquiry panel		Se începe scanarea...
+Show bluetooth console…	Window		Afișează consolă bluetooth...
+Smart phone	Settings view		Telefon inteligent
+seconds	Inquiry panel		secunde
+Server	Window		Server
+Stop bluetooth services…	Window		Oprește servicii bluetooth...
+Identify host as:	Settings view		Identifică gazda ca:
+View	Window		Vizualizare
+Refresh…	Remote devices		Reîmprospătează...
+Pair…	Remote devices		Pereche...
+Incoming connections policy:	Settings view		Regula conexiunilor de primire
+From all devices	Settings view		De la toate dispozitivele
+Show name	Extended local device view		Afișează nume
+Local devices found on system:	Settings view		Dispozitivele locale găsite în sistem:
+Scanning completed.	Inquiry panel		Scanarea a fost completată.
+Remote devices	Window		Dispozitive la distanță
+Remove	Remote devices		Elimină
+15 secs	Settings view		15 secunde
+Start bluetooth services…	Window		Pornește servicii bluetooth...
+Policy...	Settings view		Regulă...
+61 secs	Settings view		61 secunde
+There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Nu există niciun dispozitiv local Bluetooth înregistrat pe sistem.
+Identify us as...	Settings view		Identificare ca...
+Remaining 	Inquiry panel		Rămas
+As blocked	Remote devices		Ca blocat
+Pick LocalDevice...	Settings view		Selectează dispozitiv local...
+Defaults	Window		Implicite
+Inquiry	Inquiry panel		Întrebare
+Desktop	Settings view		Desktop
+Revert	Window		Revenire
+Remote devices list…	Window		Lista cu dispozive la distanță...
+Laptop	Settings view		Laptop
+Retrieving name of 	Inquiry panel		Se obține numele lui
+Bluetooth	Window		Bluetooth
+Discoverable	Extended local device view		Poate fi descoperit
+Service classes: 	Device View		Clase de servicii:
+Connections & channels…	Window		Conexiuni & canale...
+Refresh LocalDevices…	Window		Reîmprospătează dispozitivele locale...
+Settings	Window		Configurări
+Only from trusted devices	Settings view		Numai de la dispozitivele de încredere
+Scanning progress	Inquiry panel		Progresul scanării
+Always ask	Settings view		Întreabă întotdeauna
+Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Verificați dacă toate capacitățile Bluetooth ale dispozitivului la distanță sunt activate. Apăsați „Întrebare” pentru a începe scanarea. Timpul implicit necesar obținerii numelor nu este cunoscut, deși nu ar trebui să dureze mai mult de 3 secunde per dispozitiv. După aceea veți avea posibilitatea să le adăugați în lista principală, de unde vă puteți conecta la acestea.
+Retrieving names...	Inquiry panel		Se obțin numele...
+Help	Window		Ajutor
+Add…	Remote devices		Adaugă...
+Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Sistem Bluetooth Haiku, (ARCE)\n\nCreat de Oliver Ruiz Dorantes\n\nCu ajutorul:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nMulțumim persoanelor individuale care au ajutat...\n\nTrimitere/donare de hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomic:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nCu patch-uri:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nCare mi-a dăruit toate cunoștințele în domeniu: echipa yellowTAB
+Server	Settings view		Server
+OK	main		OK
+Disconnect	Remote devices		Deconectează
+Authenticate	Extended local device view		Autentificare

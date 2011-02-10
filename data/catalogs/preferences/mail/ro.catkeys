@@ -1,0 +1,36 @@
+1	romanian	x-vnd.Haiku-Mail	964584951
+Mail checking	Config Window		Verificare mail
+Settings	Config Window		Configurări
+Only when dial-up is connected	Config Window		Doar atunci când linia comutată este conectată
+While sending and receiving	Config Window		În timp ce se trimite și se recepționează
+days	Config Window		zile
+Start mail services on startup	Config Window		Rulează serviciile de mail la pornire
+Account name:	Config Views		Nume cont:
+Revert	Config Window		Revenire
+Accounts	Config Window		Conturi
+Remove	Config Window		Elimină
+Miscellaneous	Config Window		Diverse
+Show connection status window:	Config Window		Afișează fereastra de stare a conexiunii:
+While sending	Config Window		În timp ce se trimite
+Schedule outgoing mail when dial-up is disconnected	Config Window		Planifică mailurile de ieșire când linia comutată este deconectată
+hours	Config Window		ore
+Add	Config Window		Adaugă
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nConfigurările generale nu au putut fi inversate.\n\nEroare la obținerea configurărilor generale:\n%s\n
+Real name:	Config Views		Nume real:
+Return address:	Config Views		Întoarce adresa:
+Edit mailbox menu…	Config Window		Editează meniul cutiei cu mail
+Check every	Config Window		Verifică la fiecare
+never	Config Window		niciodată
+Account settings	Config Views		Configurări cont
+minutes	Config Window		minute
+Error retrieving general settings: %s\n	Config Window		Eroare la obținerea configurărilor generale: %s\n
+Apply	Config Window		Aplică
+Always	Config Window		Întotdeauna
+OK	Config Window		Bine
+Beta	Config Window		Beta
+Alpha	Config Window		Alfa
+Golden master	Config Window		Principal golden
+Final	Config Window		Final
+Gamma	Config Window		Gama
+Development	Config Window		Dezvoltare
+Error	Config Window		Eroare

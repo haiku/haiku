@@ -1,0 +1,45 @@
+1	romanian	x-vnd.Haiku-Notifications	2815623548
+Right of icon	DisplayView		În dreapta pictogramei
+Notifications	GeneralView		Înștiințări
+seconds of inactivity	GeneralView		secunde de inactivitate
+Revert	PrefletWin		Revenire
+Mini icon	DisplayView		Mini pictogramă
+Enable notifications	GeneralView		Activează înștiințări
+Error	NotificationView		Eroare
+OK	GeneralView		OK
+Events are not notified	GeneralView		Evenimentele nu sunt înștiințate
+Save	PrefletWin		Salvează
+Type	NotificationView		Tip
+Notifications cannot be stopped, because the server can't be reached.	GeneralView		Înștiințările nu pot fi oprite, deoarece serverul nu poate fi contactat.
+OK	NotificationView		OK
+Important	NotificationView		Important
+Notifications	PrefletWin		Înștiințări
+Cannot disable notifications because the server can't be reached.	GeneralView		Nu se pot dezactiva înștiințările deoarece serverul nu poate fi contactat.
+Progress	NotificationView		Progres
+Last Received	NotificationView		Ultima primită
+Title position:	DisplayView		Poziție titlu:
+General	PrefletView		General
+Display	PrefletView		Afișare
+Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Nu se pot activa înștiințările la pornire, probabil că nu aveți drepturi de scriere în dosarul de configurări pentru pornirea sistemului.
+Search:	NotificationView		Caută:
+Allowed	NotificationView		Permis
+Yes	NotificationView		Da
+Large icon	DisplayView		Pictogramă largă
+Icon size:	DisplayView		Dimensiune pictogramă:
+Hide notifications from screen after	GeneralView		Ascunde înștiințările de pe ecran după
+Disable notifications	GeneralView		Dezactivează înștiințări
+Notifications	NotificationView		Înștiințări
+No	NotificationView		Nu
+Title	NotificationView		Titlu
+Information	NotificationView		Informații
+Window width:	DisplayView		Lățime fereastră:
+Application	NotificationView		Aplicație
+Enabled	NotificationView		Activat
+OK	DisplayView		Bine
+Unknown	NotificationView		Necunoscut
+Can't save preferences, you probably don't have write access to the boot settings directory.	GeneralView		Nu se pot salva preferințele, probabil că nu aveți acces pentru scriere în dosarul de configurări pentru pornirea sistemului.
+Above icon	DisplayView		Deasupra pictogramei
+Enable notifications at startup	GeneralView		Activează înștiințări la pornire
+The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Serverul de înștiințări nu poate fi găsit, înseamnă că instalarea dumneavoastră InfoPopper nu a fost completată cu succes.
+Applications	NotificationView		Aplicații
+Events are notified	GeneralView		Evenimentele sunt înștiințate

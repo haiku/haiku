@@ -1,0 +1,139 @@
+1	romanian	x-vnd.Haiku-MediaPlayer	1869404730
+1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (American)
+Stream settings	MediaPlayer-Main		Configurări flux
+Close window when done playing movies	MediaPlayer-SettingsWindow		Închide fereastra când s-a terminat redarea de filme
+<unknown>	PlaylistItem-album		<necunoscut>
+Remove (Del)	MediaPlayer-PlaylistWindow		Elimină (Del)
+Save Playlist	MediaPlayer-PlaylistWindow		Salvează lista de redare
+error	MediaPlayer-Main		eroare
+None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Niciun fișier pe care ați vrut să le redați nu par a fi fișiere media.
+Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Salvarea listei de redare a eșuat.\n\nEroare:
+New player…	MediaPlayer-Main		Player nou...
+100% scale	MediaPlayer-Main		scală 100%
+Close	MediaPlayer-Main		Închide
+Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Unele fișiere nu pot fi mutate la gunoi.
+MediaPlayer Current Playlist	MediaPlayer-Main		Listă de redare curentă PlayerMedia
+Open	MediaPlayer-Main		Deschide
+Next	MediaPlayer-Main		Următor
+OK	MediaPlayer-SettingsWindow		OK
+Track %d	MediaPlayer-Main		Pista %d
+2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.31 : 1 (Cinemascop)
+Medium	MediaPlayer-SettingsWindow		Mediu
+Close	MediaPlayer-PlaylistWindow		Închide
+Toggle mute.	MediaPlayer-Main		Comută pe mut.
+Open…	MediaPlayer-PlaylistWindow		Deschide...
+Undo	MediaPlayer-PlaylistWindow		Refă
+File info…	MediaPlayer-Main		Informații fișier...
+Use hardware video overlays if available	MediaPlayer-SettingsWindow		Utilizează suprapunerea video hardware dacă este disponibilă
+Pause playback.	MediaPlayer-Main		Pauză redare
+Remove Entry	MediaPlayer-RemovePLItemsCmd		Elimină intrare
+MediaPlayer encountered an internal error. The file could not be opened.	MediaPlayer-Main		PlayerMedia a întălnit o eroare internă. Fișierul nu a putut fi deschis.
+Drop files to play	MediaPlayer-Main		Plasați fișiere pentru a le reda
+Full volume	MediaPlayer-SettingsWindow		Volum complet
+TogglePlaying	MediaPlayer-Main		ComutăRedare
+Cancel	MediaPlayer-SettingsWindow		Anulează
+Nothing to Play	MediaPlayer-Main		Nimic de redat
+Quit	MediaPlayer-Main		Părăsește
+Muted	MediaPlayer-SettingsWindow		Mut
+Video	MediaPlayer-Main		Video
+Start playing.	MediaPlayer-Main		Începe redarea
+MediaPlayer\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		PlayerMedia\n\nScris de Marcus Overhagen, Stephan Aßmus și Frederik Modéen
+There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Nu există niciun decodor instalat pentru a gestiona formatul fișierului, sau decodorul întâmpină probleme cu versiunea specifică a formatului.
+Import Entry	MediaPlayer-ImportPLItemsCmd		Importă intrare
+Gets the URI of the currently playing item.	MediaPlayer-Main		Obține adresa URI a elementului curent redat.
+400% scale	MediaPlayer-Main		scală 400%
+Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Salvarea listei de redare a eșuat:\n\nEroare:
+Move Entries	MediaPlayer-MovePLItemsCmd		Mută intrări
+Loop sounds by default	MediaPlayer-SettingsWindow		Repetă sunetele în mod implicit
+Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		Eroare de mutare la gunoi
+Audio	MediaPlayer-Main		Audio
+Open Playlist	MediaPlayer-PlaylistWindow		Deschide lista de redare
+OK	MediaPlayer-Main		OK
+Settings…	MediaPlayer-Main		Configurări...
+MediaPlayer settings	MediaPlayer-SettingsWindow		Configurări MediaPlayer
+Move Entry	MediaPlayer-MovePLItemsCmd		Mută intrare
+Stop playing.	MediaPlayer-Main		Oprește redarea.
+Open	MediaPlayer-PlaylistWindow		Deschide
+Error: 	MediaPlayer-RemovePLItemsCmd		Eroare:
+Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Eroare internă (mesaj greșit). Salvarea listei de redare a eșuat.
+Skip to the previous track.	MediaPlayer-Main		Mergi la pista precedentă.
+Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Scalează filme lin (modul fără suprapunere)
+OK	MediaPlayer-RemovePLItemsCmd		OK
+50% scale	MediaPlayer-Main		scală 50%
+Subtitles	MediaPlayer-Main		Subtitrări
+Prev	MediaPlayer-Main		Prec
+Volume	MediaPlayer-Main		Volum
+Audio track	MediaPlayer-Main		Pistă audio
+Import Entries	MediaPlayer-ImportPLItemsCmd		Importă intrări
+Pause	MediaPlayer-Main		Pauză
+No aspect correction	MediaPlayer-Main		Fără corecție de aspect
+Automatically start playing	MediaPlayer-SettingsWindow		Pornește redarea automat
+Track	Video Track Menu		Pistă
+Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Eroare internă (blocarea a eșuat). Salvarea listei de redare a eșuat.
+View options	MediaPlayer-SettingsWindow		Opțiuni vizualizare
+Play mode	MediaPlayer-SettingsWindow		Mod de redare
+Remove Entries	MediaPlayer-RemovePLItemsCmd		Elimină intrări
+Video track	MediaPlayer-Main		Pistă video
+Attributes	MediaPlayer-Main		Atribute
+All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Nu s-au putut muta toate fișierele la gunoi.
+<untitled>	PlaylistItem-title		<fără titlu>
+Track	Audio Track Menu		Pistă
+Skip to the next track.	MediaPlayer-Main		Mergi la pista următoare.
+<nothing to redo>	MediaPlayer-PlaylistWindow		<nimic de repetat>
+Play	MediaPlayer-Main		Redă
+Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Elimină intrările la gunoi
+200% scale	MediaPlayer-Main		scală 200%
+It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Se pare că serverul media nu rulează.\nDoriți să îl porniți?
+Aspect ratio	MediaPlayer-Main		Proporție aspect
+Error: 	MediaPlayer-Main		Eroare:
+Large	MediaPlayer-SettingsWindow		Larg
+Bottom of video	MediaPlayer-SettingsWindow		Baza video
+Remove and put into Trash	MediaPlayer-PlaylistWindow		Elimină și plasează la gunoi
+About MediaPlayer…	MediaPlayer-Main		Despre MediaPlayer...
+Stop	MediaPlayer-Main		Oprește
+Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Eroare internă (fără memorie). Salvarea listei de redare a eșuat.
+Hide interface	MediaPlayer-Main		Ascunde interfață
+Copy Entry	MediaPlayer-CopyPLItemsCmd		Copiază intrare
+none	Subtitles menu		nimic
+Thanks	MediaPlayer-Main		Mulțumesc
+URI	MediaPlayer-Main		URI
+Mute	MediaPlayer-Main		Mut
+Scale controls in full-screen mode	MediaPlayer-SettingsWindow		Scalează controale în modul ecran complet
+Close window when done playing sounds	MediaPlayer-SettingsWindow		Închide fereastra când s-a terminat redarea sunetelor
+Toggle pause/play.	MediaPlayer-Main		Comută pornit/oprit.
+Subtitle placement	MediaPlayer-SettingsWindow		Amplasare subtitrare
+Small	MediaPlayer-SettingsWindow		Mic
+Randomize	MediaPlayer-PlaylistWindow		Amestecă aleator
+Off	Subtitles menu		Oprit
+Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Amestecă aleator intrările
+Revert	MediaPlayer-SettingsWindow		Revenire
+Edit	MediaPlayer-PlaylistWindow		Editează
+Subtitle size	MediaPlayer-SettingsWindow		Mărime subtitrări
+Start media server	MediaPlayer-Main		Pornește server media
+<unnamed>	PlaylistItem-name		<nedenumit>
+Open Clips	MediaPlayer-Main		Deschide clipuri
+Remove all	MediaPlayer-PlaylistWindow		Elimină tot
+OK	MediaPlayer-PlaylistWindow		OK
+none	Audio track menu		nimic
+Loop movies by default	MediaPlayer-SettingsWindow		Repetă filmele în mod implicit
+Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Obține/configurează volumul (0.0-2.0)
+Playlist…	MediaPlayer-Main		Listă de redare...
+<unknown>	PlaylistItem-author		<necunoscut>
+Save as…	MediaPlayer-PlaylistWindow		Salvează ca...
+Copy Entries	MediaPlayer-CopyPLItemsCmd		Copiază intrări
+Redo	MediaPlayer-PlaylistWindow		Repetă
+Always on top	MediaPlayer-Main		Întotdeauna deasupra
+Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Elimină intrările la gunoi
+Save	MediaPlayer-Main		Salvează
+<nothing to undo>	MediaPlayer-PlaylistWindow		<nimic de refăcut>
+Save	MediaPlayer-PlaylistWindow		Salvează
+Full screen	MediaPlayer-Main		Ecran complet
+Open file…	MediaPlayer-Main		Deschide fișier...
+300% scale	MediaPlayer-Main		scală 300%
+Bottom of screen	MediaPlayer-SettingsWindow		Baza ecranului
+Save error	MediaPlayer-PlaylistWindow		Eroare la salvare
+Play background clips at	MediaPlayer-SettingsWindow		Redă clipurile de fundal la
+Rating	MediaPlayer-Main		Apreciere
+Playlist	MediaPlayer-PlaylistWindow		Listă de redare
+Lock Peaks	MediaPlayer-PeakView		Blochează vârfuri
+Low volume	MediaPlayer-SettingsWindow		Volum redus

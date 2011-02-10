@@ -1,0 +1,28 @@
+1	romanian	x-vnd.Haiku-ScreenSaver	1468011094
+Run module	ScreenSaver		Pornește modul
+Could not load screen saver	ScreenSaver		Nu s-a putut încărca protectorul de ecran
+30 seconds	ScreenSaver		30 de secunde
+Password…	ScreenSaver		Parolă...
+Password:	ScreenSaver		Parolă:
+Password lock	ScreenSaver		Blocare parolă
+Add…	ScreenSaver		Adaugă...
+mouse is here	ScreenSaver		mausul este aici
+Modules	ScreenSaver		Module
+Test	ScreenSaver		Testează
+ScreenSaver	ScreenSaver		ProtectorEcran
+Module settings	ScreenSaver		Configurări modul
+Cancel	ScreenSaver		Anulează
+Turn off screen	ScreenSaver		Închide ecranul
+No options available	ScreenSaver		Nu există opțiuni disponibile
+Password Window	ScreenSaver		Fereastră parolă
+Enable screen saver	ScreenSaver		Activează protectorul de ecran
+Fade now when	ScreenSaver		Estompează acum când
+Fade	ScreenSaver		Estompează
+Passwords don't match. Please try again.	ScreenSaver		Parolele nu se potrivesc. Încercați din nou.
+OK	ScreenSaver		OK
+Don't fade when	ScreenSaver		Nu estompa când
+Blackness	ScreenSaver		Întunecat
+Use custom password	ScreenSaver		Utilizează parolă personalizată
+Done	ScreenSaver		Gata
+Confirm password:	ScreenSaver		Confirmare parolă:
+Use network password	ScreenSaver		Utilizează parolă de rețea

@@ -1,0 +1,16 @@
+1	romanian	x-vnd.Haiku-NetworkStatus	2196811244
+No link	NetworkStatusView		Nicio legătură
+Netmask	NetworkStatusView		Mască de rețea
+Broadcast	NetworkStatusView		Bandă largă
+Unknown	NetworkStatusView		Necunoscut
+Ready	NetworkStatusView		Gata
+NetworkStatus	NetworkStatusWindow		StareRețea
+No stateful configuration	NetworkStatusView		Nicio configurație de stare
+Configuring	NetworkStatusView		Se configurează
+Address	NetworkStatusView		Adresă
+OK	NetworkStatusView		Bine
+Open network preferences…	NetworkStatusView		Deschide preferințe de rețea...
+Quit	NetworkStatusView		Părăsește
+Run in window	NetworkStatus		Rulează în fereastră
+Install in Deskbar	NetworkStatus		Instalează în bara de desktop
+You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Puteți rula StareRețea într-o fereastră sau să-l instalați în bara de desktop.

@@ -1,0 +1,25 @@
+1	romanian	x-vnd.Haiku-DataTranslations	3899335910
+DataTranslations	DataTranslations		TraduceriDate
+Info…	DataTranslations		Info...
+about	DataTranslations		despre
+Could not install 	DataTranslations		Nu s-a putut instala
+Cancel	DataTranslations		Anulează
+Name:	DataTranslations		Nume:
+Panel Info	DataTranslations		Info panou
+The item '	DataTranslations		Elementul '
+%name' does not appear to be a Translator and will not be installed.	DataTranslations		%name' nu pare a fi un traducător și nu va fi instalat.
+DataTranslations - Note	DataTranslations		TraduceriDate - Notă
+Name: %name \nVersion: 	DataTranslations		Nume: %name \nVersiune:
+Overwrite	DataTranslations		Suprascrie
+Info:	DataTranslations		Info:
+info	DataTranslations		info
+%name already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		%name există deja în dosarul Traducători! Traducătorul existent ar trebui să fie suprascris?
+Path:	DataTranslations		Cale:
+The new translator has been installed successfully.	DataTranslations		Traducătorul nou a fost instalat cu succes.
+\nInfo: %info\n\nPath:\n	DataTranslations		\nInfo: %info\n\nCale:\n
+DataTranslations - Error	DataTranslations		TraduceriDate - Eroare
+An item named '	DataTranslations		Un element cu numele '
+Icon	DataTranslations		Pictogramă
+DataTranslations\n\twritten by Oliver Siebenmarck and others\n\tCopyright 2002-2010, Haiku Inc. All rights reserved.\n	DataTranslations		TraduceriDate\n\tscris de Oliver Siebenmarck și alții\n\tDrepturi de autor 2002-2010, Haiku Inc. Toate drepturile rezervate.\n
+Version:	DataTranslations		Versiune:
+Translation Settings\n\nUse this control panel to set values that various\ntranslators use when no other settings are specified\nin the application.	DataTranslations		Configurări traducere\n\nUtilizați acest panou de control pentru a stabili diferite\nvalori pe care le folosesc traducătorii când nu sunt specificate alte configurări\nîn aplicație.

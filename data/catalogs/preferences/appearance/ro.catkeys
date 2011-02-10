@@ -1,0 +1,35 @@
+1	romanian	x-vnd.Haiku-Appearance	3440239690
+Shadow	Colors tab		Umbră
+On	AntialiasingSettingsView		Pornit
+Defaults	APRWindow		Implicite
+Shine	Colors tab		Strălucire
+Off	AntialiasingSettingsView		Oprit
+Success	Colors tab		Succes
+Inactive window tab text	Colors tab		Text de fereastră tab inactivă
+Failure	Colors tab		Eşec
+Hinting menu	AntialiasingSettingsView		Meniu de sugestii
+Document background	Colors tab		Fundalul documentului
+Tooltip background	Colors tab		Fundalul indiciului
+Selected menu item background	Colors tab		Fundalul elementului de meniu selectat
+Navigation base	Colors tab		Bază de navigare
+Window tab text	Colors tab		Text fereastră tab
+Document text	Colors tab		Document text
+Navigation pulse	Colors tab		Puls de navigare
+Selected menu item text	Colors tab		Textul elementului de meniu selectat
+Menu background	Colors tab		Fundalul meniului
+Appearance	APRWindow		Aspect
+Panel background	Colors tab		Fundalul panoului
+Colors	APRWindow		Culori
+Control background	Colors tab		Fundalul controlului   
+Inactive window tab	Colors tab		Fereastră tab inactivă
+Reduce colored edges filter strength:	AntialiasingSettingsView		Reduce intensitatea filtrului marginilor colorate:
+Control text	Colors tab		Text de control
+Tooltip text	Colors tab		Text de indiciu
+Menu item text	Colors tab		Text de element meniu
+LCD subpixel	AntialiasingSettingsView		Subpixel LCD
+Selected menu item border	Colors tab		Marginea elementului de meniu selectat
+Strong	AntialiasingSettingsView		Îngroșat
+Panel text	Colors tab		Text de panou
+Monospaced fonts only	AntialiasingSettingsView		Doar fonturi monospațiate
+Antialiasing menu	AntialiasingSettingsView		Meniu anticrenelare
+Glyph hinting:	AntialiasingSettingsView		Indiciu glyph:
