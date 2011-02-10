@@ -199,14 +199,14 @@ MailboxWatcher::MessageReceived(BMessage* message)
 				message->FindInt64("directory", &ref.directory);
 				message->FindString("name", &name);
 				ref.set_name(name);
-				//TODO not thread safe
+
 				fProtocol->AppendMessage(ref);
 				break;
 		
 			case B_ENTRY_REMOVED:
 				message->FindInt32("device", &nref.device);
 				message->FindInt64("node", &nref.node);
-				//TODO not thread safe
+
 				fProtocol->DeleteMessage(nref);
 				break;
 

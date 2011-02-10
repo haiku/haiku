@@ -170,7 +170,7 @@ IMAPStorage::AddNewMessage(int32 uid, int32 flags, BPositionIO** file)
 
 	BPath filePath = fMailboxPath;
 	filePath.Append(fileName);
-	TRACE("file name %s\n", filePath.Path());
+	TRACE("AddNewMessage %s\n", filePath.Path());
 	BFile* newFile = new BFile(filePath.Path(), B_READ_WRITE | B_CREATE_FILE
 		| B_ERASE_FILE);
 	if (newFile == NULL)
@@ -238,7 +238,8 @@ IMAPStorage::DeleteMessage(int32 uid)
 	BPath filePath = fMailboxPath;
 	filePath.Append(storageEntry.fileName);
 	BEntry entry(filePath.Path());
-TRACE("delete %s\n", filePath.Path());
+	TRACE("IMAPStorage::DeleteMessage %s, %ld\n", filePath.Path(), uid);
+
 	status_t status = entry.Remove();
 	if (status != B_OK)
 		return status;
@@ -439,8 +440,11 @@ IMAPStorage::_ReadFilesThread()
 
 		StorageMailEntry entry;
 		entry.fileName = ref.name;
-		if (ReadUniqueID(node, entry.uid) != B_OK)
+		if (ReadUniqueID(node, entry.uid) != B_OK) {
+			TRACE("IMAPStorage::_ReadFilesThread() failed to read uid %s\n",
+				ref.name);
 			continue;
+		}
 
 		if (node.ReadAttr("MAIL:server_flags", B_INT32_TYPE, 0, &entry.flags,
 			sizeof(int32)) != sizeof(int32))
@@ -475,9 +479,11 @@ IMAPStorage::_WriteFlags(int32 flags, BNode& node)
 status_t
 IMAPStorage::ReadUniqueID(BNode& node, int32& uid)
 {
-	char uidString[256];
+	const uint32 kMaxUniqueLength = 32;
+	char uidString[kMaxUniqueLength];
+	memset(uidString, 0, kMaxUniqueLength);
 	if (node.ReadAttr("MAIL:unique_id", B_STRING_TYPE, 0, uidString,
-		256) < 0)
+		kMaxUniqueLength) < 0)
 		return B_ERROR;
 	uid = atoi(uidString);
 	return B_OK;

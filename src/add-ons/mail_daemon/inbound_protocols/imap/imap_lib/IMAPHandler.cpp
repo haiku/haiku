@@ -394,7 +394,7 @@ FetchMessageCommand::Handle(const BString& response)
 	BString headerSize = IMAPParser::RemovePrimitiveFromLeft(extracted);
 	headerSize = IMAPParser::ExtractNextElement(headerSize);
 	int32 size = atoi(headerSize);
-	TRACE("Header size %i\n", (int)size);
+
 	status_t status = fConnectionReader.ReadToFile(size, data);
 	if (status != B_OK) {
 		if (!fOutData)
