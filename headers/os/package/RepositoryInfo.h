@@ -8,6 +8,7 @@
 
 #include <Archivable.h>
 #include <Entry.h>
+#include <ObjectList.h>
 #include <String.h>
 
 #include <package/PackageArchitecture.h>
@@ -37,6 +38,8 @@ public:
 			const BString&		Summary() const;
 			uint8				Priority() const;
 			BPackageArchitecture	Architecture() const;
+			const BObjectList<BString>&	LicenseNames() const;
+			const BObjectList<BString>&	LicenseTexts() const;
 
 			void				SetName(const BString& name);
 			void				SetOriginalBaseURL(const BString& url);
@@ -44,6 +47,10 @@ public:
 			void				SetSummary(const BString& summary);
 			void				SetPriority(uint8 priority);
 			void				SetArchitecture(BPackageArchitecture arch);
+
+			status_t			AddLicense(const BString& licenseName,
+									const BString& licenseText);
+			void				ClearLicenses();
 
 public:
 	static	BRepositoryInfo*	Instantiate(BMessage* data);
@@ -56,6 +63,8 @@ public:
 	static	const char*			kSummaryField;
 	static	const char*			kPriorityField;
 	static	const char*			kArchitectureField;
+	static	const char*			kLicenseNameField;
+	static	const char*			kLicenseTextField;
 
 private:
 			status_t			fInitStatus;
@@ -66,6 +75,8 @@ private:
 			BString				fSummary;
 			uint8				fPriority;
 			BPackageArchitecture	fArchitecture;
+			BObjectList<BString>	fLicenseNames;
+			BObjectList<BString>	fLicenseTexts;
 };
 
 

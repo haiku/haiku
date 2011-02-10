@@ -30,6 +30,8 @@ const char* BRepositoryInfo::kVendorField		= "vendor";
 const char* BRepositoryInfo::kSummaryField		= "summary";
 const char* BRepositoryInfo::kPriorityField		= "priority";
 const char* BRepositoryInfo::kArchitectureField	= "architecture";
+const char* BRepositoryInfo::kLicenseNameField	= "licenseName";
+const char* BRepositoryInfo::kLicenseTextField	= "licenseText";
 
 
 BRepositoryInfo::BRepositoryInfo()
@@ -43,7 +45,8 @@ BRepositoryInfo::BRepositoryInfo()
 
 BRepositoryInfo::BRepositoryInfo(BMessage* data)
 	:
-	inherited(data)
+	inherited(data),
+	fLicenseTexts(5, true)
 {
 	fInitStatus = SetTo(data);
 }
@@ -90,6 +93,16 @@ BRepositoryInfo::Archive(BMessage* data, bool deep) const
 		return result;
 	if ((result = data->AddUInt8(kArchitectureField, fArchitecture)) != B_OK)
 		return result;
+	for (int i = 0; i < fLicenseNames.CountItems(); ++i) {
+		result = data->AddString(kLicenseNameField, *fLicenseNames.ItemAt(i));
+		if (result != B_OK)
+			return result;
+	}
+	for (int i = 0; i < fLicenseTexts.CountItems(); ++i) {
+		result = data->AddString(kLicenseTextField, *fLicenseTexts.ItemAt(i));
+		if (result != B_OK)
+			return result;
+	}
 
 	return B_OK;
 }
@@ -123,6 +136,20 @@ BRepositoryInfo::SetTo(const BMessage* data)
 	result = data->FindUInt8(kArchitectureField, (uint8*)&fArchitecture);
 	if (result != B_OK)
 		return result;
+
+	const char* licenseName;
+	const char* licenseText;
+	for (int i = 0;
+		data->FindString(kLicenseNameField, i, &licenseName) == B_OK
+			&& data->FindString(kLicenseTextField, i, &licenseText) == B_OK;
+		++i) {
+		BString* newLicenseName = new (std::nothrow) BString(licenseName);
+		if (newLicenseName == NULL || !fLicenseNames.AddItem(newLicenseName))
+			return B_NO_MEMORY;
+		BString* newLicenseText = new (std::nothrow) BString(licenseText);
+		if (newLicenseText == NULL || !fLicenseTexts.AddItem(newLicenseText))
+			return B_NO_MEMORY;
+	}
 
 	return B_OK;
 }
@@ -239,6 +266,20 @@ BRepositoryInfo::Architecture() const
 }
 
 
+const BObjectList<BString>&
+BRepositoryInfo::LicenseNames() const
+{
+	return fLicenseNames;
+}
+
+
+const BObjectList<BString>&
+BRepositoryInfo::LicenseTexts() const
+{
+	return fLicenseTexts;
+}
+
+
 void
 BRepositoryInfo::SetName(const BString& name)
 {
@@ -278,6 +319,30 @@ void
 BRepositoryInfo::SetArchitecture(BPackageArchitecture architecture)
 {
 	fArchitecture = architecture;
+}
+
+
+status_t
+BRepositoryInfo::AddLicense(const BString& licenseName,
+	const BString& licenseText)
+{
+	BString* newLicenseName = new (std::nothrow) BString(licenseName);
+	if (newLicenseName == NULL || !fLicenseNames.AddItem(newLicenseName))
+		return B_NO_MEMORY;
+
+	BString* newLicenseText = new (std::nothrow) BString(licenseText);
+	if (newLicenseText == NULL || !fLicenseTexts.AddItem(newLicenseText))
+		return B_NO_MEMORY;
+
+	return B_OK;
+}
+
+
+void
+BRepositoryInfo::ClearLicenses()
+{
+	fLicenseNames.MakeEmpty();
+	fLicenseTexts.MakeEmpty();
 }
 
 
