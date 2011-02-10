@@ -48,9 +48,10 @@ public:
 		printf("%s (%s)\n", packageInfo.Name().String(),
 			packageInfo.Version().ToString().String());
 		if (fVerbose) {
-			printf("\tsummary:      %s\n", packageInfo.Summary().String());
-			printf("\tvendor:       %s\n", packageInfo.Vendor().String());
-			printf("\tpackager:     %s\n", packageInfo.Packager().String());
+			printf("\tsummary:         %s\n", packageInfo.Summary().String());
+			printf("\tvendor:          %s\n", packageInfo.Vendor().String());
+			printf("\tpackager:        %s\n", packageInfo.Packager().String());
+			printf("\tsha256-checksum: %s\n", packageInfo.Checksum().String());
 			if (uint32 flags = packageInfo.Flags()) {
 				printf("\tflags:\n");
 				if ((flags & B_PACKAGE_FLAG_APPROVE_LICENSE) != 0)
@@ -61,21 +62,30 @@ public:
 		}
 	}
 
-	virtual void OnPackageAttributesSizeInfo(uint32 stringCount,
+	virtual void OnRepositoryInfoSectionDone(uint32 uncompressedSize)
+	{
+		if (fQuiet || !fVerbose)
+			return;
+
+		printf("----- Repository Info Section --------------------\n");
+		printf("repository info size:    %10lu (uncompressed)\n",
+			uncompressedSize);
+	}
+
+	virtual void OnPackageAttributesSectionDone(uint32 stringCount,
 		uint32 uncompressedSize)
 	{
 		if (fQuiet || !fVerbose)
 			return;
 
-		printf("----- Package Attribute Info ---------------------\n");
+		printf("----- Package Attribute Section -------------------\n");
 		printf("string count:            %10lu\n", stringCount);
 		printf("package attributes size: %10lu (uncompressed)\n",
 			uncompressedSize);
 	}
 
-	virtual void OnRepositorySizeInfo(uint32 headerSize,
-		uint32 repositoryInfoSize, uint32 packageCount,
-		uint32 packageAttributesSize, uint64 totalSize)
+	virtual void OnRepositoryDone(uint32 headerSize, uint32 repositoryInfoSize,
+		uint32 packageCount, uint32 packageAttributesSize, uint64 totalSize)
 	{
 		if (fQuiet)
 			return;

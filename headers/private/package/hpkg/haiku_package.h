@@ -49,18 +49,19 @@ struct hpkg_repo_header {
 	uint32	magic;							// "hpkr"
 	uint16	header_size;
 	uint16	version;
-	uint64	total_size;
+	uint32	total_size;
 
-	// repository header
-	uint32	repository_header_length;
+	// repository info section
+	uint32	info_compression;
+	uint32	info_length_compressed;
+	uint32	info_length_uncompressed;
 
 	// package attributes section
-	uint32	attributes_compression;
-	uint32	attributes_length_compressed;
-	uint32	attributes_length_uncompressed;
-
-	uint64	attributes_strings_length;
-	uint64	attributes_strings_count;
+	uint32	packages_compression;
+	uint32	packages_length_compressed;
+	uint32	packages_length_uncompressed;
+	uint32	packages_strings_length;
+	uint32	packages_strings_count;
 };
 
 
@@ -148,6 +149,7 @@ enum HPKGPackageAttributeID {
 	HPKG_PACKAGE_ATTRIBUTE_FRESHENS,
 	HPKG_PACKAGE_ATTRIBUTE_REPLACES,
 	HPKG_PACKAGE_ATTRIBUTE_RESOLVABLE_OPERATOR,
+	HPKG_PACKAGE_ATTRIBUTE_CHECKSUM,
 	//
 	HPKG_PACKAGE_ATTRIBUTE_ENUM_COUNT,
 };

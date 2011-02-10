@@ -36,9 +36,12 @@ public:
 	virtual	void				OnPackageAdded(
 									const BPackageInfo& packageInfo) = 0;
 
-	virtual void				OnPackageAttributesSizeInfo(uint32 stringCount,
+	virtual void				OnRepositoryInfoSectionDone(
 									uint32 uncompressedSize) = 0;
-	virtual void				OnRepositorySizeInfo(uint32 headerSize,
+	virtual void				OnPackageAttributesSectionDone(
+									uint32 stringCount,
+									uint32 uncompressedSize) = 0;
+	virtual void				OnRepositoryDone(uint32 headerSize,
 									uint32 repositoryInfoLength,
 									uint32 packageCount,
 									uint32 packageAttributesSize,

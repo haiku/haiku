@@ -479,6 +479,16 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 			= fPackageStringCache.Get(replacesList.ItemAt(i)->String());
 		attributeList.Add(replaces);
 	}
+
+	// checksum (optional, only exists in repositories)
+	if (packageInfo.Checksum().Length() > 0) {
+		PackageAttribute* checksum = new PackageAttribute(
+			HPKG_PACKAGE_ATTRIBUTE_CHECKSUM, B_HPKG_ATTRIBUTE_TYPE_STRING,
+			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
+		checksum->string
+			= fPackageStringCache.Get(packageInfo.Checksum().String());
+		attributeList.Add(checksum);
+	}
 }
 
 

@@ -228,28 +228,24 @@ RepositoryWriterImpl::_Finish()
 	hpkg_repo_header header;
 
 	// write repository header
-	ssize_t repositoryInfoLength;
-	status_t result = _WriteRepositoryInfo(repositoryInfoLength);
+	ssize_t infoLengthCompressed;
+	status_t result = _WriteRepositoryInfo(header, infoLengthCompressed);
 	if (result != B_OK)
 		return result;
 
-	header.repository_header_length
-		= B_HOST_TO_BENDIAN_INT32(repositoryInfoLength);
-
 	// write package attributes
+	ssize_t packagesLengthCompressed;
 	off_t totalSize = _WritePackageAttributes(header,
-		sizeof(header) + repositoryInfoLength);
+		sizeof(header) + infoLengthCompressed, packagesLengthCompressed);
 
-	fListener->OnRepositorySizeInfo(sizeof(header), repositoryInfoLength,
-		fPackageCount,
-		B_BENDIAN_TO_HOST_INT32(header.attributes_length_compressed),
-		totalSize);
+	fListener->OnRepositoryDone(sizeof(header), infoLengthCompressed,
+		fPackageCount, packagesLengthCompressed, totalSize);
 
 	// general
 	header.magic = B_HOST_TO_BENDIAN_INT32(B_HPKG_REPO_MAGIC);
 	header.header_size = B_HOST_TO_BENDIAN_INT16((uint16)sizeof(header));
 	header.version = B_HOST_TO_BENDIAN_INT16(B_HPKG_REPO_VERSION);
-	header.total_size = B_HOST_TO_BENDIAN_INT64(totalSize);
+	header.total_size = B_HOST_TO_BENDIAN_INT32(totalSize);
 
 	// write the header
 	WriteBuffer(&header, sizeof(header), 0);
@@ -350,7 +346,8 @@ RepositoryWriterImpl::_RegisterCurrentPackageInfo()
 
 
 status_t
-RepositoryWriterImpl::_WriteRepositoryInfo(ssize_t& _repositoryInfoLength)
+RepositoryWriterImpl::_WriteRepositoryInfo(hpkg_repo_header& header,
+	ssize_t& _infoLengthCompressed)
 {
 	BMessage archive;
 	status_t result = fRepositoryInfo->Archive(&archive);
@@ -359,22 +356,45 @@ RepositoryWriterImpl::_WriteRepositoryInfo(ssize_t& _repositoryInfoLength)
 		return result;
 	}
 
-	_repositoryInfoLength = archive.FlattenedSize();
-	char buffer[_repositoryInfoLength];
-	if ((result = archive.Flatten(buffer, _repositoryInfoLength)) != B_OK) {
+	ssize_t	flattenedSize = archive.FlattenedSize();
+	char buffer[flattenedSize];
+	if ((result = archive.Flatten(buffer, flattenedSize)) != B_OK) {
 		fListener->PrintError("can't flatten repository header!\n");
 		return result;
 	}
 
 	off_t startOffset = sizeof(hpkg_repo_header);
-	WriteBuffer(buffer, _repositoryInfoLength, startOffset);
+
+	// write the package attributes (zlib writer on top of a file writer)
+	FDDataWriter realWriter(FD(), startOffset, fListener);
+	ZlibDataWriter zlibWriter(&realWriter);
+	SetDataWriter(&zlibWriter);
+	zlibWriter.Init();
+
+	DataWriter()->WriteDataThrows(buffer, flattenedSize);
+
+	zlibWriter.Finish();
+	SetDataWriter(NULL);
+
+	fListener->OnRepositoryInfoSectionDone(zlibWriter.BytesWritten());
+
+	_infoLengthCompressed = realWriter.BytesWritten();
+
+	// update the header
+	header.info_compression
+		= B_HOST_TO_BENDIAN_INT32(B_HPKG_COMPRESSION_ZLIB);
+	header.info_length_compressed
+		= B_HOST_TO_BENDIAN_INT32(_infoLengthCompressed);
+	header.info_length_uncompressed
+		= B_HOST_TO_BENDIAN_INT32(flattenedSize);
 
 	return B_OK;
 }
 
+
 off_t
 RepositoryWriterImpl::_WritePackageAttributes(hpkg_repo_header& header,
-	off_t startOffset)
+	off_t startOffset, ssize_t& _packagesLengthCompressed)
 {
 	// write the package attributes (zlib writer on top of a file writer)
 	FDDataWriter realWriter(FD(), startOffset, fListener);
@@ -391,18 +411,20 @@ RepositoryWriterImpl::_WritePackageAttributes(hpkg_repo_header& header,
 	off_t endOffset = realWriter.Offset();
 	SetDataWriter(NULL);
 
-	fListener->OnPackageAttributesSizeInfo(stringsCount,
+	fListener->OnPackageAttributesSectionDone(stringsCount,
 		zlibWriter.BytesWritten());
 
+	_packagesLengthCompressed = endOffset - startOffset;
+
 	// update the header
-	header.attributes_compression
+	header.packages_compression
 		= B_HOST_TO_BENDIAN_INT32(B_HPKG_COMPRESSION_ZLIB);
-	header.attributes_length_compressed
-		= B_HOST_TO_BENDIAN_INT32(endOffset - startOffset);
-	header.attributes_length_uncompressed
+	header.packages_length_compressed
+		= B_HOST_TO_BENDIAN_INT32(_packagesLengthCompressed);
+	header.packages_length_uncompressed
 		= B_HOST_TO_BENDIAN_INT32(zlibWriter.BytesWritten());
-	header.attributes_strings_count = B_HOST_TO_BENDIAN_INT32(stringsCount);
-	header.attributes_strings_length
+	header.packages_strings_count = B_HOST_TO_BENDIAN_INT32(stringsCount);
+	header.packages_strings_length
 		= B_HOST_TO_BENDIAN_INT32(stringsLengthUncompressed);
 
 	return endOffset;

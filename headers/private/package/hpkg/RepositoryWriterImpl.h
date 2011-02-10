@@ -64,11 +64,11 @@ private:
 			status_t			_Finish();
 
 			status_t			_RegisterCurrentPackageInfo();
-			status_t			_WriteRepositoryInfo(
-									ssize_t& _repositoryInfoLength);
+			status_t			_WriteRepositoryInfo(hpkg_repo_header& header,
+									ssize_t& _infoLengthCompressed);
 			off_t				_WritePackageAttributes(
-									hpkg_repo_header& header,
-									off_t startOffset);
+									hpkg_repo_header& header, off_t startOffset,
+									ssize_t& _packagesLengthCompressed);
 
 			struct PackageNameSet;
 
