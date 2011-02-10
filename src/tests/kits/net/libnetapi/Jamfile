@@ -4,6 +4,7 @@ UnitTestLib libnetapitest.so :
 	NetAPITestAddon.cpp
 
 	NetworkAddressTest.cpp
+	NetworkInterfaceTest.cpp
 
 	: bnetapi $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++)
 ;
