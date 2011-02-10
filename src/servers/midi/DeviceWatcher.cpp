@@ -13,6 +13,8 @@
 #include "DeviceWatcher.h"
 #include "PortDrivers.h"
 
+#include <errno.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <new>
 
@@ -43,7 +45,7 @@ public:
 		:  fFD(fd), fConsumer(consumer), fProducer(producer)
 	{
 	}
-		
+
 	int 				fFD;
 	MidiPortConsumer*	fConsumer;
 	MidiPortProducer*	fProducer;
@@ -53,7 +55,7 @@ public:
 
 DeviceWatcher::DeviceWatcher()
 	: BLooper("MIDI devices watcher"),
-	fDeviceEndpointsMap(), fVectorIconData(NULL), fVectorIconDataSize(0), 
+	fDeviceEndpointsMap(), fVectorIconData(NULL), fVectorIconDataSize(0),
 	fLargeIcon(NULL), fMiniIcon(NULL)
 {
 	// Load midi endpoint vector icon data
@@ -67,10 +69,10 @@ DeviceWatcher::DeviceWatcher()
 		// Load MIDI port endpoint vector icon
 		const uint8* data = (const uint8*)resources.LoadResource(
 			B_VECTOR_ICON_TYPE,	"endpoint_vector_icon", &dataSize);
-			
+
 		if (data != NULL && dataSize > 0)
 			fVectorIconData = new(std::nothrow) uint8[dataSize];
-			
+
 		if (fVectorIconData) {
 			// data is own by resources local object: copy its content for
 			// later use
@@ -79,17 +81,17 @@ DeviceWatcher::DeviceWatcher()
 		}
 	}
 
-	// Render 32x32 and 16x16 B_CMAP8 icons for R5 compatibility	
+	// Render 32x32 and 16x16 B_CMAP8 icons for R5 compatibility
 	if (fVectorIconData != NULL) {
 		fLargeIcon = new(std::nothrow) BBitmap(BRect(0, 0, 31, 31), B_CMAP8);
 		fMiniIcon  = new(std::nothrow) BBitmap(BRect(0, 0, 15, 15), B_CMAP8);
 
-		if (BIconUtils::GetVectorIcon(fVectorIconData, fVectorIconDataSize, 
+		if (BIconUtils::GetVectorIcon(fVectorIconData, fVectorIconDataSize,
 			fLargeIcon) != B_OK) {
 			delete fLargeIcon;
 			fLargeIcon = NULL;
 		}
-		if (BIconUtils::GetVectorIcon(fVectorIconData, fVectorIconDataSize, 
+		if (BIconUtils::GetVectorIcon(fVectorIconData, fVectorIconDataSize,
 			fMiniIcon) != B_OK) {
 			delete fMiniIcon;
 			fMiniIcon = NULL;
@@ -103,14 +105,14 @@ DeviceWatcher::DeviceWatcher()
 DeviceWatcher::~DeviceWatcher()
 {
 	Stop();
-	
+
 	delete fLargeIcon;
 	delete fMiniIcon;
 	delete[] fVectorIconData;
 }
 
 
-status_t 
+status_t
 DeviceWatcher::Start()
 {
 	// Do an initial scan
@@ -120,7 +122,7 @@ DeviceWatcher::Start()
 	// message to the midi_server to register itself, and blocks until it gets
 	// a response. But since we _are_ the midi_server we will never be able to
 	// send that response if our main thread is already blocking.
-	
+
     resume_thread(spawn_thread(_InitialDevicesScanThread,
 		"Initial devices scan", B_NORMAL_PRIORITY, this));
 
@@ -131,7 +133,7 @@ DeviceWatcher::Start()
 }
 
 
-status_t 
+status_t
 DeviceWatcher::Stop()
 {
 	return BPathMonitor::StopWatching(kDevicesRoot, this);
@@ -143,11 +145,11 @@ DeviceWatcher::MessageReceived(BMessage* message)
 {
 	if (message->what != B_PATH_MONITOR)
 		return;
-		
+
 	int32 opcode;
 	if (message->FindInt32("opcode", &opcode) != B_OK)
 		return;
-		
+
 	// message->PrintToStream();
 
 	const char* path;
@@ -171,7 +173,7 @@ DeviceWatcher::MessageReceived(BMessage* message)
 
 
 /* static  */
-int32 
+int32
 DeviceWatcher::_InitialDevicesScanThread(void* data)
 {
 	((DeviceWatcher*)data)->_ScanDevices(kDevicesRoot);
@@ -179,15 +181,15 @@ DeviceWatcher::_InitialDevicesScanThread(void* data)
 }
 
 
-void 
+void
 DeviceWatcher::_ScanDevices(const char* path)
 {
 	TRACE(("DeviceWatcher::_ScanDevices(\"%s\");\n", path));
-	
+
 	BDirectory dir(path);
 	if (dir.InitCheck() != B_OK)
 		return;
-	
+
 	BEntry entry;
 	while (dir.GetNextEntry(&entry) == B_OK)  {
 		BPath name;
@@ -210,12 +212,12 @@ DeviceWatcher::_AddDevice(const char* path)
 		TRACE(("already known...!\n"));
 		return;
 	}
-		
+
 	BEntry entry(path);
 	if (entry.IsDirectory())
 		// Invalid path!
 		return;
-		
+
 	if (entry.IsSymLink()) {
 		BEntry symlink(path, true);
 		if (symlink.IsDirectory()) {
@@ -225,24 +227,40 @@ DeviceWatcher::_AddDevice(const char* path)
 	}
 
 	int fd = open(path, O_RDWR | O_EXCL);
-	if (fd < 0)
-		return;
-		
-	
+	if (fd < 0) {
+		if (errno != EACCES)
+			return;
+
+		// maybe it's a input or output only port?
+		fd = open(path, O_RDONLY | O_EXCL);
+		if (fd < 0 && errno == EACCES)
+			fd = open(path, O_WRONLY | O_EXCL);
+		if (fd < 0)
+			return;
+	}
+
 	TRACE(("Doing _AddDevice(\"%s\"); fd=%d\n", path, fd));
 
-	MidiPortConsumer* consumer = new MidiPortConsumer(fd, path);
-	_SetIcons(consumer);
-	TRACE(("Register %s MidiPortConsumer\n", consumer->Name()));
-	consumer->Register();
+	MidiPortConsumer* consumer = NULL;
+	MidiPortProducer* producer = NULL;
 
-	MidiPortProducer* producer = new MidiPortProducer(fd, path);
-	_SetIcons(producer);
-	TRACE(("Register %s MidiPortProducer\n", producer->Name()));
-	producer->Register();
+	int flags = fcntl(fd, F_GETFL);
 
-	DeviceEndpoints* deviceEndpoints = new DeviceEndpoints(fd, consumer, producer);
-	fDeviceEndpointsMap.Put(path, deviceEndpoints);	
+	if ((flags & O_ACCMODE) != O_RDONLY) {
+		consumer = new MidiPortConsumer(fd, path);
+		_SetIcons(consumer);
+		TRACE(("Register %s MidiPortConsumer\n", consumer->Name()));
+		consumer->Register();
+	}
+
+	if ((flags & O_ACCMODE) != O_WRONLY) {
+		producer = new MidiPortProducer(fd, path);
+		_SetIcons(producer);
+		TRACE(("Register %s MidiPortProducer\n", producer->Name()));
+		producer->Register();
+	}
+
+	fDeviceEndpointsMap.Put(path, new DeviceEndpoints(fd, consumer, producer));
 	TRACE(("Done _AddDevice(\"%s\")\n", path));
 }
 
@@ -251,20 +269,24 @@ void
 DeviceWatcher::_RemoveDevice(const char* path)
 {
 	TRACE(("DeviceWatcher::_RemoveDevice(\"%s\");\n", path));
-		
+
 	DeviceEndpoints* deviceEndpoints = fDeviceEndpointsMap.Get(path);
 	if (!deviceEndpoints) {
 		TRACE(("_RemoveDevice(\"%s\") didn't find endpoint in map!!\n", path));
 		return;
-	}	
+	}
 
 	TRACE((" _RemoveDevice(\"%s\") unregistering\n", path));
-	deviceEndpoints->fConsumer->Unregister();
-	deviceEndpoints->fProducer->Unregister();
+	if (deviceEndpoints->fConsumer)
+		deviceEndpoints->fConsumer->Unregister();
+	if (deviceEndpoints->fProducer)
+		deviceEndpoints->fProducer->Unregister();
 
 	TRACE((" _RemoveDevice(\"%s\") releasing\n", path));
-	deviceEndpoints->fConsumer->Release();
-	deviceEndpoints->fProducer->Release();
+	if (deviceEndpoints->fConsumer)
+		deviceEndpoints->fConsumer->Release();
+	if (deviceEndpoints->fProducer)
+		deviceEndpoints->fProducer->Release();
 
 	TRACE((" _RemoveDevice(\"%s\") removing from map\n", path));
 	fDeviceEndpointsMap.Remove(path);
@@ -272,23 +294,23 @@ DeviceWatcher::_RemoveDevice(const char* path)
 }
 
 
-void 
+void
 DeviceWatcher::_SetIcons(BMidiEndpoint* endpoint)
 {
 	BMessage msg;
 
 	if (fVectorIconData && fVectorIconDataSize > 0) {
-		msg.AddData("icon", B_VECTOR_ICON_TYPE, fVectorIconData, 
+		msg.AddData("icon", B_VECTOR_ICON_TYPE, fVectorIconData,
 			fVectorIconDataSize);
 	}
-	
+
 	if (fLargeIcon) {
-		msg.AddData("be:large_icon", B_LARGE_ICON_TYPE, fLargeIcon->Bits(), 
+		msg.AddData("be:large_icon", B_LARGE_ICON_TYPE, fLargeIcon->Bits(),
 			fLargeIcon->BitsLength());
 	}
-	
+
 	if (fMiniIcon) {
-		msg.AddData("be:mini_icon", B_MINI_ICON_TYPE, fMiniIcon->Bits(), 
+		msg.AddData("be:mini_icon", B_MINI_ICON_TYPE, fMiniIcon->Bits(),
 			fMiniIcon->BitsLength());
 	}
 
