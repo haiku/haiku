@@ -389,7 +389,7 @@ BNetworkInterface::FindAddress(const BNetworkAddress& address)
 {
 	int socket = ::socket(address.Family(), SOCK_DGRAM, 0);
 	if (socket < 0)
-		return errno;
+		return -1;
 
 	FileDescriptorCloser closer(socket);
 
@@ -402,7 +402,7 @@ BNetworkInterface::FindAddress(const BNetworkAddress& address)
 
 	if (ioctl(socket, B_SOCKET_GET_ALIAS, &request, sizeof(struct ifaliasreq))
 			< 0)
-		return errno;
+		return -1;
 
 	return request.ifra_index;
 }
@@ -413,7 +413,7 @@ BNetworkInterface::FindFirstAddress(int family)
 {
 	int socket = ::socket(family, SOCK_DGRAM, 0);
 	if (socket < 0)
-		return errno;
+		return -1;
 
 	FileDescriptorCloser closer(socket);
 
@@ -422,11 +422,11 @@ BNetworkInterface::FindFirstAddress(int family)
 
 	strlcpy(request.ifra_name, Name(), IF_NAMESIZE);
 	request.ifra_index = -1;
-	request.ifra_addr.ss_family = AF_UNSPEC;
+	request.ifra_addr.ss_family = family;
 
 	if (ioctl(socket, B_SOCKET_GET_ALIAS, &request, sizeof(struct ifaliasreq))
 			< 0)
-		return errno;
+		return -1;
 
 	return request.ifra_index;
 }
