@@ -48,4 +48,4 @@ private:
 }	// namespace BPackageKit
 
 
-#endif	// _PACKAGE__HPKG__PRIVATE__PACKAGE_READER_H_
+#endif	// _PACKAGE__HPKG__PACKAGE_READER_H_
