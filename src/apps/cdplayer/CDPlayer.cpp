@@ -144,23 +144,23 @@ CDPlayer::BuildGUI()
 	r.bottom = r.top + labelHeight;
 	r.OffsetBy(0, r.Height() + 5);
 
-	fCurrentTrack = new BStringView(r, B_TRANSLATE("TrackNumber"),
+	fCurrentTrack = new BStringView(r, "TrackNumber",
 		 "", B_FOLLOW_LEFT_RIGHT);
 	box->AddChild(fCurrentTrack);
 
 	r.OffsetBy(0, r.Height() + 5);
 	r.right = r.left + (r.Width() / 2);
-	fTrackTime = new BStringView(r, B_TRANSLATE("TrackTime"),
+	fTrackTime = new BStringView(r, "TrackTime",
 		 "Track: 88:88 / 88:88", B_FOLLOW_LEFT_RIGHT);
 	fTrackTime->ResizeToPreferred();
-	fTrackTime->SetText("Track: --:-- / --:--");
+	fTrackTime->SetText(B_TRANSLATE("Track: --:-- / --:--"));
 	box->AddChild(fTrackTime);
 
 	r.OffsetTo(fTrackTime->Frame().right + 5, r.top);
-	fDiscTime = new BStringView(r, B_TRANSLATE("DiscTime"),
+	fDiscTime = new BStringView(r, "DiscTime",
 		"Disc: 88:88 / 88:88", B_FOLLOW_RIGHT);
 	fDiscTime->ResizeToPreferred();
-	fDiscTime->SetText("Disc: --:-- / --:--");
+	fDiscTime->SetText(B_TRANSLATE("Disc: --:-- / --:--"));
 	box->AddChild(fDiscTime);
 
 	float maxWidth = max_c(fDiscTime->Frame().right, fCDTitle->Frame().right);

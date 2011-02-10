@@ -353,7 +353,7 @@ PadView::DisplayMenu(BPoint where, LaunchButton* button) const
 	}
 	menu->AddSeparatorItem();
 	// window settings
-	BMenu* settingsM = new BMenu("Settings");
+	BMenu* settingsM = new BMenu(B_TRANSLATE("Settings"));
 	settingsM->SetFont(be_plain_font);
 
 	const char* toggleLayoutLabel;

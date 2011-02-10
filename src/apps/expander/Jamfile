@@ -21,6 +21,7 @@ DoCatalogs Expander :
 	:
 	ExpanderApp.cpp
 	ExpanderWindow.cpp
+	ExpanderPreferences.cpp
 	ExpanderSettings.cpp
 	DirectoryFilePanel.cpp
 ;

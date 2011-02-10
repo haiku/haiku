@@ -14,10 +14,15 @@
 
 #include <stdio.h>
 
+#include <Catalog.h>
+#include <Locale.h>
 #include <Roster.h>
 #include <Screen.h>
 
 #include "Constants.h"
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Monitor View"
 
 
 MonitorView::MonitorView(BRect rect, const char *name, int32 width, int32 height)
@@ -106,7 +111,7 @@ MonitorView::Draw(BRect updateRect)
 	float height = ceilf(fontHeight.ascent + fontHeight.descent);
 
 	char text[64];
-	snprintf(text, sizeof(text), "%ld dpi", fDPI);
+	snprintf(text, sizeof(text), B_TRANSLATE("%ld dpi"), fDPI);
 
 	float width = StringWidth(text);
 	if (width > innerRect.Width() || height > innerRect.Height())

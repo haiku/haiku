@@ -862,7 +862,7 @@ MainWindow::_CreateMenuBar(BRect frame)
 	BMenu* filterModeMenu = new BMenu(B_TRANSLATE("Snap to grid"));
 	BMessage* message = new BMessage(MSG_MOUSE_FILTER_MODE);
 	message->AddInt32("mode", SNAPPING_OFF);
-	filterModeMenu->AddItem(new BMenuItem("Off", message, '4'));
+	filterModeMenu->AddItem(new BMenuItem(B_TRANSLATE("Off"), message, '4'));
 
 	message = new BMessage(MSG_MOUSE_FILTER_MODE);
 	message->AddInt32("mode", SNAPPING_64);

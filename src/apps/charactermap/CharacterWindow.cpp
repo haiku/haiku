@@ -216,7 +216,7 @@ CharacterWindow::CharacterWindow()
 	// Add menu
 
 	// "File" menu
-	BMenu* menu = new BMenu("File");
+	BMenu* menu = new BMenu(B_TRANSLATE("File"));
 	BMenuItem* item;
 
 	menu->AddItem(item = new BMenuItem(B_TRANSLATE("About CharacterMap"
@@ -230,7 +230,7 @@ CharacterWindow::CharacterWindow()
 	item->SetTarget(be_app);
 	menuBar->AddItem(menu);
 
-	menu = new BMenu("View");
+	menu = new BMenu(B_TRANSLATE("View"));
 	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Show private blocks"),
 		new BMessage(kMsgPrivateBlocks)));
 	item->SetMarked(fCharacterView->IsShowingPrivateBlocks());
@@ -493,7 +493,7 @@ CharacterWindow::_SetFont(const char* family, const char* style)
 BMenu*
 CharacterWindow::_CreateFontMenu()
 {
-	BMenu* menu = new BMenu("Font");
+	BMenu* menu = new BMenu(B_TRANSLATE("Font"));
 	BMenuItem* item;
 
 	font_family currentFamily;

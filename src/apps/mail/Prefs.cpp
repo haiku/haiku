@@ -385,7 +385,7 @@ TPrefsWindow::MessageReceived(BMessage* msg)
 				if ((item = fReplyToMenu->FindItem(label)) != NULL)
 					item->SetMarked(true);
 
-				strcpy(label, fWrap ? "On" : "Off");
+				strcpy(label, fWrap ? B_TRANSLATE("On") : B_TRANSLATE("Off"));
 				if ((item = fWrapMenu->FindItem(label)) != NULL)
 					item->SetMarked(true);
 
@@ -395,7 +395,7 @@ TPrefsWindow::MessageReceived(BMessage* msg)
 				if ((item = fAttachAttributesMenu->FindItem(label)) != NULL)
 					item->SetMarked(true);
 
-				strcpy(label, fColoredQuotes ? "On" : "Off");
+				strcpy(label, fColoredQuotes ? B_TRANSLATE("On") : B_TRANSLATE("Off"));
 				if ((item = fColoredQuotesMenu->FindItem(label)) != NULL)
 					item->SetMarked(true);
 
@@ -420,11 +420,11 @@ TPrefsWindow::MessageReceived(BMessage* msg)
 					}
 				}
 
-				strcpy(label, fWarnUnencodable ? "On" : "Off");
+				strcpy(label, fWarnUnencodable ? B_TRANSLATE("On") : B_TRANSLATE("Off"));
 				if ((item = fWarnUnencodableMenu->FindItem(label)) != NULL)
 					item->SetMarked(true);
 
-				strcpy(label, fSpellCheckStartOn ? "On" : "Off");
+				strcpy(label, fSpellCheckStartOn ? B_TRANSLATE("On") : B_TRANSLATE("Off"));
 				if ((item = fSpellCheckStartOnMenu->FindItem(label)) != NULL)
 					item->SetMarked(true);
 			} else
@@ -787,13 +787,13 @@ TPrefsWindow::_BuildBoolMenu(uint32 what, const char* boolItem, bool isTrue)
 	menu = new BPopUpMenu("");
 	msg = new BMessage(what);
 	msg->AddBool(boolItem, true);
-	menu->AddItem(item = new BMenuItem("On", msg));
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("On"), msg));
 	if (isTrue)
 		item->SetMarked(true);
 
 	msg = new BMessage(what);
 	msg->AddInt32(boolItem, false);
-	menu->AddItem(item = new BMenuItem("Off", msg));
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Off"), msg));
 	if (!isTrue)
 		item->SetMarked(true);
 
