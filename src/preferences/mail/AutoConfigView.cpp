@@ -46,8 +46,8 @@ AutoConfigView::AutoConfigView(BRect rect, AutoConfig &config)
 	// email view
 	topLeft.y += stepSize;
 	rightDown.y += stepSize;
-	fEmailView = new BTextControl(BRect(topLeft, rightDown),
-		"email", "E-mail address:", "", new BMessage(kEMailChangedMsg));
+	fEmailView = new BTextControl(BRect(topLeft, rightDown), "email",
+		"E-mail address:", "", new BMessage(kEMailChangedMsg));
 	fEmailView->SetDivider(divider);
 	AddChild(fEmailView);
 
@@ -333,8 +333,8 @@ ServerSettingsView::ServerSettingsView(BRect rect, const account_info &info)
 			fInboundEncryptionMenu->MoveTo(10, 80);
 		}
 		if (info.inboundType == IMAP) {
-			item = fInboundEncryptionMenu->Menu()
-					->ItemAt(info.providerInfo.ssl_imap);
+			item = fInboundEncryptionMenu->Menu()->ItemAt(
+				info.providerInfo.ssl_imap);
 			if (item)
 				item->SetMarked(true);
 			fInboundEncryptionMenu->MoveTo(10, 50);
@@ -361,9 +361,8 @@ ServerSettingsView::ServerSettingsView(BRect rect, const account_info &info)
 
 	serverName = info.providerInfo.smtp_server;
 	fOutboundNameView = new BTextControl(BRect(10, 20, rect.Width() - 20, 30),
-									"outbound", B_TRANSLATE("Server name:"),
-									serverName.String(),
-									new BMessage(kServerChangedMsg));
+		"outbound", B_TRANSLATE("Server name:"), serverName.String(),
+		new BMessage(kServerChangedMsg));
 	fOutboundNameView->SetDivider(divider);
 
 	box->AddChild(fOutboundNameView);
@@ -371,8 +370,8 @@ ServerSettingsView::ServerSettingsView(BRect rect, const account_info &info)
 	GetAuthEncrMenu(info.outboundProtocol, &fOutboundAuthMenu,
 						&fOutboundEncryptionMenu);
 	if (fOutboundAuthMenu) {
-		BMenuItem *item = fOutboundAuthMenu->Menu()
-							->ItemAt(info.providerInfo.authentification_smtp);
+		BMenuItem *item = fOutboundAuthMenu->Menu()->ItemAt(
+			info.providerInfo.authentification_smtp);
 		if (item)
 			item->SetMarked(true);
 		fOutboundAuthItemStart = item;
@@ -381,8 +380,8 @@ ServerSettingsView::ServerSettingsView(BRect rect, const account_info &info)
 		fOutboundAuthMenu->MoveTo(10, 50);
 	}
 	if (fOutboundEncryptionMenu) {
-		BMenuItem *item = fOutboundEncryptionMenu->Menu()
-							->ItemAt(info.providerInfo.ssl_smtp);
+		BMenuItem *item = fOutboundEncryptionMenu->Menu()->ItemAt(
+			info.providerInfo.ssl_smtp);
 		if (item)
 			item->SetMarked(true);
 		fOutboundEncrItemStart = item;

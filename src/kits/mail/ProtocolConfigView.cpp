@@ -62,13 +62,19 @@ BodyDownloadConfig::SetTo(MailAddonSettings& addonSettings)
 {
 	const BMessage* settings = &addonSettings.Settings();
 
-	if (settings->HasInt32(kPartialDownloadLimit)) {
-		BString kb;
-		kb << int32(settings->FindInt32(kPartialDownloadLimit)/1024);
-		fSizeBox->SetText(kb.String());
+	int32 limit = 0;
+	if (settings->HasInt32(kPartialDownloadLimit))
+		limit = int32(settings->FindInt32(kPartialDownloadLimit) / 1024);
+	if (limit < 0) {
 		fPartialBox->SetValue(B_CONTROL_ON);
-	} else
+		fSizeBox->SetEnabled(false);
+	} else {		
+		BString kb;
+		kb << limit;
+		fSizeBox->SetText(kb);
+		fPartialBox->SetValue(B_CONTROL_ON);
 		fSizeBox->SetEnabled(true);
+	}
 }
 
 
@@ -101,8 +107,11 @@ status_t
 BodyDownloadConfig::Archive(BMessage* into, bool) const
 {
 	into->RemoveName(kPartialDownloadLimit);
-	if (fPartialBox->Value())
+	if (fPartialBox->Value() == B_CONTROL_ON)
 		into->AddInt32(kPartialDownloadLimit, atoi(fSizeBox->Text()) * 1024);
+	else
+		into->AddInt32(kPartialDownloadLimit, -1);
+
 	return B_OK;
 }
 

@@ -54,6 +54,7 @@ public:
 									BPositionIO* data);
 
 			void				SetFetchBodyLimit(int32 limit);
+			int32				FetchBodyLimit() { return fFetchBodyLimit; }
 			status_t			FetchMessage(int32 messageNumber);
 			status_t			FetchMessages(int32 firstMessage,
 									int32 lastMessage);

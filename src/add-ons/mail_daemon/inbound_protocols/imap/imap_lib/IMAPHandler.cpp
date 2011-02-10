@@ -410,6 +410,7 @@ FetchMessageCommand::Handle(const BString& response)
 	if (uid >= 0)
 		fIMAPMailbox.Listener().HeaderFetched(uid, data);
 
+printf("fFetchBodyLimit %i\n", (int)fFetchBodyLimit);
 	if (fFetchBodyLimit >= 0 && fFetchBodyLimit <= messageSize)
 		return true;
 
@@ -622,7 +623,8 @@ ExistsHandler::Handle(const BString& response)
 
 	fIMAPMailbox.Listener().NewMessagesToFetch(exists - nMessages);
 
-	command = new FetchMessageCommand(fIMAPMailbox, nMessages + 1, exists);
+	command = new FetchMessageCommand(fIMAPMailbox, nMessages + 1, exists,
+		fIMAPMailbox.FetchBodyLimit());
 	fIMAPMailbox.AddAfterQuakeCommand(command);
 
 	TRACE("EXISTS %i\n", (int)exists);
