@@ -140,7 +140,8 @@ DirectoryIterator::Rewind()
 void
 DirectoryIterator::Iterate(EntryVisitor &visitor)
 {
-	Rewind();
+	fOffset = 0;
+	fCluster = fInode->StartCluster();
 	
 	while (_NextEntry() != B_ENTRY_NOT_FOUND) {
 		switch (fCurrent->type) {

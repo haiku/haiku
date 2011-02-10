@@ -45,10 +45,9 @@ Inode::Inode(Volume* volume, cluster_t cluster, uint32 offset)
 		fFileEntry.file.SetAttribs(EXFAT_ENTRY_ATTRIB_SUBDIR);
 		fFileEntry.file_info.SetStartCluster(Cluster());
 		fFileInfoEntry.file_info.SetFlag(0);
-	} else
+	} else {
 		fInitStatus = UpdateNodeFromDisk();
-	if (fInitStatus == B_OK) {
-		if (!IsDirectory() && !IsSymLink()) {
+		if (fInitStatus == B_OK && !IsDirectory() && !IsSymLink()) {
 			fCache = file_cache_create(fVolume->ID(), ID(), Size());
 			fMap = file_map_create(fVolume->ID(), ID(), Size());
 		}
@@ -76,20 +75,17 @@ Inode::Inode(Volume* volume, ino_t ino)
 	TRACE("Inode::Inode(%" B_PRIdINO ") cluster %ld\n", ID(), Cluster());
 	_Init();
 
-	if (fInitStatus == B_OK && ID() != 1)
-			fInitStatus = UpdateNodeFromDisk();
-	else if (fInitStatus == B_OK && ID() == 1) {
-		fFileEntry.file.SetAttribs(EXFAT_ENTRY_ATTRIB_SUBDIR);
-		fFileInfoEntry.file_info.SetStartCluster(Cluster());
-		fFileInfoEntry.file_info.SetFlag(0);
-	}
-	if (fInitStatus == B_OK) {
+	if (fInitStatus == B_OK && ID() != 1) {
+		fInitStatus = UpdateNodeFromDisk();
 		if (!IsDirectory() && !IsSymLink()) {
 			fCache = file_cache_create(fVolume->ID(), ID(), Size());
 			fMap = file_map_create(fVolume->ID(), ID(), Size());
 		}
+	} else if (fInitStatus == B_OK && ID() == 1) {
+		fFileEntry.file.SetAttribs(EXFAT_ENTRY_ATTRIB_SUBDIR);
+		fFileInfoEntry.file_info.SetStartCluster(Cluster());
+		fFileInfoEntry.file_info.SetFlag(0);
 	}
-	TRACE("Inode::Inode(%" B_PRIdINO ") end\n", ID());
 }
 
 
@@ -124,7 +120,6 @@ Inode::InitCheck()
 status_t
 Inode::UpdateNodeFromDisk()
 {
-	
 	DirectoryIterator iterator(this);
 	iterator.LookupEntry(this);
 	return B_OK;
@@ -134,7 +129,7 @@ Inode::UpdateNodeFromDisk()
 cluster_t
 Inode::NextCluster(cluster_t cluster) const
 {
-	if (!IsContiguous())
+	if (!IsContiguous() || IsDirectory())
 		return GetVolume()->NextCluster(cluster);
 	return cluster + 1;
 }

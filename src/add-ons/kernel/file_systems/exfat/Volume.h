@@ -8,6 +8,7 @@
 
 
 #include <lock.h>
+#include <string.h>
 
 #include "exfat.h"
 #include "SplayTree.h"
@@ -108,6 +109,8 @@ public:
 								{ return fFSVolume ? fFSVolume->id : -1; }
 			fs_volume*			FSVolume() const { return fFSVolume; }
 			const char*			Name() const;
+			void				SetName(const char* name)
+								{ strlcpy(fName, name, sizeof(fName)); }
 			
 			uint32				BlockSize() const { return fBlockSize; }
 			uint32				EntriesPerBlock() const
@@ -149,8 +152,8 @@ private:
 			ino_t				fNextId;
 
 			void*				fBlockCache;
-			InodesInoTree*	fInodesInoTree;
-			InodesClusterTree* fInodesClusterTree;
+			InodesInoTree*		fInodesInoTree;
+			InodesClusterTree*	fInodesClusterTree;
 			NodeTree			fNodeTree;
 			InoTree				fInoTree;
 };

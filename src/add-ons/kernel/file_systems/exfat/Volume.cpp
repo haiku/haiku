@@ -22,6 +22,7 @@
 #include <util/AutoLock.h>
 
 #include "CachedBlock.h"
+#include "encodings.h"
 #include "Inode.h"
 
 
@@ -198,6 +199,38 @@ DeviceOpener::GetSize(off_t* _size, uint32* _blockSize)
 //	#pragma mark -
 
 
+class LabelVisitor : public EntryVisitor {
+public:
+								LabelVisitor(Volume* volume);
+			bool				VisitLabel(struct exfat_entry*);
+private:
+			Volume*				fVolume;
+};
+
+
+LabelVisitor::LabelVisitor(Volume* volume)
+	:
+	fVolume(volume)
+{
+}
+
+
+bool
+LabelVisitor::VisitLabel(struct exfat_entry* entry)
+{
+	dprintf("LabelVisitor::VisitLabel()\n");
+	char utfName[30];
+	size_t utfLength = 30;
+	unicode_to_utf8((const uchar*)entry->name_label.name,
+		entry->name_label.length * 2, (uint8*)utfName, &utfLength);
+	fVolume->SetName(utfName);
+	return true;
+}
+
+
+//	#pragma mark -
+
+
 bool
 exfat_super_block::IsValid()
 {
@@ -228,6 +261,7 @@ Volume::Volume(fs_volume* volume)
 	mutex_init(&fLock, "exfat volume");
 	fInodesClusterTree = new InodesClusterTree;
 	fInodesInoTree = new InodesInoTree;
+	memset(fName, 0, sizeof(fName));
 }
 
 
@@ -249,7 +283,6 @@ Volume::IsValidSuperBlock()
 const char*
 Volume::Name() const
 {
-	/* TODO volume name is in the root directory */
 	return fName;
 }
 
@@ -321,7 +354,11 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	// all went fine
 	opener.Keep();
 
-	/*if (!fSuperBlock.label[0]) {*/
+	DirectoryIterator iterator(fRootNode);
+	LabelVisitor visitor(this);
+	iterator.Iterate(visitor);
+
+	if (fName[0] == '\0') {
 		// generate a more or less descriptive volume name
 		off_t divisor = 1ULL << 40;
 		char unit = 'T';
@@ -339,7 +376,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 
 		snprintf(fName, sizeof(fName), "%g %cB ExFAT Volume",
 			size / 10, unit);
-	//}
+	}
 
 	return B_OK;
 }
