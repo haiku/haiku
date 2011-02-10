@@ -6,6 +6,8 @@
 #define NETWORK_INTERFACE_TEST_H
 
 
+#include <NetworkInterface.h>
+
 #include <TestCase.h>
 #include <TestSuite.h>
 
@@ -15,11 +17,17 @@ public:
 								NetworkInterfaceTest();
 	virtual						~NetworkInterfaceTest();
 
+	virtual	void				setUp();
+	virtual	void				tearDown();
+
 			void				TestUnset();
 			void				TestFindAddress();
 			void				TestFindFirstAddress();
 
 	static	void				AddTests(BTestSuite& suite);
+
+private:
+			BNetworkInterface	fInterface;
 };
 
 

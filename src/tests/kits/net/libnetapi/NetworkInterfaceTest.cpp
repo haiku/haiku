@@ -24,6 +24,24 @@ NetworkInterfaceTest::~NetworkInterfaceTest()
 
 
 void
+NetworkInterfaceTest::setUp()
+{
+	fInterface.SetTo("loopTest");
+	CPPUNIT_ASSERT(BNetworkRoster::Default().AddInterface(fInterface) == B_OK);
+	CPPUNIT_ASSERT(fInterface.CountAddresses() == 0);
+		// every interface has one unspec address
+}
+
+
+void
+NetworkInterfaceTest::tearDown()
+{
+	CPPUNIT_ASSERT(BNetworkRoster::Default().RemoveInterface(fInterface)
+		== B_OK);
+}
+
+
+void
 NetworkInterfaceTest::TestUnset()
 {
 	BNetworkInterface unset("test");
@@ -35,84 +53,69 @@ NetworkInterfaceTest::TestUnset()
 void
 NetworkInterfaceTest::TestFindAddress()
 {
-	BNetworkInterface interface("testInterface");
-	CPPUNIT_ASSERT(BNetworkRoster::Default().AddInterface(interface) == B_OK);
-	CPPUNIT_ASSERT(interface.CountAddresses() == 0);
-
 	// Add first
 
 	BNetworkInterfaceAddress first;
 	first.SetAddress(BNetworkAddress(AF_INET, "8.8.8.8"));
 
-	CPPUNIT_ASSERT(interface.FindAddress(first.Address()) < 0);
-	CPPUNIT_ASSERT(interface.AddAddress(first) == B_OK);
-	CPPUNIT_ASSERT(interface.FindAddress(first.Address()) == 0);
+	CPPUNIT_ASSERT(fInterface.FindAddress(first.Address()) < 0);
+	CPPUNIT_ASSERT(fInterface.AddAddress(first) == B_OK);
+	CPPUNIT_ASSERT(fInterface.FindAddress(first.Address()) == 0);
 
 	// Add second
 
 	BNetworkInterfaceAddress second;
 	second.SetAddress(BNetworkAddress(AF_INET6, "::1"));
-
-	CPPUNIT_ASSERT(interface.FindAddress(second.Address()) < 0);
-	CPPUNIT_ASSERT(interface.AddAddress(second) == B_OK);
-	CPPUNIT_ASSERT(interface.FindAddress(second.Address()) >= 0);
+	CPPUNIT_ASSERT(fInterface.FindAddress(second.Address()) < 0);
+	CPPUNIT_ASSERT(fInterface.AddAddress(second) == B_OK);
+	CPPUNIT_ASSERT(fInterface.FindAddress(second.Address()) >= 0);
 
 	// Remove them again
 
-	CPPUNIT_ASSERT(interface.RemoveAddress(first) == B_OK);
-	CPPUNIT_ASSERT(interface.FindAddress(first.Address()) < 0);
-	CPPUNIT_ASSERT(interface.FindAddress(second.Address()) >= 0);
+	CPPUNIT_ASSERT(fInterface.RemoveAddress(first) == B_OK);
+	CPPUNIT_ASSERT(fInterface.FindAddress(first.Address()) < 0);
+	CPPUNIT_ASSERT(fInterface.FindAddress(second.Address()) >= 0);
 
-	CPPUNIT_ASSERT(interface.RemoveAddress(second.Address()) == B_OK);
-	CPPUNIT_ASSERT(interface.FindAddress(first.Address()) < 0);
-	CPPUNIT_ASSERT(interface.FindAddress(second.Address()) < 0);
-
-	CPPUNIT_ASSERT(BNetworkRoster::Default().RemoveInterface(interface)
-		== B_OK);
+	CPPUNIT_ASSERT(fInterface.RemoveAddress(second.Address()) == B_OK);
+	CPPUNIT_ASSERT(fInterface.FindAddress(first.Address()) < 0);
+	CPPUNIT_ASSERT(fInterface.FindAddress(second.Address()) < 0);
 }
 
 
 void
 NetworkInterfaceTest::TestFindFirstAddress()
 {
-	BNetworkInterface interface("testInterface");
-	CPPUNIT_ASSERT(BNetworkRoster::Default().AddInterface(interface) == B_OK);
-	CPPUNIT_ASSERT(interface.CountAddresses() == 0);
-
 	// Add first
 
 	BNetworkInterfaceAddress first;
 	first.SetAddress(BNetworkAddress(AF_INET, "8.8.8.8"));
 
-	CPPUNIT_ASSERT(interface.FindFirstAddress(AF_INET) < 0);
-	CPPUNIT_ASSERT(interface.FindFirstAddress(AF_INET6) < 0);
-	CPPUNIT_ASSERT(interface.AddAddress(first) == B_OK);
-	CPPUNIT_ASSERT(interface.FindFirstAddress(AF_INET) == 0);
-	CPPUNIT_ASSERT(interface.FindFirstAddress(AF_INET6) < 0);
+	CPPUNIT_ASSERT(fInterface.FindFirstAddress(AF_INET) < 0);
+	CPPUNIT_ASSERT(fInterface.FindFirstAddress(AF_INET6) < 0);
+	CPPUNIT_ASSERT(fInterface.AddAddress(first) == B_OK);
+	CPPUNIT_ASSERT(fInterface.FindFirstAddress(AF_INET) == 0);
+	CPPUNIT_ASSERT(fInterface.FindFirstAddress(AF_INET6) < 0);
 
 	// Add second
 
 	BNetworkInterfaceAddress second;
 	second.SetAddress(BNetworkAddress(AF_INET6, "::1"));
 
-	CPPUNIT_ASSERT(interface.AddAddress(second) == B_OK);
-	CPPUNIT_ASSERT(interface.FindFirstAddress(AF_INET) >= 0);
-	CPPUNIT_ASSERT(interface.FindFirstAddress(AF_INET6) >= 0);
-	CPPUNIT_ASSERT(interface.FindFirstAddress(AF_INET)
-		!= interface.FindFirstAddress(AF_INET6));
+	CPPUNIT_ASSERT(fInterface.AddAddress(second) == B_OK);
+	CPPUNIT_ASSERT(fInterface.FindFirstAddress(AF_INET) >= 0);
+	CPPUNIT_ASSERT(fInterface.FindFirstAddress(AF_INET6) >= 0);
+	CPPUNIT_ASSERT(fInterface.FindFirstAddress(AF_INET)
+		!= fInterface.FindFirstAddress(AF_INET6));
 
 	// Remove them again
 
-	CPPUNIT_ASSERT(interface.RemoveAddress(first) == B_OK);
-	CPPUNIT_ASSERT(interface.FindFirstAddress(AF_INET) < 0);
-	CPPUNIT_ASSERT(interface.FindFirstAddress(AF_INET6) >= 0);
+	CPPUNIT_ASSERT(fInterface.RemoveAddress(first) == B_OK);
+	CPPUNIT_ASSERT(fInterface.FindFirstAddress(AF_INET) < 0);
+	CPPUNIT_ASSERT(fInterface.FindFirstAddress(AF_INET6) >= 0);
 
-	CPPUNIT_ASSERT(interface.RemoveAddress(second.Address()) == B_OK);
-	CPPUNIT_ASSERT(interface.FindFirstAddress(AF_INET) < 0);
-	CPPUNIT_ASSERT(interface.FindFirstAddress(AF_INET6) < 0);
-
-	CPPUNIT_ASSERT(BNetworkRoster::Default().RemoveInterface(interface)
-		== B_OK);
+	CPPUNIT_ASSERT(fInterface.RemoveAddress(second.Address()) == B_OK);
+	CPPUNIT_ASSERT(fInterface.FindFirstAddress(AF_INET) < 0);
+	CPPUNIT_ASSERT(fInterface.FindFirstAddress(AF_INET6) < 0);
 }
 
 
