@@ -53,8 +53,8 @@ typedef struct usb_cdc_cm_functional_descriptor {
 } _PACKED usb_cdc_cm_functional_descriptor;
 
 enum { // Call Management Functional Descriptor capabilities bitmap
-	USB_CDC_CM_DOES_CALL_MANAGEMENT = 0x00,
-	USB_CDC_CM_OVER_DATA_INTERFACE	= 0x01
+	USB_CDC_CM_DOES_CALL_MANAGEMENT = 0x01,
+	USB_CDC_CM_OVER_DATA_INTERFACE	= 0x02
 };
 
 typedef struct usb_cdc_acm_functional_descriptor {
@@ -64,11 +64,11 @@ typedef struct usb_cdc_acm_functional_descriptor {
 	uint8	capabilities;
 } _PACKED usb_cdc_acm_functional_descriptor;
 
-enum { // Abstract Control Model Functional Descriptor capabilities bitmap
-	USB_CDC_ACM_HAS_COMM_FEATURES 		= 0x00,
-	USB_CDC_ACM_HAS_LINE_CONTROL		= 0x01,
-	USB_CDC_ACM_HAS_SEND_BREAK			= 0x02,
-	USB_CDC_ACM_HAS_NETWORK_CONNECTION	= 0x04
+enum { // Abstract Control Model Functional Descriptor capabilities bitmap (p36)
+	USB_CDC_ACM_HAS_COMM_FEATURES 		= 0x01,
+	USB_CDC_ACM_HAS_LINE_CONTROL		= 0x02,
+	USB_CDC_ACM_HAS_SEND_BREAK			= 0x04,
+	USB_CDC_ACM_HAS_NETWORK_CONNECTION	= 0x08
 };
 
 typedef struct usb_cdc_union_functional_descriptor {
