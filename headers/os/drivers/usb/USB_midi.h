@@ -18,7 +18,7 @@ typedef struct {	// USB MIDI Event Packet
 } _PACKED usb_midi_event_packet;
 
 
-// MIDIStreaming (ms) insterface descriptors (p20)
+// MIDIStreaming (ms) interface descriptors (p20)
 
 enum { // MIDI Streaming descriptors subtypes
 	USB_MS_HEADER_DESCRIPTOR = 0x01,
@@ -81,7 +81,7 @@ enum { // USB Element Capabilities bitmap (p23,25)
 	USB_MS_ELEMENT_GM2					= 0x0020,
 	// GS Format compatible (Roland)
 	USB_MS_ELEMENT_GS					= 0x0040,
-	// XG compatibily (Yamaha)
+	// XG compatible (Yamaha)
 	USB_MS_ELEMENT_XG					= 0x0080,
 	USB_MS_ELEMENT_EFX					= 0x0100,
 	// internal MIDI Patcher or Router
