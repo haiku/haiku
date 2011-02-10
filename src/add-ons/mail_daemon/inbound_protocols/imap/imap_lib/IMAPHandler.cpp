@@ -410,7 +410,6 @@ FetchMessageCommand::Handle(const BString& response)
 	if (uid >= 0)
 		fIMAPMailbox.Listener().HeaderFetched(uid, data);
 
-printf("fFetchBodyLimit %i\n", (int)fFetchBodyLimit);
 	if (fFetchBodyLimit >= 0 && fFetchBodyLimit <= messageSize)
 		return true;
 
