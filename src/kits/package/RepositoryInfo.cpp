@@ -136,6 +136,8 @@ BRepositoryInfo::SetTo(const BMessage* data)
 	result = data->FindUInt8(kArchitectureField, (uint8*)&fArchitecture);
 	if (result != B_OK)
 		return result;
+	if (fArchitecture == B_PACKAGE_ARCHITECTURE_ANY)
+		return B_BAD_DATA;
 
 	const char* licenseName;
 	const char* licenseText;
@@ -207,7 +209,7 @@ BRepositoryInfo::SetTo(const BEntry& entry)
 
 	BPackageArchitecture architecture;
 	if (BPackageInfo::GetArchitectureByName(architectureString, architecture)
-			!= B_OK) {
+			!= B_OK || architecture == B_PACKAGE_ARCHITECTURE_ANY) {
 		return B_BAD_DATA;
 	}
 
