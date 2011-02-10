@@ -32,7 +32,7 @@ class Inode : EntryVisitor {
 public:
 						Inode(Volume* volume, cluster_t cluster,
 							uint32 offset);
-						Inode::Inode(Volume* volume, ino_t ino);
+						Inode(Volume* volume, ino_t ino);
 						~Inode();
 
 			status_t	InitCheck();
