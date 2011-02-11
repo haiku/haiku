@@ -75,6 +75,7 @@ static const char rcsid[] = "$Id: dns_ho.c,v 1.23 2008/11/14 02:36:51 marka Exp 
 #include <stdio.h>
 #include <string.h>
 #include <syslog.h>
+#include <unistd.h>
 
 #include <isc/memcluster.h>
 #include <irs.h>
@@ -545,6 +546,18 @@ ho_res_get(struct irs_ho *this) {
 	return (pvt->res);
 }
 
+static int
+ipv6_available(void)
+{
+	static int socket6;
+	if (socket6 == 0) {
+		socket6 = socket(AF_INET6, SOCK_DGRAM, 0);
+		if (socket6 >= 0)
+			close(socket6);
+	}
+	return socket6 >= 0;
+}
+
 /* XXX */
 extern struct addrinfo *addr2addrinfo __P((const struct addrinfo *,
 					   const char *));
@@ -578,21 +591,22 @@ ho_addrinfo(struct irs_ho *this, const char *name, const struct addrinfo *pai)
 
 	switch (pai->ai_family) {
 	case AF_UNSPEC:
-#if 0
-		/* prefer IPv6 */
-		q->qclass = C_IN;
-		q->qtype = T_AAAA;
-		q->answer = q->qbuf.buf;
-		q->anslen = sizeof(q->qbuf);
-		q->next = q2;
-		q->action = RESTGT_DOALWAYS;
-		q2->qclass = C_IN;
-		q2->qtype = T_A;
-		q2->answer = q2->qbuf.buf;
-		q2->anslen = sizeof(q2->qbuf);
-		q2->action = RESTGT_DOALWAYS;
-		break;
-#endif
+		if (ipv6_available()) {
+			/* prefer IPv6 */
+			q->qclass = C_IN;
+			q->qtype = T_AAAA;
+			q->answer = q->qbuf.buf;
+			q->anslen = sizeof(q->qbuf);
+			q->next = q2;
+			q->action = RESTGT_DOALWAYS;
+			q2->qclass = C_IN;
+			q2->qtype = T_A;
+			q2->answer = q2->qbuf.buf;
+			q2->anslen = sizeof(q2->qbuf);
+			q2->action = RESTGT_DOALWAYS;
+			break;
+		}
+		// supposed to fall through
 	case AF_INET:
 		q->qclass = C_IN;
 		q->qtype = T_A;
