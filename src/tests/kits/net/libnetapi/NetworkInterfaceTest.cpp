@@ -27,8 +27,11 @@ void
 NetworkInterfaceTest::setUp()
 {
 	fInterface.SetTo("loopTest");
+	BNetworkRoster::Default().RemoveInterface(fInterface);
+		// just in case
+
 	CPPUNIT_ASSERT(BNetworkRoster::Default().AddInterface(fInterface) == B_OK);
-	CPPUNIT_ASSERT(fInterface.CountAddresses() == 0);
+	CPPUNIT_ASSERT(fInterface.CountAddresses() == 1);
 		// every interface has one unspec address
 }
 
@@ -53,6 +56,9 @@ NetworkInterfaceTest::TestUnset()
 void
 NetworkInterfaceTest::TestFindAddress()
 {
+	fInterface.RemoveAddressAt(0);
+		// Remove empty address
+
 	// Add first
 
 	BNetworkInterfaceAddress first;
@@ -66,6 +72,7 @@ NetworkInterfaceTest::TestFindAddress()
 
 	BNetworkInterfaceAddress second;
 	second.SetAddress(BNetworkAddress(AF_INET6, "::1"));
+
 	CPPUNIT_ASSERT(fInterface.FindAddress(second.Address()) < 0);
 	CPPUNIT_ASSERT(fInterface.AddAddress(second) == B_OK);
 	CPPUNIT_ASSERT(fInterface.FindAddress(second.Address()) >= 0);
@@ -85,6 +92,9 @@ NetworkInterfaceTest::TestFindAddress()
 void
 NetworkInterfaceTest::TestFindFirstAddress()
 {
+	fInterface.RemoveAddressAt(0);
+		// Remove empty address
+
 	// Add first
 
 	BNetworkInterfaceAddress first;
