@@ -33,6 +33,7 @@ DoCatalogs FileTypes :
 	x-vnd.Haiku-FileTypes
 	:
 	ApplicationTypeWindow.cpp
+	ApplicationTypesWindow.cpp
 	AttributeWindow.cpp
 	ExtensionWindow.cpp
 	FileTypes.cpp

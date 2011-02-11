@@ -749,9 +749,9 @@ PathListView::SetMenu(BMenu* menu)
 		new BMessage(MSG_REVERSE));
 	fCleanUpMI = new BMenuItem(B_TRANSLATE("Clean up"),
 		new BMessage(MSG_CLEAN_UP));
-	fRotateIndicesRightMI = new BMenuItem(B_TRANSLATE("Rotate indices right"),
+	fRotateIndicesRightMI = new BMenuItem(B_TRANSLATE("Rotate indices forwards"),
 		new BMessage(MSG_ROTATE_INDICES_CCW), 'R');
-	fRotateIndicesLeftMI = new BMenuItem(B_TRANSLATE("Rotate indices left"),
+	fRotateIndicesLeftMI = new BMenuItem(B_TRANSLATE("Rotate indices backwards"),
 		new BMessage(MSG_ROTATE_INDICES_CW), 'R', B_SHIFT_KEY);
 	fRemoveMI = new BMenuItem(B_TRANSLATE("Remove"),
 		new BMessage(MSG_REMOVE));
@@ -769,8 +769,8 @@ PathListView::SetMenu(BMenu* menu)
 
 	fMenu->AddSeparatorItem();
 
-	fMenu->AddItem(fRotateIndicesLeftMI);
 	fMenu->AddItem(fRotateIndicesRightMI);
+	fMenu->AddItem(fRotateIndicesLeftMI);
 
 	fMenu->AddSeparatorItem();
 

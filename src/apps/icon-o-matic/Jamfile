@@ -356,4 +356,5 @@ DoCatalogs Icon-O-Matic :
 	SetGradientCommand.cpp
 	ResetTransformationCommand.cpp
 	TransformBoxStates.cpp
+	TransformerFactory.cpp
 ;

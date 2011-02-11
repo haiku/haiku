@@ -585,8 +585,8 @@ ExpanderWindow::StartExpanding()
 
 	BEntry entry(&fSourceRef);
 	BPath path(&entry);
-	BString text(B_TRANSLATE("Expanding file "));
-	text.Append(path.Leaf());
+	BString text(B_TRANSLATE("Expanding '%s'"));
+	text.ReplaceFirst("%s", path.Leaf());
 	fStatusView->SetText(text.String());
 
 	fExpandingThread = new ExpanderThread(&message, new BMessenger(this));

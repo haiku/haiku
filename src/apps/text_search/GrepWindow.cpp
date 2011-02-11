@@ -797,6 +797,11 @@ GrepWindow::_OnStartCancel()
 
 		fButton->MakeFocus(true);
 		fButton->SetLabel(B_TRANSLATE("Cancel"));
+		fButton->ResizeToPreferred();
+		fButton->MoveTo(
+			fMenuBar->Frame().Width() - fButton->Frame().Width() - 8,
+			8 + fSearchText->Frame().Height() + 8);
+		
 		fSearch->SetEnabled(false);
 
 		// We need to remember the search pattern, because during
@@ -847,6 +852,11 @@ GrepWindow::_OnSearchFinished()
 	fEncodingMenu->SetEnabled(true);
 
 	fButton->SetLabel(B_TRANSLATE("Search"));
+	fButton->ResizeToPreferred();
+	fButton->MoveTo(
+		fMenuBar->Frame().Width() - fButton->Frame().Width() - 8,
+		8 + fSearchText->Frame().Height() + 8);
+		
 	fButton->SetEnabled(true);
 	fSearch->SetEnabled(true);
 

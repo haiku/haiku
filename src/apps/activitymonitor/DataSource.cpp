@@ -290,7 +290,7 @@ void
 MemoryDataSource::Print(BString& text, int64 value) const
 {
 	char buffer[32];
-	snprintf(buffer, sizeof(buffer), "%.1f MB", value / 1048576.0);
+	snprintf(buffer, sizeof(buffer), B_TRANSLATE("%.1f MB"), value / 1048576.0);
 
 	text = buffer;
 }
@@ -299,7 +299,7 @@ MemoryDataSource::Print(BString& text, int64 value) const
 const char*
 MemoryDataSource::Unit() const
 {
-	return "MB";
+	return B_TRANSLATE("MB");
 }
 
 
@@ -872,12 +872,12 @@ void
 CPUUsageDataSource::_SetCPU(int32 cpu)
 {
 	fCPU = cpu;
-	fLabel = "CPU";
+	fLabel = B_TRANSLATE("CPU");
 	if (SystemInfo().CPUCount() > 1)
 		fLabel << " " << cpu + 1;
-
 	fShortLabel = fLabel;
-	fLabel << " usage";
+	
+	fLabel << " " << B_TRANSLATE("usage");
 
 	const rgb_color kColors[B_MAX_CPU_COUNT] = {
 		// TODO: find some better defaults...
@@ -1045,7 +1045,8 @@ void
 PageFaultsDataSource::Print(BString& text, int64 value) const
 {
 	char buffer[32];
-	snprintf(buffer, sizeof(buffer), "%.1f faults/s", value / 1024.0);
+	snprintf(buffer, sizeof(buffer), B_TRANSLATE("%.1f faults/s"),
+		value / 1024.0);
 
 	text = buffer;
 }
@@ -1146,7 +1147,7 @@ void
 NetworkUsageDataSource::Print(BString& text, int64 value) const
 {
 	char buffer[32];
-	snprintf(buffer, sizeof(buffer), "%.1f KB/s", value / 1024.0);
+	snprintf(buffer, sizeof(buffer), B_TRANSLATE("%.1f KB/s"), value / 1024.0);
 
 	text = buffer;
 }
@@ -1177,7 +1178,8 @@ NetworkUsageDataSource::Label() const
 const char*
 NetworkUsageDataSource::ShortLabel() const
 {
-	return fIn ? B_TRANSLATE("RX") : B_TRANSLATE("TX");
+	return fIn ? B_TRANSLATE_COMMENT("RX", "Shorter version for Receiving.") : 
+		B_TRANSLATE_COMMENT("TX", "Shorter version for Sending");
 }
 
 
