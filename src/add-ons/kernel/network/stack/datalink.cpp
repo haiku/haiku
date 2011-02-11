@@ -802,8 +802,7 @@ interface_protocol_control(net_datalink_protocol* _protocol, int32 option,
 					// Find first address that matches the local address
 					address = interface->AddressForLocal(protocol->domain,
 						(const sockaddr*)&request.ifra_addr);
-				}
-				if (address == NULL) {
+				} else {
 					// Find first address for family
 					address = interface->FirstForFamily(
 						protocol->domain->family);
