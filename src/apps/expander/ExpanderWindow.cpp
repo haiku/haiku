@@ -721,9 +721,8 @@ ExpanderWindow::StartListing()
 
 	BEntry entry(&fSourceRef);
 	BPath path(&entry);
-	BString text(B_TRANSLATE("Creating listing for %s"));
+	BString text(B_TRANSLATE("Creating listing for '%s'"));
 	text.ReplaceFirst("%s", path.Leaf());
-//	text.Append(path.Leaf());
 	fStatusView->SetText(text.String());
 	fListingText->SetText("");
 
