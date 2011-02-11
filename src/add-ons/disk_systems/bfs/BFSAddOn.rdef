@@ -1,0 +1,5 @@
+/*
+ * BFSAddOn.rdef
+ */
+
+resource app_signature "application/x-vnd.Haiku-BFSAddOn";
