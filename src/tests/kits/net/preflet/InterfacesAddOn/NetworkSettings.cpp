@@ -61,19 +61,20 @@ NetworkSettings::ReadConfiguration()
 {
 	BNetworkInterface fNetworkInterface(fName);
 
+	// Obtain possible IPv4 and IPv6 addresses
 	int32 zeroAddrV4 = fNetworkInterface.FindFirstAddress(AF_INET);
 	int32 zeroAddrV6 = fNetworkInterface.FindFirstAddress(AF_INET6);
 
 	BNetworkInterfaceAddress netIntAddr4;
 	BNetworkInterfaceAddress netIntAddr6;
 
-	if (zeroAddrV4 != errno) {
+	if (zeroAddrV4 >= 0) {
 		fNetworkInterface.GetAddressAt(zeroAddrV4, netIntAddr4);
 		fIPv4Addr = netIntAddr4.Address();
 		fIPv4Mask = netIntAddr4.Mask();
 	}
 
-	if (zeroAddrV6 != errno) {
+	if (zeroAddrV6 >= 0) {
 		fNetworkInterface.GetAddressAt(zeroAddrV6, netIntAddr6);
 		fIPv6Addr = netIntAddr6.Address();
 		fIPv6Mask = netIntAddr6.Mask();
