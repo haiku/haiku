@@ -422,7 +422,7 @@ BNetworkInterface::FindFirstAddress(int family)
 
 	strlcpy(request.ifra_name, Name(), IF_NAMESIZE);
 	request.ifra_index = -1;
-	request.ifra_addr.ss_family = family;
+	request.ifra_addr.ss_family = AF_UNSPEC;
 
 	if (ioctl(socket, B_SOCKET_GET_ALIAS, &request, sizeof(struct ifaliasreq))
 			< 0)
