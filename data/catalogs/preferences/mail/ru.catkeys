@@ -1,18 +1,13 @@
-1	russian	x-vnd.Haiku-Mail	3956156796
-Select account type	Config Views		Выберите тип аккаунта
+1	russian	x-vnd.Haiku-Mail	3023422579
 Mail checking	Config Window		Проверка почты
 Settings	Config Window		Настройки
 Only when dial-up is connected	Config Window		Только при наличии связи
 While sending and receiving	Config Window		Во время отсылки и получения
 days	Config Window		дней
 Start mail services on startup	Config Window		Запускать почтовый сервис при старте
-Receive mail only	Config Views		Только для получения почты
 Account name:	Config Views		Имя аккаунта:
-OK	Config Views		ОК
-The filter could not be moved. Deleting filter.	Config Views		Невозможно переименовать фильтр. Удаление фильтра.
 Revert	Config Window		Вернуть
 Accounts	Config Window		Аккаунты
-Account type:	Config Views		Тип аккаунта:
 Remove	Config Window		Удалить
 Miscellaneous	Config Window		Разное
 Show connection status window:	Config Window		Отображать окно статуса соединения:
@@ -20,45 +15,28 @@ While sending	Config Window		Во время отправки
 Schedule outgoing mail when dial-up is disconnected	Config Window		Заносить в список ожидания исходящую почту пока отсутствует подключение
 hours	Config Window		часов
 Add	Config Window		Добавить
-Send mail only	Config Views		Только для отправки почты
-E-mail	Account		E-mail
-Unnamed	Account		Без имени
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nНевозможно получить общие настройки.\n\nВозникла ошибка при получении общих настроек:\n%s\n
-Send and receive mail	Config Views		Для отправки и получения почты
 Real name:	Config Views		Настоящее имя:
 Return address:	Config Views		Обратный адрес:
 Edit mailbox menu…	Config Window		Изменить меню…
-Remove	Config Views		Удалить
-Could not create inbound chain.	Account		Невозможно создать входяшую цепь.
 Check every	Config Window		Проверять каждые
 never	Config Window		никогда
-Never	Config Window		Никогда
-Incoming mail filters	Config Views		Фильтры входящей почты
 Account settings	Config Views		Настройки аккаунта
 minutes	Config Window		минут
 Error retrieving general settings: %s\n	Config Window		Возникла ошибка при получении общих настроек: %s\n
-OK	Account		ОК
 Apply	Config Window		Применить
-Could not create outbound chain.	Account		Невозможно создать исходящую цепь.
 Always	Config Window		Всегда
-Add filter	Config Views		Добавить фильтр
-Outgoing mail filters	Config Views		Фильтры исходящей почты
 \n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nДля создания аккаунта нажмите кнопку Добавить.\n\nДля удаления выберите нужный аккаунт и нажмите кнопку Удалить.\n\nИзменить настройки аккаунта можно просто выбрав нужный из списка.
-   · Outgoing	Account		   · Исходящие
-   · E-mail filters	Account		   · Фильтры
-   · Incoming	Account		   · Входящие
-Account settings	Config Views	Настройки аккаунта		
-Account name:	Config Views		Имя аккаунта:
-Real name:	Config Views		Настоящее имя:
-Return address:	Config Views		Обратный адрес:
-Receive mail only	Config Views		Только для получения почты
-Send mail only	Config Views		Только для отправки почты
-Send and receive mail	Config Views		Для отправки и получения почты
-Account type:	Config Views		Тип аккаунта:
-Select account type	Config Views		Выберите тип аккаунта
-Incoming mail filters	Config Views		Фильтры входящей почты
-Outgoing mail filters	Config Views		Фильтры исходящей почты
-Add filter	Config Views		Добавить фильтр
-Remove	Config Views		Удалить
-The filter could not be moved. Deleting filter.	Config Views		Фильтр не может быть перемещен. Удаление фильтра.
-OK	Config Views		ОК
+OK	Config Window		ОК
+Beta	Config Window		Бета
+Alpha	Config Window		Альфа
+Golden master	Config Window		Золотая
+Final	Config Window		Финальная
+Gamma	Config Window		Гамма
+E-mail	Config Window		E-mail
+Mail Daemon Replacement\n\nby Haiku, Inc. All rights reserved.\n\nVersion %ld.%ld.%ld %s\n\nSee LICENSE file included in the installation package for more information.\n\n\n\nYou can contact us at:\n%s\n\nPlease submit bug reports using the %s\n\nProject homepage at:\n%s	Config Window		Mail Daemon Replacement\n\nразработан Haiku, Inc. Все права защищены.\n\nВерсия %ld.%ld.%ld %s\n\nДля более подробной информации смотрите файл LICENSE, находящийся в установочном архиве.\n\n\n\nВы можете связаться с нами:\n%s\n\nПожалуйста, отправляйте отчеты об ошибках используя %s\n\nСтраница проекта:\n%s
+Development	Config Window		В разработке
+Error	Config Window		Ошибка
+· E-mail filters	Config Window		   · Почтовые фильтры
+· Outgoing	Config Window		   · Исходящие
+· Incoming	Config Window		   · Входящие

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Be-MAIL	1685878103
+1	russian	x-vnd.Be-MAIL	1928106015
 %d - Date	Mail		%d - Дата
 Attach attributes:	Mail		Прикрепление атрибутов:
 Inconsistency occurred in the undo/redo buffer.	Mail		Произошло несоответствие в буфере отмены/повтора.
@@ -52,14 +52,12 @@ Print…	Mail		Печать…
 Warn unencodable:	Mail		Предупреждать о невозможности декодировать:
 Quit	Mail		Выход
 %n - Full name	Mail		%n - Полное имя
-Read 	Mail		Читать
 Trash	Mail		Корзина
 Default account:	Mail		Аккаунт по умолчанию:
 Size:	Mail		Размер:
 Account from mail	Mail		Аккаунт из письма
 Edit signatures…	Mail		Изменить подписи…
 New	Mail		Новое
-Attachments: 	Mail		Вложения: 
 Set to %s	Mail		Установить %s
 Forward	Mail		Переслать
 E-mail draft could not be saved!	Mail		Черновик не может быть сохранен!
@@ -114,7 +112,6 @@ Queries	Mail		Запросы
 Do you wish to save this message as a draft before closing?	Mail		Сохранить это сообщение как черновик?
 Save	Mail		Сохранить
 Random	Mail		Случайная
-Close and 	Mail		Закрыть и 
 Save as draft	Mail		Сохранить как черновик
 The mail_daemon could not be started:\n\t	Mail		Невозможно запустить mail_daemon:\n\t
 Open attachment	Mail		Открыть вложение
@@ -123,7 +120,7 @@ From:	Mail		От:
 Couldn't open this signature. Sorry.	Mail		Невозможно открыть эту подпись. Извините.
 Open draft	Mail		Открыть черновик
 Cut	Mail		Вырезать
-Check spelling	Mail		Проверять орфографию 
+Check spelling	Mail		Проверять орфографию
 Set to Saved	Mail		Послать в сохраненные
 Open this link	Mail		Открыть эту ссылку
 Auto signature:	Mail		Автоподпись:
@@ -139,6 +136,11 @@ View	Mail		Вид
 Mail couldn't find its dictionary.	Mail		Невозможно найти файл словаря.
 Mail\n\n	Mail		Mail\n
 Mail	Mail		Почта
-Written by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Разработал Robert Polic.\nУлучшено командой Dr. Zoidberg.\n\nCopyright 1991-2001, Be, Inc.\nCopyright 2005-2010, Haiku, Inc.\n
 Text wrapping:	Mail		Перенос строк:
 File	Mail		Файл
+Written by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Разработал Robert Polic.\nУлучшено коммандой Dr. Zoidberg.\n\nCopyright 1991-2001, Be, Inc.\nCopyright 2005-2010 Haiku, Inc.\n
+Read 	Mail		 Читать 
+Attachments: 	Mail		Вложения: 
+Close and 	Mail		Закрыть и 
+Off	Mail		Выключить
+On	Mail		Включить

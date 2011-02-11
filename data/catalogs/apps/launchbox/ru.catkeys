@@ -1,0 +1,38 @@
+1	russian	x-vnd.Haiku-LaunchBox	3325160291
+New	LaunchBox		Новый
+Set description…	LaunchBox		Указать описание…
+Vertical layout	LaunchBox		Вертикальное расположение
+OK	LaunchBox		ОК
+Pad 1	LaunchBox		Панель 1
+last chance	LaunchBox		последний шанс
+Quit	LaunchBox		Выход
+Clear button	LaunchBox		Очистить кнопку
+Failed to launch application with signature '	LaunchBox		Не удалось запустить приложение с сигнатурой '
+About	LaunchBox		О программе
+Ignore double-click	LaunchBox		Игнорировать двойной щелчок
+Auto-raise	LaunchBox		Всплывать автоматически
+Show on all workspaces	LaunchBox		Отображать на всех рабочих столах
+Show window border	LaunchBox		Показать рамку окна
+Pad 	LaunchBox		Панель 
+Icon size	LaunchBox		Размер значков
+Bummer	LaunchBox		Облом
+Cancel	LaunchBox		Отмена
+Remove button	LaunchBox		Удалить кнопку
+Description for '	LaunchBox		Описание для '
+Horizontal layout	LaunchBox		Горизонтальное расположение
+Name Panel	LaunchBox		Название панели
+Add button here	LaunchBox		Добавить сюда кнопку
+Failed to launch '	LaunchBox		Не удалось запустить '
+Stephan Aßmus (aka stippi)	LaunchBox		Stephan Aßmus (stippi)
+Failed to launch 'something',error in Pad data.	LaunchBox		Не удалось запустить 'something', ошибка в данных панели.
+Close	LaunchBox		Закрыть
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Не удалось послать команду "открыть папку" в Tracker.\n\nОшибка: 
+
+You can drag an icon here.	LaunchBox		Вы можете перетащить значок сюда.
+Clone	LaunchBox		Дублировать
+LaunchBox	LaunchBox		LaunchBox
+launch popup	LaunchBox		launch popup
+Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Вы действительно хотите закрыть эту панель?\n(Эта панель не сохранится.)
+
+'.\n\nError: 	LaunchBox		'.\n\nОшибка: 
+Settings	LaunchBox		Настройки

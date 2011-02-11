@@ -1,26 +1,26 @@
-1	russian	x-vnd.haiku-screenshoti	1952808038
+1	russian	x-vnd.haiku-screenshot	166521589
 seconds	ScreenshotWindow		секунд
-Settings…	ScreenshotWindow		Настройки…
-Delay:	ScreenshotWindow		Задержка
 Desktop	ScreenshotWindow		Рабочий стол
 Include window border	ScreenshotWindow		Включая заголовок окна
-Copy to clipboard	ScreenshotWindow		Скопировать в буфер
-New screenshot	ScreenshotWindow		Новый снимок
+Select	ScreenshotWindow		Выбрать
 Capture active window	ScreenshotWindow		Захватить активное окно
 Cancel	ScreenshotWindow		Отмена
-Select	ScreenshotWindow		Выбрать
-screenshot	ScreenshotWindow	!! Basename of screenshot files. !!	screenshot
 Name:	ScreenshotWindow		Имя:
-screenshot1	ScreenshotWindow	!! Filename of first screenshot !!	screenshot1
-SomethingLongHere	ScreenshotWindow	!! length >= screenshot file name? !!	SomethingLongHere
 Choose folder	ScreenshotWindow		Выбрать папку
-Screenshot	ScreenshotWindow		Cнимок экрана
 Save	ScreenshotWindow		Сохранить
-Overwrite	ScreenshotWindow		Перезаписать
-Choose folder...	ScreenshotWindow		Выбрать папку...
+overwrite	ScreenshotWindow		Перезаписать
+Choose folder...	ScreenshotWindow		Выбрать папку…
+Please select	ScreenshotWindow		Пожалуйста выберите
 Save as:	ScreenshotWindow		Сохранить как:
+Copy to clipboard	ScreenshotWindow		Скопировать в буфер
 Save in:	ScreenshotWindow		Сохранить в:
+screenshot	Screenshot	Base filename of screenshot files	screenshot
+New screenshot	ScreenshotWindow		Новый снимок
 Artwork folder	ScreenshotWindow		Папку artwork
 Home folder	ScreenshotWindow		Домашнюю папку
+Screenshot	ScreenshotWindow		Снимок экрана
 This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Такой файл уже существует.\nВы уверены, что хотите его перезаписать?
+Settings…	ScreenshotWindow		Настройки…
+Delay:	ScreenshotWindow		Задержка:
 Include mouse pointer	ScreenshotWindow		Включая курсор
+Translator Settings	ScreenshotWindow		Настройки транслятора

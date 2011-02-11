@@ -1,0 +1,45 @@
+1	russian	x-vnd.Haiku-ProcessController	780947807
+Memory usage	ProcessController		Использование памяти
+Do you really want to kill the team \"%s\"?	ProcessController		Вы действительно хотите убить команду \"%s\"?
+
+Restart Deskbar	ProcessController		Перезапустить Deskbar
+Debug thread	ProcessController		Отладить поток
+Your setting filecould not be saved!\n(%s)	ProcessController		Не удалось сохранить файл настроек!\n(%s)
+
+This team is already gone…	ProcessController		Этой команды уже не существует…
+Error saving file	ProcessController		Ошибка при сохранении файла
+This thread is already gone…	ProcessController		Этого потока уже не существует…
+Cancel	ProcessController		Отмена
+Run in window	ProcessController		Запустить в окне
+Processor %d	ProcessController		Процессор %d
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
+ProcessController is already installed in Deskbar.	ProcessController		Контроллер процессов уже установлен в Deskbar.
+This is the last active processor...\nYou can't turn it off!	ProcessController		Это последний активный процессор...\nВы не можете его отключить!
+thread	ProcessController		поток
+Preferences	ProcessController		Настройки
+%s priority [%d]	ProcessController		%s приоритет [%d]
+Quit application	ProcessController		Завершить приложение
+What do you want to do with the thread \"%s\"?	ProcessController		Что вы хотите сделать с потоком \"%s\"?
+
+about	ProcessController		about
+Gone teams…	ProcessController		Ушедшие команды…
+Restart Tracker	ProcessController		Перезапустить Tracker
+Live in the Deskbar	ProcessController		Жить в Deskbar
+Kill this thread!	ProcessController		Убить этот поток!
+Debug this thread!	ProcessController		Отладить этот поток!
+New Terminal	ProcessController		Новый терминал
+About ProcessController…	ProcessController		О контроллере процессов…
+Ok!	ProcessController		ОК!
+Quit an application	ProcessController		Завершить приложение
+Install in Deskbar	ProcessController		Установить в Deskbar
+ProcessController\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n	ProcessController		ProcessController\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n
+Threads and CPU usage	ProcessController		Потоки и загрузка ЦПУ
+Global Popup	ProcessController		Global Popup
+OK	ProcessController		ОК
+Damned!	ProcessController		Проклятье!
+priority	ProcessController		приоритет
+Usage: %s [-deskbar]\n	ProcessController		Использование: %s [-deskbar]\n
+Yes, kill this team!	ProcessController		Да, уничтожить эту команду!
+That's no Fun!	ProcessController		Это не смешно!
+You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Вы можете запустить контроллер процессов в окне или установить его в Deskbar.
+

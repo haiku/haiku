@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku.CodyCam	2594096346
+1	russian	x-vnd.Haiku.CodyCam	3318183214
 Capturing Image…	VideoConsumer.cpp		Захват изображения…
 Every 30 seconds	CodyCam		Каждые 30 секунд
 File name:	CodyCam		Имя файла:
@@ -27,7 +27,7 @@ Logging in…	VideoConsumer.cpp		Авторизация…
 Server:	CodyCam		Сервер:
 server address expected	CodyCam		укажите адрес сервера
 Error creating output file	VideoConsumer.cpp		Ошибка при создании файла
-unrecognized upload client specified	CodyCam		Указанный клиент загрузки не распознан
+unrecognized upload client specified	CodyCam		указан неопознанный клиент загрузки
 File %s ; Line %ld # unterminated quote\n	SettingsHandler		Файл %s ; Строка %ld # unterminated quote\n
 Output	CodyCam		Вывод
 Every 15 minutes	CodyCam		Каждые 15 минут
@@ -43,14 +43,13 @@ Cannot register the video window	CodyCam		Невозможно зарегист�
 Every 24 hours	CodyCam		Каждые 24 часа
 unknown command	SettingsHandler		неизвестная команда
 Video settings	CodyCam		Настройка видео
-Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		Не найден видеоисточник. \nДля использования CodyCam вам нужна веб-камера.
+Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		Не найден видеоисточник. \nДля использования CodyCam необходима веб-камера.
 still image filename expected	CodyCam		укажите название изображения
 About CodyCam	CodyCam		О программе
 invalid upload client %ld\n	VideoConsumer.cpp		неправильный клиент загрузки: %ld\n
 Every 15 seconds	CodyCam		Каждые 15 секунд
 Error writing output file	VideoConsumer.cpp		Ошибка при записи файла
 About Codycam…	CodyCam		О программе…
-Background View	CodyCam		Задний вид
 image file format expected	CodyCam		укажите формат изображения
 Cannot set the time source for the video source	CodyCam		Невозможно установить счетчик времени для видео источника
 Type:	CodyCam		Тип:
@@ -65,7 +64,7 @@ Error setting type of output file	VideoConsumer.cpp		Ошибка при зад�
 upload client name expected	CodyCam		укажите имя клиент загрузки
 SFTP	CodyCam		SFTP
 Connected…	VideoConsumer.cpp		Подключен…
-PASS <suppressed>  (real password sent)\n	FtpClient		ПАРОЛЬ <скрыт>  (реальный пароль отослан)\n
+PASS <suppressed>  (real password sent)\n	FtpClient		ПАРОЛЬ <скрыт> (реальный пароль отослан)\n
 Every 5 minutes	CodyCam		Каждые 5 минут
 read: %d\n	SftpClient		чтение: %d\n
 OK	CodyCam		ОК
@@ -75,11 +74,11 @@ Cannot connect the video source to the video window	CodyCam		Невозможн�
 capture rate expected	CodyCam		укажите периодичность захвата
 Error getting initial latency for the capture node	CodyCam		Ошибка при получении задержки для узла захвата
 Send to…	CodyCam		Послать…
-on or off expected	Settings	Do not translate 'on' and 'off'	укажите включить или выключить
 Quit	CodyCam		Выход
 cmd: '%s'\n	FtpClient		команда: '%s'\n
 Never	CodyCam		Никогда
 CodyCam	CodyCam		CodyCam
+CodyCam	CodyCam		Камера
 Cannot create a video window	CodyCam		Невозможно создать видео окно
 Every 10 minutes	CodyCam		Каждые 10 минут
 Cannot start the video source	CodyCam		Невозможно запустить видео источник
@@ -94,7 +93,5 @@ Cannot seek time source!	CodyCam		Невозможно обратиться к �
 File	CodyCam		Файл
 Image Format Menu	CodyCam		Меню формата изображения
 Every 30 minutes	CodyCam		Каждые 30 минут
-FTP Setup	CodyCam		Настроить FTP
 reply: '%s'\n	SftpClient		ответ: '%s'\n
 Start video	CodyCam		Запустить видео
-CodyCam	CodyCam		Камера

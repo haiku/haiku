@@ -3,7 +3,7 @@ List stack size:	Capabilities		Размер стека списка:
 Information	InfoView		Информация
 Max. clipping planes:	Capabilities		Максимальное количество отсечений:
 Max. texture units:	Capabilities		Максимальное количество текстурных блоков:
-Renderer name:	InfoView		Название рендера: 
+Renderer name:	InfoView		Название рендера:
 Vendor name:	InfoView		Имя поставщика:
 Attributes stack size:	Capabilities		Размер стека атрибутов:
 OpenGL version:	InfoView		Версия OpenGL:

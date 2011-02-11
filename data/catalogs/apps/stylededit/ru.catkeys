@@ -1,14 +1,12 @@
-1	russian	x-vnd.Haiku-StyledEdit	2750476595
+1	russian	x-vnd.Haiku-StyledEdit	3614078026
 OK	LoadAlert		ОК
 ???	LoadAlert		???
 Left	Menus		По левому краю
-Revert to the last version of \"%s\"? 	RevertToSavedAlert		Вернуться к последней версии \"%s\"? 
 Search backwards	FindandReplaceWindow		Искать снизу вверх
 Size	Menus		Размер
 Save	QuitAlert		Сохранить
-Redo typing	Menus		Повторить
 Replace same	Menus		Заменить совпадение
-Can't undo	Menus		Невозможно отменить
+Can't Undo	Menus		Невозможно отменить
 Save	Menus		Сохранить
 Replace with:	FindandReplaceWindow		Заменить на:
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Невозможно вернуть, файл не найден: \"%s\".
@@ -20,7 +18,6 @@ Replace in all windows	FindandReplaceWindow		Заменить во всех ок
 Wrap lines	Menus		Перенос строк
 Cancel	RevertToSavedAlert		Отмена
 Document	Menus		Документ
-Save changes to the document \"%s\"? 	QuitAlert		Сохранить изменения в файле \"%s\"? 
 Font	Menus		Шрифт
 Replace all	FindandReplaceWindow		Заменить все
 Default	Open_and_SaveAsPanel		По умолчанию
@@ -28,7 +25,6 @@ Cancel	FindandReplaceWindow		Отмена
 Error loading \"%s\":\n\tUnsupported format	LoadAlert		Ошибка при открытии \"%s\":\n\tФормат не поддерживается
 OK	RevertToSavedAlert		ОК
 Don't save	QuitAlert		Не сохранять
-Align	Menus		Выровнить
 Color	Menus		Цвет
 Red	Menus		Красный
 Open…	Menus		Открыть…
@@ -42,13 +38,11 @@ Find selection	Menus		Найти выделенное
 Find:	FindandReplaceWindow		Найти:
 Error saving \"%s\":\n%s	SaveAlert		Ошибка сохранения \"%s\":\n%s
 Replace	FindandReplaceWindow		Заменить
-Undo typing	Menus		Вернуть
 Find again	Menus		Найти далее
 Cancel	QuitAlert		Отмена
 Find…	Menus		Найти…
 Error loading \"%s\":\n\t%s	LoadAlert		Ошибка загрузки \"%s\":\n\t%s
 Black	Menus		Черный
-Untitled 	StyledEditWindow		Новый документ 
 OK	SaveAlert		ОК
 Find	FindandReplaceWindow		Найти
 Encoding	Open_and_SaveAsPanel		Кодировка
@@ -57,7 +51,6 @@ Right	Menus		По правому краю
 Cancel	SaveAlert		Отмена
 Save	SaveAlert		Сохранить
 Don't save	SaveAlert		Не сохранять
-This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Этот файл отмечен только для чтения. Сохранить изменения в документе \"%s\"? 
 Paste	Menus		Вставить
 File	Menus		Файл
 Page setup…	Menus		Настройка печати…
@@ -69,4 +62,19 @@ Close	Menus		Закрыть
 Copy	Menus		Копировать
 Cut	Menus		Вырезать
 Select all	Menus		Выделить всё
-Save as…	Menus		Сохранить как...
+Save as…	Menus		Сохранить как…
+Lines:	Statistics		Строк:
+Document statistics	Statistics		Статистика документа
+Statistics…	Menus		Статистика…
+Words:	Statistics		Слов:
+OK	Statistics		ОК
+Undo typing	QuitAlert		Отменить ввод
+Characters:	Statistics		Символов:
+Redo typing	QuitAlert		Повторить ввод
+Italic	Menus		Наклонный
+Bold	Menus		Жирный
+Align	Menus		Выровнять
+Revert to the last version of \"%s\"? 	RevertToSavedAlert		Вернуться к последней версии \"%s\"? 
+Save changes to the document \"%s\"? 	QuitAlert		Сохранить изменения в файле \"%s\"? 
+This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Этот файл отмечен только для чтения. Сохранить изменения в документе \"%s\"? 
+Untitled 	StyledEditWindow		Новый документ 

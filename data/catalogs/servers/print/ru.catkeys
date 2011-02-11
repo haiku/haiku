@@ -1,4 +1,4 @@
-1	russian	x-vnd.Be-PSRV	219268753
+1	russian	x-vnd.Be-PSRV	2998115175
 Undefined	ConfigWindow		не определены
 Cancel	PrintServerApp		Отмена
 Page setup:	ConfigWindow		Настройки печати:
@@ -9,13 +9,11 @@ Would you like to set one up now?	PrintServerApp		Хотите настроит�
 Portrait	ConfigWindow		Портрет
 All pages	ConfigWindow		Все страницы
 There is no default printer set up.	PrintServerApp		Не выбран принтер по умолчанию.
-There already exists a printer you are going to create, but it's driver could not be found! Replace?	PrintServerApp		Принтер, который вы собираетесь создать, уже существует, но его драйвер невозможно найти! Заменить?
 Printer:	ConfigWindow		Принтер:
 Select a printer	ConfigWindow		Выберите принтер
 No	PrintServerApp		Нет
 Landscape	ConfigWindow		Альбом
 There are no printers set up.	PrintServerApp		Нет настроенных принтеров.
-There already exists a printer you are going to create, but it's not usable at all! Replace?	PrintServerApp		Принтер, который вы собираетесь создать, уже существует, но он не используется! Заменить?
 OK	PrintServerApp		ОК
 Print setup	ConfigWindow		Настройка печати
 Would you like to make @ the default printer?	PrintServerApp		Вы хотите сделать @ принтером по умолчанию?
@@ -23,7 +21,6 @@ Page setup	ConfigWindow		Настройка печати
 Paper setup:	ConfigWindow		Параметры бумаги:
 Page %1 to %2	ConfigWindow		Страница %1 из %2
 Page %1 to %2, %3 copies	ConfigWindow		Страница %1 из %2, копий: %3
-Show configuration window	PrintServerApp Scripting		Показать окно настройки
 All pages, %1 copies	ConfigWindow		Все страницы, копий: %1
-Delete a specific printer	PrintServerApp Scripting		Удалить выбранный принтер
-Create a new printer	PrintServerApp Scripting		Создать новый принтер
+A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Принтер с таким же именем уже существует, но его драйвер не найден! Заменить?
+A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Принтер с таким же именем уже существует, но его нельзя использовать! Заменить?

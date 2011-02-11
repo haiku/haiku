@@ -1,0 +1,48 @@
+1	russian	x-vnd.Haiku-Devices	1250375801
+Order by:	DevicesView		Сортировать по:
+ACPI controller	Device		ACPI контроллер
+Memory controller	Device		Контроллер памяти
+Docking station	Device		Кредл
+Computer	Device		Компьютер
+Detailed	DevicesView		Подробности
+Properties	PropertyList		Свойства
+Category	DevicesView		категориям
+Quit	DevicesView		Выход
+Device paths	Device		Путь к устройству
+Manufacturer\t\t\t: 	Device		Производитель\t\t\t: 
+Processor	Device		Процессор
+ACPI Information	DeviceACPI		Информация ACPI
+Device Name\t\t\t\t: 	Device		Название устройства\t\t\t\t: 
+Generic system peripheral	Device		Общая системная периферия
+Display controller	Device		Контроллер дисплея
+Mass storage controller	Device		Контроллер накопителей
+About Devices…	DevicesView		О программе…
+Input device controller	Device		Контроллер устройств ввода
+Device paths\t: 	Device		Путь к устройству\t: 
+Network controller	Device		Сетевой контроллер
+Devices\n\twritten by Pieter Panman\n\n\tBased on listdev by Jérôme Duval\n\tand the previous Devices preference\n\tby Jérôme Duval and Sikosis\n\tCopyright 2009, Haiku, Inc.\n	DevicesApplication		Devices\n\tразрабал Pieter Panman\n\n\tОсновано на listdev от Jérôme Duval\n\tи на предыдущей версии Devices\n\t разработанной Jérôme Duval и Sikosis\n\tАвторские права 2009, Haiku, Inc.\n
+Driver used	Device		Используемый драйвер
+Driver used\t\t\t\t: 	Device		Используется драйвер\t\t\t\t: 
+Bus	DevicesView		Шина
+Communication controller	Device		Контроллер связи
+Basic information	DevicesView		Основная информация
+PCI Information	DevicePCI		PCI информация 
+Manufacturer:	Device		Производитель:
+Multimedia controller	Device		Мультимедийный контроллер
+Device name:	Device		Название устройства:
+Report compatibility	DevicesView		Отчет о совместимости
+about	DevicesApplication		о программе
+Signal processing controller	Device		Контроллер обработки сигналов
+Serial bus controller	Device		Контроллер последовательной шины
+Wireless controller	Device		Беспроводной контроллер
+Device name	Device		Название устройства
+Manufacturer	Device		Производитель 
+Intelligent controller	Device		Интеллектуальный контроллер
+Satellite communications controller	Device		Контроллер спутниковой связи
+Bridge	Device		Мост
+Refresh devices	DevicesView		Обновить список устройств
+Connection	DevicesView		подключению
+Generate system information	DevicesView		Сгенерировать системную информацию
+Encryption controller	Device		Контроллер шифрования
+Unclassified device	Device		Неклассифицированные устройства
+Devices	DevicesView		Устройства

@@ -12,7 +12,7 @@ User:	Keymap window		Пользовательские:
 Switch shortcut keys to Haiku mode	Keymap window		Переключить раскладку в режим Haiku
 Keymap	Keymap window		Раскладка
 Sample and clipboard:	Keymap window		Пример и буфер обмена:
-Layout	Keymap window		Макет 
+Layout	Keymap window		Макет
 Switch shortcut keys to Windows/Linux mode	Keymap window		Переключить раскладку в режим Windows/Linux
 Revert	Keymap window		Вернуть
 Save as…	Keymap window		Сохранить как…

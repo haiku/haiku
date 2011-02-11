@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-BluetoothPrefs	4044811765
+1	russian	x-vnd.Haiku-BluetoothPrefs	912779521
 About Bluetooth…	Window		О программе…
 Handheld	Settings view		Переносной
 Default inquiry time:	Settings view		Время запроса по умолчанию:
@@ -26,7 +26,7 @@ Policy...	Settings view		Политика...
 61 secs	Settings view		61 сек
 There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Не было найдено ни одного bluetooth устройства, зарегистрированного в системе.
 Identify us as...	Settings view		Идентифицировать нас как...
-Remaining 	Inquiry panel		Осталось
+Remaining 	Inquiry panel		Осталось 
 As blocked	Remote devices		Как блокированный
 Pick LocalDevice...	Settings view		Выбор локального устройства...
 Defaults	Window		По умолчанию
@@ -35,10 +35,10 @@ Desktop	Settings view		Рабочий стол
 Revert	Window		Вернуть
 Remote devices list…	Window		Список внешних устройств…
 Laptop	Settings view		Ноутбук
-Retrieving name of 	Inquiry panel		Получение имени
+Retrieving name of 	Inquiry panel		Получение имени 
 Bluetooth	Window		Bluetooth
 Discoverable	Extended local device view		Видимый
-Service classes: 	Device View		Классы сервиса:
+Service classes: 	Device View		Служебные классы: 
 Connections & channels…	Window		Список подключений и каналов…
 Refresh LocalDevices…	Window		Обновление локальных устройств…
 Settings	Window		Настройки
@@ -50,5 +50,7 @@ Retrieving names...	Inquiry panel		Получение имен...
 Help	Window		Помощь
 Add…	Remote devices		Добавить…
 Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Bluetooth Haiku стек, (ARCE)\n\nРазработл Oliver Ruiz Dorantes\n\nПри поддержке:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nСпасибо всем тем, кто оказывал помощь...\n\nПрисылал/жертвовал оборудование:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\tи Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nПоддерживал финансово:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nПрисылал патчи:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nТестировал:\n\t- Petter H. Juliussen\nТем, кто дал мне все знания:\n\t- команде yellowTAB
- seconds	Inquiry panel		 секунд
 Server	Settings view		Сервер
+OK	main		ОК
+Disconnect	Remote devices		Отключить
+Authenticate	Extended local device view		Аутентифицировать

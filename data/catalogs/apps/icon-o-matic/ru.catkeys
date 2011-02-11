@@ -1,0 +1,82 @@
+1	russian	x-vnd.haiku-icon_o_matic	3977795013
+Select All	Icon-O-Matic-PathManipulator		Выделить всё
+Add Style	Icon-O-Matic-AddStylesCmd		Добавить стиль
+Color (#%02x%02x%02x)	Style name after dropping a color		Цвет (#%02x%02x%02x)
+Add	Icon-O-Matic-StylesList		Добавить
+Closed	Icon-O-Matic-PropertyNames		Закрыто
+Remove Path	Icon-O-Matic-RemovePathsCmd		Удалить путь
+Height	Icon-O-Matic-PropertyNames		Высота
+Width	Icon-O-Matic-PropertyNames		Ширина
+Duplicate	Icon-O-Matic-ShapesList		Дублировать
+Move	Icon-O-Matic-TransformationBoxStates		Переместить
+Copy	Icon-O-Matic-Properties		Копировать
+Save as…	Icon-O-Matic-Menu-File		Сохранить как…
+Change Color	Icon-O-Matic-SetColorCmd		Изменить цвет
+Style	Icon-O-Matic-Menus		Стиль
+<modify path>	Icon-O-Matic-PathCmd		<изменить путь>
+Error: 	Icon-O-Matic-Main		Ошибка:
+Opening the icon failed!	Icon-O-Matic-Main		Не удалось открыть значок
+bad news	Icon-O-Matic-Exporter		плохие новости
+Cancel	Icon-O-Matic-SVGExport		Отмена
+All	Icon-O-Matic-Properties		Все
+Add Shape	Icon-O-Matic-AddShapesCmd		Добавить форму
+Gradient type	Icon-O-Matic-StyleTypes		Тип градиента
+Remove	Icon-O-Matic-StylesList		Удалить
+Remove	Icon-O-Matic-PathsList		Удалить
+Quit	Icon-O-Matic-Menu-File		Выход
+No	Icon-O-Matic-StyledTextImport		Нет
+Add	Icon-O-Matic-TransformersList		Добавить
+Export Icon	Dialog title		Экспортировать значок
+Color	Icon-O-Matic-StyleTypes		Цвет
+Settings…	Icon-O-Matic-SavePanel		Настройки…
+Remove	Icon-O-Matic-PathManipulator		Удалить
+Gradient	Icon-O-Matic-StyleTypes		Градиент
+BEOS:ICON Attribute	Icon-O-Matic-SavePanel		Атрибут BEOS:ICON
+Export as…	Icon-O-Matic-Menu-File		Экспортировать как…
+Invert selection	Icon-O-Matic-Properties		Инвертировать выделение
+Paste	Icon-O-Matic-Properties		Вставить
+Cancel	Icon-O-Matic-ColorPicker		Отмена
+Path	Icon-O-Matic-Menus		Путь
+File	Icon-O-Matic-Menus		Файл
+Error: 	Icon-O-Matic-Exporter		Ошибка:
+Path	Icon-O-Matic-PropertyNames		Путь
+Cancel	Icon-O-Matic-Main		Отмена
+<unavailable>	Icon-O-Matic-StyleTypes		<недоступно>
+Add	Icon-O-Matic-PathsList		Добавить
+Bummer	Cancel button - error alert		Облом
+Remove	Icon-O-Matic-ShapesList		Удалить
+Add Styles	Icon-O-Matic-AddStylesCmd		Добавить стиль
+Format	Icon-O-Matic-SavePanel		Формат
+Edit	Icon-O-Matic-Menus		Изменить
+Style type	Icon-O-Matic-StyleTypes		Тип стиля
+Add Path	Icon-O-Matic-AddPathsCmd		Добавиь путь
+Color	Icon-O-Matic-PropertyNames		Цвет
+Insert Control Point	Icon-O-Matic-InsertPointCmd		Вставить
+OK	Icon-O-Matic-SVGImport		ОК
+Save	Icon-O-Matic-Menu-File		Сохранить
+Duplicate	Icon-O-Matic-PathsList		Дублировать
+Save	Icon-O-Matic-Main		Сохранить
+Open…	Icon-O-Matic-Menu-File		Открыть…
+Options	Icon-O-Matic-Menus		Опции
+Edit Gradient	Icon-O-Matic-SetGradientCmd		Изменить градиент
+Move Shape	Icon-O-Matic-MoveShapesCommand		Переместить форму
+Save changes to current icon?	Icon-O-Matic-Main		Сохранить изменения в текущем значке?
+Opening the document failed!	Icon-O-Matic-Main		Не удалось открыть документ!
+New	Icon-O-Matic-Menu-File		Новый
+Save Icon	Dialog title		Сохранить значок
+Paste Properties	Icon-O-Matic-Properties		Вставить свойства
+Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Возможно, Icon-O-Matic не перенес все данные из загруженного SVG файла. Перезаписывая оригинальный файл, эта информация может быть потеряна.
+Add shape with path	Icon-O-Matic-Menu-Shape		Добавить форму с путем
+Remove Transformers	Icon-O-Matic-RemoveTransformersCmd		Удалить преобразования
+Transformation	Icon-O-Matic-TransformationBoxStates		Преобразование
+<unkown property>	Icon-O-Matic-PropertyNames		<неизвестное свойство>
+Linear	Icon-O-Matic-StyleTypes		Линейный
+Assign Path	Icon-O-Matic-AddPathsCmd		Назначить путь
+OK	Icon-O-Matic-ColorPicker		ОК
+bad news	Title of error alert		плохие новости
+Remove Paths	Icon-O-Matic-RemovePathsCmd		Удалить пути
+<nothing to undo>	Icon-O-Matic-Menu-Edit		<нечего отменять>
+Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		Заморозить форму
+Add shape with style	Icon-O-Matic-Menu-Shape		Добавить форму со стилем
+HVIF Source Code	Icon-O-Matic-SavePanel		Исходный код HVIF
+Undo	Icon-O-Matic-Main		Отменить

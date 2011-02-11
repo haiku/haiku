@@ -1,0 +1,28 @@
+1	russian	x-vnd.Haiku-ScreenSaver	1468011094
+Run module	ScreenSaver		Запускать заставку через 
+Could not load screen saver	ScreenSaver		Не удалось загрузить заставку
+30 seconds	ScreenSaver		30 секунд
+Password…	ScreenSaver		Пароль…
+Password:	ScreenSaver		Пароль:
+Password lock	ScreenSaver		Требовать пароль через 
+Add…	ScreenSaver		Добавить…
+mouse is here	ScreenSaver		мышь находится здесь
+Modules	ScreenSaver		Заставки
+Test	ScreenSaver		Проверить
+ScreenSaver	ScreenSaver		Хранитель экрана
+Module settings	ScreenSaver		Настройки заставки
+Cancel	ScreenSaver		Отмена
+Turn off screen	ScreenSaver		Выключать экран через 
+No options available	ScreenSaver		Нет доступных настроек
+Password Window	ScreenSaver		Окно пароля
+Enable screen saver	ScreenSaver		Включить хранитель экрана
+Fade now when	ScreenSaver		Включать заставку, когда
+Fade	ScreenSaver		Настройки
+Passwords don't match. Please try again.	ScreenSaver		Пароли не совпадают. Пожалуйста, попробуйте еще раз.
+OK	ScreenSaver		ОК
+Don't fade when	ScreenSaver		Не включать заставку, когда
+Blackness	ScreenSaver		Пустой экран
+Use custom password	ScreenSaver		Использовать выбранный пароль
+Done	ScreenSaver		Готово
+Confirm password:	ScreenSaver		Подтверждение пароля:
+Use network password	ScreenSaver		Использовать сетевой пароль

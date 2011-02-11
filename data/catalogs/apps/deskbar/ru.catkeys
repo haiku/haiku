@@ -1,4 +1,4 @@
-1	russian	x-vnd.Be-TSKB	2686533917
+1	russian	x-vnd.Be-TSKB	34208151
 Applications	PreferencesWindow		Приложения
 Recent applications	BeMenu		Недавние приложения
 Edit menu…	PreferencesWindow		Изменить меню…
@@ -15,7 +15,6 @@ Show all	WindowMenu		Показать все
 No windows	WindowMenu		Нет окон
 Power off	BeMenu		Выключить компьютер
 Auto-raise	PreferencesWindow		Всплывать автоматически
-Full date	PreferencesWindow		Полная дата
 Hide time	TimeView		Скрыть часы
 Recent folders:	PreferencesWindow		Недавние папки:
 Deskbar preferences…	BeMenu		Настроить Deskbar…

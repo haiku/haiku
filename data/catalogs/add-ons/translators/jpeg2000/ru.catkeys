@@ -1,0 +1,16 @@
+1	russian	x-vnd.Haiku-JPEG2000Translator	496980629
+Write	JPEG2000Translator		Запись
+JPEG2000 images	JPEG2000Translator		JPEG2000 изображения
+Based on JasPer library:	JPEG2000Translator		Основано на библиотеке JasPer:
+Output only codestream (.jpc)	JPEG2000Translator		Выводить только поток кодов (.jpc)
+Write black-and-white images as RGB24	JPEG2000Translator		Записывать черно-белые изображения как RGB24
+the University of British Columbia, Canada.	JPEG2000Translator		Университет Британской Колумбии, Канада.
+Output quality	JPEG2000Translator		Качество вывода
+Read	JPEG2000Translator		Чтение
+1999-2000, Image Power, Inc. and	JPEG2000Translator		1999-2000, Корпорация Image Power и
+ImageMagick's jp2 codec was used as \"tutorial\".	JPEG2000Translator		jp2 кодек из ImageMagick был использован как \"руководство\".
+Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Растровый формат Be (JPEG2000Translator)
+Low	JPEG2000Translator		Низкое
+About	JPEG2000Translator		Авторы
+High	JPEG2000Translator		Высокое
+Read greyscale images as RGB32	JPEG2000Translator		Читать изображения в оттенках серого как RGB32

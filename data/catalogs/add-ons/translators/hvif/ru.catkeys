@@ -1,0 +1,8 @@
+1	russian	x-vnd.Haiku-HVIFTranslator	813066125
+HVIF icons	HVIFTranslator		HVIF значки
+Render size:	HVIFView		Размер изображения:
+HVIFTranslator Settings	HVIFTranslator		Настройки HVIF транслятора
+Native Haiku vector icon translator	HVIFTranslator		Транслятор нативный векторных значков Haiku
+Native Haiku icon format translator	HVIFView		Транслятор нативного формата значков Haiku
+HVIF Settings	HVIFMain		HVIF настройки
+Version %d.%d.%d, %s	HVIFView		Версия %d.%d.%d, %s

@@ -1,0 +1,42 @@
+1	russian	x-vnd.Haiku-ActivityMonitor	657126014
+P-faults	DataSource		Ошибки страниц
+Media nodes	DataSource		Медиа узлы
+Raw clipboard size	DataSource		Полный размер буфера обмена
+Threads	DataSource		Потоки
+Add graph	ActivityWindow		Добавить график
+Teams	DataSource		Команды
+Hide legend	ActivityView		Скрыть легенду
+Network send	DataSource		Исходящий трафик
+CPU usage (combined)	DataSource		Использование ЦПУ (всего)
+CPU	DataSource		ЦПУ
+Used memory	DataSource		Использовано памяти
+Cached memory	DataSource		Закэшировано памяти
+Apps	DataSource		Приложения
+Show legend	ActivityView		Показать легенду
+Settings	ActivityWindow		Настройки
+Receiving	DataSource		Прием
+Settings…	ActivityWindow		Настройки…
+Ports	DataSource		Порты
+Page faults	DataSource		Ошибки страниц
+Text clipboard size	DataSource		Размер текстового буфера обмена
+Sending	DataSource		Передача
+Cache	DataSource		Кэш
+About ActivityMonitor…	ActivityWindow		О программе…
+TX	DataSource		Передача
+Update time interval:	SettingsWindow		Временной интервал обновления:
+Quit	ActivityWindow		Выход
+Block cache memory	DataSource		Память блокового кэша
+Remove graph	ActivityView		Удалить график
+RX	DataSource		Прием
+CPU usage	DataSource		Использование ЦПУ
+Sems	DataSource		Семафоры
+Running applications	DataSource		Запущенные приложения
+Semaphores	DataSource		Семафоры
+Block cache	DataSource		Блоковый кэш
+Swap space	DataSource		Размер файла подкачки
+Swap	DataSource		Файл подкачки
+File	ActivityWindow		Файл
+Additional items	ActivityView		Дополнительные графики
+Network receive	DataSource		Входящий трафик
+Memory	DataSource		Память
+ActivityMonitor	ActivityWindow		Мониторинг активности

@@ -1,13 +1,12 @@
-1	russian	x-vnd.Haiku-Mouse	104106491
-Click to activate	SettingsView		Нажать для активации
+1	russian	x-vnd.Haiku-Mouse	3392409209
 Mouse type:	SettingsView		Тип мыши:
 Warp	SettingsView		Перемещение
 2-Button	SettingsView		Двухкнопочная
-Double-click test area	SettingsView		Область для проверки двойного клика 
+Double-click test area	SettingsView		Область для проверки двойного клика
 Revert	MouseWindow		Вернуть
 ...by Andrew Edward McCall	MouseApplication		...разработал Andrew Edward McCall
 Mouse acceleration	SettingsView		Ускорение курсора
-Click to focus	SettingsView		Нажать для фокусировки
+Click to focus	SettingsView		Нажать для фокусировки окна
 3-Button	SettingsView		Трёхкнопочная
 Mouse speed	SettingsView		Скорость курсора
 Focus mode:	SettingsView		Режим фокуса:
@@ -22,3 +21,4 @@ Fast	SettingsView		Быстро
 Normal	SettingsView		Обычно
 Mouse	MouseWindow		Мышь
 Slow	SettingsView		Медленно
+Click to focus and raise	SettingsView		Нажать для фокуса и поднятия окна

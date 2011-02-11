@@ -1,5 +1,5 @@
-1	russian	x-vnd.Haiku-Terminal	3460363657
-Not found.	Terminal TermWindow		Не найдено
+1	russian	x-vnd.Haiku-Terminal	4136448166
+Not found.	Terminal TermWindow		Не найдено.
 Switch Terminals	Terminal TermWindow		Переключить терминалы
 Change directory	Terminal TermView		Сменить каталог
 OK	Terminal TermWindow		ОК
@@ -10,7 +10,6 @@ Match case	Terminal FindWindow		Учитывать регистр
 Quit	Terminal TermWindow		Выход
 Use default shell	Terminal Shell		Использовать оболочку по умолчанию
 Select all	Terminal TermWindow		Выделить всё
-Edit	Terminal TermWindow		Изменить
 Terminal	Terminal TermWindow		Терминал
 Save to file…	Terminal PrefWindow		Сохранить в файл…
 OK	Terminal PrefWindow		ОК
@@ -24,16 +23,17 @@ Window size	Terminal TermWindow		Размер окна
 Terminal settings	Terminal PrefWindow		Настройки терминала
 Find	Terminal FindWindow		Найти
 Appearance	Terminal PrefWindow		Внешний вид
-Use selection	Terminal FindWindow		Использовать выделение
+Use selection	Terminal FindWindow		Использовать выделенный текст
 Size:	Terminal AppearancePrefView		Размер:
+Cannot execute \"%command\":\n\t%error	Terminal Shell		Невозможно выполнить \"%command\":\n\t%error
 Full screen	Terminal TermWindow		На весь экран
 Page setup…	Terminal TermWindow		Настройка печати…
 OK	Terminal TermView		ОК
 Insert path	Terminal TermView		Вставить путь
+Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Терминал\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nИспользование: %s [OPTION] [SHELL]\n
 No search string was entered.	Terminal TermWindow		Не введена строка поиска
 Don't save	Terminal PrefWindow		Не сохранять
 Match word	Terminal FindWindow		Только слово целиком
-Close tab	Terminal SmartTabView		Закрыть вкладку
 Nothing is selected.	Terminal TermWindow		Ничего не выделено
 Text not found.	Terminal TermWindow		Текст не найден
 Find…	Terminal TermWindow		Найти…
@@ -54,21 +54,50 @@ Use text:	Terminal FindWindow		Использовать текст:
 Cancel	Terminal TermWindow		Отмена
 OK	Terminal TermApp		ОК
 Find failed	Terminal TermWindow		Строка не найдена
-Shell 	Terminal TermWindow		Консоль 
 Search forward	Terminal FindWindow		Искать сверху вниз
 Find previous	Terminal TermWindow		Найти ранее
 About Terminal…	Terminal TermWindow		О программе…
 Find next	Terminal TermWindow		Найти далее
 Close active tab	Terminal TermWindow		Закрыть активную вкладку
-Terminal	Terminal TermApp		Терминал
 Paste	Terminal TermWindow		Вставить
 Save changes to this settings panel?	Terminal PrefWindow		Сохранить изменения в панеле настройки?
 Cancel	Terminal PrefWindow		Отмена
 Save	Terminal PrefWindow		Сохранить
 Cancel	Terminal TermView		Отмена
--h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h, --help вывести этот текст\n -t, --title установить заголовок окна\n -f, --fullscreen запустить в полном экране\n
+-h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		 -h, --help вывести этот текст\n -t, --title установить заголовок окна\n -f, --fullscreen запустить в полном экране\n
 Color schema:	Terminal AppearancePrefView		Цветовая схема:
 Terminal\n\nwritten by Kazuho Okui and Takashi Murai\nupdated by Kian Duffy and others\n\nCopyright ©2003-2009, Haiku.\n	Terminal TermView		Terminal\n\nразработал Kazuho Okui и Takashi Murai\nобновлено Kian Duffy и многими другими\n\nCopyright ©2003-2009, Haiku.\n
-Confirm exit if active programs exist	Terminal AppearancePrefView		Подтвержать выход если запущен процесс
-A process is still running.\nIf you close the Terminal the process will be killed.	Terminal TermWindow		В окне терминала запущена программа.\nЕсли вы закроете это окно, то этот процесс будет завершён.
-Really quit?	Terminal TermWindow		Действительно выйти?
+Confirm exit if active programs exist	Terminal AppearancePrefView		Подтверждать выход если запущены процессы
+Edit	Terminal TermWindow		Изменить
+Shell 	Terminal TermWindow		Консоль 
+The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Этот шаблон описывает заголовок текущей вкладки.\nВозможно использовать следующие переменные:\n
+Close tab	Terminal TermWindow		Закрыть вкладку
+Window title:	Terminal AppearancePrefView		Заголовок окна
+Really close?	Terminal TermWindow		Действительно закрыть?
+Window title:	Terminal TermWindow		Заголовок окна:
+Tab title:	Terminal AppearancePrefView		Заголовок вкладки:
+The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Этот шаблон описывает заголовки окна.\nВозможно использовать следующие переменные:\n
+Window title…	Terminal TermWindow		Заголовок окна…
+Set window title	Terminal TermWindow		Установить заголовок окна
+Close other tabs	Terminal TermWindow		Закрыть остальные вкладки
+The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Этот шаблон описывает заголовки вкладок.\nВозможно использовать следующие переменные:\n
+Close	Terminal TermWindow		Закрыть
+Close window	Terminal TermWindow		Закрыть окно
+Set tab title	Terminal TermWindow		Переименовть вкладку
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Этот шаблон описывает заголовок окна.\nВозможно использовать следующие переменные:\n
+Edit tab title…	Terminal TermWindow		Переименовать вкладку…
+Tab title:	Terminal TermWindow		Заголовок вкладки
+The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Процесс \"%1\" все еще работает.\nЕсли вы закроете вкладку, то этот процесс будет уничтожен.
+
+The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Процесс \"%1\" все еще работает.\nЕсли вы закроете Терминал, то этот процесс будет уничтожен.
+The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Следующие процессы все еще работают:\n\n\t%1\n\nЕсли вы закроете Терминал, то эти процессы будут уничтожены.
+Custom	Terminal colors schema		Пользовательские
+Black on White	Terminal colors schema		Черный на белом
+Cancel	Terminal SetTitleWindow		Отмена
+Selected text	Terminal AppearancePrefView		Выделенный текст
+OK	Terminal SetTitleWindow		ОК
+Background	Terminal AppearancePrefView		Фон
+White on Black	Terminal colors schema		Черный на белом
+Selected background	Terminal AppearancePrefView		Выделенный фон
+Text	Terminal AppearancePrefView		Текст
+Use default	Terminal SetTitleWindow		По умолчанию

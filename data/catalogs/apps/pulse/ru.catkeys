@@ -1,10 +1,11 @@
-1	russian	x-vnd.Haiku-Pulse	4219993330
+1	russian	x-vnd.Haiku-Pulse	2756001860
 OK	PrefsWindow		ОК
 Quit	DeskbarPulseView		Выход
 Pulse	PulseWindow		Пульс
 Mini mode	DeskbarPulseView		Мини режим
 Remove replicant	CPUButton		Удалить репликант
 Active color	ConfigView		Активный цвет
+Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Использование: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
 Fade colors	ConfigView		Затенять цвета
 OK	DeskbarPulseView		ОК
 Deskbar mode	PrefsWindow		Режим Deskbar
