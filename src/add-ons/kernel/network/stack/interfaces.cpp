@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2011, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -54,7 +54,8 @@ struct AddressHashDefinition {
 
 	size_t Hash(InterfaceAddress* address) const
 	{
-		return address->domain->address_module->hash_address(address->local, false);
+		return address->domain->address_module->hash_address(address->local,
+			false);
 	}
 
 	bool Compare(const KeyType& key, InterfaceAddress* address) const
@@ -75,7 +76,7 @@ struct AddressHashDefinition {
 	}
 };
 
-typedef BOpenHashTable<AddressHashDefinition, true, true> AddressTable;
+typedef BOpenHashTable<AddressHashDefinition, true, false> AddressTable;
 
 
 static mutex sLock;
@@ -308,6 +309,13 @@ InterfaceAddress::RemoveDefaultRoutes(int32 option)
 		route.flags = RTF_LOCAL | RTF_HOST;
 		remove_route(domain, &route);
 	}
+}
+
+
+bool
+InterfaceAddress::LocalIsDefined() const
+{
+	return local != NULL && local->sa_family != AF_UNSPEC;
 }
 
 
@@ -594,8 +602,10 @@ Interface::AddAddress(InterfaceAddress* address)
 	fAddresses.Add(address);
 	locker.Unlock();
 
-	MutexLocker hashLocker(sHashLock);
-	sAddressTable.Insert(address);
+	if (address->LocalIsDefined()) {
+		MutexLocker hashLocker(sHashLock);
+		sAddressTable.Insert(address);
+	}
 	return B_OK;
 }
 
@@ -614,8 +624,10 @@ Interface::RemoveAddress(InterfaceAddress* address)
 
 	locker.Unlock();
 
-	MutexLocker hashLocker(sHashLock);
-	sAddressTable.Remove(address);
+	if (address->LocalIsDefined()) {
+		MutexLocker hashLocker(sHashLock);
+		sAddressTable.Remove(address);
+	}
 }
 
 
@@ -1198,12 +1210,19 @@ add_interface(const char* name, net_domain_private* domain,
 
 	locker.Unlock();
 
-	notify_interface_added(interface);
-	add_interface_address(interface, domain, request);
+	status_t status = add_interface_address(interface, domain, request);
+	if (status == B_OK)
+		notify_interface_added(interface);
+	else {
+		locker.Lock();
+		sInterfaces.Remove(interface);
+		locker.Unlock();
+		interface->ReleaseReference();
+	}
 
 	interface->ReleaseReference();
 
-	return B_OK;
+	return status;
 }
 
 
@@ -1316,7 +1335,8 @@ update_interface_address(InterfaceAddress* interfaceAddress, int32 option,
 		return B_OK;
 	}
 
-	sAddressTable.Remove(interfaceAddress);
+	if (interfaceAddress->LocalIsDefined())
+		sAddressTable.Remove(interfaceAddress);
 
 	// Copy new address over
 	status_t status = InterfaceAddress::Set(_address, newAddress);
@@ -1354,7 +1374,8 @@ update_interface_address(InterfaceAddress* interfaceAddress, int32 option,
 		notify_interface_changed(interface);
 	}
 
-	sAddressTable.Insert(interfaceAddress);
+	if (interfaceAddress->LocalIsDefined())
+		sAddressTable.Insert(interfaceAddress);
 	return status;
 }
 

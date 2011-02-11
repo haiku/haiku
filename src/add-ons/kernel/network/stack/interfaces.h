@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2011, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -46,6 +46,8 @@ struct InterfaceAddress : DoublyLinkedListLinkImpl<InterfaceAddress>,
 
 			void				AddDefaultRoutes(int32 option);
 			void				RemoveDefaultRoutes(int32 option);
+
+			bool				LocalIsDefined() const;
 
 			InterfaceAddress*&	HashTableLink() { return fLink; }
 
