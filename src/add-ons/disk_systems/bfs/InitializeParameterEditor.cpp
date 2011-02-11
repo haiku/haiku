@@ -10,6 +10,7 @@
 #include "InitializeParameterEditor.h"
 
 #include <Button.h>
+#include <Catalog.h>
 #include <CheckBox.h>
 #include <ControlLook.h>
 #include <GridLayoutBuilder.h>
@@ -22,6 +23,8 @@
 #include <View.h>
 #include <Window.h>
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "BFS_Initialize_Parameter"
 
 static uint32 MSG_BLOCK_SIZE = 'blsz';
 static uint32 MSG_NAME_CHANGED = 'nmch';
@@ -95,7 +98,7 @@ InitializeBFSEditor::PartitionNameChanged(const char* name)
 void
 InitializeBFSEditor::_CreateViewControls()
 {
-	fNameTC = new BTextControl("Name:", "Haiku", NULL);
+	fNameTC = new BTextControl(B_TRANSLATE("Name:"), "Haiku", NULL);
 	fNameTC->SetModificationMessage(new BMessage(MSG_NAME_CHANGED));
 	// TODO find out what is the max length for this specific FS partition name
 	fNameTC->TextView()->SetMaxBytes(31);
@@ -103,30 +106,32 @@ InitializeBFSEditor::_CreateViewControls()
 	BPopUpMenu* blocksizeMenu = new BPopUpMenu("blocksize");
 	BMessage* message = new BMessage(MSG_BLOCK_SIZE);
 	message->AddString("size", "1024");
-	blocksizeMenu->AddItem(new BMenuItem("1024 (Mostly small files)",
-		message));
+	blocksizeMenu->AddItem(new BMenuItem(
+		B_TRANSLATE("1024 (Mostly small files)"), message));
 	message = new BMessage(MSG_BLOCK_SIZE);
 	message->AddString("size", "2048");
-	BMenuItem* defaultItem = new BMenuItem("2048 (Recommended)", message);
+	BMenuItem* defaultItem = new BMenuItem(B_TRANSLATE("2048 (Recommended)"),
+		message);
 	blocksizeMenu->AddItem(defaultItem);
 	message = new BMessage(MSG_BLOCK_SIZE);
 	message->AddString("size", "4096");
 	blocksizeMenu->AddItem(new BMenuItem("4096", message));
 	message = new BMessage(MSG_BLOCK_SIZE);
 	message->AddString("size", "8192");
-	blocksizeMenu->AddItem(new BMenuItem("8192 (Mostly large files)",
-		message));
+	blocksizeMenu->AddItem(new BMenuItem(
+		B_TRANSLATE("8192 (Mostly large files)"), message));
 
-	fBlockSizeMF = new BMenuField("Blocksize:", blocksizeMenu, NULL);
+	fBlockSizeMF = new BMenuField(B_TRANSLATE("Blocksize:"), blocksizeMenu,
+		NULL);
 	defaultItem->SetMarked(true);
 
-	fUseIndicesCB = new BCheckBox("Enable query support", NULL);
+	fUseIndicesCB = new BCheckBox(B_TRANSLATE("Enable query support"), NULL);
 	fUseIndicesCB->SetValue(true);
-	fUseIndicesCB->SetToolTip("Disabling query support may speed up "
-		"certain file system operations, but should only be used "
+	fUseIndicesCB->SetToolTip(B_TRANSLATE("Disabling query support may speed "
+		"up certain file system operations, but should only be used "
 		"if one is absolutely certain that one will not need queries.\n"
 		"Any volume that is intended for booting Haiku must have query "
-		"support enabled.");
+		"support enabled."));
 
 	float spacing = be_control_look->DefaultItemSpacing();
 

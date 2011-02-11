@@ -21,5 +21,12 @@ Addon <disk_system>intel :
 	# kernel sources
 	PartitionMap.cpp
 
-	: be $(TARGET_LIBSUPC++)
+	: be $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
+	: IntelDiskAddOn.rdef
+;
+
+DoCatalogs <disk_system>intel :
+	application/x-vnd.Haiku-IntelDiskAddOn
+	:
+	CreationParameterEditor.cpp
 ;

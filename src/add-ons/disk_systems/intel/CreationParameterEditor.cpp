@@ -6,10 +6,14 @@
 
 #include "CreationParameterEditor.h"
 
+#include <Catalog.h>
 #include <DiskDeviceTypes.h>
 #include <GroupView.h>
 #include <PartitionParameterEditor.h>
 #include <View.h>
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "BFS_Creation_Parameter"
 
 
 PrimaryPartitionEditor::PrimaryPartitionEditor()
@@ -19,7 +23,7 @@ PrimaryPartitionEditor::PrimaryPartitionEditor()
 	fActiveCB(NULL),
 	fParameters(NULL)
 {
-	fActiveCB = new BCheckBox("active", "Active partition", NULL);
+	fActiveCB = new BCheckBox("active", B_TRANSLATE("Active partition"), NULL);
 	fView = new BGroupView(B_VERTICAL);
 	fView->AddChild(fActiveCB);
 }

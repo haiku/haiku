@@ -11,5 +11,12 @@ Addon <disk_system>bfs :
 
 	bfs_disk_system.cpp
 
-	: be $(TARGET_LIBSUPC++)
+	: be $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
+	: BFSAddOn.rdef
+;
+
+DoCatalogs <disk_system>bfs :
+	application/x-vnd.Haiku-BFSAddOn
+	:
+	InitializeParameterEditor.cpp	
 ;
