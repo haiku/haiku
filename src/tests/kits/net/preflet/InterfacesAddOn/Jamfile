@@ -17,6 +17,7 @@ Addon Interfaces :
 	InterfacesAddOn.cpp
 	InterfacesListView.cpp
 	NetworkSettings.cpp
+	SettingsWindow.cpp
 
 	# from src/apps/networkstatus
 	RadioView.cpp
