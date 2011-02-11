@@ -27,6 +27,7 @@ public:
 									off_t *_length = NULL);
 private:
 			const uint32		kBlockSize;
+			const uint32		kClusterSize;
 			Volume*				fVolume;
 			Inode*				fInode;
 			off_t				fNumBlocks;

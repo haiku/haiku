@@ -24,6 +24,7 @@
 DataStream::DataStream(Volume* volume, Inode* inode, off_t size)
 	:
 	kBlockSize(volume->BlockSize()),
+	kClusterSize(volume->ClusterSize()),
 	fVolume(volume),
 	fInode(inode),
 	fSize(size)
@@ -44,8 +45,8 @@ DataStream::FindBlock(off_t pos, off_t& physical, off_t *_length)
 		TRACE("FindBlock: offset larger than size\n");
 		return B_ENTRY_NOT_FOUND;
 	}
-	cluster_t clusterIndex = pos / fVolume->ClusterSize();
-	uint32 offset = pos % fVolume->ClusterSize();
+	cluster_t clusterIndex = pos / kClusterSize;
+	uint32 offset = pos % kClusterSize;
 
 	cluster_t cluster = fInode->StartCluster();
 	for (uint32 i = 0; i < clusterIndex; i++)
@@ -53,9 +54,16 @@ DataStream::FindBlock(off_t pos, off_t& physical, off_t *_length)
 	fsblock_t block;
 	fVolume->ClusterToBlock(cluster, block);
 	physical = block * kBlockSize + offset;
-	*_length = min_c(kBlockSize, fSize - pos);
+	for (uint32 i = 0; i < 64; i++) {
+		cluster_t extentEnd = fInode->NextCluster(cluster);
+		if (extentEnd == EXFAT_CLUSTER_END || extentEnd == cluster + 1)
+			break;
+		cluster = extentEnd;
+	}
+	*_length = min_c((cluster - clusterIndex + 1) * kClusterSize - offset,
+		fSize - pos);
 	TRACE("inode %" B_PRIdINO ": cluster %ld, pos %lld, %lld\n",
-		fInode->ID(), fInode->StartCluster(), pos, physical);
+		fInode->ID(), clusterIndex, pos, physical);
 	return B_OK;
 }
 
