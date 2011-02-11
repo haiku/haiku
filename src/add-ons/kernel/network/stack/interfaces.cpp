@@ -679,6 +679,9 @@ Interface::AddressAt(size_t index)
 int32
 Interface::IndexOfAddress(InterfaceAddress* address)
 {
+	if (address == NULL)
+		return -1;
+
 	RecursiveLocker locker(fLock);
 
 	AddressList::Iterator iterator = fAddresses.GetIterator();
@@ -709,7 +712,15 @@ Interface::RemoveAddresses()
 	RecursiveLocker locker(fLock);
 
 	while (InterfaceAddress* address = fAddresses.RemoveHead()) {
+		locker.Unlock();
+
 		address->ReleaseReference();
+		if (address->LocalIsDefined()) {
+			MutexLocker hashLocker(sHashLock);
+			sAddressTable.Remove(address);
+		}
+
+		locker.Lock();
 	}
 }
 
