@@ -396,6 +396,10 @@ InterfaceAddress::Set(sockaddr** _address, const sockaddr* to)
 }
 
 
+/*!	Makes sure that the sockaddr object pointed to by \a _address is large
+	enough to hold \a size bytes.
+	\a _address may point to NULL when calling this method.
+*/
 /*static*/ sockaddr*
 InterfaceAddress::Prepare(sockaddr** _address, size_t size)
 {
@@ -714,11 +718,11 @@ Interface::RemoveAddresses()
 	while (InterfaceAddress* address = fAddresses.RemoveHead()) {
 		locker.Unlock();
 
-		address->ReleaseReference();
 		if (address->LocalIsDefined()) {
 			MutexLocker hashLocker(sHashLock);
 			sAddressTable.Remove(address);
 		}
+		address->ReleaseReference();
 
 		locker.Lock();
 	}
@@ -1354,31 +1358,29 @@ update_interface_address(InterfaceAddress* interfaceAddress, int32 option,
 	if (status == B_OK) {
 		sockaddr* address = *_address;
 
-		if (option == SIOCSIFADDR) {
+		if (option == SIOCSIFADDR || option == SIOCSIFNETMASK) {
 			// Reset netmask and broadcast addresses to defaults
 			net_domain* domain = interfaceAddress->domain;
-			sockaddr* netmask = NULL;
-			const sockaddr* oldNetmask = NULL;
+			sockaddr* defaultNetmask = NULL;
+			const sockaddr* netmask = NULL;
 			if (option == SIOCSIFADDR) {
-				netmask = InterfaceAddress::Prepare(
+				defaultNetmask = InterfaceAddress::Prepare(
 					&interfaceAddress->mask, address->sa_len);
-			} else {
-				oldNetmask = oldAddress;
-				netmask = interfaceAddress->mask;
-			}
+			} else
+				netmask = newAddress;
 
 			// Reset the broadcast address if the address family has
 			// such
-			sockaddr* broadcast = NULL;
+			sockaddr* defaultBroadcast = NULL;
 			if ((domain->address_module->flags
 					& NET_ADDRESS_MODULE_FLAG_BROADCAST_ADDRESS) != 0) {
-				broadcast = InterfaceAddress::Prepare(
+				defaultBroadcast = InterfaceAddress::Prepare(
 					&interfaceAddress->destination, address->sa_len);
 			} else
 				InterfaceAddress::Set(&interfaceAddress->destination, NULL);
 
-			domain->address_module->set_to_defaults(netmask, broadcast,
-				interfaceAddress->local, oldNetmask);
+			domain->address_module->set_to_defaults(defaultNetmask,
+				defaultBroadcast, interfaceAddress->local, netmask);
 		}
 
 		interfaceAddress->AddDefaultRoutes(option);
