@@ -6,5 +6,5 @@ UnitTestLib libnetapitest.so :
 	NetworkAddressTest.cpp
 	NetworkInterfaceTest.cpp
 
-	: bnetapi $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++)
+	: bnetapi network $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++)
 ;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2010-2011, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef NETWORK_ADDRESS_TEST_H
@@ -16,6 +16,7 @@ public:
 	virtual						~NetworkAddressTest();
 
 			void				TestUnset();
+			void				TestSetTo();
 			void				TestWildcard();
 			void				TestIsLocal();
 			void				TestFlatten();

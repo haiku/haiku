@@ -1,10 +1,12 @@
 /*
- * Copyright 2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2010-2011, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
 
 #include "NetworkAddressTest.h"
+
+#include <netinet6/in6.h>
 
 #include <NetworkAddress.h>
 #include <TypeConstants.h>
@@ -37,6 +39,26 @@ NetworkAddressTest::TestUnset()
 
 	set.Unset();
 	CPPUNIT_ASSERT(unset == set);
+}
+
+
+void
+NetworkAddressTest::TestSetTo()
+{
+	BNetworkAddress address;
+
+	CPPUNIT_ASSERT(address.SetTo("127.0.0.1") == B_OK);
+	CPPUNIT_ASSERT(address.Family() == AF_INET);
+	CPPUNIT_ASSERT(address == BNetworkAddress(INADDR_LOOPBACK));
+
+	CPPUNIT_ASSERT(address.SetTo("::1") == B_OK);
+	CPPUNIT_ASSERT(address.Family() == AF_INET6);
+	CPPUNIT_ASSERT(address == BNetworkAddress(in6addr_loopback));
+
+	CPPUNIT_ASSERT(address.SetTo(AF_INET, "::1") != B_OK);
+	CPPUNIT_ASSERT(address.SetTo(AF_INET6, "127.0.0.1") != B_OK);
+	CPPUNIT_ASSERT(address.SetTo(AF_INET, "127.0.0.1") == B_OK);
+	CPPUNIT_ASSERT(address.SetTo(AF_INET6, "::1") == B_OK);
 }
 
 
@@ -101,6 +123,8 @@ NetworkAddressTest::AddTests(BTestSuite& parent)
 
 	suite.addTest(new CppUnit::TestCaller<NetworkAddressTest>(
 		"NetworkAddressTest::TestUnset", &NetworkAddressTest::TestUnset));
+	suite.addTest(new CppUnit::TestCaller<NetworkAddressTest>(
+		"NetworkAddressTest::TestSetTo", &NetworkAddressTest::TestSetTo));
 	suite.addTest(new CppUnit::TestCaller<NetworkAddressTest>(
 		"NetworkAddressTest::TestWildcard", &NetworkAddressTest::TestWildcard));
 	suite.addTest(new CppUnit::TestCaller<NetworkAddressTest>(
