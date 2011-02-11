@@ -446,7 +446,7 @@ BNetworkAddress::SetAddress(in_addr_t inetAddress)
 		return B_BAD_VALUE;
 
 	sockaddr_in& address = (sockaddr_in&)fAddress;
-	address.sin_addr.s_addr = inetAddress;
+	address.sin_addr.s_addr = htonl(inetAddress);
 	return B_OK;
 }
 
