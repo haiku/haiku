@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2010-2011, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -15,7 +15,12 @@
 static bool
 strip_port(BString& host, BString& port)
 {
-	int32 separator = host.FindFirst(':');
+	int32 first = host.FindFirst(':');
+	int32 separator = host.FindLast(':');
+	if (separator != first
+		&& (separator == 0 || host.ByteAt(separator - 1) != ']'))
+		return false;
+
 	if (separator != -1) {
 		// looks like there is a port
 		host.CopyInto(port, separator + 1, -1);
@@ -160,7 +165,7 @@ BNetworkAddressResolver::SetTo(int family, const char* host,
 		portString.Length() != 0 ? portString.String() : NULL, &hint, &fInfo);
 	if (status == 0)
 		return fStatus = B_OK;
-	
+
 	// Map errors
 	// TODO: improve error reporting, maybe add specific error codes?
 
@@ -184,12 +189,12 @@ BNetworkAddressResolver::SetTo(int family, const char* host,
 		case EAI_MEMORY:
 			fStatus = B_NO_MEMORY;
 			break;
-		
+
 		case EAI_AGAIN:
 			// TODO: better error code to denote temporary failure?
 			fStatus = B_TIMED_OUT;
 			break;
-		
+
 		default:
 			fStatus = B_ERROR;
 			break;
