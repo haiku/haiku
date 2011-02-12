@@ -10,7 +10,7 @@
  * This file may be used under the terms of the Be Sample Code License.
  */
 
-#include "PeopleWindow.h"
+#include "PersonWindow.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -34,14 +34,14 @@
 #include <Volume.h>
 
 #include "PeopleApp.h"
-#include "PeopleView.h"
+#include "PersonView.h"
 
 
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "People"
 
 
-TPeopleWindow::TPeopleWindow(BRect frame, const char* title,
+PersonWindow::PersonWindow(BRect frame, const char* title,
 		const char* nameAttribute, const char* categoryAttribute,
 		const entry_ref* ref)
 	:
@@ -100,7 +100,7 @@ TPeopleWindow::TPeopleWindow(BRect frame, const char* title,
 	} else
 		_SetToRef(NULL);
 
-	fView = new TPeopleView("PeopleView", categoryAttribute, fRef);
+	fView = new PersonView("PeopleView", categoryAttribute, fRef);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.SetInsets(0, 0, 0, 0)
@@ -112,14 +112,14 @@ TPeopleWindow::TPeopleWindow(BRect frame, const char* title,
 }
 
 
-TPeopleWindow::~TPeopleWindow()
+PersonWindow::~PersonWindow()
 {
 	_SetToRef(NULL);
 }
 
 
 void
-TPeopleWindow::MenusBeginning()
+PersonWindow::MenusBeginning()
 {
 	bool enabled = !fView->IsSaved();
 	fSave->SetEnabled(enabled);
@@ -147,7 +147,7 @@ TPeopleWindow::MenusBeginning()
 
 
 void
-TPeopleWindow::MessageReceived(BMessage* msg)
+PersonWindow::MessageReceived(BMessage* msg)
 {
 	char			str[256];
 	BDirectory		directory;
@@ -263,7 +263,7 @@ TPeopleWindow::MessageReceived(BMessage* msg)
 
 
 bool
-TPeopleWindow::QuitRequested()
+PersonWindow::QuitRequested()
 {
 	status_t result;
 
@@ -296,7 +296,7 @@ TPeopleWindow::QuitRequested()
 
 
 void
-TPeopleWindow::Show()
+PersonWindow::Show()
 {
 	fView->MakeFocus();
 	BWindow::Show();
@@ -304,14 +304,14 @@ TPeopleWindow::Show()
 
 
 void
-TPeopleWindow::AddAttribute(const char* label, const char* attribute)
+PersonWindow::AddAttribute(const char* label, const char* attribute)
 {
 	fView->AddAttribute(label, attribute);
 }
 
 
 void
-TPeopleWindow::SaveAs()
+PersonWindow::SaveAs()
 {
 	char name[B_FILE_NAME_LENGTH];
 	_GetDefaultFileName(name);
@@ -346,7 +346,7 @@ TPeopleWindow::SaveAs()
 
 
 bool
-TPeopleWindow::RefersPersonFile(const entry_ref& ref) const
+PersonWindow::RefersPersonFile(const entry_ref& ref) const
 {
 	if (fRef == NULL)
 		return false;
@@ -355,7 +355,7 @@ TPeopleWindow::RefersPersonFile(const entry_ref& ref) const
 
 
 void
-TPeopleWindow::_GetDefaultFileName(char* name)
+PersonWindow::_GetDefaultFileName(char* name)
 {
 	strncpy(name, fView->AttributeValue(fNameAttribute), B_FILE_NAME_LENGTH);
 	while (*name) {
@@ -367,7 +367,7 @@ TPeopleWindow::_GetDefaultFileName(char* name)
 
 
 void
-TPeopleWindow::_SetToRef(entry_ref* ref)
+PersonWindow::_SetToRef(entry_ref* ref)
 {
 	if (fRef != NULL) {
 		_WatchChanges(false);
@@ -381,7 +381,7 @@ TPeopleWindow::_SetToRef(entry_ref* ref)
 
 
 void
-TPeopleWindow::_WatchChanges(bool enable)
+PersonWindow::_WatchChanges(bool enable)
 {
 	if (fRef == NULL)
 		return;

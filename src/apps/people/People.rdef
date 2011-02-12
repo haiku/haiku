@@ -10,7 +10,7 @@ resource app_version {
 	internal = 0,
 
 	short_info = "People",
-	long_info  = "People ©1999 Be, Inc. ©2005-2009 Haiku, Inc."
+	long_info  = "People ©1999 Be, Inc. ©2005-2011 Haiku, Inc."
 };
 
 resource app_flags B_SINGLE_LAUNCH;

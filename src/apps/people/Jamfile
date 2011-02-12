@@ -5,8 +5,8 @@ UsePrivateHeaders shared ;
 Application People : main.cpp
 	AttributeTextControl.cpp
 	PeopleApp.cpp
-	PeopleView.cpp
-	PeopleWindow.cpp 
+	PersonView.cpp
+	PersonWindow.cpp 
 	: libbe.so libtracker.so $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
 	: People.rdef
 	;
@@ -15,6 +15,6 @@ DoCatalogs People :
 	x-vnd.Be-PEPL
 	: 
 	PeopleApp.cpp
-	PeopleView.cpp
-	PeopleWindow.cpp
+	PersonView.cpp
+	PersonWindow.cpp
 ;

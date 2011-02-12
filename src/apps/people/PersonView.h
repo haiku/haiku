@@ -9,8 +9,8 @@
  * Copyright 1999, Be Incorporated.   All Rights Reserved.
  * This file may be used under the terms of the Be Sample Code License.
  */
-#ifndef PEOPLE_VIEW_H
-#define PEOPLE_VIEW_H
+#ifndef PERSON_VIEW_H
+#define PERSON_VIEW_H
 
 
 #include <GridView.h>
@@ -30,12 +30,12 @@ enum {
 };
 
 
-class TPeopleView : public BGridView {
+class PersonView : public BGridView {
 public:
-								TPeopleView(const char* name,
+								PersonView(const char* name,
 									const char* categoryAttribute,
 									const entry_ref* ref);
-	virtual						~TPeopleView();
+	virtual						~PersonView();
 
 	virtual	void				MakeFocus(bool focus = true);
 	virtual	void				MessageReceived(BMessage* message);
@@ -66,4 +66,4 @@ private:
 			BString				fCategoryAttribute;
 };
 
-#endif // PEOPLE_VIEW_H
+#endif // PERSON_VIEW_H

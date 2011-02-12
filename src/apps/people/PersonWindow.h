@@ -8,8 +8,8 @@
  * Copyright 1999, Be Incorporated.   All Rights Reserved.
  * This file may be used under the terms of the Be Sample Code License.
  */
-#ifndef PEOPLE_WINDOW_H
-#define PEOPLE_WINDOW_H
+#ifndef PERSON_WINDOW_H
+#define PERSON_WINDOW_H
 
 
 #include <String.h>
@@ -21,19 +21,19 @@
 #define WIND_HEIGHT			340
 
 
-class TPeopleView;
+class PersonView;
 class BFilePanel;
 class BMenuItem;
 
 
-class TPeopleWindow : public BWindow {
+class PersonWindow : public BWindow {
 public:
 
-								TPeopleWindow(BRect frame, const char* title,
+								PersonWindow(BRect frame, const char* title,
 									const char* nameAttribute,
 									const char* categoryAttribute,
 									const entry_ref* ref);
-	virtual						~TPeopleWindow();
+	virtual						~PersonWindow();
 
 	virtual	void				MenusBeginning();
 	virtual	void				MessageReceived(BMessage* message);
@@ -62,10 +62,10 @@ private:
 			BMenuItem*			fRevert;
 			BMenuItem*			fSave;
 			BMenuItem*			fUndo;
-			TPeopleView*		fView;
+			PersonView*		fView;
 
 			BString				fNameAttribute;
 };
 
 
-#endif // PEOPLE_WINDOW_H
+#endif // PERSON_WINDOW_H

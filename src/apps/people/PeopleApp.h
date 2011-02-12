@@ -30,7 +30,7 @@ enum {
 	M_WINDOW_QUITS	= 'wndq'
 };
 
-class TPeopleWindow;
+class PersonWindow;
 
 class TPeopleApp : public BApplication {
 public:
@@ -44,9 +44,9 @@ public:
 		virtual void			ReadyToRun();
 
 private:
-				TPeopleWindow*	_FindWindow(const entry_ref&) const;
-				TPeopleWindow*	_NewWindow(entry_ref* = NULL);
-				void			_AddAttributes(TPeopleWindow* window) const;
+				PersonWindow*	_FindWindow(const entry_ref&) const;
+				PersonWindow*	_NewWindow(entry_ref* = NULL);
+				void			_AddAttributes(PersonWindow* window) const;
 				void			_SavePreferences(BMessage* message) const;
 
 private:

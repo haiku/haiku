@@ -11,7 +11,7 @@
  */
 
 
-#include "PeopleView.h"
+#include "PersonView.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -37,7 +37,7 @@
 #define B_TRANSLATE_CONTEXT "People"
 
 
-TPeopleView::TPeopleView(const char* name, const char* categoryAttribute,
+PersonView::PersonView(const char* name, const char* categoryAttribute,
 		const entry_ref *ref)
 	:
 	BGridView(),
@@ -55,14 +55,14 @@ TPeopleView::TPeopleView(const char* name, const char* categoryAttribute,
 }
 
 
-TPeopleView::~TPeopleView()
+PersonView::~PersonView()
 {
 	delete fFile;
 }
 
 
 void
-TPeopleView::AddAttribute(const char* label, const char* attribute)
+PersonView::AddAttribute(const char* label, const char* attribute)
 {
 	// TODO: We could check if this attribute has already been added.
 
@@ -95,7 +95,7 @@ TPeopleView::AddAttribute(const char* label, const char* attribute)
 
 
 void
-TPeopleView::MakeFocus(bool focus)
+PersonView::MakeFocus(bool focus)
 {
 	if (focus && fControls.CountItems() > 0)
 		fControls.ItemAt(0)->MakeFocus();
@@ -105,7 +105,7 @@ TPeopleView::MakeFocus(bool focus)
 
 
 void
-TPeopleView::MessageReceived(BMessage* msg)
+PersonView::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
 		case M_SAVE:
@@ -140,7 +140,7 @@ TPeopleView::MessageReceived(BMessage* msg)
 
 
 void
-TPeopleView::BuildGroupMenu()
+PersonView::BuildGroupMenu()
 {
 	BMenuItem* item;
 	while ((item = fGroups->ItemAt(0)) != NULL) {
@@ -219,7 +219,7 @@ TPeopleView::BuildGroupMenu()
 
 
 void
-TPeopleView::CreateFile(const entry_ref* ref)
+PersonView::CreateFile(const entry_ref* ref)
 {
 	delete fFile;
 	fFile = new BFile(ref, B_READ_WRITE);
@@ -228,7 +228,7 @@ TPeopleView::CreateFile(const entry_ref* ref)
 
 
 bool
-TPeopleView::IsSaved() const
+PersonView::IsSaved() const
 {
 	for (int32 i = fControls.CountItems() - 1; i >= 0; i--) {
 		if (fControls.ItemAt(i)->HasChanged())
@@ -240,7 +240,7 @@ TPeopleView::IsSaved() const
 
 
 void
-TPeopleView::Save()
+PersonView::Save()
 {
 	int32 count = fControls.CountItems();
 	for (int32 i = 0; i < count; i++) {
@@ -254,7 +254,7 @@ TPeopleView::Save()
 
 
 const char*
-TPeopleView::AttributeValue(const char* attribute) const
+PersonView::AttributeValue(const char* attribute) const
 {
 	for (int32 i = fControls.CountItems() - 1; i >= 0; i--) {
 		if (fControls.ItemAt(i)->Attribute() == attribute)
@@ -266,7 +266,7 @@ TPeopleView::AttributeValue(const char* attribute) const
 
 
 void
-TPeopleView::SetAttribute(const char* attribute, bool update)
+PersonView::SetAttribute(const char* attribute, bool update)
 {
 	char* value = NULL;
 	attr_info info;
@@ -282,7 +282,7 @@ TPeopleView::SetAttribute(const char* attribute, bool update)
 
 
 void
-TPeopleView::SetAttribute(const char* attribute, const char* value,
+PersonView::SetAttribute(const char* attribute, const char* value,
 	bool update)
 {
 	if (!LockLooper())
@@ -324,7 +324,7 @@ TPeopleView::SetAttribute(const char* attribute, const char* value,
 
 
 bool
-TPeopleView::IsTextSelected() const
+PersonView::IsTextSelected() const
 {
 	for (int32 i = fControls.CountItems() - 1; i >= 0; i--) {
 		BTextView* text = fControls.ItemAt(i)->TextView();

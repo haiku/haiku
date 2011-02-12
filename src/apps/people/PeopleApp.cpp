@@ -12,6 +12,8 @@
  */
 
 
+#include "PeopleApp.h"
+
 #include <Alert.h>
 #include <AutoDeleter.h>
 #include <Bitmap.h>
@@ -25,8 +27,7 @@
 #include <Volume.h>
 #include <VolumeRoster.h>
 
-#include "PeopleApp.h"
-#include "PeopleWindow.h"
+#include "PersonWindow.h"
 #include "PersonIcons.h"
 
 #include <string.h>
@@ -250,7 +251,7 @@ TPeopleApp::RefsReceived(BMessage* message)
 		entry_ref ref;
 		message->FindRef("refs", index++, &ref);
 
-		TPeopleWindow* window = _FindWindow(ref);
+		PersonWindow* window = _FindWindow(ref);
 		if (window != NULL)
 			window->Activate(true);
 		else {
@@ -273,10 +274,10 @@ TPeopleApp::ReadyToRun()
 // #pragma mark -
 
 
-TPeopleWindow*
+PersonWindow*
 TPeopleApp::_NewWindow(entry_ref* ref)
 {
-	TPeopleWindow* window = new TPeopleWindow(fPosition,
+	PersonWindow* window = new PersonWindow(fPosition,
 		B_TRANSLATE("New person"), kNameAttribute,
 		kCategoryAttribute, ref);
 
@@ -300,7 +301,7 @@ TPeopleApp::_NewWindow(entry_ref* ref)
 
 
 void
-TPeopleApp::_AddAttributes(TPeopleWindow* window) const
+TPeopleApp::_AddAttributes(PersonWindow* window) const
 {
 	int32 count = fAttributes.CountItems();
 	for (int32 i = 0; i < count; i++) {
@@ -314,11 +315,11 @@ TPeopleApp::_AddAttributes(TPeopleWindow* window) const
 }
 
 
-TPeopleWindow*
+PersonWindow*
 TPeopleApp::_FindWindow(const entry_ref& ref) const
 {
 	for (int32 i = 0; BWindow* window = WindowAt(i); i++) {
-		TPeopleWindow* personWindow = dynamic_cast<TPeopleWindow*>(window);
+		PersonWindow* personWindow = dynamic_cast<PersonWindow*>(window);
 		if (personWindow == NULL)
 			continue;
 		if (personWindow->RefersPersonFile(ref))
