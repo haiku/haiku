@@ -944,6 +944,13 @@ FileTypesWindow::MessageReceived(BMessage* message)
 }
 
 
+void
+FileTypesWindow::SelectType(const char* type)
+{
+	fTypeListView->SelectType(type);
+}
+
+
 bool
 FileTypesWindow::QuitRequested()
 {

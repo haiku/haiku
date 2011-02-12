@@ -39,6 +39,8 @@ public:
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	bool				QuitRequested();
 
+			void				SelectType(const char* type);
+
 			void				PlaceSubWindow(BWindow* window);
 
 private:

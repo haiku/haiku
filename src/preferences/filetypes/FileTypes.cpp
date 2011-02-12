@@ -31,52 +31,53 @@
 #define B_TRANSLATE_CONTEXT "FileTypes"
 
 
-const char *kSignature = "application/x-vnd.Haiku-FileTypes";
+const char* kSignature = "application/x-vnd.Haiku-FileTypes";
 
 static const uint32 kMsgFileTypesSettings = 'FTst';
 static const uint32 kCascadeOffset = 20;
 
 
 class Settings {
-	public:
-		Settings();
-		~Settings();
+public:
+								Settings();
+								~Settings();
 
-		const BMessage &Message() const { return fMessage; }
-		void UpdateFrom(BMessage *message);
+			const BMessage&		Message() const { return fMessage; }
+			void				UpdateFrom(BMessage* message);
 
-	private:
-		void _SetDefaults();
-		status_t _Open(BFile *file, int32 mode);
+private:
+			void				_SetDefaults();
+			status_t			_Open(BFile* file, int32 mode);
 
-		BMessage	fMessage;
-		bool		fUpdated;
+			BMessage			fMessage;
+			bool				fUpdated;
 };
 
 class FileTypes : public BApplication {
-	public:
-		FileTypes();
-		virtual ~FileTypes();
+public:
+								FileTypes();
+	virtual						~FileTypes();
 
-		virtual void ReadyToRun();
+	virtual	void				ReadyToRun();
 
-		virtual void RefsReceived(BMessage* message);
-		virtual void ArgvReceived(int32 argc, char** argv);
-		virtual void MessageReceived(BMessage* message);
+	virtual	void				RefsReceived(BMessage* message);
+	virtual	void				ArgvReceived(int32 argc, char** argv);
+	virtual	void				MessageReceived(BMessage* message);
 
-		virtual void AboutRequested();
-		virtual bool QuitRequested();
+	virtual	void				AboutRequested();
+	virtual	bool				QuitRequested();
 
-	private:
-		void _WindowClosed();
+private:
+			void				_WindowClosed();
 
-		Settings	fSettings;
-		BFilePanel	*fFilePanel;
-		BMessenger	fFilePanelTarget;
-		BWindow		*fTypesWindow;
-		BWindow		*fApplicationTypesWindow;
-		uint32		fWindowCount;
-		uint32		fTypeWindowCount;
+			Settings			fSettings;
+			BFilePanel*			fFilePanel;
+			BMessenger			fFilePanelTarget;
+			FileTypesWindow*	fTypesWindow;
+			BWindow*			fApplicationTypesWindow;
+			uint32				fWindowCount;
+			uint32				fTypeWindowCount;
+			BString				fArgvType;
 };
 
 
@@ -116,32 +117,7 @@ Settings::~Settings()
 
 
 void
-Settings::_SetDefaults()
-{
-	fMessage.AddRect("file_types_frame", BRect(80.0f, 80.0f, 600.0f, 480.0f));
-	fMessage.AddRect("app_types_frame", BRect(100.0f, 100.0f, 540.0f, 480.0f));
-	fMessage.AddBool("show_icons", true);
-	fMessage.AddBool("show_rule", false);
-	fMessage.AddFloat("left_split_weight", 0.2);
-	fMessage.AddFloat("right_split_weight", 0.8);
-}
-
-
-status_t
-Settings::_Open(BFile *file, int32 mode)
-{
-	BPath path;
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
-		return B_ERROR;
-
-	path.Append("FileTypes settings");
-
-	return file->SetTo(path.Path(), mode);
-}
-
-
-void
-Settings::UpdateFrom(BMessage *message)
+Settings::UpdateFrom(BMessage* message)
 {
 	BRect frame;
 	if (message->FindRect("file_types_frame", &frame) == B_OK)
@@ -168,11 +144,37 @@ Settings::UpdateFrom(BMessage *message)
 }
 
 
+void
+Settings::_SetDefaults()
+{
+	fMessage.AddRect("file_types_frame", BRect(80.0f, 80.0f, 600.0f, 480.0f));
+	fMessage.AddRect("app_types_frame", BRect(100.0f, 100.0f, 540.0f, 480.0f));
+	fMessage.AddBool("show_icons", true);
+	fMessage.AddBool("show_rule", false);
+	fMessage.AddFloat("left_split_weight", 0.2);
+	fMessage.AddFloat("right_split_weight", 0.8);
+}
+
+
+status_t
+Settings::_Open(BFile* file, int32 mode)
+{
+	BPath path;
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
+		return B_ERROR;
+
+	path.Append("FileTypes settings");
+
+	return file->SetTo(path.Path(), mode);
+}
+
+
 //	#pragma mark -
 
 
 FileTypes::FileTypes()
-	: BApplication(kSignature),
+	:
+	BApplication(kSignature),
 	fTypesWindow(NULL),
 	fApplicationTypesWindow(NULL),
 	fWindowCount(0),
@@ -202,7 +204,7 @@ FileTypes::ReadyToRun()
 
 
 void
-FileTypes::RefsReceived(BMessage *message)
+FileTypes::RefsReceived(BMessage* message)
 {
 	bool traverseLinks = (modifiers() & B_SHIFT_KEY) == 0;
 
@@ -270,12 +272,17 @@ FileTypes::RefsReceived(BMessage *message)
 
 
 void
-FileTypes::ArgvReceived(int32 argc, char **argv)
+FileTypes::ArgvReceived(int32 argc, char** argv)
 {
-	BMessage *message = CurrentMessage();
+	if (argc == 3 && strcmp(argv[1], "-type") == 0) {
+		fArgvType = argv[2];
+		return;
+	}
+
+	BMessage* message = CurrentMessage();
 
 	BDirectory currentDirectory;
-	if (message)
+	if (message != NULL)
 		currentDirectory.SetTo(message->FindString("cwd"));
 
 	BMessage refs;
@@ -306,15 +313,7 @@ FileTypes::ArgvReceived(int32 argc, char **argv)
 
 
 void
-FileTypes::_WindowClosed()
-{
-	if (--fWindowCount == 0 && !fFilePanel->IsShowing())
-		PostMessage(B_QUIT_REQUESTED);
-}
-
-
-void
-FileTypes::MessageReceived(BMessage *message)
+FileTypes::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kMsgSettingsChanged:
@@ -324,6 +323,13 @@ FileTypes::MessageReceived(BMessage *message)
 		case kMsgOpenTypesWindow:
 			if (fTypesWindow == NULL) {
 				fTypesWindow = new FileTypesWindow(fSettings.Message());
+				if (fArgvType.Length() > 0) {
+					// Set the window to the type that was requested on the
+					// command line (-type), we do this only once, if we
+					// ever opened more than one FileTypesWindow.
+					fTypesWindow->SelectType(fArgvType.String());
+					fArgvType = "";
+				}
 				fTypesWindow->Show();
 				fWindowCount++;
 			} else
@@ -418,8 +424,8 @@ FileTypes::AboutRequested()
 	aboutText << "\n";
 	aboutText << B_TRANSLATE("\twritten by Axel Dörfler\n"
 		"\tCopyright 2006-2007, Haiku.\n");
-	BAlert *alert = new BAlert("about", aboutText.String(), B_TRANSLATE("OK"));
-	BTextView *view = alert->TextView();
+	BAlert* alert = new BAlert("about", aboutText.String(), B_TRANSLATE("OK"));
+	BTextView* view = alert->TextView();
 	BFont font;
 
 	view->SetStylable(true);
@@ -437,6 +443,14 @@ bool
 FileTypes::QuitRequested()
 {
 	return true;
+}
+
+
+void
+FileTypes::_WindowClosed()
+{
+	if (--fWindowCount == 0 && !fFilePanel->IsShowing())
+		PostMessage(B_QUIT_REQUESTED);
 }
 
 
@@ -492,10 +506,9 @@ error_alert(const char* message, status_t status, alert_type type)
 
 
 int
-main(int argc, char **argv)
+main(int argc, char** argv)
 {
 	FileTypes probe;
-
 	probe.Run();
 	return 0;
 }
