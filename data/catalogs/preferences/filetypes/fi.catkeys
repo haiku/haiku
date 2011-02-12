@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-FileTypes	525617155
+1	finnish	x-vnd.Haiku-FileTypes	1575473845
 Add group	New File Type Window		Lisää ryhmä
 Args only	Application Type Window		Vain argumentit
 Remove	Application Type Window		Poista
@@ -132,3 +132,27 @@ Could not open \"%s\":\n%s	FileTypes		Ei voitu avata tiedostoa ”%s”:\n%s
 Multiple files from \"%s\" file type	FileType Window		Useita tiedostoja ”%s”-tiedostotyypistä
 Same as…	FileTypes Window		Sama kuin…
 Same as…	FileType Window		Sama kuin…
+Move down	FileTypes Window		Siirrä alas
+Move up	FileTypes Window		Siirrä ylös
+Description:	Application Types Window		Kuvaus:
+Beta	Application Types Window		Beta
+Name:	Application Types Window		Nimi:
+Progress	Application Types Window		Edistyminen
+Launch	Application Types Window		Käynnistä
+Abort	Application Types Window		Keskeytä
+Edit…	Application Types Window		Muokkaa...
+Final	Application Types Window		Lopullinen
+Development	Application Types Window		Kehitys
+Information	Application Types Window		Tiedot
+Gamma	Application Types Window		Gamma
+Golden master	Application Types Window		Tuotantoversio
+Removing uninstalled application types	Application Types Window		Poistetaan poistettujen sovellusten tyyppejä
+Alpha	Application Types Window		Alfa
+Version	Application Types Window		Versio
+Remove uninstalled	Application Types Window		Poista poistetut sovellukset
+Path:	Application Types Window		Polku:
+Show in Tracker…	Application Types Window		Näitä Seuraajassa...
+%ld Application type%s could be removed.	Application Types Window		%ld sovellustyyppiä %s ei voitu poistaa.
+Application types	Application Types Window		Sovellustyypit
+Signature:	Application Types Window		Allekirjoitus:
+Version:	Application Types Window		Versio:

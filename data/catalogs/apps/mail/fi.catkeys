@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Be-MAIL	1685878103
+1	finnish	x-vnd.Be-MAIL	1928106015
 %d - Date	Mail		%d - Päivämäärä
 Attach attributes:	Mail		Liittämisattribuutit:
 Inconsistency occurred in the undo/redo buffer.	Mail		Tapahtui epäjohdonmukaisuutta puskurin perumisen/uudelleentekemisen yhteydessä.
@@ -142,3 +142,5 @@ Written by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2
 Text wrapping:	Mail		Tekstin vieritys:
 File	Mail		Tiedosto
 Mail	Mail		Sähköposti
+Off	Mail		Pois päältä
+On	Mail		Päällä

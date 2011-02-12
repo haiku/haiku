@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Expander	1292562546
+1	finnish	x-vnd.Haiku-Expander	3863172519
 Expand	ExpanderMenu		Laajenna
 Set destination…	ExpanderMenu		Aseta kohde…
 File expanded	ExpanderWindow		Tiedosto laajennettu
@@ -14,12 +14,10 @@ Expander	ExpanderWindow	!! Window Title !!	Laajentaja
 The destination folder does not exist.	ExpanderWindow		Kohdekansiota ei ole olemassa.
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Oletko varma, että haluat pysäyttää tämän arkiston\nlaajentamisen? Laajennetut alkiot eivät ehkä ole valmiita.
 Select	DirectoryFilePanel		Valitse
-Creating listing for 	ExpanderWindow		Luodaan luettelo kohteelle 
 Settings	ExpanderMenu		Asetukset
 Settings…	ExpanderMenu		Asetukset…
 Expander: Choose destination	DirectoryFilePanel		Laajentaja: Valitse kohde
 Show contents	ExpanderWindow		Näytä sisällöt
-Expanding file 	ExpanderWindow		Laajennetaan tiedosto 
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Kansio on joko siirretty, nimetty uudelleen tai sitä\nei tueta.
 The file doesn't exist	ExpanderWindow		Tiedostoa ei ole olemassa
 Stop	ExpanderMenu		Pysäytä
@@ -37,3 +35,19 @@ Destination	ExpanderWindow		Kohde
 \n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\ttekijä: Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nalkuperäinen Be-versio: \nDominic, Hiroshi, Peter, Pavel ja Robert\n
 Expander	About		Laajentaja
 is not supported	ExpanderWindow		ei ole tuettu
+Close window when done expanding	ExpanderPreferences		Sulje ikkuna kun laajentaminen on tehty
+Use:	ExpanderPreferences		Käyttö:
+Expander settings	ExpanderPreferences		Laajentaja-asetukset
+Automatically expand files	ExpanderPreferences		Laajenna tiedostot automaattisesti
+Cancel	ExpanderPreferences		Peru
+Destination folder:	ExpanderPreferences		Kohdekansio:
+Same directory as source (archive) file	ExpanderPreferences		Sama hakemisto lähde(arkisto)tiedostona
+Expansion:	ExpanderPreferences		Laajentaminen:
+Select	ExpanderPreferences		Valitse
+Automatically show contents listing	ExpanderPreferences		Näytä sisältöluettelo automaattisesti
+OK	ExpanderPreferences		Valmis
+Leave destination folder path empty	ExpanderPreferences		Jätä kohdekansiopolku tyhjäksi
+Other:	ExpanderPreferences		Muut:
+Open destination folder after extraction	ExpanderPreferences		Avaa kohdekansio purkamisen jälkeen
+Creating listing for '%s'	ExpanderWindow		Luodaan luettelo kohteelle ’%s’
+Expanding '%s'	ExpanderWindow		Laajennetaan ’%s’

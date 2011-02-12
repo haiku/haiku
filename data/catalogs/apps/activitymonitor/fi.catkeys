@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-ActivityMonitor	657126014
+1	finnish	x-vnd.Haiku-ActivityMonitor	2460668699
 P-faults	DataSource		P-viat
 Media nodes	DataSource		Mediasolmut
 Raw clipboard size	DataSource		Raakaleikepöydän koko
@@ -22,12 +22,10 @@ Text clipboard size	DataSource		Tekstileikepöydän koko
 Sending	DataSource		Lähetetään
 Cache	DataSource		Välimuisti
 About ActivityMonitor…	ActivityWindow		Ohjelmasta AktiviteettiValvonta...
-TX	DataSource		TX
 Update time interval:	SettingsWindow		Päivitä aikaväli:
 Quit	ActivityWindow		Poistu
 Block cache memory	DataSource		Lohkovälimuisti
 Remove graph	ActivityView		Poista kuvaaja
-RX	DataSource		RX
 CPU usage	DataSource		Suoritinkäyttö
 Sems	DataSource		Opastimet
 Running applications	DataSource		Suoritetaan sovelluksia
@@ -40,3 +38,10 @@ Additional items	ActivityView		Lisäkohteet
 Network receive	DataSource		Verkko vastaanota
 Memory	DataSource		Muisti
 ActivityMonitor	ActivityWindow		Aktiviteettivalvonta
+MB	DataSource		Mt
+%.1f faults/s	DataSource		%.1f vikaa/s
+TX	DataSource	Shorter version for Sending	Läh.
+%.1f MB	DataSource		%.1f Mt
+usage	DataSource		käyttö
+%.1f KB/s	DataSource		%.1f kt/s
+RX	DataSource	Shorter version for Receiving.	Vast.

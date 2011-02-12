@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-LaunchBox	2991338515
+1	finnish	x-vnd.Haiku-LaunchBox	387611335
 New	LaunchBox		Uusi
 Set description…	LaunchBox		Aseta kuvaus...
 Vertical layout	LaunchBox		Pystysuora sijoittelu
@@ -33,3 +33,4 @@ LaunchBox	LaunchBox		Käynnistyslaatikko
 launch popup	LaunchBox		käynnistysponnahdusikkuna
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Haluatko todella sulkea alustan?\n(Alustaa ei muisteta.)
 '.\n\nError: 	LaunchBox		'.\n\nVirhe: 
+Settings	LaunchBox		Asetukset

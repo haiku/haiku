@@ -1,18 +1,13 @@
-1	finnish	x-vnd.Haiku-Mail	404309185
-Select account type	Config Views		Valitse tilityyppi
+1	finnish	x-vnd.Haiku-Mail	3023422579
 Mail checking	Config Window		Sähköpostin tarkistus
 Settings	Config Window		Asetukset
 Only when dial-up is connected	Config Window		Vain kun valintayhteys on yhdistetty
 While sending and receiving	Config Window		Lähetettäessä ja vastaanotettaessa
 days	Config Window		päivä
 Start mail services on startup	Config Window		Käynnistä postipalvelut tietokoneen käynnistyksen yhteydessä
-Receive mail only	Config Views		Vastaanota vain sähköpostia
 Account name:	Config Views		Tilin nimi:
-OK	Config Views		Valmis
-The filter could not be moved. Deleting filter.	Config Views		Suodatinta ei voitu siirtää. Poistetaan suodatin.
 Revert	Config Window		Palauta
 Accounts	Config Window		Tilit
-Account type:	Config Views		Tilityyppi:
 Remove	Config Window		Poista
 Miscellaneous	Config Window		Sekalaiset
 Show connection status window:	Config Window		Näytä yhteystilaikkuna:
@@ -20,55 +15,28 @@ While sending	Config Window		Lähetettäessä
 Schedule outgoing mail when dial-up is disconnected	Config Window		Aikatauluta lähtevä sähköposti kun valintayhteys ei ole kytketty
 hours	Config Window		tunti
 Add	Config Window		Lisää
-Send mail only	Config Views		Lähetä vain sähköposti
-E-mail	Account		Sähköposti
-Unnamed	Account		Nimetön
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nYleisasetuksia ei voitu palauttaa.\n\nVirhe noudettaessa yleisasetuksia:\n%s\n
-Send and receive mail	Config Views		Lähetä ja vastaanota sähköpostia
 Real name:	Config Views		Oikea nimi:
-· Outgoing	Account		· Lähtevä
 Return address:	Config Views		Paluuosoite:
-· E-mail filters	Account		· Sähköpostisuodattimet
-· Incoming	Account		· Tuleva
 Edit mailbox menu…	Config Window		Muokkaa sähköpostilaatikkovalikkoa...
-Remove	Config Views		Poista
-Could not create inbound chain.	Account		Ei voitu luoda tulevaa ketjua.
 Check every	Config Window		Tarkista joka
 never	Config Window		älä tarkista
-Incoming mail filters	Config Views		Tulevan postin suodattimet
 Account settings	Config Views		Tiliasetukset
 minutes	Config Window		minuutti
 Error retrieving general settings: %s\n	Config Window		Virhe noudettaessa yleisasetuksia: %s\n
-OK	Account		Valmis
 Apply	Config Window		Sovella
-Could not create outbound chain.	Account		Ei voitu luoda lähtevää ketjua.
 Always	Config Window		Aina
-Add filter	Config Views		Lisää suodatin
-Outgoing mail filters	Config Views		Lähtevän postin suodattimet
 \n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nLuo uusi tili ”Lisää”-painikkeella.\n\nPoista tili ”Poista”-painikkella valitusta kohdasta.\n\nValitse kohde luettelosta sen asetusten muuttamiseksi.
-Inbound	E-Mail		Tuleva
-Server Name:	E-Mail		Palvelinnimi:
 OK	Config Window		Valmis
-E-mail address:	E-Mail		Sähköpostiosoite:
-Account name:	E-Mail		Tilinimi:
-Account Type:	E-Mail		Tilityyppi:
 Beta	Config Window		Beeta
-Login name:	E-Mail		Kirjautumisnimi:
-Password:	E-Mail		Salasana:
-E-mail	Config Views		Sähköposti
-Send mail only	E-Mail		Lähetä vain postia
 Alpha	Config Window		Alfa
-Send and receive mail	E-Mail		Lähetä ja vastaanota postia
 Golden master	Config Window		Golden master
 Final	Config Window		Lopullinen
-failed to open '%s' to read nameservers: %s\n	E-Mail		epäonnistuttiin avaamaan ’%s’ nimipalvelimien lukemiseksi: %s\n
-Receive mail only	E-Mail		Vastaanota vain postia
-Choose Protocol	Config Views		Valitse yhteyskäytäntö
-Choose Protocol	E-Mail		Valitse yhteyskäytäntö
-Outbound	E-Mail		Lähtevä
 Gamma	Config Window		Gamma
-Real name:	E-Mail		Oikea nimi:
 E-mail	Config Window		Sähköposti
 Mail Daemon Replacement\n\nby Haiku, Inc. All rights reserved.\n\nVersion %ld.%ld.%ld %s\n\nSee LICENSE file included in the installation package for more information.\n\n\n\nYou can contact us at:\n%s\n\nPlease submit bug reports using the %s\n\nProject homepage at:\n%s	Config Window		Sähköpostitaustaohjelmakorvaus\n\ntekijä: Haiku, Inc. All rights reserved.\n\nVersio %ld.%ld.%ld %s\n\nLisätietoja varten katso LICENSE-tiedostoa, joka on asennuspakkauksessa.\n\n\n\nVoit ottaa meihin yhteyttä osoitteessa:\n%s\n\nLähetä vikailmoitukset käyttäen osoitetta %s\n\nHankkeen kotisivu on osoitteessa:\n%s
 Development	Config Window		Kehitys
 Error	Config Window		Virhe
+· E-mail filters	Config Window		· Sähköpostisuodattimet
+· Outgoing	Config Window		· Lähtevä
+· Incoming	Config Window		· Tuleva

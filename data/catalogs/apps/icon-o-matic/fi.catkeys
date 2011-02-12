@@ -1,4 +1,4 @@
-1	finnish	x-vnd.haiku-icon_o_matic	1583997925
+1	finnish	x-vnd.haiku-icon_o_matic	3809094595
 Select All	Icon-O-Matic-PathManipulator		Valitse kaikki
 Add Style	Icon-O-Matic-AddStylesCmd		Lisää tyyli
 Save changes to current icon?	Icon-O-Matic-Main		Tallenna muutokset nykyiseen kuvakkeeseen?
@@ -47,7 +47,6 @@ Style	Icon-O-Matic-Menus		Tyyli
 <modify path>	Icon-O-Matic-PathCmd		<muokkaa polkua>
 Opening the icon failed!	Icon-O-Matic-Main		Kuvakkeen avaaminen epäonnistui!
 Error: 	Icon-O-Matic-Main		Virhe:
-Rotate indices right	Icon-O-Matic-PathsList		Pyöritä osoittimia oikealle
 Name	Icon-O-Matic-PropertyNames		Nimi
 bad news	Icon-O-Matic-Exporter		huonoja uutisia
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<ei mitään tehtävää>
@@ -59,7 +58,6 @@ Scale X	Icon-O-Matic-PropertyNames		Skaalaa X
 Set 	Set (property name)		Aseta
 Cancel	Icon-O-Matic-SVGExport		Peru
 Add shape with style	Icon-O-Matic-Menu-Shape		Lisää hahmo tyylillä
-Rotate indices left	Icon-O-Matic-PathsList		Pyöritä osoittimia vasemmalle
 Remove Shape	Icon-O-Matic-RemoveShapesCmd		Poista hahmo
 Reverse	Icon-O-Matic-PathsList		Käänteinen
 HVIF Source Code	Icon-O-Matic-SavePanel		HVIF-lähdekoodi
@@ -190,3 +188,10 @@ Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Poista hahmot
 Clean up	Icon-O-Matic-PathsList		Puhdista
 Detect Orient.	Icon-O-Matic-PropertyNames		Havaitse suunta.
 Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Tiedoston ’%s’ avaaminen SVG-asiakirjana epäonnistui.\n\nVirhe: %s
+Off	Icon-O-Matic-Menu-Settings		Pois päältä
+Stroke	Transformation		Piirto
+Rotate indices backwards	Icon-O-Matic-PathsList		Pyöritä osoittimia taaksepäin
+Contour	Transformation		Ääriviiva
+Perspective	Transformation		Perspektiivi
+Rotate indices forwards	Icon-O-Matic-PathsList		Pyöritä osoittimia eteenpäin
+Transformation	Transformation		Muodonmuutos
