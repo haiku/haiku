@@ -582,254 +582,6 @@ FileTypesWindow::~FileTypesWindow()
 }
 
 
-BRect
-FileTypesWindow::_Frame(const BMessage& settings) const
-{
-	BRect rect;
-	if (settings.FindRect("file_types_frame", &rect) == B_OK)
-		return rect;
-
-	return BRect(80.0f, 80.0f, 0.0f, 0.0f);
-}
-
-
-void
-FileTypesWindow::_ShowSnifferRule(bool show)
-{
-	if (fRuleControl->IsHidden() == !show)
-		return;
-
-	if (!show)
-		fRuleControl->Hide();
-	else
-		fRuleControl->Show();
-}
-
-
-void
-FileTypesWindow::_UpdateExtensions(BMimeType* type)
-{
-	// clear list
-
-	for (int32 i = fExtensionListView->CountItems(); i-- > 0;) {
-		delete fExtensionListView->ItemAt(i);
-	}
-	fExtensionListView->MakeEmpty();
-
-	// fill it again
-
-	if (type == NULL)
-		return;
-
-	BMessage extensions;
-	if (type->GetFileExtensions(&extensions) != B_OK)
-		return;
-
-	const char* extension;
-	int32 i = 0;
-	while (extensions.FindString("extensions", i++, &extension) == B_OK) {
-		char dotExtension[B_FILE_NAME_LENGTH];
-		snprintf(dotExtension, B_FILE_NAME_LENGTH, ".%s", extension);
-
-		fExtensionListView->AddItem(new BStringItem(dotExtension));
-	}
-}
-
-
-void
-FileTypesWindow::_AdoptPreferredApplication(BMessage* message, bool sameAs)
-{
-	if (fCurrentType.Type() == NULL)
-		return;
-
-	BString preferred;
-	if (retrieve_preferred_app(message, sameAs, fCurrentType.Type(), preferred)
-		!= B_OK) {
-		return;
-	}
-
-	status_t status = fCurrentType.SetPreferredApp(preferred.String());
-	if (status != B_OK)
-		error_alert(B_TRANSLATE("Could not set preferred application"),
-			status);
-}
-
-
-void
-FileTypesWindow::_UpdatePreferredApps(BMimeType* type)
-{
-	update_preferred_app_menu(fPreferredField->Menu(), type,
-		kMsgPreferredAppChosen);
-}
-
-
-void
-FileTypesWindow::_UpdateIcon(BMimeType* type)
-{
-	if (type != NULL)
-		fIconView->SetTo(*type);
-	else
-		fIconView->Unset();
-}
-
-
-void
-FileTypesWindow::_SetType(BMimeType* type, int32 forceUpdate)
-{
-	bool enabled = type != NULL;
-
-	// update controls
-
-	if (type != NULL) {
-		if (fCurrentType == *type) {
-			if (!forceUpdate)
-				return;
-		} else
-			forceUpdate = B_EVERYTHING_CHANGED;
-
-		if (&fCurrentType != type)
-			fCurrentType.SetTo(type->Type());
-
-		fInternalNameView->SetText(type->Type());
-
-		char description[B_MIME_TYPE_LENGTH];
-
-		if ((forceUpdate & B_SHORT_DESCRIPTION_CHANGED) != 0) {
-			if (type->GetShortDescription(description) != B_OK)
-				description[0] = '\0';
-			fTypeNameControl->SetText(description);
-		}
-
-		if ((forceUpdate & B_LONG_DESCRIPTION_CHANGED) != 0) {
-			if (type->GetLongDescription(description) != B_OK)
-				description[0] = '\0';
-			fDescriptionControl->SetText(description);
-		}
-
-		if ((forceUpdate & B_SNIFFER_RULE_CHANGED) != 0) {
-			BString rule;
-			if (type->GetSnifferRule(&rule) != B_OK)
-				rule = "";
-			fRuleControl->SetText(rule.String());
-		}
-
-		fExtensionListView->SetType(&fCurrentType);
-	} else {
-		fCurrentType.Unset();
-		fInternalNameView->SetText(NULL);
-		fTypeNameControl->SetText(NULL);
-		fDescriptionControl->SetText(NULL);
-		fRuleControl->SetText(NULL);
-		fPreferredField->Menu()->ItemAt(0)->SetMarked(true);
-		fExtensionListView->SetType(NULL);
-		fAttributeListView->SetTo(NULL);
-	}
-
-	if ((forceUpdate & B_FILE_EXTENSIONS_CHANGED) != 0)
-		_UpdateExtensions(type);
-
-	if ((forceUpdate & B_PREFERRED_APP_CHANGED) != 0)
-		_UpdatePreferredApps(type);
-
-	if ((forceUpdate & (B_ICON_CHANGED | B_PREFERRED_APP_CHANGED)) != 0)
-		_UpdateIcon(type);
-
-	if ((forceUpdate & B_ATTR_INFO_CHANGED) != 0)
-		fAttributeListView->SetTo(type);
-
-	// enable/disable controls
-
-	fIconView->SetEnabled(enabled);
-
-	fInternalNameView->SetEnabled(enabled);
-	fTypeNameControl->SetEnabled(enabled);
-	fDescriptionControl->SetEnabled(enabled);
-	fPreferredField->SetEnabled(enabled);
-
-	fRemoveTypeButton->SetEnabled(enabled);
-
-	fSelectButton->SetEnabled(enabled);
-	fSameAsButton->SetEnabled(enabled);
-
-	fExtensionLabel->SetEnabled(enabled);
-	fAddExtensionButton->SetEnabled(enabled);
-	fRemoveExtensionButton->SetEnabled(false);
-	fRuleControl->SetEnabled(enabled);
-
-	fAddAttributeButton->SetEnabled(enabled);
-	fRemoveAttributeButton->SetEnabled(false);
-	fMoveUpAttributeButton->SetEnabled(false);
-	fMoveDownAttributeButton->SetEnabled(false);
-}
-
-
-void
-FileTypesWindow::_MoveUpAttributeIndex(int32 index)
-{
-	BMessage attributes;
-	if (fCurrentType.GetAttrInfo(&attributes) != B_OK)
-		return;
-
-	// Iterate over all known attribute fields, and for each field,
-	// iterate over all fields of the same name and build a copy
-	// of the attributes message with the field at the given index swapped
-	// with the previous field.
-	BMessage resortedAttributes;
-	for (uint32 i = 0; i <
-			sizeof(kAttributeNames) / sizeof(kAttributeNames[0]);
-			i++) {
-
-		type_code type;
-		int32 count;
-		bool isFixedSize;
-		if (attributes.GetInfo(kAttributeNames[i], &type, &count,
-				&isFixedSize) != B_OK) {
-			// Apparently the message does not contain this name,
-			// so just ignore this attribute name.
-			// NOTE: This shows that the attribute description is
-			// too fragile. It would have been better to pack each
-			// attribute description into a separate BMessage. 
-			continue;
-		}
-
-		for (int32 j = 0; j < count; j++) {
-			const void* data;
-			ssize_t size;
-			int32 originalIndex;
-			if (j == index - 1)
-				originalIndex = j + 1;
-			else if (j == index)
-				originalIndex = j - 1;
-			else
-				originalIndex = j; 
-			attributes.FindData(kAttributeNames[i], type,
-				originalIndex, &data, &size);
-			if (j == 0) {
-				resortedAttributes.AddData(kAttributeNames[i], type,
-					data, size, isFixedSize);
-			} else {
-				resortedAttributes.AddData(kAttributeNames[i], type,
-					data, size);
-			}
-		}
-	}
-
-	// Setting it directly on the type will trigger an update of the GUI as
-	// well. TODO: FileTypes is heavily descructive, it should use an
-	// Undo/Redo stack.
-	fCurrentType.SetAttrInfo(&resortedAttributes);
-}
-
-
-void
-FileTypesWindow::PlaceSubWindow(BWindow* window)
-{
-	window->MoveTo(Frame().left + (Frame().Width() - window->Frame().Width())
-		/ 2.0f, Frame().top + (Frame().Height() - window->Frame().Height())
-		/ 2.0f);
-}
-
-
 void
 FileTypesWindow::MessageReceived(BMessage* message)
 {
@@ -1203,6 +955,257 @@ FileTypesWindow::QuitRequested()
 
 	be_app->PostMessage(kMsgTypesWindowClosed);
 	return true;
+}
+
+
+void
+FileTypesWindow::PlaceSubWindow(BWindow* window)
+{
+	window->MoveTo(Frame().left + (Frame().Width() - window->Frame().Width())
+		/ 2.0f, Frame().top + (Frame().Height() - window->Frame().Height())
+		/ 2.0f);
+}
+
+
+// #pragma mark - private
+
+
+BRect
+FileTypesWindow::_Frame(const BMessage& settings) const
+{
+	BRect rect;
+	if (settings.FindRect("file_types_frame", &rect) == B_OK)
+		return rect;
+
+	return BRect(80.0f, 80.0f, 0.0f, 0.0f);
+}
+
+
+void
+FileTypesWindow::_ShowSnifferRule(bool show)
+{
+	if (fRuleControl->IsHidden() == !show)
+		return;
+
+	if (!show)
+		fRuleControl->Hide();
+	else
+		fRuleControl->Show();
+}
+
+
+void
+FileTypesWindow::_UpdateExtensions(BMimeType* type)
+{
+	// clear list
+
+	for (int32 i = fExtensionListView->CountItems(); i-- > 0;) {
+		delete fExtensionListView->ItemAt(i);
+	}
+	fExtensionListView->MakeEmpty();
+
+	// fill it again
+
+	if (type == NULL)
+		return;
+
+	BMessage extensions;
+	if (type->GetFileExtensions(&extensions) != B_OK)
+		return;
+
+	const char* extension;
+	int32 i = 0;
+	while (extensions.FindString("extensions", i++, &extension) == B_OK) {
+		char dotExtension[B_FILE_NAME_LENGTH];
+		snprintf(dotExtension, B_FILE_NAME_LENGTH, ".%s", extension);
+
+		fExtensionListView->AddItem(new BStringItem(dotExtension));
+	}
+}
+
+
+void
+FileTypesWindow::_AdoptPreferredApplication(BMessage* message, bool sameAs)
+{
+	if (fCurrentType.Type() == NULL)
+		return;
+
+	BString preferred;
+	if (retrieve_preferred_app(message, sameAs, fCurrentType.Type(), preferred)
+		!= B_OK) {
+		return;
+	}
+
+	status_t status = fCurrentType.SetPreferredApp(preferred.String());
+	if (status != B_OK)
+		error_alert(B_TRANSLATE("Could not set preferred application"),
+			status);
+}
+
+
+void
+FileTypesWindow::_UpdatePreferredApps(BMimeType* type)
+{
+	update_preferred_app_menu(fPreferredField->Menu(), type,
+		kMsgPreferredAppChosen);
+}
+
+
+void
+FileTypesWindow::_UpdateIcon(BMimeType* type)
+{
+	if (type != NULL)
+		fIconView->SetTo(*type);
+	else
+		fIconView->Unset();
+}
+
+
+void
+FileTypesWindow::_SetType(BMimeType* type, int32 forceUpdate)
+{
+	bool enabled = type != NULL;
+
+	// update controls
+
+	if (type != NULL) {
+		if (fCurrentType == *type) {
+			if (!forceUpdate)
+				return;
+		} else
+			forceUpdate = B_EVERYTHING_CHANGED;
+
+		if (&fCurrentType != type)
+			fCurrentType.SetTo(type->Type());
+
+		fInternalNameView->SetText(type->Type());
+
+		char description[B_MIME_TYPE_LENGTH];
+
+		if ((forceUpdate & B_SHORT_DESCRIPTION_CHANGED) != 0) {
+			if (type->GetShortDescription(description) != B_OK)
+				description[0] = '\0';
+			fTypeNameControl->SetText(description);
+		}
+
+		if ((forceUpdate & B_LONG_DESCRIPTION_CHANGED) != 0) {
+			if (type->GetLongDescription(description) != B_OK)
+				description[0] = '\0';
+			fDescriptionControl->SetText(description);
+		}
+
+		if ((forceUpdate & B_SNIFFER_RULE_CHANGED) != 0) {
+			BString rule;
+			if (type->GetSnifferRule(&rule) != B_OK)
+				rule = "";
+			fRuleControl->SetText(rule.String());
+		}
+
+		fExtensionListView->SetType(&fCurrentType);
+	} else {
+		fCurrentType.Unset();
+		fInternalNameView->SetText(NULL);
+		fTypeNameControl->SetText(NULL);
+		fDescriptionControl->SetText(NULL);
+		fRuleControl->SetText(NULL);
+		fPreferredField->Menu()->ItemAt(0)->SetMarked(true);
+		fExtensionListView->SetType(NULL);
+		fAttributeListView->SetTo(NULL);
+	}
+
+	if ((forceUpdate & B_FILE_EXTENSIONS_CHANGED) != 0)
+		_UpdateExtensions(type);
+
+	if ((forceUpdate & B_PREFERRED_APP_CHANGED) != 0)
+		_UpdatePreferredApps(type);
+
+	if ((forceUpdate & (B_ICON_CHANGED | B_PREFERRED_APP_CHANGED)) != 0)
+		_UpdateIcon(type);
+
+	if ((forceUpdate & B_ATTR_INFO_CHANGED) != 0)
+		fAttributeListView->SetTo(type);
+
+	// enable/disable controls
+
+	fIconView->SetEnabled(enabled);
+
+	fInternalNameView->SetEnabled(enabled);
+	fTypeNameControl->SetEnabled(enabled);
+	fDescriptionControl->SetEnabled(enabled);
+	fPreferredField->SetEnabled(enabled);
+
+	fRemoveTypeButton->SetEnabled(enabled);
+
+	fSelectButton->SetEnabled(enabled);
+	fSameAsButton->SetEnabled(enabled);
+
+	fExtensionLabel->SetEnabled(enabled);
+	fAddExtensionButton->SetEnabled(enabled);
+	fRemoveExtensionButton->SetEnabled(false);
+	fRuleControl->SetEnabled(enabled);
+
+	fAddAttributeButton->SetEnabled(enabled);
+	fRemoveAttributeButton->SetEnabled(false);
+	fMoveUpAttributeButton->SetEnabled(false);
+	fMoveDownAttributeButton->SetEnabled(false);
+}
+
+
+void
+FileTypesWindow::_MoveUpAttributeIndex(int32 index)
+{
+	BMessage attributes;
+	if (fCurrentType.GetAttrInfo(&attributes) != B_OK)
+		return;
+
+	// Iterate over all known attribute fields, and for each field,
+	// iterate over all fields of the same name and build a copy
+	// of the attributes message with the field at the given index swapped
+	// with the previous field.
+	BMessage resortedAttributes;
+	for (uint32 i = 0; i <
+			sizeof(kAttributeNames) / sizeof(kAttributeNames[0]);
+			i++) {
+
+		type_code type;
+		int32 count;
+		bool isFixedSize;
+		if (attributes.GetInfo(kAttributeNames[i], &type, &count,
+				&isFixedSize) != B_OK) {
+			// Apparently the message does not contain this name,
+			// so just ignore this attribute name.
+			// NOTE: This shows that the attribute description is
+			// too fragile. It would have been better to pack each
+			// attribute description into a separate BMessage. 
+			continue;
+		}
+
+		for (int32 j = 0; j < count; j++) {
+			const void* data;
+			ssize_t size;
+			int32 originalIndex;
+			if (j == index - 1)
+				originalIndex = j + 1;
+			else if (j == index)
+				originalIndex = j - 1;
+			else
+				originalIndex = j; 
+			attributes.FindData(kAttributeNames[i], type,
+				originalIndex, &data, &size);
+			if (j == 0) {
+				resortedAttributes.AddData(kAttributeNames[i], type,
+					data, size, isFixedSize);
+			} else {
+				resortedAttributes.AddData(kAttributeNames[i], type,
+					data, size);
+			}
+		}
+	}
+
+	// Setting it directly on the type will trigger an update of the GUI as
+	// well. TODO: FileTypes is heavily descructive, it should use an
+	// Undo/Redo stack.
+	fCurrentType.SetAttrInfo(&resortedAttributes);
 }
 
 
