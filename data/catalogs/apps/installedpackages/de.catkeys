@@ -1,0 +1,11 @@
+1	german	x-vnd.Haiku-InstalledPackages	3041446229
+No package selected.	UninstallView		Es wurde kein Paket ausgewählt.
+Remove	UninstallView		Entfernen
+Installed packages	UninstallWindow		Installierte Pakete
+Close	UninstallApplication		Schließen
+InstalledPackages	UninstallApplication		Installierte Pakete
+BeOS legacy .pkg package removing application for Haiku.\n\nCopyright 2007,\nŁukasz 'Sil2100' Zemczak\n\nCopyright (c) 2007 Haiku, Inc.\n	UninstallApplication		Anwendung zum Entfernen alter .pkg BeOS-Pakete für Haiku.\n\nCopyright 2007,\nŁukasz 'Sil2100' Zemczak\n\nCopyright (c) 2007 Haiku, Inc.\n
+Package description	UninstallView		Paketbeschreibung
+The package you selected has been successfully removed from your system.	UninstallView		Das ausgewählte Paket wurde erfolgreich aus dem System entfernt.
+OK	UninstallView		OK
+The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Das ausgewählte Paket konnte nicht aus dem System entfernt werden. Die angegebene Installationsdaten-Datei ist möglicherweise beschädigt.

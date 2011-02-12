@@ -1,0 +1,28 @@
+1	german	x-vnd.Haiku-JPEGTranslator	1834097482
+JPEG Library Error: %s\n	be_jerror		JPEG-Bibliothek, Fehler: %s\n
+ISO	exit_parser		ISO
+Low	JPEGTranslator		Niedrig
+ExposureTime	exit_parser		Belichtungszeit
+Orientation	exit_parser		Ausrichtung
+None	JPEGTranslator		Keine
+High	JPEGTranslator		Hoch
+Model	exit_parser		Modell
+JPEG Library Warning: %s\n	be_jerror		JPEG-Bibliothek, Warnung: %s\n
+Maker	exit_parser		Ersteller
+Output quality	JPEGTranslator		Ausgabequalität
+with \"lossless\" encoding support patch by Ken Murchison\n	JPEGTranslator		Mit \"verlustfreier\" Kodierung von Ken Murchison\n
+JPEG images	JPEGTranslator		JPEG-Bilder
+Prevent colors 'washing out'	JPEGTranslator		'Ausgewaschene' Farben verhindern
+Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Benutze CMYK-Code '0' als 100% Farbdeckung
+About	JPEGTranslator		Über
+With some colorspace conversion routines by Magnus Hellman\n	JPEGTranslator		Mit einigen Farbraum Konvertierungsroutinen von Magnus Hellman\n
+Make file smaller (sligthtly worse quality)	JPEGTranslator		Kleinere Dateien (mit etwas schlechterer Qualität)
+Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Be-Bitmap-Format (JPEGTranslator)
+Show warning messages	JPEGTranslator		Warnungen anzeigen
+Output smoothing strength	JPEGTranslator		Glättung
+Based on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n	JPEGTranslator		Basiert auf der IJG-Bibliothek © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n
+Write	JPEGTranslator		Schreiben
+Write black-and-white images as RGB24	JPEGTranslator		Schwarz-Weiß-Bilder als RGB24 ausgeben
+Read greyscale images as RGB32	JPEGTranslator		Graustufen-Bilder als RGB32 einlesen.
+Read	JPEGTranslator		Lesen
+Use progressive compression	JPEGTranslator		Progressive Komprimierung

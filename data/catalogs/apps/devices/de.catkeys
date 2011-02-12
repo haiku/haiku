@@ -1,0 +1,48 @@
+1	german	x-vnd.Haiku-Devices	1250375801
+Order by:	DevicesView		Sortieren nach:
+ACPI controller	Device		ACPI-Controller
+Memory controller	Device		Speichercontroller
+Docking station	Device		Andockstation
+Computer	Device		Computer
+Detailed	DevicesView		Details
+Properties	PropertyList		Eigenschaften
+Category	DevicesView		Kategorie
+Quit	DevicesView		Beenden
+Device paths	Device		Gerätepfade
+Manufacturer\t\t\t: 	Device		Hersteller\t\t\t:
+Processor	Device		Prozessor
+ACPI Information	DeviceACPI		ACPI-Information
+Device Name\t\t\t\t: 	Device		Gerätename\t\t\t\t:
+Generic system peripheral	Device		Peripheriegeräte
+Display controller	Device		Anzeige-Controller
+Mass storage controller	Device		Massenspeicher-Controller
+About Devices…	DevicesView		Über Devices...
+Input device controller	Device		Eingabegeräte-Kontroller
+Device paths\t: 	Device		Gerätepfade\t:
+Network controller	Device		Netzwerk-Controller
+Devices\n\twritten by Pieter Panman\n\n\tBased on listdev by Jérôme Duval\n\tand the previous Devices preference\n\tby Jérôme Duval and Sikosis\n\tCopyright 2009, Haiku, Inc.\n	DevicesApplication		Devices\n\tvon Pieter Panman.\n\n\tBasiert auf listdev von Jérôme Duval\n\tund auf den früheren Devices-Einstellungen\n\tvon Jérôme Duval und Sikosis.\n\tCopyright 2009, Haiku, Inc.\n
+Driver used	Device		Treiber benutzt
+Driver used\t\t\t\t: 	Device		Treiber benutzt\t\t\t\t:
+Bus	DevicesView		Bus
+Communication controller	Device		Kommunikationscontroller
+Basic information	DevicesView		Basisinformation
+PCI Information	DevicePCI		PCI-Information
+Manufacturer:	Device		Hersteller:
+Multimedia controller	Device		Multimedia-Controller
+Device name:	Device		Gerätename:
+Report compatibility	DevicesView		Kompatibilität anzeigen
+about	DevicesApplication		über
+Signal processing controller	Device		Signalverarbeitungscontroller
+Serial bus controller	Device		Serieller Bus-Controller
+Wireless controller	Device		Funknetzwerk-Controller
+Device name	Device		Gerätename
+Manufacturer	Device		Hersteller
+Intelligent controller	Device		Intelligenter Controller
+Satellite communications controller	Device		Satellitenkommunikations-Controller
+Bridge	Device		Schnittstellen
+Refresh devices	DevicesView		Geräte aktualisieren
+Connection	DevicesView		Verbindung
+Generate system information	DevicesView		Systeminformationen erstellen
+Encryption controller	Device		Verschlüsselungscontroller
+Unclassified device	Device		Sonstige Geräte
+Devices	DevicesView		Geräte

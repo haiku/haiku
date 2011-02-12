@@ -121,6 +121,7 @@ static const Translation gTranslations[] =
 	},
 	{ "de",
 		"Colin Günther\n"
+		"Mirko Israel\n"
 		"leszek\n"
 		"Christian Morgenroth\n"
 		"Joachim Seemer (Humdinger)\n"

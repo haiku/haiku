@@ -1,0 +1,47 @@
+1	german	x-vnd.Haiku-ActivityMonitor	2460668699
+P-faults	DataSource		Seitenfehler
+Media nodes	DataSource		Media Nodes
+Raw clipboard size	DataSource		Größe der Raw-Ablage
+Threads	DataSource		Threads
+Add graph	ActivityWindow		Graphen hinzufügen
+Teams	DataSource		Teams
+Hide legend	ActivityView		Legende ausblenden
+Network send	DataSource		Netzwerk senden
+CPU usage (combined)	DataSource		CPU-Auslastung (alle)
+CPU	DataSource		CPU
+Used memory	DataSource		Benutzter Speicher
+Cached memory	DataSource		Gecachter Speicher
+Apps	DataSource		Apps
+Show legend	ActivityView		Legende anzeigen
+Settings	ActivityWindow		Einstellungen
+Receiving	DataSource		Empfangen
+Settings…	ActivityWindow		Einstellungen...
+Ports	DataSource		Ports
+Page faults	DataSource		Seitenfehler
+Text clipboard size	DataSource		Größe der Text-Ablage
+Sending	DataSource		Senden
+Cache	DataSource		Cache
+About ActivityMonitor…	ActivityWindow		Über ActivityMonitor...
+Update time interval:	SettingsWindow		Aktualisierungsintervall:
+Quit	ActivityWindow		Beenden
+Block cache memory	DataSource		Block-Cache-Speicher
+Remove graph	ActivityView		Graph entfernen
+CPU usage	DataSource		CPU-Auslastung
+Sems	DataSource		Sems
+Running applications	DataSource		Laufende Anwendungen
+Semaphores	DataSource		Semaphoren
+Block cache	DataSource		Block-Cache
+Swap space	DataSource		Auslagerungsspeicher
+Swap	DataSource		Auslagerung
+File	ActivityWindow		Datei
+Additional items	ActivityView		Zusätzliche Elemente
+Network receive	DataSource		Netzwerk empfangen
+Memory	DataSource		Speicher
+ActivityMonitor	ActivityWindow		ActivityMonitor
+MB	DataSource		MiB
+%.1f faults/s	DataSource		%.1f Fehler/s
+TX	DataSource	Shorter version for Sending	Senden
+%.1f MB	DataSource		%.1f MiB
+usage	DataSource		Last
+%.1f KB/s	DataSource		%.1f KiB/s
+RX	DataSource	Shorter version for Receiving.	Empfangen

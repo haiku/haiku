@@ -1,38 +1,54 @@
-1	german	x-vnd.Be-PSRV	2376709688
-Undefined	ConfigWindow		Undefiniert
-A5	ConfigWindow		DIN A5
+1	german	x-vnd.Be-PSRV	1761631281
+Undefined	ConfigWindow		Unbestimmt
 Cancel	PrintServerApp		Abbrechen
-copies	ConfigWindow		Kopien
-Legal	ConfigWindow		US-Legal
-A2	ConfigWindow		DIN A2
-to	ConfigWindow		bis
-Page setup:	ConfigWindow		Seiteneinrichtung:
+Page setup:	ConfigWindow		Seite einrichten:
 OK	ConfigWindow		OK
 Cancel	ConfigWindow		Abbrechen
 Yes	PrintServerApp		Ja
-Would you like to set one up now?	PrintServerApp		Möchten Sie jetzt einen einrichten?
-Portrait	ConfigWindow		Portrait (hochkant)
+Would you like to set one up now?	PrintServerApp		Soll jetzt einer eingerichtet werden?
+Portrait	ConfigWindow		Hochformat
 All pages	ConfigWindow		Alle Seiten
-There is no default printer set up.	PrintServerApp		Es ist kein bevorzugter Drucker eingerichtet.
-Tabloid	ConfigWindow		US Tabloid
-There already exists a printer you are going to create, but it's driver could not be found! Replace?	PrintServerApp		Es gibt bereits einen Drucker wie Sie ihn gerade anlegen, aber der passende Treiber konnte nicht gefunden werden. Ersetzen?
-A4	ConfigWindow		DIN A4
+There is no default printer set up.	PrintServerApp		Es ist kein Standarddrucker eingerichtet.
 Printer:	ConfigWindow		Drucker:
 Select a printer	ConfigWindow		Drucker wählen
-A1	ConfigWindow		DIN A1
 No	PrintServerApp		Nein
-B5	ConfigWindow		ISO B5
-Landscape	ConfigWindow		Landschaft (seitwärts)
+Landscape	ConfigWindow		Querformat
 There are no printers set up.	PrintServerApp		Es sind keine Drucker eingerichtet.
-Page	ConfigWindow		Seite
-Ledger	ConfigWindow		US Ledger
-Letter	ConfigWindow		US Brief
-There already exists a printer you are going to create, but it's not usable at all! Replace?	PrintServerApp		Es gibt bereits einen Drucker wie Sie ihn gerade anlegen, aber der funktioniert überhaupt nicht nicht! Ersetzen?
-A0	ConfigWindow		DIN A0
-A6	ConfigWindow		DIN A6
-A3	ConfigWindow		DIN A3
 OK	PrintServerApp		OK
 Print setup	ConfigWindow		Druckeinstellungen
-Would you like to make @ the default printer?	PrintServerApp		Möchten Sie @ zum bevorzugten Drucker machen?
+Would you like to make @ the default printer?	PrintServerApp		Soll @ der Standarddrucker werden?
 Page setup	ConfigWindow		Seite einrichten
 Paper setup:	ConfigWindow		Papierformat:
+Return the number of available transports	PrintServerApp Scripting		Anzahl der verfügbaren Transporte melden
+Return the number of available printers	PrintServerApp Scripting		Meldet die Anzahl der verfügbaren Drucker
+Get currently available ports/devices	Transport Scripting		Gerade verfügbare Ports/Geräte anzeigen
+Retrieve or select the active printer	PrintServerApp Scripting		Aktiven Drucker holen oder auswählen
+Retrieve a specific printer	PrintServerApp Scripting		Einen bestimmten Drucker holen
+Page %1 to %2	ConfigWindow		Seite %1 bis %2
+Get name of the printer add-on used for this printer	Printer Scripting		Name des von diesem Drucker verwendeten Add-ons anzeigen
+Printer server	ConfigWindow		Druckserver
+Page %1 to %2, %3 copies	ConfigWindow		Seite %1 bis %2, %3 Kopien
+Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	US-Ledger
+A6	ConfigWindow	ISO 216 paper size	A6
+B5	ConfigWindow	ISO 216 paper size	B5
+A0	ConfigWindow	ISO 216 paper size	A0
+Letter	ConfigWindow	ANSI A (letter), a North American paper size	US-Brief
+A2	ConfigWindow	ISO 216 paper size	A2
+Show configuration window	PrintServerApp Scripting		Einstellungsfenster anzeigen
+A4	ConfigWindow	ISO 216 paper size	A4
+Get comments about this printer	Printer Scripting		Druckerkommentar anzeigen
+Get the transport configuration for this printer	Printer Scripting		Transport-Konfiguration für diesen Drucker anzeigen
+Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	US-Legal
+Get name of the transport add-on used for this printer	Printer Scripting		Name des von diesem Drucker verwendeten Transport-Add-ons anzeigen
+All pages, %1 copies	ConfigWindow		Alle Seiten, %1 Kopien
+Delete a specific printer	PrintServerApp Scripting		Bestimmten Drucker löschen
+Create a new printer	PrintServerApp Scripting		Neuen Drucker erstellen
+A1	ConfigWindow	ISO 216 paper size	A1
+Retrieve a specific transport	PrintServerApp Scripting		Bestimmten Transport holen
+Get name of printer	Printer Scripting		Druckernamen ermitteln
+A3	ConfigWindow	ISO 216 paper size	A3
+Get name of transport	Transport Scripting		Transportnamen ermitteln
+A5	ConfigWindow	ISO 216 paper size	A5
+Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	US-Tabloid
+A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Ein Drucker mit diesen Namen existiert bereits, aber sein Treiber konnte nicht gefunden werden! Soll er ersetzt werden?
+A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Ein Drucker mit diesen Namen existiert bereits, kann aber nicht benutzt werden! Soll er ersetzt werden?

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-BluetoothPrefs	3931795142
+1	german	x-vnd.Haiku-BluetoothPrefs	912779521
 About Bluetooth…	Window		Über Bluetooth…
 Handheld	Settings view		Handheld
 Default inquiry time:	Settings view		Suchdauer:
@@ -6,7 +6,7 @@ Add device to list	Inquiry panel		Gerät zur Liste hinzufügen
 Starting scan...	Inquiry panel		Suche startet...
 Show bluetooth console…	Window		Bluetooth-Konsole anzeigen…
 Smart phone	Settings view		Smartphone
-seconds	Inquiry panel		 Sekunden
+seconds	Inquiry panel		Sekunden
 Server	Window		Server
 Stop bluetooth services…	Window		Bluetooth-Dienste beenden…
 Identify host as:	Settings view		Agieren als:
@@ -48,6 +48,9 @@ Always ask	Settings view		Immer fragen
 Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Bitte stellen Sie sicher, dass Bluetooth auf dem gesuchten Gerät aktiviert ist.\nDrücken Sie Suchen um andere Bluetooth-Geräte zu finden.\nFür gewöhnlich dauert das Ermitteln des Namens pro Gerät 3 Sekunden. Gefundene Bluetooth-Geräte können anschließend der Geräteliste hinzugefügt werden.\nWechseln Sie zur Liste der bekannten Geräte, wenn Sie eine Verbindung herstellen möchten.
 Retrieving names...	Inquiry panel		Empfangen der Namen...
 Help	Window		Hilfe
-Add…	Remote devices		Hinzufügen…
-Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Haiku Bluetooth system, (ARCE)\n\nGeschrieben von Oliver Ruiz Dorantes\n\nUnterstützt durch:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nDanke an alle, die geholfen haben...\n\nVersand/Spende von Hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nFinanziell:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nMit Patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTest:\n\t- Petter H. Juliussen\nDas ganze Wissen bekam ich von:\n\t- yellowTAB Team
+Add…	Remote devices		Hinzu…
+Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Haiku Bluetooth system, (ARCE)\n\nVon Oliver Ruiz Dorantes.\n\nUnterstützt durch:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin.\n\nDanke an alle, die geholfen haben...\n\nVersand/Spende von Hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nFinanziell:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nMit Patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTest:\n\t- Petter H. Juliussen\nDas ganze Wissen bekam ich von:\n\t- yellowTAB Team
 Server	Settings view		Server
+OK	main		OK
+Disconnect	Remote devices		Trennen
+Authenticate	Extended local device view		Authentifizieren

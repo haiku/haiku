@@ -1,23 +1,24 @@
-1	german	x-vnd.Haiku-Mouse	524453314
+1	german	x-vnd.Haiku-Mouse	3392409209
 Mouse type:	SettingsView		Mausart:
 Warp	SettingsView		Warp
-2-Button	SettingsView		2-Button
-Double-click test area	SettingsView		Doppelklick-Testfläche
-Revert	MouseWindow		Revert
+2-Button	SettingsView		2-Tasten
+Double-click test area	SettingsView		Testfeld für Doppelklick
+Revert	MouseWindow		Anfangswerte
 ...by Andrew Edward McCall	MouseApplication		...von Andrew Edward McCall
-Mouse acceleration	SettingsView		Mauszeigerbeschleunigung
-Click to focus	SettingsView		Klicken, um Fokus zu erlangen
-3-Button	SettingsView		3-Button
-Mouse speed	SettingsView		Mauszeigergeschwindigkeit
-Focus mode:	SettingsView		Fokus-Einstellung:
+Mouse acceleration	SettingsView		Beschleunigung
+Click to focus	SettingsView		Klicken aktiviert Fenster
+3-Button	SettingsView		3-Tasten
+Mouse speed	SettingsView		Geschwindigkeit
+Focus mode:	SettingsView		Modus:
 Instant warp	SettingsView		Instant warp
 Dig Deal	MouseApplication		Achso
-1-Button	SettingsView		1-Button
-Double-click speed	SettingsView		Doppelklick-Geschwindigkeit
+1-Button	SettingsView		1-Taste
+Double-click speed	SettingsView		Doppelklickgeschwindigkeit
 Defaults	MouseWindow		Standardwerte
-Focus follows mouse	SettingsView		Fokus folgt Mauszeiger
-Accept first click	SettingsView		Ersten Klick übernehmen
+Focus follows mouse	SettingsView		Ohne Klicken aktivieren
+Accept first click	SettingsView		Auf ersten Klick reagieren
 Fast	SettingsView		Schnell
 Normal	SettingsView		Normal
-Mouse	MouseWindow		Maus
+Mouse	MouseWindow		Mouse
 Slow	SettingsView		Langsam
+Click to focus and raise	SettingsView		Klicken aktiviert und bringt nach vorn

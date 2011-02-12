@@ -1,18 +1,18 @@
 1	german	x-vnd.haiku.zip-o-matic	274748138
-1 file added.	file:ZipOMaticWindow.cpp		Ein Eintrag hinzugefügt.
-Stop	file:ZipOMaticWindow.cpp		Abbruch
+1 file added.	file:ZipOMaticWindow.cpp		Eine Datei wurde hinzugefügt.
+Stop	file:ZipOMaticWindow.cpp		Abbrechen
 Creating archive: %s	file:ZipOMaticWindow.cpp		Archiv wird erzeugt: %s
 Continue	file:ZipOMaticWindow.cpp		Fortsetzen
-Preparing to archive	file:ZipperThread.cpp		Archiv wird vorbereitet
+Preparing to archive	file:ZipperThread.cpp		Archivierung wird vorbereitet
 Filename: %s	file:ZipOMaticWindow.cpp		Dateiname: %s
 Let them continue	file:ZipOMatic.cpp		Fortsetzen zulassen
 Do you want to stop them?	file:ZipOMatic.cpp		Soll abgebrochen werden?
-Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Soll das Erzeugen des Archivs wirklich abgebrochen werden?
-%ld files added.	file:ZipOMaticWindow.cpp		%ld Einträge hinzugefügt.
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Soll die Archivierung wirklich abgebrochen werden?
+%ld files added.	file:ZipOMaticWindow.cpp		%ld Dateien wurden hinzugefügt.
 Stopped	file:ZipOMaticWindow.cpp		Abgebrochen
 Archive	file:ZipperThread.cpp		Archiv
-Drop files to zip.	file:ZipOMaticWindow.cpp		Einträge zum Zippen hier fallenlassen.
-Error creating archive	file:ZipOMaticWindow.cpp		Fehler bei der Erzeugung des Archivs.
-You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		Es laufen %ld Zip-O-Matic Instanzen.\n\n
-Archive created OK	file:ZipOMaticWindow.cpp		Archiv fehlerfrei erzeugt.
+Drop files to zip.	file:ZipOMaticWindow.cpp		Dateien zur Archivierung hier fallen lassen.
+Error creating archive	file:ZipOMaticWindow.cpp		Fehler bei Erzeugung des Archivs.
+You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		Es laufen %ld Zip-O-Matic-Instanzen.\n\n
+Archive created OK	file:ZipOMaticWindow.cpp		Archiv wurde fehlerfrei erzeugt.
 Stop them	file:ZipOMatic.cpp		Abbrechen

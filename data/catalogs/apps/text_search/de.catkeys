@@ -1,0 +1,35 @@
+1	german	x-vnd.Haiku.TextSearch	3449010850
+%s: Not enough room to escape the filename.	Grepper		%s: Nicht genügend Platz für Escape-Sequenzen für den Dateinamen.
+Trim to selection	GrepWindow		Auf Auswahl begrenzen
+Follow symbolic links	GrepWindow		Verknüpfungen folgen
+Close	GrepWindow		Schließen
+Cancel	GrepWindow		Abbrechen
+The unselected files will be removed from the list.	GrepWindow		Die nicht ausgewählten Dateien werden aus der Liste entfernt.
+Please select the files you wish to have selected for you in Tracker.	GrepWindow		Bitte die Dateien auswählen, die im Tracker markiert werden sollen.
+Open files in Pe	GrepWindow		Dateien in Pe öffnen
+Copy text to clipboard	GrepWindow		Text in Ablage kopieren
+Created by Matthijs Hollemans.\n\nContributed to by Peter Hinely, Serge Fantino, Hideki Naito, Oscar Lesta, Oliver Tappe, Jonas Sundström, Luc Schrijvers and momoziro.\n	GrepWindow		Von Matthijs Hollemans.\n\nWeiterentwickelt von Peter Hinely, Serge Fantino, Hideki Naito, Oscar Lesta, Oliver Tappe, Jonas Sundström, Luc Schrijvers und momoziro.\n
+Settings	GrepWindow		Einstellungen
+Select all	GrepWindow		Alles auswählen
+OK	GrepWindow		OK
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME konnte mindestens einen Ordner nicht öffnen.
+Escape search text	GrepWindow		Escape-Sequenzen benutzen
+Search	GrepWindow		Suchen
+Open selection	GrepWindow		Auswahl öffnen
+Look in sub-folders	GrepWindow		Unterordner durchsuchen
+Actions	GrepWindow		Aktionen
+File	GrepWindow		Datei
+Encoding	GrepWindow		Kodierung
+History	GrepWindow		Historie
+%s: There was a problem running grep.	Grepper		%s: Es gab ein Problem beim Ausführen von grep.
+New window	GrepWindow		Neues Fenster
+Please select the files you wish to keep searching.	GrepWindow		Bitte die Dateien auswählen, die weiterhin durchsucht werden sollen.
+TextSearch	GrepWindow		TextSearch
+Quit	GrepWindow		Beenden
+Show files in Tracker	GrepWindow		Dateien im Tracker zeigen
+About TextSearch…	GrepWindow		Über TextSearch...
+Case-sensitive	GrepWindow		Groß-/Kleinschreibung beachten
+Text files only	GrepWindow		Nur Textdateien
+Show lines	GrepWindow		Treffer-Zeilen anzeigen
+Set target…	GrepWindow		Ziel wählen...
+Skip folders starting with a dot	GrepWindow		Mit Punkt beginnende Ordner ignorieren

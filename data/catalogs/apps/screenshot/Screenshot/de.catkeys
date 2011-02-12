@@ -1,29 +1,26 @@
-1	german	x-vnd.Haiku-screenshot-cli	1091349652
-seconds	ScreenshotWindow		 Sekunden
-Options	ScreenshotWindow		Optionen
+1	german	x-vnd.haiku-screenshot	166521589
+seconds	ScreenshotWindow		Sekunden
 Desktop	ScreenshotWindow		Desktop
-Include window border	ScreenshotWindow		Fensterrahmen einbeziehen
-Back to saving	ScreenshotWindow		Zurück
+Include window border	ScreenshotWindow		Inklusive Fensterrahmen
 Select	ScreenshotWindow		Auswählen
-Capture active window	ScreenshotWindow		Aktives Fenster aufnehmen
+Capture active window	ScreenshotWindow		Nur aktives Fenster
 Cancel	ScreenshotWindow		Abbrechen
-screenshot	ScreenshotWindow	!! Basename of screenshot files. !!	bildschirmfoto
 Name:	ScreenshotWindow		Name:
-screenshot1	ScreenshotWindow	!! Filename of first screenshot !!	bildschirmfoto1
-SomethingLongHere	ScreenshotWindow	!! length >= screenshot file name? !!	SomethingLongHere
-Save screenshot	ScreenshotWindow		Bildschirmfoto speichern
-Capture entire screen	ScreenshotWindow		Gesamten Bildschirm aufnehmen
-Choose folder	ScreenshotWindow		Ordner auswählen
-Take screenshot	ScreenshotWindow		Bildschirmfoto aufnehmen
+Choose folder	ScreenshotWindow		Ordner wählen
 Save	ScreenshotWindow		Speichern
-Overwrite	ScreenshotWindow		Überschreiben
-Retake screenshot	ScreenshotWindow		Bildschirmfoto neu aufnehmen
-Choose folder...	ScreenshotWindow		Ordner auswählen...
+overwrite	ScreenshotWindow		überschreiben
+Choose folder...	ScreenshotWindow		Ordner wählen...
 Please select	ScreenshotWindow		Bitte auswählen
-Save as:	ScreenshotWindow		Speichern als:
+Save as:	ScreenshotWindow		Format:
+Copy to clipboard	ScreenshotWindow		In Ablage kopieren
 Save in:	ScreenshotWindow		Speichern in:
-Take screenshot after a delay of	ScreenshotWindow		Bildschirmfoto aufnehmen mit einer Verzögerung von
-Artwork folder	ScreenshotWindow		Artwork Ordner
-Home folder	ScreenshotWindow		Home Ordner
-This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Eine Datei mit diesem Namen gibt es bereits.\nSind Sie sicher, dass Sie sie überschreiben möchten?
-Include mouse pointer	ScreenshotWindow		Mauszeiger einbeziehen
+screenshot	Screenshot	Base filename of screenshot files	Bildschirmfoto
+New screenshot	ScreenshotWindow		Neue Aufnahme
+Artwork folder	ScreenshotWindow		Artwork-Ordner
+Home folder	ScreenshotWindow		Home-Ordner
+Screenshot	ScreenshotWindow		Screenshot
+This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Diese Datei existiert bereits.\nSoll sie überschreiben werden?
+Settings…	ScreenshotWindow		Einstellungen...
+Delay:	ScreenshotWindow		Verzögerung:
+Include mouse pointer	ScreenshotWindow		Inklusive Mauszeiger
+Translator Settings	ScreenshotWindow		Translator-Einstellungen

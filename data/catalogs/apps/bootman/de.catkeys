@@ -1,5 +1,5 @@
-1	german	x-vnd.Haiku-bootman	2993174226
-The boot manager has been successfully installed on your system.	BootManagerController		Der Boot-Manager wurde erfolgreich in Ihrem System eingerichtet.
+1	german	x-vnd.Haiku-bootman	681536107
+The boot manager has been successfully installed on your system.	BootManagerController		Der Bootmanager wurde erfolgreich auf dem System eingerichtet.
 At least one partition must be selected!	BootManagerController		Es muss mindestens eine Partition ausgewählt werden!
 The old Master Boot Record could not be saved to %s	BootManagerController		Der alte Master-Boot-Record konnte nicht unter %s gesichert werden.
 The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		Der Master-Boot-Record (MBR) des Bootlaufwerks:\n\t%s\nwird nun  gesichert. Bitte wählen Sie die Zieldatei, in die der MBR gespeichert wird.\n\nSollte etwas bei der Installation schiefgehen oder falls Sie zu einem späteren Zeitpunkt das Bootmenü entfernen wollen, können Sie einfach das Bootman-Programm starten und die Option 'Deinstallation' auswählen.
@@ -9,55 +9,56 @@ Uninstall boot menu	EntryPage	Title	Bootmenü deinstallieren
 Write boot menu	BootManagerController	Button	Bootmenü auf Platte schreiben
 File:	FileSelectionPage	Text control label	Datei:
 Uninstallation of boot menu completed	BootManagerController	Title	Deinstallation des Bootmenüs abgeschlossen.
-Next	WizardView	Button	Nächste
+Next	WizardView	Button	Weiter
 Back	BootManagerController	Button	Zurück
 Install boot menu	EntryPage	Title	Bootmenü installieren
 Choose this option to install a boot menu, allowing you to select which operating system to boot when you turn on your computer.	EntryPage		Mit dieser Option können Sie ein Bootmenü installieren, mit dem Sie nach einem Rechnerstart das zu ladende Betriebssystem auswählen können.
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		Bitte geben Sie Datei mit dem Master-Boot-Record (MBR) an, der für die Wiederherstellung verwendet werden soll. Diese Datei wurde erstellt, als der Bootmanager das erste Mal installiert wurde.
 Unnamed %d	LegacyBootDrive	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Unbenannte %d
-The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager needs 2 KB available space before the first partition.	BootManagerController		Die Partitionstabelle auf der ersten Festplatte ist nicht mit dem Bootmanager kompatibel.\nBoot Manager benötigt 2 KB freien Speicher vor der ersten Partition.
+The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager needs 2 KB available space before the first partition.	BootManagerController		Die Partitionstabelle auf der ersten Festplatte ist nicht mit dem Bootmanager kompatibel.\nDer Bootmanager benötigt 2 KB freien Speicher vor der ersten Partition.
 Partition table not compatible	BootManagerController	Title	Partitionstabelle ist nicht kompatibel
 The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Die folgenden Partitionen wurden erkannt. Bitte setzen Sie einen Haken vor jede Partition, die ins Bootmenü aufgenommen werden soll. Sie können außerdem die Namen bestimmen, wie sie im Menü erscheinen sollen.
 The Master Boot Record of the boot device (%s) has been successfully restored from %s.	BootManagerController		Der Master-Boot-Record des Bootlaufwerks (%s) wurde erfolgreich aus der Datei %s wiederhergestellt.
 Select	FileSelectionPage	Button	Auswählen
-Next	BootManagerController	Button	Nächste
+Next	BootManagerController	Button	Weiter
 Restore MBR	BootManagerController	Button	MBR wiederherstellen
-Previous	WizardView	Button	Vorheriges
+Previous	WizardView	Button	Zurück
 Choose this option to remove the boot menu previously installed by this program.\n	EntryPage		Mit dieser Option können Sie das Bootmenü wieder entfernen, das mit diesem Programm eingerichtet wurde.\n
 Summary	BootManagerController	Title	Zusammenfassung
 Installation of boot menu failed	BootManagerController	Title	Installation des Bootmenüs fehlgeschlagen
 The Master Boot Record could not be restored!	BootManagerController		Der Master-Boot-Record konnte nicht wiederhergestellt werden!
 Partitions	PartitionsPage	Title	Partitionen
-Done	BootManagerController	Button	Erledigt
+Done	BootManagerController	Button	Fertig
 Partitions	DefaultPartitionPage	Pop up menu title	Partitionen
 Uninstallation of boot menu failed	BootManagerController	Title	Deinstallation des Bootmenüs fehlgeschlagen
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Es wird nun das folgende Bootmenü auf das Laufwerk (%s) geschrieben. Bitte überprüfen Sie die Einstellungen, bevor Sie fortfahren.
 Installation of boot menu completed	BootManagerController	Title	Installation des Bootmenüs abgeschlossen
-Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Bitte geben Sie Datei mit dem Master-Boot-Record (MBR) an, der für die Wiederherstellung verwendet werden soll. Diese Datei wurde erstellt, als der Bootmanager das erste Mal installiert wurde.
+Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Bitte geben Sie die Datei mit dem Master-Boot-Record (MBR) an, der für die Wiederherstellung verwendet werden soll. Diese Datei wurde erstellt, als der Bootmanager das erste Mal installiert wurde.
 Uninstall boot manager	BootManagerController	Title	Bootmanager deinstallieren
 Uninstall Boot Manager	UninstallPage	Title	Bootmanager deinstallieren
 Old Master Boot Record saved	BootManagerController	Title	Alten Master-Boot-Record gespeichert
-Boot Manager	BootManagerWindow	Window Title	Boot-Manager
+Boot Manager	BootManagerWindow	Window Title	Bootmanager
 Old Master Boot Record Saved failure	BootManagerController	Title	Fehler beim Sichern des alten Master-Boot-Record
-Boot Manager is unable to read the partition table!	BootManagerController		Boot-Manager kann die Partitionstabelle nicht auslesen!
+Boot Manager is unable to read the partition table!	BootManagerController		Der Boot-Manager kann die Partitionstabelle nicht auslesen!
 Default Partition:	DefaultPartitionPage	Menu field label	Bevorzugte Partition:
 OK	BootManager		OK
 Unknown	LegacyBootDrive	Text is shown for an unknown partition type	Unbekannt
 Default Partition	DefaultPartitionPage	Title	Bevorzugte Partition
 Error reading partition table	BootManagerController	Title	Fehler beim Lesen der Partitionstabelle
-About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Es wird nun das Bootmenü auf den Datenträger geschrieben. Sind Sie sicher, das Sie weitermachen wollen?
+About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Gleich wird das Bootmenü auf den Datenträger geschrieben. Sind Sie sicher, das Sie fortfahren wollen?
 OK	BootManagerController	Button	OK
 Backup Master Boot Record	BootManagerController	Title	Backup des Master-Boot-Record erstellen
-Haiku Boot Manager	BootManager	About text title	Haiku Boot-Manager
+Haiku Boot Manager	BootManager	About text title	Haiku Bootmanager
 written by	BootManager		geschrieben von
 Copyright %year, Haiku Inc.\n	BootManager	Leave %year untranslated	Copyright %year, Haiku Inc.\n
 After two seconds	DefaultPartitionPage		Nach zwei Sekunden
 Timeout: %s	DefaultPartitionPage		Timeout: %s
 After four seconds	DefaultPartitionPage		Nach vier Sekunden
-Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		Bitte geben Sie eine Standard-Partition und einen Timeout an.\nDas Bootmenü wird die Standard-Partition nach Ablauf des Timeouts laden, sofern Sie keine andere Partition wählen. Sie können auch das Bootmenü unbegrenzt auf eine explizite Auswahl warten lassen.\nWenn Sie beim Start die ALT-Taste gedrückt halten, wird der Timeout ausgeschaltet.
+Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		Bitte eine Standard-Partition und ein Zeitlimit angeben.\nDas Bootmenü wird die Standard-Partition nach Ablauf der Zeitbegrenzung automatisch laden, sofern keine andere Partition gewählt wird. Das Bootmenü kann auch solange warten, bis eine Partition ausgewählt wurde.\nWird beim Hochfahren die ALT-Taste gedrückt gehalten, deaktiviert sich die Zeitbegrenzung.
 After one second	DefaultPartitionPage		Nach einer Sekunde
 After one minute	DefaultPartitionPage		Nach einer Minute
 After five seconds	DefaultPartitionPage		Nach fünf Sekunden
-Never	DefaultPartitionPage		Niemals
+Never	DefaultPartitionPage		Nie
 Immediately	DefaultPartitionPage		Sofort
 After three seconds	DefaultPartitionPage		Nach drei Sekunden
+The old Master Boot Record was successfully saved to %s.	BootManagerController		Der vorherige Master-Boot-Record (MBR) wurde unter %s gespeichert.
