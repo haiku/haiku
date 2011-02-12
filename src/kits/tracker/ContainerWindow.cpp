@@ -3827,10 +3827,11 @@ BContainerWindow::ShowSelectionWindow()
 		fSelectionWindow = new SelectionWindow(this);
 		fSelectionWindow->Show();
 	} else if (fSelectionWindow->Lock()) {
-		if (fSelectionWindow->IsHidden()) {
-			fSelectionWindow->MoveCloseToMouse();
+		// The window is already there, just bring it close
+		fSelectionWindow->MoveCloseToMouse();
+		if (fSelectionWindow->IsHidden())
 			fSelectionWindow->Show();
-		}
+
 		fSelectionWindow->Unlock();
 	}
 }

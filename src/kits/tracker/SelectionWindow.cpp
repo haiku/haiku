@@ -32,12 +32,13 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
-#include <BeBuild.h>
+
 #include <Alert.h>
 #include <Box.h>
 #include <Catalog.h>
 #include <Locale.h>
 #include <MenuItem.h>
+#include <MessageFilter.h>
 
 #include "AutoLock.h"
 #include "ContainerWindow.h"
@@ -45,12 +46,13 @@ All rights reserved.
 #include "Screen.h"
 #include "SelectionWindow.h"
 
-const int frameThickness = 9;
 
 const uint32 kSelectButtonPressed = 'sbpr';
 
+
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "SelectionWindow"
+
 
 SelectionWindow::SelectionWindow(BContainerWindow* window)
 	:
@@ -147,6 +149,32 @@ SelectionWindow::SelectionWindow(BContainerWindow* window)
 		B_TRANSLATE("Name matches wildcard expression:###"));
 	float minWidth = bottomMinWidth > topMinWidth ? bottomMinWidth : topMinWidth;
 
+	class EscapeFilter : public BMessageFilter {
+	public:
+		EscapeFilter(BWindow* target)
+			:
+			BMessageFilter(B_KEY_DOWN),
+			fTarget(target)
+		{
+		}
+
+		virtual filter_result Filter(BMessage* message, BHandler** _target)
+		{
+			int8 byte;
+			if (message->what == B_KEY_DOWN
+				&& message->FindInt8("byte", &byte) == B_OK
+				&& byte == B_ESCAPE) {
+				fTarget->Hide();
+				return B_SKIP_MESSAGE;
+			}
+			return B_DISPATCH_MESSAGE;
+		}
+
+	private:
+		BWindow* fTarget;
+	};
+	AddCommonFilter(new(std::nothrow) EscapeFilter(this));
+
 	Run();
 
 	Lock();
@@ -154,7 +182,7 @@ SelectionWindow::SelectionWindow(BContainerWindow* window)
 
 	SetSizeLimits(minWidth, 1280, Bounds().bottom, Bounds().bottom);
 
-	MoveCloseToMouse();	
+	MoveCloseToMouse();
 	Unlock();
 }
 
@@ -212,12 +240,13 @@ SelectionWindow::MoveCloseToMouse()
 
 	// ... unless that's outside of the current screen size:
 	BScreen screen;
-	windowPosition.x = MAX(0, MIN(screen.Frame().right - Frame().Width(),
+	windowPosition.x = MAX(20, MIN(screen.Frame().right - 20 - Frame().Width(),
 		windowPosition.x));
-	windowPosition.y = MAX(0, MIN(screen.Frame().bottom - Frame().Height(),
-		windowPosition.y));
+	windowPosition.y = MAX(20,
+		MIN(screen.Frame().bottom - 20 - Frame().Height(), windowPosition.y));
 
 	MoveTo(windowPosition);
+	SetWorkspaces(1UL << current_workspace());
 }
 
 
