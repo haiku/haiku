@@ -59,7 +59,7 @@ actions PCIHeaderGen1
 }
 
 local pciidsFile = [ DownloadFile pci.ids
-			: http://pciids.sourceforge.net/pci.ids ] ;
+			: http://www.haiku-files.org/files/pci.ids ] ;
 
 PCIHeaderGen [ FGristFiles pcihdr.h ] : $(pciidsFile) : pci-header.awk ;
 
