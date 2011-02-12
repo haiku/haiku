@@ -8,7 +8,7 @@
 
 #include <new>
 
-#include <package/hpkg/haiku_package.h>
+#include <package/hpkg/HPKGDefsPrivate.h>
 
 
 static const uint32 kMaxCachedBuffers = 32;

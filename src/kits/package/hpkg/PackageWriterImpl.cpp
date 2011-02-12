@@ -28,7 +28,7 @@
 
 #include <AutoDeleter.h>
 
-#include <package/hpkg/haiku_package.h>
+#include <package/hpkg/HPKGDefsPrivate.h>
 
 #include <package/hpkg/DataOutput.h>
 #include <package/hpkg/DataReader.h>
@@ -52,87 +52,15 @@ static const size_t kZlibCompressionSizeThreshold = 64;
 // #pragma mark - Attributes
 
 
-struct PackageWriterImpl::AttributeTypeKey {
-	const char*	name;
-	uint8		type;
-
-	AttributeTypeKey(const char* name, uint8 type)
-		:
-		name(name),
-		type(type)
-	{
-	}
-};
-
-
-struct PackageWriterImpl::AttributeType {
-	char*			name;
-	uint8			type;
-	int32			index;
-	uint32			usageCount;
-	AttributeType*	next;	// hash table link
-
-	AttributeType()
-		:
-		name(NULL),
-		type(B_HPKG_ATTRIBUTE_TYPE_INVALID),
-		index(-1),
-		usageCount(1)
-	{
-	}
-
-	~AttributeType()
-	{
-		free(name);
-	}
-
-	bool Init(const char* name, uint8 type)
-	{
-		this->name = strdup(name);
-		if (this->name == NULL)
-			return false;
-
-		this->type = type;
-		return true;
-	}
-};
-
-
-struct PackageWriterImpl::AttributeTypeHashDefinition {
-	typedef AttributeTypeKey	KeyType;
-	typedef	AttributeType		ValueType;
-
-	size_t HashKey(const AttributeTypeKey& key) const
-	{
-		return hash_string(key.name) ^ (uint32)key.type;
-	}
-
-	size_t Hash(const AttributeType* value) const
-	{
-		return hash_string(value->name) ^ (uint32)value->type;
-	}
-
-	bool Compare(const AttributeTypeKey& key, const AttributeType* value) const
-	{
-		return strcmp(value->name, key.name) == 0 && value->type == key.type;
-	}
-
-	AttributeType*& GetLink(AttributeType* value) const
-	{
-		return value->next;
-	}
-};
-
-
 struct PackageWriterImpl::Attribute
 	: public DoublyLinkedListLinkImpl<Attribute> {
-	AttributeType*				type;
+	BHPKGAttributeID			id;
 	AttributeValue				value;
 	DoublyLinkedList<Attribute>	children;
 
-	Attribute(AttributeType* type)
+	Attribute(BHPKGAttributeID id_ = B_HPKG_ATTRIBUTE_ID_ENUM_COUNT)
 		:
-		type(type)
+		id(id_)
 	{
 	}
 
@@ -150,14 +78,6 @@ struct PackageWriterImpl::Attribute
 	{
 		while (Attribute* child = children.RemoveHead())
 			delete child;
-	}
-};
-
-
-struct PackageWriterImpl::AttributeTypeUsageGreater {
-	bool operator()(const AttributeType* a, const AttributeType* b)
-	{
-		return a->usageCount > b->usageCount;
 	}
 };
 
@@ -279,11 +199,11 @@ private:
 
 template<typename Type>
 inline PackageWriterImpl::Attribute*
-PackageWriterImpl::_AddAttribute(const char* attributeName, Type value)
+PackageWriterImpl::_AddAttribute(BHPKGAttributeID attributeID, Type value)
 {
 	AttributeValue attributeValue;
 	attributeValue.SetTo(value);
-	return _AddAttribute(attributeName, attributeValue);
+	return _AddAttribute(attributeID, attributeValue);
 }
 
 
@@ -298,8 +218,7 @@ PackageWriterImpl::PackageWriterImpl(BPackageWriterListener* listener)
 	fDataBufferSize(2 * B_HPKG_DEFAULT_DATA_CHUNK_SIZE_ZLIB),
 	fRootEntry(NULL),
 	fRootAttribute(NULL),
-	fTopAttribute(NULL),
-	fAttributeTypes(NULL)
+	fTopAttribute(NULL)
 {
 }
 
@@ -307,15 +226,6 @@ PackageWriterImpl::PackageWriterImpl(BPackageWriterListener* listener)
 PackageWriterImpl::~PackageWriterImpl()
 {
 	delete fRootAttribute;
-
-	if (fAttributeTypes != NULL) {
-		AttributeType* attributeType = fAttributeTypes->Clear(true);
-		while (attributeType != NULL) {
-			AttributeType* next = attributeType->next;
-			delete attributeType;
-			attributeType = next;
-		}
-	}
 
 	delete fRootEntry;
 
@@ -409,14 +319,10 @@ PackageWriterImpl::_Init(const char* fileName)
 	if (fStringCache.Init() != B_OK)
 		throw std::bad_alloc();
 
-	fAttributeTypes = new AttributeTypeTable;
-	if (fAttributeTypes->Init() != B_OK)
-		throw std::bad_alloc();
-
 	// create entry list
 	fRootEntry = new Entry(NULL, 0, true);
 
-	fRootAttribute = new Attribute(NULL);
+	fRootAttribute = new Attribute();
 
 	fHeapOffset = fHeapEnd = sizeof(hpkg_header);
 	fTopAttribute = fRootAttribute;
@@ -587,12 +493,10 @@ PackageWriterImpl::_WriteTOC(hpkg_header& header)
 	zlibWriter.Init();
 
 	// write the sections
-	uint64 uncompressedAttributeTypesSize;
 	uint64 uncompressedStringsSize;
 	uint64 uncompressedMainSize;
-	int32 cachedStringsWritten = _WriteTOCSections(
-		uncompressedAttributeTypesSize, uncompressedStringsSize,
-		uncompressedMainSize);
+	int32 cachedStringsWritten
+		= _WriteTOCSections(uncompressedStringsSize, uncompressedMainSize);
 
 	// finish the writer
 	zlibWriter.Finish();
@@ -601,8 +505,7 @@ PackageWriterImpl::_WriteTOC(hpkg_header& header)
 
 	off_t endOffset = fHeapEnd;
 
-	fListener->OnTOCSizeInfo(uncompressedAttributeTypesSize,
-		uncompressedStringsSize, uncompressedMainSize,
+	fListener->OnTOCSizeInfo(uncompressedStringsSize, uncompressedMainSize,
 		zlibWriter.BytesWritten());
 
 	// update the header
@@ -615,10 +518,6 @@ PackageWriterImpl::_WriteTOC(hpkg_header& header)
 		zlibWriter.BytesWritten());
 
 	// TOC subsections
-	header.toc_attribute_types_length = B_HOST_TO_BENDIAN_INT64(
-		uncompressedAttributeTypesSize);
-	header.toc_attribute_types_count = B_HOST_TO_BENDIAN_INT64(
-		fAttributeTypes->CountElements());
 	header.toc_strings_length = B_HOST_TO_BENDIAN_INT64(
 		uncompressedStringsSize);
 	header.toc_strings_count = B_HOST_TO_BENDIAN_INT64(cachedStringsWritten);
@@ -626,13 +525,8 @@ PackageWriterImpl::_WriteTOC(hpkg_header& header)
 
 
 int32
-PackageWriterImpl::_WriteTOCSections(uint64& _attributeTypesSize,
-	uint64& _stringsSize, uint64& _mainSize)
+PackageWriterImpl::_WriteTOCSections(uint64& _stringsSize, uint64& _mainSize)
 {
-	// write the attribute type abbreviations
-	uint64 attributeTypesOffset = DataWriter()->BytesWritten();
-	_WriteAttributeTypes();
-
 	// write the cached strings
 	uint64 cachedStringsOffset = DataWriter()->BytesWritten();
 	int32 cachedStringsWritten = WriteCachedStrings(fStringCache, 2);
@@ -641,43 +535,10 @@ PackageWriterImpl::_WriteTOCSections(uint64& _attributeTypesSize,
 	uint64 mainOffset = DataWriter()->BytesWritten();
 	_WriteAttributeChildren(fRootAttribute);
 
-	_attributeTypesSize = cachedStringsOffset - attributeTypesOffset;
 	_stringsSize = mainOffset - cachedStringsOffset;
 	_mainSize = DataWriter()->BytesWritten() - mainOffset;
 
 	return cachedStringsWritten;
-}
-
-
-void
-PackageWriterImpl::_WriteAttributeTypes()
-{
-	// create an array of the attribute types
-	int32 attributeTypeCount = fAttributeTypes->CountElements();
-	AttributeType** attributeTypes = new AttributeType*[attributeTypeCount];
-	ArrayDeleter<AttributeType*> attributeTypesDeleter(attributeTypes);
-
-	int32 index = 0;
-	for (AttributeTypeTable::Iterator it = fAttributeTypes->GetIterator();
-			AttributeType* type = it.Next();) {
-		attributeTypes[index++] = type;
-	}
-
-	// sort it by descending usage count
-	std::sort(attributeTypes, attributeTypes + attributeTypeCount,
-		AttributeTypeUsageGreater());
-
-	// assign the indices and write entries to disk
-	for (int32 i = 0; i < attributeTypeCount; i++) {
-		AttributeType* attributeType = attributeTypes[i];
-		attributeType->index = i;
-
-		Write<uint8>(attributeType->type);
-		WriteString(attributeType->name);
-	}
-
-	// write a terminating 0 byte
-	Write<uint8>(0);
 }
 
 
@@ -687,12 +548,10 @@ PackageWriterImpl::_WriteAttributeChildren(Attribute* attribute)
 	DoublyLinkedList<Attribute>::Iterator it
 		= attribute->children.GetIterator();
 	while (Attribute* child = it.Next()) {
-		AttributeType* type = child->type;
-
 		// write tag
 		uint8 encoding = child->value.ApplicableEncoding();
-		WriteUnsignedLEB128(HPKG_ATTRIBUTE_TAG_COMPOSE(type->index,
-			encoding, !child->children.IsEmpty()));
+		WriteUnsignedLEB128(HPKG_ATTRIBUTE_TAG_COMPOSE(child->id,
+			child->value.type, encoding, !child->children.IsEmpty()));
 
 		// write value
 		WriteAttributeValue(child->value, encoding);
@@ -800,19 +659,19 @@ PackageWriterImpl::_AddEntry(int dirFD, Entry* entry, const char* fileName,
 
 	// add attribute entry
 	Attribute* entryAttribute = _AddStringAttribute(
-		HPKG_ATTRIBUTE_NAME_DIRECTORY_ENTRY, fileName);
+		B_HPKG_ATTRIBUTE_ID_DIRECTORY_ENTRY, fileName);
 	Stacker<Attribute> entryAttributeStacker(fTopAttribute, entryAttribute);
 
 	// add stat data
 	if (fileType != B_HPKG_DEFAULT_FILE_TYPE)
-		_AddAttribute(HPKG_ATTRIBUTE_NAME_FILE_TYPE, fileType);
+		_AddAttribute(B_HPKG_ATTRIBUTE_ID_FILE_TYPE, fileType);
 	if (defaultPermissions != uint32(st.st_mode & ALLPERMS)) {
-		_AddAttribute(HPKG_ATTRIBUTE_NAME_FILE_PERMISSIONS,
+		_AddAttribute(B_HPKG_ATTRIBUTE_ID_FILE_PERMISSIONS,
 			uint32(st.st_mode & ALLPERMS));
 	}
-	_AddAttribute(HPKG_ATTRIBUTE_NAME_FILE_ATIME, uint32(st.st_atime));
-	_AddAttribute(HPKG_ATTRIBUTE_NAME_FILE_MTIME, uint32(st.st_mtime));
-	_AddAttribute(HPKG_ATTRIBUTE_NAME_FILE_CRTIME, uint32(st.st_crtime));
+	_AddAttribute(B_HPKG_ATTRIBUTE_ID_FILE_ATIME, uint32(st.st_atime));
+	_AddAttribute(B_HPKG_ATTRIBUTE_ID_FILE_MTIME, uint32(st.st_mtime));
+	_AddAttribute(B_HPKG_ATTRIBUTE_ID_FILE_CRTIME, uint32(st.st_crtime));
 	// TODO: File user/group!
 
 	// add file data/symlink path
@@ -836,7 +695,7 @@ PackageWriterImpl::_AddEntry(int dirFD, Entry* entry, const char* fileName,
 		}
 
 		path[bytesRead] = '\0';
-		_AddStringAttribute(HPKG_ATTRIBUTE_NAME_SYMLINK_PATH, path);
+		_AddStringAttribute(B_HPKG_ATTRIBUTE_ID_SYMLINK_PATH, path);
 	}
 
 	// add attributes
@@ -854,12 +713,12 @@ PackageWriterImpl::_AddEntry(int dirFD, Entry* entry, const char* fileName,
 
 			// create attribute entry
 			Attribute* attributeAttribute = _AddStringAttribute(
-				HPKG_ATTRIBUTE_NAME_FILE_ATTRIBUTE, entry->d_name);
+				B_HPKG_ATTRIBUTE_ID_FILE_ATTRIBUTE, entry->d_name);
 			Stacker<Attribute> attributeAttributeStacker(fTopAttribute,
 				attributeAttribute);
 
 			// add type
-			_AddAttribute(HPKG_ATTRIBUTE_NAME_FILE_ATTRIBUTE_TYPE,
+			_AddAttribute(B_HPKG_ATTRIBUTE_ID_FILE_ATTRIBUTE_TYPE,
 				(uint32)attrInfo.type);
 
 			// add data
@@ -912,11 +771,10 @@ PackageWriterImpl::_AddEntry(int dirFD, Entry* entry, const char* fileName,
 
 
 PackageWriterImpl::Attribute*
-PackageWriterImpl::_AddAttribute(const char* attributeName,
+PackageWriterImpl::_AddAttribute(BHPKGAttributeID id,
 	const AttributeValue& value)
 {
-	Attribute* attribute = new Attribute(
-		_GetAttributeType(attributeName, value.type));
+	Attribute* attribute = new Attribute(id);
 
 	attribute->value = value;
 	fTopAttribute->AddChild(attribute);
@@ -926,53 +784,32 @@ PackageWriterImpl::_AddAttribute(const char* attributeName,
 
 
 PackageWriterImpl::Attribute*
-PackageWriterImpl::_AddStringAttribute(const char* attributeName,
+PackageWriterImpl::_AddStringAttribute(BHPKGAttributeID attributeID,
 	const char* value)
 {
 	AttributeValue attributeValue;
 	attributeValue.SetTo(fStringCache.Get(value));
-	return _AddAttribute(attributeName, attributeValue);
+	return _AddAttribute(attributeID, attributeValue);
 }
 
 
 PackageWriterImpl::Attribute*
-PackageWriterImpl::_AddDataAttribute(const char* attributeName, uint64 dataSize,
-	uint64 dataOffset)
+PackageWriterImpl::_AddDataAttribute(BHPKGAttributeID attributeID,
+	uint64 dataSize, uint64 dataOffset)
 {
 	AttributeValue attributeValue;
 	attributeValue.SetToData(dataSize, dataOffset);
-	return _AddAttribute(attributeName, attributeValue);
+	return _AddAttribute(attributeID, attributeValue);
 }
 
 
 PackageWriterImpl::Attribute*
-PackageWriterImpl::_AddDataAttribute(const char* attributeName, uint64 dataSize,
-	const uint8* data)
+PackageWriterImpl::_AddDataAttribute(BHPKGAttributeID attributeID,
+	uint64 dataSize, const uint8* data)
 {
 	AttributeValue attributeValue;
 	attributeValue.SetToData(dataSize, data);
-	return _AddAttribute(attributeName, attributeValue);
-}
-
-
-PackageWriterImpl::AttributeType*
-PackageWriterImpl::_GetAttributeType(const char* attributeName, uint8 type)
-{
-	AttributeType* attributeType = fAttributeTypes->Lookup(
-		AttributeTypeKey(attributeName, type));
-	if (attributeType != NULL) {
-		attributeType->usageCount++;
-		return attributeType;
-	}
-
-	attributeType = new AttributeType;
-	if (!attributeType->Init(attributeName, type)) {
-		delete attributeType;
-		throw std::bad_alloc();
-	}
-
-	fAttributeTypes->Insert(attributeType);
-	return attributeType;
+	return _AddAttribute(attributeID, attributeValue);
 }
 
 
@@ -988,7 +825,7 @@ PackageWriterImpl::_AddData(BDataReader& dataReader, off_t size)
 			return error;
 		}
 
-		_AddDataAttribute(HPKG_ATTRIBUTE_NAME_DATA, size, buffer);
+		_AddDataAttribute(B_HPKG_ATTRIBUTE_ID_DATA, size, buffer);
 		return B_OK;
 	}
 
@@ -1012,14 +849,14 @@ PackageWriterImpl::_AddData(BDataReader& dataReader, off_t size)
 	fHeapEnd = dataOffset + compressedSize;
 
 	// add data attribute
-	Attribute* dataAttribute = _AddDataAttribute(HPKG_ATTRIBUTE_NAME_DATA,
+	Attribute* dataAttribute = _AddDataAttribute(B_HPKG_ATTRIBUTE_ID_DATA,
 		compressedSize, dataOffset - fHeapOffset);
 	Stacker<Attribute> attributeAttributeStacker(fTopAttribute, dataAttribute);
 
 	// if compressed, add compression attributes
 	if (compression != B_HPKG_COMPRESSION_NONE) {
-		_AddAttribute(HPKG_ATTRIBUTE_NAME_DATA_COMPRESSION, compression);
-		_AddAttribute(HPKG_ATTRIBUTE_NAME_DATA_SIZE, (uint64)size);
+		_AddAttribute(B_HPKG_ATTRIBUTE_ID_DATA_COMPRESSION, compression);
+		_AddAttribute(B_HPKG_ATTRIBUTE_ID_DATA_SIZE, (uint64)size);
 			// uncompressed size
 	}
 

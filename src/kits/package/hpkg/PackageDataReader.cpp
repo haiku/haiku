@@ -11,7 +11,7 @@
 #include <algorithm>
 #include <new>
 
-#include <package/hpkg/haiku_package.h>
+#include <package/hpkg/HPKGDefsPrivate.h>
 #include <package/hpkg/BufferCache.h>
 #include <package/hpkg/CachedBuffer.h>
 #include <package/hpkg/DataOutput.h>

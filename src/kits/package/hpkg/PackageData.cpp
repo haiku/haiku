@@ -8,7 +8,7 @@
 
 #include <string.h>
 
-#include <package/hpkg/haiku_package.h>
+#include <package/hpkg/HPKGDefsPrivate.h>
 
 
 namespace BPackageKit {

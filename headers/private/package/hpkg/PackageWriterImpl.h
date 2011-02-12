@@ -42,16 +42,10 @@ public:
 			status_t			Finish();
 
 private:
-			struct AttributeTypeKey;
-			struct AttributeType;
-			struct AttributeTypeHashDefinition;
 			struct Attribute;
-			struct AttributeTypeUsageGreater;
 			struct Entry;
 			struct SubPathAdder;
 
-			typedef BOpenHashTable<AttributeTypeHashDefinition>
-				AttributeTypeTable;
 			typedef DoublyLinkedList<Entry> EntryList;
 
 private:
@@ -66,9 +60,8 @@ private:
 			status_t			_CheckLicenses();
 
 			void				_WriteTOC(hpkg_header& header);
-			int32				_WriteTOCSections(uint64& _attributeTypesSize,
-									uint64& _stringsSize, uint64& _mainSize);
-			void				_WriteAttributeTypes();
+			int32				_WriteTOCSections(uint64& _stringsSize,
+									uint64& _mainSize);
 			void				_WriteAttributeChildren(Attribute* attribute);
 
 			void				_WritePackageAttributes(hpkg_header& header);
@@ -76,22 +69,20 @@ private:
 			void				_AddEntry(int dirFD, Entry* entry,
 									const char* fileName, char* pathBuffer);
 
-			Attribute*			_AddAttribute(const char* attributeName,
+			Attribute*			_AddAttribute(BHPKGAttributeID attributeID,
 									const AttributeValue& value);
 
 	template<typename Type>
-	inline	Attribute*			_AddAttribute(const char* attributeName,
+	inline	Attribute*			_AddAttribute(BHPKGAttributeID attributeID,
 									Type value);
 
-			Attribute*			_AddStringAttribute(const char* attributeName,
+			Attribute*			_AddStringAttribute(
+									BHPKGAttributeID attributeID,
 									const char* value);
-			Attribute*			_AddDataAttribute(const char* attributeName,
+			Attribute*			_AddDataAttribute(BHPKGAttributeID attributeID,
 									uint64 dataSize, uint64 dataOffset);
-			Attribute*			_AddDataAttribute(const char* attributeName,
+			Attribute*			_AddDataAttribute(BHPKGAttributeID attributeID,
 									uint64 dataSize, const uint8* data);
-
-			AttributeType*		_GetAttributeType(const char* attributeName,
-									uint8 type);
 
 			status_t			_AddData(BDataReader& dataReader, off_t size);
 
@@ -117,7 +108,6 @@ private:
 			Attribute*			fTopAttribute;
 
 			StringCache			fStringCache;
-			AttributeTypeTable*	fAttributeTypes;
 
 			BPackageInfo		fPackageInfo;
 };

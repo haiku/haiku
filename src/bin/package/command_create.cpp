@@ -46,16 +46,13 @@ public:
 		printf("\t%s\n", path);
 	}
 
-	virtual void OnTOCSizeInfo(uint64 uncompressedAttributeTypesSize,
-		uint64 uncompressedStringsSize, uint64 uncompressedMainSize,
-		uint64 uncompressedTOCSize)
+	virtual void OnTOCSizeInfo(uint64 uncompressedStringsSize,
+		uint64 uncompressedMainSize, uint64 uncompressedTOCSize)
 	{
 		if (fQuiet || !fVerbose)
 			return;
 
 		printf("----- TOC Info -----------------------------------\n");
-		printf("attribute types size:    %10llu (uncompressed)\n",
-			uncompressedAttributeTypesSize);
 		printf("cached strings size:     %10llu (uncompressed)\n",
 			uncompressedStringsSize);
 		printf("TOC main size:           %10llu (uncompressed)\n",

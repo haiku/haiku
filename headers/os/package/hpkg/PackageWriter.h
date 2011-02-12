@@ -29,9 +29,7 @@ public:
 
 	virtual	void				OnEntryAdded(const char* path) = 0;
 
-	virtual void				OnTOCSizeInfo(
-									uint64 uncompressedAttributeTypesSize,
-									uint64 uncompressedStringsSize,
+	virtual void				OnTOCSizeInfo(uint64 uncompressedStringsSize,
 									uint64 uncompressedMainSize,
 									uint64 uncompressedTOCSize) = 0;
 	virtual void				OnPackageAttributesSizeInfo(uint32 stringCount,

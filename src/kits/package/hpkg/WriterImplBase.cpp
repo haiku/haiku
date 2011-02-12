@@ -18,7 +18,7 @@
 
 #include <AutoDeleter.h>
 
-#include <package/hpkg/haiku_package.h>
+#include <package/hpkg/HPKGDefsPrivate.h>
 
 #include <package/hpkg/DataReader.h>
 #include <package/hpkg/ErrorOutput.h>
@@ -276,7 +276,7 @@ WriterImplBase::ZlibDataWriter::WriteData(const void* buffer, size_t size)
 
 // #pragma mark - PackageAttribute
 
-WriterImplBase::PackageAttribute::PackageAttribute(HPKGPackageAttributeID id_,
+WriterImplBase::PackageAttribute::PackageAttribute(BHPKGAttributeID id_,
 	uint8 type_, uint8 encoding_)
 	:
 	id(id_)
@@ -357,21 +357,22 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 	const BPackageInfo& packageInfo)
 {
 	// name
-	PackageAttribute* name = new PackageAttribute(HPKG_PACKAGE_ATTRIBUTE_NAME,
-		B_HPKG_ATTRIBUTE_TYPE_STRING, B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
+	PackageAttribute* name = new PackageAttribute(
+		B_HPKG_ATTRIBUTE_ID_PACKAGE_NAME, B_HPKG_ATTRIBUTE_TYPE_STRING,
+		B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
 	name->string = fPackageStringCache.Get(packageInfo.Name().String());
 	attributeList.Add(name);
 
 	// summary
 	PackageAttribute* summary = new PackageAttribute(
-		HPKG_PACKAGE_ATTRIBUTE_SUMMARY, B_HPKG_ATTRIBUTE_TYPE_STRING,
+		B_HPKG_ATTRIBUTE_ID_PACKAGE_SUMMARY, B_HPKG_ATTRIBUTE_TYPE_STRING,
 		B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
 	summary->string = fPackageStringCache.Get(packageInfo.Summary().String());
 	attributeList.Add(summary);
 
 	// description
 	PackageAttribute* description = new PackageAttribute(
-		HPKG_PACKAGE_ATTRIBUTE_DESCRIPTION, B_HPKG_ATTRIBUTE_TYPE_STRING,
+		B_HPKG_ATTRIBUTE_ID_PACKAGE_DESCRIPTION, B_HPKG_ATTRIBUTE_TYPE_STRING,
 		B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
 	description->string
 		= fPackageStringCache.Get(packageInfo.Description().String());
@@ -379,28 +380,28 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 
 	// vendor
 	PackageAttribute* vendor = new PackageAttribute(
-		HPKG_PACKAGE_ATTRIBUTE_VENDOR, B_HPKG_ATTRIBUTE_TYPE_STRING,
+		B_HPKG_ATTRIBUTE_ID_PACKAGE_VENDOR, B_HPKG_ATTRIBUTE_TYPE_STRING,
 		B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
 	vendor->string = fPackageStringCache.Get(packageInfo.Vendor().String());
 	attributeList.Add(vendor);
 
 	// packager
 	PackageAttribute* packager = new PackageAttribute(
-		HPKG_PACKAGE_ATTRIBUTE_PACKAGER, B_HPKG_ATTRIBUTE_TYPE_STRING,
+		B_HPKG_ATTRIBUTE_ID_PACKAGE_PACKAGER, B_HPKG_ATTRIBUTE_TYPE_STRING,
 		B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
 	packager->string = fPackageStringCache.Get(packageInfo.Packager().String());
 	attributeList.Add(packager);
 
 	// flags
 	PackageAttribute* flags = new PackageAttribute(
-		HPKG_PACKAGE_ATTRIBUTE_FLAGS, B_HPKG_ATTRIBUTE_TYPE_UINT,
+		B_HPKG_ATTRIBUTE_ID_PACKAGE_FLAGS, B_HPKG_ATTRIBUTE_TYPE_UINT,
 		B_HPKG_ATTRIBUTE_ENCODING_INT_32_BIT);
 	flags->unsignedInt = packageInfo.Flags();
 	attributeList.Add(flags);
 
 	// architecture
 	PackageAttribute* architecture = new PackageAttribute(
-		HPKG_PACKAGE_ATTRIBUTE_ARCHITECTURE, B_HPKG_ATTRIBUTE_TYPE_UINT,
+		B_HPKG_ATTRIBUTE_ID_PACKAGE_ARCHITECTURE, B_HPKG_ATTRIBUTE_TYPE_UINT,
 		B_HPKG_ATTRIBUTE_ENCODING_INT_8_BIT);
 	architecture->unsignedInt = packageInfo.Architecture();
 	attributeList.Add(architecture);
@@ -412,7 +413,7 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 	const BObjectList<BString>& copyrightList = packageInfo.CopyrightList();
 	for (int i = 0; i < copyrightList.CountItems(); ++i) {
 		PackageAttribute* copyright = new PackageAttribute(
-			HPKG_PACKAGE_ATTRIBUTE_COPYRIGHT, B_HPKG_ATTRIBUTE_TYPE_STRING,
+			B_HPKG_ATTRIBUTE_ID_PACKAGE_COPYRIGHT, B_HPKG_ATTRIBUTE_TYPE_STRING,
 			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
 		copyright->string
 			= fPackageStringCache.Get(copyrightList.ItemAt(i)->String());
@@ -423,7 +424,7 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 	const BObjectList<BString>& licenseList = packageInfo.LicenseList();
 	for (int i = 0; i < licenseList.CountItems(); ++i) {
 		PackageAttribute* license = new PackageAttribute(
-			HPKG_PACKAGE_ATTRIBUTE_LICENSE, B_HPKG_ATTRIBUTE_TYPE_STRING,
+			B_HPKG_ATTRIBUTE_ID_PACKAGE_LICENSE, B_HPKG_ATTRIBUTE_TYPE_STRING,
 			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
 		license->string
 			= fPackageStringCache.Get(licenseList.ItemAt(i)->String());
@@ -437,17 +438,17 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 		BPackageResolvable* resolvable = providesList.ItemAt(i);
 		bool hasVersion = resolvable->Version().InitCheck() == B_OK;
 
-		PackageAttribute* providesType = new PackageAttribute(
-			HPKG_PACKAGE_ATTRIBUTE_PROVIDES_TYPE, B_HPKG_ATTRIBUTE_TYPE_UINT,
-			B_HPKG_ATTRIBUTE_ENCODING_INT_8_BIT);
-		providesType->unsignedInt = resolvable->Type();
-		attributeList.Add(providesType);
-
 		PackageAttribute* provides = new PackageAttribute(
-			HPKG_PACKAGE_ATTRIBUTE_PROVIDES, B_HPKG_ATTRIBUTE_TYPE_STRING,
+			B_HPKG_ATTRIBUTE_ID_PACKAGE_PROVIDES, B_HPKG_ATTRIBUTE_TYPE_STRING,
 			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
 		provides->string = fPackageStringCache.Get(resolvable->Name().String());
 		attributeList.Add(provides);
+
+		PackageAttribute* providesType = new PackageAttribute(
+			B_HPKG_ATTRIBUTE_ID_PACKAGE_PROVIDES_TYPE,
+			B_HPKG_ATTRIBUTE_TYPE_UINT, B_HPKG_ATTRIBUTE_ENCODING_INT_8_BIT);
+		providesType->unsignedInt = resolvable->Type();
+		provides->children.Add(providesType);
 
 		if (hasVersion)
 			RegisterPackageVersion(provides->children, resolvable->Version());
@@ -455,25 +456,25 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 
 	// requires list
 	RegisterPackageResolvableExpressionList(attributeList,
-		packageInfo.RequiresList(), HPKG_PACKAGE_ATTRIBUTE_REQUIRES);
+		packageInfo.RequiresList(), B_HPKG_ATTRIBUTE_ID_PACKAGE_REQUIRES);
 
 	// supplements list
 	RegisterPackageResolvableExpressionList(attributeList,
-		packageInfo.SupplementsList(), HPKG_PACKAGE_ATTRIBUTE_SUPPLEMENTS);
+		packageInfo.SupplementsList(), B_HPKG_ATTRIBUTE_ID_PACKAGE_SUPPLEMENTS);
 
 	// conflicts list
 	RegisterPackageResolvableExpressionList(attributeList,
-		packageInfo.ConflictsList(), HPKG_PACKAGE_ATTRIBUTE_CONFLICTS);
+		packageInfo.ConflictsList(), B_HPKG_ATTRIBUTE_ID_PACKAGE_CONFLICTS);
 
 	// freshens list
 	RegisterPackageResolvableExpressionList(attributeList,
-		packageInfo.FreshensList(), HPKG_PACKAGE_ATTRIBUTE_FRESHENS);
+		packageInfo.FreshensList(), B_HPKG_ATTRIBUTE_ID_PACKAGE_FRESHENS);
 
 	// replaces list
 	const BObjectList<BString>& replacesList = packageInfo.ReplacesList();
 	for (int i = 0; i < replacesList.CountItems(); ++i) {
 		PackageAttribute* replaces = new PackageAttribute(
-			HPKG_PACKAGE_ATTRIBUTE_REPLACES, B_HPKG_ATTRIBUTE_TYPE_STRING,
+			B_HPKG_ATTRIBUTE_ID_PACKAGE_REPLACES, B_HPKG_ATTRIBUTE_TYPE_STRING,
 			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
 		replaces->string
 			= fPackageStringCache.Get(replacesList.ItemAt(i)->String());
@@ -483,7 +484,7 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 	// checksum (optional, only exists in repositories)
 	if (packageInfo.Checksum().Length() > 0) {
 		PackageAttribute* checksum = new PackageAttribute(
-			HPKG_PACKAGE_ATTRIBUTE_CHECKSUM, B_HPKG_ATTRIBUTE_TYPE_STRING,
+			B_HPKG_ATTRIBUTE_ID_PACKAGE_CHECKSUM, B_HPKG_ATTRIBUTE_TYPE_STRING,
 			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
 		checksum->string
 			= fPackageStringCache.Get(packageInfo.Checksum().String());
@@ -497,28 +498,38 @@ WriterImplBase::RegisterPackageVersion(PackageAttributeList& attributeList,
 	const BPackageVersion& version)
 {
 	PackageAttribute* versionMajor = new PackageAttribute(
-		HPKG_PACKAGE_ATTRIBUTE_VERSION_MAJOR, B_HPKG_ATTRIBUTE_TYPE_STRING,
+		B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MAJOR, B_HPKG_ATTRIBUTE_TYPE_STRING,
 		B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
 	versionMajor->string = fPackageStringCache.Get(version.Major().String());
 	attributeList.Add(versionMajor);
 
-	PackageAttribute* versionMinor = new PackageAttribute(
-		HPKG_PACKAGE_ATTRIBUTE_VERSION_MINOR, B_HPKG_ATTRIBUTE_TYPE_STRING,
-		B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-	versionMinor->string = fPackageStringCache.Get(version.Minor().String());
-	attributeList.Add(versionMinor);
+	if (version.Minor().Length() > 0) {
+		PackageAttribute* versionMinor = new PackageAttribute(
+			B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MINOR,
+			B_HPKG_ATTRIBUTE_TYPE_STRING,
+			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
+		versionMinor->string
+			= fPackageStringCache.Get(version.Minor().String());
+		versionMajor->children.Add(versionMinor);
 
-	PackageAttribute* versionMicro = new PackageAttribute(
-		HPKG_PACKAGE_ATTRIBUTE_VERSION_MICRO, B_HPKG_ATTRIBUTE_TYPE_STRING,
-		B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-	versionMicro->string = fPackageStringCache.Get(version.Micro().String());
-	attributeList.Add(versionMicro);
+		if (version.Micro().Length() > 0) {
+			PackageAttribute* versionMicro = new PackageAttribute(
+				B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MICRO,
+				B_HPKG_ATTRIBUTE_TYPE_STRING,
+				B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
+			versionMicro->string
+				= fPackageStringCache.Get(version.Micro().String());
+			versionMajor->children.Add(versionMicro);
+		}
+	}
 
-	PackageAttribute* versionRelease = new PackageAttribute(
-		HPKG_PACKAGE_ATTRIBUTE_VERSION_RELEASE, B_HPKG_ATTRIBUTE_TYPE_UINT,
-		B_HPKG_ATTRIBUTE_ENCODING_INT_8_BIT);
-	versionRelease->unsignedInt = version.Release();
-	attributeList.Add(versionRelease);
+	if (version.Release() != 0) {
+		PackageAttribute* versionRelease = new PackageAttribute(
+			B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_RELEASE,
+			B_HPKG_ATTRIBUTE_TYPE_UINT, B_HPKG_ATTRIBUTE_ENCODING_INT_8_BIT);
+		versionRelease->unsignedInt = version.Release();
+		versionMajor->children.Add(versionRelease);
+	}
 }
 
 
@@ -531,15 +542,15 @@ WriterImplBase::RegisterPackageResolvableExpressionList(
 		BPackageResolvableExpression* resolvableExpr = expressionList.ItemAt(i);
 		bool hasVersion = resolvableExpr->Version().InitCheck() == B_OK;
 
-		PackageAttribute* name = new PackageAttribute(
-			(HPKGPackageAttributeID)id, B_HPKG_ATTRIBUTE_TYPE_STRING,
+		PackageAttribute* name = new PackageAttribute((BHPKGAttributeID)id,
+			B_HPKG_ATTRIBUTE_TYPE_STRING,
 			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
 		name->string = fPackageStringCache.Get(resolvableExpr->Name().String());
 		attributeList.Add(name);
 
 		if (hasVersion) {
 			PackageAttribute* op = new PackageAttribute(
-				HPKG_PACKAGE_ATTRIBUTE_RESOLVABLE_OPERATOR,
+				B_HPKG_ATTRIBUTE_ID_PACKAGE_RESOLVABLE_OPERATOR,
 				B_HPKG_ATTRIBUTE_TYPE_UINT,
 				B_HPKG_ATTRIBUTE_ENCODING_INT_8_BIT);
 			op->unsignedInt = resolvableExpr->Operator();
@@ -717,7 +728,7 @@ WriterImplBase::_WritePackageAttributes(
 		uint8 encoding = attribute->ApplicableEncoding();
 
 		// write tag
-		WriteUnsignedLEB128(HPKG_PACKAGE_ATTRIBUTE_TAG_COMPOSE(
+		WriteUnsignedLEB128(HPKG_ATTRIBUTE_TAG_COMPOSE(
 			attribute->id, attribute->type, encoding,
 			!attribute->children.IsEmpty()));
 

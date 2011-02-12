@@ -1,5 +1,4 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>
  * Distributed under the terms of the MIT License.
  */
@@ -48,6 +47,80 @@ static const size_t kMaxTOCSize					= 64 * 1024 * 1024;
 static const size_t kMaxPackageAttributesSize	= 1 * 1024 * 1024;
 
 static const size_t kScratchBufferSize			= 64 * 1024;
+
+
+enum {
+	ATTRIBUTE_INDEX_DIRECTORY_ENTRY = 0,
+	ATTRIBUTE_INDEX_FILE_TYPE,
+	ATTRIBUTE_INDEX_FILE_PERMISSIONS,
+	ATTRIBUTE_INDEX_FILE_USER,
+	ATTRIBUTE_INDEX_FILE_GROUP,
+	ATTRIBUTE_INDEX_FILE_ATIME,
+	ATTRIBUTE_INDEX_FILE_MTIME,
+	ATTRIBUTE_INDEX_FILE_CRTIME,
+	ATTRIBUTE_INDEX_FILE_ATIME_NANOS,
+	ATTRIBUTE_INDEX_FILE_MTIME_NANOS,
+	ATTRIBUTE_INDEX_FILE_CRTIM_NANOS,
+	ATTRIBUTE_INDEX_FILE_ATTRIBUTE,
+	ATTRIBUTE_INDEX_FILE_ATTRIBUTE_TYPE,
+	ATTRIBUTE_INDEX_DATA,
+	ATTRIBUTE_INDEX_DATA_SIZE,
+	ATTRIBUTE_INDEX_DATA_COMPRESSION,
+	ATTRIBUTE_INDEX_DATA_CHUNK_SIZE,
+	ATTRIBUTE_INDEX_SYMLINK_PATH
+};
+
+
+struct standard_attribute_index_entry {
+	const char*	name;
+	uint8		type;
+	int8		index;
+};
+
+#undef MAKE_ATTRIBUTE_INDEX_ENTRY
+#define MAKE_ATTRIBUTE_INDEX_ENTRY(name, type)	\
+	{ B_HPKG_ATTRIBUTE_ID_##name, B_HPKG_ATTRIBUTE_TYPE_##type, \
+		ATTRIBUTE_INDEX_##name }
+
+static const standard_attribute_index_entry kStandardAttributeIndices[] = {
+	MAKE_ATTRIBUTE_INDEX_ENTRY(DIRECTORY_ENTRY, STRING),
+	MAKE_ATTRIBUTE_INDEX_ENTRY(FILE_TYPE, UINT),
+	MAKE_ATTRIBUTE_INDEX_ENTRY(FILE_PERMISSIONS, UINT),
+	MAKE_ATTRIBUTE_INDEX_ENTRY(FILE_USER, STRING),
+	MAKE_ATTRIBUTE_INDEX_ENTRY(FILE_GROUP, STRING),
+	MAKE_ATTRIBUTE_INDEX_ENTRY(FILE_ATIME, UINT),
+	MAKE_ATTRIBUTE_INDEX_ENTRY(FILE_MTIME, UINT),
+	MAKE_ATTRIBUTE_INDEX_ENTRY(FILE_CRTIME, UINT),
+	MAKE_ATTRIBUTE_INDEX_ENTRY(FILE_ATIME_NANOS, UINT),
+	MAKE_ATTRIBUTE_INDEX_ENTRY(FILE_MTIME_NANOS, UINT),
+	MAKE_ATTRIBUTE_INDEX_ENTRY(FILE_CRTIM_NANOS, UINT),
+	MAKE_ATTRIBUTE_INDEX_ENTRY(FILE_ATTRIBUTE, STRING),
+	MAKE_ATTRIBUTE_INDEX_ENTRY(FILE_ATTRIBUTE_TYPE, UINT),
+	MAKE_ATTRIBUTE_INDEX_ENTRY(DATA, RAW),
+	MAKE_ATTRIBUTE_INDEX_ENTRY(DATA_SIZE, UINT),
+	MAKE_ATTRIBUTE_INDEX_ENTRY(DATA_COMPRESSION, UINT),
+	MAKE_ATTRIBUTE_INDEX_ENTRY(DATA_CHUNK_SIZE, UINT),
+	MAKE_ATTRIBUTE_INDEX_ENTRY(SYMLINK_PATH, STRING),
+	{}
+};
+
+
+// #pragma mark - AttributeType
+
+
+struct PackageReaderImpl::AttributeType {
+	uint8	type;
+	char	name[0];
+};
+
+
+// #pragma mark - AttributeType
+
+
+struct PackageReaderImpl::AttributeTypeReference {
+	AttributeType*	type;
+	int32			standardIndex;
+};
 
 
 // #pragma mark - AttributeHandler
@@ -105,9 +178,11 @@ struct PackageReaderImpl::AttributeHandler
 		fLevel = level;
 	}
 
-	virtual status_t HandleAttribute(AttributeHandlerContext* context,
-		uint8 id, const AttributeValue& value, AttributeHandler** _handler)
+	virtual status_t HandleChildAttribute(AttributeHandlerContext* context,
+		AttributeType* type, int8 typeIndex, const AttributeValue& value,
+		AttributeHandler** _handler)
 	{
+TRACE("%*signored attribute \"%s\" (%u)\n", fLevel * 2, "", type->name, type->type);
 		return B_OK;
 	}
 
@@ -161,15 +236,16 @@ struct PackageReaderImpl::DataAttributeHandler : AttributeHandler {
 		return B_OK;
 	}
 
-	virtual status_t HandleAttribute(AttributeHandlerContext* context,
-		uint8 id, const AttributeValue& value, AttributeHandler** _handler)
+	virtual status_t HandleChildAttribute(AttributeHandlerContext* context,
+		AttributeType* type, int8 typeIndex, const AttributeValue& value,
+		AttributeHandler** _handler)
 	{
-		switch (id) {
-			case B_HPKG_ATTRIBUTE_ID_DATA_SIZE:
+		switch (typeIndex) {
+			case ATTRIBUTE_INDEX_DATA_SIZE:
 				fData->SetUncompressedSize(value.unsignedInt);
 				return B_OK;
 
-			case B_HPKG_ATTRIBUTE_ID_DATA_COMPRESSION:
+			case ATTRIBUTE_INDEX_DATA_COMPRESSION:
 			{
 				switch (value.unsignedInt) {
 					case B_HPKG_COMPRESSION_NONE:
@@ -186,12 +262,13 @@ struct PackageReaderImpl::DataAttributeHandler : AttributeHandler {
 				return B_OK;
 			}
 
-			case B_HPKG_ATTRIBUTE_ID_DATA_CHUNK_SIZE:
+			case ATTRIBUTE_INDEX_DATA_CHUNK_SIZE:
 				fData->SetChunkSize(value.unsignedInt);
 				return B_OK;
 		}
 
-		return AttributeHandler::HandleAttribute(context, id, value, _handler);
+		return AttributeHandler::HandleChildAttribute(context, type, typeIndex,
+			value, _handler);
 	}
 
 private:
@@ -207,24 +284,28 @@ struct PackageReaderImpl::AttributeAttributeHandler : AttributeHandler {
 	{
 	}
 
-	virtual status_t HandleAttribute(AttributeHandlerContext* context,
-		uint8 id, const AttributeValue& value, AttributeHandler** _handler)
+	virtual status_t HandleChildAttribute(AttributeHandlerContext* context,
+		AttributeType* type, int8 typeIndex, const AttributeValue& value,
+		AttributeHandler** _handler)
 	{
-		switch (id) {
-			case B_HPKG_ATTRIBUTE_ID_DATA:
+		switch (typeIndex) {
+			case ATTRIBUTE_INDEX_DATA:
+			{
 				if (_handler != NULL) {
 					return DataAttributeHandler::Create(context,
 						&fAttribute.Data(), value, *_handler);
 				}
 				return DataAttributeHandler::InitData(context,
 					&fAttribute.Data(), value);
+			}
 
-			case B_HPKG_ATTRIBUTE_ID_FILE_ATTRIBUTE_TYPE:
+			case ATTRIBUTE_INDEX_FILE_ATTRIBUTE_TYPE:
 				fAttribute.SetType(value.unsignedInt);
 				return B_OK;
 		}
 
-		return AttributeHandler::HandleAttribute(context, id, value, _handler);
+		return AttributeHandler::HandleChildAttribute(context, type, typeIndex,
+			value, _handler);
 	}
 
 	virtual status_t Delete(AttributeHandlerContext* context)
@@ -274,11 +355,12 @@ struct PackageReaderImpl::EntryAttributeHandler : AttributeHandler {
 		return B_OK;
 	}
 
-	virtual status_t HandleAttribute(AttributeHandlerContext* context,
-		uint8 id, const AttributeValue& value, AttributeHandler** _handler)
+	virtual status_t HandleChildAttribute(AttributeHandlerContext* context,
+		AttributeType* type, int8 typeIndex, const AttributeValue& value,
+		AttributeHandler** _handler)
 	{
-		switch (id) {
-			case B_HPKG_ATTRIBUTE_ID_DIRECTORY_ENTRY:
+		switch (typeIndex) {
+			case ATTRIBUTE_INDEX_DIRECTORY_ENTRY:
 			{
 				status_t error = _Notify(context);
 				if (error != B_OK)
@@ -292,43 +374,43 @@ struct PackageReaderImpl::EntryAttributeHandler : AttributeHandler {
 				return B_OK;
 			}
 
-			case B_HPKG_ATTRIBUTE_ID_FILE_TYPE:
+			case ATTRIBUTE_INDEX_FILE_TYPE:
 				return _SetFileType(context, value.unsignedInt);
 
-			case B_HPKG_ATTRIBUTE_ID_FILE_PERMISSIONS:
+			case ATTRIBUTE_INDEX_FILE_PERMISSIONS:
 				fEntry.SetPermissions(value.unsignedInt);
 				return B_OK;
 
-			case B_HPKG_ATTRIBUTE_ID_FILE_USER:
-			case B_HPKG_ATTRIBUTE_ID_FILE_GROUP:
+			case ATTRIBUTE_INDEX_FILE_USER:
+			case ATTRIBUTE_INDEX_FILE_GROUP:
 				// TODO:...
 				break;
 
-			case B_HPKG_ATTRIBUTE_ID_FILE_ATIME:
+			case ATTRIBUTE_INDEX_FILE_ATIME:
 				fEntry.SetAccessTime(value.unsignedInt);
 				return B_OK;
 
-			case B_HPKG_ATTRIBUTE_ID_FILE_MTIME:
+			case ATTRIBUTE_INDEX_FILE_MTIME:
 				fEntry.SetModifiedTime(value.unsignedInt);
 				return B_OK;
 
-			case B_HPKG_ATTRIBUTE_ID_FILE_CRTIME:
+			case ATTRIBUTE_INDEX_FILE_CRTIME:
 				fEntry.SetCreationTime(value.unsignedInt);
 				return B_OK;
 
-			case B_HPKG_ATTRIBUTE_ID_FILE_ATIME_NANOS:
+			case ATTRIBUTE_INDEX_FILE_ATIME_NANOS:
 				fEntry.SetAccessTimeNanos(value.unsignedInt);
 				return B_OK;
 
-			case B_HPKG_ATTRIBUTE_ID_FILE_MTIME_NANOS:
+			case ATTRIBUTE_INDEX_FILE_MTIME_NANOS:
 				fEntry.SetModifiedTimeNanos(value.unsignedInt);
 				return B_OK;
 
-			case B_HPKG_ATTRIBUTE_ID_FILE_CRTIM_NANOS:
+			case ATTRIBUTE_INDEX_FILE_CRTIM_NANOS:
 				fEntry.SetCreationTimeNanos(value.unsignedInt);
 				return B_OK;
 
-			case B_HPKG_ATTRIBUTE_ID_FILE_ATTRIBUTE:
+			case ATTRIBUTE_INDEX_FILE_ATTRIBUTE:
 			{
 				status_t error = _Notify(context);
 				if (error != B_OK)
@@ -347,20 +429,25 @@ struct PackageReaderImpl::EntryAttributeHandler : AttributeHandler {
 				}
 			}
 
-			case B_HPKG_ATTRIBUTE_ID_DATA:
+			case ATTRIBUTE_INDEX_DATA:
+			{
 				if (_handler != NULL) {
 					return DataAttributeHandler::Create(context, &fEntry.Data(),
 						value, *_handler);
 				}
 				return DataAttributeHandler::InitData(context, &fEntry.Data(),
 					value);
+			}
 
-			case B_HPKG_ATTRIBUTE_ID_SYMLINK_PATH:
+			case ATTRIBUTE_INDEX_SYMLINK_PATH:
+			{
 				fEntry.SetSymlinkPath(value.string);
 				return B_OK;
+			}
 		}
 
-		return AttributeHandler::HandleAttribute(context, id, value, _handler);
+		return AttributeHandler::HandleChildAttribute(context, type, typeIndex,
+			value, _handler);
 	}
 
 	virtual status_t Delete(AttributeHandlerContext* context)
@@ -395,17 +482,14 @@ private:
 				fEntry.SetType(S_IFREG);
 				fEntry.SetPermissions(B_HPKG_DEFAULT_FILE_PERMISSIONS);
 				break;
-
 			case B_HPKG_FILE_TYPE_DIRECTORY:
 				fEntry.SetType(S_IFDIR);
 				fEntry.SetPermissions(B_HPKG_DEFAULT_DIRECTORY_PERMISSIONS);
 				break;
-
 			case B_HPKG_FILE_TYPE_SYMLINK:
 				fEntry.SetType(S_IFLNK);
 				fEntry.SetPermissions(B_HPKG_DEFAULT_SYMLINK_PERMISSIONS);
 				break;
-
 			default:
 				context->errorOutput->PrintError("Error: Invalid file type for "
 					"package entry (%llu)\n", fileType);
@@ -420,331 +504,13 @@ private:
 };
 
 
-struct PackageReaderImpl::PackageVersionAttributeHandler : AttributeHandler {
-	PackageVersionAttributeHandler(BPackageInfoAttributeValue& packageInfoValue,
-		BPackageVersionData& versionData, bool notify)
-		:
-		fPackageInfoValue(packageInfoValue),
-		fPackageVersionData(versionData),
-		fNotify(notify)
+struct PackageReaderImpl::RootAttributeHandler : AttributeHandler {
+	virtual status_t HandleChildAttribute(AttributeHandlerContext* context,
+		AttributeType* type, int8 typeIndex, const AttributeValue& value,
+		AttributeHandler** _handler)
 	{
-	}
-
-	virtual status_t HandleAttribute(AttributeHandlerContext* context,
-		uint8 id, const AttributeValue& value, AttributeHandler** _handler)
-	{
-		switch (id) {
-			case B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MINOR:
-				fPackageVersionData.minor = value.string;
-				break;
-
-			case B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MICRO:
-				fPackageVersionData.micro = value.string;
-				break;
-
-			case B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_RELEASE:
-				fPackageVersionData.release = value.unsignedInt;
-				break;
-
-			default:
-				context->errorOutput->PrintError("Error: Invalid package "
-					"attribute section: unexpected package attribute id %d "
-					"encountered when parsing package version\n", id);
-				return B_BAD_DATA;
-		}
-
-		return B_OK;
-	}
-
-	virtual status_t Delete(AttributeHandlerContext* context)
-	{
-		status_t error = B_OK;
-		if (fNotify) {
-			fPackageInfoValue.attributeID = B_PACKAGE_INFO_VERSION;
-			error = context->packageContentHandler->HandlePackageAttribute(
-				fPackageInfoValue);
-			fPackageInfoValue.Clear();
-		}
-
-		delete this;
-		return error;
-	}
-
-private:
-	BPackageInfoAttributeValue&	fPackageInfoValue;
-	BPackageVersionData&		fPackageVersionData;
-	bool						fNotify;
-};
-
-
-struct PackageReaderImpl::PackageResolvableAttributeHandler : AttributeHandler {
-	PackageResolvableAttributeHandler(
-		BPackageInfoAttributeValue& packageInfoValue)
-		:
-		fPackageInfoValue(packageInfoValue)
-	{
-	}
-
-	virtual status_t HandleAttribute(AttributeHandlerContext* context,
-		uint8 id, const AttributeValue& value, AttributeHandler** _handler)
-	{
-		switch (id) {
-			case B_HPKG_ATTRIBUTE_ID_PACKAGE_PROVIDES_TYPE:
-				fPackageInfoValue.resolvable.type
-					= (BPackageResolvableType)value.unsignedInt;
-				break;
-
-			case B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MAJOR:
-				fPackageInfoValue.resolvable.haveVersion = true;
-				fPackageInfoValue.resolvable.version.major = value.string;
-				if (_handler != NULL) {
-					*_handler
-						= new(std::nothrow) PackageVersionAttributeHandler(
-							fPackageInfoValue,
-							fPackageInfoValue.resolvable.version, false);
-					if (*_handler == NULL)
-						return B_NO_MEMORY;
-				}
-				break;
-
-			default:
-				context->errorOutput->PrintError("Error: Invalid package "
-					"attribute section: unexpected package attribute id %d "
-					"encountered when parsing package resolvable\n", id);
-				return B_BAD_DATA;
-		}
-
-		return B_OK;
-	}
-
-	virtual status_t Delete(AttributeHandlerContext* context)
-	{
-		status_t error = context->packageContentHandler->HandlePackageAttribute(
-			fPackageInfoValue);
-		fPackageInfoValue.Clear();
-
-		delete this;
-		return error;
-	}
-
-private:
-	BPackageInfoAttributeValue&	fPackageInfoValue;
-};
-
-
-struct PackageReaderImpl::PackageResolvableExpressionAttributeHandler
-	: AttributeHandler {
-	PackageResolvableExpressionAttributeHandler(
-		BPackageInfoAttributeValue& packageInfoValue)
-		:
-		fPackageInfoValue(packageInfoValue)
-	{
-	}
-
-	virtual status_t HandleAttribute(AttributeHandlerContext* context,
-		uint8 id, const AttributeValue& value, AttributeHandler** _handler)
-	{
-		switch (id) {
-			case B_HPKG_ATTRIBUTE_ID_PACKAGE_RESOLVABLE_OPERATOR:
-				if (value.unsignedInt >= B_PACKAGE_RESOLVABLE_OP_ENUM_COUNT) {
-					context->errorOutput->PrintError(
-						"Error: Invalid package attribute section: invalid "
-						"package resolvable operator %lld encountered\n",
-						value.unsignedInt);
-					return B_BAD_DATA;
-				}
-				fPackageInfoValue.resolvableExpression.op
-					= (BPackageResolvableOperator)value.unsignedInt;
-				break;
-
-			case B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MAJOR:
-				fPackageInfoValue.resolvableExpression.haveOpAndVersion = true;
-				fPackageInfoValue.resolvableExpression.version.major
-					= value.string;
-				if (_handler != NULL) {
-					*_handler
-						= new(std::nothrow) PackageVersionAttributeHandler(
-							fPackageInfoValue,
-							fPackageInfoValue.resolvableExpression.version,
-							false);
-					if (*_handler == NULL)
-						return B_NO_MEMORY;
-				}
-				return B_OK;
-
-			default:
-				context->errorOutput->PrintError("Error: Invalid package "
-					"attribute section: unexpected package attribute id %d "
-					"encountered when parsing package resolvable-expression\n",
-					id);
-				return B_BAD_DATA;
-		}
-
-		return B_OK;
-	}
-
-	virtual status_t Delete(AttributeHandlerContext* context)
-	{
-		status_t error = context->packageContentHandler->HandlePackageAttribute(
-			fPackageInfoValue);
-		fPackageInfoValue.Clear();
-
-		delete this;
-		return error;
-	}
-
-private:
-	BPackageInfoAttributeValue&	fPackageInfoValue;
-};
-
-
-struct PackageReaderImpl::PackageAttributeHandler : AttributeHandler {
-	virtual status_t HandleAttribute(AttributeHandlerContext* context,
-		uint8 id, const AttributeValue& value, AttributeHandler** _handler)
-	{
-		switch (id) {
-			case B_HPKG_ATTRIBUTE_ID_PACKAGE_NAME:
-				fPackageInfoValue.SetTo(B_PACKAGE_INFO_NAME, value.string);
-				break;
-
-			case B_HPKG_ATTRIBUTE_ID_PACKAGE_SUMMARY:
-				fPackageInfoValue.SetTo(B_PACKAGE_INFO_SUMMARY, value.string);
-				break;
-
-			case B_HPKG_ATTRIBUTE_ID_PACKAGE_DESCRIPTION:
-				fPackageInfoValue.SetTo(B_PACKAGE_INFO_DESCRIPTION,
-					value.string);
-				break;
-
-			case B_HPKG_ATTRIBUTE_ID_PACKAGE_VENDOR:
-				fPackageInfoValue.SetTo(B_PACKAGE_INFO_VENDOR, value.string);
-				break;
-
-			case B_HPKG_ATTRIBUTE_ID_PACKAGE_PACKAGER:
-				fPackageInfoValue.SetTo(B_PACKAGE_INFO_PACKAGER, value.string);
-				break;
-
-			case B_HPKG_ATTRIBUTE_ID_PACKAGE_FLAGS:
-				fPackageInfoValue.SetTo(B_PACKAGE_INFO_FLAGS,
-					(uint32)value.unsignedInt);
-				break;
-
-			case B_HPKG_ATTRIBUTE_ID_PACKAGE_ARCHITECTURE:
-				if (value.unsignedInt
-						>= B_PACKAGE_ARCHITECTURE_ENUM_COUNT) {
-					context->errorOutput->PrintError(
-						"Error: Invalid package attribute section: "
-						"Invalid package architecture %lld encountered\n",
-						value.unsignedInt);
-					return B_BAD_DATA;
-				}
-				fPackageInfoValue.SetTo(B_PACKAGE_INFO_ARCHITECTURE,
-					(uint8)value.unsignedInt);
-				break;
-
-			case B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MAJOR:
-				fPackageInfoValue.attributeID = B_PACKAGE_INFO_VERSION;
-				fPackageInfoValue.version.major = value.string;
-				if (_handler != NULL) {
-					*_handler
-						= new(std::nothrow) PackageVersionAttributeHandler(
-							fPackageInfoValue, fPackageInfoValue.version, true);
-					if (*_handler == NULL)
-						return B_NO_MEMORY;
-				}
-				break;
-
-			case B_HPKG_ATTRIBUTE_ID_PACKAGE_COPYRIGHT:
-				fPackageInfoValue.SetTo(B_PACKAGE_INFO_COPYRIGHTS,
-					value.string);
-				break;
-
-			case B_HPKG_ATTRIBUTE_ID_PACKAGE_LICENSE:
-				fPackageInfoValue.SetTo(B_PACKAGE_INFO_LICENSES,
-					value.string);
-				break;
-
-			case B_HPKG_ATTRIBUTE_ID_PACKAGE_PROVIDES:
-				fPackageInfoValue.resolvable.name = value.string;
-				fPackageInfoValue.attributeID = B_PACKAGE_INFO_PROVIDES;
-				if (_handler != NULL) {
-					*_handler
-						= new(std::nothrow) PackageResolvableAttributeHandler(
-							fPackageInfoValue);
-					if (*_handler == NULL)
-						return B_NO_MEMORY;
-				}
-				break;
-
-			case B_HPKG_ATTRIBUTE_ID_PACKAGE_REQUIRES:
-			case B_HPKG_ATTRIBUTE_ID_PACKAGE_SUPPLEMENTS:
-			case B_HPKG_ATTRIBUTE_ID_PACKAGE_CONFLICTS:
-			case B_HPKG_ATTRIBUTE_ID_PACKAGE_FRESHENS:
-				fPackageInfoValue.resolvableExpression.name = value.string;
-				switch (id) {
-					case B_HPKG_ATTRIBUTE_ID_PACKAGE_REQUIRES:
-						fPackageInfoValue.attributeID = B_PACKAGE_INFO_REQUIRES;
-						break;
-
-					case B_HPKG_ATTRIBUTE_ID_PACKAGE_SUPPLEMENTS:
-						fPackageInfoValue.attributeID
-							= B_PACKAGE_INFO_SUPPLEMENTS;
-						break;
-
-					case B_HPKG_ATTRIBUTE_ID_PACKAGE_CONFLICTS:
-						fPackageInfoValue.attributeID
-							= B_PACKAGE_INFO_CONFLICTS;
-						break;
-
-					case B_HPKG_ATTRIBUTE_ID_PACKAGE_FRESHENS:
-						fPackageInfoValue.attributeID = B_PACKAGE_INFO_FRESHENS;
-						break;
-				}
-				if (_handler != NULL) {
-					*_handler = new(std::nothrow)
-						PackageResolvableExpressionAttributeHandler(
-							fPackageInfoValue);
-					if (*_handler == NULL)
-						return B_NO_MEMORY;
-				}
-				break;
-
-			case B_HPKG_ATTRIBUTE_ID_PACKAGE_REPLACES:
-				fPackageInfoValue.SetTo(B_PACKAGE_INFO_REPLACES, value.string);
-				break;
-
-			default:
-				context->errorOutput->PrintError(
-					"Error: Invalid package attribute section: unexpected "
-					"package attribute id %d encountered\n", id);
-				return B_BAD_DATA;
-		}
-
-		// notify unless the current attribute has children, in which case
-		// the child-handler will notify when it's done
-		if (_handler == NULL) {
-			status_t error = context->packageContentHandler
-				->HandlePackageAttribute(fPackageInfoValue);
-			fPackageInfoValue.Clear();
-			if (error != B_OK)
-				return error;
-		}
-
-		return B_OK;
-	}
-
-private:
-	BPackageInfoAttributeValue	fPackageInfoValue;
-};
-
-
-struct PackageReaderImpl::RootAttributeHandler : PackageAttributeHandler {
-	typedef PackageAttributeHandler inherited;
-
-	virtual status_t HandleAttribute(AttributeHandlerContext* context,
-		uint8 id, const AttributeValue& value, AttributeHandler** _handler)
-	{
-		if (id == B_HPKG_ATTRIBUTE_ID_DIRECTORY_ENTRY) {
+		if (typeIndex == ATTRIBUTE_INDEX_DIRECTORY_ENTRY) {
+//TRACE("%*sentry \"%s\"\n", fLevel * 2, "", value.string);
 			if (_handler != NULL) {
 				return EntryAttributeHandler::Create(context, NULL,
 					value.string, *_handler);
@@ -752,7 +518,8 @@ struct PackageReaderImpl::RootAttributeHandler : PackageAttributeHandler {
 			return B_OK;
 		}
 
-		return inherited::HandleAttribute(context, id, value, _handler);
+		return AttributeHandler::HandleChildAttribute(context, type, typeIndex,
+			value, _handler);
 	}
 };
 
@@ -761,36 +528,37 @@ struct PackageReaderImpl::LowLevelAttributeHandler : AttributeHandler {
 	LowLevelAttributeHandler()
 		:
 		fToken(NULL),
-		fID(B_HPKG_ATTRIBUTE_ID_ENUM_COUNT)
+		fAttributeName(NULL)
 	{
 	}
 
-	LowLevelAttributeHandler(uint8 id, const BPackageAttributeValue& value,
-		void* token)
+	LowLevelAttributeHandler(const char* attributeName,
+		const BPackageAttributeValue& value, void* token)
 		:
 		fToken(token),
-		fID(id),
+		fAttributeName(attributeName),
 		fValue(value)
 	{
 	}
 
-	virtual status_t HandleAttribute(AttributeHandlerContext* context,
-		uint8 id, const AttributeValue& value, AttributeHandler** _handler)
+	virtual status_t HandleChildAttribute(AttributeHandlerContext* context,
+		AttributeType* type, int8 typeIndex, const AttributeValue& value,
+		AttributeHandler** _handler)
 	{
 		// notify the content handler
 		void* token;
 		status_t error = context->lowLevelPackageContentHandler
-			->HandleAttribute((BHPKGAttributeID)id, value, fToken, token);
+			->HandleAttribute(type->name, value, fToken, token);
 		if (error != B_OK)
 			return error;
 
 		// create a subhandler for the attribute, if it has children
 		if (_handler != NULL) {
-			*_handler = new(std::nothrow) LowLevelAttributeHandler(id, value,
-				token);
+			*_handler = new(std::nothrow) LowLevelAttributeHandler(type->name,
+				value, token);
 			if (*_handler == NULL) {
 				context->lowLevelPackageContentHandler->HandleAttributeDone(
-					(BHPKGAttributeID)id, value, token);
+					type->name, value, token);
 				return B_NO_MEMORY;
 			}
 			return B_OK;
@@ -798,25 +566,22 @@ struct PackageReaderImpl::LowLevelAttributeHandler : AttributeHandler {
 
 		// no children -- just call the done hook
 		return context->lowLevelPackageContentHandler->HandleAttributeDone(
-			(BHPKGAttributeID)id, value, token);
+			type->name, value, token);
 	}
 
 	virtual status_t Delete(AttributeHandlerContext* context)
 	{
-		status_t error = B_OK;
-		if (fID != B_HPKG_ATTRIBUTE_ID_ENUM_COUNT) {
-			error = context->lowLevelPackageContentHandler->HandleAttributeDone(
-				(BHPKGAttributeID)fID, fValue, fToken);
+		if (fAttributeName != NULL) {
+			return context->lowLevelPackageContentHandler->HandleAttributeDone(
+				fAttributeName, fValue, fToken);
 		}
 
-		delete this;
-		return error;
+		return B_OK;
 	}
 
 private:
-
 	void*			fToken;
-	uint8			fID;
+	const char*		fAttributeName;
 	AttributeValue	fValue;
 };
 
@@ -853,6 +618,7 @@ PackageReaderImpl::PackageReaderImpl(BErrorOutput* errorOutput)
 	fTOCSection("TOC"),
 	fPackageAttributesSection("package attributes section"),
 	fCurrentSection(NULL),
+	fAttributeTypes(NULL),
 	fScratchBuffer(NULL),
 	fScratchBufferSize(0)
 {
@@ -865,6 +631,7 @@ PackageReaderImpl::~PackageReaderImpl()
 		close(fFD);
 
 	delete[] fScratchBuffer;
+	delete[] fAttributeTypes;
 }
 
 
@@ -969,12 +736,19 @@ PackageReaderImpl::Init(int fd, bool keepFD)
 	}
 
 	// TOC subsections
+	fTOCAttributeTypesLength
+		= B_BENDIAN_TO_HOST_INT64(header.toc_attribute_types_length);
+	fTOCAttributeTypesCount
+		= B_BENDIAN_TO_HOST_INT64(header.toc_attribute_types_count);
 	fTOCSection.stringsLength
 		= B_BENDIAN_TO_HOST_INT64(header.toc_strings_length);
 	fTOCSection.stringsCount
 		= B_BENDIAN_TO_HOST_INT64(header.toc_strings_count);
 
-	if (fTOCSection.stringsLength > fTOCSection.uncompressedLength
+	if (fTOCAttributeTypesLength > fTOCSection.uncompressedLength
+		|| fTOCSection.stringsLength
+			> fTOCSection.uncompressedLength - fTOCAttributeTypesLength
+		|| fTOCAttributeTypesCount > fTOCAttributeTypesLength
 		|| fTOCSection.stringsCount > fTOCSection.stringsLength) {
 		fErrorOutput->PrintError("Error: Invalid package file: Invalid TOC "
 			"subsections description\n");
@@ -1051,6 +825,12 @@ PackageReaderImpl::Init(int fd, bool keepFD)
 	fCurrentSection = &fTOCSection;
 	fCurrentSection->currentOffset = 0;
 
+	// attribute types
+	error = _ParseTOCAttributeTypes();
+	if (error != B_OK)
+		return error;
+	fCurrentSection->currentOffset += fTOCAttributeTypesLength;
+
 	// strings
 	error = _ParseStrings();
 	if (error != B_OK)
@@ -1111,6 +891,62 @@ PackageReaderImpl::_CheckCompression(const SectionInfo& section) const
 
 		default:
 			return "Invalid compression algorithm ID";
+	}
+}
+
+
+status_t
+PackageReaderImpl::_ParseTOCAttributeTypes()
+{
+	// allocate table
+	fAttributeTypes = new(std::nothrow) AttributeTypeReference[
+		fTOCAttributeTypesCount];
+	if (fAttributeTypes == NULL) {
+		fErrorOutput->PrintError("Error: Out of memory!\n");
+		return B_NO_MEMORY;
+	}
+
+	// parse the section and fill the table
+	uint8* position = fTOCSection.data + fTOCSection.currentOffset;
+	uint8* sectionEnd = position + fTOCAttributeTypesLength;
+	uint32 index = 0;
+	while (true) {
+		if (position >= sectionEnd) {
+			fErrorOutput->PrintError("Error: Malformed TOC attribute types "
+				"section\n");
+			return B_BAD_DATA;
+		}
+
+		AttributeType* type = (AttributeType*)position;
+
+		if (type->type == 0) {
+			if (position + 1 != sectionEnd) {
+				fErrorOutput->PrintError("Error: Excess bytes in TOC attribute "
+					"types section\n");
+				return B_BAD_DATA;
+			}
+
+			if (index != fTOCAttributeTypesCount) {
+				fErrorOutput->PrintError("Error: Invalid TOC attribute types "
+					"section: Less types than specified in the header\n");
+				return B_BAD_DATA;
+			}
+
+			return B_OK;
+		}
+
+		if (index >= fTOCAttributeTypesCount) {
+			fErrorOutput->PrintError("Error: Invalid TOC attribute types "
+				"section: More types than specified in the header\n");
+			return B_BAD_DATA;
+		}
+
+		size_t nameLength = strnlen(type->name,
+			(char*)sectionEnd - type->name);
+		position = (uint8*)type->name + nameLength + 1;
+		fAttributeTypes[index].type = type;
+		fAttributeTypes[index].standardIndex = _GetStandardIndex(type);
+		index++;
 	}
 }
 
@@ -1178,7 +1014,8 @@ PackageReaderImpl::_ParseContent(AttributeHandlerContext* context,
 {
 	// parse the TOC
 	fCurrentSection = &fTOCSection;
-	fTOCSection.currentOffset = fTOCSection.stringsLength;
+	fTOCSection.currentOffset = fTOCAttributeTypesLength
+		+ fTOCSection.stringsLength;
 
 	// prepare attribute handler context
 	context->heapOffset = fHeapOffset;
@@ -1202,17 +1039,15 @@ PackageReaderImpl::_ParseContent(AttributeHandlerContext* context,
 
 	// parse package attributes
 	fCurrentSection = &fPackageAttributesSection;
-	fAttributeHandlerStack->Add(rootAttributeHandler);
-		// re-init the attribute handler stack
 	if (error == B_OK)
-		error = _ParseAttributeTree(context);
+		error = _ParsePackageAttributes(&context);
 	if (error == B_OK) {
 		if (fPackageAttributesSection.currentOffset
 				< fPackageAttributesSection.uncompressedLength) {
 			fErrorOutput->PrintError("Error: %llu excess byte(s) in package "
 				"attributes section\n",
 				fPackageAttributesSection.uncompressedLength
-					- fPackageAttributesSection.currentOffset);
+					- fPackageAttributesSectionSection.currentOffset);
 			error = B_BAD_DATA;
 		}
 	}
@@ -1239,12 +1074,8 @@ PackageReaderImpl::_ParseAttributeTree(AttributeHandlerContext* context)
 	int level = 0;
 
 	while (true) {
-		uint8 id;
-		AttributeValue value;
-		bool hasChildren;
 		uint64 tag;
-
-		status_t error = _ReadAttribute(id, value, &hasChildren, &tag);
+		status_t error = _ReadUnsignedLEB128(tag);
 		if (error != B_OK)
 			return error;
 
@@ -1260,8 +1091,26 @@ PackageReaderImpl::_ParseAttributeTree(AttributeHandlerContext* context)
 			continue;
 		}
 
+		// get the type
+		uint64 typeIndex = HPKG_ATTRIBUTE_TAG_INDEX(tag);
+		if (typeIndex >= fTOCAttributeTypesCount) {
+			fErrorOutput->PrintError("Error: Invalid TOC section: "
+				"Invalid attribute type index\n");
+			return B_BAD_DATA;
+		}
+		AttributeTypeReference* type = fAttributeTypes + typeIndex;
+
+		// get the value
+		AttributeValue value;
+		error = _ReadAttributeValue(type->type->type,
+			HPKG_ATTRIBUTE_TAG_ENCODING(tag), value);
+		if (error != B_OK)
+			return error;
+
+		bool hasChildren = HPKG_ATTRIBUTE_TAG_HAS_CHILDREN(tag);
 		AttributeHandler* childHandler = NULL;
-		error = _CurrentAttributeHandler()->HandleAttribute(context, id, value,
+		error = _CurrentAttributeHandler()->HandleChildAttribute(context,
+			type->type, type->standardIndex, value,
 			hasChildren ? &childHandler : NULL);
 		if (error != B_OK)
 			return error;
@@ -1277,8 +1126,9 @@ PackageReaderImpl::_ParseAttributeTree(AttributeHandlerContext* context)
 				}
 			}
 
-			childHandler->SetLevel(++level);
+			childHandler->SetLevel(level);
 			_PushAttributeHandler(childHandler);
+			level++;
 		}
 	}
 }
@@ -1287,135 +1137,145 @@ PackageReaderImpl::_ParseAttributeTree(AttributeHandlerContext* context)
 status_t
 PackageReaderImpl::_ParsePackageAttributes(AttributeHandlerContext* context)
 {
-//
-//		if (tag == 0) {
-//			return
-//				context->packageContentHandler->HandlePackageAttributesDone();
-//		}
-//
-//		switch (id) {
-//			case B_HPKG_ATTRIBUTE_ID_PACKAGE_NAME:
-//				handlerValue.SetTo(B_PACKAGE_INFO_NAME, attributeValue.string);
-//				break;
-//
-//			case B_HPKG_ATTRIBUTE_ID_PACKAGE_SUMMARY:
-//				handlerValue.SetTo(B_PACKAGE_INFO_SUMMARY,
-//					attributeValue.string);
-//				break;
-//
-//			case B_HPKG_ATTRIBUTE_ID_PACKAGE_DESCRIPTION:
-//				handlerValue.SetTo(B_PACKAGE_INFO_DESCRIPTION,
-//					attributeValue.string);
-//				break;
-//
-//			case B_HPKG_ATTRIBUTE_ID_PACKAGE_VENDOR:
-//				handlerValue.SetTo(B_PACKAGE_INFO_VENDOR,
-//					attributeValue.string);
-//				break;
-//
-//			case B_HPKG_ATTRIBUTE_ID_PACKAGE_PACKAGER:
-//				handlerValue.SetTo(B_PACKAGE_INFO_PACKAGER,
-//					attributeValue.string);
-//				break;
-//
-//			case B_HPKG_ATTRIBUTE_ID_PACKAGE_FLAGS:
-//				handlerValue.SetTo(B_PACKAGE_INFO_FLAGS,
-//					(uint32)attributeValue.unsignedInt);
-//				break;
-//
-//			case B_HPKG_ATTRIBUTE_ID_PACKAGE_ARCHITECTURE:
-//				if (attributeValue.unsignedInt
-//						>= B_PACKAGE_ARCHITECTURE_ENUM_COUNT) {
-//					fErrorOutput->PrintError(
-//						"Error: Invalid package attribute section: "
-//						"Invalid package architecture %lld encountered\n",
-//						attributeValue.unsignedInt);
-//					return B_BAD_DATA;
-//				}
-//				handlerValue.SetTo(B_PACKAGE_INFO_ARCHITECTURE,
-//					(uint8)attributeValue.unsignedInt);
-//				break;
-//
-//			case B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MAJOR:
-//				error = _ParsePackageVersion(handlerValue.version,
-//					attributeValue.string);
-//				if (error != B_OK)
-//					return error;
-//				handlerValue.attributeID = B_PACKAGE_INFO_VERSION;
-//				break;
-//
-//			case B_HPKG_ATTRIBUTE_ID_PACKAGE_COPYRIGHT:
-//				handlerValue.SetTo(B_PACKAGE_INFO_COPYRIGHTS,
-//					attributeValue.string);
-//				break;
-//
-//			case B_HPKG_ATTRIBUTE_ID_PACKAGE_LICENSE:
-//				handlerValue.SetTo(B_PACKAGE_INFO_LICENSES,
-//					attributeValue.string);
-//				break;
-//
-//			case B_HPKG_ATTRIBUTE_ID_PACKAGE_PROVIDES_TYPE:
-//				error = _ParsePackageProvides(handlerValue.resolvable,
-//					(BPackageResolvableType)attributeValue.unsignedInt);
-//				if (error != B_OK)
-//					return error;
-//				handlerValue.attributeID = B_PACKAGE_INFO_PROVIDES;
-//				break;
-//
-//			case B_HPKG_ATTRIBUTE_ID_PACKAGE_REQUIRES:
-//				error = _ParsePackageResolvableExpression(
-//					handlerValue.resolvableExpression, attributeValue.string,
-//					hasChildren);
-//				if (error != B_OK)
-//					return error;
-//				handlerValue.attributeID = B_PACKAGE_INFO_REQUIRES;
-//				break;
-//
-//			case B_HPKG_ATTRIBUTE_ID_PACKAGE_SUPPLEMENTS:
-//				error = _ParsePackageResolvableExpression(
-//					handlerValue.resolvableExpression, attributeValue.string,
-//					hasChildren);
-//				if (error != B_OK)
-//					return error;
-//				handlerValue.attributeID = B_PACKAGE_INFO_SUPPLEMENTS;
-//				break;
-//
-//			case B_HPKG_ATTRIBUTE_ID_PACKAGE_CONFLICTS:
-//				error = _ParsePackageResolvableExpression(
-//					handlerValue.resolvableExpression, attributeValue.string,
-//					hasChildren);
-//				if (error != B_OK)
-//					return error;
-//				handlerValue.attributeID = B_PACKAGE_INFO_CONFLICTS;
-//				break;
-//
-//			case B_HPKG_ATTRIBUTE_ID_PACKAGE_FRESHENS:
-//				error = _ParsePackageResolvableExpression(
-//					handlerValue.resolvableExpression, attributeValue.string,
-//					hasChildren);
-//				if (error != B_OK)
-//					return error;
-//				handlerValue.attributeID = B_PACKAGE_INFO_FRESHENS;
-//				break;
-//
-//			case B_HPKG_ATTRIBUTE_ID_PACKAGE_REPLACES:
-//				handlerValue.SetTo(B_PACKAGE_INFO_REPLACES,
-//					attributeValue.string);
-//				break;
-//
-//			default:
-//				fErrorOutput->PrintError(
-//					"Error: Invalid package attribute section: unexpected "
-//					"package attribute id %d encountered\n", id);
-//				return B_BAD_DATA;
-//		}
-//
-//		error = context->packageContentHandler->HandlePackageAttribute(
-//			handlerValue);
-//		if (error != B_OK)
-//			return error;
-//	}
-	return B_OK;
+	while (true) {
+		uint8 id;
+		AttributeValue attributeValue;
+		bool hasChildren;
+		uint64 tag;
+		BPackageInfoAttributeValue handlerValue;
+
+		status_t error
+			= _ReadPackageAttribute(id, attributeValue, &hasChildren, &tag);
+		if (error != B_OK)
+			return error;
+
+		if (tag == 0) {
+			return
+				context->packageContentHandler->HandlePackageAttributesDone();
+		}
+
+		switch (id) {
+			case HPKG_PACKAGE_ATTRIBUTE_NAME:
+				handlerValue.SetTo(B_PACKAGE_INFO_NAME, attributeValue.string);
+				break;
+
+			case HPKG_PACKAGE_ATTRIBUTE_SUMMARY:
+				handlerValue.SetTo(B_PACKAGE_INFO_SUMMARY,
+					attributeValue.string);
+				break;
+
+			case HPKG_PACKAGE_ATTRIBUTE_DESCRIPTION:
+				handlerValue.SetTo(B_PACKAGE_INFO_DESCRIPTION,
+					attributeValue.string);
+				break;
+
+			case HPKG_PACKAGE_ATTRIBUTE_VENDOR:
+				handlerValue.SetTo(B_PACKAGE_INFO_VENDOR,
+					attributeValue.string);
+				break;
+
+			case HPKG_PACKAGE_ATTRIBUTE_PACKAGER:
+				handlerValue.SetTo(B_PACKAGE_INFO_PACKAGER,
+					attributeValue.string);
+				break;
+
+			case HPKG_PACKAGE_ATTRIBUTE_FLAGS:
+				handlerValue.SetTo(B_PACKAGE_INFO_FLAGS,
+					(uint32)attributeValue.unsignedInt);
+				break;
+
+			case HPKG_PACKAGE_ATTRIBUTE_ARCHITECTURE:
+				if (attributeValue.unsignedInt
+						>= B_PACKAGE_ARCHITECTURE_ENUM_COUNT) {
+					fErrorOutput->PrintError(
+						"Error: Invalid package attribute section: "
+						"Invalid package architecture %lld encountered\n",
+						attributeValue.unsignedInt);
+					return B_BAD_DATA;
+				}
+				handlerValue.SetTo(B_PACKAGE_INFO_ARCHITECTURE,
+					(uint8)attributeValue.unsignedInt);
+				break;
+
+			case HPKG_PACKAGE_ATTRIBUTE_VERSION_MAJOR:
+				error = _ParsePackageVersion(handlerValue.version,
+					attributeValue.string);
+				if (error != B_OK)
+					return error;
+				handlerValue.attributeIndex = B_PACKAGE_INFO_VERSION;
+				break;
+
+			case HPKG_PACKAGE_ATTRIBUTE_COPYRIGHT:
+				handlerValue.SetTo(B_PACKAGE_INFO_COPYRIGHTS,
+					attributeValue.string);
+				break;
+
+			case HPKG_PACKAGE_ATTRIBUTE_LICENSE:
+				handlerValue.SetTo(B_PACKAGE_INFO_LICENSES,
+					attributeValue.string);
+				break;
+
+			case HPKG_PACKAGE_ATTRIBUTE_PROVIDES_TYPE:
+				error = _ParsePackageProvides(handlerValue.resolvable,
+					(BPackageResolvableType)attributeValue.unsignedInt);
+				if (error != B_OK)
+					return error;
+				handlerValue.attributeIndex = B_PACKAGE_INFO_PROVIDES;
+				break;
+
+			case HPKG_PACKAGE_ATTRIBUTE_REQUIRES:
+				error = _ParsePackageResolvableExpression(
+					handlerValue.resolvableExpression, attributeValue.string,
+					hasChildren);
+				if (error != B_OK)
+					return error;
+				handlerValue.attributeIndex = B_PACKAGE_INFO_REQUIRES;
+				break;
+
+			case HPKG_PACKAGE_ATTRIBUTE_SUPPLEMENTS:
+				error = _ParsePackageResolvableExpression(
+					handlerValue.resolvableExpression, attributeValue.string,
+					hasChildren);
+				if (error != B_OK)
+					return error;
+				handlerValue.attributeIndex = B_PACKAGE_INFO_SUPPLEMENTS;
+				break;
+
+			case HPKG_PACKAGE_ATTRIBUTE_CONFLICTS:
+				error = _ParsePackageResolvableExpression(
+					handlerValue.resolvableExpression, attributeValue.string,
+					hasChildren);
+				if (error != B_OK)
+					return error;
+				handlerValue.attributeIndex = B_PACKAGE_INFO_CONFLICTS;
+				break;
+
+			case HPKG_PACKAGE_ATTRIBUTE_FRESHENS:
+				error = _ParsePackageResolvableExpression(
+					handlerValue.resolvableExpression, attributeValue.string,
+					hasChildren);
+				if (error != B_OK)
+					return error;
+				handlerValue.attributeIndex = B_PACKAGE_INFO_FRESHENS;
+				break;
+
+			case HPKG_PACKAGE_ATTRIBUTE_REPLACES:
+				handlerValue.SetTo(B_PACKAGE_INFO_REPLACES,
+					attributeValue.string);
+				break;
+
+			default:
+				fErrorOutput->PrintError(
+					"Error: Invalid package attribute section: unexpected "
+					"package attribute id %d encountered\n", id);
+				return B_BAD_DATA;
+		}
+
+		error = context->packageContentHandler->HandlePackageAttribute(
+			handlerValue);
+		if (error != B_OK)
+			return error;
+	}
 }
 
 
@@ -1423,62 +1283,62 @@ status_t
 PackageReaderImpl::_ParsePackageVersion(BPackageVersionData& _version,
 	const char* major)
 {
-//	uint8 id;
-//	AttributeValue value;
-//	status_t error;
-//
-//	_version.major = NULL;
-//	_version.minor = NULL;
-//	_version.micro = NULL;
-//	_version.release = 0;
-//
-//	// major (may have been read already)
-//	if (major == NULL) {
-//		error = _ReadPackageAttribute(id, value);
-//		if (error != B_OK)
-//			return error;
-//		if (id != B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MAJOR) {
-//			fErrorOutput->PrintError("Error: Invalid package attribute section:"
-//				" Invalid package version, expected major\n");
-//			return B_BAD_DATA;
-//		}
-//		major = value.string;
-//	}
-//	_version.major = major;
-//
-//	// minor
-//	error = _ReadPackageAttribute(id, value);
-//	if (error != B_OK)
-//		return error;
-//	if (id != B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MINOR) {
-//		fErrorOutput->PrintError("Error: Invalid package attribute section:"
-//			" Invalid package version, expected minor\n");
-//		return B_BAD_DATA;
-//	}
-//	_version.minor = value.string;
-//
-//	// micro
-//	error = _ReadPackageAttribute(id, value);
-//	if (error != B_OK)
-//		return error;
-//	if (id != B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MICRO) {
-//		fErrorOutput->PrintError("Error: Invalid package attribute section:"
-//			" Invalid package version, expected micro\n");
-//		return B_BAD_DATA;
-//	}
-//	_version.micro = value.string;
-//
-//	// release
-//	error = _ReadPackageAttribute(id, value);
-//	if (error != B_OK)
-//		return error;
-//	if (id != B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_RELEASE) {
-//		fErrorOutput->PrintError("Error: Invalid package attribute section:"
-//			" Invalid package version, expected release\n");
-//		return B_BAD_DATA;
-//	}
-//	_version.release = (uint8)value.unsignedInt;
-//
+	uint8 id;
+	AttributeValue value;
+	status_t error;
+
+	_version.major = NULL;
+	_version.minor = NULL;
+	_version.micro = NULL;
+	_version.release = 0;
+
+	// major (may have been read already)
+	if (major == NULL) {
+		error = _ReadPackageAttribute(id, value);
+		if (error != B_OK)
+			return error;
+		if (id != HPKG_PACKAGE_ATTRIBUTE_VERSION_MAJOR) {
+			fErrorOutput->PrintError("Error: Invalid package attribute section:"
+				" Invalid package version, expected major\n");
+			return B_BAD_DATA;
+		}
+		major = value.string;
+	}
+	_version.major = major;
+
+	// minor
+	error = _ReadPackageAttribute(id, value);
+	if (error != B_OK)
+		return error;
+	if (id != HPKG_PACKAGE_ATTRIBUTE_VERSION_MINOR) {
+		fErrorOutput->PrintError("Error: Invalid package attribute section:"
+			" Invalid package version, expected minor\n");
+		return B_BAD_DATA;
+	}
+	_version.minor = value.string;
+
+	// micro
+	error = _ReadPackageAttribute(id, value);
+	if (error != B_OK)
+		return error;
+	if (id != HPKG_PACKAGE_ATTRIBUTE_VERSION_MICRO) {
+		fErrorOutput->PrintError("Error: Invalid package attribute section:"
+			" Invalid package version, expected micro\n");
+		return B_BAD_DATA;
+	}
+	_version.micro = value.string;
+
+	// release
+	error = _ReadPackageAttribute(id, value);
+	if (error != B_OK)
+		return error;
+	if (id != HPKG_PACKAGE_ATTRIBUTE_VERSION_RELEASE) {
+		fErrorOutput->PrintError("Error: Invalid package attribute section:"
+			" Invalid package version, expected release\n");
+		return B_BAD_DATA;
+	}
+	_version.release = (uint8)value.unsignedInt;
+
 	return B_OK;
 }
 
@@ -1487,46 +1347,46 @@ status_t
 PackageReaderImpl::_ParsePackageProvides(BPackageResolvableData& _resolvable,
 	BPackageResolvableType providesType)
 {
-//	uint8 id;
-//	AttributeValue value;
-//	bool hasChildren;
-//
-//	if (providesType >= B_PACKAGE_RESOLVABLE_TYPE_ENUM_COUNT) {
-//		fErrorOutput->PrintError("Error: Invalid package attribute section: "
-//			"Invalid package provides type %lld encountered\n", providesType);
-//		return B_BAD_DATA;
-//	}
-//	_resolvable.type = providesType;
-//	_resolvable.haveVersion = false;
-//
-//	// provides name
-//	status_t error = _ReadPackageAttribute(id, value, &hasChildren);
-//	if (error != B_OK)
-//		return error;
-//	if (id != B_HPKG_ATTRIBUTE_ID_PACKAGE_PROVIDES) {
-//		fErrorOutput->PrintError("Error: Invalid package attribute section: "
-//			"Invalid package provides, expected name of resolvable\n");
-//		return B_BAD_DATA;
-//	}
-//	_resolvable.name = value.string;
-//
-//	// there may be a version added as child
-//	if (hasChildren) {
-//		error = _ParsePackageVersion(_resolvable.version);
-//		if (error != B_OK)
-//			return error;
-//
-//		_resolvable.haveVersion = true;
-//
-//		uint64 tag;
-//		if ((error = _ReadUnsignedLEB128(tag)) != B_OK)
-//			return error;
-//		if (tag != 0) {
-//			fErrorOutput->PrintError("Error: Invalid package attribute "
-//				"section: Invalid package provides, expected end-tag\n");
-//			return B_BAD_DATA;
-//		}
-//	}
+	uint8 id;
+	AttributeValue value;
+	bool hasChildren;
+
+	if (providesType >= B_PACKAGE_RESOLVABLE_TYPE_ENUM_COUNT) {
+		fErrorOutput->PrintError("Error: Invalid package attribute section: "
+			"Invalid package provides type %lld encountered\n", providesType);
+		return B_BAD_DATA;
+	}
+	_resolvable.type = providesType;
+	_resolvable.haveVersion = false;
+
+	// provides name
+	status_t error = _ReadPackageAttribute(id, value, &hasChildren);
+	if (error != B_OK)
+		return error;
+	if (id != HPKG_PACKAGE_ATTRIBUTE_PROVIDES) {
+		fErrorOutput->PrintError("Error: Invalid package attribute section: "
+			"Invalid package provides, expected name of resolvable\n");
+		return B_BAD_DATA;
+	}
+	_resolvable.name = value.string;
+
+	// there may be a version added as child
+	if (hasChildren) {
+		error = _ParsePackageVersion(_resolvable.version);
+		if (error != B_OK)
+			return error;
+
+		_resolvable.haveVersion = true;
+
+		uint64 tag;
+		if ((error = _ReadUnsignedLEB128(tag)) != B_OK)
+			return error;
+		if (tag != 0) {
+			fErrorOutput->PrintError("Error: Invalid package attribute "
+				"section: Invalid package provides, expected end-tag\n");
+			return B_BAD_DATA;
+		}
+	}
 
 	return B_OK;
 }
@@ -1537,55 +1397,55 @@ PackageReaderImpl::_ParsePackageResolvableExpression(
 	BPackageResolvableExpressionData& _resolvableExpression,
 	const char* resolvableName, bool hasChildren)
 {
-//	_resolvableExpression.name = resolvableName;
-//	_resolvableExpression.haveOpAndVersion = false;
-//
-//	// there may be an operator and a version added as child
-//	if (hasChildren) {
-//		// resolvable-expression operator
-//		uint8 id;
-//		AttributeValue value;
-//		status_t error = _ReadPackageAttribute(id, value);
-//		if (error != B_OK)
-//			return error;
-//		if (id != B_HPKG_ATTRIBUTE_ID_PACKAGE_RESOLVABLE_OPERATOR) {
-//			fErrorOutput->PrintError("Error: Invalid package attribute section:"
-//				" Invalid package resolvable expression, expected operator\n");
-//			return B_BAD_DATA;
-//		}
-//
-//		if (value.unsignedInt >= B_PACKAGE_RESOLVABLE_OP_ENUM_COUNT) {
-//			fErrorOutput->PrintError("Error: Invalid package attribute section:"
-//				" Invalid package resolvable operator %lld encountered\n",
-//				value.unsignedInt);
-//			return B_BAD_DATA;
-//		}
-//
-//		_resolvableExpression.op
-//			= (BPackageResolvableOperator)value.unsignedInt;
-//
-//		error = _ParsePackageVersion(_resolvableExpression.version);
-//		if (error != B_OK)
-//			return error;
-//
-//		_resolvableExpression.haveOpAndVersion = true;
-//
-//		uint64 tag;
-//		if ((error = _ReadUnsignedLEB128(tag)) != B_OK)
-//			return error;
-//		if (tag != 0) {
-//			fErrorOutput->PrintError("Error: Invalid package attribute section:"
-//				" Invalid package resolvable expression, expected end-tag\n");
-//			return B_BAD_DATA;
-//		}
-//	}
+	_resolvableExpression.name = resolvableName;
+	_resolvableExpression.haveOpAndVersion = false;
+
+	// there may be an operator and a version added as child
+	if (hasChildren) {
+		// resolvable-expression operator
+		uint8 id;
+		AttributeValue value;
+		status_t error = _ReadPackageAttribute(id, value);
+		if (error != B_OK)
+			return error;
+		if (id != HPKG_PACKAGE_ATTRIBUTE_RESOLVABLE_OPERATOR) {
+			fErrorOutput->PrintError("Error: Invalid package attribute section:"
+				" Invalid package resolvable expression, expected operator\n");
+			return B_BAD_DATA;
+		}
+
+		if (value.unsignedInt >= B_PACKAGE_RESOLVABLE_OP_ENUM_COUNT) {
+			fErrorOutput->PrintError("Error: Invalid package attribute section:"
+				" Invalid package resolvable operator %lld encountered\n",
+				value.unsignedInt);
+			return B_BAD_DATA;
+		}
+
+		_resolvableExpression.op
+			= (BPackageResolvableOperator)value.unsignedInt;
+
+		error = _ParsePackageVersion(_resolvableExpression.version);
+		if (error != B_OK)
+			return error;
+
+		_resolvableExpression.haveOpAndVersion = true;
+
+		uint64 tag;
+		if ((error = _ReadUnsignedLEB128(tag)) != B_OK)
+			return error;
+		if (tag != 0) {
+			fErrorOutput->PrintError("Error: Invalid package attribute section:"
+				" Invalid package resolvable expression, expected end-tag\n");
+			return B_BAD_DATA;
+		}
+	}
 
 	return B_OK;
 }
 
 
 status_t
-PackageReaderImpl::_ReadAttribute(uint8& _id, AttributeValue& _value,
+PackageReaderImpl::_ReadPackageAttribute(uint8& _id, AttributeValue& _value,
 	bool* _hasChildren, uint64* _tag)
 {
 	uint64 tag;
@@ -1595,29 +1455,29 @@ PackageReaderImpl::_ReadAttribute(uint8& _id, AttributeValue& _value,
 
 	if (tag != 0) {
 		// get the type
-		uint16 type = HPKG_ATTRIBUTE_TAG_TYPE(tag);
+		uint16 type = HPKG_PACKAGE_ATTRIBUTE_TAG_TYPE(tag);
 		if (type >= B_HPKG_ATTRIBUTE_TYPE_ENUM_COUNT) {
-			fErrorOutput->PrintError("Error: Invalid %s section: attribute "
-				"type %d not supported!\n", fCurrentSection->name, type);
+			fErrorOutput->PrintError("Error: Invalid package attribute "
+				"section: attribute type %d not supported!\n", type);
 			return B_BAD_DATA;
 		}
 
 		// get the value
-		error = _ReadAttributeValue(type, HPKG_ATTRIBUTE_TAG_ENCODING(tag),
-			_value);
+		error = _ReadAttributeValue(type,
+			HPKG_PACKAGE_ATTRIBUTE_TAG_ENCODING(tag), _value);
 		if (error != B_OK)
 			return error;
 
-		_id = HPKG_ATTRIBUTE_TAG_ID(tag);
-		if (_id >= B_HPKG_ATTRIBUTE_ID_ENUM_COUNT) {
-			fErrorOutput->PrintError("Error: Invalid %s section: "
-				"attribute id %d not supported!\n", fCurrentSection->name, _id);
+		_id = HPKG_PACKAGE_ATTRIBUTE_TAG_ID(tag);
+		if (_id >= HPKG_PACKAGE_ATTRIBUTE_ENUM_COUNT) {
+			fErrorOutput->PrintError("Error: Invalid package attribute section: "
+				"attribute id %d not supported!\n", _id);
 			return B_BAD_DATA;
 		}
 	}
 
 	if (_hasChildren != NULL)
-		*_hasChildren = HPKG_ATTRIBUTE_TAG_HAS_CHILDREN(tag);
+		*_hasChildren = HPKG_PACKAGE_ATTRIBUTE_TAG_HAS_CHILDREN(tag);
 	if (_tag != NULL)
 		*_tag = tag;
 
@@ -1919,6 +1779,21 @@ PackageReaderImpl::_ReadCompressedBuffer(const SectionInfo& section)
 		default:
 			return B_BAD_DATA;
 	}
+}
+
+
+/*static*/ int8
+PackageReaderImpl::_GetStandardIndex(const AttributeType* type)
+{
+	// TODO: Building a hash table once would make the loopup faster.
+	for (int32 i = 0; kStandardAttributeIndices[i].name != NULL; i++) {
+		if (type->type == kStandardAttributeIndices[i].type
+			&& strcmp(kStandardAttributeIndices[i].name, type->name) == 0) {
+			return i;
+		}
+	}
+
+	return -1;
 }
 
 

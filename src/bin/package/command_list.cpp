@@ -111,7 +111,7 @@ struct PackageContentListHandler : BPackageContentHandler {
 	virtual status_t HandlePackageAttribute(
 		const BPackageInfoAttributeValue& value)
 	{
-		switch (value.attributeIndex) {
+		switch (value.attributeID) {
 			case B_PACKAGE_INFO_NAME:
 				printf("package-attributes:\n");
 				printf("\tname: %s\n", value.string);
@@ -218,16 +218,10 @@ struct PackageContentListHandler : BPackageContentHandler {
 			default:
 				printf(
 					"*** Invalid package attribute section: unexpected "
-					"package attribute index %d encountered\n",
-					value.attributeIndex);
+					"package attribute id %d encountered\n", value.attributeID);
 				return B_BAD_DATA;
 		}
 
-		return B_OK;
-	}
-
-	virtual status_t HandlePackageAttributesDone()
-	{
 		return B_OK;
 	}
 
@@ -308,14 +302,12 @@ command_list(int argc, const char* const* argv)
 	StandardErrorOutput errorOutput;
 	BPackageReader packageReader(&errorOutput);
 	status_t error = packageReader.Init(packageFileName);
-printf("Init(): %s\n", strerror(error));
 	if (error != B_OK)
 		return 1;
 
 	// list
 	PackageContentListHandler handler(listAttributes);
 	error = packageReader.ParseContent(&handler);
-printf("ParseContent(): %s\n", strerror(error));
 	if (error != B_OK)
 		return 1;
 

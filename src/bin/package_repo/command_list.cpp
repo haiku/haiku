@@ -26,7 +26,7 @@
 using namespace BPackageKit::BHPKG;
 using namespace BPackageKit;
 
-
+/*
 struct PackageContentListHandler : BPackageContentHandler {
 	PackageContentListHandler(bool listAttributes)
 		:
@@ -265,7 +265,7 @@ private:
 	int		fLevel;
 	bool	fListAttribute;
 };
-
+*/
 
 int
 command_list(int argc, const char* const* argv)
@@ -305,19 +305,17 @@ command_list(int argc, const char* const* argv)
 	const char* packageFileName = argv[optind++];
 
 	// open package
-	StandardErrorOutput errorOutput;
-	BPackageReader packageReader(&errorOutput);
-	status_t error = packageReader.Init(packageFileName);
-printf("Init(): %s\n", strerror(error));
-	if (error != B_OK)
-		return 1;
+//	StandardErrorOutput errorOutput;
+//	BPackageReader packageReader(&errorOutput);
+//	status_t error = packageReader.Init(packageFileName);
+//	if (error != B_OK)
+//		return 1;
 
 	// list
-	PackageContentListHandler handler(listAttributes);
-	error = packageReader.ParseContent(&handler);
-printf("ParseContent(): %s\n", strerror(error));
-	if (error != B_OK)
-		return 1;
+//	PackageContentListHandler handler(listAttributes);
+//	error = packageReader.ParseContent(&handler);
+//	if (error != B_OK)
+//		return 1;
 
 	return 0;
 }

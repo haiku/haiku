@@ -51,39 +51,49 @@ struct BPackageInfoAttributeValue {
 				BPackageResolvableData resolvable;
 				BPackageResolvableExpressionData resolvableExpression;
 			};
-			uint8				attributeIndex;
+			BPackageInfoAttributeID	attributeID;
 
 public:
-	inline						BPackageInfoAttributeValue();
+								BPackageInfoAttributeValue();
 
-	inline	void				SetTo(BPackageInfoAttributeIndex index,
+			void				SetTo(BPackageInfoAttributeID id,
 									uint8 value);
-	inline	void				SetTo(BPackageInfoAttributeIndex index,
+			void				SetTo(BPackageInfoAttributeID id,
 									const char* value);
+
+			void				Clear();
 };
 
 
+inline
 BPackageInfoAttributeValue::BPackageInfoAttributeValue()
-	:
-	attributeIndex(B_PACKAGE_INFO_ENUM_COUNT)
 {
+	Clear();
 }
 
 
-void
-BPackageInfoAttributeValue::SetTo(BPackageInfoAttributeIndex index, uint8 value)
+inline void
+BPackageInfoAttributeValue::SetTo(BPackageInfoAttributeID id, uint8 value)
 {
-	attributeIndex = index;
+	attributeID = id;
 	unsignedInt = value;
 }
 
 
-void
-BPackageInfoAttributeValue::SetTo(BPackageInfoAttributeIndex index,
+inline void
+BPackageInfoAttributeValue::SetTo(BPackageInfoAttributeID id,
 	const char* value)
 {
-	attributeIndex = index;
+	attributeID = id;
 	string = value;
+}
+
+
+inline void
+BPackageInfoAttributeValue::Clear()
+{
+	memset(this, 0, sizeof(BPackageInfoAttributeValue));
+	attributeID = B_PACKAGE_INFO_ENUM_COUNT;
 }
 
 

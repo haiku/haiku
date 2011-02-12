@@ -18,6 +18,8 @@ namespace BPackageKit {
 
 
 BPackageVersion::BPackageVersion()
+	:
+	fRelease(0)
 {
 }
 

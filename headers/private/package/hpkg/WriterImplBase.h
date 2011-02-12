@@ -8,7 +8,7 @@
 
 #include <util/DoublyLinkedList.h>
 
-#include <package/hpkg/haiku_package.h>
+#include <package/hpkg/HPKGDefsPrivate.h>
 
 #include <package/hpkg/DataOutput.h>
 #include <package/hpkg/Strings.h>
@@ -79,10 +79,10 @@ protected:
 			struct PackageAttribute :
 					public DoublyLinkedListLinkImpl<PackageAttribute>,
 					public AttributeValue {
-				HPKGPackageAttributeID 				id;
+				BHPKGAttributeID 					id;
 				DoublyLinkedList<PackageAttribute>	children;
 
-				PackageAttribute(HPKGPackageAttributeID id_, uint8 type,
+				PackageAttribute(BHPKGAttributeID id_, uint8 type,
 					uint8 encoding);
 				~PackageAttribute();
 

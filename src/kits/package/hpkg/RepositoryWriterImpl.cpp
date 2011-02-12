@@ -14,7 +14,7 @@
 #include <Message.h>
 #include <Path.h>
 
-#include <package/hpkg/haiku_package.h>
+#include <package/hpkg/HPKGDefsPrivate.h>
 #include <package/hpkg/PackageInfoAttributeValue.h>
 #include <package/hpkg/PackageReader.h>
 #include <package/ChecksumAccessors.h>
@@ -122,7 +122,7 @@ status_t
 RepositoryWriterImpl::HandlePackageAttribute(
 	const BPackageInfoAttributeValue& value)
 {
-	switch (value.attributeIndex) {
+	switch (value.attributeID) {
 		case B_PACKAGE_INFO_NAME:
 			fPackageInfo.SetName(value.string);
 			break;
@@ -191,7 +191,7 @@ RepositoryWriterImpl::HandlePackageAttribute(
 		default:
 			fListener->PrintError(
 				"Invalid package attribute section: unexpected package "
-				"attribute index %d encountered\n", value.attributeIndex);
+				"attribute id %d encountered\n", value.attributeID);
 			return B_BAD_DATA;
 	}
 

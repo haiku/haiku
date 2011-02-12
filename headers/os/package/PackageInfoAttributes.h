@@ -9,7 +9,7 @@
 namespace BPackageKit {
 
 
-enum BPackageInfoAttributeIndex {
+enum BPackageInfoAttributeID {
 	B_PACKAGE_INFO_NAME = 0,
 	B_PACKAGE_INFO_SUMMARY,		// single line
 	B_PACKAGE_INFO_DESCRIPTION,	// multiple lines possible

@@ -8,6 +8,8 @@
 
 #include <SupportDefs.h>
 
+#include <package/hpkg/HPKGDefs.h>
+
 
 namespace BPackageKit {
 
@@ -24,14 +26,18 @@ class BLowLevelPackageContentHandler {
 public:
 	virtual						~BLowLevelPackageContentHandler();
 
-	virtual	status_t			HandleAttribute(const char* attributeName,
+	virtual	status_t			HandleAttribute(BHPKGAttributeID attributeID,
 									const BPackageAttributeValue& value,
 									void* parentToken, void*& _token) = 0;
-	virtual	status_t			HandleAttributeDone(const char* attributeName,
+	virtual	status_t			HandleAttributeDone(
+									BHPKGAttributeID attributeID,
 									const BPackageAttributeValue& value,
 									void* token) = 0;
 
 	virtual	void				HandleErrorOccurred() = 0;
+
+protected:
+	static	const char*			AttributeNameForID(uint8 id);
 };
 
 
@@ -47,7 +53,6 @@ public:
 	virtual	status_t			HandlePackageAttribute(
 									const BPackageInfoAttributeValue& value
 									) = 0;
-	virtual	status_t			HandlePackageAttributesDone() = 0;
 
 	virtual	void				HandleErrorOccurred() = 0;
 };

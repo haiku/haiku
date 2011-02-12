@@ -1,10 +1,9 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>
  * Distributed under the terms of the MIT License.
  */
-#ifndef _PACKAGE__HPKG__PRIVATE__PACKAGE_READER_IMPL_H_
-#define _PACKAGE__HPKG__PRIVATE__PACKAGE_READER_IMPL_H_
+#ifndef _PACKAGE__HPKG__PRIVATE__REPOSITORY_READER_IMPL_H_
+#define _PACKAGE__HPKG__PRIVATE__REPOSITORY_READER_IMPL_H_
 
 
 #include <SupportDefs.h>
@@ -46,18 +45,16 @@ public:
 			int					PackageFileFD()	{ return fFD; }
 
 private:
+			struct AttributeType;
+			struct AttributeTypeReference;
 			struct AttributeHandlerContext;
 			struct AttributeHandler;
 			struct IgnoreAttributeHandler;
 			struct DataAttributeHandler;
 			struct AttributeAttributeHandler;
 			struct EntryAttributeHandler;
-			struct PackageAttributeHandler;
-			struct PackageVersionAttributeHandler;
-			struct PackageResolvableAttributeHandler;
-			struct PackageResolvableExpressionAttributeHandler;
 			struct RootAttributeHandler;
-			struct LowLevelAttributeHandler;
+			struct PackageAttributeHandler;
 			struct PackageContentListHandler;
 
 			struct SectionInfo {
@@ -96,6 +93,8 @@ private:
 			const char*			_CheckCompression(
 									const SectionInfo& section) const;
 
+			status_t			_ParseTOCAttributeTypes();
+
 			status_t			_ParseStrings();
 
 			status_t			_ParseContent(AttributeHandlerContext* context,
@@ -117,7 +116,7 @@ private:
 									const char* resolvableName,
 									bool hasChildren);
 
-			status_t			_ReadAttribute(uint8& _id,
+			status_t			_ReadPackageAttribute(uint8& _id,
 									AttributeValue& _value,
 									bool* _hasChildren = NULL,
 									uint64* _tag = NULL);
@@ -141,6 +140,8 @@ private:
 			status_t			_ReadCompressedBuffer(
 									const SectionInfo& section);
 
+	static	int8				_GetStandardIndex(const AttributeType* type);
+
 	inline	AttributeHandler*	_CurrentAttributeHandler() const;
 	inline	void				_PushAttributeHandler(
 									AttributeHandler* handler);
@@ -155,9 +156,14 @@ private:
 			uint64				fHeapOffset;
 			uint64				fHeapSize;
 
+			uint64				fTOCAttributeTypesLength;
+			uint64				fTOCAttributeTypesCount;
+
 			SectionInfo			fTOCSection;
 			SectionInfo			fPackageAttributesSection;
 			SectionInfo*		fCurrentSection;
+
+			AttributeTypeReference* fAttributeTypes;
 
 			AttributeHandlerList* fAttributeHandlerStack;
 
@@ -181,4 +187,4 @@ PackageReaderImpl::_Read(Type& _value)
 }	// namespace BPackageKit
 
 
-#endif	// _PACKAGE__HPKG__PRIVATE__PACKAGE_READER_IMPL_H_
+#endif	// _PACKAGE__HPKG__PRIVATE__REPOSITORY_READER_IMPL_H_

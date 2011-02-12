@@ -34,13 +34,13 @@ struct PackageContentDumpHandler : BLowLevelPackageContentHandler {
 	{
 	}
 
-	virtual status_t HandleAttribute(const char* attributeName,
+	virtual status_t HandleAttribute(BHPKGAttributeID attributeID,
 		const BPackageAttributeValue& value, void* parentToken, void*& _token)
 	{
 		if (fErrorOccurred)
 			return B_OK;
 
-		printf("%*s>%s: ", fLevel * 2, "", attributeName);
+		printf("%*s>%s: ", fLevel * 2, "", AttributeNameForID(attributeID));
 		_PrintValue(value);
 		printf("\n");
 
@@ -49,7 +49,7 @@ struct PackageContentDumpHandler : BLowLevelPackageContentHandler {
 		return B_OK;
 	}
 
-	virtual status_t HandleAttributeDone(const char* attributeName,
+	virtual status_t HandleAttributeDone(BHPKGAttributeID attributeID,
 		const BPackageAttributeValue& value, void* token)
 	{
 		if (fErrorOccurred)
@@ -58,7 +58,7 @@ struct PackageContentDumpHandler : BLowLevelPackageContentHandler {
 		fLevel--;
 
 		if (fHasChildren)
-			printf("%*s<%s\n", fLevel * 2, "", attributeName);
+			printf("%*s<%s\n", fLevel * 2, "", AttributeNameForID(attributeID));
 
 		fHasChildren = true;
 		return B_OK;
@@ -144,14 +144,12 @@ command_dump(int argc, const char* const* argv)
 	StandardErrorOutput errorOutput;
 	BPackageReader packageReader(&errorOutput);
 	status_t error = packageReader.Init(packageFileName);
-printf("Init(): %s\n", strerror(error));
 	if (error != B_OK)
 		return 1;
 
 	// list
 	PackageContentDumpHandler handler;
 	error = packageReader.ParseContent(&handler);
-printf("ParseContent(): %s\n", strerror(error));
 	if (error != B_OK)
 		return 1;
 
