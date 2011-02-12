@@ -103,20 +103,6 @@ private:
 			status_t			_ParseAttributeTree(
 									AttributeHandlerContext* context);
 
-			status_t			_ParsePackageAttributes(
-									AttributeHandlerContext* context);
-			status_t			_ParsePackageVersion(
-									BPackageVersionData& _version,
-									const char* major = NULL);
-			status_t			_ParsePackageProvides(
-									BPackageResolvableData& _resolvable,
-									BPackageResolvableType providesType);
-			status_t			_ParsePackageResolvableExpression(
-									BPackageResolvableExpressionData&
-										_resolvableExpression,
-									const char* resolvableName,
-									bool hasChildren);
-
 			status_t			_ReadAttribute(uint8& _id,
 									AttributeValue& _value,
 									bool* _hasChildren = NULL,
