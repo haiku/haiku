@@ -23,6 +23,7 @@
 #include <fs_index.h>
 #include <Locale.h>
 #include <Path.h>
+#include <Roster.h>
 #include <Screen.h>
 #include <Volume.h>
 #include <VolumeRoster.h>
@@ -236,6 +237,26 @@ TPeopleApp::MessageReceived(BMessage* message)
 			if (fWindowCount < 1)
 				PostMessage(B_QUIT_REQUESTED);
 			break;
+
+		case M_CONFIGURE_ATTRIBUTES:
+		{
+			const char* arguments[] = { "-type", B_PERSON_MIMETYPE, 0 };
+			status_t ret = be_roster->Launch(
+				"application/x-vnd.Haiku-FileTypes",
+				sizeof(arguments) / sizeof(const char*) - 1,
+				const_cast<char**>(arguments));
+			if (ret != B_OK && ret != B_ALREADY_RUNNING) {
+				BString errorMsg(B_TRANSLATE("Launching the FileTypes "
+					"preflet to configure Person attributes has failed."
+					"\n\nError: "));
+				errorMsg << strerror(ret);
+				BAlert* alert = new BAlert(B_TRANSLATE("Error"),
+					errorMsg.String(), B_TRANSLATE("OK"), NULL, NULL,
+					B_WIDTH_AS_USUAL, B_STOP_ALERT);
+				alert->Go(NULL);
+			}
+			break;
+		}
 
 		default:
 			BApplication::MessageReceived(message);

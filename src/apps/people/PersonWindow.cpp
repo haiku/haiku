@@ -92,6 +92,10 @@ PersonWindow::PersonWindow(BRect frame, const char* title,
 	BMenuItem* selectAllItem = new BMenuItem(B_TRANSLATE("Select all"),
 		new BMessage(M_SELECT), 'A');
 	menu->AddItem(selectAllItem);
+	menu->AddSeparatorItem();
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Configure attributes"), 
+		new BMessage(M_CONFIGURE_ATTRIBUTES), 'F'));
+	item->SetTarget(be_app);
 	menuBar->AddItem(menu);
 
 	if (ref != NULL) {

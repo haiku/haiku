@@ -25,9 +25,10 @@
 class BFile;
 
 enum {
-	M_NEW			= 'newp',
-	M_SAVE_AS		= 'svas',
-	M_WINDOW_QUITS	= 'wndq'
+	M_NEW					= 'newp',
+	M_SAVE_AS				= 'svas',
+	M_WINDOW_QUITS			= 'wndq',
+	M_CONFIGURE_ATTRIBUTES	= 'catr'
 };
 
 class PersonWindow;
