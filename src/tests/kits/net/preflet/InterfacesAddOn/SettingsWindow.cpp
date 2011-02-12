@@ -8,6 +8,7 @@
 
 
 #include "SettingsWindow.h"
+#include "SettingsIfView.h"
 
 #include <Application.h>
 
@@ -18,8 +19,8 @@
 SettingsWindow::SettingsWindow(NetworkSettings* settings)
 	: BWindow(BRect(50, 50, 400, 302), "Interface Settings",
 		B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
-		B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE
-		| B_AUTO_UPDATE_SIZE_LIMITS, B_CURRENT_WORKSPACE)
+		B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE,
+		B_CURRENT_WORKSPACE)
 {
 	fNetworkSettings = settings;
 
@@ -69,12 +70,11 @@ SettingsWindow::MessageReceived(BMessage* message)
 status_t
 SettingsWindow::_PopulateTabs()
 {
-	// TODO : Temporary, just to get example data
 	BRect frame = fTabView->Bounds();
-	BView* view4 = new BView(frame, "net_settings_ipv4",
-		B_FOLLOW_ALL_SIDES, B_WILL_DRAW);
-	BView* view6 = new BView(frame, "net_settings_ipv6",
-		B_FOLLOW_ALL_SIDES, B_WILL_DRAW);
+	BView* view4 = new SettingsIfView(frame, "net_settings_ipv4",
+		AF_INET, fNetworkSettings);
+	BView* view6 = new SettingsIfView(frame, "net_settings_ipv6",
+		AF_INET6, fNetworkSettings);
 
 	BTab* tab4 = new BTab;
 	BTab* tab6 = new BTab;
