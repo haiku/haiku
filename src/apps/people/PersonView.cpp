@@ -41,6 +41,7 @@ PersonView::PersonView(const char* name, const char* categoryAttribute,
 		const entry_ref *ref)
 	:
 	BGridView(),
+	fGroups(NULL),
 	fControls(20, false),
 	fCategoryAttribute(categoryAttribute)
 {
@@ -142,6 +143,9 @@ PersonView::MessageReceived(BMessage* msg)
 void
 PersonView::BuildGroupMenu()
 {
+	if (fGroups == NULL)
+		return;
+
 	BMenuItem* item;
 	while ((item = fGroups->ItemAt(0)) != NULL) {
 		fGroups->RemoveItem(item);
