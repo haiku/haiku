@@ -12,7 +12,6 @@
 #include <Catalog.h>
 #include <CheckBox.h>
 #include <GroupLayoutBuilder.h>
-#include <Locale.h>
 #include <SpaceLayoutItem.h>
 #include <StringView.h>
 

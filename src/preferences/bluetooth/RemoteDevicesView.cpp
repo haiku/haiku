@@ -6,7 +6,6 @@
 
 #include <Alert.h>
 #include <Catalog.h>
-#include <Locale.h>
 #include <Messenger.h>
 
 #include <Directory.h>

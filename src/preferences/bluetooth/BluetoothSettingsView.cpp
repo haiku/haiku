@@ -11,7 +11,6 @@
 #include <Catalog.h>
 #include <GridLayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
-#include <Locale.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <PopUpMenu.h>
@@ -156,35 +155,40 @@ BluetoothSettingsView::MessageReceived(BMessage* message)
 		case kMsgSetDeviceClassDesktop:
 		{
 			devClass.SetRecord(1, 1, 0x72);
-			ActiveLocalDevice->SetDeviceClass(devClass);
+			if (ActiveLocalDevice != NULL)
+				ActiveLocalDevice->SetDeviceClass(devClass);
 			break;
 		}
 
 		case kMsgSetDeviceClassServer:
 		{
 			devClass.SetRecord(1, 2, 0x72);
-			ActiveLocalDevice->SetDeviceClass(devClass);
+			if (ActiveLocalDevice != NULL)
+				ActiveLocalDevice->SetDeviceClass(devClass);
 			break;
 		}
 
 		case kMsgSetDeviceClassLaptop:
 		{
 			devClass.SetRecord(1, 3, 0x72);
-			ActiveLocalDevice->SetDeviceClass(devClass);
+			if (ActiveLocalDevice != NULL)
+				ActiveLocalDevice->SetDeviceClass(devClass);
 			break;
 		}
 
 		case kMsgSetDeviceClassHandheld:
 		{
 			devClass.SetRecord(1, 4, 0x72);
-			ActiveLocalDevice->SetDeviceClass(devClass);
+			if (ActiveLocalDevice != NULL)
+				ActiveLocalDevice->SetDeviceClass(devClass);
 			break;
 		}
 
 		case kMsgSetDeviceClassSmartPhone:
 		{
 			devClass.SetRecord(2, 3, 0x72);
-			ActiveLocalDevice->SetDeviceClass(devClass);
+			if (ActiveLocalDevice != NULL)
+				ActiveLocalDevice->SetDeviceClass(devClass);
 			break;
 		}
 

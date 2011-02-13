@@ -6,7 +6,6 @@
 
 #include <Alert.h>
 #include <Catalog.h>
-#include <Locale.h>
 #include <MessageRunner.h>
 #include <Roster.h>
 
@@ -30,9 +29,11 @@ BluetoothApplication::ReadyToRun()
 	if (!be_roster->IsRunning(BLUETOOTH_SIGNATURE)) {
 
 		int32 choice = (new BAlert("bluetooth_server not running",
-			"bluetooth_server has not been found running on the system."
-			"Should be started, or stay offline", "Work offline",
-			"Quit", "Start please", B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+			B_TRANSLATE("bluetooth_server has not been found running on the "
+			"system. Should be started, or stay offline"),
+			B_TRANSLATE("Work offline"), B_TRANSLATE("Quit"),
+			B_TRANSLATE("Start please"), B_WIDTH_AS_USUAL,
+			B_WARNING_ALERT))->Go();
 
 
 		switch (choice) {

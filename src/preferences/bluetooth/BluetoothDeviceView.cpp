@@ -149,21 +149,22 @@ BluetoothDeviceView::SetBluetoothDevice(BluetoothDevice* bDevice)
 
 		string = "";
 		if (bDevice->GetProperty("manufacturer", &value) == B_OK)
-			string << "Manufacturer: " << BluetoothManufacturer(value);
+			string << B_TRANSLATE("Manufacturer: ")
+			   	<< BluetoothManufacturer(value);
 		fManufacturerProperties->SetText(string.String());
 
 		string = "";
 		if (bDevice->GetProperty("acl_mtu", &value) == B_OK)
 			string << "ACL mtu: " << value;
 		if (bDevice->GetProperty("acl_max_pkt", &value) == B_OK)
-			string << " packets: " << value;
+			string << B_TRANSLATE(" packets: ") << value;
 		fACLBuffersProperties->SetText(string.String());
 
 		string = "";
 		if (bDevice->GetProperty("sco_mtu", &value) == B_OK)
 			string << "SCO mtu: " << value;
 		if (bDevice->GetProperty("sco_max_pkt", &value) == B_OK)
-			string << " packets: " << value;
+			string << B_TRANSLATE(" packets: ") << value;
 		fSCOBuffersProperties->SetText(string.String());
 
 	}

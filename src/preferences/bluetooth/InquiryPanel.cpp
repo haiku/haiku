@@ -7,7 +7,6 @@
 #include <Button.h>
 #include <Catalog.h>
 #include <GroupLayoutBuilder.h>
-#include <Locale.h>
 #include <ListView.h>
 #include <ListItem.h>
 #include <MessageRunner.h>
@@ -94,7 +93,7 @@ private:
 
 InquiryPanel::InquiryPanel(BRect frame, LocalDevice* lDevice)
 	:
-	BWindow(frame, "Bluetooth", B_FLOATING_WINDOW,
+	BWindow(frame, B_TRANSLATE("Bluetooth"), B_FLOATING_WINDOW,
 	B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS,	B_ALL_WORKSPACES ),
 	fMessenger(this),
  	fScanning(false),
@@ -252,13 +251,15 @@ InquiryPanel::MessageReceived(BMessage* message)
 		case kMsgSecond:
 			if (fScanning && scanningTime < timer) {
 				// TODO time formatting could use Locale Kit
-				BString elapsedTime = B_TRANSLATE("Remaining ");
 
 				// TODO should not be needed if SetMaxValue works...
 				fScanProgress->SetTo(scanningTime * 100 / timer);
+				BString elapsedTime = B_TRANSLATE("Remaining %1 seconds");
 
-				elapsedTime << (int)(timer - scanningTime) <<
-					B_TRANSLATE(" seconds");
+				BString seconds("");
+				seconds << (int)(timer - scanningTime);
+
+				elapsedTime.ReplaceFirst("%1", seconds.String()); 
 				fScanProgress->SetTrailingText(elapsedTime.String());
 
 				scanningTime = scanningTime + 1;
@@ -274,11 +275,13 @@ InquiryPanel::MessageReceived(BMessage* message)
 					if (!labelPlaced) {
 
 						labelPlaced = true;
-						BString progressText =
-							B_TRANSLATE("Retrieving name of ");
-						progressText << bdaddrUtils::ToString(fDiscoveryAgent
+						BString progressText(B_TRANSLATE("Retrieving name of %1"));
+							
+						BString namestr;						
+						namestr << bdaddrUtils::ToString(fDiscoveryAgent
 							->RetrieveDevices(0).ItemAt(retrievalIndex)
 							->GetBluetoothAddress());
+						progressText.ReplaceFirst("%1", namestr.String());
 						fScanProgress->SetTrailingText(progressText.String());
 
 					} else {

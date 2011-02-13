@@ -8,7 +8,6 @@
 #include <Button.h>
 #include <Catalog.h>
 #include <GroupLayoutBuilder.h>
-#include <Locale.h>
 #include <Messenger.h>
 #include <SpaceLayoutItem.h>
 #include <TabView.h>
