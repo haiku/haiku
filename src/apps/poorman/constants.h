@@ -71,7 +71,6 @@ extern const char* STR_TXT_VIEW;
 // Preferences Window
 extern		 char* STR_WIN_NAME_PREF;
 extern const char* STR_SETTINGS_FILE_NAME;
-extern const char* STR_SETTINGS_NEW_FILE_NAME;
 extern const char* STR_DEFAULT_WEB_DIRECTORY;
 
 extern const char* STR_TAB_SITE;

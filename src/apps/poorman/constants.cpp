@@ -73,8 +73,6 @@ char* STR_WIN_NAME_PREF
 
 const char* STR_SETTINGS_FILE_NAME
 	= "PoorMan settings";
-const char* STR_SETTINGS_NEW_FILE_NAME
-	= B_TRANSLATE("OBOS PoorMan settings");
 const char* STR_DEFAULT_WEB_DIRECTORY
 	= "/boot/home/public_html";
 const char* STR_TAB_SITE
