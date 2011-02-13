@@ -195,7 +195,7 @@ ActivityWindow::MessageReceived(BMessage* message)
 				// Just bring the window to front (via scripting)
 				BMessage toFront(B_SET_PROPERTY);
 				toFront.AddSpecifier("Active");
-				toFront.AddSpecifier("Window", "Settings");
+				toFront.AddSpecifier("Window", B_TRANSLATE("Settings"));
 				toFront.AddBool("data", true);
 				fSettingsWindow.SendMessage(&toFront);
 			} else {
