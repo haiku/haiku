@@ -232,11 +232,15 @@ dump_widget_amplifier_capabilities(hda_widget& widget, bool input)
 static void
 dump_widget_pm_support(hda_widget& widget)
 {
-	TRACE("\tSupported power states: %s%s%s%s\n",
+	TRACE("\tSupported power states: %s%s%s%s%s%s%s%s\n",
 		widget.pm & POWER_STATE_D0 ? "D0 " : "",
 		widget.pm & POWER_STATE_D1 ? "D1 " : "",
 		widget.pm & POWER_STATE_D2 ? "D2 " : "",
-		widget.pm & POWER_STATE_D3 ? "D3 " : "");
+		widget.pm & POWER_STATE_D3 ? "D3 " : "",
+		widget.pm & POWER_STATE_D3COLD ? "D3COLD " : "",
+		widget.pm & POWER_STATE_S3D3COLD ? "S3D3COLD " : "",
+		widget.pm & POWER_STATE_CLKSTOP ? "CLKSTOP " : "",
+		widget.pm & POWER_STATE_EPSS ? "EPSS " : "");
 }
 
 

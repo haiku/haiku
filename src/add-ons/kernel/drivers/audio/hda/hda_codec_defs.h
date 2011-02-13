@@ -289,6 +289,10 @@ enum pin_dev_type {
 #define POWER_STATE_D1					(1L << 1)
 #define POWER_STATE_D2					(1L << 2)
 #define POWER_STATE_D3					(1L << 3)
+#define POWER_STATE_D3COLD				(1L << 4)
+#define POWER_STATE_S3D3COLD			(1L << 29)
+#define POWER_STATE_CLKSTOP				(1L << 30)
+#define POWER_STATE_EPSS				(1L << 31)
 
 /* Configuration default */
 #define CONF_DEFAULT_SEQUENCE_MASK			0x0000000f
