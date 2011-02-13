@@ -305,13 +305,12 @@ static int handle_non_rfc2047_encoding(char **buffer,size_t *bufferLength,size_t
 		// just to be sure
 		int32 destLength = length * 4 + 1;
 		int32 destBufferLength = destLength;
-		char *dest = (char *)malloc(destLength);
+		char *dest = (char*)malloc(destLength);
 		if (dest == NULL)
 			return 0;
 
-		if (convert_to_utf8(B_ISO1_CONVERSION,string,&length,dest,&destLength,&state) == B_OK)
-		{
-			free(*buffer);
+		if (convert_to_utf8(B_ISO1_CONVERSION, string, &length,dest,
+			&destLength, &state) == B_OK) {
 			*buffer = dest;
 			*bufferLength = destBufferLength;
 			*sourceLength = destLength;
