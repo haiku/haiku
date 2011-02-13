@@ -30,6 +30,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	Bzip					- file archiving utility
 #	CCache					- fast compiler cache
 #	CDRecord				- the command line CD writing tools
+#	Classpath				- GNU Classpath
 #	Clockwerk				- native audio/video compositing
 #	CLucene					- indexed file search
 #	Curl					- a client that groks URLs
@@ -47,6 +48,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	GPerf					- the perfect hash function generator.
 #	Groff					- text formatter used for man pages
 #	ICU-devel				- the headers and lib-links for ICU (for development)
+#	JamVM					- JamVM, a Java Virtual machine
 #	KeymapSwitcher			- Easy to use keymap switcher
 #	LibEvent				- An event notification library
 #	LibIconv				- text encoding conversion library
@@ -399,6 +401,20 @@ if [ IsOptionalHaikuImagePackageAdded CDRecord ] {
 	} else {
 		InstallOptionalHaikuImagePackage cdrtools-3.00-x86-gcc2-2010-08-25-1.zip
 			: $(baseURL)/cdrtools-3.00-x86-gcc2-2010-08-25-1.zip ;
+	}
+}
+
+
+# Classpath
+if [ IsOptionalHaikuImagePackageAdded Classpath ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package Classpath available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		InstallOptionalHaikuImagePackage
+			classpath-0.98-x86-gcc4-2011-02-13.zip
+			: http://jerome.duval.free.fr/obos/classpath-0.98-x86-gcc4-2011-02-13.zip ;
+	} else {
+		Echo "No optional package Classpath available for gcc2" ;
 	}
 }
 
@@ -947,6 +963,21 @@ if [ IsOptionalHaikuImagePackageAdded ICU-devel ] {
 			: /system/lib $(abiVersionedLib) : : true ;
 		AddSymlinkToHaikuHybridImage develop abi $(arch) $(abi) lib
 			: $(abiVersionedLib) : $(lib) ;
+	}
+}
+
+
+# JamVM
+if [ IsOptionalHaikuImagePackageAdded JamVM ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package JamVM available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		InstallOptionalHaikuImagePackage
+			jamvm-1.5.4-x86-gcc4-2011-02-13.zip
+			: http://jerome.duval.free.fr/obos/jamvm-1.5.4-x86-gcc4-2011-02-13.zip ;
+		AddSymlinkToHaikuImage common bin : /boot/common/bin/jamvm : java ;
+	} else {
+		Echo "No optional package JamVM available for gcc2" ;
 	}
 }
 
