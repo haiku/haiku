@@ -76,8 +76,9 @@ MailboxSelectHandler::Command()
 	if (fMailboxName == "")
 		return "";
 
-	BString command = "SELECT ";
+	BString command = "SELECT \"";
 	command += fMailboxName;
+	command += "\"";
 	return command;
 }
 
@@ -773,8 +774,9 @@ SubscribeCommand::SubscribeCommand(const char* mailboxName)
 BString
 SubscribeCommand::Command()
 {
-	BString command = "SUBSCRIBE ";
+	BString command = "SUBSCRIBE \"";
 	command += fMailboxName;
+	command += "\"";
 	return command;
 }
 
@@ -797,8 +799,9 @@ UnsubscribeCommand::UnsubscribeCommand(const char* mailboxName)
 BString
 UnsubscribeCommand::Command()
 {
-	BString command = "UNSUBSCRIBE ";
+	BString command = "UNSUBSCRIBE \"";
 	command += fMailboxName;
+	command += "\"";
 	return command;
 }
 
