@@ -184,6 +184,10 @@ POP3Protocol::SyncMessages()
 
 		entry_ref ref;
 		entry.GetRef(&ref);
+		// the ref becomes invalid after renaming the file thus we already
+		// write the status here
+		MarkMessageAsRead(ref, false);
+
 		int32 size = MessageSize(toRetrieve);
 		if (fFetchBodyLimit < 0 || size <= fFetchBodyLimit) {
 			error = mailIO.Seek(0, SEEK_END);
@@ -205,8 +209,6 @@ POP3Protocol::SyncMessages()
 		}
 
 		file.WriteAttr("MAIL:size", B_INT32_TYPE, 0, &size, sizeof(int32));
-
-		MarkMessageAsRead(ref, false);
 
 		// save manifest in case we get disturbed
 		fManifest += uid;
