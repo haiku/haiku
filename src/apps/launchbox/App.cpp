@@ -54,8 +54,8 @@ App::ReadyToRun()
 		BMessage windowMessage;
 		for (int32 i = 0; settings.FindMessage("window", i, &windowMessage)
 				>= B_OK; i++) {
-			BString name(B_TRANSLATE("Pad "));
-			name << i + 1;
+			BString name(B_TRANSLATE("Pad"));
+			name << " " << i + 1;
 			BMessage* windowSettings = new BMessage(windowMessage);
 			MainWindow* window = new MainWindow(name.String(), frame,
 				windowSettings);
@@ -80,8 +80,8 @@ App::MessageReceived(BMessage* message)
 		case MSG_ADD_WINDOW: {
 			BMessage* settings = new BMessage('sett');
 			bool wasCloned = message->FindMessage("window", settings) == B_OK;
-			BString name(B_TRANSLATE("Pad "));
-			name << CountWindows() + 1;
+			BString name(B_TRANSLATE("Pad"));
+			name << " " << CountWindows() + 1;
 			MainWindow* window = new MainWindow(name.String(),
 				BRect(50.0, 50.0, 65.0, 100.0), settings);
 			if (wasCloned)

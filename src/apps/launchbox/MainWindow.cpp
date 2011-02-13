@@ -142,13 +142,14 @@ MainWindow::MessageReceived(BMessage* message)
 				} else {
 					status_t ret = be_roster->Launch(button->Ref());
 					if (ret < B_OK && ret != B_ALREADY_RUNNING) {
-						errorMessage = B_TRANSLATE("Failed to launch '");
+						BString errStr(B_TRANSLATE("Failed to launch '%1'.\n"
+							"\nError:"));
 						BPath path(button->Ref());
 						if (path.InitCheck() >= B_OK)
-							errorMessage << path.Path();
+							errStr.ReplaceFirst("%1", path.Path());
 						else
-							errorMessage << button->Ref()->name;
-						errorMessage << B_TRANSLATE("'.\n\nError: ");
+							errStr.ReplaceFirst("%1", button->Ref()->name);
+						errorMessage << errStr.String() << " ";
 						errorMessage << strerror(ret);
 					} else
 						launchedByRef = true;
@@ -157,10 +158,10 @@ MainWindow::MessageReceived(BMessage* message)
 			if (!launchedByRef && button->AppSignature()) {
 				status_t ret = be_roster->Launch(button->AppSignature());
 				if (ret != B_OK && ret != B_ALREADY_RUNNING) {
-					errorMessage = B_TRANSLATE("Failed to launch application"
-					" with signature '");
-					errorMessage << button->AppSignature() <<
-						B_TRANSLATE("'.\n\nError: ");
+					BString errStr(B_TRANSLATE("Failed to launch application "
+						"with signature '%2'.\n\nError:"));
+					errStr.ReplaceFirst("%2", button->AppSignature());
+					errorMessage << errStr.String() << " ";
 					errorMessage << strerror(ret);
 				} else {
 					// clear error message on success (might have been
@@ -212,8 +213,8 @@ MainWindow::MessageReceived(BMessage* message)
 					// message comes from pad view
 					entry_ref* ref = button->Ref();
 					if (ref) {
-						BString helper(B_TRANSLATE("Description for '"));
-						helper << ref->name << "'";
+						BString helper(B_TRANSLATE("Description for '%3'"));
+						helper.ReplaceFirst("%3", ref->name);
 						make_sure_frame_is_on_screen(fNamePanelFrame, this);
 						new NamePanel(helper.String(), button->Description(),
 							this, this, new BMessage(*message),
