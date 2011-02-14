@@ -1,4 +1,4 @@
-1	swedish	system	2677153267
+1	swedish	system	2686335505
 %3.2f GiB	StringForSize		%3.2f GiB
 %3.2f KiB	StringForSize		%3.2f KiB
 %d bytes	StringForSize		%d byte
@@ -7,3 +7,13 @@
 Green:	ColorControl		Grön:
 Red:	ColorControl		Röd:
 Blue:	ColorControl		Blå:
+Close	AboutWindow		Stäng
+Written by:	AboutWindow		Skrivet av:
+About…	AboutWindow		Om...
+Copyright © %years% Haiku, Inc.	AboutWindow		Copyright © %years% Haiku, Inc.
+Cut	TextView		Klippa ut
+Copy	TextView		Kopiera
+Paste	TextView		Klistra in
+Redo	TextView		Gör om
+Select All	TextView		Markera alla
+Undo	TextView		Ångra

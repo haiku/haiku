@@ -3,11 +3,11 @@ Control highlight	Colors tab		Framhävd kontroll
 Control border	Colors tab		Kontrollkant
 Antialiasing type:	AntialiasingSettingsView		Kantutjämningstyp:
 Shadow	Colors tab		Skugga
-On	AntialiasingSettingsView		Aktiv
+On	AntialiasingSettingsView		På
 Defaults	APRWindow		Förval
 Grayscale	AntialiasingSettingsView		Gråskala
 Shine	Colors tab		Ljusstyrka
-Off	AntialiasingSettingsView		Inaktiv
+Off	AntialiasingSettingsView		Av
 Success	Colors tab		Framgång
 Inactive window tab text	Colors tab		Fliktext för inaktiva fönster
 Failure	Colors tab		Misslyckande

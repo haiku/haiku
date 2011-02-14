@@ -1,0 +1,48 @@
+1	swedish	x-vnd.Haiku-Devices	1250375801
+Order by:	DevicesView		Sortera efter:
+ACPI controller	Device		ACPI-kontroller
+Memory controller	Device		Minneskontroller
+Docking station	Device		Dockningsstation
+Computer	Device		Dator
+Detailed	DevicesView		Detaljerad
+Properties	PropertyList		Egenskaper
+Category	DevicesView		Kategori
+Quit	DevicesView		Avsluta
+Device paths	Device		Enhetssökväg
+Manufacturer\t\t\t: 	Device		Tillverkare\t\t\t
+Processor	Device		Processor
+ACPI Information	DeviceACPI		ACPI-information
+Device Name\t\t\t\t: 	Device		Enhetsnamn\t\t\t\t:
+Generic system peripheral	Device		Allmänt systemtillbehör
+Display controller	Device		Skärmkontroller
+Mass storage controller	Device		Lagringskontroller
+About Devices…	DevicesView		Om Enheter...
+Input device controller	Device		Indataenhetskontroller
+Device paths\t: 	Device		Enhetssökvägar\t:
+Network controller	Device		Nätverkskontroller
+Devices\n\twritten by Pieter Panman\n\n\tBased on listdev by Jérôme Duval\n\tand the previous Devices preference\n\tby Jérôme Duval and Sikosis\n\tCopyright 2009, Haiku, Inc.\n	DevicesApplication		Enheter\n\tskrivet av Pieter Panman\n\n\tBaserat på listdev av Jérôme Duval\n\toch den tidigare Enhetsegenskaper\n\tav Jérôme Duval och Sikosis\n\tCopyright 2009, Haiku, Inc.\n
+Driver used	Device		Drivrutin använd
+Driver used\t\t\t\t: 	Device		Drivrutin använd\t\t\t\t:
+Bus	DevicesView		Buss
+Communication controller	Device		Kommunikationskontroller
+Basic information	DevicesView		Grundläggande information
+PCI Information	DevicePCI		PCI-information
+Manufacturer:	Device		Tillverkare:
+Multimedia controller	Device		Multimediakontroller
+Device name:	Device		Enhetsnamn:
+Report compatibility	DevicesView		Rapportera kompatibilitet
+about	DevicesApplication		om
+Signal processing controller	Device		Signalbehandlingskontroller
+Serial bus controller	Device		Seriell kontroller
+Wireless controller	Device		Trådlös kontroller
+Device name	Device		Enhetsnamn
+Manufacturer	Device		Tillverkare
+Intelligent controller	Device		Intelligent kontroller
+Satellite communications controller	Device		Satelitkommunikationskontroller
+Bridge	Device		Brygga
+Refresh devices	DevicesView		Uppdatera enhetsvy
+Connection	DevicesView		Anslutning
+Generate system information	DevicesView		Generera systeminformation
+Encryption controller	Device		Krypteringskontroller
+Unclassified device	Device		Oklassificerad enhet
+Devices	DevicesView		Enheter

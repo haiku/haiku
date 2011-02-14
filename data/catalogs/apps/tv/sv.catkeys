@@ -1,0 +1,30 @@
+1	swedish	x-vnd.Haiku.TV	3791845041
+TV	MainWin		TV
+Channel	MainWin		Kanal
+Settings…	MainWin		Inställningar...
+Interface	MainWin		Gränssnitt
+Keep aspect ratio	MainWin		Behåll bildförhållande
+Previous channel	MainWin		Föregående kanal
+Settings	MainWin		Inställningar
+About %1…	MainWin	Parameter %1 is the name of the application.	Om %1...
+No border	MainWin		Ingen kant
+Always on top	MainWin		Alltid överst
+OK	MainWin		OK
+Quit	MainWin		Avsluta
+Full screen	MainWin		Hela skärmen
+\nRevision 	MainWin		\nVersion
+Debug	MainWin		Avlusa
+Scale to native size	MainWin		Skala till ursprungsstorlek
+unknown	MainWin		okänd
+Next channel	MainWin		Nästa kanal
+Error, interface is busy:\n\n	MainWin		Fel, gränsnittet är upptaget:\n\n
+None	MainWin		Ingen
+force 704 x 576, display aspect 4:3	MainWin		påtvinga 704 x 576, bildförhållande 4:3
+DVB - Digital Video Broadcasting TV	MainWin		DVB - Digital Video Broadcasting TV
+force 544 x 576, display aspect 4:3	MainWin		tvinga 544 x 573, bildförhållande 4:3
+pixel aspect ratio	MainWin		pixel bildförhållande
+No menu	MainWin		Ingen meny
+\nBuild 	MainWin		\nBuild
+Error, connecting to interface failed:\n\n	MainWin		Fel, misslyckades att ansluta till gränssnittet:\n\n
+\nVersion 	MainWin		\nVersion
+force 720 x 576, display aspect 4:3	MainWin		tvinga 720 x 576, bildförhållande 4:3

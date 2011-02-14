@@ -1,0 +1,42 @@
+1	swedish	x-vnd.Haiku-Mail	3023422579
+Mail checking	Config Window		Kontrollerar e-post
+Settings	Config Window		Inställningar
+Only when dial-up is connected	Config Window		Endast när uppringd förbindelse är uppkopplad
+While sending and receiving	Config Window		När sändning och mottagning sker
+days	Config Window		dagar
+Start mail services on startup	Config Window		Starta e-posttjänster vid start
+Account name:	Config Views		Kontonamn:
+Accounts	Config Window		Konton
+Revert	Config Window		Återgå
+Remove	Config Window		Ta bort
+Miscellaneous	Config Window		Diverse
+Show connection status window:	Config Window		Visa anslutningsstatusfönster:
+While sending	Config Window		När sändning sker
+Schedule outgoing mail when dial-up is disconnected	Config Window		Schemalägg utgående e-post när uppringning är nerkopplad
+Add	Config Window		Lägg till
+hours	Config Window		timmar
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nGrundinställningarna kunde inte återställas.\n\nEtt fel uppstod när grundinställningarna skulle återställas:\n%s\n
+Real name:	Config Views		Verkligt namn:
+Return address:	Config Views		Svarsadress:
+Edit mailbox menu…	Config Window		Redigera e-postmeny...
+Check every	Config Window		Kontrollera varje
+Account settings	Config Views		Kontoinställningar
+minutes	Config Window		minuter
+Error retrieving general settings: %s\n	Config Window		Misslyckades att hämta grundinställningarna: %s\n
+Apply	Config Window		Verkställ
+never	Config Window		aldrig
+Always	Config Window		Alltid
+\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nSkapa ett nytt konto via Lägg till-knappen.\n\nTa bort ett konto med Ta bort-knappen vid den valda objektet.\n\nVälj ett listobjekt för att ändra dess inställningar.
+OK	Config Window		OK
+Beta	Config Window		Beta
+Alpha	Config Window		Alfa
+Golden master	Config Window		Produktionsversion
+Final	Config Window		Slutgiltig
+Gamma	Config Window		Gamma
+E-mail	Config Window		E-post
+Mail Daemon Replacement\n\nby Haiku, Inc. All rights reserved.\n\nVersion %ld.%ld.%ld %s\n\nSee LICENSE file included in the installation package for more information.\n\n\n\nYou can contact us at:\n%s\n\nPlease submit bug reports using the %s\n\nProject homepage at:\n%s	Config Window		E-postdemonsersättning\n\nav Haiku, Inc. All rights reserved.\n\nVersion %ld.%ld.%ld %s\n\nSe LICENSE-filen för mer information.\n\n\n\nDu kan kontakta oss på:\n%s\n\nEventuella buggar kan rapporteras genom %s\n\nProjekthemsida: \n%s
+Development	Config Window		Utveckling
+Error	Config Window		Fel
+· E-mail filters	Config Window		· E-postfilter
+· Outgoing	Config Window		· Utgående
+· Incoming	Config Window		· Inkommande

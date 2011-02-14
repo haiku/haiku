@@ -1,0 +1,45 @@
+1	swedish	x-vnd.Haiku-Pulse	2756001860
+OK	PrefsWindow		OK
+Quit	DeskbarPulseView		Avsluta
+Pulse	PulseWindow		Puls
+Mini mode	DeskbarPulseView		Komprimerat läge
+Remove replicant	CPUButton		Ta bort replikant
+Active color	ConfigView		Aktiv färg
+Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Hantering: Pulse [--mini] [-w bredd] [--width=bredd]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
+Fade colors	ConfigView		Tona färger
+OK	DeskbarPulseView		OK
+Deskbar mode	PrefsWindow		Deskbar-läge
+Normal mode	PrefsWindow		Normalläge
+Defaults	PrefsWindow		Förinställningar
+Normal mode	MiniPulseView		Normalläge
+Deskbar	CPUButton		Deskbar
+Frame color	ConfigView		Ramfärg
+Mini mode	PrefsWindow		Komprimerat läge
+OK	PulseApp		OK
+Bar colors	ConfigView		Bandfärg
+Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	CPUButton		Puls\n\nAv David Ramsey och Arve Hjønnevåg\nReviderad av Daniel Switkin
+Settings…	PulseView		Inställningar...
+You can't disable the last active CPU.	PulseView		Du kan inte inaktivera den sista aktiva CPUn.
+Info	CPUButton		Information
+OK	PulseView		OK
+Remove(): %s	DeskbarPulseView		Remove(): %s
+Deskbar menu	CPUButton		Deskbar meny
+About Pulse…	PulseView		Om Puls...
+Deskbar mode	MiniPulseView		Deskbar-läge
+Quit	MiniPulseView		Avsluta
+Pulse	NormalPulseView		Puls
+Deskbar mode	NormalPulseView		Deskbar-läge
+Width of icon:	ConfigView		Ikonbredd:
+Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	PulseWindow		Puls\n\nAv David Ramsey och Arve Hjønnevåg\nReviderad av Daniel Switkin
+You can't disable the last active CPU.	CPUButton		Du kan inte inaktivera den sista aktiva CPUn.
+Normal mode	DeskbarPulseView		Normalläge
+OK	CPUButton		OK
+About Pulse…	CPUButton		Om Puls...
+Mini mode	NormalPulseView		Komprimerat läge
+Info	DeskbarPulseView		Information
+Pulse settings	PulseWindow		Pulsinställningar
+Idle color	ConfigView		Overksam färg
+Info	PulseWindow		Information
+Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	DeskbarPulseView		Puls\n\nAv David Ramsey och Arve Hjønnevåg\nReviderad av Daniel Switkin
+OK	PulseWindow		OK
+CPU progress bar	NormalPulseView		CPU progressband

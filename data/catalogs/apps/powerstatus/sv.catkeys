@@ -1,0 +1,50 @@
+1	swedish	x-vnd.Haiku-PowerStatus	1564851502
+Design capacity low warning: 	PowerStatus		Varning för låg tillverkningskapacitet:
+Show percent	PowerStatus		Visa procent
+PowerStatus settings	PowerStatus		Batteristatus
+Design capacity: 	PowerStatus		Tillverkningskapacitet:
+mW	PowerStatus		mW
+about	PowerStatus		om
+Type: 	PowerStatus		Typ:
+non-rechargeable	PowerStatus		Ej uppladdningsbar
+Empty battery slot	PowerStatus		Tomt batterifack
+mV	PowerStatus		mV
+Run in window	PowerStatus		Kör i fönster
+ACPI connect\n	PowerStatus		ACPI anslutning\n
+mWh	PowerStatus		mWh
+Battery info…	PowerStatus		Batteriinformation...
+Show time	PowerStatus		Visa tid
+Last full charge: 	PowerStatus		Senast fulladdad:
+No power interface found.\n	PowerStatus		Batteristöd finns ej.\n
+Battery unused	PowerStatus		Batteri oanvänt
+Extended battery info	PowerStatus		Ytterligare batteriinformation
+try %s\n	PowerStatus		prova %s\n
+mA	PowerStatus		mA
+Current rate: 	PowerStatus		Nuvarande värde:
+discharging	PowerStatus		laddar ur
+Show text label	PowerStatus		Visa textetikett
+About…	PowerStatus		Om...
+Model number: 	PowerStatus		Modellnummer:
+Install in Deskbar	PowerStatus		Installera i Deskbar
+mAh	PowerStatus		mAh
+Capacity: 	PowerStatus		Kapacitet:
+Battery discharging	PowerStatus		Laddar ur batteriet
+Serial number: 	PowerStatus		Serienummer:
+Capacity granularity 1: 	PowerStatus		Kapacitetskornighet 1:
+OK	PowerStatus		OK
+OEM info: 	PowerStatus		OEM information:
+Design voltage: 	PowerStatus		Tillverkningsspänning:
+ACPI driver found\n	PowerStatus		ACPI-drivrutin hittades\n
+PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		Batteristatus\nskrivet av Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
+Battery charging	PowerStatus		Laddar batteri
+Design capacity warning: 	PowerStatus		Varning för låg tillverkningskapacitet:
+Battery info	PowerStatus		Batteriinformation
+Quit	PowerStatus		Avsluta
+rechargeable	PowerStatus		uppladdningsbart
+charging	PowerStatus		laddar
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Du kan köra Batteristatus i ett fönster eller i Deskbar.
+Power status box	PowerStatus		Batteristatus
+Show status icon	PowerStatus		Visa statusikon
+Capacity granularity 2: 	PowerStatus		Kapacitetskornighet 2:
+Technology: 	PowerStatus		Teknologi:
+no battery	PowerStatus		inget batteri

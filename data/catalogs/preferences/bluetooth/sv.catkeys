@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-BluetoothPrefs	3931795142
+1	swedish	x-vnd.Haiku-BluetoothPrefs	912779521
 About Bluetooth…	Window		Om Bluetooth…
 Handheld	Settings view		Handhållen
 Default inquiry time:	Settings view		Förvald frågotid:
@@ -24,11 +24,11 @@ Remove	Remote devices		Ta bort
 Start bluetooth services…	Window		Starta Bluetooth-tjänster…
 Policy...	Settings view		Policy...
 61 secs	Settings view		61 s
-There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Inga LocalDevice funna på systemet
+There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Inga lokala enheter funna på systemet
 Identify us as...	Settings view		Identifiera som...
 Remaining 	Inquiry panel		Återstående
 As blocked	Remote devices		Som blockerad
-Pick LocalDevice...	Settings view		Välj LocalDevice...
+Pick LocalDevice...	Settings view		Välj lokal enhet...
 Defaults	Window		Förval
 Inquiry	Inquiry panel		Förfrågan
 Desktop	Settings view		Skrivbord
@@ -40,7 +40,7 @@ Bluetooth	Window		Bluetooth
 Discoverable	Extended local device view		Synlig
 Service classes: 	Device View		Tjänsteklasser:
 Connections & channels…	Window		Lista över förbindelser och kanaler…
-Refresh LocalDevices…	Window		Uppdatera LocalDevices…
+Refresh LocalDevices…	Window		Uppdatera lokal enhet…
 Settings	Window		Inställningar
 Only from trusted devices	Settings view		Endast från betrodda källor
 Scanning progress	Inquiry panel		Genomsökningsstatus
@@ -49,5 +49,8 @@ Check that the Bluetooth capabilities of your remote device are activated. Press
 Retrieving names...	Inquiry panel		Hämtar namn...
 Help	Window		Hjälp
 Add…	Remote devices		Lägg till…
-Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Haiku Bluetooth system, (ARCE)\n\nSkapad av Oliver Ruiz Dorantes\n\nMed hjälp av:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nSom gav mig all kunskap:\n\t- the yellowTAB team
+Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Haiku Blåtands-system, (ARCE)\n\nSkapad av Oliver Ruiz Dorantes\n\nMed hjälp av:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nSom gav mig all kunskap:\n\t- the yellowTAB team
 Server	Settings view		Server
+OK	main		OK
+Disconnect	Remote devices		Koppla från
+Authenticate	Extended local device view		Autentisera

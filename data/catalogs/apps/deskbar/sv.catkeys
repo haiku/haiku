@@ -1,3 +1,39 @@
-1	swedish	x-vnd.Be-TSKB	1884644663
+1	swedish	x-vnd.Be-TSKB	34208151
 Applications	PreferencesWindow		Applikationer
 Recent applications	BeMenu		Senaste applikationer
+Edit menu…	PreferencesWindow		Redigera meny...
+Recent documents:	PreferencesWindow		Senaste dokument:
+Recent folders	BeMenu		Senaste mappar
+Sort running applications	PreferencesWindow		Sortera aktiva applikationer
+Change time…	TimeView		Ställ in tid...
+<Be folder is empty>	BeMenu		<mappen är tom>
+Window	PreferencesWindow		Fönster
+Menu	PreferencesWindow		Meny
+Show seconds	PreferencesWindow		Visa sekunder
+Always on top	PreferencesWindow		Alltid överst
+Show all	WindowMenu		Visa alla
+No windows	WindowMenu		Saknar fönster
+Power off	BeMenu		Stäng av
+Auto-raise	PreferencesWindow		Höj fönstret vid närkontakt
+Hide time	TimeView		Göm tiden
+Recent folders:	PreferencesWindow		Senaste mappar:
+Deskbar preferences…	BeMenu		Deskbar inställningar...
+Show application expander	PreferencesWindow		Visa applikationsexpanderare
+Close all	WindowMenu		Stäng alla
+Deskbar preferences	PreferencesWindow		Deskbar inställningar
+Mount	BeMenu		Montera
+Recent applications:	PreferencesWindow		Senaste applikationer:
+Tracker always first	PreferencesWindow		Visa Tracker först
+About Haiku…	BeMenu		Om Haiku...
+Show calendar…	TimeView		Visa kalender...
+Restart system	BeMenu		Starta om
+Find…	BeMenu		Hitta...
+Restart Tracker	BeMenu		Starta om Tracker
+Show Time	Tray		Visa tid
+Expand new applications	PreferencesWindow		Expandera nya applikationer
+Clock	PreferencesWindow		Klocka
+Recent documents	BeMenu		Senaste dokument
+Hide all	WindowMenu		Göm alla
+Shutdown…	BeMenu		Avstängning...
+Quit application	WindowMenu		Avsluta applikation
+Show replicants	BeMenu		Visa replikanter

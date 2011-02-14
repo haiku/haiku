@@ -1,0 +1,10 @@
+1	swedish	x-vnd.Haiku-WebPTranslator	3502239072
+Version %d.%d.%d, %s	ConfigView		Version %d.%d.%d, %s
+WebP Images	ConfigView		WebP-bilder
+WebP images	WebPTranslator		WebP-bilder
+WebPTranslator Settings	ConfigView		WebP-översättningsinställningar
+WebP Settings	main		WebP-inställningar
+WebP image	WebPTranslator		WebP-bild
+stream GetSize(): %lld\n	WebPTranslator		ström GetSize(): %lld\n
+Based on libwebp v0.1	ConfigView		Baserad på libwebp v0.1
+WebP image translator	WebPTranslator		WebP-bildöversättare

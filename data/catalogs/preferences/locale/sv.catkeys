@@ -1,17 +1,25 @@
-1	swedish	x-vnd.Haiku-Locale	2023461026
+1	swedish	x-vnd.Haiku-Locale	2295953467
 Available languages	Locale Preflet Window		Tillgängliga språk
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Kan inte hitta listan över tillgängliga språk! Prefleten kan inte användas!
-Long format:	TimeFormatSettings		Långt datum:
+Long format:	TimeFormatSettings		Långt format:
 Currency	TimeFormatSettings		Valuta
-Short format:	TimeFormatSettings		Kort datum:
+Short format:	TimeFormatSettings		Kort format:
 Language	Locale Preflet Window		Språk
 Preferred languages	Locale Preflet Window		Föredragna språk
 Numbers	TimeFormatSettings		Nummer
 24 hour	TimeFormatSettings		24 timmar
 Defaults	Locale Preflet Window		Förval
 Revert	Locale Preflet Window		Återgå
-OK	Locale Preflet Window		Ok
+OK	Locale Preflet Window		OK
 Time	TimeFormatSettings		Tid
 Date	TimeFormatSettings		Datum
 12 hour	TimeFormatSettings		12 timmar
 Locale	Locale Preflet		Lokalitet
+already chosen	LanguageListView		redan valt
+Negative:	TimeFormatSettings		Negativt:
+Use month/day-names from preferred language	TimeFormatSettings		Använd det förvalda språkets format för månad/dag
+Formatting	Locale Preflet Window		Formatering
+Locale	Locale Preflet Window		Lokalitet
+Full format:	TimeFormatSettings		Fullt format:
+Medium format:	TimeFormatSettings		Mediumformat:
+Positive:	TimeFormatSettings		Positivt:

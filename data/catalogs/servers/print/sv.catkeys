@@ -1,21 +1,54 @@
-1	swedish	x-vnd.Be-PSRV	3878243268
+1	swedish	x-vnd.Be-PSRV	1761631281
 Undefined	ConfigWindow		Odefinierad
 Cancel	PrintServerApp		Avbryt
-Page setup:	ConfigWindow		Sidinställningar:
 OK	ConfigWindow		Okej
 Cancel	ConfigWindow		Avbryt
 Yes	PrintServerApp		Ja
 Would you like to set one up now?	PrintServerApp		Vill du ställa in en nu?
 Portrait	ConfigWindow		Porträtt
 All pages	ConfigWindow		Alla sidor
-There is no default printer set up.	PrintServerApp		Det finns ingen förinställd skrivare.
 Printer:	ConfigWindow		Skrivare:
 Select a printer	ConfigWindow		Välj en skrivare
 No	PrintServerApp		Nej
 Landscape	ConfigWindow		Landskap
 There are no printers set up.	PrintServerApp		Det finns inga inställda skrivare.
 OK	PrintServerApp		Okej
+Page setup:	ConfigWindow		Sidinställningar:
+There is no default printer set up.	PrintServerApp		Det finns ingen förinställd skrivare.
 Print setup	ConfigWindow		Skrivarinställningar
 Would you like to make @ the default printer?	PrintServerApp		Vill du välja @ som förinställd skrivare?
 Page setup	ConfigWindow		Sidinställningar
 Paper setup:	ConfigWindow		Pappersinställningar
+Return the number of available printers	PrintServerApp Scripting		Visa antal tillgängliga skrivare
+Return the number of available transports	PrintServerApp Scripting		Visa antalet tillgängliga åtkomstmetoder
+Retrieve a specific printer	PrintServerApp Scripting		Visa en specifik skrivare
+Retrieve or select the active printer	PrintServerApp Scripting		Visa eller välj aktiv skrivare
+Get currently available ports/devices	Transport Scripting		Visa tillgängliga portar/enheter
+Page %1 to %2	ConfigWindow		Sida %1 till %2
+Get name of the printer add-on used for this printer	Printer Scripting		Visa namnet till skrivartillägget för denna skrivare
+Printer server	ConfigWindow		Utskriftsserver
+Page %1 to %2, %3 copies	ConfigWindow		Sida %1 till %2, %3 kopior
+Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Liggare
+A6	ConfigWindow	ISO 216 paper size	A6
+B5	ConfigWindow	ISO 216 paper size	B5
+A0	ConfigWindow	ISO 216 paper size	A0
+Letter	ConfigWindow	ANSI A (letter), a North American paper size	Letter
+A2	ConfigWindow	ISO 216 paper size	A2
+Show configuration window	PrintServerApp Scripting		Visa inställningsfönster
+A4	ConfigWindow	ISO 216 paper size	A4
+Get comments about this printer	Printer Scripting		Hämta kommentarer om denna skrivare
+Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	Legal
+Get the transport configuration for this printer	Printer Scripting		Visa åtkomstkonfigurationen för den här skrivaren
+Get name of the transport add-on used for this printer	Printer Scripting		Visa namnet på åtkomstmetoden för den här skrivaren
+All pages, %1 copies	ConfigWindow		Alla sidor, %1 kopior
+Delete a specific printer	PrintServerApp Scripting		Ta bort en skrivare
+Create a new printer	PrintServerApp Scripting		Lägg till en ny skrivare
+A1	ConfigWindow	ISO 216 paper size	A1
+Retrieve a specific transport	PrintServerApp Scripting		Visa en åtkomstmetod
+Get name of printer	Printer Scripting		Hämta skrivarnamn
+A3	ConfigWindow	ISO 216 paper size	A3
+Get name of transport	Transport Scripting		Visa namn för åtkomstmetod
+A5	ConfigWindow	ISO 216 paper size	A5
+Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Tabloid
+A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		En skrivare med det namnet finns redan men dess drivrutin kunde inte finnas. Ska skrivaren ersättas?
+A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		En skrivare med det namnet finns redan men den fungerar inte. Ska skrivaren ersättas?

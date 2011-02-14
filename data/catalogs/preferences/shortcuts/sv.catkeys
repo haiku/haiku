@@ -1,0 +1,56 @@
+1	swedish	x-vnd.Haiku-Shortcuts	1120793954
+Error, NULL state description?\n	ShortcutsSpec		Fel: NULL i tillståndsbeskrivning?\n
+MoveMouse	ShortcutsSpec		MoveMouse
+OK	ShortcutsWindow		Okej
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Genvägar kunde inte spara dina genvägsuppsättning.
+Cancel	ShortcutsWindow		Avbryt
+InsertString	ShortcutsSpec		InsertString
+Append KeySet…	ShortcutsWindow		Lägg till genvägsuppsättning…
+Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
+Key	ShortcutsWindow		Tangent
+Open KeySet…	ShortcutsWindow		Öppna genvägsuppsättning…
+Shortcuts\n\nBased on SpicyKeys for BeOS made by Jeremy Friesner.	ShortcutsApp		Genvägar\n\nBaserat på SpicyKeys för BeOS, skrivet av Jeremy Friesner.
+MouseUp	ShortcutsSpec		MouseUp
+Revert to saved	ShortcutsWindow		Återgå till sparade
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
+Shortcuts	ShortcutsWindow		Genvägar
+*InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Din text\"
+*MouseUp	ShortcutsWindow		*MouseUp
+(Choose application with file requester)	ShortcutsWindow		(Välj applikation i filväljarfönstret)
+Window	ShortcutsSpec	Name for modifier on keyboard	Start
+*LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Genvägar kunde inte öppna din tagentuppsättning!
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"
+SendMessage	ShortcutsSpec		SendMessage
+MoveMouseTo	ShortcutsSpec		MoveMouseTo
+Save	ShortcutsWindow		Spara
+*MouseButton 1	ShortcutsWindow		*MouseButton 1
+*MoveMouse +20 +0	ShortcutsWindow		*MoveMouse +20 +0
+MouseDown	ShortcutsSpec		MouseDown
+Remove selected shortcut	ShortcutsWindow		Ta bort markerad genväg
+MouseButton	ShortcutsSpec		MouseButton
+Add new shortcut	ShortcutsWindow		Lägg till ny genväg
+Save & apply	ShortcutsWindow		Spara & tillämpa
+OK	ShortcutsApp		Okej
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SendMessage application/x-vnd.Be-TRAK 'Tfnd'
+Append	ShortcutsWindow		Lägg till
+File	ShortcutsWindow		Arkiv
+Beep	ShortcutsSpec		Beep
+Quit	ShortcutsWindow		Avsluta
+*MouseDown	ShortcutsWindow		*MouseDown
+Don't save	ShortcutsWindow		Spara inte
+Multi	ShortcutsSpec		Multi
+Application	ShortcutsWindow		Applikation
+Shift	ShortcutsSpec	Name for modifier on keyboard	Skift
+*Beep	ShortcutsWindow		*Beep
+*MoveMouseTo 50% 50%	ShortcutsWindow		*MoveMouseTo 50% 50%
+Save KeySet as…	ShortcutsWindow		Spara genvägar som...
+Open	ShortcutsWindow		Öppna
+Really quit without saving your changes?	ShortcutsWindow		Vill du verkligen avsluta utan att spara ändringarna?
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Genvägar kunde inte läsa dina inställningar!
+Select	ShortcutsWindow		Välj
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Genvägar kunde inte spara dina inställningar!
+About Shortcuts	ShortcutsWindow		Om Genvägar
+Oh no	ShortcutsWindow		Åh nej!
+About Shortcuts	ShortcutsApp		Om Genvägar
+LaunchHandler	ShortcutsSpec		LaunchHandler

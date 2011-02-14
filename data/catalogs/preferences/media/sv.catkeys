@@ -1,9 +1,9 @@
-1	swedish	x-vnd.Haiku-Media	2505372198
+1	swedish	x-vnd.Haiku-Media	1588474509
 Show volume control on Deskbar	Media views		Visa volymkontrollen i Deskbar
 Audio input:	Media views		Ljudingång:
 Restarting media services\nStarting media server…\n	Media Window		Startar om mediatjänster\nStartar mediaservern…\n
 Video input:	Media views		Videoingång:
-Waiting for media_server to quit.	Media Window		Väntar på media_server ska stängas ner.
+Waiting for media_server to quit.	Media Window		Väntar på att mediaservern ska stängas ner.
 Defaults	Media views		Förval
 Stopping media server…	Media Window		Avslutar mediaservern…
 Video output:	Media views		Videoutgång:
@@ -11,7 +11,6 @@ Enable real-time audio	Media views		Aktivera realtidsljud
 Quit	Media Window		Avsluta
 OK	Media Window		Ok
 Enabling real-time video allows system to perform video operations as fast and smoothly as possible.  It achieves optimum performance by using more RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Genom att aktivera realtidsvideo låter du systemet behandla video så snabbt och jämnt som möjligt. Detta möjliggörs genom att mer minne används.\n\nAktivera bara detta om video är högprioriterat.
-Default nodes	Media views		Förvalda noder
 Starting media server…	Media Window		Startar mediaservern…
 Restart the media server to apply changes.	Media views		Starta om mediaservern för att aktivera ändringarna.
 Done shutting down.	Media Window		Färdigavslutad.
@@ -28,7 +27,13 @@ Ready for use…	Media Window		Redo att användas…
 Real-time	Media views		Realtid
 Restart media services	Media views		Starta om mediatjänsterna
 Enabling real-time audio allows system to record and play audio as fast as possible.  It achieves this performance by using more CPU and RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Genom att aktivera realtidsljud låter du systemet behandla ljud så snabbt och jämnt som möjligt. Detta möjliggörs genom att mer minne används.\n\nAktivera bara detta om ljud är högprioriterat.
-Couldn't remove volume control in Deskbar: %s\n	Media Window		Kunde inte ta bort volymkontrollen från Deskbar: %s\n
-Couldn't add volume control in Deskbar: %s\n	Media Window		Kunde inte lägga till volymkontrollen i Deskbar: %s\n
 Media	Media Window		Media
 Channel:	Media views		Kanal:
+Video settings	Media Window		Videoinställningar
+Audio mixer	Media Window		Ljudmixer
+<none>	Media views		<ingen>
+Couldn't add volume control in Deskbar: %s\n	Media views		Kunde inte lägga till volymkontroll i Deskbar: %s\n
+OK	Media views		OK
+Real-time audio is currently unimplemented in Haiku.	Media views		Realtidsljud är inte implementerat i Haiku.
+Couldn't remove volume control in Deskbar: %s\n	Media views		Kunde inte ta bort volymkontrollen från Deskbar: %s\n
+Real-time video is currently unimplemented in Haiku.	Media views		Realtidsvideo är inte implementerat i Haiku.

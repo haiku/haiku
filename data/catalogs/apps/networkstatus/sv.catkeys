@@ -1,0 +1,24 @@
+1	swedish	x-vnd.Haiku-NetworkStatus	3992317590
+NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		Nätverksstatus hantering:\n\t--deskbar\tlägg till replikant till Deskbar\n\t--help\t\tskriv ut denna information och avsluta\n
+Broadcast information:\n	NetworkStatusView		Annonsera information:\n
+No link	NetworkStatusView		Ingen länk
+Address information:\n	NetworkStatusView		Adressinformation:\n
+Launching the network preflet failed.\n\nError: 	NetworkStatusView		Öppning av nätverksinställningarna misslyckades.\n\nFel:
+NetworkStatus\n\twritten by %1 and Hugo Santos\n\t%2, Haiku, Inc.\n	NetworkStatusView		Nätverkstatus\n\tskrivet av %1 och Hugo Santos\n\t%2, Haiku, Inc.\n
+Netmask	NetworkStatusView		Nätmask
+Broadcast	NetworkStatusView		Annonsera
+Unknown	NetworkStatusView		Okänd
+Ready	NetworkStatusView		Redo
+NetworkStatus	NetworkStatusWindow		Nätverkstatus
+No stateful configuration	NetworkStatusView		Ingen förbindelseorienterad konfiguration
+Configuring	NetworkStatusView		Konfigurerar
+Address	NetworkStatusView		Adress
+OK	NetworkStatusView		OK
+Open network preferences…	NetworkStatusView		Öppna nätverksinställningar...
+Quit	NetworkStatusView		Avsluta
+Netmask information:\n	NetworkStatusView		Nätmaskinformation:\n
+<no wireless networks found>	NetworkStatusView		<inga trådlösa nätverk hittades>
+Run in window	NetworkStatus		Kör i fönster
+Install in Deskbar	NetworkStatus		Installera i Deskbar
+You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Du kan köra Nätverksstatus i ett fönster eller installera det i Deskbar.
+Could not join wireless network:\n	NetworkStatusView		Kunde inte ansluta till trådlöst nätverk:\n

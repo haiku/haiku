@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Fonts	1355959961
+1	swedish	x-vnd.Haiku-Fonts	1393111467
 Plain font:	Font view		Normalt teckensnitt:
 Defaults	Main window		Förval
 Fonts	Main window		Teckensnitt
@@ -8,4 +8,5 @@ Size:	Font Selection view		Storlek:
 Menu font:	Font view		Menyteckensnitt:
 Fixed font:	Font view		Fast teckensnitt:
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Flygande bäckasiner söka hwila på mjuka tuvor.
-Bold font:	Font view		Fett teckesnitt:
+Bold font:	Font view		Fet stil:
+OK	main		OK

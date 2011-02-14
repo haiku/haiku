@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Expander	2957181365
+1	swedish	x-vnd.Haiku-Expander	3863172519
 Expand	ExpanderMenu		Expandera
 Set destination…	ExpanderMenu		Sätt destination…
 File expanded	ExpanderWindow		Fil expanderad
@@ -14,21 +14,19 @@ Expander	ExpanderWindow	!! Window Title !!	Expanderaren
 The destination folder does not exist.	ExpanderWindow		Destinationsmappen existerar inte.
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Är du säker på att du vill sluta expandera det här\narkivet? De expanderade sakerna kan vara ofärdiga.
 Select	DirectoryFilePanel		Välj
-Creating listing for 	ExpanderWindow		Skapa listning för
 Settings	ExpanderMenu		Inställningar
 Settings…	ExpanderMenu		Inställningar...
 Expander: Choose destination	DirectoryFilePanel		Expander: Välj destination
 Show contents	ExpanderWindow		Visa innehåll
-Expanding file 	ExpanderWindow		Expanderar fil
-The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Mappen antingen flyttades, döptes om eller stöddes\ninte.
+The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Mappen har antingen flyttats, döpts om eller är oåtkomlig.
 The file doesn't exist	ExpanderWindow		Filen existerar inte
 Stop	ExpanderMenu		Stoppa
 File	ExpanderMenu		Fil
 Expand	ExpanderWindow		Expandera
 Close	ExpanderMenu		Stäng
 The destination is not a folder.	ExpanderWindow		Destinationen är inte en mapp.
-About Expander…	ExpanderMenu		Om Expander…
-OK	About		Okej
+About Expander…	ExpanderMenu		Om Expanderaren…
+OK	About		Ok
 Set source…	ExpanderMenu		Sätt källa…
 Select '%s'	DirectoryFilePanel		Välj '%s'
 Show contents	ExpanderMenu		Visa innehåll
@@ -36,3 +34,20 @@ Stop	ExpanderWindow		Stoppa
 Destination	ExpanderWindow		Destination
 \n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tSkriven av Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nden ursprungliga Be-versionen av \nDominic, Hiroshi, Peter, Pavel and Robert\n
 Expander	About		Expanderaren
+is not supported	ExpanderWindow		saknas stöd för
+Close window when done expanding	ExpanderPreferences		Stäng fönstret när expandering är klar
+Use:	ExpanderPreferences		Använd:
+Expander settings	ExpanderPreferences		Expanderaren inställningar
+Automatically expand files	ExpanderPreferences		Expandera filer automatiskt
+Cancel	ExpanderPreferences		Avbryt
+Destination folder:	ExpanderPreferences		Destinationsmapp:
+Same directory as source (archive) file	ExpanderPreferences		Samma mapp som arkivfilen
+Expansion:	ExpanderPreferences		Expandering:
+Select	ExpanderPreferences		Välj
+Automatically show contents listing	ExpanderPreferences		Visa innehållslista direkt
+OK	ExpanderPreferences		OK
+Leave destination folder path empty	ExpanderPreferences		Visa tom målsökväg
+Other:	ExpanderPreferences		Annan:
+Open destination folder after extraction	ExpanderPreferences		Öppna mappen efter uppackning
+Creating listing for '%s'	ExpanderWindow		Skapar innehållslista för '%s'
+Expanding '%s'	ExpanderWindow		Expanderar '%s'
