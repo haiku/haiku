@@ -26,13 +26,14 @@
 #include <package/hpkg/PackageEntry.h>
 #include <package/hpkg/PackageEntryAttribute.h>
 #include <package/hpkg/PackageReader.h>
+#include <package/BlockBufferCacheNoLock.h>
 
-#include "BlockBufferCacheNoLock.h"
 #include "package.h"
 #include "StandardErrorOutput.h"
 
 
 using namespace BPackageKit::BHPKG;
+using BPackageKit::BBlockBufferCacheNoLock;
 
 
 struct PackageContentExtractHandler : BPackageContentHandler {
@@ -296,7 +297,7 @@ private:
 	}
 
 private:
-	BlockBufferCacheNoLock	fBufferCache;
+	BBlockBufferCacheNoLock	fBufferCache;
 	BFDDataReader			fPackageFileReader;
 	void*					fDataBuffer;
 	size_t					fDataBufferSize;

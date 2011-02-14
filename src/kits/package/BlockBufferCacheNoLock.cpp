@@ -5,10 +5,13 @@
  */
 
 
-#include "BlockBufferCacheNoLock.h"
+#include <package/BlockBufferCacheNoLock.h>
 
 
-BlockBufferCacheNoLock::BlockBufferCacheNoLock(size_t blockSize,
+namespace BPackageKit {
+
+
+BBlockBufferCacheNoLock::BBlockBufferCacheNoLock(size_t blockSize,
 	uint32 maxCachedBlocks)
 	:
 	BBlockBufferCache(blockSize, maxCachedBlocks)
@@ -16,19 +19,22 @@ BlockBufferCacheNoLock::BlockBufferCacheNoLock(size_t blockSize,
 }
 
 
-BlockBufferCacheNoLock::~BlockBufferCacheNoLock()
+BBlockBufferCacheNoLock::~BBlockBufferCacheNoLock()
 {
 }
 
 
 bool
-BlockBufferCacheNoLock::Lock()
+BBlockBufferCacheNoLock::Lock()
 {
 	return true;
 }
 
 
 void
-BlockBufferCacheNoLock::Unlock()
+BBlockBufferCacheNoLock::Unlock()
 {
 }
+
+
+}	// namespace BPackageKit

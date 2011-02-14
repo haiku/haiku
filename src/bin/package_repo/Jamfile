@@ -8,7 +8,6 @@ DEFINES += B_ENABLE_INCOMPLETE_POSIX_AT_SUPPORT ;
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src bin package ] ;
 
 BinCommand package_repo :
-	BlockBufferCacheNoLock.cpp
 	command_create.cpp
 	command_list.cpp
 	package_repo.cpp

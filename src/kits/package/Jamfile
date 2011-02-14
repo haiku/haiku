@@ -43,6 +43,7 @@ SharedLibrary libpackage.so
 	ActivateRepositoryConfigJob.cpp
 	AddRepositoryRequest.cpp
 	Attributes.cpp
+	BlockBufferCacheNoLock.cpp
 	ChecksumAccessors.cpp
 	Context.cpp
 	DropRepositoryRequest.cpp
