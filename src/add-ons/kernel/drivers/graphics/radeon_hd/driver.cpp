@@ -1,8 +1,12 @@
 /*
-	Copyright (c) 2002, Thomas Kurschel
-
-
-*/
+ * Copyright (c) 2002, Thomas Kurschel
+ * Copyright 2004-2011 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Thomas Kurschel
+ *		Clemens Zeidler, <haiku@clemens-zeidler.de>
+ */
 
 #include "driver.h"
 #include "device.h"

@@ -7,7 +7,6 @@
  *		Clemens Zeidler, haiku@clemens-zeidler.de
  */
 
-
 #include "radeon_hd.h"
 
 #include "AreaKeeper.h"

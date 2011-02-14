@@ -6,6 +6,7 @@
  *		Axel Dörfler, axeld@pinc-software.de
  *		Clemens Zeidler, haiku@clemens-zeidler.de
  */
+
 #ifndef RADEON_RD_PRIVATE_H
 #define RADEON_RD_PRIVATE_H
 
