@@ -16,6 +16,7 @@
 
 #include <AppFileInfo.h>
 #include <Bitmap.h>
+#include <Catalog.h>
 #include <Entry.h>
 #include <File.h>
 #include <MenuItem.h>
@@ -29,11 +30,13 @@
 #include <tracker_private.h>
 
 #include "Commands.h"
-#include "Common.h"
+#include "DiskUsage.h"
 #include "InfoWindow.h"
 #include "MainWindow.h"
 #include "Scanner.h"
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Pie View"
 
 static const int32 kIdxGetInfo = 0;
 static const int32 kIdxOpen = 1;
@@ -96,7 +99,8 @@ void
 AppMenuItem::GetContentSize(float* _width, float* _height)
 {
 	if (_width)
-		*_width = fIcon->Bounds().Width() + be_plain_font->StringWidth(Label());
+		*_width = fIcon->Bounds().Width() +
+			be_plain_font->StringWidth(Label());
 
 	if (_height) {
 		struct font_height fh;
@@ -134,11 +138,13 @@ PieView::PieView(BVolume* volume)
 	fOutdated(false)
 {
 	fMouseOverMenu = new BPopUpMenu(kEmptyStr, false, false);
-	fMouseOverMenu->AddItem(new BMenuItem(kMenuGetInfo, NULL), kIdxGetInfo);
-	fMouseOverMenu->AddItem(new BMenuItem(kMenuOpen, NULL), kIdxOpen);
+	fMouseOverMenu->AddItem(new BMenuItem(B_TRANSLATE("Get Info"), NULL),
+		kIdxGetInfo);
+	fMouseOverMenu->AddItem(new BMenuItem(B_TRANSLATE("Open"), NULL),
+		kIdxOpen);
 
 	fFileUnavailableMenu = new BPopUpMenu(kEmptyStr, false, false);
-	BMenuItem* item = new BMenuItem(kStrUnavail, NULL);
+	BMenuItem* item = new BMenuItem(B_TRANSLATE("file unavailable"), NULL);
 	item->SetEnabled(false);
 	fFileUnavailableMenu->AddItem(item);
 
@@ -424,14 +430,14 @@ PieView::_DrawPieChart(BRect updateRect)
 		parent = parent->parent;
 		colorIdx++;
 	}
-	_DrawDirectory(pieRect, currentDir, 0.0, 0.0, colorIdx % kBasePieColorCount,
-		0);
+	_DrawDirectory(pieRect, currentDir, 0.0, 0.0,
+		colorIdx % kBasePieColorCount, 0);
 	
 	if (fOutdated) {
 		
 		BRect b = Bounds();		
 
-		float strWidth = StringWidth(kOutdatedStr);
+		float strWidth = StringWidth(B_TRANSLATE("Outdated view"));
 		float bx = (b.Width() - strWidth - kSmallHMargin);
 
 		struct font_height fh;
@@ -439,7 +445,7 @@ PieView::_DrawPieChart(BRect updateRect)
 
 		float by = (b.Height() - ceil(fh.descent) - kSmallVMargin);
 		SetHighColor(0x00, 0x00, 0x00);
-		DrawString(kOutdatedStr, BPoint(bx, by));
+		DrawString(B_TRANSLATE("Outdated view"), BPoint(bx, by));
 	}
 }
 
@@ -711,10 +717,11 @@ PieView::_BuildOpenWithMenu(FileInfo* info)
 
 	delete type;
 
-	BMenu* openWith = new BMenu(kMenuOpenWith);
+	BMenu* openWith = new BMenu(B_TRANSLATE("Open With"));
 
 	if (appList.size() == 0) {
-		BMenuItem* item = new BMenuItem(kMenuNoApps, NULL);
+		BMenuItem* item = new BMenuItem(B_TRANSLATE("no supporting apps"), 
+			NULL);
 		item->SetEnabled(false);
 		openWith->AddItem(item);
 	} else {
@@ -749,7 +756,7 @@ PieView::_ShowContextMenu(FileInfo* info, BPoint p)
 		// Add a "Rescan" option for folders.
 		BMenuItem* rescan = NULL;
 		if (info->children.size() > 0) {
-			rescan = new BMenuItem(kStrRescan, NULL);
+			rescan = new BMenuItem(B_TRANSLATE("Rescan"), NULL);
 			fMouseOverMenu->AddItem(rescan, kIdxRescan);
 		}
 

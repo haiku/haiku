@@ -5,7 +5,6 @@ SubDirHdrs $(HAIKU_TOP) src kits tracker ;
 
 Application DiskUsage :
 	App.cpp
-	Common.cpp
 	ControlsView.cpp
 	DiskUsage.cpp
 	InfoWindow.cpp
@@ -15,7 +14,18 @@ Application DiskUsage :
 	Snapshot.cpp
 	StatusView.cpp
 	VolumeView.cpp
-	: be $(TARGET_LIBSTDC++)
+	: be $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSTDC++)
 	: DiskUsage.rdef
+;
+
+DoCatalogs DiskUsage :
+	x-vnd.Haiku-DiskUsage
+	:
+	MainWindow.cpp
+	InfoWindow.cpp
+	PieView.cpp
+	Scanner.cpp
+	StatusView.cpp
+	VolumeView.cpp
 ;
 

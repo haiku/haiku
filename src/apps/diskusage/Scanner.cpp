@@ -13,10 +13,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <Catalog.h>
 #include <Directory.h>
 #include <PathMonitor.h>
 
-#include "Common.h"
+#include "DiskUsage.h"
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Scanner"
 
 using std::vector;
 
@@ -63,7 +67,8 @@ Scanner::MessageReceived(BMessage* message)
 		case kScanRefresh:
 		{
 			FileInfo* startInfo;
-			if (message->FindPointer(kNameFilePtr, (void **)&startInfo) == B_OK)
+			if (message->FindPointer(kNameFilePtr, (void **)&startInfo) 
+				== B_OK)
 				_RunScan(startInfo);
 			break;
 		}
@@ -200,10 +205,13 @@ Scanner::_DirectoryContains(FileInfo* currentDir, entry_ref* ref)
 void
 Scanner::_RunScan(FileInfo* startInfo)
 {
+	BString stringScan(B_TRANSLATE("Scanning %refName%"));
+
 	if (startInfo == NULL || startInfo == fSnapshot->rootDir) {
 		delete fSnapshot;
 		fSnapshot = new VolumeSnapshot(fVolume);
-		fTask = kStrScanningX + fSnapshot->name;
+		stringScan.ReplaceFirst("%refName%", fSnapshot->name.c_str());
+		fTask = stringScan.String();
 		fVolumeBytesInUse = fSnapshot->capacity - fSnapshot->freeBytes;
 		fVolumeBytesScanned = 0;
 		fProgress = 0.0;
@@ -215,8 +223,9 @@ Scanner::_RunScan(FileInfo* startInfo)
 
 		FileInfo* freeSpace = new FileInfo;
 		freeSpace->pseudo = true;
-		string s = "Free on " + fSnapshot->name;
-		freeSpace->ref.set_name(s.c_str());
+		BString string(B_TRANSLATE("Free on %refName%"));
+		string.ReplaceFirst("%refName%", fSnapshot->name.c_str());
+		freeSpace->ref.set_name(string.String());
 		freeSpace->size = fSnapshot->freeBytes;
 		fSnapshot->freeSpace = freeSpace;
 
@@ -225,9 +234,10 @@ Scanner::_RunScan(FileInfo* startInfo)
 	} else {
 		fSnapshot->capacity = fVolume->Capacity();
 		fSnapshot->freeBytes = fVolume->FreeBytes();
-		fTask = kStrScanningX + string(startInfo->ref.name);
+		stringScan.ReplaceFirst("%refName%", startInfo->ref.name);
+		fTask = stringScan.String();
 		fVolumeBytesInUse = fSnapshot->capacity - fSnapshot->freeBytes;
-		fVolumeBytesScanned = fVolumeBytesInUse - startInfo->size; // best guess
+		fVolumeBytesScanned = fVolumeBytesInUse - startInfo->size; //best guess
 		fProgress = 100.0 * fVolumeBytesScanned / fVolumeBytesInUse;
 		fLastReport = -100.0;
 

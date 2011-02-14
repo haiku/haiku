@@ -14,6 +14,7 @@
 #include <math.h>
 #include <stdio.h>
 
+#include <Catalog.h>
 #include <Box.h>
 #include <Button.h>
 #include <Node.h>
@@ -22,9 +23,11 @@
 
 #include <LayoutBuilder.h>
 
-#include "Common.h"
+#include "DiskUsage.h"
 #include "Scanner.h"
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Status View"
 
 StatusView::StatusView()
 	:
@@ -35,13 +38,13 @@ StatusView::StatusView()
 	SetLowColor(kPieBGColor);
 
 	fSizeView = new BStringView(NULL, kEmptyStr);
-	fSizeView->SetExplicitMinSize(BSize(StringWidth("9999.99 GB"),
+	fSizeView->SetExplicitMinSize(BSize(StringWidth(B_TRANSLATE("9999.99 GB")),
 		B_SIZE_UNSET));
-	fSizeView->SetExplicitMaxSize(BSize(StringWidth("9999.99 GB"),
+	fSizeView->SetExplicitMaxSize(BSize(StringWidth(B_TRANSLATE("9999.99 GB")),
 		B_SIZE_UNSET));
 
 	char testLabel[256];
-	sprintf(testLabel, kManyFiles, 999999);
+	sprintf(testLabel, B_TRANSLATE("%d files"), 999999);
 
 	fCountView = new BStringView(NULL, kEmptyStr);
 	fCountView->SetExplicitMinSize(BSize(StringWidth(testLabel), B_SIZE_UNSET));
@@ -50,7 +53,7 @@ StatusView::StatusView()
 	fPathView = new BStringView(NULL, kEmptyStr);
 	fPathView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
-	fRefreshBtn = new BButton(NULL, kStrScan, new BMessage(kBtnRescan));
+	fRefreshBtn = new BButton(NULL, B_TRANSLATE("Scan"), new BMessage(kBtnRescan));
 
 	fRefreshBtn->SetExplicitMaxSize(BSize(B_SIZE_UNSET, B_SIZE_UNLIMITED));
 
@@ -119,7 +122,7 @@ StatusView::ShowInfo(const FileInfo* info)
 	if (!info->pseudo) {
 		BNode node(&info->ref);
 		if (node.InitCheck() != B_OK) {
-			fPathView->SetText(kStrUnavail);
+			fPathView->SetText(B_TRANSLATE("file unavailable"));
 			fSizeView->SetText(kEmptyStr);
 			fCountView->SetText(kEmptyStr);
 			return;
@@ -139,7 +142,8 @@ StatusView::ShowInfo(const FileInfo* info)
 
 	if (info->count > 0) {
 		char label[256];
-		sprintf(label, (info->count == 1) ? kOneFile : kManyFiles, info->count);
+		sprintf(label, (info->count == 1) ? B_TRANSLATE("%d file") : 
+			B_TRANSLATE("%d files"), info->count);
 		fCountView->SetText(label);
 	} else {
 		fCountView->SetText(kEmptyStr);

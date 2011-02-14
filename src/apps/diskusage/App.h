@@ -27,7 +27,6 @@ public:
 	virtual	bool				QuitRequested();
 
 private:
-			BResources*			fResources;
 			MainWindow*			fMainWindow;
 			BMessage*			fSavedRefsReceived;
 };

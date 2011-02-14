@@ -3,13 +3,13 @@ resource app_signature "application/x-vnd.Haiku-DiskUsage";
 resource app_version {
 		major  = 1,
 		middle = 0,
-		minor  = 0,
+		minor  = 2,
 
 		variety = B_APPV_FINAL,
 		internal = 0,
 
-		short_info = "1.0.1",
-		long_info = "1.0.1 ©1999 Mike Steed, ©2008-2009 Haiku"
+		short_info = "1.0.2",
+		long_info = "1.0.2 ©1999 Mike Steed, ©2008-2011 Haiku"
 };
 
 resource app_flags B_MULTIPLE_LAUNCH;
@@ -47,36 +47,3 @@ resource vector_icon {
 	$"18001501178600040A01010B1815FF01178400040A08010C000A09010D000A0A"
 	$"010E00"
 };
-
-resource(101, "RGB_WIN") rgb_color { 0xDE, 0xDB, 0xDE, 0xFF };
-resource(102, "RGB_PIE_OL") rgb_color { 0x80, 0x80, 0x80, 0xFF };
-resource(103, "RGB_PIE_BG") rgb_color { 0xFF, 0xFF, 0xFF, 0xFF };
-resource(104, "RGB_PIE_MT") rgb_color { 0xA0, 0xA0, 0xA0, 0xFF };
-resource(105, "RGB_PIE_1") rgb_color { 0x00, 0x60, 0x60, 0xFF };
-resource(106, "RGB_PIE_2") rgb_color { 0x00, 0x00, 0x68, 0xFF };
-resource(107, "RGB_PIE_3") rgb_color { 0x60, 0x00, 0x60, 0xFF };
-resource(108, "RGB_PIE_4") rgb_color { 0x68, 0x00, 0x00, 0xFF };
-
-resource(101, "N_PIE_COLORS") (uint8)4;
-
-resource(103, "STR_N_FILES") "%d files";
-resource(102, "STR_1_FILE") "%d file";
-resource(101, "STR_VM_LABEL") "Volume:";
-resource(120, "STR_SCAN") "Scan";
-resource(104, "STR_RESCAN") "Rescan";
-resource(105, "STR_SCN_X") "Scanning ";
-resource(106, "STR_UNAVAIL") "file unavailable";
-resource(107, "STR_VM_DFLT") "(Select)";
-resource(108, "STR_VPROMPT") "Select a volume to scan";
-resource(109, "STR_M_INFO") "Get Info";
-resource(110, "STR_M_OPEN") "Open";
-resource(111, "STR_M_OPENW") "Open With";
-resource(112, "STR_M_NAPPS") "no supporting apps";
-resource(113, "STR_SIZE") "Size";
-resource(114, "STR_INFILES") " in %d files";
-resource(115, "STR_MADE") "Created";
-resource(116, "STR_MOD") "Modified";
-resource(117, "STR_TIMEFMT") "%a, %d %b %Y, %r";
-resource(118, "STR_KIND") "Kind";
-resource(119, "STR_PATH") "Path";
-resource(121, "STR_OUTDATED") "Outdated view";

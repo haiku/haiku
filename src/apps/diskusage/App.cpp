@@ -12,27 +12,36 @@
 
 #include <stdio.h>
 
+#include <Entry.h>
 #include <File.h>
 #include <FindDirectory.h>
 #include <Node.h>
 #include <Path.h>
 
-#include "Common.h"
+#include "DiskUsage.h"
 #include "MainWindow.h"
 
 
 App::App()
 	:
 	BApplication(kAppSignature),
-	fResources(read_resources(kAppSignature)),
 	fMainWindow(NULL), fSavedRefsReceived(NULL)
 {
+	// Get a reference to the help file.
+	BPath path;
+	if (find_directory(B_BEOS_DOCUMENTATION_DIRECTORY, &path) == B_OK
+		&& path.Append(kHelpFileName) == B_OK) {
+		printf("help file =? %s\n", path.Path());
+		BEntry entry(path.Path());
+		helpFileWasFound = entry.Exists();
+		entry.GetRef(&helpFileRef);
+	} else
+		helpFileWasFound = false;
 }
 
 
 App::~App()
 {
-	delete fResources;
 	delete fSavedRefsReceived;
 }
 
