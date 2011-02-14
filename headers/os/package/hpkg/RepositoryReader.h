@@ -20,7 +20,7 @@ namespace BPrivate {
 using BPrivate::RepositoryReaderImpl;
 
 class BErrorOutput;
-class BRepositoryContentHandler;
+class BPackageContentHandler;
 
 
 class BRepositoryReader {

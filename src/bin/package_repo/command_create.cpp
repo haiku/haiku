@@ -48,10 +48,10 @@ public:
 		printf("%s (%s)\n", packageInfo.Name().String(),
 			packageInfo.Version().ToString().String());
 		if (fVerbose) {
-			printf("\tsummary:         %s\n", packageInfo.Summary().String());
-			printf("\tvendor:          %s\n", packageInfo.Vendor().String());
-			printf("\tpackager:        %s\n", packageInfo.Packager().String());
-			printf("\tsha256-checksum: %s\n", packageInfo.Checksum().String());
+			printf("\tsummary:  %s\n", packageInfo.Summary().String());
+			printf("\tvendor:   %s\n", packageInfo.Vendor().String());
+			printf("\tpackager: %s\n", packageInfo.Packager().String());
+			printf("\tchecksum: %s\n", packageInfo.Checksum().String());
 			if (uint32 flags = packageInfo.Flags()) {
 				printf("\tflags:\n");
 				if ((flags & B_PACKAGE_FLAG_APPROVE_LICENSE) != 0)
@@ -59,7 +59,8 @@ public:
 				if ((flags & B_PACKAGE_FLAG_SYSTEM_PACKAGE) != 0)
 					printf("\t\tsystem_package\n");
 			}
-		}
+		} else
+			printf("\tchecksum: %s\n", packageInfo.Checksum().String());
 	}
 
 	virtual void OnRepositoryInfoSectionDone(uint32 uncompressedSize)

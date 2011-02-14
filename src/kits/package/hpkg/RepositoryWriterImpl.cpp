@@ -350,7 +350,7 @@ RepositoryWriterImpl::_Finish()
 	header.magic = B_HOST_TO_BENDIAN_INT32(B_HPKG_REPO_MAGIC);
 	header.header_size = B_HOST_TO_BENDIAN_INT16((uint16)sizeof(header));
 	header.version = B_HOST_TO_BENDIAN_INT16(B_HPKG_REPO_VERSION);
-	header.total_size = B_HOST_TO_BENDIAN_INT32(totalSize);
+	header.total_size = B_HOST_TO_BENDIAN_INT64(totalSize);
 
 	// write the header
 	WriteBuffer(&header, sizeof(header), 0);
@@ -534,12 +534,12 @@ RepositoryWriterImpl::_WritePackageAttributes(hpkg_repo_header& header,
 	header.packages_compression
 		= B_HOST_TO_BENDIAN_INT32(B_HPKG_COMPRESSION_ZLIB);
 	header.packages_length_compressed
-		= B_HOST_TO_BENDIAN_INT32(_packagesLengthCompressed);
+		= B_HOST_TO_BENDIAN_INT64(_packagesLengthCompressed);
 	header.packages_length_uncompressed
-		= B_HOST_TO_BENDIAN_INT32(zlibWriter.BytesWritten());
-	header.packages_strings_count = B_HOST_TO_BENDIAN_INT32(stringsCount);
+		= B_HOST_TO_BENDIAN_INT64(zlibWriter.BytesWritten());
+	header.packages_strings_count = B_HOST_TO_BENDIAN_INT64(stringsCount);
 	header.packages_strings_length
-		= B_HOST_TO_BENDIAN_INT32(stringsLengthUncompressed);
+		= B_HOST_TO_BENDIAN_INT64(stringsLengthUncompressed);
 
 	return endOffset;
 }

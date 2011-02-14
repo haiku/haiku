@@ -9,6 +9,7 @@
 #include <new>
 
 #include <package/hpkg/ErrorOutput.h>
+#include <package/hpkg/PackageContentHandler.h>
 #include <package/hpkg/RepositoryReaderImpl.h>
 
 
@@ -41,7 +42,7 @@ BRepositoryReader::Init(const char* fileName)
 
 
 status_t
-BRepositoryReader::ParseContent(BRepositoryContentHandler* contentHandler)
+BRepositoryReader::ParseContent(BPackageContentHandler* contentHandler)
 {
 	if (fImpl == NULL)
 		return B_NO_INIT;

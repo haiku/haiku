@@ -185,13 +185,18 @@ protected:
 			void				WriteBuffer(const void* buffer, size_t size,
 									off_t offset);
 
-			int					FD() const;
-			AbstractDataWriter*	DataWriter() const;
-			const PackageAttributeList&	PackageAttributes() const;
-			PackageAttributeList&	PackageAttributes();
+	inline	int					FD() const;
 
-			void				SetDataWriter(AbstractDataWriter* dataWriter);
-			void				SetFinished(bool finished);
+	inline	const PackageAttributeList&	PackageAttributes() const;
+	inline	PackageAttributeList&	PackageAttributes();
+
+	inline	const StringCache&	PackageStringCache() const;
+	inline	StringCache&		PackageStringCache();
+
+	inline	AbstractDataWriter*	DataWriter() const;
+	inline	void				SetDataWriter(AbstractDataWriter* dataWriter);
+
+	inline	void				SetFinished(bool finished);
 
 private:
 			void				_WritePackageAttributes(
@@ -280,6 +285,20 @@ inline WriterImplBase::PackageAttributeList&
 WriterImplBase::PackageAttributes()
 {
 	return fPackageAttributes;
+}
+
+
+inline const StringCache&
+WriterImplBase::PackageStringCache() const
+{
+	return fPackageStringCache;
+}
+
+
+inline StringCache&
+WriterImplBase::PackageStringCache()
+{
+	return fPackageStringCache;
 }
 
 

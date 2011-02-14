@@ -46,7 +46,7 @@ struct hpkg_repo_header {
 	uint32	magic;							// "hpkr"
 	uint16	header_size;
 	uint16	version;
-	uint32	total_size;
+	uint64	total_size;
 
 	// repository info section
 	uint32	info_compression;
@@ -55,10 +55,10 @@ struct hpkg_repo_header {
 
 	// package attributes section
 	uint32	packages_compression;
-	uint32	packages_length_compressed;
-	uint32	packages_length_uncompressed;
-	uint32	packages_strings_length;
-	uint32	packages_strings_count;
+	uint64	packages_length_compressed;
+	uint64	packages_length_uncompressed;
+	uint64	packages_strings_length;
+	uint64	packages_strings_count;
 };
 
 
