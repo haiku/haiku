@@ -35,19 +35,44 @@ const struct supported_device {
 	int32		type;
 	const char*	name;
 } kSupportedDevices[] = {
-	{0x9540, 0, "Radeon HD 4550"},	/*RV710*/
+	//R600 series	(HD 2xxx - 42xx)
+	//	Radeon 2400		- RV610
+	{0x9611, 0, "Radeon HD 3100"},	/*RV620, IGP*/
+	{0x9613, 0, "Radeon HD 3100"},	/*RV620, IGP*/
+	{0x9610, 0, "Radeon HD 3200"},	/*RV620, IGP*/
+	{0x9612, 0, "Radeon HD 3200"},	/*RV620, IGP*/
+	{0x9615, 0, "Radeon HD 3200"},	/*RV620, IGP*/
+	//  Radeon 3410		- RV620
+	//  Radeon 3430		- RV620
+	{0x95c5, 0, "Radeon HD 3450"},	/*RV620*/
+	//  Radeon 3470		- RV620
+	//	Radeon 4200		- RV620
+	//	Radeon 4225		- RV620
+	//	Radeon 4250		- RV620
+	//	Radeon 4270		- RV620
+	//	Radeon 2600		- RV630
+	//	Radeon 2700		- RV630
+	//  Radeon 3650		- RV635
+	//  Radeon 3670		- RV635
+	//  Radeon 3850		- RV670
+	//  Radeon 3870		- RV670
+	//  Radeon 3850 x2	- RV680
+	//  Radeon 3870 x2	- RV680
+
+	//R700 series	(HD 43xx - HD 48xx)
+	//	Radeon 4330		- RV710
 	{0x954f, 0, "Radeon HD 4350"},	/*RV710*/
-	{0x9610, 0, "Radeon HD 3200"},	/*RS780, IGP*/
-	{0x9611, 0, "Radeon 3100"},		/*RS780, IGP*/
-	{0x9612, 0, "Radeon HD 3200"},	/*RS780, IGP*/
-	{0x9613, 0, "Radeon 3100"},		/*RS780, IGP*/
-	{0x9614, 0, "Radeon 3300"},		/*RS780, IGP*/
-	{0x9615, 0, "Radeon 3200"},		/*RS780, IGP*/
-	{0x9616, 0, "Radeon 3000"},		/*RS780, IGP*/
-	{0x9710, 0, "Radeon HD 4200"},	/*RS880, IGP*/
-	{0x9711, 0, "Radeon 4100"},		/*RS880, IGP*/
-	{0x9714, 0, "Radeon HD 4290"},	/*RS880, IGP*/
-	{0x9715, 0, "Radeon HD 4250"}	/*RS880, IGP*/
+	{0x9555, 0, "Radeon HD 4350"},	/*RV710*/
+	//	Radeon 4530		- RV710
+	{0x9540, 0, "Radeon HD 4550"}	/*RV710*/
+	//	Radeon 4570		- RV710
+	//	Radeon 4650		- RV730
+	//	Radeon 4670		- RV730
+	//	Radeon 4830		- RV740
+	//	Radeon 4850		- RV770
+	//	Radeon 4860		- RV740
+	//	Radeon 4870		- RV770
+	//	Radeon 4870	x2	- RV770
 };
 
 
