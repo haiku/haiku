@@ -467,14 +467,14 @@ Tab::~Tab()
 float
 Tab::Position() const
 {
-	return (float)fVariable->Value();
+	return (float)fVariable->Value() - kMakePositiveOffset;
 }
 
 
 void
 Tab::SetPosition(float position)
 {
-	fVariable->SetValue(position);
+	fVariable->SetValue(position + kMakePositiveOffset);
 }
 
 

@@ -57,9 +57,6 @@ GroupCookie::~GroupCookie()
 }
 
 
-const float kBigOffset = 5000;
-
-
 void
 GroupCookie::DoGroupLayout(SATWindow* triggerWindow)
 {
@@ -68,7 +65,7 @@ GroupCookie::DoGroupLayout(SATWindow* triggerWindow)
 
 	BRect frame = triggerWindow->CompleteWindowFrame();
 	// Make it also work for solver which don't support negative variables
-	frame.OffsetBy(kBigOffset, kBigOffset);
+	frame.OffsetBy(kMakePositiveOffset, kMakePositiveOffset);
 
 	// adjust window size soft constraints
 	fWidthConstraint->SetRightSide(frame.Width());
@@ -122,9 +119,10 @@ GroupCookie::MoveWindow(int32 workspace)
 	Desktop* desktop = window->Desktop();
 
 	BRect frame = fSATWindow->CompleteWindowFrame();
-	BRect frameSAT(fLeftBorder->Value() - kBigOffset,
-		fTopBorder->Value() - kBigOffset, fRightBorder->Value() - kBigOffset,
-		fBottomBorder->Value() - kBigOffset);
+	BRect frameSAT(fLeftBorder->Value() - kMakePositiveOffset,
+		fTopBorder->Value() - kMakePositiveOffset,
+		fRightBorder->Value() - kMakePositiveOffset,
+		fBottomBorder->Value() - kMakePositiveOffset);
 
 	desktop->MoveWindowBy(window, round(frameSAT.left - frame.left),
 		round(frameSAT.top - frame.top), workspace);

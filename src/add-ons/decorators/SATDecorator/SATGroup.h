@@ -86,6 +86,10 @@ class SATGroup;
 typedef BObjectList<Crossing> CrossingList;
 
 
+// make all coordinates positive needed for the solver
+const float kMakePositiveOffset = 5000;
+
+
 class Tab : public BReferenceable {
 public:
 		enum orientation_t
