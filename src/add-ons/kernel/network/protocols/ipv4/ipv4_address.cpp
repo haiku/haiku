@@ -448,8 +448,7 @@ ipv4_set_to_defaults(sockaddr *_defaultMask, sockaddr *_defaultBroadcast,
 		defaultBroadcast->sin_len = sizeof(sockaddr_in);
 		defaultBroadcast->sin_family = AF_INET;
 		defaultBroadcast->sin_port = 0;
-		defaultBroadcast->sin_addr.s_addr = (address->sin_addr.s_addr & net)
-			| ~net;
+		defaultBroadcast->sin_addr.s_addr = address->sin_addr.s_addr | ~net;
 	}
 
 	return B_OK;
