@@ -21,7 +21,7 @@ public:
 								BPackageEntry(BPackageEntry* parent,
 									const char* name);
 
-			const BPackageEntry*	Parent() const		{ return fParent; }
+			const BPackageEntry*	Parent() const	{ return fParent; }
 			const char*			Name() const		{ return fName; }
 			void*				UserToken() const	{ return fUserToken; }
 
@@ -67,7 +67,7 @@ private:
 			timespec			fAccessTime;
 			timespec			fModifiedTime;
 			timespec			fCreationTime;
-			BPackageData			fData;
+			BPackageData		fData;
 			const char*			fSymlinkPath;
 };
 
