@@ -589,9 +589,10 @@ PackageReaderImpl::ParseContent(BPackageContentHandler* contentHandler)
 {
 	AttributeHandlerContext context(ErrorOutput(), contentHandler);
 	RootAttributeHandler rootAttributeHandler;
-	status_t error = _ParseTOC(&context, &rootAttributeHandler);
+	status_t error
+		= ParsePackageAttributesSection(&context, &rootAttributeHandler);
 	if (error == B_OK)
-		error = ParsePackageAttributesSection(&context, &rootAttributeHandler);
+		error = _ParseTOC(&context, &rootAttributeHandler);
 	return error;
 }
 
@@ -601,9 +602,10 @@ PackageReaderImpl::ParseContent(BLowLevelPackageContentHandler* contentHandler)
 {
 	AttributeHandlerContext context(ErrorOutput(), contentHandler);
 	LowLevelAttributeHandler rootAttributeHandler;
-	status_t error = _ParseTOC(&context, &rootAttributeHandler);
+	status_t error
+		= ParsePackageAttributesSection(&context, &rootAttributeHandler);
 	if (error == B_OK)
-		error = ParsePackageAttributesSection(&context, &rootAttributeHandler);
+		error = _ParseTOC(&context, &rootAttributeHandler);
 	return error;
 }
 
