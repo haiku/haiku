@@ -41,6 +41,7 @@ HAIKU_PACKAGE_FS_PACKAGE_READER_SOURCES =
 	PackageEntry.cpp
 	PackageEntryAttribute.cpp
 	PackageReaderImpl.cpp
+	ReaderImplBase.cpp
 
 	# compression
 	ZlibCompressionBase.cpp

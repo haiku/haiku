@@ -7,14 +7,7 @@
 #define _PACKAGE__HPKG__PRIVATE__PACKAGE_READER_IMPL_H_
 
 
-#include <SupportDefs.h>
-
-#include <util/SinglyLinkedList.h>
-
-#include <package/hpkg/PackageAttributeValue.h>
-#include <package/hpkg/PackageContentHandler.h>
-#include <package/hpkg/PackageInfoAttributeValue.h>
-#include <package/hpkg/PackageReader.h>
+#include <package/hpkg/ReaderImplBase.h>
 
 
 namespace BPackageKit {
@@ -24,13 +17,13 @@ namespace BHPKG {
 
 class BPackageEntry;
 class BPackageEntryAttribute;
-class BErrorOutput;
 
 
 namespace BPrivate {
 
 
-class PackageReaderImpl {
+class PackageReaderImpl : public ReaderImplBase {
+	typedef	ReaderImplBase		inherited;
 public:
 								PackageReaderImpl(
 									BErrorOutput* errorOutput);
@@ -43,120 +36,38 @@ public:
 			status_t			ParseContent(BLowLevelPackageContentHandler*
 										contentHandler);
 
-			int					PackageFileFD()	{ return fFD; }
+			int					PackageFileFD() const;
+
+protected:
+								// from ReaderImplBase
+	virtual	status_t			ReadAttributeValue(uint8 type, uint8 encoding,
+									AttributeValue& _value);
 
 private:
-			struct AttributeHandlerContext;
-			struct AttributeHandler;
-			struct IgnoreAttributeHandler;
 			struct DataAttributeHandler;
 			struct AttributeAttributeHandler;
 			struct EntryAttributeHandler;
-			struct PackageAttributeHandler;
-			struct PackageVersionAttributeHandler;
-			struct PackageResolvableAttributeHandler;
-			struct PackageResolvableExpressionAttributeHandler;
 			struct RootAttributeHandler;
-			struct LowLevelAttributeHandler;
-			struct PackageContentListHandler;
-
-			struct SectionInfo {
-				uint32			compression;
-				uint32			compressedLength;
-				uint32			uncompressedLength;
-				uint8*			data;
-				uint64			offset;
-				uint64			currentOffset;
-				uint64			stringsLength;
-				uint64			stringsCount;
-				char**			strings;
-				const char*		name;
-
-				SectionInfo(const char* _name)
-					:
-					data(NULL),
-					strings(NULL),
-					name(_name)
-				{
-				}
-
-				~SectionInfo()
-				{
-					delete[] strings;
-					delete[] data;
-				}
-			};
-
-			typedef BPackageAttributeValue AttributeValue;
-			typedef SinglyLinkedList<AttributeHandler> AttributeHandlerList;
 
 private:
-			status_t			_Init(const char* fileName);
-
-			const char*			_CheckCompression(
-									const SectionInfo& section) const;
-
-			status_t			_ParseStrings();
-
-			status_t			_ParseContent(AttributeHandlerContext* context,
+			status_t			_ParseTOC(AttributeHandlerContext* context,
 									AttributeHandler* rootAttributeHandler);
-			status_t			_ParseAttributeTree(
-									AttributeHandlerContext* context);
-
-			status_t			_ReadAttribute(uint8& _id,
-									AttributeValue& _value,
-									bool* _hasChildren = NULL,
-									uint64* _tag = NULL);
-
-			status_t			_ReadAttributeValue(uint8 type, uint8 encoding,
-									AttributeValue& _value);
-
-			status_t			_ReadUnsignedLEB128(uint64& _value);
-			status_t			_ReadString(const char*& _string,
-									size_t* _stringLength = NULL);
-
-	template<typename Type>
-	inline	status_t			_Read(Type& _value);
 
 			status_t			_GetTOCBuffer(size_t size,
 									const void*& _buffer);
-			status_t			_ReadSectionBuffer(void* buffer, size_t size);
-
-			status_t			_ReadBuffer(off_t offset, void* buffer,
-									size_t size);
-			status_t			_ReadCompressedBuffer(
-									const SectionInfo& section);
-
-	inline	AttributeHandler*	_CurrentAttributeHandler() const;
-	inline	void				_PushAttributeHandler(
-									AttributeHandler* handler);
-	inline	AttributeHandler*	_PopAttributeHandler();
-
 private:
-			BErrorOutput*		fErrorOutput;
-			int					fFD;
-			bool				fOwnsFD;
-
 			uint64				fTotalSize;
 			uint64				fHeapOffset;
 			uint64				fHeapSize;
 
 			SectionInfo			fTOCSection;
-			SectionInfo			fPackageAttributesSection;
-			SectionInfo*		fCurrentSection;
-
-			AttributeHandlerList* fAttributeHandlerStack;
-
-			uint8*				fScratchBuffer;
-			size_t				fScratchBufferSize;
 };
 
 
-template<typename Type>
-status_t
-PackageReaderImpl::_Read(Type& _value)
+inline int
+PackageReaderImpl::PackageFileFD() const
 {
-	return _ReadSectionBuffer(&_value, sizeof(Type));
+	return FD();
 }
 
 
