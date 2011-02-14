@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2011, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -709,7 +709,8 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address,
 				break;
 			}
 			case OPTION_SERVER_ADDRESS:
-				fServer.SetAddress(*(in_addr_t*)data);
+				fServer.SetAddress(
+					(in_addr_t)B_BENDIAN_TO_HOST_INT32(*(uint32*)data));
 				break;
 
 			case OPTION_ADDRESS_LEASE_TIME:
