@@ -77,7 +77,7 @@ using namespace BPrivate;
 using std::map;
 
 
-const char* kDateLabel = "Date:";
+const char* kDateLabel = B_TRANSLATE("Date:");
 const uint32 kMsgFrom = 'hFrm';
 const uint32 kMsgEncoding = 'encd';
 const uint32 kMsgAddressChosen = 'acsn';
@@ -234,7 +234,7 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 		fEncodingMenu->AddSeparatorItem();
 		msg = new BMessage(kMsgEncoding);
 		msg->AddInt32("charset", B_MAIL_NULL_CONVERSION);
-		fEncodingMenu->AddItem(item = new BMenuItem("Automatic", msg));
+		fEncodingMenu->AddItem(item = new BMenuItem(B_TRANSLATE("Automatic"), msg));
 		if (!markedCharSet)
 			item->SetMarked(true);
 	}

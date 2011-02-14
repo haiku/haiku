@@ -870,29 +870,22 @@ TTextView::TTextView(BRect frame, BRect text, bool incoming,
 	fCursor(false),
 	fFirstSpellMark(NULL)
 {
-	BFont menuFont = *be_plain_font;
-	menuFont.SetSize(10);
-
 	fStopSem = create_sem(1, "reader_sem");
 	SetStylable(true);
 
 	fEnclosures = new BList();
 
-	//
-	//	Enclosure pop up menu
-	//
+	// Enclosure pop up menu
 	fEnclosureMenu = new BPopUpMenu("Enclosure", false, false);
-	fEnclosureMenu->SetFont(&menuFont);
+	fEnclosureMenu->SetFont(be_plain_font);
 	fEnclosureMenu->AddItem(new BMenuItem(
 		B_TRANSLATE("Save attachment" B_UTF8_ELLIPSIS),	new BMessage(M_SAVE)));
 	fEnclosureMenu->AddItem(new BMenuItem(B_TRANSLATE("Open attachment"),
 		new BMessage(M_OPEN)));
 
-	//
-	//	Hyperlink pop up menu
-	//
+	// Hyperlink pop up menu
 	fLinkMenu = new BPopUpMenu("Link", false, false);
-	fLinkMenu->SetFont(&menuFont);
+	fLinkMenu->SetFont(be_plain_font);
 	fLinkMenu->AddItem(new BMenuItem(B_TRANSLATE("Open this link"),
 		new BMessage(M_OPEN)));
 	fLinkMenu->AddItem(new BMenuItem(B_TRANSLATE("Copy link location"),
@@ -1543,7 +1536,8 @@ TTextView::MouseDown(BPoint where)
 						delete string;
 					}
 				} else {
-					(menuItem = new BMenuItem("No matches", NULL))->SetEnabled(false);
+					menuItem = new BMenuItem(B_TRANSLATE("No matches"), NULL);
+					menuItem->SetEnabled(false);
 					menu.AddItem(menuItem);
 				}
 

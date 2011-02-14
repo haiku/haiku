@@ -31,15 +31,9 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
-//--------------------------------------------------------------------
-//	
-//	Enclosures.h
-//
-//--------------------------------------------------------------------
-
 #ifndef _ENCLOSURES_H
 #define _ENCLOSURES_H
+
 
 #include <Box.h>
 #include <File.h>
@@ -54,77 +48,71 @@ All rights reserved.
 
 #include <MailMessage.h>
 
-#define ENCLOSURES_HEIGHT	 65
 
-#define ENCLOSE_TEXT		"Attachments:"
-#define ENCLOSE_TEXT_H		 7
-#define ENCLOSE_TEXT_V		 3
-#define ENCLOSE_FIELD_V		 3
+#define ENCLOSURES_HEIGHT	65
+
+#define ENCLOSE_TEXT		B_TRANSLATE_WITH_CONTEXT("Attachments:", "Mail")
+#define ENCLOSE_TEXT_H		7
+#define ENCLOSE_TEXT_V		3
+#define ENCLOSE_FIELD_V		3
+
 
 class TListView;
 class TMailWindow;
 class TScrollView;
 
 
-//====================================================================
+class TEnclosuresView : public BView {
+public:
+								TEnclosuresView(BRect rect, BRect windowRect);
+	virtual						~TEnclosuresView();
 
-class TEnclosuresView : public BView
-{
-	public:
-		TEnclosuresView(BRect, BRect);
-		~TEnclosuresView();
+	virtual	void				Draw(BRect updateRect);
+	virtual	void				MessageReceived(BMessage* message);
+			void				Focus(bool focus);
+			void				AddEnclosuresFromMail(BEmailMessage* mail);
 
-		virtual	void Draw(BRect);
-		virtual void MessageReceived(BMessage*);
-		void Focus(bool);
-		void AddEnclosuresFromMail(BEmailMessage *mail);
+			TListView*			fList;
 
-		TListView *fList;
-
-	private:
-		bool fFocus;
-		float fOffset;
-		TMailWindow *fWindow;
+private:
+			bool				fFocus;
+			float				fOffset;
+			TMailWindow*		fWindow;
 };
 
 
-//====================================================================
+class TListView : public BListView {
+public:
+								TListView(BRect rect, TEnclosuresView* view);
 
-class TListView : public BListView
-{
-	public:
-		TListView(BRect, TEnclosuresView *);
+	virtual	void				AttachedToWindow();
+	virtual	void				MakeFocus(bool focus);
+	virtual	void				MouseDown(BPoint point);
+	virtual	void				KeyDown(const char* bytes,int32 numBytes);
 
-		virtual	void AttachedToWindow();
-		virtual void MakeFocus(bool);
-		virtual void MouseDown(BPoint point);
-		virtual void KeyDown(const char *bytes,int32 numBytes);
-
-	private:
-		TEnclosuresView *fParent;
+private:
+			TEnclosuresView*	fParent;
 };
 
 
-//====================================================================
+class TListItem : public BListItem {
+public:
+								TListItem(entry_ref* ref);
+								TListItem(BMailComponent* component);
 
-class TListItem : public BListItem
-{
-	public:
-		TListItem(entry_ref *);
-		TListItem(BMailComponent *);
+	virtual	void				DrawItem(BView* owner, BRect rect,
+									bool complete);
+	virtual	void				Update(BView* owner, const BFont* font);
 
-		virtual void DrawItem(BView *, BRect, bool);
-		virtual	void Update(BView *, const BFont *);
+			BMailComponent*		Component() { return fComponent; };
+			entry_ref*			Ref() { return &fRef; }
+			node_ref*			NodeRef() { return &fNodeRef; }
 
-		BMailComponent *Component() { return fComponent; };
-		entry_ref	*Ref() { return &fRef; }
-		node_ref	*NodeRef() { return &fNodeRef; }
-
-	private:
-		BMailComponent	*fComponent;
-		entry_ref	fRef;
-		node_ref	fNodeRef;
+private:
+			BMailComponent*		fComponent;
+			entry_ref			fRef;
+			node_ref			fNodeRef;
 };
 
-#endif // #ifndef _ENCLOSURES_H
 
+#endif	// _ENCLOSURES_H
