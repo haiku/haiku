@@ -43,6 +43,7 @@ public:
 									uint32 uncompressedSize) = 0;
 	virtual void				OnRepositoryDone(uint32 headerSize,
 									uint32 repositoryInfoLength,
+									uint32 licenseCount,
 									uint32 packageCount,
 									uint32 packageAttributesSize,
 									uint64 totalSize) = 0;
@@ -54,7 +55,7 @@ public:
 public:
 								BRepositoryWriter(
 									BRepositoryWriterListener* listener,
-									const BRepositoryInfo* repositoryInfo);
+									BRepositoryInfo* repositoryInfo);
 								~BRepositoryWriter();
 
 			status_t			Init(const char* fileName);

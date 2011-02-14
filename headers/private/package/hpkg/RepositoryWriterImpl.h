@@ -30,33 +30,18 @@ namespace BPrivate {
 
 struct hpkg_header;
 
-class RepositoryWriterImpl
-	: public WriterImplBase, private BPackageContentHandler {
+class RepositoryWriterImpl : public WriterImplBase {
 	typedef	WriterImplBase		inherited;
 
 public:
 								RepositoryWriterImpl(
 									BRepositoryWriterListener* listener,
-									const BRepositoryInfo* repositoryInfo);
+									BRepositoryInfo* repositoryInfo);
 								~RepositoryWriterImpl();
 
 			status_t			Init(const char* fileName);
 			status_t			AddPackage(const BEntry& packageEntry);
 			status_t			Finish();
-
-private:
-								// BPackageContentHandler
-	virtual	status_t			HandleEntry(BPackageEntry* entry);
-	virtual	status_t			HandleEntryAttribute(BPackageEntry* entry,
-									BPackageEntryAttribute* attribute);
-	virtual	status_t			HandleEntryDone(BPackageEntry* entry);
-
-	virtual	status_t			HandlePackageAttribute(
-									const BPackageInfoAttributeValue& value
-									);
-	virtual	status_t			HandlePackageAttributesDone();
-
-	virtual	void				HandleErrorOccurred();
 
 private:
 			status_t			_Init(const char* fileName);
@@ -75,7 +60,7 @@ private:
 private:
 			BRepositoryWriterListener*	fListener;
 
-			const BRepositoryInfo*	fRepositoryInfo;
+			BRepositoryInfo*	fRepositoryInfo;
 
 			BPackageInfo		fPackageInfo;
 			uint32				fPackageCount;

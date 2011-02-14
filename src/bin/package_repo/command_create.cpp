@@ -85,12 +85,15 @@ public:
 	}
 
 	virtual void OnRepositoryDone(uint32 headerSize, uint32 repositoryInfoSize,
-		uint32 packageCount, uint32 packageAttributesSize, uint64 totalSize)
+		uint32 licenseCount, uint32 packageCount, uint32 packageAttributesSize,
+		uint64 totalSize)
 	{
 		if (fQuiet)
 			return;
 
 		printf("----- Package Repository Info -----\n");
+		if (fVerbose)
+			printf("embedded license count   %10lu\n", licenseCount);
 		printf("package count            %10lu\n", packageCount);
 		printf("-----------------------------------\n");
 		printf("header size:             %10lu\n", headerSize);

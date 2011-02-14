@@ -18,7 +18,7 @@ namespace BHPKG {
 
 
 BRepositoryWriter::BRepositoryWriter(BRepositoryWriterListener* listener,
-	const BRepositoryInfo* repositoryInfo)
+	BRepositoryInfo* repositoryInfo)
 	:
 	fImpl(new (std::nothrow) RepositoryWriterImpl(listener, repositoryInfo))
 {
