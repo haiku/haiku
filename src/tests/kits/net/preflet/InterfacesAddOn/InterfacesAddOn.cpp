@@ -16,7 +16,7 @@
 
 #include "InterfacesAddOn.h"
 #include "InterfacesListView.h"
-#include "SettingsWindow.h"
+#include "InterfaceWindow.h"
 
 #include <stdio.h>
 
@@ -137,7 +137,7 @@ InterfacesAddOn::MessageReceived(BMessage* msg)
 		if (!item)
 			break;
 
-		SettingsWindow* sw = new SettingsWindow(item->GetSettings());
+		InterfaceWindow* sw = new InterfaceWindow(item->GetSettings());
 		sw->Show();
 		break;
 	}

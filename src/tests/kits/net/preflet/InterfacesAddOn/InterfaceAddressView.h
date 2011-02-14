@@ -6,8 +6,8 @@
  *      Alexander von Gluck, kallisti5@unixzen.com
  */
 
-#ifndef SETTINGS_IFVIEW_H
-#define SETTINGS_IFVIEW_H
+#ifndef INTERFACE_ADDRESS_VIEW_H
+#define INTERFACE_ADDRESS_VIEW_H
 
 #include "NetworkSettings.h"
 
@@ -15,11 +15,12 @@
 #include <View.h>
 
 
-class SettingsIfView : public BView {
+class InterfaceAddressView : public BView {
 public:
-								SettingsIfView(BRect frame, const char* name,
-									int family, NetworkSettings* settings);
-	virtual						~SettingsIfView();
+								InterfaceAddressView(BRect frame,
+									const char* name, int family,
+									NetworkSettings* settings);
+	virtual						~InterfaceAddressView();
 
 private:
 			NetworkSettings*	fSettings;
@@ -27,5 +28,5 @@ private:
 };
 
 
-#endif /* SETTINGS_IFVIEW_H */
+#endif /* INTERFACE_ADDRESS_VIEW_H */
 

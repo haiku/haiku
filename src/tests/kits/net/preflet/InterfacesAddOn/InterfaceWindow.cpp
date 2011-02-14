@@ -7,8 +7,8 @@
  */
 
 
-#include "SettingsWindow.h"
-#include "SettingsIfView.h"
+#include "InterfaceWindow.h"
+#include "InterfaceAddressView.h"
 
 #include <Application.h>
 
@@ -16,7 +16,7 @@
 #define B_TRANSLATE_CONTEXT "NetworkSetupWindow"
 
 
-SettingsWindow::SettingsWindow(NetworkSettings* settings)
+InterfaceWindow::InterfaceWindow(NetworkSettings* settings)
 	: BWindow(BRect(50, 50, 400, 302), "Interface Settings",
 		B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
 		B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE,
@@ -51,13 +51,13 @@ SettingsWindow::SettingsWindow(NetworkSettings* settings)
 }
 
 
-SettingsWindow::~SettingsWindow()
+InterfaceWindow::~InterfaceWindow()
 {
 }
 
 
 void
-SettingsWindow::MessageReceived(BMessage* message)
+InterfaceWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		default:
@@ -68,12 +68,12 @@ SettingsWindow::MessageReceived(BMessage* message)
 
 
 status_t
-SettingsWindow::_PopulateTabs()
+InterfaceWindow::_PopulateTabs()
 {
 	BRect frame = fTabView->Bounds();
-	BView* view4 = new SettingsIfView(frame, "net_settings_ipv4",
+	BView* view4 = new InterfaceAddressView(frame, "net_settings_ipv4",
 		AF_INET, fNetworkSettings);
-	BView* view6 = new SettingsIfView(frame, "net_settings_ipv6",
+	BView* view6 = new InterfaceAddressView(frame, "net_settings_ipv6",
 		AF_INET6, fNetworkSettings);
 
 	BTab* tab4 = new BTab;
@@ -90,7 +90,7 @@ SettingsWindow::_PopulateTabs()
 
 
 bool
-SettingsWindow::QuitRequested()
+InterfaceWindow::QuitRequested()
 {
 	return true;
 }

@@ -7,8 +7,8 @@
  */
 
 
-#ifndef SETTINGS_WINDOW_H
-#define SETTINGS_WINDOW_H
+#ifndef INTERFACE_WINDOW_H
+#define INTERFACE_WINDOW_H
 
 #include "NetworkSettings.h"
 
@@ -26,10 +26,10 @@ enum {
 };
 
 
-class SettingsWindow : public BWindow {
+class InterfaceWindow : public BWindow {
 public:
-								SettingsWindow(NetworkSettings* settings);
-	virtual						~SettingsWindow();
+								InterfaceWindow(NetworkSettings* settings);
+	virtual						~InterfaceWindow();
 	virtual	bool				QuitRequested();
 	virtual	void				MessageReceived(BMessage* mesage);
 
@@ -43,5 +43,5 @@ private:
 };
 
 
-#endif  /* SETTINGS_WINDOW_H */
+#endif  /* INTERFACE_WINDOW_H */
 

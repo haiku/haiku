@@ -6,7 +6,7 @@
  *      Alexander von Gluck, kallisti5@unixzen.com
  */
 
-#include "SettingsIfView.h"
+#include "InterfaceAddressView.h"
 #include "NetworkSettings.h"
 
 #include <GroupLayout.h>
@@ -14,8 +14,8 @@
 #include <StringView.h>
 
 
-SettingsIfView::SettingsIfView(BRect frame, const char* name, int family,
-	NetworkSettings* settings)
+InterfaceAddressView::InterfaceAddressView(BRect frame, const char* name,
+	int family, NetworkSettings* settings)
 	:
 	BView(frame, name, B_FOLLOW_ALL_SIDES, 0),
 	fSettings(settings),
@@ -36,7 +36,7 @@ SettingsIfView::SettingsIfView(BRect frame, const char* name, int family,
 }
 
 
-SettingsIfView::~SettingsIfView()
+InterfaceAddressView::~InterfaceAddressView()
 {
 
 }
