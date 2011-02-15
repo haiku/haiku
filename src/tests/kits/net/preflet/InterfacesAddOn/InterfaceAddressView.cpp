@@ -12,6 +12,7 @@
 
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
+#include <GridLayoutBuilder.h>
 #include <MenuItem.h>
 #include <StringView.h>
 
@@ -23,9 +24,6 @@ InterfaceAddressView::InterfaceAddressView(BRect frame, const char* name,
 	fSettings(settings),
 	fFamily(family)
 {
-	float textControlW;
-	float textControlH;
-
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
 	// Create our controls
@@ -39,35 +37,27 @@ InterfaceAddressView::InterfaceAddressView(BRect frame, const char* name,
 	fModePopUpMenu->AddItem(new BMenuItem("None",
 		new BMessage(NONESEL_MSG)));
 
-	fModeField = new BMenuField(frame, "mode", "Mode:",
-		fModePopUpMenu, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP, B_WILL_DRAW);
+	fModeField = new BMenuField("Mode:", fModePopUpMenu);
 
-	fAddressField = new BTextControl(frame, "address", "IP Address:",
-		NULL, NULL, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
-	fNetmaskField = new BTextControl(frame, "netmask", "Netmask:",
-		NULL, NULL, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
-	fGatewayField = new BTextControl(frame, "gateway", "Gateway:",
-		NULL, NULL, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
-
-	fAddressField->GetPreferredSize(&textControlW, &textControlH);
-	float labelSize = ( textControlW + 50 )
-		- fAddressField->StringWidth("XXX.XXX.XXX.XXX");
+	fAddressField = new BTextControl("IP Address:", NULL, NULL);
+	fNetmaskField = new BTextControl("Netmask:", NULL, NULL);
+	fGatewayField = new BTextControl("Gateway:", NULL, NULL);
 
 	RevertFields();
 		// Do the initial field population
 
-	fModeField->SetDivider(labelSize);
-	fAddressField->SetDivider(labelSize);
-	fNetmaskField->SetDivider(labelSize);
-	fGatewayField->SetDivider(labelSize);
-
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
-		.Add(fModeField)
-		.Add(fAddressField)
-		.Add(fNetmaskField)
-		.Add(fGatewayField)
+		.Add(BGridLayoutBuilder()
+			.Add(fModeField->CreateLabelLayoutItem(), 0, 0)
+			.Add(fModeField->CreateMenuBarLayoutItem(), 1, 0)
+			.Add(fAddressField->CreateLabelLayoutItem(), 0, 1)
+			.Add(fAddressField->CreateTextViewLayoutItem(), 1, 1)
+			.Add(fNetmaskField->CreateLabelLayoutItem(), 0, 2)
+			.Add(fNetmaskField->CreateTextViewLayoutItem(), 1, 2)
+			.Add(fGatewayField->CreateLabelLayoutItem(), 0, 3)
+			.Add(fGatewayField->CreateTextViewLayoutItem(), 1, 3)
+		)
 		.AddGlue()
-		.SetInsets(10, 10, 10, 10)
 	);
 }
 
