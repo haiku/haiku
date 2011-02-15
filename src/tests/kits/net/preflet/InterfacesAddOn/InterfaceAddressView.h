@@ -20,7 +20,8 @@
 
 enum {
     AUTOSEL_MSG = 'iato',
-    STATICSEL_MSG = 'istc'
+    STATICSEL_MSG = 'istc',
+    NONESEL_MSG = 'inon'
 };
 
 

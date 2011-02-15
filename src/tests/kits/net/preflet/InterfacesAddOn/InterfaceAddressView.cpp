@@ -35,6 +35,9 @@ InterfaceAddressView::InterfaceAddressView(BRect frame, const char* name,
 		new BMessage(AUTOSEL_MSG)));
 	fModePopUpMenu->AddItem(new BMenuItem("Static",
 		new BMessage(STATICSEL_MSG)));
+	fModePopUpMenu->AddSeparatorItem();
+	fModePopUpMenu->AddItem(new BMenuItem("None",
+		new BMessage(NONESEL_MSG)));
 
 	fModeField = new BMenuField(frame, "mode", "Mode:",
 		fModePopUpMenu, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP, B_WILL_DRAW);
@@ -92,6 +95,12 @@ InterfaceAddressView::MessageReceived(BMessage* message)
 		case STATICSEL_MSG:
 			_EnableFields(true);
 			break;
+		case NONESEL_MSG:
+			_EnableFields(false);
+			fAddressField->SetText("");
+			fNetmaskField->SetText("");
+			fGatewayField->SetText("");
+			break;
 		default:
 			BView::MessageReceived(message);
 	}
@@ -111,13 +120,23 @@ status_t
 InterfaceAddressView::RevertFields()
 {
 	// Populate address fields with current settings
+
 	const char* currMode = fSettings->AutoConfigure() ? "Automatic" : "Static";
-	BMenuItem* item = fModePopUpMenu->FindItem(currMode);
-	if (item)
-		item->SetMarked(true);
 
 	_EnableFields(!fSettings->AutoConfigure());
 		// if Autoconfigured, disable address fields until changed
+
+	// TODO : AutoConfigure needs to be based on family
+	if (fSettings->IPAddr(fFamily).IsEmpty()
+		&& !fSettings->AutoConfigure())
+	{
+		currMode = "None";
+		_EnableFields(false);
+	}
+
+	BMenuItem* item = fModePopUpMenu->FindItem(currMode);
+	if (item)
+		item->SetMarked(true);
 
 	fAddressField->SetText(fSettings->IP(fFamily));
 	fNetmaskField->SetText(fSettings->Netmask(fFamily));
