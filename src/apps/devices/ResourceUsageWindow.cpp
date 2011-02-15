@@ -189,7 +189,7 @@ RangeItem::Compare(const void *firstArg, const void *secondArg)
 
 // ResourceUsageWindow - Constructor
 ResourceUsageWindow::ResourceUsageWindow(BRect frame, BList &list) 
-	: BWindow (frame, "Resource Usage", B_TITLED_WINDOW_LOOK,
+	: BWindow (frame, B_TRANSLATE("Resource Usage"), B_TITLED_WINDOW_LOOK,
 		B_NORMAL_WINDOW_FEEL , B_NOT_ZOOMABLE|B_NOT_RESIZABLE)
 {
 	InitWindow(list);

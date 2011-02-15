@@ -48,17 +48,22 @@ DeviceACPI::InitFromAttributes()
 	} else if (rootACPIPath == "\\_TZ_") {
 		outlineName = B_TRANSLATE("ACPI Thermal Zone");
 	} else if (rootACPIPath == "\\_PR_.") {
+		// This allows to localize apostrophes, too
+		BString string(B_TRANSLATE("ACPI Processor Namespace '%2'"));
+		string.ReplaceFirst("%2", nodeACPIPath);
 		// each CPU node is considered a root node
-		outlineName << B_TRANSLATE("ACPI Processor Namespace '")
-			<< nodeACPIPath << "'";
+		outlineName << string.String();
 	} else if (rootACPIPath == "\\_SI_") {
 		outlineName = B_TRANSLATE("ACPI System Indicator");
 	} else {
-		outlineName << B_TRANSLATE("ACPI node '") << nodeACPIPath << "'";
+		// This allows to localize apostrophes, too
+		BString string(B_TRANSLATE("ACPI node '%1'"));
+		string.ReplaceFirst("%1", nodeACPIPath);
+		outlineName << string.String();
 	}
 
 	SetAttribute(B_TRANSLATE("Device name"), outlineName.String());
-	SetAttribute(B_TRANSLATE("Manufacturer"), B_TRANSLATE("Not implimented"));
+	SetAttribute(B_TRANSLATE("Manufacturer"), B_TRANSLATE("Not implemented"));
 
 	SetText(outlineName.String());
 }
@@ -79,7 +84,8 @@ DeviceACPI::GetBusAttributes()
 BString
 DeviceACPI::GetBusStrings()
 {
-	BString str;
-	str << "Class Info:\t\t\t\t: " << fAttributeMap["Class Info"];
+	BString str("Class Info:\t\t\t\t: %classInfo%");
+	str.ReplaceFirst("%classInfo%", fAttributeMap["Class Info"]);
+	
 	return str;
 }

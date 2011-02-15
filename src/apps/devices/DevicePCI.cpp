@@ -19,7 +19,6 @@ extern "C" {
 }
 
 
-
 DevicePCI::DevicePCI(Device* parent)
 	:
 	Device(parent),
@@ -76,7 +75,7 @@ DevicePCI::InitFromAttributes()
 	const char *venFull;
 	get_vendor_info(fVendorId, &venShort, &venFull);
 	if (!venShort && !venFull) {
-		ManufacturerName << "Unknown";
+		ManufacturerName << B_TRANSLATE("Unknown");
 	} else if (venShort && venFull) {
 		ManufacturerName << venFull << "(" << venShort << ")";
 	} else {
@@ -90,7 +89,7 @@ DevicePCI::InitFromAttributes()
 	get_device_info(fVendorId, fDeviceId, fSubsystemVendorId, fSubSystemId,
 		&devShort, &devFull);
 	if (!devShort && !devFull) {
-		DeviceName << "Unknown";
+		DeviceName << B_TRANSLATE("Unknown");
 	} else if (devShort && devFull) {
 		DeviceName << devFull << "(" << devShort << ")";
 	} else {
@@ -125,7 +124,7 @@ DevicePCI::GetBusAttributes()
 BString
 DevicePCI::GetBusStrings()
 {
-	BString str;
-	str << "Class Info:\t\t\t\t: " << fAttributeMap["Class Info"];
+	BString str("Class Info:\t\t\t\t: %classInfo%");
+	str.ReplaceFirst("%classInfo%", fAttributeMap["Class Info"]);
 	return str;
 }

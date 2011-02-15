@@ -107,18 +107,23 @@ Device::GetAllAttributes()
 BString
 Device::GetBasicStrings()
 {
-	BString str;
-	str << B_TRANSLATE("Device Name\t\t\t\t: ") << GetName() << "\n";
-	str << B_TRANSLATE("Manufacturer\t\t\t: ") << GetManufacturer() << "\n";
-	str << B_TRANSLATE("Driver used\t\t\t\t: ") << GetDriverUsed() << "\n";
-	str << B_TRANSLATE("Device paths\t: ") << GetDevPathsPublished();
+	BString str(B_TRANSLATE("Device Name\t\t\t\t: %Name%\n"
+							"Manufacturer\t\t\t: %Manufacturer%\n"
+							"Driver used\t\t\t\t: %DriverUsed%\n"
+							"Device paths\t: %DevicePaths%"));
+	
+	str.ReplaceFirst("%Name%", GetName()); 
+	str.ReplaceFirst("%Manufacturer%", GetManufacturer());
+	str.ReplaceFirst("%DriverUsed%", GetDriverUsed());
+	str.ReplaceFirst("%DevicePaths%", GetDevPathsPublished());
+
 	return str;
 }
 
 BString
 Device::GetBusStrings()
 {
-	return "None";
+	return B_TRANSLATE("None");
 }
 
 
