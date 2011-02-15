@@ -201,10 +201,10 @@ rule ExtractArchive directory : entries : archiveFile : grist
 	# <directory> - The directory into which to extract the archive file. The
 	#               directory is created is by this rule and it is the target
 	#               that the extract action is associated with.
-	# <entries>   - The entries of the archive file one is interested in. The 
-	#               rule always exctracts the complete archive file, from the 
-	#               given entries the rule creates targets (using <grist>) 
-	#               representing the extracted entries. Those targets are 
+	# <entries>   - The entries of the archive file one is interested in. The
+	#               rule always extracts the complete archive file, from the
+	#               given entries the rule creates targets (using <grist>)
+	#               representing the extracted entries. Those targets are
 	#               returned by the rule.
 	# <archiveFile> - The archive file target to extract.
 	# <grist>     - The grist used to create targets from <entries>. Defaults to
