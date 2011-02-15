@@ -13,3 +13,13 @@ Application MediaConverter :
 	: be media tracker $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSTDC++)
 	: MediaConverter.rdef
 ;
+
+DoCatalogs MediaConverter :
+	x-vnd.Haiku-MediaConverter
+	:
+	MediaFileInfoView.cpp
+	MediaFileInfo.cpp
+	MediaEncoderWindow.cpp
+	MediaConverterWindow.cpp
+	MediaConverterApp.cpp
+;

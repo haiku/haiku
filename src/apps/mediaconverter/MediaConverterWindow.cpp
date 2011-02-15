@@ -110,8 +110,9 @@ CodecMenuItem::~CodecMenuItem()
 
 MediaConverterWindow::MediaConverterWindow(BRect frame)
 	:
-	BWindow(frame, "MediaConverter", B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
-		B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
+	BWindow(frame, B_TRANSLATE("MediaConverter"), B_TITLED_WINDOW_LOOK, 
+		B_NORMAL_WINDOW_FEEL, B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS | 
+		B_AUTO_UPDATE_SIZE_LIMITS),
 	fVideoQuality(75),
 	fAudioQuality(75),
 	fSaveFilePanel(NULL),
@@ -386,13 +387,13 @@ MediaConverterWindow::MessageReceived(BMessage* msg)
 		{
 			BString title(B_TRANSLATE("About" B_UTF8_ELLIPSIS));
 			(new BAlert(title,
-					"MediaConverter\n"
+					B_TRANSLATE("MediaConverter\n"
 					VERSION"\n"
 					B_UTF8_COPYRIGHT" 1999, Be Incorporated.\n"
 					B_UTF8_COPYRIGHT" 2000-2004 Jun Suzuki\n"
 					B_UTF8_COPYRIGHT" 2007 Stephan Aßmus\n"
-					B_UTF8_COPYRIGHT" 2010 Haiku, Inc.",
-					B_TRANSLATE("OK")))->Go();
+					B_UTF8_COPYRIGHT" 2010 Haiku, Inc."),
+ 					B_TRANSLATE("OK")))->Go();
 			break;
 		}
 
@@ -436,10 +437,9 @@ MediaConverterWindow::MessageReceived(BMessage* msg)
 			}
 
 			if (status != B_OK && status != B_ALREADY_RUNNING) {
-				BString errorString;
-				errorString << B_TRANSLATE("Error launching: ") << 
-					strerror(status);
-				(new BAlert("", errorString.String(), 
+				BString errorString(B_TRANSLATE("Error launching: %strError%"));
+				errorString.ReplaceFirst("%strError%", strerror(status));
+				(new BAlert(B_TRANSLATE("Error"), errorString.String(), 
 					B_TRANSLATE("OK")))->Go();
 			}
 			break;
