@@ -15,8 +15,11 @@
 #include <ObjectList.h>
 #include <Path.h>
 
+#include <package/RepositoryCache.h>
 #include <package/RepositoryConfig.h>
+#include <package/PackageInfo.h>
 #include <package/PackageRoster.h>
+#include <package/RepositoryInfo.h>
 
 #include "pkgman.h"
 
@@ -95,9 +98,32 @@ command_list_repos(int argc, const char* const* argv)
 			WARN(result, "skipping repository-config '%s'", path.Path());
 			continue;
 		}
-		printf("    %s %s\n",
+		if (verbose && i > 0)
+			printf("\n");
+		printf(" %s %s\n",
 			repoConfig.IsUserSpecific() ? "[User]" : "      ",
 			repoConfig.Name().String());
+		printf("\t\tbase-url:  %s\n", repoConfig.BaseURL().String());
+		printf("\t\tpriority:  %u\n", repoConfig.Priority());
+
+		if (verbose) {
+			BRepositoryCache repoCache;
+			result = roster.GetRepositoryCache(repoName, &repoCache);
+			if (result == B_OK) {
+				printf("\t\tvendor:    %s\n",
+					repoCache.Info().Vendor().String());
+				printf("\t\tsummary:   %s\n",
+					repoCache.Info().Summary().String());
+				printf("\t\tarch:      %s\n", BPackageInfo::kArchitectureNames[
+						repoCache.Info().Architecture()]);
+				printf("\t\tpkg-count: %lu\n", repoCache.PackageCount());
+				printf("\t\torig-url:  %s\n",
+					repoCache.Info().OriginalBaseURL().String());
+				printf("\t\torig-prio: %u\n", repoCache.Info().Priority());
+
+			} else
+				printf("\t\t<no repository cache found>\n");
+		}
 	}
 
 	return 0;
