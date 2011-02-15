@@ -169,7 +169,7 @@ HaikuMailFormatFilter::HeaderFetched(const entry_ref& ref, BFile* file)
 	}
 
 	BNodeInfo info(file);
-	info.SetType("text/x-partial-email");
+	info.SetType(B_PARTIAL_MAIL_TYPE);
 }
 
 
