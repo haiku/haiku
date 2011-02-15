@@ -19,12 +19,12 @@
 #include <Path.h>
 
 #include <HashMap.h>
-#include <HashString.h>
 
 #include <package/hpkg/ErrorOutput.h>
 #include <package/hpkg/PackageInfoAttributeValue.h>
 #include <package/hpkg/RepositoryContentHandler.h>
 #include <package/hpkg/RepositoryReader.h>
+#include <package/HashableString.h>
 #include <package/PackageInfo.h>
 #include <package/RepositoryInfo.h>
 
@@ -32,38 +32,11 @@
 namespace BPackageKit {
 
 
+using BPrivate::HashableString;
 using namespace BHPKG;
 
 
 namespace {
-
-
-struct HashableString : public BString {
-	uint32  hashCode;
-
-	HashableString()
-		:
-		hashCode(0)
-	{
-	}
-
-	HashableString(const BString& string_)
-		:
-		BString(string_),
-		hashCode(string_hash(String()))
-	{
-	}
-
-	inline uint32 GetHashCode() const
-	{
-		return hashCode;
-	}
-
-	inline bool operator!= (const HashableString& other) const
-	{
-		return Compare(other) != 0 || hashCode != other.hashCode;
-	}
-};
 
 
 typedef ::BPrivate::HashMap<HashableString, BPackageInfo> PackageHashMap;

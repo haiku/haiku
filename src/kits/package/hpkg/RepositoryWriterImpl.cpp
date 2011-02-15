@@ -8,13 +8,13 @@
 
 #include <algorithm>
 #include <new>
-#include <set>
 
 #include <ByteOrder.h>
 #include <Message.h>
 #include <Path.h>
 
 #include <AutoDeleter.h>
+#include <HashSet.h>
 
 #include <package/hpkg/HPKGDefsPrivate.h>
 #include <package/hpkg/PackageDataReader.h>
@@ -23,6 +23,7 @@
 #include <package/hpkg/PackageReader.h>
 #include <package/BlockBufferCacheNoLock.h>
 #include <package/ChecksumAccessors.h>
+#include <package/HashableString.h>
 #include <package/RepositoryInfo.h>
 
 
@@ -34,6 +35,7 @@ namespace BPrivate {
 
 
 using BPackageKit::BPrivate::GeneralFileChecksumAccessor;
+using BPackageKit::BPrivate::HashableString;
 
 
 namespace {
@@ -254,7 +256,8 @@ private:
 }	// anonymous namespace
 
 
-struct RepositoryWriterImpl::PackageNameSet : public std::set<BString> {
+struct RepositoryWriterImpl::PackageNameSet
+	: public ::BPrivate::HashSet<HashableString> {
 };
 
 
@@ -281,6 +284,9 @@ RepositoryWriterImpl::Init(const char* fileName)
 {
 	try {
 		fPackageNames = new PackageNameSet();
+		status_t result = fPackageNames->InitCheck();
+		if (result != B_OK)
+			return result;
 		return _Init(fileName);
 	} catch (status_t error) {
 		return error;
@@ -417,9 +423,7 @@ RepositoryWriterImpl::_RegisterCurrentPackageInfo()
 	}
 
 	// reject package with a name that we've seen already
-	PackageNameSet::const_iterator namePos
-		= fPackageNames->find(fPackageInfo.Name());
-	if (namePos != fPackageNames->end()) {
+	if (fPackageNames->Contains(fPackageInfo.Name())) {
 		fListener->PrintError("package %s has already been added!\n",
 			fPackageInfo.Name().String());
 		return B_NAME_IN_USE;
@@ -449,7 +453,8 @@ RepositoryWriterImpl::_RegisterCurrentPackageInfo()
 		return B_BAD_DATA;
 	}
 
-	fPackageNames->insert(fPackageInfo.Name());
+	if ((result = fPackageNames->Add(fPackageInfo.Name())) != B_OK)
+		return result;
 
 	RegisterPackageInfo(PackageAttributes(), fPackageInfo);
 	fPackageCount++;
