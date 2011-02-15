@@ -87,7 +87,7 @@ CDPlayer::CDPlayer(BRect frame, const char *name, uint32 resizeMask,
 		BAlert *alert = new BAlert("CDPlayer", B_TRANSLATE(
 			"It appears that there are no CD"
 			" drives on your computer or there is no system software to "
-			"support one. Sorry."), "OK");
+			"support one. Sorry."), B_TRANSLATE("OK"));
 		alert->Go();
 	}
 
@@ -151,14 +151,14 @@ CDPlayer::BuildGUI()
 	r.OffsetBy(0, r.Height() + 5);
 	r.right = r.left + (r.Width() / 2);
 	fTrackTime = new BStringView(r, "TrackTime",
-		 "Track: 88:88 / 88:88", B_FOLLOW_LEFT_RIGHT);
+		 B_TRANSLATE("Track: 88:88 / 88:88"), B_FOLLOW_LEFT_RIGHT);
 	fTrackTime->ResizeToPreferred();
 	fTrackTime->SetText(B_TRANSLATE("Track: --:-- / --:--"));
 	box->AddChild(fTrackTime);
 
 	r.OffsetTo(fTrackTime->Frame().right + 5, r.top);
 	fDiscTime = new BStringView(r, "DiscTime",
-		"Disc: 88:88 / 88:88", B_FOLLOW_RIGHT);
+		B_TRANSLATE("Disc: 88:88 / 88:88"), B_FOLLOW_RIGHT);
 	fDiscTime->ResizeToPreferred();
 	fDiscTime->SetText(B_TRANSLATE("Disc: --:-- / --:--"));
 	box->AddChild(fDiscTime);
@@ -475,8 +475,8 @@ CDPlayer::_WatchCDState()
 			SetLabel(fCDTitle, B_TRANSLATE("CD drive is empty"));
 
 			SetLabel(fCurrentTrack, "");
-			SetLabel(fTrackTime, "Track: --:-- / --:--");
-			SetLabel(fDiscTime, "Disc: --:-- / --:--");
+			SetLabel(fTrackTime, B_TRANSLATE("Track: --:-- / --:--"));
+			SetLabel(fDiscTime, B_TRANSLATE("Disc: --:-- / --:--"));
 			fPlayList.SetTrackCount(0);
 			fPlayList.SetStartingTrack(1);
 			fPlayList.SetCurrentTrack(1);
@@ -580,7 +580,7 @@ CDPlayer::_WatchCDState()
 	}
 
 	if (updateTrackGui) {
-		BString currentTrackName;
+		BString currentTrackName(B_TRANSLATE("Track %whichTrack%: %trackAt%"));
 
 		if (playlistTrack >= 0) {
 			int16 whichTrack = playlistTrack;
@@ -588,8 +588,14 @@ CDPlayer::_WatchCDState()
 			if (whichTrack == 0)
 				whichTrack++;
 
-			currentTrackName << "Track " << whichTrack << ": "
-				<< fCDData.TrackAt(whichTrack - 1);
+			BString stringTrack;
+			stringTrack << whichTrack;
+
+			BString stringTrackAt;
+			stringTrack << fCDData.TrackAt(whichTrack - 1);
+
+			currentTrackName.ReplaceFirst("%whichTrack%", stringTrack);
+			currentTrackName.ReplaceFirst("%trackAt%", stringTrackAt);
 
 			SetLabel(fCurrentTrack, currentTrackName.String());
 
@@ -606,13 +612,13 @@ CDPlayer::_WatchCDState()
 
 	if (fCDDrive.GetTime(trackTime, discTime)) {
 		fCDDrive.GetTimeForDisc(discTotal);
-		sprintf(timeString, "Disc: %ld:%.2ld / %ld:%.2ld",
+		sprintf(timeString, B_TRANSLATE("Disc: %ld:%.2ld / %ld:%.2ld"),
 			discTime.GetMinutes(), discTime.GetSeconds(),
 			discTotal.GetMinutes(), discTotal.GetSeconds());
 		SetLabel(fDiscTime, timeString);
 
 		fCDDrive.GetTimeForTrack(playlistTrack, trackTotal);
-		sprintf(timeString, "Track: %ld:%.2ld / %ld:%.2ld",
+		sprintf(timeString, B_TRANSLATE("Track: %ld:%.2ld / %ld:%.2ld"),
 			trackTime.GetMinutes(), trackTime.GetSeconds(),
 			trackTotal.GetMinutes(), trackTotal.GetSeconds());
 		SetLabel(fTrackTime, timeString);
@@ -627,8 +633,9 @@ CDPlayer::_WatchCDState()
 
 
 CDPlayerWindow::CDPlayerWindow()
-	: BWindow(BRect (100, 100, 405, 280), "CDPlayer", B_TITLED_WINDOW,
-		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
+	: BWindow(BRect (100, 100, 405, 280), B_TRANSLATE("CDPlayer"), 
+		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE | 
+		B_ASYNCHRONOUS_CONTROLS)
 {
 }
 
@@ -648,7 +655,7 @@ CDPlayerApplication::CDPlayerApplication()
 	: BApplication("application/x-vnd.Haiku-CDPlayer")
 {
 	BWindow *window = new CDPlayerWindow();
-	CDPlayer *view = new CDPlayer(window->Bounds(), "CD");
+	CDPlayer *view = new CDPlayer(window->Bounds(), B_TRANSLATE("CD"));
 	if (view->InitCheck()) {
 		window->ResizeTo(view->Bounds().Width(), view->Bounds().Height());
 		window->AddChild(view);
