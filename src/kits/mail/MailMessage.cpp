@@ -389,8 +389,8 @@ BEmailMessage::GetName(BString *name) const
 void
 BEmailMessage::SendViaAccountFrom(BEmailMessage *message)
 {
-	char name[B_FILE_NAME_LENGTH];
-	if (message->GetAccountName(name, B_FILE_NAME_LENGTH) < B_OK) {
+	BString name;
+	if (message->GetAccountName(name) < B_OK) {
 		// just return the message with the default account
 		return;
 	}
@@ -435,31 +435,26 @@ BEmailMessage::Account() const
 
 
 status_t
-BEmailMessage::GetAccountName(char *account,int32 maxLength) const
+BEmailMessage::GetAccountName(BString& accountName) const
 {
-	if (account == NULL || maxLength <= 0)
-		return B_BAD_VALUE;
+	BFile *file = dynamic_cast<BFile *>(fData);
+	if (!file)
+		return B_ERROR;
 
-	if (BFile *file = dynamic_cast<BFile *>(fData)) {
-		status_t status = file->ReadAttr(B_MAIL_ATTR_ACCOUNT,B_STRING_TYPE,0,account,maxLength);
-		account[maxLength - 1] = '\0';
+	int32 accountId;
+	size_t read = file->ReadAttr(B_MAIL_ATTR_ACCOUNT, B_INT32_TYPE, 0,
+		&accountId, sizeof(int32));
+	if (read < sizeof(int32))
+		return B_ERROR;
 
-		return status >= 0 ? B_OK : status;
-	}
+	BMailAccounts accounts;
+	BMailAccountSettings* account =  accounts.AccountByID(accountId);
+	if (account)
+		accountName = account->Name();
+	else
+		accountName = "";
 
-	// ToDo: try to get account name out of the chain lists
-	return B_ERROR;
-}
-
-
-status_t
-BEmailMessage::GetAccountName(BString *account) const
-{
-	char *buffer = account->LockBuffer(B_FILE_NAME_LENGTH);
-	status_t status = GetAccountName(buffer,B_FILE_NAME_LENGTH);
-	account->UnlockBuffer();
-
-	return status;
+	return B_OK;
 }
 
 
@@ -798,22 +793,21 @@ BEmailMessage::RenderToRFC822(BPositionIO *file)
 			attributed->WriteAttrString(B_MAIL_ATTR_PRIORITY,&attr);
 		}
 		attr = "Pending";
-		attributed->WriteAttrString(B_MAIL_ATTR_STATUS,&attr);
+		attributed->WriteAttrString(B_MAIL_ATTR_STATUS, &attr);
 		attr = "1.0";
-		attributed->WriteAttrString(B_MAIL_ATTR_MIME,&attr);
-		BMailAccounts accounts;
-		BMailAccountSettings* account =  accounts.AccountByID(_account_id);
-		if (account)
-			attr = account->Name();
-		else
-			attr = "";
-		attributed->WriteAttrString(B_MAIL_ATTR_ACCOUNT,&attr);
+		attributed->WriteAttrString(B_MAIL_ATTR_MIME, &attr);
+		
+		attributed->WriteAttr(B_MAIL_ATTR_ACCOUNT, B_INT32_TYPE, 0,
+			&_account_id, sizeof(int32));
 
-		attributed->WriteAttr(B_MAIL_ATTR_WHEN,B_TIME_TYPE,0,&creationTime,sizeof(int32));
+		attributed->WriteAttr(B_MAIL_ATTR_WHEN, B_TIME_TYPE, 0, &creationTime,
+			sizeof(int32));
 		int32 flags = B_MAIL_PENDING | B_MAIL_SAVE;
-		attributed->WriteAttr(B_MAIL_ATTR_FLAGS,B_INT32_TYPE,0,&flags,sizeof(int32));
+		attributed->WriteAttr(B_MAIL_ATTR_FLAGS, B_INT32_TYPE, 0, &flags,
+			sizeof(int32));
 
-		attributed->WriteAttr("MAIL:account",B_INT32_TYPE,0,&_account_id,sizeof(int32));
+		attributed->WriteAttr("MAIL:account", B_INT32_TYPE, 0, &_account_id,
+			sizeof(int32));
 	}
 
 	return B_OK;

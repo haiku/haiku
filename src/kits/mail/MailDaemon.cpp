@@ -82,7 +82,22 @@ BMailDaemon::MarkAsRead(int32 account, const entry_ref& ref, bool read)
 	message.AddRef("ref", &ref);
 	message.AddBool("read", read);
 
-	return daemon.SendMessage(&message);	
+	return daemon.SendMessage(&message);
+}
+
+
+status_t
+BMailDaemon::FetchBody(const entry_ref& ref)
+{
+	BMessenger daemon("application/x-vnd.Be-POST");
+	if (!daemon.IsValid())
+		return B_MAIL_NO_DAEMON;
+
+	BMessage message(kMsgFetchBody);
+	message.AddRef("refs", &ref);
+
+	BMessage reply;
+	return daemon.SendMessage(&message, &reply);
 }
 
 

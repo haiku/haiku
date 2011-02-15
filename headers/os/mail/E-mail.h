@@ -41,6 +41,7 @@ enum mail_flags {
 };
 
 #define B_MAIL_TYPE				"text/x-email"			// mime type
+#define B_PARTIAL_MAIL_TYPE		"text/x-partial-email"	// mime type
 
 
 // WARNING: Everything past this point is deprecated. See MailMessage.h,

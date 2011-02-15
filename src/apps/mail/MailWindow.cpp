@@ -788,7 +788,8 @@ TMailWindow::GetTrackerWindowFile(entry_ref *ref, bool next) const
 		if (BNodeInfo(&node).GetType(fileType) != B_OK)
 			return false;
 
-		if (strcasecmp(fileType,"text/x-email") == 0)
+		if (strcasecmp(fileType, B_MAIL_TYPE) == 0
+			|| strcasecmp(fileType, B_PARTIAL_MAIL_TYPE) == 0)
 			foundRef = true;
 	}
 
@@ -1504,8 +1505,8 @@ TMailWindow::MessageReceived(BMessage *msg)
 			if (fRef != NULL) {
 				entry_ref nextRef = *fRef;
 				if (GetTrackerWindowFile(&nextRef, (msg->what == M_NEXTMSG))) {
-					TMailWindow *window
-						= static_cast<TMailApp *>(be_app)->FindWindow(nextRef);
+					TMailWindow *window = static_cast<TMailApp *>(be_app)
+						->FindWindow(nextRef);
 					if (window == NULL) {
 						if (fAutoMarkRead)
 							SetCurrentMessageRead();
@@ -2820,9 +2821,14 @@ TMailWindow::OpenMessage(entry_ref *ref, uint32 characterSetForDecoding)
 	BNodeInfo fileInfo(&file);
 	fileInfo.GetType(mimeType);
 
+	if (strcmp(mimeType, B_PARTIAL_MAIL_TYPE) == 0) {
+		BMailDaemon::FetchBody(*ref);
+		fileInfo.GetType(mimeType);
+	}
+
 	// Check if it's a draft file, which contains only the text, and has the
 	// from, to, bcc, attachments listed as attributes.
-	if (!strcmp(kDraftType, mimeType)) {
+	if (strcmp(kDraftType, mimeType) == 0) {
 		BNode node(fRef);
 		off_t size;
 		BString string;

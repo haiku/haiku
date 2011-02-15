@@ -15,6 +15,7 @@ const uint32 kMsgAccountsChanged = 'macc';
 const uint32 kMsgSetStatusWindowMode = 'shst';
 const uint32 kMsgCountNewMessages = 'mnum';
 const uint32 kMsgMarkMessageAsRead = 'mmar';
+const uint32 kMsgFetchBody = 'mfeb';
 
 
 class BMailDaemon {
@@ -27,7 +28,7 @@ public:
 									bool waitForFetchCompletion = false);
 	static status_t				MarkAsRead(int32 account, const entry_ref& ref,
 									bool read = true);
-
+	static status_t				FetchBody(const entry_ref& ref);
 	static status_t				Quit();
 };
 

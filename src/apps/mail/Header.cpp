@@ -730,8 +730,9 @@ THeaderView::LoadMessage(BEmailMessage *mail)
 	if (fAccountTo != NULL)
 		fAccountTo->SetText(mail->To());
 
-	if (fAccount != NULL && mail->GetAccountName(string,sizeof(string)) == B_OK)
-		fAccount->SetText(string);
+	BString accountName;
+	if (fAccount != NULL && mail->GetAccountName(accountName) == B_OK)
+		fAccount->SetText(accountName);
 
 	return B_OK;
 }

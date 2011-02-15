@@ -63,8 +63,7 @@ class BEmailMessage : public BMailContainer {
 		void SendViaAccount(const char *account_name);
 		void SendViaAccount(int32 account);
 		int32 Account() const;
-		status_t GetAccountName(char *account,int32 maxLength) const;
-		status_t GetAccountName(BString *account) const;
+		status_t GetAccountName(BString& accountName) const;
 
 		virtual status_t AddComponent(BMailComponent *component);
 		virtual status_t RemoveComponent(BMailComponent *component);

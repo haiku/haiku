@@ -406,9 +406,9 @@ status_t
 InboundProtocol::MarkMessageAsRead(const entry_ref& ref, bool read)
 {
 	BNode node(&ref);
-	BString statusString = (read == true) ? "Read" : "New";
-	if (node.WriteAttr("MAIL:status", B_STRING_TYPE, 0, statusString.String(),
-		statusString.Length()) < 0)
+	const char* statusString = (read == true) ? "Read" : "New";
+	if (node.WriteAttr(B_MAIL_ATTR_STATUS, B_STRING_TYPE, 0, statusString,
+		strlen(statusString)) < 0)
 		return B_ERROR;
 	return B_OK;
 }

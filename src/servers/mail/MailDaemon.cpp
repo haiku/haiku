@@ -437,6 +437,10 @@ MailDaemonApp::MessageReceived(BMessage* msg)
 			break;
 		}
 
+		case kMsgFetchBody:
+			RefsReceived(msg);
+			break;
+
 		case 'lkch':	// status window look changed
 		case 'wsch':	// workspace changed
 			fMailStatusWindow->PostMessage(msg);
