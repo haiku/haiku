@@ -68,7 +68,7 @@ enum message_option {
 	OPTION_ADDRESS_LEASE_TIME = 51,
 	OPTION_OVERLOAD = 52,
 	OPTION_MESSAGE_TYPE = 53,
-	OPTION_SERVER_IDENTIFIER = 54,
+	OPTION_SERVER_ADDRESS = 54,
 	OPTION_REQUEST_PARAMETERS = 55,
 	OPTION_ERROR_MESSAGE = 56,
 	OPTION_MAX_MESSAGE_SIZE = 57,
@@ -693,24 +693,24 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address,
 		// iterate through all options
 		switch (option) {
 			case OPTION_ROUTER_ADDRESS:
-				syslog(LOG_INFO, "  gateway: %s\n",
+				syslog(LOG_DEBUG, "  gateway: %s\n",
 						_AddressToString(data).String());
 				address.AddString("gateway", _AddressToString(data));
 				break;
 			case OPTION_SUBNET_MASK:
-				syslog(LOG_INFO, "  subnet: %s\n",
+				syslog(LOG_DEBUG, "  subnet: %s\n",
 						_AddressToString(data).String());
 				address.AddString("mask", _AddressToString(data));
 				break;
 			case OPTION_BROADCAST_ADDRESS:
-				syslog(LOG_INFO, "  broadcast: %s\n",
+				syslog(LOG_DEBUG, "  broadcast: %s\n",
 						_AddressToString(data).String());
 				address.AddString("broadcast", _AddressToString(data));
 				break;
 			case OPTION_DOMAIN_NAME_SERVER:
 			{
 				for (uint32 i = 0; i < size / 4; i++) {
-					syslog(LOG_INFO, "  nameserver[%d]: %s\n", i,
+					syslog(LOG_DEBUG, "  nameserver[%d]: %s\n", i,
 						_AddressToString(&data[i * 4]).String());
 					resolverConfiguration.AddString("nameserver",
 						_AddressToString(&data[i * 4]).String());
@@ -719,30 +719,30 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address,
 					size / 4);
 				break;
 			}
-			case OPTION_SERVER_IDENTIFIER:
-				syslog(LOG_INFO, "  server: %s\n",
+			case OPTION_SERVER_ADDRESS:
+				syslog(LOG_DEBUG, "  server: %s\n",
 						_AddressToString(data).String());
-				fServer.SetAddress(*(in_addr_t*)data);
+				fServer.SetAddress(ntohl(*(in_addr_t*)data));
 				break;
 
 			case OPTION_ADDRESS_LEASE_TIME:
-				syslog(LOG_INFO, "  lease time: %lu seconds\n",
+				syslog(LOG_DEBUG, "  lease time: %lu seconds\n",
 					ntohl(*(uint32*)data));
 				fLeaseTime = ntohl(*(uint32*)data) * 1000000LL;
 				break;
 			case OPTION_RENEWAL_TIME:
-				syslog(LOG_INFO, "  renewal time: %lu seconds\n",
+				syslog(LOG_DEBUG, "  renewal time: %lu seconds\n",
 					ntohl(*(uint32*)data));
 				fRenewalTime = ntohl(*(uint32*)data) * 1000000LL;
 				break;
 			case OPTION_REBINDING_TIME:
-				syslog(LOG_INFO, "  rebinding time: %lu seconds\n",
+				syslog(LOG_DEBUG, "  rebinding time: %lu seconds\n",
 					ntohl(*(uint32*)data));
 				fRebindingTime = ntohl(*(uint32*)data) * 1000000LL;
 				break;
 
 			case OPTION_HOST_NAME:
-				syslog(LOG_INFO, "  host name: \"%.*s\"\n", (int)size,
+				syslog(LOG_DEBUG, "  host name: \"%.*s\"\n", (int)size,
 					(const char*)data);
 				break;
 
@@ -752,7 +752,7 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address,
 				strlcpy(domain, (const char*)data,
 					min_c(size + 1, sizeof(domain)));
 
-				syslog(LOG_INFO, "  domain name: \"%s\"\n", domain);
+				syslog(LOG_DEBUG, "  domain name: \"%s\"\n", domain);
 
 				resolverConfiguration.AddString("domain", domain);
 				break;
@@ -767,7 +767,7 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address,
 				break;
 
 			default:
-				syslog(LOG_INFO, "  UNKNOWN OPTION %lu (0x%x)\n",
+				syslog(LOG_DEBUG, "  UNKNOWN OPTION %lu (0x%x)\n",
 					(uint32)option, (uint32)option);
 				break;
 		}
@@ -802,7 +802,7 @@ DHCPClient::_PrepareMessage(dhcp_message& message, dhcp_state state)
 
 			if (state == REQUESTING) {
 				const sockaddr_in& server = (sockaddr_in&)fServer.SockAddr();
-				next = message.PutOption(next, OPTION_SERVER_IDENTIFIER,
+				next = message.PutOption(next, OPTION_SERVER_ADDRESS,
 					(uint32)server.sin_addr.s_addr);
 			}
 
@@ -815,7 +815,7 @@ DHCPClient::_PrepareMessage(dhcp_message& message, dhcp_state state)
 
 		case DHCP_RELEASE: {
 			const sockaddr_in& server = (sockaddr_in&)fServer.SockAddr();
-			next = message.PutOption(next, OPTION_SERVER_IDENTIFIER,
+			next = message.PutOption(next, OPTION_SERVER_ADDRESS,
 				(uint32)server.sin_addr.s_addr);
 
 			message.client_address = fAssignedAddress;
