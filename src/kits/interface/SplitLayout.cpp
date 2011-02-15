@@ -198,6 +198,14 @@ BSplitLayout::BSplitLayout(enum orientation orientation,
 BSplitLayout::BSplitLayout(BMessage* from)
 	:
 	BAbstractLayout(BUnarchiver::PrepareArchive(from)),
+	fOrientation(B_HORIZONTAL),
+	fLeftInset(0),
+	fRightInset(0),
+	fTopInset(0),
+	fBottomInset(0),
+	fSplitterSize(6),
+	fSpacing(be_control_look->DefaultItemSpacing()),
+
 	fSplitterItems(),
 	fVisibleItems(),
 	fMin(),
