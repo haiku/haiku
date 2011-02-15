@@ -5,15 +5,23 @@
  * Authors:
  *      Alexander von Gluck, kallisti5@unixzen.com
  */
-
 #ifndef INTERFACE_ADDRESS_VIEW_H
 #define INTERFACE_ADDRESS_VIEW_H
 
+
 #include "NetworkSettings.h"
 
+#include <MenuField.h>
+#include <PopUpMenu.h>
 #include <Screen.h>
-#include <View.h>
 #include <TextControl.h>
+#include <View.h>
+
+
+enum {
+    AUTOSEL_MSG = 'iato',
+    STATICSEL_MSG = 'istc'
+};
 
 
 class InterfaceAddressView : public BView {
@@ -22,12 +30,19 @@ public:
 									const char* name, int family,
 									NetworkSettings* settings);
 	virtual						~InterfaceAddressView();
+	virtual	void				MessageReceived(BMessage* message);
+	virtual void				AttachedToWindow();
 			status_t			RevertFields();
 
+
 private:
+			void				_EnableFields(bool enabled);
+
 			NetworkSettings*	fSettings;
 			int					fFamily;
 
+			BPopUpMenu*			fModePopUpMenu;
+			BMenuField*			fModeField;
 			BTextControl*		fAddressField;
 			BTextControl*		fNetmaskField;
 			BTextControl*		fGatewayField;

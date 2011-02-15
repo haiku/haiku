@@ -6,16 +6,16 @@
  *		Philippe Houdoin
  * 		Fredrik Modéen
  */
-
-
 #ifndef INTERFACES_ADDON_H
 #define INTERFACES_ADDON_H
+
 
 #include <Box.h>
 #include <ListView.h>
 #include <Button.h> 
 
 #include "NetworkSetupAddOn.h"
+
 
 class InterfacesAddOn : public NetworkSetupAddOn, public BBox
 {
@@ -41,4 +41,6 @@ private:
 		BButton*		fOnOff;
 };
 
+
 #endif /*INTERFACES_ADDON_H*/
+

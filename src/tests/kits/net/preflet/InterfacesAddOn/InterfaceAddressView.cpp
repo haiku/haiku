@@ -6,11 +6,13 @@
  *      Alexander von Gluck, kallisti5@unixzen.com
  */
 
+
 #include "InterfaceAddressView.h"
 #include "NetworkSettings.h"
 
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
+#include <MenuItem.h>
 #include <StringView.h>
 
 
@@ -27,6 +29,16 @@ InterfaceAddressView::InterfaceAddressView(BRect frame, const char* name,
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
 	// Create our controls
+	fModePopUpMenu = new BPopUpMenu("modes");
+
+	fModePopUpMenu->AddItem(new BMenuItem("Automatic",
+		new BMessage(AUTOSEL_MSG)));
+	fModePopUpMenu->AddItem(new BMenuItem("Static",
+		new BMessage(STATICSEL_MSG)));
+
+	fModeField = new BMenuField(frame, "mode", "Mode:",
+		fModePopUpMenu, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP, B_WILL_DRAW);
+
 	fAddressField = new BTextControl(frame, "address", "IP Address:",
 		NULL, NULL, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
 	fNetmaskField = new BTextControl(frame, "netmask", "Netmask:",
@@ -41,11 +53,13 @@ InterfaceAddressView::InterfaceAddressView(BRect frame, const char* name,
 	RevertFields();
 		// Do the initial field population
 
+	fModeField->SetDivider(labelSize);
 	fAddressField->SetDivider(labelSize);
 	fNetmaskField->SetDivider(labelSize);
 	fGatewayField->SetDivider(labelSize);
 
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
+		.Add(fModeField)
 		.Add(fAddressField)
 		.Add(fNetmaskField)
 		.Add(fGatewayField)
@@ -61,10 +75,50 @@ InterfaceAddressView::~InterfaceAddressView()
 }
 
 
+void
+InterfaceAddressView::AttachedToWindow()
+{
+	fModePopUpMenu->SetTargetForItems(this);
+}
+
+
+void
+InterfaceAddressView::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case AUTOSEL_MSG:
+			_EnableFields(false);
+			break;
+		case STATICSEL_MSG:
+			_EnableFields(true);
+			break;
+		default:
+			BView::MessageReceived(message);
+	}
+}
+
+
+void
+InterfaceAddressView::_EnableFields(bool enabled)
+{
+	fAddressField->SetEnabled(enabled);
+	fNetmaskField->SetEnabled(enabled);
+	fGatewayField->SetEnabled(enabled);
+}
+
+
 status_t
 InterfaceAddressView::RevertFields()
 {
 	// Populate address fields with current settings
+	const char* currMode = fSettings->AutoConfigure() ? "Automatic" : "Static";
+	BMenuItem* item = fModePopUpMenu->FindItem(currMode);
+	if (item)
+		item->SetMarked(true);
+
+	_EnableFields(!fSettings->AutoConfigure());
+		// if Autoconfigured, disable address fields until changed
+
 	fAddressField->SetText(fSettings->IP(fFamily));
 	fNetmaskField->SetText(fSettings->Netmask(fFamily));
 	fGatewayField->SetText(fSettings->Gateway(fFamily));

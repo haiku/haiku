@@ -5,10 +5,9 @@
  * Authors:
  *      Alexander von Gluck, kallisti5@unixzen.com
  */
-
-
 #ifndef INTERFACE_WINDOW_H
 #define INTERFACE_WINDOW_H
+
 
 #include "NetworkSettings.h"
 #include "InterfaceAddressView.h"

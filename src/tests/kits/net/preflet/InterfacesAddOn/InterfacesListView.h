@@ -7,10 +7,9 @@
  *		Fredrik Modéen
  *		Alexander von Gluck, kallisti5@unixzen.com
  */
-
-
 #ifndef INTERFACES_LIST_VIEW_H
 #define INTERFACES_LIST_VIEW_H
+
 
 #include <net/if.h>
 #include <net/if_dl.h>

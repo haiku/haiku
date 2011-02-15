@@ -8,6 +8,7 @@
  *		Clemens Zeidler, <haiku@clemens-zeidler.de>
  */
 
+
 #include "driver.h"
 #include "device.h"
 #include "lock.h"

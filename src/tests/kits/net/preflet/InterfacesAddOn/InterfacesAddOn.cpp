@@ -81,7 +81,7 @@ InterfacesAddOn::CreateView(BRect *bounds)
 	fOnOff = new BButton(intViewRect, "onoff", "Disable",
 		new BMessage(ONOFF_INTERFACE_MSG));
 
-	fOnOff->Hide();
+	fOnOff->SetEnabled(false);
 
 	// Build the layout
 	SetLayout(new BGroupLayout(B_VERTICAL));
@@ -107,7 +107,6 @@ InterfacesAddOn::AttachedToWindow()
 	fListview->SetTarget(this);
 	fConfigure->SetTarget(this);
 	fOnOff->SetTarget(this);
-
 }
 
 
@@ -122,14 +121,12 @@ InterfacesAddOn::MessageReceived(BMessage* msg)
 
 	switch (msg->what) {
 	case INTERFACE_SELECTED_MSG: {
-		fConfigure->SetEnabled(item != NULL);
 		fOnOff->SetEnabled(item != NULL);
-		if (item == NULL) {
-			fOnOff->Hide();
+		fConfigure->SetEnabled(item != NULL);
+		if (!item)
 			break;
-		}
+		fConfigure->SetEnabled(!item->IsDisabled());
 		fOnOff->SetLabel(item->IsDisabled() ? "Enable" : "Disable");
-		fOnOff->Show();
 		break;
 	}
 
@@ -148,6 +145,7 @@ InterfacesAddOn::MessageReceived(BMessage* msg)
 
 		item->SetDisabled(!item->IsDisabled());
 		fOnOff->SetLabel(item->IsDisabled() ? "Enable" : "Disable");
+		fConfigure->SetEnabled(!item->IsDisabled());
 		fListview->Invalidate();
 		break;
 

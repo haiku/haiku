@@ -4,9 +4,11 @@
  *
  */
 
-#include <stdlib.h>
 
 #include "NetworkSetupAddOn.h"
+
+#include <stdlib.h>
+
 
 class StatusAddOn : public NetworkSetupAddOn {
 	public:
@@ -14,11 +16,11 @@ class StatusAddOn : public NetworkSetupAddOn {
 };
 
 
-
 const char * StatusAddOn::Name()
 {
 	return "Status";
 }
+
 
 NetworkSetupAddOn * get_addon()
 {
