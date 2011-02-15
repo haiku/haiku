@@ -10,9 +10,9 @@ this string in the user's specified language, if available.
 Most of the time, you don't have to deal with BCatalog directly. You use the
 translation macros instead. However, there are some cases where you will have to
 use catalogs directly. These include :
-	\item Tools for managing catalogs : if you want to add, remove or edit
+	\li Tools for managing catalogs : if you want to add, remove or edit
 entries in a catalog, you need to do it using the BCatalog class.
-	\item Accessing catalogs other than your own : the macros only grant you
+	\li Accessing catalogs other than your own : the macros only grant you
 access to the catalog linked with your application. To access other catalogs
 (for example if you create a script interpreter and want to localize the
 scripts), you will have to open a catalog associated with your script.
@@ -30,17 +30,18 @@ the translator team, from your sourcecode.
 
 \section chaining Chaining of catalogs
 The catalogs you get from the locale kit are designed to use a fallback system
-so that the user get strings in the language he's the more fluent with,
-depending onwhat isavailable.
+so that the user get strings in the language he's the most fluent with,
+depending on what catalogs are available.
 
-For example, if the user set hislanguage preferences as french(France), spanish,
-english, when an application loads a catalog, the following rules are used :
-	\item Try to load a french(France) catalog. If it is found, this catalog
-will automatically include strings from the generic french catalog.
-	\item Try to load a generic french catalog.
-	\item Try to load a generic spanish catalog.
-	\item Try to load a generic english catalog.
-	\item If all of them failed, use the strings that ar ein the source code.
+For example, if the user sets his language preferences as french(France),
+spanish, english, when an application loads a catalog, the following rules are
+used :
+	\li Try to load a french(France) catalog. If it is found, this catalog
+		will automatically include strings from the generic french catalog.
+	\li Try to load a generic french catalog.
+	\li Try to load a generic spanish catalog.
+	\li Try to load a generic english catalog.
+	\li If all of them failed, use the strings that are in the source code.
 
 Note that french(France) will failback to french, but then directly to the
 language in the source code. This avoids mixing 3 or more languages in the same
