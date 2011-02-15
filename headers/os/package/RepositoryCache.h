@@ -30,12 +30,19 @@ public:
 
 			void				SetIsUserSpecific(bool isUserSpecific);
 
+			uint32				PackageCount() const;
+
+private:
+			struct PackageMap;
+
 private:
 			status_t			fInitStatus;
 
 			BEntry				fEntry;
 			BRepositoryInfo		fInfo;
 			bool				fIsUserSpecific;
+
+			PackageMap*			fPackageMap;
 };
 
 

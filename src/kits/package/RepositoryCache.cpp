@@ -9,6 +9,8 @@
 
 #include <package/RepositoryCache.h>
 
+#include <stdio.h>
+
 #include <new>
 
 #include <Directory.h>
@@ -16,21 +18,220 @@
 #include <FindDirectory.h>
 #include <Path.h>
 
+#include <HashMap.h>
+#include <HashString.h>
+
+#include <package/hpkg/ErrorOutput.h>
+#include <package/hpkg/PackageInfoAttributeValue.h>
+#include <package/hpkg/RepositoryContentHandler.h>
+#include <package/hpkg/RepositoryReader.h>
+#include <package/PackageInfo.h>
+#include <package/RepositoryInfo.h>
+
 
 namespace BPackageKit {
+
+
+using namespace BHPKG;
+
+
+namespace {
+
+
+struct HashableString : public BString {
+	uint32  hashCode;
+
+	HashableString()
+		:
+		hashCode(0)
+	{
+	}
+
+	HashableString(const BString& string_)
+		:
+		BString(string_),
+		hashCode(string_hash(String()))
+	{
+	}
+
+	inline uint32 GetHashCode() const
+	{
+		return hashCode;
+	}
+
+	inline bool operator!= (const HashableString& other) const
+	{
+		return Compare(other) != 0 || hashCode != other.hashCode;
+	}
+};
+
+
+typedef ::BPrivate::HashMap<HashableString, BPackageInfo> PackageHashMap;
+
+struct RepositoryContentHandler : BRepositoryContentHandler {
+	RepositoryContentHandler(BRepositoryInfo* repositoryInfo,
+		PackageHashMap* packageMap)
+		:
+		fRepositoryInfo(repositoryInfo),
+		fPackageMap(packageMap)
+	{
+	}
+
+	virtual status_t HandleEntry(BPackageEntry* entry)
+	{
+		return B_OK;
+	}
+
+	virtual status_t HandleEntryAttribute(BPackageEntry* entry,
+		BPackageEntryAttribute* attribute)
+	{
+		return B_OK;
+	}
+
+	virtual status_t HandleEntryDone(BPackageEntry* entry)
+	{
+		return B_OK;
+	}
+
+	virtual status_t HandlePackageAttribute(
+		const BPackageInfoAttributeValue& value)
+	{
+		switch (value.attributeID) {
+			case B_PACKAGE_INFO_NAME:
+				fPackageInfo.SetName(value.string);
+				break;
+
+			case B_PACKAGE_INFO_SUMMARY:
+				fPackageInfo.SetSummary(value.string);
+				break;
+
+			case B_PACKAGE_INFO_DESCRIPTION:
+				fPackageInfo.SetDescription(value.string);
+				break;
+
+			case B_PACKAGE_INFO_VENDOR:
+				fPackageInfo.SetVendor(value.string);
+				break;
+
+			case B_PACKAGE_INFO_PACKAGER:
+				fPackageInfo.SetPackager(value.string);
+				break;
+
+			case B_PACKAGE_INFO_FLAGS:
+				fPackageInfo.SetFlags(value.unsignedInt);
+				break;
+
+			case B_PACKAGE_INFO_ARCHITECTURE:
+				fPackageInfo.SetArchitecture(
+					(BPackageArchitecture)value.unsignedInt);
+				break;
+
+			case B_PACKAGE_INFO_VERSION:
+				fPackageInfo.SetVersion(value.version);
+				break;
+
+			case B_PACKAGE_INFO_COPYRIGHTS:
+				fPackageInfo.AddCopyright(value.string);
+				break;
+
+			case B_PACKAGE_INFO_LICENSES:
+				fPackageInfo.AddLicense(value.string);
+				break;
+
+			case B_PACKAGE_INFO_PROVIDES:
+				fPackageInfo.AddProvides(value.resolvable);
+				break;
+
+			case B_PACKAGE_INFO_REQUIRES:
+				fPackageInfo.AddRequires(value.resolvableExpression);
+				break;
+
+			case B_PACKAGE_INFO_SUPPLEMENTS:
+				fPackageInfo.AddSupplements(value.resolvableExpression);
+				break;
+
+			case B_PACKAGE_INFO_CONFLICTS:
+				fPackageInfo.AddConflicts(value.resolvableExpression);
+				break;
+
+			case B_PACKAGE_INFO_FRESHENS:
+				fPackageInfo.AddFreshens(value.resolvableExpression);
+				break;
+
+			case B_PACKAGE_INFO_REPLACES:
+				fPackageInfo.AddReplaces(value.string);
+				break;
+
+			case B_PACKAGE_INFO_CHECKSUM:
+			{
+				fPackageInfo.SetChecksum(value.string);
+				status_t result = fPackageInfo.InitCheck();
+				if (result != B_OK)
+					return result;
+
+				if (fPackageMap->ContainsKey(fPackageInfo.Name()))
+					return B_NAME_IN_USE;
+				result = fPackageMap->Put(fPackageInfo.Name(), fPackageInfo);
+				if (result != B_OK)
+					return result;
+
+				fPackageInfo.Clear();
+				break;
+			}
+
+			default:
+				return B_BAD_DATA;
+		}
+
+		return B_OK;
+	}
+
+	virtual status_t HandleRepositoryInfo(const BRepositoryInfo& repositoryInfo)
+	{
+		*fRepositoryInfo = repositoryInfo;
+
+		return B_OK;
+	}
+
+	virtual void HandleErrorOccurred()
+	{
+	}
+
+private:
+	BRepositoryInfo*	fRepositoryInfo;
+	BPackageInfo		fPackageInfo;
+	PackageHashMap*		fPackageMap;
+};
+
+
+class StandardErrorOutput : public BErrorOutput {
+	virtual	void PrintErrorVarArgs(const char* format, va_list args)
+	{
+		vfprintf(stderr, format, args);
+	}
+};
+
+
+}	// anonymous namespace
+
+
+struct BRepositoryCache::PackageMap : public PackageHashMap {
+};
 
 
 BRepositoryCache::BRepositoryCache()
 	:
 	fInitStatus(B_NO_INIT),
-	fIsUserSpecific(false)
+	fIsUserSpecific(false),
+	fPackageMap(new (std::nothrow) PackageMap)
 {
 }
 
 
 BRepositoryCache::BRepositoryCache(const BEntry& entry)
 	:
-	fIsUserSpecific(false)
+	fIsUserSpecific(false),
+	fPackageMap(new (std::nothrow) PackageMap)
 {
 	fInitStatus = SetTo(entry);
 }
@@ -38,6 +239,7 @@ BRepositoryCache::BRepositoryCache(const BEntry& entry)
 
 BRepositoryCache::~BRepositoryCache()
 {
+	delete fPackageMap;
 }
 
 
@@ -79,18 +281,27 @@ BRepositoryCache::SetIsUserSpecific(bool isUserSpecific)
 status_t
 BRepositoryCache::SetTo(const BEntry& entry)
 {
-	fEntry = entry;
-
-	BFile file(&entry, B_READ_ONLY);
-	status_t result = file.InitCheck();
+	if (fPackageMap == NULL)
+		return B_NO_MEMORY;
+	status_t result = fPackageMap->InitCheck();
 	if (result != B_OK)
 		return result;
 
-	BMessage headerMsg;
-	if ((result = headerMsg.Unflatten(&file)) != B_OK)
+	fEntry = entry;
+	fPackageMap->Clear();
+
+	BPath repositoryCachePath;
+	if ((result = entry.GetPath(&repositoryCachePath)) != B_OK)
 		return result;
 
-	if ((result = fInfo.SetTo(&headerMsg)) != B_OK)
+	// read repository cache
+	StandardErrorOutput errorOutput;
+	BRepositoryReader repositoryReader(&errorOutput);
+	if ((result = repositoryReader.Init(repositoryCachePath.Path())) != B_OK)
+		return result;
+
+	RepositoryContentHandler handler(&fInfo, fPackageMap);
+	if ((result = repositoryReader.ParseContent(&handler)) != B_OK)
 		return result;
 
 	BPath userSettingsPath;
@@ -104,26 +315,14 @@ BRepositoryCache::SetTo(const BEntry& entry)
 }
 
 
-//status_t
-//BRepositoryCache::_ReadPackageHeaders()
-//{
-////	if (fPackageHeaders != NULL)
-////		return B_OK;
-//
-//	BFile file(&fEntry, B_READ_ONLY);
-//	status_t result = file.InitCheck();
-//	if (result != B_OK)
-//		return result;
-//
-//	BMessage headerMsg;
-//	if ((result = headerMsg.Unflatten(&file)) != B_OK)
-//		return result;
-//
-//
-//	// TODO: read packages!
-//
-//	return B_OK;
-//}
+uint32
+BRepositoryCache::PackageCount() const
+{
+	if (fPackageMap == NULL)
+		return 0;
+
+	return fPackageMap->Size();
+}
 
 
 }	// namespace BPackageKit
