@@ -67,7 +67,7 @@ InterfaceAddressView::RevertFields()
 	// Populate address fields with current settings
 	fAddressField->SetText(fSettings->IP(fFamily));
 	fNetmaskField->SetText(fSettings->Netmask(fFamily));
-	fNetmaskField->SetText(fSettings->Gateway(fFamily));
+	fGatewayField->SetText(fSettings->Gateway(fFamily));
 
 	return B_OK;
 }
