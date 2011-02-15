@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>
  * Distributed under the terms of the MIT License.
  */
 
@@ -11,10 +11,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <package/hpkg/PackageContentHandler.h>
 #include <package/hpkg/PackageInfoAttributeValue.h>
+#include <package/hpkg/RepositoryContentHandler.h>
 #include <package/hpkg/RepositoryReader.h>
-
 #include <package/PackageInfo.h>
 #include <package/RepositoryInfo.h>
 
@@ -25,7 +24,7 @@
 using namespace BPackageKit::BHPKG;
 using namespace BPackageKit;
 
-struct RepositoryContentListHandler : BPackageContentHandler {
+struct RepositoryContentListHandler : BRepositoryContentHandler {
 	RepositoryContentListHandler(bool verbose)
 		:
 		fLevel(0),
@@ -190,6 +189,26 @@ struct RepositoryContentListHandler : BPackageContentHandler {
 					"*** Invalid package attribute section: unexpected "
 					"package attribute id %d encountered\n", value.attributeID);
 				return B_BAD_DATA;
+		}
+
+		return B_OK;
+	}
+
+	virtual status_t HandleRepositoryInfo(const BRepositoryInfo& repositoryInfo)
+	{
+		printf("repository-info:\n");
+		printf("\tname: %s\n", repositoryInfo.Name().String());
+		printf("\tsummary: %s\n", repositoryInfo.Summary().String());
+		printf("\turl: %s\n", repositoryInfo.OriginalBaseURL().String());
+		printf("\tvendor: %s\n", repositoryInfo.Vendor().String());
+		printf("\tpriority: %u\n", repositoryInfo.Priority());
+		printf("\tarchitecture: %s\n",
+			BPackageInfo::kArchitectureNames[repositoryInfo.Architecture()]);
+		const BObjectList<BString> licenseNames = repositoryInfo.LicenseNames();
+		if (!licenseNames.IsEmpty()) {
+			printf("\tlicenses:\n");
+			for (int i = 0; i < licenseNames.CountItems(); ++i)
+				printf("\t\t%s\n", licenseNames.ItemAt(i)->String());
 		}
 
 		return B_OK;

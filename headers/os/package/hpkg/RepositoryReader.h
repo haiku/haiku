@@ -20,7 +20,7 @@ namespace BPrivate {
 using BPrivate::RepositoryReaderImpl;
 
 class BErrorOutput;
-class BPackageContentHandler;
+class BRepositoryContentHandler;
 
 
 class BRepositoryReader {
@@ -30,7 +30,7 @@ public:
 
 			status_t			Init(const char* fileName);
 			status_t			ParseContent(
-									BPackageContentHandler* contentHandler);
+									BRepositoryContentHandler* contentHandler);
 
 private:
 			RepositoryReaderImpl*	fImpl;

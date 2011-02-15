@@ -18,9 +18,9 @@
 #include <ByteOrder.h>
 #include <Message.h>
 
-#include <package/hpkg/HPKGDefsPrivate.h>
-
 #include <package/hpkg/ErrorOutput.h>
+#include <package/hpkg/HPKGDefsPrivate.h>
+#include <package/hpkg/RepositoryContentHandler.h>
 
 
 namespace BPackageKit {
@@ -252,11 +252,14 @@ RepositoryReaderImpl::GetRepositoryInfo(BRepositoryInfo* _repositoryInfo) const
 
 
 status_t
-RepositoryReaderImpl::ParseContent(BPackageContentHandler* contentHandler)
+RepositoryReaderImpl::ParseContent(BRepositoryContentHandler* contentHandler)
 {
 	AttributeHandlerContext context(ErrorOutput(), contentHandler);
 	PackageAttributeHandler rootAttributeHandler;
-	return ParsePackageAttributesSection(&context, &rootAttributeHandler);
+	status_t result = contentHandler->HandleRepositoryInfo(fRepositoryInfo);
+	if (result == B_OK)
+		result = ParsePackageAttributesSection(&context, &rootAttributeHandler);
+	return result;
 }
 
 

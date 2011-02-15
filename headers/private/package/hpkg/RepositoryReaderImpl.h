@@ -16,6 +16,9 @@ namespace BPackageKit {
 namespace BHPKG {
 
 
+class BRepositoryContentHandler;
+
+
 namespace BPrivate {
 
 
@@ -33,7 +36,7 @@ public:
 									BRepositoryInfo* _repositoryInfo) const;
 
 			status_t			ParseContent(
-									BPackageContentHandler* contentHandler);
+									BRepositoryContentHandler* contentHandler);
 
 private:
 			struct RootAttributeHandler;
