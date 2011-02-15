@@ -57,10 +57,10 @@ CharacterMap::MessageReceived(BMessage* message)
 void
 CharacterMap::AboutRequested()
 {
-	BAlert *alert = new BAlert(B_TRANSLATE("about"), B_TRANSLATE(
+	BAlert *alert = new BAlert("about", B_TRANSLATE(
 		"CharacterMap\n"
 		"\twritten by Axel Dörfler\n"
-		"\tCopyright 2009, Haiku, Inc.\n"), "OK");
+		"\tCopyright 2009, Haiku, Inc.\n"), B_TRANSLATE("OK"));
 	BTextView *view = alert->TextView();
 	BFont font;
 

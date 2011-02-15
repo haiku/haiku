@@ -121,8 +121,8 @@ private:
 
 
 CharacterWindow::CharacterWindow()
-	: BWindow(BRect(100, 100, 700, 550), "CharacterMap", B_TITLED_WINDOW,
-		B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE
+	: BWindow(BRect(100, 100, 700, 550), B_TRANSLATE("CharacterMap"), 
+		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE
 			| B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	BMessage settings;
@@ -310,8 +310,8 @@ CharacterWindow::MessageReceived(BMessage* message)
 				sizeof(utf8Hex));
 
 			char text[128];
-			snprintf(text, sizeof(text), "'%s' Code: %#lx (%ld), UTF-8: %s",
-				utf8, character, character, utf8Hex);
+			snprintf(text, sizeof(text), "'%s' %s: %#lx (%ld), UTF-8: %s",
+				utf8, B_TRANSLATE("Code"), character, character, utf8Hex);
 
 			fCodeView->SetText(text);
 			break;
