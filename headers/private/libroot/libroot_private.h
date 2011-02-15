@@ -32,6 +32,7 @@ status_t __flatten_process_args(const char* const* args, int32 argCount,
 void _call_atexit_hooks_for_range(addr_t start, addr_t size);
 void __init_env(const struct user_space_program_args *args);
 void __init_heap(void);
+void __init_heap_post_env(void);
 
 void __init_time(void);
 void __arch_init_time(struct real_time_data *data, bool setDefaults);

@@ -2,12 +2,13 @@
  * Copyright 2008-2009, Michael Lotz, mmlr@mlotz.ch.
  * Distributed under the terms of the MIT License.
  *
- * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2011, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
+
 
 #include <malloc.h>
 #include <malloc_debug.h>
@@ -41,6 +42,7 @@ static bool sReuseMemory = true;
 static bool sParanoidValidation = false;
 static thread_id sWallCheckThread = -1;
 static bool sStopWallChecking = false;
+static bool sUseGuardPage = false;
 
 
 void
@@ -1817,6 +1819,25 @@ __init_heap(void)
 }
 
 
+extern "C" void
+__init_heap_post_env(void)
+{
+	const char *mode = getenv("MALLOC_DEBUG");
+	if (mode != NULL) {
+		if (strchr(mode, 'p'))
+			heap_debug_set_paranoid_validation(true);
+		if (strchr(mode, 'w'))
+			heap_debug_start_wall_checking(500);
+		else if (strchr(mode, 'W'))
+			heap_debug_start_wall_checking(100);
+		if (strchr(mode, 'g'))
+			sUseGuardPage = true;
+		if (strchr(mode, 'r'))
+			heap_debug_set_memory_reuse(false);
+	}
+}
+
+
 //	#pragma mark - Public API
 
 
@@ -1908,6 +1929,9 @@ memalign(size_t alignment, size_t size)
 void *
 malloc(size_t size)
 {
+	if (sUseGuardPage)
+		return heap_debug_malloc_with_guard_page(size);
+
 	return memalign(0, size);
 }
 

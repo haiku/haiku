@@ -119,6 +119,13 @@ __init_heap(void)
 }
 
 
+extern "C" void
+__init_heap_post_env(void)
+{
+	// no heap options available
+}
+
+
 static void
 insert_chunk(free_chunk *newChunk)
 {
