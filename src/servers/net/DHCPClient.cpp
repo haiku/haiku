@@ -68,7 +68,7 @@ enum message_option {
 	OPTION_ADDRESS_LEASE_TIME = 51,
 	OPTION_OVERLOAD = 52,
 	OPTION_MESSAGE_TYPE = 53,
-	OPTION_SERVER_ADDRESS = 54,
+	OPTION_SERVER_IDENTIFIER = 54,
 	OPTION_REQUEST_PARAMETERS = 55,
 	OPTION_ERROR_MESSAGE = 56,
 	OPTION_MAX_MESSAGE_SIZE = 57,
@@ -522,8 +522,10 @@ DHCPClient::_Negotiate(dhcp_state state)
 
 	while (state != ACKNOWLEDGED) {
 		char buffer[2048];
+		struct sockaddr_in from;
+		socklen_t fromLength = sizeof(from);
 		ssize_t bytesReceived = recvfrom(socket, buffer, sizeof(buffer),
-			0, NULL, NULL);
+			0, (struct sockaddr*)&from, &fromLength);
 		if (bytesReceived < 0 && errno == B_TIMED_OUT) {
 			// depending on the state, we'll just try again
 			if (!_TimeoutShift(socket, timeout, tries)) {
@@ -551,8 +553,9 @@ DHCPClient::_Negotiate(dhcp_state state)
 			continue;
 		}
 
-		syslog(LOG_DEBUG, "DHCP received %s for %s\n",
-			dhcp_message::TypeToString(message->Type()), Device());
+		syslog(LOG_DEBUG, "Received %s from %s for %s\n",
+			dhcp_message::TypeToString(message->Type()),
+				_AddressToString(from.sin_addr.s_addr).String(), Device());
 
 		switch (message->Type()) {
 			case DHCP_NONE:
@@ -569,6 +572,8 @@ DHCPClient::_Negotiate(dhcp_state state)
 				// collect interface options
 
 				fAssignedAddress = message->your_address;
+				syslog(LOG_INFO, "  your_address: %s\n",
+						_AddressToString(fAssignedAddress).String());
 
 				fConfiguration.MakeEmpty();
 				fConfiguration.AddString("device", Device());
@@ -688,18 +693,24 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address,
 		// iterate through all options
 		switch (option) {
 			case OPTION_ROUTER_ADDRESS:
+				syslog(LOG_INFO, "  gateway: %s\n",
+						_AddressToString(data).String());
 				address.AddString("gateway", _AddressToString(data));
 				break;
 			case OPTION_SUBNET_MASK:
+				syslog(LOG_INFO, "  subnet: %s\n",
+						_AddressToString(data).String());
 				address.AddString("mask", _AddressToString(data));
 				break;
 			case OPTION_BROADCAST_ADDRESS:
+				syslog(LOG_INFO, "  broadcast: %s\n",
+						_AddressToString(data).String());
 				address.AddString("broadcast", _AddressToString(data));
 				break;
 			case OPTION_DOMAIN_NAME_SERVER:
 			{
 				for (uint32 i = 0; i < size / 4; i++) {
-					syslog(LOG_INFO, "DHCP for %s got DNS: %s\n", Device(),
+					syslog(LOG_INFO, "  nameserver[%d]: %s\n", i,
 						_AddressToString(&data[i * 4]).String());
 					resolverConfiguration.AddString("nameserver",
 						_AddressToString(&data[i * 4]).String());
@@ -708,29 +719,30 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address,
 					size / 4);
 				break;
 			}
-			case OPTION_SERVER_ADDRESS:
-				fServer.SetAddress(
-					(in_addr_t)B_BENDIAN_TO_HOST_INT32(*(uint32*)data));
+			case OPTION_SERVER_IDENTIFIER:
+				syslog(LOG_INFO, "  server: %s\n",
+						_AddressToString(data).String());
+				fServer.SetAddress(*(in_addr_t*)data);
 				break;
 
 			case OPTION_ADDRESS_LEASE_TIME:
-				syslog(LOG_INFO, "lease time of %lu seconds\n",
-					htonl(*(uint32*)data));
-				fLeaseTime = htonl(*(uint32*)data) * 1000000LL;
+				syslog(LOG_INFO, "  lease time: %lu seconds\n",
+					ntohl(*(uint32*)data));
+				fLeaseTime = ntohl(*(uint32*)data) * 1000000LL;
 				break;
 			case OPTION_RENEWAL_TIME:
-				syslog(LOG_INFO, "renewal time of %lu seconds\n",
-					htonl(*(uint32*)data));
-				fRenewalTime = htonl(*(uint32*)data) * 1000000LL;
+				syslog(LOG_INFO, "  renewal time: %lu seconds\n",
+					ntohl(*(uint32*)data));
+				fRenewalTime = ntohl(*(uint32*)data) * 1000000LL;
 				break;
 			case OPTION_REBINDING_TIME:
-				syslog(LOG_INFO, "rebinding time of %lu seconds\n",
-					htonl(*(uint32*)data));
-				fRebindingTime = htonl(*(uint32*)data) * 1000000LL;
+				syslog(LOG_INFO, "  rebinding time: %lu seconds\n",
+					ntohl(*(uint32*)data));
+				fRebindingTime = ntohl(*(uint32*)data) * 1000000LL;
 				break;
 
 			case OPTION_HOST_NAME:
-				syslog(LOG_INFO, "DHCP host name: \"%.*s\"\n", (int)size,
+				syslog(LOG_INFO, "  host name: \"%.*s\"\n", (int)size,
 					(const char*)data);
 				break;
 
@@ -740,7 +752,7 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address,
 				strlcpy(domain, (const char*)data,
 					min_c(size + 1, sizeof(domain)));
 
-				syslog(LOG_INFO, "DHCP domain name: \"%s\"\n", domain);
+				syslog(LOG_INFO, "  domain name: \"%s\"\n", domain);
 
 				resolverConfiguration.AddString("domain", domain);
 				break;
@@ -750,12 +762,13 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address,
 				break;
 
 			case OPTION_ERROR_MESSAGE:
-				syslog(LOG_INFO, "DHCP error message: \"%.*s\"\n", (int)size,
+				syslog(LOG_INFO, "  error message: \"%.*s\"\n", (int)size,
 					(const char*)data);
 				break;
 
 			default:
-				syslog(LOG_INFO, "unknown option %lu\n", (uint32)option);
+				syslog(LOG_INFO, "  UNKNOWN OPTION %lu (0x%x)\n",
+					(uint32)option, (uint32)option);
 				break;
 		}
 	}
@@ -789,7 +802,7 @@ DHCPClient::_PrepareMessage(dhcp_message& message, dhcp_state state)
 
 			if (state == REQUESTING) {
 				const sockaddr_in& server = (sockaddr_in&)fServer.SockAddr();
-				next = message.PutOption(next, OPTION_SERVER_ADDRESS,
+				next = message.PutOption(next, OPTION_SERVER_IDENTIFIER,
 					(uint32)server.sin_addr.s_addr);
 			}
 
@@ -802,7 +815,7 @@ DHCPClient::_PrepareMessage(dhcp_message& message, dhcp_state state)
 
 		case DHCP_RELEASE: {
 			const sockaddr_in& server = (sockaddr_in&)fServer.SockAddr();
-			next = message.PutOption(next, OPTION_SERVER_ADDRESS,
+			next = message.PutOption(next, OPTION_SERVER_IDENTIFIER,
 				(uint32)server.sin_addr.s_addr);
 
 			message.client_address = fAssignedAddress;
@@ -840,7 +853,7 @@ DHCPClient::_TimeoutShift(int socket, time_t& timeout, uint32& tries)
 		if (++tries > 2)
 			return false;
 	}
-	syslog(LOG_DEBUG, "DHCP timeout shift for %s: %lu secs (try %lu)\n",
+	syslog(LOG_DEBUG, "Timeout shift for %s: %lu secs (try %lu)\n",
 		Device(), timeout, tries);
 
 	struct timeval value;
@@ -872,8 +885,9 @@ status_t
 DHCPClient::_SendMessage(int socket, dhcp_message& message,
 	const BNetworkAddress& address) const
 {
-	syslog(LOG_DEBUG, "DHCP send message %s for %s\n",
-		dhcp_message::TypeToString(message.Type()), Device());
+	syslog(LOG_DEBUG, "Send %s to %s on %s\n",
+		dhcp_message::TypeToString(message.Type()),
+			address.ToString().String(), Device());
 
 	ssize_t bytesSent = sendto(socket, &message, message.Size(),
 		address.IsBroadcast() ? MSG_BCAST : 0, address, address.Length());
