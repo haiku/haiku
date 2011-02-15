@@ -11,6 +11,7 @@
 #define INTERFACE_WINDOW_H
 
 #include "NetworkSettings.h"
+#include "InterfaceAddressView.h"
 
 #include <Button.h>
 #include <Catalog.h>
@@ -22,7 +23,7 @@
 
 enum {
 	APPLY_MSG = 'aply',
-	CANCEL_MSG = 'cncl'
+	REVERT_MSG = 'rvrt'
 };
 
 
@@ -38,8 +39,11 @@ private:
 
 			NetworkSettings*	fNetworkSettings;
 			BButton*			fApplyButton;
-			BButton*			fCancelButton;
+			BButton*			fRevertButton;
 			BTabView*			fTabView;
+
+			InterfaceAddressView* fIPv4TabView;
+			InterfaceAddressView* fIPv6TabView;
 };
 
 

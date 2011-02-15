@@ -41,9 +41,9 @@ public:
 
 			const char*			IP(int family);
 			const char*			Netmask(int family);
+			const char*			Gateway(int family);
 			int32				PrefixLen(int family);
 
-			const char*			Gateway()  { return fGateway.String(); }
 			const char*			Name()  { return fName.String(); }
 			const char*			Domain() { return fDomain.String(); }
 			bool				AutoConfigure() { return fIPv4Auto; }
@@ -60,15 +60,18 @@ private:
 
 			BNetworkInterface	fNetworkInterface;
 
+			// IPv4 address configuration
 			bool				fIPv4Auto;
-			bool				fIPv6Auto;
-
 			BNetworkAddress		fIPv4Addr;
 			BNetworkAddress		fIPv4Mask;
+			BNetworkAddress		fIPv4Gateway;
+
+			// IPv6 address configuration
+			bool				fIPv6Auto;
 			BNetworkAddress		fIPv6Addr;
 			BNetworkAddress		fIPv6Mask;
+			BNetworkAddress		fIPv6Gateway;
 
-			BString				fGateway;
 			BString				fName;
 			BString				fDomain;
 			bool				fDisabled;

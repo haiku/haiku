@@ -22,9 +22,9 @@ public:
 									const char* name, int family,
 									NetworkSettings* settings);
 	virtual						~InterfaceAddressView();
+			status_t			RevertFields();
 
 private:
-			status_t			_RevertFields();
 			NetworkSettings*	fSettings;
 			int					fFamily;
 

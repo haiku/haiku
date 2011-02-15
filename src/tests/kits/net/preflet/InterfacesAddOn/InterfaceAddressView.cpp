@@ -31,20 +31,24 @@ InterfaceAddressView::InterfaceAddressView(BRect frame, const char* name,
 		NULL, NULL, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
 	fNetmaskField = new BTextControl(frame, "netmask", "Netmask:",
 		NULL, NULL, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
+	fGatewayField = new BTextControl(frame, "gateway", "Gateway:",
+		NULL, NULL, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
 
 	fAddressField->GetPreferredSize(&textControlW, &textControlH);
 	float labelSize = ( textControlW + 50 )
 		- fAddressField->StringWidth("XXX.XXX.XXX.XXX");
 
-	_RevertFields();
+	RevertFields();
 		// Do the initial field population
 
 	fAddressField->SetDivider(labelSize);
 	fNetmaskField->SetDivider(labelSize);
+	fGatewayField->SetDivider(labelSize);
 
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
 		.Add(fAddressField)
 		.Add(fNetmaskField)
+		.Add(fGatewayField)
 		.AddGlue()
 		.SetInsets(10, 10, 10, 10)
 	);
@@ -58,11 +62,12 @@ InterfaceAddressView::~InterfaceAddressView()
 
 
 status_t
-InterfaceAddressView::_RevertFields()
+InterfaceAddressView::RevertFields()
 {
 	// Populate address fields with current settings
 	fAddressField->SetText(fSettings->IP(fFamily));
 	fNetmaskField->SetText(fSettings->Netmask(fFamily));
+	fNetmaskField->SetText(fSettings->Gateway(fFamily));
 
 	return B_OK;
 }

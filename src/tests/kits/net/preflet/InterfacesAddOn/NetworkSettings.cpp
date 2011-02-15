@@ -109,7 +109,7 @@ NetworkSettings::ReadConfiguration()
 
 		if ((route.flags & RTF_GATEWAY) != 0) {
 			sockaddr_in* inetAddress = (sockaddr_in*)route.gateway;
-			fGateway = inet_ntoa(inetAddress->sin_addr);
+			fIPv4Gateway = inet_ntoa(inetAddress->sin_addr);
 		}
 
 		int32 addressSize = 0;
@@ -232,6 +232,16 @@ NetworkSettings::Netmask(int family)
 		return fIPv6Mask.ToString();
 
 	return fIPv4Mask.ToString();
+}
+
+
+const char*
+NetworkSettings::Gateway(int family)
+{
+	if (family == AF_INET6)
+		return fIPv6Gateway.ToString();
+
+	return fIPv4Gateway.ToString();
 }
 
 

@@ -8,7 +8,6 @@
 
 
 #include "InterfaceWindow.h"
-#include "InterfaceAddressView.h"
 
 #include <Application.h>
 
@@ -17,7 +16,8 @@
 
 
 InterfaceWindow::InterfaceWindow(NetworkSettings* settings)
-	: BWindow(BRect(50, 50, 370, 350), "Interface Settings",
+	:
+	BWindow(BRect(50, 50, 370, 350), "Interface Settings",
 		B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
 		B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE,
 		B_CURRENT_WORKSPACE)
@@ -29,8 +29,8 @@ InterfaceWindow::InterfaceWindow(NetworkSettings* settings)
 	fApplyButton = new BButton("apply", B_TRANSLATE("Apply"),
 		new BMessage(APPLY_MSG));
 
-	fCancelButton = new BButton("cancel", B_TRANSLATE("Cancel"),
-		new BMessage(CANCEL_MSG));
+	fRevertButton = new BButton("revert", B_TRANSLATE("Revert"),
+		new BMessage(REVERT_MSG));
 
 	fTabView->SetResizingMode(B_FOLLOW_ALL);
 		// ensure tab container matches window size
@@ -43,7 +43,7 @@ InterfaceWindow::InterfaceWindow(NetworkSettings* settings)
 		.Add(fTabView)
 		.AddGroup(B_HORIZONTAL, 5)
 			.AddGlue()
-			.Add(fCancelButton)
+			.Add(fRevertButton)
 			.Add(fApplyButton)
 		.End()
 		.SetInsets(10, 10, 10, 10)
@@ -60,6 +60,12 @@ void
 InterfaceWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case REVERT_MSG:
+			// RFC : we could check fTabView for Selection
+			// here and only revert the selected tab.
+			fIPv4TabView->RevertFields();
+			fIPv6TabView->RevertFields();
+			break;
 		default:
 			BWindow::MessageReceived(message);
 	}
@@ -71,18 +77,18 @@ status_t
 InterfaceWindow::_PopulateTabs()
 {
 	BRect frame = fTabView->Bounds();
-	BView* view4 = new InterfaceAddressView(frame, "net_settings_ipv4",
+	fIPv4TabView = new InterfaceAddressView(frame, "net_settings_ipv4",
 		AF_INET, fNetworkSettings);
-	BView* view6 = new InterfaceAddressView(frame, "net_settings_ipv6",
+	fIPv6TabView = new InterfaceAddressView(frame, "net_settings_ipv6",
 		AF_INET6, fNetworkSettings);
 
 	BTab* tab4 = new BTab;
 	BTab* tab6 = new BTab;
 
-	fTabView->AddTab(view4, tab4);
+	fTabView->AddTab(fIPv4TabView, tab4);
 	tab4->SetLabel("IPv4");
 
-	fTabView->AddTab(view6, tab6);
+	fTabView->AddTab(fIPv6TabView, tab6);
 	tab6->SetLabel("IPv6");
 
 	return B_OK;
