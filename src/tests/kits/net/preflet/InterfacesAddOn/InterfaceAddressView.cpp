@@ -21,18 +21,33 @@ InterfaceAddressView::InterfaceAddressView(BRect frame, const char* name,
 	fSettings(settings),
 	fFamily(family)
 {
+	float textControlW;
+	float textControlH;
+
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
-	// TODO : Draw address fields in a generic way
-	BStringView* address = new BStringView(Bounds(), "address",
-		fSettings->IP(family));
+	// Create our controls
+	fAddressField = new BTextControl(frame, "address", "IP Address:",
+		NULL, NULL, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
+	fNetmaskField = new BTextControl(frame, "netmask", "Netmask:",
+		NULL, NULL, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
+
+	fAddressField->GetPreferredSize(&textControlW, &textControlH);
+	float labelSize = ( textControlW + 50 )
+		- fAddressField->StringWidth("XXX.XXX.XXX.XXX");
+
+	_RevertFields();
+		// Do the initial field population
+
+	fAddressField->SetDivider(labelSize);
+	fNetmaskField->SetDivider(labelSize);
 
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
-		.Add(address)
+		.Add(fAddressField)
+		.Add(fNetmaskField)
 		.AddGlue()
 		.SetInsets(10, 10, 10, 10)
 	);
-
 }
 
 
@@ -42,3 +57,12 @@ InterfaceAddressView::~InterfaceAddressView()
 }
 
 
+status_t
+InterfaceAddressView::_RevertFields()
+{
+	// Populate address fields with current settings
+	fAddressField->SetText(fSettings->IP(fFamily));
+	fNetmaskField->SetText(fSettings->Netmask(fFamily));
+
+	return B_OK;
+}

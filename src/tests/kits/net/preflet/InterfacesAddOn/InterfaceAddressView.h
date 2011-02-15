@@ -13,6 +13,7 @@
 
 #include <Screen.h>
 #include <View.h>
+#include <TextControl.h>
 
 
 class InterfaceAddressView : public BView {
@@ -23,8 +24,13 @@ public:
 	virtual						~InterfaceAddressView();
 
 private:
+			status_t			_RevertFields();
 			NetworkSettings*	fSettings;
 			int					fFamily;
+
+			BTextControl*		fAddressField;
+			BTextControl*		fNetmaskField;
+			BTextControl*		fGatewayField;
 };
 
 

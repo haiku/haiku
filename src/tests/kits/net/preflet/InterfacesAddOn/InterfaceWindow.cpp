@@ -17,7 +17,7 @@
 
 
 InterfaceWindow::InterfaceWindow(NetworkSettings* settings)
-	: BWindow(BRect(50, 50, 400, 302), "Interface Settings",
+	: BWindow(BRect(50, 50, 370, 350), "Interface Settings",
 		B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
 		B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE,
 		B_CURRENT_WORKSPACE)
