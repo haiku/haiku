@@ -2000,19 +2000,38 @@ realloc(void *address, size_t newSize)
 		if (info->magic == kAreaAllocationMagic && info->area == area
 			&& info->size == areaInfo.size && info->base == areaInfo.address
 			&& info->allocation_size < areaInfo.size) {
-			size_t available = info->size - ((addr_t)info->allocation_base
-				- (addr_t)info->base);
+			if (sUseGuardPage) {
+				size_t available = info->size - B_PAGE_SIZE
+					- sizeof(area_allocation_info);
 
-			if (available >= newSize) {
-				// there is enough room available for the newSize
-				INFO(("realloc(): new size %ld fits in old area %ld with %ld "
-					"available\n", newSize, area, available));
-				info->allocation_size = newSize;
-				return address;
+				if (available >= newSize) {
+					// there is enough room available for the newSize
+					newAddress = (void*)((addr_t)info->allocation_base
+						+ info->allocation_size - newSize);
+					INFO(("realloc(): new size %ld fits in old area %ld with "
+						"%ld available -> new address: %p\n", newSize, area,
+						available, newAddress));
+					memmove(newAddress, info->allocation_base,
+						min_c(newSize, info->allocation_size));
+					info->allocation_base = newAddress;
+					info->allocation_size = newSize;
+					return newAddress;
+				}
+			} else {
+				size_t available = info->size - ((addr_t)info->allocation_base
+					- (addr_t)info->base);
+
+				if (available >= newSize) {
+					// there is enough room available for the newSize
+					INFO(("realloc(): new size %ld fits in old area %ld with "
+						"%ld available\n", newSize, area, available));
+					info->allocation_size = newSize;
+					return address;
+				}
 			}
 
 			// have to allocate/copy/free - TODO maybe resize the area instead?
-			newAddress = memalign(0, newSize);
+			newAddress = malloc(newSize);
 			if (newAddress == NULL) {
 				panic("realloc(): failed to allocate new block of %ld"
 					" bytes\n", newSize);
@@ -2036,7 +2055,7 @@ realloc(void *address, size_t newSize)
 void *
 calloc(size_t numElements, size_t size)
 {
-	void *address = memalign(0, numElements * size);
+	void *address = malloc(numElements * size);
 	if (address != NULL)
 		memset(address, 0, numElements * size);
 
