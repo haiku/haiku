@@ -15,17 +15,17 @@
 #include <PopUpMenu.h>
 #include <Screen.h>
 #include <TextControl.h>
-#include <View.h>
+#include <GroupView.h>
 
 
 enum {
-	AUTOSEL_MSG = 'iato',
-	STATICSEL_MSG = 'istc',
-	NONESEL_MSG = 'inon'
+	M_MODE_AUTO = 'iato',
+	M_MODE_STATIC = 'istc',
+	M_MODE_NONE = 'inon'
 };
 
 
-class InterfaceAddressView : public BView {
+class InterfaceAddressView : public BGroupView {
 public:
 								InterfaceAddressView(BRect frame,
 									const char* name, int family,

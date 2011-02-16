@@ -10,9 +10,7 @@
 #include "InterfaceAddressView.h"
 #include "NetworkSettings.h"
 
-#include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
-#include <GridLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <MenuItem.h>
 #include <StringView.h>
 
@@ -20,7 +18,7 @@
 InterfaceAddressView::InterfaceAddressView(BRect frame, const char* name,
 	int family, NetworkSettings* settings)
 	:
-	BView(frame, name, B_FOLLOW_ALL_SIDES, 0),
+	BGroupView(B_VERTICAL),
 	fSettings(settings),
 	fFamily(family)
 {
@@ -30,12 +28,12 @@ InterfaceAddressView::InterfaceAddressView(BRect frame, const char* name,
 	fModePopUpMenu = new BPopUpMenu("modes");
 
 	fModePopUpMenu->AddItem(new BMenuItem("Automatic",
-		new BMessage(AUTOSEL_MSG)));
+		new BMessage(M_MODE_AUTO)));
 	fModePopUpMenu->AddItem(new BMenuItem("Static",
-		new BMessage(STATICSEL_MSG)));
+		new BMessage(M_MODE_STATIC)));
 	fModePopUpMenu->AddSeparatorItem();
 	fModePopUpMenu->AddItem(new BMenuItem("None",
-		new BMessage(NONESEL_MSG)));
+		new BMessage(M_MODE_NONE)));
 
 	fModeField = new BMenuField("Mode:", fModePopUpMenu);
 
@@ -46,19 +44,16 @@ InterfaceAddressView::InterfaceAddressView(BRect frame, const char* name,
 	RevertFields();
 		// Do the initial field population
 
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
-		.Add(BGridLayoutBuilder()
-			.Add(fModeField->CreateLabelLayoutItem(), 0, 0)
-			.Add(fModeField->CreateMenuBarLayoutItem(), 1, 0)
-			.Add(fAddressField->CreateLabelLayoutItem(), 0, 1)
-			.Add(fAddressField->CreateTextViewLayoutItem(), 1, 1)
-			.Add(fNetmaskField->CreateLabelLayoutItem(), 0, 2)
-			.Add(fNetmaskField->CreateTextViewLayoutItem(), 1, 2)
-			.Add(fGatewayField->CreateLabelLayoutItem(), 0, 3)
-			.Add(fGatewayField->CreateTextViewLayoutItem(), 1, 3)
-		)
+	BLayoutBuilder::Group<>(this)
+		.AddGrid()
+			.AddMenuField(fModeField, 0, 0, B_ALIGN_RIGHT)
+			.AddTextControl(fAddressField, 0, 1, B_ALIGN_RIGHT)
+			.AddTextControl(fNetmaskField, 0, 2, B_ALIGN_RIGHT)
+			.AddTextControl(fGatewayField, 0, 3, B_ALIGN_RIGHT)
+		.End()
 		.AddGlue()
-	);
+		.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
+			B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING);
 }
 
 
@@ -79,13 +74,13 @@ void
 InterfaceAddressView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case AUTOSEL_MSG:
+		case M_MODE_AUTO:
 			_EnableFields(false);
 			break;
-		case STATICSEL_MSG:
+		case M_MODE_STATIC:
 			_EnableFields(true);
 			break;
-		case NONESEL_MSG:
+		case M_MODE_NONE:
 			_EnableFields(false);
 			fAddressField->SetText("");
 			fNetmaskField->SetText("");
