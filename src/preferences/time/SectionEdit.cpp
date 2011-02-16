@@ -8,6 +8,7 @@
  *
  */
 
+
 #include "SectionEdit.h"
 
 #include <Bitmap.h>
@@ -88,7 +89,7 @@ TSectionEdit::Draw(BRect updateRect)
 
 	for (uint32 idx = 0; idx < fSectionCount; idx++) {
 		DrawSection(idx, ((uint32)fFocus == idx) && IsFocus());
-		if (idx < fSectionCount -1)
+		if (idx < fSectionCount - 1)
 			DrawSeparator(idx);
 	}
 }
@@ -103,7 +104,7 @@ TSectionEdit::MouseDown(BPoint where)
 		DoUpPress();
 	else if (fDownRect.Contains(where))
 		DoDownPress();
-	else if (fSectionList->CountItems()> 0) {
+	else if (fSectionList->CountItems() > 0) {
 		TSection* section;
 		for (uint32 idx = 0; idx < fSectionCount; idx++) {
 			section = (TSection*)fSectionList->ItemAt(idx);
@@ -141,7 +142,7 @@ TSectionEdit::KeyDown(const char* bytes, int32 numbytes)
 		case B_LEFT_ARROW:
 			fFocus -= 1;
 			if (fFocus < 0)
-				fFocus = fSectionCount -1;
+				fFocus = fSectionCount - 1;
 			SectionFocus(fFocus);
 			break;
 
@@ -251,4 +252,3 @@ TSectionEdit::SeparatorWidth() const
 {
 	return 0.0f;
 }
-
