@@ -4,6 +4,7 @@ UsePublicHeaders locale ;
 UsePrivateHeaders locale ;
 UsePrivateHeaders shared ;
 
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits locale ] ;
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits tracker ] ;
 
 local localetools =

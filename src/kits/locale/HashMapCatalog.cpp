@@ -11,6 +11,9 @@
 #include <stdlib.h>
 
 
+namespace BPrivate {
+
+
 /*
  * This is the standard implementation of a localization catalog, using a hash
  * map. This class is abstract, you need to inherit it and provide methodes for
@@ -86,7 +89,8 @@ CatKey::GetStringParts(BString* str, BString* ctx, BString* cmt) const
 }
 
 
-uint32 CatKey::HashFun(const char* s, int startValue) {
+uint32
+CatKey::HashFun(const char* s, int startValue) {
 	unsigned long h = startValue;
 	for ( ; *s; ++s)
 		h = 5 * h + *s;
@@ -97,7 +101,7 @@ uint32 CatKey::HashFun(const char* s, int startValue) {
 	return size_t(h);
 }
 
-// (end CatKey)
+
 // BHashMapCatalog
 
 
@@ -143,15 +147,17 @@ BHashMapCatalog::GetString(const CatKey& key)
 }
 
 
-void
+static status_t
 parseQuotedChars(BString& stringToParse)
 {
 	char* in = stringToParse.LockBuffer(0);
+	if (in == NULL)
+		return B_ERROR;
 	char* out = in;
 	int newLength = 0;
 	bool quoted = false;
 
-	while (*in != 0 || quoted) {
+	while (*in != 0) {
 		if (quoted) {
 			if (*in == 'n')
 				*out = '\n';
@@ -160,17 +166,19 @@ parseQuotedChars(BString& stringToParse)
 			else if (*in == '"')
 				*out = '"';
 			else if (*in == 'x') {
+				if (in[1] == '\0' || in[2] == '\0')
+					break;
 				// Parse the 2-digit hex integer that follows
 				char tmp[3];
-				tmp[0] = *(in+1);
-				tmp[1] = *(in+2);
+				tmp[0] = in[1];
+				tmp[1] = in[2];
 				tmp[2] = '\0';
 				unsigned int hexchar = strtoul(tmp, NULL, 16);
 				*out = hexchar;
 				// skip the number
 				in += 2;
 			} else {
-				// dump quote from unknown quoting-sequence:
+				// drop quote from unknown quoting-sequence:
 				*out = *in ;
 			}
 			quoted = false;
@@ -187,7 +195,9 @@ parseQuotedChars(BString& stringToParse)
 		in++;
 	}
 	*out = '\0';
-	stringToParse.UnlockBuffer();
+	stringToParse.UnlockBuffer(newLength);
+
+	return B_OK;
 }
 
 
@@ -197,12 +207,14 @@ BHashMapCatalog::SetString(const char *string, const char *translated,
 {
 	BString stringCopy(string);
 	BString translatedCopy(translated);
-	parseQuotedChars(stringCopy);
-	parseQuotedChars(translatedCopy);
+	status_t result = parseQuotedChars(stringCopy);
+	if (result != B_OK)
+		return result;
+	if ((result = parseQuotedChars(translatedCopy)) != B_OK)
+		return result;
 	CatKey key(stringCopy.String(), context, comment);
-	fCatMap.Put(key, translatedCopy.String());
+	return fCatMap.Put(key, translatedCopy.String());
 		// overwrite existing element
-	return B_OK;
 }
 
 
@@ -210,11 +222,12 @@ status_t
 BHashMapCatalog::SetString(int32 id, const char *translated)
 {
 	BString translatedCopy(translated);
-	parseQuotedChars(translatedCopy);
+	status_t result = parseQuotedChars(translatedCopy);
+	if (result != B_OK)
+		return result;
 	CatKey key(id);
-	fCatMap.Put(key, translatedCopy.String());
+	return fCatMap.Put(key, translatedCopy.String());
 		// overwrite existing element
-	return B_OK;
 }
 
 
@@ -222,10 +235,11 @@ status_t
 BHashMapCatalog::SetString(const CatKey& key, const char *translated)
 {
 	BString translatedCopy(translated);
-	parseQuotedChars(translatedCopy);
-	fCatMap.Put(key, translatedCopy.String());
+	status_t result = parseQuotedChars(translatedCopy);
+	if (result != B_OK)
+		return result;
+	return fCatMap.Put(key, translatedCopy.String());
 		// overwrite existing element
-	return B_OK;
 }
 
 
@@ -260,3 +274,6 @@ BHashMapCatalog::UpdateFingerprint()
 {
 	fFingerprint = ComputeFingerprint();
 }
+
+
+}	// namespace BPrivate
