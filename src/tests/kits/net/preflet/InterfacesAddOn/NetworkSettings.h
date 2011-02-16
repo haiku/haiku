@@ -22,20 +22,17 @@ public:
 								NetworkSettings(const char* name);
 	virtual						~NetworkSettings();
 
-//			void				SetIP(const BString& ip)
-//									{ fIP = ip; }
-//			void				SetGateway(const BString& ip)
-//									{ fGateway = ip; }
-//			void				SetNetmask(const BString& ip)
-//									{ fNetmask = ip; }
-//			void				SetDomain(const BString& domain)
-//									{ fDomain = domain; }
-//			void				SetAutoConfigure(bool autoConfigure)
-//									{ fAuto = autoConfigure; }
+			void				SetIP(int family, const char* ip);
+			void				SetNetmask(int family, const char* mask);
+			void				SetGateway(int family, const char* mask);
+			void				SetAutoConfigure(int family, bool autoConf);
+
 			void				SetDisabled(bool disabled)
 									{ fDisabled = disabled; }
 //			void				SetWirelessNetwork(const char* name)
 //									{ fWirelessNetwork.SetTo(name); }
+//			void				SetDomain(const BString& domain)
+//									{ fDomain = domain; }
 
 			BNetworkAddress		IPAddr(int family);
 

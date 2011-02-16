@@ -21,8 +21,8 @@
 
 
 enum {
-	APPLY_MSG = 'aply',
-	REVERT_MSG = 'rvrt'
+	MSG_IP_SAVE = 'ipap',
+	MSG_IP_REVERT = 'iprv'
 };
 
 

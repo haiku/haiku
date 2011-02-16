@@ -20,18 +20,18 @@ InterfaceWindow::InterfaceWindow(NetworkSettings* settings)
 	:
 	BWindow(BRect(50, 50, 370, 350), "Interface Settings",
 		B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
-		B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE,
+		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE,
 		B_CURRENT_WORKSPACE)
 {
 	fNetworkSettings = settings;
 
 	fTabView = new BTabView("settings_tabs");
 
-	fApplyButton = new BButton("apply", B_TRANSLATE("Apply"),
-		new BMessage(APPLY_MSG));
+	fApplyButton = new BButton("save", B_TRANSLATE("Save"),
+		new BMessage(MSG_IP_SAVE));
 
 	fRevertButton = new BButton("revert", B_TRANSLATE("Revert"),
-		new BMessage(REVERT_MSG));
+		new BMessage(MSG_IP_REVERT));
 
 	fTabView->SetResizingMode(B_FOLLOW_ALL);
 		// ensure tab container matches window size
@@ -61,11 +61,16 @@ void
 InterfaceWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case REVERT_MSG:
+		case MSG_IP_REVERT:
 			// RFC : we could check fTabView for Selection
 			// here and only revert the selected tab.
 			fIPv4TabView->RevertFields();
 			fIPv6TabView->RevertFields();
+			break;
+		case MSG_IP_SAVE:
+			fIPv4TabView->SaveFields();
+			fIPv6TabView->SaveFields();
+			this->Quit();
 			break;
 		default:
 			BWindow::MessageReceived(message);

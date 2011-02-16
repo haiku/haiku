@@ -129,3 +129,17 @@ InterfaceAddressView::RevertFields()
 
 	return B_OK;
 }
+
+
+status_t
+InterfaceAddressView::SaveFields()
+{
+	fSettings->SetIP(fFamily, fAddressField->Text());
+	fSettings->SetNetmask(fFamily, fNetmaskField->Text());
+	fSettings->SetGateway(fFamily, fGatewayField->Text());
+
+	BMenuItem* item = fModePopUpMenu->FindItem("Automatic");
+	fSettings->SetAutoConfigure(fFamily, item->IsMarked());
+
+	return B_OK;
+}

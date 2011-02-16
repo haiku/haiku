@@ -56,6 +56,8 @@ NetworkSettings::~NetworkSettings()
 }
 
 
+// -- Interface address read code
+
 void
 NetworkSettings::ReadConfiguration()
 {
@@ -252,5 +254,48 @@ NetworkSettings::PrefixLen(int family)
 		return fIPv6Mask.PrefixLength();
 
 	return fIPv4Mask.PrefixLength();
+}
+
+
+// -- Interface address write code
+
+
+void
+NetworkSettings::SetIP(int family, const char* ip)
+{
+	if (family == AF_INET6)
+		fIPv6Addr = ip;
+	else
+		fIPv4Addr = ip;
+}
+
+
+void
+NetworkSettings::SetNetmask(int family, const char* mask)
+{
+	if (family == AF_INET6)
+		fIPv6Mask = mask;
+	else
+		fIPv4Mask = mask;
+}
+
+
+void
+NetworkSettings::SetGateway(int family, const char* ip)
+{
+	if (family == AF_INET6)
+		fIPv6Gateway = ip;
+	else
+		fIPv4Gateway = ip;
+}
+
+
+void
+NetworkSettings::SetAutoConfigure(int family, bool autoConf)
+{
+	if (family == AF_INET6)
+		fIPv6Auto = autoConf;
+	else
+		fIPv4Auto = autoConf;
 }
 

@@ -34,6 +34,7 @@ public:
 	virtual	void				MessageReceived(BMessage* message);
 	virtual void				AttachedToWindow();
 			status_t			RevertFields();
+			status_t			SaveFields();
 
 
 private:
