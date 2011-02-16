@@ -1787,10 +1787,12 @@ BString::LockBuffer(int32 maxLength)
 	if (maxLength > length)
 		length = maxLength;
 
-	if (_MakeWritable(length, true) == B_OK) {
-		_ReferenceCount() = -1;
-			// mark unshareable
-	}
+	if (_MakeWritable(length, true) != B_OK)
+		return NULL;
+
+	_ReferenceCount() = -1;
+		// mark unshareable
+
 	return fPrivateData;
 }
 
