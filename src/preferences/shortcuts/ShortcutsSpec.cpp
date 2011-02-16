@@ -51,7 +51,7 @@ const char* ShortcutsSpec::sCommandName;
 
 
 #define ICON_BITMAP_RECT BRect(0.0f, 0.0f, 15.0f, 15.0f)
-#define ICON_BITMAP_SPACE B_COLOR_8_BIT
+#define ICON_BITMAP_SPACE B_RGBA32
 
 
 // Returns the (pos)'th char in the string, or '\0' if (pos) if off the end of
@@ -441,7 +441,7 @@ ShortcutsSpec::DrawItemColumn(BView* owner, BRect item_column_rect,
 
 		bitmapRegion.Include(item_column_rect);
 		owner->ConstrainClippingRegion(&bitmapRegion);
-		owner->SetDrawingMode(B_OP_OVER);
+		owner->SetDrawingMode(B_OP_ALPHA);
 
 		if ((fCommand != NULL) && (fCommand[0] == '*'))
 			owner->DrawBitmap(sActuatorBitmaps[fBitmapValid ? 1 : 0],

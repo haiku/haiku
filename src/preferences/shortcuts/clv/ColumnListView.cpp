@@ -60,8 +60,9 @@ class CLVContainerView : public BScrollView
 
 
 CLVContainerView::CLVContainerView(char* name, BView* target, uint32 resizingMode, uint32 flags,
-	bool horizontal, bool vertical, border_style border) :
-BScrollView(name,target,resizingMode,flags,horizontal,vertical,border)
+	bool horizontal, bool vertical, border_style border)
+	:
+	BScrollView(name, target, resizingMode, flags, horizontal, vertical, border)
 {
 	IsBeingDestroyed = false;
 };
@@ -73,35 +74,38 @@ CLVContainerView::~CLVContainerView()
 }
 
 
-ColumnListView::ColumnListView(BRect Frame, BScrollView **ContainerView, const char *Name,
-	uint32 ResizingMode, uint32 flags, list_view_type Type, bool hierarchical, bool horizontal,
-	bool vertical, border_style border, const BFont *LabelFont)
-: BListView(Frame,Name,Type,B_FOLLOW_ALL_SIDES,flags|B_PULSE_NEEDED),
-fHierarchical(hierarchical),
-fColumnList(6),
-fColumnDisplayList(6),
-fDataWidth(0),
-fDataHeight(0),
-fPageWidth(0),
-fPageHeight(0),
-fSortKeyList(6),
-fRightArrow(BRect(0.0,0.0,10.0,10.0),B_COLOR_8_BIT,CLVRightArrowData,false,false),
-fDownArrow(BRect(0.0,0.0,10.0,10.0),B_COLOR_8_BIT,CLVDownArrowData,false,false),
-fFullItemList(32),
-_selectedColumn(-1),
-_editMessage(NULL)
+ColumnListView::ColumnListView(BRect frame, BScrollView **containerView,
+	const char *name, uint32 resizingMode, uint32 flags, list_view_type type,
+	bool hierarchical, bool horizontal, bool vertical, border_style border,
+	const BFont *labelFont)
+	:
+	BListView(frame, name, type, B_FOLLOW_ALL_SIDES, flags | B_PULSE_NEEDED),
+	fHierarchical(hierarchical),
+	fColumnList(6),
+	fColumnDisplayList(6),
+	fDataWidth(0),
+	fDataHeight(0),
+	fPageWidth(0),
+	fPageHeight(0),
+	fSortKeyList(6),
+	fRightArrow(BRect(0, 0, 10, 10), B_RGBA32, CLVRightArrowData, false, false),
+	fDownArrow(BRect(0, 0, 10, 10), B_RGBA32, CLVDownArrowData, false, false),
+	fFullItemList(32),
+	_selectedColumn(-1),
+	_editMessage(NULL)
 {
 	//Create the column titles bar view
-	font_height FontAttributes;
-	LabelFont->GetHeight(&FontAttributes);
-	float fLabelFontHeight = ceil(FontAttributes.ascent) + ceil(FontAttributes.descent);
-	float ColumnLabelViewBottom = Frame.top+1.0+fLabelFontHeight+3.0;
-	fColumnLabelView = new CLVColumnLabelView(BRect(Frame.left,Frame.top,Frame.right,
-		ColumnLabelViewBottom),this,LabelFont);
+	font_height fontAttributes;
+	labelFont->GetHeight(&fontAttributes);
+	float fLabelFontHeight = ceil(fontAttributes.ascent)
+		+ ceil(fontAttributes.descent);
+	float columnLabelViewBottom = frame.top + 1 + fLabelFontHeight + 3;
+	fColumnLabelView = new CLVColumnLabelView(BRect(frame.left, frame.top,
+		frame.right, columnLabelViewBottom), this, labelFont);
 
 	//Create the container view
-	CreateContainer(horizontal,vertical,border,ResizingMode,flags);
-	*ContainerView = fScrollView;
+	CreateContainer(horizontal, vertical, border, resizingMode, flags);
+	*containerView = fScrollView;
 
 	//Complete the setup
 	UpdateColumnSizesDataRectSizeScrollBars();
