@@ -660,9 +660,9 @@ fs_rstat(fs_volume *_vol, fs_vnode *_node, struct stat *stbuf)
 	stbuf->st_uid = 0;
 	stbuf->st_gid = 0;
 	stbuf->st_ino = MREF(ni->mft_no);
-	stbuf->st_atime = ni->last_access_time;
-	stbuf->st_ctime = ni->last_mft_change_time;
-	stbuf->st_mtime = ni->last_data_change_time;
+	stbuf->st_atim = ntfs2timespec(ni->last_access_time);
+	stbuf->st_ctim = ntfs2timespec(ni->last_mft_change_time);
+	stbuf->st_mtim = ntfs2timespec(ni->last_data_change_time);
 
 exit:
 	if (ni)
@@ -1484,7 +1484,7 @@ fs_rename(fs_volume *_vol, fs_vnode *_odir, const char *oldname,
 	int uoldnameLength;
 
 	status_t result = B_NO_ERROR;
-	
+
 	char path[MAX_PATH];
 
 	if (ns->flags & B_FS_IS_READONLY) {
@@ -1663,8 +1663,8 @@ do_unlink(fs_volume *_vol, vnode *dir, const char *name, bool isdir)
 	ntfschar *uname = NULL;
 	int unameLength;
 	char path[MAX_PATH];
-	
-	status_t result = B_NO_ERROR;	
+
+	status_t result = B_NO_ERROR;
 
 	unameLength = ntfs_mbstoucs(name, &uname);
 	if (unameLength < 0) {
