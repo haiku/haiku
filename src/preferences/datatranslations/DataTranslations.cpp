@@ -10,6 +10,8 @@
 
 #include "DataTranslations.h"
 
+#include <stdio.h>
+
 #include <Alert.h>
 #include <Catalog.h>
 #include <Directory.h>
@@ -51,7 +53,7 @@ DataTranslationsApplication::SetWindowCorner(const BPoint& leftTop)
 void
 DataTranslationsApplication::AboutRequested()
 {
-	BAlert* alert = new BAlert(B_TRANSLATE("about"),
+	BAlert* alert = new BAlert(B_TRANSLATE("About"),
 		B_TRANSLATE("DataTranslations\n\twritten by Oliver Siebenmarck and"
 		" others\n\tCopyright 2002-2010, Haiku Inc. All rights reserved.\n"),
 		B_TRANSLATE("OK"));
@@ -72,10 +74,12 @@ DataTranslationsApplication::AboutRequested()
 void
 DataTranslationsApplication::_InstallError(const char* name, status_t status)
 {
-	BString text(B_TRANSLATE("Could not install "));
-	text << name << ":\n" << strerror(status);
+	BString text;
+	snprintf(text.LockBuffer(512), 512,
+			B_TRANSLATE("Could not install %s:\n%s"), name, strerror(status));
+	text.UnlockBuffer();
 	BAlert* alert = new BAlert(B_TRANSLATE("DataTranslations - Error"),
-		text.String(), B_TRANSLATE("Ok"));
+		text.String(), B_TRANSLATE("OK"));
 	alert->Go();
 }
 
@@ -102,9 +106,9 @@ DataTranslationsApplication::_Install(BDirectory& target, BEntry& entry)
 void
 DataTranslationsApplication::_NoTranslatorError(const char* name)
 {
-	BString text(B_TRANSLATE("The item '"));
-	text << B_TRANSLATE("%name' does not appear to be a Translator and will"
-		" not be installed.");
+	BString text(
+		B_TRANSLATE("The item '%name' does not appear to be a Translator and "
+		"will not be installed."));
 	text.ReplaceAll("%name", name);
 	BAlert* alert = new BAlert("", text.String(), B_TRANSLATE("Ok"));
 	alert->Go();
@@ -152,10 +156,10 @@ DataTranslationsApplication::RefsReceived(BMessage* message)
 		}
 
 		if (target.Contains(ref.name)) {
-			BString string(B_TRANSLATE("An item named '"));
-			string << B_TRANSLATE("%name already exists in the "
+			BString string(
+				B_TRANSLATE("An item named '%name' already exists in the "
 				"Translators folder! Shall the existing translator be "
-				"overwritten?");
+				"overwritten?"));
 			string.ReplaceAll("%name", ref.name);
 
 			BAlert* alert = new BAlert(B_TRANSLATE("DataTranslations - Note"),

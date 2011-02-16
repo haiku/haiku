@@ -15,6 +15,8 @@
 #include "IconView.h"
 #include "TranslatorListView.h"
 
+#include <stdio.h>
+
 #include <Application.h>
 #include <Alignment.h>
 #include <Alert.h>
@@ -223,17 +225,15 @@ DataTranslationsWindow::_ShowInfoAlert(int32 id)
 	_GetTranslatorInfo(id, name, info, version, path);
 
 	BString message;
-	message << B_TRANSLATE("Name: %name \nVersion: ");
-	message.ReplaceAll("%name", name);
-
 	// Convert the version number into a readable format
-	message << (int)B_TRANSLATION_MAJOR_VERSION(version)
-		<< '.' << (int)B_TRANSLATION_MINOR_VERSION(version)
-		<< '.' << (int)B_TRANSLATION_REVISION_VERSION(version);
-	message << B_TRANSLATE("\nInfo: %info\n\nPath:\n") << path.Path() << "\n";
-	message.ReplaceAll("%info", info);
+	snprintf(message.LockBuffer(512), 512,
+		B_TRANSLATE("Name:\t%s \nVersion:\t%ld.%ld.%ld\nInfo:\t%s\n\nPath:\n%s\n"),
+			name, B_TRANSLATION_MAJOR_VERSION(version),
+			B_TRANSLATION_MINOR_VERSION(version),
+			B_TRANSLATION_REVISION_VERSION(version), info, path.Path());
+	message.UnlockBuffer();
 
-	BAlert* alert = new BAlert(B_TRANSLATE("info"), message.String(),
+	BAlert* alert = new BAlert(B_TRANSLATE("Info"), message.String(),
 		B_TRANSLATE("OK"));
 	BTextView *view = alert->TextView();
 	BFont font;
@@ -243,8 +243,8 @@ DataTranslationsWindow::_ShowInfoAlert(int32 id)
 	view->GetFont(&font);
 	font.SetFace(B_BOLD_FACE);
 
-	const char* labels[] = {B_TRANSLATE("Name:"), B_TRANSLATE("Version:"),
-		B_TRANSLATE("Info:"), B_TRANSLATE("Path:"), NULL};
+	const char* labels[] = { B_TRANSLATE("Name:"), B_TRANSLATE("Version:"),
+		B_TRANSLATE("Info:"), B_TRANSLATE("Path:"), NULL };
 	for (int32 i = 0; labels[i]; i++) {
 		int32 index = message.FindFirst(labels[i]);
 		view->SetFontAndColor(index, index + strlen(labels[i]), &font);
