@@ -100,7 +100,7 @@ TTimeEdit::DrawSection(uint32 index, bool hasFocus)
 	if (!section)
 		return;
 
-	if (fFieldPositions == NULL || index * 2 + 1 > (uint32)fFieldPosCount)
+	if (fFieldPositions == NULL || index * 2 + 1 >= (uint32)fFieldPosCount)
 		return;
 
 	BRect bounds = section->Frame();
@@ -132,7 +132,7 @@ TTimeEdit::DrawSeparator(uint32 index)
 	if (!section)
 		return;
 
-	if (fFieldPositions == NULL || index * 2 + 2 > (uint32)fFieldPosCount)
+	if (fFieldPositions == NULL || index * 2 + 2 >= (uint32)fFieldPosCount)
 		return;
 
 	BString field;
@@ -277,8 +277,18 @@ void
 TTimeEdit::_UpdateFields()
 {
 	time_t time = fTime.Time_t();
+
+	if (fFieldPositions != NULL) {
+		free(fFieldPositions);
+		fFieldPositions = NULL;
+	}
 	BLocale::Default()->FormatTime(&fText, fFieldPositions, fFieldPosCount,
 		time, B_MEDIUM_TIME_FORMAT);
+
+	if (fFields != NULL) {
+		free(fFields);
+		fFields = NULL;
+	}
 	BLocale::Default()->GetTimeFields(fFields, fFieldCount,
 		B_MEDIUM_TIME_FORMAT);
 }
@@ -492,7 +502,7 @@ TDateEdit::DrawSection(uint32 index, bool hasFocus)
 	if (!section)
 		return;
 
-	if (fFieldPositions == NULL || index * 2 + 1 > (uint32)fFieldPosCount)
+	if (fFieldPositions == NULL || index * 2 + 1 >= (uint32)fFieldPosCount)
 		return;
 
 	SetLowColor(ViewColor());
@@ -525,7 +535,7 @@ TDateEdit::DrawSeparator(uint32 index)
 	if (!section)
 		return;
 
-	if (fFieldPositions == NULL || index * 2 + 2 > (uint32)fFieldPosCount)
+	if (fFieldPositions == NULL || index * 2 + 2 >= (uint32)fFieldPosCount)
 		return;
 
 	BString field;
@@ -677,8 +687,18 @@ void
 TDateEdit::_UpdateFields()
 {
 	time_t time = BDateTime(fDate, BTime()).Time_t();
+
+	if (fFieldPositions != NULL) {
+		free(fFieldPositions);
+		fFieldPositions = NULL;
+	}
 	BLocale::Default()->FormatDate(&fText, fFieldPositions, fFieldPosCount,
 		time, B_SHORT_DATE_FORMAT);
+
+	if (fFields != NULL) {
+		free(fFields);
+		fFields = NULL;
+	}
 	BLocale::Default()->GetDateFields(fFields, fFieldCount,
 		B_SHORT_DATE_FORMAT);
 }
