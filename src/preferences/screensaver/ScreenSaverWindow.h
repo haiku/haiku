@@ -23,6 +23,7 @@
 
 class BButton;
 class BTabView;
+class BTextView;
 
 class ModulesView;
 class ScreenCornerSelector;
@@ -62,6 +63,7 @@ private:
 
 			BCheckBox*			fTurnOffCheckBox;
 			TimeSlider*			fTurnOffSlider;
+			BTextView*			fTurnOffNotSupported;
 
 			BCheckBox*			fPasswordCheckBox;
 			TimeSlider*			fPasswordSlider;

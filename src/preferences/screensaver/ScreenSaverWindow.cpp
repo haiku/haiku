@@ -32,6 +32,7 @@
 #include <Slider.h>
 #include <StringView.h>
 #include <TabView.h>
+#include <TextView.h>
 
 #include <BuildScreenSaverDefaultSettingsView.h>
 
@@ -552,7 +553,7 @@ ModulesView::_OpenSaver()
 		// There are no settings at all, we add the module name here to
 		// let it look a bit better at least.
 		BPrivate::BuildScreenSaverDefaultSettingsView(fSettingsView,
-			fSettings.ModuleName()[0] ? fSettings.ModuleName() : 
+			fSettings.ModuleName()[0] ? fSettings.ModuleName() :
 			B_TRANSLATE("Blackness"), saver || !fSettings.ModuleName()[0]
 				? B_TRANSLATE("No options available") :
 				B_TRANSLATE("Could not load screen saver"));
@@ -734,6 +735,21 @@ ScreenSaverWindow::_SetupFadeTab(BRect rect)
 	fTurnOffSlider->ResizeTo(fTurnOffSlider->Bounds().Width(), height);
 	box->AddChild(fTurnOffSlider);
 
+	rgb_color textColor = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+		B_DISABLED_LABEL_TINT);
+	BRect textRect(0, 0, fTurnOffSlider->Bounds().Width(), height);
+	textRect.InsetBy(0, 3);
+	fTurnOffNotSupported = new BTextView(rect, "not_supported",
+		textRect, be_plain_font, &textColor, B_FOLLOW_ALL, B_WILL_DRAW);
+	fTurnOffNotSupported->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fTurnOffNotSupported->MakeEditable(false);
+	fTurnOffNotSupported->MakeSelectable(false);
+	fTurnOffNotSupported->SetText(
+		B_TRANSLATE("Display Power Management Signaling not available"));
+
+	fTurnOffNotSupported->ResizeTo(fTurnOffSlider->Bounds().Width(), height);
+	box->AddChild(fTurnOffNotSupported);
+
 	// Password
 	rect.left = 8;
 	rect.OffsetBy(0, fTurnOffSlider->Bounds().Height() + 4.0f);
@@ -835,6 +851,16 @@ ScreenSaverWindow::_UpdateTurnOffScreen()
 
 	fTurnOffCheckBox->SetValue(enabled && fTurnOffScreenFlags != 0
 		? B_CONTROL_ON : B_CONTROL_OFF);
+
+	enabled = fEnableCheckBox->Value() == B_CONTROL_ON;
+	fTurnOffCheckBox->SetEnabled(enabled && fTurnOffScreenFlags != 0);
+	if (fTurnOffScreenFlags != 0) {
+		fTurnOffNotSupported->Hide();
+		fTurnOffSlider->Show();
+	} else {
+		fTurnOffSlider->Hide();
+		fTurnOffNotSupported->Show();
+	}
 }
 
 
