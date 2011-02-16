@@ -38,7 +38,9 @@ static const char rcsid[] = "$Id: tree.c,v 1.4 2005/04/27 04:56:39 sra Exp $";
  * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-/*#define		DEBUG	"tree"*/
+#ifdef DEBUG
+# define DEBUG_DOMAIN "tree"
+#endif
 
 #include "port_before.h"
 
@@ -56,21 +58,21 @@ static char	*debugFuncs[256];
 # define ENTER(proc) { \
 			debugFuncs[debugDepth] = proc; \
 			fprintf(stderr, "ENTER(%d:%s.%s)\n", \
-				debugDepth, DEBUG, \
+				debugDepth, DEBUG_DOMAIN, \
 				debugFuncs[debugDepth]); \
 			debugDepth++; \
 		}
 # define RET(value) { \
 			debugDepth--; \
 			fprintf(stderr, "RET(%d:%s.%s)\n", \
-				debugDepth, DEBUG, \
+				debugDepth, DEBUG_DOMAIN, \
 				debugFuncs[debugDepth]); \
 			return (value); \
 		}
 # define RETV { \
 			debugDepth--; \
 			fprintf(stderr, "RETV(%d:%s.%s)\n", \
-				debugDepth, DEBUG, \
+				debugDepth, DEBUG_DOMAIN, \
 				debugFuncs[debugDepth]); \
 			return; \
 		}
@@ -99,7 +101,7 @@ tree_init(tree **ppr_tree) {
 	*ppr_tree = NULL;
 	RETV
 }
-	
+
 tree_t
 tree_srch(tree **ppr_tree, int (*pfi_compare)(tree_t, tree_t), tree_t	p_user) {
 	ENTER("tree_srch")

@@ -112,7 +112,7 @@ static const char rcsid[] = "$Id: res_send.c,v 1.22 2009/01/22 23:49:23 tbox Exp
 #endif /* USE_POLL */
 
 /* Options.  Leave them on. */
-#define DEBUG
+//#define DEBUG
 #include "res_debug.h"
 #include "res_private.h"
 
@@ -133,9 +133,11 @@ static int		send_vc(res_state, const u_char *, int,
 static int		send_dg(res_state, const u_char *, int,
 				u_char *, int, int *, int, int,
 				int *, int *);
+#ifdef DEBUG
 static void		Aerror(const res_state, FILE *, const char *, int,
 			       const struct sockaddr *, int);
 static void		Perror(const res_state, FILE *, const char *, int);
+#endif // DEBUG
 static int		sock_eq(struct sockaddr *, struct sockaddr *);
 #if defined(NEED_PSELECT) && !defined(USE_POLL)
 static int		pselect(int, void *, void *, void *,
@@ -294,7 +296,9 @@ res_nsend(res_state statp,
 	  const u_char *buf, int buflen, u_char *ans, int anssiz)
 {
 	int gotsomewhere, terrno, tries, v_circuit, resplen, ns, n;
+#ifdef DEBUG
 	char abuf[NI_MAXHOST];
+#endif
 
 #ifdef USE_POLL
 	highestFD = sysconf(_SC_OPEN_MAX) - 1;
@@ -1021,6 +1025,8 @@ send_dg(res_state statp, const u_char *buf, int buflen, u_char *ans,
 	return (resplen);
 }
 
+#ifdef DEBUG
+
 static void
 Aerror(const res_state statp, FILE *file, const char *string, int error,
        const struct sockaddr *address, int alen)
@@ -1054,6 +1060,8 @@ Perror(const res_state statp, FILE *file, const char *string, int error) {
 			string, strerror(error));
 	errno = save;
 }
+
+#endif	// DEBUG
 
 static int
 sock_eq(struct sockaddr *a, struct sockaddr *b) {

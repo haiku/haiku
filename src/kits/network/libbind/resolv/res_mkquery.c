@@ -85,7 +85,7 @@ static const char rcsid[] = "$Id: res_mkquery.c,v 1.10 2008/12/11 09:59:00 marka
 #include "port_after.h"
 
 /* Options.  Leave them on. */
-#define DEBUG
+//#define DEBUG
 
 extern const char *_res_opcodes[];
 

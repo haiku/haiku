@@ -21,7 +21,7 @@
 #ifndef DEBUG
 #   define Dprint(cond, args) /*empty*/
 #   define DprintQ(cond, args, query, size) /*empty*/
-#   define Aerror(statp, file, string, error, address) /*empty*/
+#   define Aerror(statp, file, string, error, address, addrLen) /*empty*/
 #   define Perror(statp, file, string, error) /*empty*/
 #else
 #   define Dprint(cond, args) if (cond) {fprintf args;} else {}
@@ -31,5 +31,5 @@
 		} else {}
 #endif
 
-#endif /* _RES_DEBUG_H_ */ 
+#endif /* _RES_DEBUG_H_ */
 /*! \file */

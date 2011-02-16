@@ -48,7 +48,7 @@ static const char rcsid[] = "$Id: res_mkupdate.c,v 1.10 2008/12/11 09:59:00 mark
 #include "port_after.h"
 
 /* Options.  Leave them on. */
-#define DEBUG
+//#define DEBUG
 #define MAXPORT 1024
 
 static int getnum_str(u_char **, u_char *);
@@ -68,7 +68,7 @@ int res_servicenumber(const char *);
  * Returns the size of the resulting packet if no error
  *
  * On error,
- *	returns 
+ *	returns
  *\li              -1 if error in reading a word/number in rdata
  *		   portion for update packets
  *\li		-2 if length of buffer passed is insufficient
@@ -348,7 +348,7 @@ res_nmkupdate(res_state statp, ns_updrec *rrecp_in, u_char *buf, int buflen) {
 				return (-1);
 			ShrinkBuffer(1);
 			*cp++ = i & 0xff;
-			 
+
 			for (i = 0; i < MAXPORT/8 ; i++)
 				bm[i] = 0;
 
@@ -704,7 +704,7 @@ res_nmkupdate(res_state statp, ns_updrec *rrecp_in, u_char *buf, int buflen) {
 		n = (u_int16_t)((cp - sp2) - INT16SZ);
 		PUTSHORT(n, sp2);
 	} /*for*/
-		
+
 	hp->qdcount = htons(counts[0]);
 	hp->ancount = htons(counts[1]);
 	hp->nscount = htons(counts[2]);
@@ -721,7 +721,7 @@ static int
 getword_str(char *buf, int size, u_char **startpp, u_char *endp) {
         char *cp;
         int c;
- 
+
         for (cp = buf; *startpp <= endp; ) {
                 c = **startpp;
                 if (isspace(c) || c == '\0') {
@@ -755,7 +755,7 @@ getstr_str(char *buf, int size, u_char **startpp, u_char *endp) {
 	int seen_quote = 0;
 	int escape = 0;
 	int dig = 0;
- 
+
 	for (cp = buf; *startpp <= endp; ) {
                 if ((c = **startpp) == '\0')
 			break;
@@ -773,7 +773,7 @@ getstr_str(char *buf, int size, u_char **startpp, u_char *endp) {
 				c1 = 0;
 				(*startpp)++;
 				continue;
-			} 
+			}
 			goto do_escape;
 		case '"':
 			if (!escape) {
@@ -797,7 +797,7 @@ getstr_str(char *buf, int size, u_char **startpp, u_char *endp) {
 				case '7':
 				case '8':
 				case '9':
-					c1 = c1 * 10 + 
+					c1 = c1 * 10 +
 						(strchr(digits, c) - digits);
 
 					if (++dig == 3) {
@@ -858,7 +858,7 @@ gethexnum_str(u_char **startpp, u_char *endp) {
                                 break;
                         }
 			return (-1);
-                }        
+                }
                 (*startpp)++;
 		if (isdigit(c))
 	                n = n * 16 + (c - '0');
@@ -903,7 +903,7 @@ getnum_str(u_char **startpp, u_char *endp) {
                                 break;
                         }
 			return (-1);
-                }        
+                }
                 (*startpp)++;
                 n = n * 10 + (c - '0');
                 seendigit = 1;
