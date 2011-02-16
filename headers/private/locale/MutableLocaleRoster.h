@@ -114,15 +114,16 @@ struct RosterData {
 			bool				fAreResourcesLoaded;
 			BResources			fResources;
 
-								RosterData();
+			status_t			fInitStatus;
+
 								RosterData(const BLanguage& language,
 									const BFormattingConventions& conventions);
 								~RosterData();
 
 	static	RosterData*			Default();
 
-			void				InitializeCatalogAddOns();
-			void				CleanupCatalogAddOns();
+			status_t			InitCheck() const;
+
 			status_t			Refresh();
 
 	static	int					CompareInfos(const void* left,
@@ -133,6 +134,11 @@ struct RosterData {
 			status_t			SetDefaultTimeZone(const BTimeZone& zone);
 			status_t			SetPreferredLanguages(const BMessage* msg);
 private:
+			status_t			_Initialize();
+
+			status_t			_InitializeCatalogAddOns();
+			void				_CleanupCatalogAddOns();
+
 			status_t			_LoadLocaleSettings();
 			status_t			_SaveLocaleSettings();
 

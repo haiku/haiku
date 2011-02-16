@@ -12,6 +12,7 @@
 
 #include <set>
 
+#include <pthread.h>
 #include <syslog.h>
 
 #include <AppFileInfo.h>
@@ -126,6 +127,9 @@ CatalogAddOnInfo::UnloadIfPossible()
 // #pragma mark - RosterData
 
 
+namespace {
+
+
 static const char* kPriorityAttr = "ADDON:priority";
 
 static const char* kLanguageField = "language";
@@ -133,23 +137,28 @@ static const char* kLanguageField = "language";
 static const char* kTimezoneField = "timezone";
 static const char* kOffsetField = "offset";
 
-static RosterData sRosterData(BLanguage("en_US"),
-	BFormattingConventions("en_US"));
+
+static RosterData* sRosterData = NULL;
+static pthread_once_t sRosterDataInitOnce = PTHREAD_ONCE_INIT;
+
+static struct RosterDataReaper {
+	~RosterDataReaper()
+	{
+		delete sRosterData;
+		sRosterData = NULL;
+	}
+} sRosterDataReaper;
 
 
-RosterData::RosterData()
-	:
-	fLock("LocaleRosterData"),
-	fAreResourcesLoaded(false)
+}	// anonymous namespace
+
+
+
+static void
+InitializeRosterData()
 {
-	openlog_team("liblocale.so", LOG_PID, LOG_USER);
-#ifndef DEBUG
-	setlogmask_team(LOG_UPTO(LOG_WARNING));
-#endif
-
-	InitializeCatalogAddOns();
-
-	Refresh();
+	sRosterData = new (std::nothrow) RosterData(BLanguage("en_US"),
+		BFormattingConventions("en_US"));
 }
 
 
@@ -160,14 +169,7 @@ RosterData::RosterData(const BLanguage& language,
 	fDefaultLocale(&language, &conventions),
 	fAreResourcesLoaded(false)
 {
-	openlog_team("liblocale.so", LOG_PID, LOG_USER);
-#ifndef DEBUG
-	setlogmask_team(LOG_UPTO(LOG_WARNING));
-#endif
-
-	InitializeCatalogAddOns();
-
-	Refresh();
+	fInitStatus = _Initialize();
 }
 
 
@@ -175,7 +177,7 @@ RosterData::~RosterData()
 {
 	BAutolock lock(fLock);
 
-	CleanupCatalogAddOns();
+	_CleanupCatalogAddOns();
 	closelog();
 }
 
@@ -183,15 +185,17 @@ RosterData::~RosterData()
 /*static*/ RosterData*
 RosterData::Default()
 {
-	return &sRosterData;
+	if (sRosterData == NULL)
+		pthread_once(&sRosterDataInitOnce, &BPrivate::InitializeRosterData);
+
+	return sRosterData;
 }
 
 
-int
-RosterData::CompareInfos(const void* left, const void* right)
+status_t
+RosterData::InitCheck() const
 {
-	return ((CatalogAddOnInfo*)right)->fPriority
-		- ((CatalogAddOnInfo*)left)->fPriority;
+	return fAreResourcesLoaded ? B_OK : B_NO_INIT;
 }
 
 
@@ -208,23 +212,128 @@ RosterData::Refresh()
 	return B_OK;
 }
 
+
+int
+RosterData::CompareInfos(const void* left, const void* right)
+{
+	return ((CatalogAddOnInfo*)right)->fPriority
+		- ((CatalogAddOnInfo*)left)->fPriority;
+}
+
+
+status_t
+RosterData::SetDefaultFormattingConventions(
+	const BFormattingConventions& newFormattingConventions)
+{
+	status_t status = B_OK;
+
+	BAutolock lock(fLock);
+	if (!lock.IsLocked())
+		return B_ERROR;
+
+	status = _SetDefaultFormattingConventions(newFormattingConventions);
+
+	if (status == B_OK)
+		status = _SaveLocaleSettings();
+
+	if (status == B_OK) {
+		BMessage updateMessage(B_LOCALE_CHANGED);
+		status = _AddDefaultFormattingConventionsToMessage(&updateMessage);
+		if (status == B_OK)
+			status = be_roster->Broadcast(&updateMessage);
+	}
+
+	return status;
+}
+
+
+status_t
+RosterData::SetDefaultTimeZone(const BTimeZone& newZone)
+{
+	status_t status = B_OK;
+
+	BAutolock lock(fLock);
+	if (!lock.IsLocked())
+		return B_ERROR;
+
+	status = _SetDefaultTimeZone(newZone);
+
+	if (status == B_OK)
+		status = _SaveTimeSettings();
+
+	if (status == B_OK) {
+		BMessage updateMessage(B_LOCALE_CHANGED);
+		status = _AddDefaultTimeZoneToMessage(&updateMessage);
+		if (status == B_OK)
+			status = be_roster->Broadcast(&updateMessage);
+	}
+
+	return status;
+}
+
+
+status_t
+RosterData::SetPreferredLanguages(const BMessage* languages)
+{
+	status_t status = B_OK;
+
+	BAutolock lock(fLock);
+	if (!lock.IsLocked())
+		return B_ERROR;
+
+	status = _SetPreferredLanguages(languages);
+
+	if (status == B_OK)
+		status = _SaveLocaleSettings();
+
+	if (status == B_OK) {
+		BMessage updateMessage(B_LOCALE_CHANGED);
+		status = _AddPreferredLanguagesToMessage(&updateMessage);
+		if (status == B_OK)
+			status = be_roster->Broadcast(&updateMessage);
+	}
+
+	return status;
+}
+
+
+status_t
+RosterData::_Initialize()
+{
+	openlog_team("liblocale.so", LOG_PID, LOG_USER);
+#ifndef DEBUG
+	setlogmask_team(LOG_UPTO(LOG_WARNING));
+#endif
+
+	status_t result = _InitializeCatalogAddOns();
+	if (result != B_OK)
+		return result;
+
+	if ((result = Refresh()) != B_OK)
+		return result;
+
+	fInitStatus = B_OK;
+	return B_OK;
+}
+
+
 /*
 iterate over add-on-folders and collect information about each
 catalog-add-ons (types of catalogs) into fCatalogAddOnInfos.
 */
-void
-RosterData::InitializeCatalogAddOns()
+status_t
+RosterData::_InitializeCatalogAddOns()
 {
 	BAutolock lock(fLock);
 	if (!lock.IsLocked())
-		return;
+		return B_ERROR;
 
 	// add info about embedded default catalog:
 	CatalogAddOnInfo* defaultCatalogAddOnInfo
 		= new(std::nothrow) CatalogAddOnInfo("Default", "",
 			DefaultCatalog::kDefaultCatalogAddOnPriority);
 	if (!defaultCatalogAddOnInfo)
-		return;
+		return B_NO_MEMORY;
 
 	defaultCatalogAddOnInfo->fInstantiateFunc = DefaultCatalog::Instantiate;
 	defaultCatalogAddOnInfo->fInstantiateEmbeddedFunc
@@ -330,6 +439,8 @@ RosterData::InitializeCatalogAddOns()
 		}
 	}
 	fCatalogAddOnInfos.SortItems(CompareInfos);
+
+	return B_OK;
 }
 
 
@@ -337,7 +448,7 @@ RosterData::InitializeCatalogAddOns()
  * unloads all catalog-add-ons (which will throw away all loaded catalogs, too)
  */
 void
-RosterData::CleanupCatalogAddOns()
+RosterData::_CleanupCatalogAddOns()
 {
 	BAutolock lock(fLock);
 	if (!lock.IsLocked())
@@ -350,82 +461,6 @@ RosterData::CleanupCatalogAddOns()
 		delete info;
 	}
 	fCatalogAddOnInfos.MakeEmpty();
-}
-
-
-status_t
-RosterData::SetDefaultFormattingConventions(
-	const BFormattingConventions& newFormattingConventions)
-{
-	status_t status = B_OK;
-
-	BAutolock lock(fLock);
-	if (!lock.IsLocked())
-		return B_ERROR;
-
-	status = _SetDefaultFormattingConventions(newFormattingConventions);
-
-	if (status == B_OK)
-		status = _SaveLocaleSettings();
-
-	if (status == B_OK) {
-		BMessage updateMessage(B_LOCALE_CHANGED);
-		status = _AddDefaultFormattingConventionsToMessage(&updateMessage);
-		if (status == B_OK)
-			status = be_roster->Broadcast(&updateMessage);
-	}
-
-	return status;
-}
-
-
-status_t
-RosterData::SetDefaultTimeZone(const BTimeZone& newZone)
-{
-	status_t status = B_OK;
-
-	BAutolock lock(fLock);
-	if (!lock.IsLocked())
-		return B_ERROR;
-
-	status = _SetDefaultTimeZone(newZone);
-
-	if (status == B_OK)
-		status = _SaveTimeSettings();
-
-	if (status == B_OK) {
-		BMessage updateMessage(B_LOCALE_CHANGED);
-		status = _AddDefaultTimeZoneToMessage(&updateMessage);
-		if (status == B_OK)
-			status = be_roster->Broadcast(&updateMessage);
-	}
-
-	return status;
-}
-
-
-status_t
-RosterData::SetPreferredLanguages(const BMessage* languages)
-{
-	status_t status = B_OK;
-
-	BAutolock lock(fLock);
-	if (!lock.IsLocked())
-		return B_ERROR;
-
-	status = _SetPreferredLanguages(languages);
-
-	if (status == B_OK)
-		status = _SaveLocaleSettings();
-
-	if (status == B_OK) {
-		BMessage updateMessage(B_LOCALE_CHANGED);
-		status = _AddPreferredLanguagesToMessage(&updateMessage);
-		if (status == B_OK)
-			status = be_roster->Broadcast(&updateMessage);
-	}
-
-	return status;
 }
 
 
@@ -653,7 +688,13 @@ RosterData::_AddPreferredLanguagesToMessage(BMessage* message) const
 // #pragma mark - MutableLocaleRoster
 
 
+namespace {
+
+
 static MutableLocaleRoster sLocaleRoster;
+
+
+}	// anonymous namespace
 
 
 MutableLocaleRoster::MutableLocaleRoster()
