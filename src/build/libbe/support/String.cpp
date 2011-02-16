@@ -1,42 +1,31 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2003, OpenBeOS
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:	  String.cpp
-//	Author(s):    Marc Flerackers (mflerackers@androme.be)
-//                Stefano Ceccherini (burton666@libero.it)
-//                Oliver Tappe (openbeos@hirschkaefer.de)
-//
-//	Description:   String class supporting common string operations.
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2010, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Marc Flerackers (mflerackers@androme.be)
+ *		Stefano Ceccherini (burton666@libero.it)
+ *		Oliver Tappe (openbeos@hirschkaefer.de)
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		Julun <host.haiku@gmx.de>
+ *		Michael Lotz <mmlr@mlotz.ch>
+ */
 
-// Standard Includes -----------------------------------------------------------
-#include <cctype>
-#include <cstdio>
-#include <cstdlib>
 
-// System Includes -------------------------------------------------------------
-#include <Debug.h>
+/*! String class supporting common string operations. */
+
+
 #include <String.h>
 
-#define ENABLE_INLINES 0 // Set this to 1 to make some private methods inline
+#include <ctype.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#include <Debug.h>
+
+#include <utf8_functions.h>
+
 
 // define proper names for case-option of _DoReplace()
 #define KEEP_CASE false
@@ -46,482 +35,464 @@
 #define REPLACE_ALL 0x7FFFFFFF
 
 
-const char *B_EMPTY_STRING = "";
+const uint32 kPrivateDataOffset = 2 * sizeof(int32);
+
+const char* B_EMPTY_STRING = "";
 
 
 // helper function, returns minimum of two given values (but clamps to 0):
 static inline int32
 min_clamp0(int32 num1, int32 num2)
 {
-	if (num1<num2)
+	if (num1 < num2)
 		return num1 > 0 ? num1 : 0;
-	else
-		return num2 > 0 ? num2 : 0;
+
+	return num2 > 0 ? num2 : 0;
 }
 
 
-// helper function, returns length of given string (but clamps to given maximum):
+//! Returns length of given string (but clamps to given maximum).
 static inline int32
 strlen_clamp(const char* str, int32 max)
-{	// this should yield 0 for max<0:
-	int32 len=0;
-	while( len<max && *str++)
-		len++;
-	return len;
+{
+	// this should yield 0 for max<0:
+	int32 length = 0;
+	while (length < max && *str++) {
+		length++;
+	}
+	return length;
 }
 
 
-// helper function, massages given pointer into a legal c-string:
-static inline const char *
+//! Helper function for strlen() that can handle NULL strings.
+static inline size_t
+string_length(const char* string)
+{
+	return string != NULL ? strlen(string) : 0;
+}
+
+
+//! helper function, massages given pointer into a legal c-string:
+static inline const char*
 safestr(const char* str)
 {
 	return str ? str : "";
 }
 
 
-// helper class for BString::_ReplaceAtPositions():
-struct
-BString::PosVect {
+static inline vint32&
+data_reference_count(char* data)
+{
+	return *(((int32 *)data) - 2);
+}
+
+
+static inline int32&
+data_length(char* data)
+{
+	return *(((int32*)data) - 1);
+}
+
+
+//	#pragma mark - PosVect
+
+
+class BString::PosVect {
+public:
 	PosVect()
 		:
-		size(0),
-		bufSize(20),
-		buf(NULL)
+		fSize(0),
+		fBufferSize(20),
+		fBuffer(NULL)
 	{
 	}
 
 	~PosVect()
 	{
-		free(buf);
+		free(fBuffer);
 	}
 
 	bool Add(int32 pos)
 	{
-		if (!buf || size == bufSize) {
-			if (buf)
-				bufSize *= 2;
-			int32 *newBuf = (int32 *)realloc(buf, bufSize * sizeof(int32));
-			if (!newBuf)
+		if (fBuffer == NULL || fSize == fBufferSize) {
+			if (fBuffer != NULL)
+				fBufferSize *= 2;
+
+			int32* newBuffer = NULL;
+			newBuffer = (int32*)realloc(fBuffer, fBufferSize * sizeof(int32));
+			if (newBuffer == NULL)
 				return false;
-			buf = newBuf;
+
+			fBuffer = newBuffer;
 		}
-		buf[size++] = pos;
+
+		fBuffer[fSize++] = pos;
 		return true;
 	}
 
-	inline int32 ItemAt(int32 idx) const
+	inline int32 ItemAt(int32 index) const
 	{
-		return buf[idx];
+		return fBuffer[index];
 	}
 
 	inline int32 CountItems() const
 	{
-		return size;
+		return fSize;
 	}
 
 private:
-	int32 size;
-	int32 bufSize;
-	int32 *buf;
+	int32	fSize;
+	int32	fBufferSize;
+	int32*	fBuffer;
 };
 
 
-// helper macro that is used to fall into debugger if a given param check fails:
-#ifdef DEBUG
-	#define CHECK_PARAM( expr, msg) \
-	if (!(expr)) \
-		debugger( msg)
+//	#pragma mark - BStringRef
 
-	#define CHECK_PARAM_RET( expr, msg, retval) \
-	if (!(expr)) \
-		debugger( msg)
 
-	#define CHECK_PARAM_VOID( expr, msg) \
-	if (!(expr)) \
-		debugger( msg)
-#else
-	#define CHECK_PARAM( expr, msg) \
-	if (!(expr)) \
-		return *this
+BStringRef::BStringRef(BString& string, int32 position)
+	: fString(string), fPosition(position)
+{
+}
 
-	#define CHECK_PARAM_RET( expr, msg, retval) \
-	if (!(expr)) \
-		return (retval);
 
-	#define CHECK_PARAM_VOID( expr, msg)
-#endif
+BStringRef::operator char() const
+{
+	return fPosition < fString.Length() ? fString.fPrivateData[fPosition] : 0;
+}
 
-// -----------------------------------------------------------------------------
 
-/*!
-	\class BString
-	\brief String class supporting common string operations
+BStringRef&
+BStringRef::operator=(char c)
+{
+	fString._MakeWritable();
+	fString.fPrivateData[fPosition] = c;
+	return *this;
+}
 
-	BString is a string allocation and manipulation class. The object
-	takes care to allocate and free memory for you, so it will always be
-	"big enough" to store your strings.
 
-	\author <a href='mailto:mflerackers@androme.be>Marc Flerackers</a>
-	\author <a href='mailto:burton666@freemail.it>Stefano Ceccherini</a>
-	\author <a href='mailto:openbeos@hirschaefer.de>Oliver Tappe</a>
-*/
+BStringRef&
+BStringRef::operator=(const BStringRef &rc)
+{
+	return operator=(rc.fString.fPrivateData[rc.fPosition]);
+}
 
-/*!	\var char* BString::_privateData
-	\brief BString's storage for data
-*/
 
-// constructor
-/*!	\brief Creates an uninitialized BString.
-*/
+const char*
+BStringRef::operator&() const
+{
+	return &fString.fPrivateData[fPosition];
+}
+
+
+char*
+BStringRef::operator&()
+{
+	if (fString._MakeWritable() != B_OK)
+		return NULL;
+
+	fString._ReferenceCount() = -1;
+		// mark as unsharable
+	return &fString.fPrivateData[fPosition];
+}
+
+
+//	#pragma mark - BString
+
+
+inline vint32&
+BString::_ReferenceCount()
+{
+	return data_reference_count(fPrivateData);
+}
+
+
+inline const vint32&
+BString::_ReferenceCount() const
+{
+	return data_reference_count(fPrivateData);
+}
+
+
+inline bool
+BString::_IsShareable() const
+{
+	return fPrivateData != NULL && _ReferenceCount() >= 0;
+}
+
+
 BString::BString()
-	:_privateData(NULL)
+	:
+	fPrivateData(NULL)
 {
+	_Init("", 0);
 }
 
 
-// constructor
-/*! \brief Creates a BString and initializes it to the given string.
-	\param str Pointer to a NULL terminated string.
-*/
-BString::BString(const char* str)
-	:_privateData(NULL)
+BString::BString(const char* string)
+	:
+	fPrivateData(NULL)
 {
-	if (str != NULL)
-		_Init(str, strlen(str));
+	_Init(string, strlen(safestr(string)));
 }
 
 
-// copy constructor
-/*! \brief Creates a BString and makes it a copy of the supplied one.
-	\param string the BString object to be copied.
-*/
-BString::BString(const BString &string)
-	:_privateData(NULL)
+BString::BString(const BString& string)
+	:
+	fPrivateData(NULL)
 {
-	_Init(string.String(), string.Length());
+	// check if source is sharable - if so, share else clone
+	if (string._IsShareable()) {
+		fPrivateData = string.fPrivateData;
+		atomic_add(&_ReferenceCount(), 1);
+			// string cannot go away right now
+	} else
+		_Init(string.String(), string.Length());
 }
 
 
-// constructor
-/*! \brief Creates a BString and initializes it to the given string.
-	\param str Pointer to a NULL terminated string.
-	\param maxLength The amount of characters you want to copy from the original
-		string.
-*/
-BString::BString(const char *str, int32 maxLength)
-	:_privateData(NULL)
+BString::BString(const char* string, int32 maxLength)
+	: fPrivateData(NULL)
 {
-	if (str != NULL) {
-		int32 len = strlen_clamp(str, maxLength);
-		_Init(str, len);
-	}
+	_Init(string, strlen_clamp(safestr(string), maxLength));
 }
 
 
-// destructor
-/*! \brief Frees all resources associated with the object.
-
-	Frees the memory allocated by the BString object.
-*/
 BString::~BString()
 {
-	if (_privateData)
-		free(_privateData - sizeof(int32));
+	if (!_IsShareable() || atomic_add(&_ReferenceCount(), -1) == 1)
+		_FreePrivateData();
 }
 
 
-/*---- Access --------------------------------------------------------------*/
-// String, implemented inline in the header
-/*! \fn const char* BString::String() const
-	\brief Returns a pointer to the object string, NULL terminated.
-
-	Returns a pointer to the object string, guaranteed to be NULL
-	terminated. You can't modify or free the pointer. Once the BString
-	object is deleted, the pointer becomes invalid.
-
-	\return A pointer to the object string.
-*/
+//	#pragma mark - Access
 
 
-// Length, implemented inline in the header
-/*!	\fn int32 BString::Length() const
-	\brief Returns the length of the string, measured in bytes.
-	\return The length of the string, measured in bytes.
-*/
-
-
-// CountChars
-/*! \brief Returns the length of the object measured in characters.
-	\return An integer which is the number of characters in the string.
-
-	Counts the number of UTF8 characters contained in the string.
-*/
 int32
 BString::CountChars() const
 {
-	int32 count = 0;
-
-	const char *start = _privateData;
-
-	/* String's end. This way we don't have to check for '\0' */
-	/* but just compare two pointers (which should be faster) */
-	const char *end = _privateData + Length();
-
-#if 0
-	// ejaesler: Left in memoriam of one man's foolish disregard for the
-	// maxim "Premature optimization is the root of all evil"
-	while (*ptr) {
-		// Jump to next UTF8 character
-		// ejaesler: BGA's nifty function
-		ptr += utf8_char_len(*ptr);
-		count++;
-	}
-#endif
-
-	while (start++ != end) {
-		count++;
-
-		// Jump to next UTF8 character
-		for (; (*start & 0xc0) == 0x80; start++);
-	}
-
-	return count;
+	return UTF8CountChars(fPrivateData, Length());
 }
 
 
-/*---- Assignment ----------------------------------------------------------*/
-// equal operator
-/*! \brief Makes a copy of the given BString object.
-	\param string The string object to copy.
-	\return
-		The function always returns \c *this .
-*/
-BString&
-BString::operator=(const BString &string)
+int32
+BString::CountBytes(int32 fromCharOffset, int32 charCount) const
 {
-	if (&string != this) // Avoid auto-assignment
-		_DoAssign(string.String(), string.Length());
+	return UTF8CountBytes(
+		fPrivateData + UTF8CountBytes(fPrivateData, fromCharOffset), charCount);
+}
+
+
+//	#pragma mark - Assignment
+
+
+BString&
+BString::operator=(const BString& string)
+{
+	return SetTo(string);
+}
+
+
+BString&
+BString::operator=(const char* string)
+{
+	if (!string)
+		string = "";
+	if (string != String())
+		SetTo(string, strlen(string));
 	return *this;
 }
 
 
-// equal operator
-/*! \brief Re-initializes the object to the given string.
-	\param str Pointer to a string.
-	\return
-		The function always returns \c *this .
-*/
-BString&
-BString::operator=(const char *str)
-{
-	if (str != NULL)
-		_DoAssign(str, strlen(str));
-	else
-		_GrowBy(-Length()); // Empties the string
-
-	return *this;
-}
-
-
-// equal operator
-/*! \brief Re-initializes the object to the given character.
-	\param c The character which you want to initialize the string to.
-	\return
-		The function always returns \c *this .
-*/
 BString&
 BString::operator=(char c)
 {
-	_DoAssign(&c, 1);
+	return SetTo(c, 1);
+}
+
+
+BString&
+BString::SetTo(const char* string, int32 maxLength)
+{
+	if (maxLength < 0)
+		maxLength = INT32_MAX;
+
+	maxLength = strlen_clamp(safestr(string), maxLength);
+
+	if (_MakeWritable(maxLength, false) == B_OK)
+		memcpy(fPrivateData, string, maxLength);
+
 	return *this;
 }
 
 
-// SetTo
-/*! \brief Re-initializes the object to the given string.
-	\param str Pointer to a string.
-	\param length Amount of characters to copy from the original string.
-	\return
-		The function always returns \c *this .
-*/
 BString&
-BString::SetTo(const char *str, int32 length)
+BString::SetTo(const BString& string)
 {
-	if (str != NULL) {
-		int32 len = strlen_clamp(str, length);
-		_DoAssign(str, len);
+	// we share the information already
+	if (fPrivateData == string.fPrivateData)
+		return *this;
+
+	bool freeData = true;
+
+	if (_IsShareable() && atomic_add(&_ReferenceCount(), -1) > 1) {
+		// there is still someone who shares our data
+		freeData = false;
 	}
-	else
-		_GrowBy(-Length()); // Empties the string
+
+	if (freeData)
+		_FreePrivateData();
+
+	// if source is sharable share, otherwise clone
+	if (string._IsShareable()) {
+		fPrivateData = string.fPrivateData;
+		atomic_add(&_ReferenceCount(), 1);
+			// the string cannot go away right now
+	} else
+		_Init(string.String(), string.Length());
 
 	return *this;
 }
 
 
-// SetTo
-/*! \brief Makes a copy of the given BString object.
-	\param from The string object to copy.
-	\return
-		The function always returns \c *this .
-*/
 BString&
-BString::SetTo(const BString &from)
+BString::Adopt(BString& from)
 {
-	if (&from != this) // Avoid auto-assignment
-		_DoAssign(from.String(), from.Length());
+	SetTo(from);
+	from.SetTo("");
+
 	return *this;
 }
 
 
-// Adopt
-/*! \brief Adopt's data of the given BString object, freeing the original object.
-	\param from The string object to adopt.
-	\return
-		The function always returns \c *this .
-*/
 BString&
-BString::Adopt(BString &from)
+BString::SetTo(const BString& string, int32 maxLength)
 {
-	if (&from == this) // Avoid auto-adoption
-		return *this;
-
-	if (_privateData)
-		free(_privateData - sizeof(int32));
-
-	/* "steal" the data from the given BString */
-	_privateData = from._privateData;
-	from._privateData = NULL;
-
+	if (maxLength < 0)
+		maxLength = INT32_MAX;
+	if (fPrivateData != string.fPrivateData
+		// make sure we reassing in case length is different
+		|| (fPrivateData == string.fPrivateData && Length() > maxLength)) {
+		maxLength = min_clamp0(maxLength, string.Length());
+		if (_MakeWritable(maxLength, false) == B_OK)
+			memcpy(fPrivateData, string.String(), maxLength);
+	}
 	return *this;
 }
 
 
-// SetTo
-/*! \brief Makes a copy of the given BString object.
-	\param from The string object to copy.
-	\param length Amount of characters to copy from the original BString.
-	\return
-		The function always returns \c *this .
-*/
 BString&
-BString::SetTo(const BString &string, int32 length)
+BString::Adopt(BString& from, int32 maxLength)
 {
-	if (&string != this) // Avoid auto-assignment
-		_DoAssign(string.String(), min_clamp0(length, string.Length()));
-	return *this;
-}
-
-
-// Adopt
-/*! \brief Adopt's data of the given BString object, freeing the original object.
-	\param from The string object to adopt.
-	\param length Amount of characters to get from the original BString.
-	\return
-		The function always returns \c *this .
-*/
-BString&
-BString::Adopt(BString &from, int32 length)
-{
-	if (&from == this) // Avoid auto-adoption
-		return *this;
-
-	int32 len = min_clamp0(length, from.Length());
-
-	if (_privateData)
-		free(_privateData - sizeof(int32));
-
-	/* "steal" the data from the given BString */
-	_privateData = from._privateData;
-	from._privateData = NULL;
-
-	if (len < Length())
-		_GrowBy(len - Length()); // Negative, we truncate
+	SetTo(from, maxLength);
+	from.SetTo("");
 
 	return *this;
 }
 
 
-// SetTo
-/*! \brief Initializes the object to a string composed by a character you specify.
-	\param c The character you want to initialize the BString.
-	\param count The number of characters you want the BString to be composed by.
-	\return
-		The function always returns \c *this .
-*/
 BString&
 BString::SetTo(char c, int32 count)
 {
 	if (count < 0)
 		count = 0;
-	int32 curLen = Length();
 
-	if (curLen == count || _GrowBy(count - curLen))
-		memset(_privateData, c, count);
+	if (_MakeWritable(count, false) == B_OK)
+		memset(fPrivateData, c, count);
 	return *this;
 }
 
 
-/*---- Substring copying ---------------------------------------------------*/
-
-// CopyInto
-/*! \brief Copy the BString data (or part of it) into another BString.
-	\param into The BString where to copy the object.
-	\param fromOffset The offset (zero based) where to begin the copy
-	\param length The amount of bytes to copy.
-	\return This function always returns *this .
-*/
-BString &
-BString::CopyInto(BString &into, int32 fromOffset, int32 length) const
+BString&
+BString::SetToChars(const char* string, int32 charCount)
 {
-	if (&into != this) {
-		CHECK_PARAM_RET(fromOffset >= 0, "'fromOffset' must not be negative!",
-						into);
-		CHECK_PARAM_RET(fromOffset <= Length(), "'fromOffset' exceeds length!",
-						into);
-		into.SetTo(String() + fromOffset, length);
-	}
+	return SetTo(string, UTF8CountBytes(string, charCount));
+}
+
+
+BString&
+BString::SetToChars(const BString& string, int32 charCount)
+{
+	return SetTo(string, UTF8CountBytes(string.String(), charCount));
+}
+
+
+BString&
+BString::AdoptChars(BString& string, int32 charCount)
+{
+	return Adopt(string, UTF8CountBytes(string.String(), charCount));
+}
+
+
+//	#pragma mark - Substring copying
+
+
+BString&
+BString::CopyInto(BString& into, int32 fromOffset, int32 length) const
+{
+	if (this != &into)
+		into.SetTo(fPrivateData + fromOffset, length);
 	return into;
 }
 
 
-// CopyInto
-/*! \brief Copy the BString data (or part of it) into the supplied buffer.
-	\param into The buffer where to copy the object.
-	\param fromOffset The offset (zero based) where to begin the copy
-	\param length The amount of bytes to copy.
-*/
 void
-BString::CopyInto(char *into, int32 fromOffset, int32 length) const
+BString::CopyInto(char* into, int32 fromOffset, int32 length) const
 {
-	if (into != NULL) {
-		CHECK_PARAM_VOID(fromOffset >= 0, "'fromOffset' must not be negative!");
-		CHECK_PARAM_VOID(fromOffset <= Length(), "'fromOffset' exceeds length!");
-		int32 len = min_clamp0(length, Length() - fromOffset);
-		memcpy(into, _privateData + fromOffset, len);
+	if (into) {
+		length = min_clamp0(length, Length() - fromOffset);
+		memcpy(into, fPrivateData + fromOffset, length);
 	}
 }
 
 
-/*---- Appending -----------------------------------------------------------*/
-// plus operator
-/*!	\brief Appends the given string to the object.
-	\param str A pointer to the string to append.
-	\return This function always returns *this .
-*/
 BString&
-BString::operator+=(const char *str)
+BString::CopyCharsInto(BString& into, int32 fromCharOffset,
+	int32 charCount) const
 {
-	if (str != NULL)
-		_DoAppend(str, strlen(str));
+	int32 fromOffset = UTF8CountBytes(fPrivateData, fromCharOffset);
+	int32 length = UTF8CountBytes(fPrivateData + fromOffset, charCount);
+	return CopyInto(into, fromOffset, length);
+}
+
+
+bool
+BString::CopyCharsInto(char* into, int32* intoLength, int32 fromCharOffset,
+	int32 charCount) const
+{
+	if (into == NULL)
+		return false;
+
+	int32 fromOffset = UTF8CountBytes(fPrivateData, fromCharOffset);
+	int32 length = UTF8CountBytes(fPrivateData + fromOffset, charCount);
+	length = min_clamp0(length, Length() - fromOffset);
+
+	if (intoLength != NULL) {
+		if (*intoLength < length)
+			return false;
+		*intoLength = length;
+	}
+
+	memcpy(into, fPrivateData + fromOffset, length);
+	return true;
+}
+
+
+//	#pragma mark - Appending
+
+
+BString&
+BString::operator+=(const char* string)
+{
+	if (string) {
+		int32 length = strlen(string);
+		if (length > 0)
+			_DoAppend(string, length);
+	}
 	return *this;
 }
 
 
-// plus operator
-/*!	\brief Appends the given character to the object.
-	\param c The character to append.
-	\return This function always returns *this .
-*/
 BString&
 BString::operator+=(char c)
 {
@@ -530,76 +501,68 @@ BString::operator+=(char c)
 }
 
 
-// Append
-/*!	\brief Appends the given BString to the object.
-	\param string The BString to append.
-	\param length The maximum bytes to get from the original object.
-	\return This function always returns *this .
-*/
 BString&
-BString::Append(const BString &string, int32 length)
+BString::Append(const BString& string, int32 length)
 {
-	_DoAppend(string.String(), min_clamp0(length, string.Length()));
-	return *this;
-}
-
-
-// Append
-/*!	\brief Appends the given string to the object.
-	\param str A pointer to the string to append.
-	\param length The maximum bytes to get from the original string.
-	\return This function always returns *this .
-*/
-BString&
-BString::Append(const char *str, int32 length)
-{
-	if (str != NULL) {
-		int32 len = strlen_clamp(str, length);
-		_DoAppend(str, len);
+	if (&string != this) {
+		length = min_clamp0(length, string.Length());
+		if (length > 0)
+			_DoAppend(string.fPrivateData, length);
 	}
 	return *this;
 }
 
 
-// Append
-/*!	\brief Appends the given character to the object.
-	\param c The character to append.
-	\param count The number of characters to append.
-	\return This function always returns *this .
-*/
+BString&
+BString::Append(const char* string, int32 length)
+{
+	if (string) {
+		length = strlen_clamp(string, length);
+		if (length > 0)
+			_DoAppend(string, length);
+	}
+	return *this;
+}
+
+
 BString&
 BString::Append(char c, int32 count)
 {
-	int32 len = Length();
-	if (count > 0 && _GrowBy(count))
-		memset(_privateData + len, c, count);
-
+	int32 oldLength = Length();
+	if (count > 0 && _DoAppend("", count))
+		memset(fPrivateData + oldLength, c, count);
 	return *this;
 }
 
 
-/*---- Prepending ----------------------------------------------------------*/
-// Prepend
-/*!	\brief Prepends the given string to the object.
-	\param str A pointer to the string to prepend.
-	\return This function always returns *this .
-*/
 BString&
-BString::Prepend(const char *str)
+BString::AppendChars(const BString& string, int32 charCount)
 {
-	if (str != NULL)
-		_DoPrepend(str, strlen(str));
+	return Append(string, UTF8CountBytes(string.String(), charCount));
+}
+
+
+BString&
+BString::AppendChars(const char* string, int32 charCount)
+{
+	return Append(string, UTF8CountBytes(string, charCount));
+}
+
+
+//	#pragma mark - Prepending
+
+
+BString&
+BString::Prepend(const char* string)
+{
+	if (string)
+		_DoPrepend(string, strlen(string));
 	return *this;
 }
 
 
-// Prepend
-/*!	\brief Prepends the given BString to the object.
-	\param string The BString object to prepend.
-	\return This function always returns *this .
-*/
 BString&
-BString::Prepend(const BString &string)
+BString::Prepend(const BString& string)
 {
 	if (&string != this)
 		_DoPrepend(string.String(), string.Length());
@@ -607,275 +570,253 @@ BString::Prepend(const BString &string)
 }
 
 
-// Prepend
-/*!	\brief Prepends the given string to the object.
-	\param str A pointer to the string to prepend.
-	\param length The maximum amount of bytes to get from the string.
-	\return This function always returns *this .
-*/
 BString&
-BString::Prepend(const char *str, int32 length)
+BString::Prepend(const char* string, int32 length)
 {
-	if (str != NULL) {
-		int32 len = strlen_clamp(str, length);
-		_DoPrepend(str, len);
-	}
+	if (string)
+		_DoPrepend(string, strlen_clamp(string, length));
 	return *this;
 }
 
 
-// Prepend
-/*!	\brief Prepends the given BString to the object.
-	\param string The BString object to prepend.
-	\param len The maximum amount of bytes to get from the BString.
-	\return This function always returns *this .
-*/
 BString&
-BString::Prepend(const BString &string, int32 len)
+BString::Prepend(const BString& string, int32 length)
 {
 	if (&string != this)
-		_DoPrepend(string.String(), min_clamp0(len, string.Length()));
+		_DoPrepend(string.fPrivateData, min_clamp0(length, string.Length()));
 	return *this;
 }
 
 
-// Prepend
-/*!	\brief Prepends the given character to the object.
-	\param c The character to prepend.
-	\param count The amount of characters to prepend.
-	\return This function always returns *this .
-*/
 BString&
 BString::Prepend(char c, int32 count)
 {
-	if (count > 0 && _OpenAtBy(0, count))
-		memset(_privateData, c, count);
-
+	if (count > 0 && _DoPrepend("", count))
+		memset(fPrivateData, c, count);
 	return *this;
 }
 
 
-/*---- Inserting ----------------------------------------------------------*/
-// Insert
-/*! \brief Inserts the given string at the given position into the object's data.
-	\param str A pointer to the string to insert.
-	\param pos The offset into the BString's data where to insert the string.
-	\return This function always returns *this .
-*/
 BString&
-BString::Insert(const char *str, int32 pos)
+BString::PrependChars(const char* string, int32 charCount)
 {
-	if (str != NULL) {
-		CHECK_PARAM(pos <= Length(), "'pos' exceeds length!");
-		int32 len = (int32)strlen(str);
-		if (pos < 0) {
-			int32 skipLen = min_clamp0(-1 * pos, len);
-			str += skipLen;
+	return Prepend(string, UTF8CountBytes(string, charCount));
+}
+
+
+BString&
+BString::PrependChars(const BString& string, int32 charCount)
+{
+	return Prepend(string, UTF8CountBytes(string.String(), charCount));
+}
+
+
+//	#pragma mark - Inserting
+
+
+BString&
+BString::Insert(const char* string, int32 position)
+{
+	if (string != NULL && position <= Length()) {
+		int32 len = int32(strlen(string));
+		if (position < 0) {
+			int32 skipLen = min_clamp0(-1 * position, len);
+			string += skipLen;
 			len -= skipLen;
-			pos = 0;
-		} else
-			pos = min_clamp0(pos, Length());
-		if (_OpenAtBy(pos, len))
-			memcpy(_privateData + pos, str, len);
+			position = 0;
+		} else {
+			position = min_clamp0(position, Length());
+		}
+		_DoInsert(string, position, len);
 	}
 	return *this;
 }
 
 
-// Insert
-/*! \brief Inserts the given string at the given position into the object's data.
-	\param str A pointer to the string to insert.
-	\param length The amount of bytes to insert.
-	\param pos The offset into the BString's data where to insert the string.
-	\return This function always returns *this .
-*/
 BString&
-BString::Insert(const char *str, int32 length, int32 pos)
+BString::Insert(const char* string, int32 length, int32 position)
 {
-	if (str != NULL) {
-		CHECK_PARAM(pos <= Length(), "'pos' exceeds length!");
-		int32 len = strlen_clamp(str, length);
-		if (pos < 0) {
-			int32 skipLen = min_clamp0(-1 * pos, len);
-			str += skipLen;
+	if (string != NULL && position <= Length()) {
+		int32 len = strlen_clamp(string, length);
+		if (position < 0) {
+			int32 skipLen = min_clamp0(-1 * position, len);
+			string += skipLen;
 			len -= skipLen;
-			pos = 0;
-		} else
-			pos = min_clamp0(pos, Length());
-		if (_OpenAtBy(pos, len))
-			memcpy(_privateData + pos, str, len);
+			position = 0;
+		} else {
+			position = min_clamp0(position, Length());
+		}
+		_DoInsert(string, position, len);
 	}
 	return *this;
 }
 
 
-// Insert
-/*! \brief Inserts the given string at the given position into the object's data.
-	\param str A pointer to the string to insert.
-	\param fromOffset
-	\param length The amount of bytes to insert.
-	\param pos The offset into the BString's data where to insert the string.
-	\return This function always returns *this .
-*/
 BString&
-BString::Insert(const char *str, int32 fromOffset, int32 length, int32 pos)
+BString::Insert(const char* string, int32 fromOffset, int32 length,
+	int32 position)
 {
-	CHECK_PARAM(fromOffset >= 0, "'fromOffset' must not be negative!");
-	return Insert(str + fromOffset, length, pos);
-}
-
-
-// Insert
-/*! \brief Inserts the given BString at the given position into the object's data.
-	\param string The BString object to insert.
-	\param pos The offset into the BString's data where to insert the string.
-	\return This function always returns *this .
-*/
-BString&
-BString::Insert(const BString &string, int32 pos)
-{
-	if (&string != this)
-		Insert(string.String(), pos); //TODO: Optimize
+	if (string)
+		Insert(string + fromOffset, length, position);
 	return *this;
 }
 
 
-// Insert
-/*! \brief Inserts the given BString at the given position into the object's data.
-	\param string The BString object to insert.
-	\param length The amount of bytes to insert.
-	\param pos The offset into the BString's data where to insert the string.
-	\return This function always returns *this .
-*/
 BString&
-BString::Insert(const BString &string, int32 length, int32 pos)
+BString::Insert(const BString& string, int32 position)
 {
-	if (&string != this)
-		Insert(string.String(), length, pos); //TODO: Optimize
+	if (&string != this && string.Length() > 0)
+		Insert(string.fPrivateData, position);
 	return *this;
 }
 
 
-// Insert
-/*! \brief Inserts the given string at the given position into the object's data.
-	\param string The BString object to insert.
-	\param fromOffset
-	\param length The amount of bytes to insert.
-	\param pos The offset into the BString's data where to insert the string.
-	\return This function always returns *this .
-*/
 BString&
-BString::Insert(const BString &string, int32 fromOffset, int32 length, int32 pos)
+BString::Insert(const BString& string, int32 length, int32 position)
 {
-	if (&string != this) {
-		CHECK_PARAM(fromOffset >= 0, "'fromOffset' must not be negative!");
-		Insert(string.String() + fromOffset, length, pos);
-	}
+	if (&string != this && string.Length() > 0)
+		Insert(string.String(), length, position);
 	return *this;
 }
 
 
-// Insert
-/*! \brief Inserts the given character at the given position into the object's data.
-	\param c The character to insert.
-	\param count The amount of bytes to insert.
-	\param pos The offset into the BString's data where to insert the string.
-	\return This function always returns *this .
-*/
 BString&
-BString::Insert(char c, int32 count, int32 pos)
+BString::Insert(const BString& string, int32 fromOffset, int32 length,
+	int32 position)
 {
-	CHECK_PARAM(pos <= Length(), "'pos' exceeds length!");
-	if (pos < 0) {
-		count = max_c(count + pos, 0);
-		pos = 0;
+	if (&string != this && string.Length() > 0)
+		Insert(string.String() + fromOffset, length, position);
+	return *this;
+}
+
+
+BString&
+BString::Insert(char c, int32 count, int32 position)
+{
+	if (position < 0) {
+		count = MAX(count + position, 0);
+		position = 0;
 	} else
-		pos = min_clamp0(pos, Length());
+		position = min_clamp0(position, Length());
 
-	if (count > 0 && _OpenAtBy(pos, count))
-		memset(_privateData + pos, c, count);
+	if (count > 0 && _DoInsert("", position, count))
+		memset(fPrivateData + position, c, count);
 
 	return *this;
 }
 
 
-/*---- Removing -----------------------------------------------------------*/
-// Truncate
-/*! \brief Truncate the string to the new length.
-	\param newLength The new lenght of the string.
-	\param lazy If true, the memory-optimisation is postponed to later
-	\return This function always returns *this .
-*/
+BString&
+BString::InsertChars(const char* string, int32 charPosition)
+{
+	return Insert(string, UTF8CountBytes(fPrivateData, charPosition));
+}
+
+
+BString&
+BString::InsertChars(const char* string, int32 charCount, int32 charPosition)
+{
+	return Insert(string, UTF8CountBytes(string, charCount),
+		UTF8CountBytes(fPrivateData, charPosition));
+}
+
+
+BString&
+BString::InsertChars(const char* string, int32 fromCharOffset,
+	int32 charCount, int32 charPosition)
+{
+	int32 fromOffset = UTF8CountBytes(string, fromCharOffset);
+	return Insert(string, fromOffset,
+		UTF8CountBytes(string + fromOffset, charCount),
+		UTF8CountBytes(fPrivateData, charPosition));
+}
+
+
+BString&
+BString::InsertChars(const BString& string, int32 charPosition)
+{
+	return Insert(string, UTF8CountBytes(fPrivateData, charPosition));
+}
+
+
+BString&
+BString::InsertChars(const BString& string, int32 charCount, int32 charPosition)
+{
+	return Insert(string, UTF8CountBytes(string.String(), charCount),
+		UTF8CountBytes(fPrivateData, charPosition));
+}
+
+
+BString&
+BString::InsertChars(const BString& string, int32 fromCharOffset,
+	int32 charCount, int32 charPosition)
+{
+	int32 fromOffset = UTF8CountBytes(string.String(), fromCharOffset);
+	return Insert(string, fromOffset,
+		UTF8CountBytes(string.String() + fromOffset, charCount),
+		UTF8CountBytes(fPrivateData, charPosition));
+}
+
+
+//	#pragma mark - Removing
+
+
 BString&
 BString::Truncate(int32 newLength, bool lazy)
 {
 	if (newLength < 0)
 		newLength = 0;
 
-	int32 curLen = Length();
+	if (newLength < Length()) {
+		// ignore lazy, since we might detach
+		_MakeWritable(newLength, true);
+	}
 
-	if (newLength < curLen) {
-		if (lazy) {
-			// don't free memory yet, just set new length:
-			// XXX: Uhm, where do we keep track of the amount
-			// of memory we allocated ?
-			_SetLength(newLength);
-			_privateData[newLength] = '\0';
-		} else
-			_GrowBy(newLength - curLen); //Negative
+	return *this;
+}
+
+
+BString&
+BString::TruncateChars(int32 newCharCount, bool lazy)
+{
+	return Truncate(UTF8CountBytes(fPrivateData, newCharCount));
+}
+
+
+BString&
+BString::Remove(int32 from, int32 length)
+{
+	if (length > 0 && from < Length())
+		_ShrinkAtBy(from, min_clamp0(length, (Length() - from)));
+	return *this;
+}
+
+
+BString&
+BString::RemoveChars(int32 fromCharOffset, int32 charCount)
+{
+	int32 fromOffset = UTF8CountBytes(fPrivateData, fromCharOffset);
+	return Remove(fromOffset,
+		UTF8CountBytes(fPrivateData + fromOffset, charCount));
+}
+
+
+BString&
+BString::RemoveFirst(const BString& string)
+{
+	if (string.Length() > 0) {
+		int32 pos = _ShortFindAfter(string.String(), string.Length());
+		if (pos >= 0)
+			_ShrinkAtBy(pos, string.Length());
 	}
 	return *this;
 }
 
 
-// Remove
-/*! \brief Removes some bytes, starting at the given offset
-	\param from The offset from which you want to start removing
-	\param length The number of bytes to remove
-	\return This function always returns *this .
-*/
 BString&
-BString::Remove(int32 from, int32 length)
-{
-	int32 len = Length();
-	if (from < 0) {
-		int32 skipLen = min_clamp0(from, len);
-		len -= skipLen;
-		from = 0;
-	} else
-		from = min_clamp0(from, len);
-	_ShrinkAtBy(from, min_clamp0(length, len - from));
-	return *this;
-}
-
-
-// Remove
-/*! \brief Removes the first occurrence of the given BString.
-	\param string The BString to remove.
-	\return This function always returns *this .
-*/
-BString&
-BString::RemoveFirst(const BString &string)
-{
-	int32 pos = _ShortFindAfter(string.String(), string.Length());
-
-	if (pos >= 0)
-		_ShrinkAtBy(pos, string.Length());
-
-	return *this;
-}
-
-
-// Remove
-/*! \brief Removes the last occurrence of the given BString.
-	\param string The BString to remove.
-	\return This function always returns *this .
-*/
-BString&
-BString::RemoveLast(const BString &string)
+BString::RemoveLast(const BString& string)
 {
 	int32 pos = _FindBefore(string.String(), Length(), string.Length());
-
 	if (pos >= 0)
 		_ShrinkAtBy(pos, string.Length());
 
@@ -883,301 +824,284 @@ BString::RemoveLast(const BString &string)
 }
 
 
-// Remove
-/*! \brief Removes all occurrences of the given BString.
-	\param string The BString to remove.
-	\return This function always returns *this .
-*/
 BString&
-BString::RemoveAll(const BString &string)
+BString::RemoveAll(const BString& string)
 {
+	if (string.Length() == 0 || Length() == 0 || FindFirst(string) < 0)
+		return *this;
+
+	if (_MakeWritable() != B_OK)
+		return *this;
+
 	return _DoReplace(string.String(), "", REPLACE_ALL, 0, KEEP_CASE);
 }
 
 
-// Remove
-/*! \brief Removes the first occurrence of the given string.
-	\param str A pointer to the string to remove.
-	\return This function always returns *this .
-*/
 BString&
-BString::RemoveFirst(const char *str)
+BString::RemoveFirst(const char* string)
 {
-	if (str != NULL) {
-		int32 pos = _ShortFindAfter(str, strlen(str));
+	int32 length = string ? strlen(string) : 0;
+	if (length > 0) {
+		int32 pos = _ShortFindAfter(string, length);
 		if (pos >= 0)
-			_ShrinkAtBy(pos, strlen(str));
+			_ShrinkAtBy(pos, length);
 	}
 	return *this;
 }
 
 
-// Remove
-/*! \brief Removes the last occurrence of the given string.
-	\param str A pointer to the string to remove.
-	\return This function always returns *this .
-*/
 BString&
-BString::RemoveLast(const char *str)
+BString::RemoveLast(const char* string)
 {
-	if (str != NULL) {
-		int32 len = strlen(str);
-		int32 pos = _FindBefore(str, Length(), len);
+	int32 length = string ? strlen(string) : 0;
+	if (length > 0) {
+		int32 pos = _FindBefore(string, Length(), length);
 		if (pos >= 0)
-			_ShrinkAtBy(pos, len);
+			_ShrinkAtBy(pos, length);
 	}
 	return *this;
 }
 
 
-// Remove
-/*! \brief Removes all occurrences of the given string.
-	\param str A pointer to the string to remove.
-	\return This function always returns *this .
-*/
 BString&
-BString::RemoveAll(const char *str)
+BString::RemoveAll(const char* string)
 {
-	return _DoReplace(str, "", REPLACE_ALL, 0, KEEP_CASE);
-}
-
-
-// Remove
-/*! \brief Removes all the characters specified.
-	\param setOfCharsToRemove The set of characters to remove.
-	\return This function always returns *this .
-*/
-BString&
-BString::RemoveSet(const char *setOfCharsToRemove)
-{
-	return ReplaceSet(setOfCharsToRemove, "");
-}
-
-
-// MoveInto
-/*! \brief Move the BString data (or part of it) into another BString.
-	\param into The BString where to move the object.
-	\param from The offset (zero based) where to begin the move
-	\param length The amount of bytes to move.
-	\return This function always returns into.
-*/
-BString&
-BString::MoveInto(BString &into, int32 from, int32 length)
-{
-	CHECK_PARAM_RET(from >= 0, "'from' must not be negative!", into);
-	CHECK_PARAM_RET(from <= Length(), "'from' exceeds length!", into);
-	int32 len = min_clamp0(length, Length() - from);
-	if (&into == this) {
-		/* TODO: [zooey]: to be activated later (>R1):
-		// strings are identical, just move the data:
-		if (from>0 && _privateData)
-			memmove( _privateData, _privateData+from, len);
-		Truncate( len);
-		*/
+	if (!string || Length() == 0 || FindFirst(string) < 0)
 		return *this;
+
+	if (_MakeWritable() != B_OK)
+		return *this;
+
+	return _DoReplace(string, "", REPLACE_ALL, 0, KEEP_CASE);
+}
+
+
+BString&
+BString::RemoveSet(const char* setOfBytesToRemove)
+{
+	return ReplaceSet(setOfBytesToRemove, "");
+}
+
+
+BString&
+BString::RemoveCharsSet(const char* setOfCharsToRemove)
+{
+	return ReplaceCharsSet(setOfCharsToRemove, "");
+}
+
+
+BString&
+BString::MoveInto(BString& into, int32 from, int32 length)
+{
+	if (length) {
+		CopyInto(into, from, length);
+		Remove(from, length);
 	}
-	into.SetTo(String() + from, len);
-	_ShrinkAtBy(from, len);
+	return into;
+}
+
+
+void
+BString::MoveInto(char* into, int32 from, int32 length)
+{
+	if (into) {
+		CopyInto(into, from, length);
+		Remove(from, length);
+	}
+}
+
+
+BString&
+BString::MoveCharsInto(BString& into, int32 fromCharOffset, int32 charCount)
+{
+	if (charCount > 0) {
+		CopyCharsInto(into, fromCharOffset, charCount);
+		RemoveChars(fromCharOffset, charCount);
+	}
 
 	return into;
 }
 
 
-// MoveInto
-/*! \brief Move the BString data (or part of it) into the given buffer.
-	\param into The buffer where to move the object.
-	\param from The offset (zero based) where to begin the move
-	\param length The amount of bytes to move.
-*/
-void
-BString::MoveInto(char *into, int32 from, int32 length)
+bool
+BString::MoveCharsInto(char* into, int32* intoLength, int32 fromCharOffset,
+	int32 charCount)
 {
-	if (into != NULL) {
-		CHECK_PARAM_VOID(from >= 0, "'from' must not be negative!");
-		CHECK_PARAM_VOID(from <= Length(), "'from' exceeds length!");
-		int32 len = min_clamp0(length, Length() - from);
-		memcpy(into, String() + from, len);
-		into[len] = '\0';
-		_ShrinkAtBy(from, len);
-	}
+	if (!CopyCharsInto(into, intoLength, fromCharOffset, charCount))
+		return false;
+
+	RemoveChars(fromCharOffset, charCount);
+	return true;
 }
 
 
-/*---- Compare functions ---------------------------------------------------*/
+//	#pragma mark - Compare functions
+
+
 bool
-BString::operator<(const char *string) const
+BString::operator<(const char* string) const
 {
 	return strcmp(String(), safestr(string)) < 0;
 }
 
 
 bool
-BString::operator<=(const char *string) const
+BString::operator<=(const char* string) const
 {
 	return strcmp(String(), safestr(string)) <= 0;
 }
 
 
 bool
-BString::operator==(const char *string) const
+BString::operator==(const char* string) const
 {
 	return strcmp(String(), safestr(string)) == 0;
 }
 
 
 bool
-BString::operator>=(const char *string) const
+BString::operator>=(const char* string) const
 {
 	return strcmp(String(), safestr(string)) >= 0;
 }
 
 
 bool
-BString::operator>(const char *string) const
+BString::operator>(const char* string) const
 {
 	return strcmp(String(), safestr(string)) > 0;
 }
 
 
-/*---- strcmp-style compare functions --------------------------------------*/
+//	#pragma mark - strcmp()-style compare functions
+
+
 int
-BString::Compare(const BString &string) const
+BString::Compare(const BString& string) const
 {
 	return strcmp(String(), string.String());
 }
 
 
 int
-BString::Compare(const char *string) const
+BString::Compare(const char* string) const
 {
 	return strcmp(String(), safestr(string));
 }
 
 
 int
-BString::Compare(const BString &string, int32 n) const
+BString::Compare(const BString& string, int32 length) const
 {
-	return strncmp(String(), string.String(), n);
+	return strncmp(String(), string.String(), length);
 }
 
 
 int
-BString::Compare(const char *string, int32 n) const
+BString::Compare(const char* string, int32 length) const
 {
-	return strncmp(String(), safestr(string), n);
+	return strncmp(String(), safestr(string), length);
 }
 
 
 int
-BString::ICompare(const BString &string) const
+BString::CompareChars(const BString& string, int32 charCount) const
+{
+	return Compare(string, UTF8CountBytes(fPrivateData, charCount));
+}
+
+
+int
+BString::CompareChars(const char* string, int32 charCount) const
+{
+	return Compare(string, UTF8CountBytes(fPrivateData, charCount));
+}
+
+
+int
+BString::ICompare(const BString& string) const
 {
 	return strcasecmp(String(), string.String());
 }
 
 
 int
-BString::ICompare(const char *str) const
+BString::ICompare(const char* string) const
 {
-	return strcasecmp(String(), safestr(str));
+	return strcasecmp(String(), safestr(string));
 }
 
 
 int
-BString::ICompare(const BString &string, int32 n) const
+BString::ICompare(const BString& string, int32 length) const
 {
-	return strncasecmp(String(), string.String(), n);
+	return strncasecmp(String(), string.String(), length);
 }
 
 
 int
-BString::ICompare(const char *str, int32 n) const
+BString::ICompare(const char* string, int32 length) const
 {
-	return strncasecmp(String(), safestr(str), n);
+	return strncasecmp(String(), safestr(string), length);
 }
 
 
-/*---- Searching -----------------------------------------------------------*/
-// FindFirst
-/*! \brief Find the first occurrence of the given BString.
-	\param string The BString to search for.
-	\return The offset(zero based) into the data
-		where the given BString has been found.
-*/
+//	#pragma mark - Searching
+
+
 int32
-BString::FindFirst(const BString &string) const
+BString::FindFirst(const BString& string) const
 {
 	return _ShortFindAfter(string.String(), string.Length());
 }
 
 
-// FindFirst
-/*! \brief Find the first occurrence of the given string.
-	\param string The string to search for.
-	\return The offset(zero based) into the data
-		where the given string has been found.
-*/
 int32
-BString::FindFirst(const char *string) const
+BString::FindFirst(const char* string) const
 {
 	if (string == NULL)
 		return B_BAD_VALUE;
+
 	return _ShortFindAfter(string, strlen(string));
 }
 
 
-// FindFirst
-/*! \brief Find the first occurrence of the given BString,
-		starting from the given offset.
-	\param string The BString to search for.
-	\param fromOffset The offset where to start the search.
-	\return An integer which is the offset(zero based) into the data
-		where the given BString has been found.
-*/
 int32
-BString::FindFirst(const BString &string, int32 fromOffset) const
+BString::FindFirst(const BString& string, int32 fromOffset) const
 {
 	if (fromOffset < 0)
 		return B_ERROR;
+
 	return _FindAfter(string.String(), min_clamp0(fromOffset, Length()),
-						    string.Length());
+		string.Length());
 }
 
 
-// FindFirst
-/*! \brief Find the first occurrence of the given string,
-		starting from the given offset.
-	\param string The string to search for.
-	\param fromOffset The offset where to start the search.
-	\return The offset(zero based) into the data
-		where the given string has been found.
-*/
 int32
-BString::FindFirst(const char *string, int32 fromOffset) const
+BString::FindFirst(const char* string, int32 fromOffset) const
 {
 	if (string == NULL)
 		return B_BAD_VALUE;
+
 	if (fromOffset < 0)
 		return B_ERROR;
-	return _FindAfter(string, min_clamp0(fromOffset, Length()), strlen(string));
+
+	return _FindAfter(string, min_clamp0(fromOffset, Length()),
+		strlen(safestr(string)));
 }
 
 
-// FindFirst
-/*! \brief Find the first occurrence of the given character.
-	\param c The character to search for.
-	\return The offset(zero based) into the data
-		where the given character has been found.
-*/
 int32
 BString::FindFirst(char c) const
 {
-	const char *start = String();
-	const char *end = String() + Length(); /* String's end */
+	const char* start = String();
+	const char* end = String() + Length();
 
-	/* Scans the string until we find the character, */
-	/* or we hit the string's end */
-	while(start != end && *start != c)
+	// Scans the string until we found the
+	// character, or we reach the string's start
+	while (start != end && *start != c) {
 		start++;
+	}
 
 	if (start == end)
 		return B_ERROR;
@@ -1186,27 +1110,20 @@ BString::FindFirst(char c) const
 }
 
 
-// FindFirst
-/*! \brief Find the first occurrence of the given character,
-		starting from the given offset.
-	\param c The character to search for.
-	\param fromOffset The offset where to start the search.
-	\return The offset(zero based) into the data
-		where the given character has been found.
-*/
 int32
 BString::FindFirst(char c, int32 fromOffset) const
 {
 	if (fromOffset < 0)
 		return B_ERROR;
 
-	const char *start = String() + min_clamp0(fromOffset, Length());
-	const char *end = String() + Length(); /* String's end */
+	const char* start = String() + min_clamp0(fromOffset, Length());
+	const char* end = String() + Length();
 
-	/* Scans the string until we found the character, */
-	/* or we hit the string's end */
-	while(start < end && *start != c)
+	// Scans the string until we found the
+	// character, or we reach the string's start
+	while (start < end && *start != c) {
 		start++;
+	}
 
 	if (start >= end)
 		return B_ERROR;
@@ -1215,207 +1132,210 @@ BString::FindFirst(char c, int32 fromOffset) const
 }
 
 
-// FindLast
-/*! \brief Find the last occurrence of the given BString.
-	\param string The BString to search for.
-	\return The offset(zero based) into the data
-		where the given BString has been found.
-*/
 int32
-BString::FindLast(const BString &string) const
+BString::FindFirstChars(const BString& string, int32 fromCharOffset) const
+{
+	return FindFirst(string, UTF8CountBytes(fPrivateData, fromCharOffset));
+}
+
+
+int32
+BString::FindFirstChars(const char* string, int32 fromCharOffset) const
+{
+	return FindFirst(string, UTF8CountBytes(fPrivateData, fromCharOffset));
+}
+
+
+int32
+BString::FindLast(const BString& string) const
 {
 	return _FindBefore(string.String(), Length(), string.Length());
 }
 
 
-// FindLast
-/*! \brief Find the last occurrence of the given string.
-	\param string The string to search for.
-	\return The offset(zero based) into the data
-		where the given string has been found.
-*/
 int32
-BString::FindLast(const char *string) const
+BString::FindLast(const char* string) const
 {
 	if (string == NULL)
 		return B_BAD_VALUE;
-	return _FindBefore(string, Length(), strlen(string));
+
+	return _FindBefore(string, Length(), strlen(safestr(string)));
 }
 
 
-// FindLast
-/*! \brief Find the last occurrence of the given BString,
-		starting from the given offset, and going backwards.
-	\param string The BString to search for.
-	\param beforeOffset The offset where to start the search.
-	\return An integer which is the offset(zero based) into the data
-		where the given BString has been found.
-*/
 int32
-BString::FindLast(const BString &string, int32 beforeOffset) const
+BString::FindLast(const BString& string, int32 beforeOffset) const
 {
 	if (beforeOffset < 0)
 		return B_ERROR;
+
 	return _FindBefore(string.String(), min_clamp0(beforeOffset, Length()),
-							 string.Length());
+		string.Length());
 }
 
 
-// FindLast
-/*! \brief Find the last occurrence of the given string,
-		starting from the given offset, and going backwards.
-	\param string The string to search for.
-	\return The offset(zero based) into the data
-		where the given string has been found.
-*/
 int32
-BString::FindLast(const char *string, int32 beforeOffset) const
+BString::FindLast(const char* string, int32 beforeOffset) const
 {
 	if (string == NULL)
 		return B_BAD_VALUE;
+
 	if (beforeOffset < 0)
 		return B_ERROR;
-	return _FindBefore(string, min_clamp0(beforeOffset, Length()), strlen(string));
+
+	return _FindBefore(string, min_clamp0(beforeOffset, Length()),
+		strlen(safestr(string)));
 }
 
 
-// FindLast
-/*! \brief Find the last occurrence of the given character.
-	\param c The character to search for.
-	\return The offset(zero based) into the data
-		where the given character has been found.
-*/
 int32
 BString::FindLast(char c) const
 {
-	const char *start = String();
-	const char *end = String() + Length(); /* String's end */
+	const char* const start = String();
+	const char* end = String() + Length() - 1;
 
-	/* Scans the string backwards until we found the character, */
-	/* or we reach the string's start */
-	while(end != start && *end != c)
+	// Scans the string backwards until we found
+	// the character, or we reach the string's start
+	while (end >= start && *end != c) {
 		end--;
+	}
 
-	if (end == start)
+	if (end < start)
 		return B_ERROR;
 
-	return end - String();
+	return end - start;
 }
 
 
-// FindLast
-/*! \brief Find the last occurrence of the given character,
-		starting from the given offset and going backwards.
-	\param c The character to search for.
-	\param beforeOffset The offset where to start the search.
-	\return The offset(zero based) into the data
-		where the given character has been found.
-*/
 int32
 BString::FindLast(char c, int32 beforeOffset) const
 {
 	if (beforeOffset < 0)
 		return B_ERROR;
 
-	const char *start = String();
-	const char *end = String() + Length() - beforeOffset;
+	const char* const start = String();
+	const char* end = String() + min_clamp0(beforeOffset + 1, Length()) - 1;
 
-	/* Scans the string backwards until we found the character, */
-	/* or we reach the string's start */
-	while(end > start && *end != c)
+	// Scans the string backwards until we found
+	// the character, or we reach the string's start
+	while (end >= start && *end != c) {
 		end--;
+	}
 
-	if (end <= start)
+	if (end < start)
 		return B_ERROR;
 
-	return end - String();
+	return end - start;
 }
 
 
 int32
-BString::IFindFirst(const BString &string) const
+BString::FindLastChars(const BString& string, int32 beforeCharOffset) const
+{
+	return FindLast(string, UTF8CountBytes(fPrivateData, beforeCharOffset));
+}
+
+
+int32
+BString::FindLastChars(const char* string, int32 beforeCharOffset) const
+{
+	return FindLast(string, UTF8CountBytes(fPrivateData, beforeCharOffset));
+}
+
+
+int32
+BString::IFindFirst(const BString& string) const
 {
 	return _IFindAfter(string.String(), 0, string.Length());
 }
 
 
 int32
-BString::IFindFirst(const char *string) const
+BString::IFindFirst(const char* string) const
 {
 	if (string == NULL)
 		return B_BAD_VALUE;
-	return _IFindAfter(string, 0, strlen(string));
+
+	return _IFindAfter(string, 0, strlen(safestr(string)));
 }
 
 
 int32
-BString::IFindFirst(const BString &string, int32 fromOffset) const
+BString::IFindFirst(const BString& string, int32 fromOffset) const
 {
 	if (fromOffset < 0)
 		return B_ERROR;
+
 	return _IFindAfter(string.String(), min_clamp0(fromOffset, Length()),
-						    string.Length());
+		string.Length());
 }
 
 
 int32
-BString::IFindFirst(const char *string, int32 fromOffset) const
+BString::IFindFirst(const char* string, int32 fromOffset) const
 {
 	if (string == NULL)
 		return B_BAD_VALUE;
+
 	if (fromOffset < 0)
 		return B_ERROR;
-	return _IFindAfter(string, min_clamp0(fromOffset,Length()), strlen(string));
+
+	return _IFindAfter(string, min_clamp0(fromOffset,Length()),
+		strlen(safestr(string)));
 }
 
 
 int32
-BString::IFindLast(const BString &string) const
+BString::IFindLast(const BString& string) const
 {
 	return _IFindBefore(string.String(), Length(), string.Length());
 }
 
 
 int32
-BString::IFindLast(const char *string) const
+BString::IFindLast(const char* string) const
 {
 	if (string == NULL)
 		return B_BAD_VALUE;
-	return _IFindBefore(string, Length(), strlen(string));
+
+	return _IFindBefore(string, Length(), strlen(safestr(string)));
 }
 
 
 int32
-BString::IFindLast(const BString &string, int32 beforeOffset) const
+BString::IFindLast(const BString& string, int32 beforeOffset) const
 {
 	if (beforeOffset < 0)
 		return B_ERROR;
+
 	return _IFindBefore(string.String(), min_clamp0(beforeOffset, Length()),
-							  string.Length());
+		string.Length());
 }
 
 
 int32
-BString::IFindLast(const char *string, int32 beforeOffset) const
+BString::IFindLast(const char* string, int32 beforeOffset) const
 {
 	if (string == NULL)
 		return B_BAD_VALUE;
+
 	if (beforeOffset < 0)
 		return B_ERROR;
-	return _IFindBefore(string, min_clamp0(beforeOffset,Length()),
-							  strlen(string));
+
+	return _IFindBefore(string, min_clamp0(beforeOffset, Length()),
+		strlen(safestr(string)));
 }
 
 
-/*---- Replacing -----------------------------------------------------------*/
+//	#pragma mark - Replacing
+
+
 BString&
 BString::ReplaceFirst(char replaceThis, char withThis)
 {
 	int32 pos = FindFirst(replaceThis);
-
-	if (pos >= 0)
-		_privateData[pos] = withThis;
-
+	if (pos >= 0 && _MakeWritable() == B_OK)
+		fPrivateData[pos] = withThis;
 	return *this;
 }
 
@@ -1424,10 +1344,8 @@ BString&
 BString::ReplaceLast(char replaceThis, char withThis)
 {
 	int32 pos = FindLast(replaceThis);
-
-	if (pos >= 0)
-		_privateData[pos] = withThis;
-
+	if (pos >= 0 && _MakeWritable() == B_OK)
+		fPrivateData[pos] = withThis;
 	return *this;
 }
 
@@ -1435,29 +1353,17 @@ BString::ReplaceLast(char replaceThis, char withThis)
 BString&
 BString::ReplaceAll(char replaceThis, char withThis, int32 fromOffset)
 {
-	CHECK_PARAM(fromOffset >= 0, "'fromOffset' must not be negative!");
-	for (int32 pos = min_clamp0(fromOffset, Length());;) {
-		pos = FindFirst(replaceThis, pos);
-		if (pos < 0)
-			break;
-		_privateData[pos] = withThis;
-	}
+	fromOffset = min_clamp0(fromOffset, Length());
+	int32 pos = FindFirst(replaceThis, fromOffset);
 
-	return *this;
-}
-
-
-BString&
-BString::Replace(char replaceThis, char withThis, int32 maxReplaceCount, int32 fromOffset)
-{
-	CHECK_PARAM(fromOffset >= 0, "'fromOffset' must not be negative!");
-	if (maxReplaceCount > 0) {
-		for (int32 pos = min_clamp0(fromOffset, Length());
-			  		maxReplaceCount > 0; maxReplaceCount--) {
+	// detach and set first match
+	if (pos >= 0 && _MakeWritable() == B_OK) {
+		fPrivateData[pos] = withThis;
+		for (pos = pos;;) {
 			pos = FindFirst(replaceThis, pos);
 			if (pos < 0)
 				break;
-			_privateData[pos] = withThis;
+			fPrivateData[pos] = withThis;
 		}
 	}
 	return *this;
@@ -1465,24 +1371,51 @@ BString::Replace(char replaceThis, char withThis, int32 maxReplaceCount, int32 f
 
 
 BString&
-BString::ReplaceFirst(const char *replaceThis, const char *withThis)
+BString::Replace(char replaceThis, char withThis, int32 maxReplaceCount,
+	int32 fromOffset)
 {
-	return _DoReplace( replaceThis, withThis, 1, 0, KEEP_CASE);
+	fromOffset = min_clamp0(fromOffset, Length());
+	int32 pos = FindFirst(replaceThis, fromOffset);
+
+	if (maxReplaceCount > 0 && pos >= 0 && _MakeWritable() == B_OK) {
+		maxReplaceCount--;
+		fPrivateData[pos] = withThis;
+		for (pos = pos;  maxReplaceCount > 0; maxReplaceCount--) {
+			pos = FindFirst(replaceThis, pos);
+			if (pos < 0)
+				break;
+			fPrivateData[pos] = withThis;
+		}
+	}
+	return *this;
 }
 
 
 BString&
-BString::ReplaceLast(const char *replaceThis, const char *withThis)
+BString::ReplaceFirst(const char* replaceThis, const char* withThis)
 {
-	if (replaceThis == NULL)
+	if (!replaceThis || !withThis || FindFirst(replaceThis) < 0)
 		return *this;
 
-	int32 firstStringLength = strlen(replaceThis);
-	int32 pos = _FindBefore(replaceThis, Length(), firstStringLength);
+	if (_MakeWritable() != B_OK)
+		return *this;
+
+	return _DoReplace(replaceThis, withThis, 1, 0, KEEP_CASE);
+}
+
+
+BString&
+BString::ReplaceLast(const char* replaceThis, const char* withThis)
+{
+	if (!replaceThis || !withThis)
+		return *this;
+
+	int32 replaceThisLength = strlen(replaceThis);
+	int32 pos = _FindBefore(replaceThis, Length(), replaceThisLength);
 
 	if (pos >= 0) {
-		int32 len = (withThis ? strlen(withThis) : 0);
-		int32 difference = len - firstStringLength;
+		int32 withThisLength =  strlen(withThis);
+		int32 difference = withThisLength - replaceThisLength;
 
 		if (difference > 0) {
 			if (!_OpenAtBy(pos, difference))
@@ -1490,8 +1423,11 @@ BString::ReplaceLast(const char *replaceThis, const char *withThis)
 		} else if (difference < 0) {
 			if (!_ShrinkAtBy(pos, -difference))
 				return *this;
+		} else {
+			if (_MakeWritable() != B_OK)
+				return *this;
 		}
-		memcpy(_privateData + pos, withThis, len);
+		memcpy(fPrivateData + pos, withThis, withThisLength);
 	}
 
 	return *this;
@@ -1499,20 +1435,51 @@ BString::ReplaceLast(const char *replaceThis, const char *withThis)
 
 
 BString&
-BString::ReplaceAll(const char *replaceThis, const char *withThis, int32 fromOffset)
+BString::ReplaceAll(const char* replaceThis, const char* withThis,
+	int32 fromOffset)
 {
-	CHECK_PARAM(fromOffset >= 0, "'fromOffset' must not be negative!");
+	if (!replaceThis || !withThis || FindFirst(replaceThis) < 0)
+		return *this;
+
+	if (_MakeWritable() != B_OK)
+		return *this;
+
 	return _DoReplace(replaceThis, withThis, REPLACE_ALL,
-							 min_clamp0(fromOffset,Length()), KEEP_CASE);
+		min_clamp0(fromOffset, Length()), KEEP_CASE);
 }
 
 
 BString&
-BString::Replace(const char *replaceThis, const char *withThis, int32 maxReplaceCount, int32 fromOffset)
+BString::Replace(const char* replaceThis, const char* withThis,
+	int32 maxReplaceCount, int32 fromOffset)
 {
-	CHECK_PARAM(fromOffset >= 0, "'fromOffset' must not be negative!");
+	if (!replaceThis || !withThis || maxReplaceCount <= 0
+		|| FindFirst(replaceThis) < 0)
+		return *this;
+
+	if (_MakeWritable() != B_OK)
+		return *this;
+
 	return _DoReplace(replaceThis, withThis, maxReplaceCount,
-							 min_clamp0(fromOffset,Length()), KEEP_CASE);
+		min_clamp0(fromOffset, Length()), KEEP_CASE);
+}
+
+
+BString&
+BString::ReplaceAllChars(const char* replaceThis, const char* withThis,
+	int32 fromCharOffset)
+{
+	return ReplaceAll(replaceThis, withThis,
+		UTF8CountBytes(fPrivateData, fromCharOffset));
+}
+
+
+BString&
+BString::ReplaceChars(const char* replaceThis, const char* withThis,
+	int32 maxReplaceCount, int32 fromCharOffset)
+{
+	return Replace(replaceThis, withThis, maxReplaceCount,
+		UTF8CountBytes(fPrivateData, fromCharOffset));
 }
 
 
@@ -1520,11 +1487,10 @@ BString&
 BString::IReplaceFirst(char replaceThis, char withThis)
 {
 	char tmp[2] = { replaceThis, '\0' };
+
 	int32 pos = _IFindAfter(tmp, 0, 1);
-
-	if (pos >= 0)
-		_privateData[pos] = withThis;
-
+	if (pos >= 0 && _MakeWritable() == B_OK)
+		fPrivateData[pos] = withThis;
 	return *this;
 }
 
@@ -1533,11 +1499,10 @@ BString&
 BString::IReplaceLast(char replaceThis, char withThis)
 {
 	char tmp[2] = { replaceThis, '\0' };
+
 	int32 pos = _IFindBefore(tmp, Length(), 1);
-
-	if (pos >= 0)
-		_privateData[pos] = withThis;
-
+	if (pos >= 0 && _MakeWritable() == B_OK)
+		fPrivateData[pos] = withThis;
 	return *this;
 }
 
@@ -1545,60 +1510,70 @@ BString::IReplaceLast(char replaceThis, char withThis)
 BString&
 BString::IReplaceAll(char replaceThis, char withThis, int32 fromOffset)
 {
-	CHECK_PARAM(fromOffset >= 0, "'fromOffset' must not be negative!");
-
 	char tmp[2] = { replaceThis, '\0' };
+	fromOffset = min_clamp0(fromOffset, Length());
+	int32 pos = _IFindAfter(tmp, fromOffset, 1);
 
-	for (int32 pos = min_clamp0(fromOffset, Length());;) {
-		pos = _IFindAfter(tmp, pos, 1);
-		if (pos < 0)
-			break;
-		_privateData[pos] = withThis;
+	if (pos >= 0 && _MakeWritable() == B_OK) {
+		fPrivateData[pos] = withThis;
+		for (pos = pos;;) {
+			pos = _IFindAfter(tmp, pos, 1);
+			if (pos < 0)
+				break;
+			fPrivateData[pos] = withThis;
+		}
 	}
 	return *this;
 }
 
 
 BString&
-BString::IReplace(char replaceThis, char withThis, int32 maxReplaceCount, int32 fromOffset)
+BString::IReplace(char replaceThis, char withThis, int32 maxReplaceCount,
+	int32 fromOffset)
 {
-	CHECK_PARAM(fromOffset >= 0, "'fromOffset' must not be negative!");
-
 	char tmp[2] = { replaceThis, '\0' };
+	fromOffset = min_clamp0(fromOffset, Length());
+	int32 pos = _IFindAfter(tmp, fromOffset, 1);
 
-	if (_privateData == NULL)
+	if (maxReplaceCount > 0 && pos >= 0 && _MakeWritable() == B_OK) {
+		fPrivateData[pos] = withThis;
+		maxReplaceCount--;
+		for (pos = pos;  maxReplaceCount > 0; maxReplaceCount--) {
+			pos = _IFindAfter(tmp, pos, 1);
+			if (pos < 0)
+				break;
+			fPrivateData[pos] = withThis;
+		}
+	}
+
+	return *this;
+}
+
+
+BString&
+BString::IReplaceFirst(const char* replaceThis, const char* withThis)
+{
+	if (!replaceThis || !withThis || IFindFirst(replaceThis) < 0)
 		return *this;
 
-	for (int32 pos = min_clamp0(fromOffset,Length());
-			maxReplaceCount > 0;   maxReplaceCount--) {
-		pos = _IFindAfter(tmp, pos, 1);
-		if (pos < 0)
-			break;
-		_privateData[pos] = withThis;
-	}
-	return *this;
-}
-
-
-BString&
-BString::IReplaceFirst(const char *replaceThis, const char *withThis)
-{
+	if (_MakeWritable() != B_OK)
+		return *this;
 	return _DoReplace(replaceThis, withThis, 1, 0, IGNORE_CASE);
 }
 
 
 BString&
-BString::IReplaceLast(const char *replaceThis, const char *withThis)
+BString::IReplaceLast(const char* replaceThis, const char* withThis)
 {
-	if (replaceThis == NULL)
+	if (!replaceThis || !withThis)
 		return *this;
 
-	int32 firstStringLength = strlen(replaceThis);
-	int32 pos = _IFindBefore(replaceThis, Length(), firstStringLength);
+	int32 replaceThisLength = strlen(replaceThis);
+	int32 pos = _IFindBefore(replaceThis, Length(), replaceThisLength);
 
 	if (pos >= 0) {
-		int32 len = (withThis ? strlen(withThis) : 0);
-		int32 difference = len - firstStringLength;
+		int32 withThisLength = strlen(withThis);
+		int32 difference = withThisLength - replaceThisLength;
 
 		if (difference > 0) {
 			if (!_OpenAtBy(pos, difference))
@@ -1606,9 +1581,11 @@ BString::IReplaceLast(const char *replaceThis, const char *withThis)
 		} else if (difference < 0) {
 			if (!_ShrinkAtBy(pos, -difference))
 				return *this;
+		} else {
+			if (_MakeWritable() != B_OK)
+				return *this;
 		}
-		memcpy(_privateData + pos, withThis, len);
-
+		memcpy(fPrivateData + pos, withThis, withThisLength);
 	}
 
 	return *this;
@@ -1616,65 +1593,84 @@ BString::IReplaceLast(const char *replaceThis, const char *withThis)
 
 
 BString&
-BString::IReplaceAll(const char *replaceThis, const char *withThis, int32 fromOffset)
+BString::IReplaceAll(const char* replaceThis, const char* withThis,
+	int32 fromOffset)
 {
-	CHECK_PARAM(fromOffset >= 0, "'fromOffset' must not be negative!");
+	if (!replaceThis || !withThis || IFindFirst(replaceThis) < 0)
+		return *this;
+
+	if (_MakeWritable() != B_OK)
+		return *this;
+
 	return _DoReplace(replaceThis, withThis, REPLACE_ALL,
-							 min_clamp0(fromOffset, Length()), IGNORE_CASE);
+		min_clamp0(fromOffset, Length()), IGNORE_CASE);
 }
 
 
 BString&
-BString::IReplace(const char *replaceThis, const char *withThis, int32 maxReplaceCount, int32 fromOffset)
+BString::IReplace(const char* replaceThis, const char* withThis,
+	int32 maxReplaceCount, int32 fromOffset)
 {
-	CHECK_PARAM(fromOffset >= 0, "'fromOffset' must not be negative!");
+	if (!replaceThis || !withThis || maxReplaceCount <= 0
+		|| FindFirst(replaceThis) < 0)
+		return *this;
+
+	if (_MakeWritable() != B_OK)
+		return *this;
+
 	return _DoReplace(replaceThis, withThis, maxReplaceCount,
-							 min_clamp0(fromOffset, Length()), IGNORE_CASE);
+		min_clamp0(fromOffset, Length()), IGNORE_CASE);
 }
 
 
 BString&
-BString::ReplaceSet(const char *setOfChars, char with)
+BString::ReplaceSet(const char* setOfBytes, char with)
 {
-	if (setOfChars == NULL)
+	if (!setOfBytes || strcspn(fPrivateData, setOfBytes) >= uint32(Length()))
+		return *this;
+
+	if (_MakeWritable() != B_OK)
 		return *this;
 
 	int32 offset = 0;
 	int32 length = Length();
-
 	for (int32 pos;;) {
-		pos = strcspn(String() + offset, setOfChars);
+		pos = strcspn(fPrivateData + offset, setOfBytes);
 
 		offset += pos;
 		if (offset >= length)
 			break;
 
-		_privateData[offset] = with;
+		fPrivateData[offset] = with;
 		offset++;
 	}
 
 	return *this;
 }
 
-BString&
-BString::ReplaceSet(const char *setOfChars, const char *with)
-{
-	int32 withLen = with ? strlen(with) : 0;
-	if (withLen == 1)
-		// delegate simple case:
-		return ReplaceSet( setOfChars, *with);
 
-	if (setOfChars == NULL || _privateData == NULL)
+BString&
+BString::ReplaceSet(const char* setOfBytes, const char* with)
+{
+	if (!setOfBytes || !with
+		|| strcspn(fPrivateData, setOfBytes) >= uint32(Length()))
 		return *this;
 
-	PosVect positions;
+	// delegate simple case
+	int32 withLen = strlen(with);
+	if (withLen == 1)
+		return ReplaceSet(setOfBytes, *with);
 
+	if (_MakeWritable() != B_OK)
+		return *this;
+
+	int32 pos = 0;
 	int32 searchLen = 1;
 	int32 len = Length();
-	int32 pos = 0;
-	for (int32 offset = 0; offset < len; offset += (pos+searchLen))
-	{
-		pos = strcspn(_privateData + offset, setOfChars);
+
+	PosVect positions;
+	for (int32 offset = 0; offset < len; offset += (pos + searchLen)) {
+		pos = strcspn(fPrivateData + offset, setOfBytes);
 		if (pos + offset >= len)
 			break;
 		if (!positions.Add(offset + pos))
@@ -1686,249 +1682,306 @@ BString::ReplaceSet(const char *setOfChars, const char *with)
 }
 
 
-/*---- Unchecked char access -----------------------------------------------*/
-
-// operator[]
-/*! \brief Returns a reference to the data at the given offset.
-
-	This function can be used to read a byte or to change its value.
-	\param index The index (zero based) of the byte to get.
-	\return Returns a reference to the specified byte.
-*/
-char &
-BString::operator[](int32 index)
+BString&
+BString::ReplaceCharsSet(const char* setOfChars, const char* with)
 {
-	return _privateData[index];
+	if (!setOfChars || !with)
+		return *this;
+
+	int32 setCharCount = UTF8CountChars(setOfChars, -1);
+	if ((uint32)setCharCount == strlen(setOfChars)) {
+		// no multi-byte chars at all
+		return ReplaceSet(setOfChars, with);
+	}
+
+	BString setString(setOfChars);
+	BString result;
+
+	int32 withLength = strlen(with);
+	int32 charCount = CountChars();
+	for (int32 i = 0; i < charCount; i++) {
+		int32 charLength;
+		const char* sourceChar = CharAt(i, &charLength);
+		bool match = false;
+
+		for (int32 j = 0; j < setCharCount; j++) {
+			int32 setCharLength;
+			const char* setChar = setString.CharAt(j, &setCharLength);
+			if (charLength == setCharLength
+				&& memcmp(sourceChar, setChar, charLength) == 0) {
+				match = true;
+				break;
+			}
+		}
+
+		if (match)
+			result.Append(with, withLength);
+		else
+			result.Append(sourceChar, charLength);
+	}
+
+	*this = result;
+	return *this;
 }
 
 
-/*---- Fast low-level manipulation -----------------------------------------*/
+//	#pragma mark - Unchecked char access
+
+
+#if __GNUC__ > 3
+BStringRef
+BString::operator[](int32 index)
+{
+	return BStringRef(*this, index);
+}
+#else
+char&
+BString::operator[](int32 index)
+{
+	if (_MakeWritable() != B_OK) {
+		static char invalid;
+		return invalid;
+	}
+
+	_ReferenceCount() = -1;
+		// mark string as unshareable
+
+	return fPrivateData[index];
+}
+#endif
+
+
+const char*
+BString::CharAt(int32 charIndex, int32* bytes) const
+{
+	int32 offset = UTF8CountBytes(fPrivateData, charIndex);
+	if (bytes != NULL)
+		*bytes = UTF8NextCharLen(fPrivateData + offset);
+	return fPrivateData + offset;
+}
+
+
+bool
+BString::CharAt(int32 charIndex, char* buffer, int32* bytes) const
+{
+	int32 length;
+	const char* charAt = CharAt(charIndex, &length);
+	if (bytes != NULL) {
+		if (*bytes < length)
+			return false;
+		*bytes = length;
+	}
+
+	memcpy(buffer, charAt, length);
+	return true;
+}
+
+
+//	#pragma mark - Fast low-level manipulation
+
+
 char*
 BString::LockBuffer(int32 maxLength)
 {
-	_SetUsingAsCString(true); //debug
+	int32 length = Length();
+	if (maxLength > length)
+		length = maxLength;
 
-	int32 len = Length();
+	if (_MakeWritable(length, true) != B_OK)
+		return NULL;
 
-	if (maxLength > len) {
-		if (!_GrowBy(maxLength - len))
-			return NULL;
-		if (!len && _privateData)
-			// if string was empty before call to LockBuffer(), we make sure the
-			// buffer represents an empty c-string:
-			*_privateData = '\0';
-	} else if (!maxLength && !len) {
-		// special case for unallocated string, we return an empty c-string:
-		return const_cast<char*>(String());
-	}
+	_ReferenceCount() = -1;
+		// mark unshareable
 
-	return _privateData;
+	return fPrivateData;
 }
 
 
 BString&
 BString::UnlockBuffer(int32 length)
 {
-	_SetUsingAsCString(false); //debug
+	if (length > 0)
+		length = min_clamp0(length, Length());
+	else
+		length = fPrivateData == NULL ? 0 : strlen(fPrivateData);
 
-	if (length < 0)
-		length = (_privateData == NULL) ? 0 : strlen(_privateData);
-
-	if (length != Length())
-		_GrowBy(length - Length());
+	if (_Resize(length) != NULL) {
+		fPrivateData[length] = '\0';
+		_ReferenceCount() = 1;
+			// mark shareable again
+	}
 
 	return *this;
 }
 
 
-/*---- Uppercase<->Lowercase ------------------------------------------------*/
-// ToLower
-/*! \brief Converts the BString to lowercase
-	\return This function always returns *this .
-*/
+//	#pragma mark - Uppercase <-> Lowercase
+
+
 BString&
 BString::ToLower()
 {
 	int32 length = Length();
-	for (int32 count = 0; count < length; count++)
-			_privateData[count] = tolower(_privateData[count]);
-
+	if (length > 0 && _MakeWritable() == B_OK) {
+		for (int32 count = 0; count < length; count++)
+			fPrivateData[count] = tolower(fPrivateData[count]);
+	}
 	return *this;
 }
 
 
-// ToUpper
-/*! \brief Converts the BString to uppercase
-	\return This function always returns *this .
-*/
 BString&
 BString::ToUpper()
 {
 	int32 length = Length();
-	for (int32 count = 0; count < length; count++)
-			_privateData[count] = toupper(_privateData[count]);
-
+	if (length > 0 && _MakeWritable() == B_OK) {
+		for (int32 count = 0; count < length; count++)
+			fPrivateData[count] = toupper(fPrivateData[count]);
+	}
 	return *this;
 }
 
 
-// Capitalize
-/*! \brief Converts the first character to uppercase, rest to lowercase
-	\return This function always returns *this .
-*/
 BString&
 BString::Capitalize()
 {
-	if (_privateData == NULL)
-		return *this;
-
-	_privateData[0] = toupper(_privateData[0]);
 	int32 length = Length();
 
-	for (int32 count = 1; count < length; count++)
-			_privateData[count] = tolower(_privateData[count]);
-
+	if (length > 0 && _MakeWritable() == B_OK) {
+		fPrivateData[0] = toupper(fPrivateData[0]);
+		for (int32 count = 1; count < length; count++)
+			fPrivateData[count] = tolower(fPrivateData[count]);
+	}
 	return *this;
 }
 
 
-// CapitalizeEachWord
-/*! \brief Converts the first character of every word to uppercase, rest to lowercase.
-
-	Converts the first character of every "word" (series of alpabetical characters
-	separated by non alphabetical characters) to uppercase, and the rest to lowercase.
-	\return This function always returns *this .
-*/
 BString&
 BString::CapitalizeEachWord()
 {
-	if (_privateData == NULL)
-		return *this;
-
-	int32 count = 0;
 	int32 length = Length();
 
-	do {
-		// Find the first alphabetical character...
-		for(; count < length; count++) {
-			if (isalpha(_privateData[count])) {
-				// ...found! Convert it to uppercase.
-				_privateData[count] = toupper(_privateData[count]);
-				count++;
-				break;
+	if (length > 0 && _MakeWritable() == B_OK) {
+		int32 count = 0;
+		do {
+			// Find the first alphabetical character...
+			for (; count < length; count++) {
+				if (isalpha(fPrivateData[count])) {
+					// ...found! Convert it to uppercase.
+					fPrivateData[count] = toupper(fPrivateData[count]);
+					count++;
+					break;
+				}
 			}
-		}
-		// Now find the first non-alphabetical character,
-		// and meanwhile, turn to lowercase all the alphabetical ones
-		for(; count < length; count++) {
-			if (isalpha(_privateData[count]))
-				_privateData[count] = tolower(_privateData[count]);
-			else
-				break;
-		}
-	} while (count < length);
 
-	return *this;
-}
-
-
-/*----- Escaping and Deescaping --------------------------------------------*/
-BString&
-BString::CharacterEscape(const char *original, const char *setOfCharsToEscape, char escapeWith)
-{
-	SetTo(original);
-	CharacterEscape(setOfCharsToEscape, escapeWith);
-
-	return *this;
-}
-
-
-BString&
-BString::CharacterEscape(const char *setOfCharsToEscape, char escapeWith)
-{
-	if (setOfCharsToEscape == NULL || _privateData == NULL)
-		return *this;
-
-	PosVect positions;
-	int32 len = Length();
-	int32 pos = 0;
-	for (int32 offset = 0; offset < len; offset += pos + 1) {
-		if ((pos = strcspn(_privateData + offset, setOfCharsToEscape)) < len - offset)
-			if (!positions.Add(offset + pos))
-				return *this;
-	}
-
-	uint32 count = positions.CountItems();
-	int32 newLength = len + count;
-	if (!newLength) {
-		_GrowBy( -len);
-		return *this;
-	}
-	int32 lastPos = 0;
-	char* oldAdr = _privateData;
-	char* newData = (char*)malloc(newLength + sizeof(int32) + 1);
-	if (newData) {
-		newData += sizeof(int32);
-		char* newAdr = newData;
-		for (uint32 i = 0; i < count; ++i) {
-			pos = positions.ItemAt( i);
-			len = pos-lastPos;
-			if (len > 0) {
-				memcpy(newAdr, oldAdr, len);
-				oldAdr += len;
-				newAdr += len;
+			// Now find the first non-alphabetical character,
+			// and meanwhile, turn to lowercase all the alphabetical ones
+			for (; count < length; count++) {
+				if (isalpha(fPrivateData[count]))
+					fPrivateData[count] = tolower(fPrivateData[count]);
+				else
+					break;
 			}
-			*newAdr++ = escapeWith;
-			*newAdr++ = *oldAdr++;
-			lastPos = pos + 1;
-		}
-		len = Length() + 1 - lastPos;
-		if (len > 0)
-			memcpy(newAdr, oldAdr, len);
-
-		free(_privateData - sizeof(int32));
-		_privateData = newData;
-		_privateData[newLength] = 0;
-		_SetLength( newLength);
+		} while (count < length);
 	}
+	return *this;
+}
 
+
+//	#pragma mark - Escaping and De-escaping
+
+
+BString&
+BString::CharacterEscape(const char* original,
+						 const char* setOfCharsToEscape, char escapeWith)
+{
+	if (setOfCharsToEscape)
+		_DoCharacterEscape(original, setOfCharsToEscape, escapeWith);
 	return *this;
 }
 
 
 BString&
-BString::CharacterDeescape(const char *original, char escapeChar)
+BString::CharacterEscape(const char* setOfCharsToEscape, char escapeWith)
 {
-	SetTo(original);
-	CharacterDeescape(escapeChar);
-
+	if (setOfCharsToEscape && Length() > 0)
+		_DoCharacterEscape(fPrivateData, setOfCharsToEscape, escapeWith);
 	return *this;
+}
+
+
+BString&
+BString::CharacterDeescape(const char* original, char escapeChar)
+{
+	return _DoCharacterDeescape(original, escapeChar);
 }
 
 
 BString&
 BString::CharacterDeescape(char escapeChar)
 {
-	const char temp[2] = {escapeChar, 0};
-	return _DoReplace(temp, "", REPLACE_ALL, 0, KEEP_CASE);
+	if (Length() > 0)
+		_DoCharacterDeescape(fPrivateData, escapeChar);
+	return *this;
 }
 
 
-/*---- Simple sprintf replacement calls ------------------------------------*/
-/*---- Slower than sprintf but type and overflow safe ----------------------*/
+//	#pragma mark - Trimming
+
+
 BString&
-BString::operator<<(const char *str)
+BString::Trim()
 {
-	if (str != NULL)
-		_DoAppend(str, strlen(str));
+	const char* string = String();
+
+	int32 startCount = 0;
+	while (isspace(string[startCount])) {
+		startCount++;
+	}
+
+	int32 endCount = 0;
+	while (isspace(string[Length() - endCount - 1])) {
+		endCount++;
+	}
+
+	if (startCount == 0 && endCount == 0)
+		return *this;
+
+	// We actually need to trim
+
+	size_t length = Length() - startCount - endCount;
+	if (startCount == 0) {
+		_MakeWritable(length, true);
+	} else if (_MakeWritable() == B_OK) {
+		memmove(fPrivateData, fPrivateData + startCount, length);
+		fPrivateData[length] = '\0';
+		_SetLength(length);
+	}
+
+	return *this;
+}
+
+
+//	#pragma mark - Insert
+
+
+BString&
+BString::operator<<(const char* string)
+{
+	if (string != NULL) {
+		int32 length = strlen(string);
+		if (length > 0)
+			_DoAppend(string, length);
+	}
 	return *this;
 }
 
 
 BString&
-BString::operator<<(const BString &string)
+BString::operator<<(const BString& string)
 {
-	_DoAppend(string.String(), string.Length());
+	if (string.Length() > 0)
+		_DoAppend(string.String(), string.Length());
 	return *this;
 }
 
@@ -1944,40 +1997,44 @@ BString::operator<<(char c)
 BString&
 BString::operator<<(int i)
 {
-	char num[64];
-	sprintf(num, "%d", i);
+	char num[32];
+	int32 length = snprintf(num, sizeof(num), "%d", i);
 
-	return *this << num;
+	_DoAppend(num, length);
+	return *this;
 }
 
 
 BString&
 BString::operator<<(unsigned int i)
 {
-	char num[64];
-	sprintf(num, "%u", i);
+	char num[32];
+	int32 length = snprintf(num, sizeof(num), "%u", i);
 
-	return *this << num;
+	_DoAppend(num, length);
+	return *this;
 }
 
 
 BString&
 BString::operator<<(unsigned long i)
 {
-	char num[64];
-	sprintf(num, "%lu", i);
+	char num[32];
+	int32 length = snprintf(num, sizeof(num), "%lu", i);
 
-	return *this << num;
+	_DoAppend(num, length);
+	return *this;
 }
 
 
 BString&
 BString::operator<<(long i)
 {
-	char num[64];
-	sprintf(num, "%ld", i);
+	char num[32];
+	int32 length = snprintf(num, sizeof(num), "%ld", i);
 
-	return *this << num;
+	_DoAppend(num, length);
+	return *this;
 }
 
 
@@ -1985,9 +2042,10 @@ BString&
 BString::operator<<(unsigned long long i)
 {
 	char num[64];
-	sprintf(num, "%llu", i);
+	int32 length = snprintf(num, sizeof(num), "%llu", i);
 
-	return *this << num;
+	_DoAppend(num, length);
+	return *this;
 }
 
 
@@ -1995,9 +2053,10 @@ BString&
 BString::operator<<(long long i)
 {
 	char num[64];
-	sprintf(num, "%lld", i);
+	int32 length = snprintf(num, sizeof(num), "%lld", i);
 
-	return *this << num;
+	_DoAppend(num, length);
+	return *this;
 }
 
 
@@ -2005,120 +2064,247 @@ BString&
 BString::operator<<(float f)
 {
 	char num[64];
-	sprintf(num, "%.2f", f);
+	int32 length = snprintf(num, sizeof(num), "%.2f", f);
 
-	return *this << num;
+	_DoAppend(num, length);
+	return *this;
 }
 
 
-/*---- Private or Reserved ------------------------------------------------*/
-char *
-BString::_Alloc(int32 dataLen)
+//	#pragma mark - Private or reserved
+
+
+/*!	Detaches this string from an eventually shared fPrivateData, ie. this makes
+	this string writable.
+*/
+status_t
+BString::_MakeWritable()
 {
-	char *dataPtr = _privateData ? _privateData - sizeof(int32) : NULL;
-	if (dataLen <= 0) {	// release buffer if requested size is 0:
-		free(dataPtr);
-		_privateData = NULL;
+	if (atomic_get(&_ReferenceCount()) > 1) {
+		// It might be shared, and this requires special treatment
+		char* newData = _Clone(fPrivateData, Length());
+		if (atomic_add(&_ReferenceCount(), -1) == 1) {
+			// someone else left, we were the last owner
+			_FreePrivateData();
+		}
+		if (newData == NULL)
+			return B_NO_MEMORY;
+
+		fPrivateData = newData;
+	}
+
+	return B_OK;
+}
+
+
+/*!	Makes this string writable, and resizes the buffer to \a length bytes (not
+	including the terminating null).
+
+	@param length The length of the new buffer in bytes.
+	@param copy If true, the current string will be copied into the new string.
+*/
+status_t
+BString::_MakeWritable(int32 length, bool copy)
+{
+	char* newData = NULL;
+
+	if (atomic_get(&_ReferenceCount()) > 1) {
+		// we might share our data with someone else
+		if (copy)
+			newData = _Clone(fPrivateData, length);
+		else
+			newData = _Allocate(length);
+
+		if (newData == NULL)
+			return B_NO_MEMORY;
+
+		if (atomic_add(&_ReferenceCount(), -1) == 1) {
+			// someone else left, we were the last owner
+			_FreePrivateData();
+		}
+	} else {
+		// we don't share our data with someone else
+		newData = _Resize(length);
+
+		if (newData == NULL)
+			return B_NO_MEMORY;
+	}
+
+	fPrivateData = newData;
+	return B_OK;
+}
+
+
+/*!	Allocates a new private data buffer with the space to store \a length bytes
+	(not including the terminating null).
+*/
+/*static*/ char*
+BString::_Allocate(int32 length)
+{
+	if (length < 0)
 		return NULL;
-	}
-	int32 allocLen = dataLen + sizeof(int32) + 1;
-	dataPtr = (char *)realloc(dataPtr, allocLen);
-	if (dataPtr) {
-		dataPtr += sizeof(int32);
-		_privateData = dataPtr;
 
-		_SetLength(dataLen);
-		_privateData[dataLen] = '\0';
-	}
-	return dataPtr;
-}
+	char* newData = (char*)malloc(length + kPrivateDataOffset + 1);
+	if (newData == NULL)
+		return NULL;
 
-void
-BString::_Init(const char *str, int32 len)
-{
-	if (_Alloc(len))
-		memcpy(_privateData, str, len);
+	newData += kPrivateDataOffset;
+	newData[length] = '\0';
+
+	// initialize reference count & length
+	data_reference_count(newData) = 1;
+	data_length(newData) = length & 0x7fffffff;
+
+	return newData;
 }
 
 
-#if ENABLE_INLINES
-inline
-#endif
-void
-BString::_DoAssign(const char *str, int32 len)
+/*!	Resizes the private data buffer. You must already have a writable buffer
+	when you call this method.
+*/
+char*
+BString::_Resize(int32 length)
 {
-	int32 curLen = Length();
+	ASSERT(_ReferenceCount() == 1 || _ReferenceCount() == -1);
 
-	if (len == curLen || _GrowBy(len - curLen))
-		memcpy(_privateData, str, len);
+	if (length == Length())
+		return fPrivateData;
+
+	char* data = fPrivateData ? fPrivateData - kPrivateDataOffset : NULL;
+	if (length < 0)
+		length = 0;
+
+	data = (char*)realloc(data, length + kPrivateDataOffset + 1);
+	if (data == NULL)
+		return NULL;
+
+	data += kPrivateDataOffset;
+
+	fPrivateData = data;
+	fPrivateData[length] = '\0';
+
+	_SetLength(length);
+	_ReferenceCount() = 1;
+
+	return data;
 }
 
 
-#if ENABLE_INLINES
-inline
-#endif
 void
-BString::_DoAppend(const char *str, int32 len)
+BString::_Init(const char* src, int32 length)
 {
-	int32 length = Length();
-	if (_GrowBy(len))
-		memcpy(_privateData + length, str, len);
+	fPrivateData = _Clone(src, length);
+	if (fPrivateData == NULL)
+		fPrivateData = _Clone(NULL, 0);
 }
 
 
 char*
-BString::_GrowBy(int32 size)
+BString::_Clone(const char* data, int32 length)
 {
-	int32 newLen = Length() + size;
-	return _Alloc(newLen);
-}
+	char* newData = _Allocate(length);
+	if (newData == NULL)
+		return NULL;
 
-
-char *
-BString::_OpenAtBy(int32 offset, int32 length)
-{
-	int32 oldLength = Length();
-
-	char* newData = _Alloc(oldLength + length);
-	if (newData != NULL)
-		memmove(_privateData + offset + length, _privateData + offset,
-				  oldLength - offset);
+	if (data != NULL && length > 0) {
+		// "data" may not span over the whole length
+		strncpy(newData, data, length);
+	}
 
 	return newData;
 }
 
 
 char*
-BString::_ShrinkAtBy(int32 offset, int32 length)
+BString::_OpenAtBy(int32 offset, int32 length)
 {
-	if (!_privateData)
-		return NULL;
 	int32 oldLength = Length();
 
-	memmove(_privateData + offset, _privateData + offset + length,
-		     oldLength - offset - length);
+	if (_MakeWritable() != B_OK)
+		return NULL;
 
-	// the following actually should never fail, since we are reducing the size...
-	return _Alloc(oldLength - length);
+	memmove(fPrivateData + offset + length, fPrivateData + offset,
+		oldLength - offset);
+	return _Resize(oldLength + length);
 }
 
 
-#if ENABLE_INLINES
-inline
-#endif
+char*
+BString::_ShrinkAtBy(int32 offset, int32 length)
+{
+	int32 oldLength = Length();
+	if (_MakeWritable() != B_OK)
+		return NULL;
+
+	memmove(fPrivateData + offset, fPrivateData + offset + length,
+		oldLength - offset - length);
+	return _Resize(oldLength - length);
+}
+
+
 void
-BString::_DoPrepend(const char *str, int32 count)
+BString::_SetLength(int32 length)
 {
-	if (_OpenAtBy(0, count))
-		memcpy(_privateData, str, count);
+	data_length(fPrivateData) = length & 0x7fffffff;
 }
 
 
-/* XXX: These could be inlined too, if they are too slow */
-int32
-BString::_FindAfter(const char *str, int32 offset, int32 strlen) const
+void
+BString::_FreePrivateData()
 {
-	const char *ptr = strstr(String() + offset, str);
+	if (fPrivateData != NULL) {
+		free(fPrivateData - kPrivateDataOffset);
+		fPrivateData = NULL;
+	}
+}
+
+
+bool
+BString::_DoAppend(const char* string, int32 length)
+{
+	int32 oldLength = Length();
+	if (_MakeWritable(oldLength + length, true) == B_OK) {
+		strncpy(fPrivateData + oldLength, string, length);
+		return true;
+	}
+	return false;
+}
+
+
+bool
+BString::_DoPrepend(const char* string, int32 length)
+{
+	// TODO: this could be optimized (allocate a new buffer, use memcpy())
+	int32 oldLength = Length();
+	if (_MakeWritable(oldLength + length, true) == B_OK) {
+		memmove(fPrivateData + length, fPrivateData, oldLength);
+		if (string && length)
+			strncpy(fPrivateData, string, length);
+		return true;
+	}
+	return false;
+}
+
+
+bool
+BString::_DoInsert(const char* string, int32 offset, int32 length)
+{
+	int32 oldLength = Length();
+	if (_MakeWritable(oldLength + length, true) == B_OK) {
+		memmove(fPrivateData + offset + length, fPrivateData + offset,
+			oldLength - offset);
+		if (string != NULL && length)
+			strncpy(fPrivateData + offset, string, length);
+		return true;
+	}
+	return false;
+}
+
+
+int32
+BString::_ShortFindAfter(const char* string, int32 len) const
+{
+	const char* ptr = strstr(String(), string);
 
 	if (ptr != NULL)
 		return ptr - String();
@@ -2128,9 +2314,9 @@ BString::_FindAfter(const char *str, int32 offset, int32 strlen) const
 
 
 int32
-BString::_IFindAfter(const char *str, int32 offset, int32 strlen) const
+BString::_FindAfter(const char* string, int32 offset, int32 length) const
 {
-	const char *ptr = strcasestr(String() + offset, str);
+	const char* ptr = strstr(String() + offset, string);
 
 	if (ptr != NULL)
 		return ptr - String();
@@ -2140,9 +2326,9 @@ BString::_IFindAfter(const char *str, int32 offset, int32 strlen) const
 
 
 int32
-BString::_ShortFindAfter(const char *str, int32 len) const
+BString::_IFindAfter(const char* string, int32 offset, int32 length) const
 {
-	const char *ptr = strstr(String(), str);
+	const char* ptr = strcasestr(String() + offset, string);
 
 	if (ptr != NULL)
 		return ptr - String();
@@ -2152,14 +2338,14 @@ BString::_ShortFindAfter(const char *str, int32 len) const
 
 
 int32
-BString::_FindBefore(const char *str, int32 offset, int32 strlen) const
+BString::_FindBefore(const char* string, int32 offset, int32 length) const
 {
-	if (_privateData) {
-		const char *ptr = _privateData + offset - strlen;
+	if (fPrivateData != NULL) {
+		const char* ptr = fPrivateData + offset - length;
 
-		while (ptr >= _privateData) {
-			if (!memcmp(ptr, str, strlen))
-				return ptr - _privateData;
+		while (ptr >= fPrivateData) {
+			if (!memcmp(ptr, string, length))
+				return ptr - fPrivateData;
 			ptr--;
 		}
 	}
@@ -2168,14 +2354,14 @@ BString::_FindBefore(const char *str, int32 offset, int32 strlen) const
 
 
 int32
-BString::_IFindBefore(const char *str, int32 offset, int32 strlen) const
+BString::_IFindBefore(const char* string, int32 offset, int32 length) const
 {
-	if (_privateData) {
-		char *ptr1 = _privateData + offset - strlen;
+	if (fPrivateData != NULL) {
+		char* ptr1 = fPrivateData + offset - length;
 
-		while (ptr1 >= _privateData) {
-			if (!strncasecmp(ptr1, str, strlen))
-				return ptr1 - _privateData;
+		while (ptr1 >= fPrivateData) {
+			if (!strncasecmp(ptr1, string, length))
+				return ptr1 - fPrivateData;
 			ptr1--;
 		}
 	}
@@ -2184,15 +2370,83 @@ BString::_IFindBefore(const char *str, int32 offset, int32 strlen) const
 
 
 BString&
-BString::_DoReplace(const char *findThis, const char *replaceWith, int32 maxReplaceCount,
-						  int32 fromOffset,	bool ignoreCase)
+BString::_DoCharacterEscape(const char* string, const char* setOfCharsToEscape,
+	char escapeChar)
+{
+	if (_MakeWritable(string_length(string), false) != B_OK)
+		return *this;
+
+	memcpy(fPrivateData, string, Length());
+
+	PosVect positions;
+	int32 length = Length();
+	int32 pos;
+	for (int32 offset = 0; offset < length; offset += pos + 1) {
+		pos = strcspn(fPrivateData + offset, setOfCharsToEscape);
+		if (pos < length - offset && !positions.Add(offset + pos))
+			return *this;
+	}
+
+	uint32 count = positions.CountItems();
+	int32 newLength = length + count;
+	if (!newLength) {
+		_Resize(0);
+		return *this;
+	}
+
+	char* newData = _Allocate(newLength);
+	if (newData) {
+		char* oldString = fPrivateData;
+		char* newString = newData;
+		int32 lastPos = 0;
+
+		for (uint32 i = 0; i < count; ++i) {
+			pos = positions.ItemAt(i);
+			length = pos - lastPos;
+			if (length > 0) {
+				memcpy(newString, oldString, length);
+				oldString += length;
+				newString += length;
+			}
+			*newString++ = escapeChar;
+			*newString++ = *oldString++;
+			lastPos = pos + 1;
+		}
+
+		length = Length() + 1 - lastPos;
+		if (length > 0)
+			memcpy(newString, oldString, length);
+
+		_FreePrivateData();
+		fPrivateData = newData;
+	}
+	return *this;
+}
+
+
+BString&
+BString::_DoCharacterDeescape(const char* string, char escapeChar)
+{
+	if (_MakeWritable(string_length(string), false) != B_OK)
+		return *this;
+
+	memcpy(fPrivateData, string, Length());
+	const char escape[2] = { escapeChar, '\0' };
+	return _DoReplace(escape, "", REPLACE_ALL, 0, KEEP_CASE);
+}
+
+
+BString&
+BString::_DoReplace(const char* findThis, const char* replaceWith,
+	int32 maxReplaceCount, int32 fromOffset, bool ignoreCase)
 {
 	if (findThis == NULL || maxReplaceCount <= 0
 		|| fromOffset < 0 || fromOffset >= Length())
 		return *this;
 
-	typedef int32 (BString::*TFindMethod)(const char *, int32, int32) const;
-	TFindMethod findMethod = ignoreCase ? &BString::_IFindAfter : &BString::_FindAfter;
+	typedef int32 (BString::*TFindMethod)(const char*, int32, int32) const;
+	TFindMethod findMethod = ignoreCase
+		? &BString::_IFindAfter : &BString::_FindAfter;
 	int32 findLen = strlen(findThis);
 
 	if (!replaceWith)
@@ -2201,10 +2455,9 @@ BString::_DoReplace(const char *findThis, const char *replaceWith, int32 maxRepl
 	int32 replaceLen = strlen(replaceWith);
 	int32 lastSrcPos = fromOffset;
 	PosVect positions;
-	for(int32 srcPos = 0;
-			maxReplaceCount > 0
-			&& (srcPos = (this->*findMethod)(findThis, lastSrcPos, findLen)) >= 0;
-			maxReplaceCount-- ) {
+	for (int32 srcPos = 0; maxReplaceCount > 0
+		&& (srcPos = (this->*findMethod)(findThis, lastSrcPos, findLen)) >= 0;
+			maxReplaceCount--) {
 		positions.Add(srcPos);
 		lastSrcPos = srcPos + findLen;
 	}
@@ -2214,102 +2467,87 @@ BString::_DoReplace(const char *findThis, const char *replaceWith, int32 maxRepl
 
 
 void
-BString::_ReplaceAtPositions(const PosVect* positions,
-											  int32 searchLen, const char* with,
-											  int32 withLen)
+BString::_ReplaceAtPositions(const PosVect* positions, int32 searchLength,
+	const char* with, int32 withLength)
 {
-	int32 len = Length();
+	int32 length = Length();
 	uint32 count = positions->CountItems();
-	int32 newLength = len + count * (withLen - searchLen);
+	int32 newLength = length + count * (withLength - searchLength);
 	if (!newLength) {
-		_GrowBy(-len);
+		_Resize(0);
 		return;
 	}
-	int32 pos;
+
+	char* newData = _Allocate(newLength);
+	if (newData == NULL)
+		return;
+
+	char* oldString = fPrivateData;
+	char* newString = newData;
 	int32 lastPos = 0;
-	char *oldAdr = _privateData;
-	char *newData = (char *)malloc(newLength + sizeof(int32) + 1);
-	if (newData) {
-		newData += sizeof(int32);
-		char *newAdr = newData;
-		for(uint32 i = 0; i < count; ++i) {
-			pos = positions->ItemAt(i);
-			len = pos - lastPos;
-			if (len > 0) {
-				memcpy(newAdr, oldAdr, len);
-				oldAdr += len;
-				newAdr += len;
-			}
-			memcpy(newAdr, with, withLen);
-			oldAdr += searchLen;
-			newAdr += withLen;
-			lastPos = pos+searchLen;
+
+	for (uint32 i = 0; i < count; ++i) {
+		int32 pos = positions->ItemAt(i);
+		length = pos - lastPos;
+		if (length > 0) {
+			memcpy(newString, oldString, length);
+			oldString += length;
+			newString += length;
 		}
-		len = Length() + 1 - lastPos;
-		if (len > 0)
-			memcpy(newAdr, oldAdr, len);
-
-		free(_privateData - sizeof(int32));
-		_privateData = newData;
-		_privateData[newLength] = 0;
-		_SetLength( newLength);
+		memcpy(newString, with, withLength);
+		oldString += searchLength;
+		newString += withLength;
+		lastPos = pos + searchLength;
 	}
+
+	length = Length() + 1 - lastPos;
+	if (length > 0)
+		memcpy(newString, oldString, length);
+
+	_FreePrivateData();
+	fPrivateData = newData;
 }
 
 
-#if ENABLE_INLINES
-inline
-#endif
-void
-BString::_SetLength(int32 length)
+//	#pragma mark - backwards compatibility
+
+
+/*!	Translates to (missing const):
+	BString& BString::operator<<(BString& string)
+*/
+extern "C" BString&
+__ls__7BStringR7BString(BString* self, BString& string)
 {
-	*((int32*)_privateData - 1) = length & 0x7fffffff;
+	return self->operator<<(string);
 }
 
 
-#if DEBUG
-// AFAIK, these are not implemented in BeOS R5
-// XXX : Test these puppies
-void
-BString::_SetUsingAsCString(bool state)
-{
-	//TODO: Implement ?
-}
+//	#pragma mark - Non-member compare for sorting, etc.
 
 
-void
-BString::_AssertNotUsingAsCString() const
-{
-	//TODO: Implement ?
-}
-#endif
-
-
-/*----- Non-member compare for sorting, etc. ------------------------------*/
 int
-Compare(const BString &string1, const BString &string2)
+Compare(const BString& string1, const BString& string2)
 {
 	return strcmp(string1.String(), string2.String());
 }
 
 
 int
-ICompare(const BString &string1, const BString &string2)
+ICompare(const BString& string1, const BString& string2)
 {
 	return strcasecmp(string1.String(), string2.String());
 }
 
 
 int
-Compare(const BString *string1, const BString *string2)
+Compare(const BString* string1, const BString* string2)
 {
 	return strcmp(string1->String(), string2->String());
 }
 
 
 int
-ICompare(const BString *string1, const BString *string2)
+ICompare(const BString* string1, const BString* string2)
 {
 	return strcasecmp(string1->String(), string2->String());
 }
-
