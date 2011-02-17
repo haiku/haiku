@@ -63,7 +63,9 @@ BGroupLayoutBuilder::GetTopLayout(BGroupLayout** _layout)
 BView*
 BGroupLayoutBuilder::TopView() const
 {
-	return TopLayout()->Owner();
+	if (BGroupLayout* layout = TopLayout())
+		return layout->Owner();
+	return NULL;
 }
 
 // GetTopView
