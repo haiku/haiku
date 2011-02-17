@@ -718,9 +718,9 @@ fs_wstat(fs_volume *_vol, fs_vnode *_node, const struct stat *st, uint32 mask)
 	if (mask & B_STAT_MODIFICATION_TIME) {
 		ERRPRINT("fs_wstat: setting modification time\n");
 
-		ni->last_access_time = st->st_atime;
-		ni->last_data_change_time = st->st_mtime;
-		ni->last_mft_change_time = st->st_ctime;
+		ni->last_access_time = timespec2ntfs(st->st_atim);
+		ni->last_data_change_time = timespec2ntfs(st->st_mtim);
+		ni->last_mft_change_time = timespec2ntfs(st->st_ctim);
 
 		notify_stat_changed(ns->id, MREF(ni->mft_no), mask);
 	}
