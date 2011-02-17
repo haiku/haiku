@@ -1,48 +1,47 @@
-1	finnish	x-vnd.Haiku-Devices	1250375801
-Order by:	DevicesView		Järjestys:
-ACPI controller	Device		ACPI-ohjain
-Memory controller	Device		Muistiohjain
-Docking station	Device		Telakka-asema
-Computer	Device		Tietokone
-Detailed	DevicesView		Yksityiskohdat
-Properties	PropertyList		Ominaisuudet
-Category	DevicesView		Luokka
-Quit	DevicesView		Poistu
-Device paths	Device		Laitepolut
-Manufacturer\t\t\t: 	Device		Valmistaja\t\t\t:
-Processor	Device		Suoritin
+1	finnish	x-vnd.Haiku-Devices	2430293984
 ACPI Information	DeviceACPI		ACPI-tiedot
-Device Name\t\t\t\t: 	Device		Laitenimi\t\t\t\t:
-Generic system peripheral	Device		Yleinen järjestelmän oheislaite
-Display controller	Device		Näyttöohjain
-Mass storage controller	Device		Massamuistilaiteohjain
+ACPI controller	Device		ACPI-ohjain
 About Devices…	DevicesView		Ohjelmasta Laitteet...
-Input device controller	Device		Syötelaiteohjain
-Device paths\t: 	Device		Laitepolut\t:
-Network controller	Device		Verkko-ohjain
-Devices\n\twritten by Pieter Panman\n\n\tBased on listdev by Jérôme Duval\n\tand the previous Devices preference\n\tby Jérôme Duval and Sikosis\n\tCopyright 2009, Haiku, Inc.\n	DevicesApplication		Laitteet\n\ttekijä: Pieter Panman\n\n\tPerustuu Jérôme Duvalin tekemään listdev-ohjelmaan\n\tja edelliseen Jérôme Duvalin ja Sikosisin\n\tlaitepreferenssiin\n\tCopyright 2009, Haiku, Inc.\n
-Driver used	Device		Käytetty laite
-Driver used\t\t\t\t: 	Device		Käytetty laite\t\t\t\t:
-Bus	DevicesView		Väylä
-Communication controller	Device		Viestintäohjain
 Basic information	DevicesView		Perustiedot
-PCI Information	DevicePCI		PCI-tiedot
-Manufacturer:	Device		Valmistaja:
-Multimedia controller	Device		Multimediaohjain
-Device name:	Device		Laitenimi:
-Report compatibility	DevicesView		Ilmoita yhteensopivuudesta
-about	DevicesApplication		ohjelmasta
-Signal processing controller	Device		Signaalikäsittelyohjain
-Serial bus controller	Device		Sarjaväyläohjain
-Wireless controller	Device		Langaton ohjain
-Device name	Device		Laitenimi
-Manufacturer	Device		Valmistaja
-Intelligent controller	Device		Älyohjain
-Satellite communications controller	Device		Satelliittiviestintäohjain
 Bridge	Device		Silta
-Refresh devices	DevicesView		Virkistä laitteita
+Bus	DevicesView		Väylä
+Category	DevicesView		Luokka
+Communication controller	Device		Viestintäohjain
+Computer	Device		Tietokone
 Connection	DevicesView		Yhteys
-Generate system information	DevicesView		Tuota järjestelmätiedot
-Encryption controller	Device		Salausohjain
-Unclassified device	Device		Luokittelematon laite
+Detailed	DevicesView		Yksityiskohdat
+Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Laitenimi\t\t\t\t: %Name%\nValmistaja\t\t\t: %Manufacturer%\nKäytetty ajuri\t\t\t\t: %DriverUsed%\nLaitepolut\t: %DevicePaths%
+Device name	Device		Laitenimi
+Device name:	Device		Laitenimi:
+Device paths	Device		Laitepolut
+Devices	DevicesApplication		Laitteet
 Devices	DevicesView		Laitteet
+Devices\n\twritten by Pieter Panman\n\n\tBased on listdev by Jérôme Duval\n\tand the previous Devices preference\n\tby Jérôme Duval and Sikosis\n\tCopyright 2009, Haiku, Inc.\n	DevicesApplication		Laitteet\n\ttekijä: Pieter Panman\n\n\tPerustuu Jérôme Duvalin tekemään listdev-ohjelmaan\n\tja edelliseen Jérôme Duvalin  ja Sikosisin\n\tlaitepreferenssiin\n\tCopyright 2009, Haiku, Inc.\n
+Display controller	Device		Näyttöohjain
+Docking station	Device		Telakka-asema
+Driver used	Device		Käytetty laite
+Encryption controller	Device		Salausohjain
+Generate system information	DevicesView		Tuota järjestelmätiedot
+Generic system peripheral	Device		Yleinen järjestelmän oheislaite
+Input device controller	Device		Syötelaiteohjain
+Intelligent controller	Device		Älyohjain
+Manufacturer	Device		Valmistaja
+Manufacturer:	Device		Valmistaja:
+Mass storage controller	Device		Massamuistilaiteohjain
+Memory controller	Device		Muistiohjain
+Multimedia controller	Device		Multimediaohjain
+Network controller	Device		Verkko-ohjain
+None	Device		Ei mikään
+OK	DevicesApplication		Valmis
+Order by:	DevicesView		Järjestys:
+PCI Information	DevicePCI		PCI-tiedot
+Processor	Device		Suoritin
+Properties	PropertyList		Ominaisuudet
+Quit	DevicesView		Poistu
+Refresh devices	DevicesView		Virkistä laitteita
+Report compatibility	DevicesView		Ilmoita yhteensopivuudesta
+Satellite communications controller	Device		Satelliittiviestintäohjain
+Serial bus controller	Device		Sarjaväyläohjain
+Signal processing controller	Device		Signaalikäsittelyohjain
+Unclassified device	Device		Luokittelematon laite
+Wireless controller	Device		Langaton ohjain

@@ -1,13 +1,13 @@
 1	finnish	x-vnd.Haiku-Time	2846531571
-OK	Time		Valmis
-\nNow: 	Time		\nNyt:
-Preview time:	Time		Esikatseluaika:
-about	Time		ohjelmasta
-Set time zone	Time		Aseta aikavyöhyke
-Time	Time		Aika
-Date & Time	Time		Päivämäärä & Aika
-Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Päivämäärä & Aika, tekijä:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
 <Other>	Time		<muut>
 Current time:	Time		Nykyinen aika:
-Time zone	Time		Aikavyöhyke
+Date & Time	Time		Päivämäärä & Aika
+OK	Time		Valmis
+Preview time:	Time		Esikatseluaika:
 Revert	Time		Palauta
+Set time zone	Time		Aseta aikavyöhyke
+Time	Time		Aika
+Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Päivämäärä & Aika, tekijä::\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
+Time zone	Time		Aikavyöhyke
+\nNow: 	Time		\nNyt
+about	Time		ohjelmasta

@@ -1,14 +1,14 @@
 1	finnish	x-vnd.Haiku-Keyboard	914649575
-Keyboard	KeyboardWindow		Näppäimistö
-Written by Andrew Edward McCall	KeyboardApplication		Tekijä: Andrew Edward McCall
-Typing test area	KeyboardView		Kirjoitustestausalue
 Defaults	KeyboardWindow		Oletukset
-Key repeat rate	KeyboardView		Näppäintoistotaajuus
-Revert	KeyboardWindow		Palauta
 Delay until key repeat	KeyboardView		Näppäimen toistoviive
-OK	KeyboardApplication		Valmis
 Fast	KeyboardView		Nopea
+Key repeat rate	KeyboardView		Näppäintoistotaajuus
+Keyboard	KeyboardWindow		Näppäimistö
+Long	KeyboardView		Pitkä
+OK	KeyboardApplication		Valmis
+Revert	KeyboardWindow		Palauta
+Short	KeyboardView		Lyhyt
 Slow	KeyboardView		Hidas
 Something has gone wrong!	KeyboardApplication		Jotain meni väärin!
-Long	KeyboardView		Pitkä
-Short	KeyboardView		Lyhyt
+Typing test area	KeyboardView		Kirjoitustestausalue
+Written by Andrew Edward McCall	KeyboardApplication		Tekijä: Andrew Edward McCall

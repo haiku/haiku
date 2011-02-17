@@ -1,19 +1,19 @@
 1	finnish	system	2686335505
+%.2f TiB	StringForSize		%.2f tebitavua
 %3.2f GiB	StringForSize		%3.2f gibitavua
 %3.2f KiB	StringForSize		%3.2f kibitavua
-%d bytes	StringForSize		%d tavua
-%.2f TiB	StringForSize		%.2f tebitavua
 %3.2f MiB	StringForSize		%3.2f mebitavua
-Green:	ColorControl		Vihreä:
-Red:	ColorControl		Punainen:
+%d bytes	StringForSize		%d tavua
+About…	AboutWindow		Ohjelmasta...
 Blue:	ColorControl		Sininen:
 Close	AboutWindow		Sulje
-Written by:	AboutWindow		Tekijä:
-About…	AboutWindow		Ohjelmasta...
+Copy	TextView		Kopioi
 Copyright © %years% Haiku, Inc.	AboutWindow		Copyright © %years% Haiku, Inc.
 Cut	TextView		Leikkaa
-Copy	TextView		Kopioi
+Green:	ColorControl		Vihreä:
 Paste	TextView		Liitä
+Red:	ColorControl		Punainen:
 Redo	TextView		Tee uudelleen
 Select All	TextView		Valitse kaikki
 Undo	TextView		Peru
+Written by:	AboutWindow		Tekijä:

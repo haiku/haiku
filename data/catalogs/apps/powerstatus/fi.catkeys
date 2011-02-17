@@ -1,50 +1,50 @@
 1	finnish	x-vnd.Haiku-PowerStatus	1564851502
-Design capacity low warning: 	PowerStatus		Suunnittelukapasiteetti alhainen -varoitus
-Show percent	PowerStatus		Näytä prosenttiluku
-PowerStatus settings	PowerStatus		Virtatila-asetukset
-Design capacity: 	PowerStatus		Suunnittelukapasiteetti:
-mW	PowerStatus		mW
-about	PowerStatus		ohjelmasta
-Type: 	PowerStatus		Tyyppi:
-non-rechargeable	PowerStatus		ei-uudelleenladattava
-Empty battery slot	PowerStatus		Tyhjä akkulokero
-mV	PowerStatus		mV
-Run in window	PowerStatus		Suorita ikkunassa
 ACPI connect\n	PowerStatus		ACPI-yhdistä\n
-mWh	PowerStatus		mWh
-Battery info…	PowerStatus		Akkutiedot...
-Show time	PowerStatus		Näytä aika
-Last full charge: 	PowerStatus		Viimeinen täysi lataus:
-No power interface found.\n	PowerStatus		Virtalähderajapintaa ei löytynyt.\n
-Battery unused	PowerStatus		Akku käyttämätön
-Extended battery info	PowerStatus		Laajennetut akkutiedot
-try %s\n	PowerStatus		yritä %s\n
-mA	PowerStatus		mA
-Current rate: 	PowerStatus		Virtamäärä:
-discharging	PowerStatus		puretaan latausta
-Show text label	PowerStatus		Näytä tekstinimiö
-About…	PowerStatus		Ohjelmasta...
-Model number: 	PowerStatus		Mallinumero:
-Install in Deskbar	PowerStatus		Asenna Työpöytäpalkkiin
-mAh	PowerStatus		mAh
-Capacity: 	PowerStatus		Kapasiteetti:
-Battery discharging	PowerStatus		Akkulatauksen purkaminen
-Serial number: 	PowerStatus		Sarjanumero:
-Capacity granularity 1: 	PowerStatus		Kapasiteettirakeisuus 1:
-OK	PowerStatus		Valmis
-OEM info: 	PowerStatus		OEM-tiedot:
-Design voltage: 	PowerStatus		Suunnittelujännite:
 ACPI driver found\n	PowerStatus		ACPI-ajuri löytyi\n
-PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		Virtatila\ntekijä: Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
+About…	PowerStatus		Ohjelmasta...
 Battery charging	PowerStatus		Akkulataus
-Design capacity warning: 	PowerStatus		Suunnittelukapasiteettivaroitus:
+Battery discharging	PowerStatus		Akkulatauksen purkaminen
 Battery info	PowerStatus		Akkutiedot
-Quit	PowerStatus		Poistu
-rechargeable	PowerStatus		uudelleenladattava
-charging	PowerStatus		ladataan
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Voit suorittaa Virtatilan ikkunassa tai asentaa sen Työpöytäpalkkiin.
-Power status box	PowerStatus		Virtatilalaatikko
-Show status icon	PowerStatus		Näytä tilakuvake
+Battery info…	PowerStatus		Akkutiedot...
+Battery unused	PowerStatus		Akku käyttämätön
+Capacity granularity 1: 	PowerStatus		Kapasiteettirakeisuus 1:
 Capacity granularity 2: 	PowerStatus		Kapasiteettirakeisuus 2:
+Capacity: 	PowerStatus		Kapasiteetti:
+Current rate: 	PowerStatus		Virtamäärä:
+Design capacity low warning: 	PowerStatus		Suunnittelukapasiteetti alhainen -varoitus
+Design capacity warning: 	PowerStatus		Suunnittelukapasiteettivaroitus:
+Design capacity: 	PowerStatus		Suunnittelukapasiteetti:
+Design voltage: 	PowerStatus		Suunnittelujännite:
+Empty battery slot	PowerStatus		Tyhjä akkulokero
+Extended battery info	PowerStatus		Laajennetut akkutiedot
+Install in Deskbar	PowerStatus		Asenna Työpöytäpalkkiin
+Last full charge: 	PowerStatus		Viimeinen täysi lataus:
+Model number: 	PowerStatus		Mallinumero:
+No power interface found.\n	PowerStatus		Virtalähderajapintaa ei löytynyt.\n
+OEM info: 	PowerStatus		OEM-tiedot:
+OK	PowerStatus		Valmis
+Power status box	PowerStatus		Virtatilalaatikko
+PowerStatus settings	PowerStatus		Virtatila-asetukset
+PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		Virtatila\ntekijä: Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
+Quit	PowerStatus		Poistu
+Run in window	PowerStatus		Suorita ikkunassa
+Serial number: 	PowerStatus		Sarjanumero:
+Show percent	PowerStatus		Näytä prosenttiluku
+Show status icon	PowerStatus		Näytä tilakuvake
+Show text label	PowerStatus		Näytä tekstinimiö
+Show time	PowerStatus		Näytä aika
 Technology: 	PowerStatus		Teknologia:
+Type: 	PowerStatus		Tyyppi:
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Voit suorittaa Virtatilan ikkunassa tai asentaa sen Työpöytäpalkkiin.
+about	PowerStatus		ohjelmasta
+charging	PowerStatus		ladataan
+discharging	PowerStatus		puretaan latausta
+mA	PowerStatus		mA
+mAh	PowerStatus		mAh
+mV	PowerStatus		mV
+mW	PowerStatus		mW
+mWh	PowerStatus		mWh
 no battery	PowerStatus		ei akkua
+non-rechargeable	PowerStatus		ei-uudelleenladattava
+rechargeable	PowerStatus		uudelleenladattava
+try %s\n	PowerStatus		yritä %s\n

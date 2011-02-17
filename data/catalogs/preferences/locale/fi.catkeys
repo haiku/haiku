@@ -1,25 +1,25 @@
 1	finnish	x-vnd.Haiku-Locale	2295953467
-Available languages	Locale Preflet Window		Valittavat kielet
-Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Valittavia kieliä ei löydy! Et voi käyttää tätä asetusohjelmaa!
-Long format:	TimeFormatSettings		Pitkä muoto:
-Currency	TimeFormatSettings		Valuutta
-Short format:	TimeFormatSettings		Lyhyt muoto:
-Language	Locale Preflet Window		Kieli
-Preferred languages	Locale Preflet Window		Toivotut kielet
-Numbers	TimeFormatSettings		Numerot
-24 hour	TimeFormatSettings		24 tuntia
-Defaults	Locale Preflet Window		Oletukset
-Revert	Locale Preflet Window		Palauta
-OK	Locale Preflet Window		Valmis
-Time	TimeFormatSettings		Aika
-Date	TimeFormatSettings		Päivämäärä
 12 hour	TimeFormatSettings		12 tuntia
-Locale	Locale Preflet		Maa-asetus
-already chosen	LanguageListView		jo valittu
-Negative:	TimeFormatSettings		Negatiivinen:
-Use month/day-names from preferred language	TimeFormatSettings		Käytä ensisijaisen kielen kuukausi/päivä -nimiä
+24 hour	TimeFormatSettings		24 tuntia
+Available languages	Locale Preflet Window		Valittavat kielet
+Currency	TimeFormatSettings		Valuutta
+Date	TimeFormatSettings		Päivämäärä
+Defaults	Locale Preflet Window		Oletukset
 Formatting	Locale Preflet Window		Muotoillaan
-Locale	Locale Preflet Window		Maa-asetus
-Full format:	TimeFormatSettings		Kokonainen muoto:
+Full format:	TimeFormatSettings		Koko muoto:
+Language	Locale Preflet Window		Kieli
+Locale	Locale Preflet		Maa-asetus
+Locale	Locale Preflet Window		Paikallisasetus
+Long format:	TimeFormatSettings		Pitkä muoto:
 Medium format:	TimeFormatSettings		Keskikokoinen muoto:
-Positive:	TimeFormatSettings		Positiivinen:
+Negative:	TimeFormatSettings		Kielteinen:
+Numbers	TimeFormatSettings		Numerot
+OK	Locale Preflet Window		Valmis
+Positive:	TimeFormatSettings		Myönteinen:
+Preferred languages	Locale Preflet Window		Toivotut kielet
+Revert	Locale Preflet Window		Palauta
+Short format:	TimeFormatSettings		Lyhyt muoto:
+Time	TimeFormatSettings		Aika
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Valittavia kieliä ei löydy! Et voi käyttää tätä asetusohjelmaa!
+Use month/day-names from preferred language	TimeFormatSettings		Käytä ensisijaisen kielen kuukausi/päivä -nimiä
+already chosen	LanguageListView		jo valittu

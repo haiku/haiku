@@ -1,19 +1,19 @@
 1	finnish	x-vnd.Haiku-MidiPlayer	1406887279
-None	Main Window		Ei mikään
-Live input:	Main Window		Live-syöte:
-Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Haiku MIDI Player 1.0.0 beta\n\nTämä pieni ohjelma\nOsaa soittaa  tuhansia\nKehnolta kuulostavia lauluja
-Stop	Main Window		Pysäytä
 Cavern	Main Window		Luola
-Volume:	Main Window		Äänenvoimakkuus:
-Reverb:	Main Window		Kaikuefekti:
+Closet	Main Window		Kaappi
+Could not load song	Main Window		Ei voitu ladata laulua
+Drop MIDI file here	Scope View		Pudota MIDI-tiedosto tänne
+Dungeon	Main Window		Tyrmä
+Garage	Main Window		Korjaamo
+Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Haiku MIDI Player 1.0.0 beta\n\nTämä pieni ohjelma\nOsaa soittaa  tuhansia\nKehnolta kuulostavia lauluja
+Igor's lab	Main Window		Igorin labra
+Live input:	Main Window		Live-syöte:
+MidiPlayer	Main Window		MidiPlayer
+None	Main Window		Ei mikään
 OK	Main Window		Valmis
 Off	Main Window		Pois päältä
-Dungeon	Main Window		Tyrmä
 Play	Main Window		Soita
-Garage	Main Window		Korjaamo
-Closet	Main Window		Kaappi
-Igor's lab	Main Window		Igorin labra
+Reverb:	Main Window		Kaikuefekti:
 Scope	Main Window		Näkyvyysalue
-Could not load song	Main Window		Ei voitu ladata laulua
-MidiPlayer	Main Window		MidiPlayer
-Drop MIDI file here	Scope View		Pudota MIDI-tiedosto tänne
+Stop	Main Window		Pysäytä
+Volume:	Main Window		Äänenvoimakkuus:

@@ -1,25 +1,25 @@
 1	finnish	x-vnd.Haiku-Backgrounds	739979648
-X:	Main View		X:
-Resolution: 	Image Filepanel		Resoluutio: 
-pick one	Main View		poimi yksi
-Default	Main View		Oletus
-Center	Main View		Keskitä
-Manual	Main View		Manuaalinen
-Default folder	Main View		Oletuskansio
-Revert	Main View		Palauta
-None	Main View		Ei mikään
 All workspaces	Main View		Kaikki työtilat
-Icon label outline	Main View		Kuvakenimiön ääriviiva
-Other…	Main View		Muut…
-Current workspace	Main View		Nykyinen työtila
-Folder: 	Main View		Kansio: 
-Apply	Main View		Käytä
-Other folder…	Main View		Muu kansio…
+Apply	Main View		Sovella
 Backgrounds	Main Window		Taustat
-Y:	Main View		Y:
-Tile	Main View		Limitä
-Select	Main View		Valitse
-Scale to fit	Main View		Skaalaa sopimaan
+Center	Main View		Keskitä
+Current workspace	Main View		Nykyinen työtila
+Default	Main View		Oletus
+Default folder	Main View		Oletuskansio
+Folder: 	Main View		Kansio: 
+Icon label outline	Main View		Kuvakenimiön ääriviiva
+Image:	Main View		Kuva:
+Manual	Main View		Manuaalinen
+None	Main View		Ei mikään
+Other folder…	Main View		Muu kansio…
+Other…	Main View		Muut…
 Placement:	Main View		Sijoittaminen:
 Preview	Main View		Esikatselu
-Image:	Main View		Kuva:
+Resolution: 	Image Filepanel		Resoluutio: 
+Revert	Main View		Palauta
+Scale to fit	Main View		Skaalaa sopimaan
+Select	Main View		Valitse
+Tile	Main View		Limitä
+X:	Main View		X:
+Y:	Main View		Y:
+pick one	Main View		poimi yksi

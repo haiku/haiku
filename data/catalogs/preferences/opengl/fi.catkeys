@@ -1,26 +1,26 @@
 1	finnish	x-vnd.Haiku-OpenGL	899836772
-List stack size:	Capabilities		Luettelopinon koko:
-Information	InfoView		Tiedot
-Max. clipping planes:	Capabilities		Maksimileikkaustasot:
-Max. texture units:	Capabilities		Maksimitekstuuriyksiköt:
-Renderer name:	InfoView		Renderointinimi:
-Vendor name:	InfoView		Myyjänimi:
 Attributes stack size:	Capabilities		Attribuuttipinokoko:
-OpenGL version:	InfoView		OpenGL-versio:
-Name stack size:	Capabilities		Nimipinokoko:
 Auxiliary buffer(s):	Capabilities		Apupuskuri(t):
-Max. recommended vertex elements:	Capabilities		Suositeltujen vertex-elementtien enimmäismäärä:
-GLU version:	InfoView		GLU-versio:
-Model stack size:	Capabilities		Mallipinokoko:
-Projection stack size:	Capabilities		Projektiopinokoko:
-Max. lights:	Capabilities		Valoja enintään:
-Max. 2D texture size:	Capabilities		2D-tekstuurin enimmäiskoko:
-Max. convolution:	Capabilities		Maksimikierre:
-GLUT API version:	InfoView		GLUT API -versio:
-Texture stack size:	Capabilities		Tekstuuripinokoko:
-Max. evaluators equation order:	Capabilities		Maksimievaloijan yhtälöjärjestys:
-Max. 3D texture size:	Capabilities		3D-tekstuurin enimmäiskoko:
-Capabilities	Capabilities		Kapasiteetit
-Max. recommended index elements:	Capabilities		Suositeltujen indeksielementtien enimmäismäärä:
 Available	Extensions		Käytettävissä oleva
+Capabilities	Capabilities		Kapasiteetit
 Extensions	Extensions		Laajennukset
+GLU version:	InfoView		GLU-versio:
+GLUT API version:	InfoView		GLUT API -versio:
+Information	InfoView		Tiedot
+List stack size:	Capabilities		Luettelopinon koko:
+Max. 2D texture size:	Capabilities		2D-tekstuurin enimmäiskoko:
+Max. 3D texture size:	Capabilities		3D-tekstuurin enimmäiskoko:
+Max. clipping planes:	Capabilities		Maksimileikkaustasot:
+Max. convolution:	Capabilities		Maksimikierre:
+Max. evaluators equation order:	Capabilities		Maksimievaloijan yhtälöjärjestys:
+Max. lights:	Capabilities		Valoja enintään:
+Max. recommended index elements:	Capabilities		Suositeltujen indeksielementtien enimmäismäärä:
+Max. recommended vertex elements:	Capabilities		Suositeltujen vertex-elementtien enimmäismäärä:
+Max. texture units:	Capabilities		Maksimitekstuuriyksiköt:
+Model stack size:	Capabilities		Mallipinokoko:
+Name stack size:	Capabilities		Nimipinokoko:
+OpenGL version:	InfoView		OpenGL-versio:
+Projection stack size:	Capabilities		Projektiopinokoko:
+Renderer name:	InfoView		Renderointinimi:
+Texture stack size:	Capabilities		Tekstuuripinokoko:
+Vendor name:	InfoView		Myyjänimi:

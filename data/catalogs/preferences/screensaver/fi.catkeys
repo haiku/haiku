@@ -1,28 +1,29 @@
-1	finnish	x-vnd.Haiku-ScreenSaver	1468011094
-Run module	ScreenSaver		Suorita moduuli
-Could not load screen saver	ScreenSaver		Ei voitu ladata näytönsäästäjää
+1	finnish	x-vnd.Haiku-ScreenSaver	937285216
 30 seconds	ScreenSaver		30 sekuntia
-Password…	ScreenSaver		Salasana...
-Password:	ScreenSaver		Salasana:
-Password lock	ScreenSaver		Salasanalukitus
 Add…	ScreenSaver		Lisää...
-mouse is here	ScreenSaver		hiiri on täällä
-Modules	ScreenSaver		Moduulit
-Test	ScreenSaver		Testi
-ScreenSaver	ScreenSaver		Näytönsäästäjä
-Module settings	ScreenSaver		Moduuliasetukset
-Cancel	ScreenSaver		Peru
-Turn off screen	ScreenSaver		Käännä näyttö pois päältä
-No options available	ScreenSaver		Valitsimia ei ole käytettävissä
-Password Window	ScreenSaver		Salasanaikkuna
-Enable screen saver	ScreenSaver		Ota käyttöön näytönsäästäjä
-Fade now when	ScreenSaver		Häivytä nyt kun
-Fade	ScreenSaver		Häivytä
-Passwords don't match. Please try again.	ScreenSaver		Salasanat eivät täsmää. Yritä uudelleen.
-OK	ScreenSaver		Valmis
-Don't fade when	ScreenSaver		Älä häivytä kun
 Blackness	ScreenSaver		Mustuus
-Use custom password	ScreenSaver		Käytä räätälöityä salasanaa
-Done	ScreenSaver		Valmis
+Cancel	ScreenSaver		Peru
 Confirm password:	ScreenSaver		Vahvista salasana:
+Could not load screen saver	ScreenSaver		Ei voitu ladata näytönsäästäjää
+Display Power Management Signaling not available	ScreenSaver		Näytön jännitesyötön hallinnan signalointi ei ole saatavilla
+Don't fade when	ScreenSaver		Älä häivytä kun
+Done	ScreenSaver		Valmis
+Enable screen saver	ScreenSaver		Ota käyttöön näytönsäästäjä
+Fade	ScreenSaver		Häivytä
+Fade now when	ScreenSaver		Häivytä nyt kun
+Module settings	ScreenSaver		Moduuliasetukset
+Modules	ScreenSaver		Moduulit
+No options available	ScreenSaver		Valitsimia ei ole käytettävissä
+OK	ScreenSaver		Valmis
+Password Window	ScreenSaver		Salasanaikkuna
+Password lock	ScreenSaver		Salasanalukitus
+Password:	ScreenSaver		Salasana:
+Passwords don't match. Please try again.	ScreenSaver		Salasanat eivät täsmää. Yritä uudelleen.
+Password…	ScreenSaver		Salasana...
+Run module	ScreenSaver		Suorita moduuli
+ScreenSaver	ScreenSaver		Näytönsäästäjä
+Test	ScreenSaver		Testi
+Turn off screen	ScreenSaver		Käännä näyttö pois päältä
+Use custom password	ScreenSaver		Käytä räätälöityä salasanaa
 Use network password	ScreenSaver		Käytä verkkosalasanaa
+mouse is here	ScreenSaver		hiiri on täällä

@@ -1,35 +1,35 @@
 1	finnish	x-vnd.Haiku.TextSearch	3449010850
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME ei voitu avata yhtä tai useampaa kansiota.
 %s: Not enough room to escape the filename.	Grepper		%s: Ei kylliksi tilaa tiedostonimen ohittamiseen.
-Trim to selection	GrepWindow		Leikkaa valintaan
-Follow symbolic links	GrepWindow		Seuraa symbolisia linkkejä
-Close	GrepWindow		Sulje
+%s: There was a problem running grep.	Grepper		%s: Pulma grep-ohjelmaa suoritettaessa.
+About TextSearch…	GrepWindow		Ohjelmasta Tekstihaku...
+Actions	GrepWindow		Toiminnot
 Cancel	GrepWindow		Peru
-The unselected files will be removed from the list.	GrepWindow		Valitsemattomat tiedostot poistetaan luettelosta.
-Please select the files you wish to have selected for you in Tracker.	GrepWindow		Valitse tiedostot, jotka haluat valittaviksi Jäljittäjässä.
-Open files in Pe	GrepWindow		Avaa tiedostot Pe-editorissa
+Case-sensitive	GrepWindow		Kirjainkoosta riippuva
+Close	GrepWindow		Sulje
 Copy text to clipboard	GrepWindow		Kopioi teksti leikepöydälle
 Created by Matthijs Hollemans.\n\nContributed to by Peter Hinely, Serge Fantino, Hideki Naito, Oscar Lesta, Oliver Tappe, Jonas Sundström, Luc Schrijvers and momoziro.\n	GrepWindow		Tekijä: Matthijs Hollemans.\n\nAvustajat: Peter Hinely, Serge Fantino, Hideki Naito, Oscar Lesta, Oliver Tappe, Jonas Sundström, Luc Schrijvers ja momoziro.\n
-Settings	GrepWindow		Asetukset
-Select all	GrepWindow		Valitse kaikki
-OK	GrepWindow		Valmis
-%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME ei voitu avata yhtä tai useampaa kansiota.
-Escape search text	GrepWindow		Älä ota huomioon etsintätekstiä
-Search	GrepWindow		Etsintä
-Open selection	GrepWindow		Avaa valinta
-Look in sub-folders	GrepWindow		Etsi alikansioista
-Actions	GrepWindow		Toiminnot
-File	GrepWindow		Tiedosto
 Encoding	GrepWindow		Koodaus
+Escape search text	GrepWindow		Älä ota huomioon etsintätekstiä
+File	GrepWindow		Tiedosto
+Follow symbolic links	GrepWindow		Seuraa symbolisia linkkejä
 History	GrepWindow		Historia
-%s: There was a problem running grep.	Grepper		%s: Pulma grep-ohjelmaa suoritettaessa.
+Look in sub-folders	GrepWindow		Etsi alikansioista
 New window	GrepWindow		Uusi ikkuna
+OK	GrepWindow		Valmis
+Open files in Pe	GrepWindow		Avaa tiedostot Pe-editorissa
+Open selection	GrepWindow		Avaa valinta
+Please select the files you wish to have selected for you in Tracker.	GrepWindow		Valitse tiedostot, jotka haluat valittaviksi Jäljittäjässä.
 Please select the files you wish to keep searching.	GrepWindow		Valitse tiedostot, jotka haluat pitää etsinnässä.
-TextSearch	GrepWindow		Tekstihaku
 Quit	GrepWindow		Poistu
-Show files in Tracker	GrepWindow		Näytä tiedostot Jäljittäjässä
-About TextSearch…	GrepWindow		Ohjelmasta Tekstihaku...
-Case-sensitive	GrepWindow		Kirjainkoosta riippuva
-Text files only	GrepWindow		Vain tekstitiedostot
-Show lines	GrepWindow		Näytä rivit
+Search	GrepWindow		Etsintä
+Select all	GrepWindow		Valitse kaikki
 Set target…	GrepWindow		Aseta kohde...
+Settings	GrepWindow		Asetukset
+Show files in Tracker	GrepWindow		Näytä tiedostot Jäljittäjässä
+Show lines	GrepWindow		Näytä rivit
 Skip folders starting with a dot	GrepWindow		Ohita kansiot, joiden nimet alkavat pisteellä
+Text files only	GrepWindow		Vain tekstitiedostot
+TextSearch	GrepWindow		Tekstihaku
+The unselected files will be removed from the list.	GrepWindow		Valitsemattomat tiedostot poistetaan luettelosta.
+Trim to selection	GrepWindow		Leikkaa valintaan

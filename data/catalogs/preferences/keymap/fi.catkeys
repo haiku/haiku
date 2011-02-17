@@ -1,22 +1,22 @@
 1	finnish	x-vnd.Haiku-Keymap	4175672673
-Tilde trigger	Keymap window		Aaltoviivaliipaisin
-Grave trigger	Keymap window		Gravisliipaisin
-Select dead keys	Keymap window		Valitse kuolleet näppäimet
-Quit	Keymap window		Poistu
+(Current)	Keymap window		(Nykyinen)
+Acute trigger	Keymap window		Akuuttiaksenttiliipaisin
 Circumflex trigger	Keymap window		Sirkumfleksiliipaisin
 Diaeresis trigger	Keymap window		Treemaliipaisin
-Open…	Keymap window		Avaa…
-System:	Keymap window		Järjestelmä:
-Switch shortcut keys	Keymap window		Vaihda pikanäppäimiä
-User:	Keymap window		Käyttäjä:
-Switch shortcut keys to Haiku mode	Keymap window		Vaihda pikanäppäimet Haiku-tilaan
-Keymap	Keymap window		Näppäinkartta
-Sample and clipboard:	Keymap window		Näyte ja leikepöytä:
-Layout	Keymap window		Ulkoasu
-Switch shortcut keys to Windows/Linux mode	Keymap window		Vaihda pikanäppäimet Windows/Linux -tilaan
-Revert	Keymap window		Palauta
-Save as…	Keymap window		Tallenna nimellä…
 File	Keymap window		Tiedosto
-(Current)	Keymap window		(Nykyinen)
 Font	Keymap window		Kirjasin
-Acute trigger	Keymap window		Akuuttiaksenttiliipaisin
+Grave trigger	Keymap window		Gravisliipaisin
+Keymap	Keymap window		Näppäinkartta
+Layout	Keymap window		Ulkoasu
+Open…	Keymap window		Avaa…
+Quit	Keymap window		Poistu
+Revert	Keymap window		Palauta
+Sample and clipboard:	Keymap window		Näyte ja leikepöytä:
+Save as…	Keymap window		Tallenna nimellä…
+Select dead keys	Keymap window		Valitse kuolleet näppäimet
+Switch shortcut keys	Keymap window		Vaihda pikanäppäimiä
+Switch shortcut keys to Haiku mode	Keymap window		Vaihda pikanäppäimet Haiku-tilaan
+Switch shortcut keys to Windows/Linux mode	Keymap window		Vaihda pikanäppäimet Windows/Linux -tilaan
+System:	Keymap window		Järjestelmä:
+Tilde trigger	Keymap window		Aaltoviivaliipaisin
+User:	Keymap window		Käyttäjä:

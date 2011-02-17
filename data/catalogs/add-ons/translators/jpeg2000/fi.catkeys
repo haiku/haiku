@@ -1,16 +1,16 @@
 1	finnish	x-vnd.Haiku-JPEG2000Translator	496980629
-Write	JPEG2000Translator		Kirjoita
-JPEG2000 images	JPEG2000Translator		JPEG2000-kuvat
+1999-2000, Image Power, Inc. and	JPEG2000Translator		1999-2000, Image Power, Inc. ja
+About	JPEG2000Translator		Ohjelmasta
 Based on JasPer library:	JPEG2000Translator		Perustuu JasPer-kirjastoon:
+Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Be-bittikarttamuoto (JPEG2000Translator)
+High	JPEG2000Translator		Korkea
+ImageMagick's jp2 codec was used as \"tutorial\".	JPEG2000Translator		ImageMagick:n jp2-koodekkia käytettiin ”tutorial”-oppikurssina.
+JPEG2000 images	JPEG2000Translator		JPEG2000-kuvat
+Low	JPEG2000Translator		Matala
 Output only codestream (.jpc)	JPEG2000Translator		Tulosta vain koodivirta (.jpc)
-Write black-and-white images as RGB24	JPEG2000Translator		Kirjoita mustavalkoiset kuvat RGB24-kuvina
-the University of British Columbia, Canada.	JPEG2000Translator		Columbian yliopisto, Kanada.
 Output quality	JPEG2000Translator		Tulostuslaatu
 Read	JPEG2000Translator		Lue
-1999-2000, Image Power, Inc. and	JPEG2000Translator		1999-2000, Image Power, Inc. ja
-ImageMagick's jp2 codec was used as \"tutorial\".	JPEG2000Translator		ImageMagick:n jp2-koodekkia käytettiin ”tutorial”-oppikurssina.
-Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Be-bittikarttamuoto (JPEG2000-muunnin)
-Low	JPEG2000Translator		Matala
-About	JPEG2000Translator		Ohjelmasta
-High	JPEG2000Translator		Korkea
 Read greyscale images as RGB32	JPEG2000Translator		Lue harmaaväriskaalakuvat RGB32-kuvina
+Write	JPEG2000Translator		Kirjoita
+Write black-and-white images as RGB24	JPEG2000Translator		Kirjoita mustavalkoiset kuvat RGB24-kuvina
+the University of British Columbia, Canada.	JPEG2000Translator		Columbian yliopisto, Kanada.

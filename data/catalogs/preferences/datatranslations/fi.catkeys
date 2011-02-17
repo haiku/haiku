@@ -1,26 +1,23 @@
-1	finnish	x-vnd.Haiku-DataTranslations	2482065199
-DataTranslations	DataTranslations		Tietomuunnokset
-Info…	DataTranslations		Tiedot...
-about	DataTranslations		ohjelmasta
-Could not install 	DataTranslations		Ei voitu asentaa
+1	finnish	x-vnd.Haiku-DataTranslations	3706134146
+About	DataTranslations		ohjelmasta
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Kohde nimeltään ’%name’ on jo olemassa Translator-kansiossa! Pitäisikö olemassa oleva tietomuunnin korvata?
 Cancel	DataTranslations		Peru
-Name:	DataTranslations		Nimi:
-Panel Info	DataTranslations		Paneelitiedot
-The item '	DataTranslations		Kohde ’
-%name' does not appear to be a Translator and will not be installed.	DataTranslations		%name’ ei näytä olevan Tietomuunnin ja sitä ei asenneta.
-DataTranslations - Note	DataTranslations		Tietomuunnokset - Ilmoitus
-Name: %name \nVersion: 	DataTranslations		Nimi: %name \nVersio: 
-Overwrite	DataTranslations		Korvaa
-Info:	DataTranslations		Tiedot:
-info	DataTranslations		tiedot
-%name already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		%name on jo olemassa Translators-kansiossa! Korvataanko olemassa oleva tietomuunnin?
-Path:	DataTranslations		Polku:
-The new translator has been installed successfully.	DataTranslations		Uusi tietomuunnin on asennettu onnistuneesti.
-\nInfo: %info\n\nPath:\n	DataTranslations		\nTiedot: %info\n\nPolku:\n
+Could not install %s:\n%s	DataTranslations		Ei voitu asentaa %s:\n%s
+DataTranslations	DataTranslations		Tietomuunnokset
 DataTranslations - Error	DataTranslations		Tietomuunnokset - Virhe
-OK	DataTranslations		Valmis
-An item named '	DataTranslations		Kohde nimeltä ’
-Icon	DataTranslations		Kuvake
+DataTranslations - Note	DataTranslations		Tietomuunnokset - Ilmoitus
 DataTranslations\n\twritten by Oliver Siebenmarck and others\n\tCopyright 2002-2010, Haiku Inc. All rights reserved.\n	DataTranslations		Tietomuunnokset\n\ttekijä: Oliver Siebenmarck ja muut\n\tCopyright 2002-2010, Haiku Inc. All rights reserved.\n
-Version:	DataTranslations		Versio:
+Icon	DataTranslations		Kuvake
+Info	DataTranslations		tiedot
+Info:	DataTranslations		Tiedot:
+Info…	DataTranslations		Tiedot...
+Name:	DataTranslations		Nimi:
+Name:\t%s \nVersion:\t%ld.%ld.%ld\nInfo:\t%s\n\nPath:\n%s\n	DataTranslations		Nimi:\t%s \nVersio:\t%ld.%ld.%ld\nTiedot:\t%s\n\nPolku:\n%s\n
+OK	DataTranslations		Valmis
+Overwrite	DataTranslations		Korvaa
+Panel Info	DataTranslations		Paneelitiedot
+Path:	DataTranslations		Polku:
+The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Kohde ’%name’ ei näytä olevan tietomuunnin ja sitä ei asenneta.
+The new translator has been installed successfully.	DataTranslations		Uusi tietomuunnin on asennettu onnistuneesti.
 Translation Settings\n\nUse this control panel to set values that various\ntranslators use when no other settings are specified\nin the application.	DataTranslations		Tietomuunnosasetukset\n\nKäytä tätä ohjauspaneelia eri tietomuuntimien\narvojen asettamiseksi kun sovellukselle ei ole\nmääritelty muita asetuksia.
+Version:	DataTranslations		Versio:

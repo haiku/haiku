@@ -1,45 +1,45 @@
 1	finnish	x-vnd.Haiku-Pulse	2756001860
-OK	PrefsWindow		Valmis
-Quit	DeskbarPulseView		Poistu
-Pulse	PulseWindow		Pulssi
-Mini mode	DeskbarPulseView		Minitila
-Remove replicant	CPUButton		Poista replikantti
-Active color	ConfigView		Käytössä oleva väri
-Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Käyttö: Pulse [--mini] [-w leveys] [--width=leveys]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
-Fade colors	ConfigView		Haalita värit
-OK	DeskbarPulseView		Valmis
-Deskbar mode	PrefsWindow		Työpöytäpalkkitila
-Normal mode	PrefsWindow		Normaalitila
-Defaults	PrefsWindow		Oletukset
-Normal mode	MiniPulseView		Normaalitila
-Deskbar	CPUButton		Työpöytäpalkki
-Frame color	ConfigView		Kehysväri
-Mini mode	PrefsWindow		Minitila
-OK	PulseApp		Valmis
-Bar colors	ConfigView		Palkkivärit
-Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	CPUButton		Pulssi\n\nTekijät: David Ramsey ja Arve Hjønnevåg\nKorjausversio: Daniel Switkin
-Settings…	PulseView		Asetukset...
-You can't disable the last active CPU.	PulseView		Et voi ottaa pois käytöstä viimeistä käytössä olevaa prosessoria.
-Info	CPUButton		Tiedot
-OK	PulseView		Valmis
-Remove(): %s	DeskbarPulseView		Remove(): %s
-Deskbar menu	CPUButton		Työpöytäpalkkivalikko
-About Pulse…	PulseView		Ohjelmasta Pulssi...
-Deskbar mode	MiniPulseView		Työpöytäpalkkitila
-Quit	MiniPulseView		Poistu
-Pulse	NormalPulseView		Pulssi
-Deskbar mode	NormalPulseView		Työpöytäpalkkitila
-Width of icon:	ConfigView		Kuvakkeen leveys:
-Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	PulseWindow		Pulssi\n\nTekijät: David Ramsey ja Arve Hjønnevåg\nKorjausversio: Daniel Switkin
-You can't disable the last active CPU.	CPUButton		Et voi ottaa pois käytöstä viimeistä käytössä olevaa prosessoria.
-Normal mode	DeskbarPulseView		Normaalitila
-OK	CPUButton		Valmis
 About Pulse…	CPUButton		Ohjelmasta Pulssi...
-Mini mode	NormalPulseView		Minitila
-Info	DeskbarPulseView		Tiedot
-Pulse settings	PulseWindow		Pulssi-asetukset
-Idle color	ConfigView		Joutokäyntiväri
-Info	PulseWindow		Tiedot
-Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	DeskbarPulseView		Pulssi\n\nTekijä: David Ramsey ja Arve Hjønnevåg\nKorjausversio: Daniel Switkin
-OK	PulseWindow		Valmis
+About Pulse…	PulseView		Ohjelmasta Pulssi...
+Active color	ConfigView		Käytössä oleva väri
+Bar colors	ConfigView		Palkkivärit
 CPU progress bar	NormalPulseView		Prosessorin edistymispalkki
+Defaults	PrefsWindow		Oletukset
+Deskbar	CPUButton		Työpöytäpalkki
+Deskbar menu	CPUButton		Työpöytäpalkkivalikko
+Deskbar mode	MiniPulseView		Työpöytäpalkkitila
+Deskbar mode	NormalPulseView		Työpöytäpalkkitila
+Deskbar mode	PrefsWindow		Työpöytäpalkkitila
+Fade colors	ConfigView		Haalita värit
+Frame color	ConfigView		Kehysväri
+Idle color	ConfigView		Joutokäyntiväri
+Info	CPUButton		Tiedot
+Info	DeskbarPulseView		Tiedot
+Info	PulseWindow		Tiedot
+Mini mode	DeskbarPulseView		Minitila
+Mini mode	NormalPulseView		Minitila
+Mini mode	PrefsWindow		Minitila
+Normal mode	DeskbarPulseView		Normaalitila
+Normal mode	MiniPulseView		Normaalitila
+Normal mode	PrefsWindow		Normaalitila
+OK	CPUButton		Valmis
+OK	DeskbarPulseView		Valmis
+OK	PrefsWindow		Valmis
+OK	PulseApp		Valmis
+OK	PulseView		Valmis
+OK	PulseWindow		Valmis
+Pulse	NormalPulseView		Pulssi
+Pulse	PulseWindow		Pulssi
+Pulse settings	PulseWindow		Pulssi-asetukset
+Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	CPUButton		Pulssi\n\nTekijät: David Ramsey ja Arve Hjønnevåg\nKorjausversio: Daniel Switkin
+Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	DeskbarPulseView		Pulssi\n\nTekijä: David Ramsey ja Arve Hjønnevåg\nKorjausversio: Daniel Switkin
+Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	PulseWindow		Pulssi\n\nTekijät: David Ramsey ja Arve Hjønnevåg\nKorjausversio: Daniel Switkin
+Quit	DeskbarPulseView		Poistu
+Quit	MiniPulseView		Poistu
+Remove replicant	CPUButton		Poista replikantti
+Remove(): %s	DeskbarPulseView		Remove(): %s
+Settings…	PulseView		Asetukset...
+Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Käyttö: Pulse [--mini] [-w leveys] [--width=leveys]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
+Width of icon:	ConfigView		Kuvakkeen leveys:
+You can't disable the last active CPU.	CPUButton		Et voi ottaa pois käytöstä viimeistä käytössä olevaa prosessoria.
+You can't disable the last active CPU.	PulseView		Et voi ottaa pois käytöstä viimeistä käytössä olevaa prosessoria.

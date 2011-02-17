@@ -1,18 +1,18 @@
 1	finnish	x-vnd.haiku.zip-o-matic	274748138
-1 file added.	file:ZipOMaticWindow.cpp		1 tiedosto lisätty.
-Stop	file:ZipOMaticWindow.cpp		Pysäytä
-Creating archive: %s	file:ZipOMaticWindow.cpp		Luodaan arkisto: %s
-Continue	file:ZipOMaticWindow.cpp		Jatka
-Preparing to archive	file:ZipperThread.cpp		Valmistellaan arkistoimaan
-Filename: %s	file:ZipOMaticWindow.cpp		Tiedostonimi: %s
-Let them continue	file:ZipOMatic.cpp		Salli niiden jatkaa
-Do you want to stop them?	file:ZipOMatic.cpp		Haluatko pysäyttää ne?
-Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Oletko varma, että haluat pysäyttää tämän arkiston luomisen?
 %ld files added.	file:ZipOMaticWindow.cpp		%ld tiedostoa lisätty.
-Stopped	file:ZipOMaticWindow.cpp		Pysäytetty
+1 file added.	file:ZipOMaticWindow.cpp		1 tiedosto lisätty.
 Archive	file:ZipperThread.cpp		Arkisto
+Archive created OK	file:ZipOMaticWindow.cpp		Arkisto luotu valmiiksi
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Oletko varma, että haluat pysäyttää tämän arkiston luomisen?
+Continue	file:ZipOMaticWindow.cpp		Jatka
+Creating archive: %s	file:ZipOMaticWindow.cpp		Luodaan arkisto: %s
+Do you want to stop them?	file:ZipOMatic.cpp		Haluatko pysäyttää ne?
 Drop files to zip.	file:ZipOMaticWindow.cpp		Pudota tiedostot zip-pakettiin.
 Error creating archive	file:ZipOMaticWindow.cpp		Virhe luotaessa arkistoa
-You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		Suoritat parhaillaan %ld Zip-O-Matic -ohjelmaa.\n\n
-Archive created OK	file:ZipOMaticWindow.cpp		Arkisto luotu valmiiksi
+Filename: %s	file:ZipOMaticWindow.cpp		Tiedostonimi: %s
+Let them continue	file:ZipOMatic.cpp		Salli niiden jatkaa
+Preparing to archive	file:ZipperThread.cpp		Valmistellaan arkistoimaan
+Stop	file:ZipOMaticWindow.cpp		Pysäytä
 Stop them	file:ZipOMatic.cpp		Pysäytä ne
+Stopped	file:ZipOMaticWindow.cpp		Pysäytetty
+You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		Suoritat parhaillaan %ld Zip-O-Matic -ohjelmaa.\n\n
