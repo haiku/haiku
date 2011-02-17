@@ -18,6 +18,7 @@
 
 #include <Alert.h>
 #include <Application.h>
+#include <Catalog.h>
 #include <Debug.h>
 #include <File.h>
 #include <NodeMonitor.h>
@@ -27,15 +28,19 @@
 #include "AppUsage.h"
 #include "BorderView.h"
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "NotificationWindow"
+
 
 property_info main_prop_list[] = {
-	{"message", {B_GET_PROPERTY, 0}, {B_INDEX_SPECIFIER, 0}, "get a message"},
+	{"message", {B_GET_PROPERTY, 0}, {B_INDEX_SPECIFIER, 0}, 
+		B_TRANSLATE_MARK("get a message")},
 	{"message", {B_COUNT_PROPERTIES, 0}, {B_DIRECT_SPECIFIER, 0},
-		"count messages"},
+		B_TRANSLATE_MARK("count messages")},
 	{"message", {B_CREATE_PROPERTY, 0}, {B_DIRECT_SPECIFIER, 0},
-		"create a message"},
+		B_TRANSLATE_MARK("create a message")},
 	{"message", {B_SET_PROPERTY, 0}, {B_INDEX_SPECIFIER, 0},
-		"modify a message"},
+		B_TRANSLATE_MARK("modify a message")},
 	{0}
 };
 
@@ -46,12 +51,12 @@ const float kPenSize				= 1;
 const float kEdgePadding			= 5;
 const float kSmallPadding			= 2;
 
-
 NotificationWindow::NotificationWindow()
 	:
-	BWindow(BRect(10, 10, 30, 30), "Notification", B_BORDERED_WINDOW,
-		B_AVOID_FRONT | B_AVOID_FOCUS | B_NOT_CLOSABLE | B_NOT_ZOOMABLE
-			| B_NOT_MINIMIZABLE | B_NOT_RESIZABLE, B_ALL_WORKSPACES)
+	BWindow(BRect(10, 10, 30, 30), B_TRANSLATE_MARK("Notification"), 
+		B_BORDERED_WINDOW, B_AVOID_FRONT | B_AVOID_FOCUS | B_NOT_CLOSABLE 
+		| B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_NOT_RESIZABLE, 
+		B_ALL_WORKSPACES)
 {
 	fBorder = new BorderView(Bounds(), "Notification");
 
@@ -470,8 +475,9 @@ NotificationWindow::LoadAppFilters(bool startMonitor)
 		entry.GetNodeRef(&nref);
 
 		if (watch_node(&nref, B_WATCH_ALL, BMessenger(this)) != B_OK) {
-			BAlert* alert = new BAlert("", "Couldn't start filter "
-				" monitor. Live filter changes disabled.", "Darn.");
+			BAlert* alert = new BAlert(B_TRANSLATE("Warning"),
+					B_TRANSLATE("Couldn't start filter monitor."
+						" Live filter changes disabled."), B_TRANSLATE("Darn."));
 			alert->Go();
 		}
 	}
@@ -534,8 +540,9 @@ NotificationWindow::_LoadGeneralSettings(bool startMonitor)
 		entry.GetNodeRef(&nref);
 
 		if (watch_node(&nref, B_WATCH_ALL, BMessenger(this)) != B_OK) {
-			BAlert* alert = new BAlert("", "Couldn't start general settings "
-				" monitor.\nLive filter changes disabled.", "OK");
+			BAlert* alert = new BAlert(B_TRANSLATE("Warning"),
+						B_TRANSLATE("Couldn't start general settings monitor.\n"
+						"Live filter changes disabled."), B_TRANSLATE("OK"));
 			alert->Go();
 		}
 	}
@@ -598,8 +605,9 @@ NotificationWindow::_LoadDisplaySettings(bool startMonitor)
 		entry.GetNodeRef(&nref);
 
 		if (watch_node(&nref, B_WATCH_ALL, BMessenger(this)) != B_OK) {
-			BAlert* alert = new BAlert("", "Couldn't start display settings "
-				" monitor.\nLive filter changes disabled.", "OK");
+			BAlert* alert = new BAlert(B_TRANSLATE("Warning"),
+				B_TRANSLATE("Couldn't start display settings monitor.\n"
+					"Live filter changes disabled."), B_TRANSLATE("OK"));
 			alert->Go();
 		}
 	}
