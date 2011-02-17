@@ -15,49 +15,54 @@ static bool blocking[4];
 static pthread_key_t self;
 
 
-static void suspendLoop(int *i) {
-    sigjmp_buf env;
-    sigset_t mask;
+static void 
+suspendLoop(int *i) {
+	sigjmp_buf env;
+	sigset_t mask;
 
-    sigsetjmp(env, false);
+	sigsetjmp(env, false);
 
 	state[*i] = false;
 
-    sigfillset(&mask);
-    sigdelset(&mask, SIGUSR1);
-    sigdelset(&mask, SIGTERM);
+	sigfillset(&mask);
+	sigdelset(&mask, SIGUSR1);
+	sigdelset(&mask, SIGTERM);
 
-    while(state[*i] == false && blocking[*i] == false)
-        sigsuspend(&mask);
+	while (state[*i] == false && blocking[*i] == false)
+		sigsuspend(&mask);
 
 	state[*i] = true;
 }
 
 
-static void suspendHandler(int sig) {
-    int *i = (int*)pthread_getspecific(self);
-    suspendLoop(i);
+static void 
+suspendHandler(int sig) {
+	int *i = (int*)pthread_getspecific(self);
+	suspendLoop(i);
 }
 
-static void initialiseSignals()
+
+static void 
+initialiseSignals()
 {
-    struct sigaction act;
-    sigset_t mask;
+	struct sigaction act;
+	sigset_t mask;
 
-    act.sa_handler = suspendHandler;
-    sigemptyset(&act.sa_mask);
-    act.sa_flags = 0;
-    sigaction(SIGUSR1, &act, NULL);
+	act.sa_handler = suspendHandler;
+	sigemptyset(&act.sa_mask);
+	act.sa_flags = 0;
+	sigaction(SIGUSR1, &act, NULL);
 
-    sigemptyset(&mask);
-    sigaddset(&mask, SIGQUIT);
-    sigaddset(&mask, SIGINT);
-    sigaddset(&mask, SIGPIPE);
-    sigprocmask(SIG_BLOCK, &mask, NULL);
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGQUIT);
+	sigaddset(&mask, SIGINT);
+	sigaddset(&mask, SIGPIPE);
+	sigprocmask(SIG_BLOCK, &mask, NULL);
 }
 
 
-static void self_suspend(int* i)
+static void 
+self_suspend(int* i)
 {
 	sigset_t mask;
 
@@ -77,7 +82,9 @@ static void self_suspend(int* i)
 }
 
 
-void *threadStart(void *arg) {
+void *
+threadStart(void *arg)
+{
 	int *i = (int*)arg;
 	pthread_setspecific(self, i);
 
@@ -94,7 +101,8 @@ void *threadStart(void *arg) {
 }
 
 
-/*void suspendAllThreads()
+/*void 
+suspendAllThreads()
 {
 	for (int i = 0; i < 4; i++) {
 		blocking[i] = false;
@@ -111,7 +119,8 @@ void *threadStart(void *arg) {
 
 
 
-void resumeAllThreads()
+void
+resumeAllThreads()
 {
 	for (int i = 0; i < 4; i++) {
 		blocking[i] = true;
@@ -130,14 +139,15 @@ void resumeAllThreads()
 }
 
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
 	initialiseSignals();
 
 	pthread_key_create(&self, NULL);
 
 	pthread_attr_init(&attributes);
-    pthread_attr_setdetachstate(&attributes, PTHREAD_CREATE_DETACHED);
+	pthread_attr_setdetachstate(&attributes, PTHREAD_CREATE_DETACHED);
 
 	for (int i = 0; i < 4; i++) {
 		if (pthread_create(&tid[i], &attributes, threadStart, &i) != 0)
@@ -152,3 +162,4 @@ int main(int argc, char **argv)
 	resumeAllThreads();
 	printf("resuming all threads done\n");
 }
+
