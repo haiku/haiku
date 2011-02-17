@@ -17,6 +17,7 @@ SimpleTest getsubopt_test : getsubopt_test.cpp ;
 SimpleTest locale_test : locale_test.cpp ;
 SimpleTest memalign_test : memalign_test.cpp ;
 SimpleTest mprotect_test : mprotect_test.cpp ;
+SimpleTest pthread_signal_test : pthread_signal_test.cpp ;
 SimpleTest realtime_sem_test1 : realtime_sem_test1.cpp ;
 SimpleTest seek_and_write_test : seek_and_write_test.cpp ;
 SimpleTest setpgid_test : setpgid_test.cpp ;
