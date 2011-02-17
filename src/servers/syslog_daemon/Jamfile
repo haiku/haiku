@@ -13,7 +13,13 @@ Server syslog_daemon :
 	# ToDo: this can be removed for the Haiku build
 	strlcpy.c
 	:
-	be $(TARGET_LIBSUPC++)
+	be $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
+;
+
+DoCatalogs syslog_daemon :
+	x-vnd.Haiku-SystemLogger
+	:
+	SyslogDaemon.cpp
 ;
 
 SEARCH on [ FGristFiles

@@ -9,14 +9,17 @@
 #include "syslog_output.h"
 
 #include <Alert.h>
-#include <TextView.h>
-#include <Font.h>
+#include <Catalog.h>
 #include <FindDirectory.h>
+#include <Font.h>
 #include <Path.h>
+#include <TextView.h>
 
 #include <stdio.h>
 #include <string.h>
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "SyslogDaemon"
 
 const char *kSignature = "application/x-vnd.Haiku-SystemLogger";
 
@@ -51,14 +54,15 @@ SyslogDaemon::AboutRequested()
 	find_directory(B_COMMON_LOG_DIRECTORY, &path);
 	path.Append("syslog");
 
-	char message[512];
-	sprintf(message,
-		"Syslog Daemon\n\n"
-		"This daemon is responsible for collecting "
-		"all system messages and write them to the "
-		"system-wide log at \"%s\".\n\n", path.Path());
+	BString name(B_TRANSLATE("Syslog Daemon"));
+	BString message;
+	snprintf(message.LockBuffer(512), 512,
+		B_TRANSLATE("%s\n\nThis daemon is responsible for collecting "
+			"all system messages and write them to the system-wide log "
+			"at \"%s\".\n\n"), name.String(), path.Path());
+	message.UnlockBuffer();
 
-	BAlert *alert = new BAlert("Syslog daemon", message, "OK");
+	BAlert *alert = new BAlert(name.String(), message.String(), B_TRANSLATE("OK"));
 	BTextView *view = alert->TextView();
 	BFont font;
 
@@ -67,7 +71,7 @@ SyslogDaemon::AboutRequested()
 	view->GetFont(&font);
 	font.SetSize(21);
 	font.SetFace(B_BOLD_FACE); 			
-	view->SetFontAndColor(0, 13, &font);
+	view->SetFontAndColor(0, name.Length(), &font);
 
 	alert->Go(NULL);
 }
