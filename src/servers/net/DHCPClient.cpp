@@ -694,17 +694,17 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address,
 		switch (option) {
 			case OPTION_ROUTER_ADDRESS:
 				syslog(LOG_DEBUG, "  gateway: %s\n",
-						_AddressToString(data).String());
+					_AddressToString(data).String());
 				address.AddString("gateway", _AddressToString(data));
 				break;
 			case OPTION_SUBNET_MASK:
 				syslog(LOG_DEBUG, "  subnet: %s\n",
-						_AddressToString(data).String());
+					_AddressToString(data).String());
 				address.AddString("mask", _AddressToString(data));
 				break;
 			case OPTION_BROADCAST_ADDRESS:
 				syslog(LOG_DEBUG, "  broadcast: %s\n",
-						_AddressToString(data).String());
+					_AddressToString(data).String());
 				address.AddString("broadcast", _AddressToString(data));
 				break;
 			case OPTION_DOMAIN_NAME_SERVER:
@@ -721,8 +721,8 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address,
 			}
 			case OPTION_SERVER_ADDRESS:
 				syslog(LOG_DEBUG, "  server: %s\n",
-						_AddressToString(data).String());
-				fServer.SetAddress(ntohl(*(in_addr_t*)data));
+					_AddressToString(data).String());
+				fServer.SetAddress(*(in_addr_t*)data);
 				break;
 
 			case OPTION_ADDRESS_LEASE_TIME:

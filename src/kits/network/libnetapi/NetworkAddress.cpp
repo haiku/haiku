@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2010-2011, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -353,7 +353,7 @@ BNetworkAddress::SetToBroadcast(int family, uint16 port)
 
 
 status_t
-BNetworkAddress::SetToLocal()
+BNetworkAddress::SetToLocal(int family, uint16 port)
 {
 	// TODO: choose a local address from the network interfaces
 	return fStatus = B_NOT_SUPPORTED;
@@ -361,9 +361,24 @@ BNetworkAddress::SetToLocal()
 
 
 status_t
-BNetworkAddress::SetToLoopback()
+BNetworkAddress::SetToLoopback(int family, uint16 port)
 {
-	return SetTo("localhost");
+	switch (family) {
+		// TODO: choose family depending on availability of IPv6
+		case AF_UNSPEC:
+		case AF_INET:
+			SetTo(htonl(INADDR_LOOPBACK), port);
+			break;
+
+		case AF_INET6:
+			SetTo(in6addr_loopback, port);
+			break;
+
+		default:
+			return fStatus = B_NOT_SUPPORTED;
+	}
+
+	return B_OK;
 }
 
 
@@ -446,7 +461,7 @@ BNetworkAddress::SetAddress(in_addr_t inetAddress)
 		return B_BAD_VALUE;
 
 	sockaddr_in& address = (sockaddr_in&)fAddress;
-	address.sin_addr.s_addr = htonl(inetAddress);
+	address.sin_addr.s_addr = inetAddress;
 	return B_OK;
 }
 

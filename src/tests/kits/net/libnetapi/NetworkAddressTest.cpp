@@ -49,7 +49,7 @@ NetworkAddressTest::TestSetTo()
 
 	CPPUNIT_ASSERT(address.SetTo("127.0.0.1") == B_OK);
 	CPPUNIT_ASSERT(address.Family() == AF_INET);
-	CPPUNIT_ASSERT(address == BNetworkAddress(INADDR_LOOPBACK));
+	CPPUNIT_ASSERT(address == BNetworkAddress(htonl(INADDR_LOOPBACK)));
 
 	CPPUNIT_ASSERT(address.SetTo("::1") == B_OK);
 	CPPUNIT_ASSERT(address.Family() == AF_INET6);

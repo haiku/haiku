@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2010-2011, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _NETWORK_ADDRESS_H
@@ -63,8 +63,10 @@ public:
 			void				SetTo(const BNetworkAddress& other);
 
 			status_t			SetToBroadcast(int family, uint16 port = 0);
-			status_t			SetToLocal();
-			status_t			SetToLoopback();
+			status_t			SetToLocal(int family = AF_UNSPEC,
+									uint16 port = 0);
+			status_t			SetToLoopback(int family = AF_UNSPEC,
+									uint16 port = 0);
 			status_t			SetToMask(int family, uint32 prefixLength);
 			status_t			SetToWildcard(int family, uint16 port = 0);
 
