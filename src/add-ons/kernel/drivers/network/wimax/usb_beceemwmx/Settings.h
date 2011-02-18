@@ -1,21 +1,24 @@
 /*
- *	Ubee WiMax USB Driver.
- *	Copyright (c) 2010 Alexander von Gluck <kallisti5@unixzen.com>
- *	Distributed under the terms of the MIT license.
- *	
- *	Heavily based on code of :
- *	Driver for USB Ethernet Control Model devices
- *	Copyright (C) 2008 Michael Lotz <mmlr@mlotz.ch>
+ *	Beceem WiMax USB Driver
+ *	Copyright 2010-2011 Haiku, Inc. All rights reserved.
  *	Distributed under the terms of the MIT license.
  *
+ *	Authors:
+ *		Alexander von Gluck, <kallisti5@unixzen.com>
+ *
+ *	Partially using:
+ *		USB Ethernet Control Model devices
+ *			(c) 2008 by Michael Lotz, <mmlr@mlotz.ch>
+ *		ASIX AX88172/AX88772/AX88178 USB 2.0 Ethernet Driver
+ *			(c) 2008 by S.Zharski, <imker@gmx.li>
  */
-
 #ifndef _USB_BECEEM_SETTINGS_H_ 
 #define _USB_BECEEM_SETTINGS_H_
 
-#include <driver_settings.h> 
 
+#include <driver_settings.h> 
 #include "Driver.h"
+
 
 void load_settings();
 void release_settings();

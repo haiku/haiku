@@ -1,18 +1,18 @@
 /*
- *	Beceem WiMax USB Driver.
- *	Copyright (c) 2010 Alexander von Gluck <kallisti5@unixzen.com>
- *	Distributed under the terms of the MIT license.
- *	
- *	Heavily based on code of :
- *	Driver for USB Ethernet Control Model devices
- *	Copyright (C) 2008 Michael Lotz <mmlr@mlotz.ch>
+ *	Beceem WiMax USB Driver
+ *	Copyright 2010-2011 Haiku, Inc. All rights reserved.
  *	Distributed under the terms of the MIT license.
  *
- *	The Beceem chipset can be used via multiple interfaces
- *	such as PCMCIA, MII, PCI, SDIO, and Serial. However I have
- *	only found it implemented commercially for PC use as USB. 
+ *	Authors:
+ *		Alexander von Gluck, <kallisti5@unixzen.com>
  *
+ *	Partially using:
+ *		USB Ethernet Control Model devices
+ *			(c) 2008 by Michael Lotz, <mmlr@mlotz.ch>
+ *		ASIX AX88172/AX88772/AX88178 USB 2.0 Ethernet Driver
+ *			(c) 2008 by S.Zharski, <imker@gmx.li>
  */
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,11 +28,13 @@
 #include "Driver.h"
 #include "Settings.h"
 
+
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 static const char *sDeviceBaseName = "net/usb_beceemwmx/";
 BeceemDevice *gBeceemDevices[MAX_DEVICES];
 char *gDeviceNames[MAX_DEVICES + 1];
 usb_module_info *gUSBModule = NULL;
+
 
 usb_support_descriptor gSupportedDevices[] = {
 	{ 0, 0, 0, 0x0489, 0xe016},
@@ -47,7 +49,9 @@ usb_support_descriptor gSupportedDevices[] = {
 		// "ZTE TU25 WiMAX Adapter [Beceem BCS200]"
 };
 
+
 mutex gDriverLock;
+
 
 // auto-release helper class
 class DriverSmartLock {
@@ -55,6 +59,7 @@ public:
 	DriverSmartLock()  { mutex_lock(&gDriverLock);   }
 	~DriverSmartLock() { mutex_unlock(&gDriverLock); }
 };
+
 
 BeceemDevice *
 create_beceem_device(usb_device device)

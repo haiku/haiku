@@ -8,13 +8,16 @@
  *	Description: Wrangle Beceem volatile DDR memory.
  */
 
+
 #include "Settings.h"
 #include "BeceemDDR.h"
+
 
 BeceemDDR::BeceemDDR()
 {
   TRACE("Debug: Load DDR handler\n");
 }
+
 
 status_t
 BeceemDDR::DDRInit(WIMAX_DEVICE* swmxdevice)

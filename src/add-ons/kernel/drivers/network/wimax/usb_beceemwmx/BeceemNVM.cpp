@@ -20,6 +20,7 @@
 #include "BeceemDevice.h"
 #include "BeceemNVM.h"
 
+
 BeceemNVM::BeceemNVM()
 {
 	TRACE("Debug: Load non-volatile memory handler\n");
@@ -84,7 +85,7 @@ BeceemNVM::NVMDetect()
 	EEPROMBulkRead(0x0, 4, &uiData);
 	if (uiData == BECM)
 	{
-		TRACE_ALWAYS("Info: EEPROM non-volatile memory detected.\n");
+		TRACE_ALWAYS("Info: EEPROM nvm detected.\n");
 		pwmxdevice->nvmType = NVM_EEPROM;
 		pwmxdevice->nvmDSDSize = EEPROMGetSize();
 		return B_OK;
@@ -95,9 +96,9 @@ BeceemNVM::NVMDetect()
 		return B_ERROR;
 
 	FlashBulkRead(0x0 + pwmxdevice->nvmFlashCalStart, 4, &uiData);
-	if(uiData == BECM)
+	if (uiData == BECM)
 	{
-			TRACE_ALWAYS("Info: Flash non-volatile memory detected.\n");
+			TRACE_ALWAYS("Info: Flash nvm detected.\n");
 			pwmxdevice->nvmType = NVM_FLASH;
 			pwmxdevice->nvmDSDSize = FlashGetSize();
 			return B_OK;
@@ -105,7 +106,7 @@ BeceemNVM::NVMDetect()
 
 	pwmxdevice->nvmType = NVM_UNKNOWN;
 
-	TRACE_ALWAYS("Error: Couldn't detect non-volatile storage method, found 0x%X\n",
+	TRACE_ALWAYS("Error: Couldn't detect nvm storage method, found 0x%X\n",
 				uiData);
 	return B_ERROR;
 }
@@ -125,7 +126,8 @@ BeceemNVM::NVMChipSelect(unsigned int offset)
 	if (bSelectedChip == ChipIndex)
 		return B_OK;
 
-	TRACE("Debug: Selecting chip %d for transaction at 0x%x\n", ChipIndex, offset);
+	TRACE("Debug: Selecting chip %d for transaction at 0x%x\n",
+		ChipIndex, offset);
 
 	// Migrate selected chip to new selection
 	bSelectedChip = ChipIndex;
@@ -136,7 +138,7 @@ BeceemNVM::NVMChipSelect(unsigned int offset)
 	// TRACE("Reading GPIO config 0x%x\n", &GPIOConfig);
 	// TRACE("Reading Flash config 0x%x\n", &FlashConfig);
 
-	switch(ChipIndex)
+	switch (ChipIndex)
 	{
 	case 0:
 		PartNum = 0;
@@ -190,7 +192,7 @@ BeceemNVM::NVMRead(unsigned int offset, unsigned int size, unsigned int* buffer)
 		// Increase offset by FlashCalibratedStart
 		myOffset = offset + pwmxdevice->nvmFlashCalStart;
 
-		TRACE("Debug: Performing read of non-volatile flash memory at 0x%x (%d)\n",
+		TRACE("Debug: Performing read of flash nvm at 0x%x (%d)\n",
 			myOffset, size);
 
 		// If firmware was already pushed, Beceem notes a hardware bug here.
@@ -257,16 +259,21 @@ int
 BeceemNVM::FlashGetBaseAddr()
 {
 	if (pwmxdevice->driverDDRinit == true) {
-		if (pwmxdevice->nvmFlashCSDone == true && pwmxdevice->nvmFlashRaw == false &&
-			!((pwmxdevice->nvmFlashMajor == 1) && (pwmxdevice->nvmFlashMinor == 1)) ) {
+		if (pwmxdevice->nvmFlashCSDone == true
+			&& pwmxdevice->nvmFlashRaw == false
+			&& !((pwmxdevice->nvmFlashMajor == 1)
+			&& (pwmxdevice->nvmFlashMinor == 1))) {
 			return pwmxdevice->nvmFlashBaseAddr;
 		} else {
 			return FLASH_CONTIGIOUS_START_ADDR_AFTER_INIT;
 		}
 	} else {
-		if (pwmxdevice->nvmFlashCSDone == true && pwmxdevice->nvmFlashRaw == false &&
-			!((pwmxdevice->nvmFlashMajor == 1) && (pwmxdevice->nvmFlashMinor == 1)) ) {
-			return pwmxdevice->nvmFlashBaseAddr | FLASH_CONTIGIOUS_START_ADDR_BEFORE_INIT;
+		if (pwmxdevice->nvmFlashCSDone == true
+			&& pwmxdevice->nvmFlashRaw == false
+			&& !((pwmxdevice->nvmFlashMajor == 1)
+			&& (pwmxdevice->nvmFlashMinor == 1))) {
+			return pwmxdevice->nvmFlashBaseAddr
+				| FLASH_CONTIGIOUS_START_ADDR_BEFORE_INIT;
 		} else {
 			return FLASH_CONTIGIOUS_START_ADDR_BEFORE_INIT;
 		}
@@ -298,7 +305,8 @@ BeceemNVM::FlashReadID()
 
 	// Read SPI READQ Register, The output will be 4 bytes long
 	// The ID is the first 3 bytes.
-	BizarroReadRegister(FLASH_SPI_READQ_REG, sizeof(RDID), (unsigned int*)&RDID);
+	BizarroReadRegister(FLASH_SPI_READQ_REG, sizeof(RDID),
+		(unsigned int*)&RDID);
 
 	return (RDID >>8);
 }
@@ -325,16 +333,21 @@ BeceemNVM::FlashReadCS()
 	}
 
 	// CS Signature(4), Minor(2), Major(2)
-	FlashBulkRead(pwmxdevice->nvmFlashCSStart, 8, (unsigned int*)pwmxdevice->nvmFlashCSInfo);
-	pwmxdevice->nvmFlashCSInfo->FlashLayoutVersion =  ntohl(pwmxdevice->nvmFlashCSInfo->FlashLayoutVersion);
+	FlashBulkRead(pwmxdevice->nvmFlashCSStart, 8,
+		(unsigned int*)pwmxdevice->nvmFlashCSInfo);
+
+	pwmxdevice->nvmFlashCSInfo->FlashLayoutVersion
+		= ntohl(pwmxdevice->nvmFlashCSInfo->FlashLayoutVersion);
 
 	TRACE_ALWAYS("Info: Flash CS Version/Signature: 0x%X/0x%X\n",
 				(pwmxdevice->nvmFlashCSInfo->FlashLayoutVersion),
 				ntohl(pwmxdevice->nvmFlashCSInfo->MagicNumber));
 
-	if ( ntohl(pwmxdevice->nvmFlashCSInfo->MagicNumber) == FLASH_CS_SIGNATURE ) {
-		pwmxdevice->nvmFlashMajor = MAJOR_VERSION(pwmxdevice->nvmFlashCSInfo->FlashLayoutVersion);
-		pwmxdevice->nvmFlashMinor = MINOR_VERSION(pwmxdevice->nvmFlashCSInfo->FlashLayoutVersion);
+	if (ntohl(pwmxdevice->nvmFlashCSInfo->MagicNumber) == FLASH_CS_SIGNATURE) {
+		pwmxdevice->nvmFlashMajor
+			= MAJOR_VERSION(pwmxdevice->nvmFlashCSInfo->FlashLayoutVersion);
+		pwmxdevice->nvmFlashMinor
+			= MINOR_VERSION(pwmxdevice->nvmFlashCSInfo->FlashLayoutVersion);
 	} else {
 		TRACE_ALWAYS("Error: Unknown flash magic signature!\n");
 		pwmxdevice->nvmFlashMajor = 0;
@@ -345,16 +358,20 @@ BeceemNVM::FlashReadCS()
 	if (pwmxdevice->nvmFlashMajor == 0x1)
 	{
 		// device is older flash map
-		FlashBulkRead(pwmxdevice->nvmFlashCSStart, sizeof(FLASH_CS_INFO), (unsigned int*)pwmxdevice->nvmFlashCSInfo);
+		FlashBulkRead(pwmxdevice->nvmFlashCSStart, sizeof(FLASH_CS_INFO),
+			(unsigned int*)pwmxdevice->nvmFlashCSInfo);
 		snooze(100);
 		FlashCSFlip(pwmxdevice->nvmFlashCSInfo);
 		FlashCSDump(pwmxdevice->nvmFlashCSInfo);
 
-		pwmxdevice->nvmFlashCalStart = (pwmxdevice->nvmFlashCSInfo->OffsetFromZeroForCalibrationStart);
+		pwmxdevice->nvmFlashCalStart
+			= (pwmxdevice->nvmFlashCSInfo->OffsetFromZeroForCalibrationStart);
 
-		if(!((pwmxdevice->nvmFlashMajor == 1) && (pwmxdevice->nvmFlashMinor == 1)))
+		if (!((pwmxdevice->nvmFlashMajor == 1)
+			&& (pwmxdevice->nvmFlashMinor == 1)))
 		{
-			pwmxdevice->nvmFlashCSStart = (pwmxdevice->nvmFlashCSInfo->OffsetFromZeroForControlSectionStart);
+			pwmxdevice->nvmFlashCSStart
+				= (pwmxdevice->nvmFlashCSInfo->OffsetFromZeroForControlSectionStart);
 		}
 
 		// TODO : Flash Write sizes.. no write support atm
@@ -373,12 +390,13 @@ BeceemNVM::FlashReadCS()
 			pwmxdevice->fpFlashWriteWithStatusCheck = flashWriteStatus;
 		}
 		*/
-	
+
 		//BcmGetFlashSectorSize(Adapter, (Adapter->psFlashCSInfo->FlashSectorSizeSig),
 		//						(Adapter->psFlashCSInfo->FlashSectorSize));
 		#endif
 
-		pwmxdevice->nvmFlashBaseAddr = pwmxdevice->nvmFlashCSInfo->FlashBaseAddr & 0xFCFFFFFF;
+		pwmxdevice->nvmFlashBaseAddr = pwmxdevice->nvmFlashCSInfo->FlashBaseAddr
+			& 0xFCFFFFFF;
 
 	} else {
 		// device is newer flash map layout
@@ -604,11 +622,12 @@ BeceemNVM::FlashBulkWrite(unsigned int offset, unsigned int size, unsigned int* 
 
 		if (NumSectTobeRead > 1)
 		{
-			memcpy(&TempBuffer[CurrSectOffsetAddr], ucBuffer, SectBoundary-(SectAlignAddr+CurrSectOffsetAddr));
+			memcpy(&TempBuffer[CurrSectOffsetAddr], ucBuffer,
+				SectBoundary - (SectAlignAddr + CurrSectOffsetAddr));
 			ucBuffer += ((SectBoundary-(SectAlignAddr + CurrSectOffsetAddr)));
 			size -= (SectBoundary-(SectAlignAddr + CurrSectOffsetAddr));
 		} else {
-			memcpy(&TempBuffer[CurrSectOffsetAddr],ucBuffer, size);
+			memcpy(&TempBuffer[CurrSectOffsetAddr], ucBuffer, size);
 		}
 
 		// TODO : SaveHeaderIfPresent if IsFlash2x?
@@ -668,7 +687,7 @@ BeceemNVM::FlashBulkWrite(unsigned int offset, unsigned int size, unsigned int* 
 		}
 		#endif
 
-		if(BPStatus)
+		if (BPStatus)
 		{
 			RestoreBlockProtect(BPStatus);
 			BPStatus = 0;
@@ -773,15 +792,15 @@ BeceemNVM::EEPROMGetSize()
 	unsigned int	uiIndex = 0;
 
 	// To find the EEPROM size read the possible boundaries of the
-	// EEPROM like 4K,8K etc..accessing the EEPROM beyond its size will 
-	// result in wrap around. So when we get the End of the EEPROM we will 
+	// EEPROM like 4K,8K etc..accessing the EEPROM beyond its size will
+	// result in wrap around. So when we get the End of the EEPROM we will
 	// get 'BECM' string which is indeed at offset 0.
 
 	EEPROMBulkRead(0x0, 4, &uiData);
 
 	if (ntohl(uiData) == BECM)
 	{
-		// If EEPROM is present ,it will have 'BECM' string at 0th offset.
+		// If EEPROM is present, it will have 'BECM' string at 0th offset.
 
 		for (uiIndex = 1 ; uiIndex <= 256; uiIndex *= 2)
 		{
@@ -854,7 +873,8 @@ BeceemNVM::EEPROMRead(unsigned int offset, unsigned int *pdwData)
 			return B_ERROR;
 		}
 
-		BizarroReadRegister(EEPROM_SPI_Q_STATUS_REG, sizeof(unsigned int), &Value);
+		BizarroReadRegister(EEPROM_SPI_Q_STATUS_REG, sizeof(unsigned int),
+			&Value);
 	}
 
 	BizarroReadRegister(EEPROM_READ_DATAQ_REG, sizeof(unsigned int), &Value);

@@ -1,18 +1,23 @@
 /*
- *	Beceem WiMax USB Driver.
- *	Copyright (c) 2010 Alexander von Gluck <kallisti5@unixzen.com>
- *	Distributed under the terms of the MIT license.
- *	
- *	Heavily based on code of :
- *	Driver for USB Ethernet Control Model devices
- *	Copyright (C) 2008 Michael Lotz <mmlr@mlotz.ch>
+ *	Beceem WiMax USB Driver
+ *	Copyright 2010-2011 Haiku, Inc. All rights reserved.
  *	Distributed under the terms of the MIT license.
  *
+ *	Authors:
+ *		Alexander von Gluck, <kallisti5@unixzen.com>
+ *
+ *	Partially using:
+ *		USB Ethernet Control Model devices
+ *			(c) 2008 by Michael Lotz, <mmlr@mlotz.ch>
+ *		ASIX AX88172/AX88772/AX88178 USB 2.0 Ethernet Driver
+ *			(c) 2008 by S.Zharski, <imker@gmx.li>
  */
+
 
 #include <lock.h> // for mutex
 
 #include "Settings.h"
+
 
 bool gTraceOn = false;
 bool gTruncateLogFile = false;
@@ -20,6 +25,7 @@ bool gAddTimeStamp = true;
 bool gTraceFlow = false;
 static char *gLogFilePath = NULL;
 mutex gLogLock;
+
 
 static 
 void create_log()
@@ -32,6 +38,7 @@ void create_log()
 
 	mutex_init(&gLogLock, DRIVER_NAME"-logging");
 }
+
 
 void load_settings()
 {
@@ -56,6 +63,7 @@ void load_settings()
 	create_log();
 }
 
+
 void release_settings()
 {
 	if(gLogFilePath != NULL) {
@@ -63,6 +71,7 @@ void release_settings()
 		free(gLogFilePath);
 	}
 }
+
 
 void usb_beceem_trace(bool force, const char* func, const char *fmt, ...)
 {

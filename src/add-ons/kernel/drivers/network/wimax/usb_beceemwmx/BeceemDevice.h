@@ -1,16 +1,18 @@
 /*
- *	Beceem WiMax USB Driver.
- *	Copyright (c) 2010 Alexander von Gluck <kallisti5@unixzen.com>
- *	Distributed under the terms of the GNU General Public License.
- *
- *	Based on GPL code developed by: Beceem Communications Pvt. Ltd
- *
- *	Driver for USB Ethernet Control Model devices
- *	Copyright (C) 2008 Michael Lotz <mmlr@mlotz.ch>
+ *	Beceem WiMax USB Driver
+ *	Copyright 2010-2011 Haiku, Inc. All rights reserved.
  *	Distributed under the terms of the MIT license.
  *
- *	Description: Wrangle Beceem wimax usb device
+ *	Authors:
+ *		Alexander von Gluck, <kallisti5@unixzen.com>
+ *
+ *	Partially using:
+ *		USB Ethernet Control Model devices
+ *			(c) 2008 by Michael Lotz, <mmlr@mlotz.ch>
+ *		ASIX AX88172/AX88772/AX88178 USB 2.0 Ethernet Driver
+ *			(c) 2008 by S.Zharski, <imker@gmx.li>
  */
+
 
 #ifndef _USB_BECEEM_DEVICE_H_
 #define _USB_BECEEM_DEVICE_H_

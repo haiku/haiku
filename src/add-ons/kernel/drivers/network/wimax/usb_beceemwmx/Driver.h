@@ -1,17 +1,20 @@
 /*
- *	Beceem WiMax USB Driver.
- *	Copyright (c) 2010 Alexander von Gluck <kallisti5@unixzen.com>
+ *	Beceem WiMax USB Driver
+ *	Copyright 2010-2011 Haiku, Inc. All rights reserved.
  *	Distributed under the terms of the MIT license.
  *
- *	Heavily based on code of :
- *	Driver for USB Ethernet Control Model devices
- *	Copyright (C) 2008 Michael Lotz <mmlr@mlotz.ch>
- *	Distributed under the terms of the MIT license.
+ *	Authors:
+ *		Alexander von Gluck, <kallisti5@unixzen.com>
  *
+ *	Partially using:
+ *		USB Ethernet Control Model devices
+ *			(c) 2008 by Michael Lotz, <mmlr@mlotz.ch>
+ *		ASIX AX88172/AX88772/AX88178 USB 2.0 Ethernet Driver
+ *			(c) 2008 by S.Zharski, <imker@gmx.li>
  */
-
 #ifndef _USB_BECEEM_DRIVER_H_
 #define _USB_BECEEM_DRIVER_H_
+
 
 #include <OS.h>
 #include <KernelExport.h>
@@ -24,6 +27,7 @@
 #include <stdio.h>
 
 #include <util/kernel_cpp.h>
+
 
 #define DRIVER_NAME	"usb_beceemwmx"
 #define MAX_DEVICES	8
@@ -101,6 +105,7 @@ const char* const kVersion = "ver.5.2.45.1";
 
 extern usb_module_info *gUSBModule;
 
+
 extern "C" {
 status_t	usb_beceem_device_added(usb_device device, void **cookie);
 status_t	usb_beceem_device_removed(void *cookie);
@@ -111,6 +116,7 @@ void		uninit_driver();
 const char **publish_devices();
 device_hooks *find_device(const char *name);
 }
+
 
 #endif //_USB_BECEEM_DRIVER_H_
 
