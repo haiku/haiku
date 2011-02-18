@@ -3,7 +3,7 @@ THE HAIKU BOOK HOWTO
 
 The end user documentation for Haiku is automatically generated from the 
 source code using the Doxygen tool. We are talking BeBook-style documentation 
-here, not development related docs (those belong in /current/docs/develop).
+here, not development related docs (those belong in trunk/docs/develop).
 
 This HOWTO only explains how to include your kit into the "Haiku Book", it
 is not a Doxygen tutorial. For information about using Doxygen, see the Doxygen
@@ -16,8 +16,8 @@ There are two ways to document your kit:
 
 Either way is fine. The documentation for the Midi Kit, for example, uses the
 latter option. The files with the Doxygen comments all live in the midi2 subdir
-of /current/docs/user. Of course, if you embed the Doxygen comments directly in
-your source code, you don't need to make a subdir in /current/docs/user.
+of /trunk/docs/user. Of course, if you embed the Doxygen comments directly in
+your source code, you don't need to make a subdir in /trunk/docs/user.
 
 There is one Doxygen config file (Doxyfile) for the entire book, so you don't
 have to make your own Doxyfile. You just have to add the directories with your
@@ -25,7 +25,7 @@ commented files to the INPUT directive, so doxygen will know where to find them.
 You probably also want to add a link to your kit on the main page (book.dox).
 
 To generate the docs, simply type "doxygen" in the Terminal. The script puts 
-the resulting HTML docs in "/current/distro/x86.R1/beos/docs".
+the resulting HTML docs in "/trunk/generated/doxygen/html".
 
 Note: theoretically, Doxygen allows us to treat each kit as a separate "module", 
 using the \defgroup and \ingroup tags. In practice, the results of this are a 
