@@ -1605,7 +1605,7 @@ ShowImageView::ZoomOut(BPoint where)
 }
 
 
-/*!	Fits to image to the view bounds.
+/*!	Fits the image to the view bounds.
 */
 void
 ShowImageView::FitToBounds()
