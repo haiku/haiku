@@ -1369,7 +1369,10 @@ ShowImageWindow::QuitRequested()
 
 	ShowImageSettings* settings = my_app->Settings();
 	if (settings->Lock()) {
-		settings->SetRect("WindowFrame", Frame());
+		if (fFullScreen)
+			settings->SetRect("WindowFrame", fWindowFrame);
+		else
+			settings->SetRect("WindowFrame", Frame());
 		settings->Unlock();
 	}
 
