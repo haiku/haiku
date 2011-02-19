@@ -577,7 +577,7 @@ HeaderView::HeaderView(BRect frame, const entry_ref *ref, DataEditor &editor)
 	rect.right = rect.left + 75;
 	rect.OffsetBy(0, 2);
 	fSizeView = new BStringView(rect, B_EMPTY_STRING, B_TRANSLATE_COMMENT("of "
-		"0x0", "This is a part of \"Block 0xXXXX of 0x0026\" message. In "
+		"0x0", "This is a part of 'Block 0xXXXX of 0x0026' message. In "
 		"languages without 'of' structure it can be replaced simply "
 		"with '/'."));
 	fSizeView->SetFont(&plainFont);
