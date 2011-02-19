@@ -42,6 +42,7 @@
 
 
 extern "C" _EXPORT BView *instantiate_deskbar_item(void);
+extern const char* kDeskbarItemName;
 
 const uint32 kMsgToggleLabel = 'tglb';
 const uint32 kMsgToggleTime = 'tgtm';
@@ -50,7 +51,6 @@ const uint32 kMsgToggleExtInfo = 'texi';
 
 const uint32 kMinIconWidth = 16;
 const uint32 kMinIconHeight = 16;
-
 
 PowerStatusView::PowerStatusView(PowerStatusDriverInterface* interface,
 		BRect frame, int32 resizingMode,  int batteryID, bool inDeskbar)
@@ -609,7 +609,7 @@ PowerStatusReplicant::MouseDown(BPoint point)
 void
 PowerStatusReplicant::_AboutRequested()
 {
-	BAlert* alert = new BAlert(B_TRANSLATE("about"),
+	BAlert* alert = new BAlert(B_TRANSLATE("About"),
 		B_TRANSLATE("PowerStatus\n"
 			"written by Axel Dörfler, Clemens Zeidler\n"
 			"Copyright 2006, Haiku, Inc.\n"), B_TRANSLATE("OK"));
@@ -621,7 +621,7 @@ PowerStatusReplicant::_AboutRequested()
 	view->GetFont(&font);
 	font.SetSize(18);
 	font.SetFace(B_BOLD_FACE);
-	view->SetFontAndColor(0, 11, &font);
+	view->SetFontAndColor(0, strlen(B_TRANSLATE("PowerStatus"))-1, &font);
 
 	alert->Go();
 }
@@ -635,7 +635,7 @@ PowerStatusReplicant::_Init()
 		delete fDriverInterface;
 		fDriverInterface = new APMDriverInterface;
 		if (fDriverInterface->Connect() != B_OK) {
-			fprintf(stderr, B_TRANSLATE("No power interface found.\n"));
+			fprintf(stderr, "No power interface found.\n");
 			_Quit();
 		}
 	}
@@ -668,7 +668,7 @@ PowerStatusReplicant::_GetSettings(BFile& file, int mode)
 	if (status != B_OK)
 		return status;
 
-	path.Append(B_TRANSLATE("PowerStatus settings"));
+	path.Append("PowerStatus settings");
 
 	return file.SetTo(path.Path(), mode);
 }
