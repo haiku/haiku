@@ -10,7 +10,7 @@ OK	SoundsHApp		OK
 Other…	HWindow		Weitere...
 Play	HWindow		Wiedergabe
 Sound	HEventList		Klang
-Sound File:	HWindow		Klang-Datei:
+Sound File:	HWindow		Klangdatei:
 Sounds	SoundsHApp		Sounds
 Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Sounds\n\nvon Oliver Ruiz Dorantes und Jérôme Duval.\nOriginalversion von Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku
 Stop	HWindow		Stopp

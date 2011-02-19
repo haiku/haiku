@@ -1,27 +1,27 @@
 1	german	x-vnd.Haiku.PoorMan	805673381
-A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Ein Standard Web-Ordner \"/boot/home/public_html.\" wurde erstellt.\nDarin muss sich eine HTML-Datei mit dem Namen \"index.html\" befinden.
+A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Der Standard Web-Ordner \"/boot/home/public_html\" wurde erstellt.\nDarin muss sich eine HTML-Datei mit dem Namen \"index.html\" befinden.
 About PoorMan	PoorMan		Über PoorMan
-About PoorMan…	PoorMan		Über PoorMan..
+About PoorMan…	PoorMan		Über PoorMan...
 Advanced	PoorMan		Erweitert
 Cancel	PoorMan		Abbrechen
-Cannot start the server	PoorMan		Kann den Server nicht starten
+Cannot start the server	PoorMan		Der Server konnte nicht gestartet werden.
 Clear console log	PoorMan		Konsolenlog löschen
-Clear hit counter	PoorMan		Lösche Zugriffszähler
+Clear hit counter	PoorMan		Zugriffszähler löschen
 Clear log file	PoorMan		Logdatei leeren
 Console Logging	PoorMan		In Konsole loggen
 Controls	PoorMan		Aktionen
 Copy	PoorMan		Kopieren
 Create	PoorMan		Erstelle
-Create PoorMan log	PoorMan		PoorMan Logdatei erstellen
+Create PoorMan log	PoorMan		PoorMan-Logdatei erstellen
 Create log file	PoorMan		Logdatei erstellen
 Default	PoorMan		Standard
-Dir Created	PoorMan		Verzeichnis erstellt
+Dir Created	PoorMan		Ordner erstellt
 Directory: 	PoorMan		Ordner:
 Directory: (none)	PoorMan		Ordner: (keiner)
 Done	PoorMan		Fertig
 Edit	PoorMan		Bearbeiten
 Error Dir	PoorMan		Fehlerverzeichnis
-Error Server	PoorMan		Fehler Server
+Error Server	PoorMan		Serverfehler
 File	PoorMan		Datei
 File Name	PoorMan		Dateiname
 File logging	PoorMan		In Datei loggen
@@ -29,20 +29,20 @@ Hits: %lu	PoorMan		Zugriffe: %lu
 Hits: 0	PoorMan		Zugriffe: 0
 Log To Console	PoorMan		In Konsole loggen
 Log To File	PoorMan		In Datei loggen
-Log file name:	PoorMan		Logdatei Name:
-Logging	PoorMan		Loggen
+Log file name:	PoorMan		Logdatei-Name:
+Logging	PoorMan		Log
 Logging view	PoorMan		Log-Ansicht
 Max. simultaneous connections:	PoorMan		Max. gleichzeitige Verbindungen:
 OK	PoorMan		OK
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Bitte den Ordner auswählen, der im Web veröffentlicht werden soll.\n\nPoorMan kann den standardmäßigen \"public_html\" Ordner im home Ordner erstellen oder einen frei  zu wählenden Ordner benutzen.
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Bitte den Ordner auswählen, der im Web veröffentlicht werden soll.\n\nPoorMan kann den standardmäßigen \"public_html\" Ordner im home-Ordner erstellen oder einen frei zu wählenden Ordner benutzen.
 Poor Man's web server\nCopyright © 2004-2009 Haiku\nAll rights reserved.\n\nWritten by: Philip Harrison, Ma Jie	PoorMan		Poor Man's web server\nCopyright © 2004-2009 Haiku\nAll rights reserved.\n\nvon Philip Harrison, Ma Jie
-PoorMan settings	PoorMan		PoorMan Einstellungen
+PoorMan settings	PoorMan		PoorMan-Einstellungen
 Quit	PoorMan		Beenden
-Run server	PoorMan		Starte Server
-Save console as…	PoorMan		Speichere Konsole als...
-Save console selections as…	PoorMan		Speichere Auswahl der Konsole als...
+Run server	PoorMan		Server starten
+Save console as…	PoorMan		Konsole speichern als...
+Save console selections as…	PoorMan		Auswahl der Konsole speichern als...
 Save log console	PoorMan		Logkonsole speichern
-Save log console selection	PoorMan		Speichere Auswahl der Logkonsole
+Save log console selection	PoorMan		Auswahl der Logkonsole speichern
 Select	PoorMan		Auswählen
 Select all	PoorMan		Alles auswählen
 Select web folder	PoorMan		Web-Ordner auswählen
@@ -50,13 +50,13 @@ Send file listing if there's no start page	PoorMan		Dateiaufzählung senden wenn
 Settings…	PoorMan		Einstellungen...
 Shutting down.	PoorMan		Herunterfahren.
 Shutting down.\n	PoorMan		Herunterfahren.\n
-Site	PoorMan		Site
+Site	PoorMan		Website
 Start page:	PoorMan		Startseite:
 Starting up... 	PoorMan		Starte...
 Status: Running	PoorMan		Status: Läuft
 Status: Stopped	PoorMan		Status: Angehalten
-Web folder:	PoorMan		Web Ordner:
-Website location	PoorMan		Website Adresse
-Website options	PoorMan		Website Optionen
+Web folder:	PoorMan		Web-Ordner:
+Website location	PoorMan		Website-Adresse
+Website options	PoorMan		Website-Optionen
 connections	PoorMan		Verbindungen
 done.\n	PoorMan		fertig.\n

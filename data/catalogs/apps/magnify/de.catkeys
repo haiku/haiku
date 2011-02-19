@@ -1,9 +1,9 @@
 1	german	x-vnd.Haiku-Magnify	1680541832
-%width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize Pixels/Pixel
+%width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize Pixel/Pixel
 About Magnify…	Magnify-Main		Über Magnify...
 Add a crosshair	Magnify-Main		Fadenkreuz hinzufügen
 Copy image	Magnify-Main		Bild kopieren
-Copy/Save:\n  copy - copies the current image to the clipboard\n  save - prompts the user for a file to save to and writes out\n    the bits of the image\n	Magnify-Help		Kopieren/Speichern:\n Kopieren - Kopiert das aktuelle Bild in die Zwischenablage\n Speichern - fragt den Benutzer nach einer Datei in die das Bild gespeichert werden soll \n und speichert das Bild dorthin\n
+Copy/Save:\n  copy - copies the current image to the clipboard\n  save - prompts the user for a file to save to and writes out\n    the bits of the image\n	Magnify-Help		Bild kopieren/speichern:\nKopieren - kopiert das aktuelle Bild in die Zwischenablage\nSpeichern - speichert das Bild als Bits, die in Header-Dateien\nbei der Programmierung genutzt werden können.\n
 Decrease pixel size	Magnify-Main		Pixel verkleinern
 Decrease window size	Magnify-Main		Fenster verkleinern
 Freeze/Unfreeze image	Magnify-Main		Bild einfrieren/freigeben
@@ -16,10 +16,10 @@ Increase window size	Magnify-Main		Fenster vergrößern
 Info	Magnify-Main		Info
 Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		Info:\nInfos aus-/einblenden - blendet Informationen zu Fenster- und Pixelgröße ein/aus.\nDas kleine rote Quadrat markiert den Pixel, dessen Farbe als RGB-Wert angezeigt wird.\nFadenkreuz hinzufügen/entfernen - bis zu zwei Fadenkreuze, dargestellt durch blaue\n Quadrate und Linien, helfen beim Ausrichten von Objekten.\nGitter aus-/einblenden - steuert ein Gitter, das sich über die Pixel legt.\n
 Magnify	Magnify-Main		Magnify
-Magnify help	Magnify-Help		Magnify Hilfe
+Magnify help	Magnify-Help		Magnify-Hilfe
 Magnify!\n\n©2002-2006 Haiku\n(C)1999 Be Inc.\n\nNow with even more features and recompiled for Haiku.	Magnify-Main		Magnify!\n\n©2002-2006 Haiku\n(C)1999 Be Inc.\n\nJetzt mit noch mehr Features und neu für Haiku kompiliert.
 Make square	Magnify-Main		Quadratisches Fenster
-Navigation:\n  arrow keys - move the current selection (rgb indicator or crosshair)\n    around 1 pixel at a time\n  option-arrow key - moves the mouse location 1 pixel at a time\n  x marks the selection - the current selection has an 'x' in it\n	Magnify-Help		Navigation:\nPfeiltasten - die aktuelle Auswahl bewegen (RGB-Anzeiger oder Fadenkreuz)\nDie aktuelle Auswahl hat ein 'x' im Qudrat.\nOPT+Pfeiltaste - bewegt den Mauszeiger.\n
+Navigation:\n  arrow keys - move the current selection (rgb indicator or crosshair)\n    around 1 pixel at a time\n  option-arrow key - moves the mouse location 1 pixel at a time\n  x marks the selection - the current selection has an 'x' in it\n	Magnify-Help		Navigation:\nPfeiltasten - die aktuelle Auswahl bewegen (RGB-Anzeiger oder Fadenkreuz)\nDie aktuelle Auswahl hat ein 'x' im Quadrat.\nOPT+Pfeiltaste - bewegt den Mauszeiger.\n
 OK	Magnify-Main		OK
 Remove a crosshair	Magnify-Main		Fadenkreuz entfernen
 Save image	Magnify-Main		Bild speichern

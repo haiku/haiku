@@ -9,7 +9,7 @@ Configure attributes	People		Attribute konfigurieren
 Contact information for a person.	Long mimetype description		Kontaktinformationen einer Person.
 Contact name	People		Kontaktname
 Copy	People		Kopieren
-Could not create %s.	People		Konnte %s nicht erstellen.
+Could not create %s.	People		\"%s\" konnte nicht erstellt werden.
 Country	People		Land
 Cut	People		Ausschneiden
 E-mail	People		E-mail
@@ -33,9 +33,9 @@ Revert	People		Anfangswerte
 Save	People		Speichern
 Save as…	People		Speichern als...
 Save changes before quitting?	People		Änderungen vor dem Beenden speichern?
-Select all	People		Alle auswählen
+Select all	People		Alles auswählen
 Sorry	People		Entschuldigung
-State	People		Staat
+State	People		Bundesland
 URL	People		URL
 Undo	People		Rückgängig
 Work phone	People		Telefon (Arbeit)

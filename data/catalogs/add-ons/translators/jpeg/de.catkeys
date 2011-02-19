@@ -1,15 +1,15 @@
 1	german	x-vnd.Haiku-JPEGTranslator	1834097482
 About	JPEGTranslator		Über
-Based on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n	JPEGTranslator		Basiert auf der IJG Bibliothek © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n
-Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Be Bitmap Format (JPEGTranslator)
+Based on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n	JPEGTranslator		Basiert auf der IJG-Bibliothek © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n
+Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Be-Bitmap-Format (JPEGTranslator)
 ExposureTime	exit_parser		Belichtungszeit
 High	JPEGTranslator		Hoch
 ISO	exit_parser		ISO
-JPEG Library Error: %s\n	be_jerror		JPEG Bibliothek Fehler: %s\n
-JPEG Library Warning: %s\n	be_jerror		JPEG Bibliothek Warnung: %s\n
-JPEG images	JPEGTranslator		JPEG Bilder
+JPEG Library Error: %s\n	be_jerror		JPEG-Bibliothek, Fehler: %s\n
+JPEG Library Warning: %s\n	be_jerror		JPEG-Bibliothek, Warnung: %s\n
+JPEG images	JPEGTranslator		JPEG-Bilder
 Low	JPEGTranslator		Niedrig
-Make file smaller (sligthtly worse quality)	JPEGTranslator		Kleinere Dateien (mit etwas schlechterer Qulität)
+Make file smaller (sligthtly worse quality)	JPEGTranslator		Kleinere Dateien (mit etwas schlechterer Qualität)
 Maker	exit_parser		Ersteller
 Model	exit_parser		Modell
 None	JPEGTranslator		Keine
@@ -19,10 +19,10 @@ Output smoothing strength	JPEGTranslator		Glättung
 Prevent colors 'washing out'	JPEGTranslator		'Ausgewaschene' Farben verhindern
 Read	JPEGTranslator		Lesen
 Read greyscale images as RGB32	JPEGTranslator		Graustufen-Bilder als RGB32 einlesen.
-Show warning messages	JPEGTranslator		Zeige Warnungen
-Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Interpretiere den CMYK-Code '0' als 100% Farbdeckung
+Show warning messages	JPEGTranslator		Warnungen anzeigen
+Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Benutze CMYK-Code '0' als 100% Farbdeckung
 Use progressive compression	JPEGTranslator		Progressive Komprimierung
 With some colorspace conversion routines by Magnus Hellman\n	JPEGTranslator		Mit einigen Farbraum Konvertierungsroutinen von Magnus Hellman\n
 Write	JPEGTranslator		Schreiben
-Write black-and-white images as RGB24	JPEGTranslator		Schwarz-Weiß Bilder als RGB24 ausgeben
+Write black-and-white images as RGB24	JPEGTranslator		Schwarz-Weiß-Bilder als RGB24 ausgeben
 with \"lossless\" encoding support patch by Ken Murchison\n	JPEGTranslator		Mit \"verlustfreier\" Kodierung von Ken Murchison\n

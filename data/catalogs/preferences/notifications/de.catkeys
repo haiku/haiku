@@ -4,9 +4,9 @@ Allowed	NotificationView		Erlaubt
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Beim Speichern der Einstellungen ist ein Fehler aufgetreten.\nVermutlich ist nicht mehr genügend Speicher auf dem Datenträger verfügbar.
 Application	NotificationView		Anwendung
 Applications	NotificationView		Anwendungen
-Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Kann die Benachrichtigungen nach dem Systemstart nicht aktivieren. Wahrscheinlich fehlt die Schreibberechtigung auf den Einstellungs-Ordner des Boot-Laufwerks.
-Can't save preferences, you probably don't have write access to the boot settings directory.	GeneralView		Kann die EInstellungen nicht speichern. Wahrscheinlich fehlt die Schreibberechtigung auf den Einstellungs-Ordner des Boot-Laufwerks.
-Can't save preferenes, you probably don't have write access to the settings directory or the disk is full.	DisplayView		Kann die Einstellungen nicht speichern. Wahrscheinlich fehlt die Schreibberechtigung auf den Einstellungs-Ordner oder der freie Speicher auf dem Datenträger reicht nicht.
+Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Die Benachrichtigungen konnten nach dem Systemstart nicht aktiviert werden. Wahrscheinlich fehlt die Schreibberechtigung auf den settings-Ordner des Boot-Laufwerks.
+Can't save preferences, you probably don't have write access to the boot settings directory.	GeneralView		Die EInstellungen konnten nicht gespeichert werden. Wahrscheinlich fehlt die Schreibberechtigung auf den settings-Ordner des Boot-Laufwerks.
+Can't save preferenes, you probably don't have write access to the settings directory or the disk is full.	DisplayView		Die Einstellungen konnten nicht gespeichert werden. Wahrscheinlich fehlt die Schreibberechtigung auf den settings-Ordner oder der freie Speicher auf dem Datenträger reicht nicht.
 Cannot disable notifications because the server can't be reached.	GeneralView		Benachrichtigungen können nicht deaktiviert werden, weil der Server nicht erreicht werden kann.
 Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Benachrichtigungen können nicht aktiviert werden, weil der Server nicht gefunden wurde.\nDas bedeutet, dass die InfoPopper Installation nicht erfolgreich war.
 Disable notifications	GeneralView		Benachrichtigungen deaktivieren
@@ -26,9 +26,9 @@ Large icon	DisplayView		Großes Icon
 Last Received	NotificationView		Zuletzt empfangen
 Mini icon	DisplayView		Kleines Icon
 No	NotificationView		Nein
-Notifications	GeneralView		Benachrichtigungen
-Notifications	NotificationView		Benachrichtigungen
-Notifications	PrefletWin		Benachrichtigungen
+Notifications	GeneralView		Notifications
+Notifications	NotificationView		Notifications
+Notifications	PrefletWin		Notifications
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Benachrichtigungen können nicht angehalten werden, weil der Server nicht erreicht werden kann.
 OK	DisplayView		OK
 OK	GeneralView		OK

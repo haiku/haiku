@@ -20,15 +20,15 @@ Mail Daemon Replacement\n\nby Haiku, Inc. All rights reserved.\n\nVersion %ld.%l
 Mail checking	Config Window		E-Mail abfragen
 Miscellaneous	Config Window		Verschiedenes
 OK	Config Window		OK
-Only when dial-up is connected	Config Window		Nur bei hergestellter Einwahlverbindung
+Only when dial-up is connected	Config Window		Nur bei aktiver Einwahlverbindung
 Real name:	Config Views		Benutzername:
 Remove	Config Window		Entfernen
-Return address:	Config Views		E-Mail Adresse:
+Return address:	Config Views		E-Mail-Adresse:
 Revert	Config Window		Anfangswerte
 Schedule outgoing mail when dial-up is disconnected	Config Window		Versand aufschieben falls Einwahlverbindung nicht aktiv
 Settings	Config Window		Einstellungen
 Show connection status window:	Config Window		Statusfenster anzeigen:
-Start mail services on startup	Config Window		Starte E-mail Dienste beim Systemstart
+Start mail services on startup	Config Window		Starte E-Mail-Dienste beim Systemstart
 While sending	Config Window		Beim Senden
 While sending and receiving	Config Window		Während dem Senden und Empfangen
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nDie allgemeinen Einstellungen konnten nicht zurückgenommen werden.\n\nFehler beim Abrufen der allgemeinen Einstellungen:\n%s\n

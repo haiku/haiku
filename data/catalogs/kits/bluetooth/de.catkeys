@@ -1,5 +1,5 @@
 1	german	x-vnd.Haiku-Bluetooth	3550394259
-#CommandFailed#Not Valid name	RemoteDevice		#CommandFailed#ungültiger Name
+#CommandFailed#Not Valid name	RemoteDevice		#CommandFailed# Ungültiger Name
 #NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError# Ungültiger Name
 #NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest# Ungültiger Name
 #ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady# Ungültiger Name
@@ -16,7 +16,7 @@ Camcorder	DeviceClass		Camcorder
 Camera	DeviceClass		Kamera
 Capturing	DeviceClass		Erfassung
 Car audio	DeviceClass		Fahrzeug-Audiosystem
-Card reader	DeviceClass		Speicherkarten-Lesegerät
+Card reader	DeviceClass		Kartenleser
 Cellular	DeviceClass		Mobilfunk
 Combo keyboard/pointing device	DeviceClass		Tastatur-Maus-Kombination
 Common ISDN access	DeviceClass		Gemeisamer ISDN-Zugriff
@@ -37,12 +37,12 @@ Handheld	DeviceClass		Handheld
 Hands-free	DeviceClass		Freisprecheinrichtung
 Headphones	DeviceClass		Kopfhörer
 Helmet	DeviceClass		Helm
-HiFi audio device	DeviceClass		HIFI-Audiogerät
-Imaging	DeviceClass		Bildverarbeitung
+HiFi audio device	DeviceClass		HiFi-Audiogerät
+Imaging	DeviceClass		Bildbearbeitung
 Information	DeviceClass		Informationen
 Invalid device class!\n	DeviceClass		Ungültige Geräteklasse!\n
 Jacket	DeviceClass		Jacke
-Joystick	DeviceClass		Spielhebel
+Joystick	DeviceClass		Joystick
 Keyboard	DeviceClass		Tastatur
 LAN access	DeviceClass		LAN-Zugriff
 Laptop	DeviceClass		Laptop
@@ -53,7 +53,7 @@ Minor class: 	DeviceClass		Unterklasse:
 Miscellaneous	DeviceClass		Verschiedenes
 Networking	DeviceClass		Netzwerk
 No service available	DeviceClass		Kein Dienst verfügbar
-Not implemented	RemoteDevice		nicht implementiert
+Not implemented	RemoteDevice		Nicht implementiert
 Object transfer	DeviceClass		Objekt-Transfer
 Pager	DeviceClass	A small radio device to receive short text messages	Pager
 Palm	DeviceClass	A palm-held device	PDA
@@ -72,10 +72,10 @@ Sensing device	DeviceClass		Wahrnehmungsgerät
 Server	DeviceClass		Server
 Service classes: 	DeviceClass		Dienstklassen:
 Set-top box	DeviceClass		Set-Top-Box
-Smart phone	DeviceClass		Smart-Phone
+Smart phone	DeviceClass		Smartphone
 Telephony	DeviceClass		Telefonie
 Uncategorized	DeviceClass		Sonstiges
-Unknown (reserved) minor device class	DeviceClass		Unbekannte (reservierte) Geräteklasse.
+Unknown (reserved) minor device class	DeviceClass		Unbekannte (reservierte) Geräteklasse
 Unspecified	DeviceClass		Nicht angegeben
 VCR	DeviceClass		Videorecorder
 Vehicle	DeviceClass		Fahrzeug

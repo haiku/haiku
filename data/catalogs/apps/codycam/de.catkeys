@@ -1,33 +1,33 @@
 1	german	x-vnd.Haiku.CodyCam	1322454590
 About CodyCam	CodyCam		Über CodyCam
 About Codycam…	CodyCam		Über Codycam…
-Can't find an available connection to the video window	CodyCam		Keine verfügbare Verbindung zum Videofenster gefunden.
+Can't find an available connection to the video window	CodyCam		Es wurde keine verfügbare Verbindung zum Videofenster gefunden.
 Cannot connect the video source to the video window	CodyCam		Keine Verbindung zwischen Videoquelle und Videofenster möglich
-Cannot create a video window	CodyCam		Konnte Videofenster nicht erstellen
+Cannot create a video window	CodyCam		Das Videofenster konnte nicht erstellt werden
 Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		Es wurde keine Videoquelle gefunden. Um CodyCam zu nutzen, braucht man eine Webcam.
-Cannot find an available video stream	CodyCam		Keinen verfügbaren Videostream gefunden
-Cannot find the media roster	CodyCam		Konnte den Media Roster nicht finden
-Cannot get a time source	CodyCam		Konnte Zeitquelle nicht finden
-Cannot register the video window	CodyCam		Konnte Videofenster nicht registrieren.
-Cannot seek time source!	CodyCam		Konnte Zeitquelle nicht durchsuchen
+Cannot find an available video stream	CodyCam		Es wurde kein verfügbarer Videostream gefunden.
+Cannot find the media roster	CodyCam		Der Media-Roster konnte nicht gefunden werden
+Cannot get a time source	CodyCam		Es konnte keine Zeitquelle gefunden werden.
+Cannot register the video window	CodyCam		Das Videofenster konnte nicht registriert werden
+Cannot seek time source!	CodyCam		Zeitquelle konnte nicht durchsucht werden!
 Cannot set the time source for the video source	CodyCam		Konnte keine Zeitquelle für die Videoquelle setzen.
 Cannot set the time source for the video window	CodyCam		Konnte keine Zeitquelle für das Videofenster setzen.
-Cannot start the video source	CodyCam		Konnte Videoquelle nicht starten
-Cannot start the video window	CodyCam		Konnte Videofenster nicht starten
-Cannot start time source!	CodyCam		Konnte Zeitquelle nicht starten!
-Capture Rate Menu	CodyCam		Aufnahme Intervall Menü
+Cannot start the video source	CodyCam		Die Videoquelle konnte nicht gestartet werden
+Cannot start the video window	CodyCam		Das Videofenster konnte nicht gestartet werden
+Cannot start time source!	CodyCam		Die Zeitquelle konnte nicht gestartet werden!
+Capture Rate Menu	CodyCam		Aufnahme-Intervall-Menü
 Capture controls	CodyCam		Aufnahme-Einstellungen
 Capturing Image…	VideoConsumer.cpp		Bild wird aufgenommen...
 Close	CodyCam		Schließen
 Closing the window\n	VideoConsumer.cpp		Fenster wird geschlossen
 CodyCam	CodyCam		CodyCam
-CodyCam\n\nThe Original BeOS webcam	CodyCam		CodyCam\n\nDie Original BeOS-Webcam
+CodyCam\n\nThe Original BeOS webcam	CodyCam		CodyCam\n\nDie originale BeOS-Webcam
 Connected…	VideoConsumer.cpp		Verbunden…
 Couldn't find requested directory on server	VideoConsumer.cpp		Das angefragte Verzeichnis konnte auf dem Server nicht gefunden werden.
-Directory:	CodyCam		Verzeichnis:
+Directory:	CodyCam		Ordner:
 Error creating output file	VideoConsumer.cpp		Fehler bei Erstellung der Ausgabedatei
 Error getting initial latency for the capture node	CodyCam		Fehler bei der Ermittlung der Anfangsverzögerung für die Aufnahme-Node
-Error setting type of output file	VideoConsumer.cpp		Fehler beim Setzen vom Typ der Ausgabedatei
+Error setting type of output file	VideoConsumer.cpp		Fehler beim Setzen des Ausgabedateityps.
 Error writing output file	VideoConsumer.cpp		Fehler beim Schreiben der Ausgabedatei
 Every 10 minutes	CodyCam		Alle 10 Minuten
 Every 15 minutes	CodyCam		Alle 15 Minuten
@@ -49,8 +49,8 @@ File %s; Line %ld # %s	SettingsHandler		Datei %s; Zeile %ld # %s
 File name:	CodyCam		Dateiname:
 File transmission failed	VideoConsumer.cpp		Dateiübertragung fehlgeschlagen
 Format:	CodyCam		Format:
-Image Format Menu	CodyCam		Bildformat Menü
-JPEG image	CodyCam		JPEG Bild
+Image Format Menu	CodyCam		Bildformat-Menü
+JPEG image	CodyCam		JPEG-Bild
 Last Capture: 	VideoConsumer.cpp		Letzte Aufnahme:
 Local	CodyCam		Lokal
 Locking the window\n	VideoConsumer.cpp		Festsetzen des Fensters\n
@@ -71,7 +71,7 @@ SFTP	CodyCam		SFTP
 Send to…	CodyCam		Senden an…
 Server login failed	VideoConsumer.cpp		Server-Login fehlgeschlagen
 Server:	CodyCam		Server:
-Start video	CodyCam		Starte Video
+Start video	CodyCam		Video starten
 Stop video	CodyCam		Video anhalten
 Transmitting…	VideoConsumer.cpp		Übertragen...
 Type:	CodyCam		Typ:
@@ -87,7 +87,7 @@ on or off expected	Settings	Do not translate 'on' and 'off'	on oder off erwartet
 password	CodyCam		Passwort
 password expected	CodyCam		Passwort erwartet
 read: %d\n	SftpClient		gelesen: %d\n
-read: %ld\n	SftpClient		lese: %ld\n
+read: %ld\n	SftpClient		gelesen: %ld\n
 reply: %d, %d\n	FtpClient		Antwort: %d, %d\n
 reply: '%s'\n	SftpClient		Antwort; '%s'\n
 server address expected	CodyCam		Serveradresse erwartet

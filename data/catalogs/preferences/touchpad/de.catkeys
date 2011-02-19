@@ -5,12 +5,12 @@ High	TouchpadPrefView		Hoch
 Horizontal scroll speed	TouchpadPrefView		Horizontale Geschwindigkeit
 Horizontal scrolling	TouchpadPrefView		Horizontales Scrollen
 Off	TouchpadPrefView		Aus
-Revert	TouchpadPrefView		Zurücksetzen
-Scroll acceleration	TouchpadPrefView		Scroll-Beschleunigung
+Revert	TouchpadPrefView		Anfangswerte
+Scroll acceleration	TouchpadPrefView		Beschleunigung
 Scrolling	TouchpadPrefView		Scrollen
 Slow	TouchpadPrefView		Langsam
-Tap click sensitivity	TouchpadPrefView		Tap-Klickempfindlichkeit
-Tap gesture	TouchpadPrefView		Tap-Geste
+Tap click sensitivity	TouchpadPrefView		Empfindlichkeit
+Tap gesture	TouchpadPrefView		Klick-Eigenschaften
 Touchpad	TouchpadMain		Touchpad
 Two finger scrolling	TouchpadPrefView		Zwei-Finger-Scrollen
 Vertical scroll speed	TouchpadPrefView		Vertikale Geschwindigkeit

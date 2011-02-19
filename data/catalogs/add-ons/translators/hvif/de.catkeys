@@ -1,6 +1,6 @@
 1	german	x-vnd.Haiku-HVIFTranslator	813066125
-HVIF Settings	HVIFMain		HVIF Einstellungen
-HVIF icons	HVIFTranslator		HVIF Icons
+HVIF Settings	HVIFMain		HVIF-Einstellungen
+HVIF icons	HVIFTranslator		HVIF-Icons
 HVIFTranslator Settings	HVIFTranslator		HVIFTranslator-Einstellungen
 Native Haiku icon format translator	HVIFView		Translator für Haikus eigenes Icon-Format
 Native Haiku vector icon translator	HVIFTranslator		Translator für Haikus eigenes Vektor-Icon-Format

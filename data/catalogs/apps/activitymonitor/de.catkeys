@@ -7,13 +7,13 @@
 About ActivityMonitor…	ActivityWindow		Über ActivityMonitor...
 ActivityMonitor	ActivityWindow		ActivityMonitor
 Add graph	ActivityWindow		Graphen hinzufügen
-Additional items	ActivityView		Zusätzliche Objekte
-Apps	DataSource		Anwendungen
+Additional items	ActivityView		Zusätzliche Elemente
+Apps	DataSource		Apps
 Block cache	DataSource		Block-Cache
 Block cache memory	DataSource		Block-Cache-Speicher
 CPU	DataSource		CPU
 CPU usage	DataSource		CPU-Auslastung
-CPU usage (combined)	DataSource		CPU Auslastung (alle)
+CPU usage (combined)	DataSource		CPU-Auslastung (alle)
 Cache	DataSource		Cache
 Cached memory	DataSource		Gecachter Speicher
 File	ActivityWindow		Datei
@@ -33,17 +33,17 @@ Receiving	DataSource		Empfangen
 Remove graph	ActivityView		Graph entfernen
 Running applications	DataSource		Laufende Anwendungen
 Semaphores	DataSource		Semaphoren
-Sems	DataSource		Semaphoren
+Sems	DataSource		Sems
 Sending	DataSource		Senden
 Settings	ActivityWindow		Einstellungen
 Settings…	ActivityWindow		Einstellungen...
 Show legend	ActivityView		Legende anzeigen
 Swap	DataSource		Auslagerung
-Swap space	DataSource		Auslagerungsbereich
+Swap space	DataSource		Auslagerungsspeicher
 TX	DataSource	Shorter version for Sending	Senden
 Teams	DataSource		Teams
 Text clipboard size	DataSource		Größe der Text-Ablage
 Threads	DataSource		Threads
-Update time interval:	SettingsWindow		Aktualisierungsinterval:
+Update time interval:	SettingsWindow		Aktualisierungsintervall:
 Used memory	DataSource		Benutzter Speicher
 usage	DataSource		Last

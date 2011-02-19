@@ -25,7 +25,7 @@ Pad 1	LaunchBox		Block 1
 Quit	LaunchBox		Beenden
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Wirklich diesen Block schließen?\n(Der Block wird nicht gespeichert.)
 Remove button	LaunchBox		Feld entfernen
-Set description…	LaunchBox		Beschreibung festlegen...
+Set description…	LaunchBox		Beschreibung ändern...
 Settings	LaunchBox		EInstellungen
 Show on all workspaces	LaunchBox		Auf allen Arbeitsflächen anzeigen
 Show window border	LaunchBox		Fensterrahmen anzeigen

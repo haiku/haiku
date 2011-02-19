@@ -8,12 +8,12 @@
 -f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tnicht implementiert\n
 -h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\tHilfe anzeigen\n
 -k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tDie Art der Einträge, die geöffnet werden können (Varianten): beliebige Kombination von f, d, s (f=Datei (Voreinstellung), d=Verzeichnis, s=symbolischer Link)\n
--l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tbenutze ein Öffnen-Dateidialog (Voreinstellung)\n
+-l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tbenutze einen Datei-Öffnen-Dialog (Voreinstellung)\n
 -m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tmacht den Dateidialog modal\n
--n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tSetze den Vorgabenamen für das Speichern\n
+-n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tSetzt den Vorgabenamen für das Speichern\n
 -s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\tbenutze einen Datei-Speichern-Dialog\n
 -t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tsetzt den Fenstertitel des Dateidialogs\n
-display a load/save file panel\n	FilePanelApp		zeige einen Datei-Öffnen/Speichern-Dialog\n
+display a load/save file panel\n	FilePanelApp		Datei-Öffnen/Speichern-Dialog zeigen\n
 options:\n	FilePanelApp		Optionen:\n
 short\tlong\tdescription\n	FilePanelApp		kurze\tlange\tBeschreibung\n
 usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		Benutzung: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n 	

@@ -3,22 +3,22 @@
 (native)	ProbeView		(nativ)
 15 bit	TypeEditors		15 Bit
 16 bit	TypeEditors		16 Bit
-16 bit signed value:	TypeEditors		16 Bit Wert mit Vorzeichen:
+16 bit signed value:	TypeEditors		16-Bit-Wert mit Vorzeichen:
 16 bit unsigned value:	TypeEditors		Vorzeichenloser 16-Bit-Wert:
 32 bit	TypeEditors		32 Bit
-32 bit signed value:	TypeEditors		32 Bit Wert mit Vorzeichen:
+32 bit signed value:	TypeEditors		32-Bit-Wert mit Vorzeichen:
 32 bit size or status:	TypeEditors		32-Bit-Größe oder Status:
 32 bit unsigned pointer:	TypeEditors		Vorzeichenloser 32-Bit-Zeiger:
 32 bit unsigned size:	TypeEditors		Vorzeichenlose 32-Bit-Größe:
 32 bit unsigned value:	TypeEditors		Vorzeichenloser 32-Bit-Wert:
 64 bit signed offset:	TypeEditors		64-Bit-Offset mit Vorzeichen:
-64 bit signed value:	TypeEditors		64 Bit Wert mit Vorzeichen:
+64 bit signed value:	TypeEditors		64-Bit-Wert mit Vorzeichen:
 64 bit unsigned value:	TypeEditors		Vorzeichenloser 64-Bit-Wert:
 8 bit palette	TypeEditors		8-Bit-Palette
-8 bit signed value:	TypeEditors		8 Bit Wert mit Vorzeichen:
+8 bit signed value:	TypeEditors		8-Bit-Wert mit Vorzeichen:
 8 bit unsigned value:	TypeEditors		Vorzeichenloser 8-Bit-Wert:
-About DiskProbe…	FileWindow		Über DiskProbe
-Add	ProbeView		Hinzufügen
+About DiskProbe…	FileWindow		Über DiskProbe...
+Add	ProbeView		Hinzu
 Attribute	AttributeWindow		Attribut
 Attribute	ProbeView		Attribut
 Attribute offset: 	ProbeView		Attribut-Offset:
@@ -45,34 +45,34 @@ Close	FileWindow		Schließen
 Close	ProbeView		Schließen
 Contents:	TypeEditors		Inhalt:
 Copy	ProbeView		Kopieren
-Could not find search string.	ProbeView		Konnte Suchbegriff nicht finden.
-Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Konnte \"%s\" nicht öffnen:\n%s
-Could not open file \"%s\": %s\n	DiskProbe		Konnte die Datei \"%s\" nicht öffnen: %s\n
+Could not find search string.	ProbeView		Der Suchbegriff konnte nicht gefunden werden.
+Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	\"%s\" konnte nicht geöffnet werden:\n%s
+Could not open file \"%s\": %s\n	DiskProbe		Die Datei \"%s\" konnte nicht geöffnet werden: %s\n
 Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Bild konnte nicht eingelesen werden
 Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Dezimal
 Device	ProbeView		Gerät
-Device offset: 	ProbeView		Gerät-Offset:
+Device offset: 	ProbeView		Gerät-Offset: 
 Device: 	ProbeView		Gerät: 
 DiskProbe	OpenWindow		DiskProbe
-DiskProbe request	AttributeWindow		DiskProbe Anfrage
-DiskProbe request	DiskProbe		DiskProbe Anfrage
-DiskProbe request	ProbeView		DiskProbe Anfrage
+DiskProbe request	AttributeWindow		DiskProbe-Anfrage
+DiskProbe request	DiskProbe		DiskProbe-Anfrage
+DiskProbe request	ProbeView		DiskProbe-Anfrage
 DiskProbe\n\twritten by Axel Dörfler\n\tCopyright 2004-2007, Haiku.\n\nOriginal Be version by Robert Polic\n	DiskProbe		DiskProbe\n\tvon Axel Dörfler,\n\tCopyright 2004-2007, Haiku.\n\nOriginal Be Version von Robert Polic.\n
 Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Soll das Attribut \"%s\" wirklich von der Datei \"%s\" entfernt werden?\n\nDiese Aktion kann nicht rückgängig gemacht werden.
-Don't save	ProbeView		Nicht speichern
-Double precision floating-point value:	TypeEditors		Doppelt präziser Gleitkomma Wert:
+Don't save	ProbeView		Verwerfen
+Double precision floating-point value:	TypeEditors		Doppelt-präziser Gleitkomma-Wert:
 Edit	ProbeView		Bearbeiten
-Examine device:	OpenWindow		Gerät:
+Examine device:	OpenWindow		Gerät untersuchen:
 File	FileWindow		Datei
 File	ProbeView		Datei
-File offset: 	ProbeView		Datei Offset:
+File offset: 	ProbeView		Datei-Offset: 
 File: 	ProbeView		Datei: 
 Find	FindWindow		Suchen
 Find again	ProbeView		Weitersuchen
 Find…	ProbeView		Suchen…
-Fit	ProbeView	Size of fonts, fits to available room	Auto
+Fit	ProbeView	Size of fonts, fits to available room	Passend
 Flattened bitmap	TypeEditors		Flat-Bitmap
-Floating-point value:	TypeEditors		Gleitkomma Wert:
+Floating-point value:	TypeEditors		Gleitkommawert:
 Font size	ProbeView		Schriftgröße
 Grayscale	TypeEditors		Graustufen
 Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hexadezimal
@@ -80,34 +80,34 @@ Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if
 Icon	TypeEditors		Symbol
 Icon view	TypeEditors		Symbolansicht
 Image	TypeEditors	This is the type of view	Bild
-Image view	TypeEditors	Image means here a picture file, not a disk image.	Bild Ansicht
+Image view	TypeEditors	Image means here a picture file, not a disk image.	Bild-Ansicht
 MIME type editor	TypeEditors		MIME-Typ-Editor
-MIME type:	TypeEditors		MIME Typ:
+MIME type:	TypeEditors		MIME-Typ:
 Message	TypeEditors	This is the type of view	Message
 Message View	TypeEditors		Message-Ansicht
 Mode:	FindWindow		Modus:
 Native: %Ld (0x%0*Lx)	ProbeView		Nativ: %Ld (0x%0*Lx)
 Native: 0x%0*Lx	ProbeView		Nativ: 0x%0*Lx
 New…	FileWindow		Neu…
-Next	ProbeView		Weiter
+Next	ProbeView		Nächster
 No type editor available	AttributeWindow		Kein Editor für diesen Typ vorhanden
 Number	TypeEditors	This is the type of editor	Zahl
 Number editor	TypeEditors		Zahleneditor
 Number:	TypeEditors		Zahl:
 OK	DiskProbe		OK
 OK	ProbeView		OK
-Offset: 	ProbeView		Offset:
+Offset: 	ProbeView		Offset: 
 Open device	FileWindow		Gerät öffnen
 Open file…	FileWindow		Datei öffnen…
-PNG format	TypeEditors		PNG Format
+PNG format	TypeEditors		PNG-Format
 Page setup…	ProbeView		Seite einrichten…
 Paste	ProbeView		Einfügen
-Previous	ProbeView		Vorheriges
+Previous	ProbeView		Vorheriger
 Print…	ProbeView		Drucken…
 Probe device	OpenWindow		Gerät untersuchen
 Probe file…	OpenWindow		Datei untersuchen…
 Quit	FileWindow		Beenden
-Raw editor	AttributeWindow		Raw Editor
+Raw editor	AttributeWindow		Raw-Editor
 Redo	ProbeView		Wiederholen
 Remove	AttributeWindow		Entfernen
 Remove from file	AttributeWindow		Von Datei entfernen
@@ -116,12 +116,12 @@ Save changes before closing?	ProbeView		Änderungen vor dem Beenden speichern?
 Select all	ProbeView		Alles auswählen
 Selection	ProbeView		Auswahl
 Stop	ProbeView		Stopp
-String editor	TypeEditors		Zeichen Editor
+String editor	TypeEditors		Zeichen-Editor
 Swapped: %Ld (0x%0*Lx)	ProbeView		Getauscht: %Ld (0x%0*Lx)
 Swapped: 0x%0*Lx	ProbeView		Getauscht: 0x%0*Lx
 Text	FindWindow		Text
 Text	TypeEditors	This is the type of editor	Text
-Type editor	AttributeWindow		Typ Editor
+Type editor	AttributeWindow		Typ-Editor
 Type editor	ProbeView		Typ-Editor
 Type editor not supported	ProbeView		Typ-Editor wird nicht unterstützt
 Undo	ProbeView		Rückgängig

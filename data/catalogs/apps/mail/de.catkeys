@@ -1,18 +1,18 @@
 1	german	x-vnd.Be-MAIL	1525863502
 %d - Date	Mail		%d - Datum
-%e - E-mail address	Mail		%e - Nachrichtenadresse
+%e - E-mail address	Mail		%e - E-Mail-Adresse
 %n - Full name	Mail		%n - Voller Name
 About Mail…	Mail		Über Mail…
 Account from mail	Mail		Konto der Nachricht
 Account:	Mail		Konto:
 Accounts…	Mail		Konten…
-Add	Mail		Hinzufügen
+Add	Mail		Hinzu
 Add enclosure…	Mail		Anhang anfügen…
 Add signature	Mail		Signatur hinzufügen
 An error occurred trying to open this signature.	Mail		Beim Öffnen dieser Signatur ist ein Fehler aufgetreten.
 An error occurred trying to save the attachment.	Mail		Beim Speichern des Anhangs ist ein Fehler aufgetreten.
 An error occurred trying to save this signature.	Mail		Beim Speichern dieser Signatur ist ein Fehler aufgetreten.
-Attach attributes:	Mail		BFS-Attribute des Anhangs immer mitsenden:
+Attach attributes:	Mail		Attribute von Anhängen:
 Attachments:	Mail		Anhänge: 
 Auto signature:	Mail		Automatische Signatur:
 Automatic	Mail		Automatisch
@@ -28,7 +28,7 @@ Close and 	Mail		Schließen und
 Colored quotes:	Mail		Farbige Zitate:
 Copy	Mail		Kopieren
 Copy link location	Mail		Linkadresse kopieren
-Copy to new	Mail		Zu neu kopieren
+Copy to new	Mail		In neue Nachricht kopieren
 Couldn't open this signature. Sorry.	Mail		Diese Signatur konnte leider nicht geöffnet werden.
 Cut	Mail		Ausschneiden
 Date:	Mail		Datum:
@@ -36,45 +36,45 @@ Decoding:	Mail		Zeichendekodierung:
 Default account:	Mail		Standardkonto:
 Delete	Mail		Löschen
 Discard	Mail		Verwerfen
-Do you wish to save this message as a draft before closing?	Mail		Möchten Sie diese Nachricht als Entwurf speichern, bevor sie geschlossen wird?
-Do you wish to send this message before closing?	Mail		Möchten Sie diese Nachricht senden, bevor sie geschlossen wird?
-Don't save	Mail		Nicht speichern
-E-mail draft could not be saved!	Mail		Nachrichtenentwurf konnte nicht gespeichert werden!
+Do you wish to save this message as a draft before closing?	Mail		Soll die Nachricht als Entwurf gespeichert werden, bevor sie geschlossen wird?
+Do you wish to send this message before closing?	Mail		Soll diese Nachricht gesendet werden, bevor sie geschlossen wird?
+Don't save	Mail		Verwerfen
+E-mail draft could not be saved!	Mail		Entwurf konnte nicht gespeichert werden!
 Edit	Mail		Bearbeiten
-Edit queries…	Mail		Suchabfragen bearbeiten…
+Edit queries…	Mail		Queries bearbeiten…
 Edit signatures…	Mail		Signaturen bearbeiten…
 Encoding:	Mail		Zeichenkodierung:
 Expert	Mail		Experte
 File	Mail		Datei
-Find	Mail		Finden
-Find again	Mail		Nächstes finden
-Find…	Mail		Finden…
-Font:	Mail		Schriftsatz:
+Find	Mail		Suchen
+Find again	Mail		Weitersuchen
+Find…	Mail		Suchen…
+Font:	Mail		Schriftart:
 Forward	Mail		Weiterleiten
 Forward without attachments	Mail		Mit Anhängen weiterleiten
 From:	Mail		Von:
 Hide	Mail		Ausblenden
-Include file attributes in attachments	Mail		Dateiattribute in Anhängen speichern
-Inconsistency occurred in the undo/redo buffer.	Mail		Es ist eine Inkonsistenz im Rückgängig/Wiederherstellen-System aufgetreten.
-Initial spell check mode:	Mail		Voreingestellter Rechtschreibprüfmodus:
-Leave as '%s'	Mail		Als '%s' belassen
-Leave as New	Mail		Als Neu belassen
-Leave same	Mail		Beibehalten
+Include file attributes in attachments	Mail		Dateiattribute von Anhängen mitsenden
+Inconsistency occurred in the undo/redo buffer.	Mail		Es ist ein Fehler im Rückgängig/Wiederherstellen-Puffer aufgetreten.
+Initial spell check mode:	Mail		Rechtschreibprüfung:
+Leave as '%s'	Mail		Status '%s' belassen
+Leave as New	Mail		Status 'New' belassen
+Leave same	Mail		Status belassen
 Mail	Mail		Mail
-Mail couldn't find its dictionary.	Mail		Mail konnte sein Wörterbuch nicht finden.
-Mail preferences	Mail		Mail Einstellungen
+Mail couldn't find its dictionary.	Mail		Das Wörterbuch wurde nicht gefunden.
+Mail preferences	Mail		Mail-Einstellungen
 Mail\n\n	Mail		Mail\n\n
 Mailing	Mail		Nachrichten
 Message	Mail		Nachricht
 Move to trash	Mail		In den Papierkorb verschieben
-Need Tracker to move items to trash	Mail		Der Tracker wird benötigt, um Nachrichten in den Papierkorb zu verschieben.
+Need Tracker to move items to trash	Mail		Um Nachrichten in den Papierkorb zu verschieben, muss Tracker laufen.
 New	Mail		Neu
 New mail message	Mail		Nachricht verfassen
 Next	Mail		Nächste
 Next message	Mail		Nächste Nachricht
 No file attributes, just plain data	Mail		Keine Dateiattribute, nur reine Daten
 No matches	Mail		Keine Treffer
-None	Mail		Keines
+None	Mail		Keine
 OK	Mail		OK
 Off	Mail		Aus
 On	Mail		Ein
@@ -82,32 +82,32 @@ Only files can be added as attachments.	Mail		Nur Dateien können als Anhang hin
 Open	Mail		Öffnen
 Open attachment	Mail		Anhang öffnen
 Open draft	Mail		Entwurf öffnen
-Open this link	Mail		Diesen Link öffnen
+Open this link	Mail		Link öffnen
 Page setup…	Mail		Seite einrichten…
 Paste	Mail		Einfügen
 Preferences…	Mail		Einstellungen…
-Previous	Mail		Vorheriges
+Previous	Mail		Vorherige
 Previous message	Mail		Vorherige Nachricht
 Print	Mail		Drucken
 Print…	Mail		Drucken…
-Queries	Mail		Suchabfragen
+Queries	Mail		Queries
 Quit	Mail		Beenden
-Quote	Mail		Zitat
+Quote	Mail		Zitieren
 Random	Mail		Zufällig
 Read 	Mail		Gelesen
-Really delete this signature? This cannot be undone.	Mail		Diese Signatur tatsächlich löschen? Diese Aktion kann nicht rückgängig gemacht werden.
-Redo	Mail		Wiederherstellen
-Remove attachment	Mail		Anhang löschen
+Really delete this signature? This cannot be undone.	Mail		Diese Signatur tatsächlich löschen? Das kann nicht rückgängig gemacht werden.
+Redo	Mail		Wiederholen
+Remove attachment	Mail		Anhang entfernen
 Remove enclosure	Mail		Anhang löschen
-Remove quote	Mail		Zitat entfernen
+Remove quote	Mail		Zitatebene entfernen
 Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Anhänge von weitergeleiteten Nachrichten zu entfernen wird noch nicht unterstützt.\nEs wird nicht richtig funktionieren.
 Reply	Mail		Antworten
 Reply account:	Mail		Konto zum Beantworten:
-Reply preamble:	Mail		Antwort einleiten:
+Reply preamble:	Mail		Einleitung bei Antworten:
 Reply to all	Mail		Allen antworten
-Reply to sender	Mail		Absender antworten
+Reply to sender	Mail		Antwort an Absender
 Resend	Mail		Nochmals senden
-Revert	Mail		Änderungen verwerfen
+Revert	Mail		Anfangswerte
 Save	Mail		Speichern
 Save address	Mail		Adresse speichern
 Save as draft	Mail		Als Entwurf speichern
@@ -116,13 +116,13 @@ Save changes to this signature?	Mail		Änderungen an der Signatur speichern?
 Select all	Mail		Alles auswählen
 Send	Mail		Senden
 Send message	Mail		Nachricht senden
-Set to %s	Mail		Setzen auf %s
-Set to Saved	Mail		Als gespeichert setzen
-Set to…	Mail		Setzen auf…
-Show header	Mail		Nachrichtenkopf anzeigen
+Set to %s	Mail		Status setzen: %s
+Set to Saved	Mail		Status setzen: Saved
+Set to…	Mail		Status setzen…
+Show header	Mail		Kopfdaten anzeigen
 Show icons & labels	Mail		Icons und Beschriftung anzeigen
-Show icons only	Mail		Nur Icons anzeigen
-Show raw message	Mail		Rohnachricht anzeigen
+Show icons only	Mail		Nur Icons zeigen
+Show raw message	Mail		Originalformat anzeigen
 Signature	Mail		Signatur
 Signature:	Mail		Signatur:
 Signatures	Mail		Signaturen
@@ -133,17 +133,17 @@ Start now	Mail		Jetzt starten
 Subject:	Mail		Betreff:
 Text wrapping:	Mail		Zeilenumbruch:
 The mail_daemon could not be started:\n\t	Mail		Der Maildienst (mail_daemon) konnte nicht gestartet werden:\n\t
-The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Der Nachrichtendienst (mail_daemon) läuft nicht. Die Nachricht wird versendet, sobald der Dienst läuft.
-There is no installed handler for URL links.	Mail		Es ist keine Handhabung für URL-Verweise eingerichtet.
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Der Nachrichtendienst (mail_daemon) läuft nicht. Die Nachricht wird versendet, sobald der Dienst wieder läuft.
+There is no installed handler for URL links.	Mail		URL-Verweisen ist keine Anwendung zugeordnet.
 Title:	Mail		Titel:
 To:	Mail		An:
 Trash	Mail		Löschen
 Undo	Mail		Rückgängig
 Unread	Mail		Ungelesen
-Use default account	Mail		Standardkonto verwenden
+Use default account	Mail		Standardkonto
 User interface	Mail		Programmoberfläche
 View	Mail		Ansicht
-Warn unencodable:	Mail		Warnung nicht-kodierbar:
+Warn unencodable:	Mail		Warnung bei nicht-kodierbaren Zeichen:
 Written by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		von Robert Polic.\nErweitert durch die Dr. Zoidberg Crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku Inc.\n
-Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ihr Text enthält %ld nicht kodierbare Zeichen. Eine alternative Zeichenkodierung wäre angebracht. Wählen Sie Senden um die Nachricht trotzdem zu senden (Ersatzzeichen werden für die nicht kodierbaren Zeichen verwendet), oder brechen Sie den Vorgang ab, um das Problem zu lösen.
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Der Text enthält %ld nicht kodierbare Zeichen. Eine andere Zeichenkodierung könnte helfen. 'Senden' klicken, um die Nachricht trotzdem zu senden (Ersatzzeichen werden für die nicht kodierbaren Zeichen verwendet), oder den Vorgang abbrechen, um das Problem zu lösen.
 \\n - Newline	Mail		\\n - Zeilenumbruch

@@ -10,15 +10,15 @@ Full format:	TimeFormatSettings		Volles Format:
 Language	Locale Preflet Window		Sprache
 Locale	Locale Preflet		Locale - Landes- und Spracheinstellungen
 Locale	Locale Preflet Window		Locale
-Long format:	TimeFormatSettings		Langformat:
+Long format:	TimeFormatSettings		Langes Format:
 Medium format:	TimeFormatSettings		Mittleres Format:
 Negative:	TimeFormatSettings		Negativ:
 Numbers	TimeFormatSettings		Zahlen
-OK	Locale Preflet Window		Ok
+OK	Locale Preflet Window		OK
 Positive:	TimeFormatSettings		Positiv:
 Preferred languages	Locale Preflet Window		Bevorzugte Sprache
-Revert	Locale Preflet Window		Zurücknehmen
-Short format:	TimeFormatSettings		Kurzformat:
+Revert	Locale Preflet Window		Anfangswerte
+Short format:	TimeFormatSettings		Kurzes Format:
 Time	TimeFormatSettings		Zeit
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Es wurden keine verfügbaren Sprachen gefunden. Dieses Preflet kann daher nicht verwendet werden!
 Use month/day-names from preferred language	TimeFormatSettings		Monats-/Tagesnamen aus bevorzugter Sprache verwenden

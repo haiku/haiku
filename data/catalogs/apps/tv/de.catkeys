@@ -4,8 +4,8 @@ Always on top	MainWin		Immer im Vordergrund
 Channel	MainWin		Kanal
 DVB - Digital Video Broadcasting TV	MainWin		DVB - Digital Video Broadcasting TV
 Debug	MainWin		Debug
-Error, connecting to interface failed:\n\n	MainWin		Fehler, Verbindung zum Adapter fehlgeschlagen:\n\n
-Error, interface is busy:\n\n	MainWin		Fehler, Adapter ist beschäftigt:\n\n
+Error, connecting to interface failed:\n\n	MainWin		Fehler, Verbindung zur Hardware fehlgeschlagen:\n\n
+Error, interface is busy:\n\n	MainWin		Fehler, Hardware ist beschäftigt:\n\n
 Full screen	MainWin		Vollbild
 Interface	MainWin		Hardware
 Keep aspect ratio	MainWin		Festes Seitenverhältnis

@@ -13,9 +13,9 @@ Gateway:	EthernetSettingsView		Gateway:
 IP address:	EthernetSettingsView		IP-Adresse:
 Mode:	EthernetSettingsView		Modus:
 Netmask:	EthernetSettingsView		Netzmaske:
-Network	NetworkWindow		Netzwerk
+Network	NetworkWindow		Network
 Network:	EthernetSettingsView		Netzwerk:
 OK	EthernetSettingsView		OK
-Revert	EthernetSettingsView		Zurücksetzen
+Revert	EthernetSettingsView		Anfangswerte
 Static	EthernetSettingsView		Statisch
-The net_server needs to run for the auto configuration!	EthernetSettingsView		Der net_server muss gestartet sein für die Auto-Konfiguration!
+The net_server needs to run for the auto configuration!	EthernetSettingsView		Zur Auto-Konfiguration muss der net_server laufen!

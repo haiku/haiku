@@ -9,8 +9,8 @@ Mount error	AutoMounter		Fehler beim Einhängen
 Mount read-only	AutoMounter		Schreibgeschützt einhängen
 Mount read/write	AutoMounter		Beschreibbar einhängen
 Mount warning	AutoMounter		Warnung beim Einhängen
-Mounting volume '%s'\n\n	AutoMounter		Hänge Volume '%s' ein\n\n
-Mounting volume <unnamed volume>\n\n	AutoMounter		Hänge <unbenannten Datenträger> ein\n\n
+Mounting volume '%s'\n\n	AutoMounter		'%s' wird eingehangen\n\n
+Mounting volume <unnamed volume>\n\n	AutoMounter		<Unbenannter Datenträger> wird eingehangen\n\n
 OK	AutoMounter		OK
 Previous volumes mounted.	AutoMounter		Vorherige Datenträger wurden eingehängt.
 The file system on this volume is not the Haiku file system. It is strongly suggested to mount it in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Dieser Datenträger ist nicht mit dem Haiku-Dateisystem formattiert. Es wird empfohlen, den Datenträger schreibgeschützt einzuhängen, um möglichen Datenverlust durch Fehler in Haiku auszuschließen.

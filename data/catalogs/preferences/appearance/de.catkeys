@@ -2,42 +2,42 @@
 Antialiasing	APRWindow		Kantenglättung
 Antialiasing menu	AntialiasingSettingsView		Kantenglättungs-Menü
 Antialiasing type:	AntialiasingSettingsView		Kantenglättungstyp:
-Appearance	APRWindow		Aussehen
+Appearance	APRWindow		Appearance
 Colors	APRWindow		Farben
 Control background	Colors tab		Steuerelement - Hintergrund
 Control border	Colors tab		Steuerelement - Rahmen
-Control highlight	Colors tab		Steuerelement - Beleuchtung
-Control text	Colors tab		Steuerelement - text
+Control highlight	Colors tab		Steuerelement - Ausgewählt
+Control text	Colors tab		Steuerelement - Text
 Defaults	APRWindow		Standardwerte
 Document background	Colors tab		Dokument - Hintergrund
-Document text	Colors tab		Dokument - text
+Document text	Colors tab		Dokument - Text
 Failure	Colors tab		Fehler
-Glyph hinting:	AntialiasingSettingsView		Glyph-hinting:
+Glyph hinting:	AntialiasingSettingsView		Glyph-Hinting:
 Grayscale	AntialiasingSettingsView		Graustufen
 Hinting menu	AntialiasingSettingsView		Hinting-Menü
-Inactive window tab	Colors tab		Fenstertitel (inaktiv)
-Inactive window tab text	Colors tab		Fenstertitel - text (inaktiv)
-LCD subpixel	AntialiasingSettingsView		LCD Subpixel
+Inactive window tab	Colors tab		Reiter (inaktiv)
+Inactive window tab text	Colors tab		Reiter - Text (inaktiv)
+LCD subpixel	AntialiasingSettingsView		LCD-Subpixel
 Menu background	Colors tab		Menü - Hintergrund
-Menu item text	Colors tab		Menü - text
-Monospaced fonts only	AntialiasingSettingsView		Nur Monospace Schriften
+Menu item text	Colors tab		Menü - Text
+Monospaced fonts only	AntialiasingSettingsView		Nur nicht-proportionale Schriften
 Navigation base	Colors tab		Navigation - Grundfarbe
 Navigation pulse	Colors tab		Navigation - Leuchtfarbe
 Off	AntialiasingSettingsView		Aus
-On	AntialiasingSettingsView		An
+On	AntialiasingSettingsView		Ein
 Panel background	Colors tab		Oberfläche - Hintergrund
-Panel text	Colors tab		Oberfläche - text
-Reduce colored edges filter strength:	AntialiasingSettingsView		Stärke des Farbsaumfilters
-Revert	APRWindow		Zurücknehmen
+Panel text	Colors tab		Fenster - Text
+Reduce colored edges filter strength:	AntialiasingSettingsView		Farbsaumfilter:
+Revert	APRWindow		Anfangswerte
 Selected menu item background	Colors tab		Menü - Hintergrund (ausgewählt)
 Selected menu item border	Colors tab		Menü - Rahmen (ausgewählt)
-Selected menu item text	Colors tab		Menü - text (ausgewählt)
+Selected menu item text	Colors tab		Menü - Text (ausgewählt)
 Shadow	Colors tab		Schatten
 Shine	Colors tab		Glanz
 Strong	AntialiasingSettingsView		Stark
-Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Zur Vermeidung von möglichen Patentproblemen ist die Kombination von Subpixel-Kantenglättung und Glyph-hinting deaktiviert. Um diese Funktion zu aktivieren müssen Sie spezielle Funktionen im Konfigurationsheader der Freetype-Bibliothek freischalten und anschließend Haiku selbst kompilieren.
+Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Zur Vermeidung von möglichen Patentproblemen ist die Kombination von Subpixel-Kantenglättung und Glyph-Hinting deaktiviert. Um diese Funktion zu aktivieren, müssen spezielle Funktionen im Konfigurationsheader der Freetype-Bibliothek freigeschaltet und anschließend Haiku neu kompiliert werden.
 Success	Colors tab		Erfolg
-Tooltip background	Colors tab		Hinweis - Hintergrund
-Tooltip text	Colors tab		Hinweis - text
-Window tab	Colors tab		Fenstertitel
-Window tab text	Colors tab		Fenstertitel - text
+Tooltip background	Colors tab		Tooltip - Hintergrund
+Tooltip text	Colors tab		Tooltip - Text
+Window tab	Colors tab		Reiter
+Window tab text	Colors tab		Reiter - Text

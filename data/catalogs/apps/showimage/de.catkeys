@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-ShowImage	1508862207
+1	german	x-vnd.Haiku-ShowImage	3385354583
 %SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS Sekunden
 About ShowImage…	Menus		Über ShowImage…
 Browse	Menus		Blättern
@@ -32,18 +32,19 @@ Open…	Menus		Öffnen...
 Original size	Menus		Ursprüngliche Größe
 Page setup…	Menus		Seite einrichten...
 Previous file	Menus		Vorherige Datei
-Previous page	Menus		Vorige Seite
+Previous page	Menus		Vorherige Seite
 Print options	PrintOptionsWindow		Druckeinstellungen
 Print…	Menus		Drucken...
 Progress monitor	ProgressWindow		Fortschrittsanzeige
 Quit	Menus		Beenden
+Rating	Menus		Bewertung
 Resize to (in 1/72 inches):	PrintOptionsWindow		Größe ändern zu (in 1/72 Zoll):
-Rotate clockwise	Menus		Im Uhrzeigersinn drehen
-Rotate counterclockwise	Menus		Gegen Uhrzeigersinn drehen
+Rotate clockwise	Menus		Im Uhrzeigersinn rotieren
+Rotate counterclockwise	Menus		Gegen Uhrzeigersinn rotieren
 Save as…	Menus		Speichern unter...
 Select all	Menus		Alles auswählen
 Selection Mode	Menus		Auswahlmodus
-Show caption in full screen mode	Menus		Zeige Dateiname im Vollbild-Modus
+Show caption in full screen mode	Menus		Im Vollbild-Modus Dateiname zeigen
 ShowImage	AboutWindow		ShowImage
 ShowImage	Menus		ShowImage
 Slide delay	Menus		Verzögerung

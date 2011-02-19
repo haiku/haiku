@@ -7,7 +7,7 @@
 Abort	Application Types Window		Abbrechen
 About FileTypes…	FileTypes Window		Über FileTypes...
 Add	Attribute Window		Hinzufügen
-Add	Extension Window		Hinzu
+Add	Extension Window		Hinzufügen
 Add group	New File Type Window		Neue Gruppe erstellen
 Add icon…	Icon View		Icon hinzufügen…
 Add new group	New File Type Window		Neue Gruppe hinzufügen
@@ -42,7 +42,7 @@ Could not change file extensions	Extension Window		Dateiendung konnte nicht geä
 Could not install file type	New File Type Window		Dateityp konnte nicht eingerichtet werden
 Could not open \"%s\":\n%s	FileTypes		\"%s\" konnte nicht geöffnet werden:\n%s
 Could not open file	FileType Window		Datei konnte nicht geöffnet werden
-Could not remove file type: %s\n	FileTypes Window		Dateityp %s konnte nicht entfernt werden\n
+Could not remove file type: %s\n	FileTypes Window		Der Dateityp %s konnte nicht entfernt werden\n
 Could not retrieve application signature	Preferred App Menu		Die Signatur der Anwendung konnte nicht gefunden werden
 Could not retrieve preferred application of this file	Preferred App Menu		Die bevorzugte Anwendung für diese Datei konnte nicht gefunden werden
 Could not set preferred application	FileTypes Window		Bevorzugte Anwendung konnte nicht gesetzt werden
@@ -53,16 +53,16 @@ Description:	FileTypes Window		Beschreibung:
 Development	Application Type Window		Entwicklung
 Development	Application Types Window		Entwicklung
 Display as:	Attribute Window	Tracker offers different display modes for attributes.	Anzeigen als:
-Do you want to save the changes?	Application Type Window		Änderungen speichern?
-Done	Attribute Window		Erledigt
-Done	Extension Window		Erledigt
-Done	Type List Window		Erledigt
+Do you want to save the changes?	Application Type Window		Sollen die Änderungen gespeichert werden?
+Done	Attribute Window		Fertig
+Done	Extension Window		Fertig
+Done	Type List Window		Fertig
 Edit icon…	Icon View		Icon bearbeiten...
 Editable	Attribute Window	If Tracker allows to edit this attribute.	Editierbar
 Edit…	Application Types Window		Bearbeiten...
 Exclusive launch	Application Type Window		Exklusive Ausführung
 Extension	Extension Window		Erweiterung
-Extension:	Extension Window		Erweiterung:
+Extension:	Extension Window		Erweiterungen:
 Extensions:	FileTypes Window		Erweiterungen:
 Extra attributes	FileTypes Window		Extra Attribute
 File	Application Type Window		Datei
@@ -70,12 +70,12 @@ File	FileTypes Window		Datei
 File could not be opened	Preferred App Menu		Datei konnte nicht geöffnet werden
 File recognition	FileTypes Window		Dateierkennung
 File type	FileType Window		Dateityp
-FileTypes	FileTypes		DateiTypen
-FileTypes	FileTypes Window		DateiTypen
+FileTypes	FileTypes		FileTypes
+FileTypes	FileTypes Window		FileTypes
 FileTypes request	FileTypes		Dateityp-Anforderung
 FileTypes request	FileTypes Window		Dateityp-Anfrage
 FileTypes request	Preferred App Menu		Dateityp-Anfrage
-Final	Application Type Window		Final
+Final	Application Type Window		Endversion
 Final	Application Types Window		Endversion
 Gamma	Application Type Window		Gamma
 Gamma	Application Types Window		Gamma
@@ -93,13 +93,13 @@ Internal name:	New File Type Window		Interner Name:
 Launch	Application Types Window		Starten
 Left	Attribute Window	Attribute column alignment in Tracker	Links
 Long description:	Application Type Window		Ausführliche Beschreibung:
-Move down	FileTypes Window		Nach unten bewegen
-Move up	FileTypes Window		Nach oben bewegen
+Move down	FileTypes Window		Runter
+Move up	FileTypes Window		Hoch
 Multiple files from \"%s\" file type	FileType Window		Mehrere Dateien vom Typ \"%s\"
 Multiple launch	Application Type Window		Mehrfache Ausführung
 Name:	Application Types Window		Name:
 New file type	New File Type Window		Neuer Dateityp
-New resource file…	FileTypes Window		Neue Ressource-Datei
+New resource file…	FileTypes Window		Neue Ressource-Datei...
 None	FileTypes Window		Keine
 OK	FileTypes		OK
 Open file	FileTypes		Datei öffnen
@@ -110,17 +110,18 @@ Preferred application	FileTypes Window		Bevorzugte Anwendung
 Progress	Application Types Window		Fortschritt
 Quit	FileTypes Window		Beenden
 Quit, don't save	Application Type Window		Beenden ohne zu speichern
+Quit, don't save	Application Type Window		Beenden, ohne zu speichern
 Recognition rule is not valid:\n\n	FileTypes Window		Erkennungsregel ist ungültig:\n\n
 Remove	Application Type Window		Entfernen
 Remove	FileTypes Window		Entfernen
 Remove icon	Icon View		Icon entfernen
 Remove uninstalled	Application Types Window		Deinstallierte entfernen
 Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Das Entfernen eines Dateityps kann nicht rückgängig gemacht werden.\nSoll er wirklich entfernt werden?
-Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Das Entfernen eines Supertyps kann nicht rückgängig gemacht werden.\nAlle Dateitypen, die zu diesem Supertyp gehören, gehen verloren!\n\n Um die gesamte Gruppe zu löschen, Shift-Taste gedrückt halten und \"Entfernen\" klicken.
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Das Entfernen eines Supertyps kann nicht rückgängig gemacht werden.\nAlle Dateitypen, die zu diesem Supertyp gehören, gehen verloren!\n\n Um die gesamte Gruppe im nächsten Schritt zu löschen, Shift-Taste gedrückt halten und \"Entfernen\" klicken.
 Removing uninstalled application types	Application Types Window		Deinstallierte Anwendungen werden entfernt
-Right	Attribute Window	Attribute column alignment in Tracker	rechts
+Right	Attribute Window	Attribute column alignment in Tracker	Rechts
 Rule:	FileTypes Window		Regel:
-Same as…	FileType Window		Genauso wie…
+Same as…	FileType Window		Gleiche wie…
 Same as…	FileTypes Window		Gleiche wie...
 Save	Application Type Window		Speichern
 Save into resource file…	Application Type Window		In Resource-Datei speichern...
@@ -128,27 +129,27 @@ Save request	Application Type Window		Anfrage speichern
 Select preferred application	FileType Window		Bevorzugte Anwendung auswählen
 Select preferred application	FileTypes Window		Bevorzugte Anwendung wählen
 Select same preferred application as	FileType Window		Gleiche bevorzugte Anwendung wählen wie
-Select same preferred application as	FileTypes Window		Wähle die gleiche bevorzugte Anwendung wie
+Select same preferred application as	FileTypes Window		Gleiche bevorzugte Anwendung wählen wie
 Select same type as	FileType Window		Gleichen Typ wählen wie
-Select…	FileType Window		Wählen...
+Select…	FileType Window		Auswählen...
 Select…	FileTypes Window		Auswählen...
 Set Preferred Application	Preferred App Menu		Bevorzugte Anwendung setzen
 Settings	FileTypes Window		Einstellungen
 Short description:	Application Type Window		Kurzbeschreibung:
 Show icons in list	FileTypes Window		Icons in Liste anzeigen
 Show in Tracker…	Application Types Window		Im Tracker zeigen...
-Show recognition rule	FileTypes Window		Zeige Erkennungsregel
+Show recognition rule	FileTypes Window		Erkennungsregel zeigen
 Signature:	Application Type Window		Signatur:
 Signature:	Application Types Window		Signatur:
 Single launch	Application Type Window		Einzelausführung
 Special:	Attribute Window		Spezial:
 Supported types	Application Type Window		Unterstützte Typen
-The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Die Anwendung \"%s\" unterstützt diesen Dateityp nicht.\ Soll er trotzdem gesetzt werden?
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Die Anwendung \"%s\" unterstützt diesen Dateityp nicht.\nSoll er trotzdem gesetzt werden?
 This file type already exists	New File Type Window		Dieser Dateityp existiert bereits
 Type name:	FileTypes Window		Typname:
 Type:	Attribute Window		Typ:
 Version	Application Types Window		Version
-Version info	Application Type Window		Versionsinfo
+Version info	Application Type Window		Versionsinformation
 Version:	Application Type Window		Version:
 Version:	Application Types Window		Version:
 Visible	Attribute Window		Sichtbar

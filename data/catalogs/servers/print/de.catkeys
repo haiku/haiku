@@ -18,9 +18,9 @@ Delete a specific printer	PrintServerApp Scripting		Bestimmten Drucker löschen
 Get comments about this printer	Printer Scripting		Druckerkommentar anzeigen
 Get currently available ports/devices	Transport Scripting		Gerade verfügbare Ports/Geräte anzeigen
 Get name of printer	Printer Scripting		Druckernamen ermitteln
-Get name of the printer add-on used for this printer	Printer Scripting		Name des von diesem Drucker verwendeten Addons anzeigen
-Get name of the transport add-on used for this printer	Printer Scripting		Name des von diesem Drucker verwendeten Transport-Addons anzeigen
-Get name of transport	Transport Scripting		Druckertransportnamen ermitteln
+Get name of the printer add-on used for this printer	Printer Scripting		Name des von diesem Drucker verwendeten Add-ons anzeigen
+Get name of the transport add-on used for this printer	Printer Scripting		Name des von diesem Drucker verwendeten Transport-Add-ons anzeigen
+Get name of transport	Transport Scripting		Transportnamen ermitteln
 Get the transport configuration for this printer	Printer Scripting		Transport-Konfiguration für diesen Drucker anzeigen
 Landscape	ConfigWindow		Querformat
 Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	US-Ledger
@@ -32,23 +32,23 @@ OK	PrintServerApp		OK
 Page %1 to %2	ConfigWindow		Seite %1 bis %2
 Page %1 to %2, %3 copies	ConfigWindow		Seite %1 bis %2, %3 Kopien
 Page setup	ConfigWindow		Seite einrichten
-Page setup:	ConfigWindow		Seiten einrichten:
+Page setup:	ConfigWindow		Seite einrichten:
 Paper setup:	ConfigWindow		Papierformat:
 Portrait	ConfigWindow		Hochformat
 Print setup	ConfigWindow		Druckeinstellungen
 Printer server	ConfigWindow		Druckserver
 Printer:	ConfigWindow		Drucker:
-Retrieve a specific printer	PrintServerApp Scripting		Einen bestimmten Drucker abrufen
-Retrieve a specific transport	PrintServerApp Scripting		Bestimmten Transport melden
-Retrieve or select the active printer	PrintServerApp Scripting		Aktiven Drucker abrufen oder auswählen
+Retrieve a specific printer	PrintServerApp Scripting		Einen bestimmten Drucker holen
+Retrieve a specific transport	PrintServerApp Scripting		Bestimmten Transport holen
+Retrieve or select the active printer	PrintServerApp Scripting		Aktiven Drucker holen oder auswählen
 Return the number of available printers	PrintServerApp Scripting		Meldet die Anzahl der verfügbaren Drucker
 Return the number of available transports	PrintServerApp Scripting		Anzahl der verfügbaren Transporte melden
 Select a printer	ConfigWindow		Drucker wählen
 Show configuration window	PrintServerApp Scripting		Einstellungsfenster anzeigen
 Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	US-Tabloid
 There are no printers set up.	PrintServerApp		Es sind keine Drucker eingerichtet.
-There is no default printer set up.	PrintServerApp		Es ist kein Standard Drucker eingerichtet.
+There is no default printer set up.	PrintServerApp		Es ist kein Standarddrucker eingerichtet.
 Undefined	ConfigWindow		Unbestimmt
-Would you like to make @ the default printer?	PrintServerApp		Soll @ der Standard Drucker werden?
+Would you like to make @ the default printer?	PrintServerApp		Soll @ der Standarddrucker werden?
 Would you like to set one up now?	PrintServerApp		Soll jetzt einer eingerichtet werden?
 Yes	PrintServerApp		Ja

@@ -4,15 +4,15 @@ Auxiliary buffer(s):	Capabilities		Auxiliary-Buffer:
 Available	Extensions		Verfügbar
 Capabilities	Capabilities		Leistungsdaten
 Extensions	Extensions		Erweiterungen
-GLU version:	InfoView		GLU Version:
-GLUT API version:	InfoView		GLUT API Version:
+GLU version:	InfoView		GLU-Version:
+GLUT API version:	InfoView		GLUT-API-Version:
 Information	InfoView		Informationen
 List stack size:	Capabilities		Listen-Stackgröße:
 Max. 2D texture size:	Capabilities		Max. 2D-Texturgröße:
-Max. 3D texture size:	Capabilities		Max. 3D Texturgröße:
+Max. 3D texture size:	Capabilities		Max. 3D-Texturgröße:
 Max. clipping planes:	Capabilities		Max. Clipping-Ebenen:
 Max. convolution:	Capabilities		Max. Faltung:
-Max. evaluators equation order:	Capabilities		Max. Evaluators Equation Order:
+Max. evaluators equation order:	Capabilities		Max. Tiefe der Auswertungsformel:
 Max. lights:	Capabilities		Max. Lichter:
 Max. recommended index elements:	Capabilities		Max. Anzahl empfohlener Indexelemente:
 Max. recommended vertex elements:	Capabilities		Max. empfohlene Vertexelemente:

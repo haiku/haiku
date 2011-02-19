@@ -1,6 +1,6 @@
 1	german	x-vnd.Be-PRNT	1563474157
-%.2f KB	JobListView		%.2F KB
-1 pending job.	PrinterListView		1 unerledigter Druckauftrag
+%.2f KB	JobListView		%.2F KiB
+1 pending job.	PrinterListView		1 offener Druckauftrag.
 <pick one>	AddPrinterDialog		<auswählen>
 Add	AddPrinterDialog		Hinzufügen
 Add printer	AddPrinterDialog		Drucker hinzufügen
@@ -9,24 +9,24 @@ Black	TestPageView		Schwarz
 Blue	TestPageView		Blau
 Cancel	AddPrinterDialog		Abbrechen
 Cancel job	PrintersWindow		Druckauftrag abbrechen
-Completed	JobListView		Erledigt
+Completed	JobListView		Fertig
 Connected to:	AddPrinterDialog		Verbunden mit:
 Cyan	TestPageView		Cyan
-Default Printer	PrinterListView		Standard Drucker
+Default Printer	PrinterListView		Standarddrucker
 Driver: %driver%	PrinterListView		Treiber: %driver%
 Failed	JobListView		Fehler
 Green	TestPageView		Grün
 Magenta	TestPageView		Magenta
-Make default	PrintersWindow		Zum Standard machen
+Make default	PrintersWindow		Als Standard wählen
 No pending jobs.	PrinterListView		Keine offenen Druckaufträge.
-No printer found!	TransportMenu		Keinen Drucker gefunden!
+No printer found!	TransportMenu		Es wurde kein Drucker gefunden!
 Print jobs for 	PrintersWindow		Druckaufträge für
 Print jobs: No printer selected	PrintersWindow		Druckaufträge: kein Drucker gewählt
 Print test page	PrintersWindow		Testseite drucken
 Printer name:	AddPrinterDialog		Druckername:
-Printer type:	AddPrinterDialog		Druckertyp
+Printer type:	AddPrinterDialog		Druckertyp:
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Drucker: %printer_name%\nTreiber: %driver%\n
-Printers	PrintersWindow		Drucker
+Printers	PrintersWindow		Printers
 Processing	JobListView		In Bearbeitung
 Red	TestPageView		Rot
 Remove	PrintersWindow		Entfernen

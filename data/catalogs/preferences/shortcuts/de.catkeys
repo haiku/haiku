@@ -6,11 +6,11 @@
 *MouseButton 1	ShortcutsWindow		*Maustaste 1 drücken
 *MouseDown	ShortcutsWindow		*Maus gedrückt
 *MouseUp	ShortcutsWindow		*Maustaste losgelassen
-*MoveMouse +20 +0	ShortcutsWindow		*Bewege Maus 20 Pixel nach rechts
-*MoveMouseTo 50% 50%	ShortcutsWindow		*Bewege Maus zur Bildschirmmitte
+*MoveMouse +20 +0	ShortcutsWindow		*Maus 20 Pixel nach rechts bewegen
+*MoveMouseTo 50% 50%	ShortcutsWindow		*Maus zur Bildschirmmitte bewegen
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		Maus nach oben ins linke Eck und Maustaste 1 drücken
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*Öffne Suche-Dialog
-About Shortcuts	ShortcutsApp		Über Shortcuts
+About Shortcuts	ShortcutsApp		Über Shortcuts...
 About Shortcuts	ShortcutsWindow		Über Shortcuts...
 Add new shortcut	ShortcutsWindow		Neue Tasten-Kombi
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
@@ -20,7 +20,7 @@ Application	ShortcutsWindow		Anwendung
 Beep	ShortcutsSpec		Piepton
 Cancel	ShortcutsWindow		Abbrechen
 Control	ShortcutsSpec	Name for modifier on keyboard	Steuerung
-Don't save	ShortcutsWindow		Nicht speichern
+Don't save	ShortcutsWindow		Verwerfen
 Error, NULL state description?\n	ShortcutsSpec		Fehler, NULL Status Beschreibung?\n
 File	ShortcutsWindow		Datei
 InsertString	ShortcutsSpec		Zeichen einfügen
@@ -34,7 +34,7 @@ MoveMouseTo	ShortcutsSpec		Bewege Maus nach
 Multi	ShortcutsSpec		Mehrfach
 OK	ShortcutsApp		OK
 OK	ShortcutsWindow		OK
-Oh no	ShortcutsWindow		Oh weh
+Oh no	ShortcutsWindow		Herrje!
 Open	ShortcutsWindow		Öffnen
 Open KeySet…	ShortcutsWindow		Tastenbelegung öffnen...
 Quit	ShortcutsWindow		Beenden
@@ -45,12 +45,12 @@ Save	ShortcutsWindow		Speichern
 Save & apply	ShortcutsWindow		Speichern & anwenden
 Save KeySet as…	ShortcutsWindow		Tastenbelegung speichern unter...
 Select	ShortcutsWindow		Auswählen
-SendMessage	ShortcutsSpec		Sende Nachricht
+SendMessage	ShortcutsSpec		Nachricht senden
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 Shortcuts	ShortcutsWindow		Shortcuts
-Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Shortcuts konnte die Tastenbelegung-Datei nicht laden!
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Shortcuts konnte die Tastenbelegungsdatei nicht lesen!
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Shortcuts konnte die Tastenbelegung nicht speichern!
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Shortcuts konnte die Tastenbelegung nicht speichern.
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Die Tastenbelegungsdatei konnte nicht geladen werden.
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Die Tastenbelegungsdatei konnte nicht gelesen werden.
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Die Tastenbelegungsdatei konnte nicht gespeichert werden.
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Die Tastenbelegung konnte nicht gespeichert werden.
 Shortcuts\n\nBased on SpicyKeys for BeOS made by Jeremy Friesner.	ShortcutsApp		Shortcuts\n\nBasiert auf SpiceyKeys für BeOS von Jeremy Friesner.
 Window	ShortcutsSpec	Name for modifier on keyboard	Windows

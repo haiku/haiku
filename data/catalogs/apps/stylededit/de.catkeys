@@ -9,7 +9,7 @@ Cancel	FindandReplaceWindow		Abbrechen
 Cancel	QuitAlert		Abbrechen
 Cancel	RevertToSavedAlert		Abbrechen
 Cancel	SaveAlert		Abbrechen
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Rückgängig nicht möglich, Datei nicht gefunden: \"%s\".
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Rückgängig machen unmöglich, die Datei wurde nicht gefunden: \"%s\".
 Case-sensitive	FindandReplaceWindow		Groß-/Kleinschreibung beachten
 Center	Menus		Zentriert
 Characters:	Statistics		Zeichen:
@@ -22,24 +22,24 @@ Cyan	Menus		Türkis
 Default	Open_and_SaveAsPanel		Standard
 Document	Menus		Dokument
 Document statistics	Statistics		Dokument-Statistik
-Don't save	QuitAlert		Nicht speichern
-Don't save	SaveAlert		Nicht speichern
+Don't save	QuitAlert		Verwerfen
+Don't save	SaveAlert		Verwerfen
 Edit	Menus		Bearbeiten
 Encoding	Open_and_SaveAsPanel		Kodierung
 Error loading \"%s\":\n\t%s	LoadAlert		Fehler beim Laden von "%s":\n\t%s
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Fehler beim Laden von \"%s\":\n\tDateiformat nicht unterstützt
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Fehler beim Öffnen von \"%s\":\n\tDas Dateiformat wird nicht unterstützt.
 Error saving \"%s\":\n%s	SaveAlert		Fehler beim Speichern von "%s":\n%s
 File	Menus		Datei
-Find	FindandReplaceWindow		Finden
+Find	FindandReplaceWindow		Suchen
 Find again	Menus		Weitersuchen
 Find selection	Menus		Auswahl suchen
 Find:	FindandReplaceWindow		Suche:
 Find…	Menus		Suchen…
-Font	Menus		Schriftart
+Font	Menus		Schrift
 Green	Menus		Grün
 Italic	Menus		Kursiv
 Left	Menus		Links
-Lines:	Statistics		Zeilen
+Lines:	Statistics		Zeilen:
 Magenta	Menus		Magenta
 New	Menus		Neu
 OK	LoadAlert		OK
@@ -53,13 +53,13 @@ Print…	Menus		Drucken...
 Quit	Menus		Beenden
 Red	Menus		Rot
 Redo typing	QuitAlert		Wiederholen: Eingabe
-Replace	FindandReplaceWindow		Ersetze
+Replace	FindandReplaceWindow		Ersetzen
 Replace all	FindandReplaceWindow		Alle ersetzen
 Replace in all windows	FindandReplaceWindow		In allen Fenstern ersetzen
-Replace same	Menus		Erneut ersetzen
+Replace same	Menus		Weiter ersetzen
 Replace with:	FindandReplaceWindow		Ersetzen durch:
 Replace…	Menus		Ersetzen…
-Revert to saved…	Menus		Gespeicherte Version wiederherstellen…
+Revert to saved…	Menus		Gespeicherte Version herstellen…
 Revert to the last version of \"%s\"? 	RevertToSavedAlert		Letzte Version von \"%s\" wiederherstellen? 
 Right	Menus		Rechts
 Save	Menus		Speichern
@@ -71,7 +71,7 @@ Search backwards	FindandReplaceWindow		Rückwärts suchen
 Select all	Menus		Alles auswählen
 Size	Menus		Größe
 Statistics…	Menus		Statistik...
-This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Diese Datei ist schreibgeschützt. Änderungen am Dokument \"%s\" speichern? 
+This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Diese Datei ist als schreibgeschützt gekennzeichnet. Änderungen am Dokument \"%s\" speichern?
 Undo typing	QuitAlert		Rückgängig: Eingabe
 Untitled 	StyledEditWindow		Unbenannt
 Words:	Statistics		Wörter:

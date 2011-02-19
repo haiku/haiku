@@ -1,28 +1,28 @@
 1	german	x-vnd.Haiku-Devices	2430293984
 ACPI Information	DeviceACPI		ACPI-Information
-ACPI controller	Device		ACPI-Kontroller
+ACPI controller	Device		ACPI-Controller
 About Devices…	DevicesView		Über Devices...
 Basic information	DevicesView		Basisinformation
 Bridge	Device		Schnittstellen
 Bus	DevicesView		Bus
 Category	DevicesView		Kategorie
-Communication controller	Device		Kommunikationskontroller
+Communication controller	Device		Kommunikationscontroller
 Computer	Device		Computer
 Connection	DevicesView		Verbindung
-Detailed	DevicesView		Detaliert
+Detailed	DevicesView		Details
 Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Gerätename\t\t\t\t: %Name%\nHersteller\t\t\t: %Manufacturer%\nBenutzter Treiber\t\t\t\t: %DriverUsed%\nPfade für Treiber\t: %DevicePaths%
 Device name	Device		Gerätename
 Device name:	Device		Gerätename:
 Device paths	Device		Gerätepfade
 Devices	DevicesApplication		Devices
 Devices	DevicesView		Geräte
-Devices\n\twritten by Pieter Panman\n\n\tBased on listdev by Jérôme Duval\n\tand the previous Devices preference\n\tby Jérôme Duval and Sikosis\n\tCopyright 2009, Haiku, Inc.\n	DevicesApplication		Devices\n\tvon Pieter Panman\n\n\tBasiert auf listdev von Jérôme Duval\n\tund auf den früheren Devices-Einstellungen\n\tvon Jérôme Duval und Sikosis\n\tCopyright 2009, Haiku, Inc.\n
+Devices\n\twritten by Pieter Panman\n\n\tBased on listdev by Jérôme Duval\n\tand the previous Devices preference\n\tby Jérôme Duval and Sikosis\n\tCopyright 2009, Haiku, Inc.\n	DevicesApplication		Devices\n\tvon Pieter Panman.\n\n\tBasiert auf listdev von Jérôme Duval\n\tund auf den früheren Devices-Einstellungen\n\tvon Jérôme Duval und Sikosis.\n\tCopyright 2009, Haiku, Inc.\n
 Display controller	Device		Anzeige-Controller
-Docking station	Device		Dockingstation
+Docking station	Device		Andockstation
 Driver used	Device		Treiber benutzt
-Encryption controller	Device		Verschlüsselungskontroller
+Encryption controller	Device		Verschlüsselungscontroller
 Generate system information	DevicesView		Systeminformationen erstellen
-Generic system peripheral	Device		generische Systemgeräte
+Generic system peripheral	Device		Peripheriegeräte
 Input device controller	Device		Eingabegeräte-Kontroller
 Intelligent controller	Device		Intelligenter Controller
 Manufacturer	Device		Hersteller
@@ -30,18 +30,18 @@ Manufacturer:	Device		Hersteller:
 Mass storage controller	Device		Massenspeicher-Controller
 Memory controller	Device		Speichercontroller
 Multimedia controller	Device		Multimedia-Controller
-Network controller	Device		Netzwerk-Kontroller
+Network controller	Device		Netzwerk-Controller
 None	Device		Kein
 OK	DevicesApplication		OK
-Order by:	DevicesView		Sortierung:
+Order by:	DevicesView		Sortieren nach:
 PCI Information	DevicePCI		PCI-Information
 Processor	Device		Prozessor
 Properties	PropertyList		Eigenschaften
 Quit	DevicesView		Beenden
 Refresh devices	DevicesView		Geräte aktualisieren
 Report compatibility	DevicesView		Kompatibilität anzeigen
-Satellite communications controller	Device		Satellitenkommunikation Controller
-Serial bus controller	Device		Serieller Bus Controller
+Satellite communications controller	Device		Satellitenkommunikations-Controller
+Serial bus controller	Device		Serieller Bus-Controller
 Signal processing controller	Device		Signalverarbeitungscontroller
 Unclassified device	Device		Sonstige Geräte
-Wireless controller	Device		Wireless-Controller
+Wireless controller	Device		Funknetzwerk-Controller

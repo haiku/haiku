@@ -1,23 +1,24 @@
-1	german	x-vnd.Haiku-ProcessController	678001537
+1	german	x-vnd.Haiku-ProcessController	926983020
 %s priority [%d]	ProcessController		%s Priorität [%d]
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	
+About	ProcessController		über
 About ProcessController…	ProcessController		Über ProcessController...
 Cancel	ProcessController		Abbrechen
-Damned!	ProcessController		Mist!
-Debug this thread!	ProcessController		Debugge diesen Thread!
+Damned!	ProcessController		Herrje!
+Debug this thread!	ProcessController		Diesen Thread debuggen!
 Debug thread	ProcessController		Debug Thread
 Do you really want to kill the team \"%s\"?	ProcessController		Soll das Team \"%s\" wirklich beendet werden?
 Error saving file	ProcessController		Fehler beim Speichern der Datei
 Global Popup	ProcessController		Globales Popup
 Gone teams…	ProcessController		Verlorene Teams...
-Install in Deskbar	ProcessController		Installiere in der Deskbar
-Kill this thread!	ProcessController		Beende diesen Thread!
+Install in Deskbar	ProcessController		In Deskbar installieren
+Kill this thread!	ProcessController		Diesen Thread beenden!
 Live in the Deskbar	ProcessController		In der Deskbar laufen
 Memory usage	ProcessController		Speicherverbrauch
 New Terminal	ProcessController		Neues Terminal
-OK	ProcessController		Ok
+OK	ProcessController		OK
 Ok!	ProcessController		OK
-Preferences	ProcessController		Einstellungen
+ProcessController	ProcessController		ProcessController
 ProcessController is already installed in Deskbar.	ProcessController		ProcessController ist bereits in der Deskbar installiert.
 ProcessController\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n	ProcessController		ProcessController\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n
 Processor %d	ProcessController		Prozessor %d
@@ -34,8 +35,5 @@ Threads and CPU usage	ProcessController		Threads und CPU Auslastung
 Usage: %s [-deskbar]\n	ProcessController		Gebrauch: %s [-deskbar]\n
 What do you want to do with the thread \"%s\"?	ProcessController		Was soll mit dem Thread \"%s\" geschehen?
 Yes, kill this team!	ProcessController		Ja, dieses Team beenden!
-You can run ProcessController in a window or install it in the Deskbar.	ProcessController		ProcessController kann in einem Fenster ausgeführt oder in der Deskbar installiert werden.
-Your setting filecould not be saved!\n(%s)	ProcessController		Die Einstellungsdatei konnte nicht gespeichert werden!\n(%s)
-about	ProcessController		über
-priority	ProcessController		Priorität
-thread	ProcessController		Thread
+You can run ProcessController in a window or install it in the Deskbar.	ProcessController		ProcessController kann im Fenster ausgeführt oder in der Deskbar installiert werden.
+Your setting file could not be saved!\n(%s)	ProcessController		Die Einstellungsdatei konnte nicht gespeichert werden.\n(%s)

@@ -47,12 +47,12 @@ Internal error (out of memory). Saving the playlist failed.	MediaPlayer-Playlist
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Der Media Server läuft anscheinend nicht.\nSoll er gestartet werden?
 Large	MediaPlayer-SettingsWindow		Groß
 Lock Peaks	MediaPlayer-PeakView		Ausschlag markieren
-Loop movies by default	MediaPlayer-SettingsWindow		Video Dateien in Endlosschleife abspielen
-Loop sounds by default	MediaPlayer-SettingsWindow		Audio Dateien in Endlosschleife abspielen
+Loop movies by default	MediaPlayer-SettingsWindow		Video in Endlosschleife abspielen
+Loop sounds by default	MediaPlayer-SettingsWindow		Audio in Endlosschleife abspielen
 Low volume	MediaPlayer-SettingsWindow		Niedrige Lautstärke
 MediaPlayer Current Playlist	MediaPlayer-Main		MediaPlayer aktuelle Playliste
 MediaPlayer encountered an internal error. The file could not be opened.	MediaPlayer-Main		Es ist ein interner Fehler in MediaPlayer aufgetreten. Die Datei konnte nicht geöffnet werden.
-MediaPlayer settings	MediaPlayer-SettingsWindow		MediaPlayer Einstellungen
+MediaPlayer settings	MediaPlayer-SettingsWindow		MediaPlayer-Einstellungen
 MediaPlayer\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		MediaPlayer\n\nvon Marcus Overhagen, Stephan Aßmus und Frederik Modéen
 Medium	MediaPlayer-SettingsWindow		Mittel
 Move Entries	MediaPlayer-MovePLItemsCmd		Einträge verschieben
@@ -72,8 +72,8 @@ OK	MediaPlayer-SettingsWindow		OK
 Off	Subtitles menu		Aus
 Open	MediaPlayer-Main		Öffnen
 Open	MediaPlayer-PlaylistWindow		Öffnen
-Open Clips	MediaPlayer-Main		Öffne Clips
-Open Playlist	MediaPlayer-PlaylistWindow		Playlist öffnen
+Open Clips	MediaPlayer-Main		Clips öffnen
+Open Playlist	MediaPlayer-PlaylistWindow		Playliste öffnen
 Open file…	MediaPlayer-Main		Öffne Datei...
 Open…	MediaPlayer-PlaylistWindow		Öffnen...
 Pause	MediaPlayer-Main		Pause
@@ -99,25 +99,25 @@ Remove and put into Trash	MediaPlayer-PlaylistWindow		Entfernen und in den Papie
 Revert	MediaPlayer-SettingsWindow		Ausgangswerte
 Save	MediaPlayer-Main		Speichern
 Save	MediaPlayer-PlaylistWindow		Speichern
-Save Playlist	MediaPlayer-PlaylistWindow		Playlist speichern
+Save Playlist	MediaPlayer-PlaylistWindow		Playliste speichern
 Save as…	MediaPlayer-PlaylistWindow		Speichern als...
-Save error	MediaPlayer-PlaylistWindow		Speichern fehlgeschlagen
-Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Speichern der Playlist fehlgeschlagen.\n\nFehler:
+Save error	MediaPlayer-PlaylistWindow		Speichern ist fehlgeschlagen
+Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Speichern der Playliste fehlgeschlagen.\n\nFehler:
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Speichern der Playliste fehlgeschlagen:\n\nFehler:
 Scale controls in full-screen mode	MediaPlayer-SettingsWindow		Bedienelemente im Vollbildmodus vergrößern
-Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Zoom mit hoher Qualität (nicht im Overlay Modus)
+Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Zoom mit hoher Qualität (nicht im Overlay-Modus)
 Settings…	MediaPlayer-Main		Einstellungen...
 Skip to the next track.	MediaPlayer-Main		Zum nächsten Track springen.
 Skip to the previous track.	MediaPlayer-Main		Zum vorigen Track springen.
 Small	MediaPlayer-SettingsWindow		Klein
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Einige Dateien konnten nicht in den Papierkorb verschoben werden.
-Start media server	MediaPlayer-Main		Media Server starten
+Start media server	MediaPlayer-Main		Media-Server starten
 Start playing.	MediaPlayer-Main		Starte Wiedergabe.
 Stop	MediaPlayer-Main		Stopp
 Stop playing.	MediaPlayer-Main		Wiedergabe stoppen.
-Stream settings	MediaPlayer-Main		Stream Einstellungen
-Subtitle placement	MediaPlayer-SettingsWindow		Untertitelposition
-Subtitle size	MediaPlayer-SettingsWindow		Untertitelgröße
+Stream settings	MediaPlayer-Main		Stream-Einstellungen
+Subtitle placement	MediaPlayer-SettingsWindow		Untertitelposition:
+Subtitle size	MediaPlayer-SettingsWindow		Untertitelgröße:
 Subtitles	MediaPlayer-Main		Untertitel
 Thanks	MediaPlayer-Main		Danke
 The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Die Datei '%filename' konnte nicht geöffnet werden.\n\n
@@ -130,7 +130,7 @@ Track	Video Track Menu		Track
 Track %d	MediaPlayer-Main		Track %d
 URI	MediaPlayer-Main		URI
 Undo	MediaPlayer-PlaylistWindow		Rückgängig
-Use hardware video overlays if available	MediaPlayer-SettingsWindow		Verwendeq Hardware Overlay falls verfügbar
+Use hardware video overlays if available	MediaPlayer-SettingsWindow		Hardware-Overlay verwenden, falls verfügbar
 Video	MediaPlayer-Main		Video
 Video track	MediaPlayer-Main		Videospur
 View options	MediaPlayer-SettingsWindow		Darstellung

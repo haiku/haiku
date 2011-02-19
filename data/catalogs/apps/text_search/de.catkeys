@@ -27,7 +27,7 @@ Select all	GrepWindow		Alles auswählen
 Set target…	GrepWindow		Ziel wählen...
 Settings	GrepWindow		Einstellungen
 Show files in Tracker	GrepWindow		Dateien im Tracker zeigen
-Show lines	GrepWindow		Zeilen anzeigen
+Show lines	GrepWindow		Treffer-Zeilen anzeigen
 Skip folders starting with a dot	GrepWindow		Mit Punkt beginnende Ordner ignorieren
 Text files only	GrepWindow		Nur Textdateien
 TextSearch	GrepWindow		TextSearch
