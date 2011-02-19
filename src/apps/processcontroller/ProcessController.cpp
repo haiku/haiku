@@ -803,7 +803,7 @@ thread_debug_thread(void *arg)
 	thread_info	thinfo;
 	get_thread_info(param->thread, &thinfo);
 	char text[4096];
-	sprintf(text, "gdb -pid=%d", int(param->thread));
+	sprintf(text, "db %d", int(param->thread));
 	system(text);
 	if (param->sem >= 0 && thinfo.state == B_THREAD_WAITING && param->sem
 			== thinfo.sem) {
@@ -821,27 +821,25 @@ thread_debug_thread(void *arg)
 			if (get_sem_info(param->sem, &sinfo) == B_OK
 				&& get_thread_info(param->thread, &thinfo) == B_OK
 				&& get_team_info(thinfo.team, &infos.team_info) == B_OK) {
-				sprintf (text, B_TRANSLATE("This thread is waiting for the "
+				sprintf (text, "This thread is waiting for the "
 					"semaphore called \"%s\". As long as it waits for this "
-					"semaphore, ")
-					B_TRANSLATE("you won't be able to debug that thread.\n"),
+					"semaphore, you won't be able to debug that thread.\n",
 						sinfo.name);
 				if (sinfo.team == thinfo.team)
-					strcat(text, B_TRANSLATE("This semaphore belongs to the "
-						"thread's team.\n\nShould I release this semaphore?\n"));
+					strcat(text, "This semaphore belongs to the "
+						"thread's team.\n\nShould I release this semaphore?\n");
 				else {
 					get_team_name_and_icon(infos);
 					char moreText[1024];
-					sprintf(moreText, B_TRANSLATE("\nWARNING! This semaphore "
+					sprintf(moreText, "\nWARNING! This semaphore "
 						"belongs to the team \"%s\"!\n\nShould I release this "
-						"semaphore anyway?\n"),
+						"semaphore anyway?\n",
 						infos.team_name);
 					strcat(text, moreText);
 				}
 
-				BAlert* alert = new BAlert("", text, B_TRANSLATE("Cancel"),
-					B_TRANSLATE("Release"), NULL, B_WIDTH_AS_USUAL,
-					B_STOP_ALERT);
+				BAlert* alert = new BAlert("", text, "Cancel", "Release",
+						NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 				alert->SetShortcut(0, B_ESCAPE);
 				if (alert->Go()) {
 					get_thread_info (param->thread, &thinfo);
@@ -851,10 +849,9 @@ thread_debug_thread(void *arg)
 							+ thinfo.kernel_time)
 						release_sem(param->sem);
 					else {
-						alert = new BAlert("", B_TRANSLATE("The semaphore "
-							"wasn't released, because it wasn't necessary "
-							"anymore!"), B_TRANSLATE("OK"), NULL, NULL,
-							B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+						alert = new BAlert("", "The semaphore wasn't released, "
+							"because it wasn't necessary anymore!",
+							"OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 						alert->Go();
 					}
 				}
