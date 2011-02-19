@@ -59,22 +59,21 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define B_TRANSLATOR_BITMAP_DESCRIPTION "Be Bitmap Format (JPEGTranslator)"
 
 
-// Translation Kit required globals
-static char sTranslatorName[] = "JPEG images";
-static char sTranslatorInfo[] =
-	"©2002-2003, Marcin Konicki\n"
+static const int32 sTranslatorVersion = B_TRANSLATION_MAKE_VERSION(1, 2, 0);
+
+static const char* sTranslatorName = B_TRANSLATE_MARK("JPEG images");
+static const char* sTranslatorInfo 
+	= B_TRANSLATE_MARK("©2002-2003, Marcin Konicki\n"
 	"©2005-2007, Haiku\n"
 	"\n"
 	"Based on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n"
-	"          http://www.ijg.org/files/\n"
+	"\thttp://www.ijg.org/files/\n"
 	"\n"
 	"with \"lossless\" encoding support patch by Ken Murchison\n"
-	"          http://www.oceana.com/ftp/ljpeg/\n"
+	"\thttp://www.oceana.com/ftp/ljpeg/\n"
 	"\n"
 	"With some colorspace conversion routines by Magnus Hellman\n"
-	"          http://www.bebits.com/app/802\n";
-
-static const int32 sTranslatorVersion = B_TRANSLATION_MAKE_VERSION(1, 2, 0);
+	"\thttp://www.bebits.com/app/802\n");
 
 // Define the formats we know how to read
 static const translation_format sInputFormats[] = {
@@ -420,17 +419,20 @@ TranslatorReadView::TranslatorReadView(const char* name,
 	fSettings(settings)
 		// settings should already be Acquired()
 {
-	fAlwaysRGB32 = new BCheckBox("alwaysrgb32", VIEW_LABEL_ALWAYSRGB32,
+	fAlwaysRGB32 = new BCheckBox("alwaysrgb32",
+		B_TRANSLATE("Read greyscale images as RGB32"),
 		new BMessage(VIEW_MSG_SET_ALWAYSRGB32));
 	if (fSettings->SetGetBool(JPEG_SET_ALWAYS_RGB32, NULL))
 		fAlwaysRGB32->SetValue(B_CONTROL_ON);
 
-	fPhotoshopCMYK = new BCheckBox("photoshopCMYK", VIEW_LABEL_PHOTOSHOPCMYK,
+	fPhotoshopCMYK = new BCheckBox("photoshopCMYK",
+		B_TRANSLATE("Use CMYK code with 0 for 100% ink coverage"),
 		new BMessage(VIEW_MSG_SET_PHOTOSHOPCMYK));
 	if (fSettings->SetGetBool(JPEG_SET_PHOTOSHOP_CMYK, NULL))
 		fPhotoshopCMYK->SetValue(B_CONTROL_ON);
 
-	fShowErrorBox = new BCheckBox("error", VIEW_LABEL_SHOWREADERRORBOX,
+	fShowErrorBox = new BCheckBox("error",
+		B_TRANSLATE("Show warning messages"),
 		new BMessage(VIEW_MSG_SET_SHOWREADERRORBOX));
 	if (fSettings->SetGetBool(JPEG_SET_SHOWREADWARNING, NULL))
 		fShowErrorBox->SetValue(B_CONTROL_ON);
@@ -515,14 +517,15 @@ TranslatorWriteView::TranslatorWriteView(const char* name,
 	fSettings(settings)
 		// settings should already be Acquired()
 {
-	fQualitySlider = new SSlider("quality", VIEW_LABEL_QUALITY,
+	fQualitySlider = new SSlider("quality", B_TRANSLATE("Output quality"),
 		new BMessage(VIEW_MSG_SET_QUALITY), 0, 100);
 	fQualitySlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fQualitySlider->SetHashMarkCount(10);
 	fQualitySlider->SetLimitLabels(B_TRANSLATE("Low"), B_TRANSLATE("High"));
 	fQualitySlider->SetValue(fSettings->SetGetInt32(JPEG_SET_QUALITY, NULL));
 
-	fSmoothingSlider = new SSlider("smoothing", VIEW_LABEL_SMOOTHING,
+	fSmoothingSlider = new SSlider("smoothing",
+		B_TRANSLATE("Output smoothing strength"),
 		new BMessage(VIEW_MSG_SET_SMOOTHING), 0, 100);
 	fSmoothingSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fSmoothingSlider->SetHashMarkCount(10);
@@ -530,24 +533,28 @@ TranslatorWriteView::TranslatorWriteView(const char* name,
 	fSmoothingSlider->SetValue(
 		fSettings->SetGetInt32(JPEG_SET_SMOOTHING, NULL));
 
-	fProgress = new BCheckBox("progress", VIEW_LABEL_PROGRESSIVE,
+	fProgress = new BCheckBox("progress",
+		B_TRANSLATE("Use progressive compression"),
 		new BMessage(VIEW_MSG_SET_PROGRESSIVE));
 	if (fSettings->SetGetBool(JPEG_SET_PROGRESSIVE, NULL))
 		fProgress->SetValue(B_CONTROL_ON);
 
-	fSmallerFile = new BCheckBox("smallerfile", VIEW_LABEL_SMALLERFILE,
+	fSmallerFile = new BCheckBox("smallerfile",
+		B_TRANSLATE("Make file smaller (sligthtly worse quality)"),
 		new BMessage(VIEW_MSG_SET_SMALLERFILE));
 	if (fSettings->SetGetBool(JPEG_SET_SMALL_FILES))
 		fSmallerFile->SetValue(B_CONTROL_ON);
 
-	fOptimizeColors = new BCheckBox("optimizecolors", VIEW_LABEL_OPTIMIZECOLORS,
+	fOptimizeColors = new BCheckBox("optimizecolors",
+		B_TRANSLATE("Prevent colors 'washing out'"),
 		new BMessage(VIEW_MSG_SET_OPTIMIZECOLORS));
 	if (fSettings->SetGetBool(JPEG_SET_OPT_COLORS, NULL))
 		fOptimizeColors->SetValue(B_CONTROL_ON);
 	else
 		fSmallerFile->SetEnabled(false);
 
-	fGrayAsRGB24 = new BCheckBox("gray1asrgb24", VIEW_LABEL_GRAY1ASRGB24,
+	fGrayAsRGB24 = new BCheckBox("gray1asrgb24",
+		B_TRANSLATE("Write black-and-white images as RGB24"),
 		new BMessage(VIEW_MSG_SET_GRAY1ASRGB24));
 	if (fSettings->SetGetBool(JPEG_SET_GRAY1_AS_RGB24))
 		fGrayAsRGB24->SetValue(B_CONTROL_ON);
@@ -678,17 +685,7 @@ TranslatorAboutView::TranslatorAboutView(const char* name)
 	version->SetExplicitAlignment(labelAlignment);
 
 	BTextView* infoView = new BTextView("info");
-	BString str2(sTranslatorInfo);
-	str2.ReplaceFirst("Based on IJG library ©  1994-2009, Thomas G. Lane, "
-		"Guido Vollbeding.\n", B_TRANSLATE("Based on IJG library ©  1994-2009, "
-		"Thomas G. Lane, Guido Vollbeding.\n"));
-	str2.ReplaceFirst("with \"lossless\" encoding support patch by Ken "
-		"Murchison\n", B_TRANSLATE("with \"lossless\" encoding support patch "
-		"by Ken Murchison\n"));
-	str2.ReplaceFirst("With some colorspace conversion routines by Magnus "
-		"Hellman\n", B_TRANSLATE("With some colorspace conversion routines by "
-		"Magnus Hellman\n"));
-	infoView->SetText(str2.String());
+	infoView->SetText(sTranslatorInfo);
 	infoView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	infoView->MakeEditable(false);
 

@@ -70,14 +70,6 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define	VIEW_MSG_SET_JPC 'JSJC'
 #define	VIEW_MSG_SET_GRAYASRGB32 'JSAC'
 
-// View labels
-#define VIEW_LABEL_QUALITY B_TRANSLATE("Output quality")
-#define VIEW_LABEL_JPC B_TRANSLATE("Output only codestream (.jpc)")
-#define VIEW_LABEL_GRAY1ASRGB24 \
-	B_TRANSLATE("Write black-and-white images as RGB24")
-#define	VIEW_LABEL_GRAYASRGB32 \
-	B_TRANSLATE("Read greyscale images as RGB32")
-
 
 /*!
 	Slider used in TranslatorView

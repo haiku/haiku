@@ -55,20 +55,20 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define B_TRANSLATOR_BITMAP_MIME_STRING "image/x-be-bitmap"
 #define B_TRANSLATOR_BITMAP_DESCRIPTION "Be Bitmap Format (JPEG2000Translator)"
 
-static const char sTranslatorName[] = "JPEG2000 images";
-static const char sTranslatorInfo[] = "©2002-2003, Shard\n"
+static int32 sTranslatorVersion = B_TRANSLATION_MAKE_VERSION(1, 0, 0);
+
+static const char* sTranslatorName = B_TRANSLATE_MARK("JPEG2000 images");
+static const char* sTranslatorInfo = B_TRANSLATE_MARK("©2002-2003, Shard\n"
 	"©2005-2006, Haiku\n"
 	"\n"
 	"Based on JasPer library:\n"
 	"© 1999-2000, Image Power, Inc. and\n"
 	"the University of British Columbia, Canada.\n"
 	"© 2001-2003 Michael David Adams.\n"
-	"          http://www.ece.uvic.ca/~mdadams/jasper/\n"
+	"\thttp://www.ece.uvic.ca/~mdadams/jasper/\n"
 	"\n"
 	"ImageMagick's jp2 codec was used as \"tutorial\".\n"
-	"          http://www.imagemagick.org/\n";
-
-static int32 sTranslatorVersion = B_TRANSLATION_MAKE_VERSION(1, 0, 0);
+	"\thttp://www.imagemagick.org/\n");
 
 static const translation_format sInputFormats[] = {
 	{ JP2_FORMAT, B_TRANSLATOR_BITMAP, 0.5, 0.5,
@@ -559,7 +559,8 @@ TranslatorReadView::TranslatorReadView(const char* name,
 	BView(name, 0, new BGroupLayout(B_VERTICAL)),
 	fSettings(settings)
 {
-	fGrayAsRGB32 = new BCheckBox("grayasrgb32", VIEW_LABEL_GRAYASRGB32,
+	fGrayAsRGB32 = new BCheckBox("grayasrgb32",
+		B_TRANSLATE("Read greyscale images as RGB32"),
 		new BMessage(VIEW_MSG_SET_GRAYASRGB32));
 	if (fSettings->SetGetBool(JP2_SET_GRAY8_AS_B_RGB32))
 		fGrayAsRGB32->SetValue(B_CONTROL_ON);
@@ -616,19 +617,21 @@ TranslatorWriteView::TranslatorWriteView(const char* name,
 	BView(name, 0, new BGroupLayout(B_VERTICAL)),
 	fSettings(settings)
 {
-	fQualitySlider = new SSlider("quality", VIEW_LABEL_QUALITY,
+	fQualitySlider = new SSlider("quality", B_TRANSLATE("Output quality"),
 		new BMessage(VIEW_MSG_SET_QUALITY), 0, 100);
 	fQualitySlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fQualitySlider->SetHashMarkCount(10);
 	fQualitySlider->SetLimitLabels(B_TRANSLATE("Low"), B_TRANSLATE("High"));
 	fQualitySlider->SetValue(fSettings->SetGetInt32(JP2_SET_QUALITY));
 
-	fGrayAsRGB24 = new BCheckBox("gray1asrgb24", VIEW_LABEL_GRAY1ASRGB24,
+	fGrayAsRGB24 = new BCheckBox("gray1asrgb24",
+		B_TRANSLATE("Write black-and-white images as RGB24"),
 		new BMessage(VIEW_MSG_SET_GRAY1ASRGB24));
 	if (fSettings->SetGetBool(JP2_SET_GRAY1_AS_B_RGB24))
 		fGrayAsRGB24->SetValue(B_CONTROL_ON);
 
-	fCodeStreamOnly = new BCheckBox("codestreamonly", VIEW_LABEL_JPC,
+	fCodeStreamOnly = new BCheckBox("codestreamonly",
+		B_TRANSLATE("Output only codestream (.jpc)"),
 		new BMessage(VIEW_MSG_SET_JPC));
 	if (fSettings->SetGetBool(JP2_SET_JPC))
 		fCodeStreamOnly->SetValue(B_CONTROL_ON);
@@ -707,9 +710,7 @@ TranslatorAboutView::TranslatorAboutView(const char* name)
 	BView(name, 0, new BGroupLayout(B_VERTICAL))
 {
 	BAlignment labelAlignment = BAlignment(B_ALIGN_LEFT, B_ALIGN_TOP);
-	BString str1(sTranslatorName);
-	str1.ReplaceFirst("JPEG2000 images", B_TRANSLATE("JPEG2000 images"));
-	BStringView* title = new BStringView("Title", str1.String());
+	BStringView* title = new BStringView("Title", sTranslatorName);
 	title->SetFont(be_bold_font);
 	title->SetExplicitAlignment(labelAlignment);
 
@@ -723,17 +724,7 @@ TranslatorAboutView::TranslatorAboutView(const char* name)
 	version->SetExplicitAlignment(labelAlignment);
 
 	BTextView* infoView = new BTextView("info");
-	BString translationInfo(sTranslatorInfo);
-	translationInfo.ReplaceFirst("Based on JasPer library:", 
-		B_TRANSLATE("Based on JasPer library:"));
-	translationInfo.ReplaceFirst("1999-2000, Image Power, Inc. and", 
-		B_TRANSLATE("1999-2000, Image Power, Inc. and"));
-	translationInfo.ReplaceFirst("the University of British Columbia, Canada.",
-		B_TRANSLATE("the University of British Columbia, Canada."));
-	translationInfo.ReplaceFirst("ImageMagick's jp2 codec was used as "
-		"\"tutorial\".", B_TRANSLATE("ImageMagick's jp2 codec was used as "
-		"\"tutorial\"."));
-	infoView->SetText(translationInfo.String());
+	infoView->SetText(sTranslatorInfo);
 	infoView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	infoView->MakeEditable(false);
 

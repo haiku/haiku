@@ -70,17 +70,6 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define	VIEW_MSG_SET_PHOTOSHOPCMYK 'JSPC'
 #define	VIEW_MSG_SET_SHOWREADERRORBOX 'JSEB'
 
-// View labels
-#define VIEW_LABEL_QUALITY B_TRANSLATE_MARK("Output quality")
-#define VIEW_LABEL_SMOOTHING B_TRANSLATE_MARK("Output smoothing strength")
-#define VIEW_LABEL_PROGRESSIVE B_TRANSLATE_MARK("Use progressive compression")
-#define VIEW_LABEL_OPTIMIZECOLORS B_TRANSLATE_MARK("Prevent colors 'washing out'")
-#define VIEW_LABEL_SMALLERFILE B_TRANSLATE_MARK("Make file smaller (sligthtly worse quality)")
-#define VIEW_LABEL_GRAY1ASRGB24 B_TRANSLATE_MARK("Write black-and-white images as RGB24")
-#define VIEW_LABEL_ALWAYSRGB32 B_TRANSLATE_MARK("Read greyscale images as RGB32")
-#define VIEW_LABEL_PHOTOSHOPCMYK B_TRANSLATE_MARK("Use CMYK code with 0 for 100% ink coverage")
-#define VIEW_LABEL_SHOWREADERRORBOX B_TRANSLATE_MARK("Show warning messages")
-
 // strings for use in TranslatorSettings
 #define JPEG_SET_SMOOTHING "smoothing"
 #define JPEG_SET_QUALITY "quality"
@@ -91,7 +80,6 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define JPEG_SET_ALWAYS_RGB32 "always"
 #define JPEG_SET_PHOTOSHOP_CMYK "cmyk"
 #define JPEG_SET_SHOWREADWARNING "readWarning"
-
 
 
 /*!
@@ -214,3 +202,4 @@ EXTERN(struct jpeg_error_mgr *) be_jpeg_std_error (struct jpeg_error_mgr * err,
 	// implemented in "be_jerror.cpp"
 
 #endif // _JPEGTRANSLATOR_H_
+
