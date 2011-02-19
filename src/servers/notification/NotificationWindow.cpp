@@ -34,13 +34,13 @@
 
 property_info main_prop_list[] = {
 	{"message", {B_GET_PROPERTY, 0}, {B_INDEX_SPECIFIER, 0}, 
-		B_TRANSLATE_MARK("get a message")},
+		"get a message"},
 	{"message", {B_COUNT_PROPERTIES, 0}, {B_DIRECT_SPECIFIER, 0},
-		B_TRANSLATE_MARK("count messages")},
+		"count messages"},
 	{"message", {B_CREATE_PROPERTY, 0}, {B_DIRECT_SPECIFIER, 0},
-		B_TRANSLATE_MARK("create a message")},
+		"create a message"},
 	{"message", {B_SET_PROPERTY, 0}, {B_INDEX_SPECIFIER, 0},
-		B_TRANSLATE_MARK("modify a message")},
+		"modify a message"},
 	{0}
 };
 
