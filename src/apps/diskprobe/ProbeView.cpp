@@ -1508,14 +1508,14 @@ ProbeView::AttachedToWindow()
 	// "View" menu
 
 	menu = new BMenu(B_TRANSLATE_COMMENT("View", 
-		"This is the last menubar item \"File Edit Block View\""));
+		"This is the last menubar item 'File Edit Block View'"));
 
 	// Number Base (hex/decimal)
 
 	subMenu = new BMenu(B_TRANSLATE_COMMENT("Base", "A menu item, the number "
 		"that is basis for a system of calculation. The base 10 system is a "
-		"decimal system. This is in the same menu window than \"Font size\" "
-		"and \"BlockSize\""));
+		"decimal system. This is in the same menu window than 'Font size' "
+		"and 'BlockSize'"));
 	message = new BMessage(kMsgBaseType);
 	message->AddInt32("base_type", kDecimalBase);
 	subMenu->AddItem(item = new BMenuItem(B_TRANSLATE_COMMENT("Decimal", 
@@ -1540,8 +1540,8 @@ ProbeView::AttachedToWindow()
 	// Block Size
 
 	subMenu = new BMenu(B_TRANSLATE_COMMENT("BlockSize", "A menu item, a "
-		"shortened form from \"block size\". This is in the same menu window"
-		"than \"Base\" and \"Font size\""));
+		"shortened form from 'block size'. This is in the same menu window"
+		"than 'Base' and 'Font size'"));
 	subMenu->SetRadioMode(true);
 	const uint32 blockSizes[] = {512, 1024, 2048};
 	for (uint32 i = 0; i < sizeof(blockSizes) / sizeof(blockSizes[0]); i++) {
