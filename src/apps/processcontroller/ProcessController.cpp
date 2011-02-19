@@ -412,7 +412,7 @@ ProcessController::AboutRequested()
 	view->GetFont(&font);
 	font.SetSize(font.Size() * 1.5);
 	font.SetFace(B_BOLD_FACE);
-	view->SetFontAndColor(0, strlen(B_TRANSLATE("ProcessController"))-1, &font);
+	view->SetFontAndColor(0, strlen(B_TRANSLATE("ProcessController")), &font);
 
 	alert->Go();
 }
