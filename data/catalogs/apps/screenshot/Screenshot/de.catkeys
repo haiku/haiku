@@ -1,26 +1,26 @@
 1	german	x-vnd.haiku-screenshot	166521589
-seconds	ScreenshotWindow		Sekunden
-Desktop	ScreenshotWindow		Desktop
-Include window border	ScreenshotWindow		Inklusive Fensterrahmen
-Select	ScreenshotWindow		Auswählen
-Capture active window	ScreenshotWindow		Nur aktives Fenster
+Artwork folder	ScreenshotWindow		Artwork Ordner
 Cancel	ScreenshotWindow		Abbrechen
-Name:	ScreenshotWindow		Name:
+Capture active window	ScreenshotWindow		Nur aktives Fenster
 Choose folder	ScreenshotWindow		Ordner wählen
-Save	ScreenshotWindow		Speichern
-overwrite	ScreenshotWindow		überschreiben
 Choose folder...	ScreenshotWindow		Ordner wählen...
-Please select	ScreenshotWindow		Bitte auswählen
-Save as:	ScreenshotWindow		Format:
 Copy to clipboard	ScreenshotWindow		In Ablage kopieren
-Save in:	ScreenshotWindow		Speichern in:
-screenshot	Screenshot	Base filename of screenshot files	Bildschirmfoto
-New screenshot	ScreenshotWindow		Neue Aufnahme
-Artwork folder	ScreenshotWindow		Artwork-Ordner
-Home folder	ScreenshotWindow		Home-Ordner
-Screenshot	ScreenshotWindow		Screenshot
-This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Diese Datei existiert bereits.\nSoll sie überschreiben werden?
-Settings…	ScreenshotWindow		Einstellungen...
 Delay:	ScreenshotWindow		Verzögerung:
+Desktop	ScreenshotWindow		Desktop
+Home folder	ScreenshotWindow		Home Ordner
 Include mouse pointer	ScreenshotWindow		Inklusive Mauszeiger
+Include window border	ScreenshotWindow		Inklusive Fensterrahmen
+Name:	ScreenshotWindow		Name:
+New screenshot	ScreenshotWindow		Neue Aufnahme
+Please select	ScreenshotWindow		Bitte auswählen
+Save	ScreenshotWindow		Speichern
+Save as:	ScreenshotWindow		Format:
+Save in:	ScreenshotWindow		Speichern in:
+Screenshot	ScreenshotWindow		Screenshot
+Select	ScreenshotWindow		Auswählen
+Settings…	ScreenshotWindow		Einstellungen...
+This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Diese Datei existiert bereits.\nSoll sie überschreiben werden?
 Translator Settings	ScreenshotWindow		Translator-Einstellungen
+overwrite	ScreenshotWindow		überschreiben
+screenshot	Screenshot	Base filename of screenshot files	BIldschirmfoto
+seconds	ScreenshotWindow		Sekunden

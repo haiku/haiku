@@ -1,0 +1,71 @@
+1	german	x-vnd.Haiku-MediaConverter	3383482196
+%.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld Kanal / %lld Frames
+%.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz Mono / %lld Frames
+%.1f kHz stereo / %lld frames	MediaFileInfo		%.1f kHz Stereo / %lld Frames
+%Ld x %Ld, %Ld fps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%Ld x %Ld, %Ld Frames/s / %Ld Frames
+%amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles Dateien scheinen keine unterstützten Mediendateien zu sein:
+%d bit 	MediaFileInfo		%d Bit
+%d byte 	MediaFileInfo		%d Byte
+About MediaConverter…	Menu		Über MediaConverter...
+About…	MediaConverter		About...
+An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Es ist ein Fehler beim Lesen der Dateiinformationen aufgetreten.\n\nFehler:
+Audio encoding:	MediaConverter		Audiokodierung:
+Audio quality not supported	MediaConverter		Tonqualität nicht einstellbar
+Audio quality: %3d%%	MediaConverter		Tonqualität: %3d%%
+Audio:	MediaConverter-FileInfo		Audio:
+Cancel	MediaConverter		Abbrechen
+Cancelling	MediaConverter		Abbruch
+Cancelling…	MediaConverter		Abbruch...
+Continue	MediaConverter		Fortsetzen
+Conversion cancelled	MediaConverter		Konvertierung abgebrochen
+Conversion completed	MediaConverter		Konvertierung abgeschlossen
+Convert	MediaConverter		Konvertieren
+Drop media files onto this window	MediaConverter		Mediendateien auf diesem Fenster fallen lassen.
+Duration:	MediaConverter-FileInfo		Dauer:
+Encoder parameters	MediaConverter-EncoderWindow		Encoder-Parameter
+End   [ms]: 	MediaConverter		Ende [ms]:
+Error	MediaConverter		Fehler
+Error converting '%filename'	MediaConverter		Fehler beim Konvertieren von '%filename'
+Error creating '%filename'	MediaConverter		Fehler beim Erstellen von '%filename'
+Error launching: %strError%	MediaConverter		Fehler beim Start: %strError%
+Error loading a file	MediaConverter		Fehler beim Laden einer Datei
+Error loading files	MediaConverter		Fehler beim Laden der Dateien
+Error read audio frame %Ld	MediaConverter		Fehler beim Einlesen von Audio-Frame %Ld
+Error read video frame %Ld	MediaConverter		Fehler beim Einlesen von Video-Frame %Ld
+Error writing audio frame %Ld	MediaConverter		Fehler beim Schreiben von Audio-Frame %Ld
+Error writing video frame %Ld	MediaConverter		Fehler beim Schreiben von Video-Frame %Ld
+File	Menu		Datei
+File Error	MediaConverter-FileInfo		Datei-Fehler
+File details	MediaConverter		Dateidetails
+File format:	MediaConverter		Dateiformat:
+High	MediaConverter		Hoch
+Low	MediaConverter		Niedrig
+MediaConverter	MediaConverter		MediaConverter
+MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:SaveDirectory
+MediaConverter\n1.3.0\n© 1999, Be Incorporated.\n© 2000-2004 Jun Suzuki\n© 2007 Stephan Aßmus\n© 2010 Haiku, Inc.	MediaConverter		MediaConverter\n1.3.0\n© 1999, Be Incorporated.\n© 2000-2004 Jun Suzuki\n© 2007 Stephan Aßmus\n© 2010 Haiku, Inc.
+No audio	Audio codecs list		Keine Tonspur
+No file selected	MediaConverter-FileInfo		Keine Datei ausgewählt
+No video	Video codecs list		Keine Videospur
+None available	Audio codecs		Keine verfügbar
+None available	Video codecs		Keine verfügbar
+OK	MediaConverter		OK
+OK	MediaConverter-FileInfo		OK
+Open…	Menu		Öffnen...
+Output file '%filename' created	MediaConverter		Ausgabedatei '%filename' erstellt
+Output folder	MediaConverter		Ausgabeordner
+Output format	MediaConverter		Ausgabeformat
+Preview	MediaConverter		Vorschau
+Quit	Menu		Beenden
+Select	MediaConverter		Auswählen
+Select this folder	MediaConverter		Diesen Ordner wählen
+Source files	MediaConverter		Quelldateien
+Start [ms]: 	MediaConverter		Anfang [ms]:
+The file was not recognized as a supported media file:	MediaConverter		Die Datei scheint keine unterstützte Mediendatei zu sein:
+Video encoding:	MediaConverter		Videokodierung:
+Video quality not supported	MediaConverter		Videoqualität nicht einstellbar
+Video quality: %3d%%	MediaConverter		Videoqualität: %3d%%
+Video using parameters form settings	MediaConverter		Video benutzt die Parameter aus den Einstellungen
+Video:	MediaConverter-FileInfo		Video:
+Writing audio track: %Ld %% complete	MediaConverter		Tonspur wird geschrieben: %Ld %% fertig
+Writing video track: %Ld %% complete	MediaConverter		Videospur wird geschrieben: %Ld %% fertig
+seconds	MediaFileInfo		Sekunden

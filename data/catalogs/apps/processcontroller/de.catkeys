@@ -1,41 +1,41 @@
 1	german	x-vnd.Haiku-ProcessController	678001537
-Memory usage	ProcessController		Speicherverbrauch
-Do you really want to kill the team \"%s\"?	ProcessController		Soll das Team \"%s\" wirklich beendet werden?
-Restart Deskbar	ProcessController		Deskbar neu starten
-Debug thread	ProcessController		Debug Thread
-Your setting filecould not be saved!\n(%s)	ProcessController		Die Einstellungsdatei konnte nicht gespeichert werden!\n(%s)
-This team is already gone…	ProcessController		Dieses Team existiert nicht mehr...
-Error saving file	ProcessController		Fehler beim Speichern der Datei
-This thread is already gone…	ProcessController		Dieser Thread existiert nicht mehr...
-Cancel	ProcessController		Abbrechen
-Run in window	ProcessController		Im Fenster ausführen
-Processor %d	ProcessController		Prozessor %d
-(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	
-ProcessController is already installed in Deskbar.	ProcessController		ProcessController ist bereits in der Deskbar installiert.
-This is the last active processor...\nYou can't turn it off!	ProcessController		Dies ist der letzte aktive Prozessor...\nEr kann nicht abgeschaltet werden!
-thread	ProcessController		Thread
-Preferences	ProcessController		Einstellungen
 %s priority [%d]	ProcessController		%s Priorität [%d]
-Quit application	ProcessController		Anwendung beenden
-What do you want to do with the thread \"%s\"?	ProcessController		Was soll mit dem Thread \"%s\" geschehen?
-about	ProcessController		über
-Gone teams…	ProcessController		Verlorene Teams...
-Restart Tracker	ProcessController		Tracker neu starten
-Live in the Deskbar	ProcessController		In der Deskbar laufen
-Kill this thread!	ProcessController		Diesen Thread beenden!
-Debug this thread!	ProcessController		Diesen Thread debuggen!
-New Terminal	ProcessController		Neues Terminal
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	
 About ProcessController…	ProcessController		Über ProcessController...
-Ok!	ProcessController		OK
-Quit an application	ProcessController		Anwendung beenden
-Install in Deskbar	ProcessController		In Deskbar installieren
-ProcessController\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n	ProcessController		ProcessController\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n
-Threads and CPU usage	ProcessController		Threads und CPU Auslastung
+Cancel	ProcessController		Abbrechen
+Damned!	ProcessController		Mist!
+Debug this thread!	ProcessController		Debugge diesen Thread!
+Debug thread	ProcessController		Debug Thread
+Do you really want to kill the team \"%s\"?	ProcessController		Soll das Team \"%s\" wirklich beendet werden?
+Error saving file	ProcessController		Fehler beim Speichern der Datei
 Global Popup	ProcessController		Globales Popup
-OK	ProcessController		OK
-Damned!	ProcessController		Herrje!
-priority	ProcessController		Priorität
-Usage: %s [-deskbar]\n	ProcessController		Gebrauch: %s [-deskbar]\n
-Yes, kill this team!	ProcessController		Ja, dieses Team beenden!
+Gone teams…	ProcessController		Verlorene Teams...
+Install in Deskbar	ProcessController		Installiere in der Deskbar
+Kill this thread!	ProcessController		Beende diesen Thread!
+Live in the Deskbar	ProcessController		In der Deskbar laufen
+Memory usage	ProcessController		Speicherverbrauch
+New Terminal	ProcessController		Neues Terminal
+OK	ProcessController		Ok
+Ok!	ProcessController		OK
+Preferences	ProcessController		Einstellungen
+ProcessController is already installed in Deskbar.	ProcessController		ProcessController ist bereits in der Deskbar installiert.
+ProcessController\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n	ProcessController		ProcessController\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n
+Processor %d	ProcessController		Prozessor %d
+Quit an application	ProcessController		Anwendung beenden
+Quit application	ProcessController		Anwendung beenden
+Restart Deskbar	ProcessController		Deskbar neu starten
+Restart Tracker	ProcessController		Tracker neu starten
+Run in window	ProcessController		Im Fenster ausführen
 That's no Fun!	ProcessController		Nicht lustig!
-You can run ProcessController in a window or install it in the Deskbar.	ProcessController		ProcessController kann im Fenster ausgeführt oder in der Deskbar installiert werden.
+This is the last active processor...\nYou can't turn it off!	ProcessController		Dies ist der letzte aktive Prozessor...\nEr kann nicht abgeschaltet werden!
+This team is already gone…	ProcessController		Dieses Team existiert nicht mehr...
+This thread is already gone…	ProcessController		Dieser Thread existiert nicht mehr...
+Threads and CPU usage	ProcessController		Threads und CPU Auslastung
+Usage: %s [-deskbar]\n	ProcessController		Gebrauch: %s [-deskbar]\n
+What do you want to do with the thread \"%s\"?	ProcessController		Was soll mit dem Thread \"%s\" geschehen?
+Yes, kill this team!	ProcessController		Ja, dieses Team beenden!
+You can run ProcessController in a window or install it in the Deskbar.	ProcessController		ProcessController kann in einem Fenster ausgeführt oder in der Deskbar installiert werden.
+Your setting filecould not be saved!\n(%s)	ProcessController		Die Einstellungsdatei konnte nicht gespeichert werden!\n(%s)
+about	ProcessController		über
+priority	ProcessController		Priorität
+thread	ProcessController		Thread

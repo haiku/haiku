@@ -1,19 +1,19 @@
 1	german	x-vnd.Haiku-MidiPlayer	1406887279
-None	Main Window		Kein
-Live input:	Main Window		Live-Eingang:
-Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Haiku MIDI Player 1.0.0 beta\n\nDas kleine Programm \nKann tausend Lieder spielen\nKlingt etwas seltsam
-Stop	Main Window		Stopp
 Cavern	Main Window		Höhle
-Volume:	Main Window		Lautstärke:
-Reverb:	Main Window		Hall:
+Closet	Main Window		Schrank
+Could not load song	Main Window		Song konnte nicht geladen werden
+Drop MIDI file here	Scope View		Hier MIDI-Dateien ablegen
+Dungeon	Main Window		Kerker
+Garage	Main Window		Garage
+Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Haiku MIDI Player 1.0.0 beta\n\nWinziges Programm\nDer Klang tausender Lieder\nDoch stürzt fast nie ab
+Igor's lab	Main Window		Igors Labor
+Live input:	Main Window		Live-Eingabe:
+MidiPlayer	Main Window		MidiPlayer
+None	Main Window		Kein
 OK	Main Window		OK
 Off	Main Window		Aus
-Dungeon	Main Window		Kerker
 Play	Main Window		Abspielen
-Garage	Main Window		Garage
-Closet	Main Window		Schrank
-Igor's lab	Main Window		Igors Labor
+Reverb:	Main Window		Reverb:
 Scope	Main Window		Wellenform
-Could not load song	Main Window		Lied konnte nicht geladen werden
-MidiPlayer	Main Window		MidiPlayer
-Drop MIDI file here	Scope View		MIDI-Dateien hier fallen lassen
+Stop	Main Window		Stopp
+Volume:	Main Window		Lautstärke:

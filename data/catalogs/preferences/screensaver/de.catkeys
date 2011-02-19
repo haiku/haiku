@@ -1,28 +1,29 @@
-1	german	x-vnd.Haiku-ScreenSaver	1468011094
-Run module	ScreenSaver		Modul ausführen
-Could not load screen saver	ScreenSaver		Bildschirmschoner konnte nicht geladen werden.
+1	german	x-vnd.Haiku-ScreenSaver	937285216
 30 seconds	ScreenSaver		30 Sekunden
-Password…	ScreenSaver		Passwort...
-Password:	ScreenSaver		Passwort:
-Password lock	ScreenSaver		Passwortsperre
 Add…	ScreenSaver		Hinzu...
-mouse is here	ScreenSaver		Maus in diesem Eck
-Modules	ScreenSaver		Module
-Test	ScreenSaver		Test
-ScreenSaver	ScreenSaver		ScreenSaver
-Module settings	ScreenSaver		Moduleinstellungen
-Cancel	ScreenSaver		Abbrechen
-Turn off screen	ScreenSaver		Bildschirm ausschalten
-No options available	ScreenSaver		Keine Optionen verfügbar
-Password Window	ScreenSaver		Passwort-Fenster
-Enable screen saver	ScreenSaver		Bildschirmschoner einschalten
-Fade now when	ScreenSaver		Sofort starten, wenn
-Fade	ScreenSaver		Allgemein
-Passwords don't match. Please try again.	ScreenSaver		Die Passwörter stimmen nicht überein. Bitte nochmal versuchen.
-OK	ScreenSaver		OK
-Don't fade when	ScreenSaver		Nicht starten, wenn
 Blackness	ScreenSaver		Schwarzer Bildschirm
-Use custom password	ScreenSaver		Benutzerdefiniertes Passwort
-Done	ScreenSaver		Fertig
+Cancel	ScreenSaver		Abbrechen
 Confirm password:	ScreenSaver		Passwort bestätigen:
+Could not load screen saver	ScreenSaver		Bildschirmschoner konnte nicht geladen werden.
+Display Power Management Signaling not available	ScreenSaver		Stromsparfunktionen nicht verfügbar
+Don't fade when	ScreenSaver		Nicht starten, wenn
+Done	ScreenSaver		Fertig
+Enable screen saver	ScreenSaver		Bildschirmschoner einschalten
+Fade	ScreenSaver		Allgemein
+Fade now when	ScreenSaver		Sofort starten, wenn
+Module settings	ScreenSaver		Moduleinstellungen
+Modules	ScreenSaver		Module
+No options available	ScreenSaver		Keine Optionen verfügbar
+OK	ScreenSaver		Ok
+Password Window	ScreenSaver		Passwort Fenster
+Password lock	ScreenSaver		Passwortsperre
+Password:	ScreenSaver		Passwort:
+Passwords don't match. Please try again.	ScreenSaver		Die Passwörter stimmen nicht überein. Bitte noch einmal versuchen.
+Password…	ScreenSaver		Passwort...
+Run module	ScreenSaver		Modul ausführen
+ScreenSaver	ScreenSaver		ScreenSaver
+Test	ScreenSaver		Test
+Turn off screen	ScreenSaver		Bildschirm ausschalten
+Use custom password	ScreenSaver		Benutzerdefiniertes Passwort
 Use network password	ScreenSaver		Netzwerkpasswort
+mouse is here	ScreenSaver		Maus in diesem Eck

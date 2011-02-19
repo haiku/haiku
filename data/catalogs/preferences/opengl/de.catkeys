@@ -1,26 +1,26 @@
 1	german	x-vnd.Haiku-OpenGL	899836772
-List stack size:	Capabilities		Listen-Stackgröße:
-Information	InfoView		Informationen
-Max. clipping planes:	Capabilities		Max. Clipping-Ebenen:
-Max. texture units:	Capabilities		Max. Textur-Einheiten:
-Renderer name:	InfoView		Renderer-Name:
-Vendor name:	InfoView		Herstellername:
 Attributes stack size:	Capabilities		Attribut-Stackgröße:
-OpenGL version:	InfoView		OpenGL-Version:
-Name stack size:	Capabilities		Namen-Stackgröße:
 Auxiliary buffer(s):	Capabilities		Auxiliary-Buffer:
-Max. recommended vertex elements:	Capabilities		Max. empfohlene Vertexelemente:
-GLU version:	InfoView		GLU-Version:
-Model stack size:	Capabilities		Modell-Stackgröße:
-Projection stack size:	Capabilities		Projektionen-Stackgröße:
-Max. lights:	Capabilities		Max. Lichter:
-Max. 2D texture size:	Capabilities		Max. 2D-Texturgröße:
-Max. convolution:	Capabilities		Max. Faltung:
-GLUT API version:	InfoView		GLUT-API-Version:
-Texture stack size:	Capabilities		Texturen-Stackgröße:
-Max. evaluators equation order:	Capabilities		Max. Tiefe der Auswertungsformel:
-Max. 3D texture size:	Capabilities		Max. 3D-Texturgröße:
-Capabilities	Capabilities		Leistungsdaten
-Max. recommended index elements:	Capabilities		Max. Anzahl empfohlener Indexelemente:
 Available	Extensions		Verfügbar
+Capabilities	Capabilities		Leistungsdaten
 Extensions	Extensions		Erweiterungen
+GLU version:	InfoView		GLU Version:
+GLUT API version:	InfoView		GLUT API Version:
+Information	InfoView		Informationen
+List stack size:	Capabilities		Listen-Stackgröße:
+Max. 2D texture size:	Capabilities		Max. 2D-Texturgröße:
+Max. 3D texture size:	Capabilities		Max. 3D Texturgröße:
+Max. clipping planes:	Capabilities		Max. Clipping-Ebenen:
+Max. convolution:	Capabilities		Max. Faltung:
+Max. evaluators equation order:	Capabilities		Max. Evaluators Equation Order:
+Max. lights:	Capabilities		Max. Lichter:
+Max. recommended index elements:	Capabilities		Max. Anzahl empfohlener Indexelemente:
+Max. recommended vertex elements:	Capabilities		Max. empfohlene Vertexelemente:
+Max. texture units:	Capabilities		Max. Textur-Einheiten:
+Model stack size:	Capabilities		Modell-Stackgröße:
+Name stack size:	Capabilities		Namen-Stackgröße:
+OpenGL version:	InfoView		OpenGL-Version:
+Projection stack size:	Capabilities		Projektionen-Stackgröße:
+Renderer name:	InfoView		Renderer-Name:
+Texture stack size:	Capabilities		Texturen-Stackgröße:
+Vendor name:	InfoView		Herstellername:

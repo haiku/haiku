@@ -1,10 +1,10 @@
 1	german	x-vnd.Haiku-WebPTranslator	3502239072
-Version %d.%d.%d, %s	ConfigView		Version %d.%d.%d, %s
-WebP Images	ConfigView		WebP-Bilder
-WebP images	WebPTranslator		WebP-Bilder
-WebPTranslator Settings	ConfigView		WebPTranslator-Einstellungen
-WebP Settings	main		WebP-Einstellungen
-WebP image	WebPTranslator		WebP-Bild
-stream GetSize(): %lld\n	WebPTranslator		stream GetSize(): %lld\n
 Based on libwebp v0.1	ConfigView		Basiert auf libwebp v0.1
-WebP image translator	WebPTranslator		WebP-Bild-Translator
+Version %d.%d.%d, %s	ConfigView		Version %d.%d.%d, %s
+WebP Images	ConfigView		WebP Bilder
+WebP Settings	main		WebP Einstellungen
+WebP image	WebPTranslator		WebP Bild
+WebP image translator	WebPTranslator		WebP Bild Translator
+WebP images	WebPTranslator		WebP Bilder
+WebPTranslator Settings	ConfigView		WebP Translator Einstellungen
+stream GetSize(): %lld\n	WebPTranslator		stream GetSize(); %lld\n

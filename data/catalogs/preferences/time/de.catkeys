@@ -1,13 +1,13 @@
 1	german	x-vnd.Haiku-Time	2846531571
-OK	Time		OK
-\nNow: 	Time		\nJetzt:
-Preview time:	Time		Vorschau-Zeit:
-about	Time		über
-Set time zone	Time		Zeitzone setzen
-Time	Time		Time
-Date & Time	Time		Datum & Zeit
-Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Time & Date\n\n\tvon Andrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
 <Other>	Time		<Andere>
 Current time:	Time		Aktuelle Zeit:
-Time zone	Time		Zeitzone
+Date & Time	Time		Datum & Zeit
+OK	Time		OK
+Preview time:	Time		Vorschau Zeit:
 Revert	Time		Anfangswerte
+Set time zone	Time		Zeitzone setzen
+Time	Time		Zeit
+Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Time & Date\n\n\tvon Andrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
+Time zone	Time		Zeitzone
+\nNow: 	Time		\nJetzt:
+about	Time		über

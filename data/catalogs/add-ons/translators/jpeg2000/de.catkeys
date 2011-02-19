@@ -1,16 +1,16 @@
 1	german	x-vnd.Haiku-JPEG2000Translator	496980629
-Write	JPEG2000Translator		Schreiben
-JPEG2000 images	JPEG2000Translator		JPEG2000-Bilder
-Based on JasPer library:	JPEG2000Translator		Basiert auf der JasPer-Bibliothek:
+1999-2000, Image Power, Inc. and	JPEG2000Translator		1999-2000, Image Power, Inc. und
+About	JPEG2000Translator		Über
+Based on JasPer library:	JPEG2000Translator		Basiert auf der JasPer Bibliothek:
+Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Be Bitmap Format (JPEG2000Translator)
+High	JPEG2000Translator		Hoch
+ImageMagick's jp2 codec was used as \"tutorial\".	JPEG2000Translator		ImageMagick's jp2 Codec diente als \"Tutorial\".
+JPEG2000 images	JPEG2000Translator		JPEG2000 Bilder
+Low	JPEG2000Translator		Niedrig
 Output only codestream (.jpc)	JPEG2000Translator		Nur als Codestream ausgeben (.jpc)
-Write black-and-white images as RGB24	JPEG2000Translator		Schwarz-Weiß-Bilder als RGB24 ausgeben
-the University of British Columbia, Canada.	JPEG2000Translator		die University of British Columbia, Canada.
 Output quality	JPEG2000Translator		Ausgabequalität
 Read	JPEG2000Translator		Lesen
-1999-2000, Image Power, Inc. and	JPEG2000Translator		1999-2000, Image Power, Inc. und
-ImageMagick's jp2 codec was used as \"tutorial\".	JPEG2000Translator		ImageMagick's jp2-Codec diente als \"Tutorial\".
-Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Be-Bitmap-Format (JPEG2000Translator)
-Low	JPEG2000Translator		Niedrig
-About	JPEG2000Translator		Über
-High	JPEG2000Translator		Hoch
 Read greyscale images as RGB32	JPEG2000Translator		Graustufen-Bilder als RGB32 einlesen.
+Write	JPEG2000Translator		Schreiben
+Write black-and-white images as RGB24	JPEG2000Translator		Schwarz-Weiß Bilder als RGB24 ausgeben
+the University of British Columbia, Canada.	JPEG2000Translator		die University of British Columbia, Canada.

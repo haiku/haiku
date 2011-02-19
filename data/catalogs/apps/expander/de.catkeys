@@ -1,53 +1,53 @@
 1	german	x-vnd.Haiku-Expander	3863172519
-Expand	ExpanderMenu		Entpacken
-Set destination…	ExpanderMenu		Ziel wählen…
-File expanded	ExpanderWindow		Archiv wurde entpackt
-The destination is read only.	ExpanderWindow		Das Ziel ist schreibgeschützt.
-Expander: Open	ExpanderWindow		Expander: Öffnen
-Select current	DirectoryFilePanel		Aktuellen wählen
-Source	ExpanderWindow		Quelle
-Error when expanding archive	ExpanderWindow		Fehler beim Entpacken
-Hide contents	ExpanderWindow		Inhalt verbergen
+About Expander…	ExpanderMenu		Über Expander…
+Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Sind Sie sicher, dass Sie den Entpackvorgang abbrechen wollen? Die entpackten Einträge sind eventuell nicht vollständig.
+Automatically expand files	ExpanderPreferences		Dateien automatisch entpacken
+Automatically show contents listing	ExpanderPreferences		Dateiliste automatisch anzeigen
+Cancel	ExpanderPreferences		Abbrechen
 Cancel	ExpanderWindow		Abbrechen
+Close	ExpanderMenu		Schließen
+Close window when done expanding	ExpanderPreferences		Fenster nach dem Entpacken schließen
 Continue	ExpanderWindow		Fortsetzen
+Creating listing for '%s'	ExpanderWindow		Dateiliste für '%s' wird erstellt
+Destination	ExpanderWindow		Ziel
+Destination folder:	ExpanderPreferences		Zielordner:
+Error when expanding archive	ExpanderWindow		Fehler beim Entpacken des Archivs
+Expand	ExpanderMenu		Entpacken
+Expand	ExpanderWindow		Entpacken
+Expander	About		Expander
 Expander	ExpanderWindow	!! Window Title !!	Expander
-The destination folder does not exist.	ExpanderWindow		Der Zielordner existiert nicht.
-Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Soll das Entpacken wirklich abgebrochen werden? Die entpackten Dateien sind eventuell nicht vollständig.
+Expander settings	ExpanderPreferences		Expander-Einstellungen
+Expander: Choose destination	DirectoryFilePanel		Expander: Zielordner wählen
+Expander: Open	ExpanderWindow		Expander: Öffnen
+Expanding '%s'	ExpanderWindow		Entpacke #%s'
+Expansion:	ExpanderPreferences		Entpacken:
+File	ExpanderMenu		Datei
+File expanded	ExpanderWindow		Datei entpackt
+Hide contents	ExpanderWindow		Inhalt verbergen
+Leave destination folder path empty	ExpanderPreferences		Keinen Zielordner vorgeben
+OK	About		OK
+OK	ExpanderPreferences		OK
+Open destination folder after extraction	ExpanderPreferences		Zielordner nach dem Entpacken öffnen
+Other:	ExpanderPreferences		Allgemeines:
+Same directory as source (archive) file	ExpanderPreferences		Gleicher Ordner wie Quelldatei (Archivdatei)
 Select	DirectoryFilePanel		Auswählen
+Select	ExpanderPreferences		Auwählen
+Select '%s'	DirectoryFilePanel		Verwende '%s'
+Select current	DirectoryFilePanel		Aktuellen wählen
+Set destination…	ExpanderMenu		Ziel wählen…
+Set source…	ExpanderMenu		Quelle wählen…
 Settings	ExpanderMenu		Einstellungen
 Settings…	ExpanderMenu		Einstellungen…
-Expander: Choose destination	DirectoryFilePanel		Expander: Zielordner wählen
-Show contents	ExpanderWindow		Inhalt zeigen
-The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Der Ordner wurde entweder verschoben, umbenannt oder wird nicht unterstützt.
-The file doesn't exist	ExpanderWindow		Die Datei existiert nicht
-Stop	ExpanderMenu		Stopp
-File	ExpanderMenu		Datei
-Expand	ExpanderWindow		Entpacken
-Close	ExpanderMenu		Schließen
-The destination is not a folder.	ExpanderWindow		Das Ziel ist kein Ordner.
-About Expander…	ExpanderMenu		Über Expander…
-OK	About		OK
-Set source…	ExpanderMenu		Quelle wählen…
-Select '%s'	DirectoryFilePanel		Verwende '%s'
 Show contents	ExpanderMenu		Inhalt zeigen
+Show contents	ExpanderWindow		Inhalt zeigen
+Source	ExpanderWindow		Quelle
+Stop	ExpanderMenu		Stopp
 Stop	ExpanderWindow		Stopp
-Destination	ExpanderWindow		Ziel
-\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tAutor: Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nUrsprüngliche Be Version von \nDominic, Hiroshi, Peter, Pavel und Robert.\n
-Expander	About		Expander
-is not supported	ExpanderWindow		wird nicht unterstützt
-Close window when done expanding	ExpanderPreferences		Fenster nach dem Entpacken schließen
+The destination folder does not exist.	ExpanderWindow		Der Zielordner existiert nicht.
+The destination is not a folder.	ExpanderWindow		Das Ziel ist kein Ordner.
+The destination is read only.	ExpanderWindow		Das Ziel ist schreibgeschützt.
+The file doesn't exist	ExpanderWindow		Die Datei gibt es nicht
+The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Der Ordner wurde entweder verschoben, umbenannt oder wird nicht unterstützt.
 Use:	ExpanderPreferences		Benutzerdefiniert:
-Expander settings	ExpanderPreferences		Expander-Einstellungen
-Automatically expand files	ExpanderPreferences		Archiv automatisch entpacken
-Cancel	ExpanderPreferences		Abbrechen
-Destination folder:	ExpanderPreferences		Zielordner:
-Same directory as source (archive) file	ExpanderPreferences		Gleicher Ordner wie Quelldatei
-Expansion:	ExpanderPreferences		Entpacken:
-Select	ExpanderPreferences		Auwählen
-Automatically show contents listing	ExpanderPreferences		Dateiliste automatisch anzeigen
-OK	ExpanderPreferences		OK
-Leave destination folder path empty	ExpanderPreferences		Keinen Zielordner vorgeben
-Other:	ExpanderPreferences		Allgemeines:
-Open destination folder after extraction	ExpanderPreferences		Zielordner nach dem Entpacken öffnen
-Creating listing for '%s'	ExpanderWindow		Dateiliste für '%s' wird erstellt
-Expanding '%s'	ExpanderWindow		Entpacke #%s'
+\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tAutor: Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nUrsprüngliche Be Version von \nDominic, Hiroshi, Peter, Pavel und Robert\n
+is not supported	ExpanderWindow		wird nicht unterstützt

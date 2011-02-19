@@ -1,50 +1,50 @@
 1	german	x-vnd.Haiku-PowerStatus	1564851502
-Design capacity low warning: 	PowerStatus		Kapazitätswarnung (Herstellerangabe):
-Show percent	PowerStatus		Prozent anzeigen
-PowerStatus settings	PowerStatus		PowerStatus-Einstellungen
-Design capacity: 	PowerStatus		Kapazität (lt. Hersteller):
-mW	PowerStatus		mW
-about	PowerStatus		über
-Type: 	PowerStatus		Typ:
-non-rechargeable	PowerStatus		nicht aufladbar
-Empty battery slot	PowerStatus		Akkufach ist leer
-mV	PowerStatus		mV
-Run in window	PowerStatus		Im Fenster ausführen
 ACPI connect\n	PowerStatus		ACPI verbinden\n
-mWh	PowerStatus		mWh
-Battery info…	PowerStatus		Akku Infos...
-Show time	PowerStatus		Zeit anzeigen
-Last full charge: 	PowerStatus		Letzte vollständige Ladung:
-No power interface found.\n	PowerStatus		Es wurde keine Energieschnittstelle gefunden.\n
-Battery unused	PowerStatus		Akku unbenutzt
-Extended battery info	PowerStatus		Erweiterte Akku Infos
-try %s\n	PowerStatus		versuche %s\n
-mA	PowerStatus		mA
-Current rate: 	PowerStatus		Aktueller Wert:
-discharging	PowerStatus		wird entladen
-Show text label	PowerStatus		Beschriftung anzeigen
+ACPI driver found\n	PowerStatus		ACPI Treiber gefunden\n
 About…	PowerStatus		Über...
-Model number: 	PowerStatus		Modellnummer:
-Install in Deskbar	PowerStatus		In Deskbar installieren
-mAh	PowerStatus		mAh
-Capacity: 	PowerStatus		Kapazität:
+Battery charging	PowerStatus		Akku lädt
 Battery discharging	PowerStatus		Akku wird entladen
-Serial number: 	PowerStatus		Seriennummer:
+Battery info	PowerStatus		Akku Infos
+Battery info…	PowerStatus		Batterie Infos...
+Battery unused	PowerStatus		Batterie unbenutzt
 Capacity granularity 1: 	PowerStatus		Kapazitätsgenauigkeit 1:
-OK	PowerStatus		OK
-OEM info: 	PowerStatus		OEM-Info:
-Design voltage: 	PowerStatus		Spannung (lt. Hersteller):
-ACPI driver found\n	PowerStatus		ACPI-Treiber gefunden\n
-PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		PowerStatus\nvon Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
-Battery charging	PowerStatus		Akku wird geladen
-Design capacity warning: 	PowerStatus		Kapazitätswarnung (lt. Hersteller):
-Battery info	PowerStatus		Akku-Infos
-Quit	PowerStatus		Beenden
-rechargeable	PowerStatus		wiederaufladbar
-charging	PowerStatus		wird geladen
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		PowerStatus kann im Fenster ausgeführt oder in der Deskbar installiert werden.
-Power status box	PowerStatus		Energie-Status-Box
-Show status icon	PowerStatus		Statusicon anzeigen
 Capacity granularity 2: 	PowerStatus		Kapazitätsgenauigkeit 2:
+Capacity: 	PowerStatus		Kapazität:
+Current rate: 	PowerStatus		Aktuelle Rate:
+Design capacity low warning: 	PowerStatus		Kapazitätswarnung (Herstellerangabe):
+Design capacity warning: 	PowerStatus		Kapazitätswarnung (Herstellerangabe):
+Design capacity: 	PowerStatus		Kapazität (lt. Hersteller):
+Design voltage: 	PowerStatus		Spannung (lt. Hersteller):
+Empty battery slot	PowerStatus		Batteriefach ist leer
+Extended battery info	PowerStatus		Erweiterte Batterie Infos
+Install in Deskbar	PowerStatus		In Deskbar installieren
+Last full charge: 	PowerStatus		Letzte vollständige Ladung:
+Model number: 	PowerStatus		Modellnummer:
+No power interface found.\n	PowerStatus		Keine Energieschnittstelle gefunden.\n
+OEM info: 	PowerStatus		OEM info:
+OK	PowerStatus		OK
+Power status box	PowerStatus		Energie Status Box
+PowerStatus settings	PowerStatus		PowerStatus Einstellungen
+PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		PowerStatus\nvon Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
+Quit	PowerStatus		Beenden
+Run in window	PowerStatus		In Fenster ausführen
+Serial number: 	PowerStatus		Seriennummer:
+Show percent	PowerStatus		Prozent anzeigen
+Show status icon	PowerStatus		Statusicon anzeigen
+Show text label	PowerStatus		Zeige Beschriftung
+Show time	PowerStatus		Zeit anzeigen
 Technology: 	PowerStatus		Technologie:
+Type: 	PowerStatus		Typ:
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		PowerStatus kann in einem Fenster ausgeführt oder in der Deskbar installiert werden.
+about	PowerStatus		über
+charging	PowerStatus		wird geladen
+discharging	PowerStatus		wird entladen
+mA	PowerStatus		mA
+mAh	PowerStatus		mAh
+mV	PowerStatus		mV
+mW	PowerStatus		mW
+mWh	PowerStatus		mWh
 no battery	PowerStatus		kein Akku
+non-rechargeable	PowerStatus		nicht aufladbar
+rechargeable	PowerStatus		wiederaufladbar
+try %s\n	PowerStatus		versuche %s\n

@@ -1,39 +1,39 @@
 1	german	x-vnd.Haiku-Media	1588474509
-Show volume control on Deskbar	Media views		Lautstärkeregelung in Deskbar
-Audio input:	Media views		Audio-Eingang:
-Restarting media services\nStarting media server…\n	Media Window		Neustart der Mediendienste\nMediaserver wird gestartet…\n
-Video input:	Media views		Video-Eingang:
-Waiting for media_server to quit.	Media Window		Es wird auf die Beendigung des media_servers gewartet.
-Defaults	Media views		Standardwerte
-Stopping media server…	Media Window		Mediaserver wird angehalten…
-Video output:	Media views		Video-Ausgang:
-Enable real-time audio	Media views		Echtzeit-Audio aktivieren
-Quit	Media Window		Beenden
-OK	Media Window		OK
-Enabling real-time video allows system to perform video operations as fast and smoothly as possible.  It achieves optimum performance by using more RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Echtzeit-Video ermöglicht dem System Aufnahmen und Wiedergaben von Video so schnell und so flüssig wie möglich durchzuführen.  Dies wird durch die Verwendung von mehr Rechenleistung und Arbeitsspeicher erreicht.\n\nNur aktivieren, wenn geringstmögliche Latenzen benötigt werden.
-Starting media server…	Media Window		Mediaserver wird gestartet…
-Restart the media server to apply changes.	Media views		Bitte den Mediaserver neustarten, um die Änderungen zu übernehmen.
-Done shutting down.	Media Window		Herunterfahren beendet.
-Cleaning up.	Media Window		Aufräumen.
-Telling media_addon_server to quit.	Media Window		Media_addon_server wird aufgefordert sich zu beenden.
-Enable real-time video	Media views		Echtzeit-Video aktivieren
-This hardware has no controls.	Media Window		Dieses Gerät hat keine Einstellmöglichkeiten.
-Restarting media services\nShutting down media server\n	Media Window		Neustart der Mediendienste\nMediaserver wird heruntergefahren\n
-Audio output:	Media views		Audio-Ausgang:
-Start media server	Media Window		Mediaserver starten
-Audio settings	Media Window		Audio-Einstellungen
-Could not connect to the media server.\nWould you like to start it ?	Media Window		Verbindung mit dem Mediaserver fehlgeschlagen.\nSoll er gestartet werden?
-Ready for use…	Media Window		Einsatzbereit…
-Real-time	Media views		Echtzeit
-Restart media services	Media views		Mediendienste neustarten
-Enabling real-time audio allows system to record and play audio as fast as possible.  It achieves this performance by using more CPU and RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Echtzeit-Audio ermöglicht dem System Aufnahmen und Wiedergaben von Audio schnellstmöglich durchzuführen.  Dies wird durch die Verwendung von mehr Rechenleistung und Arbeitsspeicher erreicht.\n\nNur aktivieren, wenn geringstmögliche Latenzen benötigt werden.
-Media	Media Window		Media
-Channel:	Media views		Kanal:
-Video settings	Media Window		Video-Einstellungen
-Audio mixer	Media Window		Audiomixer
 <none>	Media views		<nichts>
+Audio input:	Media views		Audio-Eingang:
+Audio mixer	Media Window		Audiomixer
+Audio output:	Media views		Audio-Ausgang:
+Audio settings	Media Window		Audio-Einstellungen
+Channel:	Media views		Kanal:
+Cleaning up.	Media Window		Aufräumen.
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Konnte nicht mit dem Media-Server verbinden.\nMöchten Sie ihn starten?
 Couldn't add volume control in Deskbar: %s\n	Media views		Die Lautstärkeregelung konnte nicht in der Deskbar installiert werden: %s\n
-OK	Media views		OK
-Real-time audio is currently unimplemented in Haiku.	Media views		Die Echtzeitaudiowiedergabe ist in Haiku derzeit nicht implementiert.
 Couldn't remove volume control in Deskbar: %s\n	Media views		Die Lautstärkeregelung konnte nicht aus der Deskbar entfernt werden: %s\n
+Defaults	Media views		Standardwerte
+Done shutting down.	Media Window		Herunterfahren beendet.
+Enable real-time audio	Media views		Aktiviere Echtzeit-Audio
+Enable real-time video	Media views		Aktiviere Echtzeit-Video
+Enabling real-time audio allows system to record and play audio as fast as possible.  It achieves this performance by using more CPU and RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Echtzeit-Audio ermöglicht dem System Aufnahmen und Wiedergaben von Audio schnellstmöglich durchzuführen.  Dies wird durch die Verwendung von mehr Rechenleistung und Arbeitsspeicher erreicht.\n\nAktivieren Sie dieses Feature nur, wenn Sie geringstmögliche Latenzen benötigen.
+Enabling real-time video allows system to perform video operations as fast and smoothly as possible.  It achieves optimum performance by using more RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Echtzeit-Video ermöglicht dem System Aufnahmen und Wiedergaben von Video so schnell und so flüssig wie möglich durchzuführen.  Dies wird durch die Verwendung von mehr Rechenleistung und Arbeitsspeicher erreicht.\n\nAktivieren Sie dieses Feature nur, wenn Sie geringstmögliche Latenzen benötigen.
+Media	Media Window		Media
+OK	Media Window		OK
+OK	Media views		OK
+Quit	Media Window		Beenden
+Ready for use…	Media Window		Bereit zur Arbeit…
+Real-time	Media views		Echtzeit
+Real-time audio is currently unimplemented in Haiku.	Media views		Die Echtzeitaudiowiedergabe ist in Haiku derzeit nicht implementiert.
 Real-time video is currently unimplemented in Haiku.	Media views		Die Echtzeitvideowiedergabe ist in Haiku derzeit nicht implementiert.
+Restart media services	Media views		Medien-Dienste neustarten
+Restart the media server to apply changes.	Media views		Bitte den Media-Server neustarten, um die Änderungen zu übernehmen.
+Restarting media services\nShutting down media server\n	Media Window		Neustart der Mediendienste\nMedia-Server wird heruntergefahren\n
+Restarting media services\nStarting media server…\n	Media Window		Neustart der Mediendienste\nMedia-Server wird gestartet…\n
+Show volume control on Deskbar	Media views		Zeige Lautstärkeregelung in der Deskbar
+Start media server	Media Window		Starte Media-Server
+Starting media server…	Media Window		Media-Server wird gestartet…
+Stopping media server…	Media Window		Media-Server wird angehalten…
+Telling media_addon_server to quit.	Media Window		Media_addon_server wird aufgefordert, sich zu beenden.
+This hardware has no controls.	Media Window		Dieses Gerät hat keine Verstellmöglichkeiten.
+Video input:	Media views		Video-Eingang:
+Video output:	Media views		Video-Ausgang:
+Video settings	Media Window		Video-Einstellungen
+Waiting for media_server to quit.	Media Window		Warte auf Beendigung des media_servers.

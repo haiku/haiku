@@ -1,22 +1,22 @@
 1	german	x-vnd.Haiku-Keymap	4175672673
-Tilde trigger	Keymap window		Tilde-Auslöser
-Grave trigger	Keymap window		Grave-Auslöser
-Select dead keys	Keymap window		Auslösetasten definieren
-Quit	Keymap window		Beenden
-Circumflex trigger	Keymap window		Zirkumflex-Auslöser
-Diaeresis trigger	Keymap window		Diaeresis-Auslöser
-Open…	Keymap window		Öffnen…
-System:	Keymap window		System:
-Switch shortcut keys	Keymap window		Befehlstasten umschalten
-User:	Keymap window		Benutzer:
-Switch shortcut keys to Haiku mode	Keymap window		Befehlstasten zum Haiku-Modus wechseln
-Keymap	Keymap window		Keymap
-Sample and clipboard:	Keymap window		Tastenausgabe:
-Layout	Keymap window		Tastatur
-Switch shortcut keys to Windows/Linux mode	Keymap window		Befehlstasten zum Windows/Linux-Modus wechseln
-Revert	Keymap window		Anfangswerte
-Save as…	Keymap window		Speichern unter…
-File	Keymap window		Datei
 (Current)	Keymap window		(Aktiv)
-Font	Keymap window		Schriftart
 Acute trigger	Keymap window		Acute-Auslöser
+Circumflex trigger	Keymap window		Zirkumflex-Trigger
+Diaeresis trigger	Keymap window		Diaeresis-Auslöser
+File	Keymap window		Datei
+Font	Keymap window		Schriftart
+Grave trigger	Keymap window		Grave-Auslöser
+Keymap	Keymap window		Tastaturschema
+Layout	Keymap window		Layout
+Open…	Keymap window		Öffnen…
+Quit	Keymap window		Beenden
+Revert	Keymap window		Zurücksetzen
+Sample and clipboard:	Keymap window		Beispiel und Zwischenablage:
+Save as…	Keymap window		Speichern unter…
+Select dead keys	Keymap window		\"Tote\" Tasten definieren
+Switch shortcut keys	Keymap window		Shortcut-Tasten umschalten
+Switch shortcut keys to Haiku mode	Keymap window		Shortcut-Tasten zu Haiku-Modus wechseln
+Switch shortcut keys to Windows/Linux mode	Keymap window		Shortcut-Tasten zu Windows/Linux-Modus wechseln
+System:	Keymap window		System:
+Tilde trigger	Keymap window		Tilde-Auslöser
+User:	Keymap window		Benutzer:

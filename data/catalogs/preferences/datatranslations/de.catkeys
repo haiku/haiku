@@ -1,26 +1,23 @@
-1	german	x-vnd.Haiku-DataTranslations	2482065199
-DataTranslations	DataTranslations		DataTranslations
-Info…	DataTranslations		Info...
-about	DataTranslations		über
-Could not install 	DataTranslations		Konnte nicht installiert werden
+1	german	x-vnd.Haiku-DataTranslations	3706134146
+About	DataTranslations		über
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Es exististiert bereits ein Objekt mit dem Namen '%name' im Translator-Ordner! Soll der bereits vorhandene Translator überschrieben werden?
 Cancel	DataTranslations		Abbrechen
-Name:	DataTranslations		Name:
-Panel Info	DataTranslations		Panel-Info
-The item '	DataTranslations		Das Element '
-%name' does not appear to be a Translator and will not be installed.	DataTranslations		%name' scheint kein Translator zu sein und wird nicht installiert.
-DataTranslations - Note	DataTranslations		DataTranslations - Notiz
-Name: %name \nVersion: 	DataTranslations		Name: %name \nVersion:
-Overwrite	DataTranslations		Überschreiben
-Info:	DataTranslations		Info:
-info	DataTranslations		Info
-%name already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		%name gibt es bereits im Translator-Ordner! Soll der existierende Translator überschrieben werden?
-Path:	DataTranslations		Pfad:
-The new translator has been installed successfully.	DataTranslations		Der neue Translator wurde erfolgreich installiert.
-\nInfo: %info\n\nPath:\n	DataTranslations		\nInfo: %info\n\nPfad:\n
+Could not install %s:\n%s	DataTranslations		Kann %s nicht installieren:\n%s
+DataTranslations	DataTranslations		DataTranslations
 DataTranslations - Error	DataTranslations		DataTranslations - Fehler
-OK	DataTranslations		OK
-An item named '	DataTranslations		Ein Element namens '
-Icon	DataTranslations		Icon
+DataTranslations - Note	DataTranslations		DataTranslations - Notiz
 DataTranslations\n\twritten by Oliver Siebenmarck and others\n\tCopyright 2002-2010, Haiku Inc. All rights reserved.\n	DataTranslations		DataTranslations\n\t von Oliver Siebenmarck und anderen\n\tCopyright 2002-2010, Haiku Inc. All rights reserved.\n
+Icon	DataTranslations		Icon
+Info	DataTranslations		Info
+Info:	DataTranslations		Info:
+Info…	DataTranslations		Info...
+Name:	DataTranslations		Name:
+Name:\t%s \nVersion:\t%ld.%ld.%ld\nInfo:\t%s\n\nPath:\n%s\n	DataTranslations		Name:\t%s \nVersion:\t%ld.%ld.%ld\nInfo:\t%s\n\nPfad:\n%s\n
+OK	DataTranslations		OK
+Overwrite	DataTranslations		Überschreiben
+Panel Info	DataTranslations		Panel-Info
+Path:	DataTranslations		Pfad:
+The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Das Objekt '%name' scheint kein Translator zu sein und kann daher nicht installiert werden.
+The new translator has been installed successfully.	DataTranslations		Der neue Translator wurde erfolgreich installiert.
+Translation Settings\n\nUse this control panel to set values that various\ntranslators use when no other settings are specified\nin the application.	DataTranslations		Translator Einstellungen\n\nDieses Fenster dient zum Festlegen von Werten, \ndie verschiedene Translatoren in Anwendungen benutzen, \nwenn in diesen selbst keine Einstellungen vorgenommen wurden.
 Version:	DataTranslations		Version:
-Translation Settings\n\nUse this control panel to set values that various\ntranslators use when no other settings are specified\nin the application.	DataTranslations		Translator-Einstellungen\n\nDieses Fenster dient zum Festlegen von Werten, \ndie verschiedene Translatoren in Anwendungen benutzen, \nwenn in diesen selbst keine Einstellungen vorgenommen wurden.

@@ -1,16 +1,16 @@
 1	german	x-vnd.Haiku-Touchpad	1498191605
-Scrolling	TouchpadPrefView		Scrollen
-Revert	TouchpadPrefView		Anfangswerte
-Two finger scrolling	TouchpadPrefView		Zwei-Finger-Scrollen
 Defaults	TouchpadPrefView		Standardwerte
-Slow	TouchpadPrefView		Langsam
-High	TouchpadPrefView		Hoch
-Tap gesture	TouchpadPrefView		Klick-Eigenschaften
-Horizontal scrolling	TouchpadPrefView		Horizontales Scrollen
 Fast	TouchpadPrefView		Schnell
-Tap click sensitivity	TouchpadPrefView		Empfindlichkeit
-Scroll acceleration	TouchpadPrefView		Beschleunigung
-Off	TouchpadPrefView		Aus
-Touchpad	TouchpadMain		Touchpad
+High	TouchpadPrefView		Hoch
 Horizontal scroll speed	TouchpadPrefView		Horizontale Geschwindigkeit
+Horizontal scrolling	TouchpadPrefView		Horizontales Scrollen
+Off	TouchpadPrefView		Aus
+Revert	TouchpadPrefView		Zurücksetzen
+Scroll acceleration	TouchpadPrefView		Scroll-Beschleunigung
+Scrolling	TouchpadPrefView		Scrollen
+Slow	TouchpadPrefView		Langsam
+Tap click sensitivity	TouchpadPrefView		Tap-Klickempfindlichkeit
+Tap gesture	TouchpadPrefView		Tap-Geste
+Touchpad	TouchpadMain		Touchpad
+Two finger scrolling	TouchpadPrefView		Zwei-Finger-Scrollen
 Vertical scroll speed	TouchpadPrefView		Vertikale Geschwindigkeit

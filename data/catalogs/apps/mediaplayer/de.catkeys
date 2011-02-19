@@ -1,140 +1,140 @@
 1	german	x-vnd.Haiku-MediaPlayer	1983120721
 1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (Amerikanisch)
-Stream settings	MediaPlayer-Main		Stream-Einstellungen
-Close window when done playing movies	MediaPlayer-SettingsWindow		Fenster nach Abspielen von Video schließen
-<unknown>	PlaylistItem-album		<unbekannt>
-Remove (Del)	MediaPlayer-PlaylistWindow		Entfernen (Entf)
-The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Die Datei '%filename' konnte nicht geöffnet werden.\n\n
-Save Playlist	MediaPlayer-PlaylistWindow		Playliste speichern
-error	MediaPlayer-Main		Fehler
-None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Keine der gewählten Dateien scheinen Mediendateien zu sein.
-Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Speichern der Playliste fehlgeschlagen.\n\nFehler:
-New player…	MediaPlayer-Main		Neuer Player...
 100% scale	MediaPlayer-Main		100% Zoom
-Close	MediaPlayer-Main		Schließen
-Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Einige Dateien konnten nicht in den Papierkorb verschoben werden.
-MediaPlayer Current Playlist	MediaPlayer-Main		MediaPlayer aktuelle Playliste
-Open	MediaPlayer-Main		Öffnen
-Next	MediaPlayer-Main		Nächster
-OK	MediaPlayer-SettingsWindow		OK
-Track %d	MediaPlayer-Main		Track %d
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2,35 : 1 (Cinemascope)
-Medium	MediaPlayer-SettingsWindow		Mittel
-Close	MediaPlayer-PlaylistWindow		Schließen
-Toggle mute.	MediaPlayer-Main		Stumm umschalten.
-Open…	MediaPlayer-PlaylistWindow		Öffnen...
-Undo	MediaPlayer-PlaylistWindow		Rückgängig
-File info…	MediaPlayer-Main		Datei Info...
-Use hardware video overlays if available	MediaPlayer-SettingsWindow		Hardware-Overlay verwenden, falls verfügbar
-Pause playback.	MediaPlayer-Main		Wiedergabe anhalten.
-Remove Entry	MediaPlayer-RemovePLItemsCmd		Eintrag entfernen
-MediaPlayer encountered an internal error. The file could not be opened.	MediaPlayer-Main		Es ist ein interner Fehler in MediaPlayer aufgetreten. Die Datei konnte nicht geöffnet werden.
-Drop files to play	MediaPlayer-Main		Dateien zum Abspielen hier fallen lassen
-Full volume	MediaPlayer-SettingsWindow		Volle Lautstärke
-TogglePlaying	MediaPlayer-Main		Abspielen umschalten
-Cancel	MediaPlayer-SettingsWindow		Abbrechen
-Nothing to Play	MediaPlayer-Main		Nichts abzuspielen
-Quit	MediaPlayer-Main		Beenden
-Muted	MediaPlayer-SettingsWindow		Stumm geschaltet
-Video	MediaPlayer-Main		Video
-Start playing.	MediaPlayer-Main		Starte Wiedergabe.
-MediaPlayer\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		MediaPlayer\n\nvon Marcus Overhagen, Stephan Aßmus und Frederik Modéen
-There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Für dieses Format ist kein Decoder installiert oder er hat Probleme mit der dieser Version des Formats.
-Import Entry	MediaPlayer-ImportPLItemsCmd		Eintrag importieren
-Gets the URI of the currently playing item.	MediaPlayer-Main		Fragt die URI des gerade abgespielten Elements ab.
-400% scale	MediaPlayer-Main		400% Zoom
-Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Speichern der Playliste fehlgeschlagen:\n\nFehler:
-Move Entries	MediaPlayer-MovePLItemsCmd		Einträge verschieben
-Loop sounds by default	MediaPlayer-SettingsWindow		Audio in Endlosschleife abspielen
-Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		Fehler beim Verschieben in den Papierkorb
-Audio	MediaPlayer-Main		Audio
-Open Playlist	MediaPlayer-PlaylistWindow		Playliste öffnen
-OK	MediaPlayer-Main		OK
-Settings…	MediaPlayer-Main		Einstellungen...
-MediaPlayer settings	MediaPlayer-SettingsWindow		MediaPlayer-Einstellungen
-Move Entry	MediaPlayer-MovePLItemsCmd		Eintrag verschieben
-Stop playing.	MediaPlayer-Main		Wiedergabe stoppen.
-Open	MediaPlayer-PlaylistWindow		Öffnen
-Error: 	MediaPlayer-RemovePLItemsCmd		Fehler:
-Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Interner Fehler (falsche Nachrichtenstruktur). Speichern der Playliste fehlgeschlagen.
-Skip to the previous track.	MediaPlayer-Main		Zum vorigen Track springen.
-Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Zoom mit hoher Qualität (nicht im Overlay-Modus)
-OK	MediaPlayer-RemovePLItemsCmd		OK
-50% scale	MediaPlayer-Main		50% Zoom
-Subtitles	MediaPlayer-Main		Untertitel
-Prev	MediaPlayer-Main		Voriger
-Volume	MediaPlayer-Main		Lautstärke
-Audio track	MediaPlayer-Main		Audiospur
-Import Entries	MediaPlayer-ImportPLItemsCmd		Einträge importieren
-Pause	MediaPlayer-Main		Pause
-No aspect correction	MediaPlayer-Main		Seitenverhältnis nicht korrigieren
-Automatically start playing	MediaPlayer-SettingsWindow		Wiedergabe automatisch starten
-Track	Video Track Menu		Track
-Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Interner Fehler (Sperren fehlgeschlagen). Speichern der Playliste fehlgeschlagen.
-View options	MediaPlayer-SettingsWindow		Darstellung
-Play mode	MediaPlayer-SettingsWindow		Wiedergabe
-Remove Entries	MediaPlayer-RemovePLItemsCmd		Einträge entfernen
-Video track	MediaPlayer-Main		Videospur
-Attributes	MediaPlayer-Main		Attribute
-All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Es konnten nicht alle Dateien in den Papierkorb verschoben werden.
-<untitled>	PlaylistItem-title		<unbenannt>
-Track	Audio Track Menu		Track
-Skip to the next track.	MediaPlayer-Main		Zum nächsten Track springen.
-<nothing to redo>	MediaPlayer-PlaylistWindow		<nichts zu wiederholen>
-Play	MediaPlayer-Main		Wiedergabe
-Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Einträge in den Papierkorb verschieben
 200% scale	MediaPlayer-Main		200% Zoom
-It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Der Media Server läuft anscheinend nicht.\nSoll er gestartet werden?
-Aspect ratio	MediaPlayer-Main		Seitenverhältnis
-Error: 	MediaPlayer-Main		Fehler:
-Large	MediaPlayer-SettingsWindow		Groß
-Bottom of video	MediaPlayer-SettingsWindow		Unten im Video
-Remove and put into Trash	MediaPlayer-PlaylistWindow		Entfernen und in den Papierkorb verschieben
-About MediaPlayer…	MediaPlayer-Main		Über MediaPlayer...
-Stop	MediaPlayer-Main		Stopp
-Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Interner Fehler (Speicher reicht nicht aus). Speichern der Playliste fehlgeschlagen.
-Hide interface	MediaPlayer-Main		Oberfläche ausblenden
-Copy Entry	MediaPlayer-CopyPLItemsCmd		Eintrag kopieren
-none	Subtitles menu		kein
-Thanks	MediaPlayer-Main		Danke
-URI	MediaPlayer-Main		URI
-Mute	MediaPlayer-Main		Stumm
-Scale controls in full-screen mode	MediaPlayer-SettingsWindow		Bedienelemente im Vollbildmodus vergrößern
-Close window when done playing sounds	MediaPlayer-SettingsWindow		Fenster nach Abspielen von Audio schließen
-Toggle pause/play.	MediaPlayer-Main		Pause/Wiedergabe umschalten.
-Subtitle placement	MediaPlayer-SettingsWindow		Untertitelposition:
-Small	MediaPlayer-SettingsWindow		Klein
-Randomize	MediaPlayer-PlaylistWindow		Zufällige Reihenfolge
-Off	Subtitles menu		Aus
-Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Einträge zufällig anordnen
-Revert	MediaPlayer-SettingsWindow		Ausgangswerte
-Edit	MediaPlayer-PlaylistWindow		Bearbeiten
-Subtitle size	MediaPlayer-SettingsWindow		Untertitelgröße:
-Start media server	MediaPlayer-Main		Media-Server starten
-<unnamed>	PlaylistItem-name		<unbenannt>
-Open Clips	MediaPlayer-Main		Clips öffnen
-Remove all	MediaPlayer-PlaylistWindow		Alle entfernen
-OK	MediaPlayer-PlaylistWindow		OK
-none	Audio track menu		keine
-Loop movies by default	MediaPlayer-SettingsWindow		Video in Endlosschleife abspielen
-Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Zeigt/Setzt die Lautstärke (0,0-2,0)
-Playlist…	MediaPlayer-Main		Playliste...
-<unknown>	PlaylistItem-author		<unbekannt>
-Save as…	MediaPlayer-PlaylistWindow		Speichern als...
-Copy Entries	MediaPlayer-CopyPLItemsCmd		Einträge kopieren
-Redo	MediaPlayer-PlaylistWindow		Wiederholen
-Always on top	MediaPlayer-Main		Immer im Vordergrund
-Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Eintrag in den Papierkorb verschieben
-Save	MediaPlayer-Main		Speichern
-<nothing to undo>	MediaPlayer-PlaylistWindow		<nichts rückgängig zu machen>
-Save	MediaPlayer-PlaylistWindow		Speichern
-Full screen	MediaPlayer-Main		Vollbild
-Open file…	MediaPlayer-Main		Öffne Datei...
 300% scale	MediaPlayer-Main		300% Zoom
+400% scale	MediaPlayer-Main		400% Zoom
+50% scale	MediaPlayer-Main		50% Zoom
+<nothing to redo>	MediaPlayer-PlaylistWindow		<nichts zu wiederholen>
+<nothing to undo>	MediaPlayer-PlaylistWindow		<nichts rückgängig zu machen>
+<unknown>	PlaylistItem-album		<unbekannt>
+<unknown>	PlaylistItem-author		<unbekannt>
+<unnamed>	PlaylistItem-name		<unbenannt>
+<untitled>	PlaylistItem-title		<unbenannt>
+About MediaPlayer…	MediaPlayer-Main		Über MediaPlayer...
+All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Es konnten nicht alle Dateien in den Papierkorb verschoben werden.
+Always on top	MediaPlayer-Main		Immer im Vordergrund
+Aspect ratio	MediaPlayer-Main		Seitenverhältnis
+Attributes	MediaPlayer-Main		Attribute
+Audio	MediaPlayer-Main		Audio
+Audio track	MediaPlayer-Main		Audiospur
+Automatically start playing	MediaPlayer-SettingsWindow		Wiedergabe automatisch starten
 Bottom of screen	MediaPlayer-SettingsWindow		Unten im Fenster
-Save error	MediaPlayer-PlaylistWindow		Speichern ist fehlgeschlagen
-Play background clips at	MediaPlayer-SettingsWindow		Wiedergabe im Hintergrund
-Rating	MediaPlayer-Main		Bewertung
-Playlist	MediaPlayer-PlaylistWindow		Playliste
+Bottom of video	MediaPlayer-SettingsWindow		Unten im Video
+Cancel	MediaPlayer-SettingsWindow		Abbrechen
+Close	MediaPlayer-Main		Schließen
+Close	MediaPlayer-PlaylistWindow		Schließen
+Close window when done playing movies	MediaPlayer-SettingsWindow		Fenster nach Abspielen von Video schließen
+Close window when done playing sounds	MediaPlayer-SettingsWindow		Fenster nach Abspielen von Audio schließen
+Copy Entries	MediaPlayer-CopyPLItemsCmd		Einträge kopieren
+Copy Entry	MediaPlayer-CopyPLItemsCmd		Eintrag kopieren
+Drop files to play	MediaPlayer-Main		Dateien zum Abspielen hier fallen lassen
+Edit	MediaPlayer-PlaylistWindow		Bearbeiten
+Error: 	MediaPlayer-Main		Fehler:
+Error: 	MediaPlayer-RemovePLItemsCmd		Fehler:
+File info…	MediaPlayer-Main		Datei Info...
+Full screen	MediaPlayer-Main		Vollbild
+Full volume	MediaPlayer-SettingsWindow		Volle Lautstärke
+Gets the URI of the currently playing item.	MediaPlayer-Main		Fragt die URI des gerade abgespielten Elements ab.
+Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Zeigt/Setzt die Lautstärke (0,0-2,0)
+Hide interface	MediaPlayer-Main		Oberfläche ausblenden
+Import Entries	MediaPlayer-ImportPLItemsCmd		Einträge importieren
+Import Entry	MediaPlayer-ImportPLItemsCmd		Eintrag importieren
+Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Interner Fehler (Sperren fehlgeschlagen). Speichern der Playliste fehlgeschlagen.
+Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Interner Fehler (falsche Nachrichtenstruktur). Speichern der Playliste fehlgeschlagen.
+Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Interner Fehler (Speicher reicht nicht aus). Speichern der Playliste fehlgeschlagen.
+It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Der Media Server läuft anscheinend nicht.\nSoll er gestartet werden?
+Large	MediaPlayer-SettingsWindow		Groß
 Lock Peaks	MediaPlayer-PeakView		Ausschlag markieren
+Loop movies by default	MediaPlayer-SettingsWindow		Video Dateien in Endlosschleife abspielen
+Loop sounds by default	MediaPlayer-SettingsWindow		Audio Dateien in Endlosschleife abspielen
 Low volume	MediaPlayer-SettingsWindow		Niedrige Lautstärke
+MediaPlayer Current Playlist	MediaPlayer-Main		MediaPlayer aktuelle Playliste
+MediaPlayer encountered an internal error. The file could not be opened.	MediaPlayer-Main		Es ist ein interner Fehler in MediaPlayer aufgetreten. Die Datei konnte nicht geöffnet werden.
+MediaPlayer settings	MediaPlayer-SettingsWindow		MediaPlayer Einstellungen
+MediaPlayer\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		MediaPlayer\n\nvon Marcus Overhagen, Stephan Aßmus und Frederik Modéen
+Medium	MediaPlayer-SettingsWindow		Mittel
+Move Entries	MediaPlayer-MovePLItemsCmd		Einträge verschieben
+Move Entry	MediaPlayer-MovePLItemsCmd		Eintrag verschieben
+Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		Fehler beim Verschieben in den Papierkorb
+Mute	MediaPlayer-Main		Stumm
+Muted	MediaPlayer-SettingsWindow		Stumm geschaltet
+New player…	MediaPlayer-Main		Neuer Player...
+Next	MediaPlayer-Main		Nächster
+No aspect correction	MediaPlayer-Main		Seitenverhältnis nicht korrigieren
+None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Keine der gewählten Dateien scheinen Mediendateien zu sein.
+Nothing to Play	MediaPlayer-Main		Nichts abzuspielen
+OK	MediaPlayer-Main		OK
+OK	MediaPlayer-PlaylistWindow		OK
+OK	MediaPlayer-RemovePLItemsCmd		OK
+OK	MediaPlayer-SettingsWindow		OK
+Off	Subtitles menu		Aus
+Open	MediaPlayer-Main		Öffnen
+Open	MediaPlayer-PlaylistWindow		Öffnen
+Open Clips	MediaPlayer-Main		Öffne Clips
+Open Playlist	MediaPlayer-PlaylistWindow		Playlist öffnen
+Open file…	MediaPlayer-Main		Öffne Datei...
+Open…	MediaPlayer-PlaylistWindow		Öffnen...
+Pause	MediaPlayer-Main		Pause
+Pause playback.	MediaPlayer-Main		Wiedergabe anhalten.
+Play	MediaPlayer-Main		Wiedergabe
+Play background clips at	MediaPlayer-SettingsWindow		Wiedergabe im Hintergrund
+Play mode	MediaPlayer-SettingsWindow		Wiedergabe
+Playlist	MediaPlayer-PlaylistWindow		Playliste
+Playlist…	MediaPlayer-Main		Playliste...
+Prev	MediaPlayer-Main		Voriger
+Quit	MediaPlayer-Main		Beenden
+Randomize	MediaPlayer-PlaylistWindow		Zufällige Reihenfolge
+Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Einträge zufällig anordnen
+Rating	MediaPlayer-Main		Bewertung
+Redo	MediaPlayer-PlaylistWindow		Wiederholen
+Remove (Del)	MediaPlayer-PlaylistWindow		Entfernen (Entf)
+Remove Entries	MediaPlayer-RemovePLItemsCmd		Einträge entfernen
+Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Einträge in den Papierkorb verschieben
+Remove Entry	MediaPlayer-RemovePLItemsCmd		Eintrag entfernen
+Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Eintrag in den Papierkorb verschieben
+Remove all	MediaPlayer-PlaylistWindow		Alle entfernen
+Remove and put into Trash	MediaPlayer-PlaylistWindow		Entfernen und in den Papierkorb verschieben
+Revert	MediaPlayer-SettingsWindow		Ausgangswerte
+Save	MediaPlayer-Main		Speichern
+Save	MediaPlayer-PlaylistWindow		Speichern
+Save Playlist	MediaPlayer-PlaylistWindow		Playlist speichern
+Save as…	MediaPlayer-PlaylistWindow		Speichern als...
+Save error	MediaPlayer-PlaylistWindow		Speichern fehlgeschlagen
+Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Speichern der Playlist fehlgeschlagen.\n\nFehler:
+Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Speichern der Playliste fehlgeschlagen:\n\nFehler:
+Scale controls in full-screen mode	MediaPlayer-SettingsWindow		Bedienelemente im Vollbildmodus vergrößern
+Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Zoom mit hoher Qualität (nicht im Overlay Modus)
+Settings…	MediaPlayer-Main		Einstellungen...
+Skip to the next track.	MediaPlayer-Main		Zum nächsten Track springen.
+Skip to the previous track.	MediaPlayer-Main		Zum vorigen Track springen.
+Small	MediaPlayer-SettingsWindow		Klein
+Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Einige Dateien konnten nicht in den Papierkorb verschoben werden.
+Start media server	MediaPlayer-Main		Media Server starten
+Start playing.	MediaPlayer-Main		Starte Wiedergabe.
+Stop	MediaPlayer-Main		Stopp
+Stop playing.	MediaPlayer-Main		Wiedergabe stoppen.
+Stream settings	MediaPlayer-Main		Stream Einstellungen
+Subtitle placement	MediaPlayer-SettingsWindow		Untertitelposition
+Subtitle size	MediaPlayer-SettingsWindow		Untertitelgröße
+Subtitles	MediaPlayer-Main		Untertitel
+Thanks	MediaPlayer-Main		Danke
+The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Die Datei '%filename' konnte nicht geöffnet werden.\n\n
+There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Für dieses Format ist kein Decoder installiert oder er hat Probleme mit der dieser Version des Formats.
+Toggle mute.	MediaPlayer-Main		Stumm umschalten.
+Toggle pause/play.	MediaPlayer-Main		Pause/Wiedergabe umschalten.
+TogglePlaying	MediaPlayer-Main		Abspielen umschalten
+Track	Audio Track Menu		Track
+Track	Video Track Menu		Track
+Track %d	MediaPlayer-Main		Track %d
+URI	MediaPlayer-Main		URI
+Undo	MediaPlayer-PlaylistWindow		Rückgängig
+Use hardware video overlays if available	MediaPlayer-SettingsWindow		Verwendeq Hardware Overlay falls verfügbar
+Video	MediaPlayer-Main		Video
+Video track	MediaPlayer-Main		Videospur
+View options	MediaPlayer-SettingsWindow		Darstellung
+Volume	MediaPlayer-Main		Lautstärke
+error	MediaPlayer-Main		Fehler
+none	Audio track menu		keine
+none	Subtitles menu		kein

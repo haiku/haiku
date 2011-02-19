@@ -1,36 +1,36 @@
-1	german	x-vnd.Haiku-LaunchBox	387611335
-New	LaunchBox		Neu
-Set description…	LaunchBox		Beschreibung ändern...
-Vertical layout	LaunchBox		Vertikale Anordnung
-OK	LaunchBox		OK
-Pad 1	LaunchBox		Block 1
-last chance	LaunchBox		letzte Chance
-Quit	LaunchBox		Beenden
-Clear button	LaunchBox		Feld leeren
-Failed to launch application with signature '	LaunchBox		Fehler beim Start der Anwendung mit der Signatur: ' 
+1	german	x-vnd.Haiku-LaunchBox	1672943267
 About	LaunchBox		Über
-Ignore double-click	LaunchBox		Doppelklick ignorieren
+Add button here	LaunchBox		Feld hier einfügen
 Auto-raise	LaunchBox		Automatisch nach vorn holen
-Show on all workspaces	LaunchBox		Auf allen Arbeitsflächen anzeigen
-Show window border	LaunchBox		Fensterrahmen anzeigen
-Pad 	LaunchBox		Block
-Icon size	LaunchBox		Icongröße
 Bummer	LaunchBox		Mist
 Cancel	LaunchBox		Abbrechen
-Remove button	LaunchBox		Feld entfernen
-Description for '	LaunchBox		Beschreibung für '
-Horizontal layout	LaunchBox		Horizontale Anordnung
-Name Panel	LaunchBox		Namenspanel
-Add button here	LaunchBox		Feld hier einfügen
-Failed to launch '	LaunchBox		Start fehlgeschlagen: '
-Stephan Aßmus (aka stippi)	LaunchBox		Stephan Aßmus (aka stippi)	 
-Failed to launch 'something',error in Pad data.	LaunchBox		Start von 'something' fehlgeschlagen, Fehler in den Daten des Blocks.
-Close	LaunchBox		Schließen
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Senden des 'open folder' Kommandos zu Tracker fehlgeschlagen.\n\nFehler:
-You can drag an icon here.	LaunchBox		Hier kann ein Icon hingezogen werden.
+Clear button	LaunchBox		Feld leeren
 Clone	LaunchBox		Duplizieren
+Close	LaunchBox		Schließen
+Description for '%3'	LaunchBox		Beschreibung für '%3'
+Failed to launch '%1'.\n\nError:	LaunchBox		'%1' konnte nicht gestartet werden.\n\nFehler:
+Failed to launch 'something',error in Pad data.	LaunchBox		Start von 'something' fehlgeschlagen, Fehler in den Daten des Blocks.
+Failed to launch application with signature '%2'.\n\nError:	LaunchBox		Die Anwendung mit der Signatur '%2' konnte nicht gestartet werden.\n\nFehler:
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Senden des 'open folder' Kommandos zu Tracker fehlgeschlagen.\n\nFehler:
+Horizontal layout	LaunchBox		Horizontale Anordnung
+Icon size	LaunchBox		Icongröße
+Ignore double-click	LaunchBox		Doppelklick ignorieren
 LaunchBox	LaunchBox		LaunchBox
-launch popup	LaunchBox		starte popup
+Name Panel	LaunchBox		Namenspanel
+New	LaunchBox		Neu
+OK	LaunchBox		OK
+Pad	LaunchBox		Block
+Pad %1	LaunchBox		Block %1
+Pad 1	LaunchBox		Block 1
+Quit	LaunchBox		Beenden
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Wirklich diesen Block schließen?\n(Der Block wird nicht gespeichert.)
-'.\n\nError: 	LaunchBox		'.\n\nFehler:
+Remove button	LaunchBox		Feld entfernen
+Set description…	LaunchBox		Beschreibung festlegen...
 Settings	LaunchBox		EInstellungen
+Show on all workspaces	LaunchBox		Auf allen Arbeitsflächen anzeigen
+Show window border	LaunchBox		Fensterrahmen anzeigen
+Stephan Aßmus (aka stippi)	LaunchBox		Stephan Aßmus (aka stippi)	 
+Vertical layout	LaunchBox		Vertikale Anordnung
+You can drag an icon here.	LaunchBox		Hier kann ein Icon hingezogen werden.
+last chance	LaunchBox		letzte Chance
+launch popup	LaunchBox		starte popup

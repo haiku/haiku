@@ -1,7 +1,7 @@
 1	german	x-vnd.Haiku-cmd-dstconfig	2552303152
+.\n\nIs this the correct time?	dstcheck		.\n\nIst das die richtige Uhrzeit?
 Ask me later	dstcheck		Später nachfragen
 Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is	dstcheck		Achtung!\n\nWegen dem Zeitwechsel könnte die Uhrzeit ihres Computers eine Stunde verschoben sein.\n Der Rechner denkt, es ist um
 No	dstcheck		Nein
+Would you like to set the clock?	dstcheck		Möchten sie die Uhrzeit bestimmen
 Yes	dstcheck		Ja
-Would you like to set the clock?	dstcheck		Soll die Uhrzeit eingestellt werden?
-.\n\nIs this the correct time?	dstcheck		.\n\nIst das die richtige Uhrzeit?

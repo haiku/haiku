@@ -1,7 +1,7 @@
 1	german	x-vnd.Haiku-DeskCalc	1668905289
 About DeskCalc…	CalcView		Über DeskCalc…
-about	CalcView		über
-Show keypad	CalcView		Tastenfeld anzeigen
-Enable Num Lock on startup	CalcView		Num-Lock beim Start aktivieren
-DeskCalc v2.1.0\n\nwritten by Timothy Wayper,\nStephan Aßmus and Ingo Weinhold\n\n©1997, 1998 R3 Software Ltd.\n©2006-2009 Haiku, Inc.\n\nAll Rights Reserved.	CalcView		DeskCalc v2.1.0\n\nvon Timothy Wayper,\nStephan Aßmus und Ingo Weinhold\n\n©1997, 1998 R3 Software Ltd.\n©2006-2009 Haiku, Inc.\n\nAlle Rechte vorbehalten.
 Audio Feedback	CalcView		Audiorückmeldung
+DeskCalc v2.1.0\n\nwritten by Timothy Wayper,\nStephan Aßmus and Ingo Weinhold\n\n©1997, 1998 R3 Software Ltd.\n©2006-2009 Haiku, Inc.\n\nAll Rights Reserved.	CalcView		DeskCalc v2.1.0\n\nentwickelt von Timothy Wayper,\nStephan Aßmus und Ingo Weinhold\n\n©1997, 1998 R3 Software Ltd.\n©2006-2009 Haiku, Inc.\n\nAlle Rechte vorbehalten.
+Enable Num Lock on startup	CalcView		Num-Lock beim Start aktivieren
+Show keypad	CalcView		Tastenfeld anzeigen
+about	CalcView		über

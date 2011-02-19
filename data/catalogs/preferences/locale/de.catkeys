@@ -1,25 +1,25 @@
 1	german	x-vnd.Haiku-Locale	2295953467
-Available languages	Locale Preflet Window		Verfügbare Sprachen
-Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Es wurden keine verfügbaren Sprachen gefunden. Dieses Preflet kann daher nicht verwendet werden!
-Long format:	TimeFormatSettings		Langes Format:
-Currency	TimeFormatSettings		Währung
-Short format:	TimeFormatSettings		Kurzes Format:
-Language	Locale Preflet Window		Sprache
-Preferred languages	Locale Preflet Window		Bevorzugte Sprache
-Numbers	TimeFormatSettings		Zahlen
-24 hour	TimeFormatSettings		24 Stunden
-Defaults	Locale Preflet Window		Standardwerte
-Revert	Locale Preflet Window		Anfangswerte
-OK	Locale Preflet Window		OK
-Time	TimeFormatSettings		Zeit
-Date	TimeFormatSettings		Datum
 12 hour	TimeFormatSettings		12 Stunden
-Locale	Locale Preflet		Locale - Landes- und Spracheinstellungen
-already chosen	LanguageListView		bereits ausgewählt
-Negative:	TimeFormatSettings		Negativ:
-Use month/day-names from preferred language	TimeFormatSettings		Monats-/Tagesnamen aus bevorzugter Sprache verwenden
+24 hour	TimeFormatSettings		24 Stunden
+Available languages	Locale Preflet Window		Verfügbare Sprachen
+Currency	TimeFormatSettings		Währung
+Date	TimeFormatSettings		Datum
+Defaults	Locale Preflet Window		Standardwerte
 Formatting	Locale Preflet Window		Formatierung
-Locale	Locale Preflet Window		Locale
 Full format:	TimeFormatSettings		Volles Format:
+Language	Locale Preflet Window		Sprache
+Locale	Locale Preflet		Locale - Landes- und Spracheinstellungen
+Locale	Locale Preflet Window		Locale
+Long format:	TimeFormatSettings		Langformat:
 Medium format:	TimeFormatSettings		Mittleres Format:
+Negative:	TimeFormatSettings		Negativ:
+Numbers	TimeFormatSettings		Zahlen
+OK	Locale Preflet Window		Ok
 Positive:	TimeFormatSettings		Positiv:
+Preferred languages	Locale Preflet Window		Bevorzugte Sprache
+Revert	Locale Preflet Window		Zurücknehmen
+Short format:	TimeFormatSettings		Kurzformat:
+Time	TimeFormatSettings		Zeit
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Es wurden keine verfügbaren Sprachen gefunden. Dieses Preflet kann daher nicht verwendet werden!
+Use month/day-names from preferred language	TimeFormatSettings		Monats-/Tagesnamen aus bevorzugter Sprache verwenden
+already chosen	LanguageListView		bereits ausgewählt
