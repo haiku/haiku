@@ -38,13 +38,15 @@ enum {
 	kMsgDeleteCurrentFile		= 'mDcF',
 	MSG_SLIDE_SHOW				= 'mSSW',
 	kMsgStopSlideShow			= 'msss',
-	MSG_EXIT_FULL_SCREEN		= 'mEFS'
+	MSG_EXIT_FULL_SCREEN		= 'mEFS',
+	MSG_WINDOW_HAS_QUIT			= 'wndq'
 };
 
 
 class ShowImageWindow : public BWindow {
 public:
-								ShowImageWindow(const entry_ref& ref,
+								ShowImageWindow(BRect frame,
+									const entry_ref& ref,
 									const BMessenger& trackerMessenger);
 	virtual						~ShowImageWindow();
 
@@ -59,6 +61,7 @@ private:
 			void				_AddMenus(BMenuBar* bar);
 			void				_ResizeWindowToImage();
 			void				_BuildViewMenu(BMenu* menu, bool popupMenu);
+			BMenu*				_BuildRatingMenu();
 			BMenuItem*			_AddItemMenu(BMenu* menu, const char* label,
 									uint32 what, char shortcut, uint32 modifier,
 									const BHandler* target,
@@ -93,6 +96,8 @@ private:
 			void				_StartSlideShow();
 			void				_StopSlideShow();
 
+			void				_UpdateRatingMenu();
+
 private:
 			ImageFileNavigator	fNavigator;
 			BFilePanel*			fSavePanel;
@@ -100,6 +105,7 @@ private:
 			BMenu*				fBrowseMenu;
 			BMenu*				fGoToPageMenu;
 			BMenu*				fSlideShowDelayMenu;
+			BMenu*				fRatingMenu;
 			ShowImageView*		fImageView;
 			ShowImageStatusView* fStatusView;
 			ProgressWindow*		fProgressWindow;

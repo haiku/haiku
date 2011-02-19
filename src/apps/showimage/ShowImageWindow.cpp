@@ -90,6 +90,7 @@ enum {
 	MSG_SHOW_CAPTION			= 'mSCP',
 	MSG_PAGE_SETUP				= 'mPSU',
 	MSG_PREPARE_PRINT			= 'mPPT',
+	MSG_SET_RATING				= 'mSRT',
 	kMsgFitToWindow				= 'mFtW',
 	kMsgOriginalSize			= 'mOSZ',
 	kMsgStretchToWindow			= 'mStW',
@@ -116,10 +117,10 @@ bs_printf(BString* string, const char* format, ...)
 //	#pragma mark -- ShowImageWindow
 
 
-ShowImageWindow::ShowImageWindow(const entry_ref& ref,
+ShowImageWindow::ShowImageWindow(BRect frame, const entry_ref& ref,
 	const BMessenger& trackerMessenger)
 	:
-	BWindow(BRect(5, 24, 250, 100), "", B_DOCUMENT_WINDOW, 0),
+	BWindow(frame, "", B_DOCUMENT_WINDOW, 0),
 	fNavigator(ref, trackerMessenger),
 	fSavePanel(NULL),
 	fBar(NULL),
@@ -197,6 +198,8 @@ ShowImageWindow::ShowImageWindow(const entry_ref& ref,
 	BMenu* menu = new BMenu(B_TRANSLATE_WITH_CONTEXT("View", "Menus"));
 	_BuildViewMenu(menu, false);
 	fBar->AddItem(menu);
+
+	fBar->AddItem(_BuildRatingMenu());
 
 	SetPulseRate(100000);
 		// every 1/10 second; ShowImageView needs it for marching ants
@@ -292,6 +295,23 @@ ShowImageWindow::_BuildViewMenu(BMenu* menu, bool popupMenu)
 		_AddItemMenu(menu, B_TRANSLATE("Use as background" B_UTF8_ELLIPSIS),
 			MSG_DESKTOP_BACKGROUND, 0, 0, this);
 	}
+}
+
+
+BMenu*
+ShowImageWindow::_BuildRatingMenu()
+{
+	fRatingMenu = new BMenu(B_TRANSLATE("Rating"));
+	for (int32 i = 1; i <= 10; i++) {
+		BString label;
+		label << i;
+		BMessage* message = new BMessage(MSG_SET_RATING);
+		message->AddInt32("rating", i);
+		fRatingMenu->AddItem(new BMenuItem(label.String(), message));
+	}
+	// NOTE: We may want to encapsulate the Rating menu within a more
+	// general "Attributes" menu.
+	return fRatingMenu;
 }
 
 
@@ -557,15 +577,13 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			fNavigator.SetTo(ref, message->FindInt32("page"),
 				message->FindInt32("pageCount"));
 
-			if (first || (!fImageView->StretchesToBounds() && !fFullScreen)) {
-				_ResizeWindowToImage();
-				fImageView->FitToBounds();
-			}
+			fImageView->FitToBounds();
 			if (first) {
 				fImageView->MakeFocus(true);
 					// to receive key messages
 				Show();
 			}
+			_UpdateRatingMenu();
 			break;
 		}
 
@@ -889,6 +907,20 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			// This is used in the Backgrounds code for scaled placement
 			backgroundsMessage.AddInt32("placement", 'scpl');
 			be_roster->Launch("application/x-vnd.haiku-backgrounds", &backgroundsMessage);
+			break;
+		}
+
+		case MSG_SET_RATING:
+		{
+			int32 rating;
+			if (message->FindInt32("rating", &rating) != B_OK)
+				break;
+			BFile file(&fNavigator.CurrentRef(), B_WRITE_ONLY);
+			if (file.InitCheck() != B_OK)
+				break;
+			file.WriteAttr("Media:Rating", B_INT32_TYPE, 0, &rating,
+				sizeof(rating));
+			_UpdateRatingMenu();
 			break;
 		}
 
@@ -1303,6 +1335,27 @@ ShowImageWindow::_StopSlideShow()
 }
 
 
+void
+ShowImageWindow::_UpdateRatingMenu()
+{
+	BFile file(&fNavigator.CurrentRef(), B_READ_ONLY);
+	if (file.InitCheck() != B_OK)
+		return;
+	int32 rating;
+	ssize_t size = sizeof(rating);
+	if (file.ReadAttr("Media:Rating", B_INT32_TYPE, 0, &rating, size) != size)
+		rating = 0;
+	// TODO: Finding the correct item could be more robust, like by looking
+	// at the message of each item.
+	for (int32 i = 1; i <= 10; i++) {
+		BMenuItem* item = fRatingMenu->ItemAt(i - 1);
+		if (item == NULL)
+			break;
+		item->SetMarked(i == rating);
+	}
+}
+
+
 bool
 ShowImageWindow::QuitRequested()
 {
@@ -1311,5 +1364,16 @@ ShowImageWindow::QuitRequested()
 		return false;
 	}
 
-	return _ClosePrompt();
+	if (!_ClosePrompt())
+		return false;
+
+	ShowImageSettings* settings = my_app->Settings();
+	if (settings->Lock()) {
+		settings->SetRect("WindowFrame", Frame());
+		settings->Unlock();
+	}
+
+	be_app->PostMessage(MSG_WINDOW_HAS_QUIT);
+
+	return true;
 }

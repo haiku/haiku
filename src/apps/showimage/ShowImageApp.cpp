@@ -21,6 +21,7 @@
 #include <FilePanel.h>
 #include <Locale.h>
 #include <Path.h>
+#include <Screen.h>
 #include <String.h>
 
 #include "ShowImageConstants.h"
@@ -38,10 +39,12 @@ const int32 kWindowsToIgnore = 1;
 
 ShowImageApp::ShowImageApp()
 	:
-	BApplication(kApplicationSignature)
+	BApplication(kApplicationSignature),
+	fOpenPanel(new BFilePanel(B_OPEN_PANEL)),
+	fPulseStarted(false),
+	fLastWindowFrame(BRect(30, 30, 430, 330))
 {
-	fPulseStarted = false;
-	fOpenPanel = new BFilePanel(B_OPEN_PANEL);
+	_UpdateLastWindowFrame();
 }
 
 
@@ -121,6 +124,12 @@ ShowImageApp::MessageReceived(BMessage* message)
 			_CheckClipboard();
 			break;
 
+		case MSG_WINDOW_HAS_QUIT:
+			// Make sure that new windows open with the location/size of the
+			// last closed window.
+			_UpdateLastWindowFrame();
+			break;
+
 		default:
 			BApplication::MessageReceived(message);
 			break;
@@ -167,9 +176,8 @@ ShowImageApp::RefsReceived(BMessage* message)
 		message->FindMessenger("TrackerViewToken", &trackerMessenger);
 
 	entry_ref ref;
-	for (int32 i = 0; message->FindRef("refs", i, &ref) == B_OK; i++) {
+	for (int32 i = 0; message->FindRef("refs", i, &ref) == B_OK; i++)
 		_Open(ref, trackerMessenger);
-	}
 }
 
 
@@ -203,7 +211,11 @@ ShowImageApp::_StartPulse()
 void
 ShowImageApp::_Open(const entry_ref& ref, const BMessenger& trackerMessenger)
 {
-	new ShowImageWindow(ref, trackerMessenger);
+	fLastWindowFrame.OffsetBy(20, 20);
+	if (!BScreen(B_MAIN_SCREEN_ID).Frame().Contains(fLastWindowFrame))
+		fLastWindowFrame.OffsetTo(50, 50);
+	
+	new ShowImageWindow(fLastWindowFrame, ref, trackerMessenger);
 }
 
 
@@ -242,6 +254,15 @@ ShowImageApp::_CheckClipboard()
 	BMessage msg(B_CLIPBOARD_CHANGED);
 	msg.AddBool("data_available", dataAvailable);
 	_BroadcastToWindows(&msg);
+}
+
+
+void
+ShowImageApp::_UpdateLastWindowFrame()
+{
+	fLastWindowFrame = fSettings.GetRect("WindowFrame", fLastWindowFrame);
+	// Compensate the offset which we always add to new windows.
+	fLastWindowFrame.OffsetBy(-20, -20);
 }
 
 

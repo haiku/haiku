@@ -44,11 +44,13 @@ private:
 									const BMessenger& trackerMessenger);
 			void				_BroadcastToWindows(BMessage* message);
 			void				_CheckClipboard();
+			void				_UpdateLastWindowFrame();
 
 private:
 			BFilePanel*			fOpenPanel;
 			bool				fPulseStarted;
 			ShowImageSettings	fSettings;
+			BRect				fLastWindowFrame;
 };
 
 
