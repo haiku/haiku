@@ -106,14 +106,14 @@ InterfaceAddressView::RevertFields()
 {
 	// Populate address fields with current settings
 
-	const char* currMode = fSettings->AutoConfigure() ? "Automatic" : "Static";
+	const char* currMode = fSettings->AutoConfigure(fFamily)
+		? "Automatic" : "Static";
 
-	_EnableFields(!fSettings->AutoConfigure());
+	_EnableFields(!fSettings->AutoConfigure(fFamily));
 		// if Autoconfigured, disable address fields until changed
 
-	// TODO : AutoConfigure needs to be based on family
 	if (fSettings->IPAddr(fFamily).IsEmpty()
-		&& !fSettings->AutoConfigure())
+		&& !fSettings->AutoConfigure(fFamily))
 	{
 		currMode = "None";
 		_EnableFields(false);
@@ -143,3 +143,4 @@ InterfaceAddressView::SaveFields()
 
 	return B_OK;
 }
+

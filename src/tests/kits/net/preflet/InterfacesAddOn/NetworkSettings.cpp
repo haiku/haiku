@@ -35,13 +35,11 @@
 
 NetworkSettings::NetworkSettings(const char* name)
 	:
-	fIPv4Auto(true),
-	fIPv6Auto(true),
 	fDisabled(false),
 	fNameServers(5, true)
 {
-	fSocket4 = socket(AF_INET, SOCK_DGRAM, 0);
-	fSocket6 = socket(AF_INET6, SOCK_DGRAM, 0);
+	fSocket[AF_INET] = socket(AF_INET, SOCK_DGRAM, 0);
+	fSocket[AF_INET6] = socket(AF_INET6, SOCK_DGRAM, 0);
 
 	fName = name;
 
@@ -51,12 +49,13 @@ NetworkSettings::NetworkSettings(const char* name)
 
 NetworkSettings::~NetworkSettings()
 {
-	close(fSocket4);
-	close(fSocket6);
+	close(fSocket[AF_INET]);
+	close(fSocket[AF_INET6]);
 }
 
 
 // -- Interface address read code
+
 
 void
 NetworkSettings::ReadConfiguration()
@@ -72,20 +71,20 @@ NetworkSettings::ReadConfiguration()
 
 	if (zeroAddrV4 >= 0) {
 		fNetworkInterface.GetAddressAt(zeroAddrV4, netIntAddr4);
-		fIPv4Addr = netIntAddr4.Address();
-		fIPv4Mask = netIntAddr4.Mask();
+		fAddress[AF_INET] = netIntAddr4.Address();
+		fNetmask[AF_INET] = netIntAddr4.Mask();
 	}
 
 	if (zeroAddrV6 >= 0) {
 		fNetworkInterface.GetAddressAt(zeroAddrV6, netIntAddr6);
-		fIPv6Addr = netIntAddr6.Address();
-		fIPv6Mask = netIntAddr6.Mask();
+		fAddress[AF_INET6] = netIntAddr6.Address();
+		fNetmask[AF_INET6] = netIntAddr6.Mask();
 	}
 
 	// Obtain gateway
 	ifconf config;
 	config.ifc_len = sizeof(config.ifc_value);
-	if (ioctl(fSocket4, SIOCGRTSIZE, &config, sizeof(config)) < 0)
+	if (ioctl(fSocket[AF_INET], SIOCGRTSIZE, &config, sizeof(config)) < 0)
 		return;
 
 	uint32 size = (uint32)config.ifc_value;
@@ -100,7 +99,7 @@ NetworkSettings::ReadConfiguration()
 	config.ifc_len = size;
 	config.ifc_buf = buffer;
 
-	if (ioctl(fSocket4, SIOCGRTTABLE, &config, sizeof(config)) < 0)
+	if (ioctl(fSocket[AF_INET], SIOCGRTTABLE, &config, sizeof(config)) < 0)
 		return;
 
 	ifreq* interface = (ifreq*)buffer;
@@ -111,7 +110,7 @@ NetworkSettings::ReadConfiguration()
 
 		if ((route.flags & RTF_GATEWAY) != 0) {
 			sockaddr_in* inetAddress = (sockaddr_in*)route.gateway;
-			fIPv4Gateway = inet_ntoa(inetAddress->sin_addr);
+			fGateway[AF_INET] = inet_ntoa(inetAddress->sin_addr);
 		}
 
 		int32 addressSize = 0;
@@ -126,19 +125,19 @@ NetworkSettings::ReadConfiguration()
 			+ sizeof(route_entry) + addressSize);
 	}
 
+	fDisabled = (fNetworkInterface.Flags() & IFF_UP) == 0;
+
 	// Obtain selfconfiguration options
 
 	// TODO : This needs to be determined by the protocol flags
 	// instead of the interface flag... protocol flags don't seem
 	// to be complete yet. (netIntAddr4.Flags() and netIntAddr6.Flags())
 
-	fIPv4Auto = (fNetworkInterface.Flags()
+	fAutoConfigure[AF_INET] = (fNetworkInterface.Flags()
 		& (IFF_AUTO_CONFIGURED | IFF_CONFIGURING)) != 0;
 
-	fIPv6Auto = (fNetworkInterface.Flags()
+	fAutoConfigure[AF_INET6] = (fNetworkInterface.Flags()
 		& (IFF_AUTO_CONFIGURED | IFF_CONFIGURING)) != 0;
-
-	fDisabled = (fNetworkInterface.Flags() & IFF_UP) == 0;
 
 	// Read wireless network from interfaces
 
@@ -206,96 +205,4 @@ NetworkSettings::ReadConfiguration()
 	}
 }
 
-
-BNetworkAddress
-NetworkSettings::IPAddr(int family)
-{
-	if (family == AF_INET6)
-		return fIPv6Addr;
-
-	return fIPv4Addr;
-}
-
-
-const char*
-NetworkSettings::IP(int family)
-{
-	if (family == AF_INET6)
-		return fIPv6Addr.ToString();
-
-	return fIPv4Addr.ToString();
-}
-
-
-const char*
-NetworkSettings::Netmask(int family)
-{
-	if (family == AF_INET6)
-		return fIPv6Mask.ToString();
-
-	return fIPv4Mask.ToString();
-}
-
-
-const char*
-NetworkSettings::Gateway(int family)
-{
-	if (family == AF_INET6)
-		return fIPv6Gateway.ToString();
-
-	return fIPv4Gateway.ToString();
-}
-
-
-int32
-NetworkSettings::PrefixLen(int family)
-{
-	if (family == AF_INET6)
-		return fIPv6Mask.PrefixLength();
-
-	return fIPv4Mask.PrefixLength();
-}
-
-
-// -- Interface address write code
-
-
-void
-NetworkSettings::SetIP(int family, const char* ip)
-{
-	if (family == AF_INET6)
-		fIPv6Addr = ip;
-	else
-		fIPv4Addr = ip;
-}
-
-
-void
-NetworkSettings::SetNetmask(int family, const char* mask)
-{
-	if (family == AF_INET6)
-		fIPv6Mask = mask;
-	else
-		fIPv4Mask = mask;
-}
-
-
-void
-NetworkSettings::SetGateway(int family, const char* ip)
-{
-	if (family == AF_INET6)
-		fIPv6Gateway = ip;
-	else
-		fIPv4Gateway = ip;
-}
-
-
-void
-NetworkSettings::SetAutoConfigure(int family, bool autoConf)
-{
-	if (family == AF_INET6)
-		fIPv6Auto = autoConf;
-	else
-		fIPv4Auto = autoConf;
-}
 

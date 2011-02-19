@@ -95,9 +95,6 @@ InterfaceListItem::DrawItem(BView* owner, BRect /*bounds*/, bool complete)
 {
 	BListView* list = dynamic_cast<BListView*>(owner);
 
-	BNetworkAddress	addrIPv4 = fSettings->IPAddr(AF_INET);
-	BNetworkAddress	addrIPv6 = fSettings->IPAddr(AF_INET6);
-
 	if (!list)
 		return;
 
@@ -127,8 +124,10 @@ InterfaceListItem::DrawItem(BView* owner, BRect /*bounds*/, bool complete)
 	} else if (!fInterface.HasLink()) {
 		interfaceState << "no link";
 		stateIcon = fIconOffline;
-	} else if (addrIPv4.IsEmpty() && addrIPv6.IsEmpty()
-		&& fSettings->AutoConfigure()) {
+	} else if ((fSettings->IPAddr(AF_INET).IsEmpty()
+		&& fSettings->IPAddr(AF_INET6).IsEmpty())
+		&& (fSettings->AutoConfigure(AF_INET)
+		|| fSettings->AutoConfigure(AF_INET6))) {
 		interfaceState << "connecting" B_UTF8_ELLIPSIS;
 		stateIcon = fIconPending;
 	} else {
@@ -177,23 +176,23 @@ InterfaceListItem::DrawItem(BView* owner, BRect /*bounds*/, bool complete)
 		// Render IPv4 Address
 		BString v4str("IPv4: ");
 
-		if (addrIPv4.IsEmpty())
+		if (fSettings->IPAddr(AF_INET).IsEmpty())
 			v4str << "none";
 		else {
-			v4str << addrIPv4.ToString();
+			v4str << fSettings->IP(AF_INET);
 		}
 
-		if (fSettings->AutoConfigure())
+		if (fSettings->AutoConfigure(AF_INET))
 			v4str << " (DHCP)";
 		else
-			v4str << " (manual)";
+			v4str << " (static)";
 
 		list->DrawString(v4str.String(), v4addrPt);
 
 		// Render IPv6 Address (if present)
-		if (!addrIPv6.IsEmpty()) {
+		if (!fSettings->IPAddr(AF_INET6).IsEmpty()) {
 			BString v6str("IPv6: ");
-			v6str << addrIPv6.ToString();
+			v6str << fSettings->IP(AF_INET6);
 			list->DrawString(v6str, v6addrPt);
 		}
 	}

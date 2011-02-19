@@ -16,34 +16,53 @@
 #include <ObjectList.h>
 #include <String.h>
 
+#include <map>
+
+
+typedef std::map<int, BNetworkAddress> AddressMap;
+typedef std::map<int, bool> BoolMap;
+typedef std::map<int, int> SocketMap;
+
 
 class NetworkSettings {
 public:
 								NetworkSettings(const char* name);
 	virtual						~NetworkSettings();
 
-			void				SetIP(int family, const char* ip);
-			void				SetNetmask(int family, const char* mask);
-			void				SetGateway(int family, const char* mask);
-			void				SetAutoConfigure(int family, bool autoConf);
+			void				SetIP(int family, const char* ip)
+									{ fAddress[family].SetTo(ip); }
+			void				SetNetmask(int family, const char* mask)
+									{ fNetmask[family].SetTo(mask); }
+			void				SetGateway(int family, const char* ip)
+									{ fGateway[family].SetTo(ip); }
+			void				SetAutoConfigure(int family, bool autoConf)
+									{ fAutoConfigure[family] = autoConf; }
 
 			void				SetDisabled(bool disabled)
 									{ fDisabled = disabled; }
+
 //			void				SetWirelessNetwork(const char* name)
 //									{ fWirelessNetwork.SetTo(name); }
 //			void				SetDomain(const BString& domain)
 //									{ fDomain = domain; }
 
-			BNetworkAddress		IPAddr(int family);
 
-			const char*			IP(int family);
-			const char*			Netmask(int family);
-			const char*			Gateway(int family);
-			int32				PrefixLen(int family);
+			bool				AutoConfigure(int family)
+									{ return fAutoConfigure[family]; }
+			BNetworkAddress		IPAddr(int family)
+									{ return fAddress[family]; }
+			const char*			IP(int family)
+									{ return fAddress[family].ToString(); }
+			const char*			Netmask(int family)
+									{ return fNetmask[family].ToString(); }
+			const char*			Gateway(int family)
+									{ return fGateway[family].ToString(); }
+			int32				PrefixLen(int family)
+									{ return fNetmask[family].PrefixLength(); }
+
 
 			const char*			Name()  { return fName.String(); }
 			const char*			Domain() { return fDomain.String(); }
-			bool				AutoConfigure() { return fIPv4Auto; }
 			bool				IsDisabled() { return fDisabled; }
 			const BString&		WirelessNetwork() { return fWirelessNetwork; }
 
@@ -52,22 +71,14 @@ public:
 			void				ReadConfiguration();
 
 private:
-			int					fSocket4;
-			int					fSocket6;
-
+			SocketMap			fSocket;
 			BNetworkInterface	fNetworkInterface;
 
-			// IPv4 address configuration
-			bool				fIPv4Auto;
-			BNetworkAddress		fIPv4Addr;
-			BNetworkAddress		fIPv4Mask;
-			BNetworkAddress		fIPv4Gateway;
-
-			// IPv6 address configuration
-			bool				fIPv6Auto;
-			BNetworkAddress		fIPv6Addr;
-			BNetworkAddress		fIPv6Mask;
-			BNetworkAddress		fIPv6Gateway;
+			// Stored network addresses and paramaters
+			BoolMap				fAutoConfigure;
+			AddressMap			fAddress;
+			AddressMap			fNetmask;
+			AddressMap			fGateway;
 
 			BString				fName;
 			BString				fDomain;

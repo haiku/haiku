@@ -29,6 +29,7 @@ Addon Interfaces :
 	$(TARGET_NETWORK_LIBS)
 	libbnetapi.so
 	$(TARGET_LIBSUPC++)
+	$(TARGET_LIBSTDC++)
 	$(HAIKU_LOCALE_LIBS)
 	libicon.a libagg.a
 ;
