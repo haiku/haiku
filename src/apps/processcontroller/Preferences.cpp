@@ -38,7 +38,7 @@
 #define B_TRANSLATE_CONTEXT "ProcessController"
 
 Preferences::Preferences(const char* name, const char* signature, bool doSave)
-	: BMessage('Pref'), BLocker(B_TRANSLATE("Preferences"), true),
+	: BMessage('Pref'), BLocker("Preferences", true),
 	fSavePreferences(doSave)
 {
 	fNewPreferences = false;
@@ -65,7 +65,7 @@ Preferences::Preferences(const char* name, const char* signature, bool doSave)
 
 
 Preferences::Preferences(const entry_ref &ref, const char* signature, bool doSave)
-	: BMessage('Pref'), BLocker(B_TRANSLATE("Preferences"), true),
+	: BMessage('Pref'), BLocker("Preferences", true),
 	fSavePreferences(doSave)
 {
 	fSettingsFile = new entry_ref(ref);
@@ -108,13 +108,14 @@ Preferences::~Preferences()
 			}
 		} else {
 			// implement saving somewhere else!
-			char error[1024];
-			sprintf(error, B_TRANSLATE("Your setting file"
-			"could not be saved!\n(%s)"),
+			BString error;
+			snprintf(error.LockBuffer(256), 256,
+				B_TRANSLATE("Your setting file could not be saved!\n(%s)"),
 				strerror(file.InitCheck()));
-			BAlert *alert = new BAlert(B_TRANSLATE("Error saving file"), error,
-				B_TRANSLATE("Damned!"), NULL, NULL, B_WIDTH_AS_USUAL,
-				B_STOP_ALERT);
+			error.UnlockBuffer();
+			BAlert *alert = new BAlert(B_TRANSLATE("Error saving file"),
+				error.String(), B_TRANSLATE("Damned!"), NULL, NULL,
+				B_WIDTH_AS_USUAL, B_STOP_ALERT);
 			alert->Go();
 		}
 	}

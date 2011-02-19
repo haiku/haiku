@@ -89,8 +89,8 @@ PriorityMenu::BuildMenu()
 			index--;
 		}
 		message = new BMessage('PrTh');
-		message->AddInt32(B_TRANSLATE("thread"), fThreadID);
-		message->AddInt32(B_TRANSLATE("priority"), priority->priority);
+		message->AddInt32("thread", fThreadID);
+		message->AddInt32("priority", priority->priority);
 		sprintf(name, B_TRANSLATE("%s priority [%d]"), priority->name, (int)priority->priority);
 		item = new BMenuItem(name, message);
 		item->SetTarget(gPCView);

@@ -398,7 +398,7 @@ ProcessController::MessageReceived(BMessage *message)
 void
 ProcessController::AboutRequested()
 {
-	BAlert *alert = new BAlert(B_TRANSLATE("about"),
+	BAlert *alert = new BAlert(B_TRANSLATE("About"),
 		B_TRANSLATE("ProcessController\n\n"
 					"Copyright 1997-2001,\n"
 					"Georges-Edouard Berenger.\n\n"
@@ -412,7 +412,7 @@ ProcessController::AboutRequested()
 	view->GetFont(&font);
 	font.SetSize(font.Size() * 1.5);
 	font.SetFace(B_BOLD_FACE);
-	view->SetFontAndColor(0, 17, &font);
+	view->SetFontAndColor(0, strlen(B_TRANSLATE("ProcessController"))-1, &font);
 
 	alert->Go();
 }
@@ -803,7 +803,7 @@ thread_debug_thread(void *arg)
 	thread_info	thinfo;
 	get_thread_info(param->thread, &thinfo);
 	char text[4096];
-	sprintf(text, B_TRANSLATE("db %d"), int(param->thread));
+	sprintf(text, "gdb -pid=%d", int(param->thread));
 	system(text);
 	if (param->sem >= 0 && thinfo.state == B_THREAD_WAITING && param->sem
 			== thinfo.sem) {
