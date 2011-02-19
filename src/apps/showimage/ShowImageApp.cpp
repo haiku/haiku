@@ -178,9 +178,10 @@ ShowImageApp::QuitRequested()
 {
 	// Give the windows a chance to prompt the user if there are changes
 	bool result = BApplication::QuitRequested();
-	if (result)
+	if (result) {
 		be_clipboard->StopWatching(be_app_messenger);
 			// tell clipboard we don't want anymore notification
+	}
 
 	return result;
 }
@@ -200,7 +201,7 @@ ShowImageApp::_StartPulse()
 
 
 void
-ShowImageApp::_Open(const entry_ref& ref, BMessenger& trackerMessenger)
+ShowImageApp::_Open(const entry_ref& ref, const BMessenger& trackerMessenger)
 {
 	new ShowImageWindow(ref, trackerMessenger);
 }
@@ -248,10 +249,10 @@ ShowImageApp::_CheckClipboard()
 
 
 int
-main(int, char **)
+main(int, char**)
 {
-	ShowImageApp theApp;
-	theApp.Run();
+	ShowImageApp app;
+	app.Run();
 	return 0;
 }
 
