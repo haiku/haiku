@@ -1,25 +1,25 @@
 1	belarusian	x-vnd.Haiku-Locale	2295953467
-Available languages	Locale Preflet Window		Наяўныя мовы
-Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Спіс наяўных моваў не знойдзены! Немагчыма запусціць канфігурацыйную праграму!
-Long format:	TimeFormatSettings		Доўгі фармат:
-Currency	TimeFormatSettings		Валюта
-Short format:	TimeFormatSettings		Скарочаны фармат:
-Language	Locale Preflet Window		Мова
-Preferred languages	Locale Preflet Window		Пажаданыя мовы
-Numbers	TimeFormatSettings		Лічбы
-24 hour	TimeFormatSettings		24 гадзіны
-Defaults	Locale Preflet Window		Прадвызначаныя
-Revert	Locale Preflet Window		Вярнуць
-OK	Locale Preflet Window		ОК
-Time	TimeFormatSettings		Час
-Date	TimeFormatSettings		Дата
 12 hour	TimeFormatSettings		12 гадзін
-Locale	Locale Preflet		Лакаль
-already chosen	LanguageListView		ужо выбрана
-Negative:	TimeFormatSettings		Адмоўна:
-Use month/day-names from preferred language	TimeFormatSettings		Ужываць імены месяцоў і дзён з пажаданай мовы
+24 hour	TimeFormatSettings		24 гадзіны
+Available languages	Locale Preflet Window		Наяўныя мовы
+Currency	TimeFormatSettings		Валюта
+Date	TimeFormatSettings		Дата
+Defaults	Locale Preflet Window		Прадвызначаныя
 Formatting	Locale Preflet Window		Фарматаванне
-Locale	Locale Preflet Window		Лакаль
 Full format:	TimeFormatSettings		Поўны фармат
+Language	Locale Preflet Window		Мова
+Locale	Locale Preflet		Лакаль
+Locale	Locale Preflet Window		Лакаль
+Long format:	TimeFormatSettings		Доўгі фармат:
 Medium format:	TimeFormatSettings		Сярэдні фармат
+Negative:	TimeFormatSettings		Адмоўна:
+Numbers	TimeFormatSettings		Лічбы
+OK	Locale Preflet Window		ОК
 Positive:	TimeFormatSettings		Станоўча:
+Preferred languages	Locale Preflet Window		Пажаданыя мовы
+Revert	Locale Preflet Window		Вярнуць
+Short format:	TimeFormatSettings		Скарочаны фармат:
+Time	TimeFormatSettings		Час
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Спіс наяўных моваў не знойдзены! Немагчыма запусціць канфігурацыйную праграму!
+Use month/day-names from preferred language	TimeFormatSettings		Ужываць імены месяцоў і дзён з пажаданай мовы
+already chosen	LanguageListView		ужо выбрана

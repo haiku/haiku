@@ -1,35 +1,36 @@
-1	belarusian	x-vnd.Haiku-LaunchBox	2991338515
-New	LaunchBox		Новы
-Set description…	LaunchBox		Прызначыць апісанне...
-Vertical layout	LaunchBox		Вертыкальная расстаноўка
-OK	LaunchBox		ОК
-Pad 1	LaunchBox		Падложка 1
-last chance	LaunchBox		Апошняя магчымасць
-Quit	LaunchBox		Выйсці
-Clear button	LaunchBox		Ачысціць кнопку
-Failed to launch application with signature '	LaunchBox		Не ўдалося запусціць праграму з подпісам '
+1	belarusian	x-vnd.Haiku-LaunchBox	1672943267
 About	LaunchBox		Пра праграму
-Ignore double-click	LaunchBox		Ігнараваць падвойны клік
+Add button here	LaunchBox		Дадайце кнопку тут
 Auto-raise	LaunchBox		Аўта-выплыванне
-Show on all workspaces	LaunchBox		Паказаць на ўсіх рабочых сталах
-Show window border	LaunchBox		Паказаць мяжу вакна
-Pad 	LaunchBox		Падложка
-Icon size	LaunchBox		Памер іконак
 Bummer	LaunchBox		Якая непрыемнасць
 Cancel	LaunchBox		Адмена
-Remove button	LaunchBox		Выдаліць кнопку
-Description for '	LaunchBox		Апісанне для '
-Horizontal layout	LaunchBox		Гарызантальная расстаноўка
-Name Panel	LaunchBox		Назавіце Панель
-Add button here	LaunchBox		Дадайце кнопку тут
-Failed to launch '	LaunchBox		Не ўдалося запусціць '
-Stephan Aßmus (aka stippi)	LaunchBox		Stephan Aßmus (aka stippi)
-Failed to launch 'something',error in Pad data.	LaunchBox		Не удалося запусціць 'нешта', памылка у даных Падложкі.
-Close	LaunchBox		Закрыць
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Не ўдалося адаслаць Трэкеру каманду 'адкрыць каталог'.\n\nПамылка:
-You can drag an icon here.	LaunchBox		Можаце перацягнуць сюды іконку.
+Clear button	LaunchBox		Ачысціць кнопку
 Clone	LaunchBox		Кланіраваць
+Close	LaunchBox		Закрыць
+Description for '%3'	LaunchBox		Апісанне для '%3'
+Failed to launch '%1'.\n\nError:	LaunchBox		Немагчыма запусціць '%1'.\n\nПамылка:
+Failed to launch 'something',error in Pad data.	LaunchBox		Не удалося запусціць 'нешта', памылка у даных Падложкі.
+Failed to launch application with signature '%2'.\n\nError:	LaunchBox		Немагчыма запусціць праграму (сігнатура праграмы '%2').\n\nПамылка:
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Не ўдалося адаслаць Трэкеру каманду 'адкрыць каталог'.\n\nПамылка:
+Horizontal layout	LaunchBox		Гарызантальная расстаноўка
+Icon size	LaunchBox		Памер іконак
+Ignore double-click	LaunchBox		Ігнараваць падвойны клік
 LaunchBox	LaunchBox		LaunchBox
-launch popup	LaunchBox		запусіць выпадальнае меню
+Name Panel	LaunchBox		Назавіце Панель
+New	LaunchBox		Новы
+OK	LaunchBox		ОК
+Pad	LaunchBox		Падложка
+Pad %1	LaunchBox		Блокнот %1
+Pad 1	LaunchBox		Падложка 1
+Quit	LaunchBox		Выйсці
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Сапраўды закрыць падложку?\n(Потым не вернеце)
-'.\n\nError: 	LaunchBox		'.\n\nПамылка:
+Remove button	LaunchBox		Выдаліць кнопку
+Set description…	LaunchBox		Прызначыць апісанне...
+Settings	LaunchBox		Наладкі
+Show on all workspaces	LaunchBox		Паказаць на ўсіх рабочых сталах
+Show window border	LaunchBox		Паказаць мяжу вакна
+Stephan Aßmus (aka stippi)	LaunchBox		Stephan Aßmus (aka stippi)
+Vertical layout	LaunchBox		Вертыкальная расстаноўка
+You can drag an icon here.	LaunchBox		Можаце перацягнуць сюды іконку.
+last chance	LaunchBox		Апошняя магчымасць
+launch popup	LaunchBox		запусіць выпадальнае меню

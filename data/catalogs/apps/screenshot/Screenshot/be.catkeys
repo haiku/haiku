@@ -1,26 +1,26 @@
 1	belarusian	x-vnd.haiku-screenshot	166521589
-seconds	ScreenshotWindow		секунд
-Desktop	ScreenshotWindow		Рабочы стол
-Include window border	ScreenshotWindow		Уключыць мяжу вакна
-Select	ScreenshotWindow		Выбраць
-Capture active window	ScreenshotWindow		Захваціць актыўнае вакно
-Cancel	ScreenshotWindow		Адмена
-Name:	ScreenshotWindow		Імя:
-Choose folder	ScreenshotWindow		Выберыце каталог
-Save	ScreenshotWindow		Захаваць
-overwrite	ScreenshotWindow		перазапіс
-Choose folder...	ScreenshotWindow		Выберыце каталог...
-Please select	ScreenshotWindow		Калі ласка, выберыце
-Save as:	ScreenshotWindow		Захаваць як:
-Copy to clipboard	ScreenshotWindow		Капіяваць у буфер
-Save in:	ScreenshotWindow		Захаваць у:
-screenshot	Screenshot	Base filename of screenshot files	здымак
-New screenshot	ScreenshotWindow		Новы здымак экрану
 Artwork folder	ScreenshotWindow		Каталог малюнкаў
-Home folder	ScreenshotWindow		Хатні каталог
-Screenshot	ScreenshotWindow		Здымак экрану
-This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Файл ужо існуе.\n Сапраўды перазапісаць яго?
-Settings…	ScreenshotWindow		Наладкі...
+Cancel	ScreenshotWindow		Адмена
+Capture active window	ScreenshotWindow		Захваціць актыўнае вакно
+Choose folder	ScreenshotWindow		Выберыце каталог
+Choose folder...	ScreenshotWindow		Выберыце каталог...
+Copy to clipboard	ScreenshotWindow		Капіяваць у буфер
 Delay:	ScreenshotWindow		Затрымка:
+Desktop	ScreenshotWindow		Рабочы стол
+Home folder	ScreenshotWindow		Хатні каталог
 Include mouse pointer	ScreenshotWindow		Уключыць курсор мышы
+Include window border	ScreenshotWindow		Уключыць мяжу вакна
+Name:	ScreenshotWindow		Імя:
+New screenshot	ScreenshotWindow		Новы здымак экрану
+Please select	ScreenshotWindow		Калі ласка, выберыце
+Save	ScreenshotWindow		Захаваць
+Save as:	ScreenshotWindow		Захаваць як:
+Save in:	ScreenshotWindow		Захаваць у:
+Screenshot	ScreenshotWindow		Здымак экрану
+Select	ScreenshotWindow		Выбраць
+Settings…	ScreenshotWindow		Наладкі...
+This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Файл ужо існуе.\n Сапраўды перазапісаць яго?
 Translator Settings	ScreenshotWindow		Наладкі канвертара
+overwrite	ScreenshotWindow		перазапіс
+screenshot	Screenshot	Base filename of screenshot files	здымак
+seconds	ScreenshotWindow		секунд

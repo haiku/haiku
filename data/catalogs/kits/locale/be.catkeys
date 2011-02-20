@@ -1,19 +1,19 @@
 1	belarusian	system	2686335505
+%.2f TiB	StringForSize		%.2f ТіБ
 %3.2f GiB	StringForSize		%3.2f ГіБ
 %3.2f KiB	StringForSize		%3.2f КіБ
-%d bytes	StringForSize		%d байтаў
-%.2f TiB	StringForSize		%.2f ТіБ
 %3.2f MiB	StringForSize		%3.2f МіБ
-Green:	ColorControl		Зялёны:
-Red:	ColorControl		Чырвоны:
+%d bytes	StringForSize		%d байтаў
+About…	AboutWindow		Пра прагарму...
 Blue:	ColorControl		Сіні:
 Close	AboutWindow		Закрыць
-Written by:	AboutWindow		Аўтар(ы):
-About…	AboutWindow		Пра прагарму...
+Copy	TextView		Капіяваць
 Copyright © %years% Haiku, Inc.	AboutWindow		Copyright © %years% Haiku, Inc.
 Cut	TextView		Выразаць
-Copy	TextView		Капіяваць
+Green:	ColorControl		Зялёны:
 Paste	TextView		Уставіць
+Red:	ColorControl		Чырвоны:
 Redo	TextView		Зрабіць наноў
 Select All	TextView		Пазначыць ўсё
 Undo	TextView		Адвярнуць
+Written by:	AboutWindow		Аўтар(ы):

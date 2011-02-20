@@ -1,39 +1,43 @@
-1	belarusian	x-vnd.Be-PEPL	3107056777
-Edit	People		Правіць
+1	belarusian	x-vnd.Be-PEPL	3209429794
+About	People		Пра праграму
+Address	People		Адрас
+Cancel	People		Адмена
 City	People		Горад
-none	Groups list		няма
+Close	People		Закрыць
 Company	People		Кампанія
-Work phone	People		Рабочы тэлефон
-New person	People		Новая персона
-Select all	People		Выбраць усё
-File	People		Файл
+Configure attributes	People		Сканфігураваць атрыбуты
+Contact information for a person.	Long mimetype description		Кантактная інфармацыя для персоны.
+Contact name	People		Имя кантакта
+Copy	People		Капіяваць
 Could not create %s.	People		Не ўдалося стварыць %s.
 Country	People		Краіна
-Close	People		Закрыць
-Group	People		Група
-Nickname	People		Нік
-Quit	People		Выйсці
-Name	People		Імя
-Revert	People		Вярнуць
-Undo	People		Адмяніць
-E-mail	People		Эл. пошта
-Save changes before quitting?	People		Захаваць змены перад выхадам?
-OK	People		ОК
-Home phone	People		Хатні тэлефон
-Save as…	People		Захаваць як...
-Redo	People		Перарабіць
-Paste	People		Уставіць
-Save	People		Захаваць
-Person	Short mimetype description		Персона
-New person…	People		Новая персона
-Address	People		Адрас
-URL	People		URL
-Sorry	People		Sorry
-Zip	People		Zip-код
-Contact information for a person.	Long mimetype description		Кантактная інфармацыя для персоны.
-Fax	People		Факс
-Contact name	People		Имя кантакта
 Cut	People		Выразаць
-Cancel	People		Адмена
+E-mail	People		Эл. пошта
+Edit	People		Правіць
+Error	People		Памылка
+Fax	People		Факс
+File	People		Файл
+Group	People		Група
+Home phone	People		Хатні тэлефон
+Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Не ўдалося запусціць наладкі FileTypes каб сканфігураваць атрыбуты файла Асобы.\n\nПамылка:
+Name	People		Імя
+New person	People		Новая персона
+New person…	People		Новая персона
+Nickname	People		Нік
+OK	People		ОК
+Paste	People		Уставіць
+Person	Short mimetype description		Персона
+Quit	People		Выйсці
+Redo	People		Перарабіць
+Revert	People		Вярнуць
+Save	People		Захаваць
+Save as…	People		Захаваць як...
+Save changes before quitting?	People		Захаваць змены перад выхадам?
+Select all	People		Выбраць усё
+Sorry	People		Sorry
 State	People		Вобласць
-Copy	People		Капіяваць
+URL	People		URL
+Undo	People		Адмяніць
+Work phone	People		Рабочы тэлефон
+Zip	People		Zip-код
+none	Groups list		няма

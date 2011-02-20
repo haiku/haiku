@@ -1,24 +1,24 @@
 1	belarusian	x-vnd.Haiku-Mouse	3392409209
-Mouse type:	SettingsView		Тып мышы:
-Warp	SettingsView		Заварот
-2-Button	SettingsView		Дзвюхкнопкавая
-Double-click test area	SettingsView		Месца праверкі падвойнага кліка
-Revert	MouseWindow		Вярнуць
 ...by Andrew Edward McCall	MouseApplication		... распрацавана Andrew Edward McCall
-Mouse acceleration	SettingsView		Паскарэнне мышы
-Click to focus	SettingsView		Фокус па націску
+1-Button	SettingsView		Аднанопкавая
+2-Button	SettingsView		Дзвюхкнопкавая
 3-Button	SettingsView		Трохкнопкавая
-Mouse speed	SettingsView		Хуткасць мышы
+Accept first click	SettingsView		Успрымаць з першага кліку
+Click to focus	SettingsView		Фокус па націску
+Click to focus and raise	SettingsView		Клік факусіруе і падымае наверх
+Defaults	MouseWindow		Прадвызначаныя
+Dig Deal	MouseApplication		Так!
+Double-click speed	SettingsView		Хуткасць падвойнага кліку
+Double-click test area	SettingsView		Месца праверкі падвойнага кліка
+Fast	SettingsView		Хутка
+Focus follows mouse	SettingsView		Фокус суправаджае мыш
 Focus mode:	SettingsView		Рэжым фокуса:
 Instant warp	SettingsView		Імгненны заварот
-Dig Deal	MouseApplication		Так!
-1-Button	SettingsView		Аднанопкавая
-Double-click speed	SettingsView		Хуткасць падвойнага кліку
-Defaults	MouseWindow		Прадвызначаныя
-Focus follows mouse	SettingsView		Фокус суправаджае мыш
-Accept first click	SettingsView		Успрымаць з першага кліку
-Fast	SettingsView		Хутка
-Normal	SettingsView		Нармальна
 Mouse	MouseWindow		Мыш
+Mouse acceleration	SettingsView		Паскарэнне мышы
+Mouse speed	SettingsView		Хуткасць мышы
+Mouse type:	SettingsView		Тып мышы:
+Normal	SettingsView		Нармальна
+Revert	MouseWindow		Вярнуць
 Slow	SettingsView		Павольна
-Click to focus and raise	SettingsView		Клік факусіруе і падымае наверх
+Warp	SettingsView		Заварот

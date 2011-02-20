@@ -1,41 +1,39 @@
-1	belarusian	x-vnd.Haiku-ProcessController	678001537
-Memory usage	ProcessController		Ужыванне памяці
-Do you really want to kill the team \"%s\"?	ProcessController		Сапраўды жадаеце знішчыць групу \"%s\"?
-Restart Deskbar	ProcessController		Перазапусціць Deskbar
-Debug thread	ProcessController		Адладжваць паток
-Your setting filecould not be saved!\n(%s)	ProcessController		Файл вашых наладак не захаваны!\n(%s)
-This team is already gone…	ProcessController		Гэтая група ўжо не існуе...
-Error saving file	ProcessController		Памылка пры захаванні файла
-This thread is already gone…	ProcessController		Гэты паток ўжо не існуе...
-Cancel	ProcessController		Адмена
-Run in window	ProcessController		Запускаць у вакне
-Processor %d	ProcessController		Працэсар %d
-(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
-ProcessController is already installed in Deskbar.	ProcessController		ProcessController ужо ўсталяваны ў Deskbar.
-This is the last active processor...\nYou can't turn it off!	ProcessController		Гэта апошні актыўны працэсар...\nВы не можаце яго выключыць!
-thread	ProcessController		паток
-Preferences	ProcessController		Наладкі
+1	belarusian	x-vnd.Haiku-ProcessController	926983020
 %s priority [%d]	ProcessController		%s прыярытэт [%d]
-Quit application	ProcessController		Выйсці з праграмы
-What do you want to do with the thread \"%s\"?	ProcessController		Што вы жадаеце зрабіць з патокам \"%s\"?
-about	ProcessController		пра праграму
-Gone teams…	ProcessController		Знішчаныя групы
-Restart Tracker	ProcessController		Перазапусціць Трэкер
-Live in the Deskbar	ProcessController		Прывязаць да Deskbar
-Kill this thread!	ProcessController		Знішчыць паток!
-Debug this thread!	ProcessController		Адладжваць паток!
-New Terminal	ProcessController		Новы Тэрмінал
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
+About	ProcessController		пра праграму
 About ProcessController…	ProcessController		Пра ProcessController…
-Ok!	ProcessController		ОК!
-Quit an application	ProcessController		Закрыць праграму
-Install in Deskbar	ProcessController		Усталяваць у Deskbar
-ProcessController\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n	ProcessController		ProcessController\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n
-Threads and CPU usage	ProcessController		Патокі і ўжыванне ЦП
-Global Popup	ProcessController		Глабальнае паведамленне
-OK	ProcessController		ОК
+Cancel	ProcessController		Адмена
 Damned!	ProcessController		Чорт!
-priority	ProcessController		прыярытэт
-Usage: %s [-deskbar]\n	ProcessController		Ужыванне: %s [-deskbar]\n
-Yes, kill this team!	ProcessController		Так, знішчыць гэтую групу!
+Debug this thread!	ProcessController		Адладжваць паток!
+Debug thread	ProcessController		Адладжваць паток
+Do you really want to kill the team \"%s\"?	ProcessController		Сапраўды жадаеце знішчыць групу \"%s\"?
+Error saving file	ProcessController		Памылка пры захаванні файла
+Global Popup	ProcessController		Глабальнае паведамленне
+Gone teams…	ProcessController		Знішчаныя групы
+Install in Deskbar	ProcessController		Усталяваць у Deskbar
+Kill this thread!	ProcessController		Знішчыць паток!
+Live in the Deskbar	ProcessController		Прывязаць да Deskbar
+Memory usage	ProcessController		Ужыванне памяці
+New Terminal	ProcessController		Новы Тэрмінал
+OK	ProcessController		ОК
+Ok!	ProcessController		ОК!
+ProcessController	ProcessController		ProcessController
+ProcessController is already installed in Deskbar.	ProcessController		ProcessController ужо ўсталяваны ў Deskbar.
+ProcessController\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n	ProcessController		ProcessController\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n
+Processor %d	ProcessController		Працэсар %d
+Quit an application	ProcessController		Закрыць праграму
+Quit application	ProcessController		Выйсці з праграмы
+Restart Deskbar	ProcessController		Перазапусціць Deskbar
+Restart Tracker	ProcessController		Перазапусціць Трэкер
+Run in window	ProcessController		Запускаць у вакне
 That's no Fun!	ProcessController		Гэта непрыкольна!
+This is the last active processor...\nYou can't turn it off!	ProcessController		Гэта апошні актыўны працэсар...\nВы не можаце яго выключыць!
+This team is already gone…	ProcessController		Гэтая група ўжо не існуе...
+This thread is already gone…	ProcessController		Гэты паток ўжо не існуе...
+Threads and CPU usage	ProcessController		Патокі і ўжыванне ЦП
+Usage: %s [-deskbar]\n	ProcessController		Ужыванне: %s [-deskbar]\n
+What do you want to do with the thread \"%s\"?	ProcessController		Што вы жадаеце зрабіць з патокам \"%s\"?
+Yes, kill this team!	ProcessController		Так, знішчыць гэтую групу!
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Вы можаце запускаць ProcessController у вакне або ўсталяваць яго ў Deskbar.
+Your setting file could not be saved!\n(%s)	ProcessController		Немагчыма захаваць файл з наладкамі!\n(%s)

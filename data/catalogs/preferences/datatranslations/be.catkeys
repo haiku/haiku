@@ -1,26 +1,23 @@
-1	belarusian	x-vnd.Haiku-DataTranslations	2482065199
-DataTranslations	DataTranslations		DataTranslations
-Info…	DataTranslations		Інфа...
-about	DataTranslations		пра праграму
-Could not install 	DataTranslations		Не ўдалося ўсталяваць
+1	belarusian	x-vnd.Haiku-DataTranslations	3706134146
+About	DataTranslations		пра праграму
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		'%name' ўжо існуе ў спісе ўсталяваных канвертараў! Перазапісаць яго?
 Cancel	DataTranslations		Адмена
-Name:	DataTranslations		Імя:
-Panel Info	DataTranslations		Інфармацыя Панелі
-The item '	DataTranslations		Элемент '
-%name' does not appear to be a Translator and will not be installed.	DataTranslations		%name' не падобны да Канвертара і не будзе ўсталяваны.
-DataTranslations - Note	DataTranslations		DataTranslations - Нататка
-Name: %name \nVersion: 	DataTranslations		Імя: %name \nВерсія:
-Overwrite	DataTranslations		Перазапісаць
-Info:	DataTranslations		Інфа:
-info	DataTranslations		інфа
-%name already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		%name ужо існуе ў каталозе Канвертараў! Ці перазапісаць яго новым?
-Path:	DataTranslations		Пуць:
-The new translator has been installed successfully.	DataTranslations		Новы канвертар паспяхова ўстаноўлены.
-\nInfo: %info\n\nPath:\n	DataTranslations		\nІнфа: %info\n\nПуць:\n
+Could not install %s:\n%s	DataTranslations		Немагчыма усталяваць %s:\n%s
+DataTranslations	DataTranslations		DataTranslations
 DataTranslations - Error	DataTranslations		DataTranslations - Памылка
-OK	DataTranslations		ОК
-An item named '	DataTranslations		Элемент '
-Icon	DataTranslations		Іконка
+DataTranslations - Note	DataTranslations		DataTranslations - Нататка
 DataTranslations\n\twritten by Oliver Siebenmarck and others\n\tCopyright 2002-2010, Haiku Inc. All rights reserved.\n	DataTranslations		DataTranslations\n\tАўтары: Oliver Siebenmarck і іншыя\n\tCopyright 2002-2010, Haiku Inc. Усе правы ахоўваюцца.\n
-Version:	DataTranslations		Версія:
+Icon	DataTranslations		Іконка
+Info	DataTranslations		інфа
+Info:	DataTranslations		Інфа:
+Info…	DataTranslations		Інфа...
+Name:	DataTranslations		Імя:
+Name:\t%s \nVersion:\t%ld.%ld.%ld\nInfo:\t%s\n\nPath:\n%s\n	DataTranslations		Імя:\t%s \nВерсія:\t%ld.%ld.%ld\nІнфа:\t%s\n\nПуць:\n%s\n
+OK	DataTranslations		ОК
+Overwrite	DataTranslations		Перазапісаць
+Panel Info	DataTranslations		Інфармацыя Панелі
+Path:	DataTranslations		Пуць:
+The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		'%name' не з´яўляецца Канвертарам і таму не можа быць усталяваны.
+The new translator has been installed successfully.	DataTranslations		Новы канвертар паспяхова ўстаноўлены.
 Translation Settings\n\nUse this control panel to set values that various\ntranslators use when no other settings are specified\nin the application.	DataTranslations		Наладкі Канвертацыі\n\nЗ дапамогай гэтай панелі прызначце стандартныя параметры\nякія будуць выкарыстаны канвертарамі, калі гэтыя\n параметры не прызначаны ў самой праграме.
+Version:	DataTranslations		Версія:

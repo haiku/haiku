@@ -1,39 +1,53 @@
-1	belarusian	x-vnd.Haiku-Expander	1292562546
-Expand	ExpanderMenu		Распакаваць
-Set destination…	ExpanderMenu		Задаць прызначэнне…
-File expanded	ExpanderWindow		Файл распакаваны
-The destination is read only.	ExpanderWindow		Запіс ў тэчку прызначэння не дазволены.
-Expander: Open	ExpanderWindow		Распакоўшчык: Адкрыць
-Select current	DirectoryFilePanel		Пазначыць бягучы
-Source	ExpanderWindow		Крыніца
-Error when expanding archive	ExpanderWindow		Памылка падчас распакоўкі архіву
-Hide contents	ExpanderWindow		Схаваць змест
-Cancel	ExpanderWindow		Скасаваць
-Continue	ExpanderWindow		Працягваць
-Expander	ExpanderWindow	!! Window Title !!	Распакоўшчык
-The destination folder does not exist.	ExpanderWindow		Тэчка прызначэння не існуе.
+1	belarusian	x-vnd.Haiku-Expander	3863172519
+About Expander…	ExpanderMenu		Пра Распакоўшчык…
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Спыніць распакоўку гэтага \nархіва? Ужо распакаваныя файлы могуць быць няпоўнымі.
+Automatically expand files	ExpanderPreferences		Распакоўваць файлы аўтаматычна
+Automatically show contents listing	ExpanderPreferences		Аўтаматычна паказваць змесціва
+Cancel	ExpanderPreferences		Адмена
+Cancel	ExpanderWindow		Скасаваць
+Close	ExpanderMenu		Закрыць
+Close window when done expanding	ExpanderPreferences		Закрыць вакно пасля распакоўкі
+Continue	ExpanderWindow		Працягваць
+Creating listing for '%s'	ExpanderWindow		Стварэнне спіса для '%s'
+Destination	ExpanderWindow		Прызначэнне
+Destination folder:	ExpanderPreferences		Папка прызначэння:
+Error when expanding archive	ExpanderWindow		Памылка падчас распакоўкі архіву
+Expand	ExpanderMenu		Распакаваць
+Expand	ExpanderWindow		Распакаваць
+Expander	About		Распакоўшчык
+Expander	ExpanderWindow	!! Window Title !!	Распакоўшчык
+Expander settings	ExpanderPreferences		Наладкі Распакоўшчыка
+Expander: Choose destination	DirectoryFilePanel		Распакоўшчык: Абраць прызначэнне
+Expander: Open	ExpanderWindow		Распакоўшчык: Адкрыць
+Expanding '%s'	ExpanderWindow		Распакоўка '%s'
+Expansion:	ExpanderPreferences		Распакоўка:
+File	ExpanderMenu		Файл
+File expanded	ExpanderWindow		Файл распакаваны
+Hide contents	ExpanderWindow		Схаваць змест
+Leave destination folder path empty	ExpanderPreferences		Пакінуць пуць да пакі прызначэння пустым
+OK	About		Так
+OK	ExpanderPreferences		ОК
+Open destination folder after extraction	ExpanderPreferences		Паказаць паку прызначэння пасля распакоўкі
+Other:	ExpanderPreferences		Другі:
+Same directory as source (archive) file	ExpanderPreferences		Папка ў якой знаходзіцца зыходны архіў
 Select	DirectoryFilePanel		Пазначыць
-Creating listing for 	ExpanderWindow		Стварэнне спісу для 
+Select	ExpanderPreferences		Пазначыць
+Select '%s'	DirectoryFilePanel		Пазначыць '%s'
+Select current	DirectoryFilePanel		Пазначыць бягучы
+Set destination…	ExpanderMenu		Задаць прызначэнне…
+Set source…	ExpanderMenu		Задаць крыніцу…
 Settings	ExpanderMenu		Налады
 Settings…	ExpanderMenu		Налады…
-Expander: Choose destination	DirectoryFilePanel		Распакоўшчык: Абраць прызначэнне
-Show contents	ExpanderWindow		Паказаць змест
-Expanding file 	ExpanderWindow		Распакоўваецца файл 
-The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Гэты каталёг быў перамешчаны, перайменаваны, або не\n падтрымліваецца.
-The file doesn't exist	ExpanderWindow		Гэты файл не існуе
-Stop	ExpanderMenu		Спыніць
-File	ExpanderMenu		Файл
-Expand	ExpanderWindow		Распакаваць
-Close	ExpanderMenu		Закрыць
-The destination is not a folder.	ExpanderWindow		Прызначэнне не з´яўляецца каталёгам.
-About Expander…	ExpanderMenu		Пра Распакоўшчык…
-OK	About		Так
-Set source…	ExpanderMenu		Задаць крыніцу…
-Select '%s'	DirectoryFilePanel		Пазначыць '%s'
 Show contents	ExpanderMenu		Паказаць змест
+Show contents	ExpanderWindow		Паказаць змест
+Source	ExpanderWindow		Крыніца
+Stop	ExpanderMenu		Спыніць
 Stop	ExpanderWindow		Спыніць
-Destination	ExpanderWindow		Прызначэнне
+The destination folder does not exist.	ExpanderWindow		Тэчка прызначэння не існуе.
+The destination is not a folder.	ExpanderWindow		Прызначэнне не з´яўляецца каталёгам.
+The destination is read only.	ExpanderWindow		Запіс ў тэчку прызначэння не дазволены.
+The file doesn't exist	ExpanderWindow		Гэты файл не існуе
+The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Гэты каталёг быў перамешчаны, перайменаваны, або не\n падтрымліваецца.
+Use:	ExpanderPreferences		Выкарыстаць:
 \n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tраспрацавана Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nзыходная версія для BeOS была створана \nDominic, Hiroshi, Peter, Pavel and Robert\n
-Expander	About		Распакоўшчык
 is not supported	ExpanderWindow		не падтрымліваецца

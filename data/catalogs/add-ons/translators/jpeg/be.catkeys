@@ -1,28 +1,26 @@
-1	belarusian	x-vnd.Haiku-JPEGTranslator	1834097482
-JPEG Library Error: %s\n	be_jerror		Памылка бібліятэкі JPEG: %s\n
-ISO	exit_parser		ISO
-Low	JPEGTranslator		Нізкая
-ExposureTime	exit_parser		Час экспазіцыі
-Orientation	exit_parser		Арыентацыя
-None	JPEGTranslator		Адсутнічае
-High	JPEGTranslator		Ныйвышэйшая
-Model	exit_parser		Мадэль
-JPEG Library Warning: %s\n	be_jerror		Папярэджанне бібліятэкі JPEG: %s\n
-Maker	exit_parser		Маркер
-Output quality	JPEGTranslator		Якасьць выніку
-with \"lossless\" encoding support patch by Ken Murchison\n	JPEGTranslator		з падтрымкай \"безстратнага\" кадавання (дададзена Ken Murchison)\n
-JPEG images	JPEGTranslator		Выявы JPEG
-Prevent colors 'washing out'	JPEGTranslator		Прадухіляць страту 'насычанасці' колераў
-Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Выкарыстоўваць код CMYK 0 для 100% ахопа чарніламі
+1	belarusian	x-vnd.Haiku-JPEGTranslator	226512890
 About	JPEGTranslator		Пра праграму
-With some colorspace conversion routines by Magnus Hellman\n	JPEGTranslator		Выкарыстоўваць мэтады пераўтварэнняў колераў (распрацаваныя Magnus Hellman)\n
-Make file smaller (sligthtly worse quality)	JPEGTranslator		Зрабіць файл меншым (магчыма страта якасці)
 Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Фармат бітмапу BeOS (канвертар JPEG)
-Show warning messages	JPEGTranslator		Паказваць папярэджанні
+ExposureTime	exit_parser		Час экспазіцыі
+High	JPEGTranslator		Ныйвышэйшая
+ISO	exit_parser		ISO
+JPEG Library Error: %s\n	be_jerror		Памылка бібліятэкі JPEG: %s\n
+JPEG Library Warning: %s\n	be_jerror		Папярэджанне бібліятэкі JPEG: %s\n
+JPEG images	JPEGTranslator		Выявы JPEG
+Low	JPEGTranslator		Нізкая
+Make file smaller (sligthtly worse quality)	JPEGTranslator		Зрабіць файл меншым (магчыма страта якасці)
+Maker	exit_parser		Маркер
+Model	exit_parser		Мадэль
+None	JPEGTranslator		Адсутнічае
+Orientation	exit_parser		Арыентацыя
+Output quality	JPEGTranslator		Якасьць выніку
 Output smoothing strength	JPEGTranslator		Інтэнсыўнасць згладжвання
-Based on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n	JPEGTranslator		Грунтуецца на праекце IJG library © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n
+Prevent colors 'washing out'	JPEGTranslator		Прадухіляць страту 'насычанасці' колераў
+Read	JPEGTranslator		Прачытаць
+Read greyscale images as RGB32	JPEGTranslator		Чытаць выявы з шэрай палетай як RGB32
+Show warning messages	JPEGTranslator		Паказваць папярэджанні
+Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Выкарыстоўваць код CMYK 0 для 100% ахопа чарніламі
+Use progressive compression	JPEGTranslator		Выкарыстоўваць "прагрэсіўны" сціск
 Write	JPEGTranslator		Запісаць
 Write black-and-white images as RGB24	JPEGTranslator		Запісваць чорна-белыя выявы як RGB24
-Read greyscale images as RGB32	JPEGTranslator		Чытаць выявы з шэрай палетай як RGB32
-Read	JPEGTranslator		Прачытаць
-Use progressive compression	JPEGTranslator		Выкарыстоўваць "прагрэсіўны" сціск
+©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nГрунтуецца на праекце IJG library © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nз падтрымкай \"безстратнага\" кадавання (дададзена Ken Murchison)\n\thttp://www.oceana.com/ftp/ljpeg/\n\nВыкарыстоўваць мэтады пераўтварэнняў колераў (распрацаваныя Magnus Hellman)\n\thttp://www.bebits.com/app/802\n

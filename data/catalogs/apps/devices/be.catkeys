@@ -1,48 +1,47 @@
-1	belarusian	x-vnd.Haiku-Devices	1250375801
-Order by:	DevicesView		Парадкаваць па:
-ACPI controller	Device		Кантролер ACPI
-Memory controller	Device		Кантролер памяці
-Docking station	Device		Док-станцыя
-Computer	Device		Кампутар
-Detailed	DevicesView		Падрабязна
-Properties	PropertyList		Уласцівасці
-Category	DevicesView		Катэгорыя
-Quit	DevicesView		Выйсці
-Device paths	Device		Пуці прыладаў:
-Manufacturer\t\t\t: 	Device		Вытворца\t\t\t:
-Processor	Device		Працэсар
+1	belarusian	x-vnd.Haiku-Devices	2430293984
 ACPI Information	DeviceACPI		Інфармацыя ACPI
-Device Name\t\t\t\t: 	Device		Імя Прылады\t\t\t\t:
-Generic system peripheral	Device		Агульная перыферыя
-Display controller	Device		Кантролер экрану
-Mass storage controller	Device		Кантролер прылад захавання даных
+ACPI controller	Device		Кантролер ACPI
 About Devices…	DevicesView		Пра Devices...
-Input device controller	Device		Кантролер прылад уводу
-Device paths\t: 	Device		Пуці прыладаў:
-Network controller	Device		Сеткавы кантролер
-Devices\n\twritten by Pieter Panman\n\n\tBased on listdev by Jérôme Duval\n\tand the previous Devices preference\n\tby Jérôme Duval and Sikosis\n\tCopyright 2009, Haiku, Inc.\n	DevicesApplication		Devices\n\t Аўтары: Pieter Panman\n\n\tЗаснавана на listdev (створаны Jérôme Duval)\n\tі папярэдніх канфігурацыях Devices \n\t(Jérôme Duval і Sikosis)\n\tCopyright 2009, Haiku, Inc.\n
-Driver used	Device		Ужыты драйвер
-Driver used\t\t\t\t: 	Device		Ужыты драйвер\t\t\t\t:
-Bus	DevicesView		Шына
-Communication controller	Device		Кантролер камунікацый
 Basic information	DevicesView		Асноўная інфармацыя
-PCI Information	DevicePCI		Інфармацыя PCI
-Manufacturer:	Device		Вытворца:
-Multimedia controller	Device		Кантролер мультымедыя
-Device name:	Device		Імя прылады:
-Report compatibility	DevicesView		Паведаміць аб сумяшчальнасці
-about	DevicesApplication		пра праграму
-Signal processing controller	Device		Кантролер апрацоўкі сігналаў
-Serial bus controller	Device		Кантролер серыйнай шыны
-Wireless controller	Device		Бесшнуравы кантролер
-Device name	Device		Імя прылады
-Manufacturer	Device		Вытворца
-Intelligent controller	Device		Інтэлектуальны кантролер
-Satellite communications controller	Device		Кантролер спадарожнікавай сувязі
 Bridge	Device		Мост
-Refresh devices	DevicesView		Абнавіць прылады
+Bus	DevicesView		Шына
+Category	DevicesView		Катэгорыя
+Communication controller	Device		Кантролер камунікацый
+Computer	Device		Кампутар
 Connection	DevicesView		Спалучэнне
-Generate system information	DevicesView		Сабраць інфармацыю аб сістэме
-Encryption controller	Device		Кантролер шыфравання
-Unclassified device	Device		Невызначаная прылада
+Detailed	DevicesView		Падрабязна
+Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Імя прылады\t\t\t\t: %Name%\nВытворца\t\t\t: %Manufacturer%\nБягучы драйвер\t\t\t\t: %DriverUsed%\nПуці прылады\t: %DevicePaths%
+Device name	Device		Імя прылады
+Device name:	Device		Імя прылады:
+Device paths	Device		Пуці прыладаў:
+Devices	DevicesApplication		Прылады
 Devices	DevicesView		Прылады
+Devices\n\twritten by Pieter Panman\n\n\tBased on listdev by Jérôme Duval\n\tand the previous Devices preference\n\tby Jérôme Duval and Sikosis\n\tCopyright 2009, Haiku, Inc.\n	DevicesApplication		Devices\n\t Аўтары: Pieter Panman\n\n\tЗаснавана на listdev (створаны Jérôme Duval)\n\tі папярэдніх канфігурацыях Devices \n\t(Jérôme Duval і Sikosis)\n\tCopyright 2009, Haiku, Inc.\n
+Display controller	Device		Кантролер экрану
+Docking station	Device		Док-станцыя
+Driver used	Device		Ужыты драйвер
+Encryption controller	Device		Кантролер шыфравання
+Generate system information	DevicesView		Сабраць інфармацыю аб сістэме
+Generic system peripheral	Device		Агульная перыферыя
+Input device controller	Device		Кантролер прылад уводу
+Intelligent controller	Device		Інтэлектуальны кантролер
+Manufacturer	Device		Вытворца
+Manufacturer:	Device		Вытворца:
+Mass storage controller	Device		Кантролер прылад захавання даных
+Memory controller	Device		Кантролер памяці
+Multimedia controller	Device		Кантролер мультымедыя
+Network controller	Device		Сеткавы кантролер
+None	Device		Адсутнічае
+OK	DevicesApplication		ОК
+Order by:	DevicesView		Парадкаваць па:
+PCI Information	DevicePCI		Інфармацыя PCI
+Processor	Device		Працэсар
+Properties	PropertyList		Уласцівасці
+Quit	DevicesView		Выйсці
+Refresh devices	DevicesView		Абнавіць прылады
+Report compatibility	DevicesView		Паведаміць аб сумяшчальнасці
+Satellite communications controller	Device		Кантролер спадарожнікавай сувязі
+Serial bus controller	Device		Кантролер серыйнай шыны
+Signal processing controller	Device		Кантролер апрацоўкі сігналаў
+Unclassified device	Device		Невызначаная прылада
+Wireless controller	Device		Бесшнуравы кантролер

@@ -1,38 +1,38 @@
 1	belarusian	x-vnd.Haiku-About	2350236915
-Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (асабіста за ядро NewOS)\n
-%ld Processors:	AboutView		%ld Працэсараў:
-Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (заснавальнік праекту)\n\n
-The Haiku-Ports team\n	AboutView		Каманда Haiku-Ports\n
-Website, marketing & documentation:\n	AboutView		Web-сайт, маркетынг і дакументацыя:\n
-Revision	AboutView		Рэвізія
-Source Code: 	AboutView		Зыходны код: 
-Processor:	AboutView		Працэсар:
-Kernel:	AboutView		Ядро:
-Contributors:\n	AboutView		Удзельнікі:\n
-Unknown	AboutView		Невядома
-\n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… і прабачце нас тыя, пра каго мы, магчыма, забылі тут згадаць.\n\n
 %.2f GHz	AboutView		%.2f ГГц
-Memory:	AboutView		Памяць:
-Past maintainers:\n	AboutView		Былыя дагляднікі:\n
-\n\nSpecial thanks to:\n	AboutView		\n\nАсабістыя падзякі:\n
-Licenses: 	AboutView		Лицэнзіі: 
-\nCopyrights\n\n	AboutView		\nАўтарскія правы\n\n
-Current maintainers:\n	AboutView		Дагляднікі:\n
-Time running:	AboutView		Час працы:
-The Haikuware team and their bounty program\n	AboutView		Каманда Haikuware і ихнія ахвяраванні\n
-About this system	AboutWindow		Інфармацыя пра сістэму
-Version:	AboutView		Версія:
-%ld MHz	AboutView		%ld МГц
-[Click a license name to read the respective license.]\n\n	AboutView		[Націсніце ня імя ліцэнзіі каб азнёміцца з яе тэкстам.]\n\n
-License: 	AboutView		Ліцензія: 
-Translations:\n	AboutView		Пераклады:\n
-... and the many people making donations!\n\n	AboutView		... і тыя, хто рабіў саве ахвяраванні!\n\n
-The BeGeistert team\n	AboutView		Каманада BeGeistert\n
-The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku and the Haiku logo are trademarks of Haiku, Inc.\n\n	AboutView		Аўтарскія правы на код Haiku належаць Haiku, Inc. або суадносным аўтарам, калі яны пазначаны ў ісходніках. Haiku і Haiku logo - гандлёвыя маркі Haiku, Inc.\n\n
-GCC %d Hybrid	AboutView		GCC %d Hybrid
 %d MiB total	AboutView		%d MiB усяго
 %d MiB used (%d%%)	AboutView		%d MiB выкарыстана (%d%%)
-The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT licence%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		Код, унікальны для Haiku, асабіста ядро і ўвесь код, да якога могуць звяртацца праграмы, распаўсюджваецца ў межах %MIT licence%. Некаторыя сістэмныя бібліятэкі змяшчаюць код, які распаўсюджваецца ў межах ліцэнзіі LGPL. Аўтарскія правы на код трэціх старон глядзіце ніжэй.\n\n
+%ld MHz	AboutView		%ld МГц
+%ld Processors:	AboutView		%ld Працэсараў:
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB усяго %inaccessible MiB недаступна
+... and the many people making donations!\n\n	AboutView		... і тыя, хто рабіў саве ахвяраванні!\n\n
+About this system	AboutWindow		Інфармацыя пра сістэму
+Contributors:\n	AboutView		Удзельнікі:\n
+Current maintainers:\n	AboutView		Дагляднікі:\n
+GCC %d Hybrid	AboutView		GCC %d Hybrid
 Google & their Google Summer of Code program\n	AboutView		Google і іх праграма Google Summer of Code\n
+Kernel:	AboutView		Ядро:
+License: 	AboutView		Ліцензія: 
+Licenses: 	AboutView		Лицэнзіі: 
+Memory:	AboutView		Памяць:
+Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (заснавальнік праекту)\n\n
+Past maintainers:\n	AboutView		Былыя дагляднікі:\n
+Processor:	AboutView		Працэсар:
+Revision	AboutView		Рэвізія
+Source Code: 	AboutView		Зыходны код: 
+The BeGeistert team\n	AboutView		Каманада BeGeistert\n
+The Haiku-Ports team\n	AboutView		Каманда Haiku-Ports\n
+The Haikuware team and their bounty program\n	AboutView		Каманда Haikuware і ихнія ахвяраванні\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		The University of Auckland and Christof Lutteroth\n\n
+The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT licence%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		Код, унікальны для Haiku, асабіста ядро і ўвесь код, да якога могуць звяртацца праграмы, распаўсюджваецца ў межах %MIT licence%. Некаторыя сістэмныя бібліятэкі змяшчаюць код, які распаўсюджваецца ў межах ліцэнзіі LGPL. Аўтарскія правы на код трэціх старон глядзіце ніжэй.\n\n
+The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku and the Haiku logo are trademarks of Haiku, Inc.\n\n	AboutView		Аўтарскія правы на код Haiku належаць Haiku, Inc. або суадносным аўтарам, калі яны пазначаны ў ісходніках. Haiku і Haiku logo - гандлёвыя маркі Haiku, Inc.\n\n
+Time running:	AboutView		Час працы:
+Translations:\n	AboutView		Пераклады:\n
+Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (асабіста за ядро NewOS)\n
+Unknown	AboutView		Невядома
+Version:	AboutView		Версія:
+Website, marketing & documentation:\n	AboutView		Web-сайт, маркетынг і дакументацыя:\n
+[Click a license name to read the respective license.]\n\n	AboutView		[Націсніце ня імя ліцэнзіі каб азнёміцца з яе тэкстам.]\n\n
+\nCopyrights\n\n	AboutView		\nАўтарскія правы\n\n
+\n\nSpecial thanks to:\n	AboutView		\n\nАсабістыя падзякі:\n
+\n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… і прабачце нас тыя, пра каго мы, магчыма, забылі тут згадаць.\n\n

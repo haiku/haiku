@@ -1,13 +1,13 @@
 1	belarusian	x-vnd.Haiku-Time	2846531571
-OK	Time		ОК
-\nNow: 	Time		\nЗараз:
-Preview time:	Time		Праглядзець час:
-about	Time		пра праграму
-Set time zone	Time		Пазначыць часавы пояс
-Time	Time		Час
-Date & Time	Time		Дата і час
-Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Time & Date, аўтары:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
 <Other>	Time		<іншае>
 Current time:	Time		Сапраўдны час:
-Time zone	Time		Часавы пояс
+Date & Time	Time		Дата і час
+OK	Time		ОК
+Preview time:	Time		Праглядзець час:
 Revert	Time		Адвярнуць
+Set time zone	Time		Пазначыць часавы пояс
+Time	Time		Час
+Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Time & Date, аўтары:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
+Time zone	Time		Часавы пояс
+\nNow: 	Time		\nЗараз:
+about	Time		пра праграму

@@ -1,45 +1,45 @@
 1	belarusian	x-vnd.Haiku-Pulse	2756001860
-OK	PrefsWindow		ОК
-Quit	DeskbarPulseView		Выйсці
-Pulse	PulseWindow		Pulse
-Mini mode	DeskbarPulseView		Міні рэжым
-Remove replicant	CPUButton		Выдаліць рэпліканта
-Active color	ConfigView		Актыўны колер
-Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Карыстанне: [--mini] [-w шырыня] [--width=шырыня]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
-Fade colors	ConfigView		Колеры марнення
-OK	DeskbarPulseView		ОК
-Deskbar mode	PrefsWindow		Рэжым Deskbar
-Normal mode	PrefsWindow		Звычайны рэжым
-Defaults	PrefsWindow		Прадвызначаныя
-Normal mode	MiniPulseView		Звычайны рэжым
-Deskbar	CPUButton		Deskbar
-Frame color	ConfigView		Колер рамкі
-Mini mode	PrefsWindow		Міні-рэжым
-OK	PulseApp		ОК
-Bar colors	ConfigView		Колеры панэлі
-Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	CPUButton		Pulse\n\nСтворана David Ramsey і Arve Hjønnevåg\nПраверана Daniel Switkin
-Settings…	PulseView		Наладкі...
-You can't disable the last active CPU.	PulseView		Вы не можаце выключыць апошні актыўны ЦП.
-Info	CPUButton		Інфа
-OK	PulseView		ОК
-Remove(): %s	DeskbarPulseView		Remove(): %s
-Deskbar menu	CPUButton		Меню Deskbar
-About Pulse…	PulseView		Пра Pulse...
-Deskbar mode	MiniPulseView		Рэжым Deskbar
-Quit	MiniPulseView		Выйсці
-Pulse	NormalPulseView		Pulse
-Deskbar mode	NormalPulseView		Рэжым Deskbar
-Width of icon:	ConfigView		Шырыня іконкі:
-Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	PulseWindow		Pulse\n\nСтворана David Ramsey і Arve Hjønnevåg\nПраверана Daniel Switkin
-You can't disable the last active CPU.	CPUButton		Вы не можаце выключыць апошні актыўны ЦП.
-Normal mode	DeskbarPulseView		Звычайны рэжым
-OK	CPUButton		ОК
 About Pulse…	CPUButton		Пра Pulse
-Mini mode	NormalPulseView		Міні-рэжым
-Info	DeskbarPulseView		Інфа
-Pulse settings	PulseWindow		Наладкі Pulse
-Idle color	ConfigView		Неактыўны колер
-Info	PulseWindow		Інфа
-Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	DeskbarPulseView		Pulse\n\nСтворана David Ramsey і Arve Hjønnevåg\nПраверана Daniel Switkin
-OK	PulseWindow		ОК
+About Pulse…	PulseView		Пра Pulse...
+Active color	ConfigView		Актыўны колер
+Bar colors	ConfigView		Колеры панэлі
 CPU progress bar	NormalPulseView		Панель прагрэсу ЦП
+Defaults	PrefsWindow		Прадвызначаныя
+Deskbar	CPUButton		Deskbar
+Deskbar menu	CPUButton		Меню Deskbar
+Deskbar mode	MiniPulseView		Рэжым Deskbar
+Deskbar mode	NormalPulseView		Рэжым Deskbar
+Deskbar mode	PrefsWindow		Рэжым Deskbar
+Fade colors	ConfigView		Колеры марнення
+Frame color	ConfigView		Колер рамкі
+Idle color	ConfigView		Неактыўны колер
+Info	CPUButton		Інфа
+Info	DeskbarPulseView		Інфа
+Info	PulseWindow		Інфа
+Mini mode	DeskbarPulseView		Міні рэжым
+Mini mode	NormalPulseView		Міні-рэжым
+Mini mode	PrefsWindow		Міні-рэжым
+Normal mode	DeskbarPulseView		Звычайны рэжым
+Normal mode	MiniPulseView		Звычайны рэжым
+Normal mode	PrefsWindow		Звычайны рэжым
+OK	CPUButton		ОК
+OK	DeskbarPulseView		ОК
+OK	PrefsWindow		ОК
+OK	PulseApp		ОК
+OK	PulseView		ОК
+OK	PulseWindow		ОК
+Pulse	NormalPulseView		Pulse
+Pulse	PulseWindow		Pulse
+Pulse settings	PulseWindow		Наладкі Pulse
+Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	CPUButton		Pulse\n\nСтворана David Ramsey і Arve Hjønnevåg\nПраверана Daniel Switkin
+Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	DeskbarPulseView		Pulse\n\nСтворана David Ramsey і Arve Hjønnevåg\nПраверана Daniel Switkin
+Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	PulseWindow		Pulse\n\nСтворана David Ramsey і Arve Hjønnevåg\nПраверана Daniel Switkin
+Quit	DeskbarPulseView		Выйсці
+Quit	MiniPulseView		Выйсці
+Remove replicant	CPUButton		Выдаліць рэпліканта
+Remove(): %s	DeskbarPulseView		Remove(): %s
+Settings…	PulseView		Наладкі...
+Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Карыстанне: [--mini] [-w шырыня] [--width=шырыня]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
+Width of icon:	ConfigView		Шырыня іконкі:
+You can't disable the last active CPU.	CPUButton		Вы не можаце выключыць апошні актыўны ЦП.
+You can't disable the last active CPU.	PulseView		Вы не можаце выключыць апошні актыўны ЦП.
