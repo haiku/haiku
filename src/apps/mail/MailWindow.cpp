@@ -1511,7 +1511,7 @@ TMailWindow::MessageReceived(BMessage *msg)
 						if (fAutoMarkRead)
 							SetCurrentMessageRead();
 						OpenMessage(&nextRef,
-							fHeaderView->fCharacterSetUserSees);
+							fHeaderView->fCharacterSetUserSees, msg);
 					} else {
 						window->Activate();
 
@@ -2794,7 +2794,8 @@ TMailWindow::SetTitleForMessage()
 //
 
 status_t
-TMailWindow::OpenMessage(entry_ref *ref, uint32 characterSetForDecoding)
+TMailWindow::OpenMessage(entry_ref *ref, uint32 characterSetForDecoding,
+	BMessage* trackerMsg)
 {
 	//
 	//	Set some references to the email file
@@ -2822,7 +2823,7 @@ TMailWindow::OpenMessage(entry_ref *ref, uint32 characterSetForDecoding)
 	fileInfo.GetType(mimeType);
 
 	if (strcmp(mimeType, B_PARTIAL_MAIL_TYPE) == 0) {
-		BMailDaemon::FetchBody(*ref);
+		BMailDaemon::FetchBody(*ref, trackerMsg);
 		fileInfo.GetType(mimeType);
 	}
 

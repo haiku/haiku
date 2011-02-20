@@ -97,7 +97,8 @@ class TMailWindow : public BWindow {
 				status_t		SaveAsDraft();
 				status_t		OpenMessage(entry_ref* ref,
 									uint32 characterSetForDecoding
-										= B_MAIL_NULL_CONVERSION);
+										= B_MAIL_NULL_CONVERSION,
+										BMessage* trackerMsg = NULL);
 
 				status_t		GetMailNodeRef(node_ref &nodeRef) const;
 				BEmailMessage*	Mail() const { return fMail; }

@@ -199,8 +199,12 @@ MailDaemonApp::RefsReceived(BMessage* message)
 		InboundProtocolThread* protocol = _FindInboundProtocol(account);
 		if (!protocol)
 			continue;
-		bool launch = true;
-		protocol->FetchBody(ref, launch);
+
+		BMessage* launchMessage = message;
+		BMessage temp;
+		if (message->FindMessage("launch", &temp) == B_OK)
+			launchMessage = &temp;
+		protocol->FetchBody(ref, launchMessage);
 	}
 }
 

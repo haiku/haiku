@@ -28,7 +28,8 @@ public:
 									bool waitForFetchCompletion = false);
 	static status_t				MarkAsRead(int32 account, const entry_ref& ref,
 									bool read = true);
-	static status_t				FetchBody(const entry_ref& ref);
+	static status_t				FetchBody(const entry_ref& ref,
+									BMessage* launchMessage = NULL);
 	static status_t				Quit();
 };
 

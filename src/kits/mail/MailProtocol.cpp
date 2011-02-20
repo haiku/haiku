@@ -582,11 +582,17 @@ InboundProtocolThread::MessageReceived(BMessage* message)
 		entry_ref ref;
 		message->FindRef("ref", &ref);
 		status_t status = fProtocol->FetchBody(ref);
-		if (status != B_OK || !message->FindBool("launch"))
+		if (status != B_OK)
 			break;
-		BMessage argv(B_ARGV_RECEIVED);
-		BPath path(&ref);
+
+		BMessage argv;
+		if (message->FindMessage("launch", &argv) != B_OK)
+			break;
+		argv.RemoveName("argv");
+		argv.RemoveName("argc");
+
 		argv.AddString("argv", "E-mail");
+		BPath path(&ref);
 		argv.AddString("argv", path.Path());
 		argv.AddInt32("argc", 2);
 		be_roster->Launch("text/x-email", &argv);
@@ -632,11 +638,11 @@ InboundProtocolThread::SyncMessages()
 
 
 void
-InboundProtocolThread::FetchBody(const entry_ref& ref, bool launch)
+InboundProtocolThread::FetchBody(const entry_ref& ref, BMessage* launch)
 {
 	BMessage message(kMsgFetchBody);
 	message.AddRef("ref", &ref);
-	message.AddBool("launch", launch);
+	message.AddMessage("launch", launch);
 	PostMessage(&message);
 }
 
