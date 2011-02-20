@@ -26,6 +26,11 @@
 
 #include <stdio.h>
 
+#include <Catalog.h>
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "ProcessController"
+
 
 KernelMemoryBarMenuItem::KernelMemoryBarMenuItem(system_info& systemInfo)
 	: BMenuItem("System resources & caches" B_UTF8_ELLIPSIS, NULL)
@@ -81,8 +86,10 @@ KernelMemoryBarMenuItem::DrawBar(bool force)
 	cadre.InsetBy(1, 1);
 	BRect r = cadre;
 
-	float grenze1 = cadre.left + (cadre.right - cadre.left) * fCachedMemory / fPhysicalMemory;
-	float grenze2 = cadre.left + (cadre.right - cadre.left) * fCommittedMemory / fPhysicalMemory;
+	float grenze1 = cadre.left + (cadre.right - cadre.left)
+						* fCachedMemory / fPhysicalMemory;
+	float grenze2 = cadre.left + (cadre.right - cadre.left)
+						* fCommittedMemory / fPhysicalMemory;
 	if (grenze1 > cadre.right)
 		grenze1 = cadre.right;
 	if (grenze2 > cadre.right)
@@ -145,11 +152,11 @@ KernelMemoryBarMenuItem::DrawBar(bool force)
 		menu->SetHighColor(kBlack);
 
 		char infos[128];
-		sprintf(infos, "%.1f MB", fCachedMemory / 1024.f);
-		BPoint loc(cadre.left - kMargin - gMemoryTextWidth / 2 - menu->StringWidth(infos),
-			cadre.bottom + 1);
+		sprintf(infos, B_TRANSLATE("%.1f MB"), fCachedMemory / 1024.f);
+		BPoint loc(cadre.left, cadre.bottom + 1);
+		loc.x -= kMargin + gMemoryTextWidth / 2 + menu->StringWidth(infos);
 		menu->DrawString(infos, loc);
-		sprintf(infos, "%.1f MB", fCommittedMemory / 1024.f);
+		sprintf(infos, B_TRANSLATE("%.1f MB"), fCommittedMemory / 1024.f);
 		loc.x = cadre.left - kMargin - menu->StringWidth(infos);
 		menu->DrawString(infos, loc);
 		fLastSum = sum;
@@ -166,3 +173,4 @@ KernelMemoryBarMenuItem::GetContentSize(float* _width, float* _height)
 
 	*_width += 20 + kBarWidth + kMargin + gMemoryTextWidth;
 }
+

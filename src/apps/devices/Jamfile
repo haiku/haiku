@@ -84,19 +84,11 @@ DoCatalogs Devices :
 	DevicePCI.cpp
 	PropertyList.cpp
 	PropertyListPlain.cpp
+	DeviceACPI.cpp
+	Device.cpp
 ;
 
 Includes [ FGristFiles DevicesInfo.cpp ] : [ FGristFiles isapnpids.h usbdevs.h
 	usbdevs_data.h ] ;
 Includes [ FGristFiles ConfigurationWindow.cpp ] : [ FGristFiles pcihdr.h ] ;
 
-DoCatalogs Devices :
-    x-vnd.Haiku-Devices
-    :
-	DevicesApplication.cpp
-	DevicesView.cpp
-	DevicePCI.h
-	DeviceACPI.h
-	Device.cpp
-	PropertyList.h
-;

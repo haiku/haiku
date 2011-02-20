@@ -8,7 +8,12 @@
 
 
 #include "PropertyList.h"
+
+#include <Catalog.h>
 #include <ColumnTypes.h>
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "PropertyList"
 
 //#include <stdio.h>
 

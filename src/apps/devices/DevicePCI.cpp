@@ -7,10 +7,15 @@
  */
 
 
+#include "DevicePCI.h"
+
 #include <sstream>
 #include <stdlib.h>
 
-#include "DevicePCI.h"
+#include <Catalog.h>
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "DevicePCI"
 
 extern "C" {
 #include "dm_wrapper.h"
@@ -128,3 +133,11 @@ DevicePCI::GetBusStrings()
 	str.ReplaceFirst("%classInfo%", fAttributeMap["Class Info"]);
 	return str;
 }
+
+
+BString
+DevicePCI::GetBusTabName()
+{
+	return B_TRANSLATE("PCI Information");
+}
+

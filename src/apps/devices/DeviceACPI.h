@@ -10,10 +10,7 @@
 
 
 #include "Device.h"
-#include <Catalog.h>
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "DeviceACPI"
 
 class DeviceACPI : public Device {
 public:
@@ -22,9 +19,8 @@ public:
 	virtual Attributes	GetBusAttributes();
 	virtual BString		GetBusStrings();
 	virtual void		InitFromAttributes();
-	
-	virtual BString		GetBusTabName()
-							{ return B_TRANSLATE("ACPI Information"); }
+	virtual BString		GetBusTabName();
 };
 
 #endif /* DEVICEACPI_H */
+

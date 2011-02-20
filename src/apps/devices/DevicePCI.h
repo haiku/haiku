@@ -10,10 +10,6 @@
 
 
 #include "Device.h"
-#include <Catalog.h>
-
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "DevicePCI"
 
 class DevicePCI : public Device {
 public:
@@ -22,9 +18,7 @@ public:
 	virtual Attributes	GetBusAttributes();
 	virtual BString		GetBusStrings();
 	virtual void		InitFromAttributes();
-	
-	virtual BString		GetBusTabName()
-							{ return B_TRANSLATE("PCI Information"); }
+	virtual BString		GetBusTabName();
 
 private:
 	uint16				fClassBaseId;

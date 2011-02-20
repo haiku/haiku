@@ -53,7 +53,7 @@ DevicesApplication::AboutRequested()
 void
 DevicesApplication::ShowAbout()
 {
-	BAlert* alert = new BAlert("about", B_TRANSLATE("Devices\n"
+	BAlert* alert = new BAlert(B_TRANSLATE("About"), B_TRANSLATE("Devices\n"
 		"\twritten by Pieter Panman\n"
 		"\n"
 		"\tBased on listdev by Jérôme Duval\n"

@@ -7,10 +7,15 @@
  */
 
 
+#include "DeviceACPI.h"
+
 #include <sstream>
 #include <stdlib.h>
 
-#include "DeviceACPI.h"
+#include <Catalog.h>
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "DeviceACPI"
 
 
 DeviceACPI::DeviceACPI(Device* parent)
@@ -84,8 +89,16 @@ DeviceACPI::GetBusAttributes()
 BString
 DeviceACPI::GetBusStrings()
 {
-	BString str("Class Info:\t\t\t\t: %classInfo%");
+	BString str(B_TRANSLATE("Class Info:\t\t\t\t: %classInfo%"));
 	str.ReplaceFirst("%classInfo%", fAttributeMap["Class Info"]);
 	
 	return str;
 }
+	
+
+BString
+DeviceACPI::GetBusTabName()
+{
+	return B_TRANSLATE("ACPI Information");
+}
+
