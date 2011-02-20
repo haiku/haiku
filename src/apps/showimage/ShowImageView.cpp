@@ -1538,8 +1538,8 @@ ShowImageView::SetZoom(float zoom, BPoint where)
 	float fitToBoundsZoom = _FitToBoundsZoom();
 	if (zoom > 32)
 		zoom = 32;
-	if (zoom < fitToBoundsZoom / 2)
-		zoom = fitToBoundsZoom / 2;
+	if (zoom < fitToBoundsZoom / 2 && zoom < 0.25)
+		zoom = min_c(fitToBoundsZoom / 2, 0.25);
 
 	if (zoom == fZoom) {
 		// window size might have changed
