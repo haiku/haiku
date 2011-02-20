@@ -226,6 +226,9 @@ POP3Protocol::SyncMessages()
 status_t
 POP3Protocol::FetchBody(const entry_ref& ref)
 {
+	ResetProgress("Fetch body");
+	SetTotalItems(1);
+
 	status_t error = Connect();
 	if (error < B_OK)
 		return error;
@@ -263,6 +266,9 @@ POP3Protocol::FetchBody(const entry_ref& ref)
 		return status;
 
 	NotifyBodyFetched(ref, &file);
+
+	ReportProgress(0, 1);
+	ResetProgress();
 
 	Disconnect();
 	return B_OK;
