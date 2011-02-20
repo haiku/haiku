@@ -1,40 +1,43 @@
-1	swedish	x-vnd.Be-PEPL	1507105612
-Edit	People		Redigera
+1	swedish	x-vnd.Be-PEPL	3209429794
+About	People		Om
+Address	People		Adress
+Cancel	People		Avbryt
 City	People		Stad
-none	Groups list		ingen
+Close	People		Stäng
 Company	People		Företag
-Work phone	People		Arbetstelefon
-New person	People		Ny person
-Select all	People		Markera allt
-File	People		Arkiv
+Configure attributes	People		Ställ in attribut
+Contact information for a person.	Long mimetype description		Kontaktinformation för en person.
+Contact name	People		Kontaktnamn
+Copy	People		Kopiera
 Could not create %s.	People		Kunde inte skapa %s.
 Country	People		Land
-Close	People		Stäng
-Group	People		Grupp
-Nickname	People		Smeknamn
-Quit	People		Avsluta
-Name	People		Namn
-Revert	People		Återställ
-Undo	People		Ångra
-E-mail	People		E-post
-Save changes before quitting?	People		Spara ändringar innan avslut?
-OK	People		OK
-Home phone	People		Hemtelefon
-Save as…	People		Spara som...
-Redo	People		Gör om
-Paste	People		Klistra in
-Save	People		Spara
-Person	Short mimetype description		Person
-New person…	People		Ny person...
-Address	People		Adress
-URL	People		URL
-Sorry	People		Tyvärr
-Zip	People		Postnummer
-Contact information for a person.	Long mimetype description		Kontaktinformation för en person.
-Fax	People		Fax
-Contact name	People		Kontaktnamn
 Cut	People		Klipp ut
-Cancel	People		Avbryt
+E-mail	People		E-post
+Edit	People		Redigera
+Error	People		Fel
+Fax	People		Fax
+File	People		Arkiv
+Group	People		Grupp
+Home phone	People		Hemtelefon
+Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Misslyckades att starta FilTyper för redigering av attribut.\n\nFel:
+Name	People		Namn
+New person	People		Ny person
+New person…	People		Ny person...
+Nickname	People		Smeknamn
+OK	People		OK
+Paste	People		Klistra in
+Person	Short mimetype description		Person
+Quit	People		Avsluta
+Redo	People		Gör om
+Revert	People		Återställ
+Save	People		Spara
+Save as…	People		Spara som...
+Save changes before quitting?	People		Spara ändringar innan avslut?
+Select all	People		Markera allt
+Sorry	People		Tyvärr
 State	People		Region
-Copy	People		Kopiera
-About	People		Om
+URL	People		URL
+Undo	People		Ångra
+Work phone	People		Arbetstelefon
+Zip	People		Postnummer
+none	Groups list		ingen

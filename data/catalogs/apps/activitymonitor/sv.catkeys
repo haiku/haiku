@@ -1,47 +1,49 @@
-1	swedish	x-vnd.Haiku-ActivityMonitor	2460668699
-P-faults	DataSource		P-fel
-Media nodes	DataSource		Medianoder
-Raw clipboard size	DataSource		Obearbetad urklippstorlek
-Threads	DataSource		Trådar
-Add graph	ActivityWindow		Lägg till graf
-Teams	DataSource		Processer
-Hide legend	ActivityView		Göm graftext
-Network send	DataSource		Nätverk sändning
-CPU usage (combined)	DataSource		CPU användning (kombinerad)
-CPU	DataSource		CPU
-Used memory	DataSource		Använt minne
-Cached memory	DataSource		Cachat minne
-Apps	DataSource		Applikationer
-Show legend	ActivityView		Visa graftext
-Settings	ActivityWindow		Inställningar
-Receiving	DataSource		Tar emot
-Settings…	ActivityWindow		Inställningar...
-Ports	DataSource		Portar
-Page faults	DataSource		Sidfel
-Text clipboard size	DataSource		Text urklippstorlek
-Sending	DataSource		Skickar
-Cache	DataSource		Cache
+1	swedish	x-vnd.Haiku-ActivityMonitor	1946610782
+%.1f KB/s	DataSource		%.1f KB/s
+%.1f MB	DataSource		%.1f MB
+%.1f faults/s	DataSource		%.1f fel/s
+%lld ms	SettingsWindow		%lld ms
+%lld sec.	SettingsWindow		%lld sek.
 About ActivityMonitor…	ActivityWindow		Om Aktivitetsövervakaren...
-Update time interval:	SettingsWindow		Uppdateringsintervall:
-Quit	ActivityWindow		Avsluta
+ActivityMonitor	ActivityWindow		Aktivitetsövervakaren
+Add graph	ActivityWindow		Lägg till graf
+Additional items	ActivityView		Ytterligare mätvärden
+Apps	DataSource		Applikationer
+Block cache	DataSource		Block cache
 Block cache memory	DataSource		Blockcacheminne
-Remove graph	ActivityView		Ta bort graf
+CPU	DataSource		CPU
 CPU usage	DataSource		CPU användning
-Sems	DataSource		Semaforer
+CPU usage (combined)	DataSource		CPU användning (kombinerad)
+Cache	DataSource		Cache
+Cached memory	DataSource		Cachat minne
+File	ActivityWindow		Arkiv
+Hide legend	ActivityView		Göm graftext
+MB	DataSource		MB
+Media nodes	DataSource		Medianoder
+Memory	DataSource		Minne
+Network receive	DataSource		Nätverk mottagning
+Network send	DataSource		Nätverk sändning
+P-faults	DataSource		P-fel
+Page faults	DataSource		Sidfel
+Ports	DataSource		Portar
+Quit	ActivityWindow		Avsluta
+RX	DataSource	Shorter version for Receiving.	RX
+Raw clipboard size	DataSource		Obearbetad urklippstorlek
+Receiving	DataSource		Tar emot
+Remove graph	ActivityView		Ta bort graf
 Running applications	DataSource		Aktiva applikationer
 Semaphores	DataSource		Semaforer
-Block cache	DataSource		Block cache
-Swap space	DataSource		Växlingsutrymme
+Sems	DataSource		Semaforer
+Sending	DataSource		Skickar
+Settings	ActivityWindow		Inställningar
+Settings…	ActivityWindow		Inställningar...
+Show legend	ActivityView		Visa graftext
 Swap	DataSource		Växling
-File	ActivityWindow		Arkiv
-Additional items	ActivityView		Ytterligare mätvärden
-Network receive	DataSource		Nätverk mottagning
-Memory	DataSource		Minne
-ActivityMonitor	ActivityWindow		Aktivitetsövervakaren
-MB	DataSource		MB
-%.1f faults/s	DataSource		%.1f fel/s
+Swap space	DataSource		Växlingsutrymme
 TX	DataSource	Shorter version for Sending	TX
-%.1f MB	DataSource		%.1f MB
+Teams	DataSource		Processer
+Text clipboard size	DataSource		Text urklippstorlek
+Threads	DataSource		Trådar
+Update time interval:	SettingsWindow		Uppdateringsintervall:
+Used memory	DataSource		Använt minne
 usage	DataSource		använt
-%.1f KB/s	DataSource		%.1f KB/s
-RX	DataSource	Shorter version for Receiving.	RX

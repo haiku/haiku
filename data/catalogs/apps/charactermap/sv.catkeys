@@ -1,94 +1,66 @@
-1	swedish	x-vnd.Haiku-CharacterMap	2127997412
-Enclosed alphanumerics	UnicodeBlocks		Inringade siffror
-Basic Latin	UnicodeBlocks		Latin (grundläggande)
-Latin-1 supplement	UnicodeBlocks		Latin-1 (komplement)
-Hebrew	UnicodeBlocks		Hebreisk
-CJK unified ideographs	UnicodeBlocks		CJK unified ideographs
-Modifier tone letters	UnicodeBlocks		Modifier tone letters
-Khmer	UnicodeBlocks		Khmer
-Greek extended	UnicodeBlocks		Grekisk, utökad
-CharacterMap\n\twritten by Axel Dörfler\n\tCopyright 2009, Haiku, Inc.\n	CharacterMap		Teckentabell\n\tskrivet av Axel Dörfler\n\tCopyright 2009, Haiku, Inc.\n
-Devanagari	UnicodeBlocks		Devanagari
-Armenian	UnicodeBlocks		Armenisk
-Mathematical operators	UnicodeBlocks		Matematiska operatorer
-General punctuation	UnicodeBlocks		Vanliga skiljetecken
-Miscellaneous technical	UnicodeBlocks		Diverse tekniska
-Ethiopic extended	UnicodeBlocks		Etiopisk (utökad)
-Arrows	UnicodeBlocks		Pilar
-Filter:	CharacterWindow		Filtrera:
+1	swedish	x-vnd.Haiku-CharacterMap	761790197
+About CharacterMap…	CharacterWindow		Om Teckentabell...
 Ancient Greek musical notation	UnicodeBlocks		Gammelgrekiska noter
-Letterlike symbols	UnicodeBlocks		Bokstavsliknande symboler
-Currency symbols	UnicodeBlocks		Valutasymboler
-Latin extended A	UnicodeBlocks		Latinsk utökade A
-Miscellaneous symbols	UnicodeBlocks		Diverse symboler
-Byzantine musical symbols	UnicodeBlocks		Byzantinska musiksymboler
-Cyrillic extended B	UnicodeBlocks		Kyrillisk utökade B
-Quit	CharacterWindow		Avsluta
+Ancient Greek numbers	UnicodeBlocks		Gammelgrekiska nummer
+Ancient smbols	UnicodeBlocks		Antika symboler
+Arabic	UnicodeBlocks		Arabiska
+Armenian	UnicodeBlocks		Armenisk
+Arrows	UnicodeBlocks		Pilar
+Basic Latin	UnicodeBlocks		Latin (grundläggande)
+Bengali	UnicodeBlocks		Bengali
+Bopomofo	UnicodeBlocks		Bopomofo
 Braille patterns	UnicodeBlocks		Bildskriftsmönster
-Muscial symbols	UnicodeBlocks		Musikaliska symboler
-Runic	UnicodeBlocks		Runor
-Miscellaneous mathematical symbols B	UnicodeBlocks		Diverse matematiska symboler B
+Byzantine musical symbols	UnicodeBlocks		Byzantinska musiksymboler
+CJK compatibility forms	UnicodeBlocks		CJK compatibility forms
+CJK symbols and punctuation	UnicodeBlocks		CJK symbols and punctuation
+CJK unified ideographs	UnicodeBlocks		CJK unified ideographs
+CJK unified ideographs extension A	UnicodeBlocks		CJK unified ideographs extension A
+CharacterMap\n\twritten by Axel Dörfler\n\tCopyright 2009, Haiku, Inc.\n	CharacterMap		Teckentabell\n\tskrivet av Axel Dörfler\n\tCopyright 2009, Haiku, Inc.\n
+Cherokee	UnicodeBlocks		Cherokee
+Clear	CharacterWindow		Rensa
+Coptic	UnicodeBlocks		Koptisk
 Cuneiform numbers and punctuation	UnicodeBlocks		Kilskrift (siffror och interpunktioner)
-Halfwidth and fullwidth forms	UnicodeBlocks		Halv- och fullbreddsformer
-Latin extended B	UnicodeBlocks		Latinsk, utökad B
-Mathematical alphanumeric symbols	UnicodeBlocks		Matematiska alfanumeriska symboler
+Currency symbols	UnicodeBlocks		Valutasymboler
+Cyrillic extended B	UnicodeBlocks		Kyrillisk utökade B
+Devanagari	UnicodeBlocks		Devanagari
 Domino tiles	UnicodeBlocks		Dominobrickor
+Enclosed alphanumerics	UnicodeBlocks		Inringade siffror
+Ethiopic extended	UnicodeBlocks		Etiopisk (utökad)
+Filter:	CharacterWindow		Filtrera:
+Font size:	CharacterWindow		Typsnittsstorlek:
+General punctuation	UnicodeBlocks		Vanliga skiljetecken
+Geometric shapes	UnicodeBlocks		Geometriska figurer
+Greek extended	UnicodeBlocks		Grekisk, utökad
+Halfwidth and fullwidth forms	UnicodeBlocks		Halv- och fullbreddsformer
+Hangul Jamo	UnicodeBlocks		Hangul Jamo
+Hangul compatibility Jamo	UnicodeBlocks		Hangul compatibility Jamo
+Hanunoo	UnicodeBlocks		Hanunoo
+Hebrew	UnicodeBlocks		Hebreisk
+Hiragana	UnicodeBlocks		Hiragana
+Khmer	UnicodeBlocks		Khmer
+Latin extended B	UnicodeBlocks		Latinsk, utökad B
+Latin extended additional	UnicodeBlocks		Latin extended additional
+Latin-1 supplement	UnicodeBlocks		Latin-1 (komplement)
+Lepcha	UnicodeBlocks		Lepcha
+Letterlike symbols	UnicodeBlocks		Bokstavsliknande symboler
+Mathematical alphanumeric symbols	UnicodeBlocks		Matematiska alfanumeriska symboler
+Mathematical operators	UnicodeBlocks		Matematiska operatorer
+Miscellaneous mathematical symbols B	UnicodeBlocks		Diverse matematiska symboler B
+Miscellaneous symbols	UnicodeBlocks		Diverse symboler
+Miscellaneous technical	UnicodeBlocks		Diverse tekniska
+Modifier tone letters	UnicodeBlocks		Modifier tone letters
+Muscial symbols	UnicodeBlocks		Musikaliska symboler
+Ogham	UnicodeBlocks		Ogham
+Osmanya	UnicodeBlocks		Osmanya
+Quit	CharacterWindow		Avsluta
+Runic	UnicodeBlocks		Runor
+Sinhala	UnicodeBlocks		Sinhala
+Small form variants	UnicodeBlocks		Small form variants
+Specials	UnicodeBlocks		Specialtecken
 Supplementary private use area A	UnicodeBlocks		Supplementary private use area A
 Supplementary private use area B	UnicodeBlocks		Supplementary private use area B
-Hiragana	UnicodeBlocks		Hiragana
-Tagalog	UnicodeBlocks		Tagalog
-Buginese	UnicodeBlocks		Buginese
-Bopomofo	UnicodeBlocks		Bopomofo
-Lepcha	UnicodeBlocks		Lepcha
-Sinhala	UnicodeBlocks		Sinhala
-Hangul Jamo	UnicodeBlocks		Hangul Jamo
-Tamil	UnicodeBlocks		Tamil
-CharacterMap settings	CharacterWindow		CharacterMap settings
-Combining diacritical marks	UnicodeBlocks		Combining diacritical marks
-Unified Canadian Aboriginal syllabics	UnicodeBlocks		Unified Canadian Aboriginal syllabics
-Supplement punctuation	UnicodeBlocks		Supplement punctuation
-Ugaritic	UnicodeBlocks		Ugaritic
-CJK symbols and punctuation	UnicodeBlocks		CJK symbols and punctuation
-Number forms	UnicodeBlocks		Number forms
-Cherokee	UnicodeBlocks		Cherokee
-Cypriot syllabary	UnicodeBlocks		Cypriot syllabary
-Tags	UnicodeBlocks		Tags
-Geometric shapes	UnicodeBlocks		Geometriska figurer
-Linear B syllabary	UnicodeBlocks		Linear B syllabary
-Variation selectors	UnicodeBlocks		Variation selectors
-Control pictures	UnicodeBlocks		Control pictures
-CJK compatibility forms	UnicodeBlocks		CJK compatibility forms
-Arabic presentation forms B	UnicodeBlocks		Arabic presentation forms B
-Ideographic description characters	UnicodeBlocks		Ideographic description characters
-Hangul compatibility Jamo	UnicodeBlocks		Hangul compatibility Jamo
-CJK unified ideographs extension A	UnicodeBlocks		CJK unified ideographs extension A
-Bengali	UnicodeBlocks		Bengali
-Ethiopic	UnicodeBlocks		Ethiopic
-Osmanya	UnicodeBlocks		Osmanya
-Font size:	CharacterWindow		Typsnittsstorlek:
-Lycian	UnicodeBlocks		Lycian
-Bopomofo extended	UnicodeBlocks		Bopomofo extended
-Ancient smbols	UnicodeBlocks		Antika symboler
-Arabic supplement	UnicodeBlocks		Arabic supplement
-Latin extended C	UnicodeBlocks		Latinsk utökade C
 Syloti Nagri	UnicodeBlocks		Syloti Nagri
-Combining diacritical marks for symbols	UnicodeBlocks		Combining diacritical marks for symbols
-Ogham	UnicodeBlocks		Ogham
+Tagalog	UnicodeBlocks		Tagalog
+Tamil	UnicodeBlocks		Tamil
 Thaana	UnicodeBlocks		Thaana
-IPA extensions	UnicodeBlocks		IPA extensions
-Small form variants	UnicodeBlocks		Small form variants
-Cyrillic supplement	UnicodeBlocks		Cyrillic supplement
-Miscellaneous mathematical symbols A	UnicodeBlocks		Miscellaneous mathematical symbols A
-Sundanese	UnicodeBlocks		Sundanese
-Clear	CharacterWindow		Rensa
-About CharacterMap…	CharacterWindow		Om Teckentabell...
-Georgian supplement	UnicodeBlocks		Georgian utökad
-Hanunoo	UnicodeBlocks		Hanunoo
-Latin extended additional	UnicodeBlocks		Latin extended additional
-Arabic presentation forms A	UnicodeBlocks		Arabic presentation forms A
-Linear B ideograms	UnicodeBlocks		Linear B ideograms
-Glagotic	UnicodeBlocks		Glagotic
-Ancient Greek numbers	UnicodeBlocks		Gammelgrekiska nummer
-Arabic	UnicodeBlocks		Arabiska
-Specials	UnicodeBlocks		Specialtecken
-Coptic	UnicodeBlocks		Koptisk
+Unified Canadian Aboriginal syllabics	UnicodeBlocks		Unified Canadian Aboriginal syllabics

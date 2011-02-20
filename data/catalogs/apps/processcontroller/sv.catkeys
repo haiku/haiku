@@ -1,41 +1,37 @@
-1	swedish	x-vnd.Haiku-ProcessController	678001537
-Memory usage	ProcessController		Minnesanvändning
-Do you really want to kill the team \"%s\"?	ProcessController		Vill du verkligen avsluta processen \"%s\"?
-Restart Deskbar	ProcessController		Starta om Deskbar
-Debug thread	ProcessController		Felsök tråd
-Your setting filecould not be saved!\n(%s)	ProcessController		Inställningsfilen kunde inte sparas!\n(%s)
-This team is already gone…	ProcessController		Processen är redan avslutad...
-Error saving file	ProcessController		Fel vid spraning av fil
-This thread is already gone…	ProcessController		Tråden är redan avslutad
-Cancel	ProcessController		Avbryt
-Run in window	ProcessController		Kör i fönster
-Processor %d	ProcessController		Processor %d
-(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
-ProcessController is already installed in Deskbar.	ProcessController		Processkontroll är redan installerad i Deskbar.
-This is the last active processor...\nYou can't turn it off!	ProcessController		Detta är den sista aktiva processorn...\nDen kan inte stängas av!
-thread	ProcessController		tråd
-Preferences	ProcessController		Inställningar
+1	swedish	x-vnd.Haiku-ProcessController	1750065782
 %s priority [%d]	ProcessController		%s prioritet [%d]
-Quit application	ProcessController		Avsluta applikation
-What do you want to do with the thread \"%s\"?	ProcessController		Vad vill du göra med tråden \"%s\"?
-about	ProcessController		om
-Gone teams…	ProcessController		Avslutade processer...
-Restart Tracker	ProcessController		Starta om Tracker
-Live in the Deskbar	ProcessController		Lev i Deskbar
-Kill this thread!	ProcessController		Avsluta tråden!
-Debug this thread!	ProcessController		Felsök tråden!
-New Terminal	ProcessController		Ny terminal
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
+About	ProcessController		om
 About ProcessController…	ProcessController		Om Processkontroll...
-Ok!	ProcessController		OK!
-Quit an application	ProcessController		Avsluta ett program
-Install in Deskbar	ProcessController		Installera i Deskbar
-ProcessController\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n	ProcessController		Processkontroll\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n
-Threads and CPU usage	ProcessController		Tråd och CPU användning
-Global Popup	ProcessController		Global popup
-OK	ProcessController		OK
+Cancel	ProcessController		Avbryt
 Damned!	ProcessController		Attans!
-priority	ProcessController		prioritet
-Usage: %s [-deskbar]\n	ProcessController		Hantering: %s [-deskbar]\n
-Yes, kill this team!	ProcessController		Ja, avsluta den här processen!
+Debug this thread!	ProcessController		Felsök tråden!
+Debug thread	ProcessController		Felsök tråd
+Do you really want to kill the team \"%s\"?	ProcessController		Vill du verkligen avsluta processen \"%s\"?
+Error saving file	ProcessController		Fel vid spraning av fil
+Global Popup	ProcessController		Global popup
+Gone teams…	ProcessController		Avslutade processer...
+Install in Deskbar	ProcessController		Installera i Deskbar
+Kill this thread!	ProcessController		Avsluta tråden!
+Live in the Deskbar	ProcessController		Lev i Deskbar
+Memory usage	ProcessController		Minnesanvändning
+New Terminal	ProcessController		Ny terminal
+OK	ProcessController		OK
+Ok!	ProcessController		OK!
+ProcessController is already installed in Deskbar.	ProcessController		Processkontroll är redan installerad i Deskbar.
+ProcessController\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n	ProcessController		Processkontroll\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n
+Processor %d	ProcessController		Processor %d
+Quit an application	ProcessController		Avsluta ett program
+Quit application	ProcessController		Avsluta applikation
+Restart Deskbar	ProcessController		Starta om Deskbar
+Restart Tracker	ProcessController		Starta om Tracker
+Run in window	ProcessController		Kör i fönster
 That's no Fun!	ProcessController		Det var inte roligt!
+This is the last active processor...\nYou can't turn it off!	ProcessController		Detta är den sista aktiva processorn...\nDen kan inte stängas av!
+This team is already gone…	ProcessController		Processen är redan avslutad...
+This thread is already gone…	ProcessController		Tråden är redan avslutad
+Threads and CPU usage	ProcessController		Tråd och CPU användning
+Usage: %s [-deskbar]\n	ProcessController		Hantering: %s [-deskbar]\n
+What do you want to do with the thread \"%s\"?	ProcessController		Vad vill du göra med tråden \"%s\"?
+Yes, kill this team!	ProcessController		Ja, avsluta den här processen!
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Du kan köra Processkontroll i ett fönster eller installera den i Deskbar.

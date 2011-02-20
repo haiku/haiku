@@ -1,19 +1,19 @@
 1	swedish	system	2686335505
+%.2f TiB	StringForSize		%.2f TiB
 %3.2f GiB	StringForSize		%3.2f GiB
 %3.2f KiB	StringForSize		%3.2f KiB
-%d bytes	StringForSize		%d byte
-%.2f TiB	StringForSize		%.2f TiB
 %3.2f MiB	StringForSize		%3.2f MiB
-Green:	ColorControl		Grön:
-Red:	ColorControl		Röd:
+%d bytes	StringForSize		%d byte
+About…	AboutWindow		Om...
 Blue:	ColorControl		Blå:
 Close	AboutWindow		Stäng
-Written by:	AboutWindow		Skrivet av:
-About…	AboutWindow		Om...
+Copy	TextView		Kopiera
 Copyright © %years% Haiku, Inc.	AboutWindow		Copyright © %years% Haiku, Inc.
 Cut	TextView		Klippa ut
-Copy	TextView		Kopiera
+Green:	ColorControl		Grön:
 Paste	TextView		Klistra in
+Red:	ColorControl		Röd:
 Redo	TextView		Gör om
 Select All	TextView		Markera alla
 Undo	TextView		Ångra
+Written by:	AboutWindow		Skrivet av:

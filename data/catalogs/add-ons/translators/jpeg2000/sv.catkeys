@@ -1,16 +1,12 @@
-1	swedish	x-vnd.Haiku-JPEG2000Translator	496980629
-Write	JPEG2000Translator		Skriv
+1	swedish	x-vnd.Haiku-JPEG2000Translator	175497887
+About	JPEG2000Translator		Om
+Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Be bitmappsformat (JPEG2000 översättning)
+High	JPEG2000Translator		Hög
 JPEG2000 images	JPEG2000Translator		JPEG2000-bilder
-Based on JasPer library:	JPEG2000Translator		Baserad på JasPer-biblioteket:
+Low	JPEG2000Translator		Låg
 Output only codestream (.jpc)	JPEG2000Translator		Endast kodströms-utdata (.jpc)
-Write black-and-white images as RGB24	JPEG2000Translator		Skriv svart/vita bilder som RGB24
-the University of British Columbia, Canada.	JPEG2000Translator		University of British Columbia, Canada.
 Output quality	JPEG2000Translator		Utdatakvalitet
 Read	JPEG2000Translator		Läs
-1999-2000, Image Power, Inc. and	JPEG2000Translator		1999-2000, Image Power, Inc. och
-ImageMagick's jp2 codec was used as \"tutorial\".	JPEG2000Translator		ImageMagick's jp2 kodek användes som \"handledning\".
-Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Be bitmappsformat (JPEG2000 översättning)
-Low	JPEG2000Translator		Låg
-About	JPEG2000Translator		Om
-High	JPEG2000Translator		Hög
 Read greyscale images as RGB32	JPEG2000Translator		Läs gråskalebilder som RGB32
+Write	JPEG2000Translator		Skriv
+Write black-and-white images as RGB24	JPEG2000Translator		Skriv svart/vita bilder som RGB24

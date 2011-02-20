@@ -1,11 +1,11 @@
 1	swedish	x-vnd.Haiku-InstalledPackages	3041446229
-No package selected.	UninstallView		Inget paket markerat.
-Remove	UninstallView		Ta bort
-Installed packages	UninstallWindow		Installerade paket
-Close	UninstallApplication		Stäng
-InstalledPackages	UninstallApplication		Installerade paket
 BeOS legacy .pkg package removing application for Haiku.\n\nCopyright 2007,\nŁukasz 'Sil2100' Zemczak\n\nCopyright (c) 2007 Haiku, Inc.\n	UninstallApplication		BeOS ärvt .pkg paket borttagningsapplikation för Haiku.\n\nCopyright 2007,\nŁukasz 'Sil2100' Zemczak\n\nCopyright (c) 2007 Haiku, Inc.\n
-Package description	UninstallView		Paketbeskrivning
-The package you selected has been successfully removed from your system.	UninstallView		Paketet du valde har framgångsrikt tagits bort från ditt system.
+Close	UninstallApplication		Stäng
+Installed packages	UninstallWindow		Installerade paket
+InstalledPackages	UninstallApplication		Installerade paket
+No package selected.	UninstallView		Inget paket markerat.
 OK	UninstallView		OK
+Package description	UninstallView		Paketbeskrivning
+Remove	UninstallView		Ta bort
+The package you selected has been successfully removed from your system.	UninstallView		Paketet du valde har framgångsrikt tagits bort från ditt system.
 The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Det valda paketet togs inte bort från ditt system. Den installerade paketinformationsfilen kan ha varit korrupt.
