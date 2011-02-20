@@ -64,11 +64,13 @@ BodyDownloadConfig::SetTo(MailAddonSettings& addonSettings)
 
 	int32 limit = 0;
 	if (settings->HasInt32(kPartialDownloadLimit))
-		limit = int32(settings->FindInt32(kPartialDownloadLimit) / 1024);
+		limit = settings->FindInt32(kPartialDownloadLimit);
 	if (limit < 0) {
-		fPartialBox->SetValue(B_CONTROL_ON);
+		fPartialBox->SetValue(B_CONTROL_OFF);
+		fSizeBox->SetText("0");
 		fSizeBox->SetEnabled(false);
-	} else {		
+	} else {
+		limit = int32(limit / 1024);
 		BString kb;
 		kb << limit;
 		fSizeBox->SetText(kb);
