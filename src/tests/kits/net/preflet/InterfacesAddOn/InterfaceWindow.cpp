@@ -60,16 +60,25 @@ InterfaceWindow::~InterfaceWindow()
 void
 InterfaceWindow::MessageReceived(BMessage* message)
 {
+	int* supportedFamilies = fNetworkSettings->ProtocolVersions();
+	unsigned int index;
+
 	switch (message->what) {
 		case MSG_IP_REVERT:
-			// RFC : we could check fTabView for Selection
-			// here and only revert the selected tab.
-			fIPv4TabView->RevertFields();
-			fIPv6TabView->RevertFields();
+			for (index = 0; index < sizeof(supportedFamilies); index++)
+			{
+				int protocol = supportedFamilies[index];
+				if (protocol > 0)
+					fTabIPView[protocol]->RevertFields();
+			}
 			break;
 		case MSG_IP_SAVE:
-			fIPv4TabView->SaveFields();
-			fIPv6TabView->SaveFields();
+			for (index = 0; index < sizeof(supportedFamilies); index++)
+			{
+				int protocol = supportedFamilies[index];
+				if (protocol > 0)
+					fTabIPView[protocol]->SaveFields();
+			}
 			this->Quit();
 			break;
 		default:
@@ -83,19 +92,22 @@ status_t
 InterfaceWindow::_PopulateTabs()
 {
 	BRect frame = fTabView->Bounds();
-	fIPv4TabView = new InterfaceAddressView(frame, "net_settings_ipv4",
-		AF_INET, fNetworkSettings);
-	fIPv6TabView = new InterfaceAddressView(frame, "net_settings_ipv6",
-		AF_INET6, fNetworkSettings);
+	int* supportedFamilies = fNetworkSettings->ProtocolVersions();
 
-	BTab* tab4 = new BTab;
-	BTab* tab6 = new BTab;
-
-	fTabView->AddTab(fIPv4TabView, tab4);
-	tab4->SetLabel("IPv4");
-
-	fTabView->AddTab(fIPv6TabView, tab6);
-	tab6->SetLabel("IPv6");
+	unsigned int index;
+	for (index = 0; index < sizeof(supportedFamilies); index++)
+	{
+		int protocol = supportedFamilies[index];
+		if (protocol > 0)
+		{
+			fTabIPView[protocol] = new InterfaceAddressView(frame,
+				protocol, fNetworkSettings);
+			BTab* tab = new BTab;
+			fTabView->AddTab(fTabIPView[protocol], tab);
+			tab->SetLabel((protocol == AF_INET) ? "IPv4" : "IPv6");
+				// TODO : find a better way
+		}
+	}
 
 	return B_OK;
 }

@@ -19,11 +19,16 @@
 #include <TabView.h>
 #include <Window.h>
 
+#include <map>
+
 
 enum {
 	MSG_IP_SAVE = 'ipap',
 	MSG_IP_REVERT = 'iprv'
 };
+
+
+typedef std::map<int, InterfaceAddressView*> IPViewMap;
 
 
 class InterfaceWindow : public BWindow {
@@ -41,8 +46,7 @@ private:
 			BButton*			fRevertButton;
 			BTabView*			fTabView;
 
-			InterfaceAddressView* fIPv4TabView;
-			InterfaceAddressView* fIPv6TabView;
+			IPViewMap			fTabIPView;
 };
 
 

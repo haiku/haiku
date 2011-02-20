@@ -38,10 +38,21 @@ NetworkSettings::NetworkSettings(const char* name)
 	fDisabled(false),
 	fNameServers(5, true)
 {
-	fSocket[AF_INET] = socket(AF_INET, SOCK_DGRAM, 0);
-	fSocket[AF_INET6] = socket(AF_INET6, SOCK_DGRAM, 0);
+	// TODO : Detect supported IP protocol versions
+	memset(fProtocolVersions, 0, sizeof(fProtocolVersions));
+	fProtocolVersions[0] = AF_INET;
+	fProtocolVersions[1] = AF_INET6;
+
+	unsigned int index;
+	for (index = 0; index < sizeof(fProtocolVersions); index++)
+	{
+		int protocol = fProtocolVersions[index];
+		if (protocol > 0)
+			fSocket[protocol] = socket(protocol, SOCK_DGRAM, 0);
+	}
 
 	fName = name;
+
 
 	ReadConfiguration();
 }
@@ -49,8 +60,13 @@ NetworkSettings::NetworkSettings(const char* name)
 
 NetworkSettings::~NetworkSettings()
 {
-	close(fSocket[AF_INET]);
-	close(fSocket[AF_INET6]);
+	unsigned int index;
+	for (index = 0; index < sizeof(fProtocolVersions); index++)
+	{
+		int protocol = fProtocolVersions[index];
+		if (protocol > 0)
+			close(fSocket[protocol]);
+	}
 }
 
 
@@ -62,23 +78,22 @@ NetworkSettings::ReadConfiguration()
 {
 	BNetworkInterface fNetworkInterface(fName);
 
-	// Obtain possible IPv4 and IPv6 addresses
-	int32 zeroAddrV4 = fNetworkInterface.FindFirstAddress(AF_INET);
-	int32 zeroAddrV6 = fNetworkInterface.FindFirstAddress(AF_INET6);
+	unsigned int index;
+	for (index = 0; index < sizeof(fProtocolVersions); index++)
+	{
+		int protocol = fProtocolVersions[index];
 
-	BNetworkInterfaceAddress netIntAddr4;
-	BNetworkInterfaceAddress netIntAddr6;
-
-	if (zeroAddrV4 >= 0) {
-		fNetworkInterface.GetAddressAt(zeroAddrV4, netIntAddr4);
-		fAddress[AF_INET] = netIntAddr4.Address();
-		fNetmask[AF_INET] = netIntAddr4.Mask();
-	}
-
-	if (zeroAddrV6 >= 0) {
-		fNetworkInterface.GetAddressAt(zeroAddrV6, netIntAddr6);
-		fAddress[AF_INET6] = netIntAddr6.Address();
-		fNetmask[AF_INET6] = netIntAddr6.Mask();
+		if (protocol > 0) {
+			int32 zeroAddr = fNetworkInterface.FindFirstAddress(protocol);
+			if (zeroAddr >= 0) {
+				fNetworkInterface.GetAddressAt(zeroAddr,
+					fInterfaceAddressMap[protocol]);
+				fAddress[protocol]
+					= fInterfaceAddressMap[protocol].Address();
+				fNetmask[protocol]
+					= fInterfaceAddressMap[protocol].Mask();
+			}
+		}
 	}
 
 	// Obtain gateway
@@ -205,4 +220,11 @@ NetworkSettings::ReadConfiguration()
 	}
 }
 
+
+void
+NetworkSettings::WriteConfiguration()
+{
+
+
+}
 

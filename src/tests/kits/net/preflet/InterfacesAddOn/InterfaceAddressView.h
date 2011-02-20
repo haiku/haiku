@@ -28,8 +28,7 @@ enum {
 class InterfaceAddressView : public BGroupView {
 public:
 								InterfaceAddressView(BRect frame,
-									const char* name, int family,
-									NetworkSettings* settings);
+									int family, NetworkSettings* settings);
 	virtual						~InterfaceAddressView();
 	virtual	void				MessageReceived(BMessage* message);
 	virtual void				AttachedToWindow();

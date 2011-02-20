@@ -20,6 +20,7 @@
 
 
 typedef std::map<int, BNetworkAddress> AddressMap;
+typedef std::map<int, BNetworkInterfaceAddress> InterfaceAddressMap;
 typedef std::map<int, bool> BoolMap;
 typedef std::map<int, int> SocketMap;
 
@@ -28,6 +29,9 @@ class NetworkSettings {
 public:
 								NetworkSettings(const char* name);
 	virtual						~NetworkSettings();
+
+			int*				ProtocolVersions()
+									{ return fProtocolVersions; }
 
 			void				SetIP(int family, const char* ip)
 									{ fAddress[family].SetTo(ip); }
@@ -69,10 +73,15 @@ public:
 			BObjectList<BString>& NameServers() { return fNameServers; }
 
 			void				ReadConfiguration();
+			void				WriteConfiguration();
 
 private:
 			SocketMap			fSocket;
 			BNetworkInterface	fNetworkInterface;
+			InterfaceAddressMap	fInterfaceAddressMap;
+
+			int					fProtocolVersions[3];
+									// OS Supported protocol versions
 
 			// Stored network addresses and paramaters
 			BoolMap				fAutoConfigure;

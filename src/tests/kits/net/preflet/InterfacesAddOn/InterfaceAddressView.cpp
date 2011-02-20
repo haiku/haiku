@@ -15,8 +15,8 @@
 #include <StringView.h>
 
 
-InterfaceAddressView::InterfaceAddressView(BRect frame, const char* name,
-	int family, NetworkSettings* settings)
+InterfaceAddressView::InterfaceAddressView(BRect frame, int family,
+	NetworkSettings* settings)
 	:
 	BGroupView(B_VERTICAL),
 	fSettings(settings),
