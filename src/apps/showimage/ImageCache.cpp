@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2010-2011, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -19,6 +19,15 @@
 #include <AutoDeleter.h>
 
 #include "ShowImageConstants.h"
+
+
+//#define TRACE_CACHE
+#undef TRACE
+#ifdef TRACE_CACHE
+#	define TRACE(x, ...) printf(x, __VA_ARGS__)
+#else
+#	define TRACE(x, ...) ;
+#endif
 
 
 struct QueueEntry {
@@ -60,9 +69,14 @@ ImageCache::ImageCache()
 	system_info info;
 	get_system_info(&info);
 
-	fMaxThreadCount = (info.cpu_count + 1) / 2;
-	fMaxBytes = info.max_pages * B_PAGE_SIZE / 8;
+	fMaxThreadCount = info.cpu_count - 1;
+	if (fMaxThreadCount < 1)
+		fMaxThreadCount = 1;
+	fMaxBytes = info.max_pages * B_PAGE_SIZE / 5;
 	fMaxEntries = 10;
+	TRACE("max thread count: %" B_PRId32 ", max bytes: %" B_PRIu64
+			", max entries: %" B_PRIuSIZE "\n",
+		fMaxThreadCount, fMaxBytes, fMaxEntries);
 }
 
 
@@ -83,6 +97,7 @@ ImageCache::RetrieveImage(const entry_ref& ref, int32 page,
 		CacheEntry* entry = find->second;
 
 		// Requeue cache entry to the end of the by-age list
+		TRACE("requeue trace entry %s\n", ref.name);
 		fCacheEntriesByAge.Remove(entry);
 		fCacheEntriesByAge.Add(entry);
 
@@ -96,12 +111,16 @@ ImageCache::RetrieveImage(const entry_ref& ref, int32 page,
 
 	if (findQueue == fQueueMap.end()) {
 		if (target == NULL
-			&& ((fCacheMap.size() < 5 && fBytes > fMaxBytes * 1 / 2)
+			&& ((fCacheMap.size() < 4 && fCacheMap.size() > 1
+					&& fBytes + fBytes / fCacheMap.size() > fMaxBytes)
 				|| (fMaxThreadCount == 1 && fQueueMap.size() > 1))) {
 			// Don't accept any further precaching if we're low on memory
 			// anyway, or if there is already a busy queue.
+			TRACE("ignore entry %s\n", ref.name);
 			return B_NO_MEMORY;
 		}
+
+		TRACE("add to queue %s\n", ref.name);
 
 		// Push new entry to the queue
 		entry = new(std::nothrow) QueueEntry();
@@ -127,8 +146,10 @@ ImageCache::RetrieveImage(const entry_ref& ref, int32 page,
 		fQueueMap.insert(std::make_pair(
 			std::make_pair(entry->ref, entry->page), entry));
 		fQueue.push_front(entry);
-	} else
+	} else {
 		entry = findQueue->second;
+		TRACE("got entry %s from cache\n", entry->ref.name);
+	}
 
 	if (target != NULL) {
 		// Attach target as listener
@@ -143,6 +164,7 @@ ImageCache::RetrieveImage(const entry_ref& ref, int32 page,
 ImageCache::_QueueWorkerThread(void* _self)
 {
 	ImageCache* self = (ImageCache*)_self;
+	TRACE("%ld: start worker thread\n", find_thread(NULL));
 
 	// get next queue entry
 	while (true) {
@@ -153,11 +175,10 @@ ImageCache::_QueueWorkerThread(void* _self)
 		}
 
 		QueueEntry* entry = *self->fQueue.begin();
+		TRACE("%ld: got entry %s from queue.\n", find_thread(NULL),
+			entry->ref.name);
 		self->fQueue.pop_front();
 		self->fLocker.Unlock();
-
-		if (entry == NULL)
-			break;
 
 		CacheEntry* cacheEntry = NULL;
 		entry->status = self->_RetrieveImage(entry, &cacheEntry);
@@ -171,6 +192,7 @@ ImageCache::_QueueWorkerThread(void* _self)
 	}
 
 	atomic_add(&self->fThreadCount, -1);
+	TRACE("%ld: end worker thread\n", find_thread(NULL));
 	return B_OK;
 }
 
@@ -258,12 +280,17 @@ ImageCache::_RetrieveImage(QueueEntry* queueEntry, CacheEntry** _entry)
 
 	fBytes += bitmap->BitsLength();
 
+	TRACE("%ld: cached entry %s from queue (%" B_PRIu64 " bytes.\n",
+		find_thread(NULL), entry->ref.name, fBytes);
+
 	while (fBytes > fMaxBytes || fCacheMap.size() > fMaxEntries) {
 		if (fCacheMap.size() <= 2)
 			break;
 
 		// Remove the oldest entry
 		entry = fCacheEntriesByAge.RemoveHead();
+		TRACE("%ld: purge cached entry %s from queue.\n", find_thread(NULL),
+			entry->ref.name);
 		fBytes -= entry->bitmap->BitsLength();
 		fCacheMap.erase(std::make_pair(entry->ref, entry->page));
 
