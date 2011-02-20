@@ -468,8 +468,16 @@ IMAPInboundProtocol::FetchBody(const entry_ref& ref)
 
 	fIMAPMailboxThread->StopWatchingMailbox();
 	int32 uid = fStorage.RefToUID(ref);
+
+	ResetProgress("Fetch body");
+	SetTotalItems(1);
+
 	status_t status = fIMAPMailbox.FetchBody(fIMAPMailbox.UIDToMessageNumber(
 		uid));
+
+	ReportProgress(0, 1);
+	ResetProgress();
+
 	fIMAPMailboxThread->SyncAndStartWatchingMailbox();
 	return status;
 }
