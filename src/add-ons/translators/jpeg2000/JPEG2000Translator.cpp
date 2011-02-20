@@ -57,8 +57,8 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 static int32 sTranslatorVersion = B_TRANSLATION_MAKE_VERSION(1, 0, 0);
 
-static const char* sTranslatorName = B_TRANSLATE_MARK("JPEG2000 images");
-static const char* sTranslatorInfo = B_TRANSLATE_MARK("©2002-2003, Shard\n"
+static const char* sTranslatorName = B_TRANSLATE("JPEG2000 images");
+static const char* sTranslatorInfo = B_TRANSLATE("©2002-2003, Shard\n"
 	"©2005-2006, Haiku\n"
 	"\n"
 	"Based on JasPer library:\n"

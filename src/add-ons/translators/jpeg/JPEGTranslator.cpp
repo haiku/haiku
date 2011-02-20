@@ -61,9 +61,8 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 static const int32 sTranslatorVersion = B_TRANSLATION_MAKE_VERSION(1, 2, 0);
 
-static const char* sTranslatorName = B_TRANSLATE_MARK("JPEG images");
-static const char* sTranslatorInfo 
-	= B_TRANSLATE_MARK("©2002-2003, Marcin Konicki\n"
+static const char* sTranslatorName = B_TRANSLATE("JPEG images");
+static const char* sTranslatorInfo = B_TRANSLATE("©2002-2003, Marcin Konicki\n"
 	"©2005-2007, Haiku\n"
 	"\n"
 	"Based on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n"
@@ -671,9 +670,7 @@ TranslatorAboutView::TranslatorAboutView(const char* name)
 	BView(name, 0, new BGroupLayout(B_VERTICAL))
 {
 	BAlignment labelAlignment = BAlignment(B_ALIGN_LEFT, B_ALIGN_TOP);
-	BString str1(sTranslatorName);
-	str1.ReplaceFirst("JPEG images", B_TRANSLATE("JPEG images"));
-	BStringView* title = new BStringView("Title", str1.String());
+	BStringView* title = new BStringView("Title", sTranslatorName);
 	title->SetFont(be_bold_font);
 	title->SetExplicitAlignment(labelAlignment);
 

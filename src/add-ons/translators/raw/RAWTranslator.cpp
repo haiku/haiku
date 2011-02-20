@@ -92,8 +92,8 @@ const uint32 kNumInputFormats = sizeof(sInputFormats) / sizeof(translation_forma
 const uint32 kNumOutputFormats = sizeof(sOutputFormats) / sizeof(translation_format);
 const uint32 kNumDefaultSettings = sizeof(sDefaultSettings) / sizeof(TranSetting);
 
-const char* kShortName1 = B_TRANSLATE_MARK("RAW images");
-const char* kShortInfo1 = B_TRANSLATE_MARK("RAW image translator");
+const char* kShortName1 = B_TRANSLATE("RAW images");
+const char* kShortInfo1 = B_TRANSLATE("RAW image translator");
 
 
 //	#pragma mark -

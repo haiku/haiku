@@ -226,7 +226,7 @@ DataTranslationsWindow::_ShowInfoAlert(int32 id)
 
 	BString message;
 	// Convert the version number into a readable format
-	snprintf(message.LockBuffer(512), 512,
+	snprintf(message.LockBuffer(2048), 2048,
 		B_TRANSLATE("Name:\t%s \nVersion:\t%ld.%ld.%ld\nInfo:\t%s\n\nPath:\n%s\n"),
 			name, B_TRANSLATION_MAJOR_VERSION(version),
 			B_TRANSLATION_MINOR_VERSION(version),
