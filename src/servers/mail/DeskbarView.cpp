@@ -359,13 +359,17 @@ void
 DeskbarView::MouseUp(BPoint pos)
 {
 	if (fLastButtons & B_PRIMARY_MOUSE_BUTTON) {
-		entry_ref ref;
-		_GetNewQueryRef(ref);
+		if (OpenWithTracker(B_USER_SETTINGS_DIRECTORY, "Mail/mailbox")
+			!= B_OK) {
+			entry_ref ref;
+			_GetNewQueryRef(ref);
 
-		BMessenger trackerMessenger(kTrackerSignature);
-		BMessage message(B_REFS_RECEIVED);
-		message.AddRef("refs", &ref);
-		trackerMessenger.SendMessage(&message);
+			BMessenger trackerMessenger(kTrackerSignature);
+			BMessage message(B_REFS_RECEIVED);
+			message.AddRef("refs", &ref);
+
+			trackerMessenger.SendMessage(&message);
+		}
 	}
 
 	if (fLastButtons & B_TERTIARY_MOUSE_BUTTON)
@@ -444,6 +448,9 @@ DeskbarView::_CreateNewMailQuery(BEntry& query)
 	BString string("((" B_MAIL_ATTR_STATUS "==\"[nN][eE][wW]\")&&((BEOS:TYPE=="
 		"\"text/x-email\")||(BEOS:TYPE==\"text/x-partial-email\")))");
 	file.WriteAttrString("_trk/qrystr", &string);
+	file.WriteAttrString("_trk/qryinitstr", &string);
+	int32 mode = 'Fbyq';
+	file.WriteAttr("_trk/qryinitmode", B_INT32_TYPE, 0, &mode, sizeof(int32));
 	string = "E-mail";
 	file.WriteAttrString("_trk/qryinitmime", &string);
 	BNodeInfo(&file).SetType("application/x-vnd.Be-query");

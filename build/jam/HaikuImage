@@ -344,7 +344,6 @@ AddSymlinkToHaikuImage home Desktop : /boot/home : Home ;
 AddDirectoryToHaikuImage home mail draft ;
 AddDirectoryToHaikuImage home mail in ;
 AddDirectoryToHaikuImage home mail out ;
-AddSymlinkToHaikuImage home config settings Mail : ../../../mail/in : mailbox ;
 
 # Deskbar Application links
 AddDirectoryToHaikuImage home config be Applications ;
