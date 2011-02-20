@@ -1,12 +1,12 @@
 1	russian	x-vnd.Be-WORK	3231882304
-Workspaces	Workspaces		Рабочие столы
-Invalid argument: %s\n	Workspaces		Неверный аргумент: %s\n
-Quit	Workspaces		Выход
-Change workspace count…	Workspaces		Изменить количество столов…
 About Workspaces…	Workspaces		О программе…
-Workspaces\nwritten by %1, and %2.\n\nCopyright %3, Haiku.\n\nSend windows behind using the Option key. Move windows to front using the Control key.\n	Workspaces		Workspaces\n\nразработал %1 и %2.\n\nCopyright %3, Haiku.\n\nДля отправки окна в фон используйте клавишу Option.\nДля активации окна используйте клавишу Control.\n
-Show window border	Workspaces		Показывать рамку окна
-Auto-raise	Workspaces		Всплывать автоматически
-OK	Workspaces		ОК
 Always on top	Workspaces		Всегда сверху
+Auto-raise	Workspaces		Всплывать автоматически
+Change workspace count…	Workspaces		Изменить количество столов…
+Invalid argument: %s\n	Workspaces		Неверный аргумент: %s\n
+OK	Workspaces		ОК
+Quit	Workspaces		Выход
+Show window border	Workspaces		Показывать рамку окна
 Show window title	Workspaces		Показывать заголовок окна
+Workspaces	Workspaces		Рабочие столы
+Workspaces\nwritten by %1, and %2.\n\nCopyright %3, Haiku.\n\nSend windows behind using the Option key. Move windows to front using the Control key.\n	Workspaces		Workspaces\n\nразработал %1 и %2.\n\nCopyright %3, Haiku.\n\nДля отправки окна в фон используйте клавишу Option.\nДля активации окна используйте клавишу Control.\n

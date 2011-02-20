@@ -1,15 +1,15 @@
 1	russian	x-vnd.Haiku-GIFTranslator	829368084
-Websafe	GIFView		Безопасная
-Write interlaced images	GIFView		Записывать чересстрочные изображения
-Optimal	GIFView		Оптимальная
-Greyscale	GIFView		Оттенки серого
+Automatic (from alpha channel)	GIFView		Автоматически (из альфа канала)
 Be Bitmap Format (GIFTranslator)	GIFTranslator		Растровый формат Be (GIFTranslator)
+BeOS system	GIFView		Система BeOS
+Colors	GIFView		Цвета
+GIF Settings	GIFTranslator		Настройки GIF
 GIF image	GIFTranslator		GIF изображение
-Write transparent images	GIFView		Записывать прозрачные изображения
+Greyscale	GIFView		Оттенки серого
+Optimal	GIFView		Оптимальная
 Palette	GIFView		Палитра
 Use RGB color	GIFView		Использовать RGB цвета
 Use dithering	GIFView		Использовать сглаживание
-GIF Settings	GIFTranslator		Настройки GIF
-BeOS system	GIFView		Система BeOS
-Automatic (from alpha channel)	GIFView		Автоматически (из альфа канала)
-Colors	GIFView		Цвета
+Websafe	GIFView		Безопасная
+Write interlaced images	GIFView		Записывать чересстрочные изображения
+Write transparent images	GIFView		Записывать прозрачные изображения

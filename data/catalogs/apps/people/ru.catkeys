@@ -1,40 +1,43 @@
-1	russian	x-vnd.Be-PEPL	1507105612
-Edit	People		Изменить
+1	russian	x-vnd.Be-PEPL	3209429794
+About	People		О программе…
+Address	People		Адрес
+Cancel	People		Отмена
 City	People		Город
-none	Groups list		нет
+Close	People		Закрыть
 Company	People		Компания
-Work phone	People		Рабочий телефон
-New person	People		Новая персона
-Select all	People		Выделить всё
-File	People		Файл
+Configure attributes	People		Выбрать атрибуты
+Contact information for a person.	Long mimetype description		Контактная информация для человека.
+Contact name	People		Имя контакта
+Copy	People		Копировать
 Could not create %s.	People		Невозможно создать %s.
 Country	People		Страна
-Close	People		Закрыть
-Group	People		Группа
-Nickname	People		Прозвище
-Quit	People		Выход
-Name	People		Имя
-Revert	People		Вернуть
-Undo	People		Отменить
-E-mail	People		E-mail
-Save changes before quitting?	People		Сохранить изменения перед выходом?
-OK	People		ОК
-Home phone	People		Домашний телефон
-Save as…	People		Сохранить как…
-Redo	People		Отменить
-Paste	People		Вставить
-Save	People		Сохранить
-Person	Short mimetype description		Персона
-New person…	People		Новая персона…
-Address	People		Адрес
-URL	People		URL
-Sorry	People		Извините
-Zip	People		Индекс
-Contact information for a person.	Long mimetype description		Контактная информация для человека.
-Fax	People		Факс
-Contact name	People		Имя контакта
 Cut	People		Вырезать
-Cancel	People		Отмена
+E-mail	People		E-mail
+Edit	People		Изменить
+Error	People		Ошибка
+Fax	People		Факс
+File	People		Файл
+Group	People		Группа
+Home phone	People		Домашний телефон
+Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Не удалось запустить FileTypes для настройки атрибутов Персоны.\n\nОшибка:
+Name	People		Имя
+New person	People		Новая персона
+New person…	People		Новая персона…
+Nickname	People		Прозвище
+OK	People		ОК
+Paste	People		Вставить
+Person	Short mimetype description		Персона
+Quit	People		Выход
+Redo	People		Отменить
+Revert	People		Вернуть
+Save	People		Сохранить
+Save as…	People		Сохранить как…
+Save changes before quitting?	People		Сохранить изменения перед выходом?
+Select all	People		Выделить всё
+Sorry	People		Извините
 State	People		Штат
-Copy	People		Копировать
-About	People		О программе…
+URL	People		URL
+Undo	People		Отменить
+Work phone	People		Рабочий телефон
+Zip	People		Индекс
+none	Groups list		нет

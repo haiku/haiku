@@ -1,39 +1,39 @@
 1	russian	x-vnd.Haiku-Media	1588474509
-Show volume control on Deskbar	Media views		Отображать регулятор громкости в Deskbar
+<none>	Media views		<нет>
 Audio input:	Media views		Аудио вход:
-Restarting media services\nStarting media server…\n	Media Window		Перезапуск медиа служб\nЗапуск медиа сервера…\n
-Video input:	Media views		Видео вход:
-Waiting for media_server to quit.	Media Window		Ожидание выключения медиа сервера.
-Defaults	Media views		По умолчанию
-Stopping media server…	Media Window		Остановка медиа сервера…
-Video output:	Media views		Видео выход:
-Enable real-time audio	Media views		Включить аудио режим реального времени
-Quit	Media Window		Выход
-OK	Media Window		ОК
-Enabling real-time video allows system to perform video operations as fast and smoothly as possible.  It achieves optimum performance by using more RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Режим реального времени для видео позволяет системе выполнять видео операции так быстро и гладко, насколько это возможно. Это достигается за счёт большей загрузки процессора и оперативной памяти.\n\nВключите эту функцию, только если вам нужна низкая латентность.
-Starting media server…	Media Window		Запуск медиа сервера…
-Restart the media server to apply changes.	Media views		Перезапустите медиа сервер для активации изменений.
-Done shutting down.	Media Window		Остановка завершена.
-Cleaning up.	Media Window		Очистка.
-Telling media_addon_server to quit.	Media Window		Запрос завершения работы media_addon_server.
-Enable real-time video	Media views		Включить видео режим реального времени
-This hardware has no controls.	Media Window		Это оборудование не имеет параметров настройки.
-Restarting media services\nShutting down media server\n	Media Window		Перезапуск медиа служб\nОстановка медиа сервера\n
+Audio mixer	Media Window		Микшер
 Audio output:	Media views		Аудио выход:
-Start media server	Media Window		Запустить медиа сервер
 Audio settings	Media Window		Настройки звука
+Channel:	Media views		Канал:
+Cleaning up.	Media Window		Очистка.
 Could not connect to the media server.\nWould you like to start it ?	Media Window		Невозможно подключиться к медиа серверу.\nХотите запустить его?\n
+Couldn't add volume control in Deskbar: %s\n	Media views		Не удалось добавить регулятор громкости в Deskbar: %s\n
+Couldn't remove volume control in Deskbar: %s\n	Media views		Не удалось удалить регулятор громкости из Deskbar: %s\n
+Defaults	Media views		По умолчанию
+Done shutting down.	Media Window		Остановка завершена.
+Enable real-time audio	Media views		Включить аудио режим реального времени
+Enable real-time video	Media views		Включить видео режим реального времени
+Enabling real-time audio allows system to record and play audio as fast as possible.  It achieves this performance by using more CPU and RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Режим реального времени для аудио позволяет системе выполнять аудио операции так быстро и гладко, насколько это возможно. Это достигается за счёт большей загрузки процессора и оперативной памяти.\n\nВключите эту функцию, только если вам нужна низкая латентность.
+Enabling real-time video allows system to perform video operations as fast and smoothly as possible.  It achieves optimum performance by using more RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Режим реального времени для видео позволяет системе выполнять видео операции так быстро и гладко, насколько это возможно. Это достигается за счёт большей загрузки процессора и оперативной памяти.\n\nВключите эту функцию, только если вам нужна низкая латентность.
+Media	Media Window		Медиа
+OK	Media Window		ОК
+OK	Media views		ОК
+Quit	Media Window		Выход
 Ready for use…	Media Window		Готов к использованию…
 Real-time	Media views		Реальное время
-Restart media services	Media views		Перезапустить медиа службы
-Enabling real-time audio allows system to record and play audio as fast as possible.  It achieves this performance by using more CPU and RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Режим реального времени для аудио позволяет системе выполнять аудио операции так быстро и гладко, насколько это возможно. Это достигается за счёт большей загрузки процессора и оперативной памяти.\n\nВключите эту функцию, только если вам нужна низкая латентность.
-Media	Media Window		Медиа
-Channel:	Media views		Канал:
-Video settings	Media Window		Видео
-Audio mixer	Media Window		Микшер
-<none>	Media views		<нет>
-Couldn't add volume control in Deskbar: %s\n	Media views		Не удалось добавить регулятор громкости в Deskbar: %s\n
-OK	Media views		ОК
 Real-time audio is currently unimplemented in Haiku.	Media views		Режим реального времени для аудио еще не реализован.
-Couldn't remove volume control in Deskbar: %s\n	Media views		Не удалось удалить регулятор громкости из Deskbar: %s\n
 Real-time video is currently unimplemented in Haiku.	Media views		Режим реального времени для видео еще не реализован.
+Restart media services	Media views		Перезапустить медиа службы
+Restart the media server to apply changes.	Media views		Перезапустите медиа сервер для активации изменений.
+Restarting media services\nShutting down media server\n	Media Window		Перезапуск медиа служб\nОстановка медиа сервера\n
+Restarting media services\nStarting media server…\n	Media Window		Перезапуск медиа служб\nЗапуск медиа сервера…\n
+Show volume control on Deskbar	Media views		Отображать регулятор громкости в Deskbar
+Start media server	Media Window		Запустить медиа сервер
+Starting media server…	Media Window		Запуск медиа сервера…
+Stopping media server…	Media Window		Остановка медиа сервера…
+Telling media_addon_server to quit.	Media Window		Запрос завершения работы media_addon_server.
+This hardware has no controls.	Media Window		Это оборудование не имеет параметров настройки.
+Video input:	Media views		Видео вход:
+Video output:	Media views		Видео выход:
+Video settings	Media Window		Видео
+Waiting for media_server to quit.	Media Window		Ожидание выключения медиа сервера.

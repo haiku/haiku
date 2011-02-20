@@ -1,28 +1,29 @@
-1	russian	x-vnd.Haiku-ScreenSaver	1468011094
-Run module	ScreenSaver		Запускать заставку через 
-Could not load screen saver	ScreenSaver		Не удалось загрузить заставку
+1	russian	x-vnd.Haiku-ScreenSaver	937285216
 30 seconds	ScreenSaver		30 секунд
-Password…	ScreenSaver		Пароль…
-Password:	ScreenSaver		Пароль:
-Password lock	ScreenSaver		Требовать пароль через 
 Add…	ScreenSaver		Добавить…
-mouse is here	ScreenSaver		мышь находится здесь
-Modules	ScreenSaver		Заставки
-Test	ScreenSaver		Проверить
-ScreenSaver	ScreenSaver		Хранитель экрана
-Module settings	ScreenSaver		Настройки заставки
-Cancel	ScreenSaver		Отмена
-Turn off screen	ScreenSaver		Выключать экран через 
-No options available	ScreenSaver		Нет доступных настроек
-Password Window	ScreenSaver		Окно пароля
-Enable screen saver	ScreenSaver		Включить хранитель экрана
-Fade now when	ScreenSaver		Включать заставку, когда
-Fade	ScreenSaver		Настройки
-Passwords don't match. Please try again.	ScreenSaver		Пароли не совпадают. Пожалуйста, попробуйте еще раз.
-OK	ScreenSaver		ОК
-Don't fade when	ScreenSaver		Не включать заставку, когда
 Blackness	ScreenSaver		Пустой экран
-Use custom password	ScreenSaver		Использовать выбранный пароль
-Done	ScreenSaver		Готово
+Cancel	ScreenSaver		Отмена
 Confirm password:	ScreenSaver		Подтверждение пароля:
+Could not load screen saver	ScreenSaver		Не удалось загрузить заставку
+Display Power Management Signaling not available	ScreenSaver		Недоступна система сигналов управления энергопотреблением монитора
+Don't fade when	ScreenSaver		Не включать заставку, когда
+Done	ScreenSaver		Готово
+Enable screen saver	ScreenSaver		Включить хранитель экрана
+Fade	ScreenSaver		Настройки
+Fade now when	ScreenSaver		Включать заставку, когда
+Module settings	ScreenSaver		Настройки заставки
+Modules	ScreenSaver		Заставки
+No options available	ScreenSaver		Нет доступных настроек
+OK	ScreenSaver		ОК
+Password Window	ScreenSaver		Окно пароля
+Password lock	ScreenSaver		Требовать пароль через 
+Password:	ScreenSaver		Пароль:
+Passwords don't match. Please try again.	ScreenSaver		Пароли не совпадают. Пожалуйста, попробуйте еще раз.
+Password…	ScreenSaver		Пароль…
+Run module	ScreenSaver		Запускать заставку через 
+ScreenSaver	ScreenSaver		Хранитель экрана
+Test	ScreenSaver		Проверить
+Turn off screen	ScreenSaver		Выключать экран через 
+Use custom password	ScreenSaver		Использовать выбранный пароль
 Use network password	ScreenSaver		Использовать сетевой пароль
+mouse is here	ScreenSaver		мышь находится здесь

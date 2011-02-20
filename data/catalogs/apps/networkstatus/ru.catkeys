@@ -1,24 +1,24 @@
 1	russian	x-vnd.Haiku-NetworkStatus	3992317590
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		NetworkStatus опции:\n\t--deskbar\tавтоматически добавить репликант в Deskbar\n\t--help\t\tвывести этот текст и выйти\n
-Broadcast information:\n	NetworkStatusView		Широковещательная информация:\n
-No link	NetworkStatusView		Нет соединения
-Address information:\n	NetworkStatusView		Информация об адресе:\n
-Launching the network preflet failed.\n\nError: 	NetworkStatusView		Не удалось запустить утилиту настройки сети.\n\nОшибка: 
-NetworkStatus\n\twritten by %1 and Hugo Santos\n\t%2, Haiku, Inc.\n	NetworkStatusView		NetworkStatus\n\n\tРазработал %1 и Hugo Santos\n\t%2, Haiku, Inc.\n
-Netmask	NetworkStatusView		Маска подсети
-Broadcast	NetworkStatusView		Широковещательный
-Unknown	NetworkStatusView		Неизвестно
-Ready	NetworkStatusView		Готово
-NetworkStatus	NetworkStatusWindow		Статус сети
-No stateful configuration	NetworkStatusView		Нет полноценной конфигурации
-Configuring	NetworkStatusView		Настройка
+<no wireless networks found>	NetworkStatusView		<беспроводные сети не обнаружены>
 Address	NetworkStatusView		IP адрес
+Address information:\n	NetworkStatusView		Информация об адресе:\n
+Broadcast	NetworkStatusView		Широковещательный
+Broadcast information:\n	NetworkStatusView		Широковещательная информация:\n
+Configuring	NetworkStatusView		Настраивается
+Could not join wireless network:\n	NetworkStatusView		Не удалось подключиться к беспроводной сети:\n
+Install in Deskbar	NetworkStatus		Установить в Deskbar
+Launching the network preflet failed.\n\nError: 	NetworkStatusView		Не удалось запустить утилиту настройки сети.\n\nОшибка: 
+Netmask	NetworkStatusView		Маска подсети
+Netmask information:\n	NetworkStatusView		Информация о маске:\n
+NetworkStatus	NetworkStatusWindow		Статус сети
+NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		NetworkStatus опции:\n\t--deskbar\tавтоматически добавить репликант в Deskbar\n\t--help\t\tвывести этот текст и выйти\n
+NetworkStatus\n\twritten by %1 and Hugo Santos\n\t%2, Haiku, Inc.\n	NetworkStatusView		NetworkStatus\n\n\tРазработал %1 и Hugo Santos\n\t%2, Haiku, Inc.\n
+No link	NetworkStatusView		Нет соединения
+No stateful configuration	NetworkStatusView		Нет полноценной конфигурации
 OK	NetworkStatusView		ОК
 Open network preferences…	NetworkStatusView		Открыть настройки сети…
 Quit	NetworkStatusView		Выход
-Netmask information:\n	NetworkStatusView		Информация о маске:\n
-<no wireless networks found>	NetworkStatusView		<беспроводные сети не обнаружены>
+Ready	NetworkStatusView		Готов
 Run in window	NetworkStatus		Запустить в окне
-Install in Deskbar	NetworkStatus		Установить в Deskbar
+Unknown	NetworkStatusView		Неизвестно
 You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Вы можете запустить NetworkStatus в окне или установить в Deskbar.
-Could not join wireless network:\n	NetworkStatusView		Не удалось подключиться к беспроводной сети:\n

@@ -1,61 +1,62 @@
-1	russian	x-vnd.Haiku-ShowImage	1508862207
-Use as background…	Menus		Сделать фоном рабочего стола…
-Slide delay	Menus		Задержка слайд шоу
-Zoom in	Menus		Увеличить
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Документ '%s' был изменен. Вы хотите закрыть его без сохраниения?
-Previous page	Menus		Предыдущая страница
-View	Menus		Вид
+1	russian	x-vnd.Haiku-ShowImage	3385354583
+%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS секунды
+About ShowImage…	Menus		О программе…
+Browse	Menus		Просмотр
+Cancel	ClosePrompt		Отмена
+Clear selection	Menus		Очистить выделение
+Close	ClosePrompt		Закрыть
+Close	Menus		Закрыть
+Close document	ClosePrompt		Закрыть документ
+Copy	Menus		Копировать
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Невозможно открыть изображение! Либо файл, либо транслятор этого изображения отсутствует.
+DPI:	PrintOptionsWindow		Разрешение (DPI):
+Edit	Menus		Изменить
+File	Menus		Файл
+First page	Menus		Первая страница
+Fit image to page	PrintOptionsWindow		Подогнать размер изображения под страницу
+Fit to window	Menus		Подогонять под размер окна
+Flip left to right	Menus		Повернуть слева направо
+Flip top to bottom	Menus		Повернуть сверху вниз
 Full screen	Menus		На весь экран
 Go to page	Menus		Перейти к странице
-Zoom out	Menus		Уменьшить
-Rotate counterclockwise	Menus		Повернуть против часовой стрелки
-High-quality zooming	Menus		Высококачественное масштабирование
-Browse	Menus		Просмотр
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Невозможно открыть изображение! Либо файл, либо транслятор этого изображения отсутствует.
-First page	Menus		Первая страница
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Документ '%s' (страница %d) был изменен. Вы хотите закрыть его?
-About ShowImage…	Menus		О программе…
-Close	ClosePrompt		Закрыть
-Undo	Menus		Вернуть
-Resize to (in 1/72 inches):	PrintOptionsWindow		Изменить размер (1/72 дюйма):
-Flip left to right	Menus		Повернуть слева направо
-Show caption in full screen mode	Menus		Показывать название в полноэкранном режиме
-DPI:	PrintOptionsWindow		Разрешение (DPI):
-Next file	Menus		Следующий файл
-Close document	ClosePrompt		Закрыть документ
 Height: 	PrintOptionsWindow		Высота: 
-Cancel	ClosePrompt		Отмена
-Print options	PrintOptionsWindow		Настройки печати
-ShowImage	AboutWindow		ShowImage
-Last page	Menus		Последняя страница
-Previous file	Menus		Предыдущий файл
-Slide show	Menus		Слайд шоу
-Fit image to page	PrintOptionsWindow		Подогнать размер изображения под страницу
-Flip top to bottom	Menus		Повернуть сверху вниз
-Zoom factor in %:	PrintOptionsWindow		Увеличение в %:
-Width:	PrintOptionsWindow		Ширина:
+High-quality zooming	Menus		Высококачественное масштабирование
 Image	Menus		Изображение
-Rotate clockwise	Menus		Повернуть по часовой стрелке
 Job setup	PrintOptionsWindow		Печать
-Original size	Menus		Оригинальный размер
+Last page	Menus		Последняя страница
+Next file	Menus		Следующий файл
 Next page	Menus		Следующая страница
-OK	SaveToFile		ОК
-The file '%s' could not be written.	SaveToFile		Невозможно записать файл '%s'.
-Progress monitor	ProgressWindow		Монитор состояния
-File	Menus		Файл
-Page setup…	Menus		Настройка печати…
-Print…	Menus		Печать…
-Quit	Menus		Выход
-Edit	Menus		Изменить
-Close	Menus		Закрыть
-Copy	Menus		Копировать
-Select all	Menus		Выделить всё
-Save as…	Menus		Сохранить как…
-Open…	Menus		Открыть…
-ShowImage	Menus		Просмотр изображений
-Clear selection	Menus		Очистить выделение
-Selection Mode	Menus		Режим выделения
-Stretch to window	Menus		Растягивать до размеров окна
 OK	Alerts		ОК
-Fit to window	Menus		Подогонять под размер окна
-%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS секунды
+OK	SaveToFile		ОК
+Open…	Menus		Открыть…
+Original size	Menus		Оригинальный размер
+Page setup…	Menus		Настройка печати…
+Previous file	Menus		Предыдущий файл
+Previous page	Menus		Предыдущая страница
+Print options	PrintOptionsWindow		Настройки печати
+Print…	Menus		Печать…
+Progress monitor	ProgressWindow		Монитор состояния
+Quit	Menus		Выход
+Rating	Menus		Рейтинг
+Resize to (in 1/72 inches):	PrintOptionsWindow		Изменить размер (1/72 дюйма):
+Rotate clockwise	Menus		Повернуть по часовой стрелке
+Rotate counterclockwise	Menus		Повернуть против часовой стрелки
+Save as…	Menus		Сохранить как…
+Select all	Menus		Выделить всё
+Selection Mode	Menus		Режим выделения
+Show caption in full screen mode	Menus		Показывать название в полноэкранном режиме
+ShowImage	AboutWindow		ShowImage
+ShowImage	Menus		Просмотр изображений
+Slide delay	Menus		Задержка слайд шоу
+Slide show	Menus		Слайд шоу
+Stretch to window	Menus		Растягивать до размеров окна
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Документ '%s' (страница %d) был изменен. Вы хотите закрыть его?
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Документ '%s' был изменен. Вы хотите закрыть его без сохраниения?
+The file '%s' could not be written.	SaveToFile		Невозможно записать файл '%s'.
+Undo	Menus		Вернуть
+Use as background…	Menus		Сделать фоном рабочего стола…
+View	Menus		Вид
+Width:	PrintOptionsWindow		Ширина:
+Zoom factor in %:	PrintOptionsWindow		Увеличение в %:
+Zoom in	Menus		Увеличить
+Zoom out	Menus		Уменьшить

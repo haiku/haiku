@@ -1,42 +1,49 @@
-1	russian	x-vnd.Haiku-ActivityMonitor	657126014
-P-faults	DataSource		Ошибки страниц
-Media nodes	DataSource		Медиа узлы
-Raw clipboard size	DataSource		Полный размер буфера обмена
-Threads	DataSource		Потоки
-Add graph	ActivityWindow		Добавить график
-Teams	DataSource		Команды
-Hide legend	ActivityView		Скрыть легенду
-Network send	DataSource		Исходящий трафик
-CPU usage (combined)	DataSource		Использование ЦПУ (всего)
-CPU	DataSource		ЦПУ
-Used memory	DataSource		Использовано памяти
-Cached memory	DataSource		Закэшировано памяти
-Apps	DataSource		Приложения
-Show legend	ActivityView		Показать легенду
-Settings	ActivityWindow		Настройки
-Receiving	DataSource		Прием
-Settings…	ActivityWindow		Настройки…
-Ports	DataSource		Порты
-Page faults	DataSource		Ошибки страниц
-Text clipboard size	DataSource		Размер текстового буфера обмена
-Sending	DataSource		Передача
-Cache	DataSource		Кэш
+1	russian	x-vnd.Haiku-ActivityMonitor	1946610782
+%.1f KB/s	DataSource		%.1f Кбайт/с
+%.1f MB	DataSource		%.1f Мбайт
+%.1f faults/s	DataSource		%.1f ошибок/с
+%lld ms	SettingsWindow		%lld мс
+%lld sec.	SettingsWindow		%lld сек.
 About ActivityMonitor…	ActivityWindow		О программе…
-TX	DataSource		Передача
-Update time interval:	SettingsWindow		Временной интервал обновления:
-Quit	ActivityWindow		Выход
+ActivityMonitor	ActivityWindow		Мониторинг активности
+Add graph	ActivityWindow		Добавить график
+Additional items	ActivityView		Дополнительные графики
+Apps	DataSource		Приложения
+Block cache	DataSource		Блоковый кэш
 Block cache memory	DataSource		Память блокового кэша
-Remove graph	ActivityView		Удалить график
-RX	DataSource		Прием
+CPU	DataSource		ЦПУ
 CPU usage	DataSource		Использование ЦПУ
-Sems	DataSource		Семафоры
+CPU usage (combined)	DataSource		Использование ЦПУ (всего)
+Cache	DataSource		Кэш
+Cached memory	DataSource		Закэшировано памяти
+File	ActivityWindow		Файл
+Hide legend	ActivityView		Скрыть легенду
+MB	DataSource		Мбайт
+Media nodes	DataSource		Медиа узлы
+Memory	DataSource		Память
+Network receive	DataSource		Входящий трафик
+Network send	DataSource		Исходящий трафик
+P-faults	DataSource		Ошибки страниц
+Page faults	DataSource		Ошибки страниц
+Ports	DataSource		Порты
+Quit	ActivityWindow		Выход
+RX	DataSource	Shorter version for Receiving.	Прием
+Raw clipboard size	DataSource		Полный размер буфера обмена
+Receiving	DataSource		Прием
+Remove graph	ActivityView		Удалить график
 Running applications	DataSource		Запущенные приложения
 Semaphores	DataSource		Семафоры
-Block cache	DataSource		Блоковый кэш
-Swap space	DataSource		Размер файла подкачки
+Sems	DataSource		Семафоры
+Sending	DataSource		Передача
+Settings	ActivityWindow		Настройки
+Settings…	ActivityWindow		Настройки…
+Show legend	ActivityView		Показать легенду
 Swap	DataSource		Файл подкачки
-File	ActivityWindow		Файл
-Additional items	ActivityView		Дополнительные графики
-Network receive	DataSource		Входящий трафик
-Memory	DataSource		Память
-ActivityMonitor	ActivityWindow		Мониторинг активности
+Swap space	DataSource		Размер файла подкачки
+TX	DataSource	Shorter version for Sending	Передача
+Teams	DataSource		Команды
+Text clipboard size	DataSource		Размер текстового буфера обмена
+Threads	DataSource		Потоки
+Update time interval:	SettingsWindow		Временной интервал обновления:
+Used memory	DataSource		Использовано памяти
+usage	DataSource		использование

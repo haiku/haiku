@@ -1,38 +1,38 @@
-1	russian	x-vnd.Haiku-LaunchBox	3325160291
-New	LaunchBox		Новый
-Set description…	LaunchBox		Указать описание…
-Vertical layout	LaunchBox		Вертикальное расположение
-OK	LaunchBox		ОК
-Pad 1	LaunchBox		Панель 1
-last chance	LaunchBox		последний шанс
-Quit	LaunchBox		Выход
-Clear button	LaunchBox		Очистить кнопку
-Failed to launch application with signature '	LaunchBox		Не удалось запустить приложение с сигнатурой '
+1	russian	x-vnd.Haiku-LaunchBox	4217696103
 About	LaunchBox		О программе
-Ignore double-click	LaunchBox		Игнорировать двойной щелчок
+Add button here	LaunchBox		Добавить сюда кнопку
 Auto-raise	LaunchBox		Всплывать автоматически
-Show on all workspaces	LaunchBox		Отображать на всех рабочих столах
-Show window border	LaunchBox		Показать рамку окна
-Pad 	LaunchBox		Панель 
-Icon size	LaunchBox		Размер значков
 Bummer	LaunchBox		Облом
 Cancel	LaunchBox		Отмена
-Remove button	LaunchBox		Удалить кнопку
-Description for '	LaunchBox		Описание для '
-Horizontal layout	LaunchBox		Горизонтальное расположение
-Name Panel	LaunchBox		Название панели
-Add button here	LaunchBox		Добавить сюда кнопку
-Failed to launch '	LaunchBox		Не удалось запустить '
-Stephan Aßmus (aka stippi)	LaunchBox		Stephan Aßmus (stippi)
-Failed to launch 'something',error in Pad data.	LaunchBox		Не удалось запустить 'something', ошибка в данных панели.
+Clear button	LaunchBox		Очистить кнопку
+Clone	LaunchBox		Дублировать
 Close	LaunchBox		Закрыть
+Description for '%3'	LaunchBox		Описание для '%3'
+Failed to launch '%1'.\n\nError:	LaunchBox		Не удалось запустить '%1'.\n\nОшибка:
+Failed to launch 'something',error in Pad data.	LaunchBox		Не удалось запустить 'something', ошибка в данных панели.
+Failed to launch application with signature '%2'.\n\nError:	LaunchBox		Не удалось запустить приложение с сигнатурой '%2'.\n\nОшибка:
 Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Не удалось послать команду "открыть папку" в Tracker.\n\nОшибка: 
 
-You can drag an icon here.	LaunchBox		Вы можете перетащить значок сюда.
-Clone	LaunchBox		Дублировать
+Horizontal layout	LaunchBox		Горизонтальное расположение
+Icon size	LaunchBox		Размер значков
+Ignore double-click	LaunchBox		Игнорировать двойной щелчок
 LaunchBox	LaunchBox		LaunchBox
-launch popup	LaunchBox		launch popup
-Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Вы действительно хотите закрыть эту панель?\n(Эта панель не сохранится.)
+Name Panel	LaunchBox		Название панели
+New	LaunchBox		Создать
+OK	LaunchBox		ОК
+Pad	LaunchBox		Панель 
+Pad %1	LaunchBox		Панель %1
+Pad 1	LaunchBox		Панель 1
+Quit	LaunchBox		Выход
+Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Вы действительно хотите закрыть эту панель? (Эта панель не сохранится.)
 
-'.\n\nError: 	LaunchBox		'.\n\nОшибка: 
+Remove button	LaunchBox		Удалить кнопку
+Set description…	LaunchBox		Указать описание…
 Settings	LaunchBox		Настройки
+Show on all workspaces	LaunchBox		Отображать на всех рабочих столах
+Show window border	LaunchBox		Показать рамку окна
+Stephan Aßmus (aka stippi)	LaunchBox		Stephan Aßmus (stippi)
+Vertical layout	LaunchBox		Вертикальное расположение
+You can drag an icon here.	LaunchBox		Вы можете перетащить значок сюда.
+last chance	LaunchBox		последний шанс
+launch popup	LaunchBox		launch popup

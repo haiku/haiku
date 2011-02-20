@@ -1,19 +1,19 @@
 1	russian	x-vnd.Haiku-MidiPlayer	1406887279
-None	Main Window		Нет
-Live input:	Main Window		Прямой ввод:
-Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	MIDI Player\n\nЭта крошечная программа\nУмеет воспроизводить тысячи\nПростых мелодий
-Stop	Main Window		Остановить
 Cavern	Main Window		Пещера
-Volume:	Main Window		Громкость:
-Reverb:	Main Window		Реверберация:
+Closet	Main Window		Ванная
+Could not load song	Main Window		Не удалось загрузить мелодию
+Drop MIDI file here	Scope View		Перенесите сюда MIDI файл
+Dungeon	Main Window		Подземелье
+Garage	Main Window		Гараж
+Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	MIDI Player\n\nЭта крошечная программа\nУмеет воспроизводить тысячи\nПростых мелодий
+Igor's lab	Main Window		Лаборатория
+Live input:	Main Window		Прямой ввод:
+MidiPlayer	Main Window		MIDI проигрыватель
+None	Main Window		Нет
 OK	Main Window		ОК
 Off	Main Window		Выключить
-Dungeon	Main Window		Подземелье
 Play	Main Window		Проиграть
-Garage	Main Window		Гараж
-Closet	Main Window		Ванная
-Igor's lab	Main Window		Лаборатория
+Reverb:	Main Window		Реверберация:
 Scope	Main Window		Осцилограф
-Could not load song	Main Window		Не удалось загрузить мелодию
-MidiPlayer	Main Window		MIDI проигрыватель
-Drop MIDI file here	Scope View		Перенесите сюда MIDI файл
+Stop	Main Window		Остановить
+Volume:	Main Window		Громкость:

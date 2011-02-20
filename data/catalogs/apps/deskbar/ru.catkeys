@@ -1,39 +1,39 @@
 1	russian	x-vnd.Be-TSKB	34208151
-Applications	PreferencesWindow		Приложения
-Recent applications	BeMenu		Недавние приложения
-Edit menu…	PreferencesWindow		Изменить меню…
-Recent documents:	PreferencesWindow		Недавние документы:
-Recent folders	BeMenu		Недавние папки
-Sort running applications	PreferencesWindow		Сортировать запущенные приложения
-Change time…	TimeView		Настроить время…
 <Be folder is empty>	BeMenu		<Папка Be пуста>
-Window	PreferencesWindow		Окно
-Menu	PreferencesWindow		Меню
-Show seconds	PreferencesWindow		Отображать секунды
+About Haiku…	BeMenu		О системе Haiku…
 Always on top	PreferencesWindow		Всегда сверху
-Show all	WindowMenu		Показать все
-No windows	WindowMenu		Нет окон
-Power off	BeMenu		Выключить компьютер
+Applications	PreferencesWindow		Приложения
 Auto-raise	PreferencesWindow		Всплывать автоматически
-Hide time	TimeView		Скрыть часы
-Recent folders:	PreferencesWindow		Недавние папки:
-Deskbar preferences…	BeMenu		Настроить Deskbar…
-Show application expander	PreferencesWindow		Отображать список окон приложений
+Change time…	TimeView		Настроить часы…
+Clock	PreferencesWindow		Часы
 Close all	WindowMenu		Закрыть все
 Deskbar preferences	PreferencesWindow		Настройки Deskbar
-Mount	BeMenu		Подключить
-Recent applications:	PreferencesWindow		Недавние приложения:
-Tracker always first	PreferencesWindow		Tracker всегда первый
-About Haiku…	BeMenu		О системе Haiku…
-Show calendar…	TimeView		Показать календарь…
-Restart system	BeMenu		Перезагрузить компьютер
-Find…	BeMenu		Найти…
-Restart Tracker	BeMenu		Перезапустить Tracker
-Show Time	Tray		Отображать время
+Deskbar preferences…	BeMenu		Настроить Deskbar…
+Edit menu…	PreferencesWindow		Изменить меню…
 Expand new applications	PreferencesWindow		Раскрывать список окон при запуске
-Clock	PreferencesWindow		Часы
-Recent documents	BeMenu		Недавние документы
+Find…	BeMenu		Найти…
 Hide all	WindowMenu		Скрыть все
-Shutdown…	BeMenu		Завершение работы…
+Hide time	TimeView		Скрыть часы
+Menu	PreferencesWindow		Меню
+Mount	BeMenu		Подключить
+No windows	WindowMenu		Нет окон
+Power off	BeMenu		Выключить компьютер
 Quit application	WindowMenu		Закрыть приложение
+Recent applications	BeMenu		Недавние приложения
+Recent applications:	PreferencesWindow		Недавние приложения:
+Recent documents	BeMenu		Недавние документы
+Recent documents:	PreferencesWindow		Недавние документы:
+Recent folders	BeMenu		Недавние папки
+Recent folders:	PreferencesWindow		Недавние папки:
+Restart Tracker	BeMenu		Перезапустить Tracker
+Restart system	BeMenu		Перезагрузить компьютер
+Show Time	Tray		Отображать время
+Show all	WindowMenu		Показать все
+Show application expander	PreferencesWindow		Отображать список окон приложений
+Show calendar…	TimeView		Показать календарь…
 Show replicants	BeMenu		Отображать репликанты
+Show seconds	PreferencesWindow		Отображать секунды
+Shutdown…	BeMenu		Завершение работы…
+Sort running applications	PreferencesWindow		Сортировать запущенные приложения
+Tracker always first	PreferencesWindow		Tracker всегда первый
+Window	PreferencesWindow		Окно

@@ -1,48 +1,47 @@
-1	russian	x-vnd.Haiku-Devices	1250375801
-Order by:	DevicesView		Сортировать по:
-ACPI controller	Device		ACPI контроллер
-Memory controller	Device		Контроллер памяти
-Docking station	Device		Кредл
-Computer	Device		Компьютер
-Detailed	DevicesView		Подробности
-Properties	PropertyList		Свойства
-Category	DevicesView		категориям
-Quit	DevicesView		Выход
-Device paths	Device		Путь к устройству
-Manufacturer\t\t\t: 	Device		Производитель\t\t\t: 
-Processor	Device		Процессор
+1	russian	x-vnd.Haiku-Devices	2430293984
 ACPI Information	DeviceACPI		Информация ACPI
-Device Name\t\t\t\t: 	Device		Название устройства\t\t\t\t: 
-Generic system peripheral	Device		Общая системная периферия
-Display controller	Device		Контроллер дисплея
-Mass storage controller	Device		Контроллер накопителей
+ACPI controller	Device		ACPI контроллер
 About Devices…	DevicesView		О программе…
-Input device controller	Device		Контроллер устройств ввода
-Device paths\t: 	Device		Путь к устройству\t: 
-Network controller	Device		Сетевой контроллер
-Devices\n\twritten by Pieter Panman\n\n\tBased on listdev by Jérôme Duval\n\tand the previous Devices preference\n\tby Jérôme Duval and Sikosis\n\tCopyright 2009, Haiku, Inc.\n	DevicesApplication		Devices\n\tразрабал Pieter Panman\n\n\tОсновано на listdev от Jérôme Duval\n\tи на предыдущей версии Devices\n\t разработанной Jérôme Duval и Sikosis\n\tАвторские права 2009, Haiku, Inc.\n
-Driver used	Device		Используемый драйвер
-Driver used\t\t\t\t: 	Device		Используется драйвер\t\t\t\t: 
-Bus	DevicesView		Шина
-Communication controller	Device		Контроллер связи
 Basic information	DevicesView		Основная информация
-PCI Information	DevicePCI		PCI информация 
-Manufacturer:	Device		Производитель:
-Multimedia controller	Device		Мультимедийный контроллер
-Device name:	Device		Название устройства:
-Report compatibility	DevicesView		Отчет о совместимости
-about	DevicesApplication		о программе
-Signal processing controller	Device		Контроллер обработки сигналов
-Serial bus controller	Device		Контроллер последовательной шины
-Wireless controller	Device		Беспроводной контроллер
-Device name	Device		Название устройства
-Manufacturer	Device		Производитель 
-Intelligent controller	Device		Интеллектуальный контроллер
-Satellite communications controller	Device		Контроллер спутниковой связи
 Bridge	Device		Мост
-Refresh devices	DevicesView		Обновить список устройств
+Bus	DevicesView		Шина
+Category	DevicesView		категориям
+Communication controller	Device		Контроллер связи
+Computer	Device		Компьютер
 Connection	DevicesView		подключению
-Generate system information	DevicesView		Сгенерировать системную информацию
-Encryption controller	Device		Контроллер шифрования
-Unclassified device	Device		Неклассифицированные устройства
+Detailed	DevicesView		Подробности
+Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Имя устройства\t\t\t\t: %Name%\nПроизводитель\t\t\t: %Manufacturer%\nИспользуемый драйвер\t\t\t\t: %DriverUsed%\nПути устройства\t: %DevicePaths%
+Device name	Device		Название устройства
+Device name:	Device		Название устройства:
+Device paths	Device		Путь к устройству
+Devices	DevicesApplication		Устройства
 Devices	DevicesView		Устройства
+Devices\n\twritten by Pieter Panman\n\n\tBased on listdev by Jérôme Duval\n\tand the previous Devices preference\n\tby Jérôme Duval and Sikosis\n\tCopyright 2009, Haiku, Inc.\n	DevicesApplication		Devices\n\tразработал Pieter Panman\n\n\tОсновано на listdev от Jérôme Duval\n\tи на предыдущей версии Devices\n\tразработанной Jérôme Duval и Sikosis\n\tАвторские права 2009, Haiku, Inc.\n
+Display controller	Device		Контроллер дисплея
+Docking station	Device		Кредл
+Driver used	Device		Используемый драйвер
+Encryption controller	Device		Контроллер шифрования
+Generate system information	DevicesView		Сгенерировать системную информацию
+Generic system peripheral	Device		Общая системная периферия
+Input device controller	Device		Контроллер устройств ввода
+Intelligent controller	Device		Интеллектуальный контроллер
+Manufacturer	Device		Производитель 
+Manufacturer:	Device		Производитель:
+Mass storage controller	Device		Контроллер накопителей
+Memory controller	Device		Контроллер памяти
+Multimedia controller	Device		Мультимедийный контроллер
+Network controller	Device		Сетевой контроллер
+None	Device		Отсутствует
+OK	DevicesApplication		ОК
+Order by:	DevicesView		Сортировать по:
+PCI Information	DevicePCI		PCI информация 
+Processor	Device		Процессор
+Properties	PropertyList		Свойства
+Quit	DevicesView		Выход
+Refresh devices	DevicesView		Обновить список устройств
+Report compatibility	DevicesView		Отчет о совместимости
+Satellite communications controller	Device		Контроллер спутниковой связи
+Serial bus controller	Device		Контроллер последовательной шины
+Signal processing controller	Device		Контроллер обработки сигналов
+Unclassified device	Device		Неклассифицированные устройства
+Wireless controller	Device		Беспроводной контроллер

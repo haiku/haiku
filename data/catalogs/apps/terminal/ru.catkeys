@@ -1,103 +1,103 @@
-1	russian	x-vnd.Haiku-Terminal	4136448166
-Not found.	Terminal TermWindow		Не найдено.
-Switch Terminals	Terminal TermWindow		Переключить терминалы
-Change directory	Terminal TermView		Сменить каталог
-OK	Terminal TermWindow		ОК
-New Terminal	Terminal TermWindow		Новый терминал
-Terminal couldn't start the shell. Sorry.	Terminal TermApp		Терминал не смог запустить оболочку. Простите.
-Text size	Terminal TermWindow		Размер шрифта
-Match case	Terminal FindWindow		Учитывать регистр
-Quit	Terminal TermWindow		Выход
-Use default shell	Terminal Shell		Использовать оболочку по умолчанию
-Select all	Terminal TermWindow		Выделить всё
-Terminal	Terminal TermWindow		Терминал
-Save to file…	Terminal PrefWindow		Сохранить в файл…
-OK	Terminal PrefWindow		ОК
-Font:	Terminal AppearancePrefView		Шрифт:
-Copy here	Terminal TermView		Копировать сюда
-Copy	Terminal TermWindow		Копировать
-Print cancelled.	Terminal TermWindow		Печать отменена
-Increase	Terminal TermWindow		Увеличить
-Settings	Terminal TermWindow		Настройки
-Window size	Terminal TermWindow		Размер окна
-Terminal settings	Terminal PrefWindow		Настройки терминала
-Find	Terminal FindWindow		Найти
-Appearance	Terminal PrefWindow		Внешний вид
-Use selection	Terminal FindWindow		Использовать выделенный текст
-Size:	Terminal AppearancePrefView		Размер:
-Cannot execute \"%command\":\n\t%error	Terminal Shell		Невозможно выполнить \"%command\":\n\t%error
-Full screen	Terminal TermWindow		На весь экран
-Page setup…	Terminal TermWindow		Настройка печати…
-OK	Terminal TermView		ОК
-Insert path	Terminal TermView		Вставить путь
-Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Терминал\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nИспользование: %s [OPTION] [SHELL]\n
-No search string was entered.	Terminal TermWindow		Не введена строка поиска
-Don't save	Terminal PrefWindow		Не сохранять
-Match word	Terminal FindWindow		Только слово целиком
-Nothing is selected.	Terminal TermWindow		Ничего не выделено
-Text not found.	Terminal TermWindow		Текст не найден
-Find…	Terminal TermWindow		Найти…
-Move here	Terminal TermView		Переместить сюда
-Error!	Terminal getString		Ошибка!
-New tab	Terminal TermWindow		Новая вкладка
-Decrease	Terminal TermWindow		Уменьшить
-Create link here	Terminal TermView		Создать ссылку здесь
-Clear all	Terminal TermWindow		Очистить всё
-Text encoding	Terminal TermWindow		Кодировка
-size	Terminal TermView		размер
-Save as default	Terminal TermWindow		Сохранить
-Settings…	Terminal TermWindow		Настройки…
-Abort	Terminal Shell		Отменить
-Color:	Terminal AppearancePrefView		Цвет:
-Print	Terminal TermWindow		Печать
-Use text:	Terminal FindWindow		Использовать текст:
-Cancel	Terminal TermWindow		Отмена
-OK	Terminal TermApp		ОК
-Find failed	Terminal TermWindow		Строка не найдена
-Search forward	Terminal FindWindow		Искать сверху вниз
-Find previous	Terminal TermWindow		Найти ранее
-About Terminal…	Terminal TermWindow		О программе…
-Find next	Terminal TermWindow		Найти далее
-Close active tab	Terminal TermWindow		Закрыть активную вкладку
-Paste	Terminal TermWindow		Вставить
-Save changes to this settings panel?	Terminal PrefWindow		Сохранить изменения в панеле настройки?
-Cancel	Terminal PrefWindow		Отмена
-Save	Terminal PrefWindow		Сохранить
-Cancel	Terminal TermView		Отмена
+1	russian	x-vnd.Haiku-Terminal	2078065974
 -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		 -h, --help вывести этот текст\n -t, --title установить заголовок окна\n -f, --fullscreen запустить в полном экране\n
-Color schema:	Terminal AppearancePrefView		Цветовая схема:
-Terminal\n\nwritten by Kazuho Okui and Takashi Murai\nupdated by Kian Duffy and others\n\nCopyright ©2003-2009, Haiku.\n	Terminal TermView		Terminal\n\nразработал Kazuho Okui и Takashi Murai\nобновлено Kian Duffy и многими другими\n\nCopyright ©2003-2009, Haiku.\n
-Confirm exit if active programs exist	Terminal AppearancePrefView		Подтверждать выход если запущены процессы
-Edit	Terminal TermWindow		Изменить
-Shell 	Terminal TermWindow		Консоль 
-The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Этот шаблон описывает заголовок текущей вкладки.\nВозможно использовать следующие переменные:\n
-Close tab	Terminal TermWindow		Закрыть вкладку
-Window title:	Terminal AppearancePrefView		Заголовок окна
-Really close?	Terminal TermWindow		Действительно закрыть?
-Window title:	Terminal TermWindow		Заголовок окна:
-Tab title:	Terminal AppearancePrefView		Заголовок вкладки:
-The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Этот шаблон описывает заголовки окна.\nВозможно использовать следующие переменные:\n
-Window title…	Terminal TermWindow		Заголовок окна…
-Set window title	Terminal TermWindow		Установить заголовок окна
-Close other tabs	Terminal TermWindow		Закрыть остальные вкладки
-The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Этот шаблон описывает заголовки вкладок.\nВозможно использовать следующие переменные:\n
+Abort	Terminal Shell		Отменить
+About Terminal…	Terminal TermWindow		О программе…
+Appearance	Terminal PrefWindow		Внешний вид
+Background	Terminal AppearancePrefView		Фон
+Black on White	Terminal colors schema		Черный на белом
+Cancel	Terminal PrefWindow		Отмена
+Cancel	Terminal SetTitleWindow		Отмена
+Cancel	Terminal TermView		Отмена
+Cancel	Terminal TermWindow		Отмена
+Cannot execute \"%command\":\n\t%error	Terminal Shell		Невозможно выполнить \"%command\":\n\t%error
+Change directory	Terminal TermView		Сменить каталог
+Clear all	Terminal TermWindow		Очистить всё
 Close	Terminal TermWindow		Закрыть
+Close active tab	Terminal TermWindow		Закрыть активную вкладку
+Close other tabs	Terminal TermWindow		Закрыть остальные вкладки
+Close tab	Terminal TermWindow		Закрыть вкладку
 Close window	Terminal TermWindow		Закрыть окно
-Set tab title	Terminal TermWindow		Переименовть вкладку
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Этот шаблон описывает заголовок окна.\nВозможно использовать следующие переменные:\n
+Color schema:	Terminal AppearancePrefView		Цветовая схема:
+Color:	Terminal AppearancePrefView		Цвет:
+Confirm exit if active programs exist	Terminal AppearancePrefView		Подтверждать выход если запущены процессы
+Copy	Terminal TermWindow		Копировать
+Copy here	Terminal TermView		Копировать сюда
+Create link here	Terminal TermView		Создать ссылку здесь
+Custom	Terminal colors schema		Пользовательские
+Decrease	Terminal TermWindow		Уменьшить
+Don't save	Terminal PrefWindow		Не сохранять
+Edit	Terminal TermWindow		Изменить
 Edit tab title…	Terminal TermWindow		Переименовать вкладку…
+Error!	Terminal getString		Ошибка!
+Find	Terminal FindWindow		Найти
+Find failed	Terminal TermWindow		Строка не найдена
+Find next	Terminal TermWindow		Найти далее
+Find previous	Terminal TermWindow		Найти ранее
+Find…	Terminal TermWindow		Найти…
+Font:	Terminal AppearancePrefView		Шрифт:
+Full screen	Terminal TermWindow		На весь экран
+Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Терминал\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nИспользование: %s [OPTION] [SHELL]\n
+Increase	Terminal TermWindow		Увеличить
+Insert path	Terminal TermView		Вставить путь
+Match case	Terminal FindWindow		Учитывать регистр
+Match word	Terminal FindWindow		Только слово целиком
+Move here	Terminal TermView		Переместить сюда
+New Terminal	Terminal TermWindow		Новый терминал
+New tab	Terminal TermWindow		Новая вкладка
+No search string was entered.	Terminal TermWindow		Не введена строка поиска
+Not found.	Terminal TermWindow		Текст не найден
+Nothing is selected.	Terminal TermWindow		Ничего не выделено
+OK	Terminal PrefWindow		ОК
+OK	Terminal SetTitleWindow		ОК
+OK	Terminal TermApp		ОК
+OK	Terminal TermView		ОК
+OK	Terminal TermWindow		ОК
+Page setup…	Terminal TermWindow		Настройка печати…
+Paste	Terminal TermWindow		Вставить
+Print	Terminal TermWindow		Печать
+Print cancelled.	Terminal TermWindow		Печать отменена
+Quit	Terminal TermWindow		Выход
+Really close?	Terminal TermWindow		Действительно закрыть?
+Save	Terminal PrefWindow		Сохранить
+Save as default	Terminal TermWindow		Сохранить
+Save changes to this settings panel?	Terminal PrefWindow		Сохранить изменения в панеле настройки?
+Save to file…	Terminal PrefWindow		Сохранить в файл…
+Search forward	Terminal FindWindow		Искать сверху вниз
+Select all	Terminal TermWindow		Выделить всё
+Selected background	Terminal AppearancePrefView		Выделенный фон
+Selected text	Terminal AppearancePrefView		Выделенный текст
+Set tab title	Terminal TermWindow		Переименовть вкладку
+Set window title	Terminal TermWindow		Установить заголовок окна
+Settings	Terminal TermWindow		Настройки
+Settings…	Terminal TermWindow		Настройки…
+Shell 	Terminal TermWindow		Консоль 
+Size:	Terminal AppearancePrefView		Размер:
+Switch Terminals	Terminal TermWindow		Переключить терминалы
+Tab title:	Terminal AppearancePrefView		Заголовок вкладки:
 Tab title:	Terminal TermWindow		Заголовок вкладки
+Terminal	Terminal TermWindow		Терминал
+Terminal couldn't start the shell. Sorry.	Terminal TermApp		Терминал не смог запустить оболочку. Простите.
+Terminal settings	Terminal PrefWindow		Настройки терминала
+Terminal\n\nwritten by Kazuho Okui and Takashi Murai\nupdated by Kian Duffy and others\n\nCopyright ©2003-2009, Haiku.\n	Terminal TermView		Terminal\n\nразработал Kazuho Okui и Takashi Murai\nобновлено Kian Duffy и многими другими\n\nCopyright ©2003-2009, Haiku.\n
+Text	Terminal AppearancePrefView		Текст
+Text encoding	Terminal TermWindow		Кодировка
+Text not found.	Terminal TermWindow		Текст не найден
+Text size	Terminal TermWindow		Размер шрифта
+The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Следующие процессы все еще работают:\n\n\t%1\n\nЕсли вы закроете Терминал, то эти процессы будут уничтожены.
+The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Этот шаблон описывает заголовок текущей вкладки.\nВозможно использовать следующие переменные:\n
+The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Этот шаблон описывает заголовки вкладок.\nВозможно использовать следующие переменные:\n
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Этот шаблон описывает заголовок окна.\nВозможно использовать следующие переменные:\n
+The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Этот шаблон описывает заголовки окна.\nВозможно использовать следующие переменные:\n
+The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Процесс \"%1\" все еще работает.\nЕсли вы закроете Терминал, то этот процесс будет уничтожен.
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Процесс \"%1\" все еще работает.\nЕсли вы закроете вкладку, то этот процесс будет уничтожен.
 
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Процесс \"%1\" все еще работает.\nЕсли вы закроете Терминал, то этот процесс будет уничтожен.
-The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Следующие процессы все еще работают:\n\n\t%1\n\nЕсли вы закроете Терминал, то эти процессы будут уничтожены.
-Custom	Terminal colors schema		Пользовательские
-Black on White	Terminal colors schema		Черный на белом
-Cancel	Terminal SetTitleWindow		Отмена
-Selected text	Terminal AppearancePrefView		Выделенный текст
-OK	Terminal SetTitleWindow		ОК
-Background	Terminal AppearancePrefView		Фон
-White on Black	Terminal colors schema		Черный на белом
-Selected background	Terminal AppearancePrefView		Выделенный фон
-Text	Terminal AppearancePrefView		Текст
 Use default	Terminal SetTitleWindow		По умолчанию
+Use default shell	Terminal Shell		Использовать оболочку по умолчанию
+Use selection	Terminal FindWindow		Использовать выделенный текст
+Use text:	Terminal FindWindow		Использовать текст:
+White on Black	Terminal colors schema		Черный на белом
+Window size	Terminal TermWindow		Размер окна
+Window title:	Terminal AppearancePrefView		Заголовок окна
+Window title:	Terminal TermWindow		Заголовок окна:
+Window title…	Terminal TermWindow		Заголовок окна…
+size	Terminal TermView		размер

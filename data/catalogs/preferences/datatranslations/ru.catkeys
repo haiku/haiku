@@ -1,26 +1,23 @@
-1	russian	x-vnd.Haiku-DataTranslations	2482065199
-DataTranslations	DataTranslations		Перевод данных
-Info…	DataTranslations		Информация…
-about	DataTranslations		подробнее
-Could not install 	DataTranslations		Невозможно установить 
+1	russian	x-vnd.Haiku-DataTranslations	3706134146
+About	DataTranslations		подробнее
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Файл с именем '%name' уже существует в папке Translators! Заменить существующий транслятор?
 Cancel	DataTranslations		Отмена
-Name:	DataTranslations		Имя:
-Panel Info	DataTranslations		Панель информации
-The item '	DataTranslations		Файл '
-%name' does not appear to be a Translator and will not be installed.	DataTranslations		%name' не похож на транслятор и не будет установлен.
-DataTranslations - Note	DataTranslations		Перевод данных - Заметка
-Name: %name \nVersion: 	DataTranslations		Имя: %name \nВерсия: 
-Overwrite	DataTranslations		Перезаписать
-Info:	DataTranslations		Информация:
-info	DataTranslations		информация
-%name already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		%name уже существует в папке Translators! Перезаписать текущий транслятор?
-Path:	DataTranslations		Путь:
-The new translator has been installed successfully.	DataTranslations		Новый транслятор был успешно установлен.
-\nInfo: %info\n\nPath:\n	DataTranslations		\nИнформация: %info\n\nПуть:\n
+Could not install %s:\n%s	DataTranslations		Невозможно установить %s:\n%s
+DataTranslations	DataTranslations		Перевод данных
 DataTranslations - Error	DataTranslations		Перевод данных - ошибка
-OK	DataTranslations		ОК
-An item named '	DataTranslations		Файл '
-Icon	DataTranslations		Значок
+DataTranslations - Note	DataTranslations		Перевод данных - Заметка
 DataTranslations\n\twritten by Oliver Siebenmarck and others\n\tCopyright 2002-2010, Haiku Inc. All rights reserved.\n	DataTranslations		DataTranslations\n\tnразработал Oliver Siebenmarck и дригие\n\tCopyright 2002-2010, Haiku Inc. Все права защищены.\n
-Version:	DataTranslations		Версия:
+Icon	DataTranslations		Значок
+Info	DataTranslations		Информация
+Info:	DataTranslations		Информация:
+Info…	DataTranslations		Информация…
+Name:	DataTranslations		Имя:
+Name:\t%s \nVersion:\t%ld.%ld.%ld\nInfo:\t%s\n\nPath:\n%s\n	DataTranslations		Имя:\t%s \nВерсия:\t%ld.%ld.%ld\nИнформауия:\t%s\n\nПуть:\n%s\n
+OK	DataTranslations		ОК
+Overwrite	DataTranslations		Перезаписать
+Panel Info	DataTranslations		Панель информации
+Path:	DataTranslations		Путь:
+The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Похоже, что файл '%name' не является транслятором и не будет установлен.
+The new translator has been installed successfully.	DataTranslations		Новый транслятор был успешно установлен.
 Translation Settings\n\nUse this control panel to set values that various\ntranslators use when no other settings are specified\nin the application.	DataTranslations		Настройки трансляции\n\nИспользуйте эту панель настроек, чтобы установить \nзначения, которые различные\nтрансляторы используют когда никакие другие настройки не \nуказаны приложением.
+Version:	DataTranslations		Версия:

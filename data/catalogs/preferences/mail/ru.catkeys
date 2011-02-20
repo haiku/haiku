@@ -1,42 +1,42 @@
 1	russian	x-vnd.Haiku-Mail	3023422579
-Mail checking	Config Window		Проверка почты
-Settings	Config Window		Настройки
-Only when dial-up is connected	Config Window		Только при наличии связи
-While sending and receiving	Config Window		Во время отсылки и получения
-days	Config Window		дней
-Start mail services on startup	Config Window		Запускать почтовый сервис при старте
 Account name:	Config Views		Имя аккаунта:
-Revert	Config Window		Вернуть
-Accounts	Config Window		Аккаунты
-Remove	Config Window		Удалить
-Miscellaneous	Config Window		Разное
-Show connection status window:	Config Window		Отображать окно статуса соединения:
-While sending	Config Window		Во время отправки
-Schedule outgoing mail when dial-up is disconnected	Config Window		Заносить в список ожидания исходящую почту пока отсутствует подключение
-hours	Config Window		часов
-Add	Config Window		Добавить
-\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nНевозможно получить общие настройки.\n\nВозникла ошибка при получении общих настроек:\n%s\n
-Real name:	Config Views		Настоящее имя:
-Return address:	Config Views		Обратный адрес:
-Edit mailbox menu…	Config Window		Изменить меню…
-Check every	Config Window		Проверять каждые
-never	Config Window		никогда
 Account settings	Config Views		Настройки аккаунта
-minutes	Config Window		минут
-Error retrieving general settings: %s\n	Config Window		Возникла ошибка при получении общих настроек: %s\n
-Apply	Config Window		Применить
-Always	Config Window		Всегда
-\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nДля создания аккаунта нажмите кнопку Добавить.\n\nДля удаления выберите нужный аккаунт и нажмите кнопку Удалить.\n\nИзменить настройки аккаунта можно просто выбрав нужный из списка.
-OK	Config Window		ОК
-Beta	Config Window		Бета
+Accounts	Config Window		Аккаунты
+Add	Config Window		Добавить
 Alpha	Config Window		Альфа
-Golden master	Config Window		Золотая
+Always	Config Window		Всегда
+Apply	Config Window		Применить
+Beta	Config Window		Бета
+Check every	Config Window		Проверять каждые
+Development	Config Window		В разработке
+E-mail	Config Window		E-mail
+Edit mailbox menu…	Config Window		Изменить меню…
+Error	Config Window		Ошибка
+Error retrieving general settings: %s\n	Config Window		Возникла ошибка при получении общих настроек: %s\n
 Final	Config Window		Финальная
 Gamma	Config Window		Гамма
-E-mail	Config Window		E-mail
+Golden master	Config Window		Золотая
 Mail Daemon Replacement\n\nby Haiku, Inc. All rights reserved.\n\nVersion %ld.%ld.%ld %s\n\nSee LICENSE file included in the installation package for more information.\n\n\n\nYou can contact us at:\n%s\n\nPlease submit bug reports using the %s\n\nProject homepage at:\n%s	Config Window		Mail Daemon Replacement\n\nразработан Haiku, Inc. Все права защищены.\n\nВерсия %ld.%ld.%ld %s\n\nДля более подробной информации смотрите файл LICENSE, находящийся в установочном архиве.\n\n\n\nВы можете связаться с нами:\n%s\n\nПожалуйста, отправляйте отчеты об ошибках используя %s\n\nСтраница проекта:\n%s
-Development	Config Window		В разработке
-Error	Config Window		Ошибка
+Mail checking	Config Window		Проверка почты
+Miscellaneous	Config Window		Разное
+OK	Config Window		ОК
+Only when dial-up is connected	Config Window		Только при наличии связи
+Real name:	Config Views		Настоящее имя:
+Remove	Config Window		Удалить
+Return address:	Config Views		Обратный адрес:
+Revert	Config Window		Вернуть
+Schedule outgoing mail when dial-up is disconnected	Config Window		Заносить в список ожидания исходящую почту пока отсутствует подключение
+Settings	Config Window		Настройки
+Show connection status window:	Config Window		Отображать окно статуса соединения:
+Start mail services on startup	Config Window		Запускать почтовый сервис при старте
+While sending	Config Window		во время отправки
+While sending and receiving	Config Window		во время отсылки и получения
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nНевозможно получить общие настройки.\n\nВозникла ошибка при получении общих настроек:\n%s\n
+\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nДля создания аккаунта нажмите кнопку Добавить.\n\nДля удаления выберите нужный аккаунт и нажмите кнопку Удалить.\n\nИзменить настройки аккаунта можно просто выбрав нужный из списка.
+days	Config Window		дней
+hours	Config Window		часов
+minutes	Config Window		минут
+never	Config Window		не проверять
 · E-mail filters	Config Window		   · Почтовые фильтры
-· Outgoing	Config Window		   · Исходящие
 · Incoming	Config Window		   · Входящие
+· Outgoing	Config Window		   · Исходящие

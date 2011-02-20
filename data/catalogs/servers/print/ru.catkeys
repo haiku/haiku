@@ -1,26 +1,26 @@
 1	russian	x-vnd.Be-PSRV	2998115175
-Undefined	ConfigWindow		не определены
-Cancel	PrintServerApp		Отмена
-Page setup:	ConfigWindow		Настройки печати:
-OK	ConfigWindow		ОК
-Cancel	ConfigWindow		Отмена
-Yes	PrintServerApp		Да
-Would you like to set one up now?	PrintServerApp		Хотите настроить принтер сейчас?
-Portrait	ConfigWindow		Портрет
+A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Принтер с таким же именем уже существует, но его нельзя использовать! Заменить?
+A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Принтер с таким же именем уже существует, но его драйвер не найден! Заменить?
 All pages	ConfigWindow		Все страницы
-There is no default printer set up.	PrintServerApp		Не выбран принтер по умолчанию.
-Printer:	ConfigWindow		Принтер:
-Select a printer	ConfigWindow		Выберите принтер
-No	PrintServerApp		Нет
+All pages, %1 copies	ConfigWindow		Все страницы, копий: %1
+Cancel	ConfigWindow		Отмена
+Cancel	PrintServerApp		Отмена
 Landscape	ConfigWindow		Альбом
-There are no printers set up.	PrintServerApp		Нет настроенных принтеров.
+No	PrintServerApp		Нет
+OK	ConfigWindow		ОК
 OK	PrintServerApp		ОК
-Print setup	ConfigWindow		Настройка печати
-Would you like to make @ the default printer?	PrintServerApp		Вы хотите сделать @ принтером по умолчанию?
-Page setup	ConfigWindow		Настройка печати
-Paper setup:	ConfigWindow		Параметры бумаги:
 Page %1 to %2	ConfigWindow		Страница %1 из %2
 Page %1 to %2, %3 copies	ConfigWindow		Страница %1 из %2, копий: %3
-All pages, %1 copies	ConfigWindow		Все страницы, копий: %1
-A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Принтер с таким же именем уже существует, но его драйвер не найден! Заменить?
-A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Принтер с таким же именем уже существует, но его нельзя использовать! Заменить?
+Page setup	ConfigWindow		Настройка печати
+Page setup:	ConfigWindow		Настройки печати:
+Paper setup:	ConfigWindow		Параметры бумаги:
+Portrait	ConfigWindow		Портрет
+Print setup	ConfigWindow		Настройка печати
+Printer:	ConfigWindow		Принтер:
+Select a printer	ConfigWindow		Выберите принтер
+There are no printers set up.	PrintServerApp		Нет настроенных принтеров.
+There is no default printer set up.	PrintServerApp		Не выбран принтер по умолчанию.
+Undefined	ConfigWindow		не определены
+Would you like to make @ the default printer?	PrintServerApp		Вы хотите сделать @ принтером по умолчанию?
+Would you like to set one up now?	PrintServerApp		Хотите настроить принтер сейчас?
+Yes	PrintServerApp		Да

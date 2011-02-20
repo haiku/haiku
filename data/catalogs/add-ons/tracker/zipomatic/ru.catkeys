@@ -1,18 +1,18 @@
 1	russian	x-vnd.haiku.zip-o-matic	274748138
-1 file added.	file:ZipOMaticWindow.cpp		1 файл добавлен.
-Stop	file:ZipOMaticWindow.cpp		Остановить
-Creating archive: %s	file:ZipOMaticWindow.cpp		Создание архива: %s
-Continue	file:ZipOMaticWindow.cpp		Продолжить
-Preparing to archive	file:ZipperThread.cpp		Подготовка к архивации
-Filename: %s	file:ZipOMaticWindow.cpp		Имя файла: %s
-Let them continue	file:ZipOMatic.cpp		Позволить им продолжить
-Do you want to stop them?	file:ZipOMatic.cpp		Вы хотите остановить их?
-Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Вы уверены, что хотите остановить создание этого архива?
 %ld files added.	file:ZipOMaticWindow.cpp		Добавлено файлов: %ld
-Stopped	file:ZipOMaticWindow.cpp		Остановлено
+1 file added.	file:ZipOMaticWindow.cpp		1 файл добавлен.
 Archive	file:ZipperThread.cpp		Архив
+Archive created OK	file:ZipOMaticWindow.cpp		Архив успешно создан
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Вы уверены, что хотите остановить создание этого архива?
+Continue	file:ZipOMaticWindow.cpp		Продолжить
+Creating archive: %s	file:ZipOMaticWindow.cpp		Создание архива: %s
+Do you want to stop them?	file:ZipOMatic.cpp		Вы хотите остановить их?
 Drop files to zip.	file:ZipOMaticWindow.cpp		Переместите файлы для создания zip-архива.
 Error creating archive	file:ZipOMaticWindow.cpp		Ошибка при создании архива
-You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		У Вас запущено %ld копий Zip-O-Matic.\n\n
-Archive created OK	file:ZipOMaticWindow.cpp		Архив успешно создан
+Filename: %s	file:ZipOMaticWindow.cpp		Имя файла: %s
+Let them continue	file:ZipOMatic.cpp		Позволить им продолжить
+Preparing to archive	file:ZipperThread.cpp		Подготовка к архивации
+Stop	file:ZipOMaticWindow.cpp		Остановить
 Stop them	file:ZipOMatic.cpp		Остановить их
+Stopped	file:ZipOMaticWindow.cpp		Остановлено
+You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		У Вас запущено %ld копий Zip-O-Matic.\n\n

@@ -1,21 +1,21 @@
 1	russian	x-vnd.Haiku-Network	2440177840
-Gateway:	EthernetSettingsView		Шлюз:
-Netmask:	EthernetSettingsView		Маска:
-DHCP	EthernetSettingsView		DHCP
-DNS #2:	EthernetSettingsView		DNS #2:
-Apply	EthernetSettingsView		Применить
-DNS #1:	EthernetSettingsView		DNS #1:
-Network	NetworkWindow		Сеть
-Adapter:	EthernetSettingsView		Адаптер:
-IP address:	EthernetSettingsView		IP-адрес:
-Revert	EthernetSettingsView		Вернуть
-Mode:	EthernetSettingsView		Режим:
-The net_server needs to run for the auto configuration!	EthernetSettingsView		net_server должен быть запущен для автонастройки!
-Auto-configuring failed: 	EthernetSettingsView		Не удалось выполнить автонастройку: 
-Static	EthernetSettingsView		Статический IP-адрес
-OK	EthernetSettingsView		ОК
-Domain:	EthernetSettingsView		Домен:
-Disabled	EthernetSettingsView		Отключен
-Choose automatically	EthernetSettingsView		Выбрать автоматически
 <no wireless networks found>	EthernetSettingsView		<беспроводные сети не найдены>
+Adapter:	EthernetSettingsView		Адаптер:
+Apply	EthernetSettingsView		Применить
+Auto-configuring failed: 	EthernetSettingsView		Не удалось выполнить автонастройку: 
+Choose automatically	EthernetSettingsView		Выбрать автоматически
+DHCP	EthernetSettingsView		DHCP
+DNS #1:	EthernetSettingsView		DNS #1:
+DNS #2:	EthernetSettingsView		DNS #2:
+Disabled	EthernetSettingsView		Отключен
+Domain:	EthernetSettingsView		Домен:
+Gateway:	EthernetSettingsView		Шлюз:
+IP address:	EthernetSettingsView		IP-адрес:
+Mode:	EthernetSettingsView		Режим:
+Netmask:	EthernetSettingsView		Маска:
+Network	NetworkWindow		Сеть
 Network:	EthernetSettingsView		Сеть:
+OK	EthernetSettingsView		ОК
+Revert	EthernetSettingsView		Вернуть
+Static	EthernetSettingsView		Статический IP-адрес
+The net_server needs to run for the auto configuration!	EthernetSettingsView		net_server должен быть запущен для автонастройки!

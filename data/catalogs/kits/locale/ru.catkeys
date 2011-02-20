@@ -1,19 +1,19 @@
 1	russian	system	2686335505
+%.2f TiB	StringForSize		%.2f Тбайт
 %3.2f GiB	StringForSize		%3.2f Гбайт
 %3.2f KiB	StringForSize		%3.2f Кбайт
-%d bytes	StringForSize		%d байт
-%.2f TiB	StringForSize		%.2f Тбайт
 %3.2f MiB	StringForSize		%3.2f Мбайт
-Green:	ColorControl		Зеленый:
-Red:	ColorControl		Красный:
+%d bytes	StringForSize		%d байт
+About…	AboutWindow		О программе…
 Blue:	ColorControl		Синий:
 Close	AboutWindow		Закрыть
-Written by:	AboutWindow		Разработали:
-About…	AboutWindow		О программе…
+Copy	TextView		Копировать
 Copyright © %years% Haiku, Inc.	AboutWindow		Все права защищены © %years% Haiku, Inc.
 Cut	TextView		Вырезать
-Copy	TextView		Копировать
+Green:	ColorControl		Зеленый:
 Paste	TextView		Вставить
+Red:	ColorControl		Красный:
 Redo	TextView		Повторить
 Select All	TextView		Выделить все
 Undo	TextView		Отменить
+Written by:	AboutWindow		Разработали:

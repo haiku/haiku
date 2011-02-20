@@ -1,80 +1,80 @@
 1	russian	x-vnd.Haiku-StyledEdit	3614078026
-OK	LoadAlert		ОК
 ???	LoadAlert		???
-Left	Menus		По левому краю
-Search backwards	FindandReplaceWindow		Искать снизу вверх
-Size	Menus		Размер
-Save	QuitAlert		Сохранить
-Replace same	Menus		Заменить совпадение
+Align	Menus		Выровнять
+Black	Menus		Черный
+Blue	Menus		Синий
+Bold	Menus		Жирный
 Can't Undo	Menus		Невозможно отменить
-Save	Menus		Сохранить
-Replace with:	FindandReplaceWindow		Заменить на:
+Cancel	FindandReplaceWindow		Отмена
+Cancel	QuitAlert		Отмена
+Cancel	RevertToSavedAlert		Отмена
+Cancel	SaveAlert		Отмена
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Невозможно вернуть, файл не найден: \"%s\".
 Case-sensitive	FindandReplaceWindow		Учитывать регистр
-Green	Menus		Зеленый
-Revert to saved…	Menus		Вернуться к сохраненному…
-Yellow	Menus		Желтый
-Replace in all windows	FindandReplaceWindow		Заменить во всех окнах
-Wrap lines	Menus		Перенос строк
-Cancel	RevertToSavedAlert		Отмена
-Document	Menus		Документ
-Font	Menus		Шрифт
-Replace all	FindandReplaceWindow		Заменить все
-Default	Open_and_SaveAsPanel		По умолчанию
-Cancel	FindandReplaceWindow		Отмена
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Ошибка при открытии \"%s\":\n\tФормат не поддерживается
-OK	RevertToSavedAlert		ОК
-Don't save	QuitAlert		Не сохранять
-Color	Menus		Цвет
-Red	Menus		Красный
-Open…	Menus		Открыть…
 Center	Menus		По центру
-Blue	Menus		Синий
-Cyan	Menus		Бирюзовый
-Magenta	Menus		Пурпурный
-New	Menus		Новый
-Wrap-around search	FindandReplaceWindow		Поиск по всему документу
-Find selection	Menus		Найти выделенное
-Find:	FindandReplaceWindow		Найти:
-Error saving \"%s\":\n%s	SaveAlert		Ошибка сохранения \"%s\":\n%s
-Replace	FindandReplaceWindow		Заменить
-Find again	Menus		Найти далее
-Cancel	QuitAlert		Отмена
-Find…	Menus		Найти…
-Error loading \"%s\":\n\t%s	LoadAlert		Ошибка загрузки \"%s\":\n\t%s
-Black	Menus		Черный
-OK	SaveAlert		ОК
-Find	FindandReplaceWindow		Найти
-Encoding	Open_and_SaveAsPanel		Кодировка
-Replace…	Menus		Заменить…
-Right	Menus		По правому краю
-Cancel	SaveAlert		Отмена
-Save	SaveAlert		Сохранить
-Don't save	SaveAlert		Не сохранять
-Paste	Menus		Вставить
-File	Menus		Файл
-Page setup…	Menus		Настройка печати…
-Print…	Menus		Печать...
-Quit	Menus		Выход
+Characters:	Statistics		Символов:
 Clear	Menus		Очистить
-Edit	Menus		Изменить
 Close	Menus		Закрыть
+Color	Menus		Цвет
 Copy	Menus		Копировать
 Cut	Menus		Вырезать
-Select all	Menus		Выделить всё
-Save as…	Menus		Сохранить как…
-Lines:	Statistics		Строк:
+Cyan	Menus		Бирюзовый
+Default	Open_and_SaveAsPanel		По умолчанию
+Document	Menus		Документ
 Document statistics	Statistics		Статистика документа
-Statistics…	Menus		Статистика…
-Words:	Statistics		Слов:
-OK	Statistics		ОК
-Undo typing	QuitAlert		Отменить ввод
-Characters:	Statistics		Символов:
-Redo typing	QuitAlert		Повторить ввод
+Don't save	QuitAlert		Не сохранять
+Don't save	SaveAlert		Не сохранять
+Edit	Menus		Изменить
+Encoding	Open_and_SaveAsPanel		Кодировка
+Error loading \"%s\":\n\t%s	LoadAlert		Ошибка загрузки \"%s\":\n\t%s
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Ошибка при открытии \"%s\":\n\tФормат не поддерживается
+Error saving \"%s\":\n%s	SaveAlert		Ошибка сохранения \"%s\":\n%s
+File	Menus		Файл
+Find	FindandReplaceWindow		Найти
+Find again	Menus		Найти далее
+Find selection	Menus		Найти выделенное
+Find:	FindandReplaceWindow		Найти:
+Find…	Menus		Найти…
+Font	Menus		Шрифт
+Green	Menus		Зеленый
 Italic	Menus		Наклонный
-Bold	Menus		Жирный
-Align	Menus		Выровнять
+Left	Menus		По левому краю
+Lines:	Statistics		Строк:
+Magenta	Menus		Пурпурный
+New	Menus		Новый
+OK	LoadAlert		ОК
+OK	RevertToSavedAlert		ОК
+OK	SaveAlert		ОК
+OK	Statistics		ОК
+Open…	Menus		Открыть…
+Page setup…	Menus		Настройка печати…
+Paste	Menus		Вставить
+Print…	Menus		Печать...
+Quit	Menus		Выход
+Red	Menus		Красный
+Redo typing	QuitAlert		Повторить ввод
+Replace	FindandReplaceWindow		Заменить
+Replace all	FindandReplaceWindow		Заменить все
+Replace in all windows	FindandReplaceWindow		Заменить во всех окнах
+Replace same	Menus		Заменить совпадение
+Replace with:	FindandReplaceWindow		Заменить на:
+Replace…	Menus		Заменить…
+Revert to saved…	Menus		Вернуться к сохраненному…
 Revert to the last version of \"%s\"? 	RevertToSavedAlert		Вернуться к последней версии \"%s\"? 
+Right	Menus		По правому краю
+Save	Menus		Сохранить
+Save	QuitAlert		Сохранить
+Save	SaveAlert		Сохранить
+Save as…	Menus		Сохранить как…
 Save changes to the document \"%s\"? 	QuitAlert		Сохранить изменения в файле \"%s\"? 
+Search backwards	FindandReplaceWindow		Искать снизу вверх
+Select all	Menus		Выделить всё
+Size	Menus		Размер
+Statistics…	Menus		Статистика…
 This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Этот файл отмечен только для чтения. Сохранить изменения в документе \"%s\"? 
+Undo typing	QuitAlert		Отменить ввод
 Untitled 	StyledEditWindow		Новый документ 
+Words:	Statistics		Слов:
+Wrap lines	Menus		Перенос строк
+Wrap-around search	FindandReplaceWindow		Поиск по всему документу
+Yellow	Menus		Желтый
