@@ -54,6 +54,7 @@ private:
 	void				_CreateNewMailQuery(BEntry&);
 	BPopUpMenu*			_BuildMenu();
 	void				_InitBitmaps();
+	status_t			_GetNewQueryRef(entry_ref& ref);
 
 	BBitmap*			fBitmaps[kStatusCount];
 	int32				fStatus;

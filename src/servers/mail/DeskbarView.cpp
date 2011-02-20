@@ -359,9 +359,13 @@ void
 DeskbarView::MouseUp(BPoint pos)
 {
 	if (fLastButtons & B_PRIMARY_MOUSE_BUTTON) {
-		if (OpenWithTracker(B_USER_SETTINGS_DIRECTORY, "Mail/mailbox") != B_OK
-			&& OpenWithTracker(B_USER_DIRECTORY, "mail/in") != B_OK)
-			OpenWithTracker(B_USER_DIRECTORY, "mail");
+		entry_ref ref;
+		_GetNewQueryRef(ref);
+
+		BMessenger trackerMessenger(kTrackerSignature);
+		BMessage message(B_REFS_RECEIVED);
+		message.AddRef("refs", &ref);
+		trackerMessenger.SendMessage(&message);
 	}
 
 	if (fLastButtons & B_TERTIARY_MOUSE_BUTTON)
@@ -535,13 +539,7 @@ DeskbarView::_BuildMenu()
 				<< (fNewMessages != 1 ? "s" : B_EMPTY_STRING),
 			string << fNewMessages << " 通の未読メッセージ");
 
-		find_directory(B_USER_SETTINGS_DIRECTORY, &path);
-		path.Append("Mail/New E-mail");
-
-		BEntry query(path.Path());
-		if (!query.Exists())
-			_CreateNewMailQuery(query);
-		query.GetRef(&ref);
+		_GetNewQueryRef(ref);
 
 		item = new BMenuItem(navMenu = new BNavMenu(string.String(),
 			B_REFS_RECEIVED, BMessenger(kTrackerSignature)),
@@ -618,4 +616,17 @@ DeskbarView::_BuildMenu()
 		}
 	}
 	return menu;
+}
+
+
+status_t
+DeskbarView::_GetNewQueryRef(entry_ref& ref)
+{
+	BPath path;
+	find_directory(B_USER_SETTINGS_DIRECTORY, &path);
+	path.Append("Mail/New E-mail");
+	BEntry query(path.Path());
+	if (!query.Exists())
+		_CreateNewMailQuery(query);
+	return query.GetRef(&ref);
 }
