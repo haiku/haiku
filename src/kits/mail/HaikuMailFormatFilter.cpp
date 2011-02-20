@@ -54,6 +54,7 @@ HaikuMailFormatFilter::HaikuMailFormatFilter(MailProtocol& protocol,
 	fAccountId(settings->AccountID())
 {
 	const BMessage* outboundSettings = &settings->OutboundSettings().Settings();
+	fOutboundDirectory = kDefaultSentDirectory;
 	outboundSettings->FindString("destination", &fOutboundDirectory);
 }
 

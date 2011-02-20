@@ -9,6 +9,7 @@
 #include <View.h>
 #include <FilePanel.h>
 
+
 class BTextControl;
 class BButton;
 
