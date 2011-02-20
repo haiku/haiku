@@ -235,8 +235,12 @@ BMailProtocolConfigView::BMailProtocolConfigView(uint32 options_mask)
 	}
 
 	if (options_mask & B_MAIL_PROTOCOL_CAN_LEAVE_MAIL_ON_SERVER) {
-		AddChild(AddCheckBox(rect,"leave_mail_remote",MDR_DIALECT_CHOICE ("Leave mail on server","受信後にサーバ内のメールを削除しない"),new BMessage('lmos')));
-		BCheckBox *box = AddCheckBox(rect,"delete_remote_when_local",MDR_DIALECT_CHOICE ("Remove mail from server when deleted","端末で削除されたらサーバ保存分も削除"));
+		AddChild(AddCheckBox(rect, "leave_mail_on_server",
+			MDR_DIALECT_CHOICE ("Leave mail on server",
+				"受信後にサーバ内のメールを削除しない"), new BMessage('lmos')));
+		BCheckBox* box = AddCheckBox(rect, "delete_remote_when_local",
+			MDR_DIALECT_CHOICE ("Remove mail from server when deleted",
+				"端末で削除されたらサーバ保存分も削除"));
 		box->SetEnabled(false);
 		AddChild(box);
 	}
@@ -305,7 +309,7 @@ BMailProtocolConfigView::SetTo(MailAddonSettings& settings)
 	}
 
 		
-	BCheckBox *box = (BCheckBox *)(FindView("leave_mail_remote"));
+	BCheckBox *box = (BCheckBox *)(FindView("leave_mail_on_server"));
 	if (box != NULL)
 		box->SetValue(archive->FindBool("leave_mail_on_server") ? B_CONTROL_ON : B_CONTROL_OFF);
 		
@@ -360,7 +364,7 @@ BMailProtocolConfigView::AttachedToWindow()
 	if (menu != NULL)
 		menu->Menu()->SetTargetForItems(this);
 		
-	BCheckBox *box = (BCheckBox *)(FindView("leave_mail_remote"));
+	BCheckBox *box = (BCheckBox *)(FindView("leave_mail_on_server"));
 	if (box != NULL)
 		box->SetTarget(this);
 }
@@ -440,18 +444,23 @@ BMailProtocolConfigView::Archive(BMessage *into, bool deep) const
 	if (into->ReplaceInt32("auth_method",index) != B_OK)
 		into->AddInt32("auth_method",index);
 		
-	if (FindView("leave_mail_remote") != NULL) {
-		if (into->ReplaceBool("leave_mail_on_server",((BControl *)(FindView("leave_mail_remote")))->Value() == B_CONTROL_ON) != B_OK)
-			into->AddBool("leave_mail_on_server",((BControl *)(FindView("leave_mail_remote")))->Value() == B_CONTROL_ON);
-			
-		if (into->ReplaceBool("delete_remote_when_local",((BControl *)(FindView("delete_remote_when_local")))->Value() == B_CONTROL_ON) != B_OK)
-			into->AddBool("delete_remote_when_local",((BControl *)(FindView("delete_remote_when_local")))->Value() == B_CONTROL_ON);
+	if (FindView("leave_mail_on_server") != NULL) {
+		BControl* control = (BControl*)FindView("leave_mail_on_server");
+		bool on = (control->Value() == B_CONTROL_ON);
+		if (into->ReplaceBool("leave_mail_on_server", on) != B_OK)
+			into->AddBool("leave_mail_on_server", on);
+
+		control = (BControl*)FindView("delete_remote_when_local");
+		on = (control->Value() == B_CONTROL_ON);
+		if (into->ReplaceBool("delete_remote_when_local", on)) {
+			into->AddBool("delete_remote_when_local", on);
+		}
 	} else {
-		if (into->ReplaceBool("leave_mail_on_server",false) != B_OK)
-			into->AddBool("leave_mail_on_server",false);
+		if (into->ReplaceBool("leave_mail_on_server", false) != B_OK)
+			into->AddBool("leave_mail_on_server", false);
 			
-		if (into->ReplaceBool("delete_remote_when_local",false) != B_OK)
-			into->AddBool("delete_remote_when_local",false);
+		if (into->ReplaceBool("delete_remote_when_local", false) != B_OK)
+			into->AddBool("delete_remote_when_local", false);
 	}
 
 	if (fBodyDownloadConfig)
