@@ -1,5 +1,6 @@
 SubDir HAIKU_TOP src apps showimage ;
 
+UseLibraryHeaders icon ;
 UsePrivateSystemHeaders ;
 UsePrivateHeaders tracker shared ;
 UsePublicHeaders [ FDirName be_apps Tracker ] ;
@@ -19,6 +20,7 @@ Application ShowImage :
 	ShowImageUndo.cpp
 	ShowImageView.cpp
 	ShowImageWindow.cpp
+	ToolBarIcons.cpp
 	: libshared.a be tracker translation $(HAIKU_LOCALE_LIBS)
 		$(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++)
 	: ShowImage.rdef

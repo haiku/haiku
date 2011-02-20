@@ -26,6 +26,7 @@
 
 #include "ShowImageConstants.h"
 #include "ShowImageWindow.h"
+#include "ToolBarIcons.h"
 
 
 #undef B_TRANSLATE_CONTEXT
@@ -45,11 +46,15 @@ ShowImageApp::ShowImageApp()
 	fLastWindowFrame(BRect(30, 30, 430, 330))
 {
 	_UpdateLastWindowFrame();
+	// BBitmap can be created after there is a BApplication instance.
+	init_tool_bar_icons();
 }
 
 
 ShowImageApp::~ShowImageApp()
 {
+	// BBitmap must be deleted while there is still a BApplication instance.
+	uninit_tool_bar_icons();
 }
 
 
