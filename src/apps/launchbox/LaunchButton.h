@@ -1,14 +1,15 @@
 /*
- * Copyright 2006-2009, Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2006-2011, Stephan Aßmus <superstippi@gmx.de>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef LAUNCH_BUTTON_H
 #define LAUNCH_BUTTON_H
 
+
+#include <IconButton.h>
 #include <List.h>
 #include <String.h>
 
-#include "IconButton.h"
 
 enum {
 	MSG_ADD_SLOT				= 'adsl',
@@ -17,7 +18,8 @@ enum {
 	MSG_LAUNCH					= 'lnch',
 };
 
-class LaunchButton : public IconButton {
+
+class LaunchButton : public BIconButton {
 public:
 								LaunchButton(const char* name, uint32 id,
 									const char* label = NULL,
@@ -25,7 +27,7 @@ public:
 									BHandler* target = NULL);
 	virtual						~LaunchButton();
 
-	// IconButton interface
+	// BIconButton interface
 	virtual	void				AttachedToWindow();
 	virtual	void				Draw(BRect updateRect);
 	virtual	void				MessageReceived(BMessage* message);
@@ -64,6 +66,11 @@ private:
 
 			void				_NotifySettingsChanged();
 
+			void				_DrawFrame(BRect frame,
+									rgb_color left, rgb_color top,
+									rgb_color right, rgb_color bottom);
+
+private:
 			entry_ref*			fRef;
 			char*				fAppSig;
 			BString				fDescription;	

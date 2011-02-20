@@ -4,7 +4,6 @@ UsePrivateHeaders shared ;
 
 Application LaunchBox :
 	App.cpp
-	IconButton.cpp
 	LaunchButton.cpp
 	main.cpp
 	MainWindow.cpp
@@ -20,7 +19,6 @@ DoCatalogs LaunchBox :
 	x-vnd.Haiku-LaunchBox
 	:
 	App.cpp
-	IconButton.cpp
 	LaunchButton.cpp
 	MainWindow.cpp
 	NamePanel.cpp

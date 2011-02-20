@@ -1,42 +1,55 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2011, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
-/** gui class that loads an image from disk and shows it
-    as clickable button */
-
-// TODO: inherit from BControl?
-
-// NOTE: this file is a duplicate of the version in Icon-O-Matic/generic
-// it should be placed into a common folder for generic useful stuff
-
 #ifndef ICON_BUTTON_H
 #define ICON_BUTTON_H
+
+
+//! GUI class that loads an image from disk and shows it as clickable button.
+
+// TODO: inherit from BControl
+
 
 #include <Invoker.h>
 #include <String.h>
 #include <View.h>
 
+
 class BBitmap;
 class BMimeType;
 
-class IconButton : public BView, public BInvoker {
+
+namespace BPrivate {
+
+
+class BIconButton : public BView, public BInvoker {
 public:
-								IconButton(const char* name,
+								BIconButton(const char* name,
 										   uint32 id,
 										   const char* label = NULL,
 										   BMessage* message = NULL,
 										   BHandler* target = NULL);
-	virtual						~IconButton();
+	virtual						~BIconButton();
 
 	// BView interface
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	void				AttachedToWindow();
+
 	virtual	void				Draw(BRect updateRect);
+	virtual	bool				ShouldDrawBorder() const;
+	virtual	void				DrawBorder(BRect& frame,
+									const BRect& updateRect,
+									const rgb_color& backgroundColor,
+									uint32 controlLookFlags);
+	virtual	void				DrawBackground(BRect& frame,
+									const BRect& updateRect,
+									const rgb_color& backgroundColor,
+									uint32 controlLookFlags);
+
 	virtual	void				MouseDown(BPoint where);
 	virtual	void				MouseUp(BPoint where);
 	virtual	void				MouseMoved(BPoint where, uint32 transit,
@@ -50,7 +63,7 @@ public:
 	// BInvoker interface
 	virtual	status_t			Invoke(BMessage* message = NULL);
 
-	// IconButton
+	// BIconButton
 			bool				IsValid() const;
 
 	virtual	int32				Value() const;
@@ -64,6 +77,7 @@ public:
 			uint32				ID() const
 									{ return fID; }
 
+			status_t			SetIcon(int32 resourceID);
 			status_t			SetIcon(const char* pathToBitmap);
 			status_t			SetIcon(const BBitmap* bitmap);
 			status_t			SetIcon(const BMimeType* fileType,
@@ -73,23 +87,11 @@ public:
 										color_space format,
 										bool convertToBW = false);
 			void				ClearIcon();
+			void				TrimIcon(bool keepAspect = true);
 
 			BBitmap*			Bitmap() const;
 									// caller has to delete the returned bitmap
-
-	virtual	bool				DrawBorder() const;
-	virtual	void				DrawNormalBorder(BRect r,
-												 rgb_color background,
-												 rgb_color shadow,
-												 rgb_color darkShadow,
-												 rgb_color lightShadow,
-												 rgb_color light);
-	virtual	void				DrawPressedBorder(BRect r,
-												  rgb_color background,
-												  rgb_color shadow,
-												  rgb_color darkShadow,
-												  rgb_color lightShadow,
-												  rgb_color light);
+			const BString&		Label() const;
 
 protected:
 			enum {
@@ -105,19 +107,14 @@ protected:
 			void				_ClearFlags(uint32 flags);
 			bool				_HasFlags(uint32 flags) const;
 
-			void				_DrawFrame(BRect frame,
-										   rgb_color col1,
-										   rgb_color col2,
-										   rgb_color col3,
-										   rgb_color col4);
-
-// private:
+private:
 			BBitmap*			_ConvertToRGB32(const BBitmap* bitmap) const;
 			status_t			_MakeBitmaps(const BBitmap* bitmap);
 			void				_DeleteBitmaps();
 			void				_SendMessage() const;
 			void				_Update();
 
+private:
 			uint32				fButtonState;
 			int32				fID;
 			BBitmap*			fNormalBitmap;
@@ -128,5 +125,12 @@ protected:
 
 			BHandler*			fTargetCache;
 };
+
+
+} // namespac BPrivate
+
+
+using BPrivate::BIconButton;
+
 
 #endif // ICON_BUTTON_H
