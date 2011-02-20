@@ -5,6 +5,8 @@ UsePrivateHeaders shared storage ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems bfs ] ;
 
+AddResources <disk_system>bfs : BFSAddOn.rdef ;
+
 Addon <disk_system>bfs :
 	BFSAddOn.cpp
 	InitializeParameterEditor.cpp
@@ -12,7 +14,6 @@ Addon <disk_system>bfs :
 	bfs_disk_system.cpp
 
 	: be $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
-	: BFSAddOn.rdef
 ;
 
 DoCatalogs <disk_system>bfs :

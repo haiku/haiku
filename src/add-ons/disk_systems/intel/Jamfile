@@ -12,6 +12,8 @@ SEARCH_SOURCE
 	SubDirC++Flags $(defines) ;
 }
 
+AddResources <disk_system>intel : IntelDiskAddOn.rdef ;
+
 Addon <disk_system>intel :
 	IntelDiskSystem.cpp
 	ExtendedPartitionAddOn.cpp
@@ -22,7 +24,6 @@ Addon <disk_system>intel :
 	PartitionMap.cpp
 
 	: be $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
-	: IntelDiskAddOn.rdef
 ;
 
 DoCatalogs <disk_system>intel :
