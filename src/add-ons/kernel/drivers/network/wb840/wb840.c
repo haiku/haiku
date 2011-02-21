@@ -615,16 +615,19 @@ void
 wb_set_mode(wb_device *info, int mode)
 {
 	uint32 cfgAddress = (uint32)info->reg_base + WB_NETCFG;
-	int32 speed = mode & LINK_SPEED_MASK;
+
 	uint32 configFlags = 0;
 	status_t status;
+
+	info->speed = mode & LINK_SPEED_MASK;
+	info->full_duplex = mode & LINK_DUPLEX_MASK;
 
 	status = wb_stop(info);
 
 	if ((mode & LINK_DUPLEX_MASK) == LINK_FULL_DUPLEX)
 		configFlags |= WB_NETCFG_FULLDUPLEX;
 
-	if (speed == LINK_SPEED_100_MBIT)
+	if (info->speed == LINK_SPEED_100_MBIT)
 		configFlags |= WB_NETCFG_100MBPS;
 
 	write32(cfgAddress, configFlags);

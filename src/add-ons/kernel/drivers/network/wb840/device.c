@@ -8,11 +8,15 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <net/if_media.h>
+
 #include "debug.h"
 #include "device.h"
 #include "driver.h"
 #include "interface.h"
 #include "wb840.h"
+
+
 
 #define MAX_CARDS 4
 
@@ -296,6 +300,20 @@ wb840_control (void *cookie, uint32 op, void *arg, size_t len)
 			*(uint32 *)arg = WB_MAX_FRAMELEN;
 			return B_OK;
 			
+		case ETHER_GET_LINK_STATE:
+		{
+			ether_link_state_t state;
+			LOG(("ETHER_GET_LINK_STATE"));
+						
+			state.media = (data->link ? IFM_ACTIVE : 0) | IFM_ETHER
+				| (data->full_duplex ? IFM_FULL_DUPLEX : IFM_HALF_DUPLEX)
+				| (data->speed == LINK_SPEED_100_MBIT ? IFM_100_TX : IFM_10_T);
+			state.speed = data->speed == LINK_SPEED_100_MBIT ? 100000000 : 10000;
+			state.quality = 1000;
+
+			return user_memcpy(arg, &state, sizeof(ether_link_state_t));
+		}
+
 		case ETHER_ADDMULTI:
 			LOG(("ETHER_ADDMULTI\n"));
 			break;

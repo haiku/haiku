@@ -367,6 +367,8 @@ struct wb_device {
 	uint16 phy;
 	bool autoNegotiationComplete;
 	bool link;
+	bool full_duplex;
+	uint16 speed;
 	uint16 fixedMode;
 	
 	volatile int32 blockFlag;
