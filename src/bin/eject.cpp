@@ -1,25 +1,62 @@
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//  Copyright (c) 2003, OpenBeOS
-//
-//  This software is part of the OpenBeOS distribution and is covered
-//  by the OpenBeOS license.
-//
-//
-//  File:        eject.c
-//  Author:      François Revol (mmu_man@users.sf.net)
-//  Description: ejects physical media from a drive.
-//               This version also loads a media and can query for the status.
-//
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+/*
+ * Copyright (c) 2003-2011, Haiku Inc.
+ * Distributed under the terms of the MIT license.
+ *
+ * Authors:
+ *		François Revol <mmu_man@users.sf.net>
+ *		Philippe Houdoin
+ *
+ * Description: ejects physical media from a drive.
+ *              This version also loads a media and can query for the status.
+ */
 
-#include <stdio.h>
 #include <fcntl.h>
+#include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-#include <Drivers.h>
+
 #include <device/scsi.h>
+#include <DiskDevice.h>
+#include <DiskDeviceRoster.h>
+#include <DiskDeviceVisitor.h>
+#include <Drivers.h>
 #include <fs_info.h>
+#include <ObjectList.h>
+#include <Path.h>
+#include <String.h>
+
+
+class RemovableDevice {
+public:
+	RemovableDevice(BDiskDevice* device) {
+		fName = device->Name();
+		device->GetPath(&fPath);
+	};
+
+	inline const char* Name() 	{ return fName.String(); }
+	inline const char* Path()	{ return fPath.Path(); }
+
+private:
+	BString	fName;
+	BPath 	fPath;
+};
+
+
+class RemovableDeviceVisitor : public BDiskDeviceVisitor {
+public:
+	virtual bool Visit(BDiskDevice* device)	{
+		if (device->IsRemovableMedia())
+			fRemovableDevices.AddItem(new RemovableDevice(device));
+		return false; // Don't stop yet!
+	}
+
+	virtual bool Visit(BPartition* partition, int32 level) { return false; }
+
+	inline BObjectList<RemovableDevice>&	RemovableDevices() { return fRemovableDevices; }
+
+private:
+	BObjectList<RemovableDevice>	fRemovableDevices;
+};
 
 
 static int usage(char *prog)
@@ -46,7 +83,7 @@ int main(int argc, char **argv)
 	char operation = 'e';
 	int i;
 	int ret;
-	
+
 	for (i = 1; i < argc; i++) {
 		if (strncmp(argv[i], "--h", 3) == 0) {
 			return usage("eject");
@@ -64,8 +101,31 @@ int main(int argc, char **argv)
 				return ret;
 		}
 	}
-	if (device == NULL)
-		return do_eject(operation, "/dev/disk/floppy/raw");
+	if (device == NULL) {
+		BDiskDeviceRoster diskDeviceRoster;
+		RemovableDeviceVisitor visitor;
+		diskDeviceRoster.VisitEachDevice(&visitor);
+
+		int32 count = visitor.RemovableDevices().CountItems();
+		if (count < 1) {
+			printf("No removable device found!\n");
+			return 1;
+		}
+
+		if (count > 1) {
+			printf("Multiple removable devices available:\n");
+			for (i = 0; i < count; i++) {
+				RemovableDevice* item = visitor.RemovableDevices().ItemAt(i);
+				printf("  %s\t\"%s\"\n", item->Path(), item->Name());
+			}
+			return 1;
+		}
+
+		// Default to single removable device found
+		device = (char*)visitor.RemovableDevices().FirstItem()->Path();
+		return do_eject(operation, device);
+	}
+
 	return 0;
 }
 
@@ -77,7 +137,7 @@ static int do_eject(char operation, char *device)
 	status_t devstatus;
 	fs_info info;
 
-	// if the path is not on devfs, it's probably on 
+	// if the path is not on devfs, it's probably on
 	// the mountpoint of the device we want to act on.
 	// (should rather stat() for blk(char) device though).
 	if (fs_stat_dev(dev_for_path(device), &info) >= B_OK) {
