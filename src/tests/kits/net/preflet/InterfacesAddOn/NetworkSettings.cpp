@@ -38,21 +38,8 @@ NetworkSettings::NetworkSettings(const char* name)
 	fDisabled(false),
 	fNameServers(5, true)
 {
-	// TODO : Detect supported IP protocol versions
-	memset(fProtocolVersions, 0, sizeof(fProtocolVersions));
-	fProtocolVersions[0] = AF_INET;
-	fProtocolVersions[1] = AF_INET6;
-
-	unsigned int index;
-	for (index = 0; index < sizeof(fProtocolVersions); index++)
-	{
-		int protocol = fProtocolVersions[index];
-		if (protocol > 0)
-			fSocket[protocol] = socket(protocol, SOCK_DGRAM, 0);
-	}
-
 	fName = name;
-
+	_DetectProtocols();
 
 	ReadConfiguration();
 }
@@ -61,12 +48,53 @@ NetworkSettings::NetworkSettings(const char* name)
 NetworkSettings::~NetworkSettings()
 {
 	unsigned int index;
-	for (index = 0; index < sizeof(fProtocolVersions); index++)
+	for (index = 0; index < MAX_PROTOCOLS; index++)
 	{
-		int protocol = fProtocolVersions[index];
-		if (protocol > 0)
-			close(fSocket[protocol]);
+		int socket_id = fProtocols[index].socket_id;
+		if (socket_id < 0)
+			continue;
+
+		close(socket_id);
 	}
+}
+
+
+status_t
+NetworkSettings::_DetectProtocols()
+{
+	for (int index = 0; index < MAX_PROTOCOLS; index++) {
+		fProtocols[index].name = NULL;
+		fProtocols[index].present = false;
+		fProtocols[index].socket_id = -1;
+		fProtocols[index].inet_id = -1;
+	}
+
+	// First we populate the struct with the possible
+	// protocols we could configure for an interface
+	// (size limit of MAX_PROTOCOLS)
+	fProtocols[0].name = "IPv4";
+	fProtocols[0].inet_id = AF_INET;
+	fProtocols[1].name = "IPv6";
+	fProtocols[1].inet_id = AF_INET6;
+
+	// Loop through each of the possible protocols and
+	// ensure they are functional
+	for (int index = 0; index < MAX_PROTOCOLS; index++) {
+		int inet_id = fProtocols[index].inet_id;
+		if (inet_id > 0)
+		{
+			fProtocols[index].socket_id = socket(inet_id, SOCK_DGRAM, 0);
+			if (fProtocols[index].socket_id < 0) {
+				printf("Protocol %s : not present\n", fProtocols[index].name);
+				fProtocols[index].present = false;
+			} else {
+				printf("Protocol %s : present\n", fProtocols[index].name);
+				fProtocols[index].present = true;
+			}
+		}
+	}
+
+	return B_OK;
 }
 
 
@@ -77,85 +105,108 @@ void
 NetworkSettings::ReadConfiguration()
 {
 	BNetworkInterface fNetworkInterface(fName);
+	fDisabled = (fNetworkInterface.Flags() & IFF_UP) == 0;
 
-	unsigned int index;
-	for (index = 0; index < sizeof(fProtocolVersions); index++)
-	{
-		int protocol = fProtocolVersions[index];
+	for (int index = 0; index < MAX_PROTOCOLS; index++) {
+		int inet_id = fProtocols[index].inet_id;
 
-		if (protocol > 0) {
-			int32 zeroAddr = fNetworkInterface.FindFirstAddress(protocol);
+		if (fProtocols[index].present) {
+			// --- Obtain IP Addresses
+			int32 zeroAddr = fNetworkInterface.FindFirstAddress(inet_id);
 			if (zeroAddr >= 0) {
 				fNetworkInterface.GetAddressAt(zeroAddr,
-					fInterfaceAddressMap[protocol]);
-				fAddress[protocol]
-					= fInterfaceAddressMap[protocol].Address();
-				fNetmask[protocol]
-					= fInterfaceAddressMap[protocol].Mask();
+					fInterfaceAddressMap[inet_id]);
+				fAddress[inet_id].SetTo(
+					fInterfaceAddressMap[inet_id].Address());
+				fNetmask[inet_id].SetTo(
+					fInterfaceAddressMap[inet_id].Mask());
+			}
+
+			// --- Obtain gateway
+			// TODO : maybe in the future no ioctls?
+			ifconf config;
+			config.ifc_len = sizeof(config.ifc_value);
+			// Populate config with size of routing table
+			if (ioctl(fProtocols[index].socket_id, SIOCGRTSIZE,
+				&config, sizeof(config)) < 0)
+				return;
+
+			uint32 size = (uint32)config.ifc_value;
+			if (size == 0)
+				return;
+
+			// Malloc a buffer the size of the routing table
+			void* buffer = malloc(size);
+			if (buffer == NULL)
+				return;
+
+			MemoryDeleter bufferDeleter(buffer);
+			config.ifc_len = size;
+			config.ifc_buf = buffer;
+
+			if (ioctl(fProtocols[index].socket_id, SIOCGRTTABLE,
+				&config, sizeof(config)) < 0)
+				return;
+
+			ifreq* interface = (ifreq*)buffer;
+			ifreq* end = (ifreq*)((uint8*)buffer + size);
+
+			while (interface < end) {
+				route_entry& route = interface->ifr_route;
+
+				if ((route.flags & RTF_GATEWAY) != 0) {
+					if (inet_id == AF_INET) {
+						char addressOut[INET_ADDRSTRLEN];
+						sockaddr_in* socketAddr
+							= (sockaddr_in*)route.gateway;
+
+						inet_ntop(inet_id, &socketAddr->sin_addr,
+							addressOut, INET_ADDRSTRLEN);
+
+						fGateway[inet_id].SetTo(addressOut);
+
+					} else if (inet_id == AF_INET6) {
+						char addressOut[INET6_ADDRSTRLEN];
+						sockaddr_in6* socketAddr
+							= (sockaddr_in6*)route.gateway;
+
+						inet_ntop(inet_id, &socketAddr->sin6_addr,
+							addressOut, INET6_ADDRSTRLEN);
+
+						fGateway[inet_id].SetTo(addressOut);
+
+					} else {
+						printf("Cannot pull routes for unknown protocol: %d\n",
+							inet_id);
+						fGateway[inet_id].SetTo("");
+					}
+
+				}
+
+				int32 addressSize = 0;
+				if (route.destination != NULL)
+					addressSize += route.destination->sa_len;
+				if (route.mask != NULL)
+					addressSize += route.mask->sa_len;
+				if (route.gateway != NULL)
+					addressSize += route.gateway->sa_len;
+
+				interface = (ifreq *)((addr_t)interface + IF_NAMESIZE
+					+ sizeof(route_entry) + addressSize);
+			}
+
+			// --- Obtain selfconfiguration options
+			// TODO : This needs to be determined by protocol flags
+			//        AutoConfiguration on the IP level doesn't exist yet
+			//		  ( fInterfaceAddressMap[AF_INET].Flags() )
+			if (fProtocols[index].socket_id >= 0) {
+				fAutoConfigure[inet_id] = (fNetworkInterface.Flags()
+					& (IFF_AUTO_CONFIGURED | IFF_CONFIGURING)) != 0;
 			}
 		}
 	}
 
-	// Obtain gateway
-	ifconf config;
-	config.ifc_len = sizeof(config.ifc_value);
-	if (ioctl(fSocket[AF_INET], SIOCGRTSIZE, &config, sizeof(config)) < 0)
-		return;
-
-	uint32 size = (uint32)config.ifc_value;
-	if (size == 0)
-		return;
-
-	void* buffer = malloc(size);
-	if (buffer == NULL)
-		return;
-
-	MemoryDeleter bufferDeleter(buffer);
-	config.ifc_len = size;
-	config.ifc_buf = buffer;
-
-	if (ioctl(fSocket[AF_INET], SIOCGRTTABLE, &config, sizeof(config)) < 0)
-		return;
-
-	ifreq* interface = (ifreq*)buffer;
-	ifreq* end = (ifreq*)((uint8*)buffer + size);
-
-	while (interface < end) {
-		route_entry& route = interface->ifr_route;
-
-		if ((route.flags & RTF_GATEWAY) != 0) {
-			sockaddr_in* inetAddress = (sockaddr_in*)route.gateway;
-			fGateway[AF_INET] = inet_ntoa(inetAddress->sin_addr);
-		}
-
-		int32 addressSize = 0;
-		if (route.destination != NULL)
-			addressSize += route.destination->sa_len;
-		if (route.mask != NULL)
-			addressSize += route.mask->sa_len;
-		if (route.gateway != NULL)
-			addressSize += route.gateway->sa_len;
-
-		interface = (ifreq *)((addr_t)interface + IF_NAMESIZE
-			+ sizeof(route_entry) + addressSize);
-	}
-
-	fDisabled = (fNetworkInterface.Flags() & IFF_UP) == 0;
-
-	// Obtain selfconfiguration options
-
-	// TODO : This needs to be determined by the protocol flags
-	// instead of the interface flag... protocol flags don't seem
-	// to be complete yet. (netIntAddr4.Flags() and netIntAddr6.Flags())
-
-	fAutoConfigure[AF_INET] = (fNetworkInterface.Flags()
-		& (IFF_AUTO_CONFIGURED | IFF_CONFIGURING)) != 0;
-
-	fAutoConfigure[AF_INET6] = (fNetworkInterface.Flags()
-		& (IFF_AUTO_CONFIGURED | IFF_CONFIGURING)) != 0;
-
 	// Read wireless network from interfaces
-
 	fWirelessNetwork.SetTo(NULL);
 
 	BPath path;

@@ -60,24 +60,25 @@ InterfaceWindow::~InterfaceWindow()
 void
 InterfaceWindow::MessageReceived(BMessage* message)
 {
-	int* supportedFamilies = fNetworkSettings->ProtocolVersions();
-	unsigned int index;
+	protocols* supportedFamilies = fNetworkSettings->ProtocolVersions();
 
 	switch (message->what) {
 		case MSG_IP_REVERT:
-			for (index = 0; index < sizeof(supportedFamilies); index++)
+			for (int index = 0; index < MAX_PROTOCOLS; index++)
 			{
-				int protocol = supportedFamilies[index];
-				if (protocol > 0)
-					fTabIPView[protocol]->RevertFields();
+				if (supportedFamilies[index].present) {
+					int inet_id = supportedFamilies[index].inet_id;
+					fTabIPView[inet_id]->RevertFields();
+				}
 			}
 			break;
 		case MSG_IP_SAVE:
-			for (index = 0; index < sizeof(supportedFamilies); index++)
+			for (int index = 0; index < MAX_PROTOCOLS; index++)
 			{
-				int protocol = supportedFamilies[index];
-				if (protocol > 0)
-					fTabIPView[protocol]->SaveFields();
+				if (supportedFamilies[index].present) {
+					int inet_id = supportedFamilies[index].inet_id;
+					fTabIPView[inet_id]->SaveFields();
+				}
 			}
 			this->Quit();
 			break;
@@ -92,20 +93,17 @@ status_t
 InterfaceWindow::_PopulateTabs()
 {
 	BRect frame = fTabView->Bounds();
-	int* supportedFamilies = fNetworkSettings->ProtocolVersions();
+	protocols* supportedFamilies = fNetworkSettings->ProtocolVersions();
 
-	unsigned int index;
-	for (index = 0; index < sizeof(supportedFamilies); index++)
+	for (int index = 0; index < MAX_PROTOCOLS; index++)
 	{
-		int protocol = supportedFamilies[index];
-		if (protocol > 0)
-		{
-			fTabIPView[protocol] = new InterfaceAddressView(frame,
-				protocol, fNetworkSettings);
+		if (supportedFamilies[index].present) {
+			int inet_id = supportedFamilies[index].inet_id;
+			fTabIPView[inet_id] = new InterfaceAddressView(frame,
+				inet_id, fNetworkSettings);
 			BTab* tab = new BTab;
-			fTabView->AddTab(fTabIPView[protocol], tab);
-			tab->SetLabel((protocol == AF_INET) ? "IPv4" : "IPv6");
-				// TODO : find a better way
+			fTabView->AddTab(fTabIPView[inet_id], tab);
+			tab->SetLabel(supportedFamilies[index].name);
 		}
 	}
 

@@ -19,10 +19,24 @@
 #include <map>
 
 
+#define MAX_PROTOCOLS	7
+	// maximum number of protocols that could be configured
+
+
 typedef std::map<int, BNetworkAddress> AddressMap;
 typedef std::map<int, BNetworkInterfaceAddress> InterfaceAddressMap;
 typedef std::map<int, bool> BoolMap;
-typedef std::map<int, int> SocketMap;
+
+typedef struct _protocols {
+	const char* name;
+		// Eg. "IPv4", used for user descriptions
+	bool present;
+		// Does the OS have the proper addon?
+	int inet_id;
+		// Eg. AF_INET
+	int socket_id;
+		// Socket ID used for ioctls to this proto
+} protocols;
 
 
 class NetworkSettings {
@@ -30,8 +44,8 @@ public:
 								NetworkSettings(const char* name);
 	virtual						~NetworkSettings();
 
-			int*				ProtocolVersions()
-									{ return fProtocolVersions; }
+			protocols*			ProtocolVersions()
+									{ return fProtocols; }
 
 			void				SetIP(int family, const char* ip)
 									{ fAddress[family].SetTo(ip); }
@@ -76,12 +90,11 @@ public:
 			void				WriteConfiguration();
 
 private:
-			SocketMap			fSocket;
+			status_t			_DetectProtocols();
 			BNetworkInterface	fNetworkInterface;
 			InterfaceAddressMap	fInterfaceAddressMap;
 
-			int					fProtocolVersions[3];
-									// OS Supported protocol versions
+			protocols			fProtocols[MAX_PROTOCOLS];
 
 			// Stored network addresses and paramaters
 			BoolMap				fAutoConfigure;
