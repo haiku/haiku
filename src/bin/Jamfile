@@ -34,7 +34,6 @@ StdBinCommands
 #	csplit.c
 	driveinfo.c
 #	echo.c
-	eject.c
 	error.c
 	fortune.c
 	finddir.c
@@ -121,6 +120,7 @@ if $(TARGET_PLATFORM) = libbe_test {
 # standard commands that need libbe.so and libsupc++.so
 StdBinCommands
 	alert.cpp
+	eject.cpp
 	hey.cpp
 	reindex.cpp
 	resattr.cpp
