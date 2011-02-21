@@ -11,6 +11,8 @@
 #include <TextControl.h>
 
 #include <FileConfigView.h>
+#include <FindDirectory.h>
+#include <Path.h>
 #include <ProtocolConfigView.h>
 #include <MailAddon.h>
 
@@ -60,8 +62,8 @@ IMAPConfig::IMAPConfig(MailAddonSettings& settings,
 
 	SetTo(settings);
 
-	((BControl *)(FindView("leave_mail_remote")))->SetValue(B_CONTROL_ON);
-	((BControl *)(FindView("leave_mail_remote")))->Hide();
+	((BControl *)(FindView("leave_mail_on_server")))->SetValue(B_CONTROL_ON);
+	((BControl *)(FindView("leave_mail_on_server")))->Hide();
 
 	BRect frame = FindView("delete_remote_when_local")->Frame();
 
@@ -75,10 +77,15 @@ IMAPConfig::IMAPConfig(MailAddonSettings& settings,
 
 	frame.right -= 10;
 
-	BString defaultFolder = "/boot/home/mail/";
-	defaultFolder += accountSettings.Name();
+	BPath defaultFolder;
+	if (find_directory(B_USER_DIRECTORY, &defaultFolder) == B_OK)
+		defaultFolder.Append("mail");
+	else
+		defaultFolder.SetTo("/boot/home/mail/");
+	defaultFolder.Append(accountSettings.Name());
+
 	fFileView =  new BMailFileConfigView("Destination:", "destination",
-		false, defaultFolder);
+		false, defaultFolder.Path());
 	fFileView->SetTo(&settings.Settings(), NULL);
 	AddChild(fFileView);
 	fFileView->MoveBy(0, frame.bottom + 5);
