@@ -1,5 +1,5 @@
-/* Copyright (c) 2003-2005
- * Stefano Ceccherini <burton666@libero.it>. All rights reserved.
+/* Copyright (c) 2003-2011
+ * Stefano Ceccherini <stefano.ceccherini@gmail.com>. All rights reserved.
  * This file is released under the MIT license
  */
 #include "device.h"
@@ -26,8 +26,9 @@
 
 struct mii_chip_info
 {
-	const char *name;
-	uint16 id0, id1;
+	const char* name;
+	uint16 id0;
+	uint16 id1;
 	uint8  types;
 };
 
@@ -35,12 +36,12 @@ struct mii_chip_info
 const static struct mii_chip_info
 gMIIChips[] = {
 	{"DAVICOM_DM9101", PHY_ID0_DAVICOM_DM9101, PHY_ID1_DAVICOM_DM9101, MII_LAN},
-	{NULL,0,0,0}
+	{NULL, 0, 0, 0}
 };
 
 
 static int
-mii_readstatus(wb_device *device)
+mii_readstatus(wb_device* device)
 {
 	int i = 0;
 	int status;
@@ -54,7 +55,7 @@ mii_readstatus(wb_device *device)
 
 
 static phys_addr_t
-physicalAddress(volatile void *addr, uint32 length)
+physicalAddress(volatile void* addr, uint32 length)
 {
 	physical_entry table;
 
@@ -66,7 +67,7 @@ physicalAddress(volatile void *addr, uint32 length)
 
 // Prepares a RX descriptor to be used by the chip
 void
-wb_put_rx_descriptor(volatile wb_desc *descriptor)
+wb_put_rx_descriptor(volatile wb_desc* descriptor)
 {
 	descriptor->wb_status = WB_RXSTAT_OWN;
 	descriptor->wb_ctl |= WB_MAX_FRAMELEN | WB_RXCTL_RLINK;
@@ -74,7 +75,7 @@ wb_put_rx_descriptor(volatile wb_desc *descriptor)
 
 
 void
-wb_enable_interrupts(struct wb_device *device)
+wb_enable_interrupts(wb_device* device)
 {
 	write32(device->reg_base + WB_IMR, WB_INTRS);
 	write32(device->reg_base + WB_ISR, 0xFFFFFFFF);
@@ -82,7 +83,7 @@ wb_enable_interrupts(struct wb_device *device)
 
 
 void
-wb_disable_interrupts(struct wb_device *device)
+wb_disable_interrupts(wb_device* device)
 {
 	write32(device->reg_base + WB_IMR, 0L);
 	write32(device->reg_base + WB_ISR, 0L);
@@ -90,7 +91,7 @@ wb_disable_interrupts(struct wb_device *device)
 
 
 static void
-wb_selectPHY(wb_device *device)
+wb_selectPHY(wb_device* device)
 {
 	uint16 status;
 
@@ -107,12 +108,12 @@ wb_selectPHY(wb_device *device)
 
 
 status_t
-wb_initPHYs(wb_device *device)
+wb_initPHYs(wb_device* device)
 {
 	uint16 phy;
 	// search for total of 32 possible MII PHY addresses
 	for (phy = 0; phy < 32; phy++) {
-		struct mii_phy *mii;
+		struct mii_phy* mii;
 		uint16 status;
 		int i = 0;
 
@@ -123,7 +124,7 @@ wb_initPHYs(wb_device *device)
 			// this MII is not accessable
 			continue;
 
-		mii = (struct mii_phy *)malloc(sizeof(struct mii_phy));
+		mii = (struct mii_phy*)calloc(1, sizeof(struct mii_phy));
 		if (mii == NULL)
 			return B_NO_MEMORY;
 
@@ -135,15 +136,18 @@ wb_initPHYs(wb_device *device)
 		device->firstPHY = mii;
 
 		while (gMIIChips[i].name != NULL) {
-			if (gMIIChips[i].id0 == mii->id0 && gMIIChips[i].id1 == (mii->id1 & 0xfff0)) {
+			if (gMIIChips[i].id0 == mii->id0
+				&& gMIIChips[i].id1 == (mii->id1 & 0xfff0)) {
 				dprintf("Found MII PHY: %s\n", gMIIChips[i].name);
 				mii->types = gMIIChips[i].types;
 				break;
 			}
 			i++;
 		}
-		if (gMIIChips[i].name == NULL)
-			dprintf("Unknown MII PHY transceiver: id = (%x, %x).\n",mii->id0, mii->id1);
+		if (gMIIChips[i].name == NULL) {
+			dprintf("Unknown MII PHY transceiver: id = (%x, %x).\n",
+				mii->id0, mii->id1);
+		}
 	}
 
 	if (device->firstPHY == NULL) {
@@ -159,7 +163,7 @@ wb_initPHYs(wb_device *device)
 
 
 void
-wb_init(wb_device *device)
+wb_init(wb_device* device)
 {
 	LOG((DEVICE_NAME": init()\n"));
 
@@ -183,14 +187,16 @@ wb_init(wb_device *device)
 			break;
 	}
 
-	write32(device->reg_base + WB_BUSCTL, WB_BUSCTL_MUSTBEONE|WB_BUSCTL_ARBITRATION);
+	write32(device->reg_base + WB_BUSCTL,
+		WB_BUSCTL_MUSTBEONE | WB_BUSCTL_ARBITRATION);
 	WB_SETBIT(device->reg_base + WB_BUSCTL, WB_BURSTLEN_16LONG);
 
 	write32(device->reg_base + WB_BUSCTL_SKIPLEN, WB_SKIPLEN_4LONG);
 
 	// Disable early TX/RX interrupt, as we can't take advantage
 	// from them, at least for now.
-	WB_CLRBIT(device->reg_base + WB_NETCFG, (WB_NETCFG_TX_EARLY_ON|WB_NETCFG_RX_EARLY_ON));
+	WB_CLRBIT(device->reg_base + WB_NETCFG,
+		(WB_NETCFG_TX_EARLY_ON | WB_NETCFG_RX_EARLY_ON));
 
 	wb_set_rx_filter(device);
 }
@@ -225,13 +231,13 @@ wb_reset(wb_device *device)
 
 
 status_t
-wb_stop(wb_device *device)
+wb_stop(wb_device* device)
 {
 	uint32 cfgAddress = (uint32)device->reg_base + WB_NETCFG;
 	int32 i = 0;
 
-	if (read32(cfgAddress) & (WB_NETCFG_TX_ON|WB_NETCFG_RX_ON)) {
-		WB_CLRBIT(cfgAddress, (WB_NETCFG_TX_ON|WB_NETCFG_RX_ON));
+	if (read32(cfgAddress) & (WB_NETCFG_TX_ON | WB_NETCFG_RX_ON)) {
+		WB_CLRBIT(cfgAddress, (WB_NETCFG_TX_ON | WB_NETCFG_RX_ON));
 
 		for (i = 0; i < WB_TIMEOUT; i++) {
 			if ((read32(device->reg_base + WB_ISR) & WB_ISR_TX_IDLE) &&
@@ -248,7 +254,7 @@ wb_stop(wb_device *device)
 
 
 static void
-wb_updateLink(struct wb_device *device)
+wb_updateLink(wb_device* device)
 {
 	if (!device->autoNegotiationComplete) {
 		int32 mode = wb_read_mode(device);
@@ -277,9 +283,9 @@ wb_updateLink(struct wb_device *device)
 
 
 int32
-wb_tick(timer *arg)
+wb_tick(timer* arg)
 {
-	struct wb_device *device = (wb_device*)arg;
+	wb_device* device = (wb_device*)arg;
 
 	wb_updateLink(device);
 
@@ -291,7 +297,7 @@ wb_tick(timer *arg)
  * Program the rx filter.
  */
 void
-wb_set_rx_filter(wb_device *device)
+wb_set_rx_filter(wb_device* device)
 {
 	// TODO: Basically we just config the filter to accept broadcasts
 	// packets. We'll need also to configure it to multicast.
@@ -301,7 +307,7 @@ wb_set_rx_filter(wb_device *device)
 
 /***************** Interrupt handling ******************************/
 static status_t
-wb_rxok(struct wb_device *device)
+wb_rxok(wb_device* device)
 {
 	uint32 releaseRxSem = 0;
 	int16 limit;
@@ -309,12 +315,14 @@ wb_rxok(struct wb_device *device)
 	acquire_spinlock(&device->rxSpinlock);
 
 	for (limit = device->rxFree; limit > 0; limit--) {
-		if (device->rxDescriptor[device->rxInterruptIndex].wb_status & WB_RXSTAT_OWN) {
+		if (device->rxDescriptor[device->rxInterruptIndex].wb_status
+			& WB_RXSTAT_OWN) {
 			break;
 		}
 
 		releaseRxSem++;
-		device->rxInterruptIndex = (device->rxInterruptIndex + 1) & WB_RX_CNT_MASK;
+		device->rxInterruptIndex = (device->rxInterruptIndex + 1)
+			& WB_RX_CNT_MASK;
 		device->rxFree--;
 	}
 
@@ -333,7 +341,7 @@ wb_rxok(struct wb_device *device)
 
 
 static status_t
-wb_tx_nobuf(struct wb_device *info)
+wb_tx_nobuf(wb_device* info)
 {
 	int16 releaseTxSem = 0;
 	int16 limit;
@@ -377,9 +385,9 @@ wb_tx_nobuf(struct wb_device *info)
 
 
 int32
-wb_interrupt(void *arg)
+wb_interrupt(void* arg)
 {
-	struct wb_device *device = (wb_device*)arg;
+	wb_device* device = (wb_device*)arg;
 	int32 retval = B_UNHANDLED_INTERRUPT;
 	uint32 status;
 
@@ -469,21 +477,21 @@ wb_interrupt(void *arg)
  * Print an ethernet address
  */
 void
-print_address(ether_address_t *addr)
+print_address(ether_address_t* addr)
 {
 	int i;
 	char buf[3 * 6 + 1];
 
 	for (i = 0; i < 5; i++) {
-		sprintf(&buf[3*i], "%02x:", addr->ebyte[i]);
+		sprintf(&buf[3 * i], "%02x:", addr->ebyte[i]);
 	}
-	sprintf(&buf[3*5], "%02x", addr->ebyte[5]);
+	sprintf(&buf[3 * 5], "%02x", addr->ebyte[5]);
 	dprintf("%s\n", buf);
 }
 
 
 status_t
-wb_create_semaphores(struct wb_device *device)
+wb_create_semaphores(wb_device* device)
 {
 	device->rxSem = create_sem(0, "wb840 receive");
 	if (device->rxSem < B_OK) {
@@ -509,7 +517,7 @@ wb_create_semaphores(struct wb_device *device)
 
 
 void
-wb_delete_semaphores(wb_device *device)
+wb_delete_semaphores(wb_device* device)
 {
 	if (device->rxSem >= 0)
 		delete_sem(device->rxSem);
@@ -519,46 +527,57 @@ wb_delete_semaphores(wb_device *device)
 
 
 status_t
-wb_create_rings(struct wb_device *device)
+wb_create_rings(wb_device* device)
 {
 	int i;
 
-	device->rxArea = create_area("wb840 rx buffer", (void **)&device->rxBuffer[0],
-			B_ANY_KERNEL_ADDRESS, ROUND_TO_PAGE_SIZE(WB_BUFBYTES * WB_RX_LIST_CNT),
-			B_32_BIT_FULL_LOCK, B_READ_AREA | B_WRITE_AREA);
+	device->rxArea = create_area("wb840 rx buffer",
+		(void**)&device->rxBuffer[0], B_ANY_KERNEL_ADDRESS,
+		ROUND_TO_PAGE_SIZE(WB_BUFBYTES * WB_RX_LIST_CNT),
+		B_32_BIT_FULL_LOCK, B_READ_AREA | B_WRITE_AREA);
 	if (device->rxArea < B_OK)
 		return device->rxArea;
 
-	for (i = 1; i < WB_RX_LIST_CNT; i++)
-		device->rxBuffer[i] = (void *)(((uint32)device->rxBuffer[0]) + (i * WB_BUFBYTES));
+	for (i = 1; i < WB_RX_LIST_CNT; i++) {
+		device->rxBuffer[i] = (void*)(((uint32)device->rxBuffer[0])
+			+ (i * WB_BUFBYTES));
+	}
 
 	for (i = 0; i < WB_RX_LIST_CNT; i++) {
 		device->rxDescriptor[i].wb_status = 0;
 		device->rxDescriptor[i].wb_ctl = WB_RXCTL_RLINK;
 		wb_put_rx_descriptor(&device->rxDescriptor[i]);
-		device->rxDescriptor[i].wb_data = physicalAddress(device->rxBuffer[i], WB_BUFBYTES);
-		device->rxDescriptor[i].wb_next = physicalAddress(&device->rxDescriptor[(i + 1) & WB_RX_CNT_MASK],
+		device->rxDescriptor[i].wb_data = physicalAddress(
+			device->rxBuffer[i], WB_BUFBYTES);
+		device->rxDescriptor[i].wb_next = physicalAddress(
+			&device->rxDescriptor[(i + 1) & WB_RX_CNT_MASK],
 			sizeof(struct wb_desc));
 	}
 
 	device->rxFree = WB_RX_LIST_CNT;
 
-	device->txArea = create_area("wb840 tx buffer", (void **)&device->txBuffer[0],
-			B_ANY_KERNEL_ADDRESS, ROUND_TO_PAGE_SIZE(WB_BUFBYTES * WB_TX_LIST_CNT),
-			B_32_BIT_FULL_LOCK, B_READ_AREA | B_WRITE_AREA);
+	device->txArea = create_area("wb840 tx buffer",
+		(void**)&device->txBuffer[0], B_ANY_KERNEL_ADDRESS,
+		ROUND_TO_PAGE_SIZE(WB_BUFBYTES * WB_TX_LIST_CNT),
+		B_32_BIT_FULL_LOCK, B_READ_AREA | B_WRITE_AREA);
+
 	if (device->txArea < B_OK) {
 		delete_area(device->rxArea);
 		return device->txArea;
 	}
 
-	for (i = 1; i < WB_TX_LIST_CNT; i++)
-		device->txBuffer[i] = (void *)(((uint32)device->txBuffer[0]) + (i * WB_BUFBYTES));
+	for (i = 1; i < WB_TX_LIST_CNT; i++) {
+		device->txBuffer[i] = (void*)(((uint32)device->txBuffer[0])
+			+ (i * WB_BUFBYTES));
+	}
 
 	for (i = 0; i < WB_TX_LIST_CNT; i++) {
 		device->txDescriptor[i].wb_status = 0;
 		device->txDescriptor[i].wb_ctl = WB_TXCTL_TLINK;
-		device->txDescriptor[i].wb_data = physicalAddress(device->txBuffer[i], WB_BUFBYTES);
-		device->txDescriptor[i].wb_next = physicalAddress(&device->txDescriptor[(i + 1) & WB_TX_CNT_MASK],
+		device->txDescriptor[i].wb_data = physicalAddress(
+			device->txBuffer[i], WB_BUFBYTES);
+		device->txDescriptor[i].wb_next = physicalAddress(
+			&device->txDescriptor[(i + 1) & WB_TX_CNT_MASK],
 			sizeof(struct wb_desc));
 	}
 
@@ -574,7 +593,7 @@ wb_create_rings(struct wb_device *device)
 
 
 void
-wb_delete_rings(struct wb_device *device)
+wb_delete_rings(wb_device* device)
 {
 	delete_area(device->rxArea);
 	delete_area(device->txArea);
@@ -582,10 +601,12 @@ wb_delete_rings(struct wb_device *device)
 
 
 int32
-wb_read_mode(wb_device *info)
+wb_read_mode(wb_device* info)
 {
-	uint16 autoAdv, autoLinkPartner;
-	int32 speed, duplex;
+	uint16 autoAdv;
+	uint16 autoLinkPartner;
+	int32 speed;
+	int32 duplex;
 
 	uint16 status = mii_readstatus(info);
 	if (!(status & MII_STATUS_LINK)) {
@@ -595,11 +616,14 @@ wb_read_mode(wb_device *info)
 
 	// auto negotiation completed
 	autoAdv = wb_miibus_readreg(info, info->phy, MII_AUTONEG_ADV);
-	autoLinkPartner = wb_miibus_readreg(info, info->phy, MII_AUTONEG_LINK_PARTNER);
+	autoLinkPartner = wb_miibus_readreg(info, info->phy,
+		MII_AUTONEG_LINK_PARTNER);
 	status = autoAdv & autoLinkPartner;
 
-	speed = status & (MII_NWAY_TX | MII_NWAY_TX_FDX) ? LINK_SPEED_100_MBIT : LINK_SPEED_10_MBIT;
-	duplex = status & (MII_NWAY_TX_FDX | MII_NWAY_T_FDX) ? LINK_FULL_DUPLEX : LINK_HALF_DUPLEX;
+	speed = status & (MII_NWAY_TX | MII_NWAY_TX_FDX)
+		? LINK_SPEED_100_MBIT : LINK_SPEED_10_MBIT;
+	duplex = status & (MII_NWAY_TX_FDX | MII_NWAY_T_FDX)
+		? LINK_FULL_DUPLEX : LINK_HALF_DUPLEX;
 
 	info->autoNegotiationComplete = true;
 
@@ -612,7 +636,7 @@ wb_read_mode(wb_device *info)
 
 
 void
-wb_set_mode(wb_device *info, int mode)
+wb_set_mode(wb_device* info, int mode)
 {
 	uint32 cfgAddress = (uint32)info->reg_base + WB_NETCFG;
 

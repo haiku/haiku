@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003-2004 Stefano Ceccherini (burton666@libero.it)
+ * Copyright (c) 2003-2004 Stefano Ceccherini (stefano.ceccherini@gmail.com)
  * Copyright (c) 1997, 1998
  *	Bill Paul <wpaul@ctr.columbia.edu>.  All rights reserved.
  *
@@ -342,7 +342,7 @@ struct wb_device {
 	
 	// rx data
 	volatile wb_desc rxDescriptor[WB_RX_LIST_CNT];
-	volatile void *rxBuffer[WB_RX_LIST_CNT];
+	volatile void* rxBuffer[WB_RX_LIST_CNT];
 	int32 rxLock;
 	sem_id rxSem;
 	spinlock rxSpinlock;
@@ -353,7 +353,7 @@ struct wb_device {
 	
 	//tx data
 	volatile wb_desc txDescriptor[WB_TX_LIST_CNT];
-	volatile char *txBuffer[WB_TX_LIST_CNT];
+	volatile char* txBuffer[WB_TX_LIST_CNT];
 	int32 txLock;
 	sem_id txSem;
 	spinlock txSpinlock;
@@ -362,8 +362,8 @@ struct wb_device {
 	int16 txInterruptIndex;
 	int16 txSent;
 	
-	struct mii_phy *firstPHY;
-	struct mii_phy *currentPHY;
+	struct mii_phy* firstPHY;
+	struct mii_phy* currentPHY;
 	uint16 phy;
 	bool autoNegotiationComplete;
 	bool link;
@@ -480,35 +480,38 @@ enum link_modes {
 #define CP_VENDORID			0x11F6
 #define CP_DEVICEID_RL100	0x2011
 
+/*
+ * Utility Macros
+ */
 #define WB_SETBIT(reg, x) write32(reg, read32(reg) | x)
 #define WB_CLRBIT(reg, x) write32(reg, read32(reg) & ~x)
 
 // Prototypes
-extern int32	wb_interrupt(void *arg);
+extern int32		wb_interrupt(void* arg);
 
-extern status_t	wb_create_semaphores(wb_device *device);
-extern void		wb_delete_semaphores(wb_device *device);
+extern status_t		wb_create_semaphores(wb_device* device);
+extern void		wb_delete_semaphores(wb_device* device);
 
-extern status_t	wb_create_rings(wb_device *device);
-extern void		wb_delete_rings(wb_device *device);
+extern status_t		wb_create_rings(wb_device* device);
+extern void		wb_delete_rings(wb_device* device);
 
-extern void		wb_init(wb_device *device);
-extern void		wb_reset(wb_device *device);
-extern status_t wb_stop(wb_device *device);
+extern void		wb_init(wb_device* device);
+extern void		wb_reset(wb_device* device);
+extern status_t		wb_stop(wb_device* device);
 
-extern status_t wb_initPHYs(wb_device *device);
+extern status_t		wb_initPHYs(wb_device* device);
 
-extern void		wb_disable_interrupts(wb_device *device);
-extern void		wb_enable_interrupts(wb_device *device);
+extern void		wb_disable_interrupts(wb_device* device);
+extern void		wb_enable_interrupts(wb_device* device);
 
-extern void		wb_set_mode(wb_device *device, int mode);
-extern int32	wb_read_mode(wb_device *device);
+extern void		wb_set_mode(wb_device* device, int mode);
+extern int32		wb_read_mode(wb_device* device);
 
-extern void		wb_set_rx_filter(wb_device *device);
+extern void		wb_set_rx_filter(wb_device* device);
 
-extern int32	wb_tick(timer *arg);
-extern void		wb_put_rx_descriptor(volatile wb_desc *desc);
+extern int32		wb_tick(timer* arg);
+extern void		wb_put_rx_descriptor(volatile wb_desc* desc);
 
-extern void		print_address(ether_address_t *addr);
+extern void		print_address(ether_address_t* addr);
 
 #endif //__WB840_H

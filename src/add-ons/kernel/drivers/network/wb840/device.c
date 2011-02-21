@@ -1,5 +1,5 @@
-/* Copyright (c) 2003-2005 
- * Stefano Ceccherini <burton666@libero.it>. All rights reserved.
+/* Copyright (c) 2003-2011 
+ * Stefano Ceccherini <stefano.ceccherini@gmail.com>. All rights reserved.
  * This file is released under the MIT license
  */
 #include <KernelExport.h>
@@ -17,21 +17,20 @@
 #include "wb840.h"
 
 
-
 #define MAX_CARDS 4
 
-extern char * gDevNameList[];
-extern pci_info *gDevList[];
+extern char* gDevNameList[];
+extern pci_info* gDevList[];
 
 static int32 sOpenMask = 0;
 
 static status_t
-wb840_open(const char *name, uint32 flags, void** cookie)
+wb840_open(const char* name, uint32 flags, void** cookie)
 {
-	char *deviceName = NULL;
+	char* deviceName = NULL;
 	int32 i;
 	int32 mask;
-	struct wb_device *data;
+	struct wb_device* data;
 	status_t status;
 	
 	LOG((DEVICE_NAME ": open()\n"));
@@ -52,13 +51,11 @@ wb840_open(const char *name, uint32 flags, void** cookie)
 		return B_BUSY;
 	
 	// Allocate a wb_device structure
-	if (!(data = (wb_device *)malloc(sizeof(wb_device)))) {
+	if (!(data = (wb_device*)calloc(1, sizeof(wb_device)))) {
 		sOpenMask &= ~(1L << i);
 		return B_NO_MEMORY;
 	}
-	
-	memset(data, 0, sizeof(wb_device));
-	
+		
 	*cookie = data;
 
 #ifdef DEBUG
@@ -70,26 +67,27 @@ wb840_open(const char *name, uint32 flags, void** cookie)
 	data->deviceName = gDevNameList[i];
 	data->blockFlag = 0;
 	data->reg_base = data->pciInfo->u.h0.base_registers[0];	
-	data->wb_cachesize = gPci->read_pci_config(data->pciInfo->bus, data->pciInfo->device,
-			data->pciInfo->function, PCI_line_size, sizeof (PCI_line_size)) & 0xff;
+	data->wb_cachesize = gPci->read_pci_config(data->pciInfo->bus,
+		data->pciInfo->device, data->pciInfo->function, PCI_line_size,
+		sizeof(PCI_line_size)) & 0xff;
 		
 	wb_read_eeprom(data, &data->MAC_Address, 0, 3, false);
 	
 	status = wb_create_semaphores(data);
 	if (status < B_OK) {
-		LOG((DEVICE_NAME ": Couldn't create semaphores\n"));
+		LOG((DEVICE_NAME": couldn't create semaphores\n"));
 		goto err;
 	}
 		
 	status = wb_stop(data);
 	if (status < B_OK) {
-		LOG((DEVICE_NAME": Can't stop device\n"));
+		LOG((DEVICE_NAME": can't stop device\n"));
 		goto err1;
 	}
 			
 	status = wb_initPHYs(data);
 	if (status < B_OK) {
-		LOG((DEVICE_NAME": Can't init PHYs\n"));
+		LOG((DEVICE_NAME": can't init PHYs\n"));
 		goto err1;
 	}
 		
@@ -100,11 +98,11 @@ wb840_open(const char *name, uint32 flags, void** cookie)
 	status = install_io_interrupt_handler(data->irq, wb_interrupt, data, 0);
 	if (status < B_OK) {
 		LOG((DEVICE_NAME
-			" can't install interrupt handler: %s\n", strerror(status)));
+			": can't install interrupt handler: %s\n", strerror(status)));
 		goto err1;		
 	}
 	
-	LOG(("Interrupts installed at irq line %x\n", data->irq));
+	LOG((DEVICE_NAME ": interrupts installed at irq line %x\n", data->irq));
 		
 	status = wb_create_rings(data);
 	if (status < B_OK) {
@@ -139,9 +137,9 @@ err:
 
 
 static status_t
-wb840_read(void* cookie, off_t position, void *buf, size_t* num_bytes)
+wb840_read(void* cookie, off_t position, void* buf, size_t* num_bytes)
 {
-	wb_device *device = (wb_device*)cookie;
+	wb_device* device = (wb_device*)cookie;
 	int16 current;
 	status_t status;
 	size_t size;
@@ -167,7 +165,8 @@ wb840_read(void* cookie, off_t position, void *buf, size_t* num_bytes)
 	current = device->rxCurrent;
 	check = device->rxDescriptor[current].wb_status;	 
 	if (check & WB_RXSTAT_OWN) {
-		LOG(("ERROR: read: buffer %d still in use: %x\n", (int)current, (int)status));
+		LOG((DEVICE_NAME ":ERROR: read: buffer %d still in use: %x\n",
+			(int)current, (int)status));
 		atomic_and(&device->rxLock, 0);
 		*num_bytes = 0;
 		return B_BUSY;
@@ -185,7 +184,7 @@ wb840_read(void* cookie, off_t position, void *buf, size_t* num_bytes)
 			size = *num_bytes;
 		}
 		*num_bytes = size;
-		memcpy(buf, (void *)device->rxBuffer[current], size);
+		memcpy(buf, (void*)device->rxBuffer[current], size);
 	}
 	
 	device->rxCurrent = (current + 1) & WB_RX_CNT_MASK;
@@ -211,7 +210,7 @@ wb840_read(void* cookie, off_t position, void *buf, size_t* num_bytes)
 static status_t
 wb840_write(void* cookie, off_t position, const void* buffer, size_t* num_bytes)
 {
-	wb_device *device = (wb_device*)cookie;
+	wb_device* device = (wb_device*)cookie;
 	status_t status = B_OK;
 	uint16 frameSize;
 	int16 current;
@@ -231,7 +230,8 @@ wb840_write(void* cookie, off_t position, const void* buffer, size_t* num_bytes)
 	status = acquire_sem_etc(device->txSem, 1, B_TIMEOUT, ETHER_TRANSMIT_TIMEOUT);
 	if (status < B_OK) {
 		write32(device->reg_base + WB_TXSTART, 0xFFFFFFFF);
-		LOG(("write: acquiring sem failed: %ld, %s\n", status, strerror(status)));
+		LOG((DEVICE_NAME": write: acquiring sem failed: %ld, %s\n",
+			status, strerror(status)));
 		atomic_add(&device->txLock, -1);
 		*num_bytes = 0;
 		return status;
@@ -247,7 +247,7 @@ wb840_write(void* cookie, off_t position, const void* buffer, size_t* num_bytes)
 	}
 
 	/* Copy data to tx buffer */
-	memcpy((void *)device->txBuffer[current], buffer, frameSize);
+	memcpy((void*)device->txBuffer[current], buffer, frameSize);
 	device->txCurrent = (current + 1) & WB_TX_CNT_MASK;
 	LOG((DEVICE_NAME ": %d bytes written\n", frameSize));
 	
@@ -256,7 +256,8 @@ wb840_write(void* cookie, off_t position, const void* buffer, size_t* num_bytes)
 		acquire_spinlock(&device->txSpinlock);
 		
 		device->txDescriptor[current].wb_ctl = WB_TXCTL_TLINK | frameSize;
-		device->txDescriptor[current].wb_ctl |= WB_TXCTL_FIRSTFRAG | WB_TXCTL_LASTFRAG;
+		device->txDescriptor[current].wb_ctl |= WB_TXCTL_FIRSTFRAG
+			| WB_TXCTL_LASTFRAG;
 		device->txDescriptor[current].wb_status = WB_TXSTAT_OWN;
 		device->txSent++;
 
@@ -274,9 +275,9 @@ wb840_write(void* cookie, off_t position, const void* buffer, size_t* num_bytes)
 
 
 static status_t
-wb840_control (void *cookie, uint32 op, void *arg, size_t len)
+wb840_control (void* cookie, uint32 op, void* arg, size_t len)
 {
-	wb_device *data = (wb_device *)cookie;
+	wb_device* data = (wb_device*)cookie;
 	
 	LOG((DEVICE_NAME ": control()\n"));
 	switch (op) {
@@ -292,7 +293,7 @@ wb840_control (void *cookie, uint32 op, void *arg, size_t len)
 			
 		case ETHER_NONBLOCK:
 			LOG(("ETHER_NON_BLOCK\n"));
-			data->blockFlag = *(int32 *)arg ? B_TIMEOUT : 0;
+			data->blockFlag = *(int32*)arg ? B_TIMEOUT : 0;
 			return B_OK;
 		
 		case ETHER_GETFRAMESIZE:
@@ -338,7 +339,7 @@ wb840_control (void *cookie, uint32 op, void *arg, size_t len)
 static status_t
 wb840_close(void* cookie)
 {
-	wb_device *device = (wb_device *)cookie;
+	wb_device* device = (wb_device*)cookie;
 	
 	LOG((DEVICE_NAME ": close()\n"));
 	
@@ -362,7 +363,7 @@ wb840_close(void* cookie)
 static status_t
 wb840_free(void* cookie)
 {
-	wb_device *device = (wb_device *)cookie;
+	wb_device* device = (wb_device*)cookie;
 	
 	LOG((DEVICE_NAME ": free()\n"));
 	

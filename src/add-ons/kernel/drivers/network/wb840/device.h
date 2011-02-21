@@ -28,6 +28,6 @@
 #	define write32(address,data) 		(*((volatile uint32 *)(address)) = (data))
 #endif
 
-extern pci_module_info *gPci;
+extern pci_module_info* gPci;
 
 #endif

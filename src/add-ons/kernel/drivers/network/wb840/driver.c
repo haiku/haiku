@@ -1,5 +1,5 @@
-/* Copyright (c) 2003-2004 
- * Stefano Ceccherini <burton666@libero.it>. All rights reserved.
+/* Copyright (c) 2003-2011
+ * Stefano Ceccherini <stefano.ceccherini@gmail.com>. All rights reserved.
  */
 #include "debug.h"
 #include <Debug.h>
@@ -18,13 +18,13 @@
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 
-pci_module_info *gPci;
+pci_module_info* gPci;
 char* gDevNameList[MAX_CARDS + 1];
-pci_info *gDevList[MAX_CARDS];
+pci_info* gDevList[MAX_CARDS];
 
 
 static bool
-probe(pci_info *item)
+probe(pci_info* item)
 {
 	if ((item->vendor_id == WB_VENDORID && item->device_id == WB_DEVICEID_840F)
 			|| (item->vendor_id == CP_VENDORID && item->device_id == CP_DEVICEID_RL100))	
@@ -34,7 +34,7 @@ probe(pci_info *item)
 
 
 status_t
-init_hardware (void)
+init_hardware(void)
 {
 	LOG((DEVICE_NAME ": init_hardware\n"));
 	return B_OK;
@@ -42,9 +42,9 @@ init_hardware (void)
 
 
 status_t
-init_driver (void)
+init_driver(void)
 {
-	struct pci_info *item = NULL;
+	struct pci_info* item = NULL;
 	int index = 0;
 	int card_found = 0;
 	char devName[64];
@@ -56,11 +56,11 @@ init_driver (void)
 	set_dprintf_enabled(true);
 #endif
 	
-	status = get_module(B_PCI_MODULE_NAME, (module_info **)&gPci);
+	status = get_module(B_PCI_MODULE_NAME, (module_info**)&gPci);
 	if (status < B_OK)
 		return status;
 	
-	item = (pci_info *)malloc(sizeof(pci_info));
+	item = (pci_info*)malloc(sizeof(pci_info));
 	if (item == NULL) {
 		put_module(B_PCI_MODULE_NAME);
 		return B_NO_MEMORY;
@@ -128,7 +128,7 @@ device_hooks*
 find_device(const char* name)
 {
 	int32 i;
-	char *item;
+	char* item;
 
 	LOG((DEVICE_NAME ": find_device()\n"));
 	// Find device name

@@ -1,7 +1,7 @@
 #ifndef __MYDEBUG_H
 #define __MYDEBUG_H
 
-#define ARGS (const char *, ...)
+#define ARGS (const char*, ...)
 
 #ifdef DEBUG
 	#define LOG(ARGS) dprintf ARGS
