@@ -1732,8 +1732,16 @@ TMailWindow::QuitRequested()
 		}
 	} else if (fRef != NULL && !sKeepStatusOnQuit) {
 		// ...Otherwise just set the message read
-		read_flags flag = (fAutoMarkRead == true) ? B_READ : B_SEEN;
-		SetCurrentMessageRead(flag);
+		if (fAutoMarkRead == true)
+			SetCurrentMessageRead(B_READ);
+		else {
+			BNode node(fRef);
+			read_flags currentFlag;
+			if (read_read_attr(node, currentFlag) != B_OK)
+				currentFlag = B_UNREAD;
+			if (currentFlag == B_UNREAD)
+				SetCurrentMessageRead(B_SEEN);
+		}
 	}
 
 	BPrivate::BPathMonitor::StopWatching(BMessenger(this, this));
