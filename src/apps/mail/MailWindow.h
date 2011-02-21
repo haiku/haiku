@@ -42,6 +42,7 @@ All rights reserved.
 #include <Messenger.h>
 #include <Window.h>
 
+#include <E-mail.h>
 #include <mail_encoding.h>
 
 
@@ -108,7 +109,7 @@ class TMailWindow : public BWindow {
 				void			SaveTrackerPosition(entry_ref*);
 				void			SetOriginatingWindow(BWindow* window);
 
-				void			SetCurrentMessageRead(bool read = true);
+				void			SetCurrentMessageRead(read_flags flag);
 				void			SetTrackerSelectionToCurrent();
 				TMailWindow*	FrontmostWindow();
 				void			UpdateViews();

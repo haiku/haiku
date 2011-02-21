@@ -140,7 +140,7 @@ TPrefsWindow::TPrefsWindow(BRect rect, BFont* font, int32* level, bool* wrap,
 	fSpellCheckStartOn(*fNewSpellCheckStartOn),
 
 	fNewAutoMarkRead(autoMarkRead),
-	fAutoMarkRead(true)
+	fAutoMarkRead(*autoMarkRead)
 {
 	strcpy(fSignature, *fNewSignature);
 

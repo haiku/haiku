@@ -93,15 +93,36 @@ write_read_attr(BNode& node, read_flags flag)
 		< 0)
 		return B_ERROR;
 
-	if (flag == B_SEEN)
-		return B_OK;
-
-	const char* statusString = (flag == B_READ) ? "Read" : "New";
+#if R5_COMPATIBLE
+	const char* statusString = (flag == B_READ) ? "Read"
+		: (flag  == B_SEEN) ? "Seen" : "New";
 	if (node.WriteAttr(B_MAIL_ATTR_STATUS, B_STRING_TYPE, 0, statusString,
 		strlen(statusString)) < 0)
 		return B_ERROR;
-
+#endif
 	return B_OK;
+}
+
+
+status_t
+read_read_attr(BNode& node, read_flags& flag)
+{
+	if (node.ReadAttr(B_MAIL_ATTR_READ, B_INT32_TYPE, 0, &flag, sizeof(int32))
+		== sizeof(int32))
+		return B_OK;
+
+#if R5_COMPATIBLE
+	BString statusString;
+	if (node.ReadAttrString(B_MAIL_ATTR_STATUS, &statusString) == B_OK) {
+		if (statusString.ICompare("New"))
+			flag = B_UNREAD;
+		else
+			flag = B_READ;
+
+		return B_OK;
+	}
+#endif
+	return B_ERROR;
 }
 
 

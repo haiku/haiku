@@ -17,6 +17,7 @@ class BString;
 
 
 status_t write_read_attr(BNode& node, read_flags flag);
+status_t read_read_attr(BNode& node, read_flags& flag);
 
 
 // The next couple of functions are our wrapper around convert_to_utf8 and
