@@ -548,19 +548,20 @@ TermWindow::_SaveWindowPosition()
 	BFile file;
 	BMessage originalSettings;
 
-	// We append ourself to the existing settings file
-	// So we have to read it, insert our BMessage, and rewrite it.
-
+	// Read the settings file if it exists and is a valid BMessage.
 	status_t status = _GetWindowPositionFile(&file, B_READ_ONLY);
 	if (status == B_OK) {
-		originalSettings.Unflatten(&file);
-			// No error checking on that : it fails if the settings
-			// file is missing, but we can create it.
-
+		status = originalSettings.Unflatten(&file);
 		file.Unset();
+
+		if (status != B_OK)
+			status = originalSettings.MakeEmpty();
+
+		if (status != B_OK)
+			return status;
 	}
 
-	// Append the new settings
+	// Replace the settings
 	int32 id = fTerminalRoster.ID();
 	BRect rect(Frame());
 	if (originalSettings.ReplaceRect("rect", id, rect) != B_OK)
