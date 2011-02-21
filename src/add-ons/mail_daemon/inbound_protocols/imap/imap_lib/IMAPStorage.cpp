@@ -7,7 +7,7 @@
 #include <NodeInfo.h>
 #include <OS.h>
 
-#include <E-mail.h>
+#include <mail_util.h>
 
 #include "IMAPMailbox.h"
 
@@ -463,6 +463,11 @@ IMAPStorage::_ReadFilesThread()
 status_t
 IMAPStorage::_WriteFlags(int32 flags, BNode& node)
 {
+	if ((flags & kSeen) != 0)
+		write_read_attr(node, B_READ);
+	else
+		write_read_attr(node, B_UNREAD);
+
 	ssize_t writen = node.WriteAttr("MAIL:server_flags", B_INT32_TYPE, 0,
 		&flags, sizeof(int32));
 	if (writen != sizeof(int32))

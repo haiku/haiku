@@ -64,8 +64,6 @@ HaikuMailFormatFilter::HaikuMailFormatFilter(MailProtocol& protocol,
 void
 HaikuMailFormatFilter::HeaderFetched(const entry_ref& ref, BFile* file)
 {
-	write_read_attr(*file, B_UNREAD);
-
 	file->Seek(0, SEEK_SET);
 
 	BMessage attributes;
