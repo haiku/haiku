@@ -31,6 +31,17 @@ namespace MailInternal {
 }
 
 
+BString
+default_sent_directory()
+{
+	BPath path;
+	if (find_directory(B_USER_DIRECTORY, &path) != B_OK)
+		path.SetTo("/boot/home");
+	path.Append("mail/sent");
+	return path.Path();
+}
+
+
 //	#pragma mark - BMailSettings
 
 

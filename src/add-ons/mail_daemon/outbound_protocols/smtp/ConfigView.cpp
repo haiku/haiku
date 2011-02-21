@@ -71,7 +71,7 @@ SMTPConfigView::SMTPConfigView(MailAddonSettings& settings,
 	SetTo(settings);
 
 	fFileView =  new BMailFileConfigView("Destination:", "destination",
-		false, kDefaultSentDirectory);
+		false, default_sent_directory());
 	fFileView->SetTo(&settings.Settings(), NULL);
 	AddChild(fFileView);
 	float w, h;

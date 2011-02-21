@@ -8,7 +8,16 @@
 
 #include <stdio.h>
 
+#include <Node.h>
+
+#include <E-mail.h>
+
+
 class BString;
+
+
+status_t write_read_attr(BNode& node, read_flags flag);
+
 
 // The next couple of functions are our wrapper around convert_to_utf8 and
 // convert_from_utf8 so that they can also convert from UTF-8 to UTF-8 by

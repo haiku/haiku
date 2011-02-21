@@ -28,6 +28,16 @@ struct entry_ref;
 #define B_MAIL_ATTR_MIME		"MAIL:mime"				// string
 #define B_MAIL_ATTR_HEADER		"MAIL:header_length"	// int32
 #define B_MAIL_ATTR_CONTENT		"MAIL:content_length"	// int32
+#define B_MAIL_ATTR_READ		"MAIL:read"				// int32
+
+
+// read flags
+enum read_flags {
+	B_UNREAD				= 0,
+	B_SEEN					= 1,
+	B_READ					= 2
+	
+};
 
 
 // mail flags

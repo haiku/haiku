@@ -484,7 +484,7 @@ IMAPInboundProtocol::FetchBody(const entry_ref& ref)
 
 
 status_t
-IMAPInboundProtocol::MarkMessageAsRead(const entry_ref& ref, bool read)
+IMAPInboundProtocol::MarkMessageAsRead(const entry_ref& ref, read_flags flag)
 {
 	if (!IsConnected())
 		Connect(fServer, fUsername, fPassword, fUseSSL);
@@ -492,14 +492,16 @@ IMAPInboundProtocol::MarkMessageAsRead(const entry_ref& ref, bool read)
 	fIMAPMailboxThread->StopWatchingMailbox();
 	int32 uid = fStorage.RefToUID(ref);
 	int32 flags = fStorage.GetFlags(uid);
-	if (read)
+	if (flag == B_READ)
 		flags |= kSeen;
 	else
 		flags &= ~kSeen;
 	status_t status = fIMAPMailbox.SetFlags(
 		fIMAPMailbox.UIDToMessageNumber(uid), flags);
 	fIMAPMailboxThread->SyncAndStartWatchingMailbox();
-	return status;
+	if (status != B_OK)
+		return status;
+	return InboundProtocol::MarkMessageAsRead(ref, flag);
 }
 
 

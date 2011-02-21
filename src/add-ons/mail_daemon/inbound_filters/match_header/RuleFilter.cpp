@@ -89,7 +89,7 @@ RuleFilter::HeaderFetched(const entry_ref& ref, BFile* file)
 		case Z_SET_READ:
 		{
 			InboundProtocol& protocol = (InboundProtocol&)fMailProtocol;
-			protocol.MarkMessageAsRead(ref, true);
+			protocol.MarkMessageAsRead(ref, B_READ);
 			break;
 		}
 		default:

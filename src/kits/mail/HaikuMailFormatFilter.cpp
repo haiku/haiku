@@ -54,14 +54,18 @@ HaikuMailFormatFilter::HaikuMailFormatFilter(MailProtocol& protocol,
 	fAccountId(settings->AccountID())
 {
 	const BMessage* outboundSettings = &settings->OutboundSettings().Settings();
-	fOutboundDirectory = kDefaultSentDirectory;
-	outboundSettings->FindString("destination", &fOutboundDirectory);
+	if (outboundSettings->FindString("destination", &fOutboundDirectory)
+		!= B_OK) {
+		fOutboundDirectory = default_sent_directory();
+	}
 }
 
 
 void
 HaikuMailFormatFilter::HeaderFetched(const entry_ref& ref, BFile* file)
 {
+	write_read_attr(*file, B_UNREAD);
+
 	file->Seek(0, SEEK_SET);
 
 	BMessage attributes;

@@ -25,6 +25,7 @@
 
 #include <MDRLanguage.h>
 
+#include <mail_util.h>
 #include <MailAddon.h>
 #include <MailProtocol.h>
 #include <MailSettings.h>
@@ -403,14 +404,10 @@ InboundProtocol::AppendMessage(const entry_ref& ref)
 
 
 status_t
-InboundProtocol::MarkMessageAsRead(const entry_ref& ref, bool read)
+InboundProtocol::MarkMessageAsRead(const entry_ref& ref, read_flags flag)
 {
 	BNode node(&ref);
-	const char* statusString = (read == true) ? "Read" : "New";
-	if (node.WriteAttr(B_MAIL_ATTR_STATUS, B_STRING_TYPE, 0, statusString,
-		strlen(statusString)) < 0)
-		return B_ERROR;
-	return B_OK;
+	return write_read_attr(node, flag);
 }
 
 
@@ -603,7 +600,7 @@ InboundProtocolThread::MessageReceived(BMessage* message)
 	{
 		entry_ref ref;
 		message->FindRef("ref", &ref);
-		bool read = message->FindBool("read");
+		read_flags read = (read_flags)message->FindInt32("read");
 		fProtocol->MarkMessageAsRead(ref, read);
 		break;
 	}
@@ -648,11 +645,11 @@ InboundProtocolThread::FetchBody(const entry_ref& ref, BMessage* launch)
 
 
 void
-InboundProtocolThread::MarkMessageAsRead(const entry_ref& ref, bool read)
+InboundProtocolThread::MarkMessageAsRead(const entry_ref& ref, read_flags flag)
 {
 	BMessage message(kMsgMarkMessageAsRead);
 	message.AddRef("ref", &ref);
-	message.AddBool("read", read);
+	message.AddInt32("read", flag);
 	PostMessage(&message);
 }
 

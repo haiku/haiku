@@ -7,6 +7,9 @@
 */
 
 
+#include <E-mail.h>
+
+
 const uint32 kMsgCheckAndSend = 'mbth';
 const uint32 kMsgCheckMessage = 'mnow';
 const uint32 kMsgSendMessages = 'msnd';
@@ -27,7 +30,7 @@ public:
 	static int32				CountNewMessages(
 									bool waitForFetchCompletion = false);
 	static status_t				MarkAsRead(int32 account, const entry_ref& ref,
-									bool read = true);
+									read_flags flag = B_READ);
 	static status_t				FetchBody(const entry_ref& ref,
 									BMessage* launchMessage = NULL);
 	static status_t				Quit();

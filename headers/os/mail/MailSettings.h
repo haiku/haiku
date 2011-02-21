@@ -39,7 +39,7 @@ typedef enum
 } b_mail_status_window_look;
 
 
-#define kDefaultSentDirectory "/boot/home/mail/sent"
+BString default_sent_directory();
 
 
 class BMailSettings {

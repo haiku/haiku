@@ -86,6 +86,25 @@ extern const CharsetConversionEntry mail_charsets [] =
 };
 
 
+status_t
+write_read_attr(BNode& node, read_flags flag)
+{
+	if (node.WriteAttr(B_MAIL_ATTR_READ, B_INT32_TYPE, 0, &flag, sizeof(int32))
+		< 0)
+		return B_ERROR;
+
+	if (flag == B_SEEN)
+		return B_OK;
+
+	const char* statusString = (flag == B_READ) ? "Read" : "New";
+	if (node.WriteAttr(B_MAIL_ATTR_STATUS, B_STRING_TYPE, 0, statusString,
+		strlen(statusString)) < 0)
+		return B_ERROR;
+
+	return B_OK;
+}
+
+
 // The next couple of functions are our wrapper around convert_to_utf8 and
 // convert_from_utf8 so that they can also convert from UTF-8 to UTF-8 by
 // specifying the B_MAIL_UTF8_CONVERSION constant as the conversion operation.  It

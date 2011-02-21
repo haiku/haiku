@@ -58,6 +58,7 @@ makeIndices()
 		fs_create_index(device, B_MAIL_ATTR_WHEN, B_INT32_TYPE, 0);
 		fs_create_index(device, B_MAIL_ATTR_FLAGS, B_INT32_TYPE, 0);
 		fs_create_index(device, B_MAIL_ATTR_ACCOUNT, B_INT32_TYPE, 0);
+		fs_create_index(device, B_MAIL_ATTR_READ, B_INT32_TYPE, 0);
 	}
 }
 
@@ -432,7 +433,7 @@ MailDaemonApp::MessageReceived(BMessage* msg)
 			entry_ref ref;
 			if (msg->FindRef("ref", &ref) != B_OK)
 				break;
-			bool read = msg->FindBool("read");
+			read_flags read = (read_flags)msg->FindInt32("read");
 			AccountMap::iterator it = fAccounts.find(account);
 			if (it == fAccounts.end())
 				break;
@@ -670,6 +671,8 @@ MailDaemonApp::MakeMimeTypes(bool remakeMIMETypes)
 			addAttribute(info, B_MAIL_ATTR_THREAD, "Thread");
 			addAttribute(info, B_MAIL_ATTR_ACCOUNT, "Account", B_STRING_TYPE,
 				true, false, 100);
+			addAttribute(info, B_MAIL_ATTR_READ, "Read", B_INT32_TYPE,
+				true, false, 70);
 			mime.SetAttrInfo(&info);
 
 			if (i == 0) {

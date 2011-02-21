@@ -468,10 +468,6 @@ IMAPStorage::_WriteFlags(int32 flags, BNode& node)
 	if (writen != sizeof(int32))
 		return writen;
 
-	const char* statusString = (flags & kSeen) ? "Read" : "New";
-	node.WriteAttr(B_MAIL_ATTR_STATUS, B_STRING_TYPE, 0, statusString,
-		strlen(statusString));
-
 	return B_OK;
 }
 

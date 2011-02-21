@@ -98,14 +98,15 @@ IMAPRootInboundProtocol::FetchBody(const entry_ref& ref)
 
 
 status_t
-IMAPRootInboundProtocol::MarkMessageAsRead(const entry_ref& ref, bool read)
+IMAPRootInboundProtocol::MarkMessageAsRead(const entry_ref& ref,
+	read_flags flag)
 {
 	if (InterestingEntry(ref))
-		return IMAPInboundProtocol::MarkMessageAsRead(ref, read);
+		return IMAPInboundProtocol::MarkMessageAsRead(ref, flag);
 	InboundProtocolThread* thread = _FindThreadFor(ref);
 	if (!thread)
 		return B_BAD_VALUE;
-	thread->MarkMessageAsRead(ref, read);
+	thread->MarkMessageAsRead(ref, flag);
 	return B_OK;
 }
 

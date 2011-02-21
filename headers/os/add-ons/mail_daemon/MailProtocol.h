@@ -17,6 +17,7 @@
 #include <Entry.h>
 #include <File.h>
 
+#include <E-mail.h>
 #include <MailSettings.h>
 
 
@@ -145,7 +146,7 @@ public:
 	virtual	status_t			SyncMessages() = 0;
 	virtual status_t			FetchBody(const entry_ref& ref) = 0;
 	virtual	status_t			MarkMessageAsRead(const entry_ref& ref,
-									bool read = true);
+									read_flags flag = B_READ);
 	virtual	status_t			DeleteMessage(const entry_ref& ref) = 0;
 	virtual	status_t			AppendMessage(const entry_ref& ref);
 };
@@ -196,7 +197,7 @@ public:
 			void				FetchBody(const entry_ref& ref,
 									BMessage* launch = NULL);
 			void				MarkMessageAsRead(const entry_ref& ref,
-									bool read = true);
+									read_flags flag = B_READ);
 			void				DeleteMessage(const entry_ref& ref);
 			void				AppendMessage(const entry_ref& ref);
 private:

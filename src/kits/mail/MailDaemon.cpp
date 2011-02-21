@@ -71,7 +71,7 @@ BMailDaemon::CountNewMessages(bool wait_for_fetch_completion)
 
 
 status_t
-BMailDaemon::MarkAsRead(int32 account, const entry_ref& ref, bool read)
+BMailDaemon::MarkAsRead(int32 account, const entry_ref& ref, read_flags flag)
 {
 	BMessenger daemon("application/x-vnd.Be-POST");
 	if (!daemon.IsValid())
@@ -80,7 +80,7 @@ BMailDaemon::MarkAsRead(int32 account, const entry_ref& ref, bool read)
 	BMessage message(kMsgMarkMessageAsRead);
 	message.AddInt32("account", account);
 	message.AddRef("ref", &ref);
-	message.AddBool("read", read);
+	message.AddInt32("read", flag);
 
 	return daemon.SendMessage(&message);
 }

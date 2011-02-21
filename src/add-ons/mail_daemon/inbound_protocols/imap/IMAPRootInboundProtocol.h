@@ -33,7 +33,7 @@ public:
 			status_t			SyncMessages();
 			status_t			FetchBody(const entry_ref& ref);
 			status_t			MarkMessageAsRead(const entry_ref& ref,
-									bool read = true);
+									read_flags flag = B_READ);
 
 			status_t			DeleteMessage(const entry_ref& ref);
 			status_t			AppendMessage(const entry_ref& ref);

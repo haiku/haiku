@@ -184,9 +184,6 @@ POP3Protocol::SyncMessages()
 
 		entry_ref ref;
 		entry.GetRef(&ref);
-		// the ref becomes invalid after renaming the file thus we already
-		// write the status here
-		MarkMessageAsRead(ref, false);
 
 		int32 size = MessageSize(toRetrieve);
 		if (fFetchBodyLimit < 0 || size <= fFetchBodyLimit) {

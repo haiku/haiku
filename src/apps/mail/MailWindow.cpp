@@ -852,12 +852,12 @@ TMailWindow::SetCurrentMessageRead(bool read)
 	if (read && !mailStatus.ICompare("New")) {
 		node.RemoveAttr(B_MAIL_ATTR_STATUS);
 		WriteAttrString(&node, B_MAIL_ATTR_STATUS, "Read");
-		BMailDaemon::MarkAsRead(account, *fRef, true);
+		BMailDaemon::MarkAsRead(account, *fRef, B_READ);
 	}
 	if (!read && !mailStatus.ICompare("Read")) {
 		node.RemoveAttr(B_MAIL_ATTR_STATUS);
 		WriteAttrString(&node, B_MAIL_ATTR_STATUS, "New");
-		BMailDaemon::MarkAsRead(account, *fRef, false);
+		BMailDaemon::MarkAsRead(account, *fRef, B_UNREAD);
 	}
 }
 
