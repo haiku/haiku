@@ -154,8 +154,8 @@ void DeskbarView::_RefreshMailQuery()
 		BQuery *newMailQuery = new BQuery;
 		newMailQuery->SetTarget(this);
 		newMailQuery->SetVolume(&volume);
-		newMailQuery->PushAttr(B_MAIL_ATTR_STATUS);
-		newMailQuery->PushString("New");
+		newMailQuery->PushAttr(B_MAIL_ATTR_READ);
+		newMailQuery->PushInt32(B_UNREAD);
 		newMailQuery->PushOp(B_EQ);
 		newMailQuery->PushAttr("BEOS:TYPE");
 		newMailQuery->PushString("text/x-email");
@@ -445,7 +445,7 @@ DeskbarView::_CreateNewMailQuery(BEntry& query)
 	if (file.InitCheck() != B_OK)
 		return;
 
-	BString string("((" B_MAIL_ATTR_STATUS "==\"[nN][eE][wW]\")&&((BEOS:TYPE=="
+	BString string("((" B_MAIL_ATTR_READ "<2)&&((BEOS:TYPE=="
 		"\"text/x-email\")||(BEOS:TYPE==\"text/x-partial-email\")))");
 	file.WriteAttrString("_trk/qrystr", &string);
 	file.WriteAttrString("_trk/qryinitstr", &string);
