@@ -1,5 +1,6 @@
 /*
  * Copyright 2009-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2011, Philippe Saint-Pierre, stpere@gmail.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -156,6 +157,10 @@ CharacterWindow::CharacterWindow()
 	fCharacterView = new CharacterView("characters");
 	fCharacterView->SetTarget(this, kMsgCharacterChanged);
 
+	fGlyphView = new BStringView("glyph", "");
+	fGlyphView->SetExplicitMaxSize(BSize(B_SIZE_UNSET,
+		fGlyphView->PreferredSize().Height()));
+
 	// TODO: have a context object shared by CharacterView/UnicodeBlockView
 	bool show;
 	if (settings.FindBool("show private blocks", &show) == B_OK) {
@@ -210,7 +215,9 @@ CharacterWindow::CharacterWindow()
 			.Add(BGroupLayoutBuilder(B_VERTICAL, 10)
 				.Add(characterScroller)
 				.Add(fFontSizeSlider)
-				.Add(fCodeView))
+				.Add(BGroupLayoutBuilder(B_HORIZONTAL, 0)
+					.Add(fGlyphView)
+					.Add(fCodeView)))
 			.SetInsets(10, 10, 10, 10)));
 
 	// Add menu
@@ -310,9 +317,13 @@ CharacterWindow::MessageReceived(BMessage* message)
 				sizeof(utf8Hex));
 
 			char text[128];
-			snprintf(text, sizeof(text), "'%s' %s: %#lx (%ld), UTF-8: %s",
-				utf8, B_TRANSLATE("Code"), character, character, utf8Hex);
+			snprintf(text, sizeof(text), " %s: %#lx (%ld), UTF-8: %s",
+				B_TRANSLATE("Code"), character, character, utf8Hex);
 
+			char glyph[20];
+			snprintf(glyph, sizeof(glyph), "'%s'", utf8);
+
+			fGlyphView->SetText(glyph);
 			fCodeView->SetText(text);
 			break;
 		}
@@ -487,6 +498,7 @@ CharacterWindow::_SetFont(const char* family, const char* style)
 	font.SetFamilyAndStyle(family, style);
 
 	fCharacterView->SetCharacterFont(font);
+	fGlyphView->SetFont(&font, B_FONT_FAMILY_AND_STYLE);
 }
 
 

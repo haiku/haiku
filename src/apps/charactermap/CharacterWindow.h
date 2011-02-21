@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2011, Philippe Saint-Pierre, stpere@gmail.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef CHARACTER_WINDOW_H
@@ -42,6 +43,7 @@ private:
 			CharacterView*	fCharacterView;
 			BMenuItem*		fSelectedFontItem;
 			BSlider*		fFontSizeSlider;
+			BStringView*	fGlyphView;
 			BStringView*	fCodeView;
 };
 
