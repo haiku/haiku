@@ -5,6 +5,7 @@
  * Authors:
  *		Philippe Houdoin
  * 		Fredrik Modéen
+ *		Alexander von Gluck, <kallisti5@unixzen.com>
  */
 #ifndef INTERFACES_ADDON_H
 #define INTERFACES_ADDON_H
@@ -12,7 +13,7 @@
 
 #include <Box.h>
 #include <ListView.h>
-#include <Button.h> 
+#include <Button.h>
 
 #include "NetworkSetupAddOn.h"
 
@@ -22,8 +23,9 @@ class InterfacesAddOn : public NetworkSetupAddOn, public BBox
 public:
 		InterfacesAddOn(image_id addon_image);
 		~InterfacesAddOn();
-		
+
 		const char* 	Name();
+		status_t		Save();
 		BView*			CreateView(BRect *bounds);
 
 		enum {

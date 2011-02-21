@@ -2,9 +2,11 @@
  * Copyright 2004-2011 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
+ *	Authors:
+ *		Alexander von Gluck, <kallisti5@unixzen.com>
  */
 
-#include "NetworkSetupAddOn.h"
+
 #include "NetworkSetupWindow.h"
 
 #include <Application.h>
@@ -31,7 +33,8 @@
 NetworkSetupWindow::NetworkSetupWindow(const char *title)
 	:
 	BWindow(BRect(100, 100, 300, 300), title, B_TITLED_WINDOW,
-		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
+		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
+	fAddonCount(0)
 {
 	// ---- Profiles section
 	BMenu *profilesPopup = new BPopUpMenu("<none>");
@@ -55,7 +58,7 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 
 	fRevertButton = new BButton("revert", B_TRANSLATE("Revert"),
 		new BMessage(kMsgRevert));
-	fRevertButton->SetEnabled(false);
+	// fRevertButton->SetEnabled(false);
 
 	// Enable boxes resizing modes
 	fPanel->SetResizingMode(B_FOLLOW_ALL);
@@ -85,7 +88,6 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 		fMinAddonViewRect.Height()));
 
 	fAddonView = NULL;
-
 
 }
 
@@ -125,6 +127,25 @@ NetworkSetupWindow::MessageReceived(BMessage*	msg)
 			is_current = (strcmp(name.Leaf(), "current") == 0);
 
 			fApplyButton->SetEnabled(!is_current);
+			break;
+		}
+
+		case kMsgRevert: {
+			for (int addonIndex = 0; addonIndex < fAddonCount; addonIndex++) {
+				NetworkSetupAddOn* addon
+					= fNetworkAddOnMap[addonIndex];
+				addon->Revert();
+			}
+			break;
+		}
+
+
+		case kMsgApply: {
+			for (int addonIndex = 0; addonIndex < fAddonCount; addonIndex++) {
+				NetworkSetupAddOn* addon
+					= fNetworkAddOnMap[addonIndex];
+				addon->Save();
+			}
 			break;
 		}
 
@@ -264,24 +285,25 @@ NetworkSetupWindow::_BuildShowTabView(int32 msg_what)
 				B_SYMBOL_TYPE_TEXT, (void **) &get_nth_addon);
 
 			if (status == B_OK) {
-				NetworkSetupAddOn *addon;
-				int n = 0;
-				while ((addon = get_nth_addon(addon_id, n)) != NULL) {
+				while ((fNetworkAddOnMap[fAddonCount]
+					= get_nth_addon(addon_id, fAddonCount)) != NULL) {
+					printf("Adding Tab: %d\n", fAddonCount);
 					BMessage* msg = new BMessage(msg_what);
 
 					BRect r(0, 0, 0, 0);
-					BView* addon_view = addon->CreateView(&r);
+					BView* addon_view
+						= fNetworkAddOnMap[fAddonCount]->CreateView(&r);
 					fMinAddonViewRect = fMinAddonViewRect | r;
 
 					msg->AddInt32("image_id", addon_id);
 					msg->AddString("addon_path", addon_path.Path());
-					msg->AddPointer("addon", addon);
+					msg->AddPointer("addon", fNetworkAddOnMap[fAddonCount]);
 					msg->AddPointer("addon_view", addon_view);
 
 					BTab *tab = new BTab;
 					fPanel->AddTab(addon_view, tab);
-					tab->SetLabel(addon->Name());
-					n++;
+					tab->SetLabel(fNetworkAddOnMap[fAddonCount]->Name());
+					fAddonCount++;
 				}
 				continue;
 			}

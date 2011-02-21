@@ -2,10 +2,20 @@
  * Copyright 2004-2011 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
+ *	Authors:
+ *		Alexander von Gluck, <kallisti5@unixzen.com>
  */
-
 #ifndef NETWORKSETUPWINDOW_H
 #define NETWORKSETUPWINDOW_H
+
+
+#include "NetworkSetupAddOn.h"
+
+#include <map>
+
+
+typedef std::map<int, NetworkSetupAddOn*> NetworkAddOnMap;
+
 
 class NetworkSetupWindow;
 
@@ -41,8 +51,11 @@ class NetworkSetupWindow : public BWindow
 			BButton*			fRevertButton;
 			BButton*			fApplyButton;
 
+			NetworkAddOnMap		fNetworkAddOnMap;
+
 			BTabView*			fPanel;
 			BView*				fAddonView;
+			int					fAddonCount;
 			BRect				fMinAddonViewRect;
 };
 

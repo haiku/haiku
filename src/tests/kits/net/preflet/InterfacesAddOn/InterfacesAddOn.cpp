@@ -58,6 +58,14 @@ InterfacesAddOn::Name()
 }
 
 
+status_t
+InterfacesAddOn::Save()
+{
+	printf("I am saved!\n");
+	return B_OK;
+}
+
+
 BView*
 InterfacesAddOn::CreateView(BRect *bounds)
 {

@@ -4,6 +4,7 @@
  *
  */
 
+
 #include "NetworkSetupAddOn.h"
 
 #include <kernel/image.h>
@@ -14,10 +15,10 @@
 
 
 NetworkSetupAddOn::NetworkSetupAddOn(image_id image)
-	: 
-	fIsDirty(false), 
-	fProfile(NULL), 
-	fAddonImage(image), 
+	:
+	fIsDirty(false),
+	fProfile(NULL),
+	fAddonImage(image),
 	fAddonResources(NULL)
 {
 }
@@ -88,7 +89,6 @@ NetworkSetupAddOn::ImageId()
 }
 
 
-
 const char*
 NetworkSetupAddOn::Name()
 {
@@ -103,7 +103,7 @@ NetworkSetupAddOn::Resources()
 		image_info info;
 		if (get_image_info(fAddonImage, &info) != B_OK)
 			return NULL;
-		
+
 		BResources *resources = new BResources();
 		BFile addon_file(info.name, O_RDONLY);
 		if (resources->SetTo(&addon_file) == B_OK)
