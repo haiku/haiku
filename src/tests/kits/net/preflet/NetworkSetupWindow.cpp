@@ -35,7 +35,7 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 {
 	// ---- Profiles section
 	BMenu *profilesPopup = new BPopUpMenu("<none>");
-	_BuildProfilesMenu(profilesPopup, SELECT_PROFILE_MSG);
+	_BuildProfilesMenu(profilesPopup, kMsgProfileSelected);
 
 	BMenuField *profilesMenuField = new BMenuField("profiles_menu",
 		B_TRANSLATE("Profile:"), profilesPopup);
@@ -51,10 +51,10 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 	bottomDivider->SetBorder(B_PLAIN_BORDER);
 
 	fApplyButton = new BButton("apply", B_TRANSLATE("Apply"),
-		new BMessage(APPLY_NOW_MSG));
+		new BMessage(kMsgApply));
 
 	fRevertButton = new BButton("revert", B_TRANSLATE("Revert"),
-		new BMessage(REVERT_MSG));
+		new BMessage(kMsgRevert));
 	fRevertButton->SetEnabled(false);
 
 	// Enable boxes resizing modes
@@ -78,7 +78,7 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 		.SetInsets(10, 10, 10, 10)
 	);
 
-	_BuildShowTabView(SHOW_MSG);
+	_BuildShowTabView(kMsgAddonShow);
 
 	bottomDivider->SetExplicitMaxSize(BSize(B_SIZE_UNSET, 1));
 	fPanel->SetExplicitMinSize(BSize(fMinAddonViewRect.Width(),
@@ -107,44 +107,43 @@ void
 NetworkSetupWindow::MessageReceived(BMessage*	msg)
 {
 	switch (msg->what) {
-
-	case NEW_PROFILE_MSG:
-		break;
-
-	case SELECT_PROFILE_MSG: {
-		BPath name;
-		const char *path;
-		bool is_default;
-		bool is_current;
-
-		if (msg->FindString("path", &path) != B_OK)
+		case kMsgProfileNew:
 			break;
 
-		name.SetTo(path);
+		case kMsgProfileSelected: {
+			BPath name;
+			const char *path;
+			bool is_default;
+			bool is_current;
 
-		is_default = (strcmp(name.Leaf(), "default") == 0);
-		is_current = (strcmp(name.Leaf(), "current") == 0);
+			if (msg->FindString("path", &path) != B_OK)
+				break;
 
-		fApplyButton->SetEnabled(!is_current);
-		break;
-	}
+			name.SetTo(path);
 
-	case SHOW_MSG: {
-		if (fAddonView)
-			fAddonView->RemoveSelf();
+			is_default = (strcmp(name.Leaf(), "default") == 0);
+			is_current = (strcmp(name.Leaf(), "current") == 0);
 
-		fAddonView = NULL;
-		if (msg->FindPointer("addon_view", (void **) &fAddonView) != B_OK)
+			fApplyButton->SetEnabled(!is_current);
 			break;
+		}
 
-		fPanel->AddChild(fAddonView);
-		fAddonView->ResizeTo(fPanel->Bounds().Width(),
-			fPanel->Bounds().Height());
-		break;
-	}
+		case kMsgAddonShow: {
+			if (fAddonView)
+				fAddonView->RemoveSelf();
 
-	default:
-		inherited::MessageReceived(msg);
+			fAddonView = NULL;
+			if (msg->FindPointer("addon_view", (void **) &fAddonView) != B_OK)
+				break;
+
+			fPanel->AddChild(fAddonView);
+			fAddonView->ResizeTo(fPanel->Bounds().Width(),
+				fPanel->Bounds().Height());
+			break;
+		}
+
+		default:
+			inherited::MessageReceived(msg);
 	}
 }
 
@@ -193,9 +192,9 @@ NetworkSetupWindow::_BuildProfilesMenu(BMenu* menu, int32 msg_what)
 
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem(B_TRANSLATE("New" B_UTF8_ELLIPSIS),
-		new BMessage(NEW_PROFILE_MSG)));
+		new BMessage(kMsgProfileNew)));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Manage" B_UTF8_ELLIPSIS),
-		new BMessage(MANAGE_PROFILES_MSG)));
+		new BMessage(kMsgProfileManage)));
 
 	if (strlen(current_profile)) {
 		item = menu->FindItem(current_profile);

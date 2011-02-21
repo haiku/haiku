@@ -18,38 +18,34 @@ class BMenu;
 class NetworkSetupWindow : public BWindow
 {
 	public:
-		NetworkSetupWindow(const char *title);
-		~NetworkSetupWindow();
-							
-		typedef BWindow	 		inherited;
+								NetworkSetupWindow(const char *title);
+								~NetworkSetupWindow();
 
-		enum {
-			SELECT_PROFILE_MSG			= 'prof',
-			MANAGE_PROFILES_MSG			= 'mngp',
-			NEW_PROFILE_MSG				= 'newp',
-			COPY_PROFILE_MSG			= 'cpyp',
-			DELETE_PROFILE_MSG			= 'delp',
-			SHOW_MSG					= 'show',
-			HELP_MSG					= 'help',
-			DONT_TOUCH_MSG				= 'lock',
-			APPLY_NOW_MSG 				= 'aply',
-			REVERT_MSG					= 'rvrt'
-		};
-				
-		bool			QuitRequested();
-		void			MessageReceived(BMessage* msg);
+	typedef	BWindow				inherited;
+
+	static	const uint32		kMsgAddonShow = 'show';
+	static	const uint32		kMsgProfileSelected = 'prof';
+	static	const uint32		kMsgProfileManage = 'mngp';
+	static	const uint32		kMsgProfileNew = 'newp';
+	static	const uint32		kMsgApply = 'aply';
+	static	const uint32		kMsgRevert = 'rvrt';
+
+			bool				QuitRequested();
+			void				MessageReceived(BMessage* msg);
 
 	private:
-		void _BuildProfilesMenu(BMenu* menu, int32 msg);
-		void _BuildShowTabView(int32 msg);
-	
-		BButton*	fHelpButton;
-		BButton*	fRevertButton;
-		BButton*	fApplyButton;
+			void				_BuildProfilesMenu(BMenu* menu, int32 msg);
+			void				_BuildShowTabView(int32 msg);
 
-		BTabView*	fPanel;
-		BView*		fAddonView;
-		BRect		fMinAddonViewRect;
+			BButton*			fHelpButton;
+			BButton*			fRevertButton;
+			BButton*			fApplyButton;
+
+			BTabView*			fPanel;
+			BView*				fAddonView;
+			BRect				fMinAddonViewRect;
 };
 
+
 #endif // ifdef NETWORKSETUPWINDOW_H
+
