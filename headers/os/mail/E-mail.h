@@ -30,7 +30,6 @@ struct entry_ref;
 #define B_MAIL_ATTR_CONTENT		"MAIL:content_length"	// int32
 #define B_MAIL_ATTR_READ		"MAIL:read"				// int32
 
-#define R5_COMPATIBLE 1
 
 // read flags
 enum read_flags {

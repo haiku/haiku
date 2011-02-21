@@ -13,6 +13,9 @@
 #include <E-mail.h>
 
 
+#define R5_COMPATIBLE 1
+
+
 class BString;
 
 
