@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-PowerStatus	1335646776
+1	swedish	x-vnd.Haiku-PowerStatus	51899741
 About	PowerStatus		om
 About…	PowerStatus		Om...
 Battery charging	PowerStatus		Laddar batteri
@@ -22,6 +22,7 @@ Model number: 	PowerStatus		Modellnummer:
 OEM info: 	PowerStatus		OEM information:
 OK	PowerStatus		OK
 Power status box	PowerStatus		Batteristatus
+PowerStatus	PowerStatus		Batteristatus
 PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		Batteristatus\nskrivet av Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
 Quit	PowerStatus		Avsluta
 Run in window	PowerStatus		Kör i fönster
@@ -30,7 +31,7 @@ Show percent	PowerStatus		Visa procent
 Show status icon	PowerStatus		Visa statusikon
 Show text label	PowerStatus		Visa textetikett
 Show time	PowerStatus		Visa tid
-Technology: 	PowerStatus		Teknologi:
+Technology: 	PowerStatus		Teknik:
 Type: 	PowerStatus		Typ:
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Du kan köra Batteristatus i ett fönster eller i Deskbar.
 charging	PowerStatus		laddar

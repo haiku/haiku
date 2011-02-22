@@ -61,7 +61,7 @@ Performing installation.	InstallProgress		Verkställer installation.
 Please choose target	InstallerWindow		Välj mål
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Vänligen stäng Starthanterarens- och DiskHanterings fönster innan du stänger Installerarens fönster.
 Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Vänligen stäng Starthanteraren innan du stänger Installeraren.
-Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Var god stäng DiskHanteringsfönstret innan du stänger fönstret för Installer.
+Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Var god stäng Diskhanteringsfönstret innan du stänger fönstret för Installeraren.
 Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Klicka på knappen Starta för att installera från '%1s' till '%2s'.
 Quit	InstallerApp		Avsluta
 Quit	InstallerWindow		Avsluta

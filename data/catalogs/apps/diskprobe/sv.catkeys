@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-DiskProbe	4272504286
+1	swedish	x-vnd.Haiku-DiskProbe	1552395580
 %ld (native)	ProbeView		%ld (native)
 (native)	ProbeView		(native)
 15 bit	TypeEditors		15 bitar
@@ -26,12 +26,12 @@ Attribute type: 	ProbeView		Attributstyp:
 Attribute: 	ProbeView		Attribut:
 Attributes	ProbeView		Attribut
 Back	ProbeView		Tillbaka
-Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than \"Font size\" and \"BlockSize\"	Bas
+Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Bas
 Block	ProbeView		Block
 Block %Ld (0x%Lx)	ProbeView		Block %Ld (0x%Lx)
 Block 0x%Lx	ProbeView		Block 0x%Lx
 Block: 	ProbeView		Block:
-BlockSize	ProbeView	A menu item, a shortened form from \"block size\". This is in the same menu windowthan \"Base\" and \"Font size\"	Blockstorlek
+BlockSize	ProbeView	A menu item, a shortened form from 'block size'. This is in the same menu windowthan 'Base' and 'Font size'	Blockstorlek
 Bookmarks	ProbeView		Bokmärken
 Boolean	TypeEditors	This is the type of editor	Booleskt värde
 Boolean editor	TypeEditors		Boolesk editor
@@ -73,7 +73,7 @@ Find…	ProbeView		Sök…
 Fit	ProbeView	Size of fonts, fits to available room	Anpassa
 Flattened bitmap	TypeEditors		Platt bitmapp
 Floating-point value:	TypeEditors		Flyttalsvärde:
-Font size	ProbeView		Teckensnittsstorlek
+Font size	ProbeView		Typsnittsstorlek
 Grayscale	TypeEditors		Gråskala
 Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hex
 Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hexadecimal
@@ -94,7 +94,7 @@ No type editor available	AttributeWindow		Redigeringsfunktion saknas
 Number	TypeEditors	This is the type of editor	Nummer
 Number editor	TypeEditors		Nummereditor
 Number:	TypeEditors		Nummer:
-OK	DiskProbe		Ok
+OK	DiskProbe		OK
 OK	ProbeView		Ok
 Offset: 	ProbeView		Offset:
 Open device	FileWindow		Öppna enhet
@@ -127,8 +127,9 @@ Type editor not supported	ProbeView		Typeditor stöds ej
 Undo	ProbeView		Ångra
 Unknown format	TypeEditors		Okänt format
 Unknown type	TypeEditors		Okänd typ
-View	ProbeView	This is the last menubar item \"File Edit Block View\"	Visa
+View	ProbeView	This is the last menubar item 'File Edit Block View'	Visa
 Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Skrivning till filen misslyckades:\n%s\n\nAlla ändringar kommer att gå förlorade när du avslutar.
 none	ProbeView	No attributes	ingen
 of 	ProbeView		av
+of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	av 0x0
 what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	meddelandekonstant: '%.4s'\n\n

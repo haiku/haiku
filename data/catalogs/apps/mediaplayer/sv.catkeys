@@ -87,7 +87,7 @@ Prev	MediaPlayer-Main		Föregående
 Quit	MediaPlayer-Main		Avsluta
 Randomize	MediaPlayer-PlaylistWindow		Slumpa
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Slumpa poster
-Rating	MediaPlayer-Main		Rankning
+Rating	MediaPlayer-Main		Betyg
 Redo	MediaPlayer-PlaylistWindow		Gör om
 Remove (Del)	MediaPlayer-PlaylistWindow		Ta bort (Del)
 Remove Entries	MediaPlayer-RemovePLItemsCmd		Ta bort poster

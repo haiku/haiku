@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-JPEGTranslator	797380431
+1	swedish	x-vnd.Haiku-JPEGTranslator	226512890
 About	JPEGTranslator		Om
 Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Be bitmappsformat (JPEG-översättare)
 ExposureTime	exit_parser		Exponeringstid
@@ -23,3 +23,4 @@ Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Använd CMYK med noll
 Use progressive compression	JPEGTranslator		Använd progressiv kompression
 Write	JPEGTranslator		Skriv
 Write black-and-white images as RGB24	JPEGTranslator		Skriv svart/vita bilder som RGB24
+©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBaserad på IJG biblioteket © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nmed \"förlustfritt\" kodningsstöd tillagt av Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nInnehåller vissa färgrymdskonverteringsrutiner av Magnus Hellman\n\thttp://www.bebits.com/app/802\n

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-ShowImage	1508862207
+1	swedish	x-vnd.Haiku-ShowImage	3385354583
 %SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS sekunder
 About ShowImage…	Menus		Om Bildvisning…
 Browse	Menus		Bläddra
@@ -37,6 +37,7 @@ Print options	PrintOptionsWindow		Utskriftsalternativ
 Print…	Menus		Skriv ut...
 Progress monitor	ProgressWindow		Förloppsmonitor
 Quit	Menus		Avsluta
+Rating	Menus		Betyg
 Resize to (in 1/72 inches):	PrintOptionsWindow		Ändra storlek till (i måttenheten 1/72 tum):
 Rotate clockwise	Menus		Rotera medurs
 Rotate counterclockwise	Menus		Rotera moturs

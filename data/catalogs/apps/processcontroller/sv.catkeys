@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-ProcessController	1750065782
+1	swedish	x-vnd.Haiku-ProcessController	926983020
 %s priority [%d]	ProcessController		%s prioritet [%d]
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
 About	ProcessController		om
@@ -18,6 +18,7 @@ Memory usage	ProcessController		Minnesanvändning
 New Terminal	ProcessController		Ny terminal
 OK	ProcessController		OK
 Ok!	ProcessController		OK!
+ProcessController	ProcessController		Processkontroll
 ProcessController is already installed in Deskbar.	ProcessController		Processkontroll är redan installerad i Deskbar.
 ProcessController\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n	ProcessController		Processkontroll\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n
 Processor %d	ProcessController		Processor %d
@@ -35,3 +36,4 @@ Usage: %s [-deskbar]\n	ProcessController		Hantering: %s [-deskbar]\n
 What do you want to do with the thread \"%s\"?	ProcessController		Vad vill du göra med tråden \"%s\"?
 Yes, kill this team!	ProcessController		Ja, avsluta den här processen!
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Du kan köra Processkontroll i ett fönster eller installera den i Deskbar.
+Your setting file could not be saved!\n(%s)	ProcessController		Inställningsfilen kunde inte sparas!\n(%s)
