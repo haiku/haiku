@@ -1645,6 +1645,9 @@ uninit_interfaces()
 {
 #if ENABLE_DEBUGGER_COMMANDS
 	remove_debugger_command("net_interface", &dump_interface);
+	remove_debugger_command("net_interfaces", &dump_interfaces);
+	remove_debugger_command("net_local", &dump_local);
+	remove_debugger_command("net_route", &dump_route);
 #endif
 
 	mutex_destroy(&sLock);
