@@ -450,9 +450,12 @@ status_t
 add_debugger_command_etc(const char* name, debugger_command_hook func,
 	const char* description, const char* usage, uint32 flags)
 {
-	struct debugger_command *cmd;
+	bool ambiguous;
+	debugger_command *cmd = find_debugger_command(name, false, ambiguous);
+	if (cmd != NULL && ambiguous == false)
+		return B_NAME_IN_USE;
 
-	cmd = (struct debugger_command*)malloc(sizeof(struct debugger_command));
+	cmd = (debugger_command*)malloc(sizeof(debugger_command));
 	if (cmd == NULL)
 		return B_NO_MEMORY;
 
