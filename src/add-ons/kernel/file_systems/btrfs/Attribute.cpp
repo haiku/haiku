@@ -106,7 +106,7 @@ Attribute::Stat(struct stat& stat)
 	}
 
 	// found an entry to stat
-	stat.st_type = B_RAW_TYPE;
+	stat.st_type = B_XATTR_TYPE;
 	stat.st_size = entry->DataLength();
 	free(entries);
 	return B_OK;

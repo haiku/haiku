@@ -178,7 +178,7 @@ Attribute::Stat(struct stat& stat)
 	if (fBodyEntry == NULL && fBlockEntry == NULL)
 		return B_NO_INIT;
 
-	stat.st_type = B_RAW_TYPE;
+	stat.st_type = B_XATTR_TYPE;
 	
 	if (fBodyEntry != NULL)
 		stat.st_size = fBodyEntry->ValueSize();
