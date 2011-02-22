@@ -3272,6 +3272,8 @@ BMenu*
 BContainerWindow::AddMimeMenu(const BMimeType& mimeType, bool isSuperType,
 	BMenu* menu, int32 start)
 {
+	AutoLock<BLooper> _(menu->Looper());
+
 	if (!mimeType.IsValid())
 		return NULL;
 
