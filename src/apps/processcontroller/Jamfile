@@ -27,9 +27,10 @@ Application ProcessController :
 DoCatalogs ProcessController :
 	x-vnd.Haiku-ProcessController
 	:
-	ProcessController.cpp
+	KernelMemoryBarMenuItem.cpp
 	NoiseBarMenuItem.cpp
 	PCWorld.cpp
 	Preferences.cpp
 	PriorityMenu.cpp
+	ProcessController.cpp
 ;

@@ -1,4 +1,4 @@
-1	russian	x-vnd.haiku-icon_o_matic	3977795013
+1	russian	x-vnd.haiku-icon_o_matic	3581600414
 <modify path>	Icon-O-Matic-PathCmd		<изменить путь>
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<нечего отменять>
 <unavailable>	Icon-O-Matic-StyleTypes		<недоступно>
@@ -6,21 +6,17 @@
 Add	Icon-O-Matic-PathsList		Добавить
 Add	Icon-O-Matic-StylesList		Добавить
 Add	Icon-O-Matic-TransformersList		Добавить
-Add Path	Icon-O-Matic-AddPathsCmd		Добавиь путь
 Add Shape	Icon-O-Matic-AddShapesCmd		Добавить форму
 Add Style	Icon-O-Matic-AddStylesCmd		Добавить стиль
 Add Styles	Icon-O-Matic-AddStylesCmd		Добавить стиль
-Add shape with path	Icon-O-Matic-Menu-Shape		Добавить форму с путем
 Add shape with style	Icon-O-Matic-Menu-Shape		Добавить форму со стилем
 All	Icon-O-Matic-Properties		Все
-Assign Path	Icon-O-Matic-AddPathsCmd		Назначить путь
 BEOS:ICON Attribute	Icon-O-Matic-SavePanel		Атрибут BEOS:ICON
 Bummer	Cancel button - error alert		Облом
 Cancel	Icon-O-Matic-ColorPicker		Отмена
 Cancel	Icon-O-Matic-Main		Отмена
 Cancel	Icon-O-Matic-SVGExport		Отмена
 Change Color	Icon-O-Matic-SetColorCmd		Изменить цвет
-Closed	Icon-O-Matic-PropertyNames		Закрыто
 Color	Icon-O-Matic-PropertyNames		Цвет
 Color	Icon-O-Matic-StyleTypes		Цвет
 Color (#%02x%02x%02x)	Style name after dropping a color		Цвет (#%02x%02x%02x)
@@ -41,7 +37,6 @@ Gradient type	Icon-O-Matic-StyleTypes		Тип градиента
 HVIF Source Code	Icon-O-Matic-SavePanel		Исходный код HVIF
 Height	Icon-O-Matic-PropertyNames		Высота
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Возможно, Icon-O-Matic не перенес все данные из загруженного SVG файла. Перезаписывая оригинальный файл, эта информация может быть потеряна.
-Insert Control Point	Icon-O-Matic-InsertPointCmd		Вставить
 Invert selection	Icon-O-Matic-Properties		Инвертировать выделение
 Linear	Icon-O-Matic-StyleTypes		Линейный
 Move	Icon-O-Matic-TransformationBoxStates		Переместить
@@ -51,21 +46,15 @@ No	Icon-O-Matic-StyledTextImport		Нет
 OK	Icon-O-Matic-ColorPicker		ОК
 OK	Icon-O-Matic-SVGImport		ОК
 Opening the document failed!	Icon-O-Matic-Main		Не удалось открыть документ!
-Opening the icon failed!	Icon-O-Matic-Main		Не удалось открыть значок
 Open…	Icon-O-Matic-Menu-File		Открыть…
 Options	Icon-O-Matic-Menus		Опции
 Paste	Icon-O-Matic-Properties		Вставить
 Paste Properties	Icon-O-Matic-Properties		Вставить свойства
-Path	Icon-O-Matic-Menus		Путь
-Path	Icon-O-Matic-PropertyNames		Путь
 Quit	Icon-O-Matic-Menu-File		Выход
 Remove	Icon-O-Matic-PathManipulator		Удалить
 Remove	Icon-O-Matic-PathsList		Удалить
 Remove	Icon-O-Matic-ShapesList		Удалить
 Remove	Icon-O-Matic-StylesList		Удалить
-Remove Path	Icon-O-Matic-RemovePathsCmd		Удалить путь
-Remove Paths	Icon-O-Matic-RemovePathsCmd		Удалить пути
-Remove Transformers	Icon-O-Matic-RemoveTransformersCmd		Удалить преобразования
 Save	Icon-O-Matic-Main		Сохранить
 Save	Icon-O-Matic-Menu-File		Сохранить
 Save Icon	Dialog title		Сохранить значок

@@ -1,6 +1,7 @@
-1	russian	x-vnd.Haiku-Devices	2430293984
+1	russian	x-vnd.Haiku-Devices	1945405248
 ACPI Information	DeviceACPI		Информация ACPI
 ACPI controller	Device		ACPI контроллер
+About	DevicesApplication		о программе
 About Devices…	DevicesView		О программе…
 Basic information	DevicesView		Основная информация
 Bridge	Device		Мост
@@ -16,7 +17,7 @@ Device name:	Device		Название устройства:
 Device paths	Device		Путь к устройству
 Devices	DevicesApplication		Устройства
 Devices	DevicesView		Устройства
-Devices\n\twritten by Pieter Panman\n\n\tBased on listdev by Jérôme Duval\n\tand the previous Devices preference\n\tby Jérôme Duval and Sikosis\n\tCopyright 2009, Haiku, Inc.\n	DevicesApplication		Devices\n\tразработал Pieter Panman\n\n\tОсновано на listdev от Jérôme Duval\n\tи на предыдущей версии Devices\n\tразработанной Jérôme Duval и Sikosis\n\tАвторские права 2009, Haiku, Inc.\n
+Devices\n\twritten by Pieter Panman\n\n\tBased on listdev by Jérôme Duval\n\tand the previous Devices preference\n\tby Jérôme Duval and Sikosis\n\tCopyright 2009, Haiku, Inc.\n	DevicesApplication		Devices\n\tразработал Pieter Panman\n\n\tОсновано на listdev от Jérôme Duval\n\tи на предыдущей версии Devices,\n\tкоторую разработали Jérôme Duval и Sikosis\n\tАвторские права 2009, Haiku, Inc.\n
 Display controller	Device		Контроллер дисплея
 Docking station	Device		Кредл
 Driver used	Device		Используемый драйвер
@@ -36,7 +37,6 @@ OK	DevicesApplication		ОК
 Order by:	DevicesView		Сортировать по:
 PCI Information	DevicePCI		PCI информация 
 Processor	Device		Процессор
-Properties	PropertyList		Свойства
 Quit	DevicesView		Выход
 Refresh devices	DevicesView		Обновить список устройств
 Report compatibility	DevicesView		Отчет о совместимости

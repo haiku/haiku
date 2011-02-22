@@ -1,42 +1,58 @@
-1	belarusian	x-vnd.Haiku-Devices	2430293984
+1	belarusian	x-vnd.Haiku-Devices	4145096865
 ACPI Information	DeviceACPI		Інфармацыя ACPI
+ACPI Processor Namespace '%2'	DeviceACPI		Абшар '%2' працэсара ACPI
+ACPI System Bus	DeviceACPI		Сістэмная шына ACPI
+ACPI System Indicator	DeviceACPI		Сістэмны індыкатар ACPI
+ACPI Thermal Zone	DeviceACPI		Тэрмальная зона ACPI
 ACPI controller	Device		Кантролер ACPI
+ACPI node '%1'	DeviceACPI		Вузел ACPI '%1'
+About	DevicesApplication		пра праграму
 About Devices…	DevicesView		Пра Devices...
 Basic information	DevicesView		Асноўная інфармацыя
 Bridge	Device		Мост
 Bus	DevicesView		Шына
 Category	DevicesView		Катэгорыя
+Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Інфа класа:\t\t\t\t: %classInfo%
+Class info	DevicePCI		Інфа класа
 Communication controller	Device		Кантролер камунікацый
 Computer	Device		Кампутар
 Connection	DevicesView		Спалучэнне
 Detailed	DevicesView		Падрабязна
 Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Імя прылады\t\t\t\t: %Name%\nВытворца\t\t\t: %Manufacturer%\nБягучы драйвер\t\t\t\t: %DriverUsed%\nПуці прылады\t: %DevicePaths%
 Device name	Device		Імя прылады
+Device name	DeviceACPI		Імя прылады
+Device name	DevicePCI		Імя прылады
 Device name:	Device		Імя прылады:
-Device paths	Device		Пуці прыладаў:
+Device paths	Device		Пуці прыладаў
+Device paths	DevicePCI		Пуці прыладаў
 Devices	DevicesApplication		Прылады
 Devices	DevicesView		Прылады
 Devices\n\twritten by Pieter Panman\n\n\tBased on listdev by Jérôme Duval\n\tand the previous Devices preference\n\tby Jérôme Duval and Sikosis\n\tCopyright 2009, Haiku, Inc.\n	DevicesApplication		Devices\n\t Аўтары: Pieter Panman\n\n\tЗаснавана на listdev (створаны Jérôme Duval)\n\tі папярэдніх канфігурацыях Devices \n\t(Jérôme Duval і Sikosis)\n\tCopyright 2009, Haiku, Inc.\n
 Display controller	Device		Кантролер экрану
 Docking station	Device		Док-станцыя
 Driver used	Device		Ужыты драйвер
+Driver used	DevicePCI		Ужыты драйвер
 Encryption controller	Device		Кантролер шыфравання
 Generate system information	DevicesView		Сабраць інфармацыю аб сістэме
 Generic system peripheral	Device		Агульная перыферыя
 Input device controller	Device		Кантролер прылад уводу
 Intelligent controller	Device		Інтэлектуальны кантролер
 Manufacturer	Device		Вытворца
+Manufacturer	DeviceACPI		Вытворца
+Manufacturer	DevicePCI		Вытворца
 Manufacturer:	Device		Вытворца:
 Mass storage controller	Device		Кантролер прылад захавання даных
 Memory controller	Device		Кантролер памяці
 Multimedia controller	Device		Кантролер мультымедыя
+Name	PropertyList		Імя
 Network controller	Device		Сеткавы кантролер
 None	Device		Адсутнічае
+Not implemented	DeviceACPI		Не рэалізавана
+Not implemented	DevicePCI		Не рэалізавана
 OK	DevicesApplication		ОК
 Order by:	DevicesView		Парадкаваць па:
 PCI Information	DevicePCI		Інфармацыя PCI
 Processor	Device		Працэсар
-Properties	PropertyList		Уласцівасці
 Quit	DevicesView		Выйсці
 Refresh devices	DevicesView		Абнавіць прылады
 Report compatibility	DevicesView		Паведаміць аб сумяшчальнасці
@@ -44,4 +60,6 @@ Satellite communications controller	Device		Кантролер спадарож�
 Serial bus controller	Device		Кантролер серыйнай шыны
 Signal processing controller	Device		Кантролер апрацоўкі сігналаў
 Unclassified device	Device		Невызначаная прылада
+Unknown	DevicePCI		Невядомы
+Value	PropertyList		Велічыня
 Wireless controller	Device		Бесшнуравы кантролер
