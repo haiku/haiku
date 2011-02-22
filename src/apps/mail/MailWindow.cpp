@@ -1516,12 +1516,13 @@ TMailWindow::MessageReceived(BMessage *msg)
 						window->Activate();
 
 						//fSent = true;
-						BMessage msg(B_CLOSE_REQUESTED);
-						PostMessage(&msg);
+						PostMessage(B_CLOSE_REQUESTED);
 					}
 
 					SetTrackerSelectionToCurrent();
 				} else {
+					if (wasReadMsg)
+						PostMessage(B_CLOSE_REQUESTED);
 					beep();
 				}
 			}
