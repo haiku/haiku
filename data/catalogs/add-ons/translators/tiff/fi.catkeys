@@ -3,7 +3,7 @@ LZW	TIFFView		LZW
 None	TIFFView		Ei mikään
 RLE (Packbits)	TIFFView		RLE (Pakettibitit)
 TIFF Image Translator	TIFFView		TIFF-kuvamuunnin
-TIFF Library:	TIFFView		TIFF-kirjasto
+TIFF Library:	TIFFView		TIFF-kirjasto:
 TIFF Settings	TIFFMain		TIFF-asetukset
 TIFF image	TIFFTranslator		TIFF-kuva
 TIFF image translator	TIFFTranslator		TIFF-kuvamuunnin
@@ -11,6 +11,6 @@ TIFF images	TIFFTranslator		TIFF-kuvat
 TIFFTranslator Settings	TIFFTranslator		TIFF-muunninasetukset
 Use Compression:	TIFFView		Käyttäjätiivistys:
 Version %d.%d.%d %s	TIFFView		Versio %d.%d.%d %s
-ZIP (Deflate)	TIFFView		ZIP (Tyhjennä)
+ZIP (Deflate)	TIFFView		ZIP (Kutista)
 identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: ei voitu asettaa hakemistoa\n
 identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: virheellinen asiakirjahakemisto\n

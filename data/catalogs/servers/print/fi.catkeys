@@ -1,6 +1,6 @@
 1	finnish	x-vnd.Be-PSRV	1761631281
 A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Tulostin tuolla nimellä on jo olemassa, mutta se ei ole ollenkaan käytettävissä! Korvataanko?
-A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Tulostin tuolla nimellä on jo olemassa, mutta sen ajuria ei voitu löytää
+A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Tulostin tuolla nimellä on jo olemassa, mutta sen ajuria ei voitu löytää! Korvataanko?
 A0	ConfigWindow	ISO 216 paper size	A0
 A1	ConfigWindow	ISO 216 paper size	A1
 A2	ConfigWindow	ISO 216 paper size	A2

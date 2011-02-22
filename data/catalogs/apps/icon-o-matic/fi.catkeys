@@ -63,7 +63,7 @@ Error: 	Icon-O-Matic-Main		Virhe:
 Export	Icon-O-Matic-Menu-File		Vie
 Export Icon	Dialog title		Vie kuvake
 Export as…	Icon-O-Matic-Menu-File		Vie nimellä...
-Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Tiedoston '%s' avaaminen SVG-asiakirjana epäonnistui.\n\nVirhe: %s
+Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Tiedoston ’%s’ avaaminen SVG-asiakirjana epäonnistui.\n\nVirhe: %s
 File	Icon-O-Matic-Menus		Tiedosto
 Flip	Icon-O-Matic-PathManipulator		Käännä ympäri
 Flip Control Point	Icon-O-Matic-FlipPointsCmd		Käännä ohjainpiste ympäri
@@ -131,7 +131,7 @@ Remove	Icon-O-Matic-PathsList		Poista
 Remove	Icon-O-Matic-ShapesList		Poista
 Remove	Icon-O-Matic-StylesList		Poista
 Remove Control Point	Icon-O-Matic-RemovePointsCmd		Poista ohjauspiste
-Remove Control Points	Icon-O-Matic-RemovePointsCmd		Poist ohjainpisteet
+Remove Control Points	Icon-O-Matic-RemovePointsCmd		Poista ohjainpisteet
 Remove Path	Icon-O-Matic-RemovePathsCmd		Poista polku
 Remove Paths	Icon-O-Matic-RemovePathsCmd		Poista polut
 Remove Shape	Icon-O-Matic-RemoveShapesCmd		Poista hahmo

@@ -1,15 +1,15 @@
 1	finnish	x-vnd.Haiku-Shortcuts	1120793954
 (Choose application with file requester)	ShortcutsWindow		(Valitse sovellus tiedostohakijalla)
 *Beep	ShortcutsWindow		*Piip
-*InsertString \"Your Text Here\"	ShortcutsWindow		*Lisää merkkijono \"Tekstisi tänne\"
+*InsertString \"Your Text Here\"	ShortcutsWindow		*Lisää merkkijono ”Tekstisi tänne”
 *LaunchHandler text/html	ShortcutsWindow		*Käynnistyskäsittelijä text/html
 *MouseButton 1	ShortcutsWindow		*Hiiripainike 1
 *MouseDown	ShortcutsWindow		*HiiriAlas
 *MouseUp	ShortcutsWindow		*HiiriYlös
 *MoveMouse +20 +0	ShortcutsWindow		*SiirräHiiri +20 +0
 *MoveMouseTo 50% 50%	ShortcutsWindow		*SiirräHiiriKohteeseen 50% 50%
-*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Moni \"*SiirräHiiriKohteeseen 100% 0\" \"*Hiiripainike 1\"
-*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*LähetäViesti application/x-vnd.Be-TRAK 'Tfnd'
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Moni ”*SiirräHiiriKohteeseen 100% 0” ”*Hiiripainike 1”
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*LähetäViesti application/x-vnd.Be-TRAK ’Tfnd’
 About Shortcuts	ShortcutsApp		Pikanäppäimet-ohjelmasta
 About Shortcuts	ShortcutsWindow		Pikanäppäimet-ohjelmasta
 Add new shortcut	ShortcutsWindow		Lisää uusi pikanäppäin

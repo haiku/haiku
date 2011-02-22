@@ -4,7 +4,7 @@
 <empty>	PartitionList		<tyhjä>
 Active	PartitionList		Voimassa oleva
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat poistaa valitun osion?\n\nKaikki osion tiedot katoavat palauttamattomasti, jos teet niin!
-Are you sure you want to initialize the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Oletko varma, että haluat alustaa osion \"%s\"? Sinulta kysytään uudelleen ennen kuin muutokset kirjoitetaan levylle.
+Are you sure you want to initialize the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Oletko varma, että haluat alustaa osion ”%s”? Sinulta kysytään uudelleen ennen kuin muutokset kirjoitetaan levylle.
 Are you sure you want to initialize the partition? You will be asked again before changes are written to the disk.	MainWindow		Oletko varma, että haluat alustaa osion? Sinulta kysytään uudelleen ennen kuin muutokset kirjoitetaan levylle.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat nyt kirjoittaa muutokset takaisin levylle?\n\nKaikki levyn %s tiedot katoavat palauttamattomasti, jos teet niin!
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat nyt kirjoittaa muutokset takaisin levylle?\n\nKaikki osion %s tiedot kadotetaan palauttamattomasti, jos teet niin!
@@ -28,25 +28,25 @@ Delete partition	MainWindow		Poista osio
 Device	DiskView		Laite
 Device	PartitionList		Laite
 Disk	MainWindow		Levy
-Disk system \"%s\"\" not found!	MainWindow		Levyjärjestelmää \"%s\"\" ei löytynyt!
+Disk system \"%s\"\" not found!	MainWindow		Levyjärjestelmää ”%s” ei löytynyt!
 DriveSetup	MainWindow		Levyasema-asetus
 Eject	MainWindow		Poista asemasta
-End: %ld MB	Support		Loppu: %ld Mt
+End: %ld MB	Support		Loppu: %ld mebitavua
 Error: 	MainWindow	in any error alert	Virhe: 
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Osion poistaminen epäonnistui. Mitään muutoksia ei ole kirjoitettu levylle.
 Failed to initialize the partition %s!\n	MainWindow		Osion %s alustus epäonnistui!\n
 Failed to initialize the partition. No changes have been written to disk.	MainWindow		Osion alustus epäonnistui. Levylle ei ole kirjoitettu mitään muutoksia.
 File system	PartitionList		Tiedostojärjestelmä
-Format (not implemented)	MainWindow		Formatoi (ei toteutettu)
+Format (not implemented)	MainWindow		Formatoi (ei ole toteutettu)
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Osion %s alustus epäonnistui. (Mitään ei ole kirjoitettu levylle.)
 Initialize	InitParamsPanel		Alusta
 Initialize	MainWindow		Alusta
 Mount	MainWindow		Liitä
 Mount all	MainWindow		Liitä kaikki
-Mounted at	PartitionList		Liittämishetki:
+Mounted at	PartitionList		Liittämispiste:
 No disk devices have been recognized.	DiskView		Levyasemia ei  tunnistettu.
 OK	MainWindow		Valmis
-Offset: %ld MB	Support		Siirros: %ld Mt
+Offset: %ld MB	Support		Siirros: %ld mebitavua
 Parameters	PartitionList		Parametrit
 Partition	MainWindow		Osio
 Partition %ld	DiskView		Osio %ld

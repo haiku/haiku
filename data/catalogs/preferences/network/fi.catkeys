@@ -1,7 +1,7 @@
 1	finnish	x-vnd.Haiku-Network	2440177840
 <no wireless networks found>	EthernetSettingsView		<langatonta verkkoa ei löytynyt>
 Adapter:	EthernetSettingsView		Adapteri:
-Apply	EthernetSettingsView		Sovella
+Apply	EthernetSettingsView		Käytä
 Auto-configuring failed: 	EthernetSettingsView		Automaattiasetus epäonnistui: 
 Choose automatically	EthernetSettingsView		Valitse automaattisesti
 DHCP	EthernetSettingsView		DHCP

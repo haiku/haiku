@@ -1,6 +1,5 @@
-1	finnish	x-vnd.Haiku-JPEGTranslator	1834097482
+1	finnish	x-vnd.Haiku-JPEGTranslator	226512890
 About	JPEGTranslator		Ohjelmasta
-Based on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n	JPEGTranslator		Perustuu IJG-kirjastoon © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n
 Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Be-bittikarttamuoto (JPEG-muunnin)
 ExposureTime	exit_parser		Valotusaika
 High	JPEGTranslator		Korkea
@@ -22,7 +21,6 @@ Read greyscale images as RGB32	JPEGTranslator		Lue harmaaskaalavärejä RGB32-v�
 Show warning messages	JPEGTranslator		Näytä varoitussanomat
 Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Käytä CMYK-koodia mustepeitolla 0...100 %
 Use progressive compression	JPEGTranslator		Käytä progressiivista tiivistystä
-With some colorspace conversion routines by Magnus Hellman\n	JPEGTranslator		Joillakin Magnus Hellmanin väritilamuunnosrutiineilla\n
 Write	JPEGTranslator		Kirjoita
 Write black-and-white images as RGB24	JPEGTranslator		Kirjoita mustavalkoisia kuvia RGB24-väreinä
-with \"lossless\" encoding support patch by Ken Murchison\n	JPEGTranslator		Ken Murchisonin ”häviötön”-koodaustukikorjauksella\n
+©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nPerustuu IJG-kirjastoon © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nsekä Ken Murchison ”häviötön”-koodaustukikorjaukseen\n\thttp://www.oceana.com/ftp/ljpeg/\n\nMukana on joitakin Magnus Hellmanin väritilamuunnosrutiineja\n\thttp://www.bebits.com/app/802\n

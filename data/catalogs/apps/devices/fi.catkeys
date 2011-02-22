@@ -1,42 +1,58 @@
-1	finnish	x-vnd.Haiku-Devices	2430293984
+1	finnish	x-vnd.Haiku-Devices	4145096865
 ACPI Information	DeviceACPI		ACPI-tiedot
+ACPI Processor Namespace '%2'	DeviceACPI		ACPI-prosessorinimiavaruus ’%2’
+ACPI System Bus	DeviceACPI		ACPI-järjestelmäväylä
+ACPI System Indicator	DeviceACPI		ACPI-järjestelmäindikaattori
+ACPI Thermal Zone	DeviceACPI		ACI-lämpöalue
 ACPI controller	Device		ACPI-ohjain
+ACPI node '%1'	DeviceACPI		ACPI-solmu ’%1’
+About	DevicesApplication		Ohjelmasta
 About Devices…	DevicesView		Ohjelmasta Laitteet...
 Basic information	DevicesView		Perustiedot
 Bridge	Device		Silta
 Bus	DevicesView		Väylä
 Category	DevicesView		Luokka
+Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Luokkatiedot:\t\t\t\t: %classInfo%
+Class info	DevicePCI		Luokkatiedot
 Communication controller	Device		Viestintäohjain
 Computer	Device		Tietokone
 Connection	DevicesView		Yhteys
 Detailed	DevicesView		Yksityiskohdat
 Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Laitenimi\t\t\t\t: %Name%\nValmistaja\t\t\t: %Manufacturer%\nKäytetty ajuri\t\t\t\t: %DriverUsed%\nLaitepolut\t: %DevicePaths%
 Device name	Device		Laitenimi
+Device name	DeviceACPI		Laitenimi
+Device name	DevicePCI		Laitenimi
 Device name:	Device		Laitenimi:
 Device paths	Device		Laitepolut
+Device paths	DevicePCI		Laitepolut
 Devices	DevicesApplication		Laitteet
 Devices	DevicesView		Laitteet
-Devices\n\twritten by Pieter Panman\n\n\tBased on listdev by Jérôme Duval\n\tand the previous Devices preference\n\tby Jérôme Duval and Sikosis\n\tCopyright 2009, Haiku, Inc.\n	DevicesApplication		Laitteet\n\ttekijä: Pieter Panman\n\n\tPerustuu Jérôme Duvalin tekemään listdev-ohjelmaan\n\tja edelliseen Jérôme Duvalin  ja Sikosisin\n\tlaitepreferenssiin\n\tCopyright 2009, Haiku, Inc.\n
+Devices\n\twritten by Pieter Panman\n\n\tBased on listdev by Jérôme Duval\n\tand the previous Devices preference\n\tby Jérôme Duval and Sikosis\n\tCopyright 2009, Haiku, Inc.\n	DevicesApplication		Laitteet\ntekijä: Pieter Panman\n\nPerustuu Jérôme Duvalin tekemään listdev-ohjelmaan\nja edelliseen Jérôme Duvalin ja Sikosisin\nlaitepreferenssiin\nCopyright 2009, Haiku, Inc.\n
 Display controller	Device		Näyttöohjain
 Docking station	Device		Telakka-asema
 Driver used	Device		Käytetty laite
+Driver used	DevicePCI		Käytetty ajuri
 Encryption controller	Device		Salausohjain
 Generate system information	DevicesView		Tuota järjestelmätiedot
 Generic system peripheral	Device		Yleinen järjestelmän oheislaite
 Input device controller	Device		Syötelaiteohjain
 Intelligent controller	Device		Älyohjain
 Manufacturer	Device		Valmistaja
+Manufacturer	DeviceACPI		Valmistaja
+Manufacturer	DevicePCI		Valmistaja
 Manufacturer:	Device		Valmistaja:
 Mass storage controller	Device		Massamuistilaiteohjain
 Memory controller	Device		Muistiohjain
 Multimedia controller	Device		Multimediaohjain
+Name	PropertyList		Nimi
 Network controller	Device		Verkko-ohjain
-None	Device		Ei mikään
+None	Device		Ei mitään
+Not implemented	DeviceACPI		Ei ole toteutettu
+Not implemented	DevicePCI		Ei ole toteutettu
 OK	DevicesApplication		Valmis
 Order by:	DevicesView		Järjestys:
 PCI Information	DevicePCI		PCI-tiedot
 Processor	Device		Suoritin
-Properties	PropertyList		Ominaisuudet
 Quit	DevicesView		Poistu
 Refresh devices	DevicesView		Virkistä laitteita
 Report compatibility	DevicesView		Ilmoita yhteensopivuudesta
@@ -44,4 +60,6 @@ Satellite communications controller	Device		Satelliittiviestintäohjain
 Serial bus controller	Device		Sarjaväyläohjain
 Signal processing controller	Device		Signaalikäsittelyohjain
 Unclassified device	Device		Luokittelematon laite
+Unknown	DevicePCI		Tuntematon
+Value	PropertyList		Arvo
 Wireless controller	Device		Langaton ohjain

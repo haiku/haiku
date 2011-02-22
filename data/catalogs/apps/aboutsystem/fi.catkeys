@@ -1,12 +1,12 @@
 1	finnish	x-vnd.Haiku-About	2350236915
 %.2f GHz	AboutView		%.2f GHz
-%d MiB total	AboutView		%d MiB yhteensä
-%d MiB used (%d%%)	AboutView		%d MiT käytetty (%d%%)
+%d MiB total	AboutView		%d mebitavua yhteensä
+%d MiB used (%d%%)	AboutView		%d mebitavua käytetty (%d%%)
 %ld MHz	AboutView		%ld MHz
-%ld Processors:	AboutView		%ld suoritinta:
-%total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB yhteensä, %inaccessible MiB luoksepääsemätön
+%ld Processors:	AboutView		%ld Suoritinta:
+%total MiB total, %inaccessible MiB inaccessible	AboutView		%total mebitavua yhteensä, %inaccessible mebitavua luoksepääsemätön
 ... and the many people making donations!\n\n	AboutView		... ja monet lahjoituksia tehneet ihmiset!\n\n
-About this system	AboutWindow		Tästä järjestelmästä
+About this system	AboutWindow		Tietoa tästä järjestelmästä
 Contributors:\n	AboutView		Avustajat:\n
 Current maintainers:\n	AboutView		Nykyiset ylläpitäjät:\n
 GCC %d Hybrid	AboutView		GCC %d Hybridi
@@ -24,15 +24,15 @@ The BeGeistert team\n	AboutView		BeGeistert-ryhmä\n
 The Haiku-Ports team\n	AboutView		Haiku-Ports -ryhmä\n
 The Haikuware team and their bounty program\n	AboutView		Haikuware-ryhmä ja heidän bounty-ohjelmansa\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Aucklandin yliopisto ja Christof Lutteroth\n\n
-The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT licence%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		Haikulle uniikki koodi, erityisesti yhdin ja kaikki koodi, johon sovellukset linkitetään, jaellaan %MIT licence%-lisenssin ehtojen alla. Jotkut järjestelmäkirjastot sisältävät kolmannen osapuolen koodia, joka jaetaan LGPL-lisenssin alla. Löydät kolmannen osapuolen copyright-tiedot alta.\n\n
-The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku and the Haiku logo are trademarks of Haiku, Inc.\n\n	AboutView		Copyright-oikeus Haiku-koodiin on Haiku, Inc.-yrityksen tai lähdekoodissa ilmaistujen tekijöiden omaisuutta. Haiku ja Haiku-logo ovat Haiku, Inc. -yrityksen tavaramerkkejä\n\n
-Time running:	AboutView		Aika kuluu:
+The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT licence%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		Haikulle uniikki koodi, erityisesti ydin ja kaikki koodi, johon sovellukset linkitetään, jaellaan %MIT licence%-lisenssin ehtojen alla. Jotkut järjestelmäkirjastot sisältävät kolmannen osapuolen koodia, joka jaetaan LGPL-lisenssin alla. Löydät kolmannen osapuolen tekijänoikeustiedot alta.\n\n
+The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku and the Haiku logo are trademarks of Haiku, Inc.\n\n	AboutView		Tekijänoikeus Haiku-koodiin on Haiku, Inc.-yrityksen tai lähdekoodissa ilmaistujen tekijöiden omaisuutta. Haiku ja Haiku-logo ovat Haiku, Inc. -yrityksen tavaramerkkejä\n\n
+Time running:	AboutView		Käynnissäoloaika:
 Translations:\n	AboutView		Käännökset:\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (ja hänen NewOS-ytimensä)\n
 Unknown	AboutView		Tuntematon
 Version:	AboutView		Versio:
 Website, marketing & documentation:\n	AboutView		Web-sivusto, markkinointi ja dokumentaatio:\n
 [Click a license name to read the respective license.]\n\n	AboutView		[Napsauta lisenssinimeä vastaavan lisenssin lukemiseksi.]\n\n
-\nCopyrights\n\n	AboutView		\nCopyright-oikeudet\n\n
+\nCopyrights\n\n	AboutView		\nTekijänoikeudet\n\n
 \n\nSpecial thanks to:\n	AboutView		\n\nErityiskiitokset:\n
-\n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… ja luultavasti vielä jotain muuta, jonka joku unohti mainita (anteeksi!)\n\n
+\n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… ja luultavasti vielä muutama lisää, jotka unohdimme mainita (anteeksi!)\n\n

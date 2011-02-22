@@ -6,7 +6,7 @@ Application	NotificationView		Sovellus
 Applications	NotificationView		Sovellukset
 Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Et voi ottaa käyttöön ilmoituksia käynnistysaikana. Sinulla ei luultavasti ole kirjoitusoikeutta alkulatausasetushakemistoon.
 Can't save preferences, you probably don't have write access to the boot settings directory.	GeneralView		Ei voi tallentaa asetuksia. Sinulla ei luultavasti ole kirjoitusoikeutta alkulatausasetushakemistoon.
-Can't save preferenes, you probably don't have write access to the settings directory or the disk is full.	DisplayView		Et voi tallentaa asetuksia. Sinulla ei luultavasti ole kirjoitusoikeuksia asetushakemistoon tai levyasema on täynnä.
+Can't save preferenes, you probably don't have write access to the settings directory or the disk is full.	DisplayView		Et voi tallentaa asetuksia. Sinulla ei luultavasti ole kirjoitusoikeutta asetushakemistoon tai levyasema on täynnä.
 Cannot disable notifications because the server can't be reached.	GeneralView		Ei voi ottaa pois käytöstä ilmoituksia, koska palvelinta ei tavoiteta.
 Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Ei voida ottaa käyttöön ilmoituksia, koska palvelinta ei löydy.\nTämä tarkoittaa, että InfoPopper-asennus ei ole onnistunut.
 Disable notifications	GeneralView		Ota ilmoitukset pois käytöstä

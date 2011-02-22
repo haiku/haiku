@@ -1,12 +1,12 @@
 1	finnish	x-vnd.Haiku-ActivityMonitor	1946610782
-%.1f KB/s	DataSource		%.1f Kt/s
+%.1f KB/s	DataSource		%.1f kt/s
 %.1f MB	DataSource		%.1f Mt
 %.1f faults/s	DataSource		%.1f vikaa/s
 %lld ms	SettingsWindow		%lld ms
 %lld sec.	SettingsWindow		%lld s
 About ActivityMonitor…	ActivityWindow		Ohjelmasta AktiviteettiValvonta...
 ActivityMonitor	ActivityWindow		Aktiviteettivalvonta
-Add graph	ActivityWindow		Lisää graafi
+Add graph	ActivityWindow		Lisää kuvaaja
 Additional items	ActivityView		Lisäkohteet
 Apps	DataSource		Sovellukset
 Block cache	DataSource		Lohkovälimuisti
@@ -22,7 +22,7 @@ MB	DataSource		Mt
 Media nodes	DataSource		Mediasolmut
 Memory	DataSource		Muisti
 Network receive	DataSource		Verkko vastaanota
-Network send	DataSource		Verkon lähettämä
+Network send	DataSource		Verkko lähetä
 P-faults	DataSource		P-viat
 Page faults	DataSource		Sivuvirheet
 Ports	DataSource		Portit
@@ -30,7 +30,7 @@ Quit	ActivityWindow		Poistu
 RX	DataSource	Shorter version for Receiving.	Vast.
 Raw clipboard size	DataSource		Raakaleikepöydän koko
 Receiving	DataSource		Vastaanotetaan
-Remove graph	ActivityView		Poista graafi
+Remove graph	ActivityView		Poista kuvaaja
 Running applications	DataSource		Suoritetaan sovelluksia
 Semaphores	DataSource		Opastimet
 Sems	DataSource		Opastimet

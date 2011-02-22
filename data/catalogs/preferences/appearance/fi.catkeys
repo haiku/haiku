@@ -1,7 +1,7 @@
 1	finnish	x-vnd.Haiku-Appearance	3612090060
 Antialiasing	APRWindow		Reunanpehmennys
 Antialiasing menu	AntialiasingSettingsView		Reunanpehmennysvalikko
-Antialiasing type:	AntialiasingSettingsView		Reunanpehmennystapa :
+Antialiasing type:	AntialiasingSettingsView		Reunanpehmennystapa:
 Appearance	APRWindow		Ulkonäkö
 Colors	APRWindow		Värit
 Control background	Colors tab		Kontrollin tausta
@@ -12,7 +12,7 @@ Defaults	APRWindow		Oletusasetukset
 Document background	Colors tab		Dokumentin tausta
 Document text	Colors tab		Dokumentin teksti
 Failure	Colors tab		Epäonnistuminen
-Glyph hinting:	AntialiasingSettingsView		Merkin vinkkaus :
+Glyph hinting:	AntialiasingSettingsView		Kirjoitusmerkin viimeistely:
 Grayscale	AntialiasingSettingsView		Harmaasävy
 Hinting menu	AntialiasingSettingsView		Vinkkausvalikko
 Inactive window tab	Colors tab		Epäaktiivisen ikkunakahvan väri
@@ -20,7 +20,7 @@ Inactive window tab text	Colors tab		Epäaktiivisen ikkunakahvan tekstin väri
 LCD subpixel	AntialiasingSettingsView		LCD alipikseli
 Menu background	Colors tab		Valikon tausta
 Menu item text	Colors tab		Valikkovalinnan teksti
-Monospaced fonts only	AntialiasingSettingsView		Vain monospace fontti
+Monospaced fonts only	AntialiasingSettingsView		Vain monospace-kirjasimet
 Navigation base	Colors tab		Navigoinnin pohja
 Navigation pulse	Colors tab		Navigoinnin välke
 Off	AntialiasingSettingsView		Pois päältä
@@ -35,7 +35,7 @@ Selected menu item text	Colors tab		Valitun valikkovalinnan teksti
 Shadow	Colors tab		Varjo
 Shine	Colors tab		Hohto
 Strong	AntialiasingSettingsView		Vahva
-Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Alipikselipohjainen reunanpehmennys ei ole saatavilla tässä Haiku versiossa patenttisyiden takia. Ominaisuuden saaminen käyttöön vaatii Haikun uudelleenkääntämistä ja eräiden optioiden aktivoimista libfreetype:n määrittelytiedostoissa.
+Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Alipikselipohjainen reunanpehmennys yhdistettynä kirjoitusmerkkiviimeistelyyn ei ole saatavilla tässä Haiku-versiossa patenttisyiden takia. Ominaisuuden saaminen käyttöön vaatii Haikun uudelleenkääntämistä ja eräiden optioiden aktivoimista libfreetype:n määrittelytiedostoissa.
 Success	Colors tab		Onnistuminen
 Tooltip background	Colors tab		Työkaluvinkin tausta
 Tooltip text	Colors tab		Työkaluvinkin teksti

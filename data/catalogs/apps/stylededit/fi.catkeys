@@ -3,13 +3,13 @@
 Align	Menus		Tasaa
 Black	Menus		Musta
 Blue	Menus		Sininen
-Bold	Menus		Lihavoitu
+Bold	Menus		Lihavointi
 Can't Undo	Menus		Ei voi perua
 Cancel	FindandReplaceWindow		Peru
 Cancel	QuitAlert		Peru
 Cancel	RevertToSavedAlert		Peru
 Cancel	SaveAlert		Peru
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Ei voi palauttaa, tiedostoa ei löytynyt: \"%s\".
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Ei voi palauttaa, tiedostoa ei löytynyt: ”%s”.
 Case-sensitive	FindandReplaceWindow		Kirjainkoosta riippuva
 Center	Menus		Keskitä
 Characters:	Statistics		Merkkejä:
@@ -26,9 +26,9 @@ Don't save	QuitAlert		Älä tallenna
 Don't save	SaveAlert		Älä tallenna
 Edit	Menus		Muokkaa
 Encoding	Open_and_SaveAsPanel		Koodaus
-Error loading \"%s\":\n\t%s	LoadAlert		Virhe ladattaessa \"%s\":\n\t%s
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Virhe ladattaessa \"%s\":\n\tTukematon muoto
-Error saving \"%s\":\n%s	SaveAlert		Virhe tallennettaessa \"%s\":\n%s
+Error loading \"%s\":\n\t%s	LoadAlert		Virhe ladattaessa ”%s”:\n\t%s
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Virhe ladattaessa ”%s”:\n\tTukematon muoto
+Error saving \"%s\":\n%s	SaveAlert		Virhe tallennettaessa ”%s”:\n%s
 File	Menus		Tiedosto
 Find	FindandReplaceWindow		Haku
 Find again	Menus		Hae uudelleen
@@ -37,9 +37,9 @@ Find:	FindandReplaceWindow		Haku:
 Find…	Menus		Hae…
 Font	Menus		Kirjasin
 Green	Menus		Vihreä
-Italic	Menus		Kursivoitu
+Italic	Menus		Kursivointi
 Left	Menus		Vasen
-Lines:	Statistics		Riviä:
+Lines:	Statistics		Rivejä:
 Magenta	Menus		Punasininen
 New	Menus		Uusi
 OK	LoadAlert		Valmis
@@ -60,19 +60,19 @@ Replace same	Menus		Korvaa sama
 Replace with:	FindandReplaceWindow		Korvaa sisällöllä:
 Replace…	Menus		Korvaa…
 Revert to saved…	Menus		Palauta tallennettuun…
-Revert to the last version of \"%s\"? 	RevertToSavedAlert		Palauta viimeinen \"%s\"-versio? 
+Revert to the last version of \"%s\"? 	RevertToSavedAlert		Palauta viimeinen ”%s”-versio? 
 Right	Menus		Oikea
 Save	Menus		Tallenna
 Save	QuitAlert		Tallenna
 Save	SaveAlert		Tallenna
 Save as…	Menus		Tallenna nimellä...
-Save changes to the document \"%s\"? 	QuitAlert		Tallenna muutokset asiakirjaan \"%s\"? 
+Save changes to the document \"%s\"? 	QuitAlert		Tallenna muutokset asiakirjaan ”%s”? 
 Search backwards	FindandReplaceWindow		Etsi taaksepäin
 Select all	Menus		Valitse kaikki
 Size	Menus		Koko
 Statistics…	Menus		Tilastot...
-This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Tämä tiedosto on merkitty kirjoitussuojatuksi. Tallennetaanko muutokset asiakirjaan \"%s\"? 
-Undo typing	QuitAlert		Perutaan kirjoitus
+This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Tämä tiedosto on merkitty kirjoitussuojatuksi. Tallennetaanko muutokset asiakirjaan ”%s”? 
+Undo typing	QuitAlert		Peru kirjoitus
 Untitled 	StyledEditWindow		Otsikoton 
 Words:	Statistics		Sanoja:
 Wrap lines	Menus		Rivitä

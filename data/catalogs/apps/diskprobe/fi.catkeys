@@ -1,6 +1,6 @@
-1	finnish	x-vnd.Haiku-DiskProbe	679412978
-%ld (native)	ProbeView		%ld (kotoperäinen)
-(native)	ProbeView		(kotoperäinen)
+1	finnish	x-vnd.Haiku-DiskProbe	1552395580
+%ld (native)	ProbeView		%ld (alkuperäinen)
+(native)	ProbeView		(alkuperäinen)
 15 bit	TypeEditors		15-bittinen
 16 bit	TypeEditors		16-bittinen
 16 bit signed value:	TypeEditors		16-bittinen etumerkillinen arvo:
@@ -17,7 +17,7 @@
 8 bit palette	TypeEditors		8-bittinen paletti
 8 bit signed value:	TypeEditors		8-bittinen etumerkillinen arvo:
 8 bit unsigned value:	TypeEditors		8-bittinen etumerkitön arvo:
-About DiskProbe…	FileWindow		Ohjelmasta Levykoestaja
+About DiskProbe…	FileWindow		Ohjelmasta Levykoestaja...
 Add	ProbeView		Lisää
 Attribute	AttributeWindow		Attribuutti
 Attribute	ProbeView		Attribuutti
@@ -26,12 +26,12 @@ Attribute type: 	ProbeView		Attribuuttityyppi:
 Attribute: 	ProbeView		Attribuutti: 
 Attributes	ProbeView		Attribuutit
 Back	ProbeView		Takaisin
-Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than \"Font size\" and \"BlockSize\"	Kantaluku
+Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Kantaluku
 Block	ProbeView		Lohko
 Block %Ld (0x%Lx)	ProbeView		Lohko %Ld (0x%Lx)
 Block 0x%Lx	ProbeView		Lohko 0x%Lx
 Block: 	ProbeView		Lohko: 
-BlockSize	ProbeView	A menu item, a shortened form from \"block size\". This is in the same menu windowthan \"Base\" and \"Font size\"	Lohkokoko
+BlockSize	ProbeView	A menu item, a shortened form from 'block size'. This is in the same menu windowthan 'Base' and 'Font size'	Lohkokoko
 Bookmarks	ProbeView		Kirjanmerkit
 Boolean	TypeEditors	This is the type of editor	Boolean
 Boolean editor	TypeEditors		Boolean-muokkain
@@ -46,8 +46,8 @@ Close	ProbeView		Sulje
 Contents:	TypeEditors		Sisältö:
 Copy	ProbeView		Kopioi
 Could not find search string.	ProbeView		Ei voitu löytää hakumerkkijonoa.
-Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Ei voitu avata puskuria \"%s\":\n%s
-Could not open file \"%s\": %s\n	DiskProbe		Ei voitu avata tiedostoa \"%s\": %s\n
+Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Ei voitu avata puskuria ”%s”:\n%s
+Could not open file \"%s\": %s\n	DiskProbe		Ei voitu avata tiedostoa ”%s”: %s\n
 Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Ei voitu lukea kuvatiedostoa
 Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Desimaali
 Device	ProbeView		Laite
@@ -58,7 +58,7 @@ DiskProbe request	AttributeWindow		Levykoestajapyyntö
 DiskProbe request	DiskProbe		Levykoestajapyyntö
 DiskProbe request	ProbeView		Levykoestajapyyntö
 DiskProbe\n\twritten by Axel Dörfler\n\tCopyright 2004-2007, Haiku.\n\nOriginal Be version by Robert Polic\n	DiskProbe		Levykoestaja\n\ttekijä: Axel Dörfler\n\tCopyright 2004-2007, Haiku.\n\nAlkuperäisen Be-version tekijä: Robert Polic\n
-Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Haluatko todella poistaa attribuutin \"%s\" tiedostosta \"%s\"?\n\nEt voi perua tätä toimintoa.
+Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Haluatko todella poistaa attribuutin ”%s” tiedostosta ”%s”?\n\nEt voi perua tätä toimintoa.
 Don't save	ProbeView		Älä tallenna
 Double precision floating-point value:	TypeEditors		Kaksoistarkkuuden liukulukuarvo:
 Edit	ProbeView		Muokkaa
@@ -127,9 +127,9 @@ Type editor not supported	ProbeView		Tyyppimuokkainta ei tueta
 Undo	ProbeView		Peru
 Unknown format	TypeEditors		Tuntematon muoto
 Unknown type	TypeEditors		Tuntematon tyyppi
-View	ProbeView	This is the last menubar item \"File Edit Block View\"	Näkymä
+View	ProbeView	This is the last menubar item 'File Edit Block View'	Näkymä
 Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Tiedostoon kirjoittaminen epäonnistui:\n%s\n\nKaikki muutokset katoavat, kun poistut.
 none	ProbeView	No attributes	ei mitään
 of 	ProbeView		/ 
-of 0x0	ProbeView	This is a part of \"Block 0xXXXX of 0x0026\" message. In languages without 'of' structure it can be replaced simply with '/'.	/ 0x0
-what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	mikä: '%.4s'\n\n
+of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	/ 0x0
+what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	mikä: ’%.4s’\n\n

@@ -33,7 +33,7 @@ Game	DeviceClass		Peli
 Gamepad	DeviceClass		Peliohjain
 Gaming/Toy	DeviceClass		Peli/Lelu
 Glasses	DeviceClass		Luokat
-Handheld	DeviceClass		Kädessä pidettävä
+Handheld	DeviceClass		Kämmenlaite
 Hands-free	DeviceClass		Kädet vapauttava
 Headphones	DeviceClass		Korvakuulokkeet
 Helmet	DeviceClass		Kypärä
@@ -64,7 +64,7 @@ Portable audio	DeviceClass		Matkaradio
 Positioning	DeviceClass		Sijoittelu
 Printer	DeviceClass		Tulostin
 Remote control	DeviceClass		Kauko-ohjain
-Rendering	DeviceClass		Renderointi
+Rendering	DeviceClass		Renderöidään
 Robot	DeviceClass		Robotti
 SIM card reader	DeviceClass		SIM-korttilukija
 Scanner	DeviceClass		Skanneri
@@ -83,6 +83,6 @@ Video camera	DeviceClass		Videokamera
 Video conferencing	DeviceClass		Videoneuvottelu
 Video display and loudspeaker	DeviceClass		Videonäyttö ja kaiutin
 Video monitor	DeviceClass		Videonäyttö
-Wearable	DeviceClass	A wearable computer	Kannettava
+Wearable	DeviceClass	A wearable computer	Päälle puettava
 Wired modem or voice gateway	DeviceClass		Lankamodeemi tai ääniyhdyskäytävä
 Wrist watch	DeviceClass		Rannekello

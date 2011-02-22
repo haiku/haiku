@@ -2,7 +2,7 @@
 %.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld kanava / %lld kehystä
 %.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz mono / %lld kehystä
 %.1f kHz stereo / %lld frames	MediaFileInfo		%.1f kHz stereo / %lld kehystä
-%Ld x %Ld, %Ld fps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%Ld x %Ld, %Ld fps / %Ld kehystä
+%Ld x %Ld, %Ld fps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%Ld x %Ld, %Ld kehystä per sekunti / %Ld kehystä
 %amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles-tiedostoja ei tunnistettu tuettuina mediatiedostoina:
 %d bit 	MediaFileInfo		%d bitti
 %d byte 	MediaFileInfo		%d tavu

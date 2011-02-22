@@ -18,7 +18,7 @@ Gamma	Config Window		Gamma
 Golden master	Config Window		Golden master
 Mail Daemon Replacement\n\nby Haiku, Inc. All rights reserved.\n\nVersion %ld.%ld.%ld %s\n\nSee LICENSE file included in the installation package for more information.\n\n\n\nYou can contact us at:\n%s\n\nPlease submit bug reports using the %s\n\nProject homepage at:\n%s	Config Window		Sähköpostitaustaohjelmakorvaus\n\ntekijä: Haiku, Inc. All rights reserved.\n\nVersio %ld.%ld.%ld %s\n\nLisätietoja varten katso LICENSE-tiedostoa, joka on asennuspakkauksessa.\n\n\n\nVoit ottaa meihin yhteyttä osoitteessa:\n%s\n\nLähetä vikailmoitukset käyttäen osoitetta %s\n\nHankkeen kotisivu on osoitteessa:\n%s
 Mail checking	Config Window		Sähköpostin tarkistus
-Miscellaneous	Config Window		Sekalainen
+Miscellaneous	Config Window		Sekalaiset
 OK	Config Window		Valmis
 Only when dial-up is connected	Config Window		Vain kun valintayhteys on yhdistetty
 Real name:	Config Views		Oikea nimi:
@@ -32,11 +32,11 @@ Start mail services on startup	Config Window		Käynnistä postipalvelut tietokon
 While sending	Config Window		Lähetettäessä
 While sending and receiving	Config Window		Lähetettäessä ja vastaanotettaessa
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nYleisasetuksia ei voitu palauttaa.\n\nVirhe noudettaessa yleisasetuksia:\n%s\n
-\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nLuo uusi tili Lisää-painikkeella.\n\nPoista tili Poista-painikkella valitusta kohdasta.\n\nValitse kohde luettelosta sen asetusten muuttamiseksi.
-days	Config Window		päivää
-hours	Config Window		tuntia
-minutes	Config Window		minuuttia
-never	Config Window		ei koskaan
+\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nLuo uusi tili ”Lisää”-painikkeella.\n\nPoista tili ”Poista”-painikkella valitusta kohdasta.\n\nValitse kohde luettelosta sen asetusten muuttamiseksi.
+days	Config Window		päivä
+hours	Config Window		tunti
+minutes	Config Window		minuutti
+never	Config Window		älä tarkista
 · E-mail filters	Config Window		· Sähköpostisuodattimet
 · Incoming	Config Window		· Tuleva
 · Outgoing	Config Window		· Lähtevä

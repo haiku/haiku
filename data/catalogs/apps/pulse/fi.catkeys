@@ -10,7 +10,7 @@ Deskbar menu	CPUButton		Työpöytäpalkkivalikko
 Deskbar mode	MiniPulseView		Työpöytäpalkkitila
 Deskbar mode	NormalPulseView		Työpöytäpalkkitila
 Deskbar mode	PrefsWindow		Työpöytäpalkkitila
-Fade colors	ConfigView		Haalita värit
+Fade colors	ConfigView		Haalista värit
 Frame color	ConfigView		Kehysväri
 Idle color	ConfigView		Joutokäyntiväri
 Info	CPUButton		Tiedot

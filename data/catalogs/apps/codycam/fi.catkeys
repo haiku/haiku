@@ -23,7 +23,7 @@ Closing the window\n	VideoConsumer.cpp		Suljetaan ikkuna\n
 CodyCam	CodyCam		CodyCam
 CodyCam\n\nThe Original BeOS webcam	CodyCam		CodyCam\n\nAlkuperäinen BeOS-webbikamera
 Connected…	VideoConsumer.cpp		Yhdistetty…
-Couldn't find requested directory on server	VideoConsumer.cpp		Ei voitu löytää pyydettyä hakemistoa palvelimelta
+Couldn't find requested directory on server	VideoConsumer.cpp		Ei kyetty löytämään pyydettyä hakemistoa palvelimelta
 Directory:	CodyCam		Hakemisto:
 Error creating output file	VideoConsumer.cpp		Virhe luotaessa tulostetiedostoa
 Error getting initial latency for the capture node	CodyCam		Virhe haettaessa alkuviivettä kaappaussolmua varten
@@ -78,7 +78,7 @@ Type:	CodyCam		Tyyppi:
 Video settings	CodyCam		Video-asetukset
 Waiting…	CodyCam		Odotetaan…
 capture rate expected	CodyCam		odotettiin kaappaustaajuutta
-cmd: '%s'\n	FtpClient		komento: '%s'\n
+cmd: '%s'\n	FtpClient		komento: ’%s’\n
 destination directory expected	CodyCam		odotettiin kohdehakemistoa
 image file format expected	CodyCam		odotettiin kuvatiedostomuotoa
 invalid upload client %ld\n	VideoConsumer.cpp		virheellinen lähetysasiakas %ld\n
@@ -89,7 +89,7 @@ password expected	CodyCam		odotettiin salasanaa
 read: %d\n	SftpClient		luettu: %d\n
 read: %ld\n	SftpClient		luettu: %ld\n
 reply: %d, %d\n	FtpClient		vastaus: %d, %d\n
-reply: '%s'\n	SftpClient		vastaus: '%s'\n
+reply: '%s'\n	SftpClient		vastaus: ’%s’\n
 server address expected	CodyCam		odotettiin palvelinosoitetta
 still image filename expected	CodyCam		odotettiin pysäytyskuvatiedostonimeä
 unknown command	SettingsHandler		tuntematon komento

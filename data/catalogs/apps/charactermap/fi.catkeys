@@ -12,7 +12,7 @@ Arabic supplement	UnicodeBlocks		Arabian täydennys
 Armenian	UnicodeBlocks		Armenian kieli
 Arrows	UnicodeBlocks		Nuolet
 Balinese	UnicodeBlocks		Bali
-Basic Latin	UnicodeBlocks		Peruslatinalainen
+Basic Latin	UnicodeBlocks		Peruslatin-kirjaimisto
 Bengali	UnicodeBlocks		Bengali
 Block elements	UnicodeBlocks		Lohkoelementit
 Bopomofo	UnicodeBlocks		Bopomofo
@@ -68,10 +68,10 @@ File	CharacterWindow		Tiedosto
 Filter:	CharacterWindow		Suodatin:
 Font	CharacterWindow		Kirjasin
 Font size:	CharacterWindow		Kirjasinkoko:
-General punctuation	UnicodeBlocks		Yleinen välimerkit
+General punctuation	UnicodeBlocks		Yleiset välimerkit
 Geometric shapes	UnicodeBlocks		Geometriset muodot
 Georgian	UnicodeBlocks		Georgian kieli
-Georgian supplement	UnicodeBlocks		Georgian kielen täydennys
+Georgian supplement	UnicodeBlocks		Georgian täydennys
 Glagotic	UnicodeBlocks		Glagoliittinen
 Gothic	UnicodeBlocks		Gootin kieli
 Greek and Coptic	UnicodeBlocks		Kreikkalainen ja koptilainen
@@ -101,8 +101,8 @@ Latin extended A	UnicodeBlocks		Latin-laajennus A
 Latin extended B	UnicodeBlocks		Latin-laajennus B
 Latin extended C	UnicodeBlocks		Latin-laajennus C
 Latin extended D	UnicodeBlocks		Latin-laajennus D
-Latin extended additional	UnicodeBlocks		Lisää laajennetut latinalaiskirjaimet
-Latin-1 supplement	UnicodeBlocks		Latinalainen-1 täydennys
+Latin extended additional	UnicodeBlocks		Latin-laajennuslisäys
+Latin-1 supplement	UnicodeBlocks		Latin-1 täydennys
 Lepcha	UnicodeBlocks		Lepcha
 Letterlike symbols	UnicodeBlocks		Kirjaimenkaltaiset symbolit
 Limbu	UnicodeBlocks		Limbun kieli

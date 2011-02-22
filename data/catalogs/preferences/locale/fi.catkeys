@@ -6,16 +6,16 @@ Currency	TimeFormatSettings		Valuutta
 Date	TimeFormatSettings		Päivämäärä
 Defaults	Locale Preflet Window		Oletukset
 Formatting	Locale Preflet Window		Muotoillaan
-Full format:	TimeFormatSettings		Koko muoto:
+Full format:	TimeFormatSettings		Kokonainen muoto:
 Language	Locale Preflet Window		Kieli
 Locale	Locale Preflet		Maa-asetus
-Locale	Locale Preflet Window		Paikallisasetus
+Locale	Locale Preflet Window		Maa-asetus
 Long format:	TimeFormatSettings		Pitkä muoto:
 Medium format:	TimeFormatSettings		Keskikokoinen muoto:
-Negative:	TimeFormatSettings		Kielteinen:
+Negative:	TimeFormatSettings		Negatiivinen:
 Numbers	TimeFormatSettings		Numerot
 OK	Locale Preflet Window		Valmis
-Positive:	TimeFormatSettings		Myönteinen:
+Positive:	TimeFormatSettings		Positiivinen:
 Preferred languages	Locale Preflet Window		Toivotut kielet
 Revert	Locale Preflet Window		Palauta
 Short format:	TimeFormatSettings		Lyhyt muoto:

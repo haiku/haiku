@@ -7,7 +7,7 @@
 -d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\tavaa <kansio>ssa\n
 -f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\ttoteuttamaton\n
 -h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\tnäytä käyttö\n
--k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tminkäkaltaisia kohteita ei voida avata (maku): kaikki f, d, s -yhdistelmät  (tiedosto (oletus), hakemisto, symbolinen linkki)\n
+-k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tminkäkaltaisia kohteita ei voida avata (tyyppi): kaikki f, d, s -yhdistelmät  (tiedosto (oletus), hakemisto, symbolinen linkki)\n
 -l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tkäytä ladattua tiedostopaneelia (oletus)\n
 -m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\ttekee tiedostopaneelista pakollisen\n
 -n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\taseta tallennusten oletusnimi\n

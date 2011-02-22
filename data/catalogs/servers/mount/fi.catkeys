@@ -1,7 +1,7 @@
 1	finnish	x-vnd.Haiku-mount_server	1422362183
 Cancel	AutoMounter		Peru
-Could not unmount disk \"%s\":\n\t%s	AutoMounter		Ei voitu purkaa liittämistä levyasemaan \"%s\":\n\t%s
-Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Ei voitu purkaa liittämistä levyasemaan \"%s\":\n\t%s\n\nPakotetaanko liittämisen purkaminen?\n\nHuomaa: Jos sovellus parhaillaan kirjoittaa taltiolle, liittämisen purkaminen voi aiheuttaa datan häviämisen.\n
+Could not unmount disk \"%s\":\n\t%s	AutoMounter		Ei voitu purkaa liittämistä levyasemaan ”%s”:\n\t%s
+Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Ei voitu purkaa liittämistä levyasemaan ”%s”:\n\t%s\n\nPakotetaanko liittämisen purkaminen?\n\nHuomaa: Jos sovellus parhaillaan kirjoittaa taltiolle, liittämisen purkaminen voi aiheuttaa datan häviämisen.\n
 Error mounting volume:\n\n%s	AutoMounter		Virhe liitettäessä taltiota:\n\n%s
 Force unmount	AutoMounter		Pakota liittämisen purkaminen
 It is suggested to mount all additional Haiku volumes in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		On suositeltavaa liittää kaikki muut Haiku-taltiot kirjoitussuojatussa tilassa. Tämä estää datan tahattoman häviämisen Haikun virheiden vuoksi.
@@ -9,7 +9,7 @@ Mount error	AutoMounter		Liittämisvirhe
 Mount read-only	AutoMounter		Liitä kirjoitussuojattuna
 Mount read/write	AutoMounter		Liitä luku- ja kirjoitusoikeuksilla
 Mount warning	AutoMounter		Liittämisvaroitus
-Mounting volume '%s'\n\n	AutoMounter		Liitetään taltio '%s'\n\n
+Mounting volume '%s'\n\n	AutoMounter		Liitetään taltio ’%s’\n\n
 Mounting volume <unnamed volume>\n\n	AutoMounter		Liitetään taltio <nimetön taltio>\n\n
 OK	AutoMounter		Valmis
 Previous volumes mounted.	AutoMounter		Aikaisemmat liitetyt taltiot.

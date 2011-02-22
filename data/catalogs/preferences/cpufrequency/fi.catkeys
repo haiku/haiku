@@ -1,12 +1,12 @@
 1	finnish	x-vnd.Haiku-CPUFrequencyPref	4060072235
 CPU Frequency	Main window		Suoritintaajuus
 CPU frequency status view	CPU Frequency View		Suoritintaajuuden tilanäkymä
-CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		Suorittimen kellotaajuus\n\ttekijä Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
+CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		Suorittimen kellotaajuus\n\ttekijä: Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
 Defaults	Pref Window		Oletukset
 Dynamic performance	Status view		Dynaaminen suorituskyky
 Dynamic stepping	CPU Frequency View		Dynaaminen muutos
 High performance	Status view		Korkea suorituskyky
-Install replicant into Deskbar	CPU Frequency View		Asenna kopio Tilapalkkiin
+Install replicant into Deskbar	CPU Frequency View		Asenna kopio Työpöytäpalkkiin
 Integration time [ms]: 	CPU Frequency View		Integraatioaika [ms]:
 Launching the CPU frequency preflet failed.\n\nError: 	Status view		Suoritintaajuuden asetusohjelman käynnistys epäonnistui.\n\nVirhe:
 Low energy	Status view		Matala energiankulutus

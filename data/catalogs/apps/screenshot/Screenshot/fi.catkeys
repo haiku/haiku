@@ -16,11 +16,11 @@ Please select	ScreenshotWindow		Valitse
 Save	ScreenshotWindow		Tallenna
 Save as:	ScreenshotWindow		Tallenna nimellä:
 Save in:	ScreenshotWindow		Tallenna kohteeseen:
-Screenshot	ScreenshotWindow		Näytönkaapppaus
+Screenshot	ScreenshotWindow		Näytönkaappaus
 Select	ScreenshotWindow		Valitse
 Settings…	ScreenshotWindow		Asetukset...
 This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Tiedosto on jo olemassa.\n Oletko varma, etä haluat korvata sen?
-Translator Settings	ScreenshotWindow		Kääntäjäasetukset
+Translator Settings	ScreenshotWindow		Muunninasetukset
 overwrite	ScreenshotWindow		korvaa
 screenshot	Screenshot	Base filename of screenshot files	näytönkaappaus
 seconds	ScreenshotWindow		sekuntia

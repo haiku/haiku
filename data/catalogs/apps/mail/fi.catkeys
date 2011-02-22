@@ -29,7 +29,7 @@ Colored quotes:	Mail		Väritetyt lainaukset:
 Copy	Mail		Kopioi
 Copy link location	Mail		Kopioi linkkisijainti
 Copy to new	Mail		Kopioi uuteen
-Couldn't open this signature. Sorry.	Mail		Valitan, ei voitu avata tätä allekirjoitusta.
+Couldn't open this signature. Sorry.	Mail		Ei voitu avata tätä allekirjoitusta.
 Cut	Mail		Leikkaa
 Date:	Mail		Päivämäärä:
 Decoding:	Mail		Koodauksen purku:
@@ -57,7 +57,7 @@ Hide	Mail		Piilota
 Include file attributes in attachments	Mail		Sisällytä tiedostoattribuutit liitteisiin
 Inconsistency occurred in the undo/redo buffer.	Mail		Tapahtui epäjohdonmukaisuutta puskurin perumisen/uudelleentekemisen yhteydessä.
 Initial spell check mode:	Mail		Alustava oikolukutila:
-Leave as '%s'	Mail		Jätä nimellä '%s'
+Leave as '%s'	Mail		Jätä nimellä ’%s’
 Leave as New	Mail		Jätä uutena
 Leave same	Mail		Jätä samaksi
 Mail	Mail		Sähköposti
@@ -67,7 +67,7 @@ Mail\n\n	Mail		Sähköposti\n\n
 Mailing	Mail		Postitus
 Message	Mail		Viesti
 Move to trash	Mail		Siirrä roskakoriin
-Need Tracker to move items to trash	Mail		Tarvitsee seurantapalvelinta siirtämään viestit roskakoriin
+Need Tracker to move items to trash	Mail		Tarvitsee Seuraajaa siirtämään viestit roskakoriin
 New	Mail		Uusi
 New mail message	Mail		Uusi sähköpostiviesti
 Next	Mail		Seuraava
@@ -85,7 +85,7 @@ Open draft	Mail		Avaa luonnos
 Open this link	Mail		Avaa tämä linkki
 Page setup…	Mail		Sivuasetukset…
 Paste	Mail		Liitä
-Preferences…	Mail		Etuoikeudet…
+Preferences…	Mail		Asetukset…
 Previous	Mail		Edellinen
 Previous message	Mail		Edellinen viesti
 Print	Mail		Tulosta
@@ -128,7 +128,7 @@ Signature:	Mail		Allekirjoitus:
 Signatures	Mail		Allekirjoitukset
 Size:	Mail		Koko:
 Sorry	Mail		Valitan
-Sorry, could not find an application that supports the 'Person' data type.	Mail		Valitettavasti ei voitu löytää sovellusta, joka tukee 'Person'-datatyyppiä.
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Valitettavasti ei voitu löytää sovellusta, joka tukee ’Person’-datatyyppiä.
 Start now	Mail		Aloita nyt
 Subject:	Mail		Aihe:
 Text wrapping:	Mail		Tekstin vieritys:

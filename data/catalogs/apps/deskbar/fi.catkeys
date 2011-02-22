@@ -17,7 +17,7 @@ Hide time	TimeView		Piilota aika
 Menu	PreferencesWindow		Valikko
 Mount	BeMenu		Liitä
 No windows	WindowMenu		Ei ikkunoita
-Power off	BeMenu		Katkais virta
+Power off	BeMenu		Katkaise virta
 Quit application	WindowMenu		Poistu sovelluksesta
 Recent applications	BeMenu		Äskettäiset sovellukset
 Recent applications:	PreferencesWindow		Äskettäiset sovellukset:
@@ -25,7 +25,7 @@ Recent documents	BeMenu		Äskettäiset asiakirjat
 Recent documents:	PreferencesWindow		Äskettäiset asiakirjat:
 Recent folders	BeMenu		Äskettäiset kansiot
 Recent folders:	PreferencesWindow		Äskettäiset kansiot:
-Restart Tracker	BeMenu		Käynnistä jäljittäjä uudelleen
+Restart Tracker	BeMenu		Käynnistä seuraaja uudelleen
 Restart system	BeMenu		Käynnistä järjestelmä uudelleen
 Show Time	Tray		Näytä aika
 Show all	WindowMenu		Näytä kaikki
@@ -35,5 +35,5 @@ Show replicants	BeMenu		Näytä replikantit
 Show seconds	PreferencesWindow		Näytä sekunnit
 Shutdown…	BeMenu		Sulje järjestelmä...
 Sort running applications	PreferencesWindow		Lajittele suoritettavat sovellukset
-Tracker always first	PreferencesWindow		Jäljittäjä aina ensimmäisenä
+Tracker always first	PreferencesWindow		Seuraaja aina ensimmäisenä
 Window	PreferencesWindow		Ikkuna

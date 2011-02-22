@@ -1,6 +1,6 @@
-1	finnish	x-vnd.Haiku-ShowImage	1508862207
+1	finnish	x-vnd.Haiku-ShowImage	3385354583
 %SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS sekuntia
-About ShowImage…	Menus		ShowImage-ohjelmasta…
+About ShowImage…	Menus		Ohjelmasta Kuvankatselin…
 Browse	Menus		Selaa
 Cancel	ClosePrompt		Peru
 Clear selection	Menus		Tyhjennä valinta
@@ -8,7 +8,7 @@ Close	ClosePrompt		Sulje
 Close	Menus		Sulje
 Close document	ClosePrompt		Sulje asiakirja
 Copy	Menus		Kopioi
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Ei voitu ladata kuvaa! Puuttuu joko tiedosto tai kuvakääntäjä sitä varten.
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Ei voitu ladata kuvaa! Puuttuu joko tiedosto tai kuvamuunnin sitä varten.
 DPI:	PrintOptionsWindow		DPI:
 Edit	Menus		Muokkaa
 File	Menus		Tiedosto
@@ -37,6 +37,7 @@ Print options	PrintOptionsWindow		Tulostusvalitsimet
 Print…	Menus		Tulosta...
 Progress monitor	ProgressWindow		Edistymisvalvonta
 Quit	Menus		Poistu
+Rating	Menus		Arvosana
 Resize to (in 1/72 inches):	PrintOptionsWindow		Skaalaa kokoon (1/72 tuumissa):
 Rotate clockwise	Menus		Pyöritä myötäpäivään
 Rotate counterclockwise	Menus		Pyöritä vastapäivään
@@ -44,14 +45,14 @@ Save as…	Menus		Tallenna nimellä...
 Select all	Menus		Valitse kaikki
 Selection Mode	Menus		Valintatila
 Show caption in full screen mode	Menus		Näytä kuvateksti kokoruututilassa
-ShowImage	AboutWindow		ShowImage
-ShowImage	Menus		Kuvannäytin
+ShowImage	AboutWindow		Kuvankatselin
+ShowImage	Menus		Kuvankatselin
 Slide delay	Menus		Diaviive
 Slide show	Menus		Diaesitys
 Stretch to window	Menus		Venytä ikkunaan
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Asiakirja '%s' (sivu %d) on muuttunut. Haluatko sulkea asiakirjan?
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Asiakirja '%s' on muuttunut. Haluatko sulkea asiakirjan?
-The file '%s' could not be written.	SaveToFile		Tiedostoa '%s' ei voitu kirjoittaa.
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Asiakirja ’%s’ (sivu %d) on muuttunut. Haluatko sulkea asiakirjan?
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Asiakirja ’%s’ on muuttunut. Haluatko sulkea asiakirjan?
+The file '%s' could not be written.	SaveToFile		Tiedostoa ’%s’ ei voitu kirjoittaa.
 Undo	Menus		Peru
 Use as background…	Menus		Käytä taustana…
 View	Menus		Näkymä

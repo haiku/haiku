@@ -29,10 +29,10 @@ OK	About		Valmis
 OK	ExpanderPreferences		Valmis
 Open destination folder after extraction	ExpanderPreferences		Avaa kohdekansio purkamisen jälkeen
 Other:	ExpanderPreferences		Muut:
-Same directory as source (archive) file	ExpanderPreferences		Sama hakemisto kuin lähde(arkisto)tiedosto
+Same directory as source (archive) file	ExpanderPreferences		Sama hakemisto lähde(arkisto)tiedostona
 Select	DirectoryFilePanel		Valitse
 Select	ExpanderPreferences		Valitse
-Select '%s'	DirectoryFilePanel		Valitse '%s'
+Select '%s'	DirectoryFilePanel		Valitse ’%s’
 Select current	DirectoryFilePanel		Valitse nykyinen
 Set destination…	ExpanderMenu		Aseta kohde…
 Set source…	ExpanderMenu		Aseta lähde…

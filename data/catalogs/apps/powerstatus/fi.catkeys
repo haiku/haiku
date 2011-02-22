@@ -1,6 +1,5 @@
-1	finnish	x-vnd.Haiku-PowerStatus	1564851502
-ACPI connect\n	PowerStatus		ACPI-yhdistä\n
-ACPI driver found\n	PowerStatus		ACPI-ajuri löytyi\n
+1	finnish	x-vnd.Haiku-PowerStatus	51899741
+About	PowerStatus		Ohjelmasta
 About…	PowerStatus		Ohjelmasta...
 Battery charging	PowerStatus		Akkulataus
 Battery discharging	PowerStatus		Akkulatauksen purkaminen
@@ -20,11 +19,10 @@ Extended battery info	PowerStatus		Laajennetut akkutiedot
 Install in Deskbar	PowerStatus		Asenna Työpöytäpalkkiin
 Last full charge: 	PowerStatus		Viimeinen täysi lataus:
 Model number: 	PowerStatus		Mallinumero:
-No power interface found.\n	PowerStatus		Virtalähderajapintaa ei löytynyt.\n
 OEM info: 	PowerStatus		OEM-tiedot:
 OK	PowerStatus		Valmis
 Power status box	PowerStatus		Virtatilalaatikko
-PowerStatus settings	PowerStatus		Virtatila-asetukset
+PowerStatus	PowerStatus		Virtatila
 PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		Virtatila\ntekijä: Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
 Quit	PowerStatus		Poistu
 Run in window	PowerStatus		Suorita ikkunassa
@@ -36,7 +34,6 @@ Show time	PowerStatus		Näytä aika
 Technology: 	PowerStatus		Teknologia:
 Type: 	PowerStatus		Tyyppi:
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Voit suorittaa Virtatilan ikkunassa tai asentaa sen Työpöytäpalkkiin.
-about	PowerStatus		ohjelmasta
 charging	PowerStatus		ladataan
 discharging	PowerStatus		puretaan latausta
 mA	PowerStatus		mA
@@ -47,4 +44,3 @@ mWh	PowerStatus		mWh
 no battery	PowerStatus		ei akkua
 non-rechargeable	PowerStatus		ei-uudelleenladattava
 rechargeable	PowerStatus		uudelleenladattava
-try %s\n	PowerStatus		yritä %s\n

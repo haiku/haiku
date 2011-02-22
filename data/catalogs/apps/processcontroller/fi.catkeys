@@ -1,12 +1,13 @@
-1	finnish	x-vnd.Haiku-ProcessController	678001537
+1	finnish	x-vnd.Haiku-ProcessController	926983020
 %s priority [%d]	ProcessController		%s prioriteetti [%d]
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		© 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
+About	ProcessController		Ohjelmasta
 About ProcessController…	ProcessController		Ohjelmasta Prosessiohjain
 Cancel	ProcessController		Peru
 Damned!	ProcessController		Kirottua!
 Debug this thread!	ProcessController		Vikajäljitä tätä säiettä!
 Debug thread	ProcessController		Vikajäljitä säiettä
-Do you really want to kill the team \"%s\"?	ProcessController		Haluatko todella tappaa ryhmän \"%s\"?
+Do you really want to kill the team \"%s\"?	ProcessController		Haluatko todella tappaa ryhmän ”%s”?
 Error saving file	ProcessController		Virhe tallennettaessa tiedostoa
 Global Popup	ProcessController		Yleinen ponnahdusikkuna
 Gone teams…	ProcessController		Poistuneet ryhmät...
@@ -17,7 +18,7 @@ Memory usage	ProcessController		Muistikäyttö
 New Terminal	ProcessController		Uusi pääteikkuna
 OK	ProcessController		Valmis
 Ok!	ProcessController		Valmis!
-Preferences	ProcessController		Asetukset
+ProcessController	ProcessController		Prosessiohjain
 ProcessController is already installed in Deskbar.	ProcessController		Prosessiohjain on jo asennettu Työpöytäpalkkiin.
 ProcessController\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n	ProcessController		Prosessiohjain\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n
 Processor %d	ProcessController		Prosessori %d
@@ -28,14 +29,11 @@ Restart Tracker	ProcessController		Käynnistä Seuraaja uudelleen
 Run in window	ProcessController		Suorita ikkunassa
 That's no Fun!	ProcessController		Se ei ole hauskaa!
 This is the last active processor...\nYou can't turn it off!	ProcessController		Tämä on viimeinen toimiva prosessori...\nEt voi kääntää sitä pois päältä!
-This team is already gone…	ProcessController		Tämä ryhmä on jo mennyt...
-This thread is already gone…	ProcessController		Tämä säie on jo mennyt...
+This team is already gone…	ProcessController		Tämä ryhmä on jo poistunut...
+This thread is already gone…	ProcessController		Tämä säie on jo poistunut...
 Threads and CPU usage	ProcessController		Säikeet ja prosessorikäyttö
 Usage: %s [-deskbar]\n	ProcessController		Käyttö: %s [-deskbar]\n
-What do you want to do with the thread \"%s\"?	ProcessController		Mitä haluat tehdä säikeelle \"%s\"?
+What do you want to do with the thread \"%s\"?	ProcessController		Mitä haluat tehdä säikeelle ”%s”?
 Yes, kill this team!	ProcessController		Kyllä, tapa tämä ryhmä!
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Voit suorittaa Prosessiohjaimen ikkunassa tai asentaa sen Työpöytäpalkkiin.
-Your setting filecould not be saved!\n(%s)	ProcessController		Asetustiedostoasi ei voitu tallentaa!\n(%s)
-about	ProcessController		ohjelmasta
-priority	ProcessController		prioriteetti
-thread	ProcessController		säie
+Your setting file could not be saved!\n(%s)	ProcessController		Asetustiedostoasi ei voitu tallentaa!\n(%s)

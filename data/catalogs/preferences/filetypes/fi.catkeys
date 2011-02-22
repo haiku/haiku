@@ -40,7 +40,7 @@ Close	Application Type Window		Sulje
 Could not change attributes	Attribute Window		Ei voitu muuttaa attribuutteja
 Could not change file extensions	Extension Window		Ei voitu vaihtaa tiedostotarkentimia
 Could not install file type	New File Type Window		Ei voitu asentaa tiedostotyyppiä
-Could not open \"%s\":\n%s	FileTypes		Ei voitu avata \"%s\":\n%s
+Could not open \"%s\":\n%s	FileTypes		Ei voitu avata tiedostoa ”%s”:\n%s
 Could not open file	FileType Window		Ei voitu avata tiedostoa
 Could not remove file type: %s\n	FileTypes Window		Ei voitu poistaa tiedostotyyppiä: %s\n
 Could not retrieve application signature	Preferred App Menu		Ei voitu noutaa sovelluksen allekirjoitusta
@@ -95,7 +95,7 @@ Left	Attribute Window	Attribute column alignment in Tracker	Vasen
 Long description:	Application Type Window		Pitkä kuvaus:
 Move down	FileTypes Window		Siirrä alas
 Move up	FileTypes Window		Siirrä ylös
-Multiple files from \"%s\" file type	FileType Window		Useita tiedostoja \"%s\"-tiedostotyypistä
+Multiple files from \"%s\" file type	FileType Window		Useita tiedostoja ”%s”-tiedostotyypistä
 Multiple launch	Application Type Window		Useita käynnistymisiä
 Name:	Application Types Window		Nimi:
 New file type	New File Type Window		Uusi tiedostotyyppi
@@ -116,12 +116,12 @@ Remove	FileTypes Window		Poista
 Remove icon	Icon View		Poista kuvake
 Remove uninstalled	Application Types Window		Poista poistetut sovellukset
 Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Tiedostotyypin poistamista ei voi perua.\nOletko varma, että haluat poistaa sen?
-Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Kantatyypin poistamista ei voida perua.\nMenetät kaikki tiedostotyypit, jotka polveutuvat tästä kantatyypistä!\n\nOletko varma, että haluat tehdä tämän? Koko ryhmän poistaiseksi pidä vaihto-painiketta alhaalla ja paina \"Poista\".
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Kantatyypin poistamista ei voida perua.\nMenetät kaikki tiedostotyypit, jotka polveutuvat tästä kantatyypistä!\n\nOletko varma, että haluat tehdä tämän? Koko ryhmän poistaiseksi pidä vaihto-painiketta alhaalla ja paina ”Poista”.
 Removing uninstalled application types	Application Types Window		Poistetaan poistettujen sovellusten tyyppejä
 Right	Attribute Window	Attribute column alignment in Tracker	Oikealle
 Rule:	FileTypes Window		Sääntö:
-Same as…	FileType Window		Sama nimellä…
-Same as…	FileTypes Window		Sama nimellä…
+Same as…	FileType Window		Sama kuin…
+Same as…	FileTypes Window		Sama kuin…
 Save	Application Type Window		Tallenna
 Save into resource file…	Application Type Window		Tallenna resurssitiedostoon…
 Save request	Application Type Window		Tallenna pyyntö
@@ -143,7 +143,7 @@ Signature:	Application Types Window		Allekirjoitus:
 Single launch	Application Type Window		Yksittäiskäynnistys
 Special:	Attribute Window		Erityinen:
 Supported types	Application Type Window		Tuetut tyypit
-The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Sovellus \"%s\" ei tue tätä tiedostotyyppiä.\nOletko varma, että haluat silti asettaa sen?
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Sovellus ”%s” ei tue tätä tiedostotyyppiä.\nOletko varma, että haluat silti asettaa sen?
 This file type already exists	New File Type Window		Tämä tiedostotyyppi on jo olemassa
 Type name:	FileTypes Window		Tyyppinimi:
 Type:	Attribute Window		Tyyppi:

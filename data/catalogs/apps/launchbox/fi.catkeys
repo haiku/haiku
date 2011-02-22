@@ -9,9 +9,9 @@ Clone	LaunchBox		Klooni
 Close	LaunchBox		Sulje
 Description for '%3'	LaunchBox		Kohteen ’%3’ kuvaus
 Failed to launch '%1'.\n\nError:	LaunchBox		Sovelluksen ’%1’ käynnistys epäonnistui:\n\nVirhe:
-Failed to launch 'something',error in Pad data.	LaunchBox		Epäonnistuttiin käynnistämään 'jotakin', virhe Alustatiedoissa.
+Failed to launch 'something',error in Pad data.	LaunchBox		Epäonnistuttiin käynnistämään ’jotakin’, virhe Alustatiedoissa.
 Failed to launch application with signature '%2'.\n\nError:	LaunchBox		Allekirjoituksella ’%2’ varustetun sovelluksen käynnistys epäonnistui.\n\nVirhe:
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Epäonnistuttiin lähettämään 'avaa kansio'-komento Seuraajalle.\n\nVirhe: 
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Epäonnistuttiin lähettämään ’avaa kansio’-komento Seuraajalle.\n\nVirhe: 
 Horizontal layout	LaunchBox		Vaakasuora sijoittelu
 Icon size	LaunchBox		Kuvakekoko
 Ignore double-click	LaunchBox		Ohita kaksoisnapsautukset

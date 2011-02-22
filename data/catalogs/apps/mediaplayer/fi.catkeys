@@ -86,7 +86,7 @@ Playlist…	MediaPlayer-Main		Soittoluettelo...
 Prev	MediaPlayer-Main		Edellinen
 Quit	MediaPlayer-Main		Poistu
 Randomize	MediaPlayer-PlaylistWindow		Satunnaista
-Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Satunnaita kappaleita
+Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Satunnaista kappaleita
 Rating	MediaPlayer-Main		Aset arvosana
 Redo	MediaPlayer-PlaylistWindow		Tee uudelleen
 Remove (Del)	MediaPlayer-PlaylistWindow		Poista (Del)
@@ -120,7 +120,7 @@ Subtitle placement	MediaPlayer-SettingsWindow		Aliotsikon sijainti
 Subtitle size	MediaPlayer-SettingsWindow		Aliotsikon koko
 Subtitles	MediaPlayer-Main		Aliotsakkeet
 Thanks	MediaPlayer-Main		Kiitokset
-The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Tiedostoa '%filename' ei voitu avata.\n\n
+The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Tiedostoa ’%filename’ ei voitu avata.\n\n
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Tätä tiedostomuotoa käsittelevää dekooderia ei ole asennettu, tai dekooderilla on vaikeuksia tietyn muotoversion kanssa.
 Toggle mute.	MediaPlayer-Main		Vuorottele mykistystilaa
 Toggle pause/play.	MediaPlayer-Main		Vuorottele tauko/soita -tiloja.
