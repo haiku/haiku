@@ -40,6 +40,17 @@ const char* kCategoryString[] = {
 	B_TRANSLATE("ACPI controller")						// 0x13 (added later)
 };
 
+// This list is only used to translate Device properties
+static const char* kTranslateMarkString[] = {
+	B_TRANSLATE_MARK("unknown"),
+	B_TRANSLATE_MARK("Device"),
+	B_TRANSLATE_MARK("Computer"),
+	B_TRANSLATE_MARK("ACPI bus"),
+	B_TRANSLATE_MARK("PCI bus"),
+	B_TRANSLATE_MARK("ISA bus"),
+	B_TRANSLATE_MARK("Unknown device")
+};
+
 
 Device::Device(Device* physicalParent, BusType busType, Category category,
 			const BString& name, const BString& manufacturer,
@@ -50,10 +61,10 @@ Device::Device(Device* physicalParent, BusType busType, Category category,
 	fCategory(category),
 	fPhysicalParent(physicalParent)
 {
-	SetAttribute(B_TRANSLATE("Device name"), name);
-	SetAttribute(B_TRANSLATE("Manufacturer"), manufacturer);
-	SetAttribute(B_TRANSLATE("Driver used"), driverUsed);
-	SetAttribute(B_TRANSLATE("Device paths"), devPathsPublished);
+	SetAttribute(B_TRANSLATE("Device name"), B_TRANSLATE(name));
+	SetAttribute(B_TRANSLATE("Manufacturer"), B_TRANSLATE(manufacturer));
+	SetAttribute(B_TRANSLATE("Driver used"), B_TRANSLATE(driverUsed));
+	SetAttribute(B_TRANSLATE("Device paths"), B_TRANSLATE(devPathsPublished));
 }
 
 
@@ -124,6 +135,13 @@ BString
 Device::GetBusStrings()
 {
 	return B_TRANSLATE("None");
+}
+
+
+BString
+Device::GetBusTabName()
+{ 
+	return B_TRANSLATE("Bus Information"); 
 }
 
 

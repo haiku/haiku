@@ -88,8 +88,7 @@ public:
 	virtual BString			GetBusStrings();
 	virtual BString			GetAllStrings();
 	
-	virtual BString			GetBusTabName()
-								{ return "Bus Information"; }
+	virtual BString			GetBusTabName();
 
 	virtual Attribute		GetAttribute(const BString& name)
 								{ return Attribute(name.String(),
