@@ -437,8 +437,8 @@ MailDaemonApp::MessageReceived(BMessage* msg)
 			AccountMap::iterator it = fAccounts.find(account);
 			if (it == fAccounts.end())
 				break;
-			InboundProtocol* inboundProtocol = it->second.inboundProtocol;
-			inboundProtocol->MarkMessageAsRead(ref, read);
+			InboundProtocolThread* inboundThread = it->second.inboundThread;
+			inboundThread->MarkMessageAsRead(ref, read);
 			break;
 		}
 
