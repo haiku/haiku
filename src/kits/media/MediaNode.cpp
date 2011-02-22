@@ -886,10 +886,8 @@ BMediaNode::_InitObject(const char *name, media_node_id id, uint64 kinds)
 	fNodeID = id;
 	fRefCount = 1;
 	fName[0] = 0;
-	if (name) {
-		strncpy(fName, name, B_MEDIA_NAME_LENGTH - 1);
-		fName[B_MEDIA_NAME_LENGTH - 1] = 0;
-	}
+	if (name)
+		strlcpy(fName, name, B_MEDIA_NAME_LENGTH);
 	fRunMode = B_INCREASE_LATENCY;
 	fKinds = kinds;
 	fProducerThis = 0;

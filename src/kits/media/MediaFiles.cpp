@@ -93,7 +93,7 @@ BMediaFiles::RewindRefs(const char* type)
 
 	server_get_media_items_request request;
 	request.team = BPrivate::current_team();
-	strncpy(request.type, type, B_MEDIA_NAME_LENGTH);
+	strlcpy(request.type, type, B_MEDIA_NAME_LENGTH);
 
 	server_get_media_items_reply reply;
 	status_t status = QueryServer(SERVER_GET_MEDIA_FILE_ITEMS, &request,
@@ -145,8 +145,8 @@ BMediaFiles::GetRefFor(const char* type, const char* item, entry_ref* _ref)
 		return B_BAD_VALUE;
 
 	server_get_ref_for_request request;
-	strncpy(request.type, type, B_MEDIA_NAME_LENGTH);
-	strncpy(request.item, item, B_MEDIA_NAME_LENGTH);
+	strlcpy(request.type, type, B_MEDIA_NAME_LENGTH);
+	strlcpy(request.item, item, B_MEDIA_NAME_LENGTH);
 
 	server_get_ref_for_reply reply;
 	status_t status = QueryServer(SERVER_GET_REF_FOR, &request, sizeof(request),
@@ -170,8 +170,8 @@ BMediaFiles::GetAudioGainFor(const char* type, const char* item, float* _gain)
 		return B_BAD_VALUE;
 
 	server_get_item_audio_gain_request request;
-	strncpy(request.type, type, B_MEDIA_NAME_LENGTH);
-	strncpy(request.item, item, B_MEDIA_NAME_LENGTH);
+	strlcpy(request.type, type, B_MEDIA_NAME_LENGTH);
+	strlcpy(request.item, item, B_MEDIA_NAME_LENGTH);
 
 	server_get_item_audio_gain_reply reply;
 	status_t status = QueryServer(SERVER_GET_ITEM_AUDIO_GAIN, &request,
@@ -193,8 +193,8 @@ BMediaFiles::SetRefFor(const char* type, const char* item,
 	CALLED();
 
 	server_set_ref_for_request request;
-	strncpy(request.type, type, B_MEDIA_NAME_LENGTH);
-	strncpy(request.item, item, B_MEDIA_NAME_LENGTH);
+	strlcpy(request.type, type, B_MEDIA_NAME_LENGTH);
+	strlcpy(request.item, item, B_MEDIA_NAME_LENGTH);
 	request.ref = ref;
 
 	server_set_ref_for_reply reply;
@@ -215,8 +215,8 @@ BMediaFiles::SetAudioGainFor(const char* type, const char* item, float gain)
 	CALLED();
 
 	server_set_item_audio_gain_request request;
-	strncpy(request.type, type, B_MEDIA_NAME_LENGTH);
-	strncpy(request.item, item, B_MEDIA_NAME_LENGTH);
+	strlcpy(request.type, type, B_MEDIA_NAME_LENGTH);
+	strlcpy(request.item, item, B_MEDIA_NAME_LENGTH);
 	request.gain = gain;
 
 	server_set_item_audio_gain_reply reply;
@@ -238,8 +238,8 @@ BMediaFiles::RemoveRefFor(const char* type, const char* item,
 	CALLED();
 
 	server_invalidate_item_request request;
-	strncpy(request.type, type, B_MEDIA_NAME_LENGTH);
-	strncpy(request.item, item, B_MEDIA_NAME_LENGTH);
+	strlcpy(request.type, type, B_MEDIA_NAME_LENGTH);
+	strlcpy(request.item, item, B_MEDIA_NAME_LENGTH);
 
 	server_invalidate_item_reply reply;
 	status_t status = QueryServer(SERVER_INVALIDATE_MEDIA_ITEM, &request,
@@ -259,8 +259,8 @@ BMediaFiles::RemoveItem(const char* type, const char* item)
 	CALLED();
 
 	server_remove_media_item_request request;
-	strncpy(request.type, type, B_MEDIA_NAME_LENGTH);
-	strncpy(request.item, item, B_MEDIA_NAME_LENGTH);
+	strlcpy(request.type, type, B_MEDIA_NAME_LENGTH);
+	strlcpy(request.item, item, B_MEDIA_NAME_LENGTH);
 
 	server_remove_media_item_reply reply;
 	status_t status = QueryServer(SERVER_REMOVE_MEDIA_ITEM, &request,
