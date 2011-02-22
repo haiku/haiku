@@ -16,23 +16,24 @@
  * distribution in the file COPYING); if not, write to the Free Software
  * Foundation,Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-
 #ifndef _NTFS_H
 #define _NTFS_H
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include <fs_interface.h>
-#include <kernel/lock.h>
-#include <fs_info.h>
-#include <fs_cache.h>
+
 #include <fs_attr.h>
+#include <fs_cache.h>
+#include <fs_info.h>
+#include <fs_interface.h>
 #include <fs_info.h>
 #include <fs_index.h>
 #include <fs_query.h>
 #include <fs_volume.h>
+#include <lock.h>
 #include <NodeMonitor.h>
 #include <util/kernel_cpp.h>
 
@@ -78,29 +79,25 @@ typedef enum {
 } ntfs_state_bits;
 
 
-typedef struct vnode
-{
+typedef struct vnode {
 	u64			vnid;
 	u64			parent_vnid;
 	char 		*mime;
 } vnode;
 
-typedef struct filecookie
-{
+typedef struct filecookie {
 	int	omode;
-	off_t	last_size;
+	off_t last_size;
 } filecookie;
 
-typedef struct attrcookie
-{
+typedef struct attrcookie {
 	int	omode;
 	ntfs_inode *inode;
 	ntfs_attr *stream;
 	// MFT ref for EA ?
 } attrcookie;
 
-typedef struct attrdircookie
-{
+typedef struct attrdircookie {
 	ntfs_inode *inode;
 	ntfs_attr_search_ctx *ctx;
 } attrdircookie;
@@ -109,8 +106,7 @@ typedef struct attrdircookie
 
 
 
-typedef struct nspace
-{
+typedef struct nspace {
 	ntfs_volume	*ntvol;
 	char		devicePath[MAX_PATH];
 	dev_t		id;
@@ -137,3 +133,4 @@ typedef struct nspace
 
 
 #endif
+

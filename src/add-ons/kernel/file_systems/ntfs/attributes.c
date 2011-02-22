@@ -10,24 +10,27 @@
 
 #define MIME_STRING_TYPE 'MIMS'
 
-#include <SupportDefs.h>
 #include <KernelExport.h>
+#include <SupportDefs.h>
 #include <TypeConstants.h>
 
 #include <dirent.h>
 #include <fs_attr.h>
-#include <string.h>
 #include <malloc.h>
+#include <string.h>
 
-#include "ntfs.h"
 #include "attributes.h"
 #include "mime_table.h"
+#include "ntfs.h"
 
 //TODO: notify*()
 
+
 int32 kBeOSTypeCookie = 0x1234;
 
-status_t set_mime(vnode *node, const char *filename)
+
+status_t
+set_mime(vnode *node, const char *filename)
 {
 	struct ext_mime *p;
 	int32 namelen, ext_len;
@@ -38,7 +41,7 @@ status_t set_mime(vnode *node, const char *filename)
 
 	namelen = strlen(filename);
 
-	for (p=mimes;p->extension;p++) {
+	for (p = mimes; p->extension; p++) {
 		ext_len = strlen(p->extension);
 
 		if (namelen <= ext_len)
@@ -87,7 +90,7 @@ fs_open_attrib_dir(fs_volume *_vol, fs_vnode *_node, void **_cookie)
 	cookie = (attrdircookie*)ntfs_calloc(sizeof(attrdircookie));
 	if (cookie == NULL) {
 		result = ENOMEM;
-		goto	exit;
+		goto exit;
 	}
 
 	cookie->inode = ni;
@@ -110,13 +113,13 @@ exit:
 	return result;
 }
 
+
 status_t
 fs_close_attrib_dir(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 {
-	
-	
 	return B_NO_ERROR;
 }
+
 
 status_t
 fs_free_attrib_dir_cookie(fs_volume *_vol, fs_vnode *_node, void *_cookie)
@@ -136,6 +139,7 @@ fs_free_attrib_dir_cookie(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 	free(cookie);
 	return B_NO_ERROR;
 }
+
 
 status_t
 fs_rewind_attrib_dir(fs_volume *_vol, fs_vnode *_node, void *_cookie)
@@ -167,7 +171,8 @@ fs_rewind_attrib_dir(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 
 
 status_t
-fs_read_attrib_dir(fs_volume *_vol, fs_vnode *_node, void *_cookie, struct dirent *entry, size_t bufsize, uint32 *num)
+fs_read_attrib_dir(fs_volume *_vol, fs_vnode *_node, void *_cookie,
+	struct dirent *entry, size_t bufsize, uint32 *num)
 {
 	nspace *ns = (nspace *)_vol->private_volume;
 	vnode *node = (vnode *)_node->private_node;
@@ -210,14 +215,13 @@ fs_read_attrib_dir(fs_volume *_vol, fs_vnode *_node, void *_cookie, struct diren
 	if (result && errno != ENOENT) {
 		result = errno;
 		goto exit;
-	} else {
+	} else
 		result = B_OK;
-	}
-
 
 exit:
 
-	ERRPRINT("%s - EXIT, result is %s, *num %d\n", __FUNCTION__, strerror(result), *num);
+	ERRPRINT("%s - EXIT, result is %s, *num %d\n", __FUNCTION__,
+		strerror(result), *num);
 
 	UNLOCK_VOL(ns);
 	
@@ -231,8 +235,8 @@ exit:
 
 
 status_t
-fs_create_attrib(fs_volume *_vol, fs_vnode *_node, const char* name, uint32 type, int openMode,
-	void** _cookie)
+fs_create_attrib(fs_volume *_vol, fs_vnode *_node, const char* name,
+	uint32 type, int openMode, void** _cookie)
 {
 	nspace *ns = (nspace*)_vol->private_volume;
 	vnode *node = (vnode*)_node->private_node;
@@ -270,25 +274,29 @@ fs_create_attrib(fs_volume *_vol, fs_vnode *_node, const char* name, uint32 type
 		ulen = ntfs_mbstoucs(name, &uname);
 		if (ulen < 0) {
 			result = EILSEQ;
-		ERRPRINT("%s - mb alloc: %s\n", __FUNCTION__, strerror(result));
+			ERRPRINT("%s - mb alloc: %s\n", __FUNCTION__, strerror(result));
 			goto exit;
 		}
 
 		na = ntfs_attr_open(ni, AT_DATA, uname, ulen);
 		if (na) {
 			result = EEXIST;
-		ERRPRINT("%s - ntfs_attr_open: %s\n", __FUNCTION__, strerror(result));
+			ERRPRINT("%s - ntfs_attr_open: %s\n", __FUNCTION__,
+				strerror(result));
 			goto exit;
 		}
-		if (ntfs_non_resident_attr_record_add(ni, AT_DATA, uname, ulen, 0, 32, 0) < 0) {
+		if (ntfs_non_resident_attr_record_add(ni, AT_DATA, uname, ulen, 0, 32,
+			0) < 0) {
 			result = errno;
-		ERRPRINT("%s - ntfs_non_resident_attr_record_add: %s\n", __FUNCTION__, strerror(result));
+			ERRPRINT("%s - ntfs_non_resident_attr_record_add: %s\n",
+				__FUNCTION__, strerror(result));
 			goto exit;
 		}
 		na = ntfs_attr_open(ni, AT_DATA, uname, ulen);
 		if (!na) {
 			result = errno;
-		ERRPRINT("%s - ntfs_attr_open: %s\n", __FUNCTION__, strerror(result));
+			ERRPRINT("%s - ntfs_attr_open: %s\n", __FUNCTION__,
+				strerror(result));
 			goto exit;
 		}
 	}
@@ -325,7 +333,8 @@ exit:
 
 
 status_t
-fs_open_attrib(fs_volume *_vol, fs_vnode *_node, const char *name, int openMode, void **_cookie)
+fs_open_attrib(fs_volume *_vol, fs_vnode *_node, const char *name,
+	int openMode, void **_cookie)
 {
 	nspace *ns = (nspace*)_vol->private_volume;
 	vnode *node = (vnode*)_node->private_node;
@@ -436,7 +445,8 @@ fs_free_attrib_cookie(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 
 
 status_t 
-fs_read_attrib_stat(fs_volume *_vol, fs_vnode *_node, void *_cookie,struct stat *stat)
+fs_read_attrib_stat(fs_volume *_vol, fs_vnode *_node, void *_cookie,
+	struct stat *stat)
 {
 	nspace *ns = (nspace *)_vol->private_volume;
 	//vnode *node = (vnode *)_node->private_node;
@@ -450,7 +460,7 @@ fs_read_attrib_stat(fs_volume *_vol, fs_vnode *_node, void *_cookie,struct stat 
 
 	//ERRPRINT("%s - ENTER\n", __FUNCTION__);
 
-	stat->st_type = B_RAW_TYPE;
+	stat->st_type = B_XATTR_TYPE;
 	stat->st_size = na ? na->data_size : 0;
 
 //exit:
@@ -462,14 +472,15 @@ fs_read_attrib_stat(fs_volume *_vol, fs_vnode *_node, void *_cookie,struct stat 
 
 
 status_t 
-fs_read_attrib(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos, void *buffer, size_t *len)
+fs_read_attrib(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
+	void *buffer, size_t *len)
 {
 	nspace *ns = (nspace *)_vol->private_volume;
 	//vnode *node = (vnode *)_node->private_node;
 	attrcookie *cookie = (attrcookie *)_cookie;
 	ntfs_inode *ni = cookie->inode;
 	ntfs_attr *na = cookie->stream;
-	size_t  size = *len;
+	size_t size = *len;
 	int total = 0;
 	status_t result = B_NO_ERROR;
 
@@ -523,7 +534,8 @@ exit:
 
 
 status_t
-fs_write_attrib(fs_volume *_vol, fs_vnode *_node, void *_cookie,off_t pos, const void *buffer, size_t *_length)
+fs_write_attrib(fs_volume *_vol, fs_vnode *_node, void *_cookie,off_t pos,
+	const void *buffer, size_t *_length)
 {
 	nspace *ns = (nspace *)_vol->private_volume;
 	//vnode *node = (vnode *)_node->private_node;
@@ -566,8 +578,8 @@ fs_write_attrib(fs_volume *_vol, fs_vnode *_node, void *_cookie,off_t pos, const
 		while (size) {
 			off_t bytesWritten = ntfs_attr_pwrite(na, pos, size, buffer);
 			if (bytesWritten < (s64)size)
-				ERRPRINT("%s - ntfs_attr_pwrite returned less bytes than requested.\n",
-					__FUNCTION__);
+				ERRPRINT("%s - ntfs_attr_pwrite returned less bytes than "
+					"requested.\n", __FUNCTION__);
 			if (bytesWritten <= 0) {
 				ERRPRINT(("%s - ntfs_attr_pwrite()<=0\n", __FUNCTION__));
 				*_length = 0;
@@ -597,3 +609,4 @@ exit:
 	
 	return result;
 }
+

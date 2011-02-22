@@ -17,13 +17,14 @@
  * distribution in the file COPYING); if not, write to the Free Software
  * Foundation,Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
- 
-#ifndef _NTFSDIR_H
-#define _NTFSDIR_H
+#ifndef NTFSDIR_H
+#define NTFSDIR_H
 
 
-typedef struct dircookie
-{
+#include "ntfs.h"
+
+
+typedef struct dircookie {
 	u64					pos;
 	int					readed;		
 	int					last;
@@ -35,9 +36,12 @@ typedef struct dircookie
 status_t	fs_closedir(fs_volume *volume, fs_vnode *vnode, void *cookie);
 status_t	fs_free_dircookie(fs_volume *volume, fs_vnode *vnode, void *cookie);
 status_t	fs_opendir(fs_volume *volume, fs_vnode *vnode, void** cookie);
-status_t  	fs_readdir(fs_volume *volume, fs_vnode *vnode, void *_cookie, struct dirent *buf, size_t bufsize, uint32 *num );
+status_t  	fs_readdir(fs_volume *volume, fs_vnode *vnode, void *_cookie,
+				struct dirent *buf, size_t bufsize, uint32 *num );
 status_t	fs_rewinddir(fs_volume *volume, fs_vnode *vnode, void *cookie);
 
-extern void fs_ntfs_update_times(fs_volume *vol, ntfs_inode *ni, ntfs_time_update_flags mask);
+void		fs_ntfs_update_times(fs_volume *vol, ntfs_inode *ni,
+				ntfs_time_update_flags mask);
 
-#endif
+#endif // NTFSDIR_H
+

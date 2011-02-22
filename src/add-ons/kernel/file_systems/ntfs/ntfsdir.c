@@ -18,24 +18,20 @@
  * Foundation,Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <stdlib.h>
-#include <unistd.h>
-#include <fcntl.h>
+
+#include "ntfsdir.h"
+
+#include <ctype.h>
+#include <dirent.h>
 #include <errno.h>
+#include <fcntl.h>
+#include <malloc.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <ctype.h>
-#include <stdio.h>
-#include <dirent.h>
+#include <unistd.h>
 #include <sys/stat.h>
-#include <KernelExport.h>
-#include <time.h>
-#include <malloc.h>
-
-#include "ntfs.h"
-#include "attributes.h"
-#include "lock.h"
-#include "ntfsdir.h"
 
 
 //callback function for readdir()

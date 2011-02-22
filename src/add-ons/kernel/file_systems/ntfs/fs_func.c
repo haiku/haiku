@@ -20,26 +20,28 @@
  * Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include <stdlib.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <string.h>
-#include <time.h>
-#include <ctype.h>
-#include <stdio.h>
-#include <dirent.h>
-#include <sys/stat.h>
-#include <KernelExport.h>
-#include <time.h>
-#include <malloc.h>
-#include <driver_settings.h>
 
-#include "ntfs.h"
+#include "fs_func.h"
+
+#include <ctype.h>
+#include <dirent.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <malloc.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <time.h>
+#include <unistd.h>
+
+#include <driver_settings.h>
+#include <KernelExport.h>
+
 #include "attributes.h"
 #include "lock.h"
+#include "ntfs.h"
 #include "volume_util.h"
-#include "fs_func.h"
 
 
 typedef struct identify_cookie {
@@ -62,14 +64,14 @@ get_node_type(ntfs_inode* ni, int* _type)
 		*_type = S_IFREG;
 
 		if (ni->flags & FILE_ATTR_SYSTEM) {
-			na = ntfs_attr_open(ni, AT_DATA, NULL,0);
-			if (!na) {
+			na = ntfs_attr_open(ni, AT_DATA, NULL, 0);
+			if (!na)
 				return ENOENT;
-			}
+
 			// Check whether it's Interix symbolic link
 			if (na->data_size <= sizeof(INTX_FILE_TYPES) +
-			    sizeof(ntfschar) * PATH_MAX &&
-			    na->data_size > sizeof(INTX_FILE_TYPES)) {
+				sizeof(ntfschar) * PATH_MAX &&
+				na->data_size > sizeof(INTX_FILE_TYPES)) {
 				INTX_FILE *intx_file;
 
 				intx_file = ntfs_malloc(na->data_size);
@@ -94,8 +96,10 @@ get_node_type(ntfs_inode* ni, int* _type)
 	return B_OK;
 }
 
+
 void
-fs_ntfs_update_times(fs_volume *vol, ntfs_inode *ni, ntfs_time_update_flags mask)
+fs_ntfs_update_times(fs_volume *vol, ntfs_inode *ni,
+	ntfs_time_update_flags mask)
 {
 	nspace *ns = (nspace*)vol->private_volume;
 
@@ -104,6 +108,7 @@ fs_ntfs_update_times(fs_volume *vol, ntfs_inode *ni, ntfs_time_update_flags mask
 
 	ntfs_inode_update_times(ni, mask);
 }
+
 
 float
 fs_identify_partition(int fd, partition_data *partition, void **_cookie)
@@ -116,9 +121,8 @@ fs_identify_partition(int fd, partition_data *partition, void **_cookie)
 
 	// read in the boot sector
 	ERRPRINT("fs_identify_partition: read in the boot sector\n");
-	if (read_pos(fd, 0, (void*)&boot, 512) != 512) {
+	if (read_pos(fd, 0, (void*)&boot, 512) != 512)
 		return -1;
-	}
 
 	// check boot signature
 	if ((buf[0x1fe] != 0x55 || buf[0x1ff] != 0xaa) && buf[0x15] == 0xf8)
@@ -308,7 +312,7 @@ fs_rfsstat(fs_volume *_vol, struct fs_info *fss)
 	strncpy(fss->device_name, ns->devicePath, sizeof(fss->device_name));
 	strncpy(fss->volume_name, ns->ntvol->vol_name, sizeof(fss->volume_name));
 
-	for (i = strlen(fss->volume_name) - 1; i >=0 ; i--) {
+	for (i = strlen(fss->volume_name) - 1; i >= 0 ; i--) {
 		if (fss->volume_name[i] != ' ')
 			break;
 	}
@@ -504,7 +508,7 @@ fs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node, int *_type,
 		else {
 			name = (char*)malloc(MAX_PATH);
 			if (name != NULL) {
-				if (utils_inode_get_name(ni, name,MAX_PATH) == 1)
+				if (utils_inode_get_name(ni, name, MAX_PATH) == 1)
 					set_mime(newNode, name);
 				free(name);
 			}
@@ -590,7 +594,7 @@ fs_rstat(fs_volume *_vol, fs_vnode *_node, struct stat *stbuf)
 
 	ERRPRINT("fs_rstat - ENTER:\n");
 
-	if (ns == NULL || node == NULL ||stbuf == NULL) {
+	if (ns == NULL || node == NULL || stbuf == NULL) {
 		result = ENOENT;
 		goto exit;
 	}
@@ -626,9 +630,9 @@ fs_rstat(fs_volume *_vol, fs_vnode *_node, struct stat *stbuf)
 			stbuf->st_size = na->data_size;
 			stbuf->st_blocks = na->allocated_size >> 9;
 			// Check whether it's Interix symbolic link
-			if (na->data_size <= sizeof(INTX_FILE_TYPES) +
-			    sizeof(ntfschar) * PATH_MAX &&
-			    na->data_size > sizeof(INTX_FILE_TYPES)) {
+			if (na->data_size <= sizeof(INTX_FILE_TYPES)
+				+ sizeof(ntfschar) * PATH_MAX
+				&& na->data_size > sizeof(INTX_FILE_TYPES)) {
 				INTX_FILE *intx_file;
 
 				intx_file = ntfs_malloc(na->data_size);
@@ -653,9 +657,8 @@ fs_rstat(fs_volume *_vol, fs_vnode *_node, struct stat *stbuf)
 		stbuf->st_mode |= 0666;
 	}
 
-	if (ns->flags & B_FS_IS_READONLY) {
+	if (ns->flags & B_FS_IS_READONLY)
 		stbuf->st_mode &= ~(S_IWUSR | S_IWGRP | S_IWOTH);
-	}
 
 	stbuf->st_uid = 0;
 	stbuf->st_gid = 0;
@@ -697,9 +700,9 @@ fs_wstat(fs_volume *_vol, fs_vnode *_node, const struct stat *st, uint32 mask)
 	if (mask & B_STAT_SIZE) {
 		ERRPRINT("fs_wstat: setting file size to %Lx\n", st->st_size);
 
-		if (ni->mrec->flags & MFT_RECORD_IS_DIRECTORY) {
+		if (ni->mrec->flags & MFT_RECORD_IS_DIRECTORY)
 			result = EISDIR;
-		} else {
+		else {
 			ntfs_attr *na = ntfs_attr_open(ni, AT_DATA, NULL, 0);
 			if (!na) {
 				result = EINVAL;
@@ -766,7 +769,7 @@ fs_fsync(fs_volume *_vol, fs_vnode *_node)
 
 	ERRPRINT("fs_fsync: ENTER\n");
 
-	if (ns ==NULL || node== NULL) {
+	if (ns == NULL || node == NULL) {
 		result = ENOENT;
 		goto exit;
 	}
@@ -870,7 +873,7 @@ fs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode,
 
 	LOCK_VOL(ns);
 
-	ERRPRINT("fs_create - ENTER: name=%s\n",name);
+	ERRPRINT("fs_create - ENTER: name=%s\n", name);
 
 	if (_vol == NULL || _dir == NULL) {
 		result = EINVAL;
@@ -902,9 +905,9 @@ fs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode,
 
 	cookie = (filecookie*)ntfs_calloc(sizeof(filecookie));
 
-	if (cookie != NULL) {
+	if (cookie != NULL)
 		cookie->omode = omode;
-	} else {
+	else {
 		result = ENOMEM;
 		goto exit;
 	}
@@ -953,9 +956,9 @@ fs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode,
 	free(uname);
 
 exit:
-	if (result >= B_OK) {
+	if (result >= B_OK)
 		*_cookie = cookie;
-	} else
+	else
 		free(cookie);
 
 	if (na)
@@ -1073,7 +1076,7 @@ fs_write(fs_volume *_vol, fs_vnode *_dir, void *_cookie, off_t offset,
 
 	LOCK_VOL(ns);
 
-	ERRPRINT("fs_write - ENTER, offset=%d, len=%d\n", (int)offset, (int)(*len));
+	ERRPRINT("fs_write - ENTER, offset=%lld, len=%ld\n", offset, *len);
 
 	ni = ntfs_inode_open(ns->ntvol, node->vnid);
 	if (ni == NULL) {
@@ -1117,8 +1120,10 @@ fs_write(fs_volume *_vol, fs_vnode *_dir, void *_cookie, off_t offset,
 
 	while (size) {
 		off_t bytesWritten = ntfs_attr_pwrite(na, offset, size, buf);
-		if (bytesWritten < (s64)size)
-			ERRPRINT("fs_write - ntfs_attr_pwrite returned less bytes than requested.\n");
+		if (bytesWritten < (s64)size) {
+			ERRPRINT("fs_write - ntfs_attr_pwrite returned less bytes than "
+				"requested.\n");
+		}
 		if (bytesWritten <= 0) {
 			ERRPRINT(("fs_write - ntfs_attr_pwrite()<=0\n"));
 			*len = 0;
@@ -1326,7 +1331,8 @@ fs_create_symlink(fs_volume *_vol, fs_vnode *_dir, const char *name,
 		goto exit;
 	}
 
-	sym = ntfs_create_symlink(bi, securid, uname, unameLength, utarget, utargetLength);
+	sym = ntfs_create_symlink(bi, securid, uname, unameLength, utarget,
+		utargetLength);
 	if (sym == NULL) {
 		result = EINVAL;
 		goto exit;
@@ -1396,7 +1402,7 @@ fs_mkdir(fs_volume *_vol, fs_vnode *_dir, const char *name,	int perms)
 
 	LOCK_VOL(ns);
 
-	ERRPRINT("fs_mkdir - ENTER: name=%s\n",name);
+	ERRPRINT("fs_mkdir - ENTER: name=%s\n", name);
 
 	if (_vol == NULL || _dir == NULL || name == NULL) {
 	 	result = EINVAL;
@@ -1587,7 +1593,7 @@ fs_rename(fs_volume *_vol, fs_vnode *_odir, const char *oldname,
 		// renaming
 
 		nvnid = MREF(ntfs_inode_lookup_by_name(odi, unewname, unewnameLength));
-		if (nvnid != (u64) -1)
+		if (nvnid != (u64)-1)
 			get_vnode(_vol, nvnid, (void**)&nnode);
 
 		if (nnode != NULL) {
@@ -1602,7 +1608,7 @@ fs_rename(fs_volume *_vol, fs_vnode *_odir, const char *oldname,
 			goto exit;
 		}
 
-		if (ntfs_link(oi, odi, unewname, unewnameLength))  {
+		if (ntfs_link(oi, odi, unewname, unewnameLength)) {
  			ntfs_inode_close(oi);
 			result = EINVAL;
 			goto exit;
@@ -1621,8 +1627,8 @@ fs_rename(fs_volume *_vol, fs_vnode *_odir, const char *oldname,
 			goto exit;
 		}
 
-		notify_entry_moved(ns->id, MREF(odi->mft_no), oldname, MREF(odi->mft_no),
-			newname, onode->vnid);
+		notify_entry_moved(ns->id, MREF(odi->mft_no), oldname,
+			MREF(odi->mft_no), newname, onode->vnid);
 		put_vnode(_vol, onode->vnid);
 
 		if (utils_inode_get_name(oi, path, MAX_PATH) == 0) {
@@ -1680,7 +1686,7 @@ do_unlink(fs_volume *_vol, vnode *dir, const char *name, bool isdir)
 
 	vnid = MREF(ntfs_inode_lookup_by_name(bi, uname, unameLength));
 
-	if ( vnid == (u64) -1 || vnid == FILE_root)	{
+	if ( vnid == (u64)-1 || vnid == FILE_root) {
 		result = EINVAL;
 		goto exit1;
 	}
@@ -1757,19 +1763,14 @@ fs_rmdir(fs_volume *_vol, fs_vnode *_dir, const char *name)
 
 	LOCK_VOL(ns);
 
-	ERRPRINT("fs_rmdir  - ENTER:  name %s\n", name==NULL?"NULL":name);
+	ERRPRINT("fs_rmdir  - ENTER:  name %s\n", name == NULL ? "NULL" : name);
 
 	if (ns == NULL || dir == NULL || name == NULL) {
 		result = EINVAL;
 		goto exit1;
 	}
 
-	if (strcmp(name, ".") == 0) {
-		result = EPERM;
-		goto exit1;
-	}
-
-	if (strcmp(name, "..") == 0) {
+	if (strcmp(name, ".") == 0 || strcmp(name, "..") == 0) {
 		result = EPERM;
 		goto exit1;
 	}
@@ -1802,19 +1803,14 @@ fs_unlink(fs_volume *_vol, fs_vnode *_dir, const char *name)
 
 	LOCK_VOL(ns);
 
-	ERRPRINT("fs_unlink  - ENTER:  name %s\n", name==NULL?"NULL":name);
+	ERRPRINT("fs_unlink  - ENTER:  name %s\n", name == NULL ? "NULL" : name);
 
 	if (ns == NULL || dir == NULL || name == NULL) {
 		result = EINVAL;
 		goto exit;
 	}
 
-	if (strcmp(name, ".") == 0) {
-		result = EPERM;
-		goto exit;
-	}
-
-	if (strcmp(name, "..") == 0) {
+	if (strcmp(name, ".") == 0 || strcmp(name, "..") == 0) {
 		result = EPERM;
 		goto exit;
 	}

@@ -22,37 +22,39 @@
 #ifndef NTFS_FS_FUNC_H
 #define NTFS_FS_FUNC_H
 
-#include <stdlib.h>
-#include <unistd.h>
-#include <fcntl.h>
+
+#include <ctype.h>
+#include <dirent.h>
 #include <errno.h>
+#include <fcntl.h>
+#include <malloc.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <ctype.h>
-#include <stdio.h>
-#include <dirent.h>
+#include <unistd.h>
 #include <sys/stat.h>
 #include <KernelExport.h>
-#include <time.h>
-#include <malloc.h>
 
-#include "ntfs.h"
 #include "attributes.h"
 #include "lock.h"
+#include "ntfs.h"
 #include "volume_util.h"
 
-#define FS_DIR_MODE		S_IFDIR | S_IRUSR | S_IRGRP | S_IROTH | S_IWUSR | \
+
+#define FS_DIR_MODE	S_IFDIR | S_IRUSR | S_IRGRP | S_IROTH | S_IWUSR | \
 	S_IWGRP | S_IWOTH
-#define FS_FILE_MODE	S_IFREG | S_IRUSR | S_IRGRP | S_IROTH | S_IWUSR | \
+#define FS_FILE_MODE S_IFREG | S_IRUSR | S_IRGRP | S_IROTH | S_IWUSR | \
 	S_IWGRP | S_IWOTH
-#define FS_SLNK_MODE	S_IFLNK | S_IRUSR | S_IRGRP | S_IROTH | S_IWUSR | \
+#define FS_SLNK_MODE S_IFLNK | S_IRUSR | S_IRGRP | S_IROTH | S_IWUSR | \
 	S_IWGRP | S_IWOTH
 
 
 extern fs_vnode_ops gNTFSVnodeOps;
 extern fs_volume_ops gNTFSVolumeOps;
 
-void 		fs_ntfs_update_times(fs_volume *vol, ntfs_inode *ni, ntfs_time_update_flags mask);
+void 		fs_ntfs_update_times(fs_volume *vol, ntfs_inode *ni, 
+				ntfs_time_update_flags mask);
 
 float		fs_identify_partition(int fd, partition_data *partition,
 				void **_cookie);
@@ -77,7 +79,7 @@ status_t 	fs_sync(fs_volume *_vol);
 status_t	fs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node,
 				int *_type, uint32 *_flags, bool reenter);
 status_t	fs_write_vnode(fs_volume *volume, fs_vnode *vnode, bool reenter);
-status_t    fs_remove_vnode(fs_volume *volume, fs_vnode *vnode, bool reenter);
+status_t	fs_remove_vnode(fs_volume *volume, fs_vnode *vnode, bool reenter);
 status_t	fs_access(fs_volume *volume, fs_vnode *vnode, int mode);
 status_t	fs_rstat(fs_volume *volume, fs_vnode *vnode, struct stat *st);
 status_t	fs_wstat(fs_volume *volume, fs_vnode *vnode, const struct stat *st,
@@ -102,8 +104,9 @@ status_t	fs_free_dircookie(fs_volume *volume, fs_vnode *vnode, void *cookie);
 status_t 	fs_readlink(fs_volume *volume, fs_vnode *link, char *buf,
 				size_t *bufsize);
 status_t 	fs_fsync(fs_volume *_vol, fs_vnode *_node);
-status_t    fs_rename(fs_volume *volume, fs_vnode *fromDir, const char *fromName,
+status_t	fs_rename(fs_volume *volume, fs_vnode *fromDir, const char *fromName,
 				fs_vnode *toDir, const char *toName);
-status_t    fs_unlink(fs_volume *volume, fs_vnode *dir, const char *name);
+status_t	fs_unlink(fs_volume *volume, fs_vnode *dir, const char *name);
 
 #endif	// NTFS_FS_FUNC_H
+
