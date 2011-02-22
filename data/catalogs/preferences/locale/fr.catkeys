@@ -1,25 +1,25 @@
 1	french	x-vnd.Haiku-Locale	2295953467
-Available languages	Locale Preflet Window		Langues disponibles
-Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		La liste des langages disponibles est introuvable, ce preflet est donc inutilisable !
-Long format:	TimeFormatSettings		Format long :
-Currency	TimeFormatSettings		Devise
-Short format:	TimeFormatSettings		Format court :
-Language	Locale Preflet Window		Langage
-Preferred languages	Locale Preflet Window		Langues préférées
-Numbers	TimeFormatSettings		Nombres
-24 hour	TimeFormatSettings		24 heures
-Defaults	Locale Preflet Window		Défauts
-Revert	Locale Preflet Window		Défaire
-OK	Locale Preflet Window		OK
-Time	TimeFormatSettings		Heure
-Date	TimeFormatSettings		Date
 12 hour	TimeFormatSettings		12 heures
-Locale	Locale Preflet		Locale
-already chosen	LanguageListView		déjà choisi
-Negative:	TimeFormatSettings		Négatif :
-Use month/day-names from preferred language	TimeFormatSettings		Utiliser la langue active pour les noms des jours et des mois
+24 hour	TimeFormatSettings		24 heures
+Available languages	Locale Preflet Window		Langues disponibles
+Currency	TimeFormatSettings		Devise
+Date	TimeFormatSettings		Date
+Defaults	Locale Preflet Window		Défauts
 Formatting	Locale Preflet Window		Formatage
-Locale	Locale Preflet Window		Paramères régionaux
 Full format:	TimeFormatSettings		Format détaillé :
+Language	Locale Preflet Window		Langue
+Locale	Locale Preflet		Paramères régionaux
+Locale	Locale Preflet Window		Paramères régionaux
+Long format:	TimeFormatSettings		Format long :
 Medium format:	TimeFormatSettings		Format moyen :
+Negative:	TimeFormatSettings		Négatif :
+Numbers	TimeFormatSettings		Nombres
+OK	Locale Preflet Window		OK
 Positive:	TimeFormatSettings		Positif :
+Preferred languages	Locale Preflet Window		Langues préférées
+Revert	Locale Preflet Window		Défaire
+Short format:	TimeFormatSettings		Format court :
+Time	TimeFormatSettings		Heure
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		La liste des langages disponibles est introuvable, ce preflet est donc inutilisable !
+Use month/day-names from preferred language	TimeFormatSettings		Utiliser la langue active pour les noms des jours et des mois
+already chosen	LanguageListView		déjà choisi

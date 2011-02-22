@@ -13,7 +13,7 @@ Gateway:	EthernetSettingsView		Gateway:
 IP address:	EthernetSettingsView		IP-Adresse:
 Mode:	EthernetSettingsView		Modus:
 Netmask:	EthernetSettingsView		Netzmaske:
-Network	NetworkWindow		Network
+Network	NetworkWindow		Network - Netzwerk
 Network:	EthernetSettingsView		Netzwerk:
 OK	EthernetSettingsView		OK
 Revert	EthernetSettingsView		Anfangswerte

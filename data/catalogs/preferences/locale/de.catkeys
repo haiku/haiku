@@ -9,7 +9,7 @@ Formatting	Locale Preflet Window		Formatierung
 Full format:	TimeFormatSettings		Volles Format:
 Language	Locale Preflet Window		Sprache
 Locale	Locale Preflet		Locale - Landes- und Spracheinstellungen
-Locale	Locale Preflet Window		Locale
+Locale	Locale Preflet Window		Locale - Lokalisierung
 Long format:	TimeFormatSettings		Langes Format:
 Medium format:	TimeFormatSettings		Mittleres Format:
 Negative:	TimeFormatSettings		Negativ:

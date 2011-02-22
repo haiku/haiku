@@ -15,7 +15,7 @@ Enable real-time audio	Media views		Echtzeit-Audio aktivieren
 Enable real-time video	Media views		Echtzeit-Video aktivieren
 Enabling real-time audio allows system to record and play audio as fast as possible.  It achieves this performance by using more CPU and RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Echtzeit-Audio ermöglicht dem System Aufnahmen und Wiedergaben von Audio schnellstmöglich durchzuführen.  Dies wird durch die Verwendung von mehr Rechenleistung und Arbeitsspeicher erreicht.\n\nNur aktivieren, wenn geringstmögliche Latenzen benötigt werden.
 Enabling real-time video allows system to perform video operations as fast and smoothly as possible.  It achieves optimum performance by using more RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Echtzeit-Video ermöglicht dem System Aufnahmen und Wiedergaben von Video so schnell und so flüssig wie möglich durchzuführen.  Dies wird durch die Verwendung von mehr Rechenleistung und Arbeitsspeicher erreicht.\n\nNur aktivieren, wenn geringstmögliche Latenzen benötigt werden.
-Media	Media Window		Media
+Media	Media Window		Media - Audio & Video
 OK	Media Window		OK
 OK	Media views		OK
 Quit	Media Window		Beenden

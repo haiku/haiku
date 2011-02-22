@@ -1,25 +1,25 @@
 1	french	x-vnd.Haiku-Backgrounds	739979648
-X:	Main View		X :
-Resolution: 	Image Filepanel		Résolution : 
-pick one	Main View		choisir
-Default	Main View		Défaut
-Center	Main View		Centré
-Manual	Main View		Placement manuel
-Default folder	Main View		Dossier par défaut
-Revert	Main View		Défaire
-None	Main View		Aucun
 All workspaces	Main View		Tous les espaces de travail
-Icon label outline	Main View		Contour des étiquettes des icônes
-Other…	Main View		Autre…
-Current workspace	Main View		Espace de travail courant
-Folder: 	Main View		Dossier : 
 Apply	Main View		Appliquer
-Other folder…	Main View		Autre dossier…
 Backgrounds	Main Window		Fonds d'écran
-Y:	Main View		Y :
-Tile	Main View		Mosaique
-Select	Main View		Sélectionner
-Scale to fit	Main View		A l’échelle
+Center	Main View		Centré
+Current workspace	Main View		Espace de travail courant
+Default	Main View		Défaut
+Default folder	Main View		Dossier par défaut
+Folder: 	Main View		Dossier : 
+Icon label outline	Main View		Contour des étiquettes des icônes
+Image:	Main View		Image :
+Manual	Main View		Placement manuel
+None	Main View		Aucun
+Other folder…	Main View		Autre dossier…
+Other…	Main View		Autre…
 Placement:	Main View		Disposition :
 Preview	Main View		Aperçu
-Image:	Main View		Image :
+Resolution: 	Image Filepanel		Résolution : 
+Revert	Main View		Défaire
+Scale to fit	Main View		Ajuster
+Select	Main View		Sélectionner
+Tile	Main View		Mosaïque
+X:	Main View		X :
+Y:	Main View		Y :
+pick one	Main View		choisir

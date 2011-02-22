@@ -1,9 +1,19 @@
-1	french	system	2677153267
+1	french	system	2686335505
+%.2f TiB	StringForSize		%.2f Tio
 %3.2f GiB	StringForSize		%3.2f Gio
 %3.2f KiB	StringForSize		%3.2f Kio
-%d bytes	StringForSize		%d octets
-%.2f TiB	StringForSize		%.2f Tio
 %3.2f MiB	StringForSize		%3.2f Mio
-Green:	ColorControl		Vert :
-Red:	ColorControl		Rouge :
+%d bytes	StringForSize		%d octets
+About…	AboutWindow		À propos…
 Blue:	ColorControl		Bleu :
+Close	AboutWindow		Fermer
+Copy	TextView		Copier
+Copyright © %years% Haiku, Inc.	AboutWindow		Copyright © %years% Haiku, Inc.
+Cut	TextView		Couper
+Green:	ColorControl		Vert :
+Paste	TextView		Coller
+Red:	ColorControl		Rouge :
+Redo	TextView		Rétablir
+Select All	TextView		Sélectionner tout
+Undo	TextView		Annuler
+Written by:	AboutWindow		Écrit par :

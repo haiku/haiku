@@ -1,20 +1,20 @@
-1	french	x-vnd.Haiku-VirtualMemory	866260633
-Turn off	SettingsWindow		Désactiver
-GB	SettingsWindow		Go
-Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Désactiver la mémoire virtuelle perturbe le système quand la mémoire est pleine.\nLa mémoire virtuelle n'affecte pas les performances avant que ce point soit atteint.\n\nÊtes-vous vraiment sur de vouloir la désactiver ?
-Requested swap file size:	SettingsWindow		Taille demandée pour le fichier d'échange :
-Physical memory: 	SettingsWindow		Mémoire physique : 
-Changes will take effect on restart!	SettingsWindow		Les changements seront pris en compte au redémarrage !
-Defaults	SettingsWindow		Par défaut
-KB	SettingsWindow		Ko
-Use volume:	SettingsWindow		Utiliser le volume :
-Keep enabled	SettingsWindow		Laisser actif
-Revert	SettingsWindow		Défaire
-999 MB	SettingsWindow		999 Mo
-Current swap file size: 	SettingsWindow		Taille actuelle du fichier d'échange : 
-VirtualMemory	SettingsWindow		Mémoire Virtuelle
-OK	VirtualMemoryApp		OK
-VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		Mémoire Virtuelle\n\técrit par Axel Dörfler\n\tCopyright 2005, Haiku.\n
-Enable virtual memory	SettingsWindow		Activer la mémoire virtuelle
-MB	SettingsWindow		Mo
+1	french	x-vnd.Haiku-VirtualMemory	3110510347
 %Ld B	SettingsWindow		%Ld o
+Changes will take effect on restart!	SettingsWindow		Les changements seront pris en compte au redémarrage !
+Current swap file size: 	SettingsWindow		Taille actuelle du fichier d'échange : 
+Defaults	SettingsWindow		Par défaut
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Désactiver la mémoire virtuelle perturbe le système quand la mémoire est pleine.\nLa mémoire virtuelle n'affecte pas les performances avant que ce point soit atteint.\n\nÊtes-vous vraiment sur de vouloir la désactiver ?
+Enable virtual memory	SettingsWindow		Activer la mémoire virtuelle
+GB	SettingsWindow		Go
+Insufficient space for a swap file.	SettingsWindow		Il n'y a as assez d'espace pour un fichier d'échange
+KB	SettingsWindow		Ko
+Keep enabled	SettingsWindow		Laisser actif
+MB	SettingsWindow		Mo
+OK	VirtualMemoryApp		OK
+Physical memory: 	SettingsWindow		Mémoire physique : 
+Requested swap file size:	SettingsWindow		Taille demandée pour le fichier d'échange :
+Revert	SettingsWindow		Défaire
+Turn off	SettingsWindow		Désactiver
+Use volume:	SettingsWindow		Utiliser le volume :
+VirtualMemory	SettingsWindow		VirtualMemory
+VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		VirtualMemory\n\tÉcrit par Axel Dörfler\n\tCopyright 2005, Haiku.\n

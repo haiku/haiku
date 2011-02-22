@@ -1,35 +1,54 @@
-1	french	x-vnd.Be-PSRV	2610534267
-Undefined	ConfigWindow		Indéfini
-Cancel	PrintServerApp		Annuler
-Page setup:	ConfigWindow		Réglages de page :
-OK	ConfigWindow		OK
-Cancel	ConfigWindow		Annuler
-Yes	PrintServerApp		Oui
-Would you like to set one up now?	PrintServerApp		Voulez-vous en installer un maintenant ?
-Portrait	ConfigWindow		Portrait
+1	french	x-vnd.Be-PSRV	1761631281
+A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Il existe déjà une imprimante de ce nom, mais elle est inutilisable ! Voulez vous la remplacer ?
+A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Il existe déjà une imprimante de ce nom, mais son pilote est introuvable ! Voulez vous la remplacer ?
+A0	ConfigWindow	ISO 216 paper size	A0
+A1	ConfigWindow	ISO 216 paper size	A1
+A2	ConfigWindow	ISO 216 paper size	A2
+A3	ConfigWindow	ISO 216 paper size	A3
+A4	ConfigWindow	ISO 216 paper size	A4
+A5	ConfigWindow	ISO 216 paper size	A5
+A6	ConfigWindow	ISO 216 paper size	A6
 All pages	ConfigWindow		Toutes les pages
-There is no default printer set up.	PrintServerApp		Aucune imprimante par défaut n'est définie.
-Printer:	ConfigWindow		Imprimante :
-Select a printer	ConfigWindow		Choisir une imprimante
-No	PrintServerApp		Non
+All pages, %1 copies	ConfigWindow		Toutes les pages, %1 exemplaires
+B5	ConfigWindow	ISO 216 paper size	B5
+Cancel	ConfigWindow		Annuler
+Cancel	PrintServerApp		Annuler
+Create a new printer	PrintServerApp Scripting		Créer une nouvelle imprimante
+Delete a specific printer	PrintServerApp Scripting		Supprimer une imprimante précise
+Get comments about this printer	Printer Scripting		Obtenir les commentaires concernant cette imprimante
+Get currently available ports/devices	Transport Scripting		Obtenir les périphériques ou les ports disponibles
+Get name of printer	Printer Scripting		Obtenir le nom de l'imprimante
+Get name of the printer add-on used for this printer	Printer Scripting		Obtenir le nom de l'extension d'impression utilisée pour cette imprimante
+Get name of the transport add-on used for this printer	Printer Scripting		Obtenir le nom de l'extension utilisée pour la liaison avec l'imprimante
+Get name of transport	Transport Scripting		Obtenir le nom de la liaison
+Get the transport configuration for this printer	Printer Scripting		Obtenir la configuration de la liaison avec cette imprimante
 Landscape	ConfigWindow		Paysage
-There are no printers set up.	PrintServerApp		Aucune imprimante n'est installée.
+Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Tabloïd
+Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	Légal
+Letter	ConfigWindow	ANSI A (letter), a North American paper size	Lettre
+No	PrintServerApp		Non
+OK	ConfigWindow		OK
 OK	PrintServerApp		OK
-Print setup	ConfigWindow		Réglages d'impression
-Would you like to make @ the default printer?	PrintServerApp		Voudriez-vous faire de @, l'imprimante par défaut ?
-Page setup	ConfigWindow		Réglages de la mise en page
-Paper setup:	ConfigWindow		Choix du papier :
 Page %1 to %2	ConfigWindow		Page %1 sur %2
 Page %1 to %2, %3 copies	ConfigWindow		Page %1 sur %2, %3 exemplaires
-Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Tabloïd
-A6	ConfigWindow	ISO 216 paper size	A6
-B5	ConfigWindow	ISO 216 paper size	B5
-A0	ConfigWindow	ISO 216 paper size	A0
-Letter	ConfigWindow	ANSI A (letter), a North American paper size	Lettre
-A2	ConfigWindow	ISO 216 paper size	A2
+Page setup	ConfigWindow		Mise en page
+Page setup:	ConfigWindow		Réglages de page :
+Paper setup:	ConfigWindow		Choix du papier :
+Portrait	ConfigWindow		Portrait
+Print setup	ConfigWindow		Réglages d'impression
+Printer server	ConfigWindow		Serveur d'impression
+Printer:	ConfigWindow		Imprimante :
+Retrieve a specific printer	PrintServerApp Scripting		Récupérer une imprimante précise
+Retrieve a specific transport	PrintServerApp Scripting		Récupérer une liaison spécifique
+Retrieve or select the active printer	PrintServerApp Scripting		Récupérer ou sélectionner l'imprimante active
+Return the number of available printers	PrintServerApp Scripting		Renvoyer le nombre d'imprimante disponible
+Return the number of available transports	PrintServerApp Scripting		Renvoyer le nombre de liaisons disponibles
+Select a printer	ConfigWindow		Choisir une imprimante
 Show configuration window	PrintServerApp Scripting		Afficher la fenêtre de configuration
-A4	ConfigWindow	ISO 216 paper size	A4
-A1	ConfigWindow	ISO 216 paper size	A1
-A3	ConfigWindow	ISO 216 paper size	A3
-A5	ConfigWindow	ISO 216 paper size	A5
 Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Tabloïd
+There are no printers set up.	PrintServerApp		Aucune imprimante n'est installée.
+There is no default printer set up.	PrintServerApp		Aucune imprimante par défaut n'est définie.
+Undefined	ConfigWindow		Indéfini
+Would you like to make @ the default printer?	PrintServerApp		Voudriez-vous faire de @, l'imprimante par défaut ?
+Would you like to set one up now?	PrintServerApp		Voulez-vous en installer un maintenant ?
+Yes	PrintServerApp		Oui

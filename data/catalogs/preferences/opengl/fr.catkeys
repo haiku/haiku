@@ -1,26 +1,20 @@
-1	french	x-vnd.Haiku-OpenGL	899836772
-List stack size:	Capabilities		Taille de la pile de listes :
-Information	InfoView		Informations
-Max. clipping planes:	Capabilities		Nombre de plans de clipping :
-Max. texture units:	Capabilities		Nombre d'unités de texture :
-Renderer name:	InfoView		Nom du Renderer :
-Vendor name:	InfoView		Nom du vendeur :
+1	french	x-vnd.Haiku-OpenGL	3403298666
 Attributes stack size:	Capabilities		Taille de la pile d'attributs :
-OpenGL version:	InfoView		Version d'OpenGL :
-Name stack size:	Capabilities		Taille de la pile de noms :
 Auxiliary buffer(s):	Capabilities		Tampon(s) auxilliaire(s) :
-Max. recommended vertex elements:	Capabilities		Nombre d'éléments de vertex recommandé  :
-GLU version:	InfoView		Version de GLU :
-Model stack size:	Capabilities		Taille de la pile de modèles :
-Projection stack size:	Capabilities		Taille de la pile de projection :
-Max. lights:	Capabilities		Éclairage maximum :
-Max. 2D texture size:	Capabilities		Taille des textures 2D :
-Max. convolution:	Capabilities		Convolution maximale :
-GLUT API version:	InfoView		Version de l'API GLUT:
-Texture stack size:	Capabilities		Taille de la pile des textures :
-Max. evaluators equation order:	Capabilities		Ordre maximal des évaluateurs d'équations :
-Max. 3D texture size:	Capabilities		Taille des textures 3D :
-Capabilities	Capabilities		Capacités
-Max. recommended index elements:	Capabilities		Nombre maxi d'éléments d'index :
 Available	Extensions		Disponible
+Capabilities	Capabilities		Aptitudes
 Extensions	Extensions		Extensions
+GLU version:	InfoView		Version de GLU :
+GLUT API version:	InfoView		Version de l'API GLUT :
+Information	InfoView		Informations
+List stack size:	Capabilities		Taille de la pile de listes :
+Max. 2D texture size:	Capabilities		Taille maximum des textures 2D :
+Max. 3D texture size:	Capabilities		Taille maximum des textures 3D :
+Max. clipping planes:	Capabilities		Nombre de plans de coupes :
+Max. lights:	Capabilities		Nombre d'éclairages maximum :
+Model stack size:	Capabilities		Taille de la pile de modèles :
+Name stack size:	Capabilities		Taille de la pile de noms :
+OpenGL version:	InfoView		Version d'OpenGL :
+Projection stack size:	Capabilities		Taille de la pile de projection :
+Renderer name:	InfoView		Nom du moteur de rendu :
+Vendor name:	InfoView		Nom du vendeur :

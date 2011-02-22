@@ -49,7 +49,7 @@ ShowImage	AboutWindow		ShowImage
 ShowImage	Menus		ShowImage
 Slide delay	Menus		Verzögerung
 Slide show	Menus		Diashow
-Stretch to window	Menus		Fenstergröße beibehalten
+Stretch to window	Menus		Auf Fenstergröße vergrößern
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Das Dokument '%s' (Seite %d) wurde verändert. Trotzdem schließen?
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Das Bild '%s' wurde verändert. Trotzdem schließen?
 The file '%s' could not be written.	SaveToFile		Die Datei '%s' konnte nicht gespeichert werden.

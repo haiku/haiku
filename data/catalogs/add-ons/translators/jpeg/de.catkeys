@@ -1,6 +1,5 @@
-1	german	x-vnd.Haiku-JPEGTranslator	1834097482
+1	german	x-vnd.Haiku-JPEGTranslator	226512890
 About	JPEGTranslator		Über
-Based on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n	JPEGTranslator		Basiert auf der IJG-Bibliothek © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n
 Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Be-Bitmap-Format (JPEGTranslator)
 ExposureTime	exit_parser		Belichtungszeit
 High	JPEGTranslator		Hoch
@@ -22,7 +21,6 @@ Read greyscale images as RGB32	JPEGTranslator		Graustufen-Bilder als RGB32 einle
 Show warning messages	JPEGTranslator		Warnungen anzeigen
 Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Benutze CMYK-Code '0' als 100% Farbdeckung
 Use progressive compression	JPEGTranslator		Progressive Komprimierung
-With some colorspace conversion routines by Magnus Hellman\n	JPEGTranslator		Mit einigen Farbraum Konvertierungsroutinen von Magnus Hellman\n
 Write	JPEGTranslator		Schreiben
 Write black-and-white images as RGB24	JPEGTranslator		Schwarz-Weiß-Bilder als RGB24 ausgeben
-with \"lossless\" encoding support patch by Ken Murchison\n	JPEGTranslator		Mit \"verlustfreier\" Kodierung von Ken Murchison\n
+©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBasierend auf der IJG-Bibliothek © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nmit dem \"verlustfreien\" Encoding-Unterstützungspatch von Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nMit einigen Colorspace-Konvertierungsroutinen von Magnus Hellman\n\thttp://www.bebits.com/app/802\n

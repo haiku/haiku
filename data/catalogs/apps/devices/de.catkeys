@@ -1,42 +1,58 @@
-1	german	x-vnd.Haiku-Devices	2430293984
+1	german	x-vnd.Haiku-Devices	4145096865
 ACPI Information	DeviceACPI		ACPI-Information
+ACPI Processor Namespace '%2'	DeviceACPI		ACPI Prozessor Namespace '%2'
+ACPI System Bus	DeviceACPI		ACPI Systembus
+ACPI System Indicator	DeviceACPI		ACPI System-Indikator
+ACPI Thermal Zone	DeviceACPI		ACPI Temperaturzone
 ACPI controller	Device		ACPI-Controller
+ACPI node '%1'	DeviceACPI		ACPI Node '%1'
+About	DevicesApplication		über
 About Devices…	DevicesView		Über Devices...
 Basic information	DevicesView		Basisinformation
 Bridge	Device		Schnittstellen
 Bus	DevicesView		Bus
 Category	DevicesView		Kategorie
+Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Klassen-Info:\t\t\t\t: %classInfo%
+Class info	DevicePCI		Klassen-Info
 Communication controller	Device		Kommunikationscontroller
 Computer	Device		Computer
 Connection	DevicesView		Verbindung
 Detailed	DevicesView		Details
 Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Gerätename\t\t\t\t: %Name%\nHersteller\t\t\t: %Manufacturer%\nBenutzter Treiber\t\t\t\t: %DriverUsed%\nPfade für Treiber\t: %DevicePaths%
 Device name	Device		Gerätename
+Device name	DeviceACPI		Gerätename
+Device name	DevicePCI		Gerätename
 Device name:	Device		Gerätename:
 Device paths	Device		Gerätepfade
-Devices	DevicesApplication		Devices
+Device paths	DevicePCI		Gerätepfad
+Devices	DevicesApplication		Devices - Geräte
 Devices	DevicesView		Geräte
 Devices\n\twritten by Pieter Panman\n\n\tBased on listdev by Jérôme Duval\n\tand the previous Devices preference\n\tby Jérôme Duval and Sikosis\n\tCopyright 2009, Haiku, Inc.\n	DevicesApplication		Devices\n\tvon Pieter Panman.\n\n\tBasiert auf listdev von Jérôme Duval\n\tund auf den früheren Devices-Einstellungen\n\tvon Jérôme Duval und Sikosis.\n\tCopyright 2009, Haiku, Inc.\n
 Display controller	Device		Anzeige-Controller
 Docking station	Device		Andockstation
 Driver used	Device		Treiber benutzt
+Driver used	DevicePCI		Benutzter Treiber
 Encryption controller	Device		Verschlüsselungscontroller
 Generate system information	DevicesView		Systeminformationen erstellen
 Generic system peripheral	Device		Peripheriegeräte
 Input device controller	Device		Eingabegeräte-Kontroller
 Intelligent controller	Device		Intelligenter Controller
 Manufacturer	Device		Hersteller
+Manufacturer	DeviceACPI		Hersteller
+Manufacturer	DevicePCI		Hersteller
 Manufacturer:	Device		Hersteller:
 Mass storage controller	Device		Massenspeicher-Controller
 Memory controller	Device		Speichercontroller
 Multimedia controller	Device		Multimedia-Controller
+Name	PropertyList		Name
 Network controller	Device		Netzwerk-Controller
 None	Device		Kein
+Not implemented	DeviceACPI		Nicht implementiert
+Not implemented	DevicePCI		Nicht implementiert
 OK	DevicesApplication		OK
 Order by:	DevicesView		Sortieren nach:
 PCI Information	DevicePCI		PCI-Information
 Processor	Device		Prozessor
-Properties	PropertyList		Eigenschaften
 Quit	DevicesView		Beenden
 Refresh devices	DevicesView		Geräte aktualisieren
 Report compatibility	DevicesView		Kompatibilität anzeigen
@@ -44,4 +60,6 @@ Satellite communications controller	Device		Satellitenkommunikations-Controller
 Serial bus controller	Device		Serieller Bus-Controller
 Signal processing controller	Device		Signalverarbeitungscontroller
 Unclassified device	Device		Sonstige Geräte
+Unknown	DevicePCI		Unbekannt
+Value	PropertyList		Wert
 Wireless controller	Device		Funknetzwerk-Controller

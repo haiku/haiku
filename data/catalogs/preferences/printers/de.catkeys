@@ -26,7 +26,7 @@ Print test page	PrintersWindow		Testseite drucken
 Printer name:	AddPrinterDialog		Druckername:
 Printer type:	AddPrinterDialog		Druckertyp:
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Drucker: %printer_name%\nTreiber: %driver%\n
-Printers	PrintersWindow		Printers
+Printers	PrintersWindow		Printers - Drucker
 Processing	JobListView		In Bearbeitung
 Red	TestPageView		Rot
 Remove	PrintersWindow		Entfernen

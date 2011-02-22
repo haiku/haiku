@@ -1,39 +1,53 @@
-1	french	x-vnd.Haiku-Expander	1292562546
-Expand	ExpanderMenu		Décompresser
-Set destination…	ExpanderMenu		Choisir la destination…
-File expanded	ExpanderWindow		Fichier décompressé
-The destination is read only.	ExpanderWindow		La destination est en lecture seule.
-Expander: Open	ExpanderWindow		Décompresseur : Ouvrir
-Select current	DirectoryFilePanel		Sélectionner le répertoire courant
-Source	ExpanderWindow		Source
-Error when expanding archive	ExpanderWindow		Erreur lors de la décompression de l'archive
-Hide contents	ExpanderWindow		Cacher le contenu
-Cancel	ExpanderWindow		Annuler
-Continue	ExpanderWindow		Continuer
-Expander	ExpanderWindow	!! Window Title !!	Décompresseur
-The destination folder does not exist.	ExpanderWindow		Le dossier de destination n'existe pas.
+1	french	x-vnd.Haiku-Expander	3863172519
+About Expander…	ExpanderMenu		À propos de Expander…
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Êtes vous sur de vouloir stopper la décompression cette\narchive? Les fichiers extraits seront peut être incomplets.
-Select	DirectoryFilePanel		Sélectionner
-Creating listing for 	ExpanderWindow		Création de la liste pour
-Settings	ExpanderMenu		Paramètres
-Settings…	ExpanderMenu		Paramètres…
-Expander: Choose destination	DirectoryFilePanel		Décompresseur : Choix de la destination
-Show contents	ExpanderWindow		Montrer le contenu
-Expanding file 	ExpanderWindow		Décompression du fichier
-The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Le dossier a été renommé, déplacé, ou\ninsupportable.
-The file doesn't exist	ExpanderWindow		Le fichier n'existe pas
-Stop	ExpanderMenu		Arrêt
-File	ExpanderMenu		Fichier
-Expand	ExpanderWindow		Décompresser
+Automatically expand files	ExpanderPreferences		Décompresser les fichiers automatiquement
+Automatically show contents listing	ExpanderPreferences		Montrer l'inventaire automatiquement
+Cancel	ExpanderPreferences		Annuler
+Cancel	ExpanderWindow		Annuler
 Close	ExpanderMenu		Fermer
-The destination is not a folder.	ExpanderWindow		La destination n'est pas un dossier.
-About Expander…	ExpanderMenu		À propos du décompresseur…
-OK	About		OK
-Set source…	ExpanderMenu		Choisir la source…
-Select '%s'	DirectoryFilePanel		Selectionner '%s'
-Show contents	ExpanderMenu		Montrer le contenu
-Stop	ExpanderWindow		Arrêt
+Close window when done expanding	ExpanderPreferences		Fermer la fenêtre après l'extraction
+Continue	ExpanderWindow		Continuer
+Creating listing for '%s'	ExpanderWindow		Créer un inventaire pour « %s »
 Destination	ExpanderWindow		Destination
-\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\técrit par Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nVersion originale Be par\nDominic, Hiroshi, Peter, Pavel et Robert\n
-Expander	About		Décompresseur
+Destination folder:	ExpanderPreferences		Dossier de destination :
+Error when expanding archive	ExpanderWindow		Erreur lors de la décompression de l'archive
+Expand	ExpanderMenu		Décompresser
+Expand	ExpanderWindow		Décompresser
+Expander	About		Expander
+Expander	ExpanderWindow	!! Window Title !!	Expander
+Expander settings	ExpanderPreferences		Réglages du Décompresseur
+Expander: Choose destination	DirectoryFilePanel		Expander : Choix de la destination
+Expander: Open	ExpanderWindow		Expander : Ouvrir
+Expanding '%s'	ExpanderWindow		Décompression de « %s »
+Expansion:	ExpanderPreferences		Décompression :
+File	ExpanderMenu		Fichier
+File expanded	ExpanderWindow		Fichier décompressé
+Hide contents	ExpanderWindow		Cacher le contenu
+Leave destination folder path empty	ExpanderPreferences		Laissez vide le chemin du dossier de destination
+OK	About		OK
+OK	ExpanderPreferences		OK
+Open destination folder after extraction	ExpanderPreferences		Ouvrir le dossier de destination après l'extraction
+Other:	ExpanderPreferences		Autre :
+Same directory as source (archive) file	ExpanderPreferences		Même répertoire que le fichier source archivé
+Select	DirectoryFilePanel		Sélectionner
+Select	ExpanderPreferences		Sélectionner
+Select '%s'	DirectoryFilePanel		Selectionner '%s'
+Select current	DirectoryFilePanel		Sélectionner le répertoire courant
+Set destination…	ExpanderMenu		Choisir la destination…
+Set source…	ExpanderMenu		Choisir la source…
+Settings	ExpanderMenu		Réglages
+Settings…	ExpanderMenu		Réglages…
+Show contents	ExpanderMenu		Montrer le contenu
+Show contents	ExpanderWindow		Montrer le contenu
+Source	ExpanderWindow		Source
+Stop	ExpanderMenu		Arrêt
+Stop	ExpanderWindow		Arrêt
+The destination folder does not exist.	ExpanderWindow		Le dossier de destination n'existe pas.
+The destination is not a folder.	ExpanderWindow		La destination n'est pas un dossier.
+The destination is read only.	ExpanderWindow		La destination est en lecture seule.
+The file doesn't exist	ExpanderWindow		Le fichier n'existe pas
+The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Le dossier a été renommé, déplacé, ou\nn'est pas supporté.
+Use:	ExpanderPreferences		Utiliser :
+\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tÉcrit par Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nVersion originale Be par\nDominic, Hiroshi, Peter, Pavel et Robert\n
 is not supported	ExpanderWindow		n'est pas géré

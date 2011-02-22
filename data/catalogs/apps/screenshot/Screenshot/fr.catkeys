@@ -1,24 +1,26 @@
-1	french	x-vnd.haiku-screenshot	2830008934
-seconds	ScreenshotWindow		secondes
-Desktop	ScreenshotWindow		Bureau
-Include window border	ScreenshotWindow		Inclure les bords des fenêtres
-Select	ScreenshotWindow		Sélectionner
-Capture active window	ScreenshotWindow		Capturer la fenêtre active
-Cancel	ScreenshotWindow		Annuler
-Name:	ScreenshotWindow		Nom :
-Choose folder	ScreenshotWindow		Choisir un dossier
-Save	ScreenshotWindow		Enregistrer
-overwrite	ScreenshotWindow		écraser
-Choose folder...	ScreenshotWindow		Choisir un dossier…
-Save as:	ScreenshotWindow		Enregistrer sous :
-Copy to clipboard	ScreenshotWindow		Copier dans le presse-papiers
-Save in:	ScreenshotWindow		Enregistrer en :
-screenshot	Screenshot	Base filename of screenshot files	capture
-New screenshot	ScreenshotWindow		Nouvelle capture
+1	french	x-vnd.haiku-screenshot	166521589
 Artwork folder	ScreenshotWindow		Dossier d'images
-Home folder	ScreenshotWindow		Dossier personnel 
-Screenshot	ScreenshotWindow		Capture
-This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Ce fichier existe déjà.\n Voulez-vous vraiment l'écraser ?
-Settings…	ScreenshotWindow		Réglages…
+Cancel	ScreenshotWindow		Annuler
+Capture active window	ScreenshotWindow		Capturer la fenêtre active
+Choose folder	ScreenshotWindow		Choisir un dossier
+Choose folder...	ScreenshotWindow		Choisir un dossier…
+Copy to clipboard	ScreenshotWindow		Copier dans le presse-papiers
 Delay:	ScreenshotWindow		Retard :
+Desktop	ScreenshotWindow		Bureau
+Home folder	ScreenshotWindow		Dossier personnel 
 Include mouse pointer	ScreenshotWindow		Inclure le pointeur de la souris
+Include window border	ScreenshotWindow		Inclure les bords des fenêtres
+Name:	ScreenshotWindow		Nom :
+New screenshot	ScreenshotWindow		Nouvelle capture
+Please select	ScreenshotWindow		Veuillez sélectionner
+Save	ScreenshotWindow		Enregistrer
+Save as:	ScreenshotWindow		Enregistrer sous :
+Save in:	ScreenshotWindow		Enregistrer en :
+Screenshot	ScreenshotWindow		Capture
+Select	ScreenshotWindow		Sélectionner
+Settings…	ScreenshotWindow		Réglages…
+This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Ce fichier existe déjà.\n Voulez-vous vraiment l'écraser ?
+Translator Settings	ScreenshotWindow		Réglages du traducteur
+overwrite	ScreenshotWindow		écraser
+screenshot	Screenshot	Base filename of screenshot files	capture
+seconds	ScreenshotWindow		secondes

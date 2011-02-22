@@ -1,43 +1,43 @@
 1	french	x-vnd.Haiku-Appearance	3612090060
-Control highlight	Colors tab		Mise en valeur de contrôle
-Control border	Colors tab		Bordure de contrôle
-Antialiasing type:	AntialiasingSettingsView		Type de lissage :
-Shadow	Colors tab		Ombre
-On	AntialiasingSettingsView		Activé
-Defaults	APRWindow		Défaut
-Grayscale	AntialiasingSettingsView		Niveaux de gris
-Shine	Colors tab		Lumière
-Off	AntialiasingSettingsView		Désactivé
-Success	Colors tab		Réussite
-Inactive window tab text	Colors tab		Texte d'onglet de fenêtre inactive
-Failure	Colors tab		Échec
-Hinting menu	AntialiasingSettingsView		Menu hinting
-Document background	Colors tab		Arrière plan de document
-Revert	APRWindow		Défaire
-Window tab	Colors tab		Onglet de fenêtre
-Tooltip background	Colors tab		Arrière plan de bulle d'aide
-Selected menu item background	Colors tab		Arrière plan d'entrée de menu sélectionnée
 Antialiasing	APRWindow		Lissage
-Navigation base	Colors tab		Base de navigation
-Window tab text	Colors tab		Texte d'onglet de fenêtre
-Document text	Colors tab		Texte de document
-Navigation pulse	Colors tab		Pulsation de navigation
-Selected menu item text	Colors tab		Texte d'entrée de menu sélectionnée
-Menu background	Colors tab		Arrière plan de menu
+Antialiasing menu	AntialiasingSettingsView		Menu lissage
+Antialiasing type:	AntialiasingSettingsView		Type de lissage :
 Appearance	APRWindow		Apparence
-Panel background	Colors tab		Arrière plan de panneau
 Colors	APRWindow		Couleurs
 Control background	Colors tab		Arrière plan de contrôle
-Inactive window tab	Colors tab		Onglet de fenêtre inactive
-Reduce colored edges filter strength:	AntialiasingSettingsView		Intensité du filtre de réduction des bords de couleurs :
-Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Le lissage sous-pixel n'est pas disponible en même temps que le hinting de glyphes dans cette version de Haiku afin d'éviter des problèmes de brevets logiciels. Pour activer cette fonctionnalité, vous devez compiler Haiku vous-même et activer certaines options dans l'en-tête de configuration de libfreetype.
+Control border	Colors tab		Bordure de contrôle
+Control highlight	Colors tab		Mise en valeur de contrôle
 Control text	Colors tab		Texte de contrôle
-Tooltip text	Colors tab		Texte de bulle d'aide
-Menu item text	Colors tab		Texte d'entrée de menu
+Defaults	APRWindow		Défaut
+Document background	Colors tab		Arrière plan de document
+Document text	Colors tab		Texte de document
+Failure	Colors tab		Échec
+Glyph hinting:	AntialiasingSettingsView		Consigne de glyphes :
+Grayscale	AntialiasingSettingsView		Niveaux de gris
+Hinting menu	AntialiasingSettingsView		Menu ajustement
+Inactive window tab	Colors tab		Onglet de fenêtre inactive
+Inactive window tab text	Colors tab		Texte d'onglet de fenêtre inactive
 LCD subpixel	AntialiasingSettingsView		Sous-pixel LCD
-Selected menu item border	Colors tab		Bordure d'entrée de menu sélectionnée
-Strong	AntialiasingSettingsView		Important
-Panel text	Colors tab		Texte de panneau
+Menu background	Colors tab		Arrière plan de menu
+Menu item text	Colors tab		Texte d'élément de menu
 Monospaced fonts only	AntialiasingSettingsView		Seulement les polices à chasse fixe
-Antialiasing menu	AntialiasingSettingsView		Menu Antialiasing
-Glyph hinting:	AntialiasingSettingsView		Hinting de glyphes :
+Navigation base	Colors tab		Base de navigation
+Navigation pulse	Colors tab		Pulsation de navigation
+Off	AntialiasingSettingsView		Désactivé
+On	AntialiasingSettingsView		Activé
+Panel background	Colors tab		Arrière plan de panneau
+Panel text	Colors tab		Texte de panneau
+Reduce colored edges filter strength:	AntialiasingSettingsView		Intensité du filtre de réduction des bords de couleurs :
+Revert	APRWindow		Défaire
+Selected menu item background	Colors tab		Arrière plan d'entrée de menu sélectionnée
+Selected menu item border	Colors tab		Bordure d'élément de menu sélectionnée
+Selected menu item text	Colors tab		Texte d'entrée de menu sélectionnée
+Shadow	Colors tab		Ombre
+Shine	Colors tab		Lumière
+Strong	AntialiasingSettingsView		Épais
+Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Le lissage sous-pixel n'est pas disponible en même temps que les consignes de glyphes dans cette version de Haiku afin d'éviter des problèmes de brevets logiciels. Pour activer cette fonctionnalité, vous devez compiler Haiku vous-même et activer certaines options dans l'en-tête de configuration de libfreetype.
+Success	Colors tab		Réussite
+Tooltip background	Colors tab		Arrière plan de bulle d'aide
+Tooltip text	Colors tab		Texte de bulle d'aide
+Window tab	Colors tab		Onglet de fenêtre
+Window tab text	Colors tab		Texte d'onglet de fenêtre

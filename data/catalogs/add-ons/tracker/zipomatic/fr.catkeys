@@ -1,18 +1,18 @@
 1	french	x-vnd.haiku.zip-o-matic	274748138
-1 file added.	file:ZipOMaticWindow.cpp		1 fichier ajouté.
-Stop	file:ZipOMaticWindow.cpp		Arrêt
-Creating archive: %s	file:ZipOMaticWindow.cpp		Création de l'archive : %s
-Continue	file:ZipOMaticWindow.cpp		Continuer
-Preparing to archive	file:ZipperThread.cpp		Préparation de l'archivage
-Filename: %s	file:ZipOMaticWindow.cpp		Nom de fichier : %s
-Let them continue	file:ZipOMatic.cpp		Les laisser continuer
-Do you want to stop them?	file:ZipOMatic.cpp		Voulez-vous les arrêter ?
-Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Êtes-vous sur de vouloir interrompre la création de cette archive ?
 %ld files added.	file:ZipOMaticWindow.cpp		%ld fichiers ajoutés
-Stopped	file:ZipOMaticWindow.cpp		Arrêté
+1 file added.	file:ZipOMaticWindow.cpp		1 fichier ajouté.
 Archive	file:ZipperThread.cpp		Archive
+Archive created OK	file:ZipOMaticWindow.cpp		Création de l'archive réussie
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Êtes-vous sur de vouloir interrompre la création de cette archive ?
+Continue	file:ZipOMaticWindow.cpp		Continuer
+Creating archive: %s	file:ZipOMaticWindow.cpp		Création de l'archive : %s
+Do you want to stop them?	file:ZipOMatic.cpp		Voulez-vous les arrêter ?
 Drop files to zip.	file:ZipOMaticWindow.cpp		Déposer des fichiers pour les compresser.
 Error creating archive	file:ZipOMaticWindow.cpp		Erreur de création de l'archive
-You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		Vous avez %ld Zip-O-Matic en fonctionnement.\n\n
-Archive created OK	file:ZipOMaticWindow.cpp		Création de l'archive réussie
+Filename: %s	file:ZipOMaticWindow.cpp		Nom de fichier : %s
+Let them continue	file:ZipOMatic.cpp		Les laisser continuer
+Preparing to archive	file:ZipperThread.cpp		Préparation de l'archivage
+Stop	file:ZipOMaticWindow.cpp		Arrêt
 Stop them	file:ZipOMatic.cpp		Les arrêter
+Stopped	file:ZipOMaticWindow.cpp		Arrêté
+You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		Vous avez %ld Zip-O-Matic en fonctionnement.\n\n

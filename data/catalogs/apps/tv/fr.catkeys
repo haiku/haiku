@@ -1,30 +1,30 @@
 1	french	x-vnd.Haiku.TV	3791845041
-TV	MainWin		TV
+About %1…	MainWin	Parameter %1 is the name of the application.	À propos de %1…
+Always on top	MainWin		Toujours au dessus
 Channel	MainWin		Chaîne
-Settings…	MainWin		Réglages…
+DVB - Digital Video Broadcasting TV	MainWin		DVB - Télévision Numérique Terrestre
+Debug	MainWin		Déboguer
+Error, connecting to interface failed:\n\n	MainWin		Erreur, impossible de se connecter à l'interface:\n\n
+Error, interface is busy:\n\n	MainWin		Erreur, l'interface est occupée :\n\n
+Full screen	MainWin		Plein écran
 Interface	MainWin		Interface
 Keep aspect ratio	MainWin		Conserver les proportions
-Previous channel	MainWin		Chaîne précédente
-Settings	MainWin		Réglages
-About %1…	MainWin	Parameter %1 is the name of the application.	À propos de %1
-No border	MainWin		Pas de bordure
-Always on top	MainWin		Toujours au dessus
-OK	MainWin		OK
-Quit	MainWin		Quitter
-Full screen	MainWin		Plein écran
-\nRevision 	MainWin		\nRévision
-Debug	MainWin		Déboguer
-Scale to native size	MainWin		Redimensionner à la taille native
-unknown	MainWin		inconnu
 Next channel	MainWin		Chaîne suivante
-Error, interface is busy:\n\n	MainWin		Erreur, l'interface est occupée :\n\n
-None	MainWin		Aucun
-force 704 x 576, display aspect 4:3	MainWin		forcer en 704x576, proportions 4:3
-DVB - Digital Video Broadcasting TV	MainWin		DVB - Télévision Numérique Terrestre
-force 544 x 576, display aspect 4:3	MainWin		forcer en 544x576, proportions 4:3
-pixel aspect ratio	MainWin		proportions de l'image
+No border	MainWin		Pas de bordure
 No menu	MainWin		Pas de menu
+None	MainWin		Aucun
+OK	MainWin		OK
+Previous channel	MainWin		Chaîne précédente
+Quit	MainWin		Quitter
+Scale to native size	MainWin		Redimensionner à la taille native
+Settings	MainWin		Réglages
+Settings…	MainWin		Réglages…
+TV	MainWin		TV
 \nBuild 	MainWin		\nCompilé le
-Error, connecting to interface failed:\n\n	MainWin		Erreur, impossible de se connecter à l'interface:\n\n
+\nRevision 	MainWin		\nRévision
 \nVersion 	MainWin		\nVersion
+force 544 x 576, display aspect 4:3	MainWin		forcer en 544x576, proportions 4:3
+force 704 x 576, display aspect 4:3	MainWin		forcer en 704x576, proportions 4:3
 force 720 x 576, display aspect 4:3	MainWin		Forcer en 720 x 576, proportions 4:3
+pixel aspect ratio	MainWin		proportions de l'image
+unknown	MainWin		inconnu

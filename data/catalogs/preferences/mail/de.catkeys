@@ -30,7 +30,7 @@ Settings	Config Window		Einstellungen
 Show connection status window:	Config Window		Statusfenster anzeigen:
 Start mail services on startup	Config Window		Starte E-Mail-Dienste beim Systemstart
 While sending	Config Window		Beim Senden
-While sending and receiving	Config Window		Während dem Senden und Empfangen
+While sending and receiving	Config Window		Beim Senden und Empfangen
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nDie allgemeinen Einstellungen konnten nicht zurückgenommen werden.\n\nFehler beim Abrufen der allgemeinen Einstellungen:\n%s\n
 \n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nNeues Konto erstellen über den \"Hinzu\" Button.\n\nZum Löschen, Konto auswählen und \"Entfernen\" klicken.\n\nKonto auswählen, um dessen Einstellungen zu ändern.
 days	Config Window		Tage

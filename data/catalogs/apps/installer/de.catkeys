@@ -41,7 +41,7 @@ IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		WICHTIGE INFORMA
 If you have not created a partition yet, simply reboot, create the partition using whatever tool you feel most comfortable with, and reboot into Haiku to continue with the installation. You could for example use the GParted Live-CD, it can also resize existing partitions to make room.\n\n\n	InstallerApp		Falls noch keine Partition angelegt wurde, einfach den Rechner neu starten und eine Partition mit dem Lieblingsprogramm erstellen. Anschließend Haiku erneut starten, um die Installation fortzusetzen. Für die Partitionierung kann man beispielsweise eine GParted Live-CD verwenden, die zudem die Größe von bestehenden Partitionen verändern kann.\n\n\n
 Install anyway	InstallProgress		Trotzdem installieren
 Install from:	InstallerWindow		Installieren von:
-Install progress:  	InstallerWindow		Installationsverlauf:
+Install progress:  	InstallerWindow		Installationsverlauf: 
 Installation canceled.	InstallProgress		Installation abgebrochen.
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Installation abgeschlossen. Der Bootsektor wurde nach '%s' geschrieben. 'Beenden' klicken, um das Installationsprogramm zu verlassen, oder ein anderes Ziellaufwerk für eine weitere Installation auswählen.
 Installation completed. Boot sector has been written to '%s'. Press Quit to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Installation abgeschlossen. Der Bootsektor wurde nach '%s' geschrieben. 'Beenden' klicken, um den Rechner neu zu starten, oder ein anderes Ziellaufwerk für eine weitere Installation wählen.

@@ -3,7 +3,7 @@ Defaults	KeyboardWindow		Standardwerte
 Delay until key repeat	KeyboardView		Verzögerung bis Tastenwiederholung
 Fast	KeyboardView		Schnell
 Key repeat rate	KeyboardView		Tastenwiederholrate
-Keyboard	KeyboardWindow		Tastatur
+Keyboard	KeyboardWindow		Keyboard - Tastatur
 Long	KeyboardView		Lang
 OK	KeyboardApplication		OK
 Revert	KeyboardWindow		Anfangswerte

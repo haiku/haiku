@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-DiskProbe	679412978
+1	german	x-vnd.Haiku-DiskProbe	1552395580
 %ld (native)	ProbeView		%ld (nativ)
 (native)	ProbeView		(nativ)
 15 bit	TypeEditors		15 Bit
@@ -26,12 +26,12 @@ Attribute type: 	ProbeView		Attributtyp:
 Attribute: 	ProbeView		Attribut: 
 Attributes	ProbeView		Attribute
 Back	ProbeView		Zurück
-Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than \"Font size\" and \"BlockSize\"	Basis
+Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Basis
 Block	ProbeView		Block
 Block %Ld (0x%Lx)	ProbeView		Block %Ld (0x%Lx)
 Block 0x%Lx	ProbeView		Block 0x%Lx
 Block: 	ProbeView		Block: 
-BlockSize	ProbeView	A menu item, a shortened form from \"block size\". This is in the same menu windowthan \"Base\" and \"Font size\"	Blockgröße
+BlockSize	ProbeView	A menu item, a shortened form from 'block size'. This is in the same menu windowthan 'Base' and 'Font size'	Blockgröße
 Bookmarks	ProbeView		Lesezeichen
 Boolean	TypeEditors	This is the type of editor	Boolesch
 Boolean editor	TypeEditors		Boolescher Editor
@@ -127,9 +127,9 @@ Type editor not supported	ProbeView		Typ-Editor wird nicht unterstützt
 Undo	ProbeView		Rückgängig
 Unknown format	TypeEditors		Unbekanntes Format
 Unknown type	TypeEditors		Unbekannter Typ
-View	ProbeView	This is the last menubar item \"File Edit Block View\"	Ansicht
+View	ProbeView	This is the last menubar item 'File Edit Block View'	Ansicht
 Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Die Datei konnte nicht geschrieben werden:\n%s\n\nAlle Änderungen werden beim Beenden verloren gehen.
 none	ProbeView	No attributes	keine
 of 	ProbeView		von 
-of 0x0	ProbeView	This is a part of \"Block 0xXXXX of 0x0026\" message. In languages without 'of' structure it can be replaced simply with '/'.	von 0x0
+of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	von 0x0
 what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	what: '%.4s'\n\n

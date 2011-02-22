@@ -1,69 +1,62 @@
-1	french	x-vnd.Haiku-ShowImage	2679963118
-Use as background…	Menus		Utiliser comme fond d'écran...
-5 seconds	Menus		5 secondes
-Slide delay	Menus		Délai de diaporama
-Zoom in	Menus		Zoom avant
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Le document '%s' a été modifié. Êtes-vous sûr de vouloir le fermer ?
-8 seconds	Menus		8 secondes
-Previous page	Menus		Page précédente
-View	Menus		Vue
+1	french	x-vnd.Haiku-ShowImage	3385354583
+%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS secondes
+About ShowImage…	Menus		À propos de la Visionneuse…
+Browse	Menus		Parcourir
+Cancel	ClosePrompt		Annuler
+Clear selection	Menus		Effacer la sélection
+Close	ClosePrompt		Fermer
+Close	Menus		Fermer
+Close document	ClosePrompt		Fermer le document
+Copy	Menus		Copier
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		L'image n'a pas pu être lue ! Le fichier ou son traducteur n'existe pas.
+DPI:	PrintOptionsWindow		PPP :
+Edit	Menus		Editer
+File	Menus		Fichier
+First page	Menus		Première page
+Fit image to page	PrintOptionsWindow		Adapter l'image à la page
+Fit to window	Menus		Ajuster à la fenêtre
+Flip left to right	Menus		Mirroir vertical
+Flip top to bottom	Menus		Mirroir horizontal
 Full screen	Menus		Plein écran
 Go to page	Menus		Aller à la page
-Zoom out	Menus		Zoom arrière
-20 seconds	Menus		20 secondes
-3 seconds	Menus		3 secondes
-Rotate counterclockwise	Menus		Rotation antihoraire
-10 seconds	Menus		10 secondes
-High-quality zooming	Menus		Zoom haute qualité
-Browse	Menus		Parcourir
-6 seconds	Menus		6 secondes
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		L'image n'a pu être lue ! Le fichier ou son tranducteur n'existe pas.
-First page	Menus		Première page
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Le document '%s' (page %d) a changé. Voulez-vous fermer le document ?
-About ShowImage…	Menus		A propos de ShowImage…
-Close	ClosePrompt		Fermer
-Undo	Menus		Annuler
-Resize to (in 1/72 inches):	PrintOptionsWindow		Redimensionner (en 1/72 pouces) :
-9 seconds	Menus		9 secondes
-Flip left to right	Menus		Mirroir vertical
-Show caption in full screen mode	Menus		Afficher les miniatures en mode plein écran
-DPI:	PrintOptionsWindow		PPP :
-Next file	Menus		Fichier suivant
-4 seconds	Menus		4 secondes
-Close document	ClosePrompt		Fermer le document
 Height: 	PrintOptionsWindow		Hauteur : 
-Cancel	ClosePrompt		Annuler
-Print options	PrintOptionsWindow		Options d'impression
-ShowImage	AboutWindow		ShowImage
-7 seconds	Menus		7 secondes
-Last page	Menus		Dernière page
-Previous file	Menus		Fichier précédent
-Slide show	Menus		Diaporama
-Fit image to page	PrintOptionsWindow		Adapter l'image à la page
-Flip top to bottom	Menus		Mirroir horizontal
-Zoom factor in %:	PrintOptionsWindow		Zoomer (en %) :
-Width:	PrintOptionsWindow		Largeur :
+High-quality zooming	Menus		Zoom haute qualité
 Image	Menus		Image
-Rotate clockwise	Menus		Rotation horaire
 Job setup	PrintOptionsWindow		Définir la tâche
-Original size	Menus		Taille originale
+Last page	Menus		Dernière page
+Next file	Menus		Fichier suivant
 Next page	Menus		Page suivante
-OK	SaveToFile		OK
-The file '%s' could not be written.	SaveToFile		Le fichier « %s » ne peut pas être écrit.
-Progress monitor	ProgressWindow		Moniteur d'avancement
-File	Menus		Fichier
-Page setup…	Menus		Mise en page…
-Print…	Menus		Imprimer…
-Quit	Menus		Quitter
-Edit	Menus		Editer
-Close	Menus		Fermer
-Copy	Menus		Copier
-Select all	Menus		Selectionner tout
-Save as…	Menus		Enregistrer sous…
-Open…	Menus		Ouvrir…
-ShowImage	Menus		Visionneuse
-Clear selection	Menus		Effacer la sélection
-Selection Mode	Menus		Mode de sélection
-Stretch to window	Menus		Étirer à la fenêtre
 OK	Alerts		OK
-Fit to window	Menus		Ajuster à la fenêtre
+OK	SaveToFile		OK
+Open…	Menus		Ouvrir…
+Original size	Menus		Taille originale
+Page setup…	Menus		Mise en page…
+Previous file	Menus		Fichier précédent
+Previous page	Menus		Page précédente
+Print options	PrintOptionsWindow		Options d'impression
+Print…	Menus		Imprimer…
+Progress monitor	ProgressWindow		Moniteur de progression
+Quit	Menus		Quitter
+Rating	Menus		Évaluation
+Resize to (in 1/72 inches):	PrintOptionsWindow		Redimensionner (en 1/72 pouces) :
+Rotate clockwise	Menus		Rotation horaire
+Rotate counterclockwise	Menus		Rotation antihoraire
+Save as…	Menus		Enregistrer sous…
+Select all	Menus		Selectionner tout
+Selection Mode	Menus		Mode de sélection
+Show caption in full screen mode	Menus		Afficher les miniatures en mode plein écran
+ShowImage	AboutWindow		Visionneuse
+ShowImage	Menus		Visionneuse
+Slide delay	Menus		Délai de diaporama
+Slide show	Menus		Diaporama
+Stretch to window	Menus		Étirer à la fenêtre
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Le document « %s » (page %d) a changé. Voulez-vous fermer le document ?
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Le document « %s » a été modifié. Êtes-vous sûr de vouloir le fermer ?
+The file '%s' could not be written.	SaveToFile		Le fichier « %s » ne peut pas être écrit.
+Undo	Menus		Annuler
+Use as background…	Menus		Utiliser comme fond d'écran…
+View	Menus		Vue
+Width:	PrintOptionsWindow		Largeur :
+Zoom factor in %:	PrintOptionsWindow		Zoomer (en %) :
+Zoom in	Menus		Zoom avant
+Zoom out	Menus		Zoom arrière

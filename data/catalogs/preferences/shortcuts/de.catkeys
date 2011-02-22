@@ -47,7 +47,7 @@ Save KeySet as…	ShortcutsWindow		Tastenbelegung speichern unter...
 Select	ShortcutsWindow		Auswählen
 SendMessage	ShortcutsSpec		Nachricht senden
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
-Shortcuts	ShortcutsWindow		Shortcuts
+Shortcuts	ShortcutsWindow		Shortcuts - Tastenkürzel
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Die Tastenbelegungsdatei konnte nicht geladen werden.
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Die Tastenbelegungsdatei konnte nicht gelesen werden.
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Die Tastenbelegungsdatei konnte nicht gespeichert werden.

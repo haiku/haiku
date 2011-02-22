@@ -1,23 +1,42 @@
-1	french	x-vnd.Haiku-Mail	3449555026
-Select account type	Config Views		Sélectionnez le type de compte
-Mail checking	Config Window		Vérification des mails
-Settings	Config Window		Réglages
-days	Config Window		jours
+1	french	x-vnd.Haiku-Mail	3023422579
 Account name:	Config Views		Nom du compte :
-OK	Config Views		OK
-Revert	Config Window		Annuler
-Accounts	Config Window		Comptes
-Account type:	Config Views		Type de compte :
-Remove	Config Window		Supprimer
-Miscellaneous	Config Window		Divers
-hours	Config Window		heures
-Add	Config Window		Ajouter
-Send mail only	Config Views		Envoi des mails uniquement
-Return address:	Config Views		Adresse de réponse :
-never	Config Window		jamais
 Account settings	Config Views		Réglages du compte
-minutes	Config Window		minutes
-OK	Account		OK
-Apply	Config Window		Appliquer
+Accounts	Config Window		Comptes
+Add	Config Window		Ajouter
+Alpha	Config Window		Alpha
 Always	Config Window		Toujours
-Add filter	Config Views		Ajouter un filtre
+Apply	Config Window		Appliquer
+Beta	Config Window		Bêta
+Check every	Config Window		Vérifier toutes les
+Development	Config Window		Développement
+E-mail	Config Window		E-mail
+Edit mailbox menu…	Config Window		Éditer le menu de la boite mail…
+Error	Config Window		Erreur
+Error retrieving general settings: %s\n	Config Window		Erreur à la récupération des réglages généraux : %s\n
+Final	Config Window		Finale
+Gamma	Config Window		Gamma
+Golden master	Config Window		Candidate
+Mail Daemon Replacement\n\nby Haiku, Inc. All rights reserved.\n\nVersion %ld.%ld.%ld %s\n\nSee LICENSE file included in the installation package for more information.\n\n\n\nYou can contact us at:\n%s\n\nPlease submit bug reports using the %s\n\nProject homepage at:\n%s	Config Window		Démon mail de remplacement\n\npar Haiku, Inc. Tous droits réservés.\n\nVersion %ld.%ld.%ld %s\n\nPour plus d'informations, veuillez consulter le fichiers « LICENSE » inclus dans le paquet d'installation.\n\n\n\nVous pouvez nous contacter à :\n%s\n\nVeuillez soumettre vos rapports de bogues en utilisant %s\n\nPage d'accueil du projet :\n%s
+Mail checking	Config Window		Vérification des mails
+Miscellaneous	Config Window		Divers
+OK	Config Window		OK
+Only when dial-up is connected	Config Window		Uniquement quand le modem est connecté
+Real name:	Config Views		Nom réel :
+Remove	Config Window		Supprimer
+Return address:	Config Views		Adresse de réponse :
+Revert	Config Window		Rétablir
+Schedule outgoing mail when dial-up is disconnected	Config Window		Mettre les mails en partance dans la file d'attente quand le modem est déconnecté
+Settings	Config Window		Réglages
+Show connection status window:	Config Window		Afficher la fenêtre d'état de la connexion :
+Start mail services on startup	Config Window		Lancer les services de mail au démarrage
+While sending	Config Window		Pendant l'envoi 
+While sending and receiving	Config Window		Pendant l'envoi et la réception
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nImpossible de récupérer les réglages généraux.\n\nErreur durant la récupération des paramètres :\n%s\n
+\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nCréez un nouveau compte avec le bouton Ajouter.\n\nSupprimez un compte avec le bouton supprimer sur l'item sélectionné.\n\nSélectionnez un item dans la liste pour changer ses réglages.
+days	Config Window		jours
+hours	Config Window		heures
+minutes	Config Window		minutes
+never	Config Window		jamais
+· E-mail filters	Config Window		. Filtres E-mail
+· Incoming	Config Window		. Réception
+· Outgoing	Config Window		. Envoi

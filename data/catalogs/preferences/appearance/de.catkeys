@@ -2,7 +2,7 @@
 Antialiasing	APRWindow		Kantenglättung
 Antialiasing menu	AntialiasingSettingsView		Kantenglättungs-Menü
 Antialiasing type:	AntialiasingSettingsView		Kantenglättungstyp:
-Appearance	APRWindow		Appearance
+Appearance	APRWindow		Appearance - Erscheinungsbild
 Colors	APRWindow		Farben
 Control background	Colors tab		Steuerelement - Hintergrund
 Control border	Colors tab		Steuerelement - Rahmen

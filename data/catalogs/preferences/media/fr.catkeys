@@ -1,37 +1,39 @@
-1	french	x-vnd.Haiku-Media	243366818
-Show volume control on Deskbar	Media views		Afficher le contrôle de volume dans la Deskbar
+1	french	x-vnd.Haiku-Media	1588474509
+<none>	Media views		<aucun>
 Audio input:	Media views		Entrée son :
-Restarting media services\nStarting media server…\n	Media Window		Redémarrage des services media\nDémarrage du serveur media…\n
-Video input:	Media views		Entrée vidéo:
-Waiting for media_server to quit.	Media Window		Attente de la fin du serveur media.
-Defaults	Media views		Par défaut
-Stopping media server…	Media Window		Arrêt du serveur media…
-Video output:	Media views		Sortie vidéo :
-Enable real-time audio	Media views		Activer l'audio temps réel
-Quit	Media Window		Quitter
-OK	Media Window		Ok
-Enabling real-time video allows system to perform video operations as fast and smoothly as possible.  It achieves optimum performance by using more RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Activer la vidéo temps réel permet au système d'effectuer les opérations vidéo aussi rapidement et fluidement que possible. Ceci est fait en utilisant plus de mémoire.\n\n N'activez cette option que si vous avez besoin de la latence la plus faible possible.
-Default nodes	Media views		Noeuds par défaut
-Starting media server…	Media Window		Démarrage du serveur média…
-Restart the media server to apply changes.	Media views		Redémarrez le serveur media pour appliquer les changements.
-Done shutting down.	Media Window		Arrêt terminé.
-Cleaning up.	Media Window		Nettoyage.
-Telling media_addon_server to quit.	Media Window		Demande au serveur add-on media de quitter.
-Enable real-time video	Media views		Activer la vidéo temps réel
-This hardware has no controls.	Media Window		Ce matériel n'a pas de contrôles.
-Restarting media services\nShutting down media server\n	Media Window		Redémarrage des services média\nArrêt du serveur média\n
+Audio mixer	Media Window		Mélangeur audio
 Audio output:	Media views		Sortie audio:
-Start media server	Media Window		Démarrer le serveur media
 Audio settings	Media Window		Réglages audio
+Channel:	Media views		Canal :
+Cleaning up.	Media Window		Nettoyage.
 Could not connect to the media server.\nWould you like to start it ?	Media Window		Impossible de se connecter au serveur media.\nVoulez-vous le démarrer ?
+Couldn't add volume control in Deskbar: %s\n	Media views		Impossible d'insérer le contrôle du volume dans la Deskbar : %s\n
+Couldn't remove volume control in Deskbar: %s\n	Media views		Impossible de retirer le contrôle du volume de la Deskbar : %s\n
+Defaults	Media views		Par défaut
+Done shutting down.	Media Window		Arrêt terminé.
+Enable real-time audio	Media views		Activer l'audio temps réel
+Enable real-time video	Media views		Activer la vidéo temps réel
+Enabling real-time audio allows system to record and play audio as fast as possible.  It achieves this performance by using more CPU and RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Activer le son temps réel permet au système d'enregistrer et lire le son aussi rapidement que possible. Ceci utilise plus de mémoire et de temps processeur.\n\n N'activez cette option que si vous avez besoin de la latence la plus faible possible.
+Enabling real-time video allows system to perform video operations as fast and smoothly as possible.  It achieves optimum performance by using more RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Activer la vidéo temps réel permet au système d'effectuer les opérations vidéo aussi rapidement et fluidement que possible. Ceci est fait en utilisant plus de mémoire.\n\n N'activez cette option que si vous avez besoin de la latence la plus faible possible.
+Media	Media Window		Média
+OK	Media Window		Ok
+OK	Media views		OK
+Quit	Media Window		Quitter
 Ready for use…	Media Window		Prêt à servir…
 Real-time	Media views		Temps réel
+Real-time audio is currently unimplemented in Haiku.	Media views		L'audio Temps-Réel n'est actuellement pas implémenté dans Haiku.
+Real-time video is currently unimplemented in Haiku.	Media views		La vidéo Temps-Réel n'est actuellement pas implémentée dans Haiku.
 Restart media services	Media views		Redémarrer les services media
-Enabling real-time audio allows system to record and play audio as fast as possible.  It achieves this performance by using more CPU and RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Activer le son temps réel permet au système d'enregistrer et lire le son aussi rapidement que possible. Ceci utilise plus de mémoire et de temps processeur.\n\n N'activez cette option que si vous avez besoin de la latence la plus faible possible.
-Couldn't remove volume control in Deskbar: %s\n	Media Window		Impossible d'enlever le contrôle du volume de la Deskbar : %s\n
-Couldn't add volume control in Deskbar: %s\n	Media Window		Impossible d'ajouter le contrôle du volume dans la Deskbar: %s\n
-Media	Media Window		Média
-Channel:	Media views		Canal :
+Restart the media server to apply changes.	Media views		Redémarrez le serveur media pour appliquer les changements.
+Restarting media services\nShutting down media server\n	Media Window		Redémarrage des services média\nArrêt du serveur média\n
+Restarting media services\nStarting media server…\n	Media Window		Redémarrage des services media\nDémarrage du serveur media…\n
+Show volume control on Deskbar	Media views		Afficher le contrôle de volume dans la Deskbar
+Start media server	Media Window		Démarrer le serveur media
+Starting media server…	Media Window		Démarrage du serveur média…
+Stopping media server…	Media Window		Arrêt du serveur media…
+Telling media_addon_server to quit.	Media Window		Demande au serveur add-on media de quitter.
+This hardware has no controls.	Media Window		Ce matériel n'a pas de contrôles.
+Video input:	Media views		Entrée vidéo:
+Video output:	Media views		Sortie vidéo :
 Video settings	Media Window		Réglages vidéo
-Audio mixer	Media Window		Mélangeur audio
-<none>	Media views		<Aucun>
+Waiting for media_server to quit.	Media Window		Attente de la fin du serveur media.

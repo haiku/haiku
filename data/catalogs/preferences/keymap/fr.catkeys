@@ -1,22 +1,22 @@
 1	french	x-vnd.Haiku-Keymap	4175672673
-Tilde trigger	Keymap window		Tilde
-Grave trigger	Keymap window		Accent grave
-Select dead keys	Keymap window		Touches mortes
-Quit	Keymap window		Quitter
-Circumflex trigger	Keymap window		Accent circonflexe
-Diaeresis trigger	Keymap window		Trema
-Open…	Keymap window		Ouvrir…
-System:	Keymap window		Système:
-Switch shortcut keys	Keymap window		Touches raccourci
-User:	Keymap window		Utilisateur:
-Switch shortcut keys to Haiku mode	Keymap window		Touches raccourci en mode Haiku
-Keymap	Keymap window		Disposition du clavier
-Sample and clipboard:	Keymap window		Exemple et presse-papier:
-Layout	Keymap window		Disposition
-Switch shortcut keys to Windows/Linux mode	Keymap window		Touches raccourci en mode Linux/Windows
-Revert	Keymap window		Défaire
-Save as…	Keymap window		Enregistrer sous…
-File	Keymap window		Fichier
 (Current)	Keymap window		(Actif)
-Font	Keymap window		Police
 Acute trigger	Keymap window		Accent aigu
+Circumflex trigger	Keymap window		Accent circonflexe
+Diaeresis trigger	Keymap window		Tréma
+File	Keymap window		Fichier
+Font	Keymap window		Police
+Grave trigger	Keymap window		Accent grave
+Keymap	Keymap window		Disposition du clavier
+Layout	Keymap window		Disposition
+Open…	Keymap window		Ouvrir…
+Quit	Keymap window		Quitter
+Revert	Keymap window		Défaire
+Sample and clipboard:	Keymap window		Exemple et presse-papier :
+Save as…	Keymap window		Enregistrer sous…
+Select dead keys	Keymap window		Sélection des touches mortes
+Switch shortcut keys	Keymap window		Basculer les touches de raccourcis
+Switch shortcut keys to Haiku mode	Keymap window		Basculer les touches de raccourcis vers en mode Haiku
+Switch shortcut keys to Windows/Linux mode	Keymap window		Basculer les touches de raccourcis en mode Linux/Windows
+System:	Keymap window		Système :
+Tilde trigger	Keymap window		Tilde
+User:	Keymap window		Utilisateur :

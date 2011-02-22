@@ -26,7 +26,7 @@ Large icon	DisplayView		Großes Icon
 Last Received	NotificationView		Zuletzt empfangen
 Mini icon	DisplayView		Kleines Icon
 No	NotificationView		Nein
-Notifications	GeneralView		Notifications
+Notifications	GeneralView		Notifications - Benachrichtigungen
 Notifications	NotificationView		Notifications
 Notifications	PrefletWin		Notifications
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Benachrichtigungen können nicht angehalten werden, weil der Server nicht erreicht werden kann.

@@ -1,20 +1,20 @@
 1	french	x-vnd.Haiku-CPUFrequencyPref	4060072235
-Ok	Status view		OK
-CPU frequency status view	CPU Frequency View		État de la fréquence du processeur
-Set state	Status view		Changer l'état
-Defaults	Pref Window		Défaire
-Install replicant into Deskbar	CPU Frequency View		Installer le réplicant dans la Deskbar
-Quit	Status view		Quitter
-High performance	Status view		Haute performance
-Stepping policy	CPU Frequency View		Attitude d'accélération
+CPU Frequency	Main window		Fréquence du CPU
+CPU frequency status view	CPU Frequency View		Vue de l'état de la fréquence du CPU
+CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		Fréquence du processeur\n\tÉcrit par Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
+Defaults	Pref Window		Par défauts
 Dynamic performance	Status view		performance dynamique
-Step up by CPU usage	Color Step View		Accélération par utilisation processeur:
 Dynamic stepping	CPU Frequency View		Accélération dynamique
-Stepping policy: 	CPU Frequency View		Attitude d'accélération:
+High performance	Status view		Haute performance
+Install replicant into Deskbar	CPU Frequency View		Installer le réplicant dans la Deskbar
 Integration time [ms]: 	CPU Frequency View		Temps d'intégration
-Open Speedstep preferences…	Status view		Ouvrir les préférences Speestep…
-Revert	Pref Window		Défaire
+Launching the CPU frequency preflet failed.\n\nError: 	Status view		Échec de lancement des préférences de fréquence du CPU.\n\nErreur :
 Low energy	Status view		Basse consommation
-Launching the CPU frequency preflet failed.\n\nError: 	Status view		Échec de lancement des préférences de fréquence du processeur.\n\nErreur:
-CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		Fréquence du processeur\n\técrit par Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
-CPU Frequency	Main window		Fréquence du processeur
+Ok	Status view		OK
+Open Speedstep preferences…	Status view		Ouvrir les préférences Speestep…
+Quit	Status view		Quitter
+Revert	Pref Window		Défaire
+Set state	Status view		Changer l'état
+Step up by CPU usage	Color Step View		Accélération par utilisation processeur :
+Stepping policy	CPU Frequency View		Stratégie d'accélération
+Stepping policy: 	CPU Frequency View		Stratégie d'accélération :

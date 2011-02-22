@@ -1,25 +1,43 @@
-1	french	x-vnd.Be-PRNT	1513930032
-page	JobListView		page
-Cancel	AddPrinterDialog		Annuler
-Add printer	AddPrinterDialog		Ajouter une imprimante
-Printers	PrintersWindow		Imprimantes
-Default Printer	PrinterListView		Imprimante par défaut
-No pending jobs.	PrinterListView		Pas de travaux en suspens.
-pages	JobListView		pages
-Printer name:	AddPrinterDialog		Nom de l'imprimante :
-pending jobs.	PrinterListView		tâches en suspens.
-Restart job	PrintersWindow		Reprendre la tâche
-Add	AddPrinterDialog		Ajouter
-Make default	PrintersWindow		Utiliser par défaut
-Cancel job	PrintersWindow		Annuler la tâche
-1 pending job.	PrinterListView		1 tâche en suspens
-<pick one>	AddPrinterDialog		<choisir>
-Add …	PrintersWindow		Ajouter…
-Print jobs for 	PrintersWindow		Travaux d'impression pour
-Failed	JobListView		Échoué
+1	french	x-vnd.Be-PRNT	1563474157
 %.2f KB	JobListView		%.2f Ko
-Completed	JobListView		Terminé
-No printer found!	TransportMenu		Aucune imprimante trouvée !
-Print jobs: No printer selected	PrintersWindow		Travaux d'impression : Aucune imprimante sélectionnée
-Unknown status	JobListView		État inconnu
+1 pending job.	PrinterListView		1 travail en attente.
+<pick one>	AddPrinterDialog		<choisir>
+Add	AddPrinterDialog		Ajouter
+Add printer	AddPrinterDialog		Ajouter une imprimante
+Add …	PrintersWindow		Ajouter…
+Black	TestPageView		Noir
+Blue	TestPageView		Bleu
+Cancel	AddPrinterDialog		Annuler
+Cancel job	PrintersWindow		Annuler le travail
+Completed	JobListView		Achevé
 Connected to:	AddPrinterDialog		Connecté à :
+Cyan	TestPageView		Cyan
+Default Printer	PrinterListView		Imprimante par défaut
+Driver: %driver%	PrinterListView		Pilote : %driver%
+Failed	JobListView		Échoué
+Green	TestPageView		Vert
+Magenta	TestPageView		Magenta
+Make default	PrintersWindow		Utiliser par défaut
+No pending jobs.	PrinterListView		Pas de travaux en suspens.
+No printer found!	TransportMenu		Aucune imprimante trouvée !
+Print jobs for 	PrintersWindow		Travaux d'impression pour
+Print jobs: No printer selected	PrintersWindow		Travaux d'impression : Aucune imprimante sélectionnée
+Print test page	PrintersWindow		Imprimer une page de test
+Printer name:	AddPrinterDialog		Nom de l'imprimante :
+Printer type:	AddPrinterDialog		Type d'imprimante :
+Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Imprimante : %printer_name%\nPilote : %driver%\n
+Printers	PrintersWindow		Imprimantes
+Processing	JobListView		Traitement
+Red	TestPageView		Rouge
+Remove	PrintersWindow		Retirer
+Restart job	PrintersWindow		Reprendre la travail
+Test Page	PrintersWindow		Page de test
+Test Page	TestPageView		Page de test
+Transport: %transport% %transport_address%	PrinterListView		Liaison : %transport% %transport_address%
+Transport: %transport% %transport_address%	TestPageView		Liaison : %transport% %transport_address%
+Unknown status	JobListView		État inconnu
+Waiting	JobListView		Attente
+Yellow	TestPageView		Jaune
+page	JobListView		page
+pages	JobListView		pages
+pending jobs.	PrinterListView		travaux en suspens.

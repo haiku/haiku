@@ -1,19 +1,21 @@
-1	french	x-vnd.Haiku-Network	3742287184
-Gateway:	EthernetSettingsView		Passerelle :
-Netmask:	EthernetSettingsView		Masque de sous-réseau :
-DHCP	EthernetSettingsView		DHCP
-DNS #2:	EthernetSettingsView		DNS n°2 :
-Apply	EthernetSettingsView		Appliquer
-DNS #1:	EthernetSettingsView		DNS n°1 :
-Network	NetworkWindow		Réseau
+1	french	x-vnd.Haiku-Network	2440177840
+<no wireless networks found>	EthernetSettingsView		<aucun réseau sans fil disponible>
 Adapter:	EthernetSettingsView		Adaptateur :
-IP address:	EthernetSettingsView		Adresse IP :
-Revert	EthernetSettingsView		Défaire
-Sending auto-config message failed: 	EthernetSettingsView		Échec d'envoi du message de configuration automatique :
-Mode:	EthernetSettingsView		Mode :
-The net_server needs to run for the auto configuration!	EthernetSettingsView		Le net_server doit être lancé pour la configuration automatique !
+Apply	EthernetSettingsView		Appliquer
 Auto-configuring failed: 	EthernetSettingsView		Échec de la configuration automatique :
-Static	EthernetSettingsView		Statique
-OK	EthernetSettingsView		Ok
-Domain:	EthernetSettingsView		Domaine :
+Choose automatically	EthernetSettingsView		Choisir automatiquement
+DHCP	EthernetSettingsView		DHCP
+DNS #1:	EthernetSettingsView		DNS n°1 :
+DNS #2:	EthernetSettingsView		DNS n°2 :
 Disabled	EthernetSettingsView		Désactivé
+Domain:	EthernetSettingsView		Domaine :
+Gateway:	EthernetSettingsView		Passerelle :
+IP address:	EthernetSettingsView		Adresse IP :
+Mode:	EthernetSettingsView		Mode :
+Netmask:	EthernetSettingsView		Masque de sous-réseau :
+Network	NetworkWindow		Réseau
+Network:	EthernetSettingsView		Réseau :
+OK	EthernetSettingsView		Ok
+Revert	EthernetSettingsView		Défaire
+Static	EthernetSettingsView		Static
+The net_server needs to run for the auto configuration!	EthernetSettingsView		Le net_server doit être lancé pour la configuration automatique !

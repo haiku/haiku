@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-notification_server	3963115862
+1	german	x-vnd.Haiku-notification_server	906000487
 Couldn't start display settings monitor.\nLive filter changes disabled.	NotificationWindow		Die Überwachung der Darstellungseigenschaften konnte nicht gestartet werden.
 Couldn't start filter monitor. Live filter changes disabled.	NotificationWindow		Der Filter-Monitor konnte nicht gestartet werden. Echtzeit-Filteränderungen wurden deaktiviert.
 Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		Die Überwachung der allgemeinen Einstellungen konnte nicht gestartet werden.\nEchtzeit-Filteränderungen wurden deaktiviert.
@@ -6,7 +6,3 @@ Darn.	NotificationWindow		Herrje!
 Notification	NotificationWindow		Notification
 OK	NotificationWindow		OK
 Warning	NotificationWindow		Warnung
-count messages	NotificationWindow		Nachrichten zählen
-create a message	NotificationWindow		Eine Nachricht erstellen
-get a message	NotificationWindow		Eine Nachricht empfangen
-modify a message	NotificationWindow		Eine Nachricht verändern.\nEchtzeit-Filteränderungen wurden deaktiviert.

@@ -1,39 +1,39 @@
 1	french	x-vnd.Be-TSKB	34208151
-Applications	PreferencesWindow		Applications
-Recent applications	BeMenu		Applications récentes
-Edit menu…	PreferencesWindow		Éditer le menu…
-Recent documents:	PreferencesWindow		Documents récents :
-Recent folders	BeMenu		Dossiers récents
-Sort running applications	PreferencesWindow		Trier les applications lancées
-Change time…	TimeView		Changer l'heure…
 <Be folder is empty>	BeMenu		<Le dossier Be est vide>
-Window	PreferencesWindow		Fenêtre
-Menu	PreferencesWindow		Menu
-Show seconds	PreferencesWindow		Montrer les secondes
+About Haiku…	BeMenu		À propos de Haiku...
 Always on top	PreferencesWindow		Toujours au dessus
-Show all	WindowMenu		Montrer tout
-No windows	WindowMenu		Pas de fenêtres
-Power off	BeMenu		Éteindre
+Applications	PreferencesWindow		Applications
 Auto-raise	PreferencesWindow		Auto-montée
-Hide time	TimeView		Cacher l'heure
-Recent folders:	PreferencesWindow		Dossiers récents :
-Deskbar preferences…	BeMenu		Réglages de la Deskbar…
-Show application expander	PreferencesWindow		Montrer l'étendeur d'application
+Change time…	TimeView		Régler l'horloge…
+Clock	PreferencesWindow		Horloge
 Close all	WindowMenu		Tout fermer
 Deskbar preferences	PreferencesWindow		Réglages de la Deskbar
-Mount	BeMenu		Monter
-Recent applications:	PreferencesWindow		Applications récentes :
-Tracker always first	PreferencesWindow		Tracker toujours en premier
-About Haiku…	BeMenu		À propos de Haiku...
-Show calendar…	TimeView		Montrer le calendrier…
-Restart system	BeMenu		Redémarrer le système
-Find…	BeMenu		Trouver…
-Restart Tracker	BeMenu		Redémarrer le Tracker
-Show Time	Tray		Montrer l'heure
+Deskbar preferences…	BeMenu		Réglages de la Deskbar…
+Edit menu…	PreferencesWindow		Éditer le menu…
 Expand new applications	PreferencesWindow		Développer les nouvelles applications
-Clock	PreferencesWindow		Horloge
-Recent documents	BeMenu		Documents récents
+Find…	BeMenu		Trouver…
 Hide all	WindowMenu		Tout cacher
-Shutdown…	BeMenu		Éteindre...
+Hide time	TimeView		Cacher l'heure
+Menu	PreferencesWindow		Menu
+Mount	BeMenu		Monter
+No windows	WindowMenu		Pas de fenêtres
+Power off	BeMenu		Éteindre
 Quit application	WindowMenu		Quitter l'application
+Recent applications	BeMenu		Applications récentes
+Recent applications:	PreferencesWindow		Applications récentes :
+Recent documents	BeMenu		Documents récents
+Recent documents:	PreferencesWindow		Documents récents :
+Recent folders	BeMenu		Dossiers récents
+Recent folders:	PreferencesWindow		Dossiers récents :
+Restart Tracker	BeMenu		Redémarrer le Tracker
+Restart system	BeMenu		Redémarrer le système
+Show Time	Tray		Montrer l'heure
+Show all	WindowMenu		Montrer tout
+Show application expander	PreferencesWindow		Montrer l'étendeur d'application
+Show calendar…	TimeView		Montrer le calendrier…
 Show replicants	BeMenu		Montrer les réplicants
+Show seconds	PreferencesWindow		Montrer les secondes
+Shutdown…	BeMenu		Éteindre...
+Sort running applications	PreferencesWindow		Trier les applications lancées
+Tracker always first	PreferencesWindow		Tracker toujours en premier
+Window	PreferencesWindow		Fenêtre

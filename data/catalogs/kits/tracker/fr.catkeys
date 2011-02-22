@@ -1,213 +1,413 @@
-1	french	x-vnd.Haiku-libtracker	1636109715
-Sorry, you can't save things at the root of your system.	libtracker		Désolé, vous ne pouvez rien enregistrer à la racine de votre système.
-Empty Trash	libtracker		Vider la poubelle
-Recent folders	libtracker		Répertoires récents
-You cannot copy or move the root directory.	libtracker		Vous ne pouvez pas copier ou déplacer le répertoire racine.
-starts with	libtracker		commence par
-TiB	libtracker		Tio
-Duplicate	libtracker		Dupliquer
-Link To:	libtracker		Lien vers :
-Paste links	libtracker		Coller les liens
-Volume icons	libtracker		Icônes des volumes
-Create a Query template	libtracker		créer un modèle de requête 
-%num items	libtracker		%num objets
-Modified	libtracker		Modifié
-Group	libtracker		Groupe
-Create link	libtracker		Créer un lien
-Moving: 	libtracker		Déplace :
-Preparing to copy items…	libtracker		Préparation de la copie…
-Error deleting items	libtracker		Erreur en supprimant les objets
-Sorry, saving more than one item is not allowed.	libtracker		Désolé, sauver plus d'un item n'est pas autorisé.
-Open with…	libtracker		Ouvrir avec…
-for %num files	libtracker		pour %num fichiers
-Unknown	libtracker		Inconnu
-Close	libtracker		Fermer
-Go to parent	libtracker		Ouvrir le parent
-%name info	libtracker	InfoWindow Title	Informations sur %name
-(Finish: %time - %finishtime minutes left)	libtracker		(Fin à %time - %finishtime minutes restantes)
-Recent documents	libtracker		Documents récents
-Clean up	libtracker		Nettoyer
-Find…	libtracker		Trouver…
-Mount all	libtracker		Tout monter
-Opens with:	libtracker		S'ouvre avec :
-Paste layout	libtracker		Coller la disposition
-Cancel	libtracker		Annuler
-Preparing to move items…	libtracker		Préparation du déplacement…
-Invert selection	libtracker		Inverser la sélection
-Don't move files to Trash	libtracker		Ne pas déplacer les fichiers dans la poubelle
-Name	libtracker		Nom
-Cut more	libtracker		Couper plus
-save text	libtracker		enregistrer le texte
-Could not open \"%document\" (Missing symbol: %symbol). \n	libtracker		Impossible d'ouvrir \"%document\" (Symbole manquant: %symbol). \n
-Don't automount	libtracker		Ne pas monter automatiquement
-Sorry, the 'Character' attribute cannot store a multi-byte glyph.	libtracker		Désolé, l'attribut 'Caractère' ne peut pas stocker un symbole sur plusieurs octets.
-Would you like to find a suitable application to open the file?	libtracker		Voulez-vous chercher une application adaptée pour ouvrir ce fichier ?
-Increase size	libtracker		Augmenter la taille
-is	libtracker		est
-(Finish: %time - Over %finishtime hours left)	libtracker		(Fin à %time - Plus de %finishtime heures restantes)
-Could not open \"%name\" (%error). 	libtracker		Impossible d'ouvrir \"%name\" (%error).
-Copying: 	libtracker		Copie :
-You cannot replace a folder or a symbolic link with a file.	libtracker		Vous ne pouvez pas remplacer un répertoire ou un lien symbolique par un fichier
-Decrease size	libtracker		Réduire la taille
-There was an error deleting \"%name\":\n\t%error	libtracker		Une erreur est survenue lors de la suppression de « %name » :\n\t%error
-Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	libtracker		Êtes-vous sûr de vouloir supprimer les éléments sélectionnés ? Cette opération ne peut pas être annulée.
-The target disk does not support creating links.	libtracker		Le disque cible ne supporte pas la création de liens.
-The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	libtracker		L'élément sélectionné ne peut pas être déplacé dans la Poubelle. Voulez-vous le supprimer définitivement ? (Cette opération ne peut pas être annulée.)
-before	libtracker		avant
-Disks	libtracker		Disques
-Cut	libtracker		Couper
-The Tracker must be running to see Info windows.	libtracker		Pour voir les fenêtre d'informations, le Tracker doit être lancé.
-Desktop	libtracker		Bureau
-Create a Query	libtracker		Créer une requête
-Could not update permissions of file \"%name\". %error	libtracker		Impossible de mettre à jour les permissions du fichier « %name ». %error
-Error in regular expression:\n\n'	libtracker		Erreur dans une expression régulière : \n\n'
-If you %action the mime settings, Haiku may not behave properly! Are you sure you want to do this? To %action the mime settings anyway, click \"Do it\".	libtracker		Êtes vous sûr de vouloir %action le type mime ? Haiku pourrait ne pas se comporter correctement.
-Resize to Fit	libtracker		Retailler et ajuster
-Add printer…	libtracker		Ajouter une imprimante…
-Trash	libtracker		Poubelle
-greater than	libtracker		plus grand que
-Other	libtracker		Autre
-GiB	libtracker		GiO
-Query name:	libtracker		Nom de la requête :
-Or	libtracker		Ou
-Do it	libtracker		Le faire
-Emptying Trash… 	libtracker		Vidage de la corbeille...
-Sorry, you cannot edit that attribute.	libtracker		Désolé, vous ne pouvez pas éditer cet attribut
-Deleting: 	libtracker		Supprime :
-The file \"%name\" already exists in the specified folder. Do you want to replace it?	libtracker		Le fichier « %name » existe déjà dans le répertoire spécifié. Voulez-vous le remplacer ?
-Revert	libtracker		Défaire
-Could not open \"%document\" with application \"%app\" (%error). 	libtracker		Impossible d'ouvrir « %document » avec l'application « %app » (%error).
-Version	libtracker		Version
-Invert	libtracker		Inverser
-by attribute	libtracker		par attribut
-Attributes	libtracker		Attributs
-Replace all	libtracker		Tout remplacer
-Owner	libtracker		Propriétaire
-12 hour	libtracker		12 heures
-Select all	libtracker		Tout sélectionner
-Delete	libtracker		Supprimer
-ends with	libtracker		se termine par
-If you %action the config folder, Haiku may not behave properly! Are you sure you want to do this? To %action the config folder anyway, click \"Do it\".	libtracker		Si vous %action le répertoire config, Haiku pourrait ne plus fonctionner correctement. Êtes-vous sûr de vouloir faire ceci ? Pour %action le répertoire config malgré tout, cliquez sur « Le faire ».
-Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	libtracker		Erreur lors de la copie du répertoire « %name » :\n\t%error\n\nVoulez-vous continuer ?
-OK	libtracker		OK
-Make active printer	libtracker		Activer l'imprimante
-New	libtracker		Nouveau
-Paused: click to resume or stop	libtracker		Mis en pause : cliquez pour reprendre ou arrêter
-Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	libtracker		Impossible d'ouvrir « %document » avec l'application « %app » (Bibliothèques manquantes : %library).\n
-MiB	libtracker		MiO
-Include trash	libtracker		Inclure la corbeille
-Could not find an application to open \"%name\" (%error). 	libtracker		Impossible de trouver une application pour ouvrir « %name » (%error).
-Could not open \"%document\" (Missing libraries: %library). \n	libtracker		Impossible d'ouvrir « %document » (Bibliothèques manquantes : %library).\n
-Temporary	libtracker		Temporaire
-If you %action the home folder, Haiku may not behave properly! Are you sure you want to do this? To %action the home anyway, click \"Do it\".	libtracker		Êtes vous sûr de vouloir %action le répertoire « home » ? Haiku pourrait ne pas se comporter correctement.
-40 x 40	libtracker		40 x 40
-Previously mounted disks	libtracker		Disques précédemment montés
-Create link here	libtracker		Créer un lien ici
-Unmount	libtracker		Démonter
-Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	libtracker		Impossible d'ouvrir « %document » avec l'application « %app » (Symbol manquant : %symbol).\n
-less than	libtracker		moins que
-Edit query	libtracker		Modifier la requête
-Original name	libtracker		Nom original
-Preparing to delete items…	libtracker		Préparation de la suppression…
-Created:	libtracker		Créé :
-Location:	libtracker		Emplacement :
-New Query	libtracker		Nouvelle requête
-Write	libtracker		Ecrire
-Sorry, you can't copy items to the Trash.	libtracker		Désolé, vous ne pouvez pas copier des objets dans la corbeille.
-Windows	libtracker		Fenêtres
-Execute	libtracker		Exécuter
-Created	libtracker		Créé
-label too long	libtracker		étiquette trop longue
-Link \"%name\" to:	libtracker	File dialog title for new sym link	Lien « %name » vers :
-Query template	libtracker		Modèle de requête
-Description:	libtracker		Description :
-Save	libtracker		Enregistrer
-Month-day-year	libtracker		Mois-jour-année
-link	libtracker	filename link	lien
-Open	libtracker		Ouvrir
-contains	libtracker		contient
-Date & Time	libtracker		Date et Heure
-Modified:	libtracker		Modifié :
-24 hour	libtracker		24 heures
-Move	libtracker		Déplacer
-Ignore case	libtracker		Insensible à la casse
-None	libtracker		Aucun
-moving	libtracker		déplace
-Version:	libtracker		Version :
-Move here	libtracker		Déplacer ici
-after	libtracker		après
-Size	libtracker		Taille
-Search	libtracker		Rechercher
-Recalculate folder size	libtracker		Recalculer la taille du répertoire
-Favorites	libtracker		Favoris
-Edit templates…	libtracker		Éditer les modèles…
-Add	libtracker		Ajouter
-Settings…	libtracker		Réglages…
-Sorry, could not create a new folder.	libtracker		Désolé, impossible de créer un nouveau répertoire.
-Current folder	libtracker		Répertoire courant
-New folder %ld	libtracker		Nouveau dossier %ld
-Cannot unmount the boot volume \"%name\".	libtracker		Impossible de démonter le volume d'amorçage « %name ».
-Copy here	libtracker		Copier ici
-%Ld bytes	libtracker		%Ld octets
-Location	libtracker		Emplacement
-Error moving \"%name\".	libtracker		Erreur lors du déplacement de \"%name\"
-Show volumes on Desktop	libtracker		Montrer les volumes sur le bureau
-Name = %name	libtracker	FindResultTitle	Nom = %name
-Window	libtracker		Fenêtre
-There was a problem trying to replace \"%name\". The item might be open or busy.	libtracker		Un problème est survenu lors du remplacement de « %name ». L'élément est peut-être ouvert ou occupé.
-New folder%ld	libtracker		Nouveau dossier %ld
-Year-month-day	libtracker		Année-mois-jour
-New folder	libtracker		Nouveau dossier
-File	libtracker		Fichier
-Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	libtracker		Erreur lors de la copie du fichier « %name » :\n\t%error\n\nVoulez-vous continuer ?
-Close all	libtracker		Tout fermer
-(Finish: %time)	libtracker		(Fin à : %time)
-Clock	libtracker		Horloge
-Mount settings…	libtracker		Paramètres de montage…
-is not	libtracker		n'est pas
-Remove	libtracker		Enlever
-no items	libtracker		pas d'objets
-copying	libtracker		copie
-Preferences…	libtracker		Préférences…
-All disks	libtracker		Tous les disques
-Searching for disks to mount…	libtracker		Recherche des disques à monter…
-Tracker status	libtracker		État du Tracker
-Identify	libtracker		Identifier
-Automatic disk mounting	libtracker		Montage automatique des disques
-Add-ons	libtracker		Extensions
-Select…	libtracker		Selectionner…
-Could not open \"%name\". The file is mistakenly marked as executable. 	libtracker		Impossible d'ouvrir « %name ». Le fichier est marqué par erreur comme étant exécutable.
-Single window navigation	libtracker		Navigation dans une fenêtre unique
-Done	libtracker		Terminé
-Open selection with:	libtracker		Ouvrir la sélection avec :
-Paste	libtracker		Coller
-32 x 32	libtracker		32 x 32
-You must drop items on one of the disk icons in the \"Disks\" window.	libtracker		Vous devez déposer les éléments sur l'une des icônes de disques dans la fenêtre « Disques ».
-Move to	libtracker		Déplacer vers
-by name	libtracker		par nom
-Add current folder	libtracker		Ajouter le dossier courant
-%Ld B	libtracker		%Ld o
-Kind	libtracker		Type
-Move to Trash	libtracker		Déplacer vers la corbeille
-1 item	libtracker		1 objet
-Size:	libtracker		Taille :
-by formula	libtracker		par formule
-(%bytes bytes)	libtracker		(%bytes octets)
-And	libtracker		Et
-copy	libtracker	filename copy	copier
-Edit favorites…	libtracker		Édit les favoris…
-If you %action the settings folder, Haiku may not behave properly! Are you sure you want to do this? To %action the settings folder anyway, click \"Do it\".	libtracker		Êtes vous sûr de vouloir %action le dossier settings, Haiku pourrait ne plus fonctionner correctement. Pour %action le dossier settings malgré tout, cliquez sur « Le faire ».
-On	libtracker		Sur
-Space	libtracker		Espace
-Find	libtracker		Trouver
-Day-month-year	libtracker		Jour-mois-année
-If you %action the system folder or its contents, you won't be able to boot Haiku! Are you sure you want to do this? To %action the system folder or its contents anyway, hold down the Shift key and click \"Do it\".	libtracker		Êtes vous sûr de vouloir %action le dossier « system » ? Vous ne pourrez plus démarrer Haiku ! Pour %action malgré tout le dossier « system » ou son contenu, cliquez sur « Le faire » en maintenant la touche Shift appuyée.
-Replace	libtracker		Remplacer
-Restore	libtracker		Restaurer
-Save Query as template…	libtracker		Sauvegarder la Requête comme modèle…
-KiB	libtracker		KiO
-Mount	libtracker		Monter
-Copy	libtracker		Copier
-Could not open \"%document\" because application \"%app\" is in the Trash. 	libtracker		Impossible d'ouvrir « %document » parce que l'application « %app » est dans la corbeille.
-Defaults	libtracker		Défauts
-%capacity (%used used -- %free free)	libtracker		%capacity (%used utilisés -- %free libres)
+1	french	x-vnd.Haiku-libtracker	2699415616
+%BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
+%Ld B	WidgetAttributeText		%Ld o
+%Ld bytes	WidgetAttributeText		%Ld octets
+%capacity (%used used -- %free free)	InfoWindow		%capacity (%used utilisés -- %free libres)
+%name info	InfoWindow	InfoWindow Title	Informations sur %name
+%num items	CountView		%num éléments
+(%SizeProcessed of %TotalSize, %BytesPerSecond/s)	StatusWindow		(%SizeProcessed sur %TotalSize, %BytesPerSecond/s)
+(%bytes bytes)	InfoWindow		(%bytes octets)
+(Finish: %time - %finishtime minutes left)	StatusWindow		(Fin : %time - il reste %finishtime minutes)
+(Finish: %time - %finishtime seconds left)	StatusWindow		(Fin : %time - Il reste %finishtime secondes)
+(Finish: %time - Over %finishtime days left)	StatusWindow		(Fin : %time - il reste plus de %finishtime jours)
+(Finish: %time - Over %finishtime hours left)	StatusWindow		(Fin : %time - Il reste plus de %finishtime heures)
+(Finish: %time)	StatusWindow		(Fin : %time)
+1 item	CountView		1 élément
+32 x 32	ContainerWindow		32 x 32
+32 x 32	DeskWindow		32 x 32
+40 x 40	ContainerWindow		40 x 40
+40 x 40	DeskWindow		40 x 40
+48 x 48	ContainerWindow		48 x 48
+48 x 48	DeskWindow		48 x 48
+64 x 64	ContainerWindow		64 x 64
+64 x 64	DeskWindow		64 x 64
+<No recent items>	FavoritesMenu		<Pas d'éléments récents>
+Add	FindPanel		Ajouter
+Add current folder	FilePanelPriv		Ajouter le dossier courant
+Add printer…	ContainerWindow		Ajouter une imprimante…
+Add-ons	ContainerWindow		Extensions
+Add-ons	DeskWindow		Extensions
+Add-ons	FilePanelPriv		Extensions
+Add-ons	VolumeWindow		Extensions
+All BeOS disks	AutoMounterSettings		Tous les disques BeOS
+All disks	AutoMounterSettings		Tout les disques
+All disks	FindPanel		Tous les disques
+All files and folders	FindPanel		Tout les fichiers et dossiers
+An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Un élément nommé « %name » existe déjà dans ce dossier, et peut contenir\ndes éléments de même noms. Voulez vous les remplacer par ceux contenu dans le dossier que vous êtes en train de %verb ?
+An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Un élément nommé « %name » existe déjà dans ce dossier. Voulez vous le remplacer par le lien symbolique que vous créez ?
+And	FindPanel		Et
+Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		êtes vous sûr de vouloir supprimer l(es) élément(s) sélectionné(s) ? Cette opération ne peut pas être rétablie.
+Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Êtes-vous sûr de vouloir déplacer ou copier l(es) élément(s) sélectionné(s) dans ce dossier ?
+Ask before delete	SettingsView		Demander avant de supprimer
+At %func \nfind_directory() failed. \nReason: %error	TrackerInitialState		Dans %func\nfind_directory() a échoué.\nMotif : %error
+Attributes	ContainerWindow		Attributs
+Automatic disk mounting	AutoMounterSettings		Montage automatique des disques
+Cancel	ContainerWindow		Annuler
+Cancel	FSClipBoard		Annuler
+Cancel	FSUtils		Annuler
+Cancel	FilePanelPriv		Annuler
+Cancel	OpenWithWindow		Annuler
+Cancel	PoseView		Annuler
+Cancel	Tracker		Annuler
+Cancel	WidgetAttributeText		Annuler
+Cannot unmount the boot volume \"%name\".	FSUtils		Impossible de démonter le volume de démarrage « %name ».
+Capacity:	InfoWindow		Capacité :
+Clean up	ContainerWindow		Nettoyer
+Clean up	DeskWindow		Nettoyer
+Clean up	VolumeWindow		Nettoyer
+Clean up all	ContainerWindow		Nettoyer tout
+Close	ContainerWindow		Fermer
+Close	QueryContainerWindow		Fermer
+Close	VolumeWindow		Fermer
+Close all	ContainerWindow		Fermer tout
+Close all in workspace	ContainerWindow		Fermer tout dans l'espace de travail
+Copy	ContainerWindow		Copier
+Copy	FilePanelPriv		Copier
+Copy here	ContainerWindow		Copier ici
+Copy layout	ContainerWindow		Copier la disposition
+Copy more	ContainerWindow		Copier plus
+Copy to	ContainerWindow		Copier vers
+Copying: 	StatusWindow		Copie :
+Could not find an application to open \"%name\" (%error). 	FSUtils		Impossible de trouver une application pour ouvrir « %name » (%error).
+Could not find application \"%appname\"	OpenWithWindow		Impossible de trouver l'application « %appname »
+Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		Impossible d'ouvrir « %document » (Il manque la bibliothèque : %library).\n
+
+Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Impossible d'ouvrir « %document » (Il manque le symbole : %symbol).\n
+Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Impossible d'ouvrir « %document », car l'application « %app » est dans la Corbeille.
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Impossible d'ouvrir « %document » avec l'application « %app » (%error).\n
+Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Impossible d'ouvrir « %document » avec l'application « %app » (Il manque la bibliothèque : %library).\n
+Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Impossible d'ouvrir « %document » avec l'application « %app » (Il manque le symbole : %symbol).\n
+Could not open \"%name\" (%error). 	FSUtils		Impossible d'ouvrir « %name » (%error).
+Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Impossible d'ouvrir « %name ». Le fichier est marqué exécutable par erreur.
+Could not update permissions of file \"%name\". %error	FSUtils		Impossible de modifier les permissions du fichier « %name ». %error
+Create a Query	FindPanel		Créer une requête
+Create a Query template	FindPanel		Créer un modèle de requête
+Create link	ContainerWindow		Créer un lien
+Create link here	ContainerWindow		Créer un lien ici
+Create relative link	ContainerWindow		Créer un lien relatif
+Create relative link here	ContainerWindow		Créer un lien relatif ici
+Created	ContainerWindow		Créé
+Created:	InfoWindow		Créé :
+Creating links: 	StatusWindow		Création des liens :
+Current folder	ContainerWindow		Dossier courant
+Cut	ContainerWindow		Couper
+Cut	FilePanelPriv		Couper
+Cut more	ContainerWindow		Couper plus
+Decrease size	ContainerWindow		Diminuer la taille
+Decrease size	DeskWindow		Diminuer la taille
+Default application	InfoWindow		Application par défaut 
+Defaults	TrackerSettingsWindow		Par défaut
+Delete	ContainerWindow		Supprimer
+Delete	FSUtils		Supprimer
+Delete	FilePanelPriv		Supprimer
+Delete	PoseView		Supprimer
+Deleting: 	StatusWindow		Suppression :
+Description:	InfoWindow		Description :
+Desktop	Model		Bureau
+Desktop	TrackerSettingsWindow		Bureau
+Disk mount settings	AutoMounterSettings		Réglages des montages de disques
+Disk mounting during boot	AutoMounterSettings		Montage des disques au démarrage
+Disks	DirMenu		Disques
+Disks	Model		Disques
+Do it	FSUtils		Le faire
+Don't automount	AutoMounterSettings		Ne pas monter automatiquement
+Don't move files to Trash	SettingsView		Ne pas envoyer les fichiers vers la corbeille
+Done	AutoMounterSettings		Fait
+Duplicate	ContainerWindow		Dupliquer
+Edit Query template	FindPanel		Modifier le modèle de requête
+Edit favorites…	FilePanelPriv		Éditer les favoris…
+Edit name	ContainerWindow		Éditer le nom
+Edit name	FilePanelPriv		Éditer le nom
+Edit name	InfoWindow		Éditer le nom
+Edit name	VolumeWindow		Éditer le nom
+Edit query	ContainerWindow		Éditer la requète
+Edit templates…	TemplatesMenu		Éditer les modèles…
+Eject when unmounting	AutoMounterSettings		Éjecter en démontant
+Empty Trash	ContainerWindow		Vider la Corbeille
+Empty Trash	InfoWindow		Vider la corbeille
+Empty folder	NavMenu		Dossier vide
+Empty folder	SlowContextPopup		Dossier vide
+Emptying Trash… 	StatusWindow		Vidage de la Corbeille…
+Enable type-ahead filtering	SettingsView		Activer le filtrage au court de la saisie
+Error %error loading Add-On %name.	ContainerWindow		Erreur %error au chargement de l'extension %name.
+Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Erreur à la copie du fichier « %name » :\n\t%error\n\nVoulez-vous continuer ?
+Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Erreur à la copie du dossier « %name »:\n\t%error\n\nVoulez-vous continuer ?
+Error creating link to \"%name\".	FSUtils		Erreur à la création du lien vers « %name ».
+Error in regular expression:\n\n'%errstring'	PoseView		Erreur dans l'expression régulière :\n\n'%errstring'
+Error moving \"%name\"	FSUtils		Erreur lors du déplacement de « %name »
+Error moving \"%name\" to Trash. (%error)	FSUtils		Erreur en envoyant « %name » à la Corbeille. (%error)
+Error moving \"%name\".	FSUtils		Erreur au déplacement de « %name ».
+Execute	FilePermissionsView		Exécuter
+Favorites	FavoritesMenu		Favoris
+Favorites	FilePanelPriv		Favoris
+File	ContainerWindow		Fichier
+File	FilePanelPriv		Fichier
+Files cannot be moved or deleted from a read-only volume.	PoseView		Les fichiers d'un volume en lecture-seule ne peuvent être ni déplacés, ni supprimés.
+Find	FSUtils		Rechercher
+Find	FindPanel		Rechercher
+Find…	ContainerWindow		Rechercher…
+Find…	VolumeWindow		Rechercher…
+Force identify	ContainerWindow		Forcer l'identification
+Formula %formula	FindPanel	FindResultTitle	Formule %formula
+Free space color	SettingsView		Couleur de l'espace libre
+GiB	WidgetAttributeText		Gio
+Go to parent	FilePanelPriv		Aller vers le parent
+Group	FilePermissionsView		Groupe
+Handles any %type	OpenWithWindow		Traite n'importe quel %type
+Handles any file	OpenWithWindow		Gérer n'importe quel fichier
+Icon view	ContainerWindow		Vue en icônes
+Icon view	DeskWindow		Vue en icônes
+Icon view	VolumeWindow		Vue en icônes
+Identify	ContainerWindow		Identifier
+Identify	InfoWindow		Identifier
+If you %action the config folder, Haiku may not behave properly! Are you sure you want to do this? To %action the config folder anyway, click \"Do it\".	FSUtils		Êtes vous sûr de vouloir %action le dossier de configuration, Haiku pourrait ne plus fonctionner correctement. Pour %action le dossier de configuration malgré tout, cliquez sur « Le faire ».
+If you %action the home folder, Haiku may not behave properly! Are you sure you want to do this? To %action the home anyway, click \"Do it\".	FSUtils		Êtes vous sûr de vouloir %action votre dossier personnel ? Haiku pourrait ne plus fonctionner correctement. Pour %action votre dossier personnel malgré tout, cliquez sur « Le faire ».
+If you %action the mime settings, Haiku may not behave properly! Are you sure you want to do this? To %action the mime settings anyway, click \"Do it\".	FSUtils		Êtes vous sûr de vouloir %action les réglages MIME, Haiku pourrait ne plus fonctionner correctement. Pour %action les réglages MIME malgré tout, cliquez sur « Le faire ».
+If you %action the settings folder, Haiku may not behave properly! Are you sure you want to do this? To %action the settings folder anyway, click \"Do it\".	FSUtils		Êtes vous sûr de vouloir %action le dossier des réglages, Haiku pourrait ne plus fonctionner correctement. Pour %action le dossier des réglages malgré tout, cliquez sur « Le faire ».
+If you %action the system folder or its contents, you won't be able to boot Haiku! Are you sure you want to do this? To %action the system folder or its contents anyway, hold down the Shift key and click \"Do it\".	FSUtils		Êtes vous sûr de vouloir %action le dossier système ou son contenu ? Haiku pourrait ne plus démarrer. Pour %action le dossier système ou son contenu malgré tout, maintenez la touche <MAJ> enfoncée et cliquez sur « Le faire ».
+Ignore case	SelectionWindow		Ignorer la casse
+Include trash	FindPanel		Inclure la corbeille
+Increase size	ContainerWindow		Augmenter la taille
+Increase size	DeskWindow		Augmenter la taille
+Invert selection	ContainerWindow		Inverser la sélection
+Invert selection	QueryContainerWindow		Inverser la sélection
+Invert selection	VolumeWindow		Inverser la sélection
+KiB	WidgetAttributeText		Kio
+Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Lier « %name » à :
+Link to:	InfoWindow		Lier à :
+List folders first	SettingsView		Lister les dossiers en premier
+List view	ContainerWindow		Vue en liste
+List view	VolumeWindow		Vue en liste
+Location	ContainerWindow		Emplacement
+Location	OpenWithWindow		Emplacement
+Location	QueryPoseView		Emplacement
+Location:	InfoWindow		Emplacement :
+Make active printer	ContainerWindow		Rendre l'imprimante active
+MiB	WidgetAttributeText		Mio
+Mini icon view	ContainerWindow		Vue en petites icônes
+Mini icon view	DeskWindow		Vue en petites icônes
+Mini icon view	VolumeWindow		Vue en petites icônes
+Modified	ContainerWindow		Modifié
+Modified	FindPanel		Modifié
+Modified	PoseView		Modifié
+Modified	QueryPoseView		Modifié
+Modified:	InfoWindow		Modifié :
+Mount	ContainerWindow		Monter
+Mount	DeskWindow		Monter
+Mount	VolumeWindow		Monter
+Mount all	MountMenu		Monter tout
+Mount all disks now	AutoMounterSettings		Monter tous les disques maintenant
+Mount server error	AutoMounterSettings		Erreur du serveur de montage
+Mount settings…	SettingsView		Réglages du montage…
+Mount settings…	VolumeWindow		Réglages du montage…
+Move	PoseView		Déplacer
+Move here	ContainerWindow		Déplacer ici
+Move to	ContainerWindow		Déplacer vers
+Move to Trash	ContainerWindow		Envoyer à la Corbeille
+Move to Trash	FSUtils		Envoyer à la corbeille
+Move to Trash	FilePanelPriv		Envoyer à la corbeille
+Moving: 	StatusWindow		Déplacement :
+Name	ContainerWindow		Nom
+Name	FindPanel		Nom
+Name	OpenWithWindow		Nom
+Name	PoseView		Nom
+Name	QueryPoseView		Nom
+Name	SelectionWindow		Nom
+Name = %name	FindPanel	FindResultTitle	Nom = %name
+Name matches wildcard expression:###	SelectionWindow		Nom correspondant à l'expression générique : ###
+New	ContainerWindow		Nouveau
+New	DeskWindow		Nouveau
+New Query	FindPanel		Nouvelle Requête
+New folder	ContainerWindow		Nouveau dossier
+New folder	FSUtils		Nouveau dossier
+New folder	FilePanelPriv		Nouveau dossier
+New folder	TemplatesMenu		Nouveau dossier
+New folder %ld	FSUtils		Nouveau dossier %ld
+New folder%ld	FSUtils		Nouveau dossier%ld
+OK	AutoMounterSettings		OK
+OK	FSUtils		OK
+OK	InfoWindow		OK
+OK	OpenWithWindow		OK
+OK	PoseView		OK
+OK	TrackerInitialState		OK
+OK	WidgetAttributeText		OK
+On	FindPanel		Sur
+Only the boot disk	AutoMounterSettings		Seulement le disque de démarrage
+Open	ContainerWindow		Ouvrir
+Open	FilePanelPriv		Ouvrir
+Open	InfoWindow		Ouvrir
+Open	OpenWithWindow		Ouvrir
+Open	VolumeWindow		Ouvrir
+Open %name with:	OpenWithWindow		Ouvrir %name avec :
+Open and make preferred	OpenWithWindow		Ouvrir et en faire la préférence
+Open parent	ContainerWindow		Ouvrir le parent
+Open selection with:	OpenWithWindow		Ouvrir la sélection avec :
+Open with…	ContainerWindow		Ouvrir avec…
+Opens with:	InfoWindow		Ouvrir avec :
+Or	FindPanel		Ou
+Original name	ContainerWindow		Nom d'origine
+Other	FilePermissionsView		Autre
+Outline selection rectangle only	SettingsView		Uniquement les contours du rectangle de sélection
+Owner	FilePermissionsView		Propriétaire
+Paste	ContainerWindow		Coller
+Paste	FilePanelPriv		Coller
+Paste layout	ContainerWindow		Coller la disposition
+Paste links	ContainerWindow		Coller les liens
+Paused: click to resume or stop	StatusWindow		En pause : cliquez pour reprendre ou arrêter
+Permissions	ContainerWindow		Permissions
+Permissions	InfoWindow		Permissions
+Preferences…	ContainerWindow		Préférences…
+Preparing to delete items…	StatusWindow		Préparation de la suppression des éléments…
+Preparing to empty Trash…	StatusWindow		Préparation au vidage de la Corbeille…
+Preparing to move items…	StatusWindow		Préparation au déplacement des éléments…
+Previously mounted disks	AutoMounterSettings		Les disques montés précédemment
+Proceed	FSUtils		Procéder
+Prompt	FSUtils		Invite
+Query name:	FindPanel		Nom de la requête :
+Query template	FindPanel		Modèle de requête
+Read	FilePermissionsView		Lire
+Recalculate folder size	InfoWindow		Recalculer la taille du dossier
+Recent documents	FavoritesMenu		Documents récents
+Recent folders	ContainerWindow		Dossiers récents
+Recent folders	FavoritesMenu		Dossiers récents
+Remove	FindPanel		Supprimer
+Replace	FSUtils		Remplacer
+Replace	FilePanelPriv		Remplacer
+Replace all	FSUtils		Remplacer tout
+Resize to fit	ContainerWindow		Ajuster
+Resize to fit	QueryContainerWindow		Ajuster
+Resize to fit	VolumeWindow		Ajuster
+Restore	ContainerWindow		Restaurer
+Restoring: 	StatusWindow		Restauration :
+Revert	TrackerSettingsWindow		Rétablir
+Save	FilePanelPriv		Sauvegarder
+Save	FindPanel		Sauvegarder
+Save Query as template…	FindPanel		Enregistrer le modèle de la requête…
+Save as Query template:	FindPanel		Enregistrer le modèle de requête :
+Search	FindPanel		Chercher
+Searching for disks to mount…	StatusWindow		Recherche des disques à monter…
+Select	InfoWindow		Sélectionner
+Select	SelectionWindow		Sélectionner
+Select all	ContainerWindow		Sélectionner tout
+Select all	DeskWindow		Sélectionner tout
+Select all	FilePanelPriv		Sélectionner tout
+Select all	QueryContainerWindow		Sélectionner tout
+Select all	VolumeWindow		Sélectionner tout
+Select…	ContainerWindow		Sélectionner…
+Select…	DeskWindow		Sélectionner…
+Select…	FilePanelPriv		Sélectionner…
+Select…	QueryContainerWindow		Sélectionner…
+Select…	VolumeWindow		Sélectionner…
+Set new link target	InfoWindow		Définir la nouvelle cible du lien
+Settings…	MountMenu		Réglages…
+Show Disks icon	SettingsView		Afficher l'icône des disques
+Show folder location in title tab	SettingsView		Afficher l'emplacement du dossier dans la barre de titre
+Show navigator	SettingsView		Afficher le navigateur
+Show shared volumes on Desktop	SettingsView		Afficher les volumes partagés sur le Bureau
+Show space bars on volumes	SettingsView		Afficher la jauge d'espace sur les volumes
+Show volumes on Desktop	SettingsView		Afficher les volumes sur le bureau
+Single window navigation	SettingsView		Naviguer dans une fenêtre unique
+Size	ContainerWindow		Taille
+Size	FindPanel		Taille
+Size	PoseView		Taille
+Size	QueryPoseView		Taille
+Size:	InfoWindow		Taille :
+Skip	FSUtils		Passer
+Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Plusieurs éléments de ce dossier portent les mêmes noms que des éléments que vous êtes en train de %verb.\n\nVoulez-vous les remplacer par ceux que vous êtes en train de %verb ou voulez-vous qu'une confirmation vous soit demandée pour chacun d'eux ?
+Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Certains des éléments sélectionnés ne peuvent pas être envoyés à la Corbeille. Voulez vous les supprimer ? (Cette opération ne peut pas être rétablie.)
+Sorry, could not create a new folder.	FSUtils		Désolé, impossible de créer un nouveau dossier.
+Sorry, saving more than one item is not allowed.	FilePanelPriv		Désolé, Il n'est pas permis de sauvegarder plus d'un élément.
+Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Désolé, un attribut “Caractère” ne peut pas contenir un glyphe multi-octet.
+Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Désolé, Il n'y a pas assez d'espace libre dans le volume cible pour copier la sélection.
+Sorry, you can't copy items to the Trash.	FSClipBoard		Désolé, vous ne pouvez pas copier des éléments dans la Corbeille.
+Sorry, you can't copy items to the Trash.	PoseView		Désolé, vous ne pouvez pas copier des éléments dans la Corbeille.
+Sorry, you can't create links in the Trash.	PoseView		Désolé, vous ne pouvez pas créer des liens dans la Corbeille.
+Sorry, you can't save things at the root of your system.	FilePanelPriv		Désolé, vous ne pouvez rien sauvegarder à la racine de votre système.
+Sorry, you cannot edit that attribute.	WidgetAttributeText		Désolé, vous ne pouvez pas modifier cet attribut.
+Temporary	FindPanel		Temporaire
+That name is already taken. Please type another one.	InfoWindow		Ce nom est déjà utilisé. Veuillez en saisir un autre.
+That name is already taken. Please type another one.	WidgetAttributeText		Ce nom est déjà utilisé. Veuillez en saisir un autre.
+That name is too long. Please type another one.	InfoWindow		Ce nom est trop long. Veuillez en saisir un autre.
+The Tracker must be running to see Info windows.	PoseView		Le Tracker doit être en fonction pour voir les fenêtres d'informations.
+The Tracker must be running to see set the default printer.	PoseView		Le Tracker doit être lancé pour voir changer l'imprimante par défaut.
+The application \"%appname\" does not support the type of document you are about to open. Are you sure you want to proceed? If you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		L'application « %appname » ne supporte pas le type de document que vous êtes sur le point d'ouvrir. Êtes vous sûr de vouloir continuer ? Si vous savez que l'application prend en charge ce type de document, vous devriez contacter son éditeur pour lui demander de mettre à jour l'application afin d'ajouter le type de votre document à la liste de ceux pris en charge.
+The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Le fichier « %name » existe déjà dans le dossier indiqué. Voulez-vous le remplacer ?
+The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		L'élément sélectionné ne peut pas être envoyé à la Corbeille. Voulez vous le supprimer ? (Cette opération ne peut pas être rétablie.)
+The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Le nom indiqué est déjà utilisé comme nom de dossier. Veuillez en choisir un autre.
+The specified name is illegal. Please choose another name.	FilePanelPriv		Le nom indiqué n'est pas valide. Veuillez choisir un autre nom.
+The target disk does not support creating links.	FSUtils		Le disque cible ne supporte pas la création de liens.
+There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Un problème est survenu en essayant de remplacer « %name ». L'élément est peut-être ouvert ou occupé.
+There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Un problème est survenu lors de l'enregistrement dans le dossier que vous vous avez indiqué. Veuillez en essayer un autre.
+There was an error deleting \"%name\":\n\t%error	FSUtils		Il y a eu une erreur à la suppression de « %name » :\n\t%error
+There was an error resolving the link.	Tracker		Une erreur est survenue lors de la résolution du lien.
+There was an error writing the attribute.	WidgetAttributeText		Il y a eu une erreur à l'écriture de l'attribut.
+TiB	WidgetAttributeText		Tio
+To: %dir	StatusWindow		Vers : %dir
+Tracker preferences	TrackerSettingsWindow		Préférences du Tracker
+Tracker status	StatusWindow		État du Tracker
+Trash	Model		Corbeille
+Trash	TrackerSettingsWindow		Corbeille
+Unknown	FilePermissionsView		Inconnu
+Unknown	WidgetAttributeText		Inconnu
+Unmount	ContainerWindow		Démonter
+Unmount	InfoWindow		Démonter
+Unmount	VolumeWindow		Démonter
+Untitled clipping	PoseView		Extrait sans titre
+Used space color	SettingsView		Couleur de l'espace utilisé
+Version	OpenWithWindow		Version
+Version:	InfoWindow		Version :
+Volume icons	TrackerSettingsWindow		Icônes des volumes
+Warning space color	SettingsView		Couleur d'espace faible
+Window	ContainerWindow		Fenêtre
+Window	FilePanelPriv		Fenêtre
+Windows	TrackerSettingsWindow		Fenêtres
+Would you like to find a suitable application to open the file?	FSUtils		Souhaitez-vous rechercher une application appropriée pour ouvrir le fichier ?
+Would you like to find some other suitable application?	FSUtils		Souhaitez-vous rechercher une autre application appropriée ?
+Write	FilePermissionsView		Écrire
+You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		Vous essayez de remplacer l’élément :\n\t%name%dest\npar :\n\t%name%src\n\nVoulez vous le remplacer par %movemode ?	
+
+You can't move a folder into itself or any of its own sub-folders.	FSUtils		Vous ne pouvez pas déplacer un dossier dans lui-même ou dans un de ses sous-dossier.
+You can't move or copy items to read-only volumes.	FSUtils		Vous ne pouvez pas déplacer ou copiez des éléments dans un volume en lecture-seule.
+You can't move or copy the trash.	FSUtils		Vous ne pouvez ni déplacer, ni copier la Corbeille.
+You can't replace a folder with one of its sub-folders.	FSUtils		Vous ne pouvez pas remplacer un dossier par l'un de ses sous-dossiers.
+You cannot copy or move the root directory.	FSUtils		Vous ne pouvez ni copier, ni déplacer le répertoire racine.
+You cannot create a link to the root directory.	FSUtils		Vous ne pouvez pas créer un lien vers le répertoire racine.
+You cannot replace a file with a folder or a symbolic link.	FSUtils		Vous ne pouvez pas remplacer un fichier par un dossier ou un lien symbolique.
+You cannot replace a folder or a symbolic link with a file.	FSUtils		Vous ne pouvez pas remplacer un dossier ou un lien symbolique par un fichier.
+You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Vous devez déplacer des éléments sur une des icônes de disques de la fenêtre « Disques ».
+You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Vous devez déplacer des éléments sur une des icônes de disques de la fenêtre « Disques ».
+You must have at least one attribute showing.	PoseView		Vous devez avoir au moins un attribut visible.
+\nShould this be fixed?	FSUtils		\nFaut-il le corriger ?
+\n\t(%Ld bytes, 	FSUtils		\n\t(%Ld octets,
+after	FindPanel		après
+before	FindPanel		avant
+by attribute	FindPanel		par attribut
+by formula	FindPanel		par formule
+by name	FindPanel		par nom
+calculating…	InfoWindow		calcul…
+contains	FindPanel		contient
+contains	SelectionWindow		contient
+copy	FSUtils	filename copy	copier
+copying	FSUtils		copier
+ends with	FindPanel		fini par
+ends with	SelectionWindow		fini par
+for %num files	InfoWindow		pour %num fichiers
+greater than	FindPanel		supérieur à
+is	FindPanel		est
+is not	FindPanel		n'est pas
+label too long	PoseView		label trop long
+less than	FindPanel		inférieur à
+link	FSUtils	filename link	lien
+matches regular expression	SelectionWindow		correspond à l'expression régulière
+matches wildcard expression	SelectionWindow		correspond à l'expression générique
+move	FSUtils		déplacer
+moving	FSUtils		déplacement
+multiple disks	FindPanel		disques multiples
+no items	CountView		aucun élément
+of %items	StatusWindow		de %items
+parent folder	NavMenu		dossier parent
+rename	InfoWindow		renomer
+rename	TextWidget		renomer
+save text	FilePanelPriv		Sauvegarder le texte
+starts with	FindPanel		commence par
+starts with	SelectionWindow		commence par

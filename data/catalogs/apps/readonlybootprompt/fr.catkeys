@@ -1,7 +1,7 @@
 1	french	x-vnd.Haiku-ReadOnlyBootPrompt	2165068388
 Desktop (Live-CD)	BootPromptWindow		Bureau (CD Live)
-Language	BootPromptWindow		Langue
-Welcome to Haiku!	BootPromptWindow		Bienvenue dans Haiku!
-Run Installer	BootPromptWindow		Lancer l'Installeur
-Do you wish to run the Installer or continue booting to the Desktop? You can also select your preferred language and keyboard layout from the list below.\n\nNote: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.	BootPromptWindow		Voulez-vous lancer l'Installeur ou continuer le démarrage jusqu'au bureau ? Vous pouvez également choisir votre langage et votre disposition clavier préférées dans la liste ci-dessous.\n\nNote : La traduction des applications et des autres parties de Haiku n'est pas terminée. Vous trouverez souvent des phrases non traduites, mais si ça vous intéresse, vous pouvez apporter votre aide sur <www.haiku-os.org>.
+Do you wish to run the Installer or continue booting to the Desktop? You can also select your preferred language and keyboard layout from the list below.\n\nNote: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.	BootPromptWindow		Voulez-vous lancer l'installeur ou continuer le démarrage jusqu'au bureau ? Vous pouvez également choisir votre langage et votre disposition clavier préférées dans la liste ci-dessous.\n\nNote : La traduction des applications et des autres parties de Haiku n'est pas terminée. Vous trouverez souvent des phrases non traduites, mais si ça vous intéresse, vous pouvez apporter votre aide sur <www.haiku-os.org>.
 Keymap	BootPromptWindow		Disposition du clavier
+Language	BootPromptWindow		Langue
+Run Installer	BootPromptWindow		Lancer l'installeur
+Welcome to Haiku!	BootPromptWindow		Bienvenue dans Haiku !

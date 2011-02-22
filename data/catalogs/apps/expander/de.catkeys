@@ -49,5 +49,5 @@ The destination is read only.	ExpanderWindow		Das Ziel ist schreibgeschützt.
 The file doesn't exist	ExpanderWindow		Die Datei existiert nicht
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Der Ordner wurde entweder verschoben, umbenannt oder wird nicht unterstützt.
 Use:	ExpanderPreferences		Benutzerdefiniert:
-\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tAutor: Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nUrsprüngliche Be Version von \nDominic, Hiroshi, Peter, Pavel und Robert.\n
+\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tAutor: Jérôme Duval,\n\tCopyright 2004-2006, Haiku Inc.\n\nUrsprüngliche Be Version von \nDominic, Hiroshi, Peter, Pavel und Robert.\n
 is not supported	ExpanderWindow		wird nicht unterstützt
