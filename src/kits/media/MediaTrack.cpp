@@ -539,7 +539,7 @@ BMediaTrack::ReadChunk(char** _buffer, int32* _size, media_header* _header)
 		// of the last chunk. Asking the extractor for the current time will
 		// not work so well because of the chunk cache. But providing a
 		// "duration" field in the media_header could be useful.
-		fCurrentTime = fCurrentTime = _header->start_time;
+		fCurrentTime = _header->start_time;
 		fCurrentFrame = (int64)(fCurrentTime * _FrameRate() / 1000000LL);
 
 	}
