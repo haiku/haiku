@@ -568,8 +568,8 @@ VideoWindow::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case msg_filename:
 			if (control != NULL) {
-				strncpy(fFtpInfo.fileNameText,
-					((BTextControl*)control)->Text(), 63);
+				strlcpy(fFtpInfo.fileNameText,
+					((BTextControl*)control)->Text(), 64);
 				FTPINFO("file is '%s'\n", fFtpInfo.fileNameText);
 			}
 			break;
@@ -600,7 +600,7 @@ VideoWindow::MessageReceived(BMessage* message)
 
 		case msg_server:
 			if (control != NULL) {
-				strncpy(fFtpInfo.serverText,
+				strlcpy(fFtpInfo.serverText,
 					((BTextControl*)control)->Text(), 64);
 				FTPINFO("server = '%s'\n", fFtpInfo.serverText);
 			}
@@ -608,7 +608,7 @@ VideoWindow::MessageReceived(BMessage* message)
 
 		case msg_login:
 			if (control != NULL) {
-				strncpy(fFtpInfo.loginText,
+				strlcpy(fFtpInfo.loginText,
 					((BTextControl*)control)->Text(), 64);
 				FTPINFO("login = '%s'\n", fFtpInfo.loginText);
 			}
@@ -616,7 +616,7 @@ VideoWindow::MessageReceived(BMessage* message)
 
 		case msg_password:
 			if (control != NULL) {
-				strncpy(fFtpInfo.passwordText,
+				strlcpy(fFtpInfo.passwordText,
 					((BTextControl*)control)->Text(), 64);
 				FTPINFO("password = '%s'\n", fFtpInfo.passwordText);
 			}
@@ -624,7 +624,7 @@ VideoWindow::MessageReceived(BMessage* message)
 
 		case msg_directory:
 			if (control != NULL) {
-				strncpy(fFtpInfo.directoryText,
+				strlcpy(fFtpInfo.directoryText,
 					((BTextControl*)control)->Text(), 64);
 				FTPINFO("directory = '%s'\n", fFtpInfo.directoryText);
 			}
