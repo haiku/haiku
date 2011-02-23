@@ -1,20 +1,25 @@
 SubDir HAIKU_TOP src apps people ;
 
+UseLibraryHeaders icon ;
 UsePrivateHeaders shared ;
 
-Application People : main.cpp
+Application People :
+	main.cpp
 	AttributeTextControl.cpp
 	PeopleApp.cpp
 	PersonView.cpp
-	PersonWindow.cpp 
-	: libbe.so libtracker.so $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
+	PersonWindow.cpp
+	PictureView.cpp
+	: libicon.a be tracker translation
+		$(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
 	: People.rdef
-	;
+;
 
-DoCatalogs People : 
+DoCatalogs People :
 	x-vnd.Be-PEPL
-	: 
+	:
 	PeopleApp.cpp
 	PersonView.cpp
 	PersonWindow.cpp
+	# PictureView.cpp
 ;

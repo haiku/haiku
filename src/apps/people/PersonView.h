@@ -21,6 +21,7 @@
 class AttributeTextControl;
 class BFile;
 class BPopUpMenu;
+class PictureView;
 
 enum {
 	M_SAVE			= 'save',
@@ -39,6 +40,7 @@ public:
 
 	virtual	void				MakeFocus(bool focus = true);
 	virtual	void				MessageReceived(BMessage* message);
+	virtual void				Draw(BRect updateRect);
 
 			void				AddAttribute(const char* label,
 									const char* attribute);
@@ -55,6 +57,8 @@ public:
 			void				SetAttribute(const char* attribute,
 									const char* value, bool update);
 
+			void				UpdatePicture(const entry_ref* ref);
+
 			bool				IsTextSelected() const;
 
 private:
@@ -64,6 +68,7 @@ private:
 			AttributeList		fControls;
 
 			BString				fCategoryAttribute;
+			PictureView*		fPictureView;
 };
 
 #endif // PERSON_VIEW_H

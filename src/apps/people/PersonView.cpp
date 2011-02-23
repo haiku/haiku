@@ -17,6 +17,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <BitmapStream.h>
 #include <Catalog.h>
 #include <fs_attr.h>
 #include <Box.h>
@@ -27,10 +28,13 @@
 #include <MenuItem.h>
 #include <PopUpMenu.h>
 #include <Query.h>
+#include <TranslationUtils.h>
+#include <Translator.h>
 #include <VolumeRoster.h>
 #include <Window.h>
 
 #include "AttributeTextControl.h"
+#include "PictureView.h"
 
 
 #undef B_TRANSLATE_CONTEXT
@@ -43,16 +47,27 @@ PersonView::PersonView(const char* name, const char* categoryAttribute,
 	BGridView(),
 	fGroups(NULL),
 	fControls(20, false),
-	fCategoryAttribute(categoryAttribute)
+	fCategoryAttribute(categoryAttribute),
+	fPictureView(NULL)
 {
 	SetName(name);
+	SetFlags(Flags() | B_WILL_DRAW);
+
 	if (ref)
 		fFile = new BFile(ref, O_RDWR);
 	else
 		fFile = NULL;
 
 	float spacing = be_control_look->DefaultItemSpacing();
-	GridLayout()->SetInsets(spacing, spacing, spacing, spacing);
+	BGridLayout* layout = GridLayout();
+	layout->SetInsets(spacing, spacing, spacing, spacing);
+
+	// Add picture "field"
+	fPictureView = new PictureView(96, 112, ref);
+
+	layout->AddView(fPictureView, 0, 0, 1, 5);
+	layout->ItemAt(0, 0)->SetExplicitAlignment(
+		BAlignment(B_ALIGN_CENTER, B_ALIGN_TOP));
 }
 
 
@@ -65,13 +80,19 @@ PersonView::~PersonView()
 void
 PersonView::AddAttribute(const char* label, const char* attribute)
 {
-	// TODO: We could check if this attribute has already been added.
+	// Check if this attribute has already been added.
+	AttributeTextControl* control = NULL;
+	for (int32 i = fControls.CountItems() - 1; i >= 0; i--) {
+		if (fControls.ItemAt(i)->Attribute() == attribute) {
+			return;
+		}
+	}
 
-	AttributeTextControl* control = new AttributeTextControl(label, attribute);
+	control = new AttributeTextControl(label, attribute);
 	fControls.AddItem(control);
 
 	BGridLayout* layout = GridLayout();
-	int32 row = layout->CountRows();
+	int32 row = fControls.CountItems();
 
 	if (fCategoryAttribute == attribute) {
 		// Special case the category attribute. The Group popup field will
@@ -82,13 +103,13 @@ PersonView::AddAttribute(const char* label, const char* attribute)
 
 		BMenuField* field = new BMenuField("", "", fGroups);
 		field->SetEnabled(true);
-		layout->AddView(field, 0, row);
+		layout->AddView(field, 1, row);
 
 		control->SetLabel("");
-		layout->AddView(control, 1, row);
+		layout->AddView(control, 2, row);
 	} else {
-		layout->AddItem(control->CreateLabelLayoutItem(), 0, row);
-		layout->AddItem(control->CreateTextViewLayoutItem(), 1, row);
+		layout->AddItem(control->CreateLabelLayoutItem(), 1, row);
+		layout->AddItem(control->CreateTextViewLayoutItem(), 2, row);
 	}
 
 	SetAttribute(attribute, true);
@@ -114,6 +135,9 @@ PersonView::MessageReceived(BMessage* msg)
 			break;
 
 		case M_REVERT:
+			if (fPictureView)
+				fPictureView->Revert();
+
 			for (int32 i = fControls.CountItems() - 1; i >= 0; i--)
 				fControls.ItemAt(i)->Revert();
 			break;
@@ -137,6 +161,21 @@ PersonView::MessageReceived(BMessage* msg)
 		}
 
 	}
+}
+
+
+void
+PersonView::Draw(BRect updateRect)
+{
+	if (!fPictureView)
+		return;
+
+	// Draw a alert/get info-like strip
+	BRect stripeRect = Bounds();
+	float pictureWidth = /*fPictureView->Bounds().Width() */ 96;
+	stripeRect.right = 10 + pictureWidth / 2;
+	SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
+	FillRect(stripeRect);
 }
 
 
@@ -213,7 +252,7 @@ PersonView::BuildGroupMenu()
 
 	if (count == 0) {
 		fGroups->AddItem(item = new BMenuItem(
-			B_TRANSLATE_WITH_CONTEXT("none", "Groups list"), 
+			B_TRANSLATE_WITH_CONTEXT("none", "Groups list"),
 			new BMessage(M_GROUP_MENU)));
 		item->SetEnabled(false);
 	}
@@ -234,6 +273,9 @@ PersonView::CreateFile(const entry_ref* ref)
 bool
 PersonView::IsSaved() const
 {
+	if (fPictureView && fPictureView->HasChanged())
+		return false;
+
 	for (int32 i = fControls.CountItems() - 1; i >= 0; i--) {
 		if (fControls.ItemAt(i)->HasChanged())
 			return false;
@@ -254,6 +296,19 @@ PersonView::Save()
 			value, strlen(value) + 1);
 		control->Update();
 	}
+
+	// Write the picture, if any, in the person file content
+	if (fPictureView) {
+		// trim previous content
+		fFile->Seek(0, SEEK_SET);
+		fFile->SetSize(0);
+		if (fPictureView->Bitmap()) {
+			BBitmapStream stream(fPictureView->Bitmap());
+			BTranslatorRoster* roster = BTranslatorRoster::Default();
+			roster->Translate(&stream, NULL, NULL, fFile, B_PNG_FORMAT,
+				B_TRANSLATOR_BITMAP);
+		}
+	}
 }
 
 
@@ -264,7 +319,7 @@ PersonView::AttributeValue(const char* attribute) const
 		if (fControls.ItemAt(i)->Attribute() == attribute)
 			return fControls.ItemAt(i)->Text();
 	}
-	
+
 	return "";
 }
 
@@ -324,6 +379,14 @@ PersonView::SetAttribute(const char* attribute, const char* value,
 	}
 
 	UnlockLooper();
+}
+
+
+void
+PersonView::UpdatePicture(const entry_ref* ref)
+{
+	if (fPictureView)
+		fPictureView->Update(ref);
 }
 
 

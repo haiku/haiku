@@ -62,7 +62,7 @@ PersonWindow::PersonWindow(BRect frame, const char* title,
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Close"),
 		new BMessage(B_QUIT_REQUESTED), 'W'));
 	menu->AddSeparatorItem();
-	menu->AddItem(fSave = new BMenuItem(B_TRANSLATE("Save"), 
+	menu->AddItem(fSave = new BMenuItem(B_TRANSLATE("Save"),
 		new BMessage(M_SAVE), 'S'));
 	fSave->SetEnabled(FALSE);
 	menu->AddItem(new BMenuItem(
@@ -72,28 +72,28 @@ PersonWindow::PersonWindow(BRect frame, const char* title,
 		new BMessage(M_REVERT), 'R'));
 	fRevert->SetEnabled(FALSE);
 	menu->AddSeparatorItem();
-	item = new BMenuItem(B_TRANSLATE("Quit"), 
+	item = new BMenuItem(B_TRANSLATE("Quit"),
 		new BMessage(B_QUIT_REQUESTED), 'Q');
 	item->SetTarget(be_app);
 	menu->AddItem(item);
 	menuBar->AddItem(menu);
 
 	menu = new BMenu(B_TRANSLATE("Edit"));
-	menu->AddItem(fUndo = new BMenuItem(B_TRANSLATE("Undo"), 
+	menu->AddItem(fUndo = new BMenuItem(B_TRANSLATE("Undo"),
 		new BMessage(B_UNDO), 'Z'));
 	fUndo->SetEnabled(false);
 	menu->AddSeparatorItem();
-	menu->AddItem(fCut = new BMenuItem(B_TRANSLATE("Cut"), 
+	menu->AddItem(fCut = new BMenuItem(B_TRANSLATE("Cut"),
 		new BMessage(B_CUT), 'X'));
-	menu->AddItem(fCopy = new BMenuItem(B_TRANSLATE("Copy"), 
+	menu->AddItem(fCopy = new BMenuItem(B_TRANSLATE("Copy"),
 		new BMessage(B_COPY), 'C'));
-	menu->AddItem(fPaste = new BMenuItem(B_TRANSLATE("Paste"), 
+	menu->AddItem(fPaste = new BMenuItem(B_TRANSLATE("Paste"),
 		new BMessage(B_PASTE), 'V'));
 	BMenuItem* selectAllItem = new BMenuItem(B_TRANSLATE("Select all"),
 		new BMessage(M_SELECT), 'A');
 	menu->AddItem(selectAllItem);
 	menu->AddSeparatorItem();
-	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Configure attributes"), 
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Configure attributes"),
 		new BMessage(M_CONFIGURE_ATTRIBUTES), 'F'));
 	item->SetTarget(be_app);
 	menuBar->AddItem(menu);
@@ -203,7 +203,7 @@ PersonWindow::MessageReceived(BMessage* msg)
 			}
 			break;
 		}
-	
+
 		case B_NODE_MONITOR:
 		{
 			int32 opcode;
@@ -213,7 +213,7 @@ PersonWindow::MessageReceived(BMessage* msg)
 						// We lost our file. Close the window.
 						PostMessage(B_QUIT_REQUESTED);
 						break;
-					
+
 					case B_ENTRY_MOVED:
 					{
 						// We may have renamed our entry. Obtain relevant data
@@ -223,14 +223,14 @@ PersonWindow::MessageReceived(BMessage* msg)
 
 						int64 directory;
 						msg->FindInt64("to directory", &directory);
-						
+
 						int32 device;
 						msg->FindInt32("device", &device);
-						
+
 						// Update our ref.
 						delete fRef;
-						fRef = new entry_ref(device, directory, name.String()); 
-						
+						fRef = new entry_ref(device, directory, name.String());
+
 						// And our window title.
 						SetTitle(name);
 
@@ -246,7 +246,7 @@ PersonWindow::MessageReceived(BMessage* msg)
 
 						break;
 					}
-					
+
 					case B_ATTR_CHANGED:
 					{
 						// An attribute was updated.
@@ -254,7 +254,10 @@ PersonWindow::MessageReceived(BMessage* msg)
 						if (msg->FindString("attr", &attr) == B_OK)
 							fView->SetAttribute(attr.String(), true);
 						break;
-					}							
+					}
+					case B_STAT_CHANGED:
+						fView->UpdatePicture(fRef);
+						break;
 				}
 			}
 			break;
@@ -273,7 +276,7 @@ PersonWindow::QuitRequested()
 
 	if (!fView->IsSaved()) {
 		result = (new BAlert("", B_TRANSLATE("Save changes before quitting?"),
-							B_TRANSLATE("Cancel"), B_TRANSLATE("Quit"), 
+							B_TRANSLATE("Cancel"), B_TRANSLATE("Quit"),
 							B_TRANSLATE("Save")))->Go();
 		if (result == 2) {
 			if (fRef)
@@ -294,7 +297,7 @@ PersonWindow::QuitRequested()
 		be_app->PostMessage(&message);
 		be_app->Unlock();
 	}
-	
+
 	return true;
 }
 
@@ -345,7 +348,7 @@ PersonWindow::SaveAs()
 		else
 			fPanel->Window()->Activate();
 		fPanel->Window()->Unlock();
-	}	
+	}
 }
 
 
@@ -391,10 +394,10 @@ PersonWindow::_WatchChanges(bool enable)
 		return;
 
 	node_ref nodeRef;
-	
+
 	BNode node(fRef);
 	node.GetNodeRef(&nodeRef);
-	
+
 	uint32 flags;
 	BString action;
 
@@ -407,7 +410,7 @@ PersonWindow::_WatchChanges(bool enable)
 		flags = B_STOP_WATCHING;
 		action = "stoping";
 	}
-	
+
 	if (watch_node(&nodeRef, flags, this) != B_OK) {
 		printf("Error %s node monitor.\n", action.String());
 	}
