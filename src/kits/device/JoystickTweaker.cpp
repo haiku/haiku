@@ -167,10 +167,10 @@ _BJoystickTweaker::_BuildFromJoystickDesc(char *string, _joystick_info* info)
 
 	if (str.IFindFirst("module") != -1) {
 		str.RemoveFirst("module = ");
-		strncpy(info->module_name, str.String(), STRINGLENGTHCPY);
+		strlcpy(info->module_name, str.String(), STRINGLENGTHCPY);
 	} else if (str.IFindFirst("gadget") != -1) {
 		str.RemoveFirst("gadget = ");
-		strncpy(info->controller_name, str.String(), STRINGLENGTHCPY);
+		strlcpy(info->controller_name, str.String(), STRINGLENGTHCPY);
 	} else if (str.IFindFirst("num_axes") != -1) {
 		str.RemoveFirst("num_axes = ");
 		info->num_axes = atoi(str.String());		
