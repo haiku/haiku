@@ -957,13 +957,13 @@ CalcView::_ParseCalcDesc(const char* keypadDescription)
 
 		// set code
 		if (strcmp(key->label, "=") == 0)
-			strcpy(key->code, "\n");
+			strlcpy(key->code, "\n", sizeof(key->code));
 		else
-			strcpy(key->code, key->label);
+			strlcpy(key->code, key->label, sizeof(key->code));
 
 		// set keymap
 		if (strlen(key->label) == 1)
-			strcpy(key->keymap, key->label);
+			strlcpy(key->keymap, key->label, sizeof(key->keymap));
 		else
 			*key->keymap = '\0';
 
@@ -1181,9 +1181,12 @@ void
 CalcView::_FetchAppIcon(BBitmap* into)
 {
 	entry_ref appRef;
-	be_roster->FindApp(kAppSig, &appRef);
-	BFile file(&appRef, B_READ_ONLY);
-	BAppFileInfo appInfo(&file);
-	if (appInfo.GetIcon(into, B_MINI_ICON) != B_OK)
+	status_t status = be_roster->FindApp(kAppSig, &appRef);
+	if (status == B_OK) {
+		BFile file(&appRef, B_READ_ONLY);
+		BAppFileInfo appInfo(&file);
+		status = appInfo.GetIcon(into, B_MINI_ICON);
+	}
+	if (status != B_OK)
 		memset(into->Bits(), 0, into->BitsLength());
 }
