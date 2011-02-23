@@ -157,6 +157,7 @@ IMAPMailbox::StartWatchingMailbox()
 		if (status != B_OK)
 			break;
 	}
+	atomic_set(&fWatching, 0);
 	return status;
 }
 

@@ -192,8 +192,6 @@ FetchMinMessageCommand::Command()
 bool
 FetchMinMessageCommand::Handle(const BString& response)
 {
-	if (response.FindFirst("FETCH") < 0)
-		return false;
 	BString extracted = response;
 	int32 message;
 	if (!IMAPParser::RemoveUntagedFromLeft(extracted, "FETCH", message))
@@ -209,6 +207,9 @@ FetchMinMessageCommand::Handle(const BString& response)
 	MinMessage minMessage;
 	if (!ParseMinMessage(extracted, minMessage))
 		return false;
+
+	if ((minMessage.flags & kDeleted) != 0)
+		return true;
 
 	fMinMessageList->push_back(minMessage);
 	fStorage.AddNewMessage(minMessage.uid, minMessage.flags, fData);
@@ -284,8 +285,6 @@ FetchMessageListCommand::Command()
 bool
 FetchMessageListCommand::Handle(const BString& response)
 {
-	if (response.FindFirst("FETCH") < 0)
-		return false;
 	BString extracted = response;
 	int32 message;
 	if (!IMAPParser::RemoveUntagedFromLeft(extracted, "FETCH", message))
@@ -294,6 +293,9 @@ FetchMessageListCommand::Handle(const BString& response)
 	MinMessage minMessage;
 	if (!FetchMinMessageCommand::ParseMinMessage(extracted, minMessage))
 		return false;
+
+	if ((minMessage.flags & kDeleted) != 0)
+		return true;
 
 	fMinMessageList->push_back(minMessage);
 	return true;
@@ -345,8 +347,6 @@ FetchMessageCommand::Command()
 bool
 FetchMessageCommand::Handle(const BString& response)
 {
-	if (response.FindFirst("FETCH") < 0)
-		return false;
 	BString extracted = response;
 	int32 message;
 	if (!IMAPParser::RemoveUntagedFromLeft(extracted, "FETCH", message))
