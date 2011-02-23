@@ -381,7 +381,7 @@ HINF * gethostpoop (name, numeric)
     strncpy (poop->name, hostent->h_name, MAXHOSTNAMELEN - 2);
     for (x = 0; hostent->h_addr_list[x] && (x < 8); x++) {
       memcpy (&poop->iaddrs[x], hostent->h_addr_list[x], sizeof (IA));
-      strncpy (poop->addrs[x], inet_ntoa (poop->iaddrs[x]),
+      strlcpy (poop->addrs[x], inet_ntoa (poop->iaddrs[x]),
 	sizeof (poop->addrs[0]));
     } /* for x -> addrs, part A */
     if (! o_verbose)			/* if we didn't want to see the */
