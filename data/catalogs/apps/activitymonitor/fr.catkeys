@@ -1,0 +1,49 @@
+1	french	x-vnd.Haiku-ActivityMonitor	1946610782
+%.1f KB/s	DataSource		%.1f Ko/s
+%.1f MB	DataSource		%.1f Mo
+%.1f faults/s	DataSource		%.1f fautes/s
+%lld ms	SettingsWindow		%lld ms
+%lld sec.	SettingsWindow		%lld sec.
+About ActivityMonitor…	ActivityWindow		À propos du Moniteur d'Activité…
+ActivityMonitor	ActivityWindow		Moniteur d'Activité
+Add graph	ActivityWindow		Ajouter un graphe
+Additional items	ActivityView		Éléments supplémentaires
+Apps	DataSource		Applis
+Block cache	DataSource		Cache blocs
+Block cache memory	DataSource		Mémoire cache de blocs
+CPU	DataSource		CPU
+CPU usage	DataSource		Activité CPU
+CPU usage (combined)	DataSource		Activité CPU (combinée)
+Cache	DataSource		Cache
+Cached memory	DataSource		Mémoire cache
+File	ActivityWindow		Fichier
+Hide legend	ActivityView		Cacher la légende
+MB	DataSource		Mo
+Media nodes	DataSource		Nœuds média
+Memory	DataSource		Mémoire
+Network receive	DataSource		Réception réseau
+Network send	DataSource		Émission réseau
+P-faults	DataSource		P-fautes
+Page faults	DataSource		Fautes de pages
+Ports	DataSource		Ports
+Quit	ActivityWindow		Quitter
+RX	DataSource	Shorter version for Receiving.	Rx
+Raw clipboard size	DataSource		Taille du presse-papier « brut »
+Receiving	DataSource		Réception
+Remove graph	ActivityView		Supprimer un graphe
+Running applications	DataSource		Applications en cours
+Semaphores	DataSource		Sémaphores
+Sems	DataSource		Sems
+Sending	DataSource		Émission
+Settings	ActivityWindow		Réglages
+Settings…	ActivityWindow		Réglages…
+Show legend	ActivityView		Afficher la légende
+Swap	DataSource		Échange
+Swap space	DataSource		Espace d'échange
+TX	DataSource	Shorter version for Sending	Tx
+Teams	DataSource		Processus
+Text clipboard size	DataSource		Taille du presse-papier « texte »
+Threads	DataSource		Tâches
+Update time interval:	SettingsWindow		Fréquence de mise à jour :
+Used memory	DataSource		Mémoire utilisée
+usage	DataSource		utilisation

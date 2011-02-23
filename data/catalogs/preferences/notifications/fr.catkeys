@@ -1,0 +1,37 @@
+1	french	x-vnd.Haiku-Notifications	2765477073
+Above icon	DisplayView		Au dessus de l'icône
+Application	NotificationView		Application
+Applications	NotificationView		Applications
+Disable notifications	GeneralView		Désactiver les notifications
+Display	PrefletView		Affichage
+Enable notifications	GeneralView		Activer les notifications
+Enable notifications at startup	GeneralView		Activer les notifications au démarrage
+Enabled	NotificationView		Activer
+Error	NotificationView		Erreur
+Events are notified	GeneralView		Les événements sont notifiés
+General	PrefletView		Général
+Icon size:	DisplayView		Taille de l'icône
+Important	NotificationView		Important
+Large icon	DisplayView		Grande icône
+Last Received	NotificationView		Dernière reçue
+Mini icon	DisplayView		Petite icône
+No	NotificationView		Non
+Notifications	GeneralView		Notifications
+Notifications	NotificationView		Notifications
+Notifications	PrefletWin		Notifications
+OK	DisplayView		OK
+OK	GeneralView		OK
+OK	NotificationView		OK
+Progress	NotificationView		Progression
+Revert	PrefletWin		Rétablir
+Right of icon	DisplayView		À droite de l'icône
+Save	PrefletWin		Enregistrer
+Search:	NotificationView		Rechercher :
+There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		Il y a eu un problème à la sauvegarde des préférences.\nIl est possible que vous n'ayez pas le droit d'écrire dans le répertoire des réglages.
+Title	NotificationView		Titre
+Title position:	DisplayView		Position du titre :
+Type	NotificationView		Type
+Unknown	NotificationView		Inconnu
+Window width:	DisplayView		Largeur de la fenêtre
+Yes	NotificationView		Oui
+seconds of inactivity	GeneralView		secondes d'inactivités

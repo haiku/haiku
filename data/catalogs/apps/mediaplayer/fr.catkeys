@@ -1,0 +1,73 @@
+1	french	x-vnd.Haiku-MediaPlayer	723889768
+1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Panoramique américain)
+2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinémascope)
+<unknown>	PlaylistItem-album		<inconnu>
+About MediaPlayer…	MediaPlayer-Main		À propos de MédiaPlayer
+Always on top	MediaPlayer-Main		Toujours au dessus
+Aspect ratio	MediaPlayer-Main		Aspect proportionnel
+Attributes	MediaPlayer-Main		Attributs
+Audio	MediaPlayer-Main		Audio
+Audio track	MediaPlayer-Main		Piste audio
+Automatically start playing	MediaPlayer-SettingsWindow		Commencer la lecture automatiquement
+Bottom of screen	MediaPlayer-SettingsWindow		Au bas de l'écran
+Bottom of video	MediaPlayer-SettingsWindow		Au bas de la vidéo
+Cancel	MediaPlayer-SettingsWindow		Annuler
+Close	MediaPlayer-Main		Fermer
+Close	MediaPlayer-PlaylistWindow		Fermer
+Error: 	MediaPlayer-Main		Erreur :
+Error: 	MediaPlayer-RemovePLItemsCmd		Erreur :
+File info…	MediaPlayer-Main		Informations du fichier…
+Full screen	MediaPlayer-Main		Plein écran
+Hide interface	MediaPlayer-Main		Masquer l'interface
+Low volume	MediaPlayer-SettingsWindow		Volume bas
+MediaPlayer settings	MediaPlayer-SettingsWindow		Réglages de MédiaPlayer
+MediaPlayer\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		MediaPlayer\n\nÉcrit by Marcus Overhagen, Stephan Aßmus et Frederik Modéen
+Mute	MediaPlayer-Main		Muet
+Muted	MediaPlayer-SettingsWindow		Muet
+New player…	MediaPlayer-Main		Nouveau lecteur…
+Next	MediaPlayer-Main		Suivant
+OK	MediaPlayer-Main		OK
+OK	MediaPlayer-PlaylistWindow		OK
+OK	MediaPlayer-RemovePLItemsCmd		OK
+OK	MediaPlayer-SettingsWindow		OK
+Open	MediaPlayer-Main		Ouvrir
+Open	MediaPlayer-PlaylistWindow		Ouvrir
+Open Playlist	MediaPlayer-PlaylistWindow		Ouvrir une liste de lecture
+Open file…	MediaPlayer-Main		Ouvrir un fichier…
+Open…	MediaPlayer-PlaylistWindow		Ouvrir…
+Pause	MediaPlayer-Main		Pause
+Play	MediaPlayer-Main		Jouer
+Play mode	MediaPlayer-SettingsWindow		Mode de lecture
+Playlist	MediaPlayer-PlaylistWindow		Liste de lecture
+Prev	MediaPlayer-Main		Précédent
+Quit	MediaPlayer-Main		Quitter
+Randomize	MediaPlayer-PlaylistWindow		Aléatoire
+Rating	MediaPlayer-Main		Évaluation
+Redo	MediaPlayer-PlaylistWindow		Rétablir
+Remove all	MediaPlayer-PlaylistWindow		Retirer tout
+Remove and put into Trash	MediaPlayer-PlaylistWindow		Supprimer et envoyer à la corbeille
+Save	MediaPlayer-PlaylistWindow		Enregistrer 
+Save Playlist	MediaPlayer-PlaylistWindow		Enregistrer la liste de lecture
+Save as…	MediaPlayer-PlaylistWindow		Enregistrer sous…
+Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		La sauvegarde de la liste de lecture a échoué.\n\nErreur : 
+Settings…	MediaPlayer-Main		Réglages…
+Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Certains fichiers ne peuvent pas être envoyés à la corbeille
+Stop	MediaPlayer-Main		Arrêt
+Stop playing.	MediaPlayer-Main		Arrêter la lecture.
+Stream settings	MediaPlayer-Main		Réglages du flux
+Subtitle placement	MediaPlayer-SettingsWindow		Emplacement des sous-titres
+Subtitle size	MediaPlayer-SettingsWindow		Taille des sous-titres
+Subtitles	MediaPlayer-Main		Sous-titres
+Thanks	MediaPlayer-Main		Merci
+The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Impossible d'ouvrir le fichier « %filename ».\n\n
+Track	Audio Track Menu		Piste
+Track	Video Track Menu		Piste
+Track %d	MediaPlayer-Main		Piste %d
+URI	MediaPlayer-Main		URI
+Undo	MediaPlayer-PlaylistWindow		Annuler
+Video	MediaPlayer-Main		Vidéo
+Video track	MediaPlayer-Main		Piste vidéo
+View options	MediaPlayer-SettingsWindow		Options d'affichage
+Volume	MediaPlayer-Main		Volume
+error	MediaPlayer-Main		erreur
+none	Subtitles menu		aucun

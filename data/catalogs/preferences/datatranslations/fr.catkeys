@@ -1,0 +1,23 @@
+1	french	x-vnd.Haiku-DataTranslations	3706134146
+About	DataTranslations		À propos
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Un élément nommé « %name » existe déjà dans le dossier des traducteurs ! Faut-il remplacer le traducteur existant ?
+Cancel	DataTranslations		Annuler
+Could not install %s:\n%s	DataTranslations		Impossible d'installer %s :\n%s
+DataTranslations	DataTranslations		TraductionDeDonnées
+DataTranslations - Error	DataTranslations		TraductionDeDonnées - Erreur
+DataTranslations - Note	DataTranslations		DataTranslations - Notes
+DataTranslations\n\twritten by Oliver Siebenmarck and others\n\tCopyright 2002-2010, Haiku Inc. All rights reserved.\n	DataTranslations		TraductionDeDonnées\n\tÉcrit par Oliver Siebenmarck et d'autres\n\tCopyright 2002-2010, Haiku Inc. Tous droits réservés.\n
+Icon	DataTranslations		Icône
+Info	DataTranslations		information
+Info:	DataTranslations		Information :
+Info…	DataTranslations		Informations…
+Name:	DataTranslations		Nom :
+Name:\t%s \nVersion:\t%ld.%ld.%ld\nInfo:\t%s\n\nPath:\n%s\n	DataTranslations		Nom :\t%s\nVersion :\t%ld.%ld.%ld\nInformations :\t%s\n\nChemin :\n%s\n
+OK	DataTranslations		OK
+Overwrite	DataTranslations		Remplacer
+Panel Info	DataTranslations		Panneau d'informations
+Path:	DataTranslations		Chemin :
+The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		L'élément « %name » ne semble pas être un traducteur et ne sera pas installé.
+The new translator has been installed successfully.	DataTranslations		Le nouveau traducteur a été installé avec succès.
+Translation Settings\n\nUse this control panel to set values that various\ntranslators use when no other settings are specified\nin the application.	DataTranslations		Réglages du traducteur\n\nUtilisez ce panneau de configuration pour régler les\ndifférentes valeurs qui seront utilisées par défaut quand\nles applications n'indiquent pas de réglages spécifiques.
+Version:	DataTranslations		Version :

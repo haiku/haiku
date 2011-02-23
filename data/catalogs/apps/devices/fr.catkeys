@@ -1,0 +1,65 @@
+1	french	x-vnd.Haiku-Devices	4145096865
+ACPI Information	DeviceACPI		Informations ACPI
+ACPI Processor Namespace '%2'	DeviceACPI		Espace de nom ACPI du processeur « %2 »
+ACPI System Bus	DeviceACPI		Bus système ACPI
+ACPI System Indicator	DeviceACPI		Indicateur système ACPI
+ACPI Thermal Zone	DeviceACPI		Zone thermique ACPI
+ACPI controller	Device		Contrôleur ACPI
+ACPI node '%1'	DeviceACPI		Noeud ACPI « %1 »
+About	DevicesApplication		À propos
+About Devices…	DevicesView		À propos de Périphériques…
+Basic information	DevicesView		Informations de base
+Bridge	Device		Pont
+Bus	DevicesView		Bus
+Category	DevicesView		Catégorie
+Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Information de classe\t\t\t: %classInfo%
+Class info	DevicePCI		Information de classe
+Communication controller	Device		Contrôleur de communication
+Computer	Device		Ordinateur
+Connection	DevicesView		Connexion
+Detailed	DevicesView		Détaillé
+Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Nom du périphérique\t\t\t\t\t: %Name%\nFabricant\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t: %Manufacturer%\nPilote utilisé\t\t\t\t\t\t\t\t\t\t: %DriverUsed%\nChemins du périphérique\t: %DevicePaths%
+Device name	Device		Nom du périphérique
+Device name	DeviceACPI		Nom du périphérique
+Device name	DevicePCI		Nom du périphérique
+Device name:	Device		Nom du périphérique :
+Device paths	Device		Chemin des périphériques
+Device paths	DevicePCI		Chemin des périphériques
+Devices	DevicesApplication		Périphériques
+Devices	DevicesView		Périphériques
+Devices\n\twritten by Pieter Panman\n\n\tBased on listdev by Jérôme Duval\n\tand the previous Devices preference\n\tby Jérôme Duval and Sikosis\n\tCopyright 2009, Haiku, Inc.\n	DevicesApplication		Périphériques\n\tÉcrit par Pieter Panman\n\n\tBasé sur listdev par Jérôme Duval\n\tet l'ancien Devices préférences\n\tpar Jérôme duval et Sikosis\n\tCopyright 2009, Haiku, Inc.\n
+Display controller	Device		Contrôleur d'affichage
+Docking station	Device		Station d'accueil
+Driver used	Device		Pilote utilisé
+Driver used	DevicePCI		Pilote utilisé
+Encryption controller	Device		Contrôleur de chiffrement
+Generate system information	DevicesView		Générer les informations systèmes
+Generic system peripheral	Device		Périphérique système générique
+Input device controller	Device		Contrôleur de périphérique d'entrée
+Intelligent controller	Device		Contrôleur intelligent
+Manufacturer	Device		Fabriquant
+Manufacturer	DeviceACPI		Fabricant
+Manufacturer	DevicePCI		Fabricant
+Manufacturer:	Device		Fabriquant :
+Mass storage controller	Device		Contrôleur de mémoire de masse
+Memory controller	Device		Contrôleur mémoire
+Multimedia controller	Device		Contrôleur multimédia
+Name	PropertyList		Nom
+Network controller	Device		Adaptateur réseau
+None	Device		Aucun
+Not implemented	DeviceACPI		Non implémenté
+Not implemented	DevicePCI		Non implémenté
+OK	DevicesApplication		OK
+Order by:	DevicesView		Trier par :
+PCI Information	DevicePCI		Informations PCI
+Processor	Device		Microprocesseur
+Quit	DevicesView		Quitter
+Refresh devices	DevicesView		Rafraichir les périphériques
+Report compatibility	DevicesView		Rapport de compatibilité
+Satellite communications controller	Device		Contrôleur de communications par satellite
+Serial bus controller	Device		Contrôleur de bus série
+Signal processing controller	Device		Contrôleur de traitement du signal
+Unclassified device	Device		Périphérique inclassable
+Unknown	DevicePCI		Inconnu
+Value	PropertyList		Valeur
+Wireless controller	Device		Contrôleur sans fils

@@ -1,0 +1,31 @@
+1	french	x-vnd.Haiku-PowerStatus	1241307911
+About	PowerStatus		À propos
+About…	PowerStatus		À propos…
+Battery charging	PowerStatus		Batterie en charge
+Battery info…	PowerStatus		Informations batteries…
+Battery unused	PowerStatus		Batterie inutilisée
+Capacity: 	PowerStatus		Capacité :
+Design capacity low warning: 	PowerStatus		Alerte de capacité nominale faible :
+Design capacity: 	PowerStatus		Capacité nominale :
+Design voltage: 	PowerStatus		Voltage nominal :
+Install in Deskbar	PowerStatus		Installer dans la Deskbar
+Last full charge: 	PowerStatus		Dernière charge complète :
+Model number: 	PowerStatus		Numéro de modèle : 
+OK	PowerStatus		OK
+Quit	PowerStatus		Quitter
+Run in window	PowerStatus		Exécuter en fenêtre
+Serial number: 	PowerStatus		Numéro de série :
+Show percent	PowerStatus		Afficher les pourcentages
+Show status icon	PowerStatus		Afficher l'icône d'état
+Show time	PowerStatus		Monter le temps
+Technology: 	PowerStatus		Technologie :
+Type: 	PowerStatus		Type :
+charging	PowerStatus		en charge
+mA	PowerStatus		mA
+mAh	PowerStatus		mAh
+mV	PowerStatus		mV
+mW	PowerStatus		mW
+mWh	PowerStatus		mWh
+no battery	PowerStatus		pas de batterie
+non-rechargeable	PowerStatus		non-rechargeable
+rechargeable	PowerStatus		rechargeable

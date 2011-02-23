@@ -1,0 +1,104 @@
+1	french	x-vnd.haiku-icon_o_matic	4128656842
+<nothing to undo>	Icon-O-Matic-Menu-Edit		<rien à annuler>
+<unavailable>	Icon-O-Matic-StyleTypes		<indisponible>
+<unkown property>	Icon-O-Matic-PropertyNames		<propriétés inconnue>
+Add	Icon-O-Matic-PathsList		Ajouter
+Add	Icon-O-Matic-StylesList		Ajouter
+Add	Icon-O-Matic-TransformersList		Ajouter
+Add Control Point	Icon-O-Matic-AddPointCmd		Ajouter un point de contrôle
+Add Style	Icon-O-Matic-AddStylesCmd		Ajouter un style
+Add Styles	Icon-O-Matic-AddStylesCmd		Ajouter des styles
+Add circle	Icon-O-Matic-PathsList		Ajouter un cercle
+All	Icon-O-Matic-Properties		Tout
+BEOS:ICON Attribute	Icon-O-Matic-SavePanel		Attribut BEOS:ICON
+Cancel	Icon-O-Matic-ColorPicker		Annuler
+Cancel	Icon-O-Matic-Main		Annuler
+Cancel	Icon-O-Matic-SVGExport		Annuler
+Change Color	Icon-O-Matic-SetColorCmd		Changer la couleur
+Clean up	Icon-O-Matic-PathsList		Nettoyer
+Closed	Icon-O-Matic-PropertyNames		Fermé
+Color	Icon-O-Matic-PropertyNames		Couleur
+Color	Icon-O-Matic-StyleTypes		Couleur
+Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Couleur (#%02x%02x%02x)
+Color (#%02x%02x%02x)	Style name after dropping a color		Couleur (#%02x%02x%02x)
+Conic	Icon-O-Matic-StyleTypes		Conique
+Copy	Icon-O-Matic-Properties		Copier
+Detect Orient.	Icon-O-Matic-PropertyNames		Détecter l'orientation
+Diamond	Icon-O-Matic-StyleTypes		Diamant
+Duplicate	Icon-O-Matic-PathsList		Dupliquer
+Duplicate	Icon-O-Matic-ShapesList		Dupliquer
+Duplicate	Icon-O-Matic-StylesList		Dupliquer
+Edit	Icon-O-Matic-Menus		Éditer
+Edit Gradient	Icon-O-Matic-SetGradientCmd		Éditer le dégadé
+Error: 	Icon-O-Matic-Exporter		Erreur :
+Error: 	Icon-O-Matic-Main		Erreur :
+Export	Icon-O-Matic-Menu-File		Exporter
+Export Icon	Dialog title		Exporter l'icône
+Export as…	Icon-O-Matic-Menu-File		Exporter sous…
+File	Icon-O-Matic-Menus		Fichier
+Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		Figer la forme
+Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Figer les formes
+Gradient	Icon-O-Matic-StyleTypes		Dégradé
+Gradient type	Icon-O-Matic-StyleTypes		Type de dégradé
+HVIF Source Code	Icon-O-Matic-SavePanel		Code source HVIF
+Height	Icon-O-Matic-PropertyNames		Hauteur
+Insert Control Point	Icon-O-Matic-InsertPointCmd		Insérer un point de contrôle
+Linear	Icon-O-Matic-StyleTypes		Linéaire
+META:ICON Attribute	Icon-O-Matic-SavePanel		Attribut META:ICON
+Move	Icon-O-Matic-TransformationBoxStates		Déplacer
+Move Pivot	Icon-O-Matic-TransformationBoxStates		Déplacer le pivot
+Move Shape	Icon-O-Matic-MoveShapesCommand		Déplacer la forme
+Move Shapes	Icon-O-Matic-MoveShapesCommand		Déplacer les formes
+Move Style	Icon-O-Matic-MoveStylesCmd		Déplacer le style
+Name	Icon-O-Matic-PropertyNames		Nom
+No	Icon-O-Matic-StyledTextImport		Non
+None	Icon-O-Matic-Properties		Aucun
+OK	Icon-O-Matic-ColorPicker		OK
+OK	Icon-O-Matic-SVGImport		OK
+Opacity	Icon-O-Matic-PropertyNames		Opacité
+Open…	Icon-O-Matic-Menu-File		Ouvrir…
+Options	Icon-O-Matic-Menus		Options
+Overwrite	Icon-O-Matic-SVGExport		Écraser
+Paste	Icon-O-Matic-Properties		Coller
+Paste Properties	Icon-O-Matic-Properties		Coller les propriétés
+Path	Icon-O-Matic-Menus		Chemin
+Path	Icon-O-Matic-PropertyNames		Chemin
+Perspective	Icon-O-Matic-TransformersList		Perspective
+Pick a color	Icon-O-Matic-ColorPicker		Choisissez une couleur
+Properties	Icon-O-Matic-Menus		Propriétés
+Quit	Icon-O-Matic-Menu-File		Quitter
+Radial	Icon-O-Matic-StyleTypes		Radial
+Redo	Icon-O-Matic-Main		Rétablir
+Remove	Icon-O-Matic-PathManipulator		Enlever
+Remove	Icon-O-Matic-PathsList		Enlever
+Remove	Icon-O-Matic-ShapesList		Enlever
+Remove	Icon-O-Matic-StylesList		Enlever
+Remove Control Point	Icon-O-Matic-RemovePointsCmd		Enlever le point de contrôle
+Remove Control Points	Icon-O-Matic-RemovePointsCmd		Enlever les points de contrôle
+Remove Style	Icon-O-Matic-RemoveStylesCmd		Enlever le style
+Remove Styles	Icon-O-Matic-RemoveStylesCmd		Enlever les styles
+Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Réinitialiser la transformation
+Reset transformation	Icon-O-Matic-ShapesList		Annuler la transformation
+Rotate	Icon-O-Matic-TransformationBoxStates		Pivoter
+Rotation	Icon-O-Matic-PropertyNames		Rotation
+Save	Icon-O-Matic-Main		Enregistrer
+Save	Icon-O-Matic-Menu-File		Enregistrer
+Save Icon	Dialog title		Enregistrer icône
+Save as…	Icon-O-Matic-Menu-File		Enregistrer sous…
+Select	Icon-O-Matic-Properties		Sélectionner
+Select All	Icon-O-Matic-PathManipulator		Sélectionner tout
+Settings…	Icon-O-Matic-SavePanel		Réglages…
+Shape	Icon-O-Matic-Menus		Forme
+Snap to grid	Icon-O-Matic-Menu-Settings		Aligner sur la grille
+Style	Icon-O-Matic-Menus		Style
+Swatches	Icon-O-Matic-Menus		Nuancier
+The text you are trying to import is quite long,are you sure?	Icon-O-Matic-StyledTextImport		Vous essayez d'importer un texte plutôt long, êtes-vous sûr de vous ?
+Transformation	Icon-O-Matic-TransformationBoxStates		Transformation
+Transformation	Icon-O-Matic-TransformersList		Transformation
+Undo	Icon-O-Matic-Main		Annuler
+Width	Icon-O-Matic-PropertyNames		Largeur
+Yes	Icon-O-Matic-StyledTextImport		Oui
+bad news	Icon-O-Matic-Exporter		mauvaises nouvelles
+load error	Icon-O-Matic-SVGImport		erreur de chargement
+too big	Icon-O-Matic-StyledTextImport		trop grand
+warning	Icon-O-Matic-SVGExport		alerte

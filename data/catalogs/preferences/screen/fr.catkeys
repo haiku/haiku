@@ -1,0 +1,58 @@
+1	french	x-vnd.Haiku-Screen	1291852801
+%.1f Hz	Screen		%.1f Hz
+%sSerial no.: %s	Screen		N° de serie de %s : %s
+/other…	Screen		/autre…
+15 bits/pixel, 32768 colors	Screen		15 bits/pixel, 32768 couleurs
+16 bits/pixel, 65536 colors	Screen		16 bits/pixel, 65536 couleurs
+24 bits/pixel, 16 Million colors	Screen		24 bits/pixel, 16 Millions de couleurs
+32 bits/pixel, 16 Million colors	Screen		32 bits/pixel, 16 Millions de couleurs
+8 bits/pixel, 256 colors	Screen		8 bits/pixel, 256 couleurs
+About	Screen		À propos
+All workspaces	Screen		Tous les espaces de travail
+Apply	Screen		Appliquer
+Cancel	Screen		Annuler
+Colors:	Screen		Couleurs :
+Columns:	Screen		Colonnes :
+Combine displays:	Screen		Combiner les écrans :
+CombineDisplays	Screen		Combiner les Écrans
+Could not write VESA mode settings file:\n\t	Screen		Impossible d'écrire le fichier des réglages du mode VESA :\n\t
+Current workspace	Screen		Espace de travail courant
+Do you wish to keep these settings?	Screen		Voulez-vous conserver ces paramètres ?
+Done	Screen		Fait
+Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Fréquence horizontale :\t%lu - %lu kHz\nFréquence verticale :\t%lu - %lu Hz\n\nBande passante maximum :\t%g MHz
+Hz	Screen		Hz
+Keep	Screen		Conserver
+OK	Screen		OK
+Other…	Screen		Autre…
+Refresh Rate:	Screen		Fréquence de rafraîchissement :
+Resolution:	Screen		Résolution :
+Revert	Screen		Rétablir
+Rows:	Screen		Lignes :
+Screen	Screen		Écran
+Screen Alert	Screen		Alerte Écran 
+Screen preferences by the Haiku team	Screen		Préférences de l'écran par l'équipe Haiku
+Set background…	Screen		Choisir un fond d'écran…
+Settings will revert in %seconds seconds.	Screen		Les réglages seront rétablis dans %seconds secondes.
+Swap displays:	Screen		Échanger les écrans :
+SwapDisplays	Screen		Permuter les écrans
+TVStandard	Screen		Standard TV
+The screen mode could not be set:\n\t%s\n	Screen		Impossible de régler le mode de l'écran :\n\t%s\n
+Type or use the left and right arrow keys.	Screen		Utilisez les touches gauche et droite
+Undo	Screen		Annuler
+Unknown mode	Screen		Mode inconnu
+Use laptop panel:	Screen		Utiliser l'écran du portable :
+UseLaptopPanel	Screen		Utiliser l'écran du portable
+Video format:	Screen		Format vidéo:
+Workspaces	Screen		Espaces de travail
+always	Screen		toujours
+bits/pixel	Screen		bits/pixel
+colors	Screen		couleurs
+disable	Screen		désactiver
+horizontally	Screen		horizontalement
+if needed	Screen		si nécessaire
+monitor	Screen		Moniteur
+no	Screen		non
+refresh rate	Screen		fréquence de rafraîchissement
+resolution	Screen		résolution
+vertically	Screen		verticalement
+yes	Screen		oui
