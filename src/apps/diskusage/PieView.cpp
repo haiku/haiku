@@ -205,6 +205,7 @@ PieView::MessageReceived(BMessage* message)
 				fOutdated = true;
 				Invalidate();
 			}
+			break;
 		}
 
 		default:
@@ -494,7 +495,7 @@ PieView::_DrawDirectory(BRect b, FileInfo* info, float parentSpan,
 
 			// Show total volume capacity.
 			char label[B_PATH_NAME_LENGTH];
-			size_to_string(volCapacity, label);
+			size_to_string(volCapacity, label, sizeof(label));
 			SetHighColor(kPieBGColor);
 			SetDrawingMode(B_OP_OVER);
 			DrawString(label, BPoint(cx - StringWidth(label) / 2.0,

@@ -79,7 +79,7 @@ FileInfo::Type() const
 	char mimeStr[B_MIME_TYPE_LENGTH] = { '\0' };
 	if (parent == NULL) {
 		// This is the volume's root directory; treat it as a volume type.
-		strcpy(mimeStr, kVolumeType);
+		strlcpy(mimeStr, kVolumeType, sizeof(mimeStr));
 	} else {
 		// Get the MIME type from the registrar.
 		BNode node(&ref);
@@ -93,14 +93,14 @@ FileInfo::Type() const
 						// BFS volumes (e.g., CDFS volumes return B_BAD_VALUE).
 						//nodeInfo.SetType(kDirType);
 					}
-					strcpy(mimeStr, kDirType);
+					strlcpy(mimeStr, kDirType, sizeof(mimeStr));
 				}
 			}
 		}
 	}
 
 	if (strlen(mimeStr) == 0)
-		strcpy(mimeStr, kFileType);
+		strlcpy(mimeStr, kFileType, sizeof(mimeStr));
 
 	return new BMimeType(mimeStr);
 }

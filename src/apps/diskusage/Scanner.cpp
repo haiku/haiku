@@ -102,7 +102,7 @@ Scanner::MessageReceived(BMessage* message)
 				BMessage msg(kOutdatedMsg);
 				fListener.SendMessage(&msg);
 			}
-
+			break;
 		}
 
 		default:

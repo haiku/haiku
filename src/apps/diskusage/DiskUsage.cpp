@@ -19,7 +19,7 @@ entry_ref helpFileRef;
 bool helpFileWasFound = false;
 
 void
-size_to_string(off_t byteCount, char* name)
+size_to_string(off_t byteCount, char* name, int maxLength)
 {
 	struct {
 		off_t		limit;
@@ -37,13 +37,15 @@ size_to_string(off_t byteCount, char* name)
 	};
 
 	if (byteCount < 1024) {
-		sprintf(name, B_TRANSLATE("%lld bytes"), byteCount);
+		snprintf(name, maxLength, B_TRANSLATE("%lld bytes"),
+			byteCount);
 	} else {
 		int i = 0;
 		while (byteCount >= scale[i].limit)
 			i++;
 
-		sprintf(name, scale[i].format, byteCount / scale[i].divisor);
+		snprintf(name, maxLength, scale[i].format,
+			byteCount / scale[i].divisor);
 	}
 }
 

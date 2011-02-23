@@ -69,7 +69,6 @@ VolumeView::SetPath(BPath path)
 void
 VolumeView::MessageReceived(BMessage* msg)
 {
-	msg->PrintToStream();
 	switch(msg->what) {
 		case kBtnRescan:
 			fPieView->MessageReceived(msg);

@@ -44,16 +44,19 @@ StatusView::StatusView()
 		B_SIZE_UNSET));
 
 	char testLabel[256];
-	sprintf(testLabel, B_TRANSLATE("%d files"), 999999);
+	snprintf(testLabel, sizeof(testLabel), B_TRANSLATE("%d files"),
+		999999);
 
 	fCountView = new BStringView(NULL, kEmptyStr);
-	fCountView->SetExplicitMinSize(BSize(StringWidth(testLabel), B_SIZE_UNSET));
+	fCountView->SetExplicitMinSize(BSize(StringWidth(testLabel),
+		B_SIZE_UNSET));
 	fCountView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
 	fPathView = new BStringView(NULL, kEmptyStr);
 	fPathView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
-	fRefreshBtn = new BButton(NULL, B_TRANSLATE("Scan"), new BMessage(kBtnRescan));
+	fRefreshBtn = new BButton(NULL, B_TRANSLATE("Scan"),
+		new BMessage(kBtnRescan));
 
 	fRefreshBtn->SetExplicitMaxSize(BSize(B_SIZE_UNSET, B_SIZE_UNLIMITED));
 
@@ -137,13 +140,13 @@ StatusView::ShowInfo(const FileInfo* info)
 	fPathView->SetText(pathLabel.String());
 
 	char label[B_PATH_NAME_LENGTH];
-	size_to_string(info->size, label);
+	size_to_string(info->size, label, sizeof(label));
 	fSizeView->SetText(label);
 
 	if (info->count > 0) {
 		char label[256];
-		sprintf(label, (info->count == 1) ? B_TRANSLATE("%d file") : 
-			B_TRANSLATE("%d files"), info->count);
+		snprintf(label, sizeof(label), (info->count == 1) ?
+			B_TRANSLATE("%d file") : B_TRANSLATE("%d files"), info->count);
 		fCountView->SetText(label);
 	} else {
 		fCountView->SetText(kEmptyStr);

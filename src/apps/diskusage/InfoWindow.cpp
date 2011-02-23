@@ -77,12 +77,13 @@ InfoWin::InfoWin(BPoint p, FileInfo *f, BWindow* parent)
 
 	// Size
 	char name[B_PATH_NAME_LENGTH] = { 0 };
-	size_to_string(f->size, name);
+	size_to_string(f->size, name, sizeof(name));
 	if (f->count > 0) {
 		// This is a directory.
 		char str[64];
-		sprintf(str, B_TRANSLATE(" in %d files"), f->count);
-		strcat(name, str);
+		snprintf(str, sizeof(str), B_TRANSLATE(" in %d files"),
+			f->count);
+		strlcat(name, str, sizeof(name));
 	}
 	info.push_back(Item(B_TRANSLATE_MARK("Size"), name));
 

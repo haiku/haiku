@@ -70,7 +70,7 @@ extern bool helpFileWasFound;
 #define deg2rad(x) (2.0 * M_PI * (x) / 360.0)
 #define rad2deg(x) (360.0 * (x) / (2.0 * M_PI))
 
-void size_to_string(off_t byteCount, char* name);
+void size_to_string(off_t byteCount, char* name, int maxLength);
 
 
 #endif // DISKUSAGE_H
