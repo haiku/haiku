@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Installer	1204341178
+1	swedish	x-vnd.Haiku-Installer	482356557
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld av %2ld
 1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1) Om du installerar Haiku på riktigt hårdvara (inte i en emulator) så rekommenderar vi att har förberett en partiton för ändamålet. Programmen Installeraren och DiskHantering kan skapa nya partitioner för Haiku men funktionerna att ändra på befintliga partitoner har ännu inte testats tillräckligt för att anses som tillförlitligt. Vi rekommenderar därför att du inte ändrar på befintliga partitioner.\n
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2) Installeraren kommer att göra Haikus partition startbar. Däremot kommer inte Haiku att göra några ändringar i befintliga starthanterare. Om du har GRUB installerat så bör du lägga till Haiku till startmenyn. Det görs på olika sätt beroende på vilken version av GRUB som används.\n\n\n
@@ -37,8 +37,7 @@ GRUB's naming scheme is still: (hdN,n)\n\n	InstallerApp		GRUBs namnstandard är 
 Have fun and thanks a lot for trying out Haiku! We hope you like it!	InstallerApp		Ha kul och tack så mycket för att du provar Haiku! Vi hoppas att du kommer att gilla det!
 Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		Här måste du kommentera bort raden \"GRUB_HIDDEN_TIMEOUT=0\" genom att sätta en \"#\" framför den för att verkligen visa startmenyn.\n\n
 Hide optional packages	InstallerWindow		Göm valfria paket
-IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		
-VIKTIG INFORMATION INNAN DU INSTALLERAR HAIKU\n\n
+IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		VIKTIG INFORMATION INNAN DU INSTALLERAR HAIKU\n\n
 If you have not created a partition yet, simply reboot, create the partition using whatever tool you feel most comfortable with, and reboot into Haiku to continue with the installation. You could for example use the GParted Live-CD, it can also resize existing partitions to make room.\n\n\n	InstallerApp		Om du inte har skapat något partiton, starta om datorn och skapa en partition med det verktyg som passar dig. Starta sedan Haikus installationsprogram för att fortsätta med installationen. Exempelvis så kan du använda GParteds Live-CD för att ändra storleken på existerande partitioner så att Haiku får plats på hårddisken.\n\n\n
 Install anyway	InstallProgress		Installera ändå
 Install from:	InstallerWindow		Installera från:
@@ -55,7 +54,6 @@ No optional packages available.	PackagesView		Inga valbara paket tillgängliga.
 No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Inga partitioner har hittats som är dugliga för installation. Var god ställ in partitioner och initialisera minst en partition med Be-filsystemet.
 OK	InstallProgress		OK
 OK	InstallerApp		OK
-OK	InstallerWindow		Okej
 Onto:	InstallerWindow		Till:
 Performing installation.	InstallProgress		Verkställer installation.
 Please choose target	InstallerWindow		Välj mål
