@@ -38,7 +38,7 @@ class MethodMenuItem : public BMenuItem {
 		void SetIcon(const uchar *icon);
 		const uchar *Icon() { return(uchar *)fIcon.Bits(); };
 
-		const int32 Cookie() { return fCookie; };
+		int32 Cookie() { return fCookie; };
 	private:
 		BBitmap fIcon;
 		int32 fCookie;
