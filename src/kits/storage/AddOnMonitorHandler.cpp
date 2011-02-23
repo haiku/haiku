@@ -141,7 +141,7 @@ AddOnMonitorHandler::EntryCreated(const char* name, ino_t directory,
 	dev_t device, ino_t node)
 {
 	add_on_entry_info entryInfo;
-	strncpy(entryInfo.name, name, sizeof(entryInfo.name));
+	strlcpy(entryInfo.name, name, sizeof(entryInfo.name));
 	make_node_ref(device, node, &entryInfo.nref);
 	make_node_ref(device, directory, &entryInfo.dir_nref);
 	fPendingEntries.push_back(entryInfo);
@@ -286,7 +286,7 @@ AddOnMonitorHandler::EntryMoved(const char *name, const char *fromName,
 		// moved into our view
 
 		// update the info
-		strncpy(info.name, name, sizeof(info.name));
+		strlcpy(info.name, name, sizeof(info.name));
 		info.nref = entryNodeRef;
 		info.dir_nref = toNodeRef;
 
@@ -378,7 +378,7 @@ AddOnMonitorHandler::EntryMoved(const char *name, const char *fromName,
 		AddOnRemoved(&info);
 
 		// set up new addon info
-		strncpy(info.name, name, sizeof(info.name));
+		strlcpy(info.name, name, sizeof(info.name));
 		info.dir_nref = toNodeRef;
 
 		// presto!
