@@ -24,9 +24,9 @@ public:
 
 			bool				HasChanged();
 			void				Revert();
-			void				Update();
+			void				Update(const entry_ref* ref);
 
-			BBitmap*			Picture();
+			BBitmap*			Bitmap();
 
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	void				Draw(BRect updateRect);
@@ -35,7 +35,6 @@ private:
 			BBitmap*			fPicture;
 			BBitmap*			fOriginalPicture;
 			BBitmap*			fDefaultPicture;
-			const entry_ref*	fRef;
 };
 
 #endif

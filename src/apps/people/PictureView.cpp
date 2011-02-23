@@ -9,12 +9,15 @@
 
 #include "PictureView.h"
 
+#include <math.h>
+
 #include <Bitmap.h>
 #include <IconUtils.h>
+#include <LayoutUtils.h>
 #include <MimeType.h>
 #include <TranslationUtils.h>
 
-#include "PeopleApp.h"
+#include "PeopleApp.h"	// for B_PERSON_MIMETYPE
 
 
 const float kPictureMargin = 6.0;
@@ -24,8 +27,7 @@ PictureView::PictureView(float width, float height, const entry_ref* ref)
 	BView("pictureview", B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
 	fPicture(NULL),
 	fOriginalPicture(NULL),
-	fDefaultPicture(NULL),
-	fRef(ref)
+	fDefaultPicture(NULL)
 {
 	SetViewColor(255, 255, 255);
 
@@ -33,12 +35,12 @@ PictureView::PictureView(float width, float height, const entry_ref* ref)
 	SetExplicitMinSize(size);
 	SetExplicitMaxSize(size);
 
-	BMimeType mime;
-	mime.SetType(B_PERSON_MIMETYPE);
+	BMimeType mime(B_PERSON_MIMETYPE);
 	uint8* iconData;
 	size_t iconDataSize;
 	if (mime.GetIcon(&iconData, &iconDataSize) == B_OK) {
-		fDefaultPicture = new BBitmap(BRect(0, 0, width - 1, height - 1),
+		float size = width < height ? width : height;
+		fDefaultPicture = new BBitmap(BRect(0, 0, size, size),
 			B_RGB32);
 		if (fDefaultPicture->InitCheck() != B_OK
 			|| BIconUtils::GetVectorIcon(iconData, iconDataSize,
@@ -48,7 +50,7 @@ PictureView::PictureView(float width, float height, const entry_ref* ref)
 		}
 	}
 
-	Update();
+	Update(ref);
 }
 
 
@@ -86,20 +88,18 @@ PictureView::Revert()
 
 
 void
-PictureView::Update()
+PictureView::Update(const entry_ref* ref)
 {
-	fOriginalPicture = BTranslationUtils::GetBitmap(fRef);
+	fOriginalPicture = BTranslationUtils::GetBitmap(ref);
 	if (fOriginalPicture != NULL)
 		fPicture = fOriginalPicture;
-	else
-		fPicture = fDefaultPicture;
 
 	Invalidate();
 }
 
 
 BBitmap*
-PictureView::Picture()
+PictureView::Bitmap()
 {
 	return fPicture != fDefaultPicture ? fPicture : NULL;
 }
@@ -139,17 +139,33 @@ void
 PictureView::Draw(BRect updateRect)
 {
 	BRect rect = Bounds();
-	if (fPicture != NULL) {
-		if (fPicture == fDefaultPicture) {
+
+	BBitmap* picture = fPicture ? fPicture : fDefaultPicture;
+	if (picture != NULL) {
+		if (picture == fDefaultPicture) {
 			SetDrawingMode(B_OP_ALPHA);
 			SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_OVERLAY);
 			SetHighColor(0, 0, 0, 24);
 		}
- 		DrawBitmapAsync(fPicture, fPicture->Bounds(),
-			rect.InsetByCopy(kPictureMargin, kPictureMargin),
-			B_FILTER_BITMAP_BILINEAR);
+
+		// scale to fit and center picture in frame
+		BRect frame = rect.InsetByCopy(kPictureMargin, kPictureMargin);
+		BRect srcRect = picture->Bounds();
+		BSize size = frame.Size();
+		if (srcRect.Width() > srcRect.Height())
+			size.height = srcRect.Height() * size.width / srcRect.Width();
+		else
+			size.width = srcRect.Width() * size.height / srcRect.Height();
+		BRect dstRect = BLayoutUtils::AlignInFrame(frame, size,
+			BAlignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_VERTICAL_CENTER));
+
+ 		DrawBitmapAsync(picture, srcRect, dstRect, B_FILTER_BITMAP_BILINEAR);
+
+		if (picture == fDefaultPicture)
+			SetDrawingMode(B_OP_OVER);
 	}
 
+	// Draw the outer frame
 	rgb_color black = {0, 0, 0, 255};
 	SetHighColor(tint_color(black, B_LIGHTEN_2_TINT));
 	StrokeRect(rect);
