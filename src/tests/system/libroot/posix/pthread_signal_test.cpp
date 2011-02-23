@@ -9,6 +9,7 @@
 
 
 static pthread_attr_t attributes;
+static int id[4] = {0, 1, 2, 3};
 static pthread_t tid[4];
 static bool	state[4];
 static bool blocking[4];
@@ -85,18 +86,20 @@ self_suspend(int* i)
 void *
 threadStart(void *arg)
 {
-	int *i = (int*)arg;
-	pthread_setspecific(self, i);
+	int i = *(int*)arg;
+	pthread_setspecific(self, &i);
 
-	state[*i] = true;
-	blocking[*i] = true;
+	state[i] = true;
+	blocking[i] = true;
+
+	printf("threadStart(%d)\n", i);
 	
 	for (int j = 0; j < 10; j++) {
-		self_suspend(i);
-		usleep(10000);
+		usleep(1000000);
+		self_suspend(&i);
 	}
 
-	printf("quitting %d\n", *i);
+	printf("quitting %d\n", i);
 	return NULL;
 }
 
@@ -130,8 +133,9 @@ resumeAllThreads()
 		}
 	}
 
+	int t = 50;
 	for (int i = 0; i < 4; i++) {
-		while(state[i] == false) {
+		while(state[i] == false && t-- > 0) {
 			printf("thread %d still suspended, yielding\n", i);
 			sched_yield();
 		}
@@ -150,14 +154,14 @@ main(int argc, char **argv)
 	pthread_attr_setdetachstate(&attributes, PTHREAD_CREATE_DETACHED);
 
 	for (int i = 0; i < 4; i++) {
-		if (pthread_create(&tid[i], &attributes, threadStart, &i) != 0)
+		if (pthread_create(&tid[i], &attributes, threadStart, &id[i]) != 0)
 			fprintf(stderr, "couldn't create thread %d\n", i);
 		printf("thread %d created\n", i);
 	}
 	
 	/*suspendAllThreads();*/
 	printf("snoozing\n");
-	usleep(2000000);
+	usleep(3000000);
 	printf("resuming all threads\n");
 	resumeAllThreads();
 	printf("resuming all threads done\n");
