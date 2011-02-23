@@ -117,7 +117,7 @@ main(int argc, char **argv)
 				sAllVolumes = true;
 				break;
 			case 'v':
-				strncpy(volumePath, optarg, B_FILE_NAME_LENGTH);
+				strlcpy(volumePath, optarg, B_FILE_NAME_LENGTH);
 				break;
 
 			default:
