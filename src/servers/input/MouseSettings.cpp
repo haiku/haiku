@@ -105,7 +105,8 @@ MouseSettings::SaveSettings()
 		return status;
 
 	BFile file(path.Path(), B_READ_WRITE | B_CREATE_FILE);
-	if (status < B_OK)
+	status = file.InitCheck();
+	if (status != B_OK)
 		return status;
 
 	file.Write(&fSettings, sizeof(fSettings));
