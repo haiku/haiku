@@ -36,11 +36,8 @@ static char iroha_server_name[CANNA_SERVER_NAME_LEN] = {0, 0};
 int
 RkSetServerName(char *s)
 {
-  if (s)
-    (void)strncpy(iroha_server_name, s, CANNA_SERVER_NAME_LEN);
-  else
-    iroha_server_name[0] = '\0';
-  return 0;
+	strlcpy(iroha_server_name, s, CANNA_SERVER_NAME_LEN);
+	return 0;
 }
 
 char *
