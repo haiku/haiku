@@ -581,7 +581,7 @@ pcap_lookupnet(device, netp, maskp, errbuf)
 	/* XXX Work around Linux kernel bug */
 	ifr.ifr_addr.sa_family = AF_INET;
 #endif
-	(void)strncpy(ifr.ifr_name, device, sizeof(ifr.ifr_name));
+	(void)strlcpy(ifr.ifr_name, device, sizeof(ifr.ifr_name));
 	if (ioctl(fd, SIOCGIFADDR, (char *)&ifr) < 0) {
 		if (errno == EADDRNOTAVAIL) {
 			(void)snprintf(errbuf, PCAP_ERRBUF_SIZE,
