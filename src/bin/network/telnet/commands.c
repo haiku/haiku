@@ -2271,7 +2271,7 @@ tn(int argc, char *argv[])
 	hostname = hostp;
 	memset(&su, 0, sizeof su);
 	su.sun_family = AF_UNIX;
-	strncpy(su.sun_path, hostp, sizeof su.sun_path);
+	strlcpy(su.sun_path, hostp, sizeof su.sun_path);
 	printf("Trying %s...\n", hostp);
 	net = socket(AF_UNIX, SOCK_STREAM, 0);
 	if ( net < 0) {
