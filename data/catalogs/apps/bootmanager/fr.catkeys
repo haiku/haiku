@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-BootManager	2058739736
+1	french	x-vnd.Haiku-BootManager	4221922214
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Le programme est sur le point de restaurer l'enregistrement d'amorçage maître (MBR) de %disk à partir de %file. Voulez-vous continuer ?
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		vous êtes sur le point d'écrire le menu de démarrage sur le disque. Êtes-vous sûr de vouloir continuer ?
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Le programme est sur le point d'écrire le menu suivant sur le disque de démarrage (%s). Veuillez vérifier les informations ci-dessous avant de continuer.
