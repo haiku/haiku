@@ -241,7 +241,7 @@ BPrintJob::BeginJob()
 
 	// TODO: fSpoolFileName should store the name only (not path which can be
 	// 1024 bytes long)
-	strncpy(fSpoolFileName, path.Path(), sizeof(fSpoolFileName));
+	strlcpy(fSpoolFileName, path.Path(), sizeof(fSpoolFileName));
 	fSpoolFile = new BFile(fSpoolFileName, B_READ_WRITE | B_CREATE_FILE);
 
 	if (fSpoolFile->InitCheck() != B_OK) {
