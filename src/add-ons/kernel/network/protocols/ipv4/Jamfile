@@ -20,9 +20,6 @@ KernelAddon ipv4 :
 ;
 
 # Installation
-HaikuInstall install-networking : /boot/home/config/add-ons/kernel/haiku_network/protocols
+HaikuInstall install-networking : /boot/home/config/add-ons/kernel/network/protocols
 	: ipv4 ;
 
-Package haiku-networkingkit-cvs :
-	haiku :
-	boot home config add-ons kernel haiku_network protocols ;

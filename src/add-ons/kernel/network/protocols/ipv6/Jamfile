@@ -21,9 +21,6 @@ KernelAddon ipv6 :
 ;
 
 # Installation
-HaikuInstall install-networking : /boot/home/config/add-ons/kernel/haiku_network/protocols
+HaikuInstall install-networking : /boot/home/config/add-ons/kernel/network/protocols
 	: ipv6 ;
 
-Package haiku-networkingkit-cvs :
-	haiku :
-	boot home config add-ons kernel haiku_network protocols ;
