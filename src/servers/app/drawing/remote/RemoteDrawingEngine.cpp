@@ -26,6 +26,8 @@ RemoteDrawingEngine::RemoteDrawingEngine(RemoteHWInterface* interface)
 	fExtendWidth(0),
 	fCallbackAdded(false),
 	fResultNotify(-1),
+	fStringWidthResult(0.0f),
+	fReadBitmapResult(NULL),
 	fBitmapDrawingEngine(NULL)
 {
 	RemoteMessage message(NULL, fHWInterface->SendBuffer());
