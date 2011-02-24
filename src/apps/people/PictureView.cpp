@@ -127,13 +127,15 @@ PictureView::Revert()
 void
 PictureView::Update(const entry_ref* ref)
 {
-	// Don't update when user has changed the picture
+	// Don't update when user has modified the picture
 	if (HasChanged())
 		return;
 
+	BBitmap* bitmap = BTranslationUtils::GetBitmap(ref);
+	_SetPicture(bitmap);
+
 	delete fOriginalPicture;
-	fOriginalPicture = BTranslationUtils::GetBitmap(ref);
-	_SetPicture(fOriginalPicture);
+	fOriginalPicture = fPicture;
 }
 
 
