@@ -695,7 +695,7 @@ BMessage::_PrintToStream(const char* indent) const
 				case B_MESSAGE_TYPE:
 				{
 					char buffer[1024];
-					sprintf(buffer, "%s        ", indent);
+					snprintf(buffer, sizeof(buffer), "%s        ", indent);
 
 					BMessage message;
 					status_t result = message.Unflatten((const char *)pointer);
