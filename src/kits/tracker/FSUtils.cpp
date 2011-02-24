@@ -2996,7 +2996,7 @@ FSCreateNewFolderIn(const node_ref *dirNode, entry_ref *newRef,
 	status_t result = dir.InitCheck();
 	if (result == B_OK) {
 		char name[B_FILE_NAME_LENGTH];
-		strcpy(name, B_TRANSLATE("New folder"));
+		strlcpy(name, B_TRANSLATE("New folder"), sizeof(name));
 
 		int32 fnum = 1;
 		while (dir.Contains(name)) {

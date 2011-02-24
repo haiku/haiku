@@ -1319,9 +1319,9 @@ FindPanel::PushMimeType(BQuery *query) const
 	if (strcmp(kAllMimeTypes, type)) {
 		// add an asterisk if we are searching for a supertype
 		char buffer[B_FILE_NAME_LENGTH];
-		if (strchr(type,'/') == NULL) {
-			strcpy(buffer,type);
-			strcat(buffer,"/*");
+		if (strchr(type, '/') == NULL) {
+			strlcpy(buffer, type, sizeof(buffer));
+			strlcat(buffer, "/*", sizeof(buffer));
 			type = buffer;
 		}
 
