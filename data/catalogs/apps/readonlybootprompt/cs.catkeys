@@ -1,0 +1,7 @@
+1	czech	x-vnd.Haiku-ReadOnlyBootPrompt	2165068388
+Desktop (Live-CD)	BootPromptWindow		Plocha (Live-CD)
+Do you wish to run the Installer or continue booting to the Desktop? You can also select your preferred language and keyboard layout from the list below.\n\nNote: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.	BootPromptWindow		Přejete si spustit Instalátor, nebo pokračovat k Ploše? Můžete také vybrat jazyk a rozložení klávesnice ze seznamu níže.\n\nPoznámka: Na lokalizaci aplikací Haiku a dalších komponent se pracuje. Často narazíte na nepřeložené řetězce, ale pokud chcete, můžete se zapojit do práce na <www.haiku-os.org>.
+Keymap	BootPromptWindow		Rozložení klávesnice
+Language	BootPromptWindow		Jazyk
+Run Installer	BootPromptWindow		Spustit Instalátor
+Welcome to Haiku!	BootPromptWindow		Vítejte v Haiku!

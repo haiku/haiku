@@ -1,0 +1,65 @@
+1	czech	x-vnd.Haiku-Devices	4145096865
+ACPI Information	DeviceACPI		Informace o ACPI
+ACPI Processor Namespace '%2'	DeviceACPI		ACPI Namespace Processoru '%2'
+ACPI System Bus	DeviceACPI		ACPI Systémová Sběrnice
+ACPI System Indicator	DeviceACPI		ACPI Systémový Indikátor
+ACPI Thermal Zone	DeviceACPI		ACPI Tepelná Zóna
+ACPI controller	Device		ACPI kontroler
+ACPI node '%1'	DeviceACPI		ACPI uzel '%1'
+About	DevicesApplication		o
+About Devices…	DevicesView		O Devices...
+Basic information	DevicesView		Základní informace
+Bridge	Device		Bridge
+Bus	DevicesView		Sběrnice
+Category	DevicesView		Kategorie
+Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Informace třídy:\t\t\t\t: %classInfo%
+Class info	DevicePCI		Informace o třídě
+Communication controller	Device		Kontroler komunikace
+Computer	Device		Počítač
+Connection	DevicesView		Připojení
+Detailed	DevicesView		Detailně
+Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Jméno zařízení\t\t\t\t: %Name%\nVýrobce\t\t\t: %Manufacturer%\nPoužitý ovladač\t\t\t\t: %DriverUsed%\nCesty zařízení\t: %DevicePaths%
+Device name	Device		Jméno zařízení
+Device name	DeviceACPI		Název zařízení
+Device name	DevicePCI		Název zařízení
+Device name:	Device		Jméno zařízení:
+Device paths	Device		Cesty zařízení
+Device paths	DevicePCI		Cesta zařízení
+Devices	DevicesApplication		Zařízení
+Devices	DevicesView		Zařízení
+Devices\n\twritten by Pieter Panman\n\n\tBased on listdev by Jérôme Duval\n\tand the previous Devices preference\n\tby Jérôme Duval and Sikosis\n\tCopyright 2009, Haiku, Inc.\n	DevicesApplication		Devices\n\tnapsal Pieter Panman\n\n\tVytvořeno na základě listdev od Jerôme Duval\n\ta předchozích Devices preference\n\tod Jérôme Duval and Sikosis\n\tCopyright 2009, Haiku, Inc.\n
+Display controller	Device		Kontroler obrazovky
+Docking station	Device		Dokovací stanice
+Driver used	Device		Použitý ovladač
+Driver used	DevicePCI		Použitý ovladač
+Encryption controller	Device		Kontroler šifrování
+Generate system information	DevicesView		Generovat systémové informace
+Generic system peripheral	Device		Periferie generického systému
+Input device controller	Device		Kontroler vstupních zařízení
+Intelligent controller	Device		Inteligentní kontroler
+Manufacturer	Device		Výrobce
+Manufacturer	DeviceACPI		Výrobce
+Manufacturer	DevicePCI		Výrobce
+Manufacturer:	Device		Výrobce:
+Mass storage controller	Device		Kontroler Mass storage
+Memory controller	Device		Kontroler paměti
+Multimedia controller	Device		Kontroler multimédií
+Name	PropertyList		Jméno
+Network controller	Device		Kontroler sítě
+None	Device		Nic
+Not implemented	DeviceACPI		Neimplementováno
+Not implemented	DevicePCI		Neimplementováno
+OK	DevicesApplication		OK
+Order by:	DevicesView		Seřadit podle:
+PCI Information	DevicePCI		PCI informace
+Processor	Device		Procesor
+Quit	DevicesView		Ukončit
+Refresh devices	DevicesView		Obnovit zařízení
+Report compatibility	DevicesView		Kompatibilita zpráv
+Satellite communications controller	Device		Kontroler satelitních komunikací
+Serial bus controller	Device		Kontroler sériové sběrnice
+Signal processing controller	Device		Kontroler zpracování signálu
+Unclassified device	Device		Neklasifikované zařízení
+Unknown	DevicePCI		Neznámý
+Value	PropertyList		Hodnota
+Wireless controller	Device		Bezdrátový kontroler

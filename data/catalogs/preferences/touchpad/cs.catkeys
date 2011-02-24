@@ -1,0 +1,16 @@
+1	czech	x-vnd.Haiku-Touchpad	1498191605
+Defaults	TouchpadPrefView		Výchozí
+Fast	TouchpadPrefView		Rychle
+High	TouchpadPrefView		Vysoký
+Horizontal scroll speed	TouchpadPrefView		Rychlost horizontálního scrolování
+Horizontal scrolling	TouchpadPrefView		Horizontální scrolování
+Off	TouchpadPrefView		Vypnuto
+Revert	TouchpadPrefView		Vrátit
+Scroll acceleration	TouchpadPrefView		Zrychlení scrolování
+Scrolling	TouchpadPrefView		Scrolování
+Slow	TouchpadPrefView		Pomalu
+Tap click sensitivity	TouchpadPrefView		Citlivost na klik poklepáním
+Tap gesture	TouchpadPrefView		Gesto poklepání
+Touchpad	TouchpadMain		Touchpad
+Two finger scrolling	TouchpadPrefView		Scrolovat dvěma prsty
+Vertical scroll speed	TouchpadPrefView		Rychlost vertikálního scrolování

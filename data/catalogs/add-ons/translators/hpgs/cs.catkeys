@@ -1,0 +1,12 @@
+1	czech	x-vnd.Haiku-HPGSTranslator	3633584048
+Based on HPGS (http://hpgs.berlios.de)	ConfigView		Vytvořeno na základě HPGS (http://hpgs.berlios.de)
+Error: Cannot imbue plot device to reader: %s\n	HPGSTranslator		Chyba: Nemohu naplnit vykreslovací zařízení pro prohlížeč: %s\n
+Error: Cannot process plot data %s\n	HPGSTranslator		Chyba: Nemohu vykreslit data %s\n
+HPGS image	HPGSTranslator		obraz HPGS
+HPGS image translator	HPGSTranslator		překladač HPGS obrazů
+HPGS images	ConfigView		HPGS obrazy
+HPGS images	HPGSTranslator		HPGS obrazy
+HPGSTranslator Settings	ConfigView		Nastavení převadače HPGS
+Version %d.%d.%d, %s	ConfigView		Verze %d.%d.%d, %s
+Write error %s\n	HPGSTranslator		Chyba zápisu %s\n
+no hpgs\n	HPGSTranslator		není hpgs\n

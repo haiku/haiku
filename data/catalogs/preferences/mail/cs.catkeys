@@ -1,0 +1,42 @@
+1	czech	x-vnd.Haiku-Mail	3023422579
+Account name:	Config Views		Název účtu:
+Account settings	Config Views		Nastavení účtu
+Accounts	Config Window		Úcty
+Add	Config Window		Přidat
+Alpha	Config Window		Alpha
+Always	Config Window		Vždy
+Apply	Config Window		Použít
+Beta	Config Window		Beta
+Check every	Config Window		Ověřit každých
+Development	Config Window		Vývoj
+E-mail	Config Window		E-mail
+Edit mailbox menu…	Config Window		Upravit nabídku schránky
+Error	Config Window		Chyba
+Error retrieving general settings: %s\n	Config Window		Chyba při získávání obecných nastavení: %s\n
+Final	Config Window		Finální
+Gamma	Config Window		Gamma
+Golden master	Config Window		Golden master
+Mail Daemon Replacement\n\nby Haiku, Inc. All rights reserved.\n\nVersion %ld.%ld.%ld %s\n\nSee LICENSE file included in the installation package for more information.\n\n\n\nYou can contact us at:\n%s\n\nPlease submit bug reports using the %s\n\nProject homepage at:\n%s	Config Window		Náhrada za Mail Daemon\n\nod Haiku, Inc. Všechna práva vyhrazena.\n\nVerze %ld.%ld.%ld %s\n\nPřečtete si soubor s LICENCÍ v instalačním balíčku pro více informací.\n\n\n\nMůžete nás kontaktovat na:\n%s\n\nProsím odevzdávejte bugreporty přes %s\n\nDomovská stránka projektu:\n%s
+Mail checking	Config Window		Zjišťování pošty
+Miscellaneous	Config Window		Ostatní
+OK	Config Window		OK
+Only when dial-up is connected	Config Window		Pouze při dial-up připojení
+Real name:	Config Views		Skutečné jméno:
+Remove	Config Window		Odebrat
+Return address:	Config Views		Zpáteční adresa:
+Revert	Config Window		Vrátit
+Schedule outgoing mail when dial-up is disconnected	Config Window		Pozdržet odesílaní pošty dokud je dial-up odpojen
+Settings	Config Window		Nastavení
+Show connection status window:	Config Window		Zobrazit okno stavu připojení:
+Start mail services on startup	Config Window		Spustit poštovní služby při startu
+While sending	Config Window		Během odesílání
+While sending and receiving	Config Window		Během odesílání a přijímání
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nZákladní nastavení nemůže být vráceno.\n\nChyba získání základního nastavení:\n%s\n
+\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nVytvořte nový účet pomocí talčítka Přidat.\n\nÚčet ostraníte stisknutím tlačítka Odstranit na vybrané položce.\n\nVyberte položku ze seznamu pro změnu jejího nastavení.
+days	Config Window		dny
+hours	Config Window		hodiny
+minutes	Config Window		minut/y
+never	Config Window		nikdy
+· E-mail filters	Config Window		· filtry zpráv
+· Incoming	Config Window		· Příchozí
+· Outgoing	Config Window		· Odchozí

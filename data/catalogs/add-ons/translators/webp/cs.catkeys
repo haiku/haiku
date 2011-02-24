@@ -1,0 +1,10 @@
+1	czech	x-vnd.Haiku-WebPTranslator	3502239072
+Based on libwebp v0.1	ConfigView		Vytvořeno na základě libwebp v0.1
+Version %d.%d.%d, %s	ConfigView		Verze %d.%d.%d, %s
+WebP Images	ConfigView		Obrázky WebP
+WebP Settings	main		WebP Nastavení
+WebP image	WebPTranslator		obrázek WebP
+WebP image translator	WebPTranslator		převaděč obrázků WebP
+WebP images	WebPTranslator		obrázky WebP
+WebPTranslator Settings	ConfigView		Nastavení WebP Převaděče
+stream GetSize(): %lld\n	WebPTranslator		stream GetSize(): %lld\n

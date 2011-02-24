@@ -1,0 +1,14 @@
+1	czech	x-vnd.Haiku-CDPlayer	744500153
+Audio CD	CDPlayer		Audio CD
+CD	CDPlayer		CD
+CD drive is empty	CDPlayer		CD mechanika je prázdná.
+CDPlayer	CDPlayer		CDPlayer
+Disc: %ld:%.2ld / %ld:%.2ld	CDPlayer		Disk: %ld:%.2ld / %ld:%.2ld
+Disc: --:-- / --:--	CDPlayer		Disk: --:-- / --:--
+Disc: 88:88 / 88:88	CDPlayer		Disk: 88:88 / 88:88
+It appears that there are no CD drives on your computer or there is no system software to support one. Sorry.	CDPlayer		Vypadá to, že ve vašem počítači nejsou žádné CD mechaniky nebo není žádný systémový software, který by je podporoval. Je mi líto.
+OK	CDPlayer		OK
+Track %whichTrack%: %trackAt%	CDPlayer		Stopa %whichTrack%: %trackAt%
+Track: %ld:%.2ld / %ld:%.2ld	CDPlayer		Stopa: %ld:%.2ld / %ld:%.2ld
+Track: --:-- / --:--	CDPlayer		Stopa: --:-- / --:--
+Track: 88:88 / 88:88	CDPlayer		Stopa: 88:88 / 88:88
