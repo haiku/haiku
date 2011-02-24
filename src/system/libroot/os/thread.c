@@ -99,10 +99,12 @@ spawn_thread(thread_func entry, const char *name, int32 priority, void *data)
 	attributes.stack_address = NULL;
 	attributes.stack_size = 0;
 
-	thread->id = _kern_spawn_thread(&attributes);
-	if (thread->id < 0)
+	thread_id id = _kern_spawn_thread(&attributes);
+	if (id < 0)
 		free(thread);
-	return thread->id;
+	else
+		thread->id = id;
+	return id;
 }
 
 
