@@ -91,6 +91,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	Welcome					- introductory documentation to Haiku
 #	WifiFirmwareScriptData	- data files needed by install-wifi-firmwares.sh
 #	WonderBrush				- native graphics application
+#	WQY-MicroHei				- Chinese font
 #	XZ-Utils				- file archiving utility
 #	Yasm					- the assembler utility
 
@@ -1854,6 +1855,14 @@ if [ IsOptionalHaikuImagePackageAdded WonderBrush ] {
 		AddSymlinkToHaikuImage home config be Applications
 			: /boot/apps/WonderBrush/WonderBrush ;
 	}
+}
+
+
+# WQY-MicroHei
+if [ IsOptionalHaikuImagePackageAdded WQY-MicroHei ] {
+	InstallOptionalHaikuImagePackage 
+		wqy-microhei-0.2.0-beta-x86-gcc2-2011-02-23.zip
+		: $(baseURL)/wqy-microhei-0.2.0-beta-x86-gcc2-2011-02-23.zip ;
 }
 
 
