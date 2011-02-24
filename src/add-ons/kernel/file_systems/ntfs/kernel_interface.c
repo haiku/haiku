@@ -19,20 +19,16 @@
  */
  
 
-#include <stdlib.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <string.h>
 #include <ctype.h>
-#include <stdio.h>
 #include <dirent.h>
-#include <sys/stat.h>
-#include <time.h>
-#include <lock.h>
-#include <malloc.h>
+#include <errno.h>
+#include <fcntl.h>
 #include <stdio.h>
-
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <unistd.h>
+#include <sys/stat.h>
 
 #include <fs_interface.h>
 #include <kernel/lock.h>

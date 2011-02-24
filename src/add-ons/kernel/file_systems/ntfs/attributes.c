@@ -16,7 +16,7 @@
 
 #include <dirent.h>
 #include <fs_attr.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "attributes.h"
