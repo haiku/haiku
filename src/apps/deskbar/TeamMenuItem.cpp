@@ -521,8 +521,7 @@ TTeamMenuItem::ToggleExpandState(bool resizeWindow)
 
 				if (resizeWindow)
 					parent->SizeWindow();
-			} else
-				fExpanded = fExpanded;
+			}
 		}
 	} else {
 		// Remove the goodies from the Menu() that should be in the SubMenu();
@@ -544,8 +543,7 @@ TTeamMenuItem::ToggleExpandState(bool resizeWindow)
 
 			if (resizeWindow)
 				parent->SizeWindow();
-		} else
-			fExpanded = fExpanded;
+		}
 	}
 }
 
