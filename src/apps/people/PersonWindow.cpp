@@ -129,21 +129,25 @@ PersonWindow::MenusBeginning()
 	fSave->SetEnabled(enabled);
 	fRevert->SetEnabled(enabled);
 
+	bool isRedo = false;
+	bool undoEnabled = false;
+	bool cutAndCopyEnabled = false;
+
 	BTextView* textView = dynamic_cast<BTextView*>(CurrentFocus());
 	if (textView != NULL) {
-		bool isRedo = false;
 		undo_state state = textView->UndoState(&isRedo);
-		fUndo->SetEnabled(state != B_UNDO_UNAVAILABLE);
+		undoEnabled = state != B_UNDO_UNAVAILABLE;
 
-		if (isRedo)
-			fUndo->SetLabel(B_TRANSLATE("Redo"));
-		else
-			fUndo->SetLabel(B_TRANSLATE("Undo"));
-
-		enabled = fView->IsTextSelected();
-		fCut->SetEnabled(enabled);
-		fCopy->SetEnabled(enabled);
+		cutAndCopyEnabled = fView->IsTextSelected();
 	}
+
+	if (isRedo)
+		fUndo->SetLabel(B_TRANSLATE("Redo"));
+	else
+		fUndo->SetLabel(B_TRANSLATE("Undo"));
+	fUndo->SetEnabled(undoEnabled);
+	fCut->SetEnabled(cutAndCopyEnabled);
+	fCopy->SetEnabled(cutAndCopyEnabled);
 
 	be_clipboard->Lock();
 	fPaste->SetEnabled(be_clipboard->Data()->HasData("text/plain", B_MIME_TYPE));
