@@ -22,6 +22,7 @@
 BNotification::BNotification(notification_type type)
 	:
 	fType(type),
+	fProgress(0),
 	fFile(NULL),
 	fBitmap(NULL)
 {
