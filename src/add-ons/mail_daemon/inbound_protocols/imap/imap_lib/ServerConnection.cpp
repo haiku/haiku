@@ -212,7 +212,7 @@ SocketConnection::WaitForData(bigtime_t timeout)
 	/* Set the socket in the mask. */
 	FD_SET(fSocket, &fds);
 
-	int result = select(32, &fds, NULL, NULL, &tv);
+	int result = select(fSocket + 1, &fds, NULL, NULL, &tv);
 	if (result == 0)
 		return B_TIMED_OUT;
 	if (result < 0)
