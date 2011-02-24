@@ -120,20 +120,20 @@ PictureView::Revert()
 	if (!HasChanged())
 		return;
 
-	_DeletePicture();
-	fPicture = fOriginalPicture;
-	Invalidate();
+	_SetPicture(fOriginalPicture);
 }
 
 
 void
 PictureView::Update(const entry_ref* ref)
 {
-	fOriginalPicture = BTranslationUtils::GetBitmap(ref);
-	if (fOriginalPicture != NULL)
-		fPicture = fOriginalPicture;
+	// Don't update when user has changed the picture
+	if (HasChanged())
+		return;
 
-	Invalidate();
+	delete fOriginalPicture;
+	fOriginalPicture = BTranslationUtils::GetBitmap(ref);
+	_SetPicture(fOriginalPicture);
 }
 
 
@@ -158,9 +158,7 @@ PictureView::MessageReceived(BMessage* message)
 			if (picture == NULL)
 				break;
 
-			_DeletePicture();
-
-			fPicture = picture;
+			_SetPicture(picture);
 			MakeFocus(true);
 			break;
 		}
@@ -171,7 +169,7 @@ PictureView::MessageReceived(BMessage* message)
 
 		case B_DELETE:
 		case B_TRASH_TARGET:
-			_DeletePicture();
+			_SetPicture(NULL);
 			break;
 
 		case kMsgPopUpMenuClosed:
@@ -274,7 +272,7 @@ PictureView::KeyDown(const char* bytes, int32 numBytes)
 
 	switch (*bytes) {
 		case B_DELETE:
-			_DeletePicture();
+			_SetPicture(NULL);
 			break;
 
 		default:
@@ -411,15 +409,12 @@ PictureView::_HandleDrop(BMessage* message)
 
 
 void
-PictureView::_DeletePicture()
+PictureView::_SetPicture(BBitmap* picture)
 {
-	if (fPicture == NULL)
-		return;
-
 	if (fPicture != fOriginalPicture)
 		delete fPicture;
 
-	fPicture = NULL;
+	fPicture = picture;
 	Invalidate();
 }
 

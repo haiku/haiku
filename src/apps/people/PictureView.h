@@ -44,7 +44,7 @@ private:
 			void				_ShowPopUpMenu(BPoint screen);
 			BBitmap*			_CopyPicture(uint8 alpha);
 
-			void				_DeletePicture();
+			void				_SetPicture(BBitmap* bitmap);
 
 			BBitmap*			fPicture;
 			BBitmap*			fOriginalPicture;
