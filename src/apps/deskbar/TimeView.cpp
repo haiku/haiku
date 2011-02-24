@@ -80,6 +80,8 @@ TTimeView::TTimeView(float maxWidth, float height, bool showSeconds,
 {
 	fTime = fLastTime = time(NULL);
 	fSeconds = fMinute = fHour = 0;
+	fTimeStr[0] = 0;
+	fDateStr[0] = 0;
 	fLastTimeStr[0] = 0;
 	fLastDateStr[0] = 0;
 	fNeedToUpdate = true;
@@ -94,7 +96,6 @@ TTimeView::TTimeView(BMessage* data)
 {
 	fTime = fLastTime = time(NULL);
 	data->FindBool("seconds", &fShowSeconds);
-	data->FindBool("interval", &fInterval);
 
 	fLocale = *BLocale::Default();
 }
@@ -122,7 +123,6 @@ TTimeView::Archive(BMessage* data, bool deep) const
 {
 	BView::Archive(data, deep);
 	data->AddBool("seconds", fShowSeconds);
-	data->AddBool("interval", fInterval);
 	data->AddInt32("deskbar:private_align", B_ALIGN_RIGHT);
 
 	return B_OK;
@@ -268,7 +268,7 @@ TTimeView::GetCurrentDate()
 	if (str[0] == '0')
 		str++;
 
-	strcpy(fDateStr, str);
+	strlcpy(fDateStr, str, sizeof(fDateStr));
 }
 
 
@@ -329,8 +329,8 @@ TTimeView::Pulse()
 			|| !fLastTimeStr[0])
 			Update();
 
-		strcpy(fLastTimeStr, fTimeStr);
-		strcpy(fLastDateStr, fDateStr);
+		strlcpy(fLastTimeStr, fTimeStr, sizeof(fLastTimeStr));
+		strlcpy(fLastDateStr, fDateStr, sizeof(fLastDateStr));
 		fNeedToUpdate = true;
 	}
 
@@ -338,7 +338,6 @@ TTimeView::Pulse()
 		fSeconds = ct->tm_sec;
 		fMinute = ct->tm_min;
 		fHour = ct->tm_hour;
-		fInterval = ct->tm_hour >= 12;
 
 		Draw(Bounds());
 		fNeedToUpdate = false;

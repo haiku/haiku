@@ -103,7 +103,6 @@ class TTimeView : public BView {
 		int			fSeconds;
 		int			fMinute;
 		int			fHour;
-		bool		fInterval;
 
 		bool		fShowInterval;
 		bool		fShowSeconds;
