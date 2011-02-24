@@ -41,6 +41,8 @@ void __init_pwd_backend(void);
 void __reinit_pwd_backend_after_fork(void);
 void* __arch_get_caller(void);
 
+void __init_pthread(void);
+
 
 #ifdef __cplusplus
 }

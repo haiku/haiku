@@ -5,7 +5,8 @@
  */
 
 
-#include "pthread_private.h"
+#include <libroot_private.h>
+#include <pthread_private.h>
 
 #include <signal.h>
 #include <stdlib.h>
@@ -90,6 +91,13 @@ __allocate_pthread(void *data)
 	memset(thread->specific, 0, sizeof(thread->specific));
 
 	return thread;
+}
+
+
+void
+__init_pthread(void)
+{
+	sMainThread.id = find_thread(NULL);
 }
 
 

@@ -60,6 +60,7 @@ initialize_before(image_id imageID)
 	__init_env(__gRuntimeLoader->program_args);
 	__init_heap_post_env();
 	__init_pwd_backend();
+	__init_pthread();
 }
 
 
