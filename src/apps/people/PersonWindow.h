@@ -62,7 +62,7 @@ private:
 			BMenuItem*			fRevert;
 			BMenuItem*			fSave;
 			BMenuItem*			fUndo;
-			PersonView*		fView;
+			PersonView*			fView;
 
 			BString				fNameAttribute;
 };

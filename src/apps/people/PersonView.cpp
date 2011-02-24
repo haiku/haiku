@@ -305,7 +305,7 @@ PersonView::Save()
 		if (fPictureView->Bitmap()) {
 			BBitmapStream stream(fPictureView->Bitmap());
 			BTranslatorRoster* roster = BTranslatorRoster::Default();
-			roster->Translate(&stream, NULL, NULL, fFile, B_PNG_FORMAT,
+			roster->Translate(&stream, NULL, NULL, fFile, B_JPEG_FORMAT,
 				B_TRANSLATOR_BITMAP);
 		}
 	}
