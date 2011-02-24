@@ -3167,7 +3167,7 @@ BPoseView::NewFileFromTemplate(const BMessage *message)
 		return;
 
 	char fileName[B_FILE_NAME_LENGTH] = "New ";
-	strcat(fileName, message->FindString("name"));
+	strlcat(fileName, message->FindString("name"), sizeof(fileName));
 	FSMakeOriginalName(fileName, &destDir, " copy");
 
 	entry_ref srcRef;
