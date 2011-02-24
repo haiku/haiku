@@ -34,6 +34,9 @@
 const uint32 SCROLL_X_DRAG = 'sxdr';
 const uint32 SCROLL_Y_DRAG = 'sydr';
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "TouchpadPrefView"
+
 
 TouchpadView::TouchpadView(BRect frame)
 	:
@@ -98,11 +101,11 @@ TouchpadView::MouseUp(BPoint point)
 	int32 result = 0;
 	if (GetRightScrollRatio() > kSoftScrollLimit
 		|| GetBottomScrollRatio() > kSoftScrollLimit) {
-		BAlert* alert = new BAlert("ReallyChangeScrollArea",
-			"The new scroll area is very large and may impede "
-			"normal mouse operation. Do you really want to change"
-			" it?", "OK", "Cancel", NULL, B_WIDTH_AS_USUAL,
-			B_WARNING_ALERT);
+		BAlert* alert = new BAlert(B_TRANSLATE("Please confirm"),
+			B_TRANSLATE("The new scroll area is very large and may impede "
+			"normal mouse operation. Do you really want to change it?"),
+			B_TRANSLATE("OK"), B_TRANSLATE("Cancel"),
+			NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		result = alert->Go();
 	}
 	if (result == 0) {
@@ -260,9 +263,6 @@ TouchpadView::DrawSliders()
 
 
 //	#pragma mark - TouchpadPrefView
-
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "TouchpadPrefView"
 
 
 TouchpadPrefView::TouchpadPrefView()

@@ -15,7 +15,6 @@
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "PropertyList"
 
-//#include <stdio.h>
 
 PropertyRow::PropertyRow(const char* name, const char* value)
 	: BRow(),
