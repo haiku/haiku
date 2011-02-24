@@ -172,8 +172,8 @@ PersonView::Draw(BRect updateRect)
 
 	// Draw a alert/get info-like strip
 	BRect stripeRect = Bounds();
-	float pictureWidth = /*fPictureView->Bounds().Width() */ 96;
-	stripeRect.right = 10 + pictureWidth / 2;
+	stripeRect.right = GridLayout()->HorizontalSpacing()
+		+ fPictureView->Bounds().Width() / 2;
 	SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
 	FillRect(stripeRect);
 }
