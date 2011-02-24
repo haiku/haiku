@@ -148,7 +148,6 @@ private:
 			float			fItemHeight;
 			TSwitcherWindow* fSwitcher;
 			TSwitchManager*	fManager;
-			bool			fLocal;
 };
 
 class TIconView : public BView {
@@ -183,7 +182,6 @@ private:
 			void			AnimateIcon(BBitmap* startIcon, BBitmap* endIcon);
 
 			bool			fAutoScrolling;
-			bool			fCapsState;
 			TSwitcherWindow* fSwitcher;
 			TSwitchManager*	fManager;
 			BBitmap*		fOffBitmap;
@@ -373,7 +371,7 @@ TTeamGroup::TTeamGroup(BList* teams, uint32 flags, char* name,
 	fSmallIcon(NULL),
 	fLargeIcon(NULL)
 {
-	strcpy(fSignature, signature);
+	strlcpy(fSignature, signature, sizeof(fSignature));
 
 	fSmallIcon = new BBitmap(BRect(0, 0, 15, 15), kIconFormat);
 	fLargeIcon = new BBitmap(BRect(0, 0, 31, 31), kIconFormat);
@@ -1262,7 +1260,9 @@ TBox::TBox(BRect bounds, TSwitchManager* manager, TSwitcherWindow* window,
 	fWindow(window),
 	fIconView(iconView),
 	fLeftScroller(false),
-	fRightScroller(false)
+	fRightScroller(false),
+	fUpScroller(false),
+	fDownScroller(false)
 {
 }
 
@@ -2175,6 +2175,7 @@ TWindowView::TWindowView(BRect rect, TSwitchManager* manager,
 		TSwitcherWindow* window)
 	: BView(rect, "wlist_view", B_FOLLOW_NONE, B_WILL_DRAW | B_PULSE_NEEDED),
 	fCurrentToken(-1),
+	fItemHeight(-1),
 	fSwitcher(window),
 	fManager(manager)
 {
