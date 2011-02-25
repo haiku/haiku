@@ -6,7 +6,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) src tests kits net preflet ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers net ] : true ;
 
 UsePrivateHeaders net shared ;
-UseLibraryHeaders agg icon ;
+UseLibraryHeaders agg ;
 
 
 AddResources Interfaces :

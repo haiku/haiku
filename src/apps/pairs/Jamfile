@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src apps pairs ;
 
-UseLibraryHeaders icon ;
-
 Application Pairs :
 	Pairs.cpp
 	PairsWindow.cpp

@@ -11,7 +11,6 @@ UsePrivateSystemHeaders ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel file_cache ;
 UseLibraryHeaders ncurses ;
 UseLibraryHeaders termcap ;
-UseLibraryHeaders icon ;
 
 local haiku-utils_rsrc = [ FGristFiles haiku-utils.rsrc ] ;
 

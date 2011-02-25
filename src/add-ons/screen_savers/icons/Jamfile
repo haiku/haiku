@@ -1,10 +1,9 @@
 SubDir HAIKU_TOP src add-ons screen_savers icons ;
 
-UseLibraryHeaders icon ;
 UsePrivateHeaders screen_saver ;
 	# For BuildScreenSaverDefaultSettingsView
 
 ScreenSaver Icons :
-	IconDisplay.cpp IconsSaver.cpp : 
-	be libscreensaver.so libicon.a $(TARGET_LIBSUPC++)
+	IconDisplay.cpp IconsSaver.cpp :
+	be libscreensaver.so $(TARGET_LIBSUPC++)
 ;

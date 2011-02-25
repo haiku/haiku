@@ -9,7 +9,6 @@ if $(TARGET_PLATFORM) != haiku {
 UsePublicHeaders [ FDirName add-ons mail_daemon ] ;
 UsePrivateHeaders mail ;
 UsePrivateHeaders shared ;
-UseLibraryHeaders icon ;
 
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
 

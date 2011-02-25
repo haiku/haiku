@@ -1,8 +1,6 @@
 SubDir HAIKU_TOP src apps expander ;
 
-UseLibraryHeaders icon ;
-
-Application Expander : 
+Application Expander :
 	ExpanderApp.cpp
 	ExpanderWindow.cpp
 	ExpanderThread.cpp

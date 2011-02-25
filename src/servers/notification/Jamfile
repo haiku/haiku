@@ -1,7 +1,6 @@
 SubDir HAIKU_TOP src servers notification ;
 
 UsePrivateHeaders notification ;
-UseLibraryHeaders icon ;
 
 Server notification_server :
 	AppGroupView.cpp

@@ -3,8 +3,7 @@ SubDir HAIKU_TOP src kits locale ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 UsePrivateHeaders libbe locale shared ;
-UsePublicHeaders locale storage icon ;
-UseLibraryHeaders icon ;
+UsePublicHeaders locale storage ;
 
 local sources =
 	cat.cpp
@@ -75,5 +74,5 @@ DoCatalogs liblocale.so
 	AboutWindow.cpp
 	ColorControl.cpp
 	StringForSize.cpp
-	TextView.cpp	
+	TextView.cpp
 	;

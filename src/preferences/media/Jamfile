@@ -6,18 +6,17 @@ if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 	SubDirC++Flags -fmultiple-symbol-spaces ;
 }
 
-UseLibraryHeaders icon ;
 UsePrivateHeaders media shared ;
 
 Preference Media :
 	Media.cpp
-	MediaAlert.cpp 
+	MediaAlert.cpp
 	MediaIcons.cpp
 	MediaListItem.cpp
 	MediaViews.cpp
 	MediaWindow.cpp
 	: media be $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
-	: media.rdef 
+	: media.rdef
 	;
 
 DoCatalogs Media

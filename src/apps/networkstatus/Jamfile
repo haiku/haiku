@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src apps networkstatus ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders net shared ;
-UseLibraryHeaders agg icon ;
+UseLibraryHeaders agg ;
 
 local icon_libs ;
 if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {

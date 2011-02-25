@@ -5,8 +5,6 @@ AddSubDirSupportedPlatforms libbe_test ;
 
 UsePrivateHeaders interface mount shared storage support tracker ;
 
-UseLibraryHeaders icon ;
-
 AddResources libtracker.so : TrackerIcons.rdef libtracker.rdef ;
 
 SubDirC++Flags

@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons translators hvif ;
 
-UseLibraryHeaders icon ;
-
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
 AddResources HVIFTranslator : HVIFTranslator.rdef ;
@@ -10,7 +8,7 @@ Translator HVIFTranslator :
 	HVIFMain.cpp
 	HVIFTranslator.cpp
 	HVIFView.cpp
-	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++) 
+	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++)
 	$(HAIKU_LOCALE_LIBS)
 	: true
 ;
