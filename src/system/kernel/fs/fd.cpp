@@ -12,6 +12,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <sys/ioctl.h>
 
 #include <OS.h>
 
@@ -514,6 +515,17 @@ fd_ioctl(bool kernelFD, int fd, uint32 op, void* buffer, size_t length)
 	descriptor = get_fd(get_current_io_context(kernelFD), fd);
 	if (descriptor == NULL)
 		return B_FILE_ERROR;
+
+	if (op == FIONBIO || op == FIONREAD) {
+		switch (descriptor->type) {
+			case FDTYPE_FILE:
+			case FDTYPE_DIR:
+			case FDTYPE_ATTR_DIR:
+			case FDTYPE_ATTR:
+				put_fd(descriptor);
+				return ENOTTY;
+		}
+	}	
 
 	if (descriptor->ops->fd_ioctl)
 		status = descriptor->ops->fd_ioctl(descriptor, op, buffer, length);
