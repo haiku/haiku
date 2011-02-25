@@ -14,7 +14,6 @@
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 #include "MediaViews.h"
 
-#include <Alert.h>
 #include <AutoDeleter.h>
 #include <Box.h>
 #include <Button.h>
@@ -48,11 +47,9 @@
 
 SettingsView::SettingsView()
 	:
-	BGridView(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING),
-	fRealtimeCheckBox(NULL),
+	BGroupView(B_VERTICAL, B_USE_DEFAULT_SPACING),
 	fInputMenu(NULL),
-	fOutputMenu(NULL),
-	fRestartView(NULL)
+	fOutputMenu(NULL)
 {
 	// input menu
 	fInputMenu = new BPopUpMenu(B_TRANSLATE("<none>"));
@@ -61,59 +58,6 @@ SettingsView::SettingsView()
 	// input menu
 	fOutputMenu = new BPopUpMenu(B_TRANSLATE("<none>"));
 	fOutputMenu->SetLabelFromMarked(true);
-}
-
-
-BBox*
-SettingsView::MakeRealtimeBox(const char* info, uint32 realtimeMask,
-	const char* checkBoxLabel)
-{
-	// create the realtime box
-	BBox* realtimeBox = new BBox("realtime");
-	realtimeBox->SetLabel(B_TRANSLATE("Real-time"));
-
-	BMessage* checkBoxMessage = new BMessage(ML_ENABLE_REAL_TIME);
-	checkBoxMessage->AddUInt32("flags", realtimeMask);
-	fRealtimeCheckBox = new BCheckBox("realtimeCheckBox", checkBoxLabel,
-		checkBoxMessage);
-
-	uint32 flags = 0;
-	BMediaRoster::Roster()->GetRealtimeFlags(&flags);
-	if (flags & realtimeMask)
-		fRealtimeCheckBox->SetValue(B_CONTROL_ON);
-
-	BTextView* textView = new BTextView("stringView");
-	textView->Insert(info);
-	textView->MakeEditable(false);
-	textView->MakeSelectable(false);
-	textView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
-	BGroupView* realtimeGroup = new BGroupView(B_VERTICAL);
-	BLayoutBuilder::Group<>(realtimeGroup)
-		.SetInsets(B_USE_DEFAULT_SPACING, 0, B_USE_DEFAULT_SPACING,
-			B_USE_DEFAULT_SPACING)
-		.Add(fRealtimeCheckBox)
-		.Add(textView);
-
-	realtimeBox->AddChild(realtimeGroup);
-	return realtimeBox;
-}
-
-
-BStringView*
-SettingsView::MakeRestartMessageView()
-{
-	// note: this ought to display at the bottom of the default box...
-	fRestartView = new BStringView("restartStringView",
-		B_TRANSLATE("Restart the media server to apply changes."));
-	fRestartView->SetHighColor(ui_color(B_FAILURE_COLOR));
-		// not exactly failure, but sort of.
-	fRestartView->Hide();
-	fRestartView->SetExplicitAlignment(BAlignment(B_ALIGN_HORIZONTAL_CENTER,
-		B_ALIGN_VERTICAL_CENTER));
-	fRestartView->SetAlignment(B_ALIGN_HORIZONTAL_CENTER);
-	fRestartView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
-	return fRestartView;
 }
 
 
@@ -179,7 +123,6 @@ SettingsView::MessageReceived(BMessage* message)
 			NodeMenuItem* item
 				= static_cast<NodeMenuItem*>(fInputMenu->ItemAt(index));
 			SetDefaultInput(item->NodeInfo());
-			RestartRequired(true);
 			break;
 		}
 		case MEDIA_DEFAULT_OUTPUT_CHANGE:
@@ -190,18 +133,10 @@ SettingsView::MessageReceived(BMessage* message)
 			NodeMenuItem* item
 				= static_cast<NodeMenuItem*>(fOutputMenu->ItemAt(index));
 			SetDefaultOutput(item->NodeInfo());
-			RestartRequired(true);
-			break;
-		}
-		case ML_ENABLE_REAL_TIME:
-		{
-			uint32 flags = 0;
-			if (message->FindUInt32("flags", &flags) == B_OK)
-				_FlipRealtimeFlag(flags);
 			break;
 		}
 		default:
-			BGridView::MessageReceived(message);
+			BGroupView::MessageReceived(message);
 	}
 }
 
@@ -212,17 +147,6 @@ SettingsView::AttachedToWindow()
 	BMessenger thisMessenger(this);
 	fInputMenu->SetTargetForItems(thisMessenger);
 	fOutputMenu->SetTargetForItems(thisMessenger);
-	fRealtimeCheckBox->SetTarget(thisMessenger);
-}
-
-
-void
-SettingsView::RestartRequired(bool required)
-{
-	if (required)
-		fRestartView->Show();
-	else
-		fRestartView->Hide();
 }
 
 
@@ -230,28 +154,6 @@ MediaWindow*
 SettingsView::_MediaWindow() const
 {
 	return static_cast<MediaWindow*>(Window());
-}
-
-
-void
-SettingsView::_FlipRealtimeFlag(uint32 mask)
-{
-	fRealtimeCheckBox->SetValue(B_CONTROL_OFF);
-	BAlert* alert = new BAlert("realtime alert", UnimplementedRealtimeError(),
-		B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-	alert->Go();
-
-#if 0
-	// TODO: error codes
-	uint32 flags = 0;
-	BMediaRoster* roster = BMediaRoster::Roster();
-	roster->GetRealtimeFlags(&flags);
-	if (flags & mask)
-		flags &= ~mask;
-	else
-		flags |= mask;
-	roster->SetRealtimeFlags(flags);
-#endif
 }
 
 
@@ -372,30 +274,22 @@ AudioSettingsView::AudioSettingsView()
 		B_TRANSLATE("Audio output:"), OutputMenu(), NULL);
 
 	BLayoutBuilder::Grid<>(defaultsGridView)
-		.SetInsets(B_USE_DEFAULT_SPACING, 0, B_USE_DEFAULT_SPACING, 0)
+		.SetInsets(B_USE_DEFAULT_SPACING, 0, B_USE_DEFAULT_SPACING,
+			B_USE_DEFAULT_SPACING)
 		.AddMenuField(inputMenuField, 0, 0, B_ALIGN_HORIZONTAL_UNSET, 1, 3, 1)
 		.AddMenuField(outputMenuField, 0, 1)
-		.AddMenuField(_MakeChannelMenu(), 2, 1)
-		.Add(MakeRestartMessageView(), 0, 2, 4, 1);
+		.AddMenuField(_MakeChannelMenu(), 2, 1);
 
 	defaultsBox->AddChild(defaultsGridView);
 
-	const char* realtimeLabel = B_TRANSLATE("Enable real-time audio");
-	const char* realtimeInfo = B_TRANSLATE(
-		"Enabling real-time audio allows system to record and play audio "
-		"as fast as possible.  It achieves this performance by using more"
-		" CPU and RAM.\n\nOnly enable this feature if you need the lowest"
-		" latency possible.");
-
-
-	BLayoutBuilder::Grid<>(this)
+	BLayoutBuilder::Group<>(this)
 		.SetInsets(0, 0, 0, 0)
-		.Add(defaultsBox, 0, 0, 2, 1)
-		.Add(MakeRealtimeBox(realtimeInfo, B_MEDIA_REALTIME_AUDIO,
-			realtimeLabel), 0, 1, 2, 1)
-		.Add(_MakeVolumeCheckBox(),0, 2, 1, 1)
-		.Add(MakeRestartButton(), 1, 2, 1, 1)
-		.SetRowWeight(1, 10);
+		.Add(defaultsBox)
+		.AddGroup(B_HORIZONTAL)
+			.Add(_MakeVolumeCheckBox())
+			.Add(MakeRestartButton())
+			.End()
+		.AddGlue();
 }
 
 
@@ -420,13 +314,6 @@ AudioSettingsView::AttachedToWindow()
 }
 
 
-BString
-AudioSettingsView::UnimplementedRealtimeError()
-{
-	return B_TRANSLATE("Real-time audio is currently unimplemented in Haiku.");
-}
-
-
 void
 AudioSettingsView::MessageReceived(BMessage* message)
 {
@@ -441,7 +328,6 @@ AudioSettingsView::MessageReceived(BMessage* message)
 				if (item) {
 					BMediaRoster* roster = BMediaRoster::Roster();
 					roster->SetAudioOutput(*item->Input());
-					RestartRequired(true);
 				} else
 					fprintf(stderr, "ChannelMenuItem not found\n");
 			}
@@ -615,27 +501,21 @@ VideoSettingsView::VideoSettingsView()
 		B_TRANSLATE("Video output:"), OutputMenu(), NULL);
 
 	BLayoutBuilder::Grid<>(defaultsGridView)
-		.SetInsets(B_USE_DEFAULT_SPACING, 0, B_USE_DEFAULT_SPACING, 0)
+		.SetInsets(B_USE_DEFAULT_SPACING, 0, B_USE_DEFAULT_SPACING,
+			B_USE_DEFAULT_SPACING)
 		.AddMenuField(inputMenuField, 0, 0)
-		.AddMenuField(outputMenuField, 0, 1)
-		.Add(MakeRestartMessageView(), 0, 2, 2, 1);
+		.AddMenuField(outputMenuField, 0, 1);
 
 	defaultsBox->AddChild(defaultsGridView);
 
-	const char* realtimeLabel = B_TRANSLATE("Enable real-time video");
-	const char*	realtimeInfo = B_TRANSLATE(
-		"Enabling real-time video allows system to "
-		"perform video operations as fast and smoothly as possible.  It "
-		"achieves optimum performance by using more RAM.\n\n"
-		"Only enable this feature if you need the lowest latency possible.");
-
-	BLayoutBuilder::Grid<>(this)
+	BLayoutBuilder::Group<>(this)
 		.SetInsets(0, 0, 0, 0)
-		.Add(defaultsBox, 0, 0, 2, 1)
-		.Add(MakeRealtimeBox(realtimeInfo, B_MEDIA_REALTIME_VIDEO,
-			realtimeLabel), 0, 1, 2, 1)
-		.Add(MakeRestartButton(), 1, 2, 1, 1)
-		.SetRowWeight(1, 10);
+		.Add(defaultsBox)
+		.AddGroup(B_HORIZONTAL)
+			.AddGlue()
+			.Add(MakeRestartButton())
+			.End()
+		.AddGlue();
 }
 
 
@@ -655,11 +535,3 @@ VideoSettingsView::SetDefaultOutput(const dormant_node_info* info)
 	_MediaWindow()->UpdateOutputListItem(MediaListItem::VIDEO_TYPE, info);
 	BMediaRoster::Roster()->SetVideoOutput(*info);
 }
-
-
-BString
-VideoSettingsView::UnimplementedRealtimeError()
-{
-	return B_TRANSLATE("Real-time video is currently unimplemented in Haiku.");
-}
-

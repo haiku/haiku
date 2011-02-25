@@ -14,7 +14,7 @@
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 #ifndef __MEDIAVIEWS_H__
 #define __MEDIAVIEWS_H__
-#include <GridView.h>
+#include <GroupView.h>
 #include <MediaAddOn.h>
 #include <MenuItem.h>
 
@@ -33,7 +33,6 @@ class MediaWindow;
 
 
 const uint32 ML_RESTART_MEDIA_SERVER = 'resr';
-const uint32 ML_ENABLE_REAL_TIME = 'enrt';
 const uint32 ML_DEFAULT_CHANNEL_CHANGED = 'chch';
 
 
@@ -70,7 +69,7 @@ private:
 };
 
 
-class SettingsView : public BGridView
+class SettingsView : public BGroupView
 {
 public:
 	typedef BObjectList<dormant_node_info> NodeList;
@@ -85,37 +84,26 @@ public:
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	void				AttachedToWindow();
 
-			void				RestartRequired(bool required);
-	virtual	BString				UnimplementedRealtimeError() = 0;
 
 protected:
 
 			BMenu*				InputMenu() {return fInputMenu;}
 			BMenu*				OutputMenu() {return fOutputMenu;}
 
-			BBox*				MakeRealtimeBox(const char* info,
-									uint32 realtimeMask,
-									const char* checkboxLabel);
-			BStringView*		MakeRestartMessageView();
 			BButton*			MakeRestartButton();
 
 			void				_EmptyMenu(BMenu* menu);
 			MediaWindow*		_MediaWindow() const;
 
 private:
-			void				_FlipRealtimeFlag(uint32 mask);
-
 			void				_PopulateMenu(BMenu* menu, NodeList& nodes,
 									const BMessage& message);
 			NodeMenuItem*		_FindNodeItem(BMenu* menu,
 									const dormant_node_info* nodeInfo);
 			void				_ClearMenuSelection(BMenu* menu);
 
-			BCheckBox* 			fRealtimeCheckBox;
-
 			BMenu* 				fInputMenu;
 			BMenu* 				fOutputMenu;
-			BStringView*		fRestartView;
 };	
 
 
@@ -131,8 +119,6 @@ public:
 
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	void				AttachedToWindow();
-
-	virtual	BString				UnimplementedRealtimeError();
 
 private:
 			BMenuField*			_MakeChannelMenu();
@@ -156,8 +142,6 @@ public:
 
 	virtual	void				SetDefaultInput(const dormant_node_info* info);
 	virtual	void				SetDefaultOutput(const dormant_node_info* info);
-
-	virtual	BString				UnimplementedRealtimeError();
 };
 
 #endif

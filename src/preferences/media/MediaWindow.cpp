@@ -531,9 +531,6 @@ MediaWindow::InitMedia(bool first)
 	if (first) {
 		fListView->Select(fListView->IndexOf(mixer));
 	} else {
-		fAudioView->RestartRequired(false);
-		fVideoView->RestartRequired(false);
-
 		if (isVideoSelected)
 			fListView->Select(fListView->IndexOf(video));
 		else
