@@ -83,6 +83,7 @@ spawn_thread(thread_func entry, const char *name, int32 priority, void *data)
 {
 	struct thread_creation_attributes attributes;
 	pthread_thread* thread;
+	thread_id id;
 
 	thread = __allocate_pthread(data);
 	if (thread == NULL)
@@ -99,7 +100,7 @@ spawn_thread(thread_func entry, const char *name, int32 priority, void *data)
 	attributes.stack_address = NULL;
 	attributes.stack_size = 0;
 
-	thread_id id = _kern_spawn_thread(&attributes);
+	id = _kern_spawn_thread(&attributes);
 	if (id < 0)
 		free(thread);
 	else
