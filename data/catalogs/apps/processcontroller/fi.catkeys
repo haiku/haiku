@@ -1,4 +1,5 @@
-1	finnish	x-vnd.Haiku-ProcessController	926983020
+1	finnish	x-vnd.Haiku-ProcessController	3930302090
+%.1f MB	ProcessController		%.1f Mt
 %s priority [%d]	ProcessController		%s prioriteetti [%d]
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		© 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
 About	ProcessController		Ohjelmasta
@@ -27,6 +28,7 @@ Quit application	ProcessController		Poistu sovelluksesta
 Restart Deskbar	ProcessController		Käynnistä Työpöytäpalkki uudelleen
 Restart Tracker	ProcessController		Käynnistä Seuraaja uudelleen
 Run in window	ProcessController		Suorita ikkunassa
+System resources & caches…	ProcessController		Järjestelmäresurssit ja välimuistit…
 That's no Fun!	ProcessController		Se ei ole hauskaa!
 This is the last active processor...\nYou can't turn it off!	ProcessController		Tämä on viimeinen toimiva prosessori...\nEt voi kääntää sitä pois päältä!
 This team is already gone…	ProcessController		Tämä ryhmä on jo poistunut...

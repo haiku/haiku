@@ -1,9 +1,11 @@
-1	finnish	x-vnd.Haiku-Devices	4145096865
+1	finnish	x-vnd.Haiku-Devices	189828730
 ACPI Information	DeviceACPI		ACPI-tiedot
 ACPI Processor Namespace '%2'	DeviceACPI		ACPI-prosessorinimiavaruus ’%2’
 ACPI System Bus	DeviceACPI		ACPI-järjestelmäväylä
 ACPI System Indicator	DeviceACPI		ACPI-järjestelmäindikaattori
 ACPI Thermal Zone	DeviceACPI		ACI-lämpöalue
+ACPI bus	Device		ACPI-väylä
+ACPI bus	DevicesView		ACPI-väylä
 ACPI controller	Device		ACPI-ohjain
 ACPI node '%1'	DeviceACPI		ACPI-solmu ’%1’
 About	DevicesApplication		Ohjelmasta
@@ -11,13 +13,16 @@ About Devices…	DevicesView		Ohjelmasta Laitteet...
 Basic information	DevicesView		Perustiedot
 Bridge	Device		Silta
 Bus	DevicesView		Väylä
+Bus Information	Device		Väylätiedot
 Category	DevicesView		Luokka
 Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Luokkatiedot:\t\t\t\t: %classInfo%
 Class info	DevicePCI		Luokkatiedot
 Communication controller	Device		Viestintäohjain
 Computer	Device		Tietokone
+Computer	DevicesView		Tietokone
 Connection	DevicesView		Yhteys
 Detailed	DevicesView		Yksityiskohdat
+Device	Device		Laite
 Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Laitenimi\t\t\t\t: %Name%\nValmistaja\t\t\t: %Manufacturer%\nKäytetty ajuri\t\t\t\t: %DriverUsed%\nLaitepolut\t: %DevicePaths%
 Device name	Device		Laitenimi
 Device name	DeviceACPI		Laitenimi
@@ -35,6 +40,8 @@ Driver used	DevicePCI		Käytetty ajuri
 Encryption controller	Device		Salausohjain
 Generate system information	DevicesView		Tuota järjestelmätiedot
 Generic system peripheral	Device		Yleinen järjestelmän oheislaite
+ISA bus	Device		ISA-väylä
+ISA bus	DevicesView		ISA-väylä
 Input device controller	Device		Syötelaiteohjain
 Intelligent controller	Device		Älyohjain
 Manufacturer	Device		Valmistaja
@@ -52,6 +59,8 @@ Not implemented	DevicePCI		Ei ole toteutettu
 OK	DevicesApplication		Valmis
 Order by:	DevicesView		Järjestys:
 PCI Information	DevicePCI		PCI-tiedot
+PCI bus	Device		PCI-väylä
+PCI bus	DevicesView		PCI-väylä
 Processor	Device		Suoritin
 Quit	DevicesView		Poistu
 Refresh devices	DevicesView		Virkistä laitteita
@@ -61,5 +70,8 @@ Serial bus controller	Device		Sarjaväyläohjain
 Signal processing controller	Device		Signaalikäsittelyohjain
 Unclassified device	Device		Luokittelematon laite
 Unknown	DevicePCI		Tuntematon
+Unknown device	Device		Tuntematon laite
+Unknown device	DevicesView		Tuntematon laite
 Value	PropertyList		Arvo
 Wireless controller	Device		Langaton ohjain
+unknown	Device		tuntematon

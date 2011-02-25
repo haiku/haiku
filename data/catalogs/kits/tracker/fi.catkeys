@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	4182323826
+1	finnish	x-vnd.Haiku-libtracker	3424530812
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 %Ld B	WidgetAttributeText		%Ld tavua
 %Ld bytes	WidgetAttributeText		%Ld tavua
@@ -120,6 +120,7 @@ Edit favorites…	FilePanelPriv		Muokkaa suosikkeja...
 Edit name	ContainerWindow		Muokkaa nimeä
 Edit name	FilePanelPriv		Muokkaa nimeä
 Edit name	InfoWindow		Muokkaa nimeä
+Edit name	VolumeWindow		Muokkaa nimeä
 Edit query	ContainerWindow		Muokkaa kyselyä
 Edit templates…	TemplatesMenu		Muokkaa mallinteita...
 Eject when unmounting	AutoMounterSettings		Poista laitteesta irrotettaessa
