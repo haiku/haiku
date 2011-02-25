@@ -85,7 +85,7 @@ enum
 
 
 MainWin::MainWin(BRect frame_rect)
- :	BWindow(frame_rect, NAME, B_TITLED_WINDOW, 
+ :	BWindow(frame_rect, B_TRANSLATE(NAME), B_TITLED_WINDOW, 
  	B_ASYNCHRONOUS_CONTROLS /* | B_WILL_ACCEPT_FIRST_CLICK */)
  ,	fController(new Controller)
  ,	fIsFullscreen(false)
@@ -162,7 +162,7 @@ MainWin::~MainWin()
 void
 MainWin::CreateMenu()
 {
-	fFileMenu = new BMenu(NAME);
+	fFileMenu = new BMenu(B_TRANSLATE(NAME));
 	fChannelMenu = new BMenu(B_TRANSLATE("Channel"));
 	fInterfaceMenu = new BMenu(B_TRANSLATE("Interface"));
 	fSettingsMenu = new BMenu(B_TRANSLATE("Settings"));
@@ -704,8 +704,8 @@ void
 MainWin::UpdateWindowTitle()
 {
 	char buf[100];
-	sprintf(buf, "%s - %d x %d, %.3f:%.3f => %.0f x %.0f", NAME, fSourceWidth, 
-		fSourceHeight, fWidthScale, fHeightScale, 
+	sprintf(buf, "%s - %d x %d, %.3f:%.3f => %.0f x %.0f", B_TRANSLATE(NAME),
+		fSourceWidth, fSourceHeight, fWidthScale, fHeightScale, 
 		fVideoView->Bounds().Width() + 1, fVideoView->Bounds().Height() + 1);
 	SetTitle(buf);
 }

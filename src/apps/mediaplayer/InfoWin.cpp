@@ -26,6 +26,7 @@
 #include <string.h>
 
 #include <Bitmap.h>
+#include <Catalog.h>
 #include <Debug.h>
 #include <MediaDefs.h>
 #include <Mime.h>
@@ -50,6 +51,8 @@ const rgb_color kBlue =  {   0,   0, 220, 255 };
 const rgb_color kGreen = { 171, 221, 161, 255 };
 const rgb_color kBlack = {   0,   0,   0, 255 };
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "MediaPlayer-InfoWin"
 
 // should later draw an icon
 class InfoView : public BView {
@@ -159,7 +162,7 @@ InfoView::SetGenericIcon()
 InfoWin::InfoWin(BPoint leftTop, Controller* controller)
 	:
 	BWindow(BRect(leftTop.x, leftTop.y, leftTop.x + MIN_WIDTH - 1,
-		leftTop.y + 300), NAME, B_TITLED_WINDOW,
+		leftTop.y + 300), B_TRANSLATE(NAME), B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE | B_NOT_ZOOMABLE),
 	fController(controller),
 	fControllerObserver(new ControllerObserver(this,

@@ -1648,7 +1648,7 @@ StyledEditWindow::_UpdateCleanUndoRedoSaveRevert()
 	fRedoCleans = false;
 	fRevertItem->SetEnabled(fSaveMessage != NULL);
 	fSaveItem->SetEnabled(true);
-	fUndoItem->SetLabel(B_TRANSLATE("Can't Undo"));
+	fUndoItem->SetLabel(B_TRANSLATE("Can't undo"));
 	fUndoItem->SetEnabled(false);
 	fCanUndo = false;
 	fCanRedo = false;

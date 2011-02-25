@@ -166,13 +166,15 @@ static const char* kRatingAttrName = "Media:Rating";
 
 static const char* kDisabledSeekMessage = B_TRANSLATE("Drop files to play");
 
+static const char* kApplicationName = B_TRANSLATE(NAME);
+
 
 //#define printf(a...)
 
 
 MainWin::MainWin(bool isFirstWindow, BMessage* message)
 	:
-	BWindow(BRect(100, 100, 400, 300), NAME, B_TITLED_WINDOW,
+	BWindow(BRect(100, 100, 400, 300), kApplicationName, B_TITLED_WINDOW,
  		B_ASYNCHRONOUS_CONTROLS /* | B_WILL_ACCEPT_FIRST_CLICK */),
  	fCreationTime(system_time()),
 	fInfoWin(NULL),
@@ -1346,7 +1348,7 @@ MainWin::_PlaylistItemOpened(const PlaylistItemRef& item, status_t result)
 		fHasFile = false;
 		fHasVideo = false;
 		fHasAudio = false;
-		SetTitle(NAME);
+		SetTitle(kApplicationName);
 	} else {
 		fHasFile = true;
 		fHasVideo = fController->VideoTrackCount() != 0;
@@ -1418,7 +1420,7 @@ MainWin::_SetupWindow()
 void
 MainWin::_CreateMenu()
 {
-	fFileMenu = new BMenu(NAME);
+	fFileMenu = new BMenu(kApplicationName);
 	fPlaylistMenu = new BMenu(B_TRANSLATE("Playlist"B_UTF8_ELLIPSIS));
 	fAudioMenu = new BMenu(B_TRANSLATE("Audio"));
 	fVideoMenu = new BMenu(B_TRANSLATE("Video"));

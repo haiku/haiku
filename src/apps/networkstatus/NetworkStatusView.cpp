@@ -53,11 +53,11 @@
 
 
 static const char *kStatusDescriptions[] = {
-	B_TRANSLATE_MARK("Unknown"),
-	B_TRANSLATE_MARK("No link"),
-	B_TRANSLATE_MARK("No stateful configuration"),
-	B_TRANSLATE_MARK("Configuring"),
-	B_TRANSLATE_MARK("Ready")
+	B_TRANSLATE("Unknown"),
+	B_TRANSLATE("No link"),
+	B_TRANSLATE("No stateful configuration"),
+	B_TRANSLATE("Configuring"),
+	B_TRANSLATE("Ready")
 };
 
 extern "C" _EXPORT BView *instantiate_deskbar_item(void);
@@ -329,9 +329,9 @@ NetworkStatusView::_ShowConfiguration(BMessage* message)
 		const char*	label;
 		int32		control;
 	} kInformationEntries[] = {
-		{ "Address", SIOCGIFADDR },
-		{ "Broadcast", SIOCGIFBRDADDR },
-		{ "Netmask", SIOCGIFNETMASK },
+		{ B_TRANSLATE("Address"), SIOCGIFADDR },
+		{ B_TRANSLATE("Broadcast"), SIOCGIFBRDADDR },
+		{ B_TRANSLATE("Netmask"), SIOCGIFNETMASK },
 		{ NULL }
 	};
 
@@ -347,15 +347,8 @@ NetworkStatusView::_ShowConfiguration(BMessage* message)
 	if (!_PrepareRequest(request, name))
 		return;
 
-	BString text = NULL;
-	if (strncmp("Address", name, strlen(name)) == 0)
-		text = B_TRANSLATE("Address information:\n");
-
-	if (strncmp("Broadcast", name, strlen(name)) == 0)
-		text = B_TRANSLATE("Broadcast information:\n");
-
-	if (strncmp("Netmask", name, strlen(name)) == 0)
-		text = B_TRANSLATE("Netmask information:\n");
+	BString text(B_TRANSLATE("%ifaceName information:\n"));
+	text.ReplaceFirst("%ifaceName", name);
 
 	size_t boldLength = text.Length();
 
@@ -381,22 +374,7 @@ NetworkStatusView::_ShowConfiguration(BMessage* message)
 			return;
 		}
 
-		text += "\n";
-
-		if (strncmp("Address", kInformationEntries[i].label,
-			strlen(kInformationEntries[i].label)) == 0)
-			text += B_TRANSLATE("Address");
-
-		if (strncmp("Broadcast", kInformationEntries[i].label,
-			strlen(kInformationEntries[i].label)) == 0)
-			text += B_TRANSLATE("Broadcast");
-
-		if (strncmp("Netmask", kInformationEntries[i].label,
-			strlen(kInformationEntries[i].label)) == 0)
-			text += B_TRANSLATE("Netmask");
-
-		text += ": ";
-		text += address;
+		text << "\n" << kInformationEntries[i].label << ": " << address;
 	}
 
 	BAlert* alert = new BAlert(name, text.String(), B_TRANSLATE("OK"));

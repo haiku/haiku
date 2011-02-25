@@ -1602,10 +1602,10 @@ TMailWindow::MessageReceived(BMessage *msg)
 			if (showAlert) {
 				// just some patience before Tracker pops up the folder
 				snooze(250000);
-				BAlert* alert = new BAlert("helpful message",
-					"Put your favorite e-mail queries and query "
-					"templates in this folder.",
-					"OK", NULL, NULL, B_WIDTH_AS_USUAL, B_IDEA_ALERT);
+				BAlert* alert = new BAlert(B_TRANSLATE("helpful message"),
+					B_TRANSLATE("Put your favorite e-mail queries and query "
+					"templates in this folder."), B_TRANSLATE("OK"), NULL, NULL,
+					B_WIDTH_AS_USUAL, B_IDEA_ALERT);
 				alert->Go(NULL);
 			}
 

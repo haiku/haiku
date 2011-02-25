@@ -432,7 +432,8 @@ BInfoWindow::MessageReceived(BMessage *message)
 		{
 			BEntry entry(fModel->EntryRef());
 			if (ConfirmChangeIfWellKnownDirectory(&entry,
-				B_TRANSLATE("rename")))
+				B_TRANSLATE_COMMENT("rename", "As in 'If you rename ...'"),
+				B_TRANSLATE_COMMENT("rename", "As in 'To rename ...'")))
 				fAttributeView->BeginEditingTitle();
 			break;
 		}
@@ -1222,7 +1223,8 @@ AttributeView::MouseDown(BPoint point)
 		// You can't change the name of the trash
 		if (!fModel->IsTrash()
 			&& ConfirmChangeIfWellKnownDirectory(&entry,
-				B_TRANSLATE("rename"), true)
+				B_TRANSLATE_COMMENT("rename", "As in 'If you rename ...'"),
+				B_TRANSLATE_COMMENT("rename", "As in 'To rename ...'"), true)
 			&& fTitleEditView == 0)
 			BeginEditingTitle();
 	} else if (fTitleEditView) {

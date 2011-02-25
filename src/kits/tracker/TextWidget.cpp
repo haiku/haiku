@@ -331,7 +331,9 @@ BTextWidget::StartEdit(BRect bounds, BPoseView *view, BPose *pose)
 
 	BEntry entry(pose->TargetModel()->EntryRef());
 	if (entry.InitCheck() == B_OK
-		&& !ConfirmChangeIfWellKnownDirectory(&entry, B_TRANSLATE("rename")))
+		&& !ConfirmChangeIfWellKnownDirectory(&entry,
+				B_TRANSLATE_COMMENT("rename", "As in 'If you rename ...'"),
+				B_TRANSLATE_COMMENT("rename", "As in 'To rename ...'")))
 		return;
 
 	// get bounds with full text length

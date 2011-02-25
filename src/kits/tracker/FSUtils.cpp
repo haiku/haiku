@@ -612,8 +612,8 @@ enum {
 
 
 bool
-ConfirmChangeIfWellKnownDirectory(const BEntry *entry, const char *action,
-	bool dontAsk, int32 *confirmedAlready)
+ConfirmChangeIfWellKnownDirectory(const BEntry *entry, const char *ifYouDoAction,
+	const char *toDoAction, bool dontAsk, int32 *confirmedAlready)
 {
 	// Don't let the user casually move/change important files/folders
 	//
@@ -633,15 +633,15 @@ ConfirmChangeIfWellKnownDirectory(const BEntry *entry, const char *action,
 
 	if (DirectoryMatchesOrContains(entry, B_BEOS_DIRECTORY)) {
 		warning.SetTo(
-			B_TRANSLATE("If you %action the system folder or its contents, you "
-			"won't be able to boot " OS_NAME "! Are you sure you want to do "
-			"this? To %action the system folder or its contents anyway, hold down "
-			"the Shift key and click \"Do it\"."));
+			B_TRANSLATE("If you %ifYouDoAction the system folder or its "
+			"contents, you won't be able to boot " OS_NAME "! Are you sure you "
+			"want to do this? To %toDoAction the system folder or its contents "
+			"anyway, hold down the Shift key and click \"Do it\"."));
 	} else if (DirectoryMatches(entry, B_USER_DIRECTORY)) {
 		warning .SetTo(
-			B_TRANSLATE("If you %action the home folder, " OS_NAME " may not "
-			"behave properly! Are you sure you want to do this? "
-			"To %action the home anyway, click \"Do it\"."));
+			B_TRANSLATE("If you %ifYouDoAction the home folder, " OS_NAME
+			" may not behave properly! Are you sure you want to do this? "
+			"To %toDoAction the home anyway, click \"Do it\"."));
 		requireOverride = false;
 	} else if (DirectoryMatchesOrContains(entry, B_USER_CONFIG_DIRECTORY)
 		|| DirectoryMatchesOrContains(entry, B_COMMON_SETTINGS_DIRECTORY)) {
@@ -651,22 +651,22 @@ ConfirmChangeIfWellKnownDirectory(const BEntry *entry, const char *action,
 			|| DirectoryMatchesOrContains(entry, "beos_mime",
 				B_COMMON_SETTINGS_DIRECTORY)) {
 			warning.SetTo(
-				B_TRANSLATE("If you %action the mime settings, " OS_NAME
+				B_TRANSLATE("If you %ifYouDoAction the mime settings, " OS_NAME
 				" may not behave properly! Are you sure you want to do this? "
-				"To %action the mime settings anyway, click \"Do it\"."));
+				"To %toDoAction the mime settings anyway, click \"Do it\"."));
 			requireOverride = false;
 		} else if (DirectoryMatches(entry, B_USER_CONFIG_DIRECTORY)) {
 			warning.SetTo(
-				B_TRANSLATE("If you %action the config folder, " OS_NAME
+				B_TRANSLATE("If you %ifYouDoAction the config folder, " OS_NAME
 				" may not behave properly! Are you sure you want to do this? "
-				"To %action the config folder anyway, click \"Do it\"."));
+				"To %toDoAction the config folder anyway, click \"Do it\"."));
 			requireOverride = false;
 		} else if (DirectoryMatches(entry, B_USER_SETTINGS_DIRECTORY)
 			|| DirectoryMatches(entry, B_COMMON_SETTINGS_DIRECTORY)) {
 			warning.SetTo(
-				B_TRANSLATE("If you %action the settings folder, " OS_NAME
+				B_TRANSLATE("If you %ifYouDoAction the settings folder, " OS_NAME
 				" may not behave properly! Are you sure you want to do this? "
-				"To %action the settings folder anyway, click \"Do it\"."));
+				"To %toDoAction the settings folder anyway, click \"Do it\"."));
 			requireOverride = false;
 		}
 	}
@@ -682,7 +682,8 @@ ConfirmChangeIfWellKnownDirectory(const BEntry *entry, const char *action,
 		// we already warned about moving home this time around
 		return true;
 
-	warning.ReplaceAll("%action", action);
+	warning.ReplaceFirst("%ifYouDoAction", ifYouDoAction);
+	warning.ReplaceFirst("%toDoAction", toDoAction);
 
 	if ((new OverrideAlert("", warning.String(), B_TRANSLATE("Do it"),
 			(requireOverride ? B_SHIFT_KEY : 0), B_TRANSLATE("Cancel"),	0, NULL,
@@ -742,7 +743,9 @@ InitCopy(CopyLoopControl* loopControl, uint32 moveMode,
 			return B_ERROR;
 		}
 		if (moveMode == kMoveSelectionTo
-			&& !ConfirmChangeIfWellKnownDirectory(&entry, B_TRANSLATE("move"),
+			&& !ConfirmChangeIfWellKnownDirectory(&entry,
+				B_TRANSLATE_COMMENT("move", "As in 'If you move ...'"),
+				B_TRANSLATE_COMMENT("move", "As in 'To move ...'"),
 				false, &askOnceOnly)) {
 			return B_ERROR;
 		}
