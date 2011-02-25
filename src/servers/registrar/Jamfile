@@ -56,6 +56,13 @@ Server registrar
 	:
 	be
 	$(TARGET_LIBSTDC++)
+	$(HAIKU_LOCALE_LIBS)
 	:
 	registrar.rdef
+;
+
+DoCatalogs registrar :
+	application/x-vnd.Haiku-Registrar
+	:
+	ShutdownProcess.cpp
 ;

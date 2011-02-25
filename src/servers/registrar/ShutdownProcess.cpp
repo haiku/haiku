@@ -21,12 +21,14 @@
 #include <Autolock.h>
 #include <Bitmap.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <File.h>
 #include <Message.h>
 #include <MessagePrivate.h>
 #include <RegistrarDefs.h>
 #include <Roster.h>		// for B_REQUEST_QUIT
 #include <Screen.h>
+#include <String.h>
 #include <TextView.h>
 #include <View.h>
 #include <Window.h>
@@ -44,6 +46,11 @@
 #include "Registrar.h"
 #include "RosterAppInfo.h"
 #include "TRoster.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "ShutdownProcess"
+
 
 using std::nothrow;
 using namespace BPrivate;
@@ -224,7 +231,7 @@ private:
 class ShutdownProcess::ShutdownWindow : public BWindow {
 public:
 	ShutdownWindow()
-		: BWindow(BRect(0, 0, 200, 100), "Shutdown status",
+		: BWindow(BRect(0, 0, 200, 100), B_TRANSLATE("Shutdown status"),
 			B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 			B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE | B_NOT_MINIMIZABLE
 				| B_NOT_ZOOMABLE | B_NOT_CLOSABLE, B_ALL_WORKSPACES),
@@ -272,7 +279,7 @@ public:
 
 		// kill app button
 		fKillAppButton = new(nothrow) BButton(BRect(0, 0, 10, 10), "kill app",
-			"Kill application", NULL, B_FOLLOW_NONE);
+			B_TRANSLATE("Kill application"), NULL, B_FOLLOW_NONE);
 		if (!fKillAppButton)
 			return B_NO_MEMORY;
 		fRootView->AddChild(fKillAppButton);
@@ -287,7 +294,8 @@ public:
 
 		// cancel shutdown button
 		fCancelShutdownButton = new(nothrow) BButton(BRect(0, 0, 10, 10),
-			"cancel shutdown", "Cancel shutdown", NULL, B_FOLLOW_NONE);
+			"cancel shutdown", B_TRANSLATE("Cancel shutdown"), NULL,
+			B_FOLLOW_NONE);
 		if (!fCancelShutdownButton)
 			return B_NO_MEMORY;
 		fRootView->AddChild(fCancelShutdownButton);
@@ -300,7 +308,7 @@ public:
 
 		// reboot system button
 		fRebootSystemButton = new(nothrow) BButton(BRect(0, 0, 10, 10),
-			"reboot", "Restart system", NULL, B_FOLLOW_NONE);
+			"reboot", B_TRANSLATE("Restart system"), NULL, B_FOLLOW_NONE);
 		if (!fRebootSystemButton)
 			return B_NO_MEMORY;
 		fRebootSystemButton->Hide();
@@ -314,7 +322,7 @@ public:
 
 		// aborted OK button
 		fAbortedOKButton = new(nothrow) BButton(BRect(0, 0, 10, 10),
-			"ok", "OK", NULL, B_FOLLOW_NONE);
+			"ok", B_TRANSLATE("OK"), NULL, B_FOLLOW_NONE);
 		if (!fAbortedOKButton)
 			return B_NO_MEMORY;
 		fAbortedOKButton->Hide();
@@ -479,8 +487,9 @@ public:
 		fRebootSystemButton->MakeDefault(true);
 		fRebootSystemButton->Show();
 
-		SetTitle("System is shut down");
-		fTextView->SetText("It's now safe to turn off the computer.");
+		SetTitle(B_TRANSLATE("System is shut down"));
+		fTextView->SetText(
+			B_TRANSLATE("It's now safe to turn off the computer."));
 	}
 
 	void SetWaitForAbortedOK()
@@ -492,7 +501,7 @@ public:
 		// TODO: Temporary work-around for a Haiku bug.
 		fAbortedOKButton->Invalidate();
 
-		SetTitle("Shutdown aborted");
+		SetTitle(B_TRANSLATE("Shutdown aborted"));
 	}
 
 private:
@@ -1235,13 +1244,17 @@ ShutdownProcess::_WorkerDoShutdown()
 	// ask the user to confirm the shutdown, if desired
 	bool askUser;
 	if (fHasGUI && fRequest->FindBool("confirm", &askUser) == B_OK && askUser) {
-		const char* title = fReboot ? "Restart?" : "Shut down?";
+		const char* restart = B_TRANSLATE("Restart");
+		const char* shutdown = B_TRANSLATE("Shut down");
+		BString title = B_TRANSLATE("%action%?");
+		title.ReplaceFirst("%action%", fReboot ? restart : shutdown);
 		const char* text = fReboot
-			? "Do you really want to restart the system?"
-			: "Do you really want to shut down the system?";
-		const char* defaultText = fReboot ? "Restart" : "Shut down";
-		const char* otherText = fReboot ? "Shut down" : "Restart";
-		BAlert* alert = new BAlert(title, text, "Cancel", otherText, defaultText,
+			? B_TRANSLATE("Do you really want to restart the system?")
+			: B_TRANSLATE("Do you really want to shut down the system?");
+		const char* defaultText = fReboot ? restart : shutdown;
+		const char* otherText = fReboot ? restart : shutdown;
+		BAlert* alert = new BAlert(title.String(), text,
+			B_TRANSLATE("Cancel"), otherText, defaultText,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->SetShortcut(0, B_ESCAPE);
 		// We want the alert to behave more like a regular window...
@@ -1283,7 +1296,7 @@ ShutdownProcess::_WorkerDoShutdown()
 	// make the shutdown window ready and show it
 	_InitShutdownWindow();
 	_SetShutdownWindowCurrentApp(-1);
-	_SetShutdownWindowText("Tidying things up a bit.");
+	_SetShutdownWindowText(B_TRANSLATE("Tidying things up a bit."));
 	_SetShutdownWindowCancelButtonEnabled(true);
 	_SetShutdownWindowKillButtonEnabled(false);
 	_SetShowShutdownWindow(true);
@@ -1317,9 +1330,9 @@ ShutdownProcess::_WorkerDoShutdown()
 	// we're through: do the shutdown
 	_SetPhase(DONE_PHASE);
 	if (fReboot)
-		_SetShutdownWindowText("Restarting" B_UTF8_ELLIPSIS);
+		_SetShutdownWindowText(B_TRANSLATE("Restarting" B_UTF8_ELLIPSIS));
 	else
-		_SetShutdownWindowText("Shutting down" B_UTF8_ELLIPSIS);
+		_SetShutdownWindowText(B_TRANSLATE("Shutting down" B_UTF8_ELLIPSIS));
 	_ShutDown();
 	_SetShutdownWindowWaitForShutdown();
 
@@ -1480,9 +1493,9 @@ ShutdownProcess::_QuitApps(AppInfoList& list, bool systemApps)
 		}
 
 		// set window text
-		char buffer[1024];
-		snprintf(buffer, sizeof(buffer), "Asking \"%s\" to quit.", appName);
-		_SetShutdownWindowText(buffer);
+		BString buffer = B_TRANSLATE("Asking \"%appName%\" to quit.");
+		buffer.ReplaceFirst("%appName%", appName);
+		_SetShutdownWindowText(buffer.String());
 		_SetShutdownWindowCurrentApp(team);
 
 		// send the shutdown message to the app
@@ -1522,7 +1535,8 @@ ShutdownProcess::_QuitBackgroundApps()
 {
 	PRINT(("ShutdownProcess::_QuitBackgroundApps()\n"));
 
-	_SetShutdownWindowText("Asking background applications to quit.");
+	_SetShutdownWindowText(
+		B_TRANSLATE("Asking background applications to quit."));
 
 	// prepare the shutdown message
 	BMessage message;
@@ -1633,7 +1647,7 @@ ShutdownProcess::_QuitNonApps()
 {
 	PRINT(("ShutdownProcess::_QuitNonApps()\n"));
 
-	_SetShutdownWindowText("Asking other processes to quit.");
+	_SetShutdownWindowText(B_TRANSLATE("Asking other processes to quit."));
 
 	// iterate through the remaining teams and send them the TERM signal
 	int32 cookie = 0;
@@ -1692,10 +1706,10 @@ ShutdownProcess::_QuitBlockingApp(AppInfoList& list, team_id team,
 
 	if (modal) {
 		// app blocks on a modal window
-		char buffer[1024];
-		snprintf(buffer, sizeof(buffer), "The application \"%s\" might be "
-			"blocked on a modal panel.", appName);
-		_SetShutdownWindowText(buffer);
+		BString buffer = B_TRANSLATE("The application \"%appName%\" might be "
+			"blocked on a modal panel.");
+		buffer.ReplaceFirst("%appName%", appName);
+		_SetShutdownWindowText(buffer.String());
 		_SetShutdownWindowCurrentApp(team);
 		_SetShutdownWindowKillButtonEnabled(true);
 	}
@@ -1789,13 +1803,13 @@ ShutdownProcess::_DisplayAbortingApp(team_id team)
 	}
 
 	// compose the text to be displayed
-	char buffer[1024];
-	snprintf(buffer, sizeof(buffer), "Application \"%s\" has aborted the "
-		"shutdown process.", appName);
+	BString buffer = B_TRANSLATE("Application \"%appName%\" has aborted the "
+		"shutdown process.");
+	buffer.ReplaceFirst("%appName%", appName);
 
 	// set up the window
 	_SetShutdownWindowCurrentApp(team);
-	_SetShutdownWindowText(buffer);
+	_SetShutdownWindowText(buffer.String());
 	_SetShutdownWindowWaitForAbortedOK();
 
 	// schedule the timeout event
