@@ -468,15 +468,15 @@ if [ IsOptionalHaikuImagePackageAdded CMake ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				cmake-2.8.2-x86-gcc4-2010-10-31.zip
-				: $(baseURL)/cmake-2.8.2-x86-gcc4-2010-10-31.zip
+				cmake-2.8.4-x86-gcc4-2011-02-25.zip
+				: $(baseURL)/cmake-2.8.4-x86-gcc4-2011-02-25.zip
 				:
 				: true
 			;
 		} else {
 			InstallOptionalHaikuImagePackage
-				cmake-2.8.2-x86-gcc2-2010-10-13.zip
-				: $(baseURL)/cmake-2.8.2-x86-gcc2-2010-10-13.zip
+				cmake-2.8.4-x86-gcc2-2011-02-25.zip
+				: $(baseURL)/cmake-2.8.4-x86-gcc2-2011-02-25.zip
 				:
 				: true
 			;
@@ -1211,12 +1211,12 @@ if [ IsOptionalHaikuImagePackageAdded Nano ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				nano-2.2.5-x86-gcc4-2010-11-13.zip
-				: $(baseURL)/nano-2.2.5-x86-gcc4-2010-11-13.zip ;
+				nano-2.2.6-x86-gcc4-2011-02-25.zip
+				: $(baseURL)/nano-2.2.6-x86-gcc4-2011-02-25.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				nano-2.2.5-x86-gcc2-2010-10-16.zip
-				: $(baseURL)/nano-2.2.5-x86-gcc2-2010-10-16.zip ;
+				nano-2.2.6-x86-gcc2-2011-02-25.zip
+				: $(baseURL)/nano-2.2.6-x86-gcc2-2011-02-25.zip ;
 		}
 	}
 }
