@@ -1,10 +1,11 @@
 /*
- * Copyright 2006-2008, Haiku. All rights reserved.
+ * Copyright 2006-2011, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
+ * 		John Scipione <jscipione@gmail.com>
  */
 
 
@@ -96,6 +97,50 @@ scale_bilinear(uint8* bits, int32 srcWidth, int32 srcHeight, int32 dstWidth,
 			d -= 4;
 		}
 		dst += bpr;
+	}
+}
+
+
+static void
+scale2x(const uint8* srcBits, uint8* dstBits, int32 srcWidth, int32 srcHeight,
+	int32 srcBPR, int32 dstBPR)
+{
+	/*
+	 * This implements the AdvanceMAME Scale2x algorithm found on:
+	 * http://scale2x.sourceforge.net/
+	 * 
+	 * It is an incredibly simple and powerful image doubling routine that does
+	 * an astonishing job of doubling game graphic data while interpolating out
+	 * the jaggies.
+	 *
+	 * Derived from the (public domain) SDL version of the library by Pete
+	 * Shinners
+	 */
+
+	// Assume that both src and dst are 4 BPP (B_RGBA32)
+	for (int32 y = 0; y < srcHeight; ++y) {
+		for (int32 x = 0; x < srcWidth; ++x) {
+			uint32 b = *(uint32*)(srcBits + (MAX(0, y - 1) * srcBPR)
+				+ (4 * x));
+			uint32 d = *(uint32*)(srcBits + (y * srcBPR)
+				+ (4 * MAX(0, x - 1)));
+			uint32 e = *(uint32*)(srcBits + (y * srcBPR)
+				+ (4 * x));
+			uint32 f = *(uint32*)(srcBits + (y * srcBPR)
+				+ (4 * MIN(srcWidth - 1, x + 1)));
+			uint32 h = *(uint32*)(srcBits + (MIN(srcHeight - 1, y + 1)
+				* srcBPR) + (4 * x));
+
+			uint32 e0 = d == b && b != f && d != h ? d : e;
+			uint32 e1 = b == f && b != d && f != h ? f : e;
+			uint32 e2 = d == h && d != b && h != f ? d : e;
+			uint32 e3 = h == f && d != h && b != f ? f : e;
+
+			*(uint32*)(dstBits + y * 2 * dstBPR + x * 2 * 4) = e0;
+			*(uint32*)(dstBits + y * 2 * dstBPR + (x * 2 + 1) * 4) = e1;
+			*(uint32*)(dstBits + (y * 2 + 1) * dstBPR + x * 2 * 4) = e2;
+			*(uint32*)(dstBits + (y * 2 + 1) * dstBPR + (x * 2 + 1) * 4) = e3;
+		}
 	}
 }
 
@@ -448,12 +493,6 @@ BIconUtils::ConvertFromCMAP8(const uint8* src, uint32 width, uint32 height,
 		return B_ERROR;
 	}
 
-//#if __HAIKU__
-//
-//	return result->ImportBits(src, height * srcBPR, srcBPR, 0, B_CMAP8);
-//
-//#else
-
 	if (result->ColorSpace() != B_RGBA32 && result->ColorSpace() != B_RGB32) {
 		// TODO: support other color spaces
 		return B_BAD_VALUE;
@@ -463,6 +502,9 @@ BIconUtils::ConvertFromCMAP8(const uint8* src, uint32 width, uint32 height,
 	uint32 dstBPR = result->BytesPerRow();
 
 	const rgb_color* colorMap = system_colors()->color_list;
+
+	const uint8* srcStart = src;
+	uint8* dstStart = dst;
 
 	for (uint32 y = 0; y < height; y++) {
 		uint32* d = (uint32*)dst;
@@ -480,15 +522,26 @@ BIconUtils::ConvertFromCMAP8(const uint8* src, uint32 width, uint32 height,
 		dst += dstBPR;
 	}
 
+	// reset src and dst back to their original locations
+	src = srcStart;
+	dst = dstStart;
+
 	if (dstWidth > width || dstHeight > height) {
-		// up scaling
-		scale_bilinear((uint8*)result->Bits(), width, height, dstWidth,
-			dstHeight, dstBPR);
+		if (dstWidth == 2 * width && dstHeight == 2 * height) {
+			// scale using the scale2x algorithm
+			BBitmap* converted = new BBitmap(BRect(0, 0, width - 1, height - 1),
+				result->ColorSpace());
+			converted->ImportBits(src, height * srcBPR, srcBPR, 0, B_CMAP8);
+			uint8* convertedBits = (uint8*)converted->Bits();
+			int32 convertedBPR = converted->BytesPerRow();
+			scale2x(convertedBits, dst, width, height, convertedBPR, dstBPR);
+		} else {
+			// bilinear scaling
+			scale_bilinear(dst, width, height, dstWidth, dstHeight, dstBPR);
+		}
 	}
 
 	return B_OK;
-
-//#endif // __HAIKU__
 }
 
 
