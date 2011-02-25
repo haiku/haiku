@@ -129,6 +129,21 @@ public:
 									// called by AboutToQuit
 
 private:
+			BString				_DestinationString(float* _width);
+			BString				_StatusString(float availableSpace,
+									float fontSize, float* _width);
+
+			BString				_SpeedStatusString(float availableSpace,
+									float* _width);
+			BString				_FullSpeedString();
+			BString				_ShortSpeedString();
+
+			BString				_TimeStatusString(float availableSpace,
+									float* _width);
+			BString				_ShortTimeRemainingString(const char* timeText);
+			BString				_FullTimeRemainingString(time_t finishTime,
+									const char* timeText);
+
 			BStatusBar*			fStatusBar;
 			off_t				fTotalSize;
 			off_t				fItemSize;

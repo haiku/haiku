@@ -66,6 +66,7 @@ const BRect kStatusRect(200, 200, 550, 200);
 
 static bigtime_t sLastEstimatedFinishSpeedToggleTime = -1;
 static bool sShowSpeed = true;
+static const time_t kSecondsPerDay = 24 * 60 * 60;
 
 class TCustomButton : public BButton {
 public:
@@ -622,25 +623,7 @@ BStatusView::Draw(BRect updateRect)
 	}
 
 	BRect bounds(Bounds());
-
-	if (be_control_look != NULL) {
-		be_control_look->DrawRaisedBorder(this, bounds, updateRect,
-		ViewColor());
-	} else {
-		// draw a frame, which also separates multiple BStatusViews
-		rgb_color light = tint_color(ViewColor(), B_LIGHTEN_MAX_TINT);
-		rgb_color shadow = tint_color(ViewColor(), B_DARKEN_1_TINT);
-		BeginLineArray(4);
-			AddLine(BPoint(bounds.left, bounds.bottom - 1.0f),
-					BPoint(bounds.left, bounds.top), light);
-			AddLine(BPoint(bounds.left + 1.0f, bounds.top),
-					BPoint(bounds.right, bounds.top), light);
-			AddLine(BPoint(bounds.right, bounds.top + 1.0f),
-					BPoint(bounds.right, bounds.bottom), shadow);
-			AddLine(BPoint(bounds.right - 1.0f, bounds.bottom),
-					BPoint(bounds.left, bounds.bottom), shadow);
-		EndLineArray();
-	}
+	be_control_look->DrawRaisedBorder(this, bounds, updateRect, ViewColor());
 
 	SetHighColor(0, 0, 0);
 
@@ -648,123 +631,213 @@ BStatusView::Draw(BRect updateRect)
 	font_height fh;
 	GetFontHeight(&fh);
 	tp.y += ceilf(fh.leading) + ceilf(fh.ascent);
-
-	if (IsPaused())
+	if (IsPaused()) {
 		DrawString(B_TRANSLATE("Paused: click to resume or stop"), tp);
-	else if (fDestDir.Length()) {
-		BString buffer(B_TRANSLATE("To: %dir"));
-		buffer.ReplaceFirst("%dir", fDestDir);
-		SetHighColor(0, 0, 0);
-		DrawString(buffer.String(), tp);
-
-		float rightDivider = tp.x + StringWidth(buffer.String()) + 5.0f;
-		SetHighColor(tint_color(LowColor(), B_DARKEN_4_TINT));
-
-		BFont font;
-		GetFont(&font);
-		float oldFontSize = font.Size();
-		float fontSize = oldFontSize * 0.8f;
-		font.SetSize(max_c(8.0f, fontSize));
-		SetFont(&font, B_FONT_SIZE);
-
-		if (sShowSpeed) {
-			// Draw speed info
-			if (fBytesPerSecond != 0.0) {
-				char sizeBuffer[128];
-				buffer.SetTo(B_TRANSLATE(
-					"(%SizeProcessed of %TotalSize, %BytesPerSecond/s)"));
-				buffer.ReplaceFirst("%SizeProcessed",
-					string_for_size((double)fSizeProcessed, sizeBuffer,
-					sizeof(sizeBuffer)));
-				buffer.ReplaceFirst("%TotalSize",
-					string_for_size((double)fTotalSize, sizeBuffer,
-					sizeof(sizeBuffer)));
-				buffer.ReplaceFirst("%BytesPerSecond",
-					string_for_size(fBytesPerSecond, sizeBuffer,
-					sizeof(sizeBuffer)));
-				tp.x = fStatusBar->Frame().right - StringWidth(buffer.String());
-				if (tp.x > rightDivider)
-					DrawString(buffer.String(), tp);
-				else {
-					// complete string too wide, try with shorter version
-					buffer << B_TRANSLATE("%BytesPerSecond/s");
-					buffer.ReplaceFirst("%BytesPerSecond",
-						string_for_size(fBytesPerSecond, sizeBuffer,
-						sizeof(sizeBuffer)));
-					tp.x = fStatusBar->Frame().right
-						- StringWidth(buffer.String());
-					if (tp.x > rightDivider)
-						DrawString(buffer.String(), tp);
-				}
-			}
-		} else {
-			double totalBytesPerSecond = (double)(fSizeProcessed
-					- fEstimatedFinishReferenceSize)
-				* 1000000LL / (system_time() - fEstimatedFinishReferenceTime);
-			double secondsRemaining = (fTotalSize - fSizeProcessed)
-				/ totalBytesPerSecond;
-			time_t now = (time_t)real_time_clock();
-			time_t finishTime = (time_t)(now + secondsRemaining);
-
-			tm _time;
-			tm* time = localtime_r(&finishTime, &_time);
-			int32 year = time->tm_year + 1900;
-
-			char timeText[32];
-			time_t secondsPerDay = 24 * 60 * 60;
-			// TODO: Localization of time string...
-			if (now < finishTime - secondsPerDay) {
-				// process is going to take more than a day!
-				snprintf(timeText, sizeof(timeText), "%0*d:%0*d %0*d/%0*d/%ld",
-					2, time->tm_hour, 2, time->tm_min,
-					2, time->tm_mon + 1, 2, time->tm_mday, year);
-			} else {
-				snprintf(timeText, sizeof(timeText), "%0*d:%0*d",
-					2, time->tm_hour, 2, time->tm_min);
-			}
-
-			finishTime -= now;
-			time = gmtime(&finishTime);
-			char finishStr[32];
-
-			if (finishTime > secondsPerDay) {
-				buffer.SetTo(B_TRANSLATE("(Finish: %time - Over %finishtime "
-					"days left)"));
-				snprintf(finishStr, sizeof(finishStr), "%ld",
-					finishTime / secondsPerDay);
-			} else if (finishTime > 60 * 60) {
-				buffer.SetTo(B_TRANSLATE("(Finish: %time - Over %finishtime "
-					"hours left)"));
-				snprintf(finishStr, sizeof(finishStr), "%ld",
-					finishTime / (60 * 60));
-			} else if (finishTime > 60) {
-				buffer.SetTo(B_TRANSLATE("(Finish: %time - %finishtime minutes "
-					"left)"));
-				snprintf(finishStr, sizeof(finishStr), "%ld", finishTime / 60);
-			} else {
-				buffer.SetTo(B_TRANSLATE("(Finish: %time - %finishtime seconds "
-					"left)"));
-				snprintf(finishStr, sizeof(finishStr), "%ld", finishTime);
-			}
-
-			buffer.ReplaceFirst("%time", timeText);
-			buffer.ReplaceFirst("%finishtime", finishStr);
-
-			tp.x = fStatusBar->Frame().right - StringWidth(buffer.String());
-			if (tp.x > rightDivider)
-				DrawString(buffer.String(), tp);
-			else {
-				// complete string too wide, try with shorter version
-				buffer.SetTo(B_TRANSLATE("(Finish: %time)"));
-				buffer.ReplaceFirst("%time", timeText);
-				tp.x = fStatusBar->Frame().right - StringWidth(buffer.String());
-				if (tp.x > rightDivider)
-					DrawString(buffer.String(), tp);
-			}
-		}
-		font.SetSize(oldFontSize);
-		SetFont(&font, B_FONT_SIZE);
+		return;
 	}
+
+	BFont font;
+	GetFont(&font);
+	float normalFontSize = font.Size();
+	float smallFontSize = max_c(normalFontSize * 0.8f, 8.0f);
+	float availableSpace = fStatusBar->Frame().Width();
+	availableSpace -= be_control_look->DefaultLabelSpacing();
+		// subtract to provide some room between our two strings
+
+	float destinationStringWidth = 0.f;
+	BString destinationString(_DestinationString(&destinationStringWidth));
+	availableSpace -= destinationStringWidth;
+
+	float statusStringWidth = 0.f;	
+	BString statusString(_StatusString(availableSpace, smallFontSize,
+		&statusStringWidth));
+
+	if (statusStringWidth > availableSpace) {
+		TruncateString(&destinationString, B_TRUNCATE_MIDDLE,
+			availableSpace + destinationStringWidth - statusStringWidth);
+	}
+
+	BPoint textPoint = fStatusBar->Frame().LeftBottom();
+	textPoint.y += ceilf(fh.leading) + ceilf(fh.ascent);
+
+	if (destinationStringWidth > 0) {
+		DrawString(destinationString.String(), textPoint);
+	}
+
+	SetHighColor(tint_color(LowColor(), B_DARKEN_4_TINT));
+	font.SetSize(smallFontSize);
+	SetFont(&font, B_FONT_SIZE);
+
+	textPoint.x = fStatusBar->Frame().right - statusStringWidth;
+	DrawString(statusString.String(), textPoint);
+
+	font.SetSize(normalFontSize);
+	SetFont(&font, B_FONT_SIZE);
+}
+
+
+BString
+BStatusView::_DestinationString(float* _width)
+{
+	BString buffer(B_TRANSLATE("To: %dir"));
+	buffer.ReplaceFirst("%dir", fDestDir);
+
+	*_width = ceilf(StringWidth(buffer.String()));
+	return buffer;
+}
+
+
+BString
+BStatusView::_StatusString(float availableSpace, float fontSize, float* _width)
+{
+	BFont font;
+	GetFont(&font);
+	float oldSize = font.Size();
+	font.SetSize(fontSize);
+	SetFont(&font, B_FONT_SIZE);
+
+	BString status;
+	if (sShowSpeed) {
+		status = _SpeedStatusString(availableSpace, _width);
+	} else
+		status = _TimeStatusString(availableSpace, _width);
+
+	font.SetSize(oldSize);
+	SetFont(&font, B_FONT_SIZE);
+	return status;
+}
+
+
+BString
+BStatusView::_SpeedStatusString(float availableSpace, float* _width)
+{
+	BString string(_FullSpeedString());
+	*_width = StringWidth(string.String());
+	if (*_width > availableSpace) {
+		string.SetTo(_ShortSpeedString());
+		*_width = StringWidth(string.String());
+	}
+	*_width = ceilf(*_width);
+	return string;
+}
+
+
+BString
+BStatusView::_FullSpeedString()
+{
+	BString buffer;
+	if (fBytesPerSecond != 0.0) {
+		char sizeBuffer[128];
+		buffer.SetTo(B_TRANSLATE(
+			"(%SizeProcessed of %TotalSize, %BytesPerSecond/s)"));
+		buffer.ReplaceFirst("%SizeProcessed",
+			string_for_size((double)fSizeProcessed, sizeBuffer,
+			sizeof(sizeBuffer)));
+		buffer.ReplaceFirst("%TotalSize",
+			string_for_size((double)fTotalSize, sizeBuffer,
+			sizeof(sizeBuffer)));
+		buffer.ReplaceFirst("%BytesPerSecond",
+			string_for_size(fBytesPerSecond, sizeBuffer, sizeof(sizeBuffer)));
+	}
+	return buffer;
+}
+
+
+BString
+BStatusView::_ShortSpeedString()
+{
+	BString buffer;
+	if (fBytesPerSecond != 0.0) {
+		char sizeBuffer[128];
+		buffer << B_TRANSLATE("%BytesPerSecond/s");
+		buffer.ReplaceFirst("%BytesPerSecond",
+			string_for_size(fBytesPerSecond, sizeBuffer, sizeof(sizeBuffer)));
+	}
+	return buffer;
+}
+
+
+BString
+BStatusView::_TimeStatusString(float availableSpace, float* _width)
+{
+	double totalBytesPerSecond = (double)(fSizeProcessed
+			- fEstimatedFinishReferenceSize)
+		* 1000000LL / (system_time() - fEstimatedFinishReferenceTime);
+	double secondsRemaining = (fTotalSize - fSizeProcessed)
+		/ totalBytesPerSecond;
+	time_t now = (time_t)real_time_clock();
+	time_t finishTime = (time_t)(now + secondsRemaining);
+
+	tm _time;
+	tm* time = localtime_r(&finishTime, &_time);
+	int32 year = time->tm_year + 1900;
+
+	char timeText[32];
+	// TODO: Localization of time string...
+	if (now < finishTime - kSecondsPerDay) {
+		// process is going to take more than a day!
+		snprintf(timeText, sizeof(timeText), "%0*d:%0*d %0*d/%0*d/%ld",
+			2, time->tm_hour, 2, time->tm_min,
+			2, time->tm_mon + 1, 2, time->tm_mday, year);
+	} else {
+		snprintf(timeText, sizeof(timeText), "%0*d:%0*d",
+			2, time->tm_hour, 2, time->tm_min);
+	}
+
+	finishTime -= now;
+	BString string(_FullTimeRemainingString(finishTime, timeText));
+	*_width = StringWidth(string.String());
+	if (*_width > availableSpace) {
+		string.SetTo(_ShortTimeRemainingString(timeText));
+		*_width = StringWidth(string.String());
+	}
+
+	return string;
+}
+
+
+BString
+BStatusView::_ShortTimeRemainingString(const char* timeText)
+{
+	BString buffer;
+
+	// complete string too wide, try with shorter version
+	buffer.SetTo(B_TRANSLATE("(Finish: %time)"));
+	buffer.ReplaceFirst("%time", timeText);
+
+	return buffer;
+}
+
+
+BString
+BStatusView::_FullTimeRemainingString(time_t finishTime, const char* timeText)
+{
+	BString buffer;
+	char finishStr[32];
+	if (finishTime > kSecondsPerDay) {
+		buffer.SetTo(B_TRANSLATE("(Finish: %time - Over %finishtime "
+			"days left)"));
+		snprintf(finishStr, sizeof(finishStr), "%ld",
+			finishTime / kSecondsPerDay);
+	} else if (finishTime > 60 * 60) {
+		buffer.SetTo(B_TRANSLATE("(Finish: %time - Over %finishtime "
+			"hours left)"));
+		snprintf(finishStr, sizeof(finishStr), "%ld",
+			finishTime / (60 * 60));
+	} else if (finishTime > 60) {
+		buffer.SetTo(B_TRANSLATE("(Finish: %time - %finishtime minutes "
+			"left)"));
+		snprintf(finishStr, sizeof(finishStr), "%ld", finishTime / 60);
+	} else {
+		buffer.SetTo(B_TRANSLATE("(Finish: %time - %finishtime seconds "
+			"left)"));
+		snprintf(finishStr, sizeof(finishStr), "%ld", finishTime);
+	}
+
+	buffer.ReplaceFirst("%time", timeText);
+	buffer.ReplaceFirst("%finishtime", finishStr);
+
+	return buffer;
 }
 
 
