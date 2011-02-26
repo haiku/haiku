@@ -1,16 +1,20 @@
-1	czech	x-vnd.Haiku-Touchpad	1498191605
+1	czech	x-vnd.Haiku-Touchpad	827345252
+Cancel	TouchpadPrefView		Zrušit
 Defaults	TouchpadPrefView		Výchozí
 Fast	TouchpadPrefView		Rychle
 High	TouchpadPrefView		Vysoký
 Horizontal scroll speed	TouchpadPrefView		Rychlost horizontálního scrolování
 Horizontal scrolling	TouchpadPrefView		Horizontální scrolování
+OK	TouchpadPrefView		OK
 Off	TouchpadPrefView		Vypnuto
+Please confirm	TouchpadPrefView		Potvrďte prosím 
 Revert	TouchpadPrefView		Vrátit
 Scroll acceleration	TouchpadPrefView		Zrychlení scrolování
 Scrolling	TouchpadPrefView		Scrolování
 Slow	TouchpadPrefView		Pomalu
 Tap click sensitivity	TouchpadPrefView		Citlivost na klik poklepáním
 Tap gesture	TouchpadPrefView		Gesto poklepání
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Nový rozsah posunu je příliš velký a může ztěžovat běžní operace myši. Učitě to chcete změnit?
 Touchpad	TouchpadMain		Touchpad
 Two finger scrolling	TouchpadPrefView		Scrolovat dvěma prsty
 Vertical scroll speed	TouchpadPrefView		Rychlost vertikálního scrolování

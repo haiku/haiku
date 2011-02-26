@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-MediaPlayer	1983120721
+1	czech	x-vnd.Haiku-MediaPlayer	1801311807
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Americký)
 100% scale	MediaPlayer-Main		100% měřítko
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
@@ -33,6 +33,7 @@ Drop files to play	MediaPlayer-Main		Upusťte soubory pro jejich přehrání
 Edit	MediaPlayer-PlaylistWindow		Editovat
 Error: 	MediaPlayer-Main		Chyba:
 Error: 	MediaPlayer-RemovePLItemsCmd		Chyba:
+File Info	MediaPlayer-InfoWin		Informace o souboru
 File info…	MediaPlayer-Main		Informace o souboru...
 Full screen	MediaPlayer-Main		Celá obrazovka
 Full volume	MediaPlayer-SettingsWindow		Plná hlasitost
@@ -50,10 +51,11 @@ Lock Peaks	MediaPlayer-PeakView		Zamknout špičky
 Loop movies by default	MediaPlayer-SettingsWindow		Spouštět filmy implicitně ve smyčce
 Loop sounds by default	MediaPlayer-SettingsWindow		Implicitně přehrávat zvuky ve smyčce
 Low volume	MediaPlayer-SettingsWindow		Nízká hlasitost
-MediaPlayer Current Playlist	MediaPlayer-Main		MediaPlayer Aktuální Playlist
-MediaPlayer encountered an internal error. The file could not be opened.	MediaPlayer-Main		MediaPlayer se setkal s vnitřní chybou. Soubor nemohl být otevřen.
-MediaPlayer settings	MediaPlayer-SettingsWindow		Nastavení MediaPlayeru
-MediaPlayer\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		MediaPlayer\n\nNapsali Marcus Overhagen, Stephan Aßmus a Frederik Modéen
+MediaPlayer	MediaPlayer-Main		Přehrávač médií
+MediaPlayer Current Playlist	MediaPlayer-Main		Aktuální Playlist Přehrávače Médií
+MediaPlayer encountered an internal error. The file could not be opened.	MediaPlayer-Main		Přehrávač médií se setkal s vnitřní chybou. Soubor nemohl být otevřen.
+MediaPlayer settings	MediaPlayer-SettingsWindow		Nastavení Přehrávače médií
+MediaPlayer\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		Přehrávač médií\n\nNapsali Marcus Overhagen, Stephan Aßmus a Frederik Modéen
 Medium	MediaPlayer-SettingsWindow		Střední
 Move Entries	MediaPlayer-MovePLItemsCmd		Přesunout položky
 Move Entry	MediaPlayer-MovePLItemsCmd		Přesunout položku

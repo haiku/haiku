@@ -1,10 +1,10 @@
-1	czech	x-vnd.Haiku-StyledEdit	3614078026
+1	czech	x-vnd.Haiku-StyledEdit	881610730
 ???	LoadAlert		???
 Align	Menus		Zarovnání
 Black	Menus		Černá
 Blue	Menus		Modrá
 Bold	Menus		Tučně
-Can't Undo	Menus		Nelze vrátit zpět
+Can't undo	Menus		Nelze vrátit zpět
 Cancel	FindandReplaceWindow		Zrušit
 Cancel	QuitAlert		Zrušit
 Cancel	RevertToSavedAlert		Zrušit

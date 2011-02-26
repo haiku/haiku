@@ -1,4 +1,4 @@
-1	czech	x-vnd.Be-MAIL	1525863502
+1	czech	x-vnd.Be-MAIL	2797564879
 %d - Date	Mail		%d - Datum
 %e - E-mail address	Mail		%e - E-mailová adresa
 %n - Full name	Mail		%n - Plné jméno
@@ -90,6 +90,7 @@ Previous	Mail		Předchozí
 Previous message	Mail		Předchozí zpráva
 Print	Mail		Tisk
 Print…	Mail		Tisk...
+Put your favorite e-mail queries and query templates in this folder.	Mail		Vložte své oblíbené e-mailové dotazy a předlohy dotazů do tohoto adresáře.
 Queries	Mail		Dotazy
 Quit	Mail		Zavřít
 Quote	Mail		Citovat
@@ -147,3 +148,4 @@ Warn unencodable:	Mail		Varovat před nekódovatelným:
 Written by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Napsal Robert Polic.\nVylepšeno skupinou Dr. Zoidberga.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Váš text obsahuje %ld nevkladatelných znaků. Možná by bylo lepší použít jinou znakovou sadu. Stiskněte Odeslat, pokud chcete zprávu přesto poslat (místo nevkladatelných znaků budou použity znaky zástupné), nebo vyberte Zrušit pro návrat zpět a pokuste se to opravit.
 \\n - Newline	Mail		\\n - Nový řádek
+helpful message	Mail		užitečná zpráva

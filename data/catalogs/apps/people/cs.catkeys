@@ -1,4 +1,5 @@
-1	czech	x-vnd.Be-PEPL	3209429794
+1	czech	x-vnd.Be-PEPL	3664557316
+%name% picture	People		%name% obrázek
 About	People		O programu
 Address	People		Adresa
 Cancel	People		Zrušit
@@ -20,6 +21,7 @@ File	People		Soubor
 Group	People		Skupina
 Home phone	People		Telefon domů
 Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Spouštění FileTypes prefletu pro konfiguraci Osobních atributů selhalo.\n\nChyba:
+Load image…	People		Nahrát obrázek...
 Name	People		Jméno
 New person	People		Nová osoba
 New person…	People		Nová osoba...
@@ -29,6 +31,7 @@ Paste	People		Vložit
 Person	Short mimetype description		Osoba
 Quit	People		Ukončit
 Redo	People		Znovu
+Remove image	People		Odstranit obrázek
 Revert	People		Vrátit
 Save	People		Uložit
 Save as…	People		Uložit jako...
@@ -38,6 +41,7 @@ Sorry	People		Lituji
 State	People		Stát
 URL	People		URL
 Undo	People		Zpět
+Unnamed person	People		Nepojmenovaná osoba
 Work phone	People		Telefon do práce
 Zip	People		Zip
 none	Groups list		žádný
