@@ -30,7 +30,6 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	Bzip					- file archiving utility
 #	CCache					- fast compiler cache
 #	CDRecord				- the command line CD writing tools
-#	Classpath				- GNU Classpath
 #	Clockwerk				- native audio/video compositing
 #	CLucene					- indexed file search
 #	Curl					- a client that groks URLs
@@ -38,6 +37,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	CVS						- the version control system
 #	Development				- more complete dev environment (including autotools)
 #	DevelopmentBase			- basic development environment (gcc, headers, libs,...)
+#	DevelopmentJava			- JamVM, a Java Virtual machine, GNU Classpath, ECJ
 #	DevelopmentMin			- development headers, libs, tools, from sources only
 #	EtPan					- e-mail libraries
 #	Expat					- XML parsing libraries
@@ -48,7 +48,6 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	GPerf					- the perfect hash function generator.
 #	Groff					- text formatter used for man pages
 #	ICU-devel				- the headers and lib-links for ICU (for development)
-#	JamVM					- JamVM, a Java Virtual machine
 #	KeymapSwitcher			- Easy to use keymap switcher
 #	LibEvent				- An event notification library
 #	LibIconv				- text encoding conversion library
@@ -406,20 +405,6 @@ if [ IsOptionalHaikuImagePackageAdded CDRecord ] {
 }
 
 
-# Classpath
-if [ IsOptionalHaikuImagePackageAdded Classpath ] {
-	if $(TARGET_ARCH) != x86 {
-		Echo "No optional package Classpath available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		InstallOptionalHaikuImagePackage
-			classpath-0.98-x86-gcc4-2011-02-13.zip
-			: http://jerome.duval.free.fr/obos/classpath-0.98-x86-gcc4-2011-02-13.zip ;
-	} else {
-		Echo "No optional package Classpath available for gcc2" ;
-	}
-}
-
-
 # Clockwerk
 if [ IsOptionalHaikuImagePackageAdded Clockwerk ] {
 	if $(TARGET_ARCH) != x86 {
@@ -642,6 +627,51 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ]
 		: $(baseSourceURL)/2010/m4-1.4.14_haiku-2010-04-29.tar.xz ;
 	InstallSourceArchive flex-2.5.35_haiku-2010-04-29.tar.xz
 		: $(baseSourceURL)/2010/flex-2.5.35_haiku-2010-04-29.tar.xz ;
+}
+
+
+# DevelopmentJava
+if [ IsOptionalHaikuImagePackageAdded DevelopmentJava ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package DevelopmentJava available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		InstallOptionalHaikuImagePackage
+			classpath-0.98-x86-gcc4-2011-02-13.zip
+			: http://jerome.duval.free.fr/obos/classpath-0.98-x86-gcc4-2011-02-13.zip ;
+		AddSymlinkToHaikuImage common bin : 
+			/boot/common/bin/i586-pc-haiku-grmiregistry : rmiregistry ;
+		AddSymlinkToHaikuImage common bin :
+			/boot/common/bin/i586-pc-haiku-gserialver : serialver ;
+		AddSymlinkToHaikuImage common bin : 
+			/boot/common/bin/i586-pc-haiku-gjar : jar ;
+		AddSymlinkToHaikuImage common bin : 
+			/boot/common/bin/i586-pc-haiku-gjavah : javah ;
+		AddSymlinkToHaikuImage common bin : 
+			/boot/common/bin/i586-pc-haiku-gnameserv : nameserv ;
+		AddSymlinkToHaikuImage common bin : 
+			/boot/common/bin/i586-pc-haiku-gorbd : orbd ;
+		AddSymlinkToHaikuImage common bin : 
+			/boot/common/bin/i586-pc-haiku-grmid : rmid ;
+		AddSymlinkToHaikuImage common bin : 
+			/boot/common/bin/i586-pc-haiku-gkeytool : keytool ;
+		AddSymlinkToHaikuImage common bin : 
+			/boot/common/bin/i586-pc-haiku-gappletviewer : appletviewer ;
+		AddSymlinkToHaikuImage common bin : 
+			/boot/common/bin/i586-pc-haiku-grmic : rmic ;
+		AddSymlinkToHaikuImage common bin : 
+			/boot/common/bin/i586-pc-haiku-gnative2ascii : native2ascii ;
+		AddSymlinkToHaikuImage common bin : 
+			/boot/common/bin/i586-pc-haiku-gjarsigner : jarsigner ;
+		InstallOptionalHaikuImagePackage
+			jamvm-1.5.4-x86-gcc4-2011-02-13.zip
+			: http://jerome.duval.free.fr/obos/jamvm-1.5.4-x86-gcc4-2011-02-13.zip ;
+		AddSymlinkToHaikuImage common bin : /boot/common/bin/jamvm : java ;
+		InstallOptionalHaikuImagePackage
+			ecj-3.6.2-haiku-2011-02-26.zip
+			: http://jerome.duval.free.fr/obos/ecj-3.6.2-haiku-2011-02-26.zip ;
+	} else {
+		Echo "No optional package DevelopmentJava available for gcc2" ;
+	}
 }
 
 
@@ -964,21 +994,6 @@ if [ IsOptionalHaikuImagePackageAdded ICU-devel ] {
 			: /system/lib $(abiVersionedLib) : : true ;
 		AddSymlinkToHaikuHybridImage develop abi $(arch) $(abi) lib
 			: $(abiVersionedLib) : $(lib) ;
-	}
-}
-
-
-# JamVM
-if [ IsOptionalHaikuImagePackageAdded JamVM ] {
-	if $(TARGET_ARCH) != x86 {
-		Echo "No optional package JamVM available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		InstallOptionalHaikuImagePackage
-			jamvm-1.5.4-x86-gcc4-2011-02-13.zip
-			: http://jerome.duval.free.fr/obos/jamvm-1.5.4-x86-gcc4-2011-02-13.zip ;
-		AddSymlinkToHaikuImage common bin : /boot/common/bin/jamvm : java ;
-	} else {
-		Echo "No optional package JamVM available for gcc2" ;
 	}
 }
 
