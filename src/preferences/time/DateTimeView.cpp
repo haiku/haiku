@@ -16,6 +16,7 @@
 #include "TimeWindow.h"
 
 #include <CalendarView.h>
+#include <Catalog.h>
 #include <CheckBox.h>
 #include <DateTime.h>
 #include <Entry.h>
@@ -31,6 +32,9 @@
 #include <time.h>
 
 #include <syscalls.h>
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Time"
 
 
 using BPrivate::BCalendarView;
@@ -243,20 +247,21 @@ DateTimeView::_InitView()
 
 	// clock radio buttons
 	bounds.top = fClock->Frame().bottom + 10.0;
-	BStringView* text = new BStringView(bounds, "clockSetTo", "Clock set to:");
+	BStringView* text = new BStringView(bounds, "clockSetTo",
+		B_TRANSLATE("Clock set to:"));
 	AddChild(text);
 	text->ResizeToPreferred();
 
 	bounds.left += 10.0f;
 	bounds.top = text->Frame().bottom;
-	fLocalTime = new BRadioButton(bounds, "localTime", "Local time",
-		new BMessage(kRTCUpdate));
+	fLocalTime = new BRadioButton(bounds, "localTime",
+		B_TRANSLATE("Local time"), new BMessage(kRTCUpdate));
 	AddChild(fLocalTime);
 	fLocalTime->ResizeToPreferred();
 
 	bounds.left = fLocalTime->Frame().right + 10.0;
-	fGmtTime = new BRadioButton(bounds, "greenwichMeanTime", "GMT",
-		new BMessage(kRTCUpdate));
+	fGmtTime = new BRadioButton(bounds, "greenwichMeanTime",
+		B_TRANSLATE("GMT"),	new BMessage(kRTCUpdate));
 	AddChild(fGmtTime);
 	fGmtTime->ResizeToPreferred();
 
