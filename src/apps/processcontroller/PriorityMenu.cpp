@@ -76,7 +76,6 @@ PriorityMenu::BuildMenu()
 {
 	BMenuItem* item;
 	BMessage* message;
-	char name[B_OS_NAME_LENGTH + 20];
 	long found = false;
 
 	for (long index = 0; ; index++) {
@@ -91,12 +90,16 @@ PriorityMenu::BuildMenu()
 		message = new BMessage('PrTh');
 		message->AddInt32("thread", fThreadID);
 		message->AddInt32("priority", priority->priority);
-		sprintf(name, B_TRANSLATE("%s [%d]"), priority->name, 
-			(int)priority->priority);
-		item = new BMenuItem(name, message);
+		BString name;
+		const size_t size = B_OS_NAME_LENGTH * 4;
+		snprintf(name.LockBuffer(size), size,
+			B_TRANSLATE("%s [%d]"), priority->name,	(int)priority->priority);
+		name.UnlockBuffer();
+		item = new BMenuItem(name.String(), message);
 		item->SetTarget(gPCView);
 		if (fPriority == priority->priority)
 			found = true, item->SetMarked(true);
 		AddItem(item);
 	}
 }
+
