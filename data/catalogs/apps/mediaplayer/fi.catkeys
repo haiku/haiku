@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-MediaPlayer	1983120721
+1	finnish	x-vnd.Haiku-MediaPlayer	1801311807
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerikkalainen)
 100% scale	MediaPlayer-Main		100 % skaala
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
@@ -33,6 +33,7 @@ Drop files to play	MediaPlayer-Main		Pudota soitettavat tiedostot
 Edit	MediaPlayer-PlaylistWindow		Muokkaa
 Error: 	MediaPlayer-Main		Virhe:
 Error: 	MediaPlayer-RemovePLItemsCmd		Virhe:
+File Info	MediaPlayer-InfoWin		Tiedostotiedot
 File info…	MediaPlayer-Main		Tiedostotiedot...
 Full screen	MediaPlayer-Main		Kokoruutunäyttö
 Full volume	MediaPlayer-SettingsWindow		Täysi äänenvoimakkuus
@@ -50,6 +51,7 @@ Lock Peaks	MediaPlayer-PeakView		Lukitse huiput
 Loop movies by default	MediaPlayer-SettingsWindow		oletuksena elokuvat silmukassa
 Loop sounds by default	MediaPlayer-SettingsWindow		oletussilmukkaäänet
 Low volume	MediaPlayer-SettingsWindow		Alenna äänenvoimakkuutta
+MediaPlayer	MediaPlayer-Main		Mediasoitin
 MediaPlayer Current Playlist	MediaPlayer-Main		Mediasoittimen nykyinen soittoluettelo
 MediaPlayer encountered an internal error. The file could not be opened.	MediaPlayer-Main		Mediasoittimessa oli sisäinen virhe. Tiedostoa ei voitu avata.
 MediaPlayer settings	MediaPlayer-SettingsWindow		Mediasoitinasetukset

@@ -1,10 +1,10 @@
-1	finnish	x-vnd.Haiku-StyledEdit	3614078026
+1	finnish	x-vnd.Haiku-StyledEdit	881610730
 ???	LoadAlert		???
 Align	Menus		Tasaa
 Black	Menus		Musta
 Blue	Menus		Sininen
 Bold	Menus		Lihavointi
-Can't Undo	Menus		Ei voi perua
+Can't undo	Menus		Ei voi perua
 Cancel	FindandReplaceWindow		Peru
 Cancel	QuitAlert		Peru
 Cancel	RevertToSavedAlert		Peru

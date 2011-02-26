@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-ProcessController	3930302090
+1	finnish	x-vnd.Haiku-ProcessController	2647371135
 %.1f MB	ProcessController		%.1f Mt
 %s priority [%d]	ProcessController		%s prioriteetti [%d]
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		© 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
@@ -8,15 +8,20 @@ Cancel	ProcessController		Peru
 Damned!	ProcessController		Kirottua!
 Debug this thread!	ProcessController		Vikajäljitä tätä säiettä!
 Debug thread	ProcessController		Vikajäljitä säiettä
+Display	ProcessController		Näyttö
 Do you really want to kill the team \"%s\"?	ProcessController		Haluatko todella tappaa ryhmän ”%s”?
 Error saving file	ProcessController		Virhe tallennettaessa tiedostoa
 Global Popup	ProcessController		Yleinen ponnahdusikkuna
 Gone teams…	ProcessController		Poistuneet ryhmät...
+Idle	ProcessController		Joutilas
 Install in Deskbar	ProcessController		Asenna Työpöytäpalkissa
 Kill this thread!	ProcessController		Tapa tämä säie!
 Live in the Deskbar	ProcessController		Suora lähetys Työpöytäpalkista
+Low	ProcessController		Alhainen
+Lowest active	ProcessController		Alhaisin aktiviteetti
 Memory usage	ProcessController		Muistikäyttö
 New Terminal	ProcessController		Uusi pääteikkuna
+Normal	ProcessController		Normaali
 OK	ProcessController		Valmis
 Ok!	ProcessController		Valmis!
 ProcessController	ProcessController		Prosessiohjain
@@ -25,6 +30,8 @@ ProcessController\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyrigh
 Processor %d	ProcessController		Prosessori %d
 Quit an application	ProcessController		Poistu sovelluksesta
 Quit application	ProcessController		Poistu sovelluksesta
+Real-time	ProcessController		Tosiaikainen
+Real-time display	ProcessController		Tosiaikanäyttö
 Restart Deskbar	ProcessController		Käynnistä Työpöytäpalkki uudelleen
 Restart Tracker	ProcessController		Käynnistä Seuraaja uudelleen
 Run in window	ProcessController		Suorita ikkunassa
@@ -34,6 +41,8 @@ This is the last active processor...\nYou can't turn it off!	ProcessController		
 This team is already gone…	ProcessController		Tämä ryhmä on jo poistunut...
 This thread is already gone…	ProcessController		Tämä säie on jo poistunut...
 Threads and CPU usage	ProcessController		Säikeet ja prosessorikäyttö
+Urgent	ProcessController		Kiireellinen
+Urgent display	ProcessController		Kiireellinen näyttö
 Usage: %s [-deskbar]\n	ProcessController		Käyttö: %s [-deskbar]\n
 What do you want to do with the thread \"%s\"?	ProcessController		Mitä haluat tehdä säikeelle ”%s”?
 Yes, kill this team!	ProcessController		Kyllä, tapa tämä ryhmä!

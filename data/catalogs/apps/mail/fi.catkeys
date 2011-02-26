@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Be-MAIL	1525863502
+1	finnish	x-vnd.Be-MAIL	2797564879
 %d - Date	Mail		%d - Päivämäärä
 %e - E-mail address	Mail		%e - Sähköpostiosoite
 %n - Full name	Mail		%n - Koko nimi
@@ -90,6 +90,7 @@ Previous	Mail		Edellinen
 Previous message	Mail		Edellinen viesti
 Print	Mail		Tulosta
 Print…	Mail		Tulosta…
+Put your favorite e-mail queries and query templates in this folder.	Mail		Laita suosikkisähköpostikyselysi ja kyselymallinteet tähän kansioon.
 Queries	Mail		Kyselyt
 Quit	Mail		Poistu
 Quote	Mail		Lainaus
@@ -147,3 +148,4 @@ Warn unencodable:	Mail		Varoita koodaamattomista:
 Written by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Tekijä: Robert Polic.\nOhjelman laajennus: Tri Zoidbergin ryhmä.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Päätekstisi sisältää %ld merkkiä, joita ei voida koodata. Eri kirjaimisto olisi ehkä parempi? Napauttamalla Lähetä-painiketta lähetät sen kaikesta huolimatta (korvausmerkkiä käytetään koodauskelvottomien merkkien paikalla), tai valitse Peru takaisinpalaamista ja korjausyritystä varten.
 \\n - Newline	Mail		\\n - Rivinvaihto
+helpful message	Mail		hyödyllinen viesti

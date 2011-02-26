@@ -1,8 +1,9 @@
-1	finnish	x-vnd.Haiku-Pulse	742292288
+1	finnish	x-vnd.Haiku-Pulse	2756001860
 About Pulse…	CPUButton		Ohjelmasta Pulssi...
 About Pulse…	PulseView		Ohjelmasta Pulssi...
 Active color	ConfigView		Käytössä oleva väri
 Bar colors	ConfigView		Palkkivärit
+CPU progress bar	NormalPulseView		Prosessorin edistymispalkki
 Defaults	PrefsWindow		Oletukset
 Deskbar	CPUButton		Työpöytäpalkki
 Deskbar menu	CPUButton		Työpöytäpalkkivalikko
@@ -11,8 +12,10 @@ Deskbar mode	NormalPulseView		Työpöytäpalkkitila
 Deskbar mode	PrefsWindow		Työpöytäpalkkitila
 Fade colors	ConfigView		Haalista värit
 Frame color	ConfigView		Kehysväri
+Idle color	ConfigView		Joutokäyntiväri
 Info	CPUButton		Tiedot
 Info	DeskbarPulseView		Tiedot
+Info	PulseWindow		Tiedot
 Mini mode	DeskbarPulseView		Minitila
 Mini mode	NormalPulseView		Minitila
 Mini mode	PrefsWindow		Minitila
@@ -24,9 +27,12 @@ OK	DeskbarPulseView		Valmis
 OK	PrefsWindow		Valmis
 OK	PulseApp		Valmis
 OK	PulseView		Valmis
+OK	PulseWindow		Valmis
 Pulse	NormalPulseView		Pulssi
 Pulse	PulseWindow		Pulssi
+Pulse settings	PulseWindow		Pulssi-asetukset
 Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	CPUButton		Pulssi\n\nTekijät: David Ramsey ja Arve Hjønnevåg\nKorjausversio: Daniel Switkin
+Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	DeskbarPulseView		Pulssi\n\nTekijä: David Ramsey ja Arve Hjønnevåg\nKorjausversio: Daniel Switkin
 Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	PulseWindow		Pulssi\n\nTekijät: David Ramsey ja Arve Hjønnevåg\nKorjausversio: Daniel Switkin
 Quit	DeskbarPulseView		Poistu
 Quit	MiniPulseView		Poistu
