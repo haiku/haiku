@@ -1,5 +1,6 @@
-1	belarusian	x-vnd.Haiku-ProcessController	926983020
-%s priority [%d]	ProcessController		%s прыярытэт [%d]
+1	belarusian	x-vnd.Haiku-ProcessController	3246358819
+%.1f MB	ProcessController		%.1f МБ
+%s [%d]	ProcessController		%s [%d]
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
 About	ProcessController		пра праграму
 About ProcessController…	ProcessController		Пра ProcessController…
@@ -7,15 +8,20 @@ Cancel	ProcessController		Адмена
 Damned!	ProcessController		Чорт!
 Debug this thread!	ProcessController		Адладжваць паток!
 Debug thread	ProcessController		Адладжваць паток
+Display priority	ProcessController		Прыярытэт адлюстравання
 Do you really want to kill the team \"%s\"?	ProcessController		Сапраўды жадаеце знішчыць групу \"%s\"?
 Error saving file	ProcessController		Памылка пры захаванні файла
 Global Popup	ProcessController		Глабальнае паведамленне
 Gone teams…	ProcessController		Знішчаныя групы
+Idle priority	ProcessController		Прыярытэт спакою
 Install in Deskbar	ProcessController		Усталяваць у Deskbar
 Kill this thread!	ProcessController		Знішчыць паток!
 Live in the Deskbar	ProcessController		Прывязаць да Deskbar
+Low priority	ProcessController		Нізкі прыярытэт
+Lowest active priority	ProcessController		Найнізшы актыўны прыярытэт
 Memory usage	ProcessController		Ужыванне памяці
 New Terminal	ProcessController		Новы Тэрмінал
+Normal priority	ProcessController		Нармальны прыярытэт
 OK	ProcessController		ОК
 Ok!	ProcessController		ОК!
 ProcessController	ProcessController		ProcessController
@@ -24,14 +30,19 @@ ProcessController\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyrigh
 Processor %d	ProcessController		Працэсар %d
 Quit an application	ProcessController		Закрыць праграму
 Quit application	ProcessController		Выйсці з праграмы
+Real-time display priority	ProcessController		Прыярытэт адлюстравання ў рэальным часе
+Real-time priority	ProcessController		Прыярытэт рэальнага часу
 Restart Deskbar	ProcessController		Перазапусціць Deskbar
 Restart Tracker	ProcessController		Перазапусціць Трэкер
 Run in window	ProcessController		Запускаць у вакне
+System resources & caches…	ProcessController		Сістэмныя рэсурсы & кэш…
 That's no Fun!	ProcessController		Гэта непрыкольна!
 This is the last active processor...\nYou can't turn it off!	ProcessController		Гэта апошні актыўны працэсар...\nВы не можаце яго выключыць!
 This team is already gone…	ProcessController		Гэтая група ўжо не існуе...
 This thread is already gone…	ProcessController		Гэты паток ўжо не існуе...
 Threads and CPU usage	ProcessController		Патокі і ўжыванне ЦП
+Urgent display priority	ProcessController		Прыярытэт неадкладнага адлюстравання
+Urgent priority	ProcessController		Неадкладны прыярытэт
 Usage: %s [-deskbar]\n	ProcessController		Ужыванне: %s [-deskbar]\n
 What do you want to do with the thread \"%s\"?	ProcessController		Што вы жадаеце зрабіць з патокам \"%s\"?
 Yes, kill this team!	ProcessController		Так, знішчыць гэтую групу!

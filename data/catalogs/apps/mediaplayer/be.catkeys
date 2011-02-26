@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-MediaPlayer	1983120721
+1	belarusian	x-vnd.Haiku-MediaPlayer	1801311807
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Амерыка)
 100% scale	MediaPlayer-Main		Маштаб 100%
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Кінатэатр)
@@ -12,7 +12,7 @@
 <unknown>	PlaylistItem-author		<невядомы>
 <unnamed>	PlaylistItem-name		<неназваны>
 <untitled>	PlaylistItem-title		<неназваны>
-About MediaPlayer…	MediaPlayer-Main		Пра MediaPlayer...
+About MediaPlayer…	MediaPlayer-Main		Пра Праігравальнік Медыя…
 All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Нельга адправіць усе файлы ў Сметніцу.
 Always on top	MediaPlayer-Main		Заўседы наверсе
 Aspect ratio	MediaPlayer-Main		Суадносіны бакоў
@@ -33,6 +33,7 @@ Drop files to play	MediaPlayer-Main		Перацягніце файлы, якія
 Edit	MediaPlayer-PlaylistWindow		Правіць
 Error: 	MediaPlayer-Main		Памылка:
 Error: 	MediaPlayer-RemovePLItemsCmd		Памылка:
+File Info	MediaPlayer-InfoWin		Інфармацыя файла
 File info…	MediaPlayer-Main		Інфармацыя пра файл...
 Full screen	MediaPlayer-Main		Поўны экран
 Full volume	MediaPlayer-SettingsWindow		Поўная гучнасць
@@ -50,10 +51,11 @@ Lock Peaks	MediaPlayer-PeakView		Блакаваць Пікі
 Loop movies by default	MediaPlayer-SettingsWindow		Зацыкліць відэа па змоўчанню
 Loop sounds by default	MediaPlayer-SettingsWindow		Зацыкліць гукі па змоўчанню
 Low volume	MediaPlayer-SettingsWindow		Нізкая гучнасць
-MediaPlayer Current Playlist	MediaPlayer-Main		Цякучы Плэйліст MediaPlayer
+MediaPlayer	MediaPlayer-Main		Праігравальнік Медыя
+MediaPlayer Current Playlist	MediaPlayer-Main		Цякучы Плэйліст Праігравальніка Медыя
 MediaPlayer encountered an internal error. The file could not be opened.	MediaPlayer-Main		Адбылася унутраная памылка MediaPlayer. Нельга адкрыць файл.
-MediaPlayer settings	MediaPlayer-SettingsWindow		Наладкі MediaPlayer
-MediaPlayer\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		MediaPlayer\n\nСтвораны Marcus Overhagen, Stephan Aßmus and Frederik Modéen
+MediaPlayer settings	MediaPlayer-SettingsWindow		Наладкі Праігравальніка Медыя
+MediaPlayer\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		Праігравальнік Медыя\n\nСтвораны Marcus Overhagen, Stephan Aßmus and Frederik Modéen
 Medium	MediaPlayer-SettingsWindow		Сярэдняе
 Move Entries	MediaPlayer-MovePLItemsCmd		Перамясціць элементы
 Move Entry	MediaPlayer-MovePLItemsCmd		Перамясціць элемент

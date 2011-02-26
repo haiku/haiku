@@ -1,22 +1,20 @@
-1	belarusian	x-vnd.Haiku-NetworkStatus	3992317590
+1	belarusian	x-vnd.Haiku-NetworkStatus	3379615764
+%ifaceName information:\n	NetworkStatusView		Інфармацыя пра %ifaceName:\n
 <no wireless networks found>	NetworkStatusView		<бесшнуравыя сеткі не знойдзеныя>
 Address	NetworkStatusView		Адрас
-Address information:\n	NetworkStatusView		Інфармацыя пра адрас:\n
 Broadcast	NetworkStatusView		Вяшчанне
-Broadcast information:\n	NetworkStatusView		Інфармацыя пра вяшчанне:\n
 Configuring	NetworkStatusView		Наладка
 Could not join wireless network:\n	NetworkStatusView		Не ўдалося далучыцца да бесшнуравой сеткі:\n
 Install in Deskbar	NetworkStatus		Усталяваць на Deskbar
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Не ўдалося запусціць сеткавыя наладкі.\n\nПамылка:
 Netmask	NetworkStatusView		Маска сеткі
-Netmask information:\n	NetworkStatusView		Інфармацыя пра маску сеткі:\n
 NetworkStatus	NetworkStatusWindow		NetworkStatus
 NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		Опцыі NetworkStatus:\n\t--deskbar\tдадаваць дупліканта да Deskbar аўтаматычна\n\t--help\t\tпаказаць гэты тэкст і выйсці\n
 NetworkStatus\n\twritten by %1 and Hugo Santos\n\t%2, Haiku, Inc.\n	NetworkStatusView		NetworkStatus\n\tаўтары: %1, Hugo Santos\n\t%2, Haiku, Inc.\n
 No link	NetworkStatusView		Няма спасылкі
 No stateful configuration	NetworkStatusView		Няма канфігурацыі для ўліку стану пратакола
 OK	NetworkStatusView		ОК
-Open network preferences…	NetworkStatusView		Адкрыць наладкі сеткі...
+Open network preferences…	NetworkStatusView		Адкрыць наладкі сеткі…
 Quit	NetworkStatusView		Выйсці
 Ready	NetworkStatusView		Гатовы
 Run in window	NetworkStatus		Запускаць у вакне

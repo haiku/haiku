@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Be-MAIL	1525863502
+1	belarusian	x-vnd.Be-MAIL	2797564879
 %d - Date	Mail		%d - Дата
 %e - E-mail address	Mail		%e - адрас электроннай пошты
 %n - Full name	Mail		%n - Поўнае імя
@@ -41,7 +41,7 @@ Do you wish to send this message before closing?	Mail		Жадаеце дасла
 Don't save	Mail		Не захоўваць
 E-mail draft could not be saved!	Mail		Немагчыма захаваць паведмаленне ў чарнавіках!
 Edit	Mail		Правіць
-Edit queries…	Mail		Праўка…
+Edit queries…	Mail		Праўка запытаў…
 Edit signatures…	Mail		Праўка подпісаў…
 Encoding:	Mail		Кадоўка:
 Expert	Mail		Поўны
@@ -90,6 +90,7 @@ Previous	Mail		Папярэдняе
 Previous message	Mail		Папярэдняе паведамленне
 Print	Mail		Друкаваць
 Print…	Mail		Друкаваць…
+Put your favorite e-mail queries and query templates in this folder.	Mail		Скапіюйце запыты электроннай пошты і шаблоны такіх запытаў у гэтую папку.
 Queries	Mail		Запыты
 Quit	Mail		Выйсці
 Quote	Mail		Цытата
@@ -147,3 +148,4 @@ Warn unencodable:	Mail		Правяраць кадоўку:
 Written by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Аўтар -  Robert Polic.\nРаспрацавана камандай Dr. Zoidberg.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваша паведамленне месціць %ld літар якія адсутнічаюць у выбранай кадоўцы. Нягледзячы на гэта вы маеце магчымасць Даслаць яго (у такім разе адсутныя літары будуць заменены на больш стасуючыя), ці Адмяніць перасылку ды вярнуцца і правіць гэтае паведамленне далей. Магчыма іншая кадоўка дапаможа даслаць паведамленне ў зыходным выглядзе.
 \\n - Newline	Mail		\\n - Новы радок
+helpful message	Mail		Карыснае паведамленне

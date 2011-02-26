@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-libtracker	3424530812
+1	belarusian	x-vnd.Haiku-libtracker	498395429
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 %Ld B	WidgetAttributeText		%Ld Б
 %Ld bytes	WidgetAttributeText		%Ld байтаў
@@ -168,11 +168,11 @@ Icon view	DeskWindow		Від іконак
 Icon view	VolumeWindow		Від іконак
 Identify	ContainerWindow		Ідэнтыфікаваць
 Identify	InfoWindow		Ідэнтыфікаваць
-If you %action the config folder, Haiku may not behave properly! Are you sure you want to do this? To %action the config folder anyway, click \"Do it\".	FSUtils		Калі вы %action каталог канфігурацый, Haiku можа паводзіць сябе неадэкватна! Вы ўпэнены, што жадаеце зрабіць гэта? Каб %action каталог канфігурацый, клікніце \"Давай\".
-If you %action the home folder, Haiku may not behave properly! Are you sure you want to do this? To %action the home anyway, click \"Do it\".	FSUtils		Калі вы %action хатні каталог, Haiku можа паводзіць сябе неадэкватна! Вы ўпэнены, што жадаеце зрабіць гэта? Каб %action хатні каталог, клікніце \"Давай\".
-If you %action the mime settings, Haiku may not behave properly! Are you sure you want to do this? To %action the mime settings anyway, click \"Do it\".	FSUtils		Калі вы %action наладкі mime, Haiku можа паводзіць сябе неадэкватна! Вы ўпэнены, што жадаеце зрабіць гэта? Каб %action наладкі mime, клікніце \"Давай\".
-If you %action the settings folder, Haiku may not behave properly! Are you sure you want to do this? To %action the settings folder anyway, click \"Do it\".	FSUtils		Калі вы %action каталог наладак, Haiku можа паводзіць сябе неадэкватна! Вы ўпэнены, што жадаеце зрабіць гэта? Каб %action каталог наладак, клікніце \"Давай\".
-If you %action the system folder or its contents, you won't be able to boot Haiku! Are you sure you want to do this? To %action the system folder or its contents anyway, hold down the Shift key and click \"Do it\".	FSUtils		Калі вы %action сістэмны каталог або яго змест, вы не зможаце запусціць Haiku! Вы ўпэўнены, што жадаеце працягваць? Каб %action сістэмны каталог або яго змест, трымайце Shift і клікайце \"Давай\".
+If you %ifYouDoAction the config folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the config folder anyway, click \"Do it\".	FSUtils		Калі вы %ifYouDoAction каталог канфігурацый, Haiku можа паводзіць сябе неадэкватна! Вы ўпэнены, што жадаеце зрабіць гэта? Каб %toDoAction каталог канфігурацый, клікніце \"Давай\".
+If you %ifYouDoAction the home folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the home anyway, click \"Do it\".	FSUtils		Калі вы %ifYouDoAction хатні каталог, Haiku можа паводзіць сябе неадэкватна! Вы ўпэнены, што жадаеце зрабіць гэта? Каб %toDoAction хатні каталог, клікніце \"Давай\".
+If you %ifYouDoAction the mime settings, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the mime settings anyway, click \"Do it\".	FSUtils		Калі вы %ifYouDoAction наладкі mime, Haiku можа паводзіць сябе неадэкватна! Вы ўпэнены, што жадаеце зрабіць гэта? Каб %toDoAction наладкі mime, клікніце \"Давай\".
+If you %ifYouDoAction the settings folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the settings folder anyway, click \"Do it\".	FSUtils		Калі вы %ifYouDoAction каталог наладак, Haiku можа паводзіць сябе неадэкватна! Вы ўпэнены, што жадаеце зрабіць гэта? Каб %toDoAction каталог наладак, клікніце \"Давай\".
+If you %ifYouDoAction the system folder or its contents, you won't be able to boot Haiku! Are you sure you want to do this? To %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"Do it\".	FSUtils		Калі вы %ifYouDoAction сістэмны каталог або яго змест, вы не зможаце запусціць Haiku! Вы ўпэўнены, што жадаеце працягваць? Каб %toDoAction сістэмны каталог або яго змест, трымайце Shift і клікайце \"Давай\".
 Ignore case	SelectionWindow		Не ўлічваць рэгістр
 Include trash	FindPanel		Уключыць файлы са Сметніцы
 Increase size	ContainerWindow		Павялічыць памер
@@ -421,15 +421,18 @@ less than	FindPanel		менш за
 link	FSUtils	filename link	спасылка
 matches regular expression	SelectionWindow		супадае з рэгулярным выразам
 matches wildcard expression	SelectionWindow		супадае з падстановачнымі выразамі
-move	FSUtils		перамясціць
+move	FSUtils	As in 'If you move ...'	перамесціце
+move	FSUtils	As in 'To move ...'	перамясціць
 moving	FSUtils		перамяшчаеце
 multiple disks	FindPanel		множныя дыскі
 no items	CountView		няма элементаў
 no supporting apps	OpenWithWindow		няма падыходзячых праграм
 of %items	StatusWindow		з %items
 parent folder	NavMenu		бацькоўскі каталог
-rename	InfoWindow		перайменаваць
-rename	TextWidget		перайменаваць
+rename	InfoWindow	As in 'If you rename ...'	перайменуеце
+rename	InfoWindow	As in 'To rename ...'	перайменаваць
+rename	TextWidget	As in 'If you rename ...'	перайменуеце
+rename	TextWidget	As in 'To rename ...'	перайменаваць
 save text	FilePanelPriv		захаваць тэкст
 starts with	FindPanel		пачынаецца з
 starts with	SelectionWindow		пачынаецца з

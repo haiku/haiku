@@ -1,9 +1,11 @@
-1	belarusian	x-vnd.Haiku-Devices	4145096865
+1	belarusian	x-vnd.Haiku-Devices	189828730
 ACPI Information	DeviceACPI		Інфармацыя ACPI
 ACPI Processor Namespace '%2'	DeviceACPI		Абшар '%2' працэсара ACPI
 ACPI System Bus	DeviceACPI		Сістэмная шына ACPI
 ACPI System Indicator	DeviceACPI		Сістэмны індыкатар ACPI
 ACPI Thermal Zone	DeviceACPI		Тэрмальная зона ACPI
+ACPI bus	Device		Шына ACPI
+ACPI bus	DevicesView		Шына ACPI
 ACPI controller	Device		Кантролер ACPI
 ACPI node '%1'	DeviceACPI		Вузел ACPI '%1'
 About	DevicesApplication		пра праграму
@@ -11,13 +13,16 @@ About Devices…	DevicesView		Пра Devices...
 Basic information	DevicesView		Асноўная інфармацыя
 Bridge	Device		Мост
 Bus	DevicesView		Шына
+Bus Information	Device		Інфармацыя шыны
 Category	DevicesView		Катэгорыя
 Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Інфа класа:\t\t\t\t: %classInfo%
 Class info	DevicePCI		Інфа класа
 Communication controller	Device		Кантролер камунікацый
 Computer	Device		Кампутар
+Computer	DevicesView		Кампутар
 Connection	DevicesView		Спалучэнне
 Detailed	DevicesView		Падрабязна
+Device	Device		Прылада
 Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Імя прылады\t\t\t\t: %Name%\nВытворца\t\t\t: %Manufacturer%\nБягучы драйвер\t\t\t\t: %DriverUsed%\nПуці прылады\t: %DevicePaths%
 Device name	Device		Імя прылады
 Device name	DeviceACPI		Імя прылады
@@ -35,6 +40,8 @@ Driver used	DevicePCI		Ужыты драйвер
 Encryption controller	Device		Кантролер шыфравання
 Generate system information	DevicesView		Сабраць інфармацыю аб сістэме
 Generic system peripheral	Device		Агульная перыферыя
+ISA bus	Device		Шына ISA
+ISA bus	DevicesView		Шына ISA
 Input device controller	Device		Кантролер прылад уводу
 Intelligent controller	Device		Інтэлектуальны кантролер
 Manufacturer	Device		Вытворца
@@ -52,6 +59,8 @@ Not implemented	DevicePCI		Не рэалізавана
 OK	DevicesApplication		ОК
 Order by:	DevicesView		Парадкаваць па:
 PCI Information	DevicePCI		Інфармацыя PCI
+PCI bus	Device		Шына PCI
+PCI bus	DevicesView		Шына PCI
 Processor	Device		Працэсар
 Quit	DevicesView		Выйсці
 Refresh devices	DevicesView		Абнавіць прылады
@@ -61,5 +70,8 @@ Serial bus controller	Device		Кантролер серыйнай шыны
 Signal processing controller	Device		Кантролер апрацоўкі сігналаў
 Unclassified device	Device		Невызначаная прылада
 Unknown	DevicePCI		Невядомы
+Unknown device	Device		Невядомая прылада
+Unknown device	DevicesView		Невядомая прылада
 Value	PropertyList		Велічыня
 Wireless controller	Device		Бесшнуравы кантролер
+unknown	Device		невядома
