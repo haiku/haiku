@@ -463,6 +463,10 @@ create_thread(thread_creation_attributes& attributes, bool kernel)
 
 		// stop the new thread, if desired
 		debugNewThread = debugFlags & B_THREAD_DEBUG_STOP_CHILD_THREADS;
+
+		// copy signal handlers
+		memcpy(thread->sig_action, currentThread->sig_action,
+			sizeof(thread->sig_action));
 	}
 
 	// insert into global list
