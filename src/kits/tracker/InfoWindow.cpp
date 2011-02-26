@@ -1549,15 +1549,15 @@ AttributeView::CheckAndSetSize()
 
 		fFreeBytes = freeBytes;
 
-		char capacityStr[16], usedStr[16], freeStr[16];
-		string_for_size(capacity, capacityStr, sizeof(capacityStr));
-		string_for_size(capacity - fFreeBytes, usedStr, sizeof(usedStr));
-		string_for_size(fFreeBytes, freeStr, sizeof(freeStr));
-
 		fSizeStr.SetTo(B_TRANSLATE("%capacity (%used used -- %free free)"));
-		fSizeStr.ReplaceFirst("%capacity", capacityStr);
-		fSizeStr.ReplaceFirst("%used", usedStr);
-		fSizeStr.ReplaceFirst("%free", freeStr);
+
+		char sizeStr[128];
+		string_for_size(capacity, sizeStr, sizeof(sizeStr));
+		fSizeStr.ReplaceFirst("%capacity", sizeStr);
+		string_for_size(capacity - fFreeBytes, sizeStr, sizeof(sizeStr));
+		fSizeStr.ReplaceFirst("%used", sizeStr);
+		string_for_size(fFreeBytes, sizeStr, sizeof(sizeStr));
+		fSizeStr.ReplaceFirst("%free", sizeStr);
 
 	} else if (fModel->IsFile()) {
 		// poll for size changes because they do not get node monitored

@@ -740,11 +740,13 @@ HeaderView::UpdateOffsetViews(bool all)
 void
 HeaderView::UpdateFileSizeView()
 {
+	BString string(B_TRANSLATE("of "));
 	char buffer[64];
-	strcpy(buffer, B_TRANSLATE("of "));
-	FormatValue(buffer + 3, sizeof(buffer) - 3,
+	FormatValue(buffer, sizeof(buffer),
 		(fFileSize + fBlockSize - 1) / fBlockSize);
-	fSizeView->SetText(buffer);
+	string << buffer;
+
+	fSizeView->SetText(string.String());
 }
 
 
