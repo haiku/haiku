@@ -318,7 +318,7 @@ ImageCache::_NotifyListeners(CacheEntry* entry, QueueEntry* queueEntry)
 
 	std::set<BMessenger>::iterator iterator = queueEntry->listeners.begin();
 	for (; iterator != queueEntry->listeners.end(); iterator++) {
-		if (iterator->SendMessage(&notification) == B_OK) {
+		if (iterator->SendMessage(&notification) == B_OK && entry != NULL) {
 			entry->bitmapOwner->AcquireReference();
 				// this is the reference owned by the target
 		}
@@ -335,7 +335,7 @@ ImageCache::_NotifyTarget(CacheEntry* entry, const BMessenger* target)
 	BMessage notification(kMsgImageCacheImageLoaded);
 	_BuildNotification(entry, notification);
 
-	if (target->SendMessage(&notification) == B_OK) {
+	if (target->SendMessage(&notification) == B_OK && entry != NULL) {
 		entry->bitmapOwner->AcquireReference();
 			// this is the reference owned by the target
 	}
