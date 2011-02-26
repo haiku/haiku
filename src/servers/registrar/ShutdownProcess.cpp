@@ -1252,7 +1252,7 @@ ShutdownProcess::_WorkerDoShutdown()
 			? B_TRANSLATE("Do you really want to restart the system?")
 			: B_TRANSLATE("Do you really want to shut down the system?");
 		const char* defaultText = fReboot ? restart : shutdown;
-		const char* otherText = fReboot ? restart : shutdown;
+		const char* otherText = fReboot ? shutdown : restart;
 		BAlert* alert = new BAlert(title.String(), text,
 			B_TRANSLATE("Cancel"), otherText, defaultText,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
