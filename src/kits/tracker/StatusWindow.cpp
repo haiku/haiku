@@ -374,12 +374,14 @@ BStatusWindow::CheckCanceledOrPaused(thread_id thread)
 	if (isPaused && view != NULL) {
 		// say we are paused
 		view->Invalidate();
+		thread_id thread = view->Thread();
 
-		ASSERT(find_thread(NULL) == view->Thread());
+		lock.Unlock();
 
 		// and suspend ourselves
 		// we will get resumed from BStatusView::MessageReceived
-		suspend_thread(view->Thread());
+		ASSERT(find_thread(NULL) == thread);
+		suspend_thread(thread);
 	}
 
 	return wasCanceled;
