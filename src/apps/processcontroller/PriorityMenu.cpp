@@ -56,15 +56,15 @@ typedef struct {
 } PriorityRec;
 
 static PriorityRec	priorities[] = {
-	{ B_TRANSLATE_MARK("Idle"), 	0 },
-	{ B_TRANSLATE_MARK("Lowest active"),	1 },
-	{ B_TRANSLATE_MARK("Low"),	5 },
-	{ B_TRANSLATE_MARK("Normal"), 10 },
-	{ B_TRANSLATE_MARK("Display"), 15 },
-	{ B_TRANSLATE_MARK("Urgent display"), 20 },
-	{ B_TRANSLATE_MARK("Real-time display"), 100 },
-	{ B_TRANSLATE_MARK("Urgent"), 110 },
-	{ B_TRANSLATE_MARK("Real-time"), 120 },
+	{ B_TRANSLATE("Idle priority"),	0 },
+	{ B_TRANSLATE("Lowest active priority"), 1 },
+	{ B_TRANSLATE("Low priority"), 5 },
+	{ B_TRANSLATE("Normal priority"), 10 },
+	{ B_TRANSLATE("Display priority"), 15 },
+	{ B_TRANSLATE("Urgent display priority"), 20 },
+	{ B_TRANSLATE("Real-time display priority"), 100 },
+	{ B_TRANSLATE("Urgent priority"), 110 },
+	{ B_TRANSLATE("Real-time priority"), 120 },
 	{ "",	-1 }
 };
 
@@ -91,7 +91,7 @@ PriorityMenu::BuildMenu()
 		message = new BMessage('PrTh');
 		message->AddInt32("thread", fThreadID);
 		message->AddInt32("priority", priority->priority);
-		sprintf(name, B_TRANSLATE("%s priority [%d]"), priority->name, 
+		sprintf(name, B_TRANSLATE("%s [%d]"), priority->name, 
 			(int)priority->priority);
 		item = new BMenuItem(name, message);
 		item->SetTarget(gPCView);
