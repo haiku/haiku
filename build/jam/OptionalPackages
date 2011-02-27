@@ -475,12 +475,12 @@ if [ IsOptionalHaikuImagePackageAdded Curl ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Curl available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		InstallOptionalHaikuImagePackage curl-7.21.4-x86-gcc4-2011-02-18.zip
-			: $(baseURL)/curl-7.21.4-x86-gcc4-2011-02-18.zip
+		InstallOptionalHaikuImagePackage curl-7.21.3-x86-gcc4-2010-12-29.zip
+			: $(baseURL)/curl-7.21.3-x86-gcc4-2010-12-29.zip
 			: : true ;
 	} else {
-		InstallOptionalHaikuImagePackage curl-7.21.4-x86-gcc2-2011-02-18.zip
-			: $(baseURL)/curl-7.21.4-x86-gcc2-2011-02-18.zip
+		InstallOptionalHaikuImagePackage curl-7.21.3-x86-gcc2-2010-12-23.zip
+			: $(baseURL)/curl-7.21.3-x86-gcc2-2010-12-23.zip
 			: : true ;
 	}
 }
@@ -898,8 +898,8 @@ if [ IsOptionalHaikuImagePackageAdded Git ] {
 		Echo "No optional package Git available for $(TARGET_ARCH)" ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			git-1.7.3.5-x86-gcc2-2011-02-25.zip
-			: $(baseURL)/git-1.7.3.5-x86-gcc2-2011-02-25.zip
+			git-1.7.1-x86-gcc2-2010-05-26.zip
+			: $(baseURL)/git-1.7.1-x86-gcc2-2010-05-26.zip
 			:
 			: true
 		;
@@ -1029,15 +1029,15 @@ if [ IsOptionalHaikuImagePackageAdded LibEvent ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				libevent-2.0.10-x86-gcc4-2011-02-25.zip
-				: $(baseURL)/lib/libevent-2.0.10-x86-gcc4-2011-02-25.zip
+				libevent-1.4.13-x86-gcc4-2010-10-30.zip
+				: $(baseURL)/lib/libevent-1.4.13-x86-gcc4-2010-10-30.zip
 				:
 				: true
 			;
 		} else {
 			InstallOptionalHaikuImagePackage
-				libevent-2.0.10-x86-gcc2-2011-02-25.zip
-				: $(baseURL)/lib/libevent-2.0.10-x86-gcc2-2011-02-25.zip
+				libevent-1.4.13-x86-gcc2-2010-10-29.zip
+				: $(baseURL)/lib/libevent-1.4.13-x86-gcc2-2010-10-29.zip
 				:
 				: true
 			;
@@ -1386,12 +1386,12 @@ if [ IsOptionalHaikuImagePackageAdded P7zip ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				p7zip-9.13-x86-gcc4-2011-02-25.zip
-				: $(baseURL)/p7zip-9.13-x86-gcc4-2011-02-25.zip ;
+				p7zip-9.04-x86-gcc4-2010-11-13.zip
+				: $(baseURL)/p7zip-9.04-x86-gcc4-2010-11-13.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				p7zip-9.13-x86-gcc2-2011-02-25.zip
-				: $(baseURL)/p7zip-9.13-x86-gcc2-2011-02-25.zip
+				p7zip-9.04-x86-gcc2-2010-09-01.zip
+				: $(baseURL)/p7zip-9.04-x86-gcc2-2010-09-01.zip
 				:
 			;
 		}
@@ -1434,16 +1434,17 @@ if [ IsOptionalHaikuImagePackageAdded PCRE ] {
 		Echo "No optional package PCRE available for $(TARGET_ARCH)" ;
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
-			InstallOptionalHaikuImagePackage
-				libpcre-8.12-x86-gcc4-2011-02-25.zip
-				: $(baseURL)/libpcre-8.12-x86-gcc4-2011-02-25.zip
+			InstallOptionalHaikuImagePackage pcre-7.9-x86-gcc4-2009-09-30.zip
+				: $(baseURL)/pcre-7.9-x86-gcc4-2009-09-30.zip
 			;
 		} else {
 			InstallOptionalHaikuImagePackage
-				libpcre-8.12-x86-gcc2-2011-02-25.zip
-				: $(baseURL)/libpcre-8.12-x86-gcc2-2011-02-25.zip
+				libpcre-8.02-r1a2-x86-gcc2-2010-04-28-a.zip
+				: $(baseURL)/libpcre-8.02-r1a2-x86-gcc2-2010-04-28-a.zip
 			;
 		}
+		InstallSourceArchive libpcre-8.02_haiku-2010-04-29.tar.xz
+			: $(baseSourceURL)/2010/libpcre-8.02_haiku-2010-04-29.tar.xz ;
 	}
 }
 
@@ -1569,13 +1570,13 @@ if [ IsOptionalHaikuImagePackageAdded SQLite ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				sqlite-3.7.5-x86-gcc4-2011-02-25.zip
-				: $(baseURL)/sqlite-3.7.5-x86-gcc4-2011-02-25.zip
+				sqlite-3.7.3-x86-gcc4-2010-11-12.zip
+				: $(baseURL)/sqlite-3.7.3-x86-gcc4-2010-11-12.zip
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				sqlite-3.7.5-x86-gcc2-2011-02-25.zip
-				: $(baseURL)/sqlite-3.7.5-x86-gcc2-2011-02-25.zip
+				sqlite-3.7.3-x86-gcc2-2010-10-13.zip
+				: $(baseURL)/sqlite-3.7.3-x86-gcc2-2010-10-13.zip
 				: : true ;
 		}
 	}
