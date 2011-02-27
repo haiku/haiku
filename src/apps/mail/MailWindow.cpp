@@ -140,8 +140,6 @@ static const uint32 kByForumlaItem = 'Fbyq';
 BList TMailWindow::sWindowList;
 BLocker TMailWindow::sWindowListLock;
 
-static bool sKeepStatusOnQuit;
-
 
 //	#pragma mark -
 
@@ -172,12 +170,13 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 	fReadButton(NULL),
 	fNextButton(NULL)
 {
+	fKeepStatusOnQuit = false;
+
 	if (messenger != NULL)
 		fTrackerMessenger = *messenger;
 
 	char str[256];
 	char status[272];
-	uint32 message;
 	float height;
 	BMenu* menu;
 	BMenu* subMenu;
@@ -246,22 +245,20 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 
 		if (!strcmp(str, "New")) {
 			subMenu->AddItem(item = new BMenuItem(B_TRANSLATE("Leave as New"),
-				new BMessage(M_CLOSE_SAME), 'W', B_SHIFT_KEY));
+				new BMessage(B_QUIT_REQUESTED), 'W', B_SHIFT_KEY));
 #if 0
 			subMenu->AddItem(item = new BMenuItem(B_TRANSLATE("Set to Read"),
 				new BMessage(M_CLOSE_READ), 'W'));
 #endif
-			message = M_CLOSE_READ;
 		} else {
 			if (strlen(str))
 				sprintf(status, B_TRANSLATE("Leave as '%s'"), str);
 			else
 				sprintf(status, B_TRANSLATE("Leave same"));
 			subMenu->AddItem(item = new BMenuItem(status,
-							new BMessage(M_CLOSE_SAME), 'W'));
-			message = M_CLOSE_SAME;
+							new BMessage(B_QUIT_REQUESTED), 'W'));
 			AddShortcut('W', B_COMMAND_KEY | B_SHIFT_KEY,
-				new BMessage(M_CLOSE_SAME));
+				new BMessage(B_QUIT_REQUESTED));
 		}
 
 		subMenu->AddItem(new BMenuItem(B_TRANSLATE("Move to trash"),
@@ -1215,17 +1212,9 @@ TMailWindow::MessageReceived(BMessage *msg)
 			break;
 		}
 		case kMsgQuitAndKeepAllStatus:
-			sKeepStatusOnQuit = true;
+			fKeepStatusOnQuit = true;
 			be_app->PostMessage(B_QUIT_REQUESTED);
 			break;
-		case M_CLOSE_SAME:
-		{
-			BMessage message(B_QUIT_REQUESTED);
-			message.AddString("status", "");
-			message.AddString("same", "");
-			PostMessage(&message);
-			break;
-		}
 		case M_CLOSE_CUSTOM:
 			if (msg->HasString("status")) {
 				const char *str;
@@ -1731,7 +1720,7 @@ TMailWindow::QuitRequested()
 				}
 			}
 		}
-	} else if (fRef != NULL && !sKeepStatusOnQuit) {
+	} else if (fRef != NULL && !fKeepStatusOnQuit) {
 		// ...Otherwise just set the message read
 		if (fAutoMarkRead == true)
 			SetCurrentMessageRead(B_READ);

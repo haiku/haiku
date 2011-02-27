@@ -203,6 +203,8 @@ class TMailWindow : public BWindow {
 				bool			fAutoMarkRead : 1;
 				BmapButton*		fReadButton;
 				BmapButton*		fNextButton;
+
+				bool			fKeepStatusOnQuit;
 };
 
 #endif // _MAIL_WINDOW_H
