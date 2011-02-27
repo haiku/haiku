@@ -519,7 +519,7 @@ AboutView::AboutView()
 	// OS Version
 
 	char string[1024];
-	strcpy(string, B_TRANSLATE("Unknown"));
+	strlcpy(string, B_TRANSLATE("Unknown"), sizeof(string));
 
 	// the version is stored in the BEOS:APP_VERSION attribute of libbe.so
 	BPath path;
@@ -534,7 +534,7 @@ AboutView::AboutView()
 			&& appFileInfo.GetVersionInfo(&versionInfo,
 				B_APP_VERSION_KIND) == B_OK
 			&& versionInfo.short_info[0] != '\0')
-			strcpy(string, versionInfo.short_info);
+			strlcpy(string, versionInfo.short_info, sizeof(string));
 	}
 
 	// Add revision from uname() info
@@ -597,9 +597,9 @@ AboutView::AboutView()
 
 	int32 clockSpeed = get_rounded_cpu_speed();
 	if (clockSpeed < 1000)
-		sprintf(string, B_TRANSLATE("%ld MHz"), clockSpeed);
+		snprintf(string, sizeof(string), B_TRANSLATE("%ld MHz"), clockSpeed);
 	else
-		sprintf(string, B_TRANSLATE("%.2f GHz"), clockSpeed / 1000.0f);
+		snprintf(string, sizeof(string), B_TRANSLATE("%.2f GHz"), clockSpeed / 1000.0f);
 
 	BStringView* frequencyView = new BStringView("frequencytext", string);
 	frequencyView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
@@ -740,6 +740,7 @@ AboutView::MessageReceived(BMessage* msg)
 		{
 			printf("Easter egg\n");
 			PickRandomHaiku();
+			break;
 		}
 
 		default:
