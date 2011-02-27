@@ -86,7 +86,13 @@ public:
 
 			BObjectList<BString>& NameServers() { return fNameServers; }
 
+			/*	Grab and write interface settings directly from interface */
 			void				ReadConfiguration();
+			void				SetConfiguration();
+
+			/*	Grab and write interface settings from interface configuration
+				file and let NetServer sort it out */
+			void				LoadConfiguration();
 			void				WriteConfiguration();
 
 private:

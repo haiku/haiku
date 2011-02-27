@@ -13,9 +13,11 @@
 
 #include <Box.h>
 #include <ListView.h>
+#include <ListItem.h>
 #include <Button.h>
 
 #include "NetworkSetupAddOn.h"
+#include "InterfacesListView.h"
 
 
 class InterfacesAddOn : public NetworkSetupAddOn, public BBox
@@ -26,6 +28,7 @@ public:
 
 		const char* 	Name();
 		status_t		Save();
+
 		BView*			CreateView(BRect *bounds);
 
 		enum {
@@ -38,7 +41,7 @@ public:
 		void			MessageReceived(BMessage* msg);
 
 private:
-		BListView*		fListview;
+		InterfacesListView* fListview;
 		BButton*		fConfigure;
 		BButton*		fOnOff;
 };

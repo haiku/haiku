@@ -15,7 +15,6 @@
 
 
 #include "InterfacesAddOn.h"
-#include "InterfacesListView.h"
 #include "InterfaceWindow.h"
 
 #include <stdio.h>
@@ -55,14 +54,6 @@ const char*
 InterfacesAddOn::Name()
 {
 	return "Interfaces";
-}
-
-
-status_t
-InterfacesAddOn::Save()
-{
-	printf("I am saved!\n");
-	return B_OK;
 }
 
 
@@ -115,6 +106,14 @@ InterfacesAddOn::AttachedToWindow()
 	fListview->SetTarget(this);
 	fConfigure->SetTarget(this);
 	fOnOff->SetTarget(this);
+}
+
+
+status_t
+InterfacesAddOn::Save()
+{
+	// TODO : Profile?
+	return fListview->SaveItems();
 }
 
 

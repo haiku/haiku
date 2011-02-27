@@ -72,7 +72,8 @@ public:
 
 	virtual						~InterfacesListView();
 
-								InterfaceListItem* FindItem(const char* name);
+			InterfaceListItem*	FindItem(const char* name);
+			status_t			SaveItems();
 
 protected:
 	virtual	void				AttachedToWindow();

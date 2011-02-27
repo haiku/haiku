@@ -101,6 +101,11 @@ NetworkSettings::_DetectProtocols()
 // -- Interface address read code
 
 
+/*!	ReadConfiguration pulls the current interface settings
+	from the interfaces via BNetworkInterface and friends
+	and populates this classes private settings BAddresses
+	with them.
+*/
 void
 NetworkSettings::ReadConfiguration()
 {
@@ -272,10 +277,56 @@ NetworkSettings::ReadConfiguration()
 }
 
 
+/*!	SetConfiguration sets this classes current BNetworkAddress settings
+	to the interface directly via BNetworkInterface and friends
+*/
+void
+NetworkSettings::SetConfiguration()
+{
+	BNetworkInterface fNetworkInterface(fName);
+	printf("Setting %s\n", Name());
+	for (int index = 0; index < MAX_PROTOCOLS; index++) {
+		int inet_id = fProtocols[index].inet_id;
+		if (fProtocols[index].present) {
+			int32 zeroAddr = fNetworkInterface.FindFirstAddress(inet_id);
+			if (zeroAddr >= 0) {
+				BNetworkInterfaceAddress interfaceConfig;
+				fNetworkInterface.GetAddressAt(zeroAddr,
+					interfaceConfig);
+				interfaceConfig.SetAddress(fAddress[inet_id]);
+				interfaceConfig.SetMask(fNetmask[inet_id]);
+				fNetworkInterface.SetAddress(interfaceConfig);
+				fNetworkInterface.SetTo(zeroAddr);
+			} else {
+				// TODO : test this case (no address set for this protocol)
+				printf("no zeroAddr found for %s(%d), found %lu\n",
+					fProtocols[index].name, inet_id, zeroAddr);
+				BNetworkInterfaceAddress interfaceConfig;
+				interfaceConfig.SetAddress(fAddress[inet_id]);
+				interfaceConfig.SetMask(fNetmask[inet_id]);
+				fNetworkInterface.AddAddress(interfaceConfig);
+			}
+
+		}
+	}
+}
+
+
+/*!	LoadConfiguration reads the current interface configuration
+	file that NetServer looks for and populates this class with it
+*/
+void
+NetworkSettings::LoadConfiguration()
+{
+
+}
+
+
+/*!	WriteConfiguration reads this classes settings and write them to
+	the current interface configuration file that NetServer watches for.
+*/
 void
 NetworkSettings::WriteConfiguration()
 {
 
-
 }
-

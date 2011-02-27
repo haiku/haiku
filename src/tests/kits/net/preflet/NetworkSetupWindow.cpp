@@ -44,6 +44,7 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 		B_TRANSLATE("Profile:"), profilesPopup);
 
 	profilesMenuField->SetFont(be_bold_font);
+	profilesMenuField->SetEnabled(false);
 
 	// ---- Settings section
 

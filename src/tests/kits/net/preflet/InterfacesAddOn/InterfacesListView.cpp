@@ -383,6 +383,24 @@ InterfacesListView::FindItem(const char* name)
 
 
 status_t
+InterfacesListView::SaveItems()
+{
+	// Grab each fSettings instance and write it's settings
+	for (int32 i = CountItems(); i-- > 0;) {
+		InterfaceListItem* item = dynamic_cast<InterfaceListItem*>(ItemAt(i));
+		if (item == NULL)
+			continue;
+
+		NetworkSettings* ns = item->GetSettings();
+		// TODO : SetConfiguration doesn't use the interface settings file
+		ns->SetConfiguration();
+	}
+
+	return B_OK;
+}
+
+
+status_t
 InterfacesListView::_InitList()
 {
 	BNetworkRoster& roster = BNetworkRoster::Default();
