@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Media	1588474509
+1	russian	x-vnd.Haiku-Media	1701788906
 <none>	Media views		<нет>
 Audio input:	Media views		Аудио вход:
 Audio mixer	Media Window		Микшер
@@ -11,20 +11,11 @@ Couldn't add volume control in Deskbar: %s\n	Media views		Не удалось д
 Couldn't remove volume control in Deskbar: %s\n	Media views		Не удалось удалить регулятор громкости из Deskbar: %s\n
 Defaults	Media views		По умолчанию
 Done shutting down.	Media Window		Остановка завершена.
-Enable real-time audio	Media views		Включить аудио режим реального времени
-Enable real-time video	Media views		Включить видео режим реального времени
-Enabling real-time audio allows system to record and play audio as fast as possible.  It achieves this performance by using more CPU and RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Режим реального времени для аудио позволяет системе выполнять аудио операции так быстро и гладко, насколько это возможно. Это достигается за счёт большей загрузки процессора и оперативной памяти.\n\nВключите эту функцию, только если вам нужна низкая латентность.
-Enabling real-time video allows system to perform video operations as fast and smoothly as possible.  It achieves optimum performance by using more RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Режим реального времени для видео позволяет системе выполнять видео операции так быстро и гладко, насколько это возможно. Это достигается за счёт большей загрузки процессора и оперативной памяти.\n\nВключите эту функцию, только если вам нужна низкая латентность.
 Media	Media Window		Медиа
 OK	Media Window		ОК
-OK	Media views		ОК
 Quit	Media Window		Выход
 Ready for use…	Media Window		Готов к использованию…
-Real-time	Media views		Реальное время
-Real-time audio is currently unimplemented in Haiku.	Media views		Режим реального времени для аудио еще не реализован.
-Real-time video is currently unimplemented in Haiku.	Media views		Режим реального времени для видео еще не реализован.
 Restart media services	Media views		Перезапустить медиа службы
-Restart the media server to apply changes.	Media views		Перезапустите медиа сервер для активации изменений.
 Restarting media services\nShutting down media server\n	Media Window		Перезапуск медиа служб\nОстановка медиа сервера\n
 Restarting media services\nStarting media server…\n	Media Window		Перезапуск медиа служб\nЗапуск медиа сервера…\n
 Show volume control on Deskbar	Media views		Отображать регулятор громкости в Deskbar
@@ -35,5 +26,5 @@ Telling media_addon_server to quit.	Media Window		Запрос завершен�
 This hardware has no controls.	Media Window		Это оборудование не имеет параметров настройки.
 Video input:	Media views		Видео вход:
 Video output:	Media views		Видео выход:
-Video settings	Media Window		Видео
+Video settings	Media Window		Настройки видео
 Waiting for media_server to quit.	Media Window		Ожидание выключения медиа сервера.

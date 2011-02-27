@@ -3,7 +3,7 @@ Cursor	ICOTranslator		Курсор
 Enforce valid icon sizes	ConfigView		Форсировать верные размеры значков
 ICO Settings	main		Настройки ICO транслятора
 ICOTranslator Settings	ConfigView		Настройки ICO транслятора
-Icon	ICOTranslator		Значек
+Icon	ICOTranslator		Значок
 Valid icon sizes are 16, 32, or 48	ConfigView		Верные размеры значков 16, 32 или 48
 Version %d.%d.%d, %s	ConfigView		Версия %d.%d.%d, %s
 Windows %s %ld bit image	ICOTranslator		Windows %s %ld битное изображение

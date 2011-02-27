@@ -1,15 +1,13 @@
-1	russian	x-vnd.Haiku-NetworkStatus	3992317590
+1	russian	x-vnd.Haiku-NetworkStatus	3379615764
+%ifaceName information:\n	NetworkStatusView		Информация о %ifaceName:\n
 <no wireless networks found>	NetworkStatusView		<беспроводные сети не обнаружены>
 Address	NetworkStatusView		IP адрес
-Address information:\n	NetworkStatusView		Информация об адресе:\n
 Broadcast	NetworkStatusView		Широковещательный
-Broadcast information:\n	NetworkStatusView		Широковещательная информация:\n
 Configuring	NetworkStatusView		Настраивается
 Could not join wireless network:\n	NetworkStatusView		Не удалось подключиться к беспроводной сети:\n
 Install in Deskbar	NetworkStatus		Установить в Deskbar
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Не удалось запустить утилиту настройки сети.\n\nОшибка: 
 Netmask	NetworkStatusView		Маска подсети
-Netmask information:\n	NetworkStatusView		Информация о маске:\n
 NetworkStatus	NetworkStatusWindow		Статус сети
 NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		NetworkStatus опции:\n\t--deskbar\tавтоматически добавить репликант в Deskbar\n\t--help\t\tвывести этот текст и выйти\n
 NetworkStatus\n\twritten by %1 and Hugo Santos\n\t%2, Haiku, Inc.\n	NetworkStatusView		NetworkStatus\n\n\tРазработал %1 и Hugo Santos\n\t%2, Haiku, Inc.\n

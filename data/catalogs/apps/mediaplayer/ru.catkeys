@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-MediaPlayer	1909490598
+1	russian	x-vnd.Haiku-MediaPlayer	1801311807
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Американский)
 100% scale	MediaPlayer-Main		Масштаб 100%
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Синемаскоп)
@@ -33,6 +33,7 @@ Drop files to play	MediaPlayer-Main		Перетащите файлы для пр
 Edit	MediaPlayer-PlaylistWindow		Изменить
 Error: 	MediaPlayer-Main		Ошибка: 
 Error: 	MediaPlayer-RemovePLItemsCmd		Ошибка: 
+File Info	MediaPlayer-InfoWin		Информация о файле
 File info…	MediaPlayer-Main		Информация о файле…
 Full screen	MediaPlayer-Main		На весь экран
 Full volume	MediaPlayer-SettingsWindow		Полной громкости
@@ -50,6 +51,7 @@ Lock Peaks	MediaPlayer-PeakView		Зафиксировать пики
 Loop movies by default	MediaPlayer-SettingsWindow		Зацикливать видео по умолчанию
 Loop sounds by default	MediaPlayer-SettingsWindow		Зацикливать музыку по умолчанию
 Low volume	MediaPlayer-SettingsWindow		Низкой громкости
+MediaPlayer	MediaPlayer-Main		Медиаплеер
 MediaPlayer Current Playlist	MediaPlayer-Main		Текущий плэй-лист плеера
 MediaPlayer encountered an internal error. The file could not be opened.	MediaPlayer-Main		Медиаплеер обнаружил внутреннюю ошибку. Файл не может быть открыт.
 MediaPlayer settings	MediaPlayer-SettingsWindow		Настройки МедиаПлеера
@@ -137,3 +139,4 @@ View options	MediaPlayer-SettingsWindow		Настройки вида
 Volume	MediaPlayer-Main		Громкость
 error	MediaPlayer-Main		ошибка
 none	Audio track menu		пусто
+none	Subtitles menu		отсутствуют

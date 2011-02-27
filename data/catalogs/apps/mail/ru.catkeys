@@ -1,4 +1,4 @@
-1	russian	x-vnd.Be-MAIL	1525863502
+1	russian	x-vnd.Be-MAIL	2797564879
 %d - Date	Mail		%d - Дата
 %e - E-mail address	Mail		%e - E-mail адрес
 %n - Full name	Mail		%n - Полное имя
@@ -90,6 +90,7 @@ Previous	Mail		Предыдущее
 Previous message	Mail		Предыдущее письмо
 Print	Mail		Печать
 Print…	Mail		Печать…
+Put your favorite e-mail queries and query templates in this folder.	Mail		Перенесите в эту папку ваши почтовые запросы.
 Queries	Mail		Запросы
 Quit	Mail		Выход
 Quote	Mail		Цитата
@@ -147,3 +148,4 @@ Warn unencodable:	Mail		Предупреждать о невозможности
 Written by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Разработал Robert Polic.\nУлучшено командой Доктора Зойдберга.\n\nCopyright 1991-2001, Be, Inc.\nCopyright 2005-2010, Haiku, Inc.\n
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваш основной текст содержит %ld некодируемых символов. Возможно, другая кодировка подойдет лучше? Нажмите /\"Отправить/\" чтобы все равно отправить письмо (некодиуемые символы будут заменены на кодируемые), или нажмите /\"Отмена/\" и попробуйте исправить их вручную.
 \\n - Newline	Mail		\\n - Новая строка
+helpful message	Mail		полезное сообщение

@@ -1,6 +1,5 @@
-1	czech	x-vnd.Haiku-ProcessController	2647371135
+1	czech	x-vnd.Haiku-ProcessController	3199581101
 %.1f MB	ProcessController		%.1f MB
-%s priority [%d]	ProcessController		%s priorita [%d]
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
 About	ProcessController		o
 About ProcessController…	ProcessController		O Správci Procesů...
@@ -8,20 +7,15 @@ Cancel	ProcessController		Zrušit
 Damned!	ProcessController		Dokoprdele!
 Debug this thread!	ProcessController		Debug tohoto vlákna!
 Debug thread	ProcessController		Debug vlákna
-Display	ProcessController		Zobrazit
 Do you really want to kill the team \"%s\"?	ProcessController		Opravdu chcete zabít tým \"%s\"?
 Error saving file	ProcessController		Chyba při ukládání souboru
 Global Popup	ProcessController		Globální PopUp
 Gone teams…	ProcessController		Zrušené týmy...
-Idle	ProcessController		Nečiný
 Install in Deskbar	ProcessController		Nainstalovat do Deskbaru
 Kill this thread!	ProcessController		Zabít toto vlákno!
 Live in the Deskbar	ProcessController		Živě v Deskbaru
-Low	ProcessController		Nízký
-Lowest active	ProcessController		Nejnižší aktivní
 Memory usage	ProcessController		Využití paměti
 New Terminal	ProcessController		Nový Terminál
-Normal	ProcessController		Normální
 OK	ProcessController		OK
 Ok!	ProcessController		OK!
 ProcessController	ProcessController		Správce Procesů
@@ -30,8 +24,6 @@ ProcessController\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyrigh
 Processor %d	ProcessController		Procesor %d
 Quit an application	ProcessController		Ukončit aplikaci
 Quit application	ProcessController		Ukončit aplikaci
-Real-time	ProcessController		Real-time
-Real-time display	ProcessController		Real-time zobrazení
 Restart Deskbar	ProcessController		Restartovat Deskbar
 Restart Tracker	ProcessController		Restartovat Tracker
 Run in window	ProcessController		Spustit v okně
@@ -41,8 +33,6 @@ This is the last active processor...\nYou can't turn it off!	ProcessController		
 This team is already gone…	ProcessController		Tento tým je již pryč...
 This thread is already gone…	ProcessController		Toto vlákno je již pryč...
 Threads and CPU usage	ProcessController		Vlákna a využití procesoru
-Urgent	ProcessController		Urgentní
-Urgent display	ProcessController		Urgentní zobrazení
 Usage: %s [-deskbar]\n	ProcessController		Využití: %s [-deskbar]\n
 What do you want to do with the thread \"%s\"?	ProcessController		Co chcete udělat s vláknem \"%s\"?
 Yes, kill this team!	ProcessController		Ano, zabít tento tým!

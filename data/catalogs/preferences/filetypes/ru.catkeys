@@ -1,7 +1,7 @@
-1	russian	x-vnd.Haiku-FileTypes	1575473845
+1	russian	x-vnd.Haiku-FileTypes	3001025756
 %1 application type	Application Type Window		Тип приложения %1
 %ld Application type%s could be removed.	Application Types Window		Удалось очистить типов приложений: %ld.
-%s file type	FileType Window		тип файла %s
+%s file type	FileType Window		Тип файла %s
 (from application)	FileTypes Window		(из приложения)
 (from super type)	FileTypes Window		(из супертипа)
 Abort	Application Types Window		Прервать
@@ -120,7 +120,8 @@ Removing a super type cannot be reverted.\nAll file types that belong to this su
 Removing uninstalled application types	Application Types Window		Очищение удаленных типов приложений
 Right	Attribute Window	Attribute column alignment in Tracker	По правому краю
 Rule:	FileTypes Window		Правило:
-Same as…	FileType Window		Такое же как…
+Same as…	FileType Window	The same APPLICATION as\xE2\x80\xA6	Такое же как…
+Same as…	FileType Window	The same TYPE as\xE2\x80\xA6	Такой же как…
 Same as…	FileTypes Window		Такое же как…
 Save	Application Type Window		Сохранить
 Save into resource file…	Application Type Window		Сохранить в ресурс-файл…

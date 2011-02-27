@@ -1,10 +1,10 @@
-1	russian	x-vnd.Haiku-StyledEdit	3614078026
+1	russian	x-vnd.Haiku-StyledEdit	881610730
 ???	LoadAlert		???
 Align	Menus		Выровнять
 Black	Menus		Черный
 Blue	Menus		Синий
 Bold	Menus		Жирный
-Can't Undo	Menus		Невозможно отменить
+Can't undo	Menus		Невозможно отменить
 Cancel	FindandReplaceWindow		Отмена
 Cancel	QuitAlert		Отмена
 Cancel	RevertToSavedAlert		Отмена
