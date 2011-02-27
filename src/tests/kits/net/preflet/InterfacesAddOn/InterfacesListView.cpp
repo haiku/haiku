@@ -391,6 +391,9 @@ InterfacesListView::SaveItems()
 		if (item == NULL)
 			continue;
 
+		if (strcmp(item->Name(), "loop") == 0)
+			continue;
+
 		NetworkSettings* ns = item->GetSettings();
 		// TODO : SetConfiguration doesn't use the interface settings file
 		ns->SetConfiguration();
@@ -438,6 +441,9 @@ InterfacesListView::_HandleNetworkMessage(BMessage* message)
 
 	if (message->FindString("interface", &name) != B_OK
 		&& message->FindString("device", &name) != B_OK)
+		return;
+
+	if (strcmp(name, "loop") == 0)
 		return;
 
 	InterfaceListItem* item = FindItem(name);
