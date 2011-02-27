@@ -1,9 +1,9 @@
 /*!
-\page locale_intro Introduction to the Locale Kiit
+\page locale_intro Introduction to the Locale Kit
 
 The Locale Kit provides a set of tools for internationalizing, localizing and
 translating your software. This includes not only replacing string with their
-translations at runtime, but also more complex tasks such as formating numbers,
+translations at runtime, but also more complex tasks such as formatting numbers,
 dates, and times in a way that match the locale preferences of the user.
 
 The main way to access locale data is through the be_locale_roster. This is a
