@@ -198,8 +198,10 @@ static const Translation gTranslations[] =
 		"César Ortiz Pantoja (ccortiz)\n"
 	},
 	{ "sv",
+		"Patrik Gissberg\n"
 		"Johan Holmberg\n"
 		"Jimmy Olsson (phalax)\n"
+		"Jonas Sundström\n"
 		"Victor Widell\n"
 	},
 	{ "tr",
