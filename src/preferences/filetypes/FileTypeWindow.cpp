@@ -77,7 +77,7 @@ FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
 
 	fSameTypeAsButton = new BButton("same type as",
 		B_TRANSLATE_COMMENT("Same as" B_UTF8_ELLIPSIS,
-			"The same TYPE as" B_UTF8_ELLIPSIS), new BMessage(kMsgSameTypeAs));
+			"The same TYPE as ..."), new BMessage(kMsgSameTypeAs));
 
 	fileTypeBox->AddChild(BGridLayoutBuilder(padding, padding)
 		.Add(fTypeControl, 0, 0, 2, 1)
@@ -115,7 +115,7 @@ FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
 
 	fSameAppAsButton = new BButton("same app as",
 		B_TRANSLATE_COMMENT("Same as" B_UTF8_ELLIPSIS,
-			"The same APPLICATION as" B_UTF8_ELLIPSIS),
+			"The same APPLICATION as ..."),
 			new BMessage(kMsgSamePreferredAppAs));
 
 	preferredBox->AddChild(BGridLayoutBuilder(padding, padding)
