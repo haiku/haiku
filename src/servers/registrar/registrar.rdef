@@ -2,7 +2,7 @@
  * registrar.rdef
  */
 
-resource app_signature "application/x-vnd.Haiku-Registrar";
+resource app_signature "application/x-vnd.haiku-registrar";
 
 resource app_flags B_EXCLUSIVE_LAUNCH | B_BACKGROUND_APP;
 	/* the registrar's application flags are actually
