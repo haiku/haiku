@@ -25,7 +25,7 @@
 
 
 RefreshSlider::RefreshSlider(BRect frame, float min, float max, uint32 resizingMode)
-	: BSlider(frame, B_TRANSLATE("Screen"), B_TRANSLATE("Refresh Rate:"),
+	: BSlider(frame, B_TRANSLATE("Screen"), B_TRANSLATE("Refresh rate:"),
 		new BMessage(SLIDER_INVOKE_MSG), (int32)rintf(min * 10), (int32)rintf(max * 10),
 		B_BLOCK_THUMB, resizingMode),
 	fStatus(new (std::nothrow) char[32])

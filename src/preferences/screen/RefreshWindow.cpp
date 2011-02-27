@@ -28,7 +28,7 @@
 
 
 RefreshWindow::RefreshWindow(BPoint position, float current, float min, float max)
-	: BWindow(BRect(0, 0, 300, 200), B_TRANSLATE("Refresh Rate"), B_MODAL_WINDOW,
+	: BWindow(BRect(0, 0, 300, 200), B_TRANSLATE("Refresh rate"), B_MODAL_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS, B_ALL_WORKSPACES)
 {
 	min = ceilf(min);
