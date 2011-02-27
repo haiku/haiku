@@ -1,5 +1,5 @@
 1	swedish	x-vnd.Haiku-Keyboard	914649575
-Defaults	KeyboardWindow		Standardinställningar
+Defaults	KeyboardWindow		Förval
 Delay until key repeat	KeyboardView		Fördröjning till tangentupprepning
 Fast	KeyboardView		Snabb
 Key repeat rate	KeyboardView		Hastighet för tangentupprepning

@@ -10,8 +10,8 @@
 <nothing to undo>	MediaPlayer-PlaylistWindow		<inget att ångra>
 <unknown>	PlaylistItem-album		<okänd>
 <unknown>	PlaylistItem-author		<okänd>
-<unnamed>	PlaylistItem-name		<odöpt>
-<untitled>	PlaylistItem-title		<odöpt>
+<unnamed>	PlaylistItem-name		<namnlös>
+<untitled>	PlaylistItem-title		<namnlös>
 About MediaPlayer…	MediaPlayer-Main		Om MediaSpelaren...
 All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Alla filer kunde inte flyttas till Papperskorgen.
 Always on top	MediaPlayer-Main		Alltid överst

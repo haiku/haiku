@@ -96,7 +96,7 @@ Cut more	ContainerWindow		Klipp ut mer
 Decrease size	ContainerWindow		Minska storleken
 Decrease size	DeskWindow		Minska storleken
 Default application	InfoWindow		Förvald applikation
-Defaults	TrackerSettingsWindow		Förinställningar
+Defaults	TrackerSettingsWindow		Förval
 Delete	ContainerWindow		Ta bort
 Delete	FSUtils		Ta bort
 Delete	FilePanelPriv		Ta bort
@@ -372,7 +372,7 @@ Unknown	WidgetAttributeText		Okänd
 Unmount	ContainerWindow		Avmontera
 Unmount	InfoWindow		Avmontera
 Unmount	VolumeWindow		Avmontera
-Untitled bitmap	PoseView		Odöpt bitmapp
+Untitled bitmap	PoseView		Namnlös bitmapp
 Untitled clipping	PoseView		Namnlöst urklipp
 Used space color	SettingsView		Färg för diskanvändning
 Version	OpenWithWindow		Version
