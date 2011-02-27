@@ -1,9 +1,11 @@
-1	german	x-vnd.Haiku-Devices	4145096865
+1	german	x-vnd.Haiku-Devices	189828730
 ACPI Information	DeviceACPI		ACPI-Information
 ACPI Processor Namespace '%2'	DeviceACPI		ACPI Prozessor Namespace '%2'
 ACPI System Bus	DeviceACPI		ACPI Systembus
 ACPI System Indicator	DeviceACPI		ACPI System-Indikator
 ACPI Thermal Zone	DeviceACPI		ACPI Temperaturzone
+ACPI bus	Device		ACPI-Bus
+ACPI bus	DevicesView		ACPI-Bus
 ACPI controller	Device		ACPI-Controller
 ACPI node '%1'	DeviceACPI		ACPI Node '%1'
 About	DevicesApplication		über
@@ -11,13 +13,16 @@ About Devices…	DevicesView		Über Devices...
 Basic information	DevicesView		Basisinformation
 Bridge	Device		Schnittstellen
 Bus	DevicesView		Bus
+Bus Information	Device		Bus-Information
 Category	DevicesView		Kategorie
 Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Klassen-Info:\t\t\t\t: %classInfo%
 Class info	DevicePCI		Klassen-Info
 Communication controller	Device		Kommunikationscontroller
 Computer	Device		Computer
+Computer	DevicesView		Rechner
 Connection	DevicesView		Verbindung
 Detailed	DevicesView		Details
+Device	Device		Gerät
 Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Gerätename\t\t\t\t: %Name%\nHersteller\t\t\t: %Manufacturer%\nBenutzter Treiber\t\t\t\t: %DriverUsed%\nPfade für Treiber\t: %DevicePaths%
 Device name	Device		Gerätename
 Device name	DeviceACPI		Gerätename
@@ -35,6 +40,8 @@ Driver used	DevicePCI		Benutzter Treiber
 Encryption controller	Device		Verschlüsselungscontroller
 Generate system information	DevicesView		Systeminformationen erstellen
 Generic system peripheral	Device		Peripheriegeräte
+ISA bus	Device		ISA-Bus
+ISA bus	DevicesView		ISA-Bus
 Input device controller	Device		Eingabegeräte-Kontroller
 Intelligent controller	Device		Intelligenter Controller
 Manufacturer	Device		Hersteller
@@ -52,6 +59,8 @@ Not implemented	DevicePCI		Nicht implementiert
 OK	DevicesApplication		OK
 Order by:	DevicesView		Sortieren nach:
 PCI Information	DevicePCI		PCI-Information
+PCI bus	Device		PCI-Bus
+PCI bus	DevicesView		PCI-Bus
 Processor	Device		Prozessor
 Quit	DevicesView		Beenden
 Refresh devices	DevicesView		Geräte aktualisieren
@@ -61,5 +70,8 @@ Serial bus controller	Device		Serieller Bus-Controller
 Signal processing controller	Device		Signalverarbeitungscontroller
 Unclassified device	Device		Sonstige Geräte
 Unknown	DevicePCI		Unbekannt
+Unknown device	Device		Unbekanntes Gerät
+Unknown device	DevicesView		Unbekanntes Gerät
 Value	PropertyList		Wert
 Wireless controller	Device		Funknetzwerk-Controller
+unknown	Device		unbekannt

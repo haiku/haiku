@@ -1,4 +1,5 @@
-1	german	x-vnd.Be-PEPL	3209429794
+1	german	x-vnd.Be-PEPL	3664557316
+%name% picture	People		%name% Bild
 About	People		Über
 Address	People		Adresse
 Cancel	People		Abbrechen
@@ -20,6 +21,7 @@ File	People		Datei
 Group	People		Gruppe
 Home phone	People		Telefon (Privat)
 Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Der Start der Dateityp-Einstellungen zum Konfigurieren der Person-Attribute ist fehlgeschlagen.\n\nFehler:
+Load image…	People		Bild laden...
 Name	People		Name
 New person	People		Neue Person
 New person…	People		Neue Person...
@@ -29,6 +31,7 @@ Paste	People		Einfügen
 Person	Short mimetype description		Person
 Quit	People		Beenden
 Redo	People		Wiederholen
+Remove image	People		Bild löschen
 Revert	People		Anfangswerte
 Save	People		Speichern
 Save as…	People		Speichern als...
@@ -38,6 +41,7 @@ Sorry	People		Entschuldigung
 State	People		Bundesland
 URL	People		URL
 Undo	People		Rückgängig
+Unnamed person	People		Unbenannte Person
 Work phone	People		Telefon (Arbeit)
 Zip	People		Postleitzahl
 none	Groups list		keine

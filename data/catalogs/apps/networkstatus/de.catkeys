@@ -1,15 +1,13 @@
-1	german	x-vnd.Haiku-NetworkStatus	3992317590
+1	german	x-vnd.Haiku-NetworkStatus	3379615764
+%ifaceName information:\n	NetworkStatusView		%ifaceName-Information:\n
 <no wireless networks found>	NetworkStatusView		<Keine Funknetzwerke gefunden>
 Address	NetworkStatusView		Adresse
-Address information:\n	NetworkStatusView		Adress-Infos:\n
 Broadcast	NetworkStatusView		Broadcast
-Broadcast information:\n	NetworkStatusView		Broadcast-Infos:\n
 Configuring	NetworkStatusView		Konfiguriere
 Could not join wireless network:\n	NetworkStatusView		Keine Verbindung zum Funknetzwerk:\n
 Install in Deskbar	NetworkStatus		In Deskbar installieren
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Starten der Netzwerkeinstellungen fehlgeschlagen.\n\nFehler:
 Netmask	NetworkStatusView		Netzmaske
-Netmask information:\n	NetworkStatusView		Netzmasken-Informationen:\n
 NetworkStatus	NetworkStatusWindow		NetworkStatus
 NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		Gebrauch:\n\t--deskbar\tAutomatisch in Deskbar installieren\n\t--help\tDiesen Text ausgeben und beenden\n
 NetworkStatus\n\twritten by %1 and Hugo Santos\n\t%2, Haiku, Inc.\n	NetworkStatusView		NetworkStatus\n\tvon %1 und Hugo Santos\n\t%2, Haiku, Inc.\n

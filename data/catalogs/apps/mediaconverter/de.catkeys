@@ -35,7 +35,7 @@ Error read video frame %Ld	MediaConverter		Fehler beim Einlesen von Video-Frame 
 Error writing audio frame %Ld	MediaConverter		Fehler beim Schreiben von Audio-Frame %Ld
 Error writing video frame %Ld	MediaConverter		Fehler beim Schreiben von Video-Frame %Ld
 File	Menu		Datei
-File Error	MediaConverter-FileInfo		Datei-Fehler
+File Error	MediaConverter-FileInfo		Dateifehler
 File details	MediaConverter		Dateidetails
 File format:	MediaConverter		Dateiformat:
 High	MediaConverter		Hoch

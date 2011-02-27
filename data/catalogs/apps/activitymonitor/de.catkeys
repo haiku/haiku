@@ -19,7 +19,7 @@ Cached memory	DataSource		Gecachter Speicher
 File	ActivityWindow		Datei
 Hide legend	ActivityView		Legende ausblenden
 MB	DataSource		MiB
-Media nodes	DataSource		Media Nodes
+Media nodes	DataSource		Media-Nodes
 Memory	DataSource		Speicher
 Network receive	DataSource		Netzwerk empfangen
 Network send	DataSource		Netzwerk senden

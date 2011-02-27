@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-MediaPlayer	1983120721
+1	german	x-vnd.Haiku-MediaPlayer	1801311807
 1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (Amerikanisch)
 100% scale	MediaPlayer-Main		100% Zoom
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2,35 : 1 (Cinemascope)
@@ -33,6 +33,7 @@ Drop files to play	MediaPlayer-Main		Dateien zum Abspielen hier fallen lassen
 Edit	MediaPlayer-PlaylistWindow		Bearbeiten
 Error: 	MediaPlayer-Main		Fehler:
 Error: 	MediaPlayer-RemovePLItemsCmd		Fehler:
+File Info	MediaPlayer-InfoWin		Datei-Info
 File info…	MediaPlayer-Main		Datei Info...
 Full screen	MediaPlayer-Main		Vollbild
 Full volume	MediaPlayer-SettingsWindow		Volle Lautstärke
@@ -50,6 +51,7 @@ Lock Peaks	MediaPlayer-PeakView		Ausschlag markieren
 Loop movies by default	MediaPlayer-SettingsWindow		Video in Endlosschleife abspielen
 Loop sounds by default	MediaPlayer-SettingsWindow		Audio in Endlosschleife abspielen
 Low volume	MediaPlayer-SettingsWindow		Niedrige Lautstärke
+MediaPlayer	MediaPlayer-Main		MediaPlayer
 MediaPlayer Current Playlist	MediaPlayer-Main		MediaPlayer aktuelle Playliste
 MediaPlayer encountered an internal error. The file could not be opened.	MediaPlayer-Main		Es ist ein interner Fehler in MediaPlayer aufgetreten. Die Datei konnte nicht geöffnet werden.
 MediaPlayer settings	MediaPlayer-SettingsWindow		MediaPlayer-Einstellungen

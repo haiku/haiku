@@ -7,18 +7,18 @@ Ancient Greek numbers	UnicodeBlocks		Antike griechische Zahlen
 Ancient smbols	UnicodeBlocks		Antike Symbole
 Arabic	UnicodeBlocks		Arabisch
 Arabic presentation forms A	UnicodeBlocks		Arabische Präsentationsformen A
-Arabic presentation forms B	UnicodeBlocks		Arabisch: Präsentationsformen B
+Arabic presentation forms B	UnicodeBlocks		Arabische Präsentationsformen B
 Arabic supplement	UnicodeBlocks		Arabisch (Ergänzung)
 Armenian	UnicodeBlocks		Armenisch
 Arrows	UnicodeBlocks		Pfeile
 Balinese	UnicodeBlocks		Balinesisch
-Basic Latin	UnicodeBlocks		Lateinisch (Einfach)
+Basic Latin	UnicodeBlocks		Lateinisch
 Bengali	UnicodeBlocks		Bengalisch
 Block elements	UnicodeBlocks		Blockelemente
 Bopomofo	UnicodeBlocks		Bopomofo
-Bopomofo extended	UnicodeBlocks		Bopomofo erweitert
-Box drawing	UnicodeBlocks		Box-Zeichnung
-Braille patterns	UnicodeBlocks		Braille-Muster
+Bopomofo extended	UnicodeBlocks		Bopomofo (Erweiterung)
+Box drawing	UnicodeBlocks		Rahmungssymbole
+Braille patterns	UnicodeBlocks		Braille
 Buginese	UnicodeBlocks		Buginesisch
 Buhid	UnicodeBlocks		Buhid
 Byzantine musical symbols	UnicodeBlocks		Byzantinische musikalische Symbole
@@ -44,7 +44,7 @@ Combining diacritical marks	UnicodeBlocks		Kombinierende diakritische Zeichen
 Combining diacritical marks for symbols	UnicodeBlocks		Kombinierende diakritische Zeichen für Symbole
 Combining diacritical marks supplement	UnicodeBlocks		Kombinierende diakritische Zeichen (Ergänzung)
 Combining half marks	UnicodeBlocks		Kombinierende halbe diakritische Zeichen
-Control pictures	UnicodeBlocks		Kontrollbilder
+Control pictures	UnicodeBlocks		Steuerzeichensymbole
 Coptic	UnicodeBlocks		Koptisch
 Counting rod numerals	UnicodeBlocks		Rechenstab-Numerale
 Cuneiform	UnicodeBlocks		Keilschrift
@@ -52,9 +52,9 @@ Cuneiform numbers and punctuation	UnicodeBlocks		Keilförmige Nummern und Zeiche
 Currency symbols	UnicodeBlocks		Währungssymbole
 Cypriot syllabary	UnicodeBlocks		Zyprische Silben
 Cyrillic	UnicodeBlocks		Kyrillisch
-Cyrillic extended A	UnicodeBlocks		Kyrillisch (Erweitert A)
-Cyrillic extended B	UnicodeBlocks		Kyrillisch (Erweitert B)
-Cyrillic supplement	UnicodeBlocks		Kyrillisch (Erweiterung)
+Cyrillic extended A	UnicodeBlocks		Kyrillisch (Erweiterung A)
+Cyrillic extended B	UnicodeBlocks		Kyrillisch (Erweiterung B)
+Cyrillic supplement	UnicodeBlocks		Kyrillisch (Ergänzung)
 Deseret	UnicodeBlocks		Deseret
 Devanagari	UnicodeBlocks		Devanagari
 Dingbats	UnicodeBlocks		Dingbats
@@ -62,7 +62,7 @@ Domino tiles	UnicodeBlocks		Dominosteine
 Enclosed CJK letters and months	UnicodeBlocks		CJK: Eingeschlossene Buchstaben und Monate
 Enclosed alphanumerics	UnicodeBlocks		Eingeschlossene alphanumerische Zeichen
 Ethiopic	UnicodeBlocks		Äthiopisch
-Ethiopic extended	UnicodeBlocks		Äthiopisch erweitert
+Ethiopic extended	UnicodeBlocks		Äthiopisch (Erweiterung)
 Ethiopic supplement	UnicodeBlocks		Äthiopisch (Ergänzung)
 File	CharacterWindow		Datei
 Filter:	CharacterWindow		Filter:
@@ -72,10 +72,10 @@ General punctuation	UnicodeBlocks		Allgemeine Zeichensetzung
 Geometric shapes	UnicodeBlocks		Geometrische Formen
 Georgian	UnicodeBlocks		Georgisch
 Georgian supplement	UnicodeBlocks		Georgisch (Ergänzung)
-Glagotic	UnicodeBlocks		Glagotisch
+Glagotic	UnicodeBlocks		Glagolitisch
 Gothic	UnicodeBlocks		Gotisch
 Greek and Coptic	UnicodeBlocks		Griechisch und Koptisch
-Greek extended	UnicodeBlocks		Griechisch (Erweitert)
+Greek extended	UnicodeBlocks		Griechisch (Erweiterung)
 Gujarati	UnicodeBlocks		Gujarati
 Gurmukhi	UnicodeBlocks		Gurmukhi
 Halfwidth and fullwidth forms	UnicodeBlocks		Halb- und Vollbreite-Formen
@@ -91,18 +91,18 @@ Kanbun	UnicodeBlocks		Kanbun
 Kangxi radicals	UnicodeBlocks		Kangxi-Radikale
 Kannada	UnicodeBlocks		Kanaresisch
 Katakana	UnicodeBlocks		Katakana
-Katakana phonetic extensions	UnicodeBlocks		Katakana phonetische Erweiterungen
+Katakana phonetic extensions	UnicodeBlocks		Katakana: phonetische Erweiterungen
 Kayah Li	UnicodeBlocks		Kayah Li
 Kharoshthi	UnicodeBlocks		Kharoshthi
 Khmer	UnicodeBlocks		Khmer
 Khmer symbols	UnicodeBlocks		Khmer-Symbole
 Lao	UnicodeBlocks		Lao
-Latin extended A	UnicodeBlocks		Lateinisch (Erweitert A)
-Latin extended B	UnicodeBlocks		Lateinisch (Erweitert B)
-Latin extended C	UnicodeBlocks		Lateinisch (Erweitert C)
-Latin extended D	UnicodeBlocks		Lateinisch (Erweitert D)
-Latin extended additional	UnicodeBlocks		Lateinisch (Zusätzlich erweitert)
-Latin-1 supplement	UnicodeBlocks		Latin-1 (Ergänzung)
+Latin extended A	UnicodeBlocks		Lateinisch (Erweiterung A)
+Latin extended B	UnicodeBlocks		Lateinisch (Erweiterung B)
+Latin extended C	UnicodeBlocks		Lateinisch (Erweiterung C)
+Latin extended D	UnicodeBlocks		Lateinisch (Erweiterung D)
+Latin extended additional	UnicodeBlocks		Lateinisch (zusätzliche Erweiterung)
+Latin-1 supplement	UnicodeBlocks		Lateinisch (Ergänzung)
 Lepcha	UnicodeBlocks		Lepcha
 Letterlike symbols	UnicodeBlocks		Buchstabenähnliche Symbole
 Limbu	UnicodeBlocks		Limbu
@@ -114,7 +114,7 @@ Mahjong tiles	UnicodeBlocks		Mahjongsteine
 Malayalam	UnicodeBlocks		Malayalam
 Mathematical alphanumeric symbols	UnicodeBlocks		Mathematische alphanumerische Symbole
 Mathematical operators	UnicodeBlocks		Mathematische Operatoren
-Miscellaneous mathematical symbols A	UnicodeBlocks		Diverse mathemathische Symbole A
+Miscellaneous mathematical symbols A	UnicodeBlocks		Diverse mathematische Symbole A
 Miscellaneous mathematical symbols B	UnicodeBlocks		Diverse mathematische Symbole B
 Miscellaneous symbols	UnicodeBlocks		Diverse Symbole
 Miscellaneous symbols and arrows	UnicodeBlocks		Diverse Symbole und Pfeile
@@ -122,7 +122,7 @@ Miscellaneous technical	UnicodeBlocks		Diverse technische Zeichen
 Modifier tone letters	UnicodeBlocks		Modifizierungszeichen für Betonung
 Mongolian	UnicodeBlocks		Mongolisch
 Muscial symbols	UnicodeBlocks		Musikalische Symbole
-Myanmar	UnicodeBlocks		Myanmar
+Myanmar	UnicodeBlocks		Burmesisch
 N'Ko	UnicodeBlocks		N'Ko
 New Tai Lue	UnicodeBlocks		Neu-Tai-Lue
 Number forms	UnicodeBlocks		Zahlenformen
@@ -148,7 +148,7 @@ Shavian	UnicodeBlocks		Shaw
 Show private blocks	CharacterWindow		Private Blöcke zeigen
 Sinhala	UnicodeBlocks		Sinhala
 Small form variants	UnicodeBlocks		Varianten kleiner Formen
-Spacing modifier letters	UnicodeBlocks		Abstands-Modifizierungszeichen
+Spacing modifier letters	UnicodeBlocks		IPA (Modifizierungszeichen)
 Specials	UnicodeBlocks		Spezielles
 Sundanese	UnicodeBlocks		Sudanesisch
 Superscripts and subscripts	UnicodeBlocks		Hoch- und Tiefstellungen
@@ -172,7 +172,7 @@ Thai	UnicodeBlocks		Thai
 Tibetan	UnicodeBlocks		Tibetisch
 Tifinagh	UnicodeBlocks		Tifinagh
 Ugaritic	UnicodeBlocks		Ugaritisch
-Unified Canadian Aboriginal syllabics	UnicodeBlocks		Vereinheitlichte kanadische Eingeborenen-Silben
+Unified Canadian Aboriginal syllabics	UnicodeBlocks		Vereinheitlichte Silbenzeichen kanadischer Ureinwohner
 Vai	UnicodeBlocks		Vai
 Variation selectors	UnicodeBlocks		Variationsauswahl
 Variation selectors supplement	UnicodeBlocks		Abweichende Selektoren (Ergänzung)

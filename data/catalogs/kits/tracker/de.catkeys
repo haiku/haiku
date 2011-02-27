@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	2572087072
+1	german	x-vnd.Haiku-libtracker	3940918985
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 %Ld B	WidgetAttributeText		%Ld B
 %Ld bytes	WidgetAttributeText		%Ld Bytes
@@ -75,7 +75,7 @@ Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		\"%docum
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		\"%document\" konnte nicht geöffnet werden (Fehlendes Symbol: %symbol).\n
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Die Datei \"%document\" kann nicht geöffnet werden, weil sich das zugehörige Programm \"%app\" im Papierkorb befindet.
 Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		\"%document\" konnte nicht mit der Anwendung \"%app\" geöffnet werden (%error).
-Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		\"%document\" konnte nicht mit der Anwendung \"%app\" geöffnet werden. Fehlende Bibliothek: %library. \n
+Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		\"%document\" konnte nicht mit der Anwendung \"%app\" geöffnet werden (fehlende Bibliothek: %library.). \n
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		\"%document\" konnte nicht mit der Anwendung \"%app\" geöffnet werden (Fehlendes Symbol: %symbol).\n
 Could not open \"%name\" (%error). 	FSUtils		\"%name\" konnte nicht geöffnet werden (%error).
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		\"%name\" konnte nicht geöffnet werden. Die Datei ist fälschlicherweise als ausführbar gekennzeichnet.
@@ -169,11 +169,11 @@ Icon view	DeskWindow		Icon-Ansicht
 Icon view	VolumeWindow		Icon-Ansicht
 Identify	ContainerWindow		Identifizieren
 Identify	InfoWindow		Identifizieren
-If you %action the config folder, Haiku may not behave properly! Are you sure you want to do this? To %action the config folder anyway, click \"Do it\".	FSUtils		Wird der config-Ordner %action, kann Haiku vielleicht nicht mehr fehlerfrei arbeiten! Um es dennoch zu tun, \"Trotzdem\" klicken.
-If you %action the home folder, Haiku may not behave properly! Are you sure you want to do this? To %action the home anyway, click \"Do it\".	FSUtils		Wird der home-Ordner %action, kann Haiku vielleicht nicht mehr fehlerfrei arbeiten! Um es dennoch zu tun, \"Trotzdem\" klicken.
-If you %action the mime settings, Haiku may not behave properly! Are you sure you want to do this? To %action the mime settings anyway, click \"Do it\".	FSUtils		Werden die MIME Einstellungen %action, kann Haiku vielleicht nicht mehr fehlerfrei arbeiten! Um es dennoch zu tun, \"Trotzdem\" klicken.
-If you %action the settings folder, Haiku may not behave properly! Are you sure you want to do this? To %action the settings folder anyway, click \"Do it\".	FSUtils		Wird der settings-Ordner %action, kann Haiku vielleicht nicht mehr fehlerfrei arbeiten! Um es dennoch zu tun, \"Trotzdem\" klicken.
-If you %action the system folder or its contents, you won't be able to boot Haiku! Are you sure you want to do this? To %action the system folder or its contents anyway, hold down the Shift key and click \"Do it\".	FSUtils		Der System-Ordner oder seine Inhalte sollen %action werden. Dadurch kann Haiku nicht mehr gestartet werden! Um es dennoch zu tun, Shift-Taste gedrückt halten und \"Trotzdem\" klicken.
+If you %ifYouDoAction the config folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the config folder anyway, click \"Do it\".	FSUtils		Wird der config-Ordner %ifYouDoAction, kann Haiku vielleicht nicht mehr fehlerfrei arbeiten! Um ihn dennoch %toDoAction, \"Trotzdem\" klicken.
+If you %ifYouDoAction the home folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the home anyway, click \"Do it\".	FSUtils		Wird der home-Ordner %ifYouDoAction, kann Haiku vielleicht nicht mehr fehlerfrei arbeiten! Um ihn dennoch %toDoAction, \"Trotzdem\" klicken.
+If you %ifYouDoAction the mime settings, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the mime settings anyway, click \"Do it\".	FSUtils		Wird der mime-Ordner %ifYouDoAction, kann Haiku vielleicht nicht mehr fehlerfrei arbeiten! Um ihn dennoch %toDoAction, \"Trotzdem\" klicken.
+If you %ifYouDoAction the settings folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the settings folder anyway, click \"Do it\".	FSUtils		Wird der settings-Ordner %ifYouDoAction, kann Haiku vielleicht nicht mehr fehlerfrei arbeiten! Um ihn dennoch %toDoAction, \"Trotzdem\" klicken.
+If you %ifYouDoAction the system folder or its contents, you won't be able to boot Haiku! Are you sure you want to do this? To %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"Do it\".	FSUtils		Der system-Ordner oder seine Inhalte sollen %action werden. Dadurch kann Haiku nicht mehr gestartet werden! Um ihn oder seine Inhalte dennoch %toDoAction, Shift-Taste gedrückt halten und \"Trotzdem\" klicken.
 Ignore case	SelectionWindow		Ignoriere Groß-/Kleinschreibung
 Include trash	FindPanel		Einschließlich Papierkorb
 Increase size	ContainerWindow		Vergrößern
@@ -423,15 +423,18 @@ less than	FindPanel		kleiner als
 link	FSUtils	filename link	Verknüpfung
 matches regular expression	SelectionWindow		entspricht regulärem Ausdruck
 matches wildcard expression	SelectionWindow		entspricht Platzhalter-Ausdruck
-move	FSUtils		verschoben
+move	FSUtils	As in 'If you move ...'	verschoben
+move	FSUtils	As in 'To move ...'	zu verschieben
 moving	FSUtils		verschoben
 multiple disks	FindPanel		mehrere Datenträger
 no items	CountView		keine
 no supporting apps	OpenWithWindow		keine unterstützenden Anwendungen
 of %items	StatusWindow		von %items
 parent folder	NavMenu		Übergeordneter Ordner
-rename	InfoWindow		umbenannt
-rename	TextWidget		umbenannt
+rename	InfoWindow	As in 'If you rename ...'	umbenannt
+rename	InfoWindow	As in 'To rename ...'	umzubenennen
+rename	TextWidget	As in 'If you rename ...'	umbenannt
+rename	TextWidget	As in 'To rename ...'	umzubenennen
 save text	FilePanelPriv		Text speichern
 starts with	FindPanel		beginnt mit
 starts with	SelectionWindow		beginnt mit

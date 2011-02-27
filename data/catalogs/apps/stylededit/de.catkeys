@@ -1,10 +1,10 @@
-1	german	x-vnd.Haiku-StyledEdit	3614078026
+1	german	x-vnd.Haiku-StyledEdit	881610730
 ???	LoadAlert		???
 Align	Menus		Ausrichtung
 Black	Menus		Schwarz
 Blue	Menus		Blau
 Bold	Menus		Fett
-Can't Undo	Menus		Rückgängig nicht möglich
+Can't undo	Menus		Rückgängig nicht möglich
 Cancel	FindandReplaceWindow		Abbrechen
 Cancel	QuitAlert		Abbrechen
 Cancel	RevertToSavedAlert		Abbrechen

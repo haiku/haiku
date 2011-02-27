@@ -1,11 +1,11 @@
 1	german	x-vnd.Haiku-Keymap	4175672673
 (Current)	Keymap window		(Aktiv)
-Acute trigger	Keymap window		Acute-Auslöser
-Circumflex trigger	Keymap window		Zirkumflex-Auslöser
-Diaeresis trigger	Keymap window		Diaeresis-Auslöser
+Acute trigger	Keymap window		´ Akut
+Circumflex trigger	Keymap window		^ Zirkumflex
+Diaeresis trigger	Keymap window		¨ Trema/Diärese
 File	Keymap window		Datei
 Font	Keymap window		Schriftart
-Grave trigger	Keymap window		Grave-Auslöser
+Grave trigger	Keymap window		` Gravis
 Keymap	Keymap window		Keymap - Tastaturlayout
 Layout	Keymap window		Tastatur
 Open…	Keymap window		Öffnen…
@@ -14,9 +14,9 @@ Revert	Keymap window		Anfangswerte
 Sample and clipboard:	Keymap window		Tastenausgabe:
 Save as…	Keymap window		Speichern unter…
 Select dead keys	Keymap window		Auslösetasten definieren
-Switch shortcut keys	Keymap window		Befehlstasten umschalten
-Switch shortcut keys to Haiku mode	Keymap window		Befehlstasten zum Haiku-Modus wechseln
-Switch shortcut keys to Windows/Linux mode	Keymap window		Befehlstasten zum Windows/Linux-Modus wechseln
+Switch shortcut keys	Keymap window		Befehlstasten tauschen
+Switch shortcut keys to Haiku mode	Keymap window		Befehlstasten tauschen: Haiku-Modus
+Switch shortcut keys to Windows/Linux mode	Keymap window		Befehlstasten tauschen: Windows/Linux-Modus
 System:	Keymap window		System:
-Tilde trigger	Keymap window		Tilde-Auslöser
+Tilde trigger	Keymap window		~ Tilde
 User:	Keymap window		Benutzer:

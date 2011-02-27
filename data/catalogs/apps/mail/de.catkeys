@@ -1,4 +1,4 @@
-1	german	x-vnd.Be-MAIL	1525863502
+1	german	x-vnd.Be-MAIL	2797564879
 %d - Date	Mail		%d - Datum
 %e - E-mail address	Mail		%e - E-Mail-Adresse
 %n - Full name	Mail		%n - Voller Name
@@ -90,6 +90,7 @@ Previous	Mail		Vorherige
 Previous message	Mail		Vorherige Nachricht
 Print	Mail		Drucken
 Print…	Mail		Drucken…
+Put your favorite e-mail queries and query templates in this folder.	Mail		In diesem Ordner können E-Mail-Queries und Query-Vorlagen abgelegt werden.
 Queries	Mail		Queries
 Quit	Mail		Beenden
 Quote	Mail		Zitieren
@@ -147,3 +148,4 @@ Warn unencodable:	Mail		Warnung bei nicht-kodierbaren Zeichen:
 Written by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		von Robert Polic.\nErweitert durch die Dr. Zoidberg Crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku Inc.\n
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Der Text enthält %ld nicht kodierbare Zeichen. Eine andere Zeichenkodierung könnte helfen. 'Senden' klicken, um die Nachricht trotzdem zu senden (Ersatzzeichen werden für die nicht kodierbaren Zeichen verwendet), oder den Vorgang abbrechen, um das Problem zu lösen.
 \\n - Newline	Mail		\\n - Zeilenumbruch
+helpful message	Mail		Tipp
