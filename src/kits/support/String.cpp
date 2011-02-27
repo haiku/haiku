@@ -425,20 +425,30 @@ BString::AdoptChars(BString& string, int32 charCount)
 
 
 BString&
-BString::SetToArguments(const char *format, ...)
+BString::SetToArguments(const char* format, ...)
 {
+	int32 bufferSize = 128;
+	char buffer[bufferSize];
+	
 	va_list arg;
 	va_start(arg, format);
-	int32 bytes = vsnprintf(LockBuffer(0), 0, format, arg);
+	int32 bytes = vsnprintf(buffer, bufferSize, format, arg);
 	va_end(arg);
-	UnlockBuffer(0);
-	
-	va_list arg2;
-	va_start(arg2, format);
-	bytes = vsnprintf(LockBuffer(bytes), bytes + 1, format, arg2);
-	va_end(arg2);
-	UnlockBuffer(bytes);
 
+	if (bytes < 0) {
+		return *this;
+	}
+	
+	if (bytes < bufferSize) {
+		SetTo(buffer);
+	} else {
+		va_list arg2;
+		va_start(arg2, format);
+		bytes = vsnprintf(LockBuffer(bytes), bytes + 1, format, arg2);
+		va_end(arg2);
+		UnlockBuffer(bytes);
+	}
+	
 	return *this;
 }
 
