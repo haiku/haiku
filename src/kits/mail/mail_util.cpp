@@ -94,6 +94,15 @@ write_read_attr(BNode& node, read_flags flag)
 		return B_ERROR;
 
 #if R5_COMPATIBLE
+	// manage the status string only if it currently has a "read" status
+	BString currentStatus;
+	if (node.ReadAttrString(B_MAIL_ATTR_STATUS, &currentStatus) == B_OK) {
+		if (currentStatus.ICompare("New") != 0
+			&& currentStatus.ICompare("Read") != 0
+			&& currentStatus.ICompare("Seen") != 0)
+			return B_OK;
+	}
+
 	const char* statusString = (flag == B_READ) ? "Read"
 		: (flag  == B_SEEN) ? "Seen" : "New";
 	if (node.WriteAttr(B_MAIL_ATTR_STATUS, B_STRING_TYPE, 0, statusString,
