@@ -166,7 +166,7 @@ RAWTranslator::DerivedIdentify(BPositionIO *stream,
 	info->capability = RAW_IN_CAPABILITY;
 	snprintf(info->name, sizeof(info->name), 
 		B_TRANSLATE_COMMENT("%s RAW image", "Parameter (%s) is the name of "
-		"the manufacturer (like \"Canon\")"), meta.manufacturer);
+		"the manufacturer (like 'Canon')"), meta.manufacturer);
 	strcpy(info->MIME, "image/x-vnd.photo-raw");
 
 	return B_OK;
