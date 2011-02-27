@@ -1,18 +1,17 @@
-1	ukrainian	x-vnd.haiku.zip-o-matic	274748138
-1 file added.	file:ZipOMaticWindow.cpp		Додано 1 файл .
-Stop	file:ZipOMaticWindow.cpp		Зупинити
-Creating archive: %s	file:ZipOMaticWindow.cpp		Створення архіву: %s
-Continue	file:ZipOMaticWindow.cpp		Продовжити
-Preparing to archive	file:ZipperThread.cpp		Підготовка архіву
-Filename: %s	file:ZipOMaticWindow.cpp		Ім'я файлу: %s
-Let them continue	file:ZipOMatic.cpp		Нехай це продовжується
-Do you want to stop them?	file:ZipOMatic.cpp		Ви хочете зупинити це?
-Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Ви впевнені, що хочете зупинити створення цього архіву?
+1	ukrainian	x-vnd.haiku.zip-o-matic	3476213191
 %ld files added.	file:ZipOMaticWindow.cpp		%ld файлів додано.
-Stopped	file:ZipOMaticWindow.cpp		Зупинено
 Archive	file:ZipperThread.cpp		Архів
+Archive created OK	file:ZipOMaticWindow.cpp		Архів успішно створений
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Ви впевнені, що хочете зупинити створення цього архіву?
+Continue	file:ZipOMaticWindow.cpp		Продовжити
+Creating archive: %s	file:ZipOMaticWindow.cpp		Створення архіву: %s
+Do you want to stop them?	file:ZipOMatic.cpp		Ви хочете зупинити це?
 Drop files to zip.	file:ZipOMaticWindow.cpp		Перемістіть файли для створення  архіву.
 Error creating archive	file:ZipOMaticWindow.cpp		Помилка створення архіву
-You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		У вас працює %ld копій Zip-O-Matic.\n\n
-Archive created OK	file:ZipOMaticWindow.cpp		Архів успішно створений
+Filename: %s	file:ZipOMaticWindow.cpp		Ім'я файлу: %s
+Let them continue	file:ZipOMatic.cpp		Нехай це продовжується
+Preparing to archive	file:ZipperThread.cpp		Підготовка архіву
+Stop	file:ZipOMaticWindow.cpp		Зупинити
 Stop them	file:ZipOMatic.cpp		Зупинити це
+Stopped	file:ZipOMaticWindow.cpp		Зупинено
+You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		У вас працює %ld копій Zip-O-Matic.\n\n

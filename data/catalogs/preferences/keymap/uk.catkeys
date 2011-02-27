@@ -1,22 +1,22 @@
 1	ukrainian	x-vnd.Haiku-Keymap	4175672673
-Tilde trigger	Keymap window		Тільда
-Grave trigger	Keymap window		Апостроф
-Select dead keys	Keymap window		Вибрати модифікатор
-Quit	Keymap window		Вихід
+(Current)	Keymap window		(Активна)
+Acute trigger	Keymap window		Акюте
 Circumflex trigger	Keymap window		Ціркумфлекс
 Diaeresis trigger	Keymap window		Діарезіс
-Open…	Keymap window		Відкрити…
-System:	Keymap window		Системні:
-Switch shortcut keys	Keymap window		Перемкнути швидкі кнопки
-User:	Keymap window		Користувацькі:
-Switch shortcut keys to Haiku mode	Keymap window		Перемикати швидкі кнопки як у Haiku
-Keymap	Keymap window		Розкладки
-Sample and clipboard:	Keymap window		Приклад і буфер обміну
-Layout	Keymap window		Макет
-Switch shortcut keys to Windows/Linux mode	Keymap window		Перемикати швидкі кнопки як у Linux/Windows
-Revert	Keymap window		Повернути
-Save as…	Keymap window		Зберегти як…
 File	Keymap window		Файл
-(Current)	Keymap window		(Активна)
 Font	Keymap window		Шрифт
-Acute trigger	Keymap window		Акюте
+Grave trigger	Keymap window		Апостроф
+Keymap	Keymap window		Розкладки
+Layout	Keymap window		Макет
+Open…	Keymap window		Відкрити…
+Quit	Keymap window		Вихід
+Revert	Keymap window		Повернути
+Sample and clipboard:	Keymap window		Приклад і буфер обміну
+Save as…	Keymap window		Зберегти як…
+Select dead keys	Keymap window		Вибрати модифікатор
+Switch shortcut keys	Keymap window		Перемкнути швидкі кнопки
+Switch shortcut keys to Haiku mode	Keymap window		Перемикати швидкі кнопки як у Haiku
+Switch shortcut keys to Windows/Linux mode	Keymap window		Перемикати швидкі кнопки як у Linux/Windows
+System:	Keymap window		Системні:
+Tilde trigger	Keymap window		Тільда
+User:	Keymap window		Користувацькі:

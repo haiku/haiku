@@ -1,43 +1,42 @@
-1	ukrainian	x-vnd.Haiku-Appearance	3612090060
-Control highlight	Colors tab		Підсвітка елемента
-Control border	Colors tab		Межа елемента
-Antialiasing type:	AntialiasingSettingsView		Тип зглажування:
-Shadow	Colors tab		Тінь
-On	AntialiasingSettingsView		Увімкнути
-Defaults	APRWindow		По замовчуванню
-Grayscale	AntialiasingSettingsView		Відтінки сірого
-Shine	Colors tab		Сяйво
-Off	AntialiasingSettingsView		Слабе
-Success	Colors tab		Успіх
-Inactive window tab text	Colors tab		Текст заголовку неактивного вікна
-Failure	Colors tab		Невдача
-Hinting menu	AntialiasingSettingsView		Меню коректування
-Document background	Colors tab		Тло документа
-Revert	APRWindow		Повернути
-Window tab	Colors tab		Заголовок вікна
-Tooltip background	Colors tab		Тло підказки
-Selected menu item background	Colors tab		Тло вибраного пункта меню
+1	ukrainian	x-vnd.Haiku-Appearance	1378564786
 Antialiasing	APRWindow		Зглажування
-Navigation base	Colors tab		Основа навігації
-Window tab text	Colors tab		Текст заголовка вікна
-Document text	Colors tab		Текст документа
-Navigation pulse	Colors tab		Навігація рulse
-Selected menu item text	Colors tab		Текст виділеного пункту меню
-Menu background	Colors tab		Тло меню
+Antialiasing menu	AntialiasingSettingsView		Меню зглажування
+Antialiasing type:	AntialiasingSettingsView		Тип зглажування:
 Appearance	APRWindow		Вигляд
-Panel background	Colors tab		Панель
 Colors	APRWindow		Кольори
 Control background	Colors tab		Тло елементу
-Inactive window tab	Colors tab		Заголовок неактивного вікна
-Reduce colored edges filter strength:	AntialiasingSettingsView		Зменшення сили фільтрації кольорових країв:
-Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Субпіксельне зглажування в комбінації з уточненням недоступне у цій збірці Haiku через можливі патентні проблеми. Для включення цієї можливості Вам необхідно зібрати Haiku самостійно з включенням особливих опцій у заголовку конфігурації FreeType.
+Control border	Colors tab		Межа елемента
+Control highlight	Colors tab		Підсвітка елемента
 Control text	Colors tab		Текст елементу
-Tooltip text	Colors tab		Текст підказки
-Menu item text	Colors tab		Текст пункта меню
+Defaults	APRWindow		По замовчуванню
+Document background	Colors tab		Тло документа
+Document text	Colors tab		Текст документа
+Failure	Colors tab		Невдача
+Grayscale	AntialiasingSettingsView		Відтінки сірого
+Hinting menu	AntialiasingSettingsView		Меню коректування
+Inactive window tab	Colors tab		Заголовок неактивного вікна
+Inactive window tab text	Colors tab		Текст заголовку неактивного вікна
 LCD subpixel	AntialiasingSettingsView		Субпіксельне зглажування
-Selected menu item border	Colors tab		Рамка виділеного пункту меню
-Strong	AntialiasingSettingsView		Сильне
-Panel text	Colors tab		Текст панелі
+Menu background	Colors tab		Тло меню
+Menu item text	Colors tab		Текст пункта меню
 Monospaced fonts only	AntialiasingSettingsView		Тільки моноширинні шрифти
-Antialiasing menu	AntialiasingSettingsView		Меню зглажування
-Glyph hinting:	AntialiasingSettingsView		Уточнення :
+Navigation base	Colors tab		Основа навігації
+Navigation pulse	Colors tab		Навігація рulse
+Off	AntialiasingSettingsView		Слабе
+On	AntialiasingSettingsView		Увімкнути
+Panel background	Colors tab		Панель
+Panel text	Colors tab		Текст панелі
+Reduce colored edges filter strength:	AntialiasingSettingsView		Зменшення сили фільтрації кольорових країв:
+Revert	APRWindow		Повернути
+Selected menu item background	Colors tab		Тло вибраного пункта меню
+Selected menu item border	Colors tab		Рамка виділеного пункту меню
+Selected menu item text	Colors tab		Текст виділеного пункту меню
+Shadow	Colors tab		Тінь
+Shine	Colors tab		Сяйво
+Strong	AntialiasingSettingsView		Сильне
+Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Субпіксельне зглажування в комбінації з уточненням недоступне у цій збірці Haiku через можливі патентні проблеми. Для включення цієї можливості Вам необхідно зібрати Haiku самостійно з включенням особливих опцій у заголовку конфігурації FreeType.
+Success	Colors tab		Успіх
+Tooltip background	Colors tab		Тло підказки
+Tooltip text	Colors tab		Текст підказки
+Window tab	Colors tab		Заголовок вікна
+Window tab text	Colors tab		Текст заголовка вікна

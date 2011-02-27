@@ -1,5 +1,5 @@
-1	belarusian	x-vnd.Haiku-RAWTranslator	2919758153
-%s RAW image	RAWTranslator	Parameter (%s) is the name of the manufacturer (like \"Canon\")	Выява RAW у фармаце %s 
+1	belarusian	x-vnd.Haiku-RAWTranslator	1938728039
+%s RAW image	RAWTranslator	Parameter (%s) is the name of the manufacturer (like 'Canon')	Выява RAW (%s)
 Based on Dave Coffin's dcraw 8.63	ConfigView		Грунтуецца на праекце dcraw 8.63 ад Dave Coffin.
 RAW Images	ConfigView		Выявы RAW
 RAW Settings	RAWTranslator main		Наладкі RAW

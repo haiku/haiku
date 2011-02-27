@@ -1,4 +1,5 @@
-1	russian	x-vnd.Be-PEPL	3209429794
+1	russian	x-vnd.Be-PEPL	3664557316
+%name% picture	People		Изображение для %name%
 About	People		О программе…
 Address	People		Адрес
 Cancel	People		Отмена
@@ -20,6 +21,7 @@ File	People		Файл
 Group	People		Группа
 Home phone	People		Домашний телефон
 Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Не удалось запустить FileTypes для настройки атрибутов Персоны.\n\nОшибка:
+Load image…	People		Выбрать рисунок…
 Name	People		Имя
 New person	People		Новая персона
 New person…	People		Новая персона…
@@ -29,6 +31,7 @@ Paste	People		Вставить
 Person	Short mimetype description		Персона
 Quit	People		Выход
 Redo	People		Отменить
+Remove image	People		Удалить рисунок
 Revert	People		Вернуть
 Save	People		Сохранить
 Save as…	People		Сохранить как…
@@ -38,6 +41,7 @@ Sorry	People		Извините
 State	People		Штат
 URL	People		URL
 Undo	People		Отменить
+Unnamed person	People		Новая персона
 Work phone	People		Рабочий телефон
 Zip	People		Индекс
-none	Groups list		нет
+none	Groups list		пусто

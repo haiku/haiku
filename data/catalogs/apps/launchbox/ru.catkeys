@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-LaunchBox	4217696103
+1	russian	x-vnd.Haiku-LaunchBox	1672943267
 About	LaunchBox		О программе
 Add button here	LaunchBox		Добавить сюда кнопку
 Auto-raise	LaunchBox		Всплывать автоматически
@@ -11,8 +11,7 @@ Description for '%3'	LaunchBox		Описание для '%3'
 Failed to launch '%1'.\n\nError:	LaunchBox		Не удалось запустить '%1'.\n\nОшибка:
 Failed to launch 'something',error in Pad data.	LaunchBox		Не удалось запустить 'something', ошибка в данных панели.
 Failed to launch application with signature '%2'.\n\nError:	LaunchBox		Не удалось запустить приложение с сигнатурой '%2'.\n\nОшибка:
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Не удалось послать команду "открыть папку" в Tracker.\n\nОшибка: 
-
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Не удалось послать команду "открыть папку" в Tracker.\n\nОшибка:
 Horizontal layout	LaunchBox		Горизонтальное расположение
 Icon size	LaunchBox		Размер значков
 Ignore double-click	LaunchBox		Игнорировать двойной щелчок
@@ -25,7 +24,6 @@ Pad %1	LaunchBox		Панель %1
 Pad 1	LaunchBox		Панель 1
 Quit	LaunchBox		Выход
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Вы действительно хотите закрыть эту панель? (Эта панель не сохранится.)
-
 Remove button	LaunchBox		Удалить кнопку
 Set description…	LaunchBox		Указать описание…
 Settings	LaunchBox		Настройки

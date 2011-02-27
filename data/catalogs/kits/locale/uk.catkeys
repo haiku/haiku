@@ -1,19 +1,15 @@
-1	ukrainian	system	2686335505
+1	ukrainian	system	845452856
+%.2f TiB	StringForSize		%.2f TiB
 %3.2f GiB	StringForSize		%3.2f GiB
 %3.2f KiB	StringForSize		%3.2f KiB
-%d bytes	StringForSize		%d байт
-%.2f TiB	StringForSize		%.2f TiB
 %3.2f MiB	StringForSize		%3.2f MiB
-Green:	ColorControl		Зелений:
-Red:	ColorControl		Червоний:
+%d bytes	StringForSize		%d байт
+About…	AboutWindow		Про…
 Blue:	ColorControl		Синій:
 Close	AboutWindow		Закрити
-Written by:	AboutWindow		Автор:
-About…	AboutWindow		Про…
-Copyright © %years% Haiku, Inc.	AboutWindow		Copyright ©  %years% Haiku, Inc.
-Cut	TextView		 Вирізати
 Copy	TextView		Копіювати
-Paste	TextView		 Вставити
+Green:	ColorControl		Зелений:
+Red:	ColorControl		Червоний:
 Redo	TextView		Відмінити відміну
-Select All	TextView		 Вибрати все
 Undo	TextView		Відмінити
+Written by:	AboutWindow		Автор:

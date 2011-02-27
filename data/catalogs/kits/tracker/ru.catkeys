@@ -1,5 +1,5 @@
 1	russian	x-vnd.Haiku-libtracker	498395429
-%BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
+%BytesPerSecond/s	StatusWindow		%BytesPerSecond/с
 %Ld B	WidgetAttributeText		%Ld байт
 %Ld bytes	WidgetAttributeText		%Ld байт
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used занято -- %free свободно)

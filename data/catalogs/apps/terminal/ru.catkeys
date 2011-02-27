@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Terminal	2078065974
+1	russian	x-vnd.Haiku-Terminal	1210090540
 -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		 -h, --help вывести этот текст\n -t, --title установить заголовок окна\n -f, --fullscreen запустить в полном экране\n
 Abort	Terminal Shell		Отменить
 About Terminal…	Terminal TermWindow		О программе…
@@ -9,7 +9,6 @@ Cancel	Terminal PrefWindow		Отмена
 Cancel	Terminal SetTitleWindow		Отмена
 Cancel	Terminal TermView		Отмена
 Cancel	Terminal TermWindow		Отмена
-Cannot execute \"%command\":\n\t%error	Terminal Shell		Невозможно выполнить \"%command\":\n\t%error
 Change directory	Terminal TermView		Сменить каталог
 Clear all	Terminal TermWindow		Очистить всё
 Close	Terminal TermWindow		Закрыть
@@ -90,7 +89,6 @@ The pattern specifying the window title. The following placeholders\ncan be used
 The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Этот шаблон описывает заголовки окна.\nВозможно использовать следующие переменные:\n
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Процесс \"%1\" все еще работает.\nЕсли вы закроете Терминал, то этот процесс будет уничтожен.
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Процесс \"%1\" все еще работает.\nЕсли вы закроете вкладку, то этот процесс будет уничтожен.
-
 Use default	Terminal SetTitleWindow		По умолчанию
 Use default shell	Terminal Shell		Использовать оболочку по умолчанию
 Use selection	Terminal FindWindow		Использовать выделенный текст
@@ -100,4 +98,6 @@ Window size	Terminal TermWindow		Размер окна
 Window title:	Terminal AppearancePrefView		Заголовок окна
 Window title:	Terminal TermWindow		Заголовок окна:
 Window title…	Terminal TermWindow		Заголовок окна…
+\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		t%d\t-\tТекущая директория активного процесса текущей вкладки.\n\t\t\tОпционально можно указать максимальное число отображаемых компонентов пути.\n\t\t\Например '%2d' отобразит последние 2 компонента.\n\t%i\t-\tНомер окна.\n\t%p\t-\tНазвание активного процесса в текущей вкладке.\n\t%t\t-\tЗаголовок текущей вкладки.\n\t%%\t-\tСимвол процента - '%'.
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		t%d\t-\tТекущая директория активного процесса.\n\t\t\tОпционально можно указать максимальное число отображаемых компонентов пути.\n\t\t\Например '%2d' отобразит последние 2 компонента.\n\t%i\t-\tНомер вкладки.\n\t%p\t-\tНазвание активного процесса.\n\t%%\t-\tСимвол процента - '%'.
 size	Terminal TermView		размер

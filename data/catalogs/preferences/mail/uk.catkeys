@@ -1,74 +1,37 @@
-1	ukrainian	x-vnd.Haiku-Mail	404309185
-Select account type	Config Views		Виберіть тип аккаунту
-Mail checking	Config Window		Перевірка пошти
-Settings	Config Window		Налаштування
-Only when dial-up is connected	Config Window		Тільки коли включений  dial-up 
-While sending and receiving	Config Window		Поки іде відправка і отримання
-days	Config Window		днів
-Start mail services on startup	Config Window		Запускати поштовий сервіс при старті
-Receive mail only	Config Views		Тільки при отриманні пошти
+1	ukrainian	x-vnd.Haiku-Mail	4158114343
 Account name:	Config Views		Ім'я аккаунта:
-OK	Config Views		Гаразд
-The filter could not be moved. Deleting filter.	Config Views		Фільтр неможливо перемістити. Видалення фільтра.
-Revert	Config Window		Повернути
+Account settings	Config Views		Настройка аккаунта
 Accounts	Config Window		Аккаунти
-Account type:	Config Views		Тип аккаунту:
-Remove	Config Window		Видалити
-Miscellaneous	Config Window		Змішаний
-Show connection status window:	Config Window		Показати вікно стану підключення:
-While sending	Config Window		Поки відправляється
-Schedule outgoing mail when dial-up is disconnected	Config Window		Затримати відправку вихідної пошти поки діалап не підключений
-hours	Config Window		годин
 Add	Config Window		Додати
-Send mail only	Config Views		Тільки при відправці пошти
-E-mail	Account		E-mail
-Unnamed	Account		Неназваний
-\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nОсновні налаштування неможливо повернути.\n\nПомилка при відновленні налаштувань:\n%s\n
-Send and receive mail	Config Views		При відправці і отриманні пошти
-Real name:	Config Views		Справжнє ім'я:
-· Outgoing	Account		· Вихідні
-Return address:	Config Views		Зворотня адреса:
-· E-mail filters	Account		 · Фільтри E-mail 
-· Incoming	Account		· Вхідні
-Edit mailbox menu…	Config Window		Редагувати почтове меню…
-Remove	Config Views		Видалити
-Could not create inbound chain.	Account		Неможливо створити ланцюг вхідних
-Check every	Config Window		Перевіряти кожне
-never	Config Window		ніколи
-Incoming mail filters	Config Views		Вхідний поштовий фільтр
-Account settings	Config Views		Налаштування аккаунта
-minutes	Config Window		хвилин
-Error retrieving general settings: %s\n	Config Window		Помилка при відновленні основних налаштувань: %s\n
-OK	Account		Гаразд
-Apply	Config Window		Прийняти
-Could not create outbound chain.	Account		Неможливо створити ланцюг вихідних.
-Always	Config Window		Завжди
-Add filter	Config Views		Додати фільтр
-Outgoing mail filters	Config Views		Фільтри вихідної пошти
-\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nСтворіть новий аккаунт натиснувши кнопку Add .\n\nВидаліть аккаунт при допомозі кнопки Remove на вибраному пункті\n\nВиберіть пункт зі списку при необхідності змініть його налаштувань.
-Inbound	E-Mail		Вхідні
-Server Name:	E-Mail		Ім'я серверу:
-OK	Config Window		Гаразд
-E-mail address:	E-Mail		Адреса E-mail :
-Account name:	E-Mail		Ім'я акаунту:
-Account Type:	E-Mail		Тип аккаунту:
-Beta	Config Window		Бета
-Login name:	E-Mail		Логін:
-Password:	E-Mail		Пароль:
-E-mail	Config Views		E-mail
-Send mail only	E-Mail		Тільки відправити пошту
 Alpha	Config Window		Альфа
-Send and receive mail	E-Mail		Відправити і отримати пошту
-Golden master	Config Window		Золотий майстер
-Final	Config Window		Закінчення
-failed to open '%s' to read nameservers: %s\n	E-Mail		призупинено  відкриття '%s' читаються  імена серверів: %s\n
-Receive mail only	E-Mail		Тільки отримати пошту
-Choose Protocol	Config Views		Вибрати протокол
-Choose Protocol	E-Mail		Вибрати протокол
-Outbound	E-Mail		Вихідні
-Gamma	Config Window		Гамма
-Real name:	E-Mail		Справжнє ім'я:
-E-mail	Config Window		E-mail
-Mail Daemon Replacement\n\nby Haiku, Inc. All rights reserved.\n\nVersion %ld.%ld.%ld %s\n\nSee LICENSE file included in the installation package for more information.\n\n\n\nYou can contact us at:\n%s\n\nPlease submit bug reports using the %s\n\nProject homepage at:\n%s	Config Window		Mail Daemon Replacement\n\nдля Haiku, Inc. All rights reserved.\n\nВерсія %ld.%ld.%ld %s\n\nДля більшої інформації дивись файл LICENSE в інсталяційному пакунку.\n\n\n\nВи можете зв'язатись з нами:\n%s\n\nБагрепорти відправляйте на %s\n\nСторінка проекту:\n%s
+Always	Config Window		Завжди
+Apply	Config Window		Прийняти
+Beta	Config Window		Бета
+Check every	Config Window		Перевіряти кожні
 Development	Config Window		Розробка
+E-mail	Config Window		Пошта
+Edit mailbox menu…	Config Window		Редагувати почтове меню…
 Error	Config Window		Помилка
+Error retrieving general settings: %s\n	Config Window		Помилка при відновленні основних настройок: %s\n
+Final	Config Window		Закінчення
+Gamma	Config Window		Гамма
+Golden master	Config Window		Золотий майстер
+Mail Daemon Replacement\n\nby Haiku, Inc. All rights reserved.\n\nVersion %ld.%ld.%ld %s\n\nSee LICENSE file included in the installation package for more information.\n\n\n\nYou can contact us at:\n%s\n\nPlease submit bug reports using the %s\n\nProject homepage at:\n%s	Config Window		Mail Daemon Replacement\n\nдля Haiku, Inc. All rights reserved.\n\nВерсія %ld.%ld.%ld %s\n\nДля більшої інформації дивись файл LICENSE в інсталяційному пакунку.\n\n\n\nВи можете зв'язатись з нами:\n%s\n\nБагрепорти відправляйте на %s\n\nСторінка проекту:\n%s
+Mail checking	Config Window		Перевірка пошти
+Miscellaneous	Config Window		Змішаний
+OK	Config Window		Гаразд
+Real name:	Config Views		Справжнє ім'я:
+Remove	Config Window		Видалити
+Return address:	Config Views		Зворотня адреса:
+Revert	Config Window		Повернути
+Schedule outgoing mail when dial-up is disconnected	Config Window		Затримувати відправку вихідних при відключеному діалапі
+Settings	Config Window		Налаштування
+Show connection status window:	Config Window		Показати вікно стану підключення:
+Start mail services on startup	Config Window		Запускати сервіс при старті
+While sending	Config Window		Поки відправляється
+While sending and receiving	Config Window		При відправці і отриманні
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nОсновні налаштування неможливо повернути.\n\nПомилка при відновленні налаштувань:\n%s\n
+days	Config Window		днів
+hours	Config Window		годин
+minutes	Config Window		хвилин
+never	Config Window		ніколи

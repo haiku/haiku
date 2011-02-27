@@ -1,16 +1,16 @@
 1	ukrainian	x-vnd.Haiku-Touchpad	1498191605
-Scrolling	TouchpadPrefView		Прокрутка
-Revert	TouchpadPrefView		Повернути
-Two finger scrolling	TouchpadPrefView		Прокрутка двома пальцями
 Defaults	TouchpadPrefView		За замовчуванням
-Slow	TouchpadPrefView		Повільно
-High	TouchpadPrefView		Висока
-Tap gesture	TouchpadPrefView		Дотик з легким ударом і переміщенням
-Horizontal scrolling	TouchpadPrefView		Горизонтальна прокрутка
 Fast	TouchpadPrefView		Швидко
-Tap click sensitivity	TouchpadPrefView		Чутливість до дотику
-Scroll acceleration	TouchpadPrefView		Прискорення прокрутки
-Off	TouchpadPrefView		Низька
-Touchpad	TouchpadMain		Тачпад
+High	TouchpadPrefView		Висока
 Horizontal scroll speed	TouchpadPrefView		Швидкість горизонтальної прокрутки
+Horizontal scrolling	TouchpadPrefView		Горизонтальна прокрутка
+Off	TouchpadPrefView		Низька
+Revert	TouchpadPrefView		Повернути
+Scroll acceleration	TouchpadPrefView		Прискорення прокрутки
+Scrolling	TouchpadPrefView		Прокрутка
+Slow	TouchpadPrefView		Повільно
+Tap click sensitivity	TouchpadPrefView		Чутливість до дотику
+Tap gesture	TouchpadPrefView		Дотик з легким ударом і переміщенням
+Touchpad	TouchpadMain		Тачпад
+Two finger scrolling	TouchpadPrefView		Прокрутка двома пальцями
 Vertical scroll speed	TouchpadPrefView		Швидкість вертикальної прокрутки

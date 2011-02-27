@@ -1,28 +1,21 @@
-1	ukrainian	x-vnd.Haiku-JPEGTranslator	1834097482
-JPEG Library Error: %s\n	be_jerror		Помилка бібліотеки JPEG: %s\n
-ISO	exit_parser		ISO
-Low	JPEGTranslator		Низьке
-ExposureTime	exit_parser		Час витримки
-Orientation	exit_parser		Розташування
-None	JPEGTranslator		Жоден
-High	JPEGTranslator		Високе
-Model	exit_parser		Модель
-JPEG Library Warning: %s\n	be_jerror		 Попередження бібліотеки JPEG: %s\n
-Maker	exit_parser		Маркер
-Output quality	JPEGTranslator		Вихідна якість
-with \"lossless\" encoding support patch by Ken Murchison\n	JPEGTranslator		 	з підтримкою \"беззатратного\" кодування , що додав Ken Murchison \n
-JPEG images	JPEGTranslator		 Зображення JPEG
-Prevent colors 'washing out'	JPEGTranslator		попереджати втрату 'насичення' кольорів
-Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Використовувати код CMYK  0 для 100%  охоплення чорнила
+1	ukrainian	x-vnd.Haiku-JPEGTranslator	1699433362
 About	JPEGTranslator		Про
-With some colorspace conversion routines by Magnus Hellman\n	JPEGTranslator		використовувати методи перетворення кольорів, що запровадив Magnus Hellman\n
-Make file smaller (sligthtly worse quality)	JPEGTranslator		Зробити файл меньшим (можлива втрата якості)
 Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Формат Be Bitmap (Перетворювач JPEG)
-Show warning messages	JPEGTranslator		Показувати попередження
+ExposureTime	exit_parser		Час витримки
+High	JPEGTranslator		Високе
+ISO	exit_parser		ISO
+JPEG Library Error: %s\n	be_jerror		Помилка бібліотеки JPEG: %s\n
+Low	JPEGTranslator		Низьке
+Make file smaller (sligthtly worse quality)	JPEGTranslator		Зробити файл меньшим (можлива втрата якості)
+Maker	exit_parser		Маркер
+Model	exit_parser		Модель
+None	JPEGTranslator		Жоден
+Orientation	exit_parser		Розташування
+Output quality	JPEGTranslator		Вихідна якість
 Output smoothing strength	JPEGTranslator		Інтенсивність зглажування
-Based on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n	JPEGTranslator		На основі бібліотеки  IJG © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n
-Write	JPEGTranslator		 Записати
-Write black-and-white images as RGB24	JPEGTranslator		Записувати чорно-білі зображення як RGB24
-Read greyscale images as RGB32	JPEGTranslator		Читати сірі зображення як RGB32
+Prevent colors 'washing out'	JPEGTranslator		попереджати втрату 'насичення' кольорів
 Read	JPEGTranslator		Читати
+Read greyscale images as RGB32	JPEGTranslator		Читати сірі зображення як RGB32
+Show warning messages	JPEGTranslator		Показувати попередження
 Use progressive compression	JPEGTranslator		Використовувати прогресивний зтиск
+Write black-and-white images as RGB24	JPEGTranslator		Записувати чорно-білі зображення як RGB24

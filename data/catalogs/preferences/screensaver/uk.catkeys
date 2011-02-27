@@ -1,28 +1,25 @@
-1	ukrainian	x-vnd.Haiku-ScreenSaver	1468011094
-Run module	ScreenSaver		Запущений модуль
-Could not load screen saver	ScreenSaver		Не вдалося загрузити заставку
+1	ukrainian	x-vnd.Haiku-ScreenSaver	2666644122
 30 seconds	ScreenSaver		30 секунд
-Password…	ScreenSaver		Пароль...
-Password:	ScreenSaver		Пароль:
-Password lock	ScreenSaver		Використати пароль
-Add…	ScreenSaver		Додати...
-mouse is here	ScreenSaver		мишка тут
-Modules	ScreenSaver		Модулі
-Test	ScreenSaver		Тест
-ScreenSaver	ScreenSaver		Заставка
-Module settings	ScreenSaver		Налаштування модуля
-Cancel	ScreenSaver		Відмінити
-Turn off screen	ScreenSaver		Вимкнути екран
-No options available	ScreenSaver		Опції недоступні
-Password Window	ScreenSaver		Вікно паролю
-Enable screen saver	ScreenSaver		Включити Заставку
-Fade now when	ScreenSaver		Зникнути зараз коли
-Fade	ScreenSaver		Зникнення
-Passwords don't match. Please try again.	ScreenSaver		Пароль не збігаєтся. Будь ласка, спробуйте ще раз.
-OK	ScreenSaver		Гаразд
-Don't fade when	ScreenSaver		Не зникати коли
 Blackness	ScreenSaver		Чорнота
-Use custom password	ScreenSaver		Використовувати пароль користувача
-Done	ScreenSaver		Готово
+Cancel	ScreenSaver		Відмінити
 Confirm password:	ScreenSaver		Підтвердіть пароль:
+Could not load screen saver	ScreenSaver		Не вдалося загрузити заставку
+Don't fade when	ScreenSaver		Не зникати коли
+Done	ScreenSaver		Готово
+Fade	ScreenSaver		Зникнення
+Fade now when	ScreenSaver		Зникнути зараз коли
+Module settings	ScreenSaver		Налаштування модуля
+Modules	ScreenSaver		Модулі
+No options available	ScreenSaver		Опції недоступні
+OK	ScreenSaver		Гаразд
+Password Window	ScreenSaver		Вікно паролю
+Password lock	ScreenSaver		Використати пароль
+Password:	ScreenSaver		Пароль:
+Passwords don't match. Please try again.	ScreenSaver		Пароль не збігаєтся. Будь ласка, спробуйте ще раз.
+Run module	ScreenSaver		Запущений модуль
+ScreenSaver	ScreenSaver		Заставка
+Test	ScreenSaver		Тест
+Turn off screen	ScreenSaver		Вимкнути екран
+Use custom password	ScreenSaver		Використовувати пароль користувача
 Use network password	ScreenSaver		Використовувати мережевий пароль
+mouse is here	ScreenSaver		мишка тут

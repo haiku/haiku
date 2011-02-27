@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-ProcessController	3132000506
+1	russian	x-vnd.Haiku-ProcessController	4170016227
 %.1f MB	ProcessController		%.1f Мбайт
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
 About	ProcessController		about
@@ -7,8 +7,6 @@ Cancel	ProcessController		Отмена
 Damned!	ProcessController		Проклятье!
 Debug this thread!	ProcessController		Отладить этот поток!
 Debug thread	ProcessController		Отладить поток
-Do you really want to kill the team \"%s\"?	ProcessController		Вы действительно хотите убить приложение \"%s\"?
-
 Error saving file	ProcessController		Ошибка при сохранении файла
 Global Popup	ProcessController		Global Popup
 Install in Deskbar	ProcessController		Установить в Deskbar
@@ -34,9 +32,5 @@ This team is already gone…	ProcessController		Этого приложения 
 This thread is already gone…	ProcessController		Этого потока уже не существует…
 Threads and CPU usage	ProcessController		Потоки и загрузка ЦПУ
 Usage: %s [-deskbar]\n	ProcessController		Использование: %s [-deskbar]\n
-What do you want to do with the thread \"%s\"?	ProcessController		Что вы хотите сделать с потоком \"%s\"?
-
-Yes, kill this team!	ProcessController		Да, убуить это приложение!
-You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Вы можете запустить контроллер процессов в окне или установить его в Deskbar.
-
+Yes, kill this team!	ProcessController		Да, убить это приложение!
 Your setting file could not be saved!\n(%s)	ProcessController		Невозможно сохранить настройки!\n(%s)

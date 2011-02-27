@@ -1,14 +1,14 @@
 1	ukrainian	x-vnd.Haiku-Keyboard	914649575
-Keyboard	KeyboardWindow		Клавіатура
-Written by Andrew Edward McCall	KeyboardApplication		Автор Andrew Edward McCall
-Typing test area	KeyboardView		Зона перевірки писання
 Defaults	KeyboardWindow		По замовчуванню
-Key repeat rate	KeyboardView		Швидкість повтору клавіші
-Revert	KeyboardWindow		Повернути
 Delay until key repeat	KeyboardView		Затримка при повторі
-OK	KeyboardApplication		Гаразд
 Fast	KeyboardView		Швидко
+Key repeat rate	KeyboardView		Швидкість повтору клавіші
+Keyboard	KeyboardWindow		Клавіатура
+Long	KeyboardView		Довго
+OK	KeyboardApplication		Гаразд
+Revert	KeyboardWindow		Повернути
+Short	KeyboardView		Коротко
 Slow	KeyboardView		Повільно
 Something has gone wrong!	KeyboardApplication		Щось не вийшло!
-Long	KeyboardView		Довго
-Short	KeyboardView		Коротко
+Typing test area	KeyboardView		Зона перевірки писання
+Written by Andrew Edward McCall	KeyboardApplication		Автор Andrew Edward McCall

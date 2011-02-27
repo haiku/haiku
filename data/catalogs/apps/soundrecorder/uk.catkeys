@@ -1,38 +1,28 @@
-1	ukrainian	x-vnd.Haiku-SoundRecorder	1355572422
-Loop	RecorderWindow		Петля
-Cannot find default audio hardware	RecorderWindow		Неможливо знайти аудіо пристрій по замовчуванню 
-Cannot find the temporary file created to hold the new recording	RecorderWindow		Неможливо знайти тимчасовий файл створений для збереження нового запису
-Sample size: 	RecorderWindow		Розмір зразка:
-Nothing to play	RecorderWindow		Нічого для відтворення
-Duration:	RecorderWindow		Тривалість:
-Some of the files don't appear to be audio files	RecorderWindow		Деякі з файлів виявилися не звуковими
-File info	RecorderWindow		Інфо про файл
-Drop files here	SoundListView		Киньте файли сюди
-Input	RecorderWindow		Вхід
-Stop	RecorderWindow		Зупинити
-SoundRecorder	RecorderWindow		SoundRecorder
-Format: 	RecorderWindow		Format:
-Sound List	RecorderWindow		Звуколист
-Compression:	RecorderWindow		Компресія:
-Rewind	RecorderWindow		Перемотка
-Sample rate: 	RecorderWindow		Темп зразка:
-Invalid audio files	RecorderWindow		Неправильні аудіо файли
-seconds	RecorderWindow		сек.
-OK	RecorderWindow		Гаразд
-Cannot open the temporary file created to hold the new recording	RecorderWindow		Неможливо відкрити тимчасовий файл створений для збереження нового запису
-None of the files appear to be audio files	RecorderWindow		Жодних файлів, які могли би бути аудіо
-Input:	RecorderWindow		Вхід:
-Forward	RecorderWindow		Вперед
-Play	RecorderWindow		Відтворити
-Channels: 	RecorderWindow		Канали:
-bits	RecorderWindow		бітів
-None	RecorderWindow		Жоден
-Record	RecorderWindow		Записати
-Cannot recognize this file as a media file	RecorderWindow		Неможливо розпізнати файл як медіа
-File name:	RecorderWindow		І'мя файла:
-Cannot connect to the selected sound input	RecorderWindow		Неможливо під'єднати вибраний аудіо вхід
-Cannot get the file to play	RecorderWindow		Неможливо отримати файл для відтворення
-Cannot record a sound that long	RecorderWindow		Неможливо записати довший звук
-Cannot find an unused name to use for the new recording	RecorderWindow		Неможливо знайти невикористане і'мя для проведення нового запису
-Save	RecorderWindow		Зберегти
+1	ukrainian	x-vnd.Haiku-SoundRecorder	3852484968
 Cannot connect to media server	RecorderWindow		Неможливо під'єднати медіа сервер
+Cannot connect to the selected sound input	RecorderWindow		Неможливо під'єднати вибраний аудіо вхід
+Cannot find an unused name to use for the new recording	RecorderWindow		Неможливо знайти невикористане і'мя для проведення нового запису
+Cannot find the temporary file created to hold the new recording	RecorderWindow		Неможливо знайти тимчасовий файл створений для збереження нового запису
+Cannot get the file to play	RecorderWindow		Неможливо отримати файл для відтворення
+Cannot open the temporary file created to hold the new recording	RecorderWindow		Неможливо відкрити тимчасовий файл створений для збереження нового запису
+Cannot recognize this file as a media file	RecorderWindow		Неможливо розпізнати файл як медіа
+Cannot record a sound that long	RecorderWindow		Неможливо записати довший звук
+Drop files here	SoundListView		Киньте файли сюди
+File info	RecorderWindow		Інфо про файл
+Forward	RecorderWindow		Вперед
+Input	RecorderWindow		Вхід
+Invalid audio files	RecorderWindow		Неправильні аудіо файли
+Loop	RecorderWindow		Петля
+None	RecorderWindow		Жоден
+None of the files appear to be audio files	RecorderWindow		Жодних файлів, які могли би бути аудіо
+Nothing to play	RecorderWindow		Нічого для відтворення
+OK	RecorderWindow		Гаразд
+Play	RecorderWindow		Відтворити
+Record	RecorderWindow		Записати
+Rewind	RecorderWindow		Перемотка
+Sample size: 	RecorderWindow		Розмір зразка:
+Save	RecorderWindow		Зберегти
+Some of the files don't appear to be audio files	RecorderWindow		Деякі з файлів виявилися не звуковими
+Sound List	RecorderWindow		Звуколист
+SoundRecorder	RecorderWindow		SoundRecorder
+Stop	RecorderWindow		Зупинити

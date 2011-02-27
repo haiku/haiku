@@ -1,43 +1,39 @@
-1	ukrainian	x-vnd.Be-PRNT	1563474157
-Waiting	JobListView		Очікування
-page	JobListView		стор.
-Cancel	AddPrinterDialog		Відмінити
-Add printer	AddPrinterDialog		Додати принтер
-Printers	PrintersWindow		Принтери
-Default Printer	PrinterListView		Принтер по замовчуванню
-No pending jobs.	PrinterListView		Немає черги завдань.
-pages	JobListView		Стор.
-Processing	JobListView		Виконання
-Printer name:	AddPrinterDialog		Ім'я принтера:
-pending jobs.	PrinterListView		черга завдань.
-Restart job	PrintersWindow		Перезапустити завдання
-Add	AddPrinterDialog		Додати
-Make default	PrintersWindow		Зробити по замовчуванню
-Cancel job	PrintersWindow		Відмінити завдання
-1 pending job.	PrinterListView		1 завдання в черзі.
-Remove	PrintersWindow		Видалити
-<pick one>	AddPrinterDialog		<виберіть>
-Add …	PrintersWindow		Додати …
-Print jobs for 	PrintersWindow		Завдання на друк для
-Failed	JobListView		Призупинено
+1	ukrainian	x-vnd.Be-PRNT	3684149067
 %.2f KB	JobListView		%.2f KB
+1 pending job.	PrinterListView		1 завдання в черзі.
+<pick one>	AddPrinterDialog		<виберіть>
+Add	AddPrinterDialog		Додати
+Add printer	AddPrinterDialog		Додати принтер
+Add …	PrintersWindow		Додати …
+Black	TestPageView		Чорний
+Blue	TestPageView		Синій
+Cancel	AddPrinterDialog		Відмінити
+Cancel job	PrintersWindow		Відмінити завдання
 Completed	JobListView		Завершено
+Connected to:	AddPrinterDialog		Підключений до:
+Cyan	TestPageView		Голубий
+Default Printer	PrinterListView		Принтер по замовчуванню
+Driver: %driver%	PrinterListView		Драйвер: %driver%
+Failed	JobListView		Призупинено
+Green	TestPageView		Зелений
+Magenta	TestPageView		Магента
+Make default	PrintersWindow		Зробити по замовчуванню
+No pending jobs.	PrinterListView		Немає черги завдань.
 No printer found!	TransportMenu		Принтера не знайдено!
 Print jobs: No printer selected	PrintersWindow		Завдання на друк: Принтера не знайдено
-Unknown status	JobListView		Стан невідомий
-Connected to:	AddPrinterDialog		Підключений до:
+Printer name:	AddPrinterDialog		Ім'я принтера:
 Printer type:	AddPrinterDialog		Тип принтера:
-Transport: %transport% %transport_address%	PrinterListView		Транспорт: %transport% %transport_address%
-Driver: %driver%	PrinterListView		Драйвер: %driver%
-Print test page	PrintersWindow		Друк пробної  сторінки
-Test Page	PrintersWindow			Пробна сторінка
-Transport: %transport% %transport_address%	TestPageView		Транспорт: %transport% %transport_address%
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Принтер: %printer_name%\nДрайвер: %driver%\n
-Test Page	TestPageView		Пробна сторінка
-Green	TestPageView		Зелений
+Printers	PrintersWindow		Принтери
+Processing	JobListView		Виконання
 Red	TestPageView		Червоний
-Black	TestPageView		Чорний
+Remove	PrintersWindow		Видалити
+Restart job	PrintersWindow		Перезапустити завдання
+Test Page	TestPageView		Пробна сторінка
+Transport: %transport% %transport_address%	PrinterListView		Транспорт: %transport% %transport_address%
+Transport: %transport% %transport_address%	TestPageView		Транспорт: %transport% %transport_address%
+Unknown status	JobListView		Стан невідомий
+Waiting	JobListView		Очікування
 Yellow	TestPageView		Жовтий
-Blue	TestPageView		Синій
-Magenta	TestPageView		Магента
-Cyan	TestPageView		Циан
+page	JobListView		стор.
+pages	JobListView		Стор.

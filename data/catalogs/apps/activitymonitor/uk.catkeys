@@ -1,42 +1,39 @@
-1	ukrainian	x-vnd.Haiku-ActivityMonitor	657126014
-P-faults	DataSource		Р-помилки
-Media nodes	DataSource		Мультимедійні вузли
-Raw clipboard size	DataSource		Розмір буфера обміну
-Threads	DataSource		Потоки
-Add graph	ActivityWindow		Додати графік
-Teams	DataSource		Команди
-Hide legend	ActivityView		Сховати легенду
-Network send	DataSource		Відправлено по мережі
-CPU usage (combined)	DataSource		Використання СPU (загальне)
-CPU	DataSource		CPU
-Used memory	DataSource		Використана пам'ять
-Cached memory	DataSource		Кешована  пам'ять
-Apps	DataSource		Додатки
-Show legend	ActivityView		Показати легенду
-Settings	ActivityWindow		Налаштування
-Receiving	DataSource		Отримання
-Settings…	ActivityWindow		Налаштування…
-Ports	DataSource		Порти
-Page faults	DataSource		Помилки на сторінці
-Text clipboard size	DataSource		Розмір тексту в буфері обміну
-Sending	DataSource		Відправка
-Cache	DataSource		Кеш
+1	ukrainian	x-vnd.Haiku-ActivityMonitor	4064332933
 About ActivityMonitor…	ActivityWindow		Про ActivityMonitor…
-TX	DataSource		TX
-Update time interval:	SettingsWindow		Інтервал часу поновлення:
-Quit	ActivityWindow		Вийти
+ActivityMonitor	ActivityWindow		ActivityMonitor
+Add graph	ActivityWindow		Додати графік
+Additional items	ActivityView		Додаткові елементи
+Apps	DataSource		Додатки
+Block cache	DataSource		Кеш блоку
 Block cache memory	DataSource		Блок кеш пам'яті
+CPU	DataSource		CPU
+CPU usage (combined)	DataSource		Використання СPU (загальне)
+Cache	DataSource		Кеш
+Cached memory	DataSource		Кешована  пам'ять
+File	ActivityWindow		Файл
+Hide legend	ActivityView		Сховати легенду
+Media nodes	DataSource		Мультимедійні вузли
+Memory	DataSource		Пам'ять
+Network receive	DataSource		Отримано по мережі
+Network send	DataSource		Відправлено по мережі
+P-faults	DataSource		Р-помилки
+Page faults	DataSource		Помилки на сторінці
+Ports	DataSource		Порти
+Quit	ActivityWindow		Вийти
+Raw clipboard size	DataSource		Розмір буфера обміну
+Receiving	DataSource		Отримання
 Remove graph	ActivityView		Видалити графік
-RX	DataSource		RX
-CPU usage	DataSource		Використання CPU 
-Sems	DataSource		Сімс
 Running applications	DataSource		Запущені додатки
 Semaphores	DataSource		Семафори
-Block cache	DataSource		Кеш блоку
-Swap space	DataSource		Розмір підкачки
+Sems	DataSource		Сімс
+Sending	DataSource		Відправка
+Settings	ActivityWindow		Налаштування
+Settings…	ActivityWindow		Налаштування…
+Show legend	ActivityView		Показати легенду
 Swap	DataSource		Підкачка
-File	ActivityWindow		Файл
-Additional items	ActivityView		Додаткові елементи
-Network receive	DataSource		Отримано по мережі
-Memory	DataSource		Пам'ять
-ActivityMonitor	ActivityWindow		ActivityMonitor
+Swap space	DataSource		Розмір підкачки
+Teams	DataSource		Команди
+Text clipboard size	DataSource		Розмір тексту в буфері обміну
+Threads	DataSource		Потоки
+Update time interval:	SettingsWindow		Інтервал часу поновлення:
+Used memory	DataSource		Використана пам'ять

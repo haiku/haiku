@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku.CodyCam	3318183214
+1	russian	x-vnd.Haiku.CodyCam	365143083
 About CodyCam	CodyCam		О программе
 About Codycam…	CodyCam		О программе…
 Can't find an available connection to the video window	CodyCam		Не удалось обнаружить доступного соединения с видео окном
@@ -20,8 +20,6 @@ Capture controls	CodyCam		Управление захватом
 Capturing Image…	VideoConsumer.cpp		Захват изображения…
 Close	CodyCam		Закрыть
 Closing the window\n	VideoConsumer.cpp		Закрытие окна\n
-CodyCam	CodyCam		CodyCam
-CodyCam	CodyCam		Камера
 CodyCam\n\nThe Original BeOS webcam	CodyCam		CodyCam\n\nТа самая веб-камера из BeOS
 Connected…	VideoConsumer.cpp		Подключен…
 Couldn't find requested directory on server	VideoConsumer.cpp		Невозможно найти запрашиваемый каталог на сервере

@@ -1,35 +1,33 @@
-1	ukrainian	x-vnd.Haiku.TextSearch	3449010850
-%s: Not enough room to escape the filename.	Grepper		%s: Недостатньо місця для відміни імені файлу
-Trim to selection	GrepWindow		Обрізати для вибору
-Follow symbolic links	GrepWindow		Дотримуйтесь символічних посилань
-Close	GrepWindow		Закрити
+1	ukrainian	x-vnd.Haiku.TextSearch	2849441576
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME невдалося відкрити одну або більше директорій.
+%s: There was a problem running grep.	Grepper		%s: проблема запуску grep.
+About TextSearch…	GrepWindow		Про TextSearch…
+Actions	GrepWindow		Дії
 Cancel	GrepWindow		Відмінити
-The unselected files will be removed from the list.	GrepWindow		Не вибрані файли будуть вилучені зі списку.
-Please select the files you wish to have selected for you in Tracker.	GrepWindow		Виберіть файли які Ви маєте виділити у Tracker.
-Open files in Pe	GrepWindow		Відкрити файл у Pe
+Case-sensitive	GrepWindow		З урахуванням регістру
+Close	GrepWindow		Закрити
 Copy text to clipboard	GrepWindow		Копіювати текст до буферу обміну
 Created by Matthijs Hollemans.\n\nContributed to by Peter Hinely, Serge Fantino, Hideki Naito, Oscar Lesta, Oliver Tappe, Jonas Sundström, Luc Schrijvers and momoziro.\n	GrepWindow		Автор Matthijs Hollemans.\n\n Брали участь Peter Hinely, Serge Fantino, Hideki Naito, Oscar Lesta, Oliver Tappe, Jonas Sundström, Luc Schrijvers і momoziro.\n
-Settings	GrepWindow		Налаштування
-Select all	GrepWindow		Вибрати все
-OK	GrepWindow		Гаразд
-%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME невдалося відкрити одну або більше директорій.
-Escape search text	GrepWindow		Відмінити пошук туксту
-Search	GrepWindow		Пошук
-Open selection	GrepWindow		Відкрити вибране
-Look in sub-folders	GrepWindow		Дивитися в підпапках
-Actions	GrepWindow		Дії
-File	GrepWindow		Файл
 Encoding	GrepWindow		Кодування
+Escape search text	GrepWindow		Відмінити пошук туксту
+File	GrepWindow		Файл
+Follow symbolic links	GrepWindow		Дотримуйтесь символічних посилань
 History	GrepWindow		Історія
-%s: There was a problem running grep.	Grepper		%s: проблема запуску grep.
+Look in sub-folders	GrepWindow		Дивитися в підпапках
 New window	GrepWindow		Нове вікно
+OK	GrepWindow		Гаразд
+Open files in Pe	GrepWindow		Відкрити файл у Pe
+Open selection	GrepWindow		Відкрити вибране
+Please select the files you wish to have selected for you in Tracker.	GrepWindow		Виберіть файли які Ви маєте виділити у Tracker.
 Please select the files you wish to keep searching.	GrepWindow		Будь ласка виберіть файли які ви хочете продовжувати шукати.
-TextSearch	GrepWindow		Пошук тексту
 Quit	GrepWindow		Вийти
+Search	GrepWindow		Пошук
+Select all	GrepWindow		Вибрати все
+Settings	GrepWindow		Налаштування
 Show files in Tracker	GrepWindow		Показати файл у Tracker
-About TextSearch…	GrepWindow		Про TextSearch…
-Case-sensitive	GrepWindow		З урахуванням регістру
-Text files only	GrepWindow		Тільки текстові файли
 Show lines	GrepWindow		Показати лінії
-Set target…	GrepWindow		Встановити ціль...
 Skip folders starting with a dot	GrepWindow		Пропустити папки, що починаються з точки
+Text files only	GrepWindow		Тільки текстові файли
+TextSearch	GrepWindow		Пошук тексту
+The unselected files will be removed from the list.	GrepWindow		Не вибрані файли будуть вилучені зі списку.
+Trim to selection	GrepWindow		Обрізати для вибору

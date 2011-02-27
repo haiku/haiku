@@ -1,134 +1,151 @@
-1	ukrainian	x-vnd.Haiku-FileTypes	525617155
-Args only	Application Type Window		Тільки аргументи
-Add group	New File Type Window		Додати групу
-Remove	Application Type Window		Видалити
-Select same type as	FileType Window		Вибрати такий самий тип як
-Remove icon	Icon View		Видалити іконку
-Supported types	Application Type Window		Типи, що підтримуються
-Internal name:	New File Type Window		Внутрішнє і'мя:
-New file type	New File Type Window		Новий тип файлу
-Add icon…	Icon View		Додати іконку…
-Do you want to save the changes?	Application Type Window		Бажаєте зберегти зміни?
-File type	FileType Window		Тип файлу
-Could not change attributes	Attribute Window		Неможливо змінити атрибути
-OK	FileTypes		Гаразд
-Save	Application Type Window		Зберегти
-Add	Extension Window		Додати
-Select same preferred application as	FileType Window		Вибрати за бажаний додаток
-Cancel	Attribute Window		Відмінити
-Multiple launch	Application Type Window		Складний запуск
-Group:	New File Type Window		Група:
-Done	Extension Window		Виконано
-Could not open file	FileType Window		Неможливо відкрити файл
-Preferred application	FileType Window		Бажаний додаток
-Same as…	FileType Window		Такий самий як…
-File	Application Type Window		Файл
-Version:	Application Type Window		Версія:
-FileTypes request	FileTypes		Запит FileTypes
-Select…	FileType Window		Вибрати…
-Development	Application Type Window		Розробка
-Icon	FileType Window		Іконка
-Special:	Attribute Window		Особливий:
-Alpha	Application Type Window		Альфа
-Signature:	Application Type Window		Підпис
-Quit, don't save	Application Type Window		Вийти без збереження
-Add…	Application Type Window		Додати…
-Select preferred application	FileType Window		Вибрати бажаний додаток
-Single launch	Application Type Window		Простий запуск
-The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Додаток  \"%s\" Не підтримує цей тип файлу.\nВи дійсно бажаєте встановити його?
-Type:	Attribute Window		Тип:
-Done	Attribute Window		Виконано
-Set Preferred Application	Preferred App Menu		Встановити бажаний додаток
-Background app	Application Type Window		Додаток Тло  
-Add new group	New File Type Window		Додати нову групу
-Cancel	Application Type Window		Відмінити
-Cancel	New File Type Window		Відмінити
-Extension:	Extension Window		Розширення:
-Add	Attribute Window		Додати
-Close	Application Type Window		Закрити
-Golden master	Application Type Window		Золотий майстер
-Could not open \"%s\":\n%s	FileTypes		Неможливо відкрити \"%s\":\n%s
-Alignment:	Attribute Window		Вирівнювання:
-Cancel	Extension Window		Відмінити
-Application flags	Application Type Window		Флаги додатку
-Editable	Attribute Window	If Tracker allows to edit this attribute.	Редагований
-Width:	Attribute Window	Default column width in Tracker for this attribute.	Ширина:
-Save request	Application Type Window		Зберегти запит
-Beta	Application Type Window		Бета
-Attribute name:	Attribute Window		Ім'я атрибута:
-Extension	Extension Window		Розширення
-Add type	New File Type Window		Додати тип
-Internal name:	Attribute Window		Внутрішнє ім'я:
-Final	Application Type Window		Фінал
-Open file	FileTypes		Відкрити файл
-Exclusive launch	Application Type Window		Виключний запуск
-Gamma	Application Type Window		Гамма
-Default application	FileType Window		Додаток по замовчуванню
-Long description:	Application Type Window		Довгий опис:
-Version info	Application Type Window		інформація про версію
-Center	Attribute Window	Attribute column alignment in Tracker	Центр
-Short description:	Application Type Window		Короткий опис:
-File could not be opened	Preferred App Menu		Файл неможливо відкрити
-Could not change file extensions	Extension Window		Неможливо змінити розширення файлу
-Edit icon…	Icon View		Редагування іконки…
-Save into resource file…	Application Type Window		Зберегти інформацію про джерело файлу…
-Left	Attribute Window	Attribute column alignment in Tracker	Вліво
-Visible	Attribute Window		Видимий
-Could not install file type	New File Type Window		Неможливо встановити тип файлу
-Application type	Application Type Window		Тип додатку
-Application types…	FileTypes Window		Типи додатків...
-Recognition rule is not valid:\n\n	FileTypes Window		Правило розпізнання недоступне:\n\n
-Show icons in list	FileTypes Window		Показати іконки в списку
-Type name:	FileTypes Window		І'мя типу:
-About FileTypes…	FileTypes Window		Про FileTypes…
-Choose type	Type List Window		Вибрати тип
-Rule:	FileTypes Window		Правило:
-Multiple files from \"%s\" file type	FileType Window		Багаточисельні файли з\"%s\" типу файлу
-Could not retrieve preferred application of this file	Preferred App Menu		Неможливо виправити бажаний додаток для цього файлу
-Extensions:	FileTypes Window		Розширення:
-Select same preferred application as	FileTypes Window		Вибрати такий самий бажаний додаток як 
-Could not retrieve application signature	Preferred App Menu		Неможливо виправити підпис додатку
-Icon	Application Type Window		Іконка
-Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Видалення типу файлу незворотнє.\nВи впевнені , що бажаєте видалити його?
-(from application)	FileTypes Window		(з додатку)
-Could not set preferred application	FileTypes Window		Неможливо встановити бажаного додатку
-Done	Type List Window		Виконано
-Show recognition rule	FileTypes Window		Показати правило розпізнавання
-FileTypes request	Preferred App Menu		Запит FileTypes 
-Description:	FileTypes Window		Опис:
-File	FileTypes Window		Файл
-Select…	FileTypes Window		Вибрати...
-FileTypes	FileTypes Window		FileTypes
-Open…	FileTypes Window		Відкрити...
-FileTypes	FileTypes		 FileTypes
-Extra attributes	FileTypes Window		Суператрибути
-\twritten by Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n	FileTypes		\tАвтор Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n
-Add…	FileTypes Window		Додати...
-[Multiple files] file types	FileType Window		[Множинні файли] типи файлів
-Quit	FileTypes Window		Вийти
-%s file type	FileType Window		%s тип файлу
-no icon	FileTypes Window		іконка відсутня
-Settings	FileTypes Window		Налаштування
-New resource file…	FileTypes Window		Новий файл ресурсів…
-Icon	FileTypes Window		Іконка
-Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Видалення головного типу незоротнє.\nВсі типи файлів що відносяться до нього будуть втрачені!\n\nВи впевнені , що бажаєте цього? Для видалення цілої групи утримуючи клавішу Shift натисніть \"Remove (Видалити)\".
-Internal name:	FileTypes Window		Внутрішнє ім'я:
-File recognition	FileTypes Window		Розпізнання файлу
-Cancel	Type List Window		Відмінити
-Description	FileTypes Window		Опис
-None	FileTypes Window		Немає
-Remove	FileTypes Window		Видалити
-This file type already exists	New File Type Window		Тип файлу повністю присутній
-Same as…	FileTypes Window		Такий як ...
-Could not remove file type: %s\n	FileTypes Window		Неможливо видалити тип файлу: %s\n
-Cancel	Preferred App Menu		Відмінити
-Cancel	FileTypes Window		Відмінити
-Select preferred application	FileTypes Window		Вибрати бажаний додаток
-FileTypes request	FileTypes Window		Запит FileTypes 
-(from super type)	FileTypes Window		(для головного типу)
-Preferred application	FileTypes Window		Бажаний додаток
-Attribute	Attribute Window		Атрибут
-Group name:	New File Type Window		Ім'я групи
-Display as:	Attribute Window	Tracker offers different display modes for attributes.	Показати як:                                                    
-Right	Attribute Window	Attribute column alignment in Tracker	Вправо
+1	ukrainian	x-vnd.Haiku-FileTypes	985630426
 %1 application type	Application Type Window		%1 тип додатку
+%ld Application type%s could be removed.	Application Types Window		%ld Додаток type%s Неможливо видалити.
+%s file type	FileType Window		%s тип файлу
+(from application)	FileTypes Window		(з додатку)
+(from super type)	FileTypes Window		(для головного типу)
+Abort	Application Types Window		Відмінити
+About FileTypes…	FileTypes Window		Про Типи Файлів…
+Add	Attribute Window		Додати
+Add	Extension Window		Додати
+Add group	New File Type Window		Додати групу
+Add icon…	Icon View		Додати іконку…
+Add new group	New File Type Window		Додати нову групу
+Add type	New File Type Window		Додати тип
+Add…	Application Type Window		Додати…
+Alignment:	Attribute Window		Вирівнювання:
+Alpha	Application Type Window		Альфа
+Alpha	Application Types Window		Aльфа
+Application flags	Application Type Window		Флаги додатку
+Application type	Application Type Window		Тип додатку
+Application types	Application Types Window		Типи додатків
+Args only	Application Type Window		Тільки аргументи
+Attribute	Attribute Window		Атрибут
+Attribute name:	Attribute Window		Ім'я атрибута:
+Beta	Application Type Window		Бета
+Beta	Application Types Window		Бета
+Cancel	Application Type Window		Відмінити
+Cancel	Attribute Window		Відмінити
+Cancel	Extension Window		Відмінити
+Cancel	FileTypes Window		Відмінити
+Cancel	New File Type Window		Відмінити
+Cancel	Preferred App Menu		Відмінити
+Cancel	Type List Window		Відмінити
+Center	Attribute Window	Attribute column alignment in Tracker	Центр
+Choose type	Type List Window		Вибрати тип
+Close	Application Type Window		Закрити
+Could not change attributes	Attribute Window		Неможливо змінити атрибути
+Could not change file extensions	Extension Window		Неможливо змінити розширення файлу
+Could not install file type	New File Type Window		Неможливо встановити тип файлу
+Could not open \"%s\":\n%s	FileTypes		Неможливо відкрити \"%s\":\n%s
+Could not open file	FileType Window		Неможливо відкрити файл
+Could not remove file type: %s\n	FileTypes Window		Неможливо видалити тип файлу: %s\n
+Could not retrieve application signature	Preferred App Menu		Неможливо виправити підпис додатку
+Could not retrieve preferred application of this file	Preferred App Menu		Неможливо виправити бажаний додаток для цього файлу
+Could not set preferred application	FileTypes Window		Неможливо встановити бажаного додатку
+Default application	FileType Window		Додаток по замовчуванню
+Description	FileTypes Window		Опис
+Description:	Application Types Window		Опис:
+Description:	FileTypes Window		Опис:
+Development	Application Type Window		Розробка
+Development	Application Types Window		Розробка
+Display as:	Attribute Window	Tracker offers different display modes for attributes.	Показати як:                                                    
+Do you want to save the changes?	Application Type Window		Бажаєте зберегти зміни?
+Done	Attribute Window		Виконано
+Done	Extension Window		Виконано
+Done	Type List Window		Виконано
+Edit icon…	Icon View		Редагування іконки…
+Editable	Attribute Window	If Tracker allows to edit this attribute.	Що піддається редагуванню
+Edit…	Application Types Window		Редагувати…
+Exclusive launch	Application Type Window		Виключний запуск
+Extension	Extension Window		Розширення
+Extension:	Extension Window		Розширення:
+Extensions:	FileTypes Window		Розширення:
+Extra attributes	FileTypes Window		Суператрибути
+File	Application Type Window		Файл
+File	FileTypes Window		Файл
+File could not be opened	Preferred App Menu		Файл неможливо відкрити
+File recognition	FileTypes Window		Розпізнання файлу
+File type	FileType Window		Тип файлу
+FileTypes	FileTypes		Типи Файлів
+FileTypes	FileTypes Window		Типи Файлів
+FileTypes request	FileTypes		Запит Типів Файлів
+FileTypes request	FileTypes Window		Запит Типів Файлів 
+FileTypes request	Preferred App Menu		Запит Типів Файлів 
+Final	Application Type Window		Завершення
+Final	Application Types Window		Завершення
+Gamma	Application Type Window		Гамма
+Gamma	Application Types Window		Гамма
+Golden master	Application Type Window		Золотий майстер
+Golden master	Application Types Window		Золотий майстер
+Group name:	New File Type Window		Ім'я групи
+Group:	New File Type Window		Група:
+Icon	Application Type Window		Іконка
+Icon	FileType Window		Іконка
+Icon	FileTypes Window		Іконка
+Information	Application Types Window		Інформація
+Internal name:	Attribute Window		Внутрішнє ім'я:
+Internal name:	FileTypes Window		Внутрішнє ім'я:
+Internal name:	New File Type Window		Внутрішнє і'мя:
+Launch	Application Types Window		Запустити
+Left	Attribute Window	Attribute column alignment in Tracker	Вліво
+Long description:	Application Type Window		Довгий опис:
+Move down	FileTypes Window		Перемістити вниз
+Move up	FileTypes Window		Перемістити вверх
+Multiple files from \"%s\" file type	FileType Window		Багаточисельні файли з\"%s\" типу файлу
+Multiple launch	Application Type Window		Складний запуск
+Name:	Application Types Window		Ім'я:
+New file type	New File Type Window		Новий тип файлу
+New resource file…	FileTypes Window		Новий файл ресурсів…
+None	FileTypes Window		Немає
+OK	FileTypes		Гаразд
+Open file	FileTypes		Відкрити файл
+Path:	Application Types Window		Шлях:
+Preferred application	FileType Window		Бажаний додаток
+Preferred application	FileTypes Window		Бажаний додаток
+Progress	Application Types Window		Хід
+Quit	FileTypes Window		Вийти
+Quit, don't save	Application Type Window		Вийти без збереження
+Recognition rule is not valid:\n\n	FileTypes Window		Правило розпізнання недоступне:\n\n
+Remove	Application Type Window		Видалити
+Remove	FileTypes Window		Видалити
+Remove icon	Icon View		Видалити іконку
+Remove uninstalled	Application Types Window		Видалити невстановлені
+Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Видалення типу файлу незворотнє.\nВи впевнені , що бажаєте видалити його?
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Видалення головного типу незоротнє.\nВсі типи файлів що відносяться до нього будуть втрачені!\n\nВи впевнені , що бажаєте цього? Для видалення цілої групи утримуючи клавішу Shift натисніть \"Remove (Видалити)\".
+Removing uninstalled application types	Application Types Window		Видалення типів для невстановлених додатків
+Right	Attribute Window	Attribute column alignment in Tracker	Вправо
+Rule:	FileTypes Window		Правило:
+Save	Application Type Window		Зберегти
+Save into resource file…	Application Type Window		Зберегти інформацію про джерело файлу…
+Save request	Application Type Window		Зберегти запит
+Select preferred application	FileType Window		Вибрати бажаний додаток
+Select preferred application	FileTypes Window		Вибрати бажаний додаток
+Select same preferred application as	FileType Window		Вибрати за бажаний додаток
+Select same preferred application as	FileTypes Window		Вибрати такий самий бажаний додаток як 
+Select same type as	FileType Window		Вибрати такий самий тип як
+Select…	FileType Window		Вибрати…
+Set Preferred Application	Preferred App Menu		Встановити бажаний додаток
+Settings	FileTypes Window		Налаштування
+Short description:	Application Type Window		Короткий опис:
+Show icons in list	FileTypes Window		Показати іконки в списку
+Show in Tracker…	Application Types Window		Показати в Tracker…
+Show recognition rule	FileTypes Window		Показати правило розпізнавання
+Signature:	Application Type Window		Підпис
+Signature:	Application Types Window		Підпис:
+Single launch	Application Type Window		Простий запуск
+Special:	Attribute Window		Особливий:
+Supported types	Application Type Window		Типи, що підтримуються
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Додаток  \"%s\" Не підтримує цей тип файлу.\nВи дійсно бажаєте встановити його?
+This file type already exists	New File Type Window		Тип файлу повністю присутній
+Type name:	FileTypes Window		І'мя типу:
+Type:	Attribute Window		Тип:
+Version	Application Types Window		Версія
+Version info	Application Type Window		інформація про версію
+Version:	Application Type Window		Версія:
+Version:	Application Types Window		Версія:
+Visible	Attribute Window		Видимий
+Width:	Attribute Window	Default column width in Tracker for this attribute.	Ширина:
+[Multiple files] file types	FileType Window		[Множинні файли] типи файлів
+\twritten by Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n	FileTypes		\tАвтор Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n
+no icon	FileTypes Window		іконка відсутня

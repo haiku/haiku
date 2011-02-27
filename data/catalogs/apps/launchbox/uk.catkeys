@@ -1,35 +1,29 @@
-1	ukrainian	x-vnd.Haiku-LaunchBox	2991338515
-New	LaunchBox		Новий
-Set description…	LaunchBox		Встановити Опис...
-Vertical layout	LaunchBox		Вертикальне розташування
-OK	LaunchBox		Гаразд
-Pad 1	LaunchBox		Панель 1
-last chance	LaunchBox		остання спроба
-Quit	LaunchBox		Вийти
-Clear button	LaunchBox		Очистити кнопку
-Failed to launch application with signature '	LaunchBox		Не вдалося запустити додаток з підписом  '
+1	ukrainian	x-vnd.Haiku-LaunchBox	4255763202
 About	LaunchBox		Про
-Ignore double-click	LaunchBox		Ігнорувати подвійне натискання
+Add button here	LaunchBox		Додати кнопку тут
 Auto-raise	LaunchBox		Автоматичне спливання
-Show on all workspaces	LaunchBox		Показати на всіх робочих просторах
-Show window border	LaunchBox		Показувати межі вікна
-Pad 	LaunchBox		Панель
-Icon size	LaunchBox		Розмір Іконки
 Bummer	LaunchBox		Помилка
 Cancel	LaunchBox		Відміна
-Remove button	LaunchBox		Видалити кнопку
-Description for '	LaunchBox		 Описання для '
-Horizontal layout	LaunchBox		Горизонтальне розташування
-Name Panel	LaunchBox		Панель назви
-Add button here	LaunchBox		Додати кнопку тут
-Failed to launch '	LaunchBox		Запуск призупинено '
-Stephan Aßmus (aka stippi)	LaunchBox		Stephan Aßmus (ака stippi)
-Failed to launch 'something',error in Pad data.	LaunchBox		Невдалося запустити 'щось', помилка в даних  панелі.
-Close	LaunchBox		Закрити
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Призупинено команду для Tracker.\n\nПомилка:
-You can drag an icon here.	LaunchBox		Ви можете перемістити іконки сюди.
+Clear button	LaunchBox		Очистити кнопку
 Clone	LaunchBox		Клонувати
+Close	LaunchBox		Закрити
+Failed to launch 'something',error in Pad data.	LaunchBox		Невдалося запустити 'щось', помилка в даних  панелі.
+Horizontal layout	LaunchBox		Горизонтальне розташування
+Icon size	LaunchBox		Розмір Іконки
+Ignore double-click	LaunchBox		Ігнорувати подвійне натискання
 LaunchBox	LaunchBox		LaunchBox
-launch popup	LaunchBox		Увімкнути спливаючі повідомлення
+Name Panel	LaunchBox		Панель назви
+New	LaunchBox		Новий
+OK	LaunchBox		Гаразд
+Pad	LaunchBox		Панель 
+Pad 1	LaunchBox		Панель 1
+Quit	LaunchBox		Вийти
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Дійсно закрити цю панель?\n(Вона не збережеться.)
-'.\n\nError: 	LaunchBox		'.\n\nПомилка:
+Remove button	LaunchBox		Видалити кнопку
+Show on all workspaces	LaunchBox		Показати на всіх робочих просторах
+Show window border	LaunchBox		Показувати межі вікна
+Stephan Aßmus (aka stippi)	LaunchBox		Stephan Aßmus (ака stippi)
+Vertical layout	LaunchBox		Вертикальне розташування
+You can drag an icon here.	LaunchBox		Ви можете перемістити іконки сюди.
+last chance	LaunchBox		остання спроба
+launch popup	LaunchBox		Увімкнути спливаючі повідомлення

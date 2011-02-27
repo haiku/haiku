@@ -1,39 +1,30 @@
-1	ukrainian	x-vnd.Haiku-Media	1588474509
-Show volume control on Deskbar	Media views		Показати регулятор гучності в Deskbar
-Audio input:	Media views		Вхід звуку:
-Restarting media services\nStarting media server…\n	Media Window		Перезапустити\nЗапуск Медіа Сервера…\n
-Video input:	Media views		Вхід відео:
-Waiting for media_server to quit.	Media Window		Зачекайте  на вихід з Медіа Сервера.
-Defaults	Media views		По замовчуванню
-Stopping media server…	Media Window		Зупинка Медіа Сервера…
-Video output:	Media views		Вивід відео:
-Enable real-time audio	Media views		Режим реального часу для звуку
-Quit	Media Window		Вихід
-OK	Media Window		Гаразд
-Enabling real-time video allows system to perform video operations as fast and smoothly as possible.  It achieves optimum performance by using more RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Режим реального часу для відео дозволяє проводити операції максимально швидко і якісно як це можливо. Що досягається при використанні більшого об'єму пам'яті.\n\n
-Starting media server…	Media Window		Запуск Медіа Сервера…
-Restart the media server to apply changes.	Media views		Перезапустіть Медіа сервер для внесення змін.
-Done shutting down.	Media Window		Відбувається закриття.
-Cleaning up.	Media Window		Очистити.
-Telling media_addon_server to quit.	Media Window		Сказати медіасервер аддону про вихід.
-Enable real-time video	Media views		Режим реального часу для відео
-This hardware has no controls.	Media Window		Це залізо не регулюється.
-Restarting media services\nShutting down media server\n	Media Window		Перезапуск медіа сервісів\nЗакриття Медіа Сервера\n
-Audio output:	Media views		Вивід аудіо:
-Start media server	Media Window		Запуск Медіа Сервера
-Audio settings	Media Window		Настройки звуку
-Could not connect to the media server.\nWould you like to start it ?	Media Window		Медіа сервер не запущено\n Зробити це?\n
-Ready for use…	Media Window		Готовий для використання…
-Real-time	Media views		Реальний час
-Restart media services	Media views		Перезапустити медіа сервіси
-Enabling real-time audio allows system to record and play audio as fast as possible.  It achieves this performance by using more CPU and RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Режим реального часу дозволяє виконувати запис і відтворення максимально швидко. Це досягається за рахунок збільшення завантаження процесора і використання пам'яті\n\nВикористовуйте його тільки у випадку гострої необхідності.
-Media	Media Window		Медіа
-Channel:	Media views		Канал:
-Video settings	Media Window		Налаштування відео
-Audio mixer	Media Window		Аудіо міксер
+1	ukrainian	x-vnd.Haiku-Media	1701788906
 <none>	Media views		<немає>
+Audio input:	Media views		Вхід звуку:
+Audio mixer	Media Window		Аудіо міксер
+Audio output:	Media views		Вивід аудіо:
+Audio settings	Media Window		Настройки звуку
+Channel:	Media views		Канал:
+Cleaning up.	Media Window		Очистити.
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Медіа сервер не запущено\n Зробити це?\n
 Couldn't add volume control in Deskbar: %s\n	Media views		Неможливо додати регулятор гучності в Deskbar: %s\n
-OK	Media views		Гаразд
-Real-time audio is currently unimplemented in Haiku.	Media views		Звук реального часу надалі не реалізований в  Haiku.
 Couldn't remove volume control in Deskbar: %s\n	Media views		Неможливо видалити регулятор гучності з Deskbar: %s\n
-Real-time video is currently unimplemented in Haiku.	Media views		Відео реального часу надалі не зреалізовано в Haiku.
+Defaults	Media views		По замовчуванню
+Done shutting down.	Media Window		Відбувається закриття.
+Media	Media Window		Медіа
+OK	Media Window		Гаразд
+Quit	Media Window		Вихід
+Ready for use…	Media Window		Готовий для використання…
+Restart media services	Media views		Перезапустити медіа сервіси
+Restarting media services\nShutting down media server\n	Media Window		Перезапуск медіа сервісів\nЗакриття Медіа Сервера\n
+Restarting media services\nStarting media server…\n	Media Window		Перезапустити\nЗапуск Медіа Сервера…\n
+Show volume control on Deskbar	Media views		Показати регулятор гучності в Deskbar
+Start media server	Media Window		Запуск Медіа Сервера
+Starting media server…	Media Window		Запуск Медіа Сервера…
+Stopping media server…	Media Window		Зупинка Медіа Сервера…
+Telling media_addon_server to quit.	Media Window		Сказати медіасервер аддону про вихід.
+This hardware has no controls.	Media Window		Це залізо не регулюється.
+Video input:	Media views		Вхід відео:
+Video output:	Media views		Вивід відео:
+Video settings	Media Window		Налаштування відео
+Waiting for media_server to quit.	Media Window		Зачекайте  на вихід з Медіа Сервера.

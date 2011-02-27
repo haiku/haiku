@@ -1,21 +1,20 @@
-1	ukrainian	x-vnd.Haiku-Network	2440177840
-Gateway:	EthernetSettingsView		Шлюз:
-Netmask:	EthernetSettingsView		Маска:
-DHCP	EthernetSettingsView		DHCP
-DNS #2:	EthernetSettingsView		DNS #2:
-Apply	EthernetSettingsView		Застосовувати
-DNS #1:	EthernetSettingsView		DNS #1:
-Network	NetworkWindow		Мережа
-Adapter:	EthernetSettingsView		Адаптер:
-IP address:	EthernetSettingsView		IP адреса:
-Revert	EthernetSettingsView		Повернутися
-Mode:	EthernetSettingsView		Режим:
-The net_server needs to run for the auto configuration!	EthernetSettingsView		Net_server необхідно урухомити для автоматичної конфігурації!
-Auto-configuring failed: 	EthernetSettingsView		Автоматична настройка не вдалася:
-Static	EthernetSettingsView		Статичний
-OK	EthernetSettingsView		Гаразд
-Domain:	EthernetSettingsView		Домен:
-Disabled	EthernetSettingsView		Недоступний
-Choose automatically	EthernetSettingsView		Вибрати автоматично
+1	ukrainian	x-vnd.Haiku-Network	3750716362
 <no wireless networks found>	EthernetSettingsView		<немає жодної бездротової мережі>
+Adapter:	EthernetSettingsView		Адаптер:
+Apply	EthernetSettingsView		Застосовувати
+Choose automatically	EthernetSettingsView		Вибрати автоматично
+DHCP	EthernetSettingsView		DHCP
+DNS #1:	EthernetSettingsView		DNS #1:
+DNS #2:	EthernetSettingsView		DNS #2:
+Disabled	EthernetSettingsView		Недоступний
+Domain:	EthernetSettingsView		Домен:
+Gateway:	EthernetSettingsView		Шлюз:
+IP address:	EthernetSettingsView		IP адреса:
+Mode:	EthernetSettingsView		Режим:
+Netmask:	EthernetSettingsView		Маска:
+Network	NetworkWindow		Мережа
 Network:	EthernetSettingsView		Мережа:
+OK	EthernetSettingsView		Гаразд
+Revert	EthernetSettingsView		Повернутися
+Static	EthernetSettingsView		Статичний
+The net_server needs to run for the auto configuration!	EthernetSettingsView		Net_server необхідно урухомити для автоматичної конфігурації!

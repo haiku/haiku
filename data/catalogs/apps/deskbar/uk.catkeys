@@ -1,39 +1,38 @@
-1	ukrainian	x-vnd.Be-TSKB	34208151
-Applications	PreferencesWindow		Додатки
-Recent applications	BeMenu		Недавні додатки
-Edit menu…	PreferencesWindow		Редагувати меню…
-Recent documents:	PreferencesWindow		Недавні документи:
-Recent folders	BeMenu		Недавні папки
-Sort running applications	PreferencesWindow		Сортувати додатки, що запущені
-Change time…	TimeView		Змінити час…
+1	ukrainian	x-vnd.Be-TSKB	1996997432
 <Be folder is empty>	BeMenu		<Папка Ве пуста>
-Window	PreferencesWindow		Вікно
-Menu	PreferencesWindow		Меню
-Show seconds	PreferencesWindow		Показати секунди
+About Haiku…	BeMenu		Про Haiku…
 Always on top	PreferencesWindow		Завжди зверху
-Show all	WindowMenu		Показати все
+Applications	PreferencesWindow		Додатки
+Auto-raise	PreferencesWindow		Автоспливання
+Change time…	TimeView		Змінити час…
+Clock	PreferencesWindow		Годинник
+Close all	WindowMenu		Закрити все
+Deskbar preferences…	BeMenu		Налаштування Deskbar…
+Edit menu…	PreferencesWindow		Редагувати меню…
+Expand new applications	PreferencesWindow		Розпакувати нові додатки
+Find…	BeMenu		Знайти…
+Hide all	WindowMenu		Сховати все
+Hide time	TimeView		Сховати час
+Menu	PreferencesWindow		Меню
+Mount	BeMenu		Змонтувати
 No windows	WindowMenu		Немає вікон
 Power off	BeMenu		Вимкнути
-Auto-raise	PreferencesWindow		Автоспливання
-Hide time	TimeView		Сховати час
-Recent folders:	PreferencesWindow		Недавні папки:
-Deskbar preferences…	BeMenu		Налаштування Deskbar…
-Show application expander	PreferencesWindow		Показувати додаток expander
-Close all	WindowMenu		Закрити все
-Deskbar preferences	PreferencesWindow		Налаштування Deskbar 
-Mount	BeMenu		Змонтувати
-Recent applications:	PreferencesWindow		Недавні додатки:
-Tracker always first	PreferencesWindow		Tracker завжди перший
-About Haiku…	BeMenu		Про Haiku…
-Show calendar…	TimeView		Показати календар…
-Restart system	BeMenu		Перезавантажити систему
-Find…	BeMenu		Знайти…
-Restart Tracker	BeMenu		Перезавантажити Tracker
-Show Time	Tray		Показати час
-Expand new applications	PreferencesWindow		Розпакувати нові додатки
-Clock	PreferencesWindow		Годинник
-Recent documents	BeMenu		Недавні документи
-Hide all	WindowMenu		Сховати все
-Shutdown…	BeMenu		Вимкнути…
 Quit application	WindowMenu		Вийти з додатку
+Recent applications	BeMenu		Недавні додатки
+Recent applications:	PreferencesWindow		Недавні додатки:
+Recent documents	BeMenu		Недавні документи
+Recent documents:	PreferencesWindow		Недавні документи:
+Recent folders	BeMenu		Недавні папки
+Recent folders:	PreferencesWindow		Недавні папки:
+Restart Tracker	BeMenu		Перезавантажити Tracker
+Restart system	BeMenu		Перезавантажити систему
+Show Time	Tray		Показати час
+Show all	WindowMenu		Показати все
+Show application expander	PreferencesWindow		Показувати додаток expander
+Show calendar…	TimeView		Показати календар…
 Show replicants	BeMenu		Показати репліканти
+Show seconds	PreferencesWindow		Показати секунди
+Shutdown…	BeMenu		Вимкнути…
+Sort running applications	PreferencesWindow		Сортувати додатки, що запущені
+Tracker always first	PreferencesWindow		Tracker завжди перший
+Window	PreferencesWindow		Вікно

@@ -1,48 +1,40 @@
-1	ukrainian	x-vnd.Haiku-Devices	1250375801
-Order by:	DevicesView		Сортувати по:
+1	ukrainian	x-vnd.Haiku-Devices	943452746
 ACPI controller	Device		ACPI контролер
-Memory controller	Device		Контролер пам’яті
-Docking station	Device		Док-станція
-Computer	Device		Комп’ютер
-Detailed	DevicesView		Докладно
-Properties	PropertyList		Властивості
-Category	DevicesView		Категорії
-Quit	DevicesView		Вийти
-Device paths	Device		Шляхи пристрою
-Manufacturer\t\t\t: 	Device		Виробник\t\t\t:
-Processor	Device		Процесор
-ACPI Information	DeviceACPI		Інформація про ACPI 
-Device Name\t\t\t\t: 	Device		Ім’я пристрою\t\t\t\t:
-Generic system peripheral	Device		Периферійні пристрої
-Display controller	Device		Контролер дисплея
-Mass storage controller	Device		Контролер накопичувачів
+About	DevicesApplication		про
 About Devices…	DevicesView		Про Devices…
-Input device controller	Device		Контролер ввідних пристроїв
-Device paths\t: 	Device		Шляхи пристрою\t:
-Network controller	Device		Мережевий контролер
-Devices\n\twritten by Pieter Panman\n\n\tBased on listdev by Jérôme Duval\n\tand the previous Devices preference\n\tby Jérôme Duval and Sikosis\n\tCopyright 2009, Haiku, Inc.\n	DevicesApplication		Devices\n\tавтор Pieter Panman\n\n\на основі listdev Jérôme Duval\n\tі попередніх Devices preference\n\t Jérôme Duval і Sikosis\n\tCopyright 2009, Haiku, Inc.\n
-Driver used	Device		Використовує драйвер
-Driver used\t\t\t\t: 	Device		Використовує драйвер\t\t\t\t:
-Bus	DevicesView		Шина
-Communication controller	Device		Контролер зв’язку
 Basic information	DevicesView		Основна інформація
-PCI Information	DevicePCI		Інформація про PCI 
-Manufacturer:	Device		Виробник:
-Multimedia controller	Device		Мультимедійний контролер
-Device name:	Device		Назва пристрою:
-Report compatibility	DevicesView		Повідомити про сумісність
-about	DevicesApplication		про
-Signal processing controller	Device		Контроллер обробки сигналів 
-Serial bus controller	Device		Контроллер послідовної шини
-Wireless controller	Device		Бездротовий контролер
-Device name	Device		Назва пристрою
-Manufacturer	Device		Виробник
-Intelligent controller	Device		Інтелектуальний контролер
-Satellite communications controller	Device		Контроллер супутникового зв’язку
 Bridge	Device		Міст
-Refresh devices	DevicesView		Оновлення пристроїв
+Bus	DevicesView		Шина
+Category	DevicesView		Категорії
+Communication controller	Device		Контролер зв’язку
+Computer	Device		Комп’ютер
 Connection	DevicesView		Підключенню
-Generate system information	DevicesView		Створення системної інформації
-Encryption controller	Device		Контроллер шифрування 
-Unclassified device	Device		Некласифіковані пристрої
+Detailed	DevicesView		Докладно
+Device name	Device		Назва пристрою
+Device name:	Device		Назва пристрою:
+Device paths	Device		Шляхи пристрою
+Devices	DevicesApplication		Пристрої
 Devices	DevicesView		Пристрої
+Devices\n\twritten by Pieter Panman\n\n\tBased on listdev by Jérôme Duval\n\tand the previous Devices preference\n\tby Jérôme Duval and Sikosis\n\tCopyright 2009, Haiku, Inc.\n	DevicesApplication		Devices\n\tавтор Pieter Panman\n\n\на основі listdev Jérôme Duval\n\tі попередніх Devices preference\n\t Jérôme Duval і Sikosis\n\tCopyright 2009, Haiku, Inc.\n
+Display controller	Device		Контролер дисплея
+Docking station	Device		Док-станція
+Driver used	Device		Використовує драйвер
+Generate system information	DevicesView		Створення системної інформації
+Generic system peripheral	Device		Периферійні пристрої
+Input device controller	Device		Контролер ввідних пристроїв
+Intelligent controller	Device		Інтелектуальний контролер
+Manufacturer	Device		Виробник
+Manufacturer:	Device		Виробник:
+Mass storage controller	Device		Контролер накопичувачів
+Memory controller	Device		Контролер пам’яті
+Multimedia controller	Device		Мультимедійний контролер
+Network controller	Device		Мережевий контролер
+Order by:	DevicesView		Сортувати по:
+Processor	Device		Процесор
+Quit	DevicesView		Вийти
+Refresh devices	DevicesView		Оновлення пристроїв
+Report compatibility	DevicesView		Повідомити про сумісність
+Satellite communications controller	Device		Контроллер супутникового зв’язку
+Serial bus controller	Device		Контроллер послідовної шини
+Unclassified device	Device		Некласифіковані пристрої
+Wireless controller	Device		Бездротовий контролер

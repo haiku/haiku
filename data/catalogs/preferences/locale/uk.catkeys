@@ -1,25 +1,24 @@
-1	ukrainian	x-vnd.Haiku-Locale	2295953467
-Available languages	Locale Preflet Window		Доступні мови
-Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Неможливо знайти доступні мови! Ви не можете  використовувати цю функцію!
-Long format:	TimeFormatSettings		Звичний  формат:
-Currency	TimeFormatSettings		Валюта
-Short format:	TimeFormatSettings		Скорочений формат:
-Language	Locale Preflet Window		Мова
-Preferred languages	Locale Preflet Window		Мови, що переважають
-Numbers	TimeFormatSettings		Номери
-24 hour	TimeFormatSettings		24 години
-Defaults	Locale Preflet Window		По замовчуванню
-Revert	Locale Preflet Window		Повернути
-OK	Locale Preflet Window		Гаразд
-Time	TimeFormatSettings		Час
-Date	TimeFormatSettings		Дата
+1	ukrainian	x-vnd.Haiku-Locale	558426720
 12 hour	TimeFormatSettings		12 годин
-Locale	Locale Preflet		Локаль
-already chosen	LanguageListView		повністю закритий
-Negative:	TimeFormatSettings		Негатив:
-Use month/day-names from preferred language	TimeFormatSettings		Використовувати назви місяця/дня  для вибраної мови
+24 hour	TimeFormatSettings		24 години
+Available languages	Locale Preflet Window		Доступні мови
+Currency	TimeFormatSettings		Валюта
+Date	TimeFormatSettings		Дата
+Defaults	Locale Preflet Window		По замовчуванню
 Formatting	Locale Preflet Window		Форматування
-Locale	Locale Preflet Window		Локаль
 Full format:	TimeFormatSettings		Повний формат:
+Language	Locale Preflet Window		Мова
+Locale	Locale Preflet		Локаль
+Locale	Locale Preflet Window		Локаль
 Medium format:	TimeFormatSettings		Середній формат:
+Negative:	TimeFormatSettings		Негатив:
+Numbers	TimeFormatSettings		Номери
+OK	Locale Preflet Window		Гаразд
 Positive:	TimeFormatSettings		Позитив:
+Preferred languages	Locale Preflet Window		Мови, що переважають
+Revert	Locale Preflet Window		Повернути
+Short format:	TimeFormatSettings		Скорочений формат:
+Time	TimeFormatSettings		Час
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Неможливо знайти доступні мови! Ви не можете  використовувати цю функцію!
+Use month/day-names from preferred language	TimeFormatSettings		Використовувати назви місяця/дня  для вибраної мови
+already chosen	LanguageListView		повністю закритий

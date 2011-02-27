@@ -1,1 +1,23 @@
-1	russian	application/x-vnd.Haiku-Registrar	0
+1	russian	application/x-vnd.Haiku-Registrar	2599857937
+%action%?	ShutdownProcess		%action%?
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Приложение \"%appName%\" прервало процесс выключения.
+Asking \"%appName%\" to quit.	ShutdownProcess		Просьба приложению \"%appName%\" завершить работу.
+Asking background applications to quit.	ShutdownProcess		Просьба фоновым процессам завершить работу.
+Asking other processes to quit.	ShutdownProcess		Просьба остальным процессам завершить работу.
+Cancel	ShutdownProcess		Отмена
+Cancel shutdown	ShutdownProcess		Отменить выключение
+Do you really want to restart the system?	ShutdownProcess		Вы действительно хотите перезагрузить компьютер?
+Do you really want to shut down the system?	ShutdownProcess		Вы действительно хотите выключить систему?
+It's now safe to turn off the computer.	ShutdownProcess		Теперь можно выключить компьютер.
+Kill application	ShutdownProcess		Убить приложение
+OK	ShutdownProcess		ОК
+Restart	ShutdownProcess		Перезагрузить
+Restart system	ShutdownProcess		Перезагрузить компьютер
+Restarting…	ShutdownProcess		Перезагрузка…
+Shut down	ShutdownProcess		Выключить
+Shutdown aborted	ShutdownProcess		Выключение прервано
+Shutdown status	ShutdownProcess		Статус выключения
+Shutting down…	ShutdownProcess		Выключение…
+System is shut down	ShutdownProcess		Система выключена
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Приложение \"%appName%\" возможно заблокировано модальным окном.
+Tidying things up a bit.	ShutdownProcess		Приведение системы в порядок.
