@@ -4,7 +4,7 @@
 %.1f faults/s	DataSource		%.1f fel/s
 %lld ms	SettingsWindow		%lld ms
 %lld sec.	SettingsWindow		%lld sek.
-About ActivityMonitor…	ActivityWindow		Om Aktivitetsövervakaren...
+About ActivityMonitor…	ActivityWindow		Om AktivitetsÖvervakaren...
 ActivityMonitor	ActivityWindow		Aktivitetsövervakaren
 Add graph	ActivityWindow		Lägg till graf
 Additional items	ActivityView		Ytterligare mätvärden
@@ -42,7 +42,7 @@ Swap	DataSource		Växling
 Swap space	DataSource		Växlingsutrymme
 TX	DataSource	Shorter version for Sending	TX
 Teams	DataSource		Processer
-Text clipboard size	DataSource		Text urklippstorlek
+Text clipboard size	DataSource		Text urklipps storlek
 Threads	DataSource		Trådar
 Update time interval:	SettingsWindow		Uppdateringsintervall:
 Used memory	DataSource		Använt minne

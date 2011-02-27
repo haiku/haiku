@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Be-MAIL	1525863502
+1	swedish	x-vnd.Be-MAIL	2797564879
 %d - Date	Mail		%d - Datum
 %e - E-mail address	Mail		%e - mejladress
 %n - Full name	Mail		%n - Fullständigt namn
@@ -9,7 +9,7 @@ Accounts…	Mail		Konton...
 Add	Mail		Lägg till
 Add enclosure…	Mail		Bifoga fil...
 Add signature	Mail		Lägg till signatur
-An error occurred trying to open this signature.	Mail		Ett fel uppstod när den här signaturen försökte öppnas
+An error occurred trying to open this signature.	Mail		Ett fel uppstod när den här signaturen skulle öppnas
 An error occurred trying to save the attachment.	Mail		Ett fel uppstod när den bifogade filen försökte sparas.
 An error occurred trying to save this signature.	Mail		Ett fel uppstod när signaturen skulle sparas.
 Attach attributes:	Mail		Bifoga attribut:
@@ -90,6 +90,7 @@ Previous	Mail		Föregående
 Previous message	Mail		Föregående meddelande
 Print	Mail		Skriv ut
 Print…	Mail		Skriv ut...
+Put your favorite e-mail queries and query templates in this folder.	Mail		Lägg dina favorit e-post sökningar och sökmallar i denna mapp.
 Queries	Mail		Sökningar
 Quit	Mail		Avsluta
 Quote	Mail		Citat
@@ -147,3 +148,4 @@ Warn unencodable:	Mail		Varna för ogiltiga tecken:
 Written by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Skrivet av Robert Polic.\nFörbättrat av Dr. Zoidberg teamet.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Brevets huvudtext innehåller %Id oläsbara tecken. Det är möjligt att en annan teckenuppsättning skulle vara mer lämplig. Tryck på Skicka för att sända brevet som det är - oläsbara tecken kommer ersättas - eller välj Avbryt för att gå tillbaka och korrigera problemet.
 \\n - Newline	Mail		\\n - Ny rad
+helpful message	Mail		hjälpsamt meddelande

@@ -41,11 +41,11 @@ Settings…	ExpanderMenu		Inställningar...
 Show contents	ExpanderMenu		Visa innehåll
 Show contents	ExpanderWindow		Visa innehåll
 Source	ExpanderWindow		Källa
-Stop	ExpanderMenu		Stoppa
+Stop	ExpanderMenu		Avbryt
 Stop	ExpanderWindow		Stoppa
 The destination folder does not exist.	ExpanderWindow		Målmappen existerar inte.
 The destination is not a folder.	ExpanderWindow		Målet är inte en mapp.
-The destination is read only.	ExpanderWindow		Målmappen är inte skrivbar
+The destination is read only.	ExpanderWindow		Målmappen är inte skrivbar.
 The file doesn't exist	ExpanderWindow		Filen existerar inte
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Mappen har antingen flyttats, döpts om eller är oåtkomlig.
 Use:	ExpanderPreferences		Använd:

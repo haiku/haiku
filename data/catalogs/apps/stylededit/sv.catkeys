@@ -1,15 +1,15 @@
-1	swedish	x-vnd.Haiku-StyledEdit	3614078026
+1	swedish	x-vnd.Haiku-StyledEdit	881610730
 ???	LoadAlert		???
 Align	Menus		Justera
 Black	Menus		Svart
 Blue	Menus		Blå
 Bold	Menus		Fet stil
-Can't Undo	Menus		Kan inte ångra
+Can't undo	Menus		Kan inte ångra
 Cancel	FindandReplaceWindow		Avbryt
 Cancel	QuitAlert		Avbryt
 Cancel	RevertToSavedAlert		Avbryt
 Cancel	SaveAlert		Avbryt
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Kan inte återgå, filen hittades inte: \"%s\".
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Kan inte återgå, filen hittades inte: "%s".
 Case-sensitive	FindandReplaceWindow		Skiftlägeskänslig
 Center	Menus		Mitten
 Characters:	Statistics		Tecken:
@@ -26,13 +26,13 @@ Don't save	QuitAlert		Spara inte
 Don't save	SaveAlert		Spara inte
 Edit	Menus		Redigera
 Encoding	Open_and_SaveAsPanel		Kodning
-Error loading \"%s\":\n\t%s	LoadAlert		Fel vid inläsning \"%s\":\n\t%s
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Fel vid inläsning \"%s\":\n\tIcke understött format
-Error saving \"%s\":\n%s	SaveAlert		Kunde inte spara \"%s\":\n%s
+Error loading \"%s\":\n\t%s	LoadAlert		Fel vid inläsning "%s":\n\t%s
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Fel vid inläsning "%s":\n\tFormatet stöds ej
+Error saving \"%s\":\n%s	SaveAlert		Kunde inte spara "%s":\n%s
 File	Menus		Arkiv
 Find	FindandReplaceWindow		Sök
 Find again	Menus		Sök igen
-Find selection	Menus		Hitta markerad text
+Find selection	Menus		Sök efter markerad text
 Find:	FindandReplaceWindow		Sök:
 Find…	Menus		Sök…
 Font	Menus		Font
@@ -42,9 +42,9 @@ Left	Menus		Vänster
 Lines:	Statistics		Rader:
 Magenta	Menus		Magenta
 New	Menus		Ny
-OK	LoadAlert		Okej
-OK	RevertToSavedAlert		Okej
-OK	SaveAlert		Okej
+OK	LoadAlert		OK
+OK	RevertToSavedAlert		OK
+OK	SaveAlert		OK
 OK	Statistics		OK
 Open…	Menus		Öppna…
 Page setup…	Menus		Sidinställningar...
@@ -59,21 +59,21 @@ Replace in all windows	FindandReplaceWindow		Ersätt i alla fönster
 Replace same	Menus		Ersätt samma
 Replace with:	FindandReplaceWindow		Ersätt med:
 Replace…	Menus		Ersätt…
-Revert to saved…	Menus		Återgå till sparat…
-Revert to the last version of \"%s\"? 	RevertToSavedAlert		Återgå till den senast använda versionen av \"%s\"? 
+Revert to saved…	Menus		Återgå till sparad…
+Revert to the last version of \"%s\"? 	RevertToSavedAlert		Återgå till den senast använda versionen av "%s"? 
 Right	Menus		Höger
 Save	Menus		Spara
 Save	QuitAlert		Spara
 Save	SaveAlert		Spara
 Save as…	Menus		Spara som...
-Save changes to the document \"%s\"? 	QuitAlert		Spara ändringar till dokumentet \"%s\"? 
-Search backwards	FindandReplaceWindow		Sök baklänges
+Save changes to the document \"%s\"? 	QuitAlert		Spara ändringar till dokumentet "%s"? 
+Search backwards	FindandReplaceWindow		Sök bakåt
 Select all	Menus		Markera allt
 Size	Menus		Storlek
 Statistics…	Menus		Statistik...
-This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Denna fil är markerad som endast läsbar. Vill du spara ändringarna till dokumentet \"%s\"?
+This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Denna fil är markerad som endast läsbar. Vill du spara ändringarna till dokumentet "%s"?
 Undo typing	QuitAlert		Ångra inmatning
-Untitled 	StyledEditWindow		Odöpt 
+Untitled 	StyledEditWindow		Namnlös 
 Words:	Statistics		Ord:
 Wrap lines	Menus		Bryt rader
 Wrap-around search	FindandReplaceWindow		Fortsätt sökning vid andra änden

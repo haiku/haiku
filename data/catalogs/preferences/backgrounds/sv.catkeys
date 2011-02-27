@@ -2,10 +2,10 @@
 All workspaces	Main View		Alla arbetsytor
 Apply	Main View		Använd
 Backgrounds	Main Window		Bakgrunder
-Center	Main View		Centrerad
-Current workspace	Main View		Den här arbetsytan
+Center	Main View		Centrera
+Current workspace	Main View		Nuvarande arbetsyta
 Default	Main View		Standard
-Default folder	Main View		Standardmapp
+Default folder	Main View		Standardmappen
 Folder: 	Main View		Mapp:
 Icon label outline	Main View		Extra filnamnskontur
 Image:	Main View		Bild:
@@ -17,9 +17,9 @@ Placement:	Main View		Placering:
 Preview	Main View		Förhandstitt
 Resolution: 	Image Filepanel		Upplösning:
 Revert	Main View		Återställ
-Scale to fit	Main View		Omskalad
+Scale to fit	Main View		Anpassa
 Select	Main View		Välj
-Tile	Main View		Upprepad
+Tile	Main View		Upprepa
 X:	Main View		X:
 Y:	Main View		Y:
 pick one	Main View		Välj en

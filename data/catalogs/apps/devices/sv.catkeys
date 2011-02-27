@@ -1,9 +1,11 @@
-1	swedish	x-vnd.Haiku-Devices	4145096865
+1	swedish	x-vnd.Haiku-Devices	189828730
 ACPI Information	DeviceACPI		ACPI-information
 ACPI Processor Namespace '%2'	DeviceACPI		ACPI Processor-namnrymd '%2'
 ACPI System Bus	DeviceACPI		ACPI systembuss
 ACPI System Indicator	DeviceACPI		ACPI systemindikator
 ACPI Thermal Zone	DeviceACPI		ACPI termisk zon
+ACPI bus	Device		ACPI-buss
+ACPI bus	DevicesView		ACPI-buss
 ACPI controller	Device		ACPI-kontroller
 ACPI node '%1'	DeviceACPI		ACPI nod '%1'
 About	DevicesApplication		om
@@ -11,13 +13,16 @@ About Devices…	DevicesView		Om Enheter...
 Basic information	DevicesView		Grundläggande information
 Bridge	Device		Brygga
 Bus	DevicesView		Buss
+Bus Information	Device		Bussinformation
 Category	DevicesView		Kategori
 Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Klassinformation:\t\t\t\t: %classInfo%
 Class info	DevicePCI		Klassinformation
 Communication controller	Device		Kommunikationskontroller
 Computer	Device		Dator
+Computer	DevicesView		Dator
 Connection	DevicesView		Anslutning
 Detailed	DevicesView		Detaljerat
+Device	Device		Enhet
 Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Enhetsnamn\t\t\t\t: %Name%\nTillverkare\t\t\t: %Manufacturer%\nDrivrutin\t\t\t\t: %DriverUsed%\nEnhetssökväg\t: %DevicePaths%
 Device name	Device		Enhetsnamn
 Device name	DeviceACPI		Enhetsnamn
@@ -35,6 +40,8 @@ Driver used	DevicePCI		Använd drivrutin
 Encryption controller	Device		Krypteringskontroller
 Generate system information	DevicesView		Generera systeminformation
 Generic system peripheral	Device		Allmänt systemtillbehör
+ISA bus	Device		ISA-buss
+ISA bus	DevicesView		ISA-buss
 Input device controller	Device		Indataenhetskontroller
 Intelligent controller	Device		Intelligent kontroller
 Manufacturer	Device		Tillverkare
@@ -52,6 +59,8 @@ Not implemented	DevicePCI		Inte implementerat
 OK	DevicesApplication		OK
 Order by:	DevicesView		Sortera efter:
 PCI Information	DevicePCI		PCI-information
+PCI bus	Device		PCI-buss
+PCI bus	DevicesView		PCI-buss
 Processor	Device		Processor
 Quit	DevicesView		Avsluta
 Refresh devices	DevicesView		Uppdatera enhetsvy
@@ -61,5 +70,8 @@ Serial bus controller	Device		Seriell kontroller
 Signal processing controller	Device		Signalbehandlingskontroller
 Unclassified device	Device		Oklassificerad enhet
 Unknown	DevicePCI		Okänt
+Unknown device	Device		Okänd enhet
+Unknown device	DevicesView		Okänd enhet
 Value	PropertyList		Värde
 Wireless controller	Device		Trådlös kontroller
+unknown	Device		okänd

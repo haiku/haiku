@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	3424530812
+1	swedish	x-vnd.Haiku-libtracker	498395429
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 %Ld B	WidgetAttributeText		%Ld B
 %Ld bytes	WidgetAttributeText		%Ld byte
@@ -168,11 +168,11 @@ Icon view	DeskWindow		Ikonvy
 Icon view	VolumeWindow		Ikonvy
 Identify	ContainerWindow		Identifiera
 Identify	InfoWindow		Identifiera
-If you %action the config folder, Haiku may not behave properly! Are you sure you want to do this? To %action the config folder anyway, click \"Do it\".	FSUtils		Om du %action mappen 'config' kan Haiku sluta fungera! Är du säker på att du vill fortsätta? För att %action ändå, tryck på \"Do it\".
-If you %action the home folder, Haiku may not behave properly! Are you sure you want to do this? To %action the home anyway, click \"Do it\".	FSUtils		Om du %action hemkatalogen, kan Haiku sluta fungera! Är du säker på att du vill göra det? För att %action hemkatalogen i alla fall, tryck \"Gör det\".
-If you %action the mime settings, Haiku may not behave properly! Are you sure you want to do this? To %action the mime settings anyway, click \"Do it\".	FSUtils		Om du %action mime-inställningarna kan Haiku sluta fungera! Är du säker på att du vill fortsätta? För att %action mime-inställningarna ändå, tryck på \"Do it\".
-If you %action the settings folder, Haiku may not behave properly! Are you sure you want to do this? To %action the settings folder anyway, click \"Do it\".	FSUtils		Om du %action inställningsmappen så kan det hända att  Haiku inte fungerar korrekt! Är du säker på att du vill fortsätta? För att ändå %action inställningsmappen, klicka på "Gör det".
-If you %action the system folder or its contents, you won't be able to boot Haiku! Are you sure you want to do this? To %action the system folder or its contents anyway, hold down the Shift key and click \"Do it\".	FSUtils		Om du %action systemkatalogen eller dess innehåll kommer du inte kunna starta Haiku! Är du säker på det? För att %action systemkatalogen eller dess innehåll i alla fall, håll nere Skift och klicka på \"Do it\".
+If you %ifYouDoAction the config folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the config folder anyway, click \"Do it\".	FSUtils		Om du %ifYouDoAction mappen 'config'  kommer Haiku inte fungera som det ska. Är du säker på att du vill göra det?  För att %toDoAction mappen 'config', välj \"Gör det\".
+If you %ifYouDoAction the home folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the home anyway, click \"Do it\".	FSUtils		Om du %ifYouDoAction mappen 'home' kommer Haiku inte fungera som det ska. Är du säker på att du vill göra det?  För att %toDoAction mappen 'home', välj \"Gör det\".
+If you %ifYouDoAction the mime settings, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the mime settings anyway, click \"Do it\".	FSUtils		Om du %ifYouDoAction filtypsinställningarna kommer Haiku inte fungera som det ska. Är du säker på att du vill göra det?  För att %toDoAction inställningarna, välj \"Gör det\".
+If you %ifYouDoAction the settings folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the settings folder anyway, click \"Do it\".	FSUtils		Om du %ifYouDoAction mappen 'settings'  kommer Haiku inte fungera som det ska. Är du säker på att du vill göra det?  För att %toDoAction mappen 'settings', välj \"Gör det\".
+If you %ifYouDoAction the system folder or its contents, you won't be able to boot Haiku! Are you sure you want to do this? To %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"Do it\".	FSUtils		Om du %ifYouDoAction systemmappen eller dess innehåll kommer du inte att kunna starta Haiku! Är du säker på att du vill göra det?  Om du vill %toDoAction systemmappen eller dess innehåll, håll ner skifttangenten och välj \"Gör det\".
 Ignore case	SelectionWindow		Ignorera skiftesläge
 Include trash	FindPanel		Inkludera papperskorg
 Increase size	ContainerWindow		Öka storlek
@@ -421,15 +421,18 @@ less than	FindPanel		mindre än
 link	FSUtils	filename link	länk
 matches regular expression	SelectionWindow		matchar reguljärt uttryck
 matches wildcard expression	SelectionWindow		matchar jokeruttryck
-move	FSUtils		flytta
+move	FSUtils	As in 'If you move ...'	flyttar
+move	FSUtils	As in 'To move ...'	flytta
 moving	FSUtils		flyttar
 multiple disks	FindPanel		flera diskar
 no items	CountView		inga objekt
 no supporting apps	OpenWithWindow		applikation saknas
 of %items	StatusWindow		av %items
 parent folder	NavMenu		föräldrakatalog
-rename	InfoWindow		byt namn
-rename	TextWidget		döp om
+rename	InfoWindow	As in 'If you rename ...'	byter namn
+rename	InfoWindow	As in 'To rename ...'	byta namn
+rename	TextWidget	As in 'If you rename ...'	byter namn
+rename	TextWidget	As in 'To rename ...'	byta namn
 save text	FilePanelPriv		spara text
 starts with	FindPanel		börjar med
 starts with	SelectionWindow		börjar med

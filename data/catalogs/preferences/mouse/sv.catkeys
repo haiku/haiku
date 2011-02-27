@@ -6,7 +6,7 @@
 Accept first click	SettingsView		Agera på första klicket
 Click to focus	SettingsView		Klicka för att fokusera
 Click to focus and raise	SettingsView		Klicka för att fokusera och höja
-Defaults	MouseWindow		Standardinställningar
+Defaults	MouseWindow		Förval
 Dig Deal	MouseApplication		Stor sak
 Double-click speed	SettingsView		Dubbelklickshastighet
 Double-click test area	SettingsView		Testa dubbelklick här.

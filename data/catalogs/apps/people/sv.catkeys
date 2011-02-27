@@ -1,4 +1,5 @@
-1	swedish	x-vnd.Be-PEPL	3209429794
+1	swedish	x-vnd.Be-PEPL	3664557316
+%name% picture	People		%name% bild
 About	People		Om
 Address	People		Adress
 Cancel	People		Avbryt
@@ -20,6 +21,7 @@ File	People		Arkiv
 Group	People		Grupp
 Home phone	People		Hemtelefon
 Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Misslyckades att starta FilTyper för redigering av attribut.\n\nFel:
+Load image…	People		Välj bild...
 Name	People		Namn
 New person	People		Ny person
 New person…	People		Ny person...
@@ -29,6 +31,7 @@ Paste	People		Klistra in
 Person	Short mimetype description		Person
 Quit	People		Avsluta
 Redo	People		Gör om
+Remove image	People		Ta bort bild
 Revert	People		Återställ
 Save	People		Spara
 Save as…	People		Spara som...
@@ -38,6 +41,7 @@ Sorry	People		Tyvärr
 State	People		Region
 URL	People		URL
 Undo	People		Ångra
+Unnamed person	People		Namnlös person
 Work phone	People		Arbetstelefon
 Zip	People		Postnummer
 none	Groups list		ingen

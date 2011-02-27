@@ -1,18 +1,16 @@
-1	swedish	x-vnd.Haiku-NetworkStatus	3992317590
+1	swedish	x-vnd.Haiku-NetworkStatus	3379615764
+%ifaceName information:\n	NetworkStatusView		%ifaceName information:\n
 <no wireless networks found>	NetworkStatusView		<inga trådlösa nätverk hittades>
 Address	NetworkStatusView		Adress
-Address information:\n	NetworkStatusView		Adressinformation:\n
 Broadcast	NetworkStatusView		Annonsera
-Broadcast information:\n	NetworkStatusView		Annonsera information:\n
 Configuring	NetworkStatusView		Konfigurerar
 Could not join wireless network:\n	NetworkStatusView		Kunde inte ansluta till trådlöst nätverk:\n
 Install in Deskbar	NetworkStatus		Installera i Deskbar
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Öppning av nätverksinställningarna misslyckades.\n\nFel:
 Netmask	NetworkStatusView		Nätmask
-Netmask information:\n	NetworkStatusView		Nätmaskinformation:\n
-NetworkStatus	NetworkStatusWindow		Nätverkstatus
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		Nätverksstatus hantering:\n\t--deskbar\tlägg till replikant till Deskbar\n\t--help\t\tskriv ut denna information och avsluta\n
-NetworkStatus\n\twritten by %1 and Hugo Santos\n\t%2, Haiku, Inc.\n	NetworkStatusView		Nätverkstatus\n\tskrivet av %1 och Hugo Santos\n\t%2, Haiku, Inc.\n
+NetworkStatus	NetworkStatusWindow		NätverksStatus
+NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		NätverksStatus hantering:\n\t--deskbar\tlägg till replikant till Deskbar\n\t--help\t\tskriv ut denna information och avsluta\n
+NetworkStatus\n\twritten by %1 and Hugo Santos\n\t%2, Haiku, Inc.\n	NetworkStatusView		NätverksStatus\n\tskrivet av %1 och Hugo Santos\n\t%2, Haiku, Inc.\n
 No link	NetworkStatusView		Ingen länk
 No stateful configuration	NetworkStatusView		Ingen förbindelseorienterad konfiguration
 OK	NetworkStatusView		OK
@@ -21,4 +19,4 @@ Quit	NetworkStatusView		Avsluta
 Ready	NetworkStatusView		Redo
 Run in window	NetworkStatus		Kör i fönster
 Unknown	NetworkStatusView		Okänd
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Du kan köra Nätverksstatus i ett fönster eller installera det i Deskbar.
+You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Du kan köra NätverksStatus i ett fönster eller installera det i Deskbar.

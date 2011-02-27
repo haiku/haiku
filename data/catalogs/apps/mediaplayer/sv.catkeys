@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-MediaPlayer	1983120721
+1	swedish	x-vnd.Haiku-MediaPlayer	1801311807
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Amerikanskt format)
 100% scale	MediaPlayer-Main		Skala till 100%
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
@@ -33,6 +33,7 @@ Drop files to play	MediaPlayer-Main		Släpp filer för att spela upp
 Edit	MediaPlayer-PlaylistWindow		Redigera
 Error: 	MediaPlayer-Main		Fel:
 Error: 	MediaPlayer-RemovePLItemsCmd		Fel:
+File Info	MediaPlayer-InfoWin		Filinformation
 File info…	MediaPlayer-Main		Filinformation...
 Full screen	MediaPlayer-Main		Fullskärmsläge
 Full volume	MediaPlayer-SettingsWindow		Högsta volym
@@ -50,10 +51,11 @@ Lock Peaks	MediaPlayer-PeakView		Markera toppvärden
 Loop movies by default	MediaPlayer-SettingsWindow		Loopa filmer som förval
 Loop sounds by default	MediaPlayer-SettingsWindow		Loopa ljud som förval
 Low volume	MediaPlayer-SettingsWindow		Låg volym
+MediaPlayer	MediaPlayer-Main		MediaSpelaren
 MediaPlayer Current Playlist	MediaPlayer-Main		MediaSpelarens nuvarande spellista
 MediaPlayer encountered an internal error. The file could not be opened.	MediaPlayer-Main		Ett internt fel har uppstått i MediaSpelaren. Filen kunde inte öppnas.
 MediaPlayer settings	MediaPlayer-SettingsWindow		MediaSpelarens inställningar
-MediaPlayer\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		MediaSpelaren\n\nSkrivet av Marcus Overhagen, Stephan Aßmus och Frederik Modéen
+MediaPlayer\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		MediaSpelaren\n\nSkriven av Marcus Overhagen, Stephan Aßmus och Frederik Modéen
 Medium	MediaPlayer-SettingsWindow		Medium
 Move Entries	MediaPlayer-MovePLItemsCmd		Flytta poster
 Move Entry	MediaPlayer-MovePLItemsCmd		Flytta post

@@ -9,8 +9,8 @@ Control border	Colors tab		Kontrollkant
 Control highlight	Colors tab		Framhävd kontroll
 Control text	Colors tab		Kontrolltext
 Defaults	APRWindow		Förval
-Document background	Colors tab		Dokumentbakgrund
-Document text	Colors tab		Dokumenttext
+Document background	Colors tab		Dokument bakgrund
+Document text	Colors tab		Dokument text
 Failure	Colors tab		Misslyckande
 Glyph hinting:	AntialiasingSettingsView		Glyfhinting:
 Grayscale	AntialiasingSettingsView		Gråskala
@@ -40,4 +40,4 @@ Success	Colors tab		Framgång
 Tooltip background	Colors tab		Tooltipsbakgrund
 Tooltip text	Colors tab		Tooltiptext
 Window tab	Colors tab		Fösterflik
-Window tab text	Colors tab		Fönsterfliktext
+Window tab text	Colors tab		Fönsterflik text
