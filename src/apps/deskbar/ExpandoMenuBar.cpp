@@ -26,9 +26,10 @@ Except as contained in this notice, the name of Be Incorporated shall not be
 used in advertising or otherwise to promote the sale, use or other dealings in
 this Software without prior written authorization from Be Incorporated.
 
-Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered trademarks
-of Be Incorporated in the United States and other countries. Other brand product
-names are registered trademarks or trademarks of their respective holders.
+Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered
+trademarks of Be Incorporated in the United States and other countries. Other
+brand product names are registered trademarks or trademarks of their respective
+holders.
 All rights reserved.
 */
 
@@ -118,8 +119,8 @@ TExpandoMenuBar::AttachedToWindow()
 			R_BeLogoIcon);
 		if (logoBitmap != NULL)
 			fBeMenuWidth = logoBitmap->Bounds().Width() + 16;
- 		fBeMenuItem = new TBarMenuTitle(fBeMenuWidth, Frame().Height(),
- 			logoBitmap, beMenu, true);
+		fBeMenuItem = new TBarMenuTitle(fBeMenuWidth, Frame().Height(),
+			logoBitmap, beMenu, true);
 		AddItem(fBeMenuItem);
 
 		fSeparatorItem = new TTeamMenuItem(kSepItemWidth, height, fVertical);
@@ -584,10 +585,10 @@ TExpandoMenuBar::RemoveTeam(team_id team, bool partial)
 				RemoveItem(i);
 
 				if (fVertical) {
-					//	instead of resizing the window here and there in the
-					//	code the resize method will be centered in one place
-					//	thus, the same behavior (good or bad) will be used
-					//	whereever window sizing is done
+					// instead of resizing the window here and there in the
+					// code the resize method will be centered in one place
+					// thus, the same behavior (good or bad) will be used
+					// whereever window sizing is done
 					fBarView->SizeWindow(BScreen(Window()).Frame());
 				} else
 					CheckItemSizes(-1);
@@ -613,8 +614,8 @@ TExpandoMenuBar::CheckItemSizes(int32 delta)
 
 	if (!fBarView->Vertical()) {
 		// in this case there are 2 extra items:
-		//		The Be Menu
-		//		The little separator item
+		//   - The Be Menu
+		//   - The little separator item
 		fullWidth = fullWidth - (sMinimumWindowWidth * 2)
 			+ (fBeMenuWidth + kSepItemWidth);
 		width -= (fBeMenuWidth + kSepItemWidth);
@@ -624,11 +625,11 @@ TExpandoMenuBar::CheckItemSizes(int32 delta)
 	if (delta >= 0 && fullWidth > width) {
 		fOverflow = true;
 		reset = true;
-		newWidth = floorf(width/count);
+		newWidth = floorf(width / count);
 	} else if (delta < 0 && fOverflow) {
 		reset = true;
 		if (fullWidth > width)
-			newWidth = floorf(width/count);
+			newWidth = floorf(width / count);
 		else
 			newWidth = sMinimumWindowWidth;
 	}
@@ -713,10 +714,9 @@ void
 TExpandoMenuBar::CheckForSizeOverrun()
 {
 	BRect screenFrame = (BScreen(Window())).Frame();
-	if (fVertical)
-		fIsScrolling = Window()->Frame().bottom > screenFrame.bottom;
-	else
-		fIsScrolling = false;
+
+	fIsScrolling = fVertical ? Window()->Frame().bottom > screenFrame.bottom
+		: false;
 }
 
 
@@ -744,7 +744,7 @@ TExpandoMenuBar::monitor_team_windows(void* arg)
 			// Set all WindowMenuItems to require an update.
 			TWindowMenuItem* item = NULL;
 			for (int32 i = 0; i < totalItems; i++) {
-				if (!teamMenu->SubmenuAt(i)){
+				if (!teamMenu->SubmenuAt(i)) {
 					item = static_cast<TWindowMenuItem*>(teamMenu->ItemAt(i));
 					item->SetRequireUpdate();
 				}
@@ -814,7 +814,7 @@ TExpandoMenuBar::monitor_team_windows(void* arg)
 
 			// Remove any remaining items which require an update.
 			for (int32 i = 0; i < totalItems; i++) {
-				if (!teamMenu->SubmenuAt(i)){
+				if (!teamMenu->SubmenuAt(i)) {
 					item = static_cast<TWindowMenuItem*>(teamMenu->ItemAt(i));
 					if (item && item->RequiresUpdate()) {
 						item = static_cast<TWindowMenuItem*>
