@@ -184,7 +184,7 @@ SYSTEM_ADD_ONS_DRIVERS_NET = $(X86_ONLY)3com $(X86_ONLY)atheros813x
 SYSTEM_ADD_ONS_BUS_MANAGERS =  $(ATA_ONLY)ata pci $(X86_ONLY)ps2 $(X86_ONLY)isa
 	$(IDE_ONLY)ide scsi config_manager agp_gart usb firewire $(X86_ONLY)acpi
 ;
-SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs btrfs cdda ext2 fat iso9660 nfs
+SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs btrfs cdda exfat ext2 fat iso9660 nfs
 	attribute_overlay write_overlay ntfs reiserfs udf googlefs ;
 
 # wifi firmware
