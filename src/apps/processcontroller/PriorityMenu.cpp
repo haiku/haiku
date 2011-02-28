@@ -68,7 +68,7 @@ static PriorityRec	priorities[] = {
 	{ "",	-1 }
 };
 
-PriorityRec customPriority = {"Custom", 0 };
+PriorityRec customPriority = { B_TRANSLATE("Custom priority"), 0 };
 
 
 void

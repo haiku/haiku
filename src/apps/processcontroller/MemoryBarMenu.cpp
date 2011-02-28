@@ -24,6 +24,7 @@
 #include "ProcessController.h"
 
 #include <Bitmap.h>
+#include <Catalog.h>
 #include <Roster.h>
 #include <Window.h>
 
@@ -33,6 +34,9 @@
 #define EXTRA 10
 
 float gMemoryTextWidth;
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "MemoryBarMenu"
 
 
 MemoryBarMenu::MemoryBarMenu(const char* name, info_pack* infos, system_info& systemInfo)
@@ -53,7 +57,7 @@ MemoryBarMenu::MemoryBarMenu(const char* name, info_pack* infos, system_info& sy
 		fTeamList[k++] = -1;
 	}
 
-	gMemoryTextWidth = 2 * StringWidth("99999 KB") + 20;
+	gMemoryTextWidth = 2 * StringWidth(B_TRANSLATE("99999 KB")) + 20;
 
 	fRecycleCount = EXTRA;
 	fRecycleList = (MRecycleItem*)malloc(sizeof(MRecycleItem) * fRecycleCount);

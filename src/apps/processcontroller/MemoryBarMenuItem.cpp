@@ -25,8 +25,12 @@
 #include "ProcessController.h"
 
 #include <Bitmap.h>
+#include <Catalog.h>
 
 #include <stdio.h>
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "MemoryBarMenu"
 
 
 MemoryBarMenuItem::MemoryBarMenuItem(const char *label, team_id team,
@@ -210,13 +214,13 @@ MemoryBarMenuItem::DrawBar(bool force)
 	menu->SetHighColor(kBlack);
 
 	char infos[128];
-	sprintf(infos, "%d KB", fWriteMemory);
+	snprintf(infos, sizeof(infos), B_TRANSLATE("%d KB"), fWriteMemory);
 
 	BPoint loc(rect.left - kMargin - gMemoryTextWidth / 2 - menu->StringWidth(infos),
 		rect.bottom + 1);
 	menu->DrawString(infos, loc);
 
-	sprintf(infos, "%d KB", fAllMemory);
+	snprintf(infos, sizeof(infos), B_TRANSLATE("%d KB"), fAllMemory);
 	loc.x = rect.left - kMargin - menu->StringWidth(infos);
 	menu->DrawString(infos, loc);
 }

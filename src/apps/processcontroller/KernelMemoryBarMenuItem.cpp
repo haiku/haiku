@@ -152,11 +152,13 @@ KernelMemoryBarMenuItem::DrawBar(bool force)
 		menu->SetHighColor(kBlack);
 
 		char infos[128];
-		sprintf(infos, B_TRANSLATE("%.1f MB"), fCachedMemory / 1024.f);
+		snprintf(infos, sizeof(infos),
+				B_TRANSLATE("%.1f MB"), fCachedMemory / 1024.f);
 		BPoint loc(cadre.left, cadre.bottom + 1);
 		loc.x -= kMargin + gMemoryTextWidth / 2 + menu->StringWidth(infos);
 		menu->DrawString(infos, loc);
-		sprintf(infos, B_TRANSLATE("%.1f MB"), fCommittedMemory / 1024.f);
+		snprintf(infos, sizeof(infos),
+				B_TRANSLATE("%.1f MB"), fCommittedMemory / 1024.f);
 		loc.x = cadre.left - kMargin - menu->StringWidth(infos);
 		menu->DrawString(infos, loc);
 		fLastSum = sum;

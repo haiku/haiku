@@ -265,7 +265,7 @@ ProcessController::MessageReceived(BMessage *message)
 				info_pack infos;
 				if (get_team_info(team, &infos.team_info) == B_OK) {
 					get_team_name_and_icon(infos);
-					sprintf(question,
+					snprintf(question, sizeof(question),
 					B_TRANSLATE("Do you really want to kill the team \"%s\"?"),
 					infos.team_name);
 					alert = new BAlert("", question,
@@ -289,16 +289,18 @@ ProcessController::MessageReceived(BMessage *message)
 				thread_info	thinfo;
 				if (get_thread_info(thread, &thinfo) == B_OK) {
 					#if DEBUG_THREADS
-					sprintf(question, B_TRANSLATE("What do you want to do "
-					"with the thread \"%s\"?"), thinfo.name);
+					snprintf(question, sizeof(question),
+						B_TRANSLATE("What do you want to do "
+						"with the thread \"%s\"?"), thinfo.name);
 					alert = new BAlert("", question, B_TRANSLATE("Cancel"),
 					B_TRANSLATE("Debug this thread!"),
 					B_TRANSLATE("Kill this thread!"), B_WIDTH_AS_USUAL,
 					B_STOP_ALERT);
 					#define KILL 2
 					#else
-					sprintf(question, B_TRANSLATE("Are you sure you want "
-					"to kill the thread \"%s\"?"), thinfo.name);
+					snprintf(question, sizeof(question),
+						B_TRANSLATE("Are you sure you want "
+						"to kill the thread \"%s\"?"), thinfo.name);
 					alert = new BAlert("", question, B_TRANSLATE("Cancel"),
 					B_TRANSLATE("Kill this thread!"), NULL, B_WIDTH_AS_USUAL,
 					B_STOP_ALERT);
