@@ -1479,13 +1479,12 @@ TMailWindow::MessageReceived(BMessage *msg)
 			break;
 		case M_READ:
 			wasReadMsg = true;
-			SetCurrentMessageRead(B_READ);
-			_UpdateReadButton();
 			msg->what = M_NEXTMSG;
 		case M_PREVMSG:
 		case M_NEXTMSG:
 			if (fRef != NULL) {
 				entry_ref nextRef = *fRef;
+
 				if (GetTrackerWindowFile(&nextRef, (msg->what == M_NEXTMSG))) {
 					TMailWindow *window = static_cast<TMailApp *>(be_app)
 						->FindWindow(nextRef);
@@ -1494,9 +1493,9 @@ TMailWindow::MessageReceived(BMessage *msg)
 						read_flags currentFlag;
 						if (read_read_attr(node, currentFlag) != B_OK)
 							currentFlag = B_UNREAD;
-						if (fAutoMarkRead == true)
+						if (fAutoMarkRead == true || wasReadMsg)
 							SetCurrentMessageRead(B_READ);
-						else if (currentFlag != B_READ && !wasReadMsg)
+						else if (currentFlag != B_READ)
 							SetCurrentMessageRead(B_SEEN);
 
 						OpenMessage(&nextRef,
@@ -1504,14 +1503,17 @@ TMailWindow::MessageReceived(BMessage *msg)
 					} else {
 						window->Activate();
 
-						//fSent = true;
+						if (wasReadMsg)
+							SetCurrentMessageRead(B_READ);
 						PostMessage(B_CLOSE_REQUESTED);
 					}
 
 					SetTrackerSelectionToCurrent();
 				} else {
-					if (wasReadMsg)
+					if (wasReadMsg) {
+						SetCurrentMessageRead(B_READ);
 						PostMessage(B_CLOSE_REQUESTED);
+					}
 					beep();
 				}
 			}
