@@ -13,14 +13,22 @@
 #include <new>
 #include <stdio.h>
 
+#include <Alert.h>
 #include <Bitmap.h>
 #include <BitmapStream.h>
 #include <Catalog.h>
+#include <Directory.h>
+#include <File.h>
+#include <FilePanel.h>
 #include <IconUtils.h>
 #include <LayoutUtils.h>
 #include <PopUpMenu.h>
+#include <DataIO.h>
 #include <MenuItem.h>
+#include <Messenger.h>
 #include <MimeType.h>
+#include <NodeInfo.h>
+#include <String.h>
 #include <TranslatorRoster.h>
 #include <TranslationUtils.h>
 #include <Window.h>
@@ -71,7 +79,10 @@ PictureView::PictureView(float width, float height, const entry_ref* ref)
 	fPicture(NULL),
 	fOriginalPicture(NULL),
 	fDefaultPicture(NULL),
-	fShowingPopUpMenu(false)
+	fShowingPopUpMenu(false),
+	fPictureType(0),
+	fFocusChanging(false),
+	fOpenPanel(new BFilePanel(B_OPEN_PANEL))
 {
 	SetViewColor(255, 255, 255);
 
@@ -104,6 +115,8 @@ PictureView::~PictureView()
 	delete fPicture;
 	if (fOriginalPicture != fPicture)
 		delete fOriginalPicture;
+
+	delete fOpenPanel;
 }
 
 
@@ -131,11 +144,10 @@ PictureView::Update(const entry_ref* ref)
 	if (HasChanged())
 		return;
 
-	BBitmap* bitmap = BTranslationUtils::GetBitmap(ref);
-	_SetPicture(bitmap);
-
-	delete fOriginalPicture;
-	fOriginalPicture = fPicture;
+	if (_LoadPicture(ref) == B_OK) {
+		delete fOriginalPicture;
+		fOriginalPicture = fPicture;
+	}
 }
 
 
@@ -146,24 +158,43 @@ PictureView::Bitmap()
 }
 
 
+uint32
+PictureView::SuggestedType()
+{
+	return fPictureType;
+}
+
+
+const char*
+PictureView::SuggestedMIMEType()
+{
+	if (fPictureMIMEType == "")
+		return NULL;
+
+	return fPictureMIMEType.String();
+}
+
+
 void
 PictureView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case B_REFS_RECEIVED:
 		case B_SIMPLE_DATA:
 		{
 			entry_ref ref;
 			if (message->FindRef("refs", &ref) != B_OK)
 				break;
 
-			BBitmap* picture = BTranslationUtils::GetBitmap(&ref);
-			if (picture == NULL)
-				break;
-
-			_SetPicture(picture);
-			MakeFocus(true);
+			if (_LoadPicture(&ref) == B_OK)
+				MakeFocus(true);
 			break;
 		}
+
+		case B_MIME_DATA:
+			printf("B_MIME_DATA:\n");
+			message->PrintToStream();
+			break;
 
 		case B_COPY_TARGET:
 			_HandleDrop(message);
@@ -172,6 +203,11 @@ PictureView::MessageReceived(BMessage* message)
 		case B_DELETE:
 		case B_TRASH_TARGET:
 			_SetPicture(NULL);
+			break;
+
+		case kMsgLoadImage:
+			fOpenPanel->SetTarget(BMessenger(this));
+			fOpenPanel->Show();
 			break;
 
 		case kMsgPopUpMenuClosed:
@@ -189,6 +225,19 @@ void
 PictureView::Draw(BRect updateRect)
 {
 	BRect rect = Bounds();
+
+	// Draw the outer frame
+	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+	if (IsFocus() && Window() && Window()->IsActive())
+		SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
+	else
+		SetHighColor(tint_color(base, B_DARKEN_3_TINT));
+	StrokeRect(rect);
+
+	if (fFocusChanging) {
+		printf("Draw(): focus changed...\n");
+		return;
+	}
 
 	BBitmap* picture = fPicture ? fPicture : fDefaultPicture;
 	if (picture != NULL) {
@@ -210,18 +259,11 @@ PictureView::Draw(BRect updateRect)
 			SetHighColor(0, 0, 0, 24);
 		}
 
- 		DrawBitmapAsync(picture, srcRect, fPictureRect, B_FILTER_BITMAP_BILINEAR);
+ 		DrawBitmapAsync(picture, srcRect, fPictureRect,
+ 			B_FILTER_BITMAP_BILINEAR);
 
 		SetDrawingMode(B_OP_OVER);
 	}
-
-	// Draw the outer frame
-	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
-	if (IsFocus() && Window() && Window()->IsActive())
-		SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
-	else
-		SetHighColor(tint_color(base, B_DARKEN_3_TINT));
-	StrokeRect(rect);
 }
 
 
@@ -238,9 +280,17 @@ PictureView::WindowActivated(bool active)
 void
 PictureView::MakeFocus(bool focused)
 {
+	if (focused == IsFocus())
+		return;
+
 	BView::MakeFocus(focused);
 
-	Invalidate();
+	if (Window()) {
+		fFocusChanging = true;
+		Invalidate();
+		Flush();
+		fFocusChanging = false;
+	}
 }
 
 
@@ -402,11 +452,139 @@ PictureView::_BeginDrag(BPoint sourcePoint)
 
 
 void
-PictureView::_HandleDrop(BMessage* message)
+PictureView::_HandleDrop(BMessage* msg)
 {
-	// TODO
-	printf("PictureView::_HandleDrop(): \n");
-	message->PrintToStream();
+	printf("PictureControl::_HandleDrop(): \n");
+	msg->PrintToStream();
+
+	entry_ref dirRef;
+	BString name, type;
+	bool saveToFile = msg->FindString("be:filetypes", &type) == B_OK
+		&& msg->FindRef("directory", &dirRef) == B_OK
+		&& msg->FindString("name", &name) == B_OK;
+
+	bool sendInMessage = !saveToFile
+		&& msg->FindString("be:types", &type) == B_OK;
+
+	if (!sendInMessage && !saveToFile)
+		return;
+
+	BBitmap* bitmap = fPicture;
+	if (bitmap == NULL)
+		return;
+
+	BTranslatorRoster* roster = BTranslatorRoster::Default();
+	if (roster == NULL)
+		return;
+
+	BBitmapStream stream(bitmap);
+
+	// find transaltion format asked for
+	translator_info* outInfo;
+	int32 outNumInfo;
+	bool found = false;
+	translation_format format;
+
+	if (roster->GetTranslators(&stream, NULL, &outInfo, &outNumInfo) == B_OK) {
+		for (int32 i = 0; i < outNumInfo; i++) {
+			const translation_format* formats;
+			int32 formatCount;
+			roster->GetOutputFormats(outInfo[i].translator, &formats,
+					&formatCount);
+			for (int32 j = 0; j < formatCount; j++) {
+				if (strcmp(formats[j].MIME, type.String()) == 0) {
+					format = formats[j];
+					found = true;
+					break;
+				}
+			}
+		}
+	}
+
+	if (!found) {
+		stream.DetachBitmap(&bitmap);
+		return;
+	}
+
+	if (sendInMessage) {
+
+		BMessage reply(B_MIME_DATA);
+		BMallocIO memStream;
+		if (roster->Translate(&stream, NULL, NULL, &memStream,
+			format.type) == B_OK) {
+			reply.AddData(format.MIME, B_MIME_TYPE, memStream.Buffer(),
+				memStream.BufferLength());
+			msg->SendReply(&reply);
+		}
+
+	} else {
+
+		BDirectory dir(&dirRef);
+		BFile file(&dir, name.String(), B_WRITE_ONLY | B_CREATE_FILE
+			| B_ERASE_FILE);
+
+		if (file.InitCheck() == B_OK
+			&& roster->Translate(&stream, NULL, NULL, &file,
+				format.type) == B_OK) {
+			BNodeInfo nodeInfo(&file);
+			if (nodeInfo.InitCheck() == B_OK)
+				nodeInfo.SetType(type.String());
+		} else {
+			BString text = B_TRANSLATE("The file '%name%' could not "
+				"be written.");
+			text.ReplaceFirst("%name", name);
+			BAlert* alert = new BAlert(B_TRANSLATE("Error"), text.String(),
+				B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+			alert->Go();
+		}
+	}
+
+	// Detach, as we don't want our picture to be deleted
+	stream.DetachBitmap(&bitmap);
+}
+
+
+status_t
+PictureView::_LoadPicture(const entry_ref* ref)
+{
+	BFile file;
+	status_t status = file.SetTo(ref, B_READ_ONLY);
+	if (status != B_OK)
+		return status;
+
+	translator_info info;
+	memset(&info, 0, sizeof(translator_info));
+	BMessage ioExtension;
+
+	BTranslatorRoster* roster = BTranslatorRoster::Default();
+	if (roster == NULL)
+		return B_ERROR;
+
+	status = roster->Identify(&file, &ioExtension, &info, 0, NULL,
+		B_TRANSLATOR_BITMAP);
+
+	BBitmapStream stream;
+
+	if (status == B_OK) {
+		status = roster->Translate(&file, &info, &ioExtension, &stream,
+			B_TRANSLATOR_BITMAP);
+	}
+	if (status != B_OK)
+		return status;
+
+	BBitmap* picture = NULL;
+	if (stream.DetachBitmap(&picture) != B_OK)
+		return B_ERROR;
+
+	if (picture == NULL)
+		return B_ERROR;
+
+	// Remember image format so we store using same
+	fPictureMIMEType = info.MIME;
+	fPictureType = info.type;
+
+	_SetPicture(picture);
+	return B_OK;
 }
 
 
@@ -418,6 +596,11 @@ PictureView::_SetPicture(BBitmap* picture)
 
 	fPicture = picture;
 	Invalidate();
+
+	if (picture == NULL) {
+		fPictureType = 0;
+		fPictureMIMEType = "";
+	}
 }
 
 
