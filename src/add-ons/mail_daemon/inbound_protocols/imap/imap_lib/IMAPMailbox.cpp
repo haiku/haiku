@@ -289,14 +289,18 @@ IMAPMailbox::MessageNumberToUID(int32 messageNumber)
 
 
 status_t
-IMAPMailbox::DeleteMessage(int32 messageNumber)
+IMAPMailbox::DeleteMessage(int32 uid, bool permanently)
 {
-	int32 index = messageNumber - 1;
-	if (index < 0 || index >= (int32)fMessageList.size())
-		return B_BAD_VALUE;
-	status_t status = fStorage.DeleteMessage(MessageNumberToUID(messageNumber));
-	fMessageList.erase(fMessageList.begin() + index);
-	return status;
+	int32 flags = fStorage.GetFlags(uid);
+	flags |= kDeleted;
+	status_t status = SetFlags(UIDToMessageNumber(uid), flags);
+
+	if (!permanently || status != B_OK)
+		return status;
+
+	// delete permanently by invoking expunge
+	ExpungeCommmand expungeCommand(*this);
+	return ProcessCommand(&expungeCommand);
 }
 
 

@@ -72,7 +72,7 @@ public:
 			int32				UIDToMessageNumber(int32 uid);
 			int32				MessageNumberToUID(int32 messageNumber);
 
-			status_t			DeleteMessage(int32 messageNumber);
+			status_t			DeleteMessage(int32 uid, bool permanently);
 private:
 			void				_InstallUnsolicitedHandler(bool install);
 

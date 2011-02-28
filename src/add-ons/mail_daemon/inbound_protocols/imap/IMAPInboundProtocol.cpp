@@ -512,11 +512,10 @@ IMAPInboundProtocol::DeleteMessage(const entry_ref& ref)
 		Connect(fServer, fUsername, fPassword, fUseSSL);
 
 	fIMAPMailboxThread->StopWatchingMailbox();
+
 	int32 uid = fStorage.RefToUID(ref);
-	int32 flags = fStorage.GetFlags(uid);
-	flags |= kDeleted;
-	status_t status = fIMAPMailbox.SetFlags(
-		fIMAPMailbox.UIDToMessageNumber(uid), flags);
+	status_t status = fIMAPMailbox.DeleteMessage(uid, false);
+
 	fIMAPMailboxThread->SyncAndStartWatchingMailbox();
 	return status;
 }
@@ -576,11 +575,10 @@ IMAPInboundProtocol::DeleteMessage(node_ref& node)
 		fIMAPMailboxThread->SyncAndStartWatchingMailbox();
 		return B_BAD_VALUE;
 	}
+
 	int32 uid = entry->uid;
-	int32 flags = fStorage.GetFlags(uid);
-	flags |= kDeleted;
-	status_t status = fIMAPMailbox.SetFlags(
-		fIMAPMailbox.UIDToMessageNumber(uid), flags);
+	status_t status = fIMAPMailbox.DeleteMessage(uid, false);
+
 	fIMAPMailboxThread->SyncAndStartWatchingMailbox();
 	return status;
 }

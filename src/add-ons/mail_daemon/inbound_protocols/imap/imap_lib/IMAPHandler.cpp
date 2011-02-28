@@ -628,6 +628,27 @@ ExistsHandler::Handle(const BString& response)
 }
 
 
+ExpungeCommmand::ExpungeCommmand(IMAPMailbox& mailbox)
+	:
+	IMAPMailboxCommand(mailbox)
+{
+
+}
+
+BString
+ExpungeCommmand::Command()
+{
+	return "EXPUNGE";
+}
+
+
+bool
+ExpungeCommmand::Handle(const BString& response)
+{
+	return false;
+}
+
+
 ExpungeHandler::ExpungeHandler(IMAPMailbox& mailbox)
 	:
 	IMAPMailboxCommand(mailbox)
@@ -645,7 +666,15 @@ ExpungeHandler::Handle(const BString& response)
 	if (!IMAPParser::ExtractUntagedFromLeft(response, "EXPUNGE", expunge))
 		return false;
 
-	fIMAPMailbox.DeleteMessage(expunge);
+	// remove from storage
+	IMAPStorage& storage = fIMAPMailbox.GetStorage();
+	storage.DeleteMessage(fIMAPMailbox.MessageNumberToUID(expunge));
+
+	// remove from min message list
+	MinMessageList& messageList = const_cast<MinMessageList&>(
+		fIMAPMailbox.GetMessageList());
+	messageList.erase(messageList.begin() + expunge - 1);
+
 	TRACE("EXPUNGE %i\n", (int)expunge);
 
 	// the watching loop restarts again, we need to watch again to because

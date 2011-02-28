@@ -197,6 +197,18 @@ public:
 };
 
 
+/*! Just send a expunge command to delete kDeleted flagged messages. The
+response is handled by the unsolicited ExpungeHandler which is installed all
+the time. */
+class ExpungeCommmand : public IMAPMailboxCommand {
+public:
+								ExpungeCommmand(IMAPMailbox& mailbox);
+
+			BString				Command();
+			bool				Handle(const BString& response);
+};
+
+
 class ExpungeHandler : public IMAPMailboxCommand {
 public:
 								ExpungeHandler(IMAPMailbox& mailbox);
