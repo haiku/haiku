@@ -398,7 +398,13 @@ IMAPInboundProtocol::Reconnect()
 bool
 IMAPInboundProtocol::IsConnected()
 {
-	return fIsConnected;
+	if (!fIsConnected)
+		return false;
+	if (fIMAPMailbox.IsConnected())
+		return true;
+
+	Disconnect();
+	return false;
 }
 
 

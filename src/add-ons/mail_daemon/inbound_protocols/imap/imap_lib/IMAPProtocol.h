@@ -75,6 +75,7 @@ public:
 									const char* username, const char* password,
 									bool useSSL = true, int32 port = -1);
 			status_t			Disconnect();
+			bool				IsConnected();
 
 			ConnectionReader&	GetConnectionReader();
 			status_t			SendRawCommand(const char* command);
@@ -118,6 +119,8 @@ private:
 			BString				fCommandError;
 
 			vint32				fStopNow;
+
+			bool				fIsConnected;
 };
 
 

@@ -101,7 +101,7 @@ ConnectionReader::_GetNextDataBunch(BString& line, bigtime_t timeout,
 	}
 
 	int nReaded = fServerConnection->Read(buffer, maxNewLength);
-	if (nReaded < 0)
+	if (nReaded <= 0)
 		return B_ERROR;
 
 	fStringBuffer.SetTo(buffer, nReaded);
@@ -135,7 +135,8 @@ IMAPProtocol::IMAPProtocol()
 	fServerConnection(&fOwnServerConnection),
 	fConnectionReader(fServerConnection),
 	fCommandId(0),
-	fStopNow(0)
+	fStopNow(0),
+	fIsConnected(false)
 {
 
 }
@@ -146,7 +147,8 @@ IMAPProtocol::IMAPProtocol(IMAPProtocol& connection)
 	fServerConnection(connection.fServerConnection),
 	fConnectionReader(fServerConnection),
 	fCommandId(0),
-	fStopNow(0)
+	fStopNow(0),
+	fIsConnected(false)
 {
 
 }
@@ -203,6 +205,7 @@ IMAPProtocol::Connect(const char* server, const char* username,
 	if (status != B_OK)
 		return status;
 
+	fIsConnected = true;
 	return B_OK;
 }
 
@@ -211,7 +214,15 @@ status_t
 IMAPProtocol::Disconnect()
 {
 	ProcessCommand("LOGOUT");
+	fIsConnected = false;
 	return fOwnServerConnection.Disconnect();
+}
+
+
+bool
+IMAPProtocol::IsConnected()
+{
+	return fIsConnected;
 }
 
 
@@ -281,8 +292,11 @@ IMAPProtocol::SendCommand(const char* command, int32 commandId)
 
 	TRACE("_SendCommand: %s\n", cmd);
 	int commandLength = strlen(cmd);
-	if (fServerConnection->Write(cmd, commandLength) != commandLength)
+	if (fServerConnection->Write(cmd, commandLength) != commandLength) {
+		// we might lost the connection, clear the connection state
+		Disconnect();
 		return B_ERROR;
+	}
 
 	fOngoingCommands.push_back(commandId);
 	return B_OK;
@@ -301,7 +315,10 @@ IMAPProtocol::HandleResponse(int32 commandId, bigtime_t timeout)
 		if (status != B_OK) {
 			if (status != B_TIMED_OUT)
 				TRACE("S:read error %s", line.String());
-			break;
+			// we might lost the connection, clear the connection state
+			TRACE("Disconnect\n");
+			Disconnect();
+			return status;
 		}
 		//TRACE("S: %s", line.String());
 
