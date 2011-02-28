@@ -208,9 +208,6 @@ FetchMinMessageCommand::Handle(const BString& response)
 	if (!ParseMinMessage(extracted, minMessage))
 		return false;
 
-	if ((minMessage.flags & kDeleted) != 0)
-		return true;
-
 	fMinMessageList->push_back(minMessage);
 	fStorage.AddNewMessage(minMessage.uid, minMessage.flags, fData);
 	return true;
@@ -293,9 +290,6 @@ FetchMessageListCommand::Handle(const BString& response)
 	MinMessage minMessage;
 	if (!FetchMinMessageCommand::ParseMinMessage(extracted, minMessage))
 		return false;
-
-	if ((minMessage.flags & kDeleted) != 0)
-		return true;
 
 	fMinMessageList->push_back(minMessage);
 	return true;
