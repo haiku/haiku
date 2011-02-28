@@ -49,8 +49,7 @@
 #define B_TRANSLATE_CONTEXT "MediaPlayer-Main"
 
 
-static const char* kCurrentPlaylistFilename = 
-	B_TRANSLATE("MediaPlayer Current Playlist");
+static const char* kCurrentPlaylistFilename = "MediaPlayer Current Playlist";
 
 const char* kAppSig = "application/x-vnd.Haiku-MediaPlayer";
 
