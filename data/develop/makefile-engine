@@ -1,8 +1,8 @@
-##	BeOS and Haiku Generic Makefile Engine v2.2.0
+##	BeOS and Haiku Generic Makefile Engine v2.4.0
 ##	Does all the hard work for the Generic Makefile
 ##	which simply defines the project parameters
 
-##	Supports Generic Makefile v2.0, 2.01, 2.1, 2.2, 2.3
+##	Supports Generic Makefile v2.0, 2.01, 2.1, 2.2, 2.3, 2.4 
 
 #	determine wheather running on x86 or ppc
 MACHINE=$(shell uname -m)
@@ -19,6 +19,10 @@ endif
 
 ifeq ($(TYPE), )
 	TYPE = APP
+endif
+
+ifeq ($(APP_MIME_SIG), )
+	APP_MIME = x.vnd-Haiku-$(NAME)
 endif
 
 ifeq ($(DRIVER_PATH), )
@@ -217,6 +221,20 @@ endef
 		DO_RSRCS := $(XRES) -o $(TARGET) $(RSRCS)
 	endif
 
+#	the directory for internationalization sources (catkeys)
+	CATKEYS_DIR	:= locales
+
+#	the directory for internationalization resource data (catalogs)
+	CATALOGS_DIR := $(OBJ_DIR)/$(APP_MIME_SIG)
+
+# pseudo-function for converting a list of language codes in CATALOGS variable
+# to a corresponding list of catkeys files in $(CATALOGS_DIR)/xx.catalog
+# The "function" appends the .catalog suffix and prepends the $(CATALOGS_DIR)/ path
+define LOCALES_LIST_TO_CATALOGS
+	$(addprefix $(CATALOGS_DIR)/, $(addsuffix .catalog, $(foreach lang, $(LOCALES), $(lang))))
+endef
+
+CATALOGS = $(LOCALES_LIST_TO_CATALOGS)
 
 #	define the actual work to be done
 default: $(TARGET)
@@ -230,6 +248,14 @@ $(TARGET):	$(OBJ_DIR) $(OBJS) $(RSRCS)
 #	rule to create the object file directory if needed
 $(OBJ_DIR)::
 	@[ -d $(OBJ_DIR) ] || mkdir $(OBJ_DIR) > /dev/null 2>&1
+
+#	rule to create the localization sources directory if needed
+$(CATKEYS_DIR)::
+	@[ -d $(CATKEYS_DIR) ] || mkdir $(CATKEYS_DIR) > /dev/null 2>&1
+
+#	rule to create the localization data directory if needed
+$(CATALOGS_DIR):: $(OBJ_DIR)
+	@[ -d $(CATALOGS_DIR) ] || mkdir $(CATALOGS_DIR) > /dev/null 2>&1
 
 # rules to make the dependency files
 $(OBJ_DIR)/%.d : %.c
@@ -278,6 +304,23 @@ $(OBJ_DIR)/%.rsrc : %.rdef
 $(OBJ_DIR)/%.rsrc : %.RDEF
 	cat $< | $(CC) -E $(INCLUDES) $(CFLAGS) - | grep -v '^#' | $(RESCOMP) -I $(dir $<) -o "$@" -
 
+# rule to compile localization data catalogs
+$(CATALOGS_DIR)/%.catalog : $(CATKEYS_DIR)/%.catkeys
+	linkcatkeys -o "$@" -s $(APP_MIME_SIG) -l $(notdir $(basename $@)) $<
+
+# rule to preprocess program sources into file ready for collecting catkeys 
+$(OBJ_DIR)/$(NAME).pre : $(SRCS)
+	-cat $(SRCS) | $(CC) -E $(INCLUDES) $(CFLAGS) -DB_COLLECTING_CATKEYS - > $(OBJ_DIR)/$(NAME).pre
+
+# rules to collect localization catkeys
+catkeys : $(CATKEYS_DIR)/en.catkeys
+
+$(CATKEYS_DIR)/en.catkeys : $(CATKEYS_DIR) $(OBJ_DIR)/$(NAME).pre
+	collectcatkeys -s $(APP_MIME_SIG) $(OBJ_DIR)/$(NAME).pre -o $(CATKEYS_DIR)/en.catkeys
+
+# rule to create localization catalogs
+catalogs : $(CATALOGS_DIR) $(CATALOGS)
+
 #	rules to handle lex/flex and yacc/bison files
 
 $(OBJ_DIR)/%.o: %.l
@@ -316,3 +359,9 @@ else
 	mkdir -p "$(INSTALL_DIR)"
 	cp $(TARGET) $(INSTALL_DIR)/$(NAME)
 endif
+
+#	rule to install localization resources catalogs
+catalogsinstall :: catalogs
+	mkdir -p "/boot/home/config/data/locale/catalogs/$(APP_MIME_SIG)"
+	-cp $(CATALOGS_DIR)/*.catalog /boot/home/config/data/locale/catalogs/$(APP_MIME_SIG)
+

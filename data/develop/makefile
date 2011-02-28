@@ -1,4 +1,4 @@
-## BeOS Generic Makefile v2.3 ##
+## BeOS Generic Makefile v2.4 ##
 
 ## Fill in this file to specify the project being created, and the referenced
 ## makefile-engine will do all of the hard work for you.  This handles both
@@ -15,6 +15,10 @@ NAME=
 #	STATIC:	Static library archive
 #	DRIVER: Kernel Driver
 TYPE= 
+
+# 	if you plan to use localization features 
+# 	specify the application MIME siganture
+APP_MIME_SIG= 
 
 #	add support for new Pe and Eddie features
 #	to fill in generic makefile
@@ -51,6 +55,9 @@ RSRCS=
 #	-	if your library follows the naming pattern of:
 #		libXXX.so or libXXX.a you can simply specify XXX
 #		library: libbe.so entry: be
+#
+#	-	for localization support add following libs:
+#		locale localestub
 #		
 #	- 	if your library does not follow the standard library
 #		naming scheme you need to specify the path to the library
@@ -79,6 +86,14 @@ LOCAL_INCLUDE_PATHS =
 #	specify the level of optimization that you desire
 #	NONE, SOME, FULL
 OPTIMIZE= 
+
+# 	specify here the codes for languages you are going
+# 	to support in this application. The default "en"
+# 	one must be provided too. "make catkeys" will recreate only
+# 	locales/en.catkeys file. Use it as template for creating other
+# 	languages catkeys. All localization files must be placed
+# 	in "locales" sub-directory.
+LOCALES=
 
 #	specify any preprocessor symbols to be defined.  The symbols will not
 #	have their values set automatically; you must supply the value (if any)
