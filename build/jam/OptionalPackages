@@ -1004,15 +1004,15 @@ if [ IsOptionalHaikuImagePackageAdded LibEvent ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				libevent-1.4.13-x86-gcc4-2010-10-30.zip
-				: $(baseURL)/lib/libevent-1.4.13-x86-gcc4-2010-10-30.zip
+				libevent-2.0.10-x86-gcc4-2011-02-28.zip
+				: $(baseURL)/lib/libevent-2.0.10-x86-gcc4-2011-02-28.zip
 				:
 				: true
 			;
 		} else {
 			InstallOptionalHaikuImagePackage
-				libevent-1.4.13-x86-gcc2-2010-10-29.zip
-				: $(baseURL)/lib/libevent-1.4.13-x86-gcc2-2010-10-29.zip
+				libevent-2.0.10-x86-gcc2-2011-02-25.zip
+				: $(baseURL)/lib/libevent-2.0.10-x86-gcc2-2011-02-25.zip
 				:
 				: true
 			;
