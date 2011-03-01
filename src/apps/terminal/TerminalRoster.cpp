@@ -257,7 +257,6 @@ TerminalRoster::Unregister()
 
 	// remove our info and update the clipboard
 	fInfos.RemoveItem(fOurInfo);
-	delete fOurInfo;
 	fOurInfo = NULL;
 
 	_UpdateClipboard();
