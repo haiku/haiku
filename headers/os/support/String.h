@@ -49,7 +49,7 @@ public:
 			BString&		SetToChars(const BString& string, int32 charCount);
 			BString&		AdoptChars(BString& from, int32 charCount);
 			
-			BString&		SetToArguments(const char* format, ...);
+			BString&		SetToFormat(const char* format, ...);
 
 			// Substring copying
 			BString&		CopyInto(BString& into, int32 fromOffset,

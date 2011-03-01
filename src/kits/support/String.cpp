@@ -425,7 +425,7 @@ BString::AdoptChars(BString& string, int32 charCount)
 
 
 BString&
-BString::SetToArguments(const char* format, ...)
+BString::SetToFormat(const char* format, ...)
 {
 	va_list arg;
 	va_start(arg, format);
@@ -433,7 +433,8 @@ BString::SetToArguments(const char* format, ...)
 	va_end(arg);
 	
 	if (bytes <= Length()) {
-		bytes = bytes < 0 ? 0 : bytes;
+		if (bytes < 0)
+			bytes = 0;
 		UnlockBuffer(bytes);
 	} else {
 		va_list arg2;
