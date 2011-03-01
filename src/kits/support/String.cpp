@@ -427,23 +427,31 @@ BString::AdoptChars(BString& string, int32 charCount)
 BString&
 BString::SetToFormat(const char* format, ...)
 {
+	int32 bufferSize = 1024;
+	char buffer[bufferSize];
+	
 	va_list arg;
 	va_start(arg, format);
-	int32 bytes = vsnprintf(LockBuffer(0), Length() + 1, format, arg);
+	int32 bytes = vsnprintf(buffer, bufferSize, format, arg);
 	va_end(arg);
-	
-	if (bytes <= Length()) {
-		if (bytes < 0)
-			bytes = 0;
-		UnlockBuffer(bytes);
-	} else {
-		va_list arg2;
-		va_start(arg2, format);
-		bytes = vsnprintf(LockBuffer(bytes), bytes + 1, format, arg2);
-		va_end(arg2);
-		UnlockBuffer(bytes);
+
+	if (bytes < 0)
+		return Truncate(0);
+
+	if (bytes < bufferSize) {
+		SetTo(buffer);
+		return *this;
 	}
-	
+
+	va_list arg2;
+	va_start(arg2, format);
+	bytes = vsnprintf(LockBuffer(bytes), bytes + 1, format, arg2);
+	va_end(arg2);
+
+	if (bytes < 0)
+		bytes = 0;
+
+	UnlockBuffer(bytes);
 	return *this;
 }
 
