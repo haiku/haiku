@@ -1543,13 +1543,13 @@ if [ IsOptionalHaikuImagePackageAdded SQLite ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				sqlite-3.7.3-x86-gcc4-2010-11-12.zip
-				: $(baseURL)/sqlite-3.7.3-x86-gcc4-2010-11-12.zip
+				sqlite-3.7.5-x86-gcc4-2011-02-28.zip
+				: $(baseURL)/sqlite-3.7.5-x86-gcc4-2011-02-28.zip
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				sqlite-3.7.3-x86-gcc2-2010-10-13.zip
-				: $(baseURL)/sqlite-3.7.3-x86-gcc2-2010-10-13.zip
+				sqlite-3.7.5-x86-gcc2-2011-02-25.zip
+				: $(baseURL)/sqlite-3.7.5-x86-gcc2-2011-02-25.zip
 				: : true ;
 		}
 	}
