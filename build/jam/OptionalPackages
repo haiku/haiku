@@ -635,32 +635,8 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentJava ] {
 		Echo "No optional package DevelopmentJava available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage
-			classpath-0.98-x86-gcc4-2011-02-13.zip
-			: http://jerome.duval.free.fr/obos/classpath-0.98-x86-gcc4-2011-02-13.zip ;
-		AddSymlinkToHaikuImage common bin : 
-			/boot/common/bin/i586-pc-haiku-grmiregistry : rmiregistry ;
-		AddSymlinkToHaikuImage common bin :
-			/boot/common/bin/i586-pc-haiku-gserialver : serialver ;
-		AddSymlinkToHaikuImage common bin : 
-			/boot/common/bin/i586-pc-haiku-gjar : jar ;
-		AddSymlinkToHaikuImage common bin : 
-			/boot/common/bin/i586-pc-haiku-gjavah : javah ;
-		AddSymlinkToHaikuImage common bin : 
-			/boot/common/bin/i586-pc-haiku-gnameserv : nameserv ;
-		AddSymlinkToHaikuImage common bin : 
-			/boot/common/bin/i586-pc-haiku-gorbd : orbd ;
-		AddSymlinkToHaikuImage common bin : 
-			/boot/common/bin/i586-pc-haiku-grmid : rmid ;
-		AddSymlinkToHaikuImage common bin : 
-			/boot/common/bin/i586-pc-haiku-gkeytool : keytool ;
-		AddSymlinkToHaikuImage common bin : 
-			/boot/common/bin/i586-pc-haiku-gappletviewer : appletviewer ;
-		AddSymlinkToHaikuImage common bin : 
-			/boot/common/bin/i586-pc-haiku-grmic : rmic ;
-		AddSymlinkToHaikuImage common bin : 
-			/boot/common/bin/i586-pc-haiku-gnative2ascii : native2ascii ;
-		AddSymlinkToHaikuImage common bin : 
-			/boot/common/bin/i586-pc-haiku-gjarsigner : jarsigner ;
+			gnu-classpath-0.98-x86-gcc4-2011-03-01.zip
+			: http://jerome.duval.free.fr/obos/gnu-classpath-0.98-x86-gcc4-2011-03-01.zip ;
 		InstallOptionalHaikuImagePackage
 			jamvm-1.5.4-x86-gcc4-2011-02-13.zip
 			: http://jerome.duval.free.fr/obos/jamvm-1.5.4-x86-gcc4-2011-02-13.zip ;
