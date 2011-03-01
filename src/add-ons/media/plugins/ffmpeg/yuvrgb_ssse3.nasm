@@ -33,85 +33,6 @@
 %1:
 %endmacro
 
-; conversion code 
-%macro yuv2rgbsse2 0
-; u = u - 128
-; v = v - 128
-; r = y + v + v >> 2 + v >> 3 + v >> 5 
-; g = y - (u >> 2 + u >> 4 + u >> 5) - (v >> 1 + v >> 3 + v >> 4 + v >> 5)
-; b = y + u + u >> 1 + u >> 2 + u >> 6
-; subtract 16 from y
-	movdqa xmm7, [Const16]			; loads a constant using data cache (slower on first fetch but then cached)
-	psubsw xmm0,xmm7				; y = y - 16
-; subtract 128 from u and v
-	movdqa xmm7, [Const128]			; loads a constant using data cache (slower on first fetch but then cached)
-	psubsw xmm1,xmm7				; u = u - 128
-	psubsw xmm2,xmm7				; v = v - 128
-; load r,b with y 
-	movdqa xmm3,xmm0				; r = y 
-	pshufd xmm5,xmm0, 0xE4			; b = y 
-
-; r = y + v + v >> 2 + v >> 3 + v >> 5
-	paddsw xmm3, xmm2				; add v to r
-	movdqa xmm7, xmm1				; move u to scratch
-	pshufd xmm6, xmm2, 0xE4			; move v to scratch
-	
-	psraw  xmm6,2					; divide v by 4
-	paddsw xmm3, xmm6				; and add to r
-	psraw  xmm6,1					; divide v by 2
-	paddsw xmm3, xmm6				; and add to r
-	psraw  xmm6,2					; divide v by 4
-	paddsw xmm3, xmm6				; and add to r
-
-; b = y + u + u >> 1 + u >> 2 + u >> 6
-	paddsw xmm5, xmm1				; add u to b
-	psraw  xmm7,1					; divide u by 2
-	paddsw xmm5, xmm7				; and add to b
-	psraw  xmm7,1					; divide u by 2
-	paddsw xmm5, xmm7				; and add to b
-	psraw  xmm7,4					; divide u by 32
-	paddsw xmm5, xmm7				; and add to b
-	
-; g = y - u >> 2 - u >> 4 - u >> 5 - v >> 1 - v >> 3 - v >> 4 - v >> 5
-	movdqa xmm7,xmm2				; move v to scratch
-	pshufd xmm6,xmm1, 0xE4			; move u to scratch
-	movdqa xmm4,xmm0				; g = y 
-	
-	psraw  xmm6,2					; divide u by 4
-	psubsw xmm4,xmm6				; subtract from g
-	psraw  xmm6,2					; divide u by 4
-	psubsw xmm4,xmm6				; subtract from g
-	psraw  xmm6,1					; divide u by 2
-	psubsw xmm4,xmm6				; subtract from g
-
-	psraw  xmm7,1					; divide v by 2
-	psubsw xmm4,xmm7				; subtract from g
-	psraw  xmm7,2					; divide v by 4
-	psubsw xmm4,xmm7				; subtract from g
-	psraw  xmm7,1					; divide v by 2
-	psubsw xmm4,xmm7				; subtract from g
-	psraw  xmm7,1					; divide v by 2
-	psubsw xmm4,xmm7				; subtract from g
-%endmacro
-
-; outputer
-%macro rgba32sse2output 0
-; clamp values
-	pxor xmm7,xmm7
-	packuswb xmm3,xmm7				; clamp to 0,255 and pack R to 8 bit per pixel
-	packuswb xmm4,xmm7				; clamp to 0,255 and pack G to 8 bit per pixel
-	packuswb xmm5,xmm7				; clamp to 0,255 and pack B to 8 bit per pixel
-; convert to bgra32 packed
-	punpcklbw xmm5,xmm4				; bgbgbgbgbgbgbgbg
-	movdqa xmm0, xmm5				; save bg values
-	punpcklbw xmm3,xmm7				; r0r0r0r0r0r0r0r0
-	punpcklwd xmm5,xmm3				; lower half bgr0bgr0bgr0bgr0
-	punpckhwd xmm0,xmm3				; upper half bgr0bgr0bgr0bgr0
-; write to output ptr
-	movntdq [edi], xmm5				; output first 4 pixels bypassing cache
-	movntdq [edi+16], xmm0			; output second 4 pixels bypassing cache
-%endmacro
-
 SECTION .data align=16
 
 Const16	dw	16
@@ -183,6 +104,118 @@ YMask	db	0x00
 	db	0x0e
 	db	0x80
 
+UVMask	db	0x01
+	db	0x80
+	db	0x03
+	db	0x80
+	db	0x05
+	db	0x80
+	db	0x07
+	db	0x80
+	db	0x09
+	db	0x80
+	db	0x0b
+	db	0x80
+	db	0x0d
+	db	0x80
+	db	0x0f
+	db	0x80
+
+shuffconst db 0x0
+		db 0x01
+		db 0x00
+		db 0x01
+		db 0x04
+		db 0x05
+		db 0x04
+		db 0x05
+		db 0x08
+		db 0x09
+		db 0x08
+		db 0x09
+		db 0x0c
+		db 0x0d
+		db 0x0c
+		db 0x0d
+
+RConst	dw 0
+		dw 5743
+		dw 0
+		dw 5743
+		dw 0
+		dw 5743
+		dw 0
+		dw 5743
+		
+GConst	dw -1409
+		dw -2925
+		dw -1409
+		dw -2925
+		dw -1409
+		dw -2925
+		dw -1409
+		dw -2925
+		
+BConst	dw 7258
+		dw 0
+		dw 7258
+		dw 0
+		dw 7258
+		dw 0
+		dw 7258
+		dw 0
+
+; conversion code 
+%macro yuv2rgbssse3 0
+; u = u - 128
+; v = v - 128
+; r = y + 0 * u + 1.403 * v
+; g = y + -0.344 * u + -0.714 * v
+; b = y + 1.773 * u + 0 * v
+; subtract 128 from u and v
+	psubsw xmm3, [Const128]			; u = u - 128, v = v -128
+	
+	pshufd xmm5, xmm3, 0xE4			; duplicate
+	movdqa xmm4, xmm3				; duplicate
+	
+; subtract 16 from y
+;	psubsw xmm0, [Const16]			; y = y - 16
+
+	pmaddwd xmm3, [RConst]			; multiply and add
+	pmaddwd xmm4, [GConst]			; to get RGB offsets to Y
+	pmaddwd xmm5, [BConst]			;
+
+	psrad xmm3, 12					; Scale back to original range
+	psrad xmm4, 12					;
+	psrad xmm5, 12					;
+
+	pshufb xmm3, [shuffconst]		; duplicate results
+	pshufb xmm4, [shuffconst]		; 2 y values per const
+	pshufb xmm5, [shuffconst]		;
+
+	paddsw xmm3, xmm0				; and add to y
+	paddsw xmm4, xmm0				;
+	paddsw xmm5, xmm0				;
+%endmacro
+
+; outputer
+%macro rgba32ssse3output 0
+; clamp values
+	pxor xmm7,xmm7
+	packuswb xmm3,xmm7				; clamp to 0,255 and pack R to 8 bit per pixel
+	packuswb xmm4,xmm7				; clamp to 0,255 and pack G to 8 bit per pixel
+	packuswb xmm5,xmm7				; clamp to 0,255 and pack B to 8 bit per pixel
+; convert to bgra32 packed
+	punpcklbw xmm5,xmm4				; bgbgbgbgbgbgbgbg
+	movdqa xmm0, xmm5				; save bg values
+	punpcklbw xmm3,xmm7				; r0r0r0r0r0r0r0r0
+	punpcklwd xmm5,xmm3				; lower half bgr0bgr0bgr0bgr0
+	punpckhwd xmm0,xmm3				; upper half bgr0bgr0bgr0bgr0
+; write to output ptr
+	movntdq [edi], xmm5				; output first 4 pixels bypassing cache
+	movntdq [edi+16], xmm0			; output second 4 pixels bypassing cache
+%endmacro
+
 
 ; void Convert_YUV422_RGBA32_SSSE3(void *fromPtr, void *toPtr, int width)
 width    equ	ebp+16
@@ -214,20 +247,18 @@ cglobal Convert_YUV422_RGBA32_SSSE3
 	test ecx,ecx
 	jng ENDLOOP
 REPEATLOOP:							; loop over width / 8
+	prefetchnta [esi+256]
 ; YUV422 packed inputer
 	movdqa xmm0, [esi]				; should have yuyv yuyv yuyv yuyv
-	pshufd xmm1, xmm0, 0xE4			; copy to xmm1
-	movdqa xmm2, xmm0				; copy to xmm2
+	pshufd xmm3, xmm0, 0xE4			; copy to xmm1
 ; extract both y giving y0y0
 	pshufb xmm0, [YMask]
-; extract u and duplicate so each u in yuyv becomes u0u0
-	pshufb xmm1, [UMask]
-; extract v and duplicate so each v in yuyv becomes v0v0
-	pshufb xmm2, [VMask]
+; extract u and v to have u0v0
+	pshufb xmm3, [UVMask]
 
-yuv2rgbsse2
+yuv2rgbssse3
 	
-rgba32sse2output
+rgba32ssse3output
 
 ; endloop
 	add edi,32
@@ -263,28 +294,26 @@ cglobal Convert_YUV420P_RGBA32_SSSE3
 	test ecx,ecx
 	jng ENDLOOP1
 REPEATLOOP1:						; loop over width / 8
+	prefetchnta [esi+256]
+	prefetchnta [eax+128]
+	prefetchnta [ebx+128]
+
 ; YUV420 Planar inputer
 	movq xmm0, [esi]				; fetch 8 y values (8 bit) yyyyyyyy00000000
-	movd xmm1, [eax]				; fetch 4 u values (8 bit) uuuu000000000000
-	movd xmm2, [ebx]				; fetch 4 v values (8 bit) vvvv000000000000
+	movd xmm3, [eax]				; fetch 4 u values (8 bit) uuuu000000000000
+	movd xmm1, [ebx]				; fetch 4 v values (8 bit) vvvv000000000000
 	
-; extract y
+; convert y to 16 bit
 	pxor xmm7,xmm7					; 00000000000000000000000000000000
 	punpcklbw xmm0,xmm7				; interleave xmm7 into xmm0 y0y0y0y0y0y0y0y0
-; extract u and duplicate so each becomes 0u0u
-	punpcklbw xmm1,xmm7				; interleave xmm7 into xmm1 u0u0u0u000000000
-	punpcklwd xmm1,xmm7				; interleave again u000u000u000u000
-	pshuflw xmm1,xmm1, 0xA0			; copy u values
-	pshufhw xmm1,xmm1, 0xA0			; to get u0u0
-; extract v
-	punpcklbw xmm2,xmm7				; interleave xmm7 into xmm1 v0v0v0v000000000
-	punpcklwd xmm2,xmm7				; interleave again v000v000v000v000
-	pshuflw xmm2,xmm2, 0xA0			; copy v values
-	pshufhw xmm2,xmm2, 0xA0			; to get v0v0
-
-yuv2rgbsse2
 	
-rgba32sse2output
+; combine u and v
+	punpcklbw xmm3,xmm1				; uvuvuvuv00000000
+	punpcklbw xmm3,xmm7				; u0v0u0v0u0v0u0v0
+	
+yuv2rgbssse3
+	
+rgba32ssse3output
 
 ; endloop
 	add edi,32

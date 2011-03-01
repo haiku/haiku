@@ -42,9 +42,11 @@ resolve_colorspace(color_space colorSpace, PixelFormat pixelFormat, int width,
 
 			if (pixelFormat == PIX_FMT_YUV420P 
 				|| pixelFormat == PIX_FMT_YUVJ420P) {
-				if (cpu.HasSSE2() && width % 8 == 0 && height % 2 == 0) {
-					TRACE("resolve_colorspace: "
-						"gfx_conv_yuv420p_rgba32_sse2\n");
+				if (cpu.HasSSSE3() && width % 8 == 0 && height % 2 == 0) {
+					TRACE("resolve_colorspace: gfx_conv_yuv420p_rgba32_ssse3\n");
+					return gfx_conv_yuv420p_rgba32_ssse3;
+				} else if (cpu.HasSSE2() && width % 8 == 0 && height % 2 == 0) {
+					TRACE("resolve_colorspace: gfx_conv_yuv420p_rgba32_sse2\n");
 					return gfx_conv_yuv420p_rgba32_sse2;
 				} else if (cpu.HasSSE1() && width % 4 == 0
 					&& height % 2 == 0) {
@@ -58,7 +60,10 @@ resolve_colorspace(color_space colorSpace, PixelFormat pixelFormat, int width,
 
 			if (pixelFormat == PIX_FMT_YUV422P
 				|| pixelFormat == PIX_FMT_YUVJ422P) {
-				if (cpu.HasSSE2() && width % 8 == 0) {
+				if (cpu.HasSSSE3() && width % 8 == 0) {
+					TRACE("resolve_colorspace: gfx_conv_yuv422p_RGB32_ssse3\n");
+					return gfx_conv_yuv422p_rgba32_ssse3;
+				} else if (cpu.HasSSE2() && width % 8 == 0) {
 					TRACE("resolve_colorspace: gfx_conv_yuv422p_RGB32_sse2\n");
 					return gfx_conv_yuv422p_rgba32_sse2;
 				} else if (cpu.HasSSE1() && width % 4 == 0) {

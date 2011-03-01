@@ -42,7 +42,7 @@
 ; b = y + u + u >> 1 + u >> 2 + u >> 6
 ; subtract 16 from y
 	movq mm7, [Const16]				; loads a constant using data cache (slower on first fetch but then cached)
-	psubsw mm0,mm7					; y = y - 16
+;	psubsw mm0,mm7					; y = y - 16
 ; subtract 128 from u and v
 	movq mm7, [Const128]			; loads a constant using data cache (slower on first fetch but then cached)
 	psubsw mm1,mm7					; u = u - 128
