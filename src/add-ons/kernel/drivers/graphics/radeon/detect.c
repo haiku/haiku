@@ -581,8 +581,7 @@ static bool probeDevice(device_info *di)
 			di->is_igp = (device->features & INTEGRATED) ? true : false;
 
 			// detect chips with broken I2C
-			switch(device->device_id)
-			{
+			switch (device->device_id) {
 				case DEVICE_ID_RADEON_LY:
 				case DEVICE_ID_RADEON_LZ:
 				case DEVICE_ID_RADEON_LW:
@@ -600,8 +599,7 @@ static bool probeDevice(device_info *di)
 			// disable 2d DMA engine for chips that don't work with our
 			// dma code (yet).  I would have used asic type, but R410s are
 			// treated same asic as r420s in code, and the AGP x800 works fine.
-			switch (device->device_id)
-			{
+			switch (device->device_id) {
 				// rv370
 				case DEVICE_ID_RADEON_5b60:
 				case DEVICE_ID_RADEON_5b62:
