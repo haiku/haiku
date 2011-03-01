@@ -61,6 +61,13 @@ DispatcherIMAPListener::NewMessagesToFetch(int32 nMessages)
 }
 
 
+void
+DispatcherIMAPListener::FetchEnd()
+{
+	fProtocol.ResetProgress();
+}
+
+
 const uint32 kMsgStartWatching = '&StW';
 
 

@@ -31,6 +31,7 @@ public:
 			void				BodyFetched(int32 uid, BPositionIO* data);
 
 			void				NewMessagesToFetch(int32 nMessages);
+			void				FetchEnd();
 private:
 			MailProtocol&		fProtocol;
 			IMAPStorage&		fStorage;

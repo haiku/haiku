@@ -22,6 +22,7 @@ public:
 	virtual void				BodyFetched(int32 uid, BPositionIO* data) {}
 
 	virtual	void				NewMessagesToFetch(int32 nMessages) {}
+	virtual	void				FetchEnd() {}
 };
 
 

@@ -130,6 +130,7 @@ public:
 								FetchMessageCommand(IMAPMailbox& mailbox,
 									int32 firstMessage, int32 lastMessage,
 									int32 fetchBodyLimit = -1);
+								~FetchMessageCommand();
 
 			BString				Command();
 			bool				Handle(const BString& response);

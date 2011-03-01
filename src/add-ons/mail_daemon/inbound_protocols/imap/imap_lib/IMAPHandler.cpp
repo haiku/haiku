@@ -306,7 +306,7 @@ FetchMessageCommand::FetchMessageCommand(IMAPMailbox& mailbox, int32 message,
 	fOutData(data),
 	fFetchBodyLimit(fetchBodyLimit)
 {
-
+	fIMAPMailbox.Listener().NewMessagesToFetch(fEndMessage - fMessage + 1);
 }
 
 
@@ -320,7 +320,13 @@ FetchMessageCommand::FetchMessageCommand(IMAPMailbox& mailbox,
 	fOutData(NULL),
 	fFetchBodyLimit(fetchBodyLimit)
 {
-	
+	fIMAPMailbox.Listener().NewMessagesToFetch(fEndMessage - fMessage + 1);
+}
+
+
+FetchMessageCommand::~FetchMessageCommand()
+{
+	fIMAPMailbox.Listener().FetchEnd();
 }
 
 
@@ -478,6 +484,8 @@ FetchBodyCommand::Handle(const BString& response)
 	int32 uid = fIMAPMailbox.MessageNumberToUID(message);
 	if (uid >= 0)
 		fIMAPMailbox.Listener().BodyFetched(uid, fOutData);
+	else
+		fIMAPMailbox.Listener().FetchEnd();
 
 	return true;
 }
@@ -614,8 +622,6 @@ ExistsHandler::Handle(const BString& response)
 	IMAPCommand* command = new FetchMinMessageCommand(fIMAPMailbox,
 		nMessages + 1, exists, &list, NULL);
 	fIMAPMailbox.AddAfterQuakeCommand(command);
-
-	fIMAPMailbox.Listener().NewMessagesToFetch(exists - nMessages);
 
 	command = new FetchMessageCommand(fIMAPMailbox, nMessages + 1, exists,
 		fIMAPMailbox.FetchBodyLimit());
