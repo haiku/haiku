@@ -126,6 +126,7 @@ typedef struct
 Shell::Shell()
 	:
 	fFd(-1),
+	fProcessID(-1),
 	fTermParse(NULL),
 	fAttached(false)
 {

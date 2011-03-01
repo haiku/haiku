@@ -70,6 +70,7 @@ TermParse::TermParse(int fd)
 	:
 	fFd(fd),
 	fAttr(FORECOLORED(7)),
+	fSavedAttr(FORECOLORED(7)),
 	fParseThread(-1),
 	fReaderThread(-1),
 	fReaderSem(-1),

@@ -54,7 +54,7 @@ public:
 
 	status_t StartThreads(TerminalBuffer *view);
 	status_t StopThreads();
-  
+
 private:
 	inline uchar _NextParseChar();
 
@@ -99,12 +99,10 @@ private:
 	uchar fParserBuffer[ESC_PARSER_BUFFER_SIZE];
 	int32 fParserBufferSize;
 	int32 fParserBufferOffset;
-	
-	int fLockFlag;
 
 	TerminalBuffer *fBuffer;
-  
-	bool fQuitting;	
+
+	bool fQuitting;
 };
 
 #endif // TERMPARSE_H
