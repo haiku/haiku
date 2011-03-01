@@ -65,20 +65,20 @@ InterfacesAddOn::CreateView(BRect *bounds)
 	// Construct the ListView
 	fListview = new InterfacesListView(intViewRect,
 		"interfaces", B_FOLLOW_ALL_SIDES);
-	fListview->SetSelectionMessage(new BMessage(INTERFACE_SELECTED_MSG));
-	fListview->SetInvocationMessage(new BMessage(CONFIGURE_INTERFACE_MSG));
+	fListview->SetSelectionMessage(new BMessage(kMsgInterfaceSel));
+	fListview->SetInvocationMessage(new BMessage(kMsgInterfaceAct));
 
 	BScrollView* scrollView = new BScrollView(NULL, fListview,
 		B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS, false, true);
 
 	// Construct the BButtons
 	fConfigure = new BButton(intViewRect, "configure",
-		"Configure" B_UTF8_ELLIPSIS, new BMessage(CONFIGURE_INTERFACE_MSG));
+		"Configure" B_UTF8_ELLIPSIS, new BMessage(kMsgInterfaceCfg));
 
 	fConfigure->SetEnabled(false);
 
 	fOnOff = new BButton(intViewRect, "onoff", "Disable",
-		new BMessage(ONOFF_INTERFACE_MSG));
+		new BMessage(kMsgInterfaceTog));
 
 	fOnOff->SetEnabled(false);
 
@@ -127,36 +127,41 @@ InterfacesAddOn::MessageReceived(BMessage* msg)
 	}
 
 	switch (msg->what) {
-	case INTERFACE_SELECTED_MSG: {
-		fOnOff->SetEnabled(item != NULL);
-		fConfigure->SetEnabled(item != NULL);
-		if (!item)
+		case kMsgInterfaceSel:
+		{
+			fOnOff->SetEnabled(item != NULL);
+			fConfigure->SetEnabled(item != NULL);
+			if (!item)
+				break;
+			fConfigure->SetEnabled(!item->IsDisabled());
+			fOnOff->SetLabel(item->IsDisabled() ? "Enable" : "Disable");
 			break;
-		fConfigure->SetEnabled(!item->IsDisabled());
-		fOnOff->SetLabel(item->IsDisabled() ? "Enable" : "Disable");
-		break;
-	}
+		}
 
-	case CONFIGURE_INTERFACE_MSG: {
-		if (!item)
+		case kMsgInterfaceAct:
+		case kMsgInterfaceCfg:
+		{
+			if (!item)
+				break;
+
+			InterfaceWindow* sw = new InterfaceWindow(item->GetSettings());
+			sw->Show();
 			break;
+		}
 
-		InterfaceWindow* sw = new InterfaceWindow(item->GetSettings());
-		sw->Show();
-		break;
-	}
+		case kMsgInterfaceTog:
+		{
+			if (!item)
+				break;
 
-	case ONOFF_INTERFACE_MSG:
-		if (!item)
+			item->SetDisabled(!item->IsDisabled());
+			fOnOff->SetLabel(item->IsDisabled() ? "Enable" : "Disable");
+			fConfigure->SetEnabled(!item->IsDisabled());
+			fListview->Invalidate();
 			break;
+		}
 
-		item->SetDisabled(!item->IsDisabled());
-		fOnOff->SetLabel(item->IsDisabled() ? "Enable" : "Disable");
-		fConfigure->SetEnabled(!item->IsDisabled());
-		fListview->Invalidate();
-		break;
-
-	default:
-		BBox::MessageReceived(msg);
+		default:
+			BBox::MessageReceived(msg);
 	}
 }

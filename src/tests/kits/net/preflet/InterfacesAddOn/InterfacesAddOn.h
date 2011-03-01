@@ -23,27 +23,26 @@
 class InterfacesAddOn : public NetworkSetupAddOn, public BBox
 {
 public:
-		InterfacesAddOn(image_id addon_image);
-		~InterfacesAddOn();
+								InterfacesAddOn(image_id addon_image);
+								~InterfacesAddOn();
 
-		const char* 	Name();
-		status_t		Save();
+			const char* 		Name();
+			status_t			Save();
 
-		BView*			CreateView(BRect *bounds);
+			BView*				CreateView(BRect *bounds);
 
-		enum {
-			INTERFACE_SELECTED_MSG		= 'ifce',
-			CONFIGURE_INTERFACE_MSG		= 'conf',
-			ONOFF_INTERFACE_MSG			= 'onof'
-		};
+	static	const uint32        kMsgInterfaceSel = 'ifce';
+	static	const uint32        kMsgInterfaceAct = 'ifac';
+	static	const uint32        kMsgInterfaceCfg = 'ifcf';
+	static	const uint32        kMsgInterfaceTog = 'onof';
 
-		void			AttachedToWindow();
-		void			MessageReceived(BMessage* msg);
+			void				AttachedToWindow();
+			void				MessageReceived(BMessage* msg);
 
 private:
-		InterfacesListView* fListview;
-		BButton*		fConfigure;
-		BButton*		fOnOff;
+			InterfacesListView*	fListview;
+			BButton*			fConfigure;
+			BButton*			fOnOff;
 };
 
 
