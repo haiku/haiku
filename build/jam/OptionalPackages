@@ -1409,8 +1409,8 @@ if [ IsOptionalHaikuImagePackageAdded PCRE ] {
 		Echo "No optional package PCRE available for $(TARGET_ARCH)" ;
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
-			InstallOptionalHaikuImagePackage pcre-8.12-x86-gcc4-2011-02-28.zip
-				: $(baseURL)/pcre-8.12-x86-gcc4-2011-02-28.zip
+			InstallOptionalHaikuImagePackage libpcre-8.12-x86-gcc4-2011-02-28.zip
+				: $(baseURL)/libpcre-8.12-x86-gcc4-2011-02-28.zip
 			;
 		} else {
 			InstallOptionalHaikuImagePackage
