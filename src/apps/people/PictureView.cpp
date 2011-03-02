@@ -458,9 +458,6 @@ PictureView::_BeginDrag(BPoint sourcePoint)
 void
 PictureView::_HandleDrop(BMessage* msg)
 {
-	printf("PictureControl::_HandleDrop(): \n");
-	msg->PrintToStream();
-
 	entry_ref dirRef;
 	BString name, type;
 	bool saveToFile = msg->FindString("be:filetypes", &type) == B_OK
@@ -483,7 +480,7 @@ PictureView::_HandleDrop(BMessage* msg)
 
 	BBitmapStream stream(bitmap);
 
-	// find transaltion format asked for
+	// find translation format we're asked for
 	translator_info* outInfo;
 	int32 outNumInfo;
 	bool found = false;
@@ -543,7 +540,7 @@ PictureView::_HandleDrop(BMessage* msg)
 		}
 	}
 
-	// Detach, as we don't want our picture to be deleted
+	// Detach, as we don't want our fPicture to be deleted
 	stream.DetachBitmap(&bitmap);
 }
 
@@ -555,6 +552,15 @@ PictureView::_LoadPicture(const entry_ref* ref)
 	status_t status = file.SetTo(ref, B_READ_ONLY);
 	if (status != B_OK)
 		return status;
+
+	off_t fileSize;
+	status = file.GetSize(&fileSize);
+	if (status != B_OK)
+		return status;
+
+	// Check that we've at least some data to translate...
+	if (fileSize < 1)
+		return B_OK;
 
 	translator_info info;
 	memset(&info, 0, sizeof(translator_info));
@@ -583,7 +589,7 @@ PictureView::_LoadPicture(const entry_ref* ref)
 	if (picture == NULL)
 		return B_ERROR;
 
-	// Remember image format so we store using same
+	// Remember image format so we could store using the same
 	fPictureMIMEType = info.MIME;
 	fPictureType = info.type;
 
