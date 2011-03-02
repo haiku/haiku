@@ -722,7 +722,7 @@ bfs_ioctl(fs_volume* _volume, fs_vnode* _node, void* _cookie, uint32 cmd,
 		}
 #endif
 	}
-	return B_BAD_VALUE;
+	return B_DEV_INVALID_IOCTL;
 }
 
 

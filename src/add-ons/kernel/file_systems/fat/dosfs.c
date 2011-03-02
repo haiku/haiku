@@ -1220,7 +1220,7 @@ dosfs_ioctl(fs_volume *_vol, fs_vnode *_node, void *cookie, uint32 code,
 		default :
 			DPRINTF(0, ("dosfs_ioctl: vol %lx, vnode %Lx code = %ld\n",
 				vol->id, node->vnid, code));
-			result = EINVAL;
+			result = B_DEV_INVALID_IOCTL;
 			break;
 	}
 

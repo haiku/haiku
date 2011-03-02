@@ -328,7 +328,7 @@ status_t
 Volume::IOCtl(Node* node, void* cookie, int cmd, void* buffer,
 	size_t bufferSize)
 {
-	return B_BAD_VALUE;
+	return B_DEV_INVALID_IOCTL;
 }
 
 // SetFlags

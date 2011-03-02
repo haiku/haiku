@@ -370,7 +370,7 @@ exfat_ioctl(fs_volume* _volume, fs_vnode* _node, void* _cookie, uint32 cmd,
 	TRACE("ioctl: %lu\n", cmd);
 
 	/*Volume* volume = (Volume*)_volume->private_volume;*/
-	return B_OK;
+	return B_DEV_INVALID_IOCTL;
 }
 
 

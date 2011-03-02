@@ -318,7 +318,7 @@ PRINT(("  RAMFS_IOCTL_DUMP_INDEX, `%s'\n", name));
 			break;
 		}
 		default:
-			error = B_BAD_VALUE;
+			error = B_DEV_INVALID_IOCTL;
 			break;
 	}
 	RETURN_ERROR(error);
