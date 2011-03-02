@@ -62,8 +62,8 @@ PersonView::PersonView(const char* name, const char* categoryAttribute,
 	BGridLayout* layout = GridLayout();
 	layout->SetInsets(spacing, spacing, spacing, spacing);
 
-	// Add picture "field"
-	fPictureView = new PictureView(96, 112, ref);
+	// Add picture "field", using ID photo 35mm x 45mm ratio
+	fPictureView = new PictureView(70, 90, ref);
 
 	layout->AddView(fPictureView, 0, 0, 1, 5);
 	layout->ItemAt(0, 0)->SetExplicitAlignment(
