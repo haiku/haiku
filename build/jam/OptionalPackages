@@ -636,14 +636,14 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentJava ] {
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage
 			gnu-classpath-0.98-x86-gcc4-2011-03-01.zip
-			: http://jerome.duval.free.fr/obos/gnu-classpath-0.98-x86-gcc4-2011-03-01.zip ;
+			: $(baseURL)/gnu-classpath-0.98-x86-gcc4-2011-03-01.zip ;
 		InstallOptionalHaikuImagePackage
 			jamvm-1.5.4-x86-gcc4-2011-02-13.zip
-			: http://jerome.duval.free.fr/obos/jamvm-1.5.4-x86-gcc4-2011-02-13.zip ;
+			: $(baseURL)/jamvm-1.5.4-x86-gcc4-2011-02-13.zip ;
 		AddSymlinkToHaikuImage common bin : /boot/common/bin/jamvm : java ;
 		InstallOptionalHaikuImagePackage
 			ecj-3.6.2-haiku-2011-02-26.zip
-			: http://jerome.duval.free.fr/obos/ecj-3.6.2-haiku-2011-02-26.zip ;
+			: $(baseURL)/ecj-3.6.2-haiku-2011-02-26.zip ;
 	} else {
 		Echo "No optional package DevelopmentJava available for gcc2" ;
 	}
@@ -956,7 +956,7 @@ if [ IsOptionalHaikuImagePackageAdded KeymapSwitcher ] {
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage
 			KeymapSwitcher-1.2.5-r1a2-x86-gcc4-2010-05-08.zip
-			: $(baseURL)/KeymapSwitcher-1.2.5-r1a2-x86-gcc4-2010-05-08.zip
+			: $(baseURL)/KeymapSwitcher-1.2.6-x86-gcc4-2011-03-01.zip
 			:
 		;
 		AddSymlinkToHaikuImage home config be Desktop\ applets
@@ -964,7 +964,7 @@ if [ IsOptionalHaikuImagePackageAdded KeymapSwitcher ] {
 	} else {
 		InstallOptionalHaikuImagePackage
 			KeymapSwitcher-1.2.5-r1a2-x86-gcc2-2010-05-08.zip
-			: $(baseURL)/KeymapSwitcher-1.2.5-r1a2-x86-gcc2-2010-05-08.zip
+			: $(baseURL)/KeymapSwitcher-1.2.6-x86-gcc2-2011-03-01.zip
 			:
 		;
 		AddSymlinkToHaikuImage home config be Desktop\ applets
@@ -1261,12 +1261,12 @@ if [ IsOptionalHaikuImagePackageAdded OCaml ] {
 	} else {
 		InstallOptionalHaikuImagePackage
 			ocaml-3.11.1-r1a1-x86-gcc2-2009-09-06.zip
-			: http://jerome.duval.free.fr/obos/ocaml-3.11.1-r1a1-x86-gcc2-2009-09-06.zip
+			: $(baseURL)/ocaml-3.11.1-r1a1-x86-gcc2-2009-09-06.zip
 			:
 		;
 		InstallOptionalHaikuImagePackage
 			camlp5-5.12-r1a1-x86-gcc2-2009-09-06.zip
-			: http://jerome.duval.free.fr/obos/camlp5-5.12-r1a1-x86-gcc2-2009-09-06.zip
+			: $(baseURL)/camlp5-5.12-r1a1-x86-gcc2-2009-09-06.zip
 			:
 		;
 	}
@@ -1824,7 +1824,7 @@ if [ IsOptionalHaikuImagePackageAdded WonderBrush ] {
 
 # WQY-MicroHei
 if [ IsOptionalHaikuImagePackageAdded WQY-MicroHei ] {
-	InstallOptionalHaikuImagePackage 
+	InstallOptionalHaikuImagePackage
 		wqy-microhei-0.2.0-beta-x86-gcc2-2011-02-23.zip
 		: $(baseURL)/wqy-microhei-0.2.0-beta-x86-gcc2-2011-02-23.zip ;
 }
