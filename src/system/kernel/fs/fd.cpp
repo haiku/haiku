@@ -518,7 +518,10 @@ fd_ioctl(bool kernelFD, int fd, uint32 op, void* buffer, size_t length)
 	if (descriptor->ops->fd_ioctl)
 		status = descriptor->ops->fd_ioctl(descriptor, op, buffer, length);
 	else
-		status = B_NOT_SUPPORTED;
+		status = B_DEV_INVALID_IOCTL;
+
+	if (status == B_DEV_INVALID_IOCTL)
+		status = ENOTTY;
 
 	put_fd(descriptor);
 	return status;

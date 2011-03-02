@@ -5858,7 +5858,7 @@ common_ioctl(struct file_descriptor* descriptor, uint32 op, void* buffer,
 	if (HAS_FS_CALL(vnode, ioctl))
 		return FS_CALL(vnode, ioctl, descriptor->cookie, op, buffer, length);
 
-	return B_NOT_SUPPORTED;
+	return B_DEV_INVALID_IOCTL;
 }
 
 
