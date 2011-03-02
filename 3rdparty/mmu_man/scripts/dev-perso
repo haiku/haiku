@@ -144,6 +144,7 @@ function dev() {
 	
 	# make sure the update action is the first found in history.
 	test -d .svn && history -s svn up
+	test -d .bzr && history -s bzr update
 	test -d .hg && history -s hg pull
 	test -d .git && history -s git pull
 	test -d CVS && history -s cvs up -d
