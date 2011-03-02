@@ -1,20 +1,20 @@
 /*
 	ProcessController © 2000, Georges-Edouard Berenger, All Rights Reserved.
-	Copyright (C) 2004 beunited.org 
+	Copyright (C) 2004 beunited.org
 
-	This library is free software; you can redistribute it and/or 
-	modify it under the terms of the GNU Lesser General Public 
-	License as published by the Free Software Foundation; either 
-	version 2.1 of the License, or (at your option) any later version. 
+	This library is free software; you can redistribute it and/or
+	modify it under the terms of the GNU Lesser General Public
+	License as published by the Free Software Foundation; either
+	version 2.1 of the License, or (at your option) any later version.
 
-	This library is distributed in the hope that it will be useful, 
-	but WITHOUT ANY WARRANTY; without even the implied warranty of 
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-	Lesser General Public License for more details. 
+	This library is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+	Lesser General Public License for more details.
 
-	You should have received a copy of the GNU Lesser General Public 
-	License along with this library; if not, write to the Free Software 
-	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA	
+	You should have received a copy of the GNU Lesser General Public
+	License along with this library; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 
@@ -27,6 +27,7 @@
 #include <stdio.h>
 
 #include <Catalog.h>
+#include <StringForSize.h>
 
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "ProcessController"
@@ -152,13 +153,11 @@ KernelMemoryBarMenuItem::DrawBar(bool force)
 		menu->SetHighColor(kBlack);
 
 		char infos[128];
-		snprintf(infos, sizeof(infos),
-				B_TRANSLATE("%.1f MiB"), fCachedMemory / 1024.f);
+		string_for_size(fCachedMemory * 1024.0, infos, sizeof(infos));
 		BPoint loc(cadre.left, cadre.bottom + 1);
 		loc.x -= kMargin + gMemoryTextWidth / 2 + menu->StringWidth(infos);
 		menu->DrawString(infos, loc);
-		snprintf(infos, sizeof(infos),
-				B_TRANSLATE("%.1f MiB"), fCommittedMemory / 1024.f);
+		string_for_size(fCommittedMemory * 1024.0, infos, sizeof(infos));
 		loc.x = cadre.left - kMargin - menu->StringWidth(infos);
 		menu->DrawString(infos, loc);
 		fLastSum = sum;

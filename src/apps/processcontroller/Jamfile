@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src apps processcontroller ;
 
 UsePrivateSystemHeaders ;
+UsePrivateHeaders shared ;
 
 Application ProcessController :
 	AutoIcon.cpp
@@ -20,7 +21,7 @@ Application ProcessController :
 	ThreadBarMenu.cpp
 	ThreadBarMenuItem.cpp
 	Utilities.cpp
-	: be $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
+	: be libshared.a $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
 	: ProcessController.rdef
 ;
 
