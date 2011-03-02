@@ -87,8 +87,8 @@ PictureView::PictureView(float width, float height, const entry_ref* ref)
 	SetViewColor(255, 255, 255);
 
 	SetToolTip(B_TRANSLATE(
-		"Drop an image here.\n"
-		"Or use the contextual menu" B_UTF8_ELLIPSIS));
+		"Drop an image here,\n"
+		"or use the contextual menu."));
 
 	BSize size(width + 2 * kPictureMargin, height + 2 * kPictureMargin);
 	SetExplicitMinSize(size);
