@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-MediaPlayer	318698273
+1	ukrainian	x-vnd.Haiku-MediaPlayer	1446715353
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Амер.)
 100% scale	MediaPlayer-Main		Масштаб 100%
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Сінемаскоп)
@@ -43,7 +43,6 @@ Lock Peaks	MediaPlayer-PeakView		Блокувати Піки
 Loop movies by default	MediaPlayer-SettingsWindow		Закільцювати зображення по замовчуванню
 Loop sounds by default	MediaPlayer-SettingsWindow		Закольцювати звуки по стандартному
 Low volume	MediaPlayer-SettingsWindow		Мала гучність
-MediaPlayer Current Playlist	MediaPlayer-Main		Поточний список відтворення МедіаПлейера
 MediaPlayer settings	MediaPlayer-SettingsWindow		Налаштування Медіа Плейера
 MediaPlayer\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		Медіа Плейер\n\nАвтор Marcus Overhagen, Stephan Aßmus і Frederik Modéen
 Medium	MediaPlayer-SettingsWindow		Середній

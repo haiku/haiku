@@ -1,11 +1,46 @@
-1	russian	x-vnd.Haiku-PowerStatus	1036085981
-About	PowerStatus		about
+1	russian	x-vnd.Haiku-PowerStatus	51899741
+About	PowerStatus		О программе
+About…	PowerStatus		О программе…
+Battery charging	PowerStatus		Батарея заряжается
+Battery discharging	PowerStatus		Батарея разряжается
+Battery info	PowerStatus		Информация о батарее
 Battery info…	PowerStatus		Информация о батарее…
+Battery unused	PowerStatus		Батарея неиспользована
+Capacity granularity 1: 	PowerStatus		Детализация ёмкости 1:
+Capacity granularity 2: 	PowerStatus		Детализация ёмкости 2:
+Capacity: 	PowerStatus		Емкость:
+Current rate: 	PowerStatus		Текущее значение:
+Design capacity low warning: 	PowerStatus		Уровень полного разряда:
+Design capacity warning: 	PowerStatus		Уровень низкого заряда:
+Design capacity: 	PowerStatus		Штатная емкость:
+Design voltage: 	PowerStatus		Штатное напряжение:
+Empty battery slot	PowerStatus		Пустой слот батареи
+Extended battery info	PowerStatus		Расширенная информация батарее
+Install in Deskbar	PowerStatus		Установить в Deskbar
+Last full charge: 	PowerStatus		Последняя полная зарядка:
+Model number: 	PowerStatus		Номер модели:
+OEM info: 	PowerStatus		OEM информация:
 OK	PowerStatus		ОК
+Power status box	PowerStatus		Состояние электропитания
+PowerStatus	PowerStatus		PowerStatus
+PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		PowerStatus\nразработали Axel Dörfler, Clemens Zeidler\Copyright 2006, Haiku, Inc.\n
 Quit	PowerStatus		Выход
+Run in window	PowerStatus		Запустить в окне
+Serial number: 	PowerStatus		Серийный номер:
+Show percent	PowerStatus		Показать в процентах
+Show status icon	PowerStatus		Показать значок статуса
+Show text label	PowerStatus		Показать текстовую метку
+Show time	PowerStatus		Показать время
 Technology: 	PowerStatus		Технология:
 Type: 	PowerStatus		Тип:
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Вы можете запустить PowerStatus в окне или установить его в Deskbar.
+charging	PowerStatus		зарядка
+discharging	PowerStatus		разрядка
+mA	PowerStatus		мА
+mAh	PowerStatus		мА·ч
 mV	PowerStatus		мВ
 mW	PowerStatus		мВт
-mWh	PowerStatus		мВтч
-rechargeable	PowerStatus		перезаряжаемый
+mWh	PowerStatus		мВт·ч
+no battery	PowerStatus		без батареи
+non-rechargeable	PowerStatus		неперезаряжаемая
+rechargeable	PowerStatus		заряжаемая

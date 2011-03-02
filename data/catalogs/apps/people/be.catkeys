@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Be-PEPL	3664557316
+1	belarusian	x-vnd.Be-PEPL	3806322178
 %name% picture	People		Выява %name%
 About	People		Пра праграму
 Address	People		Адрас
@@ -13,6 +13,7 @@ Copy	People		Капіяваць
 Could not create %s.	People		Не ўдалося стварыць %s.
 Country	People		Краіна
 Cut	People		Выразаць
+Drop an image here.\nOr use the contextual menu…	People		Перацягніце сюды выяву.\nЦі скарыстайце кантэкстнае меню…
 E-mail	People		Эл. пошта
 Edit	People		Правіць
 Error	People		Памылка
@@ -39,6 +40,7 @@ Save changes before quitting?	People		Захаваць змены перад в�
 Select all	People		Выбраць усё
 Sorry	People		Sorry
 State	People		Вобласць
+The file '%name%' could not be written.	People		Немагчыма запісаць файл '%name%'.
 URL	People		URL
 Undo	People		Адмяніць
 Unnamed person	People		Неназваная асоба

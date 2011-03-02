@@ -5,8 +5,8 @@
 9999.99 GB	Status View		9999.99 Гбайт
 Created	Info Window		Создан
 DiskUsage	MainWindow		Анализ использования дисков
-Free on %refName%	Scanner		Свободно на %refName%
-Get Info	Pie View		Информауия
+Free on %refName%	Scanner		Свободно на разделе %refName%
+Get Info	Pie View		Информация
 Kind	Info Window		Тип
 Modified	Info Window		Изменен
 Open	Pie View		Открыть
@@ -16,7 +16,7 @@ Path	Info Window		Путь
 Rescan	Pie View		Пересканировать
 Rescan	Volume View		Пересканировать
 Scan	Status View		Сканировать
-Scanning %refName%	Scanner		Сканируется %refName%
+Scanning %refName%	Scanner		Сканируется раздел %refName%
 Size	Info Window		Размер
 file unavailable	Pie View		файл недоступен
 file unavailable	Status View		файл недоступен

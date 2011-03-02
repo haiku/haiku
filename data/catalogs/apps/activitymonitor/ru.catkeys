@@ -15,7 +15,7 @@ CPU	DataSource		ЦПУ
 CPU usage	DataSource		Использование ЦПУ
 CPU usage (combined)	DataSource		Использование ЦПУ (всего)
 Cache	DataSource		Кэш
-Cached memory	DataSource		Закэшировано памяти
+Cached memory	DataSource		Кэшируемая память
 File	ActivityWindow		Файл
 Hide legend	ActivityView		Скрыть легенду
 MB	DataSource		Мбайт
@@ -46,4 +46,4 @@ Text clipboard size	DataSource		Размер текстового буфера �
 Threads	DataSource		Потоки
 Update time interval:	SettingsWindow		Временной интервал обновления:
 Used memory	DataSource		Использовано памяти
-usage	DataSource		использование
+usage	DataSource		(загрузка)

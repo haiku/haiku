@@ -36,7 +36,7 @@ Shadow	Colors tab		Тень
 Shine	Colors tab		Сияние
 Strong	AntialiasingSettingsView		Сильная
 Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Субпиксельное сглаживание в комбинации с уточнением недоступно в этой сборке Haiku во избежание возможных патентных проблем. Для включения этой возможности вам необходимо собрать Haiku самостоятельно, включив особые опции в заголовке конфигурации FreeType.
-Success	Colors tab		Успешность
+Success	Colors tab		Успех
 Tooltip background	Colors tab		Фон подсказки
 Tooltip text	Colors tab		Текст подсказки
 Window tab	Colors tab		Заголовок окна

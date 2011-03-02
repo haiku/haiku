@@ -1,17 +1,16 @@
-1	belarusian	x-vnd.Haiku-ProcessController	3246358819
-%.1f MB	ProcessController		%.1f МБ
+1	belarusian	x-vnd.Haiku-ProcessController	35871000
 %s [%d]	ProcessController		%s [%d]
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
 About	ProcessController		пра праграму
 About ProcessController…	ProcessController		Пра ProcessController…
 Cancel	ProcessController		Адмена
+Custom priority	ProcessController		Нестандартны прыярытэт
 Damned!	ProcessController		Чорт!
 Debug this thread!	ProcessController		Адладжваць паток!
 Debug thread	ProcessController		Адладжваць паток
 Display priority	ProcessController		Прыярытэт адлюстравання
 Do you really want to kill the team \"%s\"?	ProcessController		Сапраўды жадаеце знішчыць групу \"%s\"?
 Error saving file	ProcessController		Памылка пры захаванні файла
-Global Popup	ProcessController		Глабальнае паведамленне
 Gone teams…	ProcessController		Знішчаныя групы
 Idle priority	ProcessController		Прыярытэт спакою
 Install in Deskbar	ProcessController		Усталяваць у Deskbar

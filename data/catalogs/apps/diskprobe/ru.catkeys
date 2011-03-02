@@ -87,7 +87,7 @@ Message	TypeEditors	This is the type of view	Сообщение
 Message View	TypeEditors		Вид сообщения
 Mode:	FindWindow		Режим:
 Native: %Ld (0x%0*Lx)	ProbeView		Родной: %Ld (0x%0*Lx)
-Native: 0x%0*Lx	ProbeView		Родной: 0x%0*Lx
+Native: 0x%0*Lx	ProbeView		Родное: 0x%0*Lx
 New…	FileWindow		Новый…
 Next	ProbeView		Вперед
 No type editor available	AttributeWindow		Нет доступного редактора для данного типа
@@ -117,7 +117,7 @@ Select all	ProbeView		Выделить всё
 Selection	ProbeView		Выделение
 Stop	ProbeView		Стоп
 String editor	TypeEditors		Редактор строк
-Swapped: %Ld (0x%0*Lx)	ProbeView		Перевернутый: %Ld (0x%0*Lx)
+Swapped: %Ld (0x%0*Lx)	ProbeView		Перевернутое: %Ld (0x%0*Lx)
 Swapped: 0x%0*Lx	ProbeView		Перевернутый: 0x%0*Lx
 Text	FindWindow		Текст
 Text	TypeEditors	This is the type of editor	Текст

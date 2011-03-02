@@ -1,4 +1,5 @@
-1	finnish	x-vnd.Haiku-Terminal	2033562928
+1	finnish	x-vnd.Haiku-Terminal	3038436492
+-h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h, --help tulosta tämä opaste\n -t, --title aseta ikkunan otsikko\n -f, --fullscreen aloita kokoruututilassa\n
 Abort	Terminal Shell		Keskeytä
 About Terminal…	Terminal TermWindow		Ohjelmasta Pääteikkuna...
 Appearance	Terminal PrefWindow		Ulkoasu

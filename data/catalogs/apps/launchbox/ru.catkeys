@@ -23,9 +23,9 @@ Pad	LaunchBox		Панель
 Pad %1	LaunchBox		Панель %1
 Pad 1	LaunchBox		Панель 1
 Quit	LaunchBox		Выход
-Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Вы действительно хотите закрыть эту панель? (Эта панель не сохранится.)
+Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Вы действительно хотите закрыть эту панель? (Эта панель не сохранится)
 Remove button	LaunchBox		Удалить кнопку
-Set description…	LaunchBox		Указать описание…
+Set description…	LaunchBox		Изменить описание…
 Settings	LaunchBox		Настройки
 Show on all workspaces	LaunchBox		Отображать на всех рабочих столах
 Show window border	LaunchBox		Показать рамку окна

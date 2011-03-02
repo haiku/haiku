@@ -60,7 +60,7 @@ Replace same	Menus		Заменить совпадение
 Replace with:	FindandReplaceWindow		Заменить на:
 Replace…	Menus		Заменить…
 Revert to saved…	Menus		Вернуться к сохраненному…
-Revert to the last version of \"%s\"? 	RevertToSavedAlert		Вернуться к последней версии \"%s\"? 
+Revert to the last version of \"%s\"? 	RevertToSavedAlert		Вернуться к последней сохраненной версии \"%s\"? 
 Right	Menus		По правому краю
 Save	Menus		Сохранить
 Save	QuitAlert		Сохранить

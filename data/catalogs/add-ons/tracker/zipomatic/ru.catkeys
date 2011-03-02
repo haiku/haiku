@@ -9,10 +9,10 @@ Creating archive: %s	file:ZipOMaticWindow.cpp		Создание архива: %s
 Do you want to stop them?	file:ZipOMatic.cpp		Вы хотите остановить их?
 Drop files to zip.	file:ZipOMaticWindow.cpp		Переместите файлы для создания zip-архива.
 Error creating archive	file:ZipOMaticWindow.cpp		Ошибка при создании архива
-Filename: %s	file:ZipOMaticWindow.cpp		Имя файла: %s
+Filename: %s	file:ZipOMaticWindow.cpp		Имя архива: %s
 Let them continue	file:ZipOMatic.cpp		Позволить им продолжить
 Preparing to archive	file:ZipperThread.cpp		Подготовка к архивации
 Stop	file:ZipOMaticWindow.cpp		Остановить
 Stop them	file:ZipOMatic.cpp		Остановить их
 Stopped	file:ZipOMaticWindow.cpp		Остановлено
-You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		У Вас запущено %ld копий Zip-O-Matic.\n\n
+You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		У вас запущено %ld копий Zip-O-Matic.\n\n

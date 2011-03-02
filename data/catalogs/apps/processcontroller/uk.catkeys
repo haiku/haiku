@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-ProcessController	108846885
+1	ukrainian	x-vnd.Haiku-ProcessController	975273910
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
 About	ProcessController		про
 About ProcessController…	ProcessController		Про ProcessController…
@@ -8,7 +8,6 @@ Debug this thread!	ProcessController		Відладнати цю нитку!
 Debug thread	ProcessController		Нитка відладки
 Do you really want to kill the team \"%s\"?	ProcessController		Ви дійсно бажаєте вбити потік \"%s\"?
 Error saving file	ProcessController		Помилка при збереженні файлу
-Global Popup	ProcessController		Загальне випадаюче вікно
 Gone teams…	ProcessController		Запущені потоки…
 Install in Deskbar	ProcessController		Встановити у Deskbar
 Kill this thread!	ProcessController		Вбити цю нитку!

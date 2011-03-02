@@ -7,7 +7,7 @@ Asking other processes to quit.	ShutdownProcess		Просьба остальны
 Cancel	ShutdownProcess		Отмена
 Cancel shutdown	ShutdownProcess		Отменить выключение
 Do you really want to restart the system?	ShutdownProcess		Вы действительно хотите перезагрузить компьютер?
-Do you really want to shut down the system?	ShutdownProcess		Вы действительно хотите выключить систему?
+Do you really want to shut down the system?	ShutdownProcess		Вы действительно хотите выключить компьютер?
 It's now safe to turn off the computer.	ShutdownProcess		Теперь можно выключить компьютер.
 Kill application	ShutdownProcess		Убить приложение
 OK	ShutdownProcess		ОК
@@ -18,6 +18,6 @@ Shut down	ShutdownProcess		Выключить
 Shutdown aborted	ShutdownProcess		Выключение прервано
 Shutdown status	ShutdownProcess		Статус выключения
 Shutting down…	ShutdownProcess		Выключение…
-System is shut down	ShutdownProcess		Система выключена
+System is shut down	ShutdownProcess		Компьютер выключен
 The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Приложение \"%appName%\" возможно заблокировано модальным окном.
-Tidying things up a bit.	ShutdownProcess		Приведение системы в порядок.
+Tidying things up a bit.	ShutdownProcess		Подготовка системы к выключению.

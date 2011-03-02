@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-MediaPlayer	1801311807
+1	russian	x-vnd.Haiku-MediaPlayer	2929328887
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Американский)
 100% scale	MediaPlayer-Main		Масштаб 100%
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Синемаскоп)
@@ -52,9 +52,8 @@ Loop movies by default	MediaPlayer-SettingsWindow		Зацикливать вид
 Loop sounds by default	MediaPlayer-SettingsWindow		Зацикливать музыку по умолчанию
 Low volume	MediaPlayer-SettingsWindow		Низкой громкости
 MediaPlayer	MediaPlayer-Main		Медиаплеер
-MediaPlayer Current Playlist	MediaPlayer-Main		Текущий плэй-лист плеера
 MediaPlayer encountered an internal error. The file could not be opened.	MediaPlayer-Main		Медиаплеер обнаружил внутреннюю ошибку. Файл не может быть открыт.
-MediaPlayer settings	MediaPlayer-SettingsWindow		Настройки МедиаПлеера
+MediaPlayer settings	MediaPlayer-SettingsWindow		Настройки Медиаплеера
 MediaPlayer\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		MediaPlayer\n\nРазработал Marcus Overhagen, Stephan Aßmus и Frederik Modéen
 Medium	MediaPlayer-SettingsWindow		cредний
 Move Entries	MediaPlayer-MovePLItemsCmd		Переместить записи

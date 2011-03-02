@@ -1,19 +1,26 @@
-1	russian	x-vnd.Haiku-ProcessController	4170016227
-%.1f MB	ProcessController		%.1f Мбайт
+1	russian	x-vnd.Haiku-ProcessController	35871000
+%s [%d]	ProcessController		%s [%d]
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
 About	ProcessController		about
 About ProcessController…	ProcessController		О контроллере процессов…
 Cancel	ProcessController		Отмена
+Custom priority	ProcessController		Заданный приоритет
 Damned!	ProcessController		Проклятье!
 Debug this thread!	ProcessController		Отладить этот поток!
 Debug thread	ProcessController		Отладить поток
+Display priority	ProcessController		Приоритет отображения
+Do you really want to kill the team \"%s\"?	ProcessController		Вы действительно хотите убить приложение \"%s\"?
 Error saving file	ProcessController		Ошибка при сохранении файла
-Global Popup	ProcessController		Global Popup
+Gone teams…	ProcessController		Ушедшие приложения…
+Idle priority	ProcessController		Приоритет покоя
 Install in Deskbar	ProcessController		Установить в Deskbar
 Kill this thread!	ProcessController		Убить этот поток!
 Live in the Deskbar	ProcessController		Жить в Deskbar
+Low priority	ProcessController		Низкий приортитет
+Lowest active priority	ProcessController		Низший приоритет
 Memory usage	ProcessController		Использование памяти
 New Terminal	ProcessController		Новый терминал
+Normal priority	ProcessController		Нормальный приоритет
 OK	ProcessController		ОК
 Ok!	ProcessController		ОК!
 ProcessController	ProcessController		Контроллер процессов
@@ -22,6 +29,8 @@ ProcessController\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyrigh
 Processor %d	ProcessController		Процессор %d
 Quit an application	ProcessController		Завершить приложение
 Quit application	ProcessController		Завершить приложение
+Real-time display priority	ProcessController		Приоритет отображения реального времени
+Real-time priority	ProcessController		Приоритет реального времени
 Restart Deskbar	ProcessController		Перезапустить Deskbar
 Restart Tracker	ProcessController		Перезапустить Tracker
 Run in window	ProcessController		Запустить в окне
@@ -31,6 +40,10 @@ This is the last active processor...\nYou can't turn it off!	ProcessController		
 This team is already gone…	ProcessController		Этого приложения уже не существует…
 This thread is already gone…	ProcessController		Этого потока уже не существует…
 Threads and CPU usage	ProcessController		Потоки и загрузка ЦПУ
+Urgent display priority	ProcessController		Срочный приоритет отображения
+Urgent priority	ProcessController		Срочный приоритет
 Usage: %s [-deskbar]\n	ProcessController		Использование: %s [-deskbar]\n
+What do you want to do with the thread \"%s\"?	ProcessController		Что вы хотите сделать с потоком \"%s\"?
 Yes, kill this team!	ProcessController		Да, убить это приложение!
+You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Вы можете запустить контроллер процессов в окне или установить его в Deskbar.
 Your setting file could not be saved!\n(%s)	ProcessController		Невозможно сохранить настройки!\n(%s)

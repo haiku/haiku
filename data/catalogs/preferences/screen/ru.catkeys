@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Screen	954862017
+1	russian	x-vnd.Haiku-Screen	1658032282
 %.1f Hz	Screen		%.1f Гц
 %sSerial no.: %s	Screen		%sСерийный №: %s
 /other…	Screen		/другое…
@@ -18,7 +18,7 @@ Could not write VESA mode settings file:\n\t	Screen		Ну удалось зап�
 Current workspace	Screen		Текущий рабоий стол
 Do you wish to keep these settings?	Screen		Вы хотите сохранить эти настройки?
 Done	Screen		Готово
-Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Горизонтальная частота:\t%lu - %lu кГц\nВертикальная частота:\t%lu - %lu Гц\n\nЧастота пикселизации:\t%g MГц
+Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Горизонтальная частота:\t%lu - %lu кГц\nВертикальная частота:\t\t%lu - %lu Гц\n\nЧастота пикселизации:\t\t%g MГц
 Hz	Screen		 Гц
 Keep	Screen		Сохранить
 OK	Screen		ОК
@@ -39,9 +39,10 @@ Undo	Screen		Отменить
 Unknown mode	Screen		Неизвестный режим
 Use laptop panel:	Screen		Использовать экран ноутбука:
 Video format:	Screen		Видео формат:
+Warning	Screen		Предупреждение
 Workspaces	Screen		Рабочие столы
 always	Screen		всегда
-bits/pixel	Screen		 бит на пиксель
+bits/pixel	Screen		бита на пиксель
 disable	Screen		отключить
 horizontally	Screen		горизонтально
 if needed	Screen		если требуется

@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-MediaPlayer	1801311807
+1	belarusian	x-vnd.Haiku-MediaPlayer	2929328887
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Амерыка)
 100% scale	MediaPlayer-Main		Маштаб 100%
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Кінатэатр)
@@ -52,7 +52,6 @@ Loop movies by default	MediaPlayer-SettingsWindow		Зацыкліць відэа
 Loop sounds by default	MediaPlayer-SettingsWindow		Зацыкліць гукі па змоўчанню
 Low volume	MediaPlayer-SettingsWindow		Нізкая гучнасць
 MediaPlayer	MediaPlayer-Main		Праігравальнік Медыя
-MediaPlayer Current Playlist	MediaPlayer-Main		Цякучы Плэйліст Праігравальніка Медыя
 MediaPlayer encountered an internal error. The file could not be opened.	MediaPlayer-Main		Адбылася унутраная памылка MediaPlayer. Нельга адкрыць файл.
 MediaPlayer settings	MediaPlayer-SettingsWindow		Наладкі Праігравальніка Медыя
 MediaPlayer\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		Праігравальнік Медыя\n\nСтвораны Marcus Overhagen, Stephan Aßmus and Frederik Modéen

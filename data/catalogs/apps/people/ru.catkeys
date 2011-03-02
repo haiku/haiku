@@ -1,4 +1,4 @@
-1	russian	x-vnd.Be-PEPL	3664557316
+1	russian	x-vnd.Be-PEPL	3373241496
 %name% picture	People		Изображение для %name%
 About	People		О программе…
 Address	People		Адрес
@@ -39,6 +39,7 @@ Save changes before quitting?	People		Сохранить изменения пе
 Select all	People		Выделить всё
 Sorry	People		Извините
 State	People		Штат
+The file '%name%' could not be written.	People		Невозможно записать файл '%name%'.
 URL	People		URL
 Undo	People		Отменить
 Unnamed person	People		Новая персона

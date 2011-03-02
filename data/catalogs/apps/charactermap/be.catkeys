@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-CharacterMap	3936993594
+1	belarusian	x-vnd.Haiku-CharacterMap	1305599334
 About CharacterMap…	CharacterWindow		Пра CharacterMap…
 Aegean numbers	UnicodeBlocks		Эгейскія лічбы
 Alphabetic presentation forms	UnicodeBlocks		Формы алфавітнага прадстаўлення
@@ -35,7 +35,6 @@ CJK unified ideographs extension B	UnicodeBlocks		Іерогліфы CJK дап�
 Carian	UnicodeBlocks		Карыянскі
 Cham	UnicodeBlocks		Чам
 CharacterMap	CharacterWindow		Мапа Сімвалаў
-CharacterMap settings	CharacterWindow		Наладкі CharacterMap
 CharacterMap\n\twritten by Axel Dörfler\n\tCopyright 2009, Haiku, Inc.\n	CharacterMap		CharacterMap\n\tАўтар: Axel Dörfler\n\tCopyright 2009, Haiku, Inc.\n
 Cherokee	UnicodeBlocks		Чырокі
 Clear	CharacterWindow		Ачысціць

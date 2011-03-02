@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Be-PEPL	3664557316
+1	finnish	x-vnd.Be-PEPL	3373241496
 %name% picture	People		%name%-kuva
 About	People		Ohjelmasta
 Address	People		Osoite
@@ -39,6 +39,7 @@ Save changes before quitting?	People		Tallennetaanko muutokset ennen poistumista
 Select all	People		Valitse kaikki
 Sorry	People		Valitan
 State	People		Valtio
+The file '%name%' could not be written.	People		Tiedostoon ’%name%’ ei voitu kirjoittaa.
 URL	People		Verkko-osoite
 Undo	People		Peru
 Unnamed person	People		Nimetön henkilö
