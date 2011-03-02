@@ -17,6 +17,7 @@
 #include <AppFileInfo.h>
 #include <Bitmap.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <Entry.h>
 #include <File.h>
 #include <MenuItem.h>
@@ -200,7 +201,7 @@ PieView::MessageReceived(BMessage* message)
 		}
 
 		case kOutdatedMsg:
-		{			
+		{
 			if (!fScanner->IsBusy()) {
 				fOutdated = true;
 				Invalidate();
@@ -341,7 +342,7 @@ PieView::_ShowVolume(BVolume* volume)
 	if (volume != NULL) {
 		if (fScanner == NULL)
 			fScanner = new Scanner(volume, this);
-		
+
 		if (fScanner->Snapshot() == NULL)
 			fScanner->Refresh();
 	}
@@ -365,32 +366,13 @@ PieView::_DrawProgressBar(BRect updateRect)
 	float by = floorf((b.top + b.Height() - kProgBarHeight) / 2.0);
 	float ex = bx + kProgBarWidth;
 	float ey = by + kProgBarHeight;
-	SetPenSize(1.0);
-	SetHighColor(tint_color(kWindowColor, B_LIGHTEN_2_TINT));
-	StrokeLine(BPoint(bx, ey), BPoint(ex, ey));
-	StrokeLine(BPoint(ex, by), BPoint(ex, ey));
-	SetHighColor(tint_color(kWindowColor, B_DARKEN_2_TINT));
-	StrokeLine(BPoint(bx, by), BPoint(ex, by));
-	StrokeLine(BPoint(bx, by), BPoint(bx, ey));
-
-	bx += 1.0; by += 1.0;
-	ex -= 1.0; ey -= 1.0;
 	float mx = bx + floorf((kProgBarWidth - 2.0)
 		* fScanner->Progress() / 100.0 + 0.5);
-	SetHighColor(tint_color(kWindowColor, B_DARKEN_1_TINT));
-	FillRect(BRect(mx, by, ex, ey));
 
-	SetHighColor(0x00, 0x20, 0x90);
-	StrokeLine(BPoint(bx, ey), BPoint(mx, ey));
-	StrokeLine(BPoint(mx, by), BPoint(mx, ey));
-	SetHighColor(0x00, 0xc0, 0xff);
-	StrokeLine(BPoint(bx, by), BPoint(mx, by));
-	StrokeLine(BPoint(bx, by), BPoint(bx, ey));
-
-	bx += 1.0; by += 1.0;
-	mx -= 1.0; ey -= 1.0;
-	SetHighColor(0x00, 0x80, 0xf0);
-	FillRect(BRect(bx, by, mx, ey));
+	const rgb_color kBarColor = {50, 150, 255, 255};
+	BRect barFrame(bx, by, ex, ey);
+	be_control_look->DrawStatusBar(this, barFrame, updateRect,
+		ui_color(B_PANEL_BACKGROUND_COLOR), kBarColor, mx);
 
 	// Tell what we are doing.
 	const char* task = fScanner->Task();
@@ -433,10 +415,10 @@ PieView::_DrawPieChart(BRect updateRect)
 	}
 	_DrawDirectory(pieRect, currentDir, 0.0, 0.0,
 		colorIdx % kBasePieColorCount, 0);
-	
+
 	if (fOutdated) {
-		
-		BRect b = Bounds();		
+
+		BRect b = Bounds();
 
 		float strWidth = StringWidth(B_TRANSLATE("Outdated view"));
 		float bx = (b.Width() - strWidth - kSmallHMargin);
@@ -643,7 +625,7 @@ PieView::_FileAt(const BPoint& where)
 		// Nothing at this angle.
 		return NULL;
 	}
-	
+
 	return (*i).info;
 }
 
@@ -721,7 +703,7 @@ PieView::_BuildOpenWithMenu(FileInfo* info)
 	BMenu* openWith = new BMenu(B_TRANSLATE("Open With"));
 
 	if (appList.size() == 0) {
-		BMenuItem* item = new BMenuItem(B_TRANSLATE("no supporting apps"), 
+		BMenuItem* item = new BMenuItem(B_TRANSLATE("no supporting apps"),
 			NULL);
 		item->SetEnabled(false);
 		openWith->AddItem(item);
@@ -821,7 +803,7 @@ PieView::_OpenInfo(FileInfo* info, BPoint p)
 		new InfoWin(p, info, Window());
  	} else {
 		BMessage message(kGetInfo);
-		message.AddRef("refs", &info->ref);	
+		message.AddRef("refs", &info->ref);
 		tracker.SendMessage(&message);
 	}
 }
