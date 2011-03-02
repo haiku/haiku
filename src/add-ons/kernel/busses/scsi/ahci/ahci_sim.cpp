@@ -115,7 +115,7 @@ ahci_ioctl(scsi_sim_cookie cookie, uint8 targetID, uint32 op, void *buffer,
 	size_t length)
 {
 	TRACE("ahci_ioctl, cookie %p\n", cookie);
-	return B_BAD_VALUE;
+	return B_DEV_INVALID_IOCTL;
 }
 
 

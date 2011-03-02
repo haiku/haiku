@@ -750,7 +750,7 @@ ide_sim_ioctl(ide_bus_info *bus, uint8 targetID, uint32 op, void *buffer, size_t
 		}
 	}
 
-	return B_BAD_VALUE;
+	return B_DEV_INVALID_IOCTL;
 }
 
 

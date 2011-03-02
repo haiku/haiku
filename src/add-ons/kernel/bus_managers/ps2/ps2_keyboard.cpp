@@ -508,7 +508,7 @@ keyboard_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 
 		default:
 			INFO("ps2: invalid ioctl 0x%lx\n", op);
-			return EINVAL;
+			return B_DEV_INVALID_IOCTL;
 	}
 }
 

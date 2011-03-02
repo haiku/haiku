@@ -268,7 +268,7 @@ static status_t
 acpi_namespace_control(void* cookie, uint32 op, void* arg, size_t len)
 {
 	dprintf("acpi_ns_dump: device_control\n");
-	return B_BAD_VALUE;
+	return B_DEV_INVALID_IOCTL;
 }
 
 

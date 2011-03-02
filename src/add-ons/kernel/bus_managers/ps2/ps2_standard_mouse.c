@@ -510,7 +510,7 @@ standard_mouse_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 
 		default:
 			TRACE("ps2: ioctl unknown mouse opcode: %ld\n", op);
-			return B_BAD_VALUE;
+			return B_DEV_INVALID_IOCTL;
 	}
 }
 

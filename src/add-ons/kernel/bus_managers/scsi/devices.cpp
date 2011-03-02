@@ -471,7 +471,7 @@ scsi_ioctl(scsi_device_info *device, uint32 op, void *buffer, size_t length)
 			device->target_id, op, buffer, length);
 	}
 
-	return B_BAD_VALUE;
+	return B_DEV_INVALID_IOCTL;
 }
 
 

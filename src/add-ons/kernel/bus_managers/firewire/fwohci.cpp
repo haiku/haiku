@@ -394,7 +394,7 @@ fwohci_ioctl (void *cookie, u_long cmd, void *data, size_t len)
 			err = EINVAL;
 		break;
 	default:
-		err = EINVAL;
+		err = ENOTTY;
 		break;
 	}
 	return err;

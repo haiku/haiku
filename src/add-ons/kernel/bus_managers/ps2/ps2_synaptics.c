@@ -767,7 +767,7 @@ synaptics_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 
 		default:
 			TRACE("SYNAPTICS: unknown opcode: %ld\n", op);
-			return B_BAD_VALUE;
+			return B_DEV_INVALID_IOCTL;
 	}
 }
 

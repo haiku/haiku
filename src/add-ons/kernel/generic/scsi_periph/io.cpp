@@ -332,7 +332,7 @@ periph_ioctl(scsi_periph_handle_info *handle, int op, void *buffer,
 			}
 
 			SHOW_ERROR(4, "Unknown ioctl: %x", op);
-			return B_BAD_VALUE;
+			return B_DEV_INVALID_IOCTL;
 	}
 }
 
