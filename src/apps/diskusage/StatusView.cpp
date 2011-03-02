@@ -48,12 +48,15 @@ StatusView::StatusView()
 		999999);
 
 	fCountView = new BStringView(NULL, kEmptyStr);
+	float width, height;
+	fCountView->GetPreferredSize(&width, &height);
 	fCountView->SetExplicitMinSize(BSize(StringWidth(testLabel),
 		B_SIZE_UNSET));
-	fCountView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+	fCountView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, height));
 
 	fPathView = new BStringView(NULL, kEmptyStr);
-	fPathView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+	fPathView->GetPreferredSize(&width, &height);
+	fPathView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, height));
 
 	fRefreshBtn = new BButton(NULL, B_TRANSLATE("Scan"),
 		new BMessage(kBtnRescan));
@@ -71,11 +74,11 @@ StatusView::StatusView()
 
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
-	AddChild(BLayoutBuilder::Group<>(B_HORIZONTAL)
-		.AddGroup(B_VERTICAL)
+	AddChild(BLayoutBuilder::Group<>(B_HORIZONTAL, 0)
+		.AddGroup(B_VERTICAL, 0)
 			.Add(fPathView)
 			.Add(divider1)
-			.AddGroup(B_HORIZONTAL)
+			.AddGroup(B_HORIZONTAL, 0)
 				.Add(fCountView)
 				.Add(divider2)
 				.Add(fSizeView)
@@ -83,7 +86,7 @@ StatusView::StatusView()
 			.End()
 		.AddStrut(kSmallHMargin)
 		.Add(fRefreshBtn)
-		.SetInsets(kSmallHMargin, kSmallVMargin, kSmallVMargin, kSmallVMargin)
+		.SetInsets(kSmallVMargin, kSmallVMargin, kSmallVMargin, kSmallVMargin)
 	);
 }
 

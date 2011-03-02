@@ -39,7 +39,7 @@ VolumeView::VolumeView(const char* name, BVolume* volume)
 
 	fStatusView = new StatusView();
 
-	AddChild(BLayoutBuilder::Group<>(B_VERTICAL)
+	AddChild(BLayoutBuilder::Group<>(B_VERTICAL, 2)
 		.Add(fPieView)
 		.Add(fStatusView)
 	);
