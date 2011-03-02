@@ -214,13 +214,13 @@ MemoryBarMenuItem::DrawBar(bool force)
 	menu->SetHighColor(kBlack);
 
 	char infos[128];
-	snprintf(infos, sizeof(infos), B_TRANSLATE("%d KB"), fWriteMemory);
+	snprintf(infos, sizeof(infos), B_TRANSLATE("%d KiB"), fWriteMemory);
 
 	BPoint loc(rect.left - kMargin - gMemoryTextWidth / 2 - menu->StringWidth(infos),
 		rect.bottom + 1);
 	menu->DrawString(infos, loc);
 
-	snprintf(infos, sizeof(infos), B_TRANSLATE("%d KB"), fAllMemory);
+	snprintf(infos, sizeof(infos), B_TRANSLATE("%d KiB"), fAllMemory);
 	loc.x = rect.left - kMargin - menu->StringWidth(infos);
 	menu->DrawString(infos, loc);
 }

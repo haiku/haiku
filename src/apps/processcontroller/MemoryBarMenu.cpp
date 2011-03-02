@@ -57,7 +57,7 @@ MemoryBarMenu::MemoryBarMenu(const char* name, info_pack* infos, system_info& sy
 		fTeamList[k++] = -1;
 	}
 
-	gMemoryTextWidth = 2 * StringWidth(B_TRANSLATE("99999 KB")) + 20;
+	gMemoryTextWidth = 2 * StringWidth(B_TRANSLATE("99999 KiB")) + 20;
 
 	fRecycleCount = EXTRA;
 	fRecycleList = (MRecycleItem*)malloc(sizeof(MRecycleItem) * fRecycleCount);

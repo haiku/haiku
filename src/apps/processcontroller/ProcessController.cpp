@@ -670,7 +670,7 @@ thread_popup(void *arg)
 		}
 	}
 
-	BPopUpMenu* popup = new BPopUpMenu(B_TRANSLATE("Global Popup"), false, false);
+	BPopUpMenu* popup = new BPopUpMenu("Global Popup", false, false);
 	popup->SetFont(be_plain_font);
 
 	// Quit section
