@@ -1,0 +1,77 @@
+1	norwegian_bokmål	x-vnd.Haiku-Devices	189828730
+ACPI Information	DeviceACPI		ACPI-informasjon
+ACPI Processor Namespace '%2'	DeviceACPI		ACPI-prosessor-navnerom '%2'
+ACPI System Bus	DeviceACPI		ACPI-systembuss
+ACPI System Indicator	DeviceACPI		ACPI-systemindikator
+ACPI Thermal Zone	DeviceACPI		ACPI-temperaturområde
+ACPI bus	Device		ACPI-buss
+ACPI bus	DevicesView		ACPI-buss
+ACPI controller	Device		ACPI-kontroller
+ACPI node '%1'	DeviceACPI		ACPI-node '%1'
+About	DevicesApplication		Om
+About Devices…	DevicesView		Om Enheter...
+Basic information	DevicesView		Basisinformasjon
+Bridge	Device		Bro
+Bus	DevicesView		Buss
+Bus Information	Device		Bussinformasjon
+Category	DevicesView		Kategori
+Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Klasseinformasjon:\t\t\t\t: %classInfo%
+Class info	DevicePCI		Klasseinformasjon
+Communication controller	Device		Kommunikasjonskontroller
+Computer	Device		Datamaskin
+Computer	DevicesView		Datamaskin
+Connection	DevicesView		Tilkobling
+Detailed	DevicesView		Detaljert
+Device	Device		Enhet
+Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Enhetsnavn\t\t\t\t: %Name%\nProdusent\t\t\t: %Manufacturer%\nDriver brukt\t\t\t\t: %DriverUsed%\nEnhetssti\t: %DevicePaths%
+Device name	Device		Enhetsnavn
+Device name	DeviceACPI		Enhetsnavn
+Device name	DevicePCI		Enhetsnavn
+Device name:	Device		Enhetsnavn:
+Device paths	Device		Enhetsti
+Device paths	DevicePCI		Enhetsstier
+Devices	DevicesApplication		Enheter
+Devices	DevicesView		Enheter
+Devices\n\twritten by Pieter Panman\n\n\tBased on listdev by Jérôme Duval\n\tand the previous Devices preference\n\tby Jérôme Duval and Sikosis\n\tCopyright 2009, Haiku, Inc.\n	DevicesApplication		Enheter\n\tskrevet av Pieter Panman\n\n\tBasert på listdev av Jérôme Duval\n\tog tidligere Egenskaper for Enheter\n\tav Jérôme Duval og Sikosis\n\tOpphavsrett 2009, Haiku, Inc.\n
+Display controller	Device		Skjermkontroller
+Docking station	Device		Dokkingstasjon
+Driver used	Device		Driver brukt
+Driver used	DevicePCI		Driver brukt
+Encryption controller	Device		Krypteringskontroller
+Generate system information	DevicesView		Generer systeminformasjon
+Generic system peripheral	Device		Generisk ekstern enhet
+ISA bus	Device		ISA-buss
+ISA bus	DevicesView		ISA-buss
+Input device controller	Device		Inndata enhetskontroller
+Intelligent controller	Device		Intelligent kontroller
+Manufacturer	Device		Produsent
+Manufacturer	DeviceACPI		Produsent
+Manufacturer	DevicePCI		Produsent
+Manufacturer:	Device		Produsent:
+Mass storage controller	Device		Masselagringsenhet
+Memory controller	Device		Minnekontroller
+Multimedia controller	Device		Multimediakontroller
+Name	PropertyList		Navn
+Network controller	Device		Nettverkskontroller
+None	Device		Ingen
+Not implemented	DeviceACPI		Ikke implementert
+Not implemented	DevicePCI		Ikke implementert
+OK	DevicesApplication		OK
+Order by:	DevicesView		Sorter etter:
+PCI Information	DevicePCI		PCI-informasjon
+PCI bus	Device		PCI-buss
+PCI bus	DevicesView		PCI-buss
+Processor	Device		Prosessor
+Quit	DevicesView		Avslutt
+Refresh devices	DevicesView		Oppdater enheter
+Report compatibility	DevicesView		Rapporter kompatibilitet
+Satellite communications controller	Device		Satellittkommunikasjonskontroller
+Serial bus controller	Device		Seriellbusskontroller
+Signal processing controller	Device		Signalbehandlingskontroller
+Unclassified device	Device		Uklassifisert enhet
+Unknown	DevicePCI		Ukjent
+Unknown device	Device		Ukjent enhet
+Unknown device	DevicesView		Ukjent enhet
+Value	PropertyList		Verdi
+Wireless controller	Device		Trådløs kontroller
+unknown	Device		ukjent

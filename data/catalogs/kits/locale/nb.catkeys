@@ -1,0 +1,19 @@
+1	norwegian_bokmål	system	2686335505
+%.2f TiB	StringForSize		%.2f TiB
+%3.2f GiB	StringForSize		%3.2f GiB
+%3.2f KiB	StringForSize		%3.2f KiB
+%3.2f MiB	StringForSize		%3.2f MiB
+%d bytes	StringForSize		%d byte
+About…	AboutWindow		Om...
+Blue:	ColorControl		Blå:
+Close	AboutWindow		Lukk
+Copy	TextView		Kopier
+Copyright © %years% Haiku, Inc.	AboutWindow		Opphavsrett © %years% Haiku, Inc.
+Cut	TextView		Klipp ut
+Green:	ColorControl		Grønn:
+Paste	TextView		Lim inn
+Red:	ColorControl		Rød:
+Redo	TextView		Endre
+Select All	TextView		Merk alle
+Undo	TextView		Tilbakestill
+Written by:	AboutWindow		Skrevet av:

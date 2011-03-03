@@ -1,0 +1,57 @@
+1	norwegian_bokmål	x-vnd.Haiku-MediaConverter	2077202135
+%d bit 	MediaFileInfo		%d bit
+%d byte 	MediaFileInfo		%d byte 
+About MediaConverter…	Menu		Om MediaConverter
+About…	MediaConverter		Om...
+Audio encoding:	MediaConverter		Lydformat
+Audio quality not supported	MediaConverter		Lydkvaliteten støttes ikke
+Audio quality: %3d%%	MediaConverter		Lydkvalitet: %3d%%
+Audio:	MediaConverter-FileInfo		Lyd:
+Cancel	MediaConverter		Avbryt
+Cancelling	MediaConverter		Avbryter
+Cancelling…	MediaConverter		Avbryter...
+Continue	MediaConverter		Fortsett
+Conversion cancelled	MediaConverter		Konvertering avbrutt
+Conversion completed	MediaConverter		Konvertering fullført
+Convert	MediaConverter		Konverter
+Drop media files onto this window	MediaConverter		Slipp mediafiler i dette vinduet
+Duration:	MediaConverter-FileInfo		Varighet:
+End   [ms]: 	MediaConverter		Slutt   [ms]:
+Error	MediaConverter		Feil
+Error creating '%filename'	MediaConverter		Feil ved oppretting av '%filename'
+Error loading a file	MediaConverter		Feil ved lasting av fil
+Error loading files	MediaConverter		Feil ved lasting av filer
+File	Menu		Fil
+File Error	MediaConverter-FileInfo		Feil på fil
+File details	MediaConverter		Filopplysninger
+File format:	MediaConverter		Filformat:
+High	MediaConverter		Høy
+Low	MediaConverter		Lav
+MediaConverter	MediaConverter		MediaConverter
+MediaConverter\n1.3.0\n© 1999, Be Incorporated.\n© 2000-2004 Jun Suzuki\n© 2007 Stephan Aßmus\n© 2010 Haiku, Inc.	MediaConverter		MediaConverter\n1.3.0\n© 1999, Be Incorporated.\n© 2000-2004 Jun Suzuki\n© 2007 Stephan Aßmus\n© 2010 Haiku, Inc.
+No audio	Audio codecs list		Ingen lyd
+No file selected	MediaConverter-FileInfo		Ingen fil er valgt
+No video	Video codecs list		Ingen video
+None available	Audio codecs		Ingen tilgjengelig
+None available	Video codecs		Ingen tilgjengelig
+OK	MediaConverter		OK
+OK	MediaConverter-FileInfo		OK
+Open…	Menu		Åpne...
+Output file '%filename' created	MediaConverter		Utdatafil '%filename' opprettet
+Output folder	MediaConverter		Utdatamappe
+Output format	MediaConverter		Utdataformat
+Preview	MediaConverter		Forhåndsvisning
+Quit	Menu		Avslutt
+Select	MediaConverter		Merk
+Select this folder	MediaConverter		Velg denne mappen
+Source files	MediaConverter		Kildefiler
+Start [ms]: 	MediaConverter		Start [ms]: 
+The file was not recognized as a supported media file:	MediaConverter		Filen ble ikke gjenkjent som en støttet mediafil:
+Video encoding:	MediaConverter		Videoformat
+Video quality not supported	MediaConverter		Videokvaliteten støttes ikke
+Video quality: %3d%%	MediaConverter		Videokvalitet: %3d%%
+Video using parameters form settings	MediaConverter		Video bruker parametre fra innstillingene
+Video:	MediaConverter-FileInfo		Video:
+Writing audio track: %Ld %% complete	MediaConverter		Skriver lydspor:%Ld %% fullført
+Writing video track: %Ld %% complete	MediaConverter		Skriver videospor: %Ld %% fullført
+seconds	MediaFileInfo		sekunder

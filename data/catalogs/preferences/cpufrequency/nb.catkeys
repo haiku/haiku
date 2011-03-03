@@ -1,0 +1,12 @@
+1	norwegian_bokmål	x-vnd.Haiku-CPUFrequencyPref	3374560275
+CPU Frequency	Main window		Prosessorhastighet
+CPU frequency status view	CPU Frequency View		Visning av CPU-status
+CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPUFrequency\n\tskrevet av Clemens Zeidler\n\tOpphavsrett 2009, Haiku, Inc.\n
+Defaults	Pref Window		Standardinnstillinger
+Dynamic performance	Status view		Dynamisk ytelse
+High performance	Status view		Høy ytelse
+Install replicant into Deskbar	CPU Frequency View		Installer replikanten i Deskbar
+Ok	Status view		OK
+Quit	Status view		Avslutt
+Revert	Pref Window		Tilbakestill
+Set state	Status view		Sett tilstand

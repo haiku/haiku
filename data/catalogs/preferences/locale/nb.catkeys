@@ -1,0 +1,25 @@
+1	norwegian_bokmål	x-vnd.Haiku-Locale	2295953467
+12 hour	TimeFormatSettings		12 timer
+24 hour	TimeFormatSettings		24 timer
+Available languages	Locale Preflet Window		Tilgjengelige språk
+Currency	TimeFormatSettings		Valuta
+Date	TimeFormatSettings		Dato
+Defaults	Locale Preflet Window		Standardinnstillinger
+Formatting	Locale Preflet Window		Format
+Full format:	TimeFormatSettings		Fullt format:
+Language	Locale Preflet Window		Språk
+Locale	Locale Preflet		Lokalitet
+Locale	Locale Preflet Window		Lokalitet
+Long format:	TimeFormatSettings		Langformat:
+Medium format:	TimeFormatSettings		Medium format:
+Negative:	TimeFormatSettings		Negativ:
+Numbers	TimeFormatSettings		Tall
+OK	Locale Preflet Window		OK
+Positive:	TimeFormatSettings		Positiv:
+Preferred languages	Locale Preflet Window		Foretrukne språk
+Revert	Locale Preflet Window		Tilbakestill
+Short format:	TimeFormatSettings		Kortformat:
+Time	TimeFormatSettings		Tid
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Kan ikke finne tilgjengelige språk! Disse innstillingene kan ikke benyttes!
+Use month/day-names from preferred language	TimeFormatSettings		Bruk måned- og dagsnavn fra foretrukket språk
+already chosen	LanguageListView		allerede valgt

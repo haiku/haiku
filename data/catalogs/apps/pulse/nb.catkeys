@@ -1,0 +1,43 @@
+1	norwegian_bokmål	x-vnd.Haiku-Pulse	4280762208
+About Pulse…	CPUButton		Om Pulse...
+About Pulse…	PulseView		Om Pulse
+Active color	ConfigView		Aktiv farge
+Bar colors	ConfigView		Linjefarger
+CPU progress bar	NormalPulseView		CPU-fremgangsmåler
+Defaults	PrefsWindow		Standardinnstillinger
+Deskbar	CPUButton		Deskbar
+Deskbar menu	CPUButton		Deskbarmeny
+Deskbar mode	MiniPulseView		Deskbarmodus
+Deskbar mode	NormalPulseView		Deskbarmodus
+Deskbar mode	PrefsWindow		Deskbarmodus
+Frame color	ConfigView		Kantfarge
+Idle color	ConfigView		Inaktiv farge
+Info	CPUButton		Info
+Info	DeskbarPulseView		Info
+Info	PulseWindow		Info
+Mini mode	DeskbarPulseView		Minimodus
+Mini mode	NormalPulseView		Minimodus
+Mini mode	PrefsWindow		Minimodus
+Normal mode	DeskbarPulseView		Normal modus
+Normal mode	MiniPulseView		Normalmodus
+Normal mode	PrefsWindow		Normalmodus
+OK	CPUButton		OK
+OK	DeskbarPulseView		OK
+OK	PrefsWindow		OK
+OK	PulseApp		OK
+OK	PulseView		OK
+OK	PulseWindow		OK
+Pulse	NormalPulseView		Pulse
+Pulse	PulseWindow		Pulse
+Pulse settings	PulseWindow		Pulsinnstillinger
+Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	CPUButton		Pulse\n\nAv David Ramsey og Arve Hjønnevåg\nRevidert av Daniel Switkin
+Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	DeskbarPulseView		Pulse\n\nAv David Ramsey og Arve Hjønnevåg\nRevidert av Daniel Switkin
+Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	PulseWindow		Pulse\n\nAv David Ramsey og Arve Hjønnevåg\nRevidert av Daniel Switkin
+Quit	DeskbarPulseView		Avslutt
+Quit	MiniPulseView		Avslutt
+Remove replicant	CPUButton		Fjern replikant
+Remove(): %s	DeskbarPulseView		Fjern(): %s
+Settings…	PulseView		Innstillinger...
+Width of icon:	ConfigView		Ikonbredde:
+You can't disable the last active CPU.	CPUButton		Du kan ikke slå av den siste aktive prosessoren.
+You can't disable the last active CPU.	PulseView		Du kan ikke slå av den siste aktive prosessoren.

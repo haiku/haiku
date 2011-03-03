@@ -1,0 +1,40 @@
+1	norwegian_bokmål	x-vnd.Be-PRNT	2528931969
+%.2f KB	JobListView		%.2f KB
+1 pending job.	PrinterListView		1 ventende jobb
+<pick one>	AddPrinterDialog		<velg én>
+Add	AddPrinterDialog		Legg til
+Add printer	AddPrinterDialog		Legg til skriver
+Add …	PrintersWindow		Legg til ...
+Black	TestPageView		Svart
+Blue	TestPageView		Blå
+Cancel	AddPrinterDialog		Avbryt
+Cancel job	PrintersWindow		Avbryt jobb
+Completed	JobListView		Fullført
+Connected to:	AddPrinterDialog		Forbindelse opprettet med:
+Cyan	TestPageView		Cyan
+Default Printer	PrinterListView		Standardskriver
+Driver: %driver%	PrinterListView		Driver: %driver%
+Failed	JobListView		Feilet
+Green	TestPageView		Grønn
+Magenta	TestPageView		Magenta
+Make default	PrintersWindow		Sett som standard
+No pending jobs.	PrinterListView		Ingen ventende jobber
+No printer found!	TransportMenu		Ingen skriver ble funnet!
+Print jobs for 	PrintersWindow		Utskriftsjobber for
+Print jobs: No printer selected	PrintersWindow		Utskriftsjobber: Ingen skriver er valgt
+Print test page	PrintersWindow		Skriv ut testside
+Printer name:	AddPrinterDialog		Printernavn:
+Printer type:	AddPrinterDialog		Skrivertype:
+Printers	PrintersWindow		Skrivere
+Processing	JobListView		Behandler
+Red	TestPageView		Rød
+Remove	PrintersWindow		Fjern
+Restart job	PrintersWindow		Start utskrift på nytt
+Test Page	PrintersWindow		Test side
+Test Page	TestPageView		Test side
+Unknown status	JobListView		Ukjent status
+Waiting	JobListView		Venter
+Yellow	TestPageView		Gul
+page	JobListView		side
+pages	JobListView		sider
+pending jobs.	PrinterListView		ventende jobber

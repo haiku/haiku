@@ -1,0 +1,39 @@
+1	norwegian_bokmål	x-vnd.Be-TSKB	34208151
+<Be folder is empty>	BeMenu		<Be-mappen er tom>
+About Haiku…	BeMenu		Om Haiku
+Always on top	PreferencesWindow		Alltid øverst
+Applications	PreferencesWindow		Programmer
+Auto-raise	PreferencesWindow		Fremhev automatisk
+Change time…	TimeView		Still klokken...
+Clock	PreferencesWindow		Klokke
+Close all	WindowMenu		Lukk alle
+Deskbar preferences	PreferencesWindow		Innstillinger for Deskbar
+Deskbar preferences…	BeMenu		Innstillinger for Deskbar...
+Edit menu…	PreferencesWindow		Rediger meny...
+Expand new applications	PreferencesWindow		Pakk ut nye programmer
+Find…	BeMenu		Finn...
+Hide all	WindowMenu		Skjul alle
+Hide time	TimeView		Skjul klokken
+Menu	PreferencesWindow		Meny
+Mount	BeMenu		Monter
+No windows	WindowMenu		Ingen vinduer
+Power off	BeMenu		Slå av
+Quit application	WindowMenu		Avslutt program
+Recent applications	BeMenu		Nylig brukte programmer
+Recent applications:	PreferencesWindow		Nylig brukte programmer
+Recent documents	BeMenu		Nylig brukte dokumenter
+Recent documents:	PreferencesWindow		Nylig brukte dokumenter
+Recent folders	BeMenu		Nylig brukte mapper
+Recent folders:	PreferencesWindow		Nylig brukte mapper:
+Restart Tracker	BeMenu		Start Tracker på nytt
+Restart system	BeMenu		Start systemet på nytt
+Show Time	Tray		Vis klokken
+Show all	WindowMenu		Vis alle
+Show application expander	PreferencesWindow		Vis Arkivåpner-programmet
+Show calendar…	TimeView		Vis kalender...
+Show replicants	BeMenu		Vis replikanter
+Show seconds	PreferencesWindow		Vis sekunder
+Shutdown…	BeMenu		Steng ned...
+Sort running applications	PreferencesWindow		Sorter kjørende programmer
+Tracker always first	PreferencesWindow		Tracker alltid først
+Window	PreferencesWindow		Vindu

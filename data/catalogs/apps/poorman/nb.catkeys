@@ -1,0 +1,62 @@
+1	norwegian_bokmål	x-vnd.Haiku.PoorMan	805673381
+A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		En standard nettsidemappe har blitt opprettet ved \"/boot/home/public_html.\"\nForviss deg om at det er en HTML-fil kalt \"index.html\" i den mappen.
+About PoorMan	PoorMan		Om PoorMan
+About PoorMan…	PoorMan		Om PoorMan...
+Advanced	PoorMan		Avansert
+Cancel	PoorMan		Avbryt
+Cannot start the server	PoorMan		Kan ikke starte serveren
+Clear console log	PoorMan		Tøm konsoll-loggen
+Clear hit counter	PoorMan		Nullstill treffteller
+Clear log file	PoorMan		Tøm loggfilen
+Console Logging	PoorMan		Konsoll-logging
+Controls	PoorMan		Kontroller
+Copy	PoorMan		Kopier
+Create	PoorMan		Opprett
+Create PoorMan log	PoorMan		Opprett PoorMan-logg
+Create log file	PoorMan		Opprett loggfil
+Default	PoorMan		Standard
+Dir Created	PoorMan		Mappe opprettet
+Directory: 	PoorMan		Mappe:
+Directory: (none)	PoorMan		Mappe: (ingen)
+Done	PoorMan		Ferdig
+Edit	PoorMan		Rediger
+Error Dir	PoorMan		Mappefeil
+Error Server	PoorMan		Serverfeil
+File	PoorMan		Fil
+File Name	PoorMan		Filnavn
+File logging	PoorMan		Fillogging
+Hits: %lu	PoorMan		Treff: %lu
+Hits: 0	PoorMan		Treff: 0
+Log To Console	PoorMan		Logg til konsoll
+Log To File	PoorMan		Logg til fil
+Log file name:	PoorMan		Navn på loggfil:
+Logging	PoorMan		Logging
+Logging view	PoorMan		Loggvisning
+Max. simultaneous connections:	PoorMan		Maks. samtidige tilkoblinger
+OK	PoorMan		OK
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Vennligst velg mappen du ønsker å publisere på nettet.\n\nDu kan la PoorMan opprette en standard \"public_html\" i din hjemmemappe.\nEller du kan velge én av dine egne mapper i stedet.
+Poor Man's web server\nCopyright © 2004-2009 Haiku\nAll rights reserved.\n\nWritten by: Philip Harrison, Ma Jie	PoorMan		Poor Man's web server\nOpphavsrett © 2004-2009 Haiku\nAlle rettigheter reservert.\n\nSkrevet av: Philip Harrison, Ma Jie
+PoorMan settings	PoorMan		PoorMan-innstillinger
+Quit	PoorMan		Avslutt
+Run server	PoorMan		Kjør server
+Save console as…	PoorMan		Lagre konsoll som...
+Save console selections as…	PoorMan		Lagre konsollvalg som...
+Save log console	PoorMan		Lagre konsoll-loggen
+Save log console selection	PoorMan		Lagre utvalg av loggkonsoll
+Select	PoorMan		Velg
+Select all	PoorMan		Merk alt
+Select web folder	PoorMan		Velg nettsidemappe
+Send file listing if there's no start page	PoorMan		Send liste over filer hvis det ikke er noen startside
+Settings…	PoorMan		Innstillinger...
+Shutting down.	PoorMan		Stenger ned.
+Shutting down.\n	PoorMan		Stenger ned.\n
+Site	PoorMan		Side
+Start page:	PoorMan		Startside:
+Starting up... 	PoorMan		Starter opp...
+Status: Running	PoorMan		Status: Kjører
+Status: Stopped	PoorMan		Status: Stoppet
+Web folder:	PoorMan		Mappe for nettsiden:
+Website location	PoorMan		Plassering av nettside
+Website options	PoorMan		Nettsidevalg
+connections	PoorMan		tilkoblinger
+done.\n	PoorMan		ferdig.\n

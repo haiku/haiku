@@ -1,0 +1,18 @@
+1	norwegian_bokmål	x-vnd.Haiku-ProcessController	2757875825
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
+About	ProcessController		Om
+Cancel	ProcessController		Avbryt
+Do you really want to kill the team \"%s\"?	ProcessController		Vil du virkelige ta drepe lag \"%s\"?
+Error saving file	ProcessController		Feil ved lagring av fil
+Kill this thread!	ProcessController		Drep denne tråden!
+Live in the Deskbar	ProcessController		Lev i Deskbar
+Memory usage	ProcessController		Minnebruk
+Processor %d	ProcessController		Prosessor %d
+Quit application	ProcessController		Avslutt program
+Restart Deskbar	ProcessController		Start Deskbar på nytt
+Restart Tracker	ProcessController		Start Tracker på nytt
+Run in window	ProcessController		Kjør i vindu
+This is the last active processor...\nYou can't turn it off!	ProcessController		Dette er den siste aktive prosessen...\nDu kan ikke skru den av!
+This team is already gone…	ProcessController		Laget er allerede borte...
+This thread is already gone…	ProcessController		Tråden er allerede borte...
+What do you want to do with the thread \"%s\"?	ProcessController		Hva vil du gjøre med tråden \"%s\"?

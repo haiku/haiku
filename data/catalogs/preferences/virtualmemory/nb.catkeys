@@ -1,0 +1,19 @@
+1	norwegian_bokmål	x-vnd.Haiku-VirtualMemory	2178926553
+%Ld B	SettingsWindow		%Ld B
+Changes will take effect on restart!	SettingsWindow		Endringene vil tre i kraft etter omstart!
+Current swap file size: 	SettingsWindow		Nåværende størrelse på vekslefil: 
+Defaults	SettingsWindow		Standardinnstillinger
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Deaktivering av virtuelt minne vil kunne ha uønskede effekter på systemstabiliteten idet alt tilgjengelig minne har blitt brukt opp.\nVirtuelt minne påvirker ikke systemets ytelse før dette nivået nås.\n\nEr du sikker på at du ønsker å deaktivere denne tjenesten?
+Enable virtual memory	SettingsWindow		Aktiver virtuelt minne
+GB	SettingsWindow		GB
+Insufficient space for a swap file.	SettingsWindow		Ikke nok plass til vekselfil.
+KB	SettingsWindow		KB
+Keep enabled	SettingsWindow		Behold aktivert
+MB	SettingsWindow		MB
+OK	VirtualMemoryApp		OK
+Physical memory: 	SettingsWindow		Fysisk minne: 
+Requested swap file size:	SettingsWindow		Ønsket størrelse på vekselfil:
+Revert	SettingsWindow		Tilbakestill
+Turn off	SettingsWindow		Slå av
+Use volume:	SettingsWindow		Bruk volum:
+VirtualMemory	SettingsWindow		Virtuelt minne

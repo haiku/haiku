@@ -1,0 +1,24 @@
+1	norwegian_bokmål	x-vnd.Haiku-Media	799053364
+<none>	Media views		<ingen>
+Audio input:	Media views		Lydinngang:
+Audio mixer	Media Window		Lydmikser
+Audio output:	Media views		Lydutgang:
+Audio settings	Media Window		Lydinnstillinger
+Channel:	Media views		Kanal:
+Cleaning up.	Media Window		Rydder opp.
+Couldn't add volume control in Deskbar: %s\n	Media views		Kunne ikke legge til volumkontroll i Deskbar: %s\n
+Couldn't remove volume control in Deskbar: %s\n	Media views		Kunne ikke fjerne volumkontroll i Deskbar: %s\n
+Defaults	Media views		Forvalg
+Done shutting down.	Media Window		Ferdig avsluttet.
+Media	Media Window		Media
+OK	Media Window		OK
+Quit	Media Window		Avslutt
+Ready for use…	Media Window		Klar til bruk…
+Restart media services	Media views		Start mediatjenestene på nytt
+Show volume control on Deskbar	Media views		Vis volumkontrollen i Deskbar
+Telling media_addon_server to quit.	Media Window		Ber media_addon_server om å avslutte
+This hardware has no controls.	Media Window		Maskinvaren mangler kontroller.
+Video input:	Media views		Videoinngang:
+Video output:	Media views		Videoutgang:
+Video settings	Media Window		Videoinnstillinger
+Waiting for media_server to quit.	Media Window		Venter på at media_server skal avslutte.

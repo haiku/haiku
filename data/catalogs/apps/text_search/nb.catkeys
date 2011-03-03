@@ -1,0 +1,33 @@
+1	norwegian_bokmål	x-vnd.Haiku.TextSearch	2895782387
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME kunne ikke åpne én eller flere mapper.
+%s: There was a problem running grep.	Grepper		%s: Det var et problem under kjøring av grep
+About TextSearch…	GrepWindow		Om Tekstsøk...
+Actions	GrepWindow		Handlinger
+Cancel	GrepWindow		Avbryt
+Case-sensitive	GrepWindow		Skill mellom store og små bokstaver
+Close	GrepWindow		Lukk
+Copy text to clipboard	GrepWindow		Kopier tekst til utklippstavle
+Created by Matthijs Hollemans.\n\nContributed to by Peter Hinely, Serge Fantino, Hideki Naito, Oscar Lesta, Oliver Tappe, Jonas Sundström, Luc Schrijvers and momoziro.\n	GrepWindow		Laget av Matthijs Hollemans.\n\nBidrag fra Peter Hinely, Serge Fantino, Hideki Naito, Oscar Lesta, Oliver Tappe, Jonas Sundeström, Luc Schrijvers og momoziro.\n
+Encoding	GrepWindow		Koding
+File	GrepWindow		Fil
+Follow symbolic links	GrepWindow		Følg symbolske lenker
+History	GrepWindow		Historie
+Look in sub-folders	GrepWindow		Se i undermapper
+New window	GrepWindow		Nytt vindu
+OK	GrepWindow		OK
+Open files in Pe	GrepWindow		Åpne filer i Pe
+Open selection	GrepWindow		Åpne valgte
+Please select the files you wish to have selected for you in Tracker.	GrepWindow		Vennligst velg filene du ønsker å ha valg for deg i Tracker.
+Please select the files you wish to keep searching.	GrepWindow		Vennligst velg filene du ønsker å fortsette å søke gjennom.
+Quit	GrepWindow		Avslutt
+Search	GrepWindow		Søk
+Select all	GrepWindow		Merk alle
+Set target…	GrepWindow		Sett mål...
+Settings	GrepWindow		Innstillinger
+Show files in Tracker	GrepWindow		Vis filer i Tracker
+Show lines	GrepWindow		Vis linjer
+Skip folders starting with a dot	GrepWindow		Hopp over mapper som starter med punktum
+Text files only	GrepWindow		Kun tekstfiler
+TextSearch	GrepWindow		Tekstsøk
+The unselected files will be removed from the list.	GrepWindow		De filene som ikke er merket vil bli fjernet fra listen.
+Trim to selection	GrepWindow		beskjær til utvalg

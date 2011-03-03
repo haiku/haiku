@@ -1,18 +1,18 @@
-1	norwegian bokmål	x-vnd.haiku.zip-o-matic	274748138
-1 file added.	file:ZipOMaticWindow.cpp		1 fil lagt til.
-Stop	file:ZipOMaticWindow.cpp		Avbryt
-Creating archive: %s	file:ZipOMaticWindow.cpp		Oppretter arkiv: %s
-Continue	file:ZipOMaticWindow.cpp		Fortsett
-Preparing to archive	file:ZipperThread.cpp		Forbereder arkivering
-Filename: %s	file:ZipOMaticWindow.cpp		Filnavn: %s
-Let them continue	file:ZipOMatic.cpp		La dem fortsette
-Do you want to stop them?	file:ZipOMatic.cpp		Ønsker du å avbryte dem?
-Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Er du sikker på at du ønsker å avbryte arkiveringen?
+1	norwegian_bokmål	x-vnd.haiku.zip-o-matic	274748138
 %ld files added.	file:ZipOMaticWindow.cpp		%ld filer lagt til.
-Stopped	file:ZipOMaticWindow.cpp		Avbrutt
+1 file added.	file:ZipOMaticWindow.cpp		1 fil lagt til.
 Archive	file:ZipperThread.cpp		Arkiv
+Archive created OK	file:ZipOMaticWindow.cpp		Arkivet ble opprettet
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Er du sikker på at du ønsker å avbryte arkiveringen?
+Continue	file:ZipOMaticWindow.cpp		Fortsett
+Creating archive: %s	file:ZipOMaticWindow.cpp		Oppretter arkiv: %s
+Do you want to stop them?	file:ZipOMatic.cpp		Ønsker du å avbryte dem?
 Drop files to zip.	file:ZipOMaticWindow.cpp		Slipp filer her for å arkivere dem.
 Error creating archive	file:ZipOMaticWindow.cpp		Noe gikk galt under arkiveringen.
-You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		%ld Zip-O-Matic kjører.\n\n
-Archive created OK	file:ZipOMaticWindow.cpp		Arkivet ble opprettet
+Filename: %s	file:ZipOMaticWindow.cpp		Filnavn: %s
+Let them continue	file:ZipOMatic.cpp		La dem fortsette
+Preparing to archive	file:ZipperThread.cpp		Forbereder arkivering
+Stop	file:ZipOMaticWindow.cpp		Avbryt
 Stop them	file:ZipOMatic.cpp		Avbryt dem
+Stopped	file:ZipOMaticWindow.cpp		Avbrutt
+You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		%ld Zip-O-Matic kjører.\n\n

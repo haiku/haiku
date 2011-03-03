@@ -1,0 +1,27 @@
+1	norwegian_bokmål	x-vnd.Haiku-Mail	3461113080
+Account name:	Config Views		Kontonavn
+Account settings	Config Views		Kontoinnstillinger
+Accounts	Config Window		Kontoer
+Add	Config Window		Legg til
+Always	Config Window		Alltid
+Apply	Config Window		Bruk
+Check every	Config Window		Sjekk hver
+Edit mailbox menu…	Config Window		Rediger postboksmeny...
+Mail checking	Config Window		Se etter e-post
+Miscellaneous	Config Window		Diverse
+Only when dial-up is connected	Config Window		Bare når oppringt nettverk er tilkoblet
+Real name:	Config Views		Virkelig navn
+Remove	Config Window		Fjern
+Return address:	Config Views		Svaradresse
+Revert	Config Window		Tilbakestill
+Schedule outgoing mail when dial-up is disconnected	Config Window		Legg utgående e-post i kø når oppringt nettverk er frakoblet
+Settings	Config Window		Innstillinger
+Show connection status window:	Config Window		Vis tilkoblingsstatusvindu
+Start mail services on startup	Config Window		Start e-posttjenester ved oppstart
+While sending	Config Window		Under sending
+While sending and receiving	Config Window		Under sending og mottak
+\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nLegg til en ny konto med Legg til-knappen.\n\nFjern en konto med Fjern-knappen på den valgte oppføringen.\n\nVelg en oppføring fra listen for å forandre innstillingene.
+days	Config Window		dager
+hours	Config Window		timer
+minutes	Config Window		minutter
+never	Config Window		aldri

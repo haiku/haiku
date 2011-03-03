@@ -1,0 +1,10 @@
+1	norwegian_bokmål	x-vnd.Haiku-InstalledPackages	1445740221
+BeOS legacy .pkg package removing application for Haiku.\n\nCopyright 2007,\nŁukasz 'Sil2100' Zemczak\n\nCopyright (c) 2007 Haiku, Inc.\n	UninstallApplication		Pakkefjerningsprogram for eldre BeOS .pkg-pakker for Haiku.\n\nOpphavsrett 2007,\nŁukasz 'Sil2100' Zemczak\n\nOpphavsrett (c) 2007 Haiku, Inc.\n
+Close	UninstallApplication		Lukk
+Installed packages	UninstallWindow		Installerte pakker
+No package selected.	UninstallView		Ingen pakke er valgt
+OK	UninstallView		OK
+Package description	UninstallView		Pakkebeskrivelse
+Remove	UninstallView		Fjern
+The package you selected has been successfully removed from your system.	UninstallView		Fjerning av pakken du valgte fra systemet var vellykket.
+The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Den valgte pakken ble ikke fjernet fra systemet. Filen med pakkeinformasjon kan ha vært ødelagt.

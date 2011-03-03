@@ -1,0 +1,20 @@
+1	norwegian_bokmål	x-vnd.Haiku-Touchpad	827345252
+Cancel	TouchpadPrefView		Avbryt
+Defaults	TouchpadPrefView		Standardinnstillinger
+Fast	TouchpadPrefView		Rask
+High	TouchpadPrefView		Høy
+Horizontal scroll speed	TouchpadPrefView		Horisontal skrollhastighet
+Horizontal scrolling	TouchpadPrefView		Horisontal skrolling
+OK	TouchpadPrefView		OK
+Off	TouchpadPrefView		Av
+Please confirm	TouchpadPrefView		Bekreft
+Revert	TouchpadPrefView		Tilbakestill
+Scroll acceleration	TouchpadPrefView		Scroll-akselerasjon
+Scrolling	TouchpadPrefView		Skrolling
+Slow	TouchpadPrefView		Langsom
+Tap click sensitivity	TouchpadPrefView		Tap-klikk sensitivitet
+Tap gesture	TouchpadPrefView		Tap-håndbevegelse
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Det nye skrolleområdet er veldig stort og kan hindre normale museoperasjoner. Er du sikker på at du vil endre det?
+Touchpad	TouchpadMain		Styreplate
+Two finger scrolling	TouchpadPrefView		To-finger skrolling
+Vertical scroll speed	TouchpadPrefView		Vertikal skrollhastighet

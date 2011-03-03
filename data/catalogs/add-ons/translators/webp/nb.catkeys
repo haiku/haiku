@@ -1,0 +1,9 @@
+1	norwegian_bokmål	x-vnd.Haiku-WebPTranslator	82748052
+Based on libwebp v0.1	ConfigView		Basert på libwebp v0.1
+Version %d.%d.%d, %s	ConfigView		Versjon %d.%d.%d, %s
+WebP Images	ConfigView		WebP-bilder
+WebP Settings	main		WebP-innstillinger
+WebP image	WebPTranslator		WebP-bilde
+WebP image translator	WebPTranslator		WebP-bildeoversetter
+WebP images	WebPTranslator		WebP-bilder
+WebPTranslator Settings	ConfigView		WebP-oversetterinnstillinger

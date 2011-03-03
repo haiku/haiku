@@ -1,0 +1,38 @@
+1	norwegian_bokmål	x-vnd.Haiku-PowerStatus	3358314249
+About	PowerStatus		Om
+About…	PowerStatus		Om...
+Battery charging	PowerStatus		Batteri lader
+Battery discharging	PowerStatus		Batteri utlader
+Battery info	PowerStatus		Batteriinformasjon
+Battery info…	PowerStatus		Batteriinformasjon...
+Battery unused	PowerStatus		Batteri ubrukt
+Capacity: 	PowerStatus		Kapasitet:
+Empty battery slot	PowerStatus		Batteri ikke tilstede
+Extended battery info	PowerStatus		Utvidet batteriinformasjon
+Install in Deskbar	PowerStatus		Installer i Deskbar
+Last full charge: 	PowerStatus		Siste fullstendige lading:
+Model number: 	PowerStatus		Modellnummer:
+OEM info: 	PowerStatus		OEM-informasjon:
+OK	PowerStatus		OK
+Power status box	PowerStatus		Boks for strømstatus
+PowerStatus	PowerStatus		Strøm
+Quit	PowerStatus		Avslutt
+Run in window	PowerStatus		Kjør i vindu
+Serial number: 	PowerStatus		Serelnummer:
+Show percent	PowerStatus		Vis prosent
+Show status icon	PowerStatus		Vis statusikon
+Show text label	PowerStatus		Vis tekst
+Show time	PowerStatus		Vis tid
+Technology: 	PowerStatus		Teknologi:
+Type: 	PowerStatus		Type:
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Du kan kjøre Strøm i et vindu eller installere det i Deskbar
+charging	PowerStatus		lader
+discharging	PowerStatus		lader ut
+mA	PowerStatus		mA
+mAh	PowerStatus		mAh
+mV	PowerStatus		mV
+mW	PowerStatus		mW
+mWh	PowerStatus		mWh
+no battery	PowerStatus		ingen batteri
+non-rechargeable	PowerStatus		ikke ladbar
+rechargeable	PowerStatus		oppladbar

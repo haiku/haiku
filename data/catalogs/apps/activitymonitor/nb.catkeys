@@ -1,0 +1,49 @@
+1	norwegian_bokmål	x-vnd.Haiku-ActivityMonitor	1946610782
+%.1f KB/s	DataSource		%.1f KB/s
+%.1f MB	DataSource		%.1f MB
+%.1f faults/s	DataSource		%.1f feil/s
+%lld ms	SettingsWindow		%lld ms
+%lld sec.	SettingsWindow		%lld sek.
+About ActivityMonitor…	ActivityWindow		Om Aktivitetsoversikt
+ActivityMonitor	ActivityWindow		Aktivitetsoversikt
+Add graph	ActivityWindow		Legg til graf
+Additional items	ActivityView		Tilleggsobjekter
+Apps	DataSource		Programmer
+Block cache	DataSource		Blokk-hurtigbuffer
+Block cache memory	DataSource		Blokkhurtigbufferminne
+CPU	DataSource		CPU
+CPU usage	DataSource		CPU-bruk
+CPU usage (combined)	DataSource		CPU-bruk (sammenlagt)
+Cache	DataSource		Hurtigbuffer
+Cached memory	DataSource		Hurtigbufferminne
+File	ActivityWindow		Fil
+Hide legend	ActivityView		Skjul forklaring
+MB	DataSource		MB
+Media nodes	DataSource		Medianoder
+Memory	DataSource		Minne
+Network receive	DataSource		Mottatt nettverk
+Network send	DataSource		Sendt nettverk
+P-faults	DataSource		P-feil
+Page faults	DataSource		Sidefeil
+Ports	DataSource		Porter
+Quit	ActivityWindow		Avslutt
+RX	DataSource	Shorter version for Receiving.	RX
+Raw clipboard size	DataSource		Rådata på utklippstavle
+Receiving	DataSource		Mottar
+Remove graph	ActivityView		Fjern graf
+Running applications	DataSource		Kjørende applikasjoner
+Semaphores	DataSource		Armsignal
+Sems	DataSource		Semaforer
+Sending	DataSource		Sender
+Settings	ActivityWindow		Innstillinger
+Settings…	ActivityWindow		Innstillinger...
+Show legend	ActivityView		Vis forklaring
+Swap	DataSource		Utveksling
+Swap space	DataSource		Utvekslingsminne
+TX	DataSource	Shorter version for Sending	TX
+Teams	DataSource		Lag
+Text clipboard size	DataSource		Tekst på utklippstavle
+Threads	DataSource		Tråder
+Update time interval:	SettingsWindow		Oppdateringsintervall:
+Used memory	DataSource		Brukt minne
+usage	DataSource		bruk

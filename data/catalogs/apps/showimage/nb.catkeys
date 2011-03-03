@@ -1,0 +1,62 @@
+1	norwegian_bokmål	x-vnd.Haiku-ShowImage	3385354583
+%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS sekunder
+About ShowImage…	Menus		Om ShowImage…
+Browse	Menus		Bla gjennom
+Cancel	ClosePrompt		Avbryt
+Clear selection	Menus		Fjern utvalg
+Close	ClosePrompt		Lukk
+Close	Menus		Lukk
+Close document	ClosePrompt		Lukk dokument
+Copy	Menus		Kopier
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Kunne ikke laste bildet! Enten filen eller en bildeoversetter for den finnes ikke.
+DPI:	PrintOptionsWindow		DPI:
+Edit	Menus		Rediger
+File	Menus		Fil
+First page	Menus		Første side
+Fit image to page	PrintOptionsWindow		Tilpass bilde til siden
+Fit to window	Menus		Tilpass til vindu
+Flip left to right	Menus		Vend fra venstre til høyre
+Flip top to bottom	Menus		Vend opp/ned
+Full screen	Menus		Fullskjerm
+Go to page	Menus		Gå til side
+Height: 	PrintOptionsWindow		Høyde: 
+High-quality zooming	Menus		Høykvalitets zoom
+Image	Menus		Bilde
+Job setup	PrintOptionsWindow		Jobboppsett
+Last page	Menus		Siste side
+Next file	Menus		Neste fil
+Next page	Menus		Neste side
+OK	Alerts		OK
+OK	SaveToFile		OK
+Open…	Menus		Åpne...
+Original size	Menus		Originalstørrelse
+Page setup…	Menus		Sideoppssett...
+Previous file	Menus		Forrige fil
+Previous page	Menus		Forrige side
+Print options	PrintOptionsWindow		Utskriftsalternativer
+Print…	Menus		Skriv ut...
+Progress monitor	ProgressWindow		Fremdriftsoversikt
+Quit	Menus		Avslutt
+Rating	Menus		Vurdering
+Resize to (in 1/72 inches):	PrintOptionsWindow		Endre størrelse til (i 1/72 tommer):
+Rotate clockwise	Menus		Roter med klokken
+Rotate counterclockwise	Menus		Roter mot klokken
+Save as…	Menus		Lagre som...
+Select all	Menus		Merk alle
+Selection Mode	Menus		Utvalgsmodus
+Show caption in full screen mode	Menus		Vis bildetekst i fullskjermsmodus
+ShowImage	AboutWindow		ShowImage
+ShowImage	Menus		ShowImage
+Slide delay	Menus		Lysbildeintervall
+Slide show	Menus		Lysbildevisning
+Stretch to window	Menus		Strekk til vindu
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokumentet '%s' (side %d) er endret. Ønsker du å lukke dokumentet?
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Dokumentet '%s' har blitt endret. Ønsker du å lukke dokumentet?
+The file '%s' could not be written.	SaveToFile		Kunne ikke skrive filen '%s'.
+Undo	Menus		Angre
+Use as background…	Menus		Bruk som bakgrunn…
+View	Menus		Vis
+Width:	PrintOptionsWindow		Bredde:
+Zoom factor in %:	PrintOptionsWindow		zoomfaktor i %:
+Zoom in	Menus		Zoom inn
+Zoom out	Menus		Zoom ut

@@ -1,0 +1,23 @@
+1	norwegian_bokmål	x-vnd.Haiku-DataTranslations	3706134146
+About	DataTranslations		Om
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Et element kalt '%name' finnes allerede i oversettermappen! Skal den eksisterende oversetteren overskrives?
+Cancel	DataTranslations		Avbryt
+Could not install %s:\n%s	DataTranslations		Kunne ikke installere %s:\n%s
+DataTranslations	DataTranslations		Formatoversetter
+DataTranslations - Error	DataTranslations		Formatoverstter - Feil
+DataTranslations - Note	DataTranslations		Formatoversetter - Notiser
+DataTranslations\n\twritten by Oliver Siebenmarck and others\n\tCopyright 2002-2010, Haiku Inc. All rights reserved.\n	DataTranslations		DataTranslations\n\tskrevet av Oliver Siebenmarck ved andre\n\tOpphavsrett 2002-2010, Haiku Inc. Alle rettigheter reservert.\n
+Icon	DataTranslations		Ikon
+Info	DataTranslations		informasjon
+Info:	DataTranslations		Informasjon:
+Info…	DataTranslations		Informasjon...
+Name:	DataTranslations		Navn:
+Name:\t%s \nVersion:\t%ld.%ld.%ld\nInfo:\t%s\n\nPath:\n%s\n	DataTranslations		Navn:\t%s \nVersjon:\t%ld.%ld.%ld\nInfo:\t%s\n\nSti:\n%s\n
+OK	DataTranslations		OK
+Overwrite	DataTranslations		Overskriv
+Panel Info	DataTranslations		Panelinformasjon
+Path:	DataTranslations		Sti:
+The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Elementet '%name' ser ikke ut til å være en oversetter og vil ikke bli installert.
+The new translator has been installed successfully.	DataTranslations		Installasjonen av den nye oversetteren var vellykket.
+Translation Settings\n\nUse this control panel to set values that various\ntranslators use when no other settings are specified\nin the application.	DataTranslations		Oversetterinnstillinger\n\nBruk dette kontrollpanelet for å sette verdier som de forskjellige\noversetterene bruker når ingen andre innstillinger er satt\ni programmet.
+Version:	DataTranslations		Versjon:
