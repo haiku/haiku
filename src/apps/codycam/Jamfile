@@ -26,3 +26,8 @@ DoCatalogs CodyCam :
 	SftpClient.cpp
 	VideoConsumer.cpp
 ;
+
+AddCatalogEntryAttribute CodyCam
+	:
+	"x-vnd.Haiku.CodyCam:CodyCam:CodyCam"
+;

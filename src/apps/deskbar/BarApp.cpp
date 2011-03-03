@@ -635,8 +635,12 @@ TBarApp::AddTeam(team_id team, uint32 flags, const char* sig, entry_ref* ref)
 	BFile file(ref, B_READ_ONLY);
 	BAppFileInfo appMime(&file);
 
+	BString name;	
+	if (GetLocalizedFileName(*ref, name) != B_OK)
+		name = ref->name;
+		
 	BarTeamInfo* barInfo = new BarTeamInfo(new BList(), flags, strdup(sig),
-		new BBitmap(kIconSize, kIconFormat), strdup(ref->name));
+		new BBitmap(kIconSize, kIconFormat), strdup(name.String()));
 
 	barInfo->teams->AddItem((void*)team);
 	if (appMime.GetIcon(barInfo->icon, B_MINI_ICON) != B_OK)

@@ -44,6 +44,7 @@ All rights reserved.
 #endif
 
 #include <Bitmap.h>
+#include <Catalog.h>
 #include <Debug.h>
 #include <Directory.h>
 #include <fs_attr.h>
@@ -1466,6 +1467,80 @@ GetFileIconFromAttr(BNode *file, BBitmap *result, icon_size size)
 {
 	BNodeInfo fileInfo(file);
 	return fileInfo.GetIcon(result, size);
+}
+
+
+status_t
+GetLocalizedFileName(entry_ref& ref, BString& localizedFileName, bool traverse)
+{
+	// Looks up a localized filename, by reading a catalog signature,
+	// context and string to be translated, from an attribute on the 
+	// entry_ref, and using these to look up a translation in the catalog
+	// of the top preferred language.
+
+	// Attribute format:  "signature:context:string"
+	// (no colon in any of signature, context and string)
+
+	// It fails when a comment is present in the catalog.
+
+	status_t status;
+
+	BEntry entry(&ref, traverse);
+	if (!entry.Exists())
+		return B_ENTRY_NOT_FOUND;
+
+	BNode node(&entry);
+	status = node.InitCheck();
+	if (status != B_OK)
+		return status;
+
+	attr_info attr;
+	ssize_t bytes = 0;
+
+	status = node.GetAttrInfo("SYS:NAME", &attr);
+	if (status != B_OK)
+		return status;
+
+	char attribute[attr.size + 1];
+	bytes = node.ReadAttr("SYS:NAME", B_MIME_TYPE, 0, &attribute, attr.size);
+
+	if (bytes < 0)
+		return bytes;
+	
+	if (bytes == 0 || bytes != attr.size)
+		return B_ENTRY_NOT_FOUND;
+
+	attribute[bytes] = '\0';
+
+	char* signature = attribute;
+	char* context = NULL;
+	char* string = NULL;
+
+	ssize_t i = 0;
+	for (; i < bytes; i++) {
+		if (signature[i] == ':') {
+			signature[i] = '\0';
+			context = &signature[i + 1];
+			break;
+		}
+	}
+
+	for (; i < bytes; i++) {
+		if (signature[i] == ':') {
+			signature[i] = '\0';
+			string = &signature[i + 1];
+			break;
+		}
+	}
+
+	BCatalog catalog(signature);
+
+	const char* temp = catalog.GetString(string, context);
+	if (temp == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	localizedFileName = temp;
+	return B_OK;
 }
 
 
