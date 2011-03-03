@@ -590,10 +590,11 @@ TMailApp::RefsReceived(BMessage *msg)
 			if (file.InitCheck() == B_NO_ERROR) {
 				BNodeInfo	node(&file);
 				node.GetType(type);
-				if (!strcmp(type, B_MAIL_TYPE)) {
+				if (strcmp(type, B_MAIL_TYPE) == 0
+					|| strcmp(type, B_PARTIAL_MAIL_TYPE) == 0) {
 					window = NewWindow(&ref, NULL, false, &messenger);
 					window->Show();
-				} else if(!strcmp(type, "application/x-person")) {
+				} else if(strcmp(type, "application/x-person") == 0) {
 					/* Got a People contact info file, see if it has an Email address. */
 					BString name;
 					BString email;
@@ -631,8 +632,7 @@ TMailApp::RefsReceived(BMessage *msg)
 						}
 					}
 				}
-				else if (!strcmp(type, kDraftType))
-				{
+				else if (strcmp(type, kDraftType) == 0) {
 					window = NewWindow();
 
 					// If it's a draft message, open it

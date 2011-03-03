@@ -133,9 +133,10 @@ static const float kPlainFontSizeScale = 0.9;
 
 
 THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
-		BEmailMessage *mail, bool resending, uint32 defaultCharacterSet,
-		int32 defaultAccount)
-	: BBox(rect, "m_header", B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW, B_NO_BORDER),
+	bool resending, uint32 defaultCharacterSet, int32 defaultAccount)
+	:
+	BBox(rect, "m_header", B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW, B_NO_BORDER),
+
 	fAccountMenu(NULL),
 	fEncodingMenu(NULL),
 	fAccountID(defaultAccount),
@@ -465,8 +466,6 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 		fDate->SetHighColor(0, 0, 0);
 
 		y += controlHeight + 5;
-
-		LoadMessage(mail);
 	}
 	ResizeTo(Bounds().Width(), y);
 }

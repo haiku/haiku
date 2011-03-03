@@ -27,6 +27,7 @@
 
 #include <mail_util.h>
 #include <MailAddon.h>
+#include <MailDaemon.h>
 #include <MailProtocol.h>
 #include <MailSettings.h>
 
@@ -542,8 +543,6 @@ MailProtocolThread::TriggerFileDeleted(const node_ref& node)
 
 
 const uint32 kMsgSyncMessages = '&SyM';
-const uint32 kMsgFetchBody = '&FeB';
-const uint32 kMsgMarkMessageAsRead = '&MaR';
 const uint32 kMsgDeleteMessage = '&DeM';
 const uint32 kMsgAppendMessage = '&ApM';
 
@@ -579,20 +578,15 @@ InboundProtocolThread::MessageReceived(BMessage* message)
 		entry_ref ref;
 		message->FindRef("ref", &ref);
 		status_t status = fProtocol->FetchBody(ref);
-		if (status != B_OK)
+
+		BMessenger target;
+		if (message->FindMessenger("target", &target) != B_OK)
 			break;
 
-		BMessage argv;
-		if (message->FindMessage("launch", &argv) != B_OK)
-			break;
-		argv.RemoveName("argv");
-		argv.RemoveName("argc");
-
-		argv.AddString("argv", "E-mail");
-		BPath path(&ref);
-		argv.AddString("argv", path.Path());
-		argv.AddInt32("argc", 2);
-		be_roster->Launch("text/x-email", &argv);
+		BMessage message(kMsgBodyFetched);
+		message.AddInt32("status", status);
+		message.AddRef("ref", &ref);
+		target.SendMessage(&message);
 		break;
 	}
 
@@ -635,11 +629,12 @@ InboundProtocolThread::SyncMessages()
 
 
 void
-InboundProtocolThread::FetchBody(const entry_ref& ref, BMessage* launch)
+InboundProtocolThread::FetchBody(const entry_ref& ref, BMessenger* listener)
 {
 	BMessage message(kMsgFetchBody);
 	message.AddRef("ref", &ref);
-	message.AddMessage("launch", launch);
+	if (listener)
+		message.AddMessenger("target", *listener);
 	PostMessage(&message);
 }
 

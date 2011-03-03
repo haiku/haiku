@@ -195,7 +195,7 @@ public:
 
 			void				SyncMessages();
 			void				FetchBody(const entry_ref& ref,
-									BMessage* launch = NULL);
+									BMessenger* listener = NULL);
 			void				MarkMessageAsRead(const entry_ref& ref,
 									read_flags flag = B_READ);
 			void				DeleteMessage(const entry_ref& ref);

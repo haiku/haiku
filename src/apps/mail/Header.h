@@ -82,8 +82,7 @@ class TTextControl;
 class THeaderView : public BBox {
 public:
 							THeaderView(BRect, BRect, bool incoming,
-								BEmailMessage *mail, bool resending,
-								uint32 defaultCharacterSet,
+								bool resending, uint32 defaultCharacterSet,
 								int32 defaultAccount);
 
 	virtual	void			MessageReceived(BMessage*);

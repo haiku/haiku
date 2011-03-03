@@ -19,6 +19,7 @@ const uint32 kMsgSetStatusWindowMode = 'shst';
 const uint32 kMsgCountNewMessages = 'mnum';
 const uint32 kMsgMarkMessageAsRead = 'mmar';
 const uint32 kMsgFetchBody = 'mfeb';
+const uint32 kMsgBodyFetched = 'mbfe';
 
 
 class BMailDaemon {
@@ -32,7 +33,7 @@ public:
 	static status_t				MarkAsRead(int32 account, const entry_ref& ref,
 									read_flags flag = B_READ);
 	static status_t				FetchBody(const entry_ref& ref,
-									BMessage* launchMessage = NULL);
+									BMessenger* listener = NULL);
 	static status_t				Quit();
 };
 

@@ -145,10 +145,14 @@ BLocker TMailWindow::sWindowListLock;
 
 
 TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
-		const entry_ref* ref, const char* to, const BFont* font, bool resending,
-		BMessenger* messenger)
-	: BWindow(rect, title, B_DOCUMENT_WINDOW, 0),
+	const entry_ref* ref, const char* to, const BFont* font, bool resending,
+	BMessenger* messenger)
+	:
+	BWindow(rect, title, B_DOCUMENT_WINDOW, 0),
+
 	fApp(app),
+	fMail(NULL),
+	fRef(NULL),
 	fFieldState(0),
 	fPanel(NULL),
 	fSendButton(NULL),
@@ -168,7 +172,9 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 	fStartingText(NULL),
 	fOriginatingWindow(NULL),
 	fReadButton(NULL),
-	fNextButton(NULL)
+	fNextButton(NULL),
+
+	fDownloading(false)
 {
 	fKeepStatusOnQuit = false;
 
@@ -187,13 +193,9 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 
 	if (ref) {
 		fRef = new entry_ref(*ref);
-		fMail = new BEmailMessage(fRef);
 		fIncoming = true;
-	} else {
-		fRef = NULL;
-		fMail = NULL;
+	} else
 		fIncoming = false;
-	}
 
 	fAutoMarkRead = fApp->AutoMarkRead();
 	BRect r(0, 0, RIGHT_BOUNDARY, 15);
@@ -413,40 +415,6 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 		menu->AddItem(fNextMsg);
 		menu->AddSeparatorItem();
 		fSaveAddrMenu = subMenu = new BMenu(B_TRANSLATE("Save address"));
-
-		// create the list of addresses
-
-		BList addressList;
-		get_address_list(addressList, fMail->To(), extract_address);
-		get_address_list(addressList, fMail->CC(), extract_address);
-		get_address_list(addressList, fMail->From(), extract_address);
-		get_address_list(addressList, fMail->ReplyTo(), extract_address);
-
-		for (int32 i = addressList.CountItems(); i-- > 0;) {
-			char *address = (char *)addressList.RemoveItem(0L);
-
-			// insert the new address in alphabetical order
-			int32 index = 0;
-			while ((item = subMenu->ItemAt(index)) != NULL) {
-				if (!strcmp(address, item->Label())) {
-					// item already in list
-					goto skip;
-				}
-
-				if (strcmp(address, item->Label()) < 0)
-					break;
-
-				index++;
-			}
-
-			msg = new BMessage(M_SAVE);
-			msg->AddString("address", address);
-			subMenu->AddItem(new BMenuItem(address, msg), index);
-
-		skip:
-			free(address);
-		}
-
 		menu->AddItem(subMenu);
 		fMenuBar->AddItem(menu);
 
@@ -520,7 +488,7 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 		fButtonBar = NULL;
 
 	r.top = r.bottom = height + bbheight + 1;
-	fHeaderView = new THeaderView (r, rect, fIncoming, fMail, resending,
+	fHeaderView = new THeaderView (r, rect, fIncoming, resending,
 		(resending || !fIncoming)
 		? fApp->MailCharacterSet()
 			// Use preferences setting for composing mail.
@@ -531,8 +499,8 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 	r = Frame();
 	r.OffsetTo(0, 0);
 	r.top = fHeaderView->Frame().bottom - 1;
-	fContentView = new TContentView(r, fIncoming, fMail,
-		const_cast<BFont *>(font), false, fApp->ColoredQuotes());
+	fContentView = new TContentView(r, fIncoming, const_cast<BFont *>(font),
+		false, fApp->ColoredQuotes());
 		// TContentView needs to be properly const, for now cast away constness
 
 	AddChild(fHeaderView);
@@ -592,8 +560,7 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 		}
 	}
 
-	if (fRef != NULL)
-		SetTitleForMessage();
+	OpenMessage(ref, fHeaderView->fCharacterSetUserSees);
 
 	_UpdateSizeLimits();
 
@@ -719,6 +686,7 @@ TMailWindow::~TMailWindow()
 	delete fMail;
 	delete fPanel;
 	delete fOriginatingWindow;
+	delete fRef;
 
 	BAutolock locker(sWindowListLock);
 	sWindowList.RemoveItem(this);
@@ -952,6 +920,25 @@ TMailWindow::MessageReceived(BMessage *msg)
 {
 	bool wasReadMsg = false;
 	switch (msg->what) {
+		case kMsgBodyFetched:
+		{
+			status_t status = msg->FindInt32("status");
+			if (status != B_OK) {
+				PostMessage(B_QUIT_REQUESTED);
+				break;
+			}
+
+			entry_ref ref;
+			if (msg->FindRef("ref", &ref) != B_OK)
+				break;
+			if (ref != *fRef)
+				break;
+
+			// reload the current message
+			OpenMessage(&ref, fHeaderView->fCharacterSetUserSees);
+			break;
+		}
+
 		case FIELD_CHANGED:
 		{
 			int32 prevState = fFieldState;
@@ -1479,45 +1466,46 @@ TMailWindow::MessageReceived(BMessage *msg)
 			break;
 		case M_READ:
 			wasReadMsg = true;
+			SetCurrentMessageRead(B_READ);
+			_UpdateReadButton();
 			msg->what = M_NEXTMSG;
 		case M_PREVMSG:
 		case M_NEXTMSG:
-			if (fRef != NULL) {
-				entry_ref nextRef = *fRef;
-
-				if (GetTrackerWindowFile(&nextRef, (msg->what == M_NEXTMSG))) {
-					TMailWindow *window = static_cast<TMailApp *>(be_app)
-						->FindWindow(nextRef);
-					if (window == NULL) {
-						BNode node(fRef);
-						read_flags currentFlag;
-						if (read_read_attr(node, currentFlag) != B_OK)
-							currentFlag = B_UNREAD;
-						if (fAutoMarkRead == true || wasReadMsg)
-							SetCurrentMessageRead(B_READ);
-						else if (currentFlag != B_READ)
-							SetCurrentMessageRead(B_SEEN);
-
-						OpenMessage(&nextRef,
-							fHeaderView->fCharacterSetUserSees, msg);
-					} else {
-						window->Activate();
-
-						if (wasReadMsg)
-							SetCurrentMessageRead(B_READ);
-						PostMessage(B_CLOSE_REQUESTED);
-					}
-
-					SetTrackerSelectionToCurrent();
-				} else {
-					if (wasReadMsg) {
+		{
+			if (fRef == NULL)
+				break;
+			entry_ref nextRef = *fRef;
+			if (GetTrackerWindowFile(&nextRef, (msg->what == M_NEXTMSG))) {
+				TMailWindow *window = static_cast<TMailApp *>(be_app)
+					->FindWindow(nextRef);
+				if (window == NULL) {
+					BNode node(fRef);
+					read_flags currentFlag;
+					if (read_read_attr(node, currentFlag) != B_OK)
+						currentFlag = B_UNREAD;
+					if (fAutoMarkRead == true)
 						SetCurrentMessageRead(B_READ);
-						PostMessage(B_CLOSE_REQUESTED);
-					}
-					beep();
+					else if (currentFlag != B_READ && !wasReadMsg)
+						SetCurrentMessageRead(B_SEEN);
+
+					OpenMessage(&nextRef,
+						fHeaderView->fCharacterSetUserSees);
+				} else {
+					window->Activate();
+
+					//fSent = true;
+					PostMessage(B_CLOSE_REQUESTED);
 				}
+
+				SetTrackerSelectionToCurrent();
+			} else {
+				if (wasReadMsg)
+					PostMessage(B_CLOSE_REQUESTED);
+				beep();
 			}
 			break;
+		}
+
 		case M_SAVE_POSITION:
 			if (fRef != NULL)
 				SaveTrackerPosition(fRef);
@@ -2761,6 +2749,9 @@ TMailWindow::SetTitleForMessage()
 		else
 			title = fMail->Subject();
 
+		if (fDownloading)
+			title.Prepend("Downloading: ");
+
 		if (fApp->ShowSpamGUI() && fRef != NULL) {
 			BString	classification;
 			BNode	node (fRef);
@@ -2783,7 +2774,7 @@ TMailWindow::SetTitleForMessage()
 			title << "[" << classification << "] " << oldTitle;
 		}
 	}
-	SetTitle(title.String());
+	SetTitle(title);
 }
 
 
@@ -2794,8 +2785,7 @@ TMailWindow::SetTitleForMessage()
 //
 
 status_t
-TMailWindow::OpenMessage(entry_ref *ref, uint32 characterSetForDecoding,
-	BMessage* trackerMsg)
+TMailWindow::OpenMessage(const entry_ref *ref, uint32 characterSetForDecoding)
 {
 	//
 	//	Set some references to the email file
@@ -2812,6 +2802,7 @@ TMailWindow::OpenMessage(entry_ref *ref, uint32 characterSetForDecoding,
 
 	fContentView->fTextView->StopLoad();
 	delete fMail;
+	fMail = NULL;
 
 	BFile file(fRef, B_READ_ONLY);
 	status_t err = file.InitCheck();
@@ -2823,9 +2814,12 @@ TMailWindow::OpenMessage(entry_ref *ref, uint32 characterSetForDecoding,
 	fileInfo.GetType(mimeType);
 
 	if (strcmp(mimeType, B_PARTIAL_MAIL_TYPE) == 0) {
-		BMailDaemon::FetchBody(*ref, trackerMsg);
+		BMessenger listener(this);
+		BMailDaemon::FetchBody(*ref, &listener);
 		fileInfo.GetType(mimeType);
-	}
+		_SetDownloading(true);
+	} else
+		_SetDownloading(false);
 
 	// Check if it's a draft file, which contains only the text, and has the
 	// from, to, bcc, attachments listed as attributes.
@@ -3215,3 +3209,9 @@ TMailWindow::_UpdateReadButton()
 	UpdateViews();
 }
 
+
+void
+TMailWindow::_SetDownloading(bool downloading)
+{
+	fDownloading = downloading;
+}

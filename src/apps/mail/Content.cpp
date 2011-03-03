@@ -644,9 +644,12 @@ TextRunArray::~TextRunArray()
 //	#pragma mark -
 
 
-TContentView::TContentView(BRect rect, bool incoming, BEmailMessage *mail,
-		BFont* font, bool showHeader, bool coloredQuotes)
-	: BView(rect, "m_content", B_FOLLOW_ALL, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
+TContentView::TContentView(BRect rect, bool incoming, BFont* font,
+	bool showHeader, bool coloredQuotes)
+	:
+	BView(rect, "m_content", B_FOLLOW_ALL,
+		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
+
 	fFocus(false),
 	fIncoming(incoming)
 {
@@ -662,8 +665,8 @@ TContentView::TContentView(BRect rect, bool incoming, BEmailMessage *mail,
 	text.OffsetTo(0, 0);
 	text.InsetBy(5, 5);
 
-	fTextView = new TTextView(r, text, fIncoming, mail, this, font,
-		showHeader, coloredQuotes);
+	fTextView = new TTextView(r, text, fIncoming, this, font, showHeader,
+		coloredQuotes);
 	BScrollView *scroll = new BScrollView("", fTextView, B_FOLLOW_ALL, 0, true, true);
 	AddChild(scroll);
 }
@@ -849,16 +852,17 @@ TContentView::FrameResized(float /* width */, float /* height */)
 //	#pragma mark -
 
 
-TTextView::TTextView(BRect frame, BRect text, bool incoming,
-		BEmailMessage *mail, TContentView *view, BFont *font,
-		bool showHeader, bool coloredQuotes)
-	: BTextView(frame, "", text, B_FOLLOW_ALL, B_WILL_DRAW | B_NAVIGABLE),
+TTextView::TTextView(BRect frame, BRect text, bool incoming, TContentView *view,
+	BFont *font, bool showHeader, bool coloredQuotes)
+	:
+	BTextView(frame, "", text, B_FOLLOW_ALL, B_WILL_DRAW | B_NAVIGABLE),
+
 	fHeader(showHeader),
 	fColoredQuotes(coloredQuotes),
 	fReady(false),
 	fYankBuffer(NULL),
 	fLastPosition(-1),
-	fMail(mail),
+	fMail(NULL),
 	fFont(font),
 	fParent(view),
 	fStopLoading(false),

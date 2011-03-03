@@ -106,7 +106,7 @@ class TSavePanel;
 
 class TContentView : public BView {
 	public:
-		TContentView(BRect, bool incoming, BEmailMessage *mail, BFont*,
+		TContentView(BRect, bool incoming, BFont*,
 			bool showHeader, bool coloredQuotes); 
 		virtual void MessageReceived(BMessage *);
 		void FindString(const char *);
@@ -148,9 +148,10 @@ struct quote_context {
 
 class TTextView : public BTextView {
 	public:
-		TTextView(BRect, BRect, bool incoming, BEmailMessage *mail,
-			TContentView *, BFont *, bool showHeader, bool coloredQuotes);
-		~TTextView();
+								TTextView(BRect, BRect, bool incoming,
+									TContentView*, BFont*, bool showHeader,
+									bool coloredQuotes);
+								~TTextView();
 
 		virtual	void AttachedToWindow();
 		virtual void KeyDown(const char*, int32);

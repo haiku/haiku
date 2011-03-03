@@ -201,11 +201,11 @@ MailDaemonApp::RefsReceived(BMessage* message)
 		if (!protocol)
 			continue;
 
-		BMessage* launchMessage = message;
-		BMessage temp;
-		if (message->FindMessage("launch", &temp) == B_OK)
-			launchMessage = &temp;
-		protocol->FetchBody(ref, launchMessage);
+		BMessenger target;
+		BMessenger* messenger = &target;
+		if (message->FindMessenger("target", &target) != B_OK)
+			messenger = NULL;
+		protocol->FetchBody(ref, messenger);
 	}
 }
 
@@ -638,12 +638,12 @@ MailDaemonApp::MakeMimeTypes(bool remakeMIMETypes)
 	// do a full rebuild from nothing, or just add on the new attributes that
 	// we support which the regular BeOS mail daemon didn't have.
 
-	const char* types[2] = {"text/x-email", "text/x-partial-email"};
-	BMimeType mime;
-	BMessage info;
+	const uint8 kNTypes = 2;
+	const char* types[kNTypes] = {"text/x-email", "text/x-partial-email"};
 
-	for (size_t i = 0; i < sizeof(types) / sizeof(types[0]); i++) {
-		info.MakeEmpty();
+	for (size_t i = 0; i < kNTypes; i++) {
+		BMessage info;
+		BMimeType mime;
 		mime.SetTo(types[i]);
 		if (mime.InitCheck() != B_OK) {
 			fputs("could not init mime type.\n", stderr);
@@ -682,7 +682,7 @@ MailDaemonApp::MakeMimeTypes(bool remakeMIMETypes)
 			} else {
 				mime.SetShortDescription("Partial E-mail");
 				mime.SetLongDescription("A Partially Downloaded E-mail");
-				mime.SetPreferredApp("application/x-vnd.Be-POST");
+				mime.SetPreferredApp("application/x-vnd.Be-MAIL");
 			}
 		} else {
 			// Just add the e-mail related attribute types we use to the MIME
