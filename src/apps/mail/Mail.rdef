@@ -4,6 +4,8 @@ resource app_signature "application/x-vnd.Be-MAIL";
 resource app_flags B_SINGLE_LAUNCH;
 
 resource file_types message {
+	"types" = "text/x-email",
+	"types" = "text/x-partial-email",
 	"types" = "application/x-person",
 	"types" = "application/x-vnd.Be.URL.mailto",
 	"types" = "text/x-vnd.Be-MailDraft"
