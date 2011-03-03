@@ -250,6 +250,8 @@ DNSTools::ConvertFromDNSName(const BString& string)
 	int32 nextDot = dot;
 	outString.Remove(0, sizeof(char));
 	while (true) {
+		if (nextDot >= outString.Length())
+			break;
 		dot = outString[nextDot];
 		if (dot == 0)
 			break;
