@@ -643,8 +643,7 @@ MailDaemonApp::MakeMimeTypes(bool remakeMIMETypes)
 
 	for (size_t i = 0; i < kNTypes; i++) {
 		BMessage info;
-		BMimeType mime;
-		mime.SetTo(types[i]);
+		BMimeType mime(types[i]);
 		if (mime.InitCheck() != B_OK) {
 			fputs("could not init mime type.\n", stderr);
 			return;
@@ -652,7 +651,7 @@ MailDaemonApp::MakeMimeTypes(bool remakeMIMETypes)
 
 		if (!mime.IsInstalled() || remakeMIMETypes) {
 			// install the full mime type
-			mime.Delete ();
+			mime.Delete();
 			mime.Install();
 
 			// Set up the list of e-mail related attributes that Tracker will
@@ -684,37 +683,7 @@ MailDaemonApp::MakeMimeTypes(bool remakeMIMETypes)
 				mime.SetLongDescription("A Partially Downloaded E-mail");
 				mime.SetPreferredApp("application/x-vnd.Be-MAIL");
 			}
-		} else {
-			// Just add the e-mail related attribute types we use to the MIME
-			// system.
-			mime.GetAttrInfo(&info);
-			bool hasAccount = false;
-			bool hasThread = false;
-			bool hasSize = false;
-			const char* result;
-			for (int32 index = 0; info.FindString("attr:name", index, &result)
-					== B_OK; index++) {
-				if (!strcmp(result, B_MAIL_ATTR_ACCOUNT))
-					hasAccount = true;
-				if (!strcmp(result, B_MAIL_ATTR_THREAD))
-					hasThread = true;
-				if (!strcmp(result, "MAIL:fullsize"))
-					hasSize = true;
-			}
-
-			if (!hasAccount) {
-				addAttribute(info, B_MAIL_ATTR_ACCOUNT, "Account",
-					B_STRING_TYPE, true, false, 100);
-			}
-			if (!hasThread)
-				addAttribute(info, B_MAIL_ATTR_THREAD, "Thread");
-			/*if (!hasSize)
-				addAttribute(info,"MAIL:fullsize","Message Size",B_SIZE_T_TYPE,true,false,100);*/
-			// TODO: Tracker can't display SIZT attributes. What a pain.
-			if (!hasAccount || !hasThread/* || !hasSize*/)
-				mime.SetAttrInfo(&info);
 		}
-		mime.Unset();
 	}
 }
 
