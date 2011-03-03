@@ -10,7 +10,7 @@
 #include "WebPTranslator.h"
 #include "ConfigView.h"
 
-#include "decode.h"
+#include "webp/decode.h"
 
 #include <BufferIO.h>
 #include <Catalog.h>
@@ -75,11 +75,11 @@ static const TranSetting sDefaultSettings[] = {
 	{B_TRANSLATOR_EXT_DATA_ONLY, TRAN_SETTING_BOOL, false}
 };
 
-const uint32 kNumInputFormats = sizeof(sInputFormats) / 
+const uint32 kNumInputFormats = sizeof(sInputFormats) /
 	sizeof(translation_format);
-const uint32 kNumOutputFormats = sizeof(sOutputFormats) / 
+const uint32 kNumOutputFormats = sizeof(sOutputFormats) /
 	sizeof(translation_format);
-const uint32 kNumDefaultSettings = sizeof(sDefaultSettings) / 
+const uint32 kNumDefaultSettings = sizeof(sDefaultSettings) /
 	sizeof(TranSetting);
 
 
@@ -87,7 +87,7 @@ const uint32 kNumDefaultSettings = sizeof(sDefaultSettings) /
 
 
 WebPTranslator::WebPTranslator()
-	: BaseTranslator(B_TRANSLATE("WebP images"), 
+	: BaseTranslator(B_TRANSLATE("WebP images"),
 		B_TRANSLATE("WebP image translator"),
 		WEBP_TRANSLATOR_VERSION,
 		sInputFormats, kNumInputFormats,
@@ -163,7 +163,7 @@ WebPTranslator::DerivedTranslate(BPositionIO* stream,
 	}
 
 	int width, height;
-	uint8* out = WebPDecodeRGB((const uint8*)streamData, streamSize, &width, 
+	uint8* out = WebPDecodeRGB((const uint8*)streamData, streamSize, &width,
 		&height);
 	free(streamData);
 
@@ -184,7 +184,7 @@ WebPTranslator::DerivedTranslate(BPositionIO* stream,
 	// write out Be's Bitmap header
 	swap_data(B_UINT32_TYPE, &bitmapHeader, sizeof(TranslatorBitmap),
 		B_SWAP_HOST_TO_BENDIAN);
-	ssize_t bytesWritten = target->Write(&bitmapHeader, 
+	ssize_t bytesWritten = target->Write(&bitmapHeader,
 		sizeof(TranslatorBitmap));
 	if (bytesWritten < B_OK)
 		return bytesWritten;
