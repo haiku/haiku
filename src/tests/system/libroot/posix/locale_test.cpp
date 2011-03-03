@@ -1820,6 +1820,24 @@ test_timeconversions()
 		gtm.tm_yday = -1;
 		test_mktime("GMT", gtm, testTime, 6, 197);
 
+		tm gtmplus2 = {
+			9, 26, 16, 17, 6, 110, 6, 197, 0, -2 * 3600, (char*)"GMT+2"
+		};
+		test_localtime("GMT+2", testTime, gtmplus2);
+		test_gmtime("GMT+2", testTime, gtm);
+		gtmplus2.tm_wday = -1;
+		gtmplus2.tm_yday = -1;
+		test_mktime("GMT+2", gtmplus2, testTime, 6, 197);
+
+		tm gtmminus2 = {
+			9, 26, 20, 17, 6, 110, 6, 197, 0, 2 * 3600, (char*)"GMT-2"
+		};
+		test_localtime("GMT-2", testTime, gtmminus2);
+		test_gmtime("GMT-2", testTime, gtm);
+		gtmminus2.tm_wday = -1;
+		gtmminus2.tm_yday = -1;
+		test_mktime("GMT-2", gtmminus2, testTime, 6, 197);
+
 		tm btm = {
 			9, 26, 20, 17, 6, 110, 6, 197, 1, 2 * 3600, (char*)"CEST"
 		};

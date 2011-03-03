@@ -42,6 +42,7 @@ private:
 
 			TimeConversionDataBridge*	fDataBridge;
 
+			TimeZone*			fTimeZone;
 			char				fTimeZoneID[B_FILE_NAME_LENGTH];
 };
 

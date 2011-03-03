@@ -21,7 +21,8 @@ namespace Libroot {
 ICUTimeConversion::ICUTimeConversion(const ICUTimeData& timeData)
 	:
 	fTimeData(timeData),
-	fDataBridge(NULL)
+	fDataBridge(NULL),
+	fTimeZone(NULL)
 {
 	fTimeZoneID[0] = '\0';
 }
@@ -29,6 +30,7 @@ ICUTimeConversion::ICUTimeConversion(const ICUTimeData& timeData)
 
 ICUTimeConversion::~ICUTimeConversion()
 {
+	delete fTimeZone;
 }
 
 
@@ -42,6 +44,8 @@ ICUTimeConversion::Initialize(TimeConversionDataBridge* dataBridge)
 status_t
 ICUTimeConversion::TZSet(const char* timeZoneID, const char* tz)
 {
+	bool offsetHasBeenSet = false;
+
 	// The given TZ environment variable's content overrides the default
 	// system timezone.
 	if (tz != NULL) {
@@ -54,19 +58,31 @@ ICUTimeConversion::TZSet(const char* timeZoneID, const char* tz)
 
 			strlcpy(fTimeZoneID, tz + 1, sizeof(fTimeZoneID));
 		} else {
-			// We ignore anything following the timezone name, as those values
-			// are determined by the corresponding ICU-timezone (and glibc's
-			// tzset() implementation seems to do the same).
-			const char* tzNameEnd = tz;
-			while(isalpha(*tzNameEnd))
-				++tzNameEnd;
-
-			strlcpy(fTimeZoneID, tz,
-				min_c((uint32)(1 + tzNameEnd - tz), sizeof(fTimeZoneID)));
+			// note timezone name
+			strlcpy(fTimeZoneID, tz, sizeof(fTimeZoneID));
 
 			// nothing to do if the given name matches the current timezone
 			if (strcasecmp(fTimeZoneID, fDataBridge->addrOfTZName[0]) == 0)
 				return B_OK;
+
+			// parse TZ variable (only <std> and <offset> supported)
+			const char* tzNameEnd = tz;
+			while(isalpha(*tzNameEnd))
+				++tzNameEnd;
+			if (*tzNameEnd == '-' || *tzNameEnd == '+') {
+				int hours = 0;
+				int minutes = 0;
+				int seconds = 0;
+				sscanf(tzNameEnd + 1, "%2d:%2d:%2d", &hours, &minutes,
+					&seconds);
+				hours = min_c(24, max_c(0, hours));
+				minutes = min_c(59, max_c(0, minutes));
+				seconds = min_c(59, max_c(0, seconds));
+
+				*fDataBridge->addrOfTimezone = (*tzNameEnd == '-' ? -1 : 1)
+					* (hours * 3600 + minutes * 60 + seconds);
+				offsetHasBeenSet = true;
+			}
 		}
 	} else {
 		// nothing to do if the given name matches the current timezone
@@ -76,35 +92,39 @@ ICUTimeConversion::TZSet(const char* timeZoneID, const char* tz)
 		strlcpy(fTimeZoneID, timeZoneID, sizeof(fTimeZoneID));
 	}
 
-	ObjectDeleter<TimeZone> icuTimeZone = TimeZone::createTimeZone(fTimeZoneID);
-	if (icuTimeZone.Get() == NULL)
+	delete fTimeZone;
+	fTimeZone = TimeZone::createTimeZone(fTimeZoneID);
+	if (fTimeZone == NULL)
 		return B_NO_MEMORY;
 
-	int32_t rawOffset;
-	int32_t dstOffset;
-	UDate nowMillis = 1000 * (UDate)time(NULL);
-	UErrorCode icuStatus = U_ZERO_ERROR;
-	icuTimeZone->getOffset(nowMillis, FALSE, rawOffset, dstOffset, icuStatus);
-	if (!U_SUCCESS(icuStatus)) {
-		*fDataBridge->addrOfTimezone = 0;
-		*fDataBridge->addrOfDaylight = false;
-		strcpy(fDataBridge->addrOfTZName[0], "GMT");
-		strcpy(fDataBridge->addrOfTZName[1], "GMT");
+	if (offsetHasBeenSet) {
+		fTimeZone->setRawOffset(*fDataBridge->addrOfTimezone * -1 * 1000);
+	} else {
+		int32_t rawOffset;
+		int32_t dstOffset;
+		UDate nowMillis = 1000 * (UDate)time(NULL);
+		UErrorCode icuStatus = U_ZERO_ERROR;
+		fTimeZone->getOffset(nowMillis, FALSE, rawOffset, dstOffset, icuStatus);
+		if (!U_SUCCESS(icuStatus)) {
+			*fDataBridge->addrOfTimezone = 0;
+			*fDataBridge->addrOfDaylight = false;
+			strcpy(fDataBridge->addrOfTZName[0], "GMT");
+			strcpy(fDataBridge->addrOfTZName[1], "GMT");
 
-		return B_ERROR;
+			return B_ERROR;
+		}
+		*fDataBridge->addrOfTimezone = -1 * (rawOffset + dstOffset) / 1000;
+			// we want seconds, not the ms that ICU gives us
 	}
 
-	*fDataBridge->addrOfTimezone = -1 * (rawOffset + dstOffset) / 1000;
-		// we want seconds, not the ms that ICU gives us
-
-	*fDataBridge->addrOfDaylight = icuTimeZone->useDaylightTime();
+	*fDataBridge->addrOfDaylight = fTimeZone->useDaylightTime();
 
 	for (int i = 0; i < 2; ++i) {
 		if (tz != NULL && *tz != ':' && i == 0) {
 			strcpy(fDataBridge->addrOfTZName[0], fTimeZoneID);
 		} else {
 			UnicodeString icuString;
-			icuTimeZone->getDisplayName(i == 1, TimeZone::SHORT_COMMONLY_USED,
+			fTimeZone->getDisplayName(i == 1, TimeZone::SHORT_COMMONLY_USED,
 				fTimeData.ICULocale(), icuString);
 			CheckedArrayByteSink byteSink(fDataBridge->addrOfTZName[i],
 				sizeof(fTimeZoneID));
@@ -123,12 +143,11 @@ ICUTimeConversion::TZSet(const char* timeZoneID, const char* tz)
 status_t
 ICUTimeConversion::Localtime(const time_t* inTime, struct tm* tmOut)
 {
-	ObjectDeleter<TimeZone> icuTimeZone = TimeZone::createTimeZone(fTimeZoneID);
-	if (icuTimeZone.Get() == NULL)
-		return B_NO_MEMORY;
+	if (fTimeZone == NULL)
+		return B_NO_INIT;
 
 	tmOut->tm_zone = fTimeZoneID;
-	return _FillTmValues(icuTimeZone.Get(), inTime, tmOut);
+	return _FillTmValues(fTimeZone, inTime, tmOut);
 }
 
 
@@ -145,12 +164,11 @@ ICUTimeConversion::Gmtime(const time_t* inTime, struct tm* tmOut)
 status_t
 ICUTimeConversion::Mktime(struct tm* inOutTm, time_t& timeOut)
 {
-	ObjectDeleter<TimeZone> icuTimeZone = TimeZone::createTimeZone(fTimeZoneID);
-	if (icuTimeZone.Get() == NULL)
-		return B_NO_MEMORY;
+	if (fTimeZone == NULL)
+		return B_NO_INIT;
 
 	UErrorCode icuStatus = U_ZERO_ERROR;
-	GregorianCalendar calendar(*icuTimeZone.Get(), fTimeData.ICULocale(),
+	GregorianCalendar calendar(*fTimeZone, fTimeData.ICULocale(),
 		icuStatus);
 	if (!U_SUCCESS(icuStatus))
 		return B_ERROR;
@@ -164,7 +182,7 @@ ICUTimeConversion::Mktime(struct tm* inOutTm, time_t& timeOut)
 		return B_ERROR;
 	timeOut = (time_t)((int64_t)timeInMillis / 1000);
 
-	return _FillTmValues(icuTimeZone.Get(), &timeOut, inOutTm);
+	return _FillTmValues(fTimeZone, &timeOut, inOutTm);
 }
 
 
