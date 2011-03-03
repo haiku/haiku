@@ -181,5 +181,6 @@ rule AddCatalogEntryAttribute target
 
 actions AddCatalogEntryAttribute1
 {
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
 	"$(2)" -t string "SYS:NAME" "$(CATALOG_ENTRY)" "$(1)"
 }
