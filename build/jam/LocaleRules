@@ -163,3 +163,23 @@ rule DoCatalogs target : signature : sources : sourceLanguage : regexp
 	# For the pseudo-target catkeys
 	HAIKU_LOCALE_OUTPUT_CATKEYS += $(generatedCatalog:S=.catkeys) ;
 }
+
+rule AddCatalogEntryAttribute target
+{
+	# AddCatalogEntryAttribute <target> : <attribute value> ;
+	#
+	# <attribute value> should be of the form
+	#	"x-vnd.Haiku-App:context:string"
+		
+	CATALOG_ENTRY on $(target) = "$(2)" ;
+
+	Depends $(target) : <build>addattr ;
+	
+	AddCatalogEntryAttribute1 $(target) 
+		: <build>addattr ;
+}
+
+actions AddCatalogEntryAttribute1
+{
+	"$(2)" -t string "SYS:NAME" "$(CATALOG_ENTRY)" "$(1)"
+}
