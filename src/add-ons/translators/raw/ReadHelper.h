@@ -76,7 +76,7 @@ class TReadHelper {
 		operator()(T &data)
 		{
 			fError = fStream.Read((void *)&data, sizeof(T));
-			if (fError > B_OK) {
+			if (fError >= B_OK) {
 				if (IsSwapping())
 					byte_swap(data);
 				return;
