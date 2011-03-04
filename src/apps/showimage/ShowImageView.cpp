@@ -1669,7 +1669,7 @@ ShowImageView::_DoImageOperation(ImageProcessor::operation op, bool quiet)
 }
 
 
-//! image operation initiated by user
+//! Image operation initiated by user
 void
 ShowImageView::_UserDoImageOperation(ImageProcessor::operation op, bool quiet)
 {
@@ -1681,11 +1681,10 @@ ShowImageView::_UserDoImageOperation(ImageProcessor::operation op, bool quiet)
 void
 ShowImageView::Rotate(int degree)
 {
-	if (degree == 90) {
-		_UserDoImageOperation(ImageProcessor::kRotateClockwise);
-	} else if (degree == 270) {
-		_UserDoImageOperation(ImageProcessor::kRotateCounterClockwise);
-	}
+	_UserDoImageOperation(degree == 90 ? ImageProcessor::kRotateClockwise
+		: ImageProcessor::kRotateCounterClockwise);
+
+	FitToBounds();
 }
 
 
