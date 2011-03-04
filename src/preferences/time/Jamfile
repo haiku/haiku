@@ -35,6 +35,7 @@ Preference Time
 DoCatalogs Time :
 	x-vnd.Haiku-Time
 	:
+	DateTimeView.cpp
 	Time.cpp
 	TimeWindow.cpp
 	ZoneView.cpp
