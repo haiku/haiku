@@ -245,6 +245,9 @@ DNSTools::ConvertToDNSName(const BString& string)
 BString
 DNSTools::ConvertFromDNSName(const BString& string)
 {
+	if (string.Length() == 0)
+		return string;
+
 	BString outString = string;
 	int32 dot = string[0];
 	int32 nextDot = dot;
