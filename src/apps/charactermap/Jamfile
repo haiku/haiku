@@ -22,3 +22,8 @@ DoCatalogs CharacterMap :
 	CharacterWindow.cpp
 	UnicodeBlocks.cpp
 ;
+
+AddCatalogEntryAttribute CharacterMap
+	:
+	"x-vnd.Haiku-CharacterMap:CharacterWindow:CharacterMap"
+;

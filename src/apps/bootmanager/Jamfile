@@ -28,6 +28,11 @@ Application BootManager :
 
 DoCatalogs BootManager : x-vnd.Haiku-BootManager : $(cataloguedSources) ;
 
+AddCatalogEntryAttribute BootManager
+	:
+	"x-vnd.Haiku-BootManager:BootManagerWindow:BootManager"
+;
+
 # Assemble the boot loader, and convert it into a header file
 
 # TODO: should be merged with the AssembleNasm rule

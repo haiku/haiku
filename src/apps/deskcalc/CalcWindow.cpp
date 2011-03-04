@@ -15,17 +15,19 @@
 #include <assert.h>
 
 #include <Application.h>
+#include <Catalog.h>
 #include <Dragger.h>
 #include <Screen.h>
 
 #include "CalcView.h"
 
 
-static const char* kWindowTitle		= "DeskCalc";
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Window"
 
 
 CalcWindow::CalcWindow(BRect frame, BMessage* settings)
-	: BWindow(frame, kWindowTitle, B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS)
+	: BWindow(frame, B_TRANSLATE("DeskCalc"), B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS)
 {
 	// create calculator view with calculator description and
 	// desktop background color

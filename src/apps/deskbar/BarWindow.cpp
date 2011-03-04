@@ -43,6 +43,7 @@ All rights reserved.
 #include <Path.h>
 #include <Debug.h>
 #include <File.h>
+#include <Locale.h>
 #include <MenuItem.h>
 #include <MessageFilter.h>
 #include <Screen.h>
@@ -56,6 +57,10 @@ All rights reserved.
 #include "tracker_private.h"
 
 #include <MessagePrivate.h>
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "MainWindow"
 
 
 // This is a very ugly hack to be able to call the private BMenuBar::StartMenuBar()
@@ -78,7 +83,7 @@ TBeMenu* TBarWindow::sBeMenu = NULL;
 
 TBarWindow::TBarWindow()
 	:
-	BWindow(BRect(-1000.0f, -1000.0f, -1000.0f, -1000.0f), "Deskbar",
+	BWindow(BRect(-1000.0f, -1000.0f, -1000.0f, -1000.0f), B_TRANSLATE("Deskbar"),
 		B_BORDERED_WINDOW,
 		B_WILL_ACCEPT_FIRST_CLICK | B_NOT_ZOOMABLE | B_NOT_CLOSABLE
 			| B_NOT_MINIMIZABLE | B_NOT_MOVABLE | B_NOT_RESIZABLE

@@ -17,3 +17,8 @@ DoCatalogs AboutSystem :
 	AboutSystem.cpp
 	Utilities.cpp
 ;
+
+AddCatalogEntryAttribute AboutSystem
+	:
+	"x-vnd.Haiku-About:AboutWindow:About this system"
+;

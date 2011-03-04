@@ -45,9 +45,15 @@ Application Deskbar :
 DoCatalogs Deskbar :
 	x-vnd.Be-TSKB
 	:
+	BarWindow.cpp
 	BeMenu.cpp
 	PreferencesWindow.cpp
 	StatusView.cpp
 	TimeView.cpp
 	WindowMenu.cpp
 	;
+
+AddCatalogEntryAttribute Deskbar
+	:
+	"x-vnd.Be-TSKB:MainWindow:Deskbar"
+;
