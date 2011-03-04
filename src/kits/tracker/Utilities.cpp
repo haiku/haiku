@@ -1470,9 +1470,7 @@ GetFileIconFromAttr(BNode *file, BBitmap *result, icon_size size)
 }
 
 
-/*!	\fn status_t GetLocalizedFileName(entry_ref& ref,
-		BString& localizedFileName, bool traverse)
-	\brief Looks up a localized filename in a catalog, using attribute data
+/*!	\brief Looks up a localized filename in a catalog, using attribute data
 		on the entry.
 	\param ref An entry_ref with an attribute holding data for catalog lookup.
 	\param localizedFileName A pre-allocated BString object for the result
@@ -1521,14 +1519,14 @@ GetLocalizedFileName(entry_ref& ref, BString& localizedFileName, bool traverse)
 
 	char* signature = attribute;
 	char* context = strchr(signature, ':');
-	if (context) {
+	if (context != NULL) {
 		context[0] = '\0';
 		context++;
 	} else
 		return B_ENTRY_NOT_FOUND;
 
 	char* string = strchr(context, ':');
-	if (string) {
+	if (string != NULL) {
 		string[0] = '\0';
 		string++;
 	} else
