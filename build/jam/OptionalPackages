@@ -1608,14 +1608,16 @@ if [ IsOptionalHaikuImagePackageAdded Vim ] {
 		Echo "No optional package Vim available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage vim-7.3-x86-gcc4-2010-08-22.zip
-			:  $(baseURL)/vim-7.3-x86-gcc4-2010-08-22.zip ;
+			:  $(baseURL)/vim-7.3-x86-gcc4-2010-08-22.zip
+			: : true ;
 		AddSymlinkToHaikuImage home config be Applications
 			: /boot/common/bin/gvim ;
 		# TODO: move this symlink to the archive
 		AddSymlinkToHaikuImage common bin : vim : vi ;
 	} else {
 		InstallOptionalHaikuImagePackage vim-7.3-x86-gcc2-2010-08-22.zip
-			:  $(baseURL)/vim-7.3-x86-gcc2-2010-08-22.zip ;
+			:  $(baseURL)/vim-7.3-x86-gcc2-2010-08-22.zip
+			: : true ;
 		AddSymlinkToHaikuImage home config be Applications
 			: /boot/common/bin/gvim ;
 		# TODO: move this symlink to the archive
