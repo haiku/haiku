@@ -26,15 +26,16 @@ Except as contained in this notice, the name of Be Incorporated shall not be
 used in advertising or otherwise to promote the sale, use or other dealings in
 this Software without prior written authorization from Be Incorporated.
 
-Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered trademarks
-of Be Incorporated in the United States and other countries. Other brand product
-names are registered trademarks or trademarks of their respective holders.
+Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered
+trademarks of Be Incorporated in the United States and other countries. Other
+brand product names are registered trademarks or trademarks of their respective
+holders.
 All rights reserved.
 */
 
-//	Be Menu, used in vertical mode, expanded and mini
-//		in mini mode will have team menu next to Be menu
-//		Be menu in horizontal mode is embedded in ExpandoMenuBar
+// Be Menu, used in vertical mode, expanded and mini
+//   - in mini mode will have team menu next to Be menu
+//   - Be menu in horizontal mode is embedded in ExpandoMenuBar
 
 #ifndef BARMENUBAR_H
 #define BARMENUBAR_H
@@ -63,7 +64,7 @@ class TBarMenuBar : public BMenuBar {
 
 		void InitTrackingHook(bool (* hookfunction)(BMenu*, void*), void* state,
 			bool both = false);
-	
+
 	private:
 		TBarView* fBarView;
 		TBarMenuTitle* fBeMenuItem;

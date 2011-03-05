@@ -26,9 +26,10 @@ Except as contained in this notice, the name of Be Incorporated shall not be
 used in advertising or otherwise to promote the sale, use or other dealings in
 this Software without prior written authorization from Be Incorporated.
 
-Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered trademarks
-of Be Incorporated in the United States and other countries. Other brand product
-names are registered trademarks or trademarks of their respective holders.
+Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered
+trademarks of Be Incorporated in the United States and other countries. Other
+brand product names are registered trademarks or trademarks of their respective
+holders.
 All rights reserved.
 */
 
@@ -78,7 +79,7 @@ TBarMenuBar::SmartResize(float width, float height)
 		BRect frame = Frame();
 		width = frame.Width();
 		height = frame.Height();
-	} else 
+	} else
 		ResizeTo(width, height);
 
 	width -= 1;
@@ -96,7 +97,7 @@ TBarMenuBar::SmartResize(float width, float height)
 void
 TBarMenuBar::AddTeamMenu()
 {
-	if (CountItems() > 1) 
+	if (CountItems() > 1)
 		return;
 
 	BRect frame(Frame());
@@ -112,7 +113,7 @@ TBarMenuBar::AddTeamMenu()
 void
 TBarMenuBar::RemoveTeamMenu()
 {
-	if (CountItems() < 2) 
+	if (CountItems() < 2)
 		return;
 
 	if (fAppListMenuItem) {
@@ -121,7 +122,7 @@ TBarMenuBar::RemoveTeamMenu()
 		fAppListMenuItem = NULL;
 	}
 
-	BRect frame = Frame();	
+	BRect frame = Frame();
 	SmartResize(frame.Width(), frame.Height());
 }
 
@@ -179,9 +180,10 @@ init_tracking_hook(BMenuItem* item, bool (*hookFunction)(BMenu*, void*),
 		return;
 
 	BMenu* windowMenu = item->Submenu();
-	if (windowMenu) 
-		//	have a menu, set the tracking hook
-		windowMenu->SetTrackingHook(hookFunction, state);					
+	if (windowMenu) {
+		// have a menu, set the tracking hook
+		windowMenu->SetTrackingHook(hookFunction, state);
+	}
 }
 
 
@@ -192,13 +194,13 @@ TBarMenuBar::InitTrackingHook(bool (*hookFunction)(BMenu*, void*),
 	BPoint loc;
 	uint32 buttons;
 	GetMouse(&loc, &buttons);
-	//	set the hook functions for the two menus
-	//	will always have the be menu
-	//	may have the app menu as well (mini mode)
-	if (fBeMenuItem->Frame().Contains(loc) || both) 
+	// set the hook functions for the two menus
+	// will always have the be menu
+	// may have the app menu as well (mini mode)
+	if (fBeMenuItem->Frame().Contains(loc) || both)
 		init_tracking_hook(fBeMenuItem, hookFunction, state);
 
-	if (fAppListMenuItem && (fAppListMenuItem->Frame().Contains(loc) || both)) 
+	if (fAppListMenuItem && (fAppListMenuItem->Frame().Contains(loc) || both))
 		init_tracking_hook(fAppListMenuItem, hookFunction, state);
 }
 

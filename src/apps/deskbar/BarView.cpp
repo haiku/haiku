@@ -26,9 +26,10 @@ Except as contained in this notice, the name of Be Incorporated shall not be
 used in advertising or otherwise to promote the sale, use or other dealings in
 this Software without prior written authorization from Be Incorporated.
 
-Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered trademarks
-of Be Incorporated in the United States and other countries. Other brand product
-names are registered trademarks or trademarks of their respective holders.
+Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered
+trademarks of Be Incorporated in the United States and other countries. Other
+brand product names are registered trademarks or trademarks of their respective
+holders.
 All rights reserved.
 */
 
@@ -135,9 +136,9 @@ TBarView::Draw(BRect)
 	rgb_color light = tint_color(ViewColor(), B_LIGHTEN_2_TINT);
 
 	SetHighColor(hilite);
-	if (AcrossTop()) 
+	if (AcrossTop())
 		StrokeLine(bounds.LeftBottom(), bounds.RightBottom());
-	else if (AcrossBottom()) 
+	else if (AcrossBottom())
 		StrokeLine(bounds.LeftTop(), bounds.RightTop());
 
 	if (Vertical() && Expando()) {
@@ -166,7 +167,7 @@ TBarView::MessageReceived(BMessage* message)
 			// so that I can follow the common pathway
 			// for adding icons to the tray
 			int32 id;
-			AddItem(new BMessage(*message), B_DESKBAR_TRAY, &id); 
+			AddItem(new BMessage(*message), B_DESKBAR_TRAY, &id);
 			break;
 		}
 
@@ -206,9 +207,9 @@ TBarView::PlaceBeMenu()
 		fBarMenuBar = NULL;
 	}
 
-	//	top or bottom expando mode has Be menu built in for tracking
-	//	only for vertical mini or expanded
-	//	mini mode will have team menu added as part of BarMenuBar
+	// top or bottom expando mode has Be menu built in for tracking
+	// only for vertical mini or expanded
+	// mini mode will have team menu added as part of BarMenuBar
 	if (fVertical && !fBarMenuBar) {
 		//	create the Be menu
 		BRect mbarFrame(Bounds());
@@ -217,11 +218,11 @@ TBarView::PlaceBeMenu()
 		AddChild(fBarMenuBar);
 	}
 
-	//	if there isn't a bemenu at this point,
-	//	DB should be in top/bottom mode, else error
+	// if there isn't a bemenu at this point,
+	// DB should be in top/bottom mode, else error
 	if (!fBarMenuBar)
 		return;
-		
+
 	float width = sMinimumWindowWidth;
 	BPoint loc(B_ORIGIN);
 	BRect menuFrame(fBarMenuBar->Frame());
@@ -237,9 +238,10 @@ TBarView::PlaceBeMenu()
 		else
 			width = floorf(width) / 2;
 		loc = Bounds().LeftTop();
-	} else 
+	} else {
 		// mini mode, BeMenu next to team menu
 		fBarMenuBar->AddTeamMenu();
+	}
 
 	fBarMenuBar->SmartResize(width, menuFrame.Height());
 	fBarMenuBar->MoveTo(loc);
@@ -257,13 +259,13 @@ TBarView::PlaceTray(bool, bool, BRect screenFrame)
 		fDragRegion->MoveTo(statusLoc);
 
 		if (!fReplicantTray->IsHidden())
-			fReplicantTray->Hide();	
+			fReplicantTray->Hide();
 
 		return;
 	}
 
 	if (fReplicantTray->IsHidden())
-		fReplicantTray->Show();	
+		fReplicantTray->Show();
 
 	if (fTrayLocation != 0) {
 		fReplicantTray->SetMultiRow(fVertical);
@@ -347,7 +349,7 @@ TBarView::GetPreferredWindowSize(BRect screenFrame, float* width, float* height)
 		}
 	} else {
 		// four corners
-		if (fTrayLocation != 0)		
+		if (fTrayLocation != 0)
 			windowHeight = fDragRegion->Frame().bottom;
 		else
 			windowHeight = fBarMenuBar->Frame().bottom;
@@ -404,10 +406,10 @@ TBarView::SaveSettings()
 	settings->state = (uint32)State();
 	settings->width = 0;
 	settings->showTime = ShowingClock();
-	
+
 	fReplicantTray->RememberClockSettings();
-	settings->alwaysOnTop = (Window()->Feel() & B_FLOATING_ALL_WINDOW_FEEL)
-		!= 0;
+	settings->alwaysOnTop
+		= (Window()->Feel() & B_FLOATING_ALL_WINDOW_FEEL) != 0;
 }
 
 
@@ -424,7 +426,7 @@ TBarView::UpdateAutoRaise()
 void
 TBarView::UpdatePlacement()
 {
-	ChangeState(fState, fVertical, fLeft, fTop);	
+	ChangeState(fState, fVertical, fLeft, fTop);
 }
 
 
@@ -455,7 +457,7 @@ TBarView::ChangeState(int32 state, bool vertical, bool left, bool top)
 	BString* signature = NULL;
 	if (fVertical && Expando()
 		&& static_cast<TBarApp*>(be_app)->Settings()->superExpando) {
-		// Get a list of the signatures of expanded apps. Can't use 
+		// Get a list of the signatures of expanded apps. Can't use
 		// team_id because there can be more than one team per application
 		if (fVertical && Expando() && vertical && fExpando) {
 			for (int index = 0; index < fExpando->CountItems(); index++) {
@@ -469,10 +471,10 @@ TBarView::ChangeState(int32 state, bool vertical, bool left, bool top)
 		}
 	}
 
- 	PlaceApplicationBar(screenFrame);
- 	SizeWindow(screenFrame);
- 	PositionWindow(screenFrame);
- 	Window()->UpdateIfNeeded();
+	PlaceApplicationBar(screenFrame);
+	SizeWindow(screenFrame);
+	PositionWindow(screenFrame);
+	Window()->UpdateIfNeeded();
 
 	// Re-expand those apps.
 	if (expandedItems.CountItems() > 0) {
@@ -505,7 +507,7 @@ TBarView::ChangeState(int32 state, bool vertical, bool left, bool top)
 }
 
 
-//	window placement functions
+// window placement functions
 
 bool
 TBarView::Vertical() const
@@ -558,7 +560,7 @@ TBarView::State() const
 
 // optional functionality functions
 
-bool 
+bool
 TBarView::MilTime() const
 {
 	return fShowInterval;
@@ -586,7 +588,7 @@ void
 TBarView::CacheDragData(const BMessage* incoming)
 {
 	if (!incoming)
-		return;	
+		return;
 
 	if (Dragging() && SpringLoadedFolderCompareMessages(incoming, fDragMessage))
 		return;
@@ -614,7 +616,7 @@ init_tracking_hook(BMenuItem* item,
 
 status_t
 TBarView::DragStart()
-{	
+{
 	if (!Dragging())
 		return B_OK;
 
@@ -624,7 +626,7 @@ TBarView::DragStart()
 
 	if (fExpando && fExpando->Frame().Contains(loc)) {
 		ConvertToScreen(&loc);
-		BPoint expandoLocation = fExpando->ConvertFromScreen(loc);		
+		BPoint expandoLocation = fExpando->ConvertFromScreen(loc);
 		TTeamMenuItem* item = fExpando->TeamItemAtPoint(expandoLocation);
 
 		if (fLastDragItem)
@@ -634,8 +636,8 @@ TBarView::DragStart()
 			if (item == fLastDragItem)
 				return B_OK;
 
-			fLastDragItem = item;		
-		}					
+			fLastDragItem = item;
+		}
 	}
 
 	return B_OK;
@@ -676,7 +678,7 @@ TBarView::MenuTrackingHook(BMenu* menu, void* castToThis)
 
 			if (bemenu && bemenu->LockLooper()) {
 				bemenu->ConvertFromScreen(&location);
-				if (bemenu->Frame().Contains(location)) 
+				if (bemenu->Frame().Contains(location))
 					endMenu = false;
 
 				bemenu->UnlockLooper();
@@ -685,7 +687,7 @@ TBarView::MenuTrackingHook(BMenu* menu, void* castToThis)
 			if (endMenu && expando) {
 				expando->ConvertFromScreen(&location);
 				BMenuItem* item = expando->TeamItemAtPoint(location);
-				if (item) 
+				if (item)
 					endMenu = false;
 			}
 			barview->UnlockLooper();
@@ -757,7 +759,7 @@ TBarView::AppCanHandleTypes(const char* signature)
 	if (appmime.GetAppHint(&hintref) != B_OK)
 		return false;
 
-	// an app was found, now see if it supports any of 
+	// an app was found, now see if it supports any of
 	// the refs in the message
 	BFile file(&hintref, O_RDONLY);
 	BAppFileInfo fileinfo(&file);
@@ -768,7 +770,7 @@ TBarView::AppCanHandleTypes(const char* signature)
 
 	int32 count = fCachedTypesList->CountItems();
 	for (int32 i = 0 ; i < count ; i++) {
-		if (fileinfo.IsSupportedType(fCachedTypesList->ItemAt(i)->String())) 
+		if (fileinfo.IsSupportedType(fCachedTypesList->ItemAt(i)->String()))
 			return true;
 	}
 
@@ -910,9 +912,9 @@ TBarView::ItemExists(const char* name, DeskbarShelf)
 
 int32
 TBarView::CountItems(DeskbarShelf)
-{	
-	return fReplicantTray->IconCount();	
-}	
+{
+	return fReplicantTray->IconCount();
+}
 
 
 status_t

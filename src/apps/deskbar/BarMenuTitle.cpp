@@ -26,9 +26,10 @@ Except as contained in this notice, the name of Be Incorporated shall not be
 used in advertising or otherwise to promote the sale, use or other dealings in
 this Software without prior written authorization from Be Incorporated.
 
-Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered trademarks
-of Be Incorporated in the United States and other countries. Other brand product
-names are registered trademarks or trademarks of their respective holders.
+Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered
+trademarks of Be Incorporated in the United States and other countries. Other
+brand product names are registered trademarks or trademarks of their respective
+holders.
 All rights reserved.
 */
 
@@ -116,14 +117,14 @@ TBarMenuTitle::DrawContent()
 
 	if (be_control_look != NULL) {
 		menu->SetDrawingMode(B_OP_ALPHA);
-	
+
 		if (fIcon != NULL) {
 			BRect dstRect(fIcon->Bounds());
 			dstRect.OffsetTo(frame.LeftTop());
 			dstRect.OffsetBy(rintf(((frame.Width() - dstRect.Width()) / 2)
 				- 1.0f), rintf(((frame.Height() - dstRect.Height()) / 2)
 				- 0.0f));
-	
+
 			menu->DrawBitmapAsync(fIcon, dstRect);
 		}
 		return;
@@ -200,11 +201,11 @@ TBarMenuTitle::Invoke(BMessage* message)
 		BLooper* looper = barview->Looper();
 		if (looper->Lock()) {
 			// tell barview to add the refs to the be menu
-			barview->HandleBeMenu(NULL);			
+			barview->HandleBeMenu(NULL);
 			looper->Unlock();
 		}
 	}
-		
+
 	return BMenuItem::Invoke(message);
 }
 

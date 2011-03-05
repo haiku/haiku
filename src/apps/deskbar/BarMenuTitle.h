@@ -26,9 +26,10 @@ Except as contained in this notice, the name of Be Incorporated shall not be
 used in advertising or otherwise to promote the sale, use or other dealings in
 this Software without prior written authorization from Be Incorporated.
 
-Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered trademarks
-of Be Incorporated in the United States and other countries. Other brand product
-names are registered trademarks or trademarks of their respective holders.
+Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered
+trademarks of Be Incorporated in the United States and other countries. Other
+brand product names are registered trademarks or trademarks of their respective
+holders.
 All rights reserved.
 */
 
@@ -46,15 +47,15 @@ class BMenu;
 
 class TBarMenuTitle : public BMenuItem {
 public:
- 	TBarMenuTitle(float width,float height, const BBitmap* icon,
- 		BMenu* menu, bool inexpando = false);
+	TBarMenuTitle(float width, float height, const BBitmap* icon,
+		BMenu* menu, bool inexpando = false);
 	virtual ~TBarMenuTitle();
 
 	void SetWidthHeight(float width, float height);
 	void Draw();
 
 	status_t Invoke(BMessage* message);
-		
+
 protected:
 	void DrawContent();
 	void GetContentSize(float* width, float* height);
@@ -63,7 +64,7 @@ private:
 	float fWidth;
 	float fHeight;
 	bool fInExpando;
-	const BBitmap* fIcon;	
+	const BBitmap* fIcon;
 };
 
 #endif /* BARMENUTITLE_H */
