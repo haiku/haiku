@@ -135,8 +135,6 @@ function Exit()
 function InstallOptionalHaikuImagePackage()
 {
 	# InstallOptionalHaikuImagePackage package : url : dirTokens : isCDPackage
-	# 	: isGCCAgnostic
-	# TODO add support for isGCCAgnostic
 
 	# Wrapper for Jam rule
 	echo "Installing \$1 ..."
