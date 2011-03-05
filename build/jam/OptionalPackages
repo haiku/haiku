@@ -643,8 +643,8 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentJava ] {
 			: $(baseURL)/jamvm-1.5.4-x86-gcc4-2011-02-13.zip ;
 		AddSymlinkToHaikuImage common bin : /boot/common/bin/jamvm : java ;
 		InstallOptionalHaikuImagePackage
-			ecj-3.6.2-haiku-2011-02-26.zip
-			: $(baseURL)/ecj-3.6.2-haiku-2011-02-26.zip ;
+			ecj-3.6.2-haiku-2011-03-05.zip
+			: $(baseURL)/ecj-3.6.2-haiku-2011-03-05.zip ;
 	} else {
 		Echo "No optional package DevelopmentJava available for gcc2" ;
 	}
