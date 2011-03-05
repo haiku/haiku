@@ -2787,6 +2787,8 @@ TMailWindow::SetTitleForMessage()
 status_t
 TMailWindow::OpenMessage(const entry_ref *ref, uint32 characterSetForDecoding)
 {
+	if (ref == NULL)
+		return B_ERROR;
 	//
 	//	Set some references to the email file
 	//
