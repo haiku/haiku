@@ -327,6 +327,19 @@ ScreenshotWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case B_REFS_RECEIVED:
+		{
+			entry_ref ref;
+			if (message->FindRef("refs", &ref) == B_OK) {
+				BEntry entry(&ref, true);
+				BPath path;
+				entry.GetPath(&path);
+				BString label(path.Path());
+				_AddItemToPathMenu(path.Path(), label, 3, true);
+			}
+			break;
+		}
+
 		case B_CANCEL:
 			fLastSelectedPath->SetMarked(true);
 			break;
@@ -501,6 +514,24 @@ void
 ScreenshotWindow::_AddItemToPathMenu(const char* path, BString& label,
 	int32 index, bool markItem)
 {
+	/* Make sure that item won't be a duplicata of an existing one */
+	for (int32 i = fOutputPathMenu->CountItems(); i > 0; --i) {
+		BMenuItem* menuItem = fOutputPathMenu->ItemAt(i - 1);
+		BMessage* message = menuItem->Message();
+		const char* pathFromItem;
+		if (message != NULL && message->what == kLocationChanged) {
+			if (message->FindString("path", &pathFromItem) == B_OK) {
+				if (!strcmp(path, pathFromItem)) {
+					if (markItem) {
+						fOutputPathMenu->ItemAt(i - 1)->SetMarked(true);
+						fLastSelectedPath = fOutputPathMenu->ItemAt(i - 1);
+					}
+					return;
+				}
+			}
+		}
+	}
+
 	BMessage* message = new BMessage(kLocationChanged);
 	message->AddString("path", path);
 
