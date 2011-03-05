@@ -483,7 +483,7 @@ WorkerThread::_MirrorIndices(const BPath& sourceDirectory,
 	dev_t sourceDevice = dev_for_path(sourceDirectory.Path());
 	if (sourceDevice < 0)
 		return (status_t)sourceDevice;
-	dev_t targetDevice = dev_for_path(sourceDirectory.Path());
+	dev_t targetDevice = dev_for_path(targetDirectory.Path());
 	if (targetDevice < 0)
 		return (status_t)targetDevice;
 	DIR* indices = fs_open_index_dir(sourceDevice);
@@ -497,19 +497,10 @@ WorkerThread::_MirrorIndices(const BPath& sourceDirectory,
 			errno, strerror(errno));
 		return errno;
 	}
-	while (true) {
-		dirent* index = fs_read_index_dir(indices);
-		if (index == NULL) {
-			if (errno != B_ENTRY_NOT_FOUND && errno != B_OK) {
-				printf("%s: fs_read_index_dir: (%d) %s\n",
-					sourceDirectory.Path(), errno, strerror(errno));
-				return errno;
-			}
-			break;
-		}
-		if (!strcmp(index->d_name, "name")
-			|| !strcmp(index->d_name, "size")
-			|| !strcmp(index->d_name, "last_modified")) {
+	while (dirent* index = fs_read_index_dir(indices)) {
+		if (strcmp(index->d_name, "name") == 0
+			|| strcmp(index->d_name, "size") == 0
+			|| strcmp(index->d_name, "last_modified") == 0) {
 			continue;
 		}
 
