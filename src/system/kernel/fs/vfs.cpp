@@ -5813,22 +5813,22 @@ dir_remove(int fd, char* path, bool kernel)
 	if (path != NULL) {
 		// we need to make sure our path name doesn't stop with "/", ".",
 		// or ".."
-		char* lastSlash = strrchr(path, '/');
-		if (lastSlash != NULL) {
+		char* lastSlash;
+		while ((lastSlash = strrchr(path, '/')) != NULL) {
 			char* leaf = lastSlash + 1;
 			if (!strcmp(leaf, ".."))
 				return B_NOT_ALLOWED;
 
 			// omit multiple slashes
-			while (lastSlash > path && lastSlash[-1] == '/') {
+			while (lastSlash > path && lastSlash[-1] == '/')
 				lastSlash--;
-			}
 
-			if (!leaf[0]
-				|| !strcmp(leaf, ".")) {
-				// "name/" -> "name", or "name/." -> "name"
-				lastSlash[0] = '\0';
+			if (leaf[0]
+				&& strcmp(leaf, ".")) {
+				break;
 			}
+			// "name/" -> "name", or "name/." -> "name"
+			lastSlash[0] = '\0';
 		}
 
 		if (!strcmp(path, ".") || !strcmp(path, ".."))
