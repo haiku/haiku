@@ -44,6 +44,8 @@ private:
 
 			void				_PerformInstall(BMenu* srcMenu,
 									BMenu* dstMenu);
+			status_t			_MirrorIndices(const BPath& srcDirectory,
+									const BPath& targetDirectory) const;
 			status_t			_ProcessZipPackages(const char* sourcePath,
 									const char* targetPath,
 									ProgressReporter* reporter,

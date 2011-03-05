@@ -6,6 +6,7 @@
 
 #include "WorkerThread.h"
 
+#include <errno.h>
 #include <stdio.h>
 
 #include <Alert.h>
@@ -15,6 +16,7 @@
 #include <DiskDeviceVisitor.h>
 #include <DiskDeviceTypes.h>
 #include <FindDirectory.h>
+#include <fs_index.h>
 #include <Locale.h>
 #include <Menu.h>
 #include <MenuItem.h>
@@ -249,7 +251,10 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 {
 	CALLED();
 
-	BPath targetDirectory, srcDirectory, trashPath, testPath;
+	BPath targetDirectory;
+	BPath srcDirectory;
+	BPath trashPath;
+	BPath testPath;
 	BDirectory targetDir;
 	BDiskDevice device;
 	BPartition* partition;
@@ -390,13 +395,19 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 
 	_LaunchInitScript(targetDirectory);
 
-	// let the engine collect information for the progress bar later on
+	// Mirror all the indices which are present on the source volume onto
+	// the target volume
+	err = _MirrorIndices(srcDirectory, targetDirectory);
+	if (err != B_OK)
+		goto error;
+
+	// Let the engine collect information for the progress bar later on
 	engine.ResetTargets(srcDirectory.Path());
 	err = engine.CollectTargets(srcDirectory.Path(), fCancelSemaphore);
 	if (err != B_OK)
 		goto error;
 
-	// collect selected packages also
+	// Collect selected packages also
 	if (fPackages) {
 		BPath pkgRootDir(srcDirectory.Path(), PACKAGES_DIRECTORY);
 		int32 count = fPackages->CountItems();
@@ -462,6 +473,65 @@ error:
 		statusMessage.AddInt32("error", err);
 	ERR("_PerformInstall failed");
 	BMessenger(fWindow).SendMessage(&statusMessage);
+}
+
+
+status_t
+WorkerThread::_MirrorIndices(const BPath& sourceDirectory,
+	const BPath& targetDirectory) const
+{
+	dev_t sourceDevice = dev_for_path(sourceDirectory.Path());
+	if (sourceDevice < 0)
+		return (status_t)sourceDevice;
+	dev_t targetDevice = dev_for_path(sourceDirectory.Path());
+	if (targetDevice < 0)
+		return (status_t)targetDevice;
+	DIR* indices = fs_open_index_dir(sourceDevice);
+	if (indices == NULL) {
+		if (errno == B_ENTRY_NOT_FOUND || errno == B_OK) {
+			// Assume source volume has no indices. TODO: That is likely not a
+			// valid situation, perhaps return an error instead?
+			return B_OK;
+		}
+		printf("%s: fs_open_index_dir(): (%d) %s\n", sourceDirectory.Path(),
+			errno, strerror(errno));
+		return errno;
+	}
+	while (true) {
+		dirent* index = fs_read_index_dir(indices);
+		if (index == NULL) {
+			if (errno != B_ENTRY_NOT_FOUND && errno != B_OK) {
+				printf("%s: fs_read_index_dir: (%d) %s\n",
+					sourceDirectory.Path(), errno, strerror(errno));
+				return errno;
+			}
+			break;
+		}
+		if (!strcmp(index->d_name, "name")
+			|| !strcmp(index->d_name, "size")
+			|| !strcmp(index->d_name, "last_modified")) {
+			continue;
+		}
+
+		index_info info;
+		if (fs_stat_index(sourceDevice, index->d_name, &info) != B_OK) {
+			printf("Failed to mirror index %s: fs_stat_index(): (%d) %s\n",
+				index->d_name, errno, strerror(errno));
+			return errno;
+		}
+
+		uint32 flags = 0;
+			// Flags are always 0 for the moment.
+		if (fs_create_index(targetDevice, index->d_name, info.type, flags)
+			!= B_OK) {
+			if (errno == B_FILE_EXISTS)
+				continue;
+			printf("Failed to mirror index %s: fs_create_index(): (%d) %s\n",
+				index->d_name, errno, strerror(errno));
+			return errno;
+		}
+	}
+	return B_OK;
 }
 
 
