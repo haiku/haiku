@@ -26,9 +26,10 @@ Except as contained in this notice, the name of Be Incorporated shall not be
 used in advertising or otherwise to promote the sale, use or other dealings in
 this Software without prior written authorization from Be Incorporated.
 
-Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered trademarks
-of Be Incorporated in the United States and other countries. Other brand product
-names are registered trademarks or trademarks of their respective holders.
+Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered
+trademarks of Be Incorporated in the United States and other countries. Other
+brand product names are registered trademarks or trademarks of their respective
+holders.
 All rights reserved.
 */
 
@@ -42,7 +43,7 @@ All rights reserved.
 class TBarView;
 
 enum recent_type {
-	kRecentDocuments	= 0,
+	kRecentDocuments = 0,
 	kRecentApplications,
 	kRecentFolders,
 	kRecentAppDocuments
@@ -69,15 +70,15 @@ class TRecentsMenu : public BNavMenu {
 
 	private:
 		int32			fWhich;
-		entry_ref		*fAppRef;
-		char			*fSignature;
+		entry_ref*		fAppRef;
+		char*			fSignature;
 		int32			fRecentsCount;
 		bool			fRecentsEnabled;
 
 		int32 			fItemIndex;
 		BMessage		fRecentList;
-		
-		TBarView		*fBarView;
+
+		TBarView*		fBarView;
 };
 
 
@@ -102,7 +103,7 @@ class TBeMenu : public BNavMenu {
 		void			AttachedToWindow();
 		void			DetachedFromWindow();
 
-		void			ResetTargets();		
+		void			ResetTargets();
 
 		static BMessenger DefaultTarget();
 
@@ -118,15 +119,15 @@ class TBeMenu : public BNavMenu {
 
 		bool			AddStandardBeMenuItems();
 
-	private:		
-		virtual	bool	StartBuildingItemList();
+	private:
+		virtual bool	StartBuildingItemList();
 		virtual void	DoneBuildingItemList();
-		virtual	bool	AddNextItem();
-		virtual	void	ClearMenuBuildingState();
+		virtual bool	AddNextItem();
+		virtual void	ClearMenuBuildingState();
 
-		//	to keep track of the menu building state
-		State 			fAddState;	
-		TBarView		*fBarView;
+		// to keep track of the menu building state
+		State 			fAddState;
+		TBarView*		fBarView;
 };
 
 #endif	/* _BE_MENU_H_ */

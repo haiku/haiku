@@ -17,7 +17,8 @@ class BStringView;
 namespace BPrivate {
 	class BCalendarView;
 }
-using BPrivate::BCalendarView;
+
+	using BPrivate::BCalendarView;
 
 
 class CalendarMenuWindow : public BWindow {
@@ -25,9 +26,9 @@ public:
 					CalendarMenuWindow(BPoint where);
 	virtual			~CalendarMenuWindow();
 
-	virtual	void	Show();
-	virtual	void	WindowActivated(bool active);
-	virtual	void	MessageReceived(BMessage* message);
+	virtual void	Show();
+	virtual void	WindowActivated(bool active);
+	virtual void	MessageReceived(BMessage* message);
 
 private:
 	void			_UpdateUI(const BDate& date);

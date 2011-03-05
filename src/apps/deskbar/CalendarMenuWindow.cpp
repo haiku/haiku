@@ -24,7 +24,7 @@ using BPrivate::B_WEEK_START_SUNDAY;
 using BPrivate::B_WEEK_START_MONDAY;
 
 
-// #pragma mark -- FlatButton
+//	#pragma mark -- FlatButton
 
 
 class FlatButton : public BButton {
@@ -66,7 +66,7 @@ FlatButton::Draw(BRect updateRect)
 }
 
 
-// #pragma mark -- CalendarMenuWindow
+//	#pragma mark -- CalendarMenuWindow
 
 
 enum {
