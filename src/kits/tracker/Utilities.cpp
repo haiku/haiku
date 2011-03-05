@@ -1519,18 +1519,18 @@ GetLocalizedFileName(entry_ref& ref, BString& localizedFileName, bool traverse)
 
 	char* signature = attribute;
 	char* context = strchr(signature, ':');
-	if (context != NULL) {
-		context[0] = '\0';
-		context++;
-	} else
+	if (context == NULL)
 		return B_ENTRY_NOT_FOUND;
 
+	context[0] = '\0';
+	context++;
+
 	char* string = strchr(context, ':');
-	if (string != NULL) {
-		string[0] = '\0';
-		string++;
-	} else
+	if (string == NULL)
 		return B_ENTRY_NOT_FOUND;
+
+	string[0] = '\0';
+	string++;
 
 	BCatalog catalog(signature);
 
