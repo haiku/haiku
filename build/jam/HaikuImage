@@ -771,8 +771,6 @@ AddVariableToScript $(script) : outputDir : $(HAIKU_OUTPUT_DIR) ;
 AddVariableToScript $(script) : tmpDir : $(HAIKU_TMP_DIR) ;
 AddVariableToScript $(script) : installDir : $(HAIKU_INSTALL_DIR) ;
 #AddVariableToScript $(script) : isImage : 1 ;
-AddVariableToScript $(script) : gccVersion : $(HAIKU_GCC_VERSION[1]) ;
-AddVariableToScript $(script) : isHybridBuild : $(isHybridBuild) ;
 AddVariableToScript $(script) : imageSize : $(HAIKU_IMAGE_SIZE) ;
 AddVariableToScript $(script) : imageLabel : $(HAIKU_IMAGE_LABEL) ;
 AddVariableToScript $(script) : addBuildCompatibilityLibDir

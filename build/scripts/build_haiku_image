@@ -6,8 +6,6 @@ set -o errexit
 # outputDir
 # tmpDir
 # addBuildCompatibilityLibDir
-# gccVersion
-# isHybridBuild
 # The following are only for image types:
 # installDir
 # isImage
@@ -149,7 +147,6 @@ extractFile()
 	archiveFile=$1
 	targetExtractedDir=$2
 	extractedSubDir=$3
-	isGCCAgnostic=$4
 
 	echo "Extracting $archiveFile ..."
 
@@ -176,60 +173,9 @@ extractFile()
 		rm $extractDir/.OptionalPackageDescription
 	fi
 
-	if [ "$isGCCAgnostic" = "true" ] && [ $isHybridBuild ] ; then
-		extractedLibs=`find "$extractDir/$extractedSubDir/" -name "*.so"`
-		moreExtractedLibs=`find "$extractDir/$extractedSubDir/" -name "*.so.*"`
-		staticLibs=`find "$extractDir/$extractedSubDir/" -name "*.a"`
-		#NOTE: should we symlink libtool's *.la files?
-		#laLibs=`find "$extractDir/$extractedSubDir/" -name "*.la"`
-		createSymlinksForHybrid $extractedLibs $moreExtractedLibs $staticLibs
-	fi
-
 	$cp -r "${sPrefix}$extractDir/$extractedSubDir/." "${tPrefix}$targetExtractedDir"
 
 	$rmAttrs -rf "$extractDir"
-}
-
-
-createSymlinksForHybrid()
-{
-	# createSymlinksForHybrid <libraries>
-
-	# Determine the alternative gcc subdir.
-	if [ $gccVersion -eq 2 ]; then
-		gccAltDir=gcc4
-	else
-		gccAltDir=gcc2
-	fi
-
-	# Iterate over the library file paths that were passed in.
-	for srcPathLib in $@; do
-		# determine the relative path of the library
-		relPathLib=`echo $srcPathLib | \
-			sed -e "s:${extractDir}/${extractedSubDir}/::"`
-		relPath=`dirname $relPathLib`
-
-		# check if that relative path is one of the standard library paths
-		standardLibPaths="system/lib common/lib home/config/lib"
-		isStandardPath=
-		for stdLibPath in $standardLibPaths; do
-			if [ "$relPath" = "$stdLibPath" ]; then
-				isStandardPath=true
-				break
-			fi
-		done
-
-		# create alt gcc symlinks for libs inside standard paths
-		if [ $isStandardPath ]; then
-			srcPath=`dirname $srcPathLib`
-			srcLib=`basename $srcPathLib`
-			destLinkDir="${srcPath}/${gccAltDir}"
-			destLinkTarget="../$srcLib"
-
-			mkdir -p $destLinkDir
-			ln -sf $destLinkTarget $destLinkDir
-		fi
-	done
 }
 
 

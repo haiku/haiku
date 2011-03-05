@@ -25,8 +25,6 @@ AddVariableToScript $(script) : sourceDir : $(HAIKU_TOP) ;
 AddVariableToScript $(script) : outputDir : $(HAIKU_OUTPUT_DIR) ;
 AddVariableToScript $(script) : tmpDir : $(HAIKU_TMP_DIR) ;
 AddVariableToScript $(script) : isCD : 1 ;
-AddVariableToScript $(script) : gccVersion : $(HAIKU_GCC_VERSION[1]) ;
-AddVariableToScript $(script) : isHybridBuild : $(isHybridBuild) ;
 AddVariableToScript $(script) : cdLabel : $(HAIKU_CD_LABEL) ;
 AddVariableToScript $(script) : addBuildCompatibilityLibDir
 	: $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR) ;

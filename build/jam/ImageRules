@@ -283,17 +283,16 @@ rule CopyDirectoryToContainer container : directoryTokens : sourceDirectory
 }
 
 rule ExtractArchiveToContainer container : directoryTokens : archiveFile
-	: extractedSubDir : isGCCAgnostic
+	: extractedSubDir
 {
 	# ExtractArchiveToContainer <container> : <directory> : <archiveFile>
-	#	: <extractedSubDir> : <isGCCAgnostic> ;
+	#	: <extractedSubDir> ;
 
 	local directory = [ AddDirectoryToContainer $(container)
 		: $(directoryTokens) ] ;
 
 	ARCHIVE_FILES_TO_INSTALL on $(directory) += $(archiveFile) ;
 	ARCHIVE_SUBDIR_TO_INSTALL_FROM on $(archiveFile) = $(extractedSubDir) ;
-	ARCHIVE_IS_GCC_AGNOSTIC on $(archiveFile) = $(isGCCAgnostic) ;
 }
 
 rule AddDriversToContainer container : relativeDirectoryTokens : targets
@@ -608,11 +607,6 @@ rule CreateContainerExtractFilesScript container : script
 			ARCHIVE_SUBDIR_TO_INSTALL_FROM on $(dummyTarget) =
 				$(extractedSubDir:E=.) ;
 
-			local isGCCAgnostic = [ on $(archiveFile)
-				return $(ARCHIVE_IS_GCC_AGNOSTIC) ] ;
-			ARCHIVE_IS_GCC_AGNOSTIC on $(dummyTarget) =
-				$(isGCCAgnostic:E=false) ;
-
 			Depends $(dummyTarget) : $(initScript) $(archiveFile)
 				$(serializationDependency) ;
 			Depends $(script) : $(dummyTarget) ;
@@ -628,8 +622,7 @@ rule CreateContainerExtractFilesScript container : script
 actions AddExtractFileToContainerExtractFilesScript
 {
 	echo extractFile "\"$(2[2])\"" "\"$(TARGET_DIR)\"" \
-		"\"$(ARCHIVE_SUBDIR_TO_INSTALL_FROM)\"" \
-		"\"$(ARCHIVE_IS_GCC_AGNOSTIC)\"" >> $(2[1])
+		"\"$(ARCHIVE_SUBDIR_TO_INSTALL_FROM)\"" >> $(2[1])
 }
 
 
@@ -734,16 +727,16 @@ rule AddWifiFirmwareToHaikuImage driver : package : archive : extract
 }
 
 rule ExtractArchiveToHaikuImage dirTokens : archiveFile : alwaysUpdate
-	: extractedSubDir : isGCCAgnostic
+	: extractedSubDir
 {
 	# ExtractArchiveToHaikuImage <dirTokens> : <archiveFile> : <alwaysUpdate>
-	#	: <extractedSubDir> : <isGCCAgnostic> ;
+	#	: <extractedSubDir> ;
 
 	# If the image shall only be updated, we extract only, if explicitely
 	# requested.
 	if ! [ IsUpdateHaikuImageOnly ] || $(alwaysUpdate) {
 		ExtractArchiveToContainer $(HAIKU_IMAGE_CONTAINER_NAME) : $(dirTokens)
-			: $(archiveFile) : $(extractedSubDir) : $(isGCCAgnostic) ;
+			: $(archiveFile) : $(extractedSubDir) ;
 	}
 }
 
@@ -830,7 +823,6 @@ rule InstallSourceArchive file : url
 }
 
 rule InstallOptionalHaikuImagePackage package : url : dirTokens : isCDPackage
-	: isGCCAgnostic
 {
 	# download archive file
 	local archiveFile = [ DownloadFile $(package) : $(url) ] ;
@@ -840,16 +832,9 @@ rule InstallOptionalHaikuImagePackage package : url : dirTokens : isCDPackage
 		# image!
 		# copy onto image
 		AddFilesToHaikuImage _packages_ : $(archiveFile) ;
-		#if $(isGCCAgnostic) {
-		# 	TODO: The archives would need to be marked whether they are
-		#	gcc-agnostic (e.g. via attribute). Installer's UnzipEngine would
-		#	also need to be updated, to read this attribute and create the
-		#	alt gcc dir and symlinks as needed.
-		#}
 	} else {
 		# extract onto image
-		ExtractArchiveToHaikuImage $(dirTokens) : $(archiveFile) : :
-			: $(isGCCAgnostic) ;
+		ExtractArchiveToHaikuImage $(dirTokens) : $(archiveFile) ;
 	}
 }
 
