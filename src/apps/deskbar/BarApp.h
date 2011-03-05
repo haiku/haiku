@@ -141,7 +141,7 @@ class TBarApp : public BApplication {
 		static void Unsubscribe(const BMessenger &subscriber);
 
 	private:
-		void AddTeam(team_id team, uint32 flags, const char	*sig, entry_ref	*);
+		void AddTeam(team_id team, uint32 flags, const char* sig, entry_ref*);
 		void RemoveTeam(team_id);
 
 		void InitSettings();
