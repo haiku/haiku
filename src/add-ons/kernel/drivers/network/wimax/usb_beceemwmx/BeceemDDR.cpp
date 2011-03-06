@@ -52,21 +52,23 @@ BeceemDDR::DDRInit(WIMAX_DEVICE* swmxdevice)
 					registerCount = sizeof(asT3LP_DDRSetting80MHz)
 						/ sizeof(DDR_SETTING);
 					break;
+
 				case DDR_100_MHZ:
 					psDDRSetting = asT3LP_DDRSetting100MHz;
 					registerCount = sizeof(asT3LP_DDRSetting100MHz)
 						/ sizeof(DDR_SETTING);
 					break;
+
 				case DDR_133_MHZ:
 					psDDRSetting = asT3LP_DDRSetting133MHz;
 					registerCount = sizeof(asT3LP_DDRSetting133MHz)
 						/ sizeof(DDR_SETTING);
-
 					if (vendorMipsConfig == MIPS_200_MHZ)
 						uiClockSetting = 0x03F13652;
 					else
 						uiClockSetting = 0x03F1365B;
 					break;
+
 				default:
 					return -EINVAL;
 			}
@@ -107,12 +109,14 @@ BeceemDDR::DDRInit(WIMAX_DEVICE* swmxdevice)
 					registerCount = sizeof(asT3B_DDRSetting80MHz)
 						/ sizeof(DDR_SETTING);
 					break;
+
 				case DDR_100_MHZ:
 					TRACE("Debug: DDR 100MHz\n");
 					psDDRSetting = asT3LPB_DDRSetting100MHz;
 					registerCount = sizeof(asT3B_DDRSetting100MHz)
 						/ sizeof(DDR_SETTING);
 					break;
+
 				case DDR_133_MHZ:
 					TRACE("Debug: DDR 133MHz\n");
 					psDDRSetting = asT3LPB_DDRSetting133MHz;
@@ -151,16 +155,19 @@ BeceemDDR::DDRInit(WIMAX_DEVICE* swmxdevice)
 					registerCount = sizeof(asT3_DDRSetting80MHz)
 						/ sizeof(DDR_SETTING);
 					break;
+
 				case DDR_100_MHZ:
 					psDDRSetting = asT3_DDRSetting100MHz;
 					registerCount = sizeof(asT3_DDRSetting100MHz)
 						/ sizeof(DDR_SETTING);
 					break;
+
 				case DDR_133_MHZ:
 					psDDRSetting = asT3_DDRSetting133MHz;
 					registerCount = sizeof(asT3_DDRSetting133MHz)
 						/ sizeof(DDR_SETTING);
 					break;
+
 				default:
 					return -EINVAL;
 			}
@@ -172,13 +179,14 @@ BeceemDDR::DDRInit(WIMAX_DEVICE* swmxdevice)
 					registerCount = sizeof(asT3B_DDRSetting80MHz)
 						/ sizeof(DDR_SETTING);
 					break;
+
 				case DDR_100_MHZ:
 					psDDRSetting = asT3B_DDRSetting100MHz;
 					registerCount = sizeof(asT3B_DDRSetting100MHz)
 						/ sizeof(DDR_SETTING);
 					break;
-				case DDR_133_MHZ:
 
+				case DDR_133_MHZ:
 					if (vendorPLLConfig == PLL_266_MHZ) {
 						// 266Mhz PLL selected.
 						memcpy(asT3B_DDRSetting133MHz, asDPLL_266MHZ,
@@ -198,6 +206,7 @@ BeceemDDR::DDRInit(WIMAX_DEVICE* swmxdevice)
 							uiClockSetting = 0x07F1365B;
 					}
 					break;
+
 				default:
 					return -EINVAL;
 			}
