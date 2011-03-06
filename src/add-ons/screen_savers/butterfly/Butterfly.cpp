@@ -13,10 +13,14 @@
 #include <math.h>
 #include <stdlib.h>
 
+#include <Catalog.h>
 #include <OS.h>
 #include <View.h>
 
 #include <BuildScreenSaverDefaultSettingsView.h>
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Screensaver Butterfly"
 
 
 extern "C" BScreenSaver*
@@ -40,7 +44,7 @@ void
 Butterfly::StartConfig(BView* view)
 {
 	BPrivate::BuildScreenSaverDefaultSettingsView(view, "Butterfly",
-		"by Geoffry Song");
+		B_TRANSLATE("by Geoffry Song"));
 }
 
 
@@ -162,4 +166,3 @@ Butterfly::_Iterate()
 	fBase += 0.05f;
 	return p;
 }
-

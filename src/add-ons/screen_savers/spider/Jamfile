@@ -2,11 +2,18 @@ SubDir HAIKU_TOP src add-ons screen_savers spider ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+AddResources Spider : Spider.rdef ;
+
 ScreenSaver Spider :
 	Polygon.cpp
 	PolygonQueue.cpp
 	SpiderSaver.cpp
 
-	: be libscreensaver.so $(TARGET_LIBSUPC++)
+	: be libscreensaver.so $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
 ;
 
+DoCatalogs Spider :
+	x-vnd.Haiku-SpiderScreensaver
+	:
+	SpiderSaver.cpp	
+;

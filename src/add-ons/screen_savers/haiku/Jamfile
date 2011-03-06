@@ -5,8 +5,15 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 UsePrivateHeaders screen_saver ;
 	# For BuildScreenSaverDefaultSettingsView
 
+AddResources Haiku : ScreenSaver.rdef ;
+
 Addon Haiku :
 	ScreenSaver.cpp
-	: be screensaver $(TARGET_LIBSUPC++)
+	: be screensaver $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
 ;
 
+DoCatalogs Haiku :
+	x-vnd.Haiku-HaikuScreensaver
+	:
+	ScreenSaver.cpp	
+;

@@ -13,6 +13,7 @@
 #include <string.h>
 
 #include <Bitmap.h>
+#include <Catalog.h>
 #include <Message.h>
 #include <Menu.h>
 #include <MenuField.h>
@@ -22,6 +23,9 @@
 
 #include "Polygon.h"
 #include "PolygonQueue.h"
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Screensaver Spider"
 
 enum {
 	MSG_QUEUE_NUMBER			= 'qunm',
@@ -92,8 +96,7 @@ void
 SpiderSaver::StartConfig(BView *view)
 {
 	SpiderView* configView = new SpiderView(view->Bounds(), this,
-											fQueueNumber, fMaxPolyPoints,
-											fMaxQueueDepth, fColor);
+		fQueueNumber, fMaxPolyPoints, fMaxQueueDepth, fColor);
 	view->AddChild(configView);
 }
 
@@ -334,7 +337,8 @@ SpiderView::SpiderView(BRect frame, SpiderSaver* saver,
 	be_bold_font->GetHeight(&fh);
 	float fontHeight = fh.ascent + fh.descent + 5.0;
 	frame.bottom = frame.top + fontHeight;
-	BStringView* title = new BStringView(frame, B_EMPTY_STRING, "Spider by stippi");
+	BStringView* title = new BStringView(frame, B_EMPTY_STRING,
+		B_TRANSLATE("Spider by stippi"));
 	title->SetFont(be_bold_font);
 	AddChild(title);
 
@@ -342,7 +346,7 @@ SpiderView::SpiderView(BRect frame, SpiderSaver* saver,
 	fontHeight = fh.ascent + fh.descent + 5.0;
 	frame.top = frame.bottom;
 	frame.bottom = frame.top + fontHeight;
-	title = new BStringView(frame, B_EMPTY_STRING, "for  bonefish");
+	title = new BStringView(frame, B_EMPTY_STRING, B_TRANSLATE("for  bonefish"));
 	BFont font(be_plain_font);
 	font.SetShear(110.0);
 	title->SetFont(&font);
@@ -353,70 +357,69 @@ SpiderView::SpiderView(BRect frame, SpiderSaver* saver,
 	frame.top = 10.0;
 	frame.bottom = frame.top + viewHeight;
 	frame.OffsetBy(0.0, viewHeight);
-	fQueueNumberS = new BSlider(frame, "queue number", "Max. polygon count",
-								new BMessage(MSG_QUEUE_NUMBER),
-								1, MAX_QUEUE_NUMBER);
+	fQueueNumberS = new BSlider(frame, "queue number",
+		B_TRANSLATE("Max. polygon count"), new BMessage(MSG_QUEUE_NUMBER),
+		1, MAX_QUEUE_NUMBER);
 	fQueueNumberS->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fQueueNumberS->SetHashMarkCount((MAX_QUEUE_NUMBER - 1) / 2 + 1);
 	fQueueNumberS->SetValue(queueNumber);
 	AddChild(fQueueNumberS);
 	frame.OffsetBy(0.0, viewHeight);
-	fPolyNumberS = new BSlider(frame, "poly points", "Max. points per polygon",
-								new BMessage(MSG_POLY_NUMBER),
-								MIN_POLY_POINTS, MAX_POLY_POINTS);
+	fPolyNumberS = new BSlider(frame, "poly points",
+		B_TRANSLATE("Max. points per polygon"), new BMessage(MSG_POLY_NUMBER),
+		MIN_POLY_POINTS, MAX_POLY_POINTS);
 	fPolyNumberS->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fPolyNumberS->SetHashMarkCount(MAX_POLY_POINTS - MIN_POLY_POINTS + 1);
 	fPolyNumberS->SetValue(maxPolyPoints);
 	AddChild(fPolyNumberS);
 	frame.OffsetBy(0.0, viewHeight);
-	fQueueDepthS = new BSlider(frame, "queue depth", "Trail depth",
-								new BMessage(MSG_QUEUE_DEPTH),
-								MIN_QUEUE_DEPTH, MAX_QUEUE_DEPTH);
+	fQueueDepthS = new BSlider(frame, "queue depth", B_TRANSLATE("Trail depth"),
+		new BMessage(MSG_QUEUE_DEPTH), MIN_QUEUE_DEPTH, MAX_QUEUE_DEPTH);
 	fQueueDepthS->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fQueueDepthS->SetHashMarkCount((MAX_QUEUE_DEPTH - MIN_QUEUE_DEPTH) / 4 + 1);
 	fQueueDepthS->SetValue(maxQueueDepth);
 	AddChild(fQueueDepthS);
 
-	BMenu* menu = new BMenu("Color");
+	BMenu* menu = new BMenu(B_TRANSLATE("Color"));
 	BMessage* message = new BMessage(MSG_COLOR);
 	message->AddInt32("color", RED);
-	BMenuItem* item = new BMenuItem("Red", message);
+	BMenuItem* item = new BMenuItem(B_TRANSLATE("Red"), message);
 	if (color == RED)
 		item->SetMarked(true);
 	menu->AddItem(item);
 	message = new BMessage(MSG_COLOR);
 	message->AddInt32("color", GREEN);
-	item = new BMenuItem("Green", message);
+	item = new BMenuItem(B_TRANSLATE("Green"), message);
 	if (color == GREEN)
 		item->SetMarked(true);
 	menu->AddItem(item);
 	message = new BMessage(MSG_COLOR);
 	message->AddInt32("color", BLUE);
-	item = new BMenuItem("Blue", message);
+	item = new BMenuItem(B_TRANSLATE("Blue"), message);
 	if (color == BLUE)
 		item->SetMarked(true);
 	menu->AddItem(item);
 	message = new BMessage(MSG_COLOR);
 	message->AddInt32("color", YELLOW);
-	item = new BMenuItem("Yellow", message);
+	item = new BMenuItem(B_TRANSLATE("Yellow"), message);
 	if (color == YELLOW)
 		item->SetMarked(true);
 	menu->AddItem(item);
 	message = new BMessage(MSG_COLOR);
 	message->AddInt32("color", PURPLE);
-	item = new BMenuItem("Purple", message);
+	item = new BMenuItem(B_TRANSLATE("Purple"), message);
 	if (color == PURPLE)
 		item->SetMarked(true);
 	menu->AddItem(item);
 	message = new BMessage(MSG_COLOR);
 	message->AddInt32("color", CYAN);
-	item = new BMenuItem("Cyan", message);
+	item = new BMenuItem(B_TRANSLATE("Cyan"), message);
 	if (color == CYAN)
 		item->SetMarked(true);
 	menu->AddItem(item);
 	message = new BMessage(MSG_COLOR);
 	message->AddInt32("color", GRAY);
-	item = new BMenuItem("Gray", message);
+	item = new BMenuItem(B_TRANSLATE("Gray"), message);
 	if (color == GRAY)
 		item->SetMarked(true);
 	menu->AddItem(item);
@@ -425,8 +428,8 @@ SpiderView::SpiderView(BRect frame, SpiderSaver* saver,
 	menu->SetRadioMode(true);
 
 	frame.OffsetBy(0.0, viewHeight);
-	fColorMF = new BMenuField(frame, "color", "Color", menu);
-	fColorMF->SetDivider(fColorMF->StringWidth("Color") + 5.0);
+	fColorMF = new BMenuField(frame, "color", B_TRANSLATE("Color"), menu);
+	fColorMF->SetDivider(fColorMF->StringWidth(B_TRANSLATE("Color")) + 5.0);
 	AddChild(fColorMF);
 }
 

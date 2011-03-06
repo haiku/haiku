@@ -1,13 +1,19 @@
 // IFSSaver.cpp
 
+
 #include <math.h>
 #include <stdio.h>
 
+#include <Catalog.h>
 #include <CheckBox.h>
 #include <Slider.h>
 #include <TextView.h>
 
 #include "IFSSaver.h"
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Screensaver IFS"
+
 
 enum {
 	MSG_TOGGLE_ADDITIVE		= 'tgad',
@@ -62,7 +68,7 @@ IFSSaver::StartConfig(BView *view)
 
 	// the additive check box
 	fAdditiveCB = new BCheckBox(frame, "additive setting",
-								"Render dots additive",
+								B_TRANSLATE("Render dots additive"),
 								new BMessage(MSG_TOGGLE_ADDITIVE),
 								B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 
@@ -76,7 +82,7 @@ IFSSaver::StartConfig(BView *view)
 
 	// the additive check box
 	fSpeedS = new BSlider(frame, "speed setting",
-						  "Morphing speed:",
+						  B_TRANSLATE("Morphing speed:"),
 						  new BMessage(MSG_SET_SPEED),
 						  1, 12, B_BLOCK_THUMB,
 						  B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM);
@@ -97,10 +103,10 @@ IFSSaver::StartConfig(BView *view)
 	BTextView* textView = new BTextView(bounds, B_EMPTY_STRING, textRect,
 										B_FOLLOW_ALL, B_WILL_DRAW);
 	textView->SetViewColor(view->ViewColor());
-	textView->Insert("Iterated Function System\n\n"
+	textView->Insert(B_TRANSLATE("Iterated Function System\n\n"
 					 ""B_UTF8_COPYRIGHT" 1997 Massimino Pascal\n\n"
 					 "xscreensaver port by Stephan Aßmus\n"
-					 "<stippi@yellowbites.com>");
+					 "<stippi@yellowbites.com>"));
 
 
 	textView->SetStylable(true);

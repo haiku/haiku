@@ -7,12 +7,16 @@
  */
 
 
+#include <Catalog.h>
 #include <Font.h>
 #include <ScreenSaver.h>
 #include <StringView.h>
 #include <View.h>
 
 #include <BuildScreenSaverDefaultSettingsView.h>
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Screensaver DebugNow"
 
 
 const rgb_color kMediumBlue = {0, 0, 100};
@@ -56,7 +60,7 @@ void
 DebugNow::StartConfig(BView *view) 
 {
 	BPrivate::BuildScreenSaverDefaultSettingsView(view, "DEBUG NOW",
-		"by Ryan Leavengood");
+		B_TRANSLATE("by Ryan Leavengood"));
 } 
 
 

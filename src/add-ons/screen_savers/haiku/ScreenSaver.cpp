@@ -8,13 +8,19 @@
 ** This file may be used under the terms of the MIT License.
 */
 
-#include <ScreenSaver.h>
-#include <View.h>
-#include <StringView.h>
-#include <Font.h>
+
 #include <stdlib.h>
 
+#include <Catalog.h>
+#include <Font.h>
+#include <ScreenSaver.h>
+#include <StringView.h>
+#include <View.h>
+
 #include <BuildScreenSaverDefaultSettingsView.h>
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Screensaver Haiku"
 
 
 class ScreenSaver : public BScreenSaver
@@ -56,7 +62,7 @@ void
 ScreenSaver::StartConfig(BView *view) 
 { 
 	BPrivate::BuildScreenSaverDefaultSettingsView(view, "Haiku",
-		"by Marcus Overhagen");
+		B_TRANSLATE("by Marcus Overhagen"));
 } 
 
 

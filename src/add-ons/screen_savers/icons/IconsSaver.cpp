@@ -10,12 +10,16 @@
 #include <stdlib.h>
 
 #include <Bitmap.h>
+#include <Catalog.h>
 #include <MimeType.h>
 #include <StringView.h>
 
 #include <BuildScreenSaverDefaultSettingsView.h>
 
 #include "IconDisplay.h"
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Screensaver Icons"
 
 
 #define MAX_ICONS 15
@@ -186,6 +190,6 @@ void
 IconsSaver::StartConfig(BView* view)
 {
 	BPrivate::BuildScreenSaverDefaultSettingsView(view, "Icons",
-		"by Vincent Duvert");
+		B_TRANSLATE("by Vincent Duvert"));
 }
 

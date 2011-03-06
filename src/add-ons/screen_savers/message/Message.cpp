@@ -12,6 +12,7 @@
 #include <string.h>
 
 #include <Bitmap.h>
+#include <Catalog.h>
 #include <Font.h>
 #include <ObjectList.h>
 #include <Picture.h>
@@ -22,6 +23,10 @@
 #include <View.h>
 
 #include <BuildScreenSaverDefaultSettingsView.h>
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Screensaver Message"
+
 
 // Double brackets to satisfy a compiler warning
 const pattern kCheckered = { { 0xcc, 0xcc, 0x33, 0x33, 0xcc, 0xcc, 0x33, 0x33 } };
@@ -43,7 +48,7 @@ BString *get_message()
 
 	// Just in case
 	if (result->Length() <= 0) {
-		result->Append("Insert clever anecdote or phrase here!");
+		result->Append(B_TRANSLATE("Insert clever anecdote or phrase here!"));
 	}
 
 	return result;
@@ -126,7 +131,7 @@ void
 Message::StartConfig(BView *view) 
 { 
 	BPrivate::BuildScreenSaverDefaultSettingsView(view, "Message",
-		"by Ryan Leavengood");
+		B_TRANSLATE("by Ryan Leavengood"));
 } 
 
 
