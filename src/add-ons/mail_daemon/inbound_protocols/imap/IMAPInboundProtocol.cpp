@@ -29,7 +29,7 @@ DispatcherIMAPListener::DispatcherIMAPListener(MailProtocol& protocol,
 
 void
 DispatcherIMAPListener::HeaderFetched(int32 uid, BPositionIO* data,
-	bool bodyIsComming)
+	bool bodyIsComing)
 {
 	BFile* file = dynamic_cast<BFile*>(data);
 	if (file == NULL)
@@ -40,7 +40,7 @@ DispatcherIMAPListener::HeaderFetched(int32 uid, BPositionIO* data,
 
 	fProtocol.NotifyHeaderFetched(ref, file);
 
-	if (!bodyIsComming)
+	if (!bodyIsComing)
 		fProtocol.ReportProgress(0, 1);
 }
 

@@ -19,7 +19,7 @@ public:
 	virtual						~IMAPMailboxListener() {}
 
 	virtual void				HeaderFetched(int32 uid, BPositionIO* data,
-									bool bodyIsComming) {}
+									bool bodyIsComing) {}
 	virtual void				BodyFetched(int32 uid, BPositionIO* data) {}
 
 	virtual	void				NewMessagesToFetch(int32 nMessages) {}

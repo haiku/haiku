@@ -407,15 +407,15 @@ FetchMessageCommand::Handle(const BString& response)
 	BString lastLine;
 	fConnectionReader.GetNextLine(lastLine);
 
-	bool bodyIsComming = true;
+	bool bodyIsComing = true;
 	if (fFetchBodyLimit >= 0 && fFetchBodyLimit <= messageSize)
-		bodyIsComming = false;
+		bodyIsComing = false;
 
 	int32 uid = fIMAPMailbox.MessageNumberToUID(message);
 	if (uid >= 0)
-		fIMAPMailbox.Listener().HeaderFetched(uid, data, bodyIsComming);
+		fIMAPMailbox.Listener().HeaderFetched(uid, data, bodyIsComing);
 
-	if (!bodyIsComming)
+	if (!bodyIsComing)
 		return true;
 
 	deleter.Detach();
