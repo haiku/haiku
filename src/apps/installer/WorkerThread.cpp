@@ -395,8 +395,15 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 
 	_LaunchInitScript(targetDirectory);
 
+	// Create the default indices which should always be present on a proper
+	// boot volume. We don't care if the source volume does not have them.
+	// After all, the user might be re-installing to another drive and may
+	// want to problems fixed along the way...
+	err = _CreateDefaultIndices(targetDirectory);
+	if (err != B_OK)
+		goto error;
 	// Mirror all the indices which are present on the source volume onto
-	// the target volume
+	// the target volume.
 	err = _MirrorIndices(srcDirectory, targetDirectory);
 	if (err != B_OK)
 		goto error;
@@ -488,14 +495,12 @@ WorkerThread::_MirrorIndices(const BPath& sourceDirectory,
 		return (status_t)targetDevice;
 	DIR* indices = fs_open_index_dir(sourceDevice);
 	if (indices == NULL) {
-		if (errno == B_ENTRY_NOT_FOUND || errno == B_OK) {
-			// Assume source volume has no indices. TODO: That is likely not a
-			// valid situation, perhaps return an error instead?
-			return B_OK;
-		}
 		printf("%s: fs_open_index_dir(): (%d) %s\n", sourceDirectory.Path(),
 			errno, strerror(errno));
-		return errno;
+		// Opening the index directory will fail for example on ISO-Live
+		// CDs. The default indices have already been created earlier, so
+		// we simply bail.
+		return B_OK;
 	}
 	while (dirent* index = fs_read_index_dir(indices)) {
 		if (strcmp(index->d_name, "name") == 0
@@ -508,7 +513,7 @@ WorkerThread::_MirrorIndices(const BPath& sourceDirectory,
 		if (fs_stat_index(sourceDevice, index->d_name, &info) != B_OK) {
 			printf("Failed to mirror index %s: fs_stat_index(): (%d) %s\n",
 				index->d_name, errno, strerror(errno));
-			return errno;
+			continue;
 		}
 
 		uint32 flags = 0;
@@ -519,9 +524,50 @@ WorkerThread::_MirrorIndices(const BPath& sourceDirectory,
 				continue;
 			printf("Failed to mirror index %s: fs_create_index(): (%d) %s\n",
 				index->d_name, errno, strerror(errno));
-			return errno;
+			continue;
 		}
 	}
+	return B_OK;
+}
+
+
+status_t
+WorkerThread::_CreateDefaultIndices(const BPath& targetDirectory) const
+{
+	dev_t targetDevice = dev_for_path(targetDirectory.Path());
+	if (targetDevice < 0)
+		return (status_t)targetDevice;
+
+	struct IndexInfo {
+		const char* name;
+		uint32_t	type;
+	};
+
+	const IndexInfo defaultIndices[] = {
+		{ "BEOS:APP_SIG", B_STRING_TYPE },
+		{ "BEOS:LOCALE_LANGUAGE", B_STRING_TYPE },
+		{ "BEOS:LOCALE_SIGNATURE", B_STRING_TYPE },
+		{ "_trk/qrylastchange", B_INT32_TYPE },
+		{ "_trk/recentQuery", B_INT32_TYPE },
+		{ "be:deskbar_item_status", B_STRING_TYPE }
+	};
+
+	uint32 flags = 0;
+		// Flags are always 0 for the moment.
+
+	for (uint32 i = 0; i < sizeof(defaultIndices) / sizeof(IndexInfo); i++) {
+		const IndexInfo& info = defaultIndices[i];
+		if (fs_create_index(targetDevice, info.name, info.type, flags)
+			!= B_OK) {
+			if (errno == B_FILE_EXISTS)
+				continue;
+			printf("Failed to create index %s: fs_create_index(): (%d) %s\n",
+				info.name, errno, strerror(errno));
+			return errno;
+		}
+		printf("created index: %s\n", info.name);
+	}
+
 	return B_OK;
 }
 
