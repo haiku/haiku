@@ -398,7 +398,7 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 	// Create the default indices which should always be present on a proper
 	// boot volume. We don't care if the source volume does not have them.
 	// After all, the user might be re-installing to another drive and may
-	// want to problems fixed along the way...
+	// want problems fixed along the way...
 	err = _CreateDefaultIndices(targetDirectory);
 	if (err != B_OK)
 		goto error;
@@ -565,7 +565,6 @@ WorkerThread::_CreateDefaultIndices(const BPath& targetDirectory) const
 				info.name, errno, strerror(errno));
 			return errno;
 		}
-		printf("created index: %s\n", info.name);
 	}
 
 	return B_OK;
