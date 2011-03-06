@@ -26,9 +26,10 @@ Except as contained in this notice, the name of Be Incorporated shall not be
 used in advertising or otherwise to promote the sale, use or other dealings in
 this Software without prior written authorization from Be Incorporated.
 
-Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered trademarks
-of Be Incorporated in the United States and other countries. Other brand product
-names are registered trademarks or trademarks of their respective holders.
+Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered
+trademarks of Be Incorporated in the United States and other countries. Other
+brand product names are registered trademarks or trademarks of their respective
+holders.
 All rights reserved.
 */
 
@@ -70,78 +71,78 @@ namespace TResourcePrivate {
 			:	fDeleteOK(false)
 		{
 		}
-		
+
 		virtual ~TypeObject()
 		{
 			if (!fDeleteOK)
 				debugger("deleting object owned by BResourceSet");
 		}
-		
+
 		void Delete()
 		{
 			fDeleteOK = true;
 		}
-		
+
 	private:
 		TypeObject(const TypeObject &);
 		TypeObject &operator=(const TypeObject &);
 		bool operator==(const TypeObject &);
 		bool operator!=(const TypeObject &);
-		
+
 		bool fDeleteOK;
 	};
-	
+
 	class BitmapTypeItem : public BBitmap, public TypeObject {
 	public:
 		BitmapTypeItem(BRect bounds, uint32 flags, color_space depth,
-			int32 bytesPerRow=B_ANY_BYTES_PER_ROW, screen_id screenID
+			int32 bytesPerRow = B_ANY_BYTES_PER_ROW, screen_id screenID
 			= B_MAIN_SCREEN_ID)
 			:	BBitmap(bounds, flags, depth, bytesPerRow, screenID)
 		{
 		}
-		
+
 		BitmapTypeItem(const BBitmap* source, bool accepts_views = false,
 			bool need_contiguous = false)
 			:	BBitmap(source, accepts_views, need_contiguous)
 		{
 		}
-		
+
 		BitmapTypeItem(BMessage* data)
 			:	BBitmap(data)
 		{
 		}
-		
+
 		virtual ~BitmapTypeItem()
 		{
 		}
 	};
-	
+
 	class StringBlockTypeItem : public TStringBlock, public TypeObject {
 	public:
 		StringBlockTypeItem(BDataIO* data)
 			:	TStringBlock(data)
 		{
 		}
-		
+
 		StringBlockTypeItem(const void* block, size_t size)
 			:	TStringBlock(block, size)
 		{
 		}
-		
+
 		virtual ~StringBlockTypeItem()
 		{
 		}
 	};
-	
+
 	class TypeItem {
 	public:
 		TypeItem(int32 id, const char* name, const void* data, size_t size)
-			: fID(id), fName(name),
-			  fData(const_cast<void*>(data)), fSize(size), fObject(0),
-			  fOwnData(false), fSourceIsFile(false)
+			:	fID(id), fName(name),
+				fData(const_cast<void*>(data)), fSize(size), fObject(0),
+				fOwnData(false), fSourceIsFile(false)
 		{
 		}
-		
+
 		TypeItem(int32 id, const char* name, BFile* file)
 			:	fID(id),
 				fName(name),
@@ -162,7 +163,7 @@ namespace TResourcePrivate {
 				}
 			}
 		}
-		
+
 		virtual ~TypeItem()
 		{
 			if (fOwnData) {
@@ -172,19 +173,27 @@ namespace TResourcePrivate {
 			}
 			SetObject(NULL);
 		}
-		
+
 		int32 ID() const
-			{ return fID; }
+		{
+			return fID;
+		}
 
 		const char* Name() const
-			{ return fName.String(); }
+		{
+			return fName.String();
+		}
 
 		const void* Data() const
-			{ return fData; }
+		{
+			return fData;
+		}
 
 		size_t Size() const
-			{ return fSize; }
-		
+		{
+			return fSize;
+		}
+
 		void SetObject(TypeObject* object)
 		{
 			if (object == fObject)
@@ -195,14 +204,20 @@ namespace TResourcePrivate {
 		}
 
 		TypeObject* Object() const
-			{ return fObject; }
-		
+		{
+			return fObject;
+		}
+
 		void SetSourceIsFile(bool state)
-			{ fSourceIsFile = state; }
+		{
+			fSourceIsFile = state;
+		}
 
 		bool SourceIsFile() const
-			{ return fSourceIsFile; }
-		
+		{
+			return fSourceIsFile;
+		}
+
 	private:
 		int32 fID;
 		BString fName;
@@ -212,7 +227,7 @@ namespace TResourcePrivate {
 		bool fOwnData;
 		bool fSourceIsFile;
 	};
-	
+
 	static bool FreeTypeItemFunc(void* item)
 	{
 		delete reinterpret_cast<TypeItem*>(item);
@@ -225,16 +240,18 @@ namespace TResourcePrivate {
 			:	fType(type)
 		{
 		}
-		
+
 		virtual ~TypeList()
 		{
 			fItems.DoForEach(FreeTypeItemFunc);
 			fItems.MakeEmpty();
 		}
-		
+
 		type_code Type() const
-			{ return fType; }
-		
+		{
+			return fType;
+		}
+
 		TypeItem* FindItemByID(int32 id)
 		{
 			for (int32 i = 0; i < fItems.CountItems(); i++ ) {
@@ -254,17 +271,16 @@ namespace TResourcePrivate {
 			}
 			return NULL;
 		}
-		
+
 		void AddItem(TypeItem* item)
 		{
 			fItems.AddItem(item);
 		}
-		
+
 	private:
 		type_code fType;
 		BList fItems;
 	};
-
 }
 
 using namespace TResourcePrivate;
@@ -282,13 +298,13 @@ TStringBlock::TStringBlock(BDataIO* data)
 	fStrings = (char*)malloc(1024);
 	size_t pos = 0;
 	ssize_t amount;
-	while ((amount=data->Read(fStrings + pos, 1024)) == 1024) {
+	while ((amount = data->Read(fStrings + pos, 1024)) == 1024) {
 		pos += amount;
 		fStrings = (char*)realloc(fStrings, pos + 1024);
 	}
 	if (amount > 0)
 		pos += amount;
-	
+
 	fNumEntries = PreIndex(fStrings, amount);
 	fIndex = (size_t*)malloc(sizeof(size_t) * fNumEntries);
 	MakeIndex(fStrings, amount, fNumEntries, fIndex);
@@ -304,7 +320,7 @@ TStringBlock::TStringBlock(const void* block, size_t size)
 {
 	fIndex = (size_t*)const_cast<void*>(block);
 	fStrings = (char*)const_cast<void*>(block);
-	
+
 	// Figure out how many entries there are.
 	size_t last_off = 0;
 	while (fIndex[fNumEntries] > last_off && fIndex[fNumEntries] < size ) {
@@ -339,12 +355,12 @@ size_t
 TStringBlock::PreIndex(char* strings, ssize_t len)
 {
 	size_t count = 0;
-	
 	char* orig = strings;
 	char* end = strings + len;
 	bool in_cr = false;
 	bool first = true;
 	bool skipping = false;
+
 	while (orig < end) {
 		if (*orig == '\n' || *orig == '\r' || *orig == 0) {
 			if (!in_cr && *orig == '\r')
@@ -371,30 +387,29 @@ TStringBlock::PreIndex(char* strings, ssize_t len)
 				case '\\':
 					*strings = '\\';
 					break;
-					
+
 				case '\n':
 					*strings = '\n';
 					break;
-					
+
 				case '\r':
 					*strings = '\r';
 					break;
-					
+
 				case '\t':
 					*strings = '\t';
 					break;
-					
+
 				default:
 					*strings = *orig;
 					break;
 			}
-		} else 
+		} else
 			*strings = *orig;
 
 		orig++;
 		strings++;
 	}
-	
 	return count;
 }
 
@@ -405,7 +420,7 @@ TStringBlock::MakeIndex(const char* strings, ssize_t len,
 {
 	*resultingIndex++ = 0;
 	indexLength--;
-	
+
 	ssize_t pos = 0;
 	while (pos < len && indexLength > 0) {
 		if (strings[pos] == 0 ) {
@@ -475,7 +490,7 @@ TResourceSet::AddResources(BResources* RESOURCES_ONLY(resources))
 #if USE_RESOURCES
 	if (!resources)
 		return B_BAD_VALUE;
-	
+
 	BAutolock lock(&fLock);
 	status_t err = fResources.AddItem(resources) ? B_OK : B_ERROR;
 	if (err != B_OK)
@@ -499,7 +514,7 @@ TResourceSet::AddDirectory(const char* fullPath)
 		delete path;
 		return err;
 	}
-	
+
 	BAutolock lock(&fLock);
 	err = fDirectories.AddItem(path) ? B_OK : B_ERROR;
 	if (err != B_OK)
@@ -514,13 +529,13 @@ TResourceSet::AddEnvDirectory(const char* in, const char* defaultValue)
 {
 	BString buf;
 	status_t err = ExpandString(&buf, in);
-	
+
 	if (err != B_OK) {
 		if (defaultValue)
 			return AddDirectory(defaultValue);
 		return err;
 	}
-	
+
 	return AddDirectory(buf.String());
 }
 
@@ -529,11 +544,12 @@ status_t
 TResourceSet::ExpandString(BString* out, const char* in)
 {
 	const char* start = in;
+
 	while (*in) {
 		if (*in == '$') {
 			if (start < in)
-				 out->Append(start, (int32)(in - start));
-			
+				out->Append(start, (int32)(in - start));
+
 			in++;
 			char variableName[1024];
 			size_t i = 0;
@@ -545,25 +561,25 @@ TResourceSet::ExpandString(BString* out, const char* in)
 				if (*in)
 					in++;
 
-			} else 
-				while ((isalnum(*in) || *in == '_') && i
-					< sizeof(variableName) - 1)
+			} else {
+				while ((isalnum(*in) || *in == '_')
+					&& i < sizeof(variableName) - 1)
 					variableName[i++] = *in++;
-			
+			}
+
 			start = in;
-			
 			variableName[i] = '\0';
-			
+
 			const char* val = getenv(variableName);
 			if (!val) {
 				PRINT(("Error: env var %s not found.\n", &variableName[0]));
 				return B_NAME_NOT_FOUND;
 			}
-			
+
 			status_t err = ExpandString(out, val);
 			if (err != B_OK)
 				return err;
-			
+
 		} else if (*in == '\\') {
 			if (start < in)
 				out->Append(start, (int32)(in - start));
@@ -576,7 +592,7 @@ TResourceSet::ExpandString(BString* out, const char* in)
 
 	if (start < in)
 		out->Append(start, (int32)(in - start));
-	
+
 	return B_OK;
 }
 
@@ -585,7 +601,7 @@ const void*
 TResourceSet::FindResource(type_code type, int32 id, size_t* outSize)
 {
 	TypeItem* item = FindItemID(type, id);
-	
+
 	if (outSize)
 		*outSize = item ? item->Size() : 0;
 
@@ -597,7 +613,7 @@ const void*
 TResourceSet::FindResource(type_code type, const char* name, size_t* outSize)
 {
 	TypeItem* item = FindItemName(type, name);
-	
+
 	if (outSize)
 		*outSize = item ? item->Size() : 0;
 
@@ -632,11 +648,12 @@ TResourceSet::FindStringBlock(type_code type, const char* name)
 	return ReturnStringBlockItem(FindItemName(type, name));
 }
 
-	
+
 const char*
 TResourceSet::FindString(type_code type, int32 id, uint32 index)
 {
 	const TStringBlock* stringBlock = FindStringBlock(type, id);
+
 	if (!stringBlock)
 		return NULL;
 
@@ -648,25 +665,26 @@ const char*
 TResourceSet::FindString(type_code type, const char* name, uint32 index)
 {
 	const TStringBlock* stringBlock = FindStringBlock(type, name);
+
 	if (!stringBlock)
 		return NULL;
 
 	return stringBlock->String(index);
 }
 
-	
+
 TypeList*
 TResourceSet::FindTypeList(type_code type)
 {
 	BAutolock lock(&fLock);
-	
+
 	int32 count = fTypes.CountItems();
 	for (int32 i = 0; i < count; i++ ) {
 		TypeList* list = (TypeList*)fTypes.ItemAt(i);
 		if (list && list->Type() == type)
 			return list;
 	}
-	
+
 	return NULL;
 }
 
@@ -676,12 +694,13 @@ TResourceSet::FindItemID(type_code type, int32 id)
 {
 	TypeList* list = FindTypeList(type);
 	TypeItem* item = NULL;
-	
-	if (list) item = list->FindItemByID(id);
-	
+
+	if (list)
+		item = list->FindItemByID(id);
+
 	if (!item)
 		item = LoadResource(type, id, 0, &list);
-	
+
 	return item;
 }
 
@@ -691,13 +710,13 @@ TResourceSet::FindItemName(type_code type, const char* name)
 {
 	TypeList* list = FindTypeList(type);
 	TypeItem* item = NULL;
-	
+
 	if (list)
 		item = list->FindItemByName(name);
-	
+
 	if (!item)
 		item = LoadResource(type, -1, name, &list);
-	
+
 	return item;
 }
 
@@ -707,10 +726,10 @@ TResourceSet::LoadResource(type_code type, int32 id, const char* name,
 	TypeList** inOutList)
 {
 	TypeItem* item = NULL;
-	
+
 	if (name) {
 		BEntry entry;
-		
+
 		// If a named resource, first look in directories.
 		fLock.Lock();
 		int32 count = fDirectories.CountItems();
@@ -731,7 +750,7 @@ TResourceSet::LoadResource(type_code type, int32 id, const char* name,
 		}
 		fLock.Unlock();
 	}
-	
+
 #if USE_RESOURCES
 	if (!item) {
 		// Look through resource objects for data.
@@ -746,7 +765,7 @@ TResourceSet::LoadResource(type_code type, int32 id, const char* name,
 					data = resource->LoadResource(type, id, &size);
 				else if (name != NULL)
 					data = resource->LoadResource(type, name, &size);
-					
+
 				if (data && size) {
 					item = new TypeItem(id, name, data, size);
 					item->SetSourceIsFile(false);
@@ -787,7 +806,7 @@ TResourceSet::ReturnBitmapItem(type_code, TypeItem* from)
 {
 	if (!from)
 		return NULL;
-	
+
 	TypeObject* obj = from->Object();
 	BitmapTypeItem* bitmap = dynamic_cast<BitmapTypeItem*>(obj);
 	if (bitmap)
@@ -803,10 +822,11 @@ TResourceSet::ReturnBitmapItem(type_code, TypeItem* from)
 	// Try to read as an archived bitmap.
 	stream.Seek(0, SEEK_SET);
 	BMessage archive;
-	if (archive.Unflatten(&stream) == B_OK ) {
+	if (archive.Unflatten(&stream) == B_OK) {
 		bitmap = new BitmapTypeItem(&archive);
 		if (bitmap && bitmap->InitCheck() != B_OK) {
-			bitmap->Delete();	// allows us to delete this bitmap...
+			bitmap->Delete();
+				// allows us to delete this bitmap...
 			delete bitmap;
 			bitmap = NULL;
 		}
@@ -815,11 +835,11 @@ TResourceSet::ReturnBitmapItem(type_code, TypeItem* from)
 	if (bitmap) {
 		BAutolock lock(&fLock);
 		if (from->Object() != NULL) {
-			// Whoops!  Someone snuck in under us.
+			// Whoops! Someone snuck in under us.
 			bitmap->Delete();
 			delete bitmap;
 			bitmap = dynamic_cast<BitmapTypeItem*>(from->Object());
-		} else 
+		} else
 			from->SetObject(bitmap);
 	}
 
@@ -832,33 +852,33 @@ TResourceSet::ReturnStringBlockItem(TypeItem* from)
 {
 	if (!from)
 		return NULL;
-	
+
 	TypeObject* obj = from->Object();
 	StringBlockTypeItem* stringBlock = dynamic_cast<StringBlockTypeItem*>(obj);
 	if (stringBlock)
 		return stringBlock;
-	
+
 	// Can't change an existing object.
 	if (obj)
 		return NULL;
-	
+
 	// Don't have a string block in the item -- we'll create one.
 	if (from->SourceIsFile() ) {
 		BMemoryIO stream(from->Data(), from->Size());
 		stringBlock = new StringBlockTypeItem(&stream);
 	} else
 		stringBlock = new StringBlockTypeItem(from->Data(), from->Size());
-	
+
 	if (stringBlock) {
 		BAutolock lock(&fLock);
 		if (from->Object() != NULL) {
-			// Whoops!  Someone snuck in under us.
+			// Whoops! Someone snuck in under us.
 			delete stringBlock;
 			stringBlock = dynamic_cast<StringBlockTypeItem*>(from->Object());
 		} else
 			from->SetObject(stringBlock);
 	}
-	
+
 	return stringBlock;
 }
 
@@ -867,10 +887,8 @@ TResourceSet::ReturnStringBlockItem(TypeItem* from)
 
 
 namespace TResourcePrivate {
-
 	TResourceSet* gResources = NULL;
 	BLocker gResourceLocker;
-	
 }
 
 
@@ -880,7 +898,7 @@ AppResSet()
 	// If already have it, return immediately.
 	if (gResources)
 		return gResources;
-	
+
 	// Don't have 'em, lock access to make 'em.
 	if (!gResourceLocker.Lock())
 		return NULL;
@@ -889,7 +907,7 @@ AppResSet()
 		gResourceLocker.Unlock();
 		return gResources;
 	}
-	
+
 	// Make 'em.
 	gResources = new TResourceSet;
 	gResources->AddResources(BApplication::AppResources());

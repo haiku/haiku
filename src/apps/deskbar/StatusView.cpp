@@ -26,9 +26,10 @@ Except as contained in this notice, the name of Be Incorporated shall not be
 used in advertising or otherwise to promote the sale, use or other dealings in
 this Software without prior written authorization from Be Incorporated.
 
-Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered trademarks
-of Be Incorporated in the United States and other countries. Other brand product
-names are registered trademarks or trademarks of their respective holders.
+Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered
+trademarks of Be Incorporated in the United States and other countries. Other
+brand product names are registered trademarks or trademarks of their respective
+holders.
 All rights reserved.
 */
 
@@ -74,19 +75,19 @@ All rights reserved.
 using std::max;
 
 #ifdef DB_ADDONS
-//	Add-on support
+// Add-on support
 //
-//	Item - internal item list (node, eref, etc)
-//	Icon - physical replicant handed to the DeskbarClass class
-//	AddOn - attribute based add-on
+// Item - internal item list (node, eref, etc)
+// Icon - physical replicant handed to the DeskbarClass class
+// AddOn - attribute based add-on
 
 const char* const kInstantiateItemCFunctionName = "instantiate_deskbar_item";
 const char* const kInstantiateEntryCFunctionName = "instantiate_deskbar_entry";
 const char* const kDeskbarSecurityCodeFile = "Deskbar_security_code";
 const char* const kDeskbarSecurityCodeAttr = "be:deskbar_security_code";
 const char* const kStatusPredicate = "be:deskbar_item_status";
-const char* const kEnabledPredicate = "be:deskbar_item_status=enabled";
-const char* const kDisabledPredicate = "be:deskbar_item_status=disabled";
+const char* const kEnabledPredicate = "be:deskbar_item_status = enabled";
+const char* const kDisabledPredicate = "be:deskbar_item_status = disabled";
 
 float sMinimumWindowWidth = kGutter + kMinimumTrayWidth + kDragRegionWidth;
 
@@ -240,8 +241,7 @@ TReplicantTray::DealWithClock(bool showClock)
 }
 
 
-/*!
-	Width is set to a minimum of kMinimumReplicantCount by kMaxReplicantWidth
+/*! Width is set to a minimum of kMinimumReplicantCount by kMaxReplicantWidth
 	if not in multirowmode and greater than kMinimumReplicantCount
 	the width should be calculated based on the actual
 	replicant widths
@@ -255,17 +255,15 @@ TReplicantTray::GetPreferredSize(float* preferredWidth, float* preferredHeight)
 		if (fShelf->CountReplicants() > 0)
 			height = fRightBottomReplicant.bottom;
 
-		// the height will be uniform for the number of rows
-		// necessary to show all the reps + any gutters
-		// necessary for spacing
+		// the height will be uniform for the number of rows necessary to show
+		// all the reps + any gutters necessary for spacing
 		int32 rowCount = (int32)(height / kMaxReplicantHeight);
 		height = kGutter + (rowCount * kMaxReplicantHeight)
 			+ ((rowCount - 1) * kIconGap) + kGutter;
 		height = max(kMinimumTrayHeight, height);
 		width = fMinimumTrayWidth;
 	} else {
-		// if last replicant overruns clock then
-		// resize to accomodate
+		// if last replicant overruns clock then resize to accomodate
 		if (fShelf->CountReplicants() > 0) {
 			if (fBarView->ShowingClock()
 				&& fRightBottomReplicant.right + 6 >= fClock->Frame().left) {
@@ -274,12 +272,13 @@ TReplicantTray::GetPreferredSize(float* preferredWidth, float* preferredHeight)
 			} else
 				width = fRightBottomReplicant.right + 3;
 		}
+
 		// this view has a fixed minimum width
 		width = max(fMinimumTrayWidth, width);
 	}
 
 	*preferredWidth = width;
-	// add 2 for the border
+	// add 1 for the border
 	*preferredHeight = height + 1;
 }
 
@@ -350,8 +349,7 @@ TReplicantTray::ShowReplicantMenu(BPoint point)
 	BPopUpMenu* menu = new BPopUpMenu("", false, false);
 	menu->SetFont(be_plain_font);
 
-	// If the clock is visible, show the extended menu
-	// otheriwse, show "Show Time".
+	// If clock is visible show the extended menu, otherwise show "Show Time"
 
 	if (fBarView->ShowingClock())
 		fClock->ShowClockOptions(ConvertToScreen(point));
@@ -375,7 +373,7 @@ TReplicantTray::MouseDown(BPoint where)
 		DumpList(fItemList);
 #endif
 
-	uint32	buttons;
+	uint32 buttons;
 
 	Window()->CurrentMessage()->FindInt32("buttons", (int32*)&buttons);
 	if (buttons == B_SECONDARY_MOUSE_BUTTON) {
@@ -412,15 +410,15 @@ TReplicantTray::InitAddOnSupport()
 {
 	// list to maintain refs to each rep added/deleted
 	fItemList = new BList();
-
 	bool haveKey = false;
- 	BPath path;
+	BPath path;
+
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path, true) == B_OK) {
 		path.Append(kDeskbarSecurityCodeFile);
 
-		BFile file(path.Path(),B_READ_ONLY);
+		BFile file(path.Path(), B_READ_ONLY);
 		if (file.InitCheck() == B_OK
-			&& file.Read(&fDeskbarSecurityCode,	sizeof(fDeskbarSecurityCode))
+			&& file.Read(&fDeskbarSecurityCode, sizeof(fDeskbarSecurityCode))
 				== sizeof(fDeskbarSecurityCode))
 			haveKey = true;
 	}
@@ -443,8 +441,7 @@ TReplicantTray::InitAddOnSupport()
 		}
 	}
 
-	// for each volume currently mounted
-	//		index the volume with our indices
+	// for each volume currently mounted index the volume with our indices
 	BVolumeRoster roster;
 	BVolume volume;
 	while (roster.GetNextVolume(&volume) == B_OK) {
@@ -488,8 +485,7 @@ TReplicantTray::RunAddOnQuery(BVolume* volume, const char* predicate)
 		|| fs_stat_index(volume->Device(), kStatusPredicate, &info) != 0)
 		return;
 
-	// run a new query on a specific volume
-	// make it live
+	// run a new query on a specific volume and make it live
 	BQuery query;
 	query.SetVolume(volume);
 	query.SetPredicate(predicate);
@@ -557,7 +553,7 @@ TReplicantTray::NodeExists(node_ref& nodeRef)
 }
 
 
-/*!	This handles B_NODE_MONITOR & B_QUERY_UPDATE messages received
+/*! This handles B_NODE_MONITOR & B_QUERY_UPDATE messages received
 	for the registered add-ons.
 */
 void
@@ -697,8 +693,7 @@ TReplicantTray::HandleEntryUpdate(BMessage* message)
 }
 
 
-/*!
-	The add-ons must support the exported C function API
+/*! The add-ons must support the exported C function API
 	if they do, they will be loaded and added to deskbar
 	primary function is the Instantiate function
 */
@@ -883,7 +878,7 @@ TReplicantTray::MoveItem(entry_ref* ref, ino_t toDirectory)
 	}
 }
 
-#endif	//	add-on support
+#endif // add-on support
 
 //	external add-on API routines
 //	called using the new BDeskbar class
@@ -989,7 +984,7 @@ TReplicantTray::IconCount() const
 }
 
 
-/*!	Message must contain an archivable view for later rehydration.
+/*! Message must contain an archivable view for later rehydration.
 	This function takes over ownership of the provided message on success
 	only.
 	Returns the current replicant ID.
@@ -1008,6 +1003,7 @@ TReplicantTray::AddIcon(BMessage* archive, int32* id, const entry_ref* addOn)
 		ref = *addOn;
 	} else {
 		const char* signature;
+
 		status_t status = archive->FindString("add_on", &signature);
 		if (status == B_OK) {
 			BRoster roster;
@@ -1028,10 +1024,9 @@ TReplicantTray::AddIcon(BMessage* archive, int32* id, const entry_ref* addOn)
 		return status;
 
 	BEntry entry(&ref, true);
-		// ToDo: this resolves an eventual link for the item
-		// being added - this is okay for now, but in multi-user
-		// environments, one might want to have links that
-		// carry the be:deskbar_item_status attribute
+		// TODO: this resolves an eventual link for the item being added - this
+		// is okay for now, but in multi-user environments, one might want to
+		// have links that carry the be:deskbar_item_status attribute
 	status = entry.InitCheck();
 	if (status != B_OK)
 		return status;
@@ -1041,10 +1036,10 @@ TReplicantTray::AddIcon(BMessage* archive, int32* id, const entry_ref* addOn)
 		archive->what = 0;
 
 	BRect originalBounds = archive->FindRect("_frame");
-		// this is a work-around for buggy replicants that change their
-		// size in AttachedToWindow() (such as "SVM")
+		// this is a work-around for buggy replicants that change their size in
+		// AttachedToWindow() (such as "SVM")
 
-	// !! check for name collisions?
+	// TODO: check for name collisions?
 	status = fShelf->AddReplicant(archive, BPoint(1, 1));
 	if (status != B_OK)
 		return status;
@@ -1070,7 +1065,7 @@ TReplicantTray::AddIcon(BMessage* archive, int32* id, const entry_ref* addOn)
 	// add the item to the add-on list
 
 	AddItem(*id, nodeRef, entry, addOn != NULL);
- 	return B_OK;
+	return B_OK;
 }
 
 
@@ -1129,8 +1124,7 @@ TReplicantTray::RealReplicantAdjustment(int32 startIndex)
 	float width, height;
 	GetPreferredSize(&width, &height);
 	if (oldWidth != width || oldHeight != height) {
-		// resize view to accomodate the replicants
-		// redraw as necessary
+		// resize view to accomodate the replicants, redraw as necessary
 		AdjustPlacement();
 	}
 }
@@ -1154,7 +1148,7 @@ TReplicantTray::ViewAt(int32* index, int32* id, int32 target, bool byIndex)
 			}
 		}
 	} else {
-		int32 count = fShelf->CountReplicants()-1;
+		int32 count = fShelf->CountReplicants() - 1;
 		int32 localid;
 		for (int32 repIndex = count ; repIndex >= 0 ; repIndex--) {
 			fShelf->ReplicantAt(repIndex, &view, (uint32*)&localid);
@@ -1165,7 +1159,6 @@ TReplicantTray::ViewAt(int32* index, int32* id, int32 target, bool byIndex)
 			}
 		}
 	}
-
 	return NULL;
 }
 
@@ -1189,7 +1182,6 @@ TReplicantTray::ViewAt(int32* index, int32* id, const char* name)
 			return view;
 		}
 	}
-
 	return NULL;
 }
 
@@ -1353,7 +1345,7 @@ TReplicantTray::SetMultiRow(bool state)
 //	#pragma mark -
 
 
-/*!	Draggable region that is asynchronous so that dragging does not block
+/*! Draggable region that is asynchronous so that dragging does not block
 	other activities.
 */
 TDragRegion::TDragRegion(TBarView* parent, BView* child)
@@ -1583,16 +1575,16 @@ bool
 TDragRegion::SwitchModeForRect(BPoint mouse, BRect rect,
 	bool newVertical, bool newLeft, bool newTop, int32 newState)
 {
-	if (!rect.Contains(mouse))
+	if (!rect.Contains(mouse)) {
 		// not our rect
 		return false;
+	}
 
-	if (newVertical == fBarView->Vertical()
-		&& newLeft == fBarView->Left()
-		&& newTop == fBarView->Top()
-		&& newState == fBarView->State())
+	if (newVertical == fBarView->Vertical() && newLeft == fBarView->Left()
+		&& newTop == fBarView->Top() && newState == fBarView->State()) {
 		// already in the correct mode
 		return true;
+	}
 
 	fBarView->ChangeState(newState, newVertical, newLeft, newTop);
 	return true;

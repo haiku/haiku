@@ -26,9 +26,10 @@ Except as contained in this notice, the name of Be Incorporated shall not be
 used in advertising or otherwise to promote the sale, use or other dealings in
 this Software without prior written authorization from Be Incorporated.
 
-Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered trademarks
-of Be Incorporated in the United States and other countries. Other brand product
-names are registered trademarks or trademarks of their respective holders.
+Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered
+trademarks of Be Incorporated in the United States and other countries. Other
+brand product names are registered trademarks or trademarks of their respective
+holders.
 All rights reserved.
 */
 
@@ -51,12 +52,11 @@ const int32	kIconGap = 2;
 const int32 kGutter = 1;
 const int32 kDragRegionWidth = 6;
 
-//	1 pixel left gutter
-//	space for replicant tray (6 items)
-//	6 pixel drag region
-const float kMinimumTrayWidth = kIconGap
-		+ (kMinimumReplicantCount * kIconGap)
-		+ (kMinimumReplicantCount * kMaxReplicantWidth) + kGutter;
+// 1 pixel left gutter
+// space for replicant tray (6 items)
+// 6 pixel drag region
+const float kMinimumTrayWidth = kIconGap + (kMinimumReplicantCount * kIconGap)
+	+ (kMinimumReplicantCount * kMaxReplicantWidth) + kGutter;
 const float kMinimumTrayHeight = kGutter + kMaxReplicantHeight + kGutter;
 
 extern float sMinimumWindowWidth;
@@ -104,7 +104,7 @@ public:
 	void RemoveIcon(int32 target, bool byIndex = false);
 	void RemoveIcon(const char* name);
 
-	BRect IconFrame(int32 target, bool byIndex=false);
+	BRect IconFrame(int32 target, bool byIndex = false);
 	BRect IconFrame(const char* name);
 
 	bool AcceptAddon(BRect frame, BMessage* message);

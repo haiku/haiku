@@ -26,9 +26,10 @@ Except as contained in this notice, the name of Be Incorporated shall not be
 used in advertising or otherwise to promote the sale, use or other dealings in
 this Software without prior written authorization from Be Incorporated.
 
-Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered trademarks
-of Be Incorporated in the United States and other countries. Other brand product
-names are registered trademarks or trademarks of their respective holders.
+Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered
+trademarks of Be Incorporated in the United States and other countries. Other
+brand product names are registered trademarks or trademarks of their respective
+holders.
 All rights reserved.
 */
 
@@ -43,20 +44,20 @@ All rights reserved.
 
 class TShowHideMenuItem : public BMenuItem {
 public:
-						TShowHideMenuItem(const char* title, 
+						TShowHideMenuItem(const char* title,
 										  const BList* teams,
 										  uint32 action);
 
-	static status_t 	TeamShowHideCommon(int32 action, 
-							const BList* teamList, 
-							BRect zoomRect = BRect(0, 0, 0, 0), 
+	static status_t 	TeamShowHideCommon(int32 action,
+							const BList* teamList,
+							BRect zoomRect = BRect(0, 0, 0, 0),
 							bool doZoom = false);
 protected:
 	virtual void		GetContentSize(float* width, float* height);
 	virtual void		DrawContent();
 	virtual status_t	Invoke(BMessage* message = NULL);
 
-private: 
+private:
 	const BList*		fTeams;
 	uint32				fAction;
 	float				fTitleWidth;

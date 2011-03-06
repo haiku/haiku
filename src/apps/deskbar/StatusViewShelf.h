@@ -26,14 +26,15 @@ Except as contained in this notice, the name of Be Incorporated shall not be
 used in advertising or otherwise to promote the sale, use or other dealings in
 this Software without prior written authorization from Be Incorporated.
 
-Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered trademarks
-of Be Incorporated in the United States and other countries. Other brand product
-names are registered trademarks or trademarks of their respective holders.
+Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered
+trademarks of Be Incorporated in the United States and other countries. Other
+brand product names are registered trademarks or trademarks of their respective
+holders.
 All rights reserved.
 */
 
-//	overrides BShelf; rejects draggers that won't fit into the shelf
-//	alligns received draggers into a grid
+// overrides BShelf; rejects draggers that won't fit into the shelf
+// alligns received draggers into a grid
 
 #ifndef __STATUS_VIEW_SHELF__
 #define __STATUS_VIEW_SHELF__
@@ -45,12 +46,12 @@ class TReplicantShelf : public BShelf {
 public:
 						TReplicantShelf(TReplicantTray* view);
 						~TReplicantShelf();
-						
+
 		void			MessageReceived(BMessage*);
-		
+
 protected:
 		bool 			CanAcceptReplicantView(BRect, BView*, BMessage*) const;
-		BPoint 			AdjustReplicantBy(BRect, BMessage*) const;
+		BPoint			AdjustReplicantBy(BRect, BMessage*) const;
 		void 			ReplicantDeleted(int32, const BMessage*, const BView*);
 
 private:

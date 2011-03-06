@@ -26,9 +26,10 @@ Except as contained in this notice, the name of Be Incorporated shall not be
 used in advertising or otherwise to promote the sale, use or other dealings in
 this Software without prior written authorization from Be Incorporated.
 
-Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered trademarks
-of Be Incorporated in the United States and other countries. Other brand product
-names are registered trademarks or trademarks of their respective holders.
+Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered
+trademarks of Be Incorporated in the United States and other countries. Other
+brand product names are registered trademarks or trademarks of their respective
+holders.
 All rights reserved.
 */
 
@@ -68,15 +69,16 @@ TReplicantShelf::MessageReceived(BMessage* message)
 			// since we can't use ReplicantDeleted
 			// catch the message and find the id or name specifier
 			// then delete the rep vi the api,
-			//
+
 			// this will fix the problem of realigning the reps
 			// after a remove when done through scripting
-			//
+
 			// note: if specified by index its the index not the id!
 
 			while (message->FindMessage("specifiers", index++, &repspec)
 				== B_OK) {
 				const char* str;
+
 				if (repspec.FindString("property", &str) == B_OK) {
 					if (strcmp(str, "Replicant") == 0) {
 						int32 index;
@@ -103,7 +105,7 @@ TReplicantShelf::MessageReceived(BMessage* message)
 }
 
 
-bool 
+bool
 TReplicantShelf::CanAcceptReplicantView(BRect frame, BView* view,
 	BMessage* message) const
 {

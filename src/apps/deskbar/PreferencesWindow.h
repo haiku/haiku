@@ -28,8 +28,8 @@ public:
 							PreferencesWindow(BRect frame);
 							~PreferencesWindow();
 
-	virtual	void			MessageReceived(BMessage* message);
-	virtual	void			WindowActivated(bool active);
+	virtual void			MessageReceived(BMessage* message);
+	virtual void			WindowActivated(bool active);
 
 private:
 			void			_UpdateRecentCounts();

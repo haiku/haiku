@@ -35,8 +35,7 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	// Controls
 	fMenuRecentDocuments = new BCheckBox(B_TRANSLATE("Recent documents:"),
 		new BMessage(kUpdateRecentCounts));
-	fMenuRecentApplications = new BCheckBox(
-		B_TRANSLATE("Recent applications:"),
+	fMenuRecentApplications = new BCheckBox(B_TRANSLATE("Recent applications:"),
 		new BMessage(kUpdateRecentCounts));
 	fMenuRecentFolders = new BCheckBox(B_TRANSLATE("Recent folders:"),
 		new BMessage(kUpdateRecentCounts));
@@ -52,8 +51,7 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 		new BMessage(kSortRunningApps));
 	fAppsSortTrackerFirst = new BCheckBox(B_TRANSLATE("Tracker always first"),
 		new BMessage(kTrackerFirst));
-	fAppsShowExpanders = new BCheckBox(
-		B_TRANSLATE("Show application expander"),
+	fAppsShowExpanders = new BCheckBox(B_TRANSLATE("Show application expander"),
 		new BMessage(kSuperExpando));
 	fAppsExpandNew = new BCheckBox(B_TRANSLATE("Expand new applications"),
 		new BMessage(kExpandNewTeams));
@@ -83,7 +81,7 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 
 	// Values
 	TBarApp* barApp = static_cast<TBarApp*>(be_app);
-	desk_settings* appSettings = barApp->Settings();;
+	desk_settings* appSettings = barApp->Settings();
 
 	fAppsSort->SetValue(appSettings->sortRunningApps);
 	fAppsSortTrackerFirst->SetValue(appSettings->trackerAlwaysFirst);
