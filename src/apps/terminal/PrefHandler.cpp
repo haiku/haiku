@@ -256,7 +256,7 @@ PrefHandler::getRGB(const char *key)
 		sscanf(s, "%d, %d, %d", &r, &g, &b);
 	} else {
 		fprintf(stderr,
-			B_TRANSLATE("PrefHandler::getRGB(%s) - key not found\n"), key);
+			"PrefHandler::getRGB(%s) - key not found\n", key);
 		r = g = b = 0;
 	}
 

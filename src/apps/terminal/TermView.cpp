@@ -747,7 +747,7 @@ inline void
 TermView::_InvalidateTextRect(int32 x1, int32 y1, int32 x2, int32 y2)
 {
 	BRect rect(x1 * fFontWidth, _LineOffset(y1),
-	    (x2 + 1) * fFontWidth - 1, _LineOffset(y2 + 1) - 1);
+		(x2 + 1) * fFontWidth - 1, _LineOffset(y2 + 1) - 1);
 //debug_printf("Invalidate((%f, %f) - (%f, %f))\n", rect.left, rect.top,
 //rect.right, rect.bottom);
 	Invalidate(rect);
@@ -2195,7 +2195,7 @@ TermView::_SecondaryMouseButtonDropped(BMessage* msg)
 		cdItem->SetEnabled(false);
 
 	BPopUpMenu *menu = new BPopUpMenu(
-		B_TRANSLATE("Secondary mouse button drop menu"));
+		"Secondary mouse button drop menu");
 	menu->SetAsyncAutoDestruct(true);
 	menu->AddItem(insertItem);
 	menu->AddSeparatorItem();

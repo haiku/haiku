@@ -412,14 +412,14 @@ Shell::_Spawn(int row, int col, const ShellParameters& parameters)
 	const char *ttyName;
 
 	if (master < 0) {
-    	fprintf(stderr, B_TRANSLATE("Didn't find any available pseudo ttys."));
-    	return errno;
+		fprintf(stderr, "Didn't find any available pseudo ttys.");
+		return errno;
 	}
 
 	if (grantpt(master) != 0 || unlockpt(master) != 0
 		|| (ttyName = ptsname(master)) == NULL) {
 		close(master);
-    	fprintf(stderr, B_TRANSLATE("Failed to init pseudo tty."));
+		fprintf(stderr, "Failed to init pseudo tty.");
 		return errno;
 	}
 
@@ -454,7 +454,7 @@ Shell::_Spawn(int row, int col, const ShellParameters& parameters)
 		if (setsid() < 0) {
 			handshake.status = PTY_NG;
 			snprintf(handshake.msg, sizeof(handshake.msg),
-				B_TRANSLATE("could not set session leader."));
+				"could not set session leader.");
 			send_handshake_message(terminalThread, handshake);
 			exit(1);
 		}
@@ -464,7 +464,7 @@ Shell::_Spawn(int row, int col, const ShellParameters& parameters)
 		if ((slave = open(ttyName, O_RDWR)) < 0) {
 			handshake.status = PTY_NG;
 			snprintf(handshake.msg, sizeof(handshake.msg),
-				B_TRANSLATE("can't open tty (%s)."), ttyName);
+				"can't open tty (%s).", ttyName);
 			send_handshake_message(terminalThread, handshake);
 			exit(1);
 		}
@@ -503,7 +503,7 @@ Shell::_Spawn(int row, int col, const ShellParameters& parameters)
 		if (tcsetattr(0, TCSANOW, &tio) == -1) {
 			handshake.status = PTY_NG;
 			snprintf(handshake.msg, sizeof(handshake.msg),
-				B_TRANSLATE("failed set terminal interface (TERMIOS)."));
+				"failed set terminal interface (TERMIOS).");
 			send_handshake_message(terminalThread, handshake);
 			exit(1);
 		}
@@ -519,7 +519,7 @@ Shell::_Spawn(int row, int col, const ShellParameters& parameters)
 		if (handshake.status != PTY_WS) {
 			handshake.status = PTY_NG;
 			snprintf(handshake.msg, sizeof(handshake.msg),
-				B_TRANSLATE("mismatch handshake."));
+				"mismatch handshake.");
 			send_handshake_message(terminalThread, handshake);
 			exit(1);
 		}
