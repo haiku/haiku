@@ -803,18 +803,14 @@ if [ IsOptionalHaikuImagePackageAdded GetText ] {
 				gettext-0.18.1.1-x86-gcc4-2011-02-07.zip
 				: $(baseURL)/gettext-0.18.1.1-x86-gcc4-2011-02-07.zip
 				: : true ;
-			InstallSourceArchive gettext-0.18.1.1_haiku-2011-02-07.tar.xz
-				: $(baseSourceURL)/2010/gettext-0.18.1.1_haiku-2011-02-07.tar.xz ;
-		} else if $(HAIKU_GCC_VERSION[1]) = 2 && $(isHybridBuild) {
+		} else {
 			InstallOptionalHaikuImagePackage
 				gettext-0.18.1.1-x86-gcc2-2011-02-07.zip
 				: $(baseURL)/gettext-0.18.1.1-x86-gcc2-2011-02-07.zip
 				: : true ;
-			InstallSourceArchive gettext-0.18.1.1_haiku-2011-02-07.tar.xz
-				: $(baseSourceURL)/2011/gettext-0.18.1.1_haiku-2011-02-07.tar.xz ;
-		} else {
-			Echo "No optional package GetText available for $(TARGET_ARCH)-gcc2" ;
 		}
+		InstallSourceArchive gettext-0.18.1.1_haiku-2011-02-07.tar.xz
+			: $(baseSourceURL)/2010/gettext-0.18.1.1_haiku-2011-02-07.tar.xz ;
 	}
 }
 
