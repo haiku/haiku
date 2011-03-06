@@ -28,7 +28,8 @@ DispatcherIMAPListener::DispatcherIMAPListener(MailProtocol& protocol,
 
 
 void
-DispatcherIMAPListener::HeaderFetched(int32 uid, BPositionIO* data)
+DispatcherIMAPListener::HeaderFetched(int32 uid, BPositionIO* data,
+	bool bodyIsComming)
 {
 	BFile* file = dynamic_cast<BFile*>(data);
 	if (file == NULL)
@@ -38,6 +39,9 @@ DispatcherIMAPListener::HeaderFetched(int32 uid, BPositionIO* data)
 		return;
 
 	fProtocol.NotifyHeaderFetched(ref, file);
+
+	if (!bodyIsComming)
+		fProtocol.ReportProgress(0, 1);
 }
 
 
@@ -51,6 +55,8 @@ DispatcherIMAPListener::BodyFetched(int32 uid, BPositionIO* data)
 	if (!fStorage.UIDToRef(uid, ref))
 		return;
 	fProtocol.NotifyBodyFetched(ref, file);
+
+	fProtocol.ReportProgress(0, 1);
 }
 
 
@@ -488,7 +494,6 @@ IMAPInboundProtocol::FetchBody(const entry_ref& ref)
 	status_t status = fIMAPMailbox.FetchBody(fIMAPMailbox.UIDToMessageNumber(
 		uid));
 
-	ReportProgress(0, 1);
 	ResetProgress();
 
 	fIMAPMailboxThread->SyncAndStartWatchingMailbox();

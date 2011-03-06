@@ -203,6 +203,7 @@ POP3Protocol::SyncMessages()
 				break;
 			NotifyHeaderFetched(ref, &file);
 		}
+		ReportProgress(0, 1);
 
 		if (file.WriteAttr("MAIL:unique_id", B_STRING_TYPE, 0, uid,
 			strlen(uid)) < 0) {

@@ -281,8 +281,6 @@ MailProtocol::NotifyHeaderFetched(const entry_ref& ref, BFile* data)
 {
 	for (int i = 0; i < fFilterList.CountItems(); i++)
 		fFilterList.ItemAt(i)->HeaderFetched(ref, data);
-
-	ReportProgress(0, 1);
 }
 
 

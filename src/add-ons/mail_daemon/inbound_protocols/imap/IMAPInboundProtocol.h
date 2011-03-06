@@ -27,7 +27,8 @@ public:
 			bool				Lock();
 			void				Unlock();
 
-			void				HeaderFetched(int32 uid, BPositionIO* data);
+			void				HeaderFetched(int32 uid, BPositionIO* data,
+									bool bodyIsComming);
 			void				BodyFetched(int32 uid, BPositionIO* data);
 
 			void				NewMessagesToFetch(int32 nMessages);

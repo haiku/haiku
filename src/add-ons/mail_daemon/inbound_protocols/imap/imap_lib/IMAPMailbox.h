@@ -18,7 +18,8 @@ class IMAPMailboxListener {
 public:
 	virtual						~IMAPMailboxListener() {}
 
-	virtual void				HeaderFetched(int32 uid, BPositionIO* data) {}
+	virtual void				HeaderFetched(int32 uid, BPositionIO* data,
+									bool bodyIsComming) {}
 	virtual void				BodyFetched(int32 uid, BPositionIO* data) {}
 
 	virtual	void				NewMessagesToFetch(int32 nMessages) {}

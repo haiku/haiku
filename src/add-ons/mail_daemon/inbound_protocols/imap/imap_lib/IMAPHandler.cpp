@@ -306,7 +306,7 @@ FetchMessageCommand::FetchMessageCommand(IMAPMailbox& mailbox, int32 message,
 	fOutData(data),
 	fFetchBodyLimit(fetchBodyLimit)
 {
-	fIMAPMailbox.Listener().NewMessagesToFetch(fEndMessage - fMessage + 1);
+
 }
 
 
@@ -320,13 +320,13 @@ FetchMessageCommand::FetchMessageCommand(IMAPMailbox& mailbox,
 	fOutData(NULL),
 	fFetchBodyLimit(fetchBodyLimit)
 {
-	fIMAPMailbox.Listener().NewMessagesToFetch(fEndMessage - fMessage + 1);
+
 }
 
 
 FetchMessageCommand::~FetchMessageCommand()
 {
-	fIMAPMailbox.Listener().FetchEnd();
+
 }
 
 
@@ -407,11 +407,15 @@ FetchMessageCommand::Handle(const BString& response)
 	BString lastLine;
 	fConnectionReader.GetNextLine(lastLine);
 
+	bool bodyIsComming = true;
+	if (fFetchBodyLimit >= 0 && fFetchBodyLimit <= messageSize)
+		bodyIsComming = false;
+
 	int32 uid = fIMAPMailbox.MessageNumberToUID(message);
 	if (uid >= 0)
-		fIMAPMailbox.Listener().HeaderFetched(uid, data);
+		fIMAPMailbox.Listener().HeaderFetched(uid, data, bodyIsComming);
 
-	if (fFetchBodyLimit >= 0 && fFetchBodyLimit <= messageSize)
+	if (!bodyIsComming)
 		return true;
 
 	deleter.Detach();
@@ -622,6 +626,8 @@ ExistsHandler::Handle(const BString& response)
 	IMAPCommand* command = new FetchMinMessageCommand(fIMAPMailbox,
 		nMessages + 1, exists, &list, NULL);
 	fIMAPMailbox.AddAfterQuakeCommand(command);
+
+	fIMAPMailbox.Listener().NewMessagesToFetch(exists - nMessages);
 
 	command = new FetchMessageCommand(fIMAPMailbox, nMessages + 1, exists,
 		fIMAPMailbox.FetchBodyLimit());
