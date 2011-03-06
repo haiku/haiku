@@ -1496,7 +1496,7 @@ if [ IsOptionalHaikuImagePackageAdded Tar ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Tar available for $(TARGET_ARCH)" ;
 	} else {
-		if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
+		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
 				tar-1.25-x86-gcc4-2011-02-07.zip
 				: $(baseURL)/tar-1.25-x86-gcc4-2011-02-07.zip ;
