@@ -9,10 +9,10 @@
  *
  */
 
-#include "Settings.h"
-#include "BeceemCPU.h"
 
+#include "BeceemCPU.h"
 #include "Driver.h"
+#include "Settings.h"
 
 
 BeceemCPU::BeceemCPU()
@@ -25,7 +25,7 @@ status_t
 BeceemCPU::CPUInit(WIMAX_DEVICE* swmxdevice)
 {
 	TRACE("Debug: Init CPU handler\n");
-	pwmxdevice = swmxdevice;
+	fWmxDevice = swmxdevice;
 	return B_OK;
 }
 
@@ -33,24 +33,25 @@ BeceemCPU::CPUInit(WIMAX_DEVICE* swmxdevice)
 status_t
 BeceemCPU::CPURun()
 {
-	unsigned int clkReg = 0;
+	unsigned int clockRegister = 0;
 
-	if (BizarroReadRegister(CLOCK_RESET_CNTRL_REG_1, sizeof(clkReg), &clkReg)
-			!= B_OK) {
-
+	// Read current clock register contents
+	if (BizarroReadRegister(CLOCK_RESET_CNTRL_REG_1,
+		sizeof(clockRegister), &clockRegister) != B_OK) {
 		TRACE_ALWAYS("Error: Read of clock reset reg failure\n");
 		return B_ERROR;
 	}
 
-	if (pwmxdevice->CPUFlashBoot) {
-		clkReg &= (~(1<<30));
+	// Adjust clock register contents to start cpu
+	if (fWmxDevice->CPUFlashBoot) {
+		clockRegister &= (~(1<<30));
 	} else {
-		clkReg |= (1<<30);
+		clockRegister |= (1<<30);
 	}
 
-	if (BizarroWriteRegister(CLOCK_RESET_CNTRL_REG_1, sizeof(clkReg), &clkReg)
-			!= B_OK) {
-
+	// Write new clock register contents
+	if (BizarroWriteRegister(CLOCK_RESET_CNTRL_REG_1,
+		sizeof(clockRegister), &clockRegister) != B_OK) {
 		TRACE_ALWAYS("Error: Write of clock reset reg failure\n");
 		return B_ERROR;
 	}
@@ -62,78 +63,84 @@ BeceemCPU::CPURun()
 status_t
 BeceemCPU::CPUReset()
 {
-	status_t	retval = B_OK;
 	unsigned int value = 0;
 	unsigned int uiResetValue = 0;
 
-	if (pwmxdevice->deviceChipID >= T3LPB)
+	if (fWmxDevice->deviceChipID >= T3LPB)
 	{
 		BizarroReadRegister(SYS_CFG, sizeof(value), &value);
 		BizarroReadRegister(SYS_CFG, sizeof(value), &value);
 			// SYS_CFG register is write protected hence for modifying
 			// this reg value, it should be read twice before writing.
 
-		value = value | (pwmxdevice->syscfgBefFw & 0x00000060) ;
+		value = value | (fWmxDevice->syscfgBefFw & 0x00000060) ;
 			// making bit[6...5] same as was before f/w download. this
 			// setting forces the h/w to re-populated the SP RAM area
 			// with the string descriptor .
 
-		BizarroWriteRegister(SYS_CFG, sizeof(value), &value);
+		if (BizarroWriteRegister(SYS_CFG, sizeof(value), &value) != B_OK) {
+			TRACE_ALWAYS("Error: unable to write SYS_CFG during reset\n");
+			return B_ERROR;
+		}
 	}
 
 	/* Reset the UMA-B Device */
-	if (pwmxdevice->deviceChipID >= T3LPB)
+	if (fWmxDevice->deviceChipID >= T3LPB)
 	{
-		// TRACE("Debug: Resetting UMA-B\n");
-		// retval = usb_reset_device(psIntfAdapter->udev);
-
-		if (retval != B_OK)
+		// Reset UMA-B
+		// TODO : USB reset needs implimented
+		/*
+		if (usb_reset_device(psIntfAdapter->udev) != B_OK)
 		{
-			TRACE_ALWAYS("Error: Reset failed\n");
-			goto err_exit;
+			TRACE_ALWAYS("Error: USB Reset failed\n");
+			retrun B_ERROR;
 		}
-		if (pwmxdevice->deviceChipID == BCS220_2 ||
-			pwmxdevice->deviceChipID == BCS220_2BC ||
-			pwmxdevice->deviceChipID == BCS250_BC ||
-			pwmxdevice->deviceChipID == BCS220_3)
+		*/
+
+		if (fWmxDevice->deviceChipID == BCS220_2 ||
+			fWmxDevice->deviceChipID == BCS220_2BC ||
+			fWmxDevice->deviceChipID == BCS250_BC ||
+			fWmxDevice->deviceChipID == BCS220_3)
 		{
-			retval = BizarroReadRegister(HPM_CONFIG_LDO145,
-						sizeof(value), &value);
-
-			if ( retval < 0)
-			{
-				TRACE_ALWAYS("Error: read failed with status: %d\n", retval);
-				goto err_exit;
+			if (BizarroReadRegister(HPM_CONFIG_LDO145,
+				sizeof(value), &value) != B_OK) {
+				TRACE_ALWAYS("Error: USB read failed during reset\n");
+				return B_ERROR;
 			}
-			// setting 0th bit
+			// set 0th bit
 			value |= (1<<0);
-			retval = BizarroWriteRegister(HPM_CONFIG_LDO145,
-				sizeof(value), &value);
 
-			if ( retval < 0)
-			{
-				TRACE_ALWAYS("Error: write failed with status: %d\n", retval);
-				goto err_exit;
+			if (BizarroWriteRegister(HPM_CONFIG_LDO145,
+				sizeof(value), &value) != B_OK) {
+				TRACE_ALWAYS("Error: USB write failed during reset\n");
+				return B_ERROR;
 			}
 		}
 
 	}
 	// TODO : ELSE OLDER CHIP ID's < T3LP see Misc.c:1048
 
-	if (pwmxdevice->CPUFlashBoot)
+	if (fWmxDevice->CPUFlashBoot)
 	{
 		// In flash boot mode MIPS state register has reverse polarity.
 		// So just or with setting bit 30.
 		// Make the MIPS in Reset state.
-		BizarroReadRegister(CLOCK_RESET_CNTRL_REG_1, sizeof(uiResetValue),
-			&uiResetValue);
-
+		if (BizarroReadRegister(CLOCK_RESET_CNTRL_REG_1,
+			sizeof(uiResetValue), &uiResetValue) != B_OK) {
+			TRACE_ALWAYS("Error: read failed during FlashBoot device reset\n");
+			return B_ERROR;
+		}
+		// set 30th bit
 		uiResetValue |=(1<<30);
-		BizarroWriteRegister(CLOCK_RESET_CNTRL_REG_1, sizeof(uiResetValue),
-			&uiResetValue);
+
+		if (BizarroWriteRegister(CLOCK_RESET_CNTRL_REG_1,
+			sizeof(uiResetValue), &uiResetValue) != B_OK) {
+			TRACE_ALWAYS("Error: write failed during FlashBoot device reset\n");
+			return B_ERROR;
+		}
 	}
 
-	if (pwmxdevice->deviceChipID >= T3LPB)
+	if (fWmxDevice->deviceChipID >= T3LPB)
 	{
 		uiResetValue = 0;
 			// WA for SYSConfig Issue.
@@ -144,14 +151,23 @@ BeceemCPU::CPUReset()
 			BizarroReadRegister(SYS_CFG, sizeof(uiResetValue), &uiResetValue);
 				// Read SYSCFG Twice to make it writable.
 			uiResetValue &= (~(1<<4));
-			BizarroWriteRegister(SYS_CFG, sizeof(uiResetValue), &uiResetValue);
+
+			if (BizarroWriteRegister(SYS_CFG,
+				sizeof(uiResetValue), &uiResetValue) != B_OK) {
+				TRACE_ALWAYS("Error: unable to write SYS_CFG during reset\n");
+				return B_ERROR;
+			}
 		}
 
 	}
-	uiResetValue = 0;
-	BizarroWriteRegister(0x0f01186c, sizeof(uiResetValue), &uiResetValue);
 
-	err_exit :
-		return retval;
+	uiResetValue = 0;
+	if (BizarroWriteRegister(0x0f01186c,
+		sizeof(uiResetValue), &uiResetValue) != B_OK) {
+		TRACE_ALWAYS("Error: unable to write reset to 0x0f01186c\n");
+		return B_ERROR;
+	}
+
+	return B_OK;
 }
 
