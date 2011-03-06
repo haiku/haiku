@@ -158,6 +158,9 @@ SocketConnection::SocketConnection()
 status_t
 SocketConnection::Connect(const char* server, uint32 port)
 {
+	if (fSocket >= 0)
+		Disconnect();
+
 	TRACE("SocketConnection to server %s:%i\n", server, (int)port);
 	uint32 hostIP = inet_addr(server);
 		// first see if we can parse it as a numeric address
@@ -249,6 +252,9 @@ SSLConnection::SSLConnection()
 status_t
 SSLConnection::Connect(const char* server, uint32 port)
 {
+	if (fSSL != NULL)
+		Disconnect();
+
 	BAutolock _(fLocker);
 
 	status_t status = SocketConnection::Connect(server, port);
