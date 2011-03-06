@@ -112,6 +112,7 @@ private:
 			status_t			_ProcessCommandWithoutAfterQuake(
 									const char* command,
 									bigtime_t timeout = kIMAP4ClientTimeout);
+			status_t			_Disconnect();
 
 			int32				fCommandId;
 			std::vector<int32>	fOngoingCommands;

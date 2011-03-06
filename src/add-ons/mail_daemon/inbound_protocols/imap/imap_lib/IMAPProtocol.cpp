@@ -214,8 +214,7 @@ status_t
 IMAPProtocol::Disconnect()
 {
 	ProcessCommand("LOGOUT");
-	fIsConnected = false;
-	return fOwnServerConnection.Disconnect();
+	return _Disconnect();
 }
 
 
@@ -294,7 +293,7 @@ IMAPProtocol::SendCommand(const char* command, int32 commandId)
 	int commandLength = strlen(cmd);
 	if (fServerConnection->Write(cmd, commandLength) != commandLength) {
 		// we might lost the connection, clear the connection state
-		Disconnect();
+		_Disconnect();
 		return B_ERROR;
 	}
 
@@ -317,7 +316,7 @@ IMAPProtocol::HandleResponse(int32 commandId, bigtime_t timeout)
 				TRACE("S:read error %s", line.String());
 			// we might lost the connection, clear the connection state
 			TRACE("Disconnect\n");
-			Disconnect();
+			_Disconnect();
 			return status;
 		}
 		//TRACE("S: %s", line.String());
@@ -409,4 +408,12 @@ IMAPProtocol::_ProcessCommandWithoutAfterQuake(const char* command,
 		return status;
 
 	return HandleResponse(commandId, timeout);
+}
+
+
+status_t
+IMAPProtocol::_Disconnect()
+{
+	fIsConnected = false;
+	return fOwnServerConnection.Disconnect();
 }
