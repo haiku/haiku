@@ -1507,6 +1507,27 @@ add_app_signature_type()
 
 
 static void
+add_app_name_catalog_entry()
+{
+	field_t* fields  = (field_t*)alloc_mem(1 * sizeof(field_t));
+	fields[0].type   = get_type("string");
+	fields[0].name   = "catalog_entry";
+	fields[0].resize = 0;
+	fields[0].data   = make_default(fields[0].type);
+
+	type_t type;
+	type.code     = B_STRING_TYPE;
+	type.name     = "app_name_catalog_entry";
+	type.fields   = fields;
+	type.count    = 1;
+	type.def_id   = 1;
+	type.def_name = "SYS:NAME";
+
+	type_table.insert(make_pair(type.name, type));
+}
+
+
+static void
 add_app_flags()
 {
 	field_t* fields  = (field_t*)alloc_mem(1 * sizeof(field_t));
@@ -1718,6 +1739,7 @@ init_parser()
 	add_rect_type();
 	add_rgb_color_type();
 	add_app_signature_type();
+	add_app_name_catalog_entry();
 	add_app_flags();
 	add_app_version();
 	add_large_icon();

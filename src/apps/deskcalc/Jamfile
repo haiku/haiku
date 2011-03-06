@@ -24,8 +24,3 @@ DoCatalogs DeskCalc :
 	CalcView.cpp
 	CalcWindow.cpp
 ;
-
-AddCatalogEntryAttribute DeskCalc
-	:
-	"x-vnd.Haiku-DeskCalc:Window:DeskCalc"
-;

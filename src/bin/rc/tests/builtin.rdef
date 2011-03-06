@@ -33,6 +33,12 @@ type(1, "BEOS:APP_SIG") #'MIMS' app_signature
 	string signature  // max 240 bytes (including null)
 };
 
+/* Application name catalog entry. */
+type(1, "SYS:NAME") #B_STRING_TYPE app_name_catalog_entry
+{
+	string catalog_entry
+};
+
 /* Application launch flags */
 type(1, "BEOS:APP_FLAGS") #'APPF' app_flags
 {
