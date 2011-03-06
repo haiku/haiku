@@ -26,9 +26,10 @@ Except as contained in this notice, the name of Be Incorporated shall not be
 used in advertising or otherwise to promote the sale, use or other dealings in
 this Software without prior written authorization from Be Incorporated.
 
-Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered trademarks
-of Be Incorporated in the United States and other countries. Other brand product
-names are registered trademarks or trademarks of their respective holders.
+Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered
+trademarks of Be Incorporated in the United States and other countries. Other
+brand product names are registered trademarks or trademarks of their respective
+holders.
 All rights reserved.
 */
 #ifndef TEAMMENUITEM_H
@@ -53,7 +54,7 @@ class TTeamMenuItem : public BMenuItem {
 			float width = -1.0f, float height = -1.0f,
 			bool drawLabel = true, bool vertical = true);
 		TTeamMenuItem(float width = -1.0f, float height = -1.0f,
-			bool vertical=true);
+			bool vertical = true);
 		virtual ~TTeamMenuItem();
 
 		status_t Invoke(BMessage* msg = NULL);
@@ -82,7 +83,7 @@ class TTeamMenuItem : public BMenuItem {
 		friend class TExpandoMenuBar;
 		void InitData(BList* team, BBitmap* icon, char* name, char* sig,
 			float width = -1.0f, float height = -1.0f,
-			bool drawLabel = true,bool vertical=true);
+			bool drawLabel = true, bool vertical = true);
 
 		bool _IsSelected() const;
 

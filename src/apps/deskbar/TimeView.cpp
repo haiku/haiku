@@ -26,9 +26,10 @@ Except as contained in this notice, the name of Be Incorporated shall not be
 used in advertising or otherwise to promote the sale, use or other dealings in
 this Software without prior written authorization from Be Incorporated.
 
-Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered trademarks
-of Be Incorporated in the United States and other countries. Other brand product
-names are registered trademarks or trademarks of their respective holders.
+Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered
+trademarks of Be Incorporated in the United States and other countries. Other
+brand product names are registered trademarks or trademarks of their respective
+holders.
 All rights reserved.
 */
 
@@ -154,9 +155,9 @@ TTimeView::GetPreferredSize(float* width, float* height)
 
 	GetCurrentTime();
 
-	// TODO: SetOrientation never gets called, fix that
-	// When in vertical mode, we want to limit the width so that it can't
-	// overlap the bevels in the parent view.
+	// TODO: SetOrientation never gets called, fix that when in vertical mode,
+	// we want to limit the width so that it can't overlap the bevels in the
+	// parent view.
 	*width = fOrientation ?
 		min_c(fMaxWidth - kHMargin, kHMargin + StringWidth(fTimeStr))
 		: kHMargin + StringWidth(fTimeStr);
@@ -217,6 +218,7 @@ TTimeView::MessageReceived(BMessage* message)
 
 		default:
 			BView::MessageReceived(message);
+			break;
 	}
 }
 
@@ -262,8 +264,8 @@ TTimeView::GetCurrentDate()
 
 	fLocale.FormatDate(tmp, 64, fTime, B_FULL_DATE_FORMAT);
 
-	//	remove leading 0 from date when month is less than 10 (MM/DD/YY)
-	//  or remove leading 0 from date when day is less than 10 (DD/MM/YY)
+	// remove leading 0 from date when month is less than 10 (MM/DD/YY)
+	// or remove leading 0 from date when day is less than 10 (DD/MM/YY)
 	const char* str = tmp;
 	if (str[0] == '0')
 		str++;
@@ -325,7 +327,7 @@ TTimeView::Pulse()
 		// For dates, Update() could be called two times in a row,
 		// but that should only happen very rarely
 		if ((fLastTimeStr[1] != fTimeStr[1]
-				&& (fLastTimeStr[1] == ':' || fTimeStr[1] == ':'))
+			&& (fLastTimeStr[1] == ':' || fTimeStr[1] == ':'))
 			|| !fLastTimeStr[0])
 			Update();
 
@@ -359,7 +361,6 @@ TTimeView::Update()
 	fLocale = *BLocale::Default();
 	GetCurrentTime();
 	GetCurrentDate();
-
 
 	SetToolTip(fDateStr);
 

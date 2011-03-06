@@ -26,9 +26,10 @@ Except as contained in this notice, the name of Be Incorporated shall not be
 used in advertising or otherwise to promote the sale, use or other dealings in
 this Software without prior written authorization from Be Incorporated.
 
-Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered trademarks
-of Be Incorporated in the United States and other countries. Other brand product
-names are registered trademarks or trademarks of their respective holders.
+Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered
+trademarks of Be Incorporated in the United States and other countries. Other
+brand product names are registered trademarks or trademarks of their respective
+holders.
 All rights reserved.
 */
 #ifndef SWITCHER_H
@@ -53,7 +54,7 @@ public:
 							TSwitchManager(BPoint where);
 	virtual					~TSwitchManager();
 
-	virtual	void			MessageReceived(BMessage* message);
+	virtual void			MessageReceived(BMessage* message);
 
 			void			Stop(bool doAction, uint32 modifiers);
 			void			Unblock();
@@ -85,7 +86,7 @@ private:
 								bool allowWorkspaceSwitch);
 			void			ActivateWindow(int32 windowID = -1);
 			void			_SortApps();
-			
+
 			bool			_FindNextValidApp(bool forward);
 
 			TSwitcherWindow* fWindow;

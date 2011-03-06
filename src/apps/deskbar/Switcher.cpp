@@ -26,9 +26,10 @@ Except as contained in this notice, the name of Be Incorporated shall not be
 used in advertising or otherwise to promote the sale, use or other dealings in
 this Software without prior written authorization from Be Incorporated.
 
-Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered trademarks
-of Be Incorporated in the United States and other countries. Other brand product
-names are registered trademarks or trademarks of their respective holders.
+Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered
+trademarks of Be Incorporated in the United States and other countries. Other
+brand product names are registered trademarks or trademarks of their respective
+holders.
 All rights reserved.
 */
 
@@ -99,11 +100,11 @@ public:
 								TSwitchManager* manager);
 	virtual					~TSwitcherWindow();
 
-	virtual	bool			QuitRequested();
-	virtual	void			MessageReceived(BMessage* message);
-	virtual	void			Show();
-	virtual	void			Hide();
-	virtual	void			WindowActivated(bool state);
+	virtual bool			QuitRequested();
+	virtual void			MessageReceived(BMessage* message);
+	virtual void			Show();
+	virtual void			Hide();
+	virtual void			WindowActivated(bool state);
 
 			void			DoKey(uint32 key, uint32 modifiers);
 			TIconView*		IconView();
@@ -133,12 +134,14 @@ public:
 			void			UpdateGroup(int32 groupIndex, int32 windowIndex);
 
 	virtual void			AttachedToWindow();
-	virtual	void			Draw(BRect update);
-	virtual	void			Pulse();
-	virtual	void			GetPreferredSize(float* w, float* h);
+	virtual void			Draw(BRect update);
+	virtual void			Pulse();
+	virtual void			GetPreferredSize(float* w, float* h);
 			void			ScrollTo(float x, float y)
-								{ ScrollTo(BPoint(x,y)); }
-	virtual	void			ScrollTo(BPoint where);
+							{
+								ScrollTo(BPoint(x, y));
+							}
+	virtual void			ScrollTo(BPoint where);
 
 			void			ShowIndex(int32 windex);
 			BRect			FrameOf(int32 index) const;
@@ -160,13 +163,15 @@ public:
 			void			Hiding();
 
 	virtual void			KeyDown(const char* bytes, int32 numBytes);
-	virtual	void			Pulse();
-	virtual	void			MouseDown(BPoint point);
-	virtual	void			Draw(BRect updateRect);
+	virtual void			Pulse();
+	virtual void			MouseDown(BPoint point);
+	virtual void			Draw(BRect updateRect);
 
 			void			ScrollTo(float x, float y)
-								{ ScrollTo(BPoint(x,y)); }
-	virtual	void	ScrollTo(BPoint where);
+							{
+								ScrollTo(BPoint(x, y));
+							}
+	virtual void	ScrollTo(BPoint where);
 			void			Update(int32 previous, int32 current,
 								int32 previousSlot, int32 currentSlot,
 								bool forward);
@@ -197,9 +202,9 @@ public:
 
 	virtual void			Draw(BRect update);
 	virtual void			AllAttached();
-	virtual	void			DrawIconScrollers(bool force);
-	virtual	void			DrawWindowScrollers(bool force);
-	virtual	void			MouseDown(BPoint where);
+	virtual void			DrawIconScrollers(bool force);
+	virtual void			DrawWindowScrollers(bool force);
+	virtual void			MouseDown(BPoint where);
 
 private:
 			TSwitchManager*	fManager;
@@ -250,16 +255,12 @@ LowBitIndex(uint32 value)
 inline bool
 IsVisibleInCurrentWorkspace(const window_info* windowInfo)
 {
-	/*
-	 The window list is always ordered from the top
-	 front visible window (the first on the list), going down through all
-	 the other visible windows, then all the hidden or non workspace
-	 visible window at the end.
-
-	 layer > 2 : normal visible window.
-	 layer == 2 : reserved for the desktop window (visible also).
-	 layer < 2 : hidden (0) and non workspace visible window (1)
-	*/
+	// The window list is always ordered from the top front visible window
+	// (the first on the list), going down through all the other visible
+	// windows, then all hidden or non-workspace visible windows at the end.
+	//     layer > 2  : normal visible window
+	//     layer == 2 : reserved for the desktop window (visible also)
+	//     layer < 2  : hidden (0) and non workspace visible window (1)
 	return windowInfo->layer > 2;
 }
 
@@ -278,13 +279,11 @@ bool
 IsWindowOK(const window_info* windowInfo)
 {
 	// is_mini (true means that the window is minimized).
-	// if not, then
-	// show_hide >= 1 means that the window is hidden.
-	//
+	// if not, then show_hide >= 1 means that the window is hidden.
 	// If the window is both minimized and hidden, then you get :
-	//	 TWindow->is_mini = false;
-	//	 TWindow->was_mini = true;
-	//	 TWindow->show_hide >= 1;
+	//     TWindow->is_mini = false;
+	//     TWindow->was_mini = true;
+	//     TWindow->show_hide >= 1;
 
 	if (windowInfo->feel != _STD_W_TYPE_)
 		return false;
@@ -330,14 +329,16 @@ SmartStrcmp(const char* s1, const char* s2)
 			s2++;
 			continue;
 		}
-		if (*s1 != *s2)
-			return 1;		// they differ
+		if (*s1 != *s2) {
+			// they differ
+			return 1;
+		}
 		s1++;
 		s2++;
 	}
 
 	// if one of the strings ended before the other
-	// ??? could process trailing spaces & underscores!
+	// TODO: could process trailing spaces and underscores
 	if (*s1)
 		return 1;
 	if (*s2)
@@ -446,7 +447,7 @@ TSwitchManager::TSwitchManager(BPoint point)
 	TBarApp::Subscribe(BMessenger(this), &tmpList);
 
 	for (int32 i = 0; ; i++) {
-		BarTeamInfo	*barTeamInfo = (BarTeamInfo	*)tmpList.ItemAt(i);
+		BarTeamInfo* barTeamInfo = (BarTeamInfo*)tmpList.ItemAt(i);
 		if (!barTeamInfo)
 			break;
 
@@ -483,6 +484,7 @@ TSwitchManager::MessageReceived(BMessage* message)
 			int i = 0;
 			TTeamGroup* tinfo;
 			message->FindInt32("team", &teamID);
+
 			while ((tinfo = (TTeamGroup*)fGroupList.ItemAt(i)) != NULL) {
 				if (tinfo->TeamList()->HasItem((void*)teamID)) {
 					fGroupList.RemoveItem(i);
@@ -517,15 +519,19 @@ TSwitchManager::MessageReceived(BMessage* message)
 				delete teams;
 				break;
 			}
+
 			delete smallIcon;
+
 			if (message->FindString("sig", &signature) != B_OK) {
 				delete teams;
 				break;
 			}
+
 			if (message->FindInt32("flags", (int32*)&flags) != B_OK) {
 				delete teams;
 				break;
 			}
+
 			if (message->FindString("name", &name) != B_OK) {
 				delete teams;
 				break;
@@ -546,8 +552,7 @@ TSwitchManager::MessageReceived(BMessage* message)
 			const char* signature = message->FindString("sig");
 			team_id team = message->FindInt32("team");
 
-			int32 numItems = fGroupList.CountItems();
-			for (int32 i = 0; i < numItems; i++) {
+			for (int32 i = 0; i < fGroupList.CountItems(); i++) {
 				TTeamGroup* tinfo = (TTeamGroup*)fGroupList.ItemAt(i);
 				if (strcasecmp(tinfo->Signature(), signature) == 0) {
 					if (!(tinfo->TeamList()->HasItem((void*)team)))
@@ -562,8 +567,7 @@ TSwitchManager::MessageReceived(BMessage* message)
 		{
 			team_id team = message->FindInt32("team");
 
-			int32 numItems = fGroupList.CountItems();
-			for (int32 i = 0; i < numItems; i++) {
+			for (int32 i = 0; i < fGroupList.CountItems(); i++) {
 				TTeamGroup* tinfo = (TTeamGroup*)fGroupList.ItemAt(i);
 				if (tinfo->TeamList()->HasItem((void*)team)) {
 					tinfo->TeamList()->RemoveItem((void*)team);
@@ -584,7 +588,6 @@ TSwitchManager::MessageReceived(BMessage* message)
 			// starts differentiating initial key_downs from KeyDowns generated
 			// by auto-repeat. Until then the fSkipUntil stuff helps, but it
 			// isn't perfect.
-
 			if (time < fSkipUntil)
 				break;
 
@@ -620,7 +623,7 @@ TSwitchManager::_SortApps()
 	team_id* teams;
 	int32 count;
 	if (BPrivate::get_application_order(current_workspace(), &teams, &count)
-			!= B_OK)
+		!= B_OK)
 		return;
 
 	BList groups;
@@ -656,8 +659,7 @@ TSwitchManager::MainEntry(BMessage* message)
 {
 	bigtime_t now = system_time();
 	bigtime_t timeout = now + 180000;
-		// The delay above was arrived at by trial and error and
-		// has a good "feel"
+		// The above delay has a good "feel" found by trial and error
 
 	app_info appInfo;
 	be_roster->GetActiveAppInfo(&appInfo);
@@ -885,6 +887,7 @@ TSwitchManager::_FindNextValidApp(bool forward)
 			if (fCurrentIndex < 0)
 				fCurrentIndex = max - 1;
 		}
+
 		if (fCurrentIndex == startIndex) {
 			// we've gone completely through the list without finding
 			// a good app. Oh well.
@@ -897,6 +900,7 @@ TSwitchManager::_FindNextValidApp(bool forward)
 
 	return false;
 }
+
 
 void
 TSwitchManager::SwitchToApp(int32 previousIndex, int32 newIndex, bool forward)
@@ -930,6 +934,7 @@ TSwitchManager::ActivateApp(bool forceShow, bool allowWorkspaceSwitch)
 
 	int32 currentWorkspace = current_workspace();
 	TTeamGroup* teamGroup = (TTeamGroup*)fGroupList.ItemAt(fCurrentIndex);
+
 	// Let's handle the easy case first: There's only 1 team in the group
 	if (teamGroup->TeamList()->CountItems() == 1) {
 		bool result;
@@ -988,7 +993,8 @@ TSwitchManager::ActivateApp(bool forceShow, bool allowWorkspaceSwitch)
 	if (tokens == NULL) {
 		ASSERT(windowInfo);
 		free(windowInfo);
-		return true;	// weird error, so don't try to recover
+		return true;
+			// weird error, so don't try to recover
 	}
 
 	BList windowsToActivate;
@@ -1040,6 +1046,7 @@ TSwitchManager::QuitApp()
 
 	TTeamGroup* teamGroup;
 	int32 count = 0;
+
 	for (int32 i = fCurrentIndex + 1; i < fGroupList.CountItems(); i++) {
 		teamGroup = (TTeamGroup*)fGroupList.ItemAt(i);
 
@@ -1296,7 +1303,7 @@ TBox::MouseDown(BPoint where)
 	if (fLeftScroller) {
 		BRect lhit(0, frame.top, frame.left, frame.bottom);
 		if (lhit.Contains(where)) {
-			// Want to scroll by NUMSLOTS-1 slots
+			// Want to scroll by NUMSLOTS - 1 slots
 			int32 previousIndex = fManager->CurrentIndex();
 			int32 previousSlot = fManager->CurrentSlot();
 			int32 newSlot = previousSlot - (kNumSlots - 1);
@@ -1311,16 +1318,16 @@ TBox::MouseDown(BPoint where)
 	if (fRightScroller) {
 		BRect rhit(frame.right, frame.top, bounds.right, frame.bottom);
 		if (rhit.Contains(where)) {
-			// Want to scroll by NUMSLOTS-1 slots
+			// Want to scroll by NUMSLOTS - 1 slots
 			int32 previousIndex = fManager->CurrentIndex();
 			int32 previousSlot = fManager->CurrentSlot();
-			int32 newSlot = previousSlot + (kNumSlots-1);
+			int32 newSlot = previousSlot + (kNumSlots - 1);
 			int32 newIndex = fIconView->IndexAt(newSlot);
 
 			if (newIndex < 0) {
 				// don't have a page full to scroll
 				int32 valid = fManager->CountVisibleGroups();
-				newIndex = fIconView->IndexAt(valid-1);
+				newIndex = fIconView->IndexAt(valid - 1);
 			}
 			fManager->SwitchToApp(previousIndex, newIndex, true);
 		}
@@ -1329,9 +1336,9 @@ TBox::MouseDown(BPoint where)
 	frame = fWindow->WindowView()->Frame();
 	if (fUpScroller) {
 		BRect hit1(frame.left - 10, frame.top, frame.left,
-			(frame.top+frame.bottom)/2);
+			(frame.top + frame.bottom) / 2);
 		BRect hit2(frame.right, frame.top, frame.right + 10,
-			(frame.top+frame.bottom)/2);
+			(frame.top + frame.bottom) / 2);
 		if (hit1.Contains(where) || hit2.Contains(where)) {
 			// Want to scroll up 1 window
 			fManager->CycleWindow(false, false);
@@ -1339,10 +1346,10 @@ TBox::MouseDown(BPoint where)
 	}
 
 	if (fDownScroller) {
-		BRect hit1(frame.left - 10, (frame.top+frame.bottom) / 2, frame.left,
-			frame.bottom);
-		BRect hit2(frame.right, (frame.top+frame.bottom) / 2, frame.right + 10,
-			frame.bottom);
+		BRect hit1(frame.left - 10, (frame.top + frame.bottom) / 2,
+			frame.left, frame.bottom);
+		BRect hit2(frame.right, (frame.top + frame.bottom) / 2,
+			frame.right + 10, frame.bottom);
 		if (hit1.Contains(where) || hit2.Contains(where)) {
 			// Want to scroll down 1 window
 			fManager->CycleWindow(true, false);
@@ -1374,40 +1381,42 @@ TBox::Draw(BRect update)
 
 	// Fill the area with dark gray
 	SetHighColor(darkGray);
-	box.InsetBy(1,1);
+	box.InsetBy(1, 1);
 	FillRect(box);
 
-	box.InsetBy(-1,-1);
+	box.InsetBy(-1, -1);
 
 	BeginLineArray(50);
 
 	// The main frame around the icon view
-	AddLine(box.LeftTop(), BPoint(center-kWedge, box.top), veryDarkGray);
-	AddLine(BPoint(center+kWedge, box.top), box.RightTop(), veryDarkGray);
+	AddLine(box.LeftTop(), BPoint(center - kWedge, box.top), veryDarkGray);
+	AddLine(BPoint(center + kWedge, box.top), box.RightTop(), veryDarkGray);
 
-	AddLine(box.LeftBottom(), BPoint(center-kWedge, box.bottom), veryDarkGray);
-	AddLine(BPoint(center+kWedge, box.bottom), box.RightBottom(), veryDarkGray);
+	AddLine(box.LeftBottom(), BPoint(center - kWedge, box.bottom),
+		veryDarkGray);
+	AddLine(BPoint(center + kWedge, box.bottom), box.RightBottom(),
+		veryDarkGray);
 	AddLine(box.LeftBottom() + BPoint(1, 1),
-		BPoint(center-kWedge, box.bottom + 1), white);
-	AddLine(BPoint(center+kWedge, box.bottom) + BPoint(0, 1),
+		BPoint(center - kWedge, box.bottom + 1), white);
+	AddLine(BPoint(center + kWedge, box.bottom) + BPoint(0, 1),
 		box.RightBottom() + BPoint(1, 1), white);
 
 	AddLine(box.LeftTop(), box.LeftBottom(), veryDarkGray);
 	AddLine(box.RightTop(), box.RightBottom(), veryDarkGray);
-	AddLine(box.RightTop() + BPoint(1, 1),
-		box.RightBottom() + BPoint(1, 1), white);
+	AddLine(box.RightTop() + BPoint(1, 1), box.RightBottom() + BPoint(1, 1),
+		white);
 
 	// downward pointing area at top of frame
 	BPoint point(center - kWedge, box.top);
 	AddLine(point, point + BPoint(kWedge, kWedge), veryDarkGray);
-	AddLine(point + BPoint(kWedge, kWedge),
-		BPoint(center+kWedge, point.y), veryDarkGray);
+	AddLine(point + BPoint(kWedge, kWedge), BPoint(center + kWedge, point.y),
+		veryDarkGray);
 
-	AddLine(point + BPoint(1, 0),
-		point + BPoint(1, 0) + BPoint(kWedge - 1, kWedge - 1), white);
+	AddLine(point + BPoint(1, 0), point + BPoint(1, 0)
+		+ BPoint(kWedge - 1, kWedge - 1), white);
 
 	AddLine(point + BPoint(2, -1) + BPoint(kWedge - 1, kWedge - 1),
-		BPoint(center+kWedge-1, point.y), darkGray);
+		BPoint(center + kWedge - 1, point.y), darkGray);
 
 	BPoint topPoint = point;
 
@@ -1416,7 +1425,7 @@ TBox::Draw(BRect update)
 	point.x = center - kWedge;
 	AddLine(point, point + BPoint(kWedge, -kWedge), veryDarkGray);
 	AddLine(point + BPoint(kWedge, -kWedge),
-		BPoint(center+kWedge, point.y), veryDarkGray);
+		BPoint(center + kWedge, point.y), veryDarkGray);
 
 	AddLine(point + BPoint(1, 0),
 		point + BPoint(1, 0) + BPoint(kWedge - 1, -(kWedge - 1)), white);
@@ -1436,7 +1445,7 @@ TBox::Draw(BRect update)
 
 	// fill the upward pointing arrow area
 	SetHighColor(standardGray);
-	FillTriangle(bottomPoint + BPoint(2,0),
+	FillTriangle(bottomPoint + BPoint(2, 0),
 		bottomPoint + BPoint(2, 0) + BPoint(kWedge - 2, -(kWedge - 2)),
 		BPoint(center + kWedge - 2, bottomPoint.y));
 
@@ -1467,7 +1476,7 @@ TBox::DrawIconScrollers(bool force)
 	}
 
 	int32 maxIndex = fManager->GroupList()->CountItems() - 1;
-			// last_frame is in fIconView coordinate space
+	// last_frame is in fIconView coordinate space
 	BRect lastFrame = fIconView->FrameOf(maxIndex);
 
 	if (lastFrame.right > rect.right) {
@@ -1893,7 +1902,7 @@ TIconView::CacheIcons(TTeamGroup* teamGroup)
 void
 TIconView::AnimateIcon(BBitmap* startIcon, BBitmap* endIcon)
 {
-	BRect centerRect(kCenterSlot*kSlotSize, 0,
+	BRect centerRect(kCenterSlot * kSlotSize, 0,
 		(kCenterSlot + 1) * kSlotSize - 1, kSlotSize - 1);
 	BRect startIconBounds = startIcon->Bounds();
 	BRect bounds = Bounds();
@@ -1917,7 +1926,7 @@ TIconView::AnimateIcon(BBitmap* startIcon, BBitmap* endIcon)
 	fOffBitmap->Lock();
 
 	for (int i = 0; i < 2; i++) {
-		startIconBounds.InsetBy(amount,amount);
+		startIconBounds.InsetBy(amount, amount);
 		snooze(20000);
 		fOffView->SetDrawingMode(B_OP_COPY);
 		fOffView->FillRect(fOffView->Bounds());
@@ -1927,7 +1936,7 @@ TIconView::AnimateIcon(BBitmap* startIcon, BBitmap* endIcon)
 		DrawBitmap(fOffBitmap, destRect);
 	}
 	for (int i = 0; i < 2; i++) {
-		startIconBounds.InsetBy(amount,amount);
+		startIconBounds.InsetBy(amount, amount);
 		snooze(20000);
 		fOffView->SetDrawingMode(B_OP_COPY);
 		fOffView->FillRect(fOffView->Bounds());
@@ -2054,6 +2063,7 @@ int32
 TIconView::SlotOf(int32 index) const
 {
 	BRect rect = FrameOf(index);
+
 	return (int32)(rect.left / kSlotSize) - kCenterSlot;
 }
 
@@ -2107,7 +2117,7 @@ TIconView::DrawTeams(BRect update)
 
 			SetDrawingMode(B_OP_COPY);
 		}
-		rect.OffsetBy(kSlotSize,0);
+		rect.OffsetBy(kSlotSize, 0);
 	}
 }
 
@@ -2201,7 +2211,6 @@ TWindowView::ScrollTo(BPoint where)
 }
 
 
-
 BRect
 TWindowView::FrameOf(int32 index) const
 {
@@ -2275,6 +2284,7 @@ TWindowView::Draw(BRect update)
 	int32 groupIndex = fManager->CurrentIndex();
 	TTeamGroup* teamGroup
 		= (TTeamGroup*)fManager->GroupList()->ItemAt(groupIndex);
+
 	if (teamGroup == NULL)
 		return;
 

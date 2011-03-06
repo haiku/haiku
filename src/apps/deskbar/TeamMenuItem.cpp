@@ -26,9 +26,10 @@ Except as contained in this notice, the name of Be Incorporated shall not be
 used in advertising or otherwise to promote the sale, use or other dealings in
 this Software without prior written authorization from Be Incorporated.
 
-Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered trademarks
-of Be Incorporated in the United States and other countries. Other brand product
-names are registered trademarks or trademarks of their respective holders.
+Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered
+trademarks of Be Incorporated in the United States and other countries. Other
+brand product names are registered trademarks or trademarks of their respective
+holders.
 All rights reserved.
 */
 
@@ -71,10 +72,11 @@ TTeamMenuItem::TTeamMenuItem(BList* team, BBitmap* icon, char* name, char* sig,
 }
 
 
-TTeamMenuItem::TTeamMenuItem(float width,float height,bool vertical)
+TTeamMenuItem::TTeamMenuItem(float width, float height, bool vertical)
 	:	BMenuItem("", NULL)
 {
-	InitData(NULL, NULL, strdup(""), strdup(""), width, height, false, vertical);
+	InitData(NULL, NULL, strdup(""), strdup(""), width, height, false,
+		vertical);
 }
 
 
@@ -136,10 +138,11 @@ TTeamMenuItem::Invoke(BMessage* message)
 		barview->DragStop();
 
 	// bring to front or minimize shortcuts
-	uint32 mods = modifiers();	
-	if (mods & B_CONTROL_KEY) 
+	uint32 mods = modifiers();
+	if (mods & B_CONTROL_KEY) {
 		TShowHideMenuItem::TeamShowHideCommon((mods & B_SHIFT_KEY)
 				? B_MINIMIZE_WINDOW : B_BRING_TO_FRONT, Teams());
+	}
 
 	return BMenuItem::Invoke(message);
 }
@@ -213,7 +216,7 @@ TTeamMenuItem::GetContentSize(float* width, float* height)
 		*width = kHPad + iconBounds.Width() + kLabelOffset + fLabelWidth + kHPad
 			+ 20;
 
-	if (fOverrideHeight != -1.0f) 
+	if (fOverrideHeight != -1.0f)
 		*height = fOverrideHeight;
 	else {
 		*height = iconBounds.Height();
@@ -233,8 +236,8 @@ TTeamMenuItem::Draw()
 	BMenu* menu = Menu();
 	menu->PushState();
 	rgb_color menuColor = menu->LowColor();
-
 	TBarView* barview = (static_cast<TBarApp*>(be_app))->BarView();
+
 	bool canHandle = !barview->Dragging()
 		|| barview->AppCanHandleTypes(Signature());
 
@@ -314,13 +317,14 @@ TTeamMenuItem::Draw()
 
 		// these continue the dark grey border on the left or top edge
 		menu->SetHighColor(tint_color(menuColor, B_DARKEN_4_TINT));
-		if (fVertical)
+		if (fVertical) {
 			// dark line at top
 			menu->StrokeLine(frame.LeftTop(), frame.RightTop());
-		else
+		} else {
 			// dark line on the left
 			menu->StrokeLine(frame.LeftTop(), frame.LeftBottom());
-	} else 
+		}
+	} else
 		menu->SetLowColor(menuColor);
 
 	menu->MovePenTo(ContentLocation());
@@ -337,15 +341,15 @@ TTeamMenuItem::DrawContent()
 		if (fIcon->ColorSpace() == B_RGBA32) {
 			menu->SetDrawingMode(B_OP_ALPHA);
 			menu->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
-		} else {
+		} else
 			menu->SetDrawingMode(B_OP_OVER);
-		}
-		BRect frame(Frame());
 
+		BRect frame(Frame());
 		BRect iconBounds(fIcon->Bounds());
 		BRect dstRect(iconBounds);
 		float extra = fVertical ? 0.0f : 1.0f;
 		BPoint contLoc = ContentLocation();
+
 		dstRect.OffsetTo(BPoint(contLoc.x + kHPad, contLoc.y + 
 			((frame.Height() - iconBounds.Height()) / 2) + extra));
 		menu->DrawBitmapAsync(fIcon, dstRect);
@@ -357,17 +361,17 @@ TTeamMenuItem::DrawContent()
 		menu->MovePenTo(drawLoc);
 	}
 
-	//	set the pen to black so that either method will draw in the same color
-	//	low color is set in inherited::DrawContent, override makes sure its
-	//  what we want
+	// set the pen to black so that either method will draw in the same color
+	// low color is set in inherited::DrawContent, override makes sure its
+	// what we want
 	if (fDrawLabel) {
 		menu->SetDrawingMode(B_OP_OVER);
 		menu->SetHighColor(0, 0, 0);
 
-		//	override the drawing of the content when the item is disabled
-		//	the wrong lowcolor is used when the item is disabled since the
-		//	text color does not change
-		DrawContentLabel();	
+		// override the drawing of the content when the item is disabled
+		// the wrong lowcolor is used when the item is disabled since the
+		// text color does not change
+		DrawContentLabel();
 	}
 
 	// Draw the expandable icon.
@@ -387,42 +391,42 @@ TTeamMenuItem::DrawContent()
 		} else {
 			rgb_color outlineColor = {80, 80, 80, 255};
 			rgb_color middleColor = {200, 200, 200, 255};
-	
+
 			menu->SetDrawingMode(B_OP_OVER);
-	
+
 			if (!fExpanded) {
 				menu->BeginLineArray(6);
-	
-				menu->AddLine(BPoint(rect.left + 3, rect.top + 1), 
+
+				menu->AddLine(BPoint(rect.left + 3, rect.top + 1),
 					BPoint(rect.left + 3, rect.bottom - 1), outlineColor);
-				menu->AddLine(BPoint(rect.left + 3, rect.top + 1), 
+				menu->AddLine(BPoint(rect.left + 3, rect.top + 1),
 					BPoint(rect.left + 7, rect.top + 5), outlineColor);
-				menu->AddLine(BPoint(rect.left + 7, rect.top + 5), 
+				menu->AddLine(BPoint(rect.left + 7, rect.top + 5),
 					BPoint(rect.left + 3, rect.bottom - 1), outlineColor);
-	
-				menu->AddLine(BPoint(rect.left + 4, rect.top + 3), 
+
+				menu->AddLine(BPoint(rect.left + 4, rect.top + 3),
 					BPoint(rect.left + 4, rect.bottom - 3), middleColor);
-				menu->AddLine(BPoint(rect.left + 5, rect.top + 4), 
+				menu->AddLine(BPoint(rect.left + 5, rect.top + 4),
 					BPoint(rect.left + 5, rect.bottom - 4), middleColor);
-				menu->AddLine(BPoint(rect.left + 5, rect.top + 5), 
+				menu->AddLine(BPoint(rect.left + 5, rect.top + 5),
 					BPoint(rect.left + 6, rect.top + 5), middleColor);
 				menu->EndLineArray();
 			} else {
 				// expanded state
-	
+
 				menu->BeginLineArray(6);
-				menu->AddLine(BPoint(rect.left + 1, rect.top + 3), 
+				menu->AddLine(BPoint(rect.left + 1, rect.top + 3),
 					BPoint(rect.right - 3, rect.top + 3), outlineColor);
-				menu->AddLine(BPoint(rect.left + 1, rect.top + 3), 
+				menu->AddLine(BPoint(rect.left + 1, rect.top + 3),
 					BPoint(rect.left + 5, rect.top + 7), outlineColor);
-				menu->AddLine(BPoint(rect.left + 5, rect.top + 7), 
+				menu->AddLine(BPoint(rect.left + 5, rect.top + 7),
 					BPoint(rect.right - 3, rect.top + 3), outlineColor);
-	
-				menu->AddLine(BPoint(rect.left + 3, rect.top + 4), 
+
+				menu->AddLine(BPoint(rect.left + 3, rect.top + 4),
 					BPoint(rect.right - 5, rect.top + 4), middleColor);
-				menu->AddLine(BPoint(rect.left + 4, rect.top + 5), 
+				menu->AddLine(BPoint(rect.left + 4, rect.top + 5),
 					BPoint(rect.right - 6, rect.top + 5), middleColor);
-				menu->AddLine(BPoint(rect.left + 5, rect.top + 5), 
+				menu->AddLine(BPoint(rect.left + 5, rect.top + 5),
 					BPoint(rect.left + 5, rect.top + 6), middleColor);
 				menu->EndLineArray();
 			}
@@ -437,23 +441,24 @@ TTeamMenuItem::DrawContentLabel()
 	BMenu* menu = Menu();
 	menu->MovePenBy(0, fLabelAscent);
 
-	float cachedWidth = menu->StringWidth(Label());	
+	float cachedWidth = menu->StringWidth(Label());
 	if (Submenu() && fVertical)
 		cachedWidth += 18;
 
 	const char* label = Label();
 	char* truncLabel = NULL;
 	float max = 0;
+
 	if (static_cast<TBarApp*>(be_app)->Settings()->superExpando && fVertical)
 		max = menu->MaxContentWidth() - kSwitchWidth;
 	else
 		max = menu->MaxContentWidth();
 
 	if (max > 0) {
- 		BPoint penloc = menu->PenLocation();
+		BPoint penloc = menu->PenLocation();
 		BRect frame = Frame();
 		float offset = penloc.x - frame.left;
-	 	if (cachedWidth + offset > max) {
+		if (cachedWidth + offset > max) {
 			truncLabel = (char*)malloc(strlen(label) + 4);
 			if (!truncLabel)
 				return;
@@ -491,7 +496,7 @@ void
 TTeamMenuItem::ToggleExpandState(bool resizeWindow)
 {
 	fExpanded = !fExpanded;
-	
+
 	if (fExpanded) {
 		// Populate Menu() with the stuff from SubMenu().
 		TWindowMenu* sub = (static_cast<TWindowMenu*>(Submenu()));
@@ -503,7 +508,7 @@ TTeamMenuItem::ToggleExpandState(bool resizeWindow)
 			if (locked)
 				sub->UnlockLooper();
 
-			if (sub->CountItems() > 1){
+			if (sub->CountItems() > 1) {
 				TExpandoMenuBar* parent = static_cast<TExpandoMenuBar*>(Menu());
 				int myindex = parent->IndexOf(this) + 1;
 
@@ -551,8 +556,10 @@ TTeamMenuItem::ToggleExpandState(bool resizeWindow)
 TWindowMenuItem*
 TTeamMenuItem::ExpandedWindowItem(int32 id)
 {
-	if (!fExpanded)	// Paranoia
+	if (!fExpanded) {
+		// Paranoia
 		return NULL;
+	}
 
 	TExpandoMenuBar* parent = static_cast<TExpandoMenuBar*>(Menu());
 	int childIndex = parent->IndexOf(this) + 1;

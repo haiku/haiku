@@ -26,9 +26,10 @@ Except as contained in this notice, the name of Be Incorporated shall not be
 used in advertising or otherwise to promote the sale, use or other dealings in
 this Software without prior written authorization from Be Incorporated.
 
-Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered trademarks
-of Be Incorporated in the United States and other countries. Other brand product
-names are registered trademarks or trademarks of their respective holders.
+Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered
+trademarks of Be Incorporated in the United States and other countries. Other
+brand product names are registered trademarks or trademarks of their respective
+holders.
 All rights reserved.
 */
 
@@ -88,16 +89,14 @@ void
 TWindowMenu::AttachedToWindow()
 {
 	SetFont(be_plain_font);
-
 	RemoveItems(0, CountItems(), true);
-
 	int32 miniCount = 0;
 
 	bool dragging = false;
 	TBarView* barview =(static_cast<TBarApp*>(be_app))->BarView();
 	if (barview && barview->LockLooper()) {
-		//	'dragging' mode set in BarView::CacheDragData
-		//		invoke in MouseEnter in ExpandoMenuBar
+		// 'dragging' mode set in BarView::CacheDragData
+		// invoke in MouseEnter in ExpandoMenuBar
 		dragging = barview->Dragging();
 		if (dragging) {
 			// We don't want to show the menu when dragging, but it's not
@@ -105,7 +104,7 @@ TWindowMenu::AttachedToWindow()
 			// Don't call BMenu::Hide(), it causes the menu to pop up every now
 			// and then.
 			Window()->Hide();
-			//	if in expando (horizontal or vertical)
+			// if in expando (horizontal or vertical)
 			if (barview->Expando()) {
 				SetTrackingHook(barview->MenuTrackingHook,
 					barview->GetTrackingHookData());
@@ -177,8 +176,8 @@ TWindowMenu::AttachedToWindow()
 
 	int32 itemCount = CountItems() + parentMenuItems;
 	if (itemCount < 1) {
-		TWindowMenuItem* noWindowsItem =
- 			new TWindowMenuItem(B_TRANSLATE("No windows"), -1, false, false);
+		TWindowMenuItem* noWindowsItem
+			= new TWindowMenuItem(B_TRANSLATE("No windows"), -1, false, false);
 
 		noWindowsItem->SetEnabled(false);
 
@@ -186,23 +185,23 @@ TWindowMenu::AttachedToWindow()
 
 		// if an application has no windows, this feature makes it easy to quit
 		// it. (but we only add this option if the application is not Tracker.)
- 		if (fApplicationSignature.ICompare(kTrackerSignature) != 0) {
+		if (fApplicationSignature.ICompare(kTrackerSignature) != 0) {
 			AddSeparatorItem();
 			AddItem(new TShowHideMenuItem(B_TRANSLATE("Quit application"),
 				fTeam, B_QUIT_REQUESTED));
- 		}
+		}
 	} else {
-		//	if we are in drag mode, then don't add the window controls
-		//	to the menu
+		// if we are in drag mode, then don't add the window controls
+		// to the menu
 		if (!dragging) {
-			TShowHideMenuItem* hide =
-				new TShowHideMenuItem(B_TRANSLATE("Hide all"), fTeam,
+			TShowHideMenuItem* hide
+				= new TShowHideMenuItem(B_TRANSLATE("Hide all"), fTeam,
 					B_MINIMIZE_WINDOW);
-			TShowHideMenuItem* show =
-				new TShowHideMenuItem(B_TRANSLATE("Show all"), fTeam,
+			TShowHideMenuItem* show
+				= new TShowHideMenuItem(B_TRANSLATE("Show all"), fTeam,
 					B_BRING_TO_FRONT);
-			TShowHideMenuItem* close =
-				new TShowHideMenuItem(B_TRANSLATE("Close all"), fTeam,
+			TShowHideMenuItem* close
+				= new TShowHideMenuItem(B_TRANSLATE("Close all"), fTeam,
 					B_QUIT_REQUESTED);
 
 			if (miniCount == itemCount)
@@ -212,6 +211,7 @@ TWindowMenu::AttachedToWindow()
 
 			if (!parentMenuItems)
 				AddSeparatorItem();
+
 			AddItem(hide);
 			AddItem(show);
 			AddItem(close);
@@ -225,12 +225,12 @@ TWindowMenu::AttachedToWindow()
 void
 TWindowMenu::DetachedFromWindow()
 {
-	// in expando mode the teammenu will not call DragStop,
-	// thus, it needs to be called from here
+	// in expando mode the teammenu will not call DragStop, thus, it needs to
+	// be called from here
 	TBarView* barview = (dynamic_cast<TBarApp*>(be_app))->BarView();
 	if (barview && barview->Expando() && barview->Dragging()
 		&& barview->LockLooper()) {
-		// We changed the show level in AttachedToWindow().  Undo it.
+		// We changed the show level in AttachedToWindow(). Undo it.
 		Window()->Show();
 		barview->DragStop();
 		barview->UnlockLooper();

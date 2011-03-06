@@ -26,9 +26,10 @@ Except as contained in this notice, the name of Be Incorporated shall not be
 used in advertising or otherwise to promote the sale, use or other dealings in
 this Software without prior written authorization from Be Incorporated.
 
-Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered trademarks
-of Be Incorporated in the United States and other countries. Other brand product
-names are registered trademarks or trademarks of their respective holders.
+Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered
+trademarks of Be Incorporated in the United States and other countries. Other
+brand product names are registered trademarks or trademarks of their respective
+holders.
 All rights reserved.
 */
 
@@ -48,10 +49,10 @@ All rights reserved.
 #include "WindowMenu.h"
 
 
-const float	kHPad = 10.0f;
-const float	kVPad = 2.0f;
-const float	kLabelOffset = 8.0f;
-const BRect	kIconRect(1.0f, 1.0f, 13.0f, 14.0f);
+const float kHPad = 10.0f;
+const float kVPad = 2.0f;
+const float kLabelOffset = 8.0f;
+const BRect kIconRect(1.0f, 1.0f, 13.0f, 14.0f);
 
 
 TWindowMenuItem::TWindowMenuItem(const char* title, int32 id, bool mini,
@@ -75,11 +76,11 @@ void
 TWindowMenuItem::Initialize(const char* title)
 {
 	if (fMini) {
- 		fBitmap = fCurrentWorkSpace
+		fBitmap = fCurrentWorkSpace
 			? AppResSet()->FindBitmap(B_MESSAGE_TYPE, R_WindowHiddenIcon)
 			: AppResSet()->FindBitmap(B_MESSAGE_TYPE, R_WindowHiddenSwitchIcon);
 	} else {
- 		fBitmap = fCurrentWorkSpace
+		fBitmap = fCurrentWorkSpace
 			? AppResSet()->FindBitmap(B_MESSAGE_TYPE, R_WindowShownIcon)
 			: AppResSet()->FindBitmap(B_MESSAGE_TYPE, R_WindowShownSwitchIcon);
 	}
@@ -204,7 +205,7 @@ TWindowMenuItem::Draw()
 
 	menu->PushState();
 
-	//	if not selected or being tracked on, fill with gray
+	// if not selected or being tracked on, fill with gray
 	TBarView* barview = (static_cast<TBarApp*>(be_app))->BarView();
 	if ((!IsSelected() && !menu->IsRedrawAfterSticky())
 		|| barview->Dragging() || !IsEnabled()) {
@@ -241,8 +242,8 @@ TWindowMenuItem::DrawContent()
 
 	BRect frame(Frame());
 	BPoint contLoc = ContentLocation() + BPoint(kHPad, kVPad);
-//	if (fExpanded)
-//		contLoc.x += kHPad;
+	//if (fExpanded)
+	//	contLoc.x += kHPad;
 
 	if (fID >= 0) {
 		menu->SetDrawingMode(B_OP_OVER);
