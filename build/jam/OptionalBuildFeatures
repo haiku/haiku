@@ -129,48 +129,6 @@ HAIKU_ICU_HEADERS
 	= [ FDirName $(HAIKU_ICU_DEVEL_DIR) develop headers 3rdparty ] ;
 
 
-# EtPan
-
-# Automatically install the EtPan mail lib, when the optional EtPan optional
-# package is enabled.
-if [ IsOptionalHaikuImagePackageAdded EtPan ] {
-	HAIKU_BUILD_FEATURE_ETPAN = 1 ;
-}
-
-HAIKU_ETPAN_GCC_2_PACKAGE = etpan-1.0-x86-gcc2-2010-10-20.zip ;
-HAIKU_ETPAN_GCC_4_PACKAGE = etpan-1.0-x86-gcc4-2010-10-20.zip ;
-
-if $(HAIKU_BUILD_FEATURE_ETPAN) {
-	if $(TARGET_ARCH) != x86 {
-		Echo "EtPan not available for $(TARGET_ARCH)" ;
-	} else {
-		local etpan_package ;
-		if $(HAIKU_GCC_VERSION[1]) = 2 {
-			etpan_package = $(HAIKU_ETPAN_GCC_2_PACKAGE) ;
-		} else {
-			etpan_package = $(HAIKU_ETPAN_GCC_4_PACKAGE) ;
-		}
-
-		local zipFile = [ DownloadFile $(etpan_package)
-			: $(baseURL)/$(etpan_package) ] ;
-
-		# zip file and output directory
-		HAIKU_ETPAN_ZIP_FILE = $(zipFile) ;
-		HAIKU_ETPAN_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
-			$(etpan_package:B) ] ;
-
-		# extract libraries
-		HAIKU_ETPAN_LIBS = [ ExtractArchive $(HAIKU_ETPAN_DIR)
-			:
-			common/lib/libetpan.a
-			: $(zipFile)
-		] ;
-		HAIKU_ETPAN_HEADERS
-				= [ FDirName $(HAIKU_ETPAN_DIR) common include ] ;
-	}
-}
-
-
 # CLucene
 
 # Automatically install the CLucene feature, when the optional CLucene optional
