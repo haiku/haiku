@@ -646,7 +646,6 @@ BeceemDevice::SetupDevice(bool deviceReplugged)
 	unsigned int	value			= 0;
 	unsigned long   dwReadValue     = 0;
 
-	pwmxdevice->gpioInfo[32] = {0};
 	pwmxdevice->driverState = STATE_INIT;
 
 	// ID the Beceem chipset
