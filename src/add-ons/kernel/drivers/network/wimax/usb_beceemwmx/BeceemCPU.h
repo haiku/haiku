@@ -16,9 +16,7 @@
 #define CLOCK_RESET_CNTRL_REG_1 0x0F00000C
 
 
-class BeceemCPU
-{
-
+class BeceemCPU {
 public:
 								BeceemCPU();
 			status_t			CPUInit(WIMAX_DEVICE* swmxdevice);
