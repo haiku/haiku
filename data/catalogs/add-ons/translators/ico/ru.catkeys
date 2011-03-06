@@ -7,8 +7,8 @@ Icon	ICOTranslator		Значок
 Valid icon sizes are 16, 32, or 48	ConfigView		Верные размеры значков 16, 32 или 48
 Version %d.%d.%d, %s	ConfigView		Версия %d.%d.%d, %s
 Windows %s %ld bit image	ICOTranslator		Windows %s %ld битное изображение
-Windows icon images	ConfigView		Windows значки
-Windows icon images	ICOTranslator		Windows значки
+Windows icon images	ConfigView		Транслятор ICO значков
+Windows icon images	ICOTranslator		ICO значки
 Windows icon translator	ICOTranslator		Транслятор значков Windows
 Write 32 bit images on true color input	ConfigView		Записывать 24-битные значки как 32-битные
-pixels in either direction.	ConfigView		пикселей в оба направления
+pixels in either direction.	ConfigView		пикселей в оба направления.

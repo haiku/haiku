@@ -1,5 +1,6 @@
-1	belarusian	x-vnd.Haiku-Appearance	2143940234
+1	belarusian	x-vnd.Haiku-Appearance	3612090060
 Antialiasing	APRWindow		Згладжванне
+Antialiasing menu	AntialiasingSettingsView		Меню згладжвання
 Antialiasing type:	AntialiasingSettingsView		Тып згладжвання
 Appearance	APRWindow		Афармленне
 Colors	APRWindow		Колеры
@@ -11,6 +12,7 @@ Defaults	APRWindow		Прадвызначаныя
 Document background	Colors tab		Фон дакумента
 Document text	Colors tab		Тэкст дакументу
 Failure	Colors tab		Непаспяхова
+Glyph hinting:	AntialiasingSettingsView		Хінтынг сімвалаў
 Grayscale	AntialiasingSettingsView		Адценні шэрага
 Hinting menu	AntialiasingSettingsView		Меню хінтынгу
 Inactive window tab	Colors tab		Неактыўная ўкладка

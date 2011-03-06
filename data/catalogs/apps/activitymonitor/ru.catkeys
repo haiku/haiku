@@ -41,7 +41,7 @@ Show legend	ActivityView		Показать легенду
 Swap	DataSource		Файл подкачки
 Swap space	DataSource		Размер файла подкачки
 TX	DataSource	Shorter version for Sending	Передача
-Teams	DataSource		Команды
+Teams	DataSource		Процессы
 Text clipboard size	DataSource		Размер текстового буфера обмена
 Threads	DataSource		Потоки
 Update time interval:	SettingsWindow		Временной интервал обновления:

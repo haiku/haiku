@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Terminal	3038436492
+1	belarusian	x-vnd.Haiku-Terminal	1413115910
 -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h, --help паказаць гэтую даведку\n -t, --title прызначыць імя вакна\n -f, --fullscreen запусціць у поўным экране\n
 Abort	Terminal Shell		Спыніць
 About Terminal…	Terminal TermWindow		Пра Тэрмінал...
@@ -25,12 +25,10 @@ Copy here	Terminal TermView		Капіяваць сюды
 Create link here	Terminal TermView		Стварыць спасылку сюды
 Custom	Terminal colors schema		Спецыяльнае
 Decrease	Terminal TermWindow		Паменшыць
-Didn't find any available pseudo ttys.	Terminal Shell		Не знойдзена даступных віртуальных тэрміналаў (tty).
 Don't save	Terminal PrefWindow		Не захоўваць
 Edit	Terminal TermWindow		Правіць
 Edit tab title…	Terminal TermWindow		Правіць імя ўкладкі...
 Error!	Terminal getString		Памылка!
-Failed to init pseudo tty.	Terminal Shell		Не ўдалося запусціць віртуальны тэрминал (tty).
 Find	Terminal FindWindow		Шукаць
 Find failed	Terminal TermWindow		Не ўдалося знайсці
 Find next	Terminal TermWindow		Знайсці далейшае
@@ -56,7 +54,6 @@ OK	Terminal TermView		ОК
 OK	Terminal TermWindow		ОК
 Page setup…	Terminal TermWindow		Наладкі старонкі...
 Paste	Terminal TermWindow		Уставіць
-PrefHandler::getRGB(%s) - key not found\n	Terminal getRGB		PrefHandler::getRGB(%s) - ключ не знойдзены\n
 Print	Terminal TermWindow		Друк
 Print cancelled.	Terminal TermWindow		Друк адменены
 Quit	Terminal TermWindow		Выйсці
@@ -66,7 +63,6 @@ Save as default	Terminal TermWindow		Захаваць як прадвызнач�
 Save changes to this settings panel?	Terminal PrefWindow		Захаваць змены ў гэтых наладках?
 Save to file…	Terminal PrefWindow		Захаваць у файл...
 Search forward	Terminal FindWindow		Шукаць далей
-Secondary mouse button drop menu	Terminal TermView		Выпадаючае меню другаснай кнопкі мышы
 Select all	Terminal TermWindow		Выбраць усё
 Selected background	Terminal AppearancePrefView		Выбраны фон
 Selected text	Terminal AppearancePrefView		Выбраны тэкст
@@ -106,9 +102,4 @@ Window title:	Terminal TermWindow		Імя вакна:
 Window title…	Terminal TermWindow		Загаловак вакна...
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tРабочы каталог актыўнага працэсу\n\t\t\tў цякучай укладцы.Дадаткова можна ўказаць макісмальную колькасць кампанентаў пуці.\n\t\t\t Напрыклад, '%2d' - не больша за два кампаненты.\n\t%i\t-\tІндэкс вакна.\n\t%p\t-\tІмя актыўнага працэсу ў цякучай укладцы.\n\t%t\t-\tІмя цякучай укладкі.\n\t%%\t-\tСімвал '%'.
 \t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tРабочы каталог актыўнага працэсу.\n\t\t\tДадаткова можна ўказаць макісмальную колькасць кампанентаў пуці.\n\t\t\t Напрыклад, '%2d' - не больша за два кампаненты.\n\t%i\t-\tІндэкс укладкі.\n\t%p\t-\tІмя актыўнага працэсу.\n\t%%\t-\tСімвал '%'.
-can't open tty (%s).	Terminal Shell		нельга адкрыць tty (%s)
-could not set session leader.	Terminal Shell		немагчыма прызначыць лідэра сесіі.
-failed set terminal interface (TERMIOS).	Terminal Shell		не ўдалося прызначэнне інтэрфейсу тэрмінала (TERMIOS).
-mismatch handshake.	Terminal Shell		несупадзенне пры ініцыялізацыі.
-sigaction() failed: %s\n	Terminal TermApp		sigaction() не ўдалося: %s\n
 size	Terminal TermView		памер

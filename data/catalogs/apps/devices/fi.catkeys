@@ -3,7 +3,7 @@ ACPI Information	DeviceACPI		ACPI-tiedot
 ACPI Processor Namespace '%2'	DeviceACPI		ACPI-prosessorinimiavaruus ’%2’
 ACPI System Bus	DeviceACPI		ACPI-järjestelmäväylä
 ACPI System Indicator	DeviceACPI		ACPI-järjestelmäindikaattori
-ACPI Thermal Zone	DeviceACPI		ACI-lämpöalue
+ACPI Thermal Zone	DeviceACPI		ACPI-lämpöalue
 ACPI bus	Device		ACPI-väylä
 ACPI bus	DevicesView		ACPI-väylä
 ACPI controller	Device		ACPI-ohjain

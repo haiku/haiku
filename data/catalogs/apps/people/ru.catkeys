@@ -1,4 +1,4 @@
-1	russian	x-vnd.Be-PEPL	3373241496
+1	russian	x-vnd.Be-PEPL	3077845462
 %name% picture	People		Изображение для %name%
 About	People		О программе…
 Address	People		Адрес
@@ -13,6 +13,7 @@ Copy	People		Копировать
 Could not create %s.	People		Невозможно создать %s.
 Country	People		Страна
 Cut	People		Вырезать
+Drop an image here,\nor use the contextual menu.	People		Перенесите сюда фотографию\nили используйте контекстное меню.
 E-mail	People		E-mail
 Edit	People		Изменить
 Error	People		Ошибка

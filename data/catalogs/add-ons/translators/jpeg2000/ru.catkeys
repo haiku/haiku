@@ -2,7 +2,7 @@
 About	JPEG2000Translator		Авторы
 Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Растровый формат Be (JPEG2000Translator)
 High	JPEG2000Translator		Высокое
-JPEG2000 images	JPEG2000Translator		JPEG2000 изображения
+JPEG2000 images	JPEG2000Translator		Настройки JPEG2000 транслятора
 Low	JPEG2000Translator		Низкое
 Output only codestream (.jpc)	JPEG2000Translator		Выводить только поток кодов (.jpc)
 Output quality	JPEG2000Translator		Качество вывода

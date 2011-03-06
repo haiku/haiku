@@ -30,6 +30,6 @@ Show files in Tracker	GrepWindow		Показать файлы в Tracker
 Show lines	GrepWindow		Показывать строки
 Skip folders starting with a dot	GrepWindow		Не искать в папках, начинающихся с точки
 Text files only	GrepWindow		Только текстовые файлы
-TextSearch	GrepWindow		TextSearch
+TextSearch	GrepWindow		Текстовый поиск
 The unselected files will be removed from the list.	GrepWindow		Невыделенные файлы будут удалены из списка.
 Trim to selection	GrepWindow		Искать в выделенных

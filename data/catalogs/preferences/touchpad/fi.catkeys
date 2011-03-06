@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Touchpad	3189218720
+1	finnish	x-vnd.Haiku-Touchpad	827345252
 Cancel	TouchpadPrefView		Peru
 Defaults	TouchpadPrefView		Oletukset
 Fast	TouchpadPrefView		Nopea
@@ -15,5 +15,6 @@ Slow	TouchpadPrefView		Hidas
 Tap click sensitivity	TouchpadPrefView		Napautusnapsausherkkyys
 Tap gesture	TouchpadPrefView		Napautusele
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Uusi vieritysalue on hyvin laaja ja saattaa haitata normaala hiiritoimintaa. Haluatko todella vaihtaa sen?
+Touchpad	TouchpadMain		Levyhiiri
 Two finger scrolling	TouchpadPrefView		Kaksisormivieritys
 Vertical scroll speed	TouchpadPrefView		Pystysuora vierintänopeus

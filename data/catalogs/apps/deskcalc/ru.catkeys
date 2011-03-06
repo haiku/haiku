@@ -1,7 +1,8 @@
-1	russian	x-vnd.Haiku-DeskCalc	1668905289
+1	russian	x-vnd.Haiku-DeskCalc	3960407498
 About DeskCalc…	CalcView		О программе…
 Audio Feedback	CalcView		Звуковая реакция
-DeskCalc v2.1.0\n\nwritten by Timothy Wayper,\nStephan Aßmus and Ingo Weinhold\n\n©1997, 1998 R3 Software Ltd.\n©2006-2009 Haiku, Inc.\n\nAll Rights Reserved.	CalcView		DeskCalc v2.1.0\n\nразработал Timothy Wayper,\nStephan Aßmus и Ingo Weinhold\n\n©1997, 1998 R3 Software Ltd.\n©2006-2009 Haiku, Inc.\n\nВсе права защищены.
+DeskCalc	Window		Калькулятор
+DeskCalc v2.1.0\n\nwritten by Timothy Wayper,\nStephan Aßmus and Ingo Weinhold\n\n©1997, 1998 R3 Software Ltd.\n©2006-2009 Haiku, Inc.\n\nAll Rights Reserved.	CalcView		DeskCalc v2.1.0\n\nразработал Timothy Wayper,\nStephan Aßmus и Ingo Weinhold.\n\n©1997, 1998 R3 Software Ltd.\n©2006-2009 Haiku, Inc.\n\nВсе права защищены.
 Enable Num Lock on startup	CalcView		Включать Num Lock при запуске
 Show keypad	CalcView		Показать клавиатуру
 about	CalcView		О программе

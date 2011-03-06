@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Terminal	1210090540
+1	russian	x-vnd.Haiku-Terminal	1413115910
 -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		 -h, --help вывести этот текст\n -t, --title установить заголовок окна\n -f, --fullscreen запустить в полном экране\n
 Abort	Terminal Shell		Отменить
 About Terminal…	Terminal TermWindow		О программе…
@@ -9,6 +9,7 @@ Cancel	Terminal PrefWindow		Отмена
 Cancel	Terminal SetTitleWindow		Отмена
 Cancel	Terminal TermView		Отмена
 Cancel	Terminal TermWindow		Отмена
+Cannot execute \"%command\":\n\t%error	Terminal Shell		Невозможно выполнить \"%command\":\n\t%error
 Change directory	Terminal TermView		Сменить каталог
 Clear all	Terminal TermWindow		Очистить всё
 Close	Terminal TermWindow		Закрыть
@@ -18,11 +19,11 @@ Close tab	Terminal TermWindow		Закрыть вкладку
 Close window	Terminal TermWindow		Закрыть окно
 Color schema:	Terminal AppearancePrefView		Цветовая схема:
 Color:	Terminal AppearancePrefView		Цвет:
-Confirm exit if active programs exist	Terminal AppearancePrefView		Подтверждать выход если запущены процессы
+Confirm exit if active programs exist	Terminal AppearancePrefView		Подтверждать выход если процессы еще запущены
 Copy	Terminal TermWindow		Копировать
 Copy here	Terminal TermView		Копировать сюда
 Create link here	Terminal TermView		Создать ссылку здесь
-Custom	Terminal colors schema		Пользовательские
+Custom	Terminal colors schema		Пользовательская
 Decrease	Terminal TermWindow		Уменьшить
 Don't save	Terminal PrefWindow		Не сохранять
 Edit	Terminal TermWindow		Изменить
@@ -59,7 +60,7 @@ Quit	Terminal TermWindow		Выход
 Really close?	Terminal TermWindow		Действительно закрыть?
 Save	Terminal PrefWindow		Сохранить
 Save as default	Terminal TermWindow		Сохранить
-Save changes to this settings panel?	Terminal PrefWindow		Сохранить изменения в панеле настройки?
+Save changes to this settings panel?	Terminal PrefWindow		Сохранить изменения в панели настроек?
 Save to file…	Terminal PrefWindow		Сохранить в файл…
 Search forward	Terminal FindWindow		Искать сверху вниз
 Select all	Terminal TermWindow		Выделить всё
@@ -89,6 +90,7 @@ The pattern specifying the window title. The following placeholders\ncan be used
 The pattern specifying the window titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Этот шаблон описывает заголовки окна.\nВозможно использовать следующие переменные:\n
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Процесс \"%1\" все еще работает.\nЕсли вы закроете Терминал, то этот процесс будет уничтожен.
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Процесс \"%1\" все еще работает.\nЕсли вы закроете вкладку, то этот процесс будет уничтожен.
+Unrecognized option \"%s\"\n	Terminal arguments parsing		Нераспознанная опция \"%s\"\n
 Use default	Terminal SetTitleWindow		По умолчанию
 Use default shell	Terminal Shell		Использовать оболочку по умолчанию
 Use selection	Terminal FindWindow		Использовать выделенный текст

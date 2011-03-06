@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Be-PEPL	3806322178
+1	belarusian	x-vnd.Be-PEPL	3077845462
 %name% picture	People		Выява %name%
 About	People		Пра праграму
 Address	People		Адрас
@@ -13,7 +13,7 @@ Copy	People		Капіяваць
 Could not create %s.	People		Не ўдалося стварыць %s.
 Country	People		Краіна
 Cut	People		Выразаць
-Drop an image here.\nOr use the contextual menu…	People		Перацягніце сюды выяву.\nЦі скарыстайце кантэкстнае меню…
+Drop an image here,\nor use the contextual menu.	People		Перацягніце выяву сюды,\nці выкарыстайце кантэкстнае меню.
 E-mail	People		Эл. пошта
 Edit	People		Правіць
 Error	People		Памылка

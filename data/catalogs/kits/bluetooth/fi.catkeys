@@ -32,7 +32,7 @@ Fully available	DeviceClass		Täysin käytettävissä oleva
 Game	DeviceClass		Peli
 Gamepad	DeviceClass		Peliohjain
 Gaming/Toy	DeviceClass		Peli/Lelu
-Glasses	DeviceClass		Luokat
+Glasses	DeviceClass		Silmälasit
 Handheld	DeviceClass		Kämmenlaite
 Hands-free	DeviceClass		Kädet vapauttava
 Headphones	DeviceClass		Korvakuulokkeet

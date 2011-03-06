@@ -3,7 +3,7 @@ Automatic (from alpha channel)	GIFView		Автоматически (из аль�
 Be Bitmap Format (GIFTranslator)	GIFTranslator		Растровый формат Be (GIFTranslator)
 BeOS system	GIFView		Система BeOS
 Colors	GIFView		Цвета
-GIF Settings	GIFTranslator		Настройки GIF
+GIF Settings	GIFTranslator		Настройки GIF транслятора
 GIF image	GIFTranslator		GIF изображение
 Greyscale	GIFView		Оттенки серого
 Optimal	GIFView		Оптимальная

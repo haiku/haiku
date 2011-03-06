@@ -4,7 +4,7 @@ About Codycam…	CodyCam		О программе…
 Can't find an available connection to the video window	CodyCam		Не удалось обнаружить доступного соединения с видео окном
 Cannot connect the video source to the video window	CodyCam		Невозможно подключить видео источник к видео окну
 Cannot create a video window	CodyCam		Невозможно создать видео окно
-Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		Не найден видеоисточник. \nДля использования CodyCam необходима веб-камера.
+Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		Не найден видеоисточник.\nПожалуйста, подключите вебкамеру.
 Cannot find an available video stream	CodyCam		Невозможно найти видео поток
 Cannot find the media roster	CodyCam		Невозможно найти медиа ростер
 Cannot get a time source	CodyCam		Невозможно получить продолжительность
@@ -20,8 +20,8 @@ Capture controls	CodyCam		Настройки захвата
 Capturing Image…	VideoConsumer.cpp		Захват изображения…
 Close	CodyCam		Закрыть
 Closing the window\n	VideoConsumer.cpp		Закрытие окна\n
-CodyCam	CodyCam		Камера
-CodyCam\n\nThe Original BeOS webcam	CodyCam		CodyCam\n\nТа самая веб-камера из BeOS
+CodyCam	CodyCam		Вебкамера
+CodyCam\n\nThe Original BeOS webcam	CodyCam		CodyCam\n\nТа самая вебкамера из BeOS
 Connected…	VideoConsumer.cpp		Подключен…
 Couldn't find requested directory on server	VideoConsumer.cpp		Невозможно найти запрашиваемый каталог на сервере
 Directory:	CodyCam		Каталог:
@@ -29,16 +29,16 @@ Error creating output file	VideoConsumer.cpp		Ошибка при создани
 Error getting initial latency for the capture node	CodyCam		Ошибка при получении задержки для узла захвата
 Error setting type of output file	VideoConsumer.cpp		Ошибка при задании типа выходного файла
 Error writing output file	VideoConsumer.cpp		Ошибка при записи файла
-Every 10 minutes	CodyCam		10 минут
-Every 15 minutes	CodyCam		15 минут
-Every 15 seconds	CodyCam		15 секунд
-Every 2 hours	CodyCam		2 часа
-Every 24 hours	CodyCam		24 часа
-Every 30 minutes	CodyCam		30 минут
-Every 30 seconds	CodyCam		30 секунд
-Every 4 hours	CodyCam		4 часа
-Every 5 minutes	CodyCam		5 минут
-Every 8 hours	CodyCam		8 часов
+Every 10 minutes	CodyCam		Каждые 10 минут
+Every 15 minutes	CodyCam		Каждые 15 минут
+Every 15 seconds	CodyCam		Каждые 15 секунд
+Every 2 hours	CodyCam		Каждые 2 часа
+Every 24 hours	CodyCam		Каждые 24 часа
+Every 30 minutes	CodyCam		Каждые 30 минут
+Every 30 seconds	CodyCam		Каждые 30 секунд
+Every 4 hours	CodyCam		Каждые 4 часа
+Every 5 minutes	CodyCam		Каждые 5 минут
+Every 8 hours	CodyCam		Каждые 8 часов
 Every hour	CodyCam		Каждый час
 Every minute	CodyCam		Каждую минуту
 FTP	CodyCam		FTP
@@ -63,7 +63,7 @@ PASS <suppressed>  (real password sent)\n	FtpClient		ПАРОЛЬ <скрыт> (
 Passive FTP	CodyCam		Пасивный FTP
 Password:	CodyCam		Пароль:
 Quit	CodyCam		Выход
-Rate:	CodyCam		Каждые
+Rate:	CodyCam		Периодичность:
 Remote host has closed the connection.\n	FtpClient		Сервер закрыл соединение.\n
 Rename failed	VideoConsumer.cpp		Не удалось переименовать
 Renaming…	VideoConsumer.cpp		Переименование…

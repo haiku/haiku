@@ -21,8 +21,8 @@ Hide legend	ActivityView		Piilota merkin selitys
 MB	DataSource		Mt
 Media nodes	DataSource		Mediasolmut
 Memory	DataSource		Muisti
-Network receive	DataSource		Verkko vastaanota
-Network send	DataSource		Verkko lähetä
+Network receive	DataSource		Verkkovastaanotto
+Network send	DataSource		Verkkolähetys
 P-faults	DataSource		P-viat
 Page faults	DataSource		Sivuvirheet
 Ports	DataSource		Portit

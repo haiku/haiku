@@ -11,11 +11,11 @@ Debug thread	ProcessController		Отладить поток
 Display priority	ProcessController		Приоритет отображения
 Do you really want to kill the team \"%s\"?	ProcessController		Вы действительно хотите убить приложение \"%s\"?
 Error saving file	ProcessController		Ошибка при сохранении файла
-Gone teams…	ProcessController		Ушедшие приложения…
+Gone teams…	ProcessController		Завершённые приложения…
 Idle priority	ProcessController		Приоритет покоя
 Install in Deskbar	ProcessController		Установить в Deskbar
 Kill this thread!	ProcessController		Убить этот поток!
-Live in the Deskbar	ProcessController		Жить в Deskbar
+Live in the Deskbar	ProcessController		Отображать в Deskbar
 Low priority	ProcessController		Низкий приортитет
 Lowest active priority	ProcessController		Низший приоритет
 Memory usage	ProcessController		Использование памяти
@@ -23,7 +23,7 @@ New Terminal	ProcessController		Новый терминал
 Normal priority	ProcessController		Нормальный приоритет
 OK	ProcessController		ОК
 Ok!	ProcessController		ОК!
-ProcessController	ProcessController		Контроллер процессов
+ProcessController	ProcessController		ProcessController
 ProcessController is already installed in Deskbar.	ProcessController		Контроллер процессов уже установлен в Deskbar.
 ProcessController\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n	ProcessController		ProcessController\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n
 Processor %d	ProcessController		Процессор %d

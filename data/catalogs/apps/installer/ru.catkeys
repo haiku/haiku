@@ -47,7 +47,7 @@ Installation completed. Boot sector has been written to '%s'. Press Quit to leav
 Installation completed. Boot sector has been written to '%s'. Press Quit to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Установка завершена. Загрузочный сектор был записан на раздел '%s'. Нажмите \"Выход\" чтобы закрыть Установщик или выберите другой раздел, если хотите выполнить новую установку.
 Installer	InstallerWindow		Установщик
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\n\tразработал Jérôme Duval и Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Запустить утилиту разметки диска (DriveSetup) для настройки разделов\nна доступных жестких дисках или других носителях.\nРазделы могут быть инициализированы в Be File System,\nкоторая требуются для загрузочного раздела Haiku.
+Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Запустить утилиту DriveSetup для настройки разделов\nна доступных жестких дисках или других носителях.\nРазделы могут быть инициализированы в Be File System,\nкоторая требуются для загрузочного раздела Haiku.
 NOTE: While the naming strategy for hard disks is still as described under 2.1) the naming scheme for partitions has changed.\n\n	InstallerApp		ВНИМАНИЕ: Хотя принцип именования жестких дисков такой же, как было описано в п. 2.1, схема именования разделов изменилась.\n\n
 Newer versions of GRUB use an extra configuration file to add custom entries to the boot menu. To add them to the top, you have to create/edit a file by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Новые версии GRUB используют дополнительный конфигурационный файл для добавления пользовательских записей в загрузочное меню. Чтобы добавить их, вы должны создать/изменить файл, запустив ваш текстовый редактор из терминала, например так:\n\n
 No optional packages available.	PackagesView		Опциональные пакеты недоступны.
@@ -71,7 +71,7 @@ README	InstallerApp		Cопроводительная инструкция
 Restart system	InstallerWindow		Перезагрузить компьютер
 Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Запущен Менеджер загрузки и Разметка диска…\n\nЗакройте оба приложения для продолжения установки.
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Запущен Менеджер загрузки…\n\nЗакройте Менеджер загрузки для продолжения установки.
-Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Запущена утилита разметки диска (DriveSetup)…\n\nЗакройте Разметку диска для продолжения установки.
+Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Запущена утилита разметки диска (DriveSetup)…\n\nЗакройте его для продолжения установки.
 Scanning for disks…	InstallerWindow		Сканирование дисков…
 Set up boot menu	InstallerWindow		Установить загрузочное меню
 Set up partitions…	InstallerWindow		Настройка разделов…

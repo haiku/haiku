@@ -53,7 +53,7 @@ Loop sounds by default	MediaPlayer-SettingsWindow		Зацикливать муз
 Low volume	MediaPlayer-SettingsWindow		Низкой громкости
 MediaPlayer	MediaPlayer-Main		Медиаплеер
 MediaPlayer encountered an internal error. The file could not be opened.	MediaPlayer-Main		Медиаплеер обнаружил внутреннюю ошибку. Файл не может быть открыт.
-MediaPlayer settings	MediaPlayer-SettingsWindow		Настройки Медиаплеера
+MediaPlayer settings	MediaPlayer-SettingsWindow		Настройки медиаплеера
 MediaPlayer\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		MediaPlayer\n\nРазработал Marcus Overhagen, Stephan Aßmus и Frederik Modéen
 Medium	MediaPlayer-SettingsWindow		cредний
 Move Entries	MediaPlayer-MovePLItemsCmd		Переместить записи

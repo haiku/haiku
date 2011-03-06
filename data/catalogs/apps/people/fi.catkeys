@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Be-PEPL	3373241496
+1	finnish	x-vnd.Be-PEPL	3077845462
 %name% picture	People		%name%-kuva
 About	People		Ohjelmasta
 Address	People		Osoite
@@ -13,6 +13,7 @@ Copy	People		Kopioi
 Could not create %s.	People		Ei voitu luoda kohdetta %s.
 Country	People		Maa
 Cut	People		Leikkaa
+Drop an image here,\nor use the contextual menu.	People		Pudota kuva tänne, tai käytä\nlauseyhteydestä riippuvaa valikkoa.
 E-mail	People		Sähköposti
 Edit	People		Muokkaa
 Error	People		Virhe

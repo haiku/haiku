@@ -1,6 +1,6 @@
 1	russian	x-vnd.Haiku-DiskProbe	1552395580
 %ld (native)	ProbeView		%ld (родной)
-(native)	ProbeView		 (родной)
+(native)	ProbeView		 (нативный)
 15 bit	TypeEditors		15 бит
 16 bit	TypeEditors		16 бит
 16 bit signed value:	TypeEditors		16-ти битное знаковое значение:
@@ -53,7 +53,7 @@ Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it i
 Device	ProbeView		Устройство
 Device offset: 	ProbeView		Смещение устройства: 
 Device: 	ProbeView		Устройство: 
-DiskProbe	OpenWindow		DiskProbe
+DiskProbe	OpenWindow		Редактор диска
 DiskProbe request	AttributeWindow		Запрос DiskProbe
 DiskProbe request	DiskProbe		Запрос DiskProbe
 DiskProbe request	ProbeView		Запрос DiskProbe
@@ -87,7 +87,7 @@ Message	TypeEditors	This is the type of view	Сообщение
 Message View	TypeEditors		Вид сообщения
 Mode:	FindWindow		Режим:
 Native: %Ld (0x%0*Lx)	ProbeView		Родной: %Ld (0x%0*Lx)
-Native: 0x%0*Lx	ProbeView		Родное: 0x%0*Lx
+Native: 0x%0*Lx	ProbeView		Нативное: 0x%0*Lx
 New…	FileWindow		Новый…
 Next	ProbeView		Вперед
 No type editor available	AttributeWindow		Нет доступного редактора для данного типа
@@ -117,8 +117,8 @@ Select all	ProbeView		Выделить всё
 Selection	ProbeView		Выделение
 Stop	ProbeView		Стоп
 String editor	TypeEditors		Редактор строк
-Swapped: %Ld (0x%0*Lx)	ProbeView		Перевернутое: %Ld (0x%0*Lx)
-Swapped: 0x%0*Lx	ProbeView		Перевернутый: 0x%0*Lx
+Swapped: %Ld (0x%0*Lx)	ProbeView		Перевернутый: %Ld (0x%0*Lx)
+Swapped: 0x%0*Lx	ProbeView		Перевернутое: 0x%0*Lx
 Text	FindWindow		Текст
 Text	TypeEditors	This is the type of editor	Текст
 Type editor	AttributeWindow		Редактор типа

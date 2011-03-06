@@ -1,7 +1,10 @@
-1	russian	x-vnd.Haiku-Time	2846531571
+1	russian	x-vnd.Haiku-Time	4190811892
 <Other>	Time		<Другой>
+Clock set to:	Time		Часы настроены на:
 Current time:	Time		Текущее время:
 Date & Time	Time		Дата и время
+GMT	Time		Время по Гринвичу
+Local time	Time		Местное время
 OK	Time		ОК
 Preview time:	Time		Предварительное время:
 Revert	Time		Вернуть

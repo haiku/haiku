@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Terminal	1970729598
+1	ukrainian	x-vnd.Haiku-Terminal	345409016
 Abort	Terminal Shell		Зупинити
 About Terminal…	Terminal TermWindow		Про Термінал…
 Appearance	Terminal PrefWindow		Зовн. вигляд
@@ -23,12 +23,10 @@ Copy here	Terminal TermView		Копіювати сюди
 Create link here	Terminal TermView		Створити посилання сюди
 Custom	Terminal colors schema		Спеціальний
 Decrease	Terminal TermWindow		Зменшити
-Didn't find any available pseudo ttys.	Terminal Shell		Не знайдено жодного віртуального терміналу (tty).
 Don't save	Terminal PrefWindow		Не зберігати
 Edit	Terminal TermWindow		Редагувати
 Edit tab title…	Terminal TermWindow		Редагувати ім'я вкладки…
 Error!	Terminal getString		Помилка!
-Failed to init pseudo tty.	Terminal Shell		Призупинено визначення віртуального терміналу (tty).
 Find	Terminal FindWindow		Знайти
 Find failed	Terminal TermWindow		Пошук призупинено
 Find next	Terminal TermWindow		Знайти наступне
@@ -53,7 +51,6 @@ OK	Terminal TermView		Гаразд
 OK	Terminal TermWindow		Гаразд
 Page setup…	Terminal TermWindow		Настройки друку…
 Paste	Terminal TermWindow		Вставити
-PrefHandler::getRGB(%s) - key not found\n	Terminal getRGB		PrefHandler::getRGB(%s) - ключ не знайдено\n
 Print	Terminal TermWindow		Друк
 Print cancelled.	Terminal TermWindow		Друк відмінено.
 Quit	Terminal TermWindow		Вийти
@@ -63,7 +60,6 @@ Save as default	Terminal TermWindow		Зберегти як по замовчув
 Save changes to this settings panel?	Terminal PrefWindow		Зберегти зміни для цих настройок панелі?
 Save to file…	Terminal PrefWindow		Зберегти у файл…
 Search forward	Terminal FindWindow		Шукати далі
-Secondary mouse button drop menu	Terminal TermView		Випадаюче меню другої кнопки мишки
 Select all	Terminal TermWindow		Вибрати все
 Selected background	Terminal AppearancePrefView		Вибрати тло
 Selected text	Terminal AppearancePrefView		Вибрати текст
@@ -98,9 +94,4 @@ White on Black	Terminal colors schema		Білим по чорному
 Window size	Terminal TermWindow		Розмір вікна
 Window title:	Terminal AppearancePrefView		Ім'я вікна:
 Window title:	Terminal TermWindow		Ім'я вікна:
-can't open tty (%s).	Terminal Shell		Неможливо відкрити tty (%s).
-could not set session leader.	Terminal Shell		Неможливо встановити лідера сесії.
-failed set terminal interface (TERMIOS).	Terminal Shell		Призупинено встановлення інтерфейсу терміналу (TERMIOS).
-mismatch handshake.	Terminal Shell		невідповідність при визначенні.
-sigaction() failed: %s\n	Terminal TermApp		sigaction() призупинено: %s\n
 size	Terminal TermView		розмір

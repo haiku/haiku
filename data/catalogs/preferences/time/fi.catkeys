@@ -1,7 +1,10 @@
-1	finnish	x-vnd.Haiku-Time	2846531571
+1	finnish	x-vnd.Haiku-Time	4190811892
 <Other>	Time		<muut>
+Clock set to:	Time		Kello asetettu aikaan:
 Current time:	Time		Nykyinen aika:
 Date & Time	Time		Päivämäärä & Aika
+GMT	Time		Greenwichin aika
+Local time	Time		Paikallinen aika
 OK	Time		Valmis
 Preview time:	Time		Esikatseluaika:
 Revert	Time		Palauta
