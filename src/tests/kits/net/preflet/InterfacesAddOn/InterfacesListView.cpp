@@ -29,6 +29,7 @@
 #include <NetworkInterface.h>
 #include <NetworkRoster.h>
 #include <Resources.h>
+#include <Window.h>
 
 #include <AutoDeleter.h>
 
@@ -144,9 +145,9 @@ InterfaceListItem::DrawItem(BView* owner, BRect /*bounds*/, bool complete)
 
 	iconPt += BPoint(4, 4);
 	statePt += BPoint(0, fFirstlineOffset);
-	namePt += BPoint(32 + 12, fFirstlineOffset);
-	v4addrPt += BPoint(32 + 12, fSecondlineOffset);
-	v6addrPt += BPoint(32 + 12, fThirdlineOffset);
+	namePt += BPoint(ICON_SIZE + 12, fFirstlineOffset);
+	v4addrPt += BPoint(ICON_SIZE + 12, fSecondlineOffset);
+	v6addrPt += BPoint(ICON_SIZE + 12, fThirdlineOffset);
 
 	statePt
 		-= BPoint(be_plain_font->StringWidth(interfaceState.String()), 0);
@@ -274,7 +275,8 @@ InterfaceListItem::_PopulateBitmaps(const char* mediaType) {
 
 	if (interfaceHVIF) {
 		// Now build the bitmap
-		interfaceBitmap = new BBitmap(BRect(0, 0, 31, 31), 0, B_RGBA32);
+		interfaceBitmap = new BBitmap(BRect(0, 0, ICON_SIZE, ICON_SIZE),
+			0, B_RGBA32);
 		if (BIconUtils::GetVectorIcon(interfaceHVIF,
 			iconSize, interfaceBitmap) == B_OK)
 			fIcon = interfaceBitmap;
@@ -287,7 +289,8 @@ InterfaceListItem::_PopulateBitmaps(const char* mediaType) {
 		B_VECTOR_ICON_TYPE, "offline", &iconSize);
 
 	if (offlineHVIF) {
-		fIconOffline = new BBitmap(BRect(0, 0, 31, 31), 0, B_RGBA32);
+		fIconOffline = new BBitmap(BRect(0, 0, ICON_SIZE, ICON_SIZE),
+			0, B_RGBA32);
 		BIconUtils::GetVectorIcon(offlineHVIF, iconSize, fIconOffline);
 	}
 
@@ -295,7 +298,8 @@ InterfaceListItem::_PopulateBitmaps(const char* mediaType) {
 		B_VECTOR_ICON_TYPE, "pending", &iconSize);
 
 	if (pendingHVIF) {
-		fIconPending = new BBitmap(BRect(0, 0, 31, 31), 0, B_RGBA32);
+		fIconPending = new BBitmap(BRect(0, 0, ICON_SIZE, ICON_SIZE),
+			0, B_RGBA32);
 		BIconUtils::GetVectorIcon(pendingHVIF, iconSize, fIconPending);
 	}
 
@@ -303,7 +307,8 @@ InterfaceListItem::_PopulateBitmaps(const char* mediaType) {
 		B_VECTOR_ICON_TYPE, "online", &iconSize);
 
 	if (onlineHVIF) {
-		fIconOnline = new BBitmap(BRect(0, 0, 31, 31), 0, B_RGBA32);
+		fIconOnline = new BBitmap(BRect(0, 0, ICON_SIZE, ICON_SIZE),
+			0, B_RGBA32);
 		BIconUtils::GetVectorIcon(onlineHVIF, iconSize, fIconOnline);
 	}
 
@@ -363,6 +368,36 @@ InterfacesListView::MessageReceived(BMessage* message)
 		default:
 			BListView::MessageReceived(message);
 	}
+}
+
+
+void
+InterfacesListView::MouseDown(BPoint point)
+{
+	BMessage *msg = Window()->CurrentMessage();
+	BListView::MouseDown(point);
+
+	// if user is clicking and an item that has been selected
+	// via MouseDown call above. (eg. user clicked a list item)
+	if (msg->what == B_MOUSE_DOWN
+		&& this->CurrentSelection() >= 0) {
+		uint32 buttons = 0;
+		msg->FindInt32("buttons", (int32 *)&buttons);
+
+		// was it the secondary mouse button? If so show interface options
+		if (buttons & B_SECONDARY_MOUSE_BUTTON) {
+			BPopUpMenu *menu = new BPopUpMenu("IntefaceOptions");
+			menu->SetFont(be_plain_font);
+			menu->AddItem(new BMenuItem("Renegotiate Address",
+				new BMessage(kMsgInterfaceReconfigure)));
+			menu->Go(ConvertToScreen(point));
+			//if (selected)
+			//	Window()->PostMessage(selected->Message()->what);
+			//delete menu;
+			return;
+		}
+	}
+	return;
 }
 
 

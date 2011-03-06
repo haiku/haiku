@@ -65,21 +65,19 @@ InterfacesAddOn::CreateView(BRect *bounds)
 	// Construct the ListView
 	fListview = new InterfacesListView(intViewRect,
 		"interfaces", B_FOLLOW_ALL_SIDES);
-	fListview->SetSelectionMessage(new BMessage(kMsgInterfaceSel));
-	fListview->SetInvocationMessage(new BMessage(kMsgInterfaceAct));
+	fListview->SetSelectionMessage(new BMessage(kMsgInterfaceSelected));
+	fListview->SetInvocationMessage(new BMessage(kMsgInterfaceConfigure));
 
 	BScrollView* scrollView = new BScrollView(NULL, fListview,
 		B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS, false, true);
 
 	// Construct the BButtons
 	fConfigure = new BButton(intViewRect, "configure",
-		"Configure" B_UTF8_ELLIPSIS, new BMessage(kMsgInterfaceCfg));
-
+		"Configure" B_UTF8_ELLIPSIS, new BMessage(kMsgInterfaceConfigure));
 	fConfigure->SetEnabled(false);
 
 	fOnOff = new BButton(intViewRect, "onoff", "Disable",
-		new BMessage(kMsgInterfaceTog));
-
+		new BMessage(kMsgInterfaceToggle));
 	fOnOff->SetEnabled(false);
 
 	// Build the layout
@@ -127,7 +125,7 @@ InterfacesAddOn::MessageReceived(BMessage* msg)
 	}
 
 	switch (msg->what) {
-		case kMsgInterfaceSel:
+		case kMsgInterfaceSelected:
 		{
 			fOnOff->SetEnabled(item != NULL);
 			fConfigure->SetEnabled(item != NULL);
@@ -138,8 +136,7 @@ InterfacesAddOn::MessageReceived(BMessage* msg)
 			break;
 		}
 
-		case kMsgInterfaceAct:
-		case kMsgInterfaceCfg:
+		case kMsgInterfaceConfigure:
 		{
 			if (!item)
 				break;
@@ -149,7 +146,7 @@ InterfacesAddOn::MessageReceived(BMessage* msg)
 			break;
 		}
 
-		case kMsgInterfaceTog:
+		case kMsgInterfaceToggle:
 		{
 			if (!item)
 				break;

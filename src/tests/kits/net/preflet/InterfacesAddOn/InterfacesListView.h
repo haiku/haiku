@@ -19,12 +19,19 @@
 #include <Bitmap.h>
 #include <ListView.h>
 #include <ListItem.h>
+#include <MenuItem.h>
 #include <NetworkDevice.h>
 #include <NetworkInterface.h>
+#include <PopUpMenu.h>
 #include <String.h>
 
 #include "NetworkSettings.h"
 
+
+#define ICON_SIZE 37
+
+
+static const uint32 kMsgInterfaceReconfigure = 'ifre';
 
 class InterfaceListItem : public BListItem {
 public:
@@ -78,6 +85,7 @@ public:
 protected:
 	virtual	void				AttachedToWindow();
 	virtual	void				DetachedFromWindow();
+	virtual	void				MouseDown(BPoint point);
 
 	virtual	void				MessageReceived(BMessage* message);
 

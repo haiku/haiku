@@ -20,6 +20,11 @@
 #include "InterfacesListView.h"
 
 
+static const uint32 kMsgInterfaceSelected = 'ifce';
+static const uint32 kMsgInterfaceConfigure = 'ifcf';
+static const uint32 kMsgInterfaceToggle = 'onof';
+
+
 class InterfacesAddOn : public NetworkSetupAddOn, public BBox
 {
 public:
@@ -30,11 +35,6 @@ public:
 			status_t			Save();
 
 			BView*				CreateView(BRect *bounds);
-
-	static	const uint32        kMsgInterfaceSel = 'ifce';
-	static	const uint32        kMsgInterfaceAct = 'ifac';
-	static	const uint32        kMsgInterfaceCfg = 'ifcf';
-	static	const uint32        kMsgInterfaceTog = 'onof';
 
 			void				AttachedToWindow();
 			void				MessageReceived(BMessage* msg);
