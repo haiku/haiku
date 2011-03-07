@@ -269,6 +269,19 @@ UpdateMimeInfoThread::DoMimeUpdate(const entry_ref *entry, bool *entryIsDir)
 		if (err != B_OK)
 			return err;
 
+/*		TODO: figure out why this doesn't compile here
+			when the same code works in src/servers/registrar/mime
+
+		// catalog entry
+		char catalogEntry[B_MIME_TYPE_LENGTH * 3];
+		err = appFileInfoRead.GetCatalogEntry(catalogEntry);
+		if (err == B_OK)
+			err = appFileInfoWrite.SetCatalogEntry(catalogEntry);
+		else if (err == B_ENTRY_NOT_FOUND)
+			err = appFileInfoWrite.SetCatalogEntry(NULL);
+		if (err != B_OK)
+			return err;
+*/
 		// app flags
 		uint32 appFlags;
 		err = appFileInfoRead.GetAppFlags(&appFlags);

@@ -149,6 +149,16 @@ UpdateMimeInfoThread::DoMimeUpdate(const entry_ref *entry, bool *entryIsDir)
 		if (err != B_OK)
 			return err;
 
+		// catalog entry
+		char catalogEntry[B_MIME_TYPE_LENGTH * 3];
+		err = appFileInfoRead.GetCatalogEntry(catalogEntry);
+		if (err == B_OK)
+			err = appFileInfoWrite.SetCatalogEntry(catalogEntry);
+		else if (err == B_ENTRY_NOT_FOUND)
+			err = appFileInfoWrite.SetCatalogEntry(NULL);
+		if (err != B_OK)
+			return err;
+
 		// app flags
 		uint32 appFlags;
 		err = appFileInfoRead.GetAppFlags(&appFlags);

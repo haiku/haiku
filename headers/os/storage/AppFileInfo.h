@@ -64,6 +64,9 @@ class BAppFileInfo: public BNodeInfo {
 
 		status_t GetSignature(char *signature) const;
 		status_t SetSignature(const char *signature);
+		
+		status_t GetCatalogEntry(char *catalogEntry) const;
+		status_t SetCatalogEntry(const char *catalogEntry);
 
 		status_t GetAppFlags(uint32 *flags) const;
 		status_t SetAppFlags(uint32 flags);

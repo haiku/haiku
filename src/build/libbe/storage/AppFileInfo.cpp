@@ -32,6 +32,7 @@ static const char *kVersionInfoAttribute		= "BEOS:APP_VERSION";
 static const char *kMiniIconAttribute			= "BEOS:M:";
 static const char *kLargeIconAttribute			= "BEOS:L:";
 static const char *kStandardIconType			= "STD_ICON";
+static const char *kCatalogEntryAttribute		= "SYS:NAME";
 
 // resource IDs
 static const int32 kTypeResourceID				= 2;
@@ -43,6 +44,7 @@ static const int32 kLargeIconResourceID			= 101;
 static const int32 kVersionInfoResourceID		= 1;
 static const int32 kMiniIconForTypeResourceID	= 0;
 static const int32 kLargeIconForTypeResourceID	= 0;
+static const int32 kCatalogEntryResourceID		= 1;
 
 // type codes
 enum {
@@ -307,6 +309,81 @@ BAppFileInfo::SetSignature(const char *signature)
 	}
 	return error;
 }
+
+
+// GetCatalogEntry
+/*!	\brief Gets the file's catalog entry. (localization)
+
+	\param catalogEntry A pointer to a pre-allocated character buffer of size
+		   \c B_MIME_TYPE_LENGTH * 3 or larger into which the catalog entry
+		   of the file shall be written.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_NO_INIT: The object is not properly initialized.
+	- \c B_BAD_VALUE: \c NULL \a catalogEntry or the entry stored in the
+	  attribute/resources is longer than \c B_MIME_TYPE_LENGTH * 3.
+	- \c B_BAD_TYPE: The attribute/resources the entry is stored in have
+	  the wrong type.
+	- \c B_ENTRY_NOT_FOUND: No catalog entry is set on the file.
+	- other error codes
+*/
+status_t
+BAppFileInfo::GetCatalogEntry(char *catalogEntry) const
+{
+	if (catalogEntry == NULL)
+		return B_BAD_VALUE;
+
+	if (InitCheck() != B_OK)
+		return B_NO_INIT;
+
+	size_t read = 0;
+	status_t error = _ReadData(kCatalogEntryAttribute, kCatalogEntryResourceID,
+		B_STRING_TYPE, catalogEntry, B_MIME_TYPE_LENGTH * 3, read);
+
+	if (error != B_OK)
+		return error;
+
+	if (read >= B_MIME_TYPE_LENGTH * 3)
+		return B_ERROR;
+
+	catalogEntry[read] = '\0';
+
+	return B_OK;
+}
+
+
+// SetCatalogEntry
+/*!	\brief Sets the file's catalog entry. (localization)
+
+	If \a catalogEntry is \c NULL the file's catalog entry is unset.
+
+	\param catalogEntry The catalog entry to be assigned to the file.
+		Of the form "x-vnd.Haiku-app:context:name".
+		Must not be longer than \c B_MIME_TYPE_LENGTH * 3
+		(including the terminating null). May be \c NULL.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_NO_INIT: The object is not properly initialized.
+	- \c B_BAD_VALUE: \a catalogEntry is longer than \c B_MIME_TYPE_LENGTH * 3.
+	- other error codes
+*/
+status_t
+BAppFileInfo::SetCatalogEntry(const char *catalogEntry)
+{
+	if (InitCheck() != B_OK)
+		return B_NO_INIT;
+
+	if (catalogEntry == NULL)
+		return _RemoveData(kCatalogEntryAttribute, B_STRING_TYPE);
+
+	size_t nameLength = strlen(catalogEntry);
+	if (nameLength > B_MIME_TYPE_LENGTH * 3)
+		return B_BAD_VALUE;
+
+	return _WriteData(kCatalogEntryAttribute, kCatalogEntryResourceID,
+		B_STRING_TYPE, catalogEntry, nameLength + 1);
+}
+
 
 // GetAppFlags
 /*!	\brief Gets the file's application flags.
