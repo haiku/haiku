@@ -1173,6 +1173,7 @@ CalcView::_ShowKeypad(bool show)
 			window->ResizeTo(fWidth, height);
 		} else
 			ResizeTo(fWidth, height);
+		Invalidate();
 	}
 }
 
