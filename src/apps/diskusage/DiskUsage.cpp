@@ -6,6 +6,8 @@
 
 #include "App.h"
 
+#include <TrackerAddOnAppLaunch.h>
+
 #include <stdio.h>
 
 #include <Catalog.h>
