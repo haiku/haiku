@@ -533,7 +533,7 @@ PictureView::_HandleDrop(BMessage* msg)
 		} else {
 			BString text = B_TRANSLATE("The file '%name%' could not "
 				"be written.");
-			text.ReplaceFirst("%name", name);
+			text.ReplaceFirst("%name%", name);
 			BAlert* alert = new BAlert(B_TRANSLATE("Error"), text.String(),
 				B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 			alert->Go();
