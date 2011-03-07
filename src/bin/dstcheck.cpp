@@ -46,6 +46,7 @@ TimedAlert::TimedAlert(const char *title, const char *text, const char *button1,
 	: BAlert(title, text, button1, button2, button3, width, type),
 	fRunner(NULL)
 {
+	SetShortcut(0, B_ESCAPE);
 }
 
 
@@ -143,9 +144,11 @@ main(int argc, char **argv)
 			exit(0);
 
 		if (index == 2) {
-			index = (new BAlert("dstcheck",
+			BAlert *alert = new BAlert("dstcheck",
 				B_TRANSLATE("Would you like to set the clock?"),
-				B_TRANSLATE("No"), B_TRANSLATE("Yes")))->Go();
+				B_TRANSLATE("No"), B_TRANSLATE("Yes"));
+			alert->SetShortcut(0, B_ESCAPE);
+			index = alert->Go();
 
 			if (index == 1)
 				be_roster->Launch("application/x-vnd.Haiku-Time");
