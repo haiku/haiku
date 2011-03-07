@@ -285,9 +285,11 @@ NetworkSetupWindow::_BuildShowTabView(int32 msg_what)
 			status_t status = get_image_symbol(addon_id, "get_nth_addon",
 				B_SYMBOL_TYPE_TEXT, (void **) &get_nth_addon);
 
+			int tabCount = 0;
+
 			if (status == B_OK) {
 				while ((fNetworkAddOnMap[fAddonCount]
-					= get_nth_addon(addon_id, fAddonCount)) != NULL) {
+					= get_nth_addon(addon_id, tabCount)) != NULL) {
 					printf("Adding Tab: %d\n", fAddonCount);
 					BMessage* msg = new BMessage(msg_what);
 
@@ -305,6 +307,9 @@ NetworkSetupWindow::_BuildShowTabView(int32 msg_what)
 					fPanel->AddTab(addon_view, tab);
 					tab->SetLabel(fNetworkAddOnMap[fAddonCount]->Name());
 					fAddonCount++;
+						// Number of tab addons total
+					tabCount++;
+						// Tabs for *this* addon
 				}
 				continue;
 			}
