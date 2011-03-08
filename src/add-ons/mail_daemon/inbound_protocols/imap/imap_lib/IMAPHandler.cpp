@@ -318,7 +318,8 @@ FetchMessageCommand::FetchMessageCommand(IMAPMailbox& mailbox,
 	fMessage(firstMessage),
 	fEndMessage(lastMessage),
 	fOutData(NULL),
-	fFetchBodyLimit(fetchBodyLimit)
+	fFetchBodyLimit(fetchBodyLimit),
+	fHandled(false)
 {
 
 }
@@ -326,7 +327,8 @@ FetchMessageCommand::FetchMessageCommand(IMAPMailbox& mailbox,
 
 FetchMessageCommand::~FetchMessageCommand()
 {
-
+	if (!fHandled)
+		fIMAPMailbox.Listener().FetchEnd();
 }
 
 
@@ -406,6 +408,8 @@ FetchMessageCommand::Handle(const BString& response)
 	// read last ")" line
 	BString lastLine;
 	fConnectionReader.GetNextLine(lastLine);
+
+	fHandled = true;
 
 	bool bodyIsComing = true;
 	if (fFetchBodyLimit >= 0 && fFetchBodyLimit <= messageSize)

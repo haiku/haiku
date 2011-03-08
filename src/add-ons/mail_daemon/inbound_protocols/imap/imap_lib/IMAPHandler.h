@@ -140,6 +140,7 @@ private:
 			int32				fEndMessage;
 			BPositionIO*		fOutData;
 			int32				fFetchBodyLimit;
+			bool				fHandled;
 };
 
 

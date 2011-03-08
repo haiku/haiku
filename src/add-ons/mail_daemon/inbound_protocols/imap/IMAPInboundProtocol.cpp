@@ -70,7 +70,7 @@ DispatcherIMAPListener::NewMessagesToFetch(int32 nMessages)
 void
 DispatcherIMAPListener::FetchEnd()
 {
-	fProtocol.ResetProgress();
+	fProtocol.ReportProgress(0, 1);
 }
 
 
