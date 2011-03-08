@@ -21,14 +21,30 @@
 
 #include "BaseTranslator.h"
 
-#define WEBP_TRANSLATOR_VERSION B_TRANSLATION_MAKE_VERSION(0,1,0)
+#define WEBP_TRANSLATOR_VERSION B_TRANSLATION_MAKE_VERSION(0,2,0)
 #define WEBP_IMAGE_FORMAT	'WebP'
+
+#define WEBP_SETTING_QUALITY		"quality"
+#define WEBP_SETTING_PRESET			"preset"
+#define WEBP_SETTING_SHARPNESS		"sharpness"
+#define WEBP_SETTING_METHOD			"method"
+#define WEBP_SETTING_PREPROCESSING	"preprocessing"
+
 
 #define WEBP_IN_QUALITY 0.90
 #define WEBP_IN_CAPABILITY 0.90
 
-#define BITS_OUT_QUALITY 1
-#define BITS_OUT_CAPABILITY 0.9
+#define WEBP_OUT_QUALITY 0.90
+#define WEBP_OUT_CAPABILITY 0.5
+
+#define BITS_IN_QUALITY 0.8
+#define BITS_IN_CAPABILITY 0.6
+
+#define BITS_OUT_QUALITY 0.5
+#define BITS_OUT_CAPABILITY 0.4
+
+
+struct WebPPicture;
 
 
 class WebPTranslator : public BaseTranslator {
@@ -52,6 +68,19 @@ protected:
 		// this is protected because the object is deleted by the
 		// Release() function instead of being deleted directly by
 		// the user
+
+private:
+			status_t		_TranslateFromBits(BPositionIO* stream,
+								BMessage* settings, uint32 outType,
+								BPositionIO* target);
+
+			status_t		_TranslateFromWebP(BPositionIO* stream,
+								BMessage* settings, uint32 outType,
+								BPositionIO* target);
+
+	static	int 			_EncodedWriter(const uint8_t* data,
+								size_t dataSize,
+								const WebPPicture* const picture);
 };
 
 

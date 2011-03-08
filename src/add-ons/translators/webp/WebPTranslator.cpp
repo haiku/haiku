@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Haiku, Inc. All rights reserved.
+ * Copyright 2010-2011, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,9 +8,6 @@
 
 
 #include "WebPTranslator.h"
-#include "ConfigView.h"
-
-#include "webp/decode.h"
 
 #include <BufferIO.h>
 #include <Catalog.h>
@@ -20,6 +17,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "webp/encode.h"
+#include "webp/decode.h"
+
+#include "ConfigView.h"
+#include "TranslatorSettings.h"
 
 
 #undef B_TRANSLATE_CONTEXT
@@ -45,7 +48,7 @@ class FreeAllocation {
 
 
 
-// The input formats that this translator supports.
+// The input formats that this translator knows how to read
 static const translation_format sInputFormats[] = {
 	{
 		WEBP_IMAGE_FORMAT,
@@ -55,10 +58,26 @@ static const translation_format sInputFormats[] = {
 		"image/webp",
 		"WebP image"
 	},
+	{
+		B_TRANSLATOR_BITMAP,
+		B_TRANSLATOR_BITMAP,
+		BITS_IN_QUALITY,
+		BITS_IN_CAPABILITY,
+		"image/x-be-bitmap",
+		"Be Bitmap Format (WebPTranslator)"
+	},
 };
 
-// The output formats that this translator supports.
+// The output formats that this translator knows how to write
 static const translation_format sOutputFormats[] = {
+	{
+		WEBP_IMAGE_FORMAT,
+		B_TRANSLATOR_BITMAP,
+		WEBP_OUT_QUALITY,
+		WEBP_OUT_CAPABILITY,
+		"image/webp",
+		"WebP image"
+	},
 	{
 		B_TRANSLATOR_BITMAP,
 		B_TRANSLATOR_BITMAP,
@@ -71,8 +90,12 @@ static const translation_format sOutputFormats[] = {
 
 // Default settings for the Translator
 static const TranSetting sDefaultSettings[] = {
-	{B_TRANSLATOR_EXT_HEADER_ONLY, TRAN_SETTING_BOOL, false},
-	{B_TRANSLATOR_EXT_DATA_ONLY, TRAN_SETTING_BOOL, false}
+	{ B_TRANSLATOR_EXT_HEADER_ONLY, TRAN_SETTING_BOOL, false },
+	{ B_TRANSLATOR_EXT_DATA_ONLY, TRAN_SETTING_BOOL, false },
+	{ WEBP_SETTING_QUALITY, TRAN_SETTING_INT32, 60 },
+	{ WEBP_SETTING_PRESET, TRAN_SETTING_INT32, 0 },
+	{ WEBP_SETTING_METHOD, TRAN_SETTING_INT32, 2 },
+	{ WEBP_SETTING_PREPROCESSING, TRAN_SETTING_BOOL, false },
 };
 
 const uint32 kNumInputFormats = sizeof(sInputFormats) /
@@ -138,17 +161,163 @@ WebPTranslator::DerivedIdentify(BPositionIO* stream,
 
 status_t
 WebPTranslator::DerivedTranslate(BPositionIO* stream,
-		const translator_info* info, BMessage* settings,
+		const translator_info* info, BMessage* ioExtension,
 		uint32 outType, BPositionIO* target, int32 baseType)
+{
+	if (baseType == 1)
+		// if stream is in bits format
+		return _TranslateFromBits(stream, ioExtension, outType, target);
+	else if (baseType == 0)
+		// if stream is NOT in bits format
+		return _TranslateFromWebP(stream, ioExtension, outType, target);
+	else
+		// if BaseTranslator dit not properly identify the data as
+		// bits or not bits
+		return B_NO_TRANSLATOR;
+}
+
+
+BView*
+WebPTranslator::NewConfigView(TranslatorSettings* settings)
+{
+	return new ConfigView(settings);
+}
+
+
+status_t
+WebPTranslator::_TranslateFromBits(BPositionIO* stream, BMessage* ioExtension,
+		uint32 outType, BPositionIO* target)
+{
+	if (!outType)
+		outType = WEBP_IMAGE_FORMAT;
+	if (outType != WEBP_IMAGE_FORMAT)
+		return B_NO_TRANSLATOR;
+
+	TranslatorBitmap bitsHeader;
+	status_t status;
+
+	status = identify_bits_header(stream, NULL, &bitsHeader);
+	if (status != B_OK)
+		return status;
+
+	if (bitsHeader.colors == B_CMAP8) {
+		// TODO: support whatever colospace by intermediate colorspace conversion
+		printf("Error! Colorspace not supported\n");
+		return B_NO_TRANSLATOR;
+	}
+
+	int32 bitsBytesPerPixel = 0;
+	switch (bitsHeader.colors) {
+		case B_RGB32:
+		case B_RGB32_BIG:
+		case B_RGBA32:
+		case B_RGBA32_BIG:
+		case B_CMY32:
+		case B_CMYA32:
+		case B_CMYK32:
+			bitsBytesPerPixel = 4;
+			break;
+
+		case B_RGB24:
+		case B_RGB24_BIG:
+		case B_CMY24:
+			bitsBytesPerPixel = 3;
+			break;
+
+		case B_RGB16:
+		case B_RGB16_BIG:
+		case B_RGBA15:
+		case B_RGBA15_BIG:
+		case B_RGB15:
+		case B_RGB15_BIG:
+			bitsBytesPerPixel = 2;
+			break;
+
+		case B_CMAP8:
+		case B_GRAY8:
+			bitsBytesPerPixel = 1;
+			break;
+
+		default:
+			return B_ERROR;
+	}
+
+	if (bitsBytesPerPixel < 3) {
+		// TODO support
+		return B_NO_TRANSLATOR;
+	}
+
+	WebPPicture picture;
+	WebPConfig config;
+
+	if (!WebPPictureInit(&picture) || !WebPConfigInit(&config)) {
+		printf("Error! Version mismatch!\n");
+  		return B_ERROR;
+	}
+
+	WebPPreset preset = (WebPPreset)fSettings->SetGetInt32(WEBP_SETTING_PRESET);
+	config.quality = (float)fSettings->SetGetInt32(WEBP_SETTING_QUALITY);
+
+	if (!WebPConfigPreset(&config, (WebPPreset)preset, config.quality)) {
+		printf("Error! Could initialize configuration with preset.");
+		return B_ERROR;
+	}
+
+	config.method = fSettings->SetGetInt32(WEBP_SETTING_METHOD);
+	config.preprocessing = fSettings->SetGetBool(WEBP_SETTING_PREPROCESSING);
+
+	if (!WebPValidateConfig(&config)) {
+		printf("Error! Invalid configuration.\n");
+ 		return B_ERROR;
+	}
+
+	picture.width = bitsHeader.bounds.IntegerWidth() + 1;
+	picture.height = bitsHeader.bounds.IntegerHeight() + 1;
+
+	int stride = bitsHeader.rowBytes;
+	int bitsSize = picture.height * stride;
+	uint8* bits = (uint8*)malloc(bitsSize);
+	if (bits == NULL)
+		return B_NO_MEMORY;
+
+	if (stream->Read(bits, bitsSize) != bitsSize) {
+		free(bits);
+		return B_IO_ERROR;
+	}
+
+	if (!WebPPictureImportBGRA(&picture, bits, stride)) {
+		printf("Error! WebPEncode() failed!\n");
+		free(bits);
+		return B_ERROR;
+	}
+	free(bits);
+
+    picture.writer = _EncodedWriter;
+    picture.custom_ptr = target;
+    picture.stats = NULL;
+
+	if (!WebPEncode(&config, &picture)) {
+		printf("Error! WebPEncode() failed!\n");
+		status = B_NO_TRANSLATOR;
+	} else
+		status = B_OK;
+
+	WebPPictureFree(&picture);
+	return status;
+}
+
+
+status_t
+WebPTranslator::_TranslateFromWebP(BPositionIO* stream, BMessage* ioExtension,
+		uint32 outType, BPositionIO* target)
 {
 	if (!outType)
 		outType = B_TRANSLATOR_BITMAP;
-	if (outType != B_TRANSLATOR_BITMAP || baseType != 0)
+	if (outType != B_TRANSLATOR_BITMAP)
 		return B_NO_TRANSLATOR;
 
 	off_t streamLength = 0;
 	stream->GetSize(&streamLength);
-	printf(B_TRANSLATE("stream GetSize(): %lld\n"), streamLength);
 
 	off_t streamSize = stream->Seek(0, SEEK_END);
 	stream->Seek(0, SEEK_SET);
@@ -163,7 +332,7 @@ WebPTranslator::DerivedTranslate(BPositionIO* stream,
 	}
 
 	int width, height;
-	uint8* out = WebPDecodeRGB((const uint8*)streamData, streamSize, &width,
+	uint8* out = WebPDecodeBGRA((const uint8*)streamData, streamSize, &width,
 		&height);
 	free(streamData);
 
@@ -172,14 +341,14 @@ WebPTranslator::DerivedTranslate(BPositionIO* stream,
 
 	FreeAllocation _(out);
 
- 	uint32 dataSize = width * 3 * height;
+ 	uint32 dataSize = width * 4 * height;
 
 	TranslatorBitmap bitmapHeader;
 	bitmapHeader.magic = B_TRANSLATOR_BITMAP;
 	bitmapHeader.bounds.Set(0, 0, width - 1, height - 1);
-	bitmapHeader.rowBytes = width * 3;
-	bitmapHeader.colors = B_RGB24;
-	bitmapHeader.dataSize = width * 3 * height;
+	bitmapHeader.rowBytes = width * 4;
+	bitmapHeader.colors = B_RGBA32;
+	bitmapHeader.dataSize = width * 4 * height;
 
 	// write out Be's Bitmap header
 	swap_data(B_UINT32_TYPE, &bitmapHeader, sizeof(TranslatorBitmap),
@@ -193,40 +362,36 @@ WebPTranslator::DerivedTranslate(BPositionIO* stream,
 		return B_IO_ERROR;
 
 	bool headerOnly = false;
-	if (settings != NULL)
-		settings->FindBool(B_TRANSLATOR_EXT_HEADER_ONLY, &headerOnly);
+	if (ioExtension != NULL)
+		ioExtension->FindBool(B_TRANSLATOR_EXT_HEADER_ONLY, &headerOnly);
 
 	if (headerOnly)
 		return B_OK;
 
 	uint32 dataLeft = dataSize;
 	uint8* p = out;
-	uint8 rgb[3];
 	while (dataLeft) {
-		rgb[0] = *(p+2);
-		rgb[1] = *(p+1);
-		rgb[2] = *(p);
-
-		bytesWritten = target->Write(rgb, 3);
+		bytesWritten = target->Write(p, 4);
 		if (bytesWritten < B_OK)
 			return bytesWritten;
 
-		if (bytesWritten != 3)
+		if (bytesWritten != 4)
 			return B_IO_ERROR;
 
-		p += 3;
-		dataLeft -= 3;
+		p += 4;
+		dataLeft -= 4;
 	}
 
 	return B_OK;
 }
 
 
-
-BView*
-WebPTranslator::NewConfigView(TranslatorSettings* settings)
+/* static */ int
+WebPTranslator::_EncodedWriter(const uint8_t* data, size_t dataSize,
+	const WebPPicture* const picture)
 {
-	return new ConfigView();
+  BPositionIO* target = (BPositionIO*)picture->custom_ptr;
+  return dataSize ? (target->Write(data, dataSize) == (ssize_t)dataSize) : 1;
 }
 
 
