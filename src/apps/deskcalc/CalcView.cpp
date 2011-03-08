@@ -679,6 +679,7 @@ CalcView::FrameResized(float width, float height)
 	float inset = (frame.Height() - fExpressionTextView->LineHeight(0)) / 2;
 	frame.InsetBy(inset, inset);
 	fExpressionTextView->SetTextRect(frame);
+	Invalidate();
 }
 
 
@@ -1173,7 +1174,6 @@ CalcView::_ShowKeypad(bool show)
 			window->ResizeTo(fWidth, height);
 		} else
 			ResizeTo(fWidth, height);
-		Invalidate();
 	}
 }
 
