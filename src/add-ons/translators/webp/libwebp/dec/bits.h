@@ -9,8 +9,8 @@
 //
 // Author: Skal (pascal.massimino@gmail.com)
 
-#ifndef WEBP_DECODE_BITS_H_
-#define WEBP_DECODE_BITS_H_
+#ifndef WEBP_DEC_BITS_H_
+#define WEBP_DEC_BITS_H_
 
 #include <assert.h>
 #include "webp/decode_vp8.h"
@@ -33,8 +33,8 @@ typedef struct {
   int left_;                  // how many unused bits (negated)
 } VP8BitReader;
 
-// Initialize the bit reader and the boolean decoder. Return true if ok.
-int VP8Init(VP8BitReader* const br, const uint8_t* buf, uint32_t size);
+// Initialize the bit reader and the boolean decoder.
+void VP8Init(VP8BitReader* const br, const uint8_t* buf, uint32_t size);
 
 // return the next value made of 'num_bits' bits
 uint32_t VP8GetValue(VP8BitReader* const br, int num_bits);
@@ -103,4 +103,4 @@ static inline int VP8GetSigned(VP8BitReader* const br, int v) {
 }    // extern "C"
 #endif
 
-#endif  // WEBP_DECODE_BITS_H_
+#endif  // WEBP_DEC_BITS_H_

@@ -9,8 +9,8 @@
 //
 // Author: Skal (pascal.massimino@gmail.com)
 
-#ifndef WEBP_DECODE_VP8I_H_
-#define WEBP_DECODE_VP8I_H_
+#ifndef WEBP_DEC_VP8I_H_
+#define WEBP_DEC_VP8I_H_
 
 #include <string.h>     // for memcpy()
 #include "bits.h"
@@ -29,9 +29,9 @@ enum { B_DC_PRED = 0,   // 4x4 modes
        B_TM_PRED,
        B_VE_PRED,
        B_HE_PRED,
-       B_LD_PRED,
        B_RD_PRED,
        B_VR_PRED,
+       B_LD_PRED,
        B_VL_PRED,
        B_HD_PRED,
        B_HU_PRED,
@@ -46,13 +46,6 @@ enum { B_DC_PRED = 0,   // 4x4 modes
        B_DC_PRED_NOTOP = 4,
        B_DC_PRED_NOLEFT = 5,
        B_DC_PRED_NOTOPLEFT = 6 };
-
-#ifndef ONLY_KEYFRAME_CODE
-// inter prediction modes
-enum {
-  LEFT4 = 0, ABOVE4 = 1, ZERO4 = 2, NEW4 = 3,
-  NEARESTMV, NEARMV, ZEROMV, NEWMV, SPLITMV };
-#endif
 
 enum { MB_FEATURE_TREE_PROBS = 3,
        NUM_MB_SEGMENTS = 4,
@@ -169,7 +162,7 @@ typedef struct {
 // VP8Decoder: the main opaque structure handed over to user
 
 struct VP8Decoder {
-  int status_;    // 0 = OK
+  VP8StatusCode status_;
   int ready_;     // true if ready to decode a picture with VP8Decode()
   const char* error_msg_;  // set when status_ is not OK.
 
@@ -177,10 +170,10 @@ struct VP8Decoder {
   VP8BitReader br_;
 
   // headers
-  VP8FrameHeader    frm_hdr_;
-  VP8PictureHeader  pic_hdr_;
-  VP8FilterHeader   filter_hdr_;
-  VP8SegmentHeader  segment_hdr_;
+  VP8FrameHeader   frm_hdr_;
+  VP8PictureHeader pic_hdr_;
+  VP8FilterHeader  filter_hdr_;
+  VP8SegmentHeader segment_hdr_;
 
   // dimension, in macroblock units.
   int mb_w_, mb_h_;
@@ -201,10 +194,14 @@ struct VP8Decoder {
   VP8QuantMatrix dqm_[NUM_MB_SEGMENTS];
 
   // probabilities
-  VP8Proba proba_, proba_saved_;
-  int update_proba_;
+  VP8Proba proba_;
   int use_skip_proba_;
-  uint8_t skip_p_, intra_p_, last_p_, golden_p_;
+  uint8_t skip_p_;
+#ifndef ONLY_KEYFRAME_CODE
+  uint8_t intra_p_, last_p_, golden_p_;
+  VP8Proba proba_saved_;
+  int update_proba_;
+#endif
 
   // Boundary data cache and persistent buffers.
   uint8_t* intra_t_;     // top intra modes values: 4 * mb_w_
@@ -249,7 +246,8 @@ struct VP8Decoder {
 // internal functions. Not public.
 
 // in vp8.c
-int VP8SetError(VP8Decoder* const dec, int error, const char *msg);
+int VP8SetError(VP8Decoder* const dec,
+                VP8StatusCode error, const char * const msg);
 
 // in tree.c
 void VP8ResetProba(VP8Proba* const proba);
@@ -264,9 +262,9 @@ int VP8InitFrame(VP8Decoder* const dec, VP8Io* io);
 // Predict a block and add residual
 void VP8ReconstructBlock(VP8Decoder* const dec);
 // Store a block, along with filtering params
-void VP8StoreBlock(VP8Decoder* const dec, VP8Io* const io);
-// Finalize and transmit a complete row
-void VP8FinishRow(VP8Decoder* const dec, VP8Io* io);
+void VP8StoreBlock(VP8Decoder* const dec);
+// Finalize and transmit a complete row. Return false in case of user-abort.
+int VP8FinishRow(VP8Decoder* const dec, VP8Io* io);
 
 // in dsp.c
 typedef void (*VP8Idct)(const int16_t* coeffs, uint8_t* dst);
@@ -316,4 +314,4 @@ extern VP8ChromaFilterFunc VP8HFilter8i;
 }    // extern "C"
 #endif
 
-#endif  // WEBP_DECODE_VP8I_H_
+#endif  // WEBP_DEC_VP8I_H_

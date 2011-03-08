@@ -1,0 +1,20 @@
+SubDir HAIKU_TOP src add-ons translators webp libwebp enc ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) webp ] ;
+
+MergeObject <libwebp>webpencode.o :
+	analysis.c
+	bit_writer.c
+	config.c
+	cost.c
+	dsp.c
+	filter.c
+	frame.c
+	iterator.c
+	picture.c
+	quant.c
+	syntax.c
+	tree.c
+	webpenc.c
+;

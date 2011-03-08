@@ -1608,9 +1608,9 @@ AboutView::_CreateCreditsView()
 	// libwebp
 	_AddPackageCredit(PackageCredit("libwebp")
 		.SetCopyright(COPYRIGHT_STRING
-			"2010 by Google Inc. All rights reserved.")
+			"2010 - 2011 by Google Inc. All rights reserved.")
 		.SetLicense("BSD (3-clause)")
-		.SetURL("http://www.webmproject.org/code/#libwebp_webp_image_decoder_library"));
+		.SetURL("http://www.webmproject.org/code/#libwebp_webp_image_library"));
 
 	_AddCopyrightsFromAttribute();
 	_AddPackageCreditEntries();

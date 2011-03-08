@@ -1,91 +1,26 @@
-// Copyright 2010 Google Inc.
+// Copyright 2011 Google Inc.
 //
 // This code is licensed under the same terms as WebM:
 //  Software License Agreement:  http://www.webmproject.org/license/software/
 //  Additional IP Rights Grant:  http://www.webmproject.org/license/additional/
 // -----------------------------------------------------------------------------
 //
-// Coding trees and probas
+// Token probabilities
 //
 // Author: Skal (pascal.massimino@gmail.com)
 
-#include <stdio.h>
-#include "vp8i.h"
-
-#define USE_GENERIC_TREE
+#include "vp8enci.h"
 
 #if defined(__cplusplus) || defined(c_plusplus)
 extern "C" {
 #endif
 
-#ifdef USE_GENERIC_TREE
-static const int8_t kYModesIntra4[18] = {
-  -B_DC_PRED, 1,
-    -B_TM_PRED, 2,
-      -B_VE_PRED, 3,
-        4, 6,
-          -B_HE_PRED, 5,
-            -B_RD_PRED, -B_VR_PRED,
-        -B_LD_PRED, 7,
-          -B_VL_PRED, 8,
-            -B_HD_PRED, -B_HU_PRED
-};
-#endif
-
-#ifndef ONLY_KEYFRAME_CODE
-
-// inter prediction modes
-enum {
-  LEFT4 = 0, ABOVE4 = 1, ZERO4 = 2, NEW4 = 3,
-  NEARESTMV, NEARMV, ZEROMV, NEWMV, SPLITMV };
-
-static const int8_t kYModesInter[8] = {
-  -DC_PRED, 1,
-    2, 3,
-      -V_PRED, -H_PRED,
-      -TM_PRED, -B_PRED
-};
-
-static const int8_t kMBSplit[6] = {
-  -3, 1,
-    -2, 2,
-      -0, -1
-};
-
-static const int8_t kMVRef[8] = {
-  -ZEROMV, 1,
-    -NEARESTMV, 2,
-      -NEARMV, 3,
-        -NEWMV, -SPLITMV
-};
-
-static const int8_t kMVRef4[6] = {
-  -LEFT4, 1
-    -ABOVE4, 2
-      -ZERO4, -NEW4
-};
-#endif
-
 //-----------------------------------------------------------------------------
 // Default probabilities
 
-// Inter
-#ifndef ONLY_KEYFRAME_CODE
-static const uint8_t kYModeProbaInter0[4] = { 112, 86, 140, 37 };
-static const uint8_t kUVModeProbaInter0[3] = { 162, 101, 204 };
-static const uint8_t kMVProba0[2][NUM_MV_PROBAS] = {
-  { 162, 128, 225, 146, 172, 147, 214,  39,
-    156, 128, 129, 132,  75, 145, 178, 206,
-    239, 254, 254 },
-  { 164, 128, 204, 170, 119, 235, 140, 230,
-    228, 128, 130, 130,  74, 148, 180, 203,
-    236, 254, 254 }
-};
-#endif
-
 // Paragraph 13.5
-static const uint8_t
-  CoeffsProba0[NUM_TYPES][NUM_BANDS][NUM_CTX][NUM_PROBAS] = {
+const uint8_t
+  VP8CoeffsProba0[NUM_TYPES][NUM_BANDS][NUM_CTX][NUM_PROBAS] = {
   // genereated using vp8_default_coef_probs() in entropy.c:129
   { { { 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128 },
       { 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128 },
@@ -221,7 +156,14 @@ static const uint8_t
   }
 };
 
-// Paragraph 11.5
+void VP8DefaultProbas(VP8Encoder* const enc) {
+  VP8Proba* const probas = &enc->proba_;
+  memset(probas->segments_, 255u, sizeof(probas->segments_));
+  memcpy(probas->coeffs_, VP8CoeffsProba0, sizeof(VP8CoeffsProba0));
+  probas->use_skip_proba_ = 0;
+}
+
+// Paragraph 11.5.  900bytes.
 static const uint8_t kBModesProba[NUM_BMODES][NUM_BMODES][NUM_BMODES - 1] = {
   { { 231, 120, 48, 89, 115, 113, 120, 152, 112 },
     { 152, 179, 64, 126, 170, 118, 46, 70, 95 },
@@ -325,72 +267,87 @@ static const uint8_t kBModesProba[NUM_BMODES][NUM_BMODES][NUM_BMODES - 1] = {
     { 112, 19, 12, 61, 195, 128, 48, 4, 24 } }
 };
 
-void VP8ResetProba(VP8Proba* const proba) {
-  memset(proba->segments_, 255u, sizeof(proba->segments_));
-  memcpy(proba->coeffs_, CoeffsProba0, sizeof(CoeffsProba0));
-#ifndef ONLY_KEYFRAME_CODE
-  memcpy(proba->mv_, kMVProba0, sizeof(kMVProba0));
-  memcpy(proba->ymode_, kYModeProbaInter0, sizeof(kYModeProbaInter0));
-  memcpy(proba->uvmode_, kUVModeProbaInter0, sizeof(kUVModeProbaInter0));
-#endif
-}
-
-void VP8ParseIntraMode(VP8BitReader* const br,  VP8Decoder* const dec) {
-  uint8_t* const top = dec->intra_t_ + 4 * dec->mb_x_;
-  uint8_t* const left = dec->intra_l_;
-  // Hardcoded 16x16 intra-mode decision tree.
-  dec->is_i4x4_ = !VP8GetBit(br, 145);   // decide for B_PRED first
-  if (!dec->is_i4x4_) {
-    const int ymode =
-        VP8GetBit(br, 156) ? (VP8GetBit(br, 128) ? TM_PRED : H_PRED)
-                           : (VP8GetBit(br, 163) ? V_PRED : DC_PRED);
-    dec->imodes_[0] = ymode;
-    memset(top, ymode, 4 * sizeof(top[0]));
-    memset(left, ymode, 4 * sizeof(left[0]));
-  } else {
-    uint8_t* modes = dec->imodes_;
-    int y;
-    for (y = 0; y < 4; ++y) {
-      int ymode = left[y];
-      int x;
-      for (x = 0; x < 4; ++x) {
-        const uint8_t* const prob = kBModesProba[top[x]][ymode];
-#ifdef USE_GENERIC_TREE
-        // Generic tree-parsing
-        int i = 0;
-        do {
-          i = kYModesIntra4[2 * i + VP8GetBit(br, prob[i])];
-        } while (i > 0);
-        ymode = -i;
-#else
-        // Hardcoded tree parsing
-        ymode = !VP8GetBit(br, prob[0]) ? B_DC_PRED :
-                  !VP8GetBit(br, prob[1]) ? B_TM_PRED :
-                    !VP8GetBit(br, prob[2]) ? B_VE_PRED :
-                      !VP8GetBit(br, prob[3]) ?
-                        (!VP8GetBit(br, prob[4]) ? B_HE_PRED :
-                          (!VP8GetBit(br, prob[5]) ? B_RD_PRED : B_VR_PRED)) :
-                        (!VP8GetBit(br, prob[6]) ? B_LD_PRED :
-                          (!VP8GetBit(br, prob[7]) ? B_VL_PRED :
-                            (!VP8GetBit(br, prob[8]) ? B_HD_PRED : B_HU_PRED)));
-#endif    // USE_GENERIC_TREE
-        top[x] = ymode;
-        *modes++ = ymode;
+static int PutI4Mode(VP8BitWriter* const bw, int mode,
+                     const uint8_t* const prob) {
+  if (VP8PutBit(bw, mode != B_DC_PRED, prob[0])) {
+    if (VP8PutBit(bw, mode != B_TM_PRED, prob[1])) {
+      if (VP8PutBit(bw, mode != B_VE_PRED, prob[2])) {
+        if (!VP8PutBit(bw, mode >= B_LD_PRED, prob[3])) {
+          if (VP8PutBit(bw, mode != B_HE_PRED, prob[4])) {
+            VP8PutBit(bw, mode != B_RD_PRED, prob[5]);
+          }
+        } else {
+          if (VP8PutBit(bw, mode != B_LD_PRED, prob[6])) {
+            if (VP8PutBit(bw, mode != B_VL_PRED, prob[7])) {
+              VP8PutBit(bw, mode != B_HD_PRED, prob[8]);
+            }
+          }
+        }
       }
-      left[y] = ymode;
     }
   }
-  // Hardcoded UVMode decision tree
-  dec->uvmode_ = !VP8GetBit(br, 142) ? DC_PRED
-               : !VP8GetBit(br, 114) ? V_PRED
-               : VP8GetBit(br, 183) ? TM_PRED : H_PRED;
+  return mode;
+}
+
+static void PutI16Mode(VP8BitWriter* const bw, int mode) {
+  if (VP8PutBit(bw, (mode == TM_PRED || mode == H_PRED), 156)) {
+    VP8PutBit(bw, mode == TM_PRED, 128);    // TM or HE
+  } else {
+    VP8PutBit(bw, mode == V_PRED, 163);     // VE or DC
+  }
+}
+
+static void PutUVMode(VP8BitWriter* const bw, int uv_mode) {
+  if (VP8PutBit(bw, uv_mode != DC_PRED, 142)) {
+    if (VP8PutBit(bw, uv_mode != V_PRED, 114)) {
+      VP8PutBit(bw, uv_mode != H_PRED, 183);    // else: TM_PRED
+    }
+  }
+}
+
+static void PutSegment(VP8BitWriter* const bw, int s, const uint8_t* p) {
+  if (VP8PutBit(bw, s >= 2, p[0])) p += 1;
+  VP8PutBit(bw, s & 1, p[1]);
+}
+
+void VP8CodeIntraModes(VP8Encoder* const enc) {
+  VP8BitWriter* const bw = &enc->bw_;
+  VP8EncIterator it;
+  VP8IteratorInit(enc, &it);
+  do {
+    const VP8MBInfo* mb = it.mb_;
+    const uint8_t* preds = it.preds_;
+    if (enc->segment_hdr_.update_map_) {
+      PutSegment(bw, mb->segment_, enc->proba_.segments_);
+    }
+    if (enc->proba_.use_skip_proba_) {
+      VP8PutBit(bw, mb->skip_, enc->proba_.skip_proba_);
+    }
+    if (VP8PutBit(bw, (mb->type_ != 0), 145)) {  // i16x16
+      PutI16Mode(bw, preds[0]);
+    } else {
+      const int preds_w = enc->preds_w_;
+      const uint8_t* top_pred = preds - preds_w;
+      int x, y;
+      for (y = 0; y < 4; ++y) {
+        int left = preds[-1];
+        for (x = 0; x < 4; ++x) {
+          const uint8_t* const probas = kBModesProba[top_pred[x]][left];
+          left = PutI4Mode(bw, preds[x], probas);
+        }
+        top_pred = preds;
+        preds += preds_w;
+      }
+    }
+    PutUVMode(bw, mb->uv_mode_);
+  } while (VP8IteratorNext(&it, 0));
 }
 
 //-----------------------------------------------------------------------------
 // Paragraph 13
 
-static const uint8_t
-    CoeffsUpdateProba[NUM_TYPES][NUM_BANDS][NUM_CTX][NUM_PROBAS] = {
+const uint8_t
+    VP8CoeffsUpdateProba[NUM_TYPES][NUM_BANDS][NUM_CTX][NUM_PROBAS] = {
   { { { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 },
       { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 },
       { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 }
@@ -525,64 +482,24 @@ static const uint8_t
   }
 };
 
-#ifndef ONLY_KEYFRAME_CODE
-static const uint8_t MVUpdateProba[2][NUM_MV_PROBAS] = {
-  { 237, 246, 253, 253, 254, 254, 254, 254,
-    254, 254, 254, 254, 254, 254, 250, 250,
-    252, 254, 254 },
-  { 231, 243, 245, 253, 254, 254, 254, 254,
-    254, 254, 254, 254, 254, 254, 251, 251,
-    254, 254, 254 }
-};
-#endif
-
-// Paragraph 9.9
-void VP8ParseProba(VP8BitReader* const br, VP8Decoder* const dec) {
-  VP8Proba* const proba = &dec->proba_;
+void VP8WriteProbas(VP8BitWriter* const bw, const VP8Proba* const probas) {
   int t, b, c, p;
   for (t = 0; t < NUM_TYPES; ++t) {
     for (b = 0; b < NUM_BANDS; ++b) {
       for (c = 0; c < NUM_CTX; ++c) {
         for (p = 0; p < NUM_PROBAS; ++p) {
-          if (VP8GetBit(br, CoeffsUpdateProba[t][b][c][p])) {
-            proba->coeffs_[t][b][c][p] = VP8GetValue(br, 8);
+          const uint8_t p0 = probas->coeffs_[t][b][c][p];
+          const int update = (p0 != VP8CoeffsProba0[t][b][c][p]);
+          if (VP8PutBit(bw, update, VP8CoeffsUpdateProba[t][b][c][p])) {
+            VP8PutValue(bw, p0, 8);
           }
         }
       }
     }
   }
-  dec->use_skip_proba_ = VP8Get(br);
-  if (dec->use_skip_proba_) {
-    dec->skip_p_ = VP8GetValue(br, 8);
+  if (VP8PutBitUniform(bw, probas->use_skip_proba_)) {
+    VP8PutValue(bw, probas->skip_proba_, 8);
   }
-#ifndef ONLY_KEYFRAME_CODE
-  if (!dec->frm_hdr_.key_frame_) {
-    int i;
-    dec->intra_p_ = VP8GetValue(br, 8);
-    dec->last_p_ = VP8GetValue(br, 8);
-    dec->golden_p_ = VP8GetValue(br, 8);
-    if (VP8Get(br)) {   // update y-mode
-      for (i = 0; i < 4; ++i) {
-        proba->ymode_[i] = VP8GetValue(br, 8);
-      }
-    }
-    if (VP8Get(br)) {   // update uv-mode
-      for (i = 0; i < 3; ++i) {
-        proba->uvmode_[i] = VP8GetValue(br, 8);
-      }
-    }
-    // update MV
-    for (i = 0; i < 2; ++i) {
-      int k;
-      for (k = 0; k < NUM_MV_PROBAS; ++k) {
-        if (VP8GetBit(br, MVUpdateProba[i][k])) {
-          const int v = VP8GetValue(br, 7);
-          proba->mv_[i][k] = v ? v << 1 : 1;
-        }
-      }
-    }
-  }
-#endif
 }
 
 #if defined(__cplusplus) || defined(c_plusplus)

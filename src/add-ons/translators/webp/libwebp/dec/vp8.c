@@ -16,14 +16,17 @@
 // VP8Decoder
 
 static void SetOk(VP8Decoder* const dec) {
-  dec->status_ = 0;
+  dec->status_ = VP8_STATUS_OK;
   dec->error_msg_ = "OK";
 }
 
-void VP8InitIo(VP8Io* const io) {
+int VP8InitIoInternal(VP8Io* const io, int version) {
+  if (version != WEBP_DECODER_ABI_VERSION)
+    return 0;  // mismatch error
   if (io) {
     memset(io, 0, sizeof(*io));
   }
+  return 1;
 }
 
 VP8Decoder* VP8New() {
@@ -35,8 +38,8 @@ VP8Decoder* VP8New() {
   return dec;
 }
 
-int VP8Status(VP8Decoder* const dec) {
-  if (!dec) return 2;
+VP8StatusCode VP8Status(VP8Decoder* const dec) {
+  if (!dec) return VP8_STATUS_INVALID_PARAM;
   return dec->status_;
 }
 
@@ -53,7 +56,8 @@ void VP8Delete(VP8Decoder* const dec) {
   }
 }
 
-int VP8SetError(VP8Decoder* const dec, int error, const char *msg) {
+int VP8SetError(VP8Decoder* const dec,
+                VP8StatusCode error, const char * const msg) {
   dec->status_ = error;
   dec->error_msg_ = msg;
   dec->ready_ = 0;
@@ -99,7 +103,7 @@ static int ParseSegmentHeader(VP8BitReader* br,
   } else {
     hdr->update_map_ = 0;
   }
-  return 1;
+  return !br->eof_;
 }
 
 // Paragraph 9.5
@@ -169,7 +173,7 @@ static int ParseFilterHeader(VP8BitReader* br, VP8Decoder* const dec) {
       dec->filter_levels_[0] = hdr->level_;
     }
   }
-  return 1;
+  return !br->eof_;
 }
 
 static inline uint32_t get_le32(const uint8_t* const data) {
@@ -188,14 +192,16 @@ int VP8GetHeaders(VP8Decoder* const dec, VP8Io* const io) {
     return 0;
   }
   SetOk(dec);
-  if (io == NULL || io->data == NULL || io->data_size <= 4) {
-    return VP8SetError(dec, 2, "null VP8Io passed to VP8GetHeaders()");
+  if (io == NULL) {
+    return VP8SetError(dec, VP8_STATUS_INVALID_PARAM,
+                       "null VP8Io passed to VP8GetHeaders()");
   }
 
   buf = (uint8_t *)io->data;
   buf_size = io->data_size;
-  if (buf_size < 4) {
-    return VP8SetError(dec, 2, "Not enough data to parse frame header");
+  if (buf == NULL || buf_size <= 4) {
+    return VP8SetError(dec, VP8_STATUS_NOT_ENOUGH_DATA,
+                       "Not enough data to parse frame header");
   }
 
   // Skip over valid RIFF headers
@@ -203,18 +209,26 @@ int VP8GetHeaders(VP8Decoder* const dec, VP8Io* const io) {
     uint32_t riff_size;
     uint32_t chunk_size;
     if (buf_size < 20 + 4) {
-      return VP8SetError(dec, 2, "RIFF: Truncated header.");
+      return VP8SetError(dec, VP8_STATUS_NOT_ENOUGH_DATA,
+                         "RIFF: Truncated header.");
     }
     if (memcmp(buf + 8, "WEBP", 4)) {   // wrong image file signature
-      return VP8SetError(dec, 2, "RIFF: WEBP signature not found.");
+      return VP8SetError(dec, VP8_STATUS_BITSTREAM_ERROR,
+                         "RIFF: WEBP signature not found.");
     }
     riff_size = get_le32(buf + 4);
+    if (riff_size < 12) {
+      return VP8SetError(dec, VP8_STATUS_NOT_ENOUGH_DATA,
+                         "RIFF: Truncated header.");
+    }
     if (memcmp(buf + 12, "VP8 ", 4)) {
-      return VP8SetError(dec, 2, "RIFF: Invalid compression format.");
+      return VP8SetError(dec, VP8_STATUS_BITSTREAM_ERROR,
+                         "RIFF: Invalid compression format.");
     }
     chunk_size = get_le32(buf + 16);
-    if ((chunk_size > riff_size + 8) || (chunk_size & 1)) {
-      return VP8SetError(dec, 2, "RIFF: Inconsistent size information.");
+    if (chunk_size > riff_size - 12) {
+      return VP8SetError(dec, VP8_STATUS_BITSTREAM_ERROR,
+                         "RIFF: Inconsistent size information.");
     }
     buf += 20;
     buf_size -= 20;
@@ -228,6 +242,12 @@ int VP8GetHeaders(VP8Decoder* const dec, VP8Io* const io) {
     frm_hdr->profile_ = (bits >> 1) & 7;
     frm_hdr->show_ = (bits >> 4) & 1;
     frm_hdr->partition_length_ = (bits >> 5);
+    if (frm_hdr->profile_ > 3)
+      return VP8SetError(dec, VP8_STATUS_BITSTREAM_ERROR,
+                         "Incorrect keyframe parameters.");
+    if (!frm_hdr->show_)
+      return VP8SetError(dec, VP8_STATUS_UNSUPPORTED_FEATURE,
+                         "Frame not displayable.");
     buf += 3;
     buf_size -= 3;
   }
@@ -236,10 +256,12 @@ int VP8GetHeaders(VP8Decoder* const dec, VP8Io* const io) {
   if (frm_hdr->key_frame_) {
     // Paragraph 9.2
     if (buf_size < 7) {
-      return VP8SetError(dec, 2, "cannot parse picture header");
+      return VP8SetError(dec, VP8_STATUS_NOT_ENOUGH_DATA,
+                         "cannot parse picture header");
     }
     if (buf[0] != 0x9d || buf[1] != 0x01 || buf[2] != 0x2a) {
-      return VP8SetError(dec, 2, "Bad code word");
+      return VP8SetError(dec, VP8_STATUS_BITSTREAM_ERROR,
+                         "Bad code word");
     }
     pic_hdr->width_ = ((buf[4] << 8) | buf[3]) & 0x3fff;
     pic_hdr->xscale_ = buf[4] >> 6;   // ratio: 1, 5/4 5/3 or 2
@@ -260,6 +282,10 @@ int VP8GetHeaders(VP8Decoder* const dec, VP8Io* const io) {
 
   br = &dec->br_;
   VP8Init(br, buf, buf_size);
+  if (frm_hdr->partition_length_ > buf_size) {
+    return VP8SetError(dec, VP8_STATUS_NOT_ENOUGH_DATA,
+                       "bad partition length");
+  }
   buf += frm_hdr->partition_length_;
   buf_size -= frm_hdr->partition_length_;
   if (frm_hdr->key_frame_) {
@@ -267,14 +293,17 @@ int VP8GetHeaders(VP8Decoder* const dec, VP8Io* const io) {
     pic_hdr->clamp_type_ = VP8Get(br);
   }
   if (!ParseSegmentHeader(br, &dec->segment_hdr_, &dec->proba_)) {
-    return VP8SetError(dec, 2, "cannot parse segment header");
+    return VP8SetError(dec, VP8_STATUS_BITSTREAM_ERROR,
+                       "cannot parse segment header");
   }
   // Filter specs
   if (!ParseFilterHeader(br, dec)) {
-    return VP8SetError(dec, 2, "cannot parse filter header");
+    return VP8SetError(dec, VP8_STATUS_BITSTREAM_ERROR,
+                       "cannot parse filter header");
   }
   if (!ParsePartitions(dec, buf, buf_size)) {
-    return VP8SetError(dec, 2, "cannot parse partitions");
+    return VP8SetError(dec, VP8_STATUS_BITSTREAM_ERROR,
+                       "cannot parse partitions");
   }
 
   // quantizer change
@@ -295,22 +324,24 @@ int VP8GetHeaders(VP8Decoder* const dec, VP8Io* const io) {
     dec->buffer_flags_ |= VP8Get(br) << 6;    // sign bias golden
     dec->buffer_flags_ |= VP8Get(br) << 7;    // sign bias alt ref
 #else
-    return VP8SetError(dec, 2, "Not a key frame.");
+    return VP8SetError(dec, VP8_STATUS_UNSUPPORTED_FEATURE,
+                       "Not a key frame.");
 #endif
   } else {
     dec->buffer_flags_ = 0x003 | 0x100;
   }
 
   // Paragraph 9.8
+#ifndef ONLY_KEYFRAME_CODE
   dec->update_proba_ = VP8Get(br);
   if (!dec->update_proba_) {    // save for later restore
     dec->proba_saved_ = dec->proba_;
   }
-
-#ifndef ONLY_KEYFRAME_CODE
   dec->buffer_flags_ &= 1 << 8;
   dec->buffer_flags_ |=
       (frm_hdr->key_frame_ || VP8Get(br)) << 8;    // refresh last frame
+#else
+  VP8Get(br);   // just ignore the value of update_proba_
 #endif
 
   VP8ParseProba(br, dec);
@@ -328,24 +359,24 @@ static const uint8_t kBands[16 + 1] = {
   0  // extra entry as sentinel
 };
 
-static const uint8_t kCat3[] = {173, 148, 140, 0};
-static const uint8_t kCat4[] = {176, 155, 140, 135, 0};
-static const uint8_t kCat5[] = {180, 157, 141, 134, 130, 0};
+static const uint8_t kCat3[] = { 173, 148, 140, 0 };
+static const uint8_t kCat4[] = { 176, 155, 140, 135, 0 };
+static const uint8_t kCat5[] = { 180, 157, 141, 134, 130, 0 };
 static const uint8_t kCat6[] =
-  {254, 254, 243, 230, 196, 177, 153, 140, 133, 130, 129, 0};
+  { 254, 254, 243, 230, 196, 177, 153, 140, 133, 130, 129, 0 };
 static const uint8_t * const kCat3456[] = { kCat3, kCat4, kCat5, kCat6 };
 static const uint8_t kZigzag[16] = {
   0, 1, 4, 8,  5, 2, 3, 6,  9, 12, 13, 10,  7, 11, 14, 15
 };
 
-typedef const uint8_t PROBA_ARRAY[NUM_CTX][NUM_PROBAS];
+typedef const uint8_t (*ProbaArray)[NUM_CTX][NUM_PROBAS];  // for const-casting
 
-static int GetCoeffs(VP8BitReader* const br,
-                     const uint8_t (*prob)[NUM_CTX][NUM_PROBAS],
+// Returns 1 if there's non-zero coeffs, 0 otherwise
+static int GetCoeffs(VP8BitReader* const br, ProbaArray prob,
                      int ctx, const uint16_t dq[2], int n, int16_t* out) {
   const uint8_t* p = prob[kBands[n]][ctx];
   if (!VP8GetBit(br, p[0])) {   // first EOB is more a 'CBP' bit.
-    return -1;
+    return 0;
   }
   while (1) {
     ++n;
@@ -371,12 +402,12 @@ static int GetCoeffs(VP8BitReader* const br,
               v = 7 + 2 * VP8GetBit(br, 165) + VP8GetBit(br, 145);
             }
           } else {
-            uint8_t* tab;
+            const uint8_t* tab;
             const int bit1 = VP8GetBit(br, p[8]);
             const int bit0 = VP8GetBit(br, p[9 + bit1]);
             const int cat = 2 * bit1 + bit0;
             v = 0;
-            for (tab = (uint8_t*)kCat3456[cat]; *tab; ++tab) {
+            for (tab = kCat3456[cat]; *tab; ++tab) {
               v += v + VP8GetBit(br, *tab);
             }
             v += 3 + (8 << cat);
@@ -386,13 +417,15 @@ static int GetCoeffs(VP8BitReader* const br,
       }
       j = kZigzag[n - 1];
       out[j] = VP8GetSigned(br, v) * dq[j > 0];
-      if (n == 16) break;
-      if (!VP8GetBit(br, p[0])) {   // EOB
-        return n;
+      if (n == 16 || !VP8GetBit(br, p[0])) {   // EOB
+        return 1;
       }
     }
+    if (n == 16) {
+      return 1;
+    }
   }
-  return 15;
+  return 0;
 }
 
 // Table to unpack four bits into four bytes
@@ -403,14 +436,18 @@ static const uint8_t kUnpackTab[16][4] = {
   {0, 0, 1, 1},  {1, 0, 1, 1},  {0, 1, 1, 1},  {1, 1, 1, 1} };
 
 // Macro to pack four LSB of four bytes into four bits.
-#define PACK(X, S) \
-  ((((*(uint32_t*)(X)) * 0x01020408U) & 0xff000000) >> (S))
+#if defined(__PPC__) || defined(_M_PPC) || defined(_ARCH_PPC) || \
+    defined(__BIG_ENDIAN__)
+#define PACK_CST 0x08040201U
+#else
+#define PACK_CST 0x01020408U
+#endif
+#define PACK(X, S) ((((*(uint32_t*)(X)) * PACK_CST) & 0xff000000) >> (S))
 
-typedef const uint8_t (*Proba_t)[NUM_CTX][NUM_PROBAS];  // for const-casting
 static int ParseResiduals(VP8Decoder* const dec,
                           VP8MB* const mb, VP8BitReader* const token_br) {
   int out_t_nz, out_l_nz, first;
-  Proba_t ac_prob;
+  ProbaArray ac_prob;
   const VP8QuantMatrix* q = &dec->dqm_[dec->segment_];
   int16_t* dst = dec->coeffs_;
   VP8MB* const left_mb = dec->mb_info_ - 1;
@@ -424,15 +461,15 @@ static int ParseResiduals(VP8Decoder* const dec,
   if (!dec->is_i4x4_) {    // parse DC
     int16_t dc[16] = { 0 };
     const int ctx = mb->dc_nz_ + left_mb->dc_nz_;
-    const int last = GetCoeffs(token_br, (Proba_t)dec->proba_.coeffs_[1],
-                               ctx, q->y2_mat_, 0, dc);
-    mb->dc_nz_ = left_mb->dc_nz_ = (last >= 0);
+    mb->dc_nz_ = left_mb->dc_nz_ =
+        GetCoeffs(token_br, (ProbaArray)dec->proba_.coeffs_[1],
+                  ctx, q->y2_mat_, 0, dc);
     first = 1;
-    ac_prob = (Proba_t)dec->proba_.coeffs_[0];
+    ac_prob = (ProbaArray)dec->proba_.coeffs_[0];
     VP8TransformWHT(dc, dst);
   } else {
     first = 0;
-    ac_prob = (Proba_t)dec->proba_.coeffs_[3];
+    ac_prob = (ProbaArray)dec->proba_.coeffs_[3];
   }
 
   memcpy(tnz, kUnpackTab[mb->nz_ & 0xf], sizeof(tnz));
@@ -442,11 +479,10 @@ static int ParseResiduals(VP8Decoder* const dec,
 
     for (x = 0; x < 4; ++x) {
       const int ctx = l + tnz[x];
-      const int last = GetCoeffs(token_br, ac_prob, ctx,
-                                 q->y1_mat_, first, dst);
+      l = GetCoeffs(token_br, ac_prob, ctx,
+                    q->y1_mat_, first, dst);
       nz_dc[x] = (dst[0] != 0);
-      nz_ac[x] = (last > 0);
-      tnz[x] = l = (last >= 0);
+      nz_ac[x] = tnz[x] = l;
       dst += 16;
     }
     lnz[y] = l;
@@ -463,12 +499,10 @@ static int ParseResiduals(VP8Decoder* const dec,
       int l = lnz[ch + y];
       for (x = 0; x < 2; ++x) {
         const int ctx = l + tnz[ch + x];
-        const int last =
-            GetCoeffs(token_br, (Proba_t)dec->proba_.coeffs_[2],
+        l = GetCoeffs(token_br, (ProbaArray)dec->proba_.coeffs_[2],
                       ctx, q->uv_mat_, 0, dst);
         nz_dc[y * 2 + x] = (dst[0] != 0);
-        nz_ac[y * 2 + x] = (last > 0);
-        tnz[ch + x] = l = (last >= 0);
+        nz_ac[y * 2 + x] = tnz[ch + x] = l;
         dst += 16;
       }
       lnz[ch + y] = l;
@@ -493,7 +527,6 @@ static int ParseResiduals(VP8Decoder* const dec,
 // Main loop
 
 static int ParseFrame(VP8Decoder* const dec, VP8Io* io) {
-  int ok = 1;
   VP8BitReader* const br = &dec->br_;
   VP8BitReader* token_br;
 
@@ -523,8 +556,8 @@ static int ParseFrame(VP8Decoder* const dec, VP8Io* io) {
 
       if (!info->skip_) {
         if (!ParseResiduals(dec, info, token_br)) {
-          ok = 0;
-          break;
+          return VP8SetError(dec, VP8_STATUS_BITSTREAM_ERROR,
+                             "Residual parsing failed.");
         }
       } else {
         left->nz_ = info->nz_ = 0;
@@ -537,23 +570,26 @@ static int ParseFrame(VP8Decoder* const dec, VP8Io* io) {
       VP8ReconstructBlock(dec);
 
       // Store data and save block's filtering params
-      VP8StoreBlock(dec, io);
+      VP8StoreBlock(dec);
     }
-    if (!ok) {
-      break;
+    if (!VP8FinishRow(dec, io)) {
+      return VP8SetError(dec, VP8_STATUS_USER_ABORT,
+                         "Output aborted.");
     }
-    VP8FinishRow(dec, io);
     if (dec->br_.eof_ || token_br->eof_) {
-      ok = 0;
-      break;
+      return VP8SetError(dec, VP8_STATUS_NOT_ENOUGH_DATA,
+                         "Premature end-of-file encountered.");
     }
   }
 
   // Finish
+#ifndef ONLY_KEYFRAME_CODE
   if (!dec->update_proba_) {
     dec->proba_ = dec->proba_saved_;
   }
-  return ok;
+#endif
+
+  return 1;
 }
 
 // Main entry point
@@ -562,7 +598,8 @@ int VP8Decode(VP8Decoder* const dec, VP8Io* const io) {
     return 0;
   }
   if (io == NULL) {
-    return VP8SetError(dec, 2, "NULL VP8Io parameter in VP8Decode().");
+    return VP8SetError(dec, VP8_STATUS_INVALID_PARAM,
+                       "NULL VP8Io parameter in VP8Decode().");
   }
 
   if (!dec->ready_) {
@@ -575,14 +612,18 @@ int VP8Decode(VP8Decoder* const dec, VP8Io* const io) {
   // will allocate memory and prepare everything.
   if (!VP8InitFrame(dec, io)) {
     VP8Clear(dec);
-    return VP8SetError(dec, 3, "Allocation failed");
+    return VP8SetError(dec, VP8_STATUS_OUT_OF_MEMORY,
+                       "Allocation failed");
   }
-
 
   if (io->setup && !io->setup(io)) {
     VP8Clear(dec);
-    return VP8SetError(dec, 3, "Frame setup failed");
+    return VP8SetError(dec, VP8_STATUS_USER_ABORT,
+                       "Frame setup failed");
   }
+
+  // Disable filtering per user request (_after_ setup() is called)
+  if (io->bypass_filtering) dec->filter_type_ = 0;
 
   // Main decoding loop
   {
@@ -592,7 +633,7 @@ int VP8Decode(VP8Decoder* const dec, VP8Io* const io) {
     }
     if (!ret) {
       VP8Clear(dec);
-      return VP8SetError(dec, 3, "Frame decoding failed");
+      return 0;
     }
   }
 

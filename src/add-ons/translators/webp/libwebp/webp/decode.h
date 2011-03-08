@@ -9,22 +9,10 @@
 //
 // Author: Skal (pascal.massimino@gmail.com)
 
-#ifndef WEBP_DECODE_WEBP_DECODE_H_
-#define WEBP_DECODE_WEBP_DECODE_H_
+#ifndef WEBP_WEBP_DECODE_H_
+#define WEBP_WEBP_DECODE_H_
 
-#ifndef _MSC_VER
-#include <inttypes.h>
-#else
-typedef signed char int8_t;
-typedef unsigned char uint8_t;
-typedef signed short int16_t;
-typedef unsigned short uint16_t;
-typedef signed int int32_t;
-typedef unsigned int uint32_t;
-typedef unsigned long long int uint64_t;
-#define inline __forceinline
-#endif
-
+#include "webp/types.h"
 
 #if defined(__cplusplus) || defined(c_plusplus)
 extern "C" {
@@ -108,4 +96,4 @@ uint8_t* WebPDecodeYUVInto(const uint8_t* data, uint32_t data_size,
 }    // extern "C"
 #endif
 
-#endif  // WEBP_DECODE_WEBP_DECODE_H_
+#endif  /* WEBP_WEBP_DECODE_H_ */
