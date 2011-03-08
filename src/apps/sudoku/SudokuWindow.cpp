@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2007-2011, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -32,6 +32,7 @@
 
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "SudokuWindow"
+
 
 const uint32 kMsgOpenFilePanel = 'opfp';
 const uint32 kMsgGenerateSudoku = 'gnsu';
@@ -115,10 +116,7 @@ GenerateSudoku::_Generate()
 
 	bigtime_t start = system_time();
 	generator.Generate(&fField, 40 - fLevel * 5, fProgress, &fQuit);
-	printf(B_TRANSLATE_WITH_CONTEXT("generated in %g msecs\n",
-		"When Sudoku is launched from a Terminal window, this message "
-		"is shown there."),
-		(system_time() - start) / 1000.0);
+	printf("generated in %g msecs\n", (system_time() - start) / 1000.0);
 
 	BMessage done(kMsgSudokuGenerated);
 	if (!fQuit) {
@@ -144,8 +142,9 @@ GenerateSudoku::_GenerateThread(void* _self)
 
 
 SudokuWindow::SudokuWindow()
-	: BWindow(BRect(100, 100, 500, 520), B_TRANSLATE("Sudoku"),
-	B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE),
+	:
+	BWindow(BRect(100, 100, 500, 520), B_TRANSLATE("Sudoku"),
+		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE),
 	fGenerator(NULL),
 	fStoredState(NULL),
 	fExportFormat(kExportAsText)
@@ -271,16 +270,14 @@ SudokuWindow::SudokuWindow()
 		new BMessage(B_UNDO), 'Z'));
 	fUndoItem->SetEnabled(false);
 	menu->AddItem(fRedoItem = new BMenuItem(B_TRANSLATE("Redo"),
-		new BMessage(B_REDO), 'Z',
-		B_SHIFT_KEY));
+		new BMessage(B_REDO), 'Z', B_SHIFT_KEY));
 	fRedoItem->SetEnabled(false);
 	menu->AddSeparatorItem();
 
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Snapshot current"),
 		new BMessage(kMsgStoreState)));
 	menu->AddItem(fRestoreStateItem = new BMenuItem(
-		B_TRANSLATE("Restore snapshot"),
-		new BMessage(kMsgRestoreState)));
+		B_TRANSLATE("Restore snapshot"), new BMessage(kMsgRestoreState)));
 	fRestoreStateItem->SetEnabled(fStoredState != NULL);
 	menu->AddSeparatorItem();
 

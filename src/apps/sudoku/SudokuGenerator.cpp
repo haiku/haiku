@@ -1,23 +1,25 @@
 /*
- * Copyright 2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2007-2011, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
 
 #include "SudokuGenerator.h"
 
-#include "ProgressWindow.h"
-#include "SudokuField.h"
-#include "SudokuSolver.h"
-
-#include <Catalog.h>
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include <Catalog.h>
+
+#include "ProgressWindow.h"
+#include "SudokuField.h"
+#include "SudokuSolver.h"
+
+
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "SudokuGenerator"
+
 
 SudokuGenerator::SudokuGenerator()
 {

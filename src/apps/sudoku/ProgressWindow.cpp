@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2007-2011, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -18,6 +18,7 @@
 
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "ProgressWindow"
+
 
 static const uint32 kMsgShow = 'show';
 

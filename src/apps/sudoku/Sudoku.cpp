@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2007-2011, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -15,14 +15,17 @@
 #include <Catalog.h>
 #include <TextView.h>
 
+
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "Sudoku"
+
 
 const char* kSignature = "application/x-vnd.Haiku-Sudoku";
 
 
 Sudoku::Sudoku()
-	: BApplication(kSignature)
+	:
+	BApplication(kSignature)
 {
 }
 
@@ -76,7 +79,7 @@ Sudoku::DisplayAbout()
 	font.SetSize(18);
 	font.SetFace(B_BOLD_FACE);
 	view->SetFontAndColor(0, strlen(B_TRANSLATE("Sudoku")), &font);
-	
+
 	alert->SetShortcut(0, B_ESCAPE);
 	alert->Go();
 }
