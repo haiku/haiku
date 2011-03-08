@@ -58,6 +58,14 @@ public:
 
 // see also http://prasshhant.blogspot.com/2007/03/dns-query.html
 struct dns_header {
+	dns_header()
+	{
+		q_count = 0;
+		ans_count  = 0;
+		auth_count = 0;
+		add_count  = 0;
+	}
+
 	uint16 id;						// A 16 bit identifier
 	
 	unsigned	char qr     :1;		// query (0), or a response (1)
@@ -90,7 +98,7 @@ public:
 						DNSQuery();
 						~DNSQuery();
 		status_t		ReadDNSServer(in_addr* add);
-		status_t		GetMXRecords(BString serverName,
+		status_t		GetMXRecords(const BString& serverName,
 							BObjectList<mx_record>* mxList,
 							bigtime_t timeout = 500000);
 				  
