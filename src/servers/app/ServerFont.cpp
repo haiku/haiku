@@ -244,7 +244,8 @@ ServerFont::SetStyle(FontStyle* style)
 {
 	if (style && style != fStyle) {
 		// detach from old style
-		fStyle->Release();
+		if (fStyle != NULL)
+			fStyle->Release();
 
 		// attach to new style
 		fStyle = style;
