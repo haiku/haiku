@@ -70,7 +70,7 @@ MediaFileInfo::LoadInfo(BMediaFile* file)
 
 				BString details;
 				snprintf(details.LockBuffer(256), 256,
-						B_TRANSLATE_COMMENT("%Ld x %Ld, %Ld fps / %Ld frames",
+						B_TRANSLATE_COMMENT("%u x %u, %.2ffps / %Ld frames",
 						"Width x Height, fps / frames"),
 						format.Width(), format.Height(),
 						rvf->field_rate / rvf->interlace, videoFrames);

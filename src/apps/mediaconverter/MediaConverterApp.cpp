@@ -549,11 +549,11 @@ MediaConverterApp::_ConvertFile(BMediaFile* inFile, BMediaFile* outFile,
 				break;
 			}
 			completePercent = (float)(i - start) / (float)(end - start) * 100;
-			currPercent = (int16)floor(completePercent);
+			currPercent = (int32)completePercent;
 			if (currPercent > lastPercent) {
 				lastPercent = currPercent;
 				snprintf(status.LockBuffer(128), 128,
-					B_TRANSLATE("Writing video track: %Ld %% complete"),
+					B_TRANSLATE("Writing video track: %ld%% complete"),
 					currPercent);
 				status.UnlockBuffer();
 				SetStatusMessage(status.String());
@@ -607,11 +607,11 @@ MediaConverterApp::_ConvertFile(BMediaFile* inFile, BMediaFile* outFile,
 				break;
 			}
 			completePercent = (float)(i - start) / (float)(end - start) * 100;
-			currPercent = (int16)floor(completePercent);
+			currPercent = (int32)completePercent;
 			if (currPercent > lastPercent) {
 				lastPercent = currPercent;
 				snprintf(status.LockBuffer(128), 128,
-					B_TRANSLATE("Writing audio track: %Ld %% complete"),
+					B_TRANSLATE("Writing audio track: %ld%% complete"),
 					currPercent);
 				status.UnlockBuffer();
 				SetStatusMessage(status.String());
