@@ -21,6 +21,7 @@
 #include <sys/libkern.h>
 
 
+#define printf freebsd_printf
 int printf(const char *format, ...) __printflike(1, 2);
 
 
