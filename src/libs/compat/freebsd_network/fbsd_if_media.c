@@ -65,14 +65,16 @@
  */
 
 #define IFMEDIA_DEBUG
+#ifdef IFMEDIA_DEBUG
+#   define TRACE(x...) dprintf("BSD_IFMEDIA_DEBUG: " x)
+#else
+#   define TRACE(x...) ;
+#endif
 
 static struct ifmedia_entry *ifmedia_match(struct ifmedia *ifm,
-    int flags, int mask);
+	int flags, int mask);
 
-#ifdef IFMEDIA_DEBUG
-int	ifmedia_debug = 1;
 static	void ifmedia_printword(int);
-#endif
 
 /*
  * Initialize if_media struct for a specific interface instance.
@@ -120,14 +122,12 @@ ifmedia_add(ifm, mword, data, aux)
 	register struct ifmedia_entry *entry;
 
 #ifdef IFMEDIA_DEBUG
-	if (ifmedia_debug) {
-		if (ifm == NULL) {
-			printf("ifmedia_add: null ifm\n");
-			return;
-		}
-		printf("Adding entry for ");
-		ifmedia_printword(mword);
+	if (ifm == NULL) {
+		TRACE("ifmedia_add: null ifm\n");
+		return;
 	}
+	TRACE("ifmedia_add: Adding Entry...\n");
+	ifmedia_printword(mword);
 #endif
 
 	entry = kernel_malloc(sizeof(*entry), M_IFADDR, M_NOWAIT);
@@ -176,19 +176,17 @@ ifmedia_set(ifm, target)
 	match = ifmedia_match(ifm, target, ifm->ifm_mask);
 
 	if (match == NULL) {
-		printf("ifmedia_set: no match for 0x%x/0x%x\n",
-		    target, ~ifm->ifm_mask);
+		TRACE("ifmedia_set: no match for 0x%x/0x%x\n",
+			target, ~ifm->ifm_mask);
 		panic("ifmedia_set");
 	}
 	ifm->ifm_cur = match;
 
 #ifdef IFMEDIA_DEBUG
-	if (ifmedia_debug) {
-		printf("ifmedia_set: target ");
-		ifmedia_printword(target);
-		printf("ifmedia_set: setting to ");
-		ifmedia_printword(ifm->ifm_cur->ifm_media);
-	}
+	TRACE("ifmedia_set: target ");
+	ifmedia_printword(target);
+	TRACE("ifmedia_set: setting to ");
+	ifmedia_printword(ifm->ifm_cur->ifm_media);
 #endif
 }
 
@@ -222,13 +220,8 @@ ifmedia_ioctl(ifp, ifr, ifm, cmd)
 
 		match = ifmedia_match(ifm, newmedia, ifm->ifm_mask);
 		if (match == NULL) {
-#ifdef IFMEDIA_DEBUG
-			if (ifmedia_debug) {
-				printf(
-				    "ifmedia_ioctl: no media found for 0x%x\n", 
-				    newmedia);
-			}
-#endif
+			TRACE("ifmedia_ioctl: no media found for 0x%x\n",
+				newmedia);
 			return (ENXIO);
 		}
 
@@ -249,11 +242,9 @@ ifmedia_ioctl(ifp, ifr, ifm, cmd)
 		 * driver can't switch.
 		 */
 #ifdef IFMEDIA_DEBUG
-		if (ifmedia_debug) {
-			printf("ifmedia_ioctl: switching %s to ",
-			    ifp->if_xname);
-			ifmedia_printword(match->ifm_media);
-		}
+		TRACE("ifmedia_ioctl: switching %s to ",
+			ifp->if_xname);
+		ifmedia_printword(match->ifm_media);
 #endif
 		oldentry = ifm->ifm_cur;
 		oldmedia = ifm->ifm_media;
@@ -376,10 +367,10 @@ ifmedia_match(ifm, target, mask)
 
 	LIST_FOREACH(next, &ifm->ifm_list, ifm_list) {
 		if ((next->ifm_media & mask) == (target & mask)) {
-#if defined(IFMEDIA_DEBUG) || defined(DIAGNOSTIC)
+#ifdef IFMEDIA_DEBUG
 			if (match) {
-				printf("ifmedia_match: multiple match for "
-				    "0x%x/0x%x\n", target, mask);
+				TRACE("ifmedia_match: multiple match for "
+					"0x%x/0x%x\n", target, mask);
 			}
 #endif
 			match = next;
@@ -506,16 +497,16 @@ ifmedia_printword(ifmw)
 		if (IFM_TYPE(ifmw) == desc->ifmt_word)
 			break;
 	if (desc->ifmt_string == NULL) {
-		printf("<unknown type>\n");
+		TRACE("  Type: <unknown type>\n");
 		return;
 	}
-	printf(desc->ifmt_string);
+	TRACE("  Type: %s\n", desc->ifmt_string);
 
 	/* Any mode. */
 	for (desc = ttos->modes; desc && desc->ifmt_string != NULL; desc++)
 		if (IFM_MODE(ifmw) == desc->ifmt_word) {
 			if (desc->ifmt_string != NULL)
-				printf(" mode %s", desc->ifmt_string);
+				TRACE("  Mode: %s\n", desc->ifmt_string);
 			break;
 		}
 
@@ -532,12 +523,12 @@ ifmedia_printword(ifmw)
 		if (IFM_SUBTYPE(ifmw) == desc->ifmt_word)
 			break;
 	if (desc->ifmt_string == NULL) {
-		printf(" <unknown subtype>\n");
+		TRACE("  SubType: <unknown>\n");
 		return;
 	}
 
  got_subtype:
-	printf(" %s", desc->ifmt_string);
+	TRACE("  SubType: %s\n", desc->ifmt_string);
 
 	/*
 	 * Look for shared options.
@@ -545,10 +536,8 @@ ifmedia_printword(ifmw)
 	for (desc = ifm_shared_option_descriptions;
 	    desc->ifmt_string != NULL; desc++) {
 		if (ifmw & desc->ifmt_word) {
-			if (seen_option == 0)
-				printf(" <");
-			printf("%s%s", seen_option++ ? "," : "",
-			    desc->ifmt_string);
+			TRACE("  Shared Option[%d]: %s\n", seen_option++,
+				desc->ifmt_string);
 		}
 	}
 
@@ -557,12 +546,9 @@ ifmedia_printword(ifmw)
 	 */
 	for (desc = ttos->options; desc->ifmt_string != NULL; desc++) {
 		if (ifmw & desc->ifmt_word) {
-			if (seen_option == 0)
-				printf(" <");
-			printf("%s%s", seen_option++ ? "," : "",
-			    desc->ifmt_string); 
+			TRACE("  SubType Option[%d]: %s\n", seen_option++,
+				desc->ifmt_string);
 		}
 	}
-	printf("%s\n", seen_option ? ">" : "");
 }
 #endif /* IFMEDIA_DEBUG */
