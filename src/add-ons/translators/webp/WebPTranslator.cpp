@@ -292,9 +292,9 @@ WebPTranslator::_TranslateFromBits(BPositionIO* stream, BMessage* ioExtension,
 	}
 	free(bits);
 
-    picture.writer = _EncodedWriter;
-    picture.custom_ptr = target;
-    picture.stats = NULL;
+	picture.writer = _EncodedWriter;
+	picture.custom_ptr = target;
+	picture.stats = NULL;
 
 	if (!WebPEncode(&config, &picture)) {
 		printf("Error! WebPEncode() failed!\n");
@@ -390,8 +390,8 @@ WebPTranslator::_TranslateFromWebP(BPositionIO* stream, BMessage* ioExtension,
 WebPTranslator::_EncodedWriter(const uint8_t* data, size_t dataSize,
 	const WebPPicture* const picture)
 {
-  BPositionIO* target = (BPositionIO*)picture->custom_ptr;
-  return dataSize ? (target->Write(data, dataSize) == (ssize_t)dataSize) : 1;
+	BPositionIO* target = (BPositionIO*)picture->custom_ptr;
+	return dataSize ? (target->Write(data, dataSize) == (ssize_t)dataSize) : 1;
 }
 
 
