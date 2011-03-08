@@ -27,10 +27,10 @@ static char *gLogFilePath = NULL;
 mutex gLogLock;
 
 
-static 
+static
 void create_log()
 {
-	if(gLogFilePath == NULL)
+	if (gLogFilePath == NULL)
 		return;
 
 	int flags = O_WRONLY | O_CREAT | ((gTruncateLogFile) ? O_TRUNC : 0);
@@ -43,18 +43,20 @@ void create_log()
 void load_settings()
 {
 	void *handle = load_driver_settings(DRIVER_NAME);
-	if(handle == 0)
+	if (handle == 0)
 		return;
 
 	gTraceOn = get_driver_boolean_parameter(handle, "trace", gTraceOn, true);
-	gTraceFlow = get_driver_boolean_parameter(handle, "trace_flow", gTraceFlow, true);
-	gTruncateLogFile = get_driver_boolean_parameter(handle,	"truncate_logfile", 
-						gTruncateLogFile, true);
-	gAddTimeStamp = get_driver_boolean_parameter(handle, "add_timestamp", 
-						gAddTimeStamp, true);
-	const char * logFilePath = get_driver_parameter(handle, "logfile", 
-						NULL, "/var/log/"DRIVER_NAME".log");
-	if(logFilePath != NULL) {
+	gTraceFlow = get_driver_boolean_parameter(handle, "trace_flow",
+		gTraceFlow, true);
+	gTruncateLogFile = get_driver_boolean_parameter(handle,	"truncate_logfile",
+		gTruncateLogFile, true);
+	gAddTimeStamp = get_driver_boolean_parameter(handle, "add_timestamp",
+		gAddTimeStamp, true);
+	const char * logFilePath = get_driver_parameter(handle, "logfile",
+		NULL, "/var/log/"DRIVER_NAME".log");
+
+	if (logFilePath != NULL) {
 		gLogFilePath = strdup(logFilePath);
 	}
 
@@ -66,7 +68,7 @@ void load_settings()
 
 void release_settings()
 {
-	if(gLogFilePath != NULL) {
+	if (gLogFilePath != NULL) {
 		mutex_destroy(&gLogLock);
 		free(gLogFilePath);
 	}
@@ -75,7 +77,7 @@ void release_settings()
 
 void usb_beceem_trace(bool force, const char* func, const char *fmt, ...)
 {
-	if(!(force || gTraceOn)) {
+	if (!(force || gTraceOn)) {
 //		return;
 	}
 
@@ -83,21 +85,21 @@ void usb_beceem_trace(bool force, const char* func, const char *fmt, ...)
 	static const char *prefix = "\33[33m"DRIVER_NAME":\33[0m";
 	static char buffer[1024];
 	char *buf_ptr = buffer;
-	if(gLogFilePath == NULL){
+	if (gLogFilePath == NULL) {
 		strcpy(buffer, prefix);
 		buf_ptr += strlen(prefix);
 	}
-    
-	if(gAddTimeStamp) { 
-      bigtime_t time = system_time();
-      uint32 msec = time / 1000;
-      uint32 sec  = msec / 1000;
-      sprintf(buf_ptr, "%02ld.%02ld.%03ld:", 
-			  			sec / 60, sec % 60, msec % 1000);
-      buf_ptr += strlen(buf_ptr);
-    }
 
-	if(func	!= NULL) {
+	if (gAddTimeStamp) {
+		bigtime_t time = system_time();
+		uint32 msec = time / 1000;
+		uint32 sec  = msec / 1000;
+		sprintf(buf_ptr, "%02ld.%02ld.%03ld:",
+			sec / 60, sec % 60, msec % 1000);
+		buf_ptr += strlen(buf_ptr);
+	}
+
+	if (func	!= NULL) {
 		sprintf(buf_ptr, "%s::", func);
 		buf_ptr += strlen(buf_ptr);
 	}
@@ -106,7 +108,7 @@ void usb_beceem_trace(bool force, const char* func, const char *fmt, ...)
 	vsprintf(buf_ptr, fmt, arg_list);
 	va_end(arg_list);
 
-	if(gLogFilePath == NULL) {
+	if (gLogFilePath == NULL) {
 		dprintf(buffer);
 		return;
 	}
