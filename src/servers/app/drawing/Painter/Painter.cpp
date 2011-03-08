@@ -154,7 +154,7 @@ Painter::AttachToBuffer(RenderingBuffer* buffer)
 			buffer->Width(), buffer->Height(), buffer->BytesPerRow());
 
 		fAttached = true;
-		fValidClipping = fClippingRegion
+		fValidClipping = fClippingRegion != NULL
 			&& fClippingRegion->Frame().IsValid();
 
 		// These are the AGG renderes and rasterizes which
@@ -1589,14 +1589,13 @@ Painter::InvertRect(const BRect& r) const
 	CHECK_CLIPPING
 
 	BRegion region(r);
-	if (fClippingRegion)
-		region.IntersectWith(fClippingRegion);
+	region.IntersectWith(fClippingRegion);
 
 	// implementation only for B_RGB32 at the moment
 	int32 count = region.CountRects();
-	for (int32 i = 0; i < count; i++) {
+	for (int32 i = 0; i < count; i++)
 		_InvertRect32(region.RectAt(i));
-	}
+
 	return _Clipped(r);
 }
 
