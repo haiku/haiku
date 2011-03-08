@@ -12,6 +12,20 @@ Application Sudoku :
 	SudokuView.cpp
 	SudokuWindow.cpp
 
-	: be tracker $(TARGET_LIBSTDC++)
+	: be tracker $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSTDC++)
 	: Sudoku.rdef
 	;
+
+DoCatalogs Sudoku :
+    x-vnd.Haiku-Sudoku
+    :
+	ProgressWindow.cpp
+	Sudoku.cpp
+	SudokuGenerator.cpp
+	SudokuWindow.cpp
+;
+
+AddCatalogEntryAttribute Sudoku
+	:
+	x-vnd.Haiku-Sudoku:SudokuWindow:Sudoku
+;

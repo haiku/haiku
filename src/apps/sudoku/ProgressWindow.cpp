@@ -8,6 +8,7 @@
 
 #include <Autolock.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <MessageRunner.h>
 #include <Screen.h>
 #include <StatusBar.h>
@@ -15,12 +16,15 @@
 #include <stdio.h>
 
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "ProgressWindow"
+
 static const uint32 kMsgShow = 'show';
 
 
 ProgressWindow::ProgressWindow(BWindow* referenceWindow,
 		BMessage* abortMessage)
-	: BWindow(BRect(0, 0, 250, 100), "Progress monitor",
+	: BWindow(BRect(0, 0, 250, 100), B_TRANSLATE("Progress monitor"),
 		B_MODAL_WINDOW_LOOK, B_FLOATING_APP_WINDOW_FEEL,
 		B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS),
 	fRunner(NULL)
@@ -41,7 +45,7 @@ ProgressWindow::ProgressWindow(BWindow* referenceWindow,
 
 	if (abortMessage != NULL && referenceWindow) {
 		rect.top += height + 8;
-		BButton* button = new BButton(rect, "abort", "Abort",
+		BButton* button = new BButton(rect, "abort", B_TRANSLATE("Abort"),
 			abortMessage);
 		button->ResizeToPreferred();
 		button->MoveBy((rect.Width() - button->Bounds().Width()) / 2, 0);

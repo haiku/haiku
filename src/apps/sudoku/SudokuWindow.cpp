@@ -10,6 +10,7 @@
 
 #include <Alert.h>
 #include <Application.h>
+#include <Catalog.h>
 #include <File.h>
 #include <FilePanel.h>
 #include <FindDirectory.h>
@@ -28,6 +29,9 @@
 #include "SudokuGenerator.h"
 #include "SudokuView.h"
 
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "SudokuWindow"
 
 const uint32 kMsgOpenFilePanel = 'opfp';
 const uint32 kMsgGenerateSudoku = 'gnsu';
@@ -111,7 +115,9 @@ GenerateSudoku::_Generate()
 
 	bigtime_t start = system_time();
 	generator.Generate(&fField, 40 - fLevel * 5, fProgress, &fQuit);
-	printf("generated in %g msecs\n",
+	printf(B_TRANSLATE_WITH_CONTEXT("generated in %g msecs\n",
+		"When Sudoku is launched from a Terminal window, this message "
+		"is shown there."),
 		(system_time() - start) / 1000.0);
 
 	BMessage done(kMsgSudokuGenerated);
@@ -138,8 +144,8 @@ GenerateSudoku::_GenerateThread(void* _self)
 
 
 SudokuWindow::SudokuWindow()
-	: BWindow(BRect(100, 100, 500, 520), "Sudoku", B_TITLED_WINDOW,
-		B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE),
+	: BWindow(BRect(100, 100, 500, 520), B_TRANSLATE("Sudoku"),
+	B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE),
 	fGenerator(NULL),
 	fStoredState(NULL),
 	fExportFormat(kExportAsText)
@@ -189,29 +195,31 @@ SudokuWindow::SudokuWindow()
 	// add menu
 
 	// "File" menu
-	BMenu* menu = new BMenu("File");
-	fNewMenu = new BMenu("New");
+	BMenu* menu = new BMenu(B_TRANSLATE("File"));
+	fNewMenu = new BMenu(B_TRANSLATE("New"));
 	menu->AddItem(new BMenuItem(fNewMenu, new BMessage(kMsgGenerateSudoku)));
 	fNewMenu->Superitem()->SetShortcut('N', B_COMMAND_KEY);
 
 	BMessage* message = new BMessage(kMsgGenerateSudoku);
 	message->AddInt32("level", kEasyLevel);
-	fNewMenu->AddItem(new BMenuItem("Easy", message));
+	fNewMenu->AddItem(new BMenuItem(B_TRANSLATE("Easy"), message));
 	message = new BMessage(kMsgGenerateSudoku);
 	message->AddInt32("level", kAdvancedLevel);
-	fNewMenu->AddItem(new BMenuItem("Advanced", message));
+	fNewMenu->AddItem(new BMenuItem(B_TRANSLATE("Advanced"), message));
 	message = new BMessage(kMsgGenerateSudoku);
 	message->AddInt32("level", kHardLevel);
-	fNewMenu->AddItem(new BMenuItem("Hard", message));
+	fNewMenu->AddItem(new BMenuItem(B_TRANSLATE("Hard"), message));
 
 	fNewMenu->AddSeparatorItem();
-	fNewMenu->AddItem(new BMenuItem("Blank", new BMessage(kMsgNewBlank)));
+	fNewMenu->AddItem(new BMenuItem(B_TRANSLATE("Blank"),
+		new BMessage(kMsgNewBlank)));
 
-	menu->AddItem(new BMenuItem("Start again", new BMessage(kMsgStartAgain)));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Start again"),
+		new BMessage(kMsgStartAgain)));
 	menu->AddSeparatorItem();
 	BMenu* recentsMenu = BRecentFilesList::NewFileListMenu(
-		"Open file" B_UTF8_ELLIPSIS, NULL, NULL, this, 10, false, NULL,
-		kSignature);
+		B_TRANSLATE("Open file" B_UTF8_ELLIPSIS), NULL, NULL, this, 10, false,
+		NULL, kSignature);
 	BMenuItem *item;
 	menu->AddItem(item = new BMenuItem(recentsMenu,
 		new BMessage(kMsgOpenFilePanel)));
@@ -219,35 +227,38 @@ SudokuWindow::SudokuWindow()
 
 	menu->AddSeparatorItem();
 
-	BMenu* subMenu = new BMenu("Export as" B_UTF8_ELLIPSIS);
+	BMenu* subMenu = new BMenu(B_TRANSLATE("Export as" B_UTF8_ELLIPSIS));
 	message = new BMessage(kMsgExportAs);
 	message->AddInt32("as", kExportAsText);
-	subMenu->AddItem(new BMenuItem("Text", message));
+	subMenu->AddItem(new BMenuItem(B_TRANSLATE("Text"), message));
 	message= new BMessage(kMsgExportAs);
 	message->AddInt32("as", kExportAsHTML);
-	subMenu->AddItem(new BMenuItem("HTML", message));
+	subMenu->AddItem(new BMenuItem(B_TRANSLATE("HTML"), message));
 	menu->AddItem(subMenu);
 
-	menu->AddItem(item = new BMenuItem("Copy", new BMessage(B_COPY), 'C'));
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Copy"),
+		new BMessage(B_COPY), 'C'));
 
 	menu->AddSeparatorItem();
 
-	menu->AddItem(item = new BMenuItem("About Sudoku" B_UTF8_ELLIPSIS,
+	menu->AddItem(item = new BMenuItem(
+		B_TRANSLATE("About Sudoku" B_UTF8_ELLIPSIS),
 		new BMessage(B_ABOUT_REQUESTED)));
 	menu->AddSeparatorItem();
 
-	menu->AddItem(new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED), 'Q'));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Quit"),
+		new BMessage(B_QUIT_REQUESTED), 'Q'));
 	menu->SetTargetForItems(this);
 	item->SetTarget(be_app);
 	menuBar->AddItem(menu);
 
 	// "View" menu
-	menu = new BMenu("View");
-	menu->AddItem(item = new BMenuItem("Mark invalid values",
+	menu = new BMenu(B_TRANSLATE("View"));
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Mark invalid values"),
 		new BMessage(kMsgMarkInvalid)));
 	if ((fSudokuView->HintFlags() & kMarkInvalid) != 0)
 		item->SetMarked(true);
-	menu->AddItem(item = new BMenuItem("Mark valid hints",
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Mark valid hints"),
 		new BMessage(kMsgMarkValidHints)));
 	if ((fSudokuView->HintFlags() & kMarkValidHints) != 0)
 		item->SetMarked(true);
@@ -255,23 +266,27 @@ SudokuWindow::SudokuWindow()
 	menuBar->AddItem(menu);
 
 	// "Help" menu
-	menu = new BMenu("Help");
-	menu->AddItem(fUndoItem = new BMenuItem("Undo", new BMessage(B_UNDO), 'Z'));
+	menu = new BMenu(B_TRANSLATE("Help"));
+	menu->AddItem(fUndoItem = new BMenuItem(B_TRANSLATE("Undo"),
+		new BMessage(B_UNDO), 'Z'));
 	fUndoItem->SetEnabled(false);
-	menu->AddItem(fRedoItem = new BMenuItem("Redo", new BMessage(B_REDO), 'Z',
+	menu->AddItem(fRedoItem = new BMenuItem(B_TRANSLATE("Redo"),
+		new BMessage(B_REDO), 'Z',
 		B_SHIFT_KEY));
 	fRedoItem->SetEnabled(false);
 	menu->AddSeparatorItem();
 
-	menu->AddItem(new BMenuItem("Snapshot current",
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Snapshot current"),
 		new BMessage(kMsgStoreState)));
-	menu->AddItem(fRestoreStateItem = new BMenuItem("Restore snapshot",
+	menu->AddItem(fRestoreStateItem = new BMenuItem(
+		B_TRANSLATE("Restore snapshot"),
 		new BMessage(kMsgRestoreState)));
 	fRestoreStateItem->SetEnabled(fStoredState != NULL);
 	menu->AddSeparatorItem();
 
-	menu->AddItem(new BMenuItem("Solve", new BMessage(kMsgSolveSudoku)));
-	menu->AddItem(new BMenuItem("Solve single field",
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Solve"),
+		new BMessage(kMsgSolveSudoku)));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Solve single field"),
 		new BMessage(kMsgSolveSingle)));
 	menu->SetTargetForItems(fSudokuView);
 	menuBar->AddItem(menu);
@@ -396,15 +411,16 @@ SudokuWindow::_MessageDropped(BMessage* message)
 		char buffer[1024];
 		if (hasRef) {
 			snprintf(buffer, sizeof(buffer),
-				"Could not open \"%s\":\n"
-				"%s", ref.name, strerror(status));
+				B_TRANSLATE("Could not open \"%s\":\n%s\n"), ref.name,
+				strerror(status));
 		} else {
-			snprintf(buffer, sizeof(buffer), "Could not set Sudoku:\n%s",
+			snprintf(buffer, sizeof(buffer),
+				B_TRANSLATE("Could not set Sudoku:\n%s\n"),
 				strerror(status));
 		}
 
-		(new BAlert("Sudoku request",
-			buffer, "OK", NULL, NULL,
+		(new BAlert(B_TRANSLATE("Sudoku request"),
+			buffer, B_TRANSLATE("OK"), NULL, NULL,
 			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
 	}
 }
@@ -546,8 +562,9 @@ SudokuWindow::MessageReceived(BMessage* message)
 		}
 
 		case kMsgSudokuSolved:
-			(new BAlert("Sudoku request",
-				"Sudoku solved - congratulations!", "OK", NULL, NULL,
+			(new BAlert(B_TRANSLATE("Sudoku request"),
+				B_TRANSLATE("Sudoku solved - congratulations!\n"),
+				B_TRANSLATE("OK"), NULL, NULL,
 				B_WIDTH_AS_USUAL, B_IDEA_ALERT))->Go();
 			break;
 

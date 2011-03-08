@@ -10,9 +10,14 @@
 #include "SudokuField.h"
 #include "SudokuSolver.h"
 
+#include <Catalog.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "SudokuGenerator"
 
 SudokuGenerator::SudokuGenerator()
 {
@@ -54,7 +59,7 @@ SudokuGenerator::Generate(SudokuField* target, uint32 fieldsLeft,
 
 	SudokuField field(target->BlockSize());
 	uint32 inputCount = field.Size() * field.Size() / 3;
-	_Progress(progress, "Creating solvable field", 5.f);
+	_Progress(progress, B_TRANSLATE("Creating solvable field"), 5.f);
 
 	while (!*quit) {
 		field.Reset();
@@ -107,7 +112,7 @@ SudokuGenerator::Generate(SudokuField* target, uint32 fieldsLeft,
 	bool tried[field.Size() * field.Size()];
 	int32 tries = field.Size() * field.Size() * 3 / 4;
 	memset(tried, 0, sizeof(tried));
-	_Progress(progress, "Searching for removable values", 30.f);
+	_Progress(progress, B_TRANSLATE("Searching for removable values"), 30.f);
 
 	while (!*quit && removeCount > 0 && tries-- > 0) {
 		SudokuField copy(field);
