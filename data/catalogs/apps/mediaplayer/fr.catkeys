@@ -1,7 +1,15 @@
-1	french	x-vnd.Haiku-MediaPlayer	723889768
+1	french	x-vnd.Haiku-MediaPlayer	2498218170
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Panoramique américain)
+100% scale	MediaPlayer-Main		Échelle 100%
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinémascope)
+200% scale	MediaPlayer-Main		Échelle 200%
+300% scale	MediaPlayer-Main		Echelle 300%
+400% scale	MediaPlayer-Main		Échelle 400%
+50% scale	MediaPlayer-Main		Échelle 50%
+<nothing to redo>	MediaPlayer-PlaylistWindow		<rien à rétablir>
+<nothing to undo>	MediaPlayer-PlaylistWindow		<rien à rétablir>
 <unknown>	PlaylistItem-album		<inconnu>
+<untitled>	PlaylistItem-title		<sans titre>
 About MediaPlayer…	MediaPlayer-Main		À propos de MédiaPlayer
 Always on top	MediaPlayer-Main		Toujours au dessus
 Aspect ratio	MediaPlayer-Main		Aspect proportionnel
@@ -14,18 +22,27 @@ Bottom of video	MediaPlayer-SettingsWindow		Au bas de la vidéo
 Cancel	MediaPlayer-SettingsWindow		Annuler
 Close	MediaPlayer-Main		Fermer
 Close	MediaPlayer-PlaylistWindow		Fermer
+Close window when done playing movies	MediaPlayer-SettingsWindow		Fermer la fenêtre après la lecture des vidéos
+Drop files to play	MediaPlayer-Main		Déposez les fichiers à lire
 Error: 	MediaPlayer-Main		Erreur :
 Error: 	MediaPlayer-RemovePLItemsCmd		Erreur :
 File info…	MediaPlayer-Main		Informations du fichier…
 Full screen	MediaPlayer-Main		Plein écran
+Full volume	MediaPlayer-SettingsWindow		Plein volume
 Hide interface	MediaPlayer-Main		Masquer l'interface
+Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Erreur interne (échec du verrouillage). La liste de lecture n'a pas pu être sauvegardée.
+Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Erreur interne (message incorrect). La liste de lecture n'a pas pu être sauvegardée.
+Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Erreur interne (plus de mémoire). La liste de lecture n'a pas pu être sauvegardée.
 Low volume	MediaPlayer-SettingsWindow		Volume bas
+MediaPlayer encountered an internal error. The file could not be opened.	MediaPlayer-Main		MédiaPlayer a rencontré une erreur interne. Impossible d'ouvrir le fichier.
 MediaPlayer settings	MediaPlayer-SettingsWindow		Réglages de MédiaPlayer
-MediaPlayer\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		MediaPlayer\n\nÉcrit by Marcus Overhagen, Stephan Aßmus et Frederik Modéen
+MediaPlayer\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		MédiaPlayer\n\nÉcrit by Marcus Overhagen, Stephan Aßmus et Frederik Modéen
 Mute	MediaPlayer-Main		Muet
 Muted	MediaPlayer-SettingsWindow		Muet
 New player…	MediaPlayer-Main		Nouveau lecteur…
 Next	MediaPlayer-Main		Suivant
+No aspect correction	MediaPlayer-Main		Pas de correction d'aspect
+Nothing to Play	MediaPlayer-Main		Rien à Lire
 OK	MediaPlayer-Main		OK
 OK	MediaPlayer-PlaylistWindow		OK
 OK	MediaPlayer-RemovePLItemsCmd		OK
@@ -44,14 +61,19 @@ Quit	MediaPlayer-Main		Quitter
 Randomize	MediaPlayer-PlaylistWindow		Aléatoire
 Rating	MediaPlayer-Main		Évaluation
 Redo	MediaPlayer-PlaylistWindow		Rétablir
+Remove (Del)	MediaPlayer-PlaylistWindow		Supprimer (effacer)
+Remove Entries	MediaPlayer-RemovePLItemsCmd		Retirer les entrées
+Remove Entry	MediaPlayer-RemovePLItemsCmd		Enlever l'entrée
 Remove all	MediaPlayer-PlaylistWindow		Retirer tout
 Remove and put into Trash	MediaPlayer-PlaylistWindow		Supprimer et envoyer à la corbeille
+Save	MediaPlayer-Main		Enregistrer 
 Save	MediaPlayer-PlaylistWindow		Enregistrer 
 Save Playlist	MediaPlayer-PlaylistWindow		Enregistrer la liste de lecture
 Save as…	MediaPlayer-PlaylistWindow		Enregistrer sous…
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		La sauvegarde de la liste de lecture a échoué.\n\nErreur : 
 Settings…	MediaPlayer-Main		Réglages…
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Certains fichiers ne peuvent pas être envoyés à la corbeille
+Start playing.	MediaPlayer-Main		Commencer la lecture.
 Stop	MediaPlayer-Main		Arrêt
 Stop playing.	MediaPlayer-Main		Arrêter la lecture.
 Stream settings	MediaPlayer-Main		Réglages du flux
@@ -60,6 +82,7 @@ Subtitle size	MediaPlayer-SettingsWindow		Taille des sous-titres
 Subtitles	MediaPlayer-Main		Sous-titres
 Thanks	MediaPlayer-Main		Merci
 The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Impossible d'ouvrir le fichier « %filename ».\n\n
+There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Il n'existe pas de décodeur capable de prendre en charge ce format de fichier ou bien le décodeur a des soucis avec cette version spécifique du format.
 Track	Audio Track Menu		Piste
 Track	Video Track Menu		Piste
 Track %d	MediaPlayer-Main		Piste %d

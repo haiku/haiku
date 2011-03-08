@@ -1,15 +1,13 @@
-1	french	x-vnd.Haiku-NetworkStatus	3992317590
+1	french	x-vnd.Haiku-NetworkStatus	3379615764
+%ifaceName information:\n	NetworkStatusView		Informations de %ifaceName :\n
 <no wireless networks found>	NetworkStatusView		<aucun réseaux sans fil détecté>
 Address	NetworkStatusView		Adresse
-Address information:\n	NetworkStatusView		Informations d'adresses:\n
 Broadcast	NetworkStatusView		Diffusion
-Broadcast information:\n	NetworkStatusView		Informations de diffusion :\n
 Configuring	NetworkStatusView		Configuration en cours
 Could not join wireless network:\n	NetworkStatusView		impossible de joinde le réseau sans fil :\n
 Install in Deskbar	NetworkStatus		Installer dans la Deskbar
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Le lancement de la preflet réseau a échoué.\n\nErreur : 
 Netmask	NetworkStatusView		Masque réseau
-Netmask information:\n	NetworkStatusView		Informations de masque réseau :\n
 NetworkStatus	NetworkStatusWindow		StatutRéseau
 NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		Options de StatutRéseau :\n\t--deskbar\tajoute automatiquement un réplicant à la Deskbar\n\t--help\t\taffiche cette aide et sort\n
 NetworkStatus\n\twritten by %1 and Hugo Santos\n\t%2, Haiku, Inc.\n	NetworkStatusView		StatutRéseau\n\tÉcrit par %1 et Hugo Santos\n\t%2, Haiku, Inc.\n

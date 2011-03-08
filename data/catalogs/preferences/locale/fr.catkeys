@@ -17,7 +17,7 @@ Numbers	TimeFormatSettings		Nombres
 OK	Locale Preflet Window		OK
 Positive:	TimeFormatSettings		Positif :
 Preferred languages	Locale Preflet Window		Langues préférées
-Revert	Locale Preflet Window		Défaire
+Revert	Locale Preflet Window		Rétablir
 Short format:	TimeFormatSettings		Format court :
 Time	TimeFormatSettings		Heure
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		La liste des langages disponibles est introuvable, ce preflet est donc inutilisable !

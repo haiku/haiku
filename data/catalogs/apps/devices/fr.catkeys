@@ -1,9 +1,11 @@
-1	french	x-vnd.Haiku-Devices	4145096865
+1	french	x-vnd.Haiku-Devices	189828730
 ACPI Information	DeviceACPI		Informations ACPI
 ACPI Processor Namespace '%2'	DeviceACPI		Espace de nom ACPI du processeur « %2 »
 ACPI System Bus	DeviceACPI		Bus système ACPI
 ACPI System Indicator	DeviceACPI		Indicateur système ACPI
 ACPI Thermal Zone	DeviceACPI		Zone thermique ACPI
+ACPI bus	Device		Bus ACPI
+ACPI bus	DevicesView		Bus ACPI
 ACPI controller	Device		Contrôleur ACPI
 ACPI node '%1'	DeviceACPI		Noeud ACPI « %1 »
 About	DevicesApplication		À propos
@@ -11,13 +13,16 @@ About Devices…	DevicesView		À propos de Périphériques…
 Basic information	DevicesView		Informations de base
 Bridge	Device		Pont
 Bus	DevicesView		Bus
+Bus Information	Device		Informations du bus
 Category	DevicesView		Catégorie
 Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Information de classe\t\t\t: %classInfo%
 Class info	DevicePCI		Information de classe
 Communication controller	Device		Contrôleur de communication
 Computer	Device		Ordinateur
+Computer	DevicesView		Ordinateur
 Connection	DevicesView		Connexion
-Detailed	DevicesView		Détaillé
+Detailed	DevicesView		Détail
+Device	Device		Périphérique
 Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Nom du périphérique\t\t\t\t\t: %Name%\nFabricant\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t: %Manufacturer%\nPilote utilisé\t\t\t\t\t\t\t\t\t\t: %DriverUsed%\nChemins du périphérique\t: %DevicePaths%
 Device name	Device		Nom du périphérique
 Device name	DeviceACPI		Nom du périphérique
@@ -35,12 +40,14 @@ Driver used	DevicePCI		Pilote utilisé
 Encryption controller	Device		Contrôleur de chiffrement
 Generate system information	DevicesView		Générer les informations systèmes
 Generic system peripheral	Device		Périphérique système générique
+ISA bus	Device		Bus ISA
+ISA bus	DevicesView		Bus ISA
 Input device controller	Device		Contrôleur de périphérique d'entrée
 Intelligent controller	Device		Contrôleur intelligent
-Manufacturer	Device		Fabriquant
+Manufacturer	Device		Fabricant
 Manufacturer	DeviceACPI		Fabricant
 Manufacturer	DevicePCI		Fabricant
-Manufacturer:	Device		Fabriquant :
+Manufacturer:	Device		Fabricant :
 Mass storage controller	Device		Contrôleur de mémoire de masse
 Memory controller	Device		Contrôleur mémoire
 Multimedia controller	Device		Contrôleur multimédia
@@ -52,6 +59,8 @@ Not implemented	DevicePCI		Non implémenté
 OK	DevicesApplication		OK
 Order by:	DevicesView		Trier par :
 PCI Information	DevicePCI		Informations PCI
+PCI bus	Device		Bus PCI
+PCI bus	DevicesView		Bus PCI
 Processor	Device		Microprocesseur
 Quit	DevicesView		Quitter
 Refresh devices	DevicesView		Rafraichir les périphériques
@@ -61,5 +70,8 @@ Serial bus controller	Device		Contrôleur de bus série
 Signal processing controller	Device		Contrôleur de traitement du signal
 Unclassified device	Device		Périphérique inclassable
 Unknown	DevicePCI		Inconnu
+Unknown device	Device		Périphérique inconnu
+Unknown device	DevicesView		Périphérique inconnu
 Value	PropertyList		Valeur
 Wireless controller	Device		Contrôleur sans fils
+unknown	Device		inconnu

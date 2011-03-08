@@ -1,5 +1,5 @@
 1	french	x-vnd.Haiku-Magnify	1680541832
-%width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width * %height @ %pixelSize pixels/pixel
+%width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width ⨯ %height @ %pixelSize pixels/pixel
 About Magnify…	Magnify-Main		À propos de la Loupe…
 Add a crosshair	Magnify-Main		Ajouter un viseur
 Copy image	Magnify-Main		Copier l'image
@@ -7,7 +7,7 @@ Copy/Save:\n  copy - copies the current image to the clipboard\n  save - prompts
 Decrease pixel size	Magnify-Main		Réduire le grossissement
 Decrease window size	Magnify-Main		Diminuer la taille de la fenêtre
 Freeze/Unfreeze image	Magnify-Main		Gèle/Dégèle l'image
-General:\n  32 x 32 - the top left numbers are the number of visible\n    pixels (width x height)\n  8 pixels/pixel - represents the number of pixels that are\n    used to magnify a pixel\n  R:152 G:52 B:10 -  the RGB values for the pixel under\n    the red square\n	Magnify-Help		Général: \n 32x32 - ces nombres dans le coin supérieur gauche représentent le nombre de\npixels affichés (largeur x hauteur).\n8 pixels/pixel - représente le facteur de grossissement des pixels.\nR:152 V:52 B:10 - valeurs RVB du pixel sous le carré rouge.\n
+General:\n  32 x 32 - the top left numbers are the number of visible\n    pixels (width x height)\n  8 pixels/pixel - represents the number of pixels that are\n    used to magnify a pixel\n  R:152 G:52 B:10 -  the RGB values for the pixel under\n    the red square\n	Magnify-Help		Général: \n 32⨯32 - ces nombres dans le coin supérieur gauche représentent le nombre de\npixels affichés (largeur ⨯ hauteur).\n8 pixels/pixel - représente le facteur de grossissement des pixels.\nR:152 V:52 B:10 - valeurs RVB du pixel sous le carré rouge.\n
 Help…	Magnify-Main		Aide…
 Hide/Show grid	Magnify-Main		Cacher/afficher la grille
 Hide/Show info	Magnify-Main		Cacher/Afficher les informations

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-OpenGL	3403298666
+1	french	x-vnd.Haiku-OpenGL	1643925293
 Attributes stack size:	Capabilities		Taille de la pile d'attributs :
 Auxiliary buffer(s):	Capabilities		Tampon(s) auxilliaire(s) :
 Available	Extensions		Disponible
@@ -11,6 +11,7 @@ List stack size:	Capabilities		Taille de la pile de listes :
 Max. 2D texture size:	Capabilities		Taille maximum des textures 2D :
 Max. 3D texture size:	Capabilities		Taille maximum des textures 3D :
 Max. clipping planes:	Capabilities		Nombre de plans de coupes :
+Max. convolution:	Capabilities		Convolution maximale :
 Max. lights:	Capabilities		Nombre d'éclairages maximum :
 Model stack size:	Capabilities		Taille de la pile de modèles :
 Name stack size:	Capabilities		Taille de la pile de noms :

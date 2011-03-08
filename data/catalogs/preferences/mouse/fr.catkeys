@@ -19,6 +19,6 @@ Mouse acceleration	SettingsView		Accélération de la souris
 Mouse speed	SettingsView		Vitesse de la souris
 Mouse type:	SettingsView		Type de souris :
 Normal	SettingsView		Normal
-Revert	MouseWindow		Défaire
-Slow	SettingsView		Lent
+Revert	MouseWindow		Rétablir
+Slow	SettingsView		Lente
 Warp	SettingsView		Téléportation 

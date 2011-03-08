@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Terminal	2632464371
+1	french	x-vnd.Haiku-Terminal	3863626769
 -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h, --help affiche cette aide\n -t, --title défini le titre de la fenêtre\n -f, --fullscreen démarre en plein écran\n
 Abort	Terminal Shell		Abandonner
 About Terminal…	Terminal TermWindow		À propos de Terminal…
@@ -25,12 +25,10 @@ Copy here	Terminal TermView		Copier ici
 Create link here	Terminal TermView		Créer un raccourci ici
 Custom	Terminal colors schema		Personnalisé
 Decrease	Terminal TermWindow		Réduire
-Didn't find any available pseudo ttys.	Terminal Shell		Aucun pseudo tty disponible trouvé.
 Don't save	Terminal PrefWindow		Ne pas sauver
 Edit	Terminal TermWindow		Éditer
 Edit tab title…	Terminal TermWindow		Éditer le titre de l'onglet…
 Error!	Terminal getString		Erreur !
-Failed to init pseudo tty.	Terminal Shell		Échec à l'initialisation du pseudo tty.
 Find	Terminal FindWindow		Rechercher
 Find failed	Terminal TermWindow		Échec de la recherche
 Find next	Terminal TermWindow		Rechercher le suivant
@@ -56,7 +54,6 @@ OK	Terminal TermView		OK
 OK	Terminal TermWindow		OK
 Page setup…	Terminal TermWindow		Mise en page…
 Paste	Terminal TermWindow		Coller
-PrefHandler::getRGB(%s) - key not found\n	Terminal getRGB		PrefHandler::getRGB( %s ) - clé non trouvée\n
 Print	Terminal TermWindow		Imprimer
 Print cancelled.	Terminal TermWindow		Impression annulée
 Quit	Terminal TermWindow		Quitter
@@ -66,7 +63,6 @@ Save as default	Terminal TermWindow		Enregistrer les préférences
 Save changes to this settings panel?	Terminal PrefWindow		Voulez-vous enregistrer les changements de ce panneau de réglage ?
 Save to file…	Terminal PrefWindow		Enregistrer sous…
 Search forward	Terminal FindWindow		Rechercher en avant
-Secondary mouse button drop menu	Terminal TermView		Menu contextuel du bouton secondaire de la souris
 Select all	Terminal TermWindow		Sélectionner tout
 Selected background	Terminal AppearancePrefView		Fond sélectionné
 Selected text	Terminal AppearancePrefView		Texte sélectionné
@@ -112,9 +108,4 @@ Window title…	Terminal TermWindow		Titre de la fenêtre…
 \t%i\t-\tL'indice de l'onglet.\n
 \t%p\t-\tLe nom du processus actif.\n
 \t%%\t-\tLe caractère '%'.
-can't open tty (%s).	Terminal Shell		Impossible d'ouvrir le tty ( %s ).
-could not set session leader.	Terminal Shell		le chef de session ne peut pas étre défini.
-failed set terminal interface (TERMIOS).	Terminal Shell		La connexion au Terminal a échoué (TERMIOS).
-mismatch handshake.	Terminal Shell		Négotiation infructueuse.
-sigaction() failed: %s\n	Terminal TermApp		sigaction() a échoué : %s\n
 size	Terminal TermView		taille

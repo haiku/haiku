@@ -13,7 +13,7 @@ Low energy	Status view		Basse consommation
 Ok	Status view		OK
 Open Speedstep preferences…	Status view		Ouvrir les préférences Speestep…
 Quit	Status view		Quitter
-Revert	Pref Window		Défaire
+Revert	Pref Window		Rétablir
 Set state	Status view		Changer l'état
 Step up by CPU usage	Color Step View		Accélération par utilisation processeur :
 Stepping policy	CPU Frequency View		Stratégie d'accélération

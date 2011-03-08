@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-CharacterMap	3638061597
+1	french	x-vnd.Haiku-CharacterMap	2819390811
 About CharacterMap…	CharacterWindow		À propos de la TableDesCaractères…
 Aegean numbers	UnicodeBlocks		Nombres égéens
 Alphabetic presentation forms	UnicodeBlocks		Formes de présentation alphabétiques
@@ -32,10 +32,11 @@ CJK unified ideographs extension A	UnicodeBlocks		Supplément A idéogrammes uni
 CJK unified ideographs extension B	UnicodeBlocks		Supplément B idéogrammes unifiés CJC
 Carian	UnicodeBlocks		Carien
 Cham	UnicodeBlocks		Cham
-CharacterMap settings	CharacterWindow		Réglages de la TableDesCaractères
+CharacterMap	CharacterWindow		TableDesCaractères
 CharacterMap\n\twritten by Axel Dörfler\n\tCopyright 2009, Haiku, Inc.\n	CharacterMap		TableDesCaractères\n\tÉcrit par Axel Dörfler\n\tCopyright 2009, Haiku, Inc.\n
 Cherokee	UnicodeBlocks		Chérokî
 Clear	CharacterWindow		Nettoyer
+Code	CharacterWindow		Code
 Combining half marks	UnicodeBlocks		Demi-signes combinatoires
 Control pictures	UnicodeBlocks		Pictogrammes de commande
 Coptic	UnicodeBlocks		Copte
@@ -112,6 +113,7 @@ Myanmar	UnicodeBlocks		Myanmar (Birman)
 N'Ko	UnicodeBlocks		N'Ko
 New Tai Lue	UnicodeBlocks		Nouveau taï lü
 Number forms	UnicodeBlocks		Formes numérales
+OK	CharacterMap		OK
 Ogham	UnicodeBlocks		Oġam
 Ol Chiki	UnicodeBlocks		Santâlî
 Old Persian	UnicodeBlocks		Perse ancien

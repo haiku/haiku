@@ -1,4 +1,5 @@
-1	french	x-vnd.Haiku-FileTypes	1546488482
+1	french	x-vnd.Haiku-FileTypes	780295643
+%1 application type	Application Type Window		Type d'application de %1
 %s file type	FileType Window		Type du fichier %s
 (from application)	FileTypes Window		(depuis l'application)
 (from super type)	FileTypes Window		(basé sur le super type)
@@ -17,6 +18,7 @@ Alpha	Application Type Window		Alpha
 Alpha	Application Types Window		Alpha
 Application flags	Application Type Window		Fanions de l'application
 Application type	Application Type Window		Types d'applications
+Application types	Application Types Window		Types d'application
 Application types…	FileTypes Window		Types d'applications…
 Args only	Application Type Window		Arguments seuls
 Attribute	Attribute Window		Attribut
@@ -87,6 +89,7 @@ Information	Application Types Window		Information
 Internal name:	Attribute Window		Nom interne :
 Internal name:	FileTypes Window		Nom interne :
 Internal name:	New File Type Window		Nom interne :
+Launch	Application Types Window		Lancer
 Left	Attribute Window	Attribute column alignment in Tracker	À gauche
 Long description:	Application Type Window		Description longue :
 Move down	FileTypes Window		Déplacer vers le bas
@@ -103,6 +106,7 @@ Open…	FileTypes Window		Ouvrir…
 Path:	Application Types Window		Chemin :
 Preferred application	FileType Window		Application préférée 
 Preferred application	FileTypes Window		Application préférée
+Progress	Application Types Window		Progression
 Quit	FileTypes Window		Quitter
 Quit, don't save	Application Type Window		Quitter sans enregistrer
 Recognition rule is not valid:\n\n	FileTypes Window		La règle d'identification n'est pas valide :\n\n
@@ -113,7 +117,8 @@ Removing a file type cannot be reverted.\nAre you sure you want to remove it?	Fi
 Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		La suppression d'un super type ne peut pas être annulée.\nTous les types de fichiers sous-jacents seront perdus !\n\nÊtes-vous sûr de vouloir l'effacer ? Pour supprimer l'ensemble du groupe, maintenez la touche « Maj » enfoncée et appuyez sur « Supprimer ».
 Right	Attribute Window	Attribute column alignment in Tracker	À droite
 Rule:	FileTypes Window		Règle :
-Same as…	FileType Window		Identique à…
+Same as…	FileType Window	The same APPLICATION as ...	Identique à…
+Same as…	FileType Window	The same TYPE as ...	Identique à…
 Same as…	FileTypes Window		Identique à…
 Save	Application Type Window		Enregistrer
 Save into resource file…	Application Type Window		Sauvegarder dans un fichier de ressources…
@@ -129,6 +134,7 @@ Set Preferred Application	Preferred App Menu		Definir l'application préférée
 Settings	FileTypes Window		Réglages
 Short description:	Application Type Window		Description courte :
 Show icons in list	FileTypes Window		Afficher les icônes en listes
+Show in Tracker…	Application Types Window		Afficher dans le Tracker…
 Show recognition rule	FileTypes Window		Afficher les règles d'identification
 Signature:	Application Type Window		Signature :
 Signature:	Application Types Window		Signature :

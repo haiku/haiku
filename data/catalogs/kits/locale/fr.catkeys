@@ -13,7 +13,7 @@ Cut	TextView		Couper
 Green:	ColorControl		Vert :
 Paste	TextView		Coller
 Red:	ColorControl		Rouge :
-Redo	TextView		Rétablir
+Redo	TextView		Refaire
 Select All	TextView		Sélectionner tout
 Undo	TextView		Annuler
 Written by:	AboutWindow		Écrit par :

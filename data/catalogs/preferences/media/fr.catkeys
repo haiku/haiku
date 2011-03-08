@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Media	1588474509
+1	french	x-vnd.Haiku-Media	1701788906
 <none>	Media views		<aucun>
 Audio input:	Media views		Entrée son :
 Audio mixer	Media Window		Mélangeur audio
@@ -11,20 +11,11 @@ Couldn't add volume control in Deskbar: %s\n	Media views		Impossible d'insérer 
 Couldn't remove volume control in Deskbar: %s\n	Media views		Impossible de retirer le contrôle du volume de la Deskbar : %s\n
 Defaults	Media views		Par défaut
 Done shutting down.	Media Window		Arrêt terminé.
-Enable real-time audio	Media views		Activer l'audio temps réel
-Enable real-time video	Media views		Activer la vidéo temps réel
-Enabling real-time audio allows system to record and play audio as fast as possible.  It achieves this performance by using more CPU and RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Activer le son temps réel permet au système d'enregistrer et lire le son aussi rapidement que possible. Ceci utilise plus de mémoire et de temps processeur.\n\n N'activez cette option que si vous avez besoin de la latence la plus faible possible.
-Enabling real-time video allows system to perform video operations as fast and smoothly as possible.  It achieves optimum performance by using more RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Activer la vidéo temps réel permet au système d'effectuer les opérations vidéo aussi rapidement et fluidement que possible. Ceci est fait en utilisant plus de mémoire.\n\n N'activez cette option que si vous avez besoin de la latence la plus faible possible.
 Media	Media Window		Média
 OK	Media Window		Ok
-OK	Media views		OK
 Quit	Media Window		Quitter
 Ready for use…	Media Window		Prêt à servir…
-Real-time	Media views		Temps réel
-Real-time audio is currently unimplemented in Haiku.	Media views		L'audio Temps-Réel n'est actuellement pas implémenté dans Haiku.
-Real-time video is currently unimplemented in Haiku.	Media views		La vidéo Temps-Réel n'est actuellement pas implémentée dans Haiku.
 Restart media services	Media views		Redémarrer les services media
-Restart the media server to apply changes.	Media views		Redémarrez le serveur media pour appliquer les changements.
 Restarting media services\nShutting down media server\n	Media Window		Redémarrage des services média\nArrêt du serveur média\n
 Restarting media services\nStarting media server…\n	Media Window		Redémarrage des services media\nDémarrage du serveur media…\n
 Show volume control on Deskbar	Media views		Afficher le contrôle de volume dans la Deskbar

@@ -1,7 +1,10 @@
-1	french	x-vnd.Haiku-Time	2846531571
+1	french	x-vnd.Haiku-Time	4190811892
 <Other>	Time		<Autre>
+Clock set to:	Time		Heure réglée sur :
 Current time:	Time		Heure actuelle :
 Date & Time	Time		Date & Heure
+GMT	Time		GMT
+Local time	Time		Heure locale
 OK	Time		OK
 Preview time:	Time		Aperçu de l'heure :
 Revert	Time		Rétablir

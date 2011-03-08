@@ -1,20 +1,26 @@
-1	french	x-vnd.Haiku-ProcessController	1793410045
-%s priority [%d]	ProcessController		Priorité %s [%d]
+1	french	x-vnd.Haiku-ProcessController	35871000
+%s [%d]	ProcessController		%s [%d]
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		©1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
 About	ProcessController		À propos
 About ProcessController…	ProcessController		À propos de ProcessControlleur…
 Cancel	ProcessController		Annuler
+Custom priority	ProcessController		Priorité personnalisée
 Damned!	ProcessController		Damnation !
 Debug this thread!	ProcessController		Déboguer cette tâche !
 Debug thread	ProcessController		Déboguer la tâche
+Display priority	ProcessController		Priorité affichage
 Do you really want to kill the team \"%s\"?	ProcessController		Voulez-vous vraiment tuer le processus « %s » ?
 Error saving file	ProcessController		Erreur à l'enregistrement du fichier
 Gone teams…	ProcessController		Processus zombies…
+Idle priority	ProcessController		Priorité inactive
 Install in Deskbar	ProcessController		Installer dans la Deskbar
 Kill this thread!	ProcessController		Tuer cette tâche !
 Live in the Deskbar	ProcessController		Installer dans la Deskbar
+Low priority	ProcessController		Priorité basse
+Lowest active priority	ProcessController		Priorité active la plus basse
 Memory usage	ProcessController		Consommation mémoire
 New Terminal	ProcessController		Nouveau Terminal
+Normal priority	ProcessController		Priorité normale
 OK	ProcessController		OK
 Ok!	ProcessController		Ok !
 ProcessController	ProcessController		ProcessControlleur
@@ -23,14 +29,19 @@ ProcessController\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyrigh
 Processor %d	ProcessController		Processeur %d
 Quit an application	ProcessController		Quitter une application
 Quit application	ProcessController		Quitter l'application
+Real-time display priority	ProcessController		Priorité affichage temps-réel
+Real-time priority	ProcessController		Priorité temps-réel
 Restart Deskbar	ProcessController		Redémarrer la Deskbar
 Restart Tracker	ProcessController		Redémarrer le Tracker
 Run in window	ProcessController		Exécuter dans une fenêtre
+System resources & caches…	ProcessController		Resources du système & caches…
 That's no Fun!	ProcessController		C'est pas fun !
 This is the last active processor...\nYou can't turn it off!	ProcessController		C'est le dernier processeur actif…\nVous ne pouvez pas l'éteindre !
 This team is already gone…	ProcessController		Ce processus n'existe déjà plus…
 This thread is already gone…	ProcessController		Cette tâche n'existe déjà plus…
 Threads and CPU usage	ProcessController		Tâches et activité CPU
+Urgent display priority	ProcessController		Priorité affichage urgent
+Urgent priority	ProcessController		Priorité urgente
 Usage: %s [-deskbar]\n	ProcessController		Utilisation : %s [-deskbar]\n
 What do you want to do with the thread \"%s\"?	ProcessController		Que voulez vous faire de la tâche « %s » ?
 Yes, kill this team!	ProcessController		Oui, tuer ce processus !

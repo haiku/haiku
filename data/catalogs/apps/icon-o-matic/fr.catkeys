@@ -1,4 +1,4 @@
-1	french	x-vnd.haiku-icon_o_matic	4128656842
+1	french	x-vnd.haiku-icon_o_matic	1995371605
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<rien à annuler>
 <unavailable>	Icon-O-Matic-StyleTypes		<indisponible>
 <unkown property>	Icon-O-Matic-PropertyNames		<propriétés inconnue>
@@ -45,6 +45,7 @@ Height	Icon-O-Matic-PropertyNames		Hauteur
 Insert Control Point	Icon-O-Matic-InsertPointCmd		Insérer un point de contrôle
 Linear	Icon-O-Matic-StyleTypes		Linéaire
 META:ICON Attribute	Icon-O-Matic-SavePanel		Attribut META:ICON
+Modify Control Point	Icon-O-Matic-ChangePointCmd		Modifier le point de contrôle
 Move	Icon-O-Matic-TransformationBoxStates		Déplacer
 Move Pivot	Icon-O-Matic-TransformationBoxStates		Déplacer le pivot
 Move Shape	Icon-O-Matic-MoveShapesCommand		Déplacer la forme

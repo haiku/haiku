@@ -1,0 +1,69 @@
+1	french	x-vnd.Haiku-MediaConverter	1223956204
+%.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld canaux / %Ld échantillons
+%.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz mono / %Ld échantillons
+%.1f kHz stereo / %lld frames	MediaFileInfo		%.1f kHz stéréo / %Ld échantillons
+%Ld x %Ld, %Ld fps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%ld ⨯ %ld, %f ips / %Ld images
+%amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles fichiers ne sont pas des médias reconnus pour être pris en charge :
+%d bit 	MediaFileInfo		%d bit
+%d byte 	MediaFileInfo		%d octet
+About MediaConverter…	Menu		À propos du MédiaConvertisseur…
+About…	MediaConverter		À propos…
+An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Une erreur est survenue lors de la lecture des informations du fichier.\n\nErreur : 
+Audio encoding:	MediaConverter		Encodage audio :
+Audio quality not supported	MediaConverter		Qualité audio non prise en charge
+Audio quality: %3d%%	MediaConverter		Qualité audio : %3d%%
+Audio:	MediaConverter-FileInfo		Audio :
+Cancel	MediaConverter		Annuler
+Cancelling	MediaConverter		Annulation
+Cancelling…	MediaConverter		Annulation…
+Continue	MediaConverter		Continuer
+Conversion cancelled	MediaConverter		Conversion annulée
+Conversion completed	MediaConverter		Conversion achevée
+Convert	MediaConverter		Convertir
+Drop media files onto this window	MediaConverter		Déposez les médias à convertir dans cette fenêtre
+Duration:	MediaConverter-FileInfo		Durée :
+Encoder parameters	MediaConverter-EncoderWindow		Paramètres d'encodage
+End   [ms]: 	MediaConverter		Fin [ms] :
+Error	MediaConverter		Erreur
+Error converting '%filename'	MediaConverter		Erreur à la conversion de « %filename »
+Error creating '%filename'	MediaConverter		Erreur à la création de « %filename »
+Error launching: %strError%	MediaConverter		Erreur de lancement : %strError%
+Error loading a file	MediaConverter		Erreur au chargement d'un fichier
+Error loading files	MediaConverter		Erreur de chargement des fichiers
+Error read audio frame %Ld	MediaConverter		Erreur de lecture de l'échantillons audio %Ld
+Error read video frame %Ld	MediaConverter		Erreur de lecture de l'image vidéo %Ld
+Error writing audio frame %Ld	MediaConverter		Erreur d'écriture de l'échantillons audio %Ld
+Error writing video frame %Ld	MediaConverter		Erreur d'écriture de la trame vidéo %Ld
+File	Menu		Fichier
+File Error	MediaConverter-FileInfo		Erreur Fichier
+File details	MediaConverter		Détails du fichier
+File format:	MediaConverter		Format de fichier :
+High	MediaConverter		Haute
+Low	MediaConverter		Basse
+MediaConverter	MediaConverter		MédiaConvertisseur
+MediaConverter+:SaveDirectory	MediaConverter		MédiaConvertisseur : Dossier d'enregistrement
+MediaConverter\n1.3.0\n© 1999, Be Incorporated.\n© 2000-2004 Jun Suzuki\n© 2007 Stephan Aßmus\n© 2010 Haiku, Inc.	MediaConverter		MédiaConvertisseur\n1.3.0\n© 1999, Be Incorporated.\n© 2000-2004 Jun Suzuki\n© 2007 Stephan Aßmus\n© 2010 Haiku, Inc.
+No audio	Audio codecs list		Pas de son
+No file selected	MediaConverter-FileInfo		Aucun fichier sélectionné
+No video	Video codecs list		Pas de vidéo
+None available	Audio codecs		Aucun disponible
+None available	Video codecs		Aucun disponible
+OK	MediaConverter		OK
+OK	MediaConverter-FileInfo		OK
+Open…	Menu		Ouvrir…
+Output file '%filename' created	MediaConverter		Le fichier cible « %filename » a été créé
+Output folder	MediaConverter		Dossier de sortie
+Output format	MediaConverter		Format de sortie
+Preview	MediaConverter		Aperçu
+Quit	Menu		Quitter
+Select	MediaConverter		Sélectionner
+Select this folder	MediaConverter		Sélectionner ce dossier
+Source files	MediaConverter		Fichiers sources
+Start [ms]: 	MediaConverter		Début [ms] : 
+Video encoding:	MediaConverter		Encodage vidéo :
+Video quality not supported	MediaConverter		Qualité vidéo non prise en charge
+Video quality: %3d%%	MediaConverter		Qualité vidéo : %3d%%
+Video:	MediaConverter-FileInfo		Vidéo :
+Writing audio track: %Ld %% complete	MediaConverter		Écriture de la piste audio  : %ld %% achevés
+Writing video track: %Ld %% complete	MediaConverter		Écriture de la piste vidéo  : %ld %% achevés
+seconds	MediaFileInfo		secondes

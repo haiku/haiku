@@ -45,7 +45,7 @@ Mount	MainWindow		Montera
 Mount all	MainWindow		Montera alla
 Mounted at	PartitionList		Monterad vid
 No disk devices have been recognized.	DiskView		Inga diskenheter har identifierats.
-OK	MainWindow		Okej
+OK	MainWindow		OK
 Offset: %ld MB	Support		Offset: %ld MB
 Parameters	PartitionList		Parametrar
 Partition	MainWindow		Partition

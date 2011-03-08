@@ -10,7 +10,7 @@ Mount read-only	AutoMounter		Montera endast läsbar
 Mount read/write	AutoMounter		Montera läs och skrivbar
 Mount warning	AutoMounter		Monteringsvarning
 Mounting volume '%s'\n\n	AutoMounter		Monterar volym %s'\n\n
-Mounting volume <unnamed volume>\n\n	AutoMounter		Monterar volym <namnlös volym>\n\n
+Mounting volume <unnamed volume>\n\n	AutoMounter		Monterar volym <odöpt volym>\n\n
 OK	AutoMounter		Okej
 Previous volumes mounted.	AutoMounter		Tidigare volymer monterade.
 The file system on this volume is not the Haiku file system. It is strongly suggested to mount it in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Filystemet på volymen är inte Haikus filsystem. Det är rekommenderat att montera den i endast läsbart läge. Detta förhindrar oavsiktlig dataförlust orsakat av fel i Haiku.

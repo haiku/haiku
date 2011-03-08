@@ -24,7 +24,7 @@ None	RecorderWindow		Aucun
 None of the files appear to be audio files	RecorderWindow		Aucun des fichiers ne semble-t-être un fichier audio.
 Nothing to play	RecorderWindow		Rien à jouer
 OK	RecorderWindow		OK
-Play	RecorderWindow		Lire
+Play	RecorderWindow		Lecture
 Record	RecorderWindow		Enregistrer
 Rewind	RecorderWindow		Rembobiner
 Sample rate: 	RecorderWindow		Fréquence d'échantillonnage :

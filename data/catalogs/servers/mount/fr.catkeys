@@ -7,7 +7,7 @@ Force unmount	AutoMounter		Forcer le démontage
 It is suggested to mount all additional Haiku volumes in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Il est suggéré de monter tous les volumes Haiku additionnels en mode lecture seule. Ceci évitera d'éventuelles pertes de données provoquées par des erreurs de Haiku.
 Mount error	AutoMounter		Erreur de montage
 Mount read-only	AutoMounter		Monter en lecture seule
-Mount read/write	AutoMounter		Monter en lecture et en écriture
+Mount read/write	AutoMounter		Monter en lecture/écriture
 Mount warning	AutoMounter		Avertissement
 Mounting volume '%s'\n\n	AutoMounter		Montage du volume « %s »\n\n
 Mounting volume <unnamed volume>\n\n	AutoMounter		Montage du volume <sans nom>\n\n

@@ -1,17 +1,26 @@
-1	french	x-vnd.Haiku-LaunchBox	954825596
+1	french	x-vnd.Haiku-LaunchBox	1672943267
 About	LaunchBox		À propos
 Add button here	LaunchBox		Ajouter un bouton ici
+Auto-raise	LaunchBox		Faire apparaître automatiquement
 Bummer	LaunchBox		Zut
 Cancel	LaunchBox		Annuler
+Clear button	LaunchBox		Vider le bouton
 Clone	LaunchBox		Cloner
 Close	LaunchBox		Fermer
+Description for '%3'	LaunchBox		Description for « %3 »
+Failed to launch '%1'.\n\nError:	LaunchBox		Impossible de lancer « %1 ».\n\nErreur : 
+Failed to launch 'something',error in Pad data.	LaunchBox		Impossible de lancer « quelque chose », erreur dans les données du Pavé.
+Failed to launch application with signature '%2'.\n\nError:	LaunchBox		Impossible de lancer l'application ayant la signature « %2 ».\n\nErreur : 
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Impossible d'envoyer « ouvrir le dossier » au Tracker.\n\nErreur : 
 Horizontal layout	LaunchBox		Disposition horizontale
 Icon size	LaunchBox		Taille d'icône
 Ignore double-click	LaunchBox		Ignorer le double click
 LaunchBox	LaunchBox		BoîteDeLancement
+Name Panel	LaunchBox		Nom du panneau
 New	LaunchBox		Nouveau
 OK	LaunchBox		OK
 Pad	LaunchBox		Pavé
+Pad %1	LaunchBox		Pavé %1
 Pad 1	LaunchBox		Pavé 1
 Quit	LaunchBox		Quitter
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Voulez-vous vraiment fermer ce pavé ?\n(Le pavé ne sera pas enregistré.)
@@ -24,3 +33,4 @@ Stephan Aßmus (aka stippi)	LaunchBox		Stephan Aßmus (alias stippi)
 Vertical layout	LaunchBox		Disposition verticale
 You can drag an icon here.	LaunchBox		Vous pouvez glisser une icône ici.
 last chance	LaunchBox		dernière chance
+launch popup	LaunchBox		launch popup

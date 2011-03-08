@@ -1,10 +1,10 @@
-1	french	x-vnd.Haiku-StyledEdit	3614078026
+1	french	x-vnd.Haiku-StyledEdit	881610730
 ???	LoadAlert		???
 Align	Menus		Aligner
 Black	Menus		Noir
 Blue	Menus		Bleu
 Bold	Menus		Gras
-Can't Undo	Menus		Impossible d'annuler
+Can't undo	Menus		Impossible d'annuler
 Cancel	FindandReplaceWindow		Annuler
 Cancel	QuitAlert		Annuler
 Cancel	RevertToSavedAlert		Annuler

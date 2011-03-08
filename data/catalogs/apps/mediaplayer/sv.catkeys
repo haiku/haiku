@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-MediaPlayer	1801311807
+1	swedish	x-vnd.Haiku-MediaPlayer	2929328887
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Amerikanskt format)
 100% scale	MediaPlayer-Main		Skala till 100%
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
@@ -10,8 +10,8 @@
 <nothing to undo>	MediaPlayer-PlaylistWindow		<inget att ångra>
 <unknown>	PlaylistItem-album		<okänd>
 <unknown>	PlaylistItem-author		<okänd>
-<unnamed>	PlaylistItem-name		<namnlös>
-<untitled>	PlaylistItem-title		<namnlös>
+<unnamed>	PlaylistItem-name		<odöpt>
+<untitled>	PlaylistItem-title		<odöpt>
 About MediaPlayer…	MediaPlayer-Main		Om MediaSpelaren...
 All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Alla filer kunde inte flyttas till Papperskorgen.
 Always on top	MediaPlayer-Main		Alltid överst
@@ -52,7 +52,6 @@ Loop movies by default	MediaPlayer-SettingsWindow		Loopa filmer som förval
 Loop sounds by default	MediaPlayer-SettingsWindow		Loopa ljud som förval
 Low volume	MediaPlayer-SettingsWindow		Låg volym
 MediaPlayer	MediaPlayer-Main		MediaSpelaren
-MediaPlayer Current Playlist	MediaPlayer-Main		MediaSpelarens nuvarande spellista
 MediaPlayer encountered an internal error. The file could not be opened.	MediaPlayer-Main		Ett internt fel har uppstått i MediaSpelaren. Filen kunde inte öppnas.
 MediaPlayer settings	MediaPlayer-SettingsWindow		MediaSpelarens inställningar
 MediaPlayer\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		MediaSpelaren\n\nSkriven av Marcus Overhagen, Stephan Aßmus och Frederik Modéen

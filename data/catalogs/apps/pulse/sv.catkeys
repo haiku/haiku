@@ -4,7 +4,7 @@ About Pulse…	PulseView		Om Puls...
 Active color	ConfigView		Aktiv färg
 Bar colors	ConfigView		Bandfärg
 CPU progress bar	NormalPulseView		CPU progressband
-Defaults	PrefsWindow		Förval
+Defaults	PrefsWindow		Förinställningar
 Deskbar	CPUButton		Deskbar
 Deskbar menu	CPUButton		Deskbar meny
 Deskbar mode	MiniPulseView		Deskbar-läge

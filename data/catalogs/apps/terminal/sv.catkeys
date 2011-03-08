@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Terminal	3038436492
+1	swedish	x-vnd.Haiku-Terminal	1413115910
 -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h, --help visa denna hjälp\n -t, --title ange fönstertitel\n -f, --fullscreen starta helskärmsläge\n
 Abort	Terminal Shell		Avbryt
 About Terminal…	Terminal TermWindow		Om Terminal...
@@ -25,12 +25,10 @@ Copy here	Terminal TermView		Kopiera hit
 Create link here	Terminal TermView		Skapa länk här
 Custom	Terminal colors schema		Anpassad
 Decrease	Terminal TermWindow		Minska
-Didn't find any available pseudo ttys.	Terminal Shell		Hittade inga tillgängliga pseudo ttys.
 Don't save	Terminal PrefWindow		Spara inte
 Edit	Terminal TermWindow		Redigera
 Edit tab title…	Terminal TermWindow		Redigera fliktitel...
 Error!	Terminal getString		Fel!
-Failed to init pseudo tty.	Terminal Shell		Misslyckades att initiera pseudo tty.
 Find	Terminal FindWindow		Sök
 Find failed	Terminal TermWindow		Sökning misslyckades
 Find next	Terminal TermWindow		Sök nästa
@@ -56,7 +54,6 @@ OK	Terminal TermView		OK
 OK	Terminal TermWindow		Okej
 Page setup…	Terminal TermWindow		Sidinställningar...
 Paste	Terminal TermWindow		Klistra in
-PrefHandler::getRGB(%s) - key not found\n	Terminal getRGB		PrefHandler::getRGB(%s) - nyckel hittades ej\n
 Print	Terminal TermWindow		Skriv ut
 Print cancelled.	Terminal TermWindow		Utskrift avbruten.
 Quit	Terminal TermWindow		Avsluta
@@ -66,7 +63,6 @@ Save as default	Terminal TermWindow		Spara som förvald
 Save changes to this settings panel?	Terminal PrefWindow		Spara ändringar i denna inställningspanel?
 Save to file…	Terminal PrefWindow		Spara till fil...
 Search forward	Terminal FindWindow		Sök framåt
-Secondary mouse button drop menu	Terminal TermView		Sekundär musknappsmeny
 Select all	Terminal TermWindow		Markera allt
 Selected background	Terminal AppearancePrefView		Vald bakgrund
 Selected text	Terminal AppearancePrefView		Markerad text
@@ -106,9 +102,4 @@ Window title:	Terminal TermWindow		Fönstertitel:
 Window title…	Terminal TermWindow		Fönstertitel...
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tDen valda flikens aktiva process arbetskatalog.\n\t\t\tEtt maximalt antal sökvägsdelar kan anges\n\t\t\tT.ex. '%2d' för som mest två delar.\n\t%i\t-\tFönstrets indexnummer.\n\t%p\t-\tDen valda flikens aktiva process namn.\n\t%t\t-\tDen valda flikens namn.\n\t%%\t-\tTecknet '%'.
 \t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tDen aktiva processens arbetskatalog.\n\t\t\tEtt maximalt antal sökvägsdelar kan anges\n\t\t\tT.ex. '%2d' för som mest två delar.\n\t%i\t-\tFliknummer.\n\t%p\t-\tDen aktiva processens namn.\n\t%%\t-\tTecknet '%'.
-can't open tty (%s).	Terminal Shell		kan inte öppna tty (%s).
-could not set session leader.	Terminal Shell		kunde inte skapa sessionsledare.
-failed set terminal interface (TERMIOS).	Terminal Shell		misslyckades att ställa in gränssnitt (TERMIOS).
-mismatch handshake.	Terminal Shell		handskakning misslyckades
-sigaction() failed: %s\n	Terminal TermApp		sigaction() misslyckades: %s\n
 size	Terminal TermView		storlek
