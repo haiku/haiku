@@ -53,7 +53,8 @@ struct GlyphCache {
 		advance_x(advanceX),
 		advance_y(advanceY),
 		inset_left(insetLeft),
-		inset_right(insetRight)
+		inset_right(insetRight),
+		hash_link(NULL)
 	{
 	}
 
