@@ -34,7 +34,10 @@ void create_log()
 		return;
 
 	int flags = O_WRONLY | O_CREAT | ((gTruncateLogFile) ? O_TRUNC : 0);
-	close(open(gLogFilePath, flags, 0666));
+	int filehandle = open(gLogFilePath, flags, 0666);
+	if (filehandle >= 0)
+		close(filehandle);
+	}
 
 	mutex_init(&gLogLock, DRIVER_NAME"-logging");
 }
