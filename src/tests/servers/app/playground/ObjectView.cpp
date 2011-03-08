@@ -322,11 +322,12 @@ if (dragMessage) {
 	} else if (fInitiatingDrag) {
 		BPoint offset = fLastMousePos - where;
 		if (sqrtf(offset.x * offset.x + offset.y * offset.y) > 5.0) {
-			BMessage dragMessage('drag');
-			BBitmap* dragBitmap = new BBitmap(BRect(0, 0, 40, 40), B_RGBA32, true);
+			BMessage newDragMessage('drag');
+			BBitmap* dragBitmap = new BBitmap(BRect(0, 0, 40, 40), B_RGBA32,
+				true);
 			if (dragBitmap->Lock()) {
-				BView* helper = new BView(dragBitmap->Bounds(), "offscreen view",
-										  B_FOLLOW_ALL, B_WILL_DRAW);
+				BView* helper = new BView(dragBitmap->Bounds(),
+					"offscreen view", B_FOLLOW_ALL, B_WILL_DRAW);
 				dragBitmap->AddChild(helper);
 				helper->SetDrawingMode(B_OP_ALPHA);
 				helper->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE);
@@ -346,7 +347,8 @@ if (dragMessage) {
 				helper->Sync();
 			}
 			
-			DragMessage(&dragMessage, dragBitmap, B_OP_ALPHA, B_ORIGIN, this);
+			DragMessage(&newDragMessage, dragBitmap, B_OP_ALPHA, B_ORIGIN,
+				this);
 			fInitiatingDrag = false;
 		}
 	} else {
