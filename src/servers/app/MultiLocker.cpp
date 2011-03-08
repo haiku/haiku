@@ -42,11 +42,11 @@ MultiLocker::MultiLocker(const char* baseName)
 #if !DEBUG
 	if (baseName) {
 		char name[128];
-		sprintf(name, "%s-%s", baseName, "ReadSem");
+		snprintf(name, sizeof(name), "%s-%s", baseName, "ReadSem");
 		fReadSem = create_sem(0, name);
-		sprintf(name, "%s-%s", baseName, "WriteSem");
+		snprintf(name, sizeof(name), "%s-%s", baseName, "WriteSem");
 		fWriteSem = create_sem(0, name);
-		sprintf(name, "%s-%s", baseName, "WriterLock");
+		snprintf(name, sizeof(name), "%s-%s", baseName, "WriterLock");
 		fWriterLock = create_sem(0, name);
 	} else {
 		fReadSem = create_sem(0, "MultiLocker_ReadSem");
