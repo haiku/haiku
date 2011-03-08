@@ -131,7 +131,6 @@ ConfigView::ConfigView(TranslatorSettings* settings, uint32 flags)
 		.Add(copyrights)
 		.AddGlue()
 
-		// .Add(outputSeparator)
 		.Add(BGridLayoutBuilder()
 			.Add(presetsField->CreateLabelLayoutItem(), 0, 0)
 			.Add(presetsField->CreateMenuBarLayoutItem(), 1, 0)
@@ -139,7 +138,6 @@ ConfigView::ConfigView(TranslatorSettings* settings, uint32 flags)
 		.Add(fQualitySlider)
 		.Add(fMethodSlider)
 		.Add(fPreprocessingCheckBox)
-		// .AddGlue()
 		.SetInsets(5, 5, 5, 5)
 	);
 }
