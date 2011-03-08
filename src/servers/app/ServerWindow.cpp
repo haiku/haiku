@@ -1153,6 +1153,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			if (parent != NULL && newView != NULL)
 				parent->AddChild(newView);
 			else {
+				delete newView;
 				debug_printf("ServerWindow %s: Message AS_VIEW_CREATE: "
 					"parent or newView NULL!!\n", fTitle);
 			}
