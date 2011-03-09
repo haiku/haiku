@@ -775,7 +775,7 @@ if [ IsOptionalHaikuImagePackageAdded friss ] {
 		Echo "No optional package friss available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 || $(isHybridBuild) {
 		InstallOptionalHaikuImagePackage friss-0.5pre7-x86-gcc4.zip
-			: http://pulkomandy.ath.cx/projects/friss/export/8/bin/friss-0.5pre7-x86-gcc4.zip
+			: $(baseURL)/friss-0.5pre7-x86-gcc4.zip
 			: : true ;
 	} else {
 		Echo "No optional package friss available for gcc2" ;
