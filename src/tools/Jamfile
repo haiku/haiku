@@ -58,14 +58,31 @@ BuildPlatformMain <build>listattr : listattr.cpp : $(HOST_LIBBE) ;
 if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 	AddResources <build>mimeset : mimeset.rdef ;
 }
-BuildPlatformMain <build>mimeset :
+
+local mimesetSources =
 	mimeset.cpp
 	Mime.cpp
 	database_support.cpp
 	UpdateMimeInfoThread.cpp
 	MimeUpdateThread.cpp
+;
+
+if $(HOST_PLATFORM) = haiku_host {
+	mimesetSources += AppFileInfo.cpp ;
+}
+
+BuildPlatformMain <build>mimeset :
+	$(mimesetSources)
 	: $(HOST_LIBBE) $(HOST_LIBSTDC++) $(HOST_LIBSUPC++) $(libHaikuCompat)
 ;
+
+if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
+	SEARCH on [ FGristFiles AppFileInfo.cpp ]
+		= [ FDirName $(HAIKU_TOP) src build libbe storage ] ;
+
+	SourceSysHdrs AppFileInfo.cpp UpdateMimeInfoThread.cpp
+		: [ FDirName  $(HAIKU_TOP) headers build os storage ] ;
+}
 
 BuildPlatformMain <build>mkindex : mkindex.cpp : $(HOST_LIBBE) ;
 
