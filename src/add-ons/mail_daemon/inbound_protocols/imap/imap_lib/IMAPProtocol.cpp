@@ -414,6 +414,7 @@ IMAPProtocol::_ProcessCommandWithoutAfterQuake(const char* command,
 status_t
 IMAPProtocol::_Disconnect()
 {
+	fOngoingCommands.clear();
 	fIsConnected = false;
 	return fOwnServerConnection.Disconnect();
 }
