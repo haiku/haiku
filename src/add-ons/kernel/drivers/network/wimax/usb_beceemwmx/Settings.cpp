@@ -117,9 +117,13 @@ void usb_beceem_trace(bool force, const char* func, const char *fmt, ...)
 	}
 
 	mutex_lock(&gLogLock);
-	int fd = open(gLogFilePath, O_WRONLY | O_APPEND);
-	write(fd, buffer, strlen(buffer));
-	close(fd);
+	int filehandle = open(gLogFilePath, O_WRONLY | O_APPEND);
+
+	if (filehandle >= 0) {
+		write(filehandle, buffer, strlen(buffer));
+		close(filehandle);
+	}
+
 	mutex_unlock(&gLogLock);
 }
 
