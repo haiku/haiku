@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	3231153599
+1	swedish	x-vnd.Haiku-libtracker	498395429
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 %Ld B	WidgetAttributeText		%Ld B
 %Ld bytes	WidgetAttributeText		%Ld byte
@@ -29,9 +29,12 @@ Add-ons	ContainerWindow		Tillägg
 Add-ons	DeskWindow		Tillägg
 Add-ons	FilePanelPriv		Tillägg
 Add-ons	VolumeWindow		Tillägg
+All BeOS disks	AutoMounterSettings		Alla BeOS volymer
 All disks	AutoMounterSettings		Alla diskar
 All disks	FindPanel		Alla diskar
 All files and folders	FindPanel		Alla filer och mappar
+An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Ett objekt "%name" finns redan i katalogen och kan innehålla\nobjekt med samma namn. Vill du byta dem med de objekt i katalogen du %verb?
+An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Ett objekt med namnet "%name" finns redan i denna katalog. Vill du ersätta det med den symboliska länken du skapar?
 And	FindPanel		Och
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Är du säker på att du vill radera de valda objekten? Denna operation kan inte ångras.
 Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Är du säker på att du vill flytta eller kopiera dom valda objekt(en) till denna mapp?
@@ -47,6 +50,7 @@ Cancel	OpenWithWindow		Avbryt
 Cancel	PoseView		Avbryt
 Cancel	Tracker		Avbryt
 Cancel	WidgetAttributeText		Avbryt
+Cannot unmount the boot volume \"%name\".	FSUtils		Kan inte avmontera startvolymen "%name".
 Capacity:	InfoWindow		Kapacitet:
 Clean up	ContainerWindow		Rada upp
 Clean up	DeskWindow		Rada upp
@@ -64,7 +68,17 @@ Copy layout	ContainerWindow		Kopiera layout
 Copy more	ContainerWindow		Kopiera fler
 Copy to	ContainerWindow		Kopiera till
 Copying: 	StatusWindow		Kopierar:
+Could not find an application to open \"%name\" (%error). 	FSUtils		Kunde inte hitta ett program som öppnar "%name" (%error).
 Could not find application \"%appname\"	OpenWithWindow		Kunde inte hitta programmet "%appname"
+Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		Kunde inte öppna "%document" (Saknar bibliotek: %library). \n
+Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Kunde inte öppna "%dokument" (Saknar symbol: %symbol). \n
+Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Kunde inte öppna "%document" för att programmet "%app" ligger i Papperskorgen.
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Kunde inte öppna "%document" med programmet "%app" (%error).
+Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Kunde inte öppna "%document" med programmet "%app" (Saknar bibliotek: %library). \n
+Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Kunde inte öppna "%document" med programmet "%app" (Saknar symbol: %symbol). \n
+Could not open \"%name\" (%error). 	FSUtils		Kunde inte öppna "%name" (%error).
+Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Kunde inte öppna "%name". Filen är av misstag markerad som exekverbar.
+Could not update permissions of file \"%name\". %error	FSUtils		Kunde inte uppdatera rättigheterna i filen "%name". %error
 Create %s clipping	PoseView		Skapa %s förkortning
 Create a Query	FindPanel		Skapa en sökning
 Create a Query template	FindPanel		Skapa en sökmall
@@ -81,7 +95,8 @@ Cut	FilePanelPriv		Klipp ut
 Cut more	ContainerWindow		Klipp ut mer
 Decrease size	ContainerWindow		Minska storleken
 Decrease size	DeskWindow		Minska storleken
-Defaults	TrackerSettingsWindow		Förinställningar
+Default application	InfoWindow		Förvalt program
+Defaults	TrackerSettingsWindow		Förval
 Delete	ContainerWindow		Ta bort
 Delete	FSUtils		Ta bort
 Delete	FilePanelPriv		Ta bort
@@ -93,6 +108,7 @@ Desktop	TrackerSettingsWindow		Skrivbord
 Disk mount settings	AutoMounterSettings		Diskmonteringsinställningar
 Disk mounting during boot	AutoMounterSettings		Diskmontering under uppstart
 Disks	DirMenu		Diskar
+Disks	Model		Volymer
 Do it	FSUtils		Gör det
 Does not handle file	OpenWithWindow		Hanterar inte fil
 Don't automount	AutoMounterSettings		Automontera inte
@@ -113,12 +129,18 @@ Empty Trash	InfoWindow		Töm papperskorg
 Empty folder	NavMenu		Tom mapp
 Empty folder	SlowContextPopup		Tom mapp
 Emptying Trash… 	StatusWindow		Tömmer Papperskorgen...
-Enable type-ahead filtering	SettingsView		Markera filer som matcher tangentsekvens
+Enable type-ahead filtering	SettingsView		Markera filer som matchar tangentsekvens
 Error %error loading Add-On %name.	ContainerWindow		Fel %error vid laddning av Tillägg %name.
 Error calculating folder size.	InfoWindow		Ett fel uppstod vid beräkningen av mappens storlek.
+Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Fel vid kopiering av filen "%name".\n\t%error\n\nVill du fortsätta?
+Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Fel vid kopiering av katalogen "%name":\n\t%error\n\nVill du fortsätta?
+Error creating link to \"%name\".	FSUtils		Fel vid skapande av länk till "%name".
 Error deleting items	FSUtils		Fel vid borttagning av objekt
 Error emptying Trash!	FSUtils		Ett fel uppstod när Papperskorgen skulle tömmas!
 Error in regular expression:\n\n'%errstring'	PoseView		Fel i reguljärt uttryck:\n\n'%errstring'
+Error moving \"%name\"	FSUtils		Fel vid flyttande av "%name"
+Error moving \"%name\" to Trash. (%error)	FSUtils		Fel vid flytt av "%name" till Papperskorgen. (%error)
+Error moving \"%name\".	FSUtils		Fel vid flytt av "%name".
 Execute	FilePermissionsView		Kör
 Favorites	FavoritesMenu		Favoriter
 Favorites	FilePanelPriv		Favoriter
@@ -163,6 +185,7 @@ Invert selection	VolumeWindow		Invertera markering
 KiB	WidgetAttributeText		KiB
 Kind	ContainerWindow		Sort
 Kind:	InfoWindow		Typ:
+Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Länka "%namn" till:
 Link to:	InfoWindow		Länka till:
 List folders first	SettingsView		Visa mappar först
 List view	ContainerWindow		Listvy
@@ -187,7 +210,7 @@ Mount	VolumeWindow		Montera
 Mount all	MountMenu		Montera alla
 Mount all disks now	AutoMounterSettings		Montera alla diskar nu
 Mount server error	AutoMounterSettings		Monteringsfel
-Mount settings…	SettingsView		Monteringsinställningar...
+Mount settings…	SettingsView		Monterings inställningar...
 Mount settings…	VolumeWindow		Monteringsinställningar...
 Move	PoseView		Flytta
 Move here	ContainerWindow		Flytta hit
@@ -254,6 +277,7 @@ Preparing to delete items…	StatusWindow		Förbereder bortagning av objekt...
 Preparing to empty Trash…	StatusWindow		Förbereder inför tömning av Papperskorgen...
 Preparing to move items…	StatusWindow		Förbereder flytt av objekt...
 Preparing to restore items…	StatusWindow		Förbereder återställning av objekt...
+Previously mounted disks	AutoMounterSettings		Tidigare monterade volymer
 Proceed	FSUtils		Fortsätt
 Prompt	FSUtils		Prompt
 Query name:	FindPanel		Sökningsnamn:
@@ -295,6 +319,7 @@ Select…	QueryContainerWindow		Markera...
 Select…	VolumeWindow		Välj...
 Set new link target	InfoWindow		Ange nytt länkmål
 Settings…	MountMenu		Inställningar...
+Show Disks icon	SettingsView		Visa ikonen Volymer
 Show folder location in title tab	SettingsView		Visa katalogplats i fönsterfliken
 Show navigator	SettingsView		Visa navigerare
 Show shared volumes on Desktop	SettingsView		Visa delade volymer på Skrivbordet
@@ -324,12 +349,16 @@ That name is already taken. Please type another one.	WidgetAttributeText		Namnet
 That name is too long. Please type another one.	InfoWindow		Namnet är för långt. Var god välj ett annat.
 The Tracker must be running to see Info windows.	PoseView		Tracker måste köras för att se Infofönster.
 The Tracker must be running to see set the default printer.	PoseView		Tracker måste köras för att se standardskrivaren.
+The application \"%appname\" does not support the type of document you are about to open. Are you sure you want to proceed? If you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Programmet "%appname" stödjer inte den typ av dokument som du är på väg att öppna. Är du säker på att du vill fortsätta? Om du vet vad att applikationen stödjer dokumenttypen borde du kontakta applikationens utgivare och be den uppdatera applikationen så den listar vilka dokument som stöds.
+The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Filen "%name" finns redan i den valda katalogen. Vill du ersätta den?
 The mount server could not be contacted.	AutoMounterSettings		Monteringsservern kunde inte nås.
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Det markerade objektet kan inte flyttas till Papperskorgen. Vill du ta bort den istället? (Denna operation kan inte ångras.)
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Det valda namnet används redan som namnet på katalogen. Var god välj ett annat namn.
 The specified name is illegal. Please choose another name.	FilePanelPriv		Det valda namnet är otillåtet. Var god välj ett annat namn.
+The target disk does not support creating links.	FSUtils		Målvolymen stödjer inte skapande av länkar.
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Kunde inte ersätta "%name". Filen kan vara öppen eller upptaget.
 There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Det gick inte att spara i mappen. Vänligen prova en annan mapp.
+There was an error deleting \"%name\":\n\t%error	FSUtils		Det uppstod ett fel vid borttagning av "%name":\n\t%error
 There was an error resolving the link.	Tracker		Det uppstod ett fel vid uppslag av länk.
 There was an error writing the attribute.	WidgetAttributeText		Fel inträffade vid skrivning av attribut.
 TiB	WidgetAttributeText		TiB
@@ -353,6 +382,7 @@ Warning space color	SettingsView		Färg för utrymmesvarning
 Window	ContainerWindow		Fönster
 Window	FilePanelPriv		Fönster
 Windows	TrackerSettingsWindow		Fönster
+Would you like to find a suitable application to open the file?	FSUtils		Vill du hitta ett passande program att öppna filen med?
 Would you like to find some other suitable application?	FSUtils		Vill du söka efter ett annat program?
 Write	FilePermissionsView		Skriv
 You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		Du försöker ersätta objektet:\n\t%name%dest\nmed\n\t%name%src\n\nVill du ersätta den med den som du %movemode?
@@ -365,6 +395,8 @@ You cannot create a link to the root directory.	FSUtils		Du kan inte skapa en l�
 You cannot put the Trash, home or Desktop directory into the trash.	FSUtils		Du kan inte flytta Papperskorgen, din hemkatalog eller Skrivbord till Papperskorgen.
 You cannot replace a file with a folder or a symbolic link.	FSUtils		Du kan inte ersätta en fil med en mapp eller en symbolisk länk.
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Du kan inte ersätta en mapp eller en mjuk länk med en fil.
+You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Du måste släppa objektet på en av diskikonerna i fönstret Volymer.
+You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Du måste släppa objekt(en) på en av diskikonerna i "Volymer"-fönstret.
 You must have at least one attribute showing.	PoseView		Du måste ha minst ett attribut synligt.
 \nShould this be fixed?	FSUtils		\nSka detta åtgärdas?
 \n\t(%Ld bytes, 	FSUtils		\n\t(%Ld byte,
@@ -394,6 +426,7 @@ move	FSUtils	As in 'To move ...'	flytta
 moving	FSUtils		flyttar
 multiple disks	FindPanel		flera diskar
 no items	CountView		inga objekt
+no supporting apps	OpenWithWindow		program saknas
 of %items	StatusWindow		av %items
 parent folder	NavMenu		föräldrakatalog
 rename	InfoWindow	As in 'If you rename ...'	byter namn

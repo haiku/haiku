@@ -1,4 +1,5 @@
-1	swedish	x-vnd.Haiku-CharacterMap	3967062630
+1	swedish	x-vnd.Haiku-CharacterMap	1109985677
+About CharacterMap…	CharacterWindow		Om TeckenTabell...
 Aegean numbers	UnicodeBlocks		Egeiska siffror
 Alphabetic presentation forms	UnicodeBlocks		Alfabetiska presentationsformer
 Ancient Greek musical notation	UnicodeBlocks		Gammelgrekiska noter
@@ -25,6 +26,8 @@ CJK compatibility	UnicodeBlocks		CJK compatibility
 CJK compatibility ideographs	UnicodeBlocks		CJK compatibility ideographs
 Carian	UnicodeBlocks		Kariska
 Cham	UnicodeBlocks		Cham
+CharacterMap	CharacterWindow		TeckenTabell
+CharacterMap\n\twritten by Axel Dörfler\n\tCopyright 2009, Haiku, Inc.\n	CharacterMap		TeckenTabell\n\tskrivet av Axel Dörfler\n\tCopyright 2009, Haiku, Inc.\n
 Cherokee	UnicodeBlocks		Cherokee
 Clear	CharacterWindow		Rensa
 Code	CharacterWindow		Kod
@@ -71,8 +74,10 @@ Hangul syllables	UnicodeBlocks		Hangul (stavelseskrift)
 Hanunoo	UnicodeBlocks		Hanunoo
 Hebrew	UnicodeBlocks		Hebreisk
 Hiragana	UnicodeBlocks		Hiragana
+IPA extensions	UnicodeBlocks		IPA utökningar
 Ideographic description characters	UnicodeBlocks		Ideografiska beskrivande tecken
 Kanbun	UnicodeBlocks		Kanbun
+Kangxi radicals	UnicodeBlocks		Kangxi radikaler
 Kannada	UnicodeBlocks		Kannada
 Katakana	UnicodeBlocks		Katakana
 Katakana phonetic extensions	UnicodeBlocks		Katakana, fonetiska utökningar
@@ -82,12 +87,14 @@ Khmer	UnicodeBlocks		Khmer
 Khmer symbols	UnicodeBlocks		Khmersymboler
 Lao	UnicodeBlocks		Lao
 Latin extended A	UnicodeBlocks		Latinsk, utökad A
+Latin extended B	UnicodeBlocks		Latin, utökad B
 Latin extended C	UnicodeBlocks		Latinsk, utökad C
 Latin extended D	UnicodeBlocks		Latinsk, utökad D
 Latin-1 supplement	UnicodeBlocks		Latin-1 (komplement)
 Lepcha	UnicodeBlocks		Lepcha
 Letterlike symbols	UnicodeBlocks		Bokstavsliknande symboler
 Limbu	UnicodeBlocks		Limbu
+Linear B syllabary	UnicodeBlocks		Linjär B (stavelseskrift)
 Lycian	UnicodeBlocks		Lykiska
 Lydian	UnicodeBlocks		Lydiska
 Mahjong tiles	UnicodeBlocks		Mahjong-brickor
@@ -133,6 +140,7 @@ Supplemental arrows A	UnicodeBlocks		Kompletterande pilar A
 Supplemental arrows B	UnicodeBlocks		Utökade pilar B
 Supplemental mathematical operators	UnicodeBlocks		Kompletterande matematiska operander
 Syloti Nagri	UnicodeBlocks		Syloti Nagri
+Syriac	UnicodeBlocks		Syriska
 Tagalog	UnicodeBlocks		Tagalog
 Tagbanwa	UnicodeBlocks		Tagbanwa
 Tags	UnicodeBlocks		Taggar

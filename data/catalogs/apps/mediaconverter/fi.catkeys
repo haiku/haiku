@@ -1,10 +1,11 @@
-1	finnish	x-vnd.Haiku-MediaConverter	4119128071
+1	finnish	x-vnd.Haiku-MediaConverter	4254955936
 %.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld kanava / %lld kehystä
 %.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz mono / %lld kehystä
 %.1f kHz stereo / %lld frames	MediaFileInfo		%.1f kHz stereo / %lld kehystä
 %amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles-tiedostoja ei tunnistettu tuettuina mediatiedostoina:
 %d bit 	MediaFileInfo		%d bitti
 %d byte 	MediaFileInfo		%d tavu
+%u x %u, %.2ffps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%u x %u, %.2f kehystä per sekunti / %Ld kehystä
 About MediaConverter…	Menu		Ohjelmasta Mediamuunnin...
 About…	MediaConverter		Ohjelmasta...
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Tapahtui virhe luettaessa tiedostotietoja.\n\nVirhe :
@@ -65,4 +66,6 @@ Video quality not supported	MediaConverter		Videolaatua ei tueta
 Video quality: %3d%%	MediaConverter		Videolaatu: %3d%%
 Video using parameters form settings	MediaConverter		Video käyttäen parametreja muotoasetuksiin
 Video:	MediaConverter-FileInfo		Video:
+Writing audio track: %ld%% complete	MediaConverter		Kirjoitetaan äänitiedostoa: %ld %% valmiina
+Writing video track: %ld%% complete	MediaConverter		Kirjoitetaan videotiedostoa: %ld %% valmiina
 seconds	MediaFileInfo		sekuntia

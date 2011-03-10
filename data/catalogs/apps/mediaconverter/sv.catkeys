@@ -1,11 +1,11 @@
-1	swedish	x-vnd.Haiku-MediaConverter	3383482196
+1	swedish	x-vnd.Haiku-MediaConverter	4254955936
 %.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld kanal / %lld rutor
 %.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz mono / %lld rutor
 %.1f kHz stereo / %lld frames	MediaFileInfo		%.1f kHz stereo / %lld rutor
-%Ld x %Ld, %Ld fps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%Ld x %Ld, %Ld bps / %Ld bildrutor
 %amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles kändes inte igen som mediafiler:
 %d bit 	MediaFileInfo		%d bitar
 %d byte 	MediaFileInfo		%d bytes
+%u x %u, %.2ffps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%u x %u, %.2ffps / %Ld rutor
 About MediaConverter…	Menu		Om MediaKonverteraren...
 About…	MediaConverter		Om...
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Ett fel uppstod vid inläsning av filinformationen.\n\nFel:
@@ -66,6 +66,6 @@ Video quality not supported	MediaConverter		Videokvalitén stöds ej
 Video quality: %3d%%	MediaConverter		Videokvalité: %3d%%
 Video using parameters form settings	MediaConverter		Video med parametrar från inställningar
 Video:	MediaConverter-FileInfo		Video:
-Writing audio track: %Ld %% complete	MediaConverter		Skriver ljudspår: %Ld %% färdigt
-Writing video track: %Ld %% complete	MediaConverter		Skriver videospår: %Ld %% färdigt
+Writing audio track: %ld%% complete	MediaConverter		Skriver ljudspår: %ld%% klart
+Writing video track: %ld%% complete	MediaConverter		Skriver videospår: %ld%% klart
 seconds	MediaFileInfo		sekunder

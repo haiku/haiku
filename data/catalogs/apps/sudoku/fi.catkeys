@@ -1,1 +1,39 @@
-1	finnish	x-vnd.Haiku-Sudoku	0
+1	finnish	x-vnd.Haiku-Sudoku	2100942083
+Abort	ProgressWindow		Keskeytä
+About	Sudoku		Ohjelmasta
+About Sudoku…	SudokuWindow		Ohjelmasta Sudoku...
+Advanced	SudokuWindow		Guru
+Blank	SudokuWindow		Tyhjä
+Copy	SudokuWindow		Kopioi
+Could not open \"%s\":\n%s\n	SudokuWindow		Ei voitu avata kohdetta ”%s”:\n%s\n
+Could not set Sudoku:\n%s\n	SudokuWindow		Ei voitu asettaa Sudokua:\n%s\n
+Creating solvable field	SudokuGenerator		Luodaan ratkaistava kenttä
+Easy	SudokuWindow		Helppo
+Export as…	SudokuWindow		Vie nimellä...
+File	SudokuWindow		Tiedosto
+HTML	SudokuWindow		HTML
+Hard	SudokuWindow		Vaikea
+Help	SudokuWindow		Opaste
+Mark invalid values	SudokuWindow		Merkitse väärät arvot
+Mark valid hints	SudokuWindow		Merkitse kelvolliset vihjeet
+New	SudokuWindow		Uusi
+OK	Sudoku		Valmis
+OK	SudokuWindow		Valmis
+Open file…	SudokuWindow		Avaa tiedosto...
+Progress monitor	ProgressWindow		Edistymisvalvonta
+Quit	SudokuWindow		Poistu
+Redo	SudokuWindow		Tee uudelleen
+Restore snapshot	SudokuWindow		Palauta kuvakaappaus
+Searching for removable values	SudokuGenerator		Etsitään poistettavia arvoja
+Snapshot current	SudokuWindow		Otan kuvakaappaus nykyisestä
+Solve	SudokuWindow		Ratkaise
+Solve single field	SudokuWindow		Ratkaise yksi kenttä
+Start again	SudokuWindow		Aloita uudelleen
+Sudoku	Sudoku		Sudoku
+Sudoku	SudokuWindow		Sudoku
+Sudoku request	SudokuWindow		Sudoku-pyyntö
+Sudoku solved - congratulations!\n	SudokuWindow		Sudoku ratkaistu - onneksi olkoon!\n
+Sudoku\n\twritten by Axel Dörfler\n\tCopyright 2007, Haiku Inc.\n	Sudoku		Sudoku\n\ttekijä: Axel Dörfler\n\tCopyright 2007, Haiku Inc.\n
+Text	SudokuWindow		Teksti
+Undo	SudokuWindow		Peru
+View	SudokuWindow		Näkymä
