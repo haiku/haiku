@@ -16,7 +16,6 @@
 
 #include <Alert.h>
 #include <Catalog.h>
-#include <Locale.h>
 
 #include <syscalls.h>
 
@@ -128,8 +127,10 @@ void PulseView::ChangeCPUState(BMessage *message) {
 	if (!LastEnabledCPU(which)) {
 		_kern_set_cpu_enabled(which, (int)!cpu_menu_items[which]->IsMarked());
 	} else {
-		BAlert *alert = new BAlert(NULL, B_TRANSLATE("You can't disable the "
-			"last active CPU."), B_TRANSLATE("OK"));
+		BAlert *alert = new BAlert(B_TRANSLATE("Info"),
+			B_TRANSLATE("You can't disable the last active CPU."),
+			B_TRANSLATE("OK"));
+		alert->SetShortcut(0, B_ESCAPE);
 		alert->Go(NULL);
 	}
 }
@@ -138,3 +139,4 @@ PulseView::~PulseView() {
 	if (popupmenu != NULL) delete popupmenu;
 	if (cpu_menu_items != NULL) delete cpu_menu_items;
 }
+

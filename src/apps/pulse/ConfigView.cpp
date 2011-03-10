@@ -16,7 +16,6 @@
 
 #include <Catalog.h>
 #include <CheckBox.h>
-#include <Locale.h>
 #include <RadioButton.h>
 #include <TextControl.h>
 

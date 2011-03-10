@@ -8,18 +8,22 @@
 //
 //****************************************************************************************
 
+
 #include "DeskbarPulseView.h"
-#include "Common.h"
-#include "Prefs.h"
-#include <app/Application.h>
-#include <Catalog.h>
-#include <interface/Deskbar.h>
-#include <interface/Alert.h>
-#include <Locale.h>
-#include <Roster.h>
+
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
+
+#include <Alert.h>
+#include <Application.h>
+#include <Catalog.h>
+#include <Deskbar.h>
+#include <Roster.h>
+
+#include "Common.h"
+#include "Prefs.h"
+#include "PulseApp.h"
 
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "DeskbarPulseView"
@@ -124,10 +128,7 @@ void DeskbarPulseView::MessageReceived(BMessage *message) {
 			prefswindow->Show();
 			break;
 		case PV_ABOUT: {
-			BAlert *alert = new BAlert(B_TRANSLATE("Info"), 
-				B_TRANSLATE("Pulse\n\nBy David Ramsey and Arve Hjønnevåg\n"
-				"Revised by Daniel Switkin"), B_TRANSLATE("OK"));
-			alert->Go(NULL);
+			PulseApp::ShowAbout();
 			break;
 		}
 		case PV_QUIT:
@@ -175,10 +176,13 @@ void DeskbarPulseView::Remove() {
 	BDeskbar *deskbar = new BDeskbar();
 	status_t err = deskbar->RemoveItem("DeskbarPulseView");
 	if (err != B_OK) {
-		char temp[255];
-		sprintf(temp, B_TRANSLATE("Remove(): %s"), strerror(err));
-		BAlert *alert = new BAlert(B_TRANSLATE("Info"), temp, 
+		BString str;
+		snprintf(str.LockBuffer(512), 512,
+			B_TRANSLATE("Removing from Deskbar failed.\n%s"), strerror(err));
+		str.UnlockBuffer();
+		BAlert *alert = new BAlert(B_TRANSLATE("Info"), str.String(),
 			B_TRANSLATE("OK"));
+		alert->SetShortcut(0, B_ESCAPE);
 		alert->Go(NULL);
 	}
 	delete deskbar;

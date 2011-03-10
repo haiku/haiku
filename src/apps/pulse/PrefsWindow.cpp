@@ -16,7 +16,6 @@
 
 #include <Catalog.h>
 #include <Button.h>
-#include <Locale.h>
 #include <TabView.h>
 #include <TextControl.h>
 

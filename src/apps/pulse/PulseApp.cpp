@@ -21,8 +21,8 @@
 #include <Alert.h>
 #include <Catalog.h>
 #include <Deskbar.h>
-#include <Locale.h>
 #include <Rect.h>
+#include <TextView.h>
 
 #include <syscalls.h>
 
@@ -160,6 +160,41 @@ PulseApp::~PulseApp()
 }
 
 
+void
+PulseApp::AboutRequested()
+{
+	PulseApp::ShowAbout();
+}
+
+
+void
+PulseApp::ShowAbout()
+{
+	// static version to be used in replicant mode
+	BString name(B_TRANSLATE("Pulse"));
+	BString message;
+	snprintf(message.LockBuffer(512), 512,
+		B_TRANSLATE("%s\n\nBy David Ramsey and Arve Hjønnevåg\n"
+		"Revised by Daniel Switkin\n"), name.String());
+	message.UnlockBuffer();
+
+	BAlert *alert = new BAlert(B_TRANSLATE("Info"),
+		message.String(), B_TRANSLATE("OK"));
+
+	BTextView* view = alert->TextView();
+	BFont font;
+				
+	view->SetStylable(true);			
+	view->GetFont(&font);
+	
+	font.SetSize(18);
+	font.SetFace(B_BOLD_FACE);
+	view->SetFontAndColor(0, name.Length(), &font);
+	alert->SetShortcut(0, B_ESCAPE);
+	// Use the asynchronous version so we don't block the window's thread
+	alert->Go(NULL);
+}
+
 //	#pragma mark -
 
 
@@ -234,7 +269,13 @@ LoadInDeskbar()
 	delete replicant;
 	delete deskbar;
 	if (err != B_OK) {
-		BAlert *alert = new BAlert(NULL, strerror(err), B_TRANSLATE("OK"));
+		BString message;
+		snprintf(message.LockBuffer(512), 512,
+			B_TRANSLATE("Installing in Deskbar failed\n%s"), strerror(err));
+		message.UnlockBuffer();
+		BAlert *alert = new BAlert(B_TRANSLATE("Error"),
+			message.String(), B_TRANSLATE("OK"));
+		alert->SetShortcut(0, B_ESCAPE);
 		alert->Go(NULL);
 		return false;
 	}

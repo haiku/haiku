@@ -17,8 +17,8 @@
 #include <Alert.h>
 #include <Catalog.h>
 #include <Deskbar.h>
-#include <Locale.h>
 #include <Screen.h>
+#include <TextView.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -103,11 +103,7 @@ PulseWindow::MessageReceived(BMessage *message)
 			break;
 		}
 		case PV_ABOUT: {
-			BAlert *alert = new BAlert(B_TRANSLATE("Info"), 
-				B_TRANSLATE("Pulse\n\nBy David Ramsey and Arve Hjønnevåg\n"
-				"Revised by Daniel Switkin"), B_TRANSLATE("OK"));
-			// Use the asynchronous version so we don't block the window's thread
-			alert->Go(NULL);
+			PulseApp::ShowAbout();
 			break;
 		}
 		case PV_QUIT:

@@ -16,9 +16,8 @@
 #include <Alert.h>
 #include <Catalog.h>
 #include <Dragger.h>
-#include <Locale.h>
 #include <PopUpMenu.h>
-
+#include <TextView.h>
 #include <ViewPrivate.h>
 
 #include <syscalls.h>
@@ -241,8 +240,10 @@ CPUButton::Invoke(BMessage *message)
 	if (!LastEnabledCPU(fCPU)) {
 		_kern_set_cpu_enabled(fCPU, Value());
 	} else {
-		BAlert *alert = new BAlert(NULL, B_TRANSLATE("You can't disable the "
-			"last active CPU."), B_TRANSLATE("OK"));
+		BAlert *alert = new BAlert(B_TRANSLATE("Info"),
+			B_TRANSLATE("You can't disable the last active CPU."),
+			B_TRANSLATE("OK"));
+		alert->SetShortcut(0, B_ESCAPE);
 		alert->Go(NULL);
 		SetValue(!Value());
 	}
@@ -276,11 +277,7 @@ CPUButton::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
 		case B_ABOUT_REQUESTED: {
-			BAlert *alert = new BAlert(B_TRANSLATE("Info"), 
-				B_TRANSLATE("Pulse\n\nBy David Ramsey and Arve Hjønnevåg\n"
-				"Revised by Daniel Switkin"), B_TRANSLATE("OK"));
-			// Use the asynchronous version so we don't block the window's thread
-			alert->Go(NULL);
+			PulseApp::ShowAbout();
 			break;
 		}
 		case PV_REPLICANT_PULSE: {

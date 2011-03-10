@@ -23,6 +23,9 @@ public:
 						PulseApp(int argc, char **argv);
 						~PulseApp();
 
+	virtual	void		AboutRequested();
+	static	void		ShowAbout();
+
 			Prefs*		prefs;
 
 private:

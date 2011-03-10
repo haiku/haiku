@@ -11,7 +11,6 @@
 #include "MiniPulseView.h"
 #include "Common.h"
 #include <Catalog.h>
-#include <Locale.h>
 #include <interface/Window.h>
 
 #undef B_TRANSLATE_CONTEXT
