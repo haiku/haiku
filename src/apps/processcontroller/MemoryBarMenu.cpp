@@ -24,7 +24,6 @@
 #include "ProcessController.h"
 
 #include <Bitmap.h>
-#include <Catalog.h>
 #include <Roster.h>
 #include <StringForSize.h>
 #include <Window.h>
@@ -35,9 +34,6 @@
 #define EXTRA 10
 
 float gMemoryTextWidth;
-
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "MemoryBarMenu"
 
 
 MemoryBarMenu::MemoryBarMenu(const char* name, info_pack* infos, system_info& systemInfo)

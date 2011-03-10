@@ -116,6 +116,8 @@ Preferences::~Preferences()
 			BAlert *alert = new BAlert(B_TRANSLATE("Error saving file"),
 				error.String(), B_TRANSLATE("Damned!"), NULL, NULL,
 				B_WIDTH_AS_USUAL, B_STOP_ALERT);
+			alert->SetShortcut(0, B_ESCAPE);
+
 			alert->Go();
 		}
 	}

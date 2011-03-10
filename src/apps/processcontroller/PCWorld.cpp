@@ -86,7 +86,7 @@ PCApplication::ReadyToRun()
 	BDeskbar deskbar;
 	if (!deskbar.HasItem(kDeskbarItemName)) {
 		// We're not yet installed in the Deskbar, ask if we should
-		BAlert* alert = new BAlert("",
+		BAlert* alert = new BAlert(B_TRANSLATE("Info"),
 			B_TRANSLATE("You can run ProcessController in a window"
 			" or install it in the Deskbar."), B_TRANSLATE("Run in window"),
 			B_TRANSLATE("Install in Deskbar"),
@@ -101,7 +101,7 @@ PCApplication::ReadyToRun()
 			return;
 		}
 	} else {
-		BAlert* alert = new BAlert("",
+		BAlert* alert = new BAlert(B_TRANSLATE("Info"),
 			B_TRANSLATE("ProcessController is already installed in Deskbar."),
 			B_TRANSLATE("OK"), NULL,
 			NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);

@@ -93,7 +93,7 @@ PriorityMenu::BuildMenu()
 		BString name;
 		const size_t size = B_OS_NAME_LENGTH * 4;
 		snprintf(name.LockBuffer(size), size,
-			B_TRANSLATE("%s [%d]"), priority->name,	(int)priority->priority);
+			"%s [%d]", priority->name, (int)priority->priority);
 		name.UnlockBuffer();
 		item = new BMenuItem(name.String(), message);
 		item->SetTarget(gPCView);

@@ -25,13 +25,9 @@
 #include "ProcessController.h"
 
 #include <Bitmap.h>
-#include <Catalog.h>
 #include <StringForSize.h>
 
 #include <stdio.h>
-
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "MemoryBarMenu"
 
 
 MemoryBarMenuItem::MemoryBarMenuItem(const char *label, team_id team,

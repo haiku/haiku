@@ -268,17 +268,18 @@ ProcessController::MessageReceived(BMessage *message)
 					snprintf(question, sizeof(question),
 					B_TRANSLATE("Do you really want to kill the team \"%s\"?"),
 					infos.team_name);
-					alert = new BAlert("", question,
+					alert = new BAlert(B_TRANSLATE("Please confirm"), question,
 					B_TRANSLATE("Cancel"), B_TRANSLATE("Yes, kill this team!"),
 					NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 					alert->SetShortcut(0, B_ESCAPE);
 					if (alert->Go())
 						kill_team(team);
 				} else {
-					alert = new BAlert("", B_TRANSLATE("This team is already "
-					"gone"B_UTF8_ELLIPSIS),
-					B_TRANSLATE("Ok!"), NULL, NULL, B_WIDTH_AS_USUAL,
+					alert = new BAlert(B_TRANSLATE("Info"),
+						B_TRANSLATE("This team is already gone"B_UTF8_ELLIPSIS),
+						B_TRANSLATE("Ok!"), NULL, NULL, B_WIDTH_AS_USUAL,
 						B_STOP_ALERT);
+					alert->SetShortcut(0, B_ESCAPE);
 					alert->Go();
 				}
 			}
@@ -292,18 +293,18 @@ ProcessController::MessageReceived(BMessage *message)
 					snprintf(question, sizeof(question),
 						B_TRANSLATE("What do you want to do "
 						"with the thread \"%s\"?"), thinfo.name);
-					alert = new BAlert("", question, B_TRANSLATE("Cancel"),
-					B_TRANSLATE("Debug this thread!"),
-					B_TRANSLATE("Kill this thread!"), B_WIDTH_AS_USUAL,
-					B_STOP_ALERT);
+					alert = new BAlert(B_TRANSLATE("Please confirm"), question,
+						B_TRANSLATE("Cancel"), B_TRANSLATE("Debug this thread!"),
+						B_TRANSLATE("Kill this thread!"), B_WIDTH_AS_USUAL,
+						B_STOP_ALERT);
 					#define KILL 2
 					#else
 					snprintf(question, sizeof(question),
 						B_TRANSLATE("Are you sure you want "
 						"to kill the thread \"%s\"?"), thinfo.name);
-					alert = new BAlert("", question, B_TRANSLATE("Cancel"),
-					B_TRANSLATE("Kill this thread!"), NULL, B_WIDTH_AS_USUAL,
-					B_STOP_ALERT);
+					alert = new BAlert(B_TRANSLATE("Please confirm"), question,
+						B_TRANSLATE("Cancel"), B_TRANSLATE("Kill this thread!"),
+						NULL, B_WIDTH_AS_USUAL,	B_STOP_ALERT);
 					#define KILL 1
 					#endif
 					alert->SetShortcut(0, B_ESCAPE);
@@ -324,9 +325,11 @@ ProcessController::MessageReceived(BMessage *message)
 					}
 					#endif
 				} else {
-					alert = new BAlert("", B_TRANSLATE("This thread is "
-					"already gone"B_UTF8_ELLIPSIS), B_TRANSLATE("Ok!"),
-					NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+					alert = new BAlert(B_TRANSLATE("Info"),
+						B_TRANSLATE("This thread is already gone"B_UTF8_ELLIPSIS),
+						B_TRANSLATE("Ok!"),	NULL, NULL,
+						B_WIDTH_AS_USUAL, B_STOP_ALERT);
+					alert->SetShortcut(0, B_ESCAPE);
 					alert->Go();
 				}
 			}
@@ -376,10 +379,12 @@ ProcessController::MessageReceived(BMessage *message)
 					}
 				}
 				if (last) {
-					alert = new BAlert("", B_TRANSLATE("This is the last "
-					"active processor...\nYou can't turn it off!"),
+					alert = new BAlert(B_TRANSLATE("Info"),
+						B_TRANSLATE("This is the last active processor...\n"
+						"You can't turn it off!"),
 						B_TRANSLATE("That's no Fun!"), NULL, NULL,
 						B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+					alert->SetShortcut(0, B_ESCAPE);
 					alert->Go();
 				} else
 					_kern_set_cpu_enabled(cpu, !_kern_cpu_enabled(cpu));
@@ -415,6 +420,7 @@ ProcessController::AboutRequested()
 	font.SetSize(font.Size() * 1.5);
 	font.SetFace(B_BOLD_FACE);
 	view->SetFontAndColor(0, strlen(B_TRANSLATE("ProcessController")), &font);
+	alert->SetShortcut(0, B_ESCAPE);
 
 	alert->Go();
 }

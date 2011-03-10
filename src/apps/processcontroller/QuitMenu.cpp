@@ -29,7 +29,8 @@
 
 class QuitMenuItem : public IconMenuItem {
 	public:
-				QuitMenuItem(team_id team, BBitmap* icon, const char* title, BMessage* m, bool purge = false);
+				QuitMenuItem(team_id team, BBitmap* icon, const char* title,
+					BMessage* m, bool purge = false);
 		team_id	Team() { return fTeam; }
 
 	private:
@@ -37,7 +38,9 @@ class QuitMenuItem : public IconMenuItem {
 };
 
 
-QuitMenuItem::QuitMenuItem(team_id team, BBitmap* icon, const char* title, BMessage* m, bool purge) :
+QuitMenuItem::QuitMenuItem(team_id team, BBitmap* icon, const char* title,
+	BMessage* m, bool purge) 
+	:
 	IconMenuItem(icon, title, m, true, purge), fTeam(team)
 {
 }
@@ -112,12 +115,14 @@ QuitMenu::AddTeam(team_id tmid)
 	message->AddInt32 ("team", tmid);
 	item = NULL;
 	if (t < fInfosCount)
-		item = new QuitMenuItem(tmid, fInfos[t].team_icon, fInfos[t].team_name, message);
+		item = new QuitMenuItem(tmid, fInfos[t].team_icon, fInfos[t].team_name,
+			message);
 	else {
 		info_pack infos;
 		if (get_team_info(tmid, &infos.team_info) == B_OK
 			&& get_team_name_and_icon(infos, true))
-			item = new QuitMenuItem(tmid, infos.team_icon, infos.team_name, message, true);
+			item = new QuitMenuItem(tmid, infos.team_icon, infos.team_name,
+				message, true);
 	}
 	if (item) {
 		item->SetTarget(gPCView);
