@@ -71,7 +71,7 @@ README	InstallerApp		Cопроводительная инструкция
 Restart system	InstallerWindow		Перезагрузить компьютер
 Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Запущен Менеджер загрузки и Разметка диска…\n\nЗакройте оба приложения для продолжения установки.
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Запущен Менеджер загрузки…\n\nЗакройте Менеджер загрузки для продолжения установки.
-Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Запущена утилита разметки диска (DriveSetup)…\n\nЗакройте его для продолжения установки.
+Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Запущена утилита разметки диска (DriveSetup)…\n\nЗакройте ее для продолжения установки.
 Scanning for disks…	InstallerWindow		Сканирование дисков…
 Set up boot menu	InstallerWindow		Установить загрузочное меню
 Set up partitions…	InstallerWindow		Настройка разделов…

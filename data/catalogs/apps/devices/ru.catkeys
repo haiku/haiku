@@ -32,7 +32,7 @@ Device paths	Device		Путь к устройству
 Device paths	DevicePCI		Пути устройства
 Devices	DevicesApplication		Устройства
 Devices	DevicesView		Устройства
-Devices\n\twritten by Pieter Panman\n\n\tBased on listdev by Jérôme Duval\n\tand the previous Devices preference\n\tby Jérôme Duval and Sikosis\n\tCopyright 2009, Haiku, Inc.\n	DevicesApplication		Devices\n\tразработал Pieter Panman\n\n\tОсновано на listdev от Jérôme Duval\n\tи на предыдущей версии Devices,\n\tкоторую совместно разработали\n\tJérôme Duval и Sikosis.\n\tПрава защищены 2009, Haiku, Inc.\n
+Devices\n\twritten by Pieter Panman\n\n\tBased on listdev by Jérôme Duval\n\tand the previous Devices preference\n\tby Jérôme Duval and Sikosis\n\tCopyright 2009, Haiku, Inc.\n	DevicesApplication		Devices\n\tразработал Pieter Panman.\n\n\tОсновано на listdev от Jérôme Duval\n\tи на предыдущей версии Devices,\n\tкоторую совместно разработали\n\tJérôme Duval и Sikosis.\n\tВсе права защищены 2009, Haiku, Inc.\n
 Display controller	Device		Контроллер дисплея
 Docking station	Device		Кредл
 Driver used	Device		Используемый драйвер

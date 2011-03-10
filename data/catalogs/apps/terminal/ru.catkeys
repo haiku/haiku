@@ -4,7 +4,7 @@ Abort	Terminal Shell		Отменить
 About Terminal…	Terminal TermWindow		О программе…
 Appearance	Terminal PrefWindow		Внешний вид
 Background	Terminal AppearancePrefView		Фон
-Black on White	Terminal colors schema		Черный на белом
+Black on White	Terminal colors schema		Черный текст на белом фоне
 Cancel	Terminal PrefWindow		Отмена
 Cancel	Terminal SetTitleWindow		Отмена
 Cancel	Terminal TermView		Отмена
@@ -61,7 +61,7 @@ Really close?	Terminal TermWindow		Действительно закрыть?
 Save	Terminal PrefWindow		Сохранить
 Save as default	Terminal TermWindow		Сохранить
 Save changes to this settings panel?	Terminal PrefWindow		Сохранить изменения в панели настроек?
-Save to file…	Terminal PrefWindow		Сохранить в файл…
+Save to file…	Terminal PrefWindow		Сохранить настройки в файл…
 Search forward	Terminal FindWindow		Искать сверху вниз
 Select all	Terminal TermWindow		Выделить всё
 Selected background	Terminal AppearancePrefView		Выделенный фон
@@ -95,9 +95,9 @@ Use default	Terminal SetTitleWindow		По умолчанию
 Use default shell	Terminal Shell		Использовать оболочку по умолчанию
 Use selection	Terminal FindWindow		Использовать выделенный текст
 Use text:	Terminal FindWindow		Использовать текст:
-White on Black	Terminal colors schema		Черный на белом
+White on Black	Terminal colors schema		Белый текст на черном фоне
 Window size	Terminal TermWindow		Размер окна
-Window title:	Terminal AppearancePrefView		Заголовок окна
+Window title:	Terminal AppearancePrefView		Заголовок окна:
 Window title:	Terminal TermWindow		Заголовок окна:
 Window title…	Terminal TermWindow		Заголовок окна…
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tТекущая директория активного процесса текущей вкладки.\n\t\t\tОпционально можно указать максимальное число отображаемых компонентов пути.\n\t\t\tНапример '%2d' отобразит последние 2 компонента.\n\t%i\t-\tНомер окна.\n\t%p\t-\tНазвание активного процесса в текущей вкладке.\n\t%t\t-\tЗаголовок текущей вкладки.\n\t%%\t-\tСимвол процента - '%'.

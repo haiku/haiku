@@ -1,0 +1,39 @@
+1	belarusian	x-vnd.Haiku-Sudoku	2100942083
+Abort	ProgressWindow		Перарваць
+About	Sudoku		Пра
+About Sudoku…	SudokuWindow		Пра Sudoku…
+Advanced	SudokuWindow		Прасунуты
+Blank	SudokuWindow		Чысты
+Copy	SudokuWindow		Капіяваць
+Could not open \"%s\":\n%s\n	SudokuWindow		Немагчыма адкрыць \"%s\":\n%s\n
+Could not set Sudoku:\n%s\n	SudokuWindow		Could not set Sudoku:\n%s\n
+Creating solvable field	SudokuGenerator		Стварыць вырашальнае поле
+Easy	SudokuWindow		Лёгкі
+Export as…	SudokuWindow		Экспратаваць як…
+File	SudokuWindow		Файл
+HTML	SudokuWindow		HTML
+Hard	SudokuWindow		Цяжкі
+Help	SudokuWindow		Дапамога
+Mark invalid values	SudokuWindow		Пазначыць несапраўдныя значэнні
+Mark valid hints	SudokuWindow		Пазначыць несапраўдныя падказкі
+New	SudokuWindow		Новы
+OK	Sudoku		Так
+OK	SudokuWindow		Так
+Open file…	SudokuWindow		Адкрыць файл…
+Progress monitor	ProgressWindow		Паказнік прагрэсу
+Quit	SudokuWindow		Выйсці
+Redo	SudokuWindow		Перарабіць
+Restore snapshot	SudokuWindow		Аднавіць здымак
+Searching for removable values	SudokuGenerator		Шукаць выдаляемыя значэнні
+Snapshot current	SudokuWindow		Здымак бягучага
+Solve	SudokuWindow		Вырашыць
+Solve single field	SudokuWindow		Вырашыць адно поле
+Start again	SudokuWindow		Запусціць наноў
+Sudoku	Sudoku		Sudoku
+Sudoku	SudokuWindow		Sudoku
+Sudoku request	SudokuWindow		Запыт Sudoku
+Sudoku solved - congratulations!\n	SudokuWindow		Sudoku вырашана - віншуем!\n
+Sudoku\n\twritten by Axel Dörfler\n\tCopyright 2007, Haiku Inc.\n	Sudoku		Sudoku\n\tраспрацаваны Axel Dörfler\n\tCopyright 2007, Haiku Inc.\n
+Text	SudokuWindow		Тэкст
+Undo	SudokuWindow		Адвярнуць
+View	SudokuWindow		Від

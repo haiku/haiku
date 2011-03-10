@@ -15,7 +15,7 @@ Colors:	Screen		Цвета:
 Columns:	Screen		Столбцы:
 Combine displays:	Screen		Совместить экраны:
 Could not write VESA mode settings file:\n\t	Screen		Ну удалось записать файл настроек VESA режима:\n\t
-Current workspace	Screen		Текущий рабоий стол
+Current workspace	Screen		Текущий рабочий стол
 Do you wish to keep these settings?	Screen		Вы хотите сохранить эти настройки?
 Done	Screen		Готово
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Горизонтальная частота:\t%lu - %lu кГц\nВертикальная частота:\t\t%lu - %lu Гц\n\nЧастота пикселизации:\t\t%g MГц

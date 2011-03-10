@@ -2,7 +2,7 @@
 PCX %lu bit image	PCXTranslator		PCX %lu битное изображение
 PCX Settings	main		Настройки PCX транслятора
 PCX images	ConfigView		PCX изображения
-PCX images	PCXTranslator		Транслятор PCX изображений
-PCX translator	PCXTranslator		PCX транслятор
+PCX images	PCXTranslator		PCX изображения
+PCX translator	PCXTranslator		Транслятор PCX изображений
 PCXTranslator Settings	ConfigView		Настройки PCX транслятора
 Version %d.%d.%d, %s	ConfigView		Версия %d.%d.%d, %s

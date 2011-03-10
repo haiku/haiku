@@ -1,11 +1,11 @@
-1	belarusian	x-vnd.Haiku-MediaConverter	3383482196
+1	belarusian	x-vnd.Haiku-MediaConverter	4254955936
 %.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f кГц %ld каналаў / %lld фрэймаў
 %.1f kHz mono / %lld frames	MediaFileInfo		%.1f кГц моно / %lld фрэймаў
 %.1f kHz stereo / %lld frames	MediaFileInfo		%.1f кГц стэрэа / %lld фрэймаў
-%Ld x %Ld, %Ld fps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%Ld x %Ld, %Ld fps / %Ld фрэймаў
 %amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles файлаў не былі прызнаныя як медыя, іх немагчыма апрацаваць:
 %d bit 	MediaFileInfo		%d біт
 %d byte 	MediaFileInfo		%d байтаў
+%u x %u, %.2ffps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%u x %u, %.2f fps / %Ld фрэймаў
 About MediaConverter…	Menu		Пра КанвертарМедыя…
 About…	MediaConverter		Пра праграму…
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Не ўдалося прачытаць інфармацыю пра файл.\n\nПамылка :
@@ -66,6 +66,6 @@ Video quality not supported	MediaConverter		Якасць відэа не пад�
 Video quality: %3d%%	MediaConverter		Якасць відэа: %3d%%
 Video using parameters form settings	MediaConverter		Відэа карыстае параметры з наладак
 Video:	MediaConverter-FileInfo		Відэа:
-Writing audio track: %Ld %% complete	MediaConverter		Запіс аўдыё трэку: выканана на %Ld %%
-Writing video track: %Ld %% complete	MediaConverter		Запіс відэа трэку: выканана на %Ld %%
+Writing audio track: %ld%% complete	MediaConverter		Запіс аўдыё трэку: выканана на %Ld%%
+Writing video track: %ld%% complete	MediaConverter		Запіс відэа трэку: выканана на %Ld%%
 seconds	MediaFileInfo		секунд
