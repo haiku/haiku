@@ -391,18 +391,17 @@ ConfigWindow::ConfigWindow()
 	fIntervalControl->SetDivider(labelWidth);
 	box->AddChild(fIntervalControl);
 
-	BPopUpMenu *frequencyPopUp = new BPopUpMenu(B_EMPTY_STRING);
-	const char *frequencyStrings[] = {
+	BPopUpMenu* frequencyPopUp = new BPopUpMenu(B_EMPTY_STRING);
+	const char* frequencyStrings[] = {
 		B_TRANSLATE("never"),
 		B_TRANSLATE("minutes"),
 		B_TRANSLATE("hours"),
 		B_TRANSLATE("days")};
-	BMenuItem *item;
+
 	for (int32 i = 0; i < 4; i++) {
-		frequencyPopUp->AddItem(item = new BMenuItem(frequencyStrings[i],
-			new BMessage(kMsgIntervalUnitChanged)));
-		if (i == 1)
-			item->SetMarked(true);
+		BMenuItem* item = new BMenuItem(frequencyStrings[i],
+			new BMessage(kMsgIntervalUnitChanged));
+		frequencyPopUp->AddItem(item);
 	}
 	tile.left = tile.right + 5;
 	tile.right = rect.right;
@@ -438,20 +437,17 @@ ConfigWindow::ConfigWindow()
 		B_TRANSLATE("While sending"),
 		B_TRANSLATE("While sending and receiving"),
 		B_TRANSLATE("Always")};
-	BMessage *msg;
 	for (int32 i = 0; i < 4; i++) {
-		statusPopUp->AddItem(item = new BMenuItem(statusModes[i],
-			msg = new BMessage(kMsgShowStatusWindowChanged)));
+		BMessage* msg = new BMessage(kMsgShowStatusWindowChanged);
+		BMenuItem* item = new BMenuItem(statusModes[i], msg);
+		statusPopUp->AddItem(item);
 		msg->AddInt32("ShowStatusWindow", i);
-		if (i == 0)
-			item->SetMarked(true);
 	}
 	rect = box->Bounds().InsetByCopy(8,8);
 	rect.top += 7;
 	rect.bottom = rect.top + height + 5;
-	labelWidth
-		= (int32)view->StringWidth(
-			B_TRANSLATE("Show connection status window:"))	+ 8;
+	labelWidth = (int32)view->StringWidth(
+		B_TRANSLATE("Show connection status window:"))	+ 8;
 	fStatusModeField = new BMenuField(rect, "show status",
 		B_TRANSLATE("Show connection status window:"), statusPopUp);
 	fStatusModeField->SetDivider(labelWidth);
@@ -459,9 +455,9 @@ ConfigWindow::ConfigWindow()
 
 	rect = fStatusModeField->Frame();;
 	rect.OffsetBy(0, rect.Height() + 10);
+	BMessage* msg = new BMessage(B_REFS_RECEIVED);
 	BButton *button = new BButton(rect, B_EMPTY_STRING,
-		B_TRANSLATE("Edit mailbox menu…"),
-		msg = new BMessage(B_REFS_RECEIVED));
+		B_TRANSLATE("Edit mailbox menu…"), msg);
 	button->ResizeToPreferred();
 	box->AddChild(button);
 	button->SetTarget(BMessenger("application/x-vnd.Be-TRAK"));

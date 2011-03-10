@@ -151,7 +151,13 @@ BMailSettings::SetWindowFollowsCorner(int32 which_corner)
 uint32
 BMailSettings::ShowStatusWindow()
 {
-	return fData.FindInt32("ShowStatusWindow");
+	int32 showStatusWindow;
+	if (fData.FindInt32("ShowStatusWindow", &showStatusWindow) != B_OK) {
+		// show during send and receive
+		return 2;
+	}
+
+	return showStatusWindow;
 }
 
 
@@ -257,8 +263,11 @@ BMailSettings::SetStatusWindowLook(int32 look)
 bigtime_t
 BMailSettings::AutoCheckInterval()
 {
-	bigtime_t value = B_INFINITE_TIMEOUT;
-	fData.FindInt64("AutoCheckInterval",&value);
+	bigtime_t value;
+	if (fData.FindInt64("AutoCheckInterval", &value) != B_OK) {
+		// every 5 min
+		return 5 * 60 * 1000 * 1000;
+	}
 	return value;
 }
 
