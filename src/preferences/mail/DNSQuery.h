@@ -42,7 +42,8 @@ public:
 
 private:
 		void			_Init(const void* buf, size_t size);
-		void			_ReadSubString(BString& string, off_t pos);
+		size_t			_ReadStringAt(BString& string, off_t pos);
+
 		off_t 			fWritePosition;
 		off_t 			fReadPosition;
 		BMallocIO		fBuffer;

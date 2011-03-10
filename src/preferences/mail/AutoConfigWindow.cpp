@@ -42,7 +42,7 @@ AutoConfigWindow::AutoConfigWindow(BRect rect, ConfigWindow *parent)
 		B_FOLLOW_ALL_SIDES, B_NAVIGABLE);
 	fRootView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(fRootView);
-	
+
 	int32 buttonHeight = 25;
 	int32 buttonWidth = 50;
 	BRect buttonRect = Bounds();
@@ -51,27 +51,26 @@ AutoConfigWindow::AutoConfigWindow(BRect rect, ConfigWindow *parent)
 	buttonRect.left = buttonRect.right - 2 * buttonWidth - 5;
 	buttonRect.right = buttonRect.left + buttonWidth;
 	fBackButton = new BButton(buttonRect, "back", B_TRANSLATE("Back"),
-								new BMessage(kBackMsg));
+		new BMessage(kBackMsg));
 	fBackButton->SetEnabled(false);
 	fRootView->AddChild(fBackButton);
-	
+
 	buttonRect.left+= 5 + buttonWidth;
 	buttonRect.right = buttonRect.left + buttonWidth;
 	fNextButton = new BButton(buttonRect, "ok", B_TRANSLATE("OK"), new BMessage(kOkMsg));
 	fNextButton->MakeDefault(true);
 	fRootView->AddChild(fNextButton);
-	
+
 	fBoxRect = Bounds();
 	fBoxRect.InsetBy(5,5);
 	fBoxRect.bottom-= buttonHeight + 5;
-	
+
 	fMainView = new AutoConfigView(fBoxRect, fAutoConfig);
 	fMainView->SetLabel(B_TRANSLATE("Account settings"));
 	fRootView->AddChild(fMainView);
-	
+
 	// Add a shortcut to close the window using Command-W
 	AddShortcut('W', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
-	
 }
 
 

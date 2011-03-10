@@ -94,29 +94,11 @@ BRawNetBuffer::ReadUint32(uint32& value)
 status_t
 BRawNetBuffer::ReadString(BString& string)
 {
-	if (fReadPosition >= fBuffer.BufferLength())
+	string = "";
+	size_t readed = _ReadStringAt(string, fReadPosition);
+	if (readed < 0)
 		return B_ERROR;
-
-	char* buffer = (char*)fBuffer.Buffer();
-	buffer = &buffer[fReadPosition];
-
-	// if the string is compressed we have to follow the links to the
-	// sub strings
-	while (fReadPosition < fBuffer.BufferLength() && *buffer != 0) {
-		if (uint8(*buffer) == 192) {
-			// found a pointer mark
-			buffer++;
-			// pointer takes 2 byte
-			fReadPosition = fReadPosition + 1;
-			off_t pos = uint8(*buffer);
-			_ReadSubString(string, pos);
-			break;
-		}
-		string.Append(buffer, 1);
-		buffer++;
-		fReadPosition++;
-	}
-	fReadPosition++;
+	fReadPosition += readed;
 	return B_OK;
 }
 
@@ -140,13 +122,32 @@ BRawNetBuffer::_Init(const void* buf, size_t size)
 }
 
 
-void
-BRawNetBuffer::_ReadSubString(BString& string, off_t pos)
+size_t
+BRawNetBuffer::_ReadStringAt(BString& string, off_t pos)
 {
-	// sub strings have no links to other substrings so we can read it in one
-	// piece
+	if (pos >= fBuffer.BufferLength())
+		return -1;
+
+	size_t readed = 0;
 	char* buffer = (char*)fBuffer.Buffer();
-	string.Append(&buffer[pos]);
+	buffer = &buffer[pos];
+	// if the string is compressed we have to follow the links to the
+	// sub strings
+	while (pos < fBuffer.BufferLength() && *buffer != 0) {
+		if (uint8(*buffer) == 192) {
+			// found a pointer mark
+			buffer++;
+			readed++;
+			off_t subPos = uint8(*buffer);
+			_ReadStringAt(string, subPos);
+			break;
+		}
+		string.Append(buffer, 1);
+		buffer++;
+		readed++;
+	}
+	readed++;
+	return readed;
 }
 
 

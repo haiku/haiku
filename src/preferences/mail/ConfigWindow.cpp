@@ -245,7 +245,8 @@ class AboutTextView : public BTextView
 			SetFontAndColor(0,23,&font,B_FONT_SIZE);
 
 			// center the view vertically
-			rect = TextRect();  rect.OffsetTo(0,(Bounds().Height() - TextHeight(0,42)) / 2);
+			rect = TextRect();
+			rect.OffsetTo(0,(Bounds().Height() - TextHeight(0,42)) / 2);
 			SetTextRect(rect);
 
 			// set the link regions
@@ -270,11 +271,14 @@ class AboutTextView : public BTextView
 			BTextView::Draw(updateRect);
 
 			BRect rect(fMail.Frame());
-			StrokeLine(BPoint(rect.left,rect.bottom-2),BPoint(rect.right,rect.bottom-2));
+			StrokeLine(BPoint(rect.left,rect.bottom-2),
+				BPoint(rect.right,rect.bottom-2));
 			rect = fBugsite.Frame();
-			StrokeLine(BPoint(rect.left,rect.bottom-2),BPoint(rect.right,rect.bottom-2));
+			StrokeLine(BPoint(rect.left,rect.bottom-2),
+				BPoint(rect.right,rect.bottom-2));
 			rect = fWebsite.Frame();
-			StrokeLine(BPoint(rect.left,rect.bottom-2),BPoint(rect.right,rect.bottom-2));
+			StrokeLine(BPoint(rect.left,rect.bottom-2),
+				BPoint(rect.right,rect.bottom-2));
 		}
 
 		virtual void MouseDown(BPoint point)
@@ -308,7 +312,6 @@ ConfigWindow::ConfigWindow()
 	fSaveSettings(false)
 {
 	// create controls
-
 	BRect rect(Bounds());
 	BView *top = new BView(rect, NULL, B_FOLLOW_ALL, 0);
 	top->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
