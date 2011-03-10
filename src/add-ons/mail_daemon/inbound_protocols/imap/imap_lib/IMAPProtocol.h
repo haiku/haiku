@@ -94,7 +94,8 @@ protected:
 			status_t			SendCommand(const char* command,
 									int32 commandId);
 			status_t			HandleResponse(int32 commandId,
-									bigtime_t timeout = kIMAP4ClientTimeout);
+									bigtime_t timeout = kIMAP4ClientTimeout,
+									bool disconnectOnTimeout = true);
 			void				ProcessAfterQuacks(bigtime_t timeout);
 			int32				NextCommandId();
 

@@ -303,7 +303,7 @@ IMAPProtocol::SendCommand(const char* command, int32 commandId)
 
 
 status_t
-IMAPProtocol::HandleResponse(int32 commandId, bigtime_t timeout)
+IMAPProtocol::HandleResponse(int32 commandId, bigtime_t timeout, bool disconnectOnTimeout)
 {
 	status_t commandStatus = B_ERROR;
 
@@ -312,11 +312,13 @@ IMAPProtocol::HandleResponse(int32 commandId, bigtime_t timeout)
 		BString line;
 		status_t status = fConnectionReader.GetNextLine(line, timeout);
 		if (status != B_OK) {
-			if (status != B_TIMED_OUT)
-				TRACE("S:read error %s", line.String());
 			// we might lost the connection, clear the connection state
-			TRACE("Disconnect\n");
-			_Disconnect();
+			if (status != B_TIMED_OUT) {
+				TRACE("S:read error %s", line.String());
+				_Disconnect();
+			} else if (disconnectOnTimeout) {
+				_Disconnect();				
+			}
 			return status;
 		}
 		//TRACE("S: %s", line.String());

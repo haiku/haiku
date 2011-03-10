@@ -127,7 +127,7 @@ IMAPMailbox::StartWatchingMailbox()
 	//TODO set it when we actually watching
 	atomic_set(&fWatching, 1);
 
-	// refresh every 29 min TODO: check if it works this way
+	// refresh every 29 min
 	bigtime_t timeout = 1000 * 1000 * 60 * 29; // 29 min
 	status_t status;
 	while (true) {
@@ -136,7 +136,7 @@ IMAPMailbox::StartWatchingMailbox()
 		status = SendCommand("IDLE", commandId);
 		if (status != B_OK)
 			break;
-		status = HandleResponse(commandId, timeout);
+		status = HandleResponse(commandId, timeout, false);
 		ProcessAfterQuacks(kIMAP4ClientTimeout);
 
 		if (atomic_get(&fWatching) == 0)
