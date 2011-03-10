@@ -95,10 +95,10 @@ status_t
 BRawNetBuffer::ReadString(BString& string)
 {
 	string = "";
-	int32 readed = _ReadStringAt(string, fReadPosition);
-	if (readed < 0)
+	int32 read = _ReadStringAt(string, fReadPosition);
+	if (read < 0)
 		return B_ERROR;
-	fReadPosition += readed;
+	fReadPosition += read;
 	return B_OK;
 }
 
