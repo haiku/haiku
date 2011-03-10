@@ -23,6 +23,7 @@
 static const uint32 kMsgInterfaceSelected = 'ifce';
 static const uint32 kMsgInterfaceConfigure = 'ifcf';
 static const uint32 kMsgInterfaceToggle = 'onof';
+static const uint32 kMsgInterfaceHeal = 'heal';
 
 
 class InterfacesAddOn : public NetworkSetupAddOn, public BBox
@@ -43,6 +44,7 @@ private:
 			InterfacesListView*	fListview;
 			BButton*			fConfigure;
 			BButton*			fOnOff;
+			BButton*			fHeal;
 };
 
 

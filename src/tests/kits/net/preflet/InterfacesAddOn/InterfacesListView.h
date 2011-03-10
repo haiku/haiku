@@ -31,8 +31,6 @@
 #define ICON_SIZE 37
 
 
-static const uint32 kMsgInterfaceReconfigure = 'ifre';
-
 class InterfaceListItem : public BListItem {
 public:
 								InterfaceListItem(const char* name);
@@ -85,7 +83,7 @@ public:
 protected:
 	virtual	void				AttachedToWindow();
 	virtual	void				DetachedFromWindow();
-	virtual	void				MouseDown(BPoint point);
+	virtual	void				FrameResized(float width, float height);
 
 	virtual	void				MessageReceived(BMessage* message);
 

@@ -343,6 +343,13 @@ InterfacesListView::AttachedToWindow()
 
 
 void
+InterfacesListView::FrameResized(float width, float height)
+{
+	Invalidate();
+}
+
+
+void
 InterfacesListView::DetachedFromWindow()
 {
 	BListView::DetachedFromWindow();
@@ -368,36 +375,6 @@ InterfacesListView::MessageReceived(BMessage* message)
 		default:
 			BListView::MessageReceived(message);
 	}
-}
-
-
-void
-InterfacesListView::MouseDown(BPoint point)
-{
-	BMessage *msg = Window()->CurrentMessage();
-	BListView::MouseDown(point);
-
-	// if user is clicking and an item that has been selected
-	// via MouseDown call above. (eg. user clicked a list item)
-	if (msg->what == B_MOUSE_DOWN
-		&& this->CurrentSelection() >= 0) {
-		uint32 buttons = 0;
-		msg->FindInt32("buttons", (int32 *)&buttons);
-
-		// was it the secondary mouse button? If so show interface options
-		if (buttons & B_SECONDARY_MOUSE_BUTTON) {
-			BPopUpMenu *menu = new BPopUpMenu("IntefaceOptions");
-			menu->SetFont(be_plain_font);
-			menu->AddItem(new BMenuItem("Renegotiate Address",
-				new BMessage(kMsgInterfaceReconfigure)));
-			menu->Go(ConvertToScreen(point));
-			//if (selected)
-			//	Window()->PostMessage(selected->Message()->what);
-			//delete menu;
-			return;
-		}
-	}
-	return;
 }
 
 

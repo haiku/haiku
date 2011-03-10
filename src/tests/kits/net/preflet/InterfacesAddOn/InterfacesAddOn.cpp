@@ -80,6 +80,10 @@ InterfacesAddOn::CreateView(BRect *bounds)
 		new BMessage(kMsgInterfaceToggle));
 	fOnOff->SetEnabled(false);
 
+	fHeal = new BButton(intViewRect, "heal",
+		"Heal", new BMessage(kMsgInterfaceHeal));
+	fHeal->SetEnabled(false);
+
 	// Build the layout
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
@@ -89,6 +93,7 @@ InterfacesAddOn::CreateView(BRect *bounds)
 			.Add(fConfigure)
 			.Add(fOnOff)
 			.AddGlue()
+			.Add(fHeal)
 		.End()
 		.SetInsets(10, 10, 10, 10)
 	);
@@ -104,6 +109,7 @@ InterfacesAddOn::AttachedToWindow()
 	fListview->SetTarget(this);
 	fConfigure->SetTarget(this);
 	fOnOff->SetTarget(this);
+	fHeal->SetTarget(this);
 }
 
 
@@ -127,11 +133,13 @@ InterfacesAddOn::MessageReceived(BMessage* msg)
 	switch (msg->what) {
 		case kMsgInterfaceSelected:
 		{
-			fOnOff->SetEnabled(item != NULL);
 			fConfigure->SetEnabled(item != NULL);
+			fOnOff->SetEnabled(item != NULL);
+			fHeal->SetEnabled(item != NULL);
 			if (!item)
 				break;
 			fConfigure->SetEnabled(!item->IsDisabled());
+			fHeal->SetEnabled(!item->IsDisabled());
 			fOnOff->SetLabel(item->IsDisabled() ? "Enable" : "Disable");
 			break;
 		}
@@ -152,8 +160,9 @@ InterfacesAddOn::MessageReceived(BMessage* msg)
 				break;
 
 			item->SetDisabled(!item->IsDisabled());
-			fOnOff->SetLabel(item->IsDisabled() ? "Enable" : "Disable");
 			fConfigure->SetEnabled(!item->IsDisabled());
+			fOnOff->SetLabel(item->IsDisabled() ? "Enable" : "Disable");
+			fHeal->SetEnabled(!item->IsDisabled());
 			fListview->Invalidate();
 			break;
 		}
