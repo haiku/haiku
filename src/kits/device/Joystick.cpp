@@ -49,6 +49,7 @@ LOG(const char *fmt, ...)
 BJoystick::BJoystick()
 	:
 	fBeBoxMode(false),
+	ffd(-1),
 	fDevices(new BList),
 	fJoystickInfo(new _joystick_info())
 {
@@ -61,8 +62,10 @@ BJoystick::BJoystick()
 
 BJoystick::~BJoystick()
 {
-	if (ffd >= 0)
+	if (ffd >= 0) {
 		close(ffd);
+		ffd = -1;	
+	}
 
 	for (int32 count = fDevices->CountItems() - 1; count >= 0; count--) {
 		free(fDevices->RemoveItem(count));
@@ -132,17 +135,18 @@ void
 BJoystick::Close(void)
 {
 	CALLED();
-	if (ffd >= 0)
+	if (ffd >= 0) {
 		close(ffd);
-	ffd = -1;
+		ffd = -1;
+	}
 }
 
 
 void
-BJoystick::ScanDevices(bool use_disabled)
+BJoystick::ScanDevices(bool useDisabled)
 {
 	CALLED();
-	if (use_disabled) {
+	if (useDisabled) {
 		_BJoystickTweaker temp(*this);
 		temp.scan_including_disabled();
 	}
@@ -227,6 +231,7 @@ BJoystick::CountButtons()
 	CALLED();
 	return fJoystickInfo->num_buttons;
 }
+
 
 status_t
 BJoystick::GetControllerModule(BString *out_name)
