@@ -62,10 +62,8 @@ BJoystick::BJoystick()
 
 BJoystick::~BJoystick()
 {
-	if (ffd >= 0) {
+	if (ffd >= 0)
 		close(ffd);
-		ffd = -1;	
-	}
 
 	for (int32 count = fDevices->CountItems() - 1; count >= 0; count--) {
 		free(fDevices->RemoveItem(count));
