@@ -1,7 +1,6 @@
-1	ukrainian	x-vnd.Haiku-WebPTranslator	3367474074
+1	ukrainian	x-vnd.Haiku-WebPTranslator	4242950350
 WebP Images	ConfigView		Зображення WebP
 WebP image	WebPTranslator		Зображення WebP
 WebP image translator	WebPTranslator		Перетворювач зображень WebP
 WebP images	WebPTranslator		Зображення WebP
 WebPTranslator Settings	ConfigView		Настройки перетворювача WebP
-stream GetSize(): %lld\n	WebPTranslator		потік GetSize(): %lld\n

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Pulse	2756001860
+1	russian	x-vnd.Haiku-Pulse	3652781474
 About Pulse…	CPUButton		О программе…
 About Pulse…	PulseView		О программе…
 Active color	ConfigView		Активный цвет
@@ -15,7 +15,6 @@ Frame color	ConfigView		Цвет рамки
 Idle color	ConfigView		Цвет бездействия
 Info	CPUButton		Информация
 Info	DeskbarPulseView		Информация
-Info	PulseWindow		Информация
 Mini mode	DeskbarPulseView		Мини режим
 Mini mode	NormalPulseView		Мини режим
 Mini mode	PrefsWindow		Мини режим
@@ -27,17 +26,12 @@ OK	DeskbarPulseView		ОК
 OK	PrefsWindow		ОК
 OK	PulseApp		ОК
 OK	PulseView		ОК
-OK	PulseWindow		ОК
 Pulse	NormalPulseView		Пульс
 Pulse	PulseWindow		Пульс
 Pulse settings	PulseWindow		Настройки пульсации
-Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	CPUButton		Pulse\n\nРазработал David Ramsey и Arve Hjønnevåg\nИсправлен Daniel Switkin
-Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	DeskbarPulseView		Pulse\n\nРазработал David Ramsey и Arve Hjønnevåg\nИсправлен Daniel Switkin
-Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	PulseWindow		Pulse\n\nРазработал David Ramsey и Arve Hjønnevåg\nИсправлен Daniel Switkin
 Quit	DeskbarPulseView		Выход
 Quit	MiniPulseView		Выход
 Remove replicant	CPUButton		Удалить репликант
-Remove(): %s	DeskbarPulseView		Remove(): %s
 Settings…	PulseView		Настройки…
 Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Использование: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
 Width of icon:	ConfigView		Размер значка:

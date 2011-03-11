@@ -3,7 +3,7 @@
 Abort	Terminal Shell		Отменить
 About Terminal…	Terminal TermWindow		О программе…
 Appearance	Terminal PrefWindow		Внешний вид
-Background	Terminal AppearancePrefView		Фон
+Background	Terminal AppearancePrefView		Фона
 Black on White	Terminal colors schema		Черный текст на белом фоне
 Cancel	Terminal PrefWindow		Отмена
 Cancel	Terminal SetTitleWindow		Отмена
@@ -23,7 +23,7 @@ Confirm exit if active programs exist	Terminal AppearancePrefView		Подтве�
 Copy	Terminal TermWindow		Копировать
 Copy here	Terminal TermView		Копировать сюда
 Create link here	Terminal TermView		Создать ссылку здесь
-Custom	Terminal colors schema		Пользовательская
+Custom	Terminal colors schema		Настроена вручную
 Decrease	Terminal TermWindow		Уменьшить
 Don't save	Terminal PrefWindow		Не сохранять
 Edit	Terminal TermWindow		Изменить
@@ -61,11 +61,11 @@ Really close?	Terminal TermWindow		Действительно закрыть?
 Save	Terminal PrefWindow		Сохранить
 Save as default	Terminal TermWindow		Сохранить
 Save changes to this settings panel?	Terminal PrefWindow		Сохранить изменения в панели настроек?
-Save to file…	Terminal PrefWindow		Сохранить настройки в файл…
+Save to file…	Terminal PrefWindow		Сохранить в файл…
 Search forward	Terminal FindWindow		Искать сверху вниз
 Select all	Terminal TermWindow		Выделить всё
-Selected background	Terminal AppearancePrefView		Выделенный фон
-Selected text	Terminal AppearancePrefView		Выделенный текст
+Selected background	Terminal AppearancePrefView		Выделенного фона
+Selected text	Terminal AppearancePrefView		Выделенного текста
 Set tab title	Terminal TermWindow		Переименовть вкладку
 Set window title	Terminal TermWindow		Установить заголовок окна
 Settings	Terminal TermWindow		Настройки
@@ -79,7 +79,7 @@ Terminal	Terminal TermWindow		Терминал
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Терминал не смог запустить оболочку. Простите.
 Terminal settings	Terminal PrefWindow		Настройки терминала
 Terminal\n\nwritten by Kazuho Okui and Takashi Murai\nupdated by Kian Duffy and others\n\nCopyright ©2003-2009, Haiku.\n	Terminal TermView		Terminal\n\nразработал Kazuho Okui и Takashi Murai\nобновлено Kian Duffy и многими другими\n\nCopyright ©2003-2009, Haiku.\n
-Text	Terminal AppearancePrefView		Текст
+Text	Terminal AppearancePrefView		Текста
 Text encoding	Terminal TermWindow		Кодировка
 Text not found.	Terminal TermWindow		Текст не найден
 Text size	Terminal TermWindow		Размер шрифта
