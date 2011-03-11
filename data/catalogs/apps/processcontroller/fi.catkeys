@@ -1,5 +1,4 @@
-1	finnish	x-vnd.Haiku-ProcessController	35871000
-%s [%d]	ProcessController		%s [%d]
+1	finnish	x-vnd.Haiku-ProcessController	769318393
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		© 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
 About	ProcessController		Ohjelmasta
 About ProcessController…	ProcessController		Ohjelmasta Prosessiohjain
@@ -13,6 +12,7 @@ Do you really want to kill the team \"%s\"?	ProcessController		Haluatko todella 
 Error saving file	ProcessController		Virhe tallennettaessa tiedostoa
 Gone teams…	ProcessController		Poistuneet ryhmät...
 Idle priority	ProcessController		Joutokäyntiprioriteetti
+Info	ProcessController		Tiedot
 Install in Deskbar	ProcessController		Asenna Työpöytäpalkissa
 Kill this thread!	ProcessController		Tapa tämä säie!
 Live in the Deskbar	ProcessController		Suora lähetys Työpöytäpalkista
@@ -23,6 +23,7 @@ New Terminal	ProcessController		Uusi pääteikkuna
 Normal priority	ProcessController		Normaaliprioriteetti
 OK	ProcessController		Valmis
 Ok!	ProcessController		Valmis!
+Please confirm	ProcessController		Vahvista
 ProcessController	ProcessController		Prosessiohjain
 ProcessController is already installed in Deskbar.	ProcessController		Prosessiohjain on jo asennettu Työpöytäpalkkiin.
 ProcessController\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n	ProcessController		Prosessiohjain\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n

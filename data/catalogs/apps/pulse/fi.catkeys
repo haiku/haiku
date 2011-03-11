@@ -1,4 +1,7 @@
-1	finnish	x-vnd.Haiku-Pulse	2756001860
+1	finnish	x-vnd.Haiku-Pulse	1325849358
+%.2f GHz	NormalPulseView		%.2f GHz
+%ld MHz	NormalPulseView		%ld MHz
+%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\ntekijät: David Ramsey ja Arve Hjønnevåg\nPäivittäjä: Daniel Switkin\n
 About Pulse…	CPUButton		Ohjelmasta Pulssi...
 About Pulse…	PulseView		Ohjelmasta Pulssi...
 Active color	ConfigView		Käytössä oleva väri
@@ -10,12 +13,15 @@ Deskbar menu	CPUButton		Työpöytäpalkkivalikko
 Deskbar mode	MiniPulseView		Työpöytäpalkkitila
 Deskbar mode	NormalPulseView		Työpöytäpalkkitila
 Deskbar mode	PrefsWindow		Työpöytäpalkkitila
+Error	PulseApp		Virhe
 Fade colors	ConfigView		Haalista värit
 Frame color	ConfigView		Kehysväri
 Idle color	ConfigView		Joutokäyntiväri
 Info	CPUButton		Tiedot
 Info	DeskbarPulseView		Tiedot
-Info	PulseWindow		Tiedot
+Info	PulseApp		Tiedot
+Info	PulseView		Tiedot
+Installing in Deskbar failed\n%s	PulseApp		Asentaminen Työpöytäpalkkiin epäonnistui\n%s
 Mini mode	DeskbarPulseView		Minitila
 Mini mode	NormalPulseView		Minitila
 Mini mode	PrefsWindow		Minitila
@@ -27,17 +33,14 @@ OK	DeskbarPulseView		Valmis
 OK	PrefsWindow		Valmis
 OK	PulseApp		Valmis
 OK	PulseView		Valmis
-OK	PulseWindow		Valmis
 Pulse	NormalPulseView		Pulssi
+Pulse	PulseApp		Pulssi
 Pulse	PulseWindow		Pulssi
 Pulse settings	PulseWindow		Pulssi-asetukset
-Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	CPUButton		Pulssi\n\nTekijät: David Ramsey ja Arve Hjønnevåg\nKorjausversio: Daniel Switkin
-Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	DeskbarPulseView		Pulssi\n\nTekijä: David Ramsey ja Arve Hjønnevåg\nKorjausversio: Daniel Switkin
-Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	PulseWindow		Pulssi\n\nTekijät: David Ramsey ja Arve Hjønnevåg\nKorjausversio: Daniel Switkin
 Quit	DeskbarPulseView		Poistu
 Quit	MiniPulseView		Poistu
 Remove replicant	CPUButton		Poista replikantti
-Remove(): %s	DeskbarPulseView		Remove(): %s
+Removing from Deskbar failed.\n%s	DeskbarPulseView		Poistaminen Työpöytäpalkista epäonnistui.\n%s
 Settings…	PulseView		Asetukset...
 Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Käyttö: Pulse [--mini] [-w leveys] [--width=leveys]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
 Width of icon:	ConfigView		Kuvakkeen leveys:
