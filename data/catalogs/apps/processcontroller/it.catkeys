@@ -1,0 +1,49 @@
+1	italian	x-vnd.Haiku-ProcessController	35871000
+%s [%d]	ProcessController		%s [%d]
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
+About	ProcessController		Informazioni
+About ProcessController…	ProcessController		Informazioni su ProcessController...
+Cancel	ProcessController		Cancella
+Custom priority	ProcessController		Priorità personalizzata
+Damned!	ProcessController		Accidenti!
+Debug this thread!	ProcessController		Esegui il debug di questo thread!
+Debug thread	ProcessController		Esegui il debug del thread
+Display priority	ProcessController		Priorità visualizzazione
+Do you really want to kill the team \"%s\"?	ProcessController		Vuoi veramente terminare il team \"%s\"?
+Error saving file	ProcessController		Errore nel salvataggio del file
+Gone teams…	ProcessController		Team terminati...
+Idle priority	ProcessController		Priorità inattivo
+Install in Deskbar	ProcessController		Installa nella Deskbar
+Kill this thread!	ProcessController		Termina questo thread!
+Live in the Deskbar	ProcessController		Live nella Deskbar
+Low priority	ProcessController		Bassa priorità
+Lowest active priority	ProcessController		Priorità più bassa attiva
+Memory usage	ProcessController		Uso della memoria
+New Terminal	ProcessController		Nuovo Terminale
+Normal priority	ProcessController		Priorità normale
+OK	ProcessController		OK
+Ok!	ProcessController		OK!
+ProcessController	ProcessController		ProcessController
+ProcessController is already installed in Deskbar.	ProcessController		ProcessController è già installato nella Deskbar
+ProcessController\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n	ProcessController		ProcessController\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n
+Processor %d	ProcessController		Processore %d
+Quit an application	ProcessController		Chiudi un'applcazione
+Quit application	ProcessController		Chiudi applicazione
+Real-time display priority	ProcessController		Priorità video in tempo reale
+Real-time priority	ProcessController		Priorità in tempo reale
+Restart Deskbar	ProcessController		Riavvia Deskbar
+Restart Tracker	ProcessController		Riavvia il Tracker
+Run in window	ProcessController		Esegui in finestra
+System resources & caches…	ProcessController		Risorse di sistema & cache
+That's no Fun!	ProcessController		Non è divertente!
+This is the last active processor...\nYou can't turn it off!	ProcessController		Questo è l'ultimo processore attivo...\nNon puoi spegnerlo!
+This team is already gone…	ProcessController		Questo team è già terminato...
+This thread is already gone…	ProcessController		Questo thread è già terminato...
+Threads and CPU usage	ProcessController		Thread e uso della CPU
+Urgent display priority	ProcessController		Priorità video urgente
+Urgent priority	ProcessController		Priorità urgente
+Usage: %s [-deskbar]\n	ProcessController		Utilizzo: %s [-deskbar]\n
+What do you want to do with the thread \"%s\"?	ProcessController		Cosa si vuole fare con il thread \"%s\"?
+Yes, kill this team!	ProcessController		Sì, termina questo team!
+You can run ProcessController in a window or install it in the Deskbar.	ProcessController		E' possibile eseguire ProcessController in una finestra o installarlo nella Deskbar
+Your setting file could not be saved!\n(%s)	ProcessController		Il tuo file impostazioni non può essere salvato!\n(%s)

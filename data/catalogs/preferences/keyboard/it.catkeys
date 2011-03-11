@@ -1,0 +1,14 @@
+1	italian	x-vnd.Haiku-Keyboard	914649575
+Defaults	KeyboardWindow		Predefiniti
+Delay until key repeat	KeyboardView		Ritardo di ripetizione del tasto
+Fast	KeyboardView		Veloce
+Key repeat rate	KeyboardView		Velocità di ripetizione del tasto
+Keyboard	KeyboardWindow		Keyboard
+Long	KeyboardView		Lungo
+OK	KeyboardApplication		OK
+Revert	KeyboardWindow		Ripristina
+Short	KeyboardView		Breve
+Slow	KeyboardView		Lento
+Something has gone wrong!	KeyboardApplication		Qualcosa è andato storto!
+Typing test area	KeyboardView		Area di prova digitazione
+Written by Andrew Edward McCall	KeyboardApplication		Scritto da Andrew Edward McCall

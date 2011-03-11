@@ -1,0 +1,43 @@
+1	italian	x-vnd.Be-PRNT	1563474157
+%.2f KB	JobListView		%.2f KB
+1 pending job.	PrinterListView		1 stampa in attesa.
+<pick one>	AddPrinterDialog		<scegliere>
+Add	AddPrinterDialog		Aggiungi
+Add printer	AddPrinterDialog		Aggiungi una stampante
+Add …	PrintersWindow		Aggiungi ...
+Black	TestPageView		Nero
+Blue	TestPageView		Blu
+Cancel	AddPrinterDialog		Annulla
+Cancel job	PrintersWindow		Annulla la stampa
+Completed	JobListView		Completata
+Connected to:	AddPrinterDialog		Connesso a:
+Cyan	TestPageView		Ciano
+Default Printer	PrinterListView		Stampante predefinita
+Driver: %driver%	PrinterListView		Driver: %driver%
+Failed	JobListView		Fallita
+Green	TestPageView		Verde
+Magenta	TestPageView		Magenta
+Make default	PrintersWindow		Rendi predefinita
+No pending jobs.	PrinterListView		Nessun lavoro in sospeso
+No printer found!	TransportMenu		Nessuna stampante trovata!
+Print jobs for 	PrintersWindow		Stampante in attesa per
+Print jobs: No printer selected	PrintersWindow		Stampa: nessuna stampante selezionata
+Print test page	PrintersWindow		Stampa pagina di prova
+Printer name:	AddPrinterDialog		Nome della stampante
+Printer type:	AddPrinterDialog		Tipo stampante:
+Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Stampante: %printer_name%\nDriver: %driver%\n
+Printers	PrintersWindow		Stampanti
+Processing	JobListView		In corso
+Red	TestPageView		Rosso
+Remove	PrintersWindow		Rimuovere
+Restart job	PrintersWindow		Riavvia la stampa
+Test Page	PrintersWindow		Pagina di prova
+Test Page	TestPageView		Pagina di prova
+Transport: %transport% %transport_address%	PrinterListView		Transport: %transport% %transport_address%
+Transport: %transport% %transport_address%	TestPageView		Transport: %transport% %transport_address%
+Unknown status	JobListView		Status sconosciuto
+Waiting	JobListView		In attesa
+Yellow	TestPageView		Giallo
+page	JobListView		pagina
+pages	JobListView		pagine
+pending jobs.	PrinterListView		stampa in attesa

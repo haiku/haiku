@@ -1,0 +1,17 @@
+1	italian	x-vnd.Haiku-mount_server	1422362183
+Cancel	AutoMounter		Annulla
+Could not unmount disk \"%s\":\n\t%s	AutoMounter		Non è possibile smontare il disco \"%s\":\n\t%s
+Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Non è possibile smontare il disco \"%s\":\n\t%s\n\nVuoi che venga smontato forzatamente?\n\nAttenzione: Se un'applicazione sta attuamente scrivendo sul disco, smontarlo ora potrebbe condurre a una perdita di dati.\n
+Error mounting volume:\n\n%s	AutoMounter		Impossibile montare il disco:\n\n%s
+Force unmount	AutoMounter		Smonta forzatamente
+It is suggested to mount all additional Haiku volumes in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Si consiglia di montare tutti i volumi Haiku aggiuntivi in sola lettura. Si potrà così prevenire una perdita non voluta di dati a causa di errori relativi ad Haiku. 
+Mount error	AutoMounter		Si è verificato un errore nel montaggio del volume
+Mount read-only	AutoMounter		Monta in sola lettura
+Mount read/write	AutoMounter		Monta in lettura/scrittura
+Mount warning	AutoMounter		Avvisi di montaggio
+Mounting volume '%s'\n\n	AutoMounter		Montaggio volume '%s'\n\n
+Mounting volume <unnamed volume>\n\n	AutoMounter		Montaggio del volume… <volume senza nome>\n\n
+OK	AutoMounter		OK
+Previous volumes mounted.	AutoMounter		Volumi montati in precedenza.
+The file system on this volume is not the Haiku file system. It is strongly suggested to mount it in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Il file system di questo volume non è un Haiku file system. Si consiglia di montare questo volume in sola lettura. Si potrà così prevenire una  perdita di dati indesiderata a causa di errori relativi ad Haiku. 
+Unmount error	AutoMounter		Errore nello smontaggio

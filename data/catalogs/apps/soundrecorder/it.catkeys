@@ -1,0 +1,38 @@
+1	italian	x-vnd.Haiku-SoundRecorder	1355572422
+Cannot connect to media server	RecorderWindow		Impossibile connettersi al media server
+Cannot connect to the selected sound input	RecorderWindow		Impossibile connettere all'ingresso sonoro selezionato
+Cannot find an unused name to use for the new recording	RecorderWindow		Impossibile trovare un nome inutilizzato da usare per la nuova registrazione
+Cannot find default audio hardware	RecorderWindow		Impossibile trovare l'hardware audio predefinito
+Cannot find the temporary file created to hold the new recording	RecorderWindow		Impossibile trovare il file temporaneo creato per conservare la nuova registrazione
+Cannot get the file to play	RecorderWindow		Impossibile ottenere il file da riprodurre
+Cannot open the temporary file created to hold the new recording	RecorderWindow		Impossibile aprire il file temporaneo creato per conservare la nuova registrazione
+Cannot recognize this file as a media file	RecorderWindow		Impossibile riconoscere questo file come di tipo media
+Cannot record a sound that long	RecorderWindow		Impossibile registrare un suono tanto esteso
+Channels: 	RecorderWindow		Canali:
+Compression:	RecorderWindow		Compressione:
+Drop files here	SoundListView		Trascina qui i file
+Duration:	RecorderWindow		Durata:
+File info	RecorderWindow		Informazioni sul file
+File name:	RecorderWindow		Nome file:
+Format: 	RecorderWindow		Formato:
+Forward	RecorderWindow		Avanti
+Input	RecorderWindow		Ingresso
+Input:	RecorderWindow		Ingresso:
+Invalid audio files	RecorderWindow		File audio non validi
+Loop	RecorderWindow		Ripeti
+None	RecorderWindow		Nessuno
+None of the files appear to be audio files	RecorderWindow		Nessun file sembra essere di tipo audio
+Nothing to play	RecorderWindow		Niente da riprodurre
+OK	RecorderWindow		Ok
+Play	RecorderWindow		Riproduci
+Record	RecorderWindow		Registra
+Rewind	RecorderWindow		Torna indietro
+Sample rate: 	RecorderWindow		Frequenza di campionamento:
+Sample size: 	RecorderWindow		Dimensione del campione:
+Save	RecorderWindow		Salva
+Some of the files don't appear to be audio files	RecorderWindow		Alcuni file non sembrano essere di tipo audio
+Sound List	RecorderWindow		Elenco Suono
+SoundRecorder	RecorderWindow		SoundRecorder
+Stop	RecorderWindow		Interrompi
+bits	RecorderWindow		bit
+seconds	RecorderWindow		secondi

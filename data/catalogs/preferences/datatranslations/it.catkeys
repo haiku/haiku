@@ -1,0 +1,23 @@
+1	italian	x-vnd.Haiku-DataTranslations	3706134146
+About	DataTranslations		informazioni
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Un elemento '%name' esiste già nella cartella dei Translator! Il translator deve essere sovrascritto?
+Cancel	DataTranslations		Cancella
+Could not install %s:\n%s	DataTranslations		Impossibile installare %s:\n%s
+DataTranslations	DataTranslations		DataTranslations
+DataTranslations - Error	DataTranslations		DataTranslations - Errore
+DataTranslations - Note	DataTranslations		DataTranslations - Nota
+DataTranslations\n\twritten by Oliver Siebenmarck and others\n\tCopyright 2002-2010, Haiku Inc. All rights reserved.\n	DataTranslations		DataTranslations\n\tscritto da Oliver Sienbenmarck ed altri\n\tCopyright 2002-2010, Haiku Inc. Tutti i diritti riservati.\n
+Icon	DataTranslations		Icona
+Info	DataTranslations		informazioni
+Info:	DataTranslations		Informazioni:
+Info…	DataTranslations		Informazioni...
+Name:	DataTranslations		Nome:
+Name:\t%s \nVersion:\t%ld.%ld.%ld\nInfo:\t%s\n\nPath:\n%s\n	DataTranslations		Nome:\t%s \nVersione:\t%ld.%ld.%ld\nInfo:\t%s\n\nPath:\n%s\n
+OK	DataTranslations		OK
+Overwrite	DataTranslations		Sovrascrivi
+Panel Info	DataTranslations		Pannello informazioni
+Path:	DataTranslations		Percorso:
+The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		L'elemento '%name' non sembra essere un Translator e non verrà installato.
+The new translator has been installed successfully.	DataTranslations		Il nuovo translator è stato installato con successo.
+Translation Settings\n\nUse this control panel to set values that various\ntranslators use when no other settings are specified\nin the application.	DataTranslations		Impostazioni di conversione\n\nUsare questo pannello di controllo per impostare i valori che i vari\ntranslator usano quando nessuna impostazione è stata specificata\nnell'applicazione.
+Version:	DataTranslations		Versione:

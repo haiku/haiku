@@ -1,0 +1,35 @@
+1	italian	x-vnd.Haiku.TextSearch	3449010850
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME non può aprire una o più cartelle.
+%s: Not enough room to escape the filename.	Grepper		%s: Non c'è abbastanza spazio per ripulire il nome del file.
+%s: There was a problem running grep.	Grepper		%s: È occorso un problema eseguendo grep
+About TextSearch…	GrepWindow		Informazioni su TextSearch…
+Actions	GrepWindow		Azioni
+Cancel	GrepWindow		Annulla
+Case-sensitive	GrepWindow		Sensibile alle maiuscole/minuscole
+Close	GrepWindow		Chiudi
+Copy text to clipboard	GrepWindow		Copia il testo nella clipboard
+Created by Matthijs Hollemans.\n\nContributed to by Peter Hinely, Serge Fantino, Hideki Naito, Oscar Lesta, Oliver Tappe, Jonas Sundström, Luc Schrijvers and momoziro.\n	GrepWindow		Creato da Matthijs Hollemans.\n\nCon il contributo di Peter Hinely, Serge Fantino, Hideki Naito, Oscar Lesta, Oliver Tappe, Jonas Sundström, Luc Schrijvers e momoziro.\n
+Encoding	GrepWindow		Codifica
+Escape search text	GrepWindow		Testo di ricerca ripulito
+File	GrepWindow		File
+Follow symbolic links	GrepWindow		Segui collegamenti simbolici
+History	GrepWindow		Cronologia
+Look in sub-folders	GrepWindow		Cerca nelle sotto-cartelle
+New window	GrepWindow		Nuova finestra
+OK	GrepWindow		Ok
+Open files in Pe	GrepWindow		Apri i file con Pe
+Open selection	GrepWindow		Apri quanto selezionato
+Please select the files you wish to have selected for you in Tracker.	GrepWindow		Scegli i file che desideri che vengano selezionati per te nel Tracker.
+Please select the files you wish to keep searching.	GrepWindow		Seleziona i file sui quali desideri continuare la ricerca.
+Quit	GrepWindow		Esci
+Search	GrepWindow		Trova
+Select all	GrepWindow		Seleziona tutto
+Set target…	GrepWindow		Imposta obbiettivo
+Settings	GrepWindow		Impostazioni
+Show files in Tracker	GrepWindow		Mostra i file nel Tracker
+Show lines	GrepWindow		Mostra linee
+Skip folders starting with a dot	GrepWindow		Tralascia le cartelle che iniziano con un punto
+Text files only	GrepWindow		Solo file di testo
+TextSearch	GrepWindow		TextSearch
+The unselected files will be removed from the list.	GrepWindow		I file non selezionati verranno rimossi dalla lista.
+Trim to selection	GrepWindow		Riduci alla selezione

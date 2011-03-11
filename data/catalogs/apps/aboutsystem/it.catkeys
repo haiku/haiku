@@ -1,0 +1,39 @@
+1	italian	x-vnd.Haiku-About	883416885
+%.2f GHz	AboutView		%.2f GHz
+%d MiB total	AboutView		%d MiB totali	 
+%d MiB used (%d%%)	AboutView		%d MiB utilizzati (%d%%)	 
+%ld MHz	AboutView		%ld MHz
+%ld Processors:	AboutView		%ld Processori:
+%total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB totali, %inaccessible MiB inaccessibili	
+
+... and the many people making donations!\n\n	AboutView		... e molte persone con le loro donazioni!\n\n
+About this system	AboutWindow		Informazioni su questo sistema
+Contributors:\n	AboutView		Contributori:\n
+Current maintainers:\n	AboutView		Sviluppatori attuali:\n
+GCC %d Hybrid	AboutView		GCC %d Ibrido
+Google & their Google Summer of Code program\n	AboutView		Google e il suo programma Google Summer of Code\n
+Kernel:	AboutView		Kernel:
+License: 	AboutView		Licenza: 
+Licenses: 	AboutView		Licenze: 
+Memory:	AboutView		Memoria:
+Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (fondatore del progetto)\n\n
+Past maintainers:\n	AboutView		Precedenti sviluppatori:\n
+Processor:	AboutView		Processore:
+Revision	AboutView		Revisione
+Source Code: 	AboutView		Codice sorgente: 
+The BeGeistert team\n	AboutView		Il team del BeGeistert\n
+The Haiku-Ports team\n	AboutView		Il team di Haiku-Ports\n
+The Haikuware team and their bounty program\n	AboutView		Il team di Haikuware e il loro programma di bounty\n
+The University of Auckland and Christof Lutteroth\n\n	AboutView		L'Università di Auckland e Christof Lutteroth\n\n
+The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT licence%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		Il codice che è unico di Haiku, in particolare il kernel e tutto il codice che le applicazioni possono linkare, è distribuito secondo i termini della %licenza MIT%. Alcune librerie di sistema contengono codice di terze parti distribuito sotto licenza LGPL. È possibile trovare il copyright del codice di terze parti qui sotto.\n\n
+The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku and the Haiku logo are trademarks of Haiku, Inc.\n\n	AboutView		Il copyright sul codice di Haiku appartiene ad Haiku, Inc. o ai rispettivi autori ove espressamente indicato nel codice sorgente. Haiku e il logo di Haiku sono marchi registrati di Haiku, Inc.\n\n 
+Time running:	AboutView		Tempo dall'avvio:
+Translations:\n	AboutView		Traduzioni:\n
+Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (e il suo kernel NewOS)\n
+Unknown	AboutView		Sconosciuto
+Version:	AboutView		Versione:
+Website, marketing & documentation:\n	AboutView		Sito internet, marketing e documentazione:\n
+[Click a license name to read the respective license.]\n\n	AboutView		[Clicca sul nome di una licenza per leggerla.]\n\n
+\nCopyrights\n\n	AboutView		\nCopyright\n\n
+\n\nSpecial thanks to:\n	AboutView		\n\nUn ringraziamento speciale a:\n
+\n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… e probabilmente qualcun altro che abbiamo dimenticato di citare (scusateci!)\n\n

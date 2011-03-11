@@ -1,0 +1,43 @@
+1	italian	x-vnd.Haiku-Mail	3359050941
+Account name:	Config Views		Nome account:
+Account settings	Config Views		Impostazioni account
+Accounts	Config Window		Account
+Add	Config Window		Aggiungi
+Alpha	Config Window		Alfa
+Always	Config Window		Sempre
+Apply	Config Window		Applica
+Beta	Config Window		Beta
+Check every	Config Window		Controlla ogni
+Development	Config Window		Sviluppo
+E-mail	Config Window		E-mail
+Edit mailbox menu…	Config Window		Modifica menu della casella di posta...
+Error	Config Window		Errore
+Error retrieving general settings: %s\n	Config Window		Errore nel recupero delle impostazioni generali: %s\n
+Final	Config Window		Finale
+Gamma	Config Window		Gamma
+Golden master	Config Window		Golden master
+Mail Daemon Replacement\n\nby Haiku, Inc. All rights reserved.\n\nVersion %ld.%ld.%ld %s\n\nSee LICENSE file included in the installation package for more information.\n\n\n\nYou can contact us at:\n%s\n\nPlease submit bug reports using the %s\n\nProject homepage at:\n%s	Config Window		Mail Daemon Replacement\n\nda Haiku, Inc. Tutti i diritti riservati.\n\nVersione %ld.%ls.%ls %s\n\nVedi il file LICENSE inclusi nel pacchetto di installazione per altre informazioni.\n\n\n\nÈ possibile contattarci a:\n%s\n\nInvia il rapporto di un bug usando il %s\n\nHomepage del progetto a:\n%s
+Mail checking	Config Window		Controllo posta
+Miscellaneous	Config Window		Altro
+OK	Config Window		OK
+Only when dial-up is connected	Config Window		Solo quando il modem è connesso
+Real name:	Config Views		Nome reale:
+Remove	Config Window		Rimuovi
+Return address:	Config Views		Indirizzo del mittente:
+Revert	Config Window		Ripristina
+Schedule outgoing mail when dial-up is disconnected	Config Window		Pianificazione invio dei messaggi quando il modem è disconnesso
+
+Settings	Config Window		Impostazioni
+Show connection status window:	Config Window		Mostra la finestra di stato della connessione:
+Start mail services on startup	Config Window		Avvia i servizi di posta all'avvio del sistema
+While sending	Config Window		Durante l'invio
+While sending and receiving	Config Window		Durante l'invio e la ricezione
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nLe impostazioni generali non possono essere ripristinate.\n\nErrore nel recupero delle impostazioni generali:\n%s\n
+\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nCrea un nuovo account con il pulsante "Aggiungi".\n\nRimuovi un account con il pulsante "Rimuovi" sull'elemento selezionato.\n\nSeleziona un elemento dalla lista per cambiarne le impostazioni.
+days	Config Window		giorni
+hours	Config Window		ore
+minutes	Config Window		minuti
+never	Config Window		mai
+· E-mail filters	Config Window		E-mail filtri
+· Incoming	Config Window		In entrata
+· Outgoing	Config Window		In uscita

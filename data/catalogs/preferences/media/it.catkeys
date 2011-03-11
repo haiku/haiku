@@ -1,0 +1,30 @@
+1	italian	x-vnd.Haiku-Media	1701788906
+<none>	Media views		<niente>
+Audio input:	Media views		Ingresso audio:
+Audio mixer	Media Window		Mixer audio
+Audio output:	Media views		Uscite Audio:
+Audio settings	Media Window		Impostazioni Audio
+Channel:	Media views		Canale:
+Cleaning up.	Media Window		Pulizia in corso.
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Impossibile connettersi al media server.\nVuoi avviarlo?
+Couldn't add volume control in Deskbar: %s\n	Media views		Non è stato possibile aggiungere il controllo del volume nella Deskbar: %s\n
+Couldn't remove volume control in Deskbar: %s\n	Media views		Non è stato possibile rimuovere il controllo del volume nella Deskbar: %s\n
+Defaults	Media views		Predefiniti
+Done shutting down.	Media Window		Spegnimento effettuato.
+Media	Media Window		Media
+OK	Media Window		OK
+Quit	Media Window		Esci
+Ready for use…	Media Window		Pronto all'uso…
+Restart media services	Media views		Riavvio servizi media
+Restarting media services\nShutting down media server\n	Media Window		Riavvio servizi media\nSpegnimento media server\n
+Restarting media services\nStarting media server…\n	Media Window		Riavvio servizi media\nAvvio media server…\n
+Show volume control on Deskbar	Media views		Mostra controllo volume nella Deskbar
+Start media server	Media Window		Avvia media server
+Starting media server…	Media Window		Avvio media server…
+Stopping media server…	Media Window		Interruzione del media server…
+Telling media_addon_server to quit.	Media Window		Richiesta di uscita al media_addon_server.
+This hardware has no controls.	Media Window		Questo hardware non possiede controlli.
+Video input:	Media views		Ingresso Video:
+Video output:	Media views		Uscita Video:
+Video settings	Media Window		Impostazioni video
+Waiting for media_server to quit.	Media Window		In attesa del media_server per uscire.

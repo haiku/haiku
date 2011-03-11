@@ -1,0 +1,49 @@
+1	italian	x-vnd.Haiku-ActivityMonitor	1946610782
+%.1f KB/s	DataSource			%.1f KB/s
+%.1f MB	DataSource			%.1f MB
+%.1f faults/s	DataSource		%.1f faults/s
+%lld ms	SettingsWindow			%lld ms
+%lld sec.	SettingsWindow		%lld sec.
+About ActivityMonitor…	ActivityWindow		Informazioni su ActivityMonitor...
+ActivityMonitor	ActivityWindow		Monitor delle Attività
+Add graph	ActivityWindow		Aggiungi grafico
+Additional items	ActivityView		Elementi aggiuntivi
+Apps	DataSource		Applicazioni
+Block cache	DataSource		Blocca cache
+Block cache memory	DataSource		Blocca memoria cache
+CPU	DataSource		CPU
+CPU usage	DataSource		Uso della CPU
+CPU usage (combined)	DataSource		Uso CPU (combinato)
+Cache	DataSource		Cache
+Cached memory	DataSource		Memoria cache
+File	ActivityWindow		File
+Hide legend	ActivityView		Nascondi legenda
+MB	DataSource		MB
+Media nodes	DataSource		Nodi multimediali
+Memory	DataSource		Memoria
+Network receive	DataSource		Ricezione (Rete)
+Network send	DataSource		Invio (rete)
+P-faults	DataSource		P-fault
+Page faults	DataSource		Page fault
+Ports	DataSource		Porte
+Quit	ActivityWindow		Esci
+RX	DataSource	Shorter version for Receiving.	RX
+Raw clipboard size	DataSource		Dimensione degli appunti
+Receiving	DataSource		Ricezione
+Remove graph	ActivityView		Rimuovi grafico
+Running applications	DataSource		Applicazioni in esecuzione
+Semaphores	DataSource		Semafori
+Sems	DataSource		Sems
+Sending	DataSource		Invio
+Settings	ActivityWindow		Impostazioni
+Settings…	ActivityWindow		Impostazioni...
+Show legend	ActivityView		Mostra legenda
+Swap	DataSource		Swap
+Swap space	DataSource		Spazio swap
+TX	DataSource	Shorter version for Sending	TX
+Teams	DataSource		Team
+Text clipboard size	DataSource		Dimensione appunti testuali
+Threads	DataSource		Thread
+Update time interval:	SettingsWindow		Intervallo di aggiornamento:
+Used memory	DataSource		Memoria utilizzata
+usage	DataSource		utilizzato

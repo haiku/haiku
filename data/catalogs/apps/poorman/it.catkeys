@@ -1,0 +1,62 @@
+1	italian	x-vnd.Haiku.PoorMan	805673381
+A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Una cartella web di default è stata creata in \"/boot/home/public_html.\"\nAssicurarsi che ci sia un file HTML chiamato \"index.html\" nella cartella.
+About PoorMan	PoorMan		Informazioni su PoorMan
+About PoorMan…	PoorMan		Informazioni su PoorMan
+Advanced	PoorMan		Avanzato
+Cancel	PoorMan		Cancella
+Cannot start the server	PoorMan		Non è stato possibile avviare il server
+Clear console log	PoorMan		Pulisci il log della console
+Clear hit counter	PoorMan		Ripristina il contatore degli hit
+Clear log file	PoorMan		Cancella file log
+Console Logging	PoorMan		Log della console
+Controls	PoorMan		Controlli
+Copy	PoorMan		Copia
+Create	PoorMan		Crea
+Create PoorMan log	PoorMan		Crea un log di PoorMan
+Create log file	PoorMan		Crea un file di log
+Default	PoorMan		Predefinita
+Dir Created	PoorMan		Cartella creata
+Directory: 	PoorMan		Cartella:
+Directory: (none)	PoorMan		Cartella: (nessuno)
+Done	PoorMan		Fatto
+Edit	PoorMan		Modifica
+Error Dir	PoorMan		Errore nella cartella
+Error Server	PoorMan		Errore del Server
+File	PoorMan		File
+File Name	PoorMan		Nome del file
+File logging	PoorMan		Log su file
+Hits: %lu	PoorMan		Hit: %lu
+Hits: 0	PoorMan		Hit: 0
+Log To Console	PoorMan		Invia il log alla Console
+Log To File	PoorMan		Log su file
+Log file name:	PoorMan		Nome del file di log:
+Logging	PoorMan		Log
+Logging view	PoorMan		Vista log
+Max. simultaneous connections:	PoorMan		Connessioni simultanee massime:
+OK	PoorMan		OK
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Scegliere una cartella da pubblicare sul web.\n\nPoorMan può creare un \"public_html\" di default nella cartella home.\nOppure selezionare una delle proprie cartelle.
+Poor Man's web server\nCopyright © 2004-2009 Haiku\nAll rights reserved.\n\nWritten by: Philip Harrison, Ma Jie	PoorMan		Web server di Poor Man\nCopyright © 2004-2009 Haiku\nTutti i diritti riservati.\n\nScritto da: Philip Harrison, Ma Jie
+PoorMan settings	PoorMan		Impostazioni di PoorMan
+Quit	PoorMan		Esci
+Run server	PoorMan		Esegui server
+Save console as…	PoorMan		Salva console come...
+Save console selections as…	PoorMan		Salva selezione della console come...
+Save log console	PoorMan		Salva il log della console
+Save log console selection	PoorMan		Salva la selezione del log della console
+Select	PoorMan		Seleziona
+Select all	PoorMan		Seleziona tutto
+Select web folder	PoorMan		Seleziona cartella web
+Send file listing if there's no start page	PoorMan		Mostra la lista dei file se non c'è nessuna pagina iniziale
+Settings…	PoorMan		Impostazioni...
+Shutting down.	PoorMan		Spegnimento.
+Shutting down.\n	PoorMan		Spegnimento.\n
+Site	PoorMan		Sito
+Start page:	PoorMan		Pagina iniziale:
+Starting up... 	PoorMan		Avviamento...
+Status: Running	PoorMan		Stato: In esecuzione
+Status: Stopped	PoorMan		Stato: Stop
+Web folder:	PoorMan		Cartella Web:
+Website location	PoorMan		Posizione del sito web
+Website options	PoorMan		Opzioni del sito
+connections	PoorMan		connessioni
+done.\n	PoorMan		fatto.\n

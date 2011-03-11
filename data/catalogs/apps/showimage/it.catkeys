@@ -1,74 +1,62 @@
-1	italian	x-vnd.Haiku-ShowImage	1282650517
-Paste	Menus		Incolla
-Use as background…	Menus		Utilizza come sfondo…
+1	italian	x-vnd.Haiku-ShowImage	3385354583
+%SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS secondi
+About ShowImage…	Menus		Informazioni su ShowImage…
+Browse	Menus		Sfoglia
+Cancel	ClosePrompt		Annulla
+Clear selection	Menus		Pulisci selezione
+Close	ClosePrompt		Chiudi
+Close	Menus		Chiudi
+Close document	ClosePrompt		Chiudi documento
+Copy	Menus		Copia
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Impossibile caricare l'immagine! Il file immagine, il translator relativo o entrambi non esistono.
+DPI:	PrintOptionsWindow		Punti per pollice:
+Edit	Menus		Modifica
 File	Menus		File
-5 seconds	Menus		5 secondi
-Slide delay	Menus		Tempo d'attesa
-Zoom in	Menus		Zoom avanti
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Il documento '%s' è stato modificato. Vuoi chiudere il documento?
-Page setup…	Menus		Imposta pagina…
-8 seconds	Menus		8 secondi
-Print…	Menus		Stampa…
-Previous page	Menus		Pagina precedente
-View	Menus		Visualizza
+First page	Menus		Prima pagina
+Fit image to page	PrintOptionsWindow		Adatta alla pagina
+Fit to window	Menus		Adatta alla finestra
+Flip left to right	Menus		Ribalta orizzontalmente
+Flip top to bottom	Menus		Ribalta verticalmente
 Full screen	Menus		Schermo intero
 Go to page	Menus		Vai alla pagina
-Zoom out	Menus		Zoom indietro
-20 seconds	Menus		20 secondi
-Quit	Menus		Esci
-Invert colors	Menus		Inverti colori
-3 seconds	Menus		3 secondi
-Rotate counterclockwise	Menus		Ruota in senso antiorario
-10 seconds	Menus		10 secondi
-High-quality zooming	Menus		Zoom di alta qualità
-Clear	Menus		Ripulisci
-Browse	Menus		Sfoglia
-6 seconds	Menus		6 secondi
-Edit	Menus		Modifica
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Impossibile caricare immagine! Il file immagine, il translator relativo o entrambi non esistono.
-First page	Menus		Prima pagina
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Il documento '%s' (pagina %d) è stato modificato. Vuoi chiudere il documento?
-About ShowImage…	Menus		A riguardo di ShowImage…
-Open	Menus		Apri
-OK	LoadAlerts		Ok
-Close	Menus		Chiudi
-Close	ClosePrompt		Chiudi
-Height:	ResizerWindow		Altezza:
-Undo	Menus		Annulla
-Resize to (in 1/72 inches):	PrintOptionsWindow		Ridimensiona (in punti):
-Apply	ResizerWindow		Applica
-Keep original proportions	ResizerWindow		Mantieni le proporzioni originarie
-9 seconds	Menus		9 secondi
-Flip left to right	Menus		Ribalta orizzontalmente
-Show caption in full screen mode	Menus		Mostra didascalia in modalità schermo intero
-DPI:	PrintOptionsWindow		DPI:
-Next file	Menus		File seguente
-4 seconds	Menus		4 secondi
-Zoom to window	Menus		Adatta ingrandendo
-Close document	ClosePrompt		Chiudi documento
-ShowImage	LoadAlerts		ShowImage
 Height: 	PrintOptionsWindow		Altezza: 
-Cancel	ClosePrompt		Annulla
-Resize…	Menus		Ridimensiona…
-Print options	PrintOptionsWindow		Opzioni  di stampa
-Width:	ResizerWindow		Larghezza:
-Copy	Menus		Copia
-Cut	Menus		Taglia
-ShowImage	AboutWindow		ShowImage
-7 seconds	Menus		7 secondi
-Last page	Menus		Ultima pagina
-Previous file	Menus		File precedente
-Resize	ResizerWindow		Ridimensiona
-Slide show	Menus		Mostra in successione
-Fit image to page	PrintOptionsWindow		Adatta alla pagina
-Flip top to bottom	Menus		Ribalta verticalmente
-Select all	Menus		Seleziona tutto
-Zoom factor in %:	PrintOptionsWindow		Fattore di zoom in %:
-Width:	PrintOptionsWindow		Larghezza:
+High-quality zooming	Menus		Zoom di alta qualità
 Image	Menus		Immagine
-Rotate clockwise	Menus		Ruota in senso orario
 Job setup	PrintOptionsWindow		Imposta attività
-Original size	Menus		Dimensione originaria
+Last page	Menus		Ultima pagina
+Next file	Menus		File seguente
 Next page	Menus		Pagina seguente
-Save as…	Menus		Salva come…
-Shrink to window	Menus		Adatta rimpicciolendo
+OK	Alerts		OK
+OK	SaveToFile		Ok
+Open…	Menus		Apri...
+Original size	Menus		Dimensione originale
+Page setup…	Menus		Imposta pagina…
+Previous file	Menus		File precedente
+Previous page	Menus		Pagina precedente
+Print options	PrintOptionsWindow		Opzioni di stampa
+Print…	Menus		Stampa…
+Progress monitor	ProgressWindow		Controllo avanzamento
+Quit	Menus		Esci
+Rating	Menus		Voto
+Resize to (in 1/72 inches):	PrintOptionsWindow		Ridimensiona (in 1/72 pollici):
+Rotate clockwise	Menus		Ruota in senso orario
+Rotate counterclockwise	Menus		Ruota in senso antiorario
+Save as…	Menus		salva come…
+Select all	Menus		Seleziona tutto
+Selection Mode	Menus		Modalità selezione
+Show caption in full screen mode	Menus		Mostra didascalia in modalità schermo intero
+ShowImage	AboutWindow		ShowImage
+ShowImage	Menus		ShowImage
+Slide delay	Menus		Tempo d'attesa
+Slide show	Menus		Mostra sequenza
+Stretch to window	Menus		Estendi alla finestra
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Il documento '%s' (pagina %d) è stato modificato. Vuoi chiudere il documento?
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Il documento '%s' è stato modificato. Vuoi chiudere il documento?
+The file '%s' could not be written.	SaveToFile		Il file \"%s\" non può essere scritto.
+Undo	Menus		Annulla
+Use as background…	Menus		Utilizza come sfondo…
+View	Menus		Visualizza
+Width:	PrintOptionsWindow		Larghezza:
+Zoom factor in %:	PrintOptionsWindow		Fattore di zoom in %:
+Zoom in	Menus		Zoom avanti
+Zoom out	Menus		Zoom indietro

@@ -1,0 +1,78 @@
+1	italian	x-vnd.Haiku-BootManager	59946986
+About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Il programma sta per ripristinare il MBR (Master Boot Record) del %disk da %file. Volete continuare?
+
+About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Impossibile installare il menu di avvio. Siete sicuri di voler continuare?
+
+About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Il programma è in procinto di scrivere il seguente menu di avvio sul disco (%s). Si prega di controllare le informazioni qui di seguito prima di continuare.
+
+After five seconds	DefaultPartitionPage		Dopo cinque secondi
+After four seconds	DefaultPartitionPage		Dopo quattro secondi
+After one minute	DefaultPartitionPage		Dopo un minuto
+After one second	DefaultPartitionPage		Dopo un secondo
+After three seconds	DefaultPartitionPage		Dopo tre secondi
+After two seconds	DefaultPartitionPage		Dopo due secondi
+An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		Si è verificato un errore durante la scrittura del boot manager. Il MBR (Master Boot Record) è probabilmente danneggiato, è necessario ripristinarlo immediatamente!
+At least one partition must be selected!	BootManagerController		Almeno una partizione deve essere selezionata!
+Back	BootManagerController	Button	Indietro
+Backup Master Boot Record	BootManagerController	Title	Backup del Master Boot Record
+Boot Manager is unable to read the partition table!	BootManagerController		Il boot manager non è in grado di leggere la tabella delle partizioni!
+
+BootManager	BootManager	Application name	BootManager
+BootManager	BootManagerWindow	Window Title	BootManager
+Cannot access!	DrivesPage	Cannot install	Impossibile accedere.
+Copyright %year, Haiku Inc.\n	BootManager	Leave %year untranslated	Copyright %year, Haiku Inc.\n
+Default Partition	DefaultPartitionPage	Title	Partizione di default
+Default Partition:	DefaultPartitionPage	Menu field label	Partizione di default
+Done	BootManagerController	Button	Fatto
+Drives	DrivesPage	Title	Unità
+Error reading partition table	BootManagerController	Title	Errore di lettura della tabella delle partizioni
+File:	FileSelectionPage	Text control label	File
+Hard Drive	DrivesPage	Default disk name	Disco Fisso
+Immediately	DefaultPartitionPage		Immediatamente
+Install	DrivesPage	Button	Installa
+Installation of boot menu completed	BootManagerController	Title	Installazione del menu di avvio completata
+Installation of boot menu failed	BootManagerController	Title	Installazione del menu di avvio fallita
+Never	DefaultPartitionPage		Mai
+Next	WizardView	Button	Seguente
+No space available!	DrivesPage	Cannot install	Spazio insufficiente.
+OK	BootManager		OK
+OK	BootManagerController	Button	OK
+Old Master Boot Record Saved failure	BootManagerController	Title	Salvataggio del vecchio MBR non riuscito
+Old Master Boot Record saved	BootManagerController	Title	Il vecchio Master Boot Record (MBR) è stato salvato
+Partition table not compatible	BootManagerController	Title	Tabella delle partizioni non compatibile
+Partitions	DefaultPartitionPage	Pop up menu title	Partizioni
+Partitions	PartitionsPage	Title	Partizioni
+Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		Si prega di indicare il file da cui ripristinare il 'Master Boot Record' (MBR). Questo è il file che è stato creato la prima volta che avete installato il boot manager.
+
+Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Si prega di indicare il file da cui ripristinare il 'Master Boot Record' (MBR). Questo è il file che è stato creato la prima volta che avete installato il boot manager.
+
+Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Si prega di indicare il disco dove volete installare o disinstallare il boot manager.
+Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		Si prega di specificare una partizione di default e un tempo di attesa.\nIl boot manager caricherà  la partizione dopo questo periodo, a meno che non si seleziona un'altra partizione. È inoltre possibile ottenere che il menu di avvio attenda all'infinito che selezionate una partizione. \nTenete premuto il tasto 'Alt' per disattivare il tempo di attesa in fase di boot.
+
+Previous	WizardView	Button	Precedente
+Quit	DrivesPage	Button	Esci
+Restore MBR	BootManagerController	Button	Ripristina MBR
+Select	FileSelectionPage	Button	Seleziona
+Summary	BootManagerController	Title	Sommario
+The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		Il MBR (Master Boot Record : informazioni per il boot) del dispositivo:\n\t%s\nora verrà  salvato sul disco. Si prega di selezionare un file per salvare il MBR.\n\nSe qualcosa va storto durante l'installazione o se in seguito volete rimuovere il menu di avvio, basta eseguire il programma bootman e selezionare l'opzione 'Disinstalla'.
+The Master Boot Record could not be restored!	BootManagerController		Il Master Boot Record (MBR) potrebbe non essere ripristinato!
+The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Il Master Boot Record (MBR) del disco di avvio (%DISK) è stato ripristinato con successo da %FILE.
+
+The boot manager has been successfully installed on your system.	BootManagerController		Il boot manager è stato installato correttamente sul vostro sistema.
+The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Sono state rilevate le seguenti partizioni. Si prega di selezionare le caselle accanto alle partizioni da inserire nel menu di avvio. È inoltre possibile impostare a piacere i nomi delle partizioni che appaiono nel menu di avvio.
+The old Master Boot Record could not be saved to %s	BootManagerController		Il vecchio MBR (Master Boot Record : informazioni per il boot) non poteva essere salvato in %s
+The old Master Boot Record was successfully saved to %s.	BootManagerController		Il vecchio Master Boot Record è stato salvato con successo in %s.
+The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager needs 2 KB available space before the first partition.	BootManagerController		La tabella  delle partizioni del primo disco rigido non è compatibile con il boot manager.\nIl boot manager ha bisogno di 2 KB di spazio su disco prima della prima partizione.
+
+Timeout: %s	DefaultPartitionPage		Tempo di attesa
+USB Drive	DrivesPage	Default disk name	Drive USB
+Uninstall	DrivesPage	Button	Disinstalla
+Uninstall Boot Manager	UninstallPage	Title	Disinstalla il boot manager
+Uninstall boot manager	BootManagerController	Title	Disinstallare il boot manager
+Uninstallation of boot menu completed	BootManagerController	Title	Disinstallazione del boot manager completata
+Uninstallation of boot menu failed	BootManagerController	Title	Disinstallazione del boot manager non riuscita
+Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Sconosciuto
+Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Senza nome %d
+Update	DrivesPage	Button	Aggiorna
+Write boot menu	BootManagerController	Button	Scrivere il menu di avvio
+written by	BootManager		scritto da

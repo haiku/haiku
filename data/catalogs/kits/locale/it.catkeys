@@ -1,0 +1,19 @@
+1	italian	system	2686335505
+%.2f TiB	StringForSize		%.2f TiB
+%3.2f GiB	StringForSize		%3.2f GiB
+%3.2f KiB	StringForSize		%3.2f KiB
+%3.2f MiB	StringForSize		%3.2f MiB
+%d bytes	StringForSize		%d byte
+About…	AboutWindow		Informazioni
+Blue:	ColorControl		Blu:
+Close	AboutWindow		Chiudi
+Copy	TextView		Copia
+Copyright © %years% Haiku, Inc.	AboutWindow		Copyright © %years% Haiku, Inc.
+Cut	TextView		Taglia
+Green:	ColorControl		Verde:
+Paste	TextView		Incolla
+Red:	ColorControl		Rosso:
+Redo	TextView		Ripeti
+Select All	TextView		Seleziona tutto
+Undo	TextView		Annulla
+Written by:	AboutWindow		Scritto da:

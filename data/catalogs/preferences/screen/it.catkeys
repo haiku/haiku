@@ -1,0 +1,51 @@
+1	italian	x-vnd.Haiku-Screen	1658032282
+%.1f Hz	Screen		%.1f Hz
+%sSerial no.: %s	Screen		%sNumero seriale:%s
+/other…	Screen		/altro...
+15 bits/pixel, 32768 colors	Screen		15 bit/pixel, 32768 colori
+16 bits/pixel, 65536 colors	Screen		16 bit/pixel, 65536 colori
+24 bits/pixel, 16 Million colors	Screen		24 bit/pixel, 16 Milioni di colori
+32 bits/pixel, 16 Million colors	Screen		32 bit/pixel, 16 Milioni di colori
+8 bits/pixel, 256 colors	Screen		8 bit/pixel, 256 colori
+About	Screen		Informazioni
+All workspaces	Screen		Tutti gli spazi di lavoro
+Apply	Screen		Applica
+Cancel	Screen		Cancella
+Colors:	Screen		Colori:
+Columns:	Screen		Colonne:
+Combine displays:	Screen		Combina schemi
+Could not write VESA mode settings file:\n\t	Screen		Non è stato possibile scrivere le impostazioni della modalità VESA:\n\t
+Current workspace	Screen		Spazio di lavoro corrente
+Do you wish to keep these settings?	Screen		Desideri tenere queste impostazioni?
+Done	Screen		Fatto
+Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Frequenza orizzontale:\t%lu - %lu kHz\nFrequenza verticale:\t%lu - %lu Hz\n\nMassimo clock dei pixel:\t%g MHz
+Hz	Screen		Hz
+Keep	Screen		Mantieni
+OK	Screen		Ok
+Other…	Screen		Altro...
+Refresh rate	Screen		Frequenza di aggiornamento
+Refresh rate:	Screen		Ritmo di aggiornamento
+Resolution:	Screen		Risoluzione:
+Revert	Screen		Reimposta
+Rows:	Screen		Righe
+Screen	Screen		Schermo
+Screen preferences by the Haiku team	Screen		Impostazioni schermo dal team di Haiku
+Set background…	Screen		Imposta sfondo...
+Settings will revert in %seconds seconds.	Screen		Le impostazioni verranno ripristinate in %seconds secondi.
+Swap displays:	Screen		Scambia schermi:
+The screen mode could not be set:\n\t%s\n	Screen		Non è stato possibile impostare lo schermo:\n\t%s\n
+Type or use the left and right arrow keys.	Screen		Scrivi o usa le freccette destra e sinistra sulla tastiera. 
+Undo	Screen		Annulla
+Unknown mode	Screen		Modalità sconosciuta
+Use laptop panel:	Screen		Usa pannello del portatile
+Video format:	Screen		Formato video:
+Warning	Screen		Avviso
+Workspaces	Screen		Spazi di lavoro
+always	Screen		sempre
+bits/pixel	Screen		bit/pixel
+disable	Screen		disabilita
+horizontally	Screen		orizzontalmente
+if needed	Screen		se necessario
+no	Screen		no
+vertically	Screen		verticalmente
+yes	Screen		sì

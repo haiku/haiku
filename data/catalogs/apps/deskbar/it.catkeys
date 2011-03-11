@@ -1,0 +1,40 @@
+1	italian	x-vnd.Be-TSKB	4247133739
+<Be folder is empty>	BeMenu		<La cartella Be è vuota>
+About Haiku…	BeMenu		Informazioni su Haiku…
+Always on top	PreferencesWindow		Sempre in primo piano
+Applications	PreferencesWindow		Applicazioni
+Auto-raise	PreferencesWindow		Porta automaticamente in primo piano
+Change time…	TimeView		Modifica orario…
+Clock	PreferencesWindow		Orologio
+Close all	WindowMenu		Chiudi tutto
+Deskbar	MainWindow		Deskbar
+Deskbar preferences	PreferencesWindow		Preferenze della Deskbar
+Deskbar preferences…	BeMenu		Preferenze della Deskbar…
+Edit menu…	PreferencesWindow		Modifica menu…
+Expand new applications	PreferencesWindow		Espandi le nuove applicazioni
+Find…	BeMenu		Trova…
+Hide all	WindowMenu		Nascondi tutto
+Hide time	TimeView		Nascondi l'orario
+Menu	PreferencesWindow		Menu
+Mount	BeMenu		Monta
+No windows	WindowMenu		Nessuna finestra
+Power off	BeMenu		Spegni
+Quit application	WindowMenu		Chiudi l'applicazione
+Recent applications	BeMenu		Applicazioni recenti
+Recent applications:	PreferencesWindow		Applicazioni recenti:
+Recent documents	BeMenu		Documenti recenti
+Recent documents:	PreferencesWindow		Documenti recenti:
+Recent folders	BeMenu		Cartelle recenti
+Recent folders:	PreferencesWindow		Cartelle recenti:
+Restart Tracker	BeMenu		Riavvia Tracker
+Restart system	BeMenu		Riavvia il sistema
+Show Time	Tray		Mostra l'orario
+Show all	WindowMenu		Mostra tutto
+Show application expander	PreferencesWindow		Mostra espansore applicazione
+Show calendar…	TimeView		Mostra il calendario…
+Show replicants	BeMenu		Mostra i replicanti
+Show seconds	PreferencesWindow		Mostra secondi
+Shutdown…	BeMenu		Arresta il sistema…
+Sort running applications	PreferencesWindow		Ordina applicazioni in esecuzione
+Tracker always first	PreferencesWindow		Tracker sempre per primo
+Window	PreferencesWindow		Finestra

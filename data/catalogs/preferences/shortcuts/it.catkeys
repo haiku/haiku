@@ -1,0 +1,56 @@
+1	italian	x-vnd.Haiku-Shortcuts	1120793954
+(Choose application with file requester)	ShortcutsWindow		(Seleziona applicazione con la finestra di richiesta file)
+*Beep	ShortcutsWindow		*Bip
+*InsertString \"Your Text Here\"	ShortcutsWindow		*InserisciStringa \"Qui il tuo testo\"
+*LaunchHandler text/html	ShortcutsWindow		*AvviaGestore text/html
+*MouseButton 1	ShortcutsWindow		*TastoMouse 1
+*MouseDown	ShortcutsWindow		*MousePremuto
+*MouseUp	ShortcutsWindow		*MouseRilasciato
+*MoveMouse +20 +0	ShortcutsWindow		*MuoviMouse +20 +0
+*MoveMouseTo 50% 50%	ShortcutsWindow		*MoveMouseTo 50% 50%
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multiplo \"*MuoviMouseVerso 100% 0\" \"*TastoMouse 1\"
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*InviaMessaggio application/x-vnd.Be-TRAK 'Tfnd'
+About Shortcuts	ShortcutsApp		Informazioni su Shortcuts
+About Shortcuts	ShortcutsWindow		Informazioni su Shortcuts
+Add new shortcut	ShortcutsWindow		Aggiungi nuova scorciatoia
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
+Append	ShortcutsWindow		Accoda
+Append KeySet…	ShortcutsWindow		Accoda Impostazione Tasti…
+Application	ShortcutsWindow		Applicazione
+Beep	ShortcutsSpec		Bip
+Cancel	ShortcutsWindow		Annulla
+Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
+Don't save	ShortcutsWindow		Non salvare
+Error, NULL state description?\n	ShortcutsSpec		Errore, descrizione di stato NULL?\n
+File	ShortcutsWindow		File
+InsertString	ShortcutsSpec		InserisciStringa
+Key	ShortcutsWindow		Tasto
+LaunchHandler	ShortcutsSpec		AvviaGestore 
+MouseButton	ShortcutsSpec		TastoMouse
+MouseDown	ShortcutsSpec		MousePremuto
+MouseUp	ShortcutsSpec		MouseRilasciato
+MoveMouse	ShortcutsSpec		MuoviMouse
+MoveMouseTo	ShortcutsSpec		MuoviMouseVerso
+Multi	ShortcutsSpec		Multiplo
+OK	ShortcutsApp		OK
+OK	ShortcutsWindow		OK
+Oh no	ShortcutsWindow		Oh no
+Open	ShortcutsWindow		Apri
+Open KeySet…	ShortcutsWindow		Apri Impostazione Tasti…
+Quit	ShortcutsWindow		Esci
+Really quit without saving your changes?	ShortcutsWindow		Vuoi davvero uscire senza salvare le tue modifiche?
+Remove selected shortcut	ShortcutsWindow		Rimuovi scorciatoia selezionata
+Revert to saved	ShortcutsWindow		Ripristina quanto salvato
+Save	ShortcutsWindow		Salva
+Save & apply	ShortcutsWindow		Salva e applica
+Save KeySet as…	ShortcutsWindow		Salva Impostazione tasti come…
+Select	ShortcutsWindow		Seleziona
+SendMessage	ShortcutsSpec		InviaMessaggio
+Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
+Shortcuts	ShortcutsWindow		Shortcuts
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Shortcuts non è stato capace di aprire il vostro file di impostazione tasti!
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Shortcuts non è stato capace di elaborare il tuo file di impostazione tasti!
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Shortcuts non è stato capace di salvare il tuo file di impostazione tasti!
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Shortcuts non è stato capace di salvare le tue impostazioni di tasti.
+Shortcuts\n\nBased on SpicyKeys for BeOS made by Jeremy Friesner.	ShortcutsApp		Shortcuts\n\nBasato su SpicyKeys per BeOS creato da Jeremy Friesner.
+Window	ShortcutsSpec	Name for modifier on keyboard	Finestra

@@ -1,0 +1,52 @@
+1	italian	x-vnd.Haiku-Notifications	1635178721
+Above icon	DisplayView		Sopra l'icona
+Allowed	NotificationView		Permesso
+An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Si è presentato un errore durante il salvataggio delle preferenze.\nÈ possibile che stia finendo lo spazio sul disco.
+Application	NotificationView		Applicazione
+Applications	NotificationView		Applicazioni
+Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Non è possibile abilitare le notifiche all'avvio, probabilmente non si hanno i permessi di scrittura nella cartella delle impostazioni di boot.
+Can't save preferences, you probably don't have write access to the boot settings directory.	GeneralView		Non è possibile salvare le preferenze, probabilmente non si ha accesso di scrittura alla cartella delle impostazioni di boot.
+Can't save preferenes, you probably don't have write access to the settings directory or the disk is full.	DisplayView		Non è possibile salvare le preferenze, probabilmente non si ha accesso in scrittura alla cartella delle impostazioni o il disco è pieno.
+Cannot disable notifications because the server can't be reached.	GeneralView		Non è possibile disabilitare le notifiche perché non è stato possibile raggiungere il server.
+Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Non è possibile abilitare le notifiche perché non è stato possibile trovare il server.\nQuesto significa che l'installazione di InfoPopper non è stata completata con successo.
+Disable notifications	GeneralView		Disabilita notifiche
+Display	PrefletView		Visualizzazione
+Enable notifications	GeneralView		Abilita le notifiche
+Enable notifications at startup	GeneralView		Abilita le notifiche all'avvio
+Enabled	NotificationView		Abilita
+Error	NotificationView		Errore
+Events are not notified	GeneralView		Gli eventi non sono notificati
+Events are notified	GeneralView		Gli eventi sono notificati
+General	PrefletView		Generale
+Hide notifications from screen after	GeneralView		Nascondi le notifiche dallo schermo dopo
+Icon size:	DisplayView		Dimensione icone:
+Important	NotificationView		Importante
+Information	NotificationView		Informazione
+Large icon	DisplayView		Icone grandi
+Last Received	NotificationView		Ultimo ricevuto
+Mini icon	DisplayView		Icone piccole
+No	NotificationView		No
+Notifications	GeneralView		Notifiche
+Notifications	NotificationView		Notifiche
+Notifications	PrefletWin		Notifiche
+Notifications cannot be stopped, because the server can't be reached.	GeneralView		Le notifiche non possono essere fermate, perché non è stato possibile raggiungere il server.
+OK	DisplayView		OK
+OK	GeneralView		OK
+OK	NotificationView		OK
+Progress	NotificationView		Progresso
+Revert	PrefletWin		Ripristina
+Right of icon	DisplayView		Destra dell'icona
+Save	PrefletWin		Salva
+Search:	NotificationView		Cerca:
+The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Non è possibile trovare il server delle notifiche, questo significa che l'installazione di InfoPopper non è stata completata con successo.
+The notifications server cannot be found.\nA possible cause is an installation not done correctly	GeneralView		Non è stato possibile trovare il server delle notifiche.\nUna possibile causa è che l'installazione non sia stata fatta correttamente.
+There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	DisplayView		Si è presentato un problema durante il salvataggio delle preferenze.\nÈ possibile che non si abbia accesso di scrittura alla cartella delle impostazioni.
+There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		Si è presentato un problema durante il salvataggio delle preferenze.\nÈ possibile che non si abbia accesso di scrittura alla cartella delle preferenze.
+There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	NotificationView		Si è presentato un problema durante il salvataggio delle preferenze.\nÈ possibile che non si abbia accesso di scrittura alla cartella delle preferenze.
+Title	NotificationView		Titolo
+Title position:	DisplayView		Posizione del titolo:
+Type	NotificationView		Tipo
+Unknown	NotificationView		Sconosciuto
+Window width:	DisplayView		Larghezza finestra:
+Yes	NotificationView		Sì
+seconds of inactivity	GeneralView		secondi di inattività

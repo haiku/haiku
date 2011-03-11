@@ -1,0 +1,54 @@
+1	italian	x-vnd.Be-PSRV	1761631281
+A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Una stampante con quel nome esiste già, ma non è utilizzabile! Sostituire?
+A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Una stampante con quel nome esiste già, ma il driver non è stato trovato! Sostituire?
+A0	ConfigWindow	ISO 216 paper size	A0
+A1	ConfigWindow	ISO 216 paper size	A1
+A2	ConfigWindow	ISO 216 paper size	A2
+A3	ConfigWindow	ISO 216 paper size	A3
+A4	ConfigWindow	ISO 216 paper size	A4
+A5	ConfigWindow	ISO 216 paper size	A5
+A6	ConfigWindow	ISO 216 paper size	A6
+All pages	ConfigWindow		Tutte le pagine
+All pages, %1 copies	ConfigWindow		Tutte le pagine, %1 copie
+B5	ConfigWindow	ISO 216 paper size	B5
+Cancel	ConfigWindow		Annulla
+Cancel	PrintServerApp		Annulla
+Create a new printer	PrintServerApp Scripting		Crea una nuova stampante
+Delete a specific printer	PrintServerApp Scripting		Elimina una determinata stampante
+Get comments about this printer	Printer Scripting		Ottieni i commenti su questa stampante
+Get currently available ports/devices	Transport Scripting		Ottieni porte/dispositivi disponibili
+Get name of printer	Printer Scripting		Ottieni il nome della stampante
+Get name of the printer add-on used for this printer	Printer Scripting		Ottieni il nome dell'add-on utilizzato per questa stampante
+Get name of the transport add-on used for this printer	Printer Scripting		Ottieni il nome dell'add-on di trasporto per questa stampante
+Get name of transport	Transport Scripting		Ottieni il nome del trasporto
+Get the transport configuration for this printer	Printer Scripting		Ottieni la configurazione di trasporto per questa stampante
+Landscape	ConfigWindow		Paesaggio
+Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	US-Ledger
+Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	Legale
+Letter	ConfigWindow	ANSI A (letter), a North American paper size	Lettera
+No	PrintServerApp		No
+OK	ConfigWindow		OK
+OK	PrintServerApp		OK
+Page %1 to %2	ConfigWindow		Pagina %1 di %2
+Page %1 to %2, %3 copies	ConfigWindow		Pagina %1 di %2, %3 copie
+Page setup	ConfigWindow		Imposta pagina
+Page setup:	ConfigWindow		Imposta pagina:
+Paper setup:	ConfigWindow		Scelta carta:
+Portrait	ConfigWindow		Ritratto
+Print setup	ConfigWindow		Imposta stampa
+Printer server	ConfigWindow		Server di stampa
+Printer:	ConfigWindow		Stampante:
+Retrieve a specific printer	PrintServerApp Scripting		Recupera una specifica stampante
+Retrieve a specific transport	PrintServerApp Scripting		Recupera un determinato trasporto
+Retrieve or select the active printer	PrintServerApp Scripting		Recupera o seleziona la stampante attiva
+Return the number of available printers	PrintServerApp Scripting		Restituisci il numero di stampanti disponibili
+Return the number of available transports	PrintServerApp Scripting		Restituisci il numero dei trasporti disponibili
+Select a printer	ConfigWindow		Seleziona una stampante
+Show configuration window	PrintServerApp Scripting		Visualizza la finestra di configurazione
+Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Tabloid
+There are no printers set up.	PrintServerApp		Non ci sono stampanti impostate.
+There is no default printer set up.	PrintServerApp		Non è impostata alcuna stampante predefinita.
+Undefined	ConfigWindow		Indefinito
+Would you like to make @ the default printer?	PrintServerApp		Vuoi rendere @ la stampante predefinita?
+Would you like to set one up now?	PrintServerApp		Vuoi impostarne una ora?
+Yes	PrintServerApp		Si

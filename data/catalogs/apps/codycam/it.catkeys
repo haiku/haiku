@@ -1,0 +1,97 @@
+1	italian	x-vnd.Haiku.CodyCam	1322454590
+About CodyCam	CodyCam		Informazioni su CodyCam
+About Codycam…	CodyCam		Informazioni su Codycam…
+Can't find an available connection to the video window	CodyCam		Impossibile trovare una connessione disponibile per la finestra video
+Cannot connect the video source to the video window	CodyCam		Impossibile connettere l'origine video alla finestra relativa
+Cannot create a video window	CodyCam		Impossibile creare una finestra video
+Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		Impossibile trovare una sorgente video. Per utilizzare Codycam, avete bisogno di una webcam.
+Cannot find an available video stream	CodyCam		Impossibile trovare un flusso video disponibile
+Cannot find the media roster	CodyCam		Impossibile trovare il registro dei media
+Cannot get a time source	CodyCam		Impossibile ottenere il tempo di riferimento
+Cannot register the video window	CodyCam		Impossibile registrare la finestra video
+Cannot seek time source!	CodyCam		Impossibile ottenere l'origine temporale!
+Cannot set the time source for the video source	CodyCam		Impossibile impostare il tempo di riferimento per la sorgente video
+Cannot set the time source for the video window	CodyCam		Impossibile impostare il tempo di riferimento per la finestra video
+Cannot start the video source	CodyCam		Impossibile avviare l'origine video
+Cannot start the video window	CodyCam		Impossibile avviare la finestra video
+Cannot start time source!	CodyCam		Impossibile avviare il tempo di riferimento!
+Capture Rate Menu	CodyCam		Menu frequenza dei fotogrammi di cattura
+Capture controls	CodyCam		Controlli di cattura
+Capturing Image…	VideoConsumer.cpp		Cattura di un'immagine…
+Close	CodyCam		Chiudi
+Closing the window\n	VideoConsumer.cpp		Chiusura della finestra in corso\n
+CodyCam	CodyCam		CodyCam
+CodyCam\n\nThe Original BeOS webcam	CodyCam		CodyCam\n\nL'applicazione webcam originale di BeOS
+Connected…	VideoConsumer.cpp		Connesso…
+Couldn't find requested directory on server	VideoConsumer.cpp		Impossibile trovare la cartella richiesta sul server
+Directory:	CodyCam		Cartella:
+Error creating output file	VideoConsumer.cpp		Errore nella creazione del file di output
+Error getting initial latency for the capture node	CodyCam		Errore nel recupero della latenza iniziale per il nodo di cattura
+Error setting type of output file	VideoConsumer.cpp		Errore durante l'impostazione del tipo di file in uscita
+Error writing output file	VideoConsumer.cpp		Errore di scrittura del file di output
+Every 10 minutes	CodyCam		Ogni 10 minuti
+Every 15 minutes	CodyCam		Ogni 15 minuti
+Every 15 seconds	CodyCam		Ogni 15 secondi
+Every 2 hours	CodyCam		Ogni 2 ore
+Every 24 hours	CodyCam		Ogni 24 ore
+Every 30 minutes	CodyCam		Ogni 30 minuti
+Every 30 seconds	CodyCam		Ogni 30 secondi
+Every 4 hours	CodyCam		Ogni 4 ore
+Every 5 minutes	CodyCam		Ogni 5 minuti
+Every 8 hours	CodyCam		Ogni 8 ore
+Every hour	CodyCam		Ogni ora
+Every minute	CodyCam		Ogni minuto
+FTP	CodyCam		FTP
+File	CodyCam		File
+File %s # unterminated quote at end of file\n	SettingsHandler		File %s # citazione non terminata alla fine del file\n
+File %s ; Line %ld # unterminated quote\n	SettingsHandler		File %s ; Linea %ld # citazione non terminata\n
+File %s; Line %ld # %s	SettingsHandler		File %s; Linea %ld # %s
+File name:	CodyCam		Nome del file:
+File transmission failed	VideoConsumer.cpp		Trasmissione file fallita
+Format:	CodyCam		Formato:
+Image Format Menu	CodyCam		Menu dei formati immagine
+JPEG image	CodyCam		Immagine JPEG
+Last Capture: 	VideoConsumer.cpp		Ultima Cattura:
+Local	CodyCam		Locale
+Locking the window\n	VideoConsumer.cpp		Blocco della finestra\n
+Logging in…	VideoConsumer.cpp		Autenticazione…
+Login:	CodyCam		Login:
+Never	CodyCam		Mai
+OK	CodyCam		Ok
+Output	CodyCam		Uscita
+PASS <suppressed>  (real password sent)\n	FtpClient		PASS <soppressa>  (password reale inviata)\n
+Passive FTP	CodyCam		FTP passivo
+Password:	CodyCam		Password:
+Quit	CodyCam		Esci
+Rate:	CodyCam		Fotogrammi per secondo:
+Remote host has closed the connection.\n	FtpClient		L'host remoto ha chiuso la connessione.\n
+Rename failed	VideoConsumer.cpp		Rinominazione non riuscita
+Renaming…	VideoConsumer.cpp		Rinomina…
+SFTP	CodyCam		SFTP
+Send to…	CodyCam		Inviare a...
+Server login failed	VideoConsumer.cpp		Autenticazione fallita sul server
+Server:	CodyCam		Server:
+Start video	CodyCam		Avvia video
+Stop video	CodyCam		Arresta il video
+Transmitting…	VideoConsumer.cpp		Trasmissione…
+Type:	CodyCam		Tipo:
+Video settings	CodyCam		Impostazioni video
+Waiting…	CodyCam		Attendere...
+capture rate expected	CodyCam		Frequenza dei fotogrammi attesa
+cmd: '%s'\n	FtpClient		cmd: '%s'\n
+destination directory expected	CodyCam		Cartella di destinazione prevista
+image file format expected	CodyCam		un formato per il file immagine è atteso
+invalid upload client %ld\n	VideoConsumer.cpp		client di upload non valido %ld\n
+login ID expected	CodyCam		ID di accesso previsto
+on or off expected	Settings	Do not translate 'on' and 'off'	on o off atteso
+password	CodyCam		password
+password expected	CodyCam		password attesa
+read: %d\n	SftpClient		leggere: %d\n
+read: %ld\n	SftpClient		leggere: %ld\n
+reply: %d, %d\n	FtpClient		ripeti: %d, %d\n
+reply: '%s'\n	SftpClient		ripeti: '%s'\n
+server address expected	CodyCam		indirizzo server atteso
+still image filename expected	CodyCam		serve un nome file per l'immagine statica
+unknown command	SettingsHandler		comando sconosciuto
+unrecognized upload client specified	CodyCam		client d'invio indicato non riconosciuto
+upload client name expected	CodyCam		nome del client d'invio atteso

@@ -1,0 +1,151 @@
+1	italian	x-vnd.Be-MAIL	2797564879
+%d - Date	Mail		%d - Data
+%e - E-mail address	Mail		%e - Indirizzo e-mail
+%n - Full name	Mail		%n - Nome completo
+About Mail…	Mail		Informazioni su Mail…
+Account from mail	Mail		Account dal messaggio
+Account:	Mail		Account:
+Accounts…	Mail		Account…
+Add	Mail		Aggiungi
+Add enclosure…	Mail		Aggiungi allegato…
+Add signature	Mail		Aggiungi firma
+An error occurred trying to open this signature.	Mail		Si è verificato un errore tentando di aprire questa firma.
+An error occurred trying to save the attachment.	Mail		Si è verificato un errore durante il tentativo di salvare l'allegato.
+An error occurred trying to save this signature.	Mail		Si è verificato un errore tentando di salvare questa firma.
+Attach attributes:	Mail		Attributi del file allegato:
+Attachments:	Mail		Allegati: 
+Auto signature:	Mail		Firma automatica:
+Automatic	Mail		Automatico
+Automatically mark mail as read:	Mail		Contrassegna automaticamente i messaggi come già  letti:
+Bcc:	Mail		Cci:
+Beginner	Mail		Principiante
+Button bar:	Mail		Barra dei pulsanti:
+Cancel	Mail		Annulla
+Cc:	Mail		Cc:
+Check spelling	Mail		Verifica ortografia
+Close	Mail		Chiudi
+Close and 	Mail		Chiudi e
+Colored quotes:	Mail		Citazioni colorate:
+Copy	Mail		Copia
+Copy link location	Mail		Copia collegamento
+Copy to new	Mail		Copia su nuovo
+Couldn't open this signature. Sorry.	Mail		Non è possibile aprire questa firma.
+Cut	Mail		Taglia
+Date:	Mail		Data:
+Decoding:	Mail		Decodifica:
+Default account:	Mail		Account predefinito:
+Delete	Mail		Elimina
+Discard	Mail		Scarta
+Do you wish to save this message as a draft before closing?	Mail		Volete salvare questo messaggio come bozza prima di chiudere?
+Do you wish to send this message before closing?	Mail		Volete inviare questo messaggio prima di chiudere?
+Don't save	Mail		Non salvare
+E-mail draft could not be saved!	Mail		La bozza del messaggio potrebbe non essere salvata!
+Edit	Mail		Modifica
+Edit queries…	Mail		Modifica query…
+Edit signatures…	Mail		Modifica le firme…
+Encoding:	Mail		Codifica:
+Expert	Mail		Esperto
+File	Mail		File
+Find	Mail		Trova
+Find again	Mail		Cerca di nuovo
+Find…	Mail		Trova…
+Font:	Mail		Font:
+Forward	Mail		Inoltra
+Forward without attachments	Mail		Inoltra senza allegati
+From:	Mail		Da:
+Hide	Mail		Nascondi
+Include file attributes in attachments	Mail		Includi gli attributi dei file negli allegati
+Inconsistency occurred in the undo/redo buffer.	Mail		Si è verificata un'inconsistenza nel buffer annulla/ripeti.
+Initial spell check mode:	Mail		Modalità correzione ortografica iniziale:
+Leave as '%s'	Mail		Lascia come \"%s\"
+Leave as New	Mail		Lascia come Nuovo
+Leave same	Mail		Lascia inalterato
+Mail	Mail		Mail
+Mail couldn't find its dictionary.	Mail		Mail non trova il suo dizionario.
+Mail preferences	Mail		Preferenze di Mail
+Mail\n\n	Mail		Mail\n\n
+Mailing	Mail		Posta elettronica
+Message	Mail		Messaggio
+Move to trash	Mail		Sposta nel cestino
+Need Tracker to move items to trash	Mail		Per spostare gli elementi nel cestino è necessario Tracker
+New	Mail		Nuova
+New mail message	Mail		Nuovo messaggio
+Next	Mail		Seguente
+Next message	Mail		Messaggio seguente
+No file attributes, just plain data	Mail		Nessun attributo nel file, solo dati grezzi
+No matches	Mail		Nessuna corrispondenza
+None	Mail		Nessuna
+OK	Mail		Ok
+Off	Mail		Spento
+On	Mail		Acceso
+Only files can be added as attachments.	Mail		Solo i file possono essere aggiunti come allegati.
+Open	Mail		Apri
+Open attachment	Mail		Apri allegato
+Open draft	Mail		Apri bozza
+Open this link	Mail		Apri questo collegamento
+Page setup…	Mail		Imposta pagina…
+Paste	Mail		Incolla
+Preferences…	Mail		Preferenze…
+Previous	Mail		Precedente
+Previous message	Mail		Messaggio precedente
+Print	Mail		Stampa
+Print…	Mail		Stampa…
+Put your favorite e-mail queries and query templates in this folder.	Mail		Inserisci le tue e-mail query preferite e le query templates in questa cartella.
+Queries	Mail		Query
+Quit	Mail		Esci
+Quote	Mail		Citazione
+Random	Mail		Casuale
+Read 	Mail		Leggi
+Really delete this signature? This cannot be undone.	Mail		Volete davvero cancellare questa firma? Questa operazione non potrà essere annullata.
+Redo	Mail		Ripeti
+Remove attachment	Mail		Rimuovi allegato
+Remove enclosure	Mail		Rimuovi allegato
+Remove quote	Mail		Rimuovi citazione
+Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		La rimozione degli allegati da un messaggio inoltrato non è stata ancora implementata!\nNon funziona ancora correttamente.
+Reply	Mail		Rispondi
+Reply account:	Mail		Account per la risposta:
+Reply preamble:	Mail		Preambolo di risposta:
+Reply to all	Mail		Rispondi a tutti
+Reply to sender	Mail		Rispondi al mittente
+Resend	Mail		Invia di nuovo
+Revert	Mail		Ripristina
+Save	Mail		Salva
+Save address	Mail		Salva indirizzo
+Save as draft	Mail		Salva come bozza
+Save attachment…	Mail		Salva allegato…
+Save changes to this signature?	Mail		Salvare le modifiche a questa firma?
+Select all	Mail		Seleziona tutto
+Send	Mail		Invia
+Send message	Mail		Invia messaggio
+Set to %s	Mail		Imposta come %s
+Set to Saved	Mail		Imposta come salvato
+Set to…	Mail		Imposta come…
+Show header	Mail		Mostra intestazione
+Show icons & labels	Mail		Mostra icone e testo
+Show icons only	Mail		Mostra solo le icone
+Show raw message	Mail		Mostra messaggio grezzo
+Signature	Mail		Firma
+Signature:	Mail		Firma:
+Signatures	Mail		Firme
+Size:	Mail		Dimensione:
+Sorry	Mail		Spiacenti
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Spiacente, nessun applicazione è associata a dati di tipo\"Person\".
+Start now	Mail		Avvia ora
+Subject:	Mail		Oggetto:
+Text wrapping:	Mail		Allineamento testo:
+The mail_daemon could not be started:\n\t	Mail		Il mail_daemon potrebbe non essere avviato:\n\t
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Il mail_daemon non è in esecuzione. Il messaggio è stato messo in coda e sarà inviato quando il mail_daemon verrà avviato.
+There is no installed handler for URL links.	Mail		Nessun programma è associato al collegamento URL.
+Title:	Mail		Titolo:
+To:	Mail		A:
+Trash	Mail		Cestino
+Undo	Mail		Annulla
+Unread	Mail		Non letto
+Use default account	Mail		Usa account predefinito
+User interface	Mail		Interfaccia utente
+View	Mail		Visualizza
+Warn unencodable:	Mail		Avvisa se non codificabile:
+Written by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Scritto da Robert Polic.\nMigliorato dal gruppo del Dr. Zoidberg.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright ©2005-2010 Haiku, Inc.\n
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Il messaggio di posta contiene %ld caratteri che non sono ammessi dalla codifica prescelta. Forse un differente set di caratteri potrebbe funzionare meglio? Seleziona \"Invia\" per inviare comunque il messaggio (verranno usati caratteri sostitutivi al posto di quelli non codificabili), oppure selezionate \"Annulla\" per tornare indietro e cercare di risolvere il problema.
+\\n - Newline	Mail		\\n - Nuova linea
+helpful message	Mail		messaggio utile

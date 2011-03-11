@@ -1,18 +1,18 @@
 1	italian	x-vnd.haiku.zip-o-matic	274748138
+%ld files added.	file:ZipOMaticWindow.cpp		Aggiunti %ld file.
 1 file added.	file:ZipOMaticWindow.cpp		Aggiunto un file.
-Stop	file:ZipOMaticWindow.cpp		Interrompi
-Creating archive: %s	file:ZipOMaticWindow.cpp		Creazione archivio: %s
+Archive	file:ZipperThread.cpp		Archivio
+Archive created OK	file:ZipOMaticWindow.cpp		Archivio creato con successo
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Sei sicuro di voler interrompere la creazione di questo archivio?
 Continue	file:ZipOMaticWindow.cpp		Continua
-Preparing to archive	file:ZipperThread.cpp		Preparazione all'archiviazione
+Creating archive: %s	file:ZipOMaticWindow.cpp		Creazione archivio: %s
+Do you want to stop them?	file:ZipOMatic.cpp		Vuoi interromperli?
+Drop files to zip.	file:ZipOMaticWindow.cpp		Trascina i file per creare un archivio zip.
+Error creating archive	file:ZipOMaticWindow.cpp		Errore nella creazione dell'archivio
 Filename: %s	file:ZipOMaticWindow.cpp		Nome del file: %s
 Let them continue	file:ZipOMatic.cpp		Falli proseguire
-Do you want to stop them?	file:ZipOMatic.cpp		Vuoi interromperli?
-Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Sei sicuro di voler interrompere la creazione di questo archivio?
-%ld files added.	file:ZipOMaticWindow.cpp		Aggiunti %ld file.
-Stopped	file:ZipOMaticWindow.cpp		Interrotto
-Archive	file:ZipperThread.cpp		Archivio
-Drop files to zip.	file:ZipOMaticWindow.cpp		Trascina i file per creare uno zip.
-Error creating archive	file:ZipOMaticWindow.cpp		Errore nella creazione dell'archivio
-You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		Hai %ld Zip-O-Matic in esecuzione.\n\n
-Archive created OK	file:ZipOMaticWindow.cpp		Archivio creato con successo
+Preparing to archive	file:ZipperThread.cpp		Preparazione all'archiviazione
+Stop	file:ZipOMaticWindow.cpp		Interrompi
 Stop them	file:ZipOMatic.cpp		Interrompili
+Stopped	file:ZipOMaticWindow.cpp		Interrotto
+You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		Hai %ld Zip-O-Matic in esecuzione.\n\n

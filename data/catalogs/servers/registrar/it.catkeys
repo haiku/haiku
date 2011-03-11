@@ -1,0 +1,23 @@
+1	italian	application/x-vnd.Haiku-Registrar	2599857937
+%action%?	ShutdownProcess		%action%?
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		L'applicazione \"%appName%\" ha arrestato il processo di spegnimento.
+Asking \"%appName%\" to quit.	ShutdownProcess		Chiedendo a \"%appName%\" di terminare.
+Asking background applications to quit.	ShutdownProcess		Chiedi alle applicazioni in background di chiudersi.
+Asking other processes to quit.	ShutdownProcess		Chiedendo ad altri processi di chiudersi.
+Cancel	ShutdownProcess		Annulla
+Cancel shutdown	ShutdownProcess		Cancella l'arresto
+Do you really want to restart the system?	ShutdownProcess		Davvero vuoi riavviare il sistema?
+Do you really want to shut down the system?	ShutdownProcess		Davvero volete spegnere il sistema?
+It's now safe to turn off the computer.	ShutdownProcess		Ora è sicuro spegnere il computer.
+Kill application	ShutdownProcess		Interrompi l'applicazione
+OK	ShutdownProcess		OK
+Restart	ShutdownProcess		Riavvia
+Restart system	ShutdownProcess		Riavvia il sistema
+Restarting…	ShutdownProcess		Riavvio...
+Shut down	ShutdownProcess		Spegni
+Shutdown aborted	ShutdownProcess		Spegnimento interrotto
+Shutdown status	ShutdownProcess		Stato dell'arresto
+Shutting down…	ShutdownProcess		Spegnimento...
+System is shut down	ShutdownProcess		Sistema in fase di spegnimento
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		L'applicazione \"%appName%\" potrebbe essere bloccata da una finestra di dialogo.
+Tidying things up a bit.	ShutdownProcess		Il lavoro di pulitura è in corso.

@@ -1,0 +1,88 @@
+1	italian	x-vnd.Haiku-Bluetooth	3550394259
+#CommandFailed#Not Valid name	RemoteDevice		#CommandFailed#Nome non valido
+#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError#Nome non valido
+#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest#Nome non valido
+#ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady#Nome non valido
+(reserved)	DeviceClass		(riservato)
+1-17% utilized	DeviceClass		1-17% utilizzato
+17-33% utilized	DeviceClass		17-33% utilizzato
+33-50% utilized	DeviceClass		35-50% utilizzato
+50-67% utilized	DeviceClass		50-67% utilizzato
+67-83% utilized	DeviceClass		67-83% utilizzato
+83-99% utilized	DeviceClass		83-99% utilizzato
+Audio	DeviceClass		Audio
+Audio/Video	DeviceClass		Audio/Video
+Camcorder	DeviceClass		Videocamera
+Camera	DeviceClass		Macchina fotografica
+Capturing	DeviceClass		Cattura
+Car audio	DeviceClass		Stereo auto
+Card reader	DeviceClass		Lettore di schede
+Cellular	DeviceClass		Cellulare
+Combo keyboard/pointing device	DeviceClass		Combo tastiera/dispositivo di puntamento
+Common ISDN access	DeviceClass		Comune accesso ISDN
+Computer	DeviceClass		Computer
+Controller	DeviceClass		Controller
+Cordless	DeviceClass		Cordless
+Desktop workstation	DeviceClass		Desktop workstation
+Device conforms to the headset profile	DeviceClass		Auricolare headset
+Digitizer tablet	DeviceClass		Tavoletta grafica
+Display	DeviceClass		Schermo
+Doll/Action figure	DeviceClass		Riproduzione in scala
+Fully available	DeviceClass		Pienamente disponibile
+Game	DeviceClass		Gioco
+Gamepad	DeviceClass		Gamepad
+Gaming/Toy	DeviceClass		Gaming/Toy
+Glasses	DeviceClass		Occhiali
+Handheld	DeviceClass		Palmare
+Hands-free	DeviceClass		Auricolare Hands-free
+Headphones	DeviceClass		Cuffie
+Helmet	DeviceClass		Casco
+HiFi audio device	DeviceClass		Dispositivo audio HiFi
+Imaging	DeviceClass		Analisi
+Information	DeviceClass		Informazione
+Invalid device class!\n	DeviceClass		Classe unità non valida!\n
+Jacket	DeviceClass		Jacket
+Joystick	DeviceClass		Joystick
+Keyboard	DeviceClass		Tastiera
+LAN access	DeviceClass		Accesso LAN
+Laptop	DeviceClass		Laptop
+Loudspeaker	DeviceClass		Altoparlante
+Major class: 	DeviceClass		Classe maggiore:
+Microphone	DeviceClass		Microfono
+Minor class: 	DeviceClass		Classe minore:
+Miscellaneous	DeviceClass		Varie
+Networking	DeviceClass		Networking
+No service available	DeviceClass		Nessun servizio disponibile
+Not implemented	RemoteDevice		Non implementato
+Object transfer	DeviceClass		Oggetto di trasferimento
+Pager	DeviceClass	A small radio device to receive short text messages	Cercapersone
+Palm	DeviceClass	A palm-held device	Palm
+Peripheral	DeviceClass		Periferica
+Phone	DeviceClass		Telefono
+Pointing device	DeviceClass		Dispositivo di puntamento
+Portable audio	DeviceClass		Audio portatile
+Positioning	DeviceClass		Posizionamento
+Printer	DeviceClass		Stampante
+Remote control	DeviceClass		Telecomando
+Rendering	DeviceClass		Rendering
+Robot	DeviceClass		Robot
+SIM card reader	DeviceClass		Lettore di schede SIM
+Scanner	DeviceClass		Scanner
+Sensing device	DeviceClass		Dispositivo di rilevamento
+Server	DeviceClass		Server
+Service classes: 	DeviceClass		Classi servizio:
+Set-top box	DeviceClass		Set-top box
+Smart phone	DeviceClass		Smart phone
+Telephony	DeviceClass		Telefonia
+Uncategorized	DeviceClass		Uncategorized
+Unknown (reserved) minor device class	DeviceClass		Sconosciuto (riservato) classe di unità minore
+Unspecified	DeviceClass		Non specificato
+VCR	DeviceClass		Videoregistratore
+Vehicle	DeviceClass		Veicolo
+Video camera	DeviceClass		Videocamera
+Video conferencing	DeviceClass		Videoconferenza
+Video display and loudspeaker	DeviceClass		Video display e autoparlanti
+Video monitor	DeviceClass		Monitor
+Wearable	DeviceClass	A wearable computer	Portatile
+Wired modem or voice gateway	DeviceClass		Modem via cavo o voice gateway
+Wrist watch	DeviceClass		Orologio da polso

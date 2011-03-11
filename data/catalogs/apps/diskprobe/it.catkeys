@@ -1,0 +1,135 @@
+1	italian	x-vnd.Haiku-DiskProbe	1552395580
+%ld (native)	ProbeView		%ld (nativo)
+(native)	ProbeView		(nativo)
+15 bit	TypeEditors		15 bit
+16 bit	TypeEditors		16 bit
+16 bit signed value:	TypeEditors		Valore a 16 bit con segno:
+16 bit unsigned value:	TypeEditors		Valore a 16 bit senza segno:
+32 bit	TypeEditors		32 bit
+32 bit signed value:	TypeEditors		Valore a 32 bit con segno:
+32 bit size or status:	TypeEditors		Dimensione o stato a 32 bit
+32 bit unsigned pointer:	TypeEditors		Puntatore a 32 bit senza segno:
+32 bit unsigned size:	TypeEditors		Valore 32 bit senza segno:
+32 bit unsigned value:	TypeEditors		Valore a 32 bit senza segno:
+64 bit signed offset:	TypeEditors		Compensazione 64 bit con segno:
+64 bit signed value:	TypeEditors		Valore a 64 bit con segno:
+64 bit unsigned value:	TypeEditors		Valore a 64 bit senza segno:
+8 bit palette	TypeEditors		Tavolozza a 8 bit
+8 bit signed value:	TypeEditors		Valore a 8 bit con segno:
+8 bit unsigned value:	TypeEditors		Valore a 8 bit senza segno:
+About DiskProbe…	FileWindow		Informazioni su DiskProbe...
+Add	ProbeView		Aggiungi
+Attribute	AttributeWindow		Attributo
+Attribute	ProbeView		Attributo
+Attribute offset: 	ProbeView		Posizione attributo:
+Attribute type: 	ProbeView		Tipo Attributo:
+Attribute: 	ProbeView		Attributi: 
+Attributes	ProbeView		Attributi
+Back	ProbeView		Indietro
+Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Base
+Block	ProbeView		Blocco
+Block %Ld (0x%Lx)	ProbeView		Blocco %Ld (0x%Lx)
+Block 0x%Lx	ProbeView		Blocco 0x%Lx
+Block: 	ProbeView		Blocco:
+BlockSize	ProbeView	A menu item, a shortened form from 'block size'. This is in the same menu windowthan 'Base' and 'Font size'	BlockSize
+Bookmarks	ProbeView		Segnalibri
+Boolean	TypeEditors	This is the type of editor	Booleana
+Boolean editor	TypeEditors		Editor booleano
+Boolean value:	TypeEditors		Valore Booleano:
+Cancel	AttributeWindow		Annulla
+Cancel	OpenWindow		Annulla
+Cancel	ProbeView		Annulla
+Case sensitive	FindWindow		Sensibile alle maiuscole/minuscole
+Close	AttributeWindow		Chiudi
+Close	FileWindow		Chiudi
+Close	ProbeView		Chiudi
+Contents:	TypeEditors		Contenuti:
+Copy	ProbeView		Copia
+Could not find search string.	ProbeView		Impossibile trovare la stringa cercata.
+Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Impossibile aprire \"%s\":\n%s
+Could not open file \"%s\": %s\n	DiskProbe		Impossibile aprire il file \"%s\": %s\n
+Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Impossibile leggere l'immagine
+Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Decimale
+Device	ProbeView		Dispositivo
+Device offset: 	ProbeView		Posizione dispositivo:
+Device: 	ProbeView		Dispositivo:
+DiskProbe	OpenWindow		DiskProbe
+DiskProbe request	AttributeWindow		Richiesta DiskProbe
+DiskProbe request	DiskProbe		Richiesta DiskProbe
+DiskProbe request	ProbeView		Richiesta DiskProbe
+DiskProbe\n\twritten by Axel Dörfler\n\tCopyright 2004-2007, Haiku.\n\nOriginal Be version by Robert Polic\n	DiskProbe		DiskProbe\n\tscritto da Axel Dörfler\n\tCopyright 2004-2007, Haiku.\n\nVersione Be originale di Robert Polic\n
+Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Sei sicuro di voler rimuovere l'attributo \"%s\" dal file \"%s\"?\n\nNon potrai annullare questa azione.
+Don't save	ProbeView		Non salvare
+Double precision floating-point value:	TypeEditors		Valore in virgola mobile a doppia precisione:
+Edit	ProbeView		Modifica
+Examine device:	OpenWindow		Esamina il dispositivo:
+File	FileWindow		File
+File	ProbeView		File
+File offset: 	ProbeView		Posizione file:
+File: 	ProbeView		File:
+Find	FindWindow		Trova
+Find again	ProbeView		Trova di nuovo
+Find…	ProbeView		Trova…
+Fit	ProbeView	Size of fonts, fits to available room	Adattivo
+Flattened bitmap	TypeEditors		Bitmap piana
+Floating-point value:	TypeEditors		Valore in virgola mobile:
+Font size	ProbeView		Dimensione Font
+Grayscale	TypeEditors		Scala di grigi
+Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Esadecimale
+Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Esadecimale
+Icon	TypeEditors		Icona
+Icon view	TypeEditors		Visuale per icone
+Image	TypeEditors	This is the type of view	Immagine
+Image view	TypeEditors	Image means here a picture file, not a disk image.	Visuale immagine
+MIME type editor	TypeEditors		Editor di tipo MIME
+MIME type:	TypeEditors		Tipo MIME:
+Message	TypeEditors	This is the type of view	Messaggio
+Message View	TypeEditors		Visuale Messaggio
+Mode:	FindWindow		Modalità:
+Native: %Ld (0x%0*Lx)	ProbeView		Nativo: %Ld (0x%0*Lx)
+Native: 0x%0*Lx	ProbeView		Nativo: 0x%0*Lx
+New…	FileWindow		Nuova…
+Next	ProbeView		Avanti
+No type editor available	AttributeWindow		Nessun editor disponibile
+Number	TypeEditors	This is the type of editor	Numero
+Number editor	TypeEditors		Editor Numerico
+Number:	TypeEditors		Numero:
+OK	DiskProbe		Ok
+OK	ProbeView		Ok
+Offset: 	ProbeView		Posizione:
+Open device	FileWindow		Apri dispositivo
+Open file…	FileWindow		Apri il file…
+PNG format	TypeEditors		Formato PNG
+Page setup…	ProbeView		Imposta pagina…
+Paste	ProbeView		Incolla
+Previous	ProbeView		Precedente
+Print…	ProbeView		Stampa…
+Probe device	OpenWindow		Interroga il dispositivo
+Probe file…	OpenWindow		Interroga il file…
+Quit	FileWindow		Esci
+Raw editor	AttributeWindow		Editor dati grezzi
+Redo	ProbeView		Ripeti
+Remove	AttributeWindow		Rimuovi
+Remove from file	AttributeWindow		Rimuovi dal file
+Save	ProbeView		Salva
+Save changes before closing?	ProbeView		Salvare i cambiamenti prima di chiudere?
+Select all	ProbeView		Seleziona tutto
+Selection	ProbeView		Selezione
+Stop	ProbeView		Interrompi
+String editor	TypeEditors		Editor di testo
+Swapped: %Ld (0x%0*Lx)	ProbeView		Scambiato: %Ld (0x%0*Lx)
+Swapped: 0x%0*Lx	ProbeView		Scambiato: 0x%0*Lx
+Text	FindWindow		Testo
+Text	TypeEditors	This is the type of editor	Testo
+Type editor	AttributeWindow		Editor di tipo
+Type editor	ProbeView		Editor di tipo
+Type editor not supported	ProbeView		Editor di tipo non supportato
+Undo	ProbeView		Annulla
+Unknown format	TypeEditors		Formato sconosciuto
+Unknown type	TypeEditors		Tipo sconosciuto
+View	ProbeView	This is the last menubar item 'File Edit Block View'	Vista
+Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Errore nella scrittura sul file:\n%s\n\nAlla chiusura del programma verranno perse tutte le modifiche.
+none	ProbeView	No attributes	nessuno
+of 	ProbeView		di
+of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	of 0x0
+what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	cosa: '%.4s'\n\n

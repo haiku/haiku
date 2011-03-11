@@ -1,0 +1,14 @@
+1	italian	x-vnd.Haiku-Pairs	3736877909
+Beginner (4x4)	PairsWindow		Principiante (4×4)
+Expert (8x8)	PairsWindow		Esperto (8×8)
+Game	PairsWindow		Gioco
+Intermediate (6x6)	PairsWindow		Intermedio (6×6)
+New	PairsWindow		Nuovo
+New game	PairsWindow		Nuovo partita
+OK	PairsView		Ok
+Pairs	PairsWindow		Pairs
+Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		Coppie non ha trovato sufficienti icone vettoriali nel sistema; ha bisogno di almeno %d.
+Pairs\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYou completed the game in %s clicks.\n	PairsWindow		Pairs\n\tscritto da Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nHai completato il gioco in %s click.\n
+Quit	PairsWindow		Esci
+Quit game	PairsWindow		Esci dal gioco
+Size	PairsWindow		Dimensione

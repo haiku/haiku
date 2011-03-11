@@ -1,0 +1,80 @@
+1	italian	x-vnd.Haiku-StyledEdit	881610730
+???	LoadAlert		???
+Align	Menus		Allinea
+Black	Menus		Nero
+Blue	Menus		Blu
+Bold	Menus		Grassetto
+Can't undo	Menus		Impossibile annullare
+Cancel	FindandReplaceWindow		Annulla
+Cancel	QuitAlert		Annulla
+Cancel	RevertToSavedAlert		Annulla
+Cancel	SaveAlert		Annulla
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Impossibile ripristinare, file non trovato: \"%s\".
+Case-sensitive	FindandReplaceWindow		Sensibile alle maiuscole-minuscole
+Center	Menus		Centra
+Characters:	Statistics		Caratteri:
+Clear	Menus		Cancella
+Close	Menus		Chiudi
+Color	Menus		Colore
+Copy	Menus		Copia
+Cut	Menus		Taglia
+Cyan	Menus		Ciano
+Default	Open_and_SaveAsPanel		Predefinito
+Document	Menus		Documento
+Document statistics	Statistics		Statistiche documento
+Don't save	QuitAlert		Non salvare
+Don't save	SaveAlert		Non salvare
+Edit	Menus		Modifica
+Encoding	Open_and_SaveAsPanel		Codifica
+Error loading \"%s\":\n\t%s	LoadAlert		Errore caricando \"%s\":\n\t%s
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Errore nel caricamento \"%s\":\n\tFormato non supportato
+Error saving \"%s\":\n%s	SaveAlert		Si è verificato un errore durante il salvataggio \"%s\":\n%s
+File	Menus		File
+Find	FindandReplaceWindow		Trova
+Find again	Menus		Trova ancora
+Find selection	Menus		Trova selezione
+Find:	FindandReplaceWindow		Trova:
+Find…	Menus		Trova…
+Font	Menus		Carattere
+Green	Menus		Verde
+Italic	Menus		Corsivo
+Left	Menus		Sinistra
+Lines:	Statistics		Linee:
+Magenta	Menus		Magenta
+New	Menus		Nuovo
+OK	LoadAlert		OK
+OK	RevertToSavedAlert		OK
+OK	SaveAlert		OK
+OK	Statistics		OK
+Open…	Menus		Apri…
+Page setup…	Menus		Imposta pagina…
+Paste	Menus		Incolla
+Print…	Menus		Stampa…
+Quit	Menus		Esci
+Red	Menus		Rosso
+Redo typing	QuitAlert		Ripeti digitazione
+Replace	FindandReplaceWindow		Sostituisci
+Replace all	FindandReplaceWindow		Sostituisci tutto
+Replace in all windows	FindandReplaceWindow		Sostituisci in tutte le finestre
+Replace same	Menus		Sostituisci lo stesso
+Replace with:	FindandReplaceWindow		Sostituisci con:
+Replace…	Menus		Sostituisci…
+Revert to saved…	Menus		Ripristina quanto salvato…
+Revert to the last version of \"%s\"? 	RevertToSavedAlert		Ripristina l'ultima versione di \"%s\"? 
+Right	Menus		Destra
+Save	Menus		Salva
+Save	QuitAlert		Salva
+Save	SaveAlert		Salva
+Save as…	Menus		Salva con nome…
+Save changes to the document \"%s\"? 	QuitAlert		Salva le modifiche sul documento \"%s\"? 
+Search backwards	FindandReplaceWindow		Trova precedente
+Select all	Menus		Seleziona tutto
+Size	Menus		Dimensione
+Statistics…	Menus		Statistiche...
+This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Il file è di sola lettura. Volete salvare le modifiche al documento\"%s\"? 
+Undo typing	QuitAlert		Annulla digitazione
+Untitled 	StyledEditWindow		Senza titolo
+Words:	Statistics		Parole:
+Wrap lines	Menus		A capo automatico
+Wrap-around search	FindandReplaceWindow		Ricerca ovunque
+Yellow	Menus		Giallo

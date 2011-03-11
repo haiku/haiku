@@ -1,0 +1,43 @@
+1	italian	x-vnd.Haiku-Appearance	3612090060
+Antialiasing	APRWindow		Antialiasing
+Antialiasing menu	AntialiasingSettingsView		Menu antialias
+Antialiasing type:	AntialiasingSettingsView		Tipo di antialias:
+Appearance	APRWindow		Aspetto
+Colors	APRWindow		Colori
+Control background	Colors tab		Sfondo del controllo
+Control border	Colors tab		Bordi del controllo
+Control highlight	Colors tab		Evidenziazione  del controllo
+Control text	Colors tab		Testo del controllo
+Defaults	APRWindow		Predefiniti
+Document background	Colors tab		Sfondo del documento
+Document text	Colors tab		Testo del documento
+Failure	Colors tab		Insuccesso
+Glyph hinting:	AntialiasingSettingsView		Adattamento glifo:
+Grayscale	AntialiasingSettingsView		Scala di grigio
+Hinting menu	AntialiasingSettingsView		Menu dei suggerimenti
+Inactive window tab	Colors tab		Testo della linguetta sulla finestra inattiva
+Inactive window tab text	Colors tab		Testo della linguetta della finestra inattiva
+LCD subpixel	AntialiasingSettingsView		Sub-pixel LCD
+Menu background	Colors tab		Sfondo del menu
+Menu item text	Colors tab		Testo della voce nel menu
+Monospaced fonts only	AntialiasingSettingsView		Solo font con spaziatura fissa
+Navigation base	Colors tab		Base del navigatore
+Navigation pulse	Colors tab		Navigation pulse
+Off	AntialiasingSettingsView		Disattivato
+On	AntialiasingSettingsView		Attivo
+Panel background	Colors tab		Sfondo del pannello
+Panel text	Colors tab		Testo del pannello
+Reduce colored edges filter strength:	AntialiasingSettingsView		Intensità del filtro di riduzione del bordi colorati:
+Revert	APRWindow		Ripristina
+Selected menu item background	Colors tab		Sfondo della voce selezionata nel menu
+Selected menu item border	Colors tab		Bordo della voce selezionata nel menu
+Selected menu item text	Colors tab		Testo della voce selezionata nel menu
+Shadow	Colors tab		Ombra
+Shine	Colors tab		Brillantezza
+Strong	AntialiasingSettingsView		Forte
+Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		L'antialias con sub-pixel in combinazione con l'adattamento del glifo non è disponibile in questa versione di Haiku per evitare possibili problemi dovuti ai brevetti, per attivare questa funzionalità è necessario compilare da soli Haiku e abilitare alcune opzioni nell'intestazione di libfreetype.
+Success	Colors tab		Successo
+Tooltip background	Colors tab		Sfondo dei suggerimenti
+Tooltip text	Colors tab		Testo del suggerimento
+Window tab	Colors tab		Linguetta della finestra
+Window tab text	Colors tab		Testo della linguetta sulla finestra

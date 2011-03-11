@@ -1,0 +1,14 @@
+1	italian	x-vnd.Haiku-CDPlayer	744500153
+Audio CD	CDPlayer		CD audio
+CD	CDPlayer		CD
+CD drive is empty	CDPlayer		Il lettore CD è vuoto
+CDPlayer	CDPlayer		CDPlayer
+Disc: %ld:%.2ld / %ld:%.2ld	CDPlayer		Disco: %ld:%.2ld / %ld:%.2ld
+Disc: --:-- / --:--	CDPlayer		Disco: --:-- / --:--
+Disc: 88:88 / 88:88	CDPlayer		Disco: 88:88 / 88:88
+It appears that there are no CD drives on your computer or there is no system software to support one. Sorry.	CDPlayer		Spiacenti, sembra che non ci siano lettori CD sul computer in uso o che non ci sia un software che lo supporti.
+OK	CDPlayer		OK
+Track %whichTrack%: %trackAt%	CDPlayer		Traccia %whichTrack%: %trackAt%
+Track: %ld:%.2ld / %ld:%.2ld	CDPlayer		Traccia: %ld:%.2ld / %ld:%.2ld
+Track: --:-- / --:--	CDPlayer		Traccia: --:-- / --:--
+Track: 88:88 / 88:88	CDPlayer		Traccia: 88:88 / 88:88
