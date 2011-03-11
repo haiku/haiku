@@ -59,6 +59,8 @@ public:
 			void				SetDisabled(bool disabled)
 									{ fDisabled = disabled; }
 
+			status_t			HealInterface();
+
 //			void				SetWirelessNetwork(const char* name)
 //									{ fWirelessNetwork.SetTo(name); }
 //			void				SetDomain(const BString& domain)
@@ -97,10 +99,6 @@ public:
 
 private:
 			status_t			_DetectProtocols();
-			BNetworkInterface	fNetworkInterface;
-			InterfaceAddressMap	fInterfaceAddressMap;
-
-			protocols			fProtocols[MAX_PROTOCOLS];
 
 			// Stored network addresses and paramaters
 			BoolMap				fAutoConfigure;
@@ -113,6 +111,10 @@ private:
 			bool				fDisabled;
 			BObjectList<BString> fNameServers;
 			BString				fWirelessNetwork;
+
+			protocols			fProtocols[MAX_PROTOCOLS];
+			BNetworkInterface*	fNetworkInterface;
+			InterfaceAddressMap	fInterfaceAddressMap;
 };
 
 

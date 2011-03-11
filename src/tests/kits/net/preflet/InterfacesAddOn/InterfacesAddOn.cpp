@@ -167,6 +167,16 @@ InterfacesAddOn::MessageReceived(BMessage* msg)
 			break;
 		}
 
+		case kMsgInterfaceHeal:
+		{
+			if (!item)
+				break;
+
+			NetworkSettings* ns = item->GetSettings();
+			ns->HealInterface();
+			break;
+		}
+
 		default:
 			BBox::MessageReceived(msg);
 	}
