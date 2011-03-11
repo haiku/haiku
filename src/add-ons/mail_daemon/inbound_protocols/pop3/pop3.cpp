@@ -161,14 +161,17 @@ POP3Protocol::SyncMessages()
 	ResetProgress();
 	SetTotalItems(toDownload.CountItems());
 
-	printf("POP3 to download: %i\n", (int)toDownload.CountItems());
+	printf("POP3: Messages to download: %i\n", (int)toDownload.CountItems());
 	for (int32 i = 0; i < toDownload.CountItems(); i++) {
 		const char* uid = toDownload.ItemAt(i);
 		int32 toRetrieve = fUniqueIDs.IndexOf(uid);
 
 		if (toRetrieve < 0) {
+			// should not happen!
 			error = B_NAME_NOT_FOUND;
-			break;
+			printf("POP3: uid %s index %i not found in fUniqueIDs!\n", uid,
+				(int)toRetrieve);
+			continue;
 		}
 
 		BPath path(fDestinationDir);
@@ -178,8 +181,10 @@ POP3Protocol::SyncMessages()
 		BEntry entry(path.Path());
 		BFile file(&entry, B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
 		error = file.InitCheck();
-		if (error != B_OK)
-			break;;
+		if (error != B_OK) {
+			printf("POP3: Can't create file %s\n ", path.Path());
+			break;
+		}
 		BMailMessageIO mailIO(this, &file, toRetrieve);
 
 		entry_ref ref;
@@ -192,15 +197,19 @@ POP3Protocol::SyncMessages()
 		int32 size = MessageSize(toRetrieve);
 		if (fFetchBodyLimit < 0 || size <= fFetchBodyLimit) {
 			error = mailIO.Seek(0, SEEK_END);
-			if (error < 0)
+			if (error < 0) {
+				printf("POP3: Failed to download body %s\n ", uid);
 				break;
+			}
 			NotifyHeaderFetched(ref, &file);
 			NotifyBodyFetched(ref, &file);
 		} else {
 			int32 dummy;
 			error = mailIO.ReadAt(0, &dummy, 1);
-			if (error < 0)
+			if (error < 0) {
+				printf("POP3: Failed to download header %s\n ", uid);
 				break;
+			}
 			NotifyHeaderFetched(ref, &file);
 		}
 		ReportProgress(0, 1);
