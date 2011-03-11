@@ -5,15 +5,13 @@
  */
 
 
-#include <stdio.h>
-#include <string.h>
-
 #include <AboutWindow.h>
-#include <Application.h>
 #include <Alert.h>
+#include <Application.h>
 #include <Catalog.h>
-#include <TextView.h>
 #include <Locale.h>
+#include <Roster.h>
+#include <TextView.h>
 
 #include "LocalePreflet.h"
 #include "LocaleWindow.h"
@@ -32,8 +30,11 @@ class LocalePreflet : public BApplication {
 		virtual				~LocalePreflet();
 
 		virtual	void		AboutRequested();
+		virtual	void		MessageReceived(BMessage* message);
 
 private:
+		status_t			_RestartApp(const char* signature) const;
+		
 		LocaleWindow*		fLocaleWindow;
 };
 
@@ -63,10 +64,48 @@ LocalePreflet::AboutRequested()
 		"Axel Dörfler",
 		"Adrien Destugues",
 		"Oliver Tappe",
-		 NULL
+		NULL
 	};
 	BAboutWindow about(B_TRANSLATE("Locale"), 2005, authors);
 	about.Show();
+}
+
+
+void
+LocalePreflet::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case kMsgRestartTrackerAndDeskbar:
+			if (message->FindInt32("which") == 1) {
+				_RestartApp("application/x-vnd.Be-TRAK");
+				_RestartApp("application/x-vnd.Be-TSKB");
+			}
+			break;
+		
+		default:
+			BApplication::MessageReceived(message);
+			break;
+	}
+}
+
+
+status_t
+LocalePreflet::_RestartApp(const char* signature) const
+{
+	app_info info;
+	status_t status = be_roster->GetAppInfo(signature, &info);
+	if (status != B_OK)
+		return status;
+
+	BMessenger application(signature);
+	status = application.SendMessage(B_QUIT_REQUESTED);
+	if (status != B_OK)
+		return status;
+
+	status_t exit;
+	wait_for_thread(info.thread, &exit);
+
+	return be_roster->Launch(signature);
 }
 
 

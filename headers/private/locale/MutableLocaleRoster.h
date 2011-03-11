@@ -44,6 +44,7 @@ public:
 									// the message contains one or more
 									// 'language'-string-fields which
 									// contain the language-name(s)
+			status_t			SetFilesystemTranslationPreferred(bool preferred);
 
 			status_t			GetSystemCatalog(BCatalogAddOn** catalog) const;
 
@@ -110,6 +111,8 @@ struct RosterData {
 
 			BLocale				fDefaultLocale;
 			BTimeZone			fDefaultTimeZone;
+			
+			bool				fIsFilesystemTranslationPreferred;
 
 			bool				fAreResourcesLoaded;
 			BResources			fResources;
@@ -133,6 +136,8 @@ struct RosterData {
 									const BFormattingConventions& convetions);
 			status_t			SetDefaultTimeZone(const BTimeZone& zone);
 			status_t			SetPreferredLanguages(const BMessage* msg);
+			status_t			SetFilesystemTranslationPreferred(
+									bool preferred);
 private:
 			status_t			_Initialize();
 
@@ -155,6 +160,8 @@ private:
 			status_t			_AddDefaultTimeZoneToMessage(
 									BMessage* message) const;
 			status_t			_AddPreferredLanguagesToMessage(
+									BMessage* message) const;
+			status_t			_AddFilesystemTranslationPreferenceToMessage(
 									BMessage* message) const;
 };
 

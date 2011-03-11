@@ -366,3 +366,15 @@ BLocaleRoster::_GetCatalog(BCatalog* catalog, vint32* catalogInitStatus)
 
 	return catalog;
 }
+
+
+bool
+BLocaleRoster::IsFilesystemTranslationPreferred() const
+{
+	RosterData* rosterData = RosterData::Default();
+	BAutolock lock(rosterData->fLock);
+	if (!lock.IsLocked())
+		return B_ERROR;
+
+	return rosterData->fIsFilesystemTranslationPreferred;
+}

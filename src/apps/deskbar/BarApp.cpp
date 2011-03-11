@@ -610,10 +610,11 @@ TBarApp::AddTeam(team_id team, uint32 flags, const char* sig, entry_ref* ref)
 	BFile file(ref, B_READ_ONLY);
 	BAppFileInfo appMime(&file);
 
-	BString name;	
-	if (GetLocalizedFileName(*ref, name) != B_OK)
+	BString name;
+	if (!BLocaleRoster::Default()->IsFilesystemTranslationPreferred()
+		|| GetLocalizedFileName(*ref, name) != B_OK)
 		name = ref->name;
-		
+
 	BarTeamInfo* barInfo = new BarTeamInfo(new BList(), flags, strdup(sig),
 		new BBitmap(kIconRect, kIconFormat), strdup(name.String()));
 

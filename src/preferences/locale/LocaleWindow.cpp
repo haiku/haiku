@@ -13,6 +13,7 @@
 #include <Application.h>
 #include <Button.h>
 #include <Catalog.h>
+#include <CheckBox.h>
 #include <ControlLook.h>
 #include <FormattingConventions.h>
 #include <GroupLayout.h>
@@ -46,6 +47,7 @@ static const uint32 kMsgConventionsSelection = 'csel';
 static const uint32 kMsgDefaults = 'dflt';
 
 static const uint32 kMsgPreferredLanguagesChanged = 'lang';
+static const uint32 kMsgFilesystemTranslationChanged = 'fsys';
 
 
 static int
@@ -68,7 +70,8 @@ LocaleWindow::LocaleWindow()
 		B_QUIT_ON_WINDOW_CLOSE | B_ASYNCHRONOUS_CONTROLS
 			| B_AUTO_UPDATE_SIZE_LIMITS),
 	fInitialConventionsItem(NULL),
-	fDefaultConventionsItem(NULL)
+	fDefaultConventionsItem(NULL),
+	fFilesystemTranslationCheckbox(NULL)
 {
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 
@@ -232,8 +235,24 @@ LocaleWindow::LocaleWindow()
 		.Add(fFormatView)
 		.SetInsets(spacing, spacing, spacing, spacing));
 
+	BView* systemTab = new BView(B_TRANSLATE("System"), B_WILL_DRAW);
+	systemTab->SetLayout(new BGroupLayout(B_VERTICAL, 0));
+
+	fFilesystemTranslationCheckbox = new BCheckBox("filesystemTranslation",
+		B_TRANSLATE("Translate application and folder names in Deskbar and Tracker."),
+		new BMessage(kMsgFilesystemTranslationChanged));
+
+	fFilesystemTranslationCheckbox->SetValue(
+		BLocaleRoster::Default()->IsFilesystemTranslationPreferred());
+
+	systemTab->AddChild(BLayoutBuilder::Group<>(B_VERTICAL, spacing)
+		.Add(fFilesystemTranslationCheckbox)
+		.AddGlue()
+		.SetInsets(spacing, spacing, spacing, spacing));
+
 	tabView->AddTab(languageTab);
 	tabView->AddTab(countryTab);
+	tabView->AddTab(systemTab);
 
 	BButton* button
 		= new BButton(B_TRANSLATE("Defaults"), new BMessage(kMsgDefaults));
@@ -396,6 +415,21 @@ LocaleWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case kMsgFilesystemTranslationChanged:
+		{
+			MutableLocaleRoster::Default()->SetFilesystemTranslationPreferred(
+				fFilesystemTranslationCheckbox->Value());
+				
+			BAlert* alert = new BAlert(B_TRANSLATE("Locale"),
+				B_TRANSLATE("Deskbar and Tracker need to be restarted for this "
+				"change to take effect. Would you like to restart them now?"),
+				B_TRANSLATE("Cancel"), B_TRANSLATE("Restart"), NULL,
+				B_WIDTH_FROM_WIDEST, B_IDEA_ALERT);
+			alert->Go(new BInvoker(new BMessage(kMsgRestartTrackerAndDeskbar),
+				NULL, be_app));
+			break;
+		}
+		
 		default:
 			BWindow::MessageReceived(message);
 			break;
@@ -594,4 +628,3 @@ LocaleWindow::_Defaults()
 		fConventionsListView->ScrollToSelection();
 	}
 }
-

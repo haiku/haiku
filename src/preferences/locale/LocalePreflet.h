@@ -11,6 +11,7 @@
 
 extern const char* kSignature;
 
+static const uint32 kMsgRestartTrackerAndDeskbar = 'Rstr';
 static const uint32 kMsgSettingsChanged = 'SeCh';
 
 

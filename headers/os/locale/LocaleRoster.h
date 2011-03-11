@@ -65,6 +65,8 @@ public:
 									// Get the catalog for the calling image
 									// (that needs to link with liblocalestub.a)
 
+			bool				IsFilesystemTranslationPreferred() const;
+
 	static	const char*			kCatLangAttr;
 	static	const char*			kCatSigAttr;
 	static	const char*			kCatFingerprintAttr;

@@ -14,6 +14,7 @@ static const uint32 kMsgRevert = 'revt';
 
 
 class BButton;
+class BCheckBox;
 class BListView;
 class FormatSettingsView;
 class LanguageListItem;
@@ -54,6 +55,7 @@ private:
 			LanguageListItem*	fInitialConventionsItem;
 			LanguageListItem*	fDefaultConventionsItem;
 			BMessage			fInitialPreferredLanguages;
+			BCheckBox*			fFilesystemTranslationCheckbox;
 };
 
 
