@@ -5,7 +5,7 @@ Battery charging	PowerStatus		Batteri lader
 Battery discharging	PowerStatus		Batteri utlader
 Battery info	PowerStatus		Batteriinformasjon
 Battery info…	PowerStatus		Batteriinformasjon...
-Battery unused	PowerStatus		Batteri ubrukt
+Battery unused	PowerStatus		Batteri ikke i bruk
 Capacity: 	PowerStatus		Kapasitet:
 Empty battery slot	PowerStatus		Batteri ikke tilstede
 Extended battery info	PowerStatus		Utvidet batteriinformasjon
@@ -18,7 +18,7 @@ Power status box	PowerStatus		Boks for strømstatus
 PowerStatus	PowerStatus		Strøm
 Quit	PowerStatus		Avslutt
 Run in window	PowerStatus		Kjør i vindu
-Serial number: 	PowerStatus		Serelnummer:
+Serial number: 	PowerStatus		Serienummer:
 Show percent	PowerStatus		Vis prosent
 Show status icon	PowerStatus		Vis statusikon
 Show text label	PowerStatus		Vis tekst

@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-MediaConverter	2077202135
+1	norwegian_bokmål	x-vnd.Haiku-MediaConverter	2011559818
 %d bit 	MediaFileInfo		%d bit
 %d byte 	MediaFileInfo		%d byte 
 About MediaConverter…	Menu		Om MediaConverter
@@ -52,6 +52,4 @@ Video quality not supported	MediaConverter		Videokvaliteten støttes ikke
 Video quality: %3d%%	MediaConverter		Videokvalitet: %3d%%
 Video using parameters form settings	MediaConverter		Video bruker parametre fra innstillingene
 Video:	MediaConverter-FileInfo		Video:
-Writing audio track: %Ld %% complete	MediaConverter		Skriver lydspor:%Ld %% fullført
-Writing video track: %Ld %% complete	MediaConverter		Skriver videospor: %Ld %% fullført
 seconds	MediaFileInfo		sekunder

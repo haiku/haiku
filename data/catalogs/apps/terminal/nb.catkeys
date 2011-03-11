@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-Terminal	72463647
+1	norwegian_bokmål	x-vnd.Haiku-Terminal	2742110361
 -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h, --help skriver ut denne hjelpen\n -t, --title setter vindustittelen\n -f, --fullscreen starter fullskjerm\n
 Abort	Terminal Shell		Avbryt
 About Terminal…	Terminal TermWindow		Om Terminal...
@@ -25,12 +25,10 @@ Copy here	Terminal TermView		Kopier her
 Create link here	Terminal TermView		Opprett lenke her
 Custom	Terminal colors schema		Spesiallaget
 Decrease	Terminal TermWindow		Forminsk
-Didn't find any available pseudo ttys.	Terminal Shell		Fant ingen tilgjengelige psuedo-TTY-er.
 Don't save	Terminal PrefWindow		Ikke lagre
 Edit	Terminal TermWindow		Rediger
 Edit tab title…	Terminal TermWindow		Rediger fanetittel...
 Error!	Terminal getString		Feil!
-Failed to init pseudo tty.	Terminal Shell		Klarte ikke initialisere psuedo-TTY.
 Find	Terminal FindWindow		Finn
 Find failed	Terminal TermWindow		Søk feilet
 Find next	Terminal TermWindow		Finn neste
@@ -56,7 +54,6 @@ OK	Terminal TermView		OK
 OK	Terminal TermWindow		OK
 Page setup…	Terminal TermWindow		Sideoppsett...
 Paste	Terminal TermWindow		Lim inn
-PrefHandler::getRGB(%s) - key not found\n	Terminal getRGB		PrefHandler::getRGB(%s) - nøkkel ikke funnet\n
 Print	Terminal TermWindow		Skriv ut
 Print cancelled.	Terminal TermWindow		Utskrift kansellert.
 Quit	Terminal TermWindow		Avslutt
@@ -66,7 +63,6 @@ Save as default	Terminal TermWindow		Lagre som standard
 Save changes to this settings panel?	Terminal PrefWindow		Lagre endringer i innstillingspanelet?
 Save to file…	Terminal PrefWindow		Lagre som fil...
 Search forward	Terminal FindWindow		Søk fremover
-Secondary mouse button drop menu	Terminal TermView		Sekundær museknappmeny
 Select all	Terminal TermWindow		Merk alt
 Selected background	Terminal AppearancePrefView		Valgt bakgrunn
 Selected text	Terminal AppearancePrefView		Merket tekst
@@ -104,9 +100,4 @@ Window size	Terminal TermWindow		Vindustørrelse
 Window title:	Terminal AppearancePrefView		Vindustittel:
 Window title:	Terminal TermWindow		Vindustittel:
 Window title…	Terminal TermWindow		Vindustittel...
-can't open tty (%s).	Terminal Shell		kan ikke åpne tty (%s)
-could not set session leader.	Terminal Shell		kunne ikke sette sesjonsleder
-failed set terminal interface (TERMIOS).	Terminal Shell		klarte ikke sette terminalgrensesnitt (TERMIOS)
-mismatch handshake.	Terminal Shell		feil håndtrykk
-sigaction() failed: %s\n	Terminal TermApp		sigaction() feilet: %s\n
 size	Terminal TermView		størrelse
