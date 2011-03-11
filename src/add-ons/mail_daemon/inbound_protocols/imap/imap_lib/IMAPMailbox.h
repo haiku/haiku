@@ -44,7 +44,7 @@ public:
 			status_t			Sync();
 
 			bool				SupportWatching();
-			status_t			StartWatchingMailbox();
+			status_t			StartWatchingMailbox(sem_id startedSem = -1);
 			status_t			StopWatchingMailbox();
 
 			status_t			CheckMailbox();

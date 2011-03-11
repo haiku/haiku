@@ -42,7 +42,6 @@ IMAPRootInboundProtocol::Connect(const char* server, const char* username,
 		if (!folders[i].subscribed || folders[i].folder == "INBOX")
 			continue;
 
-
 		IMAPInboundProtocol* inboundProtocol = new IMAPInboundProtocol(
 			&fAccountSettings, folders[i].folder);
 		inboundProtocol->SetMailNotifier(fMailNotifier->Clone());

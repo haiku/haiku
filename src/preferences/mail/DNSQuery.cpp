@@ -95,10 +95,10 @@ status_t
 BRawNetBuffer::ReadString(BString& string)
 {
 	string = "";
-	int32 read = _ReadStringAt(string, fReadPosition);
-	if (read < 0)
+	ssize_t bytesRead = _ReadStringAt(string, fReadPosition);
+	if (bytesRead < 0)
 		return B_ERROR;
-	fReadPosition += read;
+	fReadPosition += bytesRead;
 	return B_OK;
 }
 
@@ -122,13 +122,13 @@ BRawNetBuffer::_Init(const void* buf, size_t size)
 }
 
 
-int32
+ssize_t
 BRawNetBuffer::_ReadStringAt(BString& string, off_t pos)
 {
 	if (pos >= fBuffer.BufferLength())
 		return -1;
 
-	int32 readed = 0;
+	ssize_t bytesRead = 0;
 	char* buffer = (char*)fBuffer.Buffer();
 	buffer = &buffer[pos];
 	// if the string is compressed we have to follow the links to the
@@ -137,17 +137,17 @@ BRawNetBuffer::_ReadStringAt(BString& string, off_t pos)
 		if (uint8(*buffer) == 192) {
 			// found a pointer mark
 			buffer++;
-			readed++;
+			bytesRead++;
 			off_t subPos = uint8(*buffer);
 			_ReadStringAt(string, subPos);
 			break;
 		}
 		string.Append(buffer, 1);
 		buffer++;
-		readed++;
+		bytesRead++;
 	}
-	readed++;
-	return readed;
+	bytesRead++;
+	return bytesRead;
 }
 
 

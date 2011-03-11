@@ -42,7 +42,7 @@ public:
 
 private:
 		void			_Init(const void* buf, size_t size);
-		int32			_ReadStringAt(BString& string, off_t pos);
+		ssize_t			_ReadStringAt(BString& string, off_t pos);
 
 		off_t 			fWritePosition;
 		off_t 			fReadPosition;

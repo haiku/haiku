@@ -197,15 +197,15 @@ MailDaemonApp::RefsReceived(BMessage* message)
 			sizeof(account)) < 0)
 			continue;
 
-		InboundProtocolThread* protocol = _FindInboundProtocol(account);
-		if (!protocol)
+		InboundProtocolThread* protocolThread = _FindInboundProtocol(account);
+		if (!protocolThread)
 			continue;
 
 		BMessenger target;
 		BMessenger* messenger = &target;
 		if (message->FindMessenger("target", &target) != B_OK)
 			messenger = NULL;
-		protocol->FetchBody(ref, messenger);
+		protocolThread->FetchBody(ref, messenger);
 	}
 }
 

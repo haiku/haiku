@@ -77,39 +77,30 @@ DispatcherIMAPListener::FetchEnd()
 const uint32 kMsgStartWatching = '&StW';
 
 
-IMAPMailboxThread::IMAPMailboxThread(IMAPInboundProtocol& protocol,
-	IMAPMailbox& mailbox)
-	:
-	BLooper("IMAPMailboxThread"),
-
-	fProtocol(protocol),
-	fIMAPMailbox(mailbox),
-
-	fIsWatching(false)
+int32
+watch_mailbox(void* data)
 {
-
+	((IMAPMailboxThread*)data)->_Watch();
+	return B_OK;
 }
 
 
-void
-IMAPMailboxThread::MessageReceived(BMessage* message)
+IMAPMailboxThread::IMAPMailboxThread(IMAPInboundProtocol& protocol,
+	IMAPMailbox& mailbox)
+	:
+	fProtocol(protocol),
+	fIMAPMailbox(mailbox),
+
+	fIsWatching(false),
+	fThread(-1)
 {
-	status_t status = B_ERROR;
+	fWatchSyncSem = create_sem(0, "watch sync sem");
+}
 
-	switch (message->what) {
-		case kMsgStartWatching:
-			status = fIMAPMailbox.StartWatchingMailbox();
-			if (status != B_OK)
-				fProtocol.Disconnect();
 
-			fLock.Lock();
-			fIsWatching = false;
-			fLock.Unlock();
-			break;
-
-		default:
-			BLooper::MessageReceived(message);
-	}
+IMAPMailboxThread::~IMAPMailboxThread()
+{
+	delete_sem(fWatchSyncSem);
 }
 
 
@@ -131,9 +122,14 @@ IMAPMailboxThread::SyncAndStartWatchingMailbox()
 		BAutolock autolock(fLock);
 		if (fIsWatching)
 			return B_OK;
+		fThread = spawn_thread(watch_mailbox, "IMAPMailboxThread",
+			B_LOW_PRIORITY, this);
+		if (resume_thread(fThread) != B_OK) {
+			fThread = -1;
+			return B_ERROR;
+		}
+		acquire_sem(fWatchSyncSem);
 		fIsWatching = true;
-		autolock.Unlock();
-		PostMessage(kMsgStartWatching);
 	} else {
 		status_t status = fIMAPMailbox.CheckMailbox();
 		// if we lost connection reconnect and try again
@@ -158,9 +154,23 @@ IMAPMailboxThread::StopWatchingMailbox()
 		return status;
 
 	// wait till watching stopped
-	const uint32 kMsgNoMeaning = '&NME';
-	BMessage reply;
-	return BMessenger(this).SendMessage(kMsgNoMeaning, &reply);
+	status_t exitCode;
+	return wait_for_thread(fThread, &exitCode);
+}
+
+
+void
+IMAPMailboxThread::_Watch()
+{
+	status_t status = fIMAPMailbox.StartWatchingMailbox(fWatchSyncSem);
+	if (status != B_OK)
+		fProtocol.Disconnect();
+
+	fLock.Lock();
+	fIsWatching = false;
+	fLock.Unlock();
+
+	fThread = -1;
 }
 
 
@@ -192,7 +202,6 @@ MailboxWatcher::StartWatching(const char* mailboxDir)
 }
 
 
-#include <stdio.h>
 void
 MailboxWatcher::MessageReceived(BMessage* message)
 {
@@ -206,7 +215,6 @@ MailboxWatcher::MessageReceived(BMessage* message)
 			break;
 		switch (opcode) {
 			case B_ENTRY_CREATED:
-				printf("entry created\n");
 				break;
 				message->FindInt32("device", &ref.device);
 				message->FindInt64("directory", &ref.directory);
@@ -225,7 +233,6 @@ MailboxWatcher::MessageReceived(BMessage* message)
 
 			case B_ENTRY_MOVED:
 			{
-				printf("entry moved\n");
 				break;
 				entry_ref from;
 				entry_ref to;
@@ -301,7 +308,6 @@ IMAPInboundProtocol::IMAPInboundProtocol(BMailAccountSettings* settings,
 	fIMAPMailbox.SetFetchBodyLimit(bodyLimit);
 
 	fIMAPMailboxThread = new IMAPMailboxThread(*this, fIMAPMailbox);
-	fIMAPMailboxThread->Run();
 
 	// set watch directory
 	fINBOXWatcher = new MailboxWatcher(this);
@@ -316,8 +322,7 @@ IMAPInboundProtocol::~IMAPInboundProtocol()
 	RemoveHandler(fINBOXWatcher);
 	delete fINBOXWatcher;
 
-	fIMAPMailboxThread->Lock();
-	fIMAPMailboxThread->Quit();
+	delete fIMAPMailboxThread;
 }
 
 
@@ -456,7 +461,6 @@ IMAPInboundProtocol::UpdateSettings(const BMessage& settings)
 		delete[] passwd;
 	}
 
-	// restart mailbox's
 	SyncMessages();
 }
 

@@ -122,11 +122,11 @@ IMAPMailbox::SupportWatching()
 
 
 status_t
-IMAPMailbox::StartWatchingMailbox()
+IMAPMailbox::StartWatchingMailbox(sem_id startedSem)
 {
-	//TODO set it when we actually watching
 	atomic_set(&fWatching, 1);
 
+	bool firstIDLE = true;
 	// refresh every 29 min
 	bigtime_t timeout = 1000 * 1000 * 60 * 29; // 29 min
 	status_t status;
@@ -134,8 +134,13 @@ IMAPMailbox::StartWatchingMailbox()
 		int32 commandId = NextCommandId();
 		TRACE("IDLE ...\n");
 		status = SendCommand("IDLE", commandId);
+		if (firstIDLE) {
+			release_sem(startedSem);
+			firstIDLE = false;
+		}
 		if (status != B_OK)
 			break;
+
 		status = HandleResponse(commandId, timeout, false);
 		ProcessAfterQuacks(kIMAP4ClientTimeout);
 
@@ -157,6 +162,7 @@ IMAPMailbox::StartWatchingMailbox()
 		if (status != B_OK)
 			break;
 	}
+
 	atomic_set(&fWatching, 0);
 	return status;
 }
