@@ -59,8 +59,6 @@ public:
 			void				SetDisabled(bool disabled)
 									{ fDisabled = disabled; }
 
-			status_t			HealInterface();
-
 //			void				SetWirelessNetwork(const char* name)
 //									{ fWirelessNetwork.SetTo(name); }
 //			void				SetDomain(const BString& domain)
@@ -80,6 +78,7 @@ public:
 			int32				PrefixLen(int family)
 									{ return fNetmask[family].PrefixLength(); }
 
+			status_t			RenegotiateAddresses();
 
 			const char*			Name()  { return fName.String(); }
 			const char*			Domain() { return fDomain.String(); }

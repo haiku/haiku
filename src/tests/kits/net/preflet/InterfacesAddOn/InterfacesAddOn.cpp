@@ -80,9 +80,9 @@ InterfacesAddOn::CreateView(BRect *bounds)
 		new BMessage(kMsgInterfaceToggle));
 	fOnOff->SetEnabled(false);
 
-	fHeal = new BButton(intViewRect, "heal",
-		"Heal", new BMessage(kMsgInterfaceHeal));
-	fHeal->SetEnabled(false);
+	fRenegotiate = new BButton(intViewRect, "heal",
+		"Renegotiate", new BMessage(kMsgInterfaceRenegotiate));
+	fRenegotiate->SetEnabled(false);
 
 	// Build the layout
 	SetLayout(new BGroupLayout(B_VERTICAL));
@@ -93,7 +93,7 @@ InterfacesAddOn::CreateView(BRect *bounds)
 			.Add(fConfigure)
 			.Add(fOnOff)
 			.AddGlue()
-			.Add(fHeal)
+			.Add(fRenegotiate)
 		.End()
 		.SetInsets(10, 10, 10, 10)
 	);
@@ -109,7 +109,7 @@ InterfacesAddOn::AttachedToWindow()
 	fListview->SetTarget(this);
 	fConfigure->SetTarget(this);
 	fOnOff->SetTarget(this);
-	fHeal->SetTarget(this);
+	fRenegotiate->SetTarget(this);
 }
 
 
@@ -135,11 +135,11 @@ InterfacesAddOn::MessageReceived(BMessage* msg)
 		{
 			fConfigure->SetEnabled(item != NULL);
 			fOnOff->SetEnabled(item != NULL);
-			fHeal->SetEnabled(item != NULL);
+			fRenegotiate->SetEnabled(item != NULL);
 			if (!item)
 				break;
 			fConfigure->SetEnabled(!item->IsDisabled());
-			fHeal->SetEnabled(!item->IsDisabled());
+			fRenegotiate->SetEnabled(!item->IsDisabled());
 			fOnOff->SetLabel(item->IsDisabled() ? "Enable" : "Disable");
 			break;
 		}
@@ -162,18 +162,18 @@ InterfacesAddOn::MessageReceived(BMessage* msg)
 			item->SetDisabled(!item->IsDisabled());
 			fConfigure->SetEnabled(!item->IsDisabled());
 			fOnOff->SetLabel(item->IsDisabled() ? "Enable" : "Disable");
-			fHeal->SetEnabled(!item->IsDisabled());
+			fRenegotiate->SetEnabled(!item->IsDisabled());
 			fListview->Invalidate();
 			break;
 		}
 
-		case kMsgInterfaceHeal:
+		case kMsgInterfaceRenegotiate:
 		{
 			if (!item)
 				break;
 
 			NetworkSettings* ns = item->GetSettings();
-			ns->HealInterface();
+			ns->RenegotiateAddresses();
 			break;
 		}
 

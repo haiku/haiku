@@ -58,6 +58,8 @@ NetworkSettings::~NetworkSettings()
 
 		close(socket_id);
 	}
+
+	delete fNetworkInterface;
 }
 
 
@@ -332,20 +334,17 @@ NetworkSettings::WriteConfiguration()
 }
 
 
-/*! HealInterface performs a address renegotiation in an attempt to fix
+/*! RenegotiateAddresses performs a address renegotiation in an attempt to fix
 	connectivity problems
 */
 status_t
-NetworkSettings::HealInterface()
+NetworkSettings::RenegotiateAddresses()
 {
 	for (int index = 0; index < MAX_PROTOCOLS; index++) {
 		int inet_id = fProtocols[index].inet_id;
 		if (fProtocols[index].present
 			&& AutoConfigure(inet_id)) {
 			// If protocol is active, and set to auto
-			printf("Healing %d\n", inet_id);
-			fNetworkInterface->RemoveDefaultRoute(inet_id);
-				// Remove default route
 			fNetworkInterface->AutoConfigure(inet_id);
 				// Perform AutoConfiguration
 		}
