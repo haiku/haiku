@@ -95,7 +95,8 @@ Model::Model()
 	fIconFrom(kUnknownSource),
 	fWritable(false),
 	fNode(NULL),
-	fStatus(B_NO_INIT)
+	fStatus(B_NO_INIT),
+	fHasLocalizedName(false)
 {
 }
 
@@ -108,7 +109,9 @@ Model::Model(const Model &cloneThis)
 	fBaseType(cloneThis.fBaseType),
 	fIconFrom(cloneThis.fIconFrom),
 	fWritable(false),
-	fNode(NULL)
+	fNode(NULL),
+	fLocalizedName(cloneThis.fLocalizedName),
+	fHasLocalizedName(cloneThis.fHasLocalizedName)
 {
 	fStatBuf.st_dev = cloneThis.NodeRef()->device;
 	fStatBuf.st_ino = cloneThis.NodeRef()->node;
@@ -133,7 +136,8 @@ Model::Model(const node_ref *dirNode, const node_ref *node, const char *name,
 	:
 	fPreferredAppName(NULL),
 	fWritable(false),
-	fNode(NULL)
+	fNode(NULL),
+	fHasLocalizedName(false)
 {
 	SetTo(dirNode, node, name, open, writable);
 }
@@ -143,7 +147,8 @@ Model::Model(const BEntry *entry, bool open, bool writable)
 	:
 	fPreferredAppName(NULL),
 	fWritable(false),
-	fNode(NULL)
+	fNode(NULL),
+	fHasLocalizedName(false)
 {
 	SetTo(entry, open, writable);
 }
@@ -155,7 +160,8 @@ Model::Model(const entry_ref *ref, bool traverse, bool open, bool writable)
 	fBaseType(kUnknownNode),
 	fIconFrom(kUnknownSource),
 	fWritable(false),
-	fNode(NULL)
+	fNode(NULL),
+	fHasLocalizedName(false)
 {
 	BEntry entry(ref, traverse);
 	fStatus = entry.InitCheck();
@@ -355,7 +361,11 @@ Model::Name() const
 			break;
 
 	}
-	return fEntryRef.name;
+
+	if (fHasLocalizedName && gLocalizedNamePreferred)
+		return fLocalizedName.String();
+	else
+		return fEntryRef.name;
 }
 
 
@@ -482,6 +492,9 @@ Model::OpenNodeCommon(bool writable)
 	}
 #endif
 
+	if (gLocalizedNamePreferred)
+		CacheLocalizedName();
+
 	return fStatus;
 }
 
@@ -548,6 +561,16 @@ Model::SetupBaseType()
 			fBaseType = kUnknownNode;
 			break;
 	}
+}
+
+
+void
+Model::CacheLocalizedName()
+{
+	if (GetLocalizedFileName(fEntryRef, fLocalizedName, true) == B_OK)
+		fHasLocalizedName = true;
+	else
+		fHasLocalizedName = false;
 }
 
 

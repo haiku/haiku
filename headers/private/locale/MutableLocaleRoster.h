@@ -154,6 +154,8 @@ private:
 									const BFormattingConventions& conventions);
 			status_t			_SetDefaultTimeZone(const BTimeZone& zone);
 			status_t			_SetPreferredLanguages(const BMessage* msg);
+			void				_SetFilesystemTranslationPreferred(
+									bool preferred);
 
 			status_t			_AddDefaultFormattingConventionsToMessage(
 									BMessage* message) const;

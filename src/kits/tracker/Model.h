@@ -209,6 +209,7 @@ class Model {
 		void SetupBaseType();
 		void FinishSettingUpType();
 		void DeletePreferredAppVolumeNameLinkTo();
+		void CacheLocalizedName();
 
 		status_t FetchOneQuery(const BQuery *, BHandler *target,
 			BObjectList<BQuery>*, BVolume *);
@@ -251,6 +252,8 @@ class Model {
 		bool fWritable;
 		BNode *fNode;
 		status_t fStatus;
+		BString fLocalizedName;
+		bool fHasLocalizedName;
 };
 
 

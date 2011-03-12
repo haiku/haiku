@@ -523,6 +523,8 @@ status_t GetAppSignatureFromAttr(BFile *, char *);
 status_t GetAppIconFromAttr(BFile *, BBitmap *, icon_size);
 status_t GetFileIconFromAttr(BNode *, BBitmap *, icon_size);
 
+extern bool gLocalizedNamePreferred;
+
 status_t GetLocalizedFileName(entry_ref& ref, BString& localizedFileName,
 	bool traverse = false);
 

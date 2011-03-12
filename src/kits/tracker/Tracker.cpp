@@ -226,6 +226,9 @@ TTracker::TTracker()
 	setrlimit(RLIMIT_NOFILE, &rl);
 
 	fNodeMonitorCount = DEFAULT_MON_NUM;
+	
+	gLocalizedNamePreferred
+		= BLocaleRoster::Default()->IsFilesystemTranslationPreferred();
 
 #ifdef CHECK_OPEN_MODEL_LEAKS
 	InitOpenModelDumping();
@@ -504,6 +507,15 @@ TTracker::MessageReceived(BMessage *message)
 		case kSpaceBarColorChanged:
 			gPeriodicUpdatePoses.DoPeriodicUpdate(true);
 			break;
+
+		case B_LOCALE_CHANGED:
+		{
+			BLocaleRoster::Default()->Refresh();
+			bool localize;
+			if (message->FindBool("filesys", &localize) == B_OK)
+				gLocalizedNamePreferred = localize;
+			break;
+		}
 
 		default:
 			_inherited::MessageReceived(message);

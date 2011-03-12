@@ -306,7 +306,7 @@ RosterData::SetFilesystemTranslationPreferred(bool preferred)
 	if (!lock.IsLocked())
 		return B_ERROR;
 
-	fIsFilesystemTranslationPreferred = preferred;
+	_SetFilesystemTranslationPreferred(preferred);
 
 	status_t status = _SaveLocaleSettings();
 
@@ -510,7 +510,7 @@ RosterData::_LoadLocaleSettings()
 		
 		bool preferred;
 		if (settings.FindBool(kTranslateFilesystemField, &preferred) == B_OK)
-			SetFilesystemTranslationPreferred(preferred);
+			_SetFilesystemTranslationPreferred(preferred);
 
 		return B_OK;
 	}
@@ -669,6 +669,13 @@ RosterData::_SetPreferredLanguages(const BMessage* languages)
 	}
 
 	return B_OK;
+}
+
+
+void
+RosterData::_SetFilesystemTranslationPreferred(bool preferred)
+{
+	fIsFilesystemTranslationPreferred = preferred;
 }
 
 

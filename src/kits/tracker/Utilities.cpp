@@ -1470,6 +1470,9 @@ GetFileIconFromAttr(BNode *file, BBitmap *result, icon_size size)
 }
 
 
+bool gLocalizedNamePreferred;
+
+
 /*!	\brief Looks up a localized filename in a catalog, using attribute data
 		on the entry.
 	\param ref An entry_ref with an attribute holding data for catalog lookup.

@@ -61,6 +61,7 @@ All rights reserved.
 #include "PublicCommands.h"
 #include "ResourceSet.h"
 #include "Switcher.h"
+#include "Utilities.h"
 
 
 BLocker TBarApp::sSubscriberLock;
@@ -95,6 +96,9 @@ TBarApp::TBarApp()
 	InitIconPreloader();
 
 	be_roster->StartWatching(this);
+
+	gLocalizedNamePreferred
+		= BLocaleRoster::Default()->IsFilesystemTranslationPreferred();
 
 	sBarTeamInfoList.MakeEmpty();
 
@@ -496,6 +500,10 @@ TBarApp::MessageReceived(BMessage* message)
 		{
 			BLocaleRoster::Default()->Refresh();
 
+			bool localize;
+			if (message->FindBool("filesys", &localize) == B_OK)
+				gLocalizedNamePreferred = localize;
+
 			BMessenger(fBarWindow->FindView("_deskbar_tv_")).SendMessage(
 				message);
 				// Notify the TimeView that the format has changed and it should
@@ -611,8 +619,7 @@ TBarApp::AddTeam(team_id team, uint32 flags, const char* sig, entry_ref* ref)
 	BAppFileInfo appMime(&file);
 
 	BString name;
-	if (!BLocaleRoster::Default()->IsFilesystemTranslationPreferred()
-		|| GetLocalizedFileName(*ref, name) != B_OK)
+	if (!gLocalizedNamePreferred || GetLocalizedFileName(*ref, name) != B_OK)
 		name = ref->name;
 
 	BarTeamInfo* barInfo = new BarTeamInfo(new BList(), flags, strdup(sig),
