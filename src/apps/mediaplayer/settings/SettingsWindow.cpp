@@ -64,7 +64,7 @@ SettingsWindow::SettingsWindow(BRect frame)
 	BStringView* viewOptionsLabel = new BStringView("stringViewViewOpions", 
 		B_TRANSLATE("View options"));
 	BStringView* bgMoviesModeLabel = new BStringView("stringViewPlayBackg", 
-		B_TRANSLATE("Play background clips at"));
+		B_TRANSLATE("Play background movies at"));
 	BAlignment alignment(B_ALIGN_LEFT, B_ALIGN_VERTICAL_CENTER);
 	playModeLabel->SetExplicitAlignment(alignment);
 	playModeLabel->SetFont(be_bold_font);
