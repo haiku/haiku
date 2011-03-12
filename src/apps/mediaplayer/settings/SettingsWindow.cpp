@@ -64,7 +64,7 @@ SettingsWindow::SettingsWindow(BRect frame)
 	BStringView* viewOptionsLabel = new BStringView("stringViewViewOpions", 
 		B_TRANSLATE("View options"));
 	BStringView* bgMoviesModeLabel = new BStringView("stringViewPlayBackg", 
-		B_TRANSLATE("Play background movies at"));
+		B_TRANSLATE("Volume of background clips"));
 	BAlignment alignment(B_ALIGN_LEFT, B_ALIGN_VERTICAL_CENTER);
 	playModeLabel->SetExplicitAlignment(alignment);
 	playModeLabel->SetFont(be_bold_font);
@@ -103,7 +103,7 @@ SettingsWindow::SettingsWindow(BRect frame)
 		new BMessage(M_SETTINGS_CHANGED));
 
 	fSubtitleSizeOP = new BOptionPopUp("subtitleSize",
-		B_TRANSLATE("Subtitle size"), new BMessage(M_SETTINGS_CHANGED));
+		B_TRANSLATE("Subtitle size:"), new BMessage(M_SETTINGS_CHANGED));
 	fSubtitleSizeOP->AddOption(
 		B_TRANSLATE("Small"), mpSettings::SUBTITLE_SIZE_SMALL);
 	fSubtitleSizeOP->AddOption(
@@ -112,7 +112,7 @@ SettingsWindow::SettingsWindow(BRect frame)
 		B_TRANSLATE("Large"), mpSettings::SUBTITLE_SIZE_LARGE);
 
 	fSubtitlePlacementOP = new BOptionPopUp("subtitlePlacement",
-		B_TRANSLATE("Subtitle placement"), new BMessage(M_SETTINGS_CHANGED));
+		B_TRANSLATE("Subtitle placement:"), new BMessage(M_SETTINGS_CHANGED));
 	fSubtitlePlacementOP->AddOption(B_TRANSLATE("Bottom of video"),
 		mpSettings::SUBTITLE_PLACEMENT_BOTTOM_OF_VIDEO);
 	fSubtitlePlacementOP->AddOption(B_TRANSLATE("Bottom of screen"),
