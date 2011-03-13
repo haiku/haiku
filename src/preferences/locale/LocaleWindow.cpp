@@ -235,8 +235,8 @@ LocaleWindow::LocaleWindow()
 		.Add(fFormatView)
 		.SetInsets(spacing, spacing, spacing, spacing));
 
-	BView* systemTab = new BView(B_TRANSLATE("System"), B_WILL_DRAW);
-	systemTab->SetLayout(new BGroupLayout(B_VERTICAL, 0));
+	BView* optionsTab = new BView(B_TRANSLATE("Options"), B_WILL_DRAW);
+	optionsTab->SetLayout(new BGroupLayout(B_VERTICAL, 0));
 
 	fFilesystemTranslationCheckbox = new BCheckBox("filesystemTranslation",
 		B_TRANSLATE("Translate application and folder names in Deskbar and Tracker."),
@@ -245,14 +245,14 @@ LocaleWindow::LocaleWindow()
 	fFilesystemTranslationCheckbox->SetValue(
 		BLocaleRoster::Default()->IsFilesystemTranslationPreferred());
 
-	systemTab->AddChild(BLayoutBuilder::Group<>(B_VERTICAL, spacing)
+	optionsTab->AddChild(BLayoutBuilder::Group<>(B_VERTICAL, spacing)
 		.Add(fFilesystemTranslationCheckbox)
 		.AddGlue()
 		.SetInsets(spacing, spacing, spacing, spacing));
 
 	tabView->AddTab(languageTab);
 	tabView->AddTab(countryTab);
-	tabView->AddTab(systemTab);
+	tabView->AddTab(optionsTab);
 
 	BButton* button
 		= new BButton(B_TRANSLATE("Defaults"), new BMessage(kMsgDefaults));
