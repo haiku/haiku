@@ -102,8 +102,9 @@ private:
 
 #undef B_TRANSLATE_APP_NAME
 #define B_TRANSLATE_APP_NAME(string) \
-	BLocaleRoster::Default()->GetCatalog()->GetString((string), \
-		B_TRANSLATE_APP_NAME_CONTEXT)
+	BLocaleRoster::Default()->IsFilesystemTranslationPreferred() \
+	? BLocaleRoster::Default()->GetCatalog()->GetString((string), \
+		B_TRANSLATE_APP_NAME_CONTEXT) : (string)
 
 #undef B_TRANSLATE_WITH_CONTEXT
 #define B_TRANSLATE_WITH_CONTEXT(string, context) \
