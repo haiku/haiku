@@ -27,7 +27,8 @@
 
 
 CalcWindow::CalcWindow(BRect frame, BMessage* settings)
-	: BWindow(frame, B_TRANSLATE("DeskCalc"), B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS)
+	: BWindow(frame, B_TRANSLATE_APP_NAME("DeskCalc"), B_TITLED_WINDOW,
+	B_ASYNCHRONOUS_CONTROLS)
 {
 	// create calculator view with calculator description and
 	// desktop background color

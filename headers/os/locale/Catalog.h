@@ -63,6 +63,10 @@ private:
 };
 
 
+#undef B_TRANSLATE_APP_NAME_CONTEXT
+#define B_TRANSLATE_APP_NAME_CONTEXT "Application name"
+
+
 #ifndef B_COLLECTING_CATKEYS
 
 #ifndef B_AVOID_TRANSLATION_MACROS
@@ -95,6 +99,11 @@ private:
 #define B_TRANSLATE(string) \
 	BLocaleRoster::Default()->GetCatalog()->GetString((string), \
 		B_TRANSLATE_CONTEXT)
+
+#undef B_TRANSLATE_APP_NAME
+#define B_TRANSLATE_APP_NAME(string) \
+	BLocaleRoster::Default()->GetCatalog()->GetString((string), \
+		B_TRANSLATE_APP_NAME_CONTEXT)
 
 #undef B_TRANSLATE_WITH_CONTEXT
 #define B_TRANSLATE_WITH_CONTEXT(string, context) \
@@ -153,6 +162,10 @@ private:
 #define B_TRANSLATE_MARK_ID(id) \
 	BCatalogAddOn::MarkForTranslation((id))
 
+#undef B_TRANSLATE_MARK_APP_NAME
+#define B_TRANSLATE_MARK_APP_NAME(str) \
+	BCatalogAddOn::MarkForTranslation((str), B_TRANSLATE_APP_NAME_CONTEXT, "")
+
 // Translation macros which do not let collectcatkeys try to collect the key
 // (useful in combination with the marking macros above):
 #undef B_TRANSLATE_NOCOLLECT
@@ -186,6 +199,10 @@ private:
 #define B_TRANSLATE(string) \
 	B_CATKEY((string), B_TRANSLATE_CONTEXT)
 
+#undef B_TRANSLATE_APP_NAME
+#define B_TRANSLATE_APP_NAME(string) \
+	B_CATKEY((string), B_TRANSLATE_APP_NAME_CONTEXT)
+
 #undef B_TRANSLATE_WITH_CONTEXT
 #define B_TRANSLATE_WITH_CONTEXT(string, context) \
 	B_CATKEY((string), (context))
@@ -217,6 +234,10 @@ private:
 #undef B_TRANSLATE_MARK_ID
 #define B_TRANSLATE_MARK_ID(id) \
 	B_CATKEY((id))
+
+#undef B_TRANSLATE_MARK_APP_NAME
+#define B_TRANSLATE_MARK_APP_NAME(str) \
+	B_CATKEY((str), B_TRANSLATE_APP_NAME_CONTEXT, "")
 
 #undef B_TRANSLATE_NOCOLLECT
 #define B_TRANSLATE_NOCOLLECT(str) \

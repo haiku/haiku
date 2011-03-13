@@ -1,7 +1,7 @@
 
 resource app_signature "application/x-vnd.Haiku-DeskCalc";
 
-resource app_name_catalog_entry "x-vnd.Haiku-DeskCalc:Window:DeskCalc";
+resource app_name_catalog_entry "x-vnd.Haiku-DeskCalc:Application name:DeskCalc";
 
 resource app_version {
 	major  = 2,
