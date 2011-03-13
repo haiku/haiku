@@ -30,7 +30,7 @@
 #include "paging/arm_physical_page_mapper.h"
 
 
-#define TRACE_ARM_VM_TRANSLATION_MAP_32_BIT
+//#define TRACE_ARM_VM_TRANSLATION_MAP_32_BIT
 #ifdef TRACE_ARM_VM_TRANSLATION_MAP_32_BIT
 #	define TRACE(x...) dprintf(x)
 #else

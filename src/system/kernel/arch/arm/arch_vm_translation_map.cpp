@@ -17,7 +17,7 @@
 //#include "paging/pae/ARMPagingMethodPAE.h"
 
 
-#define TRACE_VM_TMAP
+//#define TRACE_VM_TMAP
 #ifdef TRACE_VM_TMAP
 #	define TRACE(x...) dprintf(x)
 #else
