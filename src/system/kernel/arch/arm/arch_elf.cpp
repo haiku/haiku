@@ -189,6 +189,7 @@ arch_elf_relocate_rel(struct elf_image_info *image,
 		switch (ELF32_R_TYPE(rel[i].r_info)) {
 			case R_ARM_JMP_SLOT:
 			case R_ARM_GLOB_DAT:
+			case R_ARM_ABS32:
 			{
 				struct Elf32_Sym *symbol;
 				status_t status;
@@ -215,6 +216,7 @@ arch_elf_relocate_rel(struct elf_image_info *image,
 
 		// calc A
 		switch (ELF32_R_TYPE(rel[i].r_info)) {
+			case R_ARM_ABS32:
 			case R_ARM_RELATIVE:
 				A = *(addr_t *)(image->text_region.delta + rel[i].r_offset);
 				TRACE(("A %p\n", (void *)A));
@@ -232,7 +234,9 @@ arch_elf_relocate_rel(struct elf_image_info *image,
 			case R_ARM_GLOB_DAT:
 				finalAddress = S;
 				break;
-
+			case R_ARM_ABS32:
+				finalAddress = S + A;
+				break;
 			default:
 				dprintf("arch_elf_relocate_rel: unhandled relocation type %d\n",
 					ELF32_R_TYPE(rel[i].r_info));
@@ -367,89 +371,20 @@ arch_elf_relocate_rela(struct elf_image_info *image,
                                 break;
                 }
 
-
 #warning ARM:ADDOTHERREL
-
-
                 switch (ELF32_R_TYPE(rel[i].r_info)) {
-//			case R_ARM_BREL_ADJ:
-//				?B(S) + A
-/*			case R_ARM_TLS_DESC:
-
-			case R_ARM_THM_XPC22 reserved for future Dynamic relocations:
-
-			case R_ARM_TLS_DTPMOD32:
-Module[S]
-			case R_ARM_TLS_DTPOFF32:
-S + A ? TLS
-			case R_ARM_TLS_TPOFF32:
-S + A ? tp
-*/
 			case R_ARM_GLOB_DAT:
 				write_32(P,(S + A) | T);
 				break;
-/*			case R_ARM_JUMP_SLOT:
-(S + A) | T
-			case R_ARM_RELATIVE:
-B(S) + A [Note: see Table 4-16]
-
-*/
-
-
-
-
-
-
 
                         case R_ARM_NONE:
                                 break;
 
-                        case R_ARM_COPY:
-                                // TODO: Implement!
-                                dprintf("arch_elf_relocate_rela(): R_68K_COPY not yet "
-                                        "supported!\n");
+			default:
+                                dprintf("arch_elf_relocate_rela(): unhandled "
+					"relocation type %d!\n", 
+					ELF32_R_TYPE(rel[i].r_info));
                                 return B_ERROR;
-/*
-                        case R_68K_32:
-                        case R_68K_GLOB_DAT:
-                                write_32(P, S + A);
-                                break;
-
-                        case R_68K_16:
-                                if (write_16_check(P, S + A))
-                                        break;
-dprintf("R_68K_16 overflow\n");
-                                return B_BAD_DATA;
-
-                        case R_68K_8:
-                                if (write_8_check(P, S + A))
-                                        break;
-dprintf("R_68K_8 overflow\n");
-                                return B_BAD_DATA;
-
-                        case R_68K_PC32:
-                                write_32(P, (S + A - P));
-                                break;
-
-                        case R_68K_PC16:
-                                if (write_16_check(P, (S + A - P)))
-                                        break;
-dprintf("R_68K_PC16 overflow\n");
-                                return B_BAD_DATA;
-
-                        case R_68K_PC8:
-                                if (write_8(P, (S + A - P)))
-                                        break;
-dprintf("R_68K_PC8 overflow\n");
-                                return B_BAD_DATA;
-
-                        case R_68K_GOT32:
-                                REQUIRE_GOT;
-                                write_32(P, (G + A - P));
-                                break;
-*/
-
-
 		}
 }
 #warning ARM: FIXME!!!!!!!
