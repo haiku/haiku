@@ -138,21 +138,13 @@ main(int argc, char **argv)
 		TimedAlert::GetLabel(string);
 
 		int32 index = (new TimedAlert("timedAlert", string.String(),
-			B_TRANSLATE("Ask me later"), B_TRANSLATE("Yes"),
-			B_TRANSLATE("No")))->Go();
+			B_TRANSLATE("Ask me later"), B_TRANSLATE("Use this time"),
+			B_TRANSLATE("Manually adjust time" B_UTF8_ELLIPSIS)))->Go();
 		if (index == 0)
 			exit(0);
 
-		if (index == 2) {
-			BAlert *alert = new BAlert("dstcheck",
-				B_TRANSLATE("Would you like to set the clock?"),
-				B_TRANSLATE("No"), B_TRANSLATE("Yes"));
-			alert->SetShortcut(0, B_ESCAPE);
-			index = alert->Go();
-
-			if (index == 1)
-				be_roster->Launch("application/x-vnd.Haiku-Time");
-		}
+		if (index == 2)
+			be_roster->Launch("application/x-vnd.Haiku-Time");
 	}
 
 	lseek(fd, 0, SEEK_SET);
