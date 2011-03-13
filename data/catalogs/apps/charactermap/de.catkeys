@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-CharacterMap	3936993594
+1	german	x-vnd.Haiku-CharacterMap	1305599334
 About CharacterMap…	CharacterWindow		Über CharacterMap...
 Aegean numbers	UnicodeBlocks		Ägäische Zahlen
 Alphabetic presentation forms	UnicodeBlocks		Alphabetische Präsentationsformen
@@ -35,7 +35,6 @@ CJK unified ideographs extension B	UnicodeBlocks		CJK: Einheitliche Ideogramme (
 Carian	UnicodeBlocks		Karisch
 Cham	UnicodeBlocks		Cham
 CharacterMap	CharacterWindow		CharacterMap
-CharacterMap settings	CharacterWindow		CharacterMap-Einstellungen
 CharacterMap\n\twritten by Axel Dörfler\n\tCopyright 2009, Haiku, Inc.\n	CharacterMap		CharacterMap\n\tvon Axel Dörfler.\n\tCopyright 2009, Haiku, Inc.\n	
 Cherokee	UnicodeBlocks		Cherokee
 Clear	CharacterWindow		Löschen

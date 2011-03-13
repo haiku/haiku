@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-FileTypes	3001025756
+1	german	x-vnd.Haiku-FileTypes	686287948
 %1 application type	Application Type Window		%1 Anwendungstyp
 %ld Application type%s could be removed.	Application Types Window		%ld Anwendungstyp%s konnte entfernt werden.
 %s file type	FileType Window		%s Dateityp
@@ -109,8 +109,7 @@ Preferred application	FileType Window		Bevorzugte Anwendung
 Preferred application	FileTypes Window		Bevorzugte Anwendung
 Progress	Application Types Window		Fortschritt
 Quit	FileTypes Window		Beenden
-Quit, don't save	Application Type Window		Beenden ohne zu speichern
-Quit, don't save	Application Type Window		Beenden, ohne zu speichern
+Quit, don't save	Application Type Window		Beenden, nicht speichern
 Recognition rule is not valid:\n\n	FileTypes Window		Erkennungsregel ist ungültig:\n\n
 Remove	Application Type Window		Entfernen
 Remove	FileTypes Window		Entfernen
@@ -121,8 +120,8 @@ Removing a super type cannot be reverted.\nAll file types that belong to this su
 Removing uninstalled application types	Application Types Window		Deinstallierte Anwendungen werden entfernt
 Right	Attribute Window	Attribute column alignment in Tracker	Rechts
 Rule:	FileTypes Window		Regel:
-Same as…	FileType Window	The same APPLICATION as\xE2\x80\xA6	Gleiche wie...
-Same as…	FileType Window	The same TYPE as\xE2\x80\xA6	Gleicher wie...
+Same as…	FileType Window	The same APPLICATION as ...	Gleiche wie...
+Same as…	FileType Window	The same TYPE as ...	Gleicher wie...
 Same as…	FileTypes Window		Gleiche wie...
 Save	Application Type Window		Speichern
 Save into resource file…	Application Type Window		In Resource-Datei speichern...

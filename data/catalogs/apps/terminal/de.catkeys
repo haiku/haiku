@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Terminal	3038436492
+1	german	x-vnd.Haiku-Terminal	1413115910
 -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h, --help diesen Hilfetext anzeigen\n -t, --title Fenstertitel setzen\n -f, --fullscreen Vollbildmodus starten\n
 Abort	Terminal Shell		Abbrechen
 About Terminal…	Terminal TermWindow		Über Terminal...
@@ -25,12 +25,10 @@ Copy here	Terminal TermView		Hierher kopieren
 Create link here	Terminal TermView		Verknüpfung hier erstellen
 Custom	Terminal colors schema		Benutzerdefiniert
 Decrease	Terminal TermWindow		Verkleinern
-Didn't find any available pseudo ttys.	Terminal Shell		Es konnten keine verfügbaren Pseudo-TTYs gefunden werden.
 Don't save	Terminal PrefWindow		Verwerfen
 Edit	Terminal TermWindow		Bearbeiten
 Edit tab title…	Terminal TermWindow		Reiter umbenennen...
 Error!	Terminal getString		Fehler!
-Failed to init pseudo tty.	Terminal Shell		Initialisierung des Pseudo-TTY fehlgeschlagen.
 Find	Terminal FindWindow		Suchen
 Find failed	Terminal TermWindow		Suche fehlgeschlagen
 Find next	Terminal TermWindow		Weitersuchen
@@ -56,7 +54,6 @@ OK	Terminal TermView		OK
 OK	Terminal TermWindow		OK
 Page setup…	Terminal TermWindow		Seiten einrichten...
 Paste	Terminal TermWindow		Einfügen
-PrefHandler::getRGB(%s) - key not found\n	Terminal getRGB		PrefHandler::getRGB(%s) - Schlüssel nicht gefunden\n
 Print	Terminal TermWindow		Drucken
 Print cancelled.	Terminal TermWindow		Drucken abgebrochen.
 Quit	Terminal TermWindow		Beenden
@@ -66,7 +63,6 @@ Save as default	Terminal TermWindow		Als Standard speichern
 Save changes to this settings panel?	Terminal PrefWindow		Änderungen dieser Einstellungen speichern?
 Save to file…	Terminal PrefWindow		In Datei speichern…
 Search forward	Terminal FindWindow		Vorwärts suchen
-Secondary mouse button drop menu	Terminal TermView		Kontextmenü bei Fallenlassen
 Select all	Terminal TermWindow		Alles auswählen
 Selected background	Terminal AppearancePrefView		Auswahl-Hintergrund
 Selected text	Terminal AppearancePrefView		Ausgewählter Text
@@ -106,9 +102,4 @@ Window title:	Terminal TermWindow		Fenstertitel:
 Window title…	Terminal TermWindow		Fenstertitel...
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tDas aktuelle Arbeitsverzeichnis des aktiven Prozesses\n\t\t\t in diesem Reiter. Optional kann die maximale Anzahl von Pfad-Komponenten\n\t\t\t angegeben werden, z.B. '%2d' für maximal zwei Komponenten.\n\t%i\t-\tDer Index des Fensters.\n\t%p\t-\tDer Titel dieses Reiters.\n\t%%\t-\tDas %-Zeichen.
 \t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tDas aktuelle Arbeitsverzeichnis des aktiven Prozesses.\n\t\t\tOptional kann die maximale Anzahl von Pfad-Komponenten\n\t\t\t angegeben werden, z.B. '%2d' für maximal zwei Komponenten.\n\t%i\t-\tDer Index des Reiters.\n\t%p\t-\tDer Name des aktiven Prozesses.\n\t%%\t-\tDas %-Zeichen.
-can't open tty (%s).	Terminal Shell		kann tty (%s) nicht öffnen.
-could not set session leader.	Terminal Shell		konnte "Session Leader" nicht setzen.
-failed set terminal interface (TERMIOS).	Terminal Shell		Terminal-Interface (TERMIOS) setzen fehlgeschlagen.
-mismatch handshake.	Terminal Shell		Handshake passt nicht.
-sigaction() failed: %s\n	Terminal TermApp		sigaction() fehlgeschlagen: %s\n
 size	Terminal TermView		Größe

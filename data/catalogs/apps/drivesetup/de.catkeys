@@ -59,7 +59,7 @@ Size	PartitionList		Größe
 Surface test (not implemented)	MainWindow		Oberflächentest (nicht implementiert)
 The currently selected partition does not have a parent partition.	MainWindow		Die ausgewählte Partition hat keine übergeordnete Partition.
 The currently selected partition is not empty.	MainWindow		Die gewählte Partition ist nicht leer.
-The partition %s has been successfully initialized.\n	MainWindow		Die Partition \"%s\" wurde erfolgreich initialisiert.\n
+The partition %s has been successfully initialized.\n	MainWindow		Die Partition %s wurde erfolgreich initialisiert.\n
 The partition %s is already mounted.	MainWindow		Die Partition \"%s\" ist bereits eingehangen.
 The partition %s is already unmounted.	MainWindow		Die Partition \"%s\" ist bereits ausgehangen.
 The partition %s is currently mounted.	MainWindow		Die Partition \"%s\" ist momentan eingehangen.

@@ -1,17 +1,16 @@
-1	german	x-vnd.Haiku-libtracker	3940918985
+1	german	x-vnd.Haiku-libtracker	498395429
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 %Ld B	WidgetAttributeText		%Ld B
 %Ld bytes	WidgetAttributeText		%Ld Bytes
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used benutzt -- %free frei)
 %name info	InfoWindow	InfoWindow Title	%name Info
 %num items	CountView		%num Objekte
-(%SizeProcessed of %TotalSize, %BytesPerSecond/s)	StatusWindow		(%SizeProcessed von %TotalSize, %BytesPerSecond/s)	
+(%SizeProcessed of %TotalSize, %BytesPerSecond/s)	StatusWindow		(%SizeProcessed von %TotalSize, %BytesPerSecond/s)
 (%bytes bytes)	InfoWindow		(%bytes Bytes)
 (Finish: %time - %finishtime minutes left)	StatusWindow		(Fertig: %time - %finishtime Minuten übrig)
 (Finish: %time - %finishtime seconds left)	StatusWindow		(Fertig: %time - %finishtime Sekunden übrig)
 (Finish: %time - Over %finishtime days left)	StatusWindow		(Fertig: %time - Über %finishtime Tage übrig)
-(Finish: %time - Over %finishtime hours left)	StatusWindow		(Fertig: %time - Über %finishtime Stunden übrig)	
-
+(Finish: %time - Over %finishtime hours left)	StatusWindow		(Fertig: %time - Über %finishtime Stunden übrig)
 (Finish: %time)	StatusWindow		(Fertig: %time)
 1 item	CountView		1 Objekt
 32 x 32	ContainerWindow		32 x 32
@@ -336,9 +335,8 @@ Skip	FSUtils		Überspringen
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Manche Objekte in diesem Ordner heißen genauso wie Objekte, die gerade %verb werden sollen.\n\nSollen sie alle ersetzt werden, oder soll jedes Mal einzeln nachgefragt werden?
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Einige der ausgewählten Objekte können nicht in den Papierkorb verschoben werden. Sollen sie stattdessen gelöscht werden? (Diese Aktion kann nicht rückgängig gemacht werden.)
 Sorry, could not create a new folder.	FSUtils		Der neue Ordner konnte leider nicht erstellt werden.
-Sorry, saving more than one item is not allowed.	FilePanelPriv		Es kann leider im nur ein einzelnes Objekt  gespeichert werden.
+Sorry, saving more than one item is not allowed.	FilePanelPriv		Es kann leider im nur ein einzelnes Objekt gespeichert werden.
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Das 'Zeichen' Attribut kann leider keine Multi-Byte Zeichen speichern.
-
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Es ist nicht genug Speicherplatz auf dem Zieldatenträger frei, um die Auswahl zu kopieren.
 Sorry, you can't copy items to the Trash.	FSClipBoard		Objekte können leider nicht in den Papierkorb kopiert werden.
 Sorry, you can't copy items to the Trash.	PoseView		Objekte können leider nicht in den Papierkorb kopiert werden.
@@ -395,7 +393,7 @@ You can't replace a folder with one of its sub-folders.	FSUtils		Ordner können 
 You cannot copy or move the root directory.	FSUtils		Das Root-Verzeichnis kann nicht kopiert oder bewegt werden.
 You cannot create a link to the root directory.	FSUtils		Auf das Root-Verzeichnis des Laufwerks kann keine Verknüpfung erstellt werden.
 You cannot put the Trash, home or Desktop directory into the trash.	FSUtils		Der Papierkorb, der home-Ordner und der Desktop können nicht in den Papierkorb verschoben werden.
-You cannot replace a file with a folder or a symbolic link.	FSUtils		Dateien können nicht mit Ordnern oder  Verknüpfungen ersetzt werden.
+You cannot replace a file with a folder or a symbolic link.	FSUtils		Dateien können nicht mit Ordnern oder Verknüpfungen ersetzt werden.
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Ordner oder Verknüpfungen können nicht mit einer Datei ersetzt werden.
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Objekte müssen auf eines der Icons im \"Datenträger\" Fenster fallengelassen werden.
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Objekte müssen auf eines der Icons im \"Datenträger\" Fenster fallengelassen werden.

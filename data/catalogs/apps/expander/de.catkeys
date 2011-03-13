@@ -32,7 +32,7 @@ Other:	ExpanderPreferences		Allgemeines:
 Same directory as source (archive) file	ExpanderPreferences		Gleicher Ordner wie Quelldatei
 Select	DirectoryFilePanel		Auswählen
 Select	ExpanderPreferences		Auwählen
-Select '%s'	DirectoryFilePanel		Verwende '%s'
+Select '%s'	DirectoryFilePanel		'%s' wählen
 Select current	DirectoryFilePanel		Aktuellen wählen
 Set destination…	ExpanderMenu		Ziel wählen…
 Set source…	ExpanderMenu		Quelle wählen…

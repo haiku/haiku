@@ -1,4 +1,7 @@
-1	german	x-vnd.Haiku-Pulse	2756001860
+1	german	x-vnd.Haiku-Pulse	1325849358
+%.2f GHz	NormalPulseView		%.2f GHz
+%ld MHz	NormalPulseView		%ld MHz
+%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nvon David Ramsey und Arve Hjønnevåg\nÜberarbeitet von Daniel Switkin\n
 About Pulse…	CPUButton		Über Pulse...
 About Pulse…	PulseView		Über Pulse...
 Active color	ConfigView		Aktive Farbe
@@ -10,12 +13,15 @@ Deskbar menu	CPUButton		Deskbar-Menü
 Deskbar mode	MiniPulseView		Deskbar-Modus
 Deskbar mode	NormalPulseView		Deskbar-Modus
 Deskbar mode	PrefsWindow		Deskbar-Modus
+Error	PulseApp		Fehler
 Fade colors	ConfigView		Verblassende Balken
 Frame color	ConfigView		Rahmenfarbe
 Idle color	ConfigView		Leerlauffarbe
 Info	CPUButton		Info
 Info	DeskbarPulseView		Info
-Info	PulseWindow		Info
+Info	PulseApp		Info
+Info	PulseView		Info
+Installing in Deskbar failed\n%s	PulseApp		Installation in Deskbar fehlgeschlagen.\n%s
 Mini mode	DeskbarPulseView		Mini-Modus
 Mini mode	NormalPulseView		Mini-Modus
 Mini mode	PrefsWindow		Mini-Modus
@@ -27,17 +33,14 @@ OK	DeskbarPulseView		OK
 OK	PrefsWindow		OK
 OK	PulseApp		OK
 OK	PulseView		OK
-OK	PulseWindow		OK
 Pulse	NormalPulseView		Pulse
+Pulse	PulseApp		Pulse
 Pulse	PulseWindow		Pulse
 Pulse settings	PulseWindow		Pulse-Einstellungen
-Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	CPUButton		Pulse\n\nVon David Ramsey und Arve Hjønnevåg\nÜberarbeitet von Daniel Switkin
-Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	DeskbarPulseView		Pulse\n\nVon David Ramsey und Arve Hjønnevåg\nÜberarbeitet von Daniel Switkin
-Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	PulseWindow		Pulse\n\nVon David Ramsey und Arve Hjønnevåg\nÜberarbeitet von Daniel Switkin
 Quit	DeskbarPulseView		Beenden
 Quit	MiniPulseView		Beenden
 Remove replicant	CPUButton		Replikant entfernen
-Remove(): %s	DeskbarPulseView		Remove(): %s
+Removing from Deskbar failed.\n%s	DeskbarPulseView		Entfernen aus Deskbar fehlgeschlagen.\n%s
 Settings…	PulseView		Einstellungen...
 Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Gebrauch: Pulse [--mini] [-w Breite] [--width=Breite]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
 Width of icon:	ConfigView		Balkenbreite:

@@ -1,11 +1,11 @@
-1	german	x-vnd.Haiku-MediaConverter	3383482196
+1	german	x-vnd.Haiku-MediaConverter	4254955936
 %.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld Kanal / %lld Frames
 %.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz Mono / %lld Frames
 %.1f kHz stereo / %lld frames	MediaFileInfo		%.1f kHz Stereo / %lld Frames
-%Ld x %Ld, %Ld fps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%Ld x %Ld, %Ld Frames/s / %Ld Frames
 %amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles Dateien scheinen keine unterstützten Mediendateien zu sein:
 %d bit 	MediaFileInfo		%d Bit
 %d byte 	MediaFileInfo		%d Byte
+%u x %u, %.2ffps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%u x %u, %.2f Frames/s / %Ld Frames
 About MediaConverter…	Menu		Über MediaConverter...
 About…	MediaConverter		About...
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Es ist ein Fehler beim Lesen der Dateiinformationen aufgetreten.\n\nFehler:
@@ -66,6 +66,6 @@ Video quality not supported	MediaConverter		Videoqualität nicht einstellbar
 Video quality: %3d%%	MediaConverter		Videoqualität: %3d%%
 Video using parameters form settings	MediaConverter		Video benutzt die Parameter aus den Einstellungen
 Video:	MediaConverter-FileInfo		Video:
-Writing audio track: %Ld %% complete	MediaConverter		Tonspur wird geschrieben: %Ld %% fertig
-Writing video track: %Ld %% complete	MediaConverter		Videospur wird geschrieben: %Ld %% fertig
+Writing audio track: %ld%% complete	MediaConverter		Tonspur wird geschrieben: %ld%% fertig
+Writing video track: %ld%% complete	MediaConverter		Videospur wird geschrieben: %ld%% fertig
 seconds	MediaFileInfo		Sekunden

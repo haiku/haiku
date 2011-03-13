@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-MediaPlayer	1801311807
+1	german	x-vnd.Haiku-MediaPlayer	2559622077
 1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (Amerikanisch)
 100% scale	MediaPlayer-Main		100% Zoom
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2,35 : 1 (Cinemascope)
@@ -52,7 +52,6 @@ Loop movies by default	MediaPlayer-SettingsWindow		Video in Endlosschleife abspi
 Loop sounds by default	MediaPlayer-SettingsWindow		Audio in Endlosschleife abspielen
 Low volume	MediaPlayer-SettingsWindow		Niedrige Lautstärke
 MediaPlayer	MediaPlayer-Main		MediaPlayer
-MediaPlayer Current Playlist	MediaPlayer-Main		MediaPlayer aktuelle Playliste
 MediaPlayer encountered an internal error. The file could not be opened.	MediaPlayer-Main		Es ist ein interner Fehler in MediaPlayer aufgetreten. Die Datei konnte nicht geöffnet werden.
 MediaPlayer settings	MediaPlayer-SettingsWindow		MediaPlayer-Einstellungen
 MediaPlayer\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		MediaPlayer\n\nvon Marcus Overhagen, Stephan Aßmus und Frederik Modéen
@@ -81,7 +80,6 @@ Open…	MediaPlayer-PlaylistWindow		Öffnen...
 Pause	MediaPlayer-Main		Pause
 Pause playback.	MediaPlayer-Main		Wiedergabe anhalten.
 Play	MediaPlayer-Main		Wiedergabe
-Play background clips at	MediaPlayer-SettingsWindow		Wiedergabe im Hintergrund
 Play mode	MediaPlayer-SettingsWindow		Wiedergabe
 Playlist	MediaPlayer-PlaylistWindow		Playliste
 Playlist…	MediaPlayer-Main		Playliste...
@@ -118,8 +116,8 @@ Start playing.	MediaPlayer-Main		Starte Wiedergabe.
 Stop	MediaPlayer-Main		Stopp
 Stop playing.	MediaPlayer-Main		Wiedergabe stoppen.
 Stream settings	MediaPlayer-Main		Stream-Einstellungen
-Subtitle placement	MediaPlayer-SettingsWindow		Untertitelposition:
-Subtitle size	MediaPlayer-SettingsWindow		Untertitelgröße:
+Subtitle placement:	MediaPlayer-SettingsWindow		Untertitelposition:
+Subtitle size:	MediaPlayer-SettingsWindow		Untertitelgröße:
 Subtitles	MediaPlayer-Main		Untertitel
 Thanks	MediaPlayer-Main		Danke
 The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Die Datei '%filename' konnte nicht geöffnet werden.\n\n
@@ -137,6 +135,7 @@ Video	MediaPlayer-Main		Video
 Video track	MediaPlayer-Main		Videospur
 View options	MediaPlayer-SettingsWindow		Darstellung
 Volume	MediaPlayer-Main		Lautstärke
+Volume of background clips	MediaPlayer-SettingsWindow		Wiedergabe im Hintergrund
 error	MediaPlayer-Main		Fehler
 none	Audio track menu		keine
 none	Subtitles menu		kein

@@ -1,10 +1,10 @@
 1	german	x-vnd.Haiku-PowerStatus	51899741
 About	PowerStatus		über
-About…	PowerStatus		Über...
+About…	PowerStatus		Über…
 Battery charging	PowerStatus		Akku wird geladen
 Battery discharging	PowerStatus		Akku wird entladen
 Battery info	PowerStatus		Akku-Infos
-Battery info…	PowerStatus		Akku Infos...
+Battery info…	PowerStatus		Akku-Infos…
 Battery unused	PowerStatus		Akku unbenutzt
 Capacity granularity 1: 	PowerStatus		Kapazitätsgenauigkeit 1:
 Capacity granularity 2: 	PowerStatus		Kapazitätsgenauigkeit 2:
@@ -15,7 +15,7 @@ Design capacity warning: 	PowerStatus		Kapazitätswarnung (lt. Hersteller):
 Design capacity: 	PowerStatus		Kapazität (lt. Hersteller):
 Design voltage: 	PowerStatus		Spannung (lt. Hersteller):
 Empty battery slot	PowerStatus		Akkufach ist leer
-Extended battery info	PowerStatus		Erweiterte Akku Infos
+Extended battery info	PowerStatus		Erweiterte Akku-Infos
 Install in Deskbar	PowerStatus		In Deskbar installieren
 Last full charge: 	PowerStatus		Letzte vollständige Ladung:
 Model number: 	PowerStatus		Modellnummer:

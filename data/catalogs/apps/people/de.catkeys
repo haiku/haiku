@@ -1,4 +1,4 @@
-1	german	x-vnd.Be-PEPL	3664557316
+1	german	x-vnd.Be-PEPL	3077845462
 %name% picture	People		%name% Bild
 About	People		Über
 Address	People		Adresse
@@ -13,6 +13,7 @@ Copy	People		Kopieren
 Could not create %s.	People		\"%s\" konnte nicht erstellt werden.
 Country	People		Land
 Cut	People		Ausschneiden
+Drop an image here,\nor use the contextual menu.	People		Bild hier fallen lassen,\noder Kontextmenü nutzen.
 E-mail	People		E-mail
 Edit	People		Bearbeiten
 Error	People		Fehler
@@ -39,6 +40,7 @@ Save changes before quitting?	People		Änderungen vor dem Beenden speichern?
 Select all	People		Alles auswählen
 Sorry	People		Entschuldigung
 State	People		Bundesland
+The file '%name%' could not be written.	People		Die Datei '%name%' konnte nicht gespeichert werden.
 URL	People		URL
 Undo	People		Rückgängig
 Unnamed person	People		Unbenannte Person
