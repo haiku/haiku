@@ -58,6 +58,8 @@ POP3Protocol::POP3Protocol(BMailAccountSettings* settings)
 	fSettings = fAccountSettings.InboundSettings().Settings();
 #ifdef USE_SSL
 	fUseSSL = (fSettings.FindInt32("flavor") == 1);
+	fSSL = NULL;
+	fSSLContext = NULL;
 #endif
 
 	if (fSettings.FindString("destination", &fDestinationDir) != B_OK)
@@ -177,6 +179,7 @@ POP3Protocol::SyncMessages()
 		BPath path(fDestinationDir);
 		BString fileName = "Downloading file... uid: ";
 		fileName += uid;
+		fileName.ReplaceAll("/", "_SLASH_");
 		path.Append(fileName);
 		BEntry entry(path.Path());
 		BFile file(&entry, B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
