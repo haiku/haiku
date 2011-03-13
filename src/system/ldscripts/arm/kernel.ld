@@ -1,8 +1,6 @@
 OUTPUT_FORMAT("elf32-littlearm", "elf32-littlearm", "elf32-littlearm")
 OUTPUT_ARCH(arm)
 
-ENTRY(_start)
-
 /* XXX: this shouldn't be needed to make kernel_arm have separate text and data segments!!! */
 PHDRS
 {
@@ -11,6 +9,9 @@ PHDRS
 	data PT_LOAD ;
 	dynamic PT_DYNAMIC ;
 }
+
+ENTRY(_start)
+SEARCH_DIR("libgcc");
 SECTIONS
 {
 	. = 0x80000000 + SIZEOF_HEADERS;
@@ -43,36 +44,21 @@ SECTIONS
 	.plt : { *(.plt) }
 
 	/* text/read-only data */
-	.text :	{ *(.text .text.* .glue_7* .gnu.linkonce.t.*) } :text =0x9090
+	.text :	{ *(.text .gnu.linkonce.t.*) } :text =0x9090
 
-	.rodata : { 
-		*(.rodata .rodata.* .gnu.linkonce.r.*)
-		. = ALIGN(4);
-		__commands_start = .;
-		KEEP (*(.commands))
-		__commands_end = .;
-		. = ALIGN(4);
-		__apps_start = .;
-		KEEP (*(.apps))
-		__apps_end = .;
-		. = ALIGN(4); 
-		__rodata_end = . ;		
-	}
+	.rodata : { *(.rodata) }
 
 	/* exception unwinding - should really not be needed! XXX: find the correct place. */
 	__exidx_start = .;
 	.ARM.exidx   : { *(.ARM.exidx* .gnu.linkonce.armexidx.*) }
 	__exidx_end = .;
 
-
-	.dynamic : { *(.dynamic) } :dynamic :data
-
-
 	/* writable data  */
-	__data_start_rom = .;	/* in one segment binaries, the rom data address is on top of the ram data address */
+	. = ALIGN(0x1000);
 	__data_start = .;
-	.data : SUBALIGN(4) { *(.data .data.* .gnu.linkonce.d.*) } :data
+	.data : { *(.data .gnu.linkonce.d.*) } :data
 
+	. = ALIGN(0x4);
 	__ctor_list = .;
 	.ctors : { *(.ctors) }
 	__ctor_end = .;
@@ -80,19 +66,14 @@ SECTIONS
 	.dtors : { *(.dtors) }
 	__dtor_end = .;
 	.got : { *(.got.plt) *(.got) }
-
-	__data_end = .;
+	.dynamic : { *(.dynamic) } :dynamic :data
 
 	/* uninitialized data (in same segment as writable data) */
-	. = ALIGN(4);
 	__bss_start = .;
-	.bss : { *(.bss .bss.*) }
+	.bss : { *(.bss) }
 
-	. = ALIGN(4); 
+	. = ALIGN(0x1000);
 	_end = .;
-
-/*	. =  0x80000000 + %MEMSIZE%; */
-	_end_of_ram = .;
 
 	/* Strip unnecessary stuff */
 	/DISCARD/ : { *(.comment .note .eh_frame) }
