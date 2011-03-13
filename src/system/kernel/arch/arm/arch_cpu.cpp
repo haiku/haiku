@@ -12,8 +12,6 @@
 
 #include <KernelExport.h>
 
-//#include <arch_platform.h>
-#include <arch_thread.h>
 #include <arch/cpu.h>
 #include <boot/kernel_args.h>
 #include <commpage.h>

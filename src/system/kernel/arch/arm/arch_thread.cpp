@@ -12,6 +12,7 @@
  */
 
 
+#include <thread.h>
 #include <arch_thread.h>
 
 #include <arch_cpu.h>
