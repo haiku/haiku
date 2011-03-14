@@ -1,5 +1,5 @@
-1	czech	x-vnd.Haiku-RAWTranslator	2919758153
-%s RAW image	RAWTranslator	Parameter (%s) is the name of the manufacturer (like \"Canon\")	%s RAW formát
+1	czech	x-vnd.Haiku-RAWTranslator	1938728039
+%s RAW image	RAWTranslator	Parameter (%s) is the name of the manufacturer (like 'Canon')	%s RAW obrázek
 Based on Dave Coffin's dcraw 8.63	ConfigView		Vytvořeno na základě dcraw 8.63 Dave Coffina
 RAW Images	ConfigView		Obrázky RAW
 RAW Settings	RAWTranslator main		nastavení RAW

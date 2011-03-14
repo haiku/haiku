@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-Terminal	3038436492
+1	czech	x-vnd.Haiku-Terminal	1413115910
 -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h, --help vypíše tuto nápovědu\n -t, --title nastaví nadpis okna\n -f, --fullscreen spustí přes celou obrazovku\n
 Abort	Terminal Shell		Zrušit
 About Terminal…	Terminal TermWindow		O programu Terminál...
@@ -25,12 +25,10 @@ Copy here	Terminal TermView		Kopíruj zde
 Create link here	Terminal TermView		Vytvoř zde link
 Custom	Terminal colors schema		Vlastní
 Decrease	Terminal TermWindow		Zmenšit
-Didn't find any available pseudo ttys.	Terminal Shell		Žádné pseudo tty není k dispozici.
 Don't save	Terminal PrefWindow		Neukládat
 Edit	Terminal TermWindow		Úpravy
 Edit tab title…	Terminal TermWindow		Upravit nadpis panelu...
 Error!	Terminal getString		Chyba!
-Failed to init pseudo tty.	Terminal Shell		Inicializace pseudo tty selhala.
 Find	Terminal FindWindow		Najít
 Find failed	Terminal TermWindow		Vyhledávání selhalo
 Find next	Terminal TermWindow		Vyhledat další
@@ -56,7 +54,6 @@ OK	Terminal TermView		OK
 OK	Terminal TermWindow		OK
 Page setup…	Terminal TermWindow		Nastavení stránky...
 Paste	Terminal TermWindow		Vložit
-PrefHandler::getRGB(%s) - key not found\n	Terminal getRGB		PrefHandler::getRGB(%s) - klíč nenalezen\n
 Print	Terminal TermWindow		Tisk
 Print cancelled.	Terminal TermWindow		Tisk zrušen.
 Quit	Terminal TermWindow		Ukončit
@@ -66,7 +63,6 @@ Save as default	Terminal TermWindow		Ulož jako výchozí
 Save changes to this settings panel?	Terminal PrefWindow		Uložit změny do tohoto nastavení panelu?
 Save to file…	Terminal PrefWindow		Uložit do souboru...
 Search forward	Terminal FindWindow		Vyhledat vpřed
-Secondary mouse button drop menu	Terminal TermView		Nabídka druhého tlačítka myši
 Select all	Terminal TermWindow		Vybrat vše
 Selected background	Terminal AppearancePrefView		Vybrané pozadí
 Selected text	Terminal AppearancePrefView		Vybraný text
@@ -106,9 +102,4 @@ Window title:	Terminal TermWindow		Nadpis okna:
 Window title…	Terminal TermWindow		Nadpis okna...
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tSoučasný pracovní adresář aktivního procesu v\n\t\t\tsoučasném panelu. Volitelné maximální číslo komponent cest\n\t\t\tmůže být určeno. Např. '%2d' pro alespoň dva komponenty.\n\t%i\t-\tIndex okna.\n\t%p\t-\tJméno aktivního procesu v současném panelu.\n\t%t\t-\tNadpis současného panelu.\n\t%%\t-\tZnak '%'.
 \t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tSoučasný pracovní adresář aktivního procesu.\n\t\t\tVolitelné maximální číslo komponent cest může být\n\t\t\turčeno. Např. '%2d' pro nejvíše dvě komponenty.\n\t%i\t-\tIndex panelu.\n\t%p\t-\tNázev aktivního procesu.\n\t%%\t-\tZnak '%'.
-can't open tty (%s).	Terminal Shell		Nelze otevřít tty (%s).
-could not set session leader.	Terminal Shell		Nelze nastavit session leader.
-failed set terminal interface (TERMIOS).	Terminal Shell		Nastavení prostředí terminálu selhalo (TERMIOS).
-mismatch handshake.	Terminal Shell		Neshoda handshake.
-sigaction() failed: %s\n	Terminal TermApp		sigaction() selhala: %s\n
 size	Terminal TermView		velikost

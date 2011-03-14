@@ -1,4 +1,7 @@
-1	czech	x-vnd.Haiku-Pulse	2756001860
+1	czech	x-vnd.Haiku-Pulse	1325849358
+%.2f GHz	NormalPulseView			%.2f GHz
+%ld MHz	NormalPulseView			%ld MHz
+%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nOd Davida Ramseye a Arveye Hjønnevåga\nUpraveno Danielem Switkinem\n
 About Pulse…	CPUButton		O programu Pulse...
 About Pulse…	PulseView		O programu Pulse...
 Active color	ConfigView		Aktivní barva
@@ -10,12 +13,15 @@ Deskbar menu	CPUButton		Nabídka Deskbar
 Deskbar mode	MiniPulseView		Deskbar režim
 Deskbar mode	NormalPulseView		Deskbar režim
 Deskbar mode	PrefsWindow		Deskbar režim
+Error	PulseApp		Chyba
 Fade colors	ConfigView		Barvy stínu
 Frame color	ConfigView		Barva rámečku
 Idle color	ConfigView		Barva nečinnosti
 Info	CPUButton		Info
 Info	DeskbarPulseView		Info
-Info	PulseWindow		Info
+Info	PulseApp		Info
+Info	PulseView		Info
+Installing in Deskbar failed\n%s	PulseApp		Instalace do lišty selhala.\n%s
 Mini mode	DeskbarPulseView		Mini režim
 Mini mode	NormalPulseView		Mini režim
 Mini mode	PrefsWindow		Mini režim
@@ -27,17 +33,14 @@ OK	DeskbarPulseView		OK
 OK	PrefsWindow		OK
 OK	PulseApp		OK
 OK	PulseView		OK
-OK	PulseWindow		OK
 Pulse	NormalPulseView		Pulse
+Pulse	PulseApp		Pulse
 Pulse	PulseWindow		Pulse
 Pulse settings	PulseWindow		Nastavení Pulse
-Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	CPUButton		Pulse\n\nNapsal David Ramsey a Arve Hjønnevåg\nRevize Daniel Switkin
-Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	DeskbarPulseView		Pulse\n\nNapsal David Ramsey a Arve Hjønnevåg\nRevize Daniel Switkin
-Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	PulseWindow		Pulse\n\nNapsal David Ramsey a Arve Hjønnevåg\nRevize Daniel Switkin
 Quit	DeskbarPulseView		Ukončit
 Quit	MiniPulseView		Ukončit
 Remove replicant	CPUButton		Odebrat replikant
-Remove(): %s	DeskbarPulseView		Odebrat(): %s
+Removing from Deskbar failed.\n%s	DeskbarPulseView		Odstraňování z lišty selhalo.\n%s
 Settings…	PulseView		Nastavení...
 Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Použití: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
 Width of icon:	ConfigView		Šířka ikony:

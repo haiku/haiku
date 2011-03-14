@@ -1,4 +1,4 @@
-1	czech	x-vnd.Be-PEPL	3664557316
+1	czech	x-vnd.Be-PEPL	3077845462
 %name% picture	People		%name% obrázek
 About	People		O programu
 Address	People		Adresa
@@ -13,6 +13,7 @@ Copy	People		Kopírovat
 Could not create %s.	People		Nemohu vytvořit %s.
 Country	People		Země
 Cut	People		Vyjmout
+Drop an image here,\nor use the contextual menu.	People		Sem přetáhnout obrázek,\anebo použít kontextuální nabídku.
 E-mail	People		E-mail
 Edit	People		Editovat
 Error	People		Chyba
@@ -39,6 +40,7 @@ Save changes before quitting?	People		Uložit změny před ukončením
 Select all	People		Vybrat vše
 Sorry	People		Lituji
 State	People		Stát
+The file '%name%' could not be written.	People		Zápis souboru '%name%' by se nemusel zdařit.
 URL	People		URL
 Undo	People		Zpět
 Unnamed person	People		Nepojmenovaná osoba

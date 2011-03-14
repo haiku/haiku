@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-MediaPlayer	1801311807
+1	czech	x-vnd.Haiku-MediaPlayer	2559622077
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Americký)
 100% scale	MediaPlayer-Main		100% měřítko
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
@@ -52,7 +52,6 @@ Loop movies by default	MediaPlayer-SettingsWindow		Spouštět filmy implicitně 
 Loop sounds by default	MediaPlayer-SettingsWindow		Implicitně přehrávat zvuky ve smyčce
 Low volume	MediaPlayer-SettingsWindow		Nízká hlasitost
 MediaPlayer	MediaPlayer-Main		Přehrávač médií
-MediaPlayer Current Playlist	MediaPlayer-Main		Aktuální Playlist Přehrávače Médií
 MediaPlayer encountered an internal error. The file could not be opened.	MediaPlayer-Main		Přehrávač médií se setkal s vnitřní chybou. Soubor nemohl být otevřen.
 MediaPlayer settings	MediaPlayer-SettingsWindow		Nastavení Přehrávače médií
 MediaPlayer\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		Přehrávač médií\n\nNapsali Marcus Overhagen, Stephan Aßmus a Frederik Modéen
@@ -81,7 +80,6 @@ Open…	MediaPlayer-PlaylistWindow		Otevřít...
 Pause	MediaPlayer-Main		Pozastavit
 Pause playback.	MediaPlayer-Main		Pozastavit přehrávání.
 Play	MediaPlayer-Main		Přehrát
-Play background clips at	MediaPlayer-SettingsWindow		Přehrávat klipy na pozadí
 Play mode	MediaPlayer-SettingsWindow		Režim přehrávání
 Playlist	MediaPlayer-PlaylistWindow		Playlist
 Playlist…	MediaPlayer-Main		Playlist...
@@ -118,8 +116,8 @@ Start playing.	MediaPlayer-Main		Spustit přehrávání
 Stop	MediaPlayer-Main		Zastavit
 Stop playing.	MediaPlayer-Main		Zastavit přehrávání
 Stream settings	MediaPlayer-Main		Nastavení streamu
-Subtitle placement	MediaPlayer-SettingsWindow		Umístění titulků
-Subtitle size	MediaPlayer-SettingsWindow		Velikost titulků
+Subtitle placement:	MediaPlayer-SettingsWindow		Umístění titulků:
+Subtitle size:	MediaPlayer-SettingsWindow		Velikost Titulků:
 Subtitles	MediaPlayer-Main		Titulky
 Thanks	MediaPlayer-Main		Díky
 The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Soubor '%filename' nemohl být otevřen.\n\n
@@ -137,6 +135,7 @@ Video	MediaPlayer-Main		Video
 Video track	MediaPlayer-Main		Video stopa
 View options	MediaPlayer-SettingsWindow		Volby zobrazení
 Volume	MediaPlayer-Main		Hlasitost
+Volume of background clips	MediaPlayer-SettingsWindow		Hlasitost klipů na pozadí
 error	MediaPlayer-Main		chyba
 none	Audio track menu		žádný
 none	Subtitles menu		žádný

@@ -1,11 +1,11 @@
-1	czech	x-vnd.Haiku-MediaConverter	3383482196
+1	czech	x-vnd.Haiku-MediaConverter	4254955936
 %.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld kanál / %lld snímků
 %.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz mono / %lld snímků
 %.1f kHz stereo / %lld frames	MediaFileInfo		%.1f kHz stereo / %lld snímků
-%Ld x %Ld, %Ld fps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%Ld x %Ld, %Ld fps / %Ld snímků
 %amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles souborů nebylo rozpoznáno, jako soubory médií:
 %d bit 	MediaFileInfo		%d bitový
 %d byte 	MediaFileInfo		%d byte 
+%u x %u, %.2ffps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%u x %u, %.2ffps / %Ld snímků
 About MediaConverter…	Menu		O Převaděči Médií
 About…	MediaConverter		O...
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Vyskytla se chyba načítání informací o souboru.\n\nChyba: 
@@ -66,6 +66,6 @@ Video quality not supported	MediaConverter		Nepodporovaná videokvalita
 Video quality: %3d%%	MediaConverter		Kvalita videa: %3d%%
 Video using parameters form settings	MediaConverter		Video používá parametry z nastavení
 Video:	MediaConverter-FileInfo		Video:
-Writing audio track: %Ld %% complete	MediaConverter		Zápis zvukové stopy %Ld %% dokončen
-Writing video track: %Ld %% complete	MediaConverter		Zapisování videostopy: %Ld %% cokončeno
+Writing audio track: %ld%% complete	MediaConverter		Zápis zvukové stopy: %ld%% hotovo
+Writing video track: %ld%% complete	MediaConverter		Zápis video stopy: %ld%% hotovo
 seconds	MediaFileInfo		sekund

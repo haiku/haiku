@@ -1,29 +1,37 @@
-1	czech	x-vnd.Haiku-ProcessController	3199581101
-%.1f MB	ProcessController		%.1f MB
+1	czech	x-vnd.Haiku-ProcessController	769318393
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
 About	ProcessController		o
 About ProcessController…	ProcessController		O Správci Procesů...
 Cancel	ProcessController		Zrušit
+Custom priority	ProcessController		Priorita uživatelská
 Damned!	ProcessController		Dokoprdele!
 Debug this thread!	ProcessController		Debug tohoto vlákna!
 Debug thread	ProcessController		Debug vlákna
+Display priority	ProcessController		Priorita zobrazování
 Do you really want to kill the team \"%s\"?	ProcessController		Opravdu chcete zabít tým \"%s\"?
 Error saving file	ProcessController		Chyba při ukládání souboru
-Global Popup	ProcessController		Globální PopUp
 Gone teams…	ProcessController		Zrušené týmy...
+Idle priority	ProcessController		Priorita nečinný
+Info	ProcessController		Info
 Install in Deskbar	ProcessController		Nainstalovat do Deskbaru
 Kill this thread!	ProcessController		Zabít toto vlákno!
 Live in the Deskbar	ProcessController		Živě v Deskbaru
+Low priority	ProcessController		Priorita nízká
+Lowest active priority	ProcessController		Priorita nejnižší aktivity
 Memory usage	ProcessController		Využití paměti
 New Terminal	ProcessController		Nový Terminál
+Normal priority	ProcessController		Priorita normální
 OK	ProcessController		OK
 Ok!	ProcessController		OK!
+Please confirm	ProcessController		Potvrďte prosím
 ProcessController	ProcessController		Správce Procesů
 ProcessController is already installed in Deskbar.	ProcessController		Správce Procesů je již v Deskbaru nainstalován.
 ProcessController\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n	ProcessController		Správce Procesů\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n
 Processor %d	ProcessController		Procesor %d
 Quit an application	ProcessController		Ukončit aplikaci
 Quit application	ProcessController		Ukončit aplikaci
+Real-time display priority	ProcessController		Priorita realtime zobrazování
+Real-time priority	ProcessController		Priorita realtime
 Restart Deskbar	ProcessController		Restartovat Deskbar
 Restart Tracker	ProcessController		Restartovat Tracker
 Run in window	ProcessController		Spustit v okně
@@ -33,6 +41,8 @@ This is the last active processor...\nYou can't turn it off!	ProcessController		
 This team is already gone…	ProcessController		Tento tým je již pryč...
 This thread is already gone…	ProcessController		Toto vlákno je již pryč...
 Threads and CPU usage	ProcessController		Vlákna a využití procesoru
+Urgent display priority	ProcessController		Priorita urgentní zobrazování
+Urgent priority	ProcessController		Priorita urgentní
 Usage: %s [-deskbar]\n	ProcessController		Využití: %s [-deskbar]\n
 What do you want to do with the thread \"%s\"?	ProcessController		Co chcete udělat s vláknem \"%s\"?
 Yes, kill this team!	ProcessController		Ano, zabít tento tým!

@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-FileTypes	3001025756
+1	czech	x-vnd.Haiku-FileTypes	686287948
 %1 application type	Application Type Window		%1 typ aplikace
 %ld Application type%s could be removed.	Application Types Window		typ%s aplikace %ld by mohl být odstraněn.
 %s file type	FileType Window		%s typ souboru
@@ -120,8 +120,8 @@ Removing a super type cannot be reverted.\nAll file types that belong to this su
 Removing uninstalled application types	Application Types Window		Odstraňování odinstalovaných typů aplikací
 Right	Attribute Window	Attribute column alignment in Tracker	Vpravo
 Rule:	FileTypes Window		Pravidlo:
-Same as…	FileType Window	The same APPLICATION as\xE2\x80\xA6	Stejná jako...
-Same as…	FileType Window	The same TYPE as\xE2\x80\xA6	Stejný jako...
+Same as…	FileType Window	The same APPLICATION as ...	Stejná
+Same as…	FileType Window	The same TYPE as ...	Stejný
 Same as…	FileTypes Window		Jako...
 Save	Application Type Window		Uložit
 Save into resource file…	Application Type Window		Uložit do souboru zdroje...
