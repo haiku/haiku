@@ -414,7 +414,10 @@ AddonSettings::AddonSettings()
 bool
 AddonSettings::Load(const BMessage& message)
 {
-	if (message.FindRef("ref", &fAddonRef) != B_OK)
+	const char* addonPath = NULL;
+	if (message.FindString("add-on path", &addonPath) != B_OK)
+		return false;
+	if (get_ref_for_path(addonPath, &fAddonRef) != B_OK)
 		return false;
 	if (message.FindMessage("settings", &fSettings) != B_OK)
 		return false;
@@ -426,7 +429,8 @@ AddonSettings::Load(const BMessage& message)
 bool
 AddonSettings::Save(BMessage& message)
 {
-	message.AddRef("ref", &fAddonRef);
+	BPath path(&fAddonRef);
+	message.AddString("add-on path", path.Path());
 	message.AddMessage("settings", &fSettings);
 	fModified = false;
 	return true;
