@@ -77,7 +77,7 @@ Set up boot menu	InstallerWindow		Ställ in startmeny
 Set up partitions…	InstallerWindow		Ställ in partitioner...
 Show optional packages	InstallerWindow		Visa valfria paket
 So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		Efter de andra menyposterna mot slutet av filen, lägg till något som liknar dessa rader:\n\n
-So below the heading that must not be edited, add something similar to these lines:\n\n	InstallerApp		So below the heading that must not be edited, add something similar to these lines:\n\n
+So below the heading that must not be edited, add something similar to these lines:\n\n	InstallerApp		Under huvudet, som inte ändras, kan du lägga till några rader liknande de här:\n\n
 Starting Installation.	InstallProgress		Startar installationen.
 Stop	InstallerWindow		Stopp
 Stop	InstallerWindow	In alert after pressing Stop	Stopp

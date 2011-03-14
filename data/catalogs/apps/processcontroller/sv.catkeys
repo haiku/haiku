@@ -1,5 +1,4 @@
-1	swedish	x-vnd.Haiku-ProcessController	35871000
-%s [%d]	ProcessController		%s [%d]
+1	swedish	x-vnd.Haiku-ProcessController	769318393
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
 About	ProcessController		Om
 About ProcessController…	ProcessController		Om ProcessKontroll...
@@ -13,6 +12,7 @@ Do you really want to kill the team \"%s\"?	ProcessController		Vill du verkligen
 Error saving file	ProcessController		Fel vid sparning av fil
 Gone teams…	ProcessController		Avslutade processer...
 Idle priority	ProcessController		Overksam prioritet
+Info	ProcessController		Information
 Install in Deskbar	ProcessController		Installera i Deskbar
 Kill this thread!	ProcessController		Avsluta tråden!
 Live in the Deskbar	ProcessController		Lev i Deskbar
@@ -23,12 +23,13 @@ New Terminal	ProcessController		Ny terminal
 Normal priority	ProcessController		Normal prioritet
 OK	ProcessController		OK
 Ok!	ProcessController		OK!
+Please confirm	ProcessController		Vänligen bekräfta
 ProcessController	ProcessController		ProcessKontroll
 ProcessController is already installed in Deskbar.	ProcessController		ProcessKontroll är redan installerad i Deskbar.
 ProcessController\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n	ProcessController		ProcessKontroll\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n
 Processor %d	ProcessController		Processor %d
 Quit an application	ProcessController		Avsluta ett program
-Quit application	ProcessController		Avsluta applikation
+Quit application	ProcessController		Avsluta program
 Real-time display priority	ProcessController		Realtidsvisningprioritet
 Real-time priority	ProcessController		Realtidsprioritet
 Restart Deskbar	ProcessController		Starta om Deskbar

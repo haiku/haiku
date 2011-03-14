@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-BootManager	2058739736
+1	swedish	x-vnd.Haiku-BootManager	488724516
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Kommer nu att återställa huvudstartsektorn (MBR) på %disk från %file. Vill du fortsätta?
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Kommer att skriva bootmenyn till hårddisken. Är du säker på att du vill fortsätta?
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Följande startmeny kommer att skrivas till startdisken (%s). Vänligen kontrollera informationen nedan innan du fortsätter.
@@ -13,8 +13,8 @@ At least one partition must be selected!	BootManagerController		Minst en partiti
 Back	BootManagerController	Button	Tillbaka
 Backup Master Boot Record	BootManagerController	Title	Säkerhetskopiera huvudstartsektorn
 Boot Manager is unable to read the partition table!	BootManagerController		Starthanteraren kan inte läsa partitionstabellen!
+BootManager	Application name		StartHanteraren
 BootManager	BootManager	Application name	Starthanteraren
-BootManager	BootManagerWindow	Window Title	Starthanteraren
 Cannot access!	DrivesPage	Cannot install	Kan inte få åtkomst!
 Copyright %year, Haiku Inc.\n	BootManager	Leave %year untranslated	Copyright %year, Haiku Inc.\n
 Default Partition	DefaultPartitionPage	Title	Standardpartition

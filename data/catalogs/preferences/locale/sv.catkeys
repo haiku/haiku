@@ -1,25 +1,30 @@
-1	swedish	x-vnd.Haiku-Locale	2295953467
+1	swedish	x-vnd.Haiku-Locale	250177593
 12 hour	TimeFormatSettings		12 timmar
 24 hour	TimeFormatSettings		24 timmar
 Available languages	Locale Preflet Window		Tillgängliga språk
+Cancel	Locale Preflet Window		Avbryt
 Currency	TimeFormatSettings		Valuta
 Date	TimeFormatSettings		Datum
 Defaults	Locale Preflet Window		Förval
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Deskbar och Tracker måste startas om för att ändringarna skall gälla. Vill du starta om dom nu?
 Formatting	Locale Preflet Window		Formatering
 Full format:	TimeFormatSettings		Fullt format:
 Language	Locale Preflet Window		Språk
-Locale	Locale Preflet		Lokalitet
-Locale	Locale Preflet Window		Lokalitet
+Locale	Locale Preflet		Språk
+Locale	Locale Preflet Window		Språk
 Long format:	TimeFormatSettings		Långt format:
 Medium format:	TimeFormatSettings		Mediumformat:
 Negative:	TimeFormatSettings		Negativt:
 Numbers	TimeFormatSettings		Nummer
 OK	Locale Preflet Window		OK
+Options	Locale Preflet Window		Alternativ
 Positive:	TimeFormatSettings		Positivt:
 Preferred languages	Locale Preflet Window		Föredragna språk
+Restart	Locale Preflet Window		Starta om
 Revert	Locale Preflet Window		Återgå
 Short format:	TimeFormatSettings		Kort format:
 Time	TimeFormatSettings		Tid
+Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		Översätt program och mappar i Deskbar och Tracker.
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Kan inte hitta listan över tillgängliga språk! Prefleten kan inte användas!
 Use month/day-names from preferred language	TimeFormatSettings		Använd det förvalda språkets format för månad/dag
 already chosen	LanguageListView		redan valt

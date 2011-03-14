@@ -1,1 +1,39 @@
-1	swedish	x-vnd.Haiku-Sudoku	0
+1	swedish	x-vnd.Haiku-Sudoku	2100942083
+Abort	ProgressWindow		Avbryt
+About	Sudoku		Om
+About Sudoku…	SudokuWindow		Om Sudoku...
+Advanced	SudokuWindow		Avancerat
+Blank	SudokuWindow		Tom
+Copy	SudokuWindow		Kopiera
+Could not open \"%s\":\n%s\n	SudokuWindow		Kunde inte öppna "\s":\n%s\n
+Could not set Sudoku:\n%s\n	SudokuWindow		Kunde inte ställa in Sudoku:\n%s\n
+Creating solvable field	SudokuGenerator		Skapar lösbart fält
+Easy	SudokuWindow		Lätt
+Export as…	SudokuWindow		Exportera som...
+File	SudokuWindow		Arkiv
+HTML	SudokuWindow		HTML
+Hard	SudokuWindow		Svår
+Help	SudokuWindow		Hjälp
+Mark invalid values	SudokuWindow		Markera felaktiga värden
+Mark valid hints	SudokuWindow		Markera korrekta minnesmarkeringar
+New	SudokuWindow		Ny
+OK	Sudoku		OK
+OK	SudokuWindow		OK
+Open file…	SudokuWindow		Öppna fil...
+Progress monitor	ProgressWindow		Förloppsindikator
+Quit	SudokuWindow		Avsluta
+Redo	SudokuWindow		Gör om
+Restore snapshot	SudokuWindow		Hämta sparad sudoku
+Searching for removable values	SudokuGenerator		Letar efter värden som kan tas bort
+Snapshot current	SudokuWindow		Spara till senare
+Solve	SudokuWindow		Lös
+Solve single field	SudokuWindow		Lös ett fält
+Start again	SudokuWindow		Starta igen
+Sudoku	Sudoku		Sudoku
+Sudoku	SudokuWindow		Sudoku
+Sudoku request	SudokuWindow		Sudoku undrar
+Sudoku solved - congratulations!\n	SudokuWindow		Sudoku löst - grattis!\n
+Sudoku\n\twritten by Axel Dörfler\n\tCopyright 2007, Haiku Inc.\n	Sudoku		Sudoku\n\tskrivet av Axel Dörfler\n\tUpphovsrätt 2007, Haiku Inc.\n
+Text	SudokuWindow		Text
+Undo	SudokuWindow		Ångra
+View	SudokuWindow		Visa

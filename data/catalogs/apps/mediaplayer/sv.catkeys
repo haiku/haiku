@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-MediaPlayer	2929328887
+1	swedish	x-vnd.Haiku-MediaPlayer	2559622077
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Amerikanskt format)
 100% scale	MediaPlayer-Main		Skala till 100%
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
@@ -80,7 +80,6 @@ Open…	MediaPlayer-PlaylistWindow		Öppna...
 Pause	MediaPlayer-Main		Pausa
 Pause playback.	MediaPlayer-Main		Pausa uppspelning.
 Play	MediaPlayer-Main		Spela
-Play background clips at	MediaPlayer-SettingsWindow		Spela bakgrundsklipp vid
 Play mode	MediaPlayer-SettingsWindow		Uppspelningsläge
 Playlist	MediaPlayer-PlaylistWindow		Spellista
 Playlist…	MediaPlayer-Main		Spellista...
@@ -117,8 +116,8 @@ Start playing.	MediaPlayer-Main		Starta uppspelning.
 Stop	MediaPlayer-Main		Stopp
 Stop playing.	MediaPlayer-Main		Stoppa uppspelning.
 Stream settings	MediaPlayer-Main		Ströminställningar
-Subtitle placement	MediaPlayer-SettingsWindow		Bildtextsplacering
-Subtitle size	MediaPlayer-SettingsWindow		Bildtextsstorlek
+Subtitle placement:	MediaPlayer-SettingsWindow		Undertextsplacering:
+Subtitle size:	MediaPlayer-SettingsWindow		Undertextsstorlek:
 Subtitles	MediaPlayer-Main		Bildtext
 Thanks	MediaPlayer-Main		Tack
 The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Filen '%filename' kunde inte öppnas.\n\n
@@ -136,6 +135,7 @@ Video	MediaPlayer-Main		Video
 Video track	MediaPlayer-Main		Videospår
 View options	MediaPlayer-SettingsWindow		Visningsalternativ
 Volume	MediaPlayer-Main		Volym
+Volume of background clips	MediaPlayer-SettingsWindow		Volym för bakgrundsklipp
 error	MediaPlayer-Main		fel
 none	Audio track menu		ingen
 none	Subtitles menu		ingen
