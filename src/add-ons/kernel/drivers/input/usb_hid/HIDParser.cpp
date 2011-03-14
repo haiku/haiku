@@ -103,6 +103,32 @@ HIDParser::ParseReportDescriptor(const uint8 *reportDescriptor,
 		switch (item->type) {
 			case ITEM_TYPE_MAIN:
 			{
+				// preprocess the local state if relevant (usages for
+				// collections and report items)
+				if (item->tag != ITEM_TAG_MAIN_END_COLLECTION) {
+					// make all usages extended for easier later processing
+					for (uint32 i = 0; i < usageStackUsed; i++) {
+						if (usageStack[i].is_extended)
+							continue;
+						usageStack[i].u.s.usage_page = globalState.usage_page;
+						usageStack[i].is_extended = true;
+					}
+
+					if (!localState.usage_minimum.is_extended) {
+						// the specs say if one of them is extended they must
+						// both be extended, so if the minimum isn't, the
+						// maximum mustn't either.
+						localState.usage_minimum.u.s.usage_page
+							= localState.usage_maximum.u.s.usage_page
+								= globalState.usage_page;
+						localState.usage_minimum.is_extended
+							= localState.usage_maximum.is_extended = true;
+					}
+
+					localState.usage_stack = usageStack;
+					localState.usage_stack_used = usageStackUsed;
+				}
+
 				if (item->tag == ITEM_TAG_MAIN_COLLECTION) {
 					HIDCollection *newCollection
 						= new(std::nothrow) HIDCollection(collection,
@@ -153,28 +179,6 @@ HIDParser::ParseReportDescriptor(const uint8 *reportDescriptor,
 						globalState.report_id);
 					if (target == NULL)
 						break;
-
-					// make all usages extended for easier later processing
-					for (uint32 i = 0; i < usageStackUsed; i++) {
-						if (usageStack[i].is_extended)
-							continue;
-						usageStack[i].u.s.usage_page = globalState.usage_page;
-						usageStack[i].is_extended = true;
-					}
-
-					if (!localState.usage_minimum.is_extended) {
-						// the specs say if one of them is extended they must
-						// both be extended, so if the minimum isn't, the
-						// maximum mustn't either.
-						localState.usage_minimum.u.s.usage_page
-							= localState.usage_maximum.u.s.usage_page
-								= globalState.usage_page;
-						localState.usage_minimum.is_extended
-							= localState.usage_maximum.is_extended = true;
-					}
-
-					localState.usage_stack = usageStack;
-					localState.usage_stack_used = usageStackUsed;
 
 					// fill in a sensible default if the index isn't set
 					if (!localState.designator_index_set) {
