@@ -103,7 +103,6 @@ HIDParser::ParseReportDescriptor(const uint8 *reportDescriptor,
 		switch (item->type) {
 			case ITEM_TYPE_MAIN:
 			{
-				main_item_data *mainData = (main_item_data *)&data;
 				if (item->tag == ITEM_TAG_MAIN_COLLECTION) {
 					HIDCollection *newCollection
 						= new(std::nothrow) HIDCollection(collection,
@@ -173,7 +172,7 @@ HIDParser::ParseReportDescriptor(const uint8 *reportDescriptor,
 						localState.usage_minimum.is_extended
 							= localState.usage_maximum.is_extended = true;
 					}
- 
+
 					localState.usage_stack = usageStack;
 					localState.usage_stack_used = usageStackUsed;
 
@@ -186,6 +185,7 @@ HIDParser::ParseReportDescriptor(const uint8 *reportDescriptor,
 					if (!localState.string_index_set)
 						localState.string_index = localState.string_minimum;
 
+					main_item_data *mainData = (main_item_data *)&data;
 					target->AddMainItem(globalState, localState, *mainData,
 						collection);
 				}
@@ -351,7 +351,7 @@ HIDParser::ParseReportDescriptor(const uint8 *reportDescriptor,
 				break;
 			}
 
-			case ITEM_TAG_LONG:
+			case ITEM_TYPE_LONG:
 			{
 				long_item *longItem = (long_item *)item;
 
