@@ -162,6 +162,12 @@ rule DoCatalogs target : signature : sources : sourceLanguage : regexp
 
 	# For the pseudo-target catkeys
 	HAIKU_LOCALE_OUTPUT_CATKEYS += $(generatedCatalog:S=.catkeys) ;
+	
+	# Add target catalog entry as attribute
+	CATALOG_ENTRY on $(target) = "$(signature):Application name:$(target)" ;
+	Depends $(target) : <build>addattr ;
+	AddCatalogEntryAttribute1 $(target) 
+		: <build>addattr ;
 }
 
 rule AddCatalogEntryAttribute target
