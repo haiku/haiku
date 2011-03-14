@@ -46,7 +46,12 @@ public:
 
 }	// namespace BALM
 
+
 using BALM::XTab;
 using BALM::YTab;
+
+typedef BObjectList<XTab> XTabList;
+typedef BObjectList<YTab> YTabList;
+
 
 #endif	// X_TAB_H

@@ -129,8 +129,7 @@ public:
 			ResultType			Result() const;
 			bigtime_t			SolvingTime() const;
 
-			operator BString() const;
-			void				GetString(BString& string) const;
+			BString				ToString() const;
 
 	const	ConstraintList&		Constraints() const;
 	const	VariableList&		UsedVariables() const;

@@ -64,8 +64,7 @@ public:
 			bool				IsValid();
 			void				Invalidate();
 
-								operator BString() const;
-			void				GetString(BString& string) const;
+			BString				ToString() const;
 			void				PrintToStream();
 
 								~Constraint();

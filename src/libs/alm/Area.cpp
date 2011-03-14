@@ -18,6 +18,7 @@
 #include <StringView.h>
 
 #include "ALMLayout.h"
+#include "RowColumnManager.h"
 
 
 using namespace LinearProgramming;
@@ -111,10 +112,10 @@ GroupItem::_AddItem(const GroupItem& item, enum orientation orien)
 }
 
 
-BView*
-Area::View()
+BLayoutItem*
+Area::Item()
 {
-	return fLayoutItem->View();
+	return fLayoutItem;
 }
 
 
@@ -175,11 +176,9 @@ Area::SetLeft(XTab* left)
 	fColumn = NULL;
 
 	fMinContentWidth->SetLeftSide(-1.0, fLeft, 1.0, fRight);
-	BSize preferredSize = fLayoutItem->PreferredSize();
-	_UpdatePreferredWidthConstraint(preferredSize);
-
 	if (fMaxContentWidth != NULL)
 		fMaxContentWidth->SetLeftSide(-1.0, fLeft, 1.0, fRight);
+	fRowColumnManager->TabsChanged(this);
 
 	fLayoutItem->Layout()->InvalidateLayout();
 }
@@ -198,10 +197,9 @@ Area::SetRight(XTab* right)
 	fColumn = NULL;
 
 	fMinContentWidth->SetLeftSide(-1.0, fLeft, 1.0, fRight);
-	BSize preferredSize = fLayoutItem->PreferredSize();
-	_UpdatePreferredWidthConstraint(preferredSize);
 	if (fMaxContentWidth != NULL)
 		fMaxContentWidth->SetLeftSide(-1.0, fLeft, 1.0, fRight);
+	fRowColumnManager->TabsChanged(this);
 
 	fLayoutItem->Layout()->InvalidateLayout();
 }
@@ -218,10 +216,9 @@ Area::SetTop(YTab* top)
 	fRow = NULL;
 
 	fMinContentHeight->SetLeftSide(-1.0, fTop, 1.0, fBottom);
-	BSize preferredSize = fLayoutItem->PreferredSize();
-	_UpdatePreferredHeightConstraint(preferredSize);
 	if (fMaxContentHeight != NULL)
 		fMaxContentHeight->SetLeftSide(-1.0, fTop, 1.0, fBottom);
+	fRowColumnManager->TabsChanged(this);
 
 	fLayoutItem->Layout()->InvalidateLayout();
 }
@@ -238,10 +235,9 @@ Area::SetBottom(YTab* bottom)
 	fRow = NULL;
 
 	fMinContentHeight->SetLeftSide(-1.0, fTop, 1.0, fBottom);
-	BSize preferredSize = fLayoutItem->PreferredSize();
-	_UpdatePreferredHeightConstraint(preferredSize);
 	if (fMaxContentHeight != NULL)
 		fMaxContentHeight->SetLeftSide(-1.0, fTop, 1.0, fBottom);
+	fRowColumnManager->TabsChanged(this);
 
 	fLayoutItem->Layout()->InvalidateLayout();
 }
@@ -268,34 +264,6 @@ Area::GetColumn() const
 
 
 /**
- * Sets the row that defines the top and bottom tabs.
- * May be null.
- */
-void
-Area::SetRow(Row* row)
-{
-	SetTop(row->Top());
-	SetBottom(row->Bottom());
-	fRow = row;
-	fLayoutItem->Layout()->InvalidateLayout();
-}
-
-
-/**
- * Sets the column that defines the left and right tabs.
- * May be null.
- */
-void
-Area::SetColumn(Column* column)
-{
-	SetLeft(column->Left());
-	SetRight(column->Right());
-	fColumn = column;
-	fLayoutItem->Layout()->InvalidateLayout();
-}
-
-
-/**
  * The reluctance with which the area's content shrinks below its preferred size.
  * The bigger the less likely is such shrinking.
  */
@@ -317,12 +285,10 @@ Area::GrowPenalties() const
 }
 
 
-void Area::SetShrinkPenalties(BSize shrink) {
+void
+Area::SetShrinkPenalties(BSize shrink) {
 	fShrinkPenalties = shrink;
-	if (fPreferredContentWidth != NULL) {
-		fPreferredContentWidth->SetPenaltyNeg(shrink.Width());
-		fPreferredContentHeight->SetPenaltyNeg(shrink.Height());
-	}
+
 	fLayoutItem->Layout()->InvalidateLayout();
 }
 
@@ -331,10 +297,7 @@ void
 Area::SetGrowPenalties(BSize grow)
 {
 	fGrowPenalties = grow;
-	if (fPreferredContentWidth != NULL) {
-		fPreferredContentWidth->SetPenaltyPos(grow.Width());
-		fPreferredContentHeight->SetPenaltyPos(grow.Height());
-	}
+
 	fLayoutItem->Layout()->InvalidateLayout();
 }
 
@@ -480,26 +443,19 @@ Area::SetBottomInset(float bottom)
 }
 
 
-Area::operator BString() const
+BString
+Area::ToString() const
 {
-	BString string;
-	GetString(string);
-	return string;
-}
-
-
-void
-Area::GetString(BString& string) const
-{
-	string << "Area(";
-	fLeft->GetString(string);
+	BString string = "Area(";
+	string += fLeft->ToString();
 	string << ", ";
-	fTop->GetString(string);
+	string += fTop->ToString();
 	string << ", ";
-	fRight->GetString(string);
+	string += fRight->ToString();
 	string << ", ";
-	fBottom->GetString(string);
+	string += fBottom->ToString();
 	string << ")";
+	return string;
 }
 
 
@@ -542,12 +498,24 @@ Area::InvalidateSizeConstraints()
 
 	BSize minSize = fLayoutItem->MinSize();
 	BSize maxSize = fLayoutItem->MaxSize();
-	BSize prefSize = fLayoutItem->PreferredSize();
 
 	_UpdateMinSizeConstraint(minSize);
 	_UpdateMaxSizeConstraint(maxSize);
-	_UpdatePreferredWidthConstraint(prefSize);
-	_UpdatePreferredHeightConstraint(prefSize);
+}
+
+
+BRect
+Area::Frame()
+{
+	return BRect(fLeft->Value(), fTop->Value(), fRight->Value(),
+		fBottom->Value());
+}
+
+
+BRect
+Area::ItemFrame()
+{
+	return fLayoutItem->Frame();
 }
 
 
@@ -558,7 +526,7 @@ Area::InvalidateSizeConstraints()
 Area::~Area()
 {
 	for (int32 i = 0; i < fConstraints.CountItems(); i++)
-		delete (Constraint*)fConstraints.ItemAt(i);
+		delete fConstraints.ItemAt(i);
 }
 
 
@@ -586,8 +554,6 @@ Area::Area(BLayoutItem* item)
 	fMaxContentWidth(NULL),
 	fMinContentHeight(NULL),
 	fMaxContentHeight(NULL),
-	fPreferredContentWidth(NULL),
-	fPreferredContentHeight(NULL),
 
 	fContentAspectRatio(-1),
 	fContentAspectRatioC(NULL)
@@ -599,23 +565,17 @@ Area::Area(BLayoutItem* item)
 /**
  * Initialize variables.
  */
-#if USE_SCALE_VARIABLE
 void
 Area::_Init(LinearSpec* ls, XTab* left, YTab* top, XTab* right, YTab* bottom,
-	Variable* scaleWidth, Variable* scaleHeight)
+	RowColumnManager* manager)
 {
-	fScaleWidth = scaleWidth;
-	fScaleHeight = scaleHeight;
-#else
-void
-Area::_Init(LinearSpec* ls, XTab* left, YTab* top, XTab* right, YTab* bottom)
-{
-#endif
 	fLS = ls;
 	fLeft = left;
 	fRight = right;
 	fTop = top;
 	fBottom = bottom;
+
+	fRowColumnManager = manager;
 
 	// adds the two essential constraints of the area that make sure that the
 	// left x-tab is really to the left of the right x-tab, and the top y-tab
@@ -625,31 +585,14 @@ Area::_Init(LinearSpec* ls, XTab* left, YTab* top, XTab* right, YTab* bottom)
 
 	fConstraints.AddItem(fMinContentWidth);
 	fConstraints.AddItem(fMinContentHeight);
-
-	_SetupPreferredConstraints();
-
-	BSize preferredSize = fLayoutItem->PreferredSize();
-	_UpdatePreferredWidthConstraint(preferredSize);
-	_UpdatePreferredHeightConstraint(preferredSize);
-
-	fConstraints.AddItem(fPreferredContentWidth);
-	fConstraints.AddItem(fPreferredContentHeight);
 }
 
 
-#if USE_SCALE_VARIABLE
 void
-Area::_Init(LinearSpec* ls, Row* row, Column* column, Variable* scaleWidth,
-	Variable* scaleHeight)
+Area::_Init(LinearSpec* ls, Row* row, Column* column, RowColumnManager* manager)
 {
-	_Init(ls, column->Left(), row->Top(), column->Right(), row->Bottom(),
-		scaleWidth, scaleHeight);
-#else
-void
-Area::_Init(LinearSpec* ls, Row* row, Column* column)
-{
-	_Init(ls, column->Left(), row->Top(), column->Right(), row->Bottom());
-#endif
+	_Init(ls, column->Left(), row->Top(), column->Right(), row->Bottom(), manager);
+
 	fRow = row;
 	fColumn = column;
 }
@@ -727,78 +670,4 @@ Area::_UpdateMaxSizeConstraint(BSize max)
 		delete fMaxContentWidth;
 		fMaxContentWidth = NULL;
 	}
-}
-
-
-void
-Area::_UpdatePreferredWidthConstraint(BSize& preferred)
-{
-	if (preferred.width == -1) {
-		delete fPreferredContentWidth;
-		fPreferredContentWidth = NULL;
-		return;
-	}
-
-	float width = 0;
-	if (preferred.width > 0)
-		width = preferred.width + LeftInset() + RightInset();
-
-	_SetupPreferredConstraints();
-
-#if USE_SCALE_VARIABLE
-	fPreferredContentWidth->SetLeftSide(-1.0, fLeft, 1.0, fRight, -width,
-		fScaleWidth);
-#else
-	fPreferredContentWidth->SetRightSide(width);
-#endif
-}
-
-
-void
-Area::_UpdatePreferredHeightConstraint(BSize& preferred)
-{
-	if (preferred.height == -1) {
-		delete fPreferredContentHeight;
-		fPreferredContentHeight = NULL;
-		return;
-	}
-
-	float height = 0;
-	if (preferred.height > 0)
-		height = preferred.height + TopInset() + BottomInset();
-
-	_SetupPreferredConstraints();
-#if USE_SCALE_VARIABLE
-	fPreferredContentHeight->SetLeftSide(-1.0, fTop, 1.0, fBottom, -height,
-		fScaleHeight);
-#else
-	fPreferredContentHeight->SetRightSide(height);
-#endif
-}
-
-
-void
-Area::_SetupPreferredConstraints()
-{
-#if USE_SCALE_VARIABLE
-	if (!fPreferredContentWidth) {
-		fPreferredContentWidth = fLS->AddConstraint(-1.0, fLeft, 1.0, fRight,
-			-1.0, fScaleWidth, kEQ, 0, fShrinkPenalties.Width(),
-			fGrowPenalties.Width());
-	}
-	if (!fPreferredContentHeight) {
-		fPreferredContentHeight = fLS->AddConstraint(-1.0, fTop, 1.0, fBottom,
-			-1.0, fScaleHeight, kEQ, 0, fShrinkPenalties.Height(),
-			fGrowPenalties.Height());
-	}
-#else
-	if (!fPreferredContentWidth) {
-		fPreferredContentWidth = fLS->AddConstraint(-1.0, fLeft, 1.0, fRight,
-			kEQ, 0, fShrinkPenalties.Width(), fGrowPenalties.Width());
-	}
-	if (!fPreferredContentHeight) {
-		fPreferredContentHeight = fLS->AddConstraint(-1.0, fTop, 1.0, fBottom,
-			kEQ, 0, fShrinkPenalties.Height(), fGrowPenalties.Height());
-	}
-#endif
 }

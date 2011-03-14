@@ -35,8 +35,7 @@ public:
 			const char*			Label();
 			void				SetLabel(const char* label);
 
-								operator BString() const;
-			void				GetString(BString& string) const;
+			BString				ToString() const;
 
 			Constraint*			IsEqual(Variable* var);
 			Constraint*			IsSmallerOrEqual(Variable* var);
@@ -54,7 +53,7 @@ public:
 			//! delete it yourself!
 			void				Invalidate();
 
-								~Variable();
+	virtual						~Variable();
 
 protected:
 								Variable(LinearSpec* ls);

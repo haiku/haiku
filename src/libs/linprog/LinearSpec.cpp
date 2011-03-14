@@ -618,28 +618,21 @@ LinearSpec::SolvingTime() const
 }
 
 
-LinearSpec::operator BString() const
+BString
+LinearSpec::ToString() const
 {
 	BString string;
-	GetString(string);
-	return string;
-}
-
-
-void
-LinearSpec::GetString(BString& string) const
-{
 	string << "LinearSpec " << (int32)this << ":\n";
 	for (int i = 0; i < fVariables.CountItems(); i++) {
-		Variable* variable = static_cast<Variable*>(fVariables.ItemAt(i));
-		variable->GetString(string);
+		Variable* variable = fVariables.ItemAt(i);
+		string += variable->ToString();
 		string << "=" << (float)variable->Value() << " ";
 	}
 	string << "\n";
 	for (int i = 0; i < fConstraints.CountItems(); i++) {
-		Constraint* c = static_cast<Constraint*>(fConstraints.ItemAt(i));
+		Constraint* c = fConstraints.ItemAt(i);
 		string << i << ": ";
-		c->GetString(string);
+		string += c->ToString();
 		string << "\n";
 	}
 	string << "Result=";
@@ -660,5 +653,6 @@ LinearSpec::GetString(BString& string) const
 	else
 		string << fResult;
 	string << " SolvingTime=" << fSolvingTime << "micro s";
+	return string;
 }
 

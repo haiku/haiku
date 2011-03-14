@@ -13,7 +13,11 @@
 
 namespace BALM {
 
+
+class Area;
 class BALMLayout;
+class RowColumnManager;
+
 
 /**
  * Represents a row defined by two y-tabs.
@@ -24,32 +28,21 @@ public:
 
 			YTab*				Top() const;
 			YTab*				Bottom() const;
-			Row*				Previous() const;
-			void				SetPrevious(Row* value);
-			Row*				Next() const;
-			void				SetNext(Row* value);
-			void				InsertBefore(Row* row);
-			void				InsertAfter(Row* row);
-			Constraint*			HasSameHeightAs(Row* row);
-			ConstraintList*		Constraints() const;
 
-protected:
-								Row(BALMLayout* layout);
+private:
+								Row(LinearSpec* ls, YTab* top, YTab* bottom);
 
-protected:
 			LinearSpec*			fLS;
 			YTab*				fTop;
 			YTab*				fBottom;
 
-private:
-			Row*				fPrevious;
-			Row*				fNext;
-			Constraint*			fPreviousGlue;
-			Constraint*			fNextGlue;
-			ConstraintList		fConstraints;
+			//! managed by RowColumnManager
+			Constraint*			fPrefSizeConstraint;
+			BObjectList<Area>	fAreas;
 
 public:
-	friend class			BALMLayout;
+	friend class BALMLayout;
+	friend class BALM::RowColumnManager;
 	
 };
 

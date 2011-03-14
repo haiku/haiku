@@ -13,7 +13,11 @@
 
 namespace BALM {
 
+
+class Area;
 class BALMLayout;
+class RowColumnManager;
+
 
 /**
  * Represents a column defined by two x-tabs.
@@ -24,34 +28,21 @@ public:
 
 			XTab*				Left() const;
 			XTab*				Right() const;
-			Column*				Previous() const;
-			void				SetPrevious(Column* value);
-			Column*				Next() const;
-			void				SetNext(Column* value);
 
-			void				InsertBefore(Column* column);
-			void				InsertAfter(Column* column);
-			Constraint*			HasSameWidthAs(Column* column);
+private:
+								Column(LinearSpec* ls, XTab* left, XTab* right);
 
-			ConstraintList*		Constraints() const;
-
-protected:
-								Column(BALMLayout* layout);
-
-protected:
 			LinearSpec*			fLS;
 			XTab*				fLeft;
 			XTab*				fRight;
 
-private:
-			Column*				fPrevious;
-			Column*				fNext;
-			Constraint*			fPreviousGlue;
-			Constraint*			fNextGlue;
-			ConstraintList		fConstraints;
+			//! managed by RowColumnManager
+			Constraint*			fPrefSizeConstraint;
+			BObjectList<Area>	fAreas;
 
 public:
-	friend class			BALMLayout;
+	friend class BALMLayout;
+	friend class BALM::RowColumnManager;
 	
 };
 

@@ -20,9 +20,6 @@
 #include "Tab.h"
 
 
-#define USE_SCALE_VARIABLE 0
-
-
 class Constraint;
 
 
@@ -58,6 +55,9 @@ private:
 };
 
 
+class RowColumnManager;
+
+
 /**
  * Rectangular area in the GUI, defined by a tab on each side.
  */
@@ -65,7 +65,7 @@ class Area {
 public:
 								~Area();
 
-			BView*				View();
+			BLayoutItem*		Item();
 
 			XTab*				Left() const;
 			XTab*				Right() const;
@@ -78,8 +78,6 @@ public:
 
 			Row*				GetRow() const;
 			Column*				GetColumn() const;
-			void				SetRow(Row* row);
-			void				SetColumn(Column* column);
 
 			double				ContentAspectRatio() const;
 			void				SetContentAspectRatio(double ratio);
@@ -98,40 +96,29 @@ public:
 			void				SetRightInset(float right);
 			void				SetBottomInset(float bottom);
 
-								operator BString() const;
-			void				GetString(BString& string) const;
+			BString				ToString() const;
 
 			Constraint*			SetWidthAs(Area* area, float factor = 1.0f);
 			Constraint*			SetHeightAs(Area* area, float factor = 1.0f);
 
 			void				InvalidateSizeConstraints();
 
+			BRect				Frame();
+			BRect				ItemFrame();
+
 private:
 								Area(BLayoutItem* item);
 
-#if USE_SCALE_VARIABLE
 			void				_Init(LinearSpec* ls, XTab* left, YTab* top,
 									XTab* right, YTab* bottom,
-									Variable* scaleWidth,
-									Variable* scaleHeight);
+									RowColumnManager* manager);
 			void				_Init(LinearSpec* ls, Row* row, Column* column,
-									Variable* scaleWidth,
-									Variable* scaleHeight);
-#else
-			void				_Init(LinearSpec* ls, XTab* left, YTab* top,
-									XTab* right, YTab* bottom);
-			void				_Init(LinearSpec* ls, Row* row, Column* column);
-#endif
+									RowColumnManager* manager);
 
 			void				_DoLayout();
 
 			void				_UpdateMinSizeConstraint(BSize min);
 			void				_UpdateMaxSizeConstraint(BSize max);
-			void				_UpdatePreferredWidthConstraint(
-									BSize& preferred);
-			void				_UpdatePreferredHeightConstraint(
-									BSize& preferred);
-			void				_SetupPreferredConstraints();
 private:
 			BLayoutItem*		fLayoutItem;
 
@@ -151,22 +138,18 @@ private:
 			BSize				fTopLeftInset;
 			BSize				fRightBottomInset;
 
-			BList				fConstraints;
+			BObjectList<Constraint>	fConstraints;
 			Constraint*			fMinContentWidth;
 			Constraint*			fMaxContentWidth;
 			Constraint*			fMinContentHeight;
 			Constraint*			fMaxContentHeight;
-			Constraint*			fPreferredContentWidth;
-			Constraint*			fPreferredContentHeight;
 			double				fContentAspectRatio;
 			Constraint*			fContentAspectRatioC;
 
-#if USE_SCALE_VARIABLE
-			Variable*			fScaleWidth;
-			Variable*			fScaleHeight;
-#endif
+			RowColumnManager*	fRowColumnManager;
 public:
-	friend class		BALMLayout;
+	friend class BALMLayout;
+	friend class RowColumnManager;
 
 };
 

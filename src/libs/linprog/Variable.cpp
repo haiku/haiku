@@ -160,34 +160,28 @@ Variable::SetLabel(const char* label)
 }
 
 
-Variable::operator BString() const
-{
-	BString string;
-	GetString(string);
-	return string;
-}
-
-
 /**
  * Returns index of the variable as String.
  * E.g. "Var2"
  *
  * @return the <code>String</code> index of the variable
  */
-void
-Variable::GetString(BString& string) const
+BString
+Variable::ToString() const
 {
+	BString string;
 	if (fLabel) {
 		string << fLabel;
 		if (!fIsValid)
 			string << "(invalid)";
 	} else {
-		string << "Var";
+		string << "Variable ";
 		if (!fIsValid)
 			string << "(invalid," << (int32)this << ")";
 		else
 			string << Index();
 	}
+	return string;
 }
 
 

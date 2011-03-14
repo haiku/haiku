@@ -325,17 +325,10 @@ Constraint::Invalidate()
 }
 
 
-Constraint::operator BString() const
+BString
+Constraint::ToString() const
 {
 	BString string;
-	GetString(string);
-	return string;
-}
-
-
-void
-Constraint::GetString(BString& string) const
-{
 	string << "Constraint ";
 	string << fLabel;
 	string << "(" << (int32)this << "): ";
@@ -357,14 +350,14 @@ Constraint::GetString(BString& string) const
 		string << " PenaltyNeg=" << (float)PenaltyNeg();
 	} else
 		string << "invalid";
+	return string;
 }
 
 
 void
 Constraint::PrintToStream()
 {
-	BString string;
-	GetString(string);
+	BString string = ToString();
 	printf("%s\n", string.String());
 }
 

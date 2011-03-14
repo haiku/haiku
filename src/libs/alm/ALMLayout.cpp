@@ -12,6 +12,7 @@
 #include <new>
 #include <iostream>
 
+#include "RowColumnManager.h"
 #include "ViewLayoutItem.h"
 
 
@@ -30,10 +31,11 @@ const BSize kUnsetSize(B_SIZE_UNSET, B_SIZE_UNSET);
 BALMLayout::BALMLayout(float spacing, BALMLayout* friendLayout)
 	:
 	fInset(0.0f),
-	fSpacing(spacing),
+	fSpacing(spacing / 2),
 	fCurrentArea(NULL)
 {
 	fSolver = friendLayout ? friendLayout->Solver() : &fOwnSolver;
+	fRowColumnManager = new RowColumnManager(fSolver);
 
 	fLeft = AddXTab();
 	fRight = AddXTab();
@@ -52,20 +54,12 @@ BALMLayout::BALMLayout(float spacing, BALMLayout* friendLayout)
 	fPreferredSize = kUnsetSize;
 
 	fPerformancePath = NULL;
-
-#if USE_SCALE_VARIABLE
-	fScaleWidth = fSolver->AddVariable();
-	fScaleHeight = fSolver->AddVariable();
-#endif
 }
 
 
 BALMLayout::~BALMLayout()
 {
-#if USE_SCALE_VARIABLE
-	delete fScaleWidth;
-	delete fScaleHeight;
-#endif
+	delete fRowColumnManager;
 }
 
 
@@ -85,6 +79,7 @@ BALMLayout::AddXTab()
 		return NULL;
 	}
 
+	fXTabList.AddItem(tab);
 	return tab;
 }
 
@@ -105,19 +100,36 @@ BALMLayout::AddYTab()
 		return NULL;
 	}
 
+	fYTabList.AddItem(tab);
 	return tab;
 }
 
 
-/**
- * Adds a new row to the specification.
- *
- * @return the new row
- */
-Row*
-BALMLayout::AddRow()
+int32
+BALMLayout::CountXTabs() const
 {
-	return new(std::nothrow) Row(this);
+	return fXTabList.CountItems();
+}
+
+
+int32
+BALMLayout::CountYTabs() const
+{
+	return fYTabList.CountItems();
+}
+
+
+XTab*
+BALMLayout::XTabAt(int32 index) const
+{
+	return fXTabList.ItemAt(index);
+}
+
+
+YTab*
+BALMLayout::YTabAt(int32 index) const
+{
+	return fYTabList.ItemAt(index);
 }
 
 
@@ -131,24 +143,11 @@ BALMLayout::AddRow()
 Row*
 BALMLayout::AddRow(YTab* top, YTab* bottom)
 {
-	Row* row = new(std::nothrow) Row(this);
-	if (top != NULL)
-		row->Constraints()->AddItem(row->Top()->IsEqual(top));
-	if (bottom != NULL)
-		row->Constraints()->AddItem(row->Bottom()->IsEqual(bottom));
-	return row;
-}
-
-
-/**
- * Adds a new column to the specification.
- *
- * @return the new column
- */
-Column*
-BALMLayout::AddColumn()
-{
-	return new(std::nothrow) Column(this);
+	if (top == NULL)
+		top = AddYTab();
+	if (bottom == NULL)
+		bottom = AddYTab();
+	return new(std::nothrow) Row(fSolver, top, bottom);
 }
 
 
@@ -162,12 +161,11 @@ BALMLayout::AddColumn()
 Column*
 BALMLayout::AddColumn(XTab* left, XTab* right)
 {
-	Column* column = new(std::nothrow) Column(this);
-	if (left != NULL)
-		column->Constraints()->AddItem(column->Left()->IsEqual(left));
-	if (right != NULL)
-		column->Constraints()->AddItem(column->Right()->IsEqual(right));
-	return column;
+	if (left == NULL)
+		left = AddXTab();
+	if (right == NULL)
+		right = AddXTab();
+	return new(std::nothrow) Column(fSolver, left, right);
 }
 
 
@@ -194,86 +192,126 @@ BALMLayout::AreaFor(const BLayoutItem* item) const
 
 
 Area*
+BALMLayout::AreaAt(int32 index) const
+{
+	return AreaFor(ItemAt(index));
+}
+
+
+Area*
 BALMLayout::CurrentArea() const
 {
 	return fCurrentArea;
 }
 
 
-void
+bool
 BALMLayout::SetCurrentArea(const Area* area)
 {
 	fCurrentArea = const_cast<Area*>(area);
+	return true;
 }
 
 
-void
+bool
 BALMLayout::SetCurrentArea(const BView* view)
 {
-	fCurrentArea = AreaFor(view);
+	Area* area = AreaFor(view);
+	if (!area)
+		return false;
+	fCurrentArea = area;
+	return true;
 }
 
 
-void
+bool
 BALMLayout::SetCurrentArea(const BLayoutItem* item)
 {
-	fCurrentArea = AreaFor(item);
+	Area* area = AreaFor(item);
+	if (!area)
+		return false;
+	fCurrentArea = area;
+	return true;
 }
 
 
 XTab*
 BALMLayout::LeftOf(const BView* view) const
 {
-	return AreaFor(view)->Left();
+	Area* area = AreaFor(view);
+	if (!area)
+		return NULL;
+	return area->Left();
 }
 
 
 XTab*
 BALMLayout::LeftOf(const BLayoutItem* item) const
 {
-	return AreaFor(item)->Left();
+	Area* area = AreaFor(item);
+	if (!area)
+		return NULL;
+	return area->Left();
 }
 
 
 XTab*
 BALMLayout::RightOf(const BView* view) const
 {
-	return AreaFor(view)->Right();
+	Area* area = AreaFor(view);
+	if (!area)
+		return NULL;
+	return area->Right();
 }
 
 
 XTab*
 BALMLayout::RightOf(const BLayoutItem* item) const
 {
-	return AreaFor(item)->Right();
+	Area* area = AreaFor(item);
+	if (!area)
+		return NULL;
+	return area->Right();
 }
 
 
 YTab*
 BALMLayout::TopOf(const BView* view) const
 {
-	return AreaFor(view)->Top();
+	Area* area = AreaFor(view);
+	if (!area)
+		return NULL;
+	return area->Top();
 }
 
 
 YTab*
 BALMLayout::TopOf(const BLayoutItem* item) const
 {
-	return AreaFor(item)->Top();
+	Area* area = AreaFor(item);
+	if (!area)
+		return NULL;
+	return area->Top();
 }
 
 
 YTab*
 BALMLayout::BottomOf(const BView* view) const
 {
-	return AreaFor(view)->Bottom();
+	Area* area = AreaFor(view);
+	if (!area)
+		return NULL;
+	return area->Bottom();
 }
 
 
 YTab*
 BALMLayout::BottomOf(const BLayoutItem* item) const
 {
-	return AreaFor(item)->Bottom();
+	Area* area = AreaFor(item);
+	if (!area)
+		return NULL;
+	return area->Bottom();
 }
 
 
@@ -480,6 +518,7 @@ BALMLayout::AddItem(BLayoutItem* item, XTab* left, YTab* top, XTab* right,
 	if (!bottom)
 		bottom = AddYTab();
 
+	// Area is added int ItemAdded
 	if (!BAbstractLayout::AddItem(-1, item))
 		return NULL;
 	Area* area = AreaFor(item);
@@ -487,11 +526,9 @@ BALMLayout::AddItem(BLayoutItem* item, XTab* left, YTab* top, XTab* right,
 		return NULL;
 	fCurrentArea = area;
 
-#if USE_SCALE_VARIABLE
-	area->_Init(fSolver, left, top, right, bottom, fScaleWidth, fScaleHeight);
-#else
-	area->_Init(fSolver, left, top, right, bottom);
-#endif
+	area->_Init(fSolver, left, top, right, bottom, fRowColumnManager);
+
+	fRowColumnManager->AddArea(area);
 	return area;
 }
 
@@ -506,11 +543,9 @@ BALMLayout::AddItem(BLayoutItem* item, Row* row, Column* column)
 		return NULL;
 	fCurrentArea = area;
 
-#if USE_SCALE_VARIABLE
-	area->_Init(fSolver, row, column, fScaleWidth, fScaleHeight);
-#else
-	area->_Init(fSolver, row, column);
-#endif
+	area->_Init(fSolver, row, column, fRowColumnManager);
+
+	fRowColumnManager->AddArea(area);
 	return area;
 }
 
@@ -519,6 +554,9 @@ Area*
 BALMLayout::AddItemToRight(BLayoutItem* item, XTab* right, YTab* top,
 	YTab* bottom)
 {
+	if (fCurrentArea == NULL)
+		return NULL;
+
 	XTab* left = fCurrentArea->Right();
 	if (!right)
 		right = AddXTab();
@@ -535,6 +573,9 @@ Area*
 BALMLayout::AddItemToLeft(BLayoutItem* item, XTab* left, YTab* top,
 	YTab* bottom)
 {
+	if (fCurrentArea == NULL)
+		return NULL;
+
 	if (!left)
 		left = AddXTab();
 	XTab* right = fCurrentArea->Left();
@@ -550,6 +591,9 @@ BALMLayout::AddItemToLeft(BLayoutItem* item, XTab* left, YTab* top,
 Area*
 BALMLayout::AddItemToTop(BLayoutItem* item, YTab* top, XTab* left, XTab* right)
 {
+	if (fCurrentArea == NULL)
+		return NULL;
+
 	if (!left)
 		left = fCurrentArea->Left();
 	if (!right)
@@ -566,6 +610,9 @@ Area*
 BALMLayout::AddItemToBottom(BLayoutItem* item, YTab* bottom, XTab* left,
 	XTab* right)
 {
+	if (fCurrentArea == NULL)
+		return NULL;
+
 	if (!left)
 		left = fCurrentArea->Left();
 	if (!right)
@@ -692,6 +739,7 @@ void
 BALMLayout::ItemRemoved(BLayoutItem* item, int32 fromIndex)
 {
 	if (Area* area = AreaFor(item)) {
+		fRowColumnManager->RemoveArea(area);
 		item->SetLayoutData(NULL);
 		delete area;
 	}
@@ -779,14 +827,14 @@ BALMLayout::Inset() const
 void
 BALMLayout::SetSpacing(float spacing)
 {
-	fSpacing = spacing;
+	fSpacing = spacing / 2;
 }
 
 
 float
 BALMLayout::Spacing() const
 {
-	return fSpacing;
+	return fSpacing * 2;
 }
 
 
@@ -846,4 +894,5 @@ BALMLayout::_UpdateAreaConstraints()
 {
 	for (int i = 0; i < CountItems(); i++)
 		AreaFor(ItemAt(i))->InvalidateSizeConstraints();
+	fRowColumnManager->UpdateConstraints();
 }

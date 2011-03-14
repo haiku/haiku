@@ -22,6 +22,10 @@
 
 namespace BALM {
 
+
+class RowColumnManager;
+
+
 /*!
  * A GUI layout engine using the Auckland Layout Model (ALM).
  */
@@ -33,9 +37,12 @@ public:
 
 			XTab*				AddXTab();
 			YTab*				AddYTab();
-			Row*				AddRow();
+			int32				CountXTabs() const;
+			int32				CountYTabs() const;
+			XTab*				XTabAt(int32 index) const;
+			YTab*				YTabAt(int32 index) const;
+
 			Row*				AddRow(YTab* top, YTab* bottom);
-			Column*				AddColumn();
 			Column*				AddColumn(XTab* left, XTab* right);
 
 			XTab*				Left() const;
@@ -56,10 +63,11 @@ public:
 
 			Area*				AreaFor(const BView* view) const;
 			Area*				AreaFor(const BLayoutItem* item) const;
+			Area*				AreaAt(int32 index) const;
 			Area*				CurrentArea() const;
-			void				SetCurrentArea(const Area* area);
-			void				SetCurrentArea(const BView* view);
-			void				SetCurrentArea(const BLayoutItem* item);
+			bool				SetCurrentArea(const Area* area);
+			bool				SetCurrentArea(const BView* view);
+			bool				SetCurrentArea(const BLayoutItem* item);
 	
 			XTab*				LeftOf(const BView* view) const;
 			XTab*				LeftOf(const BLayoutItem* item) const;
@@ -150,10 +158,10 @@ private:
 
 			Area*				fCurrentArea;
 
-#if USE_SCALE_VARIABLE
-			Variable*			fScaleWidth;
-			Variable*			fScaleHeight;
-#endif
+			XTabList			fXTabList;
+			YTabList			fYTabList;
+
+			RowColumnManager*	fRowColumnManager;
 };
 
 }	// namespace BALM
