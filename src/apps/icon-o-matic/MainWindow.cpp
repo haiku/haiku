@@ -89,9 +89,9 @@ enum {
 MainWindow::MainWindow(IconEditorApp* app, Document* document,
 		const BMessage* settings)
 	:
-	BWindow(BRect(50, 50, 900, 750), "Icon-O-Matic",
+	BWindow(BRect(50, 50, 900, 750), B_TRANSLATE_APP_NAME("Icon-O-Matic"),
 		B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
-			B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
+		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
 	fApp(app),
 	fDocument(document),
 	fIcon(NULL)

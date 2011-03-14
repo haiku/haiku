@@ -29,7 +29,7 @@ ExpanderApp::ExpanderApp()
 void
 ExpanderApp::AboutRequested()
 {
-	BString appName = B_TRANSLATE("Expander");
+	BString appName = B_TRANSLATE_APP_NAME("Expander");
 	int nameLength = appName.CountChars();
 	BAlert* alert = new BAlert("about",
 		appName.Append(B_TRANSLATE("\n\twritten by Jérôme Duval\n"

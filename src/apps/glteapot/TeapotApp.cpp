@@ -3,7 +3,11 @@
 	This file may be used under the terms of the Be Sample Code License.
 */
 
+
 #include "TeapotApp.h"
+
+#include <Catalog.h>
+
 
 int
 main(int argc, char** argv)
@@ -16,9 +20,11 @@ main(int argc, char** argv)
 
 
 TeapotApp::TeapotApp(const char* sign)
-	: BApplication(sign)
+	:
+	BApplication(sign)
 {
-	fTeapotWindow = new TeapotWindow(BRect(5, 25, 300, 315), "GLTeapot", B_TITLED_WINDOW, 0);	
+	fTeapotWindow = new TeapotWindow(BRect(5, 25, 300, 315),
+		B_TRANSLATE_APP_NAME("GLTeapot"), B_TITLED_WINDOW, 0);
 	fTeapotWindow->Show();
 }
 
@@ -26,7 +32,6 @@ TeapotApp::TeapotApp(const char* sign)
 void
 TeapotApp::MessageReceived(BMessage* msg)
 {
-//	msg->PrintToStream();
 	switch (msg->what) {
 
 		default:

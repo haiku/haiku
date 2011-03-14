@@ -6,6 +6,12 @@ Application Clock :
 	cl_view.cpp 
 	cl_wind.cpp 
 	clock.cpp 
-	: be $(TARGET_LIBSUPC++)
+	: be $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
 	: Clock.rdef
 	;
+
+DoCatalogs Clock :
+	x-vnd.Haiku-Clock
+	:
+	clock.cpp
+;

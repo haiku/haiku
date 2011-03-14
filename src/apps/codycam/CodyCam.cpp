@@ -56,7 +56,8 @@ namespace {
 void
 ErrorAlert(const char* message, status_t err, BWindow *window = NULL)
 {
-	BAlert *alert = new BAlert("", message, B_TRANSLATE("OK"));
+	BAlert *alert = new BAlert(B_TRANSLATE_APP_NAME("CodyCam"), message,
+		B_TRANSLATE("OK"));
 	if (window != NULL)
 		alert->CenterIn(window->Frame());
 	alert->Go();
@@ -190,7 +191,7 @@ void
 CodyCam::ReadyToRun()
 {
 	fWindow = new VideoWindow(BRect(28, 28, 28, 28),
-		(const char*) B_TRANSLATE("CodyCam"), B_TITLED_WINDOW,
+		(const char*) B_TRANSLATE_APP_NAME("CodyCam"), B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS, &fPort);
 
 	_SetUpNodes();

@@ -32,9 +32,10 @@ static const uint32 kMsgProbeDevice = 'prFl';
 
 
 OpenWindow::OpenWindow()
-	: BWindow(BRect(0, 0, 35, 10), B_TRANSLATE("DiskProbe"), B_TITLED_WINDOW,
-		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS
-			 | B_AUTO_UPDATE_SIZE_LIMITS)
+	:
+	BWindow(BRect(0, 0, 35, 10), B_TRANSLATE_APP_NAME("DiskProbe"),
+		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE
+		| B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	fDevicesMenu = new BPopUpMenu("devices");
 	CollectDevices(fDevicesMenu);

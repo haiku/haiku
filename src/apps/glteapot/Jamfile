@@ -9,6 +9,12 @@ Application GLTeapot :
 	error.cpp
 	TeapotWindow.cpp
 	TeapotApp.cpp
-	: be GL game $(TARGET_LIBSUPC++)
+	: be GL game $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
 	: GLTeapot.rdef
+;
+
+DoCatalogs GLTeapot :
+	x-vnd.Haiku-GLTeapot
+	:
+	TeapotApp.cpp
 ;

@@ -7,6 +7,7 @@
 
 
 #include <Application.h>
+#include <Catalog.h>
 
 #include "cl_wind.h"
 
@@ -19,7 +20,8 @@ main(int argc, char* argv[])
 {
 	BApplication app(kAppSignature);
 
-	BWindow* clockWindow = new TClockWindow(BRect(100, 100, 182, 182), "Clock");
+	BWindow* clockWindow = new TClockWindow(BRect(100, 100, 182, 182),
+		B_TRANSLATE_APP_NAME("Clock"));
 	clockWindow->Show();
 
 	app.Run();
