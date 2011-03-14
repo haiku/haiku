@@ -302,7 +302,8 @@ Grepper::_SetPattern(const char* src)
 			||  (c == '?')  || (c == '*')
 			||  (c == '+')  || (c == '-')
 			||  (c == ':')  || (c == '^')
-			||  (c == '\'') || (c == '"')) {
+			||  (c == '\'') || (c == '"')
+			||  (c == '`')) {
 			*dstPtr++ = '\\';
 		} else if ((c == '\\') || (c == '$')) {
 			// Some characters need to be escaped
