@@ -132,7 +132,7 @@ HIDParser::ParseReportDescriptor(const uint8 *reportDescriptor,
 				if (item->tag == ITEM_TAG_MAIN_COLLECTION) {
 					HIDCollection *newCollection
 						= new(std::nothrow) HIDCollection(collection,
-							(uint8)data, globalState, localState);
+							(uint8)data, localState);
 					if (newCollection == NULL) {
 						TRACE_ALWAYS("no memory to allocate new collection\n");
 						break;

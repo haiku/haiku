@@ -12,8 +12,7 @@ class HIDReportItem;
 class HIDCollection {
 public:
 								HIDCollection(HIDCollection *parent,
-									uint8 type, global_item_state &globalState,
-									local_item_state &localState);
+									uint8 type, local_item_state &localState);
 								~HIDCollection();
 
 		HIDCollection *			Parent() { return fParent; };
