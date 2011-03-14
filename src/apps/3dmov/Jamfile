@@ -11,6 +11,12 @@ Application 3DMov :
 	ViewCube.cpp
 	ViewSphere.cpp
 	GLUtility.cpp
-	: be GL game media translation $(TARGET_LIBSUPC++)
+	: be GL game $(HAIKU_LOCALE_LIBS) media translation $(TARGET_LIBSUPC++)
 	: 3dmov.rdef
+;
+
+DoCatalogs 3DMov :
+	x-vnd.Haiku-3DMov
+	:
+	MainWindow.cpp
 ;

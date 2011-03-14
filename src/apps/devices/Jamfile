@@ -88,11 +88,6 @@ DoCatalogs Devices :
 	Device.cpp
 ;
 
-AddCatalogEntryAttribute Devices
-	:
-	"x-vnd.Haiku-Devices:DevicesApplication:Devices"
-;
-
 Includes [ FGristFiles DevicesInfo.cpp ] : [ FGristFiles isapnpids.h usbdevs.h
 	usbdevs_data.h ] ;
 Includes [ FGristFiles ConfigurationWindow.cpp ] : [ FGristFiles pcihdr.h ] ;

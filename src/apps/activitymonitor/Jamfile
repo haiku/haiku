@@ -24,8 +24,3 @@ DoCatalogs ActivityMonitor :
 	DataSource.cpp
 	SettingsWindow.cpp
 ;
-
-AddCatalogEntryAttribute ActivityMonitor
-	:
-	"x-vnd.Haiku-ActivityMonitor:ActivityWindow:ActivityMonitor"
-;

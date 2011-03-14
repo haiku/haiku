@@ -9,8 +9,9 @@
 					On Zeta, both AddChild(new BGLView) and new MainWindow work without any problems.
 */
 
-#include <InterfaceKit.h>
+#include <Catalog.h>
 #include <GLView.h>
+#include <InterfaceKit.h>
 #include <Messenger.h>
 
 #include "MainWindow.h"
@@ -51,7 +52,8 @@ static int sMainWindowCount = 0;	// keep track of number of spawned windows
 	DESCRIPTION:	Constructor
 */
 MainWindow :: MainWindow(BRect frame, SHAPE shape)
-	: BDirectWindow(frame, "3Dmov", B_TITLED_WINDOW, 0)
+	:
+	BDirectWindow(frame, B_TRANSLATE_APP_NAME("3DMov"), B_TITLED_WINDOW, 0)
 {
 	sMainWindowCount++;
 	

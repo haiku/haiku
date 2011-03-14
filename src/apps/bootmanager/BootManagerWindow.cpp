@@ -28,9 +28,9 @@
 
 BootManagerWindow::BootManagerWindow()
 	:
-	BWindow(BRect(100, 100, 500, 400), B_TRANSLATE_COMMENT("BootManager",
-			"Window Title"), B_TITLED_WINDOW,
-		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
+	BWindow(BRect(100, 100, 500, 400), B_TRANSLATE_APP_NAME("BootManager"),
+		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE
+		| B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	float minWidth, maxWidth, minHeight, maxHeight;
 	GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);

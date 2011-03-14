@@ -31,8 +31,3 @@ DoCatalogs DiskProbe :
 	ProbeView.cpp
 	TypeEditors.cpp
 ;
-
-AddCatalogEntryAttribute DiskProbe
-	:
-	"x-vnd.Haiku-DiskProbe:OpenWindow:DiskProbe"
-;

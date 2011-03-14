@@ -40,9 +40,3 @@ DoCatalogs Pulse :
 	PrefsWindow.cpp
 	PulseWindow.cpp
 ;
-
-AddCatalogEntryAttribute Pulse 
-	:
-	x-vnd.Haiku-Pulse:PulseWindow:Pulse
-;
-

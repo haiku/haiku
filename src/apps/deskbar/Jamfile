@@ -40,7 +40,7 @@ Application Deskbar :
 	Switcher.cpp
 	$(targetSource)
 	: be $(HAIKU_LOCALE_LIBS) tracker $(targetLib) $(TARGET_LIBSUPC++)
-	;
+;
 
 DoCatalogs Deskbar :
 	x-vnd.Be-TSKB
@@ -51,9 +51,4 @@ DoCatalogs Deskbar :
 	StatusView.cpp
 	TimeView.cpp
 	WindowMenu.cpp
-	;
-
-AddCatalogEntryAttribute Deskbar
-	:
-	"x-vnd.Be-TSKB:MainWindow:Deskbar"
 ;

@@ -64,7 +64,7 @@ ActivityMonitor::ShowAbout()
 		NULL
 	};
 
-	BAboutWindow aboutWindow(kAppName, 2008, kAuthors);
+	BAboutWindow aboutWindow(B_TRANSLATE_APP_NAME("ActivityMonitor"), 2008, kAuthors);
 	aboutWindow.Show();
 }
 

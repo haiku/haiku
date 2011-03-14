@@ -35,8 +35,3 @@ DoCatalogs ProcessController :
 	PriorityMenu.cpp
 	ProcessController.cpp
 ;
-
-AddCatalogEntryAttribute ProcessController
-	:
-	x-vnd.Haiku-ProcessController:PCWindow:ProcessController
-;

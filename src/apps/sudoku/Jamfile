@@ -24,8 +24,3 @@ DoCatalogs Sudoku :
 	SudokuGenerator.cpp
 	SudokuWindow.cpp
 ;
-
-AddCatalogEntryAttribute Sudoku
-	:
-	x-vnd.Haiku-Sudoku:SudokuWindow:Sudoku
-;
