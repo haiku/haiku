@@ -1,22 +1,22 @@
 /*
  * Copyright (c) 1998-2007 Matthijs Hollemans
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a 
- * copy of this software and associated documentation files (the "Software"), 
- * to deal in the Software without restriction, including without limitation 
- * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the 
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in 
+ *
+ * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
 
@@ -143,9 +143,9 @@ Grepper::Start()
 
 	fMustQuit = false;
 	fThreadId = spawn_thread(
-		_SpawnThread, "_GrepperThread", B_NORMAL_PRIORITY, this); 
-                 
-	resume_thread(fThreadId); 
+		_SpawnThread, "_GrepperThread", B_NORMAL_PRIORITY, this);
+
+	resume_thread(fThreadId);
 }
 
 
@@ -171,14 +171,14 @@ Grepper::_SpawnThread(void* cookie)
 	Grepper* self = static_cast<Grepper*>(cookie);
 	return self->_GrepperThread();
 }
-   
+
 
 int32
-Grepper::_GrepperThread() 
+Grepper::_GrepperThread()
 {
 	BMessage message;
 
-	char fileName[B_PATH_NAME_LENGTH]; 
+	char fileName[B_PATH_NAME_LENGTH];
 	char tempString[B_PATH_NAME_LENGTH];
 	char command[B_PATH_NAME_LENGTH + 32];
 
@@ -296,7 +296,7 @@ Grepper::_SetPattern(const char* src)
 		char c = *srcPtr++;
 
 		// Put a backslash in front of characters
-		// that should be escaped. 
+		// that should be escaped.
 		if ((c == '.')  || (c == ',')
 			||  (c == '[')  || (c == ']')
 			||  (c == '?')  || (c == '*')
