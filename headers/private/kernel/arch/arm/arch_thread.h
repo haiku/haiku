@@ -20,8 +20,7 @@ void arm_push_iframe(struct iframe_stack *stack, struct iframe *frame);
 void arm_pop_iframe(struct iframe_stack *stack);
 struct iframe *arm_get_user_iframe(void);
 
-/* as we won't support SMP on arm (yet?) we can use a global here */
-/*TODO SMP-ARMS are comming..*/
+/* TODO fix this global once we support SMP ARM... */
 extern Thread *gCurrentThread;
 
 extern inline Thread *

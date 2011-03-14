@@ -37,4 +37,4 @@ struct arch_fork_arg {
 	char	dummy;
 };
 
-#endif	/* KERNEL_ARCH_M68K_THREAD_TYPES_H */
+#endif	/* KERNEL_ARCH_ARM_THREAD_TYPES_H */

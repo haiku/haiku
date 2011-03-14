@@ -6,10 +6,11 @@
 #define _KERNEL_ARCH_ARM_KERNEL_H
 
 #include <arch/cpu.h>
+
 // memory layout
-#define KERNEL_BASE 0x80000000
-#define KERNEL_SIZE 0x80000000
-#define KERNEL_TOP  (KERNEL_BASE + (KERNEL_SIZE - 1))
+#define KERNEL_BASE	0x80000000
+#define KERNEL_SIZE	0x80000000
+#define KERNEL_TOP	(KERNEL_BASE + (KERNEL_SIZE - 1))
 
 /*
 ** User space layout is a little special:
@@ -19,13 +20,13 @@
 ** region wont be placed there. The 64kb region assures a user space thread cannot pass
 ** a buffer into the kernel as part of a syscall that would cross into kernel space.
 */
-#define USER_BASE     0x100000
-#define USER_BASE_ANY USER_BASE
-#define USER_SIZE     (0x80000000 - (0x10000 + 0x100000))
-#define USER_TOP      (USER_BASE + USER_SIZE)
+#define USER_BASE		0x100000
+#define USER_BASE_ANY		USER_BASE
+#define USER_SIZE		(0x80000000 - (0x10000 + 0x100000))
+#define USER_TOP		(USER_BASE + USER_SIZE)
 
-#define KERNEL_USER_DATA_BASE  0x6fff0000
-#define USER_STACK_REGION              0x70000000
-#define USER_STACK_REGION_SIZE (USER_TOP - USER_STACK_REGION)
+#define KERNEL_USER_DATA_BASE	0x6fff0000
+#define USER_STACK_REGION	0x70000000
+#define USER_STACK_REGION_SIZE	(USER_TOP - USER_STACK_REGION)
 
 #endif	/* _KERNEL_ARCH_ARM_KERNEL_H */
