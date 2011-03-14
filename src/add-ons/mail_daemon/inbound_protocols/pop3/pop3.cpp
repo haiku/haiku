@@ -111,6 +111,12 @@ POP3Protocol::Disconnect()
 			SSL_shutdown(fSSL);
 		if (fSSLContext)
 			SSL_CTX_free(fSSLContext);
+		if (fSSLBio)
+			BIO_free(fSSLBio);
+
+		fSSL = NULL;
+		fSSLContext = NULL;
+		fSSLBio = NULL;
 	}
 #endif
 
@@ -119,6 +125,7 @@ POP3Protocol::Disconnect()
 #else
 	closesocket(fSocket);
 #endif
+	fSocket = -1;
 	return B_OK;
 }
 
