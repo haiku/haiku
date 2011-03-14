@@ -538,7 +538,17 @@ LayoutOptimizer::SetConstraints(const ConstraintList& list, int32 variableCount)
 			rightSide[c] = 0;
 			continue;
 		}
-		rightSide[c] = _RightSide(constraint);
+		double weight = 0;
+		double negPenalty = constraint->PenaltyNeg();
+		if (negPenalty > 0)
+			weight += negPenalty;
+		double posPenalty = constraint->PenaltyPos();
+		if (posPenalty > 0)
+			weight += posPenalty;
+		if (negPenalty > 0 && posPenalty > 0)
+			weight /= 2;
+		
+		rightSide[c] = _RightSide(constraint) * weight;
 		SummandList* summands = constraint->LeftSide();
 		for (int32 s = 0; s < summands->CountItems(); s++) {
 			Summand* summand = summands->ItemAt(s);
@@ -547,6 +557,7 @@ LayoutOptimizer::SetConstraints(const ConstraintList& list, int32 variableCount)
 				fSoftConstraints[c][variable] = -summand->Coeff();
 			else
 				fSoftConstraints[c][variable] = summand->Coeff();
+			fSoftConstraints[c][variable] *= weight;
 		}
 	}
 
