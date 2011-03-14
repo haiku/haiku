@@ -153,8 +153,10 @@ layout_item_for(BView* view)
 
 
 InstallerWindow::InstallerWindow()
-	: BWindow(BRect(-2000, -2000, -1800, -1800), B_TRANSLATE("Installer"),
-		B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
+	:
+	BWindow(BRect(-2000, -2000, -1800, -1800),
+		B_TRANSLATE_APP_NAME("Installer"), B_TITLED_WINDOW,
+		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
 	fEncouragedToSetupPartitions(false),
 	fDriveSetupLaunched(false),
 	fBootmanLaunched(false),
@@ -566,33 +568,42 @@ InstallerWindow::MessageReceived(BMessage *msg)
 bool
 InstallerWindow::QuitRequested()
 {
-	if (fDriveSetupLaunched && fBootmanLaunched) {
-		(new BAlert(B_TRANSLATE("Quit Boot Manager and DriveSetup"),
-			B_TRANSLATE("Please close the Boot Manager and DriveSetup windows "
-			"before closing the Installer window."), B_TRANSLATE("OK")))->Go();
-		return false;
-	} else if (fDriveSetupLaunched) {
-		(new BAlert(B_TRANSLATE("Quit DriveSetup"),
-			B_TRANSLATE("Please close the DriveSetup window before closing "
-			"the Installer window."), B_TRANSLATE("OK")))->Go();
-		return false;
-	} else if (fBootmanLaunched) {
-		(new BAlert(B_TRANSLATE("Quit Boot Manager"),
-			B_TRANSLATE("Please close the Boot Manager window before closing "
-			"the Installer window."), B_TRANSLATE("OK")))->Go();
-		return false;
-	}
-
-	if (fInstallStatus != kFinished && (Flags() & B_NOT_MINIMIZABLE) != 0) {
+	if ((Flags() & B_NOT_MINIMIZABLE) != 0) {
 		// This means Deskbar is not running, i.e. Installer is the only
 		// thing on the screen and we will reboot the machine once it quits.
-		if ((new BAlert("reallyQuit",
-			B_TRANSLATE("Are you sure you want to abort the installation and "
-				"restart the system?"),
-			B_TRANSLATE("Cancel"),
-			B_TRANSLATE("Restart system")))->Go() == 0) {
+
+		if (fDriveSetupLaunched && fBootmanLaunched) {
+			(new BAlert(B_TRANSLATE("Quit Boot Manager and DriveSetup"),
+				B_TRANSLATE("Please close the Boot Manager and DriveSetup "
+					"windows before closing the Installer window."),
+				B_TRANSLATE("OK")))->Go();
+			return false;
+		} else if (fDriveSetupLaunched) {
+			(new BAlert(B_TRANSLATE("Quit DriveSetup"),
+				B_TRANSLATE("Please close the DriveSetup window before closing "
+					"the Installer window."), B_TRANSLATE("OK")))->Go();
+			return false;
+		} else if (fBootmanLaunched) {
+			(new BAlert(B_TRANSLATE("Quit Boot Manager"),
+				B_TRANSLATE("Please close the Boot Manager window before "
+					"closing the Installer window."), B_TRANSLATE("OK")))->Go();
 			return false;
 		}
+
+		if (fInstallStatus != kFinished)
+			if ((new BAlert(B_TRANSLATE_APP_NAME("Installer"),
+				B_TRANSLATE("Are you sure you want to abort the installation "
+					"and restart the system?"),
+				B_TRANSLATE("Cancel"), B_TRANSLATE("Restart system"), NULL,
+				B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go() == 0)
+				return false;
+
+	} else if (fInstallStatus == kInstalling) {
+		if ((new BAlert(B_TRANSLATE_APP_NAME("Installer"),
+			B_TRANSLATE("Are you sure you want to abort the installation?"),
+			B_TRANSLATE("Cancel"), B_TRANSLATE("Abort"), NULL,
+			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go() == 0)
+			return false;
 	}
 
 	_QuitCopyEngine(false);
