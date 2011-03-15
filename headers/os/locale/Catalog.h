@@ -100,12 +100,6 @@ private:
 	BLocaleRoster::Default()->GetCatalog()->GetString((string), \
 		B_TRANSLATE_CONTEXT)
 
-#undef B_TRANSLATE_APP_NAME
-#define B_TRANSLATE_APP_NAME(string) \
-	BLocaleRoster::Default()->IsFilesystemTranslationPreferred() \
-	? BLocaleRoster::Default()->GetCatalog()->GetString((string), \
-		B_TRANSLATE_APP_NAME_CONTEXT) : (string)
-
 #undef B_TRANSLATE_WITH_CONTEXT
 #define B_TRANSLATE_WITH_CONTEXT(string, context) \
 	BLocaleRoster::Default()->GetCatalog()->GetString((string), (context))
@@ -123,6 +117,12 @@ private:
 #undef B_TRANSLATE_ID
 #define B_TRANSLATE_ID(id) \
 	BLocaleRoster::Default()->GetCatalog()->GetString((id))
+
+#undef B_TRANSLATE_APP_NAME
+#define B_TRANSLATE_APP_NAME(string) \
+	BLocaleRoster::Default()->IsFilesystemTranslationPreferred() \
+	? BLocaleRoster::Default()->GetCatalog()->GetString((string), \
+		B_TRANSLATE_APP_NAME_CONTEXT) : (string)
 
 // Translation markers which can be used to mark static strings/IDs which
 // are used as key for translation requests (at other places in the code):
@@ -185,6 +185,10 @@ private:
 #define B_TRANSLATE_NOCOLLECT_ID(id) \
 	B_TRANSLATE_ID(id)
 
+#undef B_TRANSLATE_NOCOLLECT_APP_NAME
+#define B_TRANSLATE_NOCOLLECT_APP_NAME(str) \
+	B_TRANSLATE_APP_NAME(str)
+
 #endif	/* B_AVOID_TRANSLATION_MACROS */
 
 #else	/* B_COLLECTING_CATKEYS */
@@ -199,10 +203,6 @@ private:
 #undef B_TRANSLATE
 #define B_TRANSLATE(string) \
 	B_CATKEY((string), B_TRANSLATE_CONTEXT)
-
-#undef B_TRANSLATE_APP_NAME
-#define B_TRANSLATE_APP_NAME(string) \
-	B_CATKEY((string), B_TRANSLATE_APP_NAME_CONTEXT)
 
 #undef B_TRANSLATE_WITH_CONTEXT
 #define B_TRANSLATE_WITH_CONTEXT(string, context) \
@@ -219,6 +219,10 @@ private:
 #undef B_TRANSLATE_ID
 #define B_TRANSLATE_ID(id) \
 	B_CATKEY((id))
+
+#undef B_TRANSLATE_APP_NAME
+#define B_TRANSLATE_APP_NAME(string) \
+	B_CATKEY((string), B_TRANSLATE_APP_NAME_CONTEXT)
 
 #undef B_TRANSLATE_MARK
 #define B_TRANSLATE_MARK(str) \
@@ -254,6 +258,10 @@ private:
 
 #undef B_TRANSLATE_NOCOLLECT_ID
 #define B_TRANSLATE_NOCOLLECT_ID(id) \
+	(void)
+
+#undef B_TRANSLATE_NOCOLLECT_APP_NAME
+#define B_TRANSLATE_NOCOLLECT_APP_NAME(str) \
 	(void)
 
 #endif	/* B_COLLECTING_CATKEYS */
