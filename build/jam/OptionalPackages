@@ -797,8 +797,8 @@ if [ IsOptionalHaikuImagePackageAdded Git ] {
 		Echo "No optional package Git available for $(TARGET_ARCH)" ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			git-1.7.1-x86-gcc2-2010-05-26.zip
-			: $(baseURL)/git-1.7.1-x86-gcc2-2010-05-26.zip
+			git-1.7.3.5-x86-gcc2-2011-03-15.zip
+			: $(baseURL)/git-1.7.3.5-x86-gcc2-2011-03-15.zip
 			: : true ;
 	}
 }
