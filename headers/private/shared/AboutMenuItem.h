@@ -11,7 +11,7 @@
 
 class BAboutMenuItem : public BMenuItem {
 public:
-							BAboutMenuItem(const char* appName);
+							BAboutMenuItem();
 };
 
 
