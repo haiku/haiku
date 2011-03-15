@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-DiskProbe	1552395580
+1	finnish	x-vnd.Haiku-DiskProbe	2517027115
 %ld (native)	ProbeView		%ld (alkuperäinen)
 (native)	ProbeView		(alkuperäinen)
 15 bit	TypeEditors		15-bittinen
@@ -53,7 +53,7 @@ Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it i
 Device	ProbeView		Laite
 Device offset: 	ProbeView		Laitesiirros: 
 Device: 	ProbeView		Laite: 
-DiskProbe	OpenWindow		Levykoestaja
+DiskProbe	Application name		Levykoestaja
 DiskProbe request	AttributeWindow		Levykoestajapyyntö
 DiskProbe request	DiskProbe		Levykoestajapyyntö
 DiskProbe request	ProbeView		Levykoestajapyyntö
@@ -86,7 +86,7 @@ MIME type:	TypeEditors		MIME-tyyppi:
 Message	TypeEditors	This is the type of view	Viesti
 Message View	TypeEditors		Viestinäkymä
 Mode:	FindWindow		Tila:
-Native: %Ld (0x%0*Lx)	ProbeView		Kotoperäinen: %Ld (0x%0*Lx)
+Native: %Ld (0x%0*Lx)	ProbeView		Alkuperäinen: %Ld (0x%0*Lx)
 Native: 0x%0*Lx	ProbeView		Kotoperäinen: 0x%0*Lx
 New…	FileWindow		Uusi…
 Next	ProbeView		Seuraava

@@ -1,8 +1,8 @@
-1	swedish	x-vnd.Haiku-CDPlayer	744500153
+1	swedish	x-vnd.Haiku-CDPlayer	1556801578
 Audio CD	CDPlayer		Ljud-CD
 CD	CDPlayer		CD
 CD drive is empty	CDPlayer		CD-enheten är tom
-CDPlayer	CDPlayer		CDSpelaren
+CDPlayer	Application name		CDSpelaren
 Disc: %ld:%.2ld / %ld:%.2ld	CDPlayer		Skiva: %ld:%.2ld / %ld:%.2ld
 Disc: --:-- / --:--	CDPlayer		Skiva: --:-- / --:--
 Disc: 88:88 / 88:88	CDPlayer		Skiva: 88:88 / 88:88

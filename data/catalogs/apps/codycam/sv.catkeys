@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku.CodyCam	1322454590
+1	swedish	x-vnd.Haiku.CodyCam	4047429991
 About CodyCam	CodyCam		Om CodyKamera
 About Codycam…	CodyCam		Om CodyKamera…
 Can't find an available connection to the video window	CodyCam		Kan inte hitta en tillgänglig anslutning till videofönstret
@@ -20,7 +20,7 @@ Capture controls	CodyCam		Inhämtningsinställningar
 Capturing Image…	VideoConsumer.cpp		Fångar bild…
 Close	CodyCam		Stäng
 Closing the window\n	VideoConsumer.cpp		Stänger fönstret\n
-CodyCam	CodyCam		CodyKamera
+CodyCam	Application name		CodyKamera
 CodyCam\n\nThe Original BeOS webcam	CodyCam		CodyKamera\n\nBeOS ursprungliga webkameraprogram
 Connected…	VideoConsumer.cpp		Ansluen...
 Couldn't find requested directory on server	VideoConsumer.cpp		Kunde inte hitta den begärda katalogen på servern

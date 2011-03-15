@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-FileTypes	686287948
+1	finnish	x-vnd.Haiku-FileTypes	1037718131
 %1 application type	Application Type Window		%1-sovellustyyppi
 %ld Application type%s could be removed.	Application Types Window		%ld sovellustyyppiä %s ei voitu poistaa.
 %s file type	FileType Window		%s-tiedostotyyppi
@@ -38,8 +38,6 @@ Center	Attribute Window	Attribute column alignment in Tracker	Keskitä
 Choose type	Type List Window		Valitse tyyppi
 Close	Application Type Window		Sulje
 Could not change attributes	Attribute Window		Ei voitu muuttaa attribuutteja
-Could not change file extensions	Extension Window		Ei voitu vaihtaa tiedostotarkentimia
-Could not install file type	New File Type Window		Ei voitu asentaa tiedostotyyppiä
 Could not open \"%s\":\n%s	FileTypes		Ei voitu avata tiedostoa ”%s”:\n%s
 Could not open file	FileType Window		Ei voitu avata tiedostoa
 Could not remove file type: %s\n	FileTypes Window		Ei voitu poistaa tiedostotyyppiä: %s\n
@@ -57,7 +55,6 @@ Do you want to save the changes?	Application Type Window		Haluatko tallentaa muu
 Done	Attribute Window		Valmis
 Done	Extension Window		Valmis
 Done	Type List Window		Valmis
-Edit icon…	Icon View		Muokkaa kuvaketta…
 Editable	Attribute Window	If Tracker allows to edit this attribute.	Muokattava
 Edit…	Application Types Window		Muokkaa...
 Exclusive launch	Application Type Window		Yksinomainen käynnistys
@@ -67,7 +64,6 @@ Extensions:	FileTypes Window		Tiedostotarkentimet:
 Extra attributes	FileTypes Window		Lisäattribuutit
 File	Application Type Window		Tiedosto
 File	FileTypes Window		Tiedosto
-File could not be opened	Preferred App Menu		Tiedostoa ei voitu avata
 File recognition	FileTypes Window		Tiedostotunnistus
 File type	FileType Window		Tiedostotyyppi
 FileTypes	FileTypes		Tiedostotyypit
@@ -106,7 +102,6 @@ Open file	FileTypes		Avaa tiedosto
 Open…	FileTypes Window		Avaa…
 Path:	Application Types Window		Polku:
 Preferred application	FileType Window		Ensisijainen sovellus
-Preferred application	FileTypes Window		Ensisijainen sovellus
 Progress	Application Types Window		Edistyminen
 Quit	FileTypes Window		Poistu
 Quit, don't save	Application Type Window		Poistu, älä tallenna
@@ -121,10 +116,8 @@ Removing uninstalled application types	Application Types Window		Poistetaan pois
 Right	Attribute Window	Attribute column alignment in Tracker	Oikealle
 Rule:	FileTypes Window		Sääntö:
 Same as…	FileType Window	The same APPLICATION as ...	Sama kuin…
-Same as…	FileType Window	The same TYPE as ...	Sama kuin…
 Same as…	FileTypes Window		Sama kuin…
 Save	Application Type Window		Tallenna
-Save into resource file…	Application Type Window		Tallenna resurssitiedostoon…
 Save request	Application Type Window		Tallenna pyyntö
 Select preferred application	FileType Window		Valitse ensisijainen sovellus
 Select preferred application	FileTypes Window		Valitse ensisijainen sovellus
@@ -135,7 +128,6 @@ Select…	FileType Window		Valitse…
 Select…	FileTypes Window		Valitse…
 Set Preferred Application	Preferred App Menu		Aseta ensisijainen sovellus
 Settings	FileTypes Window		Asetukset
-Short description:	Application Type Window		Lyhyt kuvaus:
 Show icons in list	FileTypes Window		Näytä kuvakkeet luettelossa
 Show in Tracker…	Application Types Window		Näitä Seuraajassa...
 Show recognition rule	FileTypes Window		Näytä tunnistussääntö
@@ -152,7 +144,6 @@ Version	Application Types Window		Versio
 Version info	Application Type Window		Versiotiedot
 Version:	Application Type Window		Versio:
 Version:	Application Types Window		Versio:
-Visible	Attribute Window		Näkyvä
 Width:	Attribute Window	Default column width in Tracker for this attribute.	Leveys:
 [Multiple files] file types	FileType Window		[Useita tiedostoja] tiedostotyypit
 \twritten by Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n	FileTypes		\ttekijä: Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n

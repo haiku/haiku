@@ -1,11 +1,11 @@
-1	finnish	x-vnd.Haiku-ActivityMonitor	1946610782
+1	finnish	x-vnd.Haiku-ActivityMonitor	2757340678
 %.1f KB/s	DataSource		%.1f kt/s
 %.1f MB	DataSource		%.1f Mt
 %.1f faults/s	DataSource		%.1f vikaa/s
 %lld ms	SettingsWindow		%lld ms
 %lld sec.	SettingsWindow		%lld s
-About ActivityMonitor…	ActivityWindow		Ohjelmasta AktiviteettiValvonta...
-ActivityMonitor	ActivityWindow		Aktiviteettivalvonta
+About ActivityMonitor…	ActivityWindow		Ohjelmasta Aktiviteettivalvonta...
+ActivityMonitor	Application name		Aktiviteettivalvonta
 Add graph	ActivityWindow		Lisää kuvaaja
 Additional items	ActivityView		Lisäkohteet
 Apps	DataSource		Sovellukset

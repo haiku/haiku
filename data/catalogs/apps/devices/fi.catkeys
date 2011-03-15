@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Devices	189828730
+1	finnish	x-vnd.Haiku-Devices	4146649612
 ACPI Information	DeviceACPI		ACPI-tiedot
 ACPI Processor Namespace '%2'	DeviceACPI		ACPI-prosessorinimiavaruus ’%2’
 ACPI System Bus	DeviceACPI		ACPI-järjestelmäväylä
@@ -30,7 +30,7 @@ Device name	DevicePCI		Laitenimi
 Device name:	Device		Laitenimi:
 Device paths	Device		Laitepolut
 Device paths	DevicePCI		Laitepolut
-Devices	DevicesApplication		Laitteet
+Devices	Application name		Laitteet
 Devices	DevicesView		Laitteet
 Devices\n\twritten by Pieter Panman\n\n\tBased on listdev by Jérôme Duval\n\tand the previous Devices preference\n\tby Jérôme Duval and Sikosis\n\tCopyright 2009, Haiku, Inc.\n	DevicesApplication		Laitteet\ntekijä: Pieter Panman\n\nPerustuu Jérôme Duvalin tekemään listdev-ohjelmaan\nja edelliseen Jérôme Duvalin ja Sikosisin\nlaitepreferenssiin\nCopyright 2009, Haiku, Inc.\n
 Display controller	Device		Näyttöohjain

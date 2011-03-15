@@ -1,27 +1,27 @@
-1	finnish	x-vnd.Haiku.CodyCam	1322454590
-About CodyCam	CodyCam		CodyCam-ohjelmasta
-About Codycam…	CodyCam		Codycam-ohjelmasta…
-Can't find an available connection to the video window	CodyCam		Ei voida löytää saatavilla olevaa yhteyttä video-ikkunaan
-Cannot connect the video source to the video window	CodyCam		Ei voida yhdistää videolähdettä video-ikkunaan
-Cannot create a video window	CodyCam		Ei voida luoda video-ikkunaa
-Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		Ei voi löytää videolähdettä. Tarvitset webbikameran CodyCam-ohjelman käyttämiseen.
+1	finnish	x-vnd.Haiku.CodyCam	4047429991
+About CodyCam	CodyCam		Cody-kameraohjelmasta
+About Codycam…	CodyCam		Cody-kameraohjelmasta…
+Can't find an available connection to the video window	CodyCam		Ei voida löytää saatavilla olevaa yhteyttä videoikkunaan
+Cannot connect the video source to the video window	CodyCam		Ei voida yhdistää videolähdettä videoikkunaan
+Cannot create a video window	CodyCam		Ei voida luoda videoikkunaa
+Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		Ei voi löytää videolähdettä. Tarvitset webbikameran Cody-kameraohjelman käyttämiseen.
 Cannot find an available video stream	CodyCam		Ei voida löytää saatavilla olevaa video-vuota
-Cannot find the media roster	CodyCam		Ei kyetä löytämään media-luetteloa
+Cannot find the media roster	CodyCam		Ei kyetä löytämään medialuetteloa
 Cannot get a time source	CodyCam		Ei voida hakea aikalähdettä
-Cannot register the video window	CodyCam		Ei voida rekisteröidä video-ikkunaa
+Cannot register the video window	CodyCam		Ei voida rekisteröidä videoikkunaa
 Cannot seek time source!	CodyCam		Ei voida etsiä aikalähdettä!
 Cannot set the time source for the video source	CodyCam		Ei voida asettaa aikalähdettä videolähteeseen
-Cannot set the time source for the video window	CodyCam		Ei voida asettaa aikalähdettä video-ikkunaan
-Cannot start the video source	CodyCam		Ei voida käynnistää video-lähdettä
-Cannot start the video window	CodyCam		Ei voida käynnistää video-ikkunaa
+Cannot set the time source for the video window	CodyCam		Ei voida asettaa aikalähdettä videoikkunaan
+Cannot start the video source	CodyCam		Ei voida käynnistää videolähdettä
+Cannot start the video window	CodyCam		Ei voida käynnistää videoikkunaa
 Cannot start time source!	CodyCam		Ei voida käynnistää aikalähdettä!
 Capture Rate Menu	CodyCam		Kaappaustaajusvalikko
 Capture controls	CodyCam		Kaappausohjaimet
 Capturing Image…	VideoConsumer.cpp		Kaapataan kuva…
 Close	CodyCam		Sulje
 Closing the window\n	VideoConsumer.cpp		Suljetaan ikkuna\n
-CodyCam	CodyCam		CodyCam
-CodyCam\n\nThe Original BeOS webcam	CodyCam		CodyCam\n\nAlkuperäinen BeOS-webbikamera
+CodyCam	Application name		Cody-kamera
+CodyCam\n\nThe Original BeOS webcam	CodyCam		Cody-kamera\n\nAlkuperäinen BeOS-webbikamera
 Connected…	VideoConsumer.cpp		Yhdistetty…
 Couldn't find requested directory on server	VideoConsumer.cpp		Ei kyetty löytämään pyydettyä hakemistoa palvelimelta
 Directory:	CodyCam		Hakemisto:

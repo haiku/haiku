@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-MediaPlayer	2929328887
+1	finnish	x-vnd.Haiku-MediaPlayer	2559622077
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerikkalainen)
 100% scale	MediaPlayer-Main		100 % skaala
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
@@ -80,7 +80,6 @@ Open…	MediaPlayer-PlaylistWindow		Avaa...
 Pause	MediaPlayer-Main		Tauko
 Pause playback.	MediaPlayer-Main		Tauota toisto.
 Play	MediaPlayer-Main		Soita
-Play background clips at	MediaPlayer-SettingsWindow		Soita taustavideoleikkeitä osoitteessa
 Play mode	MediaPlayer-SettingsWindow		Soittotila
 Playlist	MediaPlayer-PlaylistWindow		Soittoluettelo
 Playlist…	MediaPlayer-Main		Soittoluettelo...
@@ -117,8 +116,8 @@ Start playing.	MediaPlayer-Main		Aloita soittaminen
 Stop	MediaPlayer-Main		Pysäytä
 Stop playing.	MediaPlayer-Main		Lopeta soittaminen.
 Stream settings	MediaPlayer-Main		Virta-asetukset
-Subtitle placement	MediaPlayer-SettingsWindow		Aliotsikon sijainti
-Subtitle size	MediaPlayer-SettingsWindow		Aliotsikon koko
+Subtitle placement:	MediaPlayer-SettingsWindow		Aliotsikon sijainti:
+Subtitle size:	MediaPlayer-SettingsWindow		Aliotsikkokoko:
 Subtitles	MediaPlayer-Main		Aliotsakkeet
 Thanks	MediaPlayer-Main		Kiitokset
 The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Tiedostoa ’%filename’ ei voitu avata.\n\n
@@ -136,6 +135,7 @@ Video	MediaPlayer-Main		Video
 Video track	MediaPlayer-Main		Videokappale
 View options	MediaPlayer-SettingsWindow		Katso valitsimia
 Volume	MediaPlayer-Main		Äänenvoimakkuus
+Volume of background clips	MediaPlayer-SettingsWindow		Taustavideoleikkeen voimakkuus
 error	MediaPlayer-Main		virhe
 none	Audio track menu		ei mitään
 none	Subtitles menu		ei mitään

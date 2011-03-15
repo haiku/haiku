@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-BootManager	2058739736
+1	finnish	x-vnd.Haiku-BootManager	488724516
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Levyn %disk Master Boot Record (MBR) palautetaan tiedostosta %file. Haluatko jatkaa?
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Alkulatausvalikkoa ollaan kirjoittamassa levylle. Oletko varma, että haluat jatkaa?
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Seuraavaa alkulatausvalikkoa ollaan kirjoittamassa alkulatauslevylle (%s). Vahvista ennen jatkamista alla olevat tiedot.
@@ -13,8 +13,8 @@ At least one partition must be selected!	BootManagerController		Vähintään yks
 Back	BootManagerController	Button	Paluu
 Backup Master Boot Record	BootManagerController	Title	Varmuuskopioi Master Boot Record
 Boot Manager is unable to read the partition table!	BootManagerController		Alkulataushallinta ei kykene lukemaan osiotaulua!
+BootManager	Application name		Alkulataushallinta
 BootManager	BootManager	Application name	Alkulataushallinta
-BootManager	BootManagerWindow	Window Title	Alkulataushallinta
 Cannot access!	DrivesPage	Cannot install	Ei voi asentaa!
 Copyright %year, Haiku Inc.\n	BootManager	Leave %year untranslated	Copyright %year, Haiku Inc.\n
 Default Partition	DefaultPartitionPage	Title	Oletusosio

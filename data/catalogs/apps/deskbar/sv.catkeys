@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Be-TSKB	4247133739
+1	swedish	x-vnd.Be-TSKB	1626960223
 <Be folder is empty>	BeMenu		<mappen är tom>
 About Haiku…	BeMenu		Om Haiku...
 Always on top	PreferencesWindow		Alltid överst
@@ -7,7 +7,7 @@ Auto-raise	PreferencesWindow		Höj fönstret vid närkontakt
 Change time…	TimeView		Ställ in tid...
 Clock	PreferencesWindow		Klocka
 Close all	WindowMenu		Stäng alla
-Deskbar	MainWindow		Deskbar
+Deskbar	Application name		Deskbar
 Deskbar preferences	PreferencesWindow		Deskbar inställningar
 Deskbar preferences…	BeMenu		Deskbar inställningar...
 Edit menu…	PreferencesWindow		Redigera meny...

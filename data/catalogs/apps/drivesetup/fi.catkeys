@@ -1,8 +1,8 @@
-1	finnish	x-vnd.Haiku-DriveSetup	2723551013
+1	finnish	x-vnd.Haiku-DriveSetup	1143590865
 %ld MiB	Support		%ld mebitavua
 <empty>	DiskView		<tyhjä>
 <empty>	PartitionList		<tyhjä>
-Active	PartitionList		Voimassa oleva
+Active	PartitionList		Aktiivinen
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat poistaa valitun osion?\n\nKaikki osion tiedot katoavat palauttamattomasti, jos teet niin!
 Are you sure you want to initialize the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Oletko varma, että haluat alustaa osion ”%s”? Sinulta kysytään uudelleen ennen kuin muutokset kirjoitetaan levylle.
 Are you sure you want to initialize the partition? You will be asked again before changes are written to the disk.	MainWindow		Oletko varma, että haluat alustaa osion? Sinulta kysytään uudelleen ennen kuin muutokset kirjoitetaan levylle.
@@ -29,7 +29,7 @@ Device	DiskView		Laite
 Device	PartitionList		Laite
 Disk	MainWindow		Levy
 Disk system \"%s\"\" not found!	MainWindow		Levyjärjestelmää ”%s” ei löytynyt!
-DriveSetup	MainWindow		Levyasema-asetus
+DriveSetup	Application name		Levyasema-asetus
 Eject	MainWindow		Poista asemasta
 End: %ld MB	Support		Loppu: %ld mebitavua
 Error: 	MainWindow	in any error alert	Virhe: 
