@@ -38,7 +38,6 @@ ConfigMenu::ConfigMenu(TrayView *tv, bool useMag)
 	BMenu *tmpm;
 	BMenuItem *tmpi;
 	BMessage *msg;
-	bigtime_t delay;
 
 	AutoRaiseSettings *s = tv->Settings();
 
@@ -97,13 +96,13 @@ ConfigMenu::ConfigMenu(TrayView *tv, bool useMag)
 	msg = new BMessage(MSG_SET_BEHAVIOUR);
 	msg->AddInt32(AR_BEHAVIOUR, B_WARP_FOCUS_FOLLOWS_MOUSE);
 	tmpi = new BMenuItem("Warping (ffm)", msg);
-	tmpi->SetMarked(tv->fNormalMM == B_WARP_FOCUS_FOLLOWS_MOUSE);
+	tmpi->SetMarked(tv->fNormalMM == (mode_mouse)B_WARP_FOCUS_FOLLOWS_MOUSE);
 	tmpm->AddItem(tmpi);
 
 	msg = new BMessage(MSG_SET_BEHAVIOUR);
 	msg->AddInt32(AR_BEHAVIOUR, B_INSTANT_WARP_FOCUS_FOLLOWS_MOUSE);
 	tmpi = new BMenuItem("Instant warping (ffm)", msg);
-	tmpi->SetMarked(tv->fNormalMM == B_INSTANT_WARP_FOCUS_FOLLOWS_MOUSE);
+	tmpi->SetMarked(tv->fNormalMM == (mode_mouse)B_INSTANT_WARP_FOCUS_FOLLOWS_MOUSE);
 	tmpm->AddItem(tmpi);
 
 	tmpm->SetTargetForItems(tv);
@@ -290,7 +289,7 @@ TrayView::~TrayView(){
 }
 
 //Dehydrate into a message (called by the DeskBar)
-status_t TrayView::Archive(BMessage *data, bool deep = true) const {
+status_t TrayView::Archive(BMessage *data, bool deep) const {
 //	BEntry appentry(&_appPath, true);
 //	BPath appPath(&appentry);
 	status_t error=BView::Archive(data, deep);
@@ -298,7 +297,7 @@ status_t TrayView::Archive(BMessage *data, bool deep = true) const {
 //	data->AddFlat("_appPath", (BFlattenable *) &_appPath);
 	data->AddRef("_appPath", &_appPath);
 
-	return B_NO_ERROR;
+	return error;
 }
 
 //Rehydrate the View from a given message (called by the DeskBar)
@@ -393,8 +392,6 @@ int32 fronter(void *arg)
 	int32 tok = tv->current_window;
 	int32 ws = current_workspace();
 	sem_id sem = tv->fPollerSem;
-	int32 *tl, tlc;
-	window_info *wi;
 
 	snooze(tv->raise_delay);
 
@@ -495,17 +492,10 @@ printf("if (!%s && (%li, %li)isin(%li)(%li, %li, %li, %li) && (%li != %li) ", wi
 void TrayView::MessageReceived(BMessage* message)
 {
 	BMessenger msgr;
-	int32 *tl, tlc;
-	port_id pi;
-	int32 tok;
-	window_info *wi;
 
 	BAlert *alert;
 	bigtime_t delay;
 	int32 mode;
-	bool wasactive;
-	BPoint mouse;
-	uint32 buttons;
 
 	switch(message->what)
 	{
@@ -530,8 +520,9 @@ void TrayView::MessageReceived(BMessage* message)
 			_settings->SetMode(mode);
 			break;
 		case MSG_SET_BEHAVIOUR:
+		{
 			message->FindInt32(AR_BEHAVIOUR, &mode);
-			wasactive = _settings->Active();
+			bool wasactive = _settings->Active();
 			if (wasactive)
 				SetActive(false);
 			fNormalMM = (mode_mouse)mode;
@@ -539,6 +530,7 @@ void TrayView::MessageReceived(BMessage* message)
 			if (wasactive)
 				SetActive(true);
 			break;
+		}
 		case REMOVE_FROM_TRAY:
 		{
 			thread_id tid = spawn_thread(removeFromDeskbar, "RemoveFromDeskbar", B_NORMAL_PRIORITY, NULL);
@@ -559,6 +551,8 @@ void TrayView::MessageReceived(BMessage* message)
 		case B_SOME_WINDOW_ACTIVATED:
 //			printf("Window Activated\n");
 //			message->PrintToStream();
+			BPoint mouse;
+			uint32 buttons;
 			GetMouse(&mouse, &buttons);
 			if (buttons)
 				break;
@@ -567,14 +561,15 @@ void TrayView::MessageReceived(BMessage* message)
 			else {
 				bool doZoom = false;
                 BRect zoomRect(0.0f, 0.0f, 0.0f, 0.0f);
-				pi = msgr.fPort;
+				port_id pi = msgr.fPort;
 //				printf("port:%li (%lx)\n", pi, pi);
 
+				int32 *tl, tlc;
 				tl = get_token_list(msgr.Team(), &tlc);
 //				printf("tokens (team %li): (%li) ", msgr.Team(), tlc);
 				for (tlc; tlc; tlc--) {
 //					printf("%li ", tl[tlc-1]);
-					wi = get_window_info(tl[tlc-1]);
+					window_info *wi = get_window_info(tl[tlc-1]);
 					if (wi) {
 						if (wi->client_port == pi) {
 							if ((wi->layer < 3) // we hit the desktop or a window not on this WS
@@ -589,7 +584,7 @@ void TrayView::MessageReceived(BMessage* message)
 							if ((_settings->Mode() == Mode_All) || (wi->team == fDeskbarTeam)) {
 								PRINT(("raising wi=%li, cp=%ld, pi=%ld team=%ld DBteam=%ld\n", wi->id, wi->client_port, pi, wi->team, fDeskbarTeam));
 								current_window = wi->id;
-								tok = wi->id;
+								int32 tok = wi->id;
 								resume_thread(last_raiser_thread = spawn_thread(fronter, "fronter", B_NORMAL_PRIORITY, (void *)this));
 							} else {
 								current_window = wi->id;

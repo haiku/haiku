@@ -1,5 +1,5 @@
 #include "settings.h"
-#include <iostream.h>
+#include <iostream>
 
 #define CONF_ADDPROP(_type, _name) \
 void AutoRaiseSettings::Set##_name(_type value)\
@@ -7,7 +7,7 @@ void AutoRaiseSettings::Set##_name(_type value)\
 	_conf##_name = value;\
 }\
 \
-_type AutoRaiseSettings::##_name()\
+_type AutoRaiseSettings::_name()\
 {\
 	return _conf##_name;\
 }\
