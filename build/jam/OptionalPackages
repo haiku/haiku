@@ -435,11 +435,11 @@ if [ IsOptionalHaikuImagePackageAdded Curl ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Curl available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		InstallOptionalHaikuImagePackage curl-7.21.4-x86-gcc4-2011-02-28.zip
-			: $(baseURL)/curl-7.21.4-x86-gcc4-2011-02-28.zip ;
+		InstallOptionalHaikuImagePackage curl-7.21.4-x86-gcc4-2011-03-14.zip
+			: $(baseURL)/curl-7.21.4-x86-gcc4-2011-03-14.zip ;
 	} else {
-		InstallOptionalHaikuImagePackage curl-7.21.4-x86-gcc2-2011-02-28.zip
-			: $(baseURL)/curl-7.21.4-x86-gcc2-2011-02-28.zip ;
+		InstallOptionalHaikuImagePackage curl-7.21.4-x86-gcc2-2011-03-14.zip
+			: $(baseURL)/curl-7.21.4-x86-gcc2-2011-03-14.zip ;
 	}
 }
 
