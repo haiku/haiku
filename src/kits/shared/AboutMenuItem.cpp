@@ -31,7 +31,7 @@ BAboutMenuItem::BAboutMenuItem(const char* appName)
 	if (gLocaleBackend == NULL)
 		LocaleBackend::LoadBackend();
 
-	const char* string = B_TRANSLATE_MARK("About %app%" B_UTF8_ELLIPSIS);
+	const char* string = B_TRANSLATE_MARK("About %app%");
 	if (gLocaleBackend) {
 		string = gLocaleBackend->GetString(string, "AboutMenuItem");
 	}
