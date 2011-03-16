@@ -1,0 +1,40 @@
+1	slovak	x-vnd.Be-TSKB	19976571
+<Be folder is empty>	BeMenu		<pričinok Be je prázdny>
+About Haiku	BeMenu		O Haiku
+Always on top	PreferencesWindow		Vždy na vrchu
+Applications	PreferencesWindow		Aplikácie
+Auto-raise	PreferencesWindow		Automaticky aktivovať
+Change time…	TimeView		Zmeniť čas...
+Clock	PreferencesWindow		Hodiny
+Close all	WindowMenu		Zatvoriť všetky
+Deskbar	Application name		Panel
+Deskbar preferences	PreferencesWindow		Nastavenia Panelu
+Deskbar preferences…	BeMenu		Nastavenia Panelu...
+Edit menu…	PreferencesWindow		Upraviť menu...
+Expand new applications	PreferencesWindow		Výsuvný zoznam nových aplikácií
+Find…	BeMenu		Nájsť...
+Hide all	WindowMenu		Skryť všetky
+Hide time	TimeView		Skryť čas
+Menu	PreferencesWindow		Menu
+Mount	BeMenu		Pripojiť
+No windows	WindowMenu		Žiadne okná
+Power off	BeMenu		Vypnúť
+Quit application	WindowMenu		Ukončiť aplikáciu
+Recent applications	BeMenu		Nedávne aplikácie
+Recent applications:	PreferencesWindow		Nedávne aplikácie:
+Recent documents	BeMenu		Nedávne dokumenty
+Recent documents:	PreferencesWindow		Nedávne dokumenty:
+Recent folders	BeMenu		Nedávne priečinky
+Recent folders:	PreferencesWindow		Nedávne priečinky:
+Restart Tracker	BeMenu		Reštartovať Tracker
+Restart system	BeMenu		Reštartovať systém
+Show Time	Tray		Zobraziť čas
+Show all	WindowMenu		Zobraziť všetky
+Show application expander	PreferencesWindow		Zobraziť výsuvný zoznam aplikácií
+Show calendar…	TimeView		Zobraziť kalendár...
+Show replicants	BeMenu		Zobraziť replikantov
+Show seconds	PreferencesWindow		Zobraziť sekundy
+Shutdown…	BeMenu		Vypnúť...
+Sort running applications	PreferencesWindow		Zoradiť bežiace aplikácie
+Tracker always first	PreferencesWindow		Tracker vždy prvý
+Window	PreferencesWindow		Okno

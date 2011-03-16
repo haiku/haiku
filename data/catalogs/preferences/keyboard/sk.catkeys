@@ -1,0 +1,14 @@
+1	slovak	x-vnd.Haiku-Keyboard	914649575
+Defaults	KeyboardWindow		Predvolené
+Delay until key repeat	KeyboardView		Interval do začiatku opakovania klávesu
+Fast	KeyboardView		Rýchlo
+Key repeat rate	KeyboardView		Rýchlosť opakovania kláves
+Keyboard	KeyboardWindow		Klávesnica
+Long	KeyboardView		Dlhý
+OK	KeyboardApplication		OK
+Revert	KeyboardWindow		Vrátiť
+Short	KeyboardView		Krátky
+Slow	KeyboardView		Pomaly
+Something has gone wrong!	KeyboardApplication		Niečo sa pokazilo!
+Typing test area	KeyboardView		Oblasť na test písania
+Written by Andrew Edward McCall	KeyboardApplication		Napísal Andrew Edward McCall

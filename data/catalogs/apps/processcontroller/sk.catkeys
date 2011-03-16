@@ -1,0 +1,50 @@
+1	slovak	x-vnd.Haiku-ProcessController	769318393
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
+About	ProcessController		O aplikácii
+About ProcessController…	ProcessController		O Správcovi procesov
+Cancel	ProcessController		Zrušiť
+Custom priority	ProcessController		Vlastná priorita
+Damned!	ProcessController		Sakra!
+Debug this thread!	ProcessController		Ladiť toto vlákno!
+Debug thread	ProcessController		Ladiť vlákno
+Display priority	ProcessController		Priorita zobrazenie
+Do you really want to kill the team \"%s\"?	ProcessController		Skutočne chcete ukončiť skupinu „%s“?
+Error saving file	ProcessController		Chyba pri ukladaní súboru
+Gone teams…	ProcessController		Ukončené skupiny...
+Idle priority	ProcessController		Priorita nečinný
+Info	ProcessController		Info
+Install in Deskbar	ProcessController		Nainštalovať do Panelu
+Kill this thread!	ProcessController		Ukončiť toto vlákno!
+Live in the Deskbar	ProcessController		Zobrazovať v Paneli
+Low priority	ProcessController		Nízka priorita
+Lowest active priority	ProcessController		Najnižšia aktívna priorita
+Memory usage	ProcessController		Využitie pamäte
+New Terminal	ProcessController		Nový terminál
+Normal priority	ProcessController		Normálna priorita
+OK	ProcessController		OK
+Ok!	ProcessController		OK
+Please confirm	ProcessController		Prosím, potvrďte
+ProcessController	ProcessController		Správca procesov
+ProcessController is already installed in Deskbar.	ProcessController		Správca procesov je už v Paneli nainštalovaný.
+ProcessController\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n	ProcessController		Správca procesov\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n
+Processor %d	ProcessController		Procesor %d
+Quit an application	ProcessController		Ukončiť aplikáciu
+Quit application	ProcessController		Ukončiť aplikáciu
+Real-time display priority	ProcessController		Priorita zobrazenie v reálnom čase
+Real-time priority	ProcessController		Priorita v reálnom čase
+Restart Deskbar	ProcessController		Reštartovať Panel
+Restart Tracker	ProcessController		Reštartovať Tracker
+Run in window	ProcessController		Spustiť v okne
+System resources & caches…	ProcessController		Zdroje a vyrovnávacia pamäť systému...
+That's no Fun!	ProcessController		To nie je sranda!
+This is the last active processor...\nYou can't turn it off!	ProcessController		Toto je posledný aktívny procesor...\nNemôžete ho vypnúť!
+This team is already gone…	ProcessController		Táto skupina už je preč...
+This thread is already gone…	ProcessController		Toto vlákno už je preč...
+Threads and CPU usage	ProcessController		Vlákna a využitie CPU
+Urgent display priority	ProcessController		Priorita naliehavé zobrazenie
+Urgent priority	ProcessController		Naliehavá priorita
+Usage: %s [-deskbar]\n	ProcessController		Použitie: %s [-deskbar]\n
+What do you want to do with the thread \"%s\"?	ProcessController		Čo chcete robiť s vláknom „%s“?
+Yes, kill this team!	ProcessController		Áno, ukončiť túto skupinu!
+You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Správcu procesov môžete spúšťať v okne alebo ho nainštalovať do Panelu.
+Your setting file could not be saved!\n(%s)	ProcessController		Váš súbor s nastavením nebolo možné uložiť!\n(%s)

@@ -1,0 +1,39 @@
+1	slovak	x-vnd.Haiku-About	3334685619
+%.2f GHz	AboutView		%.2f GHz
+%d MiB total	AboutView		%d MiB celkom
+%d MiB used (%d%%)	AboutView		%d MiB využitých (%d%%)
+%ld MHz	AboutView		 %ld MHz
+%ld Processors:	AboutView		%ld procesory:
+%total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB celkom, %inaccessible MiB neprístupných
+... and the many people making donations!\n\n	AboutView		... a mnohí ďalších, ktorí prispeli dotáciou!\n\n
+About this system	AboutWindow		O tomto systéme
+AboutSystem	Application name		O systéme
+Contributors:\n	AboutView		Prispievatelia:\n
+Current maintainers:\n	AboutView		Aktívni vývojári:\n
+GCC %d Hybrid	AboutView		GCC %d Hybrid
+Google & their Google Summer of Code program\n	AboutView		Google a jeho program Google Summer of Code\n
+Kernel:	AboutView		Jadro:
+License: 	AboutView		Licencia:
+Licenses: 	AboutView		Licencie:
+Memory:	AboutView		Pamäť:
+Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (zakladateľ projektu)\n\n
+Past maintainers:\n	AboutView		Minulí vývojári:\n
+Processor:	AboutView		Procesor:
+Revision	AboutView		Revízia:
+Source Code: 	AboutView		Zdrojový kód:
+The BeGeistert team\n	AboutView		Tím BeGeistert\n
+The Haiku-Ports team\n	AboutView		T9m Haiku-Ports\n
+The Haikuware team and their bounty program\n	AboutView		Tím Haikuware a ich program odmien\n
+The University of Auckland and Christof Lutteroth\n\n	AboutView		University of Auckland a Christof Lutteroth\n\n
+The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT licence%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		Kód, ktorý je  charakteristický pre Haiku, najmä jadro a kód, ktorý využívajú aplikácie môže byť šírený za podmienok %MIT licence%. Niektoré systémové knižnice obsahujú kód tretích strán šírený pod licenciou LGPL. Autorské práva tretích strán nájdete uvedené nižšie.
+The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku and the Haiku logo are trademarks of Haiku, Inc.\n\n	AboutView		Autorské práva na kód Haiku sú majetkom Haiku, Inc alebo príslušných autorov, kde sú v zdrojovom kóde výslovne uvedení. Haiku a logo Haiku sú ochranné známky spoločnosti Haiku, Inc.\n\n
+Time running:	AboutView		Čas behu:
+Translations:\n	AboutView		Preklady:\n
+Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (a jeho jadro NewOS)\n
+Unknown	AboutView		Neznáme
+Version:	AboutView		Verzia:
+Website, marketing & documentation:\n	AboutView		Webová stránka, marketing a dokumentácia:\n
+[Click a license name to read the respective license.]\n\n	AboutView		[Kliknite na názov licencie a prečítajte si príslušnú licenciu.]\n\n
+\nCopyrights\n\n	AboutView		\nAutorské práva\n\n
+\n\nSpecial thanks to:\n	AboutView		\n\nŠpecialne poďakovanie:\n
+\n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… a mnoho ďalších, ktorých sme zabudli uviesť (prepáčte!)\n\n

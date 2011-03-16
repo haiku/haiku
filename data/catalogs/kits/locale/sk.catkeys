@@ -1,0 +1,20 @@
+1	slovak	system	709849049
+%.2f TiB	StringForSize		%.2f TiB
+%3.2f GiB	StringForSize		%3.2f GiB
+%3.2f KiB	StringForSize		%3.2f KiB
+%3.2f MiB	StringForSize		%3.2f MiB
+%d bytes	StringForSize		%d bajtov
+About %app%	AboutMenuItem		O aplikácii %app%
+About…	AboutWindow		O aplikácii...
+Blue:	ColorControl		Modrá:
+Close	AboutWindow		Zatvoriť
+Copy	TextView		Kopírovať
+Copyright © %years% Haiku, Inc.	AboutWindow		Copyright © %years% Haiku, Inc.
+Cut	TextView		Vystrihnúť
+Green:	ColorControl		Zelená:
+Paste	TextView		Vložiť
+Red:	ColorControl		Červená:
+Redo	TextView		Opakovať
+Select All	TextView		Vybrať všetko
+Undo	TextView		Späť
+Written by:	AboutWindow		Napísal:

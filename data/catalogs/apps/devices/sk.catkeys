@@ -1,0 +1,73 @@
+1	slovak	x-vnd.Haiku-Devices	1465776728
+ACPI Information	DeviceACPI		Informácie o ACPI
+ACPI Processor Namespace '%2'	DeviceACPI		Menný priestor procesora ACPI „%2“
+ACPI System Bus	DeviceACPI		Zbernica systému ACPI
+ACPI System Indicator	DeviceACPI		Indikátor systému ACPI
+ACPI Thermal Zone	DeviceACPI		Tepelná oblasť ACPI
+ACPI bus	Device		Zbernica ACPI
+ACPI bus	DevicesView		Zbernica ACPI
+ACPI controller	Device		Radič ACPI:
+ACPI node '%1'	DeviceACPI		Uzol ACPI „%1“
+Basic information	DevicesView		Základné informácie
+Bridge	Device		Most
+Bus	DevicesView		Zbernica
+Bus Information	Device		Informácie o zbernici
+Category	DevicesView		Kategória
+Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Info o triede:\t\t\t\t: %classInfo%
+Class info	DevicePCI		Info o triede
+Communication controller	Device		Radič komunikácie
+Computer	Device		Počítač
+Computer	DevicesView		Počítač
+Connection	DevicesView		Pripojenie
+Detailed	DevicesView		Podrobnosti
+Device	Device		Zariadenie
+Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Názov zariadenia\t\t\t\t: %Name%\nVýrobca\t\t\t: %Manufacturer%\nPoužitý ovládač\t\t\t\t: %DriverUsed%\nCesty k zariadeniam\t: %DevicePaths%
+Device name	Device		Názov zariadenia
+Device name	DeviceACPI		Názov zariadenia
+Device name	DevicePCI		Názov zariadenia
+Device name:	Device		Názov zariadenia:
+Device paths	Device		Cesty k zariadeniam
+Device paths	DevicePCI		Cesty k zariadeniam
+Devices	Application name		Zariadenia
+Devices	DevicesView		Zariadenia
+Display controller	Device		Radič zobrazovania
+Docking station	Device		Dokovacia stanica
+Driver used	Device		Použitý ovládač
+Driver used	DevicePCI		Použitý ovládač
+Encryption controller	Device		Radič šifrovania
+Generate system information	DevicesView		Vytvoriť informácie o systéme
+Generic system peripheral	Device		Všeobecné periférie systému
+ISA bus	Device		Zbernica ISA
+ISA bus	DevicesView		Zbernica ISA
+Input device controller	Device		Radič vstupných zariadení
+Intelligent controller	Device		Inteligentný radič
+Manufacturer	Device		Výrobca
+Manufacturer	DeviceACPI		Výrobca
+Manufacturer	DevicePCI		Výrobca
+Manufacturer:	Device		Výrobca:
+Mass storage controller	Device		Radič hromadného úložiska
+Memory controller	Device		Radič pamäte:
+Multimedia controller	Device		Radič multimédií
+Name	PropertyList		Názov
+Network controller	Device		Radič siete
+None	Device		Žiadne
+Not implemented	DeviceACPI		Neimplementované
+Not implemented	DevicePCI		Neimplementované
+Order by:	DevicesView		Zoradiť podľa:
+PCI Information	DevicePCI		Informácie PCI
+PCI bus	Device		Zbernica PCI
+PCI bus	DevicesView		Zbernica PCI
+Processor	Device		Procesor
+Quit	DevicesView		Ukončiť
+Refresh devices	DevicesView		Obnoviť zariadenia
+Report compatibility	DevicesView		Nahlásiť kompatibilitu
+Satellite communications controller	Device		Radič satelitnej komunikácie
+Serial bus controller	Device		Radič sériovej zbernice
+Signal processing controller	Device		Radič spracovania signálov
+Unclassified device	Device		Nezaradené zariadenie
+Unknown	DevicePCI		Neznáme
+Unknown device	Device		Neznáme zariadenie
+Unknown device	DevicesView		Neznáme zariadenie
+Value	PropertyList		Hodnota
+Wireless controller	Device		Radič bezdrôtových sietí
+unknown	Device		neznáme
