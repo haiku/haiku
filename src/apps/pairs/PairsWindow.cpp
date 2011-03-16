@@ -39,9 +39,9 @@ const uint32 MENU_QUIT					= 'MGqu';
 
 PairsWindow::PairsWindow()
 	:
-	BWindow(BRect(100, 100, 405, 423), B_TRANSLATE("Pairs"), B_TITLED_WINDOW,
-		B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE
-			| B_NOT_RESIZABLE | B_NOT_ZOOMABLE),
+	BWindow(BRect(100, 100, 405, 423), B_TRANSLATE_APP_NAME("Pairs"),
+		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE
+		| B_NOT_RESIZABLE | B_NOT_ZOOMABLE),
 	fPairComparing(NULL),
 	fIsFirstClick(true),
 	fIsPairsActive(true),

@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <AboutMenuItem.h>
 #include <Application.h>
 #include <Button.h>
 #include <Catalog.h>
@@ -227,8 +228,7 @@ CharacterWindow::CharacterWindow()
 	BMenu* menu = new BMenu(B_TRANSLATE("File"));
 	BMenuItem* item;
 
-	menu->AddItem(item = new BMenuItem(B_TRANSLATE("About CharacterMap"
-		 B_UTF8_ELLIPSIS), new BMessage(B_ABOUT_REQUESTED)));
+	menu->AddItem(item = new BAboutMenuItem());
 
 	menu->AddSeparatorItem();
 

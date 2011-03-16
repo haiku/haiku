@@ -11,6 +11,7 @@
 
 #include <Alert.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <ControlLook.h>
 #include <Entry.h>
 #include <File.h>
@@ -99,7 +100,8 @@ protected:
 
 
 ApplicationWindow::ApplicationWindow(BRect frame, bool visible)
-	: BWindow(frame, "Package Manager",
+	:
+	BWindow(frame, B_TRANSLATE_APP_NAME("PackageManager"),
 		B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 		B_AUTO_UPDATE_SIZE_LIMITS | B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE),
 	fMinimizeOnClose(false)

@@ -72,7 +72,8 @@ Application Devices :
 	Device.cpp
 	PropertyList.cpp
 	PropertyListPlain.cpp
-	: be libcolumnlistview.a tracker $(TARGET_LIBSUPC++) $(TARGET_LIBSTDC++) $(HAIKU_LOCALE_LIBS)
+	: be libcolumnlistview.a libshared.a tracker $(TARGET_LIBSUPC++)
+		$(TARGET_LIBSTDC++)	$(HAIKU_LOCALE_LIBS) 
 	: Devices.rdef
 ;
 

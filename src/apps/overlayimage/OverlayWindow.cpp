@@ -25,7 +25,7 @@
 
 OverlayWindow::OverlayWindow() 
 	:
-	BWindow(BRect(50, 50, 500, 200), "OverlayImage", 
+	BWindow(BRect(50, 50, 500, 200), B_TRANSLATE_APP_NAME("OverlayImage"),
 		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
 {
 	OverlayView *replView = new OverlayView(Bounds());

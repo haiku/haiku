@@ -17,7 +17,6 @@
 #define OUTPUT_FOLDER_MESSAGE			'oUTF'
 #define FOLDER_SELECT_MESSAGE			'sLFO'
 #define OPEN_FILE_MESSAGE			    'oFIL'
-#define DISP_ABOUT_MESSAGE			    'aBUT'
 #define QUIT_MESSAGE			 		'qUIT'
 #define PREVIEW_MESSAGE					'pVEW'
 #define PRIORITY_CHANGED_MESSAGE		'cPRI'

@@ -20,9 +20,9 @@
 
 UninstallWindow::UninstallWindow()
 	:
-	BWindow(BRect(100, 100, 600, 300), B_TRANSLATE("Installed packages"),
-		B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_QUIT_ON_WINDOW_CLOSE
-			| B_AUTO_UPDATE_SIZE_LIMITS)
+	BWindow(BRect(100, 100, 600, 300),
+		B_TRANSLATE_APP_NAME("InstalledPackages"), B_TITLED_WINDOW,
+		B_NOT_ZOOMABLE | B_QUIT_ON_WINDOW_CLOSE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 	AddChild(new UninstallView());

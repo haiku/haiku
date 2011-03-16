@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <AboutMenuItem.h>
 #include <Alert.h>
 #include <Application.h>
 #include <Autolock.h>
@@ -166,7 +167,7 @@ static const char* kRatingAttrName = "Media:Rating";
 
 static const char* kDisabledSeekMessage = B_TRANSLATE("Drop files to play");
 
-static const char* kApplicationName = B_TRANSLATE(NAME);
+static const char* kApplicationName = B_TRANSLATE_APP_NAME(NAME);
 
 
 //#define printf(a...)
@@ -1084,9 +1085,11 @@ MainWin::OpenPlaylistItem(const PlaylistItemRef& item)
 	if (ret != B_OK) {
 		fprintf(stderr, "MainWin::OpenPlaylistItem() - Failed to send message "
 			"to Controller.\n");
-		(new BAlert(B_TRANSLATE("error"), 
-			B_TRANSLATE(NAME" encountered an internal error. "
-			"The file could not be opened."), B_TRANSLATE("OK")))->Go();
+		BString message = B_TRANSLATE("%app% encountered an internal error. "
+			"The file could not be opened.");
+		message.ReplaceFirst("%app%", kApplicationName);
+		(new BAlert(kApplicationName, message.String(),
+			B_TRANSLATE("OK")))->Go();
 		_PlaylistItemOpened(item, ret);
 	} else {
 		BString string;
@@ -1473,8 +1476,7 @@ MainWin::_CreateMenu()
 
 	fFileMenu->AddSeparatorItem();
 
-	item = new BMenuItem(B_TRANSLATE("About " NAME B_UTF8_ELLIPSIS),
-		new BMessage(B_ABOUT_REQUESTED));
+	item = new BAboutMenuItem();
 	fFileMenu->AddItem(item);
 	item->SetTarget(be_app);
 

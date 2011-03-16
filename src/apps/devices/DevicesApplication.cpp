@@ -6,6 +6,7 @@
  *		Pieter Panman
  */
 
+#include <AboutWindow.h>
 #include <Alert.h>
 #include <Application.h>
 #include <Catalog.h>
@@ -53,24 +54,14 @@ DevicesApplication::AboutRequested()
 void
 DevicesApplication::ShowAbout()
 {
-	BAlert* alert = new BAlert(B_TRANSLATE("About"), B_TRANSLATE("Devices\n"
-		"\twritten by Pieter Panman\n"
-		"\n"
-		"\tBased on listdev by Jérôme Duval\n"
-		"\tand the previous Devices preference\n"
-		"\tby Jérôme Duval and Sikosis\n"
-		"\tCopyright 2009, Haiku, Inc.\n"), B_TRANSLATE("OK"));
-	BTextView* view = alert->TextView();
-	BFont font;
-
-	view->SetStylable(true);
-
-	view->GetFont(&font);
-	font.SetSize(18);
-	font.SetFace(B_BOLD_FACE);
-	view->SetFontAndColor(0, 7, &font);
-
-	alert->Go();
+	const char* authors[] = {
+		"Pieter Panman",
+		NULL
+	};
+	BAboutWindow about(B_TRANSLATE_APP_NAME("Devices"), 2009, authors,
+		"Based on listdev by Jérôme Duval and the previous Devices "
+		"preference by Jérôme Duval and Sikosis.");
+	about.Show();
 }
 
 

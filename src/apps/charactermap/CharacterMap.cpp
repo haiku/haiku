@@ -8,6 +8,7 @@
 
 #include <stdlib.h>
 
+#include <AboutWindow.h>
 #include <Alert.h>
 #include <Application.h>
 #include <Catalog.h>
@@ -57,21 +58,13 @@ CharacterMap::MessageReceived(BMessage* message)
 void
 CharacterMap::AboutRequested()
 {
-	BAlert *alert = new BAlert("about", B_TRANSLATE(
-		"CharacterMap\n"
-		"\twritten by Axel Dörfler\n"
-		"\tCopyright 2009, Haiku, Inc.\n"), B_TRANSLATE("OK"));
-	BTextView *view = alert->TextView();
-	BFont font;
-
-	view->SetStylable(true);
-
-	view->GetFont(&font);
-	font.SetSize(18);
-	font.SetFace(B_BOLD_FACE);
-	view->SetFontAndColor(0, 12, &font);
-
-	alert->Go();
+	const char* authors[] = {
+		"Axel Dörfler",
+		NULL
+	};
+	
+	BAboutWindow about(B_TRANSLATE_APP_NAME("CharacterMap"), 2009, authors);
+	about.Show();
 }
 
 

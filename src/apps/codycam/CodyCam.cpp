@@ -4,6 +4,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <AboutMenuItem.h>
+#include <AboutWindow.h>
 #include <Alert.h>
 #include <Button.h>
 #include <LayoutBuilder.h>
@@ -255,11 +257,6 @@ CodyCam::MessageReceived(BMessage *message)
 			break;
 		}
 
-		case msg_about:
-			(new BAlert(B_TRANSLATE("About CodyCam"), B_TRANSLATE("CodyCam\n\n"
-				"The Original BeOS webcam"), B_TRANSLATE("Close")))->Go();
-			break;
-
 		case msg_control_win:
 			// our control window is being asked to go away
 			// set our pointer to NULL
@@ -270,6 +267,21 @@ CodyCam::MessageReceived(BMessage *message)
 			BApplication::MessageReceived(message);
 			break;
 	}
+}
+
+
+void
+CodyCam::AboutRequested()
+{
+	const char* authors[] = {
+		"Be, Incorporated",
+		NULL
+	};
+	
+	BAboutWindow about(B_TRANSLATE_APP_NAME("CodyCam"), 2003, authors,
+		"The Original BeOS webcam.\n"
+		B_UTF8_COPYRIGHT " 1998-1999 Be, Incorporated.");
+	about.Show();
 }
 
 
@@ -510,8 +522,7 @@ VideoWindow::VideoWindow(BRect frame, const char* title, window_type type,
 
 	menu->AddSeparatorItem();
 
-	menuItem = new BMenuItem(B_TRANSLATE("About Codycam" B_UTF8_ELLIPSIS),
-		new BMessage(msg_about), 'B');
+	menuItem = new BAboutMenuItem();
 	menuItem->SetTarget(be_app);
 	menu->AddItem(menuItem);
 

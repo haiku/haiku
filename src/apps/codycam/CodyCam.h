@@ -40,7 +40,6 @@ enum {
 	msg_start		= 'strt',
 	msg_stop		= 'stop',
 
-	msg_about		= 'abut',
 	msg_setup		= 'setp',
 	msg_video		= 'vdeo',
 
@@ -94,6 +93,7 @@ public:
 			void			ReadyToRun();
 	virtual	bool			QuitRequested();
 	virtual	void			MessageReceived(BMessage* message);
+	virtual	void			AboutRequested();
 
 private:
 			status_t		_SetUpNodes();

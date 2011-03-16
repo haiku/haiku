@@ -246,10 +246,10 @@ TBeMenu::AddStandardBeMenuItems()
 
 #ifdef HAIKU_DISTRO_COMPATIBILITY_OFFICIAL
 	static const char* kAboutHaikuMenuItemStr = B_TRANSLATE_MARK(
-		"About Haiku" B_UTF8_ELLIPSIS);
+		"About Haiku");
 #else
 	static const char* kAboutThisSystemMenuItemStr = B_TRANSLATE_MARK(
-		"About this system" B_UTF8_ELLIPSIS);
+		"About this system");
 #endif
 
 	item = new BMenuItem(

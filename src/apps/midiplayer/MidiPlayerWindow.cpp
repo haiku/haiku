@@ -44,8 +44,10 @@
 //------------------------------------------------------------------------------
 
 MidiPlayerWindow::MidiPlayerWindow()
-	: BWindow(BRect(0, 0, 1, 1), B_TRANSLATE("MidiPlayer"), B_TITLED_WINDOW,
-	          B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
+	:
+	BWindow(BRect(0, 0, 1, 1), B_TRANSLATE_APP_NAME("MidiPlayer"),
+		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE
+		| B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	playing = false;
 	scopeEnabled = true;

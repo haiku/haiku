@@ -110,7 +110,7 @@ App::AboutRequested()
 	const char* authors[2];
 	authors[0] = B_TRANSLATE("Stephan Aßmus (aka stippi)");
 	authors[1] = NULL;
-	BString appName = B_TRANSLATE("LaunchBox");
+	BString appName = B_TRANSLATE_APP_NAME("LaunchBox");
 	BAboutWindow(appName, 2004, authors).Show();
 }
 

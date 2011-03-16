@@ -21,7 +21,7 @@
 
 PackageWindow::PackageWindow(const entry_ref *ref)
 	:
-	BWindow(BRect(100, 100, 600, 300), B_TRANSLATE("PackageInstaller"),
+	BWindow(BRect(100, 100, 600, 300), B_TRANSLATE_APP_NAME("PackageInstaller"),
 		B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_NOT_RESIZABLE)
 {
 	//SetLayout(new BGroupLayout(B_HORIZONTAL));

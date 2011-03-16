@@ -976,7 +976,7 @@ TMailWindow::MessageReceived(BMessage *msg)
 			if (!fIncoming && fieldMask & FIELD_SUBJECT) {
 				// If no subject, set to "Mail"
 				if (!fHeaderView->fSubject->TextView()->TextLength())
-					SetTitle("Mail");
+					SetTitle(B_TRANSLATE_APP_NAME("Mail"));
 				else
 					SetTitle(fHeaderView->fSubject->Text());
 			}
@@ -2741,7 +2741,7 @@ TMailWindow::SetTitleForMessage()
 	//
 	//	Figure out the title of this message and set the title bar
 	//
-	BString title = "Mail";
+	BString title = B_TRANSLATE_APP_NAME("Mail");
 
 	if (fIncoming) {
 		if (fMail->GetName(&title) == B_OK)

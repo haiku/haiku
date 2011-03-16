@@ -9,6 +9,7 @@
 
 #include "ApplicationWindow.h"
 
+#include <AboutWindow.h>
 #include <Alert.h>
 #include <Application.h>
 #include <Catalog.h>
@@ -115,21 +116,13 @@ PackageManager::MessageReceived(BMessage *msg)
 void
 PackageManager::AboutRequested()
 {
-	BAlert *about = new BAlert("about",
-		B_TRANSLATE("PackageManager\n"
-		"Written by Adrien Destugues\n"
-		"Copyright 2010 Haiku, Inc. \n"),
-		B_TRANSLATE("OK"));
-
-	BTextView *view = about->TextView();
-	BFont font;
-	view->SetStylable(true);
-	view->GetFont(&font);
-	font.SetFace(B_BOLD_FACE);
-	font.SetSize(font.Size() * 1.5);
-	view->SetFontAndColor(0, 17, &font);
-
-	about->Go();
+	const char* authors[] = {
+		"Adrien Destugues",
+		NULL
+	};
+	
+	BAboutWindow about(B_TRANSLATE_APP_NAME("PackageManager"), 2010, authors);
+	about.Show();
 }
 
 

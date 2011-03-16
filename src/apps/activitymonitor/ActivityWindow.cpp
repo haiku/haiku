@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 
+#include <AboutMenuItem.h>
 #include <Application.h>
 #include <Catalog.h>
 #include <File.h>
@@ -124,9 +125,7 @@ ActivityWindow::ActivityWindow()
 		new BMessage(kMsgAddView)));
 	menu->AddSeparatorItem();
 
-	menu->AddItem(item = new BMenuItem(
-		B_TRANSLATE("About ActivityMonitor" B_UTF8_ELLIPSIS),
-		new BMessage(B_ABOUT_REQUESTED)));
+	menu->AddItem(item = new BAboutMenuItem());
 	menu->AddSeparatorItem();
 
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Quit"),

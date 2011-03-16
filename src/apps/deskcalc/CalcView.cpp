@@ -17,6 +17,8 @@
 #include <ctype.h>
 #include <assert.h>
 
+#include <AboutMenuItem.h>
+#include <AboutWindow.h>
 #include <Alert.h>
 #include <Application.h>
 #include <AppFileInfo.h>
@@ -686,13 +688,15 @@ CalcView::FrameResized(float width, float height)
 void
 CalcView::AboutRequested()
 {
-	BAlert* alert = new BAlert(B_TRANSLATE("about"),B_TRANSLATE(
-		"DeskCalc v2.1.0\n\n"
-		"written by Timothy Wayper,\nStephan Aßmus and Ingo Weinhold\n\n"
-		B_UTF8_COPYRIGHT "1997, 1998 R3 Software Ltd.\n"
-		B_UTF8_COPYRIGHT "2006-2009 Haiku, Inc.\n\n"
-		"All Rights Reserved."), "OK");
-	alert->Go(NULL);
+	const char* authors[] = {
+		"Timothy Wayper",
+		"nStephan Aßmus",
+		"Ingo Weinhold",
+		NULL
+	};
+	BAboutWindow about(B_TRANSLATE_APP_NAME("DeskCalc"), 2006, authors,
+		B_UTF8_COPYRIGHT "1997, 1998 R3 Software Ltd.");
+	about.Show();
 }
 
 
@@ -1108,8 +1112,7 @@ CalcView::_CreatePopUpMenu()
 		new BMessage(MSG_OPTIONS_AUDIO_FEEDBACK));
 	fShowKeypadItem = new BMenuItem(B_TRANSLATE("Show keypad"),
 		new BMessage(MSG_OPTIONS_SHOW_KEYPAD));
-	fAboutItem = new BMenuItem(B_TRANSLATE("About DeskCalc" B_UTF8_ELLIPSIS),
-		new BMessage(B_ABOUT_REQUESTED));
+	fAboutItem = new BAboutMenuItem();
 
 	// apply current settings
 	fAutoNumlockItem->SetMarked(fOptions->auto_num_lock);

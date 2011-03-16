@@ -5,15 +5,19 @@
 
 
 #include "ExpanderApp.h"
-#include "ExpanderWindow.h"
 
+#include <AboutWindow.h>
 #include <Alert.h>
 #include <Catalog.h>
 #include <Locale.h>
 #include <TextView.h>
 
+#include "ExpanderWindow.h"
+
+
 ExpanderApp::ExpanderApp()
-	: BApplication("application/x-vnd.Haiku-Expander")
+	:
+	BApplication("application/x-vnd.Haiku-Expander")
 {
 	BPoint windowPosition = fSettings.Message().FindPoint("window_position");
 	BRect windowFrame(0, 0, 450, 120);
@@ -29,24 +33,13 @@ ExpanderApp::ExpanderApp()
 void
 ExpanderApp::AboutRequested()
 {
-	BString appName = B_TRANSLATE_APP_NAME("Expander");
-	int nameLength = appName.CountChars();
-	BAlert* alert = new BAlert("about",
-		appName.Append(B_TRANSLATE("\n\twritten by Jérôme Duval\n"
-			"\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \n"
-			"Dominic, Hiroshi, Peter, Pavel and Robert\n")),
-		B_TRANSLATE("OK"));
-	BTextView* view = alert->TextView();
-	BFont font;
-
-	view->SetStylable(true);
-
-	view->GetFont(&font);
-	font.SetSize(18);
-	font.SetFace(B_BOLD_FACE);
-	view->SetFontAndColor(0, nameLength, &font);
-
-	alert->Go();
+	const char* authors[] = {
+		"Jérôme Duval",
+		NULL
+	};
+	BAboutWindow about(B_TRANSLATE_APP_NAME("Expander"), 2004, authors,
+		"Original Be version by Dominic, Hiroshi, Peter, Pavel and Robert.");
+	about.Show();
 }
 
 

@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <AboutMenuItem.h>
 #include <Alert.h>
 #include <Application.h>
 #include <Box.h>
@@ -110,7 +111,7 @@ CodecMenuItem::~CodecMenuItem()
 
 MediaConverterWindow::MediaConverterWindow(BRect frame)
 	:
-	BWindow(frame, B_TRANSLATE("MediaConverter"), B_TITLED_WINDOW_LOOK, 
+	BWindow(frame, B_TRANSLATE_APP_NAME("MediaConverter"), B_TITLED_WINDOW_LOOK,
 		B_NORMAL_WINDOW_FEEL, B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS | 
 		B_AUTO_UPDATE_SIZE_LIMITS),
 	fVideoQuality(75),
@@ -383,7 +384,7 @@ MediaConverterWindow::MessageReceived(BMessage* msg)
 		case B_CANCEL:
 			break;
 
-		case DISP_ABOUT_MESSAGE:
+		case B_ABOUT_REQUESTED:
 		{
 			BString title(B_TRANSLATE("About" B_UTF8_ELLIPSIS));
 			(new BAlert(title,
@@ -932,10 +933,7 @@ MediaConverterWindow::_CreateMenu()
 		new BMessage(OPEN_FILE_MESSAGE), 'O');
 	menu->AddItem(item);
 	menu->AddSeparatorItem();
-
-	item = new BMenuItem(B_TRANSLATE_WITH_CONTEXT(
-		"About MediaConverter" B_UTF8_ELLIPSIS, "Menu"),
-		new BMessage(DISP_ABOUT_MESSAGE));
+	item = new BAboutMenuItem(),
 	menu->AddItem(item);
 	menu->AddSeparatorItem();
 	item = new BMenuItem(B_TRANSLATE_WITH_CONTEXT("Quit", "Menu"), 

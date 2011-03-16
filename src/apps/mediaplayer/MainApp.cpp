@@ -410,9 +410,11 @@ MainApp::MessageReceived(BMessage* message)
 void
 MainApp::AboutRequested()
 {
-	BAlert* alert = new BAlert("about", B_TRANSLATE(
-		NAME"\n\nWritten by Marcus Overhagen, "
-		"Stephan Aßmus and Frederik Modéen"), 
+	const char* appName = B_TRANSLATE_APP_NAME("MediaPlayer");
+	BString message = B_TRANSLATE("%app%\n\nWritten by Marcus Overhagen, "
+		"Stephan Aßmus and Frederik Modéen");
+	message.ReplaceFirst("%app%", appName);
+	BAlert* alert = new BAlert(appName, message.String(),
 		B_TRANSLATE("Thanks"));
 	alert->SetFeel(B_FLOATING_ALL_WINDOW_FEEL);
 		// Make sure it is on top of any player windows that may have the

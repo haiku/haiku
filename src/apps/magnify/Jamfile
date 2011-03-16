@@ -4,14 +4,16 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 AddSubDirSupportedPlatforms libbe_test ;
 
+UsePrivateHeaders shared ;
+
 Application Magnify : 
 	Magnify.cpp 
-	: be tracker game $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
+	: be game $(HAIKU_LOCALE_LIBS) libshared.a $(TARGET_LIBSUPC++) tracker
 	: Magnify.rdef
 ;
 
 DoCatalogs Magnify : 
-	x-vnd.Haiku-Magnify 
+	x-vnd.Haiku-Magnify
 	: 
 	Magnify.cpp
 ;

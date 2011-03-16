@@ -10,6 +10,7 @@
 
 #include "BootManagerWindow.h"
 
+#include <AboutWindow.h>
 #include <Alert.h>
 #include <Application.h>
 #include <Catalog.h>
@@ -51,30 +52,14 @@ BootManager::ReadyToRun()
 void
 BootManager::AboutRequested()
 {
-	BString aboutText;
-	const char* title = B_TRANSLATE_COMMENT("BootManager", "Application name");
-	aboutText << title << "\n\n"
-		<< B_TRANSLATE("written by")
-		<< "\n"
-			"\tDavid Dengg\n"
-			"\tMichael Pfeiffer\n"
-			"\n"
-		<< B_TRANSLATE_COMMENT("Copyright %year, Haiku Inc.\n",
-			"Leave %year untranslated");
-	aboutText.ReplaceLast("%year", "2008-2010");
-	BAlert *alert = new BAlert("about",
-		aboutText.String(), B_TRANSLATE("OK"));
-	BTextView *view = alert->TextView();
-	BFont font;
-
-	view->SetStylable(true);
-
-	view->GetFont(&font);
-	font.SetSize(18);
-	font.SetFace(B_BOLD_FACE);
-	view->SetFontAndColor(0, strlen(title), &font);
-
-	alert->Go();
+	const char* authors[] = {
+		"David Dengg",
+		"Michael Pfeiffer",
+		NULL
+	};
+	
+	BAboutWindow about(B_TRANSLATE_APP_NAME("BootManager"), 2008, authors);
+	about.Show();
 }
 
 

@@ -2,6 +2,8 @@ SubDir HAIKU_TOP src apps codycam ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+UsePrivateHeaders shared ;
+
 Application CodyCam :
 	CodyCam.cpp
 	FileUploadClient.cpp
@@ -11,7 +13,7 @@ Application CodyCam :
 	Settings.cpp
 	SettingsHandler.cpp
 	VideoConsumer.cpp
-	: be $(HAIKU_LOCALE_LIBS) media translation $(TARGET_NETAPI_LIB)
+	: be $(HAIKU_LOCALE_LIBS) libshared.a media translation $(TARGET_NETAPI_LIB)
 		$(TARGET_LIBSTDC++)
 	: CodyCam.rdef
 ;

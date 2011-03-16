@@ -13,7 +13,7 @@ Application DeskCalc :
 	ExpressionTextView.cpp
 	InputTextView.cpp
 	: be $(TARGET_LIBSTDC++) $(HAIKU_LOCALE_LIBS) media libexpression_parser.a
-		libmapm.a
+		libmapm.a libshared.a
 	: DeskCalc.rdef
 ;
 

@@ -22,7 +22,7 @@ Application BootManager :
 	WizardController.cpp
 	WizardPageView.cpp
 
-	: be textencoding tracker $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
+	: be libshared.a textencoding tracker $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
 	: BootManager.rdef
 ;
 

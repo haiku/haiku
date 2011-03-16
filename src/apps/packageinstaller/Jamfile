@@ -20,3 +20,16 @@ Application PackageInstaller :
 	: PackageInstaller.rdef
 ;
 
+DoCatalogs PackageInstaller :
+	x-vnd.Haiku-PackageInstaller
+	:
+	main.cpp
+	PackageImageViewer.cpp
+	PackageInfo.cpp
+	PackageInstall.cpp
+	PackageItem.cpp
+	PackageStatus.cpp
+	PackageTextViewer.cpp
+	PackageView.cpp
+	PackageWindow.cpp
+;

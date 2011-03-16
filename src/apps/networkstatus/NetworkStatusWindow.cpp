@@ -19,7 +19,8 @@
 
 
 NetworkStatusWindow::NetworkStatusWindow()
-	: BWindow(BRect(150, 150, 249, 249), B_TRANSLATE("NetworkStatus"), 
+	:
+	BWindow(BRect(150, 150, 249, 249), B_TRANSLATE_APP_NAME("NetworkStatus"), 
 		B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
 {
 	BView* topView = new BView(Bounds(), NULL, B_FOLLOW_ALL, B_WILL_DRAW);

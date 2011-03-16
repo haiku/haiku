@@ -10,6 +10,7 @@
 
 #include "Magnify.h"
 
+#include <AboutMenuItem.h>
 #include <Alert.h>
 #include <Bitmap.h>
 #include <Catalog.h>
@@ -131,11 +132,9 @@ static void
 BuildInfoMenu(BMenu *menu)
 {
 	BMenuItem* menuItem;
-
-	menuItem = new BMenuItem(B_TRANSLATE("About Magnify" B_UTF8_ELLIPSIS),
-		new BMessage(B_ABOUT_REQUESTED));
+	menuItem = new BAboutMenuItem();
 	menu->AddItem(menuItem);
-	menuItem = new BMenuItem(B_TRANSLATE("Help" B_UTF8_ELLIPSIS),
+	menuItem = new BMenuItem(B_TRANSLATE("Help"),
 		new BMessage(msg_help));
 	menu->AddItem(menuItem);
 	menu->AddSeparatorItem();
@@ -239,7 +238,7 @@ TApp::AboutRequested()
 
 TWindow::TWindow(int32 pixelCount)
 	:
-	BWindow(BRect(0, 0, 0, 0), B_TRANSLATE("Magnify"),
+	BWindow(BRect(0, 0, 0, 0), B_TRANSLATE_APP_NAME("Magnify"),
 		B_TITLED_WINDOW, B_OUTLINE_RESIZE)
 {
 	GetPrefs(pixelCount);

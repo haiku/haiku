@@ -43,7 +43,7 @@ const int32 MSG_LOG = 'logg';
 // ------------------------------------------------------
 // PoorMan Window
 extern const char* STR_APP_SIG;
-extern       char* STR_APP_NAME;
+extern const char* STR_APP_NAME;
 extern const char* STR_ERR_WEB_DIR; 	// Alert Box
 extern const char* STR_ERR_CANT_START;
 extern const char* STR_DIR_CREATED;
@@ -101,10 +101,6 @@ extern const char CMD_FILE_SAVE_AS;
 extern const char CMD_FILE_QUIT;
 extern const char CMD_EDIT_COPY;
 extern const char CMD_EDIT_SELECT_ALL;
-
-extern const char* STR_ABOUT_TITLE;
-extern const char* STR_ABOUT_DESC;
-extern const char* STR_ABOUT_BUTTON;
 
 
 /* Colors */
