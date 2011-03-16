@@ -86,6 +86,20 @@ IMAPFolders::UnsubscribeFolder(const char* folder)
 
 
 status_t
+IMAPFolders::GetQuota(double& used, double& total)
+{
+	GetQuotaCommand quotaCommand;
+	status_t status = ProcessCommand(&quotaCommand);
+	if (status != B_OK)
+		return status;
+
+	used = quotaCommand.UsedStorage();
+	total = quotaCommand.TotalStorage();
+	return status;
+}
+
+
+status_t
 IMAPFolders::_GetAllFolders(StringList& folders)
 {
 	ListCommand listCommand;

@@ -280,4 +280,22 @@ private:
 };
 
 
+class GetQuotaCommand : public IMAPCommand {
+public:
+								GetQuotaCommand(const char* mailboxName = "");
+
+			BString				Command();
+			bool				Handle(const BString& response);
+
+			double				UsedStorage();
+			double				TotalStorage();
+private:
+			BString				fMailboxName;
+
+			double				fUsedStorage;
+			double				fTotalStorage;
+};
+
+
+
 #endif // IMAP_HANDLER_H

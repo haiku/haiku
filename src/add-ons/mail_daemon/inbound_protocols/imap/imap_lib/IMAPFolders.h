@@ -39,6 +39,7 @@ public:
 			status_t			SubscribeFolder(const char* folder);
 			status_t			UnsubscribeFolder(const char* folder);
 
+			status_t			GetQuota(double& used, double& total);
 private:
 			status_t			_GetAllFolders(StringList& folders);
 			status_t			_GetSubscribedFolders(StringList& folders);

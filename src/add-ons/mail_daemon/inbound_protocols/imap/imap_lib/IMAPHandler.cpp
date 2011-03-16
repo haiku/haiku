@@ -852,3 +852,56 @@ UnsubscribeCommand::Handle(const BString& response)
 {
 	return false;
 }
+
+
+
+GetQuotaCommand::GetQuotaCommand(const char* mailboxName)
+	:
+	fMailboxName(mailboxName),
+
+	fUsedStorage(-1),
+	fTotalStorage(-1)
+{
+
+}
+
+
+BString
+GetQuotaCommand::Command()
+{
+	BString command = "GETQUOTA \"";
+	command += fMailboxName;
+	command += "\"";
+	return command;
+}
+
+
+bool
+GetQuotaCommand::Handle(const BString& response)
+{
+	if (response.FindFirst("QUOTA") < 0)
+		return false;
+
+	BString data = IMAPParser::ExtractBetweenBrackets(response, "(", ")");
+	IMAPParser::RemovePrimitiveFromLeft(data);
+	fUsedStorage = IMAPParser::RemoveIntegerFromLeft(data);
+	fUsedStorage *= 1024;
+	fTotalStorage = IMAPParser::RemoveIntegerFromLeft(data);
+	fTotalStorage *= 1024;
+
+	return true;
+}
+
+
+double
+GetQuotaCommand::UsedStorage()
+{
+	return fUsedStorage;
+}
+
+
+double
+GetQuotaCommand::TotalStorage()
+{
+	return fTotalStorage;
+}
