@@ -1698,8 +1698,8 @@ if [ IsOptionalHaikuImagePackageAdded XZ-Utils ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				xz-utils-4.999.9-x86-gcc4-2010-11-13.zip
-				: $(baseURL)/xz-utils-4.999.9-x86-gcc4-2010-11-13.zip ;
+				xz-utils-5.0.1-x86-gcc4-2011-03-16.zip
+				: $(baseURL)/xz-utils-5.0.1-x86-gcc4-2011-03-16.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
 				xz-utils-4.999.9-r1a2-x86-gcc4-2010-04-25-a.zip
