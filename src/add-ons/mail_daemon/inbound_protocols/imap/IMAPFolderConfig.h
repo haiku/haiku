@@ -9,6 +9,7 @@
 
 #include <Button.h>
 #include <ListView.h>
+#include <StringView.h>
 #include <Window.h>
 
 #include <MailSettings.h>
@@ -32,6 +33,8 @@ private:
 			BButton*			fApplyButton;
 	const	BMessage			fSettings;
 			FolderList			fFolderList;
+
+			BStringView*		fQuotaView;
 };
 
 

@@ -12,7 +12,8 @@
 #include <SpaceLayoutItem.h>
 #include <StringView.h>
 
-#include "ALMLayout.h"
+#include <ALMLayout.h>
+#include <StringForSize.h>
 
 #include <crypt.h>
 
@@ -229,7 +230,7 @@ const uint32 kMsgInit = '&Ini';
 
 FolderConfigWindow::FolderConfigWindow(BRect parent, const BMessage& settings)
 	:
-	BWindow(BRect(0, 0, 250, 300), "IMAP Folders", B_TITLED_WINDOW_LOOK,
+	BWindow(BRect(0, 0, 300, 300), "IMAP Folders", B_TITLED_WINDOW_LOOK,
 		B_MODAL_APP_WINDOW_FEEL, B_NO_WORKSPACE_ACTIVATION | B_NOT_ZOOMABLE
 			| B_AVOID_FRONT),
 	fSettings(settings)
@@ -248,12 +249,17 @@ FolderConfigWindow::FolderConfigWindow(BRect parent, const BMessage& settings)
 		B_SIZE_UNLIMITED));
 	fApplyButton = new BButton("Apply", "Apply", new BMessage(kMsgApplyButton));
 
+	fQuotaView = new BStringView("quota view",
+		"Failed to fetch available storage.");
+	fQuotaView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+		B_ALIGN_VERTICAL_CENTER));
+
 	layout->AddView(fFolderListView, layout->Left(), layout->Top(),
 		layout->Right(), layout->Bottom());
 
-	GroupItem item = GroupItem(fFolderListView)
-			/ (GroupItem(BSpaceLayoutItem::CreateGlue())
-				| GroupItem(fApplyButton));
+	GroupItem item = GroupItem(fQuotaView) / GroupItem(fFolderListView)
+		/ (GroupItem(BSpaceLayoutItem::CreateGlue())
+			| GroupItem(fApplyButton));
 	layout->BuildLayout(item);
 
 	PostMessage(kMsgInit);
@@ -311,6 +317,7 @@ FolderConfigWindow::_LoadFolders()
 	}
 
 	fIMAPFolders.Connect(server, username, password, useSSL);
+	fFolderList.clear();
 	fIMAPFolders.GetFolders(fFolderList);
 	for (unsigned int i = 0; i < fFolderList.size(); i++) {
 		FolderInfo& info = fFolderList[i];
@@ -318,6 +325,18 @@ FolderConfigWindow::_LoadFolders()
 		fFolderListView->AddItem(item);
 		item->SetListView(fFolderListView);
 	}
+
+	double used, total;
+	if (fIMAPFolders.GetQuota(used, total) == B_OK) {
+		char buffer[256];
+		BString quotaString = "Server storage: ";
+		quotaString += string_for_size(used, buffer, 256);
+		quotaString += " / ";
+		quotaString += string_for_size(total, buffer, 256);
+		quotaString += " used.";
+		fQuotaView->SetText(quotaString);
+	}
+
 	status->PostMessage(B_QUIT_REQUESTED);
 }
 
