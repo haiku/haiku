@@ -37,7 +37,7 @@ IMAPParser::ExtractBetweenBrackets(const BString& string, const char* start,
 	int32 startPos = outString.FindFirst(start);
 	if (startPos < 0)
 		return "";
-	outString.Remove(startPos, 1);
+	outString.Remove(0, startPos + 1);
 
 	int32 searchPos = 0;
 	while (true) {
