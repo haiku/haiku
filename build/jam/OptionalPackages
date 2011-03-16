@@ -978,12 +978,12 @@ if [ IsOptionalHaikuImagePackageAdded LibXML2 ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				libxml2-2.7.8-x86-gcc4-2011-03-15.zip
-				: $(baseURL)/libxml2-2.7.8-x86-gcc4-2011-03-15.zip ;
+				libxml2-2.7.8-x86-gcc4-2011-03-16.zip
+				: $(baseURL)/libxml2-2.7.8-x86-gcc4-2011-03-16.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				libxml2-2.7.8-x86-gcc2-2011-03-15.zip
-				: $(baseURL)/libxml2-2.7.8-x86-gcc2-2011-03-15.zip ;
+				libxml2-2.7.8-x86-gcc2-2011-03-16.zip
+				: $(baseURL)/libxml2-2.7.8-x86-gcc2-2011-03-16.zip ;
 		}
 	}
 }
@@ -1102,12 +1102,12 @@ if [ IsOptionalHaikuImagePackageAdded Neon ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				neon-0.29.5-x86-gcc4-2011-03-14.zip
-				: $(baseURL)/neon-0.29.5-x86-gcc4-2011-03-14.zip ;
+				neon-0.29.5-x86-gcc4-2011-03-16.zip
+				: $(baseURL)/neon-0.29.5-x86-gcc4-2011-03-16.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				neon-0.29.5-x86-gcc2-2011-03-14.zip
-				: $(baseURL)/neon-0.29.5-x86-gcc2-2011-03-14.zip ;
+				neon-0.29.5-x86-gcc2-2011-03-16.zip
+				: $(baseURL)/neon-0.29.5-x86-gcc2-2011-03-16.zip ;
 		}
 	}
 }
