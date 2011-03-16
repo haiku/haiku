@@ -33,7 +33,6 @@ IMAPMailbox::IMAPMailbox(IMAPStorage& storage)
 	fStorage(storage),
 
 	fMailboxSelectHandler(*this),
-	fCapabilityHandler(*this),
 	fExistsHandler(*this),
 	fExpungeHandler(*this),
 	fFlagsHandler(*this),

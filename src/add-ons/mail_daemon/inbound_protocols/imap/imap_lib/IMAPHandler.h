@@ -59,9 +59,9 @@ private:
 };
 
 
-class CapabilityHandler : public IMAPMailboxCommand {
+class CapabilityHandler : public IMAPCommand {
 public:
-								CapabilityHandler(IMAPMailbox& mailbox);
+								CapabilityHandler();
 
 			BString				Command();
 			bool				Handle(const BString& response);

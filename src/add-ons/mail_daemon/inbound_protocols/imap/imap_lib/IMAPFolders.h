@@ -43,6 +43,8 @@ public:
 private:
 			status_t			_GetAllFolders(StringList& folders);
 			status_t			_GetSubscribedFolders(StringList& folders);
+
+			CapabilityHandler	fCapabilityHandler;
 };
 
 

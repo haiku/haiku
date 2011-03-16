@@ -105,10 +105,8 @@ MailboxSelectHandler::Handle(const BString& response)
 }
 
 
-CapabilityHandler::CapabilityHandler(IMAPMailbox& mailbox)
+CapabilityHandler::CapabilityHandler()
 	:
-	IMAPMailboxCommand(mailbox),
-
 	fCapabilities("")
 {
 	
