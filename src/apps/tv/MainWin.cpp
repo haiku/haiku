@@ -85,7 +85,8 @@ enum
 
 
 MainWin::MainWin(BRect frame_rect)
- :	BWindow(frame_rect, B_TRANSLATE(NAME), B_TITLED_WINDOW, 
+	:
+	BWindow(frame_rect, B_TRANSLATE_APP_NAME(NAME), B_TITLED_WINDOW, 
  	B_ASYNCHRONOUS_CONTROLS /* | B_WILL_ACCEPT_FIRST_CLICK */)
  ,	fController(new Controller)
  ,	fIsFullscreen(false)
@@ -299,10 +300,12 @@ MainWin::SetupChannelMenu()
 		fChannelMenu->AddSeparatorItem();
 	}
 
-	char s[100];
 	for (int i = 0; i < channels; i++) {
-		sprintf(s, "%s%d %s", (i < 9) ? "  " : "", i + 1, fController->ChannelName(i));
-		fChannelMenu->AddItem(new BMenuItem(s, new BMessage(M_SELECT_CHANNEL + i)));
+		BString string;
+		string.SetToFormat("%s%d %s", (i < 9) ? "  " : "", i + 1,
+			fController->ChannelName(i));
+		fChannelMenu->AddItem(new BMenuItem(string,
+			new BMessage(M_SELECT_CHANNEL + i)));
 	}
 }
 
@@ -703,11 +706,12 @@ MainWin::FrameResized(float new_width, float new_height)
 void
 MainWin::UpdateWindowTitle()
 {
-	char buf[100];
-	sprintf(buf, "%s - %d x %d, %.3f:%.3f => %.0f x %.0f", B_TRANSLATE(NAME),
-		fSourceWidth, fSourceHeight, fWidthScale, fHeightScale, 
+	BString title;
+	title.SetToFormat("%s - %d x %d, %.3f:%.3f => %.0f x %.0f",
+		B_TRANSLATE_APP_NAME(NAME),
+		fSourceWidth, fSourceHeight, fWidthScale, fHeightScale,
 		fVideoView->Bounds().Width() + 1, fVideoView->Bounds().Height() + 1);
-	SetTitle(buf);
+	SetTitle(title);
 }
 
 
