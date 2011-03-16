@@ -163,21 +163,24 @@ PulseApp::~PulseApp()
 void
 PulseApp::AboutRequested()
 {
-	PulseApp::ShowAbout();
+	PulseApp::ShowAbout(true);
 }
 
 
 void
-PulseApp::ShowAbout()
+PulseApp::ShowAbout(bool asApplication)
 {
 	// static version to be used in replicant mode
-	BString name(B_TRANSLATE("Pulse"));
-	BString message;
-	snprintf(message.LockBuffer(512), 512,
-		B_TRANSLATE("%s\n\nBy David Ramsey and Arve Hjønnevåg\n"
-		"Revised by Daniel Switkin\n"), name.String());
-	message.UnlockBuffer();
+	BString name;
+	if (asApplication)
+		name = B_TRANSLATE_APP_NAME("Pulse");
+	else
+		name = B_TRANSLATE("Pulse");
 
+	BString message = B_TRANSLATE(
+		"%s\n\nBy David Ramsey and Arve Hjønnevåg\n"
+		"Revised by Daniel Switkin\n");
+	message.ReplaceFirst("%s", name);
 	BAlert *alert = new BAlert(B_TRANSLATE("Info"),
 		message.String(), B_TRANSLATE("OK"));
 

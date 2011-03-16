@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <AboutWindow.h>
 #include <Alert.h>
 #include <Bitmap.h>
 #include <Catalog.h>
@@ -405,24 +406,15 @@ ProcessController::MessageReceived(BMessage *message)
 void
 ProcessController::AboutRequested()
 {
-	BAlert *alert = new BAlert(B_TRANSLATE("About"),
-		B_TRANSLATE("ProcessController\n\n"
-					"Copyright 1997-2001,\n"
-					"Georges-Edouard Berenger.\n\n"
-					"Copyright "B_UTF8_COPYRIGHT" 2007 Haiku, Inc.\n"),
-		B_TRANSLATE("OK"));
-	BTextView *view = alert->TextView();
-	BFont font;
+	const char* authors[] = {
+		"Georges-Edouard Berenger",
+		NULL
+	};
 
-	view->SetStylable(true);
-
-	view->GetFont(&font);
-	font.SetSize(font.Size() * 1.5);
-	font.SetFace(B_BOLD_FACE);
-	view->SetFontAndColor(0, strlen(B_TRANSLATE("ProcessController")), &font);
-	alert->SetShortcut(0, B_ESCAPE);
-
-	alert->Go();
+	BAboutWindow about(B_TRANSLATE_APP_NAME("ProcessController"), 2007, authors,
+		"Copyright 1997-2001\n"
+		"Georges-Edouard Berenger.");
+	about.Show();
 }
 
 

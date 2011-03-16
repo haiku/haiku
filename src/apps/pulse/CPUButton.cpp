@@ -277,7 +277,7 @@ CPUButton::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
 		case B_ABOUT_REQUESTED: {
-			PulseApp::ShowAbout();
+			PulseApp::ShowAbout(false);
 			break;
 		}
 		case PV_REPLICANT_PULSE: {

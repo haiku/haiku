@@ -37,6 +37,8 @@ BView* instantiate_deskbar_item()
 
 WatchApp::WatchApp() : BApplication(APP_SIGNATURE)
 {
+	B_TRANSLATE_MARK_APP_NAME("WebWatch");
+
 	// Here we tell the Deskbar that we want to add a new replicant, and
 	// where it can find this replicant (in our app). Because we only run
 	// less than a second, there is no need for our title to appear inside

@@ -2,11 +2,6 @@ SubDir HAIKU_TOP src apps webwatch ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-#UsePrivateHeaders app ;
-#UsePrivateHeaders shared ;
-#UsePrivateHeaders tracker ;
-#SubDirHdrs $(HAIKU_TOP) src kits tracker ;
-
 Application WebWatch :
 	WatchApp.cpp
 	WatchView.cpp
@@ -17,5 +12,6 @@ Application WebWatch :
 DoCatalogs WebWatch :
 	x-vnd.mahlzeit.webwatch
 	:
+	WatchApp.cpp
 	WatchView.cpp
 ;

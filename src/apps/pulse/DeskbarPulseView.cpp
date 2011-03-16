@@ -128,7 +128,7 @@ void DeskbarPulseView::MessageReceived(BMessage *message) {
 			prefswindow->Show();
 			break;
 		case PV_ABOUT: {
-			PulseApp::ShowAbout();
+			PulseApp::ShowAbout(false);
 			break;
 		}
 		case PV_QUIT:

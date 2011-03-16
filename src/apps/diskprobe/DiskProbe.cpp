@@ -12,6 +12,7 @@
 #include "OpenWindow.h"
 #include "FindWindow.h"
 
+#include <AboutWindow.h>
 #include <Alert.h>
 #include <Application.h>
 #include <Autolock.h>
@@ -485,21 +486,14 @@ DiskProbe::MessageReceived(BMessage *message)
 void
 DiskProbe::AboutRequested()
 {
-	BAlert *alert = new BAlert("about", B_TRANSLATE("DiskProbe\n"
-		"\twritten by Axel Dörfler\n"
-		"\tCopyright 2004-2007, Haiku.\n\n"
-		"Original Be version by Robert Polic\n"), B_TRANSLATE("OK"));
-	BTextView *view = alert->TextView();
-	BFont font;
-
-	view->SetStylable(true);
-
-	view->GetFont(&font);
-	font.SetSize(18);
-	font.SetFace(B_BOLD_FACE); 			
-	view->SetFontAndColor(0, 9, &font);
-
-	alert->Go();
+	const char* authors[] = {
+		"Axel Dörfler",
+		NULL
+	};
+	
+	BAboutWindow about(B_TRANSLATE_APP_NAME("DiskProbe"), 2004, authors,
+		"Original Be version by Robert Polic.");
+	about.Show();
 }
 
 

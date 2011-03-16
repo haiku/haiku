@@ -24,7 +24,7 @@ public:
 						~PulseApp();
 
 	virtual	void		AboutRequested();
-	static	void		ShowAbout();
+	static	void		ShowAbout(bool asApplication);
 
 			Prefs*		prefs;
 

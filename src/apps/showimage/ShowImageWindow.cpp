@@ -955,7 +955,7 @@ void
 ShowImageWindow::_LoadError(const entry_ref& ref)
 {
 	// TODO: give a better error message!
-	BAlert* alert = new BAlert(B_TRANSLATE("ShowImage"),
+	BAlert* alert = new BAlert(B_TRANSLATE_APP_NAME("ShowImage"),
 		B_TRANSLATE_WITH_CONTEXT("Could not load image! Either the "
 			"file or an image translator for it does not exist.",
 			"LoadAlerts"),

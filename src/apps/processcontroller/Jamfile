@@ -30,6 +30,7 @@ DoCatalogs ProcessController :
 	:
 	KernelMemoryBarMenuItem.cpp
 	NoiseBarMenuItem.cpp
+	PCWindow.cpp
 	PCWorld.cpp
 	Preferences.cpp
 	PriorityMenu.cpp

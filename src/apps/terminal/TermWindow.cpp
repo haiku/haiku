@@ -188,7 +188,7 @@ TermWindow::TermWindow(const BString& title, Arguments* args)
 	// apply the title settings
 	fTitle.pattern = title;
 	if (fTitle.pattern.Length() == 0) {
-		fTitle.pattern = B_TRANSLATE("Terminal");
+		fTitle.pattern = B_TRANSLATE_APP_NAME("Terminal");
 
 		if (id >= 0)
 			fTitle.pattern << " " << id + 1;
@@ -426,7 +426,7 @@ TermWindow::_SetupMenu()
 {
 	BLayoutBuilder::Menu<>(fMenuBar = new BMenuBar(Bounds(), "mbar"))
 		// Terminal
-		.AddMenu(B_TRANSLATE("Terminal"))
+		.AddMenu(B_TRANSLATE_APP_NAME("Terminal"))
 			.AddItem(B_TRANSLATE("Switch Terminals"), MENU_SWITCH_TERM, B_TAB)
 				.GetItem(fSwitchTerminalsMenuItem)
 			.AddItem(B_TRANSLATE("New Terminal"), MENU_NEW_TERM, 'N')

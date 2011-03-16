@@ -123,7 +123,7 @@ void WatchView::MouseDown(BPoint point)
 	BPopUpMenu* menu = new BPopUpMenu(B_TRANSLATE("WatchView"), false, false);
 
 	menu->AddItem(new BMenuItem(
-		B_TRANSLATE("About" B_UTF8_ELLIPSIS), 
+		B_TRANSLATE("About"), 
 		new BMessage(B_ABOUT_REQUESTED)));
 
 	menu->AddItem(new BMenuItem(

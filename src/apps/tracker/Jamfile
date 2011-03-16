@@ -9,9 +9,15 @@ SubDirHdrs $(HAIKU_TOP) src kits tracker ;
 
 Application Tracker :
 	main.cpp
-	: be tracker
+	: be tracker $(HAIKU_LOCALE_LIBS)
 	: Tracker.rdef
 	;
+
+DoCatalogs Tracker :
+	x-vnd.Be-TRAK
+	:
+	main.cpp
+;
 
 if $(TARGET_PLATFORM) = libbe_test {
 	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : Tracker

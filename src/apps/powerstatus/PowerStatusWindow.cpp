@@ -11,11 +11,13 @@
 #include "PowerStatusView.h"
 
 #include <Application.h>
+#include <Catalog.h>
 
 
 PowerStatusWindow::PowerStatusWindow()
-	: BWindow(BRect(100, 150, 281, 299), "PowerStatus", B_TITLED_WINDOW,
-		B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
+	:
+	BWindow(BRect(100, 150, 281, 299), B_TRANSLATE_APP_NAME("PowerStatus"),
+		B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
 {
 	BView* topView = new BView(Bounds(), NULL, B_FOLLOW_ALL, B_WILL_DRAW);
 	topView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));

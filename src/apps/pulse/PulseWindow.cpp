@@ -27,12 +27,12 @@
 #define B_TRANSLATE_CONTEXT "PulseWindow"
 
 
-PulseWindow::PulseWindow(BRect rect) :
-	BWindow(rect, "Pulse", B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
+PulseWindow::PulseWindow(BRect rect)
+	:
+	BWindow(rect, B_TRANSLATE_APP_NAME("Pulse"), B_TITLED_WINDOW,
+		B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
 {
 	SetPulseRate(200000);
-
-	SetTitle(B_TRANSLATE("Pulse"));
 	
 	PulseApp *pulseapp = (PulseApp *)be_app;
 	BRect bounds = Bounds();
@@ -103,7 +103,7 @@ PulseWindow::MessageReceived(BMessage *message)
 			break;
 		}
 		case PV_ABOUT: {
-			PulseApp::ShowAbout();
+			PulseApp::ShowAbout(true);
 			break;
 		}
 		case PV_QUIT:

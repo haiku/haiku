@@ -8,6 +8,7 @@
 #include <stdlib.h>
 
 #include <AboutWindow.h>
+#include <Catalog.h>
 #include <Locale.h>
 
 #include "BootPromptWindow.h"
@@ -65,8 +66,8 @@ BootPromptApp::AboutRequested()
 		NULL
 	};
 
-	BAboutWindow* aboutWindow = new BAboutWindow("ReadOnlyBootPrompt", 2010,
-		kAuthors);
+	BAboutWindow* aboutWindow = new BAboutWindow(
+		B_TRANSLATE_APP_NAME("ReadOnlyBootPrompt"), 2010, kAuthors);
 
 	aboutWindow->Show();
 	delete aboutWindow;

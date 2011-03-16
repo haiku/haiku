@@ -32,7 +32,11 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
+
 #include "Tracker.h"
+
+#include <Catalog.h>
+
 
 #if DEBUG
 //#define LEAK_CHECKING
@@ -56,6 +60,7 @@ int main(int , char **)
 	SetNewLeakChecking(true);
 	SetMallocLeakChecking(true);
 #endif
+	B_TRANSLATE_MARK_APP_NAME("Tracker");
 
 	TTracker tracker;
 	tracker.Run();

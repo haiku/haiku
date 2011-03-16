@@ -102,17 +102,19 @@ struct wave_struct
 };
 
 
-RecorderWindow::RecorderWindow() :
-	BWindow(BRect(XPOS,YPOS,XPOS+MIN_WIDTH,YPOS+MIN_HEIGHT), "SoundRecorder",
-		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_NOT_V_RESIZABLE | B_NOT_ZOOMABLE),
-		fPlayer(NULL),
-		fSoundList(NULL),
-		fPlayFile(NULL),
-		fPlayTrack(NULL),
-		fPlayFrames(0),
-		fLooping(false),
-		fSavePanel(NULL),
-		fInitCheck(B_OK)
+RecorderWindow::RecorderWindow()
+	:
+	BWindow(BRect(XPOS, YPOS, XPOS + MIN_WIDTH, YPOS + MIN_HEIGHT),
+		B_TRANSLATE_APP_NAME("SoundRecorder"), B_TITLED_WINDOW,
+		B_ASYNCHRONOUS_CONTROLS | B_NOT_V_RESIZABLE | B_NOT_ZOOMABLE),
+	fPlayer(NULL),
+	fSoundList(NULL),
+	fPlayFile(NULL),
+	fPlayTrack(NULL),
+	fPlayFrames(0),
+	fLooping(false),
+	fSavePanel(NULL),
+	fInitCheck(B_OK)
 {
 	fRoster = NULL;
 	fRecordButton = NULL;
@@ -127,8 +129,6 @@ RecorderWindow::RecorderWindow() :
 	fButtonState = btnPaused;
 
 	CalcSizes(MIN_WIDTH, MIN_HEIGHT);
-
-	SetTitle(B_TRANSLATE("SoundRecorder"));
 
 	fInitCheck = InitWindow();
 	if (fInitCheck != B_OK) {

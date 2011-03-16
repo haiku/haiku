@@ -27,14 +27,20 @@
 #define B_TRANSLATE_CONTEXT "Terminal PrefWindow"
 
 PrefWindow::PrefWindow(const BMessenger& messenger)
-	: BWindow(BRect(0, 0, 375, 185), B_TRANSLATE("Terminal settings"),
+	:
+	BWindow(BRect(0, 0, 375, 185), "Terminal settings",
 		B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
-		B_NOT_RESIZABLE|B_NOT_ZOOMABLE|B_AUTO_UPDATE_SIZE_LIMITS),
+		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
 	fPreviousPref(new PrefHandler(PrefHandler::Default())),
 	fSavePanel(NULL),
 	fDirty(false),
 	fTerminalMessenger(messenger)
 {
+	BString app = B_TRANSLATE_APP_NAME("Terminal");
+	BString title = B_TRANSLATE_COMMENT("%app% settings", "window title");
+	title.ReplaceFirst("%app%", app);
+	SetTitle(title);
+
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.AddGroup(B_VERTICAL)
 		.SetInsets(10, 10, 10, 10)
