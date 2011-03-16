@@ -198,14 +198,17 @@ IMAPProtocol::Connect(const char* server, const char* username,
 
 	TRACE("Login\n");
 
+	fIsConnected = true;
+
 	BString command = "LOGIN ";
 	command << "\"" << username << "\" ";
 	command << "\"" << password << "\"";
 	status = ProcessCommand(command);
-	if (status != B_OK)
+	if (status != B_OK) {
+		_Disconnect();
 		return status;
+	}
 
-	fIsConnected = true;
 	return B_OK;
 }
 
