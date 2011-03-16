@@ -366,11 +366,11 @@ if [ IsOptionalHaikuImagePackageAdded CDRecord ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package CDRecord available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		InstallOptionalHaikuImagePackage cdrtools-3.00-x86-gcc4-2010-11-12.zip
-			: $(baseURL)/cdrtools-3.00-x86-gcc4-2010-11-12.zip ;
+		InstallOptionalHaikuImagePackage cdrtools-3.01a01-x86-gcc4-2011-03-16.zip
+			: $(baseURL)/cdrtools-3.01a01-x86-gcc4-2011-03-16.zip ;
 	} else {
-		InstallOptionalHaikuImagePackage cdrtools-3.00-x86-gcc2-2010-08-25-1.zip
-			: $(baseURL)/cdrtools-3.00-x86-gcc2-2010-08-25-1.zip ;
+		InstallOptionalHaikuImagePackage cdrtools-3.01a01-x86-gcc2-2011-03-16.zip
+			: $(baseURL)/cdrtools-3.01a01-x86-gcc2-2011-03-16.zip ;
 	}
 }
 
@@ -1398,12 +1398,12 @@ if [ IsOptionalHaikuImagePackageAdded SQLite ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				sqlite-3.7.5-x86-gcc4-2011-02-28.zip
-				: $(baseURL)/sqlite-3.7.5-x86-gcc4-2011-02-28.zip ;
+				sqlite-3.7.5-x86-gcc4-2011-03-16.zip
+				: $(baseURL)/sqlite-3.7.5-x86-gcc4-2011-03-16.zip ;
 		} else {
 			InstallOptionalHaikuImagePackage
-				sqlite-3.7.5-x86-gcc2-2011-02-25.zip
-				: $(baseURL)/sqlite-3.7.5-x86-gcc2-2011-02-25.zip ;
+				sqlite-3.7.5-x86-gcc2-2011-03-16.zip
+				: $(baseURL)/sqlite-3.7.5-x86-gcc2-2011-03-16.zip ;
 		}
 	}
 }
