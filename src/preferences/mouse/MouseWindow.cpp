@@ -34,9 +34,9 @@
 
 MouseWindow::MouseWindow(BRect _rect)
 	:
-		BWindow(_rect, B_TRANSLATE("Mouse"), B_TITLED_WINDOW,
-			B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS |
-				B_AUTO_UPDATE_SIZE_LIMITS)
+	BWindow(_rect, B_TRANSLATE_APP_NAME("Mouse"), B_TITLED_WINDOW,
+		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS
+		| B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	// Add the main settings view
 	fSettingsView = new SettingsView(fSettings);

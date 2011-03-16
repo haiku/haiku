@@ -9,14 +9,16 @@
 #include "OpenGLWindow.h"
 
 #include <Application.h>
+#include <Catalog.h>
 #include <GroupLayout.h>
 #include "OpenGLView.h"
 
 
 OpenGLWindow::OpenGLWindow()
-    : BWindow(BRect(50, 50, 450, 400), "OpenGL", B_TITLED_WINDOW,
-        B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE
-        | B_AUTO_UPDATE_SIZE_LIMITS)
+	:
+	BWindow(BRect(50, 50, 450, 400), B_TRANSLATE_APP_NAME("OpenGL"),
+		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS
+		| B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
     SetLayout(new BGroupLayout(B_VERTICAL));
     fView = new OpenGLView();

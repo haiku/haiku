@@ -165,8 +165,8 @@ screen_errors(status_t status)
 
 ScreenWindow::ScreenWindow(ScreenSettings* settings)
 	:
-	BWindow(settings->WindowFrame(), B_TRANSLATE("Screen"), B_TITLED_WINDOW,
-		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS,
+	BWindow(settings->WindowFrame(), B_TRANSLATE_APP_NAME("Screen"),
+		B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS,
 		B_ALL_WORKSPACES),
 	fBootWorkspaceApplied(false),
 	fScreenMode(this),

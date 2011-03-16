@@ -12,7 +12,6 @@
 
 #include <stdio.h>
 
-// BeOS API
 #include <Application.h>
 #include <Button.h>
 #include <Catalog.h>
@@ -39,8 +38,8 @@
 
 PrintersWindow::PrintersWindow(BRect frame)
 	:
-	Inherited(BRect(78, 71, 761, 509), B_TRANSLATE("Printers"),	B_TITLED_WINDOW,
-		0),
+	BWindow(BRect(78, 71, 761, 509), B_TRANSLATE_APP_NAME("Printers"),
+		B_TITLED_WINDOW, 0),
 	fSelectedPrinter(NULL),
 	fAddingPrinter(false)
 {

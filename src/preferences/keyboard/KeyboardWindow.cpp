@@ -28,9 +28,10 @@
 #define B_TRANSLATE_CONTEXT "KeyboardWindow"
 
 KeyboardWindow::KeyboardWindow()
-	: BWindow(BRect(0, 0, 200, 200), B_TRANSLATE("Keyboard"), B_TITLED_WINDOW,
- 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS
- 		| B_AUTO_UPDATE_SIZE_LIMITS)
+	:
+	BWindow(BRect(0, 0, 200, 200), B_TRANSLATE_APP_NAME("Keyboard"),
+		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE
+		| B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	MoveTo(fSettings.WindowCorner());
 

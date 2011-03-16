@@ -93,7 +93,7 @@ private:
 
 InquiryPanel::InquiryPanel(BRect frame, LocalDevice* lDevice)
 	:
-	BWindow(frame, B_TRANSLATE("Bluetooth"), B_FLOATING_WINDOW,
+	BWindow(frame, B_TRANSLATE_APP_NAME("Bluetooth"), B_FLOATING_WINDOW,
 	B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS,	B_ALL_WORKSPACES ),
 	fMessenger(this),
  	fScanning(false),

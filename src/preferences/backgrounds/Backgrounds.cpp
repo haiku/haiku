@@ -90,8 +90,9 @@ BackgroundsApplication::RefsReceived(BMessage* message)
 
 BackgroundsWindow::BackgroundsWindow()
 	:
-	BWindow(BRect(0, 0, 0, 0), B_TRANSLATE("Backgrounds"), B_TITLED_WINDOW,
-		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS,
+	BWindow(BRect(0, 0, 0, 0), B_TRANSLATE_APP_NAME("Backgrounds"),
+		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE
+			| B_AUTO_UPDATE_SIZE_LIMITS,
 		B_ALL_WORKSPACES)
 {
 	fBackgroundsView = new BackgroundsView();

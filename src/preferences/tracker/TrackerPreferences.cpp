@@ -7,12 +7,14 @@
  */
 
 #include <Application.h>
+#include <Catalog.h>
 #include <Roster.h>
 
 
 int 
 main(int argc, char **argv)
 {
+	B_TRANSLATE_MARK_APP_NAME("Tracker");
 	BApplication app("application/x-vnd.Haiku-TrackerPreferences");
 	
 	// launch Tracker if it's not running

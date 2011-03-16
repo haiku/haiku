@@ -25,9 +25,9 @@ static const uint32 kMsgSetDefaults = 'dflt';
 static const uint32 kMsgRevert = 'rvrt';
 
 APRWindow::APRWindow(BRect frame)
- :	BWindow(frame, B_TRANSLATE("Appearance"), B_TITLED_WINDOW,
- 		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS,
- 		B_ALL_WORKSPACES)
+	:
+	BWindow(frame, B_TRANSLATE_APP_NAME("Appearance"), B_TITLED_WINDOW,
+ 		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS, B_ALL_WORKSPACES)
 {
 
 	SetLayout(new BGroupLayout(B_HORIZONTAL));

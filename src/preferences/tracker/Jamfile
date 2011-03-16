@@ -1,7 +1,17 @@
 SubDir HAIKU_TOP src preferences tracker ;
 
-Preference <preference>Tracker :
+Preference <preference>Tracker
+	:
 	TrackerPreferences.cpp
-	: be
-	: TrackerPreferences.rdef
-	;
+	:
+	be $(HAIKU_LOCALE_LIBS)
+	:
+	TrackerPreferences.rdef
+;
+
+DoCatalogs <preference>Tracker
+	:
+	x-vnd.Haiku-TrackerPreferences
+	:
+	TrackerPreferences.cpp
+;

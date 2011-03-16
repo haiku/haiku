@@ -27,7 +27,9 @@
 #define B_TRANSLATE_CONTEXT "Time"
 
 TTimeWindow::TTimeWindow(BRect rect)
-	: BWindow(rect, B_TRANSLATE("Time"), B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
+	:
+	BWindow(rect, B_TRANSLATE_APP_NAME("Time"), B_TITLED_WINDOW,
+		B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
 {
 	_InitWindow();
 	_AlignWindow();

@@ -39,7 +39,7 @@ static const uint32 kMsgCheckFonts = 'chkf';
 
 
 MainWindow::MainWindow()
-	: BWindow(BRect(0, 0, 1, 1), B_TRANSLATE("Fonts"), B_TITLED_WINDOW,
+	: BWindow(BRect(0, 0, 1, 1), B_TRANSLATE_APP_NAME("Fonts"), B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	fDefaultsButton = new BButton("defaults", B_TRANSLATE("Defaults"),

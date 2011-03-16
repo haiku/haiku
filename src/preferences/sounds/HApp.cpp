@@ -28,7 +28,7 @@ HApp::HApp()
 	BRect rect;
 	rect.Set(200, 150, 590, 570);
 
-	HWindow* window = new HWindow(rect, B_TRANSLATE("Sounds"));
+	HWindow* window = new HWindow(rect, B_TRANSLATE_APP_NAME("Sounds"));
 	window->Show();
 }
 

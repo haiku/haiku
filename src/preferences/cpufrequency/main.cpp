@@ -26,11 +26,10 @@ main(int argc, char* argv[])
 
 	PreferencesWindow<freq_preferences> *window;
 	window = new PreferencesWindow<freq_preferences>(
-												B_TRANSLATE("CPU Frequency"),
-												kPreferencesFileName,
-												kDefaultPreferences);
-	CPUFrequencyView* prefView = new CPUFrequencyView(BRect(0, 0, 400, 350),
-														window);
+		B_TRANSLATE_APP_NAME("CPUFrequency"), kPreferencesFileName,
+		kDefaultPreferences);
+	CPUFrequencyView* prefView
+		= new CPUFrequencyView(BRect(0, 0, 400, 350), window);
 	window->SetPreferencesView(prefView);
 	window->Show();
 	app->Run();

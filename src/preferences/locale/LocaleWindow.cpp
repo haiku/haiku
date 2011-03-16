@@ -66,7 +66,7 @@ compare_typed_list_items(const BListItem* _a, const BListItem* _b)
 
 LocaleWindow::LocaleWindow()
 	:
-	BWindow(BRect(0, 0, 0, 0), B_TRANSLATE("Locale"), B_TITLED_WINDOW,
+	BWindow(BRect(0, 0, 0, 0), B_TRANSLATE_APP_NAME("Locale"), B_TITLED_WINDOW,
 		B_QUIT_ON_WINDOW_CLOSE | B_ASYNCHRONOUS_CONTROLS
 			| B_AUTO_UPDATE_SIZE_LIMITS),
 	fInitialConventionsItem(NULL),
