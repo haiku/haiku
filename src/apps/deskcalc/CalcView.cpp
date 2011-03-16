@@ -690,7 +690,7 @@ CalcView::AboutRequested()
 {
 	const char* authors[] = {
 		"Timothy Wayper",
-		"nStephan Aßmus",
+		"Stephan Aßmus",
 		"Ingo Weinhold",
 		NULL
 	};
