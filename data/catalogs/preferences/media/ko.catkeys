@@ -1,34 +1,23 @@
-1	korean	x-vnd.Haiku-Media	2505372198
-Show volume control on Deskbar	Media views		데스크바에 볼륨 컨트롤 보여주기
+1	korean	x-vnd.Haiku-Media	727599420
 Audio input:	Media views		오디오 입력:
-Restarting media services\nStarting media server…\n	Media Window		미디어 서비스 재시작\n미디어 서버 시작…\n
-Video input:	Media views		비디오 입력:
-Waiting for media_server to quit.	Media Window		미디어 서버가 종료 되기까지 대기중.
-Defaults	Media views		기본설정
-Stopping media server…	Media Window		미디어 서버 멈추는 중…
-Video output:	Media views		비디오 출력:
-Enable real-time audio	Media views		실시간 오디오 사용
-Quit	Media Window		나가기
-OK	Media Window		확인
-Enabling real-time video allows system to perform video operations as fast and smoothly as possible.  It achieves optimum performance by using more RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		실시간 비디오를 사용하면 시스템에서 비디오 작업을 최대한 빠르고 부드럽게 할 수 있습니다. 그것은 더 많은 CPU와 RAM을 사용함으로써 이러한 성능을 달성합니다.\n\n만약 당신이 가능한한 더 적은 대기시간을 필요로 하는 경우에만 이 기능을 사용하십시오.  
-Default nodes	Media views		기본 노드
-Starting media server…	Media Window		미지어 서버 시작 중…
-Restart the media server to apply changes.	Media views		바뀐 것을 적용시키기 위해 미디어 서버 재시작.
-Done shutting down.	Media Window		종료 완료.
-Cleaning up.	Media Window		정리 중.
-Telling media_addon_server to quit.	Media Window		media_addon_server 에게 나가라고 말함.
-Enable real-time video	Media views		실시간 비디오 사용
-This hardware has no controls.	Media Window		이 하드웨어는 어떤 컨트롤도 없습니다.
-Restarting media services\nShutting down media server\n	Media Window		미디어 서버스 재시작\n미디어 서버 정지중\n
 Audio output:	Media views		오디오 출력:
-Start media server	Media Window		미디어 서버 시작
 Audio settings	Media Window		오디오 설정
-Could not connect to the media server.\nWould you like to start it ?	Media Window		미디어 서버에 연결 할 수 없습니다.\n 당신은 시작시키시겠습니까?
-Ready for use…	Media Window		사용하기 위해 준비됨…
-Real-time	Media views		실시간
-Restart media services	Media views		미디어 서비스 재시작
-Enabling real-time audio allows system to record and play audio as fast as possible.  It achieves this performance by using more CPU and RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		실시간 오디오를 사용하면 시스템에서 오디오 녹음과 재생을 최대한 빠르게 할 수 있습니다.  그것은 더 많은 CPU와 RAM을 사용함으로써 이러한 성능을 달성합니다.\n\n만약 당신이 가능한한 더 적은 대기시간을 필요로 하는 경우에만 이 기능을 사용하십시오.n
-Couldn't remove volume control in Deskbar: %s\n	Media Window		데스크바에서 볼륨 컨트롤을 제거할 수 없습니다: %s\n
-Couldn't add volume control in Deskbar: %s\n	Media Window		데스크바에 볼륨 컨트롤을 추가할 수 없습니다: %s\n
-Media	Media Window		미디어
 Channel:	Media views		채널:
+Cleaning up.	Media Window		정리 중.
+Could not connect to the media server.\nWould you like to start it ?	Media Window		미디어 서버에 연결 할 수 없습니다.\n 당신은 시작시키시겠습니까?
+Defaults	Media views		기본설정
+Done shutting down.	Media Window		종료 완료.
+OK	Media Window		확인
+Quit	Media Window		나가기
+Ready for use…	Media Window		사용하기 위해 준비됨…
+Restart media services	Media views		미디어 서비스 재시작
+Restarting media services\nShutting down media server\n	Media Window		미디어 서버스 재시작\n미디어 서버 정지중\n
+Restarting media services\nStarting media server…\n	Media Window		미디어 서비스 재시작\n미디어 서버 시작…\n
+Show volume control on Deskbar	Media views		데스크바에 볼륨 컨트롤 보여주기
+Start media server	Media Window		미디어 서버 시작
+Stopping media server…	Media Window		미디어 서버 멈추는 중…
+Telling media_addon_server to quit.	Media Window		media_addon_server 에게 나가라고 말함.
+This hardware has no controls.	Media Window		이 하드웨어는 어떤 컨트롤도 없습니다.
+Video input:	Media views		비디오 입력:
+Video output:	Media views		비디오 출력:
+Waiting for media_server to quit.	Media Window		미디어 서버가 종료 되기까지 대기중.

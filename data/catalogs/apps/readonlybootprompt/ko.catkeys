@@ -1,7 +1,7 @@
 1	korean	x-vnd.Haiku-ReadOnlyBootPrompt	2165068388
 Desktop (Live-CD)	BootPromptWindow		데스크탑 (라이브 시디)
-Language	BootPromptWindow		언어
-Welcome to Haiku!	BootPromptWindow		Haiku에 오신 것을 환영합니다!
-Run Installer	BootPromptWindow		설치프로그램 실행
 Do you wish to run the Installer or continue booting to the Desktop? You can also select your preferred language and keyboard layout from the list below.\n\nNote: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.	BootPromptWindow		당신은 설치 프로그램을 실행하거나 데스크탑으로 부팅을 하겠습니까? 당신은 또한 아래 목록에서 원하는 언어 및 키보드 레이아웃을 선택 할 수 있습니다.\n\n참고: 지역화된 Haiku 프로그램과 다른 컴포넌트는  계속 작업중입니다. 당신이 번역되지 않은 문자열에 마주치고, 당신이 원한다면 <www.haiku-os.org>에서 같이 작업할 수 있습니다.
 Keymap	BootPromptWindow		키보드배열
+Language	BootPromptWindow		언어
+Run Installer	BootPromptWindow		설치프로그램 실행
+Welcome to Haiku!	BootPromptWindow		Haiku에 오신 것을 환영합니다!

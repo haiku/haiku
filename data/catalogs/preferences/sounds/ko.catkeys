@@ -1,8 +1,8 @@
 1	korean	x-vnd.Haiku-Sounds	157066591
 No such file or directory	HEventList		어떤 파일이나 디렉토리도 없음
-OK	SoundsHApp		확인
-Sound File:	HWindow		사운드 파일:
 OK	HEventList		확인
 OK	HWindow		확인
-This is not an audio file.	HWindow		이 파일은 오디오 파일이 아닙니다.
+OK	SoundsHApp		확인
+Sound File:	HWindow		사운드 파일:
 Stop	HWindow		정지
+This is not an audio file.	HWindow		이 파일은 오디오 파일이 아닙니다.

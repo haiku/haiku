@@ -1,14 +1,12 @@
-1	korean	x-vnd.Haiku-Pairs	3736877909
-Quit game	PairsWindow		게임 나가기
-New game	PairsWindow		새 게임
-Expert (8x8)	PairsWindow		전문가 (8x8)
+1	korean	x-vnd.Haiku-Pairs	1126884905
 Beginner (4x4)	PairsWindow		초보자 (4x4)
+Expert (8x8)	PairsWindow		전문가 (8x8)
 Game	PairsWindow		게임
-Size	PairsWindow		크기
-New	PairsWindow		새 게임
 Intermediate (6x6)	PairsWindow		중급자 (6x6)
-Quit	PairsWindow		나가기
+New	PairsWindow		새 게임
+New game	PairsWindow		새 게임
 OK	PairsView		확인
-Pairs	PairsWindow		짝 맞추기
-Pairs\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYou completed the game in %s clicks.\n	PairsWindow		Pairs\n\tRalf Schülke 만듬\n\tCopyright 2008-2010, Haiku Inc.\n\n당신은 %s의 클릭수에 게임을 마쳤습니다.\n
 Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		Pairs는 시스템에서 충분한 벡터 아이콘을 찾지 못했습니다; 최소한 %d를 필요로 합니다.
+Quit	PairsWindow		나가기
+Quit game	PairsWindow		게임 나가기
+Size	PairsWindow		크기

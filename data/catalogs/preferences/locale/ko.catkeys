@@ -1,18 +1,17 @@
-1	korean	x-vnd.Haiku-Locale	1431723094
-Available languages	Locale Preflet Window		사용 가능한 언어
-Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		가능한 언어를 찾을 수 없습나더! 당신은  언어 속성을 사용할 수 없습니다!
-Long format:	TimeFormatSettings		긴 형식:
-Currency	TimeFormatSettings		통화
-Short format:	TimeFormatSettings		짧은 형식:
-Language	Locale Preflet Window		언어
-Preferred languages	Locale Preflet Window		선호하는 언어
-Numbers	TimeFormatSettings		숫자
-24 hour	TimeFormatSettings		24 시간
-Defaults	Locale Preflet Window		기본설정
-Revert	Locale Preflet Window		되돌리기
-OK	Locale Preflet Window		확인
-Time	TimeFormatSettings		시간
-Date	TimeFormatSettings		날짜
+1	korean	x-vnd.Haiku-Locale	3870288686
 12 hour	TimeFormatSettings		12 시간
+24 hour	TimeFormatSettings		24 시간
+Available languages	Locale Preflet Window		사용 가능한 언어
+Currency	TimeFormatSettings		통화
+Date	TimeFormatSettings		날짜
+Defaults	Locale Preflet Window		기본설정
+Language	Locale Preflet Window		언어
 Locale	Locale Preflet		언어 설정
+Long format:	TimeFormatSettings		긴 형식:
+Numbers	TimeFormatSettings		숫자
+OK	Locale Preflet Window		확인
+Preferred languages	Locale Preflet Window		선호하는 언어
+Revert	Locale Preflet Window		되돌리기
+Short format:	TimeFormatSettings		짧은 형식:
+Time	TimeFormatSettings		시간
 already chosen	LanguageListView		이미 선택됨

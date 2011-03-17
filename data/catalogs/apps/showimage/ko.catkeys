@@ -1,53 +1,43 @@
-1	korean	x-vnd.Haiku-ShowImage	855053980
-Use as background…	Menus		배경으로 사용…
-5 seconds	Menus		5초
-Slide delay	Menus		슬라이드 대기시간
-Zoom in	Menus		확대
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		이 문서 '%s'는 변경되었습니다. 당신은 이 문서를 닫겠습니까?
-8 seconds	Menus		8초
-Previous page	Menus		이전 페이지
-View	Menus		보기
+1	korean	x-vnd.Haiku-ShowImage	2585597279
+About ShowImage…	Menus		ShowImage 정보…
+Browse	Menus		찾아보기
+Cancel	ClosePrompt		취소
+Close	ClosePrompt		닫기
+Close document	ClosePrompt		문서 닫기
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		이미지를 불러올 수 없습니다! 파일이 존재하지 않거나 알맞은 이미지 변환기가 존재하지 않습니다.
+DPI:	PrintOptionsWindow		해상도:
+First page	Menus		첫 페이지
+Fit image to page	PrintOptionsWindow		페이지에 이미지 맞게 하기
+Flip left to right	Menus		좌우 바꾸기
+Flip top to bottom	Menus		상하 바꾸기
 Full screen	Menus		전체 화면
 Go to page	Menus		페이지 찾아가기
-Zoom out	Menus		축소
-20 seconds	Menus		20초
-3 seconds	Menus		3초
-Rotate counterclockwise	Menus		시계 반대반향으로 회전
-10 seconds	Menus		10초
-High-quality zooming	Menus		고품질 확대축소
-Browse	Menus		찾아보기
-6 seconds	Menus		6초
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		이미지를 불러올 수 없습니다! 파일이 존재하지 않거나 알맞은 이미지 변환기가 존재하지 않습니다.
-First page	Menus		첫 페이지
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		이 문서 '%s' (페이지 %d)는 변경되었습니다. 이 문서를 닫겠습니까?
-About ShowImage…	Menus		ShowImage 정보…
-Close	ClosePrompt		닫기
-Undo	Menus		되돌리기
-Resize to (in 1/72 inches):	PrintOptionsWindow		(1/72 인치)로 크기 변경:
-9 seconds	Menus		9초
-Flip left to right	Menus		좌우 바꾸기
-Show caption in full screen mode	Menus		전체 화면 모드에서 설명 보기
-DPI:	PrintOptionsWindow		해상도:
-Next file	Menus		다음 파일
-4 seconds	Menus		4초
-Close document	ClosePrompt		문서 닫기
 Height: 	PrintOptionsWindow		높이: 
-Cancel	ClosePrompt		취소
-Print options	PrintOptionsWindow		인쇄 옵션
-ShowImage	AboutWindow		이미지보기
-7 seconds	Menus		7초
-Last page	Menus		마지막 페이지
-Previous file	Menus		이전 파일
-Slide show	Menus		슬라이드 쇼
-Fit image to page	PrintOptionsWindow		페이지에 이미지 맞게 하기
-Flip top to bottom	Menus		상하 바꾸기
-Zoom factor in %:	PrintOptionsWindow		%로 크기 조정:
-Width:	PrintOptionsWindow		너비:
+High-quality zooming	Menus		고품질 확대축소
 Image	Menus		이미지
-Rotate clockwise	Menus		시계방향으로 회전
 Job setup	PrintOptionsWindow		작업 설정
-Original size	Menus		원래 크기
+Last page	Menus		마지막 페이지
+Next file	Menus		다음 파일
 Next page	Menus		다음 페이지
 OK	SaveToFile		확인
-The file '%s' could not be written.	SaveToFile		이 파일 '%s' 을 기록할 수 없습니다.
+Original size	Menus		원래 크기
+Previous file	Menus		이전 파일
+Previous page	Menus		이전 페이지
+Print options	PrintOptionsWindow		인쇄 옵션
 Progress monitor	ProgressWindow		진행 모니터
+Resize to (in 1/72 inches):	PrintOptionsWindow		(1/72 인치)로 크기 변경:
+Rotate clockwise	Menus		시계방향으로 회전
+Rotate counterclockwise	Menus		시계 반대반향으로 회전
+Show caption in full screen mode	Menus		전체 화면 모드에서 설명 보기
+Slide delay	Menus		슬라이드 대기시간
+Slide show	Menus		슬라이드 쇼
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		이 문서 '%s' (페이지 %d)는 변경되었습니다. 이 문서를 닫겠습니까?
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		이 문서 '%s'는 변경되었습니다. 당신은 이 문서를 닫겠습니까?
+The file '%s' could not be written.	SaveToFile		이 파일 '%s' 을 기록할 수 없습니다.
+Undo	Menus		되돌리기
+Use as background…	Menus		배경으로 사용…
+View	Menus		보기
+Width:	PrintOptionsWindow		너비:
+Zoom factor in %:	PrintOptionsWindow		%로 크기 조정:
+Zoom in	Menus		확대
+Zoom out	Menus		축소

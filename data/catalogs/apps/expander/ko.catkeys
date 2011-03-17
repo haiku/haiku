@@ -1,38 +1,31 @@
-1	korean	x-vnd.Haiku-Expander	2957181365
-Expand	ExpanderMenu		압축풀기
-Set destination…	ExpanderMenu		압축 풀 위치 지정…
-File expanded	ExpanderWindow		파일 압축이 풀림
-The destination is read only.	ExpanderWindow		대상은 읽기 전용입니다.
-Expander: Open	ExpanderWindow		압축풀기: 열기
-Select current	DirectoryFilePanel		현재 폴더 선택
-Source	ExpanderWindow		원본
-Error when expanding archive	ExpanderWindow		압축파일 압축 풀때 에러 발생
-Hide contents	ExpanderWindow		내용 숨기기
-Cancel	ExpanderWindow		취소
-Continue	ExpanderWindow		계속
-Expander	ExpanderWindow	!! Window Title !!	압축풀기
-The destination folder does not exist.	ExpanderWindow		대상 폴더가 존재하지 않습니다.
+1	korean	x-vnd.Haiku-Expander	3653851738
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		당신은 이 압축파일의 압축을 푸는 것을 \n중단하겠습니까? 이 압축을 푸는 작업은 완료되지 않을 것입니다.
+Cancel	ExpanderWindow		취소
+Close	ExpanderMenu		닫기
+Continue	ExpanderWindow		계속
+Destination	ExpanderWindow		대상
+Error when expanding archive	ExpanderWindow		압축파일 압축 풀때 에러 발생
+Expand	ExpanderMenu		압축풀기
+Expand	ExpanderWindow		압축풀기
+Expander: Choose destination	DirectoryFilePanel		Expander:  대상 선택
+Expander: Open	ExpanderWindow		압축풀기: 열기
+File	ExpanderMenu		파일
+File expanded	ExpanderWindow		파일 압축이 풀림
+Hide contents	ExpanderWindow		내용 숨기기
 Select	DirectoryFilePanel		선택
-Creating listing for 	ExpanderWindow		목록 작성중
+Select '%s'	DirectoryFilePanel		'%s' 선택
+Select current	DirectoryFilePanel		현재 폴더 선택
+Set destination…	ExpanderMenu		압축 풀 위치 지정…
+Set source…	ExpanderMenu		압축 파일 지정…
 Settings	ExpanderMenu		설정
 Settings…	ExpanderMenu		설정…
-Expander: Choose destination	DirectoryFilePanel		Expander:  대상 선택
-Show contents	ExpanderWindow		내용 보여주기
-Expanding file 	ExpanderWindow		파일 압축 푸는 중
-The folder was either moved, renamed or not\nsupported.	ExpanderWindow		이 폴더는 이동되었거나, 이름이 바뀌었거나 아니면 \n 지원되지 않습니다.
-The file doesn't exist	ExpanderWindow		이 파일은 존재하지 않습니다
-Stop	ExpanderMenu		정지
-File	ExpanderMenu		파일
-Expand	ExpanderWindow		압축풀기
-Close	ExpanderMenu		닫기
-The destination is not a folder.	ExpanderWindow		대상은 폴더가 아닙니다.
-About Expander…	ExpanderMenu		Expander 정보…
-OK	About		확인
-Set source…	ExpanderMenu		압축 파일 지정…
-Select '%s'	DirectoryFilePanel		'%s' 선택
 Show contents	ExpanderMenu		내용 보여주기
+Show contents	ExpanderWindow		내용 보여주기
+Source	ExpanderWindow		원본
+Stop	ExpanderMenu		정지
 Stop	ExpanderWindow		정지
-Destination	ExpanderWindow		대상
-\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tJérôme Duval 작성\n\t저작권 2004-2006, Haiku Inc.\n\n원래 Be 버젼 만든 사람 \nDominic, Hiroshi, Peter, Pavel and Robert\n
-Expander	About		압축풀기
+The destination folder does not exist.	ExpanderWindow		대상 폴더가 존재하지 않습니다.
+The destination is not a folder.	ExpanderWindow		대상은 폴더가 아닙니다.
+The destination is read only.	ExpanderWindow		대상은 읽기 전용입니다.
+The file doesn't exist	ExpanderWindow		이 파일은 존재하지 않습니다
+The folder was either moved, renamed or not\nsupported.	ExpanderWindow		이 폴더는 이동되었거나, 이름이 바뀌었거나 아니면 \n 지원되지 않습니다.

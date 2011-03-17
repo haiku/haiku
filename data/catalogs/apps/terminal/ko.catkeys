@@ -1,20 +1,17 @@
-1	korean	x-vnd.Haiku-Terminal	1949672047
-Not found.	Terminal TermWindow		찾을수 없음.
-Didn't find any available pseudo ttys.	Terminal Shell		어떤 가능한 가짜 터미널도 찾을 수 없습니다.
-Switch Terminals	Terminal TermWindow		터미널 전환
+1	korean	x-vnd.Haiku-Terminal	2261470953
 Change directory	Terminal TermView		디렉토리 바꾸기
-OK	Terminal TermWindow		확인
+Copy	Terminal TermWindow		복사
+Copy here	Terminal TermView		여기에 복사
+Font:	Terminal AppearancePrefView		글꼴:
+Match case	Terminal FindWindow		대소문자 구분
 New Terminal	Terminal TermWindow		새 터미널
+Not found.	Terminal TermWindow		찾을수 없음.
+OK	Terminal PrefWindow		확인
+OK	Terminal TermWindow		확인
+Quit	Terminal TermWindow		나가기
+Save to file…	Terminal PrefWindow		파일로 저장…
+Select all	Terminal TermWindow		모두 선택
+Switch Terminals	Terminal TermWindow		터미널 전환
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		터미널은 이 셀을 실행할 수 없습니다  미안합니다.
 Text size	Terminal TermWindow		글자 크기
-Match case	Terminal FindWindow		대소문자 구분
-Quit	Terminal TermWindow		나가기
 Use default shell	Terminal Shell		기본 셀 사용
-Select all	Terminal TermWindow		모두 선택
-Terminal	Terminal TermWindow		터미널
-Save to file…	Terminal PrefWindow		파일로 저장…
-Failed to init pseudo tty.	Terminal Shell		가짜 터미널 초기화 실패함.
-OK	Terminal PrefWindow		확인
-Font:	Terminal AppearancePrefView		글꼴:
-Copy here	Terminal TermView		여기에 복사
-Copy	Terminal TermWindow		복사

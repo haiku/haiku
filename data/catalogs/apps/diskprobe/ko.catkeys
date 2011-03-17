@@ -1,112 +1,110 @@
-1	korean	x-vnd.Haiku-DiskProbe	872627029
-File offset: 	ProbeView		파일 오프셋: 
-DiskProbe	OpenWindow		DiskProbe
+1	korean	x-vnd.Haiku-DiskProbe	1913035411
 %ld (native)	ProbeView		%ld (네이티브)
-64 bit unsigned value:	TypeEditors		64 비트 부호없는 값:
-Find again	ProbeView		다시 찾기
-Text	FindWindow		텍스트
-Find…	ProbeView		찾기…
-Case sensitive	FindWindow		대소문자 구분
-Cancel	OpenWindow		취소
-Close	AttributeWindow		닫기
-File	ProbeView		파일
-Attribute	ProbeView		속성
-Floating-point value:	TypeEditors		부동 소수점 포인트:
-16 bit	TypeEditors		16 비트
-Attributes	ProbeView		속성
-Device offset: 	ProbeView		장치 오프셋: 
-Selection	ProbeView		선택
-File	FileWindow		파일
-OK	DiskProbe		확인
-Paste	ProbeView		붙여넣기
-PNG format	TypeEditors		PNG 형식
-Font size	ProbeView		글자 크기
-Attribute type: 	ProbeView		속성 타입: 
-Attribute	AttributeWindow		속성
-8 bit signed value:	TypeEditors		8 비트 부호있는 값:
-Number:	TypeEditors		숫자:
-Save	ProbeView		저장
-Number editor	TypeEditors		숫자 편집기
-No type editor available	AttributeWindow		가능한 어떤 타입 편집기도 없음
-Double precision floating-point value:	TypeEditors		선택
-Device: 	ProbeView		장치: 
-Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		당신은 정말로 파일 \"%s\"로부터 이 속성 \"%s\" 을 제거하겠습니까?\n\n당신은 이 작업을 되돌릴 수 없습니다.
-8 bit unsigned value:	TypeEditors		8 비트 부호없는 값:
-Block	ProbeView		블록
-Back	ProbeView		뒤로
-Device	ProbeView		장치
-Unknown type	TypeEditors		알수 없는 형식
-Block 0x%Lx	ProbeView		불록 0x%Lx
-Quit	FileWindow		나가기
-Undo	ProbeView		되돌리기
-Close	ProbeView		닫기
-16 bit signed value:	TypeEditors		16 비트 부호있는 값:
-64 bit signed offset:	TypeEditors		64 비트 부호있는 오프셋:
-Copy	ProbeView		복사
-Boolean value:	TypeEditors		불린 값:
-32 bit size or status:	TypeEditors		32 비트 크기나 상태:
-8 bit palette	TypeEditors		8 비트 팔레트
-Probe device	OpenWindow		블록
-Unknown format	TypeEditors		알수 없는 포맷
-MIME type:	TypeEditors		MIME 형식:
-Page setup…	ProbeView		페이지 설정
-New…	FileWindow		새 작업…
-DiskProbe request	AttributeWindow		DiskProbe가 요구됨
-Save changes before closing?	ProbeView		닫기 전에 바뀐 것을 저장하겠습니까?
-Type editor	AttributeWindow		타입 편집기
-Native: 0x%0*Lx	ProbeView		네이티브: 0x%0*Lx
-Raw editor	AttributeWindow		로우 편집기
-Message View	TypeEditors		메세지 보기
-DiskProbe request	ProbeView		DiskProbe가 요구됨
-32 bit unsigned size:	TypeEditors		32 비트 부호있는 크기:
-Flattened bitmap	TypeEditors		알수 없는 포맷
-Open file…	FileWindow		파일 열기…
-Next	ProbeView		다음
-Close	FileWindow		닫기
-Attribute: 	ProbeView		속성: 
-Remove from file	AttributeWindow		파일로부터 제거
-Don't save	ProbeView		저장 안함
-Previous	ProbeView		이전
-64 bit signed value:	TypeEditors		64 비트 부호있는 값:
-Icon	TypeEditors		아이콘
-Block: 	ProbeView		불록: 
-Examine device:	OpenWindow		메세지 보기
-Offset: 	ProbeView		오프셋: 
-OK	ProbeView		확인
-Add	ProbeView		추가
-Edit	ProbeView		편집
-Native: %Ld (0x%0*Lx)	ProbeView		네이티브: %Ld (0x%0*Lx)
-32 bit unsigned value:	TypeEditors		32 비트 부호없는 값:
-Cancel	AttributeWindow		취소
-Type editor not supported	ProbeView		타입 편집기는 지원하지 않음
-MIME type editor	TypeEditors		MIME 타입 편집기
-Swapped: %Ld (0x%0*Lx)	ProbeView		스왑: %Ld (0x%0*Lx)
-Find	FindWindow		찾기
-Remove	AttributeWindow		제거
-Print…	ProbeView		인쇄…
-Block %Ld (0x%Lx)	ProbeView		불록 %Ld (0x%Lx)
-Could not open file \"%s\": %s\n	DiskProbe		파일 \"%s\"을 열 수 없음: %s\n
-Select all	ProbeView		모두 선택
-Probe file…	OpenWindow		파일 조사…
-Icon view	TypeEditors		아이콘 보기
-Bookmarks	ProbeView		북마크
-Mode:	FindWindow		모드:
 15 bit	TypeEditors		15 비트
-Open device	FileWindow		장치 열기
-Could not find search string.	ProbeView		검색 문자열을 찾을 수 없습니다.
+16 bit	TypeEditors		16 비트
+16 bit signed value:	TypeEditors		16 비트 부호있는 값:
 16 bit unsigned value:	TypeEditors		16 비트 부호있는 값:
-Attribute offset: 	ProbeView		속성 오프셋: 
-Redo	ProbeView		다시 실행
-File: 	ProbeView		파일: 
-32 bit unsigned pointer:	TypeEditors		32 비트 부호없는 포인터:
-of 	ProbeView		파일 \"%s\"을 열 수 없음: %s\n
-DiskProbe\n\twritten by Axel Dörfler\n\tCopyright 2004-2007, Haiku.\n\nOriginal Be version by Robert Polic\n	DiskProbe		DiskProbe\n\tAxel Dörfler 작성\n\tCopyright 2004-2007, Haiku.\n\nRobert Polic가 원래 Be 버전 작성\n
-Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		파일에 쓰기 실패:\n%s\n\n당신이 끝낸 후에 바뀐 것은 없어지게 될것입니다.
 32 bit	TypeEditors		32 비트
-Cancel	ProbeView		취소
-Swapped: 0x%0*Lx	ProbeView		북마크
-Grayscale	TypeEditors		그레이스케일
 32 bit signed value:	TypeEditors		32 비트 부호있는 값:
-DiskProbe request	DiskProbe		DiskProbe가 요구됨
-Type editor	ProbeView		타입 편집기
+32 bit size or status:	TypeEditors		32 비트 크기나 상태:
+32 bit unsigned pointer:	TypeEditors		32 비트 부호없는 포인터:
+32 bit unsigned size:	TypeEditors		32 비트 부호있는 크기:
+32 bit unsigned value:	TypeEditors		32 비트 부호없는 값:
+64 bit signed offset:	TypeEditors		64 비트 부호있는 오프셋:
+64 bit signed value:	TypeEditors		64 비트 부호있는 값:
+64 bit unsigned value:	TypeEditors		64 비트 부호없는 값:
+8 bit palette	TypeEditors		8 비트 팔레트
+8 bit signed value:	TypeEditors		8 비트 부호있는 값:
+8 bit unsigned value:	TypeEditors		8 비트 부호없는 값:
+Add	ProbeView		추가
+Attribute	AttributeWindow		속성
+Attribute	ProbeView		속성
+Attribute offset: 	ProbeView		속성 오프셋: 
+Attribute type: 	ProbeView		속성 타입: 
+Attribute: 	ProbeView		속성: 
+Attributes	ProbeView		속성
+Back	ProbeView		뒤로
+Block	ProbeView		블록
+Block %Ld (0x%Lx)	ProbeView		불록 %Ld (0x%Lx)
+Block 0x%Lx	ProbeView		불록 0x%Lx
+Block: 	ProbeView		불록: 
+Bookmarks	ProbeView		북마크
+Boolean value:	TypeEditors		불린 값:
+Cancel	AttributeWindow		취소
+Cancel	OpenWindow		취소
+Cancel	ProbeView		취소
+Case sensitive	FindWindow		대소문자 구분
+Close	AttributeWindow		닫기
+Close	FileWindow		닫기
+Close	ProbeView		닫기
 Contents:	TypeEditors		내용:
+Copy	ProbeView		복사
+Could not find search string.	ProbeView		검색 문자열을 찾을 수 없습니다.
+Could not open file \"%s\": %s\n	DiskProbe		파일 \"%s\"을 열 수 없음: %s\n
+Device	ProbeView		장치
+Device offset: 	ProbeView		장치 오프셋: 
+Device: 	ProbeView		장치: 
+DiskProbe request	AttributeWindow		DiskProbe가 요구됨
+DiskProbe request	DiskProbe		DiskProbe가 요구됨
+DiskProbe request	ProbeView		DiskProbe가 요구됨
+Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		당신은 정말로 파일 \"%s\"로부터 이 속성 \"%s\" 을 제거하겠습니까?\n\n당신은 이 작업을 되돌릴 수 없습니다.
+Don't save	ProbeView		저장 안함
+Double precision floating-point value:	TypeEditors		선택
+Edit	ProbeView		편집
+Examine device:	OpenWindow		메세지 보기
+File	FileWindow		파일
+File	ProbeView		파일
+File offset: 	ProbeView		파일 오프셋: 
+File: 	ProbeView		파일: 
+Find	FindWindow		찾기
+Find again	ProbeView		다시 찾기
+Find…	ProbeView		찾기…
+Flattened bitmap	TypeEditors		알수 없는 포맷
+Floating-point value:	TypeEditors		부동 소수점 포인트:
+Font size	ProbeView		글자 크기
+Grayscale	TypeEditors		그레이스케일
+Icon	TypeEditors		아이콘
+Icon view	TypeEditors		아이콘 보기
+MIME type editor	TypeEditors		MIME 타입 편집기
+MIME type:	TypeEditors		MIME 형식:
+Message View	TypeEditors		메세지 보기
+Mode:	FindWindow		모드:
+Native: %Ld (0x%0*Lx)	ProbeView		네이티브: %Ld (0x%0*Lx)
+Native: 0x%0*Lx	ProbeView		네이티브: 0x%0*Lx
+New…	FileWindow		새 작업…
+Next	ProbeView		다음
+No type editor available	AttributeWindow		가능한 어떤 타입 편집기도 없음
+Number editor	TypeEditors		숫자 편집기
+Number:	TypeEditors		숫자:
+OK	DiskProbe		확인
+OK	ProbeView		확인
+Offset: 	ProbeView		오프셋: 
+Open device	FileWindow		장치 열기
+Open file…	FileWindow		파일 열기…
+PNG format	TypeEditors		PNG 형식
+Page setup…	ProbeView		페이지 설정
+Paste	ProbeView		붙여넣기
+Previous	ProbeView		이전
+Print…	ProbeView		인쇄…
+Probe device	OpenWindow		블록
+Probe file…	OpenWindow		파일 조사…
+Quit	FileWindow		나가기
+Raw editor	AttributeWindow		로우 편집기
+Redo	ProbeView		다시 실행
+Remove	AttributeWindow		제거
+Remove from file	AttributeWindow		파일로부터 제거
+Save	ProbeView		저장
+Save changes before closing?	ProbeView		닫기 전에 바뀐 것을 저장하겠습니까?
+Select all	ProbeView		모두 선택
+Selection	ProbeView		선택
+Swapped: %Ld (0x%0*Lx)	ProbeView		스왑: %Ld (0x%0*Lx)
+Swapped: 0x%0*Lx	ProbeView		북마크
+Text	FindWindow		텍스트
+Type editor	AttributeWindow		타입 편집기
+Type editor	ProbeView		타입 편집기
+Type editor not supported	ProbeView		타입 편집기는 지원하지 않음
+Undo	ProbeView		되돌리기
+Unknown format	TypeEditors		알수 없는 포맷
+Unknown type	TypeEditors		알수 없는 형식
+Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		파일에 쓰기 실패:\n%s\n\n당신이 끝낸 후에 바뀐 것은 없어지게 될것입니다.
+of 	ProbeView		파일 \"%s\"을 열 수 없음: %s\n

@@ -1,20 +1,17 @@
-1	korean	x-vnd.Haiku-VirtualMemory	866260633
-Turn off	SettingsWindow		해제
-GB	SettingsWindow		GB
-Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		현재 메모리에서 사용하는 가상메모리를 해제하면 시스템 안정성에 원치 않는 영향을 가져오게 될것입니다.\n메모리가 부족하게 뙬 때 까지는 가상메모리가 시스템 성능에 영향을 미치지 않을 것입니다.\n\n당신은 정말로 해제하겠습니까?
-Requested swap file size:	SettingsWindow		요청된 스왑 파일 크기:
-Physical memory: 	SettingsWindow		물리 메모리: 
-Changes will take effect on restart!	SettingsWindow		재시작 후에 변경은 적용될것입니다!
-Defaults	SettingsWindow		기본설정
-KB	SettingsWindow		KB
-Use volume:	SettingsWindow		사용하는 볼륨:
-Keep enabled	SettingsWindow		가능하도록 유지
-Revert	SettingsWindow		되돌리기
-999 MB	SettingsWindow		999 MB
-Current swap file size: 	SettingsWindow		현재 스왑파일 크기: 
-VirtualMemory	SettingsWindow		가상메모리
-OK	VirtualMemoryApp		확인
-VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		VirtualMemory\n\tAxel Dörfler에 의해 작성됨\n\t저작권 2005, Haiku.\n
-Enable virtual memory	SettingsWindow		가상 메모리 사용
-MB	SettingsWindow		MB
+1	korean	x-vnd.Haiku-VirtualMemory	1206358465
 %Ld B	SettingsWindow		%Ld B
+Changes will take effect on restart!	SettingsWindow		재시작 후에 변경은 적용될것입니다!
+Current swap file size: 	SettingsWindow		현재 스왑파일 크기: 
+Defaults	SettingsWindow		기본설정
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		현재 메모리에서 사용하는 가상메모리를 해제하면 시스템 안정성에 원치 않는 영향을 가져오게 될것입니다.\n메모리가 부족하게 뙬 때 까지는 가상메모리가 시스템 성능에 영향을 미치지 않을 것입니다.\n\n당신은 정말로 해제하겠습니까?
+Enable virtual memory	SettingsWindow		가상 메모리 사용
+GB	SettingsWindow		GB
+KB	SettingsWindow		KB
+Keep enabled	SettingsWindow		가능하도록 유지
+MB	SettingsWindow		MB
+OK	VirtualMemoryApp		확인
+Physical memory: 	SettingsWindow		물리 메모리: 
+Requested swap file size:	SettingsWindow		요청된 스왑 파일 크기:
+Revert	SettingsWindow		되돌리기
+Turn off	SettingsWindow		해제
+Use volume:	SettingsWindow		사용하는 볼륨:
