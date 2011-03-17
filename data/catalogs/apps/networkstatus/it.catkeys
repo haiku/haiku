@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-NetworkStatus	3379615764
+1	italian	x-vnd.Haiku-NetworkStatus	3643687917
 %ifaceName information:\n	NetworkStatusView		%ifaceName informazioni:\n
 <no wireless networks found>	NetworkStatusView		<nessuna rete wireless trovata>
 Address	NetworkStatusView		Indirizzo
@@ -8,7 +8,6 @@ Could not join wireless network:\n	NetworkStatusView		Impossibile accedere alla 
 Install in Deskbar	NetworkStatus		Installa sulla Deskbar
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		L'avvio della preflet di rete è fallita.\n\nErrore:
 Netmask	NetworkStatusView		Maschera di rete
-NetworkStatus	NetworkStatusWindow		NetworkStatus
 NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		Opzioni NetworkStatus:\n\t--deskbar\taggiunge automaticamente un replicante sulla Deskbar\n\t--help\t\tstampa queste informazioni ed esce\n
 NetworkStatus\n\twritten by %1 and Hugo Santos\n\t%2, Haiku, Inc.\n	NetworkStatusView		NetworkStatus\n\tscritto da %1 e Hugo Santos\n\t%2, Haiku, Inc.\n
 No link	NetworkStatusView		Nessun collegamento

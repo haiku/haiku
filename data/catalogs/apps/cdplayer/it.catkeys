@@ -1,8 +1,7 @@
-1	italian	x-vnd.Haiku-CDPlayer	744500153
+1	italian	x-vnd.Haiku-CDPlayer	523884218
 Audio CD	CDPlayer		CD audio
 CD	CDPlayer		CD
 CD drive is empty	CDPlayer		Il lettore CD è vuoto
-CDPlayer	CDPlayer		CDPlayer
 Disc: %ld:%.2ld / %ld:%.2ld	CDPlayer		Disco: %ld:%.2ld / %ld:%.2ld
 Disc: --:-- / --:--	CDPlayer		Disco: --:-- / --:--
 Disc: 88:88 / 88:88	CDPlayer		Disco: 88:88 / 88:88

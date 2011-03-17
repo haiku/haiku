@@ -1,6 +1,5 @@
-1	italian	x-vnd.Haiku-Magnify	1680541832
+1	italian	x-vnd.Haiku-Magnify	2101743114
 %width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize pixel/pixel
-About Magnify…	Magnify-Main		Informazioni su Magnify...
 Add a crosshair	Magnify-Main		Aggiungi un mirino
 Copy image	Magnify-Main		Copia immagine
 Copy/Save:\n  copy - copies the current image to the clipboard\n  save - prompts the user for a file to save to and writes out\n    the bits of the image\n	Magnify-Help		Copia/Salva:\n copia - copia l'immagine corrente sugli appunti\n salva - chiede all'utente un file su cui salvare e su cui scrivere\n i bit dell'immagine\n
@@ -8,14 +7,12 @@ Decrease pixel size	Magnify-Main		Diminuisci la dimensione dei pixel
 Decrease window size	Magnify-Main		Diminuisci la dimensione della finestra
 Freeze/Unfreeze image	Magnify-Main		Blocca/Sblocca immagine
 General:\n  32 x 32 - the top left numbers are the number of visible\n    pixels (width x height)\n  8 pixels/pixel - represents the number of pixels that are\n    used to magnify a pixel\n  R:152 G:52 B:10 -  the RGB values for the pixel under\n    the red square\n	Magnify-Help		Generale:\n 32 × 32 - i numeri in alto a sinistra indicano il numero di pixel\n visibili (larghezza × altezza)\n 8 pixel/pixel - rappresenta il numero di pixel che sono\n usati per ingrandire un pixel\n R:152 G:52 B:10 - i valori RGB per i pixel sotto\n il quadrato rosso\n
-Help…	Magnify-Main		Aiuto...
 Hide/Show grid	Magnify-Main		Mostra/Nascondi griglia
 Hide/Show info	Magnify-Main		Nascondi/Mostra informazioni
 Increase pixel size	Magnify-Main		Aumenta la dimensione dei pixel
 Increase window size	Magnify-Main		Aumenta la dimensione della finestra
 Info	Magnify-Main		Informazioni
 Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		Informazioni:\n Nascondi/Mostra informazioni - Nasconde/Mostra tutte queste nuove caratteristiche\n Nota: durante il funzionamento, un quadrato rosso apparirà, che indica\n quali valori rgb dei pixel verranno mostrati\n aggiungi/rimuovi mirino - 2 mirini possono essere aggiunti (o rimossi)\n per aiutare l'allineamento e il posizionamento degli oggetti.\n I mirini sono rappresentati da quadrati blu e da linee blu.\n Mostra/Nascondi griglia - Mostra/Nasconde la griglia che separa ogni pixel.\n
-Magnify	Magnify-Main		Ingrandisci
 Magnify help	Magnify-Help		Aiuto su Magnify
 Magnify!\n\n©2002-2006 Haiku\n(C)1999 Be Inc.\n\nNow with even more features and recompiled for Haiku.	Magnify-Main		Magnify!\n\n©2002-2006 Haiku\n(C)1999 Be Inc.\n\nOra con molte altre caratteristiche e ricompilato per Haiku.
 Make square	Magnify-Main		Rendi la finestra quadrata

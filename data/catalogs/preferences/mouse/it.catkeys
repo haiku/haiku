@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Mouse	3392409209
+1	italian	x-vnd.Haiku-Mouse	3904912604
 ...by Andrew Edward McCall	MouseApplication		…di Andrew Edward McCall
 1-Button	SettingsView		1 Tasto
 2-Button	SettingsView		2 Tasti
@@ -14,7 +14,6 @@ Fast	SettingsView		Veloce
 Focus follows mouse	SettingsView		Il focus segue il mouse
 Focus mode:	SettingsView		Modalità focus:
 Instant warp	SettingsView		Warp istantaneo
-Mouse	MouseWindow		Mouse
 Mouse acceleration	SettingsView		Accelerazione mouse
 Mouse speed	SettingsView		Velocità mouse
 Mouse type:	SettingsView		Tipo di mouse:

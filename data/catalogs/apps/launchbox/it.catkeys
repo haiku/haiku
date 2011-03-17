@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-LaunchBox	1672943267
+1	italian	x-vnd.Haiku-LaunchBox	2168437832
 About	LaunchBox		Informazioni
 Add button here	LaunchBox		Aggiungi un bottone qui
 Auto-raise	LaunchBox		Auto sollevamento
@@ -15,7 +15,6 @@ Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Fallito l
 Horizontal layout	LaunchBox		Disposizione orizzontale
 Icon size	LaunchBox		Dimensione icone
 Ignore double-click	LaunchBox		Ignora doppio click
-LaunchBox	LaunchBox		LaunchBox
 Name Panel	LaunchBox		Nome pannello
 New	LaunchBox		Nuovo
 OK	LaunchBox		OK

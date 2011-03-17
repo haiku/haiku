@@ -1,8 +1,7 @@
-1	italian	x-vnd.Haiku-Appearance	3612090060
+1	italian	x-vnd.Haiku-Appearance	1227622574
 Antialiasing	APRWindow		Antialiasing
 Antialiasing menu	AntialiasingSettingsView		Menu antialias
 Antialiasing type:	AntialiasingSettingsView		Tipo di antialias:
-Appearance	APRWindow		Aspetto
 Colors	APRWindow		Colori
 Control background	Colors tab		Sfondo del controllo
 Control border	Colors tab		Bordi del controllo

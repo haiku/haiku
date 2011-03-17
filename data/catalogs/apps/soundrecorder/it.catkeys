@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-SoundRecorder	1355572422
+1	italian	x-vnd.Haiku-SoundRecorder	1948114706
 Cannot connect to media server	RecorderWindow		Impossibile connettersi al media server
 Cannot connect to the selected sound input	RecorderWindow		Impossibile connettere all'ingresso sonoro selezionato
 Cannot find an unused name to use for the new recording	RecorderWindow		Impossibile trovare un nome inutilizzato da usare per la nuova registrazione
@@ -32,7 +32,6 @@ Sample size: 	RecorderWindow		Dimensione del campione:
 Save	RecorderWindow		Salva
 Some of the files don't appear to be audio files	RecorderWindow		Alcuni file non sembrano essere di tipo audio
 Sound List	RecorderWindow		Elenco Suono
-SoundRecorder	RecorderWindow		SoundRecorder
 Stop	RecorderWindow		Interrompi
 bits	RecorderWindow		bit
 seconds	RecorderWindow		secondi

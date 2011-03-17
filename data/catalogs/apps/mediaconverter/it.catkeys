@@ -1,12 +1,11 @@
-1	italian	x-vnd.Haiku-MediaConverter	3383482196
+1	italian	x-vnd.Haiku-MediaConverter	3793354334
 %.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld canale / %lld frame
 %.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz mono / %lld frame
 %.1f kHz stereo / %lld frames	MediaFileInfo		%.1f kHz stereo / %lld frame
-%Ld x %Ld, %Ld fps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%Ld x %Ld, %Ld fps / %Ld frame
 %amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles file non sono stati riconosciuti come media file supportati:
 %d bit 	MediaFileInfo		%d bit
 %d byte 	MediaFileInfo		%d byte 
-About MediaConverter…	Menu		Informazioni MediaConverter…
+%u x %u, %.2ffps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%u x %u, %.2ffps / %Ld frame
 About…	MediaConverter		Informazioni...
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Si è verificato un errore.\n\nErrore :  leggendo le informazioni del file
 Audio encoding:	MediaConverter		Codifica Audio:
@@ -40,7 +39,6 @@ File details	MediaConverter		File dettagli
 File format:	MediaConverter		Formato file:
 High	MediaConverter		Alto
 Low	MediaConverter		Basso
-MediaConverter	MediaConverter		MediaConverter
 MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:SaveDirectory
 MediaConverter\n1.3.0\n© 1999, Be Incorporated.\n© 2000-2004 Jun Suzuki\n© 2007 Stephan Aßmus\n© 2010 Haiku, Inc.	MediaConverter		MediaConverter\n1.3.0\n© 1999, Be Incorporated.\n© 2000-2004 Jun Suzuki\n© 2007 Stephan Aßmus\n© 2010 Haiku, Inc.
 No audio	Audio codecs list		Nessun audio
@@ -66,6 +64,6 @@ Video quality not supported	MediaConverter		Qualità video non supportata
 Video quality: %3d%%	MediaConverter		Qualità video: %3d%%
 Video using parameters form settings	MediaConverter		Il video utilizza le impostazioni dei parametri
 Video:	MediaConverter-FileInfo		Video
-Writing audio track: %Ld %% complete	MediaConverter		Scrittura traccia audio: %Ld %% completa
-Writing video track: %Ld %% complete	MediaConverter		Scrittura traccia video: %Ld %% completa
+Writing audio track: %ld%% complete	MediaConverter		Scrittura traccia video: %ld%% completato
+Writing video track: %ld%% complete	MediaConverter		Scrittura traccia video: %ld%% completato
 seconds	MediaFileInfo		secondi

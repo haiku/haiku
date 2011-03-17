@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-ShowImage	3385354583
+1	italian	x-vnd.Haiku-ShowImage	1479416858
 %SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS secondi
 About ShowImage…	Menus		Informazioni su ShowImage…
 Browse	Menus		Sfoglia
@@ -45,8 +45,6 @@ Save as…	Menus		salva come…
 Select all	Menus		Seleziona tutto
 Selection Mode	Menus		Modalità selezione
 Show caption in full screen mode	Menus		Mostra didascalia in modalità schermo intero
-ShowImage	AboutWindow		ShowImage
-ShowImage	Menus		ShowImage
 Slide delay	Menus		Tempo d'attesa
 Slide show	Menus		Mostra sequenza
 Stretch to window	Menus		Estendi alla finestra

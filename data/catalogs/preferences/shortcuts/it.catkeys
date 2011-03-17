@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Shortcuts	1120793954
+1	italian	x-vnd.Haiku-Shortcuts	2152414241
 (Choose application with file requester)	ShortcutsWindow		(Seleziona applicazione con la finestra di richiesta file)
 *Beep	ShortcutsWindow		*Bip
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InserisciStringa \"Qui il tuo testo\"
@@ -47,7 +47,6 @@ Save KeySet as…	ShortcutsWindow		Salva Impostazione tasti come…
 Select	ShortcutsWindow		Seleziona
 SendMessage	ShortcutsSpec		InviaMessaggio
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
-Shortcuts	ShortcutsWindow		Shortcuts
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Shortcuts non è stato capace di aprire il vostro file di impostazione tasti!
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Shortcuts non è stato capace di elaborare il tuo file di impostazione tasti!
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Shortcuts non è stato capace di salvare il tuo file di impostazione tasti!

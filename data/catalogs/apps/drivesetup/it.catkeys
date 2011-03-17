@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-DriveSetup	2723551013
+1	italian	x-vnd.Haiku-DriveSetup	568426562
 %ld MiB	Support		%ld MiB
 <empty>	DiskView		<vuoto>
 <empty>	PartitionList		<vuoto>
@@ -29,7 +29,6 @@ Device	DiskView		Dispositivo
 Device	PartitionList		Dispositivo
 Disk	MainWindow		Disco
 Disk system \"%s\"\" not found!	MainWindow		Non trovo il disco di sistema \"%s\"\"!
-DriveSetup	MainWindow		DriveSetup
 Eject	MainWindow		Espelli
 End: %ld MB	Support		Fine: %ld MB
 Error: 	MainWindow	in any error alert	Errore: 

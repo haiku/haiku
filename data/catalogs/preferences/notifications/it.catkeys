@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Notifications	1635178721
+1	italian	x-vnd.Haiku-Notifications	3545587988
 Above icon	DisplayView		Sopra l'icona
 Allowed	NotificationView		Permesso
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Si è presentato un errore durante il salvataggio delle preferenze.\nÈ possibile che stia finendo lo spazio sul disco.
@@ -28,7 +28,6 @@ Mini icon	DisplayView		Icone piccole
 No	NotificationView		No
 Notifications	GeneralView		Notifiche
 Notifications	NotificationView		Notifiche
-Notifications	PrefletWin		Notifiche
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Le notifiche non possono essere fermate, perché non è stato possibile raggiungere il server.
 OK	DisplayView		OK
 OK	GeneralView		OK

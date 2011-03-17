@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Keymap	4175672673
+1	italian	x-vnd.Haiku-Keymap	3858687220
 (Current)	Keymap window		(Attuale)
 Acute trigger	Keymap window		Attivatore accento acuto
 Circumflex trigger	Keymap window		Attivatore accento circonflesso
@@ -6,7 +6,6 @@ Diaeresis trigger	Keymap window		Attivatore accento dieresi
 File	Keymap window		File
 Font	Keymap window		Font
 Grave trigger	Keymap window		Attivatore accento grave
-Keymap	Keymap window		Mappa dei tasti
 Layout	Keymap window		Layout
 Open…	Keymap window		Apri…
 Quit	Keymap window		Esci

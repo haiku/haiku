@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-FileTypes	686287948
+1	italian	x-vnd.Haiku-FileTypes	297877771
 %1 application type	Application Type Window		%1 tipo applicazione
 %ld Application type%s could be removed.	Application Types Window		%ld Tipo applicazione%s può essere rimosso.
 %s file type	FileType Window		%s tipo di file
@@ -71,7 +71,6 @@ File could not be opened	Preferred App Menu		Impossibile aprire il file
 File recognition	FileTypes Window		Riconoscimento del file
 File type	FileType Window		Tipo di file
 FileTypes	FileTypes		FileTypes
-FileTypes	FileTypes Window		FileTypes
 FileTypes request	FileTypes		Richiesta di FileTypes
 FileTypes request	FileTypes Window		Richiesta di FileTypes
 FileTypes request	Preferred App Menu		Richiesta di FileTypes

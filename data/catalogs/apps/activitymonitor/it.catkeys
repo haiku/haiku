@@ -1,11 +1,10 @@
-1	italian	x-vnd.Haiku-ActivityMonitor	1946610782
+1	italian	x-vnd.Haiku-ActivityMonitor	3275442606
 %.1f KB/s	DataSource			%.1f KB/s
 %.1f MB	DataSource			%.1f MB
 %.1f faults/s	DataSource		%.1f faults/s
 %lld ms	SettingsWindow			%lld ms
 %lld sec.	SettingsWindow		%lld sec.
-About ActivityMonitor…	ActivityWindow		Informazioni su ActivityMonitor...
-ActivityMonitor	ActivityWindow		Monitor delle Attività
+ActivityMonitor	Application name		Monitor attività
 Add graph	ActivityWindow		Aggiungi grafico
 Additional items	ActivityView		Elementi aggiuntivi
 Apps	DataSource		Applicazioni

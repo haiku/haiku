@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-MediaPlayer	2929328887
+1	italian	x-vnd.Haiku-MediaPlayer	1006045360
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Americano)
 100% scale	MediaPlayer-Main		Scala 100%
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
@@ -12,7 +12,6 @@
 <unknown>	PlaylistItem-author		<sconosciuto>
 <unnamed>	PlaylistItem-name		<senza nome>
 <untitled>	PlaylistItem-title		<senza titolo>
-About MediaPlayer…	MediaPlayer-Main		Informazioni su MediaPlayer...
 All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Non è stato possibile spostare tutti i file nel Cestino
 Always on top	MediaPlayer-Main		Sempre in primo piano
 Aspect ratio	MediaPlayer-Main		Rapporto d'aspetto
@@ -51,10 +50,7 @@ Lock Peaks	MediaPlayer-PeakView		Picchi di blocco
 Loop movies by default	MediaPlayer-SettingsWindow		Manda i filmati in loop di default
 Loop sounds by default	MediaPlayer-SettingsWindow		Manda i suoni in loop di default
 Low volume	MediaPlayer-SettingsWindow		Volume basso
-MediaPlayer	MediaPlayer-Main		MediaPalyer
-MediaPlayer encountered an internal error. The file could not be opened.	MediaPlayer-Main		Si è presentato un errore interno. Il file non può essere aperto.
 MediaPlayer settings	MediaPlayer-SettingsWindow		Impostazioni di MediaPlayer
-MediaPlayer\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		MediaPlayer\n\nScritto da Marcus Overhagen, Stephan Aßmus e Frederik Modéen
 Medium	MediaPlayer-SettingsWindow		Medio
 Move Entries	MediaPlayer-MovePLItemsCmd		Sposta Voci
 Move Entry	MediaPlayer-MovePLItemsCmd		Sposta Voce
@@ -80,7 +76,6 @@ Open…	MediaPlayer-PlaylistWindow		Apri...
 Pause	MediaPlayer-Main		Metti in pausa
 Pause playback.	MediaPlayer-Main		Metti in pausa.
 Play	MediaPlayer-Main		Riproduci
-Play background clips at	MediaPlayer-SettingsWindow		Riproduci le clip in background
 Play mode	MediaPlayer-SettingsWindow		Modalità di riproduzione
 Playlist	MediaPlayer-PlaylistWindow		Playlist
 Playlist…	MediaPlayer-Main		Playlist...
@@ -117,8 +112,6 @@ Start playing.	MediaPlayer-Main		Incomincia la riproduzione
 Stop	MediaPlayer-Main		Ferma
 Stop playing.	MediaPlayer-Main		Ferma la riproduzione
 Stream settings	MediaPlayer-Main		Impostazioni dello stream
-Subtitle placement	MediaPlayer-SettingsWindow		Posizionamento dei sottotitoli
-Subtitle size	MediaPlayer-SettingsWindow		Dimensione sottotitoli
 Subtitles	MediaPlayer-Main		Sottotitoli
 Thanks	MediaPlayer-Main		Grazie
 The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Non è stato possibile aprire il file '%filename'.\n\n
@@ -136,6 +129,5 @@ Video	MediaPlayer-Main		Video
 Video track	MediaPlayer-Main		Traccia video
 View options	MediaPlayer-SettingsWindow		Opzioni di visualizzazione
 Volume	MediaPlayer-Main		Volume
-error	MediaPlayer-Main		errore
 none	Audio track menu		niente
 none	Subtitles menu		niente

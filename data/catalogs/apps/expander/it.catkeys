@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Expander	3863172519
+1	italian	x-vnd.Haiku-Expander	1580122745
 About Expander…	ExpanderMenu		Informazioni su Expander…
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Siete sicuri di voler interrompere l'espansione di questo\narchivio? I file estratti potrebbero essere incompleti.
 Automatically expand files	ExpanderPreferences		Decomprimi automaticamente i file
@@ -14,8 +14,6 @@ Destination folder:	ExpanderPreferences		Cartella di destinazione
 Error when expanding archive	ExpanderWindow		Errore durante la decompressione dell'archivio
 Expand	ExpanderMenu		Decomprimi
 Expand	ExpanderWindow		Decomprimi
-Expander	About		Expander
-Expander	ExpanderWindow	!! Window Title !!	Expander
 Expander settings	ExpanderPreferences		Impostazioni Expander
 Expander: Choose destination	DirectoryFilePanel		Expander: Scegli la destinazione
 Expander: Open	ExpanderWindow		Expander: Apri
@@ -25,7 +23,6 @@ File	ExpanderMenu		File
 File expanded	ExpanderWindow		File decompresso
 Hide contents	ExpanderWindow		Nascondi il contenuto
 Leave destination folder path empty	ExpanderPreferences		Lascia il percorso della cartella di destinazione vuoto
-OK	About		Ok
 OK	ExpanderPreferences		OK
 Open destination folder after extraction	ExpanderPreferences		Apri la cartella di destinazione dopo l'estrazione
 Other:	ExpanderPreferences		Altro:
@@ -49,5 +46,4 @@ The destination is read only.	ExpanderWindow		La destinazione è di sola lettura
 The file doesn't exist	ExpanderWindow		Il file non esiste
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		La cartella è stata spostata, rinominata o non è supportata.
 Use:	ExpanderPreferences		Usa:
-\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tscritto da Jérôme Duval\n\tCopyright ©2004-2006, Haiku Inc.\n\nVersione originale Be di\nDominic, Hiroshi, Peter, Pavel e Robert\n
 is not supported	ExpanderWindow		non è supportato

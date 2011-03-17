@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Media	1701788906
+1	italian	x-vnd.Haiku-Media	293613603
 <none>	Media views		<niente>
 Audio input:	Media views		Ingresso audio:
 Audio mixer	Media Window		Mixer audio
@@ -11,7 +11,6 @@ Couldn't add volume control in Deskbar: %s\n	Media views		Non è stato possibile
 Couldn't remove volume control in Deskbar: %s\n	Media views		Non è stato possibile rimuovere il controllo del volume nella Deskbar: %s\n
 Defaults	Media views		Predefiniti
 Done shutting down.	Media Window		Spegnimento effettuato.
-Media	Media Window		Media
 OK	Media Window		OK
 Quit	Media Window		Esci
 Ready for use…	Media Window		Pronto all'uso…

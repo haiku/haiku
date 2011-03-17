@@ -1,7 +1,5 @@
-1	italian	x-vnd.Haiku-Installer	348915720
+1	italian	x-vnd.Haiku-Installer	2709824708
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld di %2ld
-1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1) Se installate Haiku in un hardware reale (non dentro un emulatore) si raccomanda di preparare in anticipo una partizione nell'hard disk. L'Installer e il tool DriveSetup permettono di inizializzare una partizione con il file system nativo di Haiku, ma la possibilità di cambiare l'attuale schema di partizioni potrebbe non essere stata testata su una varietà  di sistemi sufficientemente ampia quindi non ne raccomandiamo l'utilizzo.\n
-
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2) L'installer renderà la partizione Haiku avviabile, ma non esegue nessun passo per integrare Haiku in un menu di avvio esistente. Se avete GRUB già installato, potete aggiungere Haiku al suo menu d'avvio. Ciò ouò essere fatto in maniera differente, dipende da quale versione di GRUB utilizzate.\n\n\n 
 2.1) GRUB 1\n	InstallerApp		2.1) GRUB 1\n
 2.2) GRUB 2\n	InstallerApp		2.2) GRUB 2\n
@@ -36,21 +34,15 @@ l'applicazione per configurare le partizioni dei dischi.
 Finally, you have to update the boot menu by entering:\n\n	InstallerApp		Infine, è necessario aggiornare il menu di avvio inserendo:\n\n
 Finishing Installation.	InstallProgress		Conclusione installazione.
 GRUB's naming scheme is still: (hdN,n)\n\n	InstallerApp		Lo schema di denominazione di GRUB è ancora: (hdN,n)\n\n
-Have fun and thanks a lot for trying out Haiku! We hope you like it!	InstallerApp		Divertitevi e mille grazie per aver provato Haiku! Speriamo vi piaccia!
-
 Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		Qui devi commentare la linea \"GRUB_HIDDEN_TIMEOUT=0\" inserendo un \"#\" davanti la linea per visualizzare il menu d'avvio.\n\n
 Hide optional packages	InstallerWindow		Nascondi pacchetti opzionali
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		INFORMAZIONI IMPORTANTI PRIMA DI INSTALLARE HAIKU\n\n
-If you have not created a partition yet, simply reboot, create the partition using whatever tool you feel most comfortable with, and reboot into Haiku to continue with the installation. You could for example use the GParted Live-CD, it can also resize existing partitions to make room.\n\n\n	InstallerApp		Se non avete ancora creato una partizione, potete riavviare, creare la partizione usando un qualsiasi tool con cui vi trovate a vostro agio, quindi riavviate dentro Haiku per continuare l'installazione. Potreste, per esempio, usare un Live-CD di GParted, che può anche ridimensionare le attuali partizioni per creare spazio.\n\n\n
-
-
 Install anyway	InstallProgress		Installa comunque
 Install from:	InstallerWindow		Installa da:
 Install progress:  	InstallerWindow		Avanzamento dell'installazione:  
 Installation canceled.	InstallProgress		Installazione annullata.
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Installazione completa. Il settore d'avvio è stato scritto su '%s'. Premi Esci per abbandonare l'Installer oppure scegli un nuovo volume di destinazione per procedere con un'altra installazione.
 Installation completed. Boot sector has been written to '%s'. Press Quit to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Installazione completa. Il settore d'avvio è stato scritto su '%s'. Premi Esci per riavviare il computer oppure scegli un nuovo volume di destinazione per procedere con un'altra installazione.
-Installer	InstallerWindow		Installer
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\tscritto da Jérôme Duval e Stephan Aßmus\n\tCopyright©2005-2010, Haiku.\n\n
 Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Avvia l'utilità DriveSetup per creare partizioni sui dischi rigidi e altri media disponibili.\nLe partizioni possono essere inizializzate con il \nBe File System necessario per una partizione d'avvio Haiku.
 NOTE: While the naming strategy for hard disks is still as described under 2.1) the naming scheme for partitions has changed.\n\n	InstallerApp		NOTA: Se la strategia di denominazione per gli hard disk è ancora come descritto al punto 2.1) lo schema di denominazione per le partizioni è cambiato.\n\n
@@ -92,8 +84,6 @@ The first logical partition always has the number \"4\", regardless of the numbe
 The mount point could not be retrieved.	InstallProgress		Impossibile recuperare il punto di montaggio.
 The partition can't be mounted. Please choose a different partition.	InstallProgress		La partizione non può essere montata. Scegli una partizione differente.
 The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Il volume di destinazione non è vuoto. Sei sicuro di voler installare comunque?\n\nNota: La cartella \"system\" sarà una copia pulita dal volume d'origine, tutte le altre cartelle verranno fuse, mentre i file e collegamenti che esistono sia sul volume d'origine che di destinazione saranno sovrascritti con la versione del volume originario.
-This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Questo è un software allo stato di alpha! Ciò significa che c'è un alto rischio di perdere dati importanti. Fate frequenti backup! Siete stati avvisati.\n\n\n
-
 Tools	InstallerWindow		Strumenti
 Try installing anyway	InstallProgress		Prova ad installare comunque
 Unknown Type	InstallProgress	Partition content type	Tipo Sconosciuto
@@ -109,14 +99,12 @@ You'll note that GRUB uses a different naming strategy for hard drives than Linu
 \"n\" is the partition number, also starting with \"0\".\n	InstallerApp		\"n\" è il numero della partizione, anch'esso comincia da \"0\".\n
 \"n\" is the partition number, which for GRUB 2 starts with \"1\"\n	InstallerApp		\"n\" è il numero della partizione, che per GRUB 2 inizia con \"1\"\n
 \t# Haiku on /dev/sda7\n	InstallerApp			\t# Haiku on /dev/sda7\n
-\t\tchainloader +1\n	InstallerApp			\t\tchainloader +1\n
 \t\tset root=(hd0,7)\n	InstallerApp		\t\tset root=(hd0,7)\n
 \tchainloader\t\t+1\n\n	InstallerApp		\tchainloader\t\t+1\n\n
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
 \trootnoverify\t\t(hd0,6)\n	InstallerApp		\trootnoverify\t\t(hd0,6)\n
 \tsudo <your favorite text editor> /boot/grub/menu.lst\n\n	InstallerApp		\tsudo <vostro editor favorito> /boot/grub/menu.lst\n\n
 \tsudo <your favorite text editor> /etc/default/grub\n\n	InstallerApp		\tsudo <vostro editor favorito> /etc/default/grub\n\n
-\tsudo <your favorite text editor> /etc/grub.d/40_custom\n\n	InstallerApp		\tsudo <vostro editor favorito> /etc/grub.d/40_custom\n\n
 \tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n
 \ttitle\t\t\t\tHaiku\n	InstallerApp		\ttitle\t\t\t\tHaiku\n
 \t}\n\n	InstallerApp		\t}\n\n

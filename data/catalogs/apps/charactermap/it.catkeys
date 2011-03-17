@@ -1,5 +1,4 @@
-1	italian	x-vnd.Haiku-CharacterMap	1305599334
-About CharacterMap…	CharacterWindow		Informazioni su CharacterMap...
+1	italian	x-vnd.Haiku-CharacterMap	1767016704
 Aegean numbers	UnicodeBlocks		Numeri Egei
 Alphabetic presentation forms	UnicodeBlocks		Forme di presentazione alfabetiche
 Ancient Greek musical notation	UnicodeBlocks		Notazione musicale Greco Antico
@@ -34,8 +33,6 @@ CJK unified ideographs extension A	UnicodeBlocks		Estenzione degli ideogrammi un
 CJK unified ideographs extension B	UnicodeBlocks		Estenzione degli ideogrammi unificati CJK
 Carian	UnicodeBlocks		Cariano
 Cham	UnicodeBlocks		Cham
-CharacterMap	CharacterWindow		Mappa caratteri
-CharacterMap\n\twritten by Axel Dörfler\n\tCopyright 2009, Haiku, Inc.\n	CharacterMap		CharacterMap\n\tscritto da Axel Dörfler\n\tCopyright 2009, Haiku, Inc.\n
 Cherokee	UnicodeBlocks		Cherokee
 Clear	CharacterWindow		Cancella
 Code	CharacterWindow		Codice
@@ -125,7 +122,6 @@ Myanmar	UnicodeBlocks		Birmano
 N'Ko	UnicodeBlocks		N'Ko
 New Tai Lue	UnicodeBlocks		Nuovo Tai Lue
 Number forms	UnicodeBlocks		Varianti numeriche
-OK	CharacterMap		OK
 Ogham	UnicodeBlocks		Ogham
 Ol Chiki	UnicodeBlocks		Ol Chiki
 Old Persian	UnicodeBlocks		Persiano antico
