@@ -1,53 +1,42 @@
-1	lithuanian	x-vnd.Haiku-BluetoothPrefs	3931795142
-About Bluetooth…	Window		Apie…
-Handheld	Settings view		Nešiojamas
-Default inquiry time:	Settings view		Numatytas užklausos laikas:
-Add device to list	Inquiry panel		Pridėti įrenginį į sąrašą
-Starting scan...	Inquiry panel		Žvalgymas...
-Show bluetooth console…	Window		Rodyti Bluetooth pultą…
-Smart phone	Settings view		Telefonas
-seconds	Inquiry panel		 sek.
-Server	Window		Tarnyba
-Stop bluetooth services…	Window		Stabdyti Bluetooth tarnybas…
-Identify host as:	Settings view		Atpažįstamas kaip:
-View	Window		Vaizdas
-Refresh…	Remote devices		Atnaujinimas…
-Pair…	Remote devices		Pora…
-Incoming connections policy:	Settings view		Įėjimų tvarka:
-From all devices	Settings view		Iš visų įrenginių
-Show name	Extended local device view		Rodyti pavadinimą
-Local devices found on system:	Settings view		Vietiniai sistemoje rasti įrenginiai:
-Scanning completed.	Inquiry panel		Apžvalgyta.
-Remote devices	Window		Nuotoliniai įrenginiai
-Remove	Remote devices		Šalinti
+1	lithuanian	x-vnd.Haiku-BluetoothPrefs	606869191
 15 secs	Settings view		15 sek.
-Start bluetooth services…	Window		Paleisti Bluetooth tarnybas…
-Policy...	Settings view		tvarkytina...
 61 secs	Settings view		61 sek.
-There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Nerasta žinomų sistemai Bluetooth įrenginių.
-Identify us as...	Settings view		atpažintini kaip...
-Remaining 	Inquiry panel		Likti
-As blocked	Remote devices		Kaip blokuotas
-Pick LocalDevice...	Settings view		Vietinio įrenginio pasirinkimas...
-Defaults	Window		Numatytai
-Inquiry	Inquiry panel		Užklausa
-Desktop	Settings view		Stalinis
-Revert	Window		Grįžti
-Remote devices list…	Window		Nuotolinių įrenginių sąrašas…
-Laptop	Settings view		Skreitinis
-Retrieving name of 	Inquiry panel		Gauti pavadinimą
-Bluetooth	Window		Bluetooth
-Discoverable	Extended local device view		Aptinkamas
-Service classes: 	Device View		Tarnybos:
-Connections & channels…	Window		Prisijungimų ir kanalų sąrašas…
-Refresh LocalDevices…	Window		Vietinių įrenginių atnaujinimas…
-Settings	Window		Nustatymai
-Only from trusted devices	Settings view		Tik iš patikimų įrenginių
-Scanning progress	Inquiry panel		Žvalgymas
-Always ask	Settings view		Visada atsiklausti
-Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Įsitikinkite, kad nuotoliniame įrenginyje įjungtas Bluetooth. Pradžiai spauskite mygtuką „Užklausti“. Laikas, reikalingas vardų gavimui nežinomas, nors ir neturėtų viršyti 3s vienam įrenginiui. Po to galėsite prisijungti prie jų.
-Retrieving names...	Inquiry panel		Vardų gavimas...
-Help	Window		Pagalba
+About Bluetooth…	Window		Apie…
+Add device to list	Inquiry panel		Pridėti įrenginį
 Add…	Remote devices		Pridėti…
+Always ask	Settings view		Visada atsiklausti
+As blocked	Remote devices		Kaip blokuotas
+Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Įsitikinkite, kad nuotoliniame įrenginyje įjungtas Bluetooth. Pradžiai spauskite mygtuką „Užklausti“. Laikas, reikalingas vardų gavimui nežinomas, nors ir neturėtų viršyti 3s vienam įrenginiui. Po to galėsite prisijungti prie jų.
+Default inquiry time:	Settings view		Numatytasis užklausos laikas:
+Desktop	Settings view		Stacionarusis kompiuteris
+Discoverable	Extended local device view		Aptinkamas
+From all devices	Settings view		Iš visų įrenginių
 Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Haiku Bluetooth sistema, (ARCE)\n\nSukūrė Oliver Ruiz Dorantes\n\nPagelbėjo:\n\t- Mika Lindqvist\n\t- Maksym Yevmenkin\n\nAtskira padėka pagelbėjusiems...\n\nAukojusiems įrenginius:\n\t- Henry Jair Abril Florez(el Colombian)\n\t\t & Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nParėmusiems pinigais:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nTaisiusiems ir baiginėjusiems:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTikrinusiems:\n\t- Petter H. Juliussen\n\t- Adrien Destugues\n\nTam, kas mane išmokė:\n\t- Įmonei yellowTAB
+Handheld	Settings view		Delninukas
+Help	Window		Pagalba
+Identify host as:	Settings view		Kompiuterio vardas:
+Identify us as...	Settings view		Prisistatyti kaip…
+Inquiry	Inquiry panel		Užklausa
+Laptop	Settings view		Skreitinis kompiuteris
+Local devices found on system:	Settings view		Vietiniai sistemoje rasti įrenginiai:
+Only from trusted devices	Settings view		Tik iš patikimų įrenginių
+Pair…	Remote devices		Suporuoti…
+Pick LocalDevice...	Settings view		Pasirinkti vietinį įrenginį…
+Refresh LocalDevices…	Window		Atnaujinti vietinių įrenginių sąrašą…
+Refresh…	Remote devices		Atnaujinimas…
+Remote devices	Window		Nuotoliniai įrenginiai
+Remote devices list…	Window		Nuotolinių įrenginių sąrašas…
+Remove	Remote devices		Šalinti
+Retrieving names...	Inquiry panel		Vardų gavimas...
+Scanning completed.	Inquiry panel		Žvalgymas baigtas.
+Scanning progress	Inquiry panel		Žvalgymas
 Server	Settings view		Tarnyba
+Server	Window		Tarnyba
+Settings	Window		Nustatymai
+Show bluetooth console…	Window		Rodyti „Bluetooth“ pultą…
+Show name	Extended local device view		Rodyti vardą
+Smart phone	Settings view		Telefonas
+Start bluetooth services…	Window		Paleisti „Bluetooth“ tarnybas…
+Starting scan...	Inquiry panel		Pradedamas žvalgymas…
+Stop bluetooth services…	Window		Stabdyti „Bluetooth“ tarnybas…
+There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Sistemoje neaptikta „Bluetooth“ įrenginių.

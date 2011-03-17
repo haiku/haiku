@@ -1,18 +1,17 @@
-1	lithuanian	x-vnd.Haiku-Locale	1431723094
-Available languages	Locale Preflet Window		Galimos kalbos
-Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Neprieinamos kalbos! Nepavyks šituo pasinaudoti!
-Long format:	TimeFormatSettings		Pilnai:
-Currency	TimeFormatSettings		Valiuta
-Short format:	TimeFormatSettings		Trumpai:
-Language	Locale Preflet Window		Kalba
-Preferred languages	Locale Preflet Window		Pageidautinos kalbos
-Numbers	TimeFormatSettings		Skaičiai
-24 hour	TimeFormatSettings		24 valnadų
-Defaults	Locale Preflet Window		Numatytai
-Revert	Locale Preflet Window		Grįžti
-OK	Locale Preflet Window		Gerai
-Time	TimeFormatSettings		Laikas
-Date	TimeFormatSettings		Data
+1	lithuanian	x-vnd.Haiku-Locale	2023461026
 12 hour	TimeFormatSettings		12 valandų
+24 hour	TimeFormatSettings		24 valnadų
+Available languages	Locale Preflet Window		Galimos kalbos
+Currency	TimeFormatSettings		Valiuta
+Date	TimeFormatSettings		Data
+Defaults	Locale Preflet Window		Numatytai
+Language	Locale Preflet Window		Kalba
 Locale	Locale Preflet		Kalba
-already chosen	LanguageListView		jau pasirinkta
+Long format:	TimeFormatSettings		Pilnai:
+Numbers	TimeFormatSettings		Skaičiai
+OK	Locale Preflet Window		Gerai
+Preferred languages	Locale Preflet Window		Pageidautinos kalbos
+Revert	Locale Preflet Window		Grįžti
+Short format:	TimeFormatSettings		Trumpai:
+Time	TimeFormatSettings		Laikas
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Neprieinamos kalbos! Nepavyks šituo pasinaudoti!

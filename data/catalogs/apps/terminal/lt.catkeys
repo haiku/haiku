@@ -1,20 +1,17 @@
-1	lithuanian	x-vnd.Haiku-Terminal	1949672047
-Not found.	Terminal TermWindow		Nerasta.
-Didn't find any available pseudo ttys.	Terminal Shell		Nerasta jokių prieinamų neva „tty“.
-Switch Terminals	Terminal TermWindow		Perjugti terminalus
+1	lithuanian	x-vnd.Haiku-Terminal	2261470953
 Change directory	Terminal TermView		Keisti aplanką
-OK	Terminal TermWindow		Gerai
+Copy	Terminal TermWindow		Kopijuoti
+Copy here	Terminal TermView		Kopijuoti čia
+Font:	Terminal AppearancePrefView		Rašmenys:
+Match case	Terminal FindWindow		Skirti lygius a<>A
 New Terminal	Terminal TermWindow		Naują terminalą
+Not found.	Terminal TermWindow		Nerasta.
+OK	Terminal PrefWindow		Gerai
+OK	Terminal TermWindow		Gerai
+Quit	Terminal TermWindow		Baigti
+Save to file…	Terminal PrefWindow		Išsaugoti bylon…
+Select all	Terminal TermWindow		Žymėti viską
+Switch Terminals	Terminal TermWindow		Perjugti terminalus
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminalas nepaleidžia apvalkalo. Apgailėtina.
 Text size	Terminal TermWindow		Rašmenų dydis
-Match case	Terminal FindWindow		Skirti lygius a<>A
-Quit	Terminal TermWindow		Baigti
 Use default shell	Terminal Shell		Naudoti numatytąjį apvalkalą
-Select all	Terminal TermWindow		Žymėti viską
-Terminal	Terminal TermWindow		Terminalas
-Save to file…	Terminal PrefWindow		Išsaugoti bylon…
-Failed to init pseudo tty.	Terminal Shell		Nepavyko paleisti neva „tty“.
-OK	Terminal PrefWindow		Gerai
-Font:	Terminal AppearancePrefView		Rašmenys:
-Copy here	Terminal TermView		Kopijuoti čia
-Copy	Terminal TermWindow		Kopijuoti

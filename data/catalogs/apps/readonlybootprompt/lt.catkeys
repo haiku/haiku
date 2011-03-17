@@ -1,7 +1,7 @@
 1	lithuanian	x-vnd.Haiku-ReadOnlyBootPrompt	2165068388
 Desktop (Live-CD)	BootPromptWindow		Darbastalį (Live-CD)
-Language	BootPromptWindow		Kalba
-Welcome to Haiku!	BootPromptWindow		Sveikina Jus Haiku!
-Run Installer	BootPromptWindow		Paleisti Diegyklę
 Do you wish to run the Installer or continue booting to the Desktop? You can also select your preferred language and keyboard layout from the list below.\n\nNote: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.	BootPromptWindow		Paleisti Diegyklę ar tęsti darbastalio paleidimą? Taip pat čia galite pasirinkti kalbą ir klaviatūros išdėstymą iš sąrašo žemiau.\n\nDėmesio: programų ir kitų Haiku dalių vertimas nėra baigtas. Ko gero dažnokai rasite neišverstų dalykų, visgi, panorėję, galite ir patys prisijungti prie darbų svetainėje <www.haiku-os.org>.
 Keymap	BootPromptWindow		Klaviatūros išdėstymas
+Language	BootPromptWindow		Kalba
+Run Installer	BootPromptWindow		Paleisti Diegyklę
+Welcome to Haiku!	BootPromptWindow		Sveikina Jus Haiku!

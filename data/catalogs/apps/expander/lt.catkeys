@@ -1,38 +1,32 @@
-1	lithuanian	x-vnd.Haiku-Expander	2957181365
-Expand	ExpanderMenu		Išskleisti
-Set destination…	ExpanderMenu		Paskirti vietą…
-File expanded	ExpanderWindow		Byla išskleista
-The destination is read only.	ExpanderWindow		Paskirties vieta tik skaitymui.
-Expander: Open	ExpanderWindow		Skleideris: Atidaryti
-Select current	DirectoryFilePanel		Parinkti esamą
-Source	ExpanderWindow		Šaltinis
-Error when expanding archive	ExpanderWindow		Klaida išskleidžiant bylą
-Hide contents	ExpanderWindow		Slėpti turinį
-Cancel	ExpanderWindow		Atsisakyti
-Continue	ExpanderWindow		Tęsti
-Expander	ExpanderWindow	!! Window Title !!	Skleideris
-The destination folder does not exist.	ExpanderWindow		Paskirties aplanko nėra.
+1	lithuanian	x-vnd.Haiku-Expander	2233184139
+About Expander…	ExpanderMenu		Apie programą…
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Tikrai norite stabdyti skleidimą šio\narchyvo? Kai kurios bylos gali būti ne iki galo išskleistos.
+Cancel	ExpanderWindow		Atsisakyti
+Close	ExpanderMenu		Uždaryti
+Continue	ExpanderWindow		Tęsti
+Destination	ExpanderWindow		Paskirtis
+Error when expanding archive	ExpanderWindow		Klaida išskleidžiant bylą
+Expand	ExpanderMenu		Išskleisti
+Expand	ExpanderWindow		Išskleisti
+Expander: Choose destination	DirectoryFilePanel		Skleideris: šaltinio vietos parinkimas
+Expander: Open	ExpanderWindow		Skleideris: Atidaryti
+File	ExpanderMenu		Byla
+File expanded	ExpanderWindow		Byla išskleista
+Hide contents	ExpanderWindow		Slėpti turinį
 Select	DirectoryFilePanel		Parinkti
-Creating listing for 	ExpanderWindow		Kuriamas sąrašas: 
+Select '%s'	DirectoryFilePanel		Rinktis „%s“
+Select current	DirectoryFilePanel		Parinkti esamą
+Set destination…	ExpanderMenu		Paskirti vietą…
+Set source…	ExpanderMenu		Parinkti šaltinį…
 Settings	ExpanderMenu		Nustatymai
 Settings…	ExpanderMenu		Nustatymai…
-Expander: Choose destination	DirectoryFilePanel		Skleideris: šaltinio vietos parinkimas
-Show contents	ExpanderWindow		Rodyti turinį
-Expanding file 	ExpanderWindow		Išskleidžiama byla 
-The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Aplankas buvo perkeltas, pervadintas arba\nnepalaikomas.
-The file doesn't exist	ExpanderWindow		Tokios bylos nėra
-Stop	ExpanderMenu		Stop
-File	ExpanderMenu		Byla
-Expand	ExpanderWindow		Išskleisti
-Close	ExpanderMenu		Uždaryti
-The destination is not a folder.	ExpanderWindow		Paskirties vieta nėra aplankas.
-About Expander…	ExpanderMenu		Apie programą…
-OK	About		Gerai
-Set source…	ExpanderMenu		Parinkti šaltinį…
-Select '%s'	DirectoryFilePanel		Rinktis „%s“
 Show contents	ExpanderMenu		Rodyti turinį
+Show contents	ExpanderWindow		Rodyti turinį
+Source	ExpanderWindow		Šaltinis
+Stop	ExpanderMenu		Stop
 Stop	ExpanderWindow		Stop
-Destination	ExpanderWindow		Paskirtis
-\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tparašyta Jérôme'o Duval'io\n\tCopyright 2004-2006, Haiku Inc.\n\npirminė „Be“ versija \nDominic'o, Hiroshi'o, Peter'io, Pavel'o bei Robert'o\n
-Expander	About		Skleideris
+The destination folder does not exist.	ExpanderWindow		Paskirties aplanko nėra.
+The destination is not a folder.	ExpanderWindow		Paskirties vieta nėra aplankas.
+The destination is read only.	ExpanderWindow		Paskirties vieta tik skaitymui.
+The file doesn't exist	ExpanderWindow		Tokios bylos nėra
+The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Aplankas buvo perkeltas, pervadintas arba\nnepalaikomas.

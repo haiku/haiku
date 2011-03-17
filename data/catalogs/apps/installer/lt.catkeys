@@ -1,75 +1,69 @@
-1	lithuanian	x-vnd.Haiku-Installer	1053708974
-Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Diegyklė „Installer“\n\tparašyta Jérôme'o Duval'io ir Stephan'o Aßmus'o\n\tCopyright 2005-2010, Haiku.\n\n
-Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Diegimas baigtas. Paleidimo sektorius įrašytas į „%s“. Spauskite „Baigti“ Diegyklės uždarymui arba rinkitės kitą skirsnį jei norite dar kur įdiegti.
-Quit	InstallerWindow		Baigti
-Stop	InstallerWindow	In alert after pressing Stop	Stop
-Installation completed. Boot sector has been written to '%s'. Press Quit to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Diegimas baigtas. Paleidimo sektorius įrašytas į „%s“. Spauskite „Baigti“ Diegyklės uždarymui arba rinkitės kitą skirsnį jei norite dar kur įdiegti.
-Install progress:  	InstallerWindow		Diegimo eiga:  
-Starting Installation.	InstallProgress		Diegimo pradžia.
-Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Tikrai norite diegti į dabar paleistą laikmeną? Diegyklei teks perleisti kompiuterį.
-OK	InstallProgress		Gerai
-Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Pasirinkite šaltinio bei paskirties laikmeną iš išpuolančių meniu. Toliau spauskite „Pradėti“.
-Install from:	InstallerWindow		Diegti iš:
+1	lithuanian	x-vnd.Haiku-Installer	750349764
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld iš %2ld
-Installer	InstallerWindow		Diegyklė
-Continue	InstallerApp		Tęsti
-Write boot sector to '%s'	InstallerWindow		Įrašyti paleidimo sektorių į „%s“
-Collecting copy information.	InstallProgress		Renkami duomenys kopijavimui.
-Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Pasirinkite šaltinio laikmeną iš išpuolančio meniu. Toliau spauskite „Pradėti“.
-Boot sector successfully written.	InstallProgress		Paleidimo sektorius sėkmingai įrašytas.
-Performing installation.	InstallProgress		Diegiama.
-scanning…	InstallerWindow		žvalgoma…
-Finishing Installation.	InstallProgress		Diegimo baigimas.
-README	InstallerApp		README
-The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Pasirinktoje laikmenoje per maža vietos. Bandykite rinktis kitą, arba nediegti papildomų paketų.
-Scanning for disks…	InstallerWindow		Žvalgoma laikmenų…
-The disk can't be mounted. Please choose a different disk.	InstallProgress		Laikmena nėra prijungiama, pasirinkite kitą.
-?? of ??	InstallerWindow	Unknown progress	?? iš ??
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Paleidžia priemonę „DriveSetup“ skirsnių tvarkymui\nprieinamose laikmenose.\nSkirsniai turi būti sužymimi kaip „Be File System“ (BFS),\ntai yra būtina Haiku paleidimo skirsniui.
-Show optional packages	InstallerWindow		Rodyti papildomus paketus
-No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Nebuvo rasta tinkamų įdiegimui skirsnių. Paruoškite bei sužymėkite kaip „Be File System“ (BFS) bent vieną skirsnį.
-Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Pasirinkite paskirties laikmeną Haiku įdiegimui iš išpuolančio meniu. Tada spauskite „Pradėti“.
-Unknown Type	InstallProgress	Partition content type	Nežinomas tipas
 <none>	InstallerWindow	No partition available	<nieko>
-Installation canceled.	InstallProgress		Diegimo atsisakyta.
-You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Negalima diegti laikmenos turinio į ją pačią. Pasirinkite kitą laikmeną.
+?? of ??	InstallerWindow	Unknown progress	?? iš ??
 ???	InstallerWindow	Unknown partition name	???
-Hide optional packages	InstallerWindow		Slėpti papildomus paketus
-Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Būtina uždaryti „DriveSetup“ langą prieš uždarant Diegyklės.
-Set up partitions…	InstallerWindow		Skirsnių nustatymas…
-The partition can't be mounted. Please choose a different partition.	InstallProgress		Skirsnis nėra prijungiamas, pasirinkite kitą.
-Install anyway	InstallProgress		Diegti vis tiek
-An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Pasitaikė klaida ir diegimas nebuvo baigtas:\n\nKlaida: %s
-Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Spauskite „Pradėti“ „%1s“ diegimui į „%2s“.
-Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Paleistas „DriveSetup“…\n\nUždarykite „DriveSetup“ diegimo tęsimui.
-Please choose target	InstallerWindow		Pasirinkite paskirties vietą
-Begin	InstallerWindow		Pradėti
-Write boot sector	InstallerWindow		Įrašyti paleidimo sektorių
-DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Nepaleidžiamas „DriveSetup“ – priemonė skirsnių tvarkymui.
-No optional packages available.	PackagesView		Papildomų paketų nėra.
 Additional disk space required: %s	InstallerWindow		Laikmenoje reikia daugiau vietos: %s
-Cancel	InstallProgress		Atsisakyti
-Try installing anyway	InstallProgress		Bandyti vis tiek diegti
-Are you sure you want to to stop the installation?	InstallerWindow		Tikrai norite stabdyti diegimą?
-Onto:	InstallerWindow		Į:
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Pasirinkta laikmena nėra tuščia.\nTikrai norite tęsti?\n\nDėmesio: aplankas „system“ bus perrašytas nauju iš diegimo laikmenos, kita bus apjungta, o kai bylos ar aplankai sutaps abiejose laikmenose –  jos bus perrašytos diegimo laikmenos bylomis ir aplankais.
-Are you sure you want to abort the installation and restart the system?	InstallerWindow		Tikrai norite sustabdyti diegimą ir perleisti kompiuterį?
-Restart system	InstallerWindow		Perleisti kompiuterį
-Quit	InstallerApp		Baigti
-OK	InstallerApp		Gerai
-Continue	InstallerWindow	In alert after pressing Stop	Tęsti
-OK	InstallerWindow		Gerai
-Cancel	InstallerWindow		Atsisakyti
 Additional disk space required: 0.0 KiB	InstallerWindow		Laikmenoje reikia daugiau vietos: 0.0 KiB
-The mount point could not be retrieved.	InstallProgress		Nunuskaitomas prijungimo taškas.
-Bootman, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		„Bootman“as, programa tvarkanti Haiku paleidimo meniu neprieinama.
-Quit Boot Manager	InstallerWindow		Išjungti Paleidyklę
-Quit Boot Manager and DriveSetup	InstallerWindow		Išjungti Paleidyklę ir LaikmenųTvarkyklę
-Set up boot menu	InstallerWindow		Nustatyti paleidimo meniu
-Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Prašome uždaryti Paleidyklę bei LaikmenųTvarkyklę prieš uždarydami Diegyklę.
-Quit DriveSetup	InstallerWindow		Išjungti LaikmenųTvarkyklę
-Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Veikianti Paleidyklė…\n\nUždarykitę Paleidyklę diegimo tęsimui.
+An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Pasitaikė klaida ir diegimas nebuvo baigtas:\n\nKlaida: %s
+Are you sure you want to abort the installation and restart the system?	InstallerWindow		Tikrai norite sustabdyti diegimą ir perleisti kompiuterį?
+Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Tikrai norite diegti į dabar paleistą laikmeną? Diegyklei teks perleisti kompiuterį.
+Are you sure you want to to stop the installation?	InstallerWindow		Tikrai norite stabdyti diegimą?
+Begin	InstallerWindow		Pradėti
 Boot sector not written because of an internal error.	InstallProgress		Paleidimo sektoriu neįrašytas dėl vidinės klaidos.
-Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Veikia Paleidyklė ir LaikmenųTvarkyklė…\n\nUždarykite abi programas diegimo tęsimui.
-Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Malonėkite prieš uždarydami Diegyklę uždaryti Paleidyklę.
-Tools	InstallerWindow		Įrankiai
+Boot sector successfully written.	InstallProgress		Paleidimo sektorius sėkmingai įrašytas.
+Cancel	InstallProgress		Atsisakyti
+Cancel	InstallerWindow		Atsisakyti
+Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Pasirinkite paskirties laikmeną Haiku įdiegimui iš išpuolančio meniu. Tada spauskite „Pradėti“.
+Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Pasirinkite šaltinio bei paskirties laikmeną iš išpuolančių meniu. Toliau spauskite „Pradėti“.
+Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Pasirinkite šaltinio laikmeną iš išpuolančio meniu. Toliau spauskite „Pradėti“.
+Collecting copy information.	InstallProgress		Renkami duomenys kopijavimui.
+Continue	InstallerApp		Tęsti
+Continue	InstallerWindow	In alert after pressing Stop	Tęsti
+DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Nepaleidžiamas „DriveSetup“ – priemonė skirsnių tvarkymui.
+Finishing Installation.	InstallProgress		Diegimo baigimas.
+Hide optional packages	InstallerWindow		Slėpti papildomus paketus
+Install anyway	InstallProgress		Diegti vis tiek
+Install from:	InstallerWindow		Diegti iš:
+Install progress:  	InstallerWindow		Diegimo eiga:  
+Installation canceled.	InstallProgress		Diegimo atsisakyta.
+Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Diegimas baigtas. Paleidimo sektorius įrašytas į „%s“. Spauskite „Baigti“ Diegyklės uždarymui arba rinkitės kitą skirsnį jei norite dar kur įdiegti.
+Installation completed. Boot sector has been written to '%s'. Press Quit to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Diegimas baigtas. Paleidimo sektorius įrašytas į „%s“. Spauskite „Baigti“ Diegyklės uždarymui arba rinkitės kitą skirsnį jei norite dar kur įdiegti.
+Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Diegyklė „Installer“\n\tparašyta Jérôme'o Duval'io ir Stephan'o Aßmus'o\n\tCopyright 2005-2010, Haiku.\n\n
+Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Paleidžia priemonę „DriveSetup“ skirsnių tvarkymui\nprieinamose laikmenose.\nSkirsniai turi būti sužymimi kaip „Be File System“ (BFS),\ntai yra būtina Haiku paleidimo skirsniui.
+No optional packages available.	PackagesView		Papildomų paketų nėra.
+No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Nebuvo rasta tinkamų įdiegimui skirsnių. Paruoškite bei sužymėkite kaip „Be File System“ (BFS) bent vieną skirsnį.
+OK	InstallProgress		Gerai
+OK	InstallerApp		Gerai
+OK	InstallerWindow		Gerai
+Onto:	InstallerWindow		Į:
+Performing installation.	InstallProgress		Diegiama.
+Please choose target	InstallerWindow		Pasirinkite paskirties vietą
+Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Prašome uždaryti Paleidyklę bei LaikmenųTvarkyklę prieš uždarydami Diegyklę.
+Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Būtina uždaryti „DriveSetup“ langą prieš uždarant Diegyklės.
+Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Spauskite „Pradėti“ „%1s“ diegimui į „%2s“.
+Quit	InstallerApp		Baigti
+Quit	InstallerWindow		Baigti
+Quit Boot Manager and DriveSetup	InstallerWindow		Išjungti Paleidyklę ir LaikmenųTvarkyklę
+Quit DriveSetup	InstallerWindow		Išjungti LaikmenųTvarkyklę
+README	InstallerApp		README
+Restart system	InstallerWindow		Perleisti kompiuterį
+Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Veikianti Paleidyklė…\n\nUždarykitę Paleidyklę diegimo tęsimui.
+Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Paleistas „DriveSetup“…\n\nUždarykite „DriveSetup“ diegimo tęsimui.
+Scanning for disks…	InstallerWindow		Žvalgoma laikmenų…
+Set up boot menu	InstallerWindow		Nustatyti paleidimo meniu
+Set up partitions…	InstallerWindow		Skirsnių nustatymas…
+Show optional packages	InstallerWindow		Rodyti papildomus paketus
+Starting Installation.	InstallProgress		Diegimo pradžia.
+Stop	InstallerWindow	In alert after pressing Stop	Stop
+The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Pasirinktoje laikmenoje per maža vietos. Bandykite rinktis kitą, arba nediegti papildomų paketų.
+The disk can't be mounted. Please choose a different disk.	InstallProgress		Laikmena nėra prijungiama, pasirinkite kitą.
+The mount point could not be retrieved.	InstallProgress		Nunuskaitomas prijungimo taškas.
+The partition can't be mounted. Please choose a different partition.	InstallProgress		Skirsnis nėra prijungiamas, pasirinkite kitą.
+The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Pasirinkta laikmena nėra tuščia.\nTikrai norite tęsti?\n\nDėmesio: aplankas „system“ bus perrašytas nauju iš diegimo laikmenos, kita bus apjungta, o kai bylos ar aplankai sutaps abiejose laikmenose –  jos bus perrašytos diegimo laikmenos bylomis ir aplankais.
+Try installing anyway	InstallProgress		Bandyti vis tiek diegti
+Unknown Type	InstallProgress	Partition content type	Nežinomas tipas
+Write boot sector	InstallerWindow		Įrašyti paleidimo sektorių
+Write boot sector to '%s'	InstallerWindow		Įrašyti paleidimo sektorių į „%s“
+You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Negalima diegti laikmenos turinio į ją pačią. Pasirinkite kitą laikmeną.
+scanning…	InstallerWindow		žvalgoma…

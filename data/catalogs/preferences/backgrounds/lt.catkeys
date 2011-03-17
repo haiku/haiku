@@ -1,25 +1,24 @@
-1	lithuanian	x-vnd.Haiku-Backgrounds	739979648
-X:	Main View		X:
-Resolution: 	Image Filepanel		Raiška:
-pick one	Main View		pasirinkti
-Default	Main View		Numatytai
-Center	Main View		Viduryje
-Manual	Main View		Savaip
-Default folder	Main View		Numatytasis aplankas
-Revert	Main View		Grįžti
-None	Main View		Jokio
-All workspaces	Main View		Visi darbastaliai
-Icon label outline	Main View		Ženkliukų pavadinimai su apvadu
-Other…	Main View		Kitas…
-Current workspace	Main View		Šis darbastalis
-Folder: 	Main View		Aplankas:
+1	lithuanian	x-vnd.Haiku-Backgrounds	4220509773
+All workspaces	Main View		Visi darbalaukiai
 Apply	Main View		Taikyti
+Center	Main View		Centruoti
+Current workspace	Main View		Šis darbalaukis
+Default	Main View		Numatytasis
+Default folder	Main View		Numatytasis aplankas
+Folder: 	Main View		Aplankas:
+Icon label outline	Main View		Piktogramų vardai turi mesti šešėlį
+Image:	Main View		Paveikslas:
+Manual	Main View		Tinkinta
+None	Main View		Jokio
 Other folder…	Main View		Kitas aplankas…
-Backgrounds	Main Window		Fonai
-Y:	Main View		Y:
-Tile	Main View		Iškloti
-Select	Main View		Parinkti
-Scale to fit	Main View		Įtalpinti
+Other…	Main View		Kitas…
 Placement:	Main View		Padėtis:
 Preview	Main View		Peržiūra
-Image:	Main View		Paveikslėlis:
+Resolution: 	Image Filepanel		Raiška:
+Revert	Main View		Atsisakyti pakeitimų
+Scale to fit	Main View		Įtalpinti
+Select	Main View		Parinkti
+Tile	Main View		Iškloti
+X:	Main View		X:
+Y:	Main View		Y:
+pick one	Main View		pasirinkite
