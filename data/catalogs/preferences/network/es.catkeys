@@ -1,18 +1,12 @@
-1	spanish	x-vnd.Haiku-Network	3643490310
-Gateway:	EthernetSettingsView		Puerta de enlace:
-Netmask:	EthernetSettingsView		Mascara de red:
-DHCP	EthernetSettingsView		DHCP
-DNS #2:	EthernetSettingsView		DNS #2:
-Apply	EthernetSettingsView		Aplicar
-DNS #1:	EthernetSettingsView		DNS #1:
-Network	NetworkWindow		Red
+1	spanish	x-vnd.Haiku-Network	1613092936
 Adapter:	EthernetSettingsView		Adaptador:
-IP address:	EthernetSettingsView		Dirección IP:
-Revert	EthernetSettingsView		Revertir
-Sending auto-config message failed: 	EthernetSettingsView		El envío del mensaje de configuración automática falló:
-Mode:	EthernetSettingsView		Modo:
-The net_server needs to run for the auto configuration!	EthernetSettingsView		¡La configuración automática necesita que el net_server esté en ejecución!
-Auto-configuring failed: 	EthernetSettingsView		La configuración automática falló:
-Static	EthernetSettingsView		Estática
-OK	EthernetSettingsView		OK
+Apply	EthernetSettingsView		Aplicar
+DHCP	EthernetSettingsView		DHCP
+DNS #1:	EthernetSettingsView		DNS #1:
+DNS #2:	EthernetSettingsView		DNS #2:
 Domain:	EthernetSettingsView		Dominio:
+Gateway:	EthernetSettingsView		Puerta de enlace:
+IP address:	EthernetSettingsView		Dirección IP:
+Mode:	EthernetSettingsView		Modo:
+Netmask:	EthernetSettingsView		Mascara de red:
+Revert	EthernetSettingsView		Revertir

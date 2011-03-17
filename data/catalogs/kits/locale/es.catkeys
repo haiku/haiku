@@ -1,9 +1,9 @@
 1	spanish	system	2677153267
+%.2f TiB	StringForSize		%.2f TiB
 %3.2f GiB	StringForSize		%3.2f GiB
 %3.2f KiB	StringForSize		%3.2f KiB
-%d bytes	StringForSize		%d bytes
-%.2f TiB	StringForSize		%.2f TiB
 %3.2f MiB	StringForSize		%3.2f MiB
+%d bytes	StringForSize		%d bytes
+Blue:	ColorControl		Azul:
 Green:	ColorControl		Verde:
 Red:	ColorControl		Rojo:
-Blue:	ColorControl		Azul:

@@ -1,11 +1,10 @@
-1	spanish	x-vnd.Haiku-Fonts	1355959961
-Plain font:	Font view		Normal:
+1	spanish	x-vnd.Haiku-Fonts	2438341287
+Bold font:	Font view		Negrita:
 Defaults	Main window		Opciones predeterminadas
-Fonts	Main window		Tipos de letra
+Fixed font:	Font view		Tipo monoespaciado:
 Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Tipos de letra\n\tCopyright 2004-2005, Haiku.\n\n
+Menu font:	Font view		Menú:
+Plain font:	Font view		Normal:
 Revert	Main window		Revertir
 Size:	Font Selection view		Tamaño:
-Menu font:	Font view		Menú:
-Fixed font:	Font view		Tipo monoespaciado:
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	El jefe buscó el éxtasis en un imprevisto baño de whisky y gozó como un duque.
-Bold font:	Font view		Negrita:

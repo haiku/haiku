@@ -1,30 +1,36 @@
-1	spanish	x-vnd.Haiku-About	2960987991
-Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (y el núcleo de su NewOS)\n
-%ld Processors:	AboutView		%ld Procesadores:
+1	spanish	x-vnd.Haiku-About	3354362740
+%.2f GHz	AboutView		%.2f GHz
+%d MiB total	AboutView		%d MiB en total
+%d MiB used (%d%%)	AboutView		%d MiB usados (%d%%)
+%ld MHz	AboutView		%ld MHz
+%ld Processors:	AboutView		%ld procesadores:
+%total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB en total, %inaccesible MiB inaccesible(s)
+... and the many people making donations!\n\n	AboutView		... ¡y a toda la gente que realizó donaciones!\n\n
+About this system	AboutWindow		Acerca de este sistema
+Contributors:\n	AboutView		Colaboradores:\n
+Current maintainers:\n	AboutView		Mantenedores actuales:\n
+GCC %d Hybrid	AboutView		GCC %d híbrido
+Kernel:	AboutView		Núcleo:
+License: 	AboutView		Licencia: 
+Licenses: 	AboutView		Licencias: 
+Memory:	AboutView		Memoria:
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (fundador del proyecto)\n\n
-The Haiku-Ports team\n	AboutView		El equipo Haiku-Ports\n
-Website, marketing & documentation:\n	AboutView		Sitio web, márketing y documentación:\n
+Past maintainers:\n	AboutView		Mantenedores previos:\n
+Processor:	AboutView		Procesador:
 Revision	AboutView		Revisión
 Source Code: 	AboutView		Código fuente:
-Processor:	AboutView		Procesador:
-Kernel:	AboutView		Núcleo:
-Contributors:\n	AboutView		Colaboradores:\n
-Unknown	AboutView		Desconocido
-\n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… y probablemente algunos más que se nos haya olvidado mencionar (¡disculpas!)\n\n
-%.2f GHz	AboutView		%.2f GHz
-Memory:	AboutView		Memoria:
-Past maintainers:\n	AboutView		Mantenedores previos:\n
-\n\nSpecial thanks to:\n	AboutView		\n\nAgradecimientos especiales a:\n
-Licenses: 	AboutView		Licencias: 
-\nCopyrights\n\n	AboutView		\nDerechos reservados\n\n
-Current maintainers:\n	AboutView		Mantenedores actuales:\n
-Time running:	AboutView		Tiempo en ejecución:
-The Haikuware team and their bounty program\n	AboutView		El equipo de Haikuware y su programa de recompensas\n
-About this system	AboutWindow		Acerca de este sistema
-Version:	AboutView		Versión:
-%ld MHz	AboutView		%ld MHz
-[Click a license name to read the respective license.]\n\n	AboutView		[Haga click en un nombre de licencia para leer la licencia respectiva.]\n\n
-License: 	AboutView		Licencia: 
-Translations:\n	AboutView		Traducciones:\n
-... and the many people making donations!\n\n	AboutView		... ¡y a toda la gente que realizó donaciones!\n\n
 The BeGeistert team\n	AboutView		El equipo de BeGeistert\n
+The Haiku-Ports team\n	AboutView		El equipo Haiku-Ports\n
+The Haikuware team and their bounty program\n	AboutView		El equipo de Haikuware y su programa de recompensas\n
+The University of Auckland and Christof Lutteroth\n\n	AboutView		La Universidad de Auckland y a Christof Lutteroth\n\n
+The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT licence%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		El código que es único de Haiku, en especial el núcleo y todo el código al cual se enlazan las aplicaciones, se distribuye bajo los términos de la %licencia MIT%. Algunas librerías del sistema contienen código de terceras personas distribuidas bajo la licencia LGPL. Los derechos de autor de terceras personas se encuentran a continuación.\n\n
+The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku and the Haiku logo are trademarks of Haiku, Inc.\n\n	AboutView		El copyright del código de Haiku es propiedad de Haiku Inc. o de los respectivos autores cuando se indique expresamente en el código fuente. Haiku y el logotipo de Haiku son marcas registradas de Haiku Inc.\n\n
+Time running:	AboutView		Tiempo en ejecución:
+Translations:\n	AboutView		Traducciones:\n
+Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (y su núcleo NewOS)\n
+Unknown	AboutView		Desconocido
+Version:	AboutView		Versión:
+Website, marketing & documentation:\n	AboutView		Sitio web, márketing y documentación:\n
+[Click a license name to read the respective license.]\n\n	AboutView		[Haga clic en un nombre para leer la licencia respectiva.]\n\n
+\n\nSpecial thanks to:\n	AboutView		\n\nAgradecimientos especiales a:\n
+\n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… y probablemente algunos más que hemos olvidado mencionar (¡perdón!)\n\n

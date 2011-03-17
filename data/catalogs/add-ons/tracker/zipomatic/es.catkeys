@@ -1,18 +1,18 @@
 1	spanish	x-vnd.haiku.zip-o-matic	274748138
-1 file added.	file:ZipOMaticWindow.cpp		1 archivo añadido.
-Stop	file:ZipOMaticWindow.cpp		Detener
-Creating archive: %s	file:ZipOMaticWindow.cpp		Creando archivo: %s
-Continue	file:ZipOMaticWindow.cpp		Continuar
-Preparing to archive	file:ZipperThread.cpp		Preparando para comprimir
-Filename: %s	file:ZipOMaticWindow.cpp		Nombre de archivo: %s
-Let them continue	file:ZipOMatic.cpp		Permitirles continuar
-Do you want to stop them?	file:ZipOMatic.cpp		¿Desea detenerlos?
-Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		¿Está seguro que desea detener la creación de este archivo?
 %ld files added.	file:ZipOMaticWindow.cpp		%ld archivos agregados.
-Stopped	file:ZipOMaticWindow.cpp		Detenido
+1 file added.	file:ZipOMaticWindow.cpp		1 archivo añadido.
 Archive	file:ZipperThread.cpp		Archivo
+Archive created OK	file:ZipOMaticWindow.cpp		Archivo creado correctamente
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		¿Está seguro que desea detener la creación de este archivo?
+Continue	file:ZipOMaticWindow.cpp		Continuar
+Creating archive: %s	file:ZipOMaticWindow.cpp		Creando archivo: %s
+Do you want to stop them?	file:ZipOMatic.cpp		¿Desea detenerlos?
 Drop files to zip.	file:ZipOMaticWindow.cpp		Suelte archivos para comprimirlos.
 Error creating archive	file:ZipOMaticWindow.cpp		Error al crear el archivo
-You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		Tiene %ld Zip-O-Matic corriendo.\n\n
-Archive created OK	file:ZipOMaticWindow.cpp		Archivo creado correctamente
+Filename: %s	file:ZipOMaticWindow.cpp		Nombre de archivo: %s
+Let them continue	file:ZipOMatic.cpp		Permitirles continuar
+Preparing to archive	file:ZipperThread.cpp		Preparando para comprimir
+Stop	file:ZipOMaticWindow.cpp		Detener
 Stop them	file:ZipOMatic.cpp		Detenerlos
+Stopped	file:ZipOMaticWindow.cpp		Detenido
+You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		Tiene %ld Zip-O-Matic corriendo.\n\n

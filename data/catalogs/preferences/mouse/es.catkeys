@@ -1,23 +1,22 @@
-1	spanish	x-vnd.Haiku-Mouse	524453314
-Mouse type:	SettingsView		Tipo de ratón:
-Warp	SettingsView		\"Warp\"
-2-Button	SettingsView		2-Botones
-Double-click test area	SettingsView		Área de prueba del doble clic
-Revert	MouseWindow		Revertir
+1	spanish	x-vnd.Haiku-Mouse	1036956709
 ...by Andrew Edward McCall	MouseApplication		...por Andrew Edward McCall
-Mouse acceleration	SettingsView		Aceleración del ratón
-Click to focus	SettingsView		Clic para dar foco
+1-Button	SettingsView		1-Botón
+2-Button	SettingsView		2-Botones
 3-Button	SettingsView		3-Botones
-Mouse speed	SettingsView		Velocidad del ratón
+Accept first click	SettingsView		Aceptar primer clic
+Click to focus	SettingsView		Clic para dar foco
+Defaults	MouseWindow		Valores predeterminados
+Dig Deal	MouseApplication		Gran cosa
+Double-click speed	SettingsView		Velocidad del doble clic
+Double-click test area	SettingsView		Área de prueba del doble clic
+Fast	SettingsView		Rápido 
+Focus follows mouse	SettingsView		El foco sigue al ratón
 Focus mode:	SettingsView		Modo de foco:
 Instant warp	SettingsView		\"Warp\" instantáneo
-Dig Deal	MouseApplication		Gran cosa
-1-Button	SettingsView		1-Botón
-Double-click speed	SettingsView		Velocidad del doble clic
-Defaults	MouseWindow		Valores predeterminados
-Focus follows mouse	SettingsView		El foco sigue al ratón
-Accept first click	SettingsView		Aceptar primer clic
-Fast	SettingsView		Rápido 
+Mouse acceleration	SettingsView		Aceleración del ratón
+Mouse speed	SettingsView		Velocidad del ratón
+Mouse type:	SettingsView		Tipo de ratón:
 Normal	SettingsView		Normal
-Mouse	MouseWindow		Ratón
+Revert	MouseWindow		Revertir
 Slow	SettingsView		Lento
+Warp	SettingsView		\"Warp\"

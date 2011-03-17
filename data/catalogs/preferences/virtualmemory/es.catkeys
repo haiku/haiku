@@ -1,20 +1,18 @@
-1	spanish	x-vnd.Haiku-VirtualMemory	866260633
-Turn off	SettingsWindow		Desactivar
-GB	SettingsWindow		GB
-Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Desactivar la memoria virtual tendrá efectos negativos sobre la estabilidad del sistema una vez que se agote la memoria RAM.\nLa memoria virtual no afecta el rendimiento del sistema hasta que no se alcance este punto.\n\n¿Está seguro de querer desactivarla?
-Requested swap file size:	SettingsWindow		Tamaño del archivo de intercambio solicitado:
-Physical memory: 	SettingsWindow		Memoria física:
-Changes will take effect on restart!	SettingsWindow		¡Los cambios se aplicarán al reiniciar!
-Defaults	SettingsWindow		Valores predeterminados
-KB	SettingsWindow		KB
-Use volume:	SettingsWindow		Usar volumen:
-Keep enabled	SettingsWindow		Mantener activada
-Revert	SettingsWindow		Revertir
-999 MB	SettingsWindow		999 MB
-Current swap file size: 	SettingsWindow		Tamaño actual del archivo de intercambio: 
-VirtualMemory	SettingsWindow		VirtualMemory
-OK	VirtualMemoryApp		Aceptar
-VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		VirtualMemory\n\tescrito por Axel Dörfler\n\tCopyright 2005, Haiku.\n
-Enable virtual memory	SettingsWindow		Activar memoria virtual
-MB	SettingsWindow		MB
+1	spanish	x-vnd.Haiku-VirtualMemory	2137942259
 %Ld B	SettingsWindow		%Ld B
+Changes will take effect on restart!	SettingsWindow		¡Los cambios se aplicarán al reiniciar!
+Current swap file size: 	SettingsWindow		Tamaño actual del archivo de intercambio: 
+Defaults	SettingsWindow		Valores predeterminados
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Desactivar la memoria virtual tendrá efectos negativos sobre la estabilidad del sistema una vez que se agote la memoria RAM.\nLa memoria virtual no afecta el rendimiento del sistema hasta que no se alcance este punto.\n\n¿Está seguro de querer desactivarla?
+Enable virtual memory	SettingsWindow		Activar memoria virtual
+GB	SettingsWindow		GB
+KB	SettingsWindow		KB
+Keep enabled	SettingsWindow		Mantener activada
+MB	SettingsWindow		MB
+OK	VirtualMemoryApp		Aceptar
+Physical memory: 	SettingsWindow		Memoria física:
+Requested swap file size:	SettingsWindow		Tamaño del archivo de intercambio solicitado:
+Revert	SettingsWindow		Revertir
+Turn off	SettingsWindow		Desactivar
+Use volume:	SettingsWindow		Usar volumen:
+VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		VirtualMemory\n\tescrito por Axel Dörfler\n\tCopyright 2005, Haiku.\n

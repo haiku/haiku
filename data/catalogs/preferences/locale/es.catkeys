@@ -1,17 +1,16 @@
-1	spanish	x-vnd.Haiku-Locale	2023461026
-Available languages	Locale Preflet Window		Idiomas disponibles
-Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		¡Es imposible encontrar los lenguajes disponibles! ¡No se puede usar este preflet!
-Long format:	TimeFormatSettings		Formato largo:
-Currency	TimeFormatSettings		Moneda
-Short format:	TimeFormatSettings		Formato corto:
-Language	Locale Preflet Window		Idioma
-Preferred languages	Locale Preflet Window		Idiomas preferidos
-Numbers	TimeFormatSettings		Números
-24 hour	TimeFormatSettings		24 horas
-Defaults	Locale Preflet Window		Predeterminados
-Revert	Locale Preflet Window		Revertir
-OK	Locale Preflet Window		Aceptar
-Time	TimeFormatSettings		Hora
-Date	TimeFormatSettings		Fecha
+1	spanish	x-vnd.Haiku-Locale	167059322
 12 hour	TimeFormatSettings		12 horas
+24 hour	TimeFormatSettings		24 horas
+Available languages	Locale Preflet Window		Idiomas disponibles
+Currency	TimeFormatSettings		Moneda
+Date	TimeFormatSettings		Fecha
+Defaults	Locale Preflet Window		Predeterminados
+Language	Locale Preflet Window		Idioma
 Locale	Locale Preflet		Región de procedencia
+Long format:	TimeFormatSettings		Formato largo:
+Numbers	TimeFormatSettings		Números
+OK	Locale Preflet Window		Aceptar
+Preferred languages	Locale Preflet Window		Idiomas preferidos
+Revert	Locale Preflet Window		Revertir
+Short format:	TimeFormatSettings		Formato corto:
+Time	TimeFormatSettings		Hora

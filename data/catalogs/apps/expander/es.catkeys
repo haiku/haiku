@@ -1,38 +1,32 @@
-1	spanish	x-vnd.Haiku-Expander	2957181365
-Expand	ExpanderMenu		Extraer
-Set destination…	ExpanderMenu		Elegir destino...
-File expanded	ExpanderWindow		Fichero descomprimido
-The destination is read only.	ExpanderWindow		El destino es de sólo lectura.
-Expander: Open	ExpanderWindow		Expander: Abrir
-Select current	DirectoryFilePanel		Selecciona actual
-Source	ExpanderWindow		Origen
-Error when expanding archive	ExpanderWindow		Error extrayendo archivo
-Hide contents	ExpanderWindow		Esconder contenidos
-Cancel	ExpanderWindow		Cancelar
-Continue	ExpanderWindow		Continuar
-Expander	ExpanderWindow	!! Window Title !!	Expander: extraer archivos
-The destination folder does not exist.	ExpanderWindow		La carpeta de destino no existe.
+1	spanish	x-vnd.Haiku-Expander	2233184139
+About Expander…	ExpanderMenu		Acerca de Expander…
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		¿Está seguro de querer parar de descomprimir este \narchivo? El elemento descomprimiéndose puede no estar completo.
+Cancel	ExpanderWindow		Cancelar
+Close	ExpanderMenu		Cerrar
+Continue	ExpanderWindow		Continuar
+Destination	ExpanderWindow		Destino
+Error when expanding archive	ExpanderWindow		Error extrayendo archivo
+Expand	ExpanderMenu		Extraer
+Expand	ExpanderWindow		Extraer
+Expander: Choose destination	DirectoryFilePanel		Expander: Elegir destino
+Expander: Open	ExpanderWindow		Expander: Abrir
+File	ExpanderMenu		Archivo
+File expanded	ExpanderWindow		Fichero descomprimido
+Hide contents	ExpanderWindow		Esconder contenidos
 Select	DirectoryFilePanel		Seleccionar
-Creating listing for 	ExpanderWindow		Creando listado para
+Select '%s'	DirectoryFilePanel		Seleccionar '%s'
+Select current	DirectoryFilePanel		Selecciona actual
+Set destination…	ExpanderMenu		Elegir destino...
+Set source…	ExpanderMenu		Elegir origen...
 Settings	ExpanderMenu		Configuración
 Settings…	ExpanderMenu		Configuración...
-Expander: Choose destination	DirectoryFilePanel		Expander: Elegir destino
-Show contents	ExpanderWindow		Mostrar contenidos
-Expanding file 	ExpanderWindow		Descomprimiendo archivo
-The folder was either moved, renamed or not\nsupported.	ExpanderWindow		La carpeta o bien fue movida, o renombrada o\n no está soportada.
-The file doesn't exist	ExpanderWindow		El archivo no existe
-Stop	ExpanderMenu		Parar
-File	ExpanderMenu		Archivo
-Expand	ExpanderWindow		Extraer
-Close	ExpanderMenu		Cerrar
-The destination is not a folder.	ExpanderWindow		El destino no es una carpeta.
-About Expander…	ExpanderMenu		Acerca de Expander…
-OK	About		Aceptar
-Set source…	ExpanderMenu		Elegir origen...
-Select '%s'	DirectoryFilePanel		Seleccionar '%s'
 Show contents	ExpanderMenu		Mostrar contenidos
+Show contents	ExpanderWindow		Mostrar contenidos
+Source	ExpanderWindow		Origen
+Stop	ExpanderMenu		Parar
 Stop	ExpanderWindow		Parar
-Destination	ExpanderWindow		Destino
-\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tescrito por Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nversión original Be por \nDominic, Hiroshi, Peter, Pavel y Robert\n
-Expander	About		Expander: extraer archivos
+The destination folder does not exist.	ExpanderWindow		La carpeta de destino no existe.
+The destination is not a folder.	ExpanderWindow		El destino no es una carpeta.
+The destination is read only.	ExpanderWindow		El destino es de sólo lectura.
+The file doesn't exist	ExpanderWindow		El archivo no existe
+The folder was either moved, renamed or not\nsupported.	ExpanderWindow		La carpeta o bien fue movida, o renombrada o\n no está soportada.
