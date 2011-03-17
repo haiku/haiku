@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Sudoku	2743785378
+1	finnish	x-vnd.Haiku-Sudoku	2414949553
 Abort	ProgressWindow		Keskeytä
 About	Sudoku		Ohjelmasta
 About Sudoku…	SudokuWindow		Ohjelmasta Sudoku...
@@ -29,6 +29,7 @@ Snapshot current	SudokuWindow		Otan kuvakaappaus nykyisestä
 Solve	SudokuWindow		Ratkaise
 Solve single field	SudokuWindow		Ratkaise yksi kenttä
 Start again	SudokuWindow		Aloita uudelleen
+Sudoku	Application name		Sudoku
 Sudoku	Sudoku		Sudoku
 Sudoku request	SudokuWindow		Sudoku-pyyntö
 Sudoku solved - congratulations!\n	SudokuWindow		Sudoku ratkaistu - onneksi olkoon!\n

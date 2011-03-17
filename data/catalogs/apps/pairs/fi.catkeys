@@ -1,4 +1,5 @@
-1	finnish	x-vnd.Haiku-Pairs	1919511432
+1	finnish	x-vnd.Haiku-Pairs	921992441
+%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYou completed the game in %num% clicks.\n	PairsWindow		%app%\n\ttekijä: Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nSait pelin valmiiksi %num% napsautuksella.\n
 Beginner (4x4)	PairsWindow		Aloittelija (4x4)
 Expert (8x8)	PairsWindow		Guru (8x8)
 Game	PairsWindow		Peli

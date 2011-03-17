@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Screen	1658032282
+1	finnish	x-vnd.Haiku-Screen	1466525338
 %.1f Hz	Screen		%.1f Hz
 %sSerial no.: %s	Screen		%sSarjanumero.: %s
 /other…	Screen		/muut...
@@ -28,6 +28,7 @@ Refresh rate:	Screen		Virkistystaajuus:
 Resolution:	Screen		Erottelukyky:
 Revert	Screen		Palauta
 Rows:	Screen		Rivit:
+Screen	Application name		Näyttöasetukset
 Screen	Screen		Näyttö
 Screen preferences by the Haiku team	Screen		Haiku-ryhmän näyttöasetukset
 Set background…	Screen		Aseta tausta...

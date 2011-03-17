@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Mouse	3904912604
+1	finnish	x-vnd.Haiku-Mouse	782036937
 ...by Andrew Edward McCall	MouseApplication		...: Andrew Edward McCall
 1-Button	SettingsView		1-painike
 2-Button	SettingsView		2-painike
@@ -14,6 +14,7 @@ Fast	SettingsView		Nopea
 Focus follows mouse	SettingsView		Kohdistus seuraa hiirtä
 Focus mode:	SettingsView		Kohdistustila:
 Instant warp	SettingsView		Pikavääristymä
+Mouse	Application name		Hiiriasetukset
 Mouse acceleration	SettingsView		Hiiren kiihdytys
 Mouse speed	SettingsView		Hiiren nopeus
 Mouse type:	SettingsView		Hiirityyppi:

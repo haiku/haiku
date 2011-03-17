@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-StyledEdit	881610730
+1	finnish	x-vnd.Haiku-StyledEdit	2766123717
 ???	LoadAlert		???
 Align	Menus		Tasaa
 Black	Menus		Musta
@@ -71,6 +71,7 @@ Search backwards	FindandReplaceWindow		Etsi taaksepäin
 Select all	Menus		Valitse kaikki
 Size	Menus		Koko
 Statistics…	Menus		Tilastot...
+StyledEdit	Application name		Tyylieditori
 This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Tämä tiedosto on merkitty kirjoitussuojatuksi. Tallennetaanko muutokset asiakirjaan ”%s”? 
 Undo typing	QuitAlert		Peru kirjoitus
 Untitled 	StyledEditWindow		Otsikoton 

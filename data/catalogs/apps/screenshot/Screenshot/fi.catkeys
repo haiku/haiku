@@ -1,4 +1,4 @@
-1	finnish	x-vnd.haiku-screenshot	731699482
+1	finnish	x-vnd.haiku-screenshot	2221316304
 Artwork folder	ScreenshotWindow		Taideteoskansio
 Cancel	ScreenshotWindow		Peru
 Capture active window	ScreenshotWindow		Kaappaa aktiivinen ikkuna
@@ -16,6 +16,7 @@ Please select	ScreenshotWindow		Valitse
 Save	ScreenshotWindow		Tallenna
 Save as:	ScreenshotWindow		Tallenna nimellä:
 Save in:	ScreenshotWindow		Tallenna kohteeseen:
+Screenshot	Application name		Näytönkaappaus
 Select	ScreenshotWindow		Valitse
 Settings…	ScreenshotWindow		Asetukset...
 This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Tiedosto on jo olemassa.\n Oletko varma, etä haluat korvata sen?

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Notifications	3545587988
+1	finnish	x-vnd.Haiku-Notifications	3348596994
 Above icon	DisplayView		Kuvakkeen yläpuolella
 Allowed	NotificationView		Sallittu
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Tapahtui virhe tallennettaessa asetuksia.\nOn mahdollista, että levytila on loppunut.
@@ -26,6 +26,7 @@ Large icon	DisplayView		Suuri kuvake
 Last Received	NotificationView		Viimeksi vastaanotettu
 Mini icon	DisplayView		Minikuvake
 No	NotificationView		Ei
+Notifications	Application name		Ilmoitusasetukset
 Notifications	GeneralView		Ilmoitukset
 Notifications	NotificationView		Ilmoitukset
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Ilmoituksia ei voi pysäyttää, koska palvelinta ei tavoiteta.

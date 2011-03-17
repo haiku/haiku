@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Shortcuts	2152414241
+1	finnish	x-vnd.Haiku-Shortcuts	1278045456
 (Choose application with file requester)	ShortcutsWindow		(Valitse sovellus tiedostohakijalla)
 *Beep	ShortcutsWindow		*Piip
 *InsertString \"Your Text Here\"	ShortcutsWindow		*Lisää merkkijono ”Tekstisi tänne”
@@ -10,8 +10,8 @@
 *MoveMouseTo 50% 50%	ShortcutsWindow		*SiirräHiiriKohteeseen 50% 50%
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Moni ”*SiirräHiiriKohteeseen 100% 0” ”*Hiiripainike 1”
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*LähetäViesti application/x-vnd.Be-TRAK ’Tfnd’
-About Shortcuts	ShortcutsApp		Pikanäppäimet-ohjelmasta
-About Shortcuts	ShortcutsWindow		Pikanäppäimet-ohjelmasta
+About Shortcuts	ShortcutsApp		Pikanäppäinasetuksista
+About Shortcuts	ShortcutsWindow		Pikanäppäinasetuksista
 Add new shortcut	ShortcutsWindow		Lisää uusi pikanäppäin
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt-painike
 Append	ShortcutsWindow		Liitä
@@ -47,9 +47,10 @@ Save KeySet as…	ShortcutsWindow		Tallenna KeySet-tiedosto nimellä…
 Select	ShortcutsWindow		Valitse
 SendMessage	ShortcutsSpec		LähetäViesti
 Shift	ShortcutsSpec	Name for modifier on keyboard	Vaihto-painike
-Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Pikanäppäimet-ohjelma ei kyennyt avaamaan KeySet-tiedostoa!
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Pikanäppäimet-ohjelma ei kyennyt jäsentämään KeySet-tiedostoa!
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Pikanäppäimet-ohjelma ei kyennyt tallentamaan KeySet-tiedostoa!
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Pikanäppäimet-ohjelma ei kyennyt tallentamaan keyset-tiedostoa.
-Shortcuts\n\nBased on SpicyKeys for BeOS made by Jeremy Friesner.	ShortcutsApp		Pikanäppäimet\n\nPerustuu BeOS-käyttöjärjestelmälle tehtyyn SpicyKeys-ohjelmaan, jonka tekijä oli Jeremy Friesner.
+Shortcuts	Application name		Pikanäppäinasetukset
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Pikanäppäinasetukset ei kyennyt avaamaan KeySet-tiedostoa!
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Pikanäppäinasetukset ei kyennyt jäsentämään KeySet-tiedostoa!
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Pikanäppäinsetukset ei kyennyt tallentamaan KeySet-tiedostoa!
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Pikanäppäinasetukset ei kyennyt tallentamaan keyset-tiedostoa.
+Shortcuts\n\nBased on SpicyKeys for BeOS made by Jeremy Friesner.	ShortcutsApp		Pikanäppäinasetukset\n\nPerustuu BeOS-käyttöjärjestelmälle tehtyyn SpicyKeys-ohjelmaan, jonka tekijä oli Jeremy Friesner.
 Window	ShortcutsSpec	Name for modifier on keyboard	Ikkuna

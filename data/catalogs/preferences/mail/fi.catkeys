@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Mail	1372873153
+1	finnish	x-vnd.Haiku-Mail	3984096638
 Account name:	Config Views		Tilin nimi:
 Account settings	Config Views		Tiliasetukset
 Accounts	Config Window		Tilit
@@ -9,6 +9,7 @@ Apply	Config Window		Sovella
 Beta	Config Window		Beeta
 Check every	Config Window		Tarkista joka
 Development	Config Window		Kehitys
+E-mail	Application name		Sähköposti
 Edit mailbox menu…	Config Window		Muokkaa sähköpostilaatikkovalikkoa...
 Error	Config Window		Virhe
 Error retrieving general settings: %s\n	Config Window		Virhe noudettaessa yleisasetuksia: %s\n
@@ -27,7 +28,7 @@ Revert	Config Window		Palauta
 Schedule outgoing mail when dial-up is disconnected	Config Window		Aikatauluta lähtevä sähköposti kun valintayhteys ei ole kytketty
 Settings	Config Window		Asetukset
 Show connection status window:	Config Window		Näytä yhteystilaikkuna:
-Start mail services on startup	Config Window		Käynnistä postipalvelut tietokoneen käynnistyksen yhteydessä
+Start mail services on startup	Config Window		Käynnistä sähköpostipalvelut tietokoneen käynnistyksen yhteydessä
 While sending	Config Window		Lähetettäessä
 While sending and receiving	Config Window		Lähetettäessä ja vastaanotettaessa
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nYleisasetuksia ei voitu palauttaa.\n\nVirhe noudettaessa yleisasetuksia:\n%s\n

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Locale	250177593
+1	finnish	x-vnd.Haiku-Locale	1708263557
 12 hour	TimeFormatSettings		12 tuntia
 24 hour	TimeFormatSettings		24 tuntia
 Available languages	Locale Preflet Window		Valittavat kielet
@@ -10,6 +10,7 @@ Deskbar and Tracker need to be restarted for this change to take effect. Would y
 Formatting	Locale Preflet Window		Muotoillaan
 Full format:	TimeFormatSettings		Kokonainen muoto:
 Language	Locale Preflet Window		Kieli
+Locale	Application name		Paikallisasetukset
 Locale	Locale Preflet		Maa-asetus
 Locale	Locale Preflet Window		Maa-asetus
 Long format:	TimeFormatSettings		Pitkä muoto:
