@@ -1,45 +1,38 @@
-1	romanian	x-vnd.Haiku-Pulse	2756001860
-OK	PrefsWindow		OK
-Quit	DeskbarPulseView		Părăsește
-Pulse	PulseWindow		Puls
-Mini mode	DeskbarPulseView		Mod mini
-Remove replicant	CPUButton		Elimină replicant
-Active color	ConfigView		Culoare activă
-Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Utilizare: Puls [--mini] [-w lățime] [--width=lățime]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
-Fade colors	ConfigView		Culori translucide
-OK	DeskbarPulseView		OK
-Deskbar mode	PrefsWindow		Mod bară de desktop
-Normal mode	PrefsWindow		Mod normal
-Defaults	PrefsWindow		Implicite
-Normal mode	MiniPulseView		Mod normal
-Deskbar	CPUButton		Bară de desktop
-Frame color	ConfigView		Culoare cadru
-Mini mode	PrefsWindow		Mod mini
-OK	PulseApp		OK
-Bar colors	ConfigView		Culori bară
-Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	CPUButton		Puls\n\nDe David Ramsey și Arve Hjønnevåg\nRevizuit de Daniel Switkin
-Settings…	PulseView		Configurări...
-You can't disable the last active CPU.	PulseView		Nu puteți dezactiva ultimul procesor activ.
-Info	CPUButton		Info
-OK	PulseView		OK
-Remove(): %s	DeskbarPulseView		Remove(): %s
-Deskbar menu	CPUButton		Meniul barei de desktop
-About Pulse…	PulseView		Despre Puls...
-Deskbar mode	MiniPulseView		Mod bară de desktop
-Quit	MiniPulseView		Părăsește
-Pulse	NormalPulseView		Puls
-Deskbar mode	NormalPulseView		Mod bară de desktop
-Width of icon:	ConfigView		Lățimea pictogramei:
-Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	PulseWindow		Puls\n\nDe David Ramsey și Arve Hjønnevåg\nRevizuit de Daniel Switkin
-You can't disable the last active CPU.	CPUButton		Nu puteți dezactiva ultimul procesor activ.
-Normal mode	DeskbarPulseView		Mod normal
-OK	CPUButton		OK
+1	romanian	x-vnd.Haiku-Pulse	628764229
 About Pulse…	CPUButton		Despre Puls...
-Mini mode	NormalPulseView		Mod mini
-Info	DeskbarPulseView		Info
-Pulse settings	PulseWindow		Configurări Puls
-Idle color	ConfigView		Culoare în așteptare
-Info	PulseWindow		Info
-Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	DeskbarPulseView		Puls\n\nDe David Ramsey și Arve Hjønnevåg\nRevizuit de Daniel Switkin
-OK	PulseWindow		OK
+About Pulse…	PulseView		Despre Puls...
+Active color	ConfigView		Culoare activă
+Bar colors	ConfigView		Culori bară
 CPU progress bar	NormalPulseView		Bara de progres a procesorului
+Defaults	PrefsWindow		Implicite
+Deskbar	CPUButton		Bară de desktop
+Deskbar menu	CPUButton		Meniul barei de desktop
+Deskbar mode	MiniPulseView		Mod bară de desktop
+Deskbar mode	NormalPulseView		Mod bară de desktop
+Deskbar mode	PrefsWindow		Mod bară de desktop
+Fade colors	ConfigView		Culori translucide
+Frame color	ConfigView		Culoare cadru
+Idle color	ConfigView		Culoare în așteptare
+Info	CPUButton		Info
+Info	DeskbarPulseView		Info
+Mini mode	DeskbarPulseView		Mod mini
+Mini mode	NormalPulseView		Mod mini
+Mini mode	PrefsWindow		Mod mini
+Normal mode	DeskbarPulseView		Mod normal
+Normal mode	MiniPulseView		Mod normal
+Normal mode	PrefsWindow		Mod normal
+OK	CPUButton		OK
+OK	DeskbarPulseView		OK
+OK	PrefsWindow		OK
+OK	PulseApp		OK
+OK	PulseView		OK
+Pulse	NormalPulseView		Puls
+Pulse settings	PulseWindow		Configurări Puls
+Quit	DeskbarPulseView		Părăsește
+Quit	MiniPulseView		Părăsește
+Remove replicant	CPUButton		Elimină replicant
+Settings…	PulseView		Configurări...
+Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Utilizare: Puls [--mini] [-w lățime] [--width=lățime]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
+Width of icon:	ConfigView		Lățimea pictogramei:
+You can't disable the last active CPU.	CPUButton		Nu puteți dezactiva ultimul procesor activ.
+You can't disable the last active CPU.	PulseView		Nu puteți dezactiva ultimul procesor activ.

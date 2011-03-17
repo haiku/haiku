@@ -1,48 +1,40 @@
-1	romanian	x-vnd.Haiku-Devices	1250375801
-Order by:	DevicesView		Ordonează după:
-ACPI controller	Device		Controler ACPI
-Memory controller	Device		Controler de memorie
-Docking station	Device		Stație de andocare
-Computer	Device		Calculator
-Detailed	DevicesView		Detaliat
-Properties	PropertyList		Proprietăți
-Category	DevicesView		Categorie
-Quit	DevicesView		Părăsește
-Device paths	Device		Căi dispozitiv
-Manufacturer\t\t\t: 	Device		Producător\t\t\t:
-Processor	Device		Procesor
+1	romanian	x-vnd.Haiku-Devices	2172461257
 ACPI Information	DeviceACPI		Informații ACPI
-Device Name\t\t\t\t: 	Device		Nume dispozitiv\t\t\t\t:
-Generic system peripheral	Device		Periferic generic de sistem
-Display controller	Device		Controler de afișare
-Mass storage controller	Device		Controler de stocare
-About Devices…	DevicesView		Despre Dispozitive...
-Input device controller	Device		Controler dispozitiv de intrare
-Device paths\t: 	Device		Căi dispozitiv\t:
-Network controller	Device		Controler de rețea
-Devices\n\twritten by Pieter Panman\n\n\tBased on listdev by Jérôme Duval\n\tand the previous Devices preference\n\tby Jérôme Duval and Sikosis\n\tCopyright 2009, Haiku, Inc.\n	DevicesApplication		Dispozitive\n\tscris de Pieter Panman\n\n\tBazat pe listdev de Jérôme Duval\n\tși de preferințele Dispozitive anterioare\n\tde Jérôme Duval și Sikosis\n\tDrepturi de autor 2009, Haiku, Inc.\n
-Driver used	Device		Driver utilizat
-Driver used\t\t\t\t: 	Device		Driver utilizat\t\t\t\t:
-Bus	DevicesView		Magistrală
-Communication controller	Device		Controler de comunicație
+ACPI controller	Device		Controler ACPI
 Basic information	DevicesView		Informații de bază
-PCI Information	DevicePCI		Informații PCI
-Manufacturer:	Device		Producător:
-Multimedia controller	Device		Controler multimedia
-Device name:	Device		Nume dispozitiv:
-Report compatibility	DevicesView		Raportează compatibilitate
-about	DevicesApplication		despre
-Signal processing controller	Device		Controler de procesare a semnalului
-Serial bus controller	Device		Controler de magistrală serială
-Wireless controller	Device		Controler fără fir
-Device name	Device		Nume dispozitiv
-Manufacturer	Device		Producător
-Intelligent controller	Device		Controler inteligent
-Satellite communications controller	Device		Controler de comunicații prin satelit
 Bridge	Device		Punte
-Refresh devices	DevicesView		Reîmprospătează dispozitive
+Bus	DevicesView		Magistrală
+Category	DevicesView		Categorie
+Communication controller	Device		Controler de comunicație
+Computer	Device		Calculator
 Connection	DevicesView		Conexiune
-Generate system information	DevicesView		Generează informații de sistem
-Encryption controller	Device		Controler de criptare
-Unclassified device	Device		Dispozitiv neclasificat
+Detailed	DevicesView		Detaliat
+Device name	Device		Nume dispozitiv
+Device name:	Device		Nume dispozitiv:
+Device paths	Device		Căi dispozitiv
 Devices	DevicesView		Dispozitive
+Display controller	Device		Controler de afișare
+Docking station	Device		Stație de andocare
+Driver used	Device		Driver utilizat
+Encryption controller	Device		Controler de criptare
+Generate system information	DevicesView		Generează informații de sistem
+Generic system peripheral	Device		Periferic generic de sistem
+Input device controller	Device		Controler dispozitiv de intrare
+Intelligent controller	Device		Controler inteligent
+Manufacturer	Device		Producător
+Manufacturer:	Device		Producător:
+Mass storage controller	Device		Controler de stocare
+Memory controller	Device		Controler de memorie
+Multimedia controller	Device		Controler multimedia
+Network controller	Device		Controler de rețea
+Order by:	DevicesView		Ordonează după:
+PCI Information	DevicePCI		Informații PCI
+Processor	Device		Procesor
+Quit	DevicesView		Părăsește
+Refresh devices	DevicesView		Reîmprospătează dispozitive
+Report compatibility	DevicesView		Raportează compatibilitate
+Satellite communications controller	Device		Controler de comunicații prin satelit
+Serial bus controller	Device		Controler de magistrală serială
+Signal processing controller	Device		Controler de procesare a semnalului
+Unclassified device	Device		Dispozitiv neclasificat
+Wireless controller	Device		Controler fără fir

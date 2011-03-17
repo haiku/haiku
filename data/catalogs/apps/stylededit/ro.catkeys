@@ -1,71 +1,71 @@
-1	romanian	x-vnd.Haiku-StyledEdit	391800387
-OK	LoadAlert		OK
+1	romanian	x-vnd.Haiku-StyledEdit	1954300387
 ???	LoadAlert		???
-Left	Menus		Stânga
-Search backwards	FindandReplaceWindow		Caută înapoi 
-Size	Menus		Dimensiune
-Save	QuitAlert		Salvează
-Replace same	Menus		Înlocuiește același
-Can't Undo	Menus		Nu se poate reface
-Save	Menus		Salvează
-Replace with:	FindandReplaceWindow		Înlocuiește cu:
-Case-sensitive	FindandReplaceWindow		Sensibil la majuscule
-Green	Menus		Verde
-Revert to saved…	Menus		Revenire la salvat...
-Yellow	Menus		Galben
-Replace in all windows	FindandReplaceWindow		Înlocuiește în toate ferestrele
-Wrap lines	Menus		Încadrează linii
-Cancel	RevertToSavedAlert		Anulează
-Document	Menus		Document
-Font	Menus		Font
-Replace all	FindandReplaceWindow		Înlocuiește tot
-Default	Open_and_SaveAsPanel		Implicit
-Cancel	FindandReplaceWindow		Anulează
-OK	RevertToSavedAlert		OK
-Don't save	QuitAlert		Nu salva
 Align	Menus		Aliniază
-Color	Menus		Culoare
-Red	Menus		Roșu
-Open…	Menus		Deschide...
-Center	Menus		Centru
+Black	Menus		Negru
 Blue	Menus		Albastru
+Bold	Menus		Aldin
+Can't undo	Menus		Nu se poate reface
+Cancel	FindandReplaceWindow		Anulează
+Cancel	QuitAlert		Anulează
+Cancel	RevertToSavedAlert		Anulează
+Cancel	SaveAlert		Anulează
+Case-sensitive	FindandReplaceWindow		Sensibil la majuscule
+Center	Menus		Centru
+Characters:	Statistics		Caractere:
+Clear	Menus		Eliberează
+Close	Menus		Închide
+Color	Menus		Culoare
+Copy	Menus		Copiază
+Cut	Menus		Taie
 Cyan	Menus		Cyan
-Magenta	Menus		Magenta
-New	Menus		Nou
-Wrap-around search	FindandReplaceWindow		Căutare încadrează împrejur
+Default	Open_and_SaveAsPanel		Implicit
+Document	Menus		Document
+Document statistics	Statistics		Statistici document
+Don't save	QuitAlert		Nu salva
+Don't save	SaveAlert		Nu salva
+Edit	Menus		Editează
+Encoding	Open_and_SaveAsPanel		Codare
+Find	FindandReplaceWindow		Găsește
+Find again	Menus		Găsește din nou
 Find selection	Menus		Găsește selecție
 Find:	FindandReplaceWindow		Găsește:
-Replace	FindandReplaceWindow		Înlocuiește
-Find again	Menus		Găsește din nou
-Cancel	QuitAlert		Anulează
 Find…	Menus		Găsește...
-Black	Menus		Negru
-Untitled 	StyledEditWindow		Fără titlu
+Font	Menus		Font
+Green	Menus		Verde
+Italic	Menus		Cursiv
+Left	Menus		Stânga
+Lines:	Statistics		Linii:
+Magenta	Menus		Magenta
+New	Menus		Nou
+OK	LoadAlert		OK
+OK	RevertToSavedAlert		OK
 OK	SaveAlert		OK
-Find	FindandReplaceWindow		Găsește
-Encoding	Open_and_SaveAsPanel		Codare
-Replace…	Menus		Înlocuiește...
-Right	Menus		Dreapta
-Cancel	SaveAlert		Anulează
-Save	SaveAlert		Salvează
-Don't save	SaveAlert		Nu salva
+OK	Statistics		OK
+Open…	Menus		Deschide...
 Paste	Menus		Lipește
 Print…	Menus		Tipărește...
 Quit	Menus		Părăsește
-Clear	Menus		Eliberează
-Edit	Menus		Editează
-Close	Menus		Închide
-Copy	Menus		Copiază
-Cut	Menus		Taie
-Select all	Menus		Selectează tot
-Save as…	Menus		Salvează ca...
-Lines:	Statistics		Linii:
-Document statistics	Statistics		Statistici document
-Statistics…	Menus		Statistici...
-Words:	Statistics		Cuvinte:
-OK	Statistics		OK
-Undo typing	QuitAlert		Refă tastarea
-Characters:	Statistics		Caractere:
+Red	Menus		Roșu
 Redo typing	QuitAlert		Repetă tastarea
-Italic	Menus		Cursiv
-Bold	Menus		Aldin
+Replace	FindandReplaceWindow		Înlocuiește
+Replace all	FindandReplaceWindow		Înlocuiește tot
+Replace in all windows	FindandReplaceWindow		Înlocuiește în toate ferestrele
+Replace same	Menus		Înlocuiește același
+Replace with:	FindandReplaceWindow		Înlocuiește cu:
+Replace…	Menus		Înlocuiește...
+Revert to saved…	Menus		Revenire la salvat...
+Right	Menus		Dreapta
+Save	Menus		Salvează
+Save	QuitAlert		Salvează
+Save	SaveAlert		Salvează
+Save as…	Menus		Salvează ca...
+Search backwards	FindandReplaceWindow		Caută înapoi 
+Select all	Menus		Selectează tot
+Size	Menus		Dimensiune
+Statistics…	Menus		Statistici...
+Undo typing	QuitAlert		Refă tastarea
+Untitled 	StyledEditWindow		Fără titlu
+Words:	Statistics		Cuvinte:
+Wrap lines	Menus		Încadrează linii
+Wrap-around search	FindandReplaceWindow		Căutare încadrează împrejur
+Yellow	Menus		Galben

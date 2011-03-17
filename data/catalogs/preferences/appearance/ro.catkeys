@@ -1,35 +1,34 @@
-1	romanian	x-vnd.Haiku-Appearance	3440239690
-Shadow	Colors tab		Umbră
-On	AntialiasingSettingsView		Pornit
-Defaults	APRWindow		Implicite
-Shine	Colors tab		Strălucire
-Off	AntialiasingSettingsView		Oprit
-Success	Colors tab		Succes
-Inactive window tab text	Colors tab		Text de fereastră tab inactivă
-Failure	Colors tab		Eşec
-Hinting menu	AntialiasingSettingsView		Meniu de sugestii
-Document background	Colors tab		Fundalul documentului
-Tooltip background	Colors tab		Fundalul indiciului
-Selected menu item background	Colors tab		Fundalul elementului de meniu selectat
-Navigation base	Colors tab		Bază de navigare
-Window tab text	Colors tab		Text fereastră tab
-Document text	Colors tab		Document text
-Navigation pulse	Colors tab		Puls de navigare
-Selected menu item text	Colors tab		Textul elementului de meniu selectat
-Menu background	Colors tab		Fundalul meniului
-Appearance	APRWindow		Aspect
-Panel background	Colors tab		Fundalul panoului
+1	romanian	x-vnd.Haiku-Appearance	1055772204
+Antialiasing menu	AntialiasingSettingsView		Meniu anticrenelare
 Colors	APRWindow		Culori
 Control background	Colors tab		Fundalul controlului   
-Inactive window tab	Colors tab		Fereastră tab inactivă
-Reduce colored edges filter strength:	AntialiasingSettingsView		Reduce intensitatea filtrului marginilor colorate:
 Control text	Colors tab		Text de control
-Tooltip text	Colors tab		Text de indiciu
-Menu item text	Colors tab		Text de element meniu
-LCD subpixel	AntialiasingSettingsView		Subpixel LCD
-Selected menu item border	Colors tab		Marginea elementului de meniu selectat
-Strong	AntialiasingSettingsView		Îngroșat
-Panel text	Colors tab		Text de panou
-Monospaced fonts only	AntialiasingSettingsView		Doar fonturi monospațiate
-Antialiasing menu	AntialiasingSettingsView		Meniu anticrenelare
+Defaults	APRWindow		Implicite
+Document background	Colors tab		Fundalul documentului
+Document text	Colors tab		Document text
+Failure	Colors tab		Eşec
 Glyph hinting:	AntialiasingSettingsView		Indiciu glyph:
+Hinting menu	AntialiasingSettingsView		Meniu de sugestii
+Inactive window tab	Colors tab		Fereastră tab inactivă
+Inactive window tab text	Colors tab		Text de fereastră tab inactivă
+LCD subpixel	AntialiasingSettingsView		Subpixel LCD
+Menu background	Colors tab		Fundalul meniului
+Menu item text	Colors tab		Text de element meniu
+Monospaced fonts only	AntialiasingSettingsView		Doar fonturi monospațiate
+Navigation base	Colors tab		Bază de navigare
+Navigation pulse	Colors tab		Puls de navigare
+Off	AntialiasingSettingsView		Oprit
+On	AntialiasingSettingsView		Pornit
+Panel background	Colors tab		Fundalul panoului
+Panel text	Colors tab		Text de panou
+Reduce colored edges filter strength:	AntialiasingSettingsView		Reduce intensitatea filtrului marginilor colorate:
+Selected menu item background	Colors tab		Fundalul elementului de meniu selectat
+Selected menu item border	Colors tab		Marginea elementului de meniu selectat
+Selected menu item text	Colors tab		Textul elementului de meniu selectat
+Shadow	Colors tab		Umbră
+Shine	Colors tab		Strălucire
+Strong	AntialiasingSettingsView		Îngroșat
+Success	Colors tab		Succes
+Tooltip background	Colors tab		Fundalul indiciului
+Tooltip text	Colors tab		Text de indiciu
+Window tab text	Colors tab		Text fereastră tab

@@ -1,16 +1,12 @@
-1	romanian	x-vnd.Haiku-Network	3489987456
-Gateway:	EthernetSettingsView		Gateway:
-Netmask:	EthernetSettingsView		Mască rețea:
-DHCP	EthernetSettingsView		DHCP
-DNS #2:	EthernetSettingsView		DNS #2:
-Apply	EthernetSettingsView		Aplică
-DNS #1:	EthernetSettingsView		DNS #1:
-Network	NetworkWindow		Rețea
+1	romanian	x-vnd.Haiku-Network	1613092936
 Adapter:	EthernetSettingsView		Adaptor:
-IP address:	EthernetSettingsView		Adresă IP:
-Revert	EthernetSettingsView		Revenire
-Mode:	EthernetSettingsView		Mod:
-The net_server needs to run for the auto configuration!	EthernetSettingsView		net_server trebuie să ruleze pentru configurarea automată!
-Auto-configuring failed: 	EthernetSettingsView		Configurarea automată a eșuat: 
-Static	EthernetSettingsView		Statică
+Apply	EthernetSettingsView		Aplică
+DHCP	EthernetSettingsView		DHCP
+DNS #1:	EthernetSettingsView		DNS #1:
+DNS #2:	EthernetSettingsView		DNS #2:
 Domain:	EthernetSettingsView		Domeniu:
+Gateway:	EthernetSettingsView		Gateway:
+IP address:	EthernetSettingsView		Adresă IP:
+Mode:	EthernetSettingsView		Mod:
+Netmask:	EthernetSettingsView		Mască rețea:
+Revert	EthernetSettingsView		Revenire

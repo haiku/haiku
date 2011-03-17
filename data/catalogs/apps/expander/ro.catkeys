@@ -1,38 +1,32 @@
-1	romanian	x-vnd.Haiku-Expander	2957181365
-Expand	ExpanderMenu		Dezarhivează
-Set destination…	ExpanderMenu		Setează destinația…
-File expanded	ExpanderWindow		Fișier dezarhivat
-The destination is read only.	ExpanderWindow		Destinația este în mod \"doar citire\".
-Expander: Open	ExpanderWindow		Dezarhivator: Deschis
-Select current	DirectoryFilePanel		Selectează curent
-Source	ExpanderWindow		Sursă
-Error when expanding archive	ExpanderWindow		Eroare la dezarhivare
-Hide contents	ExpanderWindow		Ascunde conținut
-Cancel	ExpanderWindow		Renunță
-Continue	ExpanderWindow		Continuă
-Expander	ExpanderWindow	!! Window Title !!	Dezarhivator
-The destination folder does not exist.	ExpanderWindow		Dosarul destinație nu există.
+1	romanian	x-vnd.Haiku-Expander	2233184139
+About Expander…	ExpanderMenu		Despre Dezarhivator…
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Ești sigur că vrei să oprești dezarhivarea\nacestei arhive? Elementele dezarhivate pot fi incomplete.
+Cancel	ExpanderWindow		Renunță
+Close	ExpanderMenu		Închide
+Continue	ExpanderWindow		Continuă
+Destination	ExpanderWindow		Destinație
+Error when expanding archive	ExpanderWindow		Eroare la dezarhivare
+Expand	ExpanderMenu		Dezarhivează
+Expand	ExpanderWindow		Dezarhivează
+Expander: Choose destination	DirectoryFilePanel		Dezarhivator: Alege destinația
+Expander: Open	ExpanderWindow		Dezarhivator: Deschis
+File	ExpanderMenu		Fișier
+File expanded	ExpanderWindow		Fișier dezarhivat
+Hide contents	ExpanderWindow		Ascunde conținut
 Select	DirectoryFilePanel		Selectează
-Creating listing for 	ExpanderWindow		Se crează listare pentru 
+Select '%s'	DirectoryFilePanel		Selectează '%s'
+Select current	DirectoryFilePanel		Selectează curent
+Set destination…	ExpanderMenu		Setează destinația…
+Set source…	ExpanderMenu		Setează sursa…
 Settings	ExpanderMenu		Setări
 Settings…	ExpanderMenu		Setări…
-Expander: Choose destination	DirectoryFilePanel		Dezarhivator: Alege destinația
-Show contents	ExpanderWindow		Afișează conținut
-Expanding file 	ExpanderWindow		Dezarhivare fișier 
-The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Dosarul a fost mutat, redenumit\nsau nu este suportat.
-The file doesn't exist	ExpanderWindow		Fișierul nu există
-Stop	ExpanderMenu		Oprește
-File	ExpanderMenu		Fișier
-Expand	ExpanderWindow		Dezarhivează
-Close	ExpanderMenu		Închide
-The destination is not a folder.	ExpanderWindow		Destinația nu este un dosar.
-About Expander…	ExpanderMenu		Despre Dezarhivator…
-OK	About		Bine
-Set source…	ExpanderMenu		Setează sursa…
-Select '%s'	DirectoryFilePanel		Selectează '%s'
 Show contents	ExpanderMenu		Afișează conținut
+Show contents	ExpanderWindow		Afișează conținut
+Source	ExpanderWindow		Sursă
+Stop	ExpanderMenu		Oprește
 Stop	ExpanderWindow		Oprește
-Destination	ExpanderWindow		Destinație
-\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tscris de Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nversiunea originală Be creată de \nDominic, Hiroshi, Peter, Pavel și Robert\n
-Expander	About		Dezarhivator
+The destination folder does not exist.	ExpanderWindow		Dosarul destinație nu există.
+The destination is not a folder.	ExpanderWindow		Destinația nu este un dosar.
+The destination is read only.	ExpanderWindow		Destinația este în mod \"doar citire\".
+The file doesn't exist	ExpanderWindow		Fișierul nu există
+The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Dosarul a fost mutat, redenumit\nsau nu este suportat.

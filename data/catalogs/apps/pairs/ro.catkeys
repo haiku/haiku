@@ -1,12 +1,11 @@
-1	romanian	x-vnd.Haiku-Pairs	499694401
-Quit game	PairsWindow		Închide jocul
-New game	PairsWindow		Joc nou
-Expert (8x8)	PairsWindow		Avansat (8x8)
+1	romanian	x-vnd.Haiku-Pairs	648353440
 Beginner (4x4)	PairsWindow		Începător (4x4)
+Expert (8x8)	PairsWindow		Avansat (8x8)
 Game	PairsWindow		Joc
-Size	PairsWindow		Dimensiune
-New	PairsWindow		Nou
 Intermediate (6x6)	PairsWindow		Mediu (6x6)
-Quit	PairsWindow		Închide
+New	PairsWindow		Nou
+New game	PairsWindow		Joc nou
 OK	PairsView		OK
-Pairs	PairsWindow		Perechi
+Quit	PairsWindow		Închide
+Quit game	PairsWindow		Închide jocul
+Size	PairsWindow		Dimensiune

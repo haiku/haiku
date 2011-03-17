@@ -1,11 +1,10 @@
-1	romanian	x-vnd.Haiku-Time	2210734856
-OK	Time		OK
-Preview time:	Time		Previzualizare oră:
-about	Time		despre
-Set time zone	Time		Configurează fusul orar
-Time	Time		Oră
-Date & Time	Time		Dată & oră
+1	romanian	x-vnd.Haiku-Time	1134515575
 <Other>	Time		<Altele>
 Current time:	Time		Oră curentă:
-Time zone	Time		Fus orar
+Date & Time	Time		Dată & oră
+OK	Time		OK
+Preview time:	Time		Previzualizare oră:
 Revert	Time		Inversează
+Set time zone	Time		Configurează fusul orar
+Time zone	Time		Fus orar
+about	Time		despre

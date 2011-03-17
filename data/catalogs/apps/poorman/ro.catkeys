@@ -1,57 +1,55 @@
-1	romanian	x-vnd.Haiku.PoorMan	378505618
-Website location	PoorMan		Locația site-ului web
-Error Server	PoorMan		Server de erori
-Settings…	PoorMan		Configurări
-Create PoorMan log	PoorMan		Creează istoric PoorMan
-Web folder:	PoorMan		Dosar web:
-Default	PoorMan		Implicit
-Save log console selection	PoorMan		Salvează selecția consolei de istoric
-Run server	PoorMan		Pornește server
-About PoorMan	PoorMan		Despre PoorMan
-PoorMan settings	PoorMan		Configurări PoorMan
-Clear hit counter	PoorMan		Eliberează contorul de vizite
-Copy	PoorMan		Copiază
-Max. simultaneous connections:	PoorMan		Numărul max. de conexiuni simultane:
-Start page:	PoorMan		Pagină de pornire:
-Create	PoorMan		Creează
-Shutting down.	PoorMan		Se oprește.
-Website options	PoorMan		Opțiuni site web
-File Name	PoorMan		Nume fișier
-Clear console log	PoorMan		Eliberează istoricul consolei
-Advanced	PoorMan		Avansat
-OK	PoorMan		OK
-Status: Stopped	PoorMan		Stare: oprit
-Dir Created	PoorMan		Dosar creat
-Log To File	PoorMan		Înregistrare la fișier
-Quit	PoorMan		Părăsește
-Hits: 0	PoorMan		Vizite: 0
-Save log console	PoorMan		Salvează consolă istoric
-Edit	PoorMan		Editează
-Create log file	PoorMan		Creează fișier istoric
-Log To Console	PoorMan		Înregistrare la consolă
-Directory: (none)	PoorMan		Dosar: (nimic)
-connections	PoorMan		conexiuni
-Status: Running	PoorMan		Stare: pornit
-Controls	PoorMan		Controale
-Send file listing if there's no start page	PoorMan		Trimite lista de fișiere dacă nu există o pagină de pornire
-Error Dir	PoorMan		Dosar de eroare
-Select all	PoorMan		Selectează tot
-File	PoorMan		Fișier
-File logging	PoorMan		Înregistrare fișier
-Save console selections as…	PoorMan		Salvează selecțiile consolei ca...
-Select web folder	PoorMan		Selectează dosar web
-Logging view	PoorMan		Vizualizare înregistrare
-Logging	PoorMan		Înregistrare
-Clear log file	PoorMan		Eliberează fișierul istoric
-Log file name:	PoorMan		Nume fișier istoric:
-Directory: 	PoorMan		Dosar:
+1	romanian	x-vnd.Haiku.PoorMan	3048263345
 About PoorMan…	PoorMan		Despre PoorMan...
-Done	PoorMan		Gata
-Starting up... 	PoorMan		Se pornește...
-Site	PoorMan		Site
+Advanced	PoorMan		Avansat
 Cancel	PoorMan		Anulează
-Console Logging	PoorMan		Înregistrare consolă
 Cannot start the server	PoorMan		Nu se poate porni serverul
-OBOS PoorMan settings	PoorMan		Configurări OBOS PoorMan
-Select	PoorMan		Selectează
+Clear console log	PoorMan		Eliberează istoricul consolei
+Clear hit counter	PoorMan		Eliberează contorul de vizite
+Clear log file	PoorMan		Eliberează fișierul istoric
+Console Logging	PoorMan		Înregistrare consolă
+Controls	PoorMan		Controale
+Copy	PoorMan		Copiază
+Create	PoorMan		Creează
+Create PoorMan log	PoorMan		Creează istoric PoorMan
+Create log file	PoorMan		Creează fișier istoric
+Default	PoorMan		Implicit
+Dir Created	PoorMan		Dosar creat
+Directory: 	PoorMan		Dosar:
+Directory: (none)	PoorMan		Dosar: (nimic)
+Done	PoorMan		Gata
+Edit	PoorMan		Editează
+Error Dir	PoorMan		Dosar de eroare
+Error Server	PoorMan		Server de erori
+File	PoorMan		Fișier
+File Name	PoorMan		Nume fișier
+File logging	PoorMan		Înregistrare fișier
+Hits: 0	PoorMan		Vizite: 0
+Log To Console	PoorMan		Înregistrare la consolă
+Log To File	PoorMan		Înregistrare la fișier
+Log file name:	PoorMan		Nume fișier istoric:
+Logging	PoorMan		Înregistrare
+Logging view	PoorMan		Vizualizare înregistrare
+Max. simultaneous connections:	PoorMan		Numărul max. de conexiuni simultane:
+OK	PoorMan		OK
+PoorMan settings	PoorMan		Configurări PoorMan
+Quit	PoorMan		Părăsește
+Run server	PoorMan		Pornește server
 Save console as…	PoorMan		Salvează consolă ca...
+Save console selections as…	PoorMan		Salvează selecțiile consolei ca...
+Save log console	PoorMan		Salvează consolă istoric
+Save log console selection	PoorMan		Salvează selecția consolei de istoric
+Select	PoorMan		Selectează
+Select all	PoorMan		Selectează tot
+Select web folder	PoorMan		Selectează dosar web
+Send file listing if there's no start page	PoorMan		Trimite lista de fișiere dacă nu există o pagină de pornire
+Settings…	PoorMan		Configurări
+Shutting down.	PoorMan		Se oprește.
+Site	PoorMan		Site
+Start page:	PoorMan		Pagină de pornire:
+Starting up... 	PoorMan		Se pornește...
+Status: Running	PoorMan		Stare: pornit
+Status: Stopped	PoorMan		Stare: oprit
+Web folder:	PoorMan		Dosar web:
+Website location	PoorMan		Locația site-ului web
+Website options	PoorMan		Opțiuni site web
+connections	PoorMan		conexiuni

@@ -1,38 +1,38 @@
 1	romanian	x-vnd.Be-PEPL	2887183035
-Edit	People		Editează
-City	People		Oraș
-none	Groups list		nimic
-Company	People		Companie
-Work phone	People		Telefon de serviciu
-New person	People		Persoană nouă
-Select all	People		Selectează tot
-File	People		Fișier
-Country	People		Țară
-Close	People		Închide
-Group	People		Grup
-Nickname	People		Pseudonim
-Quit	People		Părăsește
-Name	People		Nume
-Revert	People		Revenire
-Undo	People		Refă
-E-mail	People		Email
-Save changes before quitting?	People		Salvați modificările înainte de părăsire?
-OK	People		OK
-Home phone	People		Telefon de acasă
-Save as…	People		Salvează ca...
-Redo	People		Repetă
-Paste	People		Lipește
-Save	People		Salvează
-Person	Short mimetype description		Persoană
-New person…	People		Persoană nouă...
 Address	People		Adresă
-URL	People		Adresă URL
-Sorry	People		Îmi pare rău
-Zip	People		Cod poștal
-Contact information for a person.	Long mimetype description		Informațiile de contact pentru o persoană.
-Fax	People		Fax
-Contact name	People		Nume de contact
-Cut	People		Taie
 Cancel	People		Anulează
-State	People		Stare
+City	People		Oraș
+Close	People		Închide
+Company	People		Companie
+Contact information for a person.	Long mimetype description		Informațiile de contact pentru o persoană.
+Contact name	People		Nume de contact
 Copy	People		Copiază
+Country	People		Țară
+Cut	People		Taie
+E-mail	People		Email
+Edit	People		Editează
+Fax	People		Fax
+File	People		Fișier
+Group	People		Grup
+Home phone	People		Telefon de acasă
+Name	People		Nume
+New person	People		Persoană nouă
+New person…	People		Persoană nouă...
+Nickname	People		Pseudonim
+OK	People		OK
+Paste	People		Lipește
+Person	Short mimetype description		Persoană
+Quit	People		Părăsește
+Redo	People		Repetă
+Revert	People		Revenire
+Save	People		Salvează
+Save as…	People		Salvează ca...
+Save changes before quitting?	People		Salvați modificările înainte de părăsire?
+Select all	People		Selectează tot
+Sorry	People		Îmi pare rău
+State	People		Stare
+URL	People		Adresă URL
+Undo	People		Refă
+Work phone	People		Telefon de serviciu
+Zip	People		Cod poștal
+none	Groups list		nimic

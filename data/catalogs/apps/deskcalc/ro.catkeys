@@ -1,7 +1,4 @@
-1	romanian	x-vnd.Haiku-DeskCalc	1668905289
-About DeskCalc…	CalcView		Despre DeskCalc...
-about	CalcView		despre
-Show keypad	CalcView		Afișează tastatura numerică
-Enable Num Lock on startup	CalcView		Activează tasta Num Lock la pornire
-DeskCalc v2.1.0\n\nwritten by Timothy Wayper,\nStephan Aßmus and Ingo Weinhold\n\n©1997, 1998 R3 Software Ltd.\n©2006-2009 Haiku, Inc.\n\nAll Rights Reserved.	CalcView		DeskCalc v2.1.0\n\nscris de Timothy Wayper,\nStephan Aßmus și Ingo Weinhold\n\n©1997, 1998 R3 Software Ltd.\n©2006-2009 Haiku, Inc.\n\nToate drepturile rezervate.
+1	romanian	x-vnd.Haiku-DeskCalc	1432606073
 Audio Feedback	CalcView		Reacție audio
+Enable Num Lock on startup	CalcView		Activează tasta Num Lock la pornire
+Show keypad	CalcView		Afișează tastatura numerică

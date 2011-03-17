@@ -1,13 +1,13 @@
 1	romanian	system	1624661606
+%.2f TiB	StringForSize		%.2f TiB
 %3.2f GiB	StringForSize		%3.2f GiB
 %3.2f KiB	StringForSize		%3.2f KiB
-%d bytes	StringForSize		%d octeți
-%.2f TiB	StringForSize		%.2f TiB
 %3.2f MiB	StringForSize		%3.2f MiB
-Green:	ColorControl		Verde:
-Red:	ColorControl		Roșu:
+%d bytes	StringForSize		%d octeți
+About…	AboutWindow		Despre...
 Blue:	ColorControl		Albastru:
 Close	AboutWindow		Închide
-Written by:	AboutWindow		Scris de:
-About…	AboutWindow		Despre...
 Copyright © %years% Haiku, Inc.	AboutWindow		Drepturi de autor © %years% Haiku, Inc.
+Green:	ColorControl		Verde:
+Red:	ColorControl		Roșu:
+Written by:	AboutWindow		Scris de:

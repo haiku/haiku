@@ -1,7 +1,7 @@
 1	romanian	x-vnd.Haiku-ReadOnlyBootPrompt	2165068388
 Desktop (Live-CD)	BootPromptWindow		Birou (Live-CD)
-Language	BootPromptWindow		Limbaj
-Welcome to Haiku!	BootPromptWindow		Bun venit în Haiku!
-Run Installer	BootPromptWindow		Rulează Instalator
 Do you wish to run the Installer or continue booting to the Desktop? You can also select your preferred language and keyboard layout from the list below.\n\nNote: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.	BootPromptWindow		Dorești să rulezi Instalatorul sau să continui către Birou? Poți selecta limba preferată și aranjamentul tastaturii din lista de mai jos.\n\nNotă: Localizarea aplicațiilor Haiku și a celorlalte componente este un efort în derulare. Poți da peste șiruri care nu sunt traduse, dar dacă dorești, ne poți ajuta la <www.haiku-os.org>.
 Keymap	BootPromptWindow		Aranjament taste
+Language	BootPromptWindow		Limbaj
+Run Installer	BootPromptWindow		Rulează Instalator
+Welcome to Haiku!	BootPromptWindow		Bun venit în Haiku!

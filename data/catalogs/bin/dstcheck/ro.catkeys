@@ -1,7 +1,4 @@
-1	romanian	x-vnd.Haiku-cmd-dstconfig	2552303152
+1	romanian	x-vnd.Haiku-cmd-dstconfig	1891332014
+.\n\nIs this the correct time?	dstcheck		.\n\nAceasta este ora corectă?
 Ask me later	dstcheck		Întreabă-mă mai târziu
 Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is	dstcheck		Atenție!\n\nDin cauza schimbării de la ora de zi, ceasul calculatorului dumneavoastră s-ar putea să fie cu o oră mai devreme.\nCalculatorul dumneavoastră crede că este 
-No	dstcheck		Nu
-Yes	dstcheck		Da
-Would you like to set the clock?	dstcheck		Doriți să configurați ceasul?
-.\n\nIs this the correct time?	dstcheck		.\n\nAceasta este ora corectă?

@@ -1,10 +1,7 @@
-1	romanian	x-vnd.Haiku-WebPTranslator	3502239072
-Version %d.%d.%d, %s	ConfigView		Versiune %d.%d.%d, %s
+1	romanian	x-vnd.Haiku-WebPTranslator	1423533669
 WebP Images	ConfigView		Imagini WebP
-WebP images	WebPTranslator		Imagini WebP
-WebPTranslator Settings	ConfigView		Configurări TraducătorWebP
 WebP Settings	main		Configurări WebP
 WebP image	WebPTranslator		Imagine WebP
-stream GetSize(): %lld\n	WebPTranslator		flux GetSize(): %lld\n
-Based on libwebp v0.1	ConfigView		Bazat pe libwebp v0.1
 WebP image translator	WebPTranslator		Traducător imagine WebP
+WebP images	WebPTranslator		Imagini WebP
+WebPTranslator Settings	ConfigView		Configurări TraducătorWebP
