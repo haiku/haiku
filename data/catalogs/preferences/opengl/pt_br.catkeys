@@ -1,20 +1,9 @@
-1	brazilian_portuguese	x-vnd.Haiku-OpenGL	3380666128
-List stack size:	Capabilities		Tamanho da pilha de listas:
-Information	InfoView		Informações
-Max. clipping planes:	Capabilities		Número de planos de clipping:
-Max. texture units:	Capabilities		Número máximo de texturas:
-Renderer name:	InfoView		Nome do renderizador:
-Vendor name:	InfoView		Nome do fabricante:
-Attributes stack size:	Capabilities		Tamanho da pilha de atributos:
-Auxiliary buffer(s):	Capabilities		Memória(s) temporária(s) auxiliar(es):
-Max. recommended vertex elements:	Capabilities		Número máximo de vertíces recomendado:
-GLU version:	InfoView		Versão GLU:
-Projection stack size:	Capabilities		Tamanho da pilha de projeção:
-Max. lights:	Capabilities		Número máximo de luzes:
-Max. 2D texture size:	Capabilities		Tamanho máximo de texturas 2D:
-Max. convolution:	Capabilities		Convolução máxima:
-Texture stack size:	Capabilities		Tamanho da pilha de texturas:
-Max. evaluators equation order:	Capabilities		Ordem máxima dos avaliadores de equações:
-Max. 3D texture size:	Capabilities		Tamanho máxido de texturas 3D:
+1	brazilian_portuguese	x-vnd.Haiku-OpenGL	1627733364
 Capabilities	Capabilities		Capacidades
-Max. recommended index elements:	Capabilities		Número de elementos de índices recomendado:
+Max. 2D texture size:	Capabilities		Tamanho máximo de texturas 2D:
+Max. 3D texture size:	Capabilities		Tamanho máxido de texturas 3D:
+Max. lights:	Capabilities		Número máximo de luzes:
+Max. recommended vertex elements:	Capabilities		Número máximo de vertíces recomendado:
+Max. texture units:	Capabilities		Número máximo de texturas:
+Projection stack size:	Capabilities		Tamanho da pilha de projeção:
+Vendor name:	InfoView		Nome do fabricante:

@@ -1,10 +1,8 @@
-1	brazilian_portuguese	x-vnd.Haiku-Fonts	227503181
-Plain font:	Font view		Fonte normal:
+1	brazilian_portuguese	x-vnd.Haiku-Fonts	4115084591
+Bold font:	Font view		Negrito:
 Defaults	Main window		Padrões
-Fonts	Main window		Fontes
+Fixed font:	Font view		Fixo:
 Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Fontes\n\tCopyright 2004-2005, Haiku.\n\n
-Revert	Main window		Desfazer
-Menu font:	Font view		Fonte do menu:
-Fixed font:	Font view		Fonte fixa:
+Menu font:	Font view		Menu:
+Plain font:	Font view		Normal:
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Aqui jaz Xavier Bonifácio Portugal, lisboeta, hoje e sempre descance em paz.
-Bold font:	Font view		Fonte em negrito:

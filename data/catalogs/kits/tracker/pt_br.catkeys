@@ -1,124 +1,122 @@
-1	brazilian_portuguese	x-vnd.Haiku-libtracker	139125009
-OK	WidgetAttributeText		OK
-Icon view	VolumeWindow		Em ícones
+1	brazilian_portuguese	x-vnd.Haiku-libtracker	2240079555
+%Ld bytes	WidgetAttributeText		%Ld bytes
+%name info	InfoWindow	InfoWindow Title	Informações de %name
+%num items	CountView		%num itens
+(%SizeProcessed of %TotalSize, %BytesPerSecond/s)	StatusWindow		(%SizeProcessed de %TotalSize, %BytesPerSecond/s)
+(Finish: %time - Over %finishtime hours left)	StatusWindow		(Término: %time - até %finishtime horas restantes)
+32 x 32	ContainerWindow		32 x 32
+Add printer…	ContainerWindow		Adicionar impressora...
+Add-ons	ContainerWindow		Adicionais
 Add-ons	FilePanelPriv		Adicionais
-Desktop	Model		Desktop
-Identify	ContainerWindow		Identificar
-Warning space color	SettingsView		Cor do espaço de aviso
+Add-ons	VolumeWindow		Adicionais
+All disks	AutoMounterSettings		Todos os discos
+Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Você tem certeza que deseja mover ou copiar o(s) item(ns) selecionado(s) para esta pasta?
+Cancel	FSUtils		Cancelar
+Cannot unmount the boot volume \"%name\".	FSUtils		Não foi possível desmontar volume de boot \"%name\".
+Clean up	DeskWindow		Organizar
+Clean up	VolumeWindow		Organizar
 Close	VolumeWindow		Fechar
-Open	OpenWithWindow		Abrir
-Tracker status	StatusWindow		Status do Tracker
-Eject when unmounting	AutoMounterSettings		Ejetar quando desmontar
-Window	ContainerWindow		Janela 
-Decrease size	ContainerWindow		Diminuir tamanho
-Mini icon view	VolumeWindow		Em miniaturas
-You must have at least one attribute showing.	PoseView		Você precisa ao menos de um atributo visível.
-Permissions	InfoWindow		Permissões
-Invert selection	VolumeWindow		Inverter seleção
-Recent documents	FavoritesMenu		Documentos recentes
-Modified	QueryPoseView		Modificado
-Created	ContainerWindow		Criado
-If you %action the home folder, Haiku may not behave properly! Are you sure you want to do this? To %action the home anyway, click \"Do it\".	FSUtils		Se você %action a pasta home, o Haiku pode não funcionar corretamente! Você tem certeza que deseja continuar? Para %action a pasta home de qualquer maneira, clique em \"Fazer mesmo assim\".
-Error %error loading Add-On %name.	ContainerWindow		Erro %error ao carregar o Adicional %name.
-contains	SelectionWindow		contém
-Sorry, you can't save things at the root of your system.	FilePanelPriv		Desculpe, mas você não pode salvar coisas no menu raiz de seu sistema.
-Show shared volumes on Desktop	SettingsView		Mostrar volumes compartilhados no Desktop
-Paste links	ContainerWindow		Colar links
-Name	OpenWithWindow		Nome
+Close all in workspace	ContainerWindow		Fechar tudo no workspace
+Copy to	ContainerWindow		Copiar para
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Não foi possível abrir \"%document\" porque o aplicativo \"%app\" está na Lixeira.
+Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Não foi possível abrir \"%document\" com o aplicativo \"%app\" (Bibliotecas faltantes: %library). \n
+Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Não foi possível abrir \"%name\". O arquivo está erroneamente marcado como executável.
+Create %s clipping	PoseView		Criar %s recorte
+Create link	ContainerWindow		Criar atalho
+Create link here	ContainerWindow		Criar atalho aqui
+Created	ContainerWindow		Criado
+Cut	FilePanelPriv		Recortar
+Decrease size	ContainerWindow		Diminuir tamanho
+Decrease size	DeskWindow		Diminuir tamanho
+Defaults	TrackerSettingsWindow		Padrões
+Delete	ContainerWindow		Deletar
+Delete	PoseView		Deletar
+Desktop	Model		Desktop
+Disks	Model		Discos
+Do it	FSUtils		Fazer mesmo assim
+Edit name	ContainerWindow		Editar nome
+Edit templates…	TemplatesMenu		Editar modelos...
+Eject when unmounting	AutoMounterSettings		Ejetar quando desmontar
+Empty Trash	ContainerWindow		Limpar Lixeira
+Emptying Trash… 	StatusWindow		Limpando Lixeira...
+Error %error loading Add-On %name.	ContainerWindow		Erro %error ao carregar o Adicional %name.
+Error calculating folder size.	InfoWindow		Erro calculando o tamanho da pasta.
+Favorites	FavoritesMenu		Favoritos
 File	ContainerWindow		Arquivo
 Handles any %type	OpenWithWindow		Lidar com qualquer %tipo
-Delete	ContainerWindow		Deletar
-32 x 32	ContainerWindow		32 x 32
-Cannot unmount the boot volume \"%name\".	FSUtils		Não foi possível desmontar volume de boot \"%name\".
-Open with…	ContainerWindow		Abrir com...
-(Finish: %time - Over %finishtime hours left)	StatusWindow		(Término: %time - até %finishtime horas restantes)
-Write	FilePermissionsView		Escrever
-for %num files	InfoWindow		em %num arquivos
-Modified	PoseView		Modificado
-Make active printer	ContainerWindow		Marcar como impressora ativa
-Create link here	ContainerWindow		Criar atalho aqui
-Moving: 	StatusWindow		Movendo: 
-before	FindPanel		antes
-On	FindPanel		Em
-MiB	WidgetAttributeText		MiB
-greater than	FindPanel		maior que
-Delete	PoseView		Deletar
-Select all	ContainerWindow		Selecionar tudo
-Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Desculpe, o atributo 'Charactere' não pode armazenar um valor do tipo multi-byte.
-Clean up	DeskWindow		Organizar
-You cannot copy or move the root directory.	FSUtils		Você não pode copiar ou mover o menu raiz
+Icon view	ContainerWindow		Em ícones
+Icon view	VolumeWindow		Em ícones
+Identify	ContainerWindow		Identificar
+Ignore case	SelectionWindow		ignorar caso
+Increase size	DeskWindow		Aumentar tamanho
+Invert selection	ContainerWindow		Inverter seleção
 Invert selection	FilePanelPriv		Inverter seleção
-save text	FilePanelPriv		salvar texto
-Select all	FilePanelPriv		Selecionar tudo
+Invert selection	VolumeWindow		Inverter seleção
+KiB	WidgetAttributeText		KiB
+Kind	ContainerWindow		Espécie
 Link to:	InfoWindow		Atalho para:
+List view	VolumeWindow		Em lista
 Location	ContainerWindow		Local
 Location	QueryPoseView		Local
-Icon view	ContainerWindow		Em ícones
-Size	QueryPoseView		Tamanho
-Emptying Trash… 	StatusWindow		Limpando Lixeira...
-Close all in workspace	ContainerWindow		Fechar tudo no workspace
-Empty Trash	ContainerWindow		Limpar Lixeira
-Name = %name	FindPanel	FindResultTitle	Nome = %name
-Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Você tem certeza que deseja mover ou copiar o(s) item(ns) selecionado(s) para esta pasta?
-Mount server error	AutoMounterSettings		Erro do servidor de montagem
-Do it	FSUtils		Fazer mesmo assim
-Search	FindPanel		Localizar
-Preparing to empty Trash…	StatusWindow		Preparando para limpar a Lixeira...
-Disks	Model		Discos
-Create link	ContainerWindow		Criar atalho
-Decrease size	DeskWindow		Diminuir tamanho
-Size	ContainerWindow		Tamanho
-All disks	AutoMounterSettings		Todos os discos
-Would you like to find some other suitable application?	FSUtils		Você gostaria de encontrar outro aplicativo que possa servir?
-Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Não foi possível abrir \"%document\" com o aplicativo \"%app\" (Bibliotecas faltantes: %library). \n
-no items	CountView		sem itens
-Ignore case	SelectionWindow		ignorar caso
-is not	FindPanel		não é
-OK	AutoMounterSettings		OK
-Windows	TrackerSettingsWindow		Janelas
-Tracker preferences	TrackerSettingsWindow		Preferências do Tracker
-Cut	FilePanelPriv		Recortar
-Replace	FilePanelPriv		Substituir
-rename	TextWidget		renomear
-Select all	VolumeWindow		Selecionar tudo
-Opens with:	InfoWindow		Abre com:
-Open	ContainerWindow		Abrir
-(%SizeProcessed of %TotalSize, %BytesPerSecond/s)	StatusWindow		(%SizeProcessed de %TotalSize, %BytesPerSecond/s)
-Error calculating folder size.	InfoWindow		Erro calculando o tamanho da pasta.
-New folder	FilePanelPriv		Nova pasta
-%name info	InfoWindow	InfoWindow Title	Informações de %name
-Favorites	FavoritesMenu		Favoritos
-Add-ons	VolumeWindow		Adicionais
-Sorry, you can't copy items to the Trash.	PoseView		Desculpe, você não pode copiar itens para a Lixeira.
-List view	VolumeWindow		Em lista
-matches wildcard expression	SelectionWindow		encaixa na expressão coringa
-You cannot replace a folder or a symbolic link with a file.	FSUtils		Você não pode substituir uma pasta ou um atalho por um arquivo.
-Show space bars on volumes	SettingsView		Mostrar barras de espaço nos volumes
-Invert selection	ContainerWindow		Inverter seleção
-Increase size	DeskWindow		Aumentar tamanho
-Resize to fit	ContainerWindow		Reduzir para caber
-%Ld bytes	WidgetAttributeText		%Ld bytes
-Add printer…	ContainerWindow		Adicionar impressora...
-Open	VolumeWindow		Abrir
-New folder	ContainerWindow		Nova pasta
-Kind	ContainerWindow		Espécie
-Select…	ContainerWindow		Selecionar....
-Copy to	ContainerWindow		Copiar para
-Move to Trash	ContainerWindow		Mover para Lixeira
-Move to	ContainerWindow		Mover para
-Create %s clipping	PoseView		Criar %s recorte
-Set new link target	InfoWindow		Selecione o destino do atalho
-Save as Query template:	FindPanel		Salvar como modelo de Consulta
-Cancel	FSUtils		Cancelar
-Edit name	ContainerWindow		Editar nome
-Show volumes on Desktop	SettingsView		Mostrar volumes no Desktop
-KiB	WidgetAttributeText		KiB
-Defaults	TrackerSettingsWindow		Padrões
-%num items	CountView		%num itens
+Make active printer	ContainerWindow		Marcar como impressora ativa
+MiB	WidgetAttributeText		MiB
 Mini icon view	ContainerWindow		Em miniatura
-Clean up	VolumeWindow		Organizar
+Mini icon view	VolumeWindow		Em miniaturas
+Modified	PoseView		Modificado
+Modified	QueryPoseView		Modificado
+Mount server error	AutoMounterSettings		Erro do servidor de montagem
+Move to	ContainerWindow		Mover para
+Move to Trash	ContainerWindow		Mover para Lixeira
+Moving: 	StatusWindow		Movendo: 
+Name	OpenWithWindow		Nome
+Name = %name	FindPanel	FindResultTitle	Nome = %name
+New folder	ContainerWindow		Nova pasta
+New folder	FilePanelPriv		Nova pasta
+OK	AutoMounterSettings		OK
 OK	TrackerInitialState		OK
-Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Não foi possível abrir \"%name\". O arquivo está erroneamente marcado como executável.
-Add-ons	ContainerWindow		Adicionais
-Edit templates…	TemplatesMenu		Editar modelos...
+OK	WidgetAttributeText		OK
+On	FindPanel		Em
+Open	ContainerWindow		Abrir
+Open	OpenWithWindow		Abrir
+Open	VolumeWindow		Abrir
+Open with…	ContainerWindow		Abrir com...
+Opens with:	InfoWindow		Abre com:
+Paste links	ContainerWindow		Colar links
+Permissions	InfoWindow		Permissões
+Preparing to empty Trash…	StatusWindow		Preparando para limpar a Lixeira...
+Recent documents	FavoritesMenu		Documentos recentes
+Replace	FilePanelPriv		Substituir
+Resize to fit	ContainerWindow		Reduzir para caber
+Save as Query template:	FindPanel		Salvar como modelo de Consulta
+Search	FindPanel		Localizar
+Select all	ContainerWindow		Selecionar tudo
+Select all	FilePanelPriv		Selecionar tudo
+Select all	VolumeWindow		Selecionar tudo
+Select…	ContainerWindow		Selecionar....
+Set new link target	InfoWindow		Selecione o destino do atalho
+Show shared volumes on Desktop	SettingsView		Mostrar volumes compartilhados no Desktop
+Show space bars on volumes	SettingsView		Mostrar barras de espaço nos volumes
+Show volumes on Desktop	SettingsView		Mostrar volumes no Desktop
+Size	ContainerWindow		Tamanho
+Size	QueryPoseView		Tamanho
+Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Desculpe, o atributo 'Charactere' não pode armazenar um valor do tipo multi-byte.
+Sorry, you can't copy items to the Trash.	PoseView		Desculpe, você não pode copiar itens para a Lixeira.
+Sorry, you can't save things at the root of your system.	FilePanelPriv		Desculpe, mas você não pode salvar coisas no menu raiz de seu sistema.
+Tracker preferences	TrackerSettingsWindow		Preferências do Tracker
+Tracker status	StatusWindow		Status do Tracker
+Warning space color	SettingsView		Cor do espaço de aviso
+Window	ContainerWindow		Janela 
+Windows	TrackerSettingsWindow		Janelas
+Would you like to find some other suitable application?	FSUtils		Você gostaria de encontrar outro aplicativo que possa servir?
+Write	FilePermissionsView		Escrever
+You cannot copy or move the root directory.	FSUtils		Você não pode copiar ou mover o menu raiz
+You cannot replace a folder or a symbolic link with a file.	FSUtils		Você não pode substituir uma pasta ou um atalho por um arquivo.
+You must have at least one attribute showing.	PoseView		Você precisa ao menos de um atributo visível.
+before	FindPanel		antes
+contains	SelectionWindow		contém
+for %num files	InfoWindow		em %num arquivos
+greater than	FindPanel		maior que
+is not	FindPanel		não é
+matches wildcard expression	SelectionWindow		encaixa na expressão coringa
+no items	CountView		sem itens
+save text	FilePanelPriv		salvar texto

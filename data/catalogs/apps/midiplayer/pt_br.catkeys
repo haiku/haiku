@@ -1,8 +1,7 @@
-1	brazilian_portuguese	x-vnd.Haiku-MidiPlayer	1718140311
-Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Haiku MIDI Player 1.0.0 beta\n\nAplicativo\nque sabe como tocar\ncentenas de sons bregas
-Reverb:	Main Window		Reverberação:
-Dungeon	Main Window		Calabouço
-Play	Main Window		Tocar
-Scope	Main Window		Espectro
-MidiPlayer	Main Window		Tocador de MIDI
+1	brazilian_portuguese	x-vnd.Haiku-MidiPlayer	4197210655
 Drop MIDI file here	Scope View		Jogue aqui o arquivo MIDI
+Dungeon	Main Window		Calabouço
+Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Haiku MIDI Player 1.0.0 beta\n\nAplicativo\nque sabe como tocar\ncentenas de sons bregas
+Play	Main Window		Tocar
+Reverb:	Main Window		Reverberação:
+Scope	Main Window		Espectro

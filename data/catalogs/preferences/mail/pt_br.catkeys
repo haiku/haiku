@@ -1,48 +1,29 @@
-1	brazilian_portuguese	x-vnd.Haiku-Mail	1416961282
-Select account type	Config Views		Selecionar tipo de conta
-Mail checking	Config Window		Checar mail
-Settings	Config Window		Configurações
-Only when dial-up is connected	Config Window		Somente quando estiver conectado
-While sending and receiving	Config Window		Enquanto envia e recebe
-days	Config Window		dias
-Start mail services on startup	Config Window		Iniciar serviços de mail na inicialização
-Receive mail only	Config Views		Somente receber mail
+1	brazilian_portuguese	x-vnd.Haiku-Mail	778748048
 Account name:	Config Views		Nome da conta
-OK	Config Views		OK
-The filter could not be moved. Deleting filter.	Config Views		O filtro não pode ser movido. Deletando filtro.
-Revert	Config Window		Reverter
-Accounts	Config Window		Contas
-Account type:	Config Views		Tipo de conta:
-Remove	Config Window		Remover
-Miscellaneous	Config Window		Diversos
-Show connection status window:	Config Window		Mostrar janela de status de conexão:
-While sending	Config Window		Enquanto envia
-Schedule outgoing mail when dial-up is disconnected	Config Window		Agendar saída de mail quando estiver desconectado
-hours	Config Window		horas
-Add	Config Window		Adicionar
-Send mail only	Config Views		Enviar mail somente
-E-mail	Account		E-mail
-Unnamed	Account		Sem nome
-\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nAs configurações gerais não puderam ser revertidas.\n\Erro ao ler as configurações gerais:\n%s\n
-Send and receive mail	Config Views		Enviar e receber mail
-Real name:	Config Views		Nome real:
-· Outgoing	Account		· Caixa de Saída
-Return address:	Config Views		Endereço de retorno:
-· E-mail filters	Account		· Filtros de E-Mail
-· Incoming	Account		· Caixa de Entrada
-Edit mailbox menu…	Config Window		Editar menu da caixa de mail...
-Remove	Config Views		Remover
-Could not create inbound chain.	Account		Não foi possível criar uma cadeia de abastecimento.
-Check every	Config Window		Checar periodicamente
-never	Config Window		nunca
-Incoming mail filters	Config Views		Filtros de mail recebidos
 Account settings	Config Views		Configurações da conta
-minutes	Config Window		minutos
-Error retrieving general settings: %s\n	Config Window		Erro ao ler as configurações gerais: %s\n
-OK	Account		OK
-Apply	Config Window		Aplicar
-Could not create outbound chain.	Account		Não foi possível criar uma cadeia de abastecimento.
+Accounts	Config Window		Contas
+Add	Config Window		Adicionar
 Always	Config Window		Sempre
-Add filter	Config Views		Adicionar filtro
-Outgoing mail filters	Config Views		Filtros de mail enviados
+Apply	Config Window		Aplicar
+Check every	Config Window		Checar periodicamente
+Edit mailbox menu…	Config Window		Editar menu da caixa de mail...
+Error retrieving general settings: %s\n	Config Window		Erro ao ler as configurações gerais: %s\n
+Mail checking	Config Window		Checar mail
+Miscellaneous	Config Window		Detalhes
+Only when dial-up is connected	Config Window		Somente quando estiver conectado
+Real name:	Config Views		Nome real:
+Remove	Config Window		Remover
+Return address:	Config Views		Endereço de retorno:
+Revert	Config Window		Reverter
+Schedule outgoing mail when dial-up is disconnected	Config Window		Agendar saída de mail quando estiver desconectado
+Settings	Config Window		Configurações
+Show connection status window:	Config Window		Mostrar janela de status de conexão:
+Start mail services on startup	Config Window		Iniciar serviços de mail na inicialização
+While sending	Config Window		Enquanto envia
+While sending and receiving	Config Window		Enquanto envia e recebe
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nAs configurações gerais não puderam ser revertidas.\n\Erro ao ler as configurações gerais:\n%s\n
 \n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nCrie uma nova conta com o botão Adicionar.\n\nRemova uma conta com o botão Remover no item selecionado.\n\nSelecione um item na lista para mudar suas configurações.
+days	Config Window		dias
+hours	Config Window		horas
+minutes	Config Window		minutos
+never	Config Window		nunca

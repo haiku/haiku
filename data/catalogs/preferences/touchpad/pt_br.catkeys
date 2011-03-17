@@ -1,14 +1,4 @@
-1	brazilian_portuguese	x-vnd.Haiku-Touchpad	2104608255
-Scrolling	TouchpadPrefView		Deslocamento
-Revert	TouchpadPrefView		Reverter
-Two finger scrolling	TouchpadPrefView		Deslocamento com dois dedos
+1	brazilian_portuguese	x-vnd.Haiku-Touchpad	3340103500
 Defaults	TouchpadPrefView		Padrões
-Slow	TouchpadPrefView		Lento
-High	TouchpadPrefView		Alto
-Tap gesture	TouchpadPrefView		Gesto de toque
-Horizontal scrolling	TouchpadPrefView		Deslocamento horizontal
 Fast	TouchpadPrefView		Rápido
-Tap click sensitivity	TouchpadPrefView		Sensitividade do toque
-Scroll acceleration	TouchpadPrefView		Aceleração da deslocação
-Off	TouchpadPrefView		Desligado
-Touchpad	TouchpadMain		Touchpad
+Scroll acceleration	TouchpadPrefView		Aceleração do deslocamento

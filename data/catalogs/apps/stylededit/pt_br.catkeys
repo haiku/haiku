@@ -1,28 +1,25 @@
-1	brazilian_portuguese	x-vnd.Haiku-StyledEdit	3451303769
-Search backwards	FindandReplaceWindow		Localizar anterior
-Size	Menus		Tamanho
-Save	QuitAlert		Salvar
-Replace same	Menus		Substituir tudo
-Can't Undo	Menus		Impossível desfazer
-Save	Menus		Salvar
-Replace with:	FindandReplaceWindow		Substituir por:
+1	brazilian_portuguese	x-vnd.Haiku-StyledEdit	2469567507
+Can't undo	Menus		Impossível desfazer
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Impossível reverter, arquivo não encontrado: \"%s\".
-Revert to saved…	Menus		Reverter para arquivo salvo...
-Save changes to the document \"%s\"? 	QuitAlert		Salvar as alterações ao documento \"%s\"? 
-Font	Menus		Fonte
-Default	Open_and_SaveAsPanel		Padrões
-Don't save	QuitAlert		Não salvar
 Center	Menus		Centralizado
-Find selection	Menus		Localizar seleção
-Error saving \"%s\":\n%s	SaveAlert		Erro ao salvar \"%s\":\n%s
-Save	SaveAlert		Salvar
-Don't save	SaveAlert		Não salvar
-This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Este arquivo está marcado como somente leitura. Salvar alterações ao documento \"%s\"?
-Paste	Menus		Colar.
-File	Menus		Arquivo
-Clear	Menus		Limpar.
-Edit	Menus		Editar
+Clear	Menus		Limpar
 Copy	Menus		Copiar
 Cut	Menus		Recortar
-Select all	Menus		Selecionar tudo
+Default	Open_and_SaveAsPanel		Padrões
+Don't save	QuitAlert		Não salvar
+Don't save	SaveAlert		Não salvar
+Edit	Menus		Editar
+Error saving \"%s\":\n%s	SaveAlert		Erro ao salvar \"%s\":\n%s
+File	Menus		Arquivo
+Find selection	Menus		Localizar seleção
+Font	Menus		Fonte
+Paste	Menus		Colar
+Replace same	Menus		Substituir tudo
+Revert to saved…	Menus		Reverter para arquivo salvo...
+Save	Menus		Salvar
+Save	QuitAlert		Salvar
+Save	SaveAlert		Salvar
 Save as…	Menus		Salvar como...
+Save changes to the document \"%s\"? 	QuitAlert		Salvar as alterações ao documento \"%s\"? 
+Select all	Menus		Selecionar tudo
+This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Este arquivo está marcado como somente leitura. Salvar alterações ao documento \"%s\"?

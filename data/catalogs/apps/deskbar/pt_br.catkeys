@@ -1,24 +1,21 @@
-1	brazilian_portuguese	x-vnd.Be-TSKB	1987844061
+1	brazilian_portuguese	x-vnd.Be-TSKB	1025568137
+<Be folder is empty>	BeMenu		<Pasta Be está vazia>
 Applications	PreferencesWindow		Aplicativos
-Recent applications	BeMenu		Aplicativos recentes
+Close all	WindowMenu		Fechar tudo
 Edit menu…	PreferencesWindow		Editar menu...
+Expand new applications	PreferencesWindow		Expandir novos aplicativos
+Hide all	WindowMenu		Ocultar tudo
+No windows	WindowMenu		Sem janelas
+Quit application	WindowMenu		Fechar aplicativo
+Recent applications	BeMenu		Aplicativos recentes:
+Recent applications:	PreferencesWindow		Aplicativos recentes:
+Recent documents	BeMenu		Documentos recentes:
 Recent documents:	PreferencesWindow		Documentos recentes:
 Recent folders	BeMenu		Pastas recentes:
-Sort running applications	PreferencesWindow		Ordenar aplicativos em execução
-<Be folder is empty>	BeMenu		<Pasta Be está vazia>
-Show all	WindowMenu		Mostrar tudo
-No windows	WindowMenu		Sem janelas
-Deskbar preferences…	BeMenu		Preferências da Mesa de Trabalho...
-Show application expander	PreferencesWindow		Mostrar expansor de aplicativo
-Close all	WindowMenu		Fechar tudo
-Deskbar preferences	PreferencesWindow		Preferências da Mesa de Trabalho
-Recent applications:	PreferencesWindow		Aplicativos recentes:
-Tracker always first	PreferencesWindow		Tracker sempre em primeiro
-About Haiku…	BeMenu		Sobre o Haiku...
-Show calendar…	TimeView		Mostrar calendário...
 Restart system	BeMenu		Reiniciar o sistema
-Expand new applications	PreferencesWindow		Expandir novos aplicativos
-Recent documents	BeMenu		Documentos recentes:
-Hide all	WindowMenu		Ocultar tudo
+Show all	WindowMenu		Mostrar tudo
+Show application expander	PreferencesWindow		Mostrar expansor de aplicativo
+Show calendar…	TimeView		Mostrar calendário...
 Shutdown…	BeMenu		Desligar...
-Quit application	WindowMenu		Fechar aplicativo
+Sort running applications	PreferencesWindow		Ordenar aplicativos em execução
+Tracker always first	PreferencesWindow		Tracker sempre em primeiro

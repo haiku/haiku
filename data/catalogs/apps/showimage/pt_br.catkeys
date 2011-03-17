@@ -1,62 +1,27 @@
-1	brazilian_portuguese	x-vnd.Haiku-ShowImage	3986770096
-Use as background…	Menus		Usar como papel de parede...
-5 seconds	Menus		5 segundos
-Slide delay	Menus		Tempo de transição
-Zoom in	Menus		Aumentar zoom
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		O documento '%s' foi modificado. Você deseja fechar o documento?
-8 seconds	Menus		8 segundos
-Previous page	Menus		Página anterior
-View	Menus		Visualizar
-Full screen	Menus		Tela inteira
-Go to page	Menus		Ir para a página
-Zoom out	Menus		Diminuir zoom
-20 seconds	Menus		20 segundos
-3 seconds	Menus		3 segundos
-Rotate counterclockwise	Menus		Girar em sentido antiorário
-10 seconds	Menus		10 segundos
-High-quality zooming	Menus		Zoom em alta qualidade
-Browse	Menus		Navegar
-6 seconds	Menus		6 segundos
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Não foi possível abrir a imagem! Ou um arquivo ou um tradutor de imagem necessário não existe.
-First page	Menus		Primeira página
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		O documento '%s' (página %d) foi modificado. Você deseja fechar o documento?
-About ShowImage…	Menus		Sobre o Visualizador de Imagens…
-Close	ClosePrompt		Fechar
-Undo	Menus		Desfazer
-Resize to (in 1/72 inches):	PrintOptionsWindow		Redimensionar para (em 1/72 polegadas):
-9 seconds	Menus		9 segundos
-Flip left to right	Menus		Inverter da esquerda para direita
-Show caption in full screen mode	Menus		Mostrar legenda no modo de tela inteira
-DPI:	PrintOptionsWindow		DPI:
-Next file	Menus		Próximo arquivo
-4 seconds	Menus		4 segundos
-Close document	ClosePrompt		Fechar documento
-Height: 	PrintOptionsWindow		Altura: 
-Cancel	ClosePrompt		Cancelar
-Print options	PrintOptionsWindow		Opções de impressão
-ShowImage	AboutWindow		Visualizador de Imagens
-7 seconds	Menus		7 segundos
-Last page	Menus		Última página
-Previous file	Menus		Arquivo anterior
-Slide show	Menus		Show de slides
-Fit image to page	PrintOptionsWindow		Ajudar a imagem a página
-Flip top to bottom	Menus		Inverter de cima para baixo
-Zoom factor in %:	PrintOptionsWindow		Zoom em %:
-Width:	PrintOptionsWindow		Largura:
-Image	Menus		Imagem
-Rotate clockwise	Menus		Girar em sentido horário
-Job setup	PrintOptionsWindow		Configurar trabalho
-Original size	Menus		Tamanho original
-Next page	Menus		Próxima página
-OK	SaveToFile		OK
-The file '%s' could not be written.	SaveToFile		Este arquivo '%s' não pode ser escrito.
-Progress monitor	ProgressWindow		Monitor de progresso
-File	Menus		Arquivo
-Page setup…	Menus		Configurar página...
-Print…	Menus		Imprimir..
-Quit	Menus		Sair
-Edit	Menus		Editar
+1	brazilian_portuguese	x-vnd.Haiku-ShowImage	2808395036
 Close	Menus		Fechar
 Copy	Menus		Copiar
-Select all	Menus		Selecionar tudo
+Edit	Menus		Editar
+File	Menus		Arquivo
+Fit image to page	PrintOptionsWindow		Ajudar a imagem a página
+Flip left to right	Menus		Inverter da esquerda para direita
+Flip top to bottom	Menus		Inverter de cima para baixo
+Full screen	Menus		Tela inteira
+High-quality zooming	Menus		Zoom em alta qualidade
+Job setup	PrintOptionsWindow		Configurar trabalho
+Next file	Menus		Próximo arquivo
+OK	SaveToFile		OK
+Page setup…	Menus		Configurar página...
+Previous file	Menus		Arquivo anterior
+Print…	Menus		Imprimir..
+Progress monitor	ProgressWindow		Monitor de progresso
+Quit	Menus		Sair
+Rotate clockwise	Menus		Girar em sentido horário
+Rotate counterclockwise	Menus		Girar em sentido antiorário
 Save as…	Menus		Salvar como...
+Select all	Menus		Selecionar tudo
+Show caption in full screen mode	Menus		Mostrar legenda no modo de tela inteira
+Slide show	Menus		Show de slides
+The file '%s' could not be written.	SaveToFile		Este arquivo '%s' não pode ser escrito.
+Undo	Menus		Desfazer
+View	Menus		Visualizar

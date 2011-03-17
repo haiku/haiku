@@ -1,21 +1,21 @@
 1	brazilian_portuguese	x-vnd.Haiku-Appearance	3611717032
-Control highlight	Colors tab		Realce do controle
+Control background	Colors tab		Plano de fundo do controle
 Control border	Colors tab		Borda do controle
-Shadow	Colors tab		Sombra
+Control highlight	Colors tab		Realce do controle
+Control text	Colors tab		Texto do controle
 Defaults	APRWindow		Padrões
-Grayscale	AntialiasingSettingsView		Escala de cinza
-Inactive window tab text	Colors tab		Texto da aba de janela inativa
 Document background	Colors tab		Plano de fundo do documento
-Window tab	Colors tab		Aba da janela
-Tooltip background	Colors tab		Plano de fundo das dicas
-Selected menu item background	Colors tab		Plano de fundo do item de menu seleccionado
-Window tab text	Colors tab		Texto da aba da Janela
-Selected menu item text	Colors tab		Texto do item do menu selecionado
+Grayscale	AntialiasingSettingsView		Escala de cinza
+Inactive window tab	Colors tab		Aba da janela inativa
+Inactive window tab text	Colors tab		Texto da aba de janela inativa
 Menu background	Colors tab		Plano de fundo de menu
 Panel background	Colors tab		Plano de fundo do painel
-Control background	Colors tab		Plano de fundo do controle
-Inactive window tab	Colors tab		Aba da janela inativa
-Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		A possibilidade de usar o antiserrilhamento baseado em Subpíxeis juntamente com o alisamento de glifos não está disponível nesta versão do Haiku para evitar possíveis problemas com patentes. Para habilitar esta funcionalidade, você terá que compilar o Haiku e ativar certas opções no cabeçalho de configuração da libfreetype.
-Control text	Colors tab		Texto do controle
-Tooltip text	Colors tab		Texto da dica
+Selected menu item background	Colors tab		Plano de fundo do item de menu selecionado
 Selected menu item border	Colors tab		Borda do item de menu selecionado
+Selected menu item text	Colors tab		Texto do item do menu selecionado
+Shadow	Colors tab		Sombra
+Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		A possibilidade de usar o antiserrilhamento baseado em Subpíxeis juntamente com o alisamento de glifos não está disponível nesta versão do Haiku para evitar possíveis problemas com patentes. Para habilitar esta funcionalidade, você terá que compilar o Haiku e ativar certas opções no cabeçalho de configuração da libfreetype.
+Tooltip background	Colors tab		Plano de fundo das dicas
+Tooltip text	Colors tab		Texto da dica
+Window tab	Colors tab		Aba da janela
+Window tab text	Colors tab		Texto da aba da Janela
