@@ -1,32 +1,32 @@
 1	danish	x-vnd.Haiku-About	326778460
-Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (og hans NewOS kerne)\n
+%.2f GHz	AboutView		%.2f GHz
+%ld MHz	AboutView		%ld MHz
 %ld Processors:	AboutView		%ld Processorer:
+... and the many people making donations!\n\n	AboutView		... og de mange folk der har doneret!\n\n
+About this system	AboutWindow		Omkring dette system
+Contributors:\n	AboutView		Bidragydere:\n
+Current maintainers:\n	AboutView		Nuværende vedligeholdere:\n
+GCC %d Hybrid	AboutView		GCC %d Hybrid
+Kernel:	AboutView		Kerne:
+License: 	AboutView		Licens: 
+Licenses: 	AboutView		Licenser: 
+Memory:	AboutView		Hukommelse:
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (projekt grundlægger)\n\n
-The Haiku-Ports team\n	AboutView		Haiku-Ports holdet\n
-Website, marketing & documentation:\n	AboutView		Website, marketing & dokumentation:\n
+Past maintainers:\n	AboutView		Tidligere vedligeholdere:\n
+Processor:	AboutView		Processor:
 Revision	AboutView		Revision
 Source Code: 	AboutView		Kildekode: 
-Processor:	AboutView		Processor:
-Kernel:	AboutView		Kerne:
-Contributors:\n	AboutView		Bidragydere:\n
-Unknown	AboutView		Ukendt
-\n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… og sikkert nogle flere vi har glemt at nævne (undskyld!)\n\n
-%.2f GHz	AboutView		%.2f GHz
-Memory:	AboutView		Hukommelse:
-Past maintainers:\n	AboutView		Tidligere vedligeholdere:\n
-\n\nSpecial thanks to:\n	AboutView		\n\nSpecielt tak til:\n
-Licenses: 	AboutView		Licenser: 
-\nCopyrights\n\n	AboutView		\nOphavsrettigheder\n\n
-Current maintainers:\n	AboutView		Nuværende vedligeholdere:\n
-Time running:	AboutView		Tid kørt:
-The Haikuware team and their bounty program\n	AboutView		Haikuware holdet og deres dusør program\n
-About this system	AboutWindow		Omkring dette system
-Version:	AboutView		Version:
-%ld MHz	AboutView		%ld MHz
-[Click a license name to read the respective license.]\n\n	AboutView		[Klik på et licens navn for at læse det.]\n\n
-License: 	AboutView		Licens: 
-Translations:\n	AboutView		Oversættelser:\n
-... and the many people making donations!\n\n	AboutView		... og de mange folk der har doneret!\n\n
 The BeGeistert team\n	AboutView		BeGeistert holdet\n
+The Haiku-Ports team\n	AboutView		Haiku-Ports holdet\n
+The Haikuware team and their bounty program\n	AboutView		Haikuware holdet og deres dusør program\n
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku and the Haiku logo are trademarks of Haiku, Inc.\n\n	AboutView		Ophavsretten til Haiku koden er ejet af Haiku, Inc. eller af den respektive forfatter, hvis udtrykkeligt skrevet i koden. Haiku og Haiku logoet er trademarks ejet af Haiku, Inc.\n\n
-GCC %d Hybrid	AboutView		GCC %d Hybrid
+Time running:	AboutView		Tid kørt:
+Translations:\n	AboutView		Oversættelser:\n
+Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (og hans NewOS kerne)\n
+Unknown	AboutView		Ukendt
+Version:	AboutView		Version:
+Website, marketing & documentation:\n	AboutView		Website, marketing & dokumentation:\n
+[Click a license name to read the respective license.]\n\n	AboutView		[Klik på et licens navn for at læse det.]\n\n
+\nCopyrights\n\n	AboutView		\nOphavsrettigheder\n\n
+\n\nSpecial thanks to:\n	AboutView		\n\nSpecielt tak til:\n
+\n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… og sikkert nogle flere vi har glemt at nævne (undskyld!)\n\n

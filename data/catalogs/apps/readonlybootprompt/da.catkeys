@@ -1,7 +1,7 @@
 1	danish	x-vnd.Haiku-ReadOnlyBootPrompt	2165068388
 Desktop (Live-CD)	BootPromptWindow		Skrivebord (Live-CD)
-Language	BootPromptWindow		Sprog
-Welcome to Haiku!	BootPromptWindow		Velkommen til Haiku!
-Run Installer	BootPromptWindow		Kør Installer
 Do you wish to run the Installer or continue booting to the Desktop? You can also select your preferred language and keyboard layout from the list below.\n\nNote: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.	BootPromptWindow		Ønsker du at køre installationssprogrammet eller at fortsætte til skrivebordet? Du kan også vælge dit ønskede sprog og tastaturlayout fra listen nedenfor.\n\nBemærk: Oversættelse af programmer og andre komponenter er en igangværende proces. Du vil ofte støde på uoversatte tekst-strenge. Hvis du ønsker at bidrage, venligst besøg <www.haiku-os.org>.
 Keymap	BootPromptWindow		Tastatur layout
+Language	BootPromptWindow		Sprog
+Run Installer	BootPromptWindow		Kør Installer
+Welcome to Haiku!	BootPromptWindow		Velkommen til Haiku!

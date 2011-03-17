@@ -1,20 +1,19 @@
-1	danish	x-vnd.Haiku-CPUFrequencyPref	4060072235
-Ok	Status view		OK
+1	danish	x-vnd.Haiku-CPUFrequencyPref	3974849433
 CPU frequency status view	CPU Frequency View		CPU frekvens statusoversigt
-Set state	Status view		Sæt tilstand
-Defaults	Pref Window		Standard indstillinger
-Install replicant into Deskbar	CPU Frequency View		Indsæt replikant i Deskbar
-Quit	Status view		Afslut
-High performance	Status view		Høj ydeevne
-Stepping policy	CPU Frequency View		Accelerationspolitik
-Dynamic performance	Status view		Dynamisk ydeevne
-Step up by CPU usage	Color Step View		Acceleration efter CPU belastning
-Dynamic stepping	CPU Frequency View		Dynamisk acceleration
-Stepping policy: 	CPU Frequency View		Accelerationspolitik: 
-Integration time [ms]: 	CPU Frequency View		Integrationstid [ms]: 
-Open Speedstep preferences…	Status view		Åben Speedstep egenskaber…
-Revert	Pref Window		Tilbagestil
-Low energy	Status view		Lavt energiforbrug
-Launching the CPU frequency preflet failed.\n\nError: 	Status view		Det var ikke muligt at starte CPU frekvens indstillings programmet.\n\nFejl: 
 CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPUFrekvens\n\tskrevet af Clemens Zeidler\n\tOphavsret 2009, Haiku, Inc.\n
-CPU Frequency	Main window		CPU Frekvens
+Defaults	Pref Window		Standard indstillinger
+Dynamic performance	Status view		Dynamisk ydeevne
+Dynamic stepping	CPU Frequency View		Dynamisk acceleration
+High performance	Status view		Høj ydeevne
+Install replicant into Deskbar	CPU Frequency View		Indsæt replikant i Deskbar
+Integration time [ms]: 	CPU Frequency View		Integrationstid [ms]: 
+Launching the CPU frequency preflet failed.\n\nError: 	Status view		Det var ikke muligt at starte CPU frekvens indstillings programmet.\n\nFejl: 
+Low energy	Status view		Lavt energiforbrug
+Ok	Status view		OK
+Open Speedstep preferences…	Status view		Åben Speedstep egenskaber…
+Quit	Status view		Afslut
+Revert	Pref Window		Tilbagestil
+Set state	Status view		Sæt tilstand
+Step up by CPU usage	Color Step View		Acceleration efter CPU belastning
+Stepping policy	CPU Frequency View		Accelerationspolitik
+Stepping policy: 	CPU Frequency View		Accelerationspolitik: 
