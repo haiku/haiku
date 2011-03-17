@@ -1,7 +1,6 @@
-1	czech	x-vnd.Haiku-InstalledPackages	3041446229
+1	czech	x-vnd.Haiku-InstalledPackages	2164686753
 BeOS legacy .pkg package removing application for Haiku.\n\nCopyright 2007,\nŁukasz 'Sil2100' Zemczak\n\nCopyright (c) 2007 Haiku, Inc.\n	UninstallApplication		Původní BeOS aplikace pro odebírání .pkg balíčků pro Haiku.\n\nCopyright 2007,\nŁukasz 'Sil2100' Zemczak\n\nCopyright (c) 2007 Haiku, Inc.\n
 Close	UninstallApplication		Zavřít
-Installed packages	UninstallWindow		Nainstalované balíčky
 InstalledPackages	UninstallApplication		InstalledPackages
 No package selected.	UninstallView		Nevybrány žádné balíčky.
 OK	UninstallView		OK

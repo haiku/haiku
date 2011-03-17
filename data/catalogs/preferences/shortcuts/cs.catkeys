@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-Shortcuts	1120793954
+1	czech	x-vnd.Haiku-Shortcuts	2152414241
 (Choose application with file requester)	ShortcutsWindow		(Vyberte aplikaci v dialogu výběru souboru)
 *Beep	ShortcutsWindow		*Pýýp
 *InsertString \"Your Text Here\"	ShortcutsWindow		*Vložit řetězec \"Váš text zde\"
@@ -47,7 +47,6 @@ Save KeySet as…	ShortcutsWindow		Uložit KeySet jako...
 Select	ShortcutsWindow		Vybrat
 SendMessage	ShortcutsSpec		Zaslat zprávu
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
-Shortcuts	ShortcutsWindow		Zkratky
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Zkratky nemohly otevřít váš soubor KeySet!
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Zkratky nebyly schopny analyzovat váš soubor KeySet!
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Zkratky nebyly schopny uložit váš soubor KeySet!

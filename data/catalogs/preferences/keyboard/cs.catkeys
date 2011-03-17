@@ -1,9 +1,8 @@
-1	czech	x-vnd.Haiku-Keyboard	914649575
+1	czech	x-vnd.Haiku-Keyboard	1078858058
 Defaults	KeyboardWindow		Výchozí
 Delay until key repeat	KeyboardView		Prodleva před opakováním
 Fast	KeyboardView		Rychle
 Key repeat rate	KeyboardView		Rychlost opakování kláves
-Keyboard	KeyboardWindow		Klávesnice
 Long	KeyboardView		Dlouho
 OK	KeyboardApplication		OK
 Revert	KeyboardWindow		Vrátit

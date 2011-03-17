@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-DiskProbe	1552395580
+1	czech	x-vnd.Haiku-DiskProbe	2592803962
 %ld (native)	ProbeView		%Id (nativní)
 (native)	ProbeView		(nativní)
 15 bit	TypeEditors		15-bit
@@ -53,11 +53,9 @@ Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it i
 Device	ProbeView		Zařízení
 Device offset: 	ProbeView		Ofset zařízení:
 Device: 	ProbeView		Zařízení:
-DiskProbe	OpenWindow		DiskProbe
 DiskProbe request	AttributeWindow		Požadavek DiskProbe
 DiskProbe request	DiskProbe		Požadavek DiskProbe
 DiskProbe request	ProbeView		Požadavek DiskProbe
-DiskProbe\n\twritten by Axel Dörfler\n\tCopyright 2004-2007, Haiku.\n\nOriginal Be version by Robert Polic\n	DiskProbe		DiskProbe\n\tnapsal Axel Dörfler\n\tCopyright 2004-2007, Haiku Inc.\n\nOriginalní BeOS verze od Robert Polic\n
 Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Určitě chcete odebrat atribut \"%s\" ze souboru \"%s\"? Tuto akci nelze vzít zpět.
 Don't save	ProbeView		Neukládat
 Double precision floating-point value:	TypeEditors		Hodnota Double precision floating-point:

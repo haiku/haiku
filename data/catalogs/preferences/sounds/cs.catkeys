@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-Sounds	3382039821
+1	czech	x-vnd.Haiku-Sounds	145262565
 <none>	HEventList		<žádný>
 <none>	HWindow		<žádný>
 About Sounds	SoundsHApp		O Sounds
@@ -11,7 +11,6 @@ Other…	HWindow		Jiný...
 Play	HWindow		Přehrát
 Sound	HEventList		Zvuk
 Sound File:	HWindow		Soubor zvuku:
-Sounds	SoundsHApp		Sounds
 Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Sounds\n Vytvořili:\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n Původní autor Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku
 Stop	HWindow		Zastavit
 This is not an audio file.	HWindow		Tohle není soubor zvuku.

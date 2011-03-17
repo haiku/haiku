@@ -1,4 +1,4 @@
-1	czech	x-vnd.Be-MAIL	2797564879
+1	czech	x-vnd.Be-MAIL	1806372798
 %d - Date	Mail		%d - Datum
 %e - E-mail address	Mail		%e - E-mailová adresa
 %n - Full name	Mail		%n - Plné jméno
@@ -60,7 +60,6 @@ Initial spell check mode:	Mail		Úvodní kontrola pravopisu
 Leave as '%s'	Mail		Ponechat jako '%s'
 Leave as New	Mail		Ponechat jako nové
 Leave same	Mail		Nechat beze změn
-Mail	Mail		Pošta
 Mail couldn't find its dictionary.	Mail		Mail nemohl najít svůj slovník.
 Mail preferences	Mail		Volby e-mailu
 Mail\n\n	Mail		Pošta\n\n

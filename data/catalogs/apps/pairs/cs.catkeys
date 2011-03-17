@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-Pairs	3736877909
+1	czech	x-vnd.Haiku-Pairs	1126884905
 Beginner (4x4)	PairsWindow		Začátečník (4x4)
 Expert (8x8)	PairsWindow		Expert (8x8)
 Game	PairsWindow		Hra
@@ -6,9 +6,7 @@ Intermediate (6x6)	PairsWindow		Pokročilý (6x6)
 New	PairsWindow		Nová
 New game	PairsWindow		Nová hra
 OK	PairsView		OK
-Pairs	PairsWindow		Páry
 Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		Páry nenašly v systému dost vektorových ikon; potřebují alespoň %d.
-Pairs\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYou completed the game in %s clicks.\n	PairsWindow		Páry\n\tnapsal Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nDokončili jste hru za %s kliknutí.\n
 Quit	PairsWindow		Ukončit
 Quit game	PairsWindow		Ukončit hru
 Size	PairsWindow		Velikost

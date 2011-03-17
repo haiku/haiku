@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-ShowImage	3385354583
+1	czech	x-vnd.Haiku-ShowImage	1479416858
 %SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS sekund
 About ShowImage…	Menus		O ShowImage...
 Browse	Menus		Prohlížet
@@ -45,8 +45,6 @@ Save as…	Menus		Uložit jako...
 Select all	Menus		Vybrat vše
 Selection Mode	Menus		Režim výběru
 Show caption in full screen mode	Menus		Zobrazit popisek v režimu celé obrazovky
-ShowImage	AboutWindow		ShowImage
-ShowImage	Menus		ShowImage
 Slide delay	Menus		Prodleva mezi snímky
 Slide show	Menus		Slideshow
 Stretch to window	Menus		Roztáhnout do velikosti okna

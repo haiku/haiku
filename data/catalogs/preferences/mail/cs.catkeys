@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-Mail	3023422579
+1	czech	x-vnd.Haiku-Mail	1372873153
 Account name:	Config Views		Název účtu:
 Account settings	Config Views		Nastavení účtu
 Accounts	Config Window		Úcty
@@ -9,7 +9,6 @@ Apply	Config Window		Použít
 Beta	Config Window		Beta
 Check every	Config Window		Ověřit každých
 Development	Config Window		Vývoj
-E-mail	Config Window		E-mail
 Edit mailbox menu…	Config Window		Upravit nabídku schránky
 Error	Config Window		Chyba
 Error retrieving general settings: %s\n	Config Window		Chyba při získávání obecných nastavení: %s\n

@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-FileTypes	686287948
+1	czech	x-vnd.Haiku-FileTypes	297877771
 %1 application type	Application Type Window		%1 typ aplikace
 %ld Application type%s could be removed.	Application Types Window		typ%s aplikace %ld by mohl být odstraněn.
 %s file type	FileType Window		%s typ souboru
@@ -71,7 +71,6 @@ File could not be opened	Preferred App Menu		Soubor nemohl být otevřen
 File recognition	FileTypes Window		Rozpoznání souboru
 File type	FileType Window		Typ souboru
 FileTypes	FileTypes		FileTypes
-FileTypes	FileTypes Window		FileTypes
 FileTypes request	FileTypes		FileTypes požadují
 FileTypes request	FileTypes Window		Požadavek FileTypes
 FileTypes request	Preferred App Menu		Požadavek FileTypes

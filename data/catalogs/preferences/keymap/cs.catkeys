@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-Keymap	4175672673
+1	czech	x-vnd.Haiku-Keymap	3858687220
 (Current)	Keymap window		(Aktuální)
 Acute trigger	Keymap window		Aktivace čárky
 Circumflex trigger	Keymap window		Aktivace cirkumflexu
@@ -6,7 +6,6 @@ Diaeresis trigger	Keymap window		Aktivace diaeresis
 File	Keymap window		Soubor
 Font	Keymap window		Font
 Grave trigger	Keymap window		Aktivace grave
-Keymap	Keymap window		Rozložení klávesnice
 Layout	Keymap window		Rozložení
 Open…	Keymap window		Otevřít...
 Quit	Keymap window		Zavřít

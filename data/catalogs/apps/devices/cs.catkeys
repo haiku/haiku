@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-Devices	189828730
+1	czech	x-vnd.Haiku-Devices	1465776728
 ACPI Information	DeviceACPI		Informace o ACPI
 ACPI Processor Namespace '%2'	DeviceACPI		ACPI Namespace Processoru '%2'
 ACPI System Bus	DeviceACPI		ACPI Systémová Sběrnice
@@ -8,8 +8,6 @@ ACPI bus	Device		Sběrnice ACPI
 ACPI bus	DevicesView		Sběrnice ACPI
 ACPI controller	Device		ACPI kontroler
 ACPI node '%1'	DeviceACPI		ACPI uzel '%1'
-About	DevicesApplication		o
-About Devices…	DevicesView		O Devices...
 Basic information	DevicesView		Základní informace
 Bridge	Device		Bridge
 Bus	DevicesView		Sběrnice
@@ -30,9 +28,8 @@ Device name	DevicePCI		Název zařízení
 Device name:	Device		Jméno zařízení:
 Device paths	Device		Cesty zařízení
 Device paths	DevicePCI		Cesta zařízení
-Devices	DevicesApplication		Zařízení
+Devices	Application name		Zařízení
 Devices	DevicesView		Zařízení
-Devices\n\twritten by Pieter Panman\n\n\tBased on listdev by Jérôme Duval\n\tand the previous Devices preference\n\tby Jérôme Duval and Sikosis\n\tCopyright 2009, Haiku, Inc.\n	DevicesApplication		Devices\n\tnapsal Pieter Panman\n\n\tVytvořeno na základě listdev od Jerôme Duval\n\ta předchozích Devices preference\n\tod Jérôme Duval and Sikosis\n\tCopyright 2009, Haiku, Inc.\n
 Display controller	Device		Kontroler obrazovky
 Docking station	Device		Dokovací stanice
 Driver used	Device		Použitý ovladač
@@ -56,7 +53,6 @@ Network controller	Device		Kontroler sítě
 None	Device		Nic
 Not implemented	DeviceACPI		Neimplementováno
 Not implemented	DevicePCI		Neimplementováno
-OK	DevicesApplication		OK
 Order by:	DevicesView		Seřadit podle:
 PCI Information	DevicePCI		PCI informace
 PCI bus	Device		Sběrnice PCI

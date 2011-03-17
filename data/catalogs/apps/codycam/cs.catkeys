@@ -1,6 +1,4 @@
-1	czech	x-vnd.Haiku.CodyCam	1322454590
-About CodyCam	CodyCam		O CodyCam
-About Codycam…	CodyCam		O CodyCam...
+1	czech	x-vnd.Haiku.CodyCam	441085909
 Can't find an available connection to the video window	CodyCam		Nemohu najít žádné dostupné připojení k oknu videa
 Cannot connect the video source to the video window	CodyCam		Nemohu připojit zdroj videa k oknu videa
 Cannot create a video window	CodyCam		Nemohu vytvořit okno videa
@@ -18,10 +16,8 @@ Cannot start time source!	CodyCam		Nemohu spustit zdroj času!
 Capture Rate Menu	CodyCam		Menu četnosti zachycení
 Capture controls	CodyCam		Ovládání zachycení
 Capturing Image…	VideoConsumer.cpp		Zachycení obrázku...
-Close	CodyCam		Zavřít
 Closing the window\n	VideoConsumer.cpp		Zavírám okno\n
-CodyCam	CodyCam		CodyCam
-CodyCam\n\nThe Original BeOS webcam	CodyCam		CodyCam\n\nOriginální BeOS webkamera
+CodyCam	Application name		CodyCam
 Connected…	VideoConsumer.cpp		Připojeno...
 Couldn't find requested directory on server	VideoConsumer.cpp		Nebylo možné na serveru najít požadovaný adresář 
 Directory:	CodyCam		Adresář:

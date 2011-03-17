@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-MediaPlayer	2559622077
+1	czech	x-vnd.Haiku-MediaPlayer	2133469082
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Americký)
 100% scale	MediaPlayer-Main		100% měřítko
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
@@ -12,7 +12,6 @@
 <unknown>	PlaylistItem-author		<neznámý>
 <unnamed>	PlaylistItem-name		<bezejmenný>
 <untitled>	PlaylistItem-title		<bez titulku>
-About MediaPlayer…	MediaPlayer-Main		O MediaPlayer...
 All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Všechny soubory nemohly být přesunuty do Koše.
 Always on top	MediaPlayer-Main		Vždy navrchu
 Aspect ratio	MediaPlayer-Main		Poměr stran
@@ -51,10 +50,7 @@ Lock Peaks	MediaPlayer-PeakView		Zamknout špičky
 Loop movies by default	MediaPlayer-SettingsWindow		Spouštět filmy implicitně ve smyčce
 Loop sounds by default	MediaPlayer-SettingsWindow		Implicitně přehrávat zvuky ve smyčce
 Low volume	MediaPlayer-SettingsWindow		Nízká hlasitost
-MediaPlayer	MediaPlayer-Main		Přehrávač médií
-MediaPlayer encountered an internal error. The file could not be opened.	MediaPlayer-Main		Přehrávač médií se setkal s vnitřní chybou. Soubor nemohl být otevřen.
 MediaPlayer settings	MediaPlayer-SettingsWindow		Nastavení Přehrávače médií
-MediaPlayer\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		Přehrávač médií\n\nNapsali Marcus Overhagen, Stephan Aßmus a Frederik Modéen
 Medium	MediaPlayer-SettingsWindow		Střední
 Move Entries	MediaPlayer-MovePLItemsCmd		Přesunout položky
 Move Entry	MediaPlayer-MovePLItemsCmd		Přesunout položku
@@ -136,6 +132,5 @@ Video track	MediaPlayer-Main		Video stopa
 View options	MediaPlayer-SettingsWindow		Volby zobrazení
 Volume	MediaPlayer-Main		Hlasitost
 Volume of background clips	MediaPlayer-SettingsWindow		Hlasitost klipů na pozadí
-error	MediaPlayer-Main		chyba
 none	Audio track menu		žádný
 none	Subtitles menu		žádný

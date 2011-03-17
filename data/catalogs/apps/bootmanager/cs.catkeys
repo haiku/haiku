@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-BootManager	1082581841
+1	czech	x-vnd.Haiku-BootManager	140416535
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Obnova Master Boot Record (MBR) disku %disk ze souboru %file připravena. Přejete si pokračovat?
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Nabídka zavaděče je připravena k zápisu na disk. Chcete pokračovat?
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Tato nabídka zavaděče je připravena k zápisu na startovací disk (%s). Než budete pokračovat, vše si prosím ještě ověřte.
@@ -13,9 +13,8 @@ At least one partition must be selected!	BootManagerController		Musí být zvole
 Back	BootManagerController	Button	Zpět
 Backup Master Boot Record	BootManagerController	Title	Záloha Master Boot Record
 Boot Manager is unable to read the partition table!	BootManagerController		Zavaděč nemůže přečíst tabulku oddílů!
-BootManager	BootManager	Application name	Zavaděč
+BootManager	Application name		Zavaděč
 Cannot access!	DrivesPage	Cannot install	Přístup odepřen!
-Copyright %year, Haiku Inc.\n	BootManager	Leave %year untranslated	Copyright %year, Haiku Inc.\n
 Default Partition	DefaultPartitionPage	Title	Implicitní oddíl
 Default Partition:	DefaultPartitionPage	Menu field label	Výchozí oddíl:
 Done	BootManagerController	Button	Hotovo
@@ -30,7 +29,6 @@ Installation of boot menu failed	BootManagerController	Title	Selhání instalace
 Never	DefaultPartitionPage		Nikdy
 Next	WizardView	Button	Dále
 No space available!	DrivesPage	Cannot install	Není dost místa!
-OK	BootManager		OK
 OK	BootManagerController	Button	OK
 Old Master Boot Record Saved failure	BootManagerController	Title	Selhání zálohy starého Mater Boot Record
 Old Master Boot Record saved	BootManagerController	Title	Úspěšná záloha Master Boot Record
@@ -65,4 +63,3 @@ Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Neznámý
 Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Bezejmena %d
 Update	DrivesPage	Button	Aktualizovat
 Write boot menu	BootManagerController	Button	Zapsat nabídku zavaděče
-written by	BootManager		zapsána

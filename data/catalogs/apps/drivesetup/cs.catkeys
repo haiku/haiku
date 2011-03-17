@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-DriveSetup	2723551013
+1	czech	x-vnd.Haiku-DriveSetup	568426562
 %ld MiB	Support		%Id MiB
 <empty>	DiskView		<prázdný>
 <empty>	PartitionList		<prázdný>
@@ -29,7 +29,6 @@ Device	DiskView		Zařízení
 Device	PartitionList		Zařízení
 Disk	MainWindow		Disk
 Disk system \"%s\"\" not found!	MainWindow		Disk systému \"%s\"\" nenalezen!
-DriveSetup	MainWindow		Nastavení disku
 Eject	MainWindow		Vysunout
 End: %ld MB	Support		Konec: %Id MB
 Error: 	MainWindow	in any error alert	Chyba:

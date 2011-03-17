@@ -1,6 +1,5 @@
-1	czech	x-vnd.Haiku-ProcessController	769318393
+1	czech	x-vnd.Haiku-ProcessController	526557007
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
-About	ProcessController		o
 About ProcessController…	ProcessController		O Správci Procesů...
 Cancel	ProcessController		Zrušit
 Custom priority	ProcessController		Priorita uživatelská
@@ -24,9 +23,7 @@ Normal priority	ProcessController		Priorita normální
 OK	ProcessController		OK
 Ok!	ProcessController		OK!
 Please confirm	ProcessController		Potvrďte prosím
-ProcessController	ProcessController		Správce Procesů
 ProcessController is already installed in Deskbar.	ProcessController		Správce Procesů je již v Deskbaru nainstalován.
-ProcessController\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n	ProcessController		Správce Procesů\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n
 Processor %d	ProcessController		Procesor %d
 Quit an application	ProcessController		Ukončit aplikaci
 Quit application	ProcessController		Ukončit aplikaci

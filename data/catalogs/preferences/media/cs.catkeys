@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-Media	1701788906
+1	czech	x-vnd.Haiku-Media	293613603
 <none>	Media views		<žádné>
 Audio input:	Media views		Audio vstup:
 Audio mixer	Media Window		Audio směšovač
@@ -11,7 +11,6 @@ Couldn't add volume control in Deskbar: %s\n	Media views		Nelze přidat ovladač
 Couldn't remove volume control in Deskbar: %s\n	Media views		Nelze odstranit ovladač hlasitosti z Deskbaru: %s\n
 Defaults	Media views		Výchozí
 Done shutting down.	Media Window		Dokončeno vypnutí.
-Media	Media Window		Média
 OK	Media Window		OK
 Quit	Media Window		Konec
 Ready for use…	Media Window		Připraveno k použití...

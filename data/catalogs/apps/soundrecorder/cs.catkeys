@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-SoundRecorder	1355572422
+1	czech	x-vnd.Haiku-SoundRecorder	1948114706
 Cannot connect to media server	RecorderWindow		Nemohu se připojit k media serveru
 Cannot connect to the selected sound input	RecorderWindow		Nemohu se připojit k vybranému zvukovému vstupu
 Cannot find an unused name to use for the new recording	RecorderWindow		Nemohu najít žádné nepoužité jméno pro novou nahrávku
@@ -32,7 +32,6 @@ Sample size: 	RecorderWindow		Velikost vzorku:
 Save	RecorderWindow		Uložit
 Some of the files don't appear to be audio files	RecorderWindow		Zdá se, že některé soubory moc nevypadají, že by mohly vydávat nějaký zvuk
 Sound List	RecorderWindow		Seznam zvuku
-SoundRecorder	RecorderWindow		SoundRecorder
 Stop	RecorderWindow		Zastavit
 bits	RecorderWindow		bity
 seconds	RecorderWindow		sekund

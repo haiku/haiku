@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-Pulse	1325849358
+1	czech	x-vnd.Haiku-Pulse	2596799409
 %.2f GHz	NormalPulseView			%.2f GHz
 %ld MHz	NormalPulseView			%ld MHz
 %s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nOd Davida Ramseye a Arveye Hjønnevåga\nUpraveno Danielem Switkinem\n
@@ -35,7 +35,6 @@ OK	PulseApp		OK
 OK	PulseView		OK
 Pulse	NormalPulseView		Pulse
 Pulse	PulseApp		Pulse
-Pulse	PulseWindow		Pulse
 Pulse settings	PulseWindow		Nastavení Pulse
 Quit	DeskbarPulseView		Ukončit
 Quit	MiniPulseView		Ukončit

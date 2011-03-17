@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-MidiPlayer	1406887279
+1	czech	x-vnd.Haiku-MidiPlayer	3885957623
 Cavern	Main Window		Jeskyně
 Closet	Main Window		Komora
 Could not load song	Main Window		Skladbu nelze načíst
@@ -8,7 +8,6 @@ Garage	Main Window		Garáž
 Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Haiku MIDI Přehrávač 1.0.0 beta\n\nTento malý program\numožňuje přehrávat kila\nsupr skladeb
 Igor's lab	Main Window		Igorova laboratoř
 Live input:	Main Window		Živý vstup:
-MidiPlayer	Main Window		Midi Přehrávač
 None	Main Window		Žádný
 OK	Main Window		OK
 Off	Main Window		Vypnuto

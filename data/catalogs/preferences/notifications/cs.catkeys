@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-Notifications	1635178721
+1	czech	x-vnd.Haiku-Notifications	3545587988
 Above icon	DisplayView		Horní ikona
 Allowed	NotificationView		Dovoleno
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Při ukládání voleb nastala chyba.\nMožná vám dochází místo na disku.
@@ -28,7 +28,6 @@ Mini icon	DisplayView		Mini ikona
 No	NotificationView		Ne
 Notifications	GeneralView		Upozornění
 Notifications	NotificationView		Upozornění
-Notifications	PrefletWin		Upozornění
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Upozornění nemohou být zastaveny, protože server není dostupný.
 OK	DisplayView		OK
 OK	GeneralView		OK

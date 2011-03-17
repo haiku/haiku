@@ -1,4 +1,4 @@
-1	czech	x-vnd.haiku-screenshot	166521589
+1	czech	x-vnd.haiku-screenshot	731699482
 Artwork folder	ScreenshotWindow		Složka artworků
 Cancel	ScreenshotWindow		Zrušit
 Capture active window	ScreenshotWindow		Zachytit aktivní okno
@@ -16,7 +16,6 @@ Please select	ScreenshotWindow		Prosím vyberte
 Save	ScreenshotWindow		Uložit
 Save as:	ScreenshotWindow		Uložit jako:
 Save in:	ScreenshotWindow		Uložit do:
-Screenshot	ScreenshotWindow		Snímek obrazovky
 Select	ScreenshotWindow		Vybrat
 Settings…	ScreenshotWindow		Nastavení...
 This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Tento soubor již existuje.\n Určitě jej chcete přepsat?

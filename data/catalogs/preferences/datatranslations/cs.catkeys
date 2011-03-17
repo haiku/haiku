@@ -1,9 +1,8 @@
-1	czech	x-vnd.Haiku-DataTranslations	3706134146
+1	czech	x-vnd.Haiku-DataTranslations	2849987867
 About	DataTranslations		o
 An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Ve složce Překladačů již položka se jménem '%name' existuje! Již existující Překladač by měl být přepsán?
 Cancel	DataTranslations		Zrušit
 Could not install %s:\n%s	DataTranslations		%s:\n%s nebylo možné nainstalovat
-DataTranslations	DataTranslations		DataTranslations
 DataTranslations - Error	DataTranslations		DataTranslations - Chyba
 DataTranslations - Note	DataTranslations		DataTranslations - Poznámka
 DataTranslations\n\twritten by Oliver Siebenmarck and others\n\tCopyright 2002-2010, Haiku Inc. All rights reserved.\n	DataTranslations		DataTranslations\n\tnapsal Oliver Siebenmarck a další\n\tCopyright 2002-2010, Haiku Inc. Všechna práva vyhrazena.\n

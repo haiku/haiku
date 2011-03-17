@@ -1,8 +1,7 @@
-1	czech	x-vnd.Haiku-Appearance	3612090060
+1	czech	x-vnd.Haiku-Appearance	1227622574
 Antialiasing	APRWindow		Antialiasing
 Antialiasing menu	AntialiasingSettingsView		Menu antialiasingu
 Antialiasing type:	AntialiasingSettingsView		Typ antialiasingu:
-Appearance	APRWindow		Vzhled
 Colors	APRWindow		Barvy
 Control background	Colors tab		Pozadí ovládacích prvků
 Control border	Colors tab		Okraj ovládacích prvků

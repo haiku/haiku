@@ -1,5 +1,4 @@
-1	czech	x-vnd.Haiku-CharacterMap	1305599334
-About CharacterMap…	CharacterWindow		O CharacterMap… 
+1	czech	x-vnd.Haiku-CharacterMap	921188319
 Aegean numbers	UnicodeBlocks		Egejské číslice
 Alphabetic presentation forms	UnicodeBlocks		Abecední prezentační formy
 Ancient Greek musical notation	UnicodeBlocks		Starořecká hudební notace
@@ -34,8 +33,7 @@ CJK unified ideographs extension A	UnicodeBlocks		CJK unifikované ideogramy, ro
 CJK unified ideographs extension B	UnicodeBlocks		Rozšíření CJK unifikovaných ideogramů B
 Carian	UnicodeBlocks		Carian
 Cham	UnicodeBlocks		Chamština
-CharacterMap	CharacterWindow		Mapa Znaků
-CharacterMap\n\twritten by Axel Dörfler\n\tCopyright 2009, Haiku, Inc.\n	CharacterMap		CharacterMap\n\tnapsal Axel Dörfler\n\tCopyright 2009, Haiku, Inc.\n
+CharacterMap	Application name		Mapa znaků
 Cherokee	UnicodeBlocks		Cherokee
 Clear	CharacterWindow		Vymazat
 Code	CharacterWindow		Kódování
@@ -125,7 +123,6 @@ Myanmar	UnicodeBlocks		Myanmar
 N'Ko	UnicodeBlocks		N'Ko
 New Tai Lue	UnicodeBlocks		Nový Tai Lue
 Number forms	UnicodeBlocks		Číselné formy
-OK	CharacterMap		OK
 Ogham	UnicodeBlocks		Ogham
 Ol Chiki	UnicodeBlocks		Ol Chiki
 Old Persian	UnicodeBlocks		Stará perština

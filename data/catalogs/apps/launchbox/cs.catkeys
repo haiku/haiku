@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-LaunchBox	1672943267
+1	czech	x-vnd.Haiku-LaunchBox	2168437832
 About	LaunchBox		O
 Add button here	LaunchBox		Přidat sem tlačítko
 Auto-raise	LaunchBox		Automaticky vyvolat
@@ -15,7 +15,6 @@ Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Nemohu po
 Horizontal layout	LaunchBox		Horizontální rozvržení
 Icon size	LaunchBox		Velikost ikony
 Ignore double-click	LaunchBox		Ignorovat dvojklik
-LaunchBox	LaunchBox		LaunchBox
 Name Panel	LaunchBox		Panel názvu
 New	LaunchBox		Nový
 OK	LaunchBox		OK

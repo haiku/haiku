@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-Terminal	1413115910
+1	czech	x-vnd.Haiku-Terminal	4275906666
 -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h, --help vypíše tuto nápovědu\n -t, --title nastaví nadpis okna\n -f, --fullscreen spustí přes celou obrazovku\n
 Abort	Terminal Shell		Zrušit
 About Terminal…	Terminal TermWindow		O programu Terminál...
@@ -75,9 +75,7 @@ Size:	Terminal AppearancePrefView		Velikost:
 Switch Terminals	Terminal TermWindow		Přepnout terminály
 Tab title:	Terminal AppearancePrefView		Nadpis panelu:
 Tab title:	Terminal TermWindow		Nadpis panelu:
-Terminal	Terminal TermWindow		Terminál
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminál nemůže spustit shell. Lituji.
-Terminal settings	Terminal PrefWindow		Nastavení terminálu
 Terminal\n\nwritten by Kazuho Okui and Takashi Murai\nupdated by Kian Duffy and others\n\nCopyright ©2003-2009, Haiku.\n	Terminal TermView		Terminál\n\nnapsal Kazuho Okui a Takashi Murai\naktualizoval Kian Duffy a další\n\nCopyright ©2003-2009, Haiku.\n
 Text	Terminal AppearancePrefView		Text
 Text encoding	Terminal TermWindow		Kódování textu
