@@ -1,34 +1,24 @@
-1	japanese	x-vnd.Haiku-Media	2505372198
-Show volume control on Deskbar	Media views		音量コントロールを Deskbar に表示
+1	japanese	x-vnd.Haiku-Media	2390037910
 Audio input:	Media views		オーディオ入力：
-Restarting media services\nStarting media server…\n	Media Window		メディアサービスを再起動します\nメディアサービスを起動中…\n
-Video input:	Media views		ビデオ入力：
-Waiting for media_server to quit.	Media Window		media_server の終了を待機中…
-Defaults	Media views		デフォルト
-Stopping media server…	Media Window		メディアサーバーを終了しています…
-Video output:	Media views		ビデオ出力：
-Enable real-time audio	Media views		リアルタイムオーディオを有効にする
-Quit	Media Window		終了
-OK	Media Window		Ok
-Enabling real-time video allows system to perform video operations as fast and smoothly as possible.  It achieves optimum performance by using more RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		リアルタイムビデオを有効にすると、ビデオ再生や録画は可能な限り速くスムーズになります。この機能は若干のRAMを利用します。\n\n最も低いレイテンシが要求される場合のみ有効にしてください。
-Default nodes	Media views		デフォルトノード
-Starting media server…	Media Window		メディアサーバーを再起動中…
-Restart the media server to apply changes.	Media views		変更を有効にするために、メディアサーバを再起動してください。
-Done shutting down.	Media Window		シャットダウン完了。
-Cleaning up.	Media Window		整理中…
-Telling media_addon_server to quit.	Media Window		media_addon_server を終了させようとしています。
-Enable real-time video	Media views		リアルタイムビデオを有効にする
-This hardware has no controls.	Media Window		このハードウエアにはコントロールがありません。
-Restarting media services\nShutting down media server\n	Media Window		メディアサービスを再起動しています\nメディアサーバーを終了します…\n
 Audio output:	Media views		オーディオ出力：
-Start media server	Media Window		メディアサーバーの起動
 Audio settings	Media Window		オーディオ設定
-Could not connect to the media server.\nWould you like to start it ?	Media Window		メディアサーバーに接続できませんでした。\nメディアサーバーを起動しますか？
-Ready for use…	Media Window		使用可能…
-Real-time	Media views		リアルタイム設定
-Restart media services	Media views		メディアサービスを再起動
-Enabling real-time audio allows system to record and play audio as fast as possible.  It achieves this performance by using more CPU and RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		リアルタイムオーディオを有効にすると、オーディオ再生や録音の際、システムの性能を最大限に引き出せます。この機能は若干のメモリーとCPUを利用します。\n\n最も低いレイテンシが要求される場合のみ有効にしてください。
-Couldn't remove volume control in Deskbar: %s\n	Media Window		音量コントロールを Deskbar から削除できませんでした： %s\n
-Couldn't add volume control in Deskbar: %s\n	Media Window		音量コントロールを Deskbar に追加できませんでした： %s\n
-Media	Media Window		メディア
 Channel:	Media views		チャンネル：
+Cleaning up.	Media Window		整理中…
+Could not connect to the media server.\nWould you like to start it ?	Media Window		メディアサーバーに接続できませんでした。\nメディアサーバーを起動しますか？
+Defaults	Media views		デフォルト
+Done shutting down.	Media Window		シャットダウン完了。
+OK	Media Window		Ok
+Quit	Media Window		終了
+Ready for use…	Media Window		使用可能…
+Restart media services	Media views		メディアサービスを再起動
+Restarting media services\nShutting down media server\n	Media Window		メディアサービスを再起動しています\nメディアサーバーを終了します…\n
+Restarting media services\nStarting media server…\n	Media Window		メディアサービスを再起動します\nメディアサービスを起動中…\n
+Show volume control on Deskbar	Media views		音量コントロールを Deskbar に表示
+Start media server	Media Window		メディアサーバーの起動
+Starting media server…	Media Window		メディアサーバーを再起動中…
+Stopping media server…	Media Window		メディアサーバーを終了しています…
+Telling media_addon_server to quit.	Media Window		media_addon_server を終了させようとしています。
+This hardware has no controls.	Media Window		このハードウエアにはコントロールがありません。
+Video input:	Media views		ビデオ入力：
+Video output:	Media views		ビデオ出力：
+Waiting for media_server to quit.	Media Window		media_server の終了を待機中…

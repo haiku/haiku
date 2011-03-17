@@ -1,20 +1,18 @@
-1	japanese	x-vnd.Haiku-VirtualMemory	866260633
-Turn off	SettingsWindow		無効にする
-GB	SettingsWindow		GB
-Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		仮想メモリーを無効にすると、使用可能な物理メモリーが少なくなったときにシステムが不安定になることもあります。\n物理メモリーが少なくなるまでは仮想メモリがシステムパフォーマンスに影響を与えることはありません。\n\n仮想メモリーを本当に無効にしますか？
-Requested swap file size:	SettingsWindow		指定されたスワップサイズ：
-Physical memory: 	SettingsWindow		物理メモリー : 
-Changes will take effect on restart!	SettingsWindow		設定の変更は再起動後に有効になります!
-Defaults	SettingsWindow		デフォルト
-KB	SettingsWindow		KB
-Use volume:	SettingsWindow		パーティション：
-Keep enabled	SettingsWindow		有効のままにする
-Revert	SettingsWindow		元に戻す
-999 MB	SettingsWindow		999 MB
-Current swap file size: 	SettingsWindow		現在のスワップファイルサイズ：
-VirtualMemory	SettingsWindow		仮想メモリー
-OK	VirtualMemoryApp		Ok
-VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		VirtualMemory\n\tAxel Dörfler 作\n\tCopyright 2005, Haiku.\n
-Enable virtual memory	SettingsWindow		仮想メモリーを有効にする
-MB	SettingsWindow		MB
+1	japanese	x-vnd.Haiku-VirtualMemory	2137942259
 %Ld B	SettingsWindow		%Ld B
+Changes will take effect on restart!	SettingsWindow		設定の変更は再起動後に有効になります!
+Current swap file size: 	SettingsWindow		現在のスワップファイルサイズ：
+Defaults	SettingsWindow		デフォルト
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		仮想メモリーを無効にすると、使用可能な物理メモリーが少なくなったときにシステムが不安定になることもあります。\n物理メモリーが少なくなるまでは仮想メモリがシステムパフォーマンスに影響を与えることはありません。\n\n仮想メモリーを本当に無効にしますか？
+Enable virtual memory	SettingsWindow		仮想メモリーを有効にする
+GB	SettingsWindow		GB
+KB	SettingsWindow		KB
+Keep enabled	SettingsWindow		有効のままにする
+MB	SettingsWindow		MB
+OK	VirtualMemoryApp		Ok
+Physical memory: 	SettingsWindow		物理メモリー : 
+Requested swap file size:	SettingsWindow		指定されたスワップサイズ：
+Revert	SettingsWindow		元に戻す
+Turn off	SettingsWindow		無効にする
+Use volume:	SettingsWindow		パーティション：
+VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		VirtualMemory\n\tAxel Dörfler 作\n\tCopyright 2005, Haiku.\n

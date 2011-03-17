@@ -1,38 +1,38 @@
 1	japanese	x-vnd.Haiku-About	2350236915
-Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (および彼が開発したNewOSカーネル)\n
-%ld Processors:	AboutView		%ld プロセッサー：
-Michael Phipps (project founder)\n\n	AboutView		プロジェクト創立者Michael Phipps\n\n
-The Haiku-Ports team\n	AboutView		Haiku-Portsチーム\n
-Website, marketing & documentation:\n	AboutView		ウェブサイト、広報 & ドキュメント：\n
-Revision	AboutView		リビジョン
-Source Code: 	AboutView		ソースコード：
-Processor:	AboutView		プロセッサー：
-Kernel:	AboutView		カーネル：
-Contributors:\n	AboutView		その他の貢献者：\n
-Unknown	AboutView		不明
-\n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n…おそらく、ここに記載し忘れた方々もいることでしょう (すみません!)\n\n
 %.2f GHz	AboutView		%.2f GHz
-Memory:	AboutView		メモリー：
-Past maintainers:\n	AboutView		過去のメンテナー\n
-\n\nSpecial thanks to:\n	AboutView		\n\n下記の方々に特別な感謝を...\n
-Licenses: 	AboutView		ライセンス：
-\nCopyrights\n\n	AboutView		\n著作権\n\n
-Current maintainers:\n	AboutView		現在のメンテナー\n
-Time running:	AboutView		稼動時間：
-The Haikuware team and their bounty program\n	AboutView		Haikuwareチーム＆報奨金プログラム\n
-About this system	AboutWindow		このシステムについて
-Version:	AboutView		バージョン：
-%ld MHz	AboutView		%ld MHz
-[Click a license name to read the respective license.]\n\n	AboutView		「各ライセンスを表示するには、ライセンス名をクリックしてください。」\n\n
-License: 	AboutView		ライセンス：
-Translations:\n	AboutView		各国語翻訳：\n
-... and the many people making donations!\n\n	AboutView		...寄付をしていただいた大勢の方々!\n\n
-The BeGeistert team\n	AboutView		BeGeistert展チーム\n
-The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku and the Haiku logo are trademarks of Haiku, Inc.\n\n	AboutView		Haiku コードの著作権は Haiku, Inc. もしくはコード内に記載されている作者にあります。Haiku および Haiku ロゴは Haiku, Inc. のトレードマークです。\n\n
-GCC %d Hybrid	AboutView		GCC %d ハイブリッド
 %d MiB total	AboutView		合計 %d MiB
 %d MiB used (%d%%)	AboutView		%d MiB 使用中 (%d%%)
-The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT licence%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		Haiku 特有のコード、特にカーネルとカーネルにリンクするアプリケーションのコードは、%MIT licence%で公開しています。一部のシステムライブラリが LPGL ライセンスで公開されている第三者が作のコードを含めています。第三者の著作権情報は下記に記載されています。\n\n
+%ld MHz	AboutView		%ld MHz
+%ld Processors:	AboutView		%ld プロセッサー：
 %total MiB total, %inaccessible MiB inaccessible	AboutView		合計 %total MiB / %inaccessible MiB アクセス不可
+... and the many people making donations!\n\n	AboutView		...寄付をしていただいた大勢の方々!\n\n
+About this system	AboutWindow		このシステムについて
+Contributors:\n	AboutView		その他の貢献者：\n
+Current maintainers:\n	AboutView		現在のメンテナー\n
+GCC %d Hybrid	AboutView		GCC %d ハイブリッド
 Google & their Google Summer of Code program\n	AboutView		Google と Google Summer of Code プログラム\n
+Kernel:	AboutView		カーネル：
+License: 	AboutView		ライセンス：
+Licenses: 	AboutView		ライセンス：
+Memory:	AboutView		メモリー：
+Michael Phipps (project founder)\n\n	AboutView		プロジェクト創立者 Michael Phipps\n\n
+Past maintainers:\n	AboutView		過去のメンテナー\n
+Processor:	AboutView		プロセッサー：
+Revision	AboutView		リビジョン
+Source Code: 	AboutView		ソースコード：
+The BeGeistert team\n	AboutView		BeGeistert 展チーム\n
+The Haiku-Ports team\n	AboutView		Haiku-Ports チーム\n
+The Haikuware team and their bounty program\n	AboutView		Haikuware チーム＆報奨金プログラム\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Auckland 大学 と Christof Lutteroth\n\n
+The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT licence%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		Haiku 特有のコード、特にカーネルとカーネルにリンクするアプリケーションのコードは、%MIT licence%で公開しています。一部のシステムライブラリが LPGL ライセンスで公開されている第三者が作のコードを含めています。第三者の著作権情報は下記に記載されています。\n\n
+The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku and the Haiku logo are trademarks of Haiku, Inc.\n\n	AboutView		Haiku コードの著作権は Haiku, Inc. もしくはコード内に記載されている作者にあります。Haiku および Haiku ロゴは Haiku, Inc. のトレードマークです。\n\n
+Time running:	AboutView		稼動時間：
+Translations:\n	AboutView		各国語翻訳：\n
+Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (ならびに彼が開発した NewOS カーネル)\n
+Unknown	AboutView		不明
+Version:	AboutView		バージョン：
+Website, marketing & documentation:\n	AboutView		ウェブサイト、広報 & ドキュメント：\n
+[Click a license name to read the respective license.]\n\n	AboutView		「各ライセンスを表示するには、ライセンス名をクリックしてください。」\n\n
+\nCopyrights\n\n	AboutView		\n著作権\n\n
+\n\nSpecial thanks to:\n	AboutView		\n\n下記の協力者の方々に深く感謝します：\n
+\n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n…おそらく、ここに記載し忘れた方々もいることでしょう (すみません!)\n\n

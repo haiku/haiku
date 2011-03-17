@@ -1,23 +1,21 @@
-1	japanese	x-vnd.Haiku-Mouse	524453314
-Mouse type:	SettingsView		マウスの種類：
-Warp	SettingsView		ワープ
+1	japanese	x-vnd.Haiku-Mouse	2712056
+1-Button	SettingsView		1 ボタン
 2-Button	SettingsView		2 ボタン
-Double-click test area	SettingsView		ダブルクリックテスト領域
-Revert	MouseWindow		元に戻す
-...by Andrew Edward McCall	MouseApplication		Andrew Edward McCall 作
-Mouse acceleration	SettingsView		マウスの加速度
-Click to focus	SettingsView		クリックでフォーカスのみ
 3-Button	SettingsView		3 ボタン
-Mouse speed	SettingsView		マウスの速度
+Accept first click	SettingsView		最初のクリックを受け入れる
+Click to focus	SettingsView		クリックでフォーカスのみ
+Defaults	MouseWindow		デフォルト
+Dig Deal	MouseApplication		大丈夫です
+Double-click speed	SettingsView		ダブルクリック速度
+Double-click test area	SettingsView		ダブルクリックテスト領域
+Fast	SettingsView		速い (大)
+Focus follows mouse	SettingsView		フォーカスをマウス位置に合わせる
 Focus mode:	SettingsView		フォーカスモード：
 Instant warp	SettingsView		簡易ワープ
-Dig Deal	MouseApplication		大丈夫です
-1-Button	SettingsView		1 ボタン
-Double-click speed	SettingsView		ダブルクリック速度
-Defaults	MouseWindow		デフォルト
-Focus follows mouse	SettingsView		フォーカスをマウス位置に合わせる
-Accept first click	SettingsView		最初のクリックを受け入れる
-Fast	SettingsView		速い (大)
+Mouse acceleration	SettingsView		マウスの加速度
+Mouse speed	SettingsView		マウスの速度
+Mouse type:	SettingsView		マウスの種類：
 Normal	SettingsView		普通
-Mouse	MouseWindow		マウス
+Revert	MouseWindow		元に戻す
 Slow	SettingsView		遅い (小)
+Warp	SettingsView		ワープ

@@ -1,77 +1,76 @@
-1	japanese	x-vnd.Haiku-Installer	4077472690
-Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Haiku インストーラー\n\tJérôme Duval および Stephan Aßmus 作\n\tCopyright 2005-2010, Haiku.\n\n
-Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		インストールが完了し、ブートセクターが「%s」に書き込まれました。「終了」ボタンでインストーラーを終了するか、他に Haiku をインストールするボリュームを選択してください。
-Quit	InstallerWindow		終了
-Stop	InstallerWindow	In alert after pressing Stop	中断
-Installation completed. Boot sector has been written to '%s'. Press Quit to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		インストールが完了し、ブートセクターが「%s」に書き込まれました。「終了」ボタンでインストーラーを終了するか、他に Haiku をインストールするボリュームを選択してください。
-Install progress:  	InstallerWindow		進行状況：  
-Starting Installation.	InstallProgress		準備をしています…
-Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		使用中の起動ディスクにインストールしますか？この場合、システムを再起動する必要があります。
-OK	InstallProgress		Ok
-Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		メニューからインストール元とインストール先を選択してから「開始」ボタンをクリックしてください。
-Install from:	InstallerWindow		インストール元：
+1	japanese	x-vnd.Haiku-Installer	2841407003
 %1ld of %2ld	InstallerWindow	number of files copied	%2ld ファイル中 %1ld 個転送済み
-Installer	InstallerWindow		Haiku インストーラー
-Continue	InstallerApp		続ける
-Write boot sector to '%s'	InstallerWindow		ブートセクターを「%s」に書き込む
-Collecting copy information.	InstallProgress		コピー元の情報を集めています…
-Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		メニューからインストールディスクを選択してから「開始」ボタンをクリックしてください。
-Boot sector successfully written.	InstallProgress		ブートセクターの書き込みに成功しました。
-Performing installation.	InstallProgress		インストールが進行しています…
-scanning…	InstallerWindow		ディスクを検出しています…
-Finishing Installation.	InstallProgress		インストールの最終処理をしています…
-README	InstallerApp		README
-The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		インストール先ディスクの空き容量が不足している可能性があります。他のディスクを選択するか、インストールするオプションを減らしてください。
-Scanning for disks…	InstallerWindow		ディスクを検出しています…
-The disk can't be mounted. Please choose a different disk.	InstallProgress		このディスクをマウントできません。他のディスクを選択してください。
-?? of ??	InstallerWindow	Unknown progress	?? 中 ??
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		使用可能なハードディスクおよび他のメディア上\nのパーティションを操作するツール DriveSetup\nを起動します。このツールを使って、パーティション\nを Haiku の起動に必要な Be ファイルシステム (BFS)\nで初期化します。
-Show optional packages	InstallerWindow		オプショナルパッケージを表示する
-No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		インストール可能なパーティションが見つかりません。DriveSetup を使って、パーティションを作成し、最低一つのパーティションを Be ファイルシステムで初期化してください。
-Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		メニューからインストール先のディスクを選択したから「開始」ボタンをクリックしてください。
-Unknown Type	InstallProgress	Partition content type	パーティション種別不明
 <none>	InstallerWindow	No partition available	＜無し＞
-Installation canceled.	InstallProgress		インストールが中断されました。
-You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		インストール元ディスクへのインストールはできません。他のディスクを選んでください。
+?? of ??	InstallerWindow	Unknown progress	?? 中 ??
+???	InstallerWindow	Unknown currently copied item	???
 ???	InstallerWindow	Unknown partition name	???
-Hide optional packages	InstallerWindow		オプショナルパッケージを隠す
-Please close the DriveSetup window before closing the Installer window.	InstallerWindow		インストーラーを閉じる前に、DriveSetup を終了してください。
-Set up partitions…	InstallerWindow		パーティションの設定…
-The partition can't be mounted. Please choose a different partition.	InstallProgress		このパーティションをマウントできません。他のパーティションを選択してください。
-Install anyway	InstallProgress		それでもインストールする
-An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		エラーが発生しました。インストールは完了していません:\n\nエラー:  %s
-Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		「%1s」から「%2s」へのインストールを開始するには、「開始」ボタンを押してください。
-Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		DriveSetup は実行中です。\n\nDriveSetup を終了させてからインストールを続行してください。
-Please choose target	InstallerWindow		インストール先の選択
-Begin	InstallerWindow		開始
-Write boot sector	InstallerWindow		ブートセクターを書き込む
-DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		パーティションを設定する DriveSetup アプリケーションが起動できません。
-No optional packages available.	PackagesView		オプショナルパッケージはありません。
 Additional disk space required: %s	InstallerWindow		必要な追加ディスク容量：%s
-Cancel	InstallProgress		中止
-Try installing anyway	InstallProgress		それでもインストールを試みる
-Are you sure you want to to stop the installation?	InstallerWindow		インストールを中断しますか？
-Onto:	InstallerWindow		インストール先：
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		インストール先パーティションにはデータがあります。それでもインストールしますか？\n\n注意：「システム」フォルダーはインストール元からそのままクリーンコピーされますが、その他のフォルダはマージされ、両方のボリュームに存在するファイルやリンクはインストール元のバージョンで上書きされます。
-Are you sure you want to abort the installation and restart the system?	InstallerWindow		インストールを中止して、システムを再起動しますか？
-Restart system	InstallerWindow		システムを再起動
-Quit	InstallerApp		終了
-OK	InstallerApp		Ok
-Continue	InstallerWindow	In alert after pressing Stop	続ける
-OK	InstallerWindow		Ok
-Cancel	InstallerWindow		中止
 Additional disk space required: 0.0 KiB	InstallerWindow		必要な追加ディスク容量： 0.0 KiB
-The mount point could not be retrieved.	InstallProgress		マウントポイントを取得できませんでした。
+An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		エラーが発生しました。インストールは完了していません:\n\nエラー:  %s
+Are you sure you want to abort the installation and restart the system?	InstallerWindow		インストールを中止して、システムを再起動しますか？
+Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		使用中の起動ディスクにインストールしますか？この場合、システムを再起動する必要があります。
+Are you sure you want to to stop the installation?	InstallerWindow		インストールを中断しますか？
+Begin	InstallerWindow		開始
+Boot sector not written because of an internal error.	InstallProgress		内部エラーが発生したため、ブートセクターは更新されていません。
+Boot sector successfully written.	InstallProgress		ブートセクターの書き込みに成功しました。
 Bootman, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Haiku ブートメニューを設定する「Bootman」が起動できません。
+Cancel	InstallProgress		中止
+Cancel	InstallerWindow		中止
+Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		メニューからインストール先のディスクを選択したから「開始」ボタンをクリックしてください。
+Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		メニューからインストール元とインストール先を選択してから「開始」ボタンをクリックしてください。
+Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		メニューからインストールディスクを選択してから「開始」ボタンをクリックしてください。
+Collecting copy information.	InstallProgress		コピー元の情報を集めています…
+Continue	InstallerApp		続ける
+Continue	InstallerWindow	In alert after pressing Stop	続ける
+DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		パーティションを設定する DriveSetup アプリケーションが起動できません。
+Finishing Installation.	InstallProgress		インストールの最終処理をしています…
+Hide optional packages	InstallerWindow		オプショナルパッケージを隠す
+Install anyway	InstallProgress		それでもインストールする
+Install from:	InstallerWindow		インストール元：
+Install progress:  	InstallerWindow		進行状況：  
+Installation canceled.	InstallProgress		インストールが中断されました。
+Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		インストールが完了し、ブートセクターが「%s」に書き込まれました。「終了」ボタンでインストーラーを終了するか、他に Haiku をインストールするボリュームを選択してください。
+Installation completed. Boot sector has been written to '%s'. Press Quit to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		インストールが完了し、ブートセクターが「%s」に書き込まれました。「終了」ボタンでインストーラーを終了するか、他に Haiku をインストールするボリュームを選択してください。
+Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Haiku インストーラー\n\tJérôme Duval および Stephan Aßmus 作\n\tCopyright 2005-2010, Haiku.\n\n
+Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		使用可能なハードディスクおよび他のメディア上\nのパーティションを操作するツール DriveSetup\nを起動します。このツールを使って、パーティション\nを Haiku の起動に必要な Be ファイルシステム (BFS)\nで初期化します。
+No optional packages available.	PackagesView		オプショナルパッケージはありません。
+No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		インストール可能なパーティションが見つかりません。DriveSetup を使って、パーティションを作成し、最低一つのパーティションを Be ファイルシステムで初期化してください。
+OK	InstallProgress		Ok
+OK	InstallerApp		Ok
+OK	InstallerWindow		Ok
+Onto:	InstallerWindow		インストール先：
+Performing installation.	InstallProgress		インストールが進行しています…
+Please choose target	InstallerWindow		インストール先の選択
+Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Haiku インストーラーを閉じる前に Boot Manager と DriveSetup を終了してください。
+Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Boot Manager ウィンドウを閉じてから。Haiku インストーラーウィンドウを閉じてください。
+Please close the DriveSetup window before closing the Installer window.	InstallerWindow		インストーラーを閉じる前に、DriveSetup を終了してください。
+Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		「%1s」から「%2s」へのインストールを開始するには、「開始」ボタンを押してください。
+Quit	InstallerApp		終了
+Quit	InstallerWindow		終了
 Quit Boot Manager	InstallerWindow		Boot Manager の終了
 Quit Boot Manager and DriveSetup	InstallerWindow		Boot Manager と DriveSetup を終了
-Set up boot menu	InstallerWindow		ブートメニューの設定
-Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Haiku インストーラーを閉じる前に Boot Manager と DriveSetup を終了してください。
 Quit DriveSetup	InstallerWindow		DriveSetup の終了
-Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Boot Manager 実行中…\n\nインストールを続けるには、Boot Manager を閉じてください。
-Boot sector not written because of an internal error.	InstallProgress		内部エラーが発生したため、ブートセクターは更新されていません。
+README	InstallerApp		README
+Restart system	InstallerWindow		システムを再起動
 Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Boot Manager と DriveSetup が実行中…\n\nインストールを続けるには、両アプリケーションを閉じてください。
-Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Boot Manager ウィンドウを閉じてから。Haiku インストーラーウィンドウを閉じてください。
-Tools	InstallerWindow		ツール
+Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Boot Manager 実行中…\n\nインストールを続けるには、Boot Manager を閉じてください。
+Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		DriveSetup は実行中です。\n\nDriveSetup を終了させてからインストールを続行してください。
+Scanning for disks…	InstallerWindow		ディスクを検出しています…
+Set up boot menu	InstallerWindow		ブートメニューの設定
+Set up partitions…	InstallerWindow		パーティションの設定…
+Show optional packages	InstallerWindow		オプショナルパッケージを表示する
+Starting Installation.	InstallProgress		準備をしています…
 Stop	InstallerWindow		中断
-???	InstallerWindow	Unknown currently copied item	???
+Stop	InstallerWindow	In alert after pressing Stop	中断
+The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		インストール先ディスクの空き容量が不足している可能性があります。他のディスクを選択するか、インストールするオプションを減らしてください。
+The disk can't be mounted. Please choose a different disk.	InstallProgress		このディスクをマウントできません。他のディスクを選択してください。
+The mount point could not be retrieved.	InstallProgress		マウントポイントを取得できませんでした。
+The partition can't be mounted. Please choose a different partition.	InstallProgress		このパーティションをマウントできません。他のパーティションを選択してください。
+The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		インストール先パーティションにはデータがあります。それでもインストールしますか？\n\n注意：「システム」フォルダーはインストール元からそのままクリーンコピーされますが、その他のフォルダはマージされ、両方のボリュームに存在するファイルやリンクはインストール元のバージョンで上書きされます。
+Tools	InstallerWindow		ツール
+Try installing anyway	InstallProgress		それでもインストールを試みる
+Unknown Type	InstallProgress	Partition content type	パーティション種別不明
+Write boot sector	InstallerWindow		ブートセクターを書き込む
+Write boot sector to '%s'	InstallerWindow		ブートセクターを「%s」に書き込む
+You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		インストール元ディスクへのインストールはできません。他のディスクを選んでください。
+scanning…	InstallerWindow		ディスクを検出しています…

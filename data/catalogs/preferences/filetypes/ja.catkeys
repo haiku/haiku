@@ -1,78 +1,77 @@
-1	japanese	x-vnd.Haiku-FileTypes	2161646265
-Args only	Application Type Window		引数のみ
-Add group	New File Type Window		グループを追加
-Remove	Application Type Window		削除
-Select same type as	FileType Window		このアプリケーションと同じタイプを選ぶ
-Remove icon	Icon View		アイコンを削除
-Supported types	Application Type Window		対応しているタイプ
-Internal name:	New File Type Window		内部的な名前：
-New file type	New File Type Window		新規ファイルタイプ
-Add icon…	Icon View		アイコンを追加…
-Do you want to save the changes?	Application Type Window		変更を保存しますか？
-File type	FileType Window		ファイルタイプ
-Could not change attributes	Attribute Window		属性を変更できません
-OK	FileTypes		Ok
-Save	Application Type Window		保存
+1	japanese	x-vnd.Haiku-FileTypes	4292552702
+Add	Attribute Window		追加
 Add	Extension Window		追加
-Select same preferred application as	FileType Window		このタイプと同じ優先アプリケーションを選ぶ：
-Cancel	Attribute Window		中止
-Multiple launch	Application Type Window		複数起動可能
-Group:	New File Type Window		グループ：
-Done	Extension Window		完了
-Could not open file	FileType Window		ファイルが開きません
-Preferred application	FileType Window		優先アプリケーション
-Same as…	FileType Window		このタイプと同様…
-File	Application Type Window		ファイル
-Version:	Application Type Window		バージョン：
-FileTypes request	FileTypes		ファイルタイプの登録
-Select…	FileType Window		選択…
-Development	Application Type Window		開発
-Icon	FileType Window		アイコン
-Special:	Attribute Window		特別：
-Alpha	Application Type Window		アルファ版
-Signature:	Application Type Window		署名:
-Quit, don't save	Application Type Window		保存せずに終了する
+Add group	New File Type Window		グループを追加
+Add icon…	Icon View		アイコンを追加…
+Add new group	New File Type Window		新規グループを追加
+Add type	New File Type Window		タイプの追加
 Add…	Application Type Window		追加…
+Alignment:	Attribute Window		配置：
+Alpha	Application Type Window		アルファ版
+Application flags	Application Type Window		アプリケーションフラグ
+Application type	Application Type Window		アプリケーションタイプ
+Args only	Application Type Window		引数のみ
+Attribute name:	Attribute Window		属性の名前：
+Background app	Application Type Window		バックグラウンド実行
+Beta	Application Type Window		ベータ版
+Cancel	Application Type Window		中止
+Cancel	Attribute Window		中止
+Cancel	Extension Window		中止
+Cancel	New File Type Window		中止
+Center	Attribute Window	Attribute column alignment in Tracker	中央揃え
+Close	Application Type Window		閉じる
+Could not change attributes	Attribute Window		属性を変更できません
+Could not change file extensions	Extension Window		ファイル拡張子の変更はできませんでした
+Could not install file type	New File Type Window		ファイルタイプをインストールできませんでした
+Could not open \"%s\":\n%s	FileTypes		\"%s\" が開けません：\n%s
+Could not open file	FileType Window		ファイルが開きません
+Default application	FileType Window		デフォルトアプリケーション
+Development	Application Type Window		開発
+Do you want to save the changes?	Application Type Window		変更を保存しますか？
+Done	Attribute Window		完了
+Done	Extension Window		完了
+Edit icon…	Icon View		アイコンの編集…
+Editable	Attribute Window	If Tracker allows to edit this attribute.	変更可能
+Exclusive launch	Application Type Window		排他的起動
+Extension	Extension Window		拡張子
+Extension:	Extension Window		拡張子：
+File	Application Type Window		ファイル
+File could not be opened	Preferred App Menu		ファイルを開けませんでした
+File type	FileType Window		ファイルタイプ
+FileTypes request	FileTypes		ファイルタイプの登録
+Final	Application Type Window		リリース版
+Gamma	Application Type Window		ガンマ版
+Golden master	Application Type Window		ゴールデンマスター
+Group:	New File Type Window		グループ：
+Icon	FileType Window		アイコン
+Internal name:	Attribute Window		内部的な名前：
+Internal name:	New File Type Window		内部的な名前：
+Left	Attribute Window	Attribute column alignment in Tracker	左揃え
+Long description:	Application Type Window		詳細説明：
+Multiple launch	Application Type Window		複数起動可能
+New file type	New File Type Window		新規ファイルタイプ
+OK	FileTypes		Ok
+Open file	FileTypes		ファイルを開く
+Preferred application	FileType Window		優先アプリケーション
+Quit, don't save	Application Type Window		保存せずに終了する
+Remove	Application Type Window		削除
+Remove icon	Icon View		アイコンを削除
+Save	Application Type Window		保存
+Save into resource file…	Application Type Window		リソースファイルに保存…
+Save request	Application Type Window		登録したファイルタイプの保存
 Select preferred application	FileType Window		優先アプリケーションを選択する
+Select same preferred application as	FileType Window		このタイプと同じ優先アプリケーションを選ぶ：
+Select same type as	FileType Window		このアプリケーションと同じタイプを選ぶ
+Select…	FileType Window		選択…
+Set Preferred Application	Preferred App Menu		優先アプリケーションを設定する
+Short description:	Application Type Window		簡単な説明：
+Signature:	Application Type Window		署名:
 Single launch	Application Type Window		複数同時起動不可
+Special:	Attribute Window		特別：
+Supported types	Application Type Window		対応しているタイプ
 The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		\"%s\" アプリケーションはこのファイルタイプに対応していません。\nそれでも設定しますか？
 Type:	Attribute Window		タイプ：
-Done	Attribute Window		完了
-Set Preferred Application	Preferred App Menu		優先アプリケーションを設定する
-Background app	Application Type Window		バックグラウンド実行
-Add new group	New File Type Window		新規グループを追加
-Cancel	Application Type Window		中止
-Cancel	New File Type Window		中止
-Extension:	Extension Window		拡張子：
-Add	Attribute Window		追加
-Close	Application Type Window		閉じる
-Golden master	Application Type Window		ゴールデンマスター
-Could not open \"%s\":\n%s	FileTypes		\"%s\" が開けません：\n%s
-Alignment:	Attribute Window		配置：
-Cancel	Extension Window		中止
-Application flags	Application Type Window		アプリケーションフラグ
-Editable	Attribute Window	If Tracker allows to edit this attribute.	変更可能
-Width:	Attribute Window	Default column width in Tracker for this attribute.	幅：
-Save request	Application Type Window		登録したファイルタイプの保存
-Beta	Application Type Window		ベータ版
-Attribute name:	Attribute Window		属性の名前：
-Extension	Extension Window		拡張子
-Add type	New File Type Window		タイプの追加
-Internal name:	Attribute Window		内部的な名前：
-Final	Application Type Window		リリース版
-Open file	FileTypes		ファイルを開く
-Exclusive launch	Application Type Window		排他的起動
-Gamma	Application Type Window		ガンマ版
-Default application	FileType Window		デフォルトアプリケーション
-Long description:	Application Type Window		詳細説明：
 Version info	Application Type Window		バージョン情報
-Center	Attribute Window	Attribute column alignment in Tracker	中央揃え
-Short description:	Application Type Window		簡単な説明：
-File could not be opened	Preferred App Menu		ファイルを開けませんでした
-Could not change file extensions	Extension Window		ファイル拡張子の変更はできませんでした
-Edit icon…	Icon View		アイコンの編集…
-Save into resource file…	Application Type Window		リソースファイルに保存…
-Left	Attribute Window	Attribute column alignment in Tracker	左揃え
+Version:	Application Type Window		バージョン：
 Visible	Attribute Window		表示する
-Could not install file type	New File Type Window		ファイルタイプをインストールできませんでした
-Application type	Application Type Window		アプリケーションタイプ
+Width:	Attribute Window	Default column width in Tracker for this attribute.	幅：

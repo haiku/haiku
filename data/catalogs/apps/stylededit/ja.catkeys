@@ -1,70 +1,69 @@
-1	japanese	x-vnd.Haiku-StyledEdit	3141287627
-OK	LoadAlert		Ok
+1	japanese	x-vnd.Haiku-StyledEdit	571894542
 ???	LoadAlert		???
-Left	Menus		左揃え
-Revert to the last version of \"%s\"? 	RevertToSavedAlert		\"%s\" を最後に保存した内容へ戻しますか？
-Search backwards	FindandReplaceWindow		逆方向検索
-Size	Menus		サイズ
-Save	QuitAlert		保存
-Replace same	Menus		繰り返し置換
-Can't Undo	Menus		元に戻せない
-Save	Menus		保存
-Replace with:	FindandReplaceWindow		置換：
+Align	Menus		配置
+Black	Menus		黒
+Blue	Menus		青
+Can't undo	Menus		元に戻せません
+Cancel	FindandReplaceWindow		中止
+Cancel	QuitAlert		中止
+Cancel	RevertToSavedAlert		中止
+Cancel	SaveAlert		中止
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		\"%s\" ファイルが存在しないため、読み込めませんでした。
 Case-sensitive	FindandReplaceWindow		大文字/小文字を区別
-Green	Menus		緑
-Revert to saved…	Menus		最新保存版に戻す…
-Yellow	Menus		黄
-Replace in all windows	FindandReplaceWindow		全てのウィンドウで置換
-Wrap lines	Menus		ワードラップ
-Cancel	RevertToSavedAlert		中止
-Document	Menus		ドキュメント
-Save changes to the document \"%s\"? 	QuitAlert		\"%s\" が変更されましたが、保存されていません。終了前に保存しますか?
-Font	Menus		フォント
-Replace all	FindandReplaceWindow		全て置換
-Default	Open_and_SaveAsPanel		デフォルト
-Cancel	FindandReplaceWindow		中止
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		\"%s\" を読み込み中に不明なエラー発生：\n\tフォーマットがサポートされていません。
-OK	RevertToSavedAlert		Ok
-Don't save	QuitAlert		保存しない
-Align	Menus		配置
-Color	Menus		色
-Red	Menus		赤
-Open…	Menus		開く…
 Center	Menus		中央揃え
-Blue	Menus		青
-Cyan	Menus		水色
-Magenta	Menus		紫
-New	Menus		新規作成
-Wrap-around search	FindandReplaceWindow		ラップアラウンド検索
-Find selection	Menus		選択範囲を検索
-Find:	FindandReplaceWindow		検索：
-Error saving \"%s\":\n%s	SaveAlert		\"%s\" を保存中エラーが発生しました：\n%s
-Replace	FindandReplaceWindow		置換
-Find again	Menus		次を検索
-Cancel	QuitAlert		中止
-Find…	Menus		検索…
-Error loading \"%s\":\n\t%s	LoadAlert		\"%s\" を読み込み中にエラー発生：\n\t%s
-Black	Menus		黒
-Untitled 	StyledEditWindow		無題
-OK	SaveAlert		Ok
-Find	FindandReplaceWindow		検索
-Encoding	Open_and_SaveAsPanel		文字コード
-Replace…	Menus		置換…
-Right	Menus		右揃え
-Cancel	SaveAlert		中止
-Save	SaveAlert		保存
-Don't save	SaveAlert		保存しない
-This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		このファイルは読み取り専用です。変更を\"%s\"ドキュメントに保存しますか？
-Paste	Menus		貼り付け
-File	Menus		ファイル
-Page setup…	Menus		ページ設定…
-Print…	Menus		印刷…
-Quit	Menus		終了
 Clear	Menus		クリアー
-Edit	Menus		編集
 Close	Menus		閉じる
+Color	Menus		色
 Copy	Menus		コピー
 Cut	Menus		切り取り
-Select all	Menus		全文選択
+Cyan	Menus		水色
+Default	Open_and_SaveAsPanel		デフォルト
+Document	Menus		ドキュメント
+Don't save	QuitAlert		保存しない
+Don't save	SaveAlert		保存しない
+Edit	Menus		編集
+Encoding	Open_and_SaveAsPanel		文字コード
+Error loading \"%s\":\n\t%s	LoadAlert		\"%s\" を読み込み中にエラー発生：\n\t%s
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		\"%s\" を読み込み中に不明なエラー発生：\n\tフォーマットがサポートされていません。
+Error saving \"%s\":\n%s	SaveAlert		\"%s\" を保存中エラーが発生しました：\n%s
+File	Menus		ファイル
+Find	FindandReplaceWindow		検索
+Find again	Menus		次を検索
+Find selection	Menus		選択範囲を検索
+Find:	FindandReplaceWindow		検索：
+Find…	Menus		検索…
+Font	Menus		フォント
+Green	Menus		緑
+Left	Menus		左揃え
+Magenta	Menus		紫
+New	Menus		新規作成
+OK	RevertToSavedAlert		Ok
+OK	SaveAlert		Ok
+Open…	Menus		開く…
+Page setup…	Menus		ページ設定…
+Paste	Menus		貼り付け
+Print…	Menus		印刷…
+Quit	Menus		終了
+Red	Menus		赤
+Replace	FindandReplaceWindow		置換
+Replace all	FindandReplaceWindow		全て置換
+Replace in all windows	FindandReplaceWindow		全てのウィンドウで置換
+Replace same	Menus		繰り返し置換
+Replace with:	FindandReplaceWindow		置換：
+Replace…	Menus		置換…
+Revert to saved…	Menus		最新保存版に戻す…
+Revert to the last version of \"%s\"? 	RevertToSavedAlert		\"%s\" を最後に保存した内容へ戻しますか？
+Right	Menus		右揃え
+Save	Menus		保存
+Save	QuitAlert		保存
+Save	SaveAlert		保存
 Save as…	Menus		名前をつけて保存…
+Save changes to the document \"%s\"? 	QuitAlert		\"%s\" が変更されましたが、保存されていません。終了前に保存しますか?
+Search backwards	FindandReplaceWindow		逆方向検索
+Select all	Menus		全て選択
+Size	Menus		サイズ
+This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		このファイルは読み取り専用です。変更を\"%s\"ドキュメントに保存しますか？
+Untitled 	StyledEditWindow		無題
+Wrap lines	Menus		ワードラップ
+Wrap-around search	FindandReplaceWindow		ラップアラウンド検索
+Yellow	Menus		黄

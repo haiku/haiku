@@ -1,39 +1,33 @@
-1	japanese	x-vnd.Haiku-Expander	1292562546
-Expand	ExpanderMenu		解凍
-Set destination…	ExpanderMenu		解凍先を指定…
-File expanded	ExpanderWindow		ファイル解凍が完了しました
-The destination is read only.	ExpanderWindow		解凍先は読み取り専用です
-Expander: Open	ExpanderWindow		Expander: 開く
-Select current	DirectoryFilePanel		このフォルダーを選択
-Source	ExpanderWindow		書庫ファイル
-Error when expanding archive	ExpanderWindow		書庫ファイルの解凍時にエラーが発生しました
-Hide contents	ExpanderWindow		内容を隠す
-Cancel	ExpanderWindow		中止
-Continue	ExpanderWindow		続ける
-Expander	ExpanderWindow	!! Window Title !!	Expander
-The destination folder does not exist.	ExpanderWindow		解凍先フォルダーは存在しません。
+1	japanese	x-vnd.Haiku-Expander	568565320
+About Expander…	ExpanderMenu		Expander について…
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		倉庫ファイルの解凍はまだ完了していません。それでも中止しますか？
+Cancel	ExpanderWindow		中止
+Close	ExpanderMenu		閉じる
+Continue	ExpanderWindow		続ける
+Destination	ExpanderWindow		解凍先
+Error when expanding archive	ExpanderWindow		書庫ファイルの解凍時にエラーが発生しました
+Expand	ExpanderMenu		解凍
+Expand	ExpanderWindow		解凍
+Expander: Choose destination	DirectoryFilePanel		Expander: 解凍先の選択
+Expander: Open	ExpanderWindow		Expander: 開く
+File	ExpanderMenu		ファイル
+File expanded	ExpanderWindow		ファイル解凍が完了しました
+Hide contents	ExpanderWindow		内容を隠す
 Select	DirectoryFilePanel		選択
-Creating listing for 	ExpanderWindow		リスト作成中 
+Select '%s'	DirectoryFilePanel		「%s」を選択
+Select current	DirectoryFilePanel		このフォルダーを選択
+Set destination…	ExpanderMenu		解凍先を指定…
+Set source…	ExpanderMenu		書庫ファイルを指定…
 Settings	ExpanderMenu		設定
 Settings…	ExpanderMenu		設定…
-Expander: Choose destination	DirectoryFilePanel		Expander: 解凍先の選択
-Show contents	ExpanderWindow		内容を表示
-Expanding file 	ExpanderWindow		ファイルを解凍中
-The folder was either moved, renamed or not\nsupported.	ExpanderWindow		指定されたフォルダー移動されたか、名前が変更されたか、\nサポートされていません。
-The file doesn't exist	ExpanderWindow		ファイルは存在しません
-Stop	ExpanderMenu		中止
-File	ExpanderMenu		ファイル
-Expand	ExpanderWindow		解凍
-Close	ExpanderMenu		閉じる
-The destination is not a folder.	ExpanderWindow		解凍先はフォルダーではありません。
-About Expander…	ExpanderMenu		Expander について…
-OK	About		Ok
-Set source…	ExpanderMenu		書庫ファイルを指定…
-Select '%s'	DirectoryFilePanel		「%s」を選択
 Show contents	ExpanderMenu		内容を表示
+Show contents	ExpanderWindow		内容を表示
+Source	ExpanderWindow		書庫ファイル
+Stop	ExpanderMenu		中止
 Stop	ExpanderWindow		中止
-Destination	ExpanderWindow		解凍先
-\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tJérôme Duval 作\n\tCopyright 2004-2006, Haiku Inc.\n\n元の Be バージョンの作者\nDominic, Hiroshi, Peter, Pavel および Robert\n
-Expander	About		Expander
+The destination folder does not exist.	ExpanderWindow		解凍先フォルダーは存在しません。
+The destination is not a folder.	ExpanderWindow		解凍先はフォルダーではありません。
+The destination is read only.	ExpanderWindow		解凍先は読み取り専用です
+The file doesn't exist	ExpanderWindow		ファイルは存在しません
+The folder was either moved, renamed or not\nsupported.	ExpanderWindow		指定されたフォルダー移動されたか、名前が変更されたか、\nサポートされていません。
 is not supported	ExpanderWindow		はサポートされてません

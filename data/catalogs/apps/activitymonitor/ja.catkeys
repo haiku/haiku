@@ -1,0 +1,37 @@
+1	japanese	x-vnd.Haiku-ActivityMonitor	1197557042
+Add graph	ActivityWindow		グラフの追加
+Additional items	ActivityView		追加項目
+Apps	DataSource		アプリ
+Block cache	DataSource		ブロックキャッシュ
+Block cache memory	DataSource		ブロックキャッシュメモリー
+CPU	DataSource		CPU
+CPU usage	DataSource		CPU 使用量
+CPU usage (combined)	DataSource		CPU 使用量(合計)
+Cache	DataSource		キャッシュ
+Cached memory	DataSource		キャッシュメモリー
+File	ActivityWindow		ファイル
+Hide legend	ActivityView		文字を隠す
+Media nodes	DataSource		メディアノード数
+Memory	DataSource		メモリー
+Network receive	DataSource		ネットワーク受信バイト数
+Network send	DataSource		ネットワーク送信バイト数
+P-faults	DataSource		ページフォルト
+Page faults	DataSource		ページフォルト数
+Ports	DataSource		ポート数
+Quit	ActivityWindow		終了
+Raw clipboard size	DataSource		クリップボードサイズ
+Receiving	DataSource		受信バイト数
+Remove graph	ActivityView		グラフの削除
+Running applications	DataSource		実行中のアプリケーション数
+Semaphores	DataSource		セマフォ数
+Sems	DataSource		セマフォ
+Sending	DataSource		送信バイト数
+Settings	ActivityWindow		設定
+Show legend	ActivityView		文字を表示
+Swap	DataSource		スワップ
+Swap space	DataSource		スワップサイズ
+Teams	DataSource		チーム数
+Text clipboard size	DataSource		テキストクリップボードサイズ
+Threads	DataSource		スレッド数
+Update time interval:	SettingsWindow		更新間隔：
+Used memory	DataSource		使用メモリー
