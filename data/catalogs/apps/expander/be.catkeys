@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Expander	3863172519
+1	belarusian	x-vnd.Haiku-Expander	51964396
 About Expander…	ExpanderMenu		Пра Распакоўшчык…
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Спыніць распакоўку гэтага \nархіва? Ужо распакаваныя файлы могуць быць няпоўнымі.
 Automatically expand files	ExpanderPreferences		Распакоўваць файлы аўтаматычна
@@ -14,8 +14,7 @@ Destination folder:	ExpanderPreferences		Папка прызначэння:
 Error when expanding archive	ExpanderWindow		Памылка падчас распакоўкі архіву
 Expand	ExpanderMenu		Распакаваць
 Expand	ExpanderWindow		Распакаваць
-Expander	About		Распакоўшчык
-Expander	ExpanderWindow	!! Window Title !!	Распакоўшчык
+Expander	Application name		Распакоўшчык
 Expander settings	ExpanderPreferences		Наладкі Распакоўшчыка
 Expander: Choose destination	DirectoryFilePanel		Распакоўшчык: Абраць прызначэнне
 Expander: Open	ExpanderWindow		Распакоўшчык: Адкрыць
@@ -25,7 +24,6 @@ File	ExpanderMenu		Файл
 File expanded	ExpanderWindow		Файл распакаваны
 Hide contents	ExpanderWindow		Схаваць змест
 Leave destination folder path empty	ExpanderPreferences		Пакінуць пуць да пакі прызначэння пустым
-OK	About		Так
 OK	ExpanderPreferences		ОК
 Open destination folder after extraction	ExpanderPreferences		Паказаць паку прызначэння пасля распакоўкі
 Other:	ExpanderPreferences		Другі:
@@ -49,5 +47,4 @@ The destination is read only.	ExpanderWindow		Запіс ў тэчку прыз�
 The file doesn't exist	ExpanderWindow		Гэты файл не існуе
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Гэты каталёг быў перамешчаны, перайменаваны, або не\n падтрымліваецца.
 Use:	ExpanderPreferences		Выкарыстаць:
-\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tраспрацавана Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nзыходная версія для BeOS была створана \nDominic, Hiroshi, Peter, Pavel and Robert\n
 is not supported	ExpanderWindow		не падтрымліваецца

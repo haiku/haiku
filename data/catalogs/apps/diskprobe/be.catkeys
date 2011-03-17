@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-DiskProbe	1552395580
+1	belarusian	x-vnd.Haiku-DiskProbe	1375904521
 %ld (native)	ProbeView		%ld (родны)
 (native)	ProbeView		(родны)
 15 bit	TypeEditors		15 біт
@@ -53,11 +53,10 @@ Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it i
 Device	ProbeView		Прылада
 Device offset: 	ProbeView		Адступ прылады:
 Device: 	ProbeView		Прылада:
-DiskProbe	OpenWindow		DiskProbe
+DiskProbe	Application name		Рэдактар
 DiskProbe request	AttributeWindow		Запыт DiskProbe
 DiskProbe request	DiskProbe		Запыт DiskProbe
 DiskProbe request	ProbeView		Запыт DiskProbe
-DiskProbe\n\twritten by Axel Dörfler\n\tCopyright 2004-2007, Haiku.\n\nOriginal Be version by Robert Polic\n	DiskProbe		DiskProbe\n\tствораны Axel Dörfler\n\tCopyright 2004-2007, Haiku.\n\nАрыгінальная BeOS-версія - Robert Polic\n
 Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Сапраўды жадаеце выдаліць атрыбут \"%s\" з файла\"%s\"?\n\nВы не зможаце адмяніць гэтае дзеянне.
 Don't save	ProbeView		Не захоўваць
 Double precision floating-point value:	TypeEditors		Значэнне з плаваючай запятой двайной дакладнасці:

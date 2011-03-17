@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Devices	189828730
+1	belarusian	x-vnd.Haiku-Devices	1465776728
 ACPI Information	DeviceACPI		Інфармацыя ACPI
 ACPI Processor Namespace '%2'	DeviceACPI		Абшар '%2' працэсара ACPI
 ACPI System Bus	DeviceACPI		Сістэмная шына ACPI
@@ -8,8 +8,6 @@ ACPI bus	Device		Шына ACPI
 ACPI bus	DevicesView		Шына ACPI
 ACPI controller	Device		Кантролер ACPI
 ACPI node '%1'	DeviceACPI		Вузел ACPI '%1'
-About	DevicesApplication		пра праграму
-About Devices…	DevicesView		Пра Devices...
 Basic information	DevicesView		Асноўная інфармацыя
 Bridge	Device		Мост
 Bus	DevicesView		Шына
@@ -30,9 +28,8 @@ Device name	DevicePCI		Імя прылады
 Device name:	Device		Імя прылады:
 Device paths	Device		Пуці прыладаў
 Device paths	DevicePCI		Пуці прыладаў
-Devices	DevicesApplication		Прылады
+Devices	Application name		Прылады
 Devices	DevicesView		Прылады
-Devices\n\twritten by Pieter Panman\n\n\tBased on listdev by Jérôme Duval\n\tand the previous Devices preference\n\tby Jérôme Duval and Sikosis\n\tCopyright 2009, Haiku, Inc.\n	DevicesApplication		Devices\n\t Аўтары: Pieter Panman\n\n\tЗаснавана на listdev (створаны Jérôme Duval)\n\tі папярэдніх канфігурацыях Devices \n\t(Jérôme Duval і Sikosis)\n\tCopyright 2009, Haiku, Inc.\n
 Display controller	Device		Кантролер экрану
 Docking station	Device		Док-станцыя
 Driver used	Device		Ужыты драйвер
@@ -56,7 +53,6 @@ Network controller	Device		Сеткавы кантролер
 None	Device		Адсутнічае
 Not implemented	DeviceACPI		Не рэалізавана
 Not implemented	DevicePCI		Не рэалізавана
-OK	DevicesApplication		ОК
 Order by:	DevicesView		Парадкаваць па:
 PCI Information	DevicePCI		Інфармацыя PCI
 PCI bus	Device		Шына PCI

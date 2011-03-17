@@ -1,9 +1,10 @@
-1	belarusian	system	2686335505
+1	belarusian	system	709849049
 %.2f TiB	StringForSize		%.2f ТіБ
 %3.2f GiB	StringForSize		%3.2f ГіБ
 %3.2f KiB	StringForSize		%3.2f КіБ
 %3.2f MiB	StringForSize		%3.2f МіБ
 %d bytes	StringForSize		%d байтаў
+About %app%	AboutMenuItem		Пра %app%
 About…	AboutWindow		Пра прагарму...
 Blue:	ColorControl		Сіні:
 Close	AboutWindow		Закрыць

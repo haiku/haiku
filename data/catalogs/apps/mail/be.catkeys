@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Be-MAIL	2797564879
+1	belarusian	x-vnd.Be-MAIL	1806372798
 %d - Date	Mail		%d - Дата
 %e - E-mail address	Mail		%e - адрас электроннай пошты
 %n - Full name	Mail		%n - Поўнае імя
@@ -60,7 +60,6 @@ Initial spell check mode:	Mail		Пачатковы рэжым праверкі �
 Leave as '%s'	Mail		Пакінуць як '%s'
 Leave as New	Mail		Пакінуць як Новае
 Leave same	Mail		Пакінуць так
-Mail	Mail		Пошта
 Mail couldn't find its dictionary.	Mail		Немагчыма знайсці слоўнік.
 Mail preferences	Mail		Наладкі Пошты
 Mail\n\n	Mail		Пошта\n\n

@@ -1,6 +1,5 @@
-1	belarusian	x-vnd.Haiku.PoorMan	805673381
+1	belarusian	x-vnd.Haiku.PoorMan	412131821
 A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Стандартны вэб-каталог быў створаны у \"/boot/home/public_html.\"\nПераканайцеся, что там ёсць HTML файл\"index.html\".
-About PoorMan	PoorMan		Пра PoorMan
 About PoorMan…	PoorMan		Пра PoorMan…
 Advanced	PoorMan		Пашыраныя
 Cancel	PoorMan		Адмена
@@ -35,7 +34,7 @@ Logging view	PoorMan		Від пратакаліравання
 Max. simultaneous connections:	PoorMan		Макс. колькасць адначасовых спалучэнняў:
 OK	PoorMan		ОК
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Калі ласка, выберыце каталог, які трэба апублікаваць.\n\nPoorMan можа стварыць для вас стандартны каталог \"public_html\" у хатнім каталозе.\nАбо вы можаце самі выбраць пажаданы каталог.
-Poor Man's web server\nCopyright © 2004-2009 Haiku\nAll rights reserved.\n\nWritten by: Philip Harrison, Ma Jie	PoorMan		Вэб-сервер Poor Man\nCopyright © 2004-2009 Haiku\nУсе правы захаваныя.\n\nСтвораны: Philip Harrison, Ma Jie
+PoorMan	Application name		Валацуга (Web-сервер)
 PoorMan settings	PoorMan		Наладкі PoorMan
 Quit	PoorMan		Выйсці
 Run server	PoorMan		Запусціць сервер

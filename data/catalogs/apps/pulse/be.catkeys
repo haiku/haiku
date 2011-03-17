@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Pulse	1325849358
+1	belarusian	x-vnd.Haiku-Pulse	2596799409
 %.2f GHz	NormalPulseView		%.2f ГГц
 %ld MHz	NormalPulseView		%ld МГц
 %s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nРаспрацаваны David Ramsey і Arve Hjønnevåg\nПерагледжаны Daniel Switkin\n
@@ -35,7 +35,6 @@ OK	PulseApp		ОК
 OK	PulseView		ОК
 Pulse	NormalPulseView		Пульс
 Pulse	PulseApp		Пульс
-Pulse	PulseWindow		Пульс
 Pulse settings	PulseWindow		Наладкі Пульса
 Quit	DeskbarPulseView		Выйсці
 Quit	MiniPulseView		Выйсці

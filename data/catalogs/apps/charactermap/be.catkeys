@@ -1,5 +1,4 @@
-1	belarusian	x-vnd.Haiku-CharacterMap	1305599334
-About CharacterMap…	CharacterWindow		Пра CharacterMap…
+1	belarusian	x-vnd.Haiku-CharacterMap	921188319
 Aegean numbers	UnicodeBlocks		Эгейскія лічбы
 Alphabetic presentation forms	UnicodeBlocks		Формы алфавітнага прадстаўлення
 Ancient Greek musical notation	UnicodeBlocks		Старажытнагрэчаскія музыкальныя сімвалы
@@ -34,8 +33,7 @@ CJK unified ideographs extension A	UnicodeBlocks		Іерогліфы CJK дап�
 CJK unified ideographs extension B	UnicodeBlocks		Іерогліфы CJK дапаўненне B
 Carian	UnicodeBlocks		Карыянскі
 Cham	UnicodeBlocks		Чам
-CharacterMap	CharacterWindow		Мапа Сімвалаў
-CharacterMap\n\twritten by Axel Dörfler\n\tCopyright 2009, Haiku, Inc.\n	CharacterMap		CharacterMap\n\tАўтар: Axel Dörfler\n\tCopyright 2009, Haiku, Inc.\n
+CharacterMap	Application name		Табліца сімвалаў
 Cherokee	UnicodeBlocks		Чырокі
 Clear	CharacterWindow		Ачысціць
 Code	CharacterWindow		Код
@@ -125,7 +123,6 @@ Myanmar	UnicodeBlocks		Маянмар
 N'Ko	UnicodeBlocks		N'Ko
 New Tai Lue	UnicodeBlocks		Новы Tai Lue
 Number forms	UnicodeBlocks		Формы лічбаў
-OK	CharacterMap		ОК
 Ogham	UnicodeBlocks		Огам
 Ol Chiki	UnicodeBlocks		Оль Чыкі
 Old Persian	UnicodeBlocks		Стары персідскі

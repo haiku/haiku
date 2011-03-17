@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-MediaPlayer	2929328887
+1	belarusian	x-vnd.Haiku-MediaPlayer	2133469082
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Амерыка)
 100% scale	MediaPlayer-Main		Маштаб 100%
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Кінатэатр)
@@ -12,7 +12,6 @@
 <unknown>	PlaylistItem-author		<невядомы>
 <unnamed>	PlaylistItem-name		<неназваны>
 <untitled>	PlaylistItem-title		<неназваны>
-About MediaPlayer…	MediaPlayer-Main		Пра Праігравальнік Медыя…
 All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Нельга адправіць усе файлы ў Сметніцу.
 Always on top	MediaPlayer-Main		Заўседы наверсе
 Aspect ratio	MediaPlayer-Main		Суадносіны бакоў
@@ -51,10 +50,7 @@ Lock Peaks	MediaPlayer-PeakView		Блакаваць Пікі
 Loop movies by default	MediaPlayer-SettingsWindow		Зацыкліць відэа па змоўчанню
 Loop sounds by default	MediaPlayer-SettingsWindow		Зацыкліць гукі па змоўчанню
 Low volume	MediaPlayer-SettingsWindow		Нізкая гучнасць
-MediaPlayer	MediaPlayer-Main		Праігравальнік Медыя
-MediaPlayer encountered an internal error. The file could not be opened.	MediaPlayer-Main		Адбылася унутраная памылка MediaPlayer. Нельга адкрыць файл.
 MediaPlayer settings	MediaPlayer-SettingsWindow		Наладкі Праігравальніка Медыя
-MediaPlayer\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		Праігравальнік Медыя\n\nСтвораны Marcus Overhagen, Stephan Aßmus and Frederik Modéen
 Medium	MediaPlayer-SettingsWindow		Сярэдняе
 Move Entries	MediaPlayer-MovePLItemsCmd		Перамясціць элементы
 Move Entry	MediaPlayer-MovePLItemsCmd		Перамясціць элемент
@@ -80,7 +76,6 @@ Open…	MediaPlayer-PlaylistWindow		Адкрыць...
 Pause	MediaPlayer-Main		Прыпыніць
 Pause playback.	MediaPlayer-Main		Прыпыніць прайгранне.
 Play	MediaPlayer-Main		Прайграць
-Play background clips at	MediaPlayer-SettingsWindow		Іграць фонавыя кліпы на
 Play mode	MediaPlayer-SettingsWindow		Рэжым прайграння
 Playlist	MediaPlayer-PlaylistWindow		Плэйліст
 Playlist…	MediaPlayer-Main		Плэйліст
@@ -117,8 +112,8 @@ Start playing.	MediaPlayer-Main		Пачаць прайгранне.
 Stop	MediaPlayer-Main		Спыніць
 Stop playing.	MediaPlayer-Main		Спыніць прайгранне.
 Stream settings	MediaPlayer-Main		Наладкі патоку
-Subtitle placement	MediaPlayer-SettingsWindow		Знаходжанне субтытраў
-Subtitle size	MediaPlayer-SettingsWindow		Памер субтытраў
+Subtitle placement:	MediaPlayer-SettingsWindow		Месцазнаходжанне субтытраў:
+Subtitle size:	MediaPlayer-SettingsWindow		Памер субтытраў:
 Subtitles	MediaPlayer-Main		Субтытры
 Thanks	MediaPlayer-Main		Дзякуй
 The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Файл '%filename' немагчыма адкрыць.\n\n
@@ -136,6 +131,6 @@ Video	MediaPlayer-Main		Відэа
 Video track	MediaPlayer-Main		Відэа дарожка
 View options	MediaPlayer-SettingsWindow		Опцыі віду
 Volume	MediaPlayer-Main		Гучнасць
-error	MediaPlayer-Main		памылка
+Volume of background clips	MediaPlayer-SettingsWindow		Гучнасць фонавых кліпаў
 none	Audio track menu		няма
 none	Subtitles menu		няма

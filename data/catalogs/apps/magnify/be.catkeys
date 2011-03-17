@@ -1,6 +1,5 @@
-1	belarusian	x-vnd.Haiku-Magnify	1680541832
+1	belarusian	x-vnd.Haiku-Magnify	2101743114
 %width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize пікселяў на піксель
-About Magnify…	Magnify-Main		Пра Magnify…
 Add a crosshair	Magnify-Main		Дадаць перакрыжаванне
 Copy image	Magnify-Main		Капіяваць выяву
 Copy/Save:\n  copy - copies the current image to the clipboard\n  save - prompts the user for a file to save to and writes out\n    the bits of the image\n	Magnify-Help		Капіяванне/Захаванне:\n капіяваць - капіруе цякучую выяву у буфер\n захаваць - пытае у карыстача файл, у які захоўваць\n і запісвае туды выяву\n
@@ -8,14 +7,12 @@ Decrease pixel size	Magnify-Main		Паменшыць памер пікселяў
 Decrease window size	Magnify-Main		Паменшыць памер вакна
 Freeze/Unfreeze image	Magnify-Main		Замарозіць/Размарозіць выяву
 General:\n  32 x 32 - the top left numbers are the number of visible\n    pixels (width x height)\n  8 pixels/pixel - represents the number of pixels that are\n    used to magnify a pixel\n  R:152 G:52 B:10 -  the RGB values for the pixel under\n    the red square\n	Magnify-Help		Агульныя:\n 32 x32 - верхнія левыя лічбы - колькасць бачных\n пікселяў (шырыня x вышыня)\n 8 пікселяў на піксель - паказвае, колькі пікселяў\n выкарыстана, каб павялічыць адзін піксель\n R:152 G:52 B:10 - RGB значэнні пікселя пад чырвоным квадратам\n
-Help…	Magnify-Main		Даведка...
 Hide/Show grid	Magnify-Main		Схаваць/Паказаць сетку
 Hide/Show info	Magnify-Main		Схаваць/Паказаць інфармацыю
 Increase pixel size	Magnify-Main		Павялічыць памер пікселяў
 Increase window size	Magnify-Main		Павялічыць памер вакна
 Info	Magnify-Main		Інфармацыя
 Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		Інфа:\n hide/show info - хавае/паказвае новыя магчымасці\n увага: чырвоны квадрат што з´яўляецца падчас прагляду паказвае\n якія RGB велічыні пікселяў будуць адлюстраваны\n add/remove crosshairs - можна дадаць ці выдаліць 2 перакрыжаванні\n каб спрасціць выраўнованне ды размяшчэнне аб´ектаў.\n Перакрыжаванні адлюстраваны блакітнымі квадратамі і блакітнымі лініямі.\n hide/show grid - паказаць ці схаваць сетку, што падзяляе выяву на пікселі\n
-Magnify	Magnify-Main		Magnify
 Magnify help	Magnify-Help		Дапамога Magnify
 Magnify!\n\n©2002-2006 Haiku\n(C)1999 Be Inc.\n\nNow with even more features and recompiled for Haiku.	Magnify-Main		Magnify!\n\n©2002-2006 Haiku\n(C)1999 Be Inc.\n\nЦяпер яжчэ больш функцый і спецыяльна для Haiku.
 Make square	Magnify-Main		Зрабіць квадратным

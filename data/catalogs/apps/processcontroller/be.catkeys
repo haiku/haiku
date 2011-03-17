@@ -1,6 +1,5 @@
-1	belarusian	x-vnd.Haiku-ProcessController	769318393
+1	belarusian	x-vnd.Haiku-ProcessController	526557007
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
-About	ProcessController		пра праграму
 About ProcessController…	ProcessController		Пра ProcessController…
 Cancel	ProcessController		Адмена
 Custom priority	ProcessController		Нестандартны прыярытэт
@@ -24,9 +23,7 @@ Normal priority	ProcessController		Нармальны прыярытэт
 OK	ProcessController		ОК
 Ok!	ProcessController		ОК!
 Please confirm	ProcessController		Калі ласка падцвердзіце
-ProcessController	ProcessController		ProcessController
 ProcessController is already installed in Deskbar.	ProcessController		ProcessController ужо ўсталяваны ў Deskbar.
-ProcessController\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n	ProcessController		ProcessController\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n
 Processor %d	ProcessController		Працэсар %d
 Quit an application	ProcessController		Закрыць праграму
 Quit application	ProcessController		Выйсці з праграмы

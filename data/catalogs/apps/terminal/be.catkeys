@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Terminal	1413115910
+1	belarusian	x-vnd.Haiku-Terminal	4275906666
 -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h, --help паказаць гэтую даведку\n -t, --title прызначыць імя вакна\n -f, --fullscreen запусціць у поўным экране\n
 Abort	Terminal Shell		Спыніць
 About Terminal…	Terminal TermWindow		Пра Тэрмінал...
@@ -75,9 +75,7 @@ Size:	Terminal AppearancePrefView		Памер:
 Switch Terminals	Terminal TermWindow		Пераключыць Тэрміналы
 Tab title:	Terminal AppearancePrefView		Імя ўкладкі:
 Tab title:	Terminal TermWindow		Імя ўкладкі:
-Terminal	Terminal TermWindow		Тэрмінал
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Тэрмінал не змог запусціць абалонку. Выбачайце.
-Terminal settings	Terminal PrefWindow		Наладкі тэрміналу
 Terminal\n\nwritten by Kazuho Okui and Takashi Murai\nupdated by Kian Duffy and others\n\nCopyright ©2003-2009, Haiku.\n	Terminal TermView		Тэрмінал\n\nнапісаны Kazuho Okui and Takashi Murai\nабноўлены Kian Duffy і іншымі\n\nCopyright ©2003-2009, Haiku.\n
 Text	Terminal AppearancePrefView		Тэкст
 Text encoding	Terminal TermWindow		Кадоўка тэксту

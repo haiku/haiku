@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Keymap	4175672673
+1	belarusian	x-vnd.Haiku-Keymap	3858687220
 (Current)	Keymap window		(Бягучая)
 Acute trigger	Keymap window		Acute
 Circumflex trigger	Keymap window		Circumflex
@@ -6,7 +6,6 @@ Diaeresis trigger	Keymap window		Diaeresis
 File	Keymap window		Файл
 Font	Keymap window		Шрыфт
 Grave trigger	Keymap window		Grave
-Keymap	Keymap window		Мапа клавіятуры
 Layout	Keymap window		Расклад клавіятуры
 Open…	Keymap window		Адкрыць…
 Quit	Keymap window		Выйсці

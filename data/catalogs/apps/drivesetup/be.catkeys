@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-DriveSetup	2723551013
+1	belarusian	x-vnd.Haiku-DriveSetup	1143590865
 %ld MiB	Support		%ld MiB
 <empty>	DiskView		<пуста>
 <empty>	PartitionList		<пуста>
@@ -29,7 +29,7 @@ Device	DiskView		Прылада
 Device	PartitionList		Прылада
 Disk	MainWindow		Дыск
 Disk system \"%s\"\" not found!	MainWindow		Дыскавая сістэма \"%s\"\" не знойдзена!
-DriveSetup	MainWindow		Разметка Дыску
+DriveSetup	Application name		РэдактарДыскаў
 Eject	MainWindow		Выцягнуць
 End: %ld MB	Support		Канец %ld MB
 Error: 	MainWindow	in any error alert	Памылка:
