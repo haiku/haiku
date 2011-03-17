@@ -61,6 +61,7 @@ const struct supported_device {
 	//  Radeon 3670		- RV635
 	//  Radeon 3850		- RV670
 	//  Radeon 3870		- RV670
+	{0x9501, 0, "Radeon HD 3870"},	/*RV670, IGP*/
 	//  Radeon 3850 x2	- RV680
 	//  Radeon 3870 x2	- RV680
 
