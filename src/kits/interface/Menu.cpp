@@ -17,12 +17,14 @@
 #include <string.h>
 
 #include <Bitmap.h>
+#include <Catalog.h>
 #include <ControlLook.h>
 #include <Debug.h>
 #include <File.h>
 #include <FindDirectory.h>
 #include <Layout.h>
 #include <LayoutUtils.h>
+#include <LocaleBackend.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
 #include <Messenger.h>
@@ -43,6 +45,17 @@
 
 
 #define USE_CACHED_MENUWINDOW 1
+
+using BPrivate::gLocaleBackend;
+using BPrivate::LocaleBackend;
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Menu"
+
+#undef B_TRANSLATE
+#define B_TRANSLATE(str) \
+	gLocaleBackend->GetString(B_TRANSLATE_MARK(str), "Menu")
+
 
 using std::nothrow;
 using BPrivate::BMenuWindow;
@@ -180,6 +193,7 @@ static property_info sPropList[] = {
 };
 
 
+// note: this is redefined to localized one in BMenu::_InitData
 const char* BPrivate::kEmptyMenuLabel = "<empty>";
 
 
@@ -1396,6 +1410,13 @@ void BMenu::_ReservedMenu6() {}
 void
 BMenu::_InitData(BMessage* archive)
 {
+	// we need to translate some strings, and in order to do so, we need
+	// to use the LocaleBackend to reach liblocale.so
+	if (gLocaleBackend == NULL)
+		LocaleBackend::LoadBackend();
+
+	BPrivate::kEmptyMenuLabel = B_TRANSLATE("<empty>");
+
 	// TODO: Get _color, _fname, _fflt from the message, if present
 	BFont font;
 	font.SetFamilyAndStyle(sMenuInfo.f_family, sMenuInfo.f_style);

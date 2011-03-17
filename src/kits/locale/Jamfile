@@ -68,13 +68,21 @@ SEARCH on [ FGristFiles AboutWindow.cpp ] += [ FDirName $(HAIKU_TOP) src kits sh
 SEARCH on [ FGristFiles ColorControl.cpp ] += [ FDirName $(HAIKU_TOP) src kits interface ] ;
 SEARCH on [ FGristFiles StringForSize.cpp ] += [ FDirName $(HAIKU_TOP) src kits shared ] ;
 SEARCH on [ FGristFiles TextView.cpp ] += [ FDirName $(HAIKU_TOP) src kits interface ] ;
-
+SEARCH on [ FGristFiles Dragger.cpp ] += [ FDirName $(HAIKU_TOP) src kits interface ] ;
+SEARCH on [ FGristFiles Menu.cpp ] += [ FDirName $(HAIKU_TOP) src kits interface ] ;
+SEARCH on [ FGristFiles PrintJob.cpp ] += [ FDirName $(HAIKU_TOP) src kits interface ] ;
+SEARCH on [ FGristFiles ZombieReplicantView.cpp ] += [ FDirName $(HAIKU_TOP) src kits interface ] ;
+	
 DoCatalogs liblocale.so
 	: system
 	:
 	AboutMenuItem.cpp
 	AboutWindow.cpp
 	ColorControl.cpp
+	Dragger.cpp
+	Menu.cpp
+	PrintJob.cpp
 	StringForSize.cpp
 	TextView.cpp
+	ZombieReplicantView.cpp
 	;

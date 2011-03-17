@@ -19,10 +19,12 @@
 #include <Alert.h>
 #include <Application.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <Debug.h>
 #include <Entry.h>
 #include <File.h>
 #include <FindDirectory.h>
+#include <LocaleBackend.h>
 #include <Messenger.h>
 #include <NodeInfo.h>
 #include <OS.h>
@@ -33,6 +35,16 @@
 
 #include <pr_server.h>
 #include <ViewPrivate.h>
+
+using BPrivate::gLocaleBackend;
+using BPrivate::LocaleBackend;
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "PrintJob"
+
+#undef B_TRANSLATE
+#define B_TRANSLATE(str) \
+	gLocaleBackend->GetString(B_TRANSLATE_MARK(str), "PrintJob")
 
 
 /*!	Summary of spool file:
@@ -92,7 +104,7 @@ struct _page_header_ {
 static void
 ShowError(const char* message)
 {
-	BAlert* alert = new BAlert("Error", message, "OK");
+	BAlert* alert = new BAlert(B_TRANSLATE("Error"), message, B_TRANSLATE("OK"));
 	alert->Go();
 }
 
@@ -158,6 +170,11 @@ BPrintJob::BPrintJob(const char* jobName)
 	fCurrentPageHeader = new _page_header_;
 	if (fCurrentPageHeader != NULL)
 		memset(fCurrentPageHeader, 0, sizeof(_page_header_));
+
+	// we need to translate some strings, and in order to do so, we need
+	// to use the LocaleBackend to reach liblocale.so
+	if (gLocaleBackend == NULL)
+		LocaleBackend::LoadBackend();
 }
 
 
@@ -282,7 +299,7 @@ BPrintJob::CommitJob()
 		return;
 
 	if (fSpoolFileHeader.page_count == 0) {
-		ShowError("No Pages to print!");
+		ShowError(B_TRANSLATE("No Pages to print!"));
 		CancelJob();
 		return;
 	}
@@ -843,7 +860,7 @@ PrintServerMessenger::MessengerThread(void* data)
 
 	BMessenger printServer;
 	if (messenger->GetPrintServerMessenger(printServer) != B_OK) {
-		ShowError("Print Server is not responding.");
+		ShowError(B_TRANSLATE("Print Server is not responding."));
 		messenger->SetResult(NULL);
 		return B_ERROR;
 	}

@@ -89,6 +89,7 @@ private:
 
 			BDragger&			operator=(const BDragger& other);
 
+			void				_InitData();
 			void				_AddToList();
 			void				_RemoveFromList();
 			status_t			_DetermineRelationship();

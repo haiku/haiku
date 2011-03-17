@@ -18,7 +18,9 @@
 #include <Alert.h>
 #include <Beep.h>
 #include <Bitmap.h>
+#include <Catalog.h>
 #include <Dragger.h>
+#include <LocaleBackend.h>
 #include <MenuItem.h>
 #include <Message.h>
 #include <PopUpMenu.h>
@@ -35,6 +37,15 @@
 
 #include "ZombieReplicantView.h"
 
+using BPrivate::gLocaleBackend;
+using BPrivate::LocaleBackend;
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Dragger"
+
+#undef B_TRANSLATE
+#define B_TRANSLATE(str) \
+	gLocaleBackend->GetString(B_TRANSLATE_MARK(str), "Dragger")
 
 const uint32 kMsgDragStarted = 'Drgs';
 
@@ -114,8 +125,7 @@ BDragger::BDragger(BRect bounds, BView *target, uint32 rmask, uint32 flags)
 	fPopUpIsCustom(false),
 	fPopUp(NULL)
 {
-	fBitmap = new BBitmap(BRect(0.0f, 0.0f, 7.0f, 7.0f), B_CMAP8, false, false);
-	fBitmap->SetBits(kHandBitmap, fBitmap->BitsLength(), 0, B_CMAP8);
+	_InitData();
 }
 
 
@@ -132,8 +142,7 @@ BDragger::BDragger(BMessage *data)
 {
 	data->FindInt32("_rel", (int32 *)&fRelation);
 
-	fBitmap = new BBitmap(BRect(0.0f, 0.0f, 7.0f, 7.0f), B_CMAP8, false, false);
-	fBitmap->SetBits(kHandBitmap, fBitmap->BitsLength(), 0, B_CMAP8);
+	_InitData();
 
 	BMessage popupMsg;
 	if (data->FindMessage("_popup", &popupMsg) == B_OK) {
@@ -292,10 +301,10 @@ BDragger::MessageReceived(BMessage *msg)
 			if (fShelf != NULL)
 				Window()->PostMessage(kDeleteReplicant, fTarget, NULL);
 			else {
-				(new BAlert("??",
-					"Can't delete this replicant from its original "
-					"application. Life goes on.",
-					"OK", NULL, NULL, B_WIDTH_FROM_WIDEST,
+				(new BAlert(B_TRANSLATE("Warning"),
+					B_TRANSLATE("Can't delete this replicant from its original "
+					"application. Life goes on."),
+					B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_FROM_WIDEST,
 					B_WARNING_ALERT))->Go(NULL);
 			}
 			break;
@@ -616,6 +625,19 @@ BDragger::_UpdateShowAllDraggers(bool visible)
 
 
 void
+BDragger::_InitData()
+{
+	fBitmap = new BBitmap(BRect(0.0f, 0.0f, 7.0f, 7.0f), B_CMAP8, false, false);
+	fBitmap->SetBits(kHandBitmap, fBitmap->BitsLength(), 0, B_CMAP8);
+	
+	// we need to translate some strings, and in order to do so, we need
+	// to use the LocaleBackend to reach liblocale.so
+	if (gLocaleBackend == NULL)
+		LocaleBackend::LoadBackend();
+}
+
+
+void
 BDragger::_AddToList()
 {
 	DraggerManager* manager = DraggerManager::Default();
@@ -722,12 +744,12 @@ BDragger::_BuildDefaultPopUp()
 	if (name)
 		msg->AddString("target", name);
 
-	char about[B_OS_NAME_LENGTH];
-	snprintf(about, B_OS_NAME_LENGTH, "About %s" B_UTF8_ELLIPSIS, name);
+	BString about(B_TRANSLATE("About %app"B_UTF8_ELLIPSIS));
+	about.ReplaceFirst("%app", name);
 
-	fPopUp->AddItem(new BMenuItem(about, msg));
+	fPopUp->AddItem(new BMenuItem(about.String(), msg));
 	fPopUp->AddSeparatorItem();
-	fPopUp->AddItem(new BMenuItem("Remove replicant",
+	fPopUp->AddItem(new BMenuItem(B_TRANSLATE("Remove replicant"),
 		new BMessage(kDeleteReplicant)));
 }
 
