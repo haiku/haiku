@@ -1,0 +1,33 @@
+1	swedish	x-vnd.Haiku-PackageInstaller	3743501330
+%.1f GiB	PackageView		%.1f GiB
+%.1f KiB	PackageView		%.1f KiB
+(%s free)	PackageView		(%s ledigt)
+Abort	PackageInfo		Avbryt
+Abort	PackageInstall		Avbryt
+Abort	PackageView		Avbryt
+Accept	PackageTextViewer		Acceptera
+All existing files will be skipped?	PackageView		Hoppa över alla existerande filer?
+Ask again	PackageView		Fråga igen
+Continue	PackageInfo		Fortsätt
+Continue	PackageInstall		Fortsätt
+Continue	PackageTextViewer		Fortsätt
+Decline	PackageTextViewer		Acceptera inte
+Disclaimer	PackageTextViewer		Ansvarsfriskrivning
+Done	PackageInstall		Färdig
+Error on uninstall\n	PackageInstall		Fel vid avinstallation\n
+Finishing installation	PackageInstall		Slutför installation
+Install	PackageView		Installera
+Install to:	PackageView		Installera till:
+Installation type:	PackageView		Installationstyp:
+Installing package	PackageStatus		Installerar paket
+No package available.	PackageInfo		Inga paket tillgängliga.
+No package selected.	PackageInfo		Inga paket valda.
+OK	PackageView		OK
+OK	Packageinstaller main		OK
+Other…	PackageView		Annan...
+PackageInstaller	Application name		PaketInstallerare
+PackageInstaller\nBeOS legacy .pkg file installer for Haiku.\n\nCopyright 2007,\nŁukasz 'Sil2100' Zemczak\n\nCopyright (c) 2007 Haiku, Inc. \n	Packageinstaller main		PaketInstallerare\nBeOS pkg-fil installerare för Haiku.\n\nUpphovsrätt 2007,\nŁukasz 'Sil2100' Zemczak\n\nUpphovsrätt (c) 2007 Haiku, Inc. \n
+Preparing package	PackageInstall		Förbereder paket
+Replace	PackageView		Ersätt
+Stop	PackageStatus		Stoppa
+The installation of the package has been aborted.	PackageView		Installationen av paketet har avbrutits.

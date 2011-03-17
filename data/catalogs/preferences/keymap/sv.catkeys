@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Keymap	4175672673
+1	swedish	x-vnd.Haiku-Keymap	1986668195
 (Current)	Keymap window		(Nuvarande)
 Acute trigger	Keymap window		Acute trigger
 Circumflex trigger	Keymap window		Circumflex trigger
@@ -6,7 +6,7 @@ Diaeresis trigger	Keymap window		Diaeresis trigger
 File	Keymap window		Arkiv
 Font	Keymap window		Typsnitt
 Grave trigger	Keymap window		Grave trigger
-Keymap	Keymap window		Tangentbordslayout
+Keymap	Application name		TeckenUppsättning
 Layout	Keymap window		Utseende
 Open…	Keymap window		Öppna…
 Quit	Keymap window		Avsluta

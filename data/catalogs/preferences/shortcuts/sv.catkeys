@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Shortcuts	1120793954
+1	swedish	x-vnd.Haiku-Shortcuts	1278045456
 (Choose application with file requester)	ShortcutsWindow		(Välj applikation i filväljarfönstret)
 *Beep	ShortcutsWindow		*Pip
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InfogaSträng \"Din text\"
@@ -47,7 +47,7 @@ Save KeySet as…	ShortcutsWindow		Spara som...
 Select	ShortcutsWindow		Välj
 SendMessage	ShortcutsSpec		SkickaMeddelande
 Shift	ShortcutsSpec	Name for modifier on keyboard	Skift
-Shortcuts	ShortcutsWindow		Genvägar
+Shortcuts	Application name		Genvägar
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Genvägar kunde inte öppna din tagentuppsättning!
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Genvägar kunde inte läsa dina inställningar!
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Genvägar kunde inte spara dina inställningar!

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-NetworkStatus	3379615764
+1	finnish	x-vnd.Haiku-NetworkStatus	1546519911
 %ifaceName information:\n	NetworkStatusView		%ifaceName-tiedot:\n
 <no wireless networks found>	NetworkStatusView		<langatonta verkkoa ei löytynyt>
 Address	NetworkStatusView		Osoite
@@ -8,7 +8,7 @@ Could not join wireless network:\n	NetworkStatusView		Liittyminen langattomaan v
 Install in Deskbar	NetworkStatus		Asenna Työpöytäpalkkiin
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Verkkoasetusohjelman käynnistyminen epäonnistui.\n\nVirhe:
 Netmask	NetworkStatusView		Verkkopeite
-NetworkStatus	NetworkStatusWindow		Verkkotila
+NetworkStatus	Application name		Verkkotila
 NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		Verkkotilan valitsimet:\n\t--deskbar\tlisää automaatisesti replikantti Työpöytäpalkkiin\n\t--help\t\ttulosta nämä tiedot ja poistu\n
 NetworkStatus\n\twritten by %1 and Hugo Santos\n\t%2, Haiku, Inc.\n	NetworkStatusView		Verkkotila\n\ttekijät: %1 ja Hugo Santos\n\t%2, Haiku, Inc.\n
 No link	NetworkStatusView		Ei linkkiä

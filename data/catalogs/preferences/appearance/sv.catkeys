@@ -1,8 +1,8 @@
-1	swedish	x-vnd.Haiku-Appearance	3612090060
+1	swedish	x-vnd.Haiku-Appearance	3129065638
 Antialiasing	APRWindow		Kantutjämning
 Antialiasing menu	AntialiasingSettingsView		Kantutjämningsmeny
 Antialiasing type:	AntialiasingSettingsView		Kantutjämningstyp:
-Appearance	APRWindow		Utseende
+Appearance	Application name		Utseende
 Colors	APRWindow		Färger
 Control background	Colors tab		Kontrollbakgrund
 Control border	Colors tab		Kontrollkant

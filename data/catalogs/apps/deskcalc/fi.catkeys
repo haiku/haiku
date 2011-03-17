@@ -1,8 +1,5 @@
-1	finnish	x-vnd.Haiku-DeskCalc	168574347
-About DeskCalc…	CalcView		Ohjelmasta Työpöytälaskin...
+1	finnish	x-vnd.Haiku-DeskCalc	4227242427
 Audio Feedback	CalcView		Äänipalaute
 DeskCalc	Application name		Työpöytälaskin
-DeskCalc v2.1.0\n\nwritten by Timothy Wayper,\nStephan Aßmus and Ingo Weinhold\n\n©1997, 1998 R3 Software Ltd.\n©2006-2009 Haiku, Inc.\n\nAll Rights Reserved.	CalcView		Työpöytälaskin v2.1.0\n\ntekijä: Timothy Wayper,\nStephan Aßmus ja Ingo Weinhold\n\n©1997, 1998 R3 Software Ltd.\n©2006-2009 Haiku, Inc.\n\nAll Rights Reserved.
 Enable Num Lock on startup	CalcView		Ota käyttöön ”Num Lock”-asetukset käynnistettäessä
 Show keypad	CalcView		Näytä näppäimistö
-about	CalcView		Ohjelmasta

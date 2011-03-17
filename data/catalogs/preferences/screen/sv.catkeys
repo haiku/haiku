@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Screen	1658032282
+1	swedish	x-vnd.Haiku-Screen	1466525338
 %.1f Hz	Screen		%.1f Hz
 %sSerial no.: %s	Screen		%sSerienummer: %s
 /other…	Screen		/annan...
@@ -28,6 +28,7 @@ Refresh rate:	Screen		Uppdateringsfrekvens:
 Resolution:	Screen		Upplösning:
 Revert	Screen		Återställ
 Rows:	Screen		Rader:
+Screen	Application name		Skärm
 Screen	Screen		Skärm
 Screen preferences by the Haiku team	Screen		Skärm, skrivet av Haiku-teamet
 Set background…	Screen		Bakgrundsinställningar...

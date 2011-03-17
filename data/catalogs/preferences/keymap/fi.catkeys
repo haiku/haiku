@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Keymap	4175672673
+1	finnish	x-vnd.Haiku-Keymap	3858687220
 (Current)	Keymap window		(Nykyinen)
 Acute trigger	Keymap window		Akuuttiaksenttiliipaisin
 Circumflex trigger	Keymap window		Sirkumfleksiliipaisin
@@ -6,7 +6,6 @@ Diaeresis trigger	Keymap window		Treemaliipaisin
 File	Keymap window		Tiedosto
 Font	Keymap window		Kirjasin
 Grave trigger	Keymap window		Gravisliipaisin
-Keymap	Keymap window		Näppäinkartta
 Layout	Keymap window		Ulkoasu
 Open…	Keymap window		Avaa…
 Quit	Keymap window		Poistu

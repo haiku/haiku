@@ -1,8 +1,8 @@
-1	swedish	x-vnd.Be-MAIL	2797564879
+1	swedish	x-vnd.Be-MAIL	2684447565
 %d - Date	Mail		%d - Datum
 %e - E-mail address	Mail		%e - mejladress
 %n - Full name	Mail		%n - Fullständigt namn
-About Mail…	Mail		Om Mail...
+About Mail…	Mail		Om E-post...
 Account from mail	Mail		Konto från brev
 Account:	Mail		Konto:
 Accounts…	Mail		Konton...
@@ -60,10 +60,10 @@ Initial spell check mode:	Mail		Startläge för stavningskontroll:
 Leave as '%s'	Mail		Lämna som '%s'
 Leave as New	Mail		Lämna som nytt
 Leave same	Mail		Ändra inte
-Mail	Mail		Mail
-Mail couldn't find its dictionary.	Mail		Mail kunde inte hitta sin ordlista.
-Mail preferences	Mail		Mail : Inställningar
-Mail\n\n	Mail		Mail\n\n
+Mail	Application name		E-post
+Mail couldn't find its dictionary.	Mail		Programmet kunde inte hitta sin ordlista.
+Mail preferences	Mail		E-post : Inställningar
+Mail\n\n	Mail		E-post\n\n
 Mailing	Mail		Mejlning
 Message	Mail		Meddelande
 Move to trash	Mail		Flytta till papperskorgen

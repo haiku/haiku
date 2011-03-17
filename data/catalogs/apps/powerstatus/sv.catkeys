@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-PowerStatus	51899741
+1	swedish	x-vnd.Haiku-PowerStatus	1451591102
 About	PowerStatus		om
 About…	PowerStatus		Om...
 Battery charging	PowerStatus		Laddar batteri
@@ -22,6 +22,7 @@ Model number: 	PowerStatus		Modellnummer:
 OEM info: 	PowerStatus		OEM information:
 OK	PowerStatus		OK
 Power status box	PowerStatus		Batteristatus
+PowerStatus	Application name		Batteristatus
 PowerStatus	PowerStatus		Batteristatus
 PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		Batteristatus\nskrivet av Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
 Quit	PowerStatus		Avsluta

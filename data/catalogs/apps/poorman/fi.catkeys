@@ -1,6 +1,5 @@
-1	finnish	x-vnd.Haiku.PoorMan	805673381
+1	finnish	x-vnd.Haiku.PoorMan	412131821
 A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Oletuswebbikansio luotiin osoitteeseen ”/boot/home/public_html”.\nVarmista, että HTML-tiedosto nimeltään ”index.html” on tuossa kansiossa.
-About PoorMan	PoorMan		Ohjelmasta Köyhis
 About PoorMan…	PoorMan		Ohjelmasta Köyhis...
 Advanced	PoorMan		Lisäasetukset
 Cancel	PoorMan		Peru
@@ -35,7 +34,7 @@ Logging view	PoorMan		Kirjaamisnäkymä
 Max. simultaneous connections:	PoorMan		Enintään samanaikaisia yhteyksiä:
 OK	PoorMan		Valmis
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Valitse webissä julkaistava kansio.\n\nSinulla voi olla Köyhiksen luoma oletus ”public_html” kotikansiossasi.\nTai voi sen sijaan valita yhden omista kansioistasi.
-Poor Man's web server\nCopyright © 2004-2009 Haiku\nAll rights reserved.\n\nWritten by: Philip Harrison, Ma Jie	PoorMan		Köyhiksen webpalvelin\nCopyright © 2004-2009 Haiku\nAll rights reserved.\n\nTekijä: Philip Harrison, Ma Jie
+PoorMan	Application name		Köyhis
 PoorMan settings	PoorMan		Köyhisasetukset
 Quit	PoorMan		Poistu
 Run server	PoorMan		Käynnistä palvelin

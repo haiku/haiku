@@ -1,12 +1,12 @@
-1	swedish	x-vnd.Haiku-DataTranslations	3706134146
+1	swedish	x-vnd.Haiku-DataTranslations	851864743
 About	DataTranslations		om
 An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Ett objekt döpt '%name' finns redan i översättningsmappen! Skall den befintliga översättaren skrivas över?
 Cancel	DataTranslations		Avbryt
 Could not install %s:\n%s	DataTranslations		Kunde inte installera %s:\n%s
-DataTranslations	DataTranslations		Formatöversättare
-DataTranslations - Error	DataTranslations		Formatöversättare - Fel
-DataTranslations - Note	DataTranslations		Formatöversättare - Anteckning
-DataTranslations\n\twritten by Oliver Siebenmarck and others\n\tCopyright 2002-2010, Haiku Inc. All rights reserved.\n	DataTranslations		Formatöversättare\n\tskrivet av Oliver Siebenmarck med flera\n\tCopyright 2002-2010, Haiku Inc. All rights reserved.\n
+DataTranslations	Application name		FormatÖversättare
+DataTranslations - Error	DataTranslations		FormatÖversättare - Fel
+DataTranslations - Note	DataTranslations		FormatÖversättare - Anteckning
+DataTranslations\n\twritten by Oliver Siebenmarck and others\n\tCopyright 2002-2010, Haiku Inc. All rights reserved.\n	DataTranslations		FormatÖversättare\n\tskrivet av Oliver Siebenmarck med flera\n\tCopyright 2002-2010, Haiku Inc. All rights reserved.\n
 Icon	DataTranslations		Ikon
 Info	DataTranslations		Info
 Info:	DataTranslations		Information:

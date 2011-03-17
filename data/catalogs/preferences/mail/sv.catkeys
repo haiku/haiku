@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Mail	3023422579
+1	swedish	x-vnd.Haiku-Mail	3984096638
 Account name:	Config Views		Kontonamn:
 Account settings	Config Views		Kontoinställningar
 Accounts	Config Window		Konton
@@ -9,7 +9,7 @@ Apply	Config Window		Verkställ
 Beta	Config Window		Beta
 Check every	Config Window		Kontrollera varje
 Development	Config Window		Utveckling
-E-mail	Config Window		E-post
+E-mail	Application name		E-post
 Edit mailbox menu…	Config Window		Redigera e-postmeny...
 Error	Config Window		Fel
 Error retrieving general settings: %s\n	Config Window		Misslyckades att hämta grundinställningarna: %s\n

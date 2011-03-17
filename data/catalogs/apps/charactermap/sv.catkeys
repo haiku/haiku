@@ -1,5 +1,4 @@
-1	swedish	x-vnd.Haiku-CharacterMap	3087925905
-About CharacterMap…	CharacterWindow		Om TeckenTabell...
+1	swedish	x-vnd.Haiku-CharacterMap	725574662
 Aegean numbers	UnicodeBlocks		Egeiska siffror
 Alphabetic presentation forms	UnicodeBlocks		Alfabetiska presentationsformer
 Ancient Greek musical notation	UnicodeBlocks		Gammelgrekiska noter
@@ -27,7 +26,6 @@ CJK compatibility ideographs	UnicodeBlocks		CJK compatibility ideographs
 Carian	UnicodeBlocks		Kariska
 Cham	UnicodeBlocks		Cham
 CharacterMap	Application name		TeckenTabell
-CharacterMap\n\twritten by Axel Dörfler\n\tCopyright 2009, Haiku, Inc.\n	CharacterMap		TeckenTabell\n\tskrivet av Axel Dörfler\n\tCopyright 2009, Haiku, Inc.\n
 Cherokee	UnicodeBlocks		Cherokee
 Clear	CharacterWindow		Rensa
 Code	CharacterWindow		Kod
@@ -112,7 +110,6 @@ Myanmar	UnicodeBlocks		Myanmar
 N'Ko	UnicodeBlocks		N'Ko
 New Tai Lue	UnicodeBlocks		New Tai Lue
 Number forms	UnicodeBlocks		Numreriska former
-OK	CharacterMap		OK
 Ogham	UnicodeBlocks		Ogham
 Ol Chiki	UnicodeBlocks		Ol Chiki
 Old Persian	UnicodeBlocks		Fornpersiska

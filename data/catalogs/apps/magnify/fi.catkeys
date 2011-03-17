@@ -1,6 +1,5 @@
-1	finnish	x-vnd.Haiku-Magnify	1680541832
+1	finnish	x-vnd.Haiku-Magnify	2286010390
 %width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize pikseliä/pikseli
-About Magnify…	Magnify-Main		Ohjelmasta Suurenna...
 Add a crosshair	Magnify-Main		Lisää ristikkotähtäin
 Copy image	Magnify-Main		Kopioi kuva
 Copy/Save:\n  copy - copies the current image to the clipboard\n  save - prompts the user for a file to save to and writes out\n    the bits of the image\n	Magnify-Help		Kopioi/Tallenna:\n kopioi - kopioi nykyisen kuvan leikepöydälle\n tallenna - kysyy käyttäjältä tallennettavan tiedoston\n johon kuvan bitit tallennetaan\n
@@ -8,14 +7,14 @@ Decrease pixel size	Magnify-Main		Pienennä pikselikokoa
 Decrease window size	Magnify-Main		Pienennä ikkkunan kokoa
 Freeze/Unfreeze image	Magnify-Main		Jähmetä/vapauta kuva
 General:\n  32 x 32 - the top left numbers are the number of visible\n    pixels (width x height)\n  8 pixels/pixel - represents the number of pixels that are\n    used to magnify a pixel\n  R:152 G:52 B:10 -  the RGB values for the pixel under\n    the red square\n	Magnify-Help		Yleistä:\n 32 x 32 - vasemman yläkulman numerot ovat näkyvien pikseleiden\n lukumäärä (leveys x korkeus)\n 8 pikseliä/pikseli - edustaa niiden pikseleiden lukumäärää, jotka on\n käytetty suurentamaan pikseli\n R:152 G:52 B:10 - RGB-arvot punaisen neliön\n alla oleville pikseleille\n
-Help…	Magnify-Main		Opaste...
+Help	Magnify-Main		Opaste
 Hide/Show grid	Magnify-Main		Piilota/näytä rasteri
 Hide/Show info	Magnify-Main		Piilota/näytä tiedot
 Increase pixel size	Magnify-Main		Kasvata pikselin kokoa
 Increase window size	Magnify-Main		Kasvata ikkunan kokoa
 Info	Magnify-Main		Tiedot
 Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		Info:\n piilota/näytä tiedot - piilottaa/näyttää kaikki nämä uudet ominaisuudet\n huomaa: näytettäessä punainen neliö ilmestyy merkiten\n minkä pikselin rgb-arvoja näytetään\n lisää/poista ristikkotähtäin - 2 ristikkotähtäintä voidaan lisätä (tai poistaa)\n objektien tasauksen tai sijoittelun avuksi.\n Siniset neliöt ja viivat esittävät ristikkotähtäimiä.\n piilota/näytä rasteri - piilottaa/näyttää rasterin, joka erottelee jokaisen pikselin\n
-Magnify	Magnify-Main		Suurenna
+Magnify	Application name		Suurenna
 Magnify help	Magnify-Help		Suurentamisopaste
 Magnify!\n\n©2002-2006 Haiku\n(C)1999 Be Inc.\n\nNow with even more features and recompiled for Haiku.	Magnify-Main		Suurenna!\n\n©2002-2006 Haiku\n(C)1999 Be Inc.\n\nNyt lisää ominaisuuksia ja käännetty uudelleen Haikulle.
 Make square	Magnify-Main		Tee neliö

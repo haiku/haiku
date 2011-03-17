@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-DiskProbe	2517027115
+1	finnish	x-vnd.Haiku-DiskProbe	1375904521
 %ld (native)	ProbeView		%ld (alkuperäinen)
 (native)	ProbeView		(alkuperäinen)
 15 bit	TypeEditors		15-bittinen
@@ -57,7 +57,6 @@ DiskProbe	Application name		Levykoestaja
 DiskProbe request	AttributeWindow		Levykoestajapyyntö
 DiskProbe request	DiskProbe		Levykoestajapyyntö
 DiskProbe request	ProbeView		Levykoestajapyyntö
-DiskProbe\n\twritten by Axel Dörfler\n\tCopyright 2004-2007, Haiku.\n\nOriginal Be version by Robert Polic\n	DiskProbe		Levykoestaja\n\ttekijä: Axel Dörfler\n\tCopyright 2004-2007, Haiku.\n\nAlkuperäisen Be-version tekijä: Robert Polic\n
 Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Haluatko todella poistaa attribuutin ”%s” tiedostosta ”%s”?\n\nEt voi perua tätä toimintoa.
 Don't save	ProbeView		Älä tallenna
 Double precision floating-point value:	TypeEditors		Kaksoistarkkuuden liukulukuarvo:

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Network	2440177840
+1	swedish	x-vnd.Haiku-Network	3753077979
 <no wireless networks found>	EthernetSettingsView		<inga trådlösa nätverk funna>
 Adapter:	EthernetSettingsView		Nätverkskort:
 Apply	EthernetSettingsView		Använd
@@ -13,7 +13,7 @@ Gateway:	EthernetSettingsView		Gateway:
 IP address:	EthernetSettingsView		IP-adress:
 Mode:	EthernetSettingsView		Konfiguration:
 Netmask:	EthernetSettingsView		Nätmask:
-Network	NetworkWindow		Nätverk
+Network	Application name		Nätverk
 Network:	EthernetSettingsView		Nätverk:
 OK	EthernetSettingsView		Ok
 Revert	EthernetSettingsView		Återställ

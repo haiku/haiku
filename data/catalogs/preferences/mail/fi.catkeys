@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Mail	3023422579
+1	finnish	x-vnd.Haiku-Mail	1372873153
 Account name:	Config Views		Tilin nimi:
 Account settings	Config Views		Tiliasetukset
 Accounts	Config Window		Tilit
@@ -9,7 +9,6 @@ Apply	Config Window		Sovella
 Beta	Config Window		Beeta
 Check every	Config Window		Tarkista joka
 Development	Config Window		Kehitys
-E-mail	Config Window		Sähköposti
 Edit mailbox menu…	Config Window		Muokkaa sähköpostilaatikkovalikkoa...
 Error	Config Window		Virhe
 Error retrieving general settings: %s\n	Config Window		Virhe noudettaessa yleisasetuksia: %s\n

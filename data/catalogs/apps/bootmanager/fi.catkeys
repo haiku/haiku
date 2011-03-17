@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-BootManager	488724516
+1	finnish	x-vnd.Haiku-BootManager	140416535
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Levyn %disk Master Boot Record (MBR) palautetaan tiedostosta %file. Haluatko jatkaa?
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Alkulatausvalikkoa ollaan kirjoittamassa levylle. Oletko varma, että haluat jatkaa?
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Seuraavaa alkulatausvalikkoa ollaan kirjoittamassa alkulatauslevylle (%s). Vahvista ennen jatkamista alla olevat tiedot.
@@ -14,9 +14,7 @@ Back	BootManagerController	Button	Paluu
 Backup Master Boot Record	BootManagerController	Title	Varmuuskopioi Master Boot Record
 Boot Manager is unable to read the partition table!	BootManagerController		Alkulataushallinta ei kykene lukemaan osiotaulua!
 BootManager	Application name		Alkulataushallinta
-BootManager	BootManager	Application name	Alkulataushallinta
 Cannot access!	DrivesPage	Cannot install	Ei voi asentaa!
-Copyright %year, Haiku Inc.\n	BootManager	Leave %year untranslated	Copyright %year, Haiku Inc.\n
 Default Partition	DefaultPartitionPage	Title	Oletusosio
 Default Partition:	DefaultPartitionPage	Menu field label	Oletusosio:
 Done	BootManagerController	Button	Valmis
@@ -31,7 +29,6 @@ Installation of boot menu failed	BootManagerController	Title	Alkulatausvalikon a
 Never	DefaultPartitionPage		Ei koskaan
 Next	WizardView	Button	Seuraava
 No space available!	DrivesPage	Cannot install	Tilaa ei ole käytettävissä!
-OK	BootManager		Valmis
 OK	BootManagerController	Button	Valmis
 Old Master Boot Record Saved failure	BootManagerController	Title	Vanhan Master Boot Record -tietueen tallennusvirhe
 Old Master Boot Record saved	BootManagerController	Title	Vanha Master Boot Record -tietue tallennettu
@@ -66,4 +63,3 @@ Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Tuntematon
 Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Nimetön %d
 Update	DrivesPage	Button	Päivitä
 Write boot menu	BootManagerController	Button	Kirjoita alkulatausvalikko
-written by	BootManager		tekijä:

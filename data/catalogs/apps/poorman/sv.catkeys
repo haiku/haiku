@@ -1,7 +1,6 @@
-1	swedish	x-vnd.Haiku.PoorMan	805673381
+1	swedish	x-vnd.Haiku.PoorMan	412131821
 A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		En förinställd hemsidemapp har skapats som \"/boot/home/public_html.\"\nSe till att det finns en HTML fil döpt \"index.html\" i mappen.
-About PoorMan	PoorMan		Om Fattigman
-About PoorMan…	PoorMan		Om Fattigman...
+About PoorMan…	PoorMan		Om FattigMan...
 Advanced	PoorMan		Avancerat
 Cancel	PoorMan		Avbryt
 Cannot start the server	PoorMan		Kan inte starta servern
@@ -35,7 +34,7 @@ Logging view	PoorMan		Loggningsvy
 Max. simultaneous connections:	PoorMan		Maximalt antal samtidiga anslutningar:
 OK	PoorMan		OK
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Vänligen välj en mapp för hemsidepublicering.\n\nDu kan låta Fattigman skapa en förinställd \"public_html\" i din hemmapp eller välja en egen map.
-Poor Man's web server\nCopyright © 2004-2009 Haiku\nAll rights reserved.\n\nWritten by: Philip Harrison, Ma Jie	PoorMan		Fattigmans hemsideserver\nCopyright © 2004-2009 Haiku\nAll rights reserved.\n\nSkrivet av: Philip Harrison och Ma Jie
+PoorMan	Application name		FattigMan
 PoorMan settings	PoorMan		Fattigmans inställningar
 Quit	PoorMan		Avsluta
 Run server	PoorMan		Kör server

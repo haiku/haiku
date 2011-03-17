@@ -1,4 +1,4 @@
-1	swedish	x-vnd.haiku-screenshot	166521589
+1	swedish	x-vnd.haiku-screenshot	2221316304
 Artwork folder	ScreenshotWindow		Illustrationsmapp
 Cancel	ScreenshotWindow		Avbryt
 Capture active window	ScreenshotWindow		Fånga aktivt fönster
@@ -16,7 +16,7 @@ Please select	ScreenshotWindow		Vänligen välj
 Save	ScreenshotWindow		Spara
 Save as:	ScreenshotWindow		Spara som:
 Save in:	ScreenshotWindow		Spara i:
-Screenshot	ScreenshotWindow		Skärmdump
+Screenshot	Application name		Skärmdump
 Select	ScreenshotWindow		Markera
 Settings…	ScreenshotWindow		Inställningar...
 This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Filen finns redan.\n Är du säker på att du vill skriva över den?

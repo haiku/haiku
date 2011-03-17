@@ -1,5 +1,4 @@
-1	finnish	x-vnd.Haiku-CharacterMap	4129367947
-About CharacterMap…	CharacterWindow		Ohjelmasta Merkkikartta...
+1	finnish	x-vnd.Haiku-CharacterMap	921188319
 Aegean numbers	UnicodeBlocks		Aegean-numerot
 Alphabetic presentation forms	UnicodeBlocks		Aakkosellinen esitysmuoto
 Ancient Greek musical notation	UnicodeBlocks		Antiikin kreikan nuottikirjoitus 
@@ -34,7 +33,7 @@ CJK unified ideographs extension A	UnicodeBlocks		CJK-yhtenäinen ideogrammilaaj
 CJK unified ideographs extension B	UnicodeBlocks		CJK-yhdistetty ideograafinen laajennus B
 Carian	UnicodeBlocks		Carian
 Cham	UnicodeBlocks		Cham
-CharacterMap\n\twritten by Axel Dörfler\n\tCopyright 2009, Haiku, Inc.\n	CharacterMap		Merkkikartta\n\ttekijä: Axel Dörfler\n\tCopyright 2009, Haiku, Inc.\n
+CharacterMap	Application name		Merkkikartta
 Cherokee	UnicodeBlocks		Cherokee
 Clear	CharacterWindow		Nollaa
 Code	CharacterWindow		Koodi
@@ -124,7 +123,6 @@ Myanmar	UnicodeBlocks		Burman kieli
 N'Ko	UnicodeBlocks		N'Ko-kieli
 New Tai Lue	UnicodeBlocks		Uusi Tai Lue
 Number forms	UnicodeBlocks		Numeromuodot
-OK	CharacterMap		Valmis
 Ogham	UnicodeBlocks		Ogham
 Ol Chiki	UnicodeBlocks		Santalin kirjaimet
 Old Persian	UnicodeBlocks		Vanha persia

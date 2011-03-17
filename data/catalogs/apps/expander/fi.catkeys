@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Expander	2941520710
+1	finnish	x-vnd.Haiku-Expander	51964396
 About Expander…	ExpanderMenu		Laajentajasta…
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Oletko varma, että haluat pysäyttää tämän arkiston\nlaajentamisen? Laajennetut alkiot eivät ehkä ole valmiita.
 Automatically expand files	ExpanderPreferences		Laajenna tiedostot automaattisesti
@@ -24,7 +24,6 @@ File	ExpanderMenu		Tiedosto
 File expanded	ExpanderWindow		Tiedosto laajennettu
 Hide contents	ExpanderWindow		Piilota sisällöt
 Leave destination folder path empty	ExpanderPreferences		Jätä kohdekansiopolku tyhjäksi
-OK	About		Valmis
 OK	ExpanderPreferences		Valmis
 Open destination folder after extraction	ExpanderPreferences		Avaa kohdekansio purkamisen jälkeen
 Other:	ExpanderPreferences		Muut:
@@ -48,5 +47,4 @@ The destination is read only.	ExpanderWindow		Kohde on kirjoitussuojattu.
 The file doesn't exist	ExpanderWindow		Tiedostoa ei ole olemassa
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Kansio on joko siirretty, nimetty uudelleen tai sitä\nei tueta.
 Use:	ExpanderPreferences		Käyttö:
-\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\ttekijä: Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nalkuperäinen Be-versio: \nDominic, Hiroshi, Peter, Pavel ja Robert\n
 is not supported	ExpanderWindow		ei ole tuettu

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Be-MAIL	2797564879
+1	finnish	x-vnd.Be-MAIL	2684447565
 %d - Date	Mail		%d - Päivämäärä
 %e - E-mail address	Mail		%e - Sähköpostiosoite
 %n - Full name	Mail		%n - Koko nimi
@@ -60,7 +60,7 @@ Initial spell check mode:	Mail		Alustava oikolukutila:
 Leave as '%s'	Mail		Jätä nimellä ’%s’
 Leave as New	Mail		Jätä uutena
 Leave same	Mail		Jätä samaksi
-Mail	Mail		Sähköposti
+Mail	Application name		Sähköposti
 Mail couldn't find its dictionary.	Mail		Sähköposti ei löytänyt hakemistoaan.
 Mail preferences	Mail		Sähköpostietusijaisuudet
 Mail\n\n	Mail		Sähköposti\n\n

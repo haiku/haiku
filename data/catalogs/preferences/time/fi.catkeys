@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Time	4190811892
+1	finnish	x-vnd.Haiku-Time	3114592611
 <Other>	Time		<muut>
 Clock set to:	Time		Kello asetettu aikaan:
 Current time:	Time		Nykyinen aika:
@@ -9,7 +9,6 @@ OK	Time		Valmis
 Preview time:	Time		Esikatseluaika:
 Revert	Time		Palauta
 Set time zone	Time		Aseta aikavyöhyke
-Time	Time		Aika
 Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Päivämäärä & Aika, tekijä:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
 Time zone	Time		Aikavyöhyke
 \nNow: 	Time		\nNyt:

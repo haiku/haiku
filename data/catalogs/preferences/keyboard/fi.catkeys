@@ -1,9 +1,8 @@
-1	finnish	x-vnd.Haiku-Keyboard	914649575
+1	finnish	x-vnd.Haiku-Keyboard	1078858058
 Defaults	KeyboardWindow		Oletukset
 Delay until key repeat	KeyboardView		Näppäimen toistoviive
 Fast	KeyboardView		Nopea
 Key repeat rate	KeyboardView		Näppäintoistotaajuus
-Keyboard	KeyboardWindow		Näppäimistö
 Long	KeyboardView		Pitkä
 OK	KeyboardApplication		Valmis
 Revert	KeyboardWindow		Palauta

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Media	1701788906
+1	finnish	x-vnd.Haiku-Media	293613603
 <none>	Media views		<ei mitään>
 Audio input:	Media views		Äänisyöte:
 Audio mixer	Media Window		Äänisekoitin
@@ -11,7 +11,6 @@ Couldn't add volume control in Deskbar: %s\n	Media views		Ei voitu lisätä voim
 Couldn't remove volume control in Deskbar: %s\n	Media views		Ei voitu poistaa voimakkuussäädintä Työpöytäpalkissa: %s\n
 Defaults	Media views		Oletukset
 Done shutting down.	Media Window		Sulkeminen toteutettu.
-Media	Media Window		Media
 OK	Media Window		Valmis
 Quit	Media Window		Poistu
 Ready for use…	Media Window		Valmis käytettäväksi…

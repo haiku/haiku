@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Devices	4146649612
+1	swedish	x-vnd.Haiku-Devices	1465776728
 ACPI Information	DeviceACPI		ACPI-information
 ACPI Processor Namespace '%2'	DeviceACPI		ACPI Processor-namnrymd '%2'
 ACPI System Bus	DeviceACPI		ACPI systembuss
@@ -8,8 +8,6 @@ ACPI bus	Device		ACPI-buss
 ACPI bus	DevicesView		ACPI-buss
 ACPI controller	Device		ACPI-kontroller
 ACPI node '%1'	DeviceACPI		ACPI nod '%1'
-About	DevicesApplication		om
-About Devices…	DevicesView		Om Enheter...
 Basic information	DevicesView		Grundläggande information
 Bridge	Device		Brygga
 Bus	DevicesView		Buss
@@ -32,7 +30,6 @@ Device paths	Device		Enhetssökväg
 Device paths	DevicePCI		Enhetssökväg
 Devices	Application name		Enheter
 Devices	DevicesView		Enheter
-Devices\n\twritten by Pieter Panman\n\n\tBased on listdev by Jérôme Duval\n\tand the previous Devices preference\n\tby Jérôme Duval and Sikosis\n\tCopyright 2009, Haiku, Inc.\n	DevicesApplication		Enheter\n\tskrivet av Pieter Panman\n\n\tBaserat på listdev av Jérôme Duval\n\toch den tidigare Enhetsegenskaper\n\tav Jérôme Duval och Sikosis\n\tCopyright 2009, Haiku, Inc.\n
 Display controller	Device		Skärmkontroller
 Docking station	Device		Dockningsstation
 Driver used	Device		Drivrutin använd
@@ -56,7 +53,6 @@ Network controller	Device		Nätverkskontroller
 None	Device		Ingen
 Not implemented	DeviceACPI		Inte implementerat
 Not implemented	DevicePCI		Inte implementerat
-OK	DevicesApplication		OK
 Order by:	DevicesView		Sortera efter:
 PCI Information	DevicePCI		PCI-information
 PCI bus	Device		PCI-buss

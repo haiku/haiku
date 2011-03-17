@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Sudoku	2100942083
+1	finnish	x-vnd.Haiku-Sudoku	2743785378
 Abort	ProgressWindow		Keskeytä
 About	Sudoku		Ohjelmasta
 About Sudoku…	SudokuWindow		Ohjelmasta Sudoku...
@@ -30,7 +30,6 @@ Solve	SudokuWindow		Ratkaise
 Solve single field	SudokuWindow		Ratkaise yksi kenttä
 Start again	SudokuWindow		Aloita uudelleen
 Sudoku	Sudoku		Sudoku
-Sudoku	SudokuWindow		Sudoku
 Sudoku request	SudokuWindow		Sudoku-pyyntö
 Sudoku solved - congratulations!\n	SudokuWindow		Sudoku ratkaistu - onneksi olkoon!\n
 Sudoku\n\twritten by Axel Dörfler\n\tCopyright 2007, Haiku Inc.\n	Sudoku		Sudoku\n\ttekijä: Axel Dörfler\n\tCopyright 2007, Haiku Inc.\n

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku.TV	3791845041
+1	finnish	x-vnd.Haiku.TV	16571315
 About %1…	MainWin	Parameter %1 is the name of the application.	Ohjelmasta %1
 Always on top	MainWin		Aina päällimmäisenä
 Channel	MainWin		Kanava
@@ -19,6 +19,7 @@ Quit	MainWin		Poistu
 Scale to native size	MainWin		Skaalaa kotoperäiseen kokoon
 Settings	MainWin		Asetukset
 Settings…	MainWin		Asetukset...
+TV	Application name		TV
 TV	MainWin		TV
 \nBuild 	MainWin		\nRakennettu
 \nRevision 	MainWin		\nKorjausversio

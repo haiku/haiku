@@ -1,6 +1,4 @@
-1	finnish	x-vnd.Haiku.CodyCam	4047429991
-About CodyCam	CodyCam		Cody-kameraohjelmasta
-About Codycam…	CodyCam		Cody-kameraohjelmasta…
+1	finnish	x-vnd.Haiku.CodyCam	441085909
 Can't find an available connection to the video window	CodyCam		Ei voida löytää saatavilla olevaa yhteyttä videoikkunaan
 Cannot connect the video source to the video window	CodyCam		Ei voida yhdistää videolähdettä videoikkunaan
 Cannot create a video window	CodyCam		Ei voida luoda videoikkunaa
@@ -18,10 +16,8 @@ Cannot start time source!	CodyCam		Ei voida käynnistää aikalähdettä!
 Capture Rate Menu	CodyCam		Kaappaustaajusvalikko
 Capture controls	CodyCam		Kaappausohjaimet
 Capturing Image…	VideoConsumer.cpp		Kaapataan kuva…
-Close	CodyCam		Sulje
 Closing the window\n	VideoConsumer.cpp		Suljetaan ikkuna\n
 CodyCam	Application name		Cody-kamera
-CodyCam\n\nThe Original BeOS webcam	CodyCam		Cody-kamera\n\nAlkuperäinen BeOS-webbikamera
 Connected…	VideoConsumer.cpp		Yhdistetty…
 Couldn't find requested directory on server	VideoConsumer.cpp		Ei kyetty löytämään pyydettyä hakemistoa palvelimelta
 Directory:	CodyCam		Hakemisto:

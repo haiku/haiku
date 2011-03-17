@@ -1,4 +1,6 @@
-1	swedish	x-vnd.Haiku-MediaPlayer	2559622077
+1	swedish	x-vnd.Haiku-MediaPlayer	1621996569
+%app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		Ett internt fel inträffade i %app%. Filen kunde inte öppnas.
+%app%\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		%app%\n\nSkrivet av Marcus Overhagen, Stephan Aßmus och Fredrik Modéen
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Amerikanskt format)
 100% scale	MediaPlayer-Main		Skala till 100%
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
@@ -12,7 +14,6 @@
 <unknown>	PlaylistItem-author		<okänd>
 <unnamed>	PlaylistItem-name		<odöpt>
 <untitled>	PlaylistItem-title		<odöpt>
-About MediaPlayer…	MediaPlayer-Main		Om MediaSpelaren...
 All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Alla filer kunde inte flyttas till Papperskorgen.
 Always on top	MediaPlayer-Main		Alltid överst
 Aspect ratio	MediaPlayer-Main		Bildförhållande
@@ -51,10 +52,8 @@ Lock Peaks	MediaPlayer-PeakView		Markera toppvärden
 Loop movies by default	MediaPlayer-SettingsWindow		Loopa filmer som förval
 Loop sounds by default	MediaPlayer-SettingsWindow		Loopa ljud som förval
 Low volume	MediaPlayer-SettingsWindow		Låg volym
-MediaPlayer	MediaPlayer-Main		MediaSpelaren
-MediaPlayer encountered an internal error. The file could not be opened.	MediaPlayer-Main		Ett internt fel har uppstått i MediaSpelaren. Filen kunde inte öppnas.
+MediaPlayer	Application name		MediaSpelare
 MediaPlayer settings	MediaPlayer-SettingsWindow		MediaSpelarens inställningar
-MediaPlayer\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		MediaSpelaren\n\nSkriven av Marcus Overhagen, Stephan Aßmus och Frederik Modéen
 Medium	MediaPlayer-SettingsWindow		Medium
 Move Entries	MediaPlayer-MovePLItemsCmd		Flytta poster
 Move Entry	MediaPlayer-MovePLItemsCmd		Flytta post
@@ -136,6 +135,5 @@ Video track	MediaPlayer-Main		Videospår
 View options	MediaPlayer-SettingsWindow		Visningsalternativ
 Volume	MediaPlayer-Main		Volym
 Volume of background clips	MediaPlayer-SettingsWindow		Volym för bakgrundsklipp
-error	MediaPlayer-Main		fel
 none	Audio track menu		ingen
 none	Subtitles menu		ingen

@@ -1,6 +1,5 @@
-1	swedish	x-vnd.Haiku-ProcessController	769318393
+1	swedish	x-vnd.Haiku-ProcessController	1732034014
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
-About	ProcessController		Om
 About ProcessController…	ProcessController		Om ProcessKontroll...
 Cancel	ProcessController		Avbryt
 Custom priority	ProcessController		Annan prioritet
@@ -24,9 +23,8 @@ Normal priority	ProcessController		Normal prioritet
 OK	ProcessController		OK
 Ok!	ProcessController		OK!
 Please confirm	ProcessController		Vänligen bekräfta
-ProcessController	ProcessController		ProcessKontroll
+ProcessController	Application name		ProcessKontroll
 ProcessController is already installed in Deskbar.	ProcessController		ProcessKontroll är redan installerad i Deskbar.
-ProcessController\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n	ProcessController		ProcessKontroll\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n
 Processor %d	ProcessController		Processor %d
 Quit an application	ProcessController		Avsluta ett program
 Quit application	ProcessController		Avsluta program

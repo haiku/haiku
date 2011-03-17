@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Devices	4146649612
+1	finnish	x-vnd.Haiku-Devices	1465776728
 ACPI Information	DeviceACPI		ACPI-tiedot
 ACPI Processor Namespace '%2'	DeviceACPI		ACPI-prosessorinimiavaruus ’%2’
 ACPI System Bus	DeviceACPI		ACPI-järjestelmäväylä
@@ -8,8 +8,6 @@ ACPI bus	Device		ACPI-väylä
 ACPI bus	DevicesView		ACPI-väylä
 ACPI controller	Device		ACPI-ohjain
 ACPI node '%1'	DeviceACPI		ACPI-solmu ’%1’
-About	DevicesApplication		Ohjelmasta
-About Devices…	DevicesView		Ohjelmasta Laitteet...
 Basic information	DevicesView		Perustiedot
 Bridge	Device		Silta
 Bus	DevicesView		Väylä
@@ -32,7 +30,6 @@ Device paths	Device		Laitepolut
 Device paths	DevicePCI		Laitepolut
 Devices	Application name		Laitteet
 Devices	DevicesView		Laitteet
-Devices\n\twritten by Pieter Panman\n\n\tBased on listdev by Jérôme Duval\n\tand the previous Devices preference\n\tby Jérôme Duval and Sikosis\n\tCopyright 2009, Haiku, Inc.\n	DevicesApplication		Laitteet\ntekijä: Pieter Panman\n\nPerustuu Jérôme Duvalin tekemään listdev-ohjelmaan\nja edelliseen Jérôme Duvalin ja Sikosisin\nlaitepreferenssiin\nCopyright 2009, Haiku, Inc.\n
 Display controller	Device		Näyttöohjain
 Docking station	Device		Telakka-asema
 Driver used	Device		Käytetty laite
@@ -56,7 +53,6 @@ Network controller	Device		Verkko-ohjain
 None	Device		Ei mitään
 Not implemented	DeviceACPI		Ei ole toteutettu
 Not implemented	DevicePCI		Ei ole toteutettu
-OK	DevicesApplication		Valmis
 Order by:	DevicesView		Järjestys:
 PCI Information	DevicePCI		PCI-tiedot
 PCI bus	Device		PCI-väylä

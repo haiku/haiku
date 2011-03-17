@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-FileTypes	1037718131
+1	swedish	x-vnd.Haiku-FileTypes	2684370460
 %1 application type	Application Type Window		%1 programtyp
 %ld Application type%s could be removed.	Application Types Window		%ld Programtypen %s kan inte tas bort.
 %s file type	FileType Window		%s filtyp
@@ -38,6 +38,8 @@ Center	Attribute Window	Attribute column alignment in Tracker	Mitten
 Choose type	Type List Window		Välj typ
 Close	Application Type Window		Stäng
 Could not change attributes	Attribute Window		Kan inte ändra attribut
+Could not change file extensions	Extension Window		Kunde inte ändra filtillägget
+Could not install file type	New File Type Window		Kunde inte installera filtyp
 Could not open \"%s\":\n%s	FileTypes		Kunde inte öppna  \"%s\":\n%s
 Could not open file	FileType Window		Kunde inte öppna filen
 Could not remove file type: %s\n	FileTypes Window		Kunde inte ta bort filtypen: %s\n
@@ -55,6 +57,7 @@ Do you want to save the changes?	Application Type Window		Vill du spara ändring
 Done	Attribute Window		Klar
 Done	Extension Window		Klar
 Done	Type List Window		Klart
+Edit icon…	Icon View		Redigera ikon...
 Editable	Attribute Window	If Tracker allows to edit this attribute.	Redigerbar
 Edit…	Application Types Window		Redigera...
 Exclusive launch	Application Type Window		Exklusiv start
@@ -64,10 +67,11 @@ Extensions:	FileTypes Window		Tillägg:
 Extra attributes	FileTypes Window		Extra attribut
 File	Application Type Window		Arkiv
 File	FileTypes Window		Arkiv
+File could not be opened	Preferred App Menu		Filen kunde inte öppnas
 File recognition	FileTypes Window		Filigenkänning
 File type	FileType Window		Filtyp
+FileTypes	Application name		FilTyper
 FileTypes	FileTypes		FilTyper
-FileTypes	FileTypes Window		FilTyper
 FileTypes request	FileTypes		FilTyper - fråga
 FileTypes request	FileTypes Window		FilTyper - begäran
 FileTypes request	Preferred App Menu		Filtypsbegäran
@@ -102,6 +106,7 @@ Open file	FileTypes		Öppna fil
 Open…	FileTypes Window		Öppna...
 Path:	Application Types Window		Sökväg:
 Preferred application	FileType Window		Förvalt program
+Preferred application	FileTypes Window		Förinställt program
 Progress	Application Types Window		Fortskridning:
 Quit	FileTypes Window		Avsluta
 Quit, don't save	Application Type Window		Avsluta utan att spara
@@ -116,8 +121,10 @@ Removing uninstalled application types	Application Types Window		Tar bort avinst
 Right	Attribute Window	Attribute column alignment in Tracker	Höger
 Rule:	FileTypes Window		Regel:
 Same as…	FileType Window	The same APPLICATION as ...	Samma som...
+Same as…	FileType Window	The same TYPE as ...	Samma som...
 Same as…	FileTypes Window		Samma som...
 Save	Application Type Window		Spara
+Save into resource file…	Application Type Window		Spara till resursfil...
 Save request	Application Type Window		Spara begäran
 Select preferred application	FileType Window		Välj förinställda program
 Select preferred application	FileTypes Window		Välj förinställt program
@@ -128,6 +135,7 @@ Select…	FileType Window		Välj…
 Select…	FileTypes Window		Välj...
 Set Preferred Application	Preferred App Menu		Välj förinställt program
 Settings	FileTypes Window		Inställningar
+Short description:	Application Type Window		Kort beskrivning:
 Show icons in list	FileTypes Window		Visa ikoner i lista
 Show in Tracker…	Application Types Window		Visa i Tracker...
 Show recognition rule	FileTypes Window		Visa igenkänningsregel
@@ -144,6 +152,7 @@ Version	Application Types Window		Version
 Version info	Application Type Window		Versionsinfo
 Version:	Application Type Window		Version:
 Version:	Application Types Window		Version:
+Visible	Attribute Window		Synlig
 Width:	Attribute Window	Default column width in Tracker for this attribute.	Bredd:
 [Multiple files] file types	FileType Window		[Flera filer] filtyper
 \twritten by Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n	FileTypes		\tskrivet avy Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n

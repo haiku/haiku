@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Expander	2941520710
+1	swedish	x-vnd.Haiku-Expander	51964396
 About Expander…	ExpanderMenu		Om Expanderaren…
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Är du säker på att du vill sluta expandera det här\narkivet? De expanderade objekten kan vara inkompletta.
 Automatically expand files	ExpanderPreferences		Expandera filer automatiskt
@@ -24,7 +24,6 @@ File	ExpanderMenu		Arkiv
 File expanded	ExpanderWindow		Fil expanderad
 Hide contents	ExpanderWindow		Göm innehåll
 Leave destination folder path empty	ExpanderPreferences		Tomt målmappsfält
-OK	About		OK
 OK	ExpanderPreferences		OK
 Open destination folder after extraction	ExpanderPreferences		Öppna målmappen efter expandering
 Other:	ExpanderPreferences		Annan:
@@ -48,5 +47,4 @@ The destination is read only.	ExpanderWindow		Målmappen är inte skrivbar.
 The file doesn't exist	ExpanderWindow		Filen existerar inte
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Mappen har antingen flyttats, döpts om eller är oåtkomlig.
 Use:	ExpanderPreferences		Använd:
-\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tSkriven av Jérôme Duval\n\tCopyright 2004-2006, Haiku, Inc.\n\nDen ursprungliga Be-versionen av \nDominic, Hiroshi, Peter, Pavel and Robert\n
 is not supported	ExpanderWindow		saknas stöd för

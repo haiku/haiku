@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Pairs	3736877909
+1	finnish	x-vnd.Haiku-Pairs	1919511432
 Beginner (4x4)	PairsWindow		Aloittelija (4x4)
 Expert (8x8)	PairsWindow		Guru (8x8)
 Game	PairsWindow		Peli
@@ -6,9 +6,8 @@ Intermediate (6x6)	PairsWindow		Keskitaso (6x6)
 New	PairsWindow		Uusi
 New game	PairsWindow		Uusi peli
 OK	PairsView		Valmis
-Pairs	PairsWindow		Parit
+Pairs	Application name		Parit
 Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		Parit-ohjelma ei löydä riittävästi vektorikuvakkeita järjestelmästä; ohjelma tarvitsee vähintään %d kuvaketta.
-Pairs\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYou completed the game in %s clicks.\n	PairsWindow		Parit\n\ttekijä: Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nSait pelin valmiiksi %s napsautuksella.\n
 Quit	PairsWindow		Poistu
 Quit game	PairsWindow		Poistu pelistä
 Size	PairsWindow		Koko

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-ShowImage	3385354583
+1	finnish	x-vnd.Haiku-ShowImage	1479416858
 %SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS sekuntia
 About ShowImage…	Menus		Ohjelmasta Kuvankatselin…
 Browse	Menus		Selaa
@@ -45,8 +45,6 @@ Save as…	Menus		Tallenna nimellä...
 Select all	Menus		Valitse kaikki
 Selection Mode	Menus		Valintatila
 Show caption in full screen mode	Menus		Näytä kuvateksti kokoruututilassa
-ShowImage	AboutWindow		Kuvankatselin
-ShowImage	Menus		Kuvankatselin
 Slide delay	Menus		Diaviive
 Slide show	Menus		Diaesitys
 Stretch to window	Menus		Venytä ikkunaan

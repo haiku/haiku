@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-DiskProbe	2517027115
+1	swedish	x-vnd.Haiku-DiskProbe	1375904521
 %ld (native)	ProbeView		%ld (native)
 (native)	ProbeView		(native)
 15 bit	TypeEditors		15 bitar
@@ -57,7 +57,6 @@ DiskProbe	Application name		DiskInspekteraren
 DiskProbe request	AttributeWindow		DiskInspekteraren
 DiskProbe request	DiskProbe		DiskInspekteraren
 DiskProbe request	ProbeView		DiskInspekteraren-begäran
-DiskProbe\n\twritten by Axel Dörfler\n\tCopyright 2004-2007, Haiku.\n\nOriginal Be version by Robert Polic\n	DiskProbe		DiskInspekteraren\n\tskrivet av Axel Dörfler\n\tCopyright 2004-2007, Haiku.\n\nOriginal Be version av Robert Polic\n
 Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Vill du verkligen ta bort attributet \"%s\" från filen \"%s\"?\n\nDu kan inte ångra denna aktion.
 Don't save	ProbeView		Spara inte
 Double precision floating-point value:	TypeEditors		Dubbelprecisions flyttals-värde:

@@ -1,11 +1,11 @@
-1	finnish	x-vnd.Haiku-InstalledPackages	3041446229
-BeOS legacy .pkg package removing application for Haiku.\n\nCopyright 2007,\nŁukasz 'Sil2100' Zemczak\n\nCopyright (c) 2007 Haiku, Inc.\n	UninstallApplication		Perinteisen BeOS .pkg -pakkauksen poistamissovellus Haikulle.\n\nCopyright 2007,\nŁukasz ’Sil2100’ Zemczak\n\nCopyright (c) 2007 Haiku, Inc.\n
+1	finnish	x-vnd.Haiku-InstalledPackages	1778066980
+BeOS legacy .pkg package removing application for Haiku.\n\nCopyright 2007,\nŁukasz 'Sil2100' Zemczak\n\nCopyright (c) 2007 Haiku, Inc.\n	UninstallApplication		Perinteisen BeOS .pkg -paketin poistamissovellus Haikulle.\n\nCopyright 2007,\nŁukasz ’Sil2100’ Zemczak\n\nCopyright (c) 2007 Haiku, Inc.\n
 Close	UninstallApplication		Sulje
-Installed packages	UninstallWindow		Asennetut pakkaukset
-InstalledPackages	UninstallApplication		Pakkausasennukset
-No package selected.	UninstallView		Pakkausta ei ole valittu.
+InstalledPackages	Application name		Pakettiasennukset
+InstalledPackages	UninstallApplication		Pakettiasennukset
+No package selected.	UninstallView		Pakettia ei ole valittu.
 OK	UninstallView		Valmis
-Package description	UninstallView		Pakkauskuvaus
+Package description	UninstallView		Pakettikuvaus
 Remove	UninstallView		Poista
-The package you selected has been successfully removed from your system.	UninstallView		Valitsemasi pakkauksen poistaminen järjestelmästäsi onnistui.
-The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Valittua pakkausta ei poistettu järjestelmästäsi. Annettu asennettu pakkaustieto voi olla rikkonainen.
+The package you selected has been successfully removed from your system.	UninstallView		Valitsemasi paketin poistaminen järjestelmästäsi onnistui.
+The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Valittua pakettia ei poistettu järjestelmästäsi. Annetun asennetun paketin tiedot voivat olla rikkinäisiä.

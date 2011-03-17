@@ -1,9 +1,10 @@
-1	swedish	system	2686335505
+1	swedish	system	709849049
 %.2f TiB	StringForSize		%.2f TiB
 %3.2f GiB	StringForSize		%3.2f GiB
 %3.2f KiB	StringForSize		%3.2f KiB
 %3.2f MiB	StringForSize		%3.2f MiB
 %d bytes	StringForSize		%d byte
+About %app%	AboutMenuItem		Om %app%
 About…	AboutWindow		Om...
 Blue:	ColorControl		Blå:
 Close	AboutWindow		Stäng

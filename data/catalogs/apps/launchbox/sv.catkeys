@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-LaunchBox	1672943267
+1	swedish	x-vnd.Haiku-LaunchBox	3636680404
 About	LaunchBox		Om
 Add button here	LaunchBox		Lägg till knapp
 Auto-raise	LaunchBox		Upphöj automatiskt
@@ -9,21 +9,21 @@ Clone	LaunchBox		Klona
 Close	LaunchBox		Stäng
 Description for '%3'	LaunchBox		Beskrivning för '%3'
 Failed to launch '%1'.\n\nError:	LaunchBox		Misslyckades att starta '%1'.\n\nFel:
-Failed to launch 'something',error in Pad data.	LaunchBox		Misslyckades att starta 'something'. Fel på knappen.
-Failed to launch application with signature '%2'.\n\nError:	LaunchBox		Misslyckades att starta applikationen med signaturen '%2'.\n\nFel:
+Failed to launch 'something',error in Pad data.	LaunchBox		Misslyckades att starta 'någonting'. Fel på knappen.
+Failed to launch application with signature '%2'.\n\nError:	LaunchBox		Misslyckades att starta programmet med signaturen '%2'.\n\nFel:
 Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Misslyckades att skicka 'öppna mapp' kommando till Tracker.\n\nFel:
 Horizontal layout	LaunchBox		Horisontal utformning
 Icon size	LaunchBox		Ikonstorlek
 Ignore double-click	LaunchBox		Ignorera dubbelklick
-LaunchBox	LaunchBox		StartLådan
-Name Panel	LaunchBox		Namnge lådan
+LaunchBox	Application name		StartBlocket
+Name Panel	LaunchBox		Namnge Block
 New	LaunchBox		Ny
 OK	LaunchBox		OK
-Pad	LaunchBox		Låda
-Pad %1	LaunchBox		Låda %1
-Pad 1	LaunchBox		Låda 1
+Pad	LaunchBox		Block
+Pad %1	LaunchBox		Block %1
+Pad 1	LaunchBox		Block 1
 Quit	LaunchBox		Avsluta
-Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Vill du verkligen stänga lådan?\n(Lådan kommer inte att kommas ihåg.)
+Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Vill du verkligen stänga blocket?\n(Blocket kommer inte att kommas ihåg.)
 Remove button	LaunchBox		Ta bort knapp
 Set description…	LaunchBox		Ange beskrivning...
 Settings	LaunchBox		Inställningar

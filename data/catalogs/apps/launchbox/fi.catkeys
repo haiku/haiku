@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-LaunchBox	1672943267
+1	finnish	x-vnd.Haiku-LaunchBox	3636680404
 About	LaunchBox		Ohjelmasta
 Add button here	LaunchBox		Lisää painike tänne
 Auto-raise	LaunchBox		Automaattisesti päällimmäinen
@@ -15,7 +15,7 @@ Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Epäonnis
 Horizontal layout	LaunchBox		Vaakasuora sijoittelu
 Icon size	LaunchBox		Kuvakekoko
 Ignore double-click	LaunchBox		Ohita kaksoisnapsautukset
-LaunchBox	LaunchBox		Käynnistyslaatikko
+LaunchBox	Application name		Käynnistysikkuna
 Name Panel	LaunchBox		Nimipaneeli
 New	LaunchBox		Uusi
 OK	LaunchBox		Valmis

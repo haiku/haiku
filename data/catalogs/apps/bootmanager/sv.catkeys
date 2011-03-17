@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-BootManager	488724516
+1	swedish	x-vnd.Haiku-BootManager	140416535
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Kommer nu att återställa huvudstartsektorn (MBR) på %disk från %file. Vill du fortsätta?
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Kommer att skriva bootmenyn till hårddisken. Är du säker på att du vill fortsätta?
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Följande startmeny kommer att skrivas till startdisken (%s). Vänligen kontrollera informationen nedan innan du fortsätter.
@@ -14,9 +14,7 @@ Back	BootManagerController	Button	Tillbaka
 Backup Master Boot Record	BootManagerController	Title	Säkerhetskopiera huvudstartsektorn
 Boot Manager is unable to read the partition table!	BootManagerController		Starthanteraren kan inte läsa partitionstabellen!
 BootManager	Application name		StartHanteraren
-BootManager	BootManager	Application name	Starthanteraren
 Cannot access!	DrivesPage	Cannot install	Kan inte få åtkomst!
-Copyright %year, Haiku Inc.\n	BootManager	Leave %year untranslated	Copyright %year, Haiku Inc.\n
 Default Partition	DefaultPartitionPage	Title	Standardpartition
 Default Partition:	DefaultPartitionPage	Menu field label	Förvald partition:
 Done	BootManagerController	Button	Klar
@@ -31,7 +29,6 @@ Installation of boot menu failed	BootManagerController	Title	Installationen av s
 Never	DefaultPartitionPage		Aldrig
 Next	WizardView	Button	Nästa
 No space available!	DrivesPage	Cannot install	Inget utrymme tillgängligt!
-OK	BootManager		OK
 OK	BootManagerController	Button	OK
 Old Master Boot Record Saved failure	BootManagerController	Title	Kunde inte spara gamla huvudstartsektorn
 Old Master Boot Record saved	BootManagerController	Title	Gamla huvudstartsektorn sparad
@@ -66,4 +63,3 @@ Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Okänd
 Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Odöpt %d
 Update	DrivesPage	Button	Uppdatera
 Write boot menu	BootManagerController	Button	Skriv startmeny
-written by	BootManager		skrivet av
