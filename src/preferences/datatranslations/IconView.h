@@ -1,40 +1,27 @@
-/*****************************************************************************/
-// IconView
-// IconView.h
 // Author: Michael Wilber
-//
-// This BView based object displays an icon
-//
 // Copyright (C) Haiku, uses the MIT license
-/*****************************************************************************/
-
 #ifndef ICONVIEW_H
 #define ICONVIEW_H
 
-#include <View.h>
+
 #include <Bitmap.h>
 #include <Path.h>
-#include <Entry.h>
-#include <Node.h>
-#include <NodeInfo.h>
+#include <View.h>
+
 
 class IconView : public BView {
 public:
-	IconView(const BRect &frame, const char *name, uint32 resize, uint32 flags);
-		// sets up the view
-	~IconView();
+							IconView(const BRect& frame, const char* name,
+								uint32 resize, uint32 flags);
+							~IconView();
+	virtual	void			Draw(BRect area);
 	
-	bool DrawIcon(bool draw);
-	
-	bool SetIcon(const BPath &path);
+			bool			DrawIcon(bool draw);
+			bool			SetIcon(const BPath& path);
 
-	virtual	void Draw(BRect area);
-		// draws the icon
 private:
-	BBitmap *fIconBitmap;
-		// the icon
-	bool fDrawIcon;
-		// whether or not the icon is drawn
+			BBitmap*		fIconBitmap;
+			bool			fDrawIcon;
 };
 
 #endif // #ifndef ICONVIEW_H

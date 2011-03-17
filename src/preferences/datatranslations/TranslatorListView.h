@@ -16,28 +16,30 @@
 
 
 class TranslatorItem : public BStringItem {
-	public:
-		TranslatorItem(translator_id id, const char* name);
-		virtual ~TranslatorItem();
+public:
+							TranslatorItem(translator_id id, const char* name);
+	virtual					~TranslatorItem();
 
-		translator_id ID() const { return fID; }
+			translator_id	ID() const { return fID; }
 
-	private:
-		translator_id	fID;
+private:
+			translator_id	fID;
 };
+
 
 class TranslatorListView : public BListView {
-	public:
-		TranslatorListView(const char *name,
-			list_view_type type = B_SINGLE_SELECTION_LIST);
-		virtual ~TranslatorListView();
+public:
+							TranslatorListView(const char* name,
+								list_view_type type = B_SINGLE_SELECTION_LIST);
+	virtual					~TranslatorListView();
 
-		TranslatorItem* TranslatorAt(int32 index) const;
+			TranslatorItem*	TranslatorAt(int32 index) const;
 
-		virtual void MessageReceived(BMessage *message);
-		virtual void MouseMoved(BPoint point, uint32 transit, const BMessage *msg);
+	virtual	void			MessageReceived(BMessage* message);
+	virtual	void			MouseMoved(BPoint point, uint32 transit, const BMessage* msg);
 
-		void SortItems();
+			void			SortItems();
 };
+
 
 #endif	// TRANSLATOR_LIST_VIEW_H

@@ -1,35 +1,25 @@
-/*****************************************************************************/
-// IconView
-// IconView.cpp
 // Author: Michael Wilber
-//
-//
-// This BView based object displays an icon
-//
-//
 // Copyright (C) Haiku, uses the MIT license
-/*****************************************************************************/
+
+
+#include "IconView.h"
 
 #include <stdio.h>
 #include <string.h>
-#include "IconView.h"
 
-IconView::IconView(const BRect &frame, const char *name,
-	uint32 resize, uint32 flags)
-	:	BView(frame, name, resize, flags)
+#include <Entry.h>
+#include <Node.h>
+#include <NodeInfo.h>
+
+
+IconView::IconView(const BRect& frame, const char* name, uint32 resize,
+	uint32 flags)
+	:
+	BView(frame, name, resize, flags),
+	fIconBitmap(new BBitmap(BRect(B_LARGE_ICON), B_RGBA32)),
+	fDrawIcon(false)
 {
-	fDrawIcon = false;
-	
-	SetDrawingMode(B_OP_OVER);
-		// to preserve transparent areas of the icon
-		
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
-#if __HAIKU__
-	fIconBitmap = new BBitmap(BRect(0, 0, B_LARGE_ICON - 1, B_LARGE_ICON - 1), B_RGBA32);
-#else
-	fIconBitmap = new BBitmap(BRect(0, 0, B_LARGE_ICON - 1, B_LARGE_ICON - 1), B_CMAP8);
-#endif
 }
 
 IconView::~IconView()
@@ -39,7 +29,7 @@ IconView::~IconView()
 }
 
 bool
-IconView::SetIcon(const BPath &path)
+IconView::SetIcon(const BPath& path)
 {
 	fDrawIcon = false;
 	
@@ -69,12 +59,9 @@ IconView::DrawIcon(bool draw)
 void
 IconView::Draw(BRect area)
 {
-#if __HAIKU__
 	SetDrawingMode(B_OP_ALPHA);
 	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
-#else
-	SetDrawingMode(B_OP_OVER);
-#endif
+
 	if (fDrawIcon)
 		DrawBitmap(fIconBitmap);
 

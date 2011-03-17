@@ -15,8 +15,10 @@
 
 #include "DataTranslationsSettings.h"
 
+
 class BDirectory;
 class BEntry;
+
 
 class DataTranslationsApplication : public BApplication {
 public:
@@ -39,5 +41,6 @@ private:
 private:
 			DataTranslationsSettings	fSettings;
 };
+
 
 #endif	// DATA_TRANSLATIONS_H

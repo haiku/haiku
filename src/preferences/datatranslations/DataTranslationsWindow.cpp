@@ -10,10 +10,7 @@
  */
 
 
-#include "DataTranslations.h"
 #include "DataTranslationsWindow.h"
-#include "IconView.h"
-#include "TranslatorListView.h"
 
 #include <stdio.h>
 
@@ -36,6 +33,10 @@
 #include <TranslationDefs.h>
 #include <TranslatorRoster.h>
 
+#include "DataTranslations.h"
+#include "IconView.h"
+#include "TranslatorListView.h"
+
 
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "DataTranslations"
@@ -51,7 +52,7 @@ DataTranslationsWindow::DataTranslationsWindow()
 		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE
 		| B_NOT_RESIZABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
-	MoveTo(static_cast<DataTranslationsApplication *>(be_app)->WindowCorner());
+	MoveTo(static_cast<DataTranslationsApplication*>(be_app)->WindowCorner());
 
 	_SetupViews();
 
@@ -61,7 +62,7 @@ DataTranslationsWindow::DataTranslationsWindow()
 	if (!screenFrame.Contains(Frame()))
 		CenterOnScreen();
 
-	BTranslatorRoster *roster = BTranslatorRoster::Default();
+	BTranslatorRoster* roster = BTranslatorRoster::Default();
 	roster->StartWatching(this);
 
 	Show();
@@ -70,7 +71,7 @@ DataTranslationsWindow::DataTranslationsWindow()
 
 DataTranslationsWindow::~DataTranslationsWindow()
 {
-	BTranslatorRoster *roster = BTranslatorRoster::Default();
+	BTranslatorRoster* roster = BTranslatorRoster::Default();
 	roster->StopWatching(this);
 }
 
@@ -79,18 +80,19 @@ DataTranslationsWindow::~DataTranslationsWindow()
 status_t
 DataTranslationsWindow::_PopulateListView()
 {
-	BTranslatorRoster *roster = BTranslatorRoster::Default();
+	BTranslatorRoster* roster = BTranslatorRoster::Default();
 
 	// Get all Translators on the system. Gives us the number of translators
 	// installed in num_translators and a reference to the first one
 	int32 numTranslators;
-	translator_id *translators = NULL;
+	translator_id* translators = NULL;
 	roster->GetAllTranslators(&translators, &numTranslators);
 
 	for (int32 i = 0; i < numTranslators; i++) {
 		// Getting the first three Infos: Name, Info & Version
 		int32 version;
-		const char *name, *info;
+		const char* name;
+		const char* info;
 		roster->GetTranslatorInfo(translators[i], &name, &info, &version);
 		fTranslatorListView->AddItem(new TranslatorItem(translators[i], name));
 	}
@@ -109,7 +111,7 @@ DataTranslationsWindow::_GetTranslatorInfo(int32 id, const char*& name,
 	if (id < 0)
 		return B_BAD_VALUE;
 
-	BTranslatorRoster *roster = BTranslatorRoster::Default();
+	BTranslatorRoster* roster = BTranslatorRoster::Default();
 	if (roster->GetTranslatorInfo(id, &name, &info, &version) != B_OK)
 		return B_ERROR;
 
@@ -133,7 +135,7 @@ DataTranslationsWindow::_ShowConfigView(int32 id)
 	if (id < 0)
 		return B_BAD_VALUE;
 
-	BTranslatorRoster *roster = BTranslatorRoster::Default();
+	BTranslatorRoster* roster = BTranslatorRoster::Default();
 
 	// fConfigView is NULL the first time this function
 	// is called, prevent a segment fault
@@ -168,7 +170,7 @@ DataTranslationsWindow::_SetupViews()
 	fTranslatorListView->SetSelectionMessage(
 		new BMessage(kMsgSelectedTranslator));
 
-	BScrollView *scrollView = new BScrollView("scroll_trans",
+	BScrollView* scrollView = new BScrollView("scroll_trans",
 		fTranslatorListView, B_WILL_DRAW | B_FRAME_EVENTS, false,
 		true, B_FANCY_BORDER);
 
@@ -182,7 +184,7 @@ DataTranslationsWindow::_SetupViews()
 		B_FOLLOW_LEFT | B_FOLLOW_BOTTOM, B_WILL_DRAW | B_FRAME_EVENTS);
 
 	// Add the translator info button
-	BButton *button = new BButton("STD", B_TRANSLATE("Info" B_UTF8_ELLIPSIS),
+	BButton* button = new BButton("STD", B_TRANSLATE("Info" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgTranslatorInfo), B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE);
 
 	// Populate the translators list view
@@ -208,7 +210,7 @@ bool
 DataTranslationsWindow::QuitRequested()
 {
 	BPoint pt(Frame().LeftTop());
-	dynamic_cast<DataTranslationsApplication *>(be_app)->SetWindowCorner(pt);
+	dynamic_cast<DataTranslationsApplication*>(be_app)->SetWindowCorner(pt);
 	be_app->PostMessage(B_QUIT_REQUESTED);
 
 	return true;
@@ -235,7 +237,7 @@ DataTranslationsWindow::_ShowInfoAlert(int32 id)
 
 	BAlert* alert = new BAlert(B_TRANSLATE("Info"), message.String(),
 		B_TRANSLATE("OK"));
-	BTextView *view = alert->TextView();
+	BTextView* view = alert->TextView();
 	BFont font;
 
 	view->SetStylable(true);
@@ -255,7 +257,7 @@ DataTranslationsWindow::_ShowInfoAlert(int32 id)
 
 
 void
-DataTranslationsWindow::MessageReceived(BMessage *message)
+DataTranslationsWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kMsgTranslatorInfo:

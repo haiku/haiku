@@ -13,15 +13,16 @@
 
 
 class DataTranslationsSettings {
-	public:
-		DataTranslationsSettings();
-		~DataTranslationsSettings();
+public:
+							DataTranslationsSettings();
+							~DataTranslationsSettings();
 
-		BPoint WindowCorner() const { return fCorner; }
-		void SetWindowCorner(BPoint corner);
+			BPoint			WindowCorner() const { return fCorner; }
+			void			SetWindowCorner(BPoint corner);
 
-	private:
-		BPoint fCorner;
+private:
+			BPoint			fCorner;
 };
+
 
 #endif	// DATA_TRANSLATIONS_SETTINGS_H

@@ -10,13 +10,13 @@
 
 #include "DataTranslationsSettings.h"
 
-#include <Application.h>
-#include <FindDirectory.h>
-#include <File.h>
-#include <Path.h>
-#include <Message.h>
-
 #include <stdio.h>
+
+#include <Application.h>
+#include <File.h>
+#include <FindDirectory.h>
+#include <Message.h>
+#include <Path.h>
 
 
 DataTranslationsSettings::DataTranslationsSettings()
