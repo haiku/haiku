@@ -1,64 +1,63 @@
-1	hungarian	x-vnd.Haiku-Installer	2991523922
-Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Rendszertelepítő\n\Írta Jérôme Duval és Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
-Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		A telepítés befejeződött! A(z) „%s” lemez bootszektora elkészült. A „Kilépés” gombbal elhagyhatja a telepítőt, vagy új partíciót választhat egy új rendszer telepítéséhez.
-Quit	InstallerWindow		Kilépés
-Stop	InstallerWindow	In alert after pressing Stop	Megállít
-Installation completed. Boot sector has been written to '%s'. Press Quit to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		A telepítés befejeződött! A(z) „%s” lemez bootszektora elkészült. A „Kilépés” gombbal elhagyhatja a telepítőt, vagy új partíciót választhat egy új rendszer telepítéséhez.
-Install progress:  	InstallerWindow		Telepítés állapota:  
-Starting Installation.	InstallProgress		A telepítés előkészítése.
-Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Biztosan a mostani rendszerindító lemezre telepíti a rendszert? A telepítőnek újra kell indítania a számítógépét, hogy folytathassa a műveletet.
-OK	InstallProgress		Rendben
-Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Válassza ki a lemezt melyről telepíteni szeretne és válassza ki azt, amelyre telepít. Ha végzett, kattitnson a „Telepítés” gombra.
-Install from:	InstallerWindow		E lemezről:
+1	hungarian	x-vnd.Haiku-Installer	1755458235
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld/%2ld
-Installer	InstallerWindow		Telepítő
-Continue	InstallerApp		Folytatás
-Write boot sector to '%s'	InstallerWindow		Bootszektor írása „%s” helyre
-Collecting copy information.	InstallProgress		Másolás információinak összegyűjtése.
-Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Válassza ki a felugró menüből a lemezt melyről telepíteni szeretne, majd kattintson a „Telepítés” gombra.
-Boot sector successfully written.	InstallProgress		A rendszerindító szektor módosítva lett.
-Performing installation.	InstallProgress		A telepítés folyamatban!
-scanning…	InstallerWindow		keresés…
-Finishing Installation.	InstallProgress		Telepítés befejezése.
-README	InstallerApp		OLVASSEL
-The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		A céllemezen nincs elég hely a telepítéshez. Válasszon egy másik lemezt vagy csak a szükséges rendszerelemeket telepítse!
-Scanning for disks…	InstallerWindow		Lemezek keresése…
-The disk can't be mounted. Please choose a different disk.	InstallProgress		A lemez nem csatolható. Válasszon egy másikat!
-?? of ??	InstallerWindow	Unknown progress	??/??
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Indítsa el a Lemezbeállító segédprogramot a\nlétező merevlemezek és egyéb adathordozók\npartícionálásához! A partíciókat a Haiku\noperációs rendszer rendszerbetöltőjéhez\n BFS-sel (Be FájlrendSzerrel) kell inicializálni.
-Show optional packages	InstallerWindow		Nem feltétlenül szükséges csomagok megjelenítése
-No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Nincs a telepítéshez alkalmas partíció. Kérem, hozza létre a szükséges partíció(ka)t és legalább egy partíciót BFS-sel (Be FájlrendSzer) inicializáljon!
-Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Válassza ki a felugró menüből azt a lemezt, melyre telepíteni szeretne, majd kattintson a „Telepítés” gombra.
-Unknown Type	InstallProgress	Partition content type	Ismeretlen típus
 <none>	InstallerWindow	No partition available	<nincs>
-Installation canceled.	InstallProgress		A telepítés félbeszakadt.
-You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Magára a már kiválasztott lemezre nem lehet telepíteni. Kérem, válasszon egy másik lemezt!
+?? of ??	InstallerWindow	Unknown progress	??/??
 ???	InstallerWindow	Unknown partition name	???
-Hide optional packages	InstallerWindow		Nem feltétlenül szükséges csomagok elrejtése
-Please close the DriveSetup window before closing the Installer window.	InstallerWindow		A telepítőablak bezárása előtt kérem, zárja be a lemezbeállító ablakot!
-Set up partitions…	InstallerWindow		Partíciók szerkesztése…
-The partition can't be mounted. Please choose a different partition.	InstallProgress		A partíciót nem lehetett csatolni. Kérem, válasszon egy másik partíciót!
-Install anyway	InstallProgress		Telepítés folytatása
-An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Hiba történt és a telepítés nem ment teljesen végbe:\n\nA hiba:  „%s”
-Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Nyomja meg a „Telepítés” gombot a rendszer „%1s” lemezről „%2s” lemezre telepítéshez!
-Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		A lemezbeállító fut.\n\nHa végzett, zárja be a lemezbeállítót a telepítés folytatásához!
-Please choose target	InstallerWindow		Válassza ki a lemezt, melyre telepít!
-Begin	InstallerWindow		Telepítés
-Write boot sector	InstallerWindow		Rendszerbetöltő írása
-DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		A lemezbeállítót, mellyel a merevlemez partícióit lehet módosítani, nem sikerült elindítani.
-No optional packages available.	PackagesView		Nincsenek a rendszer feltelepítéséhez nem feltétlenül szükséges csomagok.
 Additional disk space required: %s	InstallerWindow		Még ennyi hely szükségeltetik: %s
-Cancel	InstallProgress		Mégsem
-Try installing anyway	InstallProgress		Feltelepítés megpróbálása
-Are you sure you want to to stop the installation?	InstallerWindow		Biztosan félbeszakítja a telepítést?
-Onto:	InstallerWindow		E lemezre:
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		A lemez, melyre települ a rendszer, nem üres. Még így is nekiáll a telepítésnek?\n\nMegjegyzés: A „rendszer” nevű mappa lesz csak egyedül újból feltelepítve, az öszes többi mappa az új telepítéssel együtt össze lesz vonva. Ahol a fájlok és a linkek már léteznek a célrendszerben, azok a telepítési forráséval lesznek felülírva.
-Are you sure you want to abort the installation and restart the system?	InstallerWindow		Biztosan meg szeretné szakítani a telepítést? A számítógép újra fog indulni!
-Restart system	InstallerWindow		Számítógép újraindítása
-Quit	InstallerApp		Kilépés
-OK	InstallerApp		Rendben
-Continue	InstallerWindow	In alert after pressing Stop	Folytatás
-OK	InstallerWindow		Rendben
-Cancel	InstallerWindow		Mégsem
 Additional disk space required: 0.0 KiB	InstallerWindow		Még 0.0 KiB hely kell.
+An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Hiba történt és a telepítés nem ment teljesen végbe:\n\nA hiba:  „%s”
+Are you sure you want to abort the installation and restart the system?	InstallerWindow		Biztosan meg szeretné szakítani a telepítést? A számítógép újra fog indulni!
+Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Biztosan a mostani rendszerindító lemezre telepíti a rendszert? A telepítőnek újra kell indítania a számítógépét, hogy folytathassa a műveletet.
+Are you sure you want to to stop the installation?	InstallerWindow		Biztosan félbeszakítja a telepítést?
+Begin	InstallerWindow		Telepítés
+Boot sector successfully written.	InstallProgress		A rendszerindító szektor módosítva lett.
+Cancel	InstallProgress		Mégsem
+Cancel	InstallerWindow		Mégsem
+Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Válassza ki a felugró menüből azt a lemezt, melyre telepíteni szeretne, majd kattintson a „Telepítés” gombra.
+Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Válassza ki a lemezt melyről telepíteni szeretne és válassza ki azt, amelyre telepít. Ha végzett, kattitnson a „Telepítés” gombra.
+Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Válassza ki a felugró menüből a lemezt melyről telepíteni szeretne, majd kattintson a „Telepítés” gombra.
+Collecting copy information.	InstallProgress		Másolás információinak összegyűjtése.
+Continue	InstallerApp		Folytatás
+Continue	InstallerWindow	In alert after pressing Stop	Folytatás
+DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		A lemezbeállítót, mellyel a merevlemez partícióit lehet módosítani, nem sikerült elindítani.
+Finishing Installation.	InstallProgress		Telepítés befejezése.
+Hide optional packages	InstallerWindow		Nem feltétlenül szükséges csomagok elrejtése
+Install anyway	InstallProgress		Telepítés folytatása
+Install from:	InstallerWindow		E lemezről:
+Install progress:  	InstallerWindow		Telepítés állapota:  
+Installation canceled.	InstallProgress		A telepítés félbeszakadt.
+Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		A telepítés befejeződött! A(z) „%s” lemez bootszektora elkészült. A „Kilépés” gombbal elhagyhatja a telepítőt, vagy új partíciót választhat egy új rendszer telepítéséhez.
+Installation completed. Boot sector has been written to '%s'. Press Quit to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		A telepítés befejeződött! A(z) „%s” lemez bootszektora elkészült. A „Kilépés” gombbal elhagyhatja a telepítőt, vagy új partíciót választhat egy új rendszer telepítéséhez.
+Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Rendszertelepítő\n\Írta Jérôme Duval és Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
+Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Indítsa el a Lemezbeállító segédprogramot a\nlétező merevlemezek és egyéb adathordozók\npartícionálásához! A partíciókat a Haiku\noperációs rendszer rendszerbetöltőjéhez\n BFS-sel (Be FájlrendSzerrel) kell inicializálni.
+No optional packages available.	PackagesView		Nincsenek a rendszer feltelepítéséhez nem feltétlenül szükséges csomagok.
+No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Nincs a telepítéshez alkalmas partíció. Kérem, hozza létre a szükséges partíció(ka)t és legalább egy partíciót BFS-sel (Be FájlrendSzer) inicializáljon!
+OK	InstallProgress		Rendben
+OK	InstallerApp		Rendben
+OK	InstallerWindow		Rendben
+Onto:	InstallerWindow		E lemezre:
+Performing installation.	InstallProgress		A telepítés folyamatban!
+Please choose target	InstallerWindow		Válassza ki a lemezt, melyre telepít!
+Please close the DriveSetup window before closing the Installer window.	InstallerWindow		A telepítőablak bezárása előtt kérem, zárja be a lemezbeállító ablakot!
+Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Nyomja meg a „Telepítés” gombot a rendszer „%1s” lemezről „%2s” lemezre telepítéshez!
+Quit	InstallerApp		Kilépés
+Quit	InstallerWindow		Kilépés
+README	InstallerApp		OLVASSEL
+Restart system	InstallerWindow		Számítógép újraindítása
+Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		A lemezbeállító fut.\n\nHa végzett, zárja be a lemezbeállítót a telepítés folytatásához!
+Scanning for disks…	InstallerWindow		Lemezek keresése…
+Set up partitions…	InstallerWindow		Partíciók szerkesztése…
+Show optional packages	InstallerWindow		Nem feltétlenül szükséges csomagok megjelenítése
+Starting Installation.	InstallProgress		A telepítés előkészítése.
+Stop	InstallerWindow	In alert after pressing Stop	Megállít
+The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		A céllemezen nincs elég hely a telepítéshez. Válasszon egy másik lemezt vagy csak a szükséges rendszerelemeket telepítse!
+The disk can't be mounted. Please choose a different disk.	InstallProgress		A lemez nem csatolható. Válasszon egy másikat!
 The mount point could not be retrieved.	InstallProgress		A csatolási pontot nem lehet meghatározni.
+The partition can't be mounted. Please choose a different partition.	InstallProgress		A partíciót nem lehetett csatolni. Kérem, válasszon egy másik partíciót!
+The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		A lemez, melyre települ a rendszer, nem üres. Még így is nekiáll a telepítésnek?\n\nMegjegyzés: A „rendszer” nevű mappa lesz csak egyedül újból feltelepítve, az öszes többi mappa az új telepítéssel együtt össze lesz vonva. Ahol a fájlok és a linkek már léteznek a célrendszerben, azok a telepítési forráséval lesznek felülírva.
+Try installing anyway	InstallProgress		Feltelepítés megpróbálása
+Unknown Type	InstallProgress	Partition content type	Ismeretlen típus
+Write boot sector	InstallerWindow		Rendszerbetöltő írása
+Write boot sector to '%s'	InstallerWindow		Bootszektor írása „%s” helyre
+You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Magára a már kiválasztott lemezre nem lehet telepíteni. Kérem, válasszon egy másik lemezt!
+scanning…	InstallerWindow		keresés…

@@ -1,17 +1,17 @@
 1	hungarian	x-vnd.Haiku-Locale	2023461026
-Available languages	Locale Preflet Window		Elérhető nyelvek
-Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Nem található a nyelvi fájl! Sajnos így a beállítópanel nem használható!
-Long format:	TimeFormatSettings		Hosszú alak:
-Currency	TimeFormatSettings		Pénznem
-Short format:	TimeFormatSettings		Rövid alak:
-Language	Locale Preflet Window		Nyelv
-Preferred languages	Locale Preflet Window		Előnyben részesített nyelvek
-Numbers	TimeFormatSettings		Számok
-24 hour	TimeFormatSettings		24-órás
-Defaults	Locale Preflet Window		Alapértelmezés
-Revert	Locale Preflet Window		Visszaállítás
-OK	Locale Preflet Window		Ok
-Time	TimeFormatSettings		Idő
-Date	TimeFormatSettings		Dátum
 12 hour	TimeFormatSettings		12-órás
+24 hour	TimeFormatSettings		24-órás
+Available languages	Locale Preflet Window		Elérhető nyelvek
+Currency	TimeFormatSettings		Pénznem
+Date	TimeFormatSettings		Dátum
+Defaults	Locale Preflet Window		Alapértelmezés
+Language	Locale Preflet Window		Nyelv
 Locale	Locale Preflet		Nyelvi beállítások
+Long format:	TimeFormatSettings		Hosszú alak:
+Numbers	TimeFormatSettings		Számok
+OK	Locale Preflet Window		Ok
+Preferred languages	Locale Preflet Window		Előnyben részesített nyelvek
+Revert	Locale Preflet Window		Visszaállítás
+Short format:	TimeFormatSettings		Rövid alak:
+Time	TimeFormatSettings		Idő
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Nem található a nyelvi fájl! Sajnos így a beállítópanel nem használható!

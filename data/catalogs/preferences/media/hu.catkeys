@@ -1,34 +1,24 @@
-1	hungarian	x-vnd.Haiku-Media	2505372198
-Show volume control on Deskbar	Media views		Hangerőszabályzó az Asztalsávon
+1	hungarian	x-vnd.Haiku-Media	2390037910
 Audio input:	Media views		Hangbemenet:
-Restarting media services\nStarting media server…\n	Media Window		Médiaszolgáltatások újraindítása\nMédiakiszolgáló elindítása…\n
-Video input:	Media views		Képbemenet:
-Waiting for media_server to quit.	Media Window		Várakozás a Médiakiszolgáló kilépésére.
-Defaults	Media views		Alapértelmezés
-Stopping media server…	Media Window		Médiakiszolgáló leállítása…
-Video output:	Media views		Képkimenet:
-Enable real-time audio	Media views		Valós idejű hang engedélyezése
-Quit	Media Window		Kilépés
-OK	Media Window		Rendben
-Enabling real-time video allows system to perform video operations as fast and smoothly as possible.  It achieves optimum performance by using more RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		A valós idejű képszolgáltatás engedélyezésével az operációs rendszer a lehető leggyorsabban és legsimábban próbálja végrehajtani a mozgóképműveleteket. Ez viszont az optimális teljesítmény elérése érdekében több memóriát igényel.\n\nKérjük, csak akkor engedélyezze, ha a lehető legkevesebb késleltetésre van szüksége.
-Default nodes	Media views		Alapértelmezett pontok
-Starting media server…	Media Window		Médiakiszolgáló elindítása…
-Restart the media server to apply changes.	Media views		A változtatások érvénybe lépéséhez indítsa újra a Médiakiszolgálót!
-Done shutting down.	Media Window		Leállítva.
-Cleaning up.	Media Window		Rendrakás.
-Telling media_addon_server to quit.	Media Window		A Médiabővítmény-kiszolgáló leállítása.
-Enable real-time video	Media views		Valós idejű kép engedélyezése
-This hardware has no controls.	Media Window		Ennek az eszköznek nincsenek vezérlői.
-Restarting media services\nShutting down media server\n	Media Window		Médiaszolgáltatások újraindítása\nMédiakiszolgáló leállítása\n
 Audio output:	Media views		Hangkimenet:
-Start media server	Media Window		Média kiszolgáló elindítása
 Audio settings	Media Window		Hangbeállítások
-Could not connect to the media server.\nWould you like to start it ?	Media Window		Nem lehet csatlakozni a Médiakiszolgálóhoz.\nEl szeretné indítani most?
-Ready for use…	Media Window		Használatra kész…
-Real-time	Media views		Valós idejű
-Restart media services	Media views		Médiaszolgáltatások újraindítása
-Enabling real-time audio allows system to record and play audio as fast as possible.  It achieves this performance by using more CPU and RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		A valós idejű hangszolgáltatás engedélyezésével az operációs rendszer a lehető leggyorsabban próbálja lejátszani és rögziteni a hanganyagokat. Ez viszont az optimális teljesítmény elérése érdekében több memóriát igényel.\n\nKérjük, csak akkor engedélyezze, ha a lehető legkissebb késleltetésre van szüksége.
-Couldn't remove volume control in Deskbar: %s\n	Media Window		A hangerőszabályzó nem törölhető az Asztalsávról: „%s”\n
-Couldn't add volume control in Deskbar: %s\n	Media Window		Nem helyezhető hangerőszabályzó az Asztalsávra: „%s”\n
-Media	Media Window		Média
 Channel:	Media views		Csatorna:
+Cleaning up.	Media Window		Rendrakás.
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Nem lehet csatlakozni a Médiakiszolgálóhoz.\nEl szeretné indítani most?
+Defaults	Media views		Alapértelmezés
+Done shutting down.	Media Window		Leállítva.
+OK	Media Window		Rendben
+Quit	Media Window		Kilépés
+Ready for use…	Media Window		Használatra kész…
+Restart media services	Media views		Médiaszolgáltatások újraindítása
+Restarting media services\nShutting down media server\n	Media Window		Médiaszolgáltatások újraindítása\nMédiakiszolgáló leállítása\n
+Restarting media services\nStarting media server…\n	Media Window		Médiaszolgáltatások újraindítása\nMédiakiszolgáló elindítása…\n
+Show volume control on Deskbar	Media views		Hangerőszabályzó az Asztalsávon
+Start media server	Media Window		Média kiszolgáló elindítása
+Starting media server…	Media Window		Médiakiszolgáló elindítása…
+Stopping media server…	Media Window		Médiakiszolgáló leállítása…
+Telling media_addon_server to quit.	Media Window		A Médiabővítmény-kiszolgáló leállítása.
+This hardware has no controls.	Media Window		Ennek az eszköznek nincsenek vezérlői.
+Video input:	Media views		Képbemenet:
+Video output:	Media views		Képkimenet:
+Waiting for media_server to quit.	Media Window		Várakozás a Médiakiszolgáló kilépésére.

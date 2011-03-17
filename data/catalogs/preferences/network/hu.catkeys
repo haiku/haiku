@@ -1,18 +1,13 @@
-1	hungarian	x-vnd.Haiku-Network	3643490310
-Gateway:	EthernetSettingsView		Átjáró:
-Netmask:	EthernetSettingsView		Alhálózati maszk:
-DHCP	EthernetSettingsView		DHCP
-DNS #2:	EthernetSettingsView		DNS #2:
-Apply	EthernetSettingsView		Alkalmaz
-DNS #1:	EthernetSettingsView		DNS #1:
-Network	NetworkWindow		Hálózat
+1	hungarian	x-vnd.Haiku-Network	3560835400
 Adapter:	EthernetSettingsView		Adapter:
-IP address:	EthernetSettingsView		IP-cím:
-Revert	EthernetSettingsView		Visszaállít
-Sending auto-config message failed: 	EthernetSettingsView		Az automatikus beállítási üzenet küldése nem sikerült: 
-Mode:	EthernetSettingsView		Mód:
-The net_server needs to run for the auto configuration!	EthernetSettingsView		A net_servernek futnia kell az automatikus beállításokhoz!
-Auto-configuring failed: 	EthernetSettingsView		Az automatikus beállítás nem sikerült: 
-Static	EthernetSettingsView		Állandó
-OK	EthernetSettingsView		Rendben
+Apply	EthernetSettingsView		Alkalmaz
+DHCP	EthernetSettingsView		DHCP
+DNS #1:	EthernetSettingsView		DNS #1:
+DNS #2:	EthernetSettingsView		DNS #2:
 Domain:	EthernetSettingsView		Domain:
+Gateway:	EthernetSettingsView		Átjáró:
+IP address:	EthernetSettingsView		IP-cím:
+Mode:	EthernetSettingsView		Mód:
+Netmask:	EthernetSettingsView		Alhálózati maszk:
+OK	EthernetSettingsView		Rendben
+Revert	EthernetSettingsView		Visszaállít

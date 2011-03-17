@@ -1,7 +1,7 @@
 1	hungarian	x-vnd.Haiku-ReadOnlyBootPrompt	2165068388
 Desktop (Live-CD)	BootPromptWindow		Asztal (Live-CD)
-Language	BootPromptWindow		Nyelv
-Welcome to Haiku!	BootPromptWindow		A Haiku üdvözli Önt!
-Run Installer	BootPromptWindow		Telepítő futtatása
 Do you wish to run the Installer or continue booting to the Desktop? You can also select your preferred language and keyboard layout from the list below.\n\nNote: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.	BootPromptWindow		A telepítőt indítja el, vagy a CD-ről tölti be az asztali környezetet? A lenti menüből kiválaszthatja az Önnek tetsző nyelvet és billentyűzetkiosztást.\n\nFigyelem! A Haiku programjainak fordítása és/vagy lokalizációja még egy folyamatban van. Emiatt lehet, hogy lefordítatlan programrészekbe fog ütközni. A fordításhoz a <www.haiku-os.org> weboldalon járulhat hozzá.
 Keymap	BootPromptWindow		Billentyűzetkiosztás
+Language	BootPromptWindow		Nyelv
+Run Installer	BootPromptWindow		Telepítő futtatása
+Welcome to Haiku!	BootPromptWindow		A Haiku üdvözli Önt!

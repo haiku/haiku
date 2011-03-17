@@ -1,14 +1,13 @@
-1	hungarian	x-vnd.Haiku-Keyboard	914649575
-Keyboard	KeyboardWindow		Billentyűzet tulajdonságai
-Written by Andrew Edward McCall	KeyboardApplication		Írta: Andrew Edward McCall
-Typing test area	KeyboardView		Tesztmező
+1	hungarian	x-vnd.Haiku-Keyboard	1078858058
 Defaults	KeyboardWindow		Alapértelmezés
-Key repeat rate	KeyboardView		Karakterismétlődés gyakorisága
-Revert	KeyboardWindow		Visszaállít
 Delay until key repeat	KeyboardView		Ismétlés előtti várakozás
-OK	KeyboardApplication		Rendben
 Fast	KeyboardView		Gyors
+Key repeat rate	KeyboardView		Karakterismétlődés gyakorisága
+Long	KeyboardView		Hosszú
+OK	KeyboardApplication		Rendben
+Revert	KeyboardWindow		Visszaállít
+Short	KeyboardView		Rövid
 Slow	KeyboardView		Lassú
 Something has gone wrong!	KeyboardApplication		Valami elromlott!
-Long	KeyboardView		Hosszú
-Short	KeyboardView		Rövid
+Typing test area	KeyboardView		Tesztmező
+Written by Andrew Edward McCall	KeyboardApplication		Írta: Andrew Edward McCall

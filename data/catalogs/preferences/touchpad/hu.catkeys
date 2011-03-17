@@ -1,14 +1,13 @@
-1	hungarian	x-vnd.Haiku-Touchpad	2104608255
-Scrolling	TouchpadPrefView		Görgetés
-Revert	TouchpadPrefView		Visszaállít
-Two finger scrolling	TouchpadPrefView		Kétujjas görgetés
+1	hungarian	x-vnd.Haiku-Touchpad	171514427
 Defaults	TouchpadPrefView		Alapértelmezés
-Slow	TouchpadPrefView		Lassú
-High	TouchpadPrefView		Magas
-Tap gesture	TouchpadPrefView		Érintési mozdulat
-Horizontal scrolling	TouchpadPrefView		Vízszintes görgetés
 Fast	TouchpadPrefView		Gyors
-Tap click sensitivity	TouchpadPrefView		Érintés érzékenysége
-Scroll acceleration	TouchpadPrefView		Görgetés gyorsulása
+High	TouchpadPrefView		Magas
+Horizontal scrolling	TouchpadPrefView		Vízszintes görgetés
 Off	TouchpadPrefView		Ki
-Touchpad	TouchpadMain		Touchpad
+Revert	TouchpadPrefView		Visszaállít
+Scroll acceleration	TouchpadPrefView		Görgetés gyorsulása
+Scrolling	TouchpadPrefView		Görgetés
+Slow	TouchpadPrefView		Lassú
+Tap click sensitivity	TouchpadPrefView		Érintés érzékenysége
+Tap gesture	TouchpadPrefView		Érintési mozdulat
+Two finger scrolling	TouchpadPrefView		Kétujjas görgetés

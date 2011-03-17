@@ -1,23 +1,22 @@
-1	hungarian	x-vnd.Haiku-Mouse	524453314
-Mouse type:	SettingsView		Egér típusa:
-Warp	SettingsView		Áthajlás
-2-Button	SettingsView		Kétgombos
-Double-click test area	SettingsView		Duplakattintásos próbaterület
-Revert	MouseWindow		Visszaállít
+1	hungarian	x-vnd.Haiku-Mouse	1036956709
 ...by Andrew Edward McCall	MouseApplication		Írta: Andrew Edward McCall
-Mouse acceleration	SettingsView		Egérmozdulat gyorsulása
-Click to focus	SettingsView		A fókuszhoz kattintani kell
+1-Button	SettingsView		Egygombos
+2-Button	SettingsView		Kétgombos
 3-Button	SettingsView		Háromgombos
-Mouse speed	SettingsView		Egérmozgatás sebessége
+Accept first click	SettingsView		Első kattintás elfogadása
+Click to focus	SettingsView		A fókuszhoz kattintani kell
+Defaults	MouseWindow		Alapértelmezett
+Dig Deal	MouseApplication		Dig Deal
+Double-click speed	SettingsView		Duplakattintás sebessége
+Double-click test area	SettingsView		Duplakattintásos próbaterület
+Fast	SettingsView		Gyors
+Focus follows mouse	SettingsView		A fókusz az egér helyzetétől függ
 Focus mode:	SettingsView		Fókuszmód:
 Instant warp	SettingsView		Szünetmentes áthajlás
-Dig Deal	MouseApplication		Dig Deal
-1-Button	SettingsView		Egygombos
-Double-click speed	SettingsView		Duplakattintás sebessége
-Defaults	MouseWindow		Alapértelmezett
-Focus follows mouse	SettingsView		A fókusz az egér helyzetétől függ
-Accept first click	SettingsView		Első kattintás elfogadása
-Fast	SettingsView		Gyors
+Mouse acceleration	SettingsView		Egérmozdulat gyorsulása
+Mouse speed	SettingsView		Egérmozgatás sebessége
+Mouse type:	SettingsView		Egér típusa:
 Normal	SettingsView		Megszokott
-Mouse	MouseWindow		Egér
+Revert	MouseWindow		Visszaállít
 Slow	SettingsView		Lassú
+Warp	SettingsView		Áthajlás

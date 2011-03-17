@@ -1,30 +1,30 @@
 1	hungarian	x-vnd.Haiku-About	2960987991
-Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrechtnek (NewOS kernel)\n
+%.2f GHz	AboutView		%.2f GHz
+%ld MHz	AboutView		%ld MHz
 %ld Processors:	AboutView		%ld Processzor:
+... and the many people making donations!\n\n	AboutView		...a rengeteg adományokkal segítő embernek!\n\n
+About this system	AboutWindow		A futó rendszerről
+Contributors:\n	AboutView		Közreműködők:\n
+Current maintainers:\n	AboutView		Jelenlegi karbantartók:\n
+Kernel:	AboutView		Kernel:
+License: 	AboutView		Licenc:
+Licenses: 	AboutView		Licencek: 
+Memory:	AboutView		Memória:
 Michael Phipps (project founder)\n\n	AboutView		Michael Phippsnek (projektalapító)\n\n
-The Haiku-Ports team\n	AboutView		A Haiku-Ports csapatának\n
-Website, marketing & documentation:\n	AboutView		Weboldal, marketing és dokumentáció:\n
+Past maintainers:\n	AboutView		Régebbi karbantartók:\n
+Processor:	AboutView		Processzor:
 Revision	AboutView		Kiadás
 Source Code: 	AboutView		Forráskód: 
-Processor:	AboutView		Processzor:
-Kernel:	AboutView		Kernel:
-Contributors:\n	AboutView		Közreműködők:\n
-Unknown	AboutView		Ismeretlen
-\n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… és a többi ember, akiket lehet elfelejtettünk megemlíteni (elnézést!)\n\n
-%.2f GHz	AboutView		%.2f GHz
-Memory:	AboutView		Memória:
-Past maintainers:\n	AboutView		Régebbi karbantartók:\n
-\n\nSpecial thanks to:\n	AboutView		\n\nKülön köszönet jár:\n
-Licenses: 	AboutView		Licencek: 
-\nCopyrights\n\n	AboutView		\nSzerzői jogok\n\n
-Current maintainers:\n	AboutView		Jelenlegi karbantartók:\n
-Time running:	AboutView		Ennyi ideje fut:
-The Haikuware team and their bounty program\n	AboutView		A Haikuware csapatának és az adományprogramjuknak\n
-About this system	AboutWindow		A futó rendszerről
-Version:	AboutView		Verzió:
-%ld MHz	AboutView		%ld MHz
-[Click a license name to read the respective license.]\n\n	AboutView		[Kattintson rá a licenc nevére az adott licenc megjelenítéséhez!]\n\n
-License: 	AboutView		Licenc:
-Translations:\n	AboutView		Fordítások:\n
-... and the many people making donations!\n\n	AboutView		...a rengeteg adományokkal segítő embernek!\n\n
 The BeGeistert team\n	AboutView		A BeGeistert csapatának\n
+The Haiku-Ports team\n	AboutView		A Haiku-Ports csapatának\n
+The Haikuware team and their bounty program\n	AboutView		A Haikuware csapatának és az adományprogramjuknak\n
+Time running:	AboutView		Ennyi ideje fut:
+Translations:\n	AboutView		Fordítások:\n
+Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrechtnek (NewOS kernel)\n
+Unknown	AboutView		Ismeretlen
+Version:	AboutView		Verzió:
+Website, marketing & documentation:\n	AboutView		Weboldal, marketing és dokumentáció:\n
+[Click a license name to read the respective license.]\n\n	AboutView		[Kattintson rá a licenc nevére az adott licenc megjelenítéséhez!]\n\n
+\nCopyrights\n\n	AboutView		\nSzerzői jogok\n\n
+\n\nSpecial thanks to:\n	AboutView		\n\nKülön köszönet jár:\n
+\n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… és a többi ember, akiket lehet elfelejtettünk megemlíteni (elnézést!)\n\n
