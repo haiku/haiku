@@ -1,25 +1,23 @@
-1	portuguese	x-vnd.Haiku-Backgrounds	739979648
-X:	Main View		X:
-Resolution: 	Image Filepanel		Resolução:
-pick one	Main View		escolha um
-Default	Main View		Predefenido
-Center	Main View		Centrado
-Manual	Main View		Manual
-Default folder	Main View		Pasta predefenida
-Revert	Main View		Reverter
-None	Main View		Nenhum
+1	portuguese	x-vnd.Haiku-Backgrounds	389381034
 All workspaces	Main View		Todas as áreas de trabalho
-Icon label outline	Main View		Limite da legenda do ícone
-Other…	Main View		Outros...
-Current workspace	Main View		Área de trabalho actual
-Folder: 	Main View		Pasta:
 Apply	Main View		Aplicar
+Center	Main View		Centrado
+Current workspace	Main View		Área de trabalho actual
+Default	Main View		Predefinido
+Default folder	Main View		Pasta predefinida
+Folder: 	Main View		Pasta:
+Icon label outline	Main View		Contorno da legenda do ícone
+Image:	Main View		Imagem:
+Manual	Main View		Manual
+None	Main View		Nenhum
 Other folder…	Main View		Outra pasta...
-Backgrounds	Main Window		Fundos
-Y:	Main View		Y:
-Tile	Main View		Mosaico
-Select	Main View		Seleccione
-Scale to fit	Main View		À escala
+Other…	Main View		Outros...
 Placement:	Main View		Posicionamento:
 Preview	Main View		Previsualização
-Image:	Main View		Imagem:
+Resolution: 	Image Filepanel		Resolução:
+Revert	Main View		Reverter
+Scale to fit	Main View		Ajustar tamanho
+Tile	Main View		Mosaico
+X:	Main View		X:
+Y:	Main View		Y:
+pick one	Main View		escolha um

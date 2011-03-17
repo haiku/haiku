@@ -1,80 +1,68 @@
-1	portuguese	x-vnd.Haiku-Terminal	3600669258
-Not found.	Terminal TermWindow		Não encontrado.
-Didn't find any available pseudo ttys.	Terminal Shell		Nenhum pseudo tty disponível encontrado.
-Switch Terminals	Terminal TermWindow		Alternar Terminais
-Change directory	Terminal TermView		Mudar de directório
-OK	Terminal TermWindow		OK
-New Terminal	Terminal TermWindow		Novo Terminal
-Terminal couldn't start the shell. Sorry.	Terminal TermApp		O Terminal não consegiu iniciar a shell. Desculpe.
-Text size	Terminal TermWindow		Tamanho do texto
-Match case	Terminal FindWindow		Corresponder maiúsculas e minúsculas
-Quit	Terminal TermWindow		Sair
-Use default shell	Terminal Shell		Utilizar shell predefinida
-Select all	Terminal TermWindow		Seleccionar tudo
-Terminal	Terminal TermWindow		Terminal
-Save to file…	Terminal PrefWindow		Guardar ficheiro...
-Failed to init pseudo tty.	Terminal Shell		Falha ao iniciar pseudo tty.
-OK	Terminal PrefWindow		OK
-Font:	Terminal AppearancePrefView		Tipo de Letra:
-Copy here	Terminal TermView		Copiar para aqui
-Copy	Terminal TermWindow		Copiar
-could not set session leader.	Terminal Shell		não foi possível defenir o líder da sessão.
-sigaction() failed: %s\n	Terminal TermApp		sigaction() falhou: %s\n
-Unrecognized option \"%s\"\n	Terminal arguments parsing		Opção desconhecida \"%s\"\n
-Print cancelled.	Terminal TermWindow		Impressão cancelada.
-Increase	Terminal TermWindow		Aumentar
-Settings	Terminal TermWindow		Definições
-Window size	Terminal TermWindow		Tamanho da janela
-Terminal settings	Terminal PrefWindow		Definições do Terminal
-Find	Terminal FindWindow		Localizar
-Appearance	Terminal PrefWindow		Aparência
-Use selection	Terminal FindWindow		Usar selecção
-Size:	Terminal AppearancePrefView		Tamanho
-Cannot execute \"%command\":\n\t%error	Terminal Shell		Não foi possível executar \"%command
-Full screen	Terminal TermWindow		Ecrã inteiro
-Page setup…	Terminal TermWindow		Configuração de página...
-OK	Terminal TermView		OK
-Insert path	Terminal TermView		Inserir caminho
-Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Terminal Haiku\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui e Takashi Murai.\n\nUtilização: %s [OPÇÃO] [SHELL]\n
-No search string was entered.	Terminal TermWindow		Não foi introduzida nenhuma cadeia de procura.
-Don't save	Terminal PrefWindow		Não guardar
-Match word	Terminal FindWindow		Palavras exactas
-Nothing is selected.	Terminal TermWindow		Não há nada seleccionado.
-Text not found.	Terminal TermWindow		Texto não encontrado.
-Find…	Terminal TermWindow		Localizar...
-Move here	Terminal TermView		Mover para aqui
-Secondary mouse button drop menu	Terminal TermView		Menu de contexto do segundo botão do rato
-Error!	Terminal getString		Erro!
-New tab	Terminal TermWindow		Novo separador
-can't open tty (%s).	Terminal Shell		não foi possível abrir a tty (%s).
-Decrease	Terminal TermWindow		Diminuir
-Create link here	Terminal TermView		Criar atalho aqui
-failed set terminal interface (TERMIOS).	Terminal Shell		a defenição da interface do terminal falhou (TERMIOS).
-Clear all	Terminal TermWindow		Limpar tudo
-Text encoding	Terminal TermWindow		Codificação do texto
-size	Terminal TermView		tamanho
-Save as default	Terminal TermWindow		Guardar como predefenição
-Settings…	Terminal TermWindow		Opções...
+1	portuguese	x-vnd.Haiku-Terminal	396469586
+-h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		 -h, --help mostra esta ajuda\n -t, --title define o título da janela\n -f, --fullscreen iniciar em ecrã inteiro\n
 Abort	Terminal Shell		Abortar
-mismatch handshake.	Terminal Shell		erro de recon
-Color:	Terminal AppearancePrefView		Cor:
-Print	Terminal TermWindow		Imprimir
-Use text:	Terminal FindWindow		Usar texto:
-Cancel	Terminal TermWindow		Cancelar
-OK	Terminal TermApp		OK
-Find failed	Terminal TermWindow		Localização falhou
-Search forward	Terminal FindWindow		Seguinte
-Find previous	Terminal TermWindow		Anterior
-About Terminal…	Terminal TermWindow		Sobre o Terminal
-Find next	Terminal TermWindow		Encontrar o seguinte
-Close active tab	Terminal TermWindow		Fechar separador activo
-PrefHandler::getRGB(%s) - key not found\n	Terminal getRGB		PrefHandler::getRGB(%s) - chave não encontrada\n
-Paste	Terminal TermWindow		Colar
-Save changes to this settings panel?	Terminal PrefWindow		Guardar alterações a este painel de opções?
+About Terminal…	Terminal TermWindow		Sobre o Terminal…
+Appearance	Terminal PrefWindow		Aparência
 Cancel	Terminal PrefWindow		Cancelar
-Save	Terminal PrefWindow		Guardar
 Cancel	Terminal TermView		Cancelar
--h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		 -h, --help mostra esta ajuda\n -t, --title define o título da janela\n -f, --fullscreen iniciar em ecrã completo\n
+Cancel	Terminal TermWindow		Cancelar
+Cannot execute \"%command\":\n\t%error	Terminal Shell		Não foi possível executar \"%command
+Change directory	Terminal TermView		Mudar de directório
+Clear all	Terminal TermWindow		Limpar tudo
+Close active tab	Terminal TermWindow		Fechar separador activo
 Color schema:	Terminal AppearancePrefView		Esquema de cores:
-Terminal\n\nwritten by Kazuho Okui and Takashi Murai\nupdated by Kian Duffy and others\n\nCopyright ©2003-2009, Haiku.\n	Terminal TermView		Terminal\n\nescrito por Kazuho Okui e Takashi Murai\nactualizado por Kian Duffy 
+Color:	Terminal AppearancePrefView		Cor:
 Confirm exit if active programs exist	Terminal AppearancePrefView		Confirmar saída se existirem programas activos
+Copy	Terminal TermWindow		Copiar
+Copy here	Terminal TermView		Copiar para aqui
+Create link here	Terminal TermView		Criar atalho aqui
+Decrease	Terminal TermWindow		Diminuir
+Don't save	Terminal PrefWindow		Não guardar
+Error!	Terminal getString		Erro!
+Find	Terminal FindWindow		Localizar
+Find failed	Terminal TermWindow		Localização falhou
+Find next	Terminal TermWindow		Encontrar o seguinte
+Find previous	Terminal TermWindow		Anterior
+Find…	Terminal TermWindow		Localizar...
+Font:	Terminal AppearancePrefView		Tipo de Letra:
+Full screen	Terminal TermWindow		Ecrã inteiro
+Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Terminal Haiku\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui e Takashi Murai.\n\nUtilização: %s [OPÇÃO] [SHELL]\n
+Increase	Terminal TermWindow		Aumentar
+Insert path	Terminal TermView		Inserir caminho
+Match case	Terminal FindWindow		Corresponder maiúsculas e minúsculas
+Match word	Terminal FindWindow		Palavras exactas
+Move here	Terminal TermView		Mover para aqui
+New Terminal	Terminal TermWindow		Novo Terminal
+New tab	Terminal TermWindow		Novo separador
+No search string was entered.	Terminal TermWindow		Não foi introduzida nenhuma cadeia de procura.
+Not found.	Terminal TermWindow		Não encontrado.
+Nothing is selected.	Terminal TermWindow		Não há nada seleccionado.
+OK	Terminal TermApp		OK
+OK	Terminal TermView		OK
+OK	Terminal TermWindow		OK
+Page setup…	Terminal TermWindow		Configuração de página…
+Paste	Terminal TermWindow		Colar
+Print	Terminal TermWindow		Imprimir
+Print cancelled.	Terminal TermWindow		Impressão cancelada.
+Quit	Terminal TermWindow		Sair
+Save	Terminal PrefWindow		Guardar
+Save as default	Terminal TermWindow		Guardar como predefenição
+Save changes to this settings panel?	Terminal PrefWindow		Guardar alterações a este painel de definições?
+Save to file…	Terminal PrefWindow		Guardar ficheiro…
+Search forward	Terminal FindWindow		Seguinte
+Select all	Terminal TermWindow		Seleccionar tudo
+Settings	Terminal TermWindow		Definições
+Settings…	Terminal TermWindow		Definições...
+Size:	Terminal AppearancePrefView		Tamanho
+Switch Terminals	Terminal TermWindow		Alternar Terminais
+Terminal couldn't start the shell. Sorry.	Terminal TermApp		O Terminal não consegiu iniciar a shell. Desculpe.
+Terminal\n\nwritten by Kazuho Okui and Takashi Murai\nupdated by Kian Duffy and others\n\nCopyright ©2003-2009, Haiku.\n	Terminal TermView		Terminal\n\nescrito por Kazuho Okui e Takashi Murai\nactualizado por Kian Duffy e outros\n\nCopyright ©2003-2009, Haiku.\n
+Text encoding	Terminal TermWindow		Codificação do texto
+Text not found.	Terminal TermWindow		Texto não encontrado.
+Text size	Terminal TermWindow		Tamanho do texto
+Unrecognized option \"%s\"\n	Terminal arguments parsing		Opção desconhecida \"%s\"\n
+Use default shell	Terminal Shell		Utilizar shell predefinida
+Use selection	Terminal FindWindow		Usar selecção
+Use text:	Terminal FindWindow		Usar texto:
+Window size	Terminal TermWindow		Tamanho da janela
+size	Terminal TermView		tamanho

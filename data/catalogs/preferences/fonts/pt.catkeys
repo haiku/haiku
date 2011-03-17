@@ -1,12 +1,5 @@
-1	portuguese	x-vnd.Haiku-Fonts	1393111467
-Plain font:	Font view		Tipo de Letra:
-Defaults	Main window		Predefenições
-Fonts	Main window		Tipos de Letra
-Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Tipos de Letra\n\tCopyright 2004-2005, Haiku. \n\n
+1	portuguese	x-vnd.Haiku-Fonts	1052332655
+OK	main		OK
 Revert	Main window		Reverter
 Size:	Font Selection view		Tamanho:
-Menu font:	Font view		Tipo de Letra menu:
-Fixed font:	Font view		Tipo de Letra fixo:
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	The quick brown fox jumps over the lazy dog.
-Bold font:	Font view		Tipo de Letra negrito:
-OK	main		OK

@@ -1,58 +1,58 @@
-1	portuguese	x-vnd.Haiku-StyledEdit	2108192170
-OK	LoadAlert		OK
+1	portuguese	x-vnd.Haiku-StyledEdit	3670692170
 ???	LoadAlert		???
-Left	Menus		À esquerda
-Revert to the last version of \"%s\"? 	RevertToSavedAlert		Reverter para a última versão de \"%s\"? 
-Search backwards	FindandReplaceWindow		Localizar anterior
-Size	Menus		Tamanho
-Save	QuitAlert		Guardar
-Replace same	Menus		Substituir todos
-Can't Undo	Menus		Impossível desfazer
-Save	Menus		Guardar
-Replace with:	FindandReplaceWindow		Substituir por:
+Align	Menus		Alinhar
+Black	Menus		Preto
+Blue	Menus		Azul
+Can't undo	Menus		Impossível desfazer
+Cancel	FindandReplaceWindow		Cancelar
+Cancel	QuitAlert		Cancelar
+Cancel	RevertToSavedAlert		Cancelar
+Cancel	SaveAlert		Cancelar
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Impossível reverter, ficheiro não encontrado: \"%s\".
 Case-sensitive	FindandReplaceWindow		Sensível a minúsculas e maiúsculas
-Green	Menus		Verde
-Revert to saved…	Menus		Reverter para o ficheiro guardado...
-Yellow	Menus		Amarelo
-Replace in all windows	FindandReplaceWindow		Substituir em todas as janelas
-Wrap lines	Menus		Quebrar linhas
-Cancel	RevertToSavedAlert		Cancelar
-Document	Menus		Documento
-Save changes to the document \"%s\"? 	QuitAlert		Guardar alterações ao documento \"%s\"? 
-Font	Menus		Tipo de letra
-Replace all	FindandReplaceWindow		Substituir todos
-Default	Open_and_SaveAsPanel		Predefenido
-Cancel	FindandReplaceWindow		Cancelar
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Erro ao carregar \"%s\":\n\tFormato não suportado
-OK	RevertToSavedAlert		OK
-Don't save	QuitAlert		Não guardar
-Align	Menus		Alinhar
-Color	Menus		Cor
-Red	Menus		Vermelho
-Open…	Menus		Abrir...
 Center	Menus		Ao centro
-Blue	Menus		Azul
+Color	Menus		Cor
 Cyan	Menus		Ciano
-Magenta	Menus		Magenta
-New	Menus		Novo
-Wrap-around search	FindandReplaceWindow		Pesquisar em todo o documento
+Default	Open_and_SaveAsPanel		Predefenido
+Document	Menus		Documento
+Don't save	QuitAlert		Não guardar
+Don't save	SaveAlert		Não guardar
+Encoding	Open_and_SaveAsPanel		Codificação
+Error loading \"%s\":\n\t%s	LoadAlert		Erro ao abrir \"%s\":\n\t%s
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Erro ao carregar \"%s\":\n\tFormato não suportado
+Error saving \"%s\":\n%s	SaveAlert		Erro ao guardar \"%s\":\n%s
+Find	FindandReplaceWindow		Localizar
+Find again	Menus		Localizar seguinte
 Find selection	Menus		Localizar selecção
 Find:	FindandReplaceWindow		Localizar:
-Error saving \"%s\":\n%s	SaveAlert		Erro ao guardar \"%s\":\n%s
-Replace	FindandReplaceWindow		Substituir
-Find again	Menus		Localizar seguinte
-Cancel	QuitAlert		Cancelar
 Find…	Menus		Localizar..
-Error loading \"%s\":\n\t%s	LoadAlert		Erro ao abrir \"%s\":\n\t%s
-Black	Menus		Preto
-Untitled 	StyledEditWindow		Sem título
+Font	Menus		Tipo de letra
+Green	Menus		Verde
+Left	Menus		À esquerda
+Magenta	Menus		Magenta
+New	Menus		Novo
+OK	LoadAlert		OK
+OK	RevertToSavedAlert		OK
 OK	SaveAlert		OK
-Find	FindandReplaceWindow		Localizar
-Encoding	Open_and_SaveAsPanel		Codificação
+Open…	Menus		Abrir...
+Red	Menus		Vermelho
+Replace	FindandReplaceWindow		Substituir
+Replace all	FindandReplaceWindow		Substituir todos
+Replace in all windows	FindandReplaceWindow		Substituir em todas as janelas
+Replace same	Menus		Substituir todos
+Replace with:	FindandReplaceWindow		Substituir por:
 Replace…	Menus		Substituir...
+Revert to saved…	Menus		Reverter para o ficheiro guardado...
+Revert to the last version of \"%s\"? 	RevertToSavedAlert		Reverter para a última versão de \"%s\"? 
 Right	Menus		À Direita
-Cancel	SaveAlert		Cancelar
+Save	Menus		Guardar
+Save	QuitAlert		Guardar
 Save	SaveAlert		Guardar
-Don't save	SaveAlert		Não guardar
+Save changes to the document \"%s\"? 	QuitAlert		Guardar alterações ao documento \"%s\"? 
+Search backwards	FindandReplaceWindow		Localizar anterior
+Size	Menus		Tamanho
 This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Este ficheiro está marcado como só de leitura. Guardar alterações ao documento \"%s\"?
+Untitled 	StyledEditWindow		Sem título
+Wrap lines	Menus		Quebrar linhas
+Wrap-around search	FindandReplaceWindow		Pesquisar em todo o documento
+Yellow	Menus		Amarelo

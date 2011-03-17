@@ -1,14 +1,13 @@
-1	portuguese	x-vnd.Haiku-Keyboard	914649575
-Keyboard	KeyboardWindow		Teclado
-Written by Andrew Edward McCall	KeyboardApplication		Escrito por Andrew Edward McCall
-Typing test area	KeyboardView		Área de teste de escrita
+1	portuguese	x-vnd.Haiku-Keyboard	1078858058
 Defaults	KeyboardWindow		Predefenições
-Key repeat rate	KeyboardView		Velocidade de repetição de tecla
-Revert	KeyboardWindow		Reverter
 Delay until key repeat	KeyboardView		Intervalo de repetição de tecla
-OK	KeyboardApplication		OK
 Fast	KeyboardView		Rápido
+Key repeat rate	KeyboardView		Velocidade de repetição de tecla
+Long	KeyboardView		Longo
+OK	KeyboardApplication		OK
+Revert	KeyboardWindow		Reverter
+Short	KeyboardView		Curto
 Slow	KeyboardView		Lento
 Something has gone wrong!	KeyboardApplication		Alguma coisa correu mal!
-Long	KeyboardView		Longo
-Short	KeyboardView		Curto
+Typing test area	KeyboardView		Área de teste de escrita
+Written by Andrew Edward McCall	KeyboardApplication		Escrito por Andrew Edward McCall

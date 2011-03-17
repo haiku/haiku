@@ -1,20 +1,18 @@
-1	portuguese	x-vnd.Haiku-VirtualMemory	866260633
-Turn off	SettingsWindow		Desligar
-GB	SettingsWindow		GB
-Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Desligar a memória virtual irá ter efeitos indesejados na estabilidade do sistema assim que a memória estiver cheia.\nA memória virtual não irá afectar a performance do sistema até que esse ponto aconteça.\n\nTem a certeza que deseja desligá-la?
-Requested swap file size:	SettingsWindow		Tamanho do ficheiro swap requerido:
-Physical memory: 	SettingsWindow		Memória física:
-Changes will take effect on restart!	SettingsWindow		As alterações irão ser efectuadas após reiniciar!
-Defaults	SettingsWindow		Predefenições
-KB	SettingsWindow		KB
-Use volume:	SettingsWindow		Usar volume:
-Keep enabled	SettingsWindow		Mantar ligados
-Revert	SettingsWindow		Reverter
-999 MB	SettingsWindow		999 MB
-Current swap file size: 	SettingsWindow		Tamanho do ficheiro swap actual:
-VirtualMemory	SettingsWindow		Memória Virtual
-OK	VirtualMemoryApp		OK
-VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		VirtualMemory\n\tescrito por Axel Dörfler\n\tCopyright 2005, Haiku.\n
-Enable virtual memory	SettingsWindow		Usar memória virtual
-MB	SettingsWindow		MB
+1	portuguese	x-vnd.Haiku-VirtualMemory	2137942259
 %Ld B	SettingsWindow		%Ld B
+Changes will take effect on restart!	SettingsWindow		As alterações irão ser efectuadas após reiniciar!
+Current swap file size: 	SettingsWindow		Tamanho do ficheiro swap actual:
+Defaults	SettingsWindow		Predefenições
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Desligar a memória virtual irá ter efeitos indesejados na estabilidade do sistema assim que a memória estiver cheia.\nA memória virtual não irá afectar a performance do sistema até que esse ponto aconteça.\n\nTem a certeza que deseja desligá-la?
+Enable virtual memory	SettingsWindow		Usar memória virtual
+GB	SettingsWindow		GB
+KB	SettingsWindow		KB
+Keep enabled	SettingsWindow		Mantar ligados
+MB	SettingsWindow		MB
+OK	VirtualMemoryApp		OK
+Physical memory: 	SettingsWindow		Memória física:
+Requested swap file size:	SettingsWindow		Tamanho do ficheiro swap requerido:
+Revert	SettingsWindow		Reverter
+Turn off	SettingsWindow		Desligar
+Use volume:	SettingsWindow		Usar volume:
+VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		VirtualMemory\n\tescrito por Axel Dörfler\n\tCopyright 2005, Haiku.\n

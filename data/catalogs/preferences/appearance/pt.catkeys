@@ -1,43 +1,37 @@
-1	portuguese	x-vnd.Haiku-Appearance	3612090060
-Control highlight	Colors tab		Realce do controlo
-Control border	Colors tab		Limite do controlo
-Antialiasing type:	AntialiasingSettingsView		Tipo de Antiserrilhamento:
-Shadow	Colors tab		Sombreado
-On	AntialiasingSettingsView		Ligado
-Defaults	APRWindow		Predefenições
-Grayscale	AntialiasingSettingsView		Escala de cinzentos
-Shine	Colors tab		Brilho
-Off	AntialiasingSettingsView		Desligado
-Success	Colors tab		Sucesso
-Inactive window tab text	Colors tab		Texto do separador de janela inactiva
-Failure	Colors tab		Falha
-Hinting menu	AntialiasingSettingsView		Menu melhoramento de tipos de letra
-Document background	Colors tab		Fundo do documento
-Revert	APRWindow		Reverter
-Window tab	Colors tab		Separador de janela
-Tooltip background	Colors tab		Fundo da descrição
-Selected menu item background	Colors tab		Fundo do item de menu seleccionado
-Antialiasing	APRWindow		Antiserrilhamento
-Navigation base	Colors tab		Base de navegação
-Window tab text	Colors tab		Texto do separador de Janela
-Document text	Colors tab		Texto do documento
-Navigation pulse	Colors tab		Pulsação de navegação
-Selected menu item text	Colors tab		Texto do item de menu seleccionado
-Menu background	Colors tab		Fundo de menu
-Appearance	APRWindow		Aparência
-Panel background	Colors tab		Fundo do painel
+1	portuguese	x-vnd.Haiku-Appearance	3361956898
+Antialiasing	APRWindow		Anti-aliasing
+Antialiasing menu	AntialiasingSettingsView		Menu anti-aliasing
+Antialiasing type:	AntialiasingSettingsView		Tipo de anti-aliasing:
 Colors	APRWindow		Cores
 Control background	Colors tab		Fundo do controlo
-Inactive window tab	Colors tab		Separador de janela inactiva
-Reduce colored edges filter strength:	AntialiasingSettingsView		Reduzir força do filtro de limites coloridos:
-Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		A possibilidade de usar o antiserrilhamento baseado em Subpíxeis e o alisamento de glifos em conjunto foi desabilitada de modo a evitar problemas com patentes. Para habilitar esta funcionalidade, terá que compilar o Haiku e activar certas opções no cabeçalho de configuração da libfreetype.
+Control border	Colors tab		Limite do controlo
+Control highlight	Colors tab		Realce do controlo
 Control text	Colors tab		Texto do controlo
-Tooltip text	Colors tab		Texto da descrição
-Menu item text	Colors tab		Texto do item de menu
+Document background	Colors tab		Fundo do documento
+Document text	Colors tab		Texto do documento
+Failure	Colors tab		Falha
+Glyph hinting:	AntialiasingSettingsView		Melhoramento de glifos:
+Grayscale	AntialiasingSettingsView		Escala de cinzentos
+Hinting menu	AntialiasingSettingsView		Menu melhoramento de tipos de letra
+Inactive window tab	Colors tab		Separador de janela inactiva
+Inactive window tab text	Colors tab		Texto do separador de janela inactiva
 LCD subpixel	AntialiasingSettingsView		Subpíxel LCD
-Selected menu item border	Colors tab		Limite do item de menu seleccionado
-Strong	AntialiasingSettingsView		Importante
+Menu background	Colors tab		Fundo do menu
+Menu item text	Colors tab		Texto do item de menu
+Navigation base	Colors tab		Base de navegação
+Navigation pulse	Colors tab		Pulsação de navegação
+Off	AntialiasingSettingsView		Desligado
+On	AntialiasingSettingsView		Ligado
+Panel background	Colors tab		Fundo do painel
 Panel text	Colors tab		Texto do painel
-Monospaced fonts only	AntialiasingSettingsView		Somente tipos de letra fixos.
-Antialiasing menu	AntialiasingSettingsView		Menu antiserrilhamento
-Glyph hinting:	AntialiasingSettingsView		Alisamento de glifos:
+Reduce colored edges filter strength:	AntialiasingSettingsView		Reduzir força do filtro de limites coloridos:
+Revert	APRWindow		Reverter
+Selected menu item background	Colors tab		Fundo do item de menu seleccionado
+Selected menu item border	Colors tab		Limite do item de menu seleccionado
+Selected menu item text	Colors tab		Texto do item de menu seleccionado
+Shadow	Colors tab		Sombreado
+Shine	Colors tab		Brilho
+Success	Colors tab		Sucesso
+Tooltip background	Colors tab		Fundo da descrição
+Tooltip text	Colors tab		Texto da descrição
+Window tab	Colors tab		Separador de janela

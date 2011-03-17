@@ -1,72 +1,45 @@
-1	portuguese	x-vnd.Haiku-DriveSetup	201850780
-Delete	MainWindow		Apagar
-Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Tem a certeza que quer aplicar todas as alterações agora?\n\nTodos os dados na partição seleccionada serão perdidos de forma irrecuperável se o fizer!
-Rescan	MainWindow		Reanalisar
-OK	MainWindow		OK
-Could not aquire partitioning information.	MainWindow		Não foi possível obter informações acerca da divisão em partições
-There's no space on the partition where a child partition could be created.	MainWindow		Não existe espaço suficiente na partição para criar uma partição dentro da mesma.
-<empty>	DiskView		<vazio>
-Unable to find the selected partition by ID.	MainWindow		Não foi possível encontrar a partição seleccionada pelo ID.
-Select a partition from the list below.	DiskView		Seleccione a partição a partir da lista em baixo.
-No disk devices have been recognized.	DiskView		Não foi encontrado nenhum disco rígido.
-The selected disk is read-only.	MainWindow		O disco seleccionado está marcado como só de leitura
-Partition name:	CreateParamsPanel		Nome da partição:
-Initialize	MainWindow		Inicializar
-Could not mount partition %s.	MainWindow		Não foi possível montar a partição %s.
-The partition %s is already unmounted.	MainWindow		A partição %s já foi desmontada.
-Failed to initialize the partition. No changes have been written to disk.	MainWindow		Não foi possível inicializar a partição. Nenhuma alteração foi escrita no disco.
-Failed to delete the partition. No changes have been written to disk.	MainWindow		Não foi possível apagar a partição. Nenhuma alteração foi escrita no disco.
-Partition type:	CreateParamsPanel		Tipo de partição:
-Could not delete the selected partition.	MainWindow		Não foi possível apagar a partição seleccionada.
-Error: 	MainWindow	in any error alert	Erro: 
-Partition %ld	DiskView		Partição %ld
-The partition %s has been successfully initialized.\n	MainWindow		A partição %s foi inicializada com sucesso.
-Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		A inicialização da partição %s falhou. (Nenhuma alteração foi escrita no disco.)
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Tem a certeza que quer aplicar todas as alterações agora?\n\nTodos os dados na partição seleccionada serão perdidos de forma irrecuperável se o fizer!
-Mounted at	PartitionList		Montado em
-Failed to initialize the partition %s!\n	MainWindow		Erro ao inicializar a partição %s!\n
-There was an error acquiring the partition row.	MainWindow		Ocorreu um erro ao obter a lista de partições a partir do disco.
-You need to select a partition entry from the list.	MainWindow		Você precisa de seleccionar uma partição da lista
-Format (not implemented)	MainWindow		Formatar (não implementado)
-The currently selected partition does not have a parent partition.	MainWindow		A partição seleccionada não tem uma partição principal.
-Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Tem a certeza que quer aplicar todas as alterações agora?\n\nTodos os dados na partição seleccionada serão perdidos de forma irrecuperável se o fizer!
-Offset: %ld MB	Support		Compensação: %ld MB
-Write changes	MainWindow		Aplicar alterações
-There was an error preparing the disk for modifications.	MainWindow		Ocorreu um erro ao preparar o disco para as alterações
-The partition %s is already mounted.	MainWindow		A partição %s já está montada.
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Tem a certeza que quer aplicar todas as alterações agora?\n\nTodos os dados na partição seleccionada serão perdidos de forma irrecuperável se o fizer!
-Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Tem a certeza que quer apagar a partição seleccionada\n\nTodos os dados na partição serão perdidos de forma irrecuperável se o fizer!
-Create…	MainWindow		Criar...
-Disk system \"%s\"\" not found!	MainWindow		Sistema de discos \"%s\"\ não encontrado!
-Could not unmount partition %s.	MainWindow		Não foi possível desmontar a partição %s.
-Mount	MainWindow		Montar
-Create	CreateParamsPanel		Criar
-Device	DiskView		Dispositivo
-Disk	MainWindow		Disco
-Volume name	PartitionList		Nome do volume
-Continue	MainWindow		Continuar
-Cannot delete the selected partition.	MainWindow		Não pode apagar a partição seleccionada.
-Mount all	MainWindow		Montar todos
-Cancel	CreateParamsPanel		Cancelar
-Delete partition	MainWindow		Apagar partição
-End: %ld MB	Support		Fim: %ld MB
-Eject	MainWindow		Eject
-Partition	MainWindow		Partição
-File system	PartitionList		Sistema de Ficheiros
-Validation of the given creation parameters failed.	MainWindow		A validação dos parâmetros de criação introduzidos falhou.
-Size	PartitionList		Tamanho
-Validation of the given initialization parameters failed.	MainWindow		A validação dos parâmetros de criação introduzidos falhou.
-The selected partition does not contain a partitioning system.	MainWindow		A partição seleccionada não contém um sistema de partições.
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Tem a certeza que quer aplicar todas as alterações agora?\n\nTodos os dados na partição seleccionada serão perdidos de forma irrecuperável se o fizer!
-The partition %s is currently mounted.	MainWindow		A partição %s já está montada.
-Partition size	CreateParamsPanel		Tamanho da partição
-Surface test (not implemented)	MainWindow		Teste de superfície (não implementado)
-Creation of the partition has failed.	MainWindow		A criação da partição seleccionada falhou.
-The currently selected partition is not empty.	MainWindow		A partição seleccionada não está vazia.
-Unmount	MainWindow		Desmontar
-<empty>	PartitionList		<vazio>
-Initialize	InitParamsPanel		Inicializar
-Device	PartitionList		Dispositivo
-Cancel	MainWindow		Cancelar
-Cancel	InitParamsPanel		Cancelar
+1	portuguese	x-vnd.Haiku-DriveSetup	110270304
 %ld MiB	Support		%ld MiB
+<empty>	DiskView		<vazio>
+<empty>	PartitionList		<vazio>
+Cancel	CreateParamsPanel		Cancelar
+Cancel	InitParamsPanel		Cancelar
+Cancel	MainWindow		Cancelar
+Continue	MainWindow		Continuar
+Could not mount partition %s.	MainWindow		Não foi possível montar a partição %s.
+Could not unmount partition %s.	MainWindow		Não foi possível desmontar a partição %s.
+Create	CreateParamsPanel		Criar
+Create…	MainWindow		Criar...
+Device	DiskView		Dispositivo
+Device	PartitionList		Dispositivo
+Disk	MainWindow		Disco
+Disk system \"%s\"\" not found!	MainWindow		Sistema de discos \"%s\"\ não encontrado!
+End: %ld MB	Support		Fim: %ld MB
+Error: 	MainWindow	in any error alert	Erro: 
+Failed to initialize the partition %s!\n	MainWindow		Erro ao inicializar a partição %s!\n
+Format (not implemented)	MainWindow		Formatar (não implementado)
+Initialize	InitParamsPanel		Inicializar
+Initialize	MainWindow		Inicializar
+Mount	MainWindow		Montar
+Mount all	MainWindow		Montar todos
+Mounted at	PartitionList		Montado em
+OK	MainWindow		OK
+Offset: %ld MB	Support		Compensação: %ld MB
+Partition	MainWindow		Partição
+Partition %ld	DiskView		Partição %ld
+Partition name:	CreateParamsPanel		Nome da partição:
+Partition size	CreateParamsPanel		Tamanho da partição
+Partition type:	CreateParamsPanel		Tipo de partição:
+Rescan	MainWindow		Reanalisar
+Surface test (not implemented)	MainWindow		Teste de superfície (não implementado)
+The partition %s is already mounted.	MainWindow		A partição %s já está montada.
+The partition %s is already unmounted.	MainWindow		A partição %s já foi desmontada.
+The partition %s is currently mounted.	MainWindow		A partição %s já está montada.
+The selected partition does not contain a partitioning system.	MainWindow		A partição seleccionada não contém um sistema de partições.
+There's no space on the partition where a child partition could be created.	MainWindow		Não existe espaço suficiente na partição para criar uma partição dentro da mesma.
+Unable to find the selected partition by ID.	MainWindow		Não foi possível encontrar a partição seleccionada pelo ID.
+Unmount	MainWindow		Desmontar
+Validation of the given creation parameters failed.	MainWindow		A validação dos parâmetros de criação introduzidos falhou.
+Validation of the given initialization parameters failed.	MainWindow		A validação dos parâmetros de criação introduzidos falhou.
+Volume name	PartitionList		Nome do volume
+Write changes	MainWindow		Aplicar alterações

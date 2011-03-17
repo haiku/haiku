@@ -1,36 +1,33 @@
-1	portuguese	x-vnd.Haiku-About	4100792155
-Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (e o seu kernel do NewOS )\n
-%ld Processors:	AboutView		%ld Processadores:
-Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (fundador do projecto)\n\n
-The Haiku-Ports team\n	AboutView		A equipa Haiku-Ports\n
-Website, marketing & documentation:\n	AboutView		Website, marketing & documentação:\n
-Revision	AboutView		Revisão
-Source Code: 	AboutView		Código-fonte: 
-Processor:	AboutView		Processador:
-Kernel:	AboutView		Kernel:
-Contributors:\n	AboutView		Colaboradores:\n
-Unknown	AboutView		Desconhecido
-\n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… e provavelmente mais alguém o qual nos esquecemos de mencionar (desculpe!)\n\n
+1	portuguese	x-vnd.Haiku-About	2847391904
 %.2f GHz	AboutView		%.2f GHz
-Memory:	AboutView		Memória:
-Past maintainers:\n	AboutView		Ex-desenvolvedores:\n
-\n\nSpecial thanks to:\n	AboutView		\n\nAgradecimentos especiais a:\n
-Licenses: 	AboutView		Licenças: 
-\nCopyrights\n\n	AboutView		\nCopyrights\n\n
-Current maintainers:\n	AboutView		Desenvolvedores actuais:\n
-Time running:	AboutView		Tempo de Uptime:
-The Haikuware team and their bounty program\n	AboutView		A equipa do Haikuware e o seu programa de recompensas\n
-About this system	AboutWindow		Sobre este sistema
-Version:	AboutView		Versão:
-%ld MHz	AboutView		%ld MHz
-[Click a license name to read the respective license.]\n\n	AboutView		[Clique no nome da licença para a ler.]\n\n
-License: 	AboutView		Licença: 
-Translations:\n	AboutView		Traduções:\n
-... and the many people making donations!\n\n	AboutView		... e as muitas pessoas que fizeram donativos!\n\n
-The BeGeistert team\n	AboutView		A equipa BeGeistert\n
-The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku and the Haiku logo are trademarks of Haiku, Inc.\n\n	AboutView		Os direitos de copyright do código do Haiku são propriedade de Haiku Inc. ou dos respectivos autores quando tal esteja explícito no código fonte. Haiku e o logo Haiku são marcas registadas de Haiku Inc.\n\n
-GCC %d Hybrid	AboutView		GCC %d Híbrido
 %d MiB total	AboutView		%d MiB no total
 %d MiB used (%d%%)	AboutView		%d MiB usados (%d%%)
-The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT licence%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		O código específico do Haiku, especialmente o kernel e todo o código  com o qual as aplicações se podem interligar, é distribuído sob os termos da licença %MIT. Algumas bibliotecas de sistema contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n
+%ld MHz	AboutView		%ld MHz
+%ld Processors:	AboutView		%ld Processadores:
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB total, %inacessíveis MiB inacessíveis
+... and the many people making donations!\n\n	AboutView		... e as muitas pessoas que fizeram donativos!\n\n
+About this system	AboutWindow		Sobre este sistema
+Contributors:\n	AboutView		Colaboradores:\n
+Current maintainers:\n	AboutView		Programadores actuais:\n
+GCC %d Hybrid	AboutView		GCC %d Híbrido
+Kernel:	AboutView		Kernel:
+License: 	AboutView		Licença: 
+Licenses: 	AboutView		Licenças: 
+Memory:	AboutView		Memória:
+Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (fundador do projecto)\n\n
+Past maintainers:\n	AboutView		Ex-programadores:\n
+Processor:	AboutView		Processador:
+Revision	AboutView		Revisão
+Source Code: 	AboutView		Código Fonte:
+The BeGeistert team\n	AboutView		A equipa BeGeistert\n
+The Haiku-Ports team\n	AboutView		A equipa Haiku-Ports\n
+The Haikuware team and their bounty program\n	AboutView		A equipa do Haikuware e o seu programa de recompensas\n
+Time running:	AboutView		Tempo de actividade:
+Translations:\n	AboutView		Traduções:\n
+Unknown	AboutView		Desconhecido
+Version:	AboutView		Versão:
+Website, marketing & documentation:\n	AboutView		Website, marketing & documentação:\n
+[Click a license name to read the respective license.]\n\n	AboutView		[Clique no nome da licença para a ler.]\n\n
+\nCopyrights\n\n	AboutView		\nCopyrights\n\n
+\n\nSpecial thanks to:\n	AboutView		\n\nAgradecimentos especiais a:\n
+\n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… e provavelmente mais alguém que nos esquecemos de mencionar (desculpe!)\n\n

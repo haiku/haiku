@@ -1,21 +1,18 @@
-1	portuguese	x-vnd.Be-PSRV	3878243268
-Undefined	ConfigWindow		Indefenido
-Cancel	PrintServerApp		Cancelar
-Page setup:	ConfigWindow		Configuração da página:
-OK	ConfigWindow		OK
-Cancel	ConfigWindow		Cancelar
-Yes	PrintServerApp		Sim
-Would you like to set one up now?	PrintServerApp		Deseja configurar uma agora?
-Portrait	ConfigWindow		Vertical
+1	portuguese	x-vnd.Be-PSRV	2777083866
 All pages	ConfigWindow		Todas as páginas
-There is no default printer set up.	PrintServerApp		Não existe nenhuma impressora predefenida.
+Cancel	ConfigWindow		Cancelar
+Cancel	PrintServerApp		Cancelar
+Landscape	ConfigWindow		Horizontal
+No	PrintServerApp		Não
+OK	ConfigWindow		OK
+OK	PrintServerApp		OK
+Page setup:	ConfigWindow		Configuração da página:
+Portrait	ConfigWindow		Vertical
+Print setup	ConfigWindow		Configuração de página
 Printer:	ConfigWindow		Impressora:
 Select a printer	ConfigWindow		Escolha uma impressora
-No	PrintServerApp		Não
-Landscape	ConfigWindow		Horizontal
 There are no printers set up.	PrintServerApp		Não existem impressoras configuradas.
-OK	PrintServerApp		OK
-Print setup	ConfigWindow		Configuração de página
-Would you like to make @ the default printer?	PrintServerApp		Deseja tornar @ na impressora predefenida?
-Page setup	ConfigWindow		Configuração de página
-Paper setup:	ConfigWindow		Configuração do papel:
+There is no default printer set up.	PrintServerApp		Não existe nenhuma impressora predefenida.
+Undefined	ConfigWindow		Indefenido
+Would you like to set one up now?	PrintServerApp		Deseja configurar uma agora?
+Yes	PrintServerApp		Sim

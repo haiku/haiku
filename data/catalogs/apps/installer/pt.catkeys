@@ -1,64 +1,32 @@
-1	portuguese	x-vnd.Haiku-Installer	2991523922
-Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Instalador\n\tescrito por Jérôme Duval e Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
-Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		A instalação terminou. O sector de arranque foi escrito em '%s'. Carregue em Terminar para sair do instalador ou escolha um novo volume de destino para executar outra instalação.
-Quit	InstallerWindow		Terminar
-Stop	InstallerWindow	In alert after pressing Stop	Parar
-Installation completed. Boot sector has been written to '%s'. Press Quit to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		A instalação terminou. O sector de arranque foi escrito em '%s'. Carregue em Terminar para sair do instalador ou escolha um novo volume de destino para executar outra instalação.
-Install progress:  	InstallerWindow		Progresso da instalação:
-Starting Installation.	InstallProgress		A iniciar a instalação.
-Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Tem a certeza que deseja instalar no disco de arranque actual? O instalador terá que reiniciar o seu computador se continuar.
-OK	InstallProgress		OK
-Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Escolha o disco de origem e de destino usando os menus. Depois clique em \"Iniciar\".
-Install from:	InstallerWindow		Instalar a partir de:
+1	portuguese	x-vnd.Haiku-Installer	1519304611
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld de %2ld
-Installer	InstallerWindow		Instalador
-Continue	InstallerApp		Continuar
-Write boot sector to '%s'	InstallerWindow		Escrever sector de arranque em '%s'
-Collecting copy information.	InstallProgress		A obter informações da cópia.
-Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Escolha o disco de origem usando o menu. Depois clique em \"Iniciar\".
-Boot sector successfully written.	InstallProgress		Sector de arranque escrito com sucesso.
-Performing installation.	InstallProgress		A executar a instalação
-scanning…	InstallerWindow		A analisar...
-Finishing Installation.	InstallProgress		A terminar a instalação
-README	InstallerApp		LEIAME
-The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		O disco de destino poderá não ter espaço suficiente. Tente escolher outro disco ou então não escolha tantos pacotes opcionais para instalar.
-Scanning for disks…	InstallerWindow		A procurar por discos...
-The disk can't be mounted. Please choose a different disk.	InstallProgress		O disco não pôde ser montado. Por favor escolha um disco diferente.
 ?? of ??	InstallerWindow	Unknown progress	?? de ??
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Inicie o utilitário DriveSetup para particionar\nos discos rígidos disponíveis.\nAs partições podem ser inicializadads com o Sistema de Ficheiros Be necessário para\n uma partição de arranque Haiku
-Show optional packages	InstallerWindow		Mostrar pacotes opcionais
-No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		Não foi encontrada nenhuma partição que seja própria para a instalação. Por favor prepare e inicialize pelo menos uma partição com o Sistema de Ficheiros Be.
-Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Escolha o disco em que deseja instalar a partir do menu. Depois clique em \"Iniciar\".
-Unknown Type	InstallProgress	Partition content type	Tipo desconhecido
-<none>	InstallerWindow	No partition available	<nenhum>
-Installation canceled.	InstallProgress		Instalação cancelada.
-You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Não pode instalar o conteúdo de um disco nele próprio. Por favor escolha um disco diferente.
 ???	InstallerWindow	Unknown partition name	???
-Hide optional packages	InstallerWindow		Ocultar pacotes opcionais
-Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Por favor feche a janela do DriveSetup antes de fechar a janela do Instalador.
-Set up partitions…	InstallerWindow		Preparar partições
-The partition can't be mounted. Please choose a different partition.	InstallProgress		A partição não pode ser montada. Por favor escolhe uma partição diferente.
-Install anyway	InstallProgress		Instalar na mesma
-An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Ocorreu um erro e a instalação não foi completada:\n\nErro:  %s
-Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Carregue no botão Iniciar para instalar a partir de '%1s' em '%2s'.
-Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		A correr o DriveSetup…\n\nFeche o DriveSetup para continuar com a instalação.
-Please choose target	InstallerWindow		Por favor escolha o disco de destino
-Begin	InstallerWindow		Iniciar
-Write boot sector	InstallerWindow		Escrever sector de arranque
-DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup, a aplicação para configurar as partições de disco, não pôde ser iniciada.
-No optional packages available.	PackagesView		Não existem pacotes opcionais disponíveis.
 Additional disk space required: %s	InstallerWindow		Espaço em disco adicional necessário: %s
-Cancel	InstallProgress		Cancelar
-Try installing anyway	InstallProgress		Tentar instalar na mesma
-Are you sure you want to to stop the installation?	InstallerWindow		Tem a certeza que deseja parar a instalação?
-Onto:	InstallerWindow		Em:
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		O volume de destino não está vazio. Tem a certeza que deseja instalar na mesma?\n\nNota: A pasta de sistema será uma cópia nova a partir do volume de origem e todo o conteúdo das outras pastas será junto. Os ficheiros que existam em ambos os volumes serão substituídos pelos do volume de origem.
-Are you sure you want to abort the installation and restart the system?	InstallerWindow		Tem a certeza que deseja abortar a instalação e reiniciar o sistema?
-Restart system	InstallerWindow		Reiniciar sistema
-Quit	InstallerApp		Terminar
-OK	InstallerApp		OK
-Continue	InstallerWindow	In alert after pressing Stop	Continuar
-OK	InstallerWindow		OK
-Cancel	InstallerWindow		Cancelar
 Additional disk space required: 0.0 KiB	InstallerWindow		Espaço em disco adicional necessário: 0.0 KiB
+Begin	InstallerWindow		Iniciar
+Cancel	InstallProgress		Cancelar
+Cancel	InstallerWindow		Cancelar
+Collecting copy information.	InstallProgress		A obter informações da cópia.
+Continue	InstallerApp		Continuar
+Continue	InstallerWindow	In alert after pressing Stop	Continuar
+Hide optional packages	InstallerWindow		Ocultar pacotes opcionais
+Install anyway	InstallProgress		Instalar na mesma
+Install from:	InstallerWindow		Instalar a partir de:
+Install progress:  	InstallerWindow		Progresso da instalação:
+Installation canceled.	InstallProgress		Instalação cancelada.
+No optional packages available.	PackagesView		Não existem pacotes opcionais disponíveis.
+OK	InstallProgress		OK
+OK	InstallerApp		OK
+OK	InstallerWindow		OK
+Onto:	InstallerWindow		Em:
+Quit	InstallerWindow		Terminar
+Restart system	InstallerWindow		Reiniciar sistema
+Show optional packages	InstallerWindow		Mostrar pacotes opcionais
+Starting Installation.	InstallProgress		A iniciar a instalação.
+Stop	InstallerWindow	In alert after pressing Stop	Parar
 The mount point could not be retrieved.	InstallProgress		Não foi possível obter o ponto de montagem.
+Try installing anyway	InstallProgress		Tentar instalar na mesma
+Unknown Type	InstallProgress	Partition content type	Tipo desconhecido
+Write boot sector to '%s'	InstallerWindow		Escrever sector de arranque em '%s'
+scanning…	InstallerWindow		A analisar...

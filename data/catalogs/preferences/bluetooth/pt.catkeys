@@ -1,53 +1,47 @@
-1	portuguese	x-vnd.Haiku-BluetoothPrefs	3931795142
-About Bluetooth…	Window		Sobre o Bluetooth...
-Handheld	Settings view		Computador de Bolso
-Default inquiry time:	Settings view		Tempo de consulta predefenido:
-Add device to list	Inquiry panel		Adicionar dispositivo à lista
-Starting scan...	Inquiry panel		A iniciar pesquisa...
-Show bluetooth console…	Window		Mostrar consola bluetooth...
-Smart phone	Settings view		Smart phone
-seconds	Inquiry panel		segundos
-Server	Window		Servidor
-Stop bluetooth services…	Window		Parar serviços bluetooth...
-Identify host as:	Settings view		Identificar anfitrião como:
-View	Window		Ver
-Refresh…	Remote devices		Actualizar...
-Pair…	Remote devices		Emparelhar...
-Incoming connections policy:	Settings view		Política de ligações de entrada:
-From all devices	Settings view		Todos os dispositivos
-Show name	Extended local device view		Mostrar nome
-Local devices found on system:	Settings view		Dispositivos locais encontrados no sistema:
-Scanning completed.	Inquiry panel		Pesquisa completa.
-Remote devices	Window		Dispositivos remotos
-Remove	Remote devices		Remover
+1	portuguese	x-vnd.Haiku-BluetoothPrefs	3727111885
 15 secs	Settings view		15 seg.
-Start bluetooth services…	Window		Iniciar serviços bluetooth...
-Policy...	Settings view		Política
 61 secs	Settings view		61 seg.
-There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Não existe nenhum Bluetooth LocalDevice registado no sistema.
-Identify us as...	Settings view		Identificar-nos como...
-Remaining 	Inquiry panel		Faltam
-As blocked	Remote devices		Como bloqueados
-Pick LocalDevice...	Settings view		Escolher LocalDevice...
-Defaults	Window		Predefenições
-Inquiry	Inquiry panel		Consulta
-Desktop	Settings view		Ambiente de Trabalho
-Revert	Window		Reverter
-Remote devices list…	Window		Lista de dispositivos remotos...
-Laptop	Settings view		Portátil
-Retrieving name of 	Inquiry panel		A obter nome de...
-Bluetooth	Window		Bluetooth
-Discoverable	Extended local device view		Detectável
-Service classes: 	Device View		Classes de serviços:
-Connections & channels…	Window		Lista de canais e ligações...
-Refresh LocalDevices…	Window		Actualizar os LocalDevices...
-Settings	Window		Defenições
-Only from trusted devices	Settings view		Apenas de dispositivos de confiança
-Scanning progress	Inquiry panel		Progresso da pesquisa
-Always ask	Settings view		Perguntar sempre
-Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Verifique que as capacidades Bluetooth do seu dispositivo remoto estão activas. Pressione o botão 'Consulta' para iniciar a pesquisa. O tempo necessário para a obtenção dos nomes é desconhecido embora não deva demorar mais que 3 segundos por cada dispositivo. Mais tarde poderá adicioná-los à sua lista principal, onde poderá emparelhá-los.
-Retrieving names...	Inquiry panel		A obter nomes...
-Help	Window		Ajuda
+About Bluetooth…	Window		Sobre o Bluetooth...
+Add device to list	Inquiry panel		Adicionar dispositivo à lista
 Add…	Remote devices		Adicionar...
-Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Sistema Bluetooth Haiku (ARCE)\n\nCriado por Oliver Ruiz Dorantes\n\nCom ajuda de:\n\t- Mika Lindqvist\n\t- Maksym Yevmenkin\n\nAgradecimentos aos que ajudaram...\n\nEnviando ou doando hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t &amp; Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomicamente:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nCom patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTestando:\n\t- Petter H. Juliussen\n\t- Adrien Destugues\n\nQuem me deu todo o conhecimento:\n\t- the yellowTAB team
+Always ask	Settings view		Perguntar sempre
+As blocked	Remote devices		Como bloqueados
+Connections & channels…	Window		Ligações e canais...
+Default inquiry time:	Settings view		Tempo de consulta predefenido:
+Defaults	Window		Predefinições
+Desktop	Settings view		Ambiente de Trabalho
+Discoverable	Extended local device view		Detectável
+From all devices	Settings view		Todos os dispositivos
+Handheld	Settings view		Computador de Bolso
+Help	Window		Ajuda
+Identify host as:	Settings view		Identificar anfitrião como:
+Identify us as...	Settings view		Identificar-nos como...
+Incoming connections policy:	Settings view		Política de ligações de entrada:
+Inquiry	Inquiry panel		Consulta
+Laptop	Settings view		Portátil
+Local devices found on system:	Settings view		Dispositivos locais encontrados no sistema:
+Only from trusted devices	Settings view		Apenas de dispositivos de confiança
+Pair…	Remote devices		Emparelhar...
+Pick LocalDevice...	Settings view		Escolher LocalDevice...
+Policy...	Settings view		Política
+Refresh LocalDevices…	Window		Actualizar os LocalDevices...
+Refresh…	Remote devices		Actualizar...
+Remote devices	Window		Dispositivos remotos
+Remote devices list…	Window		Lista de dispositivos remotos...
+Remove	Remote devices		Remover
+Retrieving names...	Inquiry panel		A obter nomes...
+Revert	Window		Reverter
+Scanning completed.	Inquiry panel		Pesquisa completa.
+Scanning progress	Inquiry panel		Progresso da pesquisa
 Server	Settings view		Servidor
+Server	Window		Servidor
+Service classes: 	Device View		Classes de serviços:
+Settings	Window		Definições
+Show bluetooth console…	Window		Mostrar consola bluetooth...
+Show name	Extended local device view		Mostrar nome
+Smart phone	Settings view		Smart phone
+Start bluetooth services…	Window		Iniciar serviços bluetooth...
+Starting scan...	Inquiry panel		A iniciar pesquisa...
+Stop bluetooth services…	Window		Parar serviços bluetooth...
+There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Não existe nenhum Bluetooth LocalDevice registado no sistema.
+View	Window		Ver

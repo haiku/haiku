@@ -1,50 +1,40 @@
-1	portuguese	x-vnd.Haiku-ShowImage	66169730
-Use as background…	Menus		Usar como papel de parede...
-5 seconds	Menus		5 segundos
-Slide delay	Menus		Tempo de transição
-Zoom in	Menus		Aumentar zoom
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		O documento '%s' foi modificado. Você deseja fechar o documento?
-8 seconds	Menus		8 segundos
-Previous page	Menus		Página anterior
-View	Menus		Ver
+1	portuguese	x-vnd.Haiku-ShowImage	1796713029
+About ShowImage…	Menus		Sobre o Visualizador de Imagens…
+Browse	Menus		Navegar
+Cancel	ClosePrompt		Cancelar
+Close	ClosePrompt		Fechar
+Close document	ClosePrompt		Fechar documento
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Não foi possível abrir a imagem! Ou um arquivo ou um tradutor de imagem necessário não existe.
+DPI:	PrintOptionsWindow		DPI:
+First page	Menus		Primeira página
+Fit image to page	PrintOptionsWindow		Ajustar imagem à página
+Flip left to right	Menus		Inverter horizontalmente
+Flip top to bottom	Menus		Inverter verticalmente
 Full screen	Menus		Ecrã inteiro
 Go to page	Menus		Ir para a página
-Zoom out	Menus		Diminuir zoom
-20 seconds	Menus		20 segundos
-3 seconds	Menus		3 segundos
-Rotate counterclockwise	Menus		Rodar para a esquerda
-10 seconds	Menus		10 segundos
-High-quality zooming	Menus		Zoom de alta qualidade
-Browse	Menus		Navegar
-6 seconds	Menus		6 segundos
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Não foi possível abrir a imagem! Ou um arquivo ou um tradutor de imagem necessário não existe.
-First page	Menus		Primeira página
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		O documento '%s' (página %d) foi modificado. Você deseja fechar o documento?
-About ShowImage…	Menus		Sobre o Visualizador de Imagens…
-Close	ClosePrompt		Fechar
-Undo	Menus		Anular
-Resize to (in 1/72 inches):	PrintOptionsWindow		Redimensionar para (em 1/72 polegadas):
-9 seconds	Menus		9 segundos
-Flip left to right	Menus		Inverter horizontalmente
-Show caption in full screen mode	Menus		Mostrar legenda no modo de ecrã inteiro
-DPI:	PrintOptionsWindow		DPI:
-Next file	Menus		Próximo ficheiro
-4 seconds	Menus		4 segundos
-Close document	ClosePrompt		Fechar documento
 Height: 	PrintOptionsWindow		Altura: 
-Cancel	ClosePrompt		Cancelar
-Print options	PrintOptionsWindow		Opções de impressão
-ShowImage	AboutWindow		Visualizador de Imagens
-7 seconds	Menus		7 segundos
-Last page	Menus		Última página
-Previous file	Menus		Ficheiro anterior
-Slide show	Menus		Apresentação de Diapositivos
-Fit image to page	PrintOptionsWindow		Ajustar imagem à página
-Flip top to bottom	Menus		Inverter verticalmente
-Zoom factor in %:	PrintOptionsWindow		Zoom em %:
-Width:	PrintOptionsWindow		Largura:
+High-quality zooming	Menus		Zoom de alta qualidade
 Image	Menus		Imagem
-Rotate clockwise	Menus		Rodar para a direita
 Job setup	PrintOptionsWindow		Configurar trabalho de impressão
-Original size	Menus		Tamanho original
+Last page	Menus		Última página
+Next file	Menus		Próximo ficheiro
 Next page	Menus		Próxima página
+Original size	Menus		Tamanho original
+Previous file	Menus		Ficheiro anterior
+Previous page	Menus		Página anterior
+Print options	PrintOptionsWindow		Opções de impressão
+Resize to (in 1/72 inches):	PrintOptionsWindow		Redimensionar para (em 1/72 polegadas):
+Rotate clockwise	Menus		Rodar para a direita
+Rotate counterclockwise	Menus		Rodar para a esquerda
+Show caption in full screen mode	Menus		Mostrar legenda no modo de ecrã inteiro
+Slide delay	Menus		Tempo de transição
+Slide show	Menus		Apresentação de Diapositivos
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		O documento '%s' (página %d) foi modificado. Você deseja fechar o documento?
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		O documento '%s' foi modificado. Você deseja fechar o documento?
+Undo	Menus		Anular
+Use as background…	Menus		Usar como papel de parede...
+View	Menus		Ver
+Width:	PrintOptionsWindow		Largura:
+Zoom factor in %:	PrintOptionsWindow		Zoom em %:
+Zoom in	Menus		Aumentar zoom
+Zoom out	Menus		Diminuir zoom

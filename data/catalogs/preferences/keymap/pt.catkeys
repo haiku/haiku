@@ -1,22 +1,21 @@
-1	portuguese	x-vnd.Haiku-Keymap	4175672673
-Tilde trigger	Keymap window		Til
-Grave trigger	Keymap window		Acento grave
-Select dead keys	Keymap window		Teclas Mortas
-Quit	Keymap window		Sair
+1	portuguese	x-vnd.Haiku-Keymap	3858687220
+(Current)	Keymap window		(Actual)
+Acute trigger	Keymap window		Acento agudo
 Circumflex trigger	Keymap window		Acento circunflexo
 Diaeresis trigger	Keymap window		Trema
-Open…	Keymap window		Abrir...
-System:	Keymap window		Sistema:
-Switch shortcut keys	Keymap window		Teclas de atalho
-User:	Keymap window		Utilizador:
-Switch shortcut keys to Haiku mode	Keymap window		Teclas de atalho em modo Haiku
-Keymap	Keymap window		Mapa de teclado
-Sample and clipboard:	Keymap window		Exemplo e Área de Transferência:
-Layout	Keymap window		Esquema
-Switch shortcut keys to Windows/Linux mode	Keymap window		Teclas de atalho em modo Windows/Linux
-Revert	Keymap window		Reverter
-Save as…	Keymap window		Guardar como...
 File	Keymap window		Ficheiro
-(Current)	Keymap window		(Actual)
 Font	Keymap window		Tipo de letra
-Acute trigger	Keymap window		Acento agudo
+Grave trigger	Keymap window		Acento grave
+Layout	Keymap window		Esquema
+Open…	Keymap window		Abrir...
+Quit	Keymap window		Sair
+Revert	Keymap window		Reverter
+Sample and clipboard:	Keymap window		Exemplo e Área de Transferência:
+Save as…	Keymap window		Guardar como...
+Select dead keys	Keymap window		Teclas Mortas
+Switch shortcut keys	Keymap window		Teclas de atalho
+Switch shortcut keys to Haiku mode	Keymap window		Teclas de atalho em modo Haiku
+Switch shortcut keys to Windows/Linux mode	Keymap window		Teclas de atalho em modo Windows/Linux
+System:	Keymap window		Sistema:
+Tilde trigger	Keymap window		Til
+User:	Keymap window		Utilizador:

@@ -1,19 +1,18 @@
-1	portuguese	x-vnd.Haiku-MidiPlayer	1406887279
-None	Main Window		Nenhum
-Live input:	Main Window		Entrada em tempo-real:
-Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Leitor de MIDI Haiku 1.0.0 beta\n\nEste programa\nirá pô-lo a ouvir\nsons manhosos.
-Stop	Main Window		Parar
+1	portuguese	x-vnd.Haiku-MidiPlayer	3885957623
 Cavern	Main Window		Caverna
-Volume:	Main Window		Volume:
-Reverb:	Main Window		Reverb:
+Closet	Main Window		Armário
+Could not load song	Main Window		Impossível carregar a música
+Drop MIDI file here	Scope View		Arraste para aqui o ficheiro MIDI
+Dungeon	Main Window		Mosteiro
+Garage	Main Window		Garagem
+Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Leitor de MIDI Haiku 1.0.0 beta\n\nEste programa\nirá pô-lo a ouvir\nsons manhosos.
+Igor's lab	Main Window		Laboratório do Igor
+Live input:	Main Window		Entrada em tempo-real:
+None	Main Window		Nenhum
 OK	Main Window		OK
 Off	Main Window		Desligado
-Dungeon	Main Window		Mosteiro
 Play	Main Window		Reproduzir
-Garage	Main Window		Garagem
-Closet	Main Window		Armário
-Igor's lab	Main Window		Laboratório do Igor
+Reverb:	Main Window		Reverb:
 Scope	Main Window		Âmbito
-Could not load song	Main Window		Impossível carregar a música
-MidiPlayer	Main Window		Leitor MIDI
-Drop MIDI file here	Scope View		Arraste para aqui o ficheiro MIDI
+Stop	Main Window		Parar
+Volume:	Main Window		Volume:
