@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-PackageInstaller	3743501330
+1	swedish	x-vnd.Haiku-PackageInstaller	1777126027
 %.1f GiB	PackageView		%.1f GiB
 %.1f KiB	PackageView		%.1f KiB
 (%s free)	PackageView		(%s ledigt)
@@ -6,7 +6,6 @@ Abort	PackageInfo		Avbryt
 Abort	PackageInstall		Avbryt
 Abort	PackageView		Avbryt
 Accept	PackageTextViewer		Acceptera
-All existing files will be skipped?	PackageView		Hoppa över alla existerande filer?
 Ask again	PackageView		Fråga igen
 Continue	PackageInfo		Fortsätt
 Continue	PackageInstall		Fortsätt
