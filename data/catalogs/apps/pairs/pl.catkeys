@@ -1,14 +1,12 @@
-1	polish	x-vnd.Haiku-Pairs	3736877909
-Quit game	PairsWindow		Wyjdź z gry
-New game	PairsWindow		Nowa gra
-Expert (8x8)	PairsWindow		Ekspert (8x8)
+1	polish	x-vnd.Haiku-Pairs	1126884905
 Beginner (4x4)	PairsWindow		Początkujący (4x4)
+Expert (8x8)	PairsWindow		Ekspert (8x8)
 Game	PairsWindow		Gra
-Size	PairsWindow		Rozmiar
-New	PairsWindow		Nowy
 Intermediate (6x6)	PairsWindow		Średni (6x6)
-Quit	PairsWindow		Zamknij
+New	PairsWindow		Nowy
+New game	PairsWindow		Nowa gra
 OK	PairsView		OK
-Pairs	PairsWindow		Pairs
-Pairs\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYou completed the game in %s clicks.\n	PairsWindow		Pairs\n\twórca Ralf Schülke\n\tPrawa autorskie 2008-2010, Haiku Inc.\n\nZakończyłeś grę z wynikiem %s kliknięć.\n
 Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		Pairs nie znalazły wystarczająco dużo ikon wektorowych w systemie; potrzeba co najmniej %d.
+Quit	PairsWindow		Zamknij
+Quit game	PairsWindow		Wyjdź z gry
+Size	PairsWindow		Rozmiar

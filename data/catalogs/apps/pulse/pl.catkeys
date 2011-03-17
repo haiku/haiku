@@ -1,45 +1,38 @@
-1	polish	x-vnd.Haiku-Pulse	2756001860
-OK	PrefsWindow		OK
-Quit	DeskbarPulseView		Wyjdź
-Pulse	PulseWindow		Pulse
-Mini mode	DeskbarPulseView		Tryb mini
-Remove replicant	CPUButton		Usuń replikant
-Active color	ConfigView		Aktywny kolor
-Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Użycie: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
-Fade colors	ConfigView		Cieniowane colory
-OK	DeskbarPulseView		OK
-Deskbar mode	PrefsWindow		Tryb Deskbar
-Normal mode	PrefsWindow		Tryb normalny
-Defaults	PrefsWindow		Domyślne
-Normal mode	MiniPulseView		Tryb normalny
-Deskbar	CPUButton		Deskbar
-Frame color	ConfigView		Kolor ramki
-Mini mode	PrefsWindow		Tryb mini
-OK	PulseApp		OK
-Bar colors	ConfigView		Kolor poprzeczki
-Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	CPUButton		Pulse\n\nautorstwa Davida Ramsey-a oraz Arve Hjønnevåg\nEdycja - Daniel Switkin
-Settings…	PulseView		Ustawienia...
-You can't disable the last active CPU.	PulseView		Nie możesz wyłączyć ostatniego aktywnego procesora.
-Info	CPUButton		Informacje
-OK	PulseView		OK
-Remove(): %s	DeskbarPulseView		Remove(): %s
-Deskbar menu	CPUButton		Deskbar menu
-About Pulse…	PulseView		O Pulse...
-Deskbar mode	MiniPulseView		Tryb Deskbar
-Quit	MiniPulseView		Wyjdź
-Pulse	NormalPulseView		Pulse
-Deskbar mode	NormalPulseView		Tryb Deskbar
-Width of icon:	ConfigView		Szerokość ikony:
-Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	PulseWindow		Pulse\n\nautorstwa Davida Ramsey-a oraz Arve Hjønnevåg\nEdycja - Daniel Switkin
-You can't disable the last active CPU.	CPUButton		Nie możesz wyłączyć ostatniego aktywnego procesora.
-Normal mode	DeskbarPulseView		Tryb normalny
-OK	CPUButton		OK
+1	polish	x-vnd.Haiku-Pulse	628764229
 About Pulse…	CPUButton		O Pulsie...
-Mini mode	NormalPulseView		Tryb mini
-Info	DeskbarPulseView		Informacja
-Pulse settings	PulseWindow		Ustawienia Pulse
-Idle color	ConfigView		Kolor bezczynny
-Info	PulseWindow		Informacja
-Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	DeskbarPulseView		Pulse\n\nautorstwa Davida Ramsey-a oraz Arve Hjønnevåg\nEdycja - Daniel Switkin
-OK	PulseWindow		OK
+About Pulse…	PulseView		O Pulse...
+Active color	ConfigView		Aktywny kolor
+Bar colors	ConfigView		Kolor poprzeczki
 CPU progress bar	NormalPulseView		Pasek postępu CPU
+Defaults	PrefsWindow		Domyślne
+Deskbar	CPUButton		Deskbar
+Deskbar menu	CPUButton		Deskbar menu
+Deskbar mode	MiniPulseView		Tryb Deskbar
+Deskbar mode	NormalPulseView		Tryb Deskbar
+Deskbar mode	PrefsWindow		Tryb Deskbar
+Fade colors	ConfigView		Cieniowane colory
+Frame color	ConfigView		Kolor ramki
+Idle color	ConfigView		Kolor bezczynny
+Info	CPUButton		Informacje
+Info	DeskbarPulseView		Informacja
+Mini mode	DeskbarPulseView		Tryb mini
+Mini mode	NormalPulseView		Tryb mini
+Mini mode	PrefsWindow		Tryb mini
+Normal mode	DeskbarPulseView		Tryb normalny
+Normal mode	MiniPulseView		Tryb normalny
+Normal mode	PrefsWindow		Tryb normalny
+OK	CPUButton		OK
+OK	DeskbarPulseView		OK
+OK	PrefsWindow		OK
+OK	PulseApp		OK
+OK	PulseView		OK
+Pulse	NormalPulseView		Pulse
+Pulse settings	PulseWindow		Ustawienia Pulse
+Quit	DeskbarPulseView		Wyjdź
+Quit	MiniPulseView		Wyjdź
+Remove replicant	CPUButton		Usuń replikant
+Settings…	PulseView		Ustawienia...
+Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Użycie: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
+Width of icon:	ConfigView		Szerokość ikony:
+You can't disable the last active CPU.	CPUButton		Nie możesz wyłączyć ostatniego aktywnego procesora.
+You can't disable the last active CPU.	PulseView		Nie możesz wyłączyć ostatniego aktywnego procesora.

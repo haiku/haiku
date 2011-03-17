@@ -1,38 +1,37 @@
-1	polish	x-vnd.Haiku-SoundRecorder	1355572422
-Loop	RecorderWindow		Pętla
+1	polish	x-vnd.Haiku-SoundRecorder	1948114706
+Cannot connect to media server	RecorderWindow		Nie można zalogować się do serwera multimedialnego
+Cannot connect to the selected sound input	RecorderWindow		Nie można podłączyć się do wskazanego źródła audio
+Cannot find an unused name to use for the new recording	RecorderWindow		Nie można odnaleść wolnej nazwy dla tego nagrania
 Cannot find default audio hardware	RecorderWindow		Nie można odnaleść domyślnego urządzenia audio
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Nie można zlokalizować pliku tymczasowego przechowującego nowe nagrania
-Sample size: 	RecorderWindow		Rozmiar próbki:
-Nothing to play	RecorderWindow		Nic do otworzenia
-Duration:	RecorderWindow		Czas trwania:
-Some of the files don't appear to be audio files	RecorderWindow		Część plików nie jest rozpoznawana jako pliki audio
-File info	RecorderWindow		Informacje o pliku
-Drop files here	SoundListView		Upuść pliki tutaj
-Input	RecorderWindow		Wejście
-Stop	RecorderWindow		Zatrzymaj
-SoundRecorder	RecorderWindow		SoundRecorder
-Format: 	RecorderWindow		Format:
-Sound List	RecorderWindow		Lista dzwięków
+Cannot get the file to play	RecorderWindow		Nie można załadować pliku do odtworzenia
+Cannot open the temporary file created to hold the new recording	RecorderWindow		Nie można odnaleść pliku tymczasowego przechowującego nowe nagrania
+Cannot recognize this file as a media file	RecorderWindow		Ten plik nie jest rozpoznawany jako plik multimedialny
+Cannot record a sound that long	RecorderWindow		Nie można nagrać dźwięku tej długości
+Channels: 	RecorderWindow		Kanały:
 Compression:	RecorderWindow		Kompresja:
+Drop files here	SoundListView		Upuść pliki tutaj
+Duration:	RecorderWindow		Czas trwania:
+File info	RecorderWindow		Informacje o pliku
+File name:	RecorderWindow		Nazwa pliku:
+Format: 	RecorderWindow		Format:
+Forward	RecorderWindow		Do przodu
+Input	RecorderWindow		Wejście
+Input:	RecorderWindow		Wejście:
+Invalid audio files	RecorderWindow		Nieprawidłowe pliki audio
+Loop	RecorderWindow		Pętla
+None	RecorderWindow		Puste
+None of the files appear to be audio files	RecorderWindow		Żaden z tych plików nie jest rozpoznawany jako plik audio
+Nothing to play	RecorderWindow		Nic do otworzenia
+OK	RecorderWindow		OK
+Play	RecorderWindow		Odtwórz
+Record	RecorderWindow		Nagranie
 Rewind	RecorderWindow		Przewiń
 Sample rate: 	RecorderWindow		Tempo próbki:
-Invalid audio files	RecorderWindow		Nieprawidłowe pliki audio
-seconds	RecorderWindow		sekund
-OK	RecorderWindow		OK
-Cannot open the temporary file created to hold the new recording	RecorderWindow		Nie można odnaleść pliku tymczasowego przechowującego nowe nagrania
-None of the files appear to be audio files	RecorderWindow		Żaden z tych plików nie jest rozpoznawany jako plik audio
-Input:	RecorderWindow		Wejście:
-Forward	RecorderWindow		Do przodu
-Play	RecorderWindow		Odtwórz
-Channels: 	RecorderWindow		Kanały:
-bits	RecorderWindow		bity
-None	RecorderWindow		Puste
-Record	RecorderWindow		Nagranie
-Cannot recognize this file as a media file	RecorderWindow		Ten plik nie jest rozpoznawany jako plik multimedialny
-File name:	RecorderWindow		Nazwa pliku:
-Cannot connect to the selected sound input	RecorderWindow		Nie można podłączyć się do wskazanego źródła audio
-Cannot get the file to play	RecorderWindow		Nie można załadować pliku do odtworzenia
-Cannot record a sound that long	RecorderWindow		Nie można nagrać dźwięku tej długości
-Cannot find an unused name to use for the new recording	RecorderWindow		Nie można odnaleść wolnej nazwy dla tego nagrania
+Sample size: 	RecorderWindow		Rozmiar próbki:
 Save	RecorderWindow		Zapisz
-Cannot connect to media server	RecorderWindow		Nie można zalogować się do serwera multimedialnego
+Some of the files don't appear to be audio files	RecorderWindow		Część plików nie jest rozpoznawana jako pliki audio
+Sound List	RecorderWindow		Lista dzwięków
+Stop	RecorderWindow		Zatrzymaj
+bits	RecorderWindow		bity
+seconds	RecorderWindow		sekund

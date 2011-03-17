@@ -1,28 +1,27 @@
-1	polish	x-vnd.Haiku-ScreenSaver	1468011094
-Run module	ScreenSaver		Uruchom moduł
-Could not load screen saver	ScreenSaver		Nie można załadować wygaszacza ekranu
+1	polish	x-vnd.Haiku-ScreenSaver	1446908601
 30 seconds	ScreenSaver		30 sekund
-Password…	ScreenSaver		Hasło...
-Password:	ScreenSaver		Hasło:
-Password lock	ScreenSaver		Blokada hasła
 Add…	ScreenSaver		Dodaj...
-mouse is here	ScreenSaver		mysz jest tutaj
-Modules	ScreenSaver		Moduły
-Test	ScreenSaver		Test
-ScreenSaver	ScreenSaver		ScreenSaver
-Module settings	ScreenSaver		Ustawienia modułu
-Cancel	ScreenSaver		Anuluj
-Turn off screen	ScreenSaver		Wyłącz ekran
-No options available	ScreenSaver		Brak dostępnych opcji
-Password Window	ScreenSaver		Okno z hasłem
-Enable screen saver	ScreenSaver		Aktywuj wygaszacz ekranu
-Fade now when	ScreenSaver		Zanikaj gdy
-Fade	ScreenSaver		Zanikaj
-Passwords don't match. Please try again.	ScreenSaver		Hasła nie zgadzają się. Proszę spróbować ponownie.
-OK	ScreenSaver		OK
-Don't fade when	ScreenSaver		Nie zanikaj gdy
 Blackness	ScreenSaver		Czarność
-Use custom password	ScreenSaver		Użyj niestandardowego hasła
-Done	ScreenSaver		Zakończono
+Cancel	ScreenSaver		Anuluj
 Confirm password:	ScreenSaver		Potwierdź hasło:
+Could not load screen saver	ScreenSaver		Nie można załadować wygaszacza ekranu
+Don't fade when	ScreenSaver		Nie zanikaj gdy
+Done	ScreenSaver		Zakończono
+Enable screen saver	ScreenSaver		Aktywuj wygaszacz ekranu
+Fade	ScreenSaver		Zanikaj
+Fade now when	ScreenSaver		Zanikaj gdy
+Module settings	ScreenSaver		Ustawienia modułu
+Modules	ScreenSaver		Moduły
+No options available	ScreenSaver		Brak dostępnych opcji
+OK	ScreenSaver		OK
+Password Window	ScreenSaver		Okno z hasłem
+Password lock	ScreenSaver		Blokada hasła
+Password:	ScreenSaver		Hasło:
+Passwords don't match. Please try again.	ScreenSaver		Hasła nie zgadzają się. Proszę spróbować ponownie.
+Password…	ScreenSaver		Hasło...
+Run module	ScreenSaver		Uruchom moduł
+Test	ScreenSaver		Test
+Turn off screen	ScreenSaver		Wyłącz ekran
+Use custom password	ScreenSaver		Użyj niestandardowego hasła
 Use network password	ScreenSaver		Użyj hasła sieciowego
+mouse is here	ScreenSaver		mysz jest tutaj

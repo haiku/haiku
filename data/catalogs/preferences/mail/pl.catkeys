@@ -1,67 +1,34 @@
-1	polish	x-vnd.Haiku-Mail	2852433271
-Select account type	Config Views		Wybierz typ konta
-Mail checking	Config Window		Sprawdzanie wiadomości
-Settings	Config Window		Ustawienia
-Only when dial-up is connected	Config Window		Tylko podczas połączenia dial-up
-While sending and receiving	Config Window		Podczas wysyłania i odbierania
-days	Config Window		dni
-Start mail services on startup	Config Window		Włącz usługi wiadomości podczas uruchamiania
-Receive mail only	Config Views		Odbieraj tylko maile
+1	polish	x-vnd.Haiku-Mail	3462213940
 Account name:	Config Views		Nazwa konta:
-OK	Config Views		OK
-The filter could not be moved. Deleting filter.	Config Views		Filtr nie mógł zostać przesunięty. Usuwanie filtru.
-Revert	Config Window		Przywróć
-Accounts	Config Window		Konta
-Account type:	Config Views		Typ konta:
-Remove	Config Window		Usuń
-Miscellaneous	Config Window		Inne
-Show connection status window:	Config Window		Pokaż okno stanu połączenia:
-While sending	Config Window		Podczas wysyłania
-Schedule outgoing mail when dial-up is disconnected	Config Window		Zaplanuj wysyłanie poczty wychodzącej, gdy połączenie dialup jest nieaktywne
-hours	Config Window		godzin
-Add	Config Window		Dodaj
-Send mail only	Config Views		Wysyłaj tylko maile
-E-mail	Account		E-mail
-Unnamed	Account		Anonimowy
-\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nGlobalne ustawienia nie mogły zostać przywrócone.\n\nBłąd podczas przywracania globlnych ustawień:\n%s\n
-Send and receive mail	Config Views		Wyślij i odbierz wiad.
-Real name:	Config Views		Prawdziwe imię:
-· Outgoing	Account		· Wychodzące
-Return address:	Config Views		Adres zwrotny:
-· E-mail filters	Account		· Fltry e-mail
-· Incoming	Account		· Przychodzące
-Edit mailbox menu…	Config Window		Edytuj menu skrzynki pocztowej
-Remove	Config Views		Usuń
-Could not create inbound chain.	Account		Nie można utworzyć łańcucha wiad. przychodzących.
-Check every	Config Window		Sprawdzaj co
-never	Config Window		nigdy
-Incoming mail filters	Config Views		Filtry poczty przychodzącej
 Account settings	Config Views		Ustawienia konta
-minutes	Config Window		minut
-Error retrieving general settings: %s\n	Config Window		Błąd podczas odbierania globalnych ustawień: %s\n
-OK	Account		OK
-Apply	Config Window		Zastosuj
-Could not create outbound chain.	Account		Nie można utworzyć łańcucha wiad. wychodzących.
-Always	Config Window		Zawsze
-Add filter	Config Views		Dodaj filtr
-Outgoing mail filters	Config Views		Fltry poczty wychodzącej
-\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nUtwórz nowe konto naciskając przycisk Dodaj.\n\nUsuń konto za pomocą przycisku Usuń po zaznaczeniu elementu.
-Server Name:	E-Mail		Nazwa serwera:
-OK	Config Window		OK
-E-mail address:	E-Mail		Adres e-mail:
-Account name:	E-Mail		Nazwa konta:
-Account Type:	E-Mail		Typ konta:
-Beta	Config Window		Beta
-Login name:	E-Mail		Login:
-Password:	E-Mail		Hasło:
-E-mail	Config Views		E-mail
-Send mail only	E-Mail		Tylko wysyłanie
+Accounts	Config Window		Konta
+Add	Config Window		Dodaj
 Alpha	Config Window		Alpha
-Send and receive mail	E-Mail		Wysyłanie i odbieranie
-Receive mail only	E-Mail		Tylko odbieranie
-Choose Protocol	Config Views		Wybierz protokół
-Choose Protocol	E-Mail		Wybierz protokół
-Real name:	E-Mail		Prawdziwe imię:
-E-mail	Config Window		E-mail
-Mail Daemon Replacement\n\nby Haiku, Inc. All rights reserved.\n\nVersion %ld.%ld.%ld %s\n\nSee LICENSE file included in the installation package for more information.\n\n\n\nYou can contact us at:\n%s\n\nPlease submit bug reports using the %s\n\nProject homepage at:\n%s	Config Window		Zamiennik Daemona Poczty\n\nprzez Haiku, Inc. Wszelkie prawa zastrzeżone.\n\nWersja %ld.%ld.%ld %s\n\nŻeby uzyskać więcej informacji, zobacz plik LICENSE zawarty w paczce instalacyjnej.\n\n\n\nMożesz się z nami skontaktować pod:\n%s\n\nRaporty błędów prosimy wysyłać używając %s\n\nStrona domowa projektu:\n%s
+Always	Config Window		Zawsze
+Apply	Config Window		Zastosuj
+Beta	Config Window		Beta
+Check every	Config Window		Sprawdzaj co
+Edit mailbox menu…	Config Window		Edytuj menu skrzynki pocztowej
 Error	Config Window		Błąd
+Error retrieving general settings: %s\n	Config Window		Błąd podczas odbierania globalnych ustawień: %s\n
+Mail Daemon Replacement\n\nby Haiku, Inc. All rights reserved.\n\nVersion %ld.%ld.%ld %s\n\nSee LICENSE file included in the installation package for more information.\n\n\n\nYou can contact us at:\n%s\n\nPlease submit bug reports using the %s\n\nProject homepage at:\n%s	Config Window		Zamiennik Daemona Poczty\n\nprzez Haiku, Inc. Wszelkie prawa zastrzeżone.\n\nWersja %ld.%ld.%ld %s\n\nŻeby uzyskać więcej informacji, zobacz plik LICENSE zawarty w paczce instalacyjnej.\n\n\n\nMożesz się z nami skontaktować pod:\n%s\n\nRaporty błędów prosimy wysyłać używając %s\n\nStrona domowa projektu:\n%s
+Mail checking	Config Window		Sprawdzanie wiadomości
+Miscellaneous	Config Window		Inne
+OK	Config Window		OK
+Only when dial-up is connected	Config Window		Tylko podczas połączenia dial-up
+Real name:	Config Views		Prawdziwe imię:
+Remove	Config Window		Usuń
+Return address:	Config Views		Adres zwrotny:
+Revert	Config Window		Przywróć
+Schedule outgoing mail when dial-up is disconnected	Config Window		Zaplanuj wysyłanie poczty wychodzącej, gdy połączenie dialup jest nieaktywne
+Settings	Config Window		Ustawienia
+Show connection status window:	Config Window		Pokaż okno stanu połączenia:
+Start mail services on startup	Config Window		Włącz usługi wiadomości podczas uruchamiania
+While sending	Config Window		Podczas wysyłania
+While sending and receiving	Config Window		Podczas wysyłania i odbierania
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nGlobalne ustawienia nie mogły zostać przywrócone.\n\nBłąd podczas przywracania globlnych ustawień:\n%s\n
+\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nUtwórz nowe konto naciskając przycisk Dodaj.\n\nUsuń konto za pomocą przycisku Usuń po zaznaczeniu elementu.
+days	Config Window		dni
+hours	Config Window		godzin
+minutes	Config Window		minut
+never	Config Window		nigdy

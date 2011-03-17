@@ -1,12 +1,11 @@
-1	polish	x-vnd.Haiku-Time	2261600441
-OK	Time		OK
-\nNow: 	Time		\nTeraz:
-Preview time:	Time		Czas podglądu:
-about	Time		o
-Set time zone	Time		Ustaw strefę czasową
-Time	Time		Czas
-Date & Time	Time		Data & Czas
-Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Time & Date, autorstwa:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
+1	polish	x-vnd.Haiku-Time	1185381160
 <Other>	Time		<Inne>
 Current time:	Time		Aktualny czas:
+Date & Time	Time		Data & Czas
+OK	Time		OK
+Preview time:	Time		Czas podglądu:
+Set time zone	Time		Ustaw strefę czasową
+Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Time & Date, autorstwa:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
 Time zone	Time		Strefa czasowa
+\nNow: 	Time		\nTeraz:
+about	Time		o

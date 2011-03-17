@@ -1,34 +1,27 @@
-1	polish	x-vnd.Haiku-Media	543136890
-Show volume control on Deskbar	Media views		Pokaż kontrolkę głośności na Deskbarze
-Audio input:	Media views		Wejście dźwięku:
-Restarting media services\nStarting media server…\n	Media Window		Ponowne uruchamianie usług multimedialnych\Uruchamianie serwera multimediów…\n
-Video input:	Media views		Wejście wideo:
-Waiting for media_server to quit.	Media Window		Oczekiwanie na zakończenie działania media_server.
-Defaults	Media views		Domyślne
-Stopping media server…	Media Window		Zatrzymywanie serwera multimediów…
-Video output:	Media views		Wyjście wideo:
-Enable real-time audio	Media views		Włącz dźwięk czasu rzeczywistego
-Quit	Media Window		Zakończ
-OK	Media Window		OK
-Enabling real-time video allows system to perform video operations as fast and smoothly as possible.  It achieves optimum performance by using more RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Włączenie wideo czasu rzeczywistego pozwala systemowi na wykonywanie operacji wideo tak szybko i płynnie jak to jest tylko możliwe. Osiągnięcie tego jest możliwe poprzez zwiększenie zużycia pamięci RAM.\n\nNależy włączyć tę funkcję tylko w przypadku, jeśli potrzeba najniższych możliwych opóźnień.
-Starting media server…	Media Window		Uruchamianie serwera multimediów…
-Restart the media server to apply changes.	Media views		Uruchom ponownie serwer multimediów by zastosować zmiany.
-Done shutting down.	Media Window		Skończono zamykanie.
-Cleaning up.	Media Window		Czyszczenie.
-Telling media_addon_server to quit.	Media Window		Powiadamianie media_addon_server, by się zakończył.
-Enable real-time video	Media views		Włącz wideo czasu rzeczywistego
-This hardware has no controls.	Media Window		Ten sprzęt nie ma żadnych ustawień.
-Restarting media services\nShutting down media server\n	Media Window		Ponowne uruchamianie usług multimedialnych\nZamykanie serwera multimediów\n
-Audio output:	Media views		Wyjście dźwięku:
-Start media server	Media Window		Uruchom serwer multimediów
-Audio settings	Media Window		Ustawienia dźwięku
-Could not connect to the media server.\nWould you like to start it ?	Media Window		Nie można połączyć się z serwerem multimediów.\nUruchomić go ponownie?
-Ready for use…	Media Window		Gotowe do użycia…
-Real-time	Media views		Ustawienia czasu rzeczywistego
-Restart media services	Media views		Ponowne uruchomienie usług multimedialnych
-Enabling real-time audio allows system to record and play audio as fast as possible.  It achieves this performance by using more CPU and RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Włączenie dźwięku czasu rzeczywistego pozwala systemowi na nagrywanie i odtwarzanie dźwięku tak szybko i płynnie jak to jest tylko możliwe. Osiągnięcie tego jest możliwe poprzez zwiększenie zużycia czasu procesora i pamięci RAM.\n\nNależy włączyć tą funkcję tylko w przypadku, jeśli potrzeba najniższych możliwych opóźnień.
-Media	Media Window		Multimedia
-Channel:	Media views		Kanał:
-Video settings	Media Window		Ustawienia wideo
-Audio mixer	Media Window		Mikser audio
+1	polish	x-vnd.Haiku-Media	128032530
 <none>	Media views		<brak>
+Audio input:	Media views		Wejście dźwięku:
+Audio mixer	Media Window		Mikser audio
+Audio output:	Media views		Wyjście dźwięku:
+Audio settings	Media Window		Ustawienia dźwięku
+Channel:	Media views		Kanał:
+Cleaning up.	Media Window		Czyszczenie.
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Nie można połączyć się z serwerem multimediów.\nUruchomić go ponownie?
+Defaults	Media views		Domyślne
+Done shutting down.	Media Window		Skończono zamykanie.
+OK	Media Window		OK
+Quit	Media Window		Zakończ
+Ready for use…	Media Window		Gotowe do użycia…
+Restart media services	Media views		Ponowne uruchomienie usług multimedialnych
+Restarting media services\nShutting down media server\n	Media Window		Ponowne uruchamianie usług multimedialnych\nZamykanie serwera multimediów\n
+Restarting media services\nStarting media server…\n	Media Window		Ponowne uruchamianie usług multimedialnych\Uruchamianie serwera multimediów…\n
+Show volume control on Deskbar	Media views		Pokaż kontrolkę głośności na Deskbarze
+Start media server	Media Window		Uruchom serwer multimediów
+Starting media server…	Media Window		Uruchamianie serwera multimediów…
+Stopping media server…	Media Window		Zatrzymywanie serwera multimediów…
+Telling media_addon_server to quit.	Media Window		Powiadamianie media_addon_server, by się zakończył.
+This hardware has no controls.	Media Window		Ten sprzęt nie ma żadnych ustawień.
+Video input:	Media views		Wejście wideo:
+Video output:	Media views		Wyjście wideo:
+Video settings	Media Window		Ustawienia wideo
+Waiting for media_server to quit.	Media Window		Oczekiwanie na zakończenie działania media_server.

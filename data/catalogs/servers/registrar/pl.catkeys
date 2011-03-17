@@ -1,0 +1,6 @@
+1	polish	application/x-vnd.Haiku-Registrar	2785295574
+Cancel	ShutdownProcess		Anuluj
+Do you really want to shut down the system?	ShutdownProcess		Czy naprawdę chcesz wyłączyć system?
+It's now safe to turn off the computer.	ShutdownProcess		Teraz można bezpiecznie wyłączyć komputer.
+OK	ShutdownProcess		OK
+Restart system	ShutdownProcess		Restartuj system
