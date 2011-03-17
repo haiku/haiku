@@ -1,8 +1,7 @@
-1	french	x-vnd.Haiku-Appearance	3612090060
+1	french	x-vnd.Haiku-Appearance	1227622574
 Antialiasing	APRWindow		Lissage
 Antialiasing menu	AntialiasingSettingsView		Menu lissage
 Antialiasing type:	AntialiasingSettingsView		Type de lissage :
-Appearance	APRWindow		Apparence
 Colors	APRWindow		Couleurs
 Control background	Colors tab		Arrière plan des contrôles
 Control border	Colors tab		Bordure des contrôles

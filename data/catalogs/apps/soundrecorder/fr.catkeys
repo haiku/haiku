@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-SoundRecorder	1355572422
+1	french	x-vnd.Haiku-SoundRecorder	1948114706
 Cannot connect to media server	RecorderWindow		Impossible de se connecter au media server
 Cannot connect to the selected sound input	RecorderWindow		Impossible de se connecter à la source sonore sélectionnée
 Cannot find an unused name to use for the new recording	RecorderWindow		Impossible de trouver un nom inutilisé pour le nouvel enregistrement.
@@ -32,7 +32,6 @@ Sample size: 	RecorderWindow		Taille de l'échantillon :
 Save	RecorderWindow		Sauvegarder
 Some of the files don't appear to be audio files	RecorderWindow		Certains fichiers semblent ne pas être des fichiers audio.
 Sound List	RecorderWindow		Liste des sons
-SoundRecorder	RecorderWindow		Magnétophone
 Stop	RecorderWindow		Arrêter
 bits	RecorderWindow		bits
 seconds	RecorderWindow		secondes

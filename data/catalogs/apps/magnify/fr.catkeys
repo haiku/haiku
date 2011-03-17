@@ -1,6 +1,5 @@
-1	french	x-vnd.Haiku-Magnify	1680541832
+1	french	x-vnd.Haiku-Magnify	2286010390
 %width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width ⨯ %height @ %pixelSize pixels/pixel
-About Magnify…	Magnify-Main		À propos de la Loupe…
 Add a crosshair	Magnify-Main		Ajouter un viseur
 Copy image	Magnify-Main		Copier l'image
 Copy/Save:\n  copy - copies the current image to the clipboard\n  save - prompts the user for a file to save to and writes out\n    the bits of the image\n	Magnify-Help		Copier/Enregistrer :\n copier - copie l'image vers le presse-papier\n enregistrer : demande à l'utilisateur de spécifier un fichier de destination où\n enregistrer l'image.\n
@@ -8,14 +7,14 @@ Decrease pixel size	Magnify-Main		Réduire le grossissement
 Decrease window size	Magnify-Main		Diminuer la taille de la fenêtre
 Freeze/Unfreeze image	Magnify-Main		Gèle/Dégèle l'image
 General:\n  32 x 32 - the top left numbers are the number of visible\n    pixels (width x height)\n  8 pixels/pixel - represents the number of pixels that are\n    used to magnify a pixel\n  R:152 G:52 B:10 -  the RGB values for the pixel under\n    the red square\n	Magnify-Help		Général: \n 32⨯32 - ces nombres dans le coin supérieur gauche représentent le nombre de\npixels affichés (largeur ⨯ hauteur).\n8 pixels/pixel - représente le facteur de grossissement des pixels.\nR:152 V:52 B:10 - valeurs RVB du pixel sous le carré rouge.\n
-Help…	Magnify-Main		Aide…
+Help	Magnify-Main		Aide
 Hide/Show grid	Magnify-Main		Cacher/afficher la grille
 Hide/Show info	Magnify-Main		Cacher/Afficher les informations
 Increase pixel size	Magnify-Main		Augmenter le grossissement
 Increase window size	Magnify-Main		Augmenter la taille de la fenêtre
 Info	Magnify-Main		Information
 Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		informations :\n Cacher/Afficher les informations - cache ou affiche toutes les nouvelles fonctionnalités\n  note : Lorsqu'un carré rouge apparait.\n  Il indique sur quel pixel la valeur de couleur RVB est mesurées.\n Ajouter/Enlever un viseur - 2 viseurs peuvent être ajoutés (ou retirés...)\n  pour aider à aligner et placer des objets.\n  Les viseurs sont représentés par des carrés bleus et des lignes bleus.\n montrer/cacher la grille - montre ou cache la grille séparant chaque pixel.\n
-Magnify	Magnify-Main		Loupe
+Magnify	Application name		Loupe
 Magnify help	Magnify-Help		Aide de la Loupe
 Magnify!\n\n©2002-2006 Haiku\n(C)1999 Be Inc.\n\nNow with even more features and recompiled for Haiku.	Magnify-Main		Loupe!\n\n©2002-2006 Haiku\n(C)1999 Be Inc.\n\nMaintenant avec encore plus de fonctions et recompilé pour Haiku.
 Make square	Magnify-Main		Rendre carré

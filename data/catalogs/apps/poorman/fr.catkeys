@@ -1,6 +1,5 @@
-1	french	x-vnd.Haiku.PoorMan	805673381
+1	french	x-vnd.Haiku.PoorMan	412131821
 A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Un dossier Web par défaut a été créé à « /boot/home/public_html. »\nVérifiez qu'il existe un fichier HTML nommé « index.html » dans ce dossier.
-About PoorMan	PoorMan		À propos de PoorMan
 About PoorMan…	PoorMan		À propos de PoorMan…
 Advanced	PoorMan		Avancé
 Cancel	PoorMan		Annuler
@@ -35,7 +34,7 @@ Logging view	PoorMan		Vue du journal
 Max. simultaneous connections:	PoorMan		Nombre max. de connexions simultanées :
 OK	PoorMan		OK
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Veuillez choisir le dossier à publier sur le Web.\n\nVous pouvez sélectionnez le dossier de votre choix, ou laisser PoorMan\ncréer le dossier par défaut « public_html » dans votre dossier personnel.
-Poor Man's web server\nCopyright © 2004-2009 Haiku\nAll rights reserved.\n\nWritten by: Philip Harrison, Ma Jie	PoorMan		PoorMan est le serveur web du « Pauv'gars »\nCopyright © 2004-2009 Haiku\nTous droits réservés.\n\n Écrit par : Philip Harrison et Ma Jie
+PoorMan	Application name		PoorMan
 PoorMan settings	PoorMan		Réglages de PoorMan
 Quit	PoorMan		Quitter
 Run server	PoorMan		Mettre le serveur en fonction

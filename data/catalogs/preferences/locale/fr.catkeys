@@ -1,10 +1,12 @@
-1	french	x-vnd.Haiku-Locale	2295953467
+1	french	x-vnd.Haiku-Locale	250177593
 12 hour	TimeFormatSettings		12 heures
 24 hour	TimeFormatSettings		24 heures
 Available languages	Locale Preflet Window		Langues disponibles
+Cancel	Locale Preflet Window		Annuler
 Currency	TimeFormatSettings		Devise
 Date	TimeFormatSettings		Date
 Defaults	Locale Preflet Window		Défauts
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Le Tracker et la Deskbar ont besoin d'être redémarrés pour prendre en compte cette modification. Souhaitez-vous les redémarrer maintenant ?
 Formatting	Locale Preflet Window		Formatage
 Full format:	TimeFormatSettings		Format détaillé :
 Language	Locale Preflet Window		Langue
@@ -15,11 +17,14 @@ Medium format:	TimeFormatSettings		Format moyen :
 Negative:	TimeFormatSettings		Négatif :
 Numbers	TimeFormatSettings		Nombres
 OK	Locale Preflet Window		OK
+Options	Locale Preflet Window		Options
 Positive:	TimeFormatSettings		Positif :
 Preferred languages	Locale Preflet Window		Langues préférées
+Restart	Locale Preflet Window		Redémarrer
 Revert	Locale Preflet Window		Rétablir
 Short format:	TimeFormatSettings		Format court :
 Time	TimeFormatSettings		Heure
+Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		Traduire le nom des applications et des dossiers dans la Deskbar et le Tracker.
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		La liste des langages disponibles est introuvable, ce preflet est donc inutilisable !
 Use month/day-names from preferred language	TimeFormatSettings		Utiliser la langue active pour les noms des jours et des mois
 already chosen	LanguageListView		déjà choisi

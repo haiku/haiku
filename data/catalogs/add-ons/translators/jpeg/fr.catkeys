@@ -19,7 +19,7 @@ Prevent colors 'washing out'	JPEGTranslator		Éviter les couleurs « délavées
 Read	JPEGTranslator		Lecture
 Read greyscale images as RGB32	JPEGTranslator		Lire les images en nuances de gris en RVB32
 Show warning messages	JPEGTranslator		Afficher les messages d'alertes
-Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Utilisez le codage CMJN  avec 0 pour 100% de couverture
+Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Utilisez le codage CMJN avec 0 pour 100% de couverture
 Use progressive compression	JPEGTranslator		Utiliser l'encodage progressif
 Write	JPEGTranslator		Écriture
 Write black-and-white images as RGB24	JPEGTranslator		Écrire les images noir&blanc en RVB24

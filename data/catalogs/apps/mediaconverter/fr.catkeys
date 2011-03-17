@@ -1,12 +1,11 @@
-1	french	x-vnd.Haiku-MediaConverter	1223956204
+1	french	x-vnd.Haiku-MediaConverter	3794171454
 %.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld canaux / %Ld échantillons
 %.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz mono / %Ld échantillons
 %.1f kHz stereo / %lld frames	MediaFileInfo		%.1f kHz stéréo / %Ld échantillons
-%Ld x %Ld, %Ld fps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%ld ⨯ %ld, %f ips / %Ld images
 %amountOfFiles files were not recognized as supported media files:	MediaConverter		%amountOfFiles fichiers ne sont pas des médias reconnus pour être pris en charge :
 %d bit 	MediaFileInfo		%d bit
 %d byte 	MediaFileInfo		%d octet
-About MediaConverter…	Menu		À propos du MédiaConvertisseur…
+%u x %u, %.2ffps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%u x %u, %.2fips / %Ld images
 About…	MediaConverter		À propos…
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Une erreur est survenue lors de la lecture des informations du fichier.\n\nErreur : 
 Audio encoding:	MediaConverter		Encodage audio :
@@ -40,7 +39,7 @@ File details	MediaConverter		Détails du fichier
 File format:	MediaConverter		Format de fichier :
 High	MediaConverter		Haute
 Low	MediaConverter		Basse
-MediaConverter	MediaConverter		MédiaConvertisseur
+MediaConverter	Application name		MédiaConvertisseur
 MediaConverter+:SaveDirectory	MediaConverter		MédiaConvertisseur : Dossier d'enregistrement
 MediaConverter\n1.3.0\n© 1999, Be Incorporated.\n© 2000-2004 Jun Suzuki\n© 2007 Stephan Aßmus\n© 2010 Haiku, Inc.	MediaConverter		MédiaConvertisseur\n1.3.0\n© 1999, Be Incorporated.\n© 2000-2004 Jun Suzuki\n© 2007 Stephan Aßmus\n© 2010 Haiku, Inc.
 No audio	Audio codecs list		Pas de son
@@ -60,10 +59,12 @@ Select	MediaConverter		Sélectionner
 Select this folder	MediaConverter		Sélectionner ce dossier
 Source files	MediaConverter		Fichiers sources
 Start [ms]: 	MediaConverter		Début [ms] : 
+The file was not recognized as a supported media file:	MediaConverter		Le fichier n'a pas été reconnu comme un média pris en charge :
 Video encoding:	MediaConverter		Encodage vidéo :
 Video quality not supported	MediaConverter		Qualité vidéo non prise en charge
 Video quality: %3d%%	MediaConverter		Qualité vidéo : %3d%%
+Video using parameters form settings	MediaConverter		La vidéo utilise les paramètres de réglages.
 Video:	MediaConverter-FileInfo		Vidéo :
-Writing audio track: %Ld %% complete	MediaConverter		Écriture de la piste audio  : %ld %% achevés
-Writing video track: %Ld %% complete	MediaConverter		Écriture de la piste vidéo  : %ld %% achevés
+Writing audio track: %ld%% complete	MediaConverter		Écriture de la piste audio : %ld%% achevés
+Writing video track: %ld%% complete	MediaConverter		Écriture de la piste vidéo : %ld%% achevés
 seconds	MediaFileInfo		secondes

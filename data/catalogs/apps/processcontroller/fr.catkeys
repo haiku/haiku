@@ -1,7 +1,5 @@
-1	french	x-vnd.Haiku-ProcessController	35871000
-%s [%d]	ProcessController		%s [%d]
+1	french	x-vnd.Haiku-ProcessController	526557007
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		©1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
-About	ProcessController		À propos
 About ProcessController…	ProcessController		À propos de ProcessControlleur…
 Cancel	ProcessController		Annuler
 Custom priority	ProcessController		Priorité personnalisée
@@ -13,6 +11,7 @@ Do you really want to kill the team \"%s\"?	ProcessController		Voulez-vous vraim
 Error saving file	ProcessController		Erreur à l'enregistrement du fichier
 Gone teams…	ProcessController		Processus zombies…
 Idle priority	ProcessController		Priorité inactive
+Info	ProcessController		Information
 Install in Deskbar	ProcessController		Installer dans la Deskbar
 Kill this thread!	ProcessController		Tuer cette tâche !
 Live in the Deskbar	ProcessController		Installer dans la Deskbar
@@ -23,9 +22,8 @@ New Terminal	ProcessController		Nouveau Terminal
 Normal priority	ProcessController		Priorité normale
 OK	ProcessController		OK
 Ok!	ProcessController		Ok !
-ProcessController	ProcessController		ProcessControlleur
+Please confirm	ProcessController		Veuillez confirmer
 ProcessController is already installed in Deskbar.	ProcessController		ProcessControlleur est déjà installé dans la Deskbar.
-ProcessController\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n	ProcessController		ProcessControlleur\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n
 Processor %d	ProcessController		Processeur %d
 Quit an application	ProcessController		Quitter une application
 Quit application	ProcessController		Quitter l'application

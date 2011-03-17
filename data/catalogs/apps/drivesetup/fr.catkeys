@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-DriveSetup	2723551013
+1	french	x-vnd.Haiku-DriveSetup	568426562
 %ld MiB	Support		%ld Mio
 <empty>	DiskView		<vide>
 <empty>	PartitionList		<vide>
@@ -29,7 +29,6 @@ Device	DiskView		Périphérique
 Device	PartitionList		Périphérique
 Disk	MainWindow		Disque
 Disk system \"%s\"\" not found!	MainWindow		Le disque système « %s » est introuvable !
-DriveSetup	MainWindow		Gestionnaire de Disques
 Eject	MainWindow		Éjecter
 End: %ld MB	Support		Fin : %ld Mo
 Error: 	MainWindow	in any error alert	Erreur : 

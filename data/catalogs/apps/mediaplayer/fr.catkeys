@@ -1,4 +1,5 @@
-1	french	x-vnd.Haiku-MediaPlayer	2498218170
+1	french	x-vnd.Haiku-MediaPlayer	4133006122
+%app%\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		%app%\n\nÉcrit par Marcus Overhagen, Stephan Aßmus et Frederik Modéen
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Panoramique américain)
 100% scale	MediaPlayer-Main		Échelle 100%
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinémascope)
@@ -10,7 +11,6 @@
 <nothing to undo>	MediaPlayer-PlaylistWindow		<rien à rétablir>
 <unknown>	PlaylistItem-album		<inconnu>
 <untitled>	PlaylistItem-title		<sans titre>
-About MediaPlayer…	MediaPlayer-Main		À propos de MédiaPlayer
 Always on top	MediaPlayer-Main		Toujours au dessus
 Aspect ratio	MediaPlayer-Main		Aspect proportionnel
 Attributes	MediaPlayer-Main		Attributs
@@ -26,6 +26,7 @@ Close window when done playing movies	MediaPlayer-SettingsWindow		Fermer la fen�
 Drop files to play	MediaPlayer-Main		Déposez les fichiers à lire
 Error: 	MediaPlayer-Main		Erreur :
 Error: 	MediaPlayer-RemovePLItemsCmd		Erreur :
+File Info	MediaPlayer-InfoWin		Informations du fichier
 File info…	MediaPlayer-Main		Informations du fichier…
 Full screen	MediaPlayer-Main		Plein écran
 Full volume	MediaPlayer-SettingsWindow		Plein volume
@@ -34,9 +35,8 @@ Internal error (locking failed). Saving the playlist failed.	MediaPlayer-Playlis
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Erreur interne (message incorrect). La liste de lecture n'a pas pu être sauvegardée.
 Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Erreur interne (plus de mémoire). La liste de lecture n'a pas pu être sauvegardée.
 Low volume	MediaPlayer-SettingsWindow		Volume bas
-MediaPlayer encountered an internal error. The file could not be opened.	MediaPlayer-Main		MédiaPlayer a rencontré une erreur interne. Impossible d'ouvrir le fichier.
+MediaPlayer	Application name		MédiaPlayer
 MediaPlayer settings	MediaPlayer-SettingsWindow		Réglages de MédiaPlayer
-MediaPlayer\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		MédiaPlayer\n\nÉcrit by Marcus Overhagen, Stephan Aßmus et Frederik Modéen
 Mute	MediaPlayer-Main		Muet
 Muted	MediaPlayer-SettingsWindow		Muet
 New player…	MediaPlayer-Main		Nouveau lecteur…
@@ -77,8 +77,8 @@ Start playing.	MediaPlayer-Main		Commencer la lecture.
 Stop	MediaPlayer-Main		Arrêt
 Stop playing.	MediaPlayer-Main		Arrêter la lecture.
 Stream settings	MediaPlayer-Main		Réglages du flux
-Subtitle placement	MediaPlayer-SettingsWindow		Emplacement des sous-titres
-Subtitle size	MediaPlayer-SettingsWindow		Taille des sous-titres
+Subtitle placement:	MediaPlayer-SettingsWindow		Emplacement des sous-titres :
+Subtitle size:	MediaPlayer-SettingsWindow		Taille des sous-titres :
 Subtitles	MediaPlayer-Main		Sous-titres
 Thanks	MediaPlayer-Main		Merci
 The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Impossible d'ouvrir le fichier « %filename ».\n\n
@@ -92,5 +92,4 @@ Video	MediaPlayer-Main		Vidéo
 Video track	MediaPlayer-Main		Piste vidéo
 View options	MediaPlayer-SettingsWindow		Options d'affichage
 Volume	MediaPlayer-Main		Volume
-error	MediaPlayer-Main		erreur
 none	Subtitles menu		aucun

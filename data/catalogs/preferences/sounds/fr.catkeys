@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Sounds	3382039821
+1	french	x-vnd.Haiku-Sounds	145262565
 <none>	HEventList		<aucun>
 <none>	HWindow		<aucun>
 About Sounds	SoundsHApp		À propos de Sons
@@ -11,7 +11,6 @@ Other…	HWindow		Autre…
 Play	HWindow		Lire
 Sound	HEventList		Son
 Sound File:	HWindow		Fichier son :
-Sounds	SoundsHApp		Sons
 Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Sons\n Écrit par :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n D'après le travail d'Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku
 Stop	HWindow		Arrêter
 This is not an audio file.	HWindow		Ceci n'est pas un fichier audio.

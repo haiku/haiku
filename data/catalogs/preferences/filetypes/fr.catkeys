@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-FileTypes	780295643
+1	french	x-vnd.Haiku-FileTypes	391885466
 %1 application type	Application Type Window		Type d'application de %1
 %s file type	FileType Window		Type du fichier %s
 (from application)	FileTypes Window		(depuis l'application)
@@ -70,7 +70,6 @@ File could not be opened	Preferred App Menu		Impossible d'ouvrir le fichier
 File recognition	FileTypes Window		Identification de fichier
 File type	FileType Window		Type de fichier
 FileTypes	FileTypes		Types de Fichiers
-FileTypes	FileTypes Window		Types de Fichiers
 FileTypes request	FileTypes		Demande de Types de Fichiers
 FileTypes request	FileTypes Window		Requête sur les Types de Fichiers
 FileTypes request	Preferred App Menu		Requête sur les Types de Fichiers

@@ -1,9 +1,10 @@
-1	french	system	2686335505
+1	french	system	709849049
 %.2f TiB	StringForSize		%.2f Tio
 %3.2f GiB	StringForSize		%3.2f Gio
 %3.2f KiB	StringForSize		%3.2f Kio
 %3.2f MiB	StringForSize		%3.2f Mio
 %d bytes	StringForSize		%d octets
+About %app%	AboutMenuItem		À propos de %app%
 About…	AboutWindow		À propos…
 Blue:	ColorControl		Bleu :
 Close	AboutWindow		Fermer

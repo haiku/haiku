@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	1954083878
+1	french	x-vnd.Haiku-libtracker	3180459772
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 %Ld B	WidgetAttributeText		%Ld o
 %Ld bytes	WidgetAttributeText		%Ld octets
@@ -384,8 +384,7 @@ Windows	TrackerSettingsWindow		Fenêtres
 Would you like to find a suitable application to open the file?	FSUtils		Souhaitez-vous rechercher une application appropriée pour ouvrir le fichier ?
 Would you like to find some other suitable application?	FSUtils		Souhaitez-vous rechercher une autre application appropriée ?
 Write	FilePermissionsView		Écrire
-You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		Vous essayez de remplacer l’élément :\n\t%name%dest\npar :\n\t%name%src\n\nVoulez vous le remplacer par %movemode ?	
-
+You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		Vous essayez de remplacer l’élément :\n\t%name%dest\npar :\n\t%name%src\n\nVoulez vous le remplacer par %movemode ?
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		Vous ne pouvez pas déplacer un dossier dans lui-même ou dans un de ses sous-dossier.
 You can't move or copy items to read-only volumes.	FSUtils		Vous ne pouvez pas déplacer ou copiez des éléments dans un volume en lecture-seule.
 You can't move or copy the trash.	FSUtils		Vous ne pouvez ni déplacer, ni copier la Corbeille.

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-BootManager	4221922214
+1	french	x-vnd.Haiku-BootManager	2303599013
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Le programme est sur le point de restaurer l'enregistrement d'amorçage maître (MBR) de %disk à partir de %file. Voulez-vous continuer ?
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		vous êtes sur le point d'écrire le menu de démarrage sur le disque. Êtes-vous sûr de vouloir continuer ?
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Le programme est sur le point d'écrire le menu suivant sur le disque de démarrage (%s). Veuillez vérifier les informations ci-dessous avant de continuer.
@@ -13,10 +13,8 @@ At least one partition must be selected!	BootManagerController		Au moins une par
 Back	BootManagerController	Button	Retour
 Backup Master Boot Record	BootManagerController	Title	Sauvegarde du MBR
 Boot Manager is unable to read the partition table!	BootManagerController		Le gestionnaire d'amorçage n'est pas en mesure de lire la table des partition !
-BootManager	BootManager	Application name	Gestionnaire d'amorçage
-BootManager	BootManagerWindow	Window Title	Gestionnaire d'amorçage
+BootManager	Application name		Gestionnaire d'amorçage
 Cannot access!	DrivesPage	Cannot install	Accès impossible !
-Copyright %year, Haiku Inc.\n	BootManager	Leave %year untranslated	Copyright %year, Haiku Inc.\n
 Default Partition	DefaultPartitionPage	Title	Partition par défaut
 Default Partition:	DefaultPartitionPage	Menu field label	Partition par défaut
 Done	BootManagerController	Button	Fait
@@ -31,7 +29,6 @@ Installation of boot menu failed	BootManagerController	Title	Echec de l'installa
 Never	DefaultPartitionPage		Jamais
 Next	WizardView	Button	Suivant
 No space available!	DrivesPage	Cannot install	Espace insuffisant
-OK	BootManager		OK
 OK	BootManagerController	Button	OK
 Old Master Boot Record Saved failure	BootManagerController	Title	Echec lors de l'enregistrement de l'ancien MBR
 Old Master Boot Record saved	BootManagerController	Title	L'ancien MBR a été sauvegardé
@@ -67,4 +64,3 @@ Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Inconnu
 Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	%d anonyme
 Update	DrivesPage	Button	Mettre à jour
 Write boot menu	BootManagerController	Button	Écrire le menu de démarrage
-written by	BootManager		Écrit par

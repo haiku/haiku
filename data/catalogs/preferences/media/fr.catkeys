@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Media	1701788906
+1	french	x-vnd.Haiku-Media	293613603
 <none>	Media views		<aucun>
 Audio input:	Media views		Entrée son :
 Audio mixer	Media Window		Mélangeur audio
@@ -11,7 +11,6 @@ Couldn't add volume control in Deskbar: %s\n	Media views		Impossible d'insérer 
 Couldn't remove volume control in Deskbar: %s\n	Media views		Impossible de retirer le contrôle du volume de la Deskbar : %s\n
 Defaults	Media views		Par défaut
 Done shutting down.	Media Window		Arrêt terminé.
-Media	Media Window		Média
 OK	Media Window		Ok
 Quit	Media Window		Quitter
 Ready for use…	Media Window		Prêt à servir…

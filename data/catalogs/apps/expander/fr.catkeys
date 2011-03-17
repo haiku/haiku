@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Expander	3863172519
+1	french	x-vnd.Haiku-Expander	51964396
 About Expander…	ExpanderMenu		À propos de Expander…
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Êtes vous sur de vouloir stopper la décompression cette\narchive? Les fichiers extraits seront peut être incomplets.
 Automatically expand files	ExpanderPreferences		Décompresser les fichiers automatiquement
@@ -14,8 +14,7 @@ Destination folder:	ExpanderPreferences		Dossier de destination :
 Error when expanding archive	ExpanderWindow		Erreur lors de la décompression de l'archive
 Expand	ExpanderMenu		Décompresser
 Expand	ExpanderWindow		Décompresser
-Expander	About		Expander
-Expander	ExpanderWindow	!! Window Title !!	Expander
+Expander	Application name		Décompresseur
 Expander settings	ExpanderPreferences		Réglages du Décompresseur
 Expander: Choose destination	DirectoryFilePanel		Expander : Choix de la destination
 Expander: Open	ExpanderWindow		Expander : Ouvrir
@@ -25,7 +24,6 @@ File	ExpanderMenu		Fichier
 File expanded	ExpanderWindow		Fichier décompressé
 Hide contents	ExpanderWindow		Cacher le contenu
 Leave destination folder path empty	ExpanderPreferences		Laissez vide le chemin du dossier de destination
-OK	About		OK
 OK	ExpanderPreferences		OK
 Open destination folder after extraction	ExpanderPreferences		Ouvrir le dossier de destination après l'extraction
 Other:	ExpanderPreferences		Autre :
@@ -49,5 +47,4 @@ The destination is read only.	ExpanderWindow		La destination est en lecture seul
 The file doesn't exist	ExpanderWindow		Le fichier n'existe pas
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Le dossier a été renommé, déplacé, ou\nn'est pas supporté.
 Use:	ExpanderPreferences		Utiliser :
-\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tÉcrit par Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nVersion originale Be par\nDominic, Hiroshi, Peter, Pavel et Robert\n
 is not supported	ExpanderWindow		n'est pas géré

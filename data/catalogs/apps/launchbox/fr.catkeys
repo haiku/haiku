@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-LaunchBox	1672943267
+1	french	x-vnd.Haiku-LaunchBox	3636680404
 About	LaunchBox		À propos
 Add button here	LaunchBox		Ajouter un bouton ici
 Auto-raise	LaunchBox		Faire apparaître automatiquement
@@ -15,7 +15,7 @@ Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Impossibl
 Horizontal layout	LaunchBox		Disposition horizontale
 Icon size	LaunchBox		Taille d'icône
 Ignore double-click	LaunchBox		Ignorer le double click
-LaunchBox	LaunchBox		BoîteDeLancement
+LaunchBox	Application name		BarreDeLancement
 Name Panel	LaunchBox		Nom du panneau
 New	LaunchBox		Nouveau
 OK	LaunchBox		OK

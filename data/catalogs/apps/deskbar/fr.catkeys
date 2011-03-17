@@ -1,13 +1,13 @@
-1	french	x-vnd.Be-TSKB	4247133739
+1	french	x-vnd.Be-TSKB	19976571
 <Be folder is empty>	BeMenu		<Le dossier Be est vide>
-About Haiku…	BeMenu		À propos de Haiku...
+About Haiku	BeMenu		À propos d'Haiku
 Always on top	PreferencesWindow		Toujours au dessus
 Applications	PreferencesWindow		Applications
 Auto-raise	PreferencesWindow		Rehausser automatiquement
 Change time…	TimeView		Régler l'horloge…
 Clock	PreferencesWindow		Horloge
 Close all	WindowMenu		Tout fermer
-Deskbar	MainWindow		Deskbar
+Deskbar	Application name		Deskbar
 Deskbar preferences	PreferencesWindow		Réglages de la Deskbar
 Deskbar preferences…	BeMenu		Réglages de la Deskbar…
 Edit menu…	PreferencesWindow		Éditer le menu…
