@@ -1,32 +1,38 @@
-1	esperanto	x-vnd.Be-TSKB	3272391255
-Applications	PreferencesWindow		Aplikaĵoj
-Recent applications	BeMenu		Ĵusaj aplikaĵoj
-Edit menu…	PreferencesWindow		Menuo Redakti…
-Recent documents:	PreferencesWindow		Ĵusaj dokumentoj:
-Recent folders	BeMenu		Ĵusaj dosierujoj
-Sort running applications	PreferencesWindow		Ordigi aktivajn aplikaĵojn
-Change time…	TimeView		Regli la horloĝon…
+1	esperanto	x-vnd.Be-TSKB	3232664655
 <Be folder is empty>	BeMenu		<La dosierujo Be estas malplena>
-Window	PreferencesWindow		Fenestro
+Always on top	PreferencesWindow		Ĉiam malfona
+Applications	PreferencesWindow		Aplikaĵoj
+Auto-raise	PreferencesWindow		Aŭtomate malfonigi
+Change time…	TimeView		Regli la horloĝon…
+Clock	PreferencesWindow		Horloĝo
+Close all	WindowMenu		Fermi ĉiujn
+Deskbar preferences	PreferencesWindow		Laborstriaj agordoj
+Deskbar preferences…	BeMenu		Laborstriaj agordoj…
+Edit menu…	PreferencesWindow		Redakti menuon…
+Expand new applications	PreferencesWindow		Elvolvi novajn aplikaĵojn
+Find…	BeMenu		Trovi…
+Hide all	WindowMenu		Malvidigi ĉiujn
+Hide time	TimeView		Malvidigi la horloĝon
 Menu	PreferencesWindow		Menuo
-Show seconds	PreferencesWindow		Vidigi sekundojn
-Always on top	PreferencesWindow		Ĉiam malfone
-Show all	WindowMenu		Vidigi ĉiujn
+Mount	BeMenu		Munti
 No windows	WindowMenu		Neniu fenestro
 Power off	BeMenu		Malŝalti
-Auto-raise	PreferencesWindow		Aŭtomate malfonigi
-Hide time	TimeView		Kaŝi horloĝon
-Recent folders:	PreferencesWindow		Ĵusaj dosierujoj:
-Deskbar preferences…	BeMenu		Deskbar agordoj…
-Close all	WindowMenu		Fermi ĉiujn
-Deskbar preferences	PreferencesWindow		Deskbar agordoj
-Mount	BeMenu		Munti
+Quit application	WindowMenu		Eliri la aplikaĵon
+Recent applications	BeMenu		Ĵusaj aplikaĵoj
 Recent applications:	PreferencesWindow		Ĵusaj aplikaĵoj:
-Tracker always first	PreferencesWindow		Tracker ĉiam unua
-About Haiku…	BeMenu		Pri Haiku…
-Find…	BeMenu		Trovi…
-Show Time	Tray		Vidigi Horloĝon
-Clock	PreferencesWindow		Horloĝo
 Recent documents	BeMenu		Ĵusaj dokumentoj
-Hide all	WindowMenu		Kaŝi ĉiujn
-Quit application	WindowMenu		Eliri aplikaĵon
+Recent documents:	PreferencesWindow		Ĵusaj dokumentoj:
+Recent folders	BeMenu		Ĵusaj dosierujoj
+Recent folders:	PreferencesWindow		Ĵusaj dosierujoj:
+Restart Tracker	BeMenu		Relanĉi Tracker-on
+Restart system	BeMenu		Reŝargi la sistemon
+Show Time	Tray		Vidigi la Horloĝon
+Show all	WindowMenu		Vidigi ĉiujn
+Show application expander	PreferencesWindow		Vidigi la elvolvilon de aplikaĵoj
+Show calendar…	TimeView		Vidigi la kalendaron…
+Show replicants	BeMenu		Vidigi la kopiataĵojn
+Show seconds	PreferencesWindow		Vidigi sekundojn
+Shutdown…	BeMenu		Fermi la sistemon…
+Sort running applications	PreferencesWindow		Ordigi aktivajn aplikaĵojn
+Tracker always first	PreferencesWindow		Tracker ĉiam unua
+Window	PreferencesWindow		Fenestro

@@ -1,14 +1,13 @@
-1	esperanto	x-vnd.Haiku-Keyboard	914649575
-Keyboard	KeyboardWindow		Klavaro
-Written by Andrew Edward McCall	KeyboardApplication		Skribita per Andrew Edward McCall
-Typing test area	KeyboardView		Tajpada provejo
+1	esperanto	x-vnd.Haiku-Keyboard	1078858058
 Defaults	KeyboardWindow		Aprioraj
-Key repeat rate	KeyboardView		Klavripeta rapideco
-Revert	KeyboardWindow		Malfari
 Delay until key repeat	KeyboardView		Malfruo antaŭ klavripeto
-OK	KeyboardApplication		Bone
 Fast	KeyboardView		Rapida
+Key repeat rate	KeyboardView		Klavripeta rapideco
+Long	KeyboardView		Longa
+OK	KeyboardApplication		Bone
+Revert	KeyboardWindow		Malfari
+Short	KeyboardView		Mallonga
 Slow	KeyboardView		Malrapida
 Something has gone wrong!	KeyboardApplication		Io malbona okazis!
-Long	KeyboardView		Longa
-Short	KeyboardView		Mallonga
+Typing test area	KeyboardView		Tajpada provejo
+Written by Andrew Edward McCall	KeyboardApplication		Skribita per Andrew Edward McCall

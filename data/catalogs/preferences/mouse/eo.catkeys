@@ -1,23 +1,22 @@
-1	esperanto	x-vnd.Haiku-Mouse	524453314
-Mouse type:	SettingsView		Mustipo:
-Warp	SettingsView		Teleporti
-2-Button	SettingsView		Dubutona
-Double-click test area	SettingsView		Testospaco de duobla klako
-Revert	MouseWindow		Malfari
+1	esperanto	x-vnd.Haiku-Mouse	1036956709
 ...by Andrew Edward McCall	MouseApplication		...per Andrew Edward McCall
-Mouse acceleration	SettingsView		Musa akcelo
-Click to focus	SettingsView		Klaki por fokusigi
+1-Button	SettingsView		Unubutona
+2-Button	SettingsView		Dubutona
 3-Button	SettingsView		Tributona
-Mouse speed	SettingsView		Musa rapideco
+Accept first click	SettingsView		Akceptu unuan klakon
+Click to focus	SettingsView		Klaki por fokusigi
+Defaults	MouseWindow		Aprioraj
+Dig Deal	MouseApplication		Ĉu tio gravas?
+Double-click speed	SettingsView		Rapideco de duobla klako
+Double-click test area	SettingsView		Testospaco de duobla klako
+Fast	SettingsView		Rapida
+Focus follows mouse	SettingsView		Musosekvanta fokuso
 Focus mode:	SettingsView		Aktivigada reĝimo:
 Instant warp	SettingsView		Teleporti tuj
-Dig Deal	MouseApplication		Ĉu tio gravas?
-1-Button	SettingsView		Unubutona
-Double-click speed	SettingsView		Rapideco de duobla klako
-Defaults	MouseWindow		Aprioraj
-Focus follows mouse	SettingsView		Musosekvanta fokuso
-Accept first click	SettingsView		Akceptu unuan klakon
-Fast	SettingsView		Rapida
+Mouse acceleration	SettingsView		Musa akcelo
+Mouse speed	SettingsView		Musa rapideco
+Mouse type:	SettingsView		Mustipo:
 Normal	SettingsView		Normala
-Mouse	MouseWindow		Muso
+Revert	MouseWindow		Malfari
 Slow	SettingsView		Malrapida
+Warp	SettingsView		Teleporti

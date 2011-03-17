@@ -1,35 +1,25 @@
-1	esperanto	x-vnd.Haiku-Media	563839393
-Show volume control on Deskbar	Media views		Montru la volumagordilon en Deskbar
-Audio input:	Media views		Sona enigo:
-Restarting media services\nStarting media server…\n	Media Window		Relanĉo de plurmediaj servoj\nLanĉo de plurmedia servilo…\n
-Video input:	Media views		Videa enigo:
-Waiting for media_server to quit.	Media Window		Atendo de la fino de la plurmedia servilo.
-Defaults	Media views		Aprioraj
-Stopping media server…	Media Window		Halto de la plurmedia servilo…
-Video output:	Media views		Videa eligo:
-Enable real-time audio	Media views		Ŝalti realtempan sonon
-Quit	Media Window		Eliri
-OK	Media Window		Bone
-Enabling real-time video allows system to perform video operations as fast and smoothly as possible.  It achieves optimum performance by using more RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Ŝalti realtempan videon ebligas, ke la sistemo faru la vidoperaciojn tiel rapide kaj glate, kiel eblas. Ĉi-tiu plejbona rendimento kostas pli da memoro.\n\nNur ŝaltu ĉi-tiun eblon se vi bezonas la plej malgrandan latentecon, kiel eblas.
-Default nodes	Media views		Aprioraj nodoj
-Starting media server…	Media Window		Lanĉo de plurmedia servilo…
-Restart the media server to apply changes.	Media views		Relanĉu la plurmedian servilon por ŝalti la ŝanĝojn.
-Done shutting down.	Media Window		Haltado kompleta.
-Cleaning up.	Media Window		Purigante.
-Telling media_addon_server to quit.	Media Window		Ordonante, ke la plurmedia aldona servilo finu.
-Enable real-time video	Media views		Ŝalti realtempan videon
-This hardware has no controls.	Media Window		Ĉi-tiu aparato ne havas agordilojn.
-Restarting media services\nShutting down media server\n	Media Window		Relanĉo de plurmediaj servoj\nHalto de la plurmedia servilo\n
-Audio output:	Media views		Sona eligo:
-Start media server	Media Window		Lanĉu la plurmedian servilon
-Audio settings	Media Window		Sonaj agordoj
-Could not connect to the media server.\nWould you like to start it ?	Media Window		Ne eblas konekti al la plurmedia servilo.\nĈu vi volas lanĉi ĝin?
-Ready for use…	Media Window		Preta je uziĝi…
-Real-time	Media views		Realtempa
-Restart media services	Media views		Relanĉu la plurmediaj servoj
-Enabling real-time audio allows system to record and play audio as fast as possible.  It achieves this performance by using more CPU and RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Ŝalti realtempan sonon ebligas, ke la sistemo registru kaj legu sonon tiel rapide, kiel eblas. Ĉi-tiu rendimento kostas pli da memoro kaj da procesora tempo.\n\nNur ŝaltu ĉi-tiun eblon se vi bezonas la plej malgrandan latentecon, kiel eblas.
-Couldn't remove volume control in Deskbar: %s\n	Media Window		Ne eblas forigi volumagordilon de la Deskbar: %s\n
-Couldn't add volume control in Deskbar: %s\n	Media Window		Ne eblas aldoni volumagordilon al la Deskbar: %s\n
-Media	Media Window		Plurmedio
-Channel:	Media views		Kanalo:
+1	esperanto	x-vnd.Haiku-Media	448505105
 <none>	Media views		<neniu>
+Audio input:	Media views		Sona enigo:
+Audio output:	Media views		Sona eligo:
+Audio settings	Media Window		Sonaj agordoj
+Channel:	Media views		Kanalo:
+Cleaning up.	Media Window		Purigante.
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Ne eblas konekti al la plurmedia servilo.\nĈu vi volas lanĉi ĝin?
+Defaults	Media views		Aprioraj
+Done shutting down.	Media Window		Haltado kompleta.
+OK	Media Window		Bone
+Quit	Media Window		Eliri
+Ready for use…	Media Window		Preta je uziĝi…
+Restart media services	Media views		Relanĉu la plurmediaj servoj
+Restarting media services\nShutting down media server\n	Media Window		Relanĉo de plurmediaj servoj\nHalto de la plurmedia servilo\n
+Restarting media services\nStarting media server…\n	Media Window		Relanĉo de plurmediaj servoj\nLanĉo de plurmedia servilo…\n
+Show volume control on Deskbar	Media views		Montru la volumagordilon en Deskbar
+Start media server	Media Window		Lanĉu la plurmedian servilon
+Starting media server…	Media Window		Lanĉo de plurmedia servilo…
+Stopping media server…	Media Window		Halto de la plurmedia servilo…
+Telling media_addon_server to quit.	Media Window		Ordonante, ke la plurmedia aldona servilo finu.
+This hardware has no controls.	Media Window		Ĉi-tiu aparato ne havas agordilojn.
+Video input:	Media views		Videa enigo:
+Video output:	Media views		Videa eligo:
+Waiting for media_server to quit.	Media Window		Atendo de la fino de la plurmedia servilo.

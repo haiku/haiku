@@ -1,12 +1,11 @@
-1	esperanto	x-vnd.Haiku-Fonts	1393111467
-Plain font:	Font view		Baza tiparo:
+1	esperanto	x-vnd.Haiku-Fonts	2475492793
+Bold font:	Font view		Grasa tiparo:
 Defaults	Main window		Aprioraj
-Fonts	Main window		Tiparoj
+Fixed font:	Font view		Egallarĝa tiparo:
 Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Tiparoj\n\tAŭtorrajto 2004-2005, Haiku.\n\n
+Menu font:	Font view		Menua tiparo:
+OK	main		Bone
+Plain font:	Font view		Baza tiparo:
 Revert	Main window		Malfari
 Size:	Font Selection view		Grandeco:
-Menu font:	Font view		Menua tiparo:
-Fixed font:	Font view		Egallarĝa tiparo:
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Aĥ! Kaŝiĝu vi hejme! Apenaŭ uzeblas ĉi fieca langtordaĵ'.
-Bold font:	Font view		Grasa tiparo:
-OK	main		Bone

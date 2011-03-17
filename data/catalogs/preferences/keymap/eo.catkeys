@@ -1,22 +1,21 @@
-1	esperanto	x-vnd.Haiku-Keymap	4175672673
-Tilde trigger	Keymap window		Tildo
-Grave trigger	Keymap window		Maldekstra korno
-Select dead keys	Keymap window		Elektu senpaŝajn klavojn
-Quit	Keymap window		Eliri
+1	esperanto	x-vnd.Haiku-Keymap	3858687220
+(Current)	Keymap window		(Kuranta)
+Acute trigger	Keymap window		Dekstra korno
 Circumflex trigger	Keymap window		Ĉapelo
 Diaeresis trigger	Keymap window		Dupunkto
-Open…	Keymap window		Malfermi…
-System:	Keymap window		Sistemo:
-Switch shortcut keys	Keymap window		Ŝparvojklavoj
-User:	Keymap window		Uzanto:
-Switch shortcut keys to Haiku mode	Keymap window		Ŝparvojklavoj laŭ Haiku
-Keymap	Keymap window		Klavara aranĝo
-Sample and clipboard:	Keymap window		Ekzemplo kaj poŝo:
-Layout	Keymap window		Aranĝo
-Switch shortcut keys to Windows/Linux mode	Keymap window		Ŝparvojklavoj laŭ Linukso/Vindozo
-Revert	Keymap window		Malfari
-Save as…	Keymap window		Konservi kiel…
 File	Keymap window		Dosiero
-(Current)	Keymap window		(Ŝaltita)
 Font	Keymap window		Tiparo
-Acute trigger	Keymap window		Dekstra korno
+Grave trigger	Keymap window		Maldekstra korno
+Layout	Keymap window		Aranĝo
+Open…	Keymap window		Malfermi…
+Quit	Keymap window		Eliri
+Revert	Keymap window		Malfari
+Sample and clipboard:	Keymap window		Ekzemplo kaj poŝo:
+Save as…	Keymap window		Konservi kiel…
+Select dead keys	Keymap window		Elektu senpaŝajn klavojn
+Switch shortcut keys	Keymap window		Ŝparvojklavoj
+Switch shortcut keys to Haiku mode	Keymap window		Ŝparvojklavoj laŭ Haiku
+Switch shortcut keys to Windows/Linux mode	Keymap window		Ŝparvojklavoj laŭ Linukso/Vindozo
+System:	Keymap window		Sistemaj:
+Tilde trigger	Keymap window		Tildo
+User:	Keymap window		Uzulaj:

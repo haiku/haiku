@@ -1,7 +1,4 @@
-1	esperanto	x-vnd.Haiku-cmd-dstconfig	2552303152
+1	esperanto	x-vnd.Haiku-cmd-dstconfig	1891332014
+.\n\nIs this the correct time?	dstcheck		.\n\nĈu tio estas korekta?
 Ask me later	dstcheck		Demandu al mi poste
 Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is	dstcheck		Atentu!\n\nKaŭze de la ŝanĝo el la somera tempo, la horloĝo de via komputilo eble malfidelas je unu horo.\nVia komputilo kredas, ke nun estas la
-No	dstcheck		Ne
-Yes	dstcheck		Jes
-Would you like to set the clock?	dstcheck		Ĉu vi volas regli la horloĝon?
-.\n\nIs this the correct time?	dstcheck		.\n\nĈu tio estas korekta?

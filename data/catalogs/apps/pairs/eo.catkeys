@@ -1,5 +1,5 @@
 1	esperanto	x-vnd.Haiku-Pairs	1797899353
-Quit game	PairsWindow		Eliri ludon
 New game	PairsWindow		Nova ludo
-Quit	PairsWindow		Eliri
 OK	PairsView		Bone
+Quit	PairsWindow		Eliri
+Quit game	PairsWindow		Eliri ludon

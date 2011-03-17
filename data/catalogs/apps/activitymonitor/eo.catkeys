@@ -1,0 +1,7 @@
+1	esperanto	x-vnd.Haiku-ActivityMonitor	1540195932
+Add graph	ActivityWindow		Aldoni grafeon
+Media nodes	DataSource		Plurmediaj nodoj
+P-faults	DataSource		P-misfunkcioj
+Raw clipboard size	DataSource		Kruda grandeco de la poŝo
+Teams	DataSource		Teamoj
+Threads	DataSource		Fadenoj

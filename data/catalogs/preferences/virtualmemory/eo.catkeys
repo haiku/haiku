@@ -1,0 +1,18 @@
+1	esperanto	x-vnd.Haiku-VirtualMemory	2137942259
+%Ld B	SettingsWindow		%Ld B
+Changes will take effect on restart!	SettingsWindow		La ŝanĝoj aktiviĝos post restarto!
+Current swap file size: 	SettingsWindow		Aktuala permutdosiera grandeco:
+Defaults	SettingsWindow		Aprioraj
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		La malŝalto de virtuala memoro maldezire efikos la sisteman stabilecon post la eluzo de la memoro.\nVirtuala memoro ne influas la sisteman rendimenton ĝis tiam.\n\nĈu vi estas certa, ke vi volas malŝalti ĝin?
+Enable virtual memory	SettingsWindow		̂Ŝalti virtualan memoron:
+GB	SettingsWindow		GB
+KB	SettingsWindow		KB
+Keep enabled	SettingsWindow		Lasi ŝaltita:
+MB	SettingsWindow		MB
+OK	VirtualMemoryApp		Daŭrigi
+Physical memory: 	SettingsWindow		Fizikala memoro: 
+Requested swap file size:	SettingsWindow		Petita permutdosiera grandeco:
+Revert	SettingsWindow		Malfari
+Turn off	SettingsWindow		Malŝalti
+Use volume:	SettingsWindow		Uzi volumon:
+VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		VirtualaMemoro\n\tskribita per Axel Dörfler\n\tKopirajto 2005, Haiku.\n

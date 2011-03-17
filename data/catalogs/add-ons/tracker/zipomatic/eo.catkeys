@@ -1,18 +1,18 @@
 1	esperanto	x-vnd.haiku.zip-o-matic	274748138
-1 file added.	file:ZipOMaticWindow.cpp		1 dosiero aldonita.
-Stop	file:ZipOMaticWindow.cpp		Halti
-Creating archive: %s	file:ZipOMaticWindow.cpp		Kreante arkivon: %s
-Continue	file:ZipOMaticWindow.cpp		Daŭri
-Preparing to archive	file:ZipperThread.cpp		Pretigante arkivi
-Filename: %s	file:ZipOMaticWindow.cpp		Dosiernomo: %s
-Let them continue	file:ZipOMatic.cpp		Ili daŭru
-Do you want to stop them?	file:ZipOMatic.cpp		Ĉu vi volas halti ilin?
-Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Ĉu vi estas certe, ke vi volas halti la kreadon de la arkivo?
 %ld files added.	file:ZipOMaticWindow.cpp		%ld dosieroj aldonitaj.
-Stopped	file:ZipOMaticWindow.cpp		Haltita
+1 file added.	file:ZipOMaticWindow.cpp		1 dosiero aldonita.
 Archive	file:ZipperThread.cpp		Arkivo
+Archive created OK	file:ZipOMaticWindow.cpp		Arkivo bone kreita
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Ĉu vi estas certe, ke vi volas halti la kreadon de la arkivo?
+Continue	file:ZipOMaticWindow.cpp		Daŭri
+Creating archive: %s	file:ZipOMaticWindow.cpp		Kreante arkivon: %s
+Do you want to stop them?	file:ZipOMatic.cpp		Ĉu vi volas halti ilin?
 Drop files to zip.	file:ZipOMaticWindow.cpp		Faligu dosierojn en la zipon.
 Error creating archive	file:ZipOMaticWindow.cpp		Eraro de kreado de arkivo
-You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		%ld aperoj de Zip-O-Matic rulas.\n\n
-Archive created OK	file:ZipOMaticWindow.cpp		Arkivo bone kreita
+Filename: %s	file:ZipOMaticWindow.cpp		Dosiernomo: %s
+Let them continue	file:ZipOMatic.cpp		Ili daŭru
+Preparing to archive	file:ZipperThread.cpp		Pretigante arkivi
+Stop	file:ZipOMaticWindow.cpp		Halti
 Stop them	file:ZipOMatic.cpp		Halti ilin
+Stopped	file:ZipOMaticWindow.cpp		Haltita
+You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		%ld aperoj de Zip-O-Matic rulas.\n\n

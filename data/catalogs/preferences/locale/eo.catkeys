@@ -1,17 +1,17 @@
 1	esperanto	x-vnd.Haiku-Locale	2023461026
-Available languages	Locale Preflet Window		Haveblaj lingvoj
-Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		La listo de haveblaj lingvoj estas maltrovebla! Do vi ne povas uzi ĉi-tiu preferileto!
-Long format:	TimeFormatSettings		Longa aranĝo:
-Currency	TimeFormatSettings		Valuto
-Short format:	TimeFormatSettings		Mallonga aranĝo:
-Language	Locale Preflet Window		Lingvo
-Preferred languages	Locale Preflet Window		Preferaj lingvoj
-Numbers	TimeFormatSettings		Numeroj
-24 hour	TimeFormatSettings		24 hora
-Defaults	Locale Preflet Window		Aprioraj
-Revert	Locale Preflet Window		Malfari
-OK	Locale Preflet Window		Bone
-Time	TimeFormatSettings		Horo
-Date	TimeFormatSettings		Dato
 12 hour	TimeFormatSettings		12 hora
+24 hour	TimeFormatSettings		24 hora
+Available languages	Locale Preflet Window		Haveblaj lingvoj
+Currency	TimeFormatSettings		Valuto
+Date	TimeFormatSettings		Dato
+Defaults	Locale Preflet Window		Aprioraj
+Language	Locale Preflet Window		Lingvo
 Locale	Locale Preflet		Lokaĵaro
+Long format:	TimeFormatSettings		Longa aranĝo:
+Numbers	TimeFormatSettings		Numeroj
+OK	Locale Preflet Window		Bone
+Preferred languages	Locale Preflet Window		Preferaj lingvoj
+Revert	Locale Preflet Window		Malfari
+Short format:	TimeFormatSettings		Mallonga aranĝo:
+Time	TimeFormatSettings		Horo
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		La listo de haveblaj lingvoj estas maltrovebla! Do vi ne povas uzi ĉi-tiu preferileto!

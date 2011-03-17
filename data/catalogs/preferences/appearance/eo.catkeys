@@ -1,43 +1,42 @@
-1	esperanto	x-vnd.Haiku-Appearance	3612090060
-Control highlight	Colors tab		Fenestraĵa emfazo
-Control border	Colors tab		Fenestraĵa rando
-Antialiasing type:	AntialiasingSettingsView		Glatigada tipo:
-Shadow	Colors tab		Ombro
-On	AntialiasingSettingsView		Ŝaltita
-Defaults	APRWindow		Aprioraj
-Grayscale	AntialiasingSettingsView		Grizoskalo
-Shine	Colors tab		Brilo
-Off	AntialiasingSettingsView		Malŝaltita
-Success	Colors tab		Sukceso
-Inactive window tab text	Colors tab		Teksto de neaktiva fenestra langeto
-Failure	Colors tab		Malsukceso
-Hinting menu	AntialiasingSettingsView		Menuo Polurado
-Document background	Colors tab		Dokumenta fono
-Revert	APRWindow		Malfari
-Window tab	Colors tab		Fenestra langeto
-Tooltip background	Colors tab		Ŝpruchelpila fono
-Selected menu item background	Colors tab		Fono de elektita menuero
+1	esperanto	x-vnd.Haiku-Appearance	1227622574
 Antialiasing	APRWindow		Glatigado
-Navigation base	Colors tab		Navigada bazo
-Window tab text	Colors tab		Teksto de fenestra langeto
-Document text	Colors tab		Dokumenta teksto
-Navigation pulse	Colors tab		Navigada pulso
-Selected menu item text	Colors tab		Teksto de elektita menuero
-Menu background	Colors tab		Menua fono
-Appearance	APRWindow		Aspekto
-Panel background	Colors tab		Panela fono
+Antialiasing menu	AntialiasingSettingsView		Menuo Glatigado
+Antialiasing type:	AntialiasingSettingsView		Glatigada tipo:
 Colors	APRWindow		Koloroj
 Control background	Colors tab		Fenestraĵa fono
-Inactive window tab	Colors tab		Neaktiva fenestra langeto
-Reduce colored edges filter strength:	AntialiasingSettingsView		Intenseco de filtro de malgrandigo de koloraj randoj:
-Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		La subbildera glatigado ne estas havebla kun la signobilda polurado en ĉi-tiu versio de Haiku por eviti problemojn de patentoj. Por ŝalti ĉi-tiun eblon, vi mem devas munti Haiku-on kaj ŝalti certajn opciojn en la konfigura ĉapo de libfreetype.
+Control border	Colors tab		Fenestraĵa rando
+Control highlight	Colors tab		Fenestraĵa emfazo
 Control text	Colors tab		Fenestraĵa teksto
-Tooltip text	Colors tab		Ŝpruchelpila teksto
-Menu item text	Colors tab		Menuera teksto
-LCD subpixel	AntialiasingSettingsView		Likvakristala ekrana subbildera
-Selected menu item border	Colors tab		Elektita menuera rando
-Strong	AntialiasingSettingsView		Forta
-Panel text	Colors tab		Panela teksto
-Monospaced fonts only	AntialiasingSettingsView		Sole egallarĝaj tiparoj
-Antialiasing menu	AntialiasingSettingsView		Menuo Glatigado
+Defaults	APRWindow		Aprioraj
+Document background	Colors tab		Dokumenta fono
+Document text	Colors tab		Dokumenta teksto
+Failure	Colors tab		Malsukceso
 Glyph hinting:	AntialiasingSettingsView		Signobilda polurado:
+Grayscale	AntialiasingSettingsView		Grizoskalo
+Hinting menu	AntialiasingSettingsView		Menuo Polurado
+Inactive window tab	Colors tab		Neaktiva fenestra langeto
+Inactive window tab text	Colors tab		Teksto de neaktiva fenestra langeto
+LCD subpixel	AntialiasingSettingsView		Likvakristala ekrana subbildera
+Menu background	Colors tab		Menua fono
+Menu item text	Colors tab		Menuera teksto
+Monospaced fonts only	AntialiasingSettingsView		Sole egallarĝaj tiparoj
+Navigation base	Colors tab		Navigada bazo
+Navigation pulse	Colors tab		Navigada pulso
+Off	AntialiasingSettingsView		Malŝaltita
+On	AntialiasingSettingsView		Ŝaltita
+Panel background	Colors tab		Panela fono
+Panel text	Colors tab		Panela teksto
+Reduce colored edges filter strength:	AntialiasingSettingsView		Intenseco de filtro de malgrandigo de koloraj randoj:
+Revert	APRWindow		Malfari
+Selected menu item background	Colors tab		Fono de elektita menuero
+Selected menu item border	Colors tab		Elektita menuera rando
+Selected menu item text	Colors tab		Teksto de elektita menuero
+Shadow	Colors tab		Ombro
+Shine	Colors tab		Brilo
+Strong	AntialiasingSettingsView		Forta
+Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		La subbildera glatigado ne estas havebla kun la signobilda polurado en ĉi-tiu versio de Haiku por eviti problemojn de patentoj. Por ŝalti ĉi-tiun eblon, vi mem devas munti Haiku-on kaj ŝalti certajn opciojn en la konfigura ĉapo de libfreetype.
+Success	Colors tab		Sukceso
+Tooltip background	Colors tab		Ŝpruchelpila fono
+Tooltip text	Colors tab		Ŝpruchelpila teksto
+Window tab	Colors tab		Fenestra langeto
+Window tab text	Colors tab		Teksto de fenestra langeto

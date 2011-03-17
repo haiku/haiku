@@ -1,0 +1,7 @@
+1	esperanto	x-vnd.Haiku-ReadOnlyBootPrompt	2165068388
+Desktop (Live-CD)	BootPromptWindow		Labortablo (Viva Lumdisko)
+Do you wish to run the Installer or continue booting to the Desktop? You can also select your preferred language and keyboard layout from the list below.\n\nNote: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.	BootPromptWindow		Ĉu vi volas lanĉi la Instalilon aŭ daŭrigi la startadon al Labortablo? Vi eblas ankaŭ elekti vian preferan lingvon kaj klavaran aranĝon el la jena listo.\n\nRimarku: La lokigado de Haiku-aj aplikaĵoj estas daŭranta verko. Vi ofte trovos mesaĝojn netradukitajn (aŭ malperfektajn), sed se vi volas, vi povas kuniĝi la laboron ĉe <www.haiku-os.org>.
+Keymap	BootPromptWindow		Klavara aranĝo
+Language	BootPromptWindow		Lingvo
+Run Installer	BootPromptWindow		Lanĉi Instalilon
+Welcome to Haiku!	BootPromptWindow		Bonvenon ĉe Haiku!
