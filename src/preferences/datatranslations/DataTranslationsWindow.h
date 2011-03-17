@@ -11,17 +11,13 @@
 #define DATA_TRANSLATIONS_WINDOW_H
 
 
+#include <Box.h>
+#include <Path.h>
+#include <View.h>
 #include <Window.h>
 
 #include "IconView.h"
-
-
-class BBox;
-class BStringView;
-class BView;
-
-class IconView;
-class TranslatorListView;
+#include "TranslatorListView.h"
 
 
 class DataTranslationsWindow : public BWindow {

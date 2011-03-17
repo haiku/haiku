@@ -17,6 +17,7 @@
 #include <Application.h>
 #include <Alignment.h>
 #include <Alert.h>
+#include <Entry.h>
 #include <Bitmap.h>
 #include <Box.h>
 #include <Button.h>
