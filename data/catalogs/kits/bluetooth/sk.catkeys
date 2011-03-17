@@ -1,0 +1,88 @@
+1	slovak	x-vnd.Haiku-Bluetooth	3550394259
+#CommandFailed#Not Valid name	RemoteDevice		#PríkazZlyhal#Neplatný názov
+#NoOwnerError#Not Valid name	RemoteDevice		#ChybaNeexistujeVlastník#Neplatný názov
+#NotCompletedRequest#Not Valid name	RemoteDevice		#NedokončenáPožiadavka#Neplatný názov
+#ServerNotReady#Not Valid name	RemoteDevice		#ServerNepripravený#Nie je platný názov
+(reserved)	DeviceClass		(vyhradené)
+1-17% utilized	DeviceClass		1-17% využitých
+17-33% utilized	DeviceClass		17-33% využitých
+33-50% utilized	DeviceClass		33-50% využitých
+50-67% utilized	DeviceClass		50-67% využitých
+67-83% utilized	DeviceClass		67-83% využitých
+83-99% utilized	DeviceClass		83-99% využitých
+Audio	DeviceClass		Zvuk
+Audio/Video	DeviceClass		Zvuk/video
+Camcorder	DeviceClass		Kamera
+Camera	DeviceClass		Fotoaparát
+Capturing	DeviceClass		Zachytávanie
+Car audio	DeviceClass		Zvukový systém vozidla
+Card reader	DeviceClass		Čítačka kariet
+Cellular	DeviceClass		Mobilné zariadenie
+Combo keyboard/pointing device	DeviceClass		Kombo klávesnica/polohovacie zariadenie
+Common ISDN access	DeviceClass		Bežný prístup ISDN
+Computer	DeviceClass		Počítač
+Controller	DeviceClass		Ovládač
+Cordless	DeviceClass		Bezdrôtový
+Desktop workstation	DeviceClass		Pracovná stanica
+Device conforms to the headset profile	DeviceClass		Zariadenie zodpovedá headset profilu
+Digitizer tablet	DeviceClass		Tablet
+Display	DeviceClass		Displej
+Doll/Action figure	DeviceClass		Bábika/akčná figúrka
+Fully available	DeviceClass		Plne dostupné
+Game	DeviceClass		Hra
+Gamepad	DeviceClass		Gamepad
+Gaming/Toy	DeviceClass		Hra/hračka
+Glasses	DeviceClass		Okuliare
+Handheld	DeviceClass		Handheld
+Hands-free	DeviceClass		Hands-free
+Headphones	DeviceClass		Slúchadlá
+Helmet	DeviceClass		Helma
+HiFi audio device	DeviceClass		Zvukové zariadenie HiFi
+Imaging	DeviceClass		Obraz
+Information	DeviceClass		Informácie
+Invalid device class!\n	DeviceClass		Neplatná trieda zariadenia!\n
+Jacket	DeviceClass		Bunda
+Joystick	DeviceClass		Joystick
+Keyboard	DeviceClass		Klávesnica
+LAN access	DeviceClass		Prístup k sieti LAN
+Laptop	DeviceClass		Notebook
+Loudspeaker	DeviceClass		Reproduktor
+Major class: 	DeviceClass		Hlavná trieda:
+Microphone	DeviceClass		Mikrofón
+Minor class: 	DeviceClass		Vedľajšia trieda:
+Miscellaneous	DeviceClass		Rôzne
+Networking	DeviceClass		Sieťové zariadenie
+No service available	DeviceClass		Nie je dostupná služba
+Not implemented	RemoteDevice		Neimplementované
+Object transfer	DeviceClass		Prenos objektov
+Pager	DeviceClass	A small radio device to receive short text messages	Pager
+Palm	DeviceClass	A palm-held device	Palm-held
+Peripheral	DeviceClass		Periférne zariadenie
+Phone	DeviceClass		Telefón
+Pointing device	DeviceClass		Polohovacie zariadenie
+Portable audio	DeviceClass		Prenosné zvukové zariadenie
+Positioning	DeviceClass		Umiestnenie
+Printer	DeviceClass		Tlačiareň
+Remote control	DeviceClass		Diaľkové ovládanie
+Rendering	DeviceClass		Vykresľovanie
+Robot	DeviceClass		Robot
+SIM card reader	DeviceClass		Čítačka SIM kariet
+Scanner	DeviceClass		Skener
+Sensing device	DeviceClass		Senzorové zariadenie
+Server	DeviceClass		Server
+Service classes: 	DeviceClass		Triedy služieb:
+Set-top box	DeviceClass		Set-top box
+Smart phone	DeviceClass		Smartfón
+Telephony	DeviceClass		Telefónia
+Uncategorized	DeviceClass		Nekategorizované
+Unknown (reserved) minor device class	DeviceClass		Neznáma (vyhradené) vedľajšia trieda zariadenia
+Unspecified	DeviceClass		Neuvedené
+VCR	DeviceClass		Videorekordér
+Vehicle	DeviceClass		Vozidlo
+Video camera	DeviceClass		Videokamera
+Video conferencing	DeviceClass		Videokonferencia
+Video display and loudspeaker	DeviceClass		Displej a reproduktor
+Video monitor	DeviceClass		Monitor
+Wearable	DeviceClass	A wearable computer	Počítač v oblečení
+Wired modem or voice gateway	DeviceClass		Modem s drôtovým pripojením alebo hlasová brána
+Wrist watch	DeviceClass		Náramkové hodinky

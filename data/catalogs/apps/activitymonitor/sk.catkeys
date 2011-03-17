@@ -1,0 +1,48 @@
+1	slovak	x-vnd.Haiku-ActivityMonitor	3275442606
+%.1f KB/s	DataSource		%.1f KB/s
+%.1f MB	DataSource		%.1f MB
+%.1f faults/s	DataSource		%.1f výpadkov/s
+%lld ms	SettingsWindow		%lld ms
+%lld sec.	SettingsWindow		%lld sek.
+ActivityMonitor	Application name		Monitor aktivity
+Add graph	ActivityWindow		Pridať graf
+Additional items	ActivityView		Ďalšie položky
+Apps	DataSource		Aplikácie
+Block cache	DataSource		Bloková cache
+Block cache memory	DataSource		Bloková vyrovnávacia pamäť
+CPU	DataSource		CPU
+CPU usage	DataSource		Využitie CPU
+CPU usage (combined)	DataSource		Využitie CPU (kombinované)
+Cache	DataSource		Vyrovnávacia pamäť
+Cached memory	DataSource		Pamäť v cache
+File	ActivityWindow		Súbor
+Hide legend	ActivityView		Skryť legendu
+MB	DataSource		MB
+Media nodes	DataSource		Mediálne uzly
+Memory	DataSource		Pamäť
+Network receive	DataSource		Sieť - prijaté
+Network send	DataSource		Sieť - odoslané
+P-faults	DataSource		P-fault
+Page faults	DataSource		Výpadky stránok
+Ports	DataSource		Porty
+Quit	ActivityWindow		Ukončiť
+RX	DataSource	Shorter version for Receiving.	RX
+Raw clipboard size	DataSource		Hrubá veľkosť schránky
+Receiving	DataSource		Prijíma sa
+Remove graph	ActivityView		Odstrániť graf
+Running applications	DataSource		Bežiace aplikácie
+Semaphores	DataSource		Semafory
+Sems	DataSource		Semafory
+Sending	DataSource		Posiela sa
+Settings	ActivityWindow		Nastavenia
+Settings…	ActivityWindow		Nastavenia...
+Show legend	ActivityView		Zobraziť legendu
+Swap	DataSource		Odkladací priestor
+Swap space	DataSource		Odkladací priestor
+TX	DataSource	Shorter version for Sending	TX
+Teams	DataSource		Tímy
+Text clipboard size	DataSource		Veľkosť textovej schránky
+Threads	DataSource		Vlákna
+Update time interval:	SettingsWindow		Časový interval aktualizácie:
+Used memory	DataSource		Využitá pamäť
+usage	DataSource		využitie

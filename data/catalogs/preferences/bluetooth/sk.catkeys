@@ -1,0 +1,61 @@
+1	slovak	x-vnd.Haiku-BluetoothPrefs	924856438
+15 secs	Settings view		15 sekúnd
+61 secs	Settings view		61 sekúnd
+About Bluetooth…	Window		O aplikácii Bluetooth...
+Add device to list	Inquiry panel		Pridať zariadenie do zoznamu
+Add…	Remote devices		Pridať...
+Always ask	Settings view		Vždy sa pýtať
+As blocked	Remote devices		Ako blokované
+Authenticate	Extended local device view		Autentifikovať
+Bluetooth	Application name		Bluetooth
+Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Zistiť, či sú schopnosti Bluetooth vášho vzdialeného zariadenia aktivované. Stlačením „Zistenie“ spustíte hľadanie. Potrebný čas na zistenie názvov nie je známy, ale nemal by byť dlhší ako 3 sekundy na zariadenie. Potom ich budete môcť pridať do svojho hlavného zoznamu, kde sa s nimi budete môcť spárovať.
+Connections & channels…	Window		Spojenia a kanály...
+Default inquiry time:	Settings view		Predvolený čas zisťovania:
+Defaults	Window		Predvolené
+Desktop	Settings view		Plocha
+Disconnect	Remote devices		Odpojiť
+Discoverable	Extended local device view		Objaviteľné
+From all devices	Settings view		Zo všetkých zariadení
+Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Haiku Bluetooth system, (ARCE)\n\nVytvoril Oliver Ruiz Dorantes\n\nS podporou:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nVďaka jednotlivcom, ktorí pomohli...\n\nPoskytli/darovali hardvér:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nSo záplatami:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nVšetky vedomosti mi poskytol:\n\t- the yellowTAB team
+Handheld	Settings view		Handheld
+Help	Window		Pomoc
+Identify host as:	Settings view		Identifikovať hostiteľa ako...
+Identify us as...	Settings view		Identifikovať sa ako...
+Incoming connections policy:	Settings view		Politika prichádzajúcich spojení:
+Inquiry	Inquiry panel		Zistenie
+Laptop	Settings view		Notebook
+Local devices found on system:	Settings view		Lokálne zariadenia nájdené na systéme:
+Manufacturer: 	Device View		Výrobca:
+OK	main		OK
+Only from trusted devices	Settings view		Iba z dôveryhodných zariadení
+Pair…	Remote devices		Spárovať...
+Pick LocalDevice...	Settings view		Vybrať lokálne zariadenie...
+Policy...	Settings view		Politika...
+Quit	main		Ukončiť
+Refresh LocalDevices…	Window		Obnoviť lokálne zariadenia...
+Refresh…	Remote devices		Obnoviť...
+Remaining %1 seconds	Inquiry panel		Zostáva %1 sekúnd
+Remote devices	Window		Vzdialené zariadenia
+Remote devices list…	Window		Zoznam vzdialených zariadení
+Remove	Remote devices		Odstrániť
+Retrieving name of %1	Inquiry panel		Zisťuje sa názov %1
+Retrieving names...	Inquiry panel		Získavajú sa názvy...
+Revert	Window		Vrátiť
+Scanning completed.	Inquiry panel		Hľadanie dokončené.
+Scanning progress	Inquiry panel		Priebeh hľadania
+Server	Settings view		Server
+Server	Window		Server
+Service classes: 	Device View		Triedy služieb:
+Settings	Window		Nastavenia
+Show bluetooth console…	Window		Zobraziť konzolu bluetooth...
+Show name	Extended local device view		Zobraziť názov
+Smart phone	Settings view		Smartfón
+Start bluetooth services…	Window		Spustiť služby bluetooth...
+Start please	main		Prosím, začnite
+Starting scan...	Inquiry panel		Začína hľadanie...
+Stop bluetooth services…	Window		Zastaviť zariadenia bluetooth...
+There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Na systéme nie je registrované žiadne lokálne zariadenie Bluetooth
+View	Window		Zobraziť
+Work offline	main		Pracovať offline
+bluetooth_server has not been found running on the system. Should be started, or stay offline	main		Bolo zistené, že na systéme nebeží bluetooth_server. Môžete ho spustiť alebo zostať offline.
+packets: 	Device View		pakety:
