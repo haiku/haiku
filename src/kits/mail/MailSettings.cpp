@@ -335,12 +335,38 @@ BMailAccounts::BMailAccounts()
 	BDirectory dir(path.Path());
 	if (dir.InitCheck() != B_OK)
 		return;
+
+	std::vector<time_t> creationTimeList;
 	BEntry entry;
 	while (dir.GetNextEntry(&entry) != B_ENTRY_NOT_FOUND) {
-		BMailAccountSettings* account = new BMailAccountSettings(entry);
-		if (account->InitCheck() != B_OK)
+		BNode node(&entry);
+		time_t creationTime;
+		if (node.GetCreationTime(&creationTime) != B_OK)
 			continue;
-		fAccounts.AddItem(account);
+
+		BMailAccountSettings* account = new BMailAccountSettings(entry);
+		if (account->InitCheck() != B_OK) {
+			delete account;
+			continue;
+		}
+
+		// sort by creation time
+		int insertIndex = -1;
+		for (unsigned int i = 0; i < creationTimeList.size(); i++) {
+			if (creationTimeList[i] > creationTime) {
+				insertIndex = i;
+				break;
+			}
+		}
+		if (insertIndex < 0) {
+			fAccounts.AddItem(account);
+			creationTimeList.push_back(creationTime);
+		} else {
+			fAccounts.AddItem(account, insertIndex);
+			creationTimeList.insert(creationTimeList.begin() + insertIndex,
+				creationTime);
+		}
+		
 	}
 }
 
@@ -793,14 +819,9 @@ BMailAccountSettings::Save()
 	fOutboundSettings.Save(outboundSettings);
 	settings.AddMessage("outbound", &outboundSettings);
 
-	BEntry oldEntry = fAccountFile;
-	status_t status = _CreateAccountFile();
+	status_t status = _CreateAccountFilePath();
 	if (status != B_OK)
 		return status;
-	oldEntry.Remove();
-
-	BPath path;
-	fAccountFile.GetPath(&path);
 
 	BFile file(&fAccountFile, B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
 	status = file.InitCheck();
@@ -836,7 +857,7 @@ BMailAccountSettings::AccountFile()
 
 
 status_t
-BMailAccountSettings::_CreateAccountFile()
+BMailAccountSettings::_CreateAccountFilePath()
 {
 	BPath path;
 	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
@@ -844,6 +865,9 @@ BMailAccountSettings::_CreateAccountFile()
 		return status;
 	path.Append("Mail/accounts");
 	create_directory(path.Path(), 777);
+
+	if (fAccountFile.InitCheck() == B_OK)
+		return B_OK;
 
 	BString fileName = fAccountName;
 	if (fileName == "")

@@ -172,7 +172,7 @@ class BMailAccountSettings
 
 	const	BEntry&				AccountFile();
 private:
-			status_t			_CreateAccountFile();
+			status_t			_CreateAccountFilePath();
 
 			status_t			fStatus;
 			BEntry				fAccountFile;
