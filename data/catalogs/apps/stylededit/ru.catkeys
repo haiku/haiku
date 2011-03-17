@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-StyledEdit	881610730
+1	russian	x-vnd.Haiku-StyledEdit	2766123717
 ???	LoadAlert		???
 Align	Menus		Выровнять
 Black	Menus		Черный
@@ -71,6 +71,7 @@ Search backwards	FindandReplaceWindow		Искать снизу вверх
 Select all	Menus		Выделить всё
 Size	Menus		Размер
 Statistics…	Menus		Статистика…
+StyledEdit	Application name		Текстовый редактор
 This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Этот файл отмечен только для чтения. Сохранить изменения в документе \"%s\"? 
 Undo typing	QuitAlert		Отменить ввод
 Untitled 	StyledEditWindow		Новый документ 

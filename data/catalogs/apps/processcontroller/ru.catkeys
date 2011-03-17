@@ -1,6 +1,5 @@
-1	russian	x-vnd.Haiku-ProcessController	3843135737
+1	russian	x-vnd.Haiku-ProcessController	1732034014
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
-About	ProcessController		about
 About ProcessController…	ProcessController		О контроллере процессов…
 Cancel	ProcessController		Отмена
 Custom priority	ProcessController		Заданный приоритет
@@ -10,8 +9,9 @@ Debug thread	ProcessController		Отладить поток
 Display priority	ProcessController		Приоритет отображения
 Do you really want to kill the team \"%s\"?	ProcessController		Вы действительно хотите убить приложение \"%s\"?
 Error saving file	ProcessController		Ошибка при сохранении файла
-Gone teams…	ProcessController		Завершённые приложения…
+Gone teams…	ProcessController		Завершённые приложения
 Idle priority	ProcessController		Приоритет покоя
+Info	ProcessController		Информация
 Install in Deskbar	ProcessController		Установить в Deskbar
 Kill this thread!	ProcessController		Убить этот поток!
 Live in the Deskbar	ProcessController		Отображать в Deskbar
@@ -22,9 +22,9 @@ New Terminal	ProcessController		Новый терминал
 Normal priority	ProcessController		Нормальный приоритет
 OK	ProcessController		ОК
 Ok!	ProcessController		ОК!
-ProcessController	ProcessController		ProcessController
+Please confirm	ProcessController		Пожалуйста, подтвердите
+ProcessController	Application name		Контроллер процесов
 ProcessController is already installed in Deskbar.	ProcessController		Контроллер процессов уже установлен в Deskbar.
-ProcessController\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n	ProcessController		ProcessController\n\nCopyright 1997-2001,\nGeorges-Edouard Berenger.\n\nCopyright © 2007 Haiku, Inc.\n
 Processor %d	ProcessController		Процессор %d
 Quit an application	ProcessController		Завершить приложение
 Quit application	ProcessController		Завершить приложение
@@ -33,7 +33,7 @@ Real-time priority	ProcessController		Приоритет реального вр
 Restart Deskbar	ProcessController		Перезапустить Deskbar
 Restart Tracker	ProcessController		Перезапустить Tracker
 Run in window	ProcessController		Запустить в окне
-System resources & caches…	ProcessController		Системные ресурсы и кеш…
+System resources & caches…	ProcessController		Системные ресурсы и кеш
 That's no Fun!	ProcessController		Это не смешно!
 This is the last active processor...\nYou can't turn it off!	ProcessController		Это последний активный процессор...\nВы не можете его отключить!
 This team is already gone…	ProcessController		Этого приложения уже не существует…

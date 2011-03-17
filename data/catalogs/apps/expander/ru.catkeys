@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Expander	3863172519
+1	russian	x-vnd.Haiku-Expander	51964396
 About Expander…	ExpanderMenu		О программе…
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Вы уверены, что хотите остановить распаковку этого\nархива? Некоторые файлы могли быть извлечены не полностью.
 Automatically expand files	ExpanderPreferences		Автоматически распаковывать файлы
@@ -14,8 +14,7 @@ Destination folder:	ExpanderPreferences		Путь для извлечения
 Error when expanding archive	ExpanderWindow		Ошибка при распаковке файла
 Expand	ExpanderMenu		Распаковать
 Expand	ExpanderWindow		Извлечь
-Expander	About		Expander
-Expander	ExpanderWindow	!! Window Title !!	Распаковщик
+Expander	Application name		Распаковщик
 Expander settings	ExpanderPreferences		Настройки извлечения
 Expander: Choose destination	DirectoryFilePanel		Expander: Выбор папки для извлечения
 Expander: Open	ExpanderWindow		Распаковщик: Открыть
@@ -25,7 +24,6 @@ File	ExpanderMenu		Файл
 File expanded	ExpanderWindow		Файл распакован
 Hide contents	ExpanderWindow		Скрыть содержимое
 Leave destination folder path empty	ExpanderPreferences		Оставить путь распаковки пустым
-OK	About		ОК
 OK	ExpanderPreferences		ОК
 Open destination folder after extraction	ExpanderPreferences		Открыть папку с извлеченными файлами после распаковки
 Other:	ExpanderPreferences		Другое:
@@ -49,5 +47,4 @@ The destination is read only.	ExpanderWindow		Путь назначения до
 The file doesn't exist	ExpanderWindow		Файл не существует
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Папка была перемещена, переименована либо не\nподдерживается.
 Use:	ExpanderPreferences		Использовать:
-\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tразработал Jérôme Duvalnt\n\tCopyright 2004-2006, Haiku Inc.\n\nОригинальную Be версию разработали\nDominic, Hiroshi, Peter, Pavel и Robert\n
 is not supported	ExpanderWindow		 не поддерживается

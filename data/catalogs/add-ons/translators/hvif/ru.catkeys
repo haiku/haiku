@@ -2,7 +2,7 @@
 HVIF Settings	HVIFMain		Настройки HVIF транслятора
 HVIF icons	HVIFTranslator		HVIF значки
 HVIFTranslator Settings	HVIFTranslator		Настройки HVIF транслятора
-Native Haiku icon format translator	HVIFView		Транслятор HVIF изображений
+Native Haiku icon format translator	HVIFView		Транслятор HVIF значков
 Native Haiku vector icon translator	HVIFTranslator		Транслятор векторных значков Haiku
-Render size:	HVIFView		Размер изображения:
+Render size:	HVIFView		Размер значков:
 Version %d.%d.%d, %s	HVIFView		Версия %d.%d.%d, %s

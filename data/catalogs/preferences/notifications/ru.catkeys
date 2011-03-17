@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Notifications	1635178721
+1	russian	x-vnd.Haiku-Notifications	3545587988
 Above icon	DisplayView		Над значком
 Allowed	NotificationView		Разрешено
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Произошла ошибка при сохранении настроек\nВозможно, что закончилось свободное место на диске.
@@ -28,7 +28,6 @@ Mini icon	DisplayView		Мелкие значки
 No	NotificationView		Нет
 Notifications	GeneralView		Уведомления
 Notifications	NotificationView		Уведомления
-Notifications	PrefletWin		Уведомления
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Невозможно остановить уведомления, потому что сервер уведомлений недоступен.
 OK	DisplayView		ОК
 OK	GeneralView		ОК

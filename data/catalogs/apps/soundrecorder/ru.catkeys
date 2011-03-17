@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-SoundRecorder	1355572422
+1	russian	x-vnd.Haiku-SoundRecorder	1960509649
 Cannot connect to media server	RecorderWindow		Невозможно подключиться к медиа серверу
 Cannot connect to the selected sound input	RecorderWindow		Невозможно подключиться к выбранному звуковому входу
 Cannot find an unused name to use for the new recording	RecorderWindow		Невозможно найти свободное имя для новой записи
@@ -32,7 +32,7 @@ Sample size: 	RecorderWindow		Размер сэмпла:
 Save	RecorderWindow		Сохранить
 Some of the files don't appear to be audio files	RecorderWindow		Некоторые из файлов не являются аудио файлами
 Sound List	RecorderWindow		Список звуков
-SoundRecorder	RecorderWindow		Звукозапись
+SoundRecorder	Application name		Звукозапись
 Stop	RecorderWindow		Стоп
 bits	RecorderWindow		 бит
 seconds	RecorderWindow		 секунд

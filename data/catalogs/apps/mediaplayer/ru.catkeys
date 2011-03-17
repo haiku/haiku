@@ -1,4 +1,6 @@
-1	russian	x-vnd.Haiku-MediaPlayer	2929328887
+1	russian	x-vnd.Haiku-MediaPlayer	1621996569
+%app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% обнаружил внутреннюю ошибку. Файл не может быть открыт.
+%app%\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		%app%\n\nРазработал Marcus Overhagen, Stephan Aßmus и Frederik Modéen
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Американский)
 100% scale	MediaPlayer-Main		Масштаб 100%
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Синемаскоп)
@@ -12,7 +14,6 @@
 <unknown>	PlaylistItem-author		<неизвестно>
 <unnamed>	PlaylistItem-name		<без названия>
 <untitled>	PlaylistItem-title		<безымянный>
-About MediaPlayer…	MediaPlayer-Main		О программе…
 All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Все файлы не могу быть перемещены в корзину.
 Always on top	MediaPlayer-Main		Всегда сверху
 Aspect ratio	MediaPlayer-Main		Соотношение сторон
@@ -51,10 +52,8 @@ Lock Peaks	MediaPlayer-PeakView		Зафиксировать пики
 Loop movies by default	MediaPlayer-SettingsWindow		Зацикливать видео по умолчанию
 Loop sounds by default	MediaPlayer-SettingsWindow		Зацикливать музыку по умолчанию
 Low volume	MediaPlayer-SettingsWindow		Низкой громкости
-MediaPlayer	MediaPlayer-Main		Медиаплеер
-MediaPlayer encountered an internal error. The file could not be opened.	MediaPlayer-Main		Медиаплеер обнаружил внутреннюю ошибку. Файл не может быть открыт.
+MediaPlayer	Application name		Медиаплеер
 MediaPlayer settings	MediaPlayer-SettingsWindow		Настройки медиаплеера
-MediaPlayer\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		MediaPlayer\n\nРазработал Marcus Overhagen, Stephan Aßmus и Frederik Modéen
 Medium	MediaPlayer-SettingsWindow		cредний
 Move Entries	MediaPlayer-MovePLItemsCmd		Переместить записи
 Move Entry	MediaPlayer-MovePLItemsCmd		Переместить запись
@@ -80,7 +79,6 @@ Open…	MediaPlayer-PlaylistWindow		Открыть…
 Pause	MediaPlayer-Main		Пауза
 Pause playback.	MediaPlayer-Main		Приостановить проигрывание.
 Play	MediaPlayer-Main		Играть
-Play background clips at	MediaPlayer-SettingsWindow		Проигрывать фоновые клипы на
 Play mode	MediaPlayer-SettingsWindow		Режим проигрывания
 Playlist	MediaPlayer-PlaylistWindow		Плей-лист
 Playlist…	MediaPlayer-Main		Плей-лист…
@@ -117,8 +115,8 @@ Start playing.	MediaPlayer-Main		Начать проигрывание.
 Stop	MediaPlayer-Main		Стоп
 Stop playing.	MediaPlayer-Main		Остановить проигрывание.
 Stream settings	MediaPlayer-Main		Настройки потока
-Subtitle placement	MediaPlayer-SettingsWindow		Расположение субтитров
-Subtitle size	MediaPlayer-SettingsWindow		Размер субтитров
+Subtitle placement:	MediaPlayer-SettingsWindow		Расположение субтитров:
+Subtitle size:	MediaPlayer-SettingsWindow		Размер субтитров:
 Subtitles	MediaPlayer-Main		Субтитры
 Thanks	MediaPlayer-Main		Спасибо
 The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Файл '%filename' не может быть открыт.\n\n
@@ -136,6 +134,6 @@ Video	MediaPlayer-Main		Видео
 Video track	MediaPlayer-Main		Видеотрек
 View options	MediaPlayer-SettingsWindow		Настройки вида
 Volume	MediaPlayer-Main		Громкость
-error	MediaPlayer-Main		ошибка
+Volume of background clips	MediaPlayer-SettingsWindow		Проигрывать фоновые клипы на
 none	Audio track menu		пусто
 none	Subtitles menu		отсутствуют

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Devices	189828730
+1	russian	x-vnd.Haiku-Devices	1465776728
 ACPI Information	DeviceACPI		Информация ACPI
 ACPI Processor Namespace '%2'	DeviceACPI		Пространство имен процессора ACPI '%2'
 ACPI System Bus	DeviceACPI		Системная шина ACPI
@@ -8,8 +8,6 @@ ACPI bus	Device		Шина ACPI
 ACPI bus	DevicesView		Шина ACPI
 ACPI controller	Device		Контроллер ACPI
 ACPI node '%1'	DeviceACPI		ACPI нода '%1'
-About	DevicesApplication		о программе
-About Devices…	DevicesView		О программе…
 Basic information	DevicesView		Основная информация
 Bridge	Device		Мост
 Bus	DevicesView		Шина
@@ -30,9 +28,8 @@ Device name	DevicePCI		Название устройства
 Device name:	Device		Название устройства:
 Device paths	Device		Путь к устройству
 Device paths	DevicePCI		Пути устройства
-Devices	DevicesApplication		Устройства
+Devices	Application name		Устройства
 Devices	DevicesView		Устройства
-Devices\n\twritten by Pieter Panman\n\n\tBased on listdev by Jérôme Duval\n\tand the previous Devices preference\n\tby Jérôme Duval and Sikosis\n\tCopyright 2009, Haiku, Inc.\n	DevicesApplication		Devices\n\tразработал Pieter Panman.\n\n\tОсновано на listdev от Jérôme Duval\n\tи на предыдущей версии Devices,\n\tкоторую совместно разработали\n\tJérôme Duval и Sikosis.\n\tВсе права защищены 2009, Haiku, Inc.\n
 Display controller	Device		Контроллер дисплея
 Docking station	Device		Кредл
 Driver used	Device		Используемый драйвер
@@ -56,7 +53,6 @@ Network controller	Device		Сетевой контроллер
 None	Device		Отсутствует
 Not implemented	DeviceACPI		Не реализовано
 Not implemented	DevicePCI		Не реализовано
-OK	DevicesApplication		ОК
 Order by:	DevicesView		Сортировать по:
 PCI Information	DevicePCI		PCI информация 
 PCI bus	Device		Шина PCI

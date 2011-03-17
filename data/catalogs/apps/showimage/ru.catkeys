@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-ShowImage	3385354583
+1	russian	x-vnd.Haiku-ShowImage	2709418306
 %SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS секунды
 About ShowImage…	Menus		О программе…
 Browse	Menus		Просмотр
@@ -45,8 +45,7 @@ Save as…	Menus		Сохранить как…
 Select all	Menus		Выделить всё
 Selection Mode	Menus		Режим выделения
 Show caption in full screen mode	Menus		Показывать название в полноэкранном режиме
-ShowImage	AboutWindow		ShowImage
-ShowImage	Menus		Просмотр изображений
+ShowImage	Application name		Просмотр изображений
 Slide delay	Menus		Задержка слайд шоу
 Slide show	Menus		Слайд шоу
 Stretch to window	Menus		Растягивать до размеров окна
@@ -57,6 +56,6 @@ Undo	Menus		Вернуть
 Use as background…	Menus		Сделать фоном рабочего стола…
 View	Menus		Вид
 Width:	PrintOptionsWindow		Ширина:
-Zoom factor in %:	PrintOptionsWindow		Увеличение в %:
+Zoom factor in %:	PrintOptionsWindow		Масштаб в %:
 Zoom in	Menus		Увеличить
 Zoom out	Menus		Уменьшить

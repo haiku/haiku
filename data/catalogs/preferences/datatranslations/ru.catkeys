@@ -1,13 +1,14 @@
-1	russian	x-vnd.Haiku-DataTranslations	1617331386
+1	russian	x-vnd.Haiku-DataTranslations	2849987867
 About	DataTranslations		подробнее
 An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Файл с именем '%name' уже существует в папке Translators! Заменить существующий транслятор?
 Cancel	DataTranslations		Отмена
 Could not install %s:\n%s	DataTranslations		Невозможно установить %s:\n%s
-DataTranslations	DataTranslations		Трансляция данных
 DataTranslations - Error	DataTranslations		Трансляция данных - ошибка
 DataTranslations - Note	DataTranslations		Трансляция данных - Заметка
 DataTranslations\n\twritten by Oliver Siebenmarck and others\n\tCopyright 2002-2010, Haiku Inc. All rights reserved.\n	DataTranslations		DataTranslations\n\tnразработал Oliver Siebenmarck и дригие\n\tCopyright 2002-2010, Haiku Inc. Все права защищены.\n
 Icon	DataTranslations		Значок
+Info	DataTranslations		Инфо
+Info:	DataTranslations		Инфо:
 Info…	DataTranslations		Информация…
 Name:	DataTranslations		Имя:
 Name:\t%s \nVersion:\t%ld.%ld.%ld\nInfo:\t%s\n\nPath:\n%s\n	DataTranslations		Имя:\t%s \nВерсия:\t%ld.%ld.%ld\nИнфо:\t%s\n\nПуть:\n%s\n

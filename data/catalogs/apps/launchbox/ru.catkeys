@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-LaunchBox	1672943267
+1	russian	x-vnd.Haiku-LaunchBox	3636680404
 About	LaunchBox		О программе
 Add button here	LaunchBox		Добавить сюда кнопку
 Auto-raise	LaunchBox		Всплывать автоматически
@@ -15,7 +15,7 @@ Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Не уд
 Horizontal layout	LaunchBox		Горизонтальное расположение
 Icon size	LaunchBox		Размер значков
 Ignore double-click	LaunchBox		Игнорировать двойной щелчок
-LaunchBox	LaunchBox		LaunchBox
+LaunchBox	Application name		Панель запуска
 Name Panel	LaunchBox		Название панели
 New	LaunchBox		Создать
 OK	LaunchBox		ОК

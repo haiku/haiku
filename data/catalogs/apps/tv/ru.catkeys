@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku.TV	3791845041
+1	russian	x-vnd.Haiku.TV	16571315
 About %1…	MainWin	Parameter %1 is the name of the application.	О программе…
 Always on top	MainWin		Всегда сверху
 Channel	MainWin		Канал
@@ -19,6 +19,7 @@ Quit	MainWin		Выход
 Scale to native size	MainWin		Оригинальный размер
 Settings	MainWin		Настройки
 Settings…	MainWin		Настройки…
+TV	Application name		Телевидение
 TV	MainWin		Телевидение
 \nBuild 	MainWin		\nСборка 
 \nRevision 	MainWin		\nРевизия 

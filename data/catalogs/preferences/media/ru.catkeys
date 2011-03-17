@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Media	1701788906
+1	russian	x-vnd.Haiku-Media	293613603
 <none>	Media views		<нет>
 Audio input:	Media views		Аудио вход:
 Audio mixer	Media Window		Микшер
@@ -11,7 +11,6 @@ Couldn't add volume control in Deskbar: %s\n	Media views		Не удалось д
 Couldn't remove volume control in Deskbar: %s\n	Media views		Не удалось удалить регулятор громкости из Deskbar: %s\n
 Defaults	Media views		По умолчанию
 Done shutting down.	Media Window		Остановка завершена.
-Media	Media Window		Медиа
 OK	Media Window		ОК
 Quit	Media Window		Выход
 Ready for use…	Media Window		Готов к использованию…

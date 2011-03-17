@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Mouse	3392409209
+1	russian	x-vnd.Haiku-Mouse	3904912604
 ...by Andrew Edward McCall	MouseApplication		...разработал Andrew Edward McCall
 1-Button	SettingsView		Однокнопочная
 2-Button	SettingsView		Двухкнопочная
@@ -14,7 +14,6 @@ Fast	SettingsView		Быстро
 Focus follows mouse	SettingsView		Фокус следует за мышью
 Focus mode:	SettingsView		Режим фокуса:
 Instant warp	SettingsView		Мгновенное перемещение
-Mouse	MouseWindow		Мышь
 Mouse acceleration	SettingsView		Ускорение курсора
 Mouse speed	SettingsView		Скорость курсора
 Mouse type:	SettingsView		Тип мыши:

@@ -1,11 +1,11 @@
-1	russian	x-vnd.Haiku-DiskProbe	1552395580
+1	russian	x-vnd.Haiku-DiskProbe	1375904521
 %ld (native)	ProbeView		%ld (родной)
 (native)	ProbeView		 (нативный)
 15 bit	TypeEditors		15 бит
 16 bit	TypeEditors		16 бит
 16 bit signed value:	TypeEditors		16-ти битное знаковое значение:
 16 bit unsigned value:	TypeEditors		16-ти битное беззнаковое значение:
-32 bit	TypeEditors		32 бит
+32 bit	TypeEditors		32 бита
 32 bit signed value:	TypeEditors		32-х битное знаковое значение:
 32 bit size or status:	TypeEditors		32-х битный размер или статус:
 32 bit unsigned pointer:	TypeEditors		32-х битный беззнаковый указатель:
@@ -53,11 +53,10 @@ Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it i
 Device	ProbeView		Устройство
 Device offset: 	ProbeView		Смещение устройства: 
 Device: 	ProbeView		Устройство: 
-DiskProbe	OpenWindow		Редактор диска
+DiskProbe	Application name		Редактор диска
 DiskProbe request	AttributeWindow		Запрос DiskProbe
 DiskProbe request	DiskProbe		Запрос DiskProbe
 DiskProbe request	ProbeView		Запрос DiskProbe
-DiskProbe\n\twritten by Axel Dörfler\n\tCopyright 2004-2007, Haiku.\n\nOriginal Be version by Robert Polic\n	DiskProbe		DiskProbe\n\tразработал Axel Dörfler\n\tCopyright 2004-2007, Haiku.\n\nОригинальную Be версию разработал Robert Polic\n
 Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Вы действительно хотите удалить атрибут \"%s\" из файла \"%s\"?\n\nЭту операцию будет невозможно отменить.
 Don't save	ProbeView		Не сохранять
 Double precision floating-point value:	TypeEditors		Значение плавающей запятой двойной точности:

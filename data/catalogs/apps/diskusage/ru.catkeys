@@ -1,16 +1,16 @@
-1	russian	x-vnd.Haiku-DiskUsage	3490177044
+1	russian	x-vnd.Haiku-DiskUsage	624290120
 %a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
 %d file	Status View		%d файл
 %d files	Status View		%d файлов
 9999.99 GB	Status View		9999.99 Гбайт
 Created	Info Window		Создан
-DiskUsage	MainWindow		Анализ использования дисков
+DiskUsage	Application name		Использование диска
 Free on %refName%	Scanner		Свободно на разделе %refName%
 Get Info	Pie View		Информация
 Kind	Info Window		Тип
 Modified	Info Window		Изменен
 Open	Pie View		Открыть
-Open With	Pie View		Открыть с
+Open With	Pie View		Открыть в
 Outdated view	Pie View		График устарел
 Path	Info Window		Путь
 Rescan	Pie View		Пересканировать

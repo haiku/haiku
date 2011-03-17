@@ -1,6 +1,5 @@
-1	russian	x-vnd.Haiku.PoorMan	805673381
+1	russian	x-vnd.Haiku.PoorMan	412131821
 A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Папка по умолчанию была создана в /boot/home/public_html.\nУбедитесь, что в этой папке есть HTML файл с именем index.html.
-About PoorMan	PoorMan		О программе…
 About PoorMan…	PoorMan		О программе…
 Advanced	PoorMan		Дополнительно
 Cancel	PoorMan		Отмена
@@ -13,7 +12,7 @@ Controls	PoorMan		Управление
 Copy	PoorMan		Копировать
 Create	PoorMan		Создать
 Create PoorMan log	PoorMan		Создать log PoorMan
-Create log file	PoorMan		Создать лог файл
+Create log file	PoorMan		Создать лог файл…
 Default	PoorMan		По умолчанию
 Dir Created	PoorMan		Создана директория
 Directory: 	PoorMan		Директория: 
@@ -35,7 +34,7 @@ Logging view	PoorMan		Окно логирования
 Max. simultaneous connections:	PoorMan		Максимум одновременных соединений:
 OK	PoorMan		ОК
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Пожалуйста, выберите папку для публикации.\n\nPoorMan может создать папку по умолчанию public_html в вашей домашней папке.\nИли вы можете выбрать любую другую папку.
-Poor Man's web server\nCopyright © 2004-2009 Haiku\nAll rights reserved.\n\nWritten by: Philip Harrison, Ma Jie	PoorMan		Веб-сервер PoorMan\nCopyright © 2004-2009 Haiku\nВсе права защищены.\n\nРазработал: Philip Harrison, Ma Jie
+PoorMan	Application name		Веб-сервер PoorMan
 PoorMan settings	PoorMan		Настройки PoorMan
 Quit	PoorMan		Выход
 Run server	PoorMan		Запустиь сервер

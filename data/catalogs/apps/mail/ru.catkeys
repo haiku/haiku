@@ -1,4 +1,4 @@
-1	russian	x-vnd.Be-MAIL	2797564879
+1	russian	x-vnd.Be-MAIL	2684447565
 %d - Date	Mail		%d - Дата
 %e - E-mail address	Mail		%e - E-mail адрес
 %n - Full name	Mail		%n - Полное имя
@@ -60,7 +60,7 @@ Initial spell check mode:	Mail		Начальный режим проверки �
 Leave as '%s'	Mail		Оставить как '%s'
 Leave as New	Mail		Оставить как новое
 Leave same	Mail		Оставить
-Mail	Mail		Почта
+Mail	Application name		Почта
 Mail couldn't find its dictionary.	Mail		Невозможно найти файл словаря.
 Mail preferences	Mail		Настройки почты
 Mail\n\n	Mail		Mail\n

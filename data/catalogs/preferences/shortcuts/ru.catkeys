@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Shortcuts	3727835933
+1	russian	x-vnd.Haiku-Shortcuts	464488924
 (Choose application with file requester)	ShortcutsWindow		(Выбрать программу)
 About Shortcuts	ShortcutsApp		О программе…
 About Shortcuts	ShortcutsWindow		О программе…
@@ -23,7 +23,6 @@ Save	ShortcutsWindow		Сохранить
 Save & apply	ShortcutsWindow		Применить
 Save KeySet as…	ShortcutsWindow		Сохранить список как…
 Select	ShortcutsWindow		Выбрать
-Shortcuts	ShortcutsWindow		Горячие клавиши
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Не удалось открыть список горячих клавиш!
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Не удалось прочитать файл списка горячих клавиш!
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Не удалось сохранить ваш файл список горячих клавиш!

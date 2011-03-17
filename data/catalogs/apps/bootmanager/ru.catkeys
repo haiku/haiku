@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-BootManager	2058739736
+1	russian	x-vnd.Haiku-BootManager	140416535
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Все готово для восстановления загрузочной записи (MBR) раздела %disk из файла %file. Хотите продолжить?
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Все готово для записи загрузочного меню на диск. Вы уверены, что хотите продолжить?
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Все готово для записи загрузочного меню на загрузочный диск (%s). Пожалуйста, проверьте информацию ниже перед тем как продолжить.
@@ -13,10 +13,8 @@ At least one partition must be selected!	BootManagerController		Как мини�
 Back	BootManagerController	Button	Назад
 Backup Master Boot Record	BootManagerController	Title	Сохранить главную загрузочную запись (MBR)
 Boot Manager is unable to read the partition table!	BootManagerController		Менеджеру загрузки не удалось прочитать таблицу разделов!
-BootManager	BootManager	Application name	Менеджер загрузки
-BootManager	BootManagerWindow	Window Title	Менеджер загрузки
+BootManager	Application name		Менеджер загрузки
 Cannot access!	DrivesPage	Cannot install	Невозможно получить доступ!
-Copyright %year, Haiku Inc.\n	BootManager	Leave %year untranslated	Все права защищены %year, Haiku Inc.\n
 Default Partition	DefaultPartitionPage	Title	Раздел по умолчанию
 Default Partition:	DefaultPartitionPage	Menu field label	Раздел по умолчанию:
 Done	BootManagerController	Button	Готово
@@ -31,7 +29,6 @@ Installation of boot menu failed	BootManagerController	Title	Удаление з
 Never	DefaultPartitionPage		бесконечно
 Next	WizardView	Button	Далее
 No space available!	DrivesPage	Cannot install	Невозможно записать MBR!
-OK	BootManager		ОК
 OK	BootManagerController	Button	ОК
 Old Master Boot Record Saved failure	BootManagerController	Title	Предыдущая загрузочная запись (MBR) сохранена
 Old Master Boot Record saved	BootManagerController	Title	Предыдущая загрузочная запись (MBR) сохранена
@@ -66,4 +63,3 @@ Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Неизве�
 Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Unnamed %d
 Update	DrivesPage	Button	Обновить
 Write boot menu	BootManagerController	Button	Записать загрузочное меню
-written by	BootManager		разработал

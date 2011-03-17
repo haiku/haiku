@@ -1,4 +1,7 @@
-1	russian	x-vnd.Haiku-Pulse	3652781474
+1	russian	x-vnd.Haiku-Pulse	3925234302
+%.2f GHz	NormalPulseView		%.2f ГГц
+%ld MHz	NormalPulseView		%ld МГц
+%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nразработали David Ramsey и Arve Hjønnevåg\nИсправлен Daniel Switkin\n
 About Pulse…	CPUButton		О программе…
 About Pulse…	PulseView		О программе…
 Active color	ConfigView		Активный цвет
@@ -10,11 +13,15 @@ Deskbar menu	CPUButton		Меню Deskbar
 Deskbar mode	MiniPulseView		Режим Deskbar
 Deskbar mode	NormalPulseView		Режим Deskbar
 Deskbar mode	PrefsWindow		Режим Deskbar
+Error	PulseApp		Ошибка
 Fade colors	ConfigView		Затенять цвета
 Frame color	ConfigView		Цвет рамки
 Idle color	ConfigView		Цвет бездействия
 Info	CPUButton		Информация
 Info	DeskbarPulseView		Информация
+Info	PulseApp		Информация
+Info	PulseView		Информация
+Installing in Deskbar failed\n%s	PulseApp		Не удалось установить в Deskbar.\n%s
 Mini mode	DeskbarPulseView		Мини режим
 Mini mode	NormalPulseView		Мини режим
 Mini mode	PrefsWindow		Мини режим
@@ -26,12 +33,14 @@ OK	DeskbarPulseView		ОК
 OK	PrefsWindow		ОК
 OK	PulseApp		ОК
 OK	PulseView		ОК
+Pulse	Application name		Пульс
 Pulse	NormalPulseView		Пульс
-Pulse	PulseWindow		Пульс
+Pulse	PulseApp		Пульс
 Pulse settings	PulseWindow		Настройки пульсации
 Quit	DeskbarPulseView		Выход
 Quit	MiniPulseView		Выход
 Remove replicant	CPUButton		Удалить репликант
+Removing from Deskbar failed.\n%s	DeskbarPulseView		Не удалось удалить из Deskbar.\n%s
 Settings…	PulseView		Настройки…
 Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Использование: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
 Width of icon:	ConfigView		Размер значка:

@@ -1,10 +1,8 @@
-1	russian	x-vnd.Haiku.CodyCam	1322454590
-About CodyCam	CodyCam		О программе
-About Codycam…	CodyCam		О программе…
+1	russian	x-vnd.Haiku.CodyCam	441085909
 Can't find an available connection to the video window	CodyCam		Не удалось обнаружить доступного соединения с видео окном
 Cannot connect the video source to the video window	CodyCam		Невозможно подключить видео источник к видео окну
 Cannot create a video window	CodyCam		Невозможно создать видео окно
-Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		Не найден видеоисточник.\nПожалуйста, подключите вебкамеру.
+Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		Не найден источник видеосигнала.\nПожалуйста, подключите вебкамеру.
 Cannot find an available video stream	CodyCam		Невозможно найти видео поток
 Cannot find the media roster	CodyCam		Невозможно найти медиа ростер
 Cannot get a time source	CodyCam		Невозможно получить продолжительность
@@ -18,10 +16,8 @@ Cannot start time source!	CodyCam		Невозможно начать отсче�
 Capture Rate Menu	CodyCam		Меню периодичности захвата
 Capture controls	CodyCam		Настройки захвата
 Capturing Image…	VideoConsumer.cpp		Захват изображения…
-Close	CodyCam		Закрыть
 Closing the window\n	VideoConsumer.cpp		Закрытие окна\n
-CodyCam	CodyCam		Вебкамера
-CodyCam\n\nThe Original BeOS webcam	CodyCam		CodyCam\n\nТа самая вебкамера из BeOS
+CodyCam	Application name		Вебкамера
 Connected…	VideoConsumer.cpp		Подключен…
 Couldn't find requested directory on server	VideoConsumer.cpp		Невозможно найти запрашиваемый каталог на сервере
 Directory:	CodyCam		Каталог:

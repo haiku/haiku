@@ -1,13 +1,13 @@
-1	russian	x-vnd.Be-TSKB	4247133739
+1	russian	x-vnd.Be-TSKB	19976571
 <Be folder is empty>	BeMenu		<Папка Be пуста>
-About Haiku…	BeMenu		О системе Haiku…
+About Haiku	BeMenu		Про Haiku
 Always on top	PreferencesWindow		Всегда сверху
 Applications	PreferencesWindow		Приложения
 Auto-raise	PreferencesWindow		Всплывать автоматически
 Change time…	TimeView		Настроить часы…
 Clock	PreferencesWindow		Часы
 Close all	WindowMenu		Закрыть все
-Deskbar	MainWindow		Deskbar
+Deskbar	Application name		Deskbar
 Deskbar preferences	PreferencesWindow		Настройки Deskbar
 Deskbar preferences…	BeMenu		Настроить Deskbar…
 Edit menu…	PreferencesWindow		Изменить меню…
