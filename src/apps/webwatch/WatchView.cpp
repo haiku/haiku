@@ -120,7 +120,7 @@ void WatchView::Draw(BRect updateRect)
 
 void WatchView::MouseDown(BPoint point) 
 {
-	BPopUpMenu* menu = new BPopUpMenu(B_TRANSLATE("WatchView"), false, false);
+	BPopUpMenu* menu = new BPopUpMenu("WatchView", false, false);
 
 	menu->AddItem(new BMenuItem(
 		B_TRANSLATE("About"), 
