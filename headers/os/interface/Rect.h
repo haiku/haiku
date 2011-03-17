@@ -25,6 +25,7 @@ public:
 									float bottom);
 								BRect(BPoint leftTop, BPoint rightBottom);
 								BRect(BPoint leftTop, BSize size);
+								BRect(float side);
 
 			BRect&				operator=(const BRect& other);
 			void				Set(float left, float top, float right,
@@ -90,14 +91,14 @@ public:
 inline BPoint
 BRect::LeftTop() const
 {
-	return *(const BPoint *)&left;
+	return *(const BPoint*)&left;
 }
 
 
 inline BPoint
 BRect::RightBottom() const
 {
-	return *(const BPoint *)&right;
+	return *(const BPoint*)&right;
 }
 
 
@@ -117,48 +118,66 @@ BRect::RightTop() const
 
 inline
 BRect::BRect()
+	:
+	left(0),
+	top(0),	
+	right(-1),
+	bottom(-1)
 {
-	top = left = 0;
-	bottom = right = -1;
 }
 
 
 inline
 BRect::BRect(float l, float t, float r, float b)
+	:
+	left(l),
+	top(t),
+	right(r),
+	bottom(b)
 {
-	left = l;
-	top = t;
-	right = r;
-	bottom = b;
 }
 
 
 inline
 BRect::BRect(const BRect& r)
+	:
+	left(r.left),
+	top(r.top),
+	right(r.right),
+	bottom(r.bottom)
 {
-	left = r.left;
-	top = r.top;
-	right = r.right;
-	bottom = r.bottom;
 }
 
 
 inline
 BRect::BRect(BPoint leftTop, BPoint rightBottom)
+	:
+	left(leftTop.x),
+	top(leftTop.y),
+	right(rightBottom.x),
+	bottom(rightBottom.y)
 {
-	left = leftTop.x;
-	top = leftTop.y;
-	right = rightBottom.x;
-	bottom = rightBottom.y;
 }
 
 
 inline
 BRect::BRect(BPoint leftTop, BSize size)
-	: left(leftTop.x),
-	  top(leftTop.y),
-	  right(leftTop.x + size.width),
-	  bottom(leftTop.y + size.height)
+	:
+	left(leftTop.x),
+	top(leftTop.y),
+	right(leftTop.x + size.width),
+	bottom(leftTop.y + size.height)
+{
+}
+
+
+inline
+BRect::BRect(float side)
+	:
+	left(0),
+	top(0),
+	right(side - 1),
+	bottom(side - 1)
 {
 }
 
@@ -217,6 +236,7 @@ BRect::Height() const
 {
 	return bottom - top;
 }
+
 
 inline BSize
 BRect::Size() const
