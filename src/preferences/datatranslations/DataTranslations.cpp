@@ -14,13 +14,13 @@
 
 #include <Alert.h>
 #include <Catalog.h>
+#include <Entry.h>
 #include <Directory.h>
 #include <FindDirectory.h>
 #include <String.h>
 #include <TranslatorRoster.h>
 #include <TextView.h>
 
-#include "DataTranslationsSettings.h"
 #include "DataTranslationsWindow.h"
 
 
@@ -40,13 +40,6 @@ DataTranslationsApplication::DataTranslationsApplication()
 
 DataTranslationsApplication::~DataTranslationsApplication()
 {
-}
-
-
-void
-DataTranslationsApplication::SetWindowCorner(const BPoint& leftTop)
-{
-	fSettings.SetWindowCorner(leftTop);
 }
 
 

@@ -34,6 +34,7 @@
 #include <TranslatorRoster.h>
 
 #include "DataTranslations.h"
+#include "DataTranslationsSettings.h"
 #include "IconView.h"
 #include "TranslatorListView.h"
 
@@ -52,7 +53,7 @@ DataTranslationsWindow::DataTranslationsWindow()
 		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE
 		| B_NOT_RESIZABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
-	MoveTo(static_cast<DataTranslationsApplication*>(be_app)->WindowCorner());
+	MoveTo(DataTranslationsSettings::Instance()->WindowCorner());
 
 	_SetupViews();
 
@@ -210,9 +211,8 @@ bool
 DataTranslationsWindow::QuitRequested()
 {
 	BPoint pt(Frame().LeftTop());
-	dynamic_cast<DataTranslationsApplication*>(be_app)->SetWindowCorner(pt);
+	DataTranslationsSettings::Instance()->SetWindowCorner(pt);
 	be_app->PostMessage(B_QUIT_REQUESTED);
-
 	return true;
 }
 

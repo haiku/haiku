@@ -19,6 +19,9 @@
 #include <Path.h>
 
 
+static DataTranslationsSettings sDataTranslationsSettings;
+
+
 DataTranslationsSettings::DataTranslationsSettings()
 {
 	BPath path;
@@ -60,4 +63,11 @@ void
 DataTranslationsSettings::SetWindowCorner(BPoint corner)
 {
 	fCorner = corner;
+}
+
+
+DataTranslationsSettings*
+DataTranslationsSettings::Instance()
+{
+	return &sDataTranslationsSettings;
 }

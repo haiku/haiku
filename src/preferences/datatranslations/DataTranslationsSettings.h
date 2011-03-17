@@ -20,6 +20,8 @@ public:
 			BPoint			WindowCorner() const { return fCorner; }
 			void			SetWindowCorner(BPoint corner);
 
+	static DataTranslationsSettings*	Instance();
+
 private:
 			BPoint			fCorner;
 };
