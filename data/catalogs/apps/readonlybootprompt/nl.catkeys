@@ -1,7 +1,7 @@
 1	dutch	x-vnd.Haiku-ReadOnlyBootPrompt	2165068388
 Desktop (Live-CD)	BootPromptWindow		Bureaublad (Live-CD)
-Language	BootPromptWindow		Taal
-Welcome to Haiku!	BootPromptWindow		Welkom bij Haiku!
-Run Installer	BootPromptWindow		Activeer Installer
 Do you wish to run the Installer or continue booting to the Desktop? You can also select your preferred language and keyboard layout from the list below.\n\nNote: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.	BootPromptWindow		Wilt u de Installer gebruiken of doorgaan met opstarten naar het Bureaublad? U kunt ook de taal en de toetsenbordindeling van uw voorkeur uit de onderstaande lijst selecteren.\n\nLet op: de localisatie van Haiku-toepassingen en andere onderdelen is een nog lopend proces. U zult regelmatig onvertaalde gedeeltes tegenkomen, maar als u wilt kunt u eraan meewerken op <www.haiku-os.org>.
 Keymap	BootPromptWindow		Toetsenbordindeling
+Language	BootPromptWindow		Taal
+Run Installer	BootPromptWindow		Activeer Installer
+Welcome to Haiku!	BootPromptWindow		Welkom bij Haiku!

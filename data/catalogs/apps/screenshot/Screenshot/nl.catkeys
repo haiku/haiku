@@ -1,0 +1,25 @@
+1	dutch	x-vnd.haiku-screenshot	731699482
+Artwork folder	ScreenshotWindow		Artwork-map
+Cancel	ScreenshotWindow		Annuleren
+Capture active window	ScreenshotWindow		Leg het actieve venster vast
+Choose folder	ScreenshotWindow		Kies map
+Choose folder...	ScreenshotWindow		Kies map...
+Copy to clipboard	ScreenshotWindow		Kopieer naar het klembord
+Delay:	ScreenshotWindow		Vertraging:
+Desktop	ScreenshotWindow		Bureaublad
+Home folder	ScreenshotWindow		Home-map
+Include mouse pointer	ScreenshotWindow		Muisaanwijzer insluiten
+Include window border	ScreenshotWindow		Vensterrand insluiten
+Name:	ScreenshotWindow		Naam:
+New screenshot	ScreenshotWindow		Nieuwe schermafbeelding
+Please select	ScreenshotWindow		Kies alstublieft
+Save	ScreenshotWindow		Opslaan
+Save as:	ScreenshotWindow		Opslaan als:
+Save in:	ScreenshotWindow		Opslaan in:
+Select	ScreenshotWindow		Selecteren
+Settings…	ScreenshotWindow		Instellingen...
+This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Dit bestand bestaat al.\n Bent u zeker dat u het wilt overschrijven?
+Translator Settings	ScreenshotWindow		Omzetter-instellingen
+overwrite	ScreenshotWindow		overschrijven
+screenshot	Screenshot	Base filename of screenshot files	schermafbeelding
+seconds	ScreenshotWindow		seconden

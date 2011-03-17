@@ -1,0 +1,38 @@
+1	dutch	x-vnd.Haiku-ActivityMonitor	2542187855
+Add graph	ActivityWindow		Voeg grafiek toe
+Additional items	ActivityView		Toegevoegde items
+Apps	DataSource		Toepassingen
+Block cache	DataSource		Blok-cache
+Block cache memory	DataSource		Geheugen blok-cache
+CPU	DataSource		CPU
+CPU usage	DataSource		CPU-gebruik
+CPU usage (combined)	DataSource		CPU-gebruik (gecombineerd)
+Cache	DataSource		Cache
+Cached memory	DataSource		Geheugen in cache
+File	ActivityWindow		Bestand
+Hide legend	ActivityView		Verberg legenda
+Media nodes	DataSource		Media-eenheid
+Memory	DataSource		Geheugen
+Network receive	DataSource		Netwerk (ontvangst)
+Network send	DataSource		Netwerk (uitgaand)
+P-faults	DataSource		P-onderbrekingen
+Page faults	DataSource		Page-onderbrekingen
+Ports	DataSource		Poorten
+Quit	ActivityWindow		Afsluiten
+Raw clipboard size	DataSource		Onbewerkte grootte klembord
+Receiving	DataSource		Ontvangend
+Remove graph	ActivityView		Verwijder grafiek
+Running applications	DataSource		Lopende toepassingen
+Semaphores	DataSource		Semaforen
+Sems	DataSource		Semaforen
+Sending	DataSource		Versturend
+Settings	ActivityWindow		Instellingen
+Settings…	ActivityWindow		Instellingen...
+Show legend	ActivityView		Toon legenda
+Swap	DataSource		Swap
+Swap space	DataSource		Swap-ruimte
+Teams	DataSource		Teams
+Text clipboard size	DataSource		Grootte klembordtekst
+Threads	DataSource		Threads
+Update time interval:	SettingsWindow		Interval bijwerktijd:
+Used memory	DataSource		Gebruikt geheugen

@@ -1,0 +1,38 @@
+1	dutch	x-vnd.Haiku-Mail	2408570677
+Account name:	Config Views		Accountnaam:
+Account settings	Config Views		Accountinstellingen
+Accounts	Config Window		Accounts
+Add	Config Window		Toevoegen
+Alpha	Config Window		Alfa
+Always	Config Window		Altijd
+Apply	Config Window		Toepassen
+Beta	Config Window		Bèta
+Check every	Config Window		Controleer elke
+Development	Config Window		Ontwikkeling
+Edit mailbox menu…	Config Window		Mailbox-menu aanpassen...
+Error	Config Window		Fout
+Error retrieving general settings: %s\n	Config Window		Fout bij het ophalen van de algemene instellingen: %s \n
+Final	Config Window		Definitief
+Gamma	Config Window		Gamma
+Golden master	Config Window		Golden Master
+Mail Daemon Replacement\n\nby Haiku, Inc. All rights reserved.\n\nVersion %ld.%ld.%ld %s\n\nSee LICENSE file included in the installation package for more information.\n\n\n\nYou can contact us at:\n%s\n\nPlease submit bug reports using the %s\n\nProject homepage at:\n%s	Config Window		Mail Daemon Replacement\n\ndoor Haiku, Inc. Alle rechten voorbehouden.\n\nVersie %ld.%ld.%ld %s\n\nZie voor meer informatie het LICENSE-bestand, te vinden in het installatiepakket.\n\n\n\nU kunt contact met ons opnemen op:\n%s\n\nDien alstublieft bug-rapporten in via de %s\n op de homepage van het project, op:\n%s
+Mail checking	Config Window		Mail checken
+Miscellaneous	Config Window		Diversen
+OK	Config Window		Oké
+Only when dial-up is connected	Config Window		Alleen bij een actieve dial-up-verbinding.
+Real name:	Config Views		Echte naam:
+Remove	Config Window		Verwijderen
+Return address:	Config Views		Retouradres:
+Revert	Config Window		Herstellen
+Schedule outgoing mail when dial-up is disconnected	Config Window		Uitgaande mail vastleggen wanneer de dial-up-verbinding verbroken is
+Settings	Config Window		Instellingen
+Show connection status window:	Config Window		Toon status-venster van de verbinding:
+Start mail services on startup	Config Window		Start maildiensten bij het opstarten
+While sending	Config Window		Tijdens het versturen
+While sending and receiving	Config Window		Tijdens versturen en ontvangen
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nDe algemene instellingen konden niet hersteld worden.\n\nFout bij het ophalen van de algemene instellingen:\n%s\n
+\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nMaak een nieuwe account aan met de 'Toevoegen' knop.\n\nVerwijder een account met de 'Verwijderen' knop bij het geselecteerde item.\n\nSelecteer een item in de lijst om de instellingen ervan te veranderen.
+days	Config Window		dagen
+hours	Config Window		uren
+minutes	Config Window		minuten
+never	Config Window		nooit

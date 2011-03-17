@@ -1,9 +1,13 @@
-1	dutch	system	2677153267
+1	dutch	system	1624661606
+%.2f TiB	StringForSize		%.2f TiB
 %3.2f GiB	StringForSize		%3.2f GiB
 %3.2f KiB	StringForSize		%3.2f KiB
-%d bytes	StringForSize		%Ld bytes
-%.2f TiB	StringForSize		%.2f TiB
 %3.2f MiB	StringForSize		%3.2f MiB
+%d bytes	StringForSize		%d bytes
+About…	AboutWindow		Over...
+Blue:	ColorControl		Blauw:
+Close	AboutWindow		Sluiten
+Copyright © %years% Haiku, Inc.	AboutWindow		Copyright © %years% Haiku, Inc.
 Green:	ColorControl		Groen:
 Red:	ColorControl		Rood:
-Blue:	ColorControl		Blauw:
+Written by:	AboutWindow		Door:

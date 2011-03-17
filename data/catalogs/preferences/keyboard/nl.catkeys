@@ -1,0 +1,13 @@
+1	dutch	x-vnd.Haiku-Keyboard	1078858058
+Defaults	KeyboardWindow		Standaardwaarden
+Delay until key repeat	KeyboardView		Vertraging tot aan herhaling
+Fast	KeyboardView		Snel
+Key repeat rate	KeyboardView		Herhalingssnelheid toets
+Long	KeyboardView		Lang
+OK	KeyboardApplication		Oké
+Revert	KeyboardWindow		Herstellen
+Short	KeyboardView		Kort
+Slow	KeyboardView		Langzaam
+Something has gone wrong!	KeyboardApplication		Er is iets misgegaan!
+Typing test area	KeyboardView		Typ-testgebied
+Written by Andrew Edward McCall	KeyboardApplication		Door Andrew Edward McCall

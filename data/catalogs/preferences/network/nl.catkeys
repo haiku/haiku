@@ -1,0 +1,16 @@
+1	dutch	x-vnd.Haiku-Network	464486446
+<no wireless networks found>	EthernetSettingsView		<geen draadloze netwerken gevonden>
+Adapter:	EthernetSettingsView		Adapter:
+Apply	EthernetSettingsView		Toepassen
+Choose automatically	EthernetSettingsView		Automatisch kiezen
+DHCP	EthernetSettingsView		DHCP:
+DNS #1:	EthernetSettingsView		DNS nr. 1:
+DNS #2:	EthernetSettingsView		DNS nr. 2:
+Domain:	EthernetSettingsView		Domein:
+Gateway:	EthernetSettingsView		Netwerkpunt:
+IP address:	EthernetSettingsView		IP-adres:
+Mode:	EthernetSettingsView		Modus:
+Netmask:	EthernetSettingsView		Subnet:
+Network:	EthernetSettingsView		Netwerk:
+OK	EthernetSettingsView		Oké
+Revert	EthernetSettingsView		Herstellen

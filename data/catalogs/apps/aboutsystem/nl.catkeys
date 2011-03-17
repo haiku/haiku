@@ -1,0 +1,38 @@
+1	dutch	x-vnd.Haiku-About	2350236915
+%.2f GHz	AboutView		%.2f GHz
+%d MiB total	AboutView		%d MiB totaal
+%d MiB used (%d%%)	AboutView		%d MiB gebruikt (%d%%)
+%ld MHz	AboutView		%ld MHz
+%ld Processors:	AboutView		%ld Processors:
+%total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB totaal, %ontoegankelijk MiB ontoegankelijk 
+... and the many people making donations!\n\n	AboutView		... en de vele mensen die doneerden!\n\n
+About this system	AboutWindow		Over dit systeem
+Contributors:\n	AboutView		Bijdragers:\n
+Current maintainers:\n	AboutView		Huidige handhavers:\n
+GCC %d Hybrid	AboutView		GCC %d Hybride
+Google & their Google Summer of Code program\n	AboutView		Google & hun 'Google Summer of Code' programma\n
+Kernel:	AboutView		Kernel:
+License: 	AboutView		Licentie: 
+Licenses: 	AboutView		Licenties: 
+Memory:	AboutView		Geheugen:
+Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (projectstichter)\n\n
+Past maintainers:\n	AboutView		Gewezen handhavers:\n
+Processor:	AboutView		Processor:
+Revision	AboutView		Revisie
+Source Code: 	AboutView		Broncode: 
+The BeGeistert team\n	AboutView		Het BeGeistert-team\n
+The Haiku-Ports team\n	AboutView		Het Haiku-Ports-team\n
+The Haikuware team and their bounty program\n	AboutView		Het Haikuware-team en hun bountyprogramma\n
+The University of Auckland and Christof Lutteroth\n\n	AboutView		De Universiteit van Auckland en Christof Lutteroth\n\n
+The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT licence%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		De code die uniek van Haiku is, in het bijzonder de kernel en alle code waar applicaties naar kunnen linken, wordt verspreid onder de %MIT-licence%. Sommige systeembibliotheken bevatten code van een derde partij, verspreid onder de LGPL-licentie. U kunt de copyrights van de code van derde partijen hieronder vinden.\n\n
+The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku and the Haiku logo are trademarks of Haiku, Inc.\n\n	AboutView		Het copyright op de Haikucode is eigendom van Haiku, Inc. of van de betreffende auteurs -waar expliciet vermeld in de bron. Haiku en het Haiku-logo zijn handelsmerken van Haiku, Inc.\n\n 
+Time running:	AboutView		Looptijd:
+Translations:\n	AboutView		Vertalingen:\n
+Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (en zijn NewOS kernel)\n
+Unknown	AboutView		Onbekend
+Version:	AboutView		Versie:
+Website, marketing & documentation:\n	AboutView		Website, marketing & documentatie:\n
+[Click a license name to read the respective license.]\n\n	AboutView		[Klik op een licentienaam om de bijbehorende licentie te lezen.]\n\n
+\nCopyrights\n\n	AboutView		\nCopyrights\n\n
+\n\nSpecial thanks to:\n	AboutView		\n\nBijzondere dank aan:\n
+\n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… en waarschijnlijk nog een aantal die we vergaten te noemen (sorry!)\n\n

@@ -1,0 +1,121 @@
+1	dutch	x-vnd.Haiku-MediaPlayer	3287412686
+1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (Amerikaans)
+2.35 : 1 (Cinemascope)	MediaPlayer-Main		2,35 : 1 (Cinemascope)
+<nothing to undo>	MediaPlayer-PlaylistWindow		<niets om ongedaan te maken>
+<unknown>	PlaylistItem-album		<onbekend>
+<unknown>	PlaylistItem-author		<onbekend>
+<unnamed>	PlaylistItem-name		<naamloos>
+<untitled>	PlaylistItem-title		<zonder titel>
+All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Niet alle bestanden konden Trash in.
+Always on top	MediaPlayer-Main		Altijd op voorgrond
+Aspect ratio	MediaPlayer-Main		Aspect-ratio
+Attributes	MediaPlayer-Main		Attributen
+Audio	MediaPlayer-Main		Audio
+Audio track	MediaPlayer-Main		Audiotrack
+Automatically start playing	MediaPlayer-SettingsWindow		Automatisch beginnen met afspelen
+Bottom of screen	MediaPlayer-SettingsWindow		Onderaan scherm
+Bottom of video	MediaPlayer-SettingsWindow		Onderaan video
+Cancel	MediaPlayer-SettingsWindow		Annuleren
+Close	MediaPlayer-Main		Afsluiten
+Close	MediaPlayer-PlaylistWindow		Afsluiten
+Close window when done playing movies	MediaPlayer-SettingsWindow		Venster sluiten als film is afgelopen
+Close window when done playing sounds	MediaPlayer-SettingsWindow		Venster sluiten na afloop geluidsweergave
+Copy Entries	MediaPlayer-CopyPLItemsCmd		Onderdelen kopiëren
+Copy Entry	MediaPlayer-CopyPLItemsCmd		Onderdeel kopiëren
+Drop files to play	MediaPlayer-Main		Bestanden verslepen om af te spelen
+Edit	MediaPlayer-PlaylistWindow		Aanpassen
+Error: 	MediaPlayer-Main		Fout:
+Error: 	MediaPlayer-RemovePLItemsCmd		Fout:
+File info…	MediaPlayer-Main		Bestandsinfo...
+Full screen	MediaPlayer-Main		Volledig scherm
+Full volume	MediaPlayer-SettingsWindow		Maximaal volume
+Gets the URI of the currently playing item.	MediaPlayer-Main		Haalt de URI op van het nu afspelende item.
+Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Volume (0.0-2.0) ophalen/instellen
+Hide interface	MediaPlayer-Main		Interface niet tonen
+Import Entries	MediaPlayer-ImportPLItemsCmd		Onderdelen importeren
+Import Entry	MediaPlayer-ImportPLItemsCmd		Onderdeel importeren
+Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Interne fout (vastzetten is mislukt). Opslaan van de afspeellijst is mislukt.
+Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Interne fout (misvormd bericht). Opslaan van de afspeellijst is mislukt.
+Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Interne fout (opgeraakt geheugen). Opslaan van de afspeellijst is mislukt.
+It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Het lijkt erop dat de mediaserver niet actief is.\nWilt u hem starten ?
+Large	MediaPlayer-SettingsWindow		Groot
+Lock Peaks	MediaPlayer-PeakView		Pieken fixeren
+Loop movies by default	MediaPlayer-SettingsWindow		Video's standaard herhalen
+Loop sounds by default	MediaPlayer-SettingsWindow		Geluiden standaard herhalen
+Low volume	MediaPlayer-SettingsWindow		Laag volume
+MediaPlayer settings	MediaPlayer-SettingsWindow		MediaPlayer-instellingen
+Medium	MediaPlayer-SettingsWindow		Gemiddeld
+Move Entries	MediaPlayer-MovePLItemsCmd		Onderdelen verplaatsen
+Move Entry	MediaPlayer-MovePLItemsCmd		Onderdeel verplaatsen
+Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		Fout bij het verplaatsen naar Trash
+Mute	MediaPlayer-Main		Geen geluid
+Muted	MediaPlayer-SettingsWindow		Geluid uit
+New player…	MediaPlayer-Main		Nieuwe speler...
+Next	MediaPlayer-Main		Volgende
+None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Geen van de bestanden die u wilde afspelen lijken mediabestanden te zijn.
+Nothing to Play	MediaPlayer-Main		Niets om af te spelen
+OK	MediaPlayer-Main		Oké
+OK	MediaPlayer-PlaylistWindow		Oké
+OK	MediaPlayer-RemovePLItemsCmd		Oké
+OK	MediaPlayer-SettingsWindow		Oké
+Off	Subtitles menu		Uit
+Open	MediaPlayer-Main		Openen
+Open	MediaPlayer-PlaylistWindow		Openen
+Open Playlist	MediaPlayer-PlaylistWindow		Afspeellijst openen
+Open file…	MediaPlayer-Main		Open bestand...
+Open…	MediaPlayer-PlaylistWindow		Openen...
+Pause	MediaPlayer-Main		Pauzeer
+Pause playback.	MediaPlayer-Main		Afspelen pauzeren.
+Play	MediaPlayer-Main		Afspelen
+Play mode	MediaPlayer-SettingsWindow		Afspeelmodus
+Playlist	MediaPlayer-PlaylistWindow		Afspeellijst
+Playlist…	MediaPlayer-Main		Afspeellijst...
+Prev	MediaPlayer-Main		Vor.
+Quit	MediaPlayer-Main		Afsluiten
+Randomize	MediaPlayer-PlaylistWindow		Randomizeren
+Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Onderdelen randomizeren
+Rating	MediaPlayer-Main		Waardering
+Redo	MediaPlayer-PlaylistWindow		Opnieuw uitvoeren
+Remove (Del)	MediaPlayer-PlaylistWindow		Verwijderen (Del)
+Remove Entries	MediaPlayer-RemovePLItemsCmd		Onderdelen verwijderen
+Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Onderdelen verwijderen naar Trash
+Remove Entry	MediaPlayer-RemovePLItemsCmd		Onderdeel verwijderen
+Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Onderdeel verwijderen naar Trash
+Remove all	MediaPlayer-PlaylistWindow		Alles verwijderen
+Remove and put into Trash	MediaPlayer-PlaylistWindow		Verwijderen en in Trash plaatsen
+Revert	MediaPlayer-SettingsWindow		Herstellen
+Save	MediaPlayer-Main		Opslaan
+Save	MediaPlayer-PlaylistWindow		Opslaan
+Save Playlist	MediaPlayer-PlaylistWindow		Afspeellijst bewaren
+Save as…	MediaPlayer-PlaylistWindow		Opslaan als...
+Save error	MediaPlayer-PlaylistWindow		Fout opslaan
+Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Opslaan van de afspeellijst is mislukt.\n\nFout:
+Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Opslaan afspeellijst is mislukt:\n\nFout:
+Settings…	MediaPlayer-Main		Instellingen...
+Skip to the next track.	MediaPlayer-Main		Overslaan naar de volgende track
+Skip to the previous track.	MediaPlayer-Main		Overslaan tot de vorige track.
+Small	MediaPlayer-SettingsWindow		Klein
+Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Sommige bestanden konden niet naar Trash worden verplaatst.
+Start media server	MediaPlayer-Main		Start mediaserver
+Start playing.	MediaPlayer-Main		Begin met afspelen.
+Stop	MediaPlayer-Main		Stoppen
+Stop playing.	MediaPlayer-Main		Stop afspelen.
+Stream settings	MediaPlayer-Main		Stream-instellingen
+Subtitles	MediaPlayer-Main		Ondertitels
+Thanks	MediaPlayer-Main		Bedankt
+The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Het bestand '%filename' kon niet geopend worden.\n\n
+There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Er is geen decoder geïnstalleerd die met het bestandstype kan omgaan, ofwel heeft de decoder moeite met de specifieke versie van het type. 
+Toggle mute.	MediaPlayer-Main		Mute aan/uit.
+Toggle pause/play.	MediaPlayer-Main		Schakelen tussen pauzeren/afspelen.
+Track	Audio Track Menu		Track
+Track	Video Track Menu		Track
+Track %d	MediaPlayer-Main		Track %d
+URI	MediaPlayer-Main		URI
+Undo	MediaPlayer-PlaylistWindow		Ongedaan maken
+Use hardware video overlays if available	MediaPlayer-SettingsWindow		Gebruik waar mogelijk hardwarematige video-overlays
+Video	MediaPlayer-Main		Video
+Video track	MediaPlayer-Main		Videotrack
+View options	MediaPlayer-SettingsWindow		Weergave-opties
+Volume	MediaPlayer-Main		Volume
+none	Audio track menu		geen
+none	Subtitles menu		geen

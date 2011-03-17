@@ -1,0 +1,39 @@
+1	dutch	x-vnd.Haiku-Pulse	628764229
+About Pulse…	CPUButton		Over Pulse...
+About Pulse…	PulseView		Over Pulse...
+Active color	ConfigView		Actief-kleur
+Bar colors	ConfigView		Werkbalk-kleuren
+CPU progress bar	NormalPulseView		CPU-voortgangsbalk
+Defaults	PrefsWindow		Standaardinstellingen
+Deskbar	CPUButton		Deskbar
+Deskbar menu	CPUButton		Deskbarmenu
+Deskbar mode	MiniPulseView		Deskbarmodus
+Deskbar mode	NormalPulseView		Deskbar-modus
+Deskbar mode	PrefsWindow		Deskbarmodus
+Fade colors	ConfigView		Kleuren vervagen
+Frame color	ConfigView		Kaderkleur
+Idle color	ConfigView		Inactief-kleur
+Info	CPUButton		Info
+Info	DeskbarPulseView		Info
+Mini mode	DeskbarPulseView		Minimodus
+Mini mode	NormalPulseView		Minimodus
+Mini mode	PrefsWindow		Minimodus
+Normal mode	DeskbarPulseView		Standaardmodus
+Normal mode	MiniPulseView		Normale modus
+Normal mode	PrefsWindow		Normale modus
+OK	CPUButton		Oké
+OK	DeskbarPulseView		Oké
+OK	PrefsWindow		Oké
+OK	PulseApp		Oké
+OK	PulseView		Oké
+Pulse	NormalPulseView		Pulse
+Pulse settings	PulseWindow		Pulse-instellingen
+Quit	DeskbarPulseView		Afsluiten
+Quit	MiniPulseView		Afsluiten
+Remove replicant	CPUButton		Replicant verwijderen
+Settings…	PulseView		Instellingen...
+Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Gebruik: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
+Width of icon:	ConfigView		Breedte van het icoon:
+Width of icon:	ConfigView		Icoonbreedte:
+You can't disable the last active CPU.	CPUButton		U kunt de laatste actieve CPU niet uitschakelen.
+You can't disable the last active CPU.	PulseView		U kunt de laatste actieve CPU niet uitschakelen.

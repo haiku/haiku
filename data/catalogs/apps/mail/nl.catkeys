@@ -1,0 +1,143 @@
+1	dutch	x-vnd.Be-MAIL	3002469710
+%d - Date	Mail		%d - Datum
+%e - E-mail address	Mail		%e - E-mailadres
+%n - Full name	Mail		%n - Volledige naam
+About Mail…	Mail		Over Mail…
+Account from mail	Mail		Account van mail
+Account:	Mail		Account:
+Accounts…	Mail		Accounts…
+Add	Mail		Toevoegen
+Add enclosure…	Mail		Bijlage toevoegen...
+Add signature	Mail		Onderschrift toevoegen
+An error occurred trying to open this signature.	Mail		Er is een fout ontstaan bij het openen van dit onderschift.
+An error occurred trying to save the attachment.	Mail		Er is een fout ontstaan bij het opslaan van de bijlage.
+An error occurred trying to save this signature.	Mail		Er is een fout ontstaan bij het opslaan van dit onderschrift.
+Attach attributes:	Mail		Attributen bijvoegen:
+Attachments:	Mail		Bijlagen: 
+Auto signature:	Mail		Automatisch onderschrift:
+Automatically mark mail as read:	Mail		Automatisch markeren als gelezen:
+Bcc:	Mail		Bcc:
+Beginner	Mail		Beginner
+Button bar:	Mail		Knoppenbalk:
+Cancel	Mail		Annuleren
+Cc:	Mail		Cc:
+Check spelling	Mail		Spelling controleren
+Close	Mail		Sluiten
+Close and 	Mail		Sluiten en
+Colored quotes:	Mail		Quotes in kleur:
+Copy	Mail		Kopiëren
+Copy link location	Mail		Linklocatie kopiëren
+Copy to new	Mail		Kopiëren naar nieuw
+Couldn't open this signature. Sorry.	Mail		Kon dit onderschrift niet openen. Sorry.
+Cut	Mail		Knippen
+Decoding:	Mail		Bezig met decoderen:
+Default account:	Mail		Standaard-account:
+Delete	Mail		Verwijderen
+Discard	Mail		Verwerpen
+Do you wish to save this message as a draft before closing?	Mail		Wilt u dit bericht als concept opslaan voordat u afsluit?
+Do you wish to send this message before closing?	Mail		Wilt u dit bericht versturen voordat u afsluit?
+Don't save	Mail		Niet opslaan
+E-mail draft could not be saved!	Mail		E-mailconcept kon niet bewaard worden!
+Edit	Mail		Aanpassen
+Edit queries…	Mail		Zoektermen aanpassen…
+Edit signatures…	Mail		Pas onderschriften aan…
+Encoding:	Mail		Coderen:
+Expert	Mail		Expert
+File	Mail		Bestand
+Find	Mail		Zoeken
+Find again	Mail		Opnieuw zoeken
+Find…	Mail		Zoeken...
+Font:	Mail		Lettertype:
+Forward	Mail		Doorsturen
+Forward without attachments	Mail		Doorsturen zonder bijlagen
+From:	Mail		Van:
+Hide	Mail		Verbergen
+Include file attributes in attachments	Mail		Bestandskenmerken onderdeel van bijlagen maken
+Inconsistency occurred in the undo/redo buffer.	Mail		Er is een onregelmatigheid ontstaan in het herstel- /herhaalbuffer.
+Initial spell check mode:	Mail		Aanvankelijke spellingcontrole-modus:
+Leave as '%s'	Mail		Behouden als '%s'
+Leave as New	Mail		Als Nieuw laten
+Leave same	Mail		Ongewijzigd laten
+Mail couldn't find its dictionary.	Mail		Mail kon zijn woordenboek niet vinden.
+Mail preferences	Mail		Mailvoorkeuren
+Mail\n\n	Mail		Mail\n\n
+Mailing	Mail		Mailverkeer
+Message	Mail		Bericht
+Move to trash	Mail		Naar prullenbak verplaatsen
+Need Tracker to move items to trash	Mail		Tracker is nodig voor verplaatsing van items naar de Prullenbak
+New	Mail		Nieuw
+New mail message	Mail		Nieuw mailbericht
+Next	Mail		Volgende
+Next message	Mail		Volgend bericht
+No file attributes, just plain data	Mail		Geen bestandskenmerken, alleen gewone gegevens
+None	Mail		Geen
+OK	Mail		Oké
+Only files can be added as attachments.	Mail		Alleen bestanden kunnen bijlagen worden.
+Open	Mail		Openen
+Open attachment	Mail		Bijlage openen
+Open draft	Mail		Concept openen
+Open this link	Mail		Deze link openen
+Page setup…	Mail		Pagina-opzet…
+Paste	Mail		Plakken
+Preferences…	Mail		Voorkeuren...
+Previous	Mail		Vorige
+Previous message	Mail		Vorig bericht
+Print	Mail		Afdrukken
+Print…	Mail		Afdrukken…
+Queries	Mail		Zoektermen
+Quit	Mail		Afsluiten
+Quote	Mail		Citeren
+Random	Mail		Willekeurig
+Read 	Mail		Lezen
+Really delete this signature? This cannot be undone.	Mail		Dit onderschrift werkelijk verwijderen? Dit kan niet ongedaan gemaakt worden.
+Redo	Mail		Herstellen
+Remove attachment	Mail		Verwijder bijlage
+Remove enclosure	Mail		Bijlage verwijderen
+Remove quote	Mail		Citaat verwijderen
+Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Verwijdering van bijlagen uit een doorgestuurd bericht is nog niet geïmplementeerd!\nHet zal nog niet goed werken.
+Reply	Mail		Beantwoorden
+Reply account:	Mail		Antwoordaccount:
+Reply preamble:	Mail		Inleiding beantwoorden:
+Reply to all	Mail		Allen beantwoorden
+Reply to sender	Mail		Afzender beantwoorden
+Resend	Mail		Opnieuw versturen
+Revert	Mail		Herstellen
+Save	Mail		Opslaan
+Save address	Mail		Adres opslaan
+Save as draft	Mail		Bewaren als concept
+Save attachment…	Mail		Bewaar bijlage…
+Save changes to this signature?	Mail		Veranderingen aan dit onderschrift opslaan?
+Select all	Mail		Alles selecteren
+Send	Mail		Versturen
+Send message	Mail		Bericht versturen
+Set to %s	Mail		Instellen als  %s
+Set to Saved	Mail		Als Bewaard markeren
+Set to…	Mail		Instellen als…
+Show header	Mail		Koptekst tonen
+Show icons & labels	Mail		Toon iconen & tekst
+Show icons only	Mail		Toon alleen iconen
+Show raw message	Mail		Toon onbewerkt bericht
+Signature	Mail		Onderschrift
+Signature:	Mail		Onderschrift:
+Signatures	Mail		Onderschriften
+Size:	Mail		Grootte:
+Sorry	Mail		Sorry
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Sorry, kon geen toepassing vinden die het 'Person'-datatype ondersteunt.
+Start now	Mail		Nu beginnen
+Subject:	Mail		Onderwerp:
+Text wrapping:	Mail		Tekstafbreking:
+The mail_daemon could not be started:\n\t	Mail		De mail_daemon kon niet worden gestart:\n\t
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		De mail_daemon is niet actief. Het bericht staat in de wachtrij en zal worden verzonden zodra de mail_daemon is gestart.
+There is no installed handler for URL links.	Mail		Er is geen toepassing voor het openen van URL-links.
+Title:	Mail		Titel:
+To:	Mail		Aan:
+Trash	Mail		Prullenbak
+Undo	Mail		Ongedaan maken
+Unread	Mail		Ongelezen
+Use default account	Mail		Standaard-account gebruiken
+User interface	Mail		Gebruikersinterface
+View	Mail		Bekijken
+Warn unencodable:	Mail		Waarschuwen oncodeerbaar:
+Written by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Door Robert Polic.\nVerbeterd door de crew van Dr. Zoidberg.\n\nCopyright 1991-2001, Be.\nCopyright 2005-2010 Haiku, Inc.\n
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Uw hoofdtekst bevat %ld niet-codeerbare tekens. Mogelijk werkt een andere letterset beter? Klik op 'Versturen' om de tekst toch te versturen (een vervangend teken zal dan gebruikt worden op de plaats van elk niet-codeerbaar teken), of kies 'Annuleren' om terug te keren voor een herstelpoging.
+\\n - Newline	Mail		\\n - Newline

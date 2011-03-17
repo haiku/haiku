@@ -1,0 +1,26 @@
+1	dutch	x-vnd.Haiku-OpenGL	899836772
+Attributes stack size:	Capabilities		Stackgrootte-kenmerken:
+Auxiliary buffer(s):	Capabilities		Hulpbuffer(s):
+Available	Extensions		Beschikbaar
+Capabilities	Capabilities		Mogelijkheden
+Extensions	Extensions		Extenties
+GLU version:	InfoView		GLU versie:
+GLUT API version:	InfoView		GLUT API-versie:
+Information	InfoView		Informatie
+List stack size:	Capabilities		Lijst stackgrootte:
+Max. 2D texture size:	Capabilities		Max. 2D textuurgrootte:
+Max. 3D texture size:	Capabilities		Max. 3D-textuurgrootte:
+Max. clipping planes:	Capabilities		Max. clippingvlakken:
+Max. convolution:	Capabilities		Max. draaiing:
+Max. evaluators equation order:	Capabilities		Max. vergelijkingsevaluatie-volgorde:
+Max. lights:	Capabilities		Max. lichten:
+Max. recommended index elements:	Capabilities		Max. aanbevolen index-elementen:
+Max. recommended vertex elements:	Capabilities		Max. aanbevolen vertex-elementen:
+Max. texture units:	Capabilities		Max. textuurunits:
+Model stack size:	Capabilities		Model-stackgrootte:
+Name stack size:	Capabilities		Naam stackgrootte:
+OpenGL version:	InfoView		OpenGL-versie:
+Projection stack size:	Capabilities		Projectie-stackgrootte:
+Renderer name:	InfoView		Renderernaam:
+Texture stack size:	Capabilities		Textuurstackgrootte:
+Vendor name:	InfoView		Vendor-naam:
