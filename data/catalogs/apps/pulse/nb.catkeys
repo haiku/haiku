@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-Pulse	882574526
+1	norwegian_bokmål	x-vnd.Haiku-Pulse	2153524577
 About Pulse…	CPUButton		Om Pulse...
 About Pulse…	PulseView		Om Pulse
 Active color	ConfigView		Aktiv farge
@@ -26,7 +26,6 @@ OK	PrefsWindow		OK
 OK	PulseApp		OK
 OK	PulseView		OK
 Pulse	NormalPulseView		Pulse
-Pulse	PulseWindow		Pulse
 Pulse settings	PulseWindow		Pulsinnstillinger
 Quit	DeskbarPulseView		Avslutt
 Quit	MiniPulseView		Avslutt

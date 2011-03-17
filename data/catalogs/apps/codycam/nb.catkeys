@@ -1,6 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku.CodyCam	1322454590
-About CodyCam	CodyCam		Om CodyCam
-About Codycam…	CodyCam		Om Codycam…
+1	norwegian_bokmål	x-vnd.Haiku.CodyCam	3353004969
 Can't find an available connection to the video window	CodyCam		Kan ikke finne en tilgjengelig tilkobling til videovinduet
 Cannot connect the video source to the video window	CodyCam		Kan ikke koble til videokilden til videovinduet
 Cannot create a video window	CodyCam		Kan ikke opprette videovindu
@@ -18,10 +16,7 @@ Cannot start time source!	CodyCam		Kan ikke starte tidskilde!
 Capture Rate Menu	CodyCam		Opptaksratiomeny
 Capture controls	CodyCam		Opptakskontroll
 Capturing Image…	VideoConsumer.cpp		Tar bilde...
-Close	CodyCam		Lukk
 Closing the window\n	VideoConsumer.cpp		Lukker vinduet\n
-CodyCam	CodyCam		CodyCam
-CodyCam\n\nThe Original BeOS webcam	CodyCam		CodyCam\n\nDet originale webkameraet fra BeOS
 Connected…	VideoConsumer.cpp		Tilkoblet...
 Couldn't find requested directory on server	VideoConsumer.cpp		Kunne ikke finne angitt mappe på serveren
 Directory:	CodyCam		Mappe:

@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-Expander	3863172519
+1	norwegian_bokmål	x-vnd.Haiku-Expander	1580122745
 About Expander…	ExpanderMenu		Om Arkivåpner…
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Er du sikker på at du vil stoppe utpakkingen av dette\narkivet? De utpakkede filene kan være ufullstendige.
 Automatically expand files	ExpanderPreferences		Pakk ut automatisk
@@ -14,8 +14,6 @@ Destination folder:	ExpanderPreferences		Målmappe
 Error when expanding archive	ExpanderWindow		Feil ved utpakking av arkiv
 Expand	ExpanderMenu		Pakk ut
 Expand	ExpanderWindow		Pakk ut
-Expander	About		Arkivåpner
-Expander	ExpanderWindow	!! Window Title !!	Arkivåpner
 Expander settings	ExpanderPreferences		Innstillinger for Arkivåpner
 Expander: Choose destination	DirectoryFilePanel		Arkivåpner: Velg mål
 Expander: Open	ExpanderWindow		Arkivåpner: Åpne
@@ -25,7 +23,6 @@ File	ExpanderMenu		Fil
 File expanded	ExpanderWindow		Fil pakket ut
 Hide contents	ExpanderWindow		Skjul innhold
 Leave destination folder path empty	ExpanderPreferences		La stien til målmappen være tom
-OK	About		OK
 OK	ExpanderPreferences		OK
 Open destination folder after extraction	ExpanderPreferences		Åpne målmappen etter utpakking
 Other:	ExpanderPreferences		Annet:
@@ -49,5 +46,4 @@ The destination is read only.	ExpanderWindow		Målet er skrivebeskyttet
 The file doesn't exist	ExpanderWindow		Filen finnes ikke
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Mappen ble enten flyttet, gitt nytt navn eller\n ikke støttet
 Use:	ExpanderPreferences		Bruk:
-\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tskrevet av Jérôme Duval\n\tOpphavsrett 2004-2006, Haiku Inc.\n\noriginal Be-versjon av \nDominic, Hiroshi, Peter, Pavel and Robert\n
 is not supported	ExpanderWindow		støttes ikke

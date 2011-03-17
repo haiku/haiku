@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-MidiPlayer	1992486928
+1	norwegian_bokmål	x-vnd.Haiku-MidiPlayer	176589976
 Cavern	Main Window		Hule
 Closet	Main Window		Skap
 Could not load song	Main Window		Kunne ikke laste sang
@@ -7,7 +7,6 @@ Dungeon	Main Window		Fangehull
 Garage	Main Window		Garasje
 Igor's lab	Main Window		Igors labb
 Live input:	Main Window		Live-inndata:
-MidiPlayer	Main Window		MIDI-spiller
 None	Main Window		Ingen
 OK	Main Window		OK
 Off	Main Window		Av

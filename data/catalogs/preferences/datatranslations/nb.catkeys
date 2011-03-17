@@ -1,9 +1,8 @@
-1	norwegian_bokmål	x-vnd.Haiku-DataTranslations	3706134146
+1	norwegian_bokmål	x-vnd.Haiku-DataTranslations	2849987867
 About	DataTranslations		Om
 An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Et element kalt '%name' finnes allerede i oversettermappen! Skal den eksisterende oversetteren overskrives?
 Cancel	DataTranslations		Avbryt
 Could not install %s:\n%s	DataTranslations		Kunne ikke installere %s:\n%s
-DataTranslations	DataTranslations		Formatoversetter
 DataTranslations - Error	DataTranslations		Formatoverstter - Feil
 DataTranslations - Note	DataTranslations		Formatoversetter - Notiser
 DataTranslations\n\twritten by Oliver Siebenmarck and others\n\tCopyright 2002-2010, Haiku Inc. All rights reserved.\n	DataTranslations		DataTranslations\n\tskrevet av Oliver Siebenmarck ved andre\n\tOpphavsrett 2002-2010, Haiku Inc. Alle rettigheter reservert.\n

@@ -1,7 +1,6 @@
-1	norwegian_bokmål	x-vnd.Haiku-MediaConverter	2011559818
+1	norwegian_bokmål	x-vnd.Haiku-MediaConverter	1549958216
 %d bit 	MediaFileInfo		%d bit
 %d byte 	MediaFileInfo		%d byte 
-About MediaConverter…	Menu		Om MediaConverter
 About…	MediaConverter		Om...
 Audio encoding:	MediaConverter		Lydformat
 Audio quality not supported	MediaConverter		Lydkvaliteten støttes ikke
@@ -27,7 +26,6 @@ File details	MediaConverter		Filopplysninger
 File format:	MediaConverter		Filformat:
 High	MediaConverter		Høy
 Low	MediaConverter		Lav
-MediaConverter	MediaConverter		MediaConverter
 MediaConverter\n1.3.0\n© 1999, Be Incorporated.\n© 2000-2004 Jun Suzuki\n© 2007 Stephan Aßmus\n© 2010 Haiku, Inc.	MediaConverter		MediaConverter\n1.3.0\n© 1999, Be Incorporated.\n© 2000-2004 Jun Suzuki\n© 2007 Stephan Aßmus\n© 2010 Haiku, Inc.
 No audio	Audio codecs list		Ingen lyd
 No file selected	MediaConverter-FileInfo		Ingen fil er valgt

@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-MediaPlayer	1228297259
+1	norwegian_bokmål	x-vnd.Haiku-MediaPlayer	4094542447
 100% scale	MediaPlayer-Main		100% skalert
 200% scale	MediaPlayer-Main		200% skalert
 300% scale	MediaPlayer-Main		300% skalert
@@ -9,7 +9,6 @@
 <unknown>	PlaylistItem-album		<ukjent>
 <unknown>	PlaylistItem-author		<ukjent>
 <untitled>	PlaylistItem-title		<uten navn>
-About MediaPlayer…	MediaPlayer-Main		Om Mediaspiller...
 All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Ikke alle filene kunne flyttes til søppelkurven.
 Always on top	MediaPlayer-Main		Alltid øverst
 Audio	MediaPlayer-Main		Audio
@@ -35,7 +34,6 @@ Internal error (out of memory). Saving the playlist failed.	MediaPlayer-Playlist
 Large	MediaPlayer-SettingsWindow		Stor
 Low volume	MediaPlayer-SettingsWindow		Lavt volum
 MediaPlayer settings	MediaPlayer-SettingsWindow		Mediaspiller-innstillinger
-MediaPlayer\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		Mediaspiller\n\nSkrevet av Marcus Overhagen, Stephan Aßmus og Frederik Modéen
 Medium	MediaPlayer-SettingsWindow		Medium
 Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		Feil ved flytting til søppelkurv
 Mute	MediaPlayer-Main		Lydløs
@@ -93,5 +91,4 @@ Video	MediaPlayer-Main		Video
 Video track	MediaPlayer-Main		Videospor
 View options	MediaPlayer-SettingsWindow		Se valg
 Volume	MediaPlayer-Main		Volum
-error	MediaPlayer-Main		feil
 none	Audio track menu		ingen

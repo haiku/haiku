@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-FileTypes	1208282584
+1	norwegian_bokmål	x-vnd.Haiku-FileTypes	819872407
 %1 application type	Application Type Window		%1 programtype
 %ld Application type%s could be removed.	Application Types Window		%ld Programtype%s kunne fjernes.
 (from super type)	FileTypes Window		(fra supertype)
@@ -63,7 +63,6 @@ File could not be opened	Preferred App Menu		Filen kunne ikke åpnes
 File recognition	FileTypes Window		Filgjenkjenning
 File type	FileType Window		Filtype
 FileTypes	FileTypes		Filtyper
-FileTypes	FileTypes Window		Filtyper
 FileTypes request	FileTypes		Filtypeforespørsel
 FileTypes request	Preferred App Menu		Filtyper-forespørsel
 Final	Application Types Window		Siste

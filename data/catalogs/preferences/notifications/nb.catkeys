@@ -1,9 +1,8 @@
-1	norwegian_bokmål	x-vnd.Haiku-Notifications	3413736533
+1	norwegian_bokmål	x-vnd.Haiku-Notifications	1029178504
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		En feil oppsto da innstillingene skulle lagres.\nDet er mulig disken begynner å bli full.
 Error	NotificationView		Feil
 Important	NotificationView		Viktig
 Mini icon	DisplayView		Mini-ikon
-Notifications	PrefletWin		Meldinger
 OK	GeneralView		OK
 OK	NotificationView		OK
 Revert	PrefletWin		Tilbakestill

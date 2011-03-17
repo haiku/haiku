@@ -1,8 +1,7 @@
-1	norwegian_bokmål	x-vnd.Haiku-Appearance	3612090060
+1	norwegian_bokmål	x-vnd.Haiku-Appearance	1227622574
 Antialiasing	APRWindow		Kantutjevning
 Antialiasing menu	AntialiasingSettingsView		Kantutjevning-meny
 Antialiasing type:	AntialiasingSettingsView		Kantutjevningstype
-Appearance	APRWindow		Utseende
 Colors	APRWindow		Farger
 Control background	Colors tab		Bakgrunn for kontrollelement
 Control border	Colors tab		Kontrollkant

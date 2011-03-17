@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-Media	799053364
+1	norwegian_bokmål	x-vnd.Haiku-Media	3685845357
 <none>	Media views		<ingen>
 Audio input:	Media views		Lydinngang:
 Audio mixer	Media Window		Lydmikser
@@ -10,7 +10,6 @@ Couldn't add volume control in Deskbar: %s\n	Media views		Kunne ikke legge til v
 Couldn't remove volume control in Deskbar: %s\n	Media views		Kunne ikke fjerne volumkontroll i Deskbar: %s\n
 Defaults	Media views		Forvalg
 Done shutting down.	Media Window		Ferdig avsluttet.
-Media	Media Window		Media
 OK	Media Window		OK
 Quit	Media Window		Avslutt
 Ready for use…	Media Window		Klar til bruk…

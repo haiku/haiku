@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-Devices	189828730
+1	norwegian_bokmål	x-vnd.Haiku-Devices	1176141157
 ACPI Information	DeviceACPI		ACPI-informasjon
 ACPI Processor Namespace '%2'	DeviceACPI		ACPI-prosessor-navnerom '%2'
 ACPI System Bus	DeviceACPI		ACPI-systembuss
@@ -8,8 +8,6 @@ ACPI bus	Device		ACPI-buss
 ACPI bus	DevicesView		ACPI-buss
 ACPI controller	Device		ACPI-kontroller
 ACPI node '%1'	DeviceACPI		ACPI-node '%1'
-About	DevicesApplication		Om
-About Devices…	DevicesView		Om Enheter...
 Basic information	DevicesView		Basisinformasjon
 Bridge	Device		Bro
 Bus	DevicesView		Buss
@@ -30,9 +28,7 @@ Device name	DevicePCI		Enhetsnavn
 Device name:	Device		Enhetsnavn:
 Device paths	Device		Enhetsti
 Device paths	DevicePCI		Enhetsstier
-Devices	DevicesApplication		Enheter
 Devices	DevicesView		Enheter
-Devices\n\twritten by Pieter Panman\n\n\tBased on listdev by Jérôme Duval\n\tand the previous Devices preference\n\tby Jérôme Duval and Sikosis\n\tCopyright 2009, Haiku, Inc.\n	DevicesApplication		Enheter\n\tskrevet av Pieter Panman\n\n\tBasert på listdev av Jérôme Duval\n\tog tidligere Egenskaper for Enheter\n\tav Jérôme Duval og Sikosis\n\tOpphavsrett 2009, Haiku, Inc.\n
 Display controller	Device		Skjermkontroller
 Docking station	Device		Dokkingstasjon
 Driver used	Device		Driver brukt
@@ -56,7 +52,6 @@ Network controller	Device		Nettverkskontroller
 None	Device		Ingen
 Not implemented	DeviceACPI		Ikke implementert
 Not implemented	DevicePCI		Ikke implementert
-OK	DevicesApplication		OK
 Order by:	DevicesView		Sorter etter:
 PCI Information	DevicePCI		PCI-informasjon
 PCI bus	Device		PCI-buss

@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-DriveSetup	2723551013
+1	norwegian_bokmål	x-vnd.Haiku-DriveSetup	568426562
 %ld MiB	Support		%ld MiB
 <empty>	DiskView		<tom>
 <empty>	PartitionList		<tom>
@@ -29,7 +29,6 @@ Device	DiskView		Enhet
 Device	PartitionList		Enhet
 Disk	MainWindow		Disk
 Disk system \"%s\"\" not found!	MainWindow		Disksystemet \"%s\"\" ble ikke funnet!
-DriveSetup	MainWindow		Diskoppsett
 Eject	MainWindow		Løs ut
 End: %ld MB	Support		Slutt: %ld MB
 Error: 	MainWindow	in any error alert	Feil: 

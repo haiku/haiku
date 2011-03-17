@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-BootManager	2058739736
+1	norwegian_bokmål	x-vnd.Haiku-BootManager	734273860
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Vil nå gjennopprette hovedpartisjonssektoren (MBR) for %disk fra %file. Ønsker du å fortsette?
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Klar til å skrive oppstartsmenyen til disk. Er du sikker på at du vil fortsette?
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Vil nå skrive følgende oppstartsmeny til oppstartsdisken (%s). Vennligst sjekk informasjonen nedenfor før du fortsetter.
@@ -13,10 +13,7 @@ At least one partition must be selected!	BootManagerController		Minst én partis
 Back	BootManagerController	Button	Tilbake
 Backup Master Boot Record	BootManagerController	Title	Sikkerhetskopier hovedpartisjonssektor
 Boot Manager is unable to read the partition table!	BootManagerController		Oppstartsbehandleren klarer ikke å lese partisjonstabellen.
-BootManager	BootManager	Application name	Oppstartsbehandler
-BootManager	BootManagerWindow	Window Title	Oppstartsbehandler
 Cannot access!	DrivesPage	Cannot install	Får ikke tilgang!
-Copyright %year, Haiku Inc.\n	BootManager	Leave %year untranslated	Opphavsrett %year, Haiku Inc.\n
 Default Partition	DefaultPartitionPage	Title	Standardpartisjon
 Default Partition:	DefaultPartitionPage	Menu field label	Standard partisjon:
 Done	BootManagerController	Button	Ferdig
@@ -31,7 +28,6 @@ Installation of boot menu failed	BootManagerController	Title	Installasjon av opp
 Never	DefaultPartitionPage		Aldri
 Next	WizardView	Button	Neste
 No space available!	DrivesPage	Cannot install	Ingen ledig plass!
-OK	BootManager		OK
 OK	BootManagerController	Button	OK
 Old Master Boot Record Saved failure	BootManagerController	Title	Lagring av gammel MBR mislyktes
 Old Master Boot Record saved	BootManagerController	Title	Gammel hovedpartisjonssektor lagret
@@ -66,4 +62,3 @@ Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Ukjent
 Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Uten navn %d
 Update	DrivesPage	Button	Oppdater
 Write boot menu	BootManagerController	Button	Skriv oppstartsmeny
-written by	BootManager		skrevet av
