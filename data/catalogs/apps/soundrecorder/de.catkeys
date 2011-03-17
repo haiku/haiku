@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-SoundRecorder	1355572422
+1	german	x-vnd.Haiku-SoundRecorder	1948114706
 Cannot connect to media server	RecorderWindow		Es konnte keine Verbindung zum Mediaserver aufgebaut werden.
 Cannot connect to the selected sound input	RecorderWindow		Es kann keine Verbindung zur ausgewählten Klangquelle hergestellt werden.
 Cannot find an unused name to use for the new recording	RecorderWindow		Für die neue Aufnahme konnte kein noch nicht verwendeter Name gefunden werden.
@@ -32,7 +32,6 @@ Sample size: 	RecorderWindow		Samplegröße:
 Save	RecorderWindow		Speichern
 Some of the files don't appear to be audio files	RecorderWindow		Einige der Dateien scheinen keine Audiodateien zu sein.
 Sound List	RecorderWindow		Dateiliste
-SoundRecorder	RecorderWindow		SoundRecorder
 Stop	RecorderWindow		Stopp
 bits	RecorderWindow		Bits
 seconds	RecorderWindow		Sekunden

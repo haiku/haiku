@@ -1,11 +1,9 @@
-1	german	x-vnd.Haiku-ActivityMonitor	1946610782
+1	german	x-vnd.Haiku-ActivityMonitor	183152641
 %.1f KB/s	DataSource		%.1f KiB/s
 %.1f MB	DataSource		%.1f MiB
 %.1f faults/s	DataSource		%.1f Fehler/s
 %lld ms	SettingsWindow		%lld ms
 %lld sec.	SettingsWindow		%lld Sek.
-About ActivityMonitor…	ActivityWindow		Über ActivityMonitor...
-ActivityMonitor	ActivityWindow		ActivityMonitor
 Add graph	ActivityWindow		Graphen hinzufügen
 Additional items	ActivityView		Zusätzliche Elemente
 Apps	DataSource		Apps

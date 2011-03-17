@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Expander	3863172519
+1	german	x-vnd.Haiku-Expander	1580122745
 About Expander…	ExpanderMenu		Über Expander…
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Soll das Entpacken wirklich abgebrochen werden? Die entpackten Dateien sind eventuell nicht vollständig.
 Automatically expand files	ExpanderPreferences		Archiv automatisch entpacken
@@ -14,8 +14,6 @@ Destination folder:	ExpanderPreferences		Zielordner:
 Error when expanding archive	ExpanderWindow		Fehler beim Entpacken
 Expand	ExpanderMenu		Entpacken
 Expand	ExpanderWindow		Entpacken
-Expander	About		Expander
-Expander	ExpanderWindow	!! Window Title !!	Expander
 Expander settings	ExpanderPreferences		Expander-Einstellungen
 Expander: Choose destination	DirectoryFilePanel		Expander: Zielordner wählen
 Expander: Open	ExpanderWindow		Expander: Öffnen
@@ -25,7 +23,6 @@ File	ExpanderMenu		Datei
 File expanded	ExpanderWindow		Archiv wurde entpackt
 Hide contents	ExpanderWindow		Inhalt verbergen
 Leave destination folder path empty	ExpanderPreferences		Keinen Zielordner vorgeben
-OK	About		OK
 OK	ExpanderPreferences		OK
 Open destination folder after extraction	ExpanderPreferences		Zielordner nach dem Entpacken öffnen
 Other:	ExpanderPreferences		Allgemeines:
@@ -49,5 +46,4 @@ The destination is read only.	ExpanderWindow		Das Ziel ist schreibgeschützt.
 The file doesn't exist	ExpanderWindow		Die Datei existiert nicht
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Der Ordner wurde entweder verschoben, umbenannt oder wird nicht unterstützt.
 Use:	ExpanderPreferences		Benutzerdefiniert:
-\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tAutor: Jérôme Duval,\n\tCopyright 2004-2006, Haiku Inc.\n\nUrsprüngliche Be Version von \nDominic, Hiroshi, Peter, Pavel und Robert.\n
 is not supported	ExpanderWindow		wird nicht unterstützt

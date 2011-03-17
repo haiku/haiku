@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Mail	3023422579
+1	german	x-vnd.Haiku-Mail	1372873153
 Account name:	Config Views		Kontoname:
 Account settings	Config Views		Kontoeinstellungen
 Accounts	Config Window		Konten
@@ -9,7 +9,6 @@ Apply	Config Window		Anwenden
 Beta	Config Window		Beta
 Check every	Config Window		Abrufen alle
 Development	Config Window		Entwicklung
-E-mail	Config Window		E-Mail
 Edit mailbox menu…	Config Window		Mailbox-Menü bearbeiten...
 Error	Config Window		Fehler
 Error retrieving general settings: %s\n	Config Window		Fehler beim Einlesen der allgemeinen Einstellungen: %s\n

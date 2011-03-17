@@ -1,6 +1,5 @@
-1	german	x-vnd.Haiku-Magnify	1680541832
+1	german	x-vnd.Haiku-Magnify	2101743114
 %width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize Pixel/Pixel
-About Magnify…	Magnify-Main		Über Magnify...
 Add a crosshair	Magnify-Main		Fadenkreuz hinzufügen
 Copy image	Magnify-Main		Bild kopieren
 Copy/Save:\n  copy - copies the current image to the clipboard\n  save - prompts the user for a file to save to and writes out\n    the bits of the image\n	Magnify-Help		Bild kopieren/speichern:\nKopieren - kopiert das aktuelle Bild in die Zwischenablage\nSpeichern - speichert das Bild als Bits, die in Header-Dateien\nbei der Programmierung genutzt werden können.\n
@@ -8,14 +7,12 @@ Decrease pixel size	Magnify-Main		Pixel verkleinern
 Decrease window size	Magnify-Main		Fenster verkleinern
 Freeze/Unfreeze image	Magnify-Main		Bild einfrieren/freigeben
 General:\n  32 x 32 - the top left numbers are the number of visible\n    pixels (width x height)\n  8 pixels/pixel - represents the number of pixels that are\n    used to magnify a pixel\n  R:152 G:52 B:10 -  the RGB values for the pixel under\n    the red square\n	Magnify-Help		Allgemein:\n32 x 32 - die linken oberen Zahlen sind die Anzahl der sichtbaren\n Pixel (Breite x Höhe)\n8 Pixel/Pixel - steht für die Anzahl der Pixel, mit\nder ein Pixel vergrößert wird.\nR:152 G:52 B:10 - die RGB Werte des Pixels unter\ndem roten Quadrat.\n
-Help…	Magnify-Main		Hilfe...
 Hide/Show grid	Magnify-Main		Gitter aus-/einblenden
 Hide/Show info	Magnify-Main		Infos aus-/einblenden
 Increase pixel size	Magnify-Main		Pixel vergrößern
 Increase window size	Magnify-Main		Fenster vergrößern
 Info	Magnify-Main		Info
 Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		Info:\nInfos aus-/einblenden - blendet Informationen zu Fenster- und Pixelgröße ein/aus.\nDas kleine rote Quadrat markiert den Pixel, dessen Farbe als RGB-Wert angezeigt wird.\nFadenkreuz hinzufügen/entfernen - bis zu zwei Fadenkreuze, dargestellt durch blaue\n Quadrate und Linien, helfen beim Ausrichten von Objekten.\nGitter aus-/einblenden - steuert ein Gitter, das sich über die Pixel legt.\n
-Magnify	Magnify-Main		Magnify
 Magnify help	Magnify-Help		Magnify-Hilfe
 Magnify!\n\n©2002-2006 Haiku\n(C)1999 Be Inc.\n\nNow with even more features and recompiled for Haiku.	Magnify-Main		Magnify!\n\n©2002-2006 Haiku\n(C)1999 Be Inc.\n\nJetzt mit noch mehr Features und neu für Haiku kompiliert.
 Make square	Magnify-Main		Quadratisches Fenster

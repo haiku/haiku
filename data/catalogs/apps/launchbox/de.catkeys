@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-LaunchBox	1672943267
+1	german	x-vnd.Haiku-LaunchBox	2168437832
 About	LaunchBox		Über
 Add button here	LaunchBox		Feld hier einfügen
 Auto-raise	LaunchBox		Automatisch nach vorn holen
@@ -15,7 +15,6 @@ Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Senden de
 Horizontal layout	LaunchBox		Horizontale Anordnung
 Icon size	LaunchBox		Icongröße
 Ignore double-click	LaunchBox		Doppelklick ignorieren
-LaunchBox	LaunchBox		LaunchBox
 Name Panel	LaunchBox		Namenspanel
 New	LaunchBox		Neu
 OK	LaunchBox		OK

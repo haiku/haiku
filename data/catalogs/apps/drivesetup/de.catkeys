@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-DriveSetup	2723551013
+1	german	x-vnd.Haiku-DriveSetup	568426562
 %ld MiB	Support		%ld MiB
 <empty>	DiskView		<leer>
 <empty>	PartitionList		<leer>
@@ -29,7 +29,6 @@ Device	DiskView		Gerät
 Device	PartitionList		Gerät
 Disk	MainWindow		Datenträger
 Disk system \"%s\"\" not found!	MainWindow		Medienschema \"%s\"\" nicht gefunden!
-DriveSetup	MainWindow		DriveSetup
 Eject	MainWindow		Auswerfen
 End: %ld MB	Support		Ende: %ld MiB
 Error: 	MainWindow	in any error alert	Fehler: 

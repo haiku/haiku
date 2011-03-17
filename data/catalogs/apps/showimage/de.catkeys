@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-ShowImage	3385354583
+1	german	x-vnd.Haiku-ShowImage	1479416858
 %SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS Sekunden
 About ShowImage…	Menus		Über ShowImage…
 Browse	Menus		Blättern
@@ -45,8 +45,6 @@ Save as…	Menus		Speichern unter...
 Select all	Menus		Alles auswählen
 Selection Mode	Menus		Auswahlmodus
 Show caption in full screen mode	Menus		Im Vollbild-Modus Dateiname zeigen
-ShowImage	AboutWindow		ShowImage
-ShowImage	Menus		ShowImage
 Slide delay	Menus		Verzögerung
 Slide show	Menus		Diashow
 Stretch to window	Menus		Auf Fenstergröße vergrößern

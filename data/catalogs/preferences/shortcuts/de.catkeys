@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Shortcuts	1120793954
+1	german	x-vnd.Haiku-Shortcuts	2152414241
 (Choose application with file requester)	ShortcutsWindow		(Eine Anwendung per Datei-Dialog wählen)
 *Beep	ShortcutsWindow		*Piepton
 *InsertString \"Your Text Here\"	ShortcutsWindow		*Zeichen einfügen \"Hier der Text\"
@@ -47,7 +47,6 @@ Save KeySet as…	ShortcutsWindow		Tastenbelegung speichern unter...
 Select	ShortcutsWindow		Auswählen
 SendMessage	ShortcutsSpec		Nachricht senden
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
-Shortcuts	ShortcutsWindow		Shortcuts - Tastenkürzel
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Die Tastenbelegungsdatei konnte nicht geladen werden.
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Die Tastenbelegungsdatei konnte nicht gelesen werden.
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Die Tastenbelegungsdatei konnte nicht gespeichert werden.

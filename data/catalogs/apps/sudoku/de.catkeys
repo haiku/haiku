@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Sudoku	2100942083
+1	german	x-vnd.Haiku-Sudoku	2743785378
 Abort	ProgressWindow		Abbrechen
 About	Sudoku		Über
 About Sudoku…	SudokuWindow		Über Sudoku...
@@ -25,12 +25,11 @@ Quit	SudokuWindow		Beenden
 Redo	SudokuWindow		Wiederholen
 Restore snapshot	SudokuWindow		Spielstand wiederherstellen
 Searching for removable values	SudokuGenerator		Suche nach entfernbaren Werten läuft
-Snapshot current	SudokuWindow		Spielstand speichern
+Snapshot current	SudokuWindow		Spielstand merken
 Solve	SudokuWindow		Auflösen
 Solve single field	SudokuWindow		Ein Feld lösen
 Start again	SudokuWindow		Von vorn beginnen
 Sudoku	Sudoku		Sudoku
-Sudoku	SudokuWindow		Sudoku
 Sudoku request	SudokuWindow		Sudoku Anfrage
 Sudoku solved - congratulations!\n	SudokuWindow		Sudoku gelöst - Glückwunsch!\n
 Sudoku\n\twritten by Axel Dörfler\n\tCopyright 2007, Haiku Inc.\n	Sudoku		Sudoku\n\t von Axel Dörfler\n\tCopyright 2007, Haiku Inc.\n

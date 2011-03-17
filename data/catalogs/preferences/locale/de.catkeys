@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Locale	3734759026
+1	german	x-vnd.Haiku-Locale	179985940
 12 hour	TimeFormatSettings		12 Stunden
 24 hour	TimeFormatSettings		24 Stunden
 Available languages	Locale Preflet Window		Verfügbare Sprachen
@@ -22,7 +22,6 @@ Preferred languages	Locale Preflet Window		Bevorzugte Sprache
 Restart	Locale Preflet Window		Neustart
 Revert	Locale Preflet Window		Anfangswerte
 Short format:	TimeFormatSettings		Kurzes Format:
-System	Locale Preflet Window		System
 Time	TimeFormatSettings		Zeit
 Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		Übersetzte Programm- und Ordnernamen in Deskbar und Tracker verwenden.
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Es wurden keine verfügbaren Sprachen gefunden. Dieses Preflet kann daher nicht verwendet werden!

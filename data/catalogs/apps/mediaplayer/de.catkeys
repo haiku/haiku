@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-MediaPlayer	2559622077
+1	german	x-vnd.Haiku-MediaPlayer	2133469082
 1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (Amerikanisch)
 100% scale	MediaPlayer-Main		100% Zoom
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2,35 : 1 (Cinemascope)
@@ -12,7 +12,6 @@
 <unknown>	PlaylistItem-author		<unbekannt>
 <unnamed>	PlaylistItem-name		<unbenannt>
 <untitled>	PlaylistItem-title		<unbenannt>
-About MediaPlayer…	MediaPlayer-Main		Über MediaPlayer...
 All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Es konnten nicht alle Dateien in den Papierkorb verschoben werden.
 Always on top	MediaPlayer-Main		Immer im Vordergrund
 Aspect ratio	MediaPlayer-Main		Seitenverhältnis
@@ -51,10 +50,7 @@ Lock Peaks	MediaPlayer-PeakView		Ausschlag markieren
 Loop movies by default	MediaPlayer-SettingsWindow		Video in Endlosschleife abspielen
 Loop sounds by default	MediaPlayer-SettingsWindow		Audio in Endlosschleife abspielen
 Low volume	MediaPlayer-SettingsWindow		Niedrige Lautstärke
-MediaPlayer	MediaPlayer-Main		MediaPlayer
-MediaPlayer encountered an internal error. The file could not be opened.	MediaPlayer-Main		Es ist ein interner Fehler in MediaPlayer aufgetreten. Die Datei konnte nicht geöffnet werden.
 MediaPlayer settings	MediaPlayer-SettingsWindow		MediaPlayer-Einstellungen
-MediaPlayer\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		MediaPlayer\n\nvon Marcus Overhagen, Stephan Aßmus und Frederik Modéen
 Medium	MediaPlayer-SettingsWindow		Mittel
 Move Entries	MediaPlayer-MovePLItemsCmd		Einträge verschieben
 Move Entry	MediaPlayer-MovePLItemsCmd		Eintrag verschieben
@@ -136,6 +132,5 @@ Video track	MediaPlayer-Main		Videospur
 View options	MediaPlayer-SettingsWindow		Darstellung
 Volume	MediaPlayer-Main		Lautstärke
 Volume of background clips	MediaPlayer-SettingsWindow		Wiedergabe im Hintergrund
-error	MediaPlayer-Main		Fehler
 none	Audio track menu		keine
 none	Subtitles menu		kein

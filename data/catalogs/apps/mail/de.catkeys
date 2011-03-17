@@ -1,4 +1,4 @@
-1	german	x-vnd.Be-MAIL	2797564879
+1	german	x-vnd.Be-MAIL	1806372798
 %d - Date	Mail		%d - Datum
 %e - E-mail address	Mail		%e - E-Mail-Adresse
 %n - Full name	Mail		%n - Voller Name
@@ -60,7 +60,6 @@ Initial spell check mode:	Mail		Rechtschreibprüfung:
 Leave as '%s'	Mail		Status '%s' belassen
 Leave as New	Mail		Status 'New' belassen
 Leave same	Mail		Status belassen
-Mail	Mail		Mail
 Mail couldn't find its dictionary.	Mail		Das Wörterbuch wurde nicht gefunden.
 Mail preferences	Mail		Mail-Einstellungen
 Mail\n\n	Mail		Mail\n\n

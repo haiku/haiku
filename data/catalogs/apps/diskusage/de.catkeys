@@ -1,10 +1,9 @@
-1	german	x-vnd.Haiku-DiskUsage	3490177044
+1	german	x-vnd.Haiku-DiskUsage	174251200
 %a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
 %d file	Status View		%d Datei
 %d files	Status View		%d Dateien
 9999.99 GB	Status View		9999,99 GiB
 Created	Info Window		Erstellt
-DiskUsage	MainWindow		DiskUsage
 Free on %refName%	Scanner		Frei auf %refName%
 Get Info	Pie View		Datei-Info
 Kind	Info Window		Art

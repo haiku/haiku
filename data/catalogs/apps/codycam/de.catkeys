@@ -1,6 +1,4 @@
-1	german	x-vnd.Haiku.CodyCam	1322454590
-About CodyCam	CodyCam		Über CodyCam
-About Codycam…	CodyCam		Über Codycam…
+1	german	x-vnd.Haiku.CodyCam	3353004969
 Can't find an available connection to the video window	CodyCam		Es wurde keine verfügbare Verbindung zum Videofenster gefunden.
 Cannot connect the video source to the video window	CodyCam		Keine Verbindung zwischen Videoquelle und Videofenster möglich
 Cannot create a video window	CodyCam		Das Videofenster konnte nicht erstellt werden
@@ -18,10 +16,7 @@ Cannot start time source!	CodyCam		Die Zeitquelle konnte nicht gestartet werden!
 Capture Rate Menu	CodyCam		Aufnahme-Intervall-Menü
 Capture controls	CodyCam		Aufnahme-Einstellungen
 Capturing Image…	VideoConsumer.cpp		Bild wird aufgenommen...
-Close	CodyCam		Schließen
 Closing the window\n	VideoConsumer.cpp		Fenster wird geschlossen
-CodyCam	CodyCam		CodyCam
-CodyCam\n\nThe Original BeOS webcam	CodyCam		CodyCam\n\nDie originale BeOS-Webcam
 Connected…	VideoConsumer.cpp		Verbunden…
 Couldn't find requested directory on server	VideoConsumer.cpp		Das angefragte Verzeichnis konnte auf dem Server nicht gefunden werden.
 Directory:	CodyCam		Ordner:

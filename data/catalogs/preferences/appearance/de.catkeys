@@ -1,8 +1,7 @@
-1	german	x-vnd.Haiku-Appearance	3612090060
+1	german	x-vnd.Haiku-Appearance	1227622574
 Antialiasing	APRWindow		Kantenglättung
 Antialiasing menu	AntialiasingSettingsView		Kantenglättungs-Menü
 Antialiasing type:	AntialiasingSettingsView		Kantenglättungstyp:
-Appearance	APRWindow		Appearance - Erscheinungsbild
 Colors	APRWindow		Farben
 Control background	Colors tab		Steuerelement - Hintergrund
 Control border	Colors tab		Steuerelement - Rahmen

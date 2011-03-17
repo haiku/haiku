@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Devices	189828730
+1	german	x-vnd.Haiku-Devices	1176141157
 ACPI Information	DeviceACPI		ACPI-Information
 ACPI Processor Namespace '%2'	DeviceACPI		ACPI Prozessor Namespace '%2'
 ACPI System Bus	DeviceACPI		ACPI Systembus
@@ -8,8 +8,6 @@ ACPI bus	Device		ACPI-Bus
 ACPI bus	DevicesView		ACPI-Bus
 ACPI controller	Device		ACPI-Controller
 ACPI node '%1'	DeviceACPI		ACPI Node '%1'
-About	DevicesApplication		über
-About Devices…	DevicesView		Über Devices...
 Basic information	DevicesView		Basisinformation
 Bridge	Device		Schnittstellen
 Bus	DevicesView		Bus
@@ -30,9 +28,7 @@ Device name	DevicePCI		Gerätename
 Device name:	Device		Gerätename:
 Device paths	Device		Gerätepfade
 Device paths	DevicePCI		Gerätepfad
-Devices	DevicesApplication		Devices - Geräte
 Devices	DevicesView		Geräte
-Devices\n\twritten by Pieter Panman\n\n\tBased on listdev by Jérôme Duval\n\tand the previous Devices preference\n\tby Jérôme Duval and Sikosis\n\tCopyright 2009, Haiku, Inc.\n	DevicesApplication		Devices\n\tvon Pieter Panman.\n\n\tBasiert auf listdev von Jérôme Duval\n\tund auf den früheren Devices-Einstellungen\n\tvon Jérôme Duval und Sikosis.\n\tCopyright 2009, Haiku, Inc.\n
 Display controller	Device		Anzeige-Controller
 Docking station	Device		Andockstation
 Driver used	Device		Treiber benutzt
@@ -56,7 +52,6 @@ Network controller	Device		Netzwerk-Controller
 None	Device		Kein
 Not implemented	DeviceACPI		Nicht implementiert
 Not implemented	DevicePCI		Nicht implementiert
-OK	DevicesApplication		OK
 Order by:	DevicesView		Sortieren nach:
 PCI Information	DevicePCI		PCI-Information
 PCI bus	Device		PCI-Bus

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-VirtualMemory	3110510347
+1	german	x-vnd.Haiku-VirtualMemory	3541691135
 %Ld B	SettingsWindow		%Ld B
 Changes will take effect on restart!	SettingsWindow		Änderungen werden erst nach einem Neustart aktiv!
 Current swap file size: 	SettingsWindow		Aktuelle Größe der Auslagerungsdatei: 
@@ -16,5 +16,4 @@ Requested swap file size:	SettingsWindow		Gewünschte Größe:
 Revert	SettingsWindow		Anfangswerte
 Turn off	SettingsWindow		Ausschalten
 Use volume:	SettingsWindow		Auf Laufwerk:
-VirtualMemory	SettingsWindow		VirtualMemory - Virtueller Speicher
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		VirtualMemory\n\tvon Axel Dörfler\n\tCopyright 2005, Haiku.\n

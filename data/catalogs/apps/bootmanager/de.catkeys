@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-BootManager	2058739736
+1	german	x-vnd.Haiku-BootManager	734273860
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Im nächsten Schritt wird der Master-Boot-Record (MBR) auf %disk aus der Sicherungsdatei %file wiederhergestellt. Wirklich fortfahren?
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Im nächsten Schritt wird das Bootmenü auf den Datenträger geschrieben. Wirklich fortfahren?
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Es wird nun das folgende Bootmenü auf das Laufwerk (%s) geschrieben. Die Einstellungen sollten vor dem nächsten Schritt noch einmal geprüft werden.
@@ -13,10 +13,7 @@ At least one partition must be selected!	BootManagerController		Es muss mindeste
 Back	BootManagerController	Button	Zurück
 Backup Master Boot Record	BootManagerController	Title	Backup des Master-Boot-Record erstellen
 Boot Manager is unable to read the partition table!	BootManagerController		BootManager kann die Partitionstabelle nicht auslesen!
-BootManager	BootManager	Application name	BootManager
-BootManager	BootManagerWindow	Window Title	BootManager
 Cannot access!	DrivesPage	Cannot install	Zugriff unmöglich!
-Copyright %year, Haiku Inc.\n	BootManager	Leave %year untranslated	Copyright %year, Haiku Inc.\n
 Default Partition	DefaultPartitionPage	Title	Standard-Partition
 Default Partition:	DefaultPartitionPage	Menu field label	Standard-Partition
 Done	BootManagerController	Button	Fertig
@@ -31,7 +28,6 @@ Installation of boot menu failed	BootManagerController	Title	Installation des Bo
 Never	DefaultPartitionPage		Niemals
 Next	WizardView	Button	Weiter
 No space available!	DrivesPage	Cannot install	Kein Speicher verfügbar!
-OK	BootManager		OK
 OK	BootManagerController	Button	OK
 Old Master Boot Record Saved failure	BootManagerController	Title	Fehler beim Sichern des alten Master-Boot-Record
 Old Master Boot Record saved	BootManagerController	Title	Alter Master-Boot-Record gespeichert
@@ -66,4 +62,3 @@ Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Unbekannt
 Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Unbenannte %d
 Update	DrivesPage	Button	Aktualisieren
 Write boot menu	BootManagerController	Button	Bootmenü schreiben
-written by	BootManager		von

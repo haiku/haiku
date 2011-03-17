@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Media	1701788906
+1	german	x-vnd.Haiku-Media	293613603
 <none>	Media views		<nichts>
 Audio input:	Media views		Audio-Eingang:
 Audio mixer	Media Window		Audiomixer
@@ -11,7 +11,6 @@ Couldn't add volume control in Deskbar: %s\n	Media views		Die Lautstärkeregelun
 Couldn't remove volume control in Deskbar: %s\n	Media views		Die Lautstärkeregelung konnte nicht aus der Deskbar entfernt werden: %s\n
 Defaults	Media views		Standardwerte
 Done shutting down.	Media Window		Herunterfahren beendet.
-Media	Media Window		Media - Audio & Video
 OK	Media Window		OK
 Quit	Media Window		Beenden
 Ready for use…	Media Window		Einsatzbereit…

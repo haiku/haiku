@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-MediaConverter	4254955936
+1	german	x-vnd.Haiku-MediaConverter	3793354334
 %.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld Kanal / %lld Frames
 %.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz Mono / %lld Frames
 %.1f kHz stereo / %lld frames	MediaFileInfo		%.1f kHz Stereo / %lld Frames
@@ -6,7 +6,6 @@
 %d bit 	MediaFileInfo		%d Bit
 %d byte 	MediaFileInfo		%d Byte
 %u x %u, %.2ffps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%u x %u, %.2f Frames/s / %Ld Frames
-About MediaConverter…	Menu		Über MediaConverter...
 About…	MediaConverter		About...
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Es ist ein Fehler beim Lesen der Dateiinformationen aufgetreten.\n\nFehler:
 Audio encoding:	MediaConverter		Audiokodierung:
@@ -40,7 +39,6 @@ File details	MediaConverter		Dateidetails
 File format:	MediaConverter		Dateiformat:
 High	MediaConverter		Hoch
 Low	MediaConverter		Niedrig
-MediaConverter	MediaConverter		MediaConverter
 MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:SaveDirectory
 MediaConverter\n1.3.0\n© 1999, Be Incorporated.\n© 2000-2004 Jun Suzuki\n© 2007 Stephan Aßmus\n© 2010 Haiku, Inc.	MediaConverter		MediaConverter\n1.3.0\n© 1999, Be Incorporated.\n© 2000-2004 Jun Suzuki\n© 2007 Stephan Aßmus\n© 2010 Haiku, Inc.
 No audio	Audio codecs list		Keine Tonspur

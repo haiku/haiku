@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-DiskProbe	1552395580
+1	german	x-vnd.Haiku-DiskProbe	2592803962
 %ld (native)	ProbeView		%ld (nativ)
 (native)	ProbeView		(nativ)
 15 bit	TypeEditors		15 Bit
@@ -53,11 +53,9 @@ Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it i
 Device	ProbeView		Gerät
 Device offset: 	ProbeView		Gerät-Offset: 
 Device: 	ProbeView		Gerät: 
-DiskProbe	OpenWindow		DiskProbe
 DiskProbe request	AttributeWindow		DiskProbe-Anfrage
 DiskProbe request	DiskProbe		DiskProbe-Anfrage
 DiskProbe request	ProbeView		DiskProbe-Anfrage
-DiskProbe\n\twritten by Axel Dörfler\n\tCopyright 2004-2007, Haiku.\n\nOriginal Be version by Robert Polic\n	DiskProbe		DiskProbe\n\tvon Axel Dörfler,\n\tCopyright 2004-2007, Haiku.\n\nOriginal Be Version von Robert Polic.\n
 Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Soll das Attribut \"%s\" wirklich von der Datei \"%s\" entfernt werden?\n\nDiese Aktion kann nicht rückgängig gemacht werden.
 Don't save	ProbeView		Verwerfen
 Double precision floating-point value:	TypeEditors		Doppelt-präziser Gleitkomma-Wert:

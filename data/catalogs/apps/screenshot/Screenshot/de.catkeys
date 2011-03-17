@@ -1,4 +1,4 @@
-1	german	x-vnd.haiku-screenshot	166521589
+1	german	x-vnd.haiku-screenshot	731699482
 Artwork folder	ScreenshotWindow		Artwork-Ordner
 Cancel	ScreenshotWindow		Abbrechen
 Capture active window	ScreenshotWindow		Nur aktives Fenster
@@ -16,7 +16,6 @@ Please select	ScreenshotWindow		Bitte auswählen
 Save	ScreenshotWindow		Speichern
 Save as:	ScreenshotWindow		Format:
 Save in:	ScreenshotWindow		Speichern in:
-Screenshot	ScreenshotWindow		Screenshot
 Select	ScreenshotWindow		Auswählen
 Settings…	ScreenshotWindow		Einstellungen...
 This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Diese Datei existiert bereits.\nSoll sie überschreiben werden?
