@@ -108,7 +108,8 @@ class TMailWindow : public BWindow {
 				void			SaveTrackerPosition(entry_ref*);
 				void			SetOriginatingWindow(BWindow* window);
 
-				void			SetCurrentMessageRead(read_flags flag);
+				void			MarkMessageRead(entry_ref* message,
+									read_flags flag);
 				void			SetTrackerSelectionToCurrent();
 				TMailWindow*	FrontmostWindow();
 				void			UpdateViews();

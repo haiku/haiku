@@ -796,9 +796,9 @@ TMailWindow::SetTrackerSelectionToCurrent()
 
 
 void
-TMailWindow::SetCurrentMessageRead(read_flags flag)
+TMailWindow::MarkMessageRead(entry_ref* message, read_flags flag)
 {
-	BNode node(fRef);
+	BNode node(message);
 	status_t status = node.InitCheck();
 	if (status != B_OK)
 		return;
@@ -811,7 +811,7 @@ TMailWindow::SetCurrentMessageRead(read_flags flag)
 	// don't wait for the server write the attribute directly
 	write_read_attr(node, flag);
 
-	BMailDaemon::MarkAsRead(account, *fRef, flag);
+	BMailDaemon::MarkAsRead(account, *message, flag);
 }
 
 
@@ -1130,7 +1130,7 @@ TMailWindow::MessageReceived(BMessage *msg)
 			}
 			if (fIncoming) {
 				read_flags flag = (fAutoMarkRead == true) ? B_READ : B_SEEN;
-				SetCurrentMessageRead(flag);
+				MarkMessageRead(fRef, flag);
 			}
 
 			if (!fTrackerMessenger.IsValid() || !fIncoming) {
@@ -1461,12 +1461,11 @@ TMailWindow::MessageReceived(BMessage *msg)
 		//	Navigation Messages
 		//
 		case M_UNREAD:
-			SetCurrentMessageRead(B_SEEN);
+			MarkMessageRead(fRef, B_SEEN);
 			_UpdateReadButton();
 			break;
 		case M_READ:
 			wasReadMsg = true;
-			SetCurrentMessageRead(B_READ);
 			_UpdateReadButton();
 			msg->what = M_NEXTMSG;
 		case M_PREVMSG:
@@ -1474,6 +1473,7 @@ TMailWindow::MessageReceived(BMessage *msg)
 		{
 			if (fRef == NULL)
 				break;
+			entry_ref orgRef = *fRef;
 			entry_ref nextRef = *fRef;
 			if (GetTrackerWindowFile(&nextRef, (msg->what == M_NEXTMSG))) {
 				TMailWindow *window = static_cast<TMailApp *>(be_app)
@@ -1484,15 +1484,14 @@ TMailWindow::MessageReceived(BMessage *msg)
 					if (read_read_attr(node, currentFlag) != B_OK)
 						currentFlag = B_UNREAD;
 					if (fAutoMarkRead == true)
-						SetCurrentMessageRead(B_READ);
+						MarkMessageRead(fRef, B_READ);
 					else if (currentFlag != B_READ && !wasReadMsg)
-						SetCurrentMessageRead(B_SEEN);
+						MarkMessageRead(fRef, B_SEEN);
 
 					OpenMessage(&nextRef,
 						fHeaderView->fCharacterSetUserSees);
 				} else {
 					window->Activate();
-
 					//fSent = true;
 					PostMessage(B_CLOSE_REQUESTED);
 				}
@@ -1501,8 +1500,11 @@ TMailWindow::MessageReceived(BMessage *msg)
 			} else {
 				if (wasReadMsg)
 					PostMessage(B_CLOSE_REQUESTED);
+
 				beep();
 			}
+			if (wasReadMsg)
+				MarkMessageRead(&orgRef, B_READ);
 			break;
 		}
 
@@ -1713,14 +1715,14 @@ TMailWindow::QuitRequested()
 	} else if (fRef != NULL && !fKeepStatusOnQuit) {
 		// ...Otherwise just set the message read
 		if (fAutoMarkRead == true)
-			SetCurrentMessageRead(B_READ);
+			MarkMessageRead(fRef, B_READ);
 		else {
 			BNode node(fRef);
 			read_flags currentFlag;
 			if (read_read_attr(node, currentFlag) != B_OK)
 				currentFlag = B_UNREAD;
 			if (currentFlag == B_UNREAD)
-				SetCurrentMessageRead(B_SEEN);
+				MarkMessageRead(fRef, B_SEEN);
 		}
 	}
 
