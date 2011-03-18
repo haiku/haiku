@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku.TV	3791845041
+1	belarusian	x-vnd.Haiku.TV	16571315
 About %1…	MainWin	Parameter %1 is the name of the application.	Пра %1...
 Always on top	MainWin		Заўседы ў фокусе
 Channel	MainWin		Канал
@@ -19,6 +19,7 @@ Quit	MainWin		Выйсці
 Scale to native size	MainWin		Расцягнуць да роднага памеру
 Settings	MainWin		Наладкі
 Settings…	MainWin		Наладкі...
+TV	Application name		Тэлевізар
 TV	MainWin		Тэлевізар
 \nBuild 	MainWin		\nЗборка
 \nRevision 	MainWin		\nРэвізія

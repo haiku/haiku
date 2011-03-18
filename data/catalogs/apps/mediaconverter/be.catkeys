@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-MediaConverter	3793354334
+1	belarusian	x-vnd.Haiku-MediaConverter	3794171454
 %.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f кГц %ld каналаў / %lld фрэймаў
 %.1f kHz mono / %lld frames	MediaFileInfo		%.1f кГц моно / %lld фрэймаў
 %.1f kHz stereo / %lld frames	MediaFileInfo		%.1f кГц стэрэа / %lld фрэймаў
@@ -39,6 +39,7 @@ File details	MediaConverter		Падрабязнасці пра файл
 File format:	MediaConverter		Фармат файла:
 High	MediaConverter		Найвышэйшая
 Low	MediaConverter		Нізкая
+MediaConverter	Application name		МедыяКанвертар
 MediaConverter+:SaveDirectory	MediaConverter		КанвертарМедыя+:Захаваць папку
 MediaConverter\n1.3.0\n© 1999, Be Incorporated.\n© 2000-2004 Jun Suzuki\n© 2007 Stephan Aßmus\n© 2010 Haiku, Inc.	MediaConverter		Канвертар Медыя\n1.3.0\n© 1999, Be Incorporated.\n© 2000-2004 Jun Suzuki\n© 2007 Stephan Aßmus\n© 2010 Haiku, Inc.
 No audio	Audio codecs list		Няма аўдыё

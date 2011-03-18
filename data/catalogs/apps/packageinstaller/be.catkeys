@@ -1,0 +1,62 @@
+1	belarusian	x-vnd.Haiku-PackageInstaller	1047551357
+%.1f GiB	PackageView		%.1f ГіБ
+%.1f KiB	PackageView		%.1f КіБ
+%.1f MiB	PackageView		%.1f МіБ
+%llu bytes	PackageView		%llu байтаў
+(%s free)	PackageView		(%s вольна)
+Abort	PackageInfo		Перарваць
+Abort	PackageInstall		Перарваць
+Abort	PackageView		Перарваць
+Accept	PackageTextViewer		Прыняць
+All existing files will be replaced?	PackageView		Усе існуючыя файлы будуць заменены?
+All existing files will be skipped?	PackageView		Усе існуючыя файлы будуць абыйдзены?
+Ask again	PackageView		Пытаць ізноў
+Continue	PackageInfo		Працягваць
+Continue	PackageInstall		Працягваць
+Continue	PackageTextViewer		Працягваць
+Decline	PackageTextViewer		Знізіць
+Disclaimer	PackageTextViewer		Адмова
+Do you want to remember this decision for the rest of this installation?\n	PackageView		Жадаеце абраць такое-ж рашэнне для астатніх этапаў усталёўкі?\n
+Done	PackageInstall		Зроблена
+Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Памылка (%s)! Немагчыма адкрыць \"%s\".\n
+Error on SetTo\n	PackageInstall		Памылка ў SetTo\n
+Error on uninstall\n	PackageInstall		Памылка усталёўкі\n
+Error while installing the package\n	PackageView		Памылка падчас усталёўкі пакунка\n
+Error while running script\n	PackageInstall		Памылка падчас запуску скрыпта\n
+Error while writing path\n	PackageInstall		Памылка падчас запісу пуці\n
+Error! \"%s\" is not a valid path.\n	Packageinstaller main		Памылка! Пуць \"%s\" некарэктны.\n
+Finishing installation	PackageInstall		Заканчэнне усталёўкі
+Image not loaded correctly	PackageImageViewer		Вобраз не загружаны
+Install	PackageView		Усталяваць
+Install to:	PackageView		Усталяваць у:
+Installation progress	PackageView		Прагрэс усталёўкі
+Installation type:	PackageView		Тып усталёўкі:
+Installing files and folders	PackageInstall		Усталёўка файлаў і папак
+Installing package	PackageStatus		Усталеўка пакунка
+No installation type selected	PackageView		Не абраны тып усталёўкі
+No package available.	PackageInfo		Няма даступных пакункаў.
+No package selected.	PackageInfo		Няма абраных пакункаў
+OK	PackageView		ОК
+OK	Packageinstaller main		ОК
+Other…	PackageView		Другі…
+Package installer	PackageView		Усталёўшчык Пакункаў
+PackageInstaller	Application name		Усталёўшчык Пакункаў
+PackageInstaller\nBeOS legacy .pkg file installer for Haiku.\n\nCopyright 2007,\nŁukasz 'Sil2100' Zemczak\n\nCopyright (c) 2007 Haiku, Inc. \n	Packageinstaller main		Усталёўшчык Пакункаў\nУсталёўшчык старых BeOS .pkg пакункаў для Haiku.\n\nCopyright 2007,\nŁukasz 'Sil2100' Zemczak\n\nCopyright (c) 2007 Haiku, Inc. \n
+Preparing package	PackageInstall		Прыгатаванне пакунку
+Replace	PackageView		Замяніць
+Running post-installation scripts	PackageInstall		Запускаюцца усталёўныя скрыпты
+Skip	PackageView		Абыйсці
+Stop	PackageStatus		Спыніць
+The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Папка '%s' ужо існуе у вашай сістэме.\nЗамяніць яе той што зададзена ў пакунку ці абыйсці?
+The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Файл '%s' ужо існуе у вашай сістэме.\nЗамяніць яго тым што зададзены ў пакунку ці абыйсці?
+The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Падобна, што абраны пакунак ужо усталёваны на вашай сістэме. Жадаеце выдаліць існуючую версію і працягнуць усталёўку?
+The installation of the package has been aborted.	PackageView		Усталёўка пакунка была перарваная.
+The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Элемент '%s' ужо існуе у вашай сістэме.\nЗамяніць яго тым што зададзены ў пакунку ці абыйсці?
+The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Файл пакунку не можа быць прачытаны.\nМагчымая прычына такой памылкі можа быць тое, што ён не з´яўляецца карэктным BeOS .pkg файлам.
+The package you requested has been successfully installed on your system.	PackageView		Абраны пакунак быў паспяхова усталяваны у вашую сістэму.
+The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Не ўдалося усталяваць абраны пакунак у сістэму. Магчыма праблема з файлам пакунка. Кансультуйцеся, калі ласка, з распрацоўшчыкам пакунка.
+The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Скрыпт '%s' ужо існуе у вашай сістэме.\nЗамяніць яго тым што зададзены ў пакунку ці абыйсці?
+The symbolic link named '%s' already exists in the give path.\nReplace the link with the one from this package or skip it?	PackageView		Спасылка '%s' ужо існуе у вашай сістэме.\nЗамяніць яе той што зададзена ў пакунку ці абыйсці?
+There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Падобна, што памер файлу пакунка не адпавядае. Верагодна, што вы маеце пашкоджаны ці наўмысна мадыфікаваны пакунак. Жадаеце працягнуць усталёўку?
+Unknown file tag %s\n	PackageInfo		Невядомая этыкетка файла %s\n
+returning on error\n	PackageInstall		вяртанне па памылцы\n

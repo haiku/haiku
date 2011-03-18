@@ -1,8 +1,9 @@
-1	belarusian	x-vnd.Haiku-DataTranslations	2849987867
+1	belarusian	x-vnd.Haiku-DataTranslations	851864743
 About	DataTranslations		пра праграму
 An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		'%name' ўжо існуе ў спісе ўсталяваных канвертараў! Перазапісаць яго?
 Cancel	DataTranslations		Адмена
 Could not install %s:\n%s	DataTranslations		Немагчыма усталяваць %s:\n%s
+DataTranslations	Application name		Канвертары
 DataTranslations - Error	DataTranslations		DataTranslations - Памылка
 DataTranslations - Note	DataTranslations		DataTranslations - Нататка
 DataTranslations\n\twritten by Oliver Siebenmarck and others\n\tCopyright 2002-2010, Haiku Inc. All rights reserved.\n	DataTranslations		DataTranslations\n\tАўтары: Oliver Siebenmarck і іншыя\n\tCopyright 2002-2010, Haiku Inc. Усе правы ахоўваюцца.\n

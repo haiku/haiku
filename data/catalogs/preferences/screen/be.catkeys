@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Screen	1658032282
+1	belarusian	x-vnd.Haiku-Screen	1466525338
 %.1f Hz	Screen		%.1f Гц
 %sSerial no.: %s	Screen		%sСерыйны нумар.: %s
 /other…	Screen		/іншае…
@@ -28,6 +28,7 @@ Refresh rate:	Screen		Частата абнаўлення:
 Resolution:	Screen		Дазвол:
 Revert	Screen		Вярнуць
 Rows:	Screen		Радкі:
+Screen	Application name		Экран
 Screen	Screen		Экран
 Screen preferences by the Haiku team	Screen		Наладкі экрана, каманда Haiku
 Set background…	Screen		Прызначыць фон…

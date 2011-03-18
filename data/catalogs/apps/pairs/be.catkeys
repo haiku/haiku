@@ -1,4 +1,5 @@
-1	belarusian	x-vnd.Haiku-Pairs	1919511432
+1	belarusian	x-vnd.Haiku-Pairs	921992441
+%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYou completed the game in %num% clicks.\n	PairsWindow		%app%\n\tраспрацавана Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nВыВы скончылі гульню ў %num% клікаў.\n
 Beginner (4x4)	PairsWindow		Пачаткоўца (4x4)
 Expert (8x8)	PairsWindow		Майстар (8x8)
 Game	PairsWindow		Гульня

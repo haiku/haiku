@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Notifications	3545587988
+1	belarusian	x-vnd.Haiku-Notifications	3348596994
 Above icon	DisplayView		Іконка зверху
 Allowed	NotificationView		Дазволена
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Адбылася памылка пры захаванні наладак.\nМагчыма, не хапае месца на дыску.
@@ -26,6 +26,7 @@ Large icon	DisplayView		Вялікая іконка
 Last Received	NotificationView		Апошняе атрыманае
 Mini icon	DisplayView		Міні-іконка
 No	NotificationView		Не
+Notifications	Application name		Паведамленні
 Notifications	GeneralView		Паведамленні
 Notifications	NotificationView		Паведамленні
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Немагчыма спыніць Notifications, бо сервер недаступны.

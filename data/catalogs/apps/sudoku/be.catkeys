@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Sudoku	2743785378
+1	belarusian	x-vnd.Haiku-Sudoku	2414949553
 Abort	ProgressWindow		Перарваць
 About	Sudoku		Пра
 About Sudoku…	SudokuWindow		Пра Sudoku…
@@ -29,6 +29,7 @@ Snapshot current	SudokuWindow		Здымак бягучага
 Solve	SudokuWindow		Вырашыць
 Solve single field	SudokuWindow		Вырашыць адно поле
 Start again	SudokuWindow		Запусціць наноў
+Sudoku	Application name		Sudoku
 Sudoku	Sudoku		Sudoku
 Sudoku request	SudokuWindow		Запыт Sudoku
 Sudoku solved - congratulations!\n	SudokuWindow		Sudoku вырашана - віншуем!\n

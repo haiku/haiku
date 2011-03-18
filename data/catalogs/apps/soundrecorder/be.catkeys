@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-SoundRecorder	1948114706
+1	belarusian	x-vnd.Haiku-SoundRecorder	1960509649
 Cannot connect to media server	RecorderWindow		Немагчыма далучыцца да медыясервера
 Cannot connect to the selected sound input	RecorderWindow		Немагчыма далучыцца да выбранага гукавага ўваходу
 Cannot find an unused name to use for the new recording	RecorderWindow		Немагчыма знайсці неязанятае імя для новага запісу
@@ -32,6 +32,7 @@ Sample size: 	RecorderWindow		Памер сэмплу:
 Save	RecorderWindow		Захаваць
 Some of the files don't appear to be audio files	RecorderWindow		Некаторыя з файлаў не падобныя да аўдыё файлаў
 Sound List	RecorderWindow		Спіс Гуку
+SoundRecorder	Application name		Гуказапіс
 Stop	RecorderWindow		Стоп
 bits	RecorderWindow		бітаў
 seconds	RecorderWindow		секунд
