@@ -14,13 +14,19 @@
 #include <Application.h>
 #include <Box.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <Screen.h>
 
 #include <WindowPrivate.h>
 
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Screensaver password dialog"
+
+
 PasswordWindow::PasswordWindow()
-	: BWindow(BRect(100, 100, 400, 230), "Enter password",
+	:
+	BWindow(BRect(100, 100, 400, 230), "Enter password",
 		B_NO_BORDER_WINDOW_LOOK, kPasswordWindowFeel
 			/* TODO: B_MODAL_APP_WINDOW_FEEL should also behave correctly */,
 		B_NOT_MOVABLE | B_NOT_CLOSABLE | B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE
@@ -35,18 +41,20 @@ PasswordWindow::PasswordWindow()
 
 	BBox *customBox = new BBox(bounds, "customBox", B_FOLLOW_NONE);
 	topView->AddChild(customBox);
-	customBox->SetLabel("Unlock screen saver");
+	customBox->SetLabel(B_TRANSLATE("Unlock screen saver"));
 
 	bounds.top += 10.0;
-	fPassword = new BTextControl(bounds, "password", "Enter password:",
-		"VeryLongPasswordPossible", B_FOLLOW_NONE);
+	fPassword = new BTextControl(bounds, "password",
+		B_TRANSLATE("Enter password:"), "VeryLongPasswordPossible",
+		B_FOLLOW_NONE);
 	customBox->AddChild(fPassword);
 	fPassword->MakeFocus(true);
 	fPassword->ResizeToPreferred();
 	fPassword->TextView()->HideTyping(true);
-	fPassword->SetDivider(be_plain_font->StringWidth("Enter password:") + 5.0);
+	fPassword->SetDivider(be_plain_font->StringWidth(
+		B_TRANSLATE_NOCOLLECT("Enter password:")) + 5.0);
 
-	BButton* button = new BButton(BRect(), "unlock", "Unlock",
+	BButton* button = new BButton(BRect(), "unlock", B_TRANSLATE("Unlock"),
 		new BMessage(kMsgUnlock), B_FOLLOW_NONE);
 	customBox->AddChild(button);
 	button->MakeDefault(true);
