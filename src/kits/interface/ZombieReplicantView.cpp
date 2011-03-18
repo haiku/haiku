@@ -70,7 +70,7 @@ _BZombieReplicantView_::MessageReceived(BMessage* msg)
 				error.ReplaceFirst("%description", description);
 			} else
 				error = B_TRANSLATE("Cannot locate the application for the "
-					"replicant. No application signature supplied.\n%error)");
+					"replicant. No application signature supplied.\n%error");
 				
 			error.ReplaceFirst("%error", strerror(fError));
 						
