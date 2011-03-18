@@ -454,7 +454,7 @@ FetchBodyCommand::Command()
 {
 	BString command = "FETCH ";
 	command << fMessage;
-	command += " BODY.PEEK[TEXT]";
+	command += " (FLAGS BODY.PEEK[TEXT])";
 	return command;
 }
 
@@ -464,13 +464,16 @@ FetchBodyCommand::Handle(const BString& response)
 {
 	if (response.FindFirst("FETCH") < 0)
 		return false;
+
 	BString extracted = response;
 	int32 message;
 	if (!IMAPParser::RemoveUntagedFromLeft(extracted, "FETCH", message))
 		return false;
-
 	if (message != fMessage)
 		return false;
+
+	int32 flags = FetchMinMessageCommand::ExtractFlags(extracted);
+	fStorage.SetFlags(fIMAPMailbox.MessageNumberToUID(message), flags);
 
 	int32 textPos = extracted.FindFirst("BODY[TEXT]");
 	if (textPos < 0)
