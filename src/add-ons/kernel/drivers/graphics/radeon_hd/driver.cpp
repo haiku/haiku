@@ -6,6 +6,7 @@
  * Authors:
  *		Thomas Kurschel
  *		Clemens Zeidler, <haiku@clemens-zeidler.de>
+ *		Alexander von Gluck IV, kallisti5@unixzen.com
  */
 
 
@@ -51,7 +52,7 @@ const struct supported_device {
 	//  Radeon 3430		- RV620
 	{0x95c5, 0, "Radeon HD 3450"},	/*RV620*/
 	//  Radeon 3470		- RV620
-	//	Radeon 4200		- RV620
+	{0x9710, 0, "Radeon HD 4200"},	/*RV620, IGP*/
 	//	Radeon 4225		- RV620
 	//	Radeon 4250		- RV620
 	//	Radeon 4270		- RV620
