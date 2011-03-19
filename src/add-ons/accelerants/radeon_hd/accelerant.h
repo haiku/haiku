@@ -50,13 +50,15 @@ read32(uint32 offset)
 	return *(volatile uint32 *)(gInfo->regs + offset);
 }
 
+
 inline void
 write32(uint32 offset, uint32 value)
 {
 	*(volatile uint32 *)(gInfo->regs + offset) = value;
 }
 
-// modes.cpp 
+
+// modes.cpp
 extern status_t create_mode_list(void);
 
 #endif	/* RADEON_HD_ACCELERANT_H */

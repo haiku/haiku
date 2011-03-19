@@ -35,18 +35,18 @@ struct accelerant_info *gInfo;
 
 class AreaCloner {
 public:
-							AreaCloner();
-							~AreaCloner();
+								AreaCloner();
+								~AreaCloner();
 
-			area_id			Clone(const char *name, void **_address,
-								uint32 spec, uint32 protection,
-								area_id sourceArea);
-			status_t		InitCheck()
-								{ return fArea < 0 ? (status_t)fArea : B_OK; }
-			void			Keep();
+			area_id				Clone(const char *name, void **_address,
+									uint32 spec, uint32 protection,
+									area_id sourceArea);
+			status_t			InitCheck()
+									{return fArea < 0 ? (status_t)fArea : B_OK;}
+			void				Keep();
 
 private:
-			area_id			fArea;
+			area_id				fArea;
 };
 
 
@@ -118,8 +118,8 @@ init_common(int device, bool isClone)
 	status_t status = sharedCloner.InitCheck();
 	if (status < B_OK) {
 		free(gInfo);
-		TRACE(("radeon_init_accelerant() failed shared area%i, %i\n", data.shared_info_area,
-			gInfo->shared_info_area));
+		TRACE(("radeon_init_accelerant() failed shared area%i, %i\n",
+			data.shared_info_area, gInfo->shared_info_area));
 		return status;
 	}
 
@@ -132,7 +132,7 @@ init_common(int device, bool isClone)
 		free(gInfo);
 		return status;
 	}
-	
+
 	sharedCloner.Keep();
 	regsCloner.Keep();
 
@@ -194,9 +194,9 @@ void
 radeon_uninit_accelerant(void)
 {
 	TRACE(("radeon_uninit_accelerant()\n"));
-	
+
 	gInfo->mode_list = NULL;
-	
+
 	radeon_shared_info &info = *gInfo->shared_info;
 
 	uninit_lock(&info.accelerant_lock);

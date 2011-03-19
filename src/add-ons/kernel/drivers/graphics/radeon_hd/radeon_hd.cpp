@@ -42,8 +42,9 @@
 status_t
 radeon_hd_init(radeon_info &info)
 {
+	TRACE((DEVICE_NAME ": radeon_hd_init() called\n"));
+
 	// memory mapped I/O
-	
 	AreaKeeper sharedCreator;
 	info.shared_area = sharedCreator.Create("radeon hd shared info",
 		(void **)&info.shared_info, B_ANY_KERNEL_ADDRESS,
@@ -75,20 +76,21 @@ radeon_hd_init(radeon_info &info)
 		dprintf(DEVICE_NAME ": could not map framebuffer!\n");
 		return info.framebuffer_area;
 	}
-	
+
 	// Turn on write combining for the area
 	vm_set_area_memory_type(info.framebuffer_area,
 		info.pci->u.h0.base_registers[RHD_FB_BAR], B_MTR_WC);
-	
+
 	sharedCreator.Detach();
 	mmioMapper.Detach();
 	frambufferMapper.Detach();
 
 	info.shared_info->registers_area = info.registers_area;
 	info.shared_info->frame_buffer_offset = 0;
-	info.shared_info->physical_graphics_memory = info.pci->u.h0.base_registers[RHD_FB_BAR];
+	info.shared_info->physical_graphics_memory
+		= info.pci->u.h0.base_registers[RHD_FB_BAR];
 
-	TRACE((DEVICE_NAME "radeon_hd_init() completed successfully!\n"));
+	TRACE((DEVICE_NAME ": radeon_hd_init() completed successfully!\n"));
 	return B_OK;
 }
 

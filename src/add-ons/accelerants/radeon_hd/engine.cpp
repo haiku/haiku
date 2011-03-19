@@ -30,8 +30,8 @@ static engine_token sEngineToken = {1, 0 /*B_2D_ACCELERATION*/, NULL};
 
 
 status_t
-radeon_acquire_engine(uint32 capabilities, uint32 maxWait, sync_token *syncToken,
-	engine_token **_engineToken)
+radeon_acquire_engine(uint32 capabilities, uint32 maxWait,
+	sync_token *syncToken, engine_token **_engineToken)
 {
 	TRACE(("radeon_acquire_engine()\n"));
 	*_engineToken = &sEngineToken;

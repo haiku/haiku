@@ -137,7 +137,7 @@ init_hardware(void)
 {
 	TRACE((DEVICE_NAME ": init_hardware()\n"));
 
-	status_t status = get_module(B_PCI_MODULE_NAME,(module_info **)&gPCI);
+	status_t status = get_module(B_PCI_MODULE_NAME, (module_info **)&gPCI);
 	if (status != B_OK) {
 		TRACE((DEVICE_NAME ": pci module unavailable\n"));
 		return status;

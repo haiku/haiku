@@ -39,9 +39,12 @@
 static status_t device_open(const char *name, uint32 flags, void **_cookie);
 static status_t device_close(void *data);
 static status_t device_free(void *data);
-static status_t device_ioctl(void *data, uint32 opcode, void *buffer, size_t length);
-static status_t device_read(void *data, off_t offset, void *buffer, size_t *length);
-static status_t device_write(void *data, off_t offset, const void *buffer, size_t *length);
+static status_t device_ioctl(void *data, uint32 opcode,
+	void *buffer, size_t length);
+static status_t device_read(void *data, off_t offset,
+	void *buffer, size_t *length);
+static status_t device_write(void *data, off_t offset,
+	const void *buffer, size_t *length);
 
 
 device_hooks gDeviceHooks = {
@@ -207,7 +210,8 @@ device_ioctl(void *data, uint32 op, void *buffer, size_t bufferLength)
 
 
 static status_t
-device_read(void */*data*/, off_t /*pos*/, void */*buffer*/, size_t *_length)
+device_read(void */*data*/, off_t /*pos*/,
+	void */*buffer*/, size_t *_length)
 {
 	*_length = 0;
 	return B_NOT_ALLOWED;
@@ -215,7 +219,8 @@ device_read(void */*data*/, off_t /*pos*/, void */*buffer*/, size_t *_length)
 
 
 static status_t
-device_write(void */*data*/, off_t /*pos*/, const void */*buffer*/, size_t *_length)
+device_write(void */*data*/, off_t /*pos*/,
+	const void */*buffer*/, size_t *_length)
 {
 	*_length = 0;
 	return B_NOT_ALLOWED;

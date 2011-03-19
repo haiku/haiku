@@ -50,4 +50,6 @@ set_pci_config(pci_info* info, uint8 offset, uint8 size, uint32 value)
 		size, value);
 }
 
+
 #endif  /* DRIVER_H */
+

@@ -45,7 +45,7 @@ get_accelerant_hook(uint32 feature, void *data)
 			return (void*)radeon_get_frame_buffer_config;
 		case B_GET_PIXEL_CLOCK_LIMITS:
 			return (void*)radeon_get_pixel_clock_limits;
-		
+
 		case B_ACQUIRE_ENGINE:
 			return (void*)radeon_acquire_engine;
 		case B_RELEASE_ENGINE:
