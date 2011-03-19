@@ -600,21 +600,11 @@ ioapic_init(kernel_args* args)
 	BPrivate::CObjectDeleter<const char, status_t>
 		acpiModulePutter(B_ACPI_MODULE_NAME, put_module);
 
-	// load pci module
-	pci_module_info* pciModule;
-	status = get_module(B_PCI_MODULE_NAME, (module_info**)&pciModule);
-	if (status != B_OK) {
-		dprintf("could not load pci module, not configuring ioapic\n");
-		return;
-	}
-	CObjectDeleter<const char, status_t> pciModulePutter(B_PCI_MODULE_NAME,
-		put_module);
-
 	// TODO: here ACPI needs to be used to properly set up the PCI IRQ
 	// routing.
 
 	IRQRoutingTable table;
-	status = read_irq_routing_table(pciModule, acpiModule, &table);
+	status = read_irq_routing_table(acpiModule, &table);
 	if (status != B_OK) {
 		dprintf("reading IRQ routing table failed, no ioapic.\n");
 		return;

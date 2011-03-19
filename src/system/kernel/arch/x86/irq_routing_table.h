@@ -7,18 +7,17 @@
 
 
 #include <ACPI.h>
-#include <PCI.h>
 
 
 #include "util/Vector.h"
 
 
 struct irq_routing_entry {
-	int				device_address;
+	int			device_address;
 	int8			pin;
 
 	acpi_handle		source;
-	int				source_index;
+	int			source_index;
 
 	// pci busmanager connection
 	uchar			pci_bus;
@@ -45,10 +44,10 @@ struct irq_descriptor {
 typedef struct acpi_prt {
 	uint32			length;
 	uint32			pin;
-	uint64			address;		// here for 64-bit alignment
+	uint64			address;	// here for 64-bit alignment
 	uint32			sourceIndex;
-	char			source[4];		// pad to 64 bits so sizeof() works in
-									// all cases
+	char			source[4];	// pad to 64 bits so sizeof()
+						// works in all cases
 } acpi_pci_routing_table;
 
 //TODO: Hack until we expose ACPI structs better, currently hardcoded to
@@ -70,8 +69,7 @@ void print_irq_descriptor(irq_descriptor* descriptor);
 void print_irq_routing_table(IRQRoutingTable* table);
 
 
-status_t read_irq_routing_table(pci_module_info *pci, acpi_module_info* acpi,
-			IRQRoutingTable* table);
+status_t read_irq_routing_table(acpi_module_info* acpi, IRQRoutingTable* table);
 status_t read_irq_descriptor(acpi_module_info* acpi, acpi_handle device,
 			const char* method, irq_descriptor* descriptor);
 

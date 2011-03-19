@@ -1,5 +1,6 @@
 /*
- * Copyright 2009, Clemens Zeidler haiku@clemens-zeidler.de. All rights reserved.
+ * Copyright 2009, Clemens Zeidler haiku@clemens-zeidler.de.
+ * All rights reserved.
  *
  * Distributed under the terms of the MIT License.
  */
@@ -50,8 +51,9 @@ print_irq_descriptor(irq_descriptor* descriptor)
 	const char* edgeTriggeredString = " edge triggered";
 
 	dprintf("irq: %i, shareable: %i, polarity: %s, interrupt_mode: %s\n",
-		descriptor->irq, descriptor->shareable, descriptor->polarity == B_HIGH_ACTIVE_POLARITY
-			? activeHighString : activeLowString,
+		descriptor->irq, descriptor->shareable, 
+		descriptor->polarity == B_HIGH_ACTIVE_POLARITY ? activeHighString
+			: activeLowString,
 		descriptor->interrupt_mode == B_LEVEL_TRIGGERED	? levelTriggeredString
 			: edgeTriggeredString);
 }
@@ -72,8 +74,8 @@ print_irq_routing_table(IRQRoutingTable* table)
 
 
 static status_t
-read_device_irq_routing_table(pci_module_info *pci, acpi_module_info* acpi,
-	acpi_handle device, IRQRoutingTable* table)
+read_device_irq_routing_table(acpi_module_info* acpi, acpi_handle device,
+	IRQRoutingTable* table)
 {
 	acpi_data buffer;
 	buffer.pointer = 0;
@@ -103,8 +105,7 @@ read_device_irq_routing_table(pci_module_info *pci, acpi_module_info* acpi,
 
 
 status_t
-read_irq_routing_table(pci_module_info *pci, acpi_module_info* acpi,
-	IRQRoutingTable* table)
+read_irq_routing_table(acpi_module_info* acpi, IRQRoutingTable* table)
 {
 	char rootPciName[255];
 	acpi_handle rootPciHandle;
@@ -117,7 +118,7 @@ read_irq_routing_table(pci_module_info *pci, acpi_module_info* acpi,
 	if (status != B_OK)
 		return status;
 	TRACE("Read root pci bus irq rooting table\n");
-	status = read_device_irq_routing_table(pci, acpi, rootPciHandle, table);
+	status = read_device_irq_routing_table(acpi, rootPciHandle, table);
 	if (status != B_OK)
 		return status;
 
@@ -133,7 +134,7 @@ read_irq_routing_table(pci_module_info *pci, acpi_module_info* acpi,
 		if (status != B_OK)
 			continue;
 
-		status = read_device_irq_routing_table(pci, acpi, brigde, table);
+		status = read_device_irq_routing_table(acpi, brigde, table);
 		if (status == B_OK)
 			TRACE("routing table found %s\n", name);			
 	}
