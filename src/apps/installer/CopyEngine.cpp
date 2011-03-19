@@ -107,10 +107,10 @@ CopyEngine::ResetTargets(const char* source)
 	// makes sense, since passing a volume is meant to folders that are
 	// volume specific, like "trash".
 	BPath path(source);
-	if (path.Append("common/var") == B_OK)
-		fVarDirectory.SetTo(path.Path());
+	if (path.Append("common/var/swap") == B_OK)
+		fSwapFileEntry.SetTo(path.Path());
 	else
-		fVarDirectory.Unset();
+		fSwapFileEntry.Unset();
 }
 
 
@@ -535,9 +535,9 @@ CopyEngine::_ShouldCopyEntry(const BEntry& entry, const char* name,
 			return false;
 		}
 	}
-	if (fVarDirectory == entry) {
+	if (fSwapFileEntry == entry) {
 		// current location of var
-		printf("ignoring common/'%s'.\n", name);
+		printf("ignoring swap file\n");
 		return false;
 	}
 	return true;
