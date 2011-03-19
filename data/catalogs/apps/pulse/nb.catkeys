@@ -1,6 +1,9 @@
-1	norwegian_bokmål	x-vnd.Haiku-Pulse	2153524577
-About Pulse…	CPUButton		Om Pulse...
-About Pulse…	PulseView		Om Pulse
+1	norwegian_bokmål	x-vnd.Haiku-Pulse	3986003180
+%.2f GHz	NormalPulseView		%.2f GHz
+%ld MHz	NormalPulseView		%ld MHz
+%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nAv David Ramsey og Arve Hjønnevåg\nRevidert av Daniel Switkin\n
+About Pulse…	CPUButton		Om Puls...
+About Pulse…	PulseView		Om Puls...
 Active color	ConfigView		Aktiv farge
 Bar colors	ConfigView		Linjefarger
 CPU progress bar	NormalPulseView		CPU-fremgangsmåler
@@ -10,10 +13,14 @@ Deskbar menu	CPUButton		Deskbarmeny
 Deskbar mode	MiniPulseView		Deskbarmodus
 Deskbar mode	NormalPulseView		Deskbarmodus
 Deskbar mode	PrefsWindow		Deskbarmodus
+Error	PulseApp		Feil
 Frame color	ConfigView		Kantfarge
 Idle color	ConfigView		Inaktiv farge
 Info	CPUButton		Info
 Info	DeskbarPulseView		Info
+Info	PulseApp		Info
+Info	PulseView		Info
+Installing in Deskbar failed\n%s	PulseApp		Klarte ikke installere i Deskbar\n%s
 Mini mode	DeskbarPulseView		Minimodus
 Mini mode	NormalPulseView		Minimodus
 Mini mode	PrefsWindow		Minimodus
@@ -25,12 +32,16 @@ OK	DeskbarPulseView		OK
 OK	PrefsWindow		OK
 OK	PulseApp		OK
 OK	PulseView		OK
-Pulse	NormalPulseView		Pulse
+Pulse	Application name		Puls
+Pulse	NormalPulseView		Puls
+Pulse	PulseApp		Puls
 Pulse settings	PulseWindow		Pulsinnstillinger
 Quit	DeskbarPulseView		Avslutt
 Quit	MiniPulseView		Avslutt
 Remove replicant	CPUButton		Fjern replikant
+Removing from Deskbar failed.\n%s	DeskbarPulseView		Klarte ikke fjerne fra Deskbar.\n%s
 Settings…	PulseView		Innstillinger...
+Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		bruk: Pulse [--mini] [-w bredde] [--width=bredde]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
 Width of icon:	ConfigView		Ikonbredde:
 You can't disable the last active CPU.	CPUButton		Du kan ikke slå av den siste aktive prosessoren.
 You can't disable the last active CPU.	PulseView		Du kan ikke slå av den siste aktive prosessoren.

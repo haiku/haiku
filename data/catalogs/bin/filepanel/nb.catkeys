@@ -1,4 +1,3 @@
-1	norwegian_bokmål	x-vnd.mmu_man.filepanel	3511195677
+1	norwegian_bokmål	x-vnd.mmu_man.filepanel	3658481023
 display a load/save file panel\n	FilePanelApp		vis panel for åpning/lagring av filer\n
 options:\n	FilePanelApp		valgmuligheter:\n
-usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		bruksmåte: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n

@@ -1,14 +1,21 @@
-1	norwegian_bokmål	x-vnd.Haiku-Mail	3461113080
+1	norwegian_bokmål	x-vnd.Haiku-Mail	1136578163
 Account name:	Config Views		Kontonavn
 Account settings	Config Views		Kontoinnstillinger
 Accounts	Config Window		Kontoer
 Add	Config Window		Legg til
+Alpha	Config Window		Alfa
 Always	Config Window		Alltid
 Apply	Config Window		Bruk
+Beta	Config Window		Beta
 Check every	Config Window		Sjekk hver
+Development	Config Window		Utvikling
+E-mail	Application name		E-postinnstillinger
 Edit mailbox menu…	Config Window		Rediger postboksmeny...
+Error	Config Window		Feil
+Gamma	Config Window		Gamma
 Mail checking	Config Window		Se etter e-post
 Miscellaneous	Config Window		Diverse
+OK	Config Window		OK
 Only when dial-up is connected	Config Window		Bare når oppringt nettverk er tilkoblet
 Real name:	Config Views		Virkelig navn
 Remove	Config Window		Fjern
@@ -25,3 +32,6 @@ days	Config Window		dager
 hours	Config Window		timer
 minutes	Config Window		minutter
 never	Config Window		aldri
+· E-mail filters	Config Window		E-postfiltre
+· Incoming	Config Window		Innkommende
+· Outgoing	Config Window		Utgående

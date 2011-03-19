@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-SoundRecorder	3772002177
+1	norwegian_bokmål	x-vnd.Haiku-SoundRecorder	69917908
 Cannot connect to media server	RecorderWindow		Kan ikke koble til media server
 Cannot connect to the selected sound input	RecorderWindow		Kan ikke koble til valgt lyd-input
 Cannot find an unused name to use for the new recording	RecorderWindow		Kan ikke finne et ubrukt navn til bruk for den nye innspillingen
@@ -27,9 +27,11 @@ OK	RecorderWindow		OK
 Play	RecorderWindow		Spill
 Record	RecorderWindow		Opptak
 Rewind	RecorderWindow		Spol tilbake
+Sample size: 	RecorderWindow		Utvalgsstørrelse
 Save	RecorderWindow		Lagre
 Some of the files don't appear to be audio files	RecorderWindow		Noen av filene ser ikke ut til å være lydfiler
 Sound List	RecorderWindow		Lydliste
+SoundRecorder	Application name		Lydopptaker
 Stop	RecorderWindow		Stopp
 bits	RecorderWindow		bit
 seconds	RecorderWindow		sekunder

@@ -1,11 +1,13 @@
-1	norwegian_bokmål	x-vnd.Be-TSKB	3232664655
+1	norwegian_bokmål	x-vnd.Be-TSKB	19976571
 <Be folder is empty>	BeMenu		<Be-mappen er tom>
+About Haiku	BeMenu		Om Haiku
 Always on top	PreferencesWindow		Alltid øverst
 Applications	PreferencesWindow		Programmer
 Auto-raise	PreferencesWindow		Fremhev automatisk
 Change time…	TimeView		Still klokken...
 Clock	PreferencesWindow		Klokke
 Close all	WindowMenu		Lukk alle
+Deskbar	Application name		Deskbar
 Deskbar preferences	PreferencesWindow		Innstillinger for Deskbar
 Deskbar preferences…	BeMenu		Innstillinger for Deskbar...
 Edit menu…	PreferencesWindow		Rediger meny...

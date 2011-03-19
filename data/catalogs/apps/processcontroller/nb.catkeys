@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-ProcessController	4271746787
+1	norwegian_bokmål	x-vnd.Haiku-ProcessController	2403406450
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
 About ProcessController…	ProcessController		Om Prosessbehandler...
 Cancel	ProcessController		Avbryt
@@ -9,6 +9,7 @@ Debug thread	ProcessController		Feilsøkingstråd
 Do you really want to kill the team \"%s\"?	ProcessController		Vil du virkelige ta drepe lag \"%s\"?
 Error saving file	ProcessController		Feil ved lagring av fil
 Gone teams…	ProcessController		Forsvunnet lag
+Info	ProcessController		Info
 Install in Deskbar	ProcessController		Installer i Deskbar
 Kill this thread!	ProcessController		Drep denne tråden!
 Live in the Deskbar	ProcessController		Lev i Deskbar
@@ -19,6 +20,8 @@ New Terminal	ProcessController		Ny Terminal
 Normal priority	ProcessController		Normal prioritet
 OK	ProcessController		OK
 Ok!	ProcessController		Ok!
+Please confirm	ProcessController		Vennligst bekreft
+ProcessController	Application name		Prosessbehandler
 ProcessController is already installed in Deskbar.	ProcessController		Prosessbehandler er allerede installert i Deskbar
 Processor %d	ProcessController		Prosessor %d
 Quit an application	ProcessController		Avslutt en applikasjon

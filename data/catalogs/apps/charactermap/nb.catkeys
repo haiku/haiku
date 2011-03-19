@@ -1,5 +1,34 @@
-1	norwegian_bokmål	x-vnd.Haiku-CharacterMap	3504671549
+1	norwegian_bokmål	x-vnd.Haiku-CharacterMap	2797966004
+Alphabetic presentation forms	UnicodeBlocks		Alfabetiske presentasjonsformer
+Arabic	UnicodeBlocks		Arabisk
+Armenian	UnicodeBlocks		Armensk
+Arrows	UnicodeBlocks		Piler
+Balinese	UnicodeBlocks		Balinesisk 
+Bengali	UnicodeBlocks		Bengalsk
+Box drawing	UnicodeBlocks		Bokstegning
+CharacterMap	Application name		Tegntabell
 Code	CharacterWindow		Kode
+Coptic	UnicodeBlocks		Koptisk
+Currency symbols	UnicodeBlocks		Valutasymboler
+Cyrillic	UnicodeBlocks		Kyrillisk
+Domino tiles	UnicodeBlocks		Dominobrikker
+Ethiopic	UnicodeBlocks		Etiopisk
 File	CharacterWindow		Fil
+Filter:	CharacterWindow		Filter:
 Font	CharacterWindow		Font
+Font size:	CharacterWindow		Skriftstørrelse:
+Geometric shapes	UnicodeBlocks		Geometriske former
+Georgian	UnicodeBlocks		Georgisk
+Gothic	UnicodeBlocks		Gotisk
+Greek and Coptic	UnicodeBlocks		Gresk og koptisk
+Hebrew	UnicodeBlocks		Hebraisk
+Khmer	UnicodeBlocks		Khmer
+Khmer symbols	UnicodeBlocks		Khmer-symboler
+Mathematical alphanumeric symbols	UnicodeBlocks		Matematiske alfanumeriske symboler
+Miscellaneous symbols	UnicodeBlocks		Diverse symboler
+Miscellaneous symbols and arrows	UnicodeBlocks		Diverse symboler og piler
+Miscellaneous technical	UnicodeBlocks		Diverse teknisk
+Mongolian	UnicodeBlocks		Mongolsk
+Quit	CharacterWindow		Avslutt
+Runic	UnicodeBlocks		Runer
 View	CharacterWindow		Vis

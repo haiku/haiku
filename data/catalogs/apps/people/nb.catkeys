@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Be-PEPL	3373241496
+1	norwegian_bokmål	x-vnd.Be-PEPL	3077845462
 %name% picture	People		%name% bilde
 About	People		Om
 Address	People		Adresse
@@ -13,6 +13,7 @@ Copy	People		Kopier
 Could not create %s.	People		Kunne ikke opprette %s.
 Country	People		Land
 Cut	People		Klipp ut
+Drop an image here,\nor use the contextual menu.	People		Slipp et bilde her,\neller bruk kontekstmenyen.
 E-mail	People		E-post
 Edit	People		Rediger
 Error	People		Feil

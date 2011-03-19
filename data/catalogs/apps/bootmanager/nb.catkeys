@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-BootManager	734273860
+1	norwegian_bokmål	x-vnd.Haiku-BootManager	140416535
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Vil nå gjennopprette hovedpartisjonssektoren (MBR) for %disk fra %file. Ønsker du å fortsette?
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Klar til å skrive oppstartsmenyen til disk. Er du sikker på at du vil fortsette?
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Vil nå skrive følgende oppstartsmeny til oppstartsdisken (%s). Vennligst sjekk informasjonen nedenfor før du fortsetter.
@@ -13,6 +13,7 @@ At least one partition must be selected!	BootManagerController		Minst én partis
 Back	BootManagerController	Button	Tilbake
 Backup Master Boot Record	BootManagerController	Title	Sikkerhetskopier hovedpartisjonssektor
 Boot Manager is unable to read the partition table!	BootManagerController		Oppstartsbehandleren klarer ikke å lese partisjonstabellen.
+BootManager	Application name		Oppstartsbehandler
 Cannot access!	DrivesPage	Cannot install	Får ikke tilgang!
 Default Partition	DefaultPartitionPage	Title	Standardpartisjon
 Default Partition:	DefaultPartitionPage	Menu field label	Standard partisjon:

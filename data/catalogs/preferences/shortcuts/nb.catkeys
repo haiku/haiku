@@ -1,5 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-Shortcuts	2152414241
-(Choose application with file requester)	ShortcutsWindow		(Velg program med filetterspørsel)
+1	norwegian_bokmål	x-vnd.Haiku-Shortcuts	1865784956
 *Beep	ShortcutsWindow		*Bip
 *InsertString \"Your Text Here\"	ShortcutsWindow		*SettInnStreng \"Din Tekst Her\"
 *LaunchHandler text/html	ShortcutsWindow		*OppstartsHåndterer text/html
@@ -10,8 +9,8 @@
 *MoveMouseTo 50% 50%	ShortcutsWindow		*FlyttMusTil 50% 50%
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"FlyttMusTil 100% 0\" \"*MuseKnapp 1\"
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SendMelding application/x-vnd.Be-TRAK 'Tfnd'
-About Shortcuts	ShortcutsApp		Om Shortcuts
-About Shortcuts	ShortcutsWindow		Om Shortcuts
+About Shortcuts	ShortcutsApp		Om Hurtigtaster
+About Shortcuts	ShortcutsWindow		Om Hurtigtaster
 Add new shortcut	ShortcutsWindow		Legg til ny snarvei
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 Append	ShortcutsWindow		Bruk
@@ -25,7 +24,7 @@ Error, NULL state description?\n	ShortcutsSpec		Feil, NULL-state beskrivelse?\n
 File	ShortcutsWindow		Fil
 InsertString	ShortcutsSpec		SettInnStreng
 Key	ShortcutsWindow		Tast
-LaunchHandler	ShortcutsSpec		OppstartsHåndterer
+LaunchHandler	ShortcutsSpec		Oppstartshåndterer
 MouseButton	ShortcutsSpec		MuseKnapp
 MouseDown	ShortcutsSpec		MusNed
 MouseUp	ShortcutsSpec		MusOpp
@@ -39,7 +38,7 @@ Open	ShortcutsWindow		Åpne
 Open KeySet…	ShortcutsWindow		Åpne sett med hurtigtaster
 Quit	ShortcutsWindow		Avslutt
 Really quit without saving your changes?	ShortcutsWindow		Vil du virkelig avslutte uten å lagre endringene?
-Remove selected shortcut	ShortcutsWindow		Fjern merkede snarvei
+Remove selected shortcut	ShortcutsWindow		Fjern merket hurtigtast
 Revert to saved	ShortcutsWindow		Tilbakestill til lagret
 Save	ShortcutsWindow		Lagre
 Save & apply	ShortcutsWindow		Lagre & bruk
@@ -47,9 +46,10 @@ Save KeySet as…	ShortcutsWindow		Lagre sett med hurtigtaster som...
 Select	ShortcutsWindow		Velg
 SendMessage	ShortcutsSpec		SendMelding
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
-Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Shortcuts kunne ikke åpne ditt sett med hurtigtaster!
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Shortcuts kunne ikke tolke filen din med hurtigtaster!
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Shortcuts klarte ikke å lagre filen din med hurtigtaster!
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Shortcuts klarte ikke å lagre ditt sett med hurtigtaster
+Shortcuts	Application name		Hurtigtaster
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Hurtigtaster kunne ikke åpne ditt sett med hurtigtaster!
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Hurtigtaster kunne ikke tolke filen din med hurtigtaster!
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Hurtigtaster klarte ikke å lagre filen din med hurtigtaster!
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Hurtigtaster klarte ikke å lagre ditt sett med hurtigtaster
 Shortcuts\n\nBased on SpicyKeys for BeOS made by Jeremy Friesner.	ShortcutsApp		Shortcuts\n\nBasert på SpicyKeys for BeOS, lagd av Jeremy Friesner.
 Window	ShortcutsSpec	Name for modifier on keyboard	Windows

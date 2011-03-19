@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-PowerStatus	3358314249
+1	norwegian_bokmål	x-vnd.Haiku-PowerStatus	470757888
 About	PowerStatus		Om
 About…	PowerStatus		Om...
 Battery charging	PowerStatus		Batteri lader
@@ -7,7 +7,7 @@ Battery info	PowerStatus		Batteriinformasjon
 Battery info…	PowerStatus		Batteriinformasjon...
 Battery unused	PowerStatus		Batteri ikke i bruk
 Capacity: 	PowerStatus		Kapasitet:
-Empty battery slot	PowerStatus		Batteri ikke tilstede
+Empty battery slot	PowerStatus		Batteri ikke til stede
 Extended battery info	PowerStatus		Utvidet batteriinformasjon
 Install in Deskbar	PowerStatus		Installer i Deskbar
 Last full charge: 	PowerStatus		Siste fullstendige lading:
@@ -15,7 +15,9 @@ Model number: 	PowerStatus		Modellnummer:
 OEM info: 	PowerStatus		OEM-informasjon:
 OK	PowerStatus		OK
 Power status box	PowerStatus		Boks for strømstatus
+PowerStatus	Application name		Strøm
 PowerStatus	PowerStatus		Strøm
+PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		PowerStatus\nskrevet av Axel Dörfler, Clemens Zeidler\nOpphavsrett 2006, Haiku, Inc.\n
 Quit	PowerStatus		Avslutt
 Run in window	PowerStatus		Kjør i vindu
 Serial number: 	PowerStatus		Serienummer:

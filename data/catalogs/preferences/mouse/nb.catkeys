@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-Mouse	3904912604
+1	norwegian_bokmål	x-vnd.Haiku-Mouse	782036937
 ...by Andrew Edward McCall	MouseApplication		...av Andrew Edward McCall
 1-Button	SettingsView		1 knapp
 2-Button	SettingsView		2 knapper
@@ -14,6 +14,7 @@ Fast	SettingsView		Rask
 Focus follows mouse	SettingsView		Fokus følger musepeker
 Focus mode:	SettingsView		Fokusmetode:
 Instant warp	SettingsView		Umiddelbar teleportering
+Mouse	Application name		Mus
 Mouse acceleration	SettingsView		Akselerasjon
 Mouse speed	SettingsView		Hastighet
 Mouse type:	SettingsView		Type mus:

@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Be-PRNT	2528931969
+1	norwegian_bokmål	x-vnd.Be-PRNT	206193168
 %.2f KB	JobListView		%.2f KB
 1 pending job.	PrinterListView		1 ventende jobb
 <pick one>	AddPrinterDialog		<velg én>
@@ -25,6 +25,7 @@ Print jobs: No printer selected	PrintersWindow		Utskriftsjobber: Ingen skriver e
 Print test page	PrintersWindow		Skriv ut testside
 Printer name:	AddPrinterDialog		Printernavn:
 Printer type:	AddPrinterDialog		Skrivertype:
+Printers	Application name		Skrivere
 Printers	PrintersWindow		Skrivere
 Processing	JobListView		Behandler
 Red	TestPageView		Rød
