@@ -149,14 +149,14 @@ DataSource::Print(BString& text, int64 value) const
 
 
 const char*
-DataSource::Name() const
+DataSource::ShortLabel() const
 {
 	return Label();
 }
 
 
 const char*
-DataSource::ShortLabel() const
+DataSource::Name() const
 {
 	return Label();
 }
@@ -243,11 +243,11 @@ DataSource::SourceAt(int32 index)
 
 
 /*static*/ const DataSource*
-DataSource::FindSource(const char* name)
+DataSource::FindSource(const char* internalName)
 {
 	for (uint32 i = 0; i < kSourcesCount; i++) {
 		const DataSource* source = kSources[i];
-		if (!strcmp(source->Name(), name))
+		if (!strcmp(source->InternalName(), internalName))
 			return source;
 	}
 
@@ -331,6 +331,13 @@ UsedMemoryDataSource::NextValue(SystemInfo& info)
 
 
 const char*
+UsedMemoryDataSource::InternalName() const
+{
+	return "Used memory";
+}
+
+
+const char*
 UsedMemoryDataSource::Label() const
 {
 	return B_TRANSLATE("Used memory");
@@ -376,6 +383,13 @@ int64
 CachedMemoryDataSource::NextValue(SystemInfo& info)
 {
 	return info.CachedMemory();
+}
+
+
+const char*
+CachedMemoryDataSource::InternalName() const
+{
+	return "Cached memory";
 }
 
 
@@ -428,6 +442,13 @@ int64
 SwapSpaceDataSource::NextValue(SystemInfo& info)
 {
 	return info.UsedSwapSpace();
+}
+
+
+const char*
+SwapSpaceDataSource::InternalName() const
+{
+	return "Swap space";
 }
 
 
@@ -487,6 +508,13 @@ BlockCacheDataSource::NextValue(SystemInfo& info)
 
 
 const char*
+BlockCacheDataSource::InternalName() const
+{
+	return "Block cache memory";
+}
+
+
+const char*
 BlockCacheDataSource::Label() const
 {
 	return B_TRANSLATE("Block cache memory");
@@ -530,6 +558,13 @@ int64
 SemaphoresDataSource::NextValue(SystemInfo& info)
 {
 	return info.UsedSemaphores();
+}
+
+
+const char*
+SemaphoresDataSource::InternalName() const
+{
+	return "Semaphores";
 }
 
 
@@ -588,6 +623,13 @@ PortsDataSource::NextValue(SystemInfo& info)
 
 
 const char*
+PortsDataSource::InternalName() const
+{
+	return "Ports";
+}
+
+
+const char*
 PortsDataSource::Label() const
 {
 	return B_TRANSLATE("Ports");
@@ -631,6 +673,13 @@ int64
 ThreadsDataSource::NextValue(SystemInfo& info)
 {
 	return info.UsedThreads();
+}
+
+
+const char*
+ThreadsDataSource::InternalName() const
+{
+	return "Threads";
 }
 
 
@@ -682,6 +731,13 @@ TeamsDataSource::NextValue(SystemInfo& info)
 
 
 const char*
+TeamsDataSource::InternalName() const
+{
+	return "Teams";
+}
+
+
+const char*
 TeamsDataSource::Label() const
 {
 	return B_TRANSLATE("Teams");
@@ -725,6 +781,13 @@ int64
 RunningAppsDataSource::NextValue(SystemInfo& info)
 {
 	return info.UsedRunningApps();
+}
+
+
+const char*
+RunningAppsDataSource::InternalName() const
+{
+	return "Running applications";
 }
 
 
@@ -837,6 +900,13 @@ const char*
 CPUUsageDataSource::ShortLabel() const
 {
 	return fShortLabel.String();
+}
+
+
+const char*
+CPUUsageDataSource::InternalName() const
+{
+	return "CPU usage";
 }
 
 
@@ -983,6 +1053,13 @@ CPUCombinedUsageDataSource::ShortLabel() const
 
 
 const char*
+CPUCombinedUsageDataSource::InternalName() const
+{
+	return "CPU usage (combined)";
+}
+
+
+const char*
 CPUCombinedUsageDataSource::Name() const
 {
 	return B_TRANSLATE("CPU usage (combined)");
@@ -1078,6 +1155,13 @@ const char*
 PageFaultsDataSource::ShortLabel() const
 {
 	return B_TRANSLATE("P-faults");
+}
+
+
+const char*
+PageFaultsDataSource::InternalName() const
+{
+	return "Page faults";
 }
 
 
@@ -1184,6 +1268,13 @@ NetworkUsageDataSource::ShortLabel() const
 
 
 const char*
+NetworkUsageDataSource::InternalName() const
+{
+	return fIn ? "Network receive" : "Network send";
+}
+
+
+const char*
 NetworkUsageDataSource::Name() const
 {
 	return fIn ? B_TRANSLATE("Network receive") : B_TRANSLATE("Network send");
@@ -1254,10 +1345,17 @@ ClipboardSizeDataSource::NextValue(SystemInfo& info)
 
 
 const char*
+ClipboardSizeDataSource::InternalName() const
+{
+	return fText ? "Text clipboard size" : "Raw clipboard size";
+}
+
+
+const char*
 ClipboardSizeDataSource::Label() const
 {
-	return fText ?
-		B_TRANSLATE("Text clipboard size") : B_TRANSLATE("Raw clipboard size");
+	return fText ? B_TRANSLATE("Text clipboard size")
+		: B_TRANSLATE("Raw clipboard size");
 }
 
 
@@ -1305,6 +1403,13 @@ int64
 MediaNodesDataSource::NextValue(SystemInfo& info)
 {
 	return info.MediaNodes();
+}
+
+
+const char*
+MediaNodesDataSource::InternalName() const
+{
+	return "Media nodes";
 }
 
 

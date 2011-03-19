@@ -643,9 +643,8 @@ ActivityView::_Init(const BMessage* settings)
 		fHistoryBackgroundColor = *color;
 
 	const char* name;
-	for (int32 i = 0; settings->FindString("source", i, &name) == B_OK; i++) {
+	for (int32 i = 0; settings->FindString("source", i, &name) == B_OK; i++)
 		AddDataSource(DataSource::FindSource(name), settings);
-	}
 }
 
 
@@ -700,7 +699,7 @@ ActivityView::SaveState(BMessage& state) const
 		DataSource* source = fSources.ItemAt(i);
 
 		if (!source->PerCPU() || source->CPU() == 0)
-			status = state.AddString("source", source->Name());
+			status = state.AddString("source", source->InternalName());
 		if (status != B_OK)
 			return status;
 

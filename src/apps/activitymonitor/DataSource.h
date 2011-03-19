@@ -38,6 +38,7 @@ public:
 	virtual	int64		NextValue(SystemInfo& info);
 	virtual void		Print(BString& text, int64 value) const;
 
+	virtual const char*	InternalName() const = 0;
 	virtual const char*	Name() const;
 	virtual const char*	Label() const;
 	virtual const char*	ShortLabel() const;
@@ -52,7 +53,7 @@ public:
 
 	static int32		CountSources();
 	static const DataSource* SourceAt(int32 index);
-	static const DataSource* FindSource(const char* name);
+	static const DataSource* FindSource(const char* internalName);
 	static int32		IndexOf(const DataSource* source);
 
 protected:
@@ -81,6 +82,7 @@ public:
 	virtual DataSource*	Copy() const;
 
 	virtual	int64		NextValue(SystemInfo& info);
+	virtual const char*	InternalName() const;
 	virtual const char*	Label() const;
 	virtual const char*	ShortLabel() const;
 	virtual bool		Primary() const;
@@ -95,6 +97,7 @@ public:
 	virtual DataSource*	Copy() const;
 
 	virtual	int64		NextValue(SystemInfo& info);
+	virtual const char*	InternalName() const;
 	virtual const char*	Label() const;
 	virtual const char*	ShortLabel() const;
 	virtual bool		Primary() const;
@@ -109,6 +112,7 @@ public:
 	virtual DataSource*	Copy() const;
 
 	virtual	int64		NextValue(SystemInfo& info);
+	virtual const char*	InternalName() const;
 	virtual const char*	Label() const;
 	virtual const char*	ShortLabel() const;
 	virtual bool		Primary() const;
@@ -123,6 +127,7 @@ public:
 	virtual DataSource*	Copy() const;
 
 	virtual	int64		NextValue(SystemInfo& info);
+	virtual const char*	InternalName() const;
 	virtual const char*	Label() const;
 	virtual const char*	ShortLabel() const;
 };
@@ -136,6 +141,7 @@ public:
 	virtual DataSource*	Copy() const;
 
 	virtual	int64		NextValue(SystemInfo& info);
+	virtual const char*	InternalName() const;
 	virtual const char*	Label() const;
 	virtual const char*	ShortLabel() const;
 	virtual bool		AdaptiveScale() const;
@@ -150,6 +156,7 @@ public:
 	virtual DataSource*	Copy() const;
 
 	virtual	int64		NextValue(SystemInfo& info);
+	virtual const char*	InternalName() const;
 	virtual const char*	Label() const;
 	virtual bool		AdaptiveScale() const;
 };
@@ -163,6 +170,7 @@ public:
 	virtual DataSource*	Copy() const;
 
 	virtual	int64		NextValue(SystemInfo& info);
+	virtual const char*	InternalName() const;
 	virtual const char*	Label() const;
 	virtual bool		AdaptiveScale() const;
 };
@@ -176,6 +184,7 @@ public:
 	virtual DataSource*	Copy() const;
 
 	virtual	int64		NextValue(SystemInfo& info);
+	virtual const char*	InternalName() const;
 	virtual const char*	Label() const;
 	virtual bool		AdaptiveScale() const;
 };
@@ -189,6 +198,7 @@ public:
 	virtual DataSource*	Copy() const;
 
 	virtual	int64		NextValue(SystemInfo& info);
+	virtual const char*	InternalName() const;
 	virtual const char*	Label() const;
 	virtual const char*	ShortLabel() const;
 	virtual bool		AdaptiveScale() const;
@@ -207,6 +217,7 @@ public:
 	virtual void		Print(BString& text, int64 value) const;
 	virtual	int64		NextValue(SystemInfo& info);
 
+	virtual const char*	InternalName() const;
 	virtual const char*	Name() const;
 	virtual const char*	Label() const;
 	virtual const char*	ShortLabel() const;
@@ -238,6 +249,7 @@ public:
 	virtual void		Print(BString& text, int64 value) const;
 	virtual	int64		NextValue(SystemInfo& info);
 
+	virtual const char*	InternalName() const;
 	virtual const char*	Name() const;
 	virtual const char*	Label() const;
 	virtual const char*	ShortLabel() const;
@@ -263,6 +275,7 @@ public:
 	virtual void		Print(BString& text, int64 value) const;
 	virtual	int64		NextValue(SystemInfo& info);
 
+	virtual const char*	InternalName() const;
 	virtual const char*	Name() const;
 	virtual const char*	Label() const;
 	virtual const char*	ShortLabel() const;
@@ -287,6 +300,7 @@ public:
 	virtual void		Print(BString& text, int64 value) const;
 	virtual	int64		NextValue(SystemInfo& info);
 
+	virtual const char*	InternalName() const;
 	virtual const char*	Name() const;
 	virtual const char*	Label() const;
 	virtual const char*	ShortLabel() const;
@@ -312,6 +326,7 @@ public:
 
 	virtual	int64		NextValue(SystemInfo& info);
 
+	virtual const char*	InternalName() const;
 	virtual const char*	Label() const;
 	virtual const char*	Unit() const;
 	virtual bool		AdaptiveScale() const;
@@ -328,6 +343,7 @@ public:
 
 	virtual DataSource*	Copy() const;
 
+	virtual const char*	InternalName() const;
 	virtual	int64		NextValue(SystemInfo& info);
 	virtual const char*	Label() const;
 	virtual bool		AdaptiveScale() const;
