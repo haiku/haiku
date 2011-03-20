@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-ShowImage	241789583
+1	ukrainian	x-vnd.Haiku-ShowImage	2630819154
 %SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS секунд
 Browse	Menus		Переглянути
 Cancel	ClosePrompt		Відмінити
@@ -40,8 +40,6 @@ Save as…	Menus		Зберегти як…
 Select all	Menus		Вибрати все
 Selection Mode	Menus		Режим вибору
 Show caption in full screen mode	Menus		Показати заголовок в повний екран
-ShowImage	AboutWindow		Переглядач 
-ShowImage	Menus		Переглядач
 Slide delay	Menus		Затримка слайда
 Slide show	Menus		Слайдшоу
 Stretch to window	Menus		Розтягнути по вікну

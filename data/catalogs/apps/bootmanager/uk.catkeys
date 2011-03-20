@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-BootManager	10978008
+1	ukrainian	x-vnd.Haiku-BootManager	2981479428
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Про відновлення MBR  %disk з %file. Ви дійсно бажаєте продовжити?
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Про запис бутменю на диск. Ви дійсно бажаєте продовжити?
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Про запис бутменю до загрузочного диску (%s). Перевірте інформацію перед продовженням.
@@ -13,10 +13,7 @@ At least one partition must be selected!	BootManagerController		Принаймн
 Back	BootManagerController	Button	Назад
 Backup Master Boot Record	BootManagerController	Title	Відновлення основного загрузочного запису
 Boot Manager is unable to read the partition table!	BootManagerController		Завантажувач не зміг прочитати таблицю розділів!
-BootManager	BootManager	Application name	Завантажувач
-BootManager	BootManagerWindow	Window Title	Завантажувач
 Cannot access!	DrivesPage	Cannot install	В доступі заборонено!
-Copyright %year, Haiku Inc.\n	BootManager	Leave %year untranslated	Copyright %year, Haiku Inc.\n
 Default Partition	DefaultPartitionPage	Title	Розділ по замовчуванню
 Default Partition:	DefaultPartitionPage	Menu field label	Розділ по замовчуванню:
 Done	BootManagerController	Button	Зроблено
@@ -31,7 +28,6 @@ Installation of boot menu failed	BootManagerController	Title	Встановле�
 Never	DefaultPartitionPage		Ніколи
 Next	WizardView	Button	Наступне
 No space available!	DrivesPage	Cannot install	Немає наявного простору!
-OK	BootManager		Гаразд
 OK	BootManagerController	Button	Гаразд
 Old Master Boot Record Saved failure	BootManagerController	Title	Збереження старого основного загрузочного запису не вдалося
 Old Master Boot Record saved	BootManagerController	Title	Збереження старого MBR
@@ -59,4 +55,3 @@ Uninstallation of boot menu failed	BootManagerController	Title	Видаленн�
 Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Невідомий
 Update	DrivesPage	Button	Обновити
 Write boot menu	BootManagerController	Button	Записати бутменю
-written by	BootManager		автор

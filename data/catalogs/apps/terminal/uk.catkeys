@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Terminal	345409016
+1	ukrainian	x-vnd.Haiku-Terminal	3208199772
 Abort	Terminal Shell		Зупинити
 About Terminal…	Terminal TermWindow		Про Термінал…
 Appearance	Terminal PrefWindow		Зовн. вигляд
@@ -71,9 +71,7 @@ Size:	Terminal AppearancePrefView		Розмір:
 Switch Terminals	Terminal TermWindow		Переключити термінали
 Tab title:	Terminal AppearancePrefView		Ім'я вкладки:
 Tab title:	Terminal TermWindow		Ім'я вкладки:
-Terminal	Terminal TermWindow		Термінал
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Термінал не зміг запустити оболонку. Прикро.
-Terminal settings	Terminal PrefWindow		Настройки терміналу
 Terminal\n\nwritten by Kazuho Okui and Takashi Murai\nupdated by Kian Duffy and others\n\nCopyright ©2003-2009, Haiku.\n	Terminal TermView		Термінал\n\nАвтори Kazuho Okui і Takashi Murai\n оновлено Kian Duffy і іншими\n\nCopyright ©2003-2009, Haiku.\n
 Text	Terminal AppearancePrefView		Текст
 Text encoding	Terminal TermWindow		Кодування тексту

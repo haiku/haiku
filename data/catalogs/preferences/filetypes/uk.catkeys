@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-FileTypes	985630426
+1	ukrainian	x-vnd.Haiku-FileTypes	597220249
 %1 application type	Application Type Window		%1 тип додатку
 %ld Application type%s could be removed.	Application Types Window		%ld Додаток type%s Неможливо видалити.
 %s file type	FileType Window		%s тип файлу
@@ -68,7 +68,6 @@ File could not be opened	Preferred App Menu		Файл неможливо від�
 File recognition	FileTypes Window		Розпізнання файлу
 File type	FileType Window		Тип файлу
 FileTypes	FileTypes		Типи Файлів
-FileTypes	FileTypes Window		Типи Файлів
 FileTypes request	FileTypes		Запит Типів Файлів
 FileTypes request	FileTypes Window		Запит Типів Файлів 
 FileTypes request	Preferred App Menu		Запит Типів Файлів 

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-VirtualMemory	3303809120
+1	ukrainian	x-vnd.Haiku-VirtualMemory	3734989908
 %Ld B	SettingsWindow		%Ld B
 Changes will take effect on restart!	SettingsWindow		Зміни настануть після перезавантаження!
 Defaults	SettingsWindow		По замовчуванню
@@ -14,5 +14,4 @@ Requested swap file size:	SettingsWindow		Розмір свопа, що запр
 Revert	SettingsWindow		Повернути
 Turn off	SettingsWindow		Вимкнути
 Use volume:	SettingsWindow		Використати образ:
-VirtualMemory	SettingsWindow		Віртуальна пам'ять
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		Віртуальна пам'ять\n\tавтор Axel Dörfler\n\tCopyright 2005, Haiku.\nПереклад: Віктор Чумак aka 386sx\n

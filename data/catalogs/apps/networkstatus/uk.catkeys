@@ -1,11 +1,10 @@
-1	ukrainian	x-vnd.Haiku-NetworkStatus	1782155860
+1	ukrainian	x-vnd.Haiku-NetworkStatus	2046228013
 <no wireless networks found>	NetworkStatusView		<Бездротова мережа не знайдена>
 Broadcast	NetworkStatusView		Передача
 Configuring	NetworkStatusView		Конфігурування
 Could not join wireless network:\n	NetworkStatusView		Бездротові мережі не під'єднані:\n
 Install in Deskbar	NetworkStatus		Встановити у Deskbar
 Netmask	NetworkStatusView		Нетмаска
-NetworkStatus	NetworkStatusWindow		Стан мережі
 NetworkStatus\n\twritten by %1 and Hugo Santos\n\t%2, Haiku, Inc.\n	NetworkStatusView		Стан мережі\n\tавтор %1 і Hugo Santos\n\t%2, Haiku, Inc.\n
 No link	NetworkStatusView		Посилання відсутнє
 No stateful configuration	NetworkStatusView		Немає стабільної конфігурації

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Expander	645651648
+1	ukrainian	x-vnd.Haiku-Expander	1067077532
 About Expander…	ExpanderMenu		Про Expander…
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Ви впевнені, що хочете зупинити розпаковку цього архіва? Розпаковка елементів може бути неповною.
 Automatically expand files	ExpanderPreferences		Автоматично розпакувати файли
@@ -13,8 +13,6 @@ Destination folder:	ExpanderPreferences		Папка призначення:
 Error when expanding archive	ExpanderWindow		Помилка при розпаковці архіва
 Expand	ExpanderMenu		Розпакувати
 Expand	ExpanderWindow		Розпакувати
-Expander	About		Розпаковувач
-Expander	ExpanderWindow	!! Window Title !!	Розпаковувач
 Expander settings	ExpanderPreferences		Настройки Розпаковувача
 Expander: Choose destination	DirectoryFilePanel		Expander: Виберіть ціль
 Expander: Open	ExpanderWindow		Expander: Відкрити
@@ -24,7 +22,6 @@ File	ExpanderMenu		Файл
 File expanded	ExpanderWindow		Файл розпаковано
 Hide contents	ExpanderWindow		Сховати вміст
 Leave destination folder path empty	ExpanderPreferences		Зберегти шлях папки призначення пустим
-OK	About		Гаразд
 Open destination folder after extraction	ExpanderPreferences		Відкрити папку призначення після розтиску
 Other:	ExpanderPreferences		Інший:
 Same directory as source (archive) file	ExpanderPreferences		Та ж папка що і джерела (архіву)

@@ -1,8 +1,7 @@
-1	ukrainian	x-vnd.Haiku-Appearance	1378564786
+1	ukrainian	x-vnd.Haiku-Appearance	1227622574
 Antialiasing	APRWindow		Зглажування
 Antialiasing menu	AntialiasingSettingsView		Меню зглажування
 Antialiasing type:	AntialiasingSettingsView		Тип зглажування:
-Appearance	APRWindow		Вигляд
 Colors	APRWindow		Кольори
 Control background	Colors tab		Тло елементу
 Control border	Colors tab		Межа елемента
@@ -12,6 +11,7 @@ Defaults	APRWindow		По замовчуванню
 Document background	Colors tab		Тло документа
 Document text	Colors tab		Текст документа
 Failure	Colors tab		Невдача
+Glyph hinting:	AntialiasingSettingsView		Уточнення:
 Grayscale	AntialiasingSettingsView		Відтінки сірого
 Hinting menu	AntialiasingSettingsView		Меню коректування
 Inactive window tab	Colors tab		Заголовок неактивного вікна

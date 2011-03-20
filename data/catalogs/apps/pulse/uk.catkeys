@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Pulse	3652781474
+1	ukrainian	x-vnd.Haiku-Pulse	628764229
 About Pulse…	CPUButton		Про Pulse…
 About Pulse…	PulseView		Про Pulse…
 Active color	ConfigView		Колір активності
@@ -27,7 +27,6 @@ OK	PrefsWindow		Гаразд
 OK	PulseApp		Гаразд
 OK	PulseView		Гаразд
 Pulse	NormalPulseView		Pulse
-Pulse	PulseWindow		Pulse
 Pulse settings	PulseWindow		Настройки Pulse
 Quit	DeskbarPulseView		Вийти
 Quit	MiniPulseView		Вийти

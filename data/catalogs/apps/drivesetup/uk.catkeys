@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-DriveSetup	2852003734
+1	ukrainian	x-vnd.Haiku-DriveSetup	696879283
 %ld MiB	Support		%ld MiB
 <empty>	DiskView		<пусто>
 <empty>	PartitionList		<пусто>
@@ -26,7 +26,6 @@ Device	DiskView		Пристрій
 Device	PartitionList		Пристрій
 Disk	MainWindow		Диск
 Disk system \"%s\"\" not found!	MainWindow		Системний диск \"%s\"\" не знайдено!
-DriveSetup	MainWindow		DriveSetup
 Eject	MainWindow		Виштовхнути
 End: %ld MB	Support		Кінець: %ld MB
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Видалення розділу призупинене. Жодні зміни не були записані на диск.

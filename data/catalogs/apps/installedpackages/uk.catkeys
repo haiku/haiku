@@ -1,7 +1,6 @@
-1	ukrainian	x-vnd.Haiku-InstalledPackages	3041446229
+1	ukrainian	x-vnd.Haiku-InstalledPackages	2164686753
 BeOS legacy .pkg package removing application for Haiku.\n\nCopyright 2007,\nŁukasz 'Sil2100' Zemczak\n\nCopyright (c) 2007 Haiku, Inc.\n	UninstallApplication		Додаток для видалення пакунків наслідників BeOS'них .pkg з Haiku.\n\nCopyright 2007,\nŁukasz 'Sil2100' Zemczak\n\nCopyright (c) 2007 Haiku, Inc.\n
 Close	UninstallApplication		Закрити
-Installed packages	UninstallWindow		Встановлені пакунки
 InstalledPackages	UninstallApplication		Встановлені пакунки
 No package selected.	UninstallView		Пакунок не вибрано
 OK	UninstallView		Гаразд

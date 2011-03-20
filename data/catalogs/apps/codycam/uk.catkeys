@@ -1,6 +1,4 @@
-1	ukrainian	x-vnd.Haiku.CodyCam	2983915408
-About CodyCam	CodyCam		Про CodyCam
-About Codycam…	CodyCam		Про CodyСam…
+1	ukrainian	x-vnd.Haiku.CodyCam	719498491
 Can't find an available connection to the video window	CodyCam		Неможливо знайти доступне вікно відео
 Cannot connect the video source to the video window	CodyCam		Неможливо підключити відео джерело до відео вікна
 Cannot create a video window	CodyCam		Неможливо створити вікно відео
@@ -17,10 +15,7 @@ Cannot start time source!	CodyCam		Неможливо почати відлік 
 Capture Rate Menu	CodyCam		Меню періодичності захоплення
 Capture controls	CodyCam		Керування захопленням
 Capturing Image…	VideoConsumer.cpp		Захоплення зображення…
-Close	CodyCam		Закрити
 Closing the window\n	VideoConsumer.cpp		Закриття вікна\n
-CodyCam	CodyCam		CodyCam
-CodyCam\n\nThe Original BeOS webcam	CodyCam		CodyCam\n\nThe Та сама веб-камера з BeOS
 Connected…	VideoConsumer.cpp		Підключення…
 Couldn't find requested directory on server	VideoConsumer.cpp		Неможливо знайти очікуваний каталог на сервері
 Directory:	CodyCam		Каталог:

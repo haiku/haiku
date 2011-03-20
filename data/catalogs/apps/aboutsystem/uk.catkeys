@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-About	1559110624
+1	ukrainian	x-vnd.Haiku-About	2350236915
 %.2f GHz	AboutView		%.2f GHz
 %d MiB total	AboutView		%d MiB заг.
 %d MiB used (%d%%)	AboutView		%d MiB викор. (%d%%)
@@ -12,11 +12,15 @@ Current maintainers:\n	AboutView		Розробники:\n
 GCC %d Hybrid	AboutView		GCC %d гібрид
 Google & their Google Summer of Code program\n	AboutView		Google і їхній програмі Google Summer of Code\n
 Kernel:	AboutView		Ядро:
+License: 	AboutView		Ліцензія:
+Licenses: 	AboutView		Ліцензії:
 Memory:	AboutView		Пам’ять:
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (засновнику проекту)\n\n
 Past maintainers:\n	AboutView		Попередні розробники:\n
 Processor:	AboutView		Процесор:
 Revision	AboutView		Ревізія
+Source Code: 	AboutView		Код:
+The BeGeistert team\n	AboutView		Команді BeGeistert\n
 The Haiku-Ports team\n	AboutView		Команді Haiku-Ports\n
 The Haikuware team and their bounty program\n	AboutView		Команді Haikuware з їхньою програмою заохочень\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Університету Окленда і Крістофу Люттероту\n\n

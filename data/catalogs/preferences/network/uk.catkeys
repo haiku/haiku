@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Network	3750716362
+1	ukrainian	x-vnd.Haiku-Network	826313819
 <no wireless networks found>	EthernetSettingsView		<немає жодної бездротової мережі>
 Adapter:	EthernetSettingsView		Адаптер:
 Apply	EthernetSettingsView		Застосовувати
@@ -12,7 +12,6 @@ Gateway:	EthernetSettingsView		Шлюз:
 IP address:	EthernetSettingsView		IP адреса:
 Mode:	EthernetSettingsView		Режим:
 Netmask:	EthernetSettingsView		Маска:
-Network	NetworkWindow		Мережа
 Network:	EthernetSettingsView		Мережа:
 OK	EthernetSettingsView		Гаразд
 Revert	EthernetSettingsView		Повернутися

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-MediaPlayer	1446715353
+1	ukrainian	x-vnd.Haiku-MediaPlayer	3266900319
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Амер.)
 100% scale	MediaPlayer-Main		Масштаб 100%
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Сінемаскоп)
@@ -44,7 +44,6 @@ Loop movies by default	MediaPlayer-SettingsWindow		Закільцювати зо
 Loop sounds by default	MediaPlayer-SettingsWindow		Закольцювати звуки по стандартному
 Low volume	MediaPlayer-SettingsWindow		Мала гучність
 MediaPlayer settings	MediaPlayer-SettingsWindow		Налаштування Медіа Плейера
-MediaPlayer\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		Медіа Плейер\n\nАвтор Marcus Overhagen, Stephan Aßmus і Frederik Modéen
 Medium	MediaPlayer-SettingsWindow		Середній
 Move Entries	MediaPlayer-MovePLItemsCmd		Перемістити записи
 Move Entry	MediaPlayer-MovePLItemsCmd		Перемістити запис
@@ -66,7 +65,6 @@ Open Playlist	MediaPlayer-PlaylistWindow		Відкрити список відт
 Pause	MediaPlayer-Main		Пауза
 Pause playback.	MediaPlayer-Main		Пауза відтворення.
 Play	MediaPlayer-Main		Відтворити
-Play background clips at	MediaPlayer-SettingsWindow		Відтворювати кліп на тлі
 Play mode	MediaPlayer-SettingsWindow		Режим відтворення
 Playlist	MediaPlayer-PlaylistWindow		Список відтворення
 Prev	MediaPlayer-Main		Попереднє
@@ -99,8 +97,6 @@ Start playing.	MediaPlayer-Main		Почати відтворення
 Stop	MediaPlayer-Main		Зупинити
 Stop playing.	MediaPlayer-Main		Зупинити відтворення
 Stream settings	MediaPlayer-Main		Настройки потоку
-Subtitle placement	MediaPlayer-SettingsWindow		Розміщення субтитрів
-Subtitle size	MediaPlayer-SettingsWindow		Розмір субтитрів
 Subtitles	MediaPlayer-Main		Субтитри
 Thanks	MediaPlayer-Main		Подяки
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Немає встановленого декодера щоб підтримував файл цього формату, або у декодера є проблема з спеціальною версією формату.
@@ -117,6 +113,5 @@ Video	MediaPlayer-Main		Відео
 Video track	MediaPlayer-Main		Відео трек
 View options	MediaPlayer-SettingsWindow		Переглянути налаштування
 Volume	MediaPlayer-Main		Гучність
-error	MediaPlayer-Main		помилка
 none	Audio track menu		нічого
 none	Subtitles menu		нічого

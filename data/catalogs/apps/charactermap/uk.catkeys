@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-CharacterMap	3069311788
+1	ukrainian	x-vnd.Haiku-CharacterMap	2687645748
 Aegean numbers	UnicodeBlocks		Егейські номери
 Alphabetic presentation forms	UnicodeBlocks		Алфавітні форми презентацій
 Ancient Greek musical notation	UnicodeBlocks		Давньогрецький нотний запис
@@ -29,8 +29,6 @@ CJK unified ideographs extension A	UnicodeBlocks		CJK єдине розшире�
 CJK unified ideographs extension B	UnicodeBlocks		CJK єдиного розширення ієрогліфів B
 Carian	UnicodeBlocks		Каріан
 Cham	UnicodeBlocks		Чам
-CharacterMap	CharacterWindow		CharacterMap
-CharacterMap\n\twritten by Axel Dörfler\n\tCopyright 2009, Haiku, Inc.\n	CharacterMap		CharacterMap\n\t автор Axel Dörfler\n\tCopyright 2009, Haiku, Inc.\n
 Cherokee	UnicodeBlocks		Черокі
 Clear	CharacterWindow		Очистити
 Code	CharacterWindow		Код
@@ -117,7 +115,6 @@ Myanmar	UnicodeBlocks		М'янми
 N'Ko	UnicodeBlocks		Нко
 New Tai Lue	UnicodeBlocks		Нові Тай Лю
 Number forms	UnicodeBlocks		Кількість форм
-OK	CharacterMap		Гаразд
 Ogham	UnicodeBlocks		Огам
 Ol Chiki	UnicodeBlocks		Ол Чікі
 Old Persian	UnicodeBlocks		Староперська

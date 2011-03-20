@@ -1,11 +1,11 @@
-1	ukrainian	x-vnd.Haiku-Backgrounds	844328151
+1	ukrainian	x-vnd.Haiku-Backgrounds	4220509773
 All workspaces	Main View		На всі робочі простори
 Apply	Main View		Використати
-Backgrounds	Main Window		Тло
 Center	Main View		Відцентрувати
 Current workspace	Main View		Поточний робочий простір
 Default	Main View		По замовчуванню
 Default folder	Main View		Папка по замовчуванню
+Folder: 	Main View		Папка:
 Icon label outline	Main View		Обкреслювати текст значків
 Image:	Main View		Зображення:
 Manual	Main View		Вручну
@@ -14,6 +14,7 @@ Other folder…	Main View		Інша папка…
 Other…	Main View		Інше…
 Placement:	Main View		Розміщення:
 Preview	Main View		Попередній перегляд
+Resolution: 	Image Filepanel		Роздільча здатність:
 Revert	Main View		Повернути
 Scale to fit	Main View		Припасувати
 Select	Main View		Вибрати

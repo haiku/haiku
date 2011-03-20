@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Be-MAIL	1894347484
+1	ukrainian	x-vnd.Be-MAIL	903155403
 %d - Date	Mail		%d - Дата
 %e - E-mail address	Mail		%e - поштова адреса
 %n - Full name	Mail		%n - Повне ім'я
@@ -55,7 +55,6 @@ Initial spell check mode:	Mail		Режим перевірки правопису
 Leave as '%s'	Mail		Зберегти як '%s'
 Leave as New	Mail		Зберегти як новий
 Leave same	Mail		Зберегти саме це
-Mail	Mail		Пошта
 Mail couldn't find its dictionary.	Mail		Пошта не може знайти цього словника.
 Mail preferences	Mail		Настройки пошти
 Mail\n\n	Mail		Пошта\n\n

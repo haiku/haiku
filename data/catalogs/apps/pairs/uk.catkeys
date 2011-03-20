@@ -1,11 +1,10 @@
-1	ukrainian	x-vnd.Haiku-Pairs	646117662
+1	ukrainian	x-vnd.Haiku-Pairs	794776701
 Beginner (4x4)	PairsWindow		Початківець (4x4)
 Expert (8x8)	PairsWindow		Експерт (8x8)
 Game	PairsWindow		Гра
 Intermediate (6x6)	PairsWindow		Середняк (6x6)
 New	PairsWindow		Новий
 New game	PairsWindow		Нова гра
-Pairs	PairsWindow		Пари
 Quit	PairsWindow		Завершити
 Quit game	PairsWindow		Завершити гру
 Size	PairsWindow		Розмір

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-LaunchBox	4255763202
+1	ukrainian	x-vnd.Haiku-LaunchBox	456290471
 About	LaunchBox		Про
 Add button here	LaunchBox		Додати кнопку тут
 Auto-raise	LaunchBox		Автоматичне спливання
@@ -11,7 +11,6 @@ Failed to launch 'something',error in Pad data.	LaunchBox		Невдалося з
 Horizontal layout	LaunchBox		Горизонтальне розташування
 Icon size	LaunchBox		Розмір Іконки
 Ignore double-click	LaunchBox		Ігнорувати подвійне натискання
-LaunchBox	LaunchBox		LaunchBox
 Name Panel	LaunchBox		Панель назви
 New	LaunchBox		Новий
 OK	LaunchBox		Гаразд

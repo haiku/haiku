@@ -1,9 +1,8 @@
-1	ukrainian	x-vnd.Haiku-DataTranslations	13469428
+1	ukrainian	x-vnd.Haiku-DataTranslations	3452290445
 About	DataTranslations		про
 An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		 Елемент з назвою '%name' повністю присутній у папці Перетворювачів! Переписати існуючий Перетворювач?
 Cancel	DataTranslations		Відміна
 Could not install %s:\n%s	DataTranslations		Неможливо встановити %s:\n%s
-DataTranslations	DataTranslations		Перетворення даних
 DataTranslations - Note	DataTranslations		Перетворення даних — Заувага
 DataTranslations\n\twritten by Oliver Siebenmarck and others\n\tCopyright 2002-2010, Haiku Inc. All rights reserved.\n	DataTranslations		Перетворення даних\n\автори Oliver Siebenmarck і інші\n\tCopyright 2002–2010, Haiku Inc. All rights reserved.\n
 Icon	DataTranslations		Іконка

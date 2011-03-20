@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Shortcuts	3016320079
+1	ukrainian	x-vnd.Haiku-Shortcuts	4047940366
 (Choose application with file requester)	ShortcutsWindow		(Виберіть програму з файлами запису)
 *Beep	ShortcutsWindow		*Сигнал
 *InsertString \"Your Text Here\"	ShortcutsWindow		*Вставити Рядок \"Ваш текст тут\"
@@ -46,7 +46,6 @@ Save KeySet as…	ShortcutsWindow		Зберегти список як…
 Select	ShortcutsWindow		Вибрати
 SendMessage	ShortcutsSpec		Відправити повідомлення
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
-Shortcuts	ShortcutsWindow		Горячі клавіші
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Ярлику невдалось розібрати ваш файл Ключів!
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Не вдалося зберегти ваш файл список горячих клавіш!
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		не вдалося створити список горячих клавіш.

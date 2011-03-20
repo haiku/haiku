@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-SoundRecorder	3852484968
+1	ukrainian	x-vnd.Haiku-SoundRecorder	150059956
 Cannot connect to media server	RecorderWindow		Неможливо під'єднати медіа сервер
 Cannot connect to the selected sound input	RecorderWindow		Неможливо під'єднати вибраний аудіо вхід
 Cannot find an unused name to use for the new recording	RecorderWindow		Неможливо знайти невикористане і'мя для проведення нового запису
@@ -24,5 +24,4 @@ Sample size: 	RecorderWindow		Розмір зразка:
 Save	RecorderWindow		Зберегти
 Some of the files don't appear to be audio files	RecorderWindow		Деякі з файлів виявилися не звуковими
 Sound List	RecorderWindow		Звуколист
-SoundRecorder	RecorderWindow		SoundRecorder
 Stop	RecorderWindow		Зупинити

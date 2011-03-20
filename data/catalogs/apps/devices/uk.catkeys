@@ -1,7 +1,5 @@
-1	ukrainian	x-vnd.Haiku-Devices	943452746
+1	ukrainian	x-vnd.Haiku-Devices	197304729
 ACPI controller	Device		ACPI контролер
-About	DevicesApplication		про
-About Devices…	DevicesView		Про Devices…
 Basic information	DevicesView		Основна інформація
 Bridge	Device		Міст
 Bus	DevicesView		Шина
@@ -13,9 +11,7 @@ Detailed	DevicesView		Докладно
 Device name	Device		Назва пристрою
 Device name:	Device		Назва пристрою:
 Device paths	Device		Шляхи пристрою
-Devices	DevicesApplication		Пристрої
 Devices	DevicesView		Пристрої
-Devices\n\twritten by Pieter Panman\n\n\tBased on listdev by Jérôme Duval\n\tand the previous Devices preference\n\tby Jérôme Duval and Sikosis\n\tCopyright 2009, Haiku, Inc.\n	DevicesApplication		Devices\n\tавтор Pieter Panman\n\n\на основі listdev Jérôme Duval\n\tі попередніх Devices preference\n\t Jérôme Duval і Sikosis\n\tCopyright 2009, Haiku, Inc.\n
 Display controller	Device		Контролер дисплея
 Docking station	Device		Док-станція
 Driver used	Device		Використовує драйвер

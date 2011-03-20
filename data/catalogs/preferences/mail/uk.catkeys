@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Mail	4158114343
+1	ukrainian	x-vnd.Haiku-Mail	2507564917
 Account name:	Config Views		Ім'я аккаунта:
 Account settings	Config Views		Настройка аккаунта
 Accounts	Config Window		Аккаунти
@@ -9,7 +9,6 @@ Apply	Config Window		Прийняти
 Beta	Config Window		Бета
 Check every	Config Window		Перевіряти кожні
 Development	Config Window		Розробка
-E-mail	Config Window		Пошта
 Edit mailbox menu…	Config Window		Редагувати почтове меню…
 Error	Config Window		Помилка
 Error retrieving general settings: %s\n	Config Window		Помилка при відновленні основних настройок: %s\n
