@@ -1,4 +1,4 @@
-1	belarusian	system	1926005588
+1	belarusian	system	180647795
 %.2f TiB	StringForSize		%.2f ТіБ
 %3.2f GiB	StringForSize		%3.2f ГіБ
 %3.2f KiB	StringForSize		%3.2f КіБ
@@ -11,7 +11,7 @@ About…	AboutWindow		Пра прагарму...
 Blue:	ColorControl		Сіні:
 Can't delete this replicant from its original application. Life goes on.	Dragger		Не ўдалося выдаліць рэплікант з яго праграмы. Але жыццё працягваецца.
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Немагчыма стварыць рэплікант \"%description\".\n%error
-Cannot locate the application for the replicant. No application signature supplied.\n%error)	ZombieReplicantView		Праграма рэпліканата не знойдзена. Подпис праграмы не зададзены.\n%error
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Праграма рэпліканата не знойдзена. Подпис праграмы не зададзены.\n%error
 Close	AboutWindow		Закрыць
 Copy	TextView		Капіяваць
 Copyright © %years% Haiku, Inc.	AboutWindow		Copyright © %years% Haiku, Inc.
