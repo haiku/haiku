@@ -1,10 +1,9 @@
-1	swedish	x-vnd.Haiku-ActivityMonitor	3275442606
+1	swedish	x-vnd.Haiku-ActivityMonitor	183152641
 %.1f KB/s	DataSource		%.1f KB/s
 %.1f MB	DataSource		%.1f MB
 %.1f faults/s	DataSource		%.1f fel/s
 %lld ms	SettingsWindow		%lld ms
 %lld sec.	SettingsWindow		%lld sek.
-ActivityMonitor	Application name		AktivitetsÖvervakaren
 Add graph	ActivityWindow		Lägg till graf
 Additional items	ActivityView		Ytterligare mätvärden
 Apps	DataSource		Program
