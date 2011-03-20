@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-FileTypes	297877771
+1	german	x-vnd.Haiku-FileTypes	2684370460
 %1 application type	Application Type Window		%1 Anwendungstyp
 %ld Application type%s could be removed.	Application Types Window		%ld Anwendungstyp%s konnte entfernt werden.
 %s file type	FileType Window		%s Dateityp
@@ -70,6 +70,7 @@ File	FileTypes Window		Datei
 File could not be opened	Preferred App Menu		Datei konnte nicht geöffnet werden
 File recognition	FileTypes Window		Dateierkennung
 File type	FileType Window		Dateityp
+FileTypes	Application name		Dateitypen
 FileTypes	FileTypes		FileTypes
 FileTypes request	FileTypes		Dateityp-Anforderung
 FileTypes request	FileTypes Window		Dateityp-Anfrage

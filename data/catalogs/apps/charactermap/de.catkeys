@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-CharacterMap	1767016704
+1	german	x-vnd.Haiku-CharacterMap	921188319
 Aegean numbers	UnicodeBlocks		Ägäische Zahlen
 Alphabetic presentation forms	UnicodeBlocks		Alphabetische Präsentationsformen
 Ancient Greek musical notation	UnicodeBlocks		Antike griechische musikalische Notation
@@ -33,6 +33,7 @@ CJK unified ideographs extension A	UnicodeBlocks		CJK: Vereinheitlichte Ideogram
 CJK unified ideographs extension B	UnicodeBlocks		CJK: Einheitliche Ideogramme (Erweiterung B)
 Carian	UnicodeBlocks		Karisch
 Cham	UnicodeBlocks		Cham
+CharacterMap	Application name		Zeichentabelle
 Cherokee	UnicodeBlocks		Cherokee
 Clear	CharacterWindow		Löschen
 Code	CharacterWindow		Code

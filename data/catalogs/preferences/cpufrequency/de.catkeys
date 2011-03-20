@@ -1,12 +1,13 @@
-1	german	x-vnd.Haiku-CPUFrequencyPref	3974849433
+1	german	x-vnd.Haiku-CPUFrequencyPref	1238067743
 CPU frequency status view	CPU Frequency View		CPU-Takt-Anzeige
+CPUFrequency	Application name		CPU-Takt
 CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPU-Takt\n\tGeschrieben von Clemens Zeidler.\n\tCopyright 2009, Haiku, Inc.\n
 Defaults	Pref Window		Standardwerte
 Dynamic performance	Status view		Dynamische Leistung
 Dynamic stepping	CPU Frequency View		Dynamische Taktung
 High performance	Status view		Hohe Leistung
 Install replicant into Deskbar	CPU Frequency View		Replikant in Deskbar installieren
-Integration time [ms]: 	CPU Frequency View		Bewertungszeitraum [ms]:
+Integration time [ms]: 	CPU Frequency View		Messintervall [ms]:
 Launching the CPU frequency preflet failed.\n\nError: 	Status view		Das CPU-Takt-Preflet konnte nicht gestartet werden.\n\nFehler:
 Low energy	Status view		Geringer Energieverbrauch
 Ok	Status view		OK

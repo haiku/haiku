@@ -408,7 +408,7 @@ by name	FindPanel		nach Name
 calculating…	InfoWindow		Berechnung läuft...
 contains	FindPanel		enthält
 contains	SelectionWindow		enthält
-copy	FSUtils	filename copy	 (Kopie)
+copy	FSUtils	filename copy	Kopie
 copying	FSUtils		kopiert
 ends with	FindPanel		endet mit
 ends with	SelectionWindow		endet mit

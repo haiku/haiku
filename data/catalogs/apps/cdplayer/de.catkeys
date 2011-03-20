@@ -1,7 +1,8 @@
-1	german	x-vnd.Haiku-CDPlayer	523884218
+1	german	x-vnd.Haiku-CDPlayer	1556801578
 Audio CD	CDPlayer		Audio-CD
 CD	CDPlayer		CD
 CD drive is empty	CDPlayer		Es befindet sich keine CD im Laufwerk.
+CDPlayer	Application name		CD-Player
 Disc: %ld:%.2ld / %ld:%.2ld	CDPlayer		CD: %ld:%.2ld / %ld:%.2ld
 Disc: --:-- / --:--	CDPlayer		CD: --:-- / --:--
 Disc: 88:88 / 88:88	CDPlayer		CD: 88:88 / 88:88

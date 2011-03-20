@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-BluetoothPrefs	4253957200
+1	german	x-vnd.Haiku-BluetoothPrefs	924856438
 15 secs	Settings view		15 s
 61 secs	Settings view		61 s
 About Bluetooth…	Window		Über Bluetooth…
@@ -7,6 +7,7 @@ Add…	Remote devices		Hinzu…
 Always ask	Settings view		Immer fragen
 As blocked	Remote devices		Blockieren
 Authenticate	Extended local device view		Authentifizieren
+Bluetooth	Application name		Bluetooth
 Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Bitte stellen Sie sicher, dass Bluetooth auf dem gesuchten Gerät aktiviert ist.\nDrücken Sie Suchen um andere Bluetooth-Geräte zu finden.\nFür gewöhnlich dauert das Ermitteln des Namens pro Gerät 3 Sekunden. Gefundene Bluetooth-Geräte können anschließend der Geräteliste hinzugefügt werden.\nWechseln Sie zur Liste der bekannten Geräte, wenn Sie eine Verbindung herstellen möchten.
 Connections & channels…	Window		Verbindungs- und Kanal-Liste...
 Default inquiry time:	Settings view		Suchdauer:

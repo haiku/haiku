@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Sudoku	2743785378
+1	german	x-vnd.Haiku-Sudoku	2414949553
 Abort	ProgressWindow		Abbrechen
 About	Sudoku		Über
 About Sudoku…	SudokuWindow		Über Sudoku...
@@ -29,6 +29,7 @@ Snapshot current	SudokuWindow		Spielstand merken
 Solve	SudokuWindow		Auflösen
 Solve single field	SudokuWindow		Ein Feld lösen
 Start again	SudokuWindow		Von vorn beginnen
+Sudoku	Application name		Sudoku
 Sudoku	Sudoku		Sudoku
 Sudoku request	SudokuWindow		Sudoku Anfrage
 Sudoku solved - congratulations!\n	SudokuWindow		Sudoku gelöst - Glückwunsch!\n

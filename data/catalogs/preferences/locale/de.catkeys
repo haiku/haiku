@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Locale	179985940
+1	german	x-vnd.Haiku-Locale	250177593
 12 hour	TimeFormatSettings		12 Stunden
 24 hour	TimeFormatSettings		24 Stunden
 Available languages	Locale Preflet Window		Verfügbare Sprachen
@@ -17,6 +17,7 @@ Medium format:	TimeFormatSettings		Mittleres Format:
 Negative:	TimeFormatSettings		Negativ:
 Numbers	TimeFormatSettings		Zahlen
 OK	Locale Preflet Window		OK
+Options	Locale Preflet Window		Optionen
 Positive:	TimeFormatSettings		Positiv:
 Preferred languages	Locale Preflet Window		Bevorzugte Sprache
 Restart	Locale Preflet Window		Neustart

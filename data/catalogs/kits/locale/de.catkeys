@@ -1,19 +1,32 @@
-1	german	system	2686335505
+1	german	system	320832488
 %.2f TiB	StringForSize		%.2f TiB
 %3.2f GiB	StringForSize		%3.2f GiB
 %3.2f KiB	StringForSize		%3.2f KiB
 %3.2f MiB	StringForSize		%3.2f MiB
 %d bytes	StringForSize		%d Bytes
+<empty>	Menu		<leer>
+About %app%	AboutMenuItem		Über %app%
+About %app…	Dragger		Über %app...
 About…	AboutWindow		Über...
 Blue:	ColorControl		Blau:
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Replikant für \"%description\" konnte nicht erstellt werden.\n%error
 Close	AboutWindow		Schließen
 Copy	TextView		Kopieren
 Copyright © %years% Haiku, Inc.	AboutWindow		Copyright © %years% Haiku, Inc.
 Cut	TextView		Ausschneiden
+Error	PrintJob		Fehler
+Error	ZombieReplicantView		Fehler
 Green:	ColorControl		Grün:
+No Pages to print!	PrintJob		Keine Seiten zu drucken!
+OK	Dragger		OK
+OK	PrintJob		OK
+OK	ZombieReplicantView		OK
 Paste	TextView		Einfügen
+Print Server is not responding.	PrintJob		Drucker-Server reagiert nicht.
 Red:	ColorControl		Rot:
 Redo	TextView		Wiederholen
+Remove replicant	Dragger		Replikant entfernen
 Select All	TextView		Alles auswählen
 Undo	TextView		Rückgängig
+Warning	Dragger		Warnung
 Written by:	AboutWindow		Von:

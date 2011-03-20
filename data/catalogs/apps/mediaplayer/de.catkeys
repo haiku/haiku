@@ -1,4 +1,6 @@
-1	german	x-vnd.Haiku-MediaPlayer	2133469082
+1	german	x-vnd.Haiku-MediaPlayer	1109719400
+%app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		Es ist ein interner Fehler in %app% aufgetreten. Die Datei konnte nicht geöffnet werden.
+%app%\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		%app%\n\nvon Marcus Overhagen, Stephan Aßmus und Frederik Modéen
 1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (Amerikanisch)
 100% scale	MediaPlayer-Main		100% Zoom
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2,35 : 1 (Cinemascope)

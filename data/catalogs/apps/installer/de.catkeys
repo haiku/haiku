@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Installer	3586371697
+1	german	x-vnd.Haiku-Installer	2680570473
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld von %2ld
 1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1)    Wird Haiku auf richtiger Hardware (nicht in einem Emulator) installiert, wird die vorherige Vorbereitung einer Festplattenpartition empfohlen. Der Installer und DriveSetup bieten zwar die Initialisierung bestehender Partitionen mit dem haiku-eigenen Dateisystem an. Da aber die Optionen zum Ändern des eigentlichen Partitionslayouts bisher nicht mit genügend unterschiedlichen Computerkonfigurationen getestet wurden, wird davon abgeraten.\n
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2)    Der Installer wird die Haiku-Partition selbst bootfähig machen, aber nichts unternehmen, um Haiku in ein bestehendes Bootmenü zu integrieren. Ist bereits GRUB installiert, kann man Haiku zu dessen Bootmenü hinzufügen. Die Vorgehensweise ist dabei abhängig von der verwendeten GRUB-Version.\n\n\n
@@ -9,12 +9,14 @@
 ?? of ??	InstallerWindow	Unknown progress	?? von ??
 ???	InstallerWindow	Unknown currently copied item	???
 ???	InstallerWindow	Unknown partition name	???
+Abort	InstallerWindow		Abbrechen
 Additional disk space required: %s	InstallerWindow		Zusätzlich benötigter Speicherplatz: %s
 Additional disk space required: 0.0 KiB	InstallerWindow		Zusätzlich benötigter Speicherplatz: 0.0 KiB
 Additionally you have to edit another file to actually display the boot menu:\n\n	InstallerApp		Zusätzlich muss noch eine weitere Datei bearbeitet werden, damit das Bootmenü überhaupt angezeigt wird:\n\n
 All hard disks start with \"hd\".\n	InstallerApp		Alle Festplatten beginnen mit \"hd\".\n
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Es trat ein Fehler auf und die Installation konnte nicht abgeschlossen werden:\n\nFehler:  %s
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Soll die Installation tatsächlich abgebrochen und der Rechner neu gestartet werden?
+Are you sure you want to abort the installation?	InstallerWindow		Soll die Installation wirklich abgebrochen werden?
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Soll tatsächlich auf das aktuelle Startlaufwerk installieren werden? Der Installer müsste dann hinterher den Rechner neustarten.
 Are you sure you want to to stop the installation?	InstallerWindow		Soll die Installation tatsächlich abgebrochen werden?
 Begin	InstallerWindow		Start
@@ -45,6 +47,7 @@ Install progress:  	InstallerWindow		Installationsverlauf:
 Installation canceled.	InstallProgress		Installation abgebrochen.
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Installation abgeschlossen. Der Bootsektor wurde nach '%s' geschrieben. 'Beenden' klicken, um das Installationsprogramm zu verlassen, oder ein anderes Ziellaufwerk für eine weitere Installation auswählen.
 Installation completed. Boot sector has been written to '%s'. Press Quit to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Installation abgeschlossen. Der Bootsektor wurde nach '%s' geschrieben. 'Beenden' klicken, um den Rechner neu zu starten, oder ein anderes Ziellaufwerk für eine weitere Installation wählen.
+Installer	Application name		Installer
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\tvon Jérôme Duval und Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Das Werkzeug DriveSetup starten, um\nverfügbare Laufwerke zu partitionieren.\nPartitionen können mit dem 'Be File System'\ninitialisiert werden, das für\neine Haiku-Bootpartition nötig ist.
 NOTE: While the naming strategy for hard disks is still as described under 2.1) the naming scheme for partitions has changed.\n\n	InstallerApp		Achtung: Während das Benennungsschema für Festplatten immer noch so ist, wie unter 2.1) beschrieben, hat sich die Benennung von Partitionen geändert.\n\n

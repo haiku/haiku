@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Devices	1176141157
+1	german	x-vnd.Haiku-Devices	1465776728
 ACPI Information	DeviceACPI		ACPI-Information
 ACPI Processor Namespace '%2'	DeviceACPI		ACPI Prozessor Namespace '%2'
 ACPI System Bus	DeviceACPI		ACPI Systembus
@@ -28,6 +28,7 @@ Device name	DevicePCI		Gerätename
 Device name:	Device		Gerätename:
 Device paths	Device		Gerätepfade
 Device paths	DevicePCI		Gerätepfad
+Devices	Application name		Geräte
 Devices	DevicesView		Geräte
 Display controller	Device		Anzeige-Controller
 Docking station	Device		Andockstation
