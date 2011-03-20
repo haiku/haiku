@@ -130,13 +130,13 @@ PackageInstall::_Install()
 			// Uninstall the package
 			err = packageInfo.Uninstall();
 			if (err != B_OK) {
-				fprintf(stderr, B_TRANSLATE("Error on uninstall\n"));
+				fprintf(stderr, "Error on uninstall\n");
 				return P_MSG_I_ERROR;
 			}
 
 			err = packageInfo.SetTo(info->GetName(), info->GetVersion(), true);
 			if (err != B_OK) {
-				fprintf(stderr, B_TRANSLATE("Error on SetTo\n"));
+				fprintf(stderr, "Error on SetTo\n");
 				return P_MSG_I_ERROR;
 			}
 		} else {
@@ -146,13 +146,13 @@ PackageInstall::_Install()
 	} else if (err == B_ENTRY_NOT_FOUND) {
 		err = packageInfo.SetTo(info->GetName(), info->GetVersion(), true);
 		if (err != B_OK) {
-			fprintf(stderr, B_TRANSLATE("Error on SetTo\n"));
+			fprintf(stderr, "Error on SetTo\n");
 			return P_MSG_I_ERROR;
 		}
 	} else if (progress->Stopped()) {
 		return P_MSG_I_ABORT;
 	} else {
-		fprintf(stderr, B_TRANSLATE("returning on error\n"));
+		fprintf(stderr, "returning on error\n");
 		return P_MSG_I_ERROR;
 	}
 
@@ -198,7 +198,7 @@ PackageInstall::_Install()
 		}
 
 		if (err != B_OK) {
-			fprintf(stderr, B_TRANSLATE("Error while writing path\n"));
+			fprintf(stderr, "Error while writing path\n");
 			return P_MSG_I_ERROR;
 		}
 
@@ -224,7 +224,7 @@ PackageInstall::_Install()
 		fCurrentScript = scr;
 
 		if (scr->DoInstall() != B_OK) {
-			fprintf(stderr, B_TRANSLATE("Error while running script\n"));
+			fprintf(stderr, "Error while running script\n");
 			return P_MSG_I_ERROR;
 		}
 		fCurrentScriptLocker.Unlock();

@@ -1029,7 +1029,7 @@ PackageInfo::Parse()
 			parser_debug("PtcI\n");
 			break;
 		} else {
-			fprintf(stderr, B_TRANSLATE("Unknown file tag %s\n"), buffer);
+			fprintf(stderr, "Unknown file tag %s\n", buffer);
 			RETURN_AND_SET_STATUS(B_ERROR);
 		}
 	}
