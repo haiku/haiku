@@ -1,11 +1,13 @@
-1	italian	x-vnd.Haiku-Network	464486446
+1	italian	x-vnd.Haiku-Network	3810742593
 <no wireless networks found>	EthernetSettingsView		<nessuna rete wireless trovata>
 Adapter:	EthernetSettingsView		Adattatore:
 Apply	EthernetSettingsView		Applica
+Auto-configuring failed: 	EthernetSettingsView		Auto-configurazione fallita: 
 Choose automatically	EthernetSettingsView		Scegli automaticamente
 DHCP	EthernetSettingsView		DHCP
 DNS #1:	EthernetSettingsView		DNS primario:
 DNS #2:	EthernetSettingsView		DNS secondario:
+Disabled	EthernetSettingsView		Disabilitato
 Domain:	EthernetSettingsView		Dominio:
 Gateway:	EthernetSettingsView		Gateway:
 IP address:	EthernetSettingsView		Indirizzo IP:
@@ -14,3 +16,5 @@ Netmask:	EthernetSettingsView		Netmask:
 Network:	EthernetSettingsView		Rete:
 OK	EthernetSettingsView		Ok
 Revert	EthernetSettingsView		Ripristina
+Static	EthernetSettingsView		Statico
+The net_server needs to run for the auto configuration!	EthernetSettingsView		E' necessario che il net_server sia avviato per l'auto-configurazione!
