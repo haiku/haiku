@@ -41,7 +41,7 @@ const struct supported_device {
 	int32		type;
 	const char*	name;
 } kSupportedDevices[] = {
-	//R600 series	(HD 2xxx - 42xx)
+	// R600 series	(HD24xx - HD42xx)
 	//	Radeon 2400		- RV610
 	{0x9611, 0, "Radeon HD 3100"},	/*RV620, IGP*/
 	{0x9613, 0, "Radeon HD 3100"},	/*RV620, IGP*/
@@ -55,7 +55,7 @@ const struct supported_device {
 	{0x9710, 0, "Radeon HD 4200"},	/*RV620, IGP*/
 	//	Radeon 4225		- RV620
 	//	Radeon 4250		- RV620
-	//	Radeon 4270		- RV620
+	{0x9712, 0, "Radeon HD 4270"},	/*RV620, IGP*/
 	//	Radeon 2600		- RV630
 	//	Radeon 2700		- RV630
 	//  Radeon 3650		- RV635
@@ -66,7 +66,7 @@ const struct supported_device {
 	//  Radeon 3850 x2	- RV680
 	//  Radeon 3870 x2	- RV680
 
-	//R700 series	(HD 43xx - HD 48xx)
+	// R700 series	(HD4330 - HD4890, HD51xx, HD5xxV)
 	//	Radeon 4330		- RV710
 	{0x954f, 0, "Radeon HD 4350"},	/*RV710*/
 	{0x9555, 0, "Radeon HD 4350"},	/*RV710*/
