@@ -1,11 +1,13 @@
-1	dutch	x-vnd.Haiku-Network	464486446
+1	dutch	x-vnd.Haiku-Network	3810742593
 <no wireless networks found>	EthernetSettingsView		<geen draadloze netwerken gevonden>
 Adapter:	EthernetSettingsView		Adapter:
 Apply	EthernetSettingsView		Toepassen
+Auto-configuring failed: 	EthernetSettingsView		Autoconfiguratie is mislukt:
 Choose automatically	EthernetSettingsView		Automatisch kiezen
 DHCP	EthernetSettingsView		DHCP:
 DNS #1:	EthernetSettingsView		DNS nr. 1:
 DNS #2:	EthernetSettingsView		DNS nr. 2:
+Disabled	EthernetSettingsView		Uitgeschakeld
 Domain:	EthernetSettingsView		Domein:
 Gateway:	EthernetSettingsView		Netwerkpunt:
 IP address:	EthernetSettingsView		IP-adres:
@@ -14,3 +16,5 @@ Netmask:	EthernetSettingsView		Subnet:
 Network:	EthernetSettingsView		Netwerk:
 OK	EthernetSettingsView		Oké
 Revert	EthernetSettingsView		Herstellen
+Static	EthernetSettingsView		Statisch
+The net_server needs to run for the auto configuration!	EthernetSettingsView		Voor autoconfiguratie moet de net_server geactiveerd zijn.

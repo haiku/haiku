@@ -1,4 +1,4 @@
-1	dutch	x-vnd.Haiku-About	2350236915
+1	dutch	x-vnd.Haiku-About	1963681728
 %.2f GHz	AboutView		%.2f GHz
 %d MiB total	AboutView		%d MiB totaal
 %d MiB used (%d%%)	AboutView		%d MiB gebruikt (%d%%)
@@ -35,4 +35,3 @@ Website, marketing & documentation:\n	AboutView		Website, marketing & documentat
 [Click a license name to read the respective license.]\n\n	AboutView		[Klik op een licentienaam om de bijbehorende licentie te lezen.]\n\n
 \nCopyrights\n\n	AboutView		\nCopyrights\n\n
 \n\nSpecial thanks to:\n	AboutView		\n\nBijzondere dank aan:\n
-\n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… en waarschijnlijk nog een aantal die we vergaten te noemen (sorry!)\n\n

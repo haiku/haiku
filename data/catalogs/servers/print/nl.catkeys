@@ -1,10 +1,12 @@
-1	dutch	x-vnd.Be-PSRV	2930725267
+1	dutch	x-vnd.Be-PSRV	1761631281
 A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Er bestaat al een printer met deze naam, maar hij is niet bruikbaar! Wilt u hem vervangen?
 A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Er bestaat al een printer met deze naam, maar diens stuurprogramma werd niet gevonden! Wilt u hem vervangen?
 A0	ConfigWindow	ISO 216 paper size	A0
 A1	ConfigWindow	ISO 216 paper size	A1
 A2	ConfigWindow	ISO 216 paper size	A2
+A3	ConfigWindow	ISO 216 paper size	A3
 A4	ConfigWindow	ISO 216 paper size	A4
+A5	ConfigWindow	ISO 216 paper size	A5
 A6	ConfigWindow	ISO 216 paper size	A6
 All pages	ConfigWindow		Alle pagina's
 All pages, %1 copies	ConfigWindow		Alle pagina's, %1 kopieën
@@ -18,6 +20,7 @@ Get currently available ports/devices	Transport Scripting		Haal het huidige aant
 Get name of printer	Printer Scripting		Haal de naam van de printer op
 Get name of the printer add-on used for this printer	Printer Scripting		Haal de naam op van de gebruikte add-on voor deze printer
 Get name of the transport add-on used for this printer	Printer Scripting		Haal de naam op van de transportadd-on voor deze printer
+Get name of transport	Transport Scripting		Haal de naam van het transport op
 Get the transport configuration for this printer	Printer Scripting		Haal de transportconfiguratie op voor deze printer
 Landscape	ConfigWindow		Landschap
 Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Ledger
@@ -28,7 +31,9 @@ OK	ConfigWindow		Oké
 OK	PrintServerApp		Oké
 Page %1 to %2	ConfigWindow		Pagina %1 to %2
 Page %1 to %2, %3 copies	ConfigWindow		Pagina %1 tot en met %2, %3 kopieën
+Page setup	ConfigWindow		Pagina-instelling
 Page setup:	ConfigWindow		Paginaset-up:
+Paper setup:	ConfigWindow		Papierinstelling:
 Portrait	ConfigWindow		Portret
 Print setup	ConfigWindow		Afdrukinstelling
 Printer server	ConfigWindow		Printerserver
@@ -40,8 +45,10 @@ Return the number of available printers	PrintServerApp Scripting		Geef het aanta
 Return the number of available transports	PrintServerApp Scripting		Geef het aantal beschikbare transporten
 Select a printer	ConfigWindow		Selecteer een printer
 Show configuration window	PrintServerApp Scripting		Toon het configuratiescherm
+Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Tabloid
 There are no printers set up.	PrintServerApp		Er zijn geen printers ingesteld.
 There is no default printer set up.	PrintServerApp		Er is geen standaardprinter ingesteld.
 Undefined	ConfigWindow		Ongedefinieerd
+Would you like to make @ the default printer?	PrintServerApp		Wilt u van @ de standaardprinter maken?
 Would you like to set one up now?	PrintServerApp		Wilt u er nu een instellen?
 Yes	PrintServerApp		Ja
