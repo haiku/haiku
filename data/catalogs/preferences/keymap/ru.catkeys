@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Keymap	3858687220
+1	russian	x-vnd.Haiku-Keymap	1986668195
 (Current)	Keymap window		(Текущая)
 Acute trigger	Keymap window		Аксант эгю
 Circumflex trigger	Keymap window		Циркумфлекс
@@ -6,6 +6,7 @@ Diaeresis trigger	Keymap window		Диерезис
 File	Keymap window		Файл
 Font	Keymap window		Шрифт
 Grave trigger	Keymap window		Апостроф
+Keymap	Application name		Раскладка
 Layout	Keymap window		Макет
 Open…	Keymap window		Открыть…
 Quit	Keymap window		Выйти

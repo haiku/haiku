@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-OpenGL	899836772
+1	russian	x-vnd.Haiku-OpenGL	644054649
 Attributes stack size:	Capabilities		Размер стека атрибутов:
 Auxiliary buffer(s):	Capabilities		Вспомогательных буферов:
 Available	Extensions		Доступно
@@ -19,6 +19,7 @@ Max. recommended vertex elements:	Capabilities		Максимальное рек�
 Max. texture units:	Capabilities		Максимальное количество текстурных блоков:
 Model stack size:	Capabilities		Размер стека модели:
 Name stack size:	Capabilities		Размер стекового имени:
+OpenGL	Application name		OpenGL
 OpenGL version:	InfoView		Версия OpenGL:
 Projection stack size:	Capabilities		Размер стека проекции:
 Renderer name:	InfoView		Название рендера:

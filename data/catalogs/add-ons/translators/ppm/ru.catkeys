@@ -1,7 +1,7 @@
 1	russian	x-vnd.Haiku-PPMTranslator	2886727868
 Based on PPMTranslator sample code	PPMTranslator		Основано на исходном коде PPM транслятора
 Be Bitmap Format (PPMTranslator)	PPMTranslator		Битмапный формат BeOS (PPM транслятор)
-Bitmap 1 bit	PPMTranslator		Битммап 1 бит
+Bitmap 1 bit	PPMTranslator		Битмап 1 бит
 CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 32 бита
 CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 бита
 CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 бита

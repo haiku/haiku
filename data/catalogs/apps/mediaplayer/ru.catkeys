@@ -37,7 +37,7 @@ Error: 	MediaPlayer-RemovePLItemsCmd		Ошибка:
 File Info	MediaPlayer-InfoWin		Информация о файле
 File info…	MediaPlayer-Main		Информация о файле…
 Full screen	MediaPlayer-Main		На весь экран
-Full volume	MediaPlayer-SettingsWindow		Полной громкости
+Full volume	MediaPlayer-SettingsWindow		На полной громкости
 Gets the URI of the currently playing item.	MediaPlayer-Main		Получает URI текущей проигрываемой записи.
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Получить/установить громкость (0.0-2.0).
 Hide interface	MediaPlayer-Main		Спрятать интерфейс
@@ -51,7 +51,7 @@ Large	MediaPlayer-SettingsWindow		крупный
 Lock Peaks	MediaPlayer-PeakView		Зафиксировать пики
 Loop movies by default	MediaPlayer-SettingsWindow		Зацикливать видео по умолчанию
 Loop sounds by default	MediaPlayer-SettingsWindow		Зацикливать музыку по умолчанию
-Low volume	MediaPlayer-SettingsWindow		Низкой громкости
+Low volume	MediaPlayer-SettingsWindow		На низкой громкости
 MediaPlayer	Application name		Медиаплеер
 MediaPlayer settings	MediaPlayer-SettingsWindow		Настройки медиаплеера
 Medium	MediaPlayer-SettingsWindow		cредний
@@ -134,6 +134,6 @@ Video	MediaPlayer-Main		Видео
 Video track	MediaPlayer-Main		Видеотрек
 View options	MediaPlayer-SettingsWindow		Настройки вида
 Volume	MediaPlayer-Main		Громкость
-Volume of background clips	MediaPlayer-SettingsWindow		Проигрывать фоновые клипы на
+Volume of background clips	MediaPlayer-SettingsWindow		Проигрывать фоновые клипы
 none	Audio track menu		пусто
 none	Subtitles menu		отсутствуют

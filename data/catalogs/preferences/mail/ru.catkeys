@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Mail	1372873153
+1	russian	x-vnd.Haiku-Mail	3984096638
 Account name:	Config Views		Имя аккаунта:
 Account settings	Config Views		Настройки аккаунта
 Accounts	Config Window		Аккаунты
@@ -9,6 +9,7 @@ Apply	Config Window		Применить
 Beta	Config Window		Бета
 Check every	Config Window		Проверять каждые
 Development	Config Window		В разработке
+E-mail	Application name		Почта
 Edit mailbox menu…	Config Window		Изменить меню…
 Error	Config Window		Ошибка
 Error retrieving general settings: %s\n	Config Window		Возникла ошибка при получении общих настроек: %s\n
@@ -36,6 +37,6 @@ days	Config Window		дней
 hours	Config Window		часов
 minutes	Config Window		минут
 never	Config Window		не проверять
-· E-mail filters	Config Window		   · Почтовые фильтры
-· Incoming	Config Window		   · Входящие
-· Outgoing	Config Window		   · Исходящие
+· E-mail filters	Config Window		· Почтовые фильтры
+· Incoming	Config Window		· Входящие
+· Outgoing	Config Window		· Исходящие

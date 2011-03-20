@@ -1,7 +1,8 @@
-1	russian	x-vnd.Haiku-Fonts	2475492793
+1	russian	x-vnd.Haiku-Fonts	3225361919
 Bold font:	Font view		Жирный шрифт:
 Defaults	Main window		По умолчанию
 Fixed font:	Font view		Моноширинный шрифт:
+Fonts	Application name		Шрифты
 Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Fonts\n\n\tCopyright 2004-2005, Haiku.\n\n
 Menu font:	Font view		Шрифт меню:
 OK	main		ОК

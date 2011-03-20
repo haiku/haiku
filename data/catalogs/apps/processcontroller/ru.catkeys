@@ -23,7 +23,7 @@ Normal priority	ProcessController		Нормальный приоритет
 OK	ProcessController		ОК
 Ok!	ProcessController		ОК!
 Please confirm	ProcessController		Пожалуйста, подтвердите
-ProcessController	Application name		Контроллер процесов
+ProcessController	Application name		Контроллер процессов
 ProcessController is already installed in Deskbar.	ProcessController		Контроллер процессов уже установлен в Deskbar.
 Processor %d	ProcessController		Процессор %d
 Quit an application	ProcessController		Завершить приложение

@@ -9,5 +9,5 @@ SGI images	SGITranslator		SGI изображения
 SGITranslator Settings	SGITranslator		Настройки SGI транслятора
 Use compression:	SGIView		Использовать сжатие:
 Version %d.%d.%d %s	SGIView		Версия %d.%d.%d %s
-\n\nbased on GIMP SGI plugin v1.5:\n	SGIView		\n\nоснован наплагине GIMP SGI v1.5:\n
+\n\nbased on GIMP SGI plugin v1.5:\n	SGIView		\n\nоснован на плагине GIMP SGI v1.5:\n
 written by:\n	SGIView		разработан:\n

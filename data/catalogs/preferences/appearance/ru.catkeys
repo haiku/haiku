@@ -1,7 +1,8 @@
-1	russian	x-vnd.Haiku-Appearance	1227622574
+1	russian	x-vnd.Haiku-Appearance	3129065638
 Antialiasing	APRWindow		Сглаживание
 Antialiasing menu	AntialiasingSettingsView		Сглаживание меню
 Antialiasing type:	AntialiasingSettingsView		Тип сглаживания:
+Appearance	Application name		Внешний вид
 Colors	APRWindow		Цвета
 Control background	Colors tab		Фон элемента
 Control border	Colors tab		Граница элемента

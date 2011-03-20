@@ -1,4 +1,4 @@
-1	russian	x-vnd.Be-PSRV	1896955773
+1	russian	x-vnd.Be-PSRV	2998115175
 A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Принтер с таким же именем уже существует, но его нельзя использовать! Заменить?
 A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Принтер с таким же именем уже существует, но его драйвер не найден! Заменить?
 All pages	ConfigWindow		Все страницы
@@ -11,7 +11,9 @@ OK	ConfigWindow		ОК
 OK	PrintServerApp		ОК
 Page %1 to %2	ConfigWindow		Страница %1 из %2
 Page %1 to %2, %3 copies	ConfigWindow		Страница %1 из %2, копий: %3
+Page setup	ConfigWindow		Настройка печати
 Page setup:	ConfigWindow		Настройки печати:
+Paper setup:	ConfigWindow		Параметры бумаги:
 Portrait	ConfigWindow		Портрет
 Print setup	ConfigWindow		Настройка печати
 Printer:	ConfigWindow		Принтер:
@@ -19,5 +21,6 @@ Select a printer	ConfigWindow		Выберите принтер
 There are no printers set up.	PrintServerApp		Нет настроенных принтеров.
 There is no default printer set up.	PrintServerApp		Не выбран принтер по умолчанию.
 Undefined	ConfigWindow		не определены
+Would you like to make @ the default printer?	PrintServerApp		Вы хотите сделать @ принтером по умолчанию?
 Would you like to set one up now?	PrintServerApp		Хотите настроить принтер сейчас?
 Yes	PrintServerApp		Да

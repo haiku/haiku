@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Locale	250177593
+1	russian	x-vnd.Haiku-Locale	1708263557
 12 hour	TimeFormatSettings		12 часовой формат
 24 hour	TimeFormatSettings		24 часовой формат
 Available languages	Locale Preflet Window		Доступные языки
@@ -10,6 +10,7 @@ Deskbar and Tracker need to be restarted for this change to take effect. Would y
 Formatting	Locale Preflet Window		Форматирование
 Full format:	TimeFormatSettings		Полный формат:
 Language	Locale Preflet Window		Язык
+Locale	Application name		Локаль
 Locale	Locale Preflet		Локаль
 Locale	Locale Preflet Window		Локаль
 Long format:	TimeFormatSettings		Длинный формат:

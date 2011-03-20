@@ -22,8 +22,8 @@ Model number: 	PowerStatus		Номер модели:
 OEM info: 	PowerStatus		OEM информация: 
 OK	PowerStatus		ОК
 Power status box	PowerStatus		Состояние электропитания
-PowerStatus	Application name		Состояние электропитания
-PowerStatus	PowerStatus		Состояние электропитания
+PowerStatus	Application name		Электропитание
+PowerStatus	PowerStatus		Электропитание
 PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		PowerStatus\nразработали:\n Axel Dörfler и Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
 Quit	PowerStatus		Выход
 Run in window	PowerStatus		Запустить в окне

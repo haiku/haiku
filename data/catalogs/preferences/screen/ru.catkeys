@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Screen	1658032282
+1	russian	x-vnd.Haiku-Screen	1466525338
 %.1f Hz	Screen		%.1f Гц
 %sSerial no.: %s	Screen		%sСерийный №: %s
 /other…	Screen		/другое…
@@ -28,6 +28,7 @@ Refresh rate:	Screen		Частота обновления:
 Resolution:	Screen		Разрешение:
 Revert	Screen		Вернуть
 Rows:	Screen		Ряды:
+Screen	Application name		Экран
 Screen	Screen		Экран
 Screen preferences by the Haiku team	Screen		Настройки экрана от команды Haiku
 Set background…	Screen		Изменить фон…

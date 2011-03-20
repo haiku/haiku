@@ -1,4 +1,4 @@
-1	russian	x-vnd.Be-PRNT	1563474157
+1	russian	x-vnd.Be-PRNT	3535702652
 %.2f KB	JobListView		%.2f Кбайт
 1 pending job.	PrinterListView		1 задание в очереди.
 <pick one>	AddPrinterDialog		<выбрать>
@@ -26,6 +26,7 @@ Print test page	PrintersWindow		Пробная страница
 Printer name:	AddPrinterDialog		Название принтера:
 Printer type:	AddPrinterDialog		Тип принтера:
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Принтер: %printer_name%\nДрайвер: %driver%\n
+Printers	Application name		Принтеры
 Printers	PrintersWindow		Принтеры
 Processing	JobListView		Обрабатывается
 Red	TestPageView		Красный
