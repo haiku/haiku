@@ -1,20 +1,35 @@
-1	french	system	709849049
+1	french	system	3310272265
 %.2f TiB	StringForSize		%.2f Tio
 %3.2f GiB	StringForSize		%3.2f Gio
 %3.2f KiB	StringForSize		%3.2f Kio
 %3.2f MiB	StringForSize		%3.2f Mio
 %d bytes	StringForSize		%d octets
+<empty>	Menu		<vide>
 About %app%	AboutMenuItem		À propos de %app%
+About %app…	Dragger		À propos de %app…
 About…	AboutWindow		À propos…
 Blue:	ColorControl		Bleu :
+Can't delete this replicant from its original application. Life goes on.	Dragger		Impossible de supprimer ce réplicant 
+à partir de son application d'origine. La vie continue.
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Impossible de créer le réplicant pour « %description ».\n%error
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Impossible de localiser l'application du réplicant. Aucune signature d'application fournie.\n%error
 Close	AboutWindow		Fermer
 Copy	TextView		Copier
 Copyright © %years% Haiku, Inc.	AboutWindow		Copyright © %years% Haiku, Inc.
 Cut	TextView		Couper
+Error	PrintJob		Erreur
+Error	ZombieReplicantView		Erreur
 Green:	ColorControl		Vert :
+No Pages to print!	PrintJob		Aucune page à imprimer !
+OK	Dragger		OK
+OK	PrintJob		OK
+OK	ZombieReplicantView		OK
 Paste	TextView		Coller
+Print Server is not responding.	PrintJob		Le serveur d'impression ne répond pas.
 Red:	ColorControl		Rouge :
 Redo	TextView		Refaire
+Remove replicant	Dragger		Enlever le réplicant
 Select All	TextView		Sélectionner tout
 Undo	TextView		Annuler
+Warning	Dragger		Avertissement
 Written by:	AboutWindow		Écrit par :

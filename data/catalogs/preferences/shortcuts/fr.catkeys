@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Shortcuts	2152414241
+1	french	x-vnd.Haiku-Shortcuts	1278045456
 (Choose application with file requester)	ShortcutsWindow		(Choisissez une application avec une requête de fichier)
 *Beep	ShortcutsWindow		*Bip
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsérerTexte « votre texte ici »
@@ -47,6 +47,7 @@ Save KeySet as…	ShortcutsWindow		Enregistrer le jeu de touches sous…
 Select	ShortcutsWindow		Sélectionner
 SendMessage	ShortcutsSpec		EnvoiMessage
 Shift	ShortcutsSpec	Name for modifier on keyboard	Majuscule
+Shortcuts	Application name		Raccourcis
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Raccourcis n'a pas pu ouvrir le fichier de jeu de touches !
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Raccourcis n'a pas pu analyser votre fichier de jeu de touches !
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Raccourcis n'a pas pu enregistrer votre fichier de jeu de touches !

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Screen	1658032282
+1	french	x-vnd.Haiku-Screen	1466525338
 %.1f Hz	Screen		%.1f Hz
 %sSerial no.: %s	Screen		N° de serie de %s : %s
 /other…	Screen		/autre…
@@ -28,6 +28,7 @@ Refresh rate:	Screen		Fréquence de rafraîchissement :
 Resolution:	Screen		Résolution :
 Revert	Screen		Rétablir
 Rows:	Screen		Lignes :
+Screen	Application name		Écran
 Screen	Screen		Écran
 Screen preferences by the Haiku team	Screen		Préférences de l'écran par l'équipe Haiku
 Set background…	Screen		Choisir un fond d'écran…

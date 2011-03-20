@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-ProcessController	526557007
+1	french	x-vnd.Haiku-ProcessController	1732034014
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		©1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
 About ProcessController…	ProcessController		À propos de ProcessControlleur…
 Cancel	ProcessController		Annuler
@@ -23,6 +23,7 @@ Normal priority	ProcessController		Priorité normale
 OK	ProcessController		OK
 Ok!	ProcessController		Ok !
 Please confirm	ProcessController		Veuillez confirmer
+ProcessController	Application name		ProcessControlleur
 ProcessController is already installed in Deskbar.	ProcessController		ProcessControlleur est déjà installé dans la Deskbar.
 Processor %d	ProcessController		Processeur %d
 Quit an application	ProcessController		Quitter une application

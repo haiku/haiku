@@ -1,8 +1,9 @@
-1	french	x-vnd.Haiku-Keyboard	1078858058
+1	french	x-vnd.Haiku-Keyboard	1112507387
 Defaults	KeyboardWindow		Par défaut
 Delay until key repeat	KeyboardView		Délai avant répétition des touches
 Fast	KeyboardView		Rapide
 Key repeat rate	KeyboardView		Vitesse de répétition des touches
+Keyboard	Application name		Clavier
 Long	KeyboardView		Longue
 OK	KeyboardApplication		OK
 Revert	KeyboardWindow		Rétablir

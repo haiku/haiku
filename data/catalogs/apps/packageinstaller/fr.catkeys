@@ -1,0 +1,51 @@
+1	french	x-vnd.Haiku-PackageInstaller	2682276160
+%.1f GiB	PackageView		%.1f Gio
+%.1f KiB	PackageView		%.1f Kio
+%.1f MiB	PackageView		%.1f Mio
+%llu bytes	PackageView		%llu octets
+(%s free)	PackageView		(%s libres)
+Abort	PackageInfo		Abandonner
+Abort	PackageInstall		Abandonner
+Abort	PackageView		Abandonner
+Accept	PackageTextViewer		Accepter
+All existing files will be replaced?	PackageView		Voulez-vous remplacer tous les fichiers existants ?
+All existing files will be skipped?	PackageView		Voulez-vous ignorer tous les fichiers existants ?
+Continue	PackageInfo		Continuer
+Continue	PackageInstall		Continuer
+Continue	PackageTextViewer		Continuer
+Disclaimer	PackageTextViewer		Mise en garde
+Do you want to remember this decision for the rest of this installation?\n	PackageView		Voulez-vous vous souvenir de cette décision pour la suite de cette installation ?\n
+Done	PackageInstall		Terminé
+Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Erreur (%s) ! Impossible d'ouvrir « %s ».\n
+Error while installing the package\n	PackageView		Erreur lors de l'installation du paquet\n
+Error while running script\n	PackageInstall		Erreur lors de l'exécution du script\n
+Error while writing path\n	PackageInstall		Erreur lors de l'écriture du chemin\n
+Error! \"%s\" is not a valid path.\n	Packageinstaller main		Erreur ! « %s » n'est pas un chemin valide.\n
+Finishing installation	PackageInstall		Finalisation de l'installation
+Install	PackageView		Installer
+Install to:	PackageView		Installer vers :
+Installation progress	PackageView		Progression de l'installation
+Installation type:	PackageView		Type d'installation :
+Installing files and folders	PackageInstall		Installation des fichiers et des dossiers
+Installing package	PackageStatus		Installation du paquet
+No installation type selected	PackageView		Aucun type d'installation sélectionné
+No package available.	PackageInfo		Aucun paquet disponible
+No package selected.	PackageInfo		Aucun paquet sélectionné
+OK	PackageView		OK
+OK	Packageinstaller main		OK
+Other…	PackageView		Autre…
+Package installer	PackageView		Installeur de paquets
+PackageInstaller	Application name		InstalleurDePaquets
+Preparing package	PackageInstall		Préparation du paquet
+Replace	PackageView		Remplacer
+Running post-installation scripts	PackageInstall		Exécution des scripts post-installation
+Skip	PackageView		passer
+Stop	PackageStatus		Arrêter
+The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Le dossier nommé « %s » existe déjà dans le chemin donné.\nVoulez-vous remplacer le dossier par celui de ce paquet ?
+The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Le fichier nommé « %s » existe déjà dans le chemin donné.\nVoulez-vous remplacer le fichier par celui de ce paquet ?
+The installation of the package has been aborted.	PackageView		L'installation du paquet a été abandonnée.
+The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		L'élément nommé « %s » existe déjà dans le chemin donné.\nVoulez-vous remplacer l'élément par celui de ce paquet ?
+The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Le paquet est illisible.\nLe fichier demandé n'est peut-être pas un paquet BeOS .pkg valide.
+The package you requested has been successfully installed on your system.	PackageView		Le paquet que vous avez demandé a été correctement installé sur votre système.
+The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Le script nommé « %s » existe déjà dans le chemin donné.\nVoulez-vous remplacer le script par celui de ce paquet ?
+The symbolic link named '%s' already exists in the give path.\nReplace the link with the one from this package or skip it?	PackageView		Le lien symbolique nommé « %s » existe déjà dans le chemin donné.\nVoulez-vous remplacer le lien par celui de ce paquet ?

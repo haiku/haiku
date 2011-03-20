@@ -1,4 +1,4 @@
-1	french	x-vnd.haiku-screenshot	731699482
+1	french	x-vnd.haiku-screenshot	2221316304
 Artwork folder	ScreenshotWindow		Dossier d'images
 Cancel	ScreenshotWindow		Annuler
 Capture active window	ScreenshotWindow		Capturer la fenêtre active
@@ -16,6 +16,7 @@ Please select	ScreenshotWindow		Veuillez sélectionner
 Save	ScreenshotWindow		Enregistrer
 Save as:	ScreenshotWindow		Enregistrer sous :
 Save in:	ScreenshotWindow		Enregistrer en :
+Screenshot	Application name		Capture d'écran
 Select	ScreenshotWindow		Sélectionner
 Settings…	ScreenshotWindow		Réglages…
 This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Ce fichier existe déjà.\n Voulez-vous vraiment l'écraser ?
