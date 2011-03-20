@@ -1,9 +1,11 @@
-1	portuguese	x-vnd.Haiku-Network	3560835400
+1	portuguese	x-vnd.Haiku-Network	2612124251
 Adapter:	EthernetSettingsView		Adaptador:
 Apply	EthernetSettingsView		Aplicar
+Auto-configuring failed: 	EthernetSettingsView		A configuração automática falhou:
 DHCP	EthernetSettingsView		DHCP
 DNS #1:	EthernetSettingsView		DNS #1:
 DNS #2:	EthernetSettingsView		DNS #2:
+Disabled	EthernetSettingsView		Desactivado
 Domain:	EthernetSettingsView		Domínio:
 Gateway:	EthernetSettingsView		Gateway:
 IP address:	EthernetSettingsView		Endereço IP:
@@ -11,3 +13,5 @@ Mode:	EthernetSettingsView		Modo:
 Netmask:	EthernetSettingsView		Máscara de Rede:
 OK	EthernetSettingsView		OK
 Revert	EthernetSettingsView		Reverter
+Static	EthernetSettingsView		Estático
+The net_server needs to run for the auto configuration!	EthernetSettingsView		O net_server precisa de correr para a configuração automática!
