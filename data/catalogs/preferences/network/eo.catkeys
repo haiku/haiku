@@ -1,6 +1,7 @@
-1	esperanto	x-vnd.Haiku-Network	1594944329
+1	esperanto	x-vnd.Haiku-Network	547436306
 Adapter:	EthernetSettingsView		Adaptilo:
 Apply	EthernetSettingsView		Daŭrigi
+Auto-configuring failed: 	EthernetSettingsView		La aŭtomata agordo malsukcesis: 
 DHCP	EthernetSettingsView		DHCP
 DNS #1:	EthernetSettingsView		1-a DNS:
 DNS #2:	EthernetSettingsView		2-a DNS:
@@ -9,3 +10,5 @@ Mode:	EthernetSettingsView		Reĝimo:
 Netmask:	EthernetSettingsView		Retmasko:
 OK	EthernetSettingsView		Bone
 Revert	EthernetSettingsView		Malfari
+Static	EthernetSettingsView		Maldinamika
+The net_server needs to run for the auto configuration!	EthernetSettingsView		La reta servilo bezonas lanĉiĝi pro la aŭtomata agordo.
