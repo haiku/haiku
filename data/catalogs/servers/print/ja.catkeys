@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Be-PSRV	3965809425
+1	japanese	x-vnd.Be-PSRV	2970921961
 All pages	ConfigWindow		全ページ
 All pages, %1 copies	ConfigWindow		全てのページを %1 部
 Cancel	ConfigWindow		中止
@@ -10,6 +10,7 @@ Get currently available ports/devices	Transport Scripting		ポート/デバイ�
 Get name of printer	Printer Scripting		プリンターの名前を取得
 Get name of the printer add-on used for this printer	Printer Scripting		このプリンターが使うプリンターアドオンを取得
 Get name of the transport add-on used for this printer	Printer Scripting		このプリンターが使うトランスポートアドオンの名前を取得
+Get name of transport	Transport Scripting		トランスポートの名前を取得
 Get the transport configuration for this printer	Printer Scripting		このプリンターのトランスポート設定を取得
 Landscape	ConfigWindow		横
 No	PrintServerApp		いいえ
@@ -17,7 +18,9 @@ OK	ConfigWindow		Ok
 OK	PrintServerApp		Ok
 Page %1 to %2	ConfigWindow		ページ %1 からページ %2 まで
 Page %1 to %2, %3 copies	ConfigWindow		ページ %1 からページ %2 まで %3 部
+Page setup	ConfigWindow		ページ設定
 Page setup:	ConfigWindow		ページ設定：
+Paper setup:	ConfigWindow		用紙設定：
 Portrait	ConfigWindow		縦
 Print setup	ConfigWindow		印刷設定
 Printer server	ConfigWindow		プリンターサーバー
@@ -31,5 +34,6 @@ Select a printer	ConfigWindow		プリンターを選択
 There are no printers set up.	PrintServerApp		プリンターはインストールされてません。
 There is no default printer set up.	PrintServerApp		デフォルトプリンターが設定されていません。
 Undefined	ConfigWindow		未定義
+Would you like to make @ the default printer?	PrintServerApp		@ をデフォルトプリンターに設定しますか？
 Would you like to set one up now?	PrintServerApp		プリンターを追加しますか？
 Yes	PrintServerApp		はい
