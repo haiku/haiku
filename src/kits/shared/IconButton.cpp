@@ -109,19 +109,16 @@ BIconButton::Draw(BRect updateRect)
 	}
 
 	if (bitmap && bitmap->IsValid()) {
-		float x = r.left + floorf((r.Width()
-			- bitmap->Bounds().Width()) / 2.0 + 0.5);
-		float y = r.top + floorf((r.Height()
-			- bitmap->Bounds().Height()) / 2.0 + 0.5);
-		BPoint point(x, y);
-		if (_HasFlags(STATE_PRESSED) || _HasFlags(STATE_FORCE_PRESSED))
-			point += BPoint(1.0, 1.0);
 		if (bitmap->ColorSpace() == B_RGBA32
 			|| bitmap->ColorSpace() == B_RGBA32_BIG) {
 			SetDrawingMode(B_OP_ALPHA);
 			SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
 		}
-		DrawBitmap(bitmap, point);
+		float x = r.left + floorf((r.Width()
+			- bitmap->Bounds().Width()) / 2.0 + 0.5);
+		float y = r.top + floorf((r.Height()
+			- bitmap->Bounds().Height()) / 2.0 + 0.5);
+		DrawBitmap(bitmap, BPoint(x, y));
 	}
 }
 
