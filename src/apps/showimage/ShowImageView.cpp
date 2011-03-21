@@ -1071,9 +1071,17 @@ ShowImageView::MouseDown(BPoint position)
 	MakeFocus(true);
 
 	BPoint point = ViewToImage(position);
+	int32 clickCount = 0;
 	uint32 buttons = 0;
-	if (Window() != NULL && Window()->CurrentMessage() != NULL)
+	if (Window() != NULL && Window()->CurrentMessage() != NULL) {
+		clickCount = Window()->CurrentMessage()->FindInt32("clicks");
 		buttons = Window()->CurrentMessage()->FindInt32("buttons");
+	}
+
+	if (buttons == B_PRIMARY_MOUSE_BUTTON && clickCount == 2) {
+		Window()->PostMessage(MSG_FULL_SCREEN);
+		return;
+	}
 
 	if (fHasSelection && fSelectionBox.Bounds().Contains(point)
 		&& (buttons

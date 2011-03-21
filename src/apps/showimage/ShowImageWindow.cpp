@@ -88,7 +88,6 @@ enum {
 	MSG_FLIP_LEFT_TO_RIGHT		= 'mFLR',
 	MSG_FLIP_TOP_TO_BOTTOM		= 'mFTB',
 	MSG_SLIDE_SHOW_DELAY		= 'mSSD',
-	MSG_FULL_SCREEN				= 'mFSC',
 	MSG_SHOW_CAPTION			= 'mSCP',
 	MSG_PAGE_SETUP				= 'mPSU',
 	MSG_PREPARE_PRINT			= 'mPPT',
@@ -160,7 +159,7 @@ ShowImageWindow::ShowImageWindow(BRect frame, const entry_ref& ref,
 	fToolBarView = new ToolBarView(viewFrame);
 
 	// Add the tool icons.
-	
+
 //	fToolBarView->AddAction(MSG_FILE_OPEN, be_app,
 //		tool_bar_icon(kIconDocumentOpen), B_TRANSLATE("Open"B_UTF8_ELLIPSIS));
 	fToolBarView->AddAction(MSG_FILE_PREV, this,

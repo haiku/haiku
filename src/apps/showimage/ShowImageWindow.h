@@ -41,6 +41,7 @@ enum {
 	kMsgDeleteCurrentFile		= 'mDcF',
 	MSG_SLIDE_SHOW				= 'mSSW',
 	kMsgStopSlideShow			= 'msss',
+	MSG_FULL_SCREEN				= 'mFSC',
 	MSG_EXIT_FULL_SCREEN		= 'mEFS',
 	MSG_WINDOW_HAS_QUIT			= 'wndq'
 };
