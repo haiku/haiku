@@ -83,9 +83,6 @@ const struct supported_device {
 };
 
 
-const uint32 kATIVendorId = 0x1002;
-
-
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 
 
@@ -104,7 +101,7 @@ get_next_radeon_hd(int32 *_cookie, pci_info &info, uint32 &type)
 
 	for (; gPCI->get_nth_pci_info(index, &info) == B_OK; index++) {
 		// check vendor
-		if (info.vendor_id != kATIVendorId
+		if (info.vendor_id != VENDOR_ID_ATI
 			|| info.class_base != PCI_display
 			|| info.class_sub != PCI_vga)
 			continue;

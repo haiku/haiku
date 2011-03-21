@@ -4,6 +4,7 @@
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Alexander von Gluck IV, kallisti5@unixzen.com
  */
 #ifndef RADEON_HD_H
 #define RADEON_HD_H
@@ -16,36 +17,15 @@
 #include <PCI.h>
 
 
-#define VENDOR_ID_ATI			0x8086
+#define VENDOR_ID_ATI			0x1002
 
 #define RADEON_TYPE_FAMILY_MASK	0xf000
 #define RADEON_TYPE_GROUP_MASK	0xfff0
 #define RADEON_TYPE_MODEL_MASK	0xffff
-// families
-#define RADEON_TYPE_7xx			0x1000
-#define RADEON_TYPE_8xx			0x2000
-#define RADEON_TYPE_9xx			0x4000
-// groups
-#define RADEON_TYPE_83x			(RADEON_TYPE_8xx | 0x0010)
-#define RADEON_TYPE_85x			(RADEON_TYPE_8xx | 0x0020)
-#define RADEON_TYPE_91x			(RADEON_TYPE_9xx | 0x0040)
-#define RADEON_TYPE_94x			(RADEON_TYPE_9xx | 0x0080)
-#define RADEON_TYPE_96x			(RADEON_TYPE_9xx | 0x0100)
-#define RADEON_TYPE_Gxx			(RADEON_TYPE_9xx | 0x0200)
-#define RADEON_TYPE_G4x			(RADEON_TYPE_9xx | 0x0400)
-// models
-#define RADEON_TYPE_MOBILE		0x0008
-#define RADEON_TYPE_915			(RADEON_TYPE_91x)
-#define RADEON_TYPE_945			(RADEON_TYPE_94x)
-#define RADEON_TYPE_945M			(RADEON_TYPE_94x | RADEON_TYPE_MOBILE)
-#define RADEON_TYPE_965			(RADEON_TYPE_96x)
-#define RADEON_TYPE_965M			(RADEON_TYPE_96x | RADEON_TYPE_MOBILE)
-#define RADEON_TYPE_G33			(RADEON_TYPE_Gxx)
-#define RADEON_TYPE_G45			(RADEON_TYPE_G4x)
-#define RADEON_TYPE_GM45			(RADEON_TYPE_G4x | RADEON_TYPE_MOBILE)
 
 #define DEVICE_NAME				"radeon_hd"
 #define RADEON_ACCELERANT_NAME	"radeon_hd.accelerant"
+
 
 struct DeviceType {
 	uint32			type;
@@ -178,208 +158,46 @@ struct radeon_free_graphics_memory {
 	uint32	buffer_base;
 };
 
-//----------------------------------------------------------
+// ----------------------------------------------------------
 // Register definitions, taken from X driver
 
-// PCI bridge memory management
-#define RADEON_GRAPHICS_MEMORY_CONTROL	0x52	// GGC - (G)MCH Graphics Control Register
-#define MEMORY_CONTROL_ENABLED			0x0004
-#define MEMORY_MASK						0x0001
-#define STOLEN_MEMORY_MASK				0x00f0
-#define i965_GTT_MASK					0x000e
-#define G33_GTT_MASK					0x0300
-#define G4X_GTT_MASK					0x0f00	// GGMS (GSM Memory Size) mask
+// ATI r600 specific
+enum _r6xxRegs {
+	/* MCLK */
+	R6_MCLK_PWRMGT_CNTL			= 0x620,
+	/* I2C */
+	R6_DC_I2C_CONTROL			= 0x7D30,  /* (RW) */
+	R6_DC_I2C_ARBITRATION		= 0x7D34,  /* (RW) */
+	R6_DC_I2C_INTERRUPT_CONTROL	= 0x7D38,  /* (RW) */
+	R6_DC_I2C_SW_STATUS			= 0x7d3c,  /* (RW) */
+	R6_DC_I2C_DDC1_SPEED		= 0x7D4C,  /* (RW) */
+	R6_DC_I2C_DDC1_SETUP		= 0x7D50,  /* (RW) */
+	R6_DC_I2C_DDC2_SPEED		= 0x7D54,  /* (RW) */
+	R6_DC_I2C_DDC2_SETUP		= 0x7D58,  /* (RW) */
+	R6_DC_I2C_DDC3_SPEED		= 0x7D5C,  /* (RW) */
+	R6_DC_I2C_DDC3_SETUP		= 0x7D60,  /* (RW) */
+	R6_DC_I2C_TRANSACTION0		= 0x7D64,  /* (RW) */
+	R6_DC_I2C_TRANSACTION1		= 0x7D68,  /* (RW) */
+	R6_DC_I2C_DATA				= 0x7D74,  /* (RW) */
+	R6_DC_I2C_DDC4_SPEED		= 0x7DB4,  /* (RW) */
+	R6_DC_I2C_DDC4_SETUP		= 0x7DBC,  /* (RW) */
+	R6_DC_GPIO_DDC4_MASK		= 0x7E00,  /* (RW) */
+	R6_DC_GPIO_DDC4_A			= 0x7E04,  /* (RW) */
+	R6_DC_GPIO_DDC4_EN			= 0x7E08,  /* (RW) */
+	R6_DC_GPIO_DDC1_MASK		= 0x7E40,  /* (RW) */
+	R6_DC_GPIO_DDC1_A			= 0x7E44,  /* (RW) */
+	R6_DC_GPIO_DDC1_EN			= 0x7E48,  /* (RW) */
+	R6_DC_GPIO_DDC1_Y			= 0x7E4C,  /* (RW) */
+	R6_DC_GPIO_DDC2_MASK		= 0x7E50,  /* (RW) */
+	R6_DC_GPIO_DDC2_A			= 0x7E54,  /* (RW) */
+	R6_DC_GPIO_DDC2_EN			= 0x7E58,  /* (RW) */
+	R6_DC_GPIO_DDC2_Y			= 0x7E5C,  /* (RW) */
+	R6_DC_GPIO_DDC3_MASK		= 0x7E60,  /* (RW) */
+	R6_DC_GPIO_DDC3_A			= 0x7E64,  /* (RW) */
+	R6_DC_GPIO_DDC3_EN			= 0x7E68,  /* (RW) */
+	R6_DC_GPIO_DDC3_Y			= 0x7E6C   /* (RW) */
+};
 
-// models i830 and up
-#define i830_LOCAL_MEMORY_ONLY			0x10
-#define i830_STOLEN_512K				0x20
-#define i830_STOLEN_1M					0x30
-#define i830_STOLEN_8M					0x40
-#define i830_FRAME_BUFFER_64M			0x01
-#define i830_FRAME_BUFFER_128M			0x00
-
-// models i855 and up
-#define i855_STOLEN_MEMORY_1M			0x10
-#define i855_STOLEN_MEMORY_4M			0x20
-#define i855_STOLEN_MEMORY_8M			0x30
-#define i855_STOLEN_MEMORY_16M			0x40
-#define i855_STOLEN_MEMORY_32M			0x50
-#define i855_STOLEN_MEMORY_48M			0x60
-#define i855_STOLEN_MEMORY_64M			0x70
-#define i855_STOLEN_MEMORY_128M			0x80
-#define i855_STOLEN_MEMORY_256M			0x90
-
-#define G4X_STOLEN_MEMORY_96MB			0xa0	// GMS - Graphics Mode Select
-#define G4X_STOLEN_MEMORY_160MB			0xb0
-#define G4X_STOLEN_MEMORY_224MB			0xc0
-#define G4X_STOLEN_MEMORY_352MB			0xd0
-
-
-// graphics page translation table
-#define RADEON_PAGE_TABLE_CONTROL		0x02020
-#define PAGE_TABLE_ENABLED				0x00000001
-#define RADEON_PAGE_TABLE_ERROR			0x02024
-#define RADEON_HARDWARE_STATUS_PAGE		0x02080
-#define i915_GTT_BASE					0x1c
-#define i830_GTT_BASE					0x10000	// (- 0x2ffff)
-#define i830_GTT_SIZE					0x20000
-#define i965_GTT_BASE					0x80000	// (- 0xfffff)
-#define i965_GTT_SIZE					0x80000
-#define i965_GTT_128K					(2 << 1)
-#define i965_GTT_256K					(1 << 1)
-#define i965_GTT_512K					(0 << 1)
-#define G33_GTT_1M						(1 << 8)
-#define G33_GTT_2M						(2 << 8)
-#define G4X_GTT_NONE					0x000	// GGMS - GSM Memory Size
-#define G4X_GTT_1M_NO_IVT				0x100	// no Intel Virtualization Tech.
-#define G4X_GTT_2M_NO_IVT				0x300
-#define G4X_GTT_2M_IVT					0x900	// with Intel Virt. Tech.
-#define G4X_GTT_3M_IVT					0xa00
-#define G4X_GTT_4M_IVT					0xb00
-
-
-#define GTT_ENTRY_VALID					0x01
-#define GTT_ENTRY_LOCAL_MEMORY			0x02
-#define GTT_PAGE_SHIFT					12
-
-// interrupts
-#define RADEON_INTERRUPT_ENABLED			0x020a0
-#define RADEON_INTERRUPT_IDENTITY		0x020a4
-#define RADEON_INTERRUPT_MASK			0x020a8
-#define RADEON_INTERRUPT_STATUS			0x020ac
-#define INTERRUPT_VBLANK				(1 << 7)
-
-// ring buffer
-#define RADEON_PRIMARY_RING_BUFFER		0x02030
-#define RADEON_SECONDARY_RING_BUFFER_0	0x02100
-#define RADEON_SECONDARY_RING_BUFFER_1	0x02110
-// offsets for the ring buffer base registers above
-#define RING_BUFFER_TAIL				0x0
-#define RING_BUFFER_HEAD				0x4
-#define RING_BUFFER_START				0x8
-#define RING_BUFFER_CONTROL				0xc
-#define RADEON_RING_BUFFER_SIZE_MASK		0x001ff000
-#define RADEON_RING_BUFFER_HEAD_MASK		0x001ffffc
-#define RADEON_RING_BUFFER_ENABLED		1
-
-// display ports
-#define RADEON_DISPLAY_A_ANALOG_PORT		0x61100
-#define DISPLAY_MONITOR_PORT_ENABLED	(1UL << 31)
-#define DISPLAY_MONITOR_PIPE_B			(1UL << 30)
-#define DISPLAY_MONITOR_VGA_POLARITY	(1UL << 15)
-#define DISPLAY_MONITOR_MODE_MASK		(3UL << 10)
-#define DISPLAY_MONITOR_ON				0
-#define DISPLAY_MONITOR_SUSPEND			(1UL << 10)
-#define DISPLAY_MONITOR_STAND_BY		(2UL << 10)
-#define DISPLAY_MONITOR_OFF				(3UL << 10)
-#define DISPLAY_MONITOR_POLARITY_MASK	(3UL << 3)
-#define DISPLAY_MONITOR_POSITIVE_HSYNC	(1UL << 3)
-#define DISPLAY_MONITOR_POSITIVE_VSYNC	(2UL << 3)
-#define RADEON_DISPLAY_A_DIGITAL_PORT	0x61120
-#define RADEON_DISPLAY_C_DIGITAL			0x61160
-#define RADEON_DISPLAY_LVDS_PORT			0x61180
-#define LVDS_POST2_RATE_SLOW			14 // PLL Divisors
-#define LVDS_POST2_RATE_FAST			7
-#define LVDS_CLKB_POWER_MASK			(3 << 4)
-#define LVDS_CLKB_POWER_UP				(3 << 4)
-#define LVDS_PORT_EN					(1 << 31)
-#define LVDS_A0A2_CLKA_POWER_UP			(3 << 8)
-#define LVDS_PIPEB_SELECT				(1 << 30)
-#define LVDS_B0B3PAIRS_POWER_UP			(3 << 2)
-#define LVDS_PLL_MODE_LVDS				(2 << 26)
-
-// PLL flags
-#define DISPLAY_PLL_ENABLED				(1UL << 31)
-#define DISPLAY_PLL_2X_CLOCK			(1UL << 30)
-#define DISPLAY_PLL_SYNC_LOCK_ENABLED	(1UL << 29)
-#define DISPLAY_PLL_NO_VGA_CONTROL		(1UL << 28)
-#define DISPLAY_PLL_MODE_ANALOG			(1UL << 26)
-#define DISPLAY_PLL_DIVIDE_HIGH			(1UL << 24)
-#define DISPLAY_PLL_DIVIDE_4X			(1UL << 23)
-#define DISPLAY_PLL_POST1_DIVIDE_2		(1UL << 21)
-#define DISPLAY_PLL_POST1_DIVISOR_MASK	0x001f0000
-#define DISPLAY_PLL_9xx_POST1_DIVISOR_MASK	0x00ff0000
-#define DISPLAY_PLL_POST1_DIVISOR_SHIFT	16
-#define DISPLAY_PLL_DIVISOR_1			(1UL << 8)
-#define DISPLAY_PLL_N_DIVISOR_MASK		0x001f0000
-#define DISPLAY_PLL_M1_DIVISOR_MASK		0x00001f00
-#define DISPLAY_PLL_M2_DIVISOR_MASK		0x0000001f
-#define DISPLAY_PLL_N_DIVISOR_SHIFT		16
-#define DISPLAY_PLL_M1_DIVISOR_SHIFT	8
-#define DISPLAY_PLL_M2_DIVISOR_SHIFT	0
-#define DISPLAY_PLL_PULSE_PHASE_SHIFT	9
-
-// display A
-#define RADEON_DISPLAY_A_HTOTAL			0x60000
-#define RADEON_DISPLAY_A_HBLANK			0x60004
-#define RADEON_DISPLAY_A_HSYNC			0x60008
-#define RADEON_DISPLAY_A_VTOTAL			0x6000c
-#define RADEON_DISPLAY_A_VBLANK			0x60010
-#define RADEON_DISPLAY_A_VSYNC			0x60014
-#define RADEON_DISPLAY_A_IMAGE_SIZE		0x6001c
-
-#define RADEON_DISPLAY_A_CONTROL			0x70180
-#define RADEON_DISPLAY_A_BASE			0x70184
-#define RADEON_DISPLAY_A_BYTES_PER_ROW	0x70188
-#define RADEON_DISPLAY_A_SURFACE			0x7019c	// i965 and up only
-#define DISPLAY_CONTROL_ENABLED			(1UL << 31)
-#define DISPLAY_CONTROL_GAMMA			(1UL << 30)
-#define DISPLAY_CONTROL_COLOR_MASK		(0x0fUL << 26)
-#define DISPLAY_CONTROL_CMAP8			(2UL << 26)
-#define DISPLAY_CONTROL_RGB15			(4UL << 26)
-#define DISPLAY_CONTROL_RGB16			(5UL << 26)
-#define DISPLAY_CONTROL_RGB32			(6UL << 26)
-
-#define RADEON_VGA_DISPLAY_CONTROL		0x71400
-#define VGA_DISPLAY_DISABLED			(1UL << 31)
-
-#define RADEON_DISPLAY_A_PALETTE			0x0a000
-
-#define RADEON_DISPLAY_A_PIPE_CONTROL	0x70008
-#define DISPLAY_PIPE_ENABLED			(1UL << 31)
-#define RADEON_DISPLAY_A_PIPE_STATUS		0x70024
-#define DISPLAY_PIPE_VBLANK_ENABLED		(1UL << 17)
-#define DISPLAY_PIPE_VBLANK_STATUS		(1UL << 1)
-
-#define RADEON_DISPLAY_A_PLL				0x06014
-#define RADEON_DISPLAY_A_PLL_DIVISOR_0	0x06040
-#define RADEON_DISPLAY_A_PLL_DIVISOR_1	0x06044
-
-// display B
-#define RADEON_DISPLAY_B_HTOTAL			0x61000
-#define RADEON_DISPLAY_B_HBLANK			0x61004
-#define RADEON_DISPLAY_B_HSYNC			0x61008
-#define RADEON_DISPLAY_B_VTOTAL			0x6100c
-#define RADEON_DISPLAY_B_VBLANK			0x61010
-#define RADEON_DISPLAY_B_VSYNC			0x61014
-
-#define RADEON_DISPLAY_B_DIGITAL_PORT	0x61140
-#define RADEON_DISPLAY_B_PIPE_SIZE		0x71190
-
-#define RADEON_DISPLAY_B_PIPE_CONTROL	0x71008
-
-#define RADEON_DISPLAY_B_CONTROL			0x71180
-#define RADEON_DISPLAY_B_BASE			0x71184
-#define RADEON_DISPLAY_B_BYTES_PER_ROW	0x71188
-#define RADEON_DISPLAY_B_POS				0x7118C
-
-#define RADEON_DISPLAY_B_IMAGE_SIZE		0x6101c
-#define RADEON_DISPLAY_B_SURFACE			0x7119c	// i965 and up only
-
-#define RADEON_DISPLAY_B_PALETTE			0x0a800
-
-#define RADEON_DISPLAY_B_PLL				0x06018
-#define RADEON_DISPLAY_B_PLL_MULTIPLIER_DIVISOR 0x06020
-#define RADEON_DISPLAY_B_PLL_DIVISOR_0	0x06048
-#define RADEON_DISPLAY_B_PLL_DIVISOR_1	0x0604c
-
-// LVDS panel
-#define RADEON_PANEL_STATUS				0x61200
-#define PANEL_STATUS_POWER_ON			(1UL << 31)
-#define RADEON_PANEL_CONTROL				0x61204
-#define PANEL_CONTROL_POWER_TARGET_ON	(1UL << 0)
-#define RADEON_PANEL_FIT_CONTROL			0x61230
-#define RADEON_PANEL_FIT_RATIOS			0x61234
 
 // cursor
 #define RADEON_CURSOR_CONTROL			0x70080
@@ -395,14 +213,6 @@ struct radeon_free_graphics_memory {
 #define CURSOR_FORMAT_XRGB				(5UL << 24)
 #define CURSOR_POSITION_NEGATIVE		0x8000
 #define CURSOR_POSITION_MASK			0x3fff
-
-// ring buffer commands
-
-#define COMMAND_NOOP					0x00
-#define COMMAND_WAIT_FOR_EVENT			(0x03 << 23)
-#define COMMAND_WAIT_FOR_OVERLAY_FLIP	(1 << 16)
-
-#define COMMAND_FLUSH					(0x04 << 23)
 
 // overlay flip
 #define COMMAND_OVERLAY_FLIP			(0x11 << 23)
@@ -425,28 +235,17 @@ struct radeon_free_graphics_memory {
 #define COMMAND_MODE_RGB16				0x01
 #define COMMAND_MODE_RGB32				0x03
 
-// i2c
+// display
 
-#define RADEON_I2C_IO_A					0x5010
-#define RADEON_I2C_IO_B					0x5014
-#define RADEON_I2C_IO_C					0x5018
-#define RADEON_I2C_IO_D					0x501c
-#define RADEON_I2C_IO_E					0x5020
-#define RADEON_I2C_IO_F					0x5024
-#define RADEON_I2C_IO_G					0x5028
-#define RADEON_I2C_IO_H					0x502c
+#define DISPLAY_CONTROL_ENABLED			(1UL << 31)
+#define DISPLAY_CONTROL_GAMMA			(1UL << 30)
+#define DISPLAY_CONTROL_COLOR_MASK		(0x0fUL << 26)
+#define DISPLAY_CONTROL_CMAP8			(2UL << 26)
+#define DISPLAY_CONTROL_RGB15			(4UL << 26)
+#define DISPLAY_CONTROL_RGB16			(5UL << 26)
+#define DISPLAY_CONTROL_RGB32			(6UL << 26)
 
-#define I2C_CLOCK_DIRECTION_MASK		(1 << 0)
-#define I2C_CLOCK_DIRECTION_OUT			(1 << 1)
-#define I2C_CLOCK_VALUE_MASK			(1 << 2)
-#define I2C_CLOCK_VALUE_OUT				(1 << 3)
-#define I2C_CLOCK_VALUE_IN				(1 << 4)
-#define I2C_DATA_DIRECTION_MASK			(1 << 8)
-#define I2C_DATA_DIRECTION_OUT			(1 << 9)
-#define I2C_DATA_VALUE_MASK				(1 << 10)
-#define I2C_DATA_VALUE_OUT				(1 << 11)
-#define I2C_DATA_VALUE_IN				(1 << 12)
-#define I2C_RESERVED					((1 << 13) | (1 << 5))
+// PCI bridge memory management
 
 // overlay
 
@@ -627,16 +426,6 @@ struct overlay_registers {
 	uint16 vertical_coefficients_uv[128];
 	uint16 horizontal_coefficients_uv[128];
 };
-
-// i965 overlay support is currently realized using its 3D hardware
-#define RADEON_i965_OVERLAY_STATE_SIZE	36864
-#define RADEON_i965_3D_CONTEXT_SIZE		32768
-
-inline bool
-radeon_uses_physical_overlay(radeon_shared_info &info)
-{
-	return !info.device_type.InGroup(RADEON_TYPE_Gxx);
-}
 
 
 struct hardware_status {
