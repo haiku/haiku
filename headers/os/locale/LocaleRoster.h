@@ -6,6 +6,7 @@
 #define _LOCALE_ROSTER_H_
 
 
+#include <Entry.h>
 #include <String.h>
 
 
@@ -66,6 +67,10 @@ public:
 									// (that needs to link with liblocalestub.a)
 
 			bool				IsFilesystemTranslationPreferred() const;
+
+			status_t			GetLocalizedFileName(entry_ref& ref,
+									BString& localizedFileName,
+									bool traverse = false);
 
 	static	const char*			kCatLangAttr;
 	static	const char*			kCatSigAttr;

@@ -26,6 +26,7 @@
 #include <Entry.h>
 #include <File.h>
 #include <FormattingConventions.h>
+#include <fs_attr.h>
 #include <IconUtils.h>
 #include <Language.h>
 #include <Locale.h>
@@ -377,4 +378,78 @@ BLocaleRoster::IsFilesystemTranslationPreferred() const
 		return B_ERROR;
 
 	return rosterData->fIsFilesystemTranslationPreferred;
+}
+
+
+/*!	\brief Looks up a localized filename in a catalog, using attribute data
+		on the entry.
+	\param ref An entry_ref with an attribute holding data for catalog lookup.
+	\param localizedFileName A pre-allocated BString object for the result
+		of the lookup.
+	\param traverse A boolean to decide if symlinks are to be traversed.
+	\return
+	- \c B_OK: success
+	- \c B_ENTRY_NOT_FOUND: failure. Attribute not found, entry not found
+		in catalog, etc
+	- other error codes: failure
+
+	Attribute format:  "signature:context:string"
+	(no colon in any of signature, context and string)
+
+	Lookup is done for the top preferred language, only.
+	Lookup fails if a comment is present in the catalog entry.
+*/
+status_t
+BLocaleRoster::GetLocalizedFileName(entry_ref& ref, BString& localizedFileName,
+	bool traverse)
+{
+	BEntry entry(&ref, traverse);
+	if (!entry.Exists())
+		return B_ENTRY_NOT_FOUND;
+
+	BNode node(&entry);
+	status_t status = node.InitCheck();
+	if (status != B_OK)
+		return status;
+
+	attr_info attr;
+	status = node.GetAttrInfo("SYS:NAME", &attr);
+	if (status != B_OK)
+		return status;
+
+	char attribute[attr.size + 1];
+	ssize_t bytes = node.ReadAttr("SYS:NAME", B_MIME_TYPE, 0, &attribute,
+		attr.size);
+
+	if (bytes < 0)
+		return bytes;
+	
+	if (bytes == 0 || bytes != attr.size)
+		return B_ENTRY_NOT_FOUND;
+
+	attribute[bytes] = '\0';
+
+	char* signature = attribute;
+	char* context = strchr(signature, ':');
+	if (context == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	context[0] = '\0';
+	context++;
+
+	char* string = strchr(context, ':');
+	if (string == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	string[0] = '\0';
+	string++;
+
+	BCatalog catalog(signature);
+
+	const char* temp = catalog.GetString(string, context);
+	if (temp == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	localizedFileName = temp;
+	return B_OK;
 }
