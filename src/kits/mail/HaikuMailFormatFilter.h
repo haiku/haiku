@@ -26,8 +26,10 @@ public:
 private:
 			status_t			_SetFileName(const entry_ref& ref,
 									const BString& name);
+			BString				_ExtractName(const BString& from);
 
 			int32				fAccountId;
+			BString				fAccountName;
 			BString				fOutboundDirectory;
 };
 

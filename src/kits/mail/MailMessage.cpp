@@ -636,10 +636,13 @@ BEmailMessage::RetrieveTextBody(BMailComponent *component)
 
 
 status_t
-BEmailMessage::SetToRFC822(BPositionIO *mail_file, size_t length, bool parse_now)
+BEmailMessage::SetToRFC822(BPositionIO *mail_file, size_t length,
+	bool parse_now)
 {
-	if (BFile *file = dynamic_cast<BFile *>(mail_file))
-		file->ReadAttr("MAIL:account",B_INT32_TYPE,0,&_account_id,sizeof(_account_id));
+	if (BFile *file = dynamic_cast<BFile *>(mail_file)) {
+		file->ReadAttr(B_MAIL_ATTR_ACCOUNT_ID, B_INT32_TYPE, 0, &_account_id,
+			sizeof(_account_id));
+	}
 
 	mail_file->Seek(0,SEEK_END);
 	length = mail_file->Position();
@@ -806,8 +809,8 @@ BEmailMessage::RenderToRFC822(BPositionIO *file)
 		attributed->WriteAttr(B_MAIL_ATTR_FLAGS, B_INT32_TYPE, 0, &flags,
 			sizeof(int32));
 
-		attributed->WriteAttr("MAIL:account", B_INT32_TYPE, 0, &_account_id,
-			sizeof(int32));
+		attributed->WriteAttr(B_MAIL_ATTR_ACCOUNT_ID, B_INT32_TYPE, 0,
+			&_account_id, sizeof(int32));
 	}
 
 	return B_OK;

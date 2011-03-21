@@ -35,12 +35,15 @@ static const mail_header_field gDefaultFields[] =
 	{ "Delivery-Date",	B_MAIL_ATTR_WHEN,		B_TIME_TYPE   },
 	{ "Reply-To",     	B_MAIL_ATTR_REPLY,		B_STRING_TYPE },
 	{ "Subject",      	B_MAIL_ATTR_SUBJECT,	B_STRING_TYPE },
-	{ "X-Priority",		B_MAIL_ATTR_PRIORITY,	B_STRING_TYPE },	// Priorities with prefered
-	{ "Priority",		B_MAIL_ATTR_PRIORITY,	B_STRING_TYPE },	// one first - the numeric
-	{ "X-Msmail-Priority", B_MAIL_ATTR_PRIORITY, B_STRING_TYPE },	// one (has more levels).
+	{ "X-Priority",		B_MAIL_ATTR_PRIORITY,	B_STRING_TYPE },
+		// Priorities with prefered
+	{ "Priority",		B_MAIL_ATTR_PRIORITY,	B_STRING_TYPE },
+		// one first - the numeric
+	{ "X-Msmail-Priority", B_MAIL_ATTR_PRIORITY, B_STRING_TYPE },
+		// one (has more levels).
 	{ "Mime-Version",	B_MAIL_ATTR_MIME,		B_STRING_TYPE },
 	{ "STATUS",       	B_MAIL_ATTR_STATUS,		B_STRING_TYPE },
-	{ "THREAD",       	"MAIL:thread",			B_STRING_TYPE }, //---Not supposed to be used for this (we add it in Parser), but why not?
+	{ "THREAD",       	B_MAIL_ATTR_THREAD,		B_STRING_TYPE },
 	{ "NAME",       	B_MAIL_ATTR_NAME,		B_STRING_TYPE },
 	{ NULL,				NULL,					0 }
 };
@@ -51,7 +54,8 @@ HaikuMailFormatFilter::HaikuMailFormatFilter(MailProtocol& protocol,
 	:
 	MailFilter(protocol, NULL),
 
-	fAccountId(settings->AccountID())
+	fAccountId(settings->AccountID()),
+	fAccountName(settings->Name())
 {
 	const BMessage* outboundSettings = &settings->OutboundSettings().Settings();
 	if (outboundSettings->FindString("destination", &fOutboundDirectory)
@@ -68,7 +72,8 @@ HaikuMailFormatFilter::HeaderFetched(const entry_ref& ref, BFile* file)
 
 	BMessage attributes;
 	// TODO attributes.AddInt32(B_MAIL_ATTR_CONTENT, length);
-	attributes.AddInt32("MAIL:account", fAccountId);
+	attributes.AddInt32(B_MAIL_ATTR_ACCOUNT_ID, fAccountId);
+	attributes.AddString(B_MAIL_ATTR_ACCOUNT, fAccountName);
 
 	BString header;
 	off_t size;
@@ -102,16 +107,16 @@ HaikuMailFormatFilter::HeaderFetched(const entry_ref& ref, BFile* file)
 		}
 	}
 
-	(*file) << attributes;
-
+	BString senderName = _ExtractName(attributes.FindString(B_MAIL_ATTR_FROM));
+	attributes.AddString(B_MAIL_ATTR_NAME, senderName);
 
 	// Generate a file name for the incoming message.  See also
 	// Message::RenderTo which does a similar thing for outgoing messages.
-
-	BString name = attributes.FindString("MAIL:subject");
+	BString name = attributes.FindString(B_MAIL_ATTR_SUBJECT);
 	SubjectToThread(name); // Extract the core subject words.
 	if (name.Length() <= 0)
 		name = "No Subject";
+	attributes.AddString(B_MAIL_ATTR_THREAD, name);
 	if (name[0] == '.')
 		name.Prepend ("_"); // Avoid hidden files, starting with a dot.
 
@@ -171,6 +176,8 @@ HaikuMailFormatFilter::HeaderFetched(const entry_ref& ref, BFile* file)
 		fMailProtocol.FileRenamed(ref, to);
 	}
 
+	(*file) << attributes;
+
 	BNodeInfo info(file);
 	info.SetType(B_PARTIAL_MAIL_TYPE);
 }
@@ -204,4 +211,26 @@ HaikuMailFormatFilter::_SetFileName(const entry_ref& ref, const BString& name)
 {
 	BEntry entry(&ref);
 	return entry.Rename(name);
+}
+
+
+BString
+HaikuMailFormatFilter::_ExtractName(const BString& from)
+{
+	BString name;
+
+	int32 emailStart = from.FindFirst("<");
+	if (emailStart < 0)
+		name = from;
+
+	from.CopyInto(name, 0, emailStart);
+	name.Trim();
+	if (name.Length() < 2)
+		return from;
+
+	if (name[name.Length() - 1] == '\"')
+		name.Truncate(name.Length() - 1, true);
+	if (name[0] == '\"')
+		name.Remove(0, 1);
+	return name;
 }

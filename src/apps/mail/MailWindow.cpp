@@ -804,7 +804,7 @@ TMailWindow::MarkMessageRead(entry_ref* message, read_flags flag)
 		return;
 
 	int32 account;
-	if (node.ReadAttr("MAIL:account", B_INT32_TYPE, 0, &account,
+	if (node.ReadAttr(B_MAIL_ATTR_ACCOUNT_ID, B_INT32_TYPE, 0, &account,
 		sizeof(account)) < 0)
 		account = -1;
 

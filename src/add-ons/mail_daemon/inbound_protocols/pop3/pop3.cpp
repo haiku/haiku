@@ -603,7 +603,7 @@ POP3Protocol::CheckForDeletedMessages()
 		entry_ref entry;
 
 		fido.SetVolume(&volume);
-		fido.PushAttr("MAIL:account");
+		fido.PushAttr(B_MAIL_ATTR_ACCOUNT_ID);
 		fido.PushInt32(fAccountSettings.AccountID());
 		fido.PushOp(B_EQ);
 

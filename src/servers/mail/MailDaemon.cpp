@@ -193,7 +193,7 @@ MailDaemonApp::RefsReceived(BMessage* message)
 			continue;
 
 		int32 account;
-		if (node.ReadAttr("MAIL:account", B_INT32_TYPE, 0, &account,
+		if (node.ReadAttr(B_MAIL_ATTR_ACCOUNT_ID, B_INT32_TYPE, 0, &account,
 			sizeof(account)) < 0)
 			continue;
 
@@ -724,7 +724,7 @@ MailDaemonApp::SendPendingMessages(BMessage* msg)
 			query.PushOp(B_EQ);
 
 			if (account >= 0) {
-				query.PushAttr("MAIL:account");
+				query.PushAttr(B_MAIL_ATTR_ACCOUNT_ID);
 				query.PushInt32(account);
 				query.PushOp(B_EQ);
 				query.PushOp(B_AND);
@@ -744,7 +744,7 @@ MailDaemonApp::SendPendingMessages(BMessage* msg)
 					continue;
 
 				int32 messageAccount;
-				if (node.ReadAttr("MAIL:account", B_INT32_TYPE, 0,
+				if (node.ReadAttr(B_MAIL_ATTR_ACCOUNT_ID, B_INT32_TYPE, 0,
 					&messageAccount, sizeof(int32)) < 0)
 					messageAccount = -1;
 

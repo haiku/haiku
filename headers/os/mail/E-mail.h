@@ -29,6 +29,9 @@ struct entry_ref;
 #define B_MAIL_ATTR_HEADER		"MAIL:header_length"	// int32
 #define B_MAIL_ATTR_CONTENT		"MAIL:content_length"	// int32
 #define B_MAIL_ATTR_READ		"MAIL:read"				// int32
+#define B_MAIL_ATTR_THREAD		"MAIL:thread"			// string
+#define B_MAIL_ATTR_ACCOUNT		"MAIL:account"			// string
+#define B_MAIL_ATTR_ACCOUNT_ID	"MAIL:account_id"		// int32
 
 
 // read flags
