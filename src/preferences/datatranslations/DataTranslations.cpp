@@ -14,12 +14,12 @@
 
 #include <Alert.h>
 #include <Catalog.h>
-#include <Entry.h>
 #include <Directory.h>
+#include <Entry.h>
 #include <FindDirectory.h>
 #include <String.h>
-#include <TranslatorRoster.h>
 #include <TextView.h>
+#include <TranslatorRoster.h>
 
 #include "DataTranslationsWindow.h"
 
@@ -32,7 +32,8 @@ const char* kApplicationSignature = "application/x-vnd.Haiku-DataTranslations";
 
 
 DataTranslationsApplication::DataTranslationsApplication()
-	: BApplication(kApplicationSignature)
+	:
+	BApplication(kApplicationSignature)
 {
 	new DataTranslationsWindow();
 }

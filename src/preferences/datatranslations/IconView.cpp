@@ -22,11 +22,13 @@ IconView::IconView(const BRect& frame, const char* name, uint32 resize,
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
 
+
 IconView::~IconView()
 {
 	delete fIconBitmap;
 	fIconBitmap = NULL;
 }
+
 
 bool
 IconView::SetIcon(const BPath& path)
@@ -45,6 +47,7 @@ IconView::SetIcon(const BPath& path)
 	return true;
 }
 
+
 bool
 IconView::DrawIcon(bool draw)
 {
@@ -55,6 +58,7 @@ IconView::DrawIcon(bool draw)
 
 	return prev;
 }
+
 
 void
 IconView::Draw(BRect area)

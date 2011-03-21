@@ -14,15 +14,15 @@
 
 #include <stdio.h>
 
-#include <Application.h>
-#include <Alignment.h>
 #include <Alert.h>
-#include <Entry.h>
+#include <Alignment.h>
+#include <Application.h>
 #include <Bitmap.h>
 #include <Box.h>
 #include <Button.h>
 #include <Catalog.h>
 #include <ControlLook.h>
+#include <Entry.h>
 #include <LayoutBuilder.h>
 #include <ListView.h>
 #include <Path.h>

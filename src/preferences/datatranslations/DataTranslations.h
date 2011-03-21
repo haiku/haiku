@@ -12,10 +12,8 @@
 
 
 #include <Application.h>
-
-
-class BDirectory;
-class BEntry;
+#include <Directory.h>
+#include <Entry.h>
 
 
 class DataTranslationsApplication : public BApplication {

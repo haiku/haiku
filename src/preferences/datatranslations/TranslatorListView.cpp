@@ -11,9 +11,9 @@
 
 #include "TranslatorListView.h"
 
-#include <Application.h>
-
 #include <string.h>
+
+#include <Application.h>
 
 
 static int
@@ -45,7 +45,7 @@ TranslatorItem::~TranslatorItem()
 //	#pragma mark -
 
 
-TranslatorListView::TranslatorListView(const char *name, list_view_type type)
+TranslatorListView::TranslatorListView(const char* name, list_view_type type)
 	:
 	BListView(name, B_SINGLE_SELECTION_LIST) 
 {	
@@ -65,7 +65,7 @@ TranslatorListView::TranslatorAt(int32 index) const
 
 
 void
-TranslatorListView::MessageReceived(BMessage *message) 
+TranslatorListView::MessageReceived(BMessage* message) 
 {
 	uint32 type; 
 	int32 count;
@@ -90,15 +90,16 @@ TranslatorListView::MessageReceived(BMessage *message)
 
 
 void
-TranslatorListView::MouseMoved(BPoint point, uint32 transit, const BMessage *dragMessage)
+TranslatorListView::MouseMoved(BPoint point, uint32 transit,
+	const BMessage* dragMessage)
 {
 	if (dragMessage != NULL && transit == B_ENTERED_VIEW) {
 		// Draw a red box around the inside of the view
 		// to tell the user that this view accepts drops
-		SetHighColor(220,0,0);
-	 	SetPenSize(4);
+		SetHighColor(220, 0, 0);
+		SetPenSize(4);
 		StrokeRect(Bounds());
-	 	SetHighColor(0,0,0);
+		SetHighColor(0, 0, 0);
 	} else if (dragMessage != NULL && transit == B_EXITED_VIEW)
 		Invalidate();
 }
