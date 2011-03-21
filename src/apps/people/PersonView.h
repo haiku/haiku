@@ -63,12 +63,14 @@ public:
 
 private:
 			BFile*				fFile;
+			time_t				fLastModificationTime;
 			BPopUpMenu*			fGroups;
 			typedef BObjectList<AttributeTextControl> AttributeList;
 			AttributeList		fControls;
 
 			BString				fCategoryAttribute;
 			PictureView*		fPictureView;
+			bool				fSaving;
 };
 
 #endif // PERSON_VIEW_H

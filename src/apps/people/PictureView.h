@@ -28,6 +28,7 @@ public:
 
 			bool				HasChanged();
 			void				Revert();
+			void				Update();
 			void				Update(const entry_ref* ref);
 
 			BBitmap*			Bitmap();

@@ -45,10 +45,12 @@ PersonView::PersonView(const char* name, const char* categoryAttribute,
 		const entry_ref *ref)
 	:
 	BGridView(),
+	fLastModificationTime(0),
 	fGroups(NULL),
 	fControls(20, false),
 	fCategoryAttribute(categoryAttribute),
-	fPictureView(NULL)
+	fPictureView(NULL),
+	fSaving(false)
 {
 	SetName(name);
 	SetFlags(Flags() | B_WILL_DRAW);
@@ -68,6 +70,9 @@ PersonView::PersonView(const char* name, const char* categoryAttribute,
 	layout->AddView(fPictureView, 0, 0, 1, 5);
 	layout->ItemAt(0, 0)->SetExplicitAlignment(
 		BAlignment(B_ALIGN_CENTER, B_ALIGN_TOP));
+
+	if (fFile)
+		fFile->GetModificationTime(&fLastModificationTime);
 }
 
 
@@ -288,6 +293,8 @@ PersonView::IsSaved() const
 void
 PersonView::Save()
 {
+	fSaving = true;
+
 	int32 count = fControls.CountItems();
 	for (int32 i = 0; i < count; i++) {
 		AttributeTextControl* control = fControls.ItemAt(i);
@@ -299,17 +306,30 @@ PersonView::Save()
 
 	// Write the picture, if any, in the person file content
 	if (fPictureView) {
-		// trim previous content
+		// Trim any previous content
 		fFile->Seek(0, SEEK_SET);
 		fFile->SetSize(0);
-		if (fPictureView->Bitmap()) {
-			BBitmapStream stream(fPictureView->Bitmap());
+
+		BBitmap* picture = fPictureView->Bitmap();
+		if (picture) {
+			BBitmapStream stream(picture);
+			// Detach *our* bitmap from stream to avoid its deletion
+			// at stream object destruction
+			stream.DetachBitmap(&picture);
+
 			BTranslatorRoster* roster = BTranslatorRoster::Default();
 			roster->Translate(&stream, NULL, NULL, fFile,
 				fPictureView->SuggestedType(), B_TRANSLATOR_BITMAP,
 				fPictureView->SuggestedMIMEType());
+
 		}
+
+		fPictureView->Update();
 	}
+
+	fFile->GetModificationTime(&fLastModificationTime);
+
+	fSaving = false;
 }
 
 
@@ -386,8 +406,22 @@ PersonView::SetAttribute(const char* attribute, const char* value,
 void
 PersonView::UpdatePicture(const entry_ref* ref)
 {
-	if (fPictureView)
-		fPictureView->Update(ref);
+	if (fPictureView == NULL)
+		return;
+
+	if (fSaving)
+		return;
+
+	time_t modificationTime = 0;
+	BEntry entry(ref);
+	entry.GetModificationTime(&modificationTime);
+
+	if (entry.InitCheck() == B_OK
+		&& modificationTime <= fLastModificationTime) {
+		return;
+	}
+
+	fPictureView->Update(ref);
 }
 
 

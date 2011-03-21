@@ -17,6 +17,7 @@
 #include <Bitmap.h>
 #include <BitmapStream.h>
 #include <Catalog.h>
+#include <Clipboard.h>
 #include <Directory.h>
 #include <File.h>
 #include <FilePanel.h>
@@ -142,6 +143,16 @@ PictureView::Revert()
 
 
 void
+PictureView::Update()
+{
+	if (fOriginalPicture != fPicture) {
+		delete fOriginalPicture;
+		fOriginalPicture = fPicture;
+	}
+}
+
+
+void
 PictureView::Update(const entry_ref* ref)
 {
 	// Don't update when user has modified the picture
@@ -187,22 +198,37 @@ PictureView::MessageReceived(BMessage* message)
 		case B_SIMPLE_DATA:
 		{
 			entry_ref ref;
-			if (message->FindRef("refs", &ref) != B_OK)
-				break;
-
-			if (_LoadPicture(&ref) == B_OK)
+			if (message->FindRef("refs", &ref) == B_OK
+				&& _LoadPicture(&ref) == B_OK)
 				MakeFocus(true);
+			else
+				_HandleDrop(message);
 			break;
 		}
 
 		case B_MIME_DATA:
-			printf("B_MIME_DATA:\n");
-			message->PrintToStream();
+			// TODO
 			break;
 
 		case B_COPY_TARGET:
 			_HandleDrop(message);
 			break;
+
+		case B_PASTE:
+		{
+			if (be_clipboard->Lock() != B_OK)
+				break;
+
+			BMessage* data = be_clipboard->Data();
+			BMessage archivedBitmap;
+			if (data->FindMessage("image/bitmap", &archivedBitmap) == B_OK) {
+				BBitmap* picture = new(std::nothrow) BBitmap(&archivedBitmap);
+				_SetPicture(picture);
+			}
+
+			be_clipboard->Unlock();
+			break;
+		}
 
 		case B_DELETE:
 		case B_TRASH_TARGET:
@@ -239,7 +265,7 @@ PictureView::Draw(BRect updateRect)
 	StrokeRect(rect);
 
 	if (fFocusChanging) {
-		printf("Draw(): focus changed...\n");
+		// focus frame is already redraw, stop here
 		return;
 	}
 
@@ -583,10 +609,8 @@ PictureView::_LoadPicture(const entry_ref* ref)
 		return status;
 
 	BBitmap* picture = NULL;
-	if (stream.DetachBitmap(&picture) != B_OK)
-		return B_ERROR;
-
-	if (picture == NULL)
+	if (stream.DetachBitmap(&picture) != B_OK
+		|| picture == NULL)
 		return B_ERROR;
 
 	// Remember image format so we could store using the same
@@ -605,12 +629,13 @@ PictureView::_SetPicture(BBitmap* picture)
 		delete fPicture;
 
 	fPicture = picture;
-	Invalidate();
 
 	if (picture == NULL) {
 		fPictureType = 0;
 		fPictureMIMEType = "";
 	}
+
+	Invalidate();
 }
 
 
