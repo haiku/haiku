@@ -20,6 +20,8 @@ ToolBarView::ToolBarView(BRect frame)
 
 	GroupLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
 
+	SetFlags(Flags() | B_FRAME_EVENTS | B_PULSE_NEEDED);
+
 	MoveTo(frame.LeftTop());
 	ResizeTo(frame.Width(), frame.Height());
 	SetResizingMode(B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
@@ -28,6 +30,16 @@ ToolBarView::ToolBarView(BRect frame)
 
 ToolBarView::~ToolBarView()
 {
+}
+
+
+void
+ToolBarView::Hide()
+{
+	BView::Hide();
+	// TODO: This could be fixed in BView instead. Looking from the BIconButtons, they
+	// are not hidden, though, only their parent is...
+	_HideToolTips();
 }
 
 
@@ -75,6 +87,25 @@ ToolBarView::SetActionPressed(uint32 command, bool pressed)
 
 
 void
+ToolBarView::Pulse()
+{
+	// TODO: Perhaps this could/should be addressed in BView instead.
+	if (IsHidden())
+		_HideToolTips();
+}
+
+
+void
+ToolBarView::FrameResized(float width, float height)
+{
+	// TODO: There seems to be a bug in app_server which does not
+	// correctly trigger invalidation of views which are shown, when
+	// the resulting dirty area is somehow already part of an update region.
+	Invalidate();
+}
+
+
+void
 ToolBarView::_AddView(BView* view)
 {
 	// Add before the space layout item at the end
@@ -101,4 +132,11 @@ ToolBarView::_FindIconButton(uint32 command) const
 	return NULL;
 }
 
+
+void
+ToolBarView::_HideToolTips() const
+{
+	for (int32 i = 0; BView* view = ChildAt(i); i++)
+		view->HideToolTip();
+}
 

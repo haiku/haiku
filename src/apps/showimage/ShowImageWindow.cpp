@@ -163,10 +163,14 @@ ShowImageWindow::ShowImageWindow(BRect frame, const entry_ref& ref,
 	
 //	fToolBarView->AddAction(MSG_FILE_OPEN, be_app,
 //		tool_bar_icon(kIconDocumentOpen), B_TRANSLATE("Open"B_UTF8_ELLIPSIS));
-	fToolBarView->AddAction(MSG_FILE_PREV, this, tool_bar_icon(kIconGoUp),
-		B_TRANSLATE("Previous file"));
-	fToolBarView->AddAction(MSG_FILE_NEXT, this, tool_bar_icon(kIconGoDown),
+	fToolBarView->AddAction(MSG_FILE_PREV, this,
+		tool_bar_icon(kIconGoPrevious), B_TRANSLATE("Previous file"));
+	fToolBarView->AddAction(MSG_FILE_NEXT, this, tool_bar_icon(kIconGoNext),
 		B_TRANSLATE("Next file"));
+	BMessage* fullScreenSlideShow = new BMessage(MSG_SLIDE_SHOW);
+	fullScreenSlideShow->AddBool("full screen", true);
+	fToolBarView->AddAction(fullScreenSlideShow, this,
+		tool_bar_icon(kIconMediaMovieLibrary), B_TRANSLATE("Slide show"));
 	fToolBarView->AddSeparator();
 	fToolBarView->AddAction(MSG_SELECTION_MODE, this,
 		tool_bar_icon(kIconDrawRectangularSelection),
@@ -180,9 +184,9 @@ ShowImageWindow::ShowImageWindow(BRect frame, const entry_ref& ref,
 		B_TRANSLATE("Zoom in"));
 	fToolBarView->AddAction(MSG_ZOOM_OUT, this, tool_bar_icon(kIconZoomOut),
 		B_TRANSLATE("Zoom out"));
-	fToolBarView->AddSeparator();
-	fToolBarView->AddAction(MSG_FULL_SCREEN, this,
-		tool_bar_icon(kIconViewFullScreen), B_TRANSLATE("Full screen"));
+//	fToolBarView->AddSeparator();
+//	fToolBarView->AddAction(MSG_FULL_SCREEN, this,
+//		tool_bar_icon(kIconViewFullScreen), B_TRANSLATE("Full screen"));
 
 	fToolBarView->ResizeTo(viewFrame.Width(), fToolBarView->MinSize().height);
 
@@ -875,6 +879,16 @@ ShowImageWindow::MessageReceived(BMessage* message)
 
 		case MSG_SLIDE_SHOW:
 		{
+			// TODO: Maybe two distinct messages? Also once the tool bar
+			// automatically shows in full screen mode, the icon should
+			// be a pause. There should be a separate icon to leave full
+			// screen mode as well.
+			bool fullScreen;
+			if (message->FindBool("full screen", &fullScreen) == B_OK
+				&& fullScreen) {
+				_ToggleFullScreen();
+			}
+
 			BMenuItem* item = fBar->FindItem(message->what);
 			if (item == NULL)
 				break;

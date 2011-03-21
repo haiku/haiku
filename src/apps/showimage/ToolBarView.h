@@ -20,6 +20,8 @@ public:
 								ToolBarView(BRect frame);
 	virtual						~ToolBarView();
 
+	virtual	void				Hide();
+
 			void				AddAction(uint32 command, BHandler* target,
 									const BBitmap* icon,
 									const char* toolTipText = NULL);
@@ -32,8 +34,12 @@ public:
 			void				SetActionPressed(uint32 command, bool pressed);
 
 private:
+	virtual	void				Pulse();
+	virtual	void				FrameResized(float width, float height);
+
 			void				_AddView(BView* view);
 			BIconButton*		_FindIconButton(uint32 command) const;
+			void				_HideToolTips() const;
 };
 
 #endif // TOOL_BAR_VIEW_H
