@@ -56,7 +56,7 @@ const struct supported_device {
 	//	Radeon 4225		- RV620
 	//	Radeon 4250		- RV620
 	{0x9712, 0, "Radeon HD 4270"},	/*RV620, IGP*/
-	//	Radeon 2600		- RV630
+	{0x9589, 0, "Radeon HD 2600"},	/*RV630*/
 	//	Radeon 2700		- RV630
 	//  Radeon 3650		- RV635
 	//  Radeon 3670		- RV635
