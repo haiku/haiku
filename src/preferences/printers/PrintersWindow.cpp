@@ -16,6 +16,7 @@
 #include <Button.h>
 #include <Catalog.h>
 #include <FindDirectory.h>
+#include <GroupLayout.h>
 #include <Layout.h>
 #include <ListView.h>
 #include <Locale.h>
@@ -34,6 +35,60 @@
 
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "PrintersWindow"
+
+
+class TestPageWindow : public BWindow {
+public:
+						TestPageWindow(BPrintJob* job, PrinterItem* printer);
+	virtual				~TestPageWindow();
+
+			void 		MessageReceived(BMessage* message);
+private:
+		BPrintJob*		fJob;
+		TestPageView*	fTestPage;
+};
+
+
+TestPageWindow::TestPageWindow(BPrintJob* job, PrinterItem* printer)
+	: BWindow(job->PaperRect().OffsetByCopy(-20000, -20000), B_TRANSLATE("Test Page"),
+		B_TITLED_WINDOW, 0), fJob(job)
+{
+	fTestPage = new TestPageView(job->PrintableRect(), printer);
+
+	// SetLayout(new BGroupLayout(B_VERTICAL));
+	AddChild(fTestPage);
+}
+
+
+TestPageWindow::~TestPageWindow()
+{
+	delete fJob;
+}
+
+
+void
+TestPageWindow::MessageReceived(BMessage* message)
+{
+	if (message->what != kMsgPrintTestPage) {
+		BWindow::MessageReceived(message);
+		return;
+	}
+
+	fJob->BeginJob();
+
+	fJob->DrawView(fTestPage, fTestPage->Bounds(), B_ORIGIN);
+	fJob->SpoolPage();
+
+	if (!fJob->CanContinue())
+		return;
+
+	fJob->CommitJob();
+
+	Quit();
+}
+
+
+// #pragma mark PrintersWindow main class
 
 
 PrintersWindow::PrintersWindow(BRect frame)
@@ -166,12 +221,12 @@ PrintersWindow::MessageReceived(BMessage* msg)
 void
 PrintersWindow::PrintTestPage(PrinterItem* printer)
 {
-	BPrintJob job(B_TRANSLATE("Test Page"));
-	job.ConfigPage();
+	BPrintJob* job = new BPrintJob(B_TRANSLATE("Test Page"));
+	job->ConfigPage();
 
-	// job.ConfigJob();
+	// job->ConfigJob();
 
-	BMessage* settings = job.Settings();
+	BMessage* settings = job->Settings();
 	if (settings == NULL)
 		return;
 
@@ -180,30 +235,9 @@ PrintersWindow::PrintTestPage(PrinterItem* printer)
 	settings->AddInt32("first_page", 1);
 	settings->AddInt32("last_page", -1);
 
-	job.BeginJob();
-
-	BRect paperRect = job.PaperRect();
-	BRect pageRect = job.PrintableRect();
-	TestPageView* testPage = new TestPageView(pageRect, printer);
-
-	BWindow* dummyWindow = new BWindow(paperRect.OffsetByCopy(40, 40),
-		B_TRANSLATE("Test Page"), B_TITLED_WINDOW, 0);
-		// B_NOT_RESIZABLE | B_NOT_ZOOMABLE);
-	// dummyWindow->Show();
-	dummyWindow->AddChild(testPage);
-
-	if (testPage->LockLooper()) {
-		job.DrawView(testPage, testPage->Bounds(), B_ORIGIN);
-		testPage->UnlockLooper();
-	}
-	job.SpoolPage();
-
-	delete dummyWindow;
-
-	if (!job.CanContinue())
-		return;
-
-	job.CommitJob();
+	BWindow* win = new TestPageWindow(job, printer);
+	win->Show();
+	win->PostMessage(kMsgPrintTestPage);
 }
 
 

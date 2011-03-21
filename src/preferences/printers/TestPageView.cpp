@@ -235,8 +235,8 @@ ColorGradientView::Draw(BRect updateRect)
 
 
 TestPageView::TestPageView(BRect frame, PrinterItem* printer)
-	: BView(frame, "testpage", /* B_FOLLOW_NONE */ B_FOLLOW_ALL,
-		B_WILL_DRAW | B_DRAW_ON_CHILDREN | B_FULL_UPDATE_ON_RESIZE),
+	: BView(frame, "testpage", B_FOLLOW_ALL,
+		B_DRAW_ON_CHILDREN | B_FULL_UPDATE_ON_RESIZE),
 	fPrinter(printer)
 {
 	SetViewColor(255, 255, 255);
@@ -318,6 +318,8 @@ TestPageView::DrawAfterChildren(BRect updateRect)
 	float minDimension = MIN(width, height);
 
 	float size = minDimension * 0.05;
+
+	SetPenSize(3.0);
 
 	BPoint pt = Bounds().LeftTop();
 	StrokeLine(pt, BPoint(pt.x + size, pt.y));
