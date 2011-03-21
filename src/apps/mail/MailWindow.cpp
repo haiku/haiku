@@ -188,7 +188,6 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 	BMenu* subMenu;
 	BMenuItem* item;
 	BMessage* msg;
-	attr_info info;
 	BFile file(ref, B_READ_ONLY);
 
 	if (ref) {
@@ -240,14 +239,13 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 		menu->AddSeparatorItem();
 
 		subMenu = new BMenu(B_TRANSLATE("Close and "));
-		if (file.GetAttrInfo(B_MAIL_ATTR_STATUS, &info) == B_NO_ERROR)
-			file.ReadAttr(B_MAIL_ATTR_STATUS, B_STRING_TYPE, 0, str, info.size);
-		else
-			str[0] = 0;
 
-		if (!strcmp(str, "New")) {
+		read_flags flag;
+		read_read_attr(file, flag);
+
+		if (flag == B_UNREAD) {
 			subMenu->AddItem(item = new BMenuItem(B_TRANSLATE("Leave as New"),
-				new BMessage(B_QUIT_REQUESTED), 'W', B_SHIFT_KEY));
+				new BMessage(kMsgQuitAndKeepAllStatus), 'W', B_SHIFT_KEY));
 #if 0
 			subMenu->AddItem(item = new BMenuItem(B_TRANSLATE("Set to Read"),
 				new BMessage(M_CLOSE_READ), 'W'));
@@ -260,7 +258,7 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 			subMenu->AddItem(item = new BMenuItem(status,
 							new BMessage(B_QUIT_REQUESTED), 'W'));
 			AddShortcut('W', B_COMMAND_KEY | B_SHIFT_KEY,
-				new BMessage(B_QUIT_REQUESTED));
+				new BMessage(kMsgQuitAndKeepAllStatus));
 		}
 
 		subMenu->AddItem(new BMenuItem(B_TRANSLATE("Move to trash"),
