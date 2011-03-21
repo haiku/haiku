@@ -629,7 +629,7 @@ TPrefsWindow::_BuildAccountMenu(int32 account)
 
 	//menu->SetRadioMode(true);
 	BMailAccounts accounts;
-	if (accounts.CountAccounts()) {
+	if (accounts.CountAccounts() == 0) {
 		menu->AddItem(item = new BMenuItem("<no account found>", NULL));
 		item->SetEnabled(false);
 		return menu;
