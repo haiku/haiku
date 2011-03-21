@@ -190,7 +190,7 @@ struct usbvc_still_image_frame_descriptor {
 	usbvc_image_size_pattern imageSizePatterns[0];
 	uint8 NumCompressionPatterns() const { return *(CompressionPatterns() - 1); }
 	const uint8* CompressionPatterns() const {
-		return (const uint8*)(imageSizePatterns + sizeof(usbvc_image_size_pattern)
+		return ((const uint8*)imageSizePatterns + sizeof(usbvc_image_size_pattern)
 			* numImageSizePatterns + sizeof(uint8));
 	} 
 } _PACKED;

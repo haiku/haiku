@@ -45,10 +45,16 @@ usbvc_guid kNV12Guid = {0x4e, 0x56, 0x31, 0x32, 0x00, 0x00, 0x10, 0x00, 0x80,
 static void
 print_guid(const usbvc_guid guid)
 {
-	printf("%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:"
-		"%02x:%02x:%02x", guid[0], guid[1], guid[2], guid[3], guid[4], guid[5],
-		guid[6], guid[7], guid[8], guid[9], guid[10], guid[11], guid[12],
-		guid[13], guid[14], guid[15]);
+	if (!memcmp(guid, kYUY2Guid, sizeof(usbvc_guid)))
+		printf("YUY2");
+	else if (!memcmp(guid, kNV12Guid, sizeof(usbvc_guid)))
+		printf("NV12");
+	else {
+		printf("%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:"
+			"%02x:%02x:%02x:%02x", guid[0], guid[1], guid[2], guid[3], guid[4],
+			guid[5], guid[6], guid[7], guid[8], guid[9], guid[10], guid[11],
+			guid[12], guid[13], guid[14], guid[15]);
+	}
 }
 
 
@@ -330,8 +336,9 @@ UVCCamDevice::ParseVideoControl(const usbvc_class_descriptor* _descriptor,
 		{
 			const usbvc_interface_header_descriptor* descriptor =
 				(const usbvc_interface_header_descriptor*)_descriptor;
-			printf("VC_HEADER:\tUVC v%04x, clk %lu Hz\n", descriptor->version,
-				descriptor->clockFrequency);
+			printf("VC_HEADER:\tUVC v%x.%02x, clk %.5f MHz\n",
+				descriptor->version >> 8, descriptor->version & 0xff,
+				descriptor->clockFrequency / 1000000.0);
 			for (uint8 i = 0; i < descriptor->numInterfacesNumbers; i++) {
 				printf("\tStreaming Interface %d\n",
 					descriptor->interfaceNumbers[i]);
@@ -347,6 +354,15 @@ UVCCamDevice::ParseVideoControl(const usbvc_class_descriptor* _descriptor,
 				descriptor->associatedTerminal);
 			printf("\tDesc: %s\n",
 				fDevice->DecodeStringDescriptor(descriptor->terminal));
+			if (descriptor->terminalType == 0x201) {
+				const usbvc_camera_terminal_descriptor* desc =
+					(const usbvc_camera_terminal_descriptor*)descriptor;
+				printf("\tObjectiveFocalLength Min/Max %d/%d\n",
+					desc->objectiveFocalLengthMin,
+					desc->objectiveFocalLengthMax);
+				printf("\tOcularFocalLength %d\n", desc->ocularFocalLength);
+				printf("\tControlSize %d\n", desc->controlSize);
+			}
 			break;
 		}
 		case VC_OUTPUT_TERMINAL:
