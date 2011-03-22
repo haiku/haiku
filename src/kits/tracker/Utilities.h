@@ -89,6 +89,10 @@ const color_space kDefaultIconDepth = B_RGBA32;
 const color_space kDefaultIconDepth = B_CMAP8;
 #endif
 
+
+extern bool gLocalizedNamePreferred;
+
+
 // misc typedefs, constants and structs
 
 // Periodically updated poses (ones with a volume space bar) register
@@ -522,11 +526,6 @@ void _ThrowOnError(status_t, const char *debugStr, const char *, int32);
 status_t GetAppSignatureFromAttr(BFile *, char *);
 status_t GetAppIconFromAttr(BFile *, BBitmap *, icon_size);
 status_t GetFileIconFromAttr(BNode *, BBitmap *, icon_size);
-
-extern bool gLocalizedNamePreferred;
-
-status_t GetLocalizedFileName(entry_ref& ref, BString& localizedFileName,
-	bool traverse = false);
 
 // debugging
 void HexDump(const void *buffer, int32 length);

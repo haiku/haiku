@@ -400,8 +400,8 @@ BLocaleRoster::IsFilesystemTranslationPreferred() const
 	Lookup fails if a comment is present in the catalog entry.
 */
 status_t
-BLocaleRoster::GetLocalizedFileName(entry_ref& ref, BString& localizedFileName,
-	bool traverse)
+BLocaleRoster::GetLocalizedFileName(const entry_ref& ref,
+	BString& localizedFileName, bool traverse)
 {
 	BEntry entry(&ref, traverse);
 	if (!entry.Exists())

@@ -68,7 +68,7 @@ public:
 
 			bool				IsFilesystemTranslationPreferred() const;
 
-			status_t			GetLocalizedFileName(entry_ref& ref,
+			status_t			GetLocalizedFileName(const entry_ref& ref,
 									BString& localizedFileName,
 									bool traverse = false);
 
