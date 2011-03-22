@@ -223,8 +223,13 @@ void
 MailDaemonApp::_InitAccount(BMailAccountSettings& settings)
 {
 	account_protocols account;
-	account.inboundProtocol = _CreateInboundProtocol(settings,
-		account.inboundImage);
+	// inbound
+	if (settings.IsInboundEnabled()) {
+		account.inboundProtocol = _CreateInboundProtocol(settings,
+			account.inboundImage);
+	} else {
+		account.inboundProtocol = NULL;
+	}
 	if (account.inboundProtocol) {
 		DefaultNotifier* notifier = new DefaultNotifier(settings.Name(), true,
 			fErrorLogWindow, fMailStatusWindow);
@@ -235,8 +240,13 @@ MailDaemonApp::_InitAccount(BMailAccountSettings& settings)
 		account.inboundThread->Run();
 	}
 
-	account.outboundProtocol = _CreateOutboundProtocol(settings,
-		account.outboundImage);
+	// outbound
+	if (settings.IsOutboundEnabled()) {
+		account.outboundProtocol = _CreateOutboundProtocol(settings,
+			account.outboundImage);
+	} else {
+		account.outboundProtocol = NULL;
+	}
 	if (account.outboundProtocol) {
 		DefaultNotifier* notifier = new DefaultNotifier(settings.Name(), false,
 			fErrorLogWindow, fMailStatusWindow);

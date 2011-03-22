@@ -164,6 +164,11 @@ class BMailAccountSettings
 			bool				HasInbound();
 			bool				HasOutbound();
 
+			void				SetInboundEnabled(bool enabled = true);
+			bool				IsInboundEnabled() const;
+			void				SetOutboundEnabled(bool enabled = true);
+			bool				IsOutboundEnabled() const;
+
 			status_t			Reload();
 			status_t			Save();
 			status_t			Delete();
@@ -185,6 +190,9 @@ private:
 
 			MailAddonSettings	fInboundSettings;
 			MailAddonSettings	fOutboundSettings;
+
+			bool				fInboundEnabled;
+			bool				fOutboundEnabled;
 
 			bool				fModified;
 };

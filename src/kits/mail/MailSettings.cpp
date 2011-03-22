@@ -611,6 +611,8 @@ MailAddonSettings::HasBeenModified()
 BMailAccountSettings::BMailAccountSettings()
 	:
 	fStatus(B_OK),
+	fInboundEnabled(true),
+	fOutboundEnabled(true),
 	fModified(true)
 {
 	fAccountID = real_time_clock();
@@ -772,6 +774,36 @@ BMailAccountSettings::HasOutbound()
 }
 
 
+void
+BMailAccountSettings::SetInboundEnabled(bool enabled)
+{
+	fInboundEnabled = enabled;
+	fModified = true;
+}
+
+
+bool
+BMailAccountSettings::IsInboundEnabled() const
+{
+	return fInboundEnabled;
+}
+
+
+void
+BMailAccountSettings::SetOutboundEnabled(bool enabled)
+{
+	fOutboundEnabled = enabled;
+	fModified = true;
+}
+
+
+bool
+BMailAccountSettings::IsOutboundEnabled() const
+{
+	return fOutboundEnabled;
+}
+
+
 status_t
 BMailAccountSettings::Reload()
 {
@@ -796,6 +828,11 @@ BMailAccountSettings::Reload()
 	settings.FindMessage("outbound", &outboundSettings);
 	fOutboundSettings.Load(outboundSettings);
 
+	if (settings.FindBool("inbound_enabled", &fInboundEnabled) != B_OK)
+		fInboundEnabled = true;
+	if (settings.FindBool("outbound_enabled", &fOutboundEnabled) != B_OK)
+		fOutboundEnabled = true;
+
 	fModified = false;
 	return B_OK;
 }
@@ -818,6 +855,9 @@ BMailAccountSettings::Save()
 	BMessage outboundSettings;
 	fOutboundSettings.Save(outboundSettings);
 	settings.AddMessage("outbound", &outboundSettings);
+
+	settings.AddBool("inbound_enabled", fInboundEnabled);
+	settings.AddBool("outbound_enabled", fOutboundEnabled);
 
 	status_t status = _CreateAccountFilePath();
 	if (status != B_OK)
