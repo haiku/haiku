@@ -47,13 +47,13 @@ typedef	UINT16*		PTABLE_UNIT_TYPE;
 typedef	UINT16		TABLE_UNIT_TYPE;
 #endif
 
-#include <regsdef.h> //This important file is dynamically generated based on the ASIC!!!!
+#include "regsdef.h" //This important file is dynamically generated based on the ASIC!!!!
 
 #define PARSER_MAJOR_REVISION 5
 #define PARSER_MINOR_REVISION 0
 
 //#include "atombios.h"
-#if (PARSER_TYPE==DRIVER_TYPE_PARSER)
+#if (PARSER_TYPE==DRIVER_TYPE_PARSER) && !defined(__HAIKU__)
 #ifdef FGL_LINUX
 #pragma pack(push,1)
 #else
@@ -457,7 +457,7 @@ typedef struct _INDIRECT_IO_PARSER_COMMANDS
     UINT8             csize;
 } INDIRECT_IO_PARSER_COMMANDS;
 
-#if (PARSER_TYPE==DRIVER_TYPE_PARSER)
+#if (PARSER_TYPE==DRIVER_TYPE_PARSER) && !defined(__HAIKU__)
 #pragma pack(pop)
 #endif
 

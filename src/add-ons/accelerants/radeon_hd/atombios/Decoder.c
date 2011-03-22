@@ -40,6 +40,9 @@ Revision History:
 #include "CD_binding.h"
 #include "CD_Common_Types.h"
 
+
+#define DISABLE_EASF
+
 #ifndef DISABLE_EASF
 	#include "easf.h"
 #endif
