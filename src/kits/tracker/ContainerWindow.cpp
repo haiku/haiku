@@ -166,15 +166,26 @@ ActivateWindowFilter(BMessage *, BHandler **target, BMessageFilter *)
 static void
 StripShortcut(const Model *model, char *result, uint32 &shortcut)
 {
-	strcpy(result, model->Name());
+	// model name (possibly localized) for the menu item label
+	strlcpy(result, model->Name(), B_FILE_NAME_LENGTH);
 
-	// check if there is a shortcut
+	// check if there is a shortcut in the model name
 	uint32 length = strlen(result);
-	shortcut = '\0';
-	if (result[length - 2] == '-') {
+	if (result[length - 2] == '-' && length > 2) {
 		shortcut = result[length - 1];
 		result[length - 2] = '\0';
+		return;
 	}
+
+	// check if there is a shortcut in the filename
+	char* refName = model->EntryRef()->name;
+	length = strlen(refName);
+	if (refName[length - 2] == '-' && length > 2) {
+		shortcut = refName[length - 1];
+		return;
+	}
+
+	shortcut = '\0';
 }
 
 
