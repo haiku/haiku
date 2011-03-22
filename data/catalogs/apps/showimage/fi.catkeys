@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-ShowImage	2709418306
+1	finnish	x-vnd.Haiku-ShowImage	2627877165
 %SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS sekuntia
 About ShowImage…	Menus		Ohjelmasta Kuvankatselin…
 Browse	Menus		Selaa
@@ -43,8 +43,9 @@ Rotate clockwise	Menus		Pyöritä myötäpäivään
 Rotate counterclockwise	Menus		Pyöritä vastapäivään
 Save as…	Menus		Tallenna nimellä...
 Select all	Menus		Valitse kaikki
-Selection Mode	Menus		Valintatila
+Selection mode	Menus		Valintatila
 Show caption in full screen mode	Menus		Näytä kuvateksti kokoruututilassa
+Show tool bar	Menus		Näytä työkalupalkki
 ShowImage	Application name		Kuvankatselin
 Slide delay	Menus		Diaviive
 Slide show	Menus		Diaesitys

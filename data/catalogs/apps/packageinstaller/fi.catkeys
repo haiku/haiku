@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-PackageInstaller	1047551357
+1	finnish	x-vnd.Haiku-PackageInstaller	3449845127
 %.1f GiB	PackageView		%.1f gibitavua
 %.1f KiB	PackageView		%.1f kibitavua
 %.1f MiB	PackageView		%.1f mebitavua
@@ -19,11 +19,7 @@ Disclaimer	PackageTextViewer		Vastuuvapauslauseke
 Do you want to remember this decision for the rest of this installation?\n	PackageView		Haluatko muistaa tämän päätöksen loppuasennuksen aikana?
 Done	PackageInstall		Valmis
 Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Virhe (%s)! Ei voitu avata ”%s”.\n
-Error on SetTo\n	PackageInstall		Virhe asetettaessa kohteeseen\n
-Error on uninstall\n	PackageInstall		Virhe asennuksen poistamisen aikana\n
 Error while installing the package\n	PackageView		Virhe asennettaessa pakettia\n
-Error while running script\n	PackageInstall		Virhe skriptiä suoritettaessa\n
-Error while writing path\n	PackageInstall		Virhe kirjoitettaessa polkua\n
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Virhe! ”%s” ei ole kelvollinen polku.\n
 Finishing installation	PackageInstall		Lopetetaan asennus
 Image not loaded correctly	PackageImageViewer		Tiedostovedosta ei ladattu oikein
@@ -58,5 +54,3 @@ The requested package failed to install on your system. This might be a problem 
 The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Skripti nimeltään ’%s’ on jo olemassa annetussa polussa.\nKorvataanko se vastaavalla tästä paketista vai ohitetaanko se?
 The symbolic link named '%s' already exists in the give path.\nReplace the link with the one from this package or skip it?	PackageView		Symbolinen linkki nimeltään ’%s’ on jo olemassa annetussa polussa.\nKorvataanko linkki tämän paketin linkillä vai ohitetaanko se?
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Pakettitiedoston tiedostokoossa näyttää olevan täsmäämättömyys. Paketti voi olla rikkinäinen tai sitä on muokattu luomisen jälkeen. Haluatko yhä jatkaa?
-Unknown file tag %s\n	PackageInfo		Tuntematon tiedostotunniste %s\n
-returning on error\n	PackageInstall		paluu virheen tapahtuessa\n

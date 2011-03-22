@@ -32,7 +32,7 @@ Sample size: 	RecorderWindow		Samplingsstorlek:
 Save	RecorderWindow		Spara
 Some of the files don't appear to be audio files	RecorderWindow		Några av filerna verkar inte vara ljudfiler
 Sound List	RecorderWindow		Ljudlista
-SoundRecorder	Application name		LjudInspelning
+SoundRecorder	Application name		LjudInspelare
 Stop	RecorderWindow		Stopp
 bits	RecorderWindow		bitar
 seconds	RecorderWindow		sekunder

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Terminal	140018576
+1	swedish	x-vnd.Haiku-Terminal	2094789868
 %app% settings	Terminal PrefWindow	window title	%app% settings
 -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h, --help visa denna hjälp\n -t, --title ange fönstertitel\n -f, --fullscreen starta helskärmsläge\n
 Abort	Terminal Shell		Avbryt
@@ -76,6 +76,7 @@ Size:	Terminal AppearancePrefView		Storlek:
 Switch Terminals	Terminal TermWindow		Växla terminal.
 Tab title:	Terminal AppearancePrefView		Fliktitel:
 Tab title:	Terminal TermWindow		Fliktitel:
+Terminal	Application name		Terminal
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal kunde inte starta skalet.
 Terminal\n\nwritten by Kazuho Okui and Takashi Murai\nupdated by Kian Duffy and others\n\nCopyright ©2003-2009, Haiku.\n	Terminal TermView		Terminal\n\nskrivet av Kazuho Okui och Takashi Murai\nuppdaterat av Kian Duffy och några andra\n\nCopyright ©2003-2009, Haiku.\n
 Text	Terminal AppearancePrefView		Text
