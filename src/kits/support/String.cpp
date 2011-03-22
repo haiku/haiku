@@ -1964,25 +1964,28 @@ BString::CharacterDeescape(char escapeChar)
 BString&
 BString::Trim()
 {
+	if (Length() <= 0)
+		return *this;
+
 	const char* string = String();
 
 	int32 startCount = 0;
-	while (isspace(string[startCount])) {
+	while (isspace(string[startCount]))
 		startCount++;
-	}
 
 	int32 endCount = 0;
-	while (isspace(string[Length() - endCount - 1])) {
+	while (isspace(string[Length() - endCount - 1]))
 		endCount++;
-	}
 
 	if (startCount == 0 && endCount == 0)
 		return *this;
 
 	// We actually need to trim
 
-	size_t length = Length() - startCount - endCount;
-	if (startCount == 0) {
+	ssize_t length = Length() - startCount - endCount;
+	if (length < 0)
+		length = 0;
+	if (startCount == 0 || length == 0) {
 		_MakeWritable(length, true);
 	} else if (_MakeWritable() == B_OK) {
 		memmove(fPrivateData, fPrivateData + startCount, length);
