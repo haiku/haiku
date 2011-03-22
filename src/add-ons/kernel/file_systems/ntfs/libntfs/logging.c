@@ -277,7 +277,7 @@ static const char * ntfs_log_get_prefix(u32 level)
 }
 #endif
 
-#ifndef __HAIKU__
+
 /**
  * ntfs_log_set_handler - Provide an alternate logging handler
  * @handler:	function to perform the logging
@@ -296,7 +296,7 @@ void ntfs_log_set_handler(ntfs_log_handler *handler)
 	} else
 		ntfs_log.handler = ntfs_log_handler_null;
 }
-#endif
+
 
 /**
  * ntfs_log_redirect - Pass on the request to the real handler
@@ -390,6 +390,7 @@ out:
 }
 #endif
 
+#ifndef __HAIKU__
 /**
  * ntfs_log_handler_fprintf - Basic logging handler
  * @function:	Function in which the log line occurred
@@ -414,9 +415,6 @@ out:
 int ntfs_log_handler_fprintf(const char *function, const char *file,
 	int line, u32 level, void *data, const char *format, va_list args)
 {
-#ifdef __HAIKU__
-	return 0;
-#else
 #ifdef DEBUG
 	int i;
 #endif
@@ -467,8 +465,9 @@ int ntfs_log_handler_fprintf(const char *function, const char *file,
 	fflush(stream);
 	errno = olderr;
 	return ret;
-#endif
 }
+
+#endif // __HAIKU__
 
 /**
  * ntfs_log_handler_null - Null logging handler (no output)
@@ -491,6 +490,8 @@ int ntfs_log_handler_null(const char *function __attribute__((unused)), const ch
 {
 	return 0;
 }
+
+#ifndef __HAIKU__
 
 /**
  * ntfs_log_handler_stdout - All logs go to stdout
@@ -516,14 +517,10 @@ int ntfs_log_handler_null(const char *function __attribute__((unused)), const ch
 int ntfs_log_handler_stdout(const char *function, const char *file,
 	int line, u32 level, void *data, const char *format, va_list args)
 {
-#ifdef __HAIKU__
-	return 0;
-#else
 	if (!data)
 		data = stdout;
 
 	return ntfs_log_handler_fprintf(function, file, line, level, data, format, args);
-#endif
 }
 
 /**
@@ -551,14 +548,10 @@ int ntfs_log_handler_stdout(const char *function, const char *file,
 int ntfs_log_handler_outerr(const char *function, const char *file,
 	int line, u32 level, void *data, const char *format, va_list args)
 {
-#ifdef __HAIKU__
-	return 0;
-#else	
 	if (!data)
 		data = ntfs_log_get_stream(level);
 
 	return ntfs_log_handler_fprintf(function, file, line, level, data, format, args);
-#endif
 }
 
 /**
@@ -585,15 +578,13 @@ int ntfs_log_handler_outerr(const char *function, const char *file,
 int ntfs_log_handler_stderr(const char *function, const char *file,
 	int line, u32 level, void *data, const char *format, va_list args)
 {
-#ifdef __HAIKU__
-	return 0;
-#else	
 	if (!data)
 		data = stderr;
 
 	return ntfs_log_handler_fprintf(function, file, line, level, data, format, args);
-#endif
 }
+
+#endif // __HAIKU__
 
 
 /**

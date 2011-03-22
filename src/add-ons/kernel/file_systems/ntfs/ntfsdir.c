@@ -75,11 +75,11 @@ fs_free_dircookie(fs_volume *_vol, fs_vnode *vnode, void *cookie)
 	nspace		*ns = (nspace*)_vol->private_volume;
 
 	LOCK_VOL(ns);
-	ERRPRINT("fs_free_dircookie - ENTER\n");
+	TRACE("fs_free_dircookie - ENTER\n");
 	if (cookie != NULL)
 		free(cookie);
 
-	ERRPRINT("fs_free_dircookie - EXIT\n");
+	TRACE("fs_free_dircookie - EXIT\n");
 
 	UNLOCK_VOL(ns);
 
@@ -98,7 +98,7 @@ fs_opendir(fs_volume *_vol, fs_vnode *_node, void** _cookie)
 
 	LOCK_VOL(ns);
 
-	ERRPRINT("fs_opendir - ENTER\n");
+	TRACE("fs_opendir - ENTER\n");
 
 	ni = ntfs_inode_open(ns->ntvol, node->vnid);
 	if (ni == NULL) {
@@ -126,7 +126,7 @@ exit:
 	if (ni)
 		ntfs_inode_close(ni);
 
-	ERRPRINT("fs_opendir - EXIT\n");
+	TRACE("fs_opendir - EXIT\n");
 
 	UNLOCK_VOL(ns);
 
@@ -144,7 +144,7 @@ fs_closedir(fs_volume *_vol, fs_vnode *_node, void *cookie)
 
 	LOCK_VOL(ns);
 
-	ERRPRINT("fs_closedir - ENTER\n");
+	TRACE("fs_closedir - ENTER\n");
 
 	ni = ntfs_inode_open(ns->ntvol, node->vnid);
 	if (ni == NULL) {
@@ -158,7 +158,7 @@ exit:
 	if (ni)
 		ntfs_inode_close(ni);
 
-	ERRPRINT("fs_closedir - EXIT\n");
+	TRACE("fs_closedir - EXIT\n");
 
 	UNLOCK_VOL(ns);
 
@@ -179,7 +179,8 @@ fs_readdir(fs_volume *_vol, fs_vnode *_node, void *_cookie, struct dirent *buf,
 
 	LOCK_VOL(ns);
 
-	ERRPRINT("fs_readdir - ENTER (sizeof(buf)=%d, bufsize=%d, num=%d\n",sizeof(buf),bufsize,*num);
+	TRACE("fs_readdir - ENTER (sizeof(buf)=%d, bufsize=%d, num=%d\n",
+		sizeof(buf), bufsize, *num);
 
 	if (!ns || !node || !cookie || !num || bufsize < sizeof(buf)) {
 	 	result = EINVAL;
@@ -193,12 +194,13 @@ fs_readdir(fs_volume *_vol, fs_vnode *_node, void *_cookie, struct dirent *buf,
 
 	ni = ntfs_inode_open(ns->ntvol, node->vnid);
 	if (ni == NULL) {
-		ERRPRINT("fs_readdir - dir not opened\n");
+		ERROR("fs_readdir - dir not opened\n");
 		result = ENOENT;
 		goto exit;
 	}
 
-	result = ntfs_readdir(ni, &cookie->pos, cookie, (ntfs_filldir_t)_ntfs_dirent_filler);
+	result = ntfs_readdir(ni, &cookie->pos, cookie,
+		(ntfs_filldir_t)_ntfs_dirent_filler);
 
 	realLen = nameLength > 255 ? 255 : nameLength;
 	buf->d_dev = ns->id;
@@ -211,7 +213,7 @@ fs_readdir(fs_volume *_vol, fs_vnode *_node, void *_cookie, struct dirent *buf,
 
 	result = B_NO_ERROR;
 
-	ERRPRINT("fs_readdir - FILE: [%s]\n",buf->d_name);
+	TRACE("fs_readdir - FILE: [%s]\n",buf->d_name);
 
 exit:
 	if (ni)
@@ -225,7 +227,7 @@ exit:
 	if (result == ENOENT)
 		result = B_NO_ERROR;
 
-	ERRPRINT("fs_readdir - EXIT result (%s)\n", strerror(result));
+	TRACE("fs_readdir - EXIT result (%s)\n", strerror(result));
 
 	UNLOCK_VOL(ns);
 
@@ -242,7 +244,7 @@ fs_rewinddir(fs_volume *_vol, fs_vnode *vnode, void *_cookie)
 
 	LOCK_VOL(ns);
 
-	ERRPRINT("fs_rewinddir - ENTER\n");
+	TRACE("fs_rewinddir - ENTER\n");
 	if (cookie != NULL) {
 		cookie->pos = 0;
 		cookie->ino = 0;
@@ -252,7 +254,7 @@ fs_rewinddir(fs_volume *_vol, fs_vnode *vnode, void *_cookie)
 		result = B_NO_ERROR;
 	}
 
-	ERRPRINT("fs_rewinddir - EXIT, result is %s\n", strerror(result));
+	TRACE("fs_rewinddir - EXIT, result is %s\n", strerror(result));
 
 	UNLOCK_VOL(ns);
 

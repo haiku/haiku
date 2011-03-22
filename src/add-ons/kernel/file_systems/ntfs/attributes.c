@@ -35,7 +35,7 @@ set_mime(vnode *node, const char *filename)
 	struct ext_mime *p;
 	int32 namelen, ext_len;
 
-	ERRPRINT("set_mime - for [%s]\n", filename);
+	TRACE("set_mime - for [%s]\n", filename);
 
 	node->mime = NULL;
 
@@ -71,7 +71,7 @@ fs_open_attrib_dir(fs_volume *_vol, fs_vnode *_node, void **_cookie)
 
 	status_t result = B_NO_ERROR;
 
-	ERRPRINT("%s - ENTER\n", __FUNCTION__);
+	TRACE("%s - ENTER\n", __FUNCTION__);
 
 	LOCK_VOL(ns);
 
@@ -106,7 +106,7 @@ exit:
 	if (ni)
 		ntfs_inode_close(ni);
 	
-	ERRPRINT("%s - EXIT, result is %s\n", __FUNCTION__, strerror(result));
+	TRACE("%s - EXIT, result is %s\n", __FUNCTION__, strerror(result));
 	
 	UNLOCK_VOL(ns);
 	
@@ -148,7 +148,7 @@ fs_rewind_attrib_dir(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 	attrdircookie *cookie = (attrdircookie *)_cookie;
 	status_t result = B_NO_ERROR;
 
-	ERRPRINT("%s - ENTER\n", __FUNCTION__);
+	TRACE("%s - ENTER\n", __FUNCTION__);
 
 	LOCK_VOL(ns);
 
@@ -162,7 +162,7 @@ fs_rewind_attrib_dir(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 
 //exit:
 
-	ERRPRINT("%s - EXIT, result is %s\n", __FUNCTION__, strerror(result));
+	TRACE("%s - EXIT, result is %s\n", __FUNCTION__, strerror(result));
 
 	UNLOCK_VOL(ns);
 	
@@ -186,7 +186,7 @@ fs_read_attrib_dir(fs_volume *_vol, fs_vnode *_node, void *_cookie,
 
 	LOCK_VOL(ns);
 
-	ERRPRINT("%s - ENTER\n", __FUNCTION__);
+	TRACE("%s - ENTER\n", __FUNCTION__);
 
 
 	while (!(result = ntfs_attrs_walk(cookie->ctx))) {
@@ -220,7 +220,7 @@ fs_read_attrib_dir(fs_volume *_vol, fs_vnode *_node, void *_cookie,
 
 exit:
 
-	ERRPRINT("%s - EXIT, result is %s, *num %d\n", __FUNCTION__,
+	TRACE("%s - EXIT, result is %s, *num %d\n", __FUNCTION__,
 		strerror(result), *num);
 
 	UNLOCK_VOL(ns);
@@ -247,7 +247,7 @@ fs_create_attrib(fs_volume *_vol, fs_vnode *_node, const char* name,
 	ntfs_attr *na = NULL;
 	status_t result = B_NO_ERROR;
 
-	ERRPRINT("%s - ENTER\n", __FUNCTION__);
+	TRACE("%s - ENTER\n", __FUNCTION__);
 
 	LOCK_VOL(ns);
 
@@ -259,7 +259,7 @@ fs_create_attrib(fs_volume *_vol, fs_vnode *_node, const char* name,
 	ni = ntfs_inode_open(ns->ntvol, node->vnid);
 	if (ni == NULL) {
 		result = errno;
-		ERRPRINT("%s - inode_open: %s\n", __FUNCTION__, strerror(result));
+		ERROR("%s - inode_open: %s\n", __FUNCTION__, strerror(result));
 		goto exit;
 	}
 
@@ -274,28 +274,28 @@ fs_create_attrib(fs_volume *_vol, fs_vnode *_node, const char* name,
 		ulen = ntfs_mbstoucs(name, &uname);
 		if (ulen < 0) {
 			result = EILSEQ;
-			ERRPRINT("%s - mb alloc: %s\n", __FUNCTION__, strerror(result));
+			ERROR("%s - mb alloc: %s\n", __FUNCTION__, strerror(result));
 			goto exit;
 		}
 
 		na = ntfs_attr_open(ni, AT_DATA, uname, ulen);
 		if (na) {
 			result = EEXIST;
-			ERRPRINT("%s - ntfs_attr_open: %s\n", __FUNCTION__,
+			ERROR("%s - ntfs_attr_open: %s\n", __FUNCTION__,
 				strerror(result));
 			goto exit;
 		}
 		if (ntfs_non_resident_attr_record_add(ni, AT_DATA, uname, ulen, 0, 32,
 			0) < 0) {
 			result = errno;
-			ERRPRINT("%s - ntfs_non_resident_attr_record_add: %s\n",
+			ERROR("%s - ntfs_non_resident_attr_record_add: %s\n",
 				__FUNCTION__, strerror(result));
 			goto exit;
 		}
 		na = ntfs_attr_open(ni, AT_DATA, uname, ulen);
 		if (!na) {
 			result = errno;
-			ERRPRINT("%s - ntfs_attr_open: %s\n", __FUNCTION__,
+			ERROR("%s - ntfs_attr_open: %s\n", __FUNCTION__,
 				strerror(result));
 			goto exit;
 		}
@@ -324,7 +324,7 @@ exit:
 	if (ni)
 		ntfs_inode_close(ni);
 
-	ERRPRINT("%s - EXIT, result is %s\n", __FUNCTION__, strerror(result));
+	TRACE("%s - EXIT, result is %s\n", __FUNCTION__, strerror(result));
 
 	UNLOCK_VOL(ns);
 
@@ -345,7 +345,7 @@ fs_open_attrib(fs_volume *_vol, fs_vnode *_node, const char *name,
 	ntfs_attr *na = NULL;
 	status_t result = B_NO_ERROR;
 
-	ERRPRINT("%s - ENTER\n", __FUNCTION__);
+	TRACE("%s - ENTER\n", __FUNCTION__);
 
 	LOCK_VOL(ns);
 
@@ -409,7 +409,7 @@ exit:
 	if (ni)
 		ntfs_inode_close(ni);
 
-	ERRPRINT("%s - EXIT, result is %s\n", __FUNCTION__, strerror(result));
+	TRACE("%s - EXIT, result is %s\n", __FUNCTION__, strerror(result));
 
 	UNLOCK_VOL(ns);
 
@@ -492,7 +492,7 @@ fs_read_attrib(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 
 	LOCK_VOL(ns);
 
-	ERRPRINT("%s - ENTER\n", __FUNCTION__);
+	TRACE("%s - ENTER\n", __FUNCTION__);
 
 	// it is a named stream
 	if (na) {
@@ -525,7 +525,7 @@ fs_read_attrib(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 
 exit:
 	
-	ERRPRINT("%s - EXIT, result is %s\n", __FUNCTION__, strerror(result));
+	TRACE("%s - EXIT, result is %s\n", __FUNCTION__, strerror(result));
 
 	UNLOCK_VOL(ns);
 	
@@ -546,9 +546,9 @@ fs_write_attrib(fs_volume *_vol, fs_vnode *_node, void *_cookie,off_t pos,
 	int total = 0;
 	status_t result = B_NO_ERROR;
 
-	ERRPRINT("%s - ENTER!!\n", __FUNCTION__);
+	TRACE("%s - ENTER!!\n", __FUNCTION__);
 	if (ns->flags & B_FS_IS_READONLY) {
-		ERRPRINT("ntfs is read-only\n");
+		ERROR("ntfs is read-only\n");
 		return EROFS;
 	}
 
@@ -560,7 +560,7 @@ fs_write_attrib(fs_volume *_vol, fs_vnode *_node, void *_cookie,off_t pos,
 
 	LOCK_VOL(ns);
 
-	ERRPRINT("%s - ENTER\n", __FUNCTION__);
+	TRACE("%s - ENTER\n", __FUNCTION__);
 
 	// it is a named stream
 	if (na) {
@@ -578,10 +578,10 @@ fs_write_attrib(fs_volume *_vol, fs_vnode *_node, void *_cookie,off_t pos,
 		while (size) {
 			off_t bytesWritten = ntfs_attr_pwrite(na, pos, size, buffer);
 			if (bytesWritten < (s64)size)
-				ERRPRINT("%s - ntfs_attr_pwrite returned less bytes than "
+				ERROR("%s - ntfs_attr_pwrite returned less bytes than "
 					"requested.\n", __FUNCTION__);
 			if (bytesWritten <= 0) {
-				ERRPRINT(("%s - ntfs_attr_pwrite()<=0\n", __FUNCTION__));
+				ERROR(("%s - ntfs_attr_pwrite()<=0\n", __FUNCTION__));
 				*_length = 0;
 				result = EINVAL;
 				goto exit;
@@ -603,7 +603,7 @@ fs_write_attrib(fs_volume *_vol, fs_vnode *_node, void *_cookie,off_t pos,
 
 exit:
 	
-	ERRPRINT("%s - EXIT, result is %s\n", __FUNCTION__, strerror(result));
+	TRACE("%s - EXIT, result is %s\n", __FUNCTION__, strerror(result));
 
 	UNLOCK_VOL(ns);
 	

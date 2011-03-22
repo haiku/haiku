@@ -54,8 +54,9 @@ extern "C" {
 #include "lock.h"
 #include "ntfsdir.h"
 
-#define  	ERRPRINT(...) ;
-//#define 	ERRPRINT dprintf
+#define  	TRACE(...) ;
+//#define		TRACE dprintf
+#define 	ERROR dprintf
 
 #define 	DEV_FD(dev)	(*(int *)dev->d_private)
 
