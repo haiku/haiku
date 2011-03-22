@@ -417,8 +417,8 @@ if [ IsOptionalHaikuImagePackageAdded CMake ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				cmake-2.8.4-x86-gcc4-2011-03-14.zip
-				: $(baseURL)/cmake-2.8.4-x86-gcc4-2011-03-14.zip
+				cmake-2.8.4-x86-gcc4-2011-03-22.zip
+				: $(baseURL)/cmake-2.8.4-x86-gcc4-2011-03-22.zip
 				: : true ;
 		} else {
 			InstallOptionalHaikuImagePackage
