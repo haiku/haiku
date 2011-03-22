@@ -14,15 +14,14 @@
 
 /*! String class supporting common string operations. */
 
-
-#include <String.h>
-
 #include <ctype.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <wctype.h>
 
 #include <Debug.h>
+#include <String.h>
 
 #include <utf8_functions.h>
 
@@ -1964,27 +1963,30 @@ BString::CharacterDeescape(char escapeChar)
 BString&
 BString::Trim()
 {
-	if (Length() <= 0)
+	size_t originalLength = Length();
+	if (originalLength <= 0)
 		return *this;
 
 	const char* string = String();
 
-	int32 startCount = 0;
-	while (isspace(string[startCount]))
+	// string is \0 terminated thus we don't need to check if we reached the end
+	uint32 startCount = 0;
+	while (iswspace(string[startCount]))
 		startCount++;
 
-	int32 endCount = 0;
-	while (isspace(string[Length() - endCount - 1]))
+	uint32 endCount = 0;
+	while (endCount < originalLength - startCount
+		&& iswspace(string[originalLength - endCount - 1])) {
 		endCount++;
+	}
 
 	if (startCount == 0 && endCount == 0)
 		return *this;
 
 	// We actually need to trim
 
-	ssize_t length = Length() - startCount - endCount;
-	if (length < 0)
-		length = 0;
+	ssize_t length = originalLength - startCount - endCount;
+	ASSERT(length >= 0);	
 	if (startCount == 0 || length == 0) {
 		_MakeWritable(length, true);
 	} else if (_MakeWritable() == B_OK) {
