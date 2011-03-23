@@ -155,13 +155,11 @@ POP3Protocol::SyncMessages()
 		return error;
 	}
 
-	int32	num_messages;
-
 	BStringList toDownload;
 	fManifest.NotHere(fUniqueIDs, &toDownload);
 
-	num_messages = toDownload.CountItems();
-	if (num_messages == 0) {
+	int32 numMessages = toDownload.CountItems();
+	if (numMessages == 0) {
 		CheckForDeletedMessages();
 		ResetProgress();
 		return B_OK;
@@ -234,6 +232,12 @@ POP3Protocol::SyncMessages()
 		// save manifest in case we get disturbed
 		fManifest += uid;
 		_WriteManifest();
+
+		bool leaveOnServer;
+		if (fSettings.FindBool("leave_mail_on_server", &leaveOnServer) == B_OK
+			&& !leaveOnServer) {
+			Delete(toRetrieve);
+		}
 	}
 
 	ResetProgress();
@@ -814,6 +818,9 @@ POP3Protocol::Delete(int32 num)
 #if DEBUG
 	puts(fLog.String());
 #endif
+	/* The mail is just marked as deleted and removed from the server when
+	sending the QUIT command. Because of that the message number stays the same
+	and we keep the uid in the uid list. */
 }
 
 
