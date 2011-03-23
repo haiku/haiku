@@ -133,6 +133,10 @@ POP3Protocol::Disconnect()
 status_t
 POP3Protocol::SyncMessages()
 {
+	bool leaveOnServer;
+	if (fSettings.FindBool("leave_mail_on_server", &leaveOnServer) != B_OK)
+		leaveOnServer = true;
+
 	// create directory if not exist
 	create_directory(fDestinationDir, 0777);
 
@@ -211,6 +215,9 @@ POP3Protocol::SyncMessages()
 			}
 			NotifyHeaderFetched(ref, &file);
 			NotifyBodyFetched(ref, &file);
+
+			if (!leaveOnServer)
+				Delete(toRetrieve);
 		} else {
 			int32 dummy;
 			error = mailIO.ReadAt(0, &dummy, 1);
@@ -232,12 +239,6 @@ POP3Protocol::SyncMessages()
 		// save manifest in case we get disturbed
 		fManifest += uid;
 		_WriteManifest();
-
-		bool leaveOnServer;
-		if (fSettings.FindBool("leave_mail_on_server", &leaveOnServer) == B_OK
-			&& !leaveOnServer) {
-			Delete(toRetrieve);
-		}
 	}
 
 	ResetProgress();
@@ -262,7 +263,6 @@ POP3Protocol::FetchBody(const entry_ref& ref)
 	if (error < B_OK)
 		return error;
 
-	
 	BFile file(&ref, B_READ_WRITE);
 	status_t status = file.InitCheck();
 	if (status != B_OK)
@@ -277,20 +277,21 @@ POP3Protocol::FetchBody(const entry_ref& ref)
 	if (toRetrieve < 0)
 		return B_NAME_NOT_FOUND;
 
-	// TODO: get rid of this BMailMessageIO!
-	// read header
-	BMailMessageIO io(this, &file, toRetrieve);
-	int32 dummy;
-	status = io.ReadAt(0, &dummy, 1);
-	if (status < 0)
-		return status;
+	bool leaveOnServer;
+	if (fSettings.FindBool("leave_mail_on_server", &leaveOnServer) != B_OK)
+		leaveOnServer = true;
 
+	// TODO: get rid of this BMailMessageIO!
+	BMailMessageIO io(this, &file, toRetrieve);
 	// read body
 	status = io.Seek(0, SEEK_END);
 	if (status < 0)
 		return status;
 
 	NotifyBodyFetched(ref, &file);
+
+	if (!leaveOnServer)
+		Delete(toRetrieve);
 
 	ReportProgress(0, 1);
 	ResetProgress();
