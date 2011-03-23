@@ -1963,8 +1963,7 @@ BString::CharacterDeescape(char escapeChar)
 BString&
 BString::Trim()
 {
-	size_t originalLength = Length();
-	if (originalLength <= 0)
+	if (Length() <= 0)
 		return *this;
 
 	const char* string = String();
