@@ -138,7 +138,7 @@ TReplicantTray::TReplicantTray(TBarView* parent, bool vertical)
 {
 	// init the minimum window width according to the logo.
 	const BBitmap* logoBitmap = AppResSet()->FindBitmap(B_MESSAGE_TYPE,
-		R_BeLogoIcon);
+		R_LeafLogoBitmap);
 	if (logoBitmap != NULL) {
 		sMinimumWindowWidth = max_c(sMinimumWindowWidth,
 			2 * (logoBitmap->Bounds().Width() + 8));

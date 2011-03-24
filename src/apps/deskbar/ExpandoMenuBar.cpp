@@ -116,7 +116,7 @@ TExpandoMenuBar::AttachedToWindow()
 		TBeMenu* beMenu = new TBeMenu(fBarView);
 		TBarWindow::SetBeMenu(beMenu);
 		const BBitmap* logoBitmap = AppResSet()->FindBitmap(B_MESSAGE_TYPE,
-			R_BeLogoIcon);
+			R_LeafLogoBitmap);
 		if (logoBitmap != NULL)
 			fBeMenuWidth = logoBitmap->Bounds().Width() + 16;
 		fBeMenuItem = new TBarMenuTitle(fBeMenuWidth, Frame().Height(),

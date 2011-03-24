@@ -1,3 +1,3 @@
 enum {
-	R_BeLogoIcon = 14
+	R_LeafLogoBitmap = 14
 };

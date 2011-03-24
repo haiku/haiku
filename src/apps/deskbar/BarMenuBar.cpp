@@ -62,7 +62,7 @@ TBarMenuBar::TBarMenuBar(TBarView* bar, BRect frame, const char* name)
 	TBarWindow::SetBeMenu(beMenu);
 
 	fBeMenuItem = new TBarMenuTitle(frame.Width(), frame.Height(),
-		AppResSet()->FindBitmap(B_MESSAGE_TYPE, R_BeLogoIcon), beMenu);
+		AppResSet()->FindBitmap(B_MESSAGE_TYPE, R_LeafLogoBitmap), beMenu);
 	AddItem(fBeMenuItem);
 }
 
