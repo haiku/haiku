@@ -5,8 +5,9 @@ UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics radeon_hd ] ;
 UsePrivateHeaders [ FDirName graphics common ] ;
 
+DEFINES += DISABLE_EASF ;
+
 StaticLibrary atombios.a :
 	Decoder.c
 	CD_Operations.c
 ;
-

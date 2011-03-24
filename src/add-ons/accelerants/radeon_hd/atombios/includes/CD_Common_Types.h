@@ -37,10 +37,41 @@ Revision History:
 #ifndef _COMMON_TYPES_H_
 	#define _COMMON_TYPES_H_
 
-#if defined (__HAIKU__)
-	// It's how we roll
-	#include <stdint.h>
+// HAIKU_ADDITION START IF
+#if defined(__HAIKU__)
+	#include <stdint.h> 
+#else
+    #ifndef LINUX
+	#if _MSC_EXTENSIONS 
+    
+    //
+    // use Microsoft* C complier dependent interger width types 
+    //
+	//    typedef unsigned __int64    uint64_t;
+	//    typedef __int64             int64_t;
+		typedef unsigned __int32    uint32_t;
+		typedef __int32             int32_t;
+#elif defined (__linux__) || defined (__NetBSD__) \
+    || defined(__sun) || defined(__OpenBSD__) \
+    || defined (__FreeBSD__) || defined(__DragonFly__) || defined(__GLIBC__)
+		typedef unsigned int uint32_t;
+		typedef int int32_t;
+	#else
+		typedef unsigned long	    uint32_t;
+		typedef signed long         int32_t;
+	#endif
+		typedef unsigned char       uint8_t;
+#if (defined(__sun) && defined(_CHAR_IS_SIGNED))
+		typedef char                int8_t;
+#else
+		typedef signed char         int8_t;
 #endif
+		typedef unsigned short      uint16_t;
+		typedef signed short        int16_t;
+	#endif
+
+#endif
+// HAIKU_ADDITION ENDIF
 
 #ifndef	UEFI_BUILD
 		typedef signed int			intn_t;
@@ -50,6 +81,9 @@ Revision History:
 		typedef signed int			intn_t;
 		typedef unsigned int		uintn_t;
 #endif
+#endif
+#ifndef FGL_LINUX
+#pragma warning ( disable : 4142 )
 #endif
 
 
@@ -122,6 +156,9 @@ typedef unsigned long ULONG_PTR;
 //typedef	UINTN		CD_STATUS;
 
 
+#ifndef FGL_LINUX
+#pragma warning ( default : 4142 )
+#endif
 #endif // _COMMON_TYPES_H_
 
 // EOF
