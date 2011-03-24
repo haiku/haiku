@@ -1185,6 +1185,8 @@ AboutView::_CreateCreditsView()
 	fCreditsView->Insert(B_TRANSLATE("\n\nSpecial thanks to:\n"));
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
+	fCreditsView->Insert(B_TRANSLATE(
+		"Be Inc. and its developer team, for having created BeOS!\n\n"));
 	fCreditsView->Insert(
 		B_TRANSLATE("Travis Geiselbrecht (and his NewOS kernel)\n"));
 	fCreditsView->Insert(
