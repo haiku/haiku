@@ -9,6 +9,6 @@ resource app_version {
 	variety = B_APPV_FINAL,
 	internal = 0,
 	short_info = "Haiku DstConfig", 
-	long_info  = "Haiku Fortune ©2002-2011 Haiku, Inc."
+	long_info  = "Haiku DstConfig ©2002-2011 Haiku, Inc."
 };
 
