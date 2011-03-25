@@ -1,4 +1,4 @@
-1	finnish	x-vnd.haiku-icon_o_matic	276810363
+1	finnish	x-vnd.haiku-icon_o_matic	2332620696
 <modify path>	Icon-O-Matic-PathCmd		<muokkaa polkua>
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<ei tehdä mitään uudelleen>
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<ei mitään tehtävää>
@@ -76,7 +76,7 @@ Gradient	Icon-O-Matic-StyleTypes		Kaltevuus
 Gradient type	Icon-O-Matic-StyleTypes		Kaltevuustyyppi
 HVIF Source Code	Icon-O-Matic-SavePanel		HVIF-lähdekoodi
 Height	Icon-O-Matic-PropertyNames		Korkeus
-Icon-O-Matic	Application name		Kuvakemaatti
+Icon-O-Matic	System name		Kuvakemaatti
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Kuvakemaatti ei ehkä tulkitse kaikkia tietoja SVG:stä ohjelmaa ladattaessa. Jos alkuperäinen tiedosto korvataan, nämä tiedot menetetään.
 Insert Control Point	Icon-O-Matic-InsertPointCmd		Lisää ohjainpiste
 Invert selection	Icon-O-Matic-Properties		Käännä valinta

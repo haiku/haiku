@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Sounds	4239510521
+1	finnish	x-vnd.Haiku-Sounds	3924145958
 <none>	HEventList		<ei mitään>
 <none>	HWindow		<ei mitään>
 About Sounds	SoundsHApp		Ääniasetuksista
@@ -11,7 +11,7 @@ Other…	HWindow		Muut...
 Play	HWindow		Soita
 Sound	HEventList		Ääni
 Sound File:	HWindow		Äänitiedosto:
-Sounds	Application name		Ääniasetukset
+Sounds	System name		Ääniasetukset
 Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Ääniasetukset\n Toivat sinulle:\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n Alkuperäistyö: Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku
 Stop	HWindow		Pysäytä
 This is not an audio file.	HWindow		Tämä ei ole äänitiedosto.

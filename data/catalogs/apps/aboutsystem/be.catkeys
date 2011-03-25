@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-About	3334685619
+1	belarusian	x-vnd.Haiku-About	3842515376
 %.2f GHz	AboutView		%.2f ГГц
 %d MiB total	AboutView		%d MiB усяго
 %d MiB used (%d%%)	AboutView		%d MiB выкарыстана (%d%%)
@@ -7,7 +7,7 @@
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB усяго %inaccessible MiB недаступна
 ... and the many people making donations!\n\n	AboutView		... і тыя, хто рабіў саве ахвяраванні!\n\n
 About this system	AboutWindow		Інфармацыя пра сістэму
-AboutSystem	Application name		Пра Сістэму
+AboutSystem	System name		Пра Сістэму
 Contributors:\n	AboutView		Удзельнікі:\n
 Current maintainers:\n	AboutView		Дагляднікі:\n
 GCC %d Hybrid	AboutView		GCC %d Hybrid

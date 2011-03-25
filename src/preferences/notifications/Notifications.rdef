@@ -1,6 +1,8 @@
 
 resource app_signature "application/x-vnd.Haiku-Notifications";
 
+resource app_name_catalog_entry "x-vnd.Haiku-Notifications:System name:Notifications";
+
 resource app_version {
 	major  = 1,
 	middle = 0,

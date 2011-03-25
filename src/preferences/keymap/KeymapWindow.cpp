@@ -70,7 +70,7 @@ static const char* kCurrentKeymapName = "(Current)";
 
 KeymapWindow::KeymapWindow()
 	:
-	BWindow(BRect(80, 50, 880, 380), B_TRANSLATE_APP_NAME("Keymap"),
+	BWindow(BRect(80, 50, 880, 380), B_TRANSLATE_SYSTEM_NAME("Keymap"),
 		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	SetLayout(new BGroupLayout(B_VERTICAL));

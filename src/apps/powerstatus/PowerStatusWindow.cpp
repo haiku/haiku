@@ -16,7 +16,7 @@
 
 PowerStatusWindow::PowerStatusWindow()
 	:
-	BWindow(BRect(100, 150, 281, 299), B_TRANSLATE_APP_NAME("PowerStatus"),
+	BWindow(BRect(100, 150, 281, 299), B_TRANSLATE_SYSTEM_NAME("PowerStatus"),
 		B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
 {
 	BView* topView = new BView(Bounds(), NULL, B_FOLLOW_ALL, B_WILL_DRAW);

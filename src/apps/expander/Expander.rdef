@@ -1,6 +1,8 @@
 
 resource app_signature "application/x-vnd.Haiku-Expander";
 
+resource app_name_catalog_entry "x-vnd.Haiku-Expander:System name:Expander";
+
 resource app_version {
 	major  = 1,
 	middle = 0,

@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-BluetoothPrefs	924856438
+1	belarusian	x-vnd.Haiku-BluetoothPrefs	4055730587
 15 secs	Settings view		15 сек
 61 secs	Settings view		61 сек
 About Bluetooth…	Window		Пра праграму Bluetooth…
@@ -7,7 +7,7 @@ Add…	Remote devices		Дадаць…
 Always ask	Settings view		Заўсёды пытаць
 As blocked	Remote devices		Як блакаваны
 Authenticate	Extended local device view		Аўтэнтыфікаваць
-Bluetooth	Application name		Bluetooth
+Bluetooth	System name		Bluetooth
 Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Праверце, ці актыўныя Bluetooth магчымасці вашай прылады. Націсніце 'Запыт' каб пачаць сканіраванне. Час, патрэбны на атрыманне імёнаў прылад, невядомы, але не павінны перавышаць 3 секунды для кожнай прылады. Пасля вы зможаце дадаць іх да вашага асноўнага спісу, дзе можна задаць іх сапражэнні.
 Connections & channels…	Window		Спіс злучэнняў і каналаў…
 Default inquiry time:	Settings view		Час стандартнага запыту:

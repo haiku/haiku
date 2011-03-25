@@ -60,7 +60,7 @@ int main(int , char **)
 	SetNewLeakChecking(true);
 	SetMallocLeakChecking(true);
 #endif
-	B_TRANSLATE_MARK_APP_NAME("Tracker");
+	B_TRANSLATE_MARK_SYSTEM_NAME("Tracker");
 
 	TTracker tracker;
 	tracker.Run();

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-About	3334685619
+1	french	x-vnd.Haiku-About	3842515376
 %.2f GHz	AboutView		%.2f GHz
 %d MiB total	AboutView		%d Mio au total
 %d MiB used (%d%%)	AboutView		%d Mio utilisés (%d%%)
@@ -7,7 +7,7 @@
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total Mio au total, %inaccessible Mio inaccessibles
 ... and the many people making donations!\n\n	AboutView		… et nos nombreux donateurs!\n\n
 About this system	AboutWindow		À propos de ce système
-AboutSystem	Application name		À propos du système
+AboutSystem	System name		À propos du système
 Contributors:\n	AboutView		Contributeurs :\n
 Current maintainers:\n	AboutView		Développeurs actuels :\n
 GCC %d Hybrid	AboutView		GCC %d Hybride

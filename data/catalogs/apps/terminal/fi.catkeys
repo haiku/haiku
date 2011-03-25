@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Terminal	2094789868
+1	finnish	x-vnd.Haiku-Terminal	1010009081
 %app% settings	Terminal PrefWindow	window title	%app%-asetukset
 -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h, --help tulosta tämä opaste\n -t, --title aseta ikkunan otsikko\n -f, --fullscreen aloita kokoruututilassa\n
 Abort	Terminal Shell		Keskeytä
@@ -76,7 +76,7 @@ Size:	Terminal AppearancePrefView		Koko:
 Switch Terminals	Terminal TermWindow		Vaihda pääteikkunoita
 Tab title:	Terminal AppearancePrefView		Välilehtiotsikko:
 Tab title:	Terminal TermWindow		Välilehtiotsikko:
-Terminal	Application name		Pääteikkuna
+Terminal	System name		Pääteikkuna
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Pääteikkuna ei voinut valitettavasti käynnistää komentotulkkia.
 Terminal\n\nwritten by Kazuho Okui and Takashi Murai\nupdated by Kian Duffy and others\n\nCopyright ©2003-2009, Haiku.\n	Terminal TermView		Pääteikkuna\n\ntekijät: Kazuho Okui ja Takashi Murai\npäivittänyt: Kian Duffy ja muut\n\nCopyright ©2003-2009, Haiku.\n
 Text	Terminal AppearancePrefView		Teksti

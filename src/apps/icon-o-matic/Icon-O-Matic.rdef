@@ -1,6 +1,8 @@
 
 resource app_signature "application/x-vnd.haiku-icon_o_matic";
 
+resource app_name_catalog_entry "x-vnd.haiku-icon_o_matic:System name:Icon-O-Matic";
+
 resource app_version {
 	major  = 1,
 	middle = 0,

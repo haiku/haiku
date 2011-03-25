@@ -349,7 +349,7 @@ private:
 AboutApp::AboutApp()
 	: BApplication("application/x-vnd.Haiku-About")
 {
-	B_TRANSLATE_MARK_APP_NAME("AboutSystem");
+	B_TRANSLATE_MARK_SYSTEM_NAME("AboutSystem");
 
 	AboutWindow *window = new(std::nothrow) AboutWindow();
 	if (window)

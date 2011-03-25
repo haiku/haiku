@@ -1,10 +1,10 @@
-1	slovak	x-vnd.Haiku-ActivityMonitor	3275442606
+1	slovak	x-vnd.Haiku-ActivityMonitor	2994145175
 %.1f KB/s	DataSource		%.1f KB/s
 %.1f MB	DataSource		%.1f MB
 %.1f faults/s	DataSource		%.1f výpadkov/s
 %lld ms	SettingsWindow		%lld ms
 %lld sec.	SettingsWindow		%lld sek.
-ActivityMonitor	Application name		Monitor aktivity
+ActivityMonitor	System name		Monitor aktivity
 Add graph	ActivityWindow		Pridať graf
 Additional items	ActivityView		Ďalšie položky
 Apps	DataSource		Aplikácie

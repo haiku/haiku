@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku.TV	16571315
+1	swedish	x-vnd.Haiku.TV	2815571176
 About %1…	MainWin	Parameter %1 is the name of the application.	Om %1...
 Always on top	MainWin		Alltid överst
 Channel	MainWin		Kanal
@@ -19,7 +19,7 @@ Quit	MainWin		Avsluta
 Scale to native size	MainWin		Skala till ursprungsstorlek
 Settings	MainWin		Inställningar
 Settings…	MainWin		Inställningar...
-TV	Application name		TV
+TV	System name		TV
 TV	MainWin		TV
 \nBuild 	MainWin		\nBuild
 \nRevision 	MainWin		\nVersion

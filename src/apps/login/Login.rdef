@@ -1,6 +1,8 @@
 
 resource app_signature "application/x-vnd.Haiku-Login";
 
+resource app_name_catalog_entry "x-vnd.Haiku-Login:System name:Login";
+
 resource app_version {
 	major      = 5,
 	middle     = 2,

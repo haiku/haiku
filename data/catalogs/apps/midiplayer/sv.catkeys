@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-MidiPlayer	2891983643
+1	swedish	x-vnd.Haiku-MidiPlayer	4180509704
 Cavern	Main Window		Grotta
 Closet	Main Window		Garderob
 Could not load song	Main Window		Kunde inte öppna filen
@@ -8,7 +8,7 @@ Garage	Main Window		Garage
 Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Haiku MIDI Spelare 1.0.0 beta\n\nDetta lilla program kan\nspela upp tusentals härliga låtar
 Igor's lab	Main Window		Igor's labb
 Live input:	Main Window		Livekälla:
-MidiPlayer	Application name		MidiSpelare
+MidiPlayer	System name		MidiSpelare
 None	Main Window		Ingen
 OK	Main Window		OK
 Off	Main Window		Av

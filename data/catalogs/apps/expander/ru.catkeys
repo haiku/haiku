@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Expander	51964396
+1	russian	x-vnd.Haiku-Expander	3061976445
 About Expander…	ExpanderMenu		О программе…
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Вы уверены, что хотите остановить распаковку этого\nархива? Некоторые файлы могли быть извлечены не полностью.
 Automatically expand files	ExpanderPreferences		Автоматически распаковывать файлы
@@ -14,7 +14,7 @@ Destination folder:	ExpanderPreferences		Путь для извлечения
 Error when expanding archive	ExpanderWindow		Ошибка при распаковке файла
 Expand	ExpanderMenu		Распаковать
 Expand	ExpanderWindow		Извлечь
-Expander	Application name		Распаковщик
+Expander	System name		Распаковщик
 Expander settings	ExpanderPreferences		Настройки извлечения
 Expander: Choose destination	DirectoryFilePanel		Expander: Выбор папки для извлечения
 Expander: Open	ExpanderWindow		Распаковщик: Открыть

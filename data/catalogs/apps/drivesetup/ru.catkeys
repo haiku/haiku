@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-DriveSetup	1143590865
+1	russian	x-vnd.Haiku-DriveSetup	1209826930
 %ld MiB	Support		%ld Мбайт
 <empty>	DiskView		<пусто>
 <empty>	PartitionList		<пусто>
@@ -29,7 +29,7 @@ Device	DiskView		Устройство
 Device	PartitionList		Устройство
 Disk	MainWindow		Диск
 Disk system \"%s\"\" not found!	MainWindow		Дисковая система \"%s\"\" не обнаружена!
-DriveSetup	Application name		Разметка диска
+DriveSetup	System name		Разметка диска
 Eject	MainWindow		Извлечь
 End: %ld MB	Support		Конец: %ld Мбайт
 Error: 	MainWindow	in any error alert	Ошибка: 

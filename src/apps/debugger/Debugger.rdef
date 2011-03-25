@@ -1,6 +1,8 @@
 
 resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.Haiku-Debugger";
 
+resource app_name_catalog_entry "x-vnd.Haiku-Debugger:System name:Debugger";
+
 resource app_version {
 	major  = 1,
 	middle = 0,

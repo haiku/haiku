@@ -27,7 +27,7 @@ const int32 kSave = '_SAV';
 
 PrefletWin::PrefletWin()
 	:
-	BWindow(BRect(0, 0, 1, 1), B_TRANSLATE_APP_NAME("Notifications"),
+	BWindow(BRect(0, 0, 1, 1), B_TRANSLATE_SYSTEM_NAME("Notifications"),
 		B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_NOT_RESIZABLE
 		| B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
 {

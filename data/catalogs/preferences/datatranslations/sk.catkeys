@@ -1,9 +1,9 @@
-1	slovak	x-vnd.Haiku-DataTranslations	851864743
+1	slovak	x-vnd.Haiku-DataTranslations	758278388
 About	DataTranslations		O aplikácii
 An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Položka „%name“ už existuje v priečinku Translators! Má sa existujúci prekladač prepísať?
 Cancel	DataTranslations		Zrušiť
 Could not install %s:\n%s	DataTranslations		Nebolo možné nainštalovať %s:\n%s
-DataTranslations	Application name		Preklad dát
+DataTranslations	System name		Preklad dát
 DataTranslations - Error	DataTranslations		Preklad dát - chyba
 DataTranslations - Note	DataTranslations		Preklad dát - poznámka
 DataTranslations\n\twritten by Oliver Siebenmarck and others\n\tCopyright 2002-2010, Haiku Inc. All rights reserved.\n	DataTranslations		DataTranslations\n\tnapísal Oliver Siebenmarck a ďalší\n\tCopyright 2002-2010, Haiku Inc. Všetky práva vyhradené.\n

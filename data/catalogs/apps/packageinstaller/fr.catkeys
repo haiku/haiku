@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-PackageInstaller	2682276160
+1	french	x-vnd.Haiku-PackageInstaller	2840441013
 %.1f GiB	PackageView		%.1f Gio
 %.1f KiB	PackageView		%.1f Kio
 %.1f MiB	PackageView		%.1f Mio
@@ -35,7 +35,7 @@ OK	PackageView		OK
 OK	Packageinstaller main		OK
 Other…	PackageView		Autre…
 Package installer	PackageView		Installeur de paquets
-PackageInstaller	Application name		InstalleurDePaquets
+PackageInstaller	System name		InstalleurDePaquets
 Preparing package	PackageInstall		Préparation du paquet
 Replace	PackageView		Remplacer
 Running post-installation scripts	PackageInstall		Exécution des scripts post-installation

@@ -1,5 +1,7 @@
 
-resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.Haiku-ActivityMonitor";
+resource app_signature "application/x-vnd.Haiku-ActivityMonitor";
+
+resource app_name_catalog_entry "x-vnd.Haiku-ActivityMonitor:System name:ActivityMonitor";
 
 resource app_version {
 	major  = 1,

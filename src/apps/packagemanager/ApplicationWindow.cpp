@@ -101,7 +101,7 @@ protected:
 
 ApplicationWindow::ApplicationWindow(BRect frame, bool visible)
 	:
-	BWindow(frame, B_TRANSLATE_APP_NAME("PackageManager"),
+	BWindow(frame, B_TRANSLATE_SYSTEM_NAME("PackageManager"),
 		B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 		B_AUTO_UPDATE_SIZE_LIMITS | B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE),
 	fMinimizeOnClose(false)

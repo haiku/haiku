@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-FileTypes	2684370460
+1	swedish	x-vnd.Haiku-FileTypes	1055306485
 %1 application type	Application Type Window		%1 programtyp
 %ld Application type%s could be removed.	Application Types Window		%ld Programtypen %s kan inte tas bort.
 %s file type	FileType Window		%s filtyp
@@ -70,7 +70,7 @@ File	FileTypes Window		Arkiv
 File could not be opened	Preferred App Menu		Filen kunde inte öppnas
 File recognition	FileTypes Window		Filigenkänning
 File type	FileType Window		Filtyp
-FileTypes	Application name		FilTyper
+FileTypes	System name		FilTyper
 FileTypes	FileTypes		FilTyper
 FileTypes request	FileTypes		FilTyper - fråga
 FileTypes request	FileTypes Window		FilTyper - begäran

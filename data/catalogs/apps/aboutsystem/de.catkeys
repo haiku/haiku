@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-About	3334685619
+1	german	x-vnd.Haiku-About	3842515376
 %.2f GHz	AboutView		%.2f GHz
 %d MiB total	AboutView		%d MiB gesamt
 %d MiB used (%d%%)	AboutView		%d MiB benutzt (%d%%)
@@ -7,7 +7,7 @@
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB gesamt, %inaccessible MiB nicht verfügbar
 ... and the many people making donations!\n\n	AboutView		... und die vielen Leute, die durch Spenden geholfen haben!\n\n
 About this system	AboutWindow		Über dieses System
-AboutSystem	Application name		Über Haiku
+AboutSystem	System name		Über Haiku
 Contributors:\n	AboutView		Mitwirkende:\n
 Current maintainers:\n	AboutView		Aktuelle Betreuer:\n
 GCC %d Hybrid	AboutView		GCC %d Hybrid

@@ -33,7 +33,7 @@ static const uint32 kMsgProbeDevice = 'prFl';
 
 OpenWindow::OpenWindow()
 	:
-	BWindow(BRect(0, 0, 35, 10), B_TRANSLATE_APP_NAME("DiskProbe"),
+	BWindow(BRect(0, 0, 35, 10), B_TRANSLATE_SYSTEM_NAME("DiskProbe"),
 		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE
 		| B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
 {

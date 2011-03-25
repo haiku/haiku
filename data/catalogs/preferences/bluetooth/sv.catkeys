@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-BluetoothPrefs	924856438
+1	swedish	x-vnd.Haiku-BluetoothPrefs	4055730587
 15 secs	Settings view		15 s
 61 secs	Settings view		61 s
 About Bluetooth…	Window		Om Bluetooth…
@@ -7,7 +7,7 @@ Add…	Remote devices		Lägg till…
 Always ask	Settings view		Fråga alltid
 As blocked	Remote devices		Som blockerad
 Authenticate	Extended local device view		Autentisera
-Bluetooth	Application name		Bluetooth
+Bluetooth	System name		Bluetooth
 Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Verifiera att bluetoot här aktiverat på din enhet. Klicka på Fråga för att söka. Tidsåtgång för åtgärden är okänd, men bör inte ta mer än tre sekunder per enhet. Efter detta kommer du att kunna lägga till dem till din huvudlista, där du kan para ihop dem i förfrågan-panelen.
 Connections & channels…	Window		Lista över förbindelser och kanaler…
 Default inquiry time:	Settings view		Förvald frågotid:

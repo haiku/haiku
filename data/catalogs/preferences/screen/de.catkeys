@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Screen	1466525338
+1	german	x-vnd.Haiku-Screen	2033930135
 %.1f Hz	Screen		%.1f Hz
 %sSerial no.: %s	Screen		%sSeriennr.: %s
 /other…	Screen		/andere...
@@ -28,7 +28,7 @@ Refresh rate:	Screen		Bildwiederholrate:
 Resolution:	Screen		Auflösung:
 Revert	Screen		Anfangswerte
 Rows:	Screen		Zeilen:
-Screen	Application name		Bildschirm
+Screen	System name		Bildschirm
 Screen	Screen		Screen - Bildschirm
 Screen preferences by the Haiku team	Screen		Bildschirm Einstellungen, vom Haiku Team
 Set background…	Screen		Hintergrund einstellen...

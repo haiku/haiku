@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-DiskProbe	2585385922
+1	norwegian_bokmål	x-vnd.Haiku-DiskProbe	3053604451
 15 bit	TypeEditors		15-bit
 16 bit	TypeEditors		16 bit
 16 bit signed value:	TypeEditors		16-bit verdi med fortegn:
@@ -45,7 +45,7 @@ Could not read image	TypeEditors	Image means here a picture file, not a disk ima
 Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Desimal
 Device	ProbeView		Enhet
 Device: 	ProbeView		Enhet
-DiskProbe	Application name		Diskinspektør
+DiskProbe	System name		Diskinspektør
 Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Vil du virkelig fjerne attributten \"%s\" fra filen \"%s\"?\n\nDu kan ikke angre denne handlingen.
 Don't save	ProbeView		Ikke lagre
 Edit	ProbeView		Rediger

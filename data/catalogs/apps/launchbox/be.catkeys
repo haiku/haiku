@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-LaunchBox	3636680404
+1	belarusian	x-vnd.Haiku-LaunchBox	1244694305
 About	LaunchBox		Пра праграму
 Add button here	LaunchBox		Дадайце кнопку тут
 Auto-raise	LaunchBox		Аўта-выплыванне
@@ -15,7 +15,7 @@ Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Не ўд
 Horizontal layout	LaunchBox		Гарызантальная расстаноўка
 Icon size	LaunchBox		Памер іконак
 Ignore double-click	LaunchBox		Ігнараваць падвойны клік
-LaunchBox	Application name		СтартПалічка
+LaunchBox	System name		СтартПалічка
 Name Panel	LaunchBox		Назавіце Панель
 New	LaunchBox		Новы
 OK	LaunchBox		ОК

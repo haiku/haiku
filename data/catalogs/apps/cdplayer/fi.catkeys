@@ -1,8 +1,8 @@
-1	finnish	x-vnd.Haiku-CDPlayer	1556801578
+1	finnish	x-vnd.Haiku-CDPlayer	592310631
 Audio CD	CDPlayer		Audio-CD
 CD	CDPlayer		CD
 CD drive is empty	CDPlayer		CD-levyasema on tyhjä
-CDPlayer	Application name		CD-soitin
+CDPlayer	System name		CD-soitin
 Disc: %ld:%.2ld / %ld:%.2ld	CDPlayer		Levy: %ld:%.2ld / %ld:%.2ld
 Disc: --:-- / --:--	CDPlayer		Levy: --:-- / --:--
 Disc: 88:88 / 88:88	CDPlayer		Levy: 88:88 / 88:88

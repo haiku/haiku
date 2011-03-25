@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-Pulse	3986003180
+1	norwegian_bokmål	x-vnd.Haiku-Pulse	2385240661
 %.2f GHz	NormalPulseView		%.2f GHz
 %ld MHz	NormalPulseView		%ld MHz
 %s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nAv David Ramsey og Arve Hjønnevåg\nRevidert av Daniel Switkin\n
@@ -32,7 +32,7 @@ OK	DeskbarPulseView		OK
 OK	PrefsWindow		OK
 OK	PulseApp		OK
 OK	PulseView		OK
-Pulse	Application name		Puls
+Pulse	System name		Puls
 Pulse	NormalPulseView		Puls
 Pulse	PulseApp		Puls
 Pulse settings	PulseWindow		Pulsinnstillinger

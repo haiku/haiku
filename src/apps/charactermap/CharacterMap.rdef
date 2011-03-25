@@ -1,5 +1,7 @@
 
-resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.Haiku-CharacterMap";
+resource app_signature "application/x-vnd.Haiku-CharacterMap";
+
+resource app_name_catalog_entry "x-vnd.Haiku-CharacterMap:System name:CharacterMap";
 
 resource app_version {
 	major  = 1,

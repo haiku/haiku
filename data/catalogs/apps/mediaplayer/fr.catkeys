@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-MediaPlayer	4133006122
+1	french	x-vnd.Haiku-MediaPlayer	3683491203
 %app%\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		%app%\n\nÉcrit par Marcus Overhagen, Stephan Aßmus et Frederik Modéen
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Panoramique américain)
 100% scale	MediaPlayer-Main		Échelle 100%
@@ -35,7 +35,7 @@ Internal error (locking failed). Saving the playlist failed.	MediaPlayer-Playlis
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Erreur interne (message incorrect). La liste de lecture n'a pas pu être sauvegardée.
 Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Erreur interne (plus de mémoire). La liste de lecture n'a pas pu être sauvegardée.
 Low volume	MediaPlayer-SettingsWindow		Volume bas
-MediaPlayer	Application name		MédiaPlayer
+MediaPlayer	System name		MédiaPlayer
 MediaPlayer settings	MediaPlayer-SettingsWindow		Réglages de MédiaPlayer
 Mute	MediaPlayer-Main		Muet
 Muted	MediaPlayer-SettingsWindow		Muet

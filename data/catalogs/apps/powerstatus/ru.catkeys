@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-PowerStatus	1451591102
+1	russian	x-vnd.Haiku-PowerStatus	4269725527
 About	PowerStatus		О программе
 About…	PowerStatus		О программе…
 Battery charging	PowerStatus		Батарея заряжается
@@ -22,7 +22,7 @@ Model number: 	PowerStatus		Номер модели:
 OEM info: 	PowerStatus		OEM информация: 
 OK	PowerStatus		ОК
 Power status box	PowerStatus		Состояние электропитания
-PowerStatus	Application name		Электропитание
+PowerStatus	System name		Электропитание
 PowerStatus	PowerStatus		Электропитание
 PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		PowerStatus\nразработали:\n Axel Dörfler и Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
 Quit	PowerStatus		Выход

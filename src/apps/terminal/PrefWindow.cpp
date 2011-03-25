@@ -36,7 +36,7 @@ PrefWindow::PrefWindow(const BMessenger& messenger)
 	fDirty(false),
 	fTerminalMessenger(messenger)
 {
-	BString app = B_TRANSLATE_APP_NAME("Terminal");
+	BString app = B_TRANSLATE_SYSTEM_NAME("Terminal");
 	BString title = B_TRANSLATE_COMMENT("%app% settings", "window title");
 	title.ReplaceFirst("%app%", app);
 	SetTitle(title);

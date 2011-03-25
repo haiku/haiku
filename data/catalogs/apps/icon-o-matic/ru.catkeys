@@ -1,4 +1,4 @@
-1	russian	x-vnd.haiku-icon_o_matic	276810363
+1	russian	x-vnd.haiku-icon_o_matic	2332620696
 <modify path>	Icon-O-Matic-PathCmd		<изменить путь>
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<нечего возвращать>
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<нечего отменять>
@@ -76,7 +76,7 @@ Gradient	Icon-O-Matic-StyleTypes		Градиент
 Gradient type	Icon-O-Matic-StyleTypes		Тип градиента
 HVIF Source Code	Icon-O-Matic-SavePanel		Исходный код HVIF
 Height	Icon-O-Matic-PropertyNames		Высота
-Icon-O-Matic	Application name		Икономатик
+Icon-O-Matic	System name		Икономатик
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Возможно, Icon-O-Matic не перенес все данные из загруженного SVG файла. Перезаписывая оригинальный файл, эта информация может быть потеряна.
 Insert Control Point	Icon-O-Matic-InsertPointCmd		Вставить точку
 Invert selection	Icon-O-Matic-Properties		Инвертировать выделение

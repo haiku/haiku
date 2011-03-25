@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Magnify	2286010390
+1	belarusian	x-vnd.Haiku-Magnify	2706372327
 %width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize пікселяў на піксель
 Add a crosshair	Magnify-Main		Дадаць перакрыжаванне
 Copy image	Magnify-Main		Капіяваць выяву
@@ -14,7 +14,7 @@ Increase pixel size	Magnify-Main		Павялічыць памер пікселя
 Increase window size	Magnify-Main		Павялічыць памер вакна
 Info	Magnify-Main		Інфармацыя
 Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		Інфа:\n hide/show info - хавае/паказвае новыя магчымасці\n увага: чырвоны квадрат што з´яўляецца падчас прагляду паказвае\n якія RGB велічыні пікселяў будуць адлюстраваны\n add/remove crosshairs - можна дадаць ці выдаліць 2 перакрыжаванні\n каб спрасціць выраўнованне ды размяшчэнне аб´ектаў.\n Перакрыжаванні адлюстраваны блакітнымі квадратамі і блакітнымі лініямі.\n hide/show grid - паказаць ці схаваць сетку, што падзяляе выяву на пікселі\n
-Magnify	Application name		Лупа
+Magnify	System name		Лупа
 Magnify help	Magnify-Help		Дапамога Magnify
 Magnify!\n\n©2002-2006 Haiku\n(C)1999 Be Inc.\n\nNow with even more features and recompiled for Haiku.	Magnify-Main		Magnify!\n\n©2002-2006 Haiku\n(C)1999 Be Inc.\n\nЦяпер яжчэ больш функцый і спецыяльна для Haiku.
 Make square	Magnify-Main		Зрабіць квадратным

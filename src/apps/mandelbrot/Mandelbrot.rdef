@@ -26,5 +26,7 @@ resource vector_icon {
 
 resource app_signature "application/x-vnd.Haiku-Mandelbrot";
 
+resource app_name_catalog_entry "x-vnd.Haiku-Mandelbrot:System name:Mandelbrot";
+
 resource app_flags B_MULTIPLE_LAUNCH;
 

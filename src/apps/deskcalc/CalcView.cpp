@@ -694,7 +694,7 @@ CalcView::AboutRequested()
 		"Ingo Weinhold",
 		NULL
 	};
-	BAboutWindow about(B_TRANSLATE_APP_NAME("DeskCalc"), 2006, authors,
+	BAboutWindow about(B_TRANSLATE_SYSTEM_NAME("DeskCalc"), 2006, authors,
 		B_UTF8_COPYRIGHT "1997, 1998 R3 Software Ltd.");
 	about.Show();
 }

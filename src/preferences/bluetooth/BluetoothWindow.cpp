@@ -35,7 +35,7 @@ LocalDevice* ActiveLocalDevice = NULL;
 
 BluetoothWindow::BluetoothWindow(BRect frame)
 	:
-	BWindow(frame, B_TRANSLATE_APP_NAME("Bluetooth"), B_TITLED_WINDOW,
+	BWindow(frame, B_TRANSLATE_SYSTEM_NAME("Bluetooth"), B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	SetLayout(new BGroupLayout(B_HORIZONTAL));

@@ -2,6 +2,8 @@ SubDir HAIKU_TOP src add-ons screen_savers slideshowsaver ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+AddResources Message : SlideShowSaver.rdef ;
+
 ScreenSaver SlideShowSaver :
 	# LiveSettings
 	LiveSetting.cpp
@@ -9,12 +11,17 @@ ScreenSaver SlideShowSaver :
 
 	# SlideShowSaver classes
 	SlideShowSaver.cpp
-	SlideShowConfigView.cpp ;
-
-LinkAgainst SlideShowSaver : be screensaver tracker translation ;
+	SlideShowConfigView.cpp
+	:
+	be screensaver $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++) tracker translation
+;
 
 Package haiku-screensavers-cvs :
 	SlideShowSaver :
 	boot home config add-ons screen_savers ;
 
-
+DoCatalogs SlideShowSaver :
+	x-vnd.Haiku-SlideShowSaver
+	:
+	SlideShowSaver.cpp
+;

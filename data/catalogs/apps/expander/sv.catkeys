@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Expander	51964396
+1	swedish	x-vnd.Haiku-Expander	3061976445
 About Expander…	ExpanderMenu		Om Expanderare…
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Är du säker på att du vill sluta expandera det här\narkivet? De expanderade objekten kan vara inkompletta.
 Automatically expand files	ExpanderPreferences		Expandera filer automatiskt
@@ -14,7 +14,7 @@ Destination folder:	ExpanderPreferences		Målmapp:
 Error when expanding archive	ExpanderWindow		Fel när arkivet skulle expanderas
 Expand	ExpanderMenu		Expandera
 Expand	ExpanderWindow		Expandera
-Expander	Application name		Expanderare
+Expander	System name		Expanderare
 Expander settings	ExpanderPreferences		Expanderaren inställningar
 Expander: Choose destination	DirectoryFilePanel		Expanderaren: Välj mål
 Expander: Open	ExpanderWindow		Expander: Öppna

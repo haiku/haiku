@@ -67,7 +67,7 @@ BootPromptApp::AboutRequested()
 	};
 
 	BAboutWindow* aboutWindow = new BAboutWindow(
-		B_TRANSLATE_APP_NAME("ReadOnlyBootPrompt"), 2010, kAuthors);
+		B_TRANSLATE_SYSTEM_NAME("ReadOnlyBootPrompt"), 2010, kAuthors);
 
 	aboutWindow->Show();
 	delete aboutWindow;

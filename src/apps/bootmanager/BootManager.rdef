@@ -67,7 +67,9 @@ resource vector_icon {
 	$"AA40FA7D0117810004"
 };
 
-resource(1, "BEOS:APP_SIG") (#'MIMS') "application/x-vnd.Haiku-BootManager";
+resource app_signature "application/x-vnd.Haiku-BootManager";
+
+resource app_name_catalog_entry "x-vnd.Haiku-BootManager:System name:BootManager";
 
 resource(1, "BEOS:FILE_TYPES") message { };
 

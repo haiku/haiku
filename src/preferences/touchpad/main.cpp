@@ -45,7 +45,7 @@ main(int argc, char* argv[])
 	BApplication* app = new BApplication("application/x-vnd.Haiku-Touchpad");
 
 	TouchpadPrefWindow* window = new TouchpadPrefWindow(BRect(50, 50, 450, 350),
-		B_TRANSLATE_APP_NAME("Touchpad"), B_TITLED_WINDOW,
+		B_TRANSLATE_SYSTEM_NAME("Touchpad"), B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE
 			| B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS);
 	window->SetLayout(new BGroupLayout(B_HORIZONTAL));

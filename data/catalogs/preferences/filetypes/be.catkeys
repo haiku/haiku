@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-FileTypes	2684370460
+1	belarusian	x-vnd.Haiku-FileTypes	1055306485
 %1 application type	Application Type Window		%1 тып праграмы
 %ld Application type%s could be removed.	Application Types Window		%ld тыпаў праграм%s можна выдаліць.
 %s file type	FileType Window		файл тыпу %s
@@ -70,7 +70,7 @@ File	FileTypes Window		Файл
 File could not be opened	Preferred App Menu		Файля ня можа быць адчынены
 File recognition	FileTypes Window		Распазанне файла
 File type	FileType Window		Тып файла
-FileTypes	Application name		Тыпы файлаў
+FileTypes	System name		Тыпы файлаў
 FileTypes	FileTypes		FileTypes
 FileTypes request	FileTypes		запыт FileTypes
 FileTypes request	FileTypes Window		Запыт тыпу.

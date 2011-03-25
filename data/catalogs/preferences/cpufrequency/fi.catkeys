@@ -1,6 +1,6 @@
-1	finnish	x-vnd.Haiku-CPUFrequencyPref	1238067743
+1	finnish	x-vnd.Haiku-CPUFrequencyPref	3079996868
 CPU frequency status view	CPU Frequency View		Suoritintaajuuden tilanäkymä
-CPUFrequency	Application name		Suorittimen kellotaajuus
+CPUFrequency	System name		Suorittimen kellotaajuus
 CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		Suorittimen kellotaajuus\n\ttekijä: Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
 Defaults	Pref Window		Oletukset
 Dynamic performance	Status view		Dynaaminen suorituskyky

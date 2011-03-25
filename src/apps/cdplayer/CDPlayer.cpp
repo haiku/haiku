@@ -634,7 +634,7 @@ CDPlayer::_WatchCDState()
 
 CDPlayerWindow::CDPlayerWindow()
 	:
-	BWindow(BRect (100, 100, 405, 280), B_TRANSLATE_APP_NAME("CDPlayer"), 
+	BWindow(BRect (100, 100, 405, 280), B_TRANSLATE_SYSTEM_NAME("CDPlayer"), 
 		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE
 		| B_ASYNCHRONOUS_CONTROLS)
 {

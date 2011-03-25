@@ -161,7 +161,7 @@ enum {
 
 MainWindow::MainWindow(BRect frame)
 	:
-	BWindow(frame, B_TRANSLATE_APP_NAME("DriveSetup"), B_DOCUMENT_WINDOW,
+	BWindow(frame, B_TRANSLATE_SYSTEM_NAME("DriveSetup"), B_DOCUMENT_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE),
 	fCurrentDisk(NULL),
 	fCurrentPartitionID(-1),

@@ -1,6 +1,8 @@
 
 resource app_signature "application/x-vnd.Haiku-MediaConverter";
 
+resource app_name_catalog_entry "x-vnd.Haiku-MediaConverter:System name:MediaConverter";
+
 resource app_version {
 	major      = 1,
 	middle     = 3,

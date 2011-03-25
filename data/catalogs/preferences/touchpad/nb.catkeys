@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-Touchpad	1512001352
+1	norwegian_bokmål	x-vnd.Haiku-Touchpad	2113285797
 Cancel	TouchpadPrefView		Avbryt
 Defaults	TouchpadPrefView		Standardinnstillinger
 Fast	TouchpadPrefView		Rask
@@ -15,6 +15,6 @@ Slow	TouchpadPrefView		Langsom
 Tap click sensitivity	TouchpadPrefView		Tap-klikk sensitivitet
 Tap gesture	TouchpadPrefView		Tap-håndbevegelse
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Det nye rulleområdet er veldig stort og kan hindre normale museoperasjoner. Er du sikker på at du vil endre det?
-Touchpad	Application name		Styreplate
+Touchpad	System name		Styreplate
 Two finger scrolling	TouchpadPrefView		To-finger-rulling
 Vertical scroll speed	TouchpadPrefView		Vertikal rullehastighet

@@ -58,7 +58,7 @@ DevicesApplication::ShowAbout()
 		"Pieter Panman",
 		NULL
 	};
-	BAboutWindow about(B_TRANSLATE_APP_NAME("Devices"), 2009, authors,
+	BAboutWindow about(B_TRANSLATE_SYSTEM_NAME("Devices"), 2009, authors,
 		"Based on listdev by Jérôme Duval and the previous Devices "
 		"preference by Jérôme Duval and Sikosis.");
 	about.Show();
@@ -67,7 +67,7 @@ DevicesApplication::ShowAbout()
 
 DevicesWindow::DevicesWindow()
 	:
-	BWindow(BRect(50, 50, 750, 550), B_TRANSLATE_APP_NAME("Devices"),
+	BWindow(BRect(50, 50, 750, 550), B_TRANSLATE_SYSTEM_NAME("Devices"),
 		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS 
 		| B_AUTO_UPDATE_SIZE_LIMITS
 		| B_QUIT_ON_WINDOW_CLOSE)

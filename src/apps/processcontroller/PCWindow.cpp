@@ -36,7 +36,7 @@
 PCWindow::PCWindow()
 	:
 	BWindow(BRect(100, 150, 131, 181),
-		B_TRANSLATE_APP_NAME("ProcessController"), B_TITLED_WINDOW,
+		B_TRANSLATE_SYSTEM_NAME("ProcessController"), B_TITLED_WINDOW,
 		B_NOT_H_RESIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
 {
 	Preferences preferences(kPreferencesFileName);

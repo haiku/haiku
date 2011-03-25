@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Be-PRNT	3535702652
+1	finnish	x-vnd.Be-PRNT	2065133853
 %.2f KB	JobListView		%.2f kilotavua
 1 pending job.	PrinterListView		1 odottava työ.
 <pick one>	AddPrinterDialog		<poimi yksi>
@@ -26,7 +26,7 @@ Print test page	PrintersWindow		Tulosta testisivu
 Printer name:	AddPrinterDialog		Tulostinnimi:
 Printer type:	AddPrinterDialog		Tulostintyyppi:
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Tulostin: %printer_name%\nAjuri: %driver%\n
-Printers	Application name		Tulostinasetukset
+Printers	System name		Tulostinasetukset
 Printers	PrintersWindow		Tulostimet
 Processing	JobListView		Käsitellään
 Red	TestPageView		Punainen

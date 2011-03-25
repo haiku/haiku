@@ -95,7 +95,7 @@ CreateKeysPopUp()
 ShortcutsWindow::ShortcutsWindow()
 	:
 	BWindow(BRect(WINDOW_START_X, WINDOW_START_Y, WINDOW_START_X + MIN_WIDTH, 
-		WINDOW_START_Y + MIN_HEIGHT * 2), B_TRANSLATE_APP_NAME("Shortcuts"),
+		WINDOW_START_Y + MIN_HEIGHT * 2), B_TRANSLATE_SYSTEM_NAME("Shortcuts"),
 		B_DOCUMENT_WINDOW, 0L), 
 	fSavePanel(NULL), 
 	fOpenPanel(NULL), 

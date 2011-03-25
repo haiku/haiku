@@ -17,7 +17,7 @@
 int 
 main(int argc, char **argv)
 {
-	B_TRANSLATE_MARK_APP_NAME("Deskbar");
+	B_TRANSLATE_MARK_SYSTEM_NAME("Deskbar");
 	BApplication app("application/x-vnd.Haiku-DeskbarPreferences");
 	be_roster->Launch("application/x-vnd.Be-TSKB", new BMessage(kConfigShow));
 	return 0;

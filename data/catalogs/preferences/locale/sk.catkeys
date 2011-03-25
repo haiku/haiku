@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Locale	1708263557
+1	slovak	x-vnd.Haiku-Locale	1488345554
 12 hour	TimeFormatSettings		12-hodinový
 24 hour	TimeFormatSettings		24-hodinový
 Available languages	Locale Preflet Window		Dostupné jazyky
@@ -10,7 +10,7 @@ Deskbar and Tracker need to be restarted for this change to take effect. Would y
 Formatting	Locale Preflet Window		Formátovanie
 Full format:	TimeFormatSettings		Plný formát:
 Language	Locale Preflet Window		Jazyk
-Locale	Application name		Locale
+Locale	System name		Locale
 Locale	Locale Preflet		Locale
 Locale	Locale Preflet Window		Locale
 Long format:	TimeFormatSettings		Dlhý formát:

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-OpenGL	644054649
+1	swedish	x-vnd.Haiku-OpenGL	209187778
 Attributes stack size:	Capabilities		Attributstackstorlek:
 Auxiliary buffer(s):	Capabilities		Hjälpbuffrar:
 Available	Extensions		Tillgängligt
@@ -19,7 +19,7 @@ Max. recommended vertex elements:	Capabilities		Max. recommenderade vertexelemen
 Max. texture units:	Capabilities		Max. texturenheter:
 Model stack size:	Capabilities		Modellstackstorlek:
 Name stack size:	Capabilities		Namnstackstorlek:
-OpenGL	Application name		OpenGL
+OpenGL	System name		OpenGL
 OpenGL version:	InfoView		OpenGL version:
 Projection stack size:	Capabilities		Projetionsstackstorlek:
 Renderer name:	InfoView		Renderarnamn:

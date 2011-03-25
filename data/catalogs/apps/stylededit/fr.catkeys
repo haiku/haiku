@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-StyledEdit	2766123717
+1	french	x-vnd.Haiku-StyledEdit	3064120758
 ???	LoadAlert		???
 Align	Menus		Aligner
 Black	Menus		Noir
@@ -71,7 +71,7 @@ Search backwards	FindandReplaceWindow		Chercher en arrière
 Select all	Menus		Selectionner tout
 Size	Menus		Taille
 Statistics…	Menus		Statistiques…
-StyledEdit	Application name		ÉditeurStylé
+StyledEdit	System name		ÉditeurStylé
 This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Ce fichier est en lecture seule. Voulez-vous sauvegarder les modifications dans le document « %s » ?
 Undo typing	QuitAlert		Annuler la saisie
 Untitled 	StyledEditWindow		Sans titre

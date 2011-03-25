@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku.TV	4015160866
+1	norwegian_bokmål	x-vnd.Haiku.TV	2519193431
 About %1…	MainWin	Parameter %1 is the name of the application.	Om %1...
 Always on top	MainWin		Alltid øverst
 Channel	MainWin		Kanal
@@ -18,7 +18,7 @@ Quit	MainWin		Avslutt
 Scale to native size	MainWin		Skaler til normal størrelse
 Settings	MainWin		Innstillinger
 Settings…	MainWin		Innstillinger
-TV	Application name		TV
+TV	System name		TV
 TV	MainWin		TV
 \nRevision 	MainWin		\nRevisjon
 \nVersion 	MainWin		\nVersjon

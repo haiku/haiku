@@ -1,8 +1,8 @@
-1	norwegian_bokmål	x-vnd.Haiku-Fonts	3225361919
+1	norwegian_bokmål	x-vnd.Haiku-Fonts	4164233892
 Bold font:	Font view		Fet skrifttype:
 Defaults	Main window		Standardinnstillinger
 Fixed font:	Font view		Fast skrifttype:
-Fonts	Application name		Skrifttyper
+Fonts	System name		Skrifttyper
 Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Skrifttyper\n\tOpphavsrett  2004-2005, Haiku.\n\n
 Menu font:	Font view		Menyskrifttype:
 OK	main		OK

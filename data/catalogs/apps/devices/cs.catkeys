@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-Devices	1465776728
+1	czech	x-vnd.Haiku-Devices	1943893993
 ACPI Information	DeviceACPI		Informace o ACPI
 ACPI Processor Namespace '%2'	DeviceACPI		ACPI Namespace Processoru '%2'
 ACPI System Bus	DeviceACPI		ACPI Systémová Sběrnice
@@ -28,7 +28,7 @@ Device name	DevicePCI		Název zařízení
 Device name:	Device		Jméno zařízení:
 Device paths	Device		Cesty zařízení
 Device paths	DevicePCI		Cesta zařízení
-Devices	Application name		Zařízení
+Devices	System name		Zařízení
 Devices	DevicesView		Zařízení
 Display controller	Device		Kontroler obrazovky
 Docking station	Device		Dokovací stanice

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Pulse	3925234302
+1	russian	x-vnd.Haiku-Pulse	2324471783
 %.2f GHz	NormalPulseView		%.2f ГГц
 %ld MHz	NormalPulseView		%ld МГц
 %s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nразработали David Ramsey и Arve Hjønnevåg\nИсправлен Daniel Switkin\n
@@ -33,7 +33,7 @@ OK	DeskbarPulseView		ОК
 OK	PrefsWindow		ОК
 OK	PulseApp		ОК
 OK	PulseView		ОК
-Pulse	Application name		Пульс
+Pulse	System name		Пульс
 Pulse	NormalPulseView		Пульс
 Pulse	PulseApp		Пульс
 Pulse settings	PulseWindow		Настройки пульсации

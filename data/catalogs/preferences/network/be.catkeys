@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Network	3753077979
+1	belarusian	x-vnd.Haiku-Network	2324385456
 <no wireless networks found>	EthernetSettingsView		<не знойдзена бесшнуравых сетак>
 Adapter:	EthernetSettingsView		Адаптар:
 Apply	EthernetSettingsView		Ужыць
@@ -13,7 +13,7 @@ Gateway:	EthernetSettingsView		Шлюз
 IP address:	EthernetSettingsView		IP адрас:
 Mode:	EthernetSettingsView		Рэжым:
 Netmask:	EthernetSettingsView		Маска сеткі:
-Network	Application name		Сетка
+Network	System name		Сетка
 Network:	EthernetSettingsView		Сетка:
 OK	EthernetSettingsView		ОК
 Revert	EthernetSettingsView		Вярнуць

@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Devices	1465776728
+1	belarusian	x-vnd.Haiku-Devices	1943893993
 ACPI Information	DeviceACPI		Інфармацыя ACPI
 ACPI Processor Namespace '%2'	DeviceACPI		Абшар '%2' працэсара ACPI
 ACPI System Bus	DeviceACPI		Сістэмная шына ACPI
@@ -28,7 +28,7 @@ Device name	DevicePCI		Імя прылады
 Device name:	Device		Імя прылады:
 Device paths	Device		Пуці прыладаў
 Device paths	DevicePCI		Пуці прыладаў
-Devices	Application name		Прылады
+Devices	System name		Прылады
 Devices	DevicesView		Прылады
 Display controller	Device		Кантролер экрану
 Docking station	Device		Док-станцыя

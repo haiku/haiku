@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-ScreenSaver	1819773808
+1	swedish	x-vnd.Haiku-ScreenSaver	2049719641
 30 seconds	ScreenSaver		30 sekunder
 Add…	ScreenSaver		Lägg till...
 Blackness	ScreenSaver		Svärta
@@ -21,7 +21,7 @@ Password:	ScreenSaver		Lösenord:
 Passwords don't match. Please try again.	ScreenSaver		Lösenorden stämmer inte överens. Vänligen försök igen.
 Password…	ScreenSaver		Lösenord...
 Run module	ScreenSaver		Starta efter
-ScreenSaver	Application name		Skärmsläckare
+ScreenSaver	System name		Skärmsläckare
 Test	ScreenSaver		Testa
 Turn off screen	ScreenSaver		Stäng av skärmen
 Use custom password	ScreenSaver		Använd anpassat lösenord

@@ -1123,7 +1123,7 @@ TMailApp::NewWindow(const entry_ref* ref, const char* to, bool resend,
 		}
 	}
 	if (title == "")
-		title = B_TRANSLATE_APP_NAME("Mail");
+		title = B_TRANSLATE_SYSTEM_NAME("Mail");
 
 	TMailWindow* window = new TMailWindow(r, title.String(), this, ref, to,
 		&fContentFont, resend, trackerMessenger);

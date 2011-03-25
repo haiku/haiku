@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Magnify	2286010390
+1	german	x-vnd.Haiku-Magnify	2706372327
 %width x %height  @ %pixelSize pixels/pixel	Magnify-Main		%width x %height @ %pixelSize Pixel/Pixel
 Add a crosshair	Magnify-Main		Fadenkreuz hinzufügen
 Copy image	Magnify-Main		Bild kopieren
@@ -14,7 +14,7 @@ Increase pixel size	Magnify-Main		Pixel vergrößern
 Increase window size	Magnify-Main		Fenster vergrößern
 Info	Magnify-Main		Info
 Info:\n  hide/show info - hides/shows all these new features\n    note: when showing, a red square will appear which signifies\n      which pixel's rgb values will be displayed\n  add/remove crosshairs - 2 crosshairs can be added (or removed)\n    to aid in the alignment and placement of objects.\n    The crosshairs are represented by blue squares and blue lines.\n  hide/show grid - hides/shows the grid that separates each pixel\n	Magnify-Help		Info:\nInfos aus-/einblenden - blendet Informationen zu Fenster- und Pixelgröße ein/aus.\nDas kleine rote Quadrat markiert den Pixel, dessen Farbe als RGB-Wert angezeigt wird.\nFadenkreuz hinzufügen/entfernen - bis zu zwei Fadenkreuze, dargestellt durch blaue\n Quadrate und Linien, helfen beim Ausrichten von Objekten.\nGitter aus-/einblenden - steuert ein Gitter, das sich über die Pixel legt.\n
-Magnify	Application name		Lupe
+Magnify	System name		Lupe
 Magnify help	Magnify-Help		Magnify-Hilfe
 Magnify!\n\n©2002-2006 Haiku\n(C)1999 Be Inc.\n\nNow with even more features and recompiled for Haiku.	Magnify-Main		Magnify!\n\n©2002-2006 Haiku\n(C)1999 Be Inc.\n\nJetzt mit noch mehr Features und neu für Haiku kompiliert.
 Make square	Magnify-Main		Quadratisches Fenster

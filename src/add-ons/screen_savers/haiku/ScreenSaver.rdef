@@ -1,8 +1,7 @@
-/*
- * ScreenSaver.rdef
- */
 
 resource app_signature "application/x-vnd.Haiku-HaikuScreensaver";
+
+resource app_name_catalog_entry "x-vnd.Haiku-HaikuScreensaver:System name:Haiku";
 
 resource app_version {
 	major  = 1,

@@ -105,7 +105,7 @@ struct wave_struct
 RecorderWindow::RecorderWindow()
 	:
 	BWindow(BRect(XPOS, YPOS, XPOS + MIN_WIDTH, YPOS + MIN_HEIGHT),
-		B_TRANSLATE_APP_NAME("SoundRecorder"), B_TITLED_WINDOW,
+		B_TRANSLATE_SYSTEM_NAME("SoundRecorder"), B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_NOT_V_RESIZABLE | B_NOT_ZOOMABLE),
 	fPlayer(NULL),
 	fSoundList(NULL),

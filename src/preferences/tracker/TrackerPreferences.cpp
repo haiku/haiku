@@ -14,7 +14,7 @@
 int 
 main(int argc, char **argv)
 {
-	B_TRANSLATE_MARK_APP_NAME("Tracker");
+	B_TRANSLATE_MARK_SYSTEM_NAME("Tracker");
 	BApplication app("application/x-vnd.Haiku-TrackerPreferences");
 	
 	// launch Tracker if it's not running

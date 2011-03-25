@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-About	3334685619
+1	czech	x-vnd.Haiku-About	3842515376
 %.2f GHz	AboutView		%.2f GHz
 %d MiB total	AboutView		%d MiB celkem
 %d MiB used (%d%%)	AboutView		%d MiB používáno (%d%%)
@@ -7,7 +7,7 @@
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB celkem, %inaccessible MiB nedostupných
 ... and the many people making donations!\n\n	AboutView		... a mnoho lidí, kteří přispěli!\n\n
 About this system	AboutWindow		O tomto systému
-AboutSystem	Application name		O Systému
+AboutSystem	System name		O Systému
 Contributors:\n	AboutView		Přispěvatelé:\n
 Current maintainers:\n	AboutView		Současní údržbáři:\n
 GCC %d Hybrid	AboutView		GCC %d Hybrid

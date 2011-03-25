@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-ShowImage	2627877165
+1	swedish	x-vnd.Haiku-ShowImage	500169354
 %SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS sekunder
 About ShowImage…	Menus		Om Bildvisning…
 Browse	Menus		Bläddra
@@ -46,7 +46,7 @@ Select all	Menus		Markera allt
 Selection mode	Menus		Markeringsläge
 Show caption in full screen mode	Menus		Visa rubrik i helskärmsläge
 Show tool bar	Menus		Visa verktygsfält
-ShowImage	Application name		BildVisning
+ShowImage	System name		BildVisning
 Slide delay	Menus		Bildspelsfördröjning
 Slide show	Menus		Bildspel
 Stretch to window	Menus		Sträck ut i fönster

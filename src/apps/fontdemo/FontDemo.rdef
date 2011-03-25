@@ -1,6 +1,8 @@
 
 resource app_signature "application/x-vnd.Haiku-FontDemo";
 
+resource app_name_catalog_entry "x-vnd.Haiku-FontDemo:System name:FontDemo";
+
 resource app_version {
 	major  = 1,
 	middle = 0,

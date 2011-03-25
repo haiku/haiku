@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Media	3878155795
+1	belarusian	x-vnd.Haiku-Media	1473363280
 <none>	Media views		<няма>
 Audio input:	Media views		Гукавы ўваход:
 Audio mixer	Media Window		Аўдыё мікшар
@@ -11,7 +11,7 @@ Couldn't add volume control in Deskbar: %s\n	Media views		Не ўдалося д
 Couldn't remove volume control in Deskbar: %s\n	Media views		Не ўдалося выдаліць элемент кіравання гучнасцю з Deskbar: %s\n
 Defaults	Media views		Прадвызначаныя
 Done shutting down.	Media Window		Медыясервер спынены.
-Media	Application name		Медыя
+Media	System name		Медыя
 OK	Media Window		ОК
 Quit	Media Window		Выйсці
 Ready for use…	Media Window		Гатовы да карыстання…

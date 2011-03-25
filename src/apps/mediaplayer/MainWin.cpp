@@ -167,7 +167,7 @@ static const char* kRatingAttrName = "Media:Rating";
 
 static const char* kDisabledSeekMessage = B_TRANSLATE("Drop files to play");
 
-static const char* kApplicationName = B_TRANSLATE_APP_NAME(NAME);
+static const char* kApplicationName = B_TRANSLATE_SYSTEM_NAME(NAME);
 
 
 //#define printf(a...)

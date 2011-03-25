@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-VirtualMemory	849887495
+1	norwegian_bokmål	x-vnd.Haiku-VirtualMemory	688347876
 %Ld B	SettingsWindow		%Ld B
 Changes will take effect on restart!	SettingsWindow		Endringene vil tre i kraft etter omstart!
 Current swap file size: 	SettingsWindow		Nåværende størrelse på vekslefil: 
@@ -16,5 +16,5 @@ Requested swap file size:	SettingsWindow		Ønsket størrelse på vekselfil:
 Revert	SettingsWindow		Tilbakestill
 Turn off	SettingsWindow		Slå av
 Use volume:	SettingsWindow		Bruk volum:
-VirtualMemory	Application name		Virtuelt minne
+VirtualMemory	System name		Virtuelt minne
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		VirtualMemory\n\tskrevet av Axel Dörfler\n\tOpphavsrett 2005, Haiku.\n

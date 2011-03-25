@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-MidiPlayer	2891983643
+1	finnish	x-vnd.Haiku-MidiPlayer	4180509704
 Cavern	Main Window		Luola
 Closet	Main Window		Kaappi
 Could not load song	Main Window		Ei voitu ladata laulua
@@ -8,7 +8,7 @@ Garage	Main Window		Korjaamo
 Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Haiku MIDI-soitin 1.0.0 beta\n\nTämä pieni ohjelma\nosaa soittaa  tuhansia\nkehnolta kuulostavia lauluja
 Igor's lab	Main Window		Igorin labra
 Live input:	Main Window		Live-syöte:
-MidiPlayer	Application name		Midi-soitin
+MidiPlayer	System name		Midi-soitin
 None	Main Window		Ei mikään
 OK	Main Window		Valmis
 Off	Main Window		Pois päältä

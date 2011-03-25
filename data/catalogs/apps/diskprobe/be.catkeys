@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-DiskProbe	1375904521
+1	belarusian	x-vnd.Haiku-DiskProbe	1844123050
 %ld (native)	ProbeView		%ld (родны)
 (native)	ProbeView		(родны)
 15 bit	TypeEditors		15 біт
@@ -53,7 +53,7 @@ Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it i
 Device	ProbeView		Прылада
 Device offset: 	ProbeView		Адступ прылады:
 Device: 	ProbeView		Прылада:
-DiskProbe	Application name		Рэдактар
+DiskProbe	System name		Рэдактар
 DiskProbe request	AttributeWindow		Запыт DiskProbe
 DiskProbe request	DiskProbe		Запыт DiskProbe
 DiskProbe request	ProbeView		Запыт DiskProbe

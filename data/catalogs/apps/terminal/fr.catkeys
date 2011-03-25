@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Terminal	250333431
+1	french	x-vnd.Haiku-Terminal	3460519940
 %app% settings	Terminal PrefWindow	window title	Réglages du %app%
 -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h, --help affiche cette aide\n -t, --title défini le titre de la fenêtre\n -f, --fullscreen démarre en plein écran\n
 Abort	Terminal Shell		Abandonner
@@ -76,7 +76,7 @@ Size:	Terminal AppearancePrefView		Taille :
 Switch Terminals	Terminal TermWindow		Inverser les Terminaux
 Tab title:	Terminal AppearancePrefView		Titre de l'onglet :
 Tab title:	Terminal TermWindow		Titre de l'onglet :
-Terminal	Application name		Terminal
+Terminal	System name		Terminal
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal ne peut pas démarrer l'interpréteur de commande.
 Terminal\n\nwritten by Kazuho Okui and Takashi Murai\nupdated by Kian Duffy and others\n\nCopyright ©2003-2009, Haiku.\n	Terminal TermView		Terminal\n\nÉcrit par Kazuho Okui et Takashi Murai\nMis à jour par by Kian Duffy et d'autres\n\nCopyright ©2003-2009, Haiku.\n
 Text	Terminal AppearancePrefView		Texte

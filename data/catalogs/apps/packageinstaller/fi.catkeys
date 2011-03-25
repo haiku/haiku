@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-PackageInstaller	3449845127
+1	finnish	x-vnd.Haiku-PackageInstaller	3608009980
 %.1f GiB	PackageView		%.1f gibitavua
 %.1f KiB	PackageView		%.1f kibitavua
 %.1f MiB	PackageView		%.1f mebitavua
@@ -36,7 +36,7 @@ OK	PackageView		Valmis
 OK	Packageinstaller main		Valmis
 Other…	PackageView		Muut...
 Package installer	PackageView		Paketin asennusohjelma
-PackageInstaller	Application name		Pakettiasennusohjelma
+PackageInstaller	System name		Pakettiasennusohjelma
 PackageInstaller\nBeOS legacy .pkg file installer for Haiku.\n\nCopyright 2007,\nŁukasz 'Sil2100' Zemczak\n\nCopyright (c) 2007 Haiku, Inc. \n	Packageinstaller main		Pakettiasennusohjelma\nAlkuperäisen BeOS .pkg -tiedoston asennusohjelma Haikulle.\n\nCopyright 2007,\nŁukasz ’Sil2100’ Zemczak\n\nCopyright (c) 2007 Haiku, Inc. \n
 Preparing package	PackageInstall		Valmistellaan pakettia
 Replace	PackageView		Korvaa

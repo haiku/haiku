@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-Shortcuts	1865784956
+1	norwegian_bokmål	x-vnd.Haiku-Shortcuts	395916189
 *Beep	ShortcutsWindow		*Bip
 *InsertString \"Your Text Here\"	ShortcutsWindow		*SettInnStreng \"Din Tekst Her\"
 *LaunchHandler text/html	ShortcutsWindow		*OppstartsHåndterer text/html
@@ -46,7 +46,7 @@ Save KeySet as…	ShortcutsWindow		Lagre sett med hurtigtaster som...
 Select	ShortcutsWindow		Velg
 SendMessage	ShortcutsSpec		SendMelding
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
-Shortcuts	Application name		Hurtigtaster
+Shortcuts	System name		Hurtigtaster
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Hurtigtaster kunne ikke åpne ditt sett med hurtigtaster!
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Hurtigtaster kunne ikke tolke filen din med hurtigtaster!
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Hurtigtaster klarte ikke å lagre filen din med hurtigtaster!

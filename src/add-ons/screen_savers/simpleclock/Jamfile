@@ -2,9 +2,16 @@ SubDir HAIKU_TOP src add-ons screen_savers simpleclock ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+AddResources Message : SimpleClock.rdef ;
+
 ScreenSaver SimpleClock :
 	SimpleClock.cpp
 
-	: be libscreensaver.so $(TARGET_LIBSUPC++)
+	: be libscreensaver.so $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
 ;
 
+DoCatalogs SimpleClock :
+	x-vnd.Haiku-SimpleClock
+	:
+	SimpleClock.cpp
+;

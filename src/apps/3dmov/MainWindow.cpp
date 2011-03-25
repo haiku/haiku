@@ -53,7 +53,7 @@ static int sMainWindowCount = 0;	// keep track of number of spawned windows
 */
 MainWindow :: MainWindow(BRect frame, SHAPE shape)
 	:
-	BDirectWindow(frame, B_TRANSLATE_APP_NAME("3DMov"), B_TITLED_WINDOW, 0)
+	BDirectWindow(frame, B_TRANSLATE_SYSTEM_NAME("3DMov"), B_TITLED_WINDOW, 0)
 {
 	sMainWindowCount++;
 	

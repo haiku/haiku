@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-CharacterMap	2797966004
+1	norwegian_bokmål	x-vnd.Haiku-CharacterMap	4013985301
 Alphabetic presentation forms	UnicodeBlocks		Alfabetiske presentasjonsformer
 Arabic	UnicodeBlocks		Arabisk
 Armenian	UnicodeBlocks		Armensk
@@ -6,7 +6,7 @@ Arrows	UnicodeBlocks		Piler
 Balinese	UnicodeBlocks		Balinesisk 
 Bengali	UnicodeBlocks		Bengalsk
 Box drawing	UnicodeBlocks		Bokstegning
-CharacterMap	Application name		Tegntabell
+CharacterMap	System name		Tegntabell
 Code	CharacterWindow		Kode
 Coptic	UnicodeBlocks		Koptisk
 Currency symbols	UnicodeBlocks		Valutasymboler

@@ -1,8 +1,8 @@
-1	french	x-vnd.Haiku-Fonts	3225361919
+1	french	x-vnd.Haiku-Fonts	4164233892
 Bold font:	Font view		Police grasse :
 Defaults	Main window		Par défauts
 Fixed font:	Font view		Police à espacement fixe :
-Fonts	Application name		Polices
+Fonts	System name		Polices
 Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Polices\n\tCopyright 2004-2005, Haiku.\n\n
 Menu font:	Font view		Police du menu :
 OK	main		OK

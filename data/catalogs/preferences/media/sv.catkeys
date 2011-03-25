@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Media	3878155795
+1	swedish	x-vnd.Haiku-Media	1473363280
 <none>	Media views		<ingen>
 Audio input:	Media views		Ljudingång:
 Audio mixer	Media Window		Ljudmixer
@@ -11,7 +11,7 @@ Couldn't add volume control in Deskbar: %s\n	Media views		Kunde inte lägga till
 Couldn't remove volume control in Deskbar: %s\n	Media views		Kunde inte ta bort volymkontrollen från Deskbar: %s\n
 Defaults	Media views		Förval
 Done shutting down.	Media Window		Färdigavslutad.
-Media	Application name		Media
+Media	System name		Media
 OK	Media Window		Ok
 Quit	Media Window		Avsluta
 Ready for use…	Media Window		Redo att användas…

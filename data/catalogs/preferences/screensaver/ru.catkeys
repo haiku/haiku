@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-ScreenSaver	1819773808
+1	russian	x-vnd.Haiku-ScreenSaver	2049719641
 30 seconds	ScreenSaver		30 секунд
 Add…	ScreenSaver		Добавить…
 Blackness	ScreenSaver		Пустой экран
@@ -21,7 +21,7 @@ Password:	ScreenSaver		Пароль:
 Passwords don't match. Please try again.	ScreenSaver		Пароли не совпадают. Пожалуйста, попробуйте еще раз.
 Password…	ScreenSaver		Пароль…
 Run module	ScreenSaver		Запускать заставку через 
-ScreenSaver	Application name		Хранитель экрана
+ScreenSaver	System name		Хранитель экрана
 Test	ScreenSaver		Проверить
 Turn off screen	ScreenSaver		Выключать экран через 
 Use custom password	ScreenSaver		Использовать выбранный пароль

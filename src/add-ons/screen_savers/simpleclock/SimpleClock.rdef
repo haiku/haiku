@@ -1,0 +1,14 @@
+
+resource app_signature "application/x-vnd.Haiku-SimpleClock";
+
+resource app_name_catalog_entry "x-vnd.Haiku-SimpleClock:System name:SimpleClock";
+
+resource app_version {
+	major  = 1,
+	middle = 0,
+	minor  = 0,
+	variety = 0,
+	internal = 0,
+	short_info = "SimpleClock",
+	long_info = "SimpleClock"
+};

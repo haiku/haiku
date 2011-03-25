@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-Magnify	786411596
+1	norwegian_bokmål	x-vnd.Haiku-Magnify	1206773533
 Copy image	Magnify-Main		Kopier bilde
 Decrease pixel size	Magnify-Main		Reduser pikselstørrelse
 Decrease window size	Magnify-Main		Forminsk vindu
@@ -7,7 +7,7 @@ Hide/Show info	Magnify-Main		Skjul/Vis info
 Increase pixel size	Magnify-Main		Øk pikselstørrelse
 Increase window size	Magnify-Main		Forstørr vindu
 Info	Magnify-Main		Info
-Magnify	Application name		Lupe
+Magnify	System name		Lupe
 Magnify help	Magnify-Help		Magnify-hjelp
 Magnify!\n\n©2002-2006 Haiku\n(C)1999 Be Inc.\n\nNow with even more features and recompiled for Haiku.	Magnify-Main		Magnify!\n\n2002-2006 Haiku\n(C)1999 Be Inc.\n\nNå med enda flere funksjoner og rekompilert for Haiku.
 Make square	Magnify-Main		Lag firkant

@@ -1,10 +1,10 @@
-1	belarusian	x-vnd.Haiku-ActivityMonitor	3275442606
+1	belarusian	x-vnd.Haiku-ActivityMonitor	2994145175
 %.1f KB/s	DataSource		%.1f КБ/сек
 %.1f MB	DataSource		%.1f МБ
 %.1f faults/s	DataSource		%.1f памылак/сек
 %lld ms	SettingsWindow		%lld м.сек
 %lld sec.	SettingsWindow		%lld сек.
-ActivityMonitor	Application name		Манітор Актыўнасці
+ActivityMonitor	System name		Манітор Актыўнасці
 Add graph	ActivityWindow		Дадаць графік
 Additional items	ActivityView		Дадатковыя элементы
 Apps	DataSource		Праграмы

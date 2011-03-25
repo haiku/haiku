@@ -1,6 +1,6 @@
-1	norwegian_bokmål	x-vnd.Haiku-CPUFrequencyPref	4032843513
+1	norwegian_bokmål	x-vnd.Haiku-CPUFrequencyPref	1579805342
 CPU frequency status view	CPU Frequency View		Visning av CPU-status
-CPUFrequency	Application name		Prosessorhastighet
+CPUFrequency	System name		Prosessorhastighet
 CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPUFrequency\n\tskrevet av Clemens Zeidler\n\tOpphavsrett 2009, Haiku, Inc.\n
 Defaults	Pref Window		Standardinnstillinger
 Dynamic performance	Status view		Dynamisk ytelse

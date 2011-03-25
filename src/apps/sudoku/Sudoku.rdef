@@ -1,6 +1,8 @@
 
 resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.Haiku-Sudoku";
 
+resource app_name_catalog_entry "x-vnd.Haiku-Sudoku:System name:Sudoku";
+
 resource app_version {
 	major  = 1,
 	middle = 0,

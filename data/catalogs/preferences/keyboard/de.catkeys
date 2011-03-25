@@ -1,9 +1,9 @@
-1	german	x-vnd.Haiku-Keyboard	1112507387
+1	german	x-vnd.Haiku-Keyboard	1711838804
 Defaults	KeyboardWindow		Standardwerte
 Delay until key repeat	KeyboardView		Verzögerung bis Tastenwiederholung
 Fast	KeyboardView		Schnell
 Key repeat rate	KeyboardView		Tastenwiederholrate
-Keyboard	Application name		Tastatur
+Keyboard	System name		Tastatur
 Long	KeyboardView		Lang
 OK	KeyboardApplication		OK
 Revert	KeyboardWindow		Anfangswerte

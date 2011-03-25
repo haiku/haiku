@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku.TV	16571315
+1	german	x-vnd.Haiku.TV	2815571176
 About %1…	MainWin	Parameter %1 is the name of the application.	Über %1...
 Always on top	MainWin		Immer im Vordergrund
 Channel	MainWin		Kanal
@@ -19,7 +19,7 @@ Quit	MainWin		Beenden
 Scale to native size	MainWin		Originalgröße
 Settings	MainWin		Einstellungen
 Settings…	MainWin		Einstellungen...
-TV	Application name		TV
+TV	System name		TV
 TV	MainWin		TV
 \nBuild 	MainWin		\nBuild 
 \nRevision 	MainWin		\nVersion

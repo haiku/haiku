@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-SoundRecorder	1960509649
+1	finnish	x-vnd.Haiku-SoundRecorder	2122042546
 Cannot connect to media server	RecorderWindow		Ei voida yhdistää mediapalvelimeen
 Cannot connect to the selected sound input	RecorderWindow		Ei kyetä yhdistämään valittuun äänisyötteeseen
 Cannot find an unused name to use for the new recording	RecorderWindow		Ei kyetä löytämää käyttämätöntä nimeä käytettäväksi uuteen äänitykseen
@@ -32,7 +32,7 @@ Sample size: 	RecorderWindow		Näytekoko:
 Save	RecorderWindow		Tallenna
 Some of the files don't appear to be audio files	RecorderWindow		Jotkut tiedostot eivät tunnu olevan äänitiedostoja
 Sound List	RecorderWindow		Ääniluettelo
-SoundRecorder	Application name		Äänitalletin
+SoundRecorder	System name		Äänitalletin
 Stop	RecorderWindow		Pysäytä
 bits	RecorderWindow		bittiä
 seconds	RecorderWindow		sekuntia

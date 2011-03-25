@@ -1,10 +1,10 @@
-1	czech	x-vnd.Haiku-ActivityMonitor	3275442606
+1	czech	x-vnd.Haiku-ActivityMonitor	2994145175
 %.1f KB/s	DataSource		%.1f KB/s
 %.1f MB	DataSource		%.1f MB
 %.1f faults/s	DataSource		%.1f chyb/s
 %lld ms	SettingsWindow		%lld ms
 %lld sec.	SettingsWindow		%lld sek.
-ActivityMonitor	Application name		Monitor činnosti
+ActivityMonitor	System name		Monitor činnosti
 Add graph	ActivityWindow		Přidat graf
 Additional items	ActivityView		Přídavné položky
 Apps	DataSource		Aplikace

@@ -1,8 +1,8 @@
-1	french	x-vnd.Haiku-CDPlayer	1556801578
+1	french	x-vnd.Haiku-CDPlayer	592310631
 Audio CD	CDPlayer		CD Audio
 CD	CDPlayer		CD
 CD drive is empty	CDPlayer		Le lecteur de CD est vide
-CDPlayer	Application name		LecteurCD
+CDPlayer	System name		LecteurCD
 Disc: %ld:%.2ld / %ld:%.2ld	CDPlayer		Disque : %ld:%.2ld / %ld:%.2ld
 Disc: --:-- / --:--	CDPlayer		Disque : --:-- / --:--
 Disc: 88:88 / 88:88	CDPlayer		Disque : 88:88 / 88:88

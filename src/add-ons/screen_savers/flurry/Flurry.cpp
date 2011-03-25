@@ -35,6 +35,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include "Flurry.h"
 
+#include <new>
+#include <sys/time.h>
+#include <time.h>
+#include <unistd.h>
+
+#include <Catalog.h>
+
 #include "Shared.h"
 #include "Smoke.h"
 #include "Spark.h"
@@ -42,21 +49,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Texture.h"
 
 
-#include <new>
-#include <time.h>
-#include <unistd.h>
-#include <sys/time.h>
-
-
 using namespace BPrivate;
 
 
 FlurryView::FlurryView(BRect bounds)
-	: BGLView(bounds, (const char *)NULL, B_FOLLOW_ALL, B_FRAME_EVENTS | B_WILL_DRAW,
+	:
+	BGLView(bounds, (const char *)NULL, B_FOLLOW_ALL, B_FRAME_EVENTS | B_WILL_DRAW,
 		BGL_RGB | BGL_ALPHA | BGL_DEPTH | BGL_DOUBLE),
-	  fOldFrameTime(-1.0),
-	  fFlurryInfo_t(NULL)
+	fOldFrameTime(-1.0),
+	fFlurryInfo_t(NULL)
 {
+	B_TRANSLATE_MARK_SYSTEM_NAME("Flurry");
+	
 	fWidth = bounds.Width();
 	fHeight = bounds.Height();
 	fStartTime = _CurrentTime();

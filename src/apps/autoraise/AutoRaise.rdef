@@ -1,6 +1,8 @@
 
 resource app_signature "application/x-vnd.mmu.AutoRaise";
 
+resource app_name_catalog_entry "x-vnd.mmu.AutoRaise:System name:AutoRaise";
+
 resource app_version {
 	major      = 0,
 	middle     = 0,

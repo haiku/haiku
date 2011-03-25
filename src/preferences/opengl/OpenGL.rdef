@@ -1,6 +1,8 @@
 
 resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.Haiku-OpenGL";
 
+resource app_name_catalog_entry "x-vnd.Haiku-OpenGL:System name:OpenGL";
+
 resource app_flags B_SINGLE_LAUNCH;
 
 resource app_version {

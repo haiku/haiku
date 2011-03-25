@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-Expander	51964396
+1	norwegian_bokmål	x-vnd.Haiku-Expander	3061976445
 About Expander…	ExpanderMenu		Om Arkivåpner…
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Er du sikker på at du vil stoppe utpakkingen av dette\narkivet? De utpakkede filene kan være ufullstendige.
 Automatically expand files	ExpanderPreferences		Pakk ut automatisk
@@ -14,7 +14,7 @@ Destination folder:	ExpanderPreferences		Målmappe
 Error when expanding archive	ExpanderWindow		Feil ved utpakking av arkiv
 Expand	ExpanderMenu		Pakk ut
 Expand	ExpanderWindow		Pakk ut
-Expander	Application name		Arkivåpner
+Expander	System name		Arkivåpner
 Expander settings	ExpanderPreferences		Innstillinger for Arkivåpner
 Expander: Choose destination	DirectoryFilePanel		Arkivåpner: Velg mål
 Expander: Open	ExpanderWindow		Arkivåpner: Åpne

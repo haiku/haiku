@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-FileTypes	2684370460
+1	russian	x-vnd.Haiku-FileTypes	1055306485
 %1 application type	Application Type Window		Тип приложения %1
 %ld Application type%s could be removed.	Application Types Window		Удалось очистить типов приложений: %ld.
 %s file type	FileType Window		Тип файла %s
@@ -70,7 +70,7 @@ File	FileTypes Window		Файл
 File could not be opened	Preferred App Menu		Невозможно открыть файл
 File recognition	FileTypes Window		Распознавание файла
 File type	FileType Window		Тип файла
-FileTypes	Application name		Типы файлов
+FileTypes	System name		Типы файлов
 FileTypes	FileTypes		FileTypes
 FileTypes request	FileTypes		Запрос типа файла
 FileTypes request	FileTypes Window		Запрос типа файла

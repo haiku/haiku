@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Shortcuts	1278045456
+1	finnish	x-vnd.Haiku-Shortcuts	4103143985
 (Choose application with file requester)	ShortcutsWindow		(Valitse sovellus tiedostohakijalla)
 *Beep	ShortcutsWindow		*Piip
 *InsertString \"Your Text Here\"	ShortcutsWindow		*Lisää merkkijono ”Tekstisi tänne”
@@ -47,7 +47,7 @@ Save KeySet as…	ShortcutsWindow		Tallenna KeySet-tiedosto nimellä…
 Select	ShortcutsWindow		Valitse
 SendMessage	ShortcutsSpec		LähetäViesti
 Shift	ShortcutsSpec	Name for modifier on keyboard	Vaihto-painike
-Shortcuts	Application name		Pikanäppäinasetukset
+Shortcuts	System name		Pikanäppäinasetukset
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Pikanäppäinasetukset ei kyennyt avaamaan KeySet-tiedostoa!
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Pikanäppäinasetukset ei kyennyt jäsentämään KeySet-tiedostoa!
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Pikanäppäinsetukset ei kyennyt tallentamaan KeySet-tiedostoa!

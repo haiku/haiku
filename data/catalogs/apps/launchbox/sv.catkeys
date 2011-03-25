@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-LaunchBox	3636680404
+1	swedish	x-vnd.Haiku-LaunchBox	1244694305
 About	LaunchBox		Om
 Add button here	LaunchBox		Lägg till knapp
 Auto-raise	LaunchBox		Upphöj automatiskt
@@ -15,7 +15,7 @@ Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Misslycka
 Horizontal layout	LaunchBox		Horisontal utformning
 Icon size	LaunchBox		Ikonstorlek
 Ignore double-click	LaunchBox		Ignorera dubbelklick
-LaunchBox	Application name		StartBlocket
+LaunchBox	System name		StartBlocket
 Name Panel	LaunchBox		Namnge Block
 New	LaunchBox		Ny
 OK	LaunchBox		OK

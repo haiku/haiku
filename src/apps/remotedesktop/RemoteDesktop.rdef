@@ -1,5 +1,7 @@
 resource app_signature "application/x-vnd.Haiku-RemoteDesktop";
 
+resource app_name_catalog_entry "x-vnd.Haiku-RemoteDesktop:System name:RemoteDesktop";
+
 resource app_version {
 	major  = 0,
 	middle = 1,

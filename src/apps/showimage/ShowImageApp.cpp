@@ -153,7 +153,7 @@ ShowImageApp::AboutRequested()
 		"Axel Dörfler",
 		NULL
 	};
-	BAboutWindow about(B_TRANSLATE_APP_NAME("ShowImage"), 2003, authors);
+	BAboutWindow about(B_TRANSLATE_SYSTEM_NAME("ShowImage"), 2003, authors);
 	about.Show();
 }
 

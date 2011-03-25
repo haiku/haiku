@@ -1,6 +1,8 @@
 
 resource app_signature "application/x-vnd.Haiku-Keymap";
 
+resource app_name_catalog_entry "x-vnd.Haiku-Keymap:System name:Keymap";
+
 resource app_version {
 	major  = 1,
 	middle = 0,

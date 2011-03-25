@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-Screen	1605570272
+1	norwegian_bokmål	x-vnd.Haiku-Screen	2172975069
 %.1f Hz	Screen		%.1f Hz
 %sSerial no.: %s	Screen		%sSerienummer: %s
 /other…	Screen		/andre...
@@ -25,7 +25,7 @@ Other…	Screen		Andre...
 Resolution:	Screen		Oppløsning:
 Revert	Screen		Tilbakestill
 Rows:	Screen		Rader:
-Screen	Application name		Skjerm
+Screen	System name		Skjerm
 Screen	Screen		Skjerm
 Screen preferences by the Haiku team	Screen		Skjerminnstillinger av Haiku-teamet
 Set background…	Screen		Sett bakgrunn...

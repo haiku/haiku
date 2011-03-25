@@ -1,6 +1,8 @@
 
 resource app_signature "application/x-vnd.Haiku-ShowImage";
 
+resource app_name_catalog_entry "x-vnd.Haiku-ShowImage:System name:ShowImage";
+
 resource app_version {
 	major  = 0, 
 	middle = 0,

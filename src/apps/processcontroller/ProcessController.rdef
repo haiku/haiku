@@ -1,6 +1,8 @@
 
 resource app_signature "application/x-vnd.Haiku-ProcessController";
 
+resource app_name_catalog_entry "x-vnd.Haiku-ProcessController:System name:ProcessController";
+
 resource app_version {
 	major  = 3,
 	middle = 1,

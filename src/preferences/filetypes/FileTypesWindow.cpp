@@ -307,7 +307,7 @@ ExtensionListView::SetType(BMimeType* type)
 
 FileTypesWindow::FileTypesWindow(const BMessage& settings)
 	:
-	BWindow(_Frame(settings), B_TRANSLATE_APP_NAME("FileTypes"),
+	BWindow(_Frame(settings), B_TRANSLATE_SYSTEM_NAME("FileTypes"),
 		B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS
 		| B_AUTO_UPDATE_SIZE_LIMITS),
 	fNewTypeWindow(NULL)

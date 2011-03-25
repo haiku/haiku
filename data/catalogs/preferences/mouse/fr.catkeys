@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Mouse	782036937
+1	french	x-vnd.Haiku-Mouse	1033564338
 ...by Andrew Edward McCall	MouseApplication		…par Andrew Edward McCall
 1-Button	SettingsView		1 bouton
 2-Button	SettingsView		2 boutons
@@ -14,7 +14,7 @@ Fast	SettingsView		Rapide
 Focus follows mouse	SettingsView		Le focus suit le pointeur
 Focus mode:	SettingsView		Méthode de focus :
 Instant warp	SettingsView		Téléportation instantanée
-Mouse	Application name		Souris
+Mouse	System name		Souris
 Mouse acceleration	SettingsView		Accélération de la souris
 Mouse speed	SettingsView		Vitesse de la souris
 Mouse type:	SettingsView		Type de souris :

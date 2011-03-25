@@ -108,7 +108,7 @@ public:
 ScreenshotWindow::ScreenshotWindow(const Utility& utility, bool silent,
 	bool clipboard)
 	:
-	BWindow(BRect(0, 0, 200.0, 100.0), B_TRANSLATE_APP_NAME("Screenshot"),
+	BWindow(BRect(0, 0, 200.0, 100.0), B_TRANSLATE_SYSTEM_NAME("Screenshot"),
 		B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_AVOID_FRONT
 		| B_QUIT_ON_WINDOW_CLOSE | B_AUTO_UPDATE_SIZE_LIMITS
 		| B_CLOSE_ON_ESCAPE),

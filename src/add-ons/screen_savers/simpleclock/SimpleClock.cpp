@@ -9,15 +9,18 @@
 */
 
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+#include <Bitmap.h>
+#include <Catalog.h>
+#include <Polygon.h>
+#include <Screen.h>
 #include <ScreenSaver.h>
 #include <StringView.h>
 #include <View.h>
-#include <Polygon.h>
-#include <Bitmap.h>
-#include <Screen.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <time.h>
+
 
 class Clock : public BScreenSaver
 {
@@ -36,15 +39,20 @@ private:
 	BRect r;
 };
 
+
 extern "C" _EXPORT BScreenSaver *instantiate_screen_saver(BMessage *message, image_id image)
 {
 	return new Clock(message, image);
 }
 
+
 Clock::Clock(BMessage *message, image_id image)
- : BScreenSaver(message, image)
+	:
+	BScreenSaver(message, image)
 {
+	B_TRANSLATE_MARK_SYSTEM_NAME("SimpleClock");
 }
+
 
 void Clock::StartConfig(BView *view)
 {

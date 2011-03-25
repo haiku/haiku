@@ -31,7 +31,7 @@ BAboutMenuItem::BAboutMenuItem()
 	app_info info;
 	const char* name = NULL;
 	if (be_app != NULL && be_app->GetAppInfo(&info) == B_OK)
-		name = B_TRANSLATE_NOCOLLECT_APP_NAME(info.ref.name);
+		name = B_TRANSLATE_NOCOLLECT_SYSTEM_NAME(info.ref.name);
 
 	// we need to translate some strings, and in order to do so, we need
 	// to use the LocaleBackend to reach liblocale.so

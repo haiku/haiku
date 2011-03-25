@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-ScreenSaver	1819773808
+1	french	x-vnd.Haiku-ScreenSaver	2049719641
 30 seconds	ScreenSaver		30 secondes
 Add…	ScreenSaver		Ajouter…
 Blackness	ScreenSaver		Ténèbres
@@ -21,7 +21,7 @@ Password:	ScreenSaver		Mot de passe :
 Passwords don't match. Please try again.	ScreenSaver		Les mots de passe ne correspondent pas. Veuillez réessayez.
 Password…	ScreenSaver		Mot de passe…
 Run module	ScreenSaver		Exécuter le module
-ScreenSaver	Application name		Économiseur d'écran
+ScreenSaver	System name		Économiseur d'écran
 Test	ScreenSaver		Test
 Turn off screen	ScreenSaver		Extinction de l'écran
 Use custom password	ScreenSaver		Utiliser un mot de passe personnalisé

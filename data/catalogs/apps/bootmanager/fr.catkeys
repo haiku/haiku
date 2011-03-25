@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-BootManager	2303599013
+1	french	x-vnd.Haiku-BootManager	883162038
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Le programme est sur le point de restaurer l'enregistrement d'amorçage maître (MBR) de %disk à partir de %file. Voulez-vous continuer ?
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		vous êtes sur le point d'écrire le menu de démarrage sur le disque. Êtes-vous sûr de vouloir continuer ?
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Le programme est sur le point d'écrire le menu suivant sur le disque de démarrage (%s). Veuillez vérifier les informations ci-dessous avant de continuer.
@@ -13,7 +13,7 @@ At least one partition must be selected!	BootManagerController		Au moins une par
 Back	BootManagerController	Button	Retour
 Backup Master Boot Record	BootManagerController	Title	Sauvegarde du MBR
 Boot Manager is unable to read the partition table!	BootManagerController		Le gestionnaire d'amorçage n'est pas en mesure de lire la table des partition !
-BootManager	Application name		Gestionnaire d'amorçage
+BootManager	System name		Gestionnaire d'amorçage
 Cannot access!	DrivesPage	Cannot install	Accès impossible !
 Default Partition	DefaultPartitionPage	Title	Partition par défaut
 Default Partition:	DefaultPartitionPage	Menu field label	Partition par défaut

@@ -1,6 +1,8 @@
 
 resource app_signature "application/x-vnd.Be-TRAK";
 
+resource app_name_catalog_entry "x-vnd.Be-TRAK:System name:Tracker";
+
 resource app_version {
 	major      = 5,
 	middle     = 2,

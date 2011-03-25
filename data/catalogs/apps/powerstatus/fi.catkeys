@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-PowerStatus	1451591102
+1	finnish	x-vnd.Haiku-PowerStatus	4269725527
 About	PowerStatus		Ohjelmasta
 About…	PowerStatus		Ohjelmasta...
 Battery charging	PowerStatus		Akkulataus
@@ -22,7 +22,7 @@ Model number: 	PowerStatus		Mallinumero:
 OEM info: 	PowerStatus		OEM-tiedot:
 OK	PowerStatus		Valmis
 Power status box	PowerStatus		Virtatilalaatikko
-PowerStatus	Application name		Virtatila
+PowerStatus	System name		Virtatila
 PowerStatus	PowerStatus		Virtatila
 PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		Virtatila\ntekijä: Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
 Quit	PowerStatus		Poistu

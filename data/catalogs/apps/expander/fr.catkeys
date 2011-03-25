@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Expander	51964396
+1	french	x-vnd.Haiku-Expander	3061976445
 About Expander…	ExpanderMenu		À propos de Expander…
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Êtes vous sur de vouloir stopper la décompression cette\narchive? Les fichiers extraits seront peut être incomplets.
 Automatically expand files	ExpanderPreferences		Décompresser les fichiers automatiquement
@@ -14,7 +14,7 @@ Destination folder:	ExpanderPreferences		Dossier de destination :
 Error when expanding archive	ExpanderWindow		Erreur lors de la décompression de l'archive
 Expand	ExpanderMenu		Décompresser
 Expand	ExpanderWindow		Décompresser
-Expander	Application name		Décompresseur
+Expander	System name		Décompresseur
 Expander settings	ExpanderPreferences		Réglages du Décompresseur
 Expander: Choose destination	DirectoryFilePanel		Expander : Choix de la destination
 Expander: Open	ExpanderWindow		Expander : Ouvrir

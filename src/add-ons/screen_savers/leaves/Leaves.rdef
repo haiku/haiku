@@ -1,8 +1,7 @@
-/*
- * Leaves.rdef
- */
 
 resource app_signature "application/x-vnd.Haiku-LeavesScreensaver";
+
+resource app_name_catalog_entry "x-vnd.Haiku-LeavesScreensaver:System name:Leaves";
 
 resource app_version {
 	major  = 1,

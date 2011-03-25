@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-BootManager	140416535
+1	russian	x-vnd.Haiku-BootManager	3014946856
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Все готово для восстановления загрузочной записи (MBR) раздела %disk из файла %file. Хотите продолжить?
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Все готово для записи загрузочного меню на диск. Вы уверены, что хотите продолжить?
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Все готово для записи загрузочного меню на загрузочный диск (%s). Пожалуйста, проверьте информацию ниже перед тем как продолжить.
@@ -13,7 +13,7 @@ At least one partition must be selected!	BootManagerController		Как мини�
 Back	BootManagerController	Button	Назад
 Backup Master Boot Record	BootManagerController	Title	Сохранить главную загрузочную запись (MBR)
 Boot Manager is unable to read the partition table!	BootManagerController		Менеджеру загрузки не удалось прочитать таблицу разделов!
-BootManager	Application name		Менеджер загрузки
+BootManager	System name		Менеджер загрузки
 Cannot access!	DrivesPage	Cannot install	Невозможно получить доступ!
 Default Partition	DefaultPartitionPage	Title	Раздел по умолчанию
 Default Partition:	DefaultPartitionPage	Menu field label	Раздел по умолчанию:

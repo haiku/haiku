@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Touchpad	1512001352
+1	french	x-vnd.Haiku-Touchpad	2113285797
 Cancel	TouchpadPrefView		Annuler
 Defaults	TouchpadPrefView		Par défaut
 Fast	TouchpadPrefView		Rapide
@@ -15,6 +15,6 @@ Slow	TouchpadPrefView		Lente
 Tap click sensitivity	TouchpadPrefView		Sensibilité du clic par tapotement
 Tap gesture	TouchpadPrefView		Mouvement de tapotement
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		La nouvelle zone de défilement est très grande, ce qui peut nuire au fonctionnement normal de la souris. Voulez-vous vraiment la changer ?
-Touchpad	Application name		PavéTactile
+Touchpad	System name		PavéTactile
 Two finger scrolling	TouchpadPrefView		Défilement à deux doigts
 Vertical scroll speed	TouchpadPrefView		Vitesse de défilement vertical

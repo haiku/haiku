@@ -1,9 +1,9 @@
-1	russian	x-vnd.Haiku-CharacterMap	836069905
+1	russian	x-vnd.Haiku-CharacterMap	2052089202
 Arabic	UnicodeBlocks		Арабский
 Armenian	UnicodeBlocks		Армянский
 CJK compatibility ideographs Supplement	UnicodeBlocks		Дополнение CJK совместимых иероглифов
 CJK strokes	UnicodeBlocks		Черты Иероглифов Восточной Азии 
-CharacterMap	Application name		Карта символов
+CharacterMap	System name		Карта символов
 Clear	CharacterWindow		Очистить
 Code	CharacterWindow		Код
 Coptic	UnicodeBlocks		Коптский

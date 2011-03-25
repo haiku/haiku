@@ -26,7 +26,7 @@ static const uint32 kMsgRevert = 'rvrt';
 
 APRWindow::APRWindow(BRect frame)
 	:
-	BWindow(frame, B_TRANSLATE_APP_NAME("Appearance"), B_TITLED_WINDOW,
+	BWindow(frame, B_TRANSLATE_SYSTEM_NAME("Appearance"), B_TITLED_WINDOW,
  		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS, B_ALL_WORKSPACES)
 {
 

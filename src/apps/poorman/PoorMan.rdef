@@ -1,5 +1,7 @@
 
-resource app_signature "application/x-vnd.Haiku.PoorMan";
+resource app_signature "application/x-vnd.Haiku-PoorMan";
+
+resource app_name_catalog_entry "x-vnd.Haiku-PoorMan:System name:PoorMan";
 
 resource app_version
 {

@@ -1,6 +1,8 @@
 
 resource app_signature "application/x-vnd.Be-MAIL";
 
+resource app_name_catalog_entry "x-vnd.Be-MAIL:System name:Mail";
+
 resource app_flags B_SINGLE_LAUNCH;
 
 resource file_types message {

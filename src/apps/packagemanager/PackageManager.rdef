@@ -1,4 +1,7 @@
 resource app_signature "application/x-vnd.Haiku-PackageManager";
+
+resource app_name_catalog_entry "x-vnd.Haiku-PackageManager:System name:PackageManager";
+
 resource app_flags B_SINGLE_LAUNCH;
 
 resource vector_icon {

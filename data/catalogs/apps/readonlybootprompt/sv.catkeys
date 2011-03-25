@@ -1,8 +1,8 @@
-1	swedish	x-vnd.Haiku-ReadOnlyBootPrompt	792875512
+1	swedish	x-vnd.Haiku-ReadOnlyBootPrompt	3629104933
 Desktop (Live-CD)	BootPromptWindow		Skrivbord (Live-CD)
 Do you wish to run the Installer or continue booting to the Desktop? You can also select your preferred language and keyboard layout from the list below.\n\nNote: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.	BootPromptWindow		Vill du köra Installationsprogrammet eller fortsätta till Skrivbordet? Du kan också välja ditt språk och tangentbordslayout från listan nedanför.\n\nObservera: Anpassning av Haikus applikationer och andra komponenter är på gång. Du kommer ofta hitta icke översatta ord, men om du vill kan du hjälpa till på <www.haiku-os.org>
 Keymap	BootPromptWindow		Tangentbordslayout
 Language	BootPromptWindow		Språk
-ReadOnlyBootPrompt	Application name		InstallationsSpråkMeny
+ReadOnlyBootPrompt	System name		InstallationsSpråkMeny
 Run Installer	BootPromptWindow		Kör Installeraren
 Welcome to Haiku!	BootPromptWindow		Välkommen till Haiku!

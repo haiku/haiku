@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-Network	3753077979
+1	norwegian_bokmål	x-vnd.Haiku-Network	2324385456
 <no wireless networks found>	EthernetSettingsView		<ingen trådløse nettverk funnet>
 Adapter:	EthernetSettingsView		Nettverkskort:
 Apply	EthernetSettingsView		Bruk
@@ -13,7 +13,7 @@ Gateway:	EthernetSettingsView		Gateway:
 IP address:	EthernetSettingsView		IP-adresse:
 Mode:	EthernetSettingsView		Modus:
 Netmask:	EthernetSettingsView		Nettverksmaske:
-Network	Application name		Nettverk
+Network	System name		Nettverk
 Network:	EthernetSettingsView		Nettverk:
 OK	EthernetSettingsView		OK
 Revert	EthernetSettingsView		Tilbakestill

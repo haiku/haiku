@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Network	3753077979
+1	russian	x-vnd.Haiku-Network	2324385456
 <no wireless networks found>	EthernetSettingsView		<беспроводные сети не найдены>
 Adapter:	EthernetSettingsView		Адаптер:
 Apply	EthernetSettingsView		Применить
@@ -13,7 +13,7 @@ Gateway:	EthernetSettingsView		Шлюз:
 IP address:	EthernetSettingsView		IP-адрес:
 Mode:	EthernetSettingsView		Режим:
 Netmask:	EthernetSettingsView		Маска:
-Network	Application name		Сеть
+Network	System name		Сеть
 Network:	EthernetSettingsView		Сеть:
 OK	EthernetSettingsView		ОК
 Revert	EthernetSettingsView		Вернуть

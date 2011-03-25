@@ -36,7 +36,7 @@ static const uint32 kMsgShowSettings = 'shst';
 
 ActivityWindow::ActivityWindow()
 	:
-	BWindow(BRect(100, 100, 500, 350), B_TRANSLATE_APP_NAME("ActivityMonitor"),
+	BWindow(BRect(100, 100, 500, 350), B_TRANSLATE_SYSTEM_NAME("ActivityMonitor"),
 	B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE)
 {
 	BMessage settings;

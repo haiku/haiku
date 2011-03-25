@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-MediaPlayer	1621996569
+1	russian	x-vnd.Haiku-MediaPlayer	1172481650
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% обнаружил внутреннюю ошибку. Файл не может быть открыт.
 %app%\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		%app%\n\nРазработал Marcus Overhagen, Stephan Aßmus и Frederik Modéen
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Американский)
@@ -52,7 +52,7 @@ Lock Peaks	MediaPlayer-PeakView		Зафиксировать пики
 Loop movies by default	MediaPlayer-SettingsWindow		Зацикливать видео по умолчанию
 Loop sounds by default	MediaPlayer-SettingsWindow		Зацикливать музыку по умолчанию
 Low volume	MediaPlayer-SettingsWindow		На низкой громкости
-MediaPlayer	Application name		Медиаплеер
+MediaPlayer	System name		Медиаплеер
 MediaPlayer settings	MediaPlayer-SettingsWindow		Настройки медиаплеера
 Medium	MediaPlayer-SettingsWindow		cредний
 Move Entries	MediaPlayer-MovePLItemsCmd		Переместить записи

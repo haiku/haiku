@@ -1,9 +1,9 @@
-1	swedish	x-vnd.Haiku-Keyboard	1112507387
+1	swedish	x-vnd.Haiku-Keyboard	1711838804
 Defaults	KeyboardWindow		Standardinställningar
 Delay until key repeat	KeyboardView		Fördröjning till tangentupprepning
 Fast	KeyboardView		Snabb
 Key repeat rate	KeyboardView		Hastighet för tangentupprepning
-Keyboard	Application name		Tangentbord
+Keyboard	System name		Tangentbord
 Long	KeyboardView		Lång
 OK	KeyboardApplication		Ok
 Revert	KeyboardWindow		Återställ

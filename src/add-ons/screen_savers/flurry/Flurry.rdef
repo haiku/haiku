@@ -1,0 +1,14 @@
+
+resource app_signature "application/x-vnd.Haiku-Flurry";
+
+resource app_name_catalog_entry "x-vnd.Haiku-Flurry:System name:Flurry";
+
+resource app_version {
+	major  = 1,
+	middle = 0,
+	minor  = 0,
+	variety = 0,
+	internal = 0,
+	short_info = "Flurry",
+	long_info = "Screensaver Flurry"
+};

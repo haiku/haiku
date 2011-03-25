@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Keymap	1986668195
+1	german	x-vnd.Haiku-Keymap	1259868356
 (Current)	Keymap window		(Aktiv)
 Acute trigger	Keymap window		´ Akut
 Circumflex trigger	Keymap window		^ Zirkumflex
@@ -6,7 +6,7 @@ Diaeresis trigger	Keymap window		¨ Trema/Diärese
 File	Keymap window		Datei
 Font	Keymap window		Schriftart
 Grave trigger	Keymap window		` Gravis
-Keymap	Application name		Tastaturlayout
+Keymap	System name		Tastaturlayout
 Layout	Keymap window		Tastatur
 Open…	Keymap window		Öffnen…
 Quit	Keymap window		Beenden

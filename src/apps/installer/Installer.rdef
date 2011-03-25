@@ -1,6 +1,8 @@
 
 resource app_signature "application/x-vnd.Haiku-Installer";
 
+resource app_name_catalog_entry "x-vnd.Haiku-Installer:System name:Installer";
+
 resource app_version {
 	major  = 1,
 	middle = 0,

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Devices	1465776728
+1	finnish	x-vnd.Haiku-Devices	1943893993
 ACPI Information	DeviceACPI		ACPI-tiedot
 ACPI Processor Namespace '%2'	DeviceACPI		ACPI-prosessorinimiavaruus ’%2’
 ACPI System Bus	DeviceACPI		ACPI-järjestelmäväylä
@@ -28,7 +28,7 @@ Device name	DevicePCI		Laitenimi
 Device name:	Device		Laitenimi:
 Device paths	Device		Laitepolut
 Device paths	DevicePCI		Laitepolut
-Devices	Application name		Laitteet
+Devices	System name		Laitteet
 Devices	DevicesView		Laitteet
 Display controller	Device		Näyttöohjain
 Docking station	Device		Telakka-asema

@@ -23,7 +23,9 @@ resource vector_icon {
 	$"8A0A050103023FF03D3D7A6FBD81013FE8DA495AD5C9C96A"
 };
 
-resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.Haiku.CodyCam";
+resource app_signature "application/x-vnd.Haiku-CodyCam";
+
+resource app_name_catalog_entry "x-vnd.Haiku-CodyCam:System name:CodyCam";
 
 resource(1, "BEOS:APP_VERSION") #'APPV' array
 {

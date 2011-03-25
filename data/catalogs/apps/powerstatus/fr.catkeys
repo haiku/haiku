@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-PowerStatus	1271119587
+1	french	x-vnd.Haiku-PowerStatus	4089254012
 About	PowerStatus		À propos
 About…	PowerStatus		À propos…
 Battery charging	PowerStatus		Batterie en charge
@@ -16,7 +16,7 @@ Last full charge: 	PowerStatus		Dernière charge complète :
 Model number: 	PowerStatus		Numéro de modèle : 
 OK	PowerStatus		OK
 Power status box	PowerStatus		Zone d'énergie
-PowerStatus	Application name		État d'énergie
+PowerStatus	System name		État d'énergie
 PowerStatus	PowerStatus		État d'énergie
 PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		État d'énergie\nÉcrit par Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
 Quit	PowerStatus		Quitter

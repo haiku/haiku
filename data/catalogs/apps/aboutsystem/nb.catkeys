@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-About	3334685619
+1	norwegian_bokmål	x-vnd.Haiku-About	3842515376
 %.2f GHz	AboutView		%.2f GHz
 %d MiB total	AboutView		%d MiB totalt
 %d MiB used (%d%%)	AboutView		%d MiB brukt (%d%%)
@@ -7,7 +7,7 @@
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB totalt, %inaccessible MiB utilgjengelig
 ... and the many people making donations!\n\n	AboutView		... og til de mange som har bidratt med donasjoner!\n\n
 About this system	AboutWindow		Om dette systemet
-AboutSystem	Application name		Om dette systemet
+AboutSystem	System name		Om dette systemet
 Contributors:\n	AboutView		Bidragsytere:\n
 Current maintainers:\n	AboutView		Nåværende vedlikeholdere:\n
 GCC %d Hybrid	AboutView		GCC %d Hybrid

@@ -1,6 +1,8 @@
 
 resource app_signature "application/x-vnd.Haiku-GLTeapot";
 
+resource app_name_catalog_entry "x-vnd.Haiku-GLTeapot:System name:GLTeapot";
+
 resource app_version {
 	major  = 1,
 	middle = 0,

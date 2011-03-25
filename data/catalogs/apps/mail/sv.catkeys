@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Be-MAIL	2684447565
+1	swedish	x-vnd.Be-MAIL	3225774574
 %d - Date	Mail		%d - Datum
 %e - E-mail address	Mail		%e - mejladress
 %n - Full name	Mail		%n - Fullständigt namn
@@ -60,7 +60,7 @@ Initial spell check mode:	Mail		Startläge för stavningskontroll:
 Leave as '%s'	Mail		Lämna som '%s'
 Leave as New	Mail		Lämna som nytt
 Leave same	Mail		Ändra inte
-Mail	Application name		E-post
+Mail	System name		E-post
 Mail couldn't find its dictionary.	Mail		Programmet kunde inte hitta sin ordlista.
 Mail preferences	Mail		E-post : Inställningar
 Mail\n\n	Mail		E-post\n\n

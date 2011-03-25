@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-DiskProbe	1375904521
+1	swedish	x-vnd.Haiku-DiskProbe	1844123050
 %ld (native)	ProbeView		%ld (native)
 (native)	ProbeView		(native)
 15 bit	TypeEditors		15 bitar
@@ -53,7 +53,7 @@ Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it i
 Device	ProbeView		Enhet
 Device offset: 	ProbeView		Enhetsoffset:
 Device: 	ProbeView		Enhet:
-DiskProbe	Application name		DiskInspekteraren
+DiskProbe	System name		DiskInspekteraren
 DiskProbe request	AttributeWindow		DiskInspekteraren
 DiskProbe request	DiskProbe		DiskInspekteraren
 DiskProbe request	ProbeView		DiskInspekteraren-begäran

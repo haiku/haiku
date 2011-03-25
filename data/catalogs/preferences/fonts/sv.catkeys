@@ -1,8 +1,8 @@
-1	swedish	x-vnd.Haiku-Fonts	3225361919
+1	swedish	x-vnd.Haiku-Fonts	4164233892
 Bold font:	Font view		Fet stil:
 Defaults	Main window		Förval
 Fixed font:	Font view		Fast teckensnitt:
-Fonts	Application name		Teckensnitt
+Fonts	System name		Teckensnitt
 Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Teckensnitt\n\tCopyright 2004-2005, Haiku.\n\n
 Menu font:	Font view		Menyteckensnitt:
 OK	main		OK

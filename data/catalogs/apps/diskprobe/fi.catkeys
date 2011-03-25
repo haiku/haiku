@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-DiskProbe	1375904521
+1	finnish	x-vnd.Haiku-DiskProbe	1844123050
 %ld (native)	ProbeView		%ld (alkuperäinen)
 (native)	ProbeView		(alkuperäinen)
 15 bit	TypeEditors		15-bittinen
@@ -53,7 +53,7 @@ Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it i
 Device	ProbeView		Laite
 Device offset: 	ProbeView		Laitesiirros: 
 Device: 	ProbeView		Laite: 
-DiskProbe	Application name		Levykoestaja
+DiskProbe	System name		Levykoestaja
 DiskProbe request	AttributeWindow		Levykoestajapyyntö
 DiskProbe request	DiskProbe		Levykoestajapyyntö
 DiskProbe request	ProbeView		Levykoestajapyyntö

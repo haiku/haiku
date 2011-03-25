@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.haiku-screenshot	2221316304
+1	belarusian	x-vnd.haiku-screenshot	1697748405
 Artwork folder	ScreenshotWindow		Каталог малюнкаў
 Cancel	ScreenshotWindow		Адмена
 Capture active window	ScreenshotWindow		Захваціць актыўнае вакно
@@ -16,7 +16,7 @@ Please select	ScreenshotWindow		Калі ласка, выберыце
 Save	ScreenshotWindow		Захаваць
 Save as:	ScreenshotWindow		Захаваць як:
 Save in:	ScreenshotWindow		Захаваць у:
-Screenshot	Application name		Здымак экрану
+Screenshot	System name		Здымак экрану
 Select	ScreenshotWindow		Выбраць
 Settings…	ScreenshotWindow		Наладкі...
 This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Файл ужо існуе.\n Сапраўды перазапісаць яго?

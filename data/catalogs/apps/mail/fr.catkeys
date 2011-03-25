@@ -1,4 +1,4 @@
-1	french	x-vnd.Be-MAIL	2684447565
+1	french	x-vnd.Be-MAIL	3225774574
 %d - Date	Mail		%d - Date
 %e - E-mail address	Mail		%e - Adresse de courriel
 %n - Full name	Mail		%n - Nom complet
@@ -60,7 +60,7 @@ Initial spell check mode:	Mail		Mode de correction orthographique initial :
 Leave as '%s'	Mail		Laisser « %s »
 Leave as New	Mail		Laisser comme Nouveau
 Leave same	Mail		Laisser à l'identique
-Mail	Application name		Mail
+Mail	System name		Mail
 Mail couldn't find its dictionary.	Mail		Mail n'a pas trouvé son dictionaire.
 Mail preferences	Mail		Préférences du courriel
 Mail\n\n	Mail		Mail\n\n

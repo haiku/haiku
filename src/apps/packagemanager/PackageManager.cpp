@@ -121,7 +121,7 @@ PackageManager::AboutRequested()
 		NULL
 	};
 	
-	BAboutWindow about(B_TRANSLATE_APP_NAME("PackageManager"), 2010, authors);
+	BAboutWindow about(B_TRANSLATE_SYSTEM_NAME("PackageManager"), 2010, authors);
 	about.Show();
 }
 

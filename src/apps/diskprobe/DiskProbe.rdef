@@ -1,6 +1,8 @@
 
 resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.Haiku-DiskProbe";
 
+resource app_name_catalog_entry "x-vnd.Haiku-DiskProbe:System name:DiskProbe";
+
 resource(1, "BEOS:FILE_TYPES") message {
 	"types" = "application/octet-stream"
 };

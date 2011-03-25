@@ -3,6 +3,8 @@ resource app_flags B_SINGLE_LAUNCH;
 
 resource app_signature "application/x-vnd.Be-PRNT";
 
+resource app_name_catalog_entry "x-vnd.Be-PRNT:System name:Printers";
+
 resource app_version {
 	major  = 1,
 	middle = 0,

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-StyledEdit	2766123717
+1	swedish	x-vnd.Haiku-StyledEdit	3064120758
 ???	LoadAlert		???
 Align	Menus		Justera
 Black	Menus		Svart
@@ -71,7 +71,7 @@ Search backwards	FindandReplaceWindow		Sök bakåt
 Select all	Menus		Markera allt
 Size	Menus		Storlek
 Statistics…	Menus		Statistik...
-StyledEdit	Application name		SkrivStiligt
+StyledEdit	System name		SkrivStiligt
 This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Denna fil är markerad som endast läsbar. Vill du spara ändringarna till dokumentet "%s"?
 Undo typing	QuitAlert		Ångra inmatning
 Untitled 	StyledEditWindow		Namnlös 

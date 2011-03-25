@@ -1,6 +1,8 @@
 
 resource app_signature "application/x-vnd.Haiku-DriveSetup";
 
+resource app_name_catalog_entry "x-vnd.Haiku-DriveSetup:System name:DriveSetup";
+
 resource app_version {
 	major  = 1,
 	middle = 0,

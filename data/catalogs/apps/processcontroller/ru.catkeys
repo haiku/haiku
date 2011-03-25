@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-ProcessController	1732034014
+1	russian	x-vnd.Haiku-ProcessController	2887520383
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
 About ProcessController…	ProcessController		О контроллере процессов…
 Cancel	ProcessController		Отмена
@@ -23,7 +23,7 @@ Normal priority	ProcessController		Нормальный приоритет
 OK	ProcessController		ОК
 Ok!	ProcessController		ОК!
 Please confirm	ProcessController		Пожалуйста, подтвердите
-ProcessController	Application name		Контроллер процессов
+ProcessController	System name		Контроллер процессов
 ProcessController is already installed in Deskbar.	ProcessController		Контроллер процессов уже установлен в Deskbar.
 Processor %d	ProcessController		Процессор %d
 Quit an application	ProcessController		Завершить приложение

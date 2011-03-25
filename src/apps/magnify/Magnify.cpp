@@ -238,7 +238,7 @@ TApp::AboutRequested()
 
 TWindow::TWindow(int32 pixelCount)
 	:
-	BWindow(BRect(0, 0, 0, 0), B_TRANSLATE_APP_NAME("Magnify"),
+	BWindow(BRect(0, 0, 0, 0), B_TRANSLATE_SYSTEM_NAME("Magnify"),
 		B_TITLED_WINDOW, B_OUTLINE_RESIZE)
 {
 	GetPrefs(pixelCount);

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-BootManager	140416535
+1	german	x-vnd.Haiku-BootManager	3014946856
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Im nächsten Schritt wird der Master-Boot-Record (MBR) auf %disk aus der Sicherungsdatei %file wiederhergestellt. Wirklich fortfahren?
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Im nächsten Schritt wird das Bootmenü auf den Datenträger geschrieben. Wirklich fortfahren?
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Es wird nun das folgende Bootmenü auf das Laufwerk (%s) geschrieben. Die Einstellungen sollten vor dem nächsten Schritt noch einmal geprüft werden.
@@ -13,7 +13,7 @@ At least one partition must be selected!	BootManagerController		Es muss mindeste
 Back	BootManagerController	Button	Zurück
 Backup Master Boot Record	BootManagerController	Title	Backup des Master-Boot-Record erstellen
 Boot Manager is unable to read the partition table!	BootManagerController		BootManager kann die Partitionstabelle nicht auslesen!
-BootManager	Application name		Bootmanager
+BootManager	System name		Bootmanager
 Cannot access!	DrivesPage	Cannot install	Zugriff unmöglich!
 Default Partition	DefaultPartitionPage	Title	Standard-Partition
 Default Partition:	DefaultPartitionPage	Menu field label	Standard-Partition

@@ -1,5 +1,7 @@
 resource app_signature "application/x-vnd.Haiku-OverlayImage";
 
+resource app_name_catalog_entry "x-vnd.Haiku-OverlayImage:System name:OverlayImage";
+
 resource app_flags B_MULTIPLE_LAUNCH;
 
 resource app_version {

@@ -173,7 +173,7 @@ PulseApp::ShowAbout(bool asApplication)
 	// static version to be used in replicant mode
 	BString name;
 	if (asApplication)
-		name = B_TRANSLATE_APP_NAME("Pulse");
+		name = B_TRANSLATE_SYSTEM_NAME("Pulse");
 	else
 		name = B_TRANSLATE("Pulse");
 

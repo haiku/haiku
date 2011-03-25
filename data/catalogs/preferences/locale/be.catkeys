@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Locale	1708263557
+1	belarusian	x-vnd.Haiku-Locale	1488345554
 12 hour	TimeFormatSettings		12 гадзін
 24 hour	TimeFormatSettings		24 гадзіны
 Available languages	Locale Preflet Window		Наяўныя мовы
@@ -10,7 +10,7 @@ Deskbar and Tracker need to be restarted for this change to take effect. Would y
 Formatting	Locale Preflet Window		Фарматаванне
 Full format:	TimeFormatSettings		Поўны фармат
 Language	Locale Preflet Window		Мова
-Locale	Application name		Лакаль
+Locale	System name		Лакаль
 Locale	Locale Preflet		Лакаль
 Locale	Locale Preflet Window		Лакаль
 Long format:	TimeFormatSettings		Доўгі фармат:

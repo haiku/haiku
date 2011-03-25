@@ -1,5 +1,7 @@
 resource app_signature "application/x-vnd.Haiku-DiskUsage";
 
+resource app_name_catalog_entry "x-vnd.Haiku-DiskUsage:System name:DiskUsage";
+
 resource app_version {
 		major  = 1,
 		middle = 0,

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Locale	1708263557
+1	swedish	x-vnd.Haiku-Locale	1488345554
 12 hour	TimeFormatSettings		12 timmar
 24 hour	TimeFormatSettings		24 timmar
 Available languages	Locale Preflet Window		Tillgängliga språk
@@ -10,7 +10,7 @@ Deskbar and Tracker need to be restarted for this change to take effect. Would y
 Formatting	Locale Preflet Window		Formatering
 Full format:	TimeFormatSettings		Fullt format:
 Language	Locale Preflet Window		Språk
-Locale	Application name		Språk & Format
+Locale	System name		Språk & Format
 Locale	Locale Preflet		Språk
 Locale	Locale Preflet Window		Språk
 Long format:	TimeFormatSettings		Långt format:

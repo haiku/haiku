@@ -1,6 +1,8 @@
 
 resource app_signature "application/x-vnd.Haiku-VirtualMemory";
 
+resource app_name_catalog_entry "x-vnd.Haiku-VirtualMemory:System name:VirtualMemory";
+
 resource app_version {
 	major  = 1,
 	middle = 0,

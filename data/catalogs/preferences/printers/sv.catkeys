@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Be-PRNT	3535702652
+1	swedish	x-vnd.Be-PRNT	2065133853
 %.2f KB	JobListView		%.2f KB
 1 pending job.	PrinterListView		1 utskrift i kön.
 <pick one>	AddPrinterDialog		<välj en>
@@ -26,7 +26,7 @@ Print test page	PrintersWindow		Skriv ut testsida
 Printer name:	AddPrinterDialog		Skrivarnamn:
 Printer type:	AddPrinterDialog		Skrivartyp:
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Skrivare: %printer_name%\nDrivrutin: %driver%\n
-Printers	Application name		Skrivare
+Printers	System name		Skrivare
 Printers	PrintersWindow		Skrivare
 Processing	JobListView		Bearbetar
 Red	TestPageView		Röd

@@ -596,7 +596,7 @@ WorkspacesView::MouseDown(BPoint where)
 
 WorkspacesWindow::WorkspacesWindow(WorkspacesSettings *settings)
 	:
-	BWindow(settings->WindowFrame(), B_TRANSLATE_APP_NAME("Workspaces"), 
+	BWindow(settings->WindowFrame(), B_TRANSLATE_SYSTEM_NAME("Workspaces"), 
 		B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 		B_AVOID_FRONT | B_WILL_ACCEPT_FIRST_CLICK, B_ALL_WORKSPACES),
  	fSettings(settings),

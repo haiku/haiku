@@ -58,7 +58,7 @@ namespace {
 void
 ErrorAlert(const char* message, status_t err, BWindow *window = NULL)
 {
-	BAlert *alert = new BAlert(B_TRANSLATE_APP_NAME("CodyCam"), message,
+	BAlert *alert = new BAlert(B_TRANSLATE_SYSTEM_NAME("CodyCam"), message,
 		B_TRANSLATE("OK"));
 	if (window != NULL)
 		alert->CenterIn(window->Frame());
@@ -143,7 +143,7 @@ const char* UploadClientAt(int32 i)
 
 CodyCam::CodyCam()
 	:
-	BApplication("application/x-vnd.Haiku.CodyCam"),
+	BApplication("application/x-vnd.Haiku-CodyCam"),
 	fMediaRoster(NULL),
 	fVideoConsumer(NULL),
 	fWindow(NULL),
@@ -193,7 +193,7 @@ void
 CodyCam::ReadyToRun()
 {
 	fWindow = new VideoWindow(BRect(28, 28, 28, 28),
-		(const char*) B_TRANSLATE_APP_NAME("CodyCam"), B_TITLED_WINDOW,
+		(const char*) B_TRANSLATE_SYSTEM_NAME("CodyCam"), B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS, &fPort);
 
 	_SetUpNodes();
@@ -278,7 +278,7 @@ CodyCam::AboutRequested()
 		NULL
 	};
 	
-	BAboutWindow about(B_TRANSLATE_APP_NAME("CodyCam"), 2003, authors,
+	BAboutWindow about(B_TRANSLATE_SYSTEM_NAME("CodyCam"), 2003, authors,
 		"The Original BeOS webcam.\n"
 		B_UTF8_COPYRIGHT " 1998-1999 Be, Incorporated.");
 	about.Show();

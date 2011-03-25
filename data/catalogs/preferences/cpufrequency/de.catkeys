@@ -1,6 +1,6 @@
-1	german	x-vnd.Haiku-CPUFrequencyPref	1238067743
+1	german	x-vnd.Haiku-CPUFrequencyPref	3079996868
 CPU frequency status view	CPU Frequency View		CPU-Takt-Anzeige
-CPUFrequency	Application name		CPU-Takt
+CPUFrequency	System name		CPU-Takt
 CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPU-Takt\n\tGeschrieben von Clemens Zeidler.\n\tCopyright 2009, Haiku, Inc.\n
 Defaults	Pref Window		Standardwerte
 Dynamic performance	Status view		Dynamische Leistung

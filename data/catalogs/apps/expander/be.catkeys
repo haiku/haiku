@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Expander	51964396
+1	belarusian	x-vnd.Haiku-Expander	3061976445
 About Expander…	ExpanderMenu		Пра Распакоўшчык…
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Спыніць распакоўку гэтага \nархіва? Ужо распакаваныя файлы могуць быць няпоўнымі.
 Automatically expand files	ExpanderPreferences		Распакоўваць файлы аўтаматычна
@@ -14,7 +14,7 @@ Destination folder:	ExpanderPreferences		Папка прызначэння:
 Error when expanding archive	ExpanderWindow		Памылка падчас распакоўкі архіву
 Expand	ExpanderMenu		Распакаваць
 Expand	ExpanderWindow		Распакаваць
-Expander	Application name		Распакоўшчык
+Expander	System name		Распакоўшчык
 Expander settings	ExpanderPreferences		Наладкі Распакоўшчыка
 Expander: Choose destination	DirectoryFilePanel		Распакоўшчык: Абраць прызначэнне
 Expander: Open	ExpanderWindow		Распакоўшчык: Адкрыць

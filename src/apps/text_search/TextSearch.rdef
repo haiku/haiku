@@ -1,6 +1,8 @@
 
 resource app_signature "application/x-vnd.Haiku.TextSearch";
 
+resource app_name_catalog_entry "x-vnd.Haiku.TextSearch:System name:TextSearch";
+
 resource app_version {
 	major  = 5,
 	middle = 1,

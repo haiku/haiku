@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-MediaPlayer	1621996569
+1	finnish	x-vnd.Haiku-MediaPlayer	1172481650
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% kohtasi sisäisen virheen. Tiedostoa ei kyetty avaamaan.
 %app%\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		%app%\n\nTekijät: Marcus Overhagen, Stephan Aßmus ja Frederik Modéen
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerikkalainen)
@@ -52,7 +52,7 @@ Lock Peaks	MediaPlayer-PeakView		Lukitse huiput
 Loop movies by default	MediaPlayer-SettingsWindow		oletuksena elokuvat silmukassa
 Loop sounds by default	MediaPlayer-SettingsWindow		oletussilmukkaäänet
 Low volume	MediaPlayer-SettingsWindow		Alenna äänenvoimakkuutta
-MediaPlayer	Application name		Mediasoitin
+MediaPlayer	System name		Mediasoitin
 MediaPlayer settings	MediaPlayer-SettingsWindow		Mediasoitinasetukset
 Medium	MediaPlayer-SettingsWindow		Media
 Move Entries	MediaPlayer-MovePLItemsCmd		Siirrä kappaleita

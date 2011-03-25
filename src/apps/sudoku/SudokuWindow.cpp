@@ -143,7 +143,7 @@ GenerateSudoku::_GenerateThread(void* _self)
 
 SudokuWindow::SudokuWindow()
 	:
-	BWindow(BRect(100, 100, 500, 520), B_TRANSLATE_APP_NAME("Sudoku"),
+	BWindow(BRect(100, 100, 500, 520), B_TRANSLATE_SYSTEM_NAME("Sudoku"),
 		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE),
 	fGenerator(NULL),
 	fStoredState(NULL),

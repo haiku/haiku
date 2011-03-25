@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Be-PRNT	3535702652
+1	belarusian	x-vnd.Be-PRNT	2065133853
 %.2f KB	JobListView		%.2f KB
 1 pending job.	PrinterListView		1 заданне ў чарзе.
 <pick one>	AddPrinterDialog		<выберыце адно>
@@ -26,7 +26,7 @@ Print test page	PrintersWindow		Надрукаваць тэставую стар
 Printer name:	AddPrinterDialog		Імя прынтэра:
 Printer type:	AddPrinterDialog		Тып прынтэру:
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Прынтэр: %printer_name%\nДрайвер: %driver%\n
-Printers	Application name		Прынтэры
+Printers	System name		Прынтэры
 Printers	PrintersWindow		Прынтэры
 Processing	JobListView		Апрацоўка
 Red	TestPageView		Чырвоны

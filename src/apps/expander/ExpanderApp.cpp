@@ -37,7 +37,7 @@ ExpanderApp::AboutRequested()
 		"Jérôme Duval",
 		NULL
 	};
-	BAboutWindow about(B_TRANSLATE_APP_NAME("Expander"), 2004, authors,
+	BAboutWindow about(B_TRANSLATE_SYSTEM_NAME("Expander"), 2004, authors,
 		"Original Be version by Dominic, Hiroshi, Peter, Pavel and Robert.");
 	about.Show();
 }

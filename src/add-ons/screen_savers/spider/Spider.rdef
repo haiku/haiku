@@ -1,8 +1,7 @@
-/*
- * Spider.rdef
- */
 
 resource app_signature "application/x-vnd.Haiku-SpiderScreensaver";
+
+resource app_name_catalog_entry "x-vnd.Haiku-SpiderScreensaver:System name:Spider";
 
 resource app_version {
 	major  = 1,

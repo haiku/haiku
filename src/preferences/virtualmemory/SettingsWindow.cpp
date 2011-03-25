@@ -129,7 +129,7 @@ VolumeMenuItem::VolumeMenuItem(const char* label, BMessage* message,
 
 SettingsWindow::SettingsWindow()
 	:
-	BWindow(BRect(0, 0, 269, 172), B_TRANSLATE_APP_NAME("VirtualMemory"),
+	BWindow(BRect(0, 0, 269, 172), B_TRANSLATE_SYSTEM_NAME("VirtualMemory"),
 		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS
 		| B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
 	fLocked(false)

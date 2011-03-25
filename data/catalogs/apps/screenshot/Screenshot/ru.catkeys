@@ -1,4 +1,4 @@
-1	russian	x-vnd.haiku-screenshot	2221316304
+1	russian	x-vnd.haiku-screenshot	1697748405
 Artwork folder	ScreenshotWindow		Папку artwork
 Cancel	ScreenshotWindow		Отмена
 Capture active window	ScreenshotWindow		Захватить активное окно
@@ -16,7 +16,7 @@ Please select	ScreenshotWindow		Пожалуйста выберите
 Save	ScreenshotWindow		Сохранить
 Save as:	ScreenshotWindow		Сохранить как:
 Save in:	ScreenshotWindow		Сохранить в:
-Screenshot	Application name		Снимок экрана
+Screenshot	System name		Снимок экрана
 Select	ScreenshotWindow		Выбрать
 Settings…	ScreenshotWindow		Настройки…
 This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Такой файл уже существует.\nВы уверены, что хотите его перезаписать?

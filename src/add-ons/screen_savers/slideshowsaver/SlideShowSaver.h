@@ -77,7 +77,7 @@ protected:
 
 	// Function taken from Haiku ShowImage,
 	// function originally written by Michael Pfeiffer
-	void SlideShowSaver::FreeEntries(BList *entries);
+	void FreeEntries(BList *entries);
 	
 	void LayoutCaption(BView *view, BFont &font, BPoint &pos, BRect &rect);	
 	void DrawCaption(BView *view);

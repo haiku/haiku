@@ -1,4 +1,4 @@
-1	czech	x-vnd.Be-TSKB	19976571
+1	czech	x-vnd.Be-TSKB	767695960
 <Be folder is empty>	BeMenu		<Be složka je prázdná>
 About Haiku	BeMenu		O Haiku
 Always on top	PreferencesWindow		Vždy na vrchu
@@ -7,7 +7,7 @@ Auto-raise	PreferencesWindow		Automatické zvětšení
 Change time…	TimeView		Změnit čas...
 Clock	PreferencesWindow		Hodiny
 Close all	WindowMenu		Zavřít vše
-Deskbar	Application name		Lišta
+Deskbar	System name		Lišta
 Deskbar preferences	PreferencesWindow		Nastavení Lišty
 Deskbar preferences…	BeMenu		Nastavení Lišty...
 Edit menu…	PreferencesWindow		Upravit nabídku...

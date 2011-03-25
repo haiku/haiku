@@ -1,8 +1,7 @@
-/*
- * IFS.rdef
- */
 
 resource app_signature "application/x-vnd.Haiku-IFSScreensaver";
+
+resource app_name_catalog_entry "x-vnd.Haiku-IFSScreensaver:System name:IFS";
 
 resource app_version {
 	major  = 1,

@@ -1,8 +1,8 @@
-1	finnish	x-vnd.Haiku-Appearance	3129065638
+1	finnish	x-vnd.Haiku-Appearance	3187486915
 Antialiasing	APRWindow		Reunanpehmennys
 Antialiasing menu	AntialiasingSettingsView		Reunanpehmennysvalikko
 Antialiasing type:	AntialiasingSettingsView		Reunanpehmennystapa:
-Appearance	Application name		Ulkoasu
+Appearance	System name		Ulkoasu
 Colors	APRWindow		Värit
 Control background	Colors tab		Kontrollin tausta
 Control border	Colors tab		Kontrollin reuna

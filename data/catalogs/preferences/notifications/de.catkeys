@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Notifications	3348596994
+1	german	x-vnd.Haiku-Notifications	3818404871
 Above icon	DisplayView		Über dem Icon
 Allowed	NotificationView		Erlaubt
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Beim Speichern der Einstellungen ist ein Fehler aufgetreten.\nVermutlich ist nicht mehr genügend Speicher auf dem Datenträger verfügbar.
@@ -26,7 +26,7 @@ Large icon	DisplayView		Großes Icon
 Last Received	NotificationView		Zuletzt empfangen
 Mini icon	DisplayView		Kleines Icon
 No	NotificationView		Nein
-Notifications	Application name		Benachrichtigungen
+Notifications	System name		Benachrichtigungen
 Notifications	GeneralView		Notifications - Benachrichtigungen
 Notifications	NotificationView		Notifications
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Benachrichtigungen können nicht angehalten werden, weil der Server nicht erreicht werden kann.

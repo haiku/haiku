@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-StyledEdit	2766123717
+1	belarusian	x-vnd.Haiku-StyledEdit	3064120758
 ???	LoadAlert		???
 Align	Menus		Раўнаванне
 Black	Menus		Чорны
@@ -71,7 +71,7 @@ Search backwards	FindandReplaceWindow		Шукаць ў адваротным на
 Select all	Menus		Абраць усё
 Size	Menus		Памер
 Statistics…	Menus		Статыстыка...
-StyledEdit	Application name		СтыльныРэдактар
+StyledEdit	System name		СтыльныРэдактар
 This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Гэты файл пазначаны толькі для чытання. Захаваць змены ў дакумент \"%s\"? 
 Undo typing	QuitAlert		Адмяніць увод
 Untitled 	StyledEditWindow		Без назвы

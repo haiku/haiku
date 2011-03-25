@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-BootManager	140416535
+1	belarusian	x-vnd.Haiku-BootManager	3014946856
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Master Boot Record (MBR) дыска %disk зараз будзе адноўлены з выкарыстаннем раней захаванай копіі змешчанай ў файле %file. Жадаеце аднавіць Master Boot Record?
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Гатовы запісаць меню запуску на дыск. Вы сапраўды жадаеце працягваць?
 About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Гатовы запісаць наступнае меню запуску на ўстройства (%s). Калі ласка, праверце інфармацыю ніжэй перад тым, як працягваць.
@@ -13,7 +13,7 @@ At least one partition must be selected!	BootManagerController		Найменей
 Back	BootManagerController	Button	Назад
 Backup Master Boot Record	BootManagerController	Title	Захаваць рэзервовую копію Master Boot Record
 Boot Manager is unable to read the partition table!	BootManagerController		Менеджер Запуску не можа прачытаць табліцу раздзелаў!
-BootManager	Application name		Мэнэджэр Запуску
+BootManager	System name		Мэнэджэр Запуску
 Cannot access!	DrivesPage	Cannot install	Няма доступу!
 Default Partition	DefaultPartitionPage	Title	Прадвызначаны падзел
 Default Partition:	DefaultPartitionPage	Menu field label	Прадвызначаны падзел:

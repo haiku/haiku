@@ -28,7 +28,7 @@
 
 BootManagerWindow::BootManagerWindow()
 	:
-	BWindow(BRect(100, 100, 500, 400), B_TRANSLATE_APP_NAME("BootManager"),
+	BWindow(BRect(100, 100, 500, 400), B_TRANSLATE_SYSTEM_NAME("BootManager"),
 		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE
 		| B_AUTO_UPDATE_SIZE_LIMITS)
 {

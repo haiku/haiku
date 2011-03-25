@@ -491,7 +491,7 @@ DiskProbe::AboutRequested()
 		NULL
 	};
 	
-	BAboutWindow about(B_TRANSLATE_APP_NAME("DiskProbe"), 2004, authors,
+	BAboutWindow about(B_TRANSLATE_SYSTEM_NAME("DiskProbe"), 2004, authors,
 		"Original Be version by Robert Polic.");
 	about.Show();
 }

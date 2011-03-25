@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Mouse	782036937
+1	belarusian	x-vnd.Haiku-Mouse	1033564338
 ...by Andrew Edward McCall	MouseApplication		... распрацавана Andrew Edward McCall
 1-Button	SettingsView		Аднанопкавая
 2-Button	SettingsView		Дзвюхкнопкавая
@@ -14,7 +14,7 @@ Fast	SettingsView		Хутка
 Focus follows mouse	SettingsView		Фокус суправаджае мыш
 Focus mode:	SettingsView		Рэжым фокуса:
 Instant warp	SettingsView		Імгненны заварот
-Mouse	Application name		Мыш
+Mouse	System name		Мыш
 Mouse acceleration	SettingsView		Паскарэнне мышы
 Mouse speed	SettingsView		Хуткасць мышы
 Mouse type:	SettingsView		Тып мышы:

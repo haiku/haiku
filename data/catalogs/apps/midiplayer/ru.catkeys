@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-MidiPlayer	2891983643
+1	russian	x-vnd.Haiku-MidiPlayer	4180509704
 Cavern	Main Window		Пещера
 Closet	Main Window		Ванная
 Could not load song	Main Window		Не удалось загрузить мелодию
@@ -8,7 +8,7 @@ Garage	Main Window		Гараж
 Haiku MIDI Player 1.0.0 beta\n\nThis tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	MIDI Player\n\nЭта крошечная программа\nУмеет воспроизводить тысячи\nПростых мелодий
 Igor's lab	Main Window		Лаборатория
 Live input:	Main Window		Прямой ввод:
-MidiPlayer	Application name		MIDI плеер
+MidiPlayer	System name		MIDI плеер
 None	Main Window		Нет
 OK	Main Window		ОК
 Off	Main Window		Выключить

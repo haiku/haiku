@@ -93,7 +93,7 @@ TestPageWindow::MessageReceived(BMessage* message)
 
 PrintersWindow::PrintersWindow(BRect frame)
 	:
-	BWindow(BRect(78, 71, 761, 509), B_TRANSLATE_APP_NAME("Printers"),
+	BWindow(BRect(78, 71, 761, 509), B_TRANSLATE_SYSTEM_NAME("Printers"),
 		B_TITLED_WINDOW, 0),
 	fSelectedPrinter(NULL),
 	fAddingPrinter(false)

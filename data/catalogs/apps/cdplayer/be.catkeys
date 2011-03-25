@@ -1,8 +1,8 @@
-1	belarusian	x-vnd.Haiku-CDPlayer	1556801578
+1	belarusian	x-vnd.Haiku-CDPlayer	592310631
 Audio CD	CDPlayer		Аўдыё CD
 CD	CDPlayer		CD
 CD drive is empty	CDPlayer		CD прывад пусты
-CDPlayer	Application name		Праігравальнік CD
+CDPlayer	System name		Праігравальнік CD
 Disc: %ld:%.2ld / %ld:%.2ld	CDPlayer		Дыск: %ld:%.2ld / %ld:%.2ld
 Disc: --:-- / --:--	CDPlayer		Дыск: --:-- / --:--
 Disc: 88:88 / 88:88	CDPlayer		Дыск: 88:88 / 88:88

@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-ShowImage	2709418306
+1	norwegian_bokmål	x-vnd.Haiku-ShowImage	581710495
 %SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS sekunder
 About ShowImage…	Menus		Om ShowImage…
 Browse	Menus		Bla gjennom
@@ -45,7 +45,7 @@ Save as…	Menus		Lagre som...
 Select all	Menus		Merk alle
 Selection Mode	Menus		Utvalgsmodus
 Show caption in full screen mode	Menus		Vis bildetekst i fullskjermsmodus
-ShowImage	Application name		Bildefremviser
+ShowImage	System name		Bildefremviser
 Slide delay	Menus		Lysbildeintervall
 Slide show	Menus		Lysbildevisning
 Stretch to window	Menus		Strekk til vindu

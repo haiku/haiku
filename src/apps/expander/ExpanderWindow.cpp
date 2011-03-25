@@ -50,7 +50,7 @@ const uint32 MSG_SHOWCONTENTS	= 'mSCT';
 ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref* ref,
 		BMessage* settings)
 	:
-	BWindow(frame, B_TRANSLATE_APP_NAME("Expander"), B_TITLED_WINDOW,
+	BWindow(frame, B_TRANSLATE_SYSTEM_NAME("Expander"), B_TITLED_WINDOW,
 		B_NORMAL_WINDOW_FEEL),
 	fSourcePanel(NULL),
 	fDestPanel(NULL),

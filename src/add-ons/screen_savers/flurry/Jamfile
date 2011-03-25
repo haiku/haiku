@@ -1,11 +1,19 @@
 SubDir HAIKU_TOP src add-ons screen_savers flurry ;
 
+AddResources Message : Flurry.rdef ;
+
 ScreenSaver Flurry :
 	Flurry.cpp
 	Smoke.cpp
 	Spark.cpp
 	Star.cpp
 	Texture.cpp
-	: be screensaver GL libshared.a $(TARGET_LIBSUPC++)
+	:
+	be screensaver GL libshared.a $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
 ;
 
+DoCatalogs Flurry :
+	x-vnd.Haiku-Flurry
+	:
+	Flurry.cpp	
+;

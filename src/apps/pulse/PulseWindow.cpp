@@ -29,7 +29,7 @@
 
 PulseWindow::PulseWindow(BRect rect)
 	:
-	BWindow(rect, B_TRANSLATE_APP_NAME("Pulse"), B_TITLED_WINDOW,
+	BWindow(rect, B_TRANSLATE_SYSTEM_NAME("Pulse"), B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
 {
 	SetPulseRate(200000);

@@ -56,8 +56,8 @@ Application PoorMan : PoorMan.cpp
 
 
 DoCatalogs PoorMan : 
-	x-vnd.Haiku.PoorMan
-	: 
+	x-vnd.Haiku-PoorMan
+	:
 	constants.cpp
 	PoorManAdvancedView.cpp
 	PoorManLoggingView.cpp

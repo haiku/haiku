@@ -1,6 +1,6 @@
-1	russian	x-vnd.Haiku-CPUFrequencyPref	1238067743
+1	russian	x-vnd.Haiku-CPUFrequencyPref	3079996868
 CPU frequency status view	CPU Frequency View		Просмотр состояния частоты ЦП
-CPUFrequency	Application name		Частота процессора
+CPUFrequency	System name		Частота процессора
 CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPUFrequency\n\tразработал Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n
 Defaults	Pref Window		По умолчанию
 Dynamic performance	Status view		Динамическая производительность

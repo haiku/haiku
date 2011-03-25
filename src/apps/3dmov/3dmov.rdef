@@ -8,4 +8,6 @@
 
 resource app_signature "application/x-vnd.Haiku-3DMov";
 
+resource app_name_catalog_entry "x-vnd.Haiku-3DMov:System name:3DMov";
+
 resource(1, "instructions.png") #'PNG ' import "instructions.png";

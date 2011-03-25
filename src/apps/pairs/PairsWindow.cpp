@@ -39,7 +39,7 @@ const uint32 MENU_QUIT					= 'MGqu';
 
 PairsWindow::PairsWindow()
 	:
-	BWindow(BRect(100, 100, 405, 423), B_TRANSLATE_APP_NAME("Pairs"),
+	BWindow(BRect(100, 100, 405, 423), B_TRANSLATE_SYSTEM_NAME("Pairs"),
 		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE
 		| B_NOT_RESIZABLE | B_NOT_ZOOMABLE),
 	fPairComparing(NULL),
@@ -228,7 +228,7 @@ PairsWindow::MessageReceived(BMessage* message)
 						"You completed the game in %num% clicks.\n");
 					
 					strAbout.ReplaceFirst("%app%",
-						B_TRANSLATE_APP_NAME("Pairs"));
+						B_TRANSLATE_SYSTEM_NAME("Pairs"));
 					strAbout.ReplaceFirst("%num%", score);
 
 					BAlert* alert = new BAlert("about",
@@ -245,7 +245,7 @@ PairsWindow::MessageReceived(BMessage* message)
 					font.SetSize(18);
 					font.SetFace(B_BOLD_FACE);
 					view->SetFontAndColor(0,
-						strlen(B_TRANSLATE_APP_NAME("Pairs")), &font);
+						strlen(B_TRANSLATE_SYSTEM_NAME("Pairs")), &font);
 					view->ResizeToPreferred();
 
 					if (alert->Go() == 0) {

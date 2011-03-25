@@ -1,6 +1,8 @@
 
 resource app_signature "application/x-vnd.Haiku-MidiPlayer";
 
+resource app_name_catalog_entry "x-vnd.Haiku-MidiPlayer:System name:MidiPlayer";
+
 resource app_version {
 	major      = 1, 
 	middle     = 0,

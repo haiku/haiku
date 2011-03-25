@@ -1,5 +1,7 @@
 
-resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.mmu_man.BSnow";
+resource app_signature "application/x-vnd.mmu_man.BSnow";
+
+resource app_name_catalog_entry "x-vnd.mmu_man.BSnow:System name:BSnow";
 
 resource app_flags B_SINGLE_LAUNCH;
 

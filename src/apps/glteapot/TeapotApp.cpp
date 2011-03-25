@@ -24,7 +24,7 @@ TeapotApp::TeapotApp(const char* sign)
 	BApplication(sign)
 {
 	fTeapotWindow = new TeapotWindow(BRect(5, 25, 300, 315),
-		B_TRANSLATE_APP_NAME("GLTeapot"), B_TITLED_WINDOW, 0);
+		B_TRANSLATE_SYSTEM_NAME("GLTeapot"), B_TITLED_WINDOW, 0);
 	fTeapotWindow->Show();
 }
 

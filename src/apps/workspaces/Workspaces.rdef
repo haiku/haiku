@@ -1,6 +1,8 @@
 
 resource app_signature "application/x-vnd.Be-WORK";
 
+resource app_name_catalog_entry "x-vnd.Be-WORK:System name:Workspaces";
+
 resource app_version {
 	major  = 1,
 	middle = 0,

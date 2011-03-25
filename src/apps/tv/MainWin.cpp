@@ -86,7 +86,7 @@ enum
 
 MainWin::MainWin(BRect frame_rect)
 	:
-	BWindow(frame_rect, B_TRANSLATE_APP_NAME(NAME), B_TITLED_WINDOW, 
+	BWindow(frame_rect, B_TRANSLATE_SYSTEM_NAME(NAME), B_TITLED_WINDOW, 
  	B_ASYNCHRONOUS_CONTROLS /* | B_WILL_ACCEPT_FIRST_CLICK */)
  ,	fController(new Controller)
  ,	fIsFullscreen(false)
@@ -708,7 +708,7 @@ MainWin::UpdateWindowTitle()
 {
 	BString title;
 	title.SetToFormat("%s - %d x %d, %.3f:%.3f => %.0f x %.0f",
-		B_TRANSLATE_APP_NAME(NAME),
+		B_TRANSLATE_SYSTEM_NAME(NAME),
 		fSourceWidth, fSourceHeight, fWidthScale, fHeightScale,
 		fVideoView->Bounds().Width() + 1, fVideoView->Bounds().Height() + 1);
 	SetTitle(title);

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-ShowImage	2709418306
+1	russian	x-vnd.Haiku-ShowImage	581710495
 %SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS секунды
 About ShowImage…	Menus		О программе…
 Browse	Menus		Просмотр
@@ -45,7 +45,7 @@ Save as…	Menus		Сохранить как…
 Select all	Menus		Выделить всё
 Selection Mode	Menus		Режим выделения
 Show caption in full screen mode	Menus		Показывать название в полноэкранном режиме
-ShowImage	Application name		Просмотр изображений
+ShowImage	System name		Просмотр изображений
 Slide delay	Menus		Задержка слайд шоу
 Slide show	Menus		Слайд шоу
 Stretch to window	Menus		Растягивать до размеров окна

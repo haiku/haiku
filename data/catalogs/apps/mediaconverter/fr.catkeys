@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-MediaConverter	3794171454
+1	french	x-vnd.Haiku-MediaConverter	3607188411
 %.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld canaux / %Ld échantillons
 %.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz mono / %Ld échantillons
 %.1f kHz stereo / %lld frames	MediaFileInfo		%.1f kHz stéréo / %Ld échantillons
@@ -39,7 +39,7 @@ File details	MediaConverter		Détails du fichier
 File format:	MediaConverter		Format de fichier :
 High	MediaConverter		Haute
 Low	MediaConverter		Basse
-MediaConverter	Application name		MédiaConvertisseur
+MediaConverter	System name		MédiaConvertisseur
 MediaConverter+:SaveDirectory	MediaConverter		MédiaConvertisseur : Dossier d'enregistrement
 MediaConverter\n1.3.0\n© 1999, Be Incorporated.\n© 2000-2004 Jun Suzuki\n© 2007 Stephan Aßmus\n© 2010 Haiku, Inc.	MediaConverter		MédiaConvertisseur\n1.3.0\n© 1999, Be Incorporated.\n© 2000-2004 Jun Suzuki\n© 2007 Stephan Aßmus\n© 2010 Haiku, Inc.
 No audio	Audio codecs list		Pas de son

@@ -122,6 +122,8 @@ resource vector_icon {
 
 resource app_signature "application/x-vnd.Haiku-Locale";
 
+resource app_name_catalog_entry "x-vnd.Haiku-Locale:System name:Locale";
+
 resource app_version {
 	major  = 1,
 	middle = 0,

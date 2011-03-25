@@ -411,7 +411,7 @@ ProcessController::AboutRequested()
 		NULL
 	};
 
-	BAboutWindow about(B_TRANSLATE_APP_NAME("ProcessController"), 2007, authors,
+	BAboutWindow about(B_TRANSLATE_SYSTEM_NAME("ProcessController"), 2007, authors,
 		"Copyright 1997-2001\n"
 		"Georges-Edouard Berenger.");
 	about.Show();

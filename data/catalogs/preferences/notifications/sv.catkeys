@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Notifications	3348596994
+1	swedish	x-vnd.Haiku-Notifications	3818404871
 Above icon	DisplayView		Ovanför ikon
 Allowed	NotificationView		Tillåten
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Ett fel uppstod när inställningarna skulle sparas.\nDet är möjligt att hårddiskutrymmet håller på att ta slut.
@@ -26,7 +26,7 @@ Large icon	DisplayView		Stor ikon
 Last Received	NotificationView		Sista mottagna 
 Mini icon	DisplayView		Miniikon
 No	NotificationView		Nej
-Notifications	Application name		Aviseringar
+Notifications	System name		Aviseringar
 Notifications	GeneralView		Aviseringar
 Notifications	NotificationView		Aviseringar
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Aviseringarna kunde inte stoppas eftersom servern inte kunde nås.

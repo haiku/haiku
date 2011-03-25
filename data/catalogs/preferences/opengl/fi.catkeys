@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-OpenGL	644054649
+1	finnish	x-vnd.Haiku-OpenGL	209187778
 Attributes stack size:	Capabilities		Attribuuttipinokoko:
 Auxiliary buffer(s):	Capabilities		Apupuskuri(t):
 Available	Extensions		Käytettävissä oleva
@@ -19,7 +19,7 @@ Max. recommended vertex elements:	Capabilities		Suositeltujen vertex-elementtien
 Max. texture units:	Capabilities		Maksimitekstuuriyksiköt:
 Model stack size:	Capabilities		Mallipinokoko:
 Name stack size:	Capabilities		Nimipinokoko:
-OpenGL	Application name		OpenGL-asetukset
+OpenGL	System name		OpenGL-asetukset
 OpenGL version:	InfoView		OpenGL-versio:
 Projection stack size:	Capabilities		Projektiopinokoko:
 Renderer name:	InfoView		Renderointinimi:

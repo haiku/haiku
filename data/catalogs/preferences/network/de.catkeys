@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Network	3753077979
+1	german	x-vnd.Haiku-Network	2324385456
 <no wireless networks found>	EthernetSettingsView		<keine Funknetzwerke gefunden>
 Adapter:	EthernetSettingsView		Adapter:
 Apply	EthernetSettingsView		Anwenden
@@ -13,7 +13,7 @@ Gateway:	EthernetSettingsView		Gateway:
 IP address:	EthernetSettingsView		IP-Adresse:
 Mode:	EthernetSettingsView		Modus:
 Netmask:	EthernetSettingsView		Netzmaske:
-Network	Application name		Netzwerk
+Network	System name		Netzwerk
 Network:	EthernetSettingsView		Netzwerk:
 OK	EthernetSettingsView		OK
 Revert	EthernetSettingsView		Anfangswerte

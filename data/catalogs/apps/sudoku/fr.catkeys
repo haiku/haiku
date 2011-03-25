@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Sudoku	2723731967
+1	french	x-vnd.Haiku-Sudoku	4130734752
 Abort	ProgressWindow		Abandon
 About	Sudoku		À propos
 About Sudoku…	SudokuWindow		À propos…
@@ -28,7 +28,7 @@ Snapshot current	SudokuWindow		Prendre un cliché
 Solve	SudokuWindow		Résoudre
 Solve single field	SudokuWindow		Résoudre une case
 Start again	SudokuWindow		Recommencer
-Sudoku	Application name		Sudoku
+Sudoku	System name		Sudoku
 Sudoku	Sudoku		Sudoku
 Sudoku request	SudokuWindow		Demande de Sudoku
 Sudoku solved - congratulations!\n	SudokuWindow		Sudoku résolu - félicitations !\n

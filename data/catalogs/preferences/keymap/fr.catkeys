@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Keymap	1986668195
+1	french	x-vnd.Haiku-Keymap	1259868356
 (Current)	Keymap window		(Actif)
 Acute trigger	Keymap window		Accent aigu
 Circumflex trigger	Keymap window		Accent circonflexe
@@ -6,7 +6,7 @@ Diaeresis trigger	Keymap window		Tréma
 File	Keymap window		Fichier
 Font	Keymap window		Police
 Grave trigger	Keymap window		Accent grave
-Keymap	Application name		Disposition Clavier
+Keymap	System name		Disposition Clavier
 Layout	Keymap window		Disposition
 Open…	Keymap window		Ouvrir…
 Quit	Keymap window		Quitter

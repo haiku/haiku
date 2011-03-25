@@ -1,5 +1,7 @@
 resource app_signature "application/x-vnd.Haiku-CDPlayer";
 
+resource app_name_catalog_entry "x-vnd.Haiku-CDPlayer:System name:CDPlayer";
+
 resource app_flags B_SINGLE_LAUNCH;
 
 resource app_version {

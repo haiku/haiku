@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Time	2288289842
+1	swedish	x-vnd.Haiku-Time	844587475
 <Other>	Time		<annan>
 Clock set to:	Time		Klockan ställd på:
 Current time:	Time		Aktuell tid:
@@ -9,7 +9,7 @@ OK	Time		OK
 Preview time:	Time		Förhandsvisa tid:
 Revert	Time		Återställ
 Set time zone	Time		Ange tidzon
-Time	Application name		Datum & Tid
+Time	System name		Datum & Tid
 Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Tid och Datum, skrivet av:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
 Time zone	Time		Tidzon
 \nNow: 	Time		\nNu:

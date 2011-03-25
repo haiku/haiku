@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-OpenGL	644054649
+1	german	x-vnd.Haiku-OpenGL	209187778
 Attributes stack size:	Capabilities		Attribut-Stackgröße:
 Auxiliary buffer(s):	Capabilities		Auxiliary-Buffer:
 Available	Extensions		Verfügbar
@@ -19,7 +19,7 @@ Max. recommended vertex elements:	Capabilities		Max. empfohlene Vertexelemente:
 Max. texture units:	Capabilities		Max. Textur-Einheiten:
 Model stack size:	Capabilities		Modell-Stackgröße:
 Name stack size:	Capabilities		Namen-Stackgröße:
-OpenGL	Application name		OpenGL
+OpenGL	System name		OpenGL
 OpenGL version:	InfoView		OpenGL-Version:
 Projection stack size:	Capabilities		Projektionen-Stackgröße:
 Renderer name:	InfoView		Renderer-Name:

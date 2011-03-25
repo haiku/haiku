@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-MediaPlayer	1621996569
+1	belarusian	x-vnd.Haiku-MediaPlayer	1172481650
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		Адбылася ўнутраная памылка %app%. Файл не можа быць адкрыты.
 %app%\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		%app%\n\nРаспрацаваны Marcus Overhagen, Stephan Aßmus і Frederik Modéen
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Амерыка)
@@ -52,7 +52,7 @@ Lock Peaks	MediaPlayer-PeakView		Блакаваць Пікі
 Loop movies by default	MediaPlayer-SettingsWindow		Зацыкліць відэа па змоўчанню
 Loop sounds by default	MediaPlayer-SettingsWindow		Зацыкліць гукі па змоўчанню
 Low volume	MediaPlayer-SettingsWindow		Нізкая гучнасць
-MediaPlayer	Application name		Праігравальнік Медыя
+MediaPlayer	System name		Праігравальнік Медыя
 MediaPlayer settings	MediaPlayer-SettingsWindow		Наладкі Праігравальніка Медыя
 Medium	MediaPlayer-SettingsWindow		Сярэдняе
 Move Entries	MediaPlayer-MovePLItemsCmd		Перамясціць элементы

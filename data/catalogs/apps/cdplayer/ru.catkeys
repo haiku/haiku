@@ -1,8 +1,8 @@
-1	russian	x-vnd.Haiku-CDPlayer	1556801578
+1	russian	x-vnd.Haiku-CDPlayer	592310631
 Audio CD	CDPlayer		Аудио CD
 CD	CDPlayer		CD
 CD drive is empty	CDPlayer		CD-привод пуст
-CDPlayer	Application name		CD плеер
+CDPlayer	System name		CD плеер
 Disc: %ld:%.2ld / %ld:%.2ld	CDPlayer		Диск: %ld:%.2ld / %ld:%.2ld
 Disc: --:-- / --:--	CDPlayer		Диск: --:-- / --:--
 Disc: 88:88 / 88:88	CDPlayer		Диск: 88:88 / 88:88

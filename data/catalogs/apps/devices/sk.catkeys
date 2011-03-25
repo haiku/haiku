@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Devices	1465776728
+1	slovak	x-vnd.Haiku-Devices	1943893993
 ACPI Information	DeviceACPI		Informácie o ACPI
 ACPI Processor Namespace '%2'	DeviceACPI		Menný priestor procesora ACPI „%2“
 ACPI System Bus	DeviceACPI		Zbernica systému ACPI
@@ -28,7 +28,7 @@ Device name	DevicePCI		Názov zariadenia
 Device name:	Device		Názov zariadenia:
 Device paths	Device		Cesty k zariadeniam
 Device paths	DevicePCI		Cesty k zariadeniam
-Devices	Application name		Zariadenia
+Devices	System name		Zariadenia
 Devices	DevicesView		Zariadenia
 Display controller	Device		Radič zobrazovania
 Docking station	Device		Dokovacia stanica

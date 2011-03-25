@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-About	3334685619
+1	russian	x-vnd.Haiku-About	3842515376
 %.2f GHz	AboutView		%.2f ГГц
 %d MiB total	AboutView		Всего %d Мбайт
 %d MiB used (%d%%)	AboutView		%d Мбайт использовано  (%d%%)
@@ -7,7 +7,7 @@
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total Мбайт всего, %inaccessible Мбайт недоступно
 ... and the many people making donations!\n\n	AboutView		... и многим другим людям, делающим пожертвования!\n\n
 About this system	AboutWindow		Об этой системе
-AboutSystem	Application name		О системе
+AboutSystem	System name		О системе
 Contributors:\n	AboutView		Внесли вклад в развитие:\n
 Current maintainers:\n	AboutView		Текущие разработчики:\n
 GCC %d Hybrid	AboutView		GCC %d Гибрид

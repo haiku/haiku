@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Time	2288289842
+1	slovak	x-vnd.Haiku-Time	844587475
 <Other>	Time		<Iné>
 Clock set to:	Time		Hodiny nastavené na:
 Current time:	Time		Aktuálny čas:
@@ -9,7 +9,7 @@ OK	Time		OK
 Preview time:	Time		Náhľad času:
 Revert	Time		Vrátiť
 Set time zone	Time		Nastaviť časové pásmo
-Time	Application name		Čas
+Time	System name		Čas
 Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Dátum a čas, napísali:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
 Time zone	Time		Časové pásmo
 \nNow: 	Time		\nTeraz:

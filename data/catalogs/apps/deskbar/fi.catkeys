@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Be-TSKB	19976571
+1	finnish	x-vnd.Be-TSKB	767695960
 <Be folder is empty>	BeMenu		<Be-kansio on tyhjä>
 About Haiku	BeMenu		Haikusta
 Always on top	PreferencesWindow		Aina päällimmäisenä
@@ -7,7 +7,7 @@ Auto-raise	PreferencesWindow		Nosta automaattisesti
 Change time…	TimeView		Muuta aikaa...
 Clock	PreferencesWindow		Kello
 Close all	WindowMenu		Sulje kaikki
-Deskbar	Application name		Työpöytäpalkki
+Deskbar	System name		Työpöytäpalkki
 Deskbar preferences	PreferencesWindow		Työpöytäpalkin asetukset
 Deskbar preferences…	BeMenu		Työpöytäpalkin asetukset...
 Edit menu…	PreferencesWindow		Muokkaa valikkoa...

@@ -124,7 +124,7 @@ private:
 
 CharacterWindow::CharacterWindow()
 	:
-	BWindow(BRect(100, 100, 700, 550), B_TRANSLATE_APP_NAME("CharacterMap"), 
+	BWindow(BRect(100, 100, 700, 550), B_TRANSLATE_SYSTEM_NAME("CharacterMap"), 
 		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE
 		| B_AUTO_UPDATE_SIZE_LIMITS)
 {

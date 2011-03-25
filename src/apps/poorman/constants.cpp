@@ -12,9 +12,9 @@
 // ------------------------------------------------------
 // PoorMan Window
 const char* STR_APP_SIG
-	= "application/x-vnd.Haiku.PoorMan";
+	= "application/x-vnd.Haiku-PoorMan";
 const char* STR_APP_NAME
-	= B_TRANSLATE_APP_NAME("PoorMan");
+	= B_TRANSLATE_SYSTEM_NAME("PoorMan");
 const char* STR_ERR_WEB_DIR
 	= B_TRANSLATE(
 	  "Please choose the folder to publish on the web.\n\n"

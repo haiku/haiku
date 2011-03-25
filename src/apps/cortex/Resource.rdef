@@ -289,7 +289,9 @@ resource(1, "BEOS:M:text/x-vnd.cortex.nodeset") #'MICN' array {
 	$"FFFFFFFFFFB000B0FFB0FFFFFFFFFFFF"
 };
 
-resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.Cortex.Route";
+resource app_signature "application/x-vnd.Cortex.Route";
+
+resource app_name_catalog_entry "x-vnd.Cortex.Route:System name:Cortex";
 
 resource(1, "BEOS:FILE_TYPES") message {
 	"types" = "text/x-vnd.Cortex.NodeSet"

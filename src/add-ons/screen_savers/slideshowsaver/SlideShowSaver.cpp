@@ -27,18 +27,24 @@
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
 
+
+#include "SlideShowSaver.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include <BitmapStream.h>
-#include <TranslatorRoster.h>
+#include <Catalog.h>
 #include <Directory.h>
 #include <File.h>
-#include <Path.h>
 #include <List.h>
+#include <Path.h>
 #include <StringView.h>
-#include "SlideShowSaver.h"
+#include <TranslatorRoster.h>
+
 #include "SlideShowConfigView.h"
+
 
 // Called by system to get the screen saver
 extern "C" _EXPORT BScreenSaver *
@@ -85,8 +91,11 @@ LiveSetting gDefaultSettings[] = {
 };
 
 SlideShowSaver::SlideShowSaver(BMessage *archive, image_id image)
-	: BScreenSaver(archive, image), fLock("SlideShow Lock")
+	:
+	BScreenSaver(archive, image), fLock("SlideShow Lock")
 {
+	B_TRANSLATE_MARK_SYSTEM_NAME("SlideShowSaver");
+	
 	fNewDirectory = true;
 	fBitmap = NULL;
 	fShowBorder = true;

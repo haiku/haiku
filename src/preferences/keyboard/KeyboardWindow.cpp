@@ -29,7 +29,7 @@
 
 KeyboardWindow::KeyboardWindow()
 	:
-	BWindow(BRect(0, 0, 200, 200), B_TRANSLATE_APP_NAME("Keyboard"),
+	BWindow(BRect(0, 0, 200, 200), B_TRANSLATE_SYSTEM_NAME("Keyboard"),
 		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE
 		| B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
 {

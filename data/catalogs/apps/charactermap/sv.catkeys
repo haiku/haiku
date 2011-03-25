@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-CharacterMap	725574662
+1	swedish	x-vnd.Haiku-CharacterMap	1941593959
 Aegean numbers	UnicodeBlocks		Egeiska siffror
 Alphabetic presentation forms	UnicodeBlocks		Alfabetiska presentationsformer
 Ancient Greek musical notation	UnicodeBlocks		Gammelgrekiska noter
@@ -25,7 +25,7 @@ CJK compatibility	UnicodeBlocks		CJK compatibility
 CJK compatibility ideographs	UnicodeBlocks		CJK compatibility ideographs
 Carian	UnicodeBlocks		Kariska
 Cham	UnicodeBlocks		Cham
-CharacterMap	Application name		TeckenTabell
+CharacterMap	System name		TeckenTabell
 Cherokee	UnicodeBlocks		Cherokee
 Clear	CharacterWindow		Rensa
 Code	CharacterWindow		Kod

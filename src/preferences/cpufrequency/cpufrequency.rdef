@@ -1,6 +1,8 @@
 
 resource app_signature "application/x-vnd.Haiku-CPUFrequencyPref";
 
+resource app_name_catalog_entry "x-vnd.Haiku-CPUFrequencyPref:System name:CPUFrequency";
+
 resource app_version {
 	major  = 1,
 	middle = 0,

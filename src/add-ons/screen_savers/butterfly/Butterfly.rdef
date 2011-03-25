@@ -1,8 +1,7 @@
-/*
- * Butterfly.rdef
- */
 
 resource app_signature "application/x-vnd.Haiku-ButterflyScreensaver";
+
+resource app_name_catalog_entry "x-vnd.Haiku-ButterflyScreensaver:System name:Butterfly";
 
 resource app_version {
 	major  = 1,

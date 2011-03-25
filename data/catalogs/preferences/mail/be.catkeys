@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Mail	3984096638
+1	belarusian	x-vnd.Haiku-Mail	2472596775
 Account name:	Config Views		Імя акаунту
 Account settings	Config Views		Наладкі акаунту
 Accounts	Config Window		Акаунты
@@ -9,7 +9,7 @@ Apply	Config Window		Прымяніць
 Beta	Config Window		Бета
 Check every	Config Window		Правяраць кожныя
 Development	Config Window		Распрацоўка
-E-mail	Application name		Е-Пошта
+E-mail	System name		Е-Пошта
 Edit mailbox menu…	Config Window		Правіць меню паштовай скрыні...
 Error	Config Window		Памылка
 Error retrieving general settings: %s\n	Config Window		Памылка пры атрыманні агульных наладак: %s\n

@@ -111,7 +111,7 @@ CodecMenuItem::~CodecMenuItem()
 
 MediaConverterWindow::MediaConverterWindow(BRect frame)
 	:
-	BWindow(frame, B_TRANSLATE_APP_NAME("MediaConverter"), B_TITLED_WINDOW_LOOK,
+	BWindow(frame, B_TRANSLATE_SYSTEM_NAME("MediaConverter"), B_TITLED_WINDOW_LOOK,
 		B_NORMAL_WINDOW_FEEL, B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS | 
 		B_AUTO_UPDATE_SIZE_LIMITS),
 	fVideoQuality(75),

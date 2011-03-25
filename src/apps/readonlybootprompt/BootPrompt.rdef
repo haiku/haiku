@@ -1,6 +1,8 @@
 
 resource app_signature "application/x-vnd.Haiku-ReadOnlyBootPrompt";
 
+resource app_name_catalog_entry "x-vnd.Haiku-ReadOnlyBootPrompt:System name:ReadOnlyBootPrompt";
+
 resource app_version {
 	major  = 1,
 	middle = 0,

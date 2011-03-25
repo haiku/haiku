@@ -155,7 +155,7 @@ layout_item_for(BView* view)
 InstallerWindow::InstallerWindow()
 	:
 	BWindow(BRect(-2000, -2000, -1800, -1800),
-		B_TRANSLATE_APP_NAME("Installer"), B_TITLED_WINDOW,
+		B_TRANSLATE_SYSTEM_NAME("Installer"), B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
 	fEncouragedToSetupPartitions(false),
 	fDriveSetupLaunched(false),
@@ -591,7 +591,7 @@ InstallerWindow::QuitRequested()
 		}
 
 		if (fInstallStatus != kFinished)
-			if ((new BAlert(B_TRANSLATE_APP_NAME("Installer"),
+			if ((new BAlert(B_TRANSLATE_SYSTEM_NAME("Installer"),
 				B_TRANSLATE("Are you sure you want to abort the installation "
 					"and restart the system?"),
 				B_TRANSLATE("Cancel"), B_TRANSLATE("Restart system"), NULL,
@@ -599,7 +599,7 @@ InstallerWindow::QuitRequested()
 				return false;
 
 	} else if (fInstallStatus == kInstalling) {
-		if ((new BAlert(B_TRANSLATE_APP_NAME("Installer"),
+		if ((new BAlert(B_TRANSLATE_SYSTEM_NAME("Installer"),
 			B_TRANSLATE("Are you sure you want to abort the installation?"),
 			B_TRANSLATE("Cancel"), B_TRANSLATE("Abort"), NULL,
 			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go() == 0)

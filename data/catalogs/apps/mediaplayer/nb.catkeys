@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-MediaPlayer	1605637054
+1	norwegian_bokmål	x-vnd.Haiku-MediaPlayer	1156122135
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Amerikansk)
 100% scale	MediaPlayer-Main		100% skalert
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
@@ -40,7 +40,7 @@ Internal error (out of memory). Saving the playlist failed.	MediaPlayer-Playlist
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Det ser ut som om mediaserveren ikke kjører.\nØnsker du å starte den?
 Large	MediaPlayer-SettingsWindow		Stor
 Low volume	MediaPlayer-SettingsWindow		Lavt volum
-MediaPlayer	Application name		Mediaspiller
+MediaPlayer	System name		Mediaspiller
 MediaPlayer settings	MediaPlayer-SettingsWindow		Mediaspiller-innstillinger
 Medium	MediaPlayer-SettingsWindow		Medium
 Move Into Trash Error	MediaPlayer-RemovePLItemsCmd		Feil ved flytting til søppelkurv

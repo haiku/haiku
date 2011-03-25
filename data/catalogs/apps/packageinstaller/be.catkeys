@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-PackageInstaller	1047551357
+1	belarusian	x-vnd.Haiku-PackageInstaller	1205716210
 %.1f GiB	PackageView		%.1f ГіБ
 %.1f KiB	PackageView		%.1f КіБ
 %.1f MiB	PackageView		%.1f МіБ
@@ -40,7 +40,7 @@ OK	PackageView		ОК
 OK	Packageinstaller main		ОК
 Other…	PackageView		Другі…
 Package installer	PackageView		Усталёўшчык Пакункаў
-PackageInstaller	Application name		Усталёўшчык Пакункаў
+PackageInstaller	System name		Усталёўшчык Пакункаў
 PackageInstaller\nBeOS legacy .pkg file installer for Haiku.\n\nCopyright 2007,\nŁukasz 'Sil2100' Zemczak\n\nCopyright (c) 2007 Haiku, Inc. \n	Packageinstaller main		Усталёўшчык Пакункаў\nУсталёўшчык старых BeOS .pkg пакункаў для Haiku.\n\nCopyright 2007,\nŁukasz 'Sil2100' Zemczak\n\nCopyright (c) 2007 Haiku, Inc. \n
 Preparing package	PackageInstall		Прыгатаванне пакунку
 Replace	PackageView		Замяніць

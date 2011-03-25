@@ -1,6 +1,8 @@
 
 resource app_signature "application/x-vnd.mahlzeit.webwatch";
 
+resource app_name_catalog_entry "x-vnd.mahlzeit.webwatch:System name:WebWatch";
+
 resource app_version {
 	major      = 1,
 	middle     = 5,

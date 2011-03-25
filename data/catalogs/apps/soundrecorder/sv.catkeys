@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-SoundRecorder	1960509649
+1	swedish	x-vnd.Haiku-SoundRecorder	2122042546
 Cannot connect to media server	RecorderWindow		Kan inte ansluta till mediaservern
 Cannot connect to the selected sound input	RecorderWindow		Kan inte ansluta till den valda ljudingången
 Cannot find an unused name to use for the new recording	RecorderWindow		Kan inte hitta ett oanvänt namn att använd för den nya inspelningen
@@ -32,7 +32,7 @@ Sample size: 	RecorderWindow		Samplingsstorlek:
 Save	RecorderWindow		Spara
 Some of the files don't appear to be audio files	RecorderWindow		Några av filerna verkar inte vara ljudfiler
 Sound List	RecorderWindow		Ljudlista
-SoundRecorder	Application name		LjudInspelare
+SoundRecorder	System name		LjudInspelare
 Stop	RecorderWindow		Stopp
 bits	RecorderWindow		bitar
 seconds	RecorderWindow		sekunder

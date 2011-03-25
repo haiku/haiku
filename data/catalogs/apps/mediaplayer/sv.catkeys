@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-MediaPlayer	1621996569
+1	swedish	x-vnd.Haiku-MediaPlayer	1172481650
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		Ett internt fel inträffade i %app%. Filen kunde inte öppnas.
 %app%\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		%app%\n\nSkrivet av Marcus Overhagen, Stephan Aßmus och Fredrik Modéen
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Amerikanskt format)
@@ -52,7 +52,7 @@ Lock Peaks	MediaPlayer-PeakView		Markera toppvärden
 Loop movies by default	MediaPlayer-SettingsWindow		Loopa filmer som förval
 Loop sounds by default	MediaPlayer-SettingsWindow		Loopa ljud som förval
 Low volume	MediaPlayer-SettingsWindow		Låg volym
-MediaPlayer	Application name		MediaSpelare
+MediaPlayer	System name		MediaSpelare
 MediaPlayer settings	MediaPlayer-SettingsWindow		MediaSpelarens inställningar
 Medium	MediaPlayer-SettingsWindow		Medium
 Move Entries	MediaPlayer-MovePLItemsCmd		Flytta poster

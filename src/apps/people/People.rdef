@@ -1,5 +1,7 @@
 
-resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.Be-PEPL";
+resource app_signature "application/x-vnd.Be-PEPL";
+
+resource app_name_catalog_entry "x-vnd.Be-PEPL:System name:People";
 
 resource app_version {
 	major  = 1,

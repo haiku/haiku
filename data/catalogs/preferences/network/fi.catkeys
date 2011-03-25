@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Network	3753077979
+1	finnish	x-vnd.Haiku-Network	2324385456
 <no wireless networks found>	EthernetSettingsView		<langatonta verkkoa ei löytynyt>
 Adapter:	EthernetSettingsView		Adapteri:
 Apply	EthernetSettingsView		Käytä
@@ -13,7 +13,7 @@ Gateway:	EthernetSettingsView		Yhdyskäytävä:
 IP address:	EthernetSettingsView		IP-osoite:
 Mode:	EthernetSettingsView		Tila:
 Netmask:	EthernetSettingsView		Verkkopeite:
-Network	Application name		Verkkoasetukset
+Network	System name		Verkkoasetukset
 Network:	EthernetSettingsView		Verkko:
 OK	EthernetSettingsView		Valmis
 Revert	EthernetSettingsView		Palauta

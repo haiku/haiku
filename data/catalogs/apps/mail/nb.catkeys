@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Be-MAIL	601781261
+1	norwegian_bokmål	x-vnd.Be-MAIL	1143108270
 %d - Date	Mail		%d - Dato
 %e - E-mail address	Mail		%e - E-postadresse
 %n - Full name	Mail		%n - Fullt navn
@@ -57,7 +57,7 @@ Hide	Mail		Skjul
 Include file attributes in attachments	Mail		Inkluder filattributter i vedlegg
 Inconsistency occurred in the undo/redo buffer.	Mail		Inkonsistens oppsto i angre/gjenopprett-bufferen.
 Leave as '%s'	Mail		La være som '%s'
-Mail	Application name		E-post
+Mail	System name		E-post
 Mail couldn't find its dictionary.	Mail		E-post kunne ikke finne ordboken
 Mail preferences	Mail		E-postinnstillinger
 Mail\n\n	Mail		E-post\n\n

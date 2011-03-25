@@ -1,9 +1,9 @@
-1	russian	x-vnd.Haiku-Keyboard	1112507387
+1	russian	x-vnd.Haiku-Keyboard	1711838804
 Defaults	KeyboardWindow		По умолчанию
 Delay until key repeat	KeyboardView		Задержка перед повтором
 Fast	KeyboardView		Быстро
 Key repeat rate	KeyboardView		Скорость повтора
-Keyboard	Application name		Клавиатура
+Keyboard	System name		Клавиатура
 Long	KeyboardView		Длинная
 OK	KeyboardApplication		ОК
 Revert	KeyboardWindow		Вернуть

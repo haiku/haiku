@@ -18,6 +18,8 @@ resource vector_icon {
 
 resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.Haiku-DialUpNetworking";
 
+resource app_name_catalog_entry "x-vnd.Haiku-DialUpNetworking:System name:DialUpNetworking";
+
 resource(1, "BEOS:APP_VERSION") #'APPV' array
 {
 	$"00000000000000000200000000000000010000004F424F532D4469616C2D5570"

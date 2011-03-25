@@ -151,7 +151,7 @@ MediaWindow::SmartNode::_FreeNode()
 // MediaWindow - Constructor
 MediaWindow::MediaWindow(BRect frame)
 	:
-	BWindow(frame, B_TRANSLATE_APP_NAME("Media"), B_TITLED_WINDOW,
+	BWindow(frame, B_TRANSLATE_SYSTEM_NAME("Media"), B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
 	fCurrentNode(BMessenger(this)),
 	fParamWeb(NULL),

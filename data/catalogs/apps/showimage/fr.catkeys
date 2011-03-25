@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-ShowImage	2709418306
+1	french	x-vnd.Haiku-ShowImage	581710495
 %SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS secondes
 About ShowImage…	Menus		À propos de la Visionneuse…
 Browse	Menus		Parcourir
@@ -45,7 +45,7 @@ Save as…	Menus		Enregistrer sous…
 Select all	Menus		Selectionner tout
 Selection Mode	Menus		Mode de sélection
 Show caption in full screen mode	Menus		Afficher les miniatures en mode plein écran
-ShowImage	Application name		Visionneuse
+ShowImage	System name		Visionneuse
 Slide delay	Menus		Délai de diaporama
 Slide show	Menus		Diaporama
 Stretch to window	Menus		Étirer à la fenêtre

@@ -1,9 +1,9 @@
-1	belarusian	x-vnd.Haiku-Keyboard	1112507387
+1	belarusian	x-vnd.Haiku-Keyboard	1711838804
 Defaults	KeyboardWindow		Прадвызначаныя
 Delay until key repeat	KeyboardView		Затрымка паўтора сімвала
 Fast	KeyboardView		Хутка
 Key repeat rate	KeyboardView		Хуткасць паўтору сімвала
-Keyboard	Application name		Клавіятура
+Keyboard	System name		Клавіятура
 Long	KeyboardView		Доўгі
 OK	KeyboardApplication		ОК
 Revert	KeyboardWindow		Вярнуць

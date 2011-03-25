@@ -1,6 +1,8 @@
 
 resource app_signature "application/x-vnd.Haiku-StyledEdit";
 
+resource app_name_catalog_entry "x-vnd.Haiku-StyledEdit:System name:StyledEdit";
+
 resource app_version {
 	major  = 1,
 	middle = 0,

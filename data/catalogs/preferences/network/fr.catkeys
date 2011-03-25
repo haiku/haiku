@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Network	3753077979
+1	french	x-vnd.Haiku-Network	2324385456
 <no wireless networks found>	EthernetSettingsView		<aucun réseau sans fil disponible>
 Adapter:	EthernetSettingsView		Adaptateur :
 Apply	EthernetSettingsView		Appliquer
@@ -13,7 +13,7 @@ Gateway:	EthernetSettingsView		Passerelle :
 IP address:	EthernetSettingsView		Adresse IP :
 Mode:	EthernetSettingsView		Mode :
 Netmask:	EthernetSettingsView		Masque réseau :
-Network	Application name		Réseau
+Network	System name		Réseau
 Network:	EthernetSettingsView		Réseau :
 OK	EthernetSettingsView		Ok
 Revert	EthernetSettingsView		Rétablir

@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-Devices	1465776728
+1	norwegian_bokmål	x-vnd.Haiku-Devices	1943893993
 ACPI Information	DeviceACPI		ACPI-informasjon
 ACPI Processor Namespace '%2'	DeviceACPI		ACPI-prosessor-navnerom '%2'
 ACPI System Bus	DeviceACPI		ACPI-systembuss
@@ -28,7 +28,7 @@ Device name	DevicePCI		Enhetsnavn
 Device name:	Device		Enhetsnavn:
 Device paths	Device		Enhetsti
 Device paths	DevicePCI		Enhetsstier
-Devices	Application name		Maskinvare
+Devices	System name		Maskinvare
 Devices	DevicesView		Enheter
 Display controller	Device		Skjermkontroller
 Docking station	Device		Dokkingstasjon

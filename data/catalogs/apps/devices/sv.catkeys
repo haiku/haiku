@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Devices	1465776728
+1	swedish	x-vnd.Haiku-Devices	1943893993
 ACPI Information	DeviceACPI		ACPI-information
 ACPI Processor Namespace '%2'	DeviceACPI		ACPI Processor-namnrymd '%2'
 ACPI System Bus	DeviceACPI		ACPI systembuss
@@ -28,7 +28,7 @@ Device name	DevicePCI		Enhetsnamn
 Device name:	Device		Enhetsnamn:
 Device paths	Device		Enhetssökväg
 Device paths	DevicePCI		Enhetssökväg
-Devices	Application name		Enheter
+Devices	System name		Enheter
 Devices	DevicesView		Enheter
 Display controller	Device		Skärmkontroller
 Docking station	Device		Dockningsstation

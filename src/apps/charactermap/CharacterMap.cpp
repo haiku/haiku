@@ -63,7 +63,7 @@ CharacterMap::AboutRequested()
 		NULL
 	};
 	
-	BAboutWindow about(B_TRANSLATE_APP_NAME("CharacterMap"), 2009, authors);
+	BAboutWindow about(B_TRANSLATE_SYSTEM_NAME("CharacterMap"), 2009, authors);
 	about.Show();
 }
 

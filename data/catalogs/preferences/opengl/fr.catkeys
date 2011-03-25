@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-OpenGL	1388143170
+1	french	x-vnd.Haiku-OpenGL	953276299
 Attributes stack size:	Capabilities		Taille de la pile d'attributs :
 Auxiliary buffer(s):	Capabilities		Tampon(s) auxilliaire(s) :
 Available	Extensions		Disponible
@@ -15,7 +15,7 @@ Max. convolution:	Capabilities		Convolution maximale :
 Max. lights:	Capabilities		Nombre d'éclairages maximum :
 Model stack size:	Capabilities		Taille de la pile de modèles :
 Name stack size:	Capabilities		Taille de la pile de noms :
-OpenGL	Application name		OpenGL
+OpenGL	System name		OpenGL
 OpenGL version:	InfoView		Version d'OpenGL :
 Projection stack size:	Capabilities		Taille de la pile de projection :
 Renderer name:	InfoView		Nom du moteur de rendu :

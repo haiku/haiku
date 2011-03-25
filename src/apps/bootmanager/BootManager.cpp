@@ -58,7 +58,7 @@ BootManager::AboutRequested()
 		NULL
 	};
 	
-	BAboutWindow about(B_TRANSLATE_APP_NAME("BootManager"), 2008, authors);
+	BAboutWindow about(B_TRANSLATE_SYSTEM_NAME("BootManager"), 2008, authors);
 	about.Show();
 }
 

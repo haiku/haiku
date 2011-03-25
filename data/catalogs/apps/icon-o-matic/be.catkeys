@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.haiku-icon_o_matic	276810363
+1	belarusian	x-vnd.haiku-icon_o_matic	2332620696
 <modify path>	Icon-O-Matic-PathCmd		<змяніць пуць>
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<няма чаго перарабляць>
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<няма чаго адмяняць>
@@ -76,7 +76,7 @@ Gradient	Icon-O-Matic-StyleTypes		Градыентны
 Gradient type	Icon-O-Matic-StyleTypes		Тып градыенту
 HVIF Source Code	Icon-O-Matic-SavePanel		Зыходны код HVIF
 Height	Icon-O-Matic-PropertyNames		Вышыня
-Icon-O-Matic	Application name		Рэдактар значкаў
+Icon-O-Matic	System name		Рэдактар значкаў
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon-O-Matic, магчыма, не дастаў усю інфармацыю з SVG файла падчас яго загрузкі. Пры перазапісу зыходнага файла гэтая інфармацыя будзе згублена.
 Insert Control Point	Icon-O-Matic-InsertPointCmd		Уставіць Кантрольную Кропку
 Invert selection	Icon-O-Matic-Properties		Інвертаваць выдзяленне

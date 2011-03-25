@@ -410,7 +410,7 @@ MainApp::MessageReceived(BMessage* message)
 void
 MainApp::AboutRequested()
 {
-	const char* appName = B_TRANSLATE_APP_NAME("MediaPlayer");
+	const char* appName = B_TRANSLATE_SYSTEM_NAME("MediaPlayer");
 	BString message = B_TRANSLATE("%app%\n\nWritten by Marcus Overhagen, "
 		"Stephan Aßmus and Frederik Modéen");
 	message.ReplaceFirst("%app%", appName);

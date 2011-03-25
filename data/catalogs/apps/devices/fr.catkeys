@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Devices	1465776728
+1	french	x-vnd.Haiku-Devices	1943893993
 ACPI Information	DeviceACPI		Informations ACPI
 ACPI Processor Namespace '%2'	DeviceACPI		Espace de nom ACPI du processeur « %2 »
 ACPI System Bus	DeviceACPI		Bus système ACPI
@@ -28,7 +28,7 @@ Device name	DevicePCI		Nom du périphérique
 Device name:	Device		Nom du périphérique :
 Device paths	Device		Chemin des périphériques
 Device paths	DevicePCI		Chemin des périphériques
-Devices	Application name		Périphériques
+Devices	System name		Périphériques
 Devices	DevicesView		Périphériques
 Display controller	Device		Contrôleur d'affichage
 Docking station	Device		Station d'accueil

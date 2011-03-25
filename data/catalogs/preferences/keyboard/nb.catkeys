@@ -1,9 +1,9 @@
-1	norwegian_bokmål	x-vnd.Haiku-Keyboard	1112507387
+1	norwegian_bokmål	x-vnd.Haiku-Keyboard	1711838804
 Defaults	KeyboardWindow		Standardinnstillinger
 Delay until key repeat	KeyboardView		Forsinkelse før tast repeteres
 Fast	KeyboardView		Rask
 Key repeat rate	KeyboardView		Repetisjonshastighet 
-Keyboard	Application name		Tastatur
+Keyboard	System name		Tastatur
 Long	KeyboardView		Lang
 OK	KeyboardApplication		OK
 Revert	KeyboardWindow		Tilbakestill

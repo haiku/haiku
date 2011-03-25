@@ -1,10 +1,10 @@
-1	russian	x-vnd.Haiku-ActivityMonitor	3275442606
+1	russian	x-vnd.Haiku-ActivityMonitor	2994145175
 %.1f KB/s	DataSource		%.1f Кбайт/с
 %.1f MB	DataSource		%.1f Мбайт
 %.1f faults/s	DataSource		%.1f ошибок/с
 %lld ms	SettingsWindow		%lld мс
 %lld sec.	SettingsWindow		%lld сек.
-ActivityMonitor	Application name		Монитор активности
+ActivityMonitor	System name		Монитор активности
 Add graph	ActivityWindow		Добавить график
 Additional items	ActivityView		Дополнительные графики
 Apps	DataSource		Приложения

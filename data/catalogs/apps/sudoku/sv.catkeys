@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Sudoku	2414949553
+1	swedish	x-vnd.Haiku-Sudoku	3821952338
 Abort	ProgressWindow		Avbryt
 About	Sudoku		Om
 About Sudoku…	SudokuWindow		Om Sudoku...
@@ -29,7 +29,7 @@ Snapshot current	SudokuWindow		Spara till senare
 Solve	SudokuWindow		Lös
 Solve single field	SudokuWindow		Lös ett fält
 Start again	SudokuWindow		Starta igen
-Sudoku	Application name		Sudoku
+Sudoku	System name		Sudoku
 Sudoku	Sudoku		Sudoku
 Sudoku request	SudokuWindow		Sudoku undrar
 Sudoku solved - congratulations!\n	SudokuWindow		Sudoku löst - grattis!\n

@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Shortcuts	1278045456
+1	belarusian	x-vnd.Haiku-Shortcuts	4103143985
 (Choose application with file requester)	ShortcutsWindow		(Выберыце праграму, якая патрабуе выбара файлу)
 *Beep	ShortcutsWindow		*Гудок
 *InsertString \"Your Text Here\"	ShortcutsWindow		*УставіцьСтраку \"Ваш Тэкст\"
@@ -47,7 +47,7 @@ Save KeySet as…	ShortcutsWindow		Захаваць KeySet як...
 Select	ShortcutsWindow		Выбраць
 SendMessage	ShortcutsSpec		АдаслацьПаведамленне
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
-Shortcuts	Application name		Гарачыя клавішы
+Shortcuts	System name		Гарачыя клавішы
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Рэдактар Гарачых Клавішаў не змог адкрыць ваш файл KeySet!
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Рэдактар Гарачых Клавішаў не змог разабраць ваш файл KeySet!
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Рэдактар Гарачых Клавішаў не змог захаваць ваш файл KeySet!

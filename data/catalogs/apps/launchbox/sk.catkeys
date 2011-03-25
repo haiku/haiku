@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-LaunchBox	3636680404
+1	slovak	x-vnd.Haiku-LaunchBox	1244694305
 About	LaunchBox		O aplikácii
 Add button here	LaunchBox		Pridať tlačidlo sem
 Auto-raise	LaunchBox		Automaticky aktivovať
@@ -15,7 +15,7 @@ Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Nepodaril
 Horizontal layout	LaunchBox		Vodorovné rozloženie
 Icon size	LaunchBox		Veľkosť ikon
 Ignore double-click	LaunchBox		Ignorovať dvojité kliknutie
-LaunchBox	Application name		Spúšťač
+LaunchBox	System name		Spúšťač
 Name Panel	LaunchBox		Panel Názov
 New	LaunchBox		Nový
 OK	LaunchBox		OK

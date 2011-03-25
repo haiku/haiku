@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Sounds	4239510521
+1	belarusian	x-vnd.Haiku-Sounds	3924145958
 <none>	HEventList		<няма>
 <none>	HWindow		<няма>
 About Sounds	SoundsHApp		Пра Гукі
@@ -11,7 +11,7 @@ Other…	HWindow		Іншы...
 Play	HWindow		Іграць
 Sound	HEventList		Гук
 Sound File:	HWindow		Аўдыё файл:
-Sounds	Application name		Гукі
+Sounds	System name		Гукі
 Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Гукі\n Аўтар :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n Першапачатковы аўтар - Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku
 Stop	HWindow		Стоп
 This is not an audio file.	HWindow		Гэта не аўдыё файл.

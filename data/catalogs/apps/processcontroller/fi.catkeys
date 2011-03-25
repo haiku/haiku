@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-ProcessController	1732034014
+1	finnish	x-vnd.Haiku-ProcessController	2887520383
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		© 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
 About ProcessController…	ProcessController		Ohjelmasta Prosessiohjain
 Cancel	ProcessController		Peru
@@ -23,7 +23,7 @@ Normal priority	ProcessController		Normaaliprioriteetti
 OK	ProcessController		Valmis
 Ok!	ProcessController		Valmis!
 Please confirm	ProcessController		Vahvista
-ProcessController	Application name		Prosessiohjain
+ProcessController	System name		Prosessiohjain
 ProcessController is already installed in Deskbar.	ProcessController		Prosessiohjain on jo asennettu Työpöytäpalkkiin.
 Processor %d	ProcessController		Prosessori %d
 Quit an application	ProcessController		Poistu sovelluksesta
