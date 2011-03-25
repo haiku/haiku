@@ -50,7 +50,7 @@ Revision History:
 extern COMMANDS_PROPERTIES CallTable[];
 
 
-static UINT8 ProcessCommandProperties(PARSER_TEMP_DATA STACK_BASED *	pParserTempData)
+UINT8 ProcessCommandProperties(PARSER_TEMP_DATA STACK_BASED *	pParserTempData)
 {
   UINT8 opcode=((COMMAND_HEADER*)pParserTempData->pWorkingTableData->IP)->Opcode;
   pParserTempData->pWorkingTableData->IP+=CallTable[opcode].headersize;
@@ -85,7 +85,7 @@ UINT16* GetCommandMasterTablePointer(DEVICE_DATA STACK_BASED*  pDeviceData)
 	return MasterTableOffset;
 }
 
-static UINT16* GetDataMasterTablePointer(DEVICE_DATA STACK_BASED*  pDeviceData)
+UINT16* GetDataMasterTablePointer(DEVICE_DATA STACK_BASED*  pDeviceData)
 {
 	UINT16		*MasterTableOffset;
 	
@@ -100,7 +100,7 @@ static UINT16* GetDataMasterTablePointer(DEVICE_DATA STACK_BASED*  pDeviceData)
 }
 
 
-static UINT8 GetTrueIndexInMasterTable(PARSER_TEMP_DATA STACK_BASED * pParserTempData, UINT8 IndexInMasterTable)
+UINT8 GetTrueIndexInMasterTable(PARSER_TEMP_DATA STACK_BASED * pParserTempData, UINT8 IndexInMasterTable)
 {
 #ifndef DISABLE_EASF
 	UINT16 i;
