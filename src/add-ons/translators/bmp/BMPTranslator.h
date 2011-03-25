@@ -67,8 +67,8 @@ struct BMPFileHeader {
 
 struct MSInfoHeader {
 	uint32 size;			// size of this struct (40)
-	uint32 width;			// bitmap width
-	uint32 height;			// bitmap height
+	int32 width;			// bitmap width
+	int32 height;			// bitmap height
 	uint16 planes;			// number of planes, always 1?
 	uint16 bitsperpixel;	// bits per pixel, (1,4,8,16, 24 or 32)
 	uint32 compression;		// type of compression
