@@ -82,8 +82,11 @@ Revision History:
 		typedef unsigned int		uintn_t;
 #endif
 #endif
+// HAIKU_ADDITION prevent silly Werror
+#if 0
 #ifndef FGL_LINUX
 #pragma warning ( disable : 4142 )
+#endif
 #endif
 
 
@@ -155,9 +158,11 @@ typedef unsigned long ULONG_PTR;
 
 //typedef	UINTN		CD_STATUS;
 
-
+// HAIKU_ADDITION prevent silly Werror
+#if 0
 #ifndef FGL_LINUX
 #pragma warning ( default : 4142 )
+#endif
 #endif
 #endif // _COMMON_TYPES_H_
 
