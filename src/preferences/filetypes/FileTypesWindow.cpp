@@ -345,10 +345,6 @@ FileTypesWindow::FileTypesWindow(const BMessage& settings)
 		new BMessage(kMsgOpenApplicationTypesWindow)));
 	menu->AddSeparatorItem();
 
-	menu->AddItem(new BMenuItem(B_TRANSLATE("About FileTypes" B_UTF8_ELLIPSIS),
-		new BMessage(B_ABOUT_REQUESTED)));
-	menu->AddSeparatorItem();
-
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Quit"),
 		new BMessage(B_QUIT_REQUESTED), 'Q', B_COMMAND_KEY));
 	menu->SetTargetForItems(be_app);

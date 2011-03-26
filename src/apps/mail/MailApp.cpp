@@ -145,32 +145,6 @@ TMailApp::~TMailApp()
 
 
 void
-TMailApp::AboutRequested()
-{
-	BString aboutText;
-	aboutText << B_TRANSLATE("Mail\n\n");
-	int titleLength = aboutText.Length();
-	aboutText << B_TRANSLATE(
-		"Written by Robert Polic.\n"
-		"Enhanced by the Dr. Zoidberg crew.\n\n"
-		"Copyright 1991-2001, Be Incorporated.\n"
-		"Copyright 2005-2010 Haiku, Inc.\n");
-	BAlert *alert = new BAlert("about", aboutText, B_TRANSLATE("OK"));
-	BTextView *view = alert->TextView();
-	BFont font;
-
-	view->SetStylable(true);
-
-	view->GetFont(&font);
-	font.SetSize(font.Size() + 7.0f);
-	font.SetFace(B_BOLD_FACE);
-	view->SetFontAndColor(0, titleLength, &font);
-
-	alert->Go();
-}
-
-
-void
 TMailApp::ArgvReceived(int32 argc, char **argv)
 {
 	BEntry entry;

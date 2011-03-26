@@ -7,7 +7,6 @@
 
 #include <stdio.h>
 
-#include <AboutWindow.h>
 #include <Catalog.h>
 #include <Entry.h>
 #include <Message.h>
@@ -101,17 +100,6 @@ App::MessageReceived(BMessage* message)
 			BApplication::MessageReceived(message);
 			break;
 	}
-}
-
-
-void
-App::AboutRequested()
-{
-	const char* authors[2];
-	authors[0] = B_TRANSLATE("Stephan Aßmus (aka stippi)");
-	authors[1] = NULL;
-	BString appName = B_TRANSLATE_SYSTEM_NAME("LaunchBox");
-	BAboutWindow(appName, 2004, authors).Show();
 }
 
 

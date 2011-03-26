@@ -1121,7 +1121,6 @@ CalcView::_CreatePopUpMenu()
 // preflet.
 //	fPopUpMenu->AddItem(fAudioFeedbackItem);
 	fPopUpMenu->AddItem(fShowKeypadItem);
-	fPopUpMenu->AddSeparatorItem();
 }
 
 

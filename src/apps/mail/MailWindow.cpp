@@ -301,12 +301,6 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 	fMenuBar->AddItem(menu);
 
 	menu->AddSeparatorItem();
-	menu->AddItem(item = new BMenuItem(
-		B_TRANSLATE("About Mail" B_UTF8_ELLIPSIS),
-		new BMessage(B_ABOUT_REQUESTED)));
-	item->SetTarget(be_app);
-
-	menu->AddSeparatorItem();
 	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Quit"),
 		new BMessage(B_QUIT_REQUESTED), 'Q'));
 	item->SetTarget(be_app);

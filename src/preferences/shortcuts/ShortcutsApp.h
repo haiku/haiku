@@ -18,7 +18,6 @@ public:
 							ShortcutsApp();
 							~ShortcutsApp();
 	virtual	void			ReadyToRun();
-	virtual	void			AboutRequested();
 };
 
 

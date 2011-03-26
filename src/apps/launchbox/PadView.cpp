@@ -425,10 +425,6 @@ PadView::DisplayMenu(BPoint where, LaunchButton* button) const
 	// app commands
 	BMenu* appM = new BMenu(B_TRANSLATE_SYSTEM_NAME("LaunchBox"));
 	appM->SetFont(be_plain_font);
-	// about
-	item = new BMenuItem(B_TRANSLATE("About"), new BMessage(B_ABOUT_REQUESTED));
-	item->SetTarget(be_app);
-	appM->AddItem(item);
 	// quit
 	item = new BMenuItem(B_TRANSLATE("Quit"), new BMessage(B_QUIT_REQUESTED));
 	item->SetTarget(be_app);

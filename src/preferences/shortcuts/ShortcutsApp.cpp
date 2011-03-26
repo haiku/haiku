@@ -10,14 +10,10 @@
 
 #include "ShortcutsApp.h"
 
-#include <Alert.h>
 #include <Catalog.h>
-#include <Locale.h>
 
 #include "ShortcutsWindow.h"
 
-
-#define APPLICATION_SIGNATURE "application/x-vnd.Haiku-Shortcuts"
 
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "ShortcutsApp"
@@ -25,7 +21,7 @@
 
 ShortcutsApp::ShortcutsApp()
 	:
-	BApplication(APPLICATION_SIGNATURE)
+	BApplication("application/x-vnd.Haiku-Shortcuts")
 {
 }
 
@@ -41,15 +37,3 @@ ShortcutsApp::ReadyToRun()
 ShortcutsApp::~ShortcutsApp()
 { 
 }
-
-
-void
-ShortcutsApp::AboutRequested()
-{
-	BAlert* alert = new BAlert(B_TRANSLATE("About Shortcuts"), 
-		B_TRANSLATE("Shortcuts\n\n"
-		"Based on SpicyKeys for BeOS made by Jeremy Friesner."),
-		B_TRANSLATE("OK"));
-	alert->Go();
-}
-

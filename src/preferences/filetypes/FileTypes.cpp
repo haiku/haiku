@@ -64,7 +64,6 @@ public:
 	virtual	void				ArgvReceived(int32 argc, char** argv);
 	virtual	void				MessageReceived(BMessage* message);
 
-	virtual	void				AboutRequested();
 	virtual	bool				QuitRequested();
 
 private:
@@ -413,29 +412,6 @@ FileTypes::MessageReceived(BMessage* message)
 			BApplication::MessageReceived(message);
 			break;
 	}
-}
-
-
-void
-FileTypes::AboutRequested()
-{
-	BString aboutText(B_TRANSLATE("FileTypes"));
-	int32 titleLength = aboutText.Length();
-	aboutText << "\n";
-	aboutText << B_TRANSLATE("\twritten by Axel Dörfler\n"
-		"\tCopyright 2006-2007, Haiku.\n");
-	BAlert* alert = new BAlert("about", aboutText.String(), B_TRANSLATE("OK"));
-	BTextView* view = alert->TextView();
-	BFont font;
-
-	view->SetStylable(true);
-
-	view->GetFont(&font);
-	font.SetSize(18);
-	font.SetFace(B_BOLD_FACE);
-	view->SetFontAndColor(0, titleLength, &font);
-
-	alert->Go();
 }
 
 

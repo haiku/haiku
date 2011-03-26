@@ -18,7 +18,6 @@ public:
 	virtual	bool				QuitRequested();
 	virtual	void				ReadyToRun();
 	virtual	void				MessageReceived(BMessage* message);
-	virtual	void				AboutRequested();
 	virtual	void				Pulse();
 
 private:

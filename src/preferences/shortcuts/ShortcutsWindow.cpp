@@ -121,9 +121,6 @@ ShortcutsWindow::ShortcutsWindow()
 		B_TRANSLATE("Save KeySet as" B_UTF8_ELLIPSIS), 
 		new BMessage(SAVE_KEYSET_AS), 'S'));
 	fileMenu->AddItem(new BSeparatorItem);
-	fileMenu->AddItem(new BMenuItem(B_TRANSLATE("About Shortcuts"),
-		new BMessage(B_ABOUT_REQUESTED)));
-	fileMenu->AddItem(new BSeparatorItem);
 	fileMenu->AddItem(new BMenuItem(B_TRANSLATE("Quit"),
 		new BMessage(B_QUIT_REQUESTED), 'Q'));
 	menuBar->AddItem(fileMenu);
@@ -536,10 +533,6 @@ ShortcutsWindow::MessageReceived(BMessage* msg)
 			}
 			break;
 		}
-
-		case B_ABOUT_REQUESTED:
-			be_app_messenger.SendMessage(B_ABOUT_REQUESTED);
-			break;
 
 		case ADD_HOTKEY_ITEM:
 			_AddNewSpec(NULL);

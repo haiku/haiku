@@ -252,9 +252,6 @@ MainWindow::MessageReceived(BMessage* message)
 		case B_PASTE:
 		case B_MODIFIERS_CHANGED:
 			break;
-		case B_ABOUT_REQUESTED:
-			be_app->PostMessage(message);
-			break;
 		default:
 			BWindow::MessageReceived(message);
 			break;

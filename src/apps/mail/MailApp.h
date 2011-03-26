@@ -54,7 +54,6 @@ class TMailApp : public BApplication {
 								TMailApp();
 		virtual					~TMailApp();
 
-		virtual	void			AboutRequested();
 		virtual	void			ArgvReceived(int32, char**);
 		virtual	void			MessageReceived(BMessage*);
 		virtual	bool			QuitRequested();
