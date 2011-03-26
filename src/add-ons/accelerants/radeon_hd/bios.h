@@ -15,3 +15,8 @@ extern "C" {
 #include "CD_Definitions.h"
 #include "atombios.h"
 }
+
+
+status_t AtomParser(void *parameterSpace, uint8_t index,
+	void *handle, void *biosBase);
+

@@ -26,13 +26,13 @@
 
 
 status_t
-AtomBiosParser(void *pspace, uint8_t index, void *handle, void *BIOSBase)
+AtomParser(void *parameterSpace, uint8_t index, void *handle, void *biosBase)
 {
 	DEVICE_DATA deviceData;
 
-	deviceData.pParameterSpace = (UINT32*)pspace;
+	deviceData.pParameterSpace = (UINT32*)parameterSpace;
 	deviceData.CAIL = handle;
-	deviceData.pBIOS_Image = (UINT8*)BIOSBase;
+	deviceData.pBIOS_Image = (UINT8*)biosBase;
 	deviceData.format = TABLE_FORMAT_BIOS;
 
 	switch (ParseTable(&deviceData, index)) {
