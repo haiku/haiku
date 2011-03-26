@@ -71,7 +71,7 @@ Search backwards	FindandReplaceWindow		Etsi taaksepäin
 Select all	Menus		Valitse kaikki
 Size	Menus		Koko
 Statistics…	Menus		Tilastot...
-StyledEdit	System name		Tyylieditori
+StyledEdit	System name		Tyylitetty editori
 This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Tämä tiedosto on merkitty kirjoitussuojatuksi. Tallennetaanko muutokset asiakirjaan ”%s”? 
 Undo typing	QuitAlert		Peru kirjoitus
 Untitled 	StyledEditWindow		Otsikoton 

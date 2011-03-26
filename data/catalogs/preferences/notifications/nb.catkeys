@@ -16,8 +16,8 @@ Large icon	DisplayView		Stort ikon
 Last Received	NotificationView		Sist mottatt
 Mini icon	DisplayView		Mini-ikon
 No	NotificationView		Nei
-Notifications	System name		Meldinger
 Notifications	GeneralView		Meldinger
+Notifications	System name		Meldinger
 OK	DisplayView		OK
 OK	GeneralView		OK
 OK	NotificationView		OK

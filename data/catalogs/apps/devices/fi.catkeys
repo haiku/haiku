@@ -28,8 +28,8 @@ Device name	DevicePCI		Laitenimi
 Device name:	Device		Laitenimi:
 Device paths	Device		Laitepolut
 Device paths	DevicePCI		Laitepolut
-Devices	System name		Laitteet
 Devices	DevicesView		Laitteet
+Devices	System name		Laitteet
 Display controller	Device		Näyttöohjain
 Docking station	Device		Telakka-asema
 Driver used	Device		Käytetty laite

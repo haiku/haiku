@@ -1,13 +1,11 @@
-1	norwegian_bokmål	x-vnd.Haiku.TextSearch	2895782387
+1	norwegian_bokmål	x-vnd.Haiku.TextSearch	627370365
 %APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME kunne ikke åpne én eller flere mapper.
 %s: There was a problem running grep.	Grepper		%s: Det var et problem under kjøring av grep
-About TextSearch…	GrepWindow		Om Tekstsøk...
 Actions	GrepWindow		Handlinger
 Cancel	GrepWindow		Avbryt
 Case-sensitive	GrepWindow		Skill mellom store og små bokstaver
 Close	GrepWindow		Lukk
 Copy text to clipboard	GrepWindow		Kopier tekst til utklippstavle
-Created by Matthijs Hollemans.\n\nContributed to by Peter Hinely, Serge Fantino, Hideki Naito, Oscar Lesta, Oliver Tappe, Jonas Sundström, Luc Schrijvers and momoziro.\n	GrepWindow		Laget av Matthijs Hollemans.\n\nBidrag fra Peter Hinely, Serge Fantino, Hideki Naito, Oscar Lesta, Oliver Tappe, Jonas Sundström, Luc Schrijvers og momoziro.\n
 Encoding	GrepWindow		Koding
 File	GrepWindow		Fil
 Follow symbolic links	GrepWindow		Følg symbolske lenker

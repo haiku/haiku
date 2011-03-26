@@ -26,8 +26,8 @@ Print test page	PrintersWindow		Tulosta testisivu
 Printer name:	AddPrinterDialog		Tulostinnimi:
 Printer type:	AddPrinterDialog		Tulostintyyppi:
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Tulostin: %printer_name%\nAjuri: %driver%\n
-Printers	System name		Tulostinasetukset
 Printers	PrintersWindow		Tulostimet
+Printers	System name		Tulostinasetukset
 Processing	JobListView		Käsitellään
 Red	TestPageView		Punainen
 Remove	PrintersWindow		Poista

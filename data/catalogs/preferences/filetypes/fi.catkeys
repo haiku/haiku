@@ -70,8 +70,8 @@ File	FileTypes Window		Tiedosto
 File could not be opened	Preferred App Menu		Tiedostoa ei voitu avata
 File recognition	FileTypes Window		Tiedostotunnistus
 File type	FileType Window		Tiedostotyyppi
-FileTypes	System name		Tiedostotyypit
 FileTypes	FileTypes		Tiedostotyypit
+FileTypes	System name		Tiedostotyyppiasetukset
 FileTypes request	FileTypes		Tiedostotyyppien pyyntö
 FileTypes request	FileTypes Window		Tiedostotyyppien pyyntö
 FileTypes request	Preferred App Menu		Tiedostotyyppien pyyntö
@@ -137,7 +137,7 @@ Set Preferred Application	Preferred App Menu		Aseta ensisijainen sovellus
 Settings	FileTypes Window		Asetukset
 Short description:	Application Type Window		Lyhyt kuvaus:
 Show icons in list	FileTypes Window		Näytä kuvakkeet luettelossa
-Show in Tracker…	Application Types Window		Näitä Seuraajassa...
+Show in Tracker…	Application Types Window		Näytä Seuraajassa...
 Show recognition rule	FileTypes Window		Näytä tunnistussääntö
 Signature:	Application Type Window		Allekirjoitus:
 Signature:	Application Types Window		Allekirjoitus:

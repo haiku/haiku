@@ -77,7 +77,7 @@ Switch Terminals	Terminal TermWindow		Vaihda pääteikkunoita
 Tab title:	Terminal AppearancePrefView		Välilehtiotsikko:
 Tab title:	Terminal TermWindow		Välilehtiotsikko:
 Terminal	System name		Pääteikkuna
-Terminal couldn't start the shell. Sorry.	Terminal TermApp		Pääteikkuna ei voinut valitettavasti käynnistää komentotulkkia.
+Terminal couldn't start the shell. Sorry.	Terminal TermApp		Pääteikkuna ei voinut käynnistää komentotulkkia.
 Terminal\n\nwritten by Kazuho Okui and Takashi Murai\nupdated by Kian Duffy and others\n\nCopyright ©2003-2009, Haiku.\n	Terminal TermView		Pääteikkuna\n\ntekijät: Kazuho Okui ja Takashi Murai\npäivittänyt: Kian Duffy ja muut\n\nCopyright ©2003-2009, Haiku.\n
 Text	Terminal AppearancePrefView		Teksti
 Text encoding	Terminal TermWindow		Tekstikoodaus

@@ -13,7 +13,7 @@ Gateway:	EthernetSettingsView		Yhdyskäytävä:
 IP address:	EthernetSettingsView		IP-osoite:
 Mode:	EthernetSettingsView		Tila:
 Netmask:	EthernetSettingsView		Verkkopeite:
-Network	System name		Verkkoasetukset
+Network	System name		Verkkotila-asetukset
 Network:	EthernetSettingsView		Verkko:
 OK	EthernetSettingsView		Valmis
 Revert	EthernetSettingsView		Palauta

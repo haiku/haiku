@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.haiku-icon_o_matic	3720512589
+1	norwegian_bokmål	x-vnd.haiku-icon_o_matic	3636943750
 <modify path>	Icon-O-Matic-PathCmd		<endre sti>
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<ingenting å omgjøre>
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<ingenting å angre på>
@@ -45,6 +45,7 @@ Color	Icon-O-Matic-StyleTypes		Farge
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Farge (#%02x%02x%02x)
 Color (#%02x%02x%02x)	Style name after dropping a color		Farge (#%02x%02x%02x)
 Conic	Icon-O-Matic-StyleTypes		Kjeglesnitt
+Contour	Transformation		Kontur
 Copy	Icon-O-Matic-Properties		Kopier
 Diamond	Icon-O-Matic-StyleTypes		Diamant
 Discard	Icon-O-Matic-Main		Forkast
@@ -68,6 +69,7 @@ Gradient	Icon-O-Matic-StyleTypes		Gradient
 Gradient type	Icon-O-Matic-StyleTypes		Gradient-type
 HVIF Source Code	Icon-O-Matic-SavePanel		HVIF-kildekode
 Height	Icon-O-Matic-PropertyNames		Høyde
+Icon-O-Matic	System name		Icon-O-Matic
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Det kan være Icon-O-Matic ikke fikk tolket alle data fra SVG når den ble lastet. Ved å overskrive den orginale filen, vil denne informasjonen bli tapt.
 Insert Control Point	Icon-O-Matic-InsertPointCmd		Sett inn kontrollpunkt
 Linear	Icon-O-Matic-StyleTypes		Linær
@@ -103,6 +105,7 @@ Paste Properties	Icon-O-Matic-Properties		Lim inn egenskaper
 Path	Icon-O-Matic-Menus		Sti
 Path	Icon-O-Matic-PropertyNames		Sti
 Perspective	Icon-O-Matic-TransformersList		Perspektiv
+Perspective	Transformation		Perspektiv
 Pick a color	Icon-O-Matic-ColorPicker		Velg en farge
 Properties	Icon-O-Matic-Menus		Egenskaper
 Quit	Icon-O-Matic-Menu-File		Avslutt

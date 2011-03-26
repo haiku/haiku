@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-MediaPlayer	1156122135
+1	norwegian_bokmål	x-vnd.Haiku-MediaPlayer	1829531264
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Amerikansk)
 100% scale	MediaPlayer-Main		100% skalert
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
@@ -94,7 +94,6 @@ Start playing.	MediaPlayer-Main		Start avspilling.
 Stop	MediaPlayer-Main		Stopp
 Stop playing.	MediaPlayer-Main		Stopp avspilling
 Subtitles	MediaPlayer-Main		Teksting
-Thanks	MediaPlayer-Main		Takk
 The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Filen '%filename' kunne ikke åpnes.\n\n
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Det var ingen dekoder installert til å håndtere filformatet, eller så har dekoderen problemer med den spesifikke versjonen av formatet.
 Toggle mute.	MediaPlayer-Main		Lydløs

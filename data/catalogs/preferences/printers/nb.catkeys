@@ -25,14 +25,14 @@ Print jobs: No printer selected	PrintersWindow		Utskriftsjobber: Ingen skriver e
 Print test page	PrintersWindow		Skriv ut testside
 Printer name:	AddPrinterDialog		Printernavn:
 Printer type:	AddPrinterDialog		Skrivertype:
-Printers	System name		Skrivere
 Printers	PrintersWindow		Skrivere
+Printers	System name		Skrivere
 Processing	JobListView		Behandler
 Red	TestPageView		Rød
 Remove	PrintersWindow		Fjern
 Restart job	PrintersWindow		Start utskrift på nytt
 Test Page	PrintersWindow		Test side
-Test Page	TestPageView		Test side
+Test Page	TestPageView		Testside
 Unknown status	JobListView		Ukjent status
 Waiting	JobListView		Venter
 Yellow	TestPageView		Gul

@@ -1,1 +1,20 @@
-1	norwegian_bokmål	x-vnd.Haiku-Sudoku	0
+1	norwegian_bokmål	x-vnd.Haiku-Sudoku	2334644121
+Abort	ProgressWindow		Avbryt
+Advanced	SudokuWindow		Avansert
+Copy	SudokuWindow		Kopier
+Could not open \"%s\":\n%s\n	SudokuWindow		Kunne ikke åpne \"%s\":\n%s\n
+Easy	SudokuWindow		Lett
+Export as…	SudokuWindow		Eksporter som...
+File	SudokuWindow		Fil
+HTML	SudokuWindow		HTML
+Hard	SudokuWindow		Vanskelig
+Help	SudokuWindow		Hjelp
+New	SudokuWindow		Ny
+OK	SudokuWindow		OK
+Open file…	SudokuWindow		Åpne fil...
+Quit	SudokuWindow		Avslutt
+Start again	SudokuWindow		Start på nytt
+Sudoku	System name		Sudoku
+Text	SudokuWindow		Tekst
+Undo	SudokuWindow		Tilbakestill
+View	SudokuWindow		Vis

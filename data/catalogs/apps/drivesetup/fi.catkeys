@@ -29,7 +29,7 @@ Device	DiskView		Laite
 Device	PartitionList		Laite
 Disk	MainWindow		Levy
 Disk system \"%s\"\" not found!	MainWindow		Levyjärjestelmää ”%s” ei löytynyt!
-DriveSetup	System name		Levyasema-asetus
+DriveSetup	System name		Levyasema-asetukset
 Eject	MainWindow		Poista asemasta
 End: %ld MB	Support		Loppu: %ld mebitavua
 Error: 	MainWindow	in any error alert	Virhe: 

@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-StyledEdit	2661020133
+1	norwegian_bokmål	x-vnd.Haiku-StyledEdit	548562865
 ???	LoadAlert		???
 Align	Menus		Juster
 Black	Menus		Svart
@@ -71,6 +71,7 @@ Search backwards	FindandReplaceWindow		Søk bakover
 Select all	Menus		Merk alle
 Size	Menus		Størrelse
 Statistics…	Menus		Statistikk...
+StyledEdit	System name		StyledEdit
 This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Filen er merket som skrivebeskyttet. Lagre endringer i dokumentet \"%s\"?
 Undo typing	QuitAlert		Angre skriving
 Untitled 	StyledEditWindow		Uten navn

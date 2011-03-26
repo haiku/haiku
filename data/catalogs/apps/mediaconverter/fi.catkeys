@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-MediaConverter	3607188411
+1	finnish	x-vnd.Haiku-MediaConverter	424866547
 %.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld kanava / %lld kehystä
 %.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz mono / %lld kehystä
 %.1f kHz stereo / %lld frames	MediaFileInfo		%.1f kHz stereo / %lld kehystä
@@ -6,7 +6,6 @@
 %d bit 	MediaFileInfo		%d bitti
 %d byte 	MediaFileInfo		%d tavu
 %u x %u, %.2ffps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%u x %u, %.2f kehystä per sekunti / %Ld kehystä
-About…	MediaConverter		Ohjelmasta...
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Tapahtui virhe luettaessa tiedostotietoja.\n\nVirhe :
 Audio encoding:	MediaConverter		Äänikoodaus:
 Audio quality not supported	MediaConverter		Äänen laatua ei tueta
@@ -41,7 +40,6 @@ High	MediaConverter		Korkea
 Low	MediaConverter		Alhainen
 MediaConverter	System name		Mediamuunnin
 MediaConverter+:SaveDirectory	MediaConverter		Mediamuunnin+:Tallenna hakemisto
-MediaConverter\n1.3.0\n© 1999, Be Incorporated.\n© 2000-2004 Jun Suzuki\n© 2007 Stephan Aßmus\n© 2010 Haiku, Inc.	MediaConverter		Mediamuunnin\n1.3.0\n© 1999, Be Incorporated.\n© 2000-2004 Jun Suzuki\n© 2007 Stephan Aßmus\n© 2010 Haiku, Inc.
 No audio	Audio codecs list		Ei ääntä
 No file selected	MediaConverter-FileInfo		Ei tiedostoa valittuna
 No video	Video codecs list		Ei videota

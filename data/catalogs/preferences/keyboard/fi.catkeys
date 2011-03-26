@@ -3,7 +3,7 @@ Defaults	KeyboardWindow		Oletukset
 Delay until key repeat	KeyboardView		Näppäimen toistoviive
 Fast	KeyboardView		Nopea
 Key repeat rate	KeyboardView		Näppäintoistotaajuus
-Keyboard	System name		Näppäimistö
+Keyboard	System name		Näppäimistöasetukset
 Long	KeyboardView		Pitkä
 OK	KeyboardApplication		Valmis
 Revert	KeyboardWindow		Palauta

@@ -26,9 +26,9 @@ Large icon	DisplayView		Suuri kuvake
 Last Received	NotificationView		Viimeksi vastaanotettu
 Mini icon	DisplayView		Minikuvake
 No	NotificationView		Ei
-Notifications	System name		Ilmoitusasetukset
 Notifications	GeneralView		Ilmoitukset
 Notifications	NotificationView		Ilmoitukset
+Notifications	System name		Ilmoitusasetukset
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Ilmoituksia ei voi pysäyttää, koska palvelinta ei tavoiteta.
 OK	DisplayView		Valmis
 OK	GeneralView		Valmis

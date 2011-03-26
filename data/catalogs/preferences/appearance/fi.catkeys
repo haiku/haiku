@@ -2,7 +2,7 @@
 Antialiasing	APRWindow		Reunanpehmennys
 Antialiasing menu	AntialiasingSettingsView		Reunanpehmennysvalikko
 Antialiasing type:	AntialiasingSettingsView		Reunanpehmennystapa:
-Appearance	System name		Ulkoasu
+Appearance	System name		Ulkoasuasetukset
 Colors	APRWindow		Värit
 Control background	Colors tab		Kontrollin tausta
 Control border	Colors tab		Kontrollin reuna

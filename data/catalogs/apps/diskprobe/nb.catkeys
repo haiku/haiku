@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-DiskProbe	3053604451
+1	norwegian_bokmål	x-vnd.Haiku-DiskProbe	356088826
 15 bit	TypeEditors		15-bit
 16 bit	TypeEditors		16 bit
 16 bit signed value:	TypeEditors		16-bit verdi med fortegn:
@@ -13,7 +13,6 @@
 8 bit palette	TypeEditors		8-bit palett
 8 bit signed value:	TypeEditors		8-bit verdi med fortegn
 8 bit unsigned value:	TypeEditors		8-bit verdi uten fortegn
-About DiskProbe…	FileWindow		Om Diskinspektør
 Add	ProbeView		Legg til
 Attribute	AttributeWindow		Attributt
 Attribute	ProbeView		Attributt

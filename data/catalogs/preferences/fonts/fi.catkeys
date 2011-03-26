@@ -2,8 +2,8 @@
 Bold font:	Font view		Lihavoitu kirjasin:
 Defaults	Main window		Oletusasetukset
 Fixed font:	Font view		Kiinteävälinen kirjasin:
-Fonts	System name		Kirjasimet
-Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Kirjasimet\n\tCopyright 2004-2005, Haiku.\n\n
+Fonts	System name		Kirjasinasetukset
+Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Kirjasinasetukset\n\tCopyright 2004-2005, Haiku.\n\n
 Menu font:	Font view		Valikkokirjasin:
 OK	main		Valmis
 Plain font:	Font view		Tavallinen kirjasin:

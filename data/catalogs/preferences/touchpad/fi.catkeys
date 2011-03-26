@@ -14,7 +14,7 @@ Scrolling	TouchpadPrefView		Vieritys
 Slow	TouchpadPrefView		Hidas
 Tap click sensitivity	TouchpadPrefView		Napautusnapsausherkkyys
 Tap gesture	TouchpadPrefView		Napautusele
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Uusi vieritysalue on hyvin laaja ja saattaa haitata normaala hiiritoimintaa. Haluatko todella vaihtaa sen?
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Uusi vieritysalue on hyvin laaja ja saattaa haitata normaalia hiiritoimintaa. Haluatko todella vaihtaa sen?
 Touchpad	System name		Levyhiiri
 Two finger scrolling	TouchpadPrefView		Kaksisormivieritys
 Vertical scroll speed	TouchpadPrefView		Pystysuora vierintänopeus

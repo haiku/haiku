@@ -28,8 +28,8 @@ Device name	DevicePCI		Enhetsnavn
 Device name:	Device		Enhetsnavn:
 Device paths	Device		Enhetsti
 Device paths	DevicePCI		Enhetsstier
-Devices	System name		Maskinvare
 Devices	DevicesView		Enheter
+Devices	System name		Maskinvare
 Display controller	Device		Skjermkontroller
 Docking station	Device		Dokkingstasjon
 Driver used	Device		Driver brukt

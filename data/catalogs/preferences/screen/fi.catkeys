@@ -23,13 +23,13 @@ Hz	Screen		Hz
 Keep	Screen		Pidä
 OK	Screen		Valmis
 Other…	Screen		Muut...
-Refresh rate	Screen		virkistystaajuus
+Refresh rate	Screen		Virkistystaajuus
 Refresh rate:	Screen		Virkistystaajuus:
 Resolution:	Screen		Erottelukyky:
 Revert	Screen		Palauta
 Rows:	Screen		Rivit:
-Screen	System name		Näyttöasetukset
 Screen	Screen		Näyttö
+Screen	System name		Näyttöasetukset
 Screen preferences by the Haiku team	Screen		Haiku-ryhmän näyttöasetukset
 Set background…	Screen		Aseta tausta...
 Settings will revert in %seconds seconds.	Screen		Asetukset palautuvat %seconds sekunnissa

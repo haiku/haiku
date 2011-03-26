@@ -1,6 +1,5 @@
-1	finnish	x-vnd.Haiku-MediaPlayer	1172481650
+1	finnish	x-vnd.Haiku-MediaPlayer	3334593067
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% kohtasi sisäisen virheen. Tiedostoa ei kyetty avaamaan.
-%app%\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		%app%\n\nTekijät: Marcus Overhagen, Stephan Aßmus ja Frederik Modéen
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerikkalainen)
 100% scale	MediaPlayer-Main		100 % skaala
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
@@ -118,7 +117,6 @@ Stream settings	MediaPlayer-Main		Virta-asetukset
 Subtitle placement:	MediaPlayer-SettingsWindow		Aliotsikon sijainti:
 Subtitle size:	MediaPlayer-SettingsWindow		Aliotsikkokoko:
 Subtitles	MediaPlayer-Main		Aliotsakkeet
-Thanks	MediaPlayer-Main		Kiitokset
 The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Tiedostoa ’%filename’ ei voitu avata.\n\n
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Tätä tiedostomuotoa käsittelevää dekooderia ei ole asennettu, tai dekooderilla on vaikeuksia tietyn muotoversion kanssa.
 Toggle mute.	MediaPlayer-Main		Vuorottele mykistystilaa

@@ -1,5 +1,4 @@
-1	finnish	x-vnd.Haiku.TV	2815571176
-About %1…	MainWin	Parameter %1 is the name of the application.	Ohjelmasta %1
+1	finnish	x-vnd.Haiku.TV	1995288111
 Always on top	MainWin		Aina päällimmäisenä
 Channel	MainWin		Kanava
 DVB - Digital Video Broadcasting TV	MainWin		DVB - Digitaalinen videolähetystv
@@ -16,14 +15,11 @@ None	MainWin		Ei mitään
 OK	MainWin		Valmis
 Previous channel	MainWin		Edellinen kanava
 Quit	MainWin		Poistu
-Scale to native size	MainWin		Skaalaa kotoperäiseen kokoon
+Scale to native size	MainWin		Skaalaa alkuperäiseen kokoon
 Settings	MainWin		Asetukset
 Settings…	MainWin		Asetukset...
-TV	System name		TV
 TV	MainWin		TV
-\nBuild 	MainWin		\nRakennettu
-\nRevision 	MainWin		\nKorjausversio
-\nVersion 	MainWin		\nVersio
+TV	System name		TV
 force 544 x 576, display aspect 4:3	MainWin		pakota 544 x 576, näytön kuvasuhde 4:3
 force 704 x 576, display aspect 4:3	MainWin		pakota 704 x 576, näytön kuvasuhde 4:3
 force 720 x 576, display aspect 4:3	MainWin		pakota 730 x 576, näytön kuvasuhde 4:3

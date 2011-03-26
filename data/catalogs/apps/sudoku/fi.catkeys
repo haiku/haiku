@@ -1,7 +1,5 @@
-1	finnish	x-vnd.Haiku-Sudoku	3821952338
+1	finnish	x-vnd.Haiku-Sudoku	2463385585
 Abort	ProgressWindow		Keskeytä
-About	Sudoku		Ohjelmasta
-About Sudoku…	SudokuWindow		Ohjelmasta Sudoku...
 Advanced	SudokuWindow		Guru
 Blank	SudokuWindow		Tyhjä
 Copy	SudokuWindow		Kopioi
@@ -17,7 +15,6 @@ Help	SudokuWindow		Opaste
 Mark invalid values	SudokuWindow		Merkitse väärät arvot
 Mark valid hints	SudokuWindow		Merkitse kelvolliset vihjeet
 New	SudokuWindow		Uusi
-OK	Sudoku		Valmis
 OK	SudokuWindow		Valmis
 Open file…	SudokuWindow		Avaa tiedosto...
 Progress monitor	ProgressWindow		Edistymisvalvonta
@@ -30,10 +27,8 @@ Solve	SudokuWindow		Ratkaise
 Solve single field	SudokuWindow		Ratkaise yksi kenttä
 Start again	SudokuWindow		Aloita uudelleen
 Sudoku	System name		Sudoku
-Sudoku	Sudoku		Sudoku
 Sudoku request	SudokuWindow		Sudoku-pyyntö
 Sudoku solved - congratulations!\n	SudokuWindow		Sudoku ratkaistu - onneksi olkoon!\n
-Sudoku\n\twritten by Axel Dörfler\n\tCopyright 2007, Haiku Inc.\n	Sudoku		Sudoku\n\ttekijä: Axel Dörfler\n\tCopyright 2007, Haiku Inc.\n
 Text	SudokuWindow		Teksti
 Undo	SudokuWindow		Peru
 View	SudokuWindow		Näkymä

@@ -1,34 +1,78 @@
-1	norwegian_bokmål	x-vnd.Haiku-CharacterMap	4013985301
+1	norwegian_bokmål	x-vnd.Haiku-CharacterMap	4276494503
 Alphabetic presentation forms	UnicodeBlocks		Alfabetiske presentasjonsformer
+Ancient Greek musical notation	UnicodeBlocks		Gammelgresk musikknotasjon
 Arabic	UnicodeBlocks		Arabisk
+Arabic presentation forms A	UnicodeBlocks		Arabisk presentasjonsformat-A
+Arabic supplement	UnicodeBlocks		Arabisk supplement
 Armenian	UnicodeBlocks		Armensk
 Arrows	UnicodeBlocks		Piler
 Balinese	UnicodeBlocks		Balinesisk 
+Basic Latin	UnicodeBlocks		Latin (enkel)
 Bengali	UnicodeBlocks		Bengalsk
+Block elements	UnicodeBlocks		Blokkelementer
 Box drawing	UnicodeBlocks		Bokstegning
-CharacterMap	System name		Tegntabell
+Buginese	UnicodeBlocks		Buginesisk
+Byzantine musical symbols	UnicodeBlocks		Bysantinske musikksymboler
+Cham	UnicodeBlocks		Cham
+CharacterMap	System name		Tegnkart
+Cherokee	UnicodeBlocks		Cherokee
 Code	CharacterWindow		Kode
 Coptic	UnicodeBlocks		Koptisk
+Cuneiform	UnicodeBlocks		Kileskrift
 Currency symbols	UnicodeBlocks		Valutasymboler
 Cyrillic	UnicodeBlocks		Kyrillisk
+Cyrillic supplement	UnicodeBlocks		Kyrillisk supplement
+Devanagari	UnicodeBlocks		Devangari
+Dingbats	UnicodeBlocks		Dingbats
 Domino tiles	UnicodeBlocks		Dominobrikker
 Ethiopic	UnicodeBlocks		Etiopisk
 File	CharacterWindow		Fil
 Filter:	CharacterWindow		Filter:
 Font	CharacterWindow		Font
 Font size:	CharacterWindow		Skriftstørrelse:
+General punctuation	UnicodeBlocks		Generell tegnsetting
 Geometric shapes	UnicodeBlocks		Geometriske former
 Georgian	UnicodeBlocks		Georgisk
+Georgian supplement	UnicodeBlocks		Georgisk supplement
+Glagotic	UnicodeBlocks		Glagolittisk
 Gothic	UnicodeBlocks		Gotisk
 Greek and Coptic	UnicodeBlocks		Gresk og koptisk
+Greek extended	UnicodeBlocks		Gresk (utvidet)
+Gujarati	UnicodeBlocks		Gujarati
 Hebrew	UnicodeBlocks		Hebraisk
+Hiragana	UnicodeBlocks		Hiragana
+IPA extensions	UnicodeBlocks		IPA-utvidelser
+Katakana	UnicodeBlocks		Katakana
+Katakana phonetic extensions	UnicodeBlocks		Katakana fonetiske utvidelser
+Kharoshthi	UnicodeBlocks		Kharosthi
 Khmer	UnicodeBlocks		Khmer
 Khmer symbols	UnicodeBlocks		Khmer-symboler
+Latin extended A	UnicodeBlocks		Latin (utvidet A)
+Latin extended B	UnicodeBlocks		Latin (utvidet B)
+Latin extended D	UnicodeBlocks		Latin (utvidet D)
+Latin-1 supplement	UnicodeBlocks		Latin-1 tillegg
+Letterlike symbols	UnicodeBlocks		Bokstavlignende symboler
+Linear B ideograms	UnicodeBlocks		Linear B-ideogramer
+Mahjong tiles	UnicodeBlocks		Mahjong-brikker
 Mathematical alphanumeric symbols	UnicodeBlocks		Matematiske alfanumeriske symboler
+Mathematical operators	UnicodeBlocks		Matematiske operatorer
+Miscellaneous mathematical symbols A	UnicodeBlocks		Diverse matematiske symboler A
 Miscellaneous symbols	UnicodeBlocks		Diverse symboler
 Miscellaneous symbols and arrows	UnicodeBlocks		Diverse symboler og piler
-Miscellaneous technical	UnicodeBlocks		Diverse teknisk
+Miscellaneous technical	UnicodeBlocks		Diverse tekniske tegn
 Mongolian	UnicodeBlocks		Mongolsk
+Myanmar	UnicodeBlocks		Burmesisk
+Ol Chiki	UnicodeBlocks		Ol chiki
+Phaistos disc	UnicodeBlocks		Festosdisken
+Phoenician	UnicodeBlocks		Fønikisk
+Phonetic extensions	UnicodeBlocks		Fonetiske utvidelser
 Quit	CharacterWindow		Avslutt
 Runic	UnicodeBlocks		Runer
+Show private blocks	CharacterWindow		Vis private blokker
+Sundanese	UnicodeBlocks		Sundanesisk
+Supplemental arrows A	UnicodeBlocks		Piler supplement A
+Syriac	UnicodeBlocks		Syrisk
+Tagalog	UnicodeBlocks		Tagalog
+Tagbanwa	UnicodeBlocks		Tagbanwa
+Tamil	UnicodeBlocks		Tamilsk
 View	CharacterWindow		Vis

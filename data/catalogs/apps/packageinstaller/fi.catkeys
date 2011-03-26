@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-PackageInstaller	3608009980
+1	finnish	x-vnd.Haiku-PackageInstaller	2979335347
 %.1f GiB	PackageView		%.1f gibitavua
 %.1f KiB	PackageView		%.1f kibitavua
 %.1f MiB	PackageView		%.1f mebitavua
@@ -33,11 +33,9 @@ No installation type selected	PackageView		Asennustyyppiä ei ole valittu
 No package available.	PackageInfo		Pakettia ei ole saatavilla.
 No package selected.	PackageInfo		Yhtään pakettia ei ole valittu.
 OK	PackageView		Valmis
-OK	Packageinstaller main		Valmis
 Other…	PackageView		Muut...
 Package installer	PackageView		Paketin asennusohjelma
-PackageInstaller	System name		Pakettiasennusohjelma
-PackageInstaller\nBeOS legacy .pkg file installer for Haiku.\n\nCopyright 2007,\nŁukasz 'Sil2100' Zemczak\n\nCopyright (c) 2007 Haiku, Inc. \n	Packageinstaller main		Pakettiasennusohjelma\nAlkuperäisen BeOS .pkg -tiedoston asennusohjelma Haikulle.\n\nCopyright 2007,\nŁukasz ’Sil2100’ Zemczak\n\nCopyright (c) 2007 Haiku, Inc. \n
+PackageInstaller	System name		Pakettiasennus
 Preparing package	PackageInstall		Valmistellaan pakettia
 Replace	PackageView		Korvaa
 Running post-installation scripts	PackageInstall		Suoritetaan jälkiasennusskriptit
@@ -50,7 +48,7 @@ The installation of the package has been aborted.	PackageView		Paketin asennus o
 The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Kohde nimeltään ’%s’ on jo olemassa annetussa polussa.\nKorvataanko kohde vastaavalla tästä paketista vai ohitetaanko se?
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Pakettitiedostoa ei kyetä lukemaan.\nYksi mahdollinen syy saattaa olla, että pyydetty tiedosto ei ole kelvollinen BeOS .pkg -paketti.
 The package you requested has been successfully installed on your system.	PackageView		Pyytämäsi paketti on asennettu järjestelmääsi onnistuneesti.
-The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Pyydetyn paketin asentaminen järjestelmääsi epäonnistui. Tämä saattaa johtua kohdepakkaustiedoston pulmasta. Ota yhteyttä tässä asiassa pakettijakelijaan.
+The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Pyydetyn paketin asentaminen järjestelmääsi epäonnistui. Tämä saattaa johtua kohdepakettitiedoston pulmasta. Ota yhteyttä tässä asiassa pakettijakelijaan.
 The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Skripti nimeltään ’%s’ on jo olemassa annetussa polussa.\nKorvataanko se vastaavalla tästä paketista vai ohitetaanko se?
 The symbolic link named '%s' already exists in the give path.\nReplace the link with the one from this package or skip it?	PackageView		Symbolinen linkki nimeltään ’%s’ on jo olemassa annetussa polussa.\nKorvataanko linkki tämän paketin linkillä vai ohitetaanko se?
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Pakettitiedoston tiedostokoossa näyttää olevan täsmäämättömyys. Paketti voi olla rikkinäinen tai sitä on muokattu luomisen jälkeen. Haluatko yhä jatkaa?

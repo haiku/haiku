@@ -22,8 +22,8 @@ Model number: 	PowerStatus		Mallinumero:
 OEM info: 	PowerStatus		OEM-tiedot:
 OK	PowerStatus		Valmis
 Power status box	PowerStatus		Virtatilalaatikko
-PowerStatus	System name		Virtatila
 PowerStatus	PowerStatus		Virtatila
+PowerStatus	System name		Virtatila
 PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		Virtatila\ntekijä: Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
 Quit	PowerStatus		Poistu
 Run in window	PowerStatus		Suorita ikkunassa

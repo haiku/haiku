@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-Keymap	2465432782
+1	norwegian_bokmål	x-vnd.Haiku-Keymap	2457049402
 (Current)	Keymap window		(gjeldende)
 File	Keymap window		Fil
 Font	Keymap window		Font
@@ -14,4 +14,5 @@ Switch shortcut keys	Keymap window		Bytt snarveitaster
 Switch shortcut keys to Haiku mode	Keymap window		Bytt snarveitaster til Haiku-modus
 Switch shortcut keys to Windows/Linux mode	Keymap window		Bytt snarveitaster til Windows/Linux-modus
 System:	Keymap window		System:
+Tilde trigger	Keymap window		Tildeutløser
 User:	Keymap window		Bruker:

@@ -25,7 +25,7 @@ Error, NULL state description?\n	ShortcutsSpec		Virhe, NULL-tilakuvaus?\n
 File	ShortcutsWindow		Tiedosto
 InsertString	ShortcutsSpec		LisääMerkkijono
 Key	ShortcutsWindow		Näppäin
-LaunchHandler	ShortcutsSpec		KäynnistysKäsittelijä
+LaunchHandler	ShortcutsSpec		Käynnistyskäsittelijä
 MouseButton	ShortcutsSpec		HiiriPainike
 MouseDown	ShortcutsSpec		HiiriAlas
 MouseUp	ShortcutsSpec		HiiriYlös
@@ -50,7 +50,7 @@ Shift	ShortcutsSpec	Name for modifier on keyboard	Vaihto-painike
 Shortcuts	System name		Pikanäppäinasetukset
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Pikanäppäinasetukset ei kyennyt avaamaan KeySet-tiedostoa!
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Pikanäppäinasetukset ei kyennyt jäsentämään KeySet-tiedostoa!
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Pikanäppäinsetukset ei kyennyt tallentamaan KeySet-tiedostoa!
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Pikanäppäinasetukset ei kyennyt tallentamaan keyset-tiedostoa.
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Pikanäppäinsetukset eivät kyenneet tallentamaan KeySet-tiedostoa!
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Pikanäppäinasetukset eivät kyenneet tallentamaan keyset-tiedostoa.
 Shortcuts\n\nBased on SpicyKeys for BeOS made by Jeremy Friesner.	ShortcutsApp		Pikanäppäinasetukset\n\nPerustuu BeOS-käyttöjärjestelmälle tehtyyn SpicyKeys-ohjelmaan, jonka tekijä oli Jeremy Friesner.
 Window	ShortcutsSpec	Name for modifier on keyboard	Ikkuna

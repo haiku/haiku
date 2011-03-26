@@ -6,5 +6,5 @@ HPGS images	ConfigView		HPGS-bilder
 HPGS images	HPGSTranslator		HPGS-bilder
 HPGSTranslator Settings	ConfigView		HPGS-oversetterinnstillinger
 Version %d.%d.%d, %s	ConfigView		Version %d.%d.%d, %s
-Write error %s\n	HPGSTranslator		Skriv feil %s\n
+Write error %s\n	HPGSTranslator		Skriving feilet %s\n
 no hpgs\n	HPGSTranslator		ingen hpgs\n

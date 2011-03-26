@@ -62,8 +62,8 @@ File	FileTypes Window		Fil
 File could not be opened	Preferred App Menu		Filen kunne ikke åpnes
 File recognition	FileTypes Window		Filgjenkjenning
 File type	FileType Window		Filtype
-FileTypes	System name		Filtyper
 FileTypes	FileTypes		Filtyper
+FileTypes	System name		Filtyper
 FileTypes request	FileTypes		Filtypeforespørsel
 FileTypes request	Preferred App Menu		Filtyper-forespørsel
 Final	Application Types Window		Siste

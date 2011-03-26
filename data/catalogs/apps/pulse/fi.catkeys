@@ -33,9 +33,9 @@ OK	DeskbarPulseView		Valmis
 OK	PrefsWindow		Valmis
 OK	PulseApp		Valmis
 OK	PulseView		Valmis
-Pulse	System name		Pulssi
 Pulse	NormalPulseView		Pulssi
 Pulse	PulseApp		Pulssi
+Pulse	System name		Pulssi
 Pulse settings	PulseWindow		Pulssi-asetukset
 Quit	DeskbarPulseView		Poistu
 Quit	MiniPulseView		Poistu

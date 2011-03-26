@@ -6,7 +6,7 @@ Diaeresis trigger	Keymap window		Treemaliipaisin
 File	Keymap window		Tiedosto
 Font	Keymap window		Kirjasin
 Grave trigger	Keymap window		Gravisliipaisin
-Keymap	System name		Näppäinkartta
+Keymap	System name		Näppäinkartta-asetukset
 Layout	Keymap window		Ulkoasu
 Open…	Keymap window		Avaa…
 Quit	Keymap window		Poistu

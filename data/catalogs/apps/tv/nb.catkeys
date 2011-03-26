@@ -1,5 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku.TV	2519193431
-About %1…	MainWin	Parameter %1 is the name of the application.	Om %1...
+1	norwegian_bokmål	x-vnd.Haiku.TV	400912834
 Always on top	MainWin		Alltid øverst
 Channel	MainWin		Kanal
 DVB - Digital Video Broadcasting TV	MainWin		DVB - Digital Video Broadcasting TV
@@ -18,8 +17,6 @@ Quit	MainWin		Avslutt
 Scale to native size	MainWin		Skaler til normal størrelse
 Settings	MainWin		Innstillinger
 Settings…	MainWin		Innstillinger
-TV	System name		TV
 TV	MainWin		TV
-\nRevision 	MainWin		\nRevisjon
-\nVersion 	MainWin		\nVersjon
+TV	System name		TV
 unknown	MainWin		ukjent

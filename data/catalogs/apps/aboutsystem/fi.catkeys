@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-About	3842515376
+1	finnish	x-vnd.Haiku-About	3019397582
 %.2f GHz	AboutView		%.2f GHz
 %d MiB total	AboutView		%d mebitavua yhteensä
 %d MiB used (%d%%)	AboutView		%d mebitavua käytetty (%d%%)
@@ -8,6 +8,7 @@
 ... and the many people making donations!\n\n	AboutView		... ja monet lahjoituksia tehneet ihmiset!\n\n
 About this system	AboutWindow		Tietoa tästä järjestelmästä
 AboutSystem	System name		Järjestelmästä
+Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. ja yrityksen kehitysryhmä BeOS-käyttöjärjestelmän luomisesta!\n\n
 Contributors:\n	AboutView		Avustajat:\n
 Current maintainers:\n	AboutView		Nykyiset ylläpitäjät:\n
 GCC %d Hybrid	AboutView		GCC %d Hybridi
