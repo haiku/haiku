@@ -819,6 +819,29 @@ DriverWatcher::EventOccurred(NotificationService& service,
 }
 
 
+static void
+dump_driver(legacy_driver* driver)
+{
+	kprintf("DEVFS DRIVER: %p\n", driver);
+	kprintf(" name:           %s\n", driver->name);
+	kprintf(" path:           %s\n", driver->path);
+	kprintf(" image:          %ld\n", driver->image);
+	kprintf(" device:         %ld\n", driver->device);
+	kprintf(" node:           %Ld\n", driver->node);
+	kprintf(" last modified:  %ld.%lu\n", driver->last_modified.tv_sec,
+		driver->last_modified.tv_nsec);
+	kprintf(" devs used:      %ld\n", driver->devices_used);
+	kprintf(" devs published: %ld\n", driver->devices.Count());
+	kprintf(" binary updated: %d\n", driver->binary_updated);
+	kprintf(" priority:       %ld\n", driver->priority);
+	kprintf(" api version:    %ld\n", driver->api_version);
+	kprintf(" hooks:          find_device %p, publish_devices %p\n"
+		"                 uninit_driver %p, uninit_hardware %p\n",
+		driver->find_device, driver->publish_devices, driver->uninit_driver,
+		driver->uninit_hardware);
+}
+
+
 static int
 dump_device(int argc, char** argv)
 {
@@ -843,29 +866,6 @@ dump_device(int argc, char** argv)
 	dump_driver(device->Driver());
 
 	return 0;
-}
-
-
-static void
-dump_driver(legacy_driver* driver)
-{
-	kprintf("DEVFS DRIVER: %p\n", driver);
-	kprintf(" name:           %s\n", driver->name);
-	kprintf(" path:           %s\n", driver->path);
-	kprintf(" image:          %ld\n", driver->image);
-	kprintf(" device:         %ld\n", driver->device);
-	kprintf(" node:           %Ld\n", driver->node);
-	kprintf(" last modified:  %ld.%lu\n", driver->last_modified.tv_sec,
-		driver->last_modified.tv_nsec);
-	kprintf(" devs used:      %ld\n", driver->devices_used);
-	kprintf(" devs published: %ld\n", driver->devices.Count());
-	kprintf(" binary updated: %d\n", driver->binary_updated);
-	kprintf(" priority:       %ld\n", driver->priority);
-	kprintf(" api version:    %ld\n", driver->api_version);
-	kprintf(" hooks:          find_device %p, publish_devices %p\n"
-		"                 uninit_driver %p, uninit_hardware %p\n",
-		driver->find_device, driver->publish_devices, driver->uninit_driver,
-		driver->uninit_hardware);
 }
 
 
