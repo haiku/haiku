@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2011, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -333,7 +333,7 @@ republish_driver(legacy_driver* driver)
 		devfs_unpublish_device(device, true);
 	}
 
-	if (exported == 0) {
+	if (exported == 0 && driver->devices_used == 0) {
 		TRACE(("devfs: driver \"%s\" does not publish any more nodes and is "
 			"unloaded\n", driver->path));
 		unload_driver(driver);
@@ -820,6 +820,56 @@ DriverWatcher::EventOccurred(NotificationService& service,
 
 
 static int
+dump_device(int argc, char** argv)
+{
+	if (argc < 2 || !strcmp(argv[1], "--help")) {
+		kprintf("usage: %s [device]\n", argv[0]);
+		return 0;
+	}
+
+	LegacyDevice* device = (LegacyDevice*)parse_expression(argv[1]);
+
+	kprintf("LEGACY DEVICE: %p\n", device);
+	kprintf(" path:     %s\n", device->Path());
+	kprintf(" hooks:    %p\n", device->Hooks());
+	device_hooks* hooks = device->Hooks();
+	kprintf("  close()     %p\n", hooks->close);
+	kprintf("  free()      %p\n", hooks->free);
+	kprintf("  control()   %p\n", hooks->control);
+	kprintf("  read()      %p\n", hooks->read);
+	kprintf("  write()     %p\n", hooks->write);
+	kprintf("  select()    %p\n", hooks->select);
+	kprintf("  deselect()  %p\n", hooks->deselect);
+	dump_driver(device->Driver());
+
+	return 0;
+}
+
+
+static void
+dump_driver(legacy_driver* driver)
+{
+	kprintf("DEVFS DRIVER: %p\n", driver);
+	kprintf(" name:           %s\n", driver->name);
+	kprintf(" path:           %s\n", driver->path);
+	kprintf(" image:          %ld\n", driver->image);
+	kprintf(" device:         %ld\n", driver->device);
+	kprintf(" node:           %Ld\n", driver->node);
+	kprintf(" last modified:  %ld.%lu\n", driver->last_modified.tv_sec,
+		driver->last_modified.tv_nsec);
+	kprintf(" devs used:      %ld\n", driver->devices_used);
+	kprintf(" devs published: %ld\n", driver->devices.Count());
+	kprintf(" binary updated: %d\n", driver->binary_updated);
+	kprintf(" priority:       %ld\n", driver->priority);
+	kprintf(" api version:    %ld\n", driver->api_version);
+	kprintf(" hooks:          find_device %p, publish_devices %p\n"
+		"                 uninit_driver %p, uninit_hardware %p\n",
+		driver->find_device, driver->publish_devices, driver->uninit_driver,
+		driver->uninit_hardware);
+}
+
+
+static int
 dump_driver(int argc, char** argv)
 {
 	if (argc < 2) {
@@ -855,24 +905,7 @@ dump_driver(int argc, char** argv)
 		return 0;
 	}
 
-	kprintf("DEVFS DRIVER: %p\n", driver);
-	kprintf(" name:           %s\n", driver->name);
-	kprintf(" path:           %s\n", driver->path);
-	kprintf(" image:          %ld\n", driver->image);
-	kprintf(" device:         %ld\n", driver->device);
-	kprintf(" node:           %Ld\n", driver->node);
-	kprintf(" last modified:  %ld.%lu\n", driver->last_modified.tv_sec,
-		driver->last_modified.tv_nsec);
-	kprintf(" devs used:      %ld\n", driver->devices_used);
-	kprintf(" devs published: %ld\n", driver->devices.Count());
-	kprintf(" binary updated: %d\n", driver->binary_updated);
-	kprintf(" priority:       %ld\n", driver->priority);
-	kprintf(" api version:    %ld\n", driver->api_version);
-	kprintf(" hooks:          find_device %p, publish_devices %p\n"
-		"                 uninit_driver %p, uninit_hardware %p\n",
-		driver->find_device, driver->publish_devices, driver->uninit_driver,
-		driver->uninit_hardware);
-
+	dump_driver(driver);
 	return 0;
 }
 
@@ -1274,8 +1307,11 @@ LegacyDevice::UninitDevice()
 	if (fInitialized-- > 1)
 		return;
 
-	if (fDriver != NULL)
-		fDriver->devices_used--;
+	if (fDriver != NULL) {
+		if (--fDriver->devices_used == 0 && fDriver->devices.IsEmpty())
+			unload_driver(fDriver);
+		fDriver = NULL;
+	}
 }
 
 
@@ -1495,6 +1531,8 @@ legacy_driver_init(void)
 
 	add_debugger_command("legacy_driver", &dump_driver,
 		"info about a legacy driver entry");
+	add_debugger_command("legacy_device", &dump_device,
+		"info about a legacy device");
 
 	return B_OK;
 }
