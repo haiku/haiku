@@ -9,7 +9,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <AboutMenuItem.h>
 #include <Alert.h>
 #include <Application.h>
 #include <Box.h>
@@ -383,20 +382,6 @@ MediaConverterWindow::MessageReceived(BMessage* msg)
 
 		case B_CANCEL:
 			break;
-
-		case B_ABOUT_REQUESTED:
-		{
-			BString title(B_TRANSLATE("About" B_UTF8_ELLIPSIS));
-			(new BAlert(title,
-					B_TRANSLATE("MediaConverter\n"
-					VERSION"\n"
-					B_UTF8_COPYRIGHT" 1999, Be Incorporated.\n"
-					B_UTF8_COPYRIGHT" 2000-2004 Jun Suzuki\n"
-					B_UTF8_COPYRIGHT" 2007 Stephan Aßmus\n"
-					B_UTF8_COPYRIGHT" 2010 Haiku, Inc."),
- 					B_TRANSLATE("OK")))->Go();
-			break;
-		}
 
 		case QUIT_MESSAGE:
 			MediaConverterWindow::QuitRequested();
@@ -931,9 +916,6 @@ MediaConverterWindow::_CreateMenu()
 	item = new BMenuItem(B_TRANSLATE_WITH_CONTEXT(
 		"Open" B_UTF8_ELLIPSIS, "Menu"),
 		new BMessage(OPEN_FILE_MESSAGE), 'O');
-	menu->AddItem(item);
-	menu->AddSeparatorItem();
-	item = new BAboutMenuItem(),
 	menu->AddItem(item);
 	menu->AddSeparatorItem();
 	item = new BMenuItem(B_TRANSLATE_WITH_CONTEXT("Quit", "Menu"), 

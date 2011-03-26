@@ -514,11 +514,6 @@ ExpanderWindow::_AddMenuBar(BLayout* layout)
 {
 	fBar = new BMenuBar("menu_bar", B_ITEMS_IN_ROW, B_INVALIDATE_AFTER_LAYOUT);
 	BMenu* menu = new BMenu(B_TRANSLATE("File"));
-	BMenuItem* item;
-	menu->AddItem(item = new BMenuItem(B_TRANSLATE("About Expander…"),
-		new BMessage(B_ABOUT_REQUESTED)));
-	item->SetTarget(be_app_messenger);
-	menu->AddSeparatorItem();
 	menu->AddItem(fSourceItem = new BMenuItem(B_TRANSLATE("Set source…"),
 		new BMessage(MSG_SOURCE), 'O'));
 	menu->AddItem(fDestItem = new BMenuItem(B_TRANSLATE("Set destination…"),

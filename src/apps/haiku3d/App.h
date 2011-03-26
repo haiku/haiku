@@ -5,23 +5,23 @@
  * Authors:
  * 		Alexandre Deckner <alex@zappotek.com>
  */
-
 #ifndef _APP_H
 #define _APP_H
 
+
 #include <Application.h>
 
-class App: public BApplication {
-public:
-					App();
-	virtual			~App();
 
-	virtual	void	ReadyToRun();
-	virtual void	AboutRequested();
-	virtual	bool	QuitRequested();
+class App : public BApplication {
+public:
+							App();
+	virtual					~App();
+
+	virtual	void			ReadyToRun();
+	virtual	bool			QuitRequested();
 
 protected:
-	BWindow*		fMainWindow;
+			BWindow*		fMainWindow;
 };
 
 #endif /* _APP_H */

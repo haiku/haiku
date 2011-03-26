@@ -51,7 +51,6 @@ extern const char* STR_DIR_CREATED;
 extern const char* STR_MNU_FILE;
 extern const char* STR_MNU_FILE_SAVE_AS;
 extern const char* STR_MNU_FILE_SAVE_SELECTION;
-extern const char* STR_MNU_FILE_ABOUT;
 extern const char* STR_MNU_FILE_QUIT;
 extern const char* STR_MNU_EDIT;
 extern const char* STR_MNU_EDIT_COPY;

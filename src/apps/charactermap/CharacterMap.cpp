@@ -8,11 +8,8 @@
 
 #include <stdlib.h>
 
-#include <AboutWindow.h>
-#include <Alert.h>
 #include <Application.h>
 #include <Catalog.h>
-#include <TextView.h>
 
 #include "CharacterWindow.h"
 
@@ -52,19 +49,6 @@ void
 CharacterMap::MessageReceived(BMessage* message)
 {
 	BApplication::MessageReceived(message);
-}
-
-
-void
-CharacterMap::AboutRequested()
-{
-	const char* authors[] = {
-		"Axel Dörfler",
-		NULL
-	};
-	
-	BAboutWindow about(B_TRANSLATE_SYSTEM_NAME("CharacterMap"), 2009, authors);
-	about.Show();
 }
 
 

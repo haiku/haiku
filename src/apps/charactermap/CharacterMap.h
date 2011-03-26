@@ -22,8 +22,6 @@ public:
 	virtual	void			RefsReceived(BMessage* message);
 	virtual	void			MessageReceived(BMessage* message);
 
-	virtual	void			AboutRequested();
-
 private:
 	CharacterWindow*		fWindow;
 };

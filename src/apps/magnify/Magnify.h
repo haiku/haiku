@@ -254,10 +254,6 @@ class TWindow : public BWindow {
 class TApp : public BApplication {
 	public:
 						TApp(int32 pixelCount = -1);
-
-		virtual void	MessageReceived(BMessage* message);
-		virtual void	ReadyToRun();
-		virtual void	AboutRequested();
 };
 
 #endif	// MAGNIFY_H

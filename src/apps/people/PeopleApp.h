@@ -38,7 +38,6 @@ public:
 								TPeopleApp();
 		virtual 				~TPeopleApp();
 
-		virtual	void			AboutRequested();
 		virtual void			ArgvReceived(int32, char**);
 		virtual void			MessageReceived(BMessage*);
 		virtual void			RefsReceived(BMessage*);

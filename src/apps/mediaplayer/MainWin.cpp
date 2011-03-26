@@ -27,7 +27,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <AboutMenuItem.h>
 #include <Alert.h>
 #include <Application.h>
 #include <Autolock.h>
@@ -1471,12 +1470,6 @@ MainWin::_CreateMenu()
 
 	item = new BMenuItem(B_TRANSLATE("Settings"B_UTF8_ELLIPSIS),
 		new BMessage(M_SETTINGS), 'S');
-	fFileMenu->AddItem(item);
-	item->SetTarget(be_app);
-
-	fFileMenu->AddSeparatorItem();
-
-	item = new BAboutMenuItem();
 	fFileMenu->AddItem(item);
 	item->SetTarget(be_app);
 

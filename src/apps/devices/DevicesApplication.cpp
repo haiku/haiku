@@ -6,7 +6,6 @@
  *		Pieter Panman
  */
 
-#include <AboutWindow.h>
 #include <Alert.h>
 #include <Application.h>
 #include <Catalog.h>
@@ -20,8 +19,6 @@
 class DevicesApplication : public BApplication {
 public:
 								DevicesApplication();
-	virtual	void				AboutRequested();
-	static	void				ShowAbout();
 };
 
 
@@ -41,27 +38,6 @@ DevicesApplication::DevicesApplication()
 	DevicesWindow* window = new DevicesWindow();
 	window->CenterOnScreen();
 	window->Show();
-}
-
-
-void
-DevicesApplication::AboutRequested()
-{
-	ShowAbout();
-}
-
-
-void
-DevicesApplication::ShowAbout()
-{
-	const char* authors[] = {
-		"Pieter Panman",
-		NULL
-	};
-	BAboutWindow about(B_TRANSLATE_SYSTEM_NAME("Devices"), 2009, authors,
-		"Based on listdev by Jérôme Duval and the previous Devices "
-		"preference by Jérôme Duval and Sikosis.");
-	about.Show();
 }
 
 

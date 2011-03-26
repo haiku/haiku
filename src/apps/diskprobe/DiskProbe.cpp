@@ -77,7 +77,6 @@ class DiskProbe : public BApplication {
 		virtual void ArgvReceived(int32 argc, char **argv);
 		virtual void MessageReceived(BMessage *message);
 
-		virtual void AboutRequested();
 		virtual bool QuitRequested();
 
 	private:
@@ -480,20 +479,6 @@ DiskProbe::MessageReceived(BMessage *message)
 			BApplication::MessageReceived(message);
 			break;
 	}
-}
-
-
-void
-DiskProbe::AboutRequested()
-{
-	const char* authors[] = {
-		"Axel Dörfler",
-		NULL
-	};
-	
-	BAboutWindow about(B_TRANSLATE_SYSTEM_NAME("DiskProbe"), 2004, authors,
-		"Original Be version by Robert Polic.");
-	about.Show();
 }
 
 

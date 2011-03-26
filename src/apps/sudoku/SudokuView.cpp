@@ -1076,10 +1076,6 @@ SudokuView::MessageReceived(BMessage* message)
 			break;
 		}
 
-		case B_ABOUT_REQUESTED:
-			Sudoku::DisplayAbout();
-			break;
-
 		default:
 			BView::MessageReceived(message);
 			break;

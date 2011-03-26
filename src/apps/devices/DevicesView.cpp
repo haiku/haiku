@@ -7,7 +7,6 @@
  */
 
 
-#include <AboutMenuItem.h>
 #include <Application.h>
 #include <Catalog.h>
 #include <MenuBar.h>
@@ -44,8 +43,6 @@ DevicesView::CreateLayout()
 	menu->AddItem(item = new BMenuItem(B_TRANSLATE(
 		"Generate system information"), new BMessage(kMsgGenerateSysInfo)));
 	item->SetEnabled(false);
-	menu->AddSeparatorItem();
-	menu->AddItem(item = new BAboutMenuItem());
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Quit"),
 		new BMessage(B_QUIT_REQUESTED), 'Q'));

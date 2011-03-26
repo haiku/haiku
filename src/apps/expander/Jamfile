@@ -12,14 +12,13 @@ Application Expander :
 	DirectoryFilePanel.cpp
 	ExpanderRules.cpp
 	PasswordAlert.cpp
-	: be libshared.a tracker $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
+	: be tracker $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
 	: Expander.rdef
 ;
 
 DoCatalogs Expander :
 	x-vnd.Haiku-Expander
 	:
-	ExpanderApp.cpp
 	ExpanderWindow.cpp
 	ExpanderPreferences.cpp
 	ExpanderSettings.cpp

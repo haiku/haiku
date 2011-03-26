@@ -32,7 +32,6 @@ DoCatalogs ShowImage :
 	:
 	PrintOptionsWindow.cpp
 	ProgressWindow.cpp
-	ShowImageApp.cpp
 	ShowImageView.cpp
 	ShowImageWindow.cpp
 ;

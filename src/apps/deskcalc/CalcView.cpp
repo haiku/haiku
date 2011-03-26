@@ -17,7 +17,6 @@
 #include <ctype.h>
 #include <assert.h>
 
-#include <AboutMenuItem.h>
 #include <AboutWindow.h>
 #include <Alert.h>
 #include <Application.h>
@@ -121,8 +120,6 @@ CalcView::CalcView(BRect frame, rgb_color rgbBaseColor, BMessage* settings)
 	fAutoNumlockItem(NULL),
 	fAudioFeedbackItem(NULL),
 	fShowKeypadItem(NULL),
-	fAboutItem(NULL),
-
 	fOptions(new CalcOptions()),
 	fShowKeypad(true)
 {
@@ -173,8 +170,6 @@ CalcView::CalcView(BMessage* archive)
 	fAutoNumlockItem(NULL),
 	fAudioFeedbackItem(NULL),
 	fShowKeypadItem(NULL),
-	fAboutItem(NULL),
-
 	fOptions(new CalcOptions()),
 	fShowKeypad(true)
 {
@@ -1112,7 +1107,6 @@ CalcView::_CreatePopUpMenu()
 		new BMessage(MSG_OPTIONS_AUDIO_FEEDBACK));
 	fShowKeypadItem = new BMenuItem(B_TRANSLATE("Show keypad"),
 		new BMessage(MSG_OPTIONS_SHOW_KEYPAD));
-	fAboutItem = new BAboutMenuItem();
 
 	// apply current settings
 	fAutoNumlockItem->SetMarked(fOptions->auto_num_lock);
@@ -1128,7 +1122,6 @@ CalcView::_CreatePopUpMenu()
 //	fPopUpMenu->AddItem(fAudioFeedbackItem);
 	fPopUpMenu->AddItem(fShowKeypadItem);
 	fPopUpMenu->AddSeparatorItem();
-	fPopUpMenu->AddItem(fAboutItem);
 }
 
 

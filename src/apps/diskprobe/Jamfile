@@ -16,7 +16,7 @@ Application DiskProbe :
 	OpenWindow.cpp
 	FindWindow.cpp
 	: be $(HAIKU_LOCALE_LIBS) tracker translation libexpression_parser.a
-		libmapm.a libshared.a $(TARGET_LIBSUPC++)
+		libmapm.a $(TARGET_LIBSUPC++)
 	: DiskProbe.rdef
 ;
 

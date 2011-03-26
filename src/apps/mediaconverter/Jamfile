@@ -12,7 +12,7 @@ Application MediaConverter :
 	MediaFileInfoView.cpp
 	MediaFileListView.cpp
 
-	: be libshared.a media tracker $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSTDC++)
+	: be media tracker $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSTDC++)
 	: MediaConverter.rdef
 ;
 

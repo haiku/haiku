@@ -6,9 +6,9 @@
  * 		Alexandre Deckner <alex@zappotek.com>
  */
 
-#include <Alert.h>
 
 #include "App.h"
+
 #include "MainWindow.h"
 
 
@@ -32,15 +32,6 @@ App::ReadyToRun()
 	const char* title = "Haiku3d";
 	fMainWindow = new MainWindow(frame, title);
 	fMainWindow->Show();
-}
-
-
-void
-App::AboutRequested()
-{
-	BAlert* alert;
-	alert = new BAlert("About", "A little 3D demo", "OK");
-	alert->Go(NULL);
 }
 
 

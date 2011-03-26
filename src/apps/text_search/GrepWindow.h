@@ -84,7 +84,6 @@ private:
 			void				_OnCopyText();
 			void				_OnSelectInTracker();
 			void				_OnQuitNow();
-			void				_OnAboutRequested();
 			void				_OnFileDrop(BMessage* message);
 			void				_OnRefsReceived(BMessage* message);
 			void				_OnOpenPanel();
@@ -109,7 +108,6 @@ private:
 			BMenuItem*			fNew;
 			BMenuItem*			fOpen;
 			BMenuItem*			fClose;
-			BMenuItem*			fAbout;
 			BMenuItem*			fQuit;
 			BMenu*				fActionMenu;
 			BMenuItem*			fSelectAll;

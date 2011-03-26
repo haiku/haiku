@@ -93,7 +93,6 @@ public:
 			void			ReadyToRun();
 	virtual	bool			QuitRequested();
 	virtual	void			MessageReceived(BMessage* message);
-	virtual	void			AboutRequested();
 
 private:
 			status_t		_SetUpNodes();

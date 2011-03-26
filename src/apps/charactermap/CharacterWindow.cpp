@@ -10,7 +10,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <AboutMenuItem.h>
 #include <Application.h>
 #include <Button.h>
 #include <Catalog.h>
@@ -228,14 +227,9 @@ CharacterWindow::CharacterWindow()
 	BMenu* menu = new BMenu(B_TRANSLATE("File"));
 	BMenuItem* item;
 
-	menu->AddItem(item = new BAboutMenuItem());
-
-	menu->AddSeparatorItem();
-
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Quit"),
 		new BMessage(B_QUIT_REQUESTED), 'Q'));
 	menu->SetTargetForItems(this);
-	item->SetTarget(be_app);
 	menuBar->AddItem(menu);
 
 	menu = new BMenu(B_TRANSLATE("View"));

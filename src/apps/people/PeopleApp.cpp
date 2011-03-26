@@ -199,14 +199,6 @@ TPeopleApp::~TPeopleApp()
 
 
 void
-TPeopleApp::AboutRequested()
-{
-	(new BAlert(B_TRANSLATE("About"), B_UTF8_ELLIPSIS "by Robert Polic",
-		B_TRANSLATE("OK")))->Go();
-}
-
-
-void
 TPeopleApp::ArgvReceived(int32 argc, char** argv)
 {
 	BMessage message(B_REFS_RECEIVED);

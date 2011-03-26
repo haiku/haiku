@@ -8,7 +8,6 @@
 
 #include "PoorManApplication.h"
 
-#include <AboutWindow.h>
 #include <Application.h>
 #include <Alert.h>
 #include <Catalog.h>
@@ -39,20 +38,6 @@ PoorManApplication::PoorManApplication()
 		else
 			PostMessage(kStartServer);
 	}
-}
-
-
-void 
-PoorManApplication::AboutRequested()
-{
-	const char* authors[] = {
-		"Philip Harrison",
-		"Ma Jie",
-		NULL
-	};
-	BAboutWindow about(STR_APP_NAME, 2004, authors,
-		"Poor Man's web server.");
-	about.Show();
 }
 
 

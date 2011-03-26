@@ -10,12 +10,8 @@
 
 #include "BootManagerWindow.h"
 
-#include <AboutWindow.h>
-#include <Alert.h>
 #include <Application.h>
 #include <Catalog.h>
-#include <Locale.h>
-#include <TextView.h>
 
 
 #undef B_TRANSLATE_CONTEXT
@@ -30,7 +26,6 @@ public:
 								BootManager();
 
 	virtual void				ReadyToRun();
-	virtual void				AboutRequested();
 };
 
 
@@ -46,20 +41,6 @@ BootManager::ReadyToRun()
 {
 	BootManagerWindow* window = new BootManagerWindow();
 	window->Show();
-}
-
-
-void
-BootManager::AboutRequested()
-{
-	const char* authors[] = {
-		"David Dengg",
-		"Michael Pfeiffer",
-		NULL
-	};
-	
-	BAboutWindow about(B_TRANSLATE_SYSTEM_NAME("BootManager"), 2008, authors);
-	about.Show();
 }
 
 

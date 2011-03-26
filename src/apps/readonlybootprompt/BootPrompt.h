@@ -21,7 +21,6 @@ public:
 								BootPromptApp();
 
 	virtual	void				MessageReceived(BMessage* message);
-	virtual	void				AboutRequested();
 	virtual	void				ReadyToRun();
 };
 

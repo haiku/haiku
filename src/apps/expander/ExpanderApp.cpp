@@ -6,12 +6,6 @@
 
 #include "ExpanderApp.h"
 
-#include <AboutWindow.h>
-#include <Alert.h>
-#include <Catalog.h>
-#include <Locale.h>
-#include <TextView.h>
-
 #include "ExpanderWindow.h"
 
 
@@ -24,28 +18,6 @@ ExpanderApp::ExpanderApp()
 	windowFrame.OffsetBy(windowPosition);
 	BMessage settings(fSettings.Message());
 	fWindow = new ExpanderWindow(windowFrame, NULL, &settings);
-}
-
-
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "About"
-
-void
-ExpanderApp::AboutRequested()
-{
-	const char* authors[] = {
-		"Jérôme Duval",
-		NULL
-	};
-	BAboutWindow about(B_TRANSLATE_SYSTEM_NAME("Expander"), 2004, authors,
-		"Original Be version by Dominic, Hiroshi, Peter, Pavel and Robert.");
-	about.Show();
-}
-
-
-void
-ExpanderApp::ReadyToRun()
-{
 }
 
 

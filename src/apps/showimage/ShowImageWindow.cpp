@@ -396,9 +396,6 @@ ShowImageWindow::_AddMenus(BMenuBar* bar)
 	_AddItemMenu(menu, B_TRANSLATE("Print" B_UTF8_ELLIPSIS),
 		MSG_PREPARE_PRINT, 'P', 0, this);
 	menu->AddSeparatorItem();
-	_AddItemMenu(menu, B_TRANSLATE("About ShowImage" B_UTF8_ELLIPSIS),
-		B_ABOUT_REQUESTED, 0, 0, be_app);
-	menu->AddSeparatorItem();
 	_AddItemMenu(menu, B_TRANSLATE("Quit"), B_QUIT_REQUESTED, 'Q', 0, be_app);
 	bar->AddItem(menu);
 

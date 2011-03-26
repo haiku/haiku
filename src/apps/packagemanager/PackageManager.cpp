@@ -9,8 +9,6 @@
 
 #include "ApplicationWindow.h"
 
-#include <AboutWindow.h>
-#include <Alert.h>
 #include <Application.h>
 #include <Catalog.h>
 #include <Entry.h>
@@ -32,8 +30,6 @@ class PackageManager : public BApplication {
 		void ReadyToRun();
 
 		void MessageReceived(BMessage *msg);
-
-		void AboutRequested();
 
 	private:
 		ApplicationWindow* fMainWindow;
@@ -110,19 +106,6 @@ PackageManager::MessageReceived(BMessage *msg)
 		default:
 			BApplication::MessageReceived(msg);
 	}
-}
-
-
-void
-PackageManager::AboutRequested()
-{
-	const char* authors[] = {
-		"Adrien Destugues",
-		NULL
-	};
-	
-	BAboutWindow about(B_TRANSLATE_SYSTEM_NAME("PackageManager"), 2010, authors);
-	about.Show();
 }
 
 

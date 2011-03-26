@@ -8,7 +8,6 @@
 
 #include <stdio.h>
 
-#include <AboutMenuItem.h>
 #include <Application.h>
 #include <Catalog.h>
 #include <File.h>
@@ -119,19 +118,13 @@ ActivityWindow::ActivityWindow()
 
 	// "File" menu
 	BMenu* menu = new BMenu(B_TRANSLATE("File"));
-	BMenuItem* item;
-
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Add graph"),
 		new BMessage(kMsgAddView)));
-	menu->AddSeparatorItem();
-
-	menu->AddItem(item = new BAboutMenuItem());
 	menu->AddSeparatorItem();
 
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Quit"),
 		new BMessage(B_QUIT_REQUESTED), 'Q'));
 	menu->SetTargetForItems(this);
-	item->SetTarget(be_app);
 	menuBar->AddItem(menu);
 
 	// "Settings" menu

@@ -4,8 +4,6 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <AboutMenuItem.h>
-#include <AboutWindow.h>
 #include <Alert.h>
 #include <Button.h>
 #include <LayoutBuilder.h>
@@ -270,21 +268,6 @@ CodyCam::MessageReceived(BMessage *message)
 }
 
 
-void
-CodyCam::AboutRequested()
-{
-	const char* authors[] = {
-		"Be, Incorporated",
-		NULL
-	};
-	
-	BAboutWindow about(B_TRANSLATE_SYSTEM_NAME("CodyCam"), 2003, authors,
-		"The Original BeOS webcam.\n"
-		B_UTF8_COPYRIGHT " 1998-1999 Be, Incorporated.");
-	about.Show();
-}
-
-
 status_t
 CodyCam::_SetUpNodes()
 {
@@ -517,12 +500,6 @@ VideoWindow::VideoWindow(BRect frame, const char* title, window_type type,
 
 	menuItem = new BMenuItem(B_TRANSLATE("Stop video"),
 		new BMessage(msg_stop), 'O');
-	menuItem->SetTarget(be_app);
-	menu->AddItem(menuItem);
-
-	menu->AddSeparatorItem();
-
-	menuItem = new BAboutMenuItem();
 	menuItem->SetTarget(be_app);
 	menu->AddItem(menuItem);
 

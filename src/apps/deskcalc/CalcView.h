@@ -120,7 +120,6 @@ class CalcView : public BView {
 			BMenuItem*			fAutoNumlockItem;
 			BMenuItem*			fAudioFeedbackItem;
 			BMenuItem*			fShowKeypadItem;
-			BMenuItem*			fAboutItem;
 
 			// calculator options.
 			CalcOptions*		fOptions;

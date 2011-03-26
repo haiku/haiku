@@ -25,29 +25,29 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
-
 #ifndef _ExpanderApp_h
 #define _ExpanderApp_h
 
+
 #include <Application.h>
-#include <Catalog.h>
+
 #include "ExpanderSettings.h"
 #include "ExpanderWindow.h"
 
+
 class ExpanderApp : public BApplication {
-	public:
-		ExpanderApp();
+public:
+							ExpanderApp();
 
-	public:
-		virtual void AboutRequested();
-		virtual void ArgvReceived(int32 argc, char **argv);
-		virtual void ReadyToRun();
-		virtual void RefsReceived(BMessage *msg);
+	virtual	void			ArgvReceived(int32 argc, char** argv);
+	virtual	void			RefsReceived(BMessage* msg);
 
-		ExpanderSettings fSettings;
-		void UpdateSettingsFrom(BMessage *message);
-	private:
-		ExpanderWindow *fWindow;
+			void			UpdateSettingsFrom(BMessage* message);
+
+			ExpanderSettings	fSettings;
+private:
+			ExpanderWindow*	fWindow;
 };
 
-#endif /* _ExpanderApp_h */
+
+#endif	// _ExpanderApp_h

@@ -92,7 +92,6 @@ GrepWindow::GrepWindow(BMessage* message)
 	  fNew(NULL),
 	  fOpen(NULL),
 	  fClose(NULL),
-	  fAbout(NULL),
 	  fQuit(NULL),
 	  fActionMenu(NULL),
 	  fSelectAll(NULL),
@@ -191,10 +190,6 @@ void GrepWindow::MenusEnded()
 void GrepWindow::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
-		case B_ABOUT_REQUESTED:
-			_OnAboutRequested();
-			break;
-
 		case MSG_NEW_WINDOW:
 			_OnNewWindow();
 			break;
@@ -433,9 +428,6 @@ GrepWindow::_CreateMenus()
 	fClose = new BMenuItem(
 		B_TRANSLATE("Close"), new BMessage(B_QUIT_REQUESTED), 'W');
 
-	fAbout = new BMenuItem(
-		B_TRANSLATE("About TextSearch" B_UTF8_ELLIPSIS), new BMessage(B_ABOUT_REQUESTED));
-
 	fQuit = new BMenuItem(
 		B_TRANSLATE("Quit"), new BMessage(MSG_QUIT_NOW), 'Q');
 
@@ -491,8 +483,6 @@ GrepWindow::_CreateMenus()
 	fFileMenu->AddSeparatorItem();
 	fFileMenu->AddItem(fOpen);
 	fFileMenu->AddItem(fClose);
-	fFileMenu->AddSeparatorItem();
-	fFileMenu->AddItem(fAbout);
 	fFileMenu->AddSeparatorItem();
 	fFileMenu->AddItem(fQuit);
 
@@ -1477,33 +1467,6 @@ GrepWindow::_OnQuitNow()
 		be_app->PostMessage(B_QUIT_REQUESTED);
 		be_app->Unlock();
 	}
-}
-
-
-void
-GrepWindow::_OnAboutRequested()
-{
-	BString text;
-	text << B_TRANSLATE(APP_NAME) << " " << "\n\n";
-	int32 titleLength = text.Length();
-	text << B_TRANSLATE("Created by Matthijs Hollemans." "\n\n"
-	"Contributed to by "
-	"Peter Hinely, Serge Fantino, Hideki Naito, Oscar Lesta, "
-	"Oliver Tappe, Jonas Sundström, Luc Schrijvers and"
-	" momoziro.\n");
-
-	BAlert* alert = new BAlert("TextSearch", text.String(), B_TRANSLATE("OK"), NULL,
-		NULL, B_WIDTH_AS_USUAL, B_INFO_ALERT);
-
-	BTextView* view = alert->TextView();
-	BFont font;
-	view->SetStylable(true);
-	view->GetFont(&font);
-	font.SetSize(font.Size() * 1.5);
-	font.SetFace(B_BOLD_FACE);
-	view->SetFontAndColor(0, titleLength, &font);
-
-	alert->Go(NULL);
 }
 
 

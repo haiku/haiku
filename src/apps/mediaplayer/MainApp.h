@@ -74,7 +74,6 @@ private:
 	virtual	void				RefsReceived(BMessage* message);
 	virtual	void				ArgvReceived(int32 argc, char** argv);
 	virtual	void				MessageReceived(BMessage* message);
-	virtual	void				AboutRequested();
 
 private:
 			void				_ShowSettingsWindow();

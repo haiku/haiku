@@ -14,7 +14,6 @@
 #include "ShowImageSettings.h"
 
 #include <Application.h>
-#include <Catalog.h>
 #include <FilePanel.h>
 
 
@@ -31,7 +30,6 @@ public:
 	virtual	void				ArgvReceived(int32 argc, char** argv);
 	virtual	void				ReadyToRun();
 	virtual	void				MessageReceived(BMessage* message);
-	virtual	void				AboutRequested();
 	virtual	void				Pulse();
 	virtual	void				RefsReceived(BMessage* message);
 	virtual	bool				QuitRequested();

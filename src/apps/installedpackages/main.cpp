@@ -30,8 +30,6 @@ public:
 	UninstallApplication();
 	~UninstallApplication();
 
-	void AboutRequested();
-
 private:
 	UninstallWindow*	fWindow;
 };
@@ -49,32 +47,6 @@ UninstallApplication::UninstallApplication()
 
 UninstallApplication::~UninstallApplication()
 {
-}
-
-
-void
-UninstallApplication::AboutRequested()
-{
-	BString aboutString = B_TRANSLATE("InstalledPackages");
-	int appNameLength = aboutString.Length();
-	aboutString << "\n";
-	aboutString << B_TRANSLATE(
-		"BeOS legacy .pkg package removing application "
-		"for Haiku.\n\n"
-		"Copyright 2007,\nŁukasz 'Sil2100' Zemczak\n\n"
-		"Copyright (c) 2007 Haiku, Inc.\n");
-	BAlert* about = new BAlert("about", aboutString.String(),
-		B_TRANSLATE("Close"));
-
-	BTextView* view = about->TextView();
-	BFont font;
-	view->SetStylable(true);
-	view->GetFont(&font);
-	font.SetFace(B_BOLD_FACE);
-	font.SetSize(font.Size() * 1.5);
-	view->SetFontAndColor(0, appNameLength, &font);
-
-	about->Go();
 }
 
 

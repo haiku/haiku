@@ -35,8 +35,6 @@ class PackageInstaller : public BApplication {
 
 		void MessageReceived(BMessage *msg);
 
-		void AboutRequested();
-
 	private:
 		BFilePanel	*fOpen;
 		uint32		fWindowCount;
@@ -137,28 +135,6 @@ PackageInstaller::MessageReceived(BMessage *msg)
 		default:
 			BApplication::MessageReceived(msg);
 	}
-}
-
-
-void
-PackageInstaller::AboutRequested()
-{
-	BAlert *about = new BAlert("about",
-		B_TRANSLATE("PackageInstaller\n"
-		"BeOS legacy .pkg file installer for Haiku.\n\n"
-		"Copyright 2007,\nŁukasz 'Sil2100' Zemczak\n\n"
-		"Copyright (c) 2007 Haiku, Inc. \n"),
-		B_TRANSLATE("OK"));
-
-	BTextView *view = about->TextView();
-	BFont font;
-	view->SetStylable(true);
-	view->GetFont(&font);
-	font.SetFace(B_BOLD_FACE);
-	font.SetSize(font.Size() * 1.5);
-	view->SetFontAndColor(0, 17, &font);
-
-	about->Go();
 }
 
 

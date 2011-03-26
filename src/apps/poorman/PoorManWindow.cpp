@@ -11,7 +11,6 @@
 #include <time.h>
 #include <arpa/inet.h>
 
-#include <AboutMenuItem.h>
 #include <Alert.h>
 #include <Box.h>
 #include <Catalog.h>
@@ -458,13 +457,6 @@ PoorManWindow::BuildFileMenu() const
 		new BMessage(MSG_MENU_FILE_SAVE_SELECTION)));
 		
 	ptrFileMenu->AddSeparatorItem();
-	
-	BAboutMenuItem * AboutItem = new BAboutMenuItem();
-	AboutItem->SetTarget(NULL, be_app);
-	ptrFileMenu->AddItem(AboutItem);
-
-	ptrFileMenu->AddSeparatorItem();
-	
 
 	ptrFileMenu->AddItem(new BMenuItem(STR_MNU_FILE_QUIT,
 		new BMessage(B_QUIT_REQUESTED), CMD_FILE_QUIT));

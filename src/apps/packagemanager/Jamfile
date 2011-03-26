@@ -6,7 +6,7 @@ Application PackageManager :
 	ApplicationView.cpp
 	ApplicationWindow.cpp
 	PackageManager.cpp
-	: be $(HAIKU_LOCALE_LIBS) libshared.a $(TARGET_LIBSUPC++) translation
+	: be $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++) translation
 	: PackageManager.rdef
 ;
 

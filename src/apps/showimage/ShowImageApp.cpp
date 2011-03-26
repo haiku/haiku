@@ -14,8 +14,6 @@
 
 #include <stdio.h>
 
-#include <AboutWindow.h>
-#include <Alert.h>
 #include <Catalog.h>
 #include <Clipboard.h>
 #include <FilePanel.h>
@@ -27,10 +25,6 @@
 #include "ShowImageConstants.h"
 #include "ShowImageWindow.h"
 #include "ToolBarIcons.h"
-
-
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "AboutWindow"
 
 
 const char* kApplicationSignature = "application/x-vnd.Haiku-ShowImage";
@@ -45,6 +39,7 @@ ShowImageApp::ShowImageApp()
 	fPulseStarted(false),
 	fLastWindowFrame(BRect(30, 30, 430, 330))
 {
+	B_TRANSLATE_MARK_SYSTEM_NAME("ShowImage");
 	_UpdateLastWindowFrame();
 	// BBitmap can be created after there is a BApplication instance.
 	init_tool_bar_icons();
@@ -139,22 +134,6 @@ ShowImageApp::MessageReceived(BMessage* message)
 			BApplication::MessageReceived(message);
 			break;
 	}
-}
-
-
-void
-ShowImageApp::AboutRequested()
-{
-	const char* authors[] = {
-		"Fernando F. Oliveira",
-		"Michael Wilber",
-		"Michael Pfeiffer",
-		"Ryan Leavengood",
-		"Axel Dörfler",
-		NULL
-	};
-	BAboutWindow about(B_TRANSLATE_SYSTEM_NAME("ShowImage"), 2003, authors);
-	about.Show();
 }
 
 

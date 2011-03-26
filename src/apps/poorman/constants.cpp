@@ -36,8 +36,6 @@ const char* STR_MNU_FILE_SAVE_AS
 	= B_TRANSLATE("Save console as" B_UTF8_ELLIPSIS);
 const char* STR_MNU_FILE_SAVE_SELECTION
 	= B_TRANSLATE("Save console selections as" B_UTF8_ELLIPSIS);
-const char* STR_MNU_FILE_ABOUT
-	= B_TRANSLATE("About PoorMan" B_UTF8_ELLIPSIS);
 const char* STR_MNU_FILE_QUIT
 	= B_TRANSLATE("Quit");
 const char* STR_MNU_EDIT

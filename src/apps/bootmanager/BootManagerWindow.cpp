@@ -42,8 +42,6 @@ BootManagerWindow::BootManagerWindow()
 
 	fController.Initialize(fWizardView);
 
-	AddShortcut('A', B_COMMAND_KEY, new BMessage(B_ABOUT_REQUESTED));
-
 	CenterOnScreen();
 
 	// Prevent minimizing this window if the user would have no way to
@@ -68,10 +66,6 @@ BootManagerWindow::MessageReceived(BMessage* msg)
 
 		case kMessagePrevious:
 			fController.Previous(fWizardView);
-			break;
-
-		case B_ABOUT_REQUESTED:
-			be_app_messenger.SendMessage(B_ABOUT_REQUESTED);
 			break;
 
 		default:
