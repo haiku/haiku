@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Time	3114592611
+1	german	x-vnd.Haiku-Time	844587475
 <Other>	Time		<Andere>
 Clock set to:	Time		Hardwareuhr gestellt auf:
 Current time:	Time		Aktuelle Zeit:
@@ -9,7 +9,8 @@ OK	Time		OK
 Preview time:	Time		Vorschau-Zeit:
 Revert	Time		Anfangswerte
 Set time zone	Time		Zeitzone setzen
-Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Time & Date\n\n\tvon Andrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
+Time	System name		Datum & Zeit
+Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Datum & Zeit\n\n\tvon Andrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
 Time zone	Time		Zeitzone
 \nNow: 	Time		\nJetzt:
 about	Time		über

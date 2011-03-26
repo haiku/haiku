@@ -1,6 +1,5 @@
-1	german	x-vnd.Haiku-MediaPlayer	1109719400
+1	german	x-vnd.Haiku-MediaPlayer	3334593067
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		Es ist ein interner Fehler in %app% aufgetreten. Die Datei konnte nicht geöffnet werden.
-%app%\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		%app%\n\nvon Marcus Overhagen, Stephan Aßmus und Frederik Modéen
 1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (Amerikanisch)
 100% scale	MediaPlayer-Main		100% Zoom
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2,35 : 1 (Cinemascope)
@@ -46,13 +45,14 @@ Import Entry	MediaPlayer-ImportPLItemsCmd		Eintrag importieren
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Interner Fehler (Sperren fehlgeschlagen). Speichern der Playliste fehlgeschlagen.
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Interner Fehler (falsche Nachrichtenstruktur). Speichern der Playliste fehlgeschlagen.
 Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Interner Fehler (Speicher reicht nicht aus). Speichern der Playliste fehlgeschlagen.
-It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Der Media Server läuft anscheinend nicht.\nSoll er gestartet werden?
+It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Der Mediaserver läuft anscheinend nicht.\nSoll er gestartet werden?
 Large	MediaPlayer-SettingsWindow		Groß
 Lock Peaks	MediaPlayer-PeakView		Ausschlag markieren
 Loop movies by default	MediaPlayer-SettingsWindow		Video in Endlosschleife abspielen
 Loop sounds by default	MediaPlayer-SettingsWindow		Audio in Endlosschleife abspielen
 Low volume	MediaPlayer-SettingsWindow		Niedrige Lautstärke
-MediaPlayer settings	MediaPlayer-SettingsWindow		MediaPlayer-Einstellungen
+MediaPlayer	System name		Media-Player
+MediaPlayer settings	MediaPlayer-SettingsWindow		Media-Player-Einstellungen
 Medium	MediaPlayer-SettingsWindow		Mittel
 Move Entries	MediaPlayer-MovePLItemsCmd		Einträge verschieben
 Move Entry	MediaPlayer-MovePLItemsCmd		Eintrag verschieben
@@ -62,7 +62,7 @@ Muted	MediaPlayer-SettingsWindow		Stumm geschaltet
 New player…	MediaPlayer-Main		Neuer Player...
 Next	MediaPlayer-Main		Nächster
 No aspect correction	MediaPlayer-Main		Seitenverhältnis nicht korrigieren
-None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Keine der gewählten Dateien scheinen Mediendateien zu sein.
+None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Keine der gewählten Dateien scheinen Mediadateien zu sein.
 Nothing to Play	MediaPlayer-Main		Nichts abzuspielen
 OK	MediaPlayer-Main		OK
 OK	MediaPlayer-PlaylistWindow		OK
@@ -109,7 +109,7 @@ Skip to the next track.	MediaPlayer-Main		Zum nächsten Track springen.
 Skip to the previous track.	MediaPlayer-Main		Zum vorigen Track springen.
 Small	MediaPlayer-SettingsWindow		Klein
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Einige Dateien konnten nicht in den Papierkorb verschoben werden.
-Start media server	MediaPlayer-Main		Media-Server starten
+Start media server	MediaPlayer-Main		Mediaserver starten
 Start playing.	MediaPlayer-Main		Starte Wiedergabe.
 Stop	MediaPlayer-Main		Stopp
 Stop playing.	MediaPlayer-Main		Wiedergabe stoppen.
@@ -117,7 +117,6 @@ Stream settings	MediaPlayer-Main		Stream-Einstellungen
 Subtitle placement:	MediaPlayer-SettingsWindow		Untertitelposition:
 Subtitle size:	MediaPlayer-SettingsWindow		Untertitelgröße:
 Subtitles	MediaPlayer-Main		Untertitel
-Thanks	MediaPlayer-Main		Danke
 The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Die Datei '%filename' konnte nicht geöffnet werden.\n\n
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Für dieses Format ist kein Decoder installiert oder er hat Probleme mit der dieser Version des Formats.
 Toggle mute.	MediaPlayer-Main		Stumm umschalten.

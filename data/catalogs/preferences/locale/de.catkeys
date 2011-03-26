@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Locale	250177593
+1	german	x-vnd.Haiku-Locale	1488345554
 12 hour	TimeFormatSettings		12 Stunden
 24 hour	TimeFormatSettings		24 Stunden
 Available languages	Locale Preflet Window		Verfügbare Sprachen
@@ -10,8 +10,9 @@ Deskbar and Tracker need to be restarted for this change to take effect. Would y
 Formatting	Locale Preflet Window		Formatierung
 Full format:	TimeFormatSettings		Volles Format:
 Language	Locale Preflet Window		Sprache
-Locale	Locale Preflet		Locale - Landes- und Spracheinstellungen
-Locale	Locale Preflet Window		Locale - Lokalisierung
+Locale	Locale Preflet		Land & Sprache
+Locale	Locale Preflet Window		Land & Sprache
+Locale	System name		Land & Sprache
 Long format:	TimeFormatSettings		Langes Format:
 Medium format:	TimeFormatSettings		Mittleres Format:
 Negative:	TimeFormatSettings		Negativ:

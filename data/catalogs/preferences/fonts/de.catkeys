@@ -1,7 +1,9 @@
-1	german	x-vnd.Haiku-Fonts	2902081521
+1	german	x-vnd.Haiku-Fonts	4164233892
 Bold font:	Font view		Fett:
 Defaults	Main window		Standardwerte
 Fixed font:	Font view		Feste Breite:
+Fonts	System name		Schriftarten
+Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Schriftarten\n\tCopyright 2004-2005, Haiku.\n\n
 Menu font:	Font view		Menü:
 OK	main		OK
 Plain font:	Font view		Normal:

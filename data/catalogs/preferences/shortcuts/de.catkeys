@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Shortcuts	2152414241
+1	german	x-vnd.Haiku-Shortcuts	4103143985
 (Choose application with file requester)	ShortcutsWindow		(Eine Anwendung per Datei-Dialog wählen)
 *Beep	ShortcutsWindow		*Piepton
 *InsertString \"Your Text Here\"	ShortcutsWindow		*Zeichen einfügen \"Hier der Text\"
@@ -10,8 +10,8 @@
 *MoveMouseTo 50% 50%	ShortcutsWindow		*Maus zur Bildschirmmitte bewegen
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		Maus nach oben ins linke Eck und Maustaste 1 drücken
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*Öffne Suche-Dialog
-About Shortcuts	ShortcutsApp		Über Shortcuts...
-About Shortcuts	ShortcutsWindow		Über Shortcuts...
+About Shortcuts	ShortcutsApp		Über Tastenkürzel...
+About Shortcuts	ShortcutsWindow		Über Tastenkürzel...
 Add new shortcut	ShortcutsWindow		Neue Tasten-Kombi
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 Append	ShortcutsWindow		Anhängen
@@ -47,9 +47,10 @@ Save KeySet as…	ShortcutsWindow		Tastenbelegung speichern unter...
 Select	ShortcutsWindow		Auswählen
 SendMessage	ShortcutsSpec		Nachricht senden
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
+Shortcuts	System name		Tastenkürzel
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Die Tastenbelegungsdatei konnte nicht geladen werden.
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Die Tastenbelegungsdatei konnte nicht gelesen werden.
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Die Tastenbelegungsdatei konnte nicht gespeichert werden.
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Die Tastenbelegung konnte nicht gespeichert werden.
-Shortcuts\n\nBased on SpicyKeys for BeOS made by Jeremy Friesner.	ShortcutsApp		Shortcuts\n\nBasiert auf SpiceyKeys für BeOS von Jeremy Friesner.
+Shortcuts\n\nBased on SpicyKeys for BeOS made by Jeremy Friesner.	ShortcutsApp		Tastenkürzel\n\nBasiert auf SpiceyKeys für BeOS von Jeremy Friesner.
 Window	ShortcutsSpec	Name for modifier on keyboard	Windows

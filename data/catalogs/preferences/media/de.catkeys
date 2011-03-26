@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Media	293613603
+1	german	x-vnd.Haiku-Media	1473363280
 <none>	Media views		<nichts>
 Audio input:	Media views		Audio-Eingang:
 Audio mixer	Media Window		Audiomixer
@@ -11,12 +11,13 @@ Couldn't add volume control in Deskbar: %s\n	Media views		Die Lautstärkeregelun
 Couldn't remove volume control in Deskbar: %s\n	Media views		Die Lautstärkeregelung konnte nicht aus der Deskbar entfernt werden: %s\n
 Defaults	Media views		Standardwerte
 Done shutting down.	Media Window		Herunterfahren beendet.
+Media	System name		Audio & Video
 OK	Media Window		OK
 Quit	Media Window		Beenden
 Ready for use…	Media Window		Einsatzbereit…
-Restart media services	Media views		Mediendienste neustarten
-Restarting media services\nShutting down media server\n	Media Window		Neustart der Mediendienste\nMediaserver wird heruntergefahren\n
-Restarting media services\nStarting media server…\n	Media Window		Neustart der Mediendienste\nMediaserver wird gestartet…\n
+Restart media services	Media views		Mediadienste neustarten
+Restarting media services\nShutting down media server\n	Media Window		Neustart der Mediadienste\nMediaserver wird heruntergefahren\n
+Restarting media services\nStarting media server…\n	Media Window		Neustart der Mediadienste\nMediaserver wird gestartet…\n
 Show volume control on Deskbar	Media views		Lautstärkeregelung in Deskbar
 Start media server	Media Window		Mediaserver starten
 Starting media server…	Media Window		Mediaserver wird gestartet…

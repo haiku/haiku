@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-PowerStatus	51899741
+1	german	x-vnd.Haiku-PowerStatus	4269725527
 About	PowerStatus		über
 About…	PowerStatus		Über…
 Battery charging	PowerStatus		Akku wird geladen
@@ -22,8 +22,9 @@ Model number: 	PowerStatus		Modellnummer:
 OEM info: 	PowerStatus		OEM-Info:
 OK	PowerStatus		OK
 Power status box	PowerStatus		Energie-Status-Box
-PowerStatus	PowerStatus		PowerStatus
-PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		PowerStatus\nvon Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
+PowerStatus	PowerStatus		Akku-Anzeige
+PowerStatus	System name		Akku-Anzeige
+PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		Akku-Anzeige\nvon Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
 Quit	PowerStatus		Beenden
 Run in window	PowerStatus		Im Fenster ausführen
 Serial number: 	PowerStatus		Seriennummer:
@@ -33,7 +34,7 @@ Show text label	PowerStatus		Beschriftung anzeigen
 Show time	PowerStatus		Zeit anzeigen
 Technology: 	PowerStatus		Technologie:
 Type: 	PowerStatus		Typ:
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		PowerStatus kann im Fenster ausgeführt oder in der Deskbar installiert werden.
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Die Akku-Anzeige kann im Fenster dargestellt oder in der Deskbar installiert werden.
 charging	PowerStatus		wird geladen
 discharging	PowerStatus		wird entladen
 mA	PowerStatus		mA

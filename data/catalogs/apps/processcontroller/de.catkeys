@@ -1,6 +1,6 @@
-1	german	x-vnd.Haiku-ProcessController	526557007
+1	german	x-vnd.Haiku-ProcessController	2887520383
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	
-About ProcessController…	ProcessController		Über ProcessController...
+About ProcessController…	ProcessController		Über Systemmanager...
 Cancel	ProcessController		Abbrechen
 Custom priority	ProcessController		Anwendungsspezifische Priorität
 Damned!	ProcessController		Herrje!
@@ -23,7 +23,8 @@ Normal priority	ProcessController		Normale Priorität
 OK	ProcessController		OK
 Ok!	ProcessController		OK
 Please confirm	ProcessController		Bitte bestätigen
-ProcessController is already installed in Deskbar.	ProcessController		ProcessController ist bereits in der Deskbar installiert.
+ProcessController	System name		Systemmanager
+ProcessController is already installed in Deskbar.	ProcessController		Der Systemmanager ist bereits in der Deskbar installiert.
 Processor %d	ProcessController		Prozessor %d
 Quit an application	ProcessController		Anwendung beenden
 Quit application	ProcessController		Anwendung beenden
@@ -43,5 +44,5 @@ Urgent priority	ProcessController		Hohe Priorität
 Usage: %s [-deskbar]\n	ProcessController		Gebrauch: %s [-deskbar]\n
 What do you want to do with the thread \"%s\"?	ProcessController		Was soll mit dem Thread \"%s\" geschehen?
 Yes, kill this team!	ProcessController		Ja, dieses Team beenden!
-You can run ProcessController in a window or install it in the Deskbar.	ProcessController		ProcessController kann im Fenster ausgeführt oder in der Deskbar installiert werden.
+You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Der Systemmanager kann im Fenster ausgeführt oder in der Deskbar installiert werden.
 Your setting file could not be saved!\n(%s)	ProcessController		Die Einstellungsdatei konnte nicht gespeichert werden.\n(%s)

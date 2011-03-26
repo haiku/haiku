@@ -1,8 +1,8 @@
-1	german	x-vnd.Be-MAIL	1806372798
+1	german	x-vnd.Be-MAIL	3225774574
 %d - Date	Mail		%d - Datum
 %e - E-mail address	Mail		%e - E-Mail-Adresse
 %n - Full name	Mail		%n - Voller Name
-About Mail…	Mail		Über Mail…
+About Mail…	Mail		Über E-Mail…
 Account from mail	Mail		Konto der Nachricht
 Account:	Mail		Konto:
 Accounts…	Mail		Konten…
@@ -32,7 +32,7 @@ Copy to new	Mail		In neue Nachricht kopieren
 Couldn't open this signature. Sorry.	Mail		Diese Signatur konnte leider nicht geöffnet werden.
 Cut	Mail		Ausschneiden
 Date:	Mail		Datum:
-Decoding:	Mail		Zeichendekodierung:
+Decoding:	Mail		Kodierung:
 Default account:	Mail		Standardkonto:
 Delete	Mail		Löschen
 Discard	Mail		Verwerfen
@@ -60,9 +60,10 @@ Initial spell check mode:	Mail		Rechtschreibprüfung:
 Leave as '%s'	Mail		Status '%s' belassen
 Leave as New	Mail		Status 'New' belassen
 Leave same	Mail		Status belassen
+Mail	System name		E-Mail
 Mail couldn't find its dictionary.	Mail		Das Wörterbuch wurde nicht gefunden.
-Mail preferences	Mail		Mail-Einstellungen
-Mail\n\n	Mail		Mail\n\n
+Mail preferences	Mail		E-Mail-Einstellungen
+Mail\n\n	Mail		E-Mail\n\n
 Mailing	Mail		Nachrichten
 Message	Mail		Nachricht
 Move to trash	Mail		In den Papierkorb verschieben

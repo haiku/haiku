@@ -28,8 +28,8 @@ Device name	DevicePCI		Gerätename
 Device name:	Device		Gerätename:
 Device paths	Device		Gerätepfade
 Device paths	DevicePCI		Gerätepfad
-Devices	System name		Geräte
 Devices	DevicesView		Geräte
+Devices	System name		Geräte
 Display controller	Device		Anzeige-Controller
 Docking station	Device		Andockstation
 Driver used	Device		Treiber benutzt

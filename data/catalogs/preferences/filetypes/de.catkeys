@@ -70,8 +70,8 @@ File	FileTypes Window		Datei
 File could not be opened	Preferred App Menu		Datei konnte nicht geöffnet werden
 File recognition	FileTypes Window		Dateierkennung
 File type	FileType Window		Dateityp
-FileTypes	System name		Dateitypen
 FileTypes	FileTypes		FileTypes
+FileTypes	System name		Dateitypen
 FileTypes request	FileTypes		Dateityp-Anforderung
 FileTypes request	FileTypes Window		Dateityp-Anfrage
 FileTypes request	Preferred App Menu		Dateityp-Anfrage

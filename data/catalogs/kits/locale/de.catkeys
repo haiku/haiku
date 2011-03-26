@@ -1,4 +1,4 @@
-1	german	system	320832488
+1	german	system	180647795
 %.2f TiB	StringForSize		%.2f TiB
 %3.2f GiB	StringForSize		%3.2f GiB
 %3.2f KiB	StringForSize		%3.2f KiB
@@ -9,7 +9,9 @@ About %app%	AboutMenuItem		Über %app%
 About %app…	Dragger		Über %app...
 About…	AboutWindow		Über...
 Blue:	ColorControl		Blau:
+Can't delete this replicant from its original application. Life goes on.	Dragger		Dieser Replikant kann nicht von seinem Ursprungsprogramm entfernt werden. Das Leben geht weiter.
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Replikant für \"%description\" konnte nicht erstellt werden.\n%error
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Das Ursprungsprogramm für den Replikanten konnte nicht gefunden werden, da keine Programm-Signatur zur Verfügung steht.\n%error
 Close	AboutWindow		Schließen
 Copy	TextView		Kopieren
 Copyright © %years% Haiku, Inc.	AboutWindow		Copyright © %years% Haiku, Inc.

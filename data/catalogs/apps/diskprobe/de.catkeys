@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-DiskProbe	2592803962
+1	german	x-vnd.Haiku-DiskProbe	3441574721
 %ld (native)	ProbeView		%ld (nativ)
 (native)	ProbeView		(nativ)
 15 bit	TypeEditors		15 Bit
@@ -17,7 +17,6 @@
 8 bit palette	TypeEditors		8-Bit-Palette
 8 bit signed value:	TypeEditors		8-Bit-Wert mit Vorzeichen:
 8 bit unsigned value:	TypeEditors		Vorzeichenloser 8-Bit-Wert:
-About DiskProbe…	FileWindow		Über DiskProbe...
 Add	ProbeView		Hinzu
 Attribute	AttributeWindow		Attribut
 Attribute	ProbeView		Attribut
@@ -53,8 +52,9 @@ Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it i
 Device	ProbeView		Gerät
 Device offset: 	ProbeView		Gerät-Offset: 
 Device: 	ProbeView		Gerät: 
+DiskProbe	System name		Hex-Editor
 DiskProbe request	AttributeWindow		DiskProbe-Anfrage
-DiskProbe request	DiskProbe		DiskProbe-Anfrage
+DiskProbe request	DiskProbe		Hex-Editor-Anfrage
 DiskProbe request	ProbeView		DiskProbe-Anfrage
 Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Soll das Attribut \"%s\" wirklich von der Datei \"%s\" entfernt werden?\n\nDiese Aktion kann nicht rückgängig gemacht werden.
 Don't save	ProbeView		Verwerfen

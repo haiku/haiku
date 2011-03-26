@@ -1,6 +1,6 @@
-1	german	x-vnd.Haiku.PoorMan	3256761185
+1	german	x-vnd.Haiku.PoorMan	412131821
 A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Der Standard Web-Ordner \"/boot/home/public_html\" wurde erstellt.\nDarin muss sich eine HTML-Datei mit dem Namen \"index.html\" befinden.
-About PoorMan…	PoorMan		Über PoorMan...
+About PoorMan…	PoorMan		Über Webserver...
 Advanced	PoorMan		Erweitert
 Cancel	PoorMan		Abbrechen
 Cannot start the server	PoorMan		Der Server konnte nicht gestartet werden.
@@ -11,7 +11,7 @@ Console Logging	PoorMan		In Konsole loggen
 Controls	PoorMan		Aktionen
 Copy	PoorMan		Kopieren
 Create	PoorMan		Erstelle
-Create PoorMan log	PoorMan		PoorMan-Logdatei erstellen
+Create PoorMan log	PoorMan		Logdatei erstellen
 Create log file	PoorMan		Logdatei erstellen
 Default	PoorMan		Standard
 Dir Created	PoorMan		Ordner erstellt
@@ -33,8 +33,9 @@ Logging	PoorMan		Log
 Logging view	PoorMan		Log-Ansicht
 Max. simultaneous connections:	PoorMan		Max. gleichzeitige Verbindungen:
 OK	PoorMan		OK
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Bitte den Ordner auswählen, der im Web veröffentlicht werden soll.\n\nPoorMan kann den standardmäßigen \"public_html\" Ordner im home-Ordner erstellen oder einen frei zu wählenden Ordner benutzen.
-PoorMan settings	PoorMan		PoorMan-Einstellungen
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Bitte den Ordner auswählen, der im Web veröffentlicht werden soll.\n\nDer Webserver kann den standardmäßigen \"public_html\" Ordner im home-Ordner erstellen oder einen frei zu wählenden Ordner benutzen.
+PoorMan	Application name		Webserver
+PoorMan settings	PoorMan		Webserver-Einstellungen
 Quit	PoorMan		Beenden
 Run server	PoorMan		Server starten
 Save console as…	PoorMan		Konsole speichern als...

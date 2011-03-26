@@ -1,9 +1,9 @@
-1	german	x-vnd.Haiku-Pulse	2596799409
+1	german	x-vnd.Haiku-Pulse	2324471783
 %.2f GHz	NormalPulseView		%.2f GHz
 %ld MHz	NormalPulseView		%ld MHz
 %s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nvon David Ramsey und Arve Hjønnevåg\nÜberarbeitet von Daniel Switkin\n
-About Pulse…	CPUButton		Über Pulse...
-About Pulse…	PulseView		Über Pulse...
+About Pulse…	CPUButton		Über CPU-Anzeige...
+About Pulse…	PulseView		Über CPU-Anzeige...
 Active color	ConfigView		Aktive Farbe
 Bar colors	ConfigView		Balkenfarbe
 CPU progress bar	NormalPulseView		CPU-Auslastungsbalken
@@ -33,9 +33,10 @@ OK	DeskbarPulseView		OK
 OK	PrefsWindow		OK
 OK	PulseApp		OK
 OK	PulseView		OK
-Pulse	NormalPulseView		Pulse
-Pulse	PulseApp		Pulse
-Pulse settings	PulseWindow		Pulse-Einstellungen
+Pulse	NormalPulseView		CPU-Anzeige
+Pulse	PulseApp		CPU-Anzeige
+Pulse	System name		CPU-Anzeige
+Pulse settings	PulseWindow		CPU-Anzeige Einstellungen
 Quit	DeskbarPulseView		Beenden
 Quit	MiniPulseView		Beenden
 Remove replicant	CPUButton		Replikant entfernen

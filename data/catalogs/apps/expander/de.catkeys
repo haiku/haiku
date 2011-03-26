@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Expander	1802170279
+1	german	x-vnd.Haiku-Expander	187676748
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Soll das Entpacken wirklich abgebrochen werden? Die entpackten Dateien sind eventuell nicht vollständig.
 Automatically expand files	ExpanderPreferences		Archiv automatisch entpacken
 Automatically show contents listing	ExpanderPreferences		Dateiliste automatisch anzeigen
@@ -13,7 +13,11 @@ Destination folder:	ExpanderPreferences		Zielordner:
 Error when expanding archive	ExpanderWindow		Fehler beim Entpacken
 Expand	ExpanderMenu		Entpacken
 Expand	ExpanderWindow		Entpacken
-Expanding '%s'	ExpanderWindow		Entpacke #%s'
+Expander	System name		Entpacker
+Expander settings	ExpanderPreferences		Entpacker-Einstellungen
+Expander: Choose destination	DirectoryFilePanel		Entpacker: Zielordner wählen
+Expander: Open	ExpanderWindow		Entpacker: Öffnen
+Expanding '%s'	ExpanderWindow		'%s' wird entpackt
 Expansion:	ExpanderPreferences		Entpacken:
 File	ExpanderMenu		Datei
 File expanded	ExpanderWindow		Archiv wurde entpackt

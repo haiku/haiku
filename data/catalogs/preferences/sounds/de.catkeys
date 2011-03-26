@@ -1,7 +1,7 @@
-1	german	x-vnd.Haiku-Sounds	145262565
+1	german	x-vnd.Haiku-Sounds	3924145958
 <none>	HEventList		<kein>
 <none>	HWindow		<kein>
-About Sounds	SoundsHApp		Über Sounds
+About Sounds	SoundsHApp		Über Klänge
 Event	HEventList		Ereignis
 No such file or directory	HEventList		Datei oder Ordner nicht gefunden
 OK	HEventList		OK
@@ -11,6 +11,7 @@ Other…	HWindow		Weitere...
 Play	HWindow		Wiedergabe
 Sound	HEventList		Klang
 Sound File:	HWindow		Klangdatei:
-Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Sounds\n\nvon Oliver Ruiz Dorantes und Jérôme Duval.\nOriginalversion von Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku
+Sounds	System name		Klänge
+Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Klänge\n\nvon Oliver Ruiz Dorantes und Jérôme Duval.\nOriginalversion von Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku
 Stop	HWindow		Stopp
 This is not an audio file.	HWindow		Dies ist keine Audiodatei.

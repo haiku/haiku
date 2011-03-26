@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-StyledEdit	881610730
+1	german	x-vnd.Haiku-StyledEdit	3064120758
 ???	LoadAlert		???
 Align	Menus		Ausrichtung
 Black	Menus		Schwarz
@@ -71,6 +71,7 @@ Search backwards	FindandReplaceWindow		Rückwärts suchen
 Select all	Menus		Alles auswählen
 Size	Menus		Größe
 Statistics…	Menus		Statistik...
+StyledEdit	System name		Texteditor
 This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Diese Datei ist als schreibgeschützt gekennzeichnet. Änderungen am Dokument \"%s\" speichern?
 Undo typing	QuitAlert		Rückgängig: Eingabe
 Untitled 	StyledEditWindow		Unbenannt

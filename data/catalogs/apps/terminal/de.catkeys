@@ -1,4 +1,5 @@
-1	german	x-vnd.Haiku-Terminal	4275906666
+1	german	x-vnd.Haiku-Terminal	1010009081
+%app% settings	Terminal PrefWindow	window title	%app%-Einstellungen
 -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h, --help diesen Hilfetext anzeigen\n -t, --title Fenstertitel setzen\n -f, --fullscreen Vollbildmodus starten\n
 Abort	Terminal Shell		Abbrechen
 About Terminal…	Terminal TermWindow		Über Terminal...
@@ -75,6 +76,7 @@ Size:	Terminal AppearancePrefView		Größe:
 Switch Terminals	Terminal TermWindow		Terminals wechseln
 Tab title:	Terminal AppearancePrefView		Reitertitel:
 Tab title:	Terminal TermWindow		Reitertitel:
+Terminal	System name		Terminal
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Das Terminal konnte die Konsole leider nicht starten.
 Terminal\n\nwritten by Kazuho Okui and Takashi Murai\nupdated by Kian Duffy and others\n\nCopyright ©2003-2009, Haiku.\n	Terminal TermView		Terminal\n\nvon Kazuho Okui und Takashi Murai\nAktualisiert von Kian Duffy und anderen\n\nCopyright ©2003-2009, Haiku.\n
 Text	Terminal AppearancePrefView		Text

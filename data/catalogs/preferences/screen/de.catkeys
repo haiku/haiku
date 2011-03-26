@@ -28,8 +28,8 @@ Refresh rate:	Screen		Bildwiederholrate:
 Resolution:	Screen		Auflösung:
 Revert	Screen		Anfangswerte
 Rows:	Screen		Zeilen:
+Screen	Screen		Bildschirm
 Screen	System name		Bildschirm
-Screen	Screen		Screen - Bildschirm
 Screen preferences by the Haiku team	Screen		Bildschirm Einstellungen, vom Haiku Team
 Set background…	Screen		Hintergrund einstellen...
 Settings will revert in %seconds seconds.	Screen		Die Einstellungen werden in %seconds Sekunden zurückgesetzt.

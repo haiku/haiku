@@ -1,4 +1,4 @@
-1	german	x-vnd.haiku-icon_o_matic	3809094595
+1	german	x-vnd.haiku-icon_o_matic	2332620696
 <modify path>	Icon-O-Matic-PathCmd		<Pfad ändern>
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<nichts zu wiederholen>
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<nichts rückgängig zu machen>
@@ -76,6 +76,7 @@ Gradient	Icon-O-Matic-StyleTypes		Farbverlauf
 Gradient type	Icon-O-Matic-StyleTypes		Verlaufstyp:
 HVIF Source Code	Icon-O-Matic-SavePanel		HVIF-Quellcode
 Height	Icon-O-Matic-PropertyNames		Höhe
+Icon-O-Matic	System name		Icon-O-Matic
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon-O-Matic konnte vielleicht nicht alle Daten aus dem SVG interpretieren, als es geladen wurde. Wird die Originaldatei überschrieben, werden diese Informationen verloren gehen.
 Insert Control Point	Icon-O-Matic-InsertPointCmd		Kontrollpunkt einfügen
 Invert selection	Icon-O-Matic-Properties		Auswahl umkehren

@@ -1,11 +1,12 @@
-1	german	x-vnd.Haiku-DataTranslations	2849987867
+1	german	x-vnd.Haiku-DataTranslations	758278388
 About	DataTranslations		Über
 An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Es exististiert bereits ein Objekt mit dem Namen '%name' im Translator-Ordner! Soll der bereits vorhandene Translator überschrieben werden?
 Cancel	DataTranslations		Abbrechen
 Could not install %s:\n%s	DataTranslations		Kann %s nicht installieren:\n%s
-DataTranslations - Error	DataTranslations		DataTranslations - Fehler
-DataTranslations - Note	DataTranslations		DataTranslations - Notiz
-DataTranslations\n\twritten by Oliver Siebenmarck and others\n\tCopyright 2002-2010, Haiku Inc. All rights reserved.\n	DataTranslations		DataTranslations\n\t von Oliver Siebenmarck und anderen\n\tCopyright 2002-2010, Haiku Inc. All rights reserved.\n
+DataTranslations	System name		Datenkonvertierung
+DataTranslations - Error	DataTranslations		Datenkonvertierung - Fehler
+DataTranslations - Note	DataTranslations		Datenkonvertierung - Notiz
+DataTranslations\n\twritten by Oliver Siebenmarck and others\n\tCopyright 2002-2010, Haiku Inc. All rights reserved.\n	DataTranslations		Datenkonvertierung\n\t von Oliver Siebenmarck und anderen\n\tCopyright 2002-2010, Haiku Inc. All rights reserved.\n
 Icon	DataTranslations		Icon
 Info	DataTranslations		Info
 Info:	DataTranslations		Info:
