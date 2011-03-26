@@ -77,6 +77,8 @@ static const rgb_color kHaikuGreen = { 42, 131, 36, 255 };
 static const rgb_color kHaikuOrange = { 255, 69, 0, 255 };
 static const rgb_color kHaikuYellow = { 255, 176, 0, 255 };
 static const rgb_color kLinkBlue = { 80, 80, 200, 255 };
+static const rgb_color kBeOSBlue = { 0, 0, 200, 255 };
+static const rgb_color kBeOSRed = { 200, 0, 0, 255 };
 
 typedef struct
 {
@@ -1187,8 +1189,20 @@ AboutView::_CreateCreditsView()
 	fCreditsView->Insert(B_TRANSLATE("\n\nSpecial thanks to:\n"));
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
-	fCreditsView->Insert(B_TRANSLATE(
+	BString beosCredits(B_TRANSLATE(
 		"Be Inc. and its developer team, for having created BeOS!\n\n"));
+	int32 beosOffset = beosCredits.FindFirst("BeOS");
+	fCreditsView->Insert(beosCredits.String(),
+		(beosOffset < 0) ? beosCredits.Length() : beosOffset);
+	if (beosOffset > -1) {
+		fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kBeOSBlue);
+		fCreditsView->Insert("B");
+		fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kBeOSRed);
+		fCreditsView->Insert("e");
+		fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
+		beosCredits.Remove(0, beosOffset + 2);
+		fCreditsView->Insert(beosCredits.String(), beosCredits.Length());
+	}
 	fCreditsView->Insert(
 		B_TRANSLATE("Travis Geiselbrecht (and his NewOS kernel)\n"));
 	fCreditsView->Insert(
