@@ -2176,7 +2176,7 @@ MainWin::_KeyDown(BMessage* msg)
 		case 't':			// t for Trash
 			if ((modifiers() & B_COMMAND_KEY) != 0) {
 				BAutolock _(fPlaylist);
-				BMessage removeMessage(M_PLAYLIST_REMOVE_AND_PUT_INTO_TRASH);
+				BMessage removeMessage(M_PLAYLIST_MOVE_TO_TRASH);
 				removeMessage.AddInt32("playlist index",
 					fPlaylist->CurrentItemIndex());
 				fPlaylistWindow->PostMessage(&removeMessage);

@@ -52,21 +52,6 @@
 // * replacing the contents by other stuff.
 
 
-enum {
-	// file
-	M_PLAYLIST_OPEN							= 'open',
-	M_PLAYLIST_SAVE							= 'save',
-	M_PLAYLIST_SAVE_AS						= 'svas',
-	M_PLAYLIST_SAVE_RESULT					= 'psrs',
-
-	// edit
-	M_PLAYLIST_EMPTY						= 'emty',
-	M_PLAYLIST_RANDOMIZE					= 'rand',
-
-	M_PLAYLIST_REMOVE						= 'rmov'
-};
-
-
 static void
 display_save_alert(const char* message)
 {
@@ -223,16 +208,13 @@ PlaylistWindow::MessageReceived(BMessage* message)
 			_SavePlaylist(message);
 			break;
 
-		case M_PLAYLIST_EMPTY:
-			fListView->RemoveAll();
-			break;
 		case M_PLAYLIST_RANDOMIZE:
 			fListView->Randomize();
 			break;
 		case M_PLAYLIST_REMOVE:
 			fListView->RemoveSelected();
 			break;
-		case M_PLAYLIST_REMOVE_AND_PUT_INTO_TRASH:
+		case M_PLAYLIST_MOVE_TO_TRASH:
 		{
 			int32 index;
 			if (message->FindInt32("playlist index", &index) == B_OK)
@@ -280,12 +262,12 @@ PlaylistWindow::_CreateMenu(BRect& frame)
 	editMenu->AddItem(new BMenuItem(B_TRANSLATE("Randomize"),
 		new BMessage(M_PLAYLIST_RANDOMIZE), 'R'));
 	editMenu->AddSeparatorItem();
-	editMenu->AddItem(new BMenuItem(B_TRANSLATE("Remove (Del)"),
+	editMenu->AddItem(new BMenuItem(B_TRANSLATE("Remove"),
 		new BMessage(M_PLAYLIST_REMOVE)/*, B_DELETE, 0*/));
-	editMenu->AddItem(new BMenuItem(B_TRANSLATE("Remove and put into Trash"),
-		new BMessage(M_PLAYLIST_REMOVE_AND_PUT_INTO_TRASH), 'T'));
-	editMenu->AddItem(new BMenuItem(B_TRANSLATE("Remove all"),
-		new BMessage(M_PLAYLIST_EMPTY), 'N'));
+			// TODO: See if we can support the modifier-less B_DELETE
+			// and draw it properly too. B_NO_MODIFIER?
+	editMenu->AddItem(new BMenuItem(B_TRANSLATE("Move file to Trash"),
+		new BMessage(M_PLAYLIST_MOVE_TO_TRASH), 'T'));
 
 	menuBar->AddItem(editMenu);
 

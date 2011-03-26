@@ -29,7 +29,16 @@ class BFilePanel;
 
 
 enum {
-	M_PLAYLIST_REMOVE_AND_PUT_INTO_TRASH	= 'rmtr'
+	// file
+	M_PLAYLIST_OPEN = 'open',
+	M_PLAYLIST_SAVE = 'save',
+	M_PLAYLIST_SAVE_AS = 'svas',
+	M_PLAYLIST_SAVE_RESULT = 'psrs',
+
+	// edit
+	M_PLAYLIST_RANDOMIZE = 'rand',
+	M_PLAYLIST_REMOVE = 'rmov',
+	M_PLAYLIST_MOVE_TO_TRASH = 'trsh'
 };
 
 
