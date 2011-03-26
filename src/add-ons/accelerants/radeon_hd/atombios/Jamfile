@@ -6,6 +6,8 @@ UsePrivateHeaders [ FDirName graphics radeon_hd ] ;
 UsePrivateHeaders [ FDirName graphics common ] ;
 
 DEFINES += DISABLE_EASF ;
+DEFINES += DRIVER_PARSER ;
+DEFINES += ENABLE_ALL_SERVICE_FUNCTIONS ;
 
 # To avoid changing AMD vendor sources
 TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
@@ -15,4 +17,5 @@ TARGET_WARNING_CCFLAGS += -Wno-pointer-to-int-cast ;
 StaticLibrary atombios.a :
 	Decoder.c
 	CD_Operations.c
+	hwserv_drv.c
 ;
