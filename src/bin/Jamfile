@@ -100,7 +100,6 @@ StdBinCommands
 	modifiers.cpp
 	open.cpp
 	play.cpp
-	query.cpp
 	quit.cpp
 	roster.cpp
 	setdecor.cpp
@@ -128,6 +127,11 @@ StdBinCommands
 	spybmessage.cpp
 	urlwrapper.cpp
 	: be $(TARGET_LIBSUPC++) : $(haiku-utils_rsrc) ;
+
+# commands that need libbe.so and liblocale.so
+StdBinCommands
+	query.cpp
+	: be $(HAIKU_LOCALE_LIBS) : $(haiku-utils_rsrc) ;
 
 # commands that need libbe.so, libsupc++.so and liblocale.so
 StdBinCommands

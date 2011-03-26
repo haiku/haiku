@@ -13,16 +13,17 @@
  */
 
 
+#include <Entry.h>
+#include <LocaleRoster.h>
 #include <Path.h>
 #include <Query.h>
-#include <Entry.h>
+#include <String.h>
 #include <Volume.h>
 #include <VolumeRoster.h>
-#include <String.h>
 
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 
@@ -33,6 +34,7 @@ static const char *kProgramName = __progname;
 static bool sAllVolumes = false;		// Query all volumes?
 static bool sEscapeMetaChars = true;	// Escape metacharacters?
 static bool sFilesOnly = false;			// Show only files?
+static bool sLocalizedAppNames = false;	// match localized names
 
 
 void
@@ -41,6 +43,7 @@ usage(void)
 	printf("usage: %s [ -ef ] [ -a || -v <path-to-volume> ] expression\n"
 		"  -e\t\tdon't escape meta-characters\n"
 		"  -f\t\tshow only files (ie. no directories or symbolic links)\n"
+		"  -l\t\tmatch expression with localized application names\n"
 		"  -a\t\tperform the query on all volumes\n"
 		"  -v <file>\tperform the query on just one volume; <file> can be any\n"
 		"\t\tfile on that volume. Defaults to the current volume.\n"
@@ -54,10 +57,12 @@ void
 perform_query(BVolume &volume, const char *predicate)
 {
 	BQuery query;
-
-	// Set up the volume and predicate for the query.
 	query.SetVolume(&volume);
-	query.SetPredicate(predicate);
+
+	if (sLocalizedAppNames)
+		query.SetPredicate("BEOS:APP_SIG=*");
+	else
+		query.SetPredicate(predicate);
 
 	status_t status = query.Fetch();
 	if (status == B_BAD_VALUE) {
@@ -84,9 +89,23 @@ perform_query(BVolume &volume, const char *predicate)
 			continue;
 		}
 
-		printf("%s\n", sEscapeMetaChars ? 
-			BString().CharacterEscape(path.Path(), " ()?*&\"'[]^\\~|;!<>*$\t", '\\').String()
-			: path.Path());
+		BString string;
+		if (sLocalizedAppNames && predicate != NULL) {
+			entry_ref ref;
+
+			if (entry.GetRef(&ref) != B_OK || BLocaleRoster::Default()
+				->GetLocalizedFileName(ref, string) != B_OK)
+				continue;
+
+			if (string.IFindFirst(predicate) < 0)
+				continue;
+		}
+
+		string = path.Path();
+		if (sEscapeMetaChars)
+			string.CharacterEscape(" ()?*&\"'[]^\\~|;!<>*$\t", '\\');
+
+		printf("%s\n", string.String());
 	}
 }
 
@@ -105,7 +124,7 @@ main(int argc, char **argv)
 
 	// Parse command-line arguments.
 	int opt;
-	while ((opt = getopt(argc, argv, "efav:")) != -1) {
+	while ((opt = getopt(argc, argv, "efalv:")) != -1) {
 		switch(opt) {
 			case 'e':
 				sEscapeMetaChars = false;
@@ -115,6 +134,9 @@ main(int argc, char **argv)
 				break;
 			case 'a':
 				sAllVolumes = true;
+				break;
+			case 'l':
+				sLocalizedAppNames = true;
 				break;
 			case 'v':
 				strlcpy(volumePath, optarg, B_FILE_NAME_LENGTH);
