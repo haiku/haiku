@@ -28,8 +28,8 @@ Refresh rate:	Screen		Частата абнаўлення:
 Resolution:	Screen		Дазвол:
 Revert	Screen		Вярнуць
 Rows:	Screen		Радкі:
-Screen	System name		Экран
 Screen	Screen		Экран
+Screen	System name		Экран
 Screen preferences by the Haiku team	Screen		Наладкі экрана, каманда Haiku
 Set background…	Screen		Прызначыць фон…
 Settings will revert in %seconds seconds.	Screen		Наладкі вернуцца праз %seconds секунд.

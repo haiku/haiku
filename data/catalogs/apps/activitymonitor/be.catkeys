@@ -4,7 +4,7 @@
 %.1f faults/s	DataSource		%.1f памылак/сек
 %lld ms	SettingsWindow		%lld м.сек
 %lld sec.	SettingsWindow		%lld сек.
-ActivityMonitor	System name		Манітор Актыўнасці
+ActivityMonitor	System name		МаніторАктыўнасці
 Add graph	ActivityWindow		Дадаць графік
 Additional items	ActivityView		Дадатковыя элементы
 Apps	DataSource		Праграмы

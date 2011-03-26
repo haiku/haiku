@@ -1,6 +1,5 @@
-1	belarusian	x-vnd.Haiku-MediaPlayer	1172481650
+1	belarusian	x-vnd.Haiku-MediaPlayer	3334593067
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		Адбылася ўнутраная памылка %app%. Файл не можа быць адкрыты.
-%app%\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		%app%\n\nРаспрацаваны Marcus Overhagen, Stephan Aßmus і Frederik Modéen
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Амерыка)
 100% scale	MediaPlayer-Main		Маштаб 100%
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Кінатэатр)
@@ -118,7 +117,6 @@ Stream settings	MediaPlayer-Main		Наладкі патоку
 Subtitle placement:	MediaPlayer-SettingsWindow		Месцазнаходжанне субтытраў:
 Subtitle size:	MediaPlayer-SettingsWindow		Памер субтытраў:
 Subtitles	MediaPlayer-Main		Субтытры
-Thanks	MediaPlayer-Main		Дзякуй
 The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Файл '%filename' немагчыма адкрыць.\n\n
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Не ўстаноўлены неабходны для фармата гэтага файла дэкодэр, або ён канфліктуе з асабістай версіяй фармата.
 Toggle mute.	MediaPlayer-Main		Укл/Выкл гук.

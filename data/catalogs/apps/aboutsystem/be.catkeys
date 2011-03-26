@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-About	3842515376
+1	belarusian	x-vnd.Haiku-About	3019397582
 %.2f GHz	AboutView		%.2f ГГц
 %d MiB total	AboutView		%d MiB усяго
 %d MiB used (%d%%)	AboutView		%d MiB выкарыстана (%d%%)
@@ -8,6 +8,7 @@
 ... and the many people making donations!\n\n	AboutView		... і тыя, хто рабіў саве ахвяраванні!\n\n
 About this system	AboutWindow		Інфармацыя пра сістэму
 AboutSystem	System name		Пра Сістэму
+Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. і яе распрацоўшчыкам, за тое што ставарылі BeOS!\n\n
 Contributors:\n	AboutView		Удзельнікі:\n
 Current maintainers:\n	AboutView		Дагляднікі:\n
 GCC %d Hybrid	AboutView		GCC %d Hybrid

@@ -1,5 +1,4 @@
-1	belarusian	x-vnd.Haiku.TV	2815571176
-About %1…	MainWin	Parameter %1 is the name of the application.	Пра %1...
+1	belarusian	x-vnd.Haiku.TV	1995288111
 Always on top	MainWin		Заўседы ў фокусе
 Channel	MainWin		Канал
 DVB - Digital Video Broadcasting TV	MainWin		DVB - Лічбавае тэлебачанне
@@ -19,11 +18,8 @@ Quit	MainWin		Выйсці
 Scale to native size	MainWin		Расцягнуць да роднага памеру
 Settings	MainWin		Наладкі
 Settings…	MainWin		Наладкі...
-TV	System name		Тэлевізар
 TV	MainWin		Тэлевізар
-\nBuild 	MainWin		\nЗборка
-\nRevision 	MainWin		\nРэвізія
-\nVersion 	MainWin		\nВерсія
+TV	System name		Тэлевізар
 force 544 x 576, display aspect 4:3	MainWin		прымусовыя 544 x 576 (4:3)
 force 704 x 576, display aspect 4:3	MainWin		прымусовыя 704 x 576 (4:3)
 force 720 x 576, display aspect 4:3	MainWin		прымусовыя 544 x 576 (4:3)

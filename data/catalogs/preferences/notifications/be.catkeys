@@ -26,9 +26,9 @@ Large icon	DisplayView		Вялікая іконка
 Last Received	NotificationView		Апошняе атрыманае
 Mini icon	DisplayView		Міні-іконка
 No	NotificationView		Не
-Notifications	System name		Паведамленні
 Notifications	GeneralView		Паведамленні
 Notifications	NotificationView		Паведамленні
+Notifications	System name		Паведамленні
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Немагчыма спыніць Notifications, бо сервер недаступны.
 OK	DisplayView		ОК
 OK	GeneralView		ОК

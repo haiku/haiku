@@ -1,6 +1,5 @@
-1	belarusian	x-vnd.Haiku-ShowImage	581710495
+1	belarusian	x-vnd.Haiku-ShowImage	1687870740
 %SECONDS seconds	Menus	Don't translate %SECONDS	%SECONDS сэкунд
-About ShowImage…	Menus		Пра ShowImage…
 Browse	Menus		Праглядзець
 Cancel	ClosePrompt		Адмена
 Clear selection	Menus		Ачысціць выдзяленне
@@ -43,8 +42,9 @@ Rotate clockwise	Menus		Павярнуць па гадзіннікавай ст�
 Rotate counterclockwise	Menus		Павярнуць супраць гадзіннікавай стрэлкі
 Save as…	Menus		Захаваць як...
 Select all	Menus		Выбраць усё
-Selection Mode	Menus		Рэжым Выдзялення
+Selection mode	Menus		Рэжым Выдзялення
 Show caption in full screen mode	Menus		Паказваць меткі ў паўнаэкранным меню
+Show tool bar	Menus		Паказаць панэль інструментаў
 ShowImage	System name		Выявы
 Slide delay	Menus		Затрымка слайду
 Slide show	Menus		Слайд шоу

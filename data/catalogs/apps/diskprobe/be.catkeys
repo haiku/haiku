@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-DiskProbe	1844123050
+1	belarusian	x-vnd.Haiku-DiskProbe	3441574721
 %ld (native)	ProbeView		%ld (родны)
 (native)	ProbeView		(родны)
 15 bit	TypeEditors		15 біт
@@ -17,7 +17,6 @@
 8 bit palette	TypeEditors		8-бітная палітра
 8 bit signed value:	TypeEditors		8-бітнае знакавае занчэнне
 8 bit unsigned value:	TypeEditors		8-бітнае занчэнне без знаку
-About DiskProbe…	FileWindow		Пра DiskProbe…
 Add	ProbeView		Дадаць
 Attribute	AttributeWindow		Атрыбут
 Attribute	ProbeView		Атрыбут
@@ -53,7 +52,7 @@ Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it i
 Device	ProbeView		Прылада
 Device offset: 	ProbeView		Адступ прылады:
 Device: 	ProbeView		Прылада:
-DiskProbe	System name		Рэдактар
+DiskProbe	System name		DiskProbe
 DiskProbe request	AttributeWindow		Запыт DiskProbe
 DiskProbe request	DiskProbe		Запыт DiskProbe
 DiskProbe request	ProbeView		Запыт DiskProbe

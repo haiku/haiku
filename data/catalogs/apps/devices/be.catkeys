@@ -28,8 +28,8 @@ Device name	DevicePCI		Імя прылады
 Device name:	Device		Імя прылады:
 Device paths	Device		Пуці прыладаў
 Device paths	DevicePCI		Пуці прыладаў
-Devices	System name		Прылады
 Devices	DevicesView		Прылады
+Devices	System name		Прылады
 Display controller	Device		Кантролер экрану
 Docking station	Device		Док-станцыя
 Driver used	Device		Ужыты драйвер

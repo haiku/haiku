@@ -23,7 +23,7 @@ Normal priority	ProcessController		Нармальны прыярытэт
 OK	ProcessController		ОК
 Ok!	ProcessController		ОК!
 Please confirm	ProcessController		Калі ласка падцвердзіце
-ProcessController	System name		Працэссы
+ProcessController	System name		Працэсы і патокі
 ProcessController is already installed in Deskbar.	ProcessController		ProcessController ужо ўсталяваны ў Deskbar.
 Processor %d	ProcessController		Працэсар %d
 Quit an application	ProcessController		Закрыць праграму

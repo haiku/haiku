@@ -33,9 +33,9 @@ OK	DeskbarPulseView		ОК
 OK	PrefsWindow		ОК
 OK	PulseApp		ОК
 OK	PulseView		ОК
-Pulse	System name		Пульс
 Pulse	NormalPulseView		Пульс
 Pulse	PulseApp		Пульс
+Pulse	System name		Пульс
 Pulse settings	PulseWindow		Наладкі Пульса
 Quit	DeskbarPulseView		Выйсці
 Quit	MiniPulseView		Выйсці

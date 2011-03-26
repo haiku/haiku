@@ -1,7 +1,5 @@
-1	belarusian	x-vnd.Haiku-Sudoku	3821952338
+1	belarusian	x-vnd.Haiku-Sudoku	2463385585
 Abort	ProgressWindow		Перарваць
-About	Sudoku		Пра
-About Sudoku…	SudokuWindow		Пра Sudoku…
 Advanced	SudokuWindow		Прасунуты
 Blank	SudokuWindow		Чысты
 Copy	SudokuWindow		Капіяваць
@@ -17,7 +15,6 @@ Help	SudokuWindow		Дапамога
 Mark invalid values	SudokuWindow		Пазначыць несапраўдныя значэнні
 Mark valid hints	SudokuWindow		Пазначыць несапраўдныя падказкі
 New	SudokuWindow		Новы
-OK	Sudoku		Так
 OK	SudokuWindow		Так
 Open file…	SudokuWindow		Адкрыць файл…
 Progress monitor	ProgressWindow		Паказнік прагрэсу
@@ -30,10 +27,8 @@ Solve	SudokuWindow		Вырашыць
 Solve single field	SudokuWindow		Вырашыць адно поле
 Start again	SudokuWindow		Запусціць наноў
 Sudoku	System name		Sudoku
-Sudoku	Sudoku		Sudoku
 Sudoku request	SudokuWindow		Запыт Sudoku
 Sudoku solved - congratulations!\n	SudokuWindow		Sudoku вырашана - віншуем!\n
-Sudoku\n\twritten by Axel Dörfler\n\tCopyright 2007, Haiku Inc.\n	Sudoku		Sudoku\n\tраспрацаваны Axel Dörfler\n\tCopyright 2007, Haiku Inc.\n
 Text	SudokuWindow		Тэкст
 Undo	SudokuWindow		Адвярнуць
 View	SudokuWindow		Від

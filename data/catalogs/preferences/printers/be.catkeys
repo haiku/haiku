@@ -26,8 +26,8 @@ Print test page	PrintersWindow		Надрукаваць тэставую стар
 Printer name:	AddPrinterDialog		Імя прынтэра:
 Printer type:	AddPrinterDialog		Тып прынтэру:
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Прынтэр: %printer_name%\nДрайвер: %driver%\n
-Printers	System name		Прынтэры
 Printers	PrintersWindow		Прынтэры
+Printers	System name		Прынтэры
 Processing	JobListView		Апрацоўка
 Red	TestPageView		Чырвоны
 Remove	PrintersWindow		Выдаліць

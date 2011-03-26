@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-MediaConverter	3607188411
+1	belarusian	x-vnd.Haiku-MediaConverter	424866547
 %.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f кГц %ld каналаў / %lld фрэймаў
 %.1f kHz mono / %lld frames	MediaFileInfo		%.1f кГц моно / %lld фрэймаў
 %.1f kHz stereo / %lld frames	MediaFileInfo		%.1f кГц стэрэа / %lld фрэймаў
@@ -6,7 +6,6 @@
 %d bit 	MediaFileInfo		%d біт
 %d byte 	MediaFileInfo		%d байтаў
 %u x %u, %.2ffps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%u x %u, %.2f fps / %Ld фрэймаў
-About…	MediaConverter		Пра праграму…
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Не ўдалося прачытаць інфармацыю пра файл.\n\nПамылка :
 Audio encoding:	MediaConverter		Аўдыё кадаванне:
 Audio quality not supported	MediaConverter		Якасць аўдыё не падтрымліваецца
@@ -39,9 +38,8 @@ File details	MediaConverter		Падрабязнасці пра файл
 File format:	MediaConverter		Фармат файла:
 High	MediaConverter		Найвышэйшая
 Low	MediaConverter		Нізкая
-MediaConverter	System name		МедыяКанвертар
+MediaConverter	System name		Канвертар медыя
 MediaConverter+:SaveDirectory	MediaConverter		КанвертарМедыя+:Захаваць папку
-MediaConverter\n1.3.0\n© 1999, Be Incorporated.\n© 2000-2004 Jun Suzuki\n© 2007 Stephan Aßmus\n© 2010 Haiku, Inc.	MediaConverter		Канвертар Медыя\n1.3.0\n© 1999, Be Incorporated.\n© 2000-2004 Jun Suzuki\n© 2007 Stephan Aßmus\n© 2010 Haiku, Inc.
 No audio	Audio codecs list		Няма аўдыё
 No file selected	MediaConverter-FileInfo		Не абрана ні воднага файла
 No video	Video codecs list		Няма відэа

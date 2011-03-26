@@ -70,8 +70,8 @@ File	FileTypes Window		Файл
 File could not be opened	Preferred App Menu		Файля ня можа быць адчынены
 File recognition	FileTypes Window		Распазанне файла
 File type	FileType Window		Тып файла
-FileTypes	System name		Тыпы файлаў
 FileTypes	FileTypes		FileTypes
+FileTypes	System name		Тыпы файлаў
 FileTypes request	FileTypes		запыт FileTypes
 FileTypes request	FileTypes Window		Запыт тыпу.
 FileTypes request	Preferred App Menu		Запыт FileTypes

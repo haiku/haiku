@@ -13,7 +13,7 @@ At least one partition must be selected!	BootManagerController		Найменей
 Back	BootManagerController	Button	Назад
 Backup Master Boot Record	BootManagerController	Title	Захаваць рэзервовую копію Master Boot Record
 Boot Manager is unable to read the partition table!	BootManagerController		Менеджер Запуску не можа прачытаць табліцу раздзелаў!
-BootManager	System name		Мэнэджэр Запуску
+BootManager	System name		Мэнэджэр Загрузкі
 Cannot access!	DrivesPage	Cannot install	Няма доступу!
 Default Partition	DefaultPartitionPage	Title	Прадвызначаны падзел
 Default Partition:	DefaultPartitionPage	Menu field label	Прадвызначаны падзел:

@@ -1,8 +1,7 @@
-1	belarusian	x-vnd.Haiku-ReadOnlyBootPrompt	3629104933
+1	belarusian	x-vnd.Haiku-ReadOnlyBootPrompt	2165068388
 Desktop (Live-CD)	BootPromptWindow		Дэсктоп (Live-CD)
 Do you wish to run the Installer or continue booting to the Desktop? You can also select your preferred language and keyboard layout from the list below.\n\nNote: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.	BootPromptWindow		Жадаеце запусціць Усталёўчык ці загрузіць дэсктоп? Таксама вы можаце выбраць пажаданую мову і расклад клавіятуры са спісу ніжэй.\nЗаметка: Лакалізацыя праграм і кампанентаў Haiku зараз у працэссе, таму вы можаце сустрэць многа неперакладзенага тэксту. Калі жадаеце дапамагчы, далучайцеся да нас на <www.haiku-os.org>.
 Keymap	BootPromptWindow		Расклад клавіятуры
 Language	BootPromptWindow		Мова
-ReadOnlyBootPrompt	System name		Запыт загрузчыка Life-CD 
 Run Installer	BootPromptWindow		Запусціць Усталёўшчык
 Welcome to Haiku!	BootPromptWindow		Вітаем!

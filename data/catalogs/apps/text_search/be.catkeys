@@ -1,14 +1,12 @@
-1	belarusian	x-vnd.Haiku.TextSearch	3449010850
+1	belarusian	x-vnd.Haiku.TextSearch	1180598828
 %APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME не змог адкрыць адзін ці некалькі каталогаў.
 %s: Not enough room to escape the filename.	Grepper		%s: Не хапае месца для перадання імя файла.
 %s: There was a problem running grep.	Grepper		%s: Праблема з запускам grep.
-About TextSearch…	GrepWindow		Пра Пошук Тэксту
 Actions	GrepWindow		Дзеянні
 Cancel	GrepWindow		Адмена
 Case-sensitive	GrepWindow		З улікам рэгістру
 Close	GrepWindow		Закрыць
 Copy text to clipboard	GrepWindow		Капіяваць у буфер
-Created by Matthijs Hollemans.\n\nContributed to by Peter Hinely, Serge Fantino, Hideki Naito, Oscar Lesta, Oliver Tappe, Jonas Sundström, Luc Schrijvers and momoziro.\n	GrepWindow		Аўтары: Matthijs Hollemans.\n\nЗ дапамогай: Peter Hinely, Serge Fantino, Hideki Naito, Oscar Lesta, Oliver Tappe, Jonas Sundström, Luc Schrijvers and momoziro.\n
 Encoding	GrepWindow		Кадоўка
 Escape search text	GrepWindow		Перадаць тэкст пошуку
 File	GrepWindow		Файл
