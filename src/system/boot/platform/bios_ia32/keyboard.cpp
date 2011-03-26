@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2011, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -43,12 +43,10 @@ clear_key_buffer(void)
 extern "C" union key
 wait_for_key(void)
 {
-	bios_regs regs;
-	regs.eax = 0;
-	call_bios(0x16, &regs);
-
 	union key key;
-	key.ax = regs.eax & 0xffff;
+	do {
+		key.ax = check_for_key();
+	} while (key.ax == 0);
 
 	return key;
 }
