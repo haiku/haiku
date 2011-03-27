@@ -1,5 +1,4 @@
-1	swedish	x-vnd.Haiku-LaunchBox	1244694305
-About	LaunchBox		Om
+1	swedish	x-vnd.Haiku-LaunchBox	2343538722
 Add button here	LaunchBox		Lägg till knapp
 Auto-raise	LaunchBox		Upphöj automatiskt
 Bummer	LaunchBox		Hoppsan
@@ -15,7 +14,7 @@ Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Misslycka
 Horizontal layout	LaunchBox		Horisontal utformning
 Icon size	LaunchBox		Ikonstorlek
 Ignore double-click	LaunchBox		Ignorera dubbelklick
-LaunchBox	System name		StartBlocket
+LaunchBox	System name		StartBlock
 Name Panel	LaunchBox		Namnge Block
 New	LaunchBox		Ny
 OK	LaunchBox		OK
@@ -29,7 +28,6 @@ Set description…	LaunchBox		Ange beskrivning...
 Settings	LaunchBox		Inställningar
 Show on all workspaces	LaunchBox		Visa på alla arbetsytor
 Show window border	LaunchBox		Visa fönsterkant
-Stephan Aßmus (aka stippi)	LaunchBox		Stephan Aßmus (också känd som stippi)
 Vertical layout	LaunchBox		Vertikal utformning
 You can drag an icon here.	LaunchBox		Du kan dra en ikon hit.
 last chance	LaunchBox		sista chansen

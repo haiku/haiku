@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-DiskProbe	1844123050
+1	swedish	x-vnd.Haiku-DiskProbe	3441574721
 %ld (native)	ProbeView		%ld (native)
 (native)	ProbeView		(native)
 15 bit	TypeEditors		15 bitar
@@ -17,7 +17,6 @@
 8 bit palette	TypeEditors		8 bitars palett
 8 bit signed value:	TypeEditors		8 bitars signed-värde:
 8 bit unsigned value:	TypeEditors		8 bitars unsigned-värde:
-About DiskProbe…	FileWindow		Om DiskInspekteraren...
 Add	ProbeView		Lägg till
 Attribute	AttributeWindow		Attribut
 Attribute	ProbeView		Attribut
@@ -53,10 +52,10 @@ Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it i
 Device	ProbeView		Enhet
 Device offset: 	ProbeView		Enhetsoffset:
 Device: 	ProbeView		Enhet:
-DiskProbe	System name		DiskInspekteraren
+DiskProbe	System name		DiskInspekterare
 DiskProbe request	AttributeWindow		DiskInspekteraren
 DiskProbe request	DiskProbe		DiskInspekteraren
-DiskProbe request	ProbeView		DiskInspekteraren-begäran
+DiskProbe request	ProbeView		DiskInspekterar begäran
 Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Vill du verkligen ta bort attributet \"%s\" från filen \"%s\"?\n\nDu kan inte ångra denna aktion.
 Don't save	ProbeView		Spara inte
 Double precision floating-point value:	TypeEditors		Dubbelprecisions flyttals-värde:

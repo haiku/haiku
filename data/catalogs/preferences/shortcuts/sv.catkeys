@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Shortcuts	4103143985
+1	swedish	x-vnd.Haiku-Shortcuts	621368175
 (Choose application with file requester)	ShortcutsWindow		(Välj applikation i filväljarfönstret)
 *Beep	ShortcutsWindow		*Pip
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InfogaSträng \"Din text\"
@@ -10,8 +10,6 @@
 *MoveMouseTo 50% 50%	ShortcutsWindow		*FlyttaMuspekareTill 50% 50%
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Flera \"*FlyttaMusTill 100% 0\" \"*Musknapp 1\"
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SkickaMeddelande application/x-vnd.Be-TRAK 'Tfnd'
-About Shortcuts	ShortcutsApp		Om Genvägar
-About Shortcuts	ShortcutsWindow		Om Genvägar
 Add new shortcut	ShortcutsWindow		Lägg till
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 Append	ShortcutsWindow		Lägg till
@@ -32,7 +30,6 @@ MouseUp	ShortcutsSpec		MusknappUpp
 MoveMouse	ShortcutsSpec		FlyttaMus
 MoveMouseTo	ShortcutsSpec		FlyttaMusenTill
 Multi	ShortcutsSpec		Multi
-OK	ShortcutsApp		OK
 OK	ShortcutsWindow		OK
 Oh no	ShortcutsWindow		Åh nej!
 Open	ShortcutsWindow		Öppna
@@ -52,5 +49,4 @@ Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Genvägar kunde i
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Genvägar kunde inte läsa dina inställningar!
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Genvägar kunde inte spara dina inställningar!
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Genvägar kunde inte spara din genvägsuppsättning.
-Shortcuts\n\nBased on SpicyKeys for BeOS made by Jeremy Friesner.	ShortcutsApp		Genvägar\n\nBaserat på SpicyKeys för BeOS, skrivet av Jeremy Friesner.
 Window	ShortcutsSpec	Name for modifier on keyboard	Start

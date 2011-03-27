@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-PackageInstaller	3608009980
+1	swedish	x-vnd.Haiku-PackageInstaller	2979335347
 %.1f GiB	PackageView		%.1f GiB
 %.1f KiB	PackageView		%.1f KiB
 %.1f MiB	PackageView		%.1f MiB
@@ -33,11 +33,9 @@ No installation type selected	PackageView		Ingen installationstyp vald
 No package available.	PackageInfo		Inga paket tillgängliga.
 No package selected.	PackageInfo		Inga paket valda.
 OK	PackageView		OK
-OK	Packageinstaller main		OK
 Other…	PackageView		Annan...
 Package installer	PackageView		Paket intallerare
 PackageInstaller	System name		PaketInstallerare
-PackageInstaller\nBeOS legacy .pkg file installer for Haiku.\n\nCopyright 2007,\nŁukasz 'Sil2100' Zemczak\n\nCopyright (c) 2007 Haiku, Inc. \n	Packageinstaller main		PaketInstallerare\nBeOS paket installerare för Haiku.\n\nUpphovsrätt 2007,\nŁukasz 'Sil2100' Zemczak\n\nUpphovsrätt (c) 2007 Haiku, Inc. \n
 Preparing package	PackageInstall		Förbereder paket
 Replace	PackageView		Ersätt
 Running post-installation scripts	PackageInstall		Kör efter-installationsskript

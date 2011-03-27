@@ -22,8 +22,8 @@ Model number: 	PowerStatus		Modellnummer:
 OEM info: 	PowerStatus		OEM information:
 OK	PowerStatus		OK
 Power status box	PowerStatus		Batteristatus
-PowerStatus	System name		BatteriStatus
 PowerStatus	PowerStatus		BatteriStatus
+PowerStatus	System name		BatteriStatus
 PowerStatus\nwritten by Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n	PowerStatus		BatteriStatus\nskrivet av Axel Dörfler, Clemens Zeidler\nCopyright 2006, Haiku, Inc.\n
 Quit	PowerStatus		Avsluta
 Run in window	PowerStatus		Kör i fönster

@@ -13,7 +13,7 @@ At least one partition must be selected!	BootManagerController		Minst en partiti
 Back	BootManagerController	Button	Tillbaka
 Backup Master Boot Record	BootManagerController	Title	Säkerhetskopiera huvudstartsektorn
 Boot Manager is unable to read the partition table!	BootManagerController		Starthanteraren kan inte läsa partitionstabellen!
-BootManager	System name		StartHanteraren
+BootManager	System name		StartHanterare
 Cannot access!	DrivesPage	Cannot install	Kan inte få åtkomst!
 Default Partition	DefaultPartitionPage	Title	Standardpartition
 Default Partition:	DefaultPartitionPage	Menu field label	Förvald partition:

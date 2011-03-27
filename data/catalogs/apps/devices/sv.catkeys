@@ -28,8 +28,8 @@ Device name	DevicePCI		Enhetsnamn
 Device name:	Device		Enhetsnamn:
 Device paths	Device		Enhetssökväg
 Device paths	DevicePCI		Enhetssökväg
-Devices	System name		Enheter
 Devices	DevicesView		Enheter
+Devices	System name		Enheter
 Display controller	Device		Skärmkontroller
 Docking station	Device		Dockningsstation
 Driver used	Device		Drivrutin använd

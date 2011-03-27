@@ -1,12 +1,12 @@
 1	swedish	x-vnd.Haiku-Fonts	4164233892
 Bold font:	Font view		Fet stil:
 Defaults	Main window		Förval
-Fixed font:	Font view		Fast teckensnitt:
-Fonts	System name		Teckensnitt
-Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Teckensnitt\n\tCopyright 2004-2005, Haiku.\n\n
-Menu font:	Font view		Menyteckensnitt:
+Fixed font:	Font view		Fast bredd typsnitt:
+Fonts	System name		Typsnitt
+Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Typsnitt\n\tCopyright 2004-2005, Haiku.\n\n
+Menu font:	Font view		Menytypsnitt:
 OK	main		OK
-Plain font:	Font view		Normalt teckensnitt:
+Plain font:	Font view		Enkelt typsnitt:
 Revert	Main window		Återgå
 Size:	Font Selection view		Storlek:
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Flygande bäckasiner söka hwila på mjuka tuvor.

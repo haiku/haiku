@@ -3,7 +3,7 @@ Above icon	DisplayView		Ovanför ikon
 Allowed	NotificationView		Tillåten
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Ett fel uppstod när inställningarna skulle sparas.\nDet är möjligt att hårddiskutrymmet håller på att ta slut.
 Application	NotificationView		Applikation
-Applications	NotificationView		Applikationer
+Applications	NotificationView		Program
 Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Kan inte aktivera aviseringar vid start. Du saknar förmodligen behörighet att skriva till startinställningsmappen.
 Can't save preferences, you probably don't have write access to the boot settings directory.	GeneralView		Kan inte spara inställningarna. Du saknar förmodligen behörighet att skriva till startinställningsmappen.
 Can't save preferenes, you probably don't have write access to the settings directory or the disk is full.	DisplayView		Kan inte spara inställningarna. Du saknar förmodligen behörighet att skriva till inställningsmappen eller så är disken full.
@@ -26,9 +26,9 @@ Large icon	DisplayView		Stor ikon
 Last Received	NotificationView		Sista mottagna 
 Mini icon	DisplayView		Miniikon
 No	NotificationView		Nej
-Notifications	System name		Aviseringar
 Notifications	GeneralView		Aviseringar
 Notifications	NotificationView		Aviseringar
+Notifications	System name		Aviseringar
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Aviseringarna kunde inte stoppas eftersom servern inte kunde nås.
 OK	DisplayView		OK
 OK	GeneralView		OK

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-About	3842515376
+1	swedish	x-vnd.Haiku-About	3019397582
 %.2f GHz	AboutView		%.2f GHz
 %d MiB total	AboutView		%d MiB totalt
 %d MiB used (%d%%)	AboutView		%d MiB använt (%d%%)
@@ -7,7 +7,8 @@
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB totalt, %inaccessible MiB otillgängligt
 ... and the many people making donations!\n\n	AboutView		...och alla de som har skänkt pengar!\n\n
 About this system	AboutWindow		Om det här systemet
-AboutSystem	System name		OmSystemet
+AboutSystem	System name		OmHaiku
+Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. och deras utvecklarteam, för att ha skapat BeOS!\n\n
 Contributors:\n	AboutView		Medarbetare:\n
 Current maintainers:\n	AboutView		Nuvarande projektledare:\n
 GCC %d Hybrid	AboutView		GCC %d-hybrid

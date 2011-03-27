@@ -1,5 +1,4 @@
-1	swedish	x-vnd.Haiku.TV	2815571176
-About %1…	MainWin	Parameter %1 is the name of the application.	Om %1...
+1	swedish	x-vnd.Haiku.TV	1995288111
 Always on top	MainWin		Alltid överst
 Channel	MainWin		Kanal
 DVB - Digital Video Broadcasting TV	MainWin		DVB - Digital Video Broadcasting TV
@@ -19,11 +18,8 @@ Quit	MainWin		Avsluta
 Scale to native size	MainWin		Skala till ursprungsstorlek
 Settings	MainWin		Inställningar
 Settings…	MainWin		Inställningar...
-TV	System name		TV
 TV	MainWin		TV
-\nBuild 	MainWin		\nBuild
-\nRevision 	MainWin		\nVersion
-\nVersion 	MainWin		\nVersion
+TV	System name		TV
 force 544 x 576, display aspect 4:3	MainWin		tvinga 544 x 573, bildförhållande 4:3
 force 704 x 576, display aspect 4:3	MainWin		påtvinga 704 x 576, bildförhållande 4:3
 force 720 x 576, display aspect 4:3	MainWin		tvinga 720 x 576, bildförhållande 4:3

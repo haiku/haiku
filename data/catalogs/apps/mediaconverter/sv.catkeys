@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-MediaConverter	3607188411
+1	swedish	x-vnd.Haiku-MediaConverter	424866547
 %.1f kHz %ld channel / %lld frames	MediaFileInfo		%.1f kHz %ld kanal / %lld rutor
 %.1f kHz mono / %lld frames	MediaFileInfo		%.1f kHz mono / %lld rutor
 %.1f kHz stereo / %lld frames	MediaFileInfo		%.1f kHz stereo / %lld rutor
@@ -6,7 +6,6 @@
 %d bit 	MediaFileInfo		%d bitar
 %d byte 	MediaFileInfo		%d bytes
 %u x %u, %.2ffps / %Ld frames	MediaFileInfo	Width x Height, fps / frames	%u x %u, %.2ffps / %Ld rutor
-About…	MediaConverter		Om...
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Ett fel uppstod vid inläsning av filinformationen.\n\nFel:
 Audio encoding:	MediaConverter		Ljudkodning:
 Audio quality not supported	MediaConverter		Ljudkvalité stöds ej
@@ -41,7 +40,6 @@ High	MediaConverter		Hög
 Low	MediaConverter		Låg
 MediaConverter	System name		MediaKonverterare
 MediaConverter+:SaveDirectory	MediaConverter		MediaKonverterare+:SaveDirectory
-MediaConverter\n1.3.0\n© 1999, Be Incorporated.\n© 2000-2004 Jun Suzuki\n© 2007 Stephan Aßmus\n© 2010 Haiku, Inc.	MediaConverter		MediaKonverterare\n1.3.0\n© 1999, Be Incorporated.\n© 2000-2004 Jun Suzuki\n© 2007 Stephan Aßmus\n© 2010 Haiku, Inc
 No audio	Audio codecs list		Inget ljud
 No file selected	MediaConverter-FileInfo		Ingen fil vald
 No video	Video codecs list		Inga filmer

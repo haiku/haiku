@@ -26,8 +26,8 @@ Print test page	PrintersWindow		Skriv ut testsida
 Printer name:	AddPrinterDialog		Skrivarnamn:
 Printer type:	AddPrinterDialog		Skrivartyp:
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Skrivare: %printer_name%\nDrivrutin: %driver%\n
-Printers	System name		Skrivare
 Printers	PrintersWindow		Skrivare
+Printers	System name		Skrivare
 Processing	JobListView		Bearbetar
 Red	TestPageView		Röd
 Remove	PrintersWindow		Ta bort

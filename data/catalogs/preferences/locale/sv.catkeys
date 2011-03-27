@@ -10,9 +10,9 @@ Deskbar and Tracker need to be restarted for this change to take effect. Would y
 Formatting	Locale Preflet Window		Formatering
 Full format:	TimeFormatSettings		Fullt format:
 Language	Locale Preflet Window		Språk
-Locale	System name		Språk & Format
 Locale	Locale Preflet		Språk
 Locale	Locale Preflet Window		Språk
+Locale	System name		Språk & Format
 Long format:	TimeFormatSettings		Långt format:
 Medium format:	TimeFormatSettings		Mediumformat:
 Negative:	TimeFormatSettings		Negativt:

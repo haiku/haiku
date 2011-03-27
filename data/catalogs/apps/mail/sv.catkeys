@@ -1,8 +1,7 @@
-1	swedish	x-vnd.Be-MAIL	3225774574
+1	swedish	x-vnd.Be-MAIL	1567591965
 %d - Date	Mail		%d - Datum
 %e - E-mail address	Mail		%e - mejladress
 %n - Full name	Mail		%n - Fullständigt namn
-About Mail…	Mail		Om E-post...
 Account from mail	Mail		Konto från brev
 Account:	Mail		Konto:
 Accounts…	Mail		Konton...
@@ -63,7 +62,6 @@ Leave same	Mail		Ändra inte
 Mail	System name		E-post
 Mail couldn't find its dictionary.	Mail		Programmet kunde inte hitta sin ordlista.
 Mail preferences	Mail		E-post : Inställningar
-Mail\n\n	Mail		E-post\n\n
 Mailing	Mail		Mejlning
 Message	Mail		Meddelande
 Move to trash	Mail		Flytta till papperskorgen
@@ -145,7 +143,6 @@ Use default account	Mail		Använd standardkonto
 User interface	Mail		Användargränssnitt
 View	Mail		Visa
 Warn unencodable:	Mail		Varna för ogiltiga tecken:
-Written by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Skrivet av Robert Polic.\nFörbättrat av Dr. Zoidberg teamet.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Brevets huvudtext innehåller %Id oläsbara tecken. Det är möjligt att en annan teckenuppsättning skulle vara mer lämplig. Tryck på Skicka för att sända brevet som det är - oläsbara tecken kommer ersättas - eller välj Avbryt för att gå tillbaka och korrigera problemet.
 \\n - Newline	Mail		\\n - Ny rad
 helpful message	Mail		hjälpsamt meddelande

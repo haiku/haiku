@@ -1,6 +1,5 @@
-1	swedish	x-vnd.Haiku-MediaPlayer	1172481650
+1	swedish	x-vnd.Haiku-MediaPlayer	103420521
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		Ett internt fel inträffade i %app%. Filen kunde inte öppnas.
-%app%\n\nWritten by Marcus Overhagen, Stephan Aßmus and Frederik Modéen	MediaPlayer-Main		%app%\n\nSkrivet av Marcus Overhagen, Stephan Aßmus och Fredrik Modéen
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Amerikanskt format)
 100% scale	MediaPlayer-Main		Skala till 100%
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
@@ -88,13 +87,10 @@ Randomize	MediaPlayer-PlaylistWindow		Slumpa
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Slumpa poster
 Rating	MediaPlayer-Main		Betyg
 Redo	MediaPlayer-PlaylistWindow		Gör om
-Remove (Del)	MediaPlayer-PlaylistWindow		Ta bort (Del)
 Remove Entries	MediaPlayer-RemovePLItemsCmd		Ta bort poster
 Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Flytta poster till Papperskorgen
 Remove Entry	MediaPlayer-RemovePLItemsCmd		Ta bort post
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Flytta post till Papperskorgen
-Remove all	MediaPlayer-PlaylistWindow		Ta bort allt
-Remove and put into Trash	MediaPlayer-PlaylistWindow		Ta bort och flytta till Papperskorgen
 Revert	MediaPlayer-SettingsWindow		Återställ
 Save	MediaPlayer-Main		Spara
 Save	MediaPlayer-PlaylistWindow		Spara
@@ -118,7 +114,6 @@ Stream settings	MediaPlayer-Main		Ströminställningar
 Subtitle placement:	MediaPlayer-SettingsWindow		Undertextsplacering:
 Subtitle size:	MediaPlayer-SettingsWindow		Undertextsstorlek:
 Subtitles	MediaPlayer-Main		Bildtext
-Thanks	MediaPlayer-Main		Tack
 The file'%filename' could not be opened.\n\n	MediaPlayer-Main		Filen '%filename' kunde inte öppnas.\n\n
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Det finns ingen avkodare installerad som kan hantera filformatet, eller så har avkodaren problem med filformatsversionen.
 Toggle mute.	MediaPlayer-Main		Aktivera tyst läge.

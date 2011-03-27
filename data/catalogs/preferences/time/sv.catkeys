@@ -9,8 +9,8 @@ OK	Time		OK
 Preview time:	Time		Förhandsvisa tid:
 Revert	Time		Återställ
 Set time zone	Time		Ange tidzon
-Time	System name		Datum & Tid
-Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Tid och Datum, skrivet av:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
+Time	System name		Tid
+Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.	Time		Datum & Tid, skrivet av:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.
 Time zone	Time		Tidzon
 \nNow: 	Time		\nNu:
 about	Time		om

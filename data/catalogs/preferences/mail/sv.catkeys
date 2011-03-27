@@ -17,7 +17,7 @@ Final	Config Window		Slutgiltig
 Gamma	Config Window		Gamma
 Golden master	Config Window		Produktionsversion
 Mail Daemon Replacement\n\nby Haiku, Inc. All rights reserved.\n\nVersion %ld.%ld.%ld %s\n\nSee LICENSE file included in the installation package for more information.\n\n\n\nYou can contact us at:\n%s\n\nPlease submit bug reports using the %s\n\nProject homepage at:\n%s	Config Window		E-postdemonsersättning\n\nav Haiku, Inc. All rights reserved.\n\nVersion %ld.%ld.%ld %s\n\nSe LICENSE-filen för mer information.\n\n\n\nDu kan kontakta oss på:\n%s\n\nEventuella buggar kan rapporteras genom %s\n\nProjekthemsida: \n%s
-Mail checking	Config Window		Kontrollerar e-post
+Mail checking	Config Window		Kontrollera e-post
 Miscellaneous	Config Window		Diverse
 OK	Config Window		OK
 Only when dial-up is connected	Config Window		Endast när uppringd förbindelse är uppkopplad

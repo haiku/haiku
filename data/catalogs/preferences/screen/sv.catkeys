@@ -28,8 +28,8 @@ Refresh rate:	Screen		Uppdateringsfrekvens:
 Resolution:	Screen		Upplösning:
 Revert	Screen		Återställ
 Rows:	Screen		Rader:
-Screen	System name		Skärm
 Screen	Screen		Skärm
+Screen	System name		Skärm
 Screen preferences by the Haiku team	Screen		Skärm, skrivet av Haiku-teamet
 Set background…	Screen		Bakgrundsinställningar...
 Settings will revert in %seconds seconds.	Screen		Inställningarna kommer att återställas inom %seconds sekunder.

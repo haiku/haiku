@@ -1,11 +1,10 @@
-1	swedish	x-vnd.Haiku-FileTypes	1055306485
+1	swedish	x-vnd.Haiku-FileTypes	473999706
 %1 application type	Application Type Window		%1 programtyp
 %ld Application type%s could be removed.	Application Types Window		%ld Programtypen %s kan inte tas bort.
 %s file type	FileType Window		%s filtyp
 (from application)	FileTypes Window		(från program)
 (from super type)	FileTypes Window		(från huvudtyp)
 Abort	Application Types Window		Avbryt
-About FileTypes…	FileTypes Window		Om FilTyper...
 Add	Attribute Window		Lägg till
 Add	Extension Window		Lägg till
 Add group	New File Type Window		Lägg till grupp
@@ -70,8 +69,8 @@ File	FileTypes Window		Arkiv
 File could not be opened	Preferred App Menu		Filen kunde inte öppnas
 File recognition	FileTypes Window		Filigenkänning
 File type	FileType Window		Filtyp
-FileTypes	System name		FilTyper
 FileTypes	FileTypes		FilTyper
+FileTypes	System name		FilTyper
 FileTypes request	FileTypes		FilTyper - fråga
 FileTypes request	FileTypes Window		FilTyper - begäran
 FileTypes request	Preferred App Menu		Filtypsbegäran
@@ -155,5 +154,4 @@ Version:	Application Types Window		Version:
 Visible	Attribute Window		Synlig
 Width:	Attribute Window	Default column width in Tracker for this attribute.	Bredd:
 [Multiple files] file types	FileType Window		[Flera filer] filtyper
-\twritten by Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n	FileTypes		\tskrivet avy Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n
 no icon	FileTypes Window		ingen ikon

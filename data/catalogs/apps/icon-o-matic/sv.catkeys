@@ -77,7 +77,7 @@ Gradient type	Icon-O-Matic-StyleTypes		Övergångstyp
 HVIF Source Code	Icon-O-Matic-SavePanel		HVIF-källkod
 Height	Icon-O-Matic-PropertyNames		Höjd
 Icon-O-Matic	System name		IkonRedigerare
-Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon-O-Matic har kanske inte tolkat all data från SVGn när den laddades. Genom att skriva över originalfilen förloras denna information.
+Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		IkonRedigeraren har kanske inte tolkat all data från SVGn när den laddades. Genom att skriva över originalfilen förloras denna information.
 Insert Control Point	Icon-O-Matic-InsertPointCmd		Infoga kontrollpunkt
 Invert selection	Icon-O-Matic-Properties		Invertera markering
 Joins	Icon-O-Matic-PropertyNames		Sammanfogningar
