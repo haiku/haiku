@@ -90,6 +90,39 @@
 #define CT_ROLL_RELATIVE_CONTROL	0x10
 #define CT_PRIVACY_CONTROL			0x11
 
+#define PU_CONTROL_UNDEFINED		0x0
+#define PU_BACKLIGHT_COMPENSATION_CONTROL 0x1
+#define PU_BRIGHTNESS_CONTROL		0x2
+#define PU_CONTRAST_CONTROL			0x3
+#define PU_GAIN_CONTROL				0x4
+#define PU_POWER_LINE_FREQUENCY_CONTROL	0x5
+#define PU_HUE_CONTROL				0x6
+#define PU_SATURATION_CONTROL		0x7
+#define PU_SHARPNESS_CONTROL		0x8
+#define PU_GAMMA_CONTROL			0x9
+#define PU_WHITE_BALANCE_TEMPERATURE_CONTROL	0xa
+#define PU_WHITE_BALANCE_TEMPERATURE_AUTO_CONTROL	0xb
+#define PU_WHITE_BALANCE_COMPONENT_CONTROL	0xc
+#define PU_WHITE_BALANCE_COMPONENT_AUTO_CONTROL	0xd
+#define PU_DIGITAL_MULTIPLIER_CONTROL	0xe
+#define PU_DIGITAL_MULTIPLIER_LIMIT_CONTROL	0xf
+#define PU_HUE_AUTO_CONTROL			0x10
+#define PU_ANALOG_VIDEO_STANDARD_CONTROL	0x11
+#define PU_ANALOG_LOCK_STATUS_CONTROL	0x12
+
+#define XU_CONTROL_UNDEFINED		0x0
+
+#define VS_CONTROL_UNDEFINED		0x0
+#define VS_PROBE_CONTROL			0x1
+#define VS_COMMIT_CONTROL			0x2
+#define VS_STILL_PROBE_CONTROL		0x3
+#define VS_STILL_COMMIT_CONTROL		0x4
+#define VS_STILL_IMAGE_TRIGGER_CONTROL	0x5
+#define VS_STREAM_ERROR_CODE_CONTROL	0x6
+#define VS_GENERATE_KEY_FRAME_CONTROL	0x7
+#define VS_UPDATE_FRAME_SEGMENT_CONTROL	0x8
+#define VS_SYNCH_DELAY_CONTROL		0x9
+
 typedef struct usbvc_class_descriptor {
 	uint8	length;
 	uint8	descriptorType;
@@ -288,6 +321,27 @@ struct usbvc_extension_unit_descriptor {
 	const uint8*	Controls() const { return &sourceID[numInputPins+1]; }
 	uint8	Extension() const
 		{	return sourceID[numInputPins + ControlSize() + 1]; }
+} _PACKED;
+
+struct usbvc_probecommit {
+	uint16	hint;
+	uint8	formatIndex;
+	uint8	frameIndex;
+	uint32	frameInterval;
+	uint16	keyFrameRate;
+	uint16	pFrameRate;
+	uint16	compQuality;
+	uint16	compWindowSize;
+	uint16	delay;
+	uint32	maxVideoFrameSize;
+	uint32	maxPayloadTransferSize;
+	uint32	clockFrequency;
+	uint8	framingInfo;
+	uint8	preferredVersion;
+	uint8	minVersion;
+	uint8	maxVersion;
+	void	SetFrameInterval(uint32 interval)
+		{ frameInterval = interval; }
 } _PACKED;
 
 
