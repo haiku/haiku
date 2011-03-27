@@ -77,6 +77,7 @@
 #define PS2_PACKET_STANDARD				3
 #define PS2_PACKET_INTELLIMOUSE			4
 #define PS2_PACKET_SYNAPTICS			6
+#define PS2_PACKET_ALPS					6
 #define PS2_MAX_PACKET_SIZE				6
 	// Should be equal to the biggest packet size
 

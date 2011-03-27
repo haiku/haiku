@@ -5,6 +5,7 @@ UsePrivateKernelHeaders ;
 
 KernelAddon ps2 :
 	packet_buffer.cpp
+	ps2_alps.c
 	ps2_common.c
 	ps2_dev.c
 	ps2_keyboard.cpp

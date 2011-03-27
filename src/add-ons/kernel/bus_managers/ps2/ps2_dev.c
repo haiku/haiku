@@ -13,6 +13,7 @@
 #include "ps2_dev.h"
 #include "ps2_service.h"
 
+#include "ps2_alps.h"
 #include "ps2_standard_mouse.h"
 #include "ps2_synaptics.h"
 #include "ps2_trackpoint.h"
@@ -112,6 +113,12 @@ ps2_dev_detect_pointing(ps2_dev *dev, device_hooks **hooks)
 	status = probe_synaptics(dev);
 	if (status == B_OK) {
 		*hooks = &gSynapticsDeviceHooks;
+		goto dev_found;
+	}
+
+	status = probe_alps(dev);
+	if (status == B_OK) {
+		*hooks = &gALPSDeviceHooks;
 		goto dev_found;
 	}
 

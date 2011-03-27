@@ -11,7 +11,6 @@
 
 #include <KernelExport.h>
 
-#include <keyboard_mouse_driver.h>
 #include <touchpad_settings.h>
 
 #include "movement_maker.h"
