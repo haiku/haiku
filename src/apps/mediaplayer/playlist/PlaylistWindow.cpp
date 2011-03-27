@@ -208,6 +208,10 @@ PlaylistWindow::MessageReceived(BMessage* message)
 			_SavePlaylist(message);
 			break;
 
+		case B_SELECT_ALL:
+			fListView->SelectAll();
+			break;
+
 		case M_PLAYLIST_RANDOMIZE:
 			fListView->Randomize();
 			break;
@@ -258,6 +262,9 @@ PlaylistWindow::_CreateMenu(BRect& frame)
 	fRedoMI = new BMenuItem(B_TRANSLATE("Redo"), new BMessage(B_REDO), 'Z', 
 		B_SHIFT_KEY);
 	editMenu->AddItem(fRedoMI);
+	editMenu->AddSeparatorItem();
+	editMenu->AddItem(new BMenuItem(B_TRANSLATE("Select all"),
+		new BMessage(B_SELECT_ALL), 'A'));
 	editMenu->AddSeparatorItem();
 	editMenu->AddItem(new BMenuItem(B_TRANSLATE("Randomize"),
 		new BMessage(M_PLAYLIST_RANDOMIZE), 'R'));
