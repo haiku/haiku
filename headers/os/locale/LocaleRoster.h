@@ -68,9 +68,13 @@ public:
 
 			bool				IsFilesystemTranslationPreferred() const;
 
-			status_t			GetLocalizedFileName(const entry_ref& ref,
-									BString& localizedFileName,
+			status_t			GetLocalizedFileName(BString& localizedFileName,
+									const entry_ref& ref,
 									bool traverse = false);
+
+			status_t			GetLocalizedFileName(BString& localizedFileName,
+									const char* signature, const char* context,
+									const char* string);
 
 	static	const char*			kCatLangAttr;
 	static	const char*			kCatSigAttr;
@@ -82,6 +86,10 @@ public:
 private:
 	static	BCatalog*			_GetCatalog(BCatalog* catalog,
 									vint32* catalogInitStatus);
+
+			status_t			_PrepareCatalogEntry(const entry_ref& ref,
+									BString& signature, BString& context,
+									BString& string, bool traverse);
 };
 
 

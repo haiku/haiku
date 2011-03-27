@@ -568,7 +568,7 @@ void
 Model::CacheLocalizedName()
 {
 	if (BLocaleRoster::Default()->GetLocalizedFileName(
-			fEntryRef, fLocalizedName, true) == B_OK)
+			fLocalizedName, fEntryRef, true) == B_OK)
 		fHasLocalizedName = true;
 	else
 		fHasLocalizedName = false;

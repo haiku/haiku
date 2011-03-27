@@ -94,7 +94,7 @@ perform_query(BVolume &volume, const char *predicate)
 			entry_ref ref;
 
 			if (entry.GetRef(&ref) != B_OK || BLocaleRoster::Default()
-				->GetLocalizedFileName(ref, string) != B_OK)
+				->GetLocalizedFileName(string, ref) != B_OK)
 				continue;
 
 			if (string.IFindFirst(predicate) < 0)

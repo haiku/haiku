@@ -381,11 +381,10 @@ BLocaleRoster::IsFilesystemTranslationPreferred() const
 }
 
 
-/*!	\brief Looks up a localized filename in a catalog, using attribute data
-		on the entry.
-	\param ref An entry_ref with an attribute holding data for catalog lookup.
+/*!	\brief Looks up a localized filename from a catalog.
 	\param localizedFileName A pre-allocated BString object for the result
 		of the lookup.
+	\param ref An entry_ref with an attribute holding data for catalog lookup.
 	\param traverse A boolean to decide if symlinks are to be traversed.
 	\return
 	- \c B_OK: success
@@ -400,8 +399,56 @@ BLocaleRoster::IsFilesystemTranslationPreferred() const
 	Lookup fails if a comment is present in the catalog entry.
 */
 status_t
-BLocaleRoster::GetLocalizedFileName(const entry_ref& ref,
-	BString& localizedFileName, bool traverse)
+BLocaleRoster::GetLocalizedFileName(BString& localizedFileName,
+	const entry_ref& ref, bool traverse)
+{
+	BString signature;
+	BString context;
+	BString string;
+	
+	status_t status = _PrepareCatalogEntry(ref, signature, context, string,
+		traverse);
+
+	if (status != B_OK)
+		return status;
+
+	return GetLocalizedFileName(localizedFileName, signature, context, string);
+}
+
+
+/*!	\brief Looks up a localized filename from a catalog.
+	\param localizedFileName A pre-allocated BString object for the result
+		of the lookup.
+	\param signature The "x-vnd..." part of an application signature.
+	\param context A catalog context. Likely B_TRANSLATE_SYSTEM_NAME_CONTEXT.
+	\param string A catalog string entry. Likely the unlocalized app name.
+	\return
+	- \c B_OK: success
+	- \c B_ENTRY_NOT_FOUND: failure. Catalog entry not found in catalog, etc
+	- other error codes: failure
+
+	Lookup is done for the top preferred language, only.
+	Lookup fails if a comment is present in the catalog entry.
+*/
+status_t
+BLocaleRoster::GetLocalizedFileName(BString& localizedFileName,
+	const char* signature, const char* context, const char* string)
+{
+	BCatalog catalog(signature);
+
+	const char* temp = catalog.GetString(string, context);
+
+	if (temp == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	localizedFileName = temp;
+	return B_OK;
+}
+
+
+status_t
+BLocaleRoster::_PrepareCatalogEntry(const entry_ref& ref, BString& signature,
+	BString& context, BString& string, bool traverse)
 {
 	BEntry entry(&ref, traverse);
 	if (!entry.Exists())
@@ -412,44 +459,26 @@ BLocaleRoster::GetLocalizedFileName(const entry_ref& ref,
 	if (status != B_OK)
 		return status;
 
-	attr_info attr;
-	status = node.GetAttrInfo("SYS:NAME", &attr);
+	status = node.ReadAttrString("SYS:NAME", &signature);
 	if (status != B_OK)
 		return status;
 
-	char attribute[attr.size + 1];
-	ssize_t bytes = node.ReadAttr("SYS:NAME", B_MIME_TYPE, 0, &attribute,
-		attr.size);
-
-	if (bytes < 0)
-		return bytes;
-	
-	if (bytes == 0 || bytes != attr.size)
+	int32 first = signature.FindFirst(':');
+	int32 last = signature.FindLast(':');
+	if (first == last)
 		return B_ENTRY_NOT_FOUND;
 
-	attribute[bytes] = '\0';
+	context = signature;
+	string = signature;
 
-	char* signature = attribute;
-	char* context = strchr(signature, ':');
-	if (context == NULL)
+	signature.Truncate(first);
+	context.Truncate(last);
+	context.Remove(0, first + 1);
+	string.Remove(0, last + 1);
+
+	if (signature.Length() == 0 || context.Length() == 0
+		|| string.Length() == 0)
 		return B_ENTRY_NOT_FOUND;
 
-	context[0] = '\0';
-	context++;
-
-	char* string = strchr(context, ':');
-	if (string == NULL)
-		return B_ENTRY_NOT_FOUND;
-
-	string[0] = '\0';
-	string++;
-
-	BCatalog catalog(signature);
-
-	const char* temp = catalog.GetString(string, context);
-	if (temp == NULL)
-		return B_ENTRY_NOT_FOUND;
-
-	localizedFileName = temp;
 	return B_OK;
 }

@@ -204,6 +204,9 @@ class Model {
 
 		bool Mimeset(bool force);
 			// returns true if mime type changed
+
+		bool HasLocalizedName() const;
+
 	private:
 		status_t OpenNodeCommon(bool writable);
 		void SetupBaseType();
@@ -448,6 +451,13 @@ inline bool
 Model::IsSymLink() const
 {
 	return fBaseType == kLinkNode;
+}
+
+
+inline bool
+Model::HasLocalizedName() const
+{
+	return fHasLocalizedName;
 }
 
 

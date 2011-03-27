@@ -782,7 +782,7 @@ TFilePanel::Init(const BMessage *)
 	if (be_app->GetAppInfo(&info) == B_OK) {
 		if (!gLocalizedNamePreferred
 			|| BLocaleRoster::Default()->GetLocalizedFileName(
-				info.ref, title, false) != B_OK)
+				title, info.ref, false) != B_OK)
 			title = info.ref.name;
 		title << ": ";
 	}

@@ -299,7 +299,9 @@ BInfoWindow::BInfoWindow(Model *model, int32 group_index, LockingList<BWindow> *
 	if (list)
 		list->AddItem(this);
 
-	AddShortcut('E', 0, new BMessage(kEditItem));
+	if (!model->IsTrash() && !model->HasLocalizedName())
+		AddShortcut('E', 0, new BMessage(kEditItem));
+
 	AddShortcut('O', 0, new BMessage(kOpenSelection));
 	AddShortcut('U', 0, new BMessage(kUnmountVolume));
 	AddShortcut('P', 0, new BMessage(kPermissionsSelected));
@@ -1222,6 +1224,7 @@ AttributeView::MouseDown(BPoint point)
 	} else if (fTitleRect.Contains(point)) {
 		// You can't change the name of the trash
 		if (!fModel->IsTrash()
+			&& !fModel->HasLocalizedName()
 			&& ConfirmChangeIfWellKnownDirectory(&entry,
 				B_TRANSLATE_COMMENT("rename", "As in 'If you rename ...'"),
 				B_TRANSLATE_COMMENT("rename", "As in 'To rename ...'"), true)
@@ -2037,9 +2040,11 @@ AttributeView::BuildContextMenu(BMenu *parent)
 		new BMessage(kOpenSelection), 'O'));
 
 	if (!model.IsTrash()) {
-		parent->AddItem(new BMenuItem(B_TRANSLATE("Edit name"),
-			new BMessage(kEditItem), 'E'));
-		parent->AddSeparatorItem();
+		if (!fModel->HasLocalizedName()) {
+			parent->AddItem(new BMenuItem(B_TRANSLATE("Edit name"),
+				new BMessage(kEditItem), 'E'));
+			parent->AddSeparatorItem();
+		}
 		if (fModel->IsVolume()) {
 			BMenuItem* item = new BMenuItem(B_TRANSLATE("Unmount"),
 				new BMessage(kUnmountVolume), 'U');

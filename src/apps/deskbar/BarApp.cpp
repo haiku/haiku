@@ -620,7 +620,7 @@ TBarApp::AddTeam(team_id team, uint32 flags, const char* sig, entry_ref* ref)
 
 	BString name;
 	if (!gLocalizedNamePreferred
-		|| BLocaleRoster::Default()->GetLocalizedFileName(*ref, name) != B_OK)
+		|| BLocaleRoster::Default()->GetLocalizedFileName(name, *ref) != B_OK)
 		name = ref->name;
 
 	BarTeamInfo* barInfo = new BarTeamInfo(new BList(), flags, strdup(sig),
