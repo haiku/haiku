@@ -52,7 +52,6 @@ protected:
 	virtual	void				ReadyToRun();
 	virtual bool				QuitRequested();
 	virtual	void				Quit();
-	virtual	void				AboutRequested();
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	void				RefsReceived(BMessage* message);
 	virtual	void				ArgvReceived(int32 argc, char** argv);

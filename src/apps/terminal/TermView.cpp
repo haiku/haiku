@@ -1790,11 +1790,6 @@ TermView::MessageReceived(BMessage *msg)
 	}
 
 	switch (msg->what){
-		case B_ABOUT_REQUESTED:
-			// (replicant) about box requested
-			AboutRequested();
-			break;
-
 		case B_SIMPLE_DATA:
 		case B_REFS_RECEIVED:
 		{
@@ -3087,22 +3082,6 @@ TermView::InitiateDrag()
 	rect = rect & Bounds();
 
 	DragMessage(&message, rect);
-}
-
-
-/* static */
-void
-TermView::AboutRequested()
-{
-	BAlert *alert = new (std::nothrow) BAlert("about",
-		B_TRANSLATE("Terminal\n\n"
-			"written by Kazuho Okui and Takashi Murai\n"
-			"updated by Kian Duffy and others\n\n"
-			"Copyright " B_UTF8_COPYRIGHT "2003-2009, Haiku.\n"),
-		B_TRANSLATE("OK"));
-	alert->SetShortcut(0, B_ESCAPE);
-	if (alert != NULL)
-		alert->Go();
 }
 
 

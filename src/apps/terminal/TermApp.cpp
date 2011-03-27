@@ -31,7 +31,6 @@
 #include "Globals.h"
 #include "PrefHandler.h"
 #include "TermConst.h"
-#include "TermView.h"
 #include "TermWindow.h"
 
 
@@ -140,13 +139,6 @@ void
 TermApp::Quit()
 {
 	BApplication::Quit();
-}
-
-
-void
-TermApp::AboutRequested()
-{
-	TermView::AboutRequested();
 }
 
 

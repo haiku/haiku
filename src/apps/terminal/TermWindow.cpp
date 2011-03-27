@@ -435,9 +435,6 @@ TermWindow::_SetupMenu()
 			.AddItem(B_TRANSLATE("Page setup" B_UTF8_ELLIPSIS), MENU_PAGE_SETUP)
 			.AddItem(B_TRANSLATE("Print"), MENU_PRINT,'P')
 			.AddSeparator()
-			.AddItem(B_TRANSLATE("About Terminal" B_UTF8_ELLIPSIS),
-				B_ABOUT_REQUESTED)
-			.AddSeparator()
 			.AddItem(B_TRANSLATE("Close window"), B_QUIT_REQUESTED, 'W',
 				B_SHIFT_KEY)
 			.AddItem(B_TRANSLATE("Close active tab"), kCloseView, 'W')
@@ -616,10 +613,6 @@ TermWindow::MessageReceived(BMessage *message)
 
 		case B_SELECT_ALL:
 			_ActiveTermView()->SelectAll();
-			break;
-
-		case B_ABOUT_REQUESTED:
-			be_app->PostMessage(B_ABOUT_REQUESTED);
 			break;
 
 		case MENU_CLEAR_ALL:

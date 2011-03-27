@@ -104,7 +104,6 @@ public:
 			void				InitiateDrag();
 
 			void				DisableResizeView(int32 disableCount = 1);
-	static	void				AboutRequested();
 
 			void				SetListener(Listener* listener)
 									{ fListener = listener; }
