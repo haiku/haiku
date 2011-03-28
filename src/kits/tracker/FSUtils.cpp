@@ -695,9 +695,11 @@ ConfirmChangeIfWellKnownDirectory(const BEntry *entry, const char *ifYouDoAction
 	warning.ReplaceFirst("%ifYouDoAction", ifYouDoAction);
 	warning.ReplaceFirst("%toDoAction", toDoAction);
 
-	if ((new OverrideAlert("", warning.String(), B_TRANSLATE("Do it"),
-			(requireOverride ? B_SHIFT_KEY : 0), B_TRANSLATE("Cancel"),	0, NULL,
-			0, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go() == 1) {
+	OverrideAlert *alert = new OverrideAlert("", warning.String(),
+		B_TRANSLATE("Do it"), (requireOverride ? B_SHIFT_KEY : 0),
+		B_TRANSLATE("Cancel"), 0, NULL, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+	alert->SetShortcut(1, B_ESCAPE);
+	if (alert->Go() == 1) {
 		if (confirmedAlready)
 			*confirmedAlready = kNotConfirmed;
 		return false;

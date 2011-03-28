@@ -425,6 +425,7 @@ LocaleWindow::MessageReceived(BMessage* message)
 				"change to take effect. Would you like to restart them now?"),
 				B_TRANSLATE("Cancel"), B_TRANSLATE("Restart"), NULL,
 				B_WIDTH_FROM_WIDEST, B_IDEA_ALERT);
+			alert->SetShortcut(0, B_ESCAPE);
 			alert->Go(new BInvoker(new BMessage(kMsgRestartTrackerAndDeskbar),
 				NULL, be_app));
 			break;
