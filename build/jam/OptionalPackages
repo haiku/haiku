@@ -114,12 +114,12 @@ if [ IsOptionalHaikuImagePackageAdded APR ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package APR available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		InstallOptionalHaikuImagePackage apr-1.4.2-x86-gcc4-2011-03-25.zip
-			: $(baseURL)/apr-1.4.2-x86-gcc4-2011-03-25.zip
+		InstallOptionalHaikuImagePackage apr-1.4.2-x86-gcc4-2011-03-28.zip
+			: $(baseURL)/apr-1.4.2-x86-gcc4-2011-03-28.zip
 			: : true ;
 	} else {
-		InstallOptionalHaikuImagePackage apr-1.4.2-x86-gcc2-2011-03-25.zip
-			: $(baseURL)/apr-1.4.2-x86-gcc2-2011-03-25.zip
+		InstallOptionalHaikuImagePackage apr-1.4.2-x86-gcc2-2011-03-28.zip
+			: $(baseURL)/apr-1.4.2-x86-gcc2-2011-03-28.zip
 			: : true ;
 	}
 }
@@ -130,12 +130,12 @@ if [ IsOptionalHaikuImagePackageAdded APR-util ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package APR-util available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		InstallOptionalHaikuImagePackage apr-util-1.3.10-x86-gcc4-2011-03-25.zip
-			: $(baseURL)/apr-util-1.3.10-x86-gcc4-2011-03-25.zip
+		InstallOptionalHaikuImagePackage apr-util-1.3.10-x86-gcc4-2011-03-28.zip
+			: $(baseURL)/apr-util-1.3.10-x86-gcc4-2011-03-28.zip
 			: : true ;
 	} else {
-		InstallOptionalHaikuImagePackage apr-util-1.3.10-x86-gcc2-2011-03-25.zip
-			: $(baseURL)/apr-util-1.3.10-x86-gcc2-2011-03-25.zip
+		InstallOptionalHaikuImagePackage apr-util-1.3.10-x86-gcc2-2011-03-28.zip
+			: $(baseURL)/apr-util-1.3.10-x86-gcc2-2011-03-28.zip
 			: : true ;
 	}
 }
