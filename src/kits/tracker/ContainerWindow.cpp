@@ -3031,11 +3031,20 @@ BContainerWindow::UpdateMenu(BMenu *menu, UpdateMenuContext context)
 		EnableNamedMenuItem(menu, kDelete, selectCount > 0);
 		EnableNamedMenuItem(menu, kDuplicateSelection, selectCount > 0);
 	}
+	
+	Model *selectedModel = NULL;
+	if (selectCount == 1)
+		selectedModel = PoseView()->SelectionList()->FirstItem()->TargetModel();
 
 	if (context == kMenuBarContext || context == kPosePopUpContext) {
 		SetUpEditQueryItem(menu);
 		EnableNamedMenuItem(menu, kEditItem, selectCount == 1
-			&& (context == kPosePopUpContext || !PoseView()->ActivePose()));
+			&& (context == kPosePopUpContext || !PoseView()->ActivePose())
+			&& selectedModel != NULL
+			&& !selectedModel->IsDesktop()
+			&& !selectedModel->IsRoot()
+			&& !selectedModel->IsTrash()
+			&& !selectedModel->HasLocalizedName());
 		SetCutItem(menu);
 		SetCopyItem(menu);
 		SetPasteItem(menu);
