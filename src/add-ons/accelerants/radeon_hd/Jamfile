@@ -12,7 +12,7 @@ Addon radeon_hd.accelerant :
 	engine.cpp
 	hooks.cpp
 	mode.cpp
-#	bios.cpp
+	bios.cpp
 	: be libaccelerantscommon.a atombios.a
 ;
 
