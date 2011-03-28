@@ -94,12 +94,12 @@ typedef struct {
 	ps2_dev*			dev;
 
 	sem_id				synaptics_sem;
-struct packet_buffer*	synaptics_ring_buffer;
+	packet_buffer*		synaptics_ring_buffer;
 	size_t				packet_index;
-	uint8				buffer[PS2_PACKET_SYNAPTICS];
+	uint8				packet_buffer[PS2_PACKET_SYNAPTICS];
 	uint8				mode;
 
-	movement_maker		movementMaker;
+	movement_maker		movement_maker;
 	bool				movement_started;
 	bool				scrolling_started;
 	bool				tap_started;
@@ -120,6 +120,7 @@ struct packet_buffer*	synaptics_ring_buffer;
 } synaptics_cookie;
 
 
+
 status_t synaptics_pass_through_set_packet_size(ps2_dev *dev, uint8 size);
 status_t passthrough_command(ps2_dev *dev, uint8 cmd, const uint8 *out,
 	int out_count, uint8 *in, int in_count, bigtime_t timeout);
@@ -133,6 +134,6 @@ status_t synaptics_ioctl(void *_cookie, uint32 op, void *buffer, size_t length);
 int32 synaptics_handle_int(ps2_dev *dev);
 void synaptics_disconnect(ps2_dev *dev);
 
-extern device_hooks gSynapticsDeviceHooks;
+device_hooks gSynapticsDeviceHooks;
 
 #endif	// PS2_SYNAPTICS_H

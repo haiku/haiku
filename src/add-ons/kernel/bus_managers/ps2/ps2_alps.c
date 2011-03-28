@@ -109,7 +109,7 @@ static alps_model_info* sFoundModel = NULL;
 
 
 // touchpad proportions
-#define SPEED_FACTOR		5
+#define SPEED_FACTOR		4.5
 #define EDGE_MOTION_WIDTH	10 
 #define EDGE_MOTION_SPEED	(5 * SPEED_FACTOR)
 // increase the touchpad size a little bit
@@ -255,17 +255,17 @@ move_to_movement(alps_cookie *cookie, touch_event *event,
 	if (!cookie->movement_started) {
 		isStartOfMovement = true;
 		cookie->movement_started = true;
-		start_new_movment(&cookie->movementMaker);
+		start_new_movment(&cookie->movement_maker);
 	}
 
-	get_movement(&cookie->movementMaker, event->xPosition, event->yPosition);
+	get_movement(&cookie->movement_maker, event->xPosition, event->yPosition);
 
-	movement->xdelta = cookie->movementMaker.xDelta;
-	movement->ydelta = cookie->movementMaker.yDelta;
+	movement->xdelta = cookie->movement_maker.xDelta;
+	movement->ydelta = cookie->movement_maker.yDelta;
 
 	// tap gesture
-	cookie->tap_delta_x += cookie->movementMaker.xDelta;
-	cookie->tap_delta_y += cookie->movementMaker.yDelta;
+	cookie->tap_delta_x += cookie->movement_maker.xDelta;
+	cookie->tap_delta_y += cookie->movement_maker.yDelta;
 
 	if (cookie->tapdrag_started) {
 		movement->buttons = kLeftButton;
@@ -348,12 +348,12 @@ check_scrolling_to_movement(alps_cookie *cookie, touch_event *event,
 	cookie->valid_edge_motion = false;
 	if (!cookie->scrolling_started) {
 		cookie->scrolling_started = true;
-		start_new_movment(&cookie->movementMaker);
+		start_new_movment(&cookie->movement_maker);
 	}
-	get_scrolling(&cookie->movementMaker, event->xPosition,
+	get_scrolling(&cookie->movement_maker, event->xPosition,
 		event->yPosition);
-	movement->wheel_ydelta = cookie->movementMaker.yDelta;
-	movement->wheel_xdelta = cookie->movementMaker.xDelta;
+	movement->wheel_ydelta = cookie->movement_maker.yDelta;
+	movement->wheel_xdelta = cookie->movement_maker.xDelta;
 
 	if (isSideScrollingV && !isSideScrollingH)
 		movement->wheel_xdelta = 0;
@@ -422,11 +422,11 @@ byte 4:  0   y6   y5   y4   y3   y2   y1   y0
 byte 5:  0   z6   z5   z4   z3   z2   z1   z0
 */
 // debug 
-static uint32 minX = 50000;
-static uint32 minY = 50000;
-static uint32 maxX = 0;
-static uint32 maxY = 0;
-static uint32 maxZ = 0;
+static int minX = 50000;
+static int minY = 50000;
+static int maxX = 0;
+static int maxY = 0;
+static int maxZ = 0;
 // debug end
 static status_t
 get_alps_movment(alps_cookie *cookie, mouse_movement *movement)
@@ -565,7 +565,7 @@ return B_ERROR;
 	}
 
 	dev->name = kALPSPath[dev->idx];
-	dev->packet_size = PS2_PACKET_ALPS;
+	dev->packet_size = -1;
 
 	return B_OK;
 }
@@ -609,10 +609,10 @@ alps_open(const char *name, uint32 flags, void **_cookie)
 
 	default_settings(&cookie->settings);
 
-	cookie->movementMaker.speed = 1 * SPEED_FACTOR;
-	cookie->movementMaker.scrolling_xStep = cookie->settings.scroll_xstepsize;
-	cookie->movementMaker.scrolling_yStep = cookie->settings.scroll_ystepsize;
-	cookie->movementMaker.scroll_acceleration
+	cookie->movement_maker.speed = 1 * SPEED_FACTOR;
+	cookie->movement_maker.scrolling_xStep = cookie->settings.scroll_xstepsize;
+	cookie->movement_maker.scrolling_yStep = cookie->settings.scroll_ystepsize;
+	cookie->movement_maker.scroll_acceleration
 		= cookie->settings.scroll_acceleration;
 	cookie->movement_started = false;
 	cookie->scrolling_started = false;
@@ -681,7 +681,7 @@ status_t
 alps_close(void *_cookie)
 {
 	status_t status;
-	alps_cookie *cookie = (alps_cookie*)_cookie;
+	alps_cookie *cookie = _cookie;
 
 	ps2_dev_command_timeout(cookie->dev, PS2_CMD_DISABLE, NULL, 0, NULL, 0,
 		150000);
@@ -717,7 +717,7 @@ alps_freecookie(void *_cookie)
 status_t
 alps_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 {
-	alps_cookie *cookie = (alps_cookie*)_cookie;
+	alps_cookie *cookie = _cookie;
 	mouse_movement movement;
 	status_t status;
 
@@ -735,11 +735,11 @@ alps_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 		case MS_SET_TOUCHPAD_SETTINGS:
 			TRACE("ALPS: MS_SET_TOUCHPAD_SETTINGS");
 			user_memcpy(&cookie->settings, buffer, sizeof(touchpad_settings));
-			cookie->movementMaker.scrolling_xStep
+			cookie->movement_maker.scrolling_xStep
 				= cookie->settings.scroll_xstepsize;
-			cookie->movementMaker.scrolling_yStep
+			cookie->movement_maker.scrolling_yStep
 				= cookie->settings.scroll_ystepsize;
-			cookie->movementMaker.scroll_acceleration
+			cookie->movement_maker.scroll_acceleration
 				= cookie->settings.scroll_acceleration;
 			return B_OK;
 
@@ -773,7 +773,7 @@ alps_write(void *cookie, off_t pos, const void *buffer, size_t *_length)
 int32
 alps_handle_int(ps2_dev *dev)
 {
-	alps_cookie *cookie = (alps_cookie*)dev->cookie;
+	alps_cookie *cookie = dev->cookie;
 	uint8 val;
 
 	val = cookie->dev->history[0].data;
@@ -793,14 +793,14 @@ alps_handle_int(ps2_dev *dev)
 		return B_UNHANDLED_INTERRUPT;
 	}
 
- 	cookie->buffer[cookie->packet_index] = val;
+ 	cookie->packet_buffer[cookie->packet_index] = val;
 
 	cookie->packet_index++;
 	if (cookie->packet_index >= 6) {
 		cookie->packet_index = 0;
 
 		if (packet_buffer_write(cookie->ring_buffer,
-				cookie->buffer, cookie->dev->packet_size)
+				cookie->packet_buffer, cookie->dev->packet_size)
 			!= cookie->dev->packet_size) {
 			// buffer is full, drop new data
 			return B_HANDLED_INTERRUPT;
@@ -817,7 +817,7 @@ alps_handle_int(ps2_dev *dev)
 void
 alps_disconnect(ps2_dev *dev)
 {
-	alps_cookie *cookie = (alps_cookie*)dev->cookie;
+	alps_cookie *cookie = dev->cookie;
 	// the mouse device might not be opened at this point
 	INFO("ALPS: alps_disconnect %s\n", dev->name);
 	if ((dev->flags & PS2_FLAG_OPEN) != 0)

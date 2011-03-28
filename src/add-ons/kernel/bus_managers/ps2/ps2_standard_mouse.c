@@ -227,7 +227,7 @@ standard_mouse_handle_int(ps2_dev *dev)
 	}
 	if (cookie->packet_index == 1) {
 		int xDelta
-			= ((cookie->buffer[0] & 0x10) ? 0xFFFFFF00 : 0) | data;
+			= ((cookie->packet_buffer[0] & 0x10) ? 0xFFFFFF00 : 0) | data;
 		if (xDelta < -100 || xDelta > 100) {
 			INFO("ps2: strange mouse data, x-delta %d, trying resync\n",
 				xDelta);
@@ -237,7 +237,7 @@ standard_mouse_handle_int(ps2_dev *dev)
 	}
 	if (cookie->packet_index == 2) {
 		int yDelta
-			= ((cookie->buffer[0] & 0x20) ? 0xFFFFFF00 : 0) | data;
+			= ((cookie->packet_buffer[0] & 0x20) ? 0xFFFFFF00 : 0) | data;
 		if (yDelta < -100 || yDelta > 100) {
 			INFO("ps2: strange mouse data, y-delta %d, trying resync\n",
 				yDelta);
@@ -246,7 +246,7 @@ standard_mouse_handle_int(ps2_dev *dev)
 		}
 	}
 
-	cookie->buffer[cookie->packet_index++] = data;
+	cookie->packet_buffer[cookie->packet_index++] = data;
 
 	if (cookie->packet_index != dev->packet_size) {
 		// packet not yet complete
@@ -257,7 +257,7 @@ standard_mouse_handle_int(ps2_dev *dev)
 
 	cookie->packet_index = 0;
 	if (packet_buffer_write(cookie->standard_mouse_buffer,
-		cookie->buffer, dev->packet_size) != dev->packet_size) {
+		cookie->packet_buffer, dev->packet_size) != dev->packet_size) {
 		// buffer is full, drop new data
 		return B_HANDLED_INTERRUPT;
 	}
@@ -352,7 +352,7 @@ standard_mouse_open(const char *name, uint32 flags, void **_cookie)
 	if (atomic_or(&dev->flags, PS2_FLAG_OPEN) & PS2_FLAG_OPEN)
 		return B_BUSY;
 
-	cookie = (standard_mouse_cookie*)malloc(sizeof(standard_mouse_cookie));
+	cookie = malloc(sizeof(standard_mouse_cookie));
 	if (cookie == NULL)
 		goto err1;
 

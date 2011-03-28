@@ -27,19 +27,23 @@
 #define F_MOUSE_TYPE_INTELLIMOUSE		0x2
 
 typedef struct {
-	ps2_dev*			dev;
+	ps2_dev*		dev;
 
-	sem_id				standard_mouse_sem;
-struct packet_buffer*	standard_mouse_buffer;
-	bigtime_t			click_last_time;
-	bigtime_t			click_speed;
-	int					click_count;
-	int					buttons_state;
-	int					flags;
-	size_t				packet_index;
-	uint8				buffer[PS2_MAX_PACKET_SIZE];
+	sem_id			standard_mouse_sem;
+	packet_buffer*	standard_mouse_buffer;
+	bigtime_t		click_last_time;
+	bigtime_t		click_speed;
+	int				click_count;
+	int				buttons_state;
+	int				flags;
+	size_t			packet_index;
+	uint8			packet_buffer[PS2_MAX_PACKET_SIZE];
 } standard_mouse_cookie;
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 status_t probe_standard_mouse(ps2_dev* dev);
 
@@ -52,7 +56,11 @@ status_t standard_mouse_ioctl(void* _cookie, uint32 op, void* buffer,
 int32 standard_mouse_handle_int(ps2_dev* dev);
 void standard_mouse_disconnect(ps2_dev* dev);
 
-extern device_hooks gStandardMouseDeviceHooks;
+device_hooks gStandardMouseDeviceHooks;
+
+#ifdef __cplusplus
+}
+#endif
 
 
 #endif	/* __PS2_STANDARD_MOUSE_H */

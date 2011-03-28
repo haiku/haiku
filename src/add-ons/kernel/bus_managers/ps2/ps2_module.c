@@ -45,13 +45,13 @@ std_ops(int32 op, ...)
 
 
 static ps2_module_info ps2_module = {
-	{
-		{
-			B_PS2_MODULE_NAME,
-			B_KEEP_LOADED,
-			std_ops
+	.binfo = {
+		.minfo = {
+			.name    = B_PS2_MODULE_NAME,
+			.flags   = B_KEEP_LOADED,
+			.std_ops = std_ops,
 		},
-		NULL
+		.rescan = NULL,
 	},
 	&function1,
 	&function2,

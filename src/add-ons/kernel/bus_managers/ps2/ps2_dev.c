@@ -23,7 +23,49 @@
 #include <string.h>
 
 
-ps2_dev ps2_device[PS2_DEVICE_COUNT];
+ps2_dev ps2_device[PS2_DEVICE_COUNT] = {
+	{
+		.name = "input/mouse/ps2/0",
+		.active = false,
+		.idx = 0,
+		.result_sem = -1,
+		.command = standard_command_timeout
+	},
+	{
+		.name = "input/mouse/ps2/1",
+		.active = false,
+		.idx = 1,
+		.result_sem = -1,
+		.command = standard_command_timeout
+	},
+	{
+		.name = "input/mouse/ps2/2",
+		.active = false,
+		.idx = 2,
+		.result_sem = -1,
+		.command = standard_command_timeout
+	},
+	{
+		.name = "input/mouse/ps2/3",
+		.active = false,
+		.idx = 3,
+		.result_sem = -1,
+		.command = standard_command_timeout
+	},
+	{
+		.name = "input/mouse/ps2/synaptics_passthrough",
+		.active = false,
+		.result_sem = -1,
+		.command = passthrough_command
+	},
+	{
+		.name = "input/keyboard/at/0",
+		.active = false,
+		.result_sem = -1,
+		.flags = PS2_FLAG_KEYB,
+		.command = standard_command_timeout
+	}
+};
 
 
 status_t
@@ -107,41 +149,6 @@ dev_found:
 status_t
 ps2_dev_init(void)
 {
-	ps2_device[0].name = "input/mouse/ps2/0";
-	ps2_device[0].active = false;
-	ps2_device[0].idx = 0;
-	ps2_device[0].result_sem = -1;
-	ps2_device[0].command = standard_command_timeout;
-
-	ps2_device[1].name = "input/mouse/ps2/1";
-	ps2_device[1].active = false;
-	ps2_device[1].idx = 1;
-	ps2_device[1].result_sem = -1;
-	ps2_device[1].command = standard_command_timeout;
-
-	ps2_device[2].name = "input/mouse/ps2/2";
-	ps2_device[2].active = false;
-	ps2_device[2].idx = 2;
-	ps2_device[2].result_sem = -1;
-	ps2_device[2].command = standard_command_timeout;
-
-	ps2_device[3].name = "input/mouse/ps2/3";
-	ps2_device[3].active = false;
-	ps2_device[3].idx = 3;
-	ps2_device[3].result_sem = -1;
-	ps2_device[3].command = standard_command_timeout;
-
-	ps2_device[4].name = "input/mouse/ps2/synaptics_passthrough";
-	ps2_device[4].active = false;
-	ps2_device[4].result_sem = -1;
-	ps2_device[4].command = passthrough_command;
-
-	ps2_device[5].name = "input/keyboard/at/0";
-	ps2_device[5].active = false;
-	ps2_device[5].result_sem = -1;
-	ps2_device[5].flags = PS2_FLAG_KEYB;
-	ps2_device[5].command = standard_command_timeout;
-
 	int i;
 	for (i = 0; i < PS2_DEVICE_COUNT; i++) {
 		ps2_dev *dev = &ps2_device[i];
