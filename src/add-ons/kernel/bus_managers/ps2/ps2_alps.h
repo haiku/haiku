@@ -14,12 +14,12 @@ typedef struct {
 	ps2_dev*			dev;
 
 	sem_id				sem;
-	packet_buffer*		ring_buffer;
+struct packet_buffer*	ring_buffer;
 	size_t				packet_index;
-	uint8				packet_buffer[PS2_PACKET_ALPS];
+	uint8				buffer[PS2_PACKET_ALPS];
 	uint8				mode;
 
-	movement_maker		movement_maker;
+	movement_maker		movementMaker;
 	bool				movement_started;
 	bool				scrolling_started;
 	bool				tap_started;
@@ -50,7 +50,7 @@ status_t alps_ioctl(void *_cookie, uint32 op, void *buffer, size_t length);
 int32 alps_handle_int(ps2_dev *dev);
 void alps_disconnect(ps2_dev *dev);
 
-device_hooks gALPSDeviceHooks;
+extern device_hooks gALPSDeviceHooks;
 
 
 #endif /* ALPS_H */

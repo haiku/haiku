@@ -186,17 +186,17 @@ move_to_movement(synaptics_cookie *cookie, touch_event *event,
 	if (!cookie->movement_started) {
 		isStartOfMovement = true;
 		cookie->movement_started = true;
-		start_new_movment(&cookie->movement_maker);
+		start_new_movment(&cookie->movementMaker);
 	}
 
-	get_movement(&cookie->movement_maker, event->xPosition, event->yPosition);
+	get_movement(&cookie->movementMaker, event->xPosition, event->yPosition);
 
-	movement->xdelta = cookie->movement_maker.xDelta;
-	movement->ydelta = cookie->movement_maker.yDelta;
+	movement->xdelta = cookie->movementMaker.xDelta;
+	movement->ydelta = cookie->movementMaker.yDelta;
 
 	// tap gesture
-	cookie->tap_delta_x += cookie->movement_maker.xDelta;
-	cookie->tap_delta_y += cookie->movement_maker.yDelta;
+	cookie->tap_delta_x += cookie->movementMaker.xDelta;
+	cookie->tap_delta_y += cookie->movementMaker.yDelta;
 
 	if (cookie->tapdrag_started) {
 		movement->buttons = kLeftButton;
@@ -279,12 +279,12 @@ check_scrolling_to_movement(synaptics_cookie *cookie, touch_event *event,
 	cookie->valid_edge_motion = false;
 	if (!cookie->scrolling_started) {
 		cookie->scrolling_started = true;
-		start_new_movment(&cookie->movement_maker);
+		start_new_movment(&cookie->movementMaker);
 	}
-	get_scrolling(&cookie->movement_maker, event->xPosition,
+	get_scrolling(&cookie->movementMaker, event->xPosition,
 		event->yPosition);
-	movement->wheel_ydelta = cookie->movement_maker.yDelta;
-	movement->wheel_xdelta = cookie->movement_maker.xDelta;
+	movement->wheel_ydelta = cookie->movementMaker.yDelta;
+	movement->wheel_xdelta = cookie->movementMaker.xDelta;
 
 	if (isSideScrollingV && !isSideScrollingH)
 		movement->wheel_xdelta = 0;
@@ -440,7 +440,8 @@ query_capability(ps2_dev *dev)
 status_t
 synaptics_pass_through_set_packet_size(ps2_dev *dev, uint8 size)
 {
-	synaptics_cookie *synapticsCookie = dev->parent_dev->cookie;
+	synaptics_cookie *synapticsCookie
+		= (synaptics_cookie*)dev->parent_dev->cookie;
 
 	status_t status = ps2_dev_command(dev->parent_dev, PS2_CMD_DISABLE, NULL,
 		0, NULL, 0);
@@ -602,10 +603,10 @@ synaptics_open(const char *name, uint32 flags, void **_cookie)
 
 	default_settings(&cookie->settings);
 
-	cookie->movement_maker.speed = 1;
-	cookie->movement_maker.scrolling_xStep = cookie->settings.scroll_xstepsize;
-	cookie->movement_maker.scrolling_yStep = cookie->settings.scroll_ystepsize;
-	cookie->movement_maker.scroll_acceleration
+	cookie->movementMaker.speed = 1;
+	cookie->movementMaker.scrolling_xStep = cookie->settings.scroll_xstepsize;
+	cookie->movementMaker.scrolling_yStep = cookie->settings.scroll_ystepsize;
+	cookie->movementMaker.scroll_acceleration
 		= cookie->settings.scroll_acceleration;
 	cookie->movement_started = false;
 	cookie->scrolling_started = false;
@@ -680,7 +681,7 @@ status_t
 synaptics_close(void *_cookie)
 {
 	status_t status;
-	synaptics_cookie *cookie = _cookie;
+	synaptics_cookie *cookie = (synaptics_cookie*)_cookie;
 
 	ps2_dev_command_timeout(cookie->dev, PS2_CMD_DISABLE, NULL, 0, NULL, 0,
 		150000);
@@ -735,7 +736,7 @@ synaptics_write(void *cookie, off_t pos, const void *buffer, size_t *_length)
 status_t
 synaptics_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 {
-	synaptics_cookie *cookie = _cookie;
+	synaptics_cookie *cookie = (synaptics_cookie*)_cookie;
 	mouse_movement movement;
 	status_t status;
 
@@ -753,11 +754,11 @@ synaptics_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 		case MS_SET_TOUCHPAD_SETTINGS:
 			TRACE("SYNAPTICS: MS_SET_TOUCHPAD_SETTINGS");
 			user_memcpy(&cookie->settings, buffer, sizeof(touchpad_settings));
-			cookie->movement_maker.scrolling_xStep
+			cookie->movementMaker.scrolling_xStep
 				= cookie->settings.scroll_xstepsize;
-			cookie->movement_maker.scrolling_yStep
+			cookie->movementMaker.scrolling_yStep
 				= cookie->settings.scroll_ystepsize;
-			cookie->movement_maker.scroll_acceleration
+			cookie->movementMaker.scroll_acceleration
 				= cookie->settings.scroll_acceleration;
 			return B_OK;
 
@@ -775,7 +776,7 @@ synaptics_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 int32
 synaptics_handle_int(ps2_dev *dev)
 {
-	synaptics_cookie *cookie = dev->cookie;
+	synaptics_cookie *cookie = (synaptics_cookie*)dev->cookie;
 	uint8 val;
 
 	val = cookie->dev->history[0].data;
@@ -795,7 +796,7 @@ synaptics_handle_int(ps2_dev *dev)
 	 	cookie->packet_index = 0;
 		return B_UNHANDLED_INTERRUPT;
  	}
- 	cookie->packet_buffer[cookie->packet_index] = val;
+ 	cookie->buffer[cookie->packet_index] = val;
 
 	cookie->packet_index++;
 	if (cookie->packet_index >= 6) {
@@ -805,25 +806,25 @@ synaptics_handle_int(ps2_dev *dev)
 		// too the pass through interrupt handle
 		if (sPassthroughDevice->active
 			&& sPassthroughDevice->handle_int != NULL
-			&& IS_SYN_PT_PACKAGE(cookie->packet_buffer)) {
+			&& IS_SYN_PT_PACKAGE(cookie->buffer)) {
 			status_t status;
 
-			sPassthroughDevice->history[0].data = cookie->packet_buffer[1];
+			sPassthroughDevice->history[0].data = cookie->buffer[1];
 			sPassthroughDevice->handle_int(sPassthroughDevice);
-			sPassthroughDevice->history[0].data = cookie->packet_buffer[4];
+			sPassthroughDevice->history[0].data = cookie->buffer[4];
 			sPassthroughDevice->handle_int(sPassthroughDevice);
-			sPassthroughDevice->history[0].data = cookie->packet_buffer[5];
+			sPassthroughDevice->history[0].data = cookie->buffer[5];
 			status = sPassthroughDevice->handle_int(sPassthroughDevice);
 
 			if (cookie->dev->packet_size == 4) {
-				sPassthroughDevice->history[0].data = cookie->packet_buffer[2];
+				sPassthroughDevice->history[0].data = cookie->buffer[2];
 				status = sPassthroughDevice->handle_int(sPassthroughDevice);
 			}
 			return status;
 		}
 
 		if (packet_buffer_write(cookie->synaptics_ring_buffer,
-				cookie->packet_buffer, cookie->dev->packet_size)
+				cookie->buffer, cookie->dev->packet_size)
 			!= cookie->dev->packet_size) {
 			// buffer is full, drop new data
 			return B_HANDLED_INTERRUPT;
@@ -840,7 +841,7 @@ synaptics_handle_int(ps2_dev *dev)
 void
 synaptics_disconnect(ps2_dev *dev)
 {
-	synaptics_cookie *cookie = dev->cookie;
+	synaptics_cookie *cookie = (synaptics_cookie*)dev->cookie;
 	// the mouse device might not be opened at this point
 	INFO("SYNAPTICS: synaptics_disconnect %s\n", dev->name);
 	if ((dev->flags & PS2_FLAG_OPEN) != 0)
