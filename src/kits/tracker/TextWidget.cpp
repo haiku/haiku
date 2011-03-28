@@ -321,12 +321,7 @@ BTextWidget::StartEdit(BRect bounds, BPoseView *view, BPose *pose)
 	if (!IsEditable())
 		return;
 
-	// don't allow editing of the trash directory name
-	if (pose->TargetModel()->IsTrash())
-		return;
-
-	// don't allow editing of the "Disks" icon name
-	if (pose->TargetModel()->IsRoot())
+	if (pose->TargetModel()->HasLocalizedName())
 		return;
 
 	BEntry entry(pose->TargetModel()->EntryRef());

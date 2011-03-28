@@ -299,9 +299,7 @@ BInfoWindow::BInfoWindow(Model *model, int32 group_index, LockingList<BWindow> *
 	if (list)
 		list->AddItem(this);
 
-	if (!model->IsTrash() && !model->HasLocalizedName())
-		AddShortcut('E', 0, new BMessage(kEditItem));
-
+	AddShortcut('E', 0, new BMessage(kEditItem));
 	AddShortcut('O', 0, new BMessage(kOpenSelection));
 	AddShortcut('U', 0, new BMessage(kUnmountVolume));
 	AddShortcut('P', 0, new BMessage(kPermissionsSelected));
@@ -433,7 +431,8 @@ BInfoWindow::MessageReceived(BMessage *message)
 		case kEditItem:
 		{
 			BEntry entry(fModel->EntryRef());
-			if (ConfirmChangeIfWellKnownDirectory(&entry,
+			if (!fModel->HasLocalizedName()
+				&& ConfirmChangeIfWellKnownDirectory(&entry,
 				B_TRANSLATE_COMMENT("rename", "As in 'If you rename ...'"),
 				B_TRANSLATE_COMMENT("rename", "As in 'To rename ...'")))
 				fAttributeView->BeginEditingTitle();
@@ -1222,9 +1221,7 @@ AttributeView::MouseDown(BPoint point)
 		InvertRect(fPathRect);
 		fTrackingState = path_track;
 	} else if (fTitleRect.Contains(point)) {
-		// You can't change the name of the trash
-		if (!fModel->IsTrash()
-			&& !fModel->HasLocalizedName()
+		if (!fModel->HasLocalizedName()
 			&& ConfirmChangeIfWellKnownDirectory(&entry,
 				B_TRANSLATE_COMMENT("rename", "As in 'If you rename ...'"),
 				B_TRANSLATE_COMMENT("rename", "As in 'To rename ...'"), true)
@@ -2039,12 +2036,12 @@ AttributeView::BuildContextMenu(BMenu *parent)
 	parent->AddItem(new BMenuItem(B_TRANSLATE("Open"),
 		new BMessage(kOpenSelection), 'O'));
 
-	if (!model.IsTrash()) {
-		if (!fModel->HasLocalizedName()) {
-			parent->AddItem(new BMenuItem(B_TRANSLATE("Edit name"),
-				new BMessage(kEditItem), 'E'));
-			parent->AddSeparatorItem();
-		}
+	if (!model.IsDesktop() && !model.IsRoot() && !model.IsTrash()
+		&& !fModel->HasLocalizedName()) {
+		parent->AddItem(new BMenuItem(B_TRANSLATE("Edit name"),
+			new BMessage(kEditItem), 'E'));
+		parent->AddSeparatorItem();
+	
 		if (fModel->IsVolume()) {
 			BMenuItem* item = new BMenuItem(B_TRANSLATE("Unmount"),
 				new BMessage(kUnmountVolume), 'U');
@@ -2056,14 +2053,16 @@ AttributeView::BuildContextMenu(BMenu *parent)
 			volume.SetTo(fModel->NodeRef()->device);
 			if (volume == boot)
 				item->SetEnabled(false);
-		} else {
-			parent->AddItem(new BMenuItem(B_TRANSLATE("Identify"),
-				new BMessage(kIdentifyEntry)));
 		}
-	} else {
+	}
+
+	if (!model.IsRoot() && !model.IsVolume() && !model.IsTrash())
+		parent->AddItem(new BMenuItem(B_TRANSLATE("Identify"),
+			new BMessage(kIdentifyEntry)));
+
+	if (model.IsTrash())
 		parent->AddItem(new BMenuItem(B_TRANSLATE("Empty Trash"),
 			new BMessage(kEmptyTrash)));
-	}
 
 	BMenuItem *sizeItem = NULL;
 	if (model.IsDirectory() && !model.IsVolume() && !model.IsRoot())  {

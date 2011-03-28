@@ -172,6 +172,7 @@ _IMPEXP_TRACKER bool FSIsTrashDir(const BEntry *);
 _IMPEXP_TRACKER bool FSIsPrintersDir(const BEntry *);
 _IMPEXP_TRACKER bool FSIsDeskDir(const BEntry *);
 _IMPEXP_TRACKER bool FSIsHomeDir(const BEntry *);
+_IMPEXP_TRACKER bool FSIsRootDir(const BEntry *);
 _IMPEXP_TRACKER void FSMoveToTrash(BObjectList<entry_ref> *srcList, BList *pointList = NULL,
 	bool async = true);
 	// Deprecated

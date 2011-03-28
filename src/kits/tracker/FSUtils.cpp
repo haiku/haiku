@@ -623,7 +623,11 @@ ConfirmChangeIfWellKnownDirectory(const BEntry *entry, const char *ifYouDoAction
 	if (confirmedAlready && *confirmedAlready == kConfirmedAll)
 		return true;
 
+	if (FSIsDeskDir(entry) || FSIsTrashDir(entry) || FSIsRootDir(entry))
+		return false;
+
 	if (!DirectoryMatchesOrContains(entry, B_SYSTEM_DIRECTORY)
+		&& !DirectoryMatchesOrContains(entry, B_COMMON_DIRECTORY)
 		&& !DirectoryMatchesOrContains(entry, B_USER_DIRECTORY))
 		// quick way out
 		return true;
@@ -631,18 +635,24 @@ ConfirmChangeIfWellKnownDirectory(const BEntry *entry, const char *ifYouDoAction
 	BString warning;
 	bool requireOverride = true;
 
-	if (DirectoryMatchesOrContains(entry, B_BEOS_DIRECTORY)) {
+	if (DirectoryMatchesOrContains(entry, B_SYSTEM_DIRECTORY)) {
 		warning.SetTo(
 			B_TRANSLATE("If you %ifYouDoAction the system folder or its "
 			"contents, you won't be able to boot " OS_NAME "! Are you sure you "
 			"want to do this? To %toDoAction the system folder or its contents "
 			"anyway, hold down the Shift key and click \"Do it\"."));
+	} else if (DirectoryMatches(entry, B_COMMON_DIRECTORY)) {
+		warning.SetTo(
+			B_TRANSLATE("If you %ifYouDoAction the common folder, " OS_NAME
+			" may not behave properly! Are you sure you want to do this? "
+			"To %toDoAction the common folder anyway, hold down the "
+			"Shift key and click \"Do it\"."));
 	} else if (DirectoryMatches(entry, B_USER_DIRECTORY)) {
 		warning .SetTo(
 			B_TRANSLATE("If you %ifYouDoAction the home folder, " OS_NAME
 			" may not behave properly! Are you sure you want to do this? "
-			"To %toDoAction the home anyway, click \"Do it\"."));
-		requireOverride = false;
+			"To %toDoAction the home folder anyway, hold down the "
+			"Shift key and click \"Do it\"."));
 	} else if (DirectoryMatchesOrContains(entry, B_USER_CONFIG_DIRECTORY)
 		|| DirectoryMatchesOrContains(entry, B_COMMON_SETTINGS_DIRECTORY)) {
 
@@ -2594,6 +2604,14 @@ bool
 FSIsHomeDir(const BEntry *entry)
 {
 	return FSIsDirFlavor(entry, B_USER_DIRECTORY);
+}
+
+
+bool
+FSIsRootDir(const BEntry *entry)
+{
+	BPath path(entry);
+	return path == "/";
 }
 
 
