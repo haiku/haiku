@@ -30,7 +30,6 @@ typedef struct {
 } movement_maker;
 
 
-
 void get_raw_movement(movement_maker *move, uint32 posX, uint32 posY);
 void compute_acceleration(movement_maker *move, int8 accel_factor);
 void get_movement(movement_maker *move, uint32 posX, uint32 posY);
