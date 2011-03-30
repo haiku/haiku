@@ -25,3 +25,10 @@ KernelAddon <usb>ehci :
 	: libusb.a
 	: ehci.rdef
 	;
+
+KernelAddon <usb>xhci :
+	xhci.cpp
+	: libusb.a
+	: xhci.rdef
+	;
+
