@@ -1179,10 +1179,24 @@ IPW2100::LoadMicrocodeAndFirmware()
 
 	TRACE_ALWAYS(("IPW2100: loading firmware %s\n", firmware));
 	int fd = open(firmware, B_READ_ONLY);
+	if (fd < 0) {
+		TRACE_ALWAYS(("IPW2100: firmware file unavailable\n"));
+		return B_ERROR;
+	}
+
 	int32 fileSize = lseek(fd, 0, SEEK_END);
 	lseek(fd, 0, SEEK_SET);
+	if (fileSize <= 0) {
+		TRACE_ALWAYS(("IPW2100: firmware file seems empty\n"));
+		return B_ERROR;
+	}
 
 	uint8 *buffer = (uint8 *)malloc(fileSize);
+	if (buffer == NULL) {
+		TRACE_ALWAYS(("IPW2100: no memory for firmware buffer\n"));
+		return B_NO_MEMORY;
+	}
+
 	ssize_t readCount = read(fd, buffer, fileSize);
 	TRACE(("IPW2100: read %ld bytes\n", readCount));
 	close(fd);
