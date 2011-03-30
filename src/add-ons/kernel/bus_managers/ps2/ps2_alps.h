@@ -19,22 +19,8 @@ struct packet_buffer*	ring_buffer;
 	uint8				buffer[PS2_PACKET_ALPS];
 	uint8				mode;
 
-	movement_maker		movementMaker;
-	bool				movement_started;
-	bool				scrolling_started;
-	bool				tap_started;
-	bigtime_t			tap_time;
-	int32				tap_delta_x;
-	int32				tap_delta_y;
-	int32				tap_clicks;
-	bool				tapdrag_started;
-	bool				valid_edge_motion;
-	bool				double_click;
-
-	bigtime_t			click_last_time;
-	bigtime_t			click_speed;
-	int32				click_count;
-	uint32				buttons_state;
+	uint8				previousZ;
+	TouchpadMovement	movementMaker;
 
 	touchpad_settings	settings;
 } alps_cookie;

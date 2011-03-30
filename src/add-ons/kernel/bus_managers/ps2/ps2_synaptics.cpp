@@ -13,13 +13,25 @@
 
 #include "ps2_synaptics.h"
 
-#include <malloc.h>
 #include <string.h>
 #include <stdlib.h>
 
 #include <keyboard_mouse_driver.h>
 
 #include "ps2_service.h"
+
+
+// synaptics touchpad proportions
+#define SYN_EDGE_MOTION_WIDTH	50
+#define SYN_EDGE_MOTION_SPEED	5
+#define SYN_AREA_OFFSET			40
+
+#define MIN_PRESSURE			30
+#define REAL_MAX_PRESSURE		100
+#define MAX_PRESSURE			200
+
+
+static hardware_specs gHardwareSpecs;
 
 
 const char* kSynapticsPath[4] = {
@@ -68,278 +80,6 @@ set_touchpad_mode(ps2_dev *dev, uint8 mode)
 	send_touchpad_arg(dev, mode);
 	return ps2_dev_command(dev, PS2_CMD_SET_SAMPLE_RATE, &sample_rate, 1,
 		NULL, 0);
-}
-
-
-static bool
-edge_motion(mouse_movement *movement, touch_event *event, bool validStart)
-{
-	int32 xdelta = 0;
-	int32 ydelta = 0;
-
-	if (event->xPosition < SYN_AREA_START_X + SYN_EDGE_MOTION_WIDTH)
-		xdelta = -SYN_EDGE_MOTION_SPEED;
-	else if (event->xPosition > SYN_AREA_END_X - SYN_EDGE_MOTION_WIDTH)
-		xdelta = SYN_EDGE_MOTION_SPEED;
-
-	if (event->yPosition < SYN_AREA_START_Y + SYN_EDGE_MOTION_WIDTH)
-		ydelta = -SYN_EDGE_MOTION_SPEED;
-	else if (event->yPosition > SYN_AREA_END_Y - SYN_EDGE_MOTION_WIDTH)
-		ydelta = SYN_EDGE_MOTION_SPEED;
-
-	if (xdelta && validStart)
-		movement->xdelta = xdelta;
-	if (ydelta && validStart)
-		movement->ydelta = ydelta;
-
-	if ((xdelta || ydelta) && !validStart)
-		return false;
-
-	return true;
-}
-
-
-/*!	If a button has been clicked (movement->buttons must be set accordingly),
-	this function updates the click_count of the \a cookie, as well as the
-	\a movement's clicks field.
-	Also, it sets the cookie's button state from movement->buttons.
-*/
-static inline void
-update_buttons(synaptics_cookie *cookie, mouse_movement *movement)
-{
-	// set click count correctly according to double click timeout
-	if (movement->buttons != 0 && cookie->buttons_state == 0) {
-		if (cookie->click_last_time + cookie->click_speed > movement->timestamp)
-			cookie->click_count++;
-		else
-			cookie->click_count = 1;
-
-		cookie->click_last_time = movement->timestamp;
-	}
-
-	if (movement->buttons != 0)
-		movement->clicks = cookie->click_count;
-
-	cookie->buttons_state = movement->buttons;
-}
-
-
-static inline void
-no_touch_to_movement(synaptics_cookie *cookie, touch_event *event,
-	mouse_movement *movement)
-{
-	uint32 buttons = event->buttons;
-
-	TRACE("SYNAPTICS: no touch event\n");
-
-	cookie->scrolling_started = false;
-	cookie->movement_started = false;
-
-	if (cookie->tapdrag_started
-		&& (movement->timestamp - cookie->tap_time) < SYN_TAP_TIMEOUT) {
-		buttons = 0x01;
-	}
-
-	// if the movement stopped switch off the tap drag when timeout is expired
-	if ((movement->timestamp - cookie->tap_time) > SYN_TAP_TIMEOUT) {
-		cookie->tapdrag_started = false;
-		cookie->valid_edge_motion = false;
-		TRACE("SYNAPTICS: tap drag gesture timed out\n");
-	}
-
-	if (abs(cookie->tap_delta_x) > 15 || abs(cookie->tap_delta_y) > 15) {
-		cookie->tap_started = false;
-		cookie->tap_clicks = 0;
-	}
-
-	if (cookie->tap_started || cookie->double_click) {
-		TRACE("SYNAPTICS: tap gesture\n");
-		cookie->tap_clicks++;
-
-		if (cookie->tap_clicks > 1) {
-			TRACE("SYNAPTICS: empty click\n");
-			buttons = 0x00;
-			cookie->tap_clicks = 0;
-			cookie->double_click = true;
-		} else {
-			buttons = 0x01;
-			cookie->tap_started = false;
-			cookie->tapdrag_started = true;
-			cookie->double_click = false;
-		}
-	}
-
-	movement->buttons = buttons;
-	update_buttons(cookie, movement);
-}
-
-
-static inline void
-move_to_movement(synaptics_cookie *cookie, touch_event *event,
-	mouse_movement *movement)
-{
-	touchpad_settings *settings = &cookie->settings;
-	bool isStartOfMovement = false;
-	float pressure = 0;
-
-	TRACE("SYNAPTICS: movement event\n");
-	if (!cookie->movement_started) {
-		isStartOfMovement = true;
-		cookie->movement_started = true;
-		start_new_movment(&cookie->movementMaker);
-	}
-
-	get_movement(&cookie->movementMaker, event->xPosition, event->yPosition);
-
-	movement->xdelta = cookie->movementMaker.xDelta;
-	movement->ydelta = cookie->movementMaker.yDelta;
-
-	// tap gesture
-	cookie->tap_delta_x += cookie->movementMaker.xDelta;
-	cookie->tap_delta_y += cookie->movementMaker.yDelta;
-
-	if (cookie->tapdrag_started) {
-		movement->buttons = kLeftButton;
-		movement->clicks = 0;
-
-		cookie->valid_edge_motion = edge_motion(movement, event,
-			cookie->valid_edge_motion);
-		TRACE("SYNAPTICS: tap drag\n");
-	} else {
-		TRACE("SYNAPTICS: movement set buttons\n");
-		movement->buttons = event->buttons;
-	}
-
-	// use only a fraction of pressure range, the max pressure seems to be
-	// to high
-	pressure = 20 * (event->zPressure - MIN_PRESSURE)
-		/ (MAX_PRESSURE - MIN_PRESSURE - 100);
-	if (!cookie->tap_started
-		&& isStartOfMovement
-		&& settings->tapgesture_sensibility > 0.
-		&& settings->tapgesture_sensibility > (20 - pressure)) {
-		TRACE("SYNAPTICS: tap started\n");
-		cookie->tap_started = true;
-		cookie->tap_time = system_time();
-		cookie->tap_delta_x = 0;
-		cookie->tap_delta_y = 0;
-	}
-
-	update_buttons(cookie, movement);
-}
-
-
-/*!	Checks if this is a scrolling event or not, and also actually does the
-	scrolling work if it is.
-
-	\return \c true if this was a scrolling event, \c false if not.
-*/
-static inline bool
-check_scrolling_to_movement(synaptics_cookie *cookie, touch_event *event,
-	mouse_movement *movement)
-{
-	touchpad_settings *settings = &cookie->settings;
-	bool isSideScrollingV = false;
-	bool isSideScrollingH = false;
-
-	// if a button is pressed don't allow to scroll, we likely be in a drag
-	// action
-	if (cookie->buttons_state != 0)
-		return false;
-
-	if ((SYN_AREA_END_X - SYN_AREA_WIDTH_X * settings->scroll_rightrange
-			< event->xPosition && !cookie->movement_started
-		&& settings->scroll_rightrange > 0.000001)
-			|| settings->scroll_rightrange > 0.999999) {
-		isSideScrollingV = true;
-	}
-	if ((SYN_AREA_START_Y + SYN_AREA_WIDTH_Y * settings->scroll_bottomrange
-				> event->yPosition && !cookie->movement_started
-			&& settings->scroll_bottomrange > 0.000001)
-				|| settings->scroll_bottomrange > 0.999999) {
-		isSideScrollingH = true;
-	}
-	if ((event->wValue == 0 || event->wValue == 1)
-		&& settings->scroll_twofinger) {
-		// two finger scrolling is enabled
-		isSideScrollingV = true;
-		isSideScrollingH = settings->scroll_twofinger_horizontal;
-	}
-
-	if (!isSideScrollingV && !isSideScrollingH) {
-		cookie->scrolling_started = false;
-		return false;
-	}
-
-	TRACE("SYNAPTICS: scroll event\n");
-
-	cookie->tap_started = false;
-	cookie->tap_clicks = 0;
-	cookie->tapdrag_started = false;
-	cookie->valid_edge_motion = false;
-	if (!cookie->scrolling_started) {
-		cookie->scrolling_started = true;
-		start_new_movment(&cookie->movementMaker);
-	}
-	get_scrolling(&cookie->movementMaker, event->xPosition,
-		event->yPosition);
-	movement->wheel_ydelta = cookie->movementMaker.yDelta;
-	movement->wheel_xdelta = cookie->movementMaker.xDelta;
-
-	if (isSideScrollingV && !isSideScrollingH)
-		movement->wheel_xdelta = 0;
-	else if (isSideScrollingH && !isSideScrollingV)
-		movement->wheel_ydelta = 0;
-
-	cookie->buttons_state = movement->buttons;
-
-	return true;
-}
-
-
-static status_t
-event_to_movement(synaptics_cookie *cookie, touch_event *event,
-	mouse_movement *movement)
-{
-	if (!movement)
-		return B_ERROR;
-
-	movement->xdelta = 0;
-	movement->ydelta = 0;
-	movement->buttons = 0;
-	movement->wheel_ydelta = 0;
-	movement->wheel_xdelta = 0;
-	movement->modifiers = 0;
-	movement->clicks = 0;
-	movement->timestamp = system_time();
-
-	if ((movement->timestamp - cookie->tap_time) > SYN_TAP_TIMEOUT) {
-		TRACE("SYNAPTICS: tap gesture timed out\n");
-		cookie->tap_started = false;
-		if (!cookie->double_click
-			|| (movement->timestamp - cookie->tap_time) > 2 * SYN_TAP_TIMEOUT) {
-			cookie->tap_clicks = 0;
-		}
-	}
-
-	if (event->buttons & kLeftButton) {
-		cookie->tap_clicks = 0;
-		cookie->tapdrag_started = false;
-		cookie->tap_started = false;
-		cookie->valid_edge_motion = false;
-	}
-
-	if (event->zPressure >= MIN_PRESSURE && event->zPressure < MAX_PRESSURE
-		&& ((event->wValue >=4 && event->wValue <=7)
-			|| event->wValue == 0 || event->wValue == 1)
-		&& (event->xPosition != 0 || event->yPosition != 0)) {
-		// The touch pad is in touch with at least one finger
-		if (!check_scrolling_to_movement(cookie, event, movement))
-			move_to_movement(cookie, event, movement);
-	} else
-		no_touch_to_movement(cookie, event, movement);
-
-	return B_OK;
 }
 
 
@@ -406,7 +146,7 @@ get_synaptics_movment(synaptics_cookie *cookie, mouse_movement *movement)
  	yTwelfBit = event_buffer[3] >> 5 & 1;
  	event.yPosition += yTwelfBit << 12;
 
- 	status = event_to_movement(cookie, &event, movement);
+ 	status = cookie->movementMaker.EventToMovement(&event, movement);
 
 	return status;
 }
@@ -592,9 +332,8 @@ synaptics_open(const char *name, uint32 flags, void **_cookie)
 	cookie = (synaptics_cookie*)malloc(sizeof(synaptics_cookie));
 	if (cookie == NULL)
 		goto err1;
-
+	cookie->movementMaker.Init();
 	*_cookie = cookie;
-	memset(cookie, 0, sizeof(synaptics_cookie));
 
 	cookie->dev = dev;
 	dev->cookie = cookie;
@@ -603,16 +342,20 @@ synaptics_open(const char *name, uint32 flags, void **_cookie)
 
 	default_settings(&cookie->settings);
 
-	cookie->movementMaker.speed = 1;
-	cookie->movementMaker.scrolling_xStep = cookie->settings.scroll_xstepsize;
-	cookie->movementMaker.scrolling_yStep = cookie->settings.scroll_ystepsize;
-	cookie->movementMaker.scroll_acceleration
-		= cookie->settings.scroll_acceleration;
-	cookie->movement_started = false;
-	cookie->scrolling_started = false;
-	cookie->tap_started = false;
-	cookie->double_click = false;
-	cookie->valid_edge_motion = false;
+	gHardwareSpecs.edgeMotionWidth = SYN_EDGE_MOTION_WIDTH;
+	gHardwareSpecs.edgeMotionSpeedFactor = SYN_EDGE_MOTION_SPEED;
+
+	gHardwareSpecs.areaStartX = SYN_AREA_START_X;
+	gHardwareSpecs.areaEndX = SYN_AREA_END_X;
+	gHardwareSpecs.areaStartY = SYN_AREA_START_Y;
+	gHardwareSpecs.areaEndY = SYN_AREA_END_Y;
+
+	gHardwareSpecs.minPressure = MIN_PRESSURE;
+	gHardwareSpecs.realMaxPressure = REAL_MAX_PRESSURE;
+	gHardwareSpecs.maxPressure = MAX_PRESSURE;
+
+	cookie->movementMaker.SetSettings(&cookie->settings);
+	cookie->movementMaker.SetSpecs(&gHardwareSpecs);
 
 	dev->packet_size = PS2_PACKET_SYNAPTICS;
 
@@ -754,17 +497,12 @@ synaptics_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 		case MS_SET_TOUCHPAD_SETTINGS:
 			TRACE("SYNAPTICS: MS_SET_TOUCHPAD_SETTINGS");
 			user_memcpy(&cookie->settings, buffer, sizeof(touchpad_settings));
-			cookie->movementMaker.scrolling_xStep
-				= cookie->settings.scroll_xstepsize;
-			cookie->movementMaker.scrolling_yStep
-				= cookie->settings.scroll_ystepsize;
-			cookie->movementMaker.scroll_acceleration
-				= cookie->settings.scroll_acceleration;
 			return B_OK;
 
 		case MS_SET_CLICKSPEED:
 			TRACE("SYNAPTICS: ioctl MS_SETCLICK (set click speed)\n");
-			return user_memcpy(&cookie->click_speed, buffer, sizeof(bigtime_t));
+			return user_memcpy(&cookie->movementMaker.click_speed, buffer,
+				sizeof(bigtime_t));
 
 		default:
 			TRACE("SYNAPTICS: unknown opcode: %ld\n", op);

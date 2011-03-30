@@ -1,11 +1,23 @@
 #include "movement_maker.h"
 
-#include <Debug.h>
+#include <stdlib.h>
+
+#include <KernelExport.h>
+
+
 #if 1
 #	define INFO(x...) dprintf(x)
 #else
 #	define INFO(x...)
 #endif
+
+// #define TRACE_MOVEMENT_MAKER
+#ifdef TRACE_MOVEMENT_MAKER
+#	define TRACE(x...) dprintf(x)
+#else
+#	define TRACE(x...)
+#endif
+
 
 typedef union {
   float value;
@@ -173,142 +185,460 @@ make_small(float value)
 }
 
 
+
 void
-get_raw_movement(movement_maker *move, uint32 posX, uint32 posY)
+MovementMaker::SetSettings(touchpad_settings* settings)
 {
+	fSettings = settings;
+}
+
+
+void
+MovementMaker::SetSpecs(hardware_specs* specs)
+{
+	fSpecs = specs;
+
+	fAreaWidth = fSpecs->areaEndX - fSpecs->areaStartX;
+	fAreaHeight = fSpecs->areaEndY - fSpecs->areaStartY;
+
+	// calibrated on the synaptics touchpad
+	fSpeed = 4100 / fAreaWidth;
+	fSmallMovement = 3 / fSpeed;
+}
+
+
+void
+MovementMaker::StartNewMovment()
+{
+	if (fSettings->scroll_xstepsize <= 0)
+		fSettings->scroll_xstepsize = 1;
+	if (fSettings->scroll_ystepsize <= 0)
+		fSettings->scroll_ystepsize = 1;
+
+	movementStarted = true;
+	scrolling_x = 0;
+	scrolling_y = 0;
+}
+
+
+void
+MovementMaker::GetMovement(uint32 posX, uint32 posY)
+{
+	_GetRawMovement(posX, posY);
+
+//	INFO("SYN: pos: %lu x %lu, delta: %ld x %ld, sums: %ld x %ld\n",
+//		posX, posY, xDelta, yDelta,
+//		deltaSumX, deltaSumY);
+
+	xDelta = xDelta;
+	yDelta = yDelta;
+}
+
+
+void
+MovementMaker::GetScrolling(uint32 posX, uint32 posY)
+{
+	int32 stepsX = 0, stepsY = 0;
+
+	_GetRawMovement(posX, posY);
+	_ComputeAcceleration(fSettings->scroll_acceleration);
+
+	if (fSettings->scroll_xstepsize > 0) {
+		scrolling_x += xDelta;
+
+		stepsX = make_small(scrolling_x / fSettings->scroll_xstepsize);
+
+		scrolling_x -= stepsX * fSettings->scroll_xstepsize;
+		xDelta = stepsX;
+	} else {
+		scrolling_x = 0;
+		xDelta = 0;
+	}
+	if (fSettings->scroll_ystepsize > 0) {
+		scrolling_y += yDelta;
+
+		stepsY = make_small(scrolling_y / fSettings->scroll_ystepsize);
+
+		scrolling_y -= stepsY * fSettings->scroll_ystepsize;
+		yDelta = -1 * stepsY;
+	} else {
+		scrolling_y = 0;
+		yDelta = 0;
+	}
+}
+
+
+void
+MovementMaker::_GetRawMovement(uint32 posX, uint32 posY)
+{
+	// calibrated on the synaptics touchpad
+	posX = posX * float(SYN_WIDTH) / fAreaWidth;
+	posY = posY * float(SYN_HEIGHT) / fAreaHeight;
+
 	const float acceleration = 0.8;
 	const float translation = 12.0;
 
 	int diff;
-	float xDelta, yDelta;
 
-	if (move->movementStarted) {
-		move->movementStarted = false;
+	if (movementStarted) {
+		movementStarted = false;
 		// init delta tracking
-		move->previousX = posX;
-		move->previousY = posY;
+		previousX = posX;
+		previousY = posY;
 		// deltas are automatically reset
 	}
 
 	// accumulate delta and store current pos, reset if pos did not change
-	diff = posX - move->previousX;
+	diff = posX - previousX;
 	// lessen the effect of small diffs
-	if ((diff > -3 && diff < -1) || (diff > 1 && diff < 3))
+	if ((diff > -fSmallMovement && diff < -1)
+		|| (diff > 1 && diff < fSmallMovement)) {
 		diff /= 2;
+	}
 	if (diff == 0)
-		move->deltaSumX = 0.0;
+		deltaSumX = 0.0;
 	else
-		move->deltaSumX += diff;
+		deltaSumX += diff;
 
-	diff = posY - move->previousY;
+	diff = posY - previousY;
 	// lessen the effect of small diffs
-	if ((diff > -3 && diff < -1) || (diff > 1 && diff < 3))
+	if ((diff > -fSmallMovement && diff < -1)
+		|| (diff > 1 && diff < fSmallMovement)) {
 		diff /= 2;
+	}
 	if (diff == 0)
-		move->deltaSumY = 0.0;
+		deltaSumY = 0.0;
 	else
-		move->deltaSumY += diff;
+		deltaSumY += diff;
 
-	move->previousX = posX;
-	move->previousY = posY;
+	previousX = posX;
+	previousY = posY;
 
 	// compute current delta and reset accumulated delta if
 	// abs() is greater than 1
-	xDelta = move->deltaSumX / translation;
-	yDelta = move->deltaSumY / translation;
+	xDelta = deltaSumX / translation;
+	yDelta = deltaSumY / translation;
 	if (xDelta > 1.0) {
-		move->deltaSumX = 0.0;
+		deltaSumX = 0.0;
 		xDelta = 1.0 + (xDelta - 1.0) * acceleration;
 	} else if (xDelta < -1.0) {
-		move->deltaSumX = 0.0;
+		deltaSumX = 0.0;
 		xDelta = -1.0 + (xDelta + 1.0) * acceleration;
 	}
 
 	if (yDelta > 1.0) {
-		move->deltaSumY = 0.0;
+		deltaSumY = 0.0;
 		yDelta = 1.0 + (yDelta - 1.0) * acceleration;
 	} else if (yDelta < -1.0) {
-		move->deltaSumY = 0.0;
+		deltaSumY = 0.0;
 		yDelta = -1.0 + (yDelta + 1.0) * acceleration;
 	}
 
-	move->xDelta = make_small(xDelta);
-	move->yDelta = make_small(yDelta);
+	xDelta = make_small(xDelta);
+	yDelta = make_small(yDelta);
 }
 
 
+
 void
-compute_acceleration(movement_maker *move, int8 accel_factor)
+MovementMaker::_ComputeAcceleration(int8 accel_factor)
 {
 	// acceleration
 	float acceleration = 1;
 	if (accel_factor != 0) {
-		acceleration = 1 + sqrtf(move->xDelta * move->xDelta
-			+ move->yDelta * move->yDelta) * accel_factor / 50.0;
+		acceleration = 1 + sqrtf(xDelta * xDelta
+			+ yDelta * yDelta) * accel_factor / 50.0;
 	}
 
-	move->xDelta = make_small(move->xDelta * acceleration);
-	move->yDelta = make_small(move->yDelta * acceleration);
+	xDelta = make_small(xDelta * acceleration);
+	yDelta = make_small(yDelta * acceleration);
+}
+
+
+// #pragma mark -
+
+
+#define TAP_TIMEOUT			200000
+
+
+void
+TouchpadMovement::Init()
+{
+	movement_started = false;
+	scrolling_started = false;
+	tap_started = false;
+	valid_edge_motion = false;
+	double_click = false;
+}
+
+
+status_t
+TouchpadMovement::EventToMovement(touch_event *event, mouse_movement *movement)
+{
+	if (!movement)
+		return B_ERROR;
+
+	movement->xdelta = 0;
+	movement->ydelta = 0;
+	movement->buttons = 0;
+	movement->wheel_ydelta = 0;
+	movement->wheel_xdelta = 0;
+	movement->modifiers = 0;
+	movement->clicks = 0;
+	movement->timestamp = system_time();
+
+	if ((movement->timestamp - tap_time) > TAP_TIMEOUT) {
+		TRACE("ALPS: tap gesture timed out\n");
+		tap_started = false;
+		if (!double_click
+			|| (movement->timestamp - tap_time) > 2 * TAP_TIMEOUT) {
+			tap_clicks = 0;
+		}
+	}
+
+	if (event->buttons & kLeftButton) {
+		tap_clicks = 0;
+		tapdrag_started = false;
+		tap_started = false;
+		valid_edge_motion = false;
+	}
+
+	if (event->zPressure >= fSpecs->minPressure
+		&& event->zPressure < fSpecs->maxPressure
+		&& ((event->wValue >= 4 && event->wValue <= 7)
+			|| event->wValue == 0 || event->wValue == 1)
+		&& (event->xPosition != 0 || event->yPosition != 0)) {
+		// The touch pad is in touch with at least one finger
+		if (!_CheckScrollingToMovement(event, movement))
+			_MoveToMovement(event, movement);
+	} else
+		_NoTouchToMovement(event, movement);
+
+	return B_OK;
+}
+
+
+bool
+TouchpadMovement::_EdgeMotion(mouse_movement *movement, touch_event *event,
+	bool validStart)
+{
+	int32 xdelta = 0;
+	int32 ydelta = 0;
+
+	if (event->xPosition < fSpecs->areaStartX + fSpecs->edgeMotionWidth)
+		xdelta = -fSpecs->edgeMotionSpeedFactor * fSpeed;
+	else if (event->xPosition > uint16(
+		fSpecs->areaEndX - fSpecs->edgeMotionWidth)) {
+		xdelta = fSpecs->edgeMotionSpeedFactor * fSpeed;
+	}
+
+	if (event->yPosition < fSpecs->areaStartY + fSpecs->edgeMotionWidth)
+		ydelta = -fSpecs->edgeMotionSpeedFactor * fSpeed;
+	else if (event->yPosition > uint16(
+		fSpecs->areaEndY - fSpecs->edgeMotionWidth)) {
+		ydelta = fSpecs->edgeMotionSpeedFactor * fSpeed;
+	}
+
+	if (xdelta && validStart)
+		movement->xdelta = xdelta;
+	if (ydelta && validStart)
+		movement->ydelta = ydelta;
+
+	if ((xdelta || ydelta) && !validStart)
+		return false;
+
+	return true;
+}
+
+
+/*!	If a button has been clicked (movement->buttons must be set accordingly),
+	this function updates the click_count, as well as the
+	\a movement's clicks field.
+	Also, it sets the button state from movement->buttons.
+*/
+void
+TouchpadMovement::_UpdateButtons(mouse_movement *movement)
+{
+	// set click count correctly according to double click timeout
+	if (movement->buttons != 0 && buttons_state == 0) {
+		if (click_last_time + click_speed > movement->timestamp)
+			click_count++;
+		else
+			click_count = 1;
+
+		click_last_time = movement->timestamp;
+	}
+
+	if (movement->buttons != 0)
+		movement->clicks = click_count;
+
+	buttons_state = movement->buttons;
 }
 
 
 void
-get_movement(movement_maker *move, uint32 posX, uint32 posY)
+TouchpadMovement::_NoTouchToMovement(touch_event *event,
+	mouse_movement *movement)
 {
-	get_raw_movement(move, posX, posY);
+	uint32 buttons = event->buttons;
 
-//	INFO("SYN: pos: %lu x %lu, delta: %ld x %ld, sums: %ld x %ld\n",
-//		posX, posY, move->xDelta, move->yDelta,
-//		move->deltaSumX, move->deltaSumY);
+	TRACE("ALPS: no touch event\n");
 
-	move->xDelta = move->xDelta * move->speed;
-	move->yDelta = move->yDelta * move->speed;
+	scrolling_started = false;
+	movement_started = false;
+
+	if (tapdrag_started
+		&& (movement->timestamp - tap_time) < TAP_TIMEOUT) {
+		buttons = 0x01;
+	}
+
+	// if the movement stopped switch off the tap drag when timeout is expired
+	if ((movement->timestamp - tap_time) > TAP_TIMEOUT) {
+		tapdrag_started = false;
+		valid_edge_motion = false;
+		TRACE("ALPS: tap drag gesture timed out\n");
+	}
+
+	if (abs(tap_delta_x) > 15 || abs(tap_delta_y) > 15) {
+		tap_started = false;
+		tap_clicks = 0;
+	}
+
+	if (tap_started || double_click) {
+		TRACE("ALPS: tap gesture\n");
+		tap_clicks++;
+
+		if (tap_clicks > 1) {
+			TRACE("ALPS: empty click\n");
+			buttons = 0x00;
+			tap_clicks = 0;
+			double_click = true;
+		} else {
+			buttons = 0x01;
+			tap_started = false;
+			tapdrag_started = true;
+			double_click = false;
+		}
+	}
+
+	movement->buttons = buttons;
+	_UpdateButtons(movement);
 }
 
 
 void
-get_scrolling(movement_maker *move, uint32 posX, uint32 posY)
+TouchpadMovement::_MoveToMovement(touch_event *event, mouse_movement *movement)
 {
-	int32 stepsX = 0, stepsY = 0;
+	bool isStartOfMovement = false;
+	float pressure = 0;
 
-	get_raw_movement(move, posX, posY);
-	compute_acceleration(move, move->scroll_acceleration);
+	TRACE("ALPS: movement event\n");
+	if (!movement_started) {
+		isStartOfMovement = true;
+		movement_started = true;
+		StartNewMovment();
+	}
 
-	if (move->scrolling_xStep > 0) {
-		move->scrolling_x += move->xDelta;
+	GetMovement(event->xPosition, event->yPosition);
 
-		stepsX = make_small(move->scrolling_x / move->scrolling_xStep);
+	movement->xdelta = xDelta;
+	movement->ydelta = yDelta;
 
-		move->scrolling_x -= stepsX * move->scrolling_xStep;
-		move->xDelta = stepsX;
+	// tap gesture
+	tap_delta_x += xDelta;
+	tap_delta_y += yDelta;
+
+	if (tapdrag_started) {
+		movement->buttons = kLeftButton;
+		movement->clicks = 0;
+
+		valid_edge_motion = _EdgeMotion(movement, event, valid_edge_motion);
+		TRACE("ALPS: tap drag\n");
 	} else {
-		move->scrolling_x = 0;
-		move->xDelta = 0;
+		TRACE("ALPS: movement set buttons\n");
+		movement->buttons = event->buttons;
 	}
-	if (move->scrolling_yStep > 0) {
-		move->scrolling_y += move->yDelta;
 
-		stepsY = make_small(move->scrolling_y / move->scrolling_yStep);
-
-		move->scrolling_y -= stepsY * move->scrolling_yStep;
-		move->yDelta = -1 * stepsY;
-	} else {
-		move->scrolling_y = 0;
-		move->yDelta = 0;
+	// use only a fraction of pressure range, the max pressure seems to be
+	// to high
+	pressure = 20 * (event->zPressure - fSpecs->minPressure)
+		/ (fSpecs->realMaxPressure - fSpecs->minPressure);
+	if (!tap_started
+		&& isStartOfMovement
+		&& fSettings->tapgesture_sensibility > 0.
+		&& fSettings->tapgesture_sensibility > (20 - pressure)) {
+		TRACE("ALPS: tap started\n");
+		tap_started = true;
+		tap_time = system_time();
+		tap_delta_x = 0;
+		tap_delta_y = 0;
 	}
+
+	_UpdateButtons(movement);
 }
 
 
-void
-start_new_movment(movement_maker *move)
+/*!	Checks if this is a scrolling event or not, and also actually does the
+	scrolling work if it is.
+
+	\return \c true if this was a scrolling event, \c false if not.
+*/
+bool
+TouchpadMovement::_CheckScrollingToMovement(touch_event *event,
+	mouse_movement *movement)
 {
-	if (move->scrolling_xStep <= 0)
-		move->scrolling_xStep = 1;
-	if (move->scrolling_yStep <= 0)
-		move->scrolling_yStep = 1;
+	bool isSideScrollingV = false;
+	bool isSideScrollingH = false;
 
-	move->movementStarted = true;
-	move->scrolling_x = 0;
-	move->scrolling_y = 0;
+	// if a button is pressed don't allow to scroll, we likely be in a drag
+	// action
+	if (buttons_state != 0)
+		return false;
+
+	if ((fSpecs->areaEndX - fAreaWidth * fSettings->scroll_rightrange
+			< event->xPosition && !movement_started
+		&& fSettings->scroll_rightrange > 0.000001)
+			|| fSettings->scroll_rightrange > 0.999999) {
+		isSideScrollingV = true;
+	}
+	if ((fSpecs->areaStartY + fAreaHeight * fSettings->scroll_bottomrange
+				> event->yPosition && !movement_started
+			&& fSettings->scroll_bottomrange > 0.000001)
+				|| fSettings->scroll_bottomrange > 0.999999) {
+		isSideScrollingH = true;
+	}
+	if ((event->wValue == 0 || event->wValue == 1)
+		&& fSettings->scroll_twofinger) {
+		// two finger scrolling is enabled
+		isSideScrollingV = true;
+		isSideScrollingH = fSettings->scroll_twofinger_horizontal;
+	}
+
+	if (!isSideScrollingV && !isSideScrollingH) {
+		scrolling_started = false;
+		return false;
+	}
+
+	TRACE("ALPS: scroll event\n");
+
+	tap_started = false;
+	tap_clicks = 0;
+	tapdrag_started = false;
+	valid_edge_motion = false;
+	if (!scrolling_started) {
+		scrolling_started = true;
+		StartNewMovment();
+	}
+	GetScrolling(event->xPosition, event->yPosition);
+	movement->wheel_ydelta = yDelta;
+	movement->wheel_xdelta = xDelta;
+
+	if (isSideScrollingV && !isSideScrollingH)
+		movement->wheel_xdelta = 0;
+	else if (isSideScrollingH && !isSideScrollingV)
+		movement->wheel_ydelta = 0;
+
+	buttons_state = movement->buttons;
+
+	return true;
 }
-
