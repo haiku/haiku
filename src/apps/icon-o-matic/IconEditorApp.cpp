@@ -757,25 +757,4 @@ IconEditorApp::_InstallDocumentMimeType()
 		fprintf(stderr, "Could not set sniffer rule of mime type: %s\n",
 			parseError.String());
 	}
-
-// NOTE: Icon-O-Matic writes the icon being saved as icon of the file anyway
-// therefor, the following code is not needed, it is also not tested and I am
-// spotting an error with SetIcon()
-//	// set document icon
-//	BResources* resources = AppResources();
-//		// does not need to be freed (belongs to BApplication base)
-//	if (resources) {
-//		size_t size;
-//		const void* iconData = resources->LoadResource('VICN', "IOM:DOC_ICON",
-//			&size);
-//		if (iconData && size > 0) {
-//			memcpy(largeIcon.Bits(), iconData, size);
-//			if (mime.SetIcon(&largeIcon, B_LARGE_ICON) < B_OK)
-//				fprintf(stderr, "Could not set large icon of mime type.\n");
-//		} else {
-//			fprintf(stderr, "Could not find icon in app resources (data: %p,
-//				"size: %ld).\n", iconData, size);
-//		}
-//	} else
-//		fprintf(stderr, "Could not find app resources.\n");
 }
