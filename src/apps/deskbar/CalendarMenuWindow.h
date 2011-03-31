@@ -1,5 +1,5 @@
 /*
- * Copyright Karsten Heimrich, host.haiku@gmx.de. All rights reserved.
+ * Copyright 2008 Karsten Heimrich, host.haiku@gmx.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _CALENDAR_MENU_WINDOW_H_
@@ -18,29 +18,30 @@ namespace BPrivate {
 	class BCalendarView;
 }
 
-	using BPrivate::BCalendarView;
+using BPrivate::BCalendarView;
 
 
 class CalendarMenuWindow : public BWindow {
 public:
-					CalendarMenuWindow(BPoint where);
-	virtual			~CalendarMenuWindow();
+								CalendarMenuWindow(BPoint where);
+	virtual						~CalendarMenuWindow();
 
-	virtual void	Show();
-	virtual void	WindowActivated(bool active);
-	virtual void	MessageReceived(BMessage* message);
-
-private:
-	void			_UpdateUI(const BDate& date);
-	BButton*		_SetupButton(const char* label, uint32 what, float height);
+	virtual void				Show();
+	virtual void				WindowActivated(bool active);
+	virtual void				MessageReceived(BMessage* message);
 
 private:
-	BStringView*	fYearLabel;
-	BStringView*	fMonthLabel;
-	BCalendarView*	fCalendarView;
-	bool			fSuppressFirstClose;
+			void				_UpdateDate(int32 year, int32 month, int32 day);
+			void				_UpdateDate(const BDate& date);
+			BButton*			_SetupButton(const char* label, uint32 what,
+									float height);
+
+private:
+			BStringView*		fYearLabel;
+			BStringView*		fMonthLabel;
+			BCalendarView*		fCalendarView;
+			bool				fSuppressFirstClose;
 };
 
 
 #endif	// _CALENDAR_MENU_WINDOW_H_
-

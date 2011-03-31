@@ -1,5 +1,5 @@
 /*
- * Copyright Karsten Heimrich, host.haiku@gmx.de. All rights reserved.
+ * Copyright 2008 Karsten Heimrich, host.haiku@gmx.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -132,7 +132,7 @@ CalendarMenuWindow::CalendarMenuWindow(BPoint where)
 	AddChild(groupView);
 
 	MoveTo(where);
-	_UpdateUI(BDate::CurrentDate(B_LOCAL_TIME));
+	_UpdateDate(BDate::CurrentDate(B_LOCAL_TIME));
 }
 
 
@@ -204,7 +204,7 @@ CalendarMenuWindow::MessageReceived(BMessage* message)
 			message->FindInt32("month", &month);
 			message->FindInt32("year", &year);
 
-			_UpdateUI(BDate(year, month, day));
+			_UpdateDate(year, month, day);
 			break;
 		}
 
@@ -212,25 +212,8 @@ CalendarMenuWindow::MessageReceived(BMessage* message)
 		case kMonthUpMessage:
 		{
 			BDate date = fCalendarView->Date();
-
-			int32 day = date.Day();
-			int32 year = date.Year();
-			int32 month = date.Month();
-
-			month += (kMonthDownMessage == message->what) ? -1 : 1;
-			if (month < 1) {
-				year--;
-				month = 12;
-			} else if (month > 12) {
-				year++;
-				month = 1;
-			}
-			date.SetDate(year, month, day);
-
-			if (day > date.DaysInMonth())
-				day = date.DaysInMonth();
-
-			_UpdateUI(BDate(year, month, day));
+			_UpdateDate(date.Year(), date.Month()
+				+ (kMonthDownMessage == message->what ? -1 : 1), date.Day());
 			break;
 		}
 
@@ -238,8 +221,9 @@ CalendarMenuWindow::MessageReceived(BMessage* message)
 		case kYearUpMessage:
 		{
 			BDate date = fCalendarView->Date();
-			int32 i = kYearDownMessage == message->what ? -1 : 1;
-			_UpdateUI(BDate(date.Year() + i, date.Month(), date.Day()));
+			_UpdateDate(
+				date.Year() + (kYearDownMessage == message->what ? -1 : 1),
+				date.Month(), date.Day());
 			break;
 		}
 
@@ -251,7 +235,32 @@ CalendarMenuWindow::MessageReceived(BMessage* message)
 
 
 void
-CalendarMenuWindow::_UpdateUI(const BDate& date)
+CalendarMenuWindow::_UpdateDate(int32 year, int32 month, int32 day)
+{
+	if (day < 1) {
+		month--;
+		day = 31;
+	}
+	if (month < 1) {
+		year--;
+		month = 12;
+	}
+	if (month > 12) {
+		year++;
+		month = 1;
+	}
+
+	BDate date(year, month, 1);
+	// Alternatively, we could choose the day at the same position instead
+	if (day > date.DaysInMonth())
+		day = date.DaysInMonth();
+
+	_UpdateDate(BDate(year, month, day));
+}
+
+
+void
+CalendarMenuWindow::_UpdateDate(const BDate& date)
 {
 	if (!date.IsValid())
 		return;
