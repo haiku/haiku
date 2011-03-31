@@ -72,10 +72,6 @@ public:
 									const entry_ref& ref,
 									bool traverse = false);
 
-			status_t			GetLocalizedFileName(BString& localizedFileName,
-									const char* signature, const char* context,
-									const char* string);
-
 	static	const char*			kCatLangAttr;
 	static	const char*			kCatSigAttr;
 	static	const char*			kCatFingerprintAttr;

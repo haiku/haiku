@@ -412,30 +412,7 @@ BLocaleRoster::GetLocalizedFileName(BString& localizedFileName,
 	if (status != B_OK)
 		return status;
 
-	return GetLocalizedFileName(localizedFileName, signature, context, string);
-}
-
-
-/*!	\brief Looks up a localized filename from a catalog.
-	\param localizedFileName A pre-allocated BString object for the result
-		of the lookup.
-	\param signature The "x-vnd..." part of an application signature.
-	\param context A catalog context. Likely B_TRANSLATE_SYSTEM_NAME_CONTEXT.
-	\param string A catalog string entry. Likely the unlocalized app name.
-	\return
-	- \c B_OK: success
-	- \c B_ENTRY_NOT_FOUND: failure. Catalog entry not found in catalog, etc
-	- other error codes: failure
-
-	Lookup is done for the top preferred language, only.
-	Lookup fails if a comment is present in the catalog entry.
-*/
-status_t
-BLocaleRoster::GetLocalizedFileName(BString& localizedFileName,
-	const char* signature, const char* context, const char* string)
-{
 	BCatalog catalog(signature);
-
 	const char* temp = catalog.GetString(string, context);
 
 	if (temp == NULL)
