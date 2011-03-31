@@ -1,22 +1,21 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006, 2011, Stephan Aßmus <superstippi@gmx.de>.
  * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef ICON_EDITOR_APP_H
 #define ICON_EDITOR_APP_H
 
+
 #include <Application.h>
 #include <String.h>
+
 
 class BFilePanel;
 class Document;
 class DocumentSaver;
 class MainWindow;
 class SavePanel;
+
 
 enum {
 	MSG_NEW							= 'newi',
@@ -31,6 +30,7 @@ enum {
 	MSG_EXPORT_AS					= 'xpas',
 };
 
+
 enum {
 	EXPORT_MODE_MESSAGE = 0,
 	EXPORT_MODE_FLAT_ICON,
@@ -43,14 +43,16 @@ enum {
 	EXPORT_MODE_ICON_SOURCE,
 };
 
+
 typedef enum {
 	LAST_PATH_OPEN = 0,
 	LAST_PATH_SAVE,
 	LAST_PATH_EXPORT,
 } path_kind;
 
+
 class IconEditorApp : public BApplication {
- public:
+public:
 								IconEditorApp();
 	virtual						~IconEditorApp();
 
@@ -63,7 +65,7 @@ class IconEditorApp : public BApplication {
 
 	// IconEditorApp
 
- private:
+private:
 			bool				_CheckSaveIcon(const BMessage* currentMessage);
 			void				_PickUpActionBeforeSave();
 
@@ -84,6 +86,7 @@ class IconEditorApp : public BApplication {
 			void				_RestoreSettings(BMessage& settings);
 			void				_InstallDocumentMimeType();
 
+private:
 			MainWindow*			fMainWindow;
 			Document*			fDocument;
 
@@ -96,5 +99,6 @@ class IconEditorApp : public BApplication {
 
 			BMessage*			fMessageAfterSave;
 };
+
 
 #endif // ICON_EDITOR_APP_H

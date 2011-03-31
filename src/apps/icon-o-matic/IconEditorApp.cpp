@@ -1,10 +1,8 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006, 2011, Stephan Aßmus <superstippi@gmx.de>.
  * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
  */
+
 
 #include "IconEditorApp.h"
 
@@ -60,7 +58,7 @@ using std::nothrow;
 
 static const char* kAppSig = "application/x-vnd.haiku-icon_o_matic";
 
-// constructor
+
 IconEditorApp::IconEditorApp()
 	: BApplication(kAppSig),
 	  fMainWindow(NULL),
@@ -77,7 +75,7 @@ IconEditorApp::IconEditorApp()
 {
 }
 
-// destructor
+
 IconEditorApp::~IconEditorApp()
 {
 	// NOTE: it is important that the GUI has been deleted
@@ -91,9 +89,10 @@ IconEditorApp::~IconEditorApp()
 	delete fMessageAfterSave;
 }
 
+
 // #pragma mark -
 
-// QuitRequested
+
 bool
 IconEditorApp::QuitRequested()
 {
@@ -109,7 +108,7 @@ IconEditorApp::QuitRequested()
 	return true;
 }
 
-// MessageReceived
+
 void
 IconEditorApp::MessageReceived(BMessage* message)
 {
@@ -219,29 +218,19 @@ IconEditorApp::MessageReceived(BMessage* message)
 	}
 }
 
-// ReadyToRun
+
 void
 IconEditorApp::ReadyToRun()
 {
 	// create file panels
 	BMessenger messenger(this, this);
 	BMessage message(B_REFS_RECEIVED);
-	fOpenPanel = new BFilePanel(B_OPEN_PANEL,
-								&messenger,
-								NULL,
-								B_FILE_NODE,
-								true,
-								&message);
+	fOpenPanel = new BFilePanel(B_OPEN_PANEL, &messenger, NULL, B_FILE_NODE,
+		true, &message);
 
 	message.what = MSG_SAVE_AS;
-	fSavePanel = new SavePanel("save panel",
-							   &messenger,
-								NULL,
-								B_FILE_NODE
-									| B_DIRECTORY_NODE
-									| B_SYMLINK_NODE,
-								false,
-								&message);
+	fSavePanel = new SavePanel("save panel", &messenger, NULL,
+		B_FILE_NODE | B_DIRECTORY_NODE | B_SYMLINK_NODE, false, &message);
 
 	// create main window
 	BMessage settings('stns');
@@ -253,7 +242,7 @@ IconEditorApp::ReadyToRun()
 	_InstallDocumentMimeType();
 }
 
-// RefsReceived
+
 void
 IconEditorApp::RefsReceived(BMessage* message)
 {
@@ -269,7 +258,7 @@ IconEditorApp::RefsReceived(BMessage* message)
 		_SyncPanels(fOpenPanel, fSavePanel);
 }
 
-// ArgvReceived
+
 void
 IconEditorApp::ArgvReceived(int32 argc, char** argv)
 {
@@ -282,9 +271,10 @@ IconEditorApp::ArgvReceived(int32 argc, char** argv)
 		_Open(ref);
 }
 
+
 // #pragma mark -
 
-// _CheckSaveIcon
+
 bool
 IconEditorApp::_CheckSaveIcon(const BMessage* currentMessage)
 {
@@ -314,7 +304,7 @@ IconEditorApp::_CheckSaveIcon(const BMessage* currentMessage)
 	}
 }
 
-// _PickUpActionBeforeSave
+
 void
 IconEditorApp::_PickUpActionBeforeSave()
 {
@@ -323,7 +313,7 @@ IconEditorApp::_PickUpActionBeforeSave()
 		fDocument->WriteUnlock();
 	}
 
-	if (!fMessageAfterSave)
+	if (fMessageAfterSave == NULL)
 		return;
 
 	PostMessage(fMessageAfterSave);
@@ -331,9 +321,10 @@ IconEditorApp::_PickUpActionBeforeSave()
 	fMessageAfterSave = NULL;
 }
 
+
 // #pragma mark -
 
-// _MakeIconEmpty
+
 void
 IconEditorApp::_MakeIconEmpty()
 {
@@ -355,7 +346,7 @@ IconEditorApp::_MakeIconEmpty()
 		fMainWindow->Unlock();
 }
 
-// _Open
+
 void
 IconEditorApp::_Open(const entry_ref& ref, bool append)
 {
@@ -506,7 +497,7 @@ IconEditorApp::_Open(const entry_ref& ref, bool append)
 	}
 }
 
-// _Open
+
 void
 IconEditorApp::_Open(const BMessenger& externalObserver, const uint8* data,
 	size_t size)
@@ -524,7 +515,8 @@ IconEditorApp::_Open(const BMessenger& externalObserver, const uint8* data,
 	if (data && size > 0) {
 		// try to open the icon from the provided data
 		FlatIconImporter flatImporter;
-		status_t ret = flatImporter.Import(icon, const_cast<uint8*>(data), size);
+		status_t ret = flatImporter.Import(icon, const_cast<uint8*>(data),
+			size);
 			// NOTE: the const_cast is a bit ugly, but no harm is done
 			// the reason is that the LittleEndianBuffer knows read and write
 			// mode, in this case it is used read-only, and it does not assume
@@ -573,7 +565,7 @@ IconEditorApp::_Open(const BMessenger& externalObserver, const uint8* data,
 	}
 }
 
-// _CreateSaver
+
 DocumentSaver*
 IconEditorApp::_CreateSaver(const entry_ref& ref, uint32 exportMode)
 {
@@ -621,7 +613,7 @@ IconEditorApp::_CreateSaver(const entry_ref& ref, uint32 exportMode)
 	return saver;
 }
 
-// _SyncPanels
+
 void
 IconEditorApp::_SyncPanels(BFilePanel* from, BFilePanel* to)
 {
@@ -641,7 +633,7 @@ IconEditorApp::_SyncPanels(BFilePanel* from, BFilePanel* to)
 	}
 }
 
-// _LastFilePath
+
 const char*
 IconEditorApp::_LastFilePath(path_kind which)
 {
@@ -679,9 +671,10 @@ IconEditorApp::_LastFilePath(path_kind which)
 	return path;
 }
 
+
 // #pragma mark -
 
-// _StoreSettings
+
 void
 IconEditorApp::_StoreSettings()
 {
@@ -695,7 +688,7 @@ IconEditorApp::_StoreSettings()
 	save_settings(&settings, "Icon-O-Matic");
 }
 
-// _RestoreSettings
+
 void
 IconEditorApp::_RestoreSettings(BMessage& settings)
 {
@@ -706,7 +699,7 @@ IconEditorApp::_RestoreSettings(BMessage& settings)
 		fSavePanel->SetExportMode(mode);
 }
 
-// _InstallDocumentMimeType
+
 void
 IconEditorApp::_InstallDocumentMimeType()
 {
@@ -727,8 +720,8 @@ IconEditorApp::_InstallDocumentMimeType()
 
 	ret = mime.Install();
 	if (ret < B_OK) {
-		fprintf(stderr, "Could not install native document mime type (%s): %s.\n",
-			kNativeIconMimeType, strerror(ret));
+		fprintf(stderr, "Could not install native document mime type (%s): "
+			"%s.\n", kNativeIconMimeType, strerror(ret));
 		return;
 	}
 	// set preferred app
@@ -765,7 +758,7 @@ IconEditorApp::_InstallDocumentMimeType()
 			parseError.String());
 	}
 
-// NOTE: Icon-O-Matic writes the icon being saved as icon of the file anyways
+// NOTE: Icon-O-Matic writes the icon being saved as icon of the file anyway
 // therefor, the following code is not needed, it is also not tested and I am
 // spotting an error with SetIcon()
 //	// set document icon
@@ -773,13 +766,16 @@ IconEditorApp::_InstallDocumentMimeType()
 //		// does not need to be freed (belongs to BApplication base)
 //	if (resources) {
 //		size_t size;
-//		const void* iconData = resources->LoadResource('VICN', "IOM:DOC_ICON", &size);
+//		const void* iconData = resources->LoadResource('VICN', "IOM:DOC_ICON",
+//			&size);
 //		if (iconData && size > 0) {
 //			memcpy(largeIcon.Bits(), iconData, size);
 //			if (mime.SetIcon(&largeIcon, B_LARGE_ICON) < B_OK)
 //				fprintf(stderr, "Could not set large icon of mime type.\n");
-//		} else
-//			fprintf(stderr, "Could not find icon in app resources (data: %p, size: %ld).\n", iconData, size);
+//		} else {
+//			fprintf(stderr, "Could not find icon in app resources (data: %p,
+//				"size: %ld).\n", iconData, size);
+//		}
 //	} else
 //		fprintf(stderr, "Could not find app resources.\n");
 }
