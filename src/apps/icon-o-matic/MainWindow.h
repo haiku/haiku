@@ -69,8 +69,8 @@ public:
 
 private:
 			void				_Init();
-			void				_CreateGUI(BRect frame);
-			BMenuBar*			_CreateMenuBar(BRect frame);
+			void				_CreateGUI();
+			BMenuBar*			_CreateMenuBar();
 
 			void				_ImproveScrollBarLayout(BView* target);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2006-2011, Stephan Aßmus <superstippi@gmx.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -106,7 +106,7 @@ MainWindow::~MainWindow()
 {
 	delete fState;
 
-	if (fIcon)
+	if (fIcon != NULL)
 		fIcon->Release();
 
 	fDocument->CommandStack()->RemoveObserver(this);
@@ -555,7 +555,7 @@ void
 MainWindow::_Init()
 {
 	// create the GUI
-	_CreateGUI(Bounds());
+	_CreateGUI();
 
 	// fix up scrollbar layout in listviews
 	_ImproveScrollBarLayout(fPathListView);
@@ -608,10 +608,8 @@ MainWindow::_Init()
 
 
 void
-MainWindow::_CreateGUI(BRect bounds)
+MainWindow::_CreateGUI()
 {
-	const float splitWidth = 13 * be_plain_font->Size();
-
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 
 	BGridLayout* layout = new BGridLayout();
@@ -622,10 +620,15 @@ MainWindow::_CreateGUI(BRect bounds)
 
 	BGroupView* leftTopView = new BGroupView(B_VERTICAL, 0);
 	layout->AddView(leftTopView, 0, 0);
-	leftTopView->SetExplicitMinSize(BSize(splitWidth, B_SIZE_UNSET));
 
 	// views along the left side
-	leftTopView->AddChild(_CreateMenuBar(bounds));
+	leftTopView->AddChild(_CreateMenuBar());
+
+	float splitWidth = 13 * be_plain_font->Size();
+	BSize minSize = leftTopView->MinSize();
+	splitWidth = std::max(splitWidth, minSize.width);
+	leftTopView->SetExplicitMaxSize(BSize(splitWidth, B_SIZE_UNSET));
+	leftTopView->SetExplicitMinSize(BSize(splitWidth, B_SIZE_UNSET));
 
 	BGroupView* iconPreviews = new BGroupView(B_HORIZONTAL);
 	iconPreviews->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -644,7 +647,6 @@ MainWindow::_CreateGUI(BRect bounds)
 		"icon preview 32 desktop");
 	fIconPreview32Desktop->SetLowColor(ui_color(B_DESKTOP_COLOR));
 
-//	fIconPreview48 = new IconView(bounds, "icon preview 48");
 	fIconPreview64 = new IconView(BRect(0, 0, 63, 63), "icon preview 64");
 	fIconPreview64->SetLowColor(ui_color(B_DESKTOP_COLOR));
 
@@ -675,10 +677,10 @@ MainWindow::_CreateGUI(BRect bounds)
 	
 	BGroupView* leftSideView = new BGroupView(B_VERTICAL, 0);
 	layout->AddView(leftSideView, 0, 1);
-	leftSideView->SetExplicitMinSize(BSize(splitWidth, B_SIZE_UNSET));
+	leftSideView->SetExplicitMaxSize(BSize(splitWidth, B_SIZE_UNSET));
 
 	// path menu and list view
-	BMenuBar* menuBar = new BMenuBar(bounds, "path menu bar");
+	BMenuBar* menuBar = new BMenuBar("path menu bar");
 	menuBar->AddItem(fPathMenu);
 	leftSideView->AddChild(menuBar);
 
@@ -690,7 +692,7 @@ MainWindow::_CreateGUI(BRect bounds)
 	leftSideView->AddChild(scrollView);
 
 	// shape list view
-	menuBar = new BMenuBar(bounds, "shape menu bar");
+	menuBar = new BMenuBar("shape menu bar");
 	menuBar->AddItem(fShapeMenu);
 	leftSideView->AddChild(menuBar);
 
@@ -701,7 +703,7 @@ MainWindow::_CreateGUI(BRect bounds)
 	leftSideView->AddChild(scrollView);
 
 	// transformer list view
-	menuBar = new BMenuBar(bounds, "transformer menu bar");
+	menuBar = new BMenuBar("transformer menu bar");
 	menuBar->AddItem(fTransformerMenu);
 	leftSideView->AddChild(menuBar);
 
@@ -712,7 +714,7 @@ MainWindow::_CreateGUI(BRect bounds)
 	leftSideView->AddChild(scrollView);
 
 	// property list view
-	menuBar = new BMenuBar(bounds, "property menu bar");
+	menuBar = new BMenuBar("property menu bar");
 	menuBar->AddItem(fPropertyMenu);
 	leftSideView->AddChild(menuBar);
 
@@ -750,7 +752,7 @@ MainWindow::_CreateGUI(BRect bounds)
 	topSide->AddView(styleGroupView);
 
 	// style list view
-	menuBar = new BMenuBar(bounds, "style menu bar");
+	menuBar = new BMenuBar("style menu bar");
 	menuBar->AddItem(fStyleMenu);
 	styleGroup->AddView(menuBar);
 
@@ -771,7 +773,7 @@ MainWindow::_CreateGUI(BRect bounds)
 	BView* swatchGroupView = new BView("swatch group", 0, swatchGroup);
 	topSide->AddView(swatchGroupView);
 
-	menuBar = new BMenuBar(bounds, "swatches menu bar");
+	menuBar = new BMenuBar("swatches menu bar");
 	menuBar->AddItem(fSwatchMenu);
 	swatchGroup->AddView(menuBar);
 
@@ -786,9 +788,9 @@ MainWindow::_CreateGUI(BRect bounds)
 }
 
 BMenuBar*
-MainWindow::_CreateMenuBar(BRect frame)
+MainWindow::_CreateMenuBar()
 {
-	BMenuBar* menuBar = new BMenuBar(frame, "main menu");
+	BMenuBar* menuBar = new BMenuBar("main menu");
 
 
 	#undef B_TRANSLATE_CONTEXT
