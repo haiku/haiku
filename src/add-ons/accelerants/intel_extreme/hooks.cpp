@@ -114,7 +114,8 @@ get_accelerant_hook(uint32 feature, void *data)
 			if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_91x)
 				|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_94x)
 				|| gInfo->shared_info->device_type.IsModel(INTEL_TYPE_965M)
-				|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_G4x))
+				|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_G4x)
+				|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_IGD))
 				return NULL;
 
 			return (void*)intel_allocate_overlay_buffer;
