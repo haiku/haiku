@@ -45,6 +45,7 @@ DoCatalogs Mail :
 	Enclosures.cpp
 	FindWindow.cpp
 	Header.cpp
+	LocalizedFolders.h
 	MailApp.cpp
 	MailPopUpMenu.cpp
 	MailWindow.cpp

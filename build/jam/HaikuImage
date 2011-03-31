@@ -487,7 +487,8 @@ SEARCH on $(networkSettingsFiles)
 AddFilesToHaikuImage common settings network : $(networkSettingsFiles) ;
 
 # post install scripts and fresh install indicator file
-local postInstallFiles = mime_update.sh default_deskbar_items.sh ;
+local postInstallFiles = add_catalog_entry_attributes.sh
+	default_deskbar_items.sh mime_update.sh ;
 postInstallFiles = $(postInstallFiles:G=post-install) ;
 SEARCH on $(postInstallFiles)
 	= [ FDirName $(HAIKU_TOP) data common boot post_install ] ;

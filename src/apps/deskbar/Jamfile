@@ -47,6 +47,7 @@ DoCatalogs Deskbar :
 	:
 	BarWindow.cpp
 	BeMenu.cpp
+	LocalizedFolders.h
 	PreferencesWindow.cpp
 	StatusView.cpp
 	TimeView.cpp

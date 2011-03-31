@@ -108,6 +108,7 @@ DoCatalogs libtracker.so :
 	FSClipboard.cpp
 	FSUtils.cpp
 	InfoWindow.cpp
+	LocalizedFolders.h
 	Model.cpp
 	MountMenu.cpp
 	NavMenu.cpp
