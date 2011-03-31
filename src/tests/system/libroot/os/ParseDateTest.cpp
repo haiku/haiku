@@ -86,6 +86,7 @@ main(int argc, char** argv)
 		{739702803,	 "Mon, June 10th, 1993 10:00:03 am +0100", ABSOLUTE, true, false},
 		{739731603,	 "Mon, June 10th, 1993 10:00:03 am -0700", ABSOLUTE, true, false},
 		{739654203,	 "Mon, June 10th, 1993 06:00:03 am ACDT", ABSOLUTE, true, false},
+		{1291204800, "01 Dec 10 12:00", ABSOLUTE, false, true},
 		{-1,		 NULL, 0, false}
 	};
 

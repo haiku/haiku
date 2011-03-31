@@ -766,11 +766,12 @@ computeDate(const char* format, bool* optional, parsed_element* elements,
 	if (now == -1)
 		now = time(NULL);
 
+	int nowYear = -1;
 	if (dateMask.IsComplete())
 		memset(&tm, 0, sizeof(tm));
 	else {
 		localtime_r(&now, &tm);
-
+		nowYear = tm.tm_year;
 		if (dateMask.HasTime()) {
 			tm.tm_min = 0;
 			tm.tm_sec = 0;
@@ -820,10 +821,31 @@ computeDate(const char* format, bool* optional, parsed_element* elements,
 						break;
 					case 'y':
 					case 'Y':
+					{
+						if (nowYear < 0) {
+							struct tm tmNow;
+							localtime_r(&now, &tmNow);
+							nowYear	= tmNow.tm_year;
+						}
+						int nowYearInCentury = nowYear % 100;
+						int nowCentury = 1900 + nowYear - nowYearInCentury;
+
 						tm.tm_year = element->value;
-						if (tm.tm_year > 1900)
+						if (tm.tm_year < 1900) {
+							// just a relative year like 11 (2011)
+
+							// interpret something like 50 as 1950 but
+							// something like 11 as 2011 (assuming now is 2011)
+							if (nowYearInCentury + 10 < tm.tm_year % 100)
+								tm.tm_year -= 100;
+							
+							tm.tm_year += nowCentury - 1900;
+						}
+						else {
 							tm.tm_year -= 1900;
+						}
 						break;
+					}
 					case 'z':	// time zone
 					case 'Z':
 					{
