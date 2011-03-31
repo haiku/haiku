@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Be-MAIL	1567591965
+1	swedish	x-vnd.Be-MAIL	2507291031
 %d - Date	Mail		%d - Datum
 %e - E-mail address	Mail		%e - mejladress
 %n - Full name	Mail		%n - Fullständigt namn
@@ -145,4 +145,11 @@ View	Mail		Visa
 Warn unencodable:	Mail		Varna för ogiltiga tecken:
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Brevets huvudtext innehåller %Id oläsbara tecken. Det är möjligt att en annan teckenuppsättning skulle vara mer lämplig. Tryck på Skicka för att sända brevet som det är - oläsbara tecken kommer ersättas - eller välj Avbryt för att gå tillbaka och korrigera problemet.
 \\n - Newline	Mail		\\n - Ny rad
+draft	B_USER_DIRECTORY/mail/draft		utkast
 helpful message	Mail		hjälpsamt meddelande
+in	B_USER_DIRECTORY/mail/in		inkorg
+mail	B_USER_DIRECTORY/mail		e-post
+out	B_USER_DIRECTORY/mail/out		utkorg
+queries	B_USER_DIRECTORY/mail/queries		sökningar
+sent	B_USER_DIRECTORY/mail/sent		skickat
+spam	B_USER_DIRECTORY/mail/spam		skräp
