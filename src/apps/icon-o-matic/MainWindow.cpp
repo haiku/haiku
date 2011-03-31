@@ -72,6 +72,7 @@ using std::nothrow;
 enum {
 	MSG_UNDO						= 'undo',
 	MSG_REDO						= 'redo',
+	MSG_UNDO_STACK_CHANGED			= 'usch',
 
 	MSG_PATH_SELECTED				= 'vpsl',
 	MSG_STYLE_SELECTED				= 'stsl',
@@ -214,8 +215,32 @@ MainWindow::MessageReceived(BMessage* message)
 		case MSG_REDO:
 			fDocument->CommandStack()->Redo();
 			break;
+		case MSG_UNDO_STACK_CHANGED:
+		{
+			// relable Undo item and update enabled status
+			BString label(B_TRANSLATE("Undo"));
+			fUndoMI->SetEnabled(fDocument->CommandStack()->GetUndoName(label));
+			if (fUndoMI->IsEnabled())
+				fUndoMI->SetLabel(label.String());
+			else {
+				fUndoMI->SetLabel(B_TRANSLATE_WITH_CONTEXT("<nothing to undo>",
+					"Icon-O-Matic-Menu-Edit"));
+			}
+	
+			// relable Redo item and update enabled status
+			label.SetTo(B_TRANSLATE("Redo"));
+			fRedoMI->SetEnabled(fDocument->CommandStack()->GetRedoName(label));
+			if (fRedoMI->IsEnabled())
+				fRedoMI->SetLabel(label.String());
+			else {
+				fRedoMI->SetLabel(B_TRANSLATE_WITH_CONTEXT("<nothing to redo>",
+					"Icon-O-Matic-Menu-Edit"));
+			}
+			break;
+		}
 
-		case MSG_MOUSE_FILTER_MODE: {
+		case MSG_MOUSE_FILTER_MODE:
+		{
 			uint32 mode;
 			if (message->FindInt32("mode", (int32*)&mode) == B_OK)
 				fCanvasView->SetMouseFilterMode(mode);
@@ -432,33 +457,13 @@ MainWindow::WorkspacesChanged(uint32 oldWorkspaces, uint32 newWorkspaces)
 void
 MainWindow::ObjectChanged(const Observable* object)
 {
-	if (!fDocument)
+	if (!fDocument || !fDocument->ReadLock())
 		return;
 
-	if (!Lock())
-		return;
+	if (object == fDocument->CommandStack())
+		PostMessage(MSG_UNDO_STACK_CHANGED);
 
-	if (object == fDocument->CommandStack()) {
-		// relable Undo item and update enabled status
-		BString label(B_TRANSLATE("Undo"));
-		fUndoMI->SetEnabled(fDocument->CommandStack()->GetUndoName(label));
-		if (fUndoMI->IsEnabled())
-			fUndoMI->SetLabel(label.String());
-		else
-			fUndoMI->SetLabel(B_TRANSLATE_WITH_CONTEXT("<nothing to undo>",
-				"Icon-O-Matic-Menu-Edit"));
-
-		// relable Redo item and update enabled status
-		label.SetTo(B_TRANSLATE("Redo"));
-		fRedoMI->SetEnabled(fDocument->CommandStack()->GetRedoName(label));
-		if (fRedoMI->IsEnabled())
-			fRedoMI->SetLabel(label.String());
-		else
-			fRedoMI->SetLabel(B_TRANSLATE_WITH_CONTEXT("<nothing to redo>",
-				"Icon-O-Matic-Menu-Edit"));
-	}
-
-	Unlock();
+	fDocument->ReadUnlock();
 }
 
 
