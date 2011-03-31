@@ -13,6 +13,8 @@
 #include <USBKit.h>
 #include <stdio.h>
 
+#include "usbspec_private.h"
+
 
 const char*
 ClassName(int classNumber) {
@@ -167,6 +169,40 @@ DumpInfo(BUSBDevice &device, bool verbose)
 	for (uint32 i = 0; i < device.CountConfigurations(); i++) {
 		printf("    [Configuration %lu]\n", i);
 		DumpConfiguration(device.ConfigurationAt(i));
+	}
+
+	if (device.Class() != 0x09)
+		return;
+
+	usb_hub_descriptor hubDescriptor;
+	size_t size = device.GetDescriptor(USB_DESCRIPTOR_HUB, 0, 0,
+		(void *)&hubDescriptor, sizeof(usb_hub_descriptor));
+	if (size == sizeof(usb_hub_descriptor)) {
+		printf("    Hub ports count......... %d\n", hubDescriptor.num_ports);
+		printf("    Hub Controller Current.. %dmA\n", hubDescriptor.max_power);
+
+		for (int index = 1; index <= hubDescriptor.num_ports; index++) {
+			usb_port_status portStatus;
+			size_t actualLength = device.ControlTransfer(USB_REQTYPE_CLASS
+				| USB_REQTYPE_OTHER_IN, USB_REQUEST_GET_STATUS, 0,
+				index, sizeof(portStatus), (void *)&portStatus);
+			if (actualLength != sizeof(portStatus))
+				continue;
+			printf("      Port %d status....... %04x.%04x%s%s%s%s%s%s%s%s%s\n",
+				index, portStatus.status, portStatus.change,
+				portStatus.status & PORT_STATUS_CONNECTION ? " Connect": "",
+				portStatus.status & PORT_STATUS_ENABLE ? " Enable": "",
+				portStatus.status & PORT_STATUS_SUSPEND ? " Suspend": "",
+				portStatus.status & PORT_STATUS_OVER_CURRENT ? " Overcurrent": "",
+				portStatus.status & PORT_STATUS_RESET ? " Reset": "",
+				portStatus.status & PORT_STATUS_POWER ? " Power": "",
+				portStatus.status & PORT_STATUS_CONNECTION ? 
+					(portStatus.status & PORT_STATUS_LOW_SPEED ? " Lowspeed" 
+					: (portStatus.status & PORT_STATUS_HIGH_SPEED ? " Highspeed"
+						: " Fullspeed")) : "",
+				portStatus.status & PORT_STATUS_TEST ? " Test": "",
+				portStatus.status & PORT_STATUS_INDICATOR ? " Indicator": "");
+		}
 	}
 }
 

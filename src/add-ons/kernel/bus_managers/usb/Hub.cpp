@@ -128,10 +128,10 @@ Hub::UpdatePortStatus(uint8 index)
 	// get the current port status
 	size_t actualLength = 0;
 	status_t result = DefaultPipe()->SendRequest(USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_IN,
-		USB_REQUEST_GET_STATUS, 0, index + 1, 4, (void *)&fPortStatus[index],
-		4, &actualLength);
+		USB_REQUEST_GET_STATUS, 0, index + 1, sizeof(usb_port_status), 
+		(void *)&fPortStatus[index], sizeof(usb_port_status), &actualLength);
 
-	if (result < B_OK || actualLength < 4) {
+	if (result < B_OK || actualLength < sizeof(usb_port_status)) {
 		TRACE_ERROR("error updating port status\n");
 		return B_ERROR;
 	}

@@ -6,14 +6,13 @@
  *		Michael Lotz <mmlr@mlotz.ch>
  *		Niels S. Reedijk
  */
-
 #ifndef _USBSPEC_PRIVATE_H
 #define _USBSPEC_PRIVATE_H
 
+
 #include <KernelExport.h>
-#include <util/Vector.h>
 #include <USB3.h>
-#include <util/kernel_cpp.h>
+
 
 #define USB_MAX_AREAS					8
 #define USB_MAX_FRAGMENT_SIZE			B_PAGE_SIZE * 96
@@ -96,6 +95,8 @@ struct usb_port_status
 #define PORT_STATUS_POWER			0x0100
 #define PORT_STATUS_LOW_SPEED		0x0200
 #define PORT_STATUS_HIGH_SPEED		0x0400
+#define PORT_STATUS_TEST			0x0800
+#define PORT_STATUS_INDICATOR		0x1000
 
 
 //The feature requests with ports

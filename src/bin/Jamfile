@@ -195,6 +195,9 @@ StdBinCommands
 	setusbconfig.cpp
 	: be libdevice.so : $(haiku-utils_rsrc) ;
 
+ObjectHdrs [ FGristFiles listusb$(SUFOBJ) ]
+	: [ FDirName $(SUBDIR) $(DOTDOT) add-ons kernel bus_managers usb ] ;
+
 # standard commands that need libbluetooth.so, due the Bluetooth Kit
 StdBinCommands
 	bt_dev_info.cpp

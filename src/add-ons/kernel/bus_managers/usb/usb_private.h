@@ -12,6 +12,7 @@
 #include "BeOSCompatibility.h"
 #include "usbspec_private.h"
 #include <lock.h>
+#include <util/Vector.h>
 
 
 #define TRACE_OUTPUT(x, y, z...) \
