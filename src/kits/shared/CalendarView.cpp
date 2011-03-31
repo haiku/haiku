@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007-2011, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -16,9 +16,8 @@
 
 namespace BPrivate {
 
-namespace {
 
-float
+static float
 FontHeight(const BView *view)
 {
 	if (!view)
@@ -31,7 +30,8 @@ FontHeight(const BView *view)
 	return ceilf(fheight.ascent + fheight.descent + fheight.leading);
 }
 
-}	// private namespace
+
+// #pragma mark -
 
 
 BCalendarView::BCalendarView(BRect frame, const char *name,
@@ -880,9 +880,9 @@ BCalendarView::_SetupDayNumbers()
 
 	// calc the last day one month before
 	if (date.Month() == 1)
-		date.SetDate(date.Year() -1, 12, fDay);
+		date.SetDate(date.Year() -1, 12, 1);
 	else
-		date.SetDate(date.Year(), date.Month() - 1, fDay);
+		date.SetDate(date.Year(), date.Month() - 1, 1);
 	const int32 lastDayBefore = date.DaysInMonth();
 
 	int32 counter = 0;
