@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-MediaPlayer	1829531264
+1	norwegian_bokmål	x-vnd.Haiku-MediaPlayer	2893326014
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Amerikansk)
 100% scale	MediaPlayer-Main		100% skalert
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
@@ -70,11 +70,8 @@ Prev	MediaPlayer-Main		Tilbake
 Quit	MediaPlayer-Main		Avslutt
 Randomize	MediaPlayer-PlaylistWindow		Tilfeldig
 Redo	MediaPlayer-PlaylistWindow		Omgjør
-Remove (Del)	MediaPlayer-PlaylistWindow		Fjern (Del)
 Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Flytt oppføringene til søppelkurven
 Remove Entry	MediaPlayer-RemovePLItemsCmd		Fjern oppføring
-Remove all	MediaPlayer-PlaylistWindow		Fjern alle
-Remove and put into Trash	MediaPlayer-PlaylistWindow		Fjern og send til søppelkurv
 Revert	MediaPlayer-SettingsWindow		Tilbakestill
 Save	MediaPlayer-Main		Lagre
 Save	MediaPlayer-PlaylistWindow		Lagre

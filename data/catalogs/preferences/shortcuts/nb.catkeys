@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-Shortcuts	395916189
+1	norwegian_bokmål	x-vnd.Haiku-Shortcuts	1209107675
 *Beep	ShortcutsWindow		*Bip
 *InsertString \"Your Text Here\"	ShortcutsWindow		*SettInnStreng \"Din Tekst Her\"
 *LaunchHandler text/html	ShortcutsWindow		*OppstartsHåndterer text/html
@@ -9,8 +9,6 @@
 *MoveMouseTo 50% 50%	ShortcutsWindow		*FlyttMusTil 50% 50%
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"FlyttMusTil 100% 0\" \"*MuseKnapp 1\"
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SendMelding application/x-vnd.Be-TRAK 'Tfnd'
-About Shortcuts	ShortcutsApp		Om Hurtigtaster
-About Shortcuts	ShortcutsWindow		Om Hurtigtaster
 Add new shortcut	ShortcutsWindow		Legg til ny snarvei
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 Append	ShortcutsWindow		Bruk
@@ -31,7 +29,6 @@ MouseUp	ShortcutsSpec		MusOpp
 MoveMouse	ShortcutsSpec		FlyttMus
 MoveMouseTo	ShortcutsSpec		FlyttMusTil
 Multi	ShortcutsSpec		Multi
-OK	ShortcutsApp		OK
 OK	ShortcutsWindow		OK
 Oh no	ShortcutsWindow		Å, nei
 Open	ShortcutsWindow		Åpne
@@ -51,5 +48,4 @@ Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Hurtigtaster kunn
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Hurtigtaster kunne ikke tolke filen din med hurtigtaster!
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Hurtigtaster klarte ikke å lagre filen din med hurtigtaster!
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Hurtigtaster klarte ikke å lagre ditt sett med hurtigtaster
-Shortcuts\n\nBased on SpicyKeys for BeOS made by Jeremy Friesner.	ShortcutsApp		Shortcuts\n\nBasert på SpicyKeys for BeOS, lagd av Jeremy Friesner.
 Window	ShortcutsSpec	Name for modifier on keyboard	Windows

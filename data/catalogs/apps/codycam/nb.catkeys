@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku.CodyCam	2416864674
+1	norwegian_bokmål	x-vnd.Haiku.CodyCam	441085909
 Can't find an available connection to the video window	CodyCam		Kan ikke finne en tilgjengelig tilkobling til videovinduet
 Cannot connect the video source to the video window	CodyCam		Kan ikke koble til videokilden til videovinduet
 Cannot create a video window	CodyCam		Kan ikke opprette videovindu
@@ -17,7 +17,7 @@ Capture Rate Menu	CodyCam		Opptaksratiomeny
 Capture controls	CodyCam		Opptakskontroll
 Capturing Image…	VideoConsumer.cpp		Tar bilde...
 Closing the window\n	VideoConsumer.cpp		Lukker vinduet\n
-CodyCam	System name		CodyCam
+CodyCam	Application name		CodyCam
 Connected…	VideoConsumer.cpp		Tilkoblet...
 Couldn't find requested directory on server	VideoConsumer.cpp		Kunne ikke finne angitt mappe på serveren
 Directory:	CodyCam		Mappe:

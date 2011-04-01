@@ -1,8 +1,7 @@
-1	norwegian_bokmål	x-vnd.Haiku-Terminal	2339003532
+1	norwegian_bokmål	x-vnd.Haiku-Terminal	3554483392
 %app% settings	Terminal PrefWindow	window title	%app%innstillinger
 -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h, --help skriver ut denne hjelpen\n -t, --title setter vindustittelen\n -f, --fullscreen starter fullskjerm\n
 Abort	Terminal Shell		Avbryt
-About Terminal…	Terminal TermWindow		Om Terminal...
 Appearance	Terminal PrefWindow		Utseende
 Background	Terminal AppearancePrefView		Bakgrunn
 Black on White	Terminal colors schema		Svart på hvitt
@@ -51,7 +50,6 @@ Nothing is selected.	Terminal TermWindow		Ingenting er valgt.
 OK	Terminal PrefWindow		OK
 OK	Terminal SetTitleWindow		OK
 OK	Terminal TermApp		OK
-OK	Terminal TermView		OK
 OK	Terminal TermWindow		OK
 Page setup…	Terminal TermWindow		Sideoppsett...
 Paste	Terminal TermWindow		Lim inn
@@ -78,7 +76,6 @@ Tab title:	Terminal AppearancePrefView		Fanetittel:
 Tab title:	Terminal TermWindow		Fanetittel:
 Terminal	System name		Terminal
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal kunne ikke starte skallet. Beklager.
-Terminal\n\nwritten by Kazuho Okui and Takashi Murai\nupdated by Kian Duffy and others\n\nCopyright ©2003-2009, Haiku.\n	Terminal TermView		Terminal\n\nskrevet av Kazuho Okui og Takashi Murai\noppdatert av Kian Duffy m/fl.\n\nOpphavsrett ©2003-2009, Haiku.\n
 Text	Terminal AppearancePrefView		Tekst
 Text encoding	Terminal TermWindow		Tekstkoding
 Text not found.	Terminal TermWindow		Tekst ikke funnet.

@@ -1,8 +1,7 @@
-1	norwegian_bokmål	x-vnd.Be-MAIL	1143108270
+1	norwegian_bokmål	x-vnd.Be-MAIL	3799596690
 %d - Date	Mail		%d - Dato
 %e - E-mail address	Mail		%e - E-postadresse
 %n - Full name	Mail		%n - Fullt navn
-About Mail…	Mail		Om E-post…
 Account from mail	Mail		Konto fra e-post
 Account:	Mail		Konto:
 Accounts…	Mail		Kontoer…
@@ -60,7 +59,6 @@ Leave as '%s'	Mail		La være som '%s'
 Mail	System name		E-post
 Mail couldn't find its dictionary.	Mail		E-post kunne ikke finne ordboken
 Mail preferences	Mail		E-postinnstillinger
-Mail\n\n	Mail		E-post\n\n
 Mailing	Mail		Sender e-post
 Message	Mail		Melding
 Move to trash	Mail		Flytt til søppelkurv
@@ -141,6 +139,4 @@ Unread	Mail		Ulest
 Use default account	Mail		Bruk standardkonto
 User interface	Mail		Brukergrensesnitt
 View	Mail		Vis
-Written by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Skrevet av Robert Polic.\nForbedret av Dr. Zoidberg-gruppen.\n\nOpphavsrett 1991-2001, Be Incorporated.\nOpphavsrett 2005-2010 Haiku, Inc.\n
-\\n - Newline	Mail		\\n - Ny linje
 helpful message	Mail		nyttig melding

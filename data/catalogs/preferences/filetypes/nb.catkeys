@@ -1,9 +1,8 @@
-1	norwegian_bokmål	x-vnd.Haiku-FileTypes	1577301121
+1	norwegian_bokmål	x-vnd.Haiku-FileTypes	995994342
 %1 application type	Application Type Window		%1 programtype
 %ld Application type%s could be removed.	Application Types Window		%ld Programtype%s kunne fjernes.
 (from super type)	FileTypes Window		(fra supertype)
 Abort	Application Types Window		Avbryt
-About FileTypes…	FileTypes Window		Om Filtyper...
 Add	Attribute Window		Legg til
 Add	Extension Window		Legg til
 Add group	New File Type Window		Legg til gruppe
@@ -138,5 +137,4 @@ Version:	Application Type Window		Versjon:
 Version:	Application Types Window		Versjon:
 Visible	Attribute Window		Synlig
 Width:	Attribute Window	Default column width in Tracker for this attribute.	Bredde
-\twritten by Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n	FileTypes		\skrevet av Axel Dörfler\n\tOpphavsrett 2006-2007, Haiku.\n
 no icon	FileTypes Window		Ingen ikon

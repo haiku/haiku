@@ -1,4 +1,4 @@
-1	norwegian_bokmål	x-vnd.Haiku-libtracker	3969619923
+1	norwegian_bokmål	x-vnd.Haiku-libtracker	1378226312
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 %Ld B	WidgetAttributeText		%Ld B
 %Ld bytes	WidgetAttributeText		%Ld byte
@@ -169,7 +169,6 @@ Icon view	VolumeWindow		Ikonvisning
 Identify	ContainerWindow		Identifiser
 Identify	InfoWindow		Identifiser
 If you %ifYouDoAction the config folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the config folder anyway, click \"Do it\".	FSUtils		Hvis du %ifYouDoAction config-mappen vil Haiku kankje ikke fungere riktig! Er du sikker på at du vil gjøre dette? For å %toDoAction config-mappen likevel, klikk på \"Do it\".
-If you %ifYouDoAction the home folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the home anyway, click \"Do it\".	FSUtils		Hvis du %ifYouDoAction hjemmemappen vil Haiku kanskje ikke fungere riktig! Er du sikker på at du vil gjøre dette? For å %toDoAction hjemmemappen likevel, klikk på \"Do it\".
 If you %ifYouDoAction the mime settings, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the mime settings anyway, click \"Do it\".	FSUtils		Hvis du %ifYouDoAction MIME-innstillingene vil Haiku kanskje ikke fungere riktig! Er du sikker på at du vil gjøre dette? For å %toDoAction MIME-innstillingene likevel, klikk på \"Do it\".
 If you %ifYouDoAction the settings folder, Haiku may not behave properly! Are you sure you want to do this? To %toDoAction the settings folder anyway, click \"Do it\".	FSUtils		Hvis du %ifYouDoAction settings-mappen vil Haiku kanskje ikke fungere riktig! Er du sikker på at du vil gjøre dette? For å %toDoAction settings-mappen likevel, klikk på \"Do it\".
 If you %ifYouDoAction the system folder or its contents, you won't be able to boot Haiku! Are you sure you want to do this? To %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"Do it\".	FSUtils		Hvis du %ifYouDoAction systemmappen eller innholdet av den, vil du ikke kunne starte Haiku! Er du sikker på at du vil gjøre dette? For å %toDoAction systemmappen eller innholdet av den likevel, hold nede Shift-tasten og klikk på \"Do it\".
