@@ -204,7 +204,7 @@ CalendarMenuWindow::MessageReceived(BMessage* message)
 			message->FindInt32("month", &month);
 			message->FindInt32("year", &year);
 
-			_UpdateDate(year, month, day);
+			_UpdateDate(BDate(year, month, day));
 			break;
 		}
 
@@ -212,8 +212,8 @@ CalendarMenuWindow::MessageReceived(BMessage* message)
 		case kMonthUpMessage:
 		{
 			BDate date = fCalendarView->Date();
-			_UpdateDate(date.Year(), date.Month()
-				+ (kMonthDownMessage == message->what ? -1 : 1), date.Day());
+			date.AddMonths(kMonthDownMessage == message->what ? -1 : 1);
+			_UpdateDate(date);
 			break;
 		}
 
@@ -221,9 +221,8 @@ CalendarMenuWindow::MessageReceived(BMessage* message)
 		case kYearUpMessage:
 		{
 			BDate date = fCalendarView->Date();
-			_UpdateDate(
-				date.Year() + (kYearDownMessage == message->what ? -1 : 1),
-				date.Month(), date.Day());
+			date.AddYears(kYearDownMessage == message->what ? -1 : 1);
+			_UpdateDate(date);
 			break;
 		}
 
@@ -231,31 +230,6 @@ CalendarMenuWindow::MessageReceived(BMessage* message)
 			BWindow::MessageReceived(message);
 			break;
 	}
-}
-
-
-void
-CalendarMenuWindow::_UpdateDate(int32 year, int32 month, int32 day)
-{
-	if (day < 1) {
-		month--;
-		day = 31;
-	}
-	if (month < 1) {
-		year--;
-		month = 12;
-	}
-	if (month > 12) {
-		year++;
-		month = 1;
-	}
-
-	BDate date(year, month, 1);
-	// Alternatively, we could choose the day at the same position instead
-	if (day > date.DaysInMonth())
-		day = date.DaysInMonth();
-
-	_UpdateDate(BDate(year, month, day));
 }
 
 
