@@ -484,8 +484,12 @@ TPrefsWindow::MessageReceived(BMessage* msg)
 			}
 
 			BTextView *text = fReplyPreamble->TextView();
-			// To do: insert at selection point rather than at the end.
-			text->Insert(text->TextLength(), item->Label(), 2);
+			int32 selectionStart;
+			int32 selectionEnd;
+			text->GetSelection(&selectionStart, &selectionEnd);
+			if (selectionStart != selectionEnd)
+				text->Delete(selectionStart, selectionEnd);
+			text->Insert(item->Label(), 2);
 		}
 		case P_SIG:
 			free(*fNewSignature);
@@ -677,29 +681,21 @@ TPrefsWindow::_BuildReplyToMenu(int32 account)
 BMenu*
 TPrefsWindow::_BuildReplyPreambleMenu()
 {
-	const char *substitutes[] = {
-/* To do: Not yet working, leave out for 2.0.0 beta 4:
-		"%f - First name",
-		"%l - Last name",
-*/
-		B_TRANSLATE("%n - Full name"),
-		B_TRANSLATE("%e - E-mail address"),
-		B_TRANSLATE("%d - Date"),
-		"",
-		B_TRANSLATE("\\n - Newline"),
-		NULL
-	};
-
 	BMenu *menu = new BMenu(B_EMPTY_STRING);
 
-	for (int32 i = 0; substitutes[i]; i++) {
-		if (*substitutes[i] == '\0') {
-			menu->AddSeparatorItem();
-		} else {
-			menu->AddItem(new BMenuItem(substitutes[i],
-				new BMessage(P_REPLY_PREAMBLE)));
-		}
-	}
+	menu->AddItem(new BMenuItem(B_TRANSLATE("%n - Full name"),
+		new BMessage(P_REPLY_PREAMBLE)));
+
+	menu->AddItem(new BMenuItem(B_TRANSLATE("%e - E-mail address"),
+		new BMessage(P_REPLY_PREAMBLE)));
+
+	menu->AddItem(new BMenuItem(B_TRANSLATE("%d - Date"),
+		new BMessage(P_REPLY_PREAMBLE)));
+
+	menu->AddSeparatorItem();
+
+	menu->AddItem(new BMenuItem(B_TRANSLATE("%b - Line break"),
+		new BMessage(P_REPLY_PREAMBLE)));
 
 	return menu;
 }

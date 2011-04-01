@@ -2053,8 +2053,6 @@ TMailWindow::CopyMessage(entry_ref *ref, TMailWindow *src)
 void
 TMailWindow::Reply(entry_ref *ref, TMailWindow *window, uint32 type)
 {
-	const char *notImplementedString = "<Not Yet Implemented>";
-
 	fRepliedMail = *ref;
 	SetOriginatingWindow(window);
 
@@ -2105,79 +2103,27 @@ TMailWindow::Reply(entry_ref *ref, TMailWindow *window, uint32 type)
 
 	// create preamble string
 
-	BString replyPreamble = fApp->ReplyPreamble();
+	BString preamble = fApp->ReplyPreamble();
 
-	char preamble[1024];
-	const char* from = replyPreamble.String();
-	char* to = preamble;
+	BString name;
+	mail->GetName(&name);
+	if (name.Length() <= 0)
+		name = B_TRANSLATE("(Name unavailable)");
 
-	while (*from) {
-		if (*from == '%') {
-			// insert special content
-			int32 length;
+	BString address(mail->From());
+	if (address.Length() <= 0)
+		address = B_TRANSLATE("(Address unavailable)");
 
-			switch (*++from) {
-				case 'n':	// full name
-				{
-					BString fullName(mail->From());
-					if (fullName.Length() <= 0)
-						fullName = "No-From-Address-Available";
-
-					extract_address_name(fullName);
-					length = fullName.Length();
-					memcpy(to, fullName.String(), length);
-					to += length;
-					break;
-				}
-
-				case 'e':	// eMail address
-				{
-					const char *address = mail->From();
-					if (address == NULL)
-						address = "<unknown>";
-					length = strlen(address);
-					memcpy(to, address, length);
-					to += length;
-					break;
-				}
-
-				case 'd':	// date
-				{
-					const char *date = mail->Date();
-					if (date == NULL)
-						date = "No-Date-Available";
-					length = strlen(date);
-					memcpy(to, date, length);
-					to += length;
-					break;
-				}
-
-				// ToDo: parse stuff!
-				case 'f':	// first name
-				case 'l':	// last name
-					length = strlen(notImplementedString);
-					memcpy(to, notImplementedString, length);
-					to += length;
-					break;
-
-				default: // Sometimes a % is just a %.
-					*to++ = *from;
-			}
-		} else if (*from == '\\') {
-			switch (*++from) {
-				case 'n':
-					*to++ = '\n';
-					break;
-
-				default:
-					*to++ = *from;
-			}
-		} else
-			*to++ = *from;
-
-		from++;
-	}
-	*to = '\0';
+	BString date(mail->Date());
+	if (date.Length() <= 0)
+		date = B_TRANSLATE("(Date unavailable)");
+			
+	preamble.ReplaceAll("%n", name);
+	preamble.ReplaceAll("%e", address);
+	preamble.ReplaceAll("%d", date);
+	preamble.ReplaceAll("%b", "\n");
+	preamble.ReplaceAll("\\n", "\n");
+		// backwards compatability with older settings
 
 	// insert (if selection) or load (if whole mail) message text into text view
 
@@ -2216,7 +2162,7 @@ TMailWindow::Reply(entry_ref *ref, TMailWindow *window, uint32 type)
 		}
 
 		fContentView->fTextView->GoToLine(0);
-		if (strlen(preamble) > 0)
+		if (preamble.Length() > 0)
 			fContentView->fTextView->Insert(preamble);
 	} else {
 		fContentView->fTextView->LoadMessage(mail, true, preamble);
