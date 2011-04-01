@@ -86,21 +86,19 @@ CailDelayMicroSeconds(VOID *CAIL, UINT32 delay)
 UINT32
 CailReadATIRegister(VOID* CAIL, UINT32 idx)
 {
-	// TODO : CailReadATIRegister
-
-	UINT32 ret = 0;
-	// ret = RHDRegRead(((atomBiosHandlePtr)CAIL), idx << 2);
-	return ret;
+	TRACE(("%s(0x%X)\n", __func__, idx << 2));
+	return read32(idx << 2);
 }
 
 
 VOID
 CailWriteATIRegister(VOID *CAIL, UINT32 idx, UINT32 data)
 {
-	// TODO : CailWriteATIRegister
+	TRACE(("%s(0x%X)\n", __func__, idx << 2));
 
+	// TODO : save MMIO via atomSaveRegisters in CailWriteATIRegister
 	// atomSaveRegisters((atomBiosHandlePtr)CAIL, atomRegisterMMIO, idx << 2);
-	// RHDRegWrite(((atomBiosHandlePtr)CAIL), idx << 2a, data);
+	write32(idx << 2, data);
 }
 
 
