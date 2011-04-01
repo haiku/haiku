@@ -150,11 +150,11 @@ add_query_menu_items(BMenu* menu, const char* attribute, uint32 what,
 
 			message->AddString("attribute", value.String());
 
-			char name[256];
+			BString name;
 			if (format != NULL)
-				snprintf(name, sizeof(name), format, value.String());
+				name.SetToFormat(format, value.String());
 			else
-				strlcpy(name, value.String(), sizeof(name));
+				name = value;
 
 			if (index < 9 && !popup)
 				menu->AddItem(new BMenuItem(name, message, '1' + index));

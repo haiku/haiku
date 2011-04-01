@@ -253,10 +253,10 @@ TMailApp::MessageReceived(BMessage *msg)
 				{
 					msg->FindRef("ref", &ref);
 					BNode file(&ref);
-					BString string = "";
+					BString string;
 
 					if (file.InitCheck() == B_OK)
-						ReadAttrString(&file, B_MAIL_ATTR_TO, &string);
+						file.ReadAttrString(B_MAIL_ATTR_TO, &string);
 
 					window = NewWindow(&ref, string.String(), true);
 					break;
@@ -1088,10 +1088,10 @@ TMailApp::NewWindow(const entry_ref* ref, const char* to, bool resend,
 	BFile file;
 	if (!resend && ref && file.SetTo(ref, O_RDONLY) == B_OK) {
 		BString name;
-		if (ReadAttrString(&file, B_MAIL_ATTR_NAME, &name) == B_OK) {
+		if (file.ReadAttrString(B_MAIL_ATTR_NAME, &name) == B_OK) {
 			title << name;
 			BString subject;
-			if (ReadAttrString(&file, B_MAIL_ATTR_SUBJECT, &subject) == B_OK)
+			if (file.ReadAttrString(B_MAIL_ATTR_SUBJECT, &subject) == B_OK)
 				title << " -> " << subject;
 		}
 	}

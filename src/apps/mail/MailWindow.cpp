@@ -47,8 +47,10 @@ of their respective holders. All rights reserved.
 #include <Clipboard.h>
 #include <Debug.h>
 #include <E-mail.h>
+#include <File.h>
 #include <InterfaceKit.h>
 #include <Locale.h>
+#include <Node.h>
 #include <PathMonitor.h>
 #include <Roster.h>
 #include <Screen.h>
@@ -181,8 +183,6 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 	if (messenger != NULL)
 		fTrackerMessenger = *messenger;
 
-	char str[256];
-	char status[272];
 	float height;
 	BMenu* menu;
 	BMenu* subMenu;
@@ -246,16 +246,18 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 		if (flag == B_UNREAD) {
 			subMenu->AddItem(item = new BMenuItem(B_TRANSLATE("Leave as New"),
 				new BMessage(kMsgQuitAndKeepAllStatus), 'W', B_SHIFT_KEY));
-#if 0
-			subMenu->AddItem(item = new BMenuItem(B_TRANSLATE("Set to Read"),
-				new BMessage(M_CLOSE_READ), 'W'));
-#endif
 		} else {
-			if (strlen(str))
-				sprintf(status, B_TRANSLATE("Leave as '%s'"), str);
+			BString status;
+			file.ReadAttrString(B_MAIL_ATTR_STATUS, &status);
+
+			BString label;
+			if (status.Length() > 0)
+				label.SetToFormat(B_TRANSLATE("Leave as '%s'"),
+					status.String());
 			else
-				sprintf(status, B_TRANSLATE("Leave same"));
-			subMenu->AddItem(item = new BMenuItem(status,
+				label = B_TRANSLATE("Leave same");
+
+			subMenu->AddItem(item = new BMenuItem(label.String(),
 							new BMessage(B_QUIT_REQUESTED), 'W'));
 			AddShortcut('W', B_COMMAND_KEY | B_SHIFT_KEY,
 				new BMessage(kMsgQuitAndKeepAllStatus));
@@ -1211,7 +1213,7 @@ TMailWindow::MessageReceived(BMessage *msg)
 				BString string = "could not read";
 				BNode node(fRef);
 				if (node.InitCheck() == B_OK)
-					ReadAttrString(&node, B_MAIL_ATTR_STATUS, &string);
+					node.ReadAttrString(B_MAIL_ATTR_STATUS, &string);
 
 				new TStatusWindow(r, this, string.String());
 			}
@@ -2029,15 +2031,15 @@ TMailWindow::CopyMessage(entry_ref *ref, TMailWindow *src)
 	if (file.InitCheck() == B_OK) {
 		BString string;
 		if (fHeaderView->fTo
-			&& ReadAttrString(&file, B_MAIL_ATTR_TO, &string) == B_OK)
+			&& file.ReadAttrString(B_MAIL_ATTR_TO, &string) == B_OK)
 			fHeaderView->fTo->SetText(string.String());
 
 		if (fHeaderView->fSubject
-			&& ReadAttrString(&file, B_MAIL_ATTR_SUBJECT, &string) == B_OK)
+			&& file.ReadAttrString(B_MAIL_ATTR_SUBJECT, &string) == B_OK)
 			fHeaderView->fSubject->SetText(string.String());
 
 		if (fHeaderView->fCc
-			&& ReadAttrString(&file, B_MAIL_ATTR_CC, &string) == B_OK)
+			&& file.ReadAttrString(B_MAIL_ATTR_CC, &string) == B_OK)
 			fHeaderView->fCc->SetText(string.String());
 	}
 
@@ -2544,7 +2546,7 @@ TMailWindow::SaveAsDraft()
 	if (fHeaderView->fCc != NULL)
 		WriteAttrString(&draft, B_MAIL_ATTR_CC, fHeaderView->fCc->Text());
 	if (fHeaderView->fBcc != NULL)
-		WriteAttrString(&draft, "MAIL:bcc", fHeaderView->fBcc->Text());
+		WriteAttrString(&draft, B_MAIL_ATTR_BCC, fHeaderView->fBcc->Text());
 
 	// Add the draft attribute for indexing
 	uint32 draftAttr = true;
@@ -2569,7 +2571,7 @@ TMailWindow::SaveAsDraft()
 			pathStr.Append(path.Path());
 		}
 		if (pathStr.Length())
-			WriteAttrString(&draft, "MAIL:attachments", pathStr.String());
+			draft.WriteAttrString("MAIL:attachments", &pathStr);
 	}
 
 	// Set the MIME Type of the file
@@ -2777,17 +2779,17 @@ TMailWindow::OpenMessage(const entry_ref *ref, uint32 characterSetForDecoding)
 		fContentView->fTextView->SetText(&file, 0, size);
 
 		// Restore Fields from attributes
-		if (ReadAttrString(&node, B_MAIL_ATTR_TO, &string) == B_OK)
+		if (node.ReadAttrString(B_MAIL_ATTR_TO, &string) == B_OK)
 			fHeaderView->fTo->SetText(string.String());
-		if (ReadAttrString(&node, B_MAIL_ATTR_SUBJECT, &string) == B_OK)
+		if (node.ReadAttrString(B_MAIL_ATTR_SUBJECT, &string) == B_OK)
 			fHeaderView->fSubject->SetText(string.String());
-		if (ReadAttrString(&node, B_MAIL_ATTR_CC, &string) == B_OK)
+		if (node.ReadAttrString(B_MAIL_ATTR_CC, &string) == B_OK)
 			fHeaderView->fCc->SetText(string.String());
-		if (ReadAttrString(&node, "MAIL:bcc", &string) == B_OK)
+		if (node.ReadAttrString(B_MAIL_ATTR_BCC, &string) == B_OK)
 			fHeaderView->fBcc->SetText(string.String());
 
 		// Restore attachments
-		if (ReadAttrString(&node, "MAIL:attachments", &string) == B_OK) {
+		if (node.ReadAttrString("MAIL:attachments", &string) == B_OK) {
 			BMessage msg(REFS_RECEIVED);
 			entry_ref enc_ref;
 

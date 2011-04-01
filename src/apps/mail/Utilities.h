@@ -44,7 +44,6 @@ class BString;
 
 extern status_t WriteAttrString(BNode* node, const char* attr,
 	const char* value);
-extern status_t ReadAttrString(BNode* node, const char* attr, BString* value);
 
 
 int32 cistrcmp(const char*, const char*);

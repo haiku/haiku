@@ -548,11 +548,11 @@ THeaderView::InitGroupCompletion()
 			continue;
 
 		BString groups;
-		if (ReadAttrString(&file, "META:group", &groups) < B_OK || groups.Length() == 0)
+		if (file.ReadAttrString("META:group", &groups) < B_OK || groups.Length() == 0)
 			continue;
 
 		BString address;
-		ReadAttrString(&file, "META:email", &address);
+		file.ReadAttrString("META:email", &address);
 
 		// avoid adding an empty address
 		if (address.Length() == 0)
@@ -822,7 +822,7 @@ TTextControl::MessageReceived(BMessage *msg)
 								attr = buffer;
 
 								BString address;
-								ReadAttrString(&node, buffer, &address);
+								node.ReadAttrString(buffer, &address);
 								if (address.Length() <= 0)
 									continue;
 
@@ -846,13 +846,13 @@ TTextControl::MessageReceived(BMessage *msg)
 						}
 
 						BString email;
-						ReadAttrString(&file,attr.String(),&email);
+						file.ReadAttrString(attr.String(), &email);
 
 						// we got something...
 						if (email.Length() > 0) {
 							// see if we can get a username as well
 							BString name;
-							ReadAttrString(&file, "META:name", &name);
+							file.ReadAttrString("META:name", &name);
 
 							BString	address;
 							if (name.Length() == 0) {
@@ -912,7 +912,7 @@ TTextControl::MessageReceived(BMessage *msg)
 
 				display = address;
 
-				ReadAttrString(&node, "META:name", &name);
+				node.ReadAttrString("META:name", &name);
 				if (name.Length() > 0) {
 					display = "";
 					display << "\"" << name << "\" <" << address << ">";
@@ -1064,7 +1064,7 @@ QPopupMenu::EntryCreated(const entry_ref &ref, ino_t node)
 	// Does the file have a group attribute?  OK to have none.
 	BString groups;
 	const char *kNoGroup = "NoGroup!";
-	ReadAttrString(&file, "META:group", &groups);
+	file.ReadAttrString("META:group", &groups);
 	if (groups.Length() <= 0)
 		groups = kNoGroup;
 
@@ -1142,10 +1142,10 @@ QPopupMenu::EntryCreated(const entry_ref &ref, ino_t node)
 		}
 
 		BString	name;
-		ReadAttrString(&file, "META:name", &name);
+		file.ReadAttrString("META:name", &name);
 
 		BString email;
-		ReadAttrString(&file, "META:email", &email);
+		file.ReadAttrString("META:email", &email);
 
 		if (email.Length() != 0 || name.Length() != 0)
 			AddPersonItem(&ref, node, name, email, NULL, groupMenu, superItem);
@@ -1154,7 +1154,7 @@ QPopupMenu::EntryCreated(const entry_ref &ref, ino_t node)
 		for (int16 i = 2; i < 6; i++) {
 			char attr[16];
 			sprintf(attr, "META:email%d", i);
-			if (ReadAttrString(&file, attr, &email) >= B_OK && email.Length() > 0)
+			if (file.ReadAttrString(attr, &email) >= B_OK && email.Length() > 0)
 				AddPersonItem(&ref, node, name, email, attr, groupMenu, superItem);
 		}
 	} while (groups.Length() > 0);

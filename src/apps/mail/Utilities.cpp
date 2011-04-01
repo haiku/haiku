@@ -58,25 +58,6 @@ WriteAttrString(BNode* node, const char* attr, const char* value)
 }
 
 
-status_t
-ReadAttrString(BNode* node, const char* attr, BString* value)
-{
-	attr_info attrInfo;
-	
-	value->SetTo("");
-	status_t status = node->GetAttrInfo(attr, &attrInfo);
-	if (status < B_OK)
-		return status;
-
-	ssize_t size = node->ReadAttr(attr, B_STRING_TYPE, 0,
-		value->LockBuffer(attrInfo.size + 1), attrInfo.size);
-
-	value->UnlockBuffer();	
-
-	return size >= 0 ? B_OK : size;
-}
-
-
 //====================================================================
 // case-insensitive version of strcmp
 //
