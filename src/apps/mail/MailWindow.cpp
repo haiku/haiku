@@ -2123,9 +2123,7 @@ TMailWindow::Reply(entry_ref *ref, TMailWindow *window, uint32 type)
 	preamble.ReplaceAll("%n", name);
 	preamble.ReplaceAll("%e", address);
 	preamble.ReplaceAll("%d", date);
-	preamble.ReplaceAll("%b", "\n");
 	preamble.ReplaceAll("\\n", "\n");
-		// backwards compatability with older settings
 
 	// insert (if selection) or load (if whole mail) message text into text view
 

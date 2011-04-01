@@ -694,7 +694,7 @@ TPrefsWindow::_BuildReplyPreambleMenu()
 
 	menu->AddSeparatorItem();
 
-	menu->AddItem(new BMenuItem(B_TRANSLATE("%b - Line break"),
+	menu->AddItem(new BMenuItem(B_TRANSLATE("\\n - Newline"),
 		new BMessage(P_REPLY_PREAMBLE)));
 
 	return menu;
