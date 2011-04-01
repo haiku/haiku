@@ -37,14 +37,6 @@ struct battery_device_cookie {
 };
 
 
-/* Notify types */
-
-#define ACPI_SYSTEM_NOTIFY              0x1
-#define ACPI_DEVICE_NOTIFY              0x2
-#define ACPI_ALL_NOTIFY                 (ACPI_SYSTEM_NOTIFY | ACPI_DEVICE_NOTIFY)
-#define ACPI_MAX_NOTIFY_HANDLER_TYPE    0x3
-#define ACPI_MAX_SYS_NOTIFY             0x7f
-
 void battery_notify_handler(acpi_handle device, uint32 value, void *context);
 
 #endif
