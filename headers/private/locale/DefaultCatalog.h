@@ -44,6 +44,8 @@ class DefaultCatalog : public BHashMapCatalog {
 		status_t WriteToAttribute(entry_ref *appOrAddOnRef);
 		status_t WriteToResource(entry_ref *appOrAddOnRef);
 
+		status_t SetRawString(const CatKey& key, const char *translated);
+
 		static BCatalogAddOn *Instantiate(const char *signature,
 			const char *language, uint32 fingerprint);
 		static BCatalogAddOn *InstantiateEmbedded(entry_ref *appOrAddOnRef);

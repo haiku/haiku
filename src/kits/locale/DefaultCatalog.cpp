@@ -147,6 +147,13 @@ DefaultCatalog::~DefaultCatalog()
 
 
 status_t
+DefaultCatalog::SetRawString(const CatKey& key, const char *translated)
+{
+	return fCatMap.Put(key, translated);
+}
+
+
+status_t
 DefaultCatalog::ReadFromFile(const char *path)
 {
 	if (!path)

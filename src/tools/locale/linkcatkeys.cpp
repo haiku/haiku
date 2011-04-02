@@ -111,12 +111,9 @@ main(int argc, char **argv)
 		BHashMapCatalog::CatWalker walker(&inputCatalog);
 		while (!walker.AtEnd()) {
 			const CatKey &key(walker.GetKey());
-			BString translatedString = walker.GetValue();
 
-			if (!targetCatImpl.GetString(key)) {
-				targetCatImpl.SetString(key,
-					translatedString.String());
-			}
+			if (!targetCatImpl.GetString(key))
+				targetCatImpl.SetRawString(key, walker.GetValue());
 			walker.Next();
 		}
 	}

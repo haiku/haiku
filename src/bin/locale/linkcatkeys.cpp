@@ -128,12 +128,8 @@ main(int argc, char **argv)
 			const CatKey fixedCatKey(keyString.String(), keyComment.String(),
 					keyContext.String());
 
-			BString translatedString = walker.GetValue();
-
-			if (!targetCatImpl->GetString(fixedCatKey)) {
-				targetCatImpl->SetString(fixedCatKey,
-					translatedString.String());
-			}
+			if (!targetCatImpl->GetString(fixedCatKey))
+				targetCatImpl->SetRawString(fixedCatKey, walker.GetValue());
 			walker.Next();
 		}
 	}
