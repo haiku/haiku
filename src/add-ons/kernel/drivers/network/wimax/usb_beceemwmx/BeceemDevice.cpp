@@ -74,7 +74,7 @@ BeceemDevice::ReadRegister(unsigned int reg, size_t size, uint32_t* buffer)
 				break;
 			}
 
-	} while ((result < 0) && (retries < MAX_USB_IO_RETRIES ) );
+	} while ((result < 0) && (retries < MAX_USB_IO_RETRIES));
 
 	if (result < 0) {
 		TRACE_ALWAYS("Error: USB read request failure."
@@ -122,7 +122,7 @@ BeceemDevice::WriteRegister(unsigned int reg, size_t size, uint32_t* buffer)
 				break;
 			}
 
-	} while ((result < 0) && (retries < MAX_USB_IO_RETRIES ) );
+	} while ((result < 0) && (retries < MAX_USB_IO_RETRIES));
 
 	if (result < 0) {
 		TRACE_ALWAYS("Error: USB write request failure."
@@ -409,9 +409,9 @@ BeceemDevice::Read(uint8 *buffer, size_t *numBytes)
 	}
 	*/
 
-	*numBytes = header[1] | ( header[2] << 8 );
+	*numBytes = header[1] | (header[2] << 8);
 
-	if (header[0] & 0xBF ) {
+	if (header[0] & 0xBF) {
 		TRACE_ALWAYS("RX error %d occured !\n", header[0]);
 	}
 
@@ -1019,9 +1019,9 @@ BeceemDevice::LoadConfig()
 	struct stat		cfgStat;
 	int				dtaread = 0;
 
-	int fh = open( FIRM_CFG, O_RDONLY );
+	int fh = open(FIRM_CFG, O_RDONLY);
 
-	if (fh == B_ERROR || fstat(fh, &cfgStat) < 0 ) {
+	if (fh == B_ERROR || fstat(fh, &cfgStat) < 0) {
 		TRACE_ALWAYS("Error: Unable to open the configuration at %s\n", FIRM_CFG);
 		return fh;
 	}
@@ -1030,7 +1030,7 @@ BeceemDevice::LoadConfig()
 
 	buffer=(unsigned int*)malloc(MAX_USB_TRANSFER);
 
-	if ( !buffer ) {
+	if (!buffer) {
 		TRACE_ALWAYS("Error: Memory allocation error.\n");
 		return B_ERROR;
 	}
@@ -1135,9 +1135,9 @@ BeceemDevice::PushConfig(unsigned int loc)
 	int				chipwriteloc = 0;
 	int				readposition = 0;
 
-	int fh = open( FIRM_CFG, O_RDONLY );
+	int fh = open(FIRM_CFG, O_RDONLY);
 
-	if (fh == B_ERROR || fstat(fh, &cfgStat) < 0 ) {
+	if (fh == B_ERROR || fstat(fh, &cfgStat) < 0) {
 		TRACE_ALWAYS("Error: Unable to open the configuration at %s\n", FIRM_CFG);
 		return fh;
 	}
@@ -1149,7 +1149,7 @@ BeceemDevice::PushConfig(unsigned int loc)
 
 	buffer=(unsigned int*)malloc(MAX_USB_TRANSFER);
 
-	if ( !buffer ) {
+	if (!buffer) {
 		TRACE_ALWAYS("Error: Memory allocation error.\n");
 		return B_ERROR;
 	}
@@ -1179,7 +1179,7 @@ BeceemDevice::PushConfig(unsigned int loc)
 
 		// As readposition should always be less then MAX_USB_TRANSFER
 		// and we have checked the validity of read's output above.
-		if ( WriteRegister(loc + chipwriteloc, readposition, buffer) != B_OK)
+		if (WriteRegister(loc + chipwriteloc, readposition, buffer) != B_OK)
 		{
 			TRACE_ALWAYS("Write failure\n");
 			result = B_ERROR;
@@ -1215,9 +1215,9 @@ BeceemDevice::PushFirmware(unsigned int loc)
 	struct stat 	firmStat;
 	status_t		result;
 
-	int fh = open( FIRM_BIN, O_RDONLY );
+	int fh = open(FIRM_BIN, O_RDONLY);
 
-	if (fh == B_ERROR || fstat(fh, &firmStat) < 0 ) {
+	if (fh == B_ERROR || fstat(fh, &firmStat) < 0) {
 		TRACE_ALWAYS("Error: Unable to open the firmware at %s\n", FIRM_BIN);
 		return fh;
 	} else
@@ -1234,7 +1234,7 @@ BeceemDevice::PushFirmware(unsigned int loc)
 	// For the push we load the file into the buffer
 	buffer=(unsigned int*)malloc(MAX_USB_TRANSFER);
 
-	if ( !buffer  ) {
+	if (!buffer) {
 		TRACE_ALWAYS("Error: Memory allocation error.\n");
 		return B_ERROR;
 	}
@@ -1242,8 +1242,8 @@ BeceemDevice::PushFirmware(unsigned int loc)
 	// TODO : Firmware Download : investigate this, SHADOW clearing thing causes a KDL atm
 	#if 0
 	// Clear the NVM SHADOW signature always before fw download.
-	WriteRegister( EEPROM_CAL_DATA_INTERNAL_LOC-4, 1, 0);
-	WriteRegister( EEPROM_CAL_DATA_INTERNAL_LOC-8, 1, 0);
+	WriteRegister(EEPROM_CAL_DATA_INTERNAL_LOC-4, 1, 0);
+	WriteRegister(EEPROM_CAL_DATA_INTERNAL_LOC-8, 1, 0);
 	#endif
 
 	// We have to spoon feed the data to the usb device as it is probbably too
@@ -1271,7 +1271,7 @@ BeceemDevice::PushFirmware(unsigned int loc)
 
 		// As readposition should always be less then MAX_USB_TRANSFER
 		// and we have checked the validity of read's output above.
-		if ( WriteRegister(loc + chipwriteloc, readposition, buffer) != B_OK)
+		if (WriteRegister(loc + chipwriteloc, readposition, buffer) != B_OK)
 		{
 			TRACE_ALWAYS("Write failure\n");
 			result = B_ERROR;
