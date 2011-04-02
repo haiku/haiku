@@ -327,11 +327,11 @@ BeceemLED::LEDThread(void *cookie)
 			uiLedIndex, led->pwmxdevice->driverState);
 
 		if (blink == true) {
-				led->LEDOff(uiLedIndex);
-				ledactive = false;
-				snooze(500000);
-				led->LEDOn(uiLedIndex);
-				ledactive = true;
+			led->LEDOff(uiLedIndex);
+			ledactive = false;
+			snooze(500000);
+			led->LEDOn(uiLedIndex);
+			ledactive = true;
 		} else {
 			// else we just flip on the color it needs to be.
 			led->LEDOn(uiLedIndex);
