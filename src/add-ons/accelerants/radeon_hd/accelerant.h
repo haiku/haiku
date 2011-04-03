@@ -58,6 +58,37 @@ write32(uint32 offset, uint32 value)
 }
 
 
+inline uint32_t
+ReadMC(int screenIndex, uint32_t addr)
+{
+	// TODO : readMC for R5XX
+	return 0;
+}
+
+
+inline void
+WriteMC(int screenIndex, uint32_t addr, uint32_t data)
+{
+	// TODO : writeMC for R5XX
+}
+
+
+inline uint32_t
+ReadPLL(int screenIndex, uint16_t offset)
+{
+	write32(CLOCK_CNTL_INDEX, offset & PLL_ADDR);
+	return read32(CLOCK_CNTL_INDEX);
+}
+
+
+inline void
+WritePLL(int screenIndex, uint16_t offset, uint32_t data)
+{
+	write32(CLOCK_CNTL_INDEX, (offset & PLL_ADDR) | PLL_WR_EN);
+	write32(CLOCK_CNTL_DATA, data);
+}
+
+
 // modes.cpp
 extern status_t create_mode_list(void);
 
