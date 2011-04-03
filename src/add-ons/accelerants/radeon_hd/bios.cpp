@@ -126,21 +126,21 @@ CailWritePCIConfigData(VOID *CAIL, VOID *src, UINT32 idx, UINT16 size)
 ULONG
 CailReadPLL(VOID *CAIL, ULONG Address)
 {
-	// TODO : CailReadPLL
-
-	ULONG ret = 0;
-	// ret = _RHDReadPLL(((atomBiosHandlePtr)CAIL)->scrnIndex, Address);
-	return ret;
+	TRACE(("%s(0x%X)\n", __func__, Address));
+	// TODO : Assumed screen index 0
+	return ReadPLL(0, Address);
 }
 
 
 VOID
 CailWritePLL(VOID *CAIL, ULONG Address, ULONG Data)
 {
-	// TODO : CailWritePLL
+	TRACE(("%s(0x%X)\n", __func__, Address));
 
+	// TODO : save PLL registers
 	// atomSaveRegisters((atomBiosHandlePtr)CAIL, atomRegisterPLL, Address);
-	// _RHDWritePLL(((atomBiosHandlePtr)CAIL)->scrnIndex, Address, Data);
+	// TODO : Assumed screen index 0
+	WritePLL(0, Address, Data);
 }
 
 
