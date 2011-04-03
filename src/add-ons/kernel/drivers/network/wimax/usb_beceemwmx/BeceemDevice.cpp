@@ -74,7 +74,7 @@ BeceemDevice::ReadRegister(unsigned int reg, size_t size, uint32_t* buffer)
 				break;
 			}
 
-	} while ((result < 0) && (retries < MAX_USB_IO_RETRIES));
+	} while (result < 0 && retries < MAX_USB_IO_RETRIES);
 
 	if (result < 0) {
 		TRACE_ALWAYS("Error: USB read request failure."
@@ -122,7 +122,7 @@ BeceemDevice::WriteRegister(unsigned int reg, size_t size, uint32_t* buffer)
 				break;
 			}
 
-	} while ((result < 0) && (retries < MAX_USB_IO_RETRIES));
+	} while (result < 0 && retries < MAX_USB_IO_RETRIES);
 
 	if (result < 0) {
 		TRACE_ALWAYS("Error: USB write request failure."
@@ -411,7 +411,7 @@ BeceemDevice::Read(uint8 *buffer, size_t *numBytes)
 
 	*numBytes = header[1] | (header[2] << 8);
 
-	if (header[0] & 0xBF) {
+	if ((header[0] & 0xBF) != 0) {
 		TRACE_ALWAYS("RX error %d occured !\n", header[0]);
 	}
 
