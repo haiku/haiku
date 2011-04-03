@@ -574,14 +574,14 @@ TRecentsMenu::AddRecents(int32 count)
 				if (doc.CountNames(B_REF_TYPE) > 0) {
 					// create recents menu that will contain the recent docs of
 					// this app
-					TRecentsMenu* docs = new TRecentsMenu(ref.name, fBarView,
-						kRecentAppDocuments, signature, &ref);
+					TRecentsMenu* docs = new TRecentsMenu(model.Name(),
+						fBarView, kRecentAppDocuments, signature, &ref);
 					docs->SetTypesList(TypesList());
 					docs->SetTarget(Target());
 
 					item = new ModelMenuItem(&model, docs);
 				} else
-					item = new ModelMenuItem(&model, ref.name, NULL);
+					item = new ModelMenuItem(&model, model.Name(), NULL);
 
 				if (item) {
 					// add refs-message so that the recent app can be launched
