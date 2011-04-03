@@ -6,6 +6,32 @@
  *		Axel Dörfler, axeld@pinc-software.de
  *		Alexander von Gluck IV, kallisti5@unixzen.com
  */
+
+/* Copyright for portions of this file (Xorg radeonhd registers)
+ *
+ * Copyright 2007, 2008  Luc Verhaegen <libv@exsuse.de>
+ * Copyright 2007, 2008  Matthias Hopf <mhopf@novell.com>
+ * Copyright 2007, 2008  Egbert Eich   <eich@novell.com>
+ * Copyright 2007, 2008  Advanced Micro Devices, Inc.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE COPYRIGHT HOLDER(S) OR AUTHOR(S) BE LIABLE FOR ANY CLAIM, DAMAGES OR
+ * OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 #ifndef RADEON_HD_H
 #define RADEON_HD_H
 
@@ -57,6 +83,7 @@ struct DeviceType {
 	}
 };
 
+
 // info about PLL on graphics card
 struct pll_info {
 	uint32			reference_frequency;
@@ -64,6 +91,7 @@ struct pll_info {
 	uint32			min_frequency;
 	uint32			divisor_register;
 };
+
 
 struct ring_buffer {
 	struct lock		lock;
@@ -75,7 +103,9 @@ struct ring_buffer {
 	uint8*			base;
 };
 
+
 struct overlay_registers;
+
 
 struct radeon_shared_info {
 	area_id			mode_list_area;		// area containing display mode list
@@ -161,6 +191,88 @@ struct radeon_free_graphics_memory {
 // ----------------------------------------------------------
 // Register definitions, taken from X driver
 
+// Generic Radeon registers
+enum {
+	CLOCK_CNTL_INDEX	= 0x8,  /* (RW) */
+	CLOCK_CNTL_DATA		= 0xC,  /* (RW) */
+	BUS_CNTL			= 0x4C, /* (RW) */
+	MC_IND_INDEX		= 0x70, /* (RW) */
+	MC_IND_DATA			= 0x74, /* (RW) */
+	RS600_MC_INDEX		= 0x70,
+	RS600_MC_DATA		= 0x74,
+	RS690_MC_INDEX		= 0x78,
+	RS690_MC_DATA		= 0x7c,
+	RS780_MC_INDEX		= 0x28f8,
+	RS780_MC_DATA		= 0x28fc,
+
+	RS60_MC_NB_MC_INDEX	= 0x78,
+	RS60_MC_NB_MC_DATA	= 0x7C,
+	CONFIG_CNTL			= 0xE0,
+	PCIE_RS69_MC_INDEX	= 0xE8,
+	PCIE_RS69_MC_DATA	= 0xEC,
+	R5XX_CONFIG_MEMSIZE	= 0x00F8,
+	
+	HDP_FB_LOCATION		= 0x0134,
+	
+	SEPROM_CNTL1		= 0x1C0,  /* (RW) */
+	
+	AGP_BASE			= 0x0170,
+	
+	GPIOPAD_MASK		= 0x198,  /* (RW) */
+	GPIOPAD_A			= 0x19C,  /* (RW) */
+	GPIOPAD_EN			= 0x1A0,  /* (RW) */
+	VIPH_CONTROL		= 0xC40,  /* (RW) */
+	
+	ROM_CNTL			= 0x1600,
+	GENERAL_PWRMGT		= 0x0618,
+	LOW_VID_LOWER_GPIO_CNTL = 0x0724,
+	MEDIUM_VID_LOWER_GPIO_CNTL = 0x0720,
+	HIGH_VID_LOWER_GPIO_CNTL = 0x071C,
+	CTXSW_VID_LOWER_GPIO_CNTL = 0x0718,
+	LOWER_GPIO_ENABLE	= 0x0710,
+
+	/* VGA registers */
+	VGA_RENDER_CONTROL		= 0x0300,
+	VGA_MODE_CONTROL		= 0x0308,
+	VGA_MEMORY_BASE_ADDRESS	= 0x0310,
+	VGA_HDP_CONTROL			= 0x0328,
+	D1VGA_CONTROL			= 0x0330,
+	D2VGA_CONTROL			= 0x0338,
+	
+	EXT1_PPLL_REF_DIV_SRC	= 0x0400,
+	EXT1_PPLL_REF_DIV		= 0x0404,
+	EXT1_PPLL_UPDATE_LOCK	= 0x0408,
+	EXT1_PPLL_UPDATE_CNTL	= 0x040C,
+	EXT2_PPLL_REF_DIV_SRC	= 0x0410,
+	EXT2_PPLL_REF_DIV		= 0x0414,
+	EXT2_PPLL_UPDATE_LOCK	= 0x0418,
+	EXT2_PPLL_UPDATE_CNTL	= 0x041C,
+	
+	EXT1_PPLL_FB_DIV		= 0x0430,
+	EXT2_PPLL_FB_DIV		= 0x0434,
+	EXT1_PPLL_POST_DIV_SRC	= 0x0438,
+	EXT1_PPLL_POST_DIV		= 0x043C,
+	EXT2_PPLL_POST_DIV_SRC	= 0x0440,
+	EXT2_PPLL_POST_DIV		= 0x0444,
+	EXT1_PPLL_CNTL			= 0x0448,
+	EXT2_PPLL_CNTL			= 0x044C,
+	P1PLL_CNTL				= 0x0450,
+	P2PLL_CNTL				= 0x0454,
+	P1PLL_INT_SS_CNTL		= 0x0458,
+	P2PLL_INT_SS_CNTL		= 0x045C,
+	
+	P1PLL_DISP_CLK_CNTL		= 0x0468, /* rv620+ */
+	P2PLL_DISP_CLK_CNTL		= 0x046C, /* rv620+ */
+	EXT1_SYM_PPLL_POST_DIV	= 0x0470, /* rv620+ */
+	EXT2_SYM_PPLL_POST_DIV	= 0x0474, /* rv620+ */
+	
+	PCLK_CRTC1_CNTL			= 0x0480,
+	PCLK_CRTC2_CNTL			= 0x0484,
+
+	// TODO : xorg reverse engineered registers
+};
+
+
 // ATI r600 specific
 enum _r6xxRegs {
 	/* MCLK */
@@ -197,6 +309,41 @@ enum _r6xxRegs {
 	R6_DC_GPIO_DDC3_EN			= 0x7E68,  /* (RW) */
 	R6_DC_GPIO_DDC3_Y			= 0x7E6C   /* (RW) */
 };
+
+
+// PLL Clock Controls
+enum {
+    /* CLOCK_CNTL_INDEX */
+    PLL_ADDR		= (0x3f << 0),
+    PLL_WR_EN		= (0x1 << 7),
+    PPLL_DIV_SEL	= (0x3 << 8),
+
+    /* SPLL_FUNC_CNTL */
+    SPLL_CHG_STATUS	= (0x1 << 29),
+    SPLL_BYPASS_EN	= (0x1 << 25),
+
+    /* MC_IND_INDEX */
+    MC_IND_ADDR		= (0xffff << 0),
+    MC_IND_SEQ_RBS_0 = (0x1 << 16),
+    MC_IND_SEQ_RBS_1 = (0x1 << 17),
+    MC_IND_SEQ_RBS_2 = (0x1 << 18),
+    MC_IND_SEQ_RBS_3 = (0x1 << 19),
+    MC_IND_AIC_RBS   = (0x1 << 20),
+    MC_IND_CITF_ARB0 = (0x1 << 21),
+    MC_IND_CITF_ARB1 = (0x1 << 22),
+    MC_IND_WR_EN     = (0x1 << 23),
+    MC_IND_RD_INV    = (0x1 << 24)
+};
+
+
+/* CLOCK_CNTL_DATA */
+#define PLL_DATA 0xffffffff
+/* MC_IND_DATA */
+#define MC_IND_ALL (MC_IND_SEQ_RBS_0 | MC_IND_SEQ_RBS_1 \
+	| MC_IND_SEQ_RBS_2 | MC_IND_SEQ_RBS_3 \
+	| MC_IND_AIC_RBS | MC_IND_CITF_ARB0 \
+	| MC_IND_CITF_ARB1)
+#define MC_IND_DATA_BIT 0xffffffff
 
 
 // cursor
