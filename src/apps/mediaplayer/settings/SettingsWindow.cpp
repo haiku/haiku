@@ -78,17 +78,17 @@ SettingsWindow::SettingsWindow(BRect frame)
 		new BMessage(M_SETTINGS_CHANGED));
 
 	fCloseWindowMoviesCB = new BCheckBox("chkBoxCloseWindowMovies", 
-		B_TRANSLATE("Close window when done playing movies"),
+		B_TRANSLATE("Close window after playing video"),
 		new BMessage(M_SETTINGS_CHANGED));
 	fCloseWindowSoundsCB = new BCheckBox("chkBoxCloseWindowSounds", 
-		B_TRANSLATE("Close window when done playing sounds"),
+		B_TRANSLATE("Close window after playing audio"),
 		new BMessage(M_SETTINGS_CHANGED));
 
 	fLoopMoviesCB = new BCheckBox("chkBoxLoopMovie",
-		B_TRANSLATE("Loop movies by default"),
+		B_TRANSLATE("Loop video"),
 		new BMessage(M_SETTINGS_CHANGED));
 	fLoopSoundsCB = new BCheckBox("chkBoxLoopSounds",
-		B_TRANSLATE("Loop sounds by default"),
+		B_TRANSLATE("Loop audio"),
 		new BMessage(M_SETTINGS_CHANGED));
 
 	fUseOverlaysCB = new BCheckBox("chkBoxUseOverlays",
@@ -99,7 +99,7 @@ SettingsWindow::SettingsWindow(BRect frame)
 		new BMessage(M_SETTINGS_CHANGED));
 
 	fScaleFullscreenControlsCB = new BCheckBox("chkBoxScaleControls",
-		B_TRANSLATE("Scale controls in full-screen mode"),
+		B_TRANSLATE("Scale controls in full screen mode"),
 		new BMessage(M_SETTINGS_CHANGED));
 
 	fSubtitleSizeOP = new BOptionPopUp("subtitleSize",

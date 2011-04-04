@@ -171,14 +171,18 @@ ScreenshotWindow::ScreenshotWindow(const Utility& utility, bool silent,
 	BStringView* seconds = new BStringView("", B_TRANSLATE("seconds"));
 	seconds->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
-	BMenuField* menuField2 = new BMenuField(B_TRANSLATE("Save in:"),
+	BMenuField* menuLocation = new BMenuField(B_TRANSLATE("Save in:"),
 		fOutputPathMenu);
 
 	fTranslatorMenu = new BMenu(B_TRANSLATE("Please select"));
 	_SetupTranslatorMenu();
-	BMenuField* menuField = new BMenuField(B_TRANSLATE("Save as:"),
+	BMenuField* menuFormat = new BMenuField(B_TRANSLATE("Save as:"),
 		fTranslatorMenu);
 
+	BButton* showSettings =  new BButton("", B_TRANSLATE("Settings"B_UTF8_ELLIPSIS),
+			new BMessage(kSettings));
+	showSettings->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT, B_ALIGN_BOTTOM));
+	
 	BBox* divider = new BBox(B_FANCY_BORDER, NULL);
 	divider->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 1));
 
@@ -188,16 +192,18 @@ ScreenshotWindow::ScreenshotWindow(const Utility& utility, bool silent,
 	fPreview = new PreviewView();
 
 	BGridLayout* gridLayout = BGridLayoutBuilder(0.0, 5.0)
-		.Add(fNameControl->CreateLabelLayoutItem(), 0, 0)
-		.Add(fNameControl->CreateTextViewLayoutItem(), 1, 0)
-		.Add(menuField->CreateLabelLayoutItem(), 0, 1)
-		.Add(menuField->CreateMenuBarLayoutItem(), 1, 1)
-		.Add(new BButton("", B_TRANSLATE("Settings"B_UTF8_ELLIPSIS),
-			new BMessage(kSettings)), 2, 1)
-		.Add(menuField2->CreateLabelLayoutItem(), 0, 2)
-		.Add(menuField2->CreateMenuBarLayoutItem(), 1, 2);
+		.Add(fDelayControl->CreateLabelLayoutItem(), 0, 0)
+		.Add(fDelayControl->CreateTextViewLayoutItem(), 1, 0)
+		.Add(seconds, 2, 0)	
+		.Add(fNameControl->CreateLabelLayoutItem(), 0, 1)
+		.Add(fNameControl->CreateTextViewLayoutItem(), 1, 1, 2, 1)
+		.Add(menuLocation->CreateLabelLayoutItem(), 0, 2)
+		.Add(menuLocation->CreateMenuBarLayoutItem(), 1, 2, 2, 1)
+		.Add(menuFormat->CreateLabelLayoutItem(), 0, 3)
+		.Add(menuFormat->CreateMenuBarLayoutItem(), 1, 3, 2, 1);
+	
 	gridLayout->SetMinColumnWidth(1,
-		menuField->StringWidth("SomethingLongHere"));
+		menuFormat->StringWidth("SomethingLongHere"));
 
 	SetLayout(new BGroupLayout(B_HORIZONTAL, 0));
 
@@ -208,13 +214,9 @@ ScreenshotWindow::ScreenshotWindow(const Utility& utility, bool silent,
 				.Add(fActiveWindow)
 				.Add(fWindowBorder)
 				.Add(fShowCursor)
-				.AddGroup(B_HORIZONTAL, 5.0)
-					.Add(fDelayControl->CreateLabelLayoutItem())
-					.Add(fDelayControl->CreateTextViewLayoutItem())
-					.Add(seconds)
-					.End()
 				.AddStrut(10.0)
 				.Add(gridLayout)
+				.Add(showSettings)
 				.AddGlue()
 				.End())
 		.AddStrut(10)

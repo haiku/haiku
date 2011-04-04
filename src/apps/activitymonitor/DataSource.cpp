@@ -1354,8 +1354,8 @@ ClipboardSizeDataSource::InternalName() const
 const char*
 ClipboardSizeDataSource::Label() const
 {
-	return fText ? B_TRANSLATE("Text clipboard size")
-		: B_TRANSLATE("Raw clipboard size");
+	return fText ? B_TRANSLATE("Text clipboard")
+		: B_TRANSLATE("Raw clipboard");
 }
 
 

@@ -557,7 +557,7 @@ WorkspacesView::MouseDown(BPoint where)
 		BMenuItem* item;
 
 		menu->AddSeparatorItem();
-		menu->AddItem(item = new BMenuItem(B_TRANSLATE("Show window title"),
+		menu->AddItem(item = new BMenuItem(B_TRANSLATE("Show window tab"),
 			new BMessage(kMsgToggleTitle)));
 		if (window->Look() == B_TITLED_WINDOW_LOOK)
 			item->SetMarked(true);

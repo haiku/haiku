@@ -1259,86 +1259,88 @@ AboutView::_CreateCreditsView()
 
 	// GNU copyrights
 	AddCopyrightEntry("The GNU Project",
-		"Contains software from the GNU Project, "
+		B_TRANSLATE("Contains software from the GNU Project, "
 		"released under the GPL and LGPL licenses:\n"
 		"GNU C Library, "
 		"GNU coretools, diffutils, findutils, "
 		"sharutils, gawk, bison, m4, make, "
 		"gdb, wget, ncurses, termcap, "
 		"Bourne Again Shell.\n"
-		COPYRIGHT_STRING "The Free Software Foundation.",
+		COPYRIGHT_STRING "The Free Software Foundation."),
 		StringVector("GNU LGPL v2.1", "GNU GPL v2", "GNU GPL v3", NULL),
 		StringVector(),
 		"http://www.gnu.org");
 
 	// FreeBSD copyrights
 	AddCopyrightEntry("The FreeBSD Project",
-		"Contains software from the FreeBSD Project, "
+		B_TRANSLATE("Contains software from the FreeBSD Project, "
 		"released under the BSD license:\n"
 		"cal, ftpd, ping, telnet, "
 		"telnetd, traceroute\n"
 		COPYRIGHT_STRING "1994-2008 The FreeBSD Project.  "
-		"All rights reserved.",
+		"All rights reserved."),
 		"http://www.freebsd.org");
 			// TODO: License!
 
 	// NetBSD copyrights
 	AddCopyrightEntry("The NetBSD Project",
-		"Contains software developed by the NetBSD, "
+		B_TRANSLATE("Contains software developed by the NetBSD, "
 		"Foundation, Inc. and its contributors:\n"
 		"ftp, tput\n"
 		COPYRIGHT_STRING "1996-2008 The NetBSD Foundation, Inc.  "
-		"All rights reserved.",
+		"All rights reserved."),
 		"http://www.netbsd.org");
 			// TODO: License!
 
 	// FFMpeg copyrights
 	_AddPackageCredit(PackageCredit("FFMpeg libavcodec")
-		.SetCopyright(COPYRIGHT_STRING "2000-2007 Fabrice Bellard, et al.")
+		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2000-2007 Fabrice "
+			"Bellard, et al."))
 		.SetLicenses("GNU LGPL v2.1", "GNU LGPL v2", NULL)
 		.SetURL("http://www.ffmpeg.org"));
 
 	// AGG copyrights
 	_AddPackageCredit(PackageCredit("AntiGrain Geometry")
-		.SetCopyright(COPYRIGHT_STRING "2002-2006 Maxim Shemanarev (McSeem).")
-		.SetLicenses("Anti-Grain Geometry", "BSD (3-clause)", "GPC", NULL)
+		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2002-2006 Maxim "
+			"Shemanarev (McSeem)."))
+		.SetLicenses("Anti-Grain Geometry", B_TRANSLATE("BSD (3-clause)"), 
+			"GPC", NULL)
 		.SetURL("http://www.antigrain.com"));
 
 	// PDFLib copyrights
 	_AddPackageCredit(PackageCredit("PDFLib")
-		.SetCopyright(COPYRIGHT_STRING "1997-2006 PDFlib GmbH and Thomas Merz. "
-			"All rights reserved.\n"
-			"PDFlib and PDFlib logo are registered trademarks of PDFlib GmbH.")
+		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "1997-2006 PDFlib GmbH and "
+			"Thomas Merz.  All rights reserved.\n"
+			"PDFlib and PDFlib logo are registered trademarks of PDFlib GmbH."))
 		.SetLicense("PDFlib Lite")
 		.SetURL("http://www.pdflib.com"));
 
 	// FreeType copyrights
 	_AddPackageCredit(PackageCredit("FreeType2")
-		.SetCopyright("Portions of this software are copyright "
-			B_UTF8_COPYRIGHT " 1996-2006 "
-			"The FreeType Project.  All rights reserved.")
+		.SetCopyright(B_TRANSLATE("Portions of this software are copyright "
+			COPYRIGHT_STRING "1996-2006 "
+			"The FreeType Project.  All rights reserved."))
 		.SetLicense("FTL")
 		.SetURL("http://www.freetype.org"));
 
 	// Mesa3D (http://www.mesa3d.org) copyrights
 	_AddPackageCredit(PackageCredit("Mesa")
-		.SetCopyright(COPYRIGHT_STRING "1999-2006 Brian Paul. "
-			"Mesa3D Project.  All rights reserved.")
+		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "1999-2006 Brian Paul. "
+			"Mesa3D Project.  All rights reserved."))
 		.SetLicense("MIT")
 		.SetURL("http://www.mesa3d.org"));
 
 	// SGI's GLU implementation copyrights
 	_AddPackageCredit(PackageCredit("GLU")
-		.SetCopyright(COPYRIGHT_STRING
-			"1991-2000 Silicon Graphics, Inc. "
-			"SGI's Software FreeB license.  All rights reserved.")
+		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "1991-2000 Silicon Graphics, "
+			"Inc. SGI's Software FreeB license.  All rights reserved."))
 		.SetLicense("SGI Free B")
 		.SetURL("http://www.sgi.com/products/software/opengl"));
 
 	// GLUT implementation copyrights
 	_AddPackageCredit(PackageCredit("GLUT")
-		.SetCopyrights(COPYRIGHT_STRING "1994-1997 Mark Kilgard. "
-			"All rights reserved.",
+		.SetCopyrights(B_TRANSLATE(COPYRIGHT_STRING "1994-1997 Mark Kilgard. "
+			"All rights reserved."),
 			COPYRIGHT_STRING "1997 Be Inc.",
 			COPYRIGHT_STRING "1999 Jake Hamby.",
 			NULL)
@@ -1348,54 +1350,53 @@ AboutView::_CreateCreditsView()
 	// OpenGroup & DEC (BRegion backend) copyright
 	_AddPackageCredit(PackageCredit("BRegion backend (XFree86)")
 		.SetCopyrights(COPYRIGHT_STRING "1987, 1988, 1998 The Open Group.",
-			COPYRIGHT_STRING "1987, 1988 Digital Equipment "
+			B_TRANSLATE(COPYRIGHT_STRING "1987, 1988 Digital Equipment "
 			"Corporation, Maynard, Massachusetts.\n"
-			"All rights reserved.",
+			"All rights reserved."),
 			NULL)
 		.SetLicenses("OpenGroup", "DEC", NULL));
 			// TODO: URL
 
 	// VL-Gothic font
 	_AddPackageCredit(PackageCredit("VL-Gothic font")
-		.SetCopyrights(COPYRIGHT_STRING "1990-2003 Wada Laboratory,"
-			" the University of Tokyo", COPYRIGHT_STRING
+		.SetCopyrights(B_TRANSLATE(COPYRIGHT_STRING "1990-2003 Wada Laboratory,"
+			" the University of Tokyo"), COPYRIGHT_STRING
 			"2003-2004 Electronic Font Open Laboratory (/efont/)",
 			COPYRIGHT_STRING "2003-2008 M+ FONTS PROJECT",
 			COPYRIGHT_STRING "2006-2009 Daisuke SUZUKI",
 			COPYRIGHT_STRING "2006-2009 Project Vine",
-			"MIT license. All rights reserved.",
+			B_TRANSLATE("MIT license. All rights reserved."),
 			NULL));
 			// TODO: License!
 
 	// expat copyrights
 	_AddPackageCredit(PackageCredit("expat")
-		.SetCopyrights(COPYRIGHT_STRING
-			"1998, 1999, 2000 Thai Open Source "
-			"Software Center Ltd and Clark Cooper.",
-			COPYRIGHT_STRING "2001, 2002, 2003 Expat maintainers.",
+		.SetCopyrights(B_TRANSLATE(COPYRIGHT_STRING "1998, 1999, 2000 Thai "
+			"Open Source Software Center Ltd and Clark Cooper."),
+			B_TRANSLATE(COPYRIGHT_STRING "2001, 2002, 2003 Expat maintainers."),
 			NULL)
 		.SetLicense("Expat")
 		.SetURL("http://expat.sourceforge.net"));
 
 	// zlib copyrights
 	_AddPackageCredit(PackageCredit("zlib")
-		.SetCopyright(COPYRIGHT_STRING
-			"1995-2004 Jean-loup Gailly and Mark Adler.")
+		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "1995-2004 Jean-loup "
+			"Gailly and Mark Adler."))
 		.SetLicense("Zlib")
 		.SetURL("http://www.zlib.net"));
 
 	// zip copyrights
 	_AddPackageCredit(PackageCredit("Info-ZIP")
-		.SetCopyright(COPYRIGHT_STRING
-			"1990-2002 Info-ZIP. All rights reserved.")
+		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "1990-2002 Info-ZIP. "
+			"All rights reserved."))
 		.SetLicense("Info-ZIP")
 		.SetURL("http://www.info-zip.org"));
 
 	// bzip2 copyrights
 	_AddPackageCredit(PackageCredit("bzip2")
-		.SetCopyright(COPYRIGHT_STRING
-			"1996-2005 Julian R Seward. All rights reserved.")
-		.SetLicense("BSD (4-clause)")
+		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "1996-2005 Julian R "
+			"Seward. All rights reserved."))
+		.SetLicense(B_TRANSLATE("BSD (4-clause)"))
 		.SetURL("http://bzip.org"));
 
 	// lp_solve copyrights
@@ -1407,9 +1408,9 @@ AboutView::_CreateCreditsView()
 
 	// OpenEXR copyrights
 	_AddPackageCredit(PackageCredit("OpenEXR")
-		.SetCopyright(COPYRIGHT_STRING "2002-2005 Industrial Light & Magic, "
-			"a division of Lucas Digital Ltd. LLC.")
-		.SetLicense("BSD (3-clause)")
+		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2002-2005 Industrial "
+			"Light & Magic, a division of Lucas Digital Ltd. LLC."))
+		.SetLicense(B_TRANSLATE("BSD (3-clause)"))
 		.SetURL("http://www.openexr.com"));
 
 	// Bullet copyrights
@@ -1420,8 +1421,8 @@ AboutView::_CreateCreditsView()
 
 	// atftp copyrights
 	_AddPackageCredit(PackageCredit("atftp")
-		.SetCopyright(COPYRIGHT_STRING
-			"2000 Jean-Pierre ervbefeL and Remi Lefebvre")
+		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2000 Jean-Pierre "
+			"ervbefeL and Remi Lefebvre"))
 		.SetLicense("GNU GPL v2"));
 			// TODO: URL!
 
@@ -1438,8 +1439,8 @@ AboutView::_CreateCreditsView()
 
 	// unrar copyrights
 	_AddPackageCredit(PackageCredit("unrar")
-		.SetCopyright(COPYRIGHT_STRING "2002-2008 Alexander L. Roshal. "
-			"All rights reserved.")
+		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2002-2008 Alexander "
+			"L. Roshal. All rights reserved."))
 		.SetLicense("UnRAR")
 		.SetURL("http://www.rarlab.com"));
 
@@ -1452,27 +1453,28 @@ AboutView::_CreateCreditsView()
 
 	// libjpeg copyrights
 	_AddPackageCredit(PackageCredit("libjpeg")
-		.SetCopyright(COPYRIGHT_STRING " 1994-2009, Thomas G. Lane,"
-			" Guido Vollbeding. This software is based in part on the "
-			"work of the Independent JPEG Group")
+		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "1994-2009, Thomas G. "
+			"Lane, Guido Vollbeding. This software is based in part on the "
+			"work of the Independent JPEG Group"))
 		.SetLicense("LibJPEG")
 		.SetURL("http://www.ijg.org"));
 
 	// libprint copyrights
 	_AddPackageCredit(PackageCredit("libprint")
-		.SetCopyright(COPYRIGHT_STRING
-			"1999-2000 Y.Takagi. All rights reserved."));
+		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "1999-2000 Y.Takagi. "
+			"All rights reserved.")));
 			// TODO: License!
 
 	// cortex copyrights
 	_AddPackageCredit(PackageCredit("Cortex")
 		.SetCopyright(COPYRIGHT_STRING "1999-2000 Eric Moon.")
-		.SetLicense("BSD (3-clause)")
+		.SetLicense(B_TRANSLATE("BSD (3-clause)"))
 		.SetURL("http://cortex.sourceforge.net/documentation"));
 
 	// FluidSynth copyrights
 	_AddPackageCredit(PackageCredit("FluidSynth")
-		.SetCopyright(COPYRIGHT_STRING "2003 Peter Hanappe and others.")
+		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2003 Peter Hanappe "
+			"and others."))
 		.SetLicense("GNU LGPL v2")
 		.SetURL("http://www.fluidsynth.org"));
 
@@ -1483,74 +1485,71 @@ AboutView::_CreateCreditsView()
 
 	// libxml2, libxslt, libexslt copyrights
 	_AddPackageCredit(PackageCredit("libxml2, libxslt")
-		.SetCopyright(COPYRIGHT_STRING
-			"1998-2003 Daniel Veillard. All rights reserved.")
-		.SetLicense("MIT (no promotion)")
+		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "1998-2003 Daniel Veillard. "
+			"All rights reserved."))
+		.SetLicense(B_TRANSLATE("MIT (no promotion)"))
 		.SetURL("http://xmlsoft.org"));
 
 	_AddPackageCredit(PackageCredit("libexslt")
-		.SetCopyright(COPYRIGHT_STRING
-			"2001-2002 Thomas Broyer, Charlie "
-			"Bozeman and Daniel Veillard.  All rights reserved.")
-		.SetLicense("MIT (no promotion)")
+		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2001-2002 Thomas Broyer, "
+			"Charlie Bozeman and Daniel Veillard.  All rights reserved."))
+		.SetLicense(B_TRANSLATE("MIT (no promotion)"))
 		.SetURL("http://xmlsoft.org"));
 
 	// Xiph.org Foundation copyrights
 	_AddPackageCredit(PackageCredit("Xiph.org Foundation")
 		.SetCopyrights("libvorbis, libogg, libtheora, libspeex",
-			COPYRIGHT_STRING "1994-2008 Xiph.Org. "
-			"All rights reserved.",
-			NULL)
-		.SetLicense("BSD (3-clause)")
+			B_TRANSLATE(COPYRIGHT_STRING "1994-2008 Xiph.Org. "
+			"All rights reserved."), NULL)
+		.SetLicense(B_TRANSLATE("BSD (3-clause)"))
 		.SetURL("http://www.xiph.org"));
 
 	// The Tcpdump Group
 	_AddPackageCredit(PackageCredit("The Tcpdump Group")
 		.SetCopyright("tcpdump, libpcap")
-		.SetLicense("BSD (3-clause)")
+		.SetLicense(B_TRANSLATE("BSD (3-clause)"))
 		.SetURL("http://www.tcpdump.org"));
 
 	// Matroska
 	_AddPackageCredit(PackageCredit("libmatroska")
-		.SetCopyright(COPYRIGHT_STRING "2002-2003 Steve Lhomme. "
-			"All rights reserved.")
+		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2002-2003 Steve Lhomme. "
+			"All rights reserved."))
 		.SetLicense("GNU LGPL v2.1")
 		.SetURL("http://www.matroska.org"));
 
 	// BColorQuantizer (originally CQuantizer code)
 	_AddPackageCredit(PackageCredit("CQuantizer")
-		.SetCopyright(COPYRIGHT_STRING "1996-1997 Jeff Prosise. "
-			"All rights reserved.")
+		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "1996-1997 Jeff Prosise. "
+			"All rights reserved."))
 		.SetLicense("CQuantizer")
 		.SetURL("http://www.xdp.it"));
 
 	// MAPM (Mike's Arbitrary Precision Math Library) used by DeskCalc
 	_AddPackageCredit(PackageCredit("MAPM")
-		.SetCopyright(COPYRIGHT_STRING
-			"1999-2007 Michael C. Ring. All rights reserved.")
+		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "1999-2007 Michael C. "
+			"Ring. All rights reserved."))
 		.SetLicense("MAPM")
 		.SetURL("http://tc.umn.edu/~ringx004"));
 
 	// MkDepend 1.7 copyright (Makefile dependency generator)
 	_AddPackageCredit(PackageCredit("MkDepend")
-		.SetCopyright(COPYRIGHT_STRING "1995-2001 Lars Düning. "
-			"All rights reserved.")
+		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "1995-2001 Lars Düning. "
+			"All rights reserved."))
 		.SetLicense("MkDepend")
 		.SetURL("http://bearnip.com/lars/be"));
 
 	// libhttpd copyright (used as Poorman backend)
 	_AddPackageCredit(PackageCredit("libhttpd")
-		.SetCopyright(COPYRIGHT_STRING
-			"1995,1998,1999,2000,2001 by "
-			"Jef Poskanzer. All rights reserved.")
+		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "1995, 1998, 1999, 2000, "
+			"2001 by Jef Poskanzer. All rights reserved."))
 		.SetLicense("LibHTTPd")
 		.SetURL("http://www.acme.com/software/thttpd/"));
 
 #ifdef __INTEL__
 	// Udis86 copyrights
 	_AddPackageCredit(PackageCredit("Udis86")
-		.SetCopyright(COPYRIGHT_STRING "2002, 2003, 2004 Vivek Mohan. "
-			"All rights reserved.")
+		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2002, 2003, 2004 "
+			"Vivek Mohan. All rights reserved."))
 		.SetURL("http://udis86.sourceforge.net"));
 			// TODO: License!
 #endif
@@ -1558,9 +1557,8 @@ AboutView::_CreateCreditsView()
 #ifdef __INTEL__
 	// Intel PRO/Wireless 2100 Firmware
 	_AddPackageCredit(PackageCredit("Intel PRO/Wireless 2100 Firmware")
-		.SetCopyright(COPYRIGHT_STRING
-			"2003-2006 by "
-			"Intel Corporation. All rights reserved.")
+		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2003-2006 by "
+			"Intel Corporation. All rights reserved."))
 		.SetLicense("Intel (2xxx firmware)")
 		.SetURL("http://ipw2100.sourceforge.net/"));
 #endif
@@ -1568,9 +1566,8 @@ AboutView::_CreateCreditsView()
 #ifdef __INTEL__
 	// Intel PRO/Wireless 2200BG Firmware
 	_AddPackageCredit(PackageCredit("Intel PRO/Wireless 2200BG Firmware")
-		.SetCopyright(COPYRIGHT_STRING
-			"2004-2005 by "
-			"Intel Corporation. All rights reserved.")
+		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2004-2005 by "
+			"Intel Corporation. All rights reserved."))
 		.SetLicense("Intel (2xxx firmware)")
 		.SetURL("http://ipw2200.sourceforge.net/"));
 #endif
@@ -1580,9 +1577,8 @@ AboutView::_CreateCreditsView()
 	_AddPackageCredit(
 		PackageCredit(
 			"Intel PRO/Wireless 3945ABG/BG Network Connection Adapter Firmware")
-		.SetCopyright(COPYRIGHT_STRING
-			"2006 - 2007 by "
-			"Intel Corporation. All rights reserved.")
+		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2006-2007 by "
+			"Intel Corporation. All rights reserved."))
 		.SetLicense("Intel (firmware)")
 		.SetURL("http://www.intellinuxwireless.org/"));
 #endif
@@ -1590,9 +1586,8 @@ AboutView::_CreateCreditsView()
 	// Intel Wireless WiFi Link 4965AGN Adapter Firmware
 	_AddPackageCredit(
 		PackageCredit("Intel Wireless WiFi Link 4965AGN Adapter Firmware")
-		.SetCopyright(COPYRIGHT_STRING
-			"2006 - 2007 by "
-			"Intel Corporation. All rights reserved.")
+		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2006-2007 by "
+			"Intel Corporation. All rights reserved."))
 		.SetLicense("Intel (firmware)")
 		.SetURL("http://www.intellinuxwireless.org/"));
 #endif
@@ -1600,9 +1595,8 @@ AboutView::_CreateCreditsView()
 #ifdef __INTEL__
 	// Marvell 88w8363
 	_AddPackageCredit(PackageCredit("Marvell 88w8363")
-		.SetCopyright(COPYRIGHT_STRING
-			"2007-2009 by "
-			"Marvell Semiconductor, Inc. All rights reserved.")
+		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2007-2009 by "
+			"Marvell Semiconductor, Inc. All rights reserved."))
 		.SetLicense("Marvell (firmware)")
 		.SetURL("http://www.marvell.com/"));
 #endif

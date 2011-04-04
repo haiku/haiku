@@ -139,7 +139,7 @@ DownloadLanguageTarball()
 		if [ -e "$1" ]; then
 			rm "$1"
 		fi
-		Echo "WARNING: Max download retries exceeded for language $1."
+		echo "WARNING: Max download retries exceeded for language $1."
 	fi
 		
 	cd "$subversionRootDirectory"

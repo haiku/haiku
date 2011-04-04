@@ -1083,10 +1083,6 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 	menu->AddItem(menuItem = new BMenuItem(B_TRANSLATE("Paste"),
 		new BMessage(B_PASTE), 'V'));
 	menuItem->SetTarget(fTextView);
-	menu->AddItem(fClearItem = new BMenuItem(B_TRANSLATE("Clear"),
-		new BMessage(MENU_CLEAR)));
-	fClearItem->SetEnabled(false);
-	fClearItem->SetTarget(fTextView);
 
 	menu->AddSeparatorItem();
 	menu->AddItem(menuItem = new BMenuItem(B_TRANSLATE("Select all"),
@@ -1104,7 +1100,7 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 		new BMessage(MENU_FIND_SELECTION), 'H'));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Replace" B_UTF8_ELLIPSIS),
 		new BMessage(MENU_REPLACE), 'R'));
-	menu->AddItem(fReplaceSameItem = new BMenuItem(B_TRANSLATE("Replace same"),
+	menu->AddItem(fReplaceSameItem = new BMenuItem(B_TRANSLATE("Replace next"),
 		new BMessage(MENU_REPLACE_SAME), 'T'));
 	fReplaceSameItem->SetEnabled(false);
 

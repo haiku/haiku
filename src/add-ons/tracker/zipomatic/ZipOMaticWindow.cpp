@@ -57,7 +57,7 @@ ZippoWindow::ZippoWindow(BList windowList, bool keepOpen)
 		B_ALIGN_VERTICAL_UNSET));
 
 	fZipOutputView = new BStringView("output_text",
-		B_TRANSLATE("Drop files to zip."));
+		B_TRANSLATE("Drop files here."));
 	fZipOutputView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
 		B_ALIGN_VERTICAL_UNSET));
 

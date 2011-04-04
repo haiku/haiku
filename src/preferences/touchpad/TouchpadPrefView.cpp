@@ -369,7 +369,7 @@ TouchpadPrefView::SetupView()
 
 	// Create the "Mouse Speed" slider...
 	fScrollAccelSlider = new BSlider("scroll_accel",
-		B_TRANSLATE("Scroll acceleration"),
+		B_TRANSLATE("Acceleration"),
 		new BMessage(SCROLL_CONTROL_CHANGED), 0, 20, B_HORIZONTAL);
 	fScrollAccelSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fScrollAccelSlider->SetHashMarkCount(7);
@@ -377,7 +377,7 @@ TouchpadPrefView::SetupView()
 		B_TRANSLATE("Fast"));
 
 	fScrollStepXSlider = new BSlider("scroll_stepX",
-		B_TRANSLATE("Horizontal scroll speed"),
+		B_TRANSLATE("Horizontal"),
 		new BMessage(SCROLL_CONTROL_CHANGED),
 		0, 20, B_HORIZONTAL);
 	fScrollStepXSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
@@ -386,7 +386,7 @@ TouchpadPrefView::SetupView()
 		B_TRANSLATE("Fast"));
 
 	fScrollStepYSlider = new BSlider("scroll_stepY",
-		B_TRANSLATE("Vertical scroll speed"),
+		B_TRANSLATE("Vertical"),
 		new BMessage(SCROLL_CONTROL_CHANGED), 0, 20, B_HORIZONTAL);
 	fScrollStepYSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fScrollStepYSlider->SetHashMarkCount(7);
@@ -423,13 +423,13 @@ TouchpadPrefView::SetupView()
 	scrollPrefLayout->AddView(scrollPrefRightLayout);
 
 	BBox* tapBox = new BBox("tapbox");
-	tapBox->SetLabel(B_TRANSLATE("Tap gesture"));
+	tapBox->SetLabel(B_TRANSLATE("Tapping"));
 
 	BGroupLayout* tapPrefLayout = new BGroupLayout(B_HORIZONTAL);
 	tapPrefLayout->SetInsets(10, tapBox->TopBorderOffset() * 2 + 10, 10, 10);
 	tapBox->SetLayout(tapPrefLayout);
 
-	fTapSlider = new BSlider("tap_sens", B_TRANSLATE("Tap click sensitivity"),
+	fTapSlider = new BSlider("tap_sens", B_TRANSLATE("Sensitivity"),
 		new BMessage(TAP_CONTROL_CHANGED), 0, 20, B_HORIZONTAL);
 	fTapSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fTapSlider->SetHashMarkCount(7);
@@ -460,7 +460,6 @@ TouchpadPrefView::SetupView()
 	layout->AddView(scrollBox);
 	layout->AddView(tapBox);
 	layout->AddView(buttonView);
-
 }
 
 
