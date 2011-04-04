@@ -17,8 +17,8 @@ Options - in order of intended workflow:
 
 --download <lang>	Download tarball of language <lang>.
 
-				E.g retries of 0k file.
-				Or a language still unknown locally.
+			E.g retries of 0k file.
+			Or a language still unknown locally.
 
 --unpack		Unpack all tarballs in a big pile.
 
@@ -34,12 +34,12 @@ Options - in order of intended workflow:
 
 
 --diff			Show diffs for all languages. Paged. Divided by language.
---diff <lang>	Show diff for language <lang>. Paged.
+--diff <lang>		Show diff for language <lang>. Paged.
 
 --commit		Commit all languages, as separate commits.
-				A standard message will be used for each.
-				("Catalog update for language xx.")
-				You will be asked for svn password once per language.
+			A standard message will be used for each.
+			("Catalog update for language xx.")
+			You will be asked for svn password once per language.
 				
 			CAVEAT! :: hta_committer currently fails to commit a langauge
 			if one of the catkey files resides in a newly added folder,
@@ -49,6 +49,13 @@ Options - in order of intended workflow:
 (--commit <lang>)	Not implemented.
 
 --delete		Delete tarballs and tempfolder.
+
+--fix_fingerprints	Force expected fingerprints on catkeys that fail to build.
+
+			Don't use this unless the fingerprints broke due to your
+			editing of catalog entries, and you need the fingerprints
+			to be updated. (It's a brute-force approach, including two
+			full "jam clean". Caveat emptor.)
 
 
 '********************************************'
@@ -287,6 +294,33 @@ RemoveTempDirectoryIfEmpty()
 }
 
 
+FixFingerprintsOfFailingCatalogs()
+{
+	# Find the catalogs that won't build.
+	bad_catalogs=$( \
+		echo $( \
+			jam catalogs 2>&1 \
+			| awk '-Fsource-catalog ' '{print$2}' \
+			| awk '-F - error' '{print$1}' \
+			| sort -u));
+
+	# Find the present and the expected fingerprints.
+	# Produce a script to replace present fingerprints with the expected ones.
+	jam catalogs 2>&1  \
+		| grep 'instead of' \
+		| awk '-Fafter load ' '{print$2}' \
+		| awk '-F. The catalog data' '{print$1}' \
+		| sed 's/ instead of /\t/g' | sed 's/[()]//g' \
+		| awk '{print "sed -i s/" $2 "/" $1 "/g"}' \
+		| awk "{ print \$0\" $bad_catalogs\" }" \
+		> hta_fingerprint_correction_script.sh;
+
+	chmod u+x hta_fingerprint_correction_script.sh;
+	$(hta_fingerprint_correction_script.sh);
+	rm hta_fingerprint_correction_script.sh
+}
+
+
 if [ $# -eq 1 ] ; then
 	case "$1" in
 		--help)
@@ -357,6 +391,11 @@ if [ $# -eq 1 ] ; then
 			AssertCurrentDirIsSubversionTrunk
 			PopulateCommitLanguageList
 			CommitAllLanguages
+			exit
+			;;
+		--fix_fingerprints)
+			AssertCurrentDirIsSubversionTrunk
+			FixFingerprintsOfFailingCatalogs
 			exit
 			;;
 		*)
