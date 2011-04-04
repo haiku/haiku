@@ -1,10 +1,8 @@
 /*
- * Copyright 2006-2007, Haiku.
- * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2006-2007, 2011, Stephan Aßmus <superstippi@gmx.de>
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
+
 
 #include "CanvasView.h"
 
@@ -22,48 +20,47 @@
 #include "CommandStack.h"
 #include "IconRenderer.h"
 
+
 using std::nothrow;
 
-// constructor
+
 CanvasView::CanvasView(BRect frame)
-	: StateView(frame, "canvas view", B_FOLLOW_ALL,
-				B_WILL_DRAW | B_FRAME_EVENTS),
-	  fBitmap(new BBitmap(BRect(0, 0, 63, 63), 0, B_RGB32)),
-	  fBackground(new BBitmap(BRect(0, 0, 63, 63), 0, B_RGB32)),
-	  fIcon(NULL),
-	  fRenderer(new IconRenderer(fBitmap)),
-	  fDirtyIconArea(fBitmap->Bounds()),
+	:
+	StateView(frame, "canvas view", B_FOLLOW_ALL,
+		B_WILL_DRAW | B_FRAME_EVENTS),
+	fBitmap(new BBitmap(BRect(0, 0, 63, 63), 0, B_RGB32)),
+	fBackground(new BBitmap(BRect(0, 0, 63, 63), 0, B_RGB32)),
+	fIcon(NULL),
+	fRenderer(new IconRenderer(fBitmap)),
+	fDirtyIconArea(fBitmap->Bounds()),
 
-	  fCanvasOrigin(0.0, 0.0),
-	  fZoomLevel(1.0),
+	fCanvasOrigin(0.0, 0.0),
+	fZoomLevel(8.0),
 
-	  fSpaceHeldDown(false),
-	  fScrollTracking(false),
-	  fScrollTrackingStart(0.0, 0.0),
+	fSpaceHeldDown(false),
+	fInScrollTo(false),
+	fScrollTracking(false),
+	fScrollTrackingStart(0.0, 0.0),
 
-	  fMouseFilterMode(SNAPPING_OFF),
-
-	  fOffsreenBitmap(NULL),
-	  fOffsreenView(NULL)
+	fMouseFilterMode(SNAPPING_OFF)
 {
 	_MakeBackground();
 	fRenderer->SetBackground(fBackground);
 }
 
-// destructor
+
 CanvasView::~CanvasView()
 {
 	SetIcon(NULL);
 	delete fRenderer;
 	delete fBitmap;
 	delete fBackground;
-
-	_FreeBackBitmap();
 }
+
 
 // #pragma mark -
 
-// AttachedToWindow
+
 void
 CanvasView::AttachedToWindow()
 {
@@ -73,26 +70,24 @@ CanvasView::AttachedToWindow()
 	SetLowColor(kStripesHigh);
 	SetHighColor(kStripesLow);
 
+	// init data rect for scrolling and center bitmap in the view
+	BRect dataRect = _LayoutCanvas();
+	SetDataRect(dataRect);
 	BRect bounds(Bounds());
-
-	_AllocBackBitmap(bounds.Width(), bounds.Height());
-
-	// layout icon in the center
-	BRect bitmapBounds(fBitmap->Bounds());
-	fCanvasOrigin.x = floorf((bounds.left + bounds.right
-		- bitmapBounds.right - bitmapBounds.left) / 2.0 + 0.5);
-	fCanvasOrigin.y = floorf((bounds.top + bounds.bottom
-		- bitmapBounds.bottom - bitmapBounds.top) / 2.0 + 0.5);
-
-	_SetZoom(8.0, false);
+	BPoint dataRectCenter((dataRect.left + dataRect.right) / 2,
+		(dataRect.top + dataRect.bottom) / 2);
+	BPoint boundsCenter((bounds.left + bounds.right) / 2,
+		(bounds.top + bounds.bottom) / 2);
+	BPoint offset = ScrollOffset();
+	offset.x = roundf(offset.x + dataRectCenter.x - boundsCenter.x);
+	offset.y = roundf(offset.y + dataRectCenter.y - boundsCenter.y);
+	SetScrollOffset(offset);
 }
 
-// FrameResized
+
 void
 CanvasView::FrameResized(float width, float height)
 {
-	_AllocBackBitmap(width, height);
-
 	// keep canvas centered
 	BPoint oldCanvasOrigin = fCanvasOrigin;
 	SetDataRect(_LayoutCanvas());
@@ -100,58 +95,30 @@ CanvasView::FrameResized(float width, float height)
 		Invalidate();
 }
 
-// Draw
+
 void
 CanvasView::Draw(BRect updateRect)
 {
-	if (!fOffsreenView) {
-		_DrawInto(this, updateRect);
-	} else {
-		BPoint boundsLeftTop = Bounds().LeftTop();
-		if (fOffsreenBitmap->Lock()) {
-			fOffsreenView->PushState();
-
-			// apply scrolling offset to offscreen view
-			fOffsreenView->SetOrigin(-boundsLeftTop.x, -boundsLeftTop.y);
-			// mirror the clipping of this view
-			// to the offscreen view for performance
-			BRegion clipping;
-			GetClippingRegion(&clipping);
-			fOffsreenView->ConstrainClippingRegion(&clipping);
-
-			_DrawInto(fOffsreenView, updateRect);
-
-			fOffsreenView->PopState();
-			fOffsreenView->Sync();
-
-			fOffsreenBitmap->Unlock();
-		}
-		// compensate scrolling offset in BView
-		BRect bitmapRect = updateRect;
-		bitmapRect.OffsetBy(-boundsLeftTop.x, -boundsLeftTop.y);
-
-		SetDrawingMode(B_OP_COPY);
-		DrawBitmap(fOffsreenBitmap, bitmapRect, updateRect);
-	}
+	_DrawInto(this, updateRect);
 }
+
 
 // #pragma mark -
 
-// MouseDown
+
 void
 CanvasView::MouseDown(BPoint where)
 {
 	if (!IsFocus())
 		MakeFocus(true);
 
-	uint32 buttons;
-	if (Window()->CurrentMessage()->FindInt32("buttons",
-		(int32*)&buttons) < B_OK)
+	int32 buttons;
+	if (Window()->CurrentMessage()->FindInt32("buttons", &buttons) < B_OK)
 		buttons = 0;
 
 	// handle clicks of the third mouse button ourselves (panning),
 	// otherwise have StateView handle it (normal clicks)
-	if (fSpaceHeldDown || buttons & B_TERTIARY_MOUSE_BUTTON) {
+	if (fSpaceHeldDown || (buttons & B_TERTIARY_MOUSE_BUTTON) != 0) {
 		// switch into scrolling mode and update cursor
 		fScrollTracking = true;
 		where.x = roundf(where.x);
@@ -160,13 +127,13 @@ CanvasView::MouseDown(BPoint where)
 		fScrollTrackingStart = where - fScrollOffsetStart;
 		_UpdateToolCursor();
 		SetMouseEventMask(B_POINTER_EVENTS,
-						  B_LOCK_WINDOW_FOCUS | B_SUSPEND_VIEW_FOCUS);
+			B_LOCK_WINDOW_FOCUS | B_SUSPEND_VIEW_FOCUS);
 	} else {
 		StateView::MouseDown(where);
 	}
 }
 
-// MouseUp
+
 void
 CanvasView::MouseUp(BPoint where)
 {
@@ -183,7 +150,7 @@ CanvasView::MouseUp(BPoint where)
 	}
 }
 
-// MouseMoved
+
 void
 CanvasView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 {
@@ -206,7 +173,7 @@ CanvasView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage
 	}
 }
 
-// FilterMouse
+
 void
 CanvasView::FilterMouse(BPoint* where) const
 {
@@ -247,7 +214,7 @@ CanvasView::FilterMouse(BPoint* where) const
 	}
 }
 
-// MouseWheelChanged
+
 bool
 CanvasView::MouseWheelChanged(BPoint where, float x, float y)
 {
@@ -255,43 +222,66 @@ CanvasView::MouseWheelChanged(BPoint where, float x, float y)
 		return false;
 
 	if (y > 0.0) {
-		_SetZoom(_NextZoomOutLevel(fZoomLevel));
+		_SetZoom(_NextZoomOutLevel(fZoomLevel), true);
 		return true;
 	} else if (y < 0.0) {
-		_SetZoom(_NextZoomInLevel(fZoomLevel));
+		_SetZoom(_NextZoomInLevel(fZoomLevel), true);
 		return true;
 	}
 	return false;
 }
 
+
 // #pragma mark -
 
-// ScrollOffsetChanged
+
+void
+CanvasView::SetScrollOffset(BPoint newOffset)
+{
+	if (fInScrollTo)
+		return;
+
+	fInScrollTo = true;
+
+	newOffset = ValidScrollOffsetFor(newOffset);
+	if (!fScrollTracking) {
+		BPoint mouseOffset = newOffset - ScrollOffset();
+		MouseMoved(fMouseInfo.position + mouseOffset, fMouseInfo.transit,
+			NULL);
+	}
+
+	Scrollable::SetScrollOffset(newOffset);
+
+	fInScrollTo = false;
+}
+
+
 void
 CanvasView::ScrollOffsetChanged(BPoint oldOffset, BPoint newOffset)
 {
 	BPoint offset = newOffset - oldOffset;
 
-	if (offset == B_ORIGIN)
+	if (offset == B_ORIGIN) {
 		// prevent circular code (MouseMoved might call ScrollBy...)
 		return;
+	}
 
 	ScrollBy(offset.x, offset.y);
-
-	if (!fScrollTracking)
-		MouseMoved(fMouseInfo.position + offset, fMouseInfo.transit, NULL);
 }
 
-// VisibleSizeChanged
+
 void
-CanvasView::VisibleSizeChanged(float oldWidth, float oldHeight,
-							   float newWidth, float newHeight)
+CanvasView::VisibleSizeChanged(float oldWidth, float oldHeight, float newWidth,
+	float newHeight)
 {
+	BRect dataRect(_LayoutCanvas());
+	SetDataRect(dataRect);
 }
+
 
 // #pragma mark -
 
-// AreaInvalidated
+
 void
 CanvasView::AreaInvalidated(const BRect& area)
 {
@@ -308,7 +298,7 @@ CanvasView::AreaInvalidated(const BRect& area)
 
 // #pragma mark -
 
-// SetIcon
+
 void
 CanvasView::SetIcon(Icon* icon)
 {
@@ -325,7 +315,7 @@ CanvasView::SetIcon(Icon* icon)
 		fIcon->AddListener(this);
 }
 
-// SetMouseFilterMode
+
 void
 CanvasView::SetMouseFilterMode(uint32 mode)
 {
@@ -336,7 +326,7 @@ CanvasView::SetMouseFilterMode(uint32 mode)
 	Invalidate(_CanvasRect());
 }
 
-// ConvertFromCanvas
+
 void
 CanvasView::ConvertFromCanvas(BPoint* point) const
 {
@@ -344,7 +334,7 @@ CanvasView::ConvertFromCanvas(BPoint* point) const
 	point->y = point->y * fZoomLevel + fCanvasOrigin.y;
 }
 
-// ConvertToCanvas
+
 void
 CanvasView::ConvertToCanvas(BPoint* point) const
 {
@@ -352,7 +342,7 @@ CanvasView::ConvertToCanvas(BPoint* point) const
 	point->y = (point->y - fCanvasOrigin.y) / fZoomLevel;
 }
 
-// ConvertFromCanvas
+
 void
 CanvasView::ConvertFromCanvas(BRect* r) const
 {
@@ -366,7 +356,7 @@ CanvasView::ConvertFromCanvas(BRect* r) const
 	r->bottom--;
 }
 
-// ConvertToCanvas
+
 void
 CanvasView::ConvertToCanvas(BRect* r) const
 {
@@ -376,9 +366,10 @@ CanvasView::ConvertToCanvas(BRect* r) const
 	r->bottom = (r->bottom - fCanvasOrigin.y) / fZoomLevel;
 }
 
+
 // #pragma mark -
 
-// _HandleKeyDown
+
 bool
 CanvasView::_HandleKeyDown(uint32 key, uint32 modifiers)
 {
@@ -410,7 +401,7 @@ CanvasView::_HandleKeyDown(uint32 key, uint32 modifiers)
 	return true;
 }
 
-// _HandleKeyUp
+
 bool
 CanvasView::_HandleKeyUp(uint32 key, uint32 modifiers)
 {
@@ -427,66 +418,19 @@ CanvasView::_HandleKeyUp(uint32 key, uint32 modifiers)
 	return true;
 }
 
-// _CanvasRect()
+
 BRect
 CanvasView::_CanvasRect() const
 {
-	BRect r = fBitmap->Bounds();
+	BRect r;
+	if (fBitmap == NULL)
+		return r;
+	r = fBitmap->Bounds();
 	ConvertFromCanvas(&r);
 	return r;
 }
 
-// _AllocBackBitmap
-void
-CanvasView::_AllocBackBitmap(float width, float height)
-{
-	// sanity check
-	if (width <= 0.0 || height <= 0.0)
-		return;
 
-	if (fOffsreenBitmap) {
-		// see if the bitmap needs to be expanded
-		BRect b = fOffsreenBitmap->Bounds();
-		if (b.Width() >= width && b.Height() >= height)
-			return;
-
-		// it does; clean up:
-		_FreeBackBitmap();
-	}
-
-	BRect b(0.0, 0.0, width, height);
-	fOffsreenBitmap = new (nothrow) BBitmap(b, B_RGB32, true);
-	if (!fOffsreenBitmap) {
-		fprintf(stderr, "CanvasView::_AllocBackBitmap(): failed to allocate\n");
-		return;
-	}
-	if (fOffsreenBitmap->IsValid()) {
-		fOffsreenView = new BView(b, 0, B_FOLLOW_NONE, B_WILL_DRAW);
-		BFont font;
-		GetFont(&font);
-		fOffsreenView->SetFont(&font);
-		fOffsreenView->SetHighColor(HighColor());
-		fOffsreenView->SetLowColor(LowColor());
-		fOffsreenView->SetFlags(Flags());
-		fOffsreenBitmap->AddChild(fOffsreenView);
-	} else {
-		_FreeBackBitmap();
-		fprintf(stderr, "CanvasView::_AllocBackBitmap(): bitmap invalid\n");
-	}
-}
-
-// _FreeBackBitmap
-void
-CanvasView::_FreeBackBitmap()
-{
-	if (fOffsreenBitmap) {
-		delete fOffsreenBitmap;
-		fOffsreenBitmap = NULL;
-		fOffsreenView = NULL;
-	}
-}
-
-// _DrawInto
 void
 CanvasView::_DrawInto(BView* view, BRect updateRect)
 {
@@ -537,7 +481,7 @@ CanvasView::_DrawInto(BView* view, BRect updateRect)
 	StateView::Draw(view, updateRect);
 }
 
-// _MakeBackground
+
 void
 CanvasView::_MakeBackground()
 {
@@ -585,7 +529,7 @@ CanvasView::_MakeBackground()
 	}
 }
 
-// _UpdateToolCursor
+
 void
 CanvasView::_UpdateToolCursor()
 {
@@ -605,9 +549,10 @@ CanvasView::_UpdateToolCursor()
 	}
 }
 
+
 // #pragma mark -
 
-// _NextZoomInLevel
+
 double
 CanvasView::_NextZoomInLevel(double zoom) const
 {
@@ -632,7 +577,7 @@ CanvasView::_NextZoomInLevel(double zoom) const
 	return 64;
 }
 
-// _NextZoomOutLevel
+
 double
 CanvasView::_NextZoomOutLevel(double zoom) const
 {
@@ -655,69 +600,69 @@ CanvasView::_NextZoomOutLevel(double zoom) const
 	return 1;
 }
 
-// _SetZoom
+
 void
 CanvasView::_SetZoom(double zoomLevel, bool mouseIsAnchor)
 {
 	if (fZoomLevel == zoomLevel)
 		return;
 
-	// TODO: still not working 100% correctly
-
-	// zoom into center of view
-	BRect bounds(Bounds());
 	BPoint anchor;
-	anchor.x = (bounds.left + bounds.right + 1) / 2.0;
-	anchor.y = (bounds.top + bounds.bottom + 1) / 2.0;
+	if (mouseIsAnchor) {
+		// zoom into mouse position
+		anchor = MouseInfo()->position;
+	} else {
+		// zoom into center of view
+		BRect bounds(Bounds());
+		anchor.x = (bounds.left + bounds.right + 1) / 2.0;
+		anchor.y = (bounds.top + bounds.bottom + 1) / 2.0;
+	}
 
 	BPoint canvasAnchor = anchor;
 	ConvertToCanvas(&canvasAnchor);
 
 	fZoomLevel = zoomLevel;
-	SetDataRect(_LayoutCanvas());
+	BRect dataRect = _LayoutCanvas();
 
 	ConvertFromCanvas(&canvasAnchor);
 
-	BPoint offset;
-	offset.x = roundf(canvasAnchor.x - anchor.x);
-	offset.y = roundf(canvasAnchor.y - anchor.y);
-
-	SetScrollOffset(ScrollOffset() + offset);
+	BPoint offset = ScrollOffset();
+	offset.x = roundf(offset.x + canvasAnchor.x - anchor.x);
+	offset.y = roundf(offset.y + canvasAnchor.y - anchor.y);
 
 	Invalidate();
+
+	SetDataRectAndScrollOffset(dataRect, offset);
 }
 
-// _LayoutCanvas
+
 BRect
 CanvasView::_LayoutCanvas()
 {
-	if (!fBitmap)
-		return BRect(0, 0, -1, -1);
-
 	// size of zoomed bitmap
-	BRect r(fBitmap->Bounds());
-	r.OffsetTo(0, 0);
-	r.right = floorf((r.Width() + 1) * fZoomLevel + 0.5) - 1;
-	r.bottom = floorf((r.Height() + 1) * fZoomLevel + 0.5) - 1;
+	BRect r(_CanvasRect());
+	r.OffsetTo(B_ORIGIN);
 
-	// TODO: ask manipulators to extend size
-
-	BRect bitmapRect = r;
+	// ask current view state to extend size
+	// TODO: Ask StateViewState to extend bounds...
+	BRect stateBounds = r; //ViewStateBounds();
 
 	// resize for empty area around bitmap
 	// (the size we want, but might still be much smaller than view)
-	r.right += r.Width() * 0.5;
-	r.bottom += r.Height() * 0.5;
+	r.InsetBy(-50, -50);
 
-	// left top of canvas within empty area
+	// center data rect in bounds
 	BRect bounds(Bounds());
-	bounds.OffsetTo(B_ORIGIN);
-	bounds = bounds | r;
-	fCanvasOrigin.x = floorf((bounds.left + bounds.right
-		- bitmapRect.right - bitmapRect.left) / 2.0 + 0.5);
-	fCanvasOrigin.y = floorf((bounds.top + bounds.bottom
-		- bitmapRect.bottom - bitmapRect.top) / 2.0 + 0.5);
+	if (bounds.Width() > r.Width())
+		r.InsetBy(-ceilf((bounds.Width() - r.Width()) / 2), 0);
+	if (bounds.Height() > r.Height())
+		r.InsetBy(0, -ceilf((bounds.Height() - r.Height()) / 2));
 
-	return bounds;
+	if (stateBounds.IsValid()) {
+		stateBounds.InsetBy(-20, -20);
+		r = r | stateBounds;
+	}
+
+	return r;
 }
 

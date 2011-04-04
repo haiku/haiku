@@ -1,9 +1,6 @@
 /*
- * Copyright 2006-2007, Haiku.
- * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2006-2007, 2011, Stephan Aßmus <superstippi@gmx.de>
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef CANVAS_VIEW_H
 #define CANVAS_VIEW_H
@@ -30,10 +27,9 @@ enum {
 	SNAPPING_16,
 };
 
-class CanvasView : public StateView,
-				   public Scrollable,
-				   public IconListener {
- public:
+
+class CanvasView : public StateView, public Scrollable, public IconListener {
+public:
 								CanvasView(BRect frame);
 	virtual						~CanvasView();
 
@@ -45,22 +41,22 @@ class CanvasView : public StateView,
 	virtual	void				MouseDown(BPoint where);
 	virtual	void				MouseUp(BPoint where);
 	virtual	void				MouseMoved(BPoint where, uint32 transit,
-										   const BMessage* dragMessage);
+									const BMessage* dragMessage);
 	virtual	void				FilterMouse(BPoint* where) const;
 
 	virtual	bool				MouseWheelChanged(BPoint where,
-												  float x, float y);
+									float x, float y);
 
 	// Scrollable interface
- protected:
+protected:
+	virtual	void				SetScrollOffset(BPoint newOffset);
 	virtual	void				ScrollOffsetChanged(BPoint oldOffset,
-													BPoint newOffset);
+									BPoint newOffset);
 	virtual	void				VisibleSizeChanged(float oldWidth,
-												   float oldHeight,
-												   float newWidth,
-												   float newHeight);
+									float oldHeight, float newWidth,
+									float newHeight);
 	// IconListener interface
- public:
+public:
 	virtual	void				AreaInvalidated(const BRect& area);
 
 	// CanvasView
@@ -79,7 +75,7 @@ class CanvasView : public StateView,
 			void				ConvertFromCanvas(BRect* rect) const;
 			void				ConvertToCanvas(BRect* rect) const;
 
- protected:
+protected:
 	// StateView interface
 	virtual	bool				_HandleKeyDown(uint32 key, uint32 modifiers);
 	virtual	bool				_HandleKeyUp(uint32 key, uint32 modifiers);
@@ -91,19 +87,20 @@ class CanvasView : public StateView,
 												 float height);
 			void				_FreeBackBitmap();
 			void				_DrawInto(BView* view,
-										  BRect updateRect);
+									BRect updateRect);
 
 			void				_MakeBackground();
 
 			void				_UpdateToolCursor();
 
- private:
+private:
 			double				_NextZoomInLevel(double zoom) const;
 			double				_NextZoomOutLevel(double zoom) const;
 			void				_SetZoom(double zoomLevel,
-										 bool mouseIsAnchor = true);
+									bool mouseIsAnchor = true);
 			BRect				_LayoutCanvas();
 
+private:
 			BBitmap*			fBitmap;
 			BBitmap*			fBackground;
 
@@ -115,6 +112,7 @@ class CanvasView : public StateView,
 			double				fZoomLevel;
 
 			bool				fSpaceHeldDown;
+			bool				fInScrollTo;
 			bool				fScrollTracking;
 			BPoint				fScrollTrackingStart;
 			BPoint				fScrollOffsetStart;
