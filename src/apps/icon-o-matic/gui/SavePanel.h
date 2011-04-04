@@ -77,7 +77,9 @@ class SavePanel : public BFilePanel,
 				SaveItem*		fRDefMI;
 				SaveItem*		fSourceMI;
 				SaveItem*		fSVGMI;
-				SaveItem*		fBitmapMI;
+				SaveItem*		fBitmap16MI;
+				SaveItem*		fBitmap32MI;
+				SaveItem*		fBitmap64MI;
 				SaveItem*		fBitmapSetMI;
 				SaveItem*		fIconAttrMI;
 				SaveItem*		fIconMimeAttrMI;

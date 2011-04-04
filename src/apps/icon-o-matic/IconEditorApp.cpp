@@ -136,7 +136,7 @@ IconEditorApp::MessageReceived(BMessage* message)
 				saver = fDocument->NativeSaver();
 			else
 				saver = fDocument->ExportSaver();
-			if (saver) {
+			if (saver != NULL) {
 				saver->Save(fDocument);
 				_PickUpActionBeforeSave();
 				break;
@@ -171,24 +171,26 @@ IconEditorApp::MessageReceived(BMessage* message)
 				}
 				_SyncPanels(fSavePanel, fOpenPanel);
 			} else {
+				printf("configure file panel\n");
 				// configure the file panel
 				const char* saveText = NULL;
 				FileSaver* saver = dynamic_cast<FileSaver*>(
 					fDocument->NativeSaver());
-
-				bool exportMode = message->what == MSG_EXPORT_AS
-									|| message->what == MSG_EXPORT;
-				if (exportMode) {
-					saver = dynamic_cast<FileSaver*>(
-						fDocument->ExportSaver());
-				}
-
-				if (saver)
+				if (saver != NULL)
 					saveText = saver->Ref()->name;
 
-				fSavePanel->SetExportMode(exportMode);
+				bool isExportMode = message->what == MSG_EXPORT_AS
+					|| message->what == MSG_EXPORT;
+				if (isExportMode) {
+					saver = dynamic_cast<FileSaver*>(
+						fDocument->ExportSaver());
+					if (saver != NULL && saver->Ref()->name != NULL)
+						saveText = saver->Ref()->name;
+				}
+
+				fSavePanel->SetExportMode(isExportMode);
 //				fSavePanel->Refresh();
-				if (saveText)
+				if (saveText != NULL)
 					fSavePanel->SetSaveText(saveText);
 				fSavePanel->Show();
 			}
@@ -469,8 +471,7 @@ IconEditorApp::_Open(const entry_ref& ref, bool append)
 		// least one ref already
 		switch (refMode) {
 			case REF_MESSAGE:
-				fDocument->SetNativeSaver(
-					new NativeSaver(ref));
+				fDocument->SetNativeSaver(new NativeSaver(ref));
 				break;
 			case REF_FLAT:
 				fDocument->SetExportSaver(
@@ -592,7 +593,13 @@ IconEditorApp::_CreateSaver(const entry_ref& ref, uint32 exportMode)
 			saver = new SimpleFileSaver(new SourceExporter(), ref);
 			break;
 
-		case EXPORT_MODE_BITMAP:
+		case EXPORT_MODE_BITMAP_16:
+			saver = new SimpleFileSaver(new BitmapExporter(16), ref);
+			break;
+		case EXPORT_MODE_BITMAP_32:
+			saver = new SimpleFileSaver(new BitmapExporter(32), ref);
+			break;
+		case EXPORT_MODE_BITMAP_64:
 			saver = new SimpleFileSaver(new BitmapExporter(64), ref);
 			break;
 

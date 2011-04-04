@@ -239,8 +239,14 @@ SavePanel::SetExportMode(int32 mode)
 		case EXPORT_MODE_SVG:
 			fSVGMI->SetMarked(true);
 			break;
-		case EXPORT_MODE_BITMAP:
-			fBitmapMI->SetMarked(true);
+		case EXPORT_MODE_BITMAP_16:
+			fBitmap16MI->SetMarked(true);
+			break;
+		case EXPORT_MODE_BITMAP_32:
+			fBitmap32MI->SetMarked(true);
+			break;
+		case EXPORT_MODE_BITMAP_64:
+			fBitmap64MI->SetMarked(true);
 			break;
 		case EXPORT_MODE_BITMAP_SET:
 			fBitmapSetMI->SetMarked(true);
@@ -413,9 +419,17 @@ SavePanel::_BuildMenu()
 
 	fFormatM->AddSeparatorItem();
 
-	fBitmapMI = new SaveItem("PNG",
-		new BMessage(MSG_FORMAT), EXPORT_MODE_BITMAP);
-	fFormatM->AddItem(fBitmapMI);
+	fBitmap16MI = new SaveItem("PNG 16x16",
+		new BMessage(MSG_FORMAT), EXPORT_MODE_BITMAP_16);
+	fFormatM->AddItem(fBitmap16MI);
+
+	fBitmap32MI = new SaveItem("PNG 32x32",
+		new BMessage(MSG_FORMAT), EXPORT_MODE_BITMAP_32);
+	fFormatM->AddItem(fBitmap32MI);
+
+	fBitmap64MI = new SaveItem("PNG 64x64",
+		new BMessage(MSG_FORMAT), EXPORT_MODE_BITMAP_64);
+	fFormatM->AddItem(fBitmap64MI);
 
 	fBitmapSetMI = new SaveItem(B_TRANSLATE("PNG Set"), 
 		new BMessage(MSG_FORMAT), EXPORT_MODE_BITMAP_SET);
