@@ -367,11 +367,9 @@ StyledTextImporter::_AddStyle(Icon *icon, text_run *run)
 	if (!run)
 		return EINVAL;
 	rgb_color color = run->color;
-	Style* style = new (nothrow) Style(color);
-	if (!style) {
-		delete style;
+	Style* style = new(std::nothrow) Style(color);
+	if (style == NULL)
 		return B_NO_MEMORY;
-	}
 	char name[30];
 	sprintf(name, B_TRANSLATE("Color (#%02x%02x%02x)"),
 		color.red, color.green, color.blue);
