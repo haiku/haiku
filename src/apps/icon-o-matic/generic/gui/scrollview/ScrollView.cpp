@@ -138,31 +138,34 @@ ScrollCorner::ScrollCorner(ScrollView* scrollView)
 	  fStartPoint(0, 0),
 	  fStartScrollOffset(0, 0)
 {
-//printf("ScrollCorner::ScrollCorner(%p)\n", scrollView);
 	SetViewColor(B_TRANSPARENT_32_BIT);
-//printf("setting up bitmap 0\n");
-	fBitmaps[0] = new BBitmap(BRect(0.0f, 0.0f, sBitmapWidth, sBitmapHeight), sColorSpace);
-//	fBitmaps[0]->SetBits((void *)sScrollCornerNormalBits, fBitmaps[0]->BitsLength(), 0L, sColorSpace);
-	char *bits = (char *)fBitmaps[0]->Bits();
+
+	fBitmaps[0] = new BBitmap(BRect(0.0f, 0.0f, sBitmapWidth - 1,
+		sBitmapHeight - 1), sColorSpace);
+	char* bits = (char*)fBitmaps[0]->Bits();
 	int32 bpr = fBitmaps[0]->BytesPerRow();
-	for (int i = 0; i <= sBitmapHeight; i++, bits += bpr)
-		memcpy(bits, &sScrollCornerNormalBits[i * sBitmapHeight * 4], sBitmapWidth * 4);
+	for (int i = 0; i < sBitmapHeight; i++, bits += bpr) {
+		memcpy(bits, &sScrollCornerNormalBits[i * sBitmapHeight * 4],
+			sBitmapWidth * 4);
+	}
 
-//printf("setting up bitmap 1\n");
-	fBitmaps[1] = new BBitmap(BRect(0.0f, 0.0f, sBitmapWidth, sBitmapHeight), sColorSpace);
-//	fBitmaps[1]->SetBits((void *)sScrollCornerPushedBits, fBitmaps[1]->BitsLength(), 0L, sColorSpace);
-	bits = (char *)fBitmaps[1]->Bits();
+	fBitmaps[1] = new BBitmap(BRect(0.0f, 0.0f, sBitmapWidth - 1,
+		sBitmapHeight - 1), sColorSpace);
+	bits = (char*)fBitmaps[1]->Bits();
 	bpr = fBitmaps[1]->BytesPerRow();
-	for (int i = 0; i <= sBitmapHeight; i++, bits += bpr)
-		memcpy(bits, &sScrollCornerPushedBits[i * sBitmapHeight * 4], sBitmapWidth * 4);
+	for (int i = 0; i < sBitmapHeight; i++, bits += bpr) {
+		memcpy(bits, &sScrollCornerPushedBits[i * sBitmapHeight * 4],
+			sBitmapWidth * 4);
+	}
 
-//printf("setting up bitmap 2\n");
-	fBitmaps[2] = new BBitmap(BRect(0.0f, 0.0f, sBitmapWidth, sBitmapHeight), sColorSpace);
-//	fBitmaps[2]->SetBits((void *)sScrollCornerDisabledBits, fBitmaps[2]->BitsLength(), 0L, sColorSpace);
-	bits = (char *)fBitmaps[2]->Bits();
+	fBitmaps[2] = new BBitmap(BRect(0.0f, 0.0f, sBitmapWidth - 1,
+		sBitmapHeight - 1), sColorSpace);
+	bits = (char*)fBitmaps[2]->Bits();
 	bpr = fBitmaps[2]->BytesPerRow();
-	for (int i = 0; i <= sBitmapHeight; i++, bits += bpr)
-		memcpy(bits, &sScrollCornerDisabledBits[i * sBitmapHeight * 4], sBitmapWidth * 4);
+	for (int i = 0; i < sBitmapHeight; i++, bits += bpr) {
+		memcpy(bits, &sScrollCornerDisabledBits[i * sBitmapHeight * 4],
+			sBitmapWidth * 4);
+	}
 }
 
 // destructor
