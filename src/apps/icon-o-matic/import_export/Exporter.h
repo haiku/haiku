@@ -1,9 +1,6 @@
 /*
- * Copyright 2006-2007, Haiku. All rights reserved.
- * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2006, 2007, 2011, Stephan Aßmus <superstippi@gmx.de>.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef EXPORTER_H
 #define EXPORTER_H
@@ -40,6 +37,8 @@ class Exporter {
 	virtual	const char*			MIMEType() = 0;
 
 			void				SetSelfDestroy(bool selfDestroy);
+
+			void				WaitForExportThread();
 
  private:
 	static	int32				_ExportThreadEntry(void* cookie);

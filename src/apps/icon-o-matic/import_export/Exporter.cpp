@@ -1,10 +1,8 @@
 /*
- * Copyright 2006, Haiku. All rights reserved.
- * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2006, 2011, Stephan Aßmus <superstippi@gmx.de>.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
+
 
 #include "Exporter.h"
 
@@ -33,7 +31,7 @@
 
 using std::nothrow;
 
-// constructor
+
 Exporter::Exporter()
 	: fDocument(NULL),
 	  fClonedIcon(NULL),
@@ -43,18 +41,15 @@ Exporter::Exporter()
 {
 }
 
-// destructor
+
 Exporter::~Exporter()
 {
-	if (fExportThread >= 0 && find_thread(NULL) != fExportThread) {
-		status_t ret;
-		wait_for_thread(fExportThread, &ret);
-	}
+	WaitForExportThread();
 
 	delete fClonedIcon;
 }
 
-// Export
+
 status_t
 Exporter::Export(Document* document, const entry_ref& ref)
 {
@@ -70,22 +65,36 @@ Exporter::Export(Document* document, const entry_ref& ref)
 
 	fExportThread = spawn_thread(_ExportThreadEntry, "export",
 								 B_NORMAL_PRIORITY, this);
-	if (fExportThread >= B_OK)
-		resume_thread(fExportThread);
+	if (fExportThread < 0)
+		return (status_t)fExportThread;
 
-	return fExportThread;
+	resume_thread(fExportThread);
+
+	return B_OK;
 }
 
-// SetSelfDestroy
+
 void
 Exporter::SetSelfDestroy(bool selfDestroy)
 {
 	fSelfDestroy = selfDestroy;
 }
 
+
+void
+Exporter::WaitForExportThread()
+{
+	if (fExportThread >= 0 && find_thread(NULL) != fExportThread) {
+		status_t ret;
+		wait_for_thread(fExportThread, &ret);
+		fExportThread = -1;
+	}
+}
+
+
 // #pragma mark -
 
-// _ExportThreadEntry
+
 int32
 Exporter::_ExportThreadEntry(void* cookie)
 {
@@ -93,7 +102,7 @@ Exporter::_ExportThreadEntry(void* cookie)
 	return exporter->_ExportThread();
 }
 
-// _ExportThread
+
 int32
 Exporter::_ExportThread()
 {
@@ -132,10 +141,9 @@ Exporter::_ExportThread()
 	return ret;
 }
 
-// _Export
+
 status_t
-Exporter::_Export(const Icon* icon,
-				  const entry_ref* docRef)
+Exporter::_Export(const Icon* icon, const entry_ref* docRef)
 {
 	// TODO: reenable the commented out code, but make it work
 	// the opposite direction, ie *copy* the file contents
