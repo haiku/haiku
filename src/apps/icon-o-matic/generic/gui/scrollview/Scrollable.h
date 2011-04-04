@@ -1,11 +1,7 @@
 /*
- * Copyright 2006, Haiku.
- * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
+ * Copyright 2001-2009, Ingo Weinhold <ingo_weinhold@gmx.de>
+ * All rights reserved. Distributed under the terms of the MIT license.
  */
-
 #ifndef SCROLLABLE_H
 #define SCROLLABLE_H
 
@@ -22,11 +18,19 @@ class Scrollable {
 			void				SetScrollSource(Scroller* source);
 			Scroller*			ScrollSource() const;
 
-			void				SetDataRect(BRect dataRect);
+			void				SetDataRect(BRect dataRect,
+									bool validateScrollOffset = true);
 			BRect				DataRect() const;
 
-			void				SetScrollOffset(BPoint offset);
+	virtual	void				SetScrollOffset(BPoint offset);
 			BPoint				ScrollOffset() const;
+
+			void				SetDataRectAndScrollOffset(BRect dataRect,
+									BPoint offset);
+
+			BPoint				ValidScrollOffsetFor(BPoint offset) const;
+			BPoint				ValidScrollOffsetFor(BPoint offset,
+									const BRect& dataRect) const;
 
 			void				SetVisibleSize(float width, float height);
 			BRect				VisibleBounds() const;
@@ -50,8 +54,6 @@ protected:
 			float				fVisibleWidth;
 			float				fVisibleHeight;
 			Scroller*			fScrollSource;
-
-			BPoint				_ValidScrollOffsetFor(BPoint offset) const;
 };
 
 
