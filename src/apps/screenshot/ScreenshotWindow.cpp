@@ -34,6 +34,7 @@
 #include <MessageFilter.h>
 #include <Path.h>
 #include <Roster.h>
+#include <SpaceLayoutItem.h>
 #include <String.h>
 #include <StringView.h>
 #include <TextControl.h>
@@ -190,17 +191,18 @@ ScreenshotWindow::ScreenshotWindow(const Utility& utility, bool silent,
 		new BMessage(kSaveScreenshot));
 
 	fPreview = new PreviewView();
-
+	
 	BGridLayout* gridLayout = BGridLayoutBuilder(0.0, 5.0)
 		.Add(fDelayControl->CreateLabelLayoutItem(), 0, 0)
 		.Add(fDelayControl->CreateTextViewLayoutItem(), 1, 0)
-		.Add(seconds, 2, 0)	
+		.Add(BSpaceLayoutItem::CreateHorizontalStrut(5), 2, 0)
+		.Add(seconds, 3, 0)	
 		.Add(fNameControl->CreateLabelLayoutItem(), 0, 1)
-		.Add(fNameControl->CreateTextViewLayoutItem(), 1, 1, 2, 1)
+		.Add(fNameControl->CreateTextViewLayoutItem(), 1, 1, 3, 1)
 		.Add(menuLocation->CreateLabelLayoutItem(), 0, 2)
-		.Add(menuLocation->CreateMenuBarLayoutItem(), 1, 2, 2, 1)
+		.Add(menuLocation->CreateMenuBarLayoutItem(), 1, 2, 3, 1)
 		.Add(menuFormat->CreateLabelLayoutItem(), 0, 3)
-		.Add(menuFormat->CreateMenuBarLayoutItem(), 1, 3, 2, 1);
+		.Add(menuFormat->CreateMenuBarLayoutItem(), 1, 3, 3, 1);
 	
 	gridLayout->SetMinColumnWidth(1,
 		menuFormat->StringWidth("SomethingLongHere"));
