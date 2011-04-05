@@ -24,7 +24,16 @@ using BPrivate::B_WEEK_START_SUNDAY;
 using BPrivate::B_WEEK_START_MONDAY;
 
 
-//	#pragma mark -- FlatButton
+enum {
+	kInvokationMessage,
+	kMonthDownMessage,
+	kMonthUpMessage,
+	kYearDownMessage,
+	kYearUpMessage
+};
+
+
+//	#pragma mark - FlatButton
 
 
 class FlatButton : public BButton {
@@ -66,16 +75,7 @@ FlatButton::Draw(BRect updateRect)
 }
 
 
-//	#pragma mark -- CalendarMenuWindow
-
-
-enum {
-	kInvokationMessage,
-	kMonthDownMessage,
-	kMonthUpMessage,
-	kYearDownMessage,
-	kYearUpMessage
-};
+//	#pragma mark - CalendarMenuWindow
 
 
 CalendarMenuWindow::CalendarMenuWindow(BPoint where)
@@ -95,15 +95,11 @@ CalendarMenuWindow::CalendarMenuWindow(BPoint where)
 	AddShortcut('W', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
 
 	fYearLabel = new BStringView("year", "");
-	fYearLabel->SetFontSize(10.0);
-
 	fMonthLabel = new BStringView("month", "");
-	fMonthLabel->SetFontSize(10.0);
 
 	fCalendarView = new BCalendarView(Bounds(), "calendar",
 		startOfWeek, B_FOLLOW_ALL);
 	fCalendarView->SetInvocationMessage(new BMessage(kInvokationMessage));
-	fCalendarView->SetFontSize(10.0);
 
 	BGroupLayout* layout = new BGroupLayout(B_HORIZONTAL);
 	SetLayout(layout);
@@ -254,7 +250,6 @@ CalendarMenuWindow::_SetupButton(const char* label, uint32 what, float height)
 {
 	FlatButton* button = new FlatButton(label, what);
 	button->SetExplicitMinSize(BSize(height, height));
-	button->SetFontSize(be_plain_font->Size() * 0.8);
 
 	return button;
 }
