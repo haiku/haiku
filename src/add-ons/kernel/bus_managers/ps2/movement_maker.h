@@ -28,7 +28,6 @@ struct touch_event {
 
 struct hardware_specs {
 	uint16		edgeMotionWidth;
-	uint16		edgeMotionSpeedFactor;
 
 	uint16		areaStartX;
 	uint16		areaEndX;
@@ -76,17 +75,18 @@ protected:
 			int8				fSpeed;
 			int16				fAreaWidth;
 			int16				fAreaHeight;
+
 private:
 			void				_GetRawMovement(uint32 posX, uint32 posY);
 			void				_ComputeAcceleration(int8 accel_factor);
 
 			
-			bool				movementStarted;
+			bool				fMovementMakerStarted;
 
-			uint32				previousX;
-			uint32				previousY;
-			int32				deltaSumX;
-			int32				deltaSumY;
+			uint32				fPreviousX;
+			uint32				fPreviousY;
+			int32				fDeltaSumX;
+			int32				fDeltaSumY;
 
 			int8				fSmallMovement;
 };
@@ -94,6 +94,7 @@ private:
 
 enum button_ids
 {
+	kNoButton = 0x00,
 	kLeftButton = 0x01,
 	kRightButton = 0x02	
 };
@@ -105,6 +106,9 @@ public:
 
 			status_t			EventToMovement(touch_event *event,
 									mouse_movement *movement);
+
+			bool				TapDragStarted() { return fTapdragStarted; }
+			bool				WasEdgeMotion() { return fValidEdgeMotion; }
 
 			bigtime_t			click_speed;
 private:
@@ -118,20 +122,24 @@ private:
 	inline	bool				_CheckScrollingToMovement(touch_event *event,
 									mouse_movement *movement);
 
-			bool				movement_started;
-			bool				scrolling_started;
-			bool				tap_started;
-			bigtime_t			tap_time;
-			int32				tap_delta_x;
-			int32				tap_delta_y;
-			int32				tap_clicks;
-			bool				tapdrag_started;
-			bool				valid_edge_motion;
-			bool				double_click;
+			bool				fMovementStarted;
+			bool				fScrollingStarted;
+			bool				fTapStarted;
+			bigtime_t			fTapTime;
+			int32				fTapDeltaX;
+			int32				fTapDeltaY;
+			int32				fTapClicks;
+			bool				fTapdragStarted;
 
-			bigtime_t			click_last_time;
-			int32				click_count;
-			uint32				buttons_state;	
+			bool				fValidEdgeMotion;
+			bigtime_t			fLastEdgeMotion;
+			float				fRestEdgeMotion;
+
+			bool				fDoubleClick;
+
+			bigtime_t			fClickLastTime;
+			int32				fClickCount;
+			uint32				fButtonsState;
 };
 
 

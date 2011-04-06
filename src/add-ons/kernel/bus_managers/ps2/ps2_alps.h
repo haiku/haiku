@@ -11,18 +11,18 @@
 
 
 typedef struct {
-	ps2_dev*			dev;
+			ps2_dev*			dev;
 
-	sem_id				sem;
-struct packet_buffer*	ring_buffer;
-	size_t				packet_index;
-	uint8				buffer[PS2_PACKET_ALPS];
-	uint8				mode;
+			sem_id				sem;
+	struct	packet_buffer*		ring_buffer;
+			size_t				packet_index;
+			uint8				buffer[PS2_PACKET_ALPS];
+			uint8				mode;
 
-	uint8				previousZ;
-	TouchpadMovement	movementMaker;
+			uint8				previousZ;
+			TouchpadMovement	movementMaker;
 
-	touchpad_settings	settings;
+			touchpad_settings	settings;
 } alps_cookie;
 
 

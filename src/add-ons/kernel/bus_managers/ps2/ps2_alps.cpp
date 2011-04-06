@@ -18,6 +18,71 @@
 #include "ps2_service.h"
 
 
+static int32 generate_event(timer* timer);
+
+
+const bigtime_t kEventInterval = 1000 * 50;
+
+
+class EventProducer {
+public:
+	EventProducer()
+	{
+		fFired = false;
+	}
+
+	status_t
+	FireEvent(alps_cookie* cookie, uint8* package)
+	{
+		fCookie = cookie;
+		memcpy(fLastPackage, package, sizeof(uint8) * PS2_PACKET_ALPS);
+
+		status_t status = add_timer(&fEventTimer, &generate_event,
+			kEventInterval, B_ONE_SHOT_RELATIVE_TIMER);
+		if (status == B_OK)
+			fFired  = true;
+		return status;
+	}
+
+	bool
+	CancelEvent()
+	{
+		if (!fFired)
+			return false;
+		fFired = false;
+		return cancel_timer(&fEventTimer);
+	}
+
+	void
+	InjectEvent()
+	{
+		if (packet_buffer_write(fCookie->ring_buffer, fLastPackage,
+			PS2_PACKET_ALPS) != PS2_PACKET_ALPS) {
+			// buffer is full, drop new data
+			return;
+		}
+		release_sem_etc(fCookie->sem, 1, B_DO_NOT_RESCHEDULE);
+	}
+
+private:
+	bool				fFired;
+	uint8				fLastPackage[PS2_PACKET_ALPS];
+	timer				fEventTimer;	
+	alps_cookie*		fCookie;		
+};
+
+
+static EventProducer gEventProducer;
+
+
+static int32
+generate_event(timer* timer)
+{
+	gEventProducer.InjectEvent();
+	return 0;
+}
+
+
 const char* kALPSPath[4] = {
 	"input/touchpad/ps2/alps_0",
 	"input/touchpad/ps2/alps_1",
@@ -100,13 +165,12 @@ static alps_model_info* sFoundModel = NULL;
 
 
 // touchpad proportions
-#define EDGE_MOTION_WIDTH	45 
-#define EDGE_MOTION_SPEED	4
+#define EDGE_MOTION_WIDTH	55
 // increase the touchpad size a little bit
 #define AREA_START_X		40
 #define AREA_END_X			987
 #define AREA_START_Y		40
-#define AREA_END_Y			733
+#define AREA_END_Y			734
 
 #define MIN_PRESSURE		15
 #define REAL_MAX_PRESSURE	70
@@ -128,13 +192,6 @@ byte 3:  0   y9   y8   y7    1    M    R    L
 byte 4:  0   y6   y5   y4   y3   y2   y1   y0
 byte 5:  0   z6   z5   z4   z3   z2   z1   z0
 */
-// debug 
-static uint32 minX = 50000;
-static uint32 minY = 50000;
-static uint32 maxX = 0;
-static uint32 maxY = 0;
-static uint32 maxZ = 0;
-// debug end
 static status_t
 get_alps_movment(alps_cookie *cookie, mouse_movement *movement)
 {
@@ -174,30 +231,13 @@ get_alps_movment(alps_cookie *cookie, mouse_movement *movement)
 		event.wValue = 4;
 	}
 	// if hardware tab gesture is off a z pressure of 16 is reported
-	//if (cookie->previousZ == 0 && event.wValue == 4 && event.zPressure == 16)
-	//	event.zPressure = 60;
+	if (cookie->previousZ == 0 && event.wValue == 4 && event.zPressure == 16)
+		event.zPressure = 60;
 
 	cookie->previousZ = event.zPressure;
 
  	event.xPosition = event_buffer[1] | ((event_buffer[2] & 0x78) << 4);
  	event.yPosition = event_buffer[4] | ((event_buffer[3] & 0x70) << 3);
-
-// debug 
-if (event.xPosition < minX)
-	minX = event.xPosition;
-if (event.yPosition < minY)
-	minY = event.yPosition;
-if (event.xPosition > maxX)
-	maxX = event.xPosition;
-if (event.yPosition > maxY)
-	maxY = event.yPosition;
-if (event.zPressure > maxZ)
-	maxZ = event.zPressure;
-bigtime_t time = system_time();
-dprintf("x %i %i, y %i %i, z %i %i, time %i, fin %i ges %i\n", minX, maxX, minY, maxY,
-	maxZ, event.zPressure, time, event_buffer[2] & 0x2,
-	event_buffer[2] & 0x1);
-// debug end
 
 	// check for trackpoint even (z pressure 127)
 	if (sFoundModel->flags & ALPS_DUALPOINT && event.zPressure == 127) {
@@ -212,6 +252,12 @@ dprintf("x %i %i, y %i %i, z %i %i, time %i, fin %i ges %i\n", minX, maxX, minY,
 		event.yPosition = AREA_END_Y - (event.yPosition - AREA_START_Y);
  		status = cookie->movementMaker.EventToMovement(&event, movement);
 	}
+
+	if (cookie->movementMaker.WasEdgeMotion()
+		|| cookie->movementMaker.TapDragStarted()) {
+		gEventProducer.FireEvent(cookie, event_buffer);
+	}
+
 	return status;
 }
 
@@ -226,7 +272,6 @@ default_settings(touchpad_settings *set)
 status_t
 probe_alps(ps2_dev* dev)
 {
-return B_ERROR;
 	int i;
 	uint8 val[3];
 	TRACE("ALPS: probe\n");
@@ -345,6 +390,8 @@ alps_open(const char *name, uint32 flags, void **_cookie)
 	alps_cookie* cookie = (alps_cookie*)malloc(sizeof(alps_cookie));
 	if (cookie == NULL)
 		goto err1;
+	memset(cookie, 0, sizeof(*cookie));
+
 	cookie->movementMaker.Init();
 	cookie->previousZ = 0;
 	*_cookie = cookie;
@@ -357,7 +404,6 @@ alps_open(const char *name, uint32 flags, void **_cookie)
 	default_settings(&cookie->settings);
 
 	gHardwareSpecs.edgeMotionWidth = EDGE_MOTION_WIDTH;
-	gHardwareSpecs.edgeMotionSpeedFactor = EDGE_MOTION_SPEED;
 
 	gHardwareSpecs.areaStartX = AREA_START_X;
 	gHardwareSpecs.areaEndX = AREA_END_X;
@@ -392,7 +438,7 @@ alps_open(const char *name, uint32 flags, void **_cookie)
 		goto err4;
 		
 	// switch tap mode off
-	if (switch_hardware_tab(dev, true) != B_OK)
+	if (switch_hardware_tab(dev, false) != B_OK)
 		goto err4;
 
 	// init the alps device to absolut mode
@@ -435,7 +481,8 @@ err1:
 status_t
 alps_close(void *_cookie)
 {
-	status_t status;
+	gEventProducer.CancelEvent();
+
 	alps_cookie *cookie = (alps_cookie*)_cookie;
 
 	ps2_dev_command_timeout(cookie->dev, PS2_CMD_DISABLE, NULL, 0, NULL, 0,
@@ -450,7 +497,7 @@ alps_close(void *_cookie)
 	// Reset the touchpad so it generate standard ps2 packets instead of
 	// extended ones. If not, BeOS is confused with such packets when rebooting
 	// without a complete shutdown.
-	status = ps2_reset_mouse(cookie->dev);
+	status_t status = ps2_reset_mouse(cookie->dev);
 	if (status != B_OK) {
 		INFO("ps2: reset failed\n");
 		return B_ERROR;
@@ -505,7 +552,7 @@ alps_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 
 
 static status_t
-alps_read(void *cookie, off_t pos, void *buffer, size_t *_length)
+alps_read(void* cookie, off_t pos, void* buffer, size_t* _length)
 {
 	*_length = 0;
 	return B_NOT_ALLOWED;
@@ -513,7 +560,7 @@ alps_read(void *cookie, off_t pos, void *buffer, size_t *_length)
 
 
 static status_t
-alps_write(void *cookie, off_t pos, const void *buffer, size_t *_length)
+alps_write(void* cookie, off_t pos, const void* buffer, size_t* _length)
 {
 	*_length = 0;
 	return B_NOT_ALLOWED;
@@ -521,11 +568,14 @@ alps_write(void *cookie, off_t pos, const void *buffer, size_t *_length)
 
 
 int32
-alps_handle_int(ps2_dev *dev)
+alps_handle_int(ps2_dev* dev)
 {
-	alps_cookie *cookie = (alps_cookie*)dev->cookie;
-	uint8 val;
+	alps_cookie* cookie = (alps_cookie*)dev->cookie;
 
+	// we got a real event cancel the fake event
+	gEventProducer.CancelEvent();
+
+	uint8 val;
 	val = cookie->dev->history[0].data;
 	if (cookie->packet_index == 0
 		&& (val & sFoundModel->maskFirstByte) != sFoundModel->firstByte) {

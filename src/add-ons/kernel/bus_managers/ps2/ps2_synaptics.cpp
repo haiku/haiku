@@ -23,7 +23,6 @@
 
 // synaptics touchpad proportions
 #define SYN_EDGE_MOTION_WIDTH	50
-#define SYN_EDGE_MOTION_SPEED	5
 #define SYN_AREA_OFFSET			40
 
 #define MIN_PRESSURE			30
@@ -345,7 +344,6 @@ synaptics_open(const char *name, uint32 flags, void **_cookie)
 	default_settings(&cookie->settings);
 
 	gHardwareSpecs.edgeMotionWidth = SYN_EDGE_MOTION_WIDTH;
-	gHardwareSpecs.edgeMotionSpeedFactor = SYN_EDGE_MOTION_SPEED;
 
 	gHardwareSpecs.areaStartX = SYN_AREA_START_X;
 	gHardwareSpecs.areaEndX = SYN_AREA_END_X;
