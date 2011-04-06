@@ -332,6 +332,8 @@ synaptics_open(const char *name, uint32 flags, void **_cookie)
 	cookie = (synaptics_cookie*)malloc(sizeof(synaptics_cookie));
 	if (cookie == NULL)
 		goto err1;
+	memset(cookie, 0, sizeof(*cookie));
+
 	cookie->movementMaker.Init();
 	*_cookie = cookie;
 
