@@ -93,7 +93,6 @@ private:
 			BMenuItem*			fUndoItem;
 			BMenuItem*			fCutItem;
 			BMenuItem*			fCopyItem;
-			BMenuItem*			fClearItem;
 
 			BMenuItem*			fFindAgainItem;
 			BMenuItem*			fReplaceSameItem;

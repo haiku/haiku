@@ -440,12 +440,10 @@ StyledEditWindow::MessageReceived(BMessage* message)
 		case ENABLE_ITEMS:
 			fCutItem->SetEnabled(true);
 			fCopyItem->SetEnabled(true);
-			fClearItem->SetEnabled(true);
 			break;
 		case DISABLE_ITEMS:
 			fCutItem->SetEnabled(false);
 			fCopyItem->SetEnabled(false);
-			fClearItem->SetEnabled(false);
 			break;
 		case TEXT_CHANGED:
 			if (fUndoFlag) {
