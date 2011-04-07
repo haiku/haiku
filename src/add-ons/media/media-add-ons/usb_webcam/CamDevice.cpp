@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "CamDevice.h"
 #include "CamSensor.h"
 #include "CamDeframer.h"
@@ -49,8 +50,7 @@ CamDevice::CamDevice(CamDeviceAddon &_addon, BUSBDevice* _device)
 	memset(&fFlavorInfo, 0, sizeof(fFlavorInfo));
 	_addon.WebCamAddOn()->FillDefaultFlavorInfo(&fFlavorInfo);
 	// if we use id matching, cache the index to the list
-	if (fCamDeviceAddon.SupportedDevices())
-	{
+	if (fCamDeviceAddon.SupportedDevices()) {
 		fSupportedDeviceIndex = fCamDeviceAddon.Sniff(_device);
 		fFlavorInfoNameStr = "";
 		fFlavorInfoNameStr << fCamDeviceAddon.SupportedDevices()[fSupportedDeviceIndex].vendor << " USB Webcam";
@@ -90,7 +90,7 @@ CamDevice::InitCheck()
 bool
 CamDevice::Matches(BUSBDevice* _device)
 {
-	return (_device) == (fDevice);
+	return _device == fDevice;
 }
 
 
@@ -156,7 +156,8 @@ CamDevice::StartTransfer()
 	PRINT((CH "()" CT));
 	if (fTransferEnabled)
 		return EALREADY;
-	fPumpThread = spawn_thread(_DataPumpThread, "USB Webcam Data Pump", 50, this);
+	fPumpThread = spawn_thread(_DataPumpThread, "USB Webcam Data Pump", 50,
+		this);
 	if (fPumpThread < B_OK)
 		return fPumpThread;
 	if (fSensor)
@@ -193,6 +194,18 @@ CamDevice::StopTransfer()
 
 
 status_t
+CamDevice::SuggestVideoFrame(uint32 &width, uint32 &height)
+{
+	if (Sensor()) {
+		width = Sensor()->MaxWidth();
+		height = Sensor()->MaxHeight();
+		return B_OK;
+	}
+	return B_NO_INIT;
+}
+
+
+status_t
 CamDevice::AcceptVideoFrame(uint32 &width, uint32 &height)
 {
 	status_t err = ENOSYS;
@@ -200,7 +213,7 @@ CamDevice::AcceptVideoFrame(uint32 &width, uint32 &height)
 		err = Sensor()->AcceptVideoFrame(width, height);
 	if (err < B_OK)
 		return err;
-	fVideoFrame = BRect(0, 0, width - 1, height - 1);
+	SetVideoFrame(BRect(0, 0, width - 1, height - 1));
 	return B_OK;
 }
 
@@ -221,7 +234,8 @@ CamDevice::SetScale(float scale)
 
 
 status_t
-CamDevice::SetVideoParams(float brightness, float contrast, float hue, float red, float green, float blue)
+CamDevice::SetVideoParams(float brightness, float contrast, float hue,
+	float red, float green, float blue)
 {
 	return B_OK;
 }
@@ -235,14 +249,16 @@ CamDevice::AddParameters(BParameterGroup *group, int32 &index)
 
 
 status_t
-CamDevice::GetParameterValue(int32 id, bigtime_t *last_change, void *value, size_t *size)
+CamDevice::GetParameterValue(int32 id, bigtime_t *last_change, void *value,
+	size_t *size)
 {
 	return B_BAD_VALUE;
 }
 
 
 status_t
-CamDevice::SetParameterValue(int32 id, bigtime_t when, const void *value, size_t size)
+CamDevice::SetParameterValue(int32 id, bigtime_t when, const void *value,
+	size_t size)
 {
 	return B_BAD_VALUE;
 }
@@ -270,7 +286,8 @@ CamDevice::ValidateStartOfFrameTag(const uint8 *tag, size_t taglen)
 
 
 bool
-CamDevice::ValidateEndOfFrameTag(const uint8 *tag, size_t taglen, size_t datalen)
+CamDevice::ValidateEndOfFrameTag(const uint8 *tag, size_t taglen,
+	size_t datalen)
 {
 	return true;
 }
@@ -449,8 +466,7 @@ CamDevice::ProbeSensor()
 	if (fCamDeviceAddon.SupportedDevices() == NULL)
 		return B_ERROR;
 	devs = fCamDeviceAddon.SupportedDevices();
-	for (i = 0; devs[i].vendor; i++)
-	{
+	for (i = 0; devs[i].vendor; i++) {
 		if (GetDevice()->VendorID() != devs[i].desc.vendor)
 			continue;
 		if (GetDevice()->ProductID() != devs[i].desc.product)
@@ -474,7 +490,8 @@ CamDevice::ProbeSensor()
 			if (err >= B_OK)
 				return B_OK;
 
-			PRINT((CH ": sensor '%s' Probe: %s" CT, name.String(), strerror(err)));
+			PRINT((CH ": sensor '%s' Probe: %s" CT, name.String(),
+				strerror(err)));
 
 			delete fSensor;
 			fSensor = NULL;
@@ -491,8 +508,7 @@ CamDevice::ProbeSensor()
 CamSensor *
 CamDevice::CreateSensor(const char *name)
 {
-	int i;
-	for (i = 0; kSensorTable[i].name; i++) {
+	for (int32 i = 0; kSensorTable[i].name; i++) {
 		if (!strcmp(kSensorTable[i].name, name))
 			return kSensorTable[i].instfunc(this);
 	}
@@ -610,16 +626,16 @@ CamDevice::DumpRegs()
 
 status_t
 CamDevice::SendCommand(uint8 dir, uint8 request, uint16 value,
-							uint16 index, uint16 length, void* data)
+	uint16 index, uint16 length, void* data)
 {
-	size_t ret;
+	ssize_t ret;
 	if (!GetDevice())
 		return ENODEV;
 	if (length > GetDevice()->MaxEndpoint0PacketSize())
 		return EINVAL;
 	ret = GetDevice()->ControlTransfer(
-				USB_REQTYPE_VENDOR | USB_REQTYPE_INTERFACE_OUT | dir,
-				request, value, index, length, data);
+		USB_REQTYPE_VENDOR | USB_REQTYPE_INTERFACE_OUT | dir,
+		request, value, index, length, data);
 	return ret;
 }
 

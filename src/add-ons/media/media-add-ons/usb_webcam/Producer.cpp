@@ -340,9 +340,10 @@ VideoProducer::FormatSuggestionRequested(
 			format->u.raw_video.display.line_count));
 
 	*format = fOutput.format;
-	if (fCamDevice && fCamDevice->Sensor()) {
-		format->u.raw_video.display.line_width = fCamDevice->Sensor()->MaxWidth();
-		format->u.raw_video.display.line_count = fCamDevice->Sensor()->MaxHeight();
+	uint32 width, height;
+	if (fCamDevice && fCamDevice->SuggestVideoFrame(width, height) == B_OK) {
+		format->u.raw_video.display.line_width = width;
+		format->u.raw_video.display.line_count = height;
 	}
 	format->u.raw_video.field_rate = FIELD_RATE;
 	return B_OK;

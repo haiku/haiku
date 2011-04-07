@@ -61,6 +61,7 @@ class CamDevice {
 	virtual status_t	StopTransfer();
 	virtual bool		TransferEnabled() const { return fTransferEnabled; };
 
+	virtual status_t	SuggestVideoFrame(uint32 &width, uint32 &height);
 	virtual status_t	AcceptVideoFrame(uint32 &width, uint32 &height);
 	virtual status_t	SetVideoFrame(BRect rect);
 	virtual BRect		VideoFrame() const { return fVideoFrame; };
