@@ -381,7 +381,6 @@ void
 DeskbarView::MouseDown(BPoint pos)
 {
 	Looper()->CurrentMessage()->FindInt32("buttons",&fLastButtons);
-	Looper()->CurrentMessage()->PrintToStream();
 
 	if (fLastButtons & B_SECONDARY_MOUSE_BUTTON) {
 		ConvertToScreen(&pos);
