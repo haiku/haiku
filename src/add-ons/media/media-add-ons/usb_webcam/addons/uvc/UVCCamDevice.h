@@ -20,13 +20,28 @@ public:
 	virtual bool				SupportsIsochronous();
 	virtual status_t			StartTransfer();
 	virtual status_t			StopTransfer();
+	virtual status_t			SuggestVideoFrame(uint32 &width,
+									uint32 &height);
+	virtual status_t			AcceptVideoFrame(uint32 &width,
+									uint32 &height);
+
 private:
-			void				ParseVideoControl(
+			void				_ParseVideoControl(
 									const usbvc_class_descriptor* descriptor,
 									size_t len);
-			void				ParseVideoStreaming(
+			void				_ParseVideoStreaming(
 									const usbvc_class_descriptor* descriptor,
 									size_t len);
+			status_t			_ProbeCommitFormat();
+			status_t			_SelectBestAlternate();
+
+			usbvc_interface_header_descriptor *fHeaderDescriptor;
+			
+			const BUSBEndpoint*	fInterruptIn;
+			uint32				fControlIndex;
+			uint32				fStreamingIndex;
+			uint32				fMaxVideoFrameSize;
+			uint32				fMaxPayloadTransferSize;
 };
 
 

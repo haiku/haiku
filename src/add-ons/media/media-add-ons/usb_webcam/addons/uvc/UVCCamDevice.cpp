@@ -70,6 +70,7 @@ UVCCamDevice::UVCCamDevice(CamDeviceAddon &_addon, BUSBDevice* _device)
 
 	for (uint32 i = 0; i < _device->CountConfigurations(); i++) {
 		config = _device->ConfigurationAt(i);
+		_device->SetConfiguration(config);
 		for (uint32 j = 0; j < config->CountInterfaces(); j++) {
 			interface = config->InterfaceAt(j);
 
@@ -81,26 +82,43 @@ UVCCamDevice::UVCCamDevice(CamDeviceAddon &_addon, BUSBDevice* _device)
 				// look for class specific interface descriptors and parse them
 				for (uint32 k = 0; interface->OtherDescriptorAt(k, generic,
 					sizeof(buffer)) == B_OK; k++) {
-					if (generic->generic.descriptor_type == (USB_REQTYPE_CLASS
-						| USB_DESCRIPTOR_INTERFACE)) {
-						ParseVideoControl((const usbvc_class_descriptor*)generic,
-							generic->generic.length);
-					}
+					if (generic->generic.descriptor_type != (USB_REQTYPE_CLASS
+						| USB_DESCRIPTOR_INTERFACE))
+						continue;
+					fControlIndex = interface->Index();
+					_ParseVideoControl((const usbvc_class_descriptor*)generic,
+						generic->generic.length);
 				}
 
+				for (uint32 k = 0; k < interface->CountEndpoints(); k++) {
+					const BUSBEndpoint *e = interface->EndpointAt(i);
+					if (e && e->IsInterrupt() && e->IsInput()) {
+						fInterruptIn = e;
+						break;
+					}
+				}
 				fInitStatus = B_OK;
 			} else if (interface->Class() == CC_VIDEO && interface->Subclass()
 				== SC_VIDEOSTREAMING) {
-				printf("UVCCamDevice: (%lu,%lu): Found Video Control interface.\n",
-					i, j);
+				printf("UVCCamDevice: (%lu,%lu): Found Video Streaming "
+					"interface.\n", i, j);
 
 				// look for class specific interface descriptors and parse them
 				for (uint32 k = 0; interface->OtherDescriptorAt(k, generic,
 					sizeof(buffer)) == B_OK; k++) {
-					if (generic->generic.descriptor_type == (USB_REQTYPE_CLASS
-						| USB_DESCRIPTOR_INTERFACE)) {
-						ParseVideoStreaming((const usbvc_class_descriptor*)generic,
-							generic->generic.length);
+					if (generic->generic.descriptor_type != (USB_REQTYPE_CLASS
+						| USB_DESCRIPTOR_INTERFACE))
+						continue;
+					fStreamingIndex = interface->Index();
+					_ParseVideoStreaming((const usbvc_class_descriptor*)generic,
+						generic->generic.length);
+				}
+				
+				for (uint32 k = 0; k < interface->CountEndpoints(); k++) {
+					const BUSBEndpoint *e = interface->EndpointAt(i);
+					if (e && e->IsIsochronous() && e->IsInput()) {
+						fIsoIn = e;
+						break;
 					}
 				}
 			}
@@ -109,8 +127,13 @@ UVCCamDevice::UVCCamDevice(CamDeviceAddon &_addon, BUSBDevice* _device)
 }
 
 
+UVCCamDevice::~UVCCamDevice()
+{
+}
+
+
 void
-UVCCamDevice::ParseVideoStreaming(const usbvc_class_descriptor* _descriptor,
+UVCCamDevice::_ParseVideoStreaming(const usbvc_class_descriptor* _descriptor,
 	size_t len)
 {
 	switch(_descriptor->descriptorSubtype) {
@@ -328,20 +351,20 @@ UVCCamDevice::ParseVideoStreaming(const usbvc_class_descriptor* _descriptor,
 
 
 void
-UVCCamDevice::ParseVideoControl(const usbvc_class_descriptor* _descriptor,
+UVCCamDevice::_ParseVideoControl(const usbvc_class_descriptor* _descriptor,
 	size_t len)
 {
 	switch(_descriptor->descriptorSubtype) {
 		case VC_HEADER:
 		{
-			const usbvc_interface_header_descriptor* descriptor =
-				(const usbvc_interface_header_descriptor*)_descriptor;
+			fHeaderDescriptor = (usbvc_interface_header_descriptor*)_descriptor;
 			printf("VC_HEADER:\tUVC v%x.%02x, clk %.5f MHz\n",
-				descriptor->version >> 8, descriptor->version & 0xff,
-				descriptor->clockFrequency / 1000000.0);
-			for (uint8 i = 0; i < descriptor->numInterfacesNumbers; i++) {
+				fHeaderDescriptor->version >> 8,
+				fHeaderDescriptor->version & 0xff,
+				fHeaderDescriptor->clockFrequency / 1000000.0);
+			for (uint8 i = 0; i < fHeaderDescriptor->numInterfacesNumbers; i++) {
 				printf("\tStreaming Interface %d\n",
-					descriptor->interfaceNumbers[i]);
+					fHeaderDescriptor->interfaceNumbers[i]);
 			}
 			break;
 		}
@@ -477,11 +500,6 @@ UVCCamDevice::ParseVideoControl(const usbvc_class_descriptor* _descriptor,
 }
 
 
-UVCCamDevice::~UVCCamDevice()
-{
-}
-
-
 bool
 UVCCamDevice::SupportsIsochronous()
 {
@@ -492,6 +510,8 @@ UVCCamDevice::SupportsIsochronous()
 status_t
 UVCCamDevice::StartTransfer()
 {
+	if (_ProbeCommitFormat() != B_OK || _SelectBestAlternate() != B_OK)
+		return B_ERROR;
 	return CamDevice::StartTransfer();
 }
 
@@ -500,6 +520,132 @@ status_t
 UVCCamDevice::StopTransfer()
 {
 	return CamDevice::StopTransfer();
+}
+
+
+status_t
+UVCCamDevice::SuggestVideoFrame(uint32 &width, uint32 &height)
+{
+	width = 320;
+	height = 240;
+	return B_OK;
+}
+
+
+status_t
+UVCCamDevice::AcceptVideoFrame(uint32 &width, uint32 &height)
+{
+	width = 320;
+	height = 240;
+	
+	SetVideoFrame(BRect(0, 0, width - 1, height - 1));
+	return B_OK;
+}
+
+
+status_t
+UVCCamDevice::_ProbeCommitFormat()
+{
+	usbvc_probecommit request;
+	memset(&request, 0, sizeof(request));
+	request.hint = 1 << 8;
+	request.SetFrameInterval(333333);
+	request.formatIndex = 1;
+	request.frameIndex = 3;
+	size_t length = fHeaderDescriptor->version > 0x100 ? 34 : 26;
+	size_t actualLength = fDevice->ControlTransfer(
+		USB_REQTYPE_CLASS | USB_REQTYPE_INTERFACE_OUT, SET_CUR,
+		VS_PROBE_CONTROL << 8, fStreamingIndex, length, &request);
+	if (actualLength != length) {
+		fprintf(stderr, "UVCCamDevice::_ProbeFormat() SET_CUR ProbeControl1"
+			" failed %ld\n", actualLength);
+		return B_ERROR;
+	}
+
+	usbvc_probecommit response;
+	actualLength = fDevice->ControlTransfer(
+		USB_REQTYPE_CLASS | USB_REQTYPE_INTERFACE_IN, GET_MAX,
+		VS_PROBE_CONTROL << 8, fStreamingIndex, sizeof(response), &response);
+	if (actualLength != sizeof(response)) {
+		fprintf(stderr, "UVCCamDevice::_ProbeFormat() GetMax ProbeControl"
+			" failed\n");
+		return B_ERROR;
+	}
+	
+	printf("usbvc_probecommit response.compQuality %d\n", response.compQuality);
+	request.compQuality = response.compQuality;
+
+	actualLength = fDevice->ControlTransfer(
+		USB_REQTYPE_CLASS | USB_REQTYPE_INTERFACE_OUT, SET_CUR,
+		VS_PROBE_CONTROL << 8, fStreamingIndex, length, &request);
+	if (actualLength != length) {
+		fprintf(stderr, "UVCCamDevice::_ProbeFormat() SetCur ProbeControl2"
+			" failed\n");
+		return B_ERROR;
+	}
+
+	actualLength = fDevice->ControlTransfer(
+		USB_REQTYPE_CLASS | USB_REQTYPE_INTERFACE_OUT, SET_CUR,
+		VS_COMMIT_CONTROL << 8, fStreamingIndex, length, &request);
+	if (actualLength != length) {
+		fprintf(stderr, "UVCCamDevice::_ProbeFormat() SetCur CommitControl"
+			" failed\n");
+		return B_ERROR;
+	}
+	
+	fMaxVideoFrameSize = response.maxVideoFrameSize;
+	fMaxPayloadTransferSize = response.maxPayloadTransferSize;	
+	printf("usbvc_probecommit setup done maxVideoFrameSize:%ld"
+		" maxPayloadTransferSize:%ld\n", fMaxVideoFrameSize,
+		fMaxPayloadTransferSize);
+	
+	return B_OK;
+}
+
+
+status_t
+UVCCamDevice::_SelectBestAlternate()
+{
+	const BUSBConfiguration *config = fDevice->ActiveConfiguration();
+	const BUSBInterface *streaming = config->InterfaceAt(fStreamingIndex);
+	
+	uint32 bestBandwidth = 0;
+	uint32 alternateIndex = 0;
+	uint32 endpointIndex = 0;
+	
+	for (uint32 i = 0; i < streaming->CountAlternates(); i++) {
+		const BUSBInterface *alternate = streaming->AlternateAt(i);
+		for (uint32 j = 0; j < alternate->CountEndpoints(); j++) {
+			const BUSBEndpoint *endpoint = alternate->EndpointAt(j);
+			if (!endpoint->IsIsochronous() || !endpoint->IsInput())
+				continue;
+			if (fMaxPayloadTransferSize > endpoint->MaxPacketSize())
+				continue;
+			if (bestBandwidth != 0
+				&& bestBandwidth < endpoint->MaxPacketSize())
+				continue;
+			bestBandwidth = endpoint->MaxPacketSize();
+			endpointIndex = j;
+			alternateIndex = i;
+		}
+	}
+	
+	if (bestBandwidth == 0) {
+		fprintf(stderr, "UVCCamDevice::_SelectBestAlternate()"
+			" couldn't find a valid alternate\n");
+		return B_ERROR;
+	}
+	
+	printf("UVCCamDevice::_SelectBestAlternate() %ld\n", bestBandwidth);
+	if (((BUSBInterface *)streaming)->SetAlternate(alternateIndex) != B_OK) {
+		fprintf(stderr, "UVCCamDevice::_SelectBestAlternate()"
+			" selecting alternate failed\n");
+		return B_ERROR;
+	}
+	
+	fIsoIn = streaming->EndpointAt(endpointIndex);
+	
+	return B_OK;
 }
 
 
