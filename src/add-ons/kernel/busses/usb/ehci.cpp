@@ -435,6 +435,7 @@ EHCI::SubmitTransfer(Transfer *transfer)
 
 	Pipe *pipe = transfer->TransferPipe();
 	if (pipe->Type() & USB_OBJECT_ISO_PIPE) {
+		TRACE_ERROR("isochronous transfers not implemented\n");
 		// ToDo: implement isochronous transfers...
 		return B_ERROR;
 	}

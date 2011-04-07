@@ -1245,6 +1245,7 @@ OHCI::_SubmitTransfer(Transfer *transfer)
 status_t
 OHCI::_SubmitIsochronousTransfer(Transfer *transfer)
 {
+	TRACE_ERROR("isochronous transfers not implemented\n");
 	return B_ERROR;
 }
 
