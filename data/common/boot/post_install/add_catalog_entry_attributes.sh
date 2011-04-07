@@ -8,7 +8,7 @@ WriteCatalogEntryAttribute()
 	
 	if ! [ -e "$2" ]
 	then
-		mkdir "$2"
+		mkdir --parents "$2"
 	fi
 
 	addattr -t string SYS:NAME "$1:$3:$(basename "$2")" "$2"
