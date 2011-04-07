@@ -22,6 +22,7 @@
 #include <Button.h>
 #include <Catalog.h>
 #include <CheckBox.h>
+#include <ControlLook.h>
 #include <File.h>
 #include <FilePanel.h>
 #include <FindDirectory.h>
@@ -190,12 +191,15 @@ ScreenshotWindow::ScreenshotWindow(const Utility& utility, bool silent,
 	BButton* saveScreenshot  = new BButton("", B_TRANSLATE("Save"),
 		new BMessage(kSaveScreenshot));
 
+	const float kSpacing = be_control_look->DefaultItemSpacing();
+	const float kLabelSpacing = be_control_look->DefaultLabelSpacing();
+
 	fPreview = new PreviewView();
 	
-	BGridLayout* gridLayout = BGridLayoutBuilder(0.0, 5.0)
+	BGridLayout* gridLayout = BGridLayoutBuilder(0.0, kSpacing / 2)
 		.Add(fDelayControl->CreateLabelLayoutItem(), 0, 0)
 		.Add(fDelayControl->CreateTextViewLayoutItem(), 1, 0)
-		.Add(BSpaceLayoutItem::CreateHorizontalStrut(5), 2, 0)
+		.Add(BSpaceLayoutItem::CreateHorizontalStrut(kLabelSpacing), 2, 0)
 		.Add(seconds, 3, 0)	
 		.Add(fNameControl->CreateLabelLayoutItem(), 0, 1)
 		.Add(fNameControl->CreateTextViewLayoutItem(), 1, 1, 3, 1)
@@ -210,21 +214,21 @@ ScreenshotWindow::ScreenshotWindow(const Utility& utility, bool silent,
 	SetLayout(new BGroupLayout(B_HORIZONTAL, 0));
 
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10.0)
+		.Add(BGroupLayoutBuilder(B_HORIZONTAL, kSpacing)
 			.Add(fPreview)
 			.AddGroup(B_VERTICAL, 0)
 				.Add(fActiveWindow)
 				.Add(fWindowBorder)
 				.Add(fShowCursor)
-				.AddStrut(10.0)
+				.AddStrut(kSpacing)
 				.Add(gridLayout)
 				.Add(showSettings)
 				.AddGlue()
 				.End())
-		.AddStrut(10)
+		.AddStrut(kSpacing)
 		.Add(divider)
-		.AddStrut(10)
-		.AddGroup(B_HORIZONTAL, 10.0)
+		.AddStrut(kSpacing)
+		.AddGroup(B_HORIZONTAL, kSpacing)
 			.Add(new BButton("", B_TRANSLATE("Copy to clipboard"),
 				new BMessage(B_COPY)))
 			.Add(new BButton("", B_TRANSLATE("New screenshot"),
@@ -232,7 +236,7 @@ ScreenshotWindow::ScreenshotWindow(const Utility& utility, bool silent,
 			.AddGlue()
 			.Add(saveScreenshot)
 			.End()
-		.SetInsets(10.0, 10.0, 10.0, 10.0)
+		.SetInsets(kSpacing, kSpacing, kSpacing, kSpacing)
 	);
 
 	saveScreenshot->MakeDefault(true);
