@@ -347,10 +347,14 @@ IconRenderer::_Render(const BRect& r)
 	for (int32 i = 0; i < shapeCount; i++) {
 		Shape* shape = fIcon->Shapes()->ShapeAtFast(i);
 
-		// don't render shape if the Level Of Detail falls out of range
+		// Don't render shape if the Level Of Detail falls out of range.
+		// That's unless the scale is bigger than the maximum
+		// MaxVisibilityScale of 4.0f.
 		if (fGlobalTransform.scale() < shape->MinVisibilityScale()
-			|| fGlobalTransform.scale() > shape->MaxVisibilityScale())
+			|| (fGlobalTransform.scale() > shape->MaxVisibilityScale()
+				&& shape->MaxVisibilityScale() < 4.0f)) {
 			continue;
+		}
 
 		Transformation transform(*shape);
 		transform.multiply(fGlobalTransform);
