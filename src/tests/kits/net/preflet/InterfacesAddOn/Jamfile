@@ -10,7 +10,7 @@ UseLibraryHeaders agg ;
 
 
 AddResources Interfaces :
-       InterfacesIcons.rdef
+	InterfacesIcons.rdef
 ;
 
 Addon Interfaces :
@@ -19,6 +19,7 @@ Addon Interfaces :
 	NetworkSettings.cpp
 	InterfaceWindow.cpp
 	InterfaceAddressView.cpp
+	InterfaceHardwareView.cpp
 
 	# from src/apps/networkstatus
 	RadioView.cpp

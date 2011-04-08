@@ -11,6 +11,7 @@
 
 #include "NetworkSettings.h"
 #include "InterfaceAddressView.h"
+#include "InterfaceHardwareView.h"
 
 #include <Button.h>
 #include <Catalog.h>
@@ -47,6 +48,7 @@ private:
 			BTabView*			fTabView;
 
 			IPViewMap			fTabIPView;
+			InterfaceHardwareView* fTabHardwareView;
 };
 
 

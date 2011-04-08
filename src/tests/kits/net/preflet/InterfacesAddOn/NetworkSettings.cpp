@@ -41,6 +41,7 @@ NetworkSettings::NetworkSettings(const char* name)
 	fName = name;
 	_DetectProtocols();
 
+	fNetworkDevice = new BNetworkDevice(fName);
 	fNetworkInterface = new BNetworkInterface(fName);
 
 	ReadConfiguration();

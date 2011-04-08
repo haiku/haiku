@@ -83,6 +83,14 @@ public:
 			const char*			Name()  { return fName.String(); }
 			const char*			Domain() { return fDomain.String(); }
 			bool				IsDisabled() { return fDisabled; }
+
+			bool				IsWireless() {
+									return fNetworkDevice->IsWireless(); }
+			bool				IsEthernet() {
+									return fNetworkDevice->IsEthernet(); }
+			bool				HasLink() {
+									return fNetworkDevice->HasLink(); }
+
 			const BString&		WirelessNetwork() { return fWirelessNetwork; }
 
 			BObjectList<BString>& NameServers() { return fNameServers; }
@@ -112,7 +120,10 @@ private:
 			BString				fWirelessNetwork;
 
 			protocols			fProtocols[MAX_PROTOCOLS];
+
 			BNetworkInterface*	fNetworkInterface;
+			BNetworkDevice*		fNetworkDevice;
+
 			InterfaceAddressMap	fInterfaceAddressMap;
 };
 

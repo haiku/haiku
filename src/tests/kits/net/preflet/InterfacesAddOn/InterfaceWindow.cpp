@@ -11,6 +11,8 @@
 
 #include <Application.h>
 
+#include <stdio.h>
+
 
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "NetworkSetupWindow"
@@ -94,6 +96,16 @@ InterfaceWindow::_PopulateTabs()
 {
 	BRect frame = fTabView->Bounds();
 	protocols* supportedFamilies = fNetworkSettings->ProtocolVersions();
+
+	BTab* hardwaretab = new BTab;
+	fTabHardwareView = new InterfaceHardwareView(frame,
+		fNetworkSettings);
+	fTabView->AddTab(fTabHardwareView, hardwaretab);
+
+	if (fNetworkSettings->IsEthernet())
+		hardwaretab->SetLabel("Wired");
+	else
+		hardwaretab->SetLabel("Wirless");
 
 	for (int index = 0; index < MAX_PROTOCOLS; index++)
 	{
