@@ -11,6 +11,7 @@
  *		yellowTAB GmbH
  *		Bernd Korz
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 
 
@@ -236,7 +237,13 @@ ShowImageWindow::ShowImageWindow(BRect frame, const entry_ref& ref,
 		0, 150, B_VERTICAL);
 	AddChild(fVerticalScrollBar);
 
-	SetSizeLimits(250, 100000, 100, 100000);
+	// Update minimum window size
+	float menuBarMinWidth;
+	fBar->GetPreferredSize(&menuBarMinWidth, NULL);
+	float toolBarMinWidth;
+	fToolBarView->GetPreferredSize(&toolBarMinWidth, NULL);
+	SetSizeLimits(std::max(menuBarMinWidth, toolBarMinWidth), 100000, 100,
+		100000);
 
 	// finish creating the window
 	if (_LoadImage() != B_OK) {
