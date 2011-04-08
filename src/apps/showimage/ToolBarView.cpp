@@ -19,8 +19,6 @@ ToolBarView::ToolBarView(BRect frame)
 	GroupLayout()->SetInsets(inset, 2, inset, 3);
 	GroupLayout()->SetSpacing(inset);
 
-	GroupLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
-
 	SetFlags(Flags() | B_FRAME_EVENTS | B_PULSE_NEEDED);
 
 	MoveTo(frame.LeftTop());
@@ -72,6 +70,13 @@ ToolBarView::AddSeparator()
 
 
 void
+ToolBarView::AddGlue()
+{
+	GroupLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
+}
+
+
+void
 ToolBarView::SetActionEnabled(uint32 command, bool enabled)
 {
 	if (BIconButton* button = _FindIconButton(command))
@@ -84,6 +89,21 @@ ToolBarView::SetActionPressed(uint32 command, bool pressed)
 {
 	if (BIconButton* button = _FindIconButton(command))
 		button->SetPressed(pressed);
+}
+
+
+void
+ToolBarView::SetActionVisible(uint32 command, bool visible)
+{
+	BIconButton* button = _FindIconButton(command);
+	if (button == NULL)
+		return;
+	for (int32 i = 0; BLayoutItem* item = GroupLayout()->ItemAt(i); i++) {
+		if (item->View() != button)
+			continue;
+		item->SetVisible(visible);
+		break;
+	}
 }
 
 
@@ -109,8 +129,7 @@ ToolBarView::FrameResized(float width, float height)
 void
 ToolBarView::_AddView(BView* view)
 {
-	// Add before the space layout item at the end
-	GroupLayout()->AddView(GroupLayout()->CountItems() - 1, view);
+	GroupLayout()->AddView(view);
 }
 
 

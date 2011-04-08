@@ -29,9 +29,11 @@ public:
 									const BBitmap* icon,
 									const char* toolTipText = NULL);
 			void				AddSeparator();
+			void				AddGlue();
 
 			void				SetActionEnabled(uint32 command, bool enabled);
 			void				SetActionPressed(uint32 command, bool pressed);
+			void				SetActionVisible(uint32 command, bool visible);
 
 private:
 	virtual	void				Pulse();
