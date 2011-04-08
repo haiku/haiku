@@ -36,10 +36,14 @@ InterfaceAddressView::InterfaceAddressView(BRect frame, int family,
 		new BMessage(M_MODE_NONE)));
 
 	fModeField = new BMenuField("Mode:", fModePopUpMenu);
+	fModeField->SetToolTip(BString("The method for obtaining an IP address"));
 
 	fAddressField = new BTextControl("IP Address:", NULL, NULL);
+	fAddressField->SetToolTip(BString("Your internet protocol address"));
 	fNetmaskField = new BTextControl("Netmask:", NULL, NULL);
+	fNetmaskField->SetToolTip(BString("Your netmask (subnet)"));
 	fGatewayField = new BTextControl("Gateway:", NULL, NULL);
+	fGatewayField->SetToolTip(BString("Your gateway (router)"));
 
 	RevertFields();
 		// Do the initial field population
