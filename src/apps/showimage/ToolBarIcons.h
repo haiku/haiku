@@ -27,6 +27,7 @@ enum {
 	kIconGoPrevious,
 	kIconGoUp,
 	kIconViewFullScreen,
+	kIconViewWindowed,
 	kIconZoomFitBest,
 	kIconZoomFitViewBest,
 	kIconZoomIn,
