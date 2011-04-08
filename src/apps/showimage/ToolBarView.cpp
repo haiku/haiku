@@ -16,7 +16,8 @@ ToolBarView::ToolBarView(BRect frame)
 	BGroupView(B_HORIZONTAL)
 {
 	float inset = ceilf(be_control_look->DefaultItemSpacing() / 2);
-	GroupLayout()->SetInsets(inset, inset, inset, inset);
+	GroupLayout()->SetInsets(inset, 2, inset, 3);
+	GroupLayout()->SetSpacing(inset);
 
 	GroupLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
 
