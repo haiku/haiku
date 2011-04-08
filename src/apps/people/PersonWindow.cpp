@@ -183,6 +183,17 @@ PersonWindow::MessageReceived(BMessage* msg)
 			SaveAs();
 			break;
 
+		case B_UNDO: // fall through
+		case B_CUT:
+		case B_COPY:
+		case B_PASTE:
+		{
+			BView* view = CurrentFocus();
+			if (view != NULL)
+				view->MessageReceived(msg);
+			break;
+		}
+
 		case B_SAVE_REQUESTED:
 		{
 			entry_ref dir;
