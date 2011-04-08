@@ -82,6 +82,7 @@ const char* kSizeFormats[] = {
 
 
 bool NameAttributeText::sSortFolderNamesFirst = false;
+bool RealNameAttributeText::sSortFolderNamesFirst = false;
 
 
 template <class View>
@@ -243,6 +244,8 @@ WidgetAttributeText::NewWidgetText(const Model* model,
 		return new KindAttributeText(model, column);
 	if (strcmp(attrName, kAttrStatName) == 0)
 		return new NameAttributeText(model, column);
+	if (strcmp(attrName, kAttrRealName) == 0)
+		return new RealNameAttributeText(model, column);
 	if (strcmp(attrName, kAttrStatSize) == 0)
 		return new SizeAttributeText(model, column);
 	if (strcmp(attrName, kAttrStatModified) == 0)
@@ -830,6 +833,144 @@ void
 NameAttributeText::SetSortFolderNamesFirst(bool enabled)
 {
 	NameAttributeText::sSortFolderNamesFirst = enabled;
+}
+
+
+bool
+NameAttributeText::IsEditable() const
+{
+	return StringAttributeText::IsEditable()
+		&& !fModel->HasLocalizedName();
+}
+
+
+// #pragma mark -
+
+
+RealNameAttributeText::RealNameAttributeText(const Model* model,
+	const BColumn* column)
+	:
+	StringAttributeText(model, column)
+{
+}
+
+
+int
+RealNameAttributeText::Compare(WidgetAttributeText& attr, BPoseView* view)
+{
+	RealNameAttributeText* compareTo
+		= dynamic_cast<RealNameAttributeText*>(&attr);
+
+	ASSERT(compareTo);
+
+	if (fValueDirty)
+		ReadValue(&fFullValueText);
+
+	if (RealNameAttributeText::sSortFolderNamesFirst)
+		return fModel->CompareFolderNamesFirst(attr.TargetModel());
+
+	return NaturalCompare(fFullValueText.String(),
+		compareTo->ValueAsText(view));
+}
+
+
+void
+RealNameAttributeText::ReadValue(BString* result)
+{
+	*result = fModel->EntryRef()->name;
+
+	fValueDirty = false;
+}
+
+
+void
+RealNameAttributeText::FitValue(BString* result, const BPoseView* view)
+{
+	if (fValueDirty)
+		ReadValue(&fFullValueText);
+	fOldWidth = fColumn->Width();
+	fTruncatedWidth = TruncString(result, fFullValueText.String(),
+		fFullValueText.Length(), view, fOldWidth, B_TRUNCATE_END);
+	fDirty = false;
+}
+
+
+void
+RealNameAttributeText::SetUpEditing(BTextView* textView)
+{
+	DisallowFilenameKeys(textView);
+
+	textView->SetMaxBytes(B_FILE_NAME_LENGTH);
+	textView->SetText(fFullValueText.String(), fFullValueText.Length());
+}
+
+
+bool
+RealNameAttributeText::CommitEditedTextFlavor(BTextView* textView)
+{
+	const char* text = textView->Text();
+
+	BEntry entry(fModel->EntryRef());
+	if (entry.InitCheck() != B_OK)
+		return false;
+
+	BDirectory	parent;
+	if (entry.GetParent(&parent) != B_OK)
+		return false;
+
+	bool removeExisting = false;
+	if (parent.Contains(text)) {
+		BAlert* alert = new BAlert("",
+			B_TRANSLATE("That name is already taken. "
+			"Please type another one."),
+			B_TRANSLATE("Replace other file"),
+			B_TRANSLATE("OK"),
+			NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+
+		alert->SetShortcut(0, 'r');
+
+		if (alert->Go())
+			return false;
+
+		removeExisting = true;
+	}
+
+	// TODO:
+	// use model-flavor specific virtuals for all of these special
+	// renamings
+	status_t result;
+	if (fModel->IsVolume()) {
+		BVolume	volume(fModel->NodeRef()->device);
+		result = volume.InitCheck();
+		if (result == B_OK) {
+			RenameVolumeUndo undo(volume, text);
+
+			result = volume.SetName(text);
+			if (result != B_OK)
+				undo.Remove();
+		}
+	} else {
+		if (fModel->IsQuery()) {
+			BModelWriteOpener opener(fModel);
+			ASSERT(fModel->Node());
+			MoreOptionsStruct::SetQueryTemporary(fModel->Node(), false);
+		}
+
+		RenameUndo undo(entry, text);
+
+		result = entry.Rename(text, removeExisting);
+		if (result != B_OK)
+			undo.Remove();
+	}
+
+	return result == B_OK;
+}
+
+
+void
+RealNameAttributeText::SetSortFolderNamesFirst(bool enabled)
+{
+	RealNameAttributeText::sSortFolderNamesFirst = enabled;
 }
 
 

@@ -2479,6 +2479,8 @@ BPoseView::MessageReceived(BMessage *message)
 								settings.SetSortFolderNamesFirst(sortFolderNamesFirst);
 
 							NameAttributeText::SetSortFolderNamesFirst(settings.SortFolderNamesFirst());
+							RealNameAttributeText::SetSortFolderNamesFirst(
+								settings.SortFolderNamesFirst());
 							SortPoses();
 							Invalidate();
 						}

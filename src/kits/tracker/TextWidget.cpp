@@ -321,9 +321,6 @@ BTextWidget::StartEdit(BRect bounds, BPoseView *view, BPose *pose)
 	if (!IsEditable())
 		return;
 
-	if (pose->TargetModel()->HasLocalizedName())
-		return;
-
 	BEntry entry(pose->TargetModel()->EntryRef());
 	if (entry.InitCheck() == B_OK
 		&& !ConfirmChangeIfWellKnownDirectory(&entry,

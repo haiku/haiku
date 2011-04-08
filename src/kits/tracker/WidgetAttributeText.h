@@ -101,7 +101,7 @@ class WidgetAttributeText {
 
 		Model *TargetModel() const;
 
-		bool IsEditable() const;
+		virtual bool IsEditable() const;
 
 		void SetDirty(bool);
 
@@ -329,6 +329,7 @@ class NameAttributeText : public StringAttributeText {
 		NameAttributeText(const Model *, const BColumn *);
 		virtual void SetUpEditing(BTextView *);
 		virtual void FitValue(BString *result, const BPoseView *);
+		virtual bool IsEditable() const;
 
 		static void SetSortFolderNamesFirst(bool);
 	protected:
@@ -337,6 +338,24 @@ class NameAttributeText : public StringAttributeText {
 		virtual void ReadValue(BString *result);
 
 		static bool sSortFolderNamesFirst;
+};
+
+
+class RealNameAttributeText : public StringAttributeText {
+public:
+							RealNameAttributeText(const Model *,
+								const BColumn *);
+	virtual	void			SetUpEditing(BTextView *);
+	virtual	void			FitValue(BString *result, const BPoseView *);
+
+	static	void			SetSortFolderNamesFirst(bool);
+
+protected:
+	virtual	bool			CommitEditedTextFlavor(BTextView *);
+	virtual	int				Compare(WidgetAttributeText &, BPoseView *view);
+	virtual	void			ReadValue(BString *result);
+
+	static	bool			sSortFolderNamesFirst;
 };
 
 

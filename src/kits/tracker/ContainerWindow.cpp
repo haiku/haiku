@@ -3186,6 +3186,11 @@ BContainerWindow::NewAttributeMenu(BMenu *menu)
 	menu->AddItem(NewAttributeMenuItem(B_TRANSLATE("Name"),
 		kAttrStatName, B_STRING_TYPE, 145, B_ALIGN_LEFT, true, true));
 
+	if (gLocalizedNamePreferred) {
+		menu->AddItem(NewAttributeMenuItem(B_TRANSLATE("Real name"),
+			kAttrRealName, B_STRING_TYPE, 145, B_ALIGN_LEFT, true, true));
+	}
+
 	menu->AddItem(NewAttributeMenuItem (B_TRANSLATE("Size"), kAttrStatSize, B_OFF_T_TYPE,
 		80, B_ALIGN_RIGHT, false, true));
 

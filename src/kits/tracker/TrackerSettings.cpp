@@ -191,6 +191,8 @@ TTrackerState::LoadSettingsIfNeeded()
 	TryReadingSettings();
 
 	NameAttributeText::SetSortFolderNamesFirst(fSortFolderNamesFirst->Value());
+	RealNameAttributeText::SetSortFolderNamesFirst(
+		fSortFolderNamesFirst->Value());
 
 	fSettingsLoaded = true;
 }
@@ -364,6 +366,7 @@ TrackerSettings::SetSortFolderNamesFirst(bool enabled)
 {
 	gTrackerState.fSortFolderNamesFirst->SetValue(enabled);
 	NameAttributeText::SetSortFolderNamesFirst(enabled);
+	RealNameAttributeText::SetSortFolderNamesFirst(enabled);
 }
 
 

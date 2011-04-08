@@ -39,6 +39,7 @@ namespace BPrivate {
 
 // viewable attributes
 #define	kAttrStatName					"_stat/name"
+#define	kAttrRealName					"_stat/realname"
 #define	kAttrStatSize					"_stat/size"
 #define	kAttrStatModified				"_stat/modified"
 #define	kAttrStatCreated				"_stat/created"
