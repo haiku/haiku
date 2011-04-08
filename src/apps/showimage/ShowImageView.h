@@ -178,6 +178,7 @@ private:
 			void				_ToggleSlideShow();
 			void				_StopSlideShow();
 			void				_ExitFullScreen();
+			void				_ShowToolBarIfEnabled(bool show);
 
 private:
 			ShowImageUndo		fUndo;

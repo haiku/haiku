@@ -97,7 +97,9 @@ enum {
 	kMsgOriginalSize			= 'mOSZ',
 	kMsgStretchToWindow			= 'mStW',
 	kMsgNextSlide				= 'mNxS',
-	kMsgToggleToolBar			= 'mTTB'
+	kMsgToggleToolBar			= 'mTTB',
+	kMsgSlideToolBar			= 'mSTB',
+	kMsgFinishSlidingToolBar	= 'mFST'
 };
 
 
@@ -127,7 +129,7 @@ bs_printf(BString* string, const char* format, ...)
 ShowImageWindow::ShowImageWindow(BRect frame, const entry_ref& ref,
 	const BMessenger& trackerMessenger)
 	:
-	BWindow(frame, "", B_DOCUMENT_WINDOW, 0),
+	BWindow(frame, "", B_DOCUMENT_WINDOW, B_AUTO_UPDATE_SIZE_LIMITS),
 	fNavigator(ref, trackerMessenger),
 	fSavePanel(NULL),
 	fBar(NULL),
@@ -148,15 +150,25 @@ ShowImageWindow::ShowImageWindow(BRect frame, const entry_ref& ref,
 {
 	_ApplySettings();
 
+	SetLayout(new BGroupLayout(B_VERTICAL, 0));
+
 	// create menu bar
-	fBar = new BMenuBar(BRect(0, 0, Bounds().right, 1), "menu_bar");
+	fBar = new BMenuBar("menu_bar");
 	_AddMenus(fBar);
+	float menuBarMinWidth = fBar->MinSize().width;
 	AddChild(fBar);
 
-	BRect viewFrame = Bounds();
-	viewFrame.top = fBar->Bounds().Height() + 1;
-	viewFrame.bottom = viewFrame.top + 30;
+	// Add a content view so the tool bar can be moved outside of the
+	// visible portion without colliding with the menu bar.
 
+	BView* contentView = new BView(BRect(), "content", B_FOLLOW_NONE, 0);
+	contentView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	contentView->SetExplicitMinSize(BSize(250, 100));
+	AddChild(contentView);
+
+	// Create the tool bar
+	BRect viewFrame = contentView->Bounds();
+	viewFrame.right -= B_V_SCROLL_BAR_WIDTH;
 	fToolBarView = new ToolBarView(viewFrame);
 
 	// Add the tool icons.
@@ -184,21 +196,21 @@ ShowImageWindow::ShowImageWindow(BRect frame, const entry_ref& ref,
 		B_TRANSLATE("Zoom in"));
 	fToolBarView->AddAction(MSG_ZOOM_OUT, this, tool_bar_icon(kIconZoomOut),
 		B_TRANSLATE("Zoom out"));
-//	fToolBarView->AddSeparator();
-//	fToolBarView->AddAction(MSG_FULL_SCREEN, this,
-//		tool_bar_icon(kIconViewFullScreen), B_TRANSLATE("Full screen"));
+	fToolBarView->AddGlue();
+	fToolBarView->AddAction(MSG_FULL_SCREEN, this,
+		tool_bar_icon(kIconViewWindowed), B_TRANSLATE("Leave full screen"));
+	fToolBarView->SetActionVisible(MSG_FULL_SCREEN, false);
 
 	fToolBarView->ResizeTo(viewFrame.Width(), fToolBarView->MinSize().height);
 
-	AddChild(fToolBarView);
+	contentView->AddChild(fToolBarView);
 
 	if (fShowToolBar)
 		viewFrame.top = fToolBarView->Frame().bottom + 1;
 	else
 		fToolBarView->Hide();
 
-	viewFrame.bottom = Bounds().bottom;
-	viewFrame.right -= B_V_SCROLL_BAR_WIDTH;
+	viewFrame.bottom = contentView->Bounds().bottom;
 	viewFrame.bottom -= B_H_SCROLL_BAR_HEIGHT;
 
 	// create the image view
@@ -208,40 +220,38 @@ ShowImageWindow::ShowImageWindow(BRect frame, const entry_ref& ref,
 	// wrap a scroll view around the view
 	fScrollView = new BScrollView("image_scroller", fImageView,
 		B_FOLLOW_ALL, 0, false, false, B_PLAIN_BORDER);
-	AddChild(fScrollView);
+	contentView->AddChild(fScrollView);
 
 	const int32 kstatusWidth = 190;
 	BRect rect;
-	rect = Bounds();
+	rect = contentView->Bounds();
 	rect.top = viewFrame.bottom + 1;
 	rect.left = viewFrame.left + kstatusWidth;
 	rect.right = viewFrame.right + 1;
 	rect.bottom += 1;
 	BScrollBar* horizontalScrollBar = new BScrollBar(rect, "hscroll",
 		fImageView, 0, 150, B_HORIZONTAL);
-	AddChild(horizontalScrollBar);
+	contentView->AddChild(horizontalScrollBar);
 
 	rect.left = 0;
 	rect.right = kstatusWidth - 1;
 	rect.bottom -= 1;
 	fStatusView = new ShowImageStatusView(rect, "status_view", B_FOLLOW_BOTTOM,
 		B_WILL_DRAW);
-	AddChild(fStatusView);
+	contentView->AddChild(fStatusView);
 
-	rect = Bounds();
+	rect = contentView->Bounds();
 	rect.top = viewFrame.top - 1;
 	rect.left = viewFrame.right + 1;
 	rect.bottom = viewFrame.bottom + 1;
 	rect.right += 1;
 	fVerticalScrollBar = new BScrollBar(rect, "vscroll", fImageView,
 		0, 150, B_VERTICAL);
-	AddChild(fVerticalScrollBar);
+	contentView->AddChild(fVerticalScrollBar);
 
 	// Update minimum window size
-	float menuBarMinWidth;
-	fBar->GetPreferredSize(&menuBarMinWidth, NULL);
-	float toolBarMinWidth;
-	fToolBarView->GetPreferredSize(&toolBarMinWidth, NULL);
+	float toolBarMinWidth = fToolBarView->MinSize().width;
+	printf("menu min size: %.1f, tool bar: %.1f\n", menuBarMinWidth, toolBarMinWidth);
 	SetSizeLimits(std::max(menuBarMinWidth, toolBarMinWidth), 100000, 100,
 		100000);
 
@@ -345,8 +355,8 @@ ShowImageWindow::_BuildViewMenu(BMenu* menu, bool popupMenu)
 	_MarkMenuItem(menu, kMsgStretchToWindow, fImageView->StretchesToBounds());
 
 	if (!popupMenu) {
-		_AddItemMenu(menu, B_TRANSLATE("Show tool bar"), kMsgToggleToolBar, 0,
-			0, this);
+		_AddItemMenu(menu, B_TRANSLATE("Show tool bar"), kMsgToggleToolBar,
+			'T', 0, this);
 		_MarkMenuItem(menu, kMsgToggleToolBar,
 			!fToolBarView->IsHidden(fToolBarView));
 	}
@@ -882,15 +892,8 @@ ShowImageWindow::MessageReceived(BMessage* message)
 
 		case MSG_SLIDE_SHOW:
 		{
-			// TODO: Maybe two distinct messages? Also once the tool bar
-			// automatically shows in full screen mode, the icon should
-			// be a pause. There should be a separate icon to leave full
-			// screen mode as well.
-			bool fullScreen;
-			if (message->FindBool("full screen", &fullScreen) == B_OK
-				&& fullScreen) {
-				_ToggleFullScreen();
-			}
+			bool fullScreen = false;
+			message->FindBool("full screen", &fullScreen);
 
 			BMenuItem* item = fBar->FindItem(message->what);
 			if (item == NULL)
@@ -899,9 +902,13 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			if (item->IsMarked()) {
 				item->SetMarked(false);
 				_StopSlideShow();
+				fToolBarView->SetActionPressed(MSG_SLIDE_SHOW, false);
 			} else if (_ClosePrompt()) {
 				item->SetMarked(true);
+				if (!fFullScreen && fullScreen)
+					_ToggleFullScreen();
 				_StartSlideShow();
+				fToolBarView->SetActionPressed(MSG_SLIDE_SHOW, true);
 			}
 			break;
 		}
@@ -913,6 +920,7 @@ ShowImageWindow::MessageReceived(BMessage* message)
 				item->SetMarked(false);
 
 			_StopSlideShow();
+			fToolBarView->SetActionPressed(MSG_SLIDE_SHOW, false);
 			break;
 		}
 
@@ -1004,13 +1012,61 @@ ShowImageWindow::MessageReceived(BMessage* message)
 		case kMsgToggleToolBar:
 		{
 			fShowToolBar = _ToggleMenuItem(message->what);
-			_SetToolBarVisible(fShowToolBar);
+			_SetToolBarVisible(fShowToolBar, true);
 
 			ShowImageSettings* settings = my_app->Settings();
 
 			if (settings->Lock()) {
 				settings->SetBool("ShowToolBar", fShowToolBar);
 				settings->Unlock();
+			}
+			break;
+		}
+		case kShowToolBarIfEnabled:
+		{
+			bool show;
+			if (message->FindBool("show", &show) != B_OK)
+				break;
+			_SetToolBarVisible(fShowToolBar && show, true);
+			break;
+		}
+		case kMsgSlideToolBar:
+		{
+			float offset;
+			if (message->FindFloat("offset", &offset) == B_OK) {
+				fToolBarView->MoveBy(0, offset);
+				fScrollView->ResizeBy(0, -offset);
+				fScrollView->MoveBy(0, offset);
+				fVerticalScrollBar->ResizeBy(0, -offset);
+				fVerticalScrollBar->MoveBy(0, offset);
+				UpdateIfNeeded();
+				snooze(15000);
+			}
+			break;
+		}
+		case kMsgFinishSlidingToolBar:
+		{
+			float offset;
+			bool show;
+			if (message->FindFloat("offset", &offset) == B_OK
+				&& message->FindBool("show", &show) == B_OK) {
+				// Compensate rounding errors with the final placement
+				if (show) {
+					fToolBarView->MoveTo(fToolBarView->Frame().left, 0);
+				} else {
+					fToolBarView->MoveTo(fToolBarView->Frame().left, offset);
+					fToolBarView->Hide();
+				}
+				BRect frame = fToolBarView->Parent()->Bounds();
+				frame.top = fToolBarView->Frame().bottom + 1;
+				fScrollView->MoveTo(0, frame.top);
+				fScrollView->ResizeTo(fScrollView->Bounds().Width(),
+					frame.Height() - B_H_SCROLL_BAR_HEIGHT + 1);
+				fVerticalScrollBar->MoveTo(
+					frame.right - B_V_SCROLL_BAR_WIDTH + 1, frame.top);
+				fVerticalScrollBar->ResizeTo(
+					fVerticalScrollBar->Bounds().Width(),
+					frame.Height() - B_H_SCROLL_BAR_HEIGHT + 1);
 			}
 			break;
 		}
@@ -1231,7 +1287,7 @@ ShowImageWindow::_ToggleFullScreen()
 		SetFlags(Flags() & ~(B_NOT_RESIZABLE | B_NOT_MOVABLE));
 	}
 
-	fToolBarView->SetActionPressed(MSG_FULL_SCREEN, fFullScreen);
+	fToolBarView->SetActionVisible(MSG_FULL_SCREEN, fFullScreen);
 	_SetToolBarVisible(!fFullScreen && fShowToolBar);
 
 	MoveTo(frame.left, frame.top);
@@ -1453,24 +1509,40 @@ ShowImageWindow::_UpdateRatingMenu()
 
 
 void
-ShowImageWindow::_SetToolBarVisible(bool visible)
+ShowImageWindow::_SetToolBarVisible(bool visible, bool animate)
 {
 	if (visible == !fToolBarView->IsHidden())
 		return;
 
-	float diff = fToolBarView->Bounds().Height() + 1;
-	if (!visible) {
+	float diff = fToolBarView->Bounds().Height() + 2;
+	if (!visible)
 		diff = -diff;
-		fToolBarView->Hide();
-	}
-
-	fScrollView->ResizeBy(0, -diff);
-	fScrollView->MoveBy(0, diff);
-	fVerticalScrollBar->ResizeBy(0, -diff);
-	fVerticalScrollBar->MoveBy(0, diff);
-
-	if (visible)
+	else
 		fToolBarView->Show();
+
+	if (animate) {
+		// Slide the controls into view. We do this with messages in order
+		// not to block the window thread.
+		const float kAnimationOffsets[] = { 0.05, 0.2, 0.5, 0.2, 0.05 };
+		const int32 steps = sizeof(kAnimationOffsets) / sizeof(float);
+		float originalY = fToolBarView->Frame().top;
+		for (int32 i = 0; i < steps; i++) {
+			BMessage message(kMsgSlideToolBar);
+			message.AddFloat("offset", floorf(diff * kAnimationOffsets[i]));
+			PostMessage(&message, this);
+		}
+		BMessage finalMessage(kMsgFinishSlidingToolBar);
+		finalMessage.AddFloat("offset", originalY + diff);
+		finalMessage.AddBool("show", visible);
+		PostMessage(&finalMessage, this);
+	} else {
+		fScrollView->ResizeBy(0, -diff);
+		fScrollView->MoveBy(0, diff);
+		fVerticalScrollBar->ResizeBy(0, -diff);
+		fVerticalScrollBar->MoveBy(0, diff);
+		if (!visible)
+			fToolBarView->Hide();
+	}
 }
 
 

@@ -42,6 +42,7 @@ enum {
 	MSG_SLIDE_SHOW				= 'mSSW',
 	kMsgStopSlideShow			= 'msss',
 	MSG_FULL_SCREEN				= 'mFSC',
+	kShowToolBarIfEnabled		= 'mSTE',
 	MSG_EXIT_FULL_SCREEN		= 'mEFS',
 	MSG_WINDOW_HAS_QUIT			= 'wndq'
 };
@@ -102,7 +103,8 @@ private:
 
 			void				_UpdateRatingMenu();
 
-			void				_SetToolBarVisible(bool visible);
+			void				_SetToolBarVisible(bool visible,
+									bool animate = false);
 
 private:
 			ImageFileNavigator	fNavigator;

@@ -234,9 +234,15 @@ ShowImageView::Pulse()
 	}
 
 	if (fHideCursor && !fHasSelection && !fShowingPopUpMenu && fIsActiveWin) {
-		if (fHideCursorCountDown <= 0)
-			be_app->ObscureCursor();
-		else
+		if (fHideCursorCountDown <= 0) {
+			BPoint mousePos;
+			uint32 buttons;
+			GetMouse(&mousePos, &buttons, false);
+			if (Bounds().Contains(mousePos)) {
+				be_app->ObscureCursor();
+				_ShowToolBarIfEnabled(false);
+			}
+		} else
 			fHideCursorCountDown--;
 	}
 }
@@ -1147,6 +1153,7 @@ void
 ShowImageView::MouseMoved(BPoint point, uint32 state, const BMessage* message)
 {
 	fHideCursorCountDown = HIDE_CURSOR_DELAY_TIME;
+	_ShowToolBarIfEnabled(true);
 	if (fCreatingSelection)
 		_UpdateSelectionRect(point, false);
 	else if (fScrollingBitmap)
@@ -1821,6 +1828,15 @@ ShowImageView::_ExitFullScreen()
 {
 	be_app->ShowCursor();
 	_SendMessageToWindow(MSG_EXIT_FULL_SCREEN);
+}
+
+
+void
+ShowImageView::_ShowToolBarIfEnabled(bool show)
+{
+	BMessage message(kShowToolBarIfEnabled);
+	message.AddBool("show", show);
+	Window()->PostMessage(&message);
 }
 
 
