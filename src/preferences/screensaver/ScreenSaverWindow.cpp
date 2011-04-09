@@ -291,7 +291,7 @@ ModulesView::ModulesView(BRect rect, const char* name,
 	rect.left = fAddButton->Frame().right + 8;
 	AddChild(fSettingsBox = new BBox(rect, "SettingsBox", B_FOLLOW_ALL,
 		B_WILL_DRAW));
-	fSettingsBox->SetLabel(B_TRANSLATE("Module settings"));
+	fSettingsBox->SetLabel(B_TRANSLATE("Screensaver settings"));
 
 	PopulateScreenSaverList();
 	fFilePanel = new BFilePanel();
@@ -634,7 +634,7 @@ ScreenSaverWindow::ScreenSaverWindow()
 	// Create the controls inside the tabs
 	rect = fTabView->ContainerView()->Bounds();
 	_SetupFadeTab(rect);
-	fModulesView = new ModulesView(rect, B_TRANSLATE("Modules"), fSettings);
+	fModulesView = new ModulesView(rect, B_TRANSLATE("Screensavers"), fSettings);
 
 	fTabView->AddTab(fFadeView);
 	fTabView->AddTab(fModulesView);
@@ -677,11 +677,11 @@ ScreenSaverWindow::~ScreenSaverWindow()
 }
 
 
-//! Create the controls for the fade tab
+//! Create the controls for the "General" tab
 void
 ScreenSaverWindow::_SetupFadeTab(BRect rect)
 {
-	fFadeView = new FadeView(rect, B_TRANSLATE("Fade"), fSettings);
+	fFadeView = new FadeView(rect, B_TRANSLATE("General"), fSettings);
 
 	float labelWidth = be_plain_font->StringWidth(B_TRANSLATE("Turn off "
 		"screen")) + 20.0f;
@@ -695,7 +695,7 @@ ScreenSaverWindow::_SetupFadeTab(BRect rect)
 		+ floorf(textHeight / 2);
 
 	fEnableCheckBox = new BCheckBox(BRect(0, 0, 1, 1), "EnableCheckBox",
-		B_TRANSLATE("Enable screen saver"),
+		B_TRANSLATE("Enable screensaver"),
 		new BMessage(kMsgEnableScreenSaverBox));
 	fEnableCheckBox->ResizeToPreferred();
 
@@ -709,7 +709,7 @@ ScreenSaverWindow::_SetupFadeTab(BRect rect)
 	rect.top = fEnableCheckBox->Bounds().bottom + 8.0f;
 	rect.right = box->Bounds().right - 8;
 	BStringView* stringView = new BStringView(rect, NULL,
-		B_TRANSLATE("Run module"));
+		B_TRANSLATE("Start screensaver"));
 	stringView->ResizeToPreferred();
 	box->AddChild(stringView);
 
@@ -913,7 +913,7 @@ ScreenSaverWindow::SetMinimalSizeLimit(float width, float height)
 void
 ScreenSaverWindow::MessageReceived(BMessage *msg)
 {
-	// "Fade" tab, slider updates
+	// "Settings" tab, slider updates
 
 	switch (msg->what) {
 		case kMsgRunSliderChanged:
@@ -939,7 +939,7 @@ ScreenSaverWindow::MessageReceived(BMessage *msg)
 	}
 
 	switch (msg->what) {
-		// "Fade" tab
+		// "General" tab
 
 		case kMsgTurnOffCheckBox:
 			fTurnOffSlider->SetEnabled(
@@ -961,7 +961,7 @@ ScreenSaverWindow::MessageReceived(BMessage *msg)
 			fPasswordWindow->Show();
 			break;
 
-		// "Modules" tab
+		// "Screensavers" tab
 
 		case kMsgUpdateList:
 			fModulesView->PopulateScreenSaverList();
